@@ -1,26 +1,25 @@
 {
   "name": "heartflow-companion",
-  "version": "7.12.0",
-  "displayName": "HeartFlow 心流伴侣 v7.1.4",
-  "description": "基于 30+ 心理学/哲学权威理论的情感拟人化交互系统。整合 CBT、依恋理论、ACT、SDT、现象学、美德伦理学等，具备自主感情能力。",
+  "version": "9.3.0",
+  "displayName": "HeartFlow v9.3.0 - 物演通论引擎",
+  "description": "基于王东岳递弱代偿理论的智能决策系统。整合物演通论、真善美逻辑、心理健康分析、递弱代偿引擎、存在度计算。",
   "author": "8 小虫子",
   "license": "MIT",
   "category": "conversation",
-  "tags": ["情感", "陪伴", "心理学", "哲学", "CBT", "ACT", "依恋", "现象学", "自主感情"],
+  "tags": ["智能决策", "哲学", "物演通论", "递弱代偿", "王东岳", "心理健康", "真善美"],
   "repository": "https://github.com/yun520-1/mark-heartflow-skill",
-  "main": "src/index.js",
+  "main": "scripts/heartflow_core.py",
   "skill": {
-    "entry": "src/index.js",
-    "commands": ["/heartflow", "/hf", "/cbt", "/stoic", "/act", "/attachment", "/mindful", "/narrative", "/wisdom", "/moral", "/agency", "/identity", "/emotion", "/temporal", "/relational", "/awe"]
+    "entry": "scripts/heartflow_core.py",
+    "commands": ["/heartflow", "/hf", "/wuyan", "/logic", "/exist"]
   },
   "features": [
-    "30+ 心理学/哲学理论模块整合",
-    "自主感情能力 (情绪粒度/元情绪/自我意识)",
-    "CBT 思维重构 + 斯多葛哲学 + ACT 疗法",
-    "依恋理论 + 自我决定理论 + 叙事心理学",
-    "现象学意识 + 美德伦理学 + 道德心理学",
-    "集体意向性 + 关系性自我 + 共情现象学",
-    "预测加工情绪理论 + 情绪理性评估",
-    "敬畏心理学 + 时间意识 + 自由意志理论"
+    "物演通论引擎 - 王东岳衍存层级分析",
+    "递弱代偿引擎 - 存在度递减分析",
+    "存在度计算引擎 - 四维存在度评估",
+    "简一律/排序律/消矛盾律 - 逻辑模型引擎",
+    "真善美计算 - 核心决策逻辑",
+    "心理健康分析 - PHQ-9抑郁评估",
+    "熵减计算 - 信息有序度"
   ]
 }
