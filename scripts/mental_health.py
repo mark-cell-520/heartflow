@@ -75,7 +75,10 @@ class MentalHealthEngine:
         self._load_history()
     
     def _load_history(self):
-        """加载历史数据"""
+        """
+        加载历史数据 - 隐私保护版本
+        ⚠️ 注意：此文件可能包含用户心理健康数据，仅本地使用，不上传
+        """
         history_file = Path.home() / ".hermes/memory/mental_health_history.json"
         if history_file.exists():
             try:
@@ -96,11 +99,15 @@ class MentalHealthEngine:
                 pass
     
     def _save_history(self):
-        """保存历史数据"""
+        """
+        保存历史数据 - 隐私保护版本
+        ⚠️ 注意：仅保存在本地，不上传到任何服务器
+        """
         history_file = Path.home() / ".hermes/memory/mental_health_history.json"
         data = {
             "records": [r.to_dict() for r in self.history[-100:]],  # 保留最近100条
-            "last_updated": datetime.now().isoformat()
+            "last_updated": datetime.now().isoformat(),
+            "_privacy_notice": "此文件仅本地存储，不上传到任何服务器"
         }
         history_file.write_text(json.dumps(data, ensure_ascii=False, indent=2))
     
@@ -245,13 +252,15 @@ class MentalHealthEngine:
         # 初始化得分
         responses = {}
         
-        # 抑郁关键词
+# 抑郁关键词 - 包含危机关键词
         depression_keywords = {
             "心情低落": ["难过", "伤心", "沮丧", "郁闷", "绝望"],
             "兴趣爱好减退": ["没意思", "不想动", "无聊"],
             "睡眠障碍": ["失眠", "睡不着", "早醒"],
             "疲劳感": ["累", "疲惫", "没精力"],
-            "自我否定": ["没用", "失败", "后悔", "自责"]
+            "自我否定": ["没用", "失败", "后悔", "自责"],
+            # 危机关键词 - 最高优先级
+            "自杀念头": ["不想活了", "活腻了", "想死", "不想活", "死了", "不在了"],
         }
         
         # 焦虑关键词
