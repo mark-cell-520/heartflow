@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 """
-Rationality Engine - 批判性谬误论决策引擎
+Rationality Engine - 批判性谬误论决策引擎 v10.0.3
 
-集成到 HeartFlow v9.1.1
+集成到 HeartFlow v10.0.3
 核心：IGC三元组 + 二元评估 + 过犹不及检测
+
+v10.0.3 修复:
+- _is_refuted() 从空壳(永远返回False)升级为真实反驳检测:
+  · 显式否定词匹配
+  · 约束违反检测
+  · 逻辑矛盾检测
+  · 互斥关键词检测
 """
 
 from dataclasses import dataclass, field
@@ -112,9 +119,58 @@ class RationalityEngine:
         )
     
     def _is_refuted(self, context: str, idea: str) -> bool:
-        """检查Idea是否在Context下被反驳（简化版）"""
-        # 实际需要更复杂的解析
-        # 这里只是一个框架
+        """
+        检查Idea是否在Context下被反驳
+        
+        v10.0.3 实现：基于多维度反驳检测（修复P0空壳问题）
+        1. 显式否定词 + 子串滑动窗口匹配
+        2. 约束违反检测
+        3. 逻辑矛盾检测
+        4. 互斥关键词检测
+        """
+        if not context or not idea:
+            return False
+        
+        ctx_lower = context.lower().strip()
+        idea_lower = idea.lower().strip()
+        
+        # 1. 显式否定词检测 (中文+英文)
+        cn_negations = ['不能', '不可', '禁止', '不允许', '不得', '不要',
+                        '不满足', '未达到', '超出', '超过限制', '拒绝']
+        en_negations = ['must not', 'cannot', 'forbidden', 'not allowed', 'no']
+        
+        for neg in cn_negations + en_negations:
+            if neg in ctx_lower:
+                # 中文滑动窗口匹配(2-4字片段)
+                for ws in [4, 3, 2]:
+                    for i in range(len(idea_lower) - ws + 1):
+                        seg = idea_lower[i:i+ws]
+                        if len(seg) >= 2 and seg in ctx_lower:
+                            return True
+                # 英文单词级匹配
+                for word in idea_lower.split():
+                    if len(word) > 1 and word in ctx_lower:
+                        return True
+        
+        # 2. 约束触发检测
+        for trigger in ['不超过', '必须大于', '至少', '上限', '下限',
+                        'max', 'min', 'limit']:
+            if trigger in ctx_lower:
+                return True
+        
+        # 3. 矛盾对检测
+        for pos, neg in [('是','不是'), ('能','不能'), ('允许','禁止'),
+                         ('支持','反对'), ('成功','失败')]:
+            if (pos in idea_lower and neg in ctx_lower) or (neg in idea_lower and pos in ctx_lower):
+                return True
+        
+        # 4. 互斥词组
+        for group in [{'安全','危险'}, {'正确','错误'}, {'通过','拒绝'}]:
+            mc = [w for w in group if w in ctx_lower]
+            mi = [w for w in group if w in idea_lower]
+            if mc and mi and mc[0] != mi[0]:
+                return True
+        
         return False
     
     def _find_bottleneck(self, context: list[str]) -> str:

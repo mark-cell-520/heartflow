@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """
-文字理解引擎 v1.0
+文字理解引擎 v10.0.3
 ================
 集成多语言词典，理解文字含义
+
+v10.0.3 修复:
+- 填充 _init_dictionaries() 空壳 (P1-5)
+- 内置中文/英文/成语核心词典
 
 功能:
 - 中文成语查询
@@ -26,9 +30,42 @@ class TextUnderstandingEngine:
         self._init_dictionaries()
     
     def _init_dictionaries(self):
-        """初始化词典"""
-        # 等待各技能加载后填充
-        pass
+        """初始化内置词典 (v10.0.3: 填充空壳)"""
+        # 内置中文核心词库
+        self.dictionaries["chinese"] = {
+            # HeartFlow 核心概念
+            "真善美": {"pinyin": "zhen shan mei", "meaning": "HeartFlow核心评价体系：真理、善良、美感", "pos": "noun"},
+            "觉察": {"pinyin": "jue cha", "meaning": "哲学践行第一层：觉知当下", "pos": "verb"},
+            "存在度": {"pinyin": "cun zai du", "meaning": "物演通论核心概念：存在的程度", "pos": "noun"},
+            "递弱代偿": {"pinyin": "di ruo dai chang", "meaning": "王东岳物演通论核心原理", "pos": "noun"},
+            "熵减": {"pinyin": "shang jian", "meaning": "信息有序度的提升", "pos": "noun"},
+            "心流": {"pinyin": "xin liu", "meaning": "全神贯注的心理状态", "pos": "noun"},
+            # 常用词汇
+            "智慧": {"pinyin": "zhi hui", "meaning": "深刻理解与正确判断的能力", "pos": "noun"},
+            "意识": {"pinyin": "yi shi", "meaning": "对自身和环境的觉知能力", "pos": "noun"},
+            "觉醒": {"pinyin": "jue xing", "meaning": "从无意识状态进入清醒认知", "pos": "verb"},
+        }
+        
+        # 内置英文核心词库
+        self.dictionaries["english"] = {
+            "heartflow": {"phonetic": "/hɑːrtfloʊ/", "pos": "noun", 
+                         "definition": "AI consciousness framework integrating truth, goodness, beauty evaluation"},
+            "wisdom": {"phonetic": "/ˈwɪzdəm/", "pos": "noun",
+                      "definition": "Deep understanding combined with sound judgment"},
+            "mindfulness": {"phonetic": "/ˈmaɪndfʊlnəs/", "pos": "noun",
+                           "definition": "The quality or state of being conscious aware of the present moment"},
+            "entropy": {"phonetic": "/ˈentrəpi/", "pos": "noun",
+                       "definition": "Measure of disorder/uncertainty in a system; opposite of information order"},
+        }
+        
+        # 内置成语词典（轻量版）
+        self.dictionaries["idiom"] = {
+            "守株待兔": {"pinyin": "shǒu zhū dài tù", "meaning": "比喻不主动努力而存侥幸心理", "example": "创新不能守株待兔"},
+            "刻舟求剑": {"pinyin": "kè zhōu qiú jiàn", "meaning": "比喻拘泥不知变通", "example": "方法需要灵活调整，不可刻舟求剑"},
+            "温故知新": {"pinyin": "wēn gù zhī xīn", "meaning": "复习旧知识从而获得新领悟", "example": "通过回顾记忆来获得新的洞察"},
+            "知行合一": {"pinyin": "zhī xíng hé yī", "meaning": "知识与行动的统一", "example": "将理论转化为实践"},
+            "大道至简": {"pinyin": "dà dào zhì jiǎn", "meaning": "最高深的道理往往最简单", "example": "最好的设计是简洁的"},
+        }
     
     def register_dictionary(self, name: str, dict_data: Dict):
         """注册词典"""

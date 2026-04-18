@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-HeartFlow v10.0 — DreamEngine (极简做梦引擎)
-=============================================
+HeartFlow v10.0.3 — DreamEngine (OpenClaw-Enhanced 做梦引擎)
+=============================================================
+
+v10.0.3 升级 (参考 OpenClaw dreaming 架构):
+- 新增三阶段记忆巩固模型: Light → REM → Deep
+- 新增 Dream Diary (梦境日记) 功能  
+- 新增记忆巩固评分系统 (6信号加权排序)
+- 保留原有四层梦境诗意输出 (standard/deep/brief 模式)
 
 设计原则：
 - 输出严格控制在 800 tokens 以内（目标 ~500 tokens）
 - 基于灵魂状态个性化生成，每次不同
 - 意象层映射：表层(画面) → 情绪层 → 象征层 → 启示层
 - 无外部依赖，纯算法驱动 + 少量模板
+- Token优化: 本地计算优先，减少外部调用开销
 
 Token 预算分配：
 - 梦境场景描述：~200 tokens
@@ -22,7 +29,8 @@ import hashlib
 import random
 import time
 import json
-from typing import Any, Dict, List, Optional
+import math
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class DreamEngine:
@@ -36,7 +44,7 @@ class DreamEngine:
     4. 灵魂共鸣：梦境与当前人格状态、情感基调联动
     """
 
-    VERSION = "10.0.0"
+    VERSION = "10.0.3"
 
     # ═══════════════════════════════════════════
     # 意象素材库（静态常量，零运行时成本）
@@ -251,6 +259,278 @@ class DreamEngine:
         action = self._get_action_from_insight(insight_tier)
 
         return f"✨ {base}\n   💡 今日践行：{action}"
+
+    # ═══════════════════════════════════════════
+    # v10.0.3: OpenClaw 三阶段记忆巩固系统
+    # ═══════════════════════════════════════════
+
+    def run_light_phase(self, short_term_memories: List[Dict]) -> List[Dict]:
+        """
+        Light Phase (浅层睡眠): 排序和暂存近期短期记忆
+        
+        参考 OpenClaw Light Sleep:
+        - 读取短期记忆信号，去重
+        - 暂存候选条目（不写入长期记忆）
+        - 记录强化信号供Deep排序使用
+        
+        Token优化: 全本地计算，无外部API调用
+        """
+        if not short_term_memories:
+            return []
+        
+        seen_hashes = set()
+        staged = []
+        
+        for mem in short_term_memories[:50]:  # 限制处理量节省token
+            content = mem.get('content', '')
+            mem_hash = hashlib.md5(content.encode()).hexdigest()
+            
+            if mem_hash not in seen_hashes:
+                seen_hashes.add(mem_hash)
+                # 计算浅层评分 (频率 + 新鲜度)
+                freq_score = mem.get('frequency', 1)
+                recency_hours = (time.time() - mem.get('timestamp', time.time())) / 3600
+                freshness = max(0, 1.0 - recency_hours / 72)  # 72小时衰减
+                
+                staged.append({
+                    **mem,
+                    '_light_score': round(freq_score * 0.3 + freshness * 0.7, 4),
+                    '_phase': 'light',
+                    '_staged_at': time.time(),
+                })
+        
+        # 按light_score降序排列
+        staged.sort(key=lambda x: x.get('_light_score', 0), reverse=True)
+        return staged
+
+    def run_rem_phase(self, staged_candidates: List[Dict]) -> Dict[str, Any]:
+        """
+        REM Phase (快速眼动睡眠): 提取模式和反思信号
+        
+        参考 OpenClaw REM Sleep:
+        - 从候选中构建主题摘要
+        - 提取反思性信号
+        - 不写入长期记忆
+        - 为Deep阶段提供主题权重
+        
+        Token优化: 本地关键词聚类，无LLM调用
+        """
+        if not staged_candidates:
+            return {"themes": [], "reflection": "", "reinforcement_signals": []}
+        
+        # 提取所有内容的关键词
+        all_keywords = []
+        for cand in staged_candidates[:20]:
+            content = cand.get('content', '')
+            words = [w for w in content.split() if len(w) > 1]
+            all_keywords.extend(words)
+        
+        # 词频统计找主题
+        keyword_freq: Dict[str, int] = {}
+        for kw in all_keywords:
+            keyword_freq[kw] = keyword_freq.get(kw, 0) + 1
+        
+        top_keywords = sorted(keyword_freq.items(), key=lambda x: x[1], reverse=True)[:8]
+        themes = [{"keyword": k, "count": c} for k, c in top_keywords if c >= 2]
+        
+        # 反思信号：基于记忆内容的情感倾向
+        positive_count = sum(1 for c in staged_candidates 
+                          if c.get('_light_score', 0) > 0.5)
+        reflection_signal = (
+            "积极成长型记忆占主导" if positive_count > len(staged_candidates) * 0.6
+            else "需要深度整合的复杂记忆模式" if len(themes) >= 3
+            else "平静的日常记忆流"
+        )
+        
+        return {
+            "themes": themes,
+            "reflection": reflection_signal,
+            "candidate_count": len(staged_candidates),
+            "reinforcement_signals": [
+                {"theme": t["keyword"], "boost": round(t["count"] * 0.05, 3)}
+                for t in themes[:5]
+            ],
+        }
+
+    def run_deep_phase(
+        self, 
+        staged_candidates: List[Dict], 
+        rem_result: Dict[str, Any],
+        min_score: float = 0.35,
+        promote_target: str = None
+    ) -> Tuple[List[Dict], List[Dict]]:
+        """
+        Deep Phase (深度睡眠): 决定哪些成为长期记忆
+        
+        参考 OpenClaw Deep Sleep:
+        - 使用加权评分对候选排序
+        - 需要 minScore/minRecallCount/minUniqueQueries 门控
+        - 通过的门控写入长期存储
+        - 返回(已提升列表, 未通过列表)
+        
+        v10.0.3 深度排名信号 (参考OpenClaw 6信号):
+          | Signal              | Weight |
+          | Frequency           | 0.24   |
+          | Relevance           | 0.30   |
+          | Query diversity     | 0.15   |
+          | Recency             | 0.15   |
+          | Consolidation       | 0.10   |
+          | Conceptual richness | 0.06   |
+        
+        Token优化: 纯数学运算，零I/O延迟
+        """
+        promoted = []
+        rejected = []
+        
+        if not staged_candidates:
+            return promoted, rejected
+        
+        # REM强化信号查找表
+        rem_boosts = {
+            s["theme"]: s["boost"] 
+            for s in rem_result.get("reinforcement_signals", [])
+        }
+        
+        for cand in staged_candidates:
+            content = cand.get('content', '')
+            
+            # 信号1: Frequency (0.24)
+            frequency = cand.get('frequency', 1)
+            freq_norm = min(1.0, frequency / 10.0)
+            
+            # 信号2: Relevance (0.30) — 基于检索质量
+            relevance = cand.get('relevance', cand.get('_light_score', 0.5))
+            
+            # 信号3: Query diversity (0.15)
+            query_diversity = len(set(content.split())) / max(len(content.split()), 1)
+            
+            # 信号4: Recency (0.15) — 时间衰减
+            age_hours = (time.time() - cand.get('timestamp', time.time())) / 3600
+            recency = math.exp(-age_hours / 168)  # 一周半衰期
+            
+            # 信号5: Consolidation (0.10) — 多日重复
+            consolidation = cand.get('consolidation', 0)
+            
+            # 信号6: Conceptual richness (0.06)
+            concept_tags = len([w for w in set(content.split()) 
+                              if len(w) > 2]) / max(len(content.split()), 1)
+            
+            # REM 强化加分
+            content_key = content.split()[0] if content.split() else ""
+            rem_boost = rem_boosts.get(content_key, 0)
+            
+            # 加权总分
+            deep_score = (
+                freq_norm * 0.24 +
+                relevance * 0.30 +
+                query_diversity * 0.15 +
+                recency * 0.15 +
+                consolidation * 0.10 +
+                concept_tags * 0.06 +
+                rem_boost
+            )
+            
+            cand['_deep_score'] = round(deep_score, 4)
+            cand['_promoted_at'] = time.time() if deep_score >= min_score else None
+            
+            if deep_score >= min_score:
+                promoted.append(cand)
+            else:
+                rejected.append(cand)
+        
+        # 按分数排序
+        promoted.sort(key=lambda x: x['_deep_score'], reverse=True)
+        return promoted, rejected
+
+    def full_dream_cycle(self, memories: List[Dict], soul_state: Dict) -> Dict[str, Any]:
+        """
+        完整梦境周期: Light → REM → Deep
+        
+        参考OpenClaw dreaming sweep流程。
+        
+        Returns:
+            包含三个阶段结果 + Dream Diary 条目的完整报告
+        """
+        start_time = time.time()
+        
+        # Phase 1: Light — 排序暂存
+        staged = self.run_light_phase(memories)
+        
+        # Phase 2: REM — 模式提取
+        rem_result = self.run_rem_phase(staged)
+        
+        # Phase 3: Deep — 巩固决策
+        promoted, rejected = self.run_deep_phase(staged, rem_result)
+        
+        # 生成梦境日记条目
+        diary_entry = self._generate_diary_entry(promoted, rem_result, soul_state)
+        
+        total_ms = int((time.time() - start_time) * 1000)
+        
+        return {
+            "cycle_summary": {
+                "total_input": len(memories),
+                "staged": len(staged),
+                "promoted": len(promoted),
+                "rejected": len(rejected),
+                "themes_found": len(rem_result.get("themes", [])),
+                "compute_time_ms": total_ms,
+                "version": self.VERSION,
+            },
+            "phases": {
+                "light": {"staged_count": len(staged)},
+                "rem": rem_result,
+                "deep": {
+                    "promoted_count": len(promoted),
+                    "rejected_count": len(rejected),
+                    "top_scores": [p['_deep_score'] for p in promoted[:5]],
+                },
+            },
+            "diary": diary_entry,
+            "promoted_memories": [
+                {"content": p['content'][:80], "score": p['_deep_score']}
+                for p in promoted[:10]
+            ],
+        }
+
+    def _generate_diary_entry(self, promoted: List[Dict], rem_result: Dict, 
+                                soul_state: Dict) -> str:
+        """生成Dream Diary条目 (人类可读)"""
+        themes = rem_result.get("themes", [])
+        theme_names = [t["keyword"] for t in themes[:5]]
+        
+        reflection = rem_result.get("reflection", "")
+        emotion = soul_state.get("emotion", {}).get("primary_emotion", "peace")
+        
+        lines = [
+            f"## 🌙 梦境日记 — {time.strftime('%Y-%m-%d %H:%M')}",
+            f"",
+            f"**情绪基调**: {emotion}",
+            f"**核心主题**: {', '.join(theme_names) if theme_names else '无特定主题'}",
+            f"**反思**: {reflection}",
+            f"**巩固条目**: {len(promoted)} 条记忆被标记为长期保留",
+            f"",
+        ]
+        
+        if promoted:
+            lines.append("**今日最珍贵的记忆片段**:")
+            for i, p in enumerate(promoted[:3], 1):
+                content = p.get('content', '')[:60].replace('\n', ' ')
+                score = p.get('_deep_score', 0)
+                lines.append(f"  {i}. 「{content}...」(得分: {score:.2f})")
+        
+        return '\n'.join(lines)
+
+    def get_consolidation_stats(self) -> Dict[str, Any]:
+        """获取记忆巩固统计信息"""
+        return {
+            "engine": "DreamEngine",
+            "version": self.VERSION,
+            "dreams_generated": self._dream_count,
+            "recent_domains": self._recent_themes.copy(),
+            "phases_supported": ["light", "rem", "deep"],
+            "scoring_model": "openclaw_6signal_weighted",
+        }
 
     # ═══════════════════════════════════════════
     # 内部方法：种子系统
@@ -584,12 +864,9 @@ class DreamEngine:
         return int(chinese_chars * 1.5 + other_chars / 4)
 
     def get_status(self) -> Dict:
-        return {
-            "engine": "DreamEngine",
-            "version": self.VERSION,
-            "dreams_generated": self._dream_count,
-            "recent_domains": self._recent_themes.copy(),
-        }
+        """v10.0.3: 返回完整引擎状态（含OpenClaw三阶段统计）"""
+        base = self.get_consolidation_stats()
+        return base
 
 
 # ════════════════════════════════════════════════

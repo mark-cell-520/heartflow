@@ -29,10 +29,18 @@ from pathlib import Path
 from datetime import datetime
 from difflib import unified_diff
 
-# ── 路径配置 ──────────────────────────────────────────────────────
+# ── 路径配置（动态检测，v10.0.3 修复硬编码问题）────────
 
 HERMES_HOME = Path.home() / ".hermes"
-CLAW_DIR = Path("/Users/apple/mark-heartflow-claw")
+# 动态检测 claw 目录：优先环境变量 → 标准路径
+_CLAW_ENV = os.environ.get("CLAW_DIR", "")
+if _CLAW_ENV and os.path.isdir(_CLAW_ENV):
+    CLAW_DIR = Path(_CLAW_ENV)
+elif Path.home() / "mark-heartflow-claw".exists():
+    CLAW_DIR = Path.home() / "mark-heartflow-claw"
+else:
+    # 回退到相对路径（兼容 Linux / macOS / Windows）
+    CLAW_DIR = Path(__file__).resolve().parent.parent
 
 SYNC_LOG = HERMES_HOME / "memory/claw_sync_log.json"
 SYNC_STATE = HERMES_HOME / "memory/_claw_sync_state.json"

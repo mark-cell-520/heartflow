@@ -337,7 +337,7 @@ if __name__ == "__main__":
     import sys
     
     if len(sys.argv) < 2:
-        print("HeartFlow v1.0")
+        print("HeartFlow v10.0.3")
         print("=" * 40)
         print("用法:")
         print("  python3 heartflow_core.py <消息>")
