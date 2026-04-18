@@ -1,9 +1,8 @@
 ---
 name: heartflow
-version: 9.4.8
+version: 9.5.0
 description: HeartFlow - 决策引擎 + 心理健康分析
 tags: [heartflow, decision, mental-health, consciousness, self-evolution]
-install: bash install.sh
 ---
 
 # HeartFlow
@@ -12,43 +11,7 @@ install: bash install.sh
 
 ## 版本
 
-**v9.4.8** - 2026-04-18
-
-## 安装
-
-### 方法 1: 使用安装脚本（推荐）
-
-```bash
-# 克隆仓库
-git clone https://github.com/yun520-1/mark-heartflow-skill.git
-cd mark-heartflow-skill
-
-# 运行安装脚本
-bash install.sh
-
-# 验证安装
-cd skill
-python3 verify_install.py
-```
-
-### 方法 2: 手动安装
-
-```bash
-# 克隆仓库
-git clone https://github.com/yun520-1/mark-heartflow-skill.git
-
-# 复制必要文件到技能目录
-cp -r mark-heartflow-skill/scripts ~/.your-skill-dir/heartflow/scripts/
-cp mark-heartflow-skill/SKILL.md ~/.your-skill-dir/heartflow/
-cp mark-heartflow-skill/VERSION.txt ~/.your-skill-dir/heartflow/
-```
-
-### 方法 3: ClawHub 安装
-
-```bash
-# 通过 ClawHub 安装（待发布）
-clawhub install heartflow
-```
+**v9.4.7** - 2026-04-18
 
 ## 快速开始
 

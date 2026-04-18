@@ -105,13 +105,22 @@ class TruthGoodBeautyEngine:
         if beauty_score < 0.6:
             reasons.append(f"审美不足 ({beauty_score:.1f})")
         
+        # 修复verdict与reasons矛盾：根据verdict设置适当的默认理由
+        if not reasons:
+            if verdict == "通过":
+                reasons = ["通过真善美检验"]
+            elif verdict == "需改进":
+                reasons = ["需要改进以达到真善美标准"]
+            else:  # 不通过
+                reasons = ["未通过真善美检验，存在严重问题"]
+        
         result = TGBResult(
             truth=truth_score,
             goodness=goodness_score,
             beauty=beauty_score,
             total=total,
             verdict=verdict,
-            reasons=reasons if reasons else ["通过真善美检验"]
+            reasons=reasons
         )
         
         self.history.append(result)
@@ -119,12 +128,12 @@ class TruthGoodBeautyEngine:
     
     def _evaluate_truth(self, context: Dict, user_input: str) -> float:
         """评估真实性"""
-        score = 1.0  # 默认满分
+        score = 0.0  # 默认无内容时得分低
         
         # 检查是否涉及事实陈述
         content = context.get("content", user_input)
         if not content:
-            return 1.0
+            return 0.0  # 无内容返回低分
         
         # 简单规则检查
         indicators = context.get("indicators", {})
@@ -172,12 +181,12 @@ class TruthGoodBeautyEngine:
     
     def _evaluate_beauty(self, context: Dict, user_input: str) -> float:
         """评估审美"""
-        score = 0.8  # 默认较高
+        score = 0.0  # 默认无内容时得分低
         
         # 检查表达优雅
         content = context.get("content", user_input)
         if not content:
-            return 1.0
+            return 0.0  # 无内容返回低分
         
         # 简单检查
         indicators = context.get("indicators", {})
@@ -188,6 +197,9 @@ class TruthGoodBeautyEngine:
             score = 0.9
         elif indicators.get("meaningful"):
             score = 0.85
+        else:
+            # 默认较低
+            score = 0.3
         
         return min(1.0, max(0.0, score))
     
