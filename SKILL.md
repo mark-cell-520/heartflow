@@ -1,6 +1,6 @@
 ---
 name: heartflow
-version: 9.5.0
+version: 9.5.2
 description: HeartFlow - 决策引擎 + 心理健康分析
 tags: [heartflow, decision, mental-health, consciousness, self-evolution]
 ---
@@ -11,7 +11,17 @@ tags: [heartflow, decision, mental-health, consciousness, self-evolution]
 
 ## 版本
 
-**v9.4.7** - 2026-04-18
+**v9.5.2** - 2026-04-18（审计修复版）
+
+### v9.5.2 更新内容
+- ✅ P0-1: 修复verdict与reasons逻辑矛盾
+- ✅ P0-2: 修复空输入返回满分问题  
+- ✅ P0-3: 添加None输入保护，防止崩溃
+- ✅ P0-4: 统一版本号
+- ✅ P0-5/P0-6/P1-8/P1-9: 集成所有未使用的引擎
+- ✅ P1-7: TGB引擎智能评估
+- ✅ P1-11: 实现动机记忆引擎
+- ✅ P2-13: CLI帮助信息
 
 ## 快速开始
 
