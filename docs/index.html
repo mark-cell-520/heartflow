@@ -461,11 +461,104 @@ body {
     </div>
 </section>
 
+<!-- Installation & Usage -->
+<section class="section section-darker">
+    <h2 class="section-title">🚀 安装 & 使用</h2>
+    <p class="section-subtitle">3行代码上手，零外部依赖，纯Python实现</p>
+    <div class="container">
+
+        <!-- Install -->
+        <div style="margin-bottom:40px;">
+            <h3 style="color:var(--accent);font-size:1.3rem;margin-bottom:16px;">📦 方式一：Git 克隆（推荐）</h3>
+            <div style="background:#0d1117;border:1px solid #30363d;border-radius:12px;padding:20px;font-family:'SF Mono',Monaco,monospace;font-size:0.88rem;overflow-x:auto;">
+                <div style="color:#8b949e;margin-bottom:6px;"># 克隆仓库并运行</div>
+                <div><span style="color:#79c0ff;">git clone</span> https://github.com/yun520-1/mark-heartflow-skill.git</div>
+                <div><span style="color:#79c0ff;">cd</span> mark-heartflow-skill && python3 examples/quick_start.py</div>
+                <div style="color:#8b949e;margin-top:10px;margin-bottom:6px;"># 或验证安装</div>
+                <div>python3 verify_install.py</div>
+            </div>
+
+            <h3 style="color:var(--accent);font-size:1.3rem;margin:24px 0 16px 0;">📦 方式二：一键安装脚本</h3>
+            <div style="background:#0d1117;border:1px solid #30363d;border-radius:12px;padding:20px;font-family:'SF Mono',Monaco,monospace;font-size:0.88rem;overflow-x:auto;">
+                <div><span style="color:#79c0ff;">curl -fsSL</span> https://raw.githubusercontent.com/yun520-1/mark-heartflow-skill/main/install.sh | bash</div>
+            </div>
+        </div>
+
+        <!-- Quick Start Code -->
+        <h3 style="color:var(--gold);font-size:1.3rem;margin-bottom:16px;">⚡ 3 行代码快速上手</h3>
+        <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);border:1px solid rgba(108,92,231,0.3);border-radius:14px;padding:24px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;right:0;background:var(--primary);color:white;padding:4px 14px;border-radius:0 0 0 12px;font-size:0.75rem;font-weight:bold;">Python</div>
+            <pre style="font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;line-height:1.8;color:#e6edf3;margin:0;"><span style="color:#ff7b72;">import</span> sys
+sys.path.insert(<span style="color:#a5d6ff;">0</span>, <span style="color:#a5d6ff;">'scripts'</span>)
+<span style="color:#ff7b72;">from</span> heartflow_core <span style="color:#ff7b72;">import</span> HeartFlow
+
+hf = HeartFlow()
+result = hf.process(<span style="color:#a5d6ff;">"今天工作压力很大"</span>)<span style="color:#8b949e;">  # 自动调用15个引擎</span>
+<span style="color:#79c0ff;">print</span>(result.decision)      <span style="color:#8b949e"># 综合决策结果</span>
+<span style="color:#79c0ff;">print</span>(result.tgb.verdict)   <span style="color:#8b949e"># 真善美判定</span>
+<span style="color:#79c0ff;">print</span>(result.mental.score) <span style="color:#8b949e"># 心理健康分数</span></pre>
+        </div>
+
+        <!-- Examples Grid -->
+        <h3 style="color:var(--accent);font-size:1.3rem;margin:32px 0 16px 0;">💡 使用案例</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+            <div style="background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.2);border-radius:12px;padding:18px;">
+                <div style="font-size:1.5rem;margin-bottom:8px;">💬</div>
+                <div style="font-weight:600;color:var(--white);font-size:1rem;margin-bottom:6px;">智能问答助手</div>
+                <div style="font-size:0.85rem;color:var(--text-dim);line-height:1.5;">ReAct推理 + 心理检测 + 真善美检验，不盲目回答</div>
+                <code style="display:inline-block;margin-top:8px;font-size:0.78rem;background:rgba(0,206,201,0.15);color:var(--accent);padding:3px 8px;border-radius:4px;">examples/intelligent_qa.py</code>
+            </div>
+            <div style="background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.2);border-radius:12px;padding:18px;">
+                <div style="font-size:1.5rem;margin-bottom:8px;">⚖️</div>
+                <div style="font-weight:600;color:var(--white);font-size:1rem;margin-bottom:6px;">论文辩论分析器</div>
+                <div style="font-size:0.85rem;color:var(--text-dim);line-height:1.5;">五角色辩证辩论：正方/反方/综合/魔鬼/主持</div>
+                <code style="display:inline-block;margin-top:8px;font-size:0.78rem;background:rgba(0,206,201,0.15);color:var(--accent);padding:3px 8px;border-radius:4px;">examples/paper_debate_analyzer.py</code>
+            </div>
+            <div style="background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.2);border-radius:12px;padding:18px;">
+                <div style="font-size:1.5rem;margin-bottom:8px;">❤️</div>
+                <div style="font-weight:600;color:var(--white);font-size:1rem;margin-bottom:6px;">心理健康顾问</div>
+                <div style="font-size:0.85rem;color:var(--text-dim);line-height:1.5;">PHQ-9 + GAD-7 专业评估 + 危机干预预警</div>
+                <code style="display:inline-block;margin-top:8px;font-size:0.78rem;background:rgba(0,206,201,0.15);color:var(--accent);padding:3px 8px;border-radius:4px;">examples/mental_health_advisor.py</code>
+            </div>
+            <div style="background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.2);border-radius:12px;padding:18px;">
+                <div style="font-size:1.5rem;margin-bottom:8px;">🧬</div>
+                <div style="font-weight:600;color:var(--white);font-size:1rem;margin-bottom:6px;">自主进化Agent</div>
+                <div style="font-size:0.85rem;color:var(--text-dim);line-height:1.5;">STaR自教学 + CRITIC批评 + EvolveR蒸馏</div>
+                <code style="display:inline-block;margin-top:8px;font-size:0.78rem;background:rgba(0,206,201,0.15);color:var(--accent);padding:3px 8px;border-radius:4px;">examples/evolving_agent.py</code>
+            </div>
+            <div style="background:rgba(253,203,110,0.08);border:1px solid rgba(253,203,110,0.2);border-radius:12px;padding:18px;">
+                <div style="font-size:1.5rem;margin-bottom:8px;">🫀</div>
+                <div style="font-weight:600;color:var(--white);font-size:1rem;margin-bottom:6px;">全功能Demo</div>
+                <div style="font-size:0.85rem;color:var(--text-dim);line-height:1.5;">全部15个引擎协同工作的终极演示</div>
+                <code style="display:inline-block;margin-top:8px;font-size:0.78rem;background:rgba(253,203,110,0.15);color:var(--gold);padding:3px 8px;border-radius:4px;">examples/full_demo.py</code>
+            </div>
+            <div style="background:rgba(0,206,201,0.08);border:1px solid rgba(0,206,201,0.2);border-radius:12px;padding:18px;">
+                <div style="font-size:1.5rem;margin-bottom:8px;">🚀</div>
+                <div style="font-weight:600;color:var(--white);font-size:1rem;margin-bottom:6px;">快速开始</div>
+                <div style="font-size:0.85rem;color:var(--text-dim);line-height:1.5;">3分钟体验所有核心引擎的快速演示</div>
+                <code style="display:inline-block;margin-top:8px;font-size:0.78rem;background:rgba(0,206,201,0.15);color:var(--accent);padding:3px 8px;border-radius:4px;">examples/quick_start.py</code>
+            </div>
+        </div>
+
+        <!-- Requirements -->
+        <div style="margin-top:28px;padding:18px;background:rgba(0,206,201,0.06);border:1px solid rgba(0,206,201,0.15);border-radius:10px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+            <span style="color:var(--text-dim);font-size:0.9rem;">前置要求:</span>
+            <span style="background:rgba(108,92,231,0.15);color:var(--primary);padding:4px 12px;border-radius:20px;font-size:0.82rem;">Python ≥ 3.9</span>
+            <span style="background:rgba(108,92,231,0.15);color:var(--primary);padding:4px 12px;border-radius:20px;font-size:0.82rem;">零外部依赖</span>
+            <span style="background:rgba(108,92,231,0.15);color:var(--primary);padding:4px 12px;border-radius:20px;font-size:0.82rem;">纯标准库</span>
+            <span style="background:rgba(0,206,201,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.82rem;">可选: numpy</span>
+        </div>
+    </div>
+</section>
+
 <!-- CTA -->
 <section class="cta-section">
     <h2>准备好体验真正会思考的AI了吗？</h2>
     <p>HeartFlow v10.0.4 —— 从模拟智能走向真实智能的第一步</p>
-    <a href="https://github.com/yun520-1/mark-heartflow-skill" class="cta-btn" target="_blank">⭐ GitHub 仓库 →</a>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+        <a href="https://github.com/yun520-1/mark-heartflow-skill" class="cta-btn" target="_blank">⭐ GitHub 仓库 →</a>
+        <a href="#install" class="cta-btn" style="background:transparent;border:2px solid var(--accent);color:var(--accent);" onclick="this.scrollIntoView({behavior:'smooth'})">🚀 快速安装</a>
+    </div>
 </section>
 
 <footer class="footer">
@@ -602,7 +695,61 @@ body {
 <section class="cta-section">
     <h2>Ready to Experience an AI That Truly Thinks?</h2>
     <p>HeartFlow v10.0.4 — From Simulated Intelligence Toward Real Intelligence</p>
-    <a href="https://github.com/yun520-1/mark-heartflow-skill" class="cta-btn" target="_blank">⭐ GitHub Repo →</a>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+        <a href="https://github.com/yun520-1/mark-heartflow-skill" class="cta-btn" target="_blank">⭐ GitHub Repo →</a>
+        <span class="cta-btn" style="background:transparent;border:2px solid var(--accent);color:var(--accent);cursor:default;">📦 Zero Dependencies · Pure Python</span>
+    </div>
+</section>
+
+<!-- Installation & Usage (EN) -->
+<section class="section section-darker">
+    <h2 class="section-title">🚀 Install & Get Started</h2>
+    <p class="section-subtitle">3 lines of code, zero external dependencies, pure Python</p>
+    <div class="container">
+
+        <!-- Install -->
+        <div style="margin-bottom:40px;">
+            <h3 style="color:var(--accent);font-size:1.3rem;margin-bottom:16px;">📦 Git Clone (Recommended)</h3>
+            <div style="background:#0d1117;border:1px solid #30363d;border-radius:12px;padding:20px;font-family:'SF Mono',Monaco,monospace;font-size:0.88rem;overflow-x:auto;">
+                <div><span style="color:#79c0ff;">git clone</span> https://github.com/yun520-1/mark-heartflow-skill.git</div>
+                <div><span style="color:#79c0ff;">cd</span> mark-heartflow-skill && python3 examples/quick_start.py</div>
+            </div>
+        </div>
+
+        <!-- Quick Start Code -->
+        <h3 style="color:var(--gold);font-size:1.3rem;margin-bottom:16px;">⚡ Quick Start — 3 Lines of Code</h3>
+        <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);border:1px solid rgba(108,92,231,0.3);border-radius:14px;padding:24px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;right:0;background:var(--primary);color:white;padding:4px 14px;border-radius:0 0 0 12px;font-size:0.75rem;font-weight:bold;">Python</div>
+            <pre style="font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;line-height:1.8;color:#e6edf3;margin:0;"><span style="color:#ff7b72;">import</span> sys
+sys.path.insert(<span style="color:#a5d6ff;">0</span>, <span style="color:#a5d6ff;">'scripts'</span>)
+<span style="color:#ff7b72;">from</span> heartflow_core <span style="color:#ff7b72;">import</span> HeartFlow
+
+hf = HeartFlow()
+result = hf.process(<span style="color:#a5d6ff;">"I feel stressed at work"</span>)<span style="color:#8b949e;">  # All 15 engines run automatically</span>
+<span style="color:#79c0ff;">print</span>(result.decision)      <span style="color:#8b949e"># Final decision</span>
+<span style="color:#79c0ff;">print</span>(result.tgb.verdict)   <span style="color:#8b949e;"># TGB ethics check</span></pre>
+        </div>
+
+        <!-- Examples -->
+        <h3 style="color:var(--accent);font-size:1.3rem;margin:32px 0 16px 0;">💡 Example Projects</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
+            <div style="background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.2);border-radius:12px;padding:16px;">
+                <div style="font-weight:600;color:var(--white);font-size:0.95rem;">💬 Intelligent QA Assistant</div><code style="font-size:0.76rem;color:var(--accent);">examples/intelligent_qa.py</code>
+            </div>
+            <div style="background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.2);border-radius:12px;padding:16px;">
+                <div style="font-weight:600;color:var(--white);font-size:0.95rem;">⚖️ Paper Debate Analyzer</div><code style="font-size:0.76rem;color:var(--accent);">examples/paper_debate_analyzer.py</code>
+            </div>
+            <div style="background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.2);border-radius:12px;padding:16px;">
+                <div style="font-weight:600;color:var(--white);font-size:0.95rem;">❤️ Mental Health Advisor</div><code style="font-size:0.76rem;color:var(--accent);">examples/mental_health_advisor.py</code>
+            </div>
+            <div style="background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.2);border-radius:12px;padding:16px;">
+                <div style="font-weight:600;color:var(--white);font-size:0.95rem;">🧬 Evolving Agent</div><code style="font-size:0.76rem;color:var(--accent);">examples/evolving_agent.py</code>
+            </div>
+            <div style="background:rgba(253,203,110,0.08);border:1px solid rgba(253,203,110,0.2);border-radius:12px;padding:16px;">
+                <div style="font-weight:600;color:var(--white);font-size:0.95rem;">🫀 Full Demo (All Engines)</div><code style="font-size:0.76rem;color:var(--gold);">examples/full_demo.py</code>
+            </div>
+        </div>
+    </div>
 </section>
 
 <footer class="footer">
