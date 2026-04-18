@@ -112,32 +112,10 @@ class RationalityEngine:
         )
     
     def _is_refuted(self, context: str, idea: str) -> bool:
-        """
-        检查Idea是否在Context下被反驳
-        
-        v9.5.2 修复：实现基本反驳检测逻辑
-        不再永远返回False
-        """
-        if not context or not idea:
-            return False
-        
-        # 反驳关键词列表
-        refutation_markers = [
-            "不成立", "错误", "不对", "矛盾", "违反", "推翻",
-            "否定", "反驳", "无法", "不能", "不可能",
-            "但是", "然而", "不过"  # 转折词可能暗示反驳
-        ]
-        
-        # 检查上下文是否包含反驳信号
-        has_refutation = any(marker in context for marker in refutation_markers)
-        
-        # 检查idea和context是否有直接矛盾
-        if "不是" in context and idea in context:
-            has_refutation = True
-        if "相反" in context:
-            has_refutation = True
-        
-        return has_refutation
+        """检查Idea是否在Context下被反驳（简化版）"""
+        # 实际需要更复杂的解析
+        # 这里只是一个框架
+        return False
     
     def _find_bottleneck(self, context: list[str]) -> str:
         """找出瓶颈（TOC理论）"""

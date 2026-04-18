@@ -308,7 +308,7 @@ class EmotionEngine:
             return 0.4
         
         # 困境
-        困境_words = ['没办法', '无能为力', '无法', '解决不了']
+       困境_words = ['没办法', '无能为力', '无法', '解决不了']
         if any(w in text for w in 困境_words):
             return 0.2
         

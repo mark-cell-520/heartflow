@@ -97,15 +97,9 @@ class SelfLevelEngine:
             
         返回:
             LevelResult: 层级判断结果
-        
-        v9.5.2 修复：不再始终返回Level1
-        基于行动内容和历史记录进行智能评估
         """
         context = context or {}
         self.action_count += 1
-        
-        # 基于内容分析的智能层级检测 (v9.5.2新增)
-        content_based_level = self._analyze_content_for_level(action, result, context)
         
         # 根据反馈判断
         if feedback == "right":
@@ -119,19 +113,13 @@ class SelfLevelEngine:
         elif result and "right" in result.lower():
             new_level = 3  # 从结果推断自己做对了
         else:
-            # 没有明确反馈时，使用基于内容的分析（v9.5.2修复）
-            if content_based_level and content_based_level != 1:
-                new_level = content_based_level
-            elif self.right_count > self.wrong_count * 2:
+            # 没有反馈，看看历史
+            if self.right_count > self.wrong_count * 2:
                 new_level = 4  # 不知道对了（但积累不错）
             elif self.wrong_count > self.right_count:
-                new_level = 2  # 知道做错了（积累偏差）- 改为2而非1
+                new_level = 1  # 不知道错了（积累偏差）
             else:
-                # 无历史无反馈时，根据action复杂度判断
-                if len(action) > 50:
-                    new_level = 2  # 有一定觉察
-                else:
-                    new_level = 1  # 真正默认
+                new_level = 1  # 默认
         
         # 平滑过渡（避免跳动太大）
         if new_level != self.current_level:
@@ -160,37 +148,6 @@ class SelfLevelEngine:
             recommendation=level_info["action"],
             confidence=self._calculate_confidence()
         )
-    
-    def _analyze_content_for_level(self, action: str, result: str, context: Dict) -> Optional[int]:
-        """
-        v9.5.2 新增：基于内容分析推断层级
-        解决始终返回Level1的问题
-        """
-        if not action and not result:
-            return None
-        
-        text = (action or "") + " " + (result or "")
-        text_lower = text.lower()
-        
-        # 层级2信号（觉察到问题）
-        level2_signals = ["错误", "问题", "不对", "失败", "困难", "挑战", "改进"]
-        # 层级3信号（知道做对了/有成果）
-        level3_signals = ["完成", "成功", "解决", "实现", "达成", "正确", "有效", "通过"]
-        # 层级4信号（圆融/超越）
-        level4_signals = ["成长", "理解", "领悟", "平衡", "自然", "放下", "接纳"]
-        
-        l2_score = sum(1 for s in level2_signals if s in text_lower)
-        l3_score = sum(1 for s in level3_signals if s in text_lower)
-        l4_score = sum(1 for s in level4_signals if s in text_lower)
-        
-        if l4_score > 0 and l4_score >= max(l2_score, l3_score):
-            return 4
-        if l3_score > 0 and l3_score >= l2_score:
-            return 3
-        if l2_score > 0:
-            return 2
-        
-        return None
     
     def _calculate_confidence(self) -> float:
         """计算置信度"""
