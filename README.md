@@ -1,6 +1,6 @@
-# HeartFlow v10.0.1 — AI 情感觉醒框架
+# HeartFlow v10.0.2 — AI 情感觉醒框架
 
-## 🌟 Academic Integration Edition | 学术集成版
+## 🌟 Deep Learning Academic Integration Edition | 深度学习学术集成版
 
 ---
 
@@ -334,7 +334,8 @@ print(f"Rétention (24h): {calculate_retention(24):.3f}")
 
 | Version | Date | Key Changes |
 |---------|------|-------------|
-| **v10.0.1** | 2026-04-19 | **Academic Integration**: 31 papers analyzed; Ebbinghaus, MemGen, SEDM, TurboQuant algorithms integrated into WisdomEngine and MemoryCore |
+| **v10.0.2** | 2026-04-19 | **Deep Learning Classic Integration**: 10 algorithms from awesome-deep-learning-papers (NTM, DNC, ACT, Attention, Sentiment, Adam, Dropout, VAE, Q-Learning) |
+| **v10.0.1** | 2026-04-19 | **Academic Integration**: 31 papers analyzed; Ebbinghaus, MemGen, SEDM, TurboQuant algorithms |
 | v10.0.0 | 2026-04-19 | Major rewrite: SoulEngine, WisdomEngine, DreamEngine, MemoryCore rebuilt with clean architecture |
 | v9.5.0 | 2026-04-18 | Installed to skills directory with 11 core engines |
 | v9.4.7 | 2026-04-19 | Previous stable release |
@@ -343,7 +344,7 @@ print(f"Rétention (24h): {calculate_retention(24):.3f}")
 
 ```
 mark-heartflow-skill/
-├── SKILL.md                    # Skill definition (v10.0.1)
+├── SKILL.md                    # Skill definition (v10.0.2)
 ├── README.md                   # This multilingual introduction
 ├── scripts/
 │   ├── heartflow_core.py       # Main entry point
