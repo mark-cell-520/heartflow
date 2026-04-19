@@ -881,18 +881,17 @@ class DeepLearningAlgorithms:
         Dropout-inspired protection against catastrophic forgetting.
         Important memories have lower chance of being dropped.
         """
-        import random
+        from secure_random_utils import random as _secure_random
         if not memories:
             return []
         
         importance_weights = importance_weights or [m.get('quantized_importance', 0.5) for m in memories]
         protected = []
-        random.seed(int(time.time() * 1000) % (2**16))
         
         for i, mem in enumerate(memories):
             imp = importance_weights[i] if i < len(importance_weights) else 0.5
             effective_rate = dropout_rate * (1 - imp)
-            if random.random() > effective_rate:
+            if _secure_random() > effective_rate:
                 protected.append(mem)
         
         return protected if protected else ([memories[0]] if memories else [])
@@ -903,13 +902,12 @@ class DeepLearningAlgorithms:
     def vae_reparameterize(mean: float, log_var: float, temperature: float = 1.0) -> float:
         """VAE reparameterization trick (Kingma & Welling 2013). z = mu + sigma*eps.
         
-        v10.0.3 修复：使用random模块生成真正的随机采样，替代确定性hash伪随机。
+        v10.0.6 修复：使用 secure_random_utils 模块生成密码学安全的随机采样。
         使用 Box-Muller 变换将均匀分布转换为标准正态分布。
         """
-        import random as _rng
-        _rng.seed(int(time.time() * 1000000 + mean * 10000 + log_var * 777) % (2 ** 32))
-        u1 = max(1e-10, min(0.999999, _rng.random()))
-        u2 = max(1e-10, min(0.999999, _rng.random()))
+        from secure_random_utils import random as _secure_random
+        u1 = max(1e-10, min(0.999999, _secure_random()))
+        u2 = max(1e-10, min(0.999999, _secure_random()))
         epsilon = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)
         sigma = math.exp(0.5 * log_var)
         z = mean + sigma * epsilon * temperature

@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """
-HeartFlow Core Engine v9.4.7
+HeartFlow Core Engine v10.0.6
+
+Version 10.0.6 Update (2026-04-19):
+- 安全改进：添加 security_init 模块
+- 安全改进：添加 secure_random_utils 模块  
+- 安全改进：添加 secure_file_utils 模块
+- 路径遍历保护
+- 递归深度限制
 
 Version 9.4.7 Update (2026-04-18):
 - Integrate motivation_memory_engine (动机-记忆集成引擎)
@@ -17,6 +24,13 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+
+# v10.0.6 安全设置
+try:
+    from security_init import setup_security
+    setup_security()
+except ImportError:
+    pass
 
 # 攻击性内容列表 - 绝对禁止作为测试用例
 ATTACK_PATTERNS = [
