@@ -1,17 +1,26 @@
 ---
 name: heartflow
-version: 9.4.7
-description: HeartFlow - 决策引擎 + 心理健康分析
-tags: [heartflow, decision, mental-health, consciousness, self-evolution]
+version: 10.0.7
+description: HeartFlow v10.0.7 - 决策引擎 + 心理健康分析 + 自我进化引擎
+tags: [heartflow, decision, mental-health, consciousness, self-evolution, ai-safety]
 ---
 
-# HeartFlow
+# HeartFlow v10.0.7
 
-自主决策引擎 + 心理健康分析系统。
+自主决策引擎 + 心理健康分析系统 + 自我进化引擎。
 
 ## 版本
 
-**v9.4.7** - 2026-04-19
+**v10.0.7** - 2026-04-19
+
+## 核心定位（目标铁律）
+
+1. **真善美逻辑** - TGB = 0.35×真 + 0.35×善 + 0.30×美
+2. **六层哲学** - 无明→觉察→清明→圆融
+3. **具身认知** - 双系统+7步思维链
+4. **心理健康** - PHQ-9/GAD-7 评估
+5. **行为经济** - 16种认知偏误识别
+6. **记忆永存** - 四层记忆系统
 
 ## 快速开始
 
