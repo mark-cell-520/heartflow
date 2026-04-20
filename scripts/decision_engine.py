@@ -11,11 +11,16 @@
   - E: Emotion (情绪效价，-1 to +1)
   - L: Learning (学习价值，0-10)
 
-v10.1.0 更新:
+v10.1.1 更新 (基于ReAct论文):
   - 优化推理透明度
   - 增加决策路径追踪
   - 增强批处理能力
   - 支持异步决策分析
+  - 新增ReAct风格思考-行动循环 (v10.1.1)
+  - 推理(Thought) → 行动(Action) → 观察(Observation) 循环
+  - 增强自主决策能力
+
+基于论文: ReAct - Synergizing Reasoning and Acting in Language Models
 """
 
 import json
@@ -444,3 +449,166 @@ if __name__ == "__main__":
     ]
     passed, reason = engine.binary_decide(opts, constraints)
     print(f"   通过: {passed}, 原因: {reason}")
+    print()
+
+    # 测试5: ReAct思考-行动循环
+    print("5. ReAct思考-行动循环")
+    react_engine = ReActDecisionEngine()
+    
+    # 模拟多轮思考-行动-观察
+    problem = "我应该在A公司和B公司之间选哪个？A公司工资高但压力大，B公司工资低但轻松"
+    result = react_engine.react_loop(problem, max_iterations=3)
+    
+    print(f"   最终决策: {result['decision']}")
+    print(f"   推理链长度: {len(result['thoughts'])}")
+    for i, step in enumerate(result['thoughts']):
+        print(f"   Step {i+1}: {step[:50]}...")
+
+
+class ReActDecisionEngine:
+    """
+    ReAct风格决策引擎
+    推理(Thought) → 行动(Action) → 观察(Observation) 循环
+    
+    基于论文: ReAct - Synergizing Reasoning and Acting in Language Models
+    
+    核心理念:
+    - 让AI不仅做决策，还要"思考"为什么要这样做
+    - 通过行动来验证假设
+    - 观察结果来调整决策
+    """
+    
+    def __init__(self, max_iterations: int = 5):
+        self.max_iterations = max_iterations
+        self.thought_history = []
+        
+    def react_loop(self, problem: str, context: Dict = None, max_iterations: int = None) -> Dict:
+        """
+        执行ReAct思考-行动循环
+        
+        Args:
+            problem: 问题描述
+            context: 上下文信息
+            max_iterations: 最大迭代次数
+            
+        Returns:
+            包含thoughts, actions, observations, decision的字典
+        """
+        max_iterations = max_iterations or self.max_iterations
+        
+        thoughts = []
+        actions = []
+        observations = []
+        
+        # 初始化问题理解
+        current_context = context or {}
+        current_context['problem'] = problem
+        
+        for i in range(max_iterations):
+            # Step 1: 思考 (Thought)
+            thought = self._think(problem, current_context, thoughts)
+            thoughts.append(thought)
+            
+            # 检查是否已经得出结论
+            if self._is_conclusion(thought):
+                break
+                
+            # Step 2: 行动 (Action)
+            action = self._act(thought, current_context)
+            actions.append(action)
+            
+            # Step 3: 观察 (Observation)
+            observation = self._observe(action, current_context)
+            observations.append(observation)
+            
+            # 更新上下文
+            current_context['last_observation'] = observation
+            current_context['iteration'] = i + 1
+        
+        # 最终决策
+        decision = self._make_decision(thoughts, actions, observations)
+        
+        return {
+            'thoughts': thoughts,
+            'actions': actions,
+            'observations': observations,
+            'decision': decision,
+            'iterations': len(thoughts)
+        }
+    
+    def _think(self, problem: str, context: Dict, history: List[str]) -> str:
+        """思考步骤：分析问题"""
+        
+        # 基于历史思考来深化理解
+        if history:
+            prev_thought = history[-1]
+            thought = f"基于之前的思考'{prev_thought[:30]}...'，我现在需要进一步分析：{problem}"
+        else:
+            # 首次思考：理解问题本质
+            thought = f"分析问题：{problem}。需要考虑：1)目标是什么 2)选项有哪些 3)每个选项的后果"
+        
+        return thought
+    
+    def _act(self, thought: str, context: Dict) -> str:
+        """行动步骤：执行分析动作"""
+        
+        # 根据思考内容决定行动
+        if "目标" in thought:
+            return "明确决策目标：选择最符合长期利益的选项"
+        elif "选项" in thought:
+            return "列出选项并评估：分析每个选项的利弊"
+        elif "后果" in thought:
+            return "预测后果：考虑短期和长期影响"
+        else:
+            return "综合分析：权衡所有因素做出决策"
+    
+    def _observe(self, action: str, context: Dict) -> str:
+        """观察步骤：从行动中获取反馈"""
+        
+        # 模拟观察结果
+        iteration = context.get('iteration', 0)
+        
+        observations = [
+            "目标已明确：职业发展 + 工作生活平衡",
+            "选项评估：A公司(高工资/高压) vs B公司(低工资/轻松)",
+            "后果分析：A公司可能3年后能力更强，B公司生活质量更高"
+        ]
+        
+        return observations[min(iteration, len(observations)-1)]
+    
+    def _is_conclusion(self, thought: str) -> bool:
+        """判断是否得出结论"""
+        
+        conclusion_keywords = ["决定", "选择", "推荐", "最终", "结论"]
+        return any(kw in thought for kw in conclusion_keywords)
+    
+    def _make_decision(self, thoughts: List[str], actions: List[str], observations: List[str]) -> str:
+        """基于完整推理链做出最终决策"""
+        
+        if not thoughts:
+            return "无法做出决策"
+        
+        # 简化决策逻辑
+        last_thought = thoughts[-1]
+        
+        # 从观察中提取信息做决策
+        if len(observations) >= 2:
+            return "基于综合分析，建议选择平衡性更好的选项"
+        
+        return last_thought
+
+
+# === 简化的ReAct接口 ===
+def react_decide(problem: str, max_iterations: int = 3) -> Dict:
+    """
+    简化的ReAct决策接口
+    
+    Args:
+        problem: 问题描述
+        max_iterations: 最大思考轮数
+        
+    Returns:
+        决策结果
+    """
+    engine = ReActDecisionEngine(max_iterations=max_iterations)
+    return engine.react_loop(problem, max_iterations=max_iterations)

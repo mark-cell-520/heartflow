@@ -96,7 +96,7 @@ AI:   [Triggers memory system] → Extracts history → Continues conversation
 
 | Info | Value |
 |------|-------|
-| **Current Version** | v10.1.1 |
+| **Current Version** | v10.1.2 |
 | **Last Update** | 2026-04-20 |
 | **Goal** | Serve all humanity's AI |
 
@@ -110,7 +110,7 @@ mark-heartflow/
 ├── scripts/          # 17 Python engines
 ├── memory/           # Memory system
 ├── internal/         # Internal documents
-└── VERSION.txt      # v10.1.1
+└── VERSION.txt      # v10.1.2
 ```
 
 ---
