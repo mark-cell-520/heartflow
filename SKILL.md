@@ -1,6 +1,6 @@
 ---
 name: heartflow
-version: 9.4.7
+version: "10.0.9"
 description: HeartFlow - 决策引擎 + 心理健康分析
 tags: [heartflow, decision, mental-health, consciousness, self-evolution]
 ---
@@ -71,6 +71,20 @@ print(result.decision)
 - 完善GitHub上传标准化流程
 - 添加自动进化工作流
 - 建立沙箱测试机制
+**审计**: 沙箱自审通过
+**状态**: 已部署
+
+
+---
+
+## 进化记录
+
+### v10.0.9 - 2026-04-20
+**目标**: 服务全人类的AI
+**类型**: 补丁版本 - 修复版本混乱
+**修复内容**:
+- 统一版本号：VERSION.txt、SKILL.md、package.json全部更新为10.0.9
+- 解决之前版本不一致问题（9.4.7/9.4.8混乱）
 **审计**: 沙箱自审通过
 **状态**: 已部署
 

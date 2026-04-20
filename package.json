@@ -1,6 +1,6 @@
 {
   "name": "heartflow",
-  "version": "9.4.7",
+  "version": "10.0.9",
   "description": "HeartFlow - 决策引擎 + 心理健康分析",
   "main": "scripts/heartflow_core.py",
   "keywords": ["heartflow", "decision", "mental-health", "consciousness"],
