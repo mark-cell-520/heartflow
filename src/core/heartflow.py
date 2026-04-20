@@ -13,7 +13,7 @@ Six Goals:
   5. TGB Unity            - Dialectical synthesis of Truth-Goodness-Beauty
   6. Six-Layer Practice   - 觉察→自省→无我→彼岸→般若→圣人
 
-Version: 10.2.2
+Version: 10.2.3
 License: MIT
 """
 
@@ -33,7 +33,7 @@ from collections import Counter
 import threading
 import queue
 
-__version__ = "10.2.2"
+__version__ = "10.2.3"
 __author__ = "HeartFlow Team"
 __license__ = "MIT"
 
@@ -990,7 +990,7 @@ class WangDongyueEngine:
 
 class HeartFlow:
     """
-    HeartFlow v10.2.2 - The AI That Truly Thinks
+HeartFlow v10.2.3 - The AI That Truly Thinks
     
     Orchestrates all engines toward six goals:
     1. True Intelligence    - Decision + Logic + Entropy
