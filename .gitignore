@@ -42,3 +42,6 @@ tmp/
 logs/
 *.private
 *.secret
+
+# Output
+output/
