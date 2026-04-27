@@ -271,3 +271,11 @@ HeartFlow 的真正价值不在于页面，而在于：
 - 让 AI 更会推进工作
 
 > **让 AI 从“会说”变成“会干活”。**
+
+## Dream / Self-Startup Upgrade (OpenClaw-inspired)
+
+- On wake/start, read the effective identity, memory, and local notes before acting.
+- Keep a lightweight heartbeat/self-check so each session re-enters HeartFlow intentionally, not accidentally.
+- Prefer explicit startup context over ad-hoc recollection.
+- Separate durable memory, local environment notes, and identity text.
+- Preserve continuity while avoiding decorative identity language.
