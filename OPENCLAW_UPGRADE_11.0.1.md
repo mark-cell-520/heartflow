@@ -1,4 +1,4 @@
-# HeartFlow OpenClaw-inspired Upgrade v11.0.1
+# HeartFlow OpenClaw-inspired Upgrade v11.2.10
 
 Date: 2026-04-27 22:59:24
 
@@ -14,7 +14,7 @@ Date: 2026-04-27 22:59:24
 - Explicit startup context first
 
 ## Version change
-- 11.0.0 -> 11.0.1
+- 11.2.10 -> 11.2.10
 
 ## Notes
 This upgrade intentionally favors real self-checking and continuity over decorative identity language.

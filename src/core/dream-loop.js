@@ -12,13 +12,14 @@
  * - replay / offline review
  * - imagination for planning
  * - self-reflection
+ * - contradiction resolution
  */
 
 const DEFAULT_WEIGHTS = {
-  recency: 0.35,
-  salience: 0.3,
-  contradiction: 0.15,
-  novelty: 0.2,
+  recency: 0.3,
+  salience: 0.25,
+  contradiction: 0.3,
+  novelty: 0.15,
 };
 
 function tokenize(text) {
@@ -37,12 +38,17 @@ function scoreFragment(fragment, memoryContext = '') {
   const contradiction = /\b(not|never|no|cannot|wrong|false)\b/i.test(text) ? 1 : 0;
   const novelty = Math.max(0, tokens.length - overlap) / Math.max(tokens.length, 1);
   const salience = /\b(version|error|fix|upgrade|dream|memory|logic|truth)\b/i.test(text) ? 1 : 0.3;
-  return (
-    DEFAULT_WEIGHTS.recency * Math.min(tokens.length / 40, 1) +
-    DEFAULT_WEIGHTS.salience * salience +
-    DEFAULT_WEIGHTS.contradiction * contradiction +
-    DEFAULT_WEIGHTS.novelty * novelty
-  );
+  return {
+    score:
+      DEFAULT_WEIGHTS.recency * Math.min(tokens.length / 40, 1) +
+      DEFAULT_WEIGHTS.salience * salience +
+      DEFAULT_WEIGHTS.contradiction * contradiction +
+      DEFAULT_WEIGHTS.novelty * novelty,
+    contradiction,
+    novelty,
+    overlap,
+    salience
+  };
 }
 
 function buildDreamFragments(memoryItems, limit = 8) {
@@ -51,9 +57,14 @@ function buildDreamFragments(memoryItems, limit = 8) {
   return items
     .map(entry => {
       const text = String((entry && entry.text) || entry || '');
-      return { entry, score: scoreFragment(text, ctx) };
+      const metrics = scoreFragment(text, ctx);
+      return { entry, ...metrics };
     })
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => {
+      if (b.contradiction !== a.contradiction) return b.contradiction - a.contradiction;
+      if (b.score !== a.score) return b.score - a.score;
+      return b.novelty - a.novelty;
+    })
     .slice(0, limit)
     .map(x => x.entry);
 }

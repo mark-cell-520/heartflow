@@ -1,4 +1,4 @@
-# HeartFlow v11.0.0 — Languages
+# HeartFlow v11.2.10 — Languages
 
 这是 HeartFlow 的多语言入口页。  
 This is the language hub for HeartFlow.
@@ -41,7 +41,7 @@ These files are currently preserved as historical material and may be unified gr
 
 ## Notes
 
-- 当前主版本：`v11.0.0`
+- 当前主版本：`v11.2.10`
 - 主定位：安装在 AI 身上的核心能力升级包
 - 重点能力：logic / decision / memory / execution
 

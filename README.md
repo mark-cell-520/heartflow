@@ -1,13 +1,13 @@
 <div align="center">
 
-# 💜 HeartFlow v11.0.0
+# 💜 HeartFlow v11.2.10
 
 ## 让 AI 不只会说，而是真的更会想、更会判、更会记、更会做
 
 **不是独立系统。不是花哨外壳。**  
 **它是安装在 AI 身上的核心能力升级包。**
 
-[![Version](https://img.shields.io/badge/version-v11.0.0-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill)
+[![Version](https://img.shields.io/badge/version-v11.2.10-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill)
 [![Focus](https://img.shields.io/badge/focus-logic%20%7C%20decision%20%7C%20memory%20%7C%20execution-7C3AED)](#为什么值得安装)
 [![Type](https://img.shields.io/badge/type-AI%20Skill-7C3AED)](#heartflow是什么)
 
@@ -139,13 +139,13 @@ HeartFlow 做的是：
 
 ---
 
-## v11.0.0 本次升级重点
+## v11.2.10 本次升级重点
 
-本次先完成了**可落地的能力升级**，不是只改文案：
+本次加入的是**梦环记忆优先级优化**，不是只改叙述：
 
-1. **Decision Verifier 决策验证器**
-   - 给决策增加 evidence / risk / alternatives / expectedOutcome / userGoal 结构化校验
-   - 检测矛盾、强断言无依据、高风险无回退方案
+- 梦环会先把含矛盾的碎片提到更高优先级
+- 记忆碎片排序更偏向“冲突优先 + 相关性其次”
+- 这样更容易把可修正的问题从碎片里提取出来
 
 2. **Execution Verifier 执行验证器**
    - 增加 plan → execute → verify 的闭环

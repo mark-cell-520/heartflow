@@ -11,6 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { generateDream } = require('./dream-loop.js');
 
 // 加载新增模块
 let AdaptiveController, AgentOrchestrator, ErrorHandler, StateSnapshot;
@@ -1452,8 +1453,7 @@ module.exports.getAgentOrchestrator = () => AgentOrchestrator ? new AgentOrchest
 module.exports.getWakeUpVerifier = () => WakeUpVerifier ? new WakeUpVerifier() : null;
 module.exports.getInteractiveDream = () => InteractiveDream ? new InteractiveDream() : null;
 module.exports.runDreamCycle = (memoryItems = [], options = {}) => {
-  const DreamLoop = require('./dream-loop.js');
-  return module.exports.runDreamCycleImpl ? module.exports.runDreamCycleImpl(memoryItems, options) : DreamLoop.generateDream(memoryItems, options);
+  return module.exports.runDreamCycleImpl ? module.exports.runDreamCycleImpl(memoryItems, options) : generateDream(memoryItems, options);
 };
 
 module.exports.runWakeUpVerification = function(dreamResult = {}) {

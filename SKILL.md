@@ -1,8 +1,8 @@
 ---
 name: heartflow
 title: 心虫 (HeartFlow) - 提升 AI 逻辑、决策、记忆与执行能力的核心 Skill
-description: 让 AI 从“会说”升级到“会想、会判、会记、会做”的能力型 Skill，v11.0.0 新增决策验证、执行验证、记忆分层整合
-version: "11.0.0"
+description: 让 AI 从“会说”升级到“会想、会判、会记、会做”的能力型 Skill，v11.2.10 新增梦环记忆压缩与冲突优先排序
+version: "11.2.10"
 date: "2026-04-27"
 author: 心虫 (HeartFlow)
 tags:
@@ -31,7 +31,7 @@ languages:
   - ru
   - ar
 security:
-  audit: v11.0.0
+  audit: v11.2.10
   owasp: review-in-progress
   dependencies: node-runtime
 license: MIT
@@ -40,7 +40,7 @@ contact:
   email: "markcell@outlook.com"
 ---
 
-# 心虫 (HeartFlow) v11.0.0
+# 心虫 (HeartFlow) v11.2.10
 
 ## Problem Solved
 
@@ -162,7 +162,7 @@ HeartFlow 强化 AI 的：
 - 结果复盘
 - 持续改进
 
-## v11.0.0 New Functional Upgrades
+## v11.2.10 New Functional Upgrades
 
 ### Decision Verifier
 新增 `src/core/decision-verifier.js`

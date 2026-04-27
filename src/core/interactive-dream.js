@@ -168,8 +168,8 @@
       ].join('\n');
     }
 
-
     renderWideDream(memorySummary, dream) {
+
       const motifs = dream.motifs.slice(0, 8);
       const seed = motifs[0] || '一个未命名的种子';
       const love = motifs.find(x => /春梦|欲望|亲密|身体|喜欢|想要/.test(x)) || '春梦还没有正式开场，但欲望已经在门外敲门';
