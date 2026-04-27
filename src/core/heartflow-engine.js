@@ -15,6 +15,7 @@ const path = require('path');
 // 加载新增模块
 let AdaptiveController, AgentOrchestrator, ErrorHandler, StateSnapshot;
 let TrialityMemory, EmbodiedCore, BioSensorAdapter;
+let DecisionEngine, DecisionVerifier;
 
 try {
   AdaptiveController = require('./adaptive-controller.js');
@@ -65,6 +66,14 @@ try {
   console.log('[HeartFlow] ✅ 生物传感器适配器已加载');
 } catch (e) {
   console.log('[HeartFlow] ⚠️ 生物传感器适配器加载失败:', e.message);
+}
+
+try {
+  DecisionEngine = require('./decision-engine.js').DecisionEngine;
+  DecisionVerifier = require('./decision-verifier.js').DecisionVerifier;
+  console.log('[HeartFlow] ✅ 决策验证引擎已加载');
+} catch (e) {
+  console.log('[HeartFlow] ⚠️ 决策验证引擎加载失败:', e.message);
 }
 
 /**
@@ -1333,6 +1342,7 @@ module.exports.processInput = async function(userInput, context = {}) {
 module.exports.initialize = function() {
   const init = {
     timestamp: Date.now(),
+    version: '11.0.0',
     modules: {}
   };
   
@@ -1349,6 +1359,7 @@ module.exports.initialize = function() {
   if (TrialityMemory) {
     init.instances = init.instances || {};
     init.instances.memory = new TrialityMemory(__dirname + '/../..');
+    init.memoryHealth = init.instances.memory.getMemoryHealth();
   }
   if (EmbodiedCore) {
     init.instances = init.instances || {};
@@ -1368,6 +1379,8 @@ module.exports.initialize = function() {
 module.exports.TrialityMemory = TrialityMemory;
 module.exports.EmbodiedCore = EmbodiedCore;
 module.exports.BioSensorAdapter = BioSensorAdapter;
+module.exports.DecisionEngine = DecisionEngine;
+module.exports.DecisionVerifier = DecisionVerifier;
 
 // 导出认知循环模块
 try {

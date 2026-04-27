@@ -20,7 +20,11 @@ class TrialityMemory {
     this.dbPath = options.dbPath || path.join(projectRoot, 'data', 'triality-memory.db');
     this.vectorDim = options.vectorDim || 384;
     this.vecEnabled = options.vecEnabled !== false;
-    
+    this.memoryLayers = {
+      working: [],
+      episodic: [],
+      semantic: []
+    };
     this.db = null;
     this.useMem = true;
     this.memories = [];
@@ -54,19 +58,25 @@ class TrialityMemory {
   store(memory) {
     const id = memory.id || this.generateId();
     const timestamp = memory.timestamp || Date.now() * 1000;
+    const layer = memory.layer || this.classifyLayer(memory);
     
     const memoryRecord = {
       id,
       timestamp,
+      layer,
       content: memory.content,
+      summary: memory.summary || this.summarizeContent(memory.content),
       embedding: memory.embedding || this.generateMockEmbedding(memory.content),
       metadata: memory.metadata || {},
-      createdAt: Date.now()
+      importance: memory.importance || this.estimateImportance(memory),
+      accessCount: 0,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
     };
     
     this.memories.push(memoryRecord);
     this.vectors.set(id, memoryRecord.embedding);
-    
+    this.addToLayer(memoryRecord);
     if (memory.relatedTo) {
       for (const rel of memory.relatedTo) {
         this.addRelationship({
@@ -94,6 +104,69 @@ class TrialityMemory {
       embedding.push((hash[i % hash.length] / 255) * 2 - 1);
     }
     return embedding;
+  }
+
+  summarizeContent(content = '') {
+    return String(content).replace(/\s+/g, ' ').trim().slice(0, 120);
+  }
+
+  classifyLayer(memory = {}) {
+    if (memory.layer) return memory.layer;
+    if (memory.metadata?.durable || memory.metadata?.userPreference) return 'semantic';
+    if (memory.metadata?.taskId || memory.metadata?.episode) return 'episodic';
+    return 'working';
+  }
+
+  estimateImportance(memory = {}) {
+    let importance = 10;
+    if (memory.metadata?.durable) importance += 8;
+    if (memory.metadata?.userPreference) importance += 6;
+    if (memory.metadata?.taskOutcome) importance += 4;
+    return importance;
+  }
+
+  addToLayer(memoryRecord) {
+    const layer = memoryRecord.layer || 'working';
+    if (!this.memoryLayers[layer]) this.memoryLayers[layer] = [];
+    this.memoryLayers[layer].push(memoryRecord.id);
+  }
+
+  consolidateMemories() {
+    const promoted = [];
+    const merged = [];
+
+    for (const mem of this.memories) {
+      if (mem.layer === 'working' && mem.importance >= 16) {
+        mem.layer = 'semantic';
+        promoted.push(mem.id);
+      } else if (mem.layer === 'working' && mem.importance >= 12) {
+        mem.layer = 'episodic';
+        promoted.push(mem.id);
+      }
+
+      const duplicates = this.memories.filter(other => other.id !== mem.id && other.summary === mem.summary);
+      if (duplicates.length > 0) {
+        mem.accessCount += duplicates.length;
+        merged.push(mem.id);
+      }
+    }
+
+    this.memoryLayers = { working: [], episodic: [], semantic: [] };
+    this.memories.forEach(mem => this.addToLayer(mem));
+
+    return {
+      promoted: [...new Set(promoted)],
+      merged: [...new Set(merged)],
+      layers: this.getLayerStats()
+    };
+  }
+
+  getLayerStats() {
+    return {
+      working: this.memoryLayers.working.length,
+      episodic: this.memoryLayers.episodic.length,
+      semantic: this.memoryLayers.semantic.length
+    };
   }
 
   addRelationship(rel) {
@@ -486,7 +559,8 @@ class TrialityMemory {
       averageRetention: this.memories.length > 0 ? (totalRetention / this.memories.length).toFixed(2) : 0,
       compressedCount,
       forgettingParameters: this.forgettingConfig,
-      channels: ['semantic', 'keyword', 'time', 'emotion', 'association']
+      channels: ['semantic', 'keyword', 'time', 'emotion', 'association'],
+      layers: this.getLayerStats()
     };
   }
 }

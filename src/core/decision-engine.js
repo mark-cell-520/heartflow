@@ -4,8 +4,9 @@
  */
 
 class DecisionEngine {
-  constructor() {
+  constructor(options = {}) {
     this.decisionHistory = [];
+    this.verifier = options.verifier || null;
   }
 
   /**
@@ -150,9 +151,27 @@ class DecisionEngine {
    */
   decide(context) {
     const evaluation = this.egoLessEvaluate(context);
+    const decisionRecord = {
+      decision: evaluation.recommendation.strategy,
+      reason: `${evaluation.question1.answer}; ${evaluation.question2.answer}; ${evaluation.question3.answer}`,
+      evidence: [evaluation.question1.answer],
+      risks: [evaluation.question2.risk, evaluation.question3.risk].filter(Boolean),
+      alternatives: evaluation.recommendation.shouldProvideOptions
+        ? ['提供多个选项', '提供单一建议但保留修改空间']
+        : ['继续当前策略'],
+      confidence: Number(((evaluation.question1.confidence || 0.5 + (evaluation.question2.risk === 'low' ? 0.2 : 0)) / 1.2).toFixed(2)),
+      expectedOutcome: evaluation.recommendation.strategy,
+      userGoal: evaluation.question1.answer,
+      constraints: ['用户利益优先', '避免过度限制用户自主性']
+    };
+
+    const verification = this.verifier ? this.verifier.verify(decisionRecord) : null;
+
     return {
-      evaluation: evaluation,
-      finalRecommendation: evaluation.recommendation
+      evaluation,
+      finalRecommendation: evaluation.recommendation,
+      decisionRecord,
+      verification
     };
   }
 

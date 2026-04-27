@@ -1,6 +1,6 @@
 {
   "name": "heartflow",
-  "description": "HeartFlow v7.6 - Self-Evolution Engine with Meta-Learning",
+  "description": "HeartFlow v11.0.0 - AI skill for logic, decision, memory, and execution upgrades",
   "releaseDate": "2026-04-11",
   "main": "src/core/heartflow-engine.js",
   "bin": {
@@ -37,7 +37,7 @@
     "express": "^5.2.1",
     "pptxgenjs": "^4.0.1"
   },
-  "version": "10.16.6",
+  "version": "11.0.0",
   "directories": {
     "doc": "docs",
     "test": "tests"

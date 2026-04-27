@@ -5,6 +5,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { ExecutionVerifier } = require('./execution-verifier.js');
 
 const PERFORMANCE_FILE = path.join(__dirname, 'agent-performance.json');
 
@@ -13,6 +14,7 @@ class AgentOrchestrator {
     this.agents = new Map();
     this.dag = this.buildDAG();
     this.performance = this.loadPerformance();
+    this.executionVerifier = new ExecutionVerifier();
     this.initialize();
   }
 
@@ -185,7 +187,12 @@ class AgentOrchestrator {
       this.updatePerformance(agentId, true);
       
       console.log(`  ✓ ${agentId} 完成`);
-      return { agentId, output, success: true, weight: agent.weight };
+      const verification = this.executionVerifier.verify(output, {
+        plan: { actions: [agent.task], expectedOutcome: agent.task },
+        expectedOutcome: agent.task,
+        fallback: '切换到更保守的执行路径'
+      });
+      return { agentId, output, success: true, weight: agent.weight, verification };
     } catch (error) {
       agent.status = 'error';
       agent.history.push({ timestamp: Date.now(), input, error: error.message, success: false });
