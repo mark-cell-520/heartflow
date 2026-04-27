@@ -294,3 +294,12 @@ HeartFlow 的真正价值不在于页面，而在于：
 - Stage flow: Light Sleep → REM → Deep Sleep → Lucid Dream.
 - Memory palace rooms: 客厅 / 书房 / 厨房 / 花园 / 地下室 / 走廊.
 - Wake-up verifier extracts reusable fragments and stores dream notes.
+
+
+## Dream Memory Palace Output Style
+
+- Dream begins as memory summary, then enters staged flow.
+- Prefer narrative fragments over mechanical explanation.
+- Keep useless or strange fragments; they may become later insight.
+- Use Light Sleep / REM / Deep Sleep / Lucid Dream as the canonical sequence.
+- On waking, store a short dream journal plus a few insight records.
