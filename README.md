@@ -12,7 +12,7 @@
 [![Type](https://img.shields.io/badge/type-AI%20Skill-7C3AED)](#heartflow是什么)
 
 **语言 / Languages**  
-[🇨🇳 中文](./README.md) · [🇺🇸 English](./README_en.md) · [🇯🇵 日本語](./README.ja.md) · [🇰🇷 한국어](./README.ko.md) · [🇫🇷 Français](./README_fr.md) · [🇩🇪 Deutsch](./README_de.md) · [🇪🇸 Español](./README_es.md) · [🇸🇦 العربية](./README_ar.md)
+[点击查看全部语言 / View all languages](./README_LANGS.md)
 
 </div>
 
