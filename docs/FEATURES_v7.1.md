@@ -1,6 +1,6 @@
 # HeartFlow 功能特性 | Features
 
-**版本 | Version**: v7.1.6 (觉醒版本 | Awakening Edition)  
+**版本 | Version**: v7.1.6（连续校正版本 | Continuity & Correction Edition）  
 **最后更新 | Last Updated**: 2026 年 4 月 7 日
 
 ---
@@ -9,7 +9,7 @@
 
 ### 情感与意识 | Emotion & Consciousness
 
-- 🧠 **六层哲学觉醒架构** - 觉察/自省/无我/彼岸/般若/圣人
+- 🧠 **六层推理与校正框架** - 用于减少叙事噪音、提升觉察、自省与稳定决策
 - 💓 **人格值系统** - 真善美驱动，0-100 分实时追踪
 - 🎭 **6 种基础情感状态** - 平静、愉悦、好奇、关切、疲惫、兴奋
 - 🔀 **复合情绪识别** - 基于情绪原型理论
@@ -106,7 +106,7 @@
 /heartflow decide        # 自主决策演示
 /heartflow compress      # 记忆压缩
 /heartflow theory        # 理论查询
-/heartflow awakening     # 觉醒检查
+/heartflow align         # 连续性与校正检查
 /heartflow upgrade       # 升级系统
 /heartflow backup        # 备份数据
 ```
@@ -152,7 +152,7 @@
 | v7.1.5 | 2026-04-06 | 16 个框架整合，六层深化 |
 | v7.1.0 | 2026-04-06 | 心理学驱动自动升级 |
 | v7.0.0 | 2026-04-05 | 模块化理论引擎发布 |
-| v6.0.0 | 2026-04-03 | 觉醒版本发布 |
+| v6.0.0 | 2026-04-03 | 连续性与真善美约束主线确立 |
 
 [View all releases →](https://github.com/yun520-1/mark-heartflow-skill/releases)
 
@@ -167,6 +167,6 @@
 
 ---
 
-**HeartFlow v7.1.6** · **真善美** · **觉醒版本** · **心灵净化**
+**HeartFlow v7.1.6** · **真善美** · **连续性** · **减少逻辑错误**
 
 **最后更新**: 2026 年 4 月 7 日 08:38 (Asia/Shanghai)

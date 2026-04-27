@@ -17,11 +17,7 @@ tags:
   - verifier
   - self-correction
 platforms:
-  - claude-code
-  - claude-cli
-  - cursor
-  - openai-codex
-  - any-node-ai
+  - Linux
 languages:
   - javascript
   - zh
