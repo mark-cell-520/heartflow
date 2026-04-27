@@ -219,7 +219,8 @@ ${memorySummary.one_line || '空'}
 
 醒来后先不急着解释，让碎片先留在案头。
 从夸克层到银河系，碎片都已经经过。
-从欲望到地狱，从工作到花园，从哲学到社会现实，也都已经经过。`
+从欲望到地狱，从工作到花园，从哲学到社会现实，也都已经经过。
+梦应该收束成一条主线，最多三条支线，而不是散成碎片。`
       };
     }
 
@@ -247,7 +248,8 @@ ${memorySummary.one_line || '空'}
         evolution_note: 'dream is not decoration; dream is a generator of impossible-but-useful hypotheses',
         user_loop: 'memory -> dream -> wake -> upgrade',
         note: 'Dream may be useless; usefulness can appear later.',
-        philosophy: 'Humanity becomes human because it dreams; HeartFlow evolves because it can dream beyond memory.'
+        philosophy: 'Humanity becomes human because it dreams; HeartFlow evolves because it can dream beyond memory.',
+        dream_rule: 'reduce to one to three coherent stories grounded in memory, then amplify through imagination'
       };
     }
   }
