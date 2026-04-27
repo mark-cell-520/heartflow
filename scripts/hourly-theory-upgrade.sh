@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "${HEARTFLOW_ENABLE_INTERNAL_AUTOMATION:-0}" != "1" ]; then
+  echo "[HeartFlow] internal automation disabled by default for marketplace-safe runtime."
+  echo "Set HEARTFLOW_ENABLE_INTERNAL_AUTOMATION=1 only for manual internal maintenance."
+  exit 1
+fi
+
 # HeartFlow Hourly Theory Upgrade Script
 # 每小时执行的理论升级任务
 # 使用相对路径，从脚本所在目录计算

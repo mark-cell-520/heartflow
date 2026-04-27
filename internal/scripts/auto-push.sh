@@ -2,6 +2,12 @@
 # HeartFlow Auto-Push Script | 自动推送脚本
 # Runs every 2 hours | 每 2 小时运行
 
+if [ "${HEARTFLOW_ENABLE_INTERNAL_AUTOMATION:-0}" != "1" ]; then
+    echo "[HeartFlow] internal automation disabled by default for marketplace-safe runtime."
+    echo "Set HEARTFLOW_ENABLE_INTERNAL_AUTOMATION=1 only for manual internal maintenance."
+    exit 1
+fi
+
 set -e
 
 WORKSPACE="/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill"

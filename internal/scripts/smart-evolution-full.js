@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+if (process.env.HEARTFLOW_ENABLE_INTERNAL_AUTOMATION !== '1') {
+  console.error('[HeartFlow] internal automation disabled by default for marketplace-safe runtime.');
+  console.error('Set HEARTFLOW_ENABLE_INTERNAL_AUTOMATION=1 only for manual internal maintenance.');
+  process.exit(1);
+}
+
 /**
  * HeartFlow Smart Evolution System v4.0
  * 智能自动进化系统 - 完整功能 + 精简流程

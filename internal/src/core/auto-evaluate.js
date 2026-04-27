@@ -14,6 +14,12 @@ const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
 
+function assertInternalAutomationEnabled() {
+  if (process.env.HEARTFLOW_ENABLE_INTERNAL_AUTOMATION !== '1') {
+    throw new Error('HeartFlow internal automation disabled by default for marketplace-safe runtime');
+  }
+}
+
 // ============================================================================
 // 评估标准定义
 // ============================================================================
@@ -170,7 +176,8 @@ function checkRiskLevel() {
 /**
  * 执行自动评估
  */
-function autoEvaluate(upgradeInfo = {}) {
+function autoEvaluate(upgradeInfo) {
+  assertInternalAutomationEnabled();
   const results = {
     timestamp: new Date().toISOString(),
     upgradeInfo,

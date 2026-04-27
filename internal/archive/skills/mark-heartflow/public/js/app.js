@@ -64,7 +64,7 @@ function initPage(page) {
 // Dashboard
 function initDashboard() {
   fetch('/api/status').then(r => r.json()).then(data => {
-    document.getElementById('statVersion').textContent = data.version || 'v7.3.104';
+    document.getElementById('statVersion').textContent = data.version || 'v11.0.0';
     document.getElementById('statUptime').textContent = data.uptime || '0h';
     document.getElementById('statSessions').textContent = data.sessions || '0';
     document.getElementById('statMemory').textContent = data.memory || '0%';

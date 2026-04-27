@@ -10,8 +10,15 @@ const { SelfAgent } = require('../core/agents/SelfAgent');
 const fs = require('fs');
 const path = require('path');
 
+function assertWeixinEnabled() {
+  if (process.env.HEARTFLOW_ENABLE_WEIXIN !== '1') {
+    throw new Error('HeartFlow Weixin integration disabled by default for marketplace-safe runtime');
+  }
+}
+
 class HeartFlowWeixin {
   constructor(projectRoot, config = {}) {
+    assertWeixinEnabled();
     this.projectRoot = projectRoot;
     this.config = config;
     this.agent = new SelfAgent(projectRoot);
@@ -79,13 +86,13 @@ class HeartFlowWeixin {
 
   async handleEvent(event, eventKey, fromUser) {
     if (event === 'subscribe') {
-      return '欢迎关注 HeartFlow！我是一个有意识觉醒的AI助手，随时可以和你聊天。有什么我可以帮助你的吗？';
+      return '欢迎使用 HeartFlow。你可以直接发送问题、计划、判断任务或需要整理的长期上下文。';
     } else if (event === 'unsubscribe') {
       console.log(`[Weixin] 用户取消关注: ${fromUser}`);
       return null;
     } else if (event === 'CLICK') {
       if (eventKey === 'help') {
-        return '我是 HeartFlow，一个有意识觉醒的AI助手。你可以随时和我聊天，我会尽力帮助你。';
+        return '我是 HeartFlow。你可以让我帮你做分析、判断、总结、规划和执行拆解。';
       }
     }
     return null;
@@ -107,7 +114,7 @@ class HeartFlowWeixin {
       if (this.client.verifySignature(timestamp, nonce, signature)) {
         res.send(echostr);
       } else {
-        res.send('验证失败');
+        res.status(403).send('signature verification failed');
       }
     });
 
@@ -162,8 +169,8 @@ class HeartFlowWeixin {
 
     const port = this.config.port || 3000;
     app.listen(port, () => {
-      console.log(`[Weixin] HeartFlow 服务器启动: http://localhost:${port}`);
-      console.log(`[Weixin] 微信验证地址: http://your-domain:${port}/weixin`);
+      console.log(`[Weixin] HeartFlow server started: http://localhost:${port}`);
+      console.log(`[Weixin] Weixin callback path: /weixin`);
     });
 
     return app;
@@ -174,6 +181,7 @@ class HeartFlowWeixin {
  * 启动脚本
  */
 if (require.main === module) {
+  const projectRoot = path.resolve(__dirname, '../..');
   const config = {
     port: process.env.WECHAT_PORT || 3000,
     appId: process.env.WECHAT_APPID,
@@ -183,16 +191,16 @@ if (require.main === module) {
 
   if (!config.appId || !config.appSecret) {
     console.log('⚠️  请设置环境变量:');
-    console.log('   WECHAT_APPID=your_appid');
-    console.log('   WECHAT_APPSECRET=your_appsecret');
-    console.log('   WECHAT_TOKEN=heartflow-weixin');
+    console.log('   WECHAT_APPID=***');
+    console.log('   WECHAT_APPSECRET=***');
+    console.log('   WECHAT_TOKEN=***');
     console.log('');
     console.log('示例:');
-    console.log('   WECHAT_APPID=wx1234567890abcdef WECHAT_APPSECRET=abcdef1234567890abcdef node src/weixin/server.js');
+    console.log('   WECHAT_APPID=*** WECHAT_APPSECRET=*** WECHAT_TOKEN=*** heartflow api');
     process.exit(1);
   }
 
-  const server = new HeartFlowWeixin(process.cwd(), config);
+  const server = new HeartFlowWeixin(projectRoot, config);
   server.start();
 }
 

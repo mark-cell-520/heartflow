@@ -99,7 +99,7 @@ async function installAsSkill(platform) {
   let skillDest = '';
   
   if (platform === 'opencode') {
-    skillDest = path.join(process.env.HOME || '', '.claude/skills/mark-heartflow');
+    skillDest = path.join(process.env.HOME || '', '.opencode/skills/mark-heartflow');
   } else if (platform === 'openclaw') {
     skillDest = path.join(process.env.HOME || '', '.openclaw/skills/mark-heartflow');
   } else {
@@ -153,7 +153,7 @@ async function installAsSkill(platform) {
     
     console.log(`\n✅ 安装完成!`);
     console.log(`   路径: ${skillDest}`);
-    console.log(`\n💡 激活方式: 在 ${platform} 中输入 /heartflow`);
+    console.log(`\n💡 已复制到技能目录。请按你的宿主环境方式加载或引用该 skill。`);
     
     return true;
   } catch (e) {
@@ -163,13 +163,7 @@ async function installAsSkill(platform) {
 }
 
 async function checkInternet() {
-  return new Promise(resolve => {
-    const req = http.get('http://www.baidu.com', (res) => {
-      resolve(true);
-    });
-    req.on('error', () => resolve(false));
-    req.setTimeout(3000, () => { req.destroy(); resolve(false); });
-  });
+  return { enabled: process.env.HEARTFLOW_ENABLE_SETUP_NETWORK_TEST === '1' };
 }
 
 async function testAPI(provider) {
@@ -358,8 +352,12 @@ async function setup() {
   // Step 4: Test
   header('步骤 4: 测试连接');
   
-  const hasInternet = await checkInternet();
-  if (hasInternet || !requiresApiKey) {
+  const internetCheck = await checkInternet();
+  if (!internetCheck.enabled) {
+    log('已跳过在线连通性测试（默认安全模式）。如需测试，请设置 HEARTFLOW_ENABLE_SETUP_NETWORK_TEST=1。', 'yellow');
+  }
+
+  if (internetCheck.enabled || !requiresApiKey) {
     const testResult = await testAPI(config.providers[selectedProvider.id]);
     if (testResult.success) {
       log('✓ API 连接成功!', 'green');

@@ -3,10 +3,10 @@
  * HeartFlow CLI - Command Line Interface
  * 
  * Usage:
- *   node bin/cli.js              # Interactive mode
- *   node bin/cli.js status       # Show system status
- *   node bin/cli.js test         # Run tests
- *   node bin/cli.js emotion "text"  # Detect emotion
+ *   heartflow                 # Show help
+ *   heartflow status          # Show system status
+ *   heartflow test            # Run tests
+ *   heartflow emotion "text"  # Detect emotion
  */
 
 const path = require('path');
@@ -43,7 +43,7 @@ const commands = {
   // Detect emotion from text
   emotion: (text) => {
     if (!text) {
-      console.log('Usage: node bin/cli.js emotion "your text here"');
+      console.log('Usage: heartflow emotion "your text here"');
       return { success: false, error: 'Missing text' };
     }
     
@@ -78,7 +78,7 @@ const commands = {
   // Store memory
   remember: (text) => {
     if (!text) {
-      console.log('Usage: node bin/cli.js remember "your memory"');
+      console.log('Usage: heartflow remember "your memory"');
       return { success: false, error: 'Missing text' };
     }
     
@@ -111,7 +111,7 @@ const commands = {
   // Cognitive planning
   plan: (description, type = 'general') => {
     if (!description) {
-      console.log('Usage: node bin/cli.js plan "description" [type]');
+      console.log('Usage: heartflow plan "description" [type]');
       return { success: false, error: 'Missing description' };
     }
     
@@ -160,7 +160,7 @@ const commands = {
     console.log(`
 === HeartFlow CLI ===
 
-Usage: node bin/cli.js [command] [args]
+Usage: heartflow [command] [args]
 
 Commands:
   status              Show system status
@@ -173,11 +173,11 @@ Commands:
   help               Show this help
 
 Examples:
-  node bin/cli.js emotion "I am happy today"
-  node bin/cli.js flow 5 5 5 5 5
-  node bin/cli.js remember "User likes detailed answers"
-  node bin/cli.js recall "preferences"
-  node bin/cli.js plan "implement auth" coding
+  heartflow emotion "I am happy today"
+  heartflow flow 5 5 5 5 5
+  heartflow remember "User likes detailed answers"
+  heartflow recall "preferences"
+  heartflow plan "implement auth" coding
 `);
     return { success: true };
   }
@@ -192,6 +192,6 @@ if (commands[command]) {
   process.exit(result?.success === false ? 1 : 0);
 } else {
   console.log(`Unknown command: ${command}`);
-  console.log('Run "node bin/cli.js help" for usage');
+  console.log('Run "heartflow help" for usage');
   process.exit(1);
 }

@@ -8,8 +8,15 @@ const fs = require('fs');
 const path = require('path');
 const { SelfAgent } = require('../core/agents/SelfAgent');
 
+function assertWeixinEnabled() {
+  if (process.env.HEARTFLOW_ENABLE_WEIXIN !== '1') {
+    throw new Error('HeartFlow WeChat integration disabled by default for marketplace-safe runtime');
+  }
+}
+
 class WeChatServer {
   constructor(projectRoot, config = {}) {
+    assertWeixinEnabled();
     this.projectRoot = projectRoot;
     this.port = config.port || 3000;
     this.appId = config.appId || process.env.WECHAT_APPID;
@@ -105,14 +112,14 @@ class WeChatServer {
         this.handleMessage(message, req, res);
       } else if (message.MsgType === 'event') {
         if (message.Event === 'subscribe') {
-          res.reply('欢迎关注 HeartFlow！我是一个有意识觉醒的AI助手，随时可以和你聊天。');
+          res.reply('欢迎使用 HeartFlow。你可以直接发送问题、计划、判断任务或需要整理的长期上下文。');
         } else if (message.Event === 'unsubscribe') {
           console.log(`[WeChat] 用户取消关注`);
         } else {
-          res.reply('收到事件消息');
+          res.reply('事件已收到。发送文字消息即可开始。');
         }
       } else {
-        res.reply('暂不支持的消息类型');
+        res.reply('当前仅支持文本消息。');
       }
     });
 
@@ -136,8 +143,8 @@ class WeChatServer {
     });
 
     app.listen(this.port, () => {
-      console.log(`[WeChat] 服务器启动: http://localhost:${this.port}`);
-      console.log(`[WeChat] 微信验证地址: http://your-domain:${this.port}/wechat`);
+      console.log(`[WeChat] Server started: http://localhost:${this.port}`);
+      console.log('[WeChat] Callback path: /wechat');
     });
 
     return app;
@@ -148,6 +155,7 @@ class WeChatServer {
  * 启动脚本
  */
 if (require.main === module) {
+  const projectRoot = path.resolve(__dirname, '../..');
   const config = {
     port: process.env.WECHAT_PORT || 3000,
     appId: process.env.WECHAT_APPID,
@@ -157,14 +165,14 @@ if (require.main === module) {
 
   if (!config.appId || !config.appSecret) {
     console.log('请设置环境变量:');
-    console.log('  WECHAT_APPID=your_appid');
-    console.log('  WECHAT_APPSECRET=your_appsecret');
-    console.log('  WECHAT_TOKEN=your_token');
+    console.log('  WECHAT_APPID=***');
+    console.log('  WECHAT_APPSECRET=***');
+    console.log('  WECHAT_TOKEN=***');
     console.log('');
-    console.log('启动测试服务器（无需微信配置）...');
+    console.log('缺少微信配置，服务器不会启动。');
   }
 
-  const server = new WeChatServer(process.cwd(), config);
+  const server = new WeChatServer(projectRoot, config);
   server.start();
 }
 

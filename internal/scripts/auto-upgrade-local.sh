@@ -1,4 +1,11 @@
 #!/bin/bash
+
+if [ "${HEARTFLOW_ENABLE_INTERNAL_AUTOMATION:-0}" != "1" ]; then
+  echo "[HeartFlow] internal automation disabled by default for marketplace-safe runtime."
+  echo "Set HEARTFLOW_ENABLE_INTERNAL_AUTOMATION=1 only for manual internal maintenance."
+  exit 1
+fi
+
 # HeartFlow 本地自动升级脚本
 # 每 23 分钟执行一次
 

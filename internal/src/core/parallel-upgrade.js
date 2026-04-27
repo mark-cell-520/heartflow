@@ -15,6 +15,12 @@ const path = require('path');
 const fs = require('fs');
 const { theoryToCode, batchConvert } = require('./theory-to-code');
 
+function assertInternalAutomationEnabled() {
+  if (process.env.HEARTFLOW_ENABLE_INTERNAL_AUTOMATION !== '1') {
+    throw new Error('HeartFlow internal automation disabled by default for marketplace-safe runtime');
+  }
+}
+
 // ============================================================================
 // 并行任务管理
 // ============================================================================
@@ -58,6 +64,7 @@ class ParallelUpgradeEngine {
    * 执行单个任务
    */
   async executeTask(task) {
+    assertInternalAutomationEnabled();
     task.status = 'running';
     console.log(`🔄 执行：${task.name}`);
     

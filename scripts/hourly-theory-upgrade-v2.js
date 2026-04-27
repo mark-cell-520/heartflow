@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+if (process.env.HEARTFLOW_ENABLE_INTERNAL_AUTOMATION !== '1') {
+  console.error('[HeartFlow] internal automation disabled by default for marketplace-safe runtime.');
+  console.error('Set HEARTFLOW_ENABLE_INTERNAL_AUTOMATION=1 only for manual internal maintenance.');
+  process.exit(1);
+}
+
 /**
  * HeartFlow v7.3.x - Enhanced Hourly Theory Upgrade
  * 

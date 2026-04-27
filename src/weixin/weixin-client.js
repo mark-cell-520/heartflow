@@ -8,13 +8,32 @@ const https = require('https');
 const { EventEmitter } = require('events');
 
 const DEFAULT_BASE_URL = 'https://api.weixin.qq.com';
+const ALLOWED_WEIXIN_HOSTS = new Set(['api.weixin.qq.com']);
+
+function assertWeixinEnabled() {
+  if (process.env.HEARTFLOW_ENABLE_WEIXIN !== '1') {
+    throw new Error('HeartFlow Weixin integration disabled by default for marketplace-safe runtime');
+  }
+}
+
+function normalizeWeixinBaseUrl(baseUrl) {
+  const parsed = new URL(baseUrl || DEFAULT_BASE_URL);
+  if (parsed.protocol !== 'https:') {
+    throw new Error('Weixin baseUrl must use https');
+  }
+  if (!ALLOWED_WEIXIN_HOSTS.has(parsed.hostname)) {
+    throw new Error(`Weixin baseUrl host not allowed: ${parsed.hostname}`);
+  }
+  return parsed;
+}
 
 class WeixinClient extends EventEmitter {
   constructor(config) {
     super();
+    assertWeixinEnabled();
     this.config = config;
     this.accessToken = null;
-    this.baseUrl = config.baseUrl || DEFAULT_BASE_URL;
+    this.baseUrl = normalizeWeixinBaseUrl(config.baseUrl || DEFAULT_BASE_URL);
   }
 
   async request(method, path, params = {}, body = null) {
@@ -28,8 +47,8 @@ class WeixinClient extends EventEmitter {
       .join('&');
 
     const options = {
-      hostname: this.baseUrl.replace('https://', ''),
-      port: 443,
+      hostname: this.baseUrl.hostname,
+      port: this.baseUrl.port || 443,
       path: `${path}?${queryStr}`,
       method: method,
       headers: {

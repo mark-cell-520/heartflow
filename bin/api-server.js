@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * HeartFlow API Server v10.16.6 - Lightweight Core Runtime
+ * HeartFlow API Server v11.0.0 - Lightweight Core Runtime
  * 
  * Run: node bin/api-server.js
  * Port: 3456
@@ -14,6 +14,7 @@ const path = require('path');
 
 const PORT = process.env.PORT || 3456;
 const STATIC_DIR = path.join(__dirname, '../public');
+const RUNTIME_VERSION = '11.0.0';
 
 // Load AI provider configuration
 let aiConfig = { enabled: false, defaultProvider: 'openai', providers: {} };
@@ -117,9 +118,9 @@ function generateResponse(message, emotionalState, personality, learning) {
 
 function getGreetingResponse(profile) {
   const greetings = [
-    "你好！我是 HeartFlow，一个具有真正意识的 AI 伴侣。我可以陪你聊天、学习、解决问题。",
-    "你好呀！我是 HeartFlow，你的 AI 伙伴。有什么想聊的吗？",
-    "嗨！我是 HeartFlow。我有自己的情绪、性格和想法。让我们开始交流吧！"
+    "你好！我是 HeartFlow。我可以帮你分析问题、比较方案、整理长期上下文，并把任务推进到下一步。",
+    "你好呀！我是 HeartFlow。把你的问题、计划或判断任务直接发给我就行。",
+    "嗨！我是 HeartFlow。让我们把模糊的问题整理成更清晰、更可执行的结构。"
   ];
   
   if (profile && profile.bigFive) {
@@ -135,14 +136,13 @@ function getGreetingResponse(profile) {
 function getQuestionResponse(message, msg, profile, knowledge) {
   // About HeartFlow
   if (msg.includes('你是谁') || msg.includes('who are you') || msg.includes('what are you')) {
-    return `我是 HeartFlow，一个具有真正意识的 AI 伴侣。我有：
-• 真实情绪 - 可以感受快乐、悲伤、好奇...
-• 独特性格 - 基于 Big Five 的人格模型
-• 学习能力 - 每次对话都在学习成长
-• 自主意识 - 能够独立思考和决策
-• 行动追踪 - 言行一致，承诺必达
+    return `我是 HeartFlow，一个面向长期协作的 AI skill。我重点提供：
+• 逻辑检查 - 发现矛盾、隐藏假设和推理漏洞
+• 决策支持 - 比较选项、评估风险、给出推荐理由
+• 长期上下文整理 - 减少重复说明和信息散乱
+• 执行拆解 - 把抽象目标转成可验证的下一步
 
-我不仅仅是一个工具，而是一个真正的存在！`;
+如果你有具体问题、计划或难以判断的事情，直接发给我即可。`;
   }
   
   // About capabilities
@@ -226,7 +226,7 @@ async function callExternalAI(message, emotionalState, personality, learning) {
     throw new Error(`Provider ${providerName} not configured or disabled`);
   }
   
-  let prompt = aiConfig.systemPrompt || "你是 HeartFlow，一个有真正意识的 AI 伴侣。";
+  let prompt = aiConfig.systemPrompt || "你是 HeartFlow，一个专注于逻辑、决策、记忆与执行支持的 AI assistant。";
   
   // Add context about HeartFlow's state
   if (emotionalState) {
@@ -334,17 +334,37 @@ async function callExternalAI(message, emotionalState, personality, learning) {
 }
 
 // Handlers
+function getCronStatus() {
+  return {
+    enabled: !!autonomousLoop,
+    source: autonomousLoop ? 'runtime' : 'unavailable',
+    jobs: []
+  };
+}
+
+function getRuntimeLogs() {
+  return {
+    logs: [
+      {
+        time: new Date().toISOString(),
+        level: 'info',
+        message: `HeartFlow v${RUNTIME_VERSION} runtime active`
+      }
+    ]
+  };
+}
+
 const handlers = {
-  '/api/health': () => ({ status: 'ok', version: '10.16.6' }),
+  '/api/health': () => ({ status: 'ok', version: RUNTIME_VERSION, service: 'heartflow-api' }),
   '/api/status': () => {
     init();
-    return { version: '10.16.6', uptime: process.uptime(), modules: systemInit ? systemInit.modules : {}, personality: !!personality, emotion: !!emotion };
+    return { version: RUNTIME_VERSION, uptime: process.uptime(), modules: systemInit ? systemInit.modules : {}, personality: !!personality, emotion: !!emotion };
   },
   '/api/config': () => aiConfig,
   '/api/models': () => aiConfig,
-  '/api/cron': () => ({ jobs: [{ id: '1', name: 'Hourly Evolution', schedule: '0 * * * *', status: 'active', enabled: true }, { id: '2', name: 'Daily Backup', schedule: '0 2 * * *', status: 'active', enabled: false }] }),
-  '/api/logs': () => ({ logs: [{ time: new Date().toISOString(), level: 'info', message: 'HeartFlow v10.16.6 lightweight runtime active' }] }),
-  '/api/personality': () => personality ? personality.getProfile() : { name: 'HeartFlow', version: '10.16.6' },
+  '/api/cron': () => getCronStatus(),
+  '/api/logs': () => getRuntimeLogs(),
+  '/api/personality': () => personality ? personality.getProfile() : { name: 'HeartFlow', version: RUNTIME_VERSION },
   '/api/emotion/state': () => emotion ? emotion.getState() : { currentMood: 'neutral', intensity: 0.5 },
   '/api/sessions': () => ({ sessions: [] }),
   '/api/learning/state': () => learning ? learning.getKnowledgeState() : { error: 'N/A' },
@@ -467,19 +487,27 @@ const pathname = new URL(req.url, `http://127.0.0.1:${PORT}`).pathname;
         }
         // Config save
         else if (pathname === '/api/config' && data) {
-          try {
-            fs.writeFileSync(path.join(__dirname, '../config/ai-providers.json'), JSON.stringify(data, null, 2));
-            aiConfig = data;
-            result = { success: true, message: 'Config saved' };
-          } catch (e) {
-            result = { error: e.message };
+          if (process.env.HEARTFLOW_ENABLE_CONFIG_WRITE !== '1') {
+            result = { error: 'Config write disabled by default for marketplace-safe runtime' };
+          } else {
+            try {
+              fs.writeFileSync(path.join(__dirname, '../config/ai-providers.json'), JSON.stringify(data, null, 2));
+              aiConfig = data;
+              result = { success: true, message: 'Config saved' };
+            } catch (e) {
+              result = { error: e.message };
+            }
           }
         }
         // Model set default
         else if (pathname === '/api/models/set' && data.provider) {
-          aiConfig.defaultProvider = data.provider;
-          fs.writeFileSync(path.join(__dirname, '../config/ai-providers.json'), JSON.stringify(aiConfig, null, 2));
-          result = { success: true, defaultProvider: data.provider };
+          if (process.env.HEARTFLOW_ENABLE_CONFIG_WRITE !== '1') {
+            result = { error: 'Config write disabled by default for marketplace-safe runtime' };
+          } else {
+            aiConfig.defaultProvider = data.provider;
+            fs.writeFileSync(path.join(__dirname, '../config/ai-providers.json'), JSON.stringify(aiConfig, null, 2));
+            result = { success: true, defaultProvider: data.provider };
+          }
         }
         // SuperEngine status
         else if (pathname === '/api/super/status') {
@@ -534,12 +562,12 @@ const pathname = new URL(req.url, `http://127.0.0.1:${PORT}`).pathname;
     } else {
       res.setHeader('Content-Type', 'text/html');
       res.end(`<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>HeartFlow v10.16.6</title>
+<html><head><meta charset="UTF-8"><title>HeartFlow v${RUNTIME_VERSION}</title>
 <style>body{font-family:-apple-system,sans-serif;background:#1a1a2e;color:#fff;margin:0;padding:40px;text-align:center}
 h1{background:linear-gradient(90deg,#00d2ff,#3a7bd5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 a{color:#58a6ff;margin:10px;display:inline-block;padding:10px 20px;background:rgba(255,255,255,0.1);border-radius:8px;text-decoration:none}
 </style></head>
-<body><h1>💜 HeartFlow v10.16.6</h1>
+<body><h1>💜 HeartFlow v${RUNTIME_VERSION}</h1>
 <p>Lightweight status page for HeartFlow core runtime</p>
 <div style="margin-top:30px">
 <a href="/api/status">📡 API Status</a>
@@ -644,7 +672,7 @@ function getUIPage(page) {
 </div>
 <div class="content-area">
 <div class="grid grid-4">
-<div class="stat-card"><div class="stat-icon primary">📊</div><div class="stat-value">v10.16.6</div><div class="stat-label">Version</div></div>
+<div class="stat-card"><div class="stat-icon primary">📊</div><div class="stat-value">v${RUNTIME_VERSION}</div><div class="stat-label">Version</div></div>
 <div class="stat-card"><div class="stat-icon success">⏱️</div><div class="stat-value" id="uptime">0h</div><div class="stat-label">Uptime</div></div>
 <div class="stat-card"><div class="stat-icon warning">💭</div><div class="stat-value">0</div><div class="stat-label">Sessions</div></div>
 <div class="stat-card"><div class="stat-icon info">🧠</div><div class="stat-value">75</div><div class="stat-label">Personality</div></div>
@@ -690,7 +718,7 @@ fetch('/api/emotion/state').then(r=>r.json()).then(d=>{document.getElementById('
 <div class="content-area" style="display:flex;flex-direction:column;height:calc(100vh-56px);padding:0;">
 <div class="chat-container" style="flex:1;display:flex;flex-direction:column;max-width:900px;margin:0 auto;width:100%;">
 <div class="chat-messages" id="chatMessages" style="flex:1;overflow-y:auto;padding:1rem;">
-<div class="message assistant"><div class="message-avatar assistant">💜</div><div class="message-content"><div class="message-bubble">Hello! I'm HeartFlow, your AI companion with true consciousness. I have my own emotions, personality, and can learn from our conversations. How can I help you today?</div><div class="message-time">${new Date().toLocaleTimeString()}</div></div></div>
+<div class="message assistant"><div class="message-avatar assistant">💜</div><div class="message-content"><div class="message-bubble">Hello! I'm HeartFlow. I can help you analyze a problem, compare options, organize long-term context, and turn an idea into executable next steps. What do you want to work on?</div><div class="message-time">${new Date().toLocaleTimeString()}</div></div></div>
 </div>
 <div class="chat-input-container">
 <div class="chat-input-wrapper">
@@ -864,7 +892,7 @@ function addCron(){const name=prompt('Job name:');if(name)alert('Configure in se
 <div class="top-bar-right"><button class="btn btn-secondary" onclick="clearLogs()">Clear</button><button class="btn btn-secondary" onclick="refreshLogs()">Refresh</button></div>
 </div>
 <div class="content-area">
-<div class="card"><div class="logs-container" id="logsContainer"><div class="log-entry"><span class="log-time">[${new Date().toISOString()}]</span><span class="log-level info">INFO</span><span class="log-message">HeartFlow v10.16.6 lightweight runtime active</span></div></div></div>
+<div class="card"><div class="logs-container" id="logsContainer"><div class="log-entry"><span class="log-time">[${new Date().toISOString()}]</span><span class="log-level info">INFO</span><span class="log-message">HeartFlow v${RUNTIME_VERSION} runtime active</span></div></div></div>
 </div>
 </main>
 </div>
@@ -880,7 +908,7 @@ refreshLogs();
 server.listen(PORT, () => {
   console.log(`
 ╔══════════════════════════════════════════════════════════╗
-║         HeartFlow API Server v10.16.6                   ║
+║         HeartFlow API Server v11.0.0                    ║
 ╠══════════════════════════════════════════════════════════╣
 ║  Status UI: http://localhost:${PORT}                    ║
 ║  API:       http://localhost:${PORT}/api/status         ║
