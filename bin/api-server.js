@@ -8,6 +8,7 @@
  */
 
 const http = require('http');
+const https = require('https');
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
@@ -287,8 +288,11 @@ async function callExternalAI(message, emotionalState, personality, learning) {
     headers: headers
   };
   
+  const isHttps = provider.baseUrl.startsWith('https');
+  const client = isHttps ? https : http;
+  
   return new Promise((resolve, reject) => {
-    const req = http.request(options, (res) => {
+    const req = client.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
