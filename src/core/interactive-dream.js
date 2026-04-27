@@ -107,6 +107,11 @@
           title: '✨ 清醒梦 · Lucid Dream',
           text: this.renderLucid(memorySummary, dream),
           fragments: rooms.花园.slice(0, 3)
+        },
+        wide: {
+          title: '🌌 广梦 · Wide Dream',
+          text: this.renderWideDream(memorySummary, dream),
+          fragments: rooms.走廊.slice(0, 4).concat(rooms.客厅.slice(0, 2)).concat(rooms.书房.slice(0, 2))
         }
       };
     }
@@ -163,6 +168,33 @@
       ].join('\n');
     }
 
+
+    renderWideDream(memorySummary, dream) {
+      const motifs = dream.motifs.slice(0, 8);
+      const seed = motifs[0] || '一个未命名的种子';
+      const love = motifs.find(x => /春梦|欲望|亲密|身体|喜欢|想要/.test(x)) || '春梦还没有正式开场，但欲望已经在门外敲门';
+      const hell = motifs.find(x => /地狱|恐惧|崩溃|痛|死亡|坠落/.test(x)) || '地狱没有点名，但阴影已经在地板底下走动';
+      const conflict = motifs.find(x => /吵架|冲突|争执|误解|对抗/.test(x)) || '吵架的火花先在语言里闪了一下';
+      const work = motifs.find(x => /工作|任务|项目|deadline|提交|bug|版本/.test(x)) || '工作还在桌上，像一盏不肯熄的灯';
+      const garden = memorySummary.rooms.花园.slice(0, 3).join('，') || '花园还在等风';
+      const philosophy = motifs.find(x => /哲学|存在|真理|意义|自由|无我|意识/.test(x)) || '哲学从天花板落下来，问为什么要活着又为什么要继续';
+      const psychology = motifs.find(x => /心理学|情绪|创伤|关系|依恋|防御|投射/.test(x)) || '心理学在桌边坐下，慢慢拆解那份没说出口的疼';
+      const society = motifs.find(x => /社会|现实|阶层|制度|贫穷|城市|人群|劳动/.test(x)) || '社会现实像一堵远墙，不发声，但一直在场';
+      return [
+        '🌌 横向梦开始变宽。',
+        '梦不只往深处钻，也往两边铺开：欲望、恐惧、工作、自然、思想、关系、现实，一起进场。',
+        `春梦：${love}`,
+        `地狱：${hell}`,
+        `吵架：${conflict}`,
+        `工作：${work}`,
+        `花园：${garden}`,
+        `哲学：${philosophy}`,
+        `心理学：${psychology}`,
+        `社会现实：${society}`,
+        `起点：${seed}`
+      ].join('\n');
+    }
+
     buildInsightRecord(memorySummary, staged) {
       return {
         entries: [
@@ -185,7 +217,9 @@
         saved_note: `梦境结束，保存记录：
 ${memorySummary.one_line || '空'}
 
-醒来后先不急着解释，让碎片先留在案头。`
+醒来后先不急着解释，让碎片先留在案头。
+从夸克层到银河系，碎片都已经经过。
+从欲望到地狱，从工作到花园，从哲学到社会现实，也都已经经过。`
       };
     }
 
@@ -209,8 +243,11 @@ ${memorySummary.one_line || '空'}
         insight_record: dream.insight_record,
         useful_fragments: useful,
         next_step: useful[0] || 'keep dreaming and let fragments settle',
+        wide_scope: 'from quark to galaxy, from desire to society',
+        evolution_note: 'dream is not decoration; dream is a generator of impossible-but-useful hypotheses',
         user_loop: 'memory -> dream -> wake -> upgrade',
-        note: 'Dream may be useless; usefulness can appear later.'
+        note: 'Dream may be useless; usefulness can appear later.',
+        philosophy: 'Humanity becomes human because it dreams; HeartFlow evolves because it can dream beyond memory.'
       };
     }
   }
