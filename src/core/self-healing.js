@@ -31,7 +31,12 @@ class SelfHealing {
       acc[x.type] = (acc[x.type] || 0) + 1;
       return acc;
     }, {});
-    return { total: this.failureWindow.length, counts };
+    const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+    return {
+      total: this.failureWindow.length,
+      counts,
+      summary: top ? `${top[0]} x${top[1]}` : 'no failures',
+    };
   }
 
   shouldRetry(result = {}) {
@@ -54,13 +59,16 @@ class SelfHealing {
   recover(result = {}) {
     const attempt = (result.attempt || 0) + 1;
     const canRetry = this.shouldRetry({ ...result, attempt });
+    const snapshot = this.summarize();
     return {
       ok: !!result.ok,
       attempt,
       canRetry,
       backoffMs: this.backoffMs * attempt,
       hints: this.repairHints(result),
-      summary: this.summarize(),
+      summary: snapshot.summary,
+      details: snapshot,
+      next_step: canRetry ? 'retry' : 'repair',
     };
   }
 }
