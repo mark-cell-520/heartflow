@@ -8,6 +8,16 @@
  * - 低 HRV 通常与压力/焦虑相关
  */
 
+const HRV_LIMITS = {
+  min: 0,
+  max: 200,
+  historySize: 100,
+  baselineMin: 10,
+  baselineMax: 100,
+  focusMin: 1,
+  focusMax: 10,
+};
+
 class BioSignalAdapter {
   constructor() {
     // 配置
@@ -35,9 +45,9 @@ class BioSignalAdapter {
     // HRV 中等 (30-70ms): 心流状态，专注度高
     // HRV 过高 (>70ms): 放松状态，专注度中等
     this.hrvFocusMapping = {
-      min: 10,
+      min: HRV_LIMITS.baselineMin,
       optimal: 50,
-      max: 100
+      max: HRV_LIMITS.baselineMax
     };
   }
 
@@ -69,7 +79,7 @@ class BioSignalAdapter {
    */
   onHRVData(hrvValue) {
     // 验证数据
-    if (typeof hrvValue !== 'number' || hrvValue < 0 || hrvValue > 200) {
+    if (typeof hrvValue !== 'number' || hrvValue < HRV_LIMITS.min || hrvValue > HRV_LIMITS.max) {
       return {
         success: false,
         message: '无效 HRV 数据 (应为 0-200ms)'
@@ -85,7 +95,7 @@ class BioSignalAdapter {
     this.hrvData.lastUpdate = new Date().toISOString();
     
     // 保留最近 100 条记录
-    if (this.hrvData.history.length > 100) {
+    if (this.hrvData.history.length > HRV_LIMITS.historySize) {
       this.hrvData.history.shift();
     }
 
@@ -153,7 +163,7 @@ class BioSignalAdapter {
    * @param {number} score - 行为专注度分数 (1-10)
    */
   updateBehaviorFocus(score) {
-    this.focusScore.fromBehavior = Math.max(1, Math.min(10, score));
+    this.focusScore.fromBehavior = Math.max(HRV_LIMITS.focusMin, Math.min(HRV_LIMITS.focusMax, score));
     this.focusScore.current = this.calculateOverallFocus();
     this.focusScore.lastCalculation = new Date().toISOString();
   }
@@ -302,7 +312,7 @@ class BioSignalAdapter {
    * @param {number} baseline - 基准 HRV 值
    */
   setBaseline(baseline) {
-    this.hrvData.baseline = Math.max(10, Math.min(100, baseline));
+    this.hrvData.baseline = Math.max(HRV_LIMITS.baselineMin, Math.min(HRV_LIMITS.baselineMax, baseline));
     return { success: true, baseline: this.hrvData.baseline };
   }
 }
