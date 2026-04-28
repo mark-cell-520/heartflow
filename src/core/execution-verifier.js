@@ -18,6 +18,7 @@ class ExecutionVerifier {
     checks.push(this.checkSuccessFlag(result));
     checks.push(this.checkExpectedOutcome(result, expected));
     checks.push(this.checkActionCoverage(result, plan));
+    checks.push(this.checkStructure(result));
 
     const issues = checks.flatMap(item => item.issues || []);
     const passed = issues.filter(i => i.severity === 'high').length === 0;
@@ -28,7 +29,8 @@ class ExecutionVerifier {
       retryRecommended: !passed,
       suggestedNextStep: this.suggestNextStep(issues, context),
       retryBudget: this.maxRetries,
-      score: this.computeScore(checks)
+      score: this.computeScore(checks),
+      summary: this.summarize(issues)
     };
   }
 
@@ -70,6 +72,19 @@ class ExecutionVerifier {
       ok: missing.length < actions.length,
       issues: missing.length < actions.length ? [] : [{ type: 'no_action_trace', severity: 'medium', message: '执行结果缺少动作痕迹，无法验证是否真正执行' }]
     };
+  }
+
+  checkStructure(result) {
+    const hasObject = result && typeof result === 'object';
+    return {
+      name: 'structure',
+      ok: hasObject,
+      issues: hasObject ? [] : [{ type: 'invalid_structure', severity: 'high', message: '执行结果不是结构化对象' }]
+    };
+  }
+
+  summarize(issues) {
+    return issues.slice(0, 3).map(i => `${i.type}:${i.message}`).join(' | ');
   }
 
   suggestNextStep(issues, context) {

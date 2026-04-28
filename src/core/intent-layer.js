@@ -193,7 +193,8 @@ class IntentLayer {
   redactPrompt(prompt) {
     return String(prompt)
       .replace(/([A-Za-z0-9_\-]{16,})/g, '[REDACTED]')
-      .replace(/(Bearer\s+)[A-Za-z0-9_\-\.]+/gi, '$1[REDACTED]');
+      .replace(/(Bearer\s+)[A-Za-z0-9_\-\.]+/gi, '$1[REDACTED]')
+      .replace(/(api[_-]?key\s*[:=]\s*)([^\s]+)/gi, '$1[REDACTED]');
   }
 
   async postToLLM(endpoint, payload) {
@@ -201,16 +202,18 @@ class IntentLayer {
     const url = new URL(endpoint);
     const mod = url.protocol === 'https:' ? require('https') : require('http');
     const body = JSON.stringify(payload);
+    const headers = {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(body),
+    };
+    if (this.llmApiKey) headers.Authorization = `Bearer ${this.llmApiKey}`;
+
     const options = {
       method: 'POST',
       hostname: url.hostname,
       port: url.port || (url.protocol === 'https:' ? 443 : 80),
       path: url.pathname,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': this.llmApiKey ? `Bearer ${this.llmApiKey}` : undefined,
-        'Content-Length': Buffer.byteLength(body),
-      }
+      headers
     };
     return new Promise((resolve, reject) => {
       const req = mod.request(options, res => {
@@ -226,15 +229,15 @@ class IntentLayer {
 
   /**
    * 构建LLM提示词
-   */
   buildPrompt(userMessage, conversationHistory) {
     const historyText = conversationHistory.length > 0
-      ? conversationHistory.slice(-5).map((msg, i) => `${i + 1}. ${msg.role || 'user'}: ${msg.content || msg}`).join('\n')
+      ? conversationHistory.slice(-5).map((msg, i) => `${i + 1}. ${msg.role || 'user'}: ${msg.content || msg}`).join('
+')
       : '(无对话历史)';
 
     return INTENT_PROMPT_TEMPLATE
-      .replace('{userMessage}', userMessage)
-      .replace('{conversationHistory}', historyText);
+      .replace('{userMessage}', this.redactPrompt(userMessage))
+      .replace('{conversationHistory}', this.redactPrompt(historyText));
   }
 
   /**

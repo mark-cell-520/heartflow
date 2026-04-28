@@ -1069,7 +1069,12 @@ function analyzePsychology(userMessage, context = {}) {
     emotional,
     deepNeed,
     defense,
-    psychology_summary: `${surface.summary}；情绪=${emotional.emotion}；深层需求=${deepNeed.need}`,
+    psychology_summary: summarizeForReply([
+      surface.summary,
+      `情绪=${emotional.emotion}`,
+      `深层需求=${deepNeed.need}`,
+      `防御=${defense.mechanism}`
+    ]).join('；'),
     nextReplyHint: '先承接怀疑，再补充证据链或指出逻辑跳跃'
   };
 }

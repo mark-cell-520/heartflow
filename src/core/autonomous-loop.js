@@ -51,7 +51,8 @@ class AutonomousLoop {
       selfEvaluation: {
         confidence: 0.7,
         competence: 0.6,
-        improvement: []
+        improvement: [],
+        summary: 'autonomy is stable but can be refined'
       },
       
       // 反思
@@ -157,6 +158,7 @@ class AutonomousLoop {
         decision,
         plan,
         execution,
+        summary: this.summarizeRun(perception, decision, plan, execution),
         duration: Date.now() - startTime
       };
       

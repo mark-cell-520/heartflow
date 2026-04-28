@@ -39,6 +39,7 @@ class StabilityGuard {
       issues,
       thresholds: this.thresholds,
       summary: issues.length === 0 ? 'stable' : 'needs repair',
+      advice: this.summarizeAdvice(issues),
     };
   }
 
@@ -58,6 +59,10 @@ class StabilityGuard {
             return 're-evaluate with a smaller snapshot';
           }),
     };
+  }
+
+  summarizeAdvice(issues) {
+    return issues.slice(0, 3).map((issue) => issue.message).join(' | ');
   }
 }
 

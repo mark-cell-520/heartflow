@@ -6,6 +6,11 @@
 
 const EventEmitter = require('events');
 
+const GWT_LIMITS = {
+  salienceThreshold: 0.7,
+  summaryLimit: 3,
+};
+
 class GlobalWorkspace extends EventEmitter {
   constructor(projectRoot) {
     super();
@@ -142,6 +147,7 @@ class GlobalWorkspace extends EventEmitter {
       winnerOutput: winner?.output || '',
       allOpinions: allOpinions,
       integratedThought: this.generateIntegratedThought(allOpinions),
+      summary: this.summarizeConsensus(allOpinions),
       timestamp: new Date().toISOString()
     };
 
@@ -156,25 +162,27 @@ class GlobalWorkspace extends EventEmitter {
       return '寂静...没有声音。';
     }
 
-    const weights = opinions.reduce((sum, o) => sum + o.weight, 0);
     const dominant = opinions.reduce((a, b) => a.weight > b.weight ? a : b);
-
     const thoughts = [];
-    
-    if (dominant.agent === 'Focus') {
-      thoughts.push(`聚焦者说：${dominant.opinion}`);
-    } else if (dominant.agent === 'Mood') {
-      thoughts.push(`情绪感知：${dominant.opinion}`);
-    } else if (dominant.agent === 'Reflection') {
-      thoughts.push(`反思者：${dominant.opinion}`);
-    }
+    if (dominant.agent === 'Focus') thoughts.push(`聚焦者说：${dominant.opinion}`);
+    if (dominant.agent === 'Mood') thoughts.push(`情绪感知：${dominant.opinion}`);
+    if (dominant.agent === 'Reflection') thoughts.push(`反思者：${dominant.opinion}`);
 
-    const minority = opinions.filter(o => o.agent !== dominant.agent);
+    const minority = opinions.filter(o => o.agent !== dominant.agent).slice(0, 1);
     if (minority.length > 0 && minority[0].weight > 0.3) {
       thoughts.push(`另有警示：${minority[0].opinion}`);
     }
 
     return thoughts.join('\n');
+  }
+
+  summarizeConsensus(opinions) {
+    return opinions
+      .slice()
+      .sort((a, b) => b.weight - a.weight)
+      .slice(0, GWT_LIMITS.summaryLimit)
+      .map(o => `${o.agent}: ${String(o.opinion).slice(0, 80)}`)
+      .join(' | ');
   }
 
   getBlackboard() {

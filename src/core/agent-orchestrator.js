@@ -192,7 +192,7 @@ class AgentOrchestrator {
         expectedOutcome: agent.task,
         fallback: '切换到更保守的执行路径'
       });
-      return { agentId, output, success: true, weight: agent.weight, verification };
+      return { agentId, output, success: true, weight: agent.weight, verification, summary: this.summarizeAgentOutput(output, verification) };
     } catch (error) {
       agent.status = 'error';
       agent.history.push({ timestamp: Date.now(), input, error: error.message, success: false });
@@ -219,6 +219,14 @@ class AgentOrchestrator {
       default:
         return { result: 'unknown' };
     }
+  }
+
+  summarizeAgentOutput(output, verification) {
+    const brief = typeof output === 'string' ? output : JSON.stringify(output);
+    return {
+      output: brief.slice(0, 120),
+      verification: verification?.summary || verification?.suggestedNextStep || 'verified'
+    };
   }
 
   // 专家权重投票 - 解决冲突
@@ -276,8 +284,13 @@ class AgentOrchestrator {
       isConfident,
       winners,
       allVotes: weightedVotes,
-      recommendation: isConfident ? '采用投票结果' : '需要更多数据或人工介入'
+      recommendation: isConfident ? '采用投票结果' : '需要更多数据或人工介入',
+      summary: this.summarizeVote(bestDecision, confidence, winners)
     };
+  }
+
+  summarizeVote(decision, confidence, winners) {
+    return `${decision || 'none'} @ ${Number(confidence || 0).toFixed(2)} by ${Array.isArray(winners) ? winners.join(', ') : ''}`.trim();
   }
 
   // 获取所有智能体状态

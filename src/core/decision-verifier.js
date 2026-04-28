@@ -43,7 +43,8 @@ class DecisionVerifier {
       issues,
       checks,
       repairHints: this.generateRepairHints(issues, normalized),
-      normalized
+      normalized,
+      summary: this.summarize(checks, issues)
     };
   }
 
@@ -150,7 +151,13 @@ class DecisionVerifier {
       hints.push('当前置信度偏低，建议生成 2-3 个候选方案后再重排');
     }
 
-    return hints;
+    return hints.slice(0, 3);
+  }
+
+  summarize(checks, issues) {
+    const bad = issues.slice(0, 3).map(i => i.type).join(', ') || 'no issues';
+    const flags = Object.entries(checks).filter(([, value]) => !value.ok).map(([k]) => k).join(', ') || 'all clear';
+    return `${flags} | ${bad}`;
   }
 }
 

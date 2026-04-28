@@ -48,11 +48,14 @@ class SelfModifier {
    * 元认知自我修改 - 只生成补丁，不直接写源代码
    */
   applyModification(suggestion) {
-    if (!this.enabled) {
+    const gateEnabled = process.env.HEARTFLOW_ENABLE_SELF_MODIFICATION === '1';
+    if (!this.enabled || !gateEnabled) {
       return {
         success: false,
         reason: 'self_modification_disabled',
-        action: 'generate_patch_only'
+        action: 'generate_patch_only',
+        enabled: this.enabled,
+        gateEnabled
       };
     }
 
