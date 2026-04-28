@@ -20,6 +20,7 @@ let DecisionEngine, DecisionVerifier;
 let DreamLoop;
 let WakeUpVerifier;
 let InteractiveDream;
+let SelfHealing, StabilityGuard;
 
 try {
   AdaptiveController = require('./adaptive-controller.js');
@@ -99,6 +100,20 @@ try {
   console.log('[HeartFlow] ✅ 交互式梦环已加载');
 } catch (e) {
   console.log('[HeartFlow] ⚠️ 交互式梦环加载失败:', e.message);
+}
+
+try {
+  SelfHealing = require('./self-healing.js').SelfHealing;
+  console.log('[HeartFlow] ✅ 自愈引擎已加载');
+} catch (e) {
+  console.log('[HeartFlow] ⚠️ 自愈引擎加载失败:', e.message);
+}
+
+try {
+  StabilityGuard = require('./stability-guard.js').StabilityGuard;
+  console.log('[HeartFlow] ✅ 稳定性守卫已加载');
+} catch (e) {
+  console.log('[HeartFlow] ⚠️ 稳定性守卫加载失败:', e.message);
 }
 
 /**
