@@ -21,6 +21,7 @@ let DreamLoop;
 let WakeUpVerifier;
 let InteractiveDream;
 let SelfHealing, StabilityGuard;
+let MADVerifier, UncertaintyEstimator, HeartbeatFallback, HealingMemoryRL;
 
 try {
   AdaptiveController = require('./adaptive-controller.js');
