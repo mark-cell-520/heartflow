@@ -24,6 +24,15 @@ function loadOptional(modulePath, label) {
   }
 }
 
+function summarizeForReply(points = [], limit = 3) {
+  const arr = Array.isArray(points) ? points : [points];
+  const compact = arr
+    .map(p => String(p || '').trim())
+    .filter(Boolean)
+    .map(p => p.replace(/\s+/g, ' '));
+  return compact.slice(0, limit);
+}
+
 // 加载新增模块
 let AdaptiveController, AgentOrchestrator, ErrorHandler, StateSnapshot;
 let TrialityMemory, EmbodiedCore, BioSensorAdapter;
@@ -1481,6 +1490,10 @@ module.exports.initialize = function() {
   if (DreamLoop) {
     init.instances = init.instances || {};
     init.instances.dreamLoop = DreamLoop;
+  }
+  if (StabilityGuard) {
+    init.instances = init.instances || {};
+    init.instances.stabilityGuard = new StabilityGuard();
   }
 
   // 默认做一次轻量梦-醒预热，确保闭环可用

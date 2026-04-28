@@ -43,8 +43,18 @@ class StabilityGuard {
       ...verdict,
       allow: verdict.stable,
       hint: verdict.stable ? 'safe to continue' : 'pause, simplify, and repair',
+      next_step: verdict.stable ? 'continue' : 'repair',
+      repairHints: verdict.stable
+        ? []
+        : verdict.issues.map((issue) => {
+            if (issue.type === 'low_confidence') return 'raise evidence density before acting';
+            if (issue.type === 'high_noise') return 'trim historical noise and reduce ambiguity';
+            if (issue.type === 'low_actionability') return 'compress insights into one concrete action';
+            return 're-evaluate with a smaller snapshot';
+          }),
     };
   }
 }
+
 
 module.exports = { StabilityGuard };
