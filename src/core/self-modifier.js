@@ -76,7 +76,9 @@ class SelfModifier {
     const patchFileName = `self-mod-${Date.now()}.patch`;
     const patchPath = path.join(this.patchDir, patchFileName);
     const patch = this.generatePatch(originalContent, modifiedContent, parsed, patchFileName);
-    fs.writeFileSync(patchPath, patch);
+    if (process.env.HEARTFLOW_ENABLE_SELF_MODIFICATION === '1') {
+      fs.writeFileSync(patchPath, patch);
+    }
 
     this.recordChange({
       file: parsed.file,

@@ -53,8 +53,8 @@ class IntentLayer {
     this.historyFile = path.join(projectRoot, '.opencode', 'memory', 'intent-history.json');
     this.intentPatterns = this.initializePatterns();
     this.loadHistory();
-    this.llmEndpoint = process.env.LLM_ENDPOINT || null;
-    this.llmApiKey = process.env.LLM_API_KEY || null;
+    this.llmEndpoint = process.env.HEARTFLOW_LLM_ENDPOINT || null;
+    this.llmApiKey = process.env.HEARTFLOW_LLM_API_KEY || null;
   }
 
   initializePatterns() {

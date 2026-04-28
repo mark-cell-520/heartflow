@@ -351,7 +351,7 @@ class GoedelEngine {
       return { success: false, reason: 'self_modification_disabled' };
     }
 
-    // 写入文件
+    // 写入文件（仅在显式开启时写入）
     fs.writeFileSync(targetPath, modifiedContent);
 
     // 记录版本

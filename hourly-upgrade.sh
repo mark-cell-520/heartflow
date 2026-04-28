@@ -79,13 +79,11 @@ echo "📦 Git 操作..."
 git stash push -m "hourly-upgrade-$(date +%s)" 2>/dev/null || true
 
 # 拉取远程更新
-git fetch origin main
-git rebase origin/main || {
+ git fetch origin main
+ git rebase origin/main || {
     echo "Rebase冲突，解决中..."
-    # 接受远程版本解决冲突
-    git checkout --theirs . 2>/dev/null || true
-    git add -A
-    git rebase --continue 2>/dev/null || true
+    echo "请手动解决冲突后继续 rebase，禁止自动接受远程代码变更"
+    exit 1
 }
 
 # 恢复本地更改

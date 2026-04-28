@@ -64,7 +64,7 @@ function httpGet(urlStr) {
       path: parsedUrl.pathname + parsedUrl.search,
       method: 'GET',
       timeout: 30000,
-      rejectUnauthorized: process.env.NODE_TLS_REJECT_UNAUTHORIZED !== 'false'
+      rejectUnauthorized: true
     };
     
     https.get(options, (res) => {
@@ -101,7 +101,7 @@ async function downloadFile(url, filepath) {
       path: parsedUrl.pathname + parsedUrl.search,
       method: 'GET',
       timeout: 120000,
-      rejectUnauthorized: process.env.NODE_TLS_REJECT_UNAUTHORIZED !== 'false'
+      rejectUnauthorized: true
     };
     
     https.get(options, (res) => {
