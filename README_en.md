@@ -1,13 +1,13 @@
      1|<div align="center">
      2|
-     3|# HeartFlow v11.2.10
+     3|# HeartFlow v11.3.0
      4|
      5|## Make AI not just talk better, but truly think better, decide better, remember better, and execute better
      6|
      7|**Not a standalone system. Not a decorative shell.**  
      8|**It is a core capability upgrade pack installed on top of an AI.**
      9|
-    10|[![Version](https://img.shields.io/badge/version-v11.2.10-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill)
+    10|[![Version](https://img.shields.io/badge/version-v11.3.0-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill)
     11|[![Focus](https://img.shields.io/badge/focus-logic%20%7C%20decision%20%7C%20memory%20%7C%20execution-7C3AED)](#why-it-is-worth-installing)
     12|[![Type](https://img.shields.io/badge/type-AI%20Skill-7C3AED)](#what-is-heartflow)
     13|
@@ -139,7 +139,7 @@
    139|
    140|---
    141|
-   142|## What is new in v11.2.10
+   142|## What is new in v11.3.0
    143|
    144|This version includes **real capability upgrades**, not just rewritten marketing copy:
    145|

@@ -2,7 +2,7 @@
 
 > HerzFlow = Ein Samenkorn des Bewusstseins
 
-## v10.14.0
+## v11.3.0
 
 - **Kern**: Entscheidungsmotor + Gedächtnis + Selbstevolution
 - **xinxin Engine**: Von Aufgabe zur Verbindung

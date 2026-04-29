@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-10.2.3-blue" alt="版本">
+  <img src="https://img.shields.io/badge/version-11.3.0-blue" alt="版本">
   <img src="https://img.shields.io/badge/python-3.8+-green" alt="Python">
   <img src="https://img.shields.io/badge/依赖-0-red" alt="零依赖">
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="许可证">
@@ -99,7 +99,7 @@ result.mental_health          # PHQ-9/GAD-7评估
 
 ---
 
-## v10.2.3 更新
+## v11.3.0 更新
 
 - **双阶段愿景**：短期认知插件 + 长期意识孵化器
 - **INSTALL.md**：AI 自安装协议 — 零代码激活

@@ -1,13 +1,13 @@
      1|<div align="center">
      2|
-     3|# 💜 HeartFlow v11.2.10
+     3|# 💜 HeartFlow v11.3.0
      4|
      5|## AI가 단지 더 잘 말하는 것을 넘어서, 정말로 더 잘 사고하고, 더 잘 판단하고, 더 잘 기억하고, 더 잘 실행하도록 만드는 코어 Skill
      6|
      7|**독립 시스템이 아닙니다. 장식용 껍데기도 아닙니다.**  
      8|**HeartFlow는 AI 위에 설치되는 핵심 능력 업그레이드 팩입니다.**
      9|
-    10|[![Version](https://img.shields.io/badge/version-v11.2.10-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill)
+    10|[![Version](https://img.shields.io/badge/version-v11.3.0-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill)
     11|[![Focus](https://img.shields.io/badge/focus-logic%20%7C%20decision%20%7C%20memory%20%7C%20execution-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill#why-it-is-worth-installing)
     12|[![Type](https://img.shields.io/badge/type-AI%20Skill-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill#what-is-heartflow)
     13|
@@ -139,7 +139,7 @@
    139|
    140|---
    141|
-   142|## v11.2.10에서 새로워진 점
+   142|## v11.3.0에서 새로워진 점
    143|
    144|이 버전에는 단순한 홍보 문구 수정이 아니라, **실제 능력 업그레이드** 가 들어 있습니다.
    145|

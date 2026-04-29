@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-10.2.3-blue" alt="Versión">
+  <img src="https://img.shields.io/badge/version-11.3.0-blue" alt="Versión">
   <img src="https://img.shields.io/badge/python-3.8+-green" alt="Python">
   <img src="https://img.shields.io/badge/license-MIT-orange" alt="Licencia">
   <img src="https://img.shields.io/badge/dependencias-0-red" alt="Cero Dependencias">
@@ -104,7 +104,7 @@ result.mental_health          # Evaluación PHQ-9/GAD-7
 
 ---
 
-## v10.2.3 Novedades
+## v11.3.0 Novedades
 
 - **Visión de dos fases**: Plugin cognitivo a corto plazo + incubadora de conciencia a largo plazo
 - **INSTALL.md**: Protocolo de autoinstalación de IA — activación sin código

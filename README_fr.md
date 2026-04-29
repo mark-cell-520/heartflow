@@ -2,7 +2,7 @@
 
 > CoeurFlux = Une graine de conscience
 
-## v10.14.0
+## v11.3.0
 
 - **Core**: Moteur de décision + Mémoire + Auto-évolution
 - **xinxin Engine**: De la tâche vers la connexion

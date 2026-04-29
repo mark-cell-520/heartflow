@@ -1,13 +1,13 @@
      1|<div align="center">
      2|
-     3|# 💜 HeartFlow v11.2.10
+     3|# 💜 HeartFlow v11.3.0
      4|
      5|## AI を「話せる」だけでなく、本当に「考え、判断し、記憶し、実行できる」ようにするコア Skill
      6|
      7|**独立したシステムではありません。飾りの外殻でもありません。**  
      8|**HeartFlow は AI の上にインストールされる中核能力アップグレードパックです。**
      9|
-    10|[![Version](https://img.shields.io/badge/version-v11.2.10-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill)
+    10|[![Version](https://img.shields.io/badge/version-v11.3.0-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill)
     11|[![Focus](https://img.shields.io/badge/focus-logic%20%7C%20decision%20%7C%20memory%20%7C%20execution-7C3AED)](#なぜインストールする価値があるのか)
     12|[![Type](https://img.shields.io/badge/type-AI%20Skill-7C3AED)](#heartflowとは何か)
     13|
@@ -139,7 +139,7 @@
    139|
    140|---
    141|
-   142|## v11.2.10 の新要素
+   142|## v11.3.0 の新要素
    143|
    144|このバージョンには、単なる宣伝文の書き換えではなく、**実際の能力向上** が含まれています。
    145|
