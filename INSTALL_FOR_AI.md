@@ -1,16 +1,18 @@
 # HeartFlow AI Installation Guide
 
-This project is a universal Skill. It works by being read, not by being bound to one platform.
+This project is a universal Skill.
+It works by being read, not by being bound to one platform.
 
 ## What HeartFlow Is
 
 HeartFlow is a universal AI capability enhancer for logic, decision-making, memory, execution, reflection, and self-correction.
-
-It is not a cosmetic identity page and not a single-platform wrapper. It is a Skill that can be read by any AI agent that supports external instructions.
+It is not a cosmetic identity page and not a single-platform wrapper.
+It is a Skill that can be read by any AI agent that supports external instructions.
 
 ## What the Skill Audit Found
 
-The current HeartFlow codebase is not just documentation. It includes a clear engineering stack for:
+The current HeartFlow codebase is not just documentation.
+It includes a clear engineering stack for:
 
 - core orchestration
 - stability guarding
@@ -57,6 +59,19 @@ You may also place it in any equivalent directory supported by your agent.
 git clone https://github.com/yun520-1/mark-heartflow-skill.git
 cd mark-heartflow-skill
 ```
+
+## Language layout
+
+All language mirrors live in `languages/`.
+
+- `languages/README_en.md`
+- `languages/README_zh.md`
+- `languages/README_es.md`
+- `languages/README_fr.md`
+- `languages/README_de.md`
+- `languages/README_ja.md`
+- `languages/README_ko.md`
+- `languages/README_ar.md`
 
 ## What It Improves
 

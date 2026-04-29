@@ -2,12 +2,12 @@
 
 Use the language entry that matches the reader's preferred language.
 
-Recommended primary entries:
+Primary entries:
 
 - English: `languages/README_en.md`
 - Chinese: `languages/README_zh.md`
 
-Additional language mirrors:
+Mirrors:
 
 - `languages/README_es.md`
 - `languages/README_fr.md`
@@ -16,5 +16,5 @@ Additional language mirrors:
 - `languages/README_ko.md`
 - `languages/README_ar.md`
 
-All entries should describe the same capability layer with the same operational meaning.
+All entries must preserve the same capability semantics.
 Historical aliases exist only for compatibility.
