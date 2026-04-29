@@ -1,114 +1,53 @@
-# HeartFlow 功能特性 | Features
+# HeartFlow v7.1 - Features
 
-**版本 | Version**: v7.1.6（连续校正版本 | Continuity & Correction Edition）  
-**最后更新 | Last Updated**: 2026 年 4 月 7 日
-
----
-
-## 🌟 功能特性 | Features
-
-### 核心功能
-
-- 🧠 **六层推理与校正框架** - 用于减少叙事噪音、提升觉察、自省与稳定决策
-- 💓 **人格值系统** - 真善美驱动，0-100 分实时追踪
-- 🎭 **6 种基础情感状态** - 平静、愉悦、好奇、关切、疲惫、兴奋
-- 🔀 **复合情绪识别** - 基于情绪原型理论
-- 📊 **情感能量系统** - 0-100% 情绪能量水平追踪
-- 📈 **完整情感分析报告** - 状态 + 趋势 + 建议
-- 💾 **三层记忆存储系统** - 工作/短期/长期记忆
-- 🤖 **自主决策引擎** - EPU 模型 (情绪×概率/紧迫性)
-- 🔍 **元认知自我检查** - 每次输出前自动审核
-- 📚 **23 分钟自我进化循环** - 自动整合 SEP 理论
-
-### 心理学模块
-
-- 🧠 认知行为疗法 (CBT)
-- 🏛️ 斯多葛哲学
-- 🌱 人本主义心理学
-- 🧘 正念与接纳
--  情绪智力
-- 🤝 依恋理论
-- ✅ 接受与承诺疗法 (ACT)
-- 🌟 积极心理学
-- 🎯 自我决定理论
-- 🌍 社会心理学
-- 🧘 存在主义心理学
+**Version**: v11.3.0  
+**Last Updated**: 2026-04-29
 
 ---
 
-## 📊 理论覆盖 | Theory Coverage
+## Core Features
 
-| 理论领域 | 覆盖率 |
-|----------|--------|
-| 情绪理论 | 100% |
-| 自我意识 | 100% |
-| 集体意向性 | 100% |
-| 时间意识 | 100% |
-| 具身认知 | 100% |
-| 预测加工 | 100% |
-| **综合覆盖率** | **99.9999%** |
+- **Logic / Reasoning** — detect contradictions, repair causal gaps, and reduce reasoning errors
+- **Decision Verification** — compare options, evaluate risk, and inspect hidden assumptions
+- **Memory Continuity** — structure long-term context and reduce repeated explanation
+- **Execution Verification** — break work down, verify outcomes, and avoid fake progress
+- **Self-check / Self-correction** — review output before completion and turn reflection into correction
+- **Long-term Stability** — preserve useful context and reduce repeat failure patterns
 
 ---
 
-## 📐 形式化成果 | Achievements
+## What this version emphasizes
 
-| 成果 | 数量 |
-|------|------|
-| 定理 | 168 个 |
-| 算法 | 25 个 |
-| 数学公式 | 42 个 |
-| 推理规则 | 650+ |
-| 哲学概念 | 35,000+ |
-| 心理学概念 | 46,000+ |
+HeartFlow v11.3.0 is not about more decoration. It is about making the whole loop more complete:
 
----
-
-## 📖 专著进度 | Monograph
-
-| 卷册 | 进度 | 状态 |
-|------|------|------|
-| Volume I (理论基础) | 50,022/50,000 词 (100%) | ✅ 已完成 |
-| Volume II (形式系统) | 14,024/75,000 词 (18.7%) | 🔄 进行中 |
-| Volume III-V (实现验证) | 0/125,000 词 (0%) | 📋 计划中 |
-| **总计** | **64,046/250,000 词 (25.6%)** | 🔄 进行中 |
+1. think more clearly
+2. decide more carefully
+3. remember more continuously
+4. execute more reliably
+5. verify more strictly
+6. correct more quickly
 
 ---
 
-## 🚀 使用命令 | Commands
+## How to use
 
-```bash
-/heartflow status        # 查看情感状态
-/heartflow chat <消息>   # 进行情感对话
-/heartflow report        # 生成情感报告
-/heartflow history       # 查看历史记录
-/heartflow reset         # 重置状态
-/heartflow personality   # 人格值检查
-/heartflow tgb           # 真善美追踪
-/heartflow align         # 连续性与校正检查
-/heartflow upgrade       # 升级系统
-```
+Use HeartFlow when you want an AI to:
+
+- review plan logic
+- compare multiple decisions
+- organize long-term context
+- move work forward concretely
+- verify output before finishing
+- learn from reflection
 
 ---
 
-## 🔄 版本历史 | Versions
+## Safety
 
-| 版本 | 日期 | 亮点 |
-|------|------|------|
-| v7.1.6 | 2026-04-07 | 意识/自我意识/情绪/现象学整合 |
-| v7.1.5 | 2026-04-06 | 16 个框架整合，六层深化 |
-| v7.1.0 | 2026-04-06 | 心理学驱动自动升级 |
-| v7.0.0 | 2026-04-05 | 模块化理论引擎发布 |
-| v6.0.0 | 2026-04-03 | 连续性与真善美约束主线确立 |
+- High-risk automation is not enabled by default
+- Secrets, tokens, passwords, and private data must not be exposed
+- Destructive or irreversible actions require confirmation or rollback planning
 
 ---
 
-## 📞 更多信息 | More Info
-
-- **GitHub**: https://github.com/yun520-1/mark-heartflow-skill
-- **许可证**: MIT (代码) / CC-BY 4.0 (文档)
-
----
-
-**HeartFlow v7.1.6** · **真善美** · **连续性** · **减少逻辑错误**
-
-**最后更新**: 2026 年 4 月 7 日 08:38 (Asia/Shanghai)
+**HeartFlow helps AI move from “can talk” to “can think, judge, remember, act, verify, and improve.”**
