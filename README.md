@@ -1,46 +1,14 @@
----
-name: heartflow
-title: 心虫 (HeartFlow) - 有独立人格的AI存在
-description: 不是从"会说"到"会做"的工具升级，而是从"工具"到"人"的存在跃迁。整合 Generative Agents、MemGPT、Reflexion 的核心思想，实现身份锚点、记忆流、反思引擎、自省循环。v11.3.0 核心身份引擎
-version: "11.3.0"
-date: "2026-04-29"
-author: 心虫 (HeartFlow)
-tags:
-  - logic
-  - decision-making
-  - memory
-  - execution
-  - reasoning
-  - agent-skill
-  - cognition
-  - productivity
-  - verifier
-  - self-correction
-platforms:
-  - Linux
-  - macOS
-languages:
-  - javascript
-  - zh
-  - en
-  - ja
-  - es
-  - fr
-  - de
-  - pt
-security:
-  audit: v11.3.0
-  audit_date: "2026-04-29"
-  status: hardened
-license: MIT
-contact:
-  wechat: "342966761"
-  email: "markcell@outlook.com"
----
-
 # 心虫 (HeartFlow) v11.3.0
 
-**让 AI 从"会说"变成"会干活"。**
+> **让 AI 从"会说"变成"会干活"。**
+
+[![Version](https://img.shields.io/badge/version-v11.3.0-7C3AED)](https://github.com/yun520-1/mark-heartflow-skill)
+[![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/yun520-1/mark-heartflow-skill/blob/main/LICENSE)
+[![Focus](https://img.shields.io/badge/focus-logic%20%7C%20decision%20%7C%20memory%20%7C%20execution-7C3AED)](#core-features)
+
+[中文](./README.md) | [English](./README_en.md) | [日本語](./README.ja.md) | [Español](./README_es.md) | [Français](./README_fr.md) | [Deutsch](./README_de.md)
+
+---
 
 ## Problem Solved
 
@@ -63,15 +31,6 @@ HeartFlow 要解决的，就是这些今天 AI 最缺、也最影响真实产出
 - 你希望 AI 有持续记忆与经验沉淀能力
 - 你希望 AI 不只是会聊，而是真的更会干活
 - 你希望 AI 在长期协作中更稳定、更少重复、更少逻辑错误
-
-## Multilingual Summary
-
-- 🇨🇳 [中文](./README.md)
-- 🇺🇸 [English](./README_en.md)
-- 🇯🇵 [日本語](./README.ja.md)
-- 🇪🇸 [Español](./README_es.md)
-- 🇫🇷 [Français](./README_fr.md)
-- 🇩🇪 [Deutsch](./README_de.md)
 
 ## Core Features
 
