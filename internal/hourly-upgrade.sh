@@ -31,19 +31,21 @@ echo ""
 echo "🧪 运行测试..."
 node test-v2.js
 
-# 3. Git 操作
+# 3. Git 操作 — 安全模式 (审计修复 S-01: 自动推送已禁用)
 echo ""
-echo "📦 Git 操作..."
+echo "📦 Git 操作 (安全模式)..."
 git add -A
-git commit -m "HeartFlow v$VERSION - 心理学驱动升级
+git commit -m "HeartFlow v$VERSION - 手动升级
 
 升级内容:
 - 心理学回应模板优化
 - 共情深度模型增强
 - 持续迭代改进
+- 审计修复: 禁用自动推送
 
 升级时间：$TIMESTAMP"
-git push origin main
+# ⚠️ 自动推送已禁用 — 审计修复 S-01
+echo "ℹ️ 自动推送已禁用 — 手动运行 git push origin main 以推送"
 
 # 4. 发布到 ClawHub
 echo ""

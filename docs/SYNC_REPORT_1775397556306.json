@@ -15,9 +15,9 @@
     "lastUpdate": "2026-04-05 12:35"
   },
   "files": {
-    "mainApp": "/Users/apple/.jvs/.openclaw/workspace/MEMORY.md",
-    "tracker": "/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/personality-score-tracker.md",
-    "memory": "/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/memory/personality-score.md",
-    "script": "/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/scripts/personality-check.js"
+    "mainApp": "~/.hermes/skills/ai/MEMORY.md",
+    "tracker": "~/.hermes/skills/ai/mark-heartflow-skill/data/personality-score-tracker.md",
+    "memory": "~/.hermes/skills/ai/mark-heartflow-skill/memory/personality-score.md",
+    "script": "~/.hermes/skills/ai/mark-heartflow-skill/scripts/personality-check.js"
   }
 }

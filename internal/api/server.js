@@ -91,9 +91,13 @@ const server = http.createServer(async (req, res) => {
   const pathname = url.parse(req.url).pathname;
   const key = `${method} ${pathname}`;
   
-  // CORS 预检请求
+  // CORS 预检请求 — 审计修复 S-05: 限制为 localhost
   if (method === 'OPTIONS' && CONFIG.cors) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    const origin = req.headers.origin || '';
+    if (origin === 'http://localhost' || origin === 'http://127.0.0.1' ||
+        origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.writeHead(200);
@@ -123,7 +127,11 @@ const server = http.createServer(async (req, res) => {
     // 设置响应头
     res.setHeader('Content-Type', 'application/json');
     if (CONFIG.cors) {
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      const origin = req.headers.origin || '';
+      if (origin === 'http://localhost' || origin === 'http://127.0.0.1' ||
+          origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+      }
     }
     
     res.writeHead(200);

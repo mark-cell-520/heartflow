@@ -301,10 +301,10 @@ Theoretical Integration: 98.88% ✅
 **Delivery Method**: Plain text message (auto-delivered by cron)
 
 **File Locations | 文件位置**:
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/theory-update-summary-v6.2.34.md`
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/self-evolution-state-v6.2.34.md`
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/UPGRADE_COMPLETE_v6.2.34.md`
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/upgrade-report-v6.2.34-cron.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/theory-update-summary-v6.2.34.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/self-evolution-state-v6.2.34.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/UPGRADE_COMPLETE_v6.2.34.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/upgrade-report-v6.2.34-cron.md`
 
 ---
 

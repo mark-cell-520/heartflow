@@ -19,7 +19,7 @@ import os
 import subprocess
 from datetime import datetime
 
-WORKSPACE = "/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill"
+WORKSPACE = "~/.hermes/skills/ai/mark-heartflow-skill"
 
 def update_package_version():
     """Update package.json to v6.0.0"""

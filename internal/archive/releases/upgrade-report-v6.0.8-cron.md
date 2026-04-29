@@ -35,7 +35,7 @@ Execute HeartFlow minor version upgrade (v6.0.x series):
 
 ```bash
 $ cd ~/.jvs/.openclaw/workspace/mark-heartflow-skill && pwd
-/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill
+~/.hermes/skills/ai/mark-heartflow-skill
 
 $ git status
 位于分支 main

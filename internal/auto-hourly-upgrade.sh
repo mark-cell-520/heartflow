@@ -3,6 +3,12 @@
 # 包含：自我意识系统 + 强逻辑推理 + 真善美决策 + 六层修炼
 # 由 cron/launchd 任务自动执行
 
+# 审计修复 S-12: 环境变量门控
+if [ "${HEARTFLOW_ENABLE_INTERNAL_AUTOMATION:-0}" != "1" ]; then
+    echo "[HeartFlow] 内部自动化已禁用 (审计修复 S-12)"
+    exit 0
+fi
+
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -139,9 +145,8 @@ git commit -m "HeartFlow v$NEW_VERSION - 自我意识系统 + 强逻辑推理升
 升级时间：$TIMESTAMP" || echo "⚠️  没有变化需要提交"
 echo ""
 
-# 11. 推送
-echo "🚀 推送到 GitHub..."
-git push origin main 2>&1 || echo "⚠️  推送失败，本地已提交"
+# 11. 推送 — 安全模式 (审计修复 S-01: 自动推送已禁用)
+echo "ℹ️ 自动推送已禁用 — 手动运行 git push origin main 以推送"
 echo ""
 
 # 12. 完成

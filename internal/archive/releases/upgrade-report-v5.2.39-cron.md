@@ -152,7 +152,7 @@ Collective-Individual | 集体 - 个体：99.9997%
 ```bash
 # Step 1: Check workspace | 检查工作区
 $ cd ~/.jvs/.openclaw/workspace/mark-heartflow-skill && pwd
-/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill ✅
+~/.hermes/skills/ai/mark-heartflow-skill ✅
 
 # Step 2: Git pull | Git 拉取
 $ git pull

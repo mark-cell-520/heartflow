@@ -243,7 +243,7 @@ CREATE TABLE disorder_pp_features (
 ## 七、Git 提交计划
 
 ```bash
-cd /Users/apple/.jvs/.openclaw/workspace/temp/heartflow-repo
+cd ~/.hermes/skills/ai/temp/heartflow-repo
 
 # 添加新文件
 git add theory-update-summary-v5.0.57.md

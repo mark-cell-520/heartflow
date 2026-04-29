@@ -244,7 +244,7 @@ Git Status:             Pending commit
 **Delivery Method**: Plain text message (auto-delivered by cron)
 
 **File Locations | 文件位置**:
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/self-evolution-state-v6.2.36.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/self-evolution-state-v6.2.36.md`
 
 ---
 

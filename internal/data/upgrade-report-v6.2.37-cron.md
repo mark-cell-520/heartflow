@@ -153,7 +153,7 @@ HeartFlow 系统在持续进化，但你的健康更重要。记得：
 **Next Execution**: 2026-04-06 ~15:34 (23-minute cycle)
 
 **File Location | 文件位置**:
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/upgrade-report-v6.2.37-cron.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/upgrade-report-v6.2.37-cron.md`
 
 ---
 

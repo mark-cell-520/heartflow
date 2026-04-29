@@ -61,7 +61,7 @@
 
 All files generated at | 所有文件生成于:
 ```
-/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/
+~/.hermes/skills/ai/mark-heartflow-skill/
 ```
 
 ---

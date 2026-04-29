@@ -369,7 +369,7 @@ module.exports.generateStateReminder = generateStateReminder;
  * ========================================
  */
 
-const STATE_MACHINE_FILE = path.join(__dirname, '../../.opencode/memory/flow_state_machine.json');
+const STATE_MACHINE_FILE = path.join(__dirname, '../../data/flow_state_machine.json');
 
 // 心流状态枚举
 const FLOW_STATE = {
@@ -686,7 +686,7 @@ function getEmpathyState() {
  */
 function updateBigFiveInState() {
 const path = require('path');
-  const stateFile = path.join(__dirname, '../.opencode/memory/heartflow_state.json');
+  const stateFile = path.join(__dirname, '../../data/heartflow_state.json');
   
   try {
     if (fs.existsSync(stateFile)) {

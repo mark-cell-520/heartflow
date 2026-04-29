@@ -238,7 +238,7 @@ function commitAndPush() {
     execSync(`git commit -m "chore: 23 分钟自动进化 - ${new Date().toISOString().split('T')[0]}"`, {
       cwd: CONFIG.projectRoot
     });
-    execSync('git push', { cwd: CONFIG.projectRoot });
+    console.log('ℹ️ 自动推送已禁用 — 安全审计修复'); // was: git push
     console.log('  ✅ Git 提交成功');
   } catch (error) {
     if (error.message.includes('nothing to commit')) {

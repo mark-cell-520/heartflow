@@ -275,7 +275,8 @@ function executeDecision(results) {
   if (results.autoApprove) {
     // 自动推送
     try {
-      execSync('git push origin main', {
+      # ⚠️ 自动推送已禁用 — 审计修复 S-01
+      console.log('ℹ️ 自动推送已禁用 — 安全审计修复'); // was: git push origin main
         cwd: path.join(__dirname, '../..'),
         stdio: 'pipe'
       });

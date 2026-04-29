@@ -24,7 +24,7 @@ HeartFlow Companion 已通过自动化 cron 执行成功从 **v5.2.22** 升级�
 
 ```bash
 $ cd ~/.jvs/.openclaw/workspace/mark-heartflow-skill && pwd
-/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill
+~/.hermes/skills/ai/mark-heartflow-skill
 
 $ git pull
 已经是最新的。

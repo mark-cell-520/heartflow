@@ -24,7 +24,7 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Optional
 import re
 
-WORKSPACE = "/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill"
+WORKSPACE = "~/.hermes/skills/ai/mark-heartflow-skill"
 VERIFICATION_LOG = f"{WORKSPACE}/VERIFICATION_LOG.md"
 FORMULA_VALIDATION = f"{WORKSPACE}/docs/FORMULA_VALIDATION.md"
 SOURCE_TRACEABILITY = f"{WORKSPACE}/docs/SOURCE_TRACEABILITY.md"

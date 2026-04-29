@@ -209,7 +209,7 @@ git push
 All files located in: `~/.jvs/.openclaw/workspace/mark-heartflow-skill/`
 
 ```
-/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/
+~/.hermes/skills/ai/mark-heartflow-skill/
 ├── theory-update-summary-v5.2.10.md      (13,125 bytes)
 ├── self-evolution-state-v5.2.10.md       (11,824 bytes)
 ├── UPGRADE_COMPLETE_v5.2.10.md           (9,701 bytes)

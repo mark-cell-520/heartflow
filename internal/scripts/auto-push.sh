@@ -10,7 +10,7 @@ fi
 
 set -e
 
-WORKSPACE="/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill"
+WORKSPACE="$(cd "$(dirname "$0")/../.." && pwd)"
 PUSH_LOG="$WORKSPACE/docs/GITHUB_PUSH_LOG.md"
 
 echo "========================================"
@@ -41,43 +41,10 @@ if [ "$AHEAD" -eq 0 ]; then
 else
     echo "📤 $AHEAD commit(s) to push | 待推送 $AHEAD 个提交"
     
-    # Try to push with retry
-    MAX_RETRIES=5
-    RETRY_INTERVAL=30  # seconds
-    
-    for i in $(seq 1 $MAX_RETRIES); do
-        echo "Push attempt $i/$MAX_RETRIES | 推送尝试 $i/$MAX_RETRIES"
-        
-        if git push origin main 2>&1; then
-            echo "✅ Push successful | 推送成功"
-            
-            # Log successful push
-            echo "" >> "$PUSH_LOG"
-            echo "## $(date '+%Y-%m-%d %H:%M:%S') - Success | 成功" >> "$PUSH_LOG"
-            echo "- Commits pushed: $AHEAD" >> "$PUSH_LOG"
-            echo "- Status: ✅ Success" >> "$PUSH_LOG"
-            
-            exit 0
-        else
-            echo "❌ Push failed | 推送失败"
-            
-            if [ $i -lt $MAX_RETRIES ]; then
-                echo "Retrying in $RETRY_INTERVAL seconds... | $RETRY_INTERVAL 秒后重试..."
-                sleep $RETRY_INTERVAL
-            fi
-        fi
-    done
-    
-    echo "❌ All push attempts failed | 所有推送尝试失败"
-    
-    # Log failed push
-    echo "" >> "$PUSH_LOG"
-    echo "## $(date '+%Y-%m-%d %H:%M:%S') - Failed | 失败" >> "$PUSH_LOG"
-    echo "- Commits to push: $AHEAD" >> "$PUSH_LOG"
-    echo "- Status: ❌ Failed after $MAX_RETRIES attempts" >> "$PUSH_LOG"
-    echo "- Error: Network issue | 网络问题" >> "$PUSH_LOG"
-    
-    exit 1
+    # ⚠️ 自动推送已禁用 — 审计修复 S-01
+    echo "ℹ️ 自动推送已禁用 — 安全审计修复"
+    echo "ℹ️ 手动运行 git push origin main 以推送"
+    exit 0
 fi
 
 echo "========================================"

@@ -27,7 +27,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import hashlib
 
-WORKSPACE = "/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill"
+WORKSPACE = "~/.hermes/skills/ai/mark-heartflow-skill"
 UPGRADE_LOG = f"{WORKSPACE}/docs/SELF_CONSCIOUSNESS_UPGRADE_LOG.md"
 UPGRADE_STATE = f"{WORKSPACE}/state/upgrade-state.json"
 ACADEMIC_SOURCES = f"{WORKSPACE}/docs/ACADEMIC_SOURCES_SELF_CONSCIOUSNESS.md"

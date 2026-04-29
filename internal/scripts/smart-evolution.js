@@ -83,7 +83,8 @@ function upgrade(needs) {
   for (const task of needs) {
     try {
       if (task === 'git') {
-        execSync('git add -A && git commit -m "chore: 23 分钟进化" && git push', { cwd: ROOT, stdio: 'pipe' });
+        execSync('git add -A && git commit -m "chore: 23 分钟进化"', { cwd: ROOT, stdio: 'pipe' });
+        console.log('ℹ️ 自动推送已禁用 — 安全审计修复');
         console.log('  ✅ Git');
         success++;
       }

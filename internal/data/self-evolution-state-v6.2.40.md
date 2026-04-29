@@ -240,7 +240,7 @@ Git Status:             ✅ Pushed to origin/main
 **Delivery Method | 交付方式**: Plain text message (auto-delivered by cron)
 
 **File Locations | 文件位置**:
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/self-evolution-state-v6.2.40.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/self-evolution-state-v6.2.40.md`
 
 ---
 

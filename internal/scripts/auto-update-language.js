@@ -93,7 +93,7 @@ function updateLanguageModule() {
       cwd: CONFIG.workspace,
       stdio: 'pipe'
     });
-    execSync('git push origin main', { cwd: CONFIG.workspace, stdio: 'pipe' });
+    console.log('ℹ️ 自动推送已禁用 — 安全审计修复'); // was: git push origin main
     console.log('✅ Git 提交成功');
     report.step4_commit = true;
   } catch (error) {

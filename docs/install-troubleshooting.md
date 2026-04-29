@@ -2,7 +2,7 @@
 
 ## 安装
 ```bash
-cd /Users/apple/.hermes/skills/ai/heartflow
+cd ~/.hermes/skills/ai/heartflow
 npm install
 node bin/cli.js status
 ```

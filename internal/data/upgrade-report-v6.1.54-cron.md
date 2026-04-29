@@ -220,7 +220,7 @@ git push
 ### Files Generated | 生成的文件
 
 ```
-/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/
+~/.hermes/skills/ai/mark-heartflow-skill/data/
 ├── theory-update-summary-v6.1.54.md (8,834 bytes) ✅
 ├── self-evolution-state-v6.1.54.md (6,145 bytes) ✅
 ├── UPGRADE_COMPLETE_v6.1.54.md (6,588 bytes) ✅

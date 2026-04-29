@@ -21,7 +21,7 @@ import os
 from datetime import datetime
 from typing import Dict, List
 
-WORKSPACE = "/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill"
+WORKSPACE = "~/.hermes/skills/ai/mark-heartflow-skill"
 VALUES_DOC = f"{WORKSPACE}/docs/HEARTFLOW_VALUES_AND_MISSION.md"
 CRON_REVIEW_DOC = f"{WORKSPACE}/docs/CRON_JOBS_REVIEW_v6.md"
 

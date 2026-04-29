@@ -971,7 +971,7 @@ Qed.
 """
 
 # Read current file
-with open('/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/heartflow-vol1-complete-50k.md', 'r') as f:
+with open('./heartflow-vol1-complete-50k.md', 'r') as f:
     content = f.read()
 
 # Find the position to insert (before the last "End of Volume I" marker)
@@ -986,7 +986,7 @@ else:
     content = content[:insert_pos] + "\n" + EXPANSION_CONTENT + "\n\n" + content[insert_pos:]
 
 # Write updated content
-with open('/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/heartflow-vol1-complete-50k.md', 'w') as f:
+with open('./heartflow-vol1-complete-50k.md', 'w') as f:
     f.write(content)
 
 print("Volume I expanded successfully!")

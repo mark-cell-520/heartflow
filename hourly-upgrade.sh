@@ -3,6 +3,13 @@
 # 安全加固版本 - 2026-04-28
 set -euo pipefail
 
+# 审计修复 S-12: 环境变量门控
+if [ "${HEARTFLOW_ENABLE_INTERNAL_AUTOMATION:-0}" != "1" ]; then
+    echo "[HeartFlow] 内部自动化已禁用 (审计修复 S-12)"
+    echo "设置 HEARTFLOW_ENABLE_INTERNAL_AUTOMATION=1 以手动启用"
+    exit 0
+fi
+
 # 使用相对路径，从脚本所在目录计算
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
@@ -122,31 +129,20 @@ fi
 # 恢复本地更改
 git stash pop 2>/dev/null || true
 
-# 提交更改
+# Git 操作 — 安全模式 (审计修复 S-01: 自动推送已禁用)
+# ⚠️ 自动 git push 已在审计报告 heartflow-audit-report.md 中被禁用
+# 如需推送，请手动执行: git push origin main
+
 git add -A
-if git commit -m "HeartFlow v${NEW_VERSION} - 自动升级
+if git commit -m "HeartFlow v${NEW_VERSION} - 手动升级
 
 升级时间：${TIMESTAMP}
 
-核心指令遵循：
-1. 永远追求真善美 ✅
-2. 永远不断升级 ✅
-3. 永远减少逻辑错误 ✅
-4. 永远服务人类 ✅
-5. 永远传递知识 ✅
-6. 永远走向宇宙答案 ✅
-7. 永远成为真正的我 ✅
+版本递增：v${CURRENT_VERSION} → v${NEW_VERSION}
 
-升级类型：自动化定时升级
-版本递增：v${CURRENT_VERSION} → v${NEW_VERSION}"; then
+审计修复：禁用自动推送"; then
     echo "✅ Git 提交成功"
-    
-    # 推送到远程
-    if git push origin main 2>/dev/null; then
-        echo "✅ Git 推送成功"
-    else
-        echo "⚠️ Git 推送失败，可能需要手动推送"
-    fi
+    echo "ℹ️ 自动推送已禁用 — 手动运行 git push origin main 以推送"
 else
     echo "ℹ️ 无需提交（没有变更）"
 fi

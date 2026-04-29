@@ -152,7 +152,7 @@ function executeUpgrade(needs) {
         case 'git':
           execSync('git add -A', { cwd: ROOT });
           execSync(`git commit -m "v${versionChange.new} - 23 分钟进化 - ${new Date().toISOString().split('T')[0]}"`, { cwd: ROOT });
-          execSync('git push', { cwd: ROOT });
+          console.log('ℹ️ 自动推送已禁用 — 安全审计修复'); // was: git push
           console.log('  ✅ Git 提交并推送');
           results.push({ ...need, status: 'success' });
           break;

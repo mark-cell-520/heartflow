@@ -23,7 +23,7 @@
 ## 一、GitHub 仓库更新检查
 
 ```bash
-$ cd /Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill
+$ cd ~/.hermes/skills/ai/mark-heartflow-skill
 $ git status
 位于分支 main
 您的分支与上游分支 'origin/main' 一致。

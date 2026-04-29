@@ -15,7 +15,7 @@ const VOL2_PATHS = [
   path.join(__dirname, '../heartflow-vol2.md'),
   path.join(__dirname, '../../heartflow-vol2.md'),
   path.join(__dirname, '../../temp/heartflow-vol2.md'),
-  '/Users/apple/.jvs/.openclaw/workspace/heartflow-vol2.md'
+  path.join(__dirname, '../../heartflow-vol2.md')
 ];
 
 function findVol2Path() {

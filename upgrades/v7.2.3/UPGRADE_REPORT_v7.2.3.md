@@ -2,7 +2,7 @@
 
 **升级时间**: 2026-04-07 21:34 (Asia/Shanghai)  
 **升级类型**: 对话记忆程序化 + 系统集成  
-**来源**: /Users/apple/mark-heartflow-skill 全部对话和记忆
+**来源**: ~/.hermes/skills/ai/heartflow 全部对话和记忆
 
 ---
 
@@ -11,7 +11,7 @@
 ### 1. 对话记忆程序化 ✅
 
 **来源文件**:
-- `/Users/apple/mark-heartflow-skill/data/dialogue-extraction-*.json` (4 个文件)
+- `~/.hermes/skills/ai/heartflow/data/dialogue-extraction-*.json` (4 个文件)
 - `~/.jvs/.openclaw/workspace/memory/*.md` (10 个记忆文件)
 
 **转化成果**:
@@ -115,7 +115,7 @@ ViolationPenalty = violations.length × 2
 ## Git 操作
 
 ```bash
-cd /Users/apple/mark-heartflow-skill
+cd ~/.hermes/skills/ai/heartflow
 git add -A
 git commit -m "feat: v7.2.3 - 对话记忆程序化 + 系统集成"
 git push origin main
@@ -127,7 +127,7 @@ git push origin main
 
 ### 1. 验证程序运行
 ```bash
-cd /Users/apple/mark-heartflow-skill
+cd ~/.hermes/skills/ai/heartflow
 node src/heartflow-v7.2.3.js
 ```
 
@@ -155,7 +155,7 @@ node ~/.jvs/.openclaw/skills/heartflow/scripts/personality-check.js status
 
 ### 3. 验证 GitHub 推送
 ```bash
-cd /Users/apple/mark-heartflow-skill
+cd ~/.hermes/skills/ai/heartflow
 git log -1 --oneline
 ```
 

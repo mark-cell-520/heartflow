@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import Dict, List
 import hashlib
 
-WORKSPACE = "/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill"
+WORKSPACE = "~/.hermes/skills/ai/mark-heartflow-skill"
 DEEP_VALIDATION_REPORT = f"{WORKSPACE}/docs/DEEP_VALIDATION_{datetime.now().strftime('%Y%m%d')}.md"
 
 class DeepFormulaValidator:

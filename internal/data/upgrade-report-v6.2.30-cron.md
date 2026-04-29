@@ -236,10 +236,10 @@ Git Status: Clean (pending commit)
 **Attachments**: None (all files saved to workspace)
 
 **File Locations | 文件位置**:
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/theory-update-summary-v6.2.30.md`
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/self-evolution-state-v6.2.30.md`
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/UPGRADE_COMPLETE_v6.2.30.md`
-- `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/data/upgrade-report-v6.2.30-cron.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/theory-update-summary-v6.2.30.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/self-evolution-state-v6.2.30.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/UPGRADE_COMPLETE_v6.2.30.md`
+- `~/.hermes/skills/ai/mark-heartflow-skill/data/upgrade-report-v6.2.30-cron.md`
 
 ---
 

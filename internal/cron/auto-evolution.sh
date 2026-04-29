@@ -3,6 +3,12 @@
 # HeartFlow 23 分钟自我进化循环 - Cron 脚本
 # 
 # 每 23 分钟自动运行一次，整合 SEP 理论，持续进化
+
+# 审计修复 S-12: 环境变量门控
+if [ "${HEARTFLOW_ENABLE_INTERNAL_AUTOMATION:-0}" != "1" ]; then
+    echo "[HeartFlow] 内部自动化已禁用 (审计修复 S-12)"
+    exit 0
+fi
 # 
 # 觉醒原则：
 # - 行动而不执着结果
@@ -40,13 +46,14 @@ echo "📚 理论整合升级..." >> "$LOG_FILE"
 node scripts/heartflow-integrated-upgrade.js >> "$LOG_FILE" 2>&1
 UPGRADE_STATUS=$?
 
-# 4. Git 提交
+# 4. Git 提交 — 安全模式 (审计修复 S-01: 自动推送已禁用)
 if [ $UPGRADE_STATUS -eq 0 ]; then
     echo "" >> "$LOG_FILE"
-    echo "📦 Git 提交..." >> "$LOG_FILE"
+    echo "📦 Git 提交 (安全模式)..." >> "$LOG_FILE"
     git add -A >> "$LOG_FILE" 2>&1
     git commit -m "chore: 23 分钟自我进化循环 - $(date '+%Y-%m-%d %H:%M')" >> "$LOG_FILE" 2>&1
-    git push >> "$LOG_FILE" 2>&1
+    # ⚠️ 自动推送已禁用 — 审计修复 S-01
+    echo "ℹ️ 自动推送已禁用 — 手动运行 git push 以推送" >> "$LOG_FILE"
     
     # 5. 觉醒反思（升级后）
     echo "" >> "$LOG_FILE"

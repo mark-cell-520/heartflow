@@ -11,7 +11,7 @@
  * 4. 自主决策转换为逻辑引擎
  * 
  * 集成来源：
- * - /Users/apple/mark-heartflow-skill 全部对话记忆
+ * - 项目对话记忆
  * - ~/.jvs/.openclaw/workspace/memory/ 所有记忆文件
  * - 真实对话历史提取
  */

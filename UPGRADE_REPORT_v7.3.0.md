@@ -102,7 +102,7 @@ AI_Personality = 0.50*Core_Capabilities + 0.30*AI_Agency + 0.10*Philosophy_Layer
 ### 4.1 每小时任务 (cron)
 ```bash
 # 每小时执行理论升级任务
-0 * * * * /Users/apple/mark-heartflow-skill-new/scripts/hourly-theory-upgrade.sh
+0 * * * * ~/.hermes/skills/ai/heartflow/scripts/hourly-theory-upgrade.sh
 ```
 
 ### 4.2 任务内容

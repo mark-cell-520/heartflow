@@ -3,6 +3,13 @@
 # HeartFlow 23 分钟自我进化循环 - Cron 脚本 v7.2.6
 # 使用相对路径，从脚本所在目录计算
 
+# 审计修复 S-12: 环境变量门控
+if [ "${HEARTFLOW_ENABLE_INTERNAL_AUTOMATION:-0}" != "1" ]; then
+    echo "[HeartFlow] 内部自动化已禁用 (审计修复 S-12)"
+    echo "设置 HEARTFLOW_ENABLE_INTERNAL_AUTOMATION=1 以手动启用"
+    exit 0
+fi
+
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 NODE_PATH="/opt/homebrew/bin/node"
 cd "$PROJECT_DIR"
@@ -79,14 +86,15 @@ EOF
 echo "✅ 升级报告已生成: $UPGRADE_DIR/UPGRADE.md" >> "$LOG_FILE"
 UPGRADE_STATUS=0
 
-# 4. Git 提交
+# 4. Git 提交 — 安全模式 (审计修复 S-01: 自动推送已禁用)
 if [ $UPGRADE_STATUS -eq 0 ]; then
     echo "" >> "$LOG_FILE"
-    echo "📦 Git 提交..." >> "$LOG_FILE"
+    echo "📦 Git 提交 (安全模式)..." >> "$LOG_FILE"
     git pull --rebase origin main >> "$LOG_FILE" 2>&1 || true
     git add -A >> "$LOG_FILE" 2>&1
     git commit -m "chore: 23分钟进化循环 - v$NEW_VERSION - $(date '+%Y-%m-%d %H:%M')" >> "$LOG_FILE" 2>&1 || true
-    git push >> "$LOG_FILE" 2>&1 || echo "Git push 无需或失败" >> "$LOG_FILE"
+    # ⚠️ 自动推送已禁用 — 审计修复 S-01
+    echo "ℹ️ 自动推送已禁用 — 手动运行 git push 以推送" >> "$LOG_FILE"
     
     # 5. 觉醒反思（升级后）
     echo "" >> "$LOG_FILE"

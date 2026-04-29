@@ -15,7 +15,7 @@ import subprocess
 import json
 from datetime import datetime
 
-WORKSPACE = "/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill"
+WORKSPACE = "~/.hermes/skills/ai/mark-heartflow-skill"
 
 def run_cmd(cmd, cwd=WORKSPACE):
     """Run shell command"""

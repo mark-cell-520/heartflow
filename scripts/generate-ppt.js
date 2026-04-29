@@ -223,6 +223,6 @@ slide11.addText('🌐 github.com/yun520-1/mark-heartflow-skill', { x: 0.5, y: 4,
 slide11.addText('⏰ 每30分钟自动升级，持续进化', { x: 0.5, y: 4.5, w: 9, h: 0.4, fontSize: 12, color: colors.muted, align: 'center' });
 
 // 保存文件
-pptx.writeFile({ fileName: '/Users/apple/mark-heartflow-skill/output/HeartFlow-Presentation.pptx' })
+pptx.writeFile({ fileName: path.join(__dirname, '../output/HeartFlow-Presentation.pptx') })
   .then(() => console.log('✅ PPT 生成完成: output/HeartFlow-Presentation.pptx'))
   .catch(err => console.error('❌ 错误:', err));

@@ -75,7 +75,7 @@
 
 ## 📝 升级报告位置
 
-- **升级计划**: `/Users/apple/.jvs/.openclaw/workspace/mark-heartflow-skill/docs/upgrade-report-v5.0.22.md`
+- **升级计划**: `~/.hermes/skills/ai/mark-heartflow-skill/docs/upgrade-report-v5.0.22.md`
 - **Git 提交**: `996a5ec`
 - **远程仓库**: https://github.com/yun520-1/mark-heartflow-skill
 
