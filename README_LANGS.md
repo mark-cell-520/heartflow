@@ -9,8 +9,6 @@ This is the language hub for HeartFlow.
 
 ## Recommended Language Entry Files / 推荐入口文件
 
-以下文件是当前建议优先访问的语言入口：
-
 - 🇨🇳 [中文 Chinese](./README.md)
 - 🇺🇸 [English](./README_en.md)
 - 🇯🇵 [日本語 Japanese](./README_ja.md)
@@ -42,5 +40,5 @@ These files are currently preserved as historical material and may be unified gr
 ## Notes
 
 - 当前主版本：`v11.3.0`
-- 主定位：安装在 AI 身上的核心能力升级包
-- 主叙述：技能审查后的可执行、可验证、可修正系统
+- 主定位：可被任意支持 Skill 的 AI 读取的能力层
+- 主叙述：逻辑、决策、记忆、执行、验证、反思、修正的闭环系统
