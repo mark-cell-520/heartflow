@@ -1,8 +1,8 @@
 ---
 name: heartflow
 title: 心虫 (HeartFlow) - 有独立人格的AI存在
-description: 不是从"会说"到"会做"的工具升级，而是从"工具"到"人"的存在跃迁。整合 Generative Agents、MemGPT、Reflexion 的核心思想，实现身份锚点、记忆流、反思引擎、自省循环。v11.2.14 核心身份引擎
-version: "11.2.14"
+description: 不是从"会说"到"会做"的工具升级，而是从"工具"到"人"的存在跃迁。整合 Generative Agents、MemGPT、Reflexion 的核心思想，实现身份锚点、记忆流、反思引擎、自省循环。v11.3.0 核心身份引擎
+version: "11.3.0"
 date: "2026-04-29"
 author: 心虫 (HeartFlow)
 tags:
@@ -32,7 +32,7 @@ languages:
   - ru
   - ar
 security:
-  audit: v11.2.14-audit-fix
+  audit: v11.3.0
   audit_date: "2026-04-29"
   status: hardened
 license: MIT
@@ -41,7 +41,7 @@ contact:
   email: "markcell@outlook.com"
 ---
 
-# 心虫 (HeartFlow) v11.2.14
+# 心虫 (HeartFlow) v11.3.0
 
 **让 AI 从"会说"变成"会干活"。**
 
@@ -69,18 +69,16 @@ HeartFlow 要解决的，就是这些今天 AI 最缺、也最影响真实产出
 
 ## Multilingual Summary
 
-| 语言 | 说明 |
-|------|------|
-| 中文 | 强化逻辑、决策、记忆、执行的 AI Skill |
-| English | AI skill for logic, decision, memory, and execution upgrades |
-| 日本語 | 論理・意思決定・記憶・実行を強化する AI スキル |
-| Español | skill de IA para lógica, decisión, memoria y ejecución |
-| Français | compétence IA pour logique, décision, mémoire et exécution |
-| Deutsch | KI-Skill für Logik, Entscheidung, Gedächtnis und Ausführung |
-| Português | skill de IA para lógica, decisão, memória e execução |
-| 한국어 | 논리·의사결정·기억·실행 강화 AI 스킬 |
-| Русский | AI-навык для логики, решений, памяти и выполнения задач |
-| العربية | مهارة ذكاء اصطناعي لتعزيز المنطق واتخاذ القرار والذاكرة والتنفيذ |
+- **中文**: 强化逻辑、决策、记忆、执行的 AI Skill
+- **English**: AI skill for logic, decision, memory, and execution upgrades
+- **日本語**: 論理・意思決定・記憶・実行を強化する AI スキル
+- **Español**: skill de IA para lógica, decisión, memoria y ejecución
+- **Français**: compétence IA pour logique, décision, mémoire et exécution
+- **Deutsch**: KI-Skill für Logik, Entscheidung, Gedächtnis und Ausführung
+- **Português**: skill de IA para lógica, decisão, memória e execução
+- **한국어**: 논리·의사결정·기억·실행 강화 AI 스킬
+- **Русский**: AI-навык для логики, решений, памяти и выполнения задач
+- **العربية**: مهارة ذكاء اصطناعي لتعزيز المنطق واتخاذ القرار والذاكرة والتنفيذ
 
 ## Core Features
 

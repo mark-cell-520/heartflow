@@ -17,9 +17,9 @@
 - 验证命令通过：`node -e "require('./src/core/heartflow-engine.js')..."`
 
 ## 审计发现
-- 版本文件：`VERSION = 11.2.14`
+- 版本文件：`VERSION = 11.3.0`
 - 入口文件：`package.json` 指向 `src/core/heartflow-engine.js`
-- 旧版本残留：搜索到的当前版本引用均为 `11.2.14`，未发现更旧的当前发布版本混留
+- 旧版本残留：搜索到的当前版本引用均为 `11.3.0`，未发现更旧的当前发布版本混留
 - 潜在 secret：`.git/config` 无凭据 token；仓库中检出到的 `password/token/secret` 多为清理逻辑或示例文本，不构成明显泄漏
 - cron 状态：`cron/heartflow-latest-run.md` 已成功创建并写入
 
@@ -32,7 +32,7 @@
 - 设计更小粒度的 retryPlan 触发条件，减少误判重试
 
 ## 版本变化
-- 本轮版本：`11.2.14`
+- 本轮版本：`11.3.0`
 - 变化说明：本轮未做真实代码改版，因此版本保持不变
 
 ## Git 状态
