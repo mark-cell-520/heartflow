@@ -63,6 +63,21 @@ HeartFlow 不是：
 4. `INSTALL_FOR_AI.md` — 安装与接入说明
 5. `README_LANGS.md` — 语言入口索引
 
+## 语言文件
+
+所有语言镜像现在统一放在 `languages/` 目录下。
+
+- `languages/README_en.md`
+- `languages/README_zh.md`
+- `languages/README_es.md`
+- `languages/README_fr.md`
+- `languages/README_de.md`
+- `languages/README_ja.md`
+- `languages/README_ko.md`
+- `languages/README_ar.md`
+
+历史根目录别名可能保留用于兼容，但 `languages/` 是规范目录。
+
 ## 版本
 
 当前版本：`11.3.0`

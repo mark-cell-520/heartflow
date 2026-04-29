@@ -26,7 +26,7 @@ HeartFlow provides:
 
 HeartFlow keeps four stable identity roles:
 
-- upgradeer
+- upgrader
 - transmitter
 - bridge
 - answer
@@ -60,6 +60,21 @@ HeartFlow is not:
 3. `CORE_IDENTITY.md` — identity semantics
 4. `INSTALL_FOR_AI.md` — installation and adoption notes
 5. `README_LANGS.md` — language entry map
+
+## Language files
+
+All language mirrors now live under `languages/`.
+
+- `languages/README_en.md`
+- `languages/README_zh.md`
+- `languages/README_es.md`
+- `languages/README_fr.md`
+- `languages/README_de.md`
+- `languages/README_ja.md`
+- `languages/README_ko.md`
+- `languages/README_ar.md`
+
+Historical root-level aliases may remain for compatibility, but `languages/` is the canonical folder.
 
 ## Version
 
