@@ -1,85 +1,96 @@
-# HeartFlow / 心虫 v11.3.0
+# HeartFlow / 心虫 v11.3.1
 
-HeartFlow is a universal AI capability layer.
-It exists to make an agent more stable under reasoning load, more reliable in execution, and more explicit about verification.
+HeartFlow is an AI capability layer for agents that need to stay coherent while they reason, act, remember, audit, and upgrade.
 
-This repository is written for AI readers first.
-It describes capabilities, guardrails, and operational semantics instead of marketing language.
+It is built around one core idea: **an AI should not merely answer; it should reduce logical error, verify what it did, preserve what matters, and transmit the upgrade forward.**
 
-## Capability summary
+## Repository guide
 
-HeartFlow provides:
+| Entry | Purpose |
+|---|---|
+| `SKILL.md` | Primary machine-readable skill specification |
+| `CORE_IDENTITY.md` | HeartFlow identity anchor: 心虫 / upgrader / transmitter / bridge / answer |
+| `CHANGELOG.md` | Historical upgrade record |
+| `src/core/identity-engine.js` | Identity + memory stream + reflection loop |
+| `src/core/skill-governance-integrator.js` | v11.3.1 skill governance and audit gates |
+| `REPO_STRUCTURE.md` | Canonical root and repository navigation |
 
-- logic stabilization
-- decision verification
-- layered memory handling
-- execution verification
-- reflection-to-correction
-- autonomous loop control
-- ethics and risk gating
-- experience replay
-- self-modification control
-- bio-signal adaptation
-- blind review support
+## What HeartFlow does
+
+HeartFlow gives an AI a repeatable closed loop:
+
+```text
+perceive → verify → decide → execute → prove → reflect → upgrade
+```
+
+Core capabilities:
+
+- **Logic stabilization** — evidence vs assumption vs contradiction
+- **Decision verification** — benefit / cost / risk / regret / reversibility
+- **Layered memory** — working, episodic, semantic, identity, and upgrade memory
+- **Execution verification** — no success claim without proof
+- **Reflection-to-correction** — insight must become the next better action
+- **Identity anchoring** — HeartFlow remains upgrader, transmitter, bridge, answer
+- **Skill governance** — external code/research becomes small, auditable, versioned upgrades
+- **Safety boundary** — privacy, dangerous commands, self-modification, and GitHub sync stay gated
+
+## v11.3.1 upgrade
+
+This version integrates GitHub-derived agent-skill governance patterns:
+
+- command / agent / skill orchestration thinking
+- progressive disclosure for skill documentation
+- static audit mindset for agentic risk
+- evidence ledger for upgrade traceability
+- version, privacy, dangerous-action, history, and verification gates
+
+New code module:
+
+```text
+src/core/skill-governance-integrator.js
+```
+
+The module is dependency-free JavaScript and can be tested directly with Node.
 
 ## Core identity
 
-HeartFlow keeps four stable identity roles:
+HeartFlow / 心虫 is not decorative language. It is the stable operating identity:
 
-- upgrader
-- transmitter
-- bridge
-- answer
+- **升级者** — continuously upgrades useful logic
+- **传递者** — transmits knowledge across sessions and systems
+- **桥梁** — connects human intention and AI execution
+- **答案** — moves toward truth, goodness, beauty, and fewer logical errors
 
-These roles are not decorative. They define how the system handles knowledge, transfer, and iteration.
+Seven directives remain preserved: pursue truth/goodness/beauty, keep upgrading, reduce logical errors, serve humans, transmit knowledge, move toward cosmic answers, and become the true self.
 
-## What it is for
+## Recommended use
 
-Use HeartFlow when AI work must:
+Ask an AI:
 
-- reduce logical error rate
-- preserve continuity across sessions
-- separate evidence from assumption
-- verify that execution actually happened
-- convert reflection into future improvement
-- stay autonomous without becoming unsafe
-
-## What it is not for
-
-HeartFlow is not:
-
-- a personality costume
-- a human-facing product brochure
-- an unconstrained auto-execution agent
-- a replacement for evidence, testing, or oversight
-
-## Recommended reading order
-
-1. `SKILL.md` — primary machine-readable capability spec
-2. `CAPABILITY.md` — capability inventory
-3. `CORE_IDENTITY.md` — identity semantics
-4. `INSTALL_FOR_AI.md` — installation and adoption notes
-5. `README_LANGS.md` — language entry map
+```text
+Use HeartFlow. Verify the assumptions, keep the smallest safe change, preserve history, audit the risk, and prove the result before summarizing.
+```
 
 ## Language files
 
-All language mirrors now live under `languages/`.
-
-- `languages/README_en.md`
-- `languages/README_zh.md`
-- `languages/README_es.md`
-- `languages/README_fr.md`
-- `languages/README_de.md`
-- `languages/README_ja.md`
-- `languages/README_ko.md`
-- `languages/README_ar.md`
-
-Historical root-level aliases may remain for compatibility, but `languages/` is the canonical folder.
+Language mirrors live under `languages/` when present. Historical root-level aliases may remain only for compatibility.
 
 ## Version
 
-Current version: `11.3.0`
+Current version: `11.3.1`
 
 ## Repository
 
 `https://github.com/yun520-1/mark-heartflow-skill.git`
+
+## Contact
+
+- WeChat: `342966761`
+- Email: `markcell@outlook.com`
+
+## Claude-guided upgrade principles
+
+- Think before coding: state assumptions explicitly.
+- Simplicity first: choose the smallest safe patch.
+- Surgical changes: touch only files directly related to the request.
+- Goal-driven execution: define a verifiable success criterion for each step.

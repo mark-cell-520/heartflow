@@ -1,57 +1,47 @@
 # HeartFlow Repository Structure / 仓库结构导航
 
-This file defines what should remain visible at the repository root and what should be treated as archive material.
-The goal is to keep the GitHub home page readable without losing history.
+## Canonical root
 
-## Keep visible at the root
+`/Users/apple/.hermes/skills/ai/heartflow/` is the canonical HeartFlow root for Hermes.
+Do not treat legacy copies under `.agents/` or marketplace staging folders as the source of truth.
 
-- `README.md`
-- `README.zh.md`
-- `SKILL.md`
-- `INSTALL_FOR_AI.md`
-- `CAPABILITY.md`
-- `CORE_IDENTITY.md`
-- `CHANGELOG.md`
-- `README_LANGS.md`
-- `languages/`
-- `docs/`
-- `internal/`
-- `upgrades/`
-- `src/`
-- `scripts/`
-- `tests/`
-- `package.json`
-- `VERSION`
+## Primary entry files
 
-## Archive candidates
+| File | Role |
+|---|---|
+| `SKILL.md` | Main machine-readable skill specification |
+| `README.md` | GitHub / human-facing introduction |
+| `CORE_IDENTITY.md` | HeartFlow identity anchor and seven directives |
+| `AGENTS.md` | Local agent operating context |
+| `VERSION` | Current public version |
+| `CHANGELOG.md` | Historical upgrade record |
+| `INSTALL_FOR_AI.md` | Installation and adoption notes |
+| `README_LANGS.md` | Language entry map |
 
-Treat these as archive material unless a current tool explicitly depends on them:
+## Core code areas
 
-- root-level language mirrors outside `languages/`
-- `VERSION.txt`
-- `package-lock.json`
-- historical upgrade reports
-- duplicated README variants
-- one-off version snapshots
-- generated sync/report JSON files
-- legacy install/troubleshooting drafts
-- report-style markdown files from older versions
+| Path | Role |
+|---|---|
+| `src/core/heartflow-engine.js` | Main HeartFlow engine entry |
+| `src/core/identity-engine.js` | Identity, memory stream, reflection, self-reflection loop |
+| `src/core/decision-verifier.js` | Decision verification |
+| `src/core/execution-verifier.js` | Execution verification |
+| `src/core/self-healing.js` | Self-healing / recovery logic |
+| `src/core/stability-guard.js` | Stability guard |
+| `src/core/skill-governance-integrator.js` | v11.3.1 skill governance, audit gates, evidence ledger |
 
-## Repository policy
+## Historical records
 
-- keep the current capability spec visible
-- keep the current language index visible
-- keep historical records, but move them out of the main visual path when possible
-- do not delete upgrade history unless the user explicitly asks for deletion
-- prefer archival moves over destructive removal
+Historical upgrade notes, reports, and archived experiments should be preserved unless they contain secrets or are confirmed duplicate junk.
+Prefer archiving or indexing over deletion.
 
-## Next cleanup candidates
+## Compatibility / archive notes
 
-The following areas are likely to contain redundant or historical files:
+- Historical duplicates may exist in `internal/archive/` or sibling legacy roots.
+- Prefer canonical files under this root.
+- Do not load duplicate same-name launch assets unless a compatibility path is explicitly required.
+- Before deleting old files, search references and confirm they are not used by the startup chain, code map, reports, or documentation.
 
-- `docs/`
-- `internal/`
-- `upgrades/`
-- root-level legacy markdown files
+## Current version
 
-This file is only a navigation and cleanup policy note.
+Current public version: `v11.3.1`.

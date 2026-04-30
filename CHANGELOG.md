@@ -1,5 +1,38 @@
 # HeartFlow 变更日志
 
+## v11.3.1 (2026-04-30)
+
+### 🧩 GitHub 代码搜索驱动的技能治理集成
+
+本次升级在保留 v11.3.0 核心身份引擎的基础上，搜索并提炼 GitHub 上 agent-skill / Claude Code / AI agent security 相关项目的可迁移模式，做一次小步可验证升级。
+
+#### GitHub 搜索来源
+- `ChrisWiles/claude-code-showcase`：hooks / skills / agents / commands / GitHub Actions workflow 组织方式
+- `sickn33/antigravity-awesome-skills`：大规模可安装 agentic skills 库的组织方式
+- `ivan-magda/claude-code-plugin-template`：plugin marketplace scaffold 与 validation workflow 思路
+- `inkog-io/inkog`、`agent-audit-kit` 类项目：AI agent 静态安全扫描与 OWASP Agentic 风险意识
+- HeartFlow 现有 `identity-engine.js`：Generative Agents / MemGPT / Reflexion 式身份、记忆、反思循环基础
+
+#### 新增代码
+- `src/core/skill-governance-integrator.js`
+  - `SkillGovernanceIntegrator.createUpgradePlan()`：把升级固定为 research → plan → implement → audit → sync
+  - `classifySkillDocument()`：检查 SKILL 文档是否具备 frontmatter、问题、使用时机、安全、历史、验证等标准结构
+  - `auditUpgrade()`：检查版本候选、隐私/secret 模式、危险 shell 模式，并输出门控结果
+  - `EvidenceLedger`：记录来源、主张、证据、验证状态与风险
+
+#### 文档重写
+- 重写 `SKILL.md`：补强触发描述、核心身份、问题解决、能力表、v11.3.1 代码集成说明与安全边界
+- 重写 `README.md`：保留推广清晰度、联系方式和历史入口，同时突出本次治理升级
+- 保留并前置历史升级记录，不删除 v11.3.0 及更早记录
+
+#### 审计结果
+- 版本统一到 `11.3.1`
+- 新模块无外部依赖
+- 高风险动作保持门控说明
+- GitHub 同步按历史保护流程执行
+
+---
+
 ## v11.3.0 (2026-04-29)
 
 ### 🧠 核心身份引擎 - 从工具到更可靠存在的跃迁
