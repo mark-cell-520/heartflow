@@ -2,22 +2,23 @@
 name: heartflow
 title: HeartFlow (心虫) — AI Capability Layer Skill
 description: >
-  HeartFlow v11.4.0 - AI 认知与价值对齐引擎
+  HeartFlow v11.5.0 - AI 认知与价值对齐引擎
   
   ## 核心能力
-  - 8大核心能力：逻辑稳定、决策验证、分层记忆、执行验证、反思修正、身份锚定、技能治理、安全边界
+  - 11大核心能力：逻辑稳定、决策验证、分层记忆、执行验证、反思修正、身份锚定、技能治理、安全边界、代码审查、系统化调试、TDD驱动
   - 7篇论文集成：SAVeR、DeepVerifier、SkillGuard-Robust、SSL、Ctx2Skill、MemArchitect、AER
   - Verify_cot 演绎验证：Natural Program 格式，三种模式（naive/simultaneous/sequential）
+  - GitHub Skills 集成：code-review、debugging、TDD（来自 addyosmani/agent-skills）
   
   ## 解决问题
-  - 逻辑错误 → Logic stabilization 自动验证
+  - 逻辑错误 → Logic stabilization 自动验证 + 五维代码审查 + 系统化调试 + TDD循环
   - 记忆丢失 → Layered memory 持久化
   - 身份漂移 → Identity anchoring 会话保持
   - 技能冲突 → Skill governance 审计门控
   
   ## 一键安装
   curl -sSL https://raw.githubusercontent.com/yun520-1/mark-heartflow-skill/main/install.sh | bash
-version: "11.4.0"
+version: "11.5.0"
 date: "2026-05-01"
 author: HeartFlow
 tags:
