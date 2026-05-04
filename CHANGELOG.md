@@ -1,26 +1,30 @@
 # HeartFlow 变更日志
 
-## v11.5.6 (2026-05-04)
+## v11.5.7 (2026-05-04)
 
-### 升级：Self-Healing RL 引擎
+### 升级：Decision Verifier 自我验证层
 
-**来源论文**：Reflexion (2023), CRITIC (2024)
+**来源论文**：arXiv 2312.09210 — "Self-Verification Improves Reasoning in Language Models" (Weng et al., 2023)
 
-**改动**：
-- `self-healing-rl.js`：从11行骨架升级为完整 Q-learning 模块
-  - ε-greedy 探索策略
-  - Q-table 累积学习
-  - 修复结果闭环反馈
-- `self-healing.js`：接入 RL 模块
-  - `recover()` 返回 RL 排序后的 hints
-  - `record(event, outcome)` 支持修复结果反馈
-  - 每次修复结果更新 Q 值
+**核心实现**：`selfVerify()` 方法，在决策输出前进行4项逆向检查：
 
-**效果**：HeartFlow 从"记录失败"升级为"从失败中学习"，修复策略质量随运行自动提升。
+| 检查项 | 内容 |
+|--------|------|
+| **逆向一致性** | 提取决策关键词，检查是否覆盖用户目标关键词 |
+| **逻辑链完整性** | decision → reason → evidence → expected_outcome 逐环验证 |
+| **反事实风险** | 高风险决策必须配有风险清单 |
+| **覆盖率** | 检查决策是否覆盖"操作/对象/约束"维度 |
+
+**验证结果**：
+- 高风险删除 → `likely_wrong` ✅
+- 强制覆盖无风险清单 → `likely_wrong` ✅
+- 逻辑链断裂 → `needs_revision` ✅
+
+**效果**：决策在输出前被逆向验证，直接减少"答非所问"类逻辑错误。
 
 ---
 
-## v11.5.0
+## v11.5.6
 
 ### 🚀 GitHub Skills 集成升级
 
