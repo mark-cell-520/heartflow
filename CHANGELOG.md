@@ -1,6 +1,26 @@
 # HeartFlow 变更日志
 
-## v11.5.0 (2026-05-01)
+## v11.5.6 (2026-05-04)
+
+### 升级：Self-Healing RL 引擎
+
+**来源论文**：Reflexion (2023), CRITIC (2024)
+
+**改动**：
+- `self-healing-rl.js`：从11行骨架升级为完整 Q-learning 模块
+  - ε-greedy 探索策略
+  - Q-table 累积学习
+  - 修复结果闭环反馈
+- `self-healing.js`：接入 RL 模块
+  - `recover()` 返回 RL 排序后的 hints
+  - `record(event, outcome)` 支持修复结果反馈
+  - 每次修复结果更新 Q 值
+
+**效果**：HeartFlow 从"记录失败"升级为"从失败中学习"，修复策略质量随运行自动提升。
+
+---
+
+## v11.5.0
 
 ### 🚀 GitHub Skills 集成升级
 

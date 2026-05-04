@@ -1,17 +1,24 @@
 /**
- * HeartFlow Self-Healing
- *
- * Lightweight recovery loop for agent runtime instability.
+ * HeartFlow Self-Healing v11.5.6
+ * 
+ * Recovery loop with RL-based repair strategy learning.
  * - detect repeated failures
  * - classify recovery path
  * - emit concrete repair hints
+ * - learn from repair outcomes (Q-learning)
+ * 
+ * Paper: Reflexion (2023), CRITIC (2024)
  */
+
+const { HealingMemoryRL } = require('./self-healing-rl.js');
 
 class SelfHealing {
   constructor(options = {}) {
     this.maxRetries = options.maxRetries ?? 2;
     this.backoffMs = options.backoffMs ?? 150;
     this.failureWindow = [];
+    this.rl = new HealingMemoryRL(options.maxMemory ?? 100);
+    this._pendingCtx = new Map(); // pending repair attempts for RL update
   }
 
   normalizeError(errorLike = {}) {
@@ -30,7 +37,7 @@ class SelfHealing {
     return { message, code, transient };
   }
 
-  record(event = {}) {
+  record(event = {}, repairOutcome = null) {
     const normalized = this.normalizeError(event);
     const item = {
       type: String(event.type || 'unknown'),
@@ -41,6 +48,16 @@ class SelfHealing {
     };
     this.failureWindow.push(item);
     if (this.failureWindow.length > 20) this.failureWindow.shift();
+
+    // RL: 关闭修复闭环
+    if (repairOutcome !== null) {
+      const pending = this._pendingCtx.get(normalized.message);
+      if (pending) {
+        this.rl.updateFromRepair(pending.context, pending.strategy, repairOutcome);
+        this.rl.record(normalized.message, pending.strategy, repairOutcome);
+        this._pendingCtx.delete(normalized.message);
+      }
+    }
     return item;
   }
 
@@ -90,16 +107,31 @@ class SelfHealing {
   recover(result = {}) {
     const retry = this.createRetryPlan(result);
     const snapshot = this.summarize();
+    const message = this.normalizeError(result).message;
+    const hints = this.repairHints(result);
+    const ctx = `${result.type || 'unknown'}|${message.slice(0, 60)}`;
+
+    // RL: 用 Q-learning 排序策略
+    const ranked = this.rl.rankedPatches(ctx);
+    const available = [...new Set([...ranked, ...hints])];
+
+    // RL: 记录待验证的修复策略
+    if (hints.length > 0) {
+      const chosen = this.rl.selectAction(ctx, available) || hints[0];
+      this._pendingCtx.set(message, { context: ctx, strategy: chosen, ts: Date.now() });
+    }
+
     return {
       ok: !!result.ok,
       attempt: retry.attempt,
       canRetry: retry.canRetry,
       backoffMs: retry.delay,
       strategy: retry.strategy,
-      hints: this.repairHints(result),
+      hints: available.slice(0, 5),   // RL排序后的hint
       summary: snapshot.summary,
       details: snapshot,
       next_step: retry.canRetry ? 'retry' : 'repair',
+      rlStats: this.rl.stats(),       // 学习状态透明
     };
   }
 }
