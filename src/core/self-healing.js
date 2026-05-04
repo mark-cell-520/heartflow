@@ -51,9 +51,11 @@ class SelfHealing {
 
     // RL: 关闭修复闭环
     if (repairOutcome !== null) {
+      // 用 normalized.message 精确匹配 _pendingCtx 的 key
       const pending = this._pendingCtx.get(normalized.message);
       if (pending) {
-        this.rl.updateFromRepair(pending.context, pending.strategy, repairOutcome);
+        // Q-key 用 record() 时传入的同一个 pattern
+        this.rl.updateFromRepair(normalized.message, pending.strategy, repairOutcome);
         this.rl.record(normalized.message, pending.strategy, repairOutcome);
         this._pendingCtx.delete(normalized.message);
       }
@@ -109,16 +111,17 @@ class SelfHealing {
     const snapshot = this.summarize();
     const message = this.normalizeError(result).message;
     const hints = this.repairHints(result);
-    const ctx = `${result.type || 'unknown'}|${message.slice(0, 60)}`;
+    // pattern = normalized.message，贯穿 record/learn/selectAction
+    const pattern = message;
 
     // RL: 用 Q-learning 排序策略
-    const ranked = this.rl.rankedPatches(ctx);
+    const ranked = this.rl.rankedPatches(pattern);
     const available = [...new Set([...ranked, ...hints])];
 
-    // RL: 记录待验证的修复策略
+    // RL: 记录待验证的修复策略（key = message，精确匹配）
     if (hints.length > 0) {
-      const chosen = this.rl.selectAction(ctx, available) || hints[0];
-      this._pendingCtx.set(message, { context: ctx, strategy: chosen, ts: Date.now() });
+      const chosen = this.rl.selectAction(pattern, available) || hints[0];
+      this._pendingCtx.set(message, { context: pattern, strategy: chosen, ts: Date.now() });
     }
 
     return {
@@ -127,11 +130,11 @@ class SelfHealing {
       canRetry: retry.canRetry,
       backoffMs: retry.delay,
       strategy: retry.strategy,
-      hints: available.slice(0, 5),   // RL排序后的hint
+      hints: available.slice(0, 5),
       summary: snapshot.summary,
       details: snapshot,
       next_step: retry.canRetry ? 'retry' : 'repair',
-      rlStats: this.rl.stats(),       // 学习状态透明
+      rlStats: this.rl.stats(),
     };
   }
 }
