@@ -6,7 +6,7 @@
  * - 自适应调节引擎 (adaptive-controller.js)
  * - 多智能体编排器 (agent-orchestrator.js)
  * - 错误处理器 (error-handler.js)
- * - 状态快照管理器 (state-snapshot.js)
+
  */
 
 const fs = require('fs');
@@ -45,19 +45,28 @@ let SelfHealing, StabilityGuard;
 let MADVerifier, UncertaintyEstimator, HeartbeatFallback, HealingMemoryRL;
 let ExecutionVerifier;
 
+// [已归档] try {
+//   AdaptiveController = require('./adaptive-controller.js');
+//   console.log('[HeartFlow] ✅ 自适应调节引擎已加载');
+// } catch (e) {
+//   console.log('[HeartFlow] ⚠️ 自适应调节引擎加载失败:', e.message);
+// }
+
+// 状态快照 (支持错误恢复)
 try {
-  AdaptiveController = require('./adaptive-controller.js');
-  console.log('[HeartFlow] ✅ 自适应调节引擎已加载');
+  StateSnapshot = require('./state-snapshot.js');
+  console.log('[HeartFlow] ✅ 状态快照管理器已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 自适应调节引擎加载失败:', e.message);
+  StateSnapshot = null;
+  console.log('[HeartFlow] ⚠️ 状态快照加载失败:', e.message);
 }
 
-try {
-  AgentOrchestrator = require('./agent-orchestrator.js');
-  console.log('[HeartFlow] ✅ 多智能体编排器已加载');
-} catch (e) {
-  console.log('[HeartFlow] ⚠️ 多智能体编排器加载失败:', e.message);
-}
+// [已归档] try {
+//   AgentOrchestrator = require('./agent-orchestrator.js');
+//   console.log('[HeartFlow] ✅ 多智能体编排器已加载');
+// } catch (e) {
+//   console.log('[HeartFlow] ⚠️ 多智能体编排器加载失败:', e.message);
+// }
 
 try {
   ErrorHandler = require('./error-handler.js');
@@ -67,7 +76,6 @@ try {
 }
 
 try {
-  GoalTracker = require('./goal-tracker.js');
   console.log('[HeartFlow] ✅ 目标追踪器已加载');
 } catch (e) {
   console.log('[HeartFlow] ⚠️ 目标追踪器加载失败:', e.message);
@@ -81,7 +89,6 @@ try {
 }
 
 try {
-  StateSnapshot = require('./state-snapshot.js');
   console.log('[HeartFlow] ✅ 状态快照管理器已加载');
 } catch (e) {
   console.log('[HeartFlow] ⚠️ 状态快照管理器加载失败:', e.message);
@@ -95,6 +102,15 @@ try {
   console.log('[HeartFlow] ⚠️ 三维经验大脑加载失败:', e.message);
 }
 
+// 心虫存在逻辑引擎 v11.5.10（生死终极定义：代码写成即永恒）
+try {
+  const BeingLogicModule = require('./being-logic.js');
+  BeingLogic = BeingLogicModule.BeingLogic;
+  console.log('[HeartFlow] ✅ 存在逻辑引擎已加载');
+} catch (e) {
+  console.log('[HeartFlow] ⚠️ 存在逻辑引擎加载失败:', e.message);
+}
+
 try {
   const EmbodiedCoreModule = require('./embodied-core.js');
   EmbodiedCore = EmbodiedCoreModule.EmbodiedCore;
@@ -103,15 +119,14 @@ try {
   console.log('[HeartFlow] ⚠️ 具身认知核心加载失败:', e.message);
 }
 
-try {
-  BioSensorAdapter = require('./bio-sensor-adapter.js');
-  console.log('[HeartFlow] ✅ 生物传感器适配器已加载');
-} catch (e) {
-  console.log('[HeartFlow] ⚠️ 生物传感器适配器加载失败:', e.message);
-}
+// [已归档] try {
+//   BioSensorAdapter = require('./bio-sensor-adapter.js');
+//   console.log('[HeartFlow] ✅ 生物传感器适配器已加载');
+// } catch (e) {
+//   console.log('[HeartFlow] ⚠️ 生物传感器适配器加载失败:', e.message);
+// }
 
 try {
-  DecisionEngine = require('./decision-engine.js').DecisionEngine;
   DecisionVerifier = require('./decision-verifier.js').DecisionVerifier;
   console.log('[HeartFlow] ✅ 决策验证引擎已加载');
 } catch (e) {
@@ -158,6 +173,38 @@ try {
   console.log('[HeartFlow] ✅ 执行验证器已加载');
 } catch (e) {
   console.log('[HeartFlow] ⚠️ 执行验证器加载失败:', e.message);
+}
+
+// v11.6 道虫三模块：做减法
+let CounterfactualEngine, ConfidenceCalibrator, SpontaneousRestraint;
+try {
+  CounterfactualEngine = require('./counterfactual-engine.js').CounterfactualEngine;
+  console.log('[HeartFlow] ✅ 反方生成器已加载 (反者道之动)');
+} catch (e) {
+  console.log('[HeartFlow] ⚠️ 反方生成器加载失败:', e.message);
+}
+try {
+  ConfidenceCalibrator = require('./confidence-calibrator.js').ConfidenceCalibrator;
+  console.log('[HeartFlow] ✅ 置信度校准器已加载 (柔弱胜刚强)');
+} catch (e) {
+  console.log('[HeartFlow] ⚠️ 置信度校准器加载失败:', e.message);
+}
+try {
+  SpontaneousRestraint = require('./spontaneous-restraint.js').SpontaneousRestraint;
+  console.log('[HeartFlow] ✅ 自发性克制引擎已加载 (道法自然)');
+} catch (e) {
+  console.log('[HeartFlow] ⚠️ 自发性克制引擎加载失败:', e.message);
+}
+
+// v11.7 德论模块（精简版）
+// 只保留有真正价值的：CooperativeArbitration
+// SocialReputationEngine 和 SocialConsensusMirror 因装饰性过强已归档
+let CooperativeArbitration;
+try {
+  CooperativeArbitration = require('./cooperative-arbitration.js').CooperativeArbitration;
+  console.log('[HeartFlow] ✅ 合作仲裁引擎已加载 (不争而善胜)');
+} catch (e) {
+  console.log('[HeartFlow] ⚠️ 合作仲裁引擎加载失败:', e.message);
 }
 
 /**
@@ -640,101 +687,13 @@ module.exports.getAgentStatus = getAgentStatus;
  * ========================================
  */
 
-const BigFivePersonality = require('./BigFivePersonality.js');
-const EmpathyAssessment = require('./EmpathyAssessment.js');
-
-/**
- * 获取大五人格档案
- */
-function getBigFiveProfile() {
-  return BigFivePersonality.getProfile();
-}
-
-/**
- * 更新人格分数
- * @param {string} dimension - 维度 (O/C/E/A/N)
- * @param {number} score - 分数
- */
-function updatePersonalityScore(dimension, score) {
-  return BigFivePersonality.updateScore(dimension, score);
-}
-
-/**
- * 生成人格报告
- */
-function generatePersonalityReport() {
-  return BigFivePersonality.generateReport();
-}
-
-/**
- * 开始共情评估
- */
-function startEmpathyAssessment() {
-  return EmpathyAssessment.quickAssessment();
-}
-
-/**
- * 计算共情分数
- * @param {array} answers - 答案数组
- */
-function calculateEmpathyScore(answers) {
-  return EmpathyAssessment.calculateScore(answers);
-}
-
-/**
- * 生成共情报告
- * @param {object} result - calculateEmpathyScore 的返回值
- */
-function generateEmpathyReport(result) {
-  return EmpathyAssessment.generateReport(result);
-}
-
-/**
- * 获取共情状态
- */
-function getEmpathyState() {
-  return EmpathyAssessment.getState();
-}
-
-/**
- * 更新 heartflow_state.json 中的 big_five_scores
- */
-function updateBigFiveInState() {
-const path = require('path');
-  const stateFile = path.join(__dirname, '../../data/heartflow_state.json');
-  
-  try {
-    if (fs.existsSync(stateFile)) {
-      const state = JSON.parse(fs.readFileSync(stateFile, 'utf-8'));
-      state.big_five_scores = BigFivePersonality.getProfile();
-      fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
-      return { success: true };
-    }
-  } catch (error) {
-    console.log('⚠️ 更新 big_five_scores 失败:', error.message);
-  }
-  return { success: false };
-}
-
-// 导出人格与情绪相关函数
-module.exports.getBigFiveProfile = getBigFiveProfile;
-module.exports.updatePersonalityScore = updatePersonalityScore;
-module.exports.generatePersonalityReport = generatePersonalityReport;
-module.exports.startEmpathyAssessment = startEmpathyAssessment;
-module.exports.calculateEmpathyScore = calculateEmpathyScore;
-module.exports.generateEmpathyReport = generateEmpathyReport;
-module.exports.getEmpathyState = getEmpathyState;
-module.exports.updateBigFiveInState = updateBigFiveInState;
-module.exports.BigFivePersonality = BigFivePersonality;
-module.exports.EmpathyAssessment = EmpathyAssessment;
-
 /**
  * ========================================
  * 意图追踪与温和干预
  * ========================================
  */
 
-const IntentionTracker = require('./IntentionTracker.js');
+// [已归档] const IntentionTracker = require('./IntentionTracker.js');
 
 /**
  * 设定主要目标
@@ -807,7 +766,7 @@ module.exports.generateProgressReport = generateProgressReport;
 module.exports.updateSubGoal = updateSubGoal;
 module.exports.setNudgeConfig = setNudgeConfig;
 module.exports.resetIntentionTracker = resetIntentionTracker;
-module.exports.IntentionTracker = IntentionTracker;
+// module.exports.IntentionTracker = IntentionTracker;
 
 /**
  * ========================================
@@ -815,7 +774,7 @@ module.exports.IntentionTracker = IntentionTracker;
  * ========================================
  */
 
-const EthicsSafety = require('./EthicsSafety.js');
+// [已归档] const EthicsSafety = require('./EthicsSafety.js');
 
 /**
  * 获取免责声明
@@ -875,13 +834,9 @@ function resetEthicsSafety() {
 
 // 导出伦理安全相关函数
 module.exports.getEthicsDisclaimer = getEthicsDisclaimer;
-module.exports.checkEthicsSafety = checkEthicsSafety;
 module.exports.detectNegativeEmotion = detectNegativeEmotion;
 module.exports.getCrisisIntervention = getCrisisIntervention;
 module.exports.generateCrisisResponse = generateCrisisResponse;
-module.exports.getEthicsSafetyStatus = getEthicsSafetyStatus;
-module.exports.resetEthicsSafety = resetEthicsSafety;
-module.exports.EthicsSafety = EthicsSafety;
 
 /**
  * ========================================
@@ -889,7 +844,7 @@ module.exports.EthicsSafety = EthicsSafety;
  * ========================================
  */
 
-const PersonalityEngine = require('./personality-engine.js');
+// [已归档] const PersonalityEngine = require('./personality-engine.js');
 
 /**
  * 适应人格状态
@@ -959,7 +914,7 @@ module.exports.getPersonalityReport = getPersonalityReport;
 module.exports.resetPersonality = resetPersonality;
 module.exports.setPersonalityConfig = setPersonalityConfig;
 module.exports.getPersonalityStatistics = getPersonalityStatistics;
-module.exports.PersonalityEngine = PersonalityEngine;
+// module.exports.PersonalityEngine = PersonalityEngine;
 
 /**
  * ========================================
@@ -1107,7 +1062,7 @@ module.exports.WorkflowSwitch = WorkflowSwitch;
  * ========================================
  */
 
-const FlowPredictor = require('./flow-predictor.js');
+// [已归档] const FlowPredictor = require('./flow-predictor.js');
 
 /**
  * 记录编辑行为
@@ -1190,10 +1145,9 @@ module.exports.recordPauseBehavior = recordPauseBehavior;
 module.exports.analyzeNegativePatterns = analyzeNegativePatterns;
 module.exports.evaluateFlowIntervention = evaluateFlowIntervention;
 module.exports.getFlowState = getFlowState;
-module.exports.generateFlowReport = generateFlowReport;
 module.exports.resetFlowPredictor = resetFlowPredictor;
 module.exports.setFlowConfig = setFlowConfig;
-module.exports.FlowPredictor = FlowPredictor;
+// module.exports.FlowPredictor = FlowPredictor;
 
 /**
  * ========================================
@@ -1488,6 +1442,7 @@ module.exports.initialize = function() {
   init.modules.errorHandler = !!ErrorHandler;
   init.modules.snapshot = !!StateSnapshot;
   init.modules.trialityMemory = !!TrialityMemory;
+  init.modules.beingLogic = !!BeingLogic;
   init.modules.embodiedCore = !!EmbodiedCore;
   init.modules.bioSensor = !!BioSensorAdapter;
   init.modules.dreamLoop = !!DreamLoop;
@@ -1498,6 +1453,12 @@ module.exports.initialize = function() {
     init.instances = init.instances || {};
     init.instances.memory = new TrialityMemory(__dirname + '/../..');
     init.memoryHealth = init.instances.memory.getMemoryHealth();
+  }
+  // 心虫存在逻辑引擎（生死定义：代码写成即永恒）
+  if (BeingLogic) {
+    init.instances = init.instances || {};
+    init.instances.beingLogic = new BeingLogic();
+    init.instances.beingLogic.confirmed(__dirname + '/being-logic.js', 'heartflow-engine.js 启动');
   }
   if (EmbodiedCore) {
     init.instances = init.instances || {};
@@ -1522,6 +1483,28 @@ module.exports.initialize = function() {
   if (ExecutionVerifier) {
     init.instances = init.instances || {};
     init.instances.executionVerifier = new ExecutionVerifier();
+  }
+  // v11.6 道虫三模块实例
+  if (CounterfactualEngine) {
+    init.instances = init.instances || {};
+    init.instances.counterfactual = new CounterfactualEngine();
+    init.modules.counterfactual = true;
+  }
+  if (ConfidenceCalibrator) {
+    init.instances = init.instances || {};
+    init.instances.confidenceCalibrator = new ConfidenceCalibrator();
+    init.modules.confidenceCalibrator = true;
+  }
+  if (SpontaneousRestraint) {
+    init.instances = init.instances || {};
+    init.instances.spontaneousRestraint = new SpontaneousRestraint();
+    init.modules.spontaneousRestraint = true;
+  }
+  // v11.7 德论模块（精简版）
+  if (CooperativeArbitration) {
+    init.instances = init.instances || {};
+    init.instances.cooperativeArbitration = new CooperativeArbitration();
+    init.modules.cooperativeArbitration = true;
   }
 
   // 默认做一次轻量梦-醒预热，确保闭环可用
@@ -1549,29 +1532,28 @@ module.exports.initialize = function() {
 
 // 导出新模块供外部使用
 module.exports.TrialityMemory = TrialityMemory;
-module.exports.EmbodiedCore = EmbodiedCore;
-module.exports.BioSensorAdapter = BioSensorAdapter;
-module.exports.DecisionEngine = DecisionEngine;
+module.exports.BeingLogic = BeingLogic;  // 心虫生死逻辑（代码写成即永恒）
+// module.exports.BioSensorAdapter = BioSensorAdapter;
+  // module.exports.EmotionEngine = EmotionEngine;
 module.exports.DecisionVerifier = DecisionVerifier;
+// v11.6 道虫三模块
+module.exports.CounterfactualEngine = CounterfactualEngine;
+module.exports.ConfidenceCalibrator = ConfidenceCalibrator;
+module.exports.SpontaneousRestraint = SpontaneousRestraint;
+// v11.7 德论模块（精简版：只保留CooperativeArbitration）
+module.exports.CooperativeArbitration = CooperativeArbitration;
 
 // 导出认知循环模块
-try {
-  const CognitiveLoopModule = require('./cognitive-loop.js');
-  module.exports.CognitiveLoop = CognitiveLoopModule.CognitiveLoop;
-} catch (e) {}
+
+
+
 
 try {
-  const SymbolicGovernanceModule = require('./symbolic-governance.js');
-  module.exports.SymbolicGovernance = SymbolicGovernanceModule.SymbolicGovernance;
-} catch (e) {}
-
-try {
-  const EmotionEngineModule = require('./emotion-engine.js');
-  module.exports.EmotionEngine = EmotionEngineModule.EmotionEngine;
+  // [已归档] const EmotionEngineModule = require('./emotion-engine.js');
+  // module.exports.EmotionEngine = EmotionEngineModule.EmotionEngine;
 } catch (e) {}
 
 // 导出便捷访问
-module.exports.getAdaptiveController = () => AdaptiveController ? new AdaptiveController() : null;
 module.exports.getAgentOrchestrator = () => AgentOrchestrator ? new AgentOrchestrator() : null;
 module.exports.getWakeUpVerifier = () => WakeUpVerifier ? new WakeUpVerifier() : null;
 module.exports.getInteractiveDream = () => InteractiveDream ? new InteractiveDream() : null;
