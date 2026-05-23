@@ -23,8 +23,7 @@ Prefer evidence, verification, and small safe upgrades. Preserve canonical files
 
 ## Current upgrade note
 
-Current public version: `v1.0.8`.
-This version adds: Boot Check (启动自检), FeedbackFunctions (RAG Triad 评估), Q-table persistence, and Meaningful Memory CORE/LEARNED/EPHEMERAL classification.
+Current public version: `0.3.2`.
 
 ## Claude-guided upgrade principles
 - Think before coding: state assumptions explicitly.

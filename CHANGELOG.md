@@ -7,6 +7,28 @@
 
 ---
 
+## v1.0.9 (2026-05-21)
+
+### ✨ v1.0.9 — 遗忘引擎 (Forgetting Engine)
+
+**论文启发**: DeepSeek-OCR paper — "Human memory decay over time ≈ visual perception degradation over spatial distance"
+
+**新增模块**: `src/memory/forgetting.js`
+- 实现视觉压缩启发的记忆衰减机制
+- 五级遗忘曲线：vivid → clear → faded → blurred → abstract
+- 渐进压缩比：1x(近期) → 4x → 10x → 16x → 20x(远期)
+- 精度模型：~97%(@10x) → ~90%(@10-12x) → ~60%(@20x)
+- `compressMemory()`: 对记忆内容应用"视觉模糊"压缩
+- `consolidateMemories()`: 将多个相关记忆整合为抽象摘要
+- `shouldForget()`: 判断记忆是否应被主动遗忘
+
+**设计原则**:
+- 近期记忆高保真，远期记忆通过增加压缩比逐渐模糊
+- 就像阅读远处文字 — 结构保留，细节丢失
+- 借鉴 DeepSeek-OCR 的光学压缩范式用于记忆管理
+
+---
+
 ## v1.0.6 (2026-05-19)
 
 ### ✨ v1.0.6

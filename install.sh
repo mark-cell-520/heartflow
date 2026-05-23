@@ -56,7 +56,9 @@ echo ""
 if [ -d "$TARGET_DIR" ]; then
     BACKUP_DIR="${TARGET_DIR}.backup.$(date +%Y%m%d_%H%M%S)"
     echo -e "${YELLOW}Backing up existing installation...${NC}"
-    cp -r "$TARGET_DIR" "$BACKUP_DIR"
+    # Exclude node_modules and .git to prevent bloat (avoid embedded repo warnings)
+    rsync -a --exclude='.git' --exclude='node_modules' --exclude='.DS_Store' --exclude='__pycache__' \
+        "$TARGET_DIR/" "$BACKUP_DIR/"
     echo -e "${GREEN}Backup created: ${BACKUP_DIR}${NC}"
     echo ""
 fi

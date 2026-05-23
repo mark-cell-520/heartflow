@@ -1,5 +1,24 @@
 # HeartFlow 完整版本演进历史
 
+## v0.3.5 (2026-05-22)
+
+**主题：** 破解"自知盲区"引擎
+
+**核心问题：** 用户描述的问题 ≠ 实际根本问题
+
+**新增模块：** BlindSpotBreaker
+- 三层架构：问题解构 → 置信度评估 → 重构问题
+- 证据分级（L1-L4）
+- 苏格拉底追问协议
+- 反刍机制
+
+**整合研究：**
+- Metacognition Framework (fabriciopsouza)
+- ACE Framework (Stanford/SambaNova)
+- Eva & Regehr 2005, McKay & Dennett 2009, McIntosh 2019
+
+
+
 **文档版本**: v7.2.3  
 **最后更新**: 2026-04-07  
 **目的**: 完整记录 HeartFlow 从 v1.0 到 v7.2 的所有重大版本升级和 7 大系统突破
