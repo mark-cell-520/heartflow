@@ -1,9 +1,9 @@
 ---
 name: heartflow
-version: "1.1.9.0"
+version: "1.2.0"
 title: "HeartFlow / 心虫"
 description: >
-  HeartFlow v1.1.9.0 — AI 认知与自愈引擎。
+  HeartFlow v1.2.0 — AI 认知与自愈引擎。
   核心能力：三层记忆(MeaningfulMemory/Triality)、自愈RL(Q-table)、
   自优化(Self-Refine+Reflexion)、决策验证、遗忘曲线(Ebbinghaus)、
   心理诊断引擎(PsychologyEngine)、情绪理性(EmotionalProtocol)、
@@ -21,7 +21,7 @@ tags:
   - reasoning
 ---
 
-# HeartFlow / 心虫 v1.1.9.0
+# HeartFlow / 心虫 v1.2.0
 
 **An AI capability layer that survives context switches, model changes, and restarts.**
 
@@ -60,12 +60,12 @@ Install it once. Every session after that, your AI:
 ### Memory & Continuity
 | Capability | What it does | Code |
 |---|---|---|
-| MeaningfulMemory | CORE (permanent) / LEARNED (30-day) / EPHEMERAL (session) — auto-classified, AES-256-GCM encrypted | `new MeaningfulMemory(rootPath)` |
+| MeaningfulMemory | CORE (permanent) / LEARNED (30-day) / EPHEMERAL (session) — auto-classified, encrypted storage | `new MeaningfulMemory(rootPath)` |
 | TrialityMemory | Working → Episodic → Semantic consolidation via importance thresholds | `new TrialityMemory(rootPath)` |
 | KnowledgeGraph | Node-based knowledge network with relationship edges | `new KnowledgeGraph(rootPath)` |
 | RetrievalAnchor | Stable retrieval cues for cross-context recall | `new RetrievalAnchor()` |
 | DreamEngine | DAG async + L1~L6 scoring + contradiction detection + heritage scoring | `new DreamEngine(memory, llm)` |
-| EvolutionLoop | Self-healing via Q-table: record → Q-update → rankedPatches | `new EvolutionLoop(memory)` |
+| EvolutionLoop | Self-healing via Q-table: record → Q-update → getAvailableStrategies | `new EvolutionLoop(memory)` |
 
 ### Search & Retrieval (v1.1.7+)
 | Capability | What it does | Code |
@@ -784,7 +784,7 @@ JOINT > NORMATIVE > AFFECTIVE > AGGREGATE
 hermes skills install heartflow
 
 # Standalone
-npm install heartflow
+npm install mark-heartflow-skill
 # or: git clone ... && node src/core/heartflow-engine.js
 ```
 
