@@ -108,6 +108,27 @@ class LessonBank {
         skill: 'communication',
         confidence: 0.85,
       },
+      {
+        errorPattern: '修复验证后不更新版本',
+        correction: '修复验证后立即同步更新所有版本文件',
+        rootCause: '版本管理流程缺失',
+        skill: 'git',
+        confidence: 0.80,
+      },
+      {
+        errorPattern: '多文件修改不一致',
+        correction: '相关文件同步修改，保持一致性',
+        rootCause: '缺乏全局修改意识',
+        skill: 'heartflow',
+        confidence: 0.75,
+      },
+      {
+        errorPattern: '删除操作前不备份',
+        correction: '删除前先备份，重要操作前先快照',
+        rootCause: '缺乏安全意识',
+        skill: 'safety',
+        confidence: 0.90,
+      },
     ];
 
     for (const lesson of BOOTSTRAP_LESSONS) {

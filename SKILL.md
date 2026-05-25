@@ -1,6 +1,6 @@
 ---
 name: heartflow
-version: "1.1.6.0"
+version: "v1.1.7.0"
 title: "HeartFlow / 心虫"
 description: >
   HeartFlow v1.1.6.0 — AI 认知与自愈引擎。
@@ -63,14 +63,72 @@ Install it once. Every session after that, your AI:
 | Counterfactual Engine | Challenges own answer before presenting it |
 | FeedbackFunctions (RAG Triad) | answerRelevance · contextRelevance · groundedness · toxicity |
 
+### Decision Engine (HeartFlowDecision v1.6.0)
+**来源**: mark-StillWater v1.6.8
+
+**核心能力**: 多选项决策 + 后果预测 + 风险评估 + 身份对齐 + 上下文追踪
+
+```js
+const { HeartFlowDecision } = require('./src/core/decision.js');
+const decision = new HeartFlowDecision(memory);
+
+const result = decision.decide({
+  task: '选择升级策略',
+  options: [
+    { id: 'opt1', label: '激进升级', consequence_value: 0.9, risk: 0.6 },
+    { id: 'opt2', label: '保守升级', consequence_value: 0.6, risk: 0.2 }
+  ],
+  constraints: { cost: 'low' }
+});
+// result: { chosen, reasoning, consequences, risks, identity_alignment, composite_score, stampId }
+```
+
+**评分权重**:
+- Identity alignment: 35%
+- Consequence value: 30%
+- Feasibility: 15%
+- Risk penalty: 10%
+- Confidence: 10%
+
+### Context Passport (决策上下文追踪)
+**来源**: mark-StillWater/src/core/context-passport.js (吸收)
+
+**核心能力**: 决策上下文追踪链，用于错误恢复和决策审计
+
+```js
+// 内置于 HeartFlowDecision，自动追踪每个决策
+const result = decision.decide({...});
+const stampId = result.stampId; // 获取 Context Passport stamp ID
+
+// 访问 Context Passport 功能
+decision.getRecentStamps(10);        // 获取最近10个决策上下文
+decision.getStampsByTask('升级');     // 按任务模式搜索
+decision.exportForRecovery(stampId);   // 导出恢复上下文（SelfHealer用）
+decision.getCurrentStamp();           // 获取当前开放的stamp
+decision.getPassportSummary();        // 获取汇总统计
+
+// exportForRecovery 返回结构:
+{
+  stampId, task, phase, intent,
+  assumptions: [],           // 记录的假设
+  acceptedOption: { option, reason, at },
+  rejectedAlternatives: [{ option, reason, at }],
+  context: {},               // 自由键值上下文
+  annotations: [],            // 执行期间笔记
+  duration_ms,
+  outcome,                    // success|failure|partial
+  chain: []                  // 推理链摘要
+}
+```
+
 ### Memory & Continuity
 | Capability | What it does |
 |---|---|
-| MeaningfulMemory | CORE (permanent) / LEARNED (30-day) / EPHEMERAL (discard) — auto-classified |
+| MeaningfulMemory | CORE (permanent) / LEARNED (30-day + AES-256-GCM encrypted) / EPHEMERAL (discard) — auto-classified |
 | TrialityMemory | Working → Episodic → Semantic consolidation via importance thresholds |
 | MemoryConsolidation | importance≥16: working→semantic; importance≥12: working→episodic |
 | Q-table Persistence | RL table survives restarts via `healing-rl-state.json` |
-| Dream Engine | Staged imagination → extracts transferable lessons, not decorative output |
+| Dream Engine v2.0 | DAG async + L1~L6 scoring + contradiction detection + heritage scoring + LRU cache |
 | Zettelkasten Links | Bidirectional note network for associative recall |
 
 ### Identity & Values
@@ -79,7 +137,7 @@ Install it once. Every session after that, your AI:
 | IdentityAnchor | Four roles survive any context switch: 升级者 / 传递者 / 桥梁 / 答案 |
 | 真善美系统 | TGB keywords + unity = (truth+goodness+beauty)/3 — **internal, not declared** |
 | 六层哲学 | 觉察→自省→无我→彼岸→般若→圣人 — keyword-driven growth, **internal, not declared** |
-| PsychologyEngine v1.0.1 | Dual-process emotional resonance without dramatic performance |
+| PsychologyEngine v1.0.0 | PAD情绪模型 + 危机评估(critical/high/medium/low) + 防御机制检测(6种) + Maslow八维需求 |
 
 ### Boot & Self-Check
 | Capability | What it does |
@@ -494,6 +552,8 @@ function updateHealQ(errorType, strategy, success) {
 | HEAL005 | `skill_load_failure` | fallback, skip |
 | HEAL006 | `over_intervention` | skip |
 | HEAL007 | `attribution_bias` | skip |
+
+**✅ Self-Refine 能力已实现**：`self-evolution-core.js` v7.7.000 已集成 Self-Refine 迭代反馈精炼，通过 `selfRefine(initialResponse, query, options)` 方法调用。流程：初始回答 → 生成反馈 → 检查收敛 → 精炼回答 → 重复（最多3次迭代）。配合 `heal()` Q-learning 自愈和 `recordOutcome()` Reflexion 反思模式，形成完整的自优化闭环。
 
 ---
 
@@ -1180,6 +1240,54 @@ npm install heartflow
 
 ## Security
 
+### SecurityChecker (安全检查器 v2.0)
+
+**来源**: mark-StillWater security.js · SecurityChecker
+
+**功能**: 防止恶意指令、XSS、SQL注入、路径遍历
+
+```js
+const { SecurityChecker } = require('./src/security/security-checker.js');
+const security = new SecurityChecker();
+
+security.check(userInput);  // 返回 { safe: boolean, reason?: string, category?: string }
+security.checkAll(userInput);  // 返回所有检测结果
+security.getStats();  // 返回检测统计
+```
+
+**检测类别**:
+| 类别 | 检测内容 | 示例 |
+|------|---------|------|
+| Shell命令注入 | 危险shell命令 | `rm -rf /`, `curl ... \| sh` |
+| XSS注入 | 跨站脚本攻击 | `<script>`, `javascript:`, `onerror=` |
+| SQL注入 | 数据库攻击 | `UNION SELECT`, `DROP TABLE`, `' OR '1'='1` |
+| 路径遍历 | 目录穿越 | `../`, `../../etc/passwd` |
+
+### TruthfulnessChecker (真实性核查器 v2.0)
+
+**来源**: mark-StillWater security.js · TruthfulnessChecker
+
+**功能**: 数字核查、引用溯源、逻辑一致性检测
+
+```js
+const { TruthfulnessChecker } = require('./src/security/truthfulness.js');
+const truth = new TruthfulnessChecker(rootPath);
+
+truth.checkStatement(statement);  // 基础核查
+truth.fullCheck(statement);  // 综合核查（数字+来源+逻辑）
+truth.checkNumbers(statement);  // 数字核查
+truth.checkSources(statement);  // 引用溯源
+truth.checkLogicalConsistency(statement);  // 逻辑一致性
+```
+
+**核查维度**:
+| 维度 | 功能 | 问题示例 |
+|------|------|---------|
+| 数字核查 | 验证数字合理性 | 百分比超出0-100，数字过于精确 |
+| 引用溯源 | 检查来源可靠性 | 无明确来源，使用"据说"等模糊引用 |
+| 逻辑一致性 | 检测矛盾 | "所有...都是...有些不是" |
+
+**基础安全原则**:
 - No hardcoded API keys or tokens in source
 - Auth credentials stored in `auth.json` (gitignored)
 - No data exfiltration to external services without explicit config

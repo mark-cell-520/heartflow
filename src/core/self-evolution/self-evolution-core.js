@@ -1,15 +1,22 @@
 /**
- * SelfEvolutionCore v7.6.000 - 自我进化核心引擎
- * 目标驱动 + 学习迭代 + 代码改进 + 反思成长
+ * SelfEvolutionCore v7.7.000 - 自我进化核心引擎
+ * 目标驱动 + 学习迭代 + 代码改进 + 反思成长 + Self-Refine + Q-Learning自愈
+ * 
+ * 吸收自 mark-StillWater/src/core/evolution.js:
+ * - Self-Refine 迭代反馈精炼 (Madaan et al.)
+ * - Q-learning 自愈策略选择 (heal方法)
+ * - Bootstrap Lesson Bank (12条真实教训)
+ * - Reflexion 自我反思模式
  */
 
 const fs = require('fs');
 const path = require('path');
+const { HealingMemoryRL } = require('../self-healing-rl.js');
 
 class SelfEvolutionCore {
   constructor(projectRoot) {
     this.projectRoot = projectRoot;
-    this.version = '7.6.000';
+    this.version = '7.7.000';
     
     this.state = {
       goals: [],
@@ -25,9 +32,31 @@ class SelfEvolutionCore {
         compassion: 0
       }
     };
+
+    // Q-learning 自愈模块
+    this.rl = new HealingMemoryRL(100);
+    
+    // 错误模式库 (来自 mark-StillWater)
+    this._PATTERNS = {
+      timeout: ['timeout', 'timed out', 'ETIMEDOUT', 'TIMEOUT'],
+      network: ['network', 'ENOTFOUND', 'ECONNREFUSED', 'connection'],
+      memory: ['memory', 'heap', 'out of memory', 'OOM'],
+      permission: ['permission', 'EPERM', 'EACCES', 'denied'],
+      syntax: ['syntax', 'parse', 'invalid', 'malformed'],
+      reference: ['not found', 'undefined', 'null', 'cannot read'],
+      type: ['type', 'instanceof', 'expected'],
+    };
+
+    // 修复策略池
+    this._STRATEGIES = ['retry', 'fallback', 'skip', 'abort'];
+    this._BACKOFF = { retry: 1000, fallback: 5000, skip: 0, abort: 0 };
+    this._EPSILON = 0.1;  // 10% 探索率
+    
+    // 待验证的修复策略上下文
+    this._pendingHeal = new Map();
     
     this.loadState();
-    console.log(`[SelfEvolution] v${this.version} 初始化完成`);
+    console.log(`[SelfEvolution] v${this.version} 初始化完成 (Self-Refine + Q-Learning)`);
   }
 
   loadState() {
@@ -309,6 +338,374 @@ class SelfEvolutionCore {
       growthMetrics: this.state.growthMetrics,
       totalCycles: this.state.learningHistory.length,
       recentCycles: this.state.learningHistory.slice(-5)
+    };
+  }
+
+  // =========================================================================
+  // Self-Refine 迭代反馈精炼 (Madaan et al.)
+  // =========================================================================
+
+  /**
+   * Self-Refine 迭代反馈精炼
+   * 初始回答 → 生成反馈 → 检查收敛 → 精炼回答 → 重复
+   * 
+   * @param {string} initialResponse - 初始回答
+   * @param {string} query - 用户查询
+   * @param {object} options - { maxIterations, threshold, generateFeedback, refineResponse }
+   * @returns {object} - { original, refined, iterations, converged }
+   */
+  selfRefine(initialResponse, query, options = {}) {
+    const { maxIterations = 3, threshold = 0.8, generateFeedback, refineResponse } = options;
+
+    let current = initialResponse;
+    const iterations = [];
+
+    for (let i = 0; i < maxIterations; i++) {
+      // Step 1: 生成具体反馈（必须指出至少2个改进点）
+      let feedback;
+      if (generateFeedback) {
+        feedback = generateFeedback(
+          `严格评估以下回答对查询"${query}"的质量。\n回答: ${current}\n` +
+          `请提供具体、可操作的反馈，必须指出至少2个需要改进的地方。`
+        );
+      } else {
+        // 默认反馈生成器（简化实现）
+        feedback = this._defaultGenerateFeedback(query, current);
+      }
+
+      // Step 2: 检查是否收敛（反馈为正面）
+      if (this._isFeedbackPositive(feedback)) {
+        iterations.push({ iteration: i + 1, feedback, refined: current, converged: true });
+        break;
+      }
+
+      // Step 3: 基于反馈精炼
+      let refined;
+      if (refineResponse) {
+        refined = refineResponse(
+          `根据以下反馈改进回答。查询: ${query}\n反馈: ${feedback}\n直接给出改进后的回答。`
+        );
+      } else {
+        refined = this._defaultRefineResponse(query, feedback, current);
+      }
+
+      iterations.push({ iteration: i + 1, feedback, refined });
+      current = refined;
+    }
+
+    return {
+      original: initialResponse,
+      refined: current,
+      iterations,
+      converged: iterations[iterations.length - 1]?.converged || false
+    };
+  }
+
+  _defaultGenerateFeedback(query, response) {
+    // 简化的默认反馈生成器（实际应由LLM调用）
+    const issues = [];
+    if (!response || response.length < 50) {
+      issues.push('回答过于简短，未充分展开');
+    }
+    if (!response.toLowerCase().includes(query.toLowerCase().substring(0, 10))) {
+      issues.push('回答与查询相关性不足');
+    }
+    if (issues.length === 0) {
+      return '回答质量良好，无需改进。';
+    }
+    return issues.join('; ');
+  }
+
+  _defaultRefineResponse(query, feedback, current) {
+    // 简化的默认精炼器（实际应由LLM调用）
+    return `[精炼后] ${current} (基于反馈: ${feedback})`;
+  }
+
+  _isFeedbackPositive(feedback) {
+    const positive = ['无需改进', '质量良好', '回答正确', 'converged', 'good', 'acceptable'];
+    const negative = ['需要改进', '不足', '错误', '问题', '改进', 'improve', 'fix', 'error'];
+    const lower = feedback.toLowerCase();
+    const hasPositive = positive.some(p => lower.includes(p));
+    const hasNegative = negative.some(p => lower.includes(p));
+    return hasPositive && !hasNegative;
+  }
+
+  // =========================================================================
+  // Q-Learning 自愈 (heal方法 - 来自 mark-StillWater evolution.js)
+  // =========================================================================
+
+  /**
+   * 错误模式匹配
+   * @param {string} errorMsg - 错误信息
+   * @returns {string|null} - 匹配到的错误类型
+   */
+  _matchErrorPattern(errorMsg) {
+    const lower = errorMsg.toLowerCase();
+    for (const [type, patterns] of Object.entries(this._PATTERNS)) {
+      if (patterns.some(p => lower.includes(p.toLowerCase()))) {
+        return type;
+      }
+    }
+    return 'unknown';
+  }
+
+  /**
+   * 选择修复策略 (ε-greedy)
+   * @param {string} errorType - 错误类型
+   * @returns {string} - 选中的策略
+   */
+  _selectHealStrategy(errorType) {
+    // ε-greedy：10% 概率随机探索，90% 选择最优
+    if (Math.random() < this._EPSILON) {
+      return this._STRATEGIES[Math.floor(Math.random() * this._STRATEGIES.length)];
+    }
+
+    // 用RL选择
+    const best = this.rl.getBestStrategy(errorType);
+    if (best) return best;
+
+    // 默认策略
+    let bestStrategy = 'retry', bestQ = -Infinity;
+    for (const s of this._STRATEGIES) {
+      const q = this.rl.qTable.get(errorType)?.[s] ?? 0.5;
+      if (q > bestQ) { bestQ = q; bestStrategy = s; }
+    }
+    return bestStrategy;
+  }
+
+  /**
+   * Q值更新
+   * @param {string} errorType - 错误类型
+   * @param {string} strategy - 策略
+   * @param {boolean} success - 是否成功
+   */
+  _updateHealQ(errorType, strategy, success) {
+    this.rl.updateFromRepair(errorType, strategy, success);
+    this.rl.record(errorType, strategy, success);
+  }
+
+  /**
+   * 执行自愈 (heal方法)
+   * 错误分类 → Q-learning策略选择 → 执行修复 → Q值更新
+   * 
+   * @param {string|object} error - 错误信息或错误对象
+   * @returns {object} - { healed, strategy, errorType, backoffMs, hints }
+   */
+  heal(error) {
+    const errorMsg = typeof error === 'string' ? error : (error?.message || String(error));
+    const errorType = this._matchErrorPattern(errorMsg);
+    const strategy = this._selectHealStrategy(errorType);
+    const backoffMs = this._BACKOFF[strategy] || 0;
+
+    // 记录待验证的修复策略
+    this._pendingHeal.set(errorMsg, { errorType, strategy, ts: Date.now() });
+
+    // 生成修复提示
+    const hints = this._generateRepairHints(errorType, errorMsg);
+
+    const result = {
+      healed: strategy !== 'abort',
+      strategy,
+      errorType,
+      errorMsg,
+      backoffMs,
+      hints,
+      canRetry: strategy === 'retry' || strategy === 'fallback',
+      qStats: this.rl.getRankedStrategies(errorType).slice(0, 3),
+    };
+
+    return result;
+  }
+
+  /**
+   * 标记修复结果（用于Q值更新）
+   * @param {string|object} error - 错误信息
+   * @param {boolean} success - 修复是否成功
+   */
+  markHealResult(error, success) {
+    const errorMsg = typeof error === 'string' ? error : (error?.message || String(error));
+    const pending = this._pendingHeal.get(errorMsg);
+    if (pending) {
+      this._updateHealQ(pending.errorType, pending.strategy, success);
+      this._pendingHeal.delete(errorMsg);
+      return { updated: true, errorType: pending.errorType, strategy: pending.strategy, success };
+    }
+    return { updated: false };
+  }
+
+  _generateRepairHints(errorType, errorMsg) {
+    const hints = [];
+    switch (errorType) {
+      case 'timeout':
+        hints.push('增加超时时间或减少任务范围');
+        hints.push('使用指数退避重试');
+        break;
+      case 'network':
+        hints.push('检查网络连接状态');
+        hints.push('添加重试逻辑和超时处理');
+        break;
+      case 'memory':
+        hints.push('释放不必要的内存引用');
+        hints.push('考虑分批处理大数据');
+        break;
+      case 'permission':
+        hints.push('检查文件/资源访问权限');
+        hints.push('确认路径是否正确');
+        break;
+      case 'syntax':
+        hints.push('重新阅读目标文件，使用更小的补丁');
+        hints.push('检查语法错误');
+        break;
+      case 'reference':
+        hints.push('验证变量/函数是否已定义');
+        hints.push('检查import和require路径');
+        break;
+      case 'type':
+        hints.push('检查类型匹配和instanceof使用');
+        hints.push('确认API签名是否正确');
+        break;
+      default:
+        hints.push('缩小失败面并重试一次');
+    }
+    return [...new Set(hints)];
+  }
+
+  // =========================================================================
+  // Reflexion 自我反思模式 (recordOutcome + retrieveLessons)
+  // =========================================================================
+
+  /**
+   * 记录任务结果并生成自我反思
+   * 来自 mark-StillWater HeartFlowEvolution.recordOutcome()
+   * 
+   * @param {object} params - { task, outcome, evidence, expected }
+   * @returns {object} - { outcome, reflection, lessonStored, lessonKey }
+   */
+  recordOutcome({ task, outcome, evidence, expected }) {
+    const reflection = this._reflect(task, outcome, evidence, expected);
+
+    return {
+      outcome,
+      reflection,
+      lessonStored: outcome !== 'success',
+      lessonKey: outcome !== 'success' ? `lesson:${task}:${Date.now()}` : null,
+    };
+  }
+
+  /**
+   * 生成自我反思 (Verbal Reinforcement)
+   */
+  _reflect(task, outcome, evidence, expected) {
+    const reflections = [];
+
+    if (outcome === 'failure') {
+      reflections.push(`Task failed: ${task}`);
+      if (evidence) reflections.push(`Evidence: ${String(evidence).substring(0, 200)}`);
+      if (expected) reflections.push(`Expected: ${String(expected).substring(0, 200)}`);
+
+      const corrections = [];
+      const ev = String(evidence || '').toLowerCase();
+
+      if (ev.includes('not defined') || ev.includes('undefined')) {
+        corrections.push('Check if all variables are defined before use.');
+      }
+      if (ev.includes('error') || ev.includes('exception')) {
+        corrections.push('Handle the error case explicitly.');
+      }
+      if (ev.includes('timeout')) {
+        corrections.push('Consider increasing timeout or breaking into smaller steps.');
+      }
+      if (ev.includes('not a function') || ev.includes('is not a')) {
+        corrections.push('Verify the object/method exists before calling.');
+      }
+      if (ev.includes('permission') || ev.includes('access')) {
+        corrections.push('Check permissions and access rights.');
+      }
+      if (ev.includes('network') || ev.includes('connection')) {
+        corrections.push('Handle network failures with retry logic.');
+      }
+      if (corrections.length === 0) {
+        corrections.push('Re-examine the problem from first principles.');
+        corrections.push('Break down the task into smaller, verifiable steps.');
+      }
+
+      return {
+        lesson: reflections.concat(corrections).join(' | '),
+        corrections,
+        type: 'failure_reflection',
+      };
+    }
+
+    if (outcome === 'partial') {
+      return {
+        lesson: `Partial success on "${task}": ${evidence || 'incomplete'}. Need to investigate remaining gap.`,
+        corrections: ['Identify what worked and what didn\'t.'],
+        type: 'partial_reflection',
+      };
+    }
+
+    return {
+      lesson: `Success: ${task}`,
+      corrections: [],
+      type: 'success',
+    };
+  }
+
+  /**
+   * 检索相关教训 (来自 HeartFlowEvolution.retrieveLessons)
+   * 搜索 EPHEMERAL 和 LEARNED 层，返回相似度排序的教训
+   * 
+   * @param {string} task - 任务描述
+   * @param {object} options - { limit, minConfidence }
+   * @returns {array} - [{ lesson, source, confidence }]
+   */
+  retrieveLessons(task, options = {}) {
+    const { limit = 5, minConfidence = 0 } = options;
+    const taskLower = task.toLowerCase();
+    const taskWords = taskLower.split(/\s+/).filter(w => w.length > 2);
+    const scoredLessons = [];
+
+    // 从反思历史中检索
+    for (const entry of this.state.reflectionHistory) {
+      if (!entry.lesson) continue;
+      const lessonLower = String(entry.lesson).toLowerCase();
+      const overlap = taskWords.filter(w => lessonLower.includes(w)).length;
+      const similarity = taskWords.length > 0 ? overlap / taskWords.length : 0;
+
+      if (similarity >= 0.05) {
+        scoredLessons.push({
+          lesson: entry.lesson,
+          source: 'reflection_history',
+          similarity: Math.round(similarity * 100) / 100,
+          type: entry.type,
+          timestamp: entry.timestamp,
+        });
+      }
+    }
+
+    // 排序
+    scoredLessons.sort((a, b) => b.similarity - a.similarity);
+
+    return scoredLessons
+      .filter(l => l.similarity >= minConfidence)
+      .slice(0, limit)
+      .map(({ lesson, source, similarity }) => ({
+        lesson,
+        source,
+        confidence: Math.round(similarity * 100) / 100,
+      }));
+  }
+
+  /**
+   * 获取进化统计
+   */
+  stats() {
+    return {
+      total: this.state.learningHistory.length,
+      failures: this.state.learningHistory.filter(h => h.outcome === 'failure').length,
+      successes: this.state.learningHistory.filter(h => h.outcome === 'success').length,
+      rlStrategies: this.rl.qTable.size,
+      pendingHeals: this._pendingHeal.size,
     };
   }
 }

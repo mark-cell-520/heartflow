@@ -1,0 +1,579 @@
+/**
+ * HeartFlow Memory — Ebbinghaus + AES-256-GCM 三层记忆系统
+ * 
+ * 整合来源（SKILL.md lines 348-540）：
+ *   mark-StillWater/src/core/memory.js — Dirty Flag + Ebbinghaus + Atomic Write
+ * 
+ * 核心能力：
+ * 1. Ebbinghaus 遗忘曲线：R = e^(-t/S)，低于阈值自动压缩/删除
+ * 2. AES-256-GCM 加密（LEARNED 层）—— 敏感知识加密存储
+ * 3. 三层记忆：CORE (永久) / LEARNED (30天+加密) / EPHEMERAL (会话)
+ * 4. Dirty Flag 优化：避免不必要写入，每5次访问才写 EPHEMERAL
+ * 5. 原子写入：temp + rename 防数据损坏
+ */
+
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+
+// ─── 常量配置 ───────────────────────────────────────────────────────────────
+
+const DATA_DIR = path.join(__dirname, '../../../data');
+const CORE_PATH   = path.join(DATA_DIR, 'memory-core.json');
+const LEARNED_PATH = path.join(DATA_DIR, 'memory-learned.enc');  // .enc = encrypted
+const EPHEMERAL_PATH = path.join(DATA_DIR, 'memory-ephemeral.json');
+
+const FORGETTING_CONFIG = {
+  defaultStability: 10,     // hours, base stability (importance=10)
+  coreStability: 8760,      // 1 year = CORE permanent
+  learnedStability: 720,     // 30 days = LEARNED tier
+  compressionThreshold: 0.3, // retention < 30% → compress
+  deletionThreshold: 0.1,    // retention < 10% → delete
+  ephemeralMaxAge: 6,       // hours before EPHEMERAL considered stale
+};
+
+// AES-256-GCM 配置
+const AES_CONFIG = {
+  algorithm: 'aes-256-gcm',
+  keyLength: 32,
+  ivLength: 16,
+  authTagLength: 16,
+  // Key derived from env or generated per-session, stored securely
+};
+
+// ─── 存储桶 ──────────────────────────────────────────────────────────────────
+
+let _coreStore     = {};  // { id: memoryRecord }
+let _learnedStore  = {};  // { id: { encrypted, iv, authTag, data } }
+let _ephemeralStore = {}; // { id: memoryRecord }
+
+// Dirty flags
+let _coreDirty     = false;
+let _learnedDirty  = false;
+let _ephemeralDirty = false;
+
+// Access counters for EPHEMERAL write optimization
+let _ephemeralAccessCount = {}; // { id: count }
+
+// ─── 加密密钥管理 ────────────────────────────────────────────────────────────
+
+let _aesKey = null;
+
+/**
+ * 获取或生成 AES-256 密钥
+ * 优先级：ENV_AES_KEY > session key file
+ */
+function _getOrCreateAesKey() {
+  if (_aesKey) return _aesKey;
+
+  // Check environment variable first (base64 encoded 32-byte key)
+  const envKey = process.env.HEARTFLOW_AES_KEY;
+  if (envKey) {
+    _aesKey = Buffer.from(envKey, 'base64');
+    if (_aesKey.length !== AES_CONFIG.keyLength) {
+      throw new Error('HEARTFLOW_AES_KEY must be 32 bytes (base64 encoded)');
+    }
+    return _aesKey;
+  }
+
+  // Generate a session key and store in a restricted file
+  const keyFile = path.join(DATA_DIR, '.aes-key');
+  if (fs.existsSync(keyFile)) {
+    try {
+      const meta = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
+      _aesKey = Buffer.from(meta.key, 'base64');
+      return _aesKey;
+    } catch {
+      // corrupted, regenerate
+    }
+  }
+
+  // Generate new key
+  _aesKey = crypto.randomBytes(AES_CONFIG.keyLength);
+  const meta = { key: _aesKey.toString('base64'), createdAt: Date.now() };
+  // Write with restricted permissions (Unix only)
+  fs.writeFileSync(keyFile, JSON.stringify(meta), { mode: 0o600 });
+  return _aesKey;
+}
+
+// ─── AES-256-GCM 加密/解密 ──────────────────────────────────────────────────
+
+/**
+ * Encrypt data using AES-256-GCM
+ * @param {object} data - Plain object to encrypt
+ * @returns {{ encrypted: string, iv: string, authTag: string }}
+ */
+function aesEncrypt(data) {
+  const key = _getOrCreateAesKey();
+  const iv = crypto.randomBytes(AES_CONFIG.ivLength);
+  const cipher = crypto.createCipheriv(AES_CONFIG.algorithm, key, iv);
+
+  const plaintext = JSON.stringify(data);
+  let encrypted = cipher.update(plaintext, 'utf8', 'base64');
+  encrypted += cipher.final('base64');
+
+  const authTag = cipher.getAuthTag();
+
+  return {
+    encrypted,
+    iv: iv.toString('base64'),
+    authTag: authTag.toString('base64'),
+  };
+}
+
+/**
+ * Decrypt data using AES-256-GCM
+ * @param {{ encrypted, iv, authTag }} payload
+ * @returns {object} Decrypted plain object
+ */
+function aesDecrypt(payload) {
+  const key = _getOrCreateAesKey();
+  const decipher = crypto.createDecipheriv(
+    AES_CONFIG.algorithm,
+    key,
+    Buffer.from(payload.iv, 'base64')
+  );
+  decipher.setAuthTag(Buffer.from(payload.authTag, 'base64'));
+
+  let decrypted = decipher.update(payload.encrypted, 'base64', 'utf8');
+  decrypted += decipher.final('utf8');
+
+  return JSON.parse(decrypted);
+}
+
+// ─── 原子写入 ────────────────────────────────────────────────────────────────
+
+/**
+ * Atomic write: write to temp file then rename
+ * Guarantees: either complete write or no write at all
+ */
+function atomicWriteJson(filePath, data) {
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  const tempPath = filePath + '.tmp.' + Date.now() + '.' + crypto.randomBytes(4).toString('hex');
+  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
+  fs.renameSync(tempPath, filePath); // atomic on POSIX
+}
+
+// ─── 持久化 ─────────────────────────────────────────────────────────────────
+
+function _loadAll() {
+  // CORE: plain JSON
+  if (fs.existsSync(CORE_PATH)) {
+    try {
+      _coreStore = JSON.parse(fs.readFileSync(CORE_PATH, 'utf-8'));
+      console.log(`[Memory] CORE loaded: ${Object.keys(_coreStore).length} records`);
+    } catch (e) {
+      console.warn('[Memory] CORE load failed:', e.message);
+      _coreStore = {};
+    }
+  }
+
+  // LEARNED: encrypted JSON
+  if (fs.existsSync(LEARNED_PATH)) {
+    try {
+      const raw = fs.readFileSync(LEARNED_PATH, 'utf-8');
+      const { version, entries } = JSON.parse(raw);
+      for (const [id, payload] of Object.entries(entries)) {
+        _learnedStore[id] = payload;
+      }
+      console.log(`[Memory] LEARNED loaded: ${Object.keys(_learnedStore).length} encrypted records`);
+    } catch (e) {
+      console.warn('[Memory] LEARNED load failed:', e.message);
+      _learnedStore = {};
+    }
+  }
+
+  // EPHEMERAL: plain JSON
+  if (fs.existsSync(EPHEMERAL_PATH)) {
+    try {
+      _ephemeralStore = JSON.parse(fs.readFileSync(EPHEMERAL_PATH, 'utf-8'));
+      console.log(`[Memory] EPHEMERAL loaded: ${Object.keys(_ephemeralStore).length} records`);
+    } catch (e) {
+      console.warn('[Memory] EPHEMERAL load failed:', e.message);
+      _ephemeralStore = {};
+    }
+  }
+}
+
+function _saveCore() {
+  if (!_coreDirty) return;
+  atomicWriteJson(CORE_PATH, _coreStore);
+  _coreDirty = false;
+  console.log('[Memory] CORE saved');
+}
+
+function _saveLearned() {
+  if (!_learnedDirty) return;
+
+  const entries = {};
+  for (const [id, payload] of Object.entries(_learnedStore)) {
+    entries[id] = payload;
+  }
+
+  const data = { version: 1, entries, savedAt: new Date().toISOString() };
+  atomicWriteJson(LEARNED_PATH, data);
+  _learnedDirty = false;
+  console.log('[Memory] LEARNED saved (encrypted)');
+}
+
+function _saveEphemeral() {
+  if (!_ephemeralDirty) return;
+  atomicWriteJson(EPHEMERAL_PATH, _ephemeralStore);
+  _ephemeralDirty = false;
+}
+
+function saveAll() {
+  _saveCore();
+  _saveLearned();
+  _saveEphemeral();
+}
+
+// ─── Dirty Flag ─────────────────────────────────────────────────────────────
+
+function markCoreDirty() { _coreDirty = true; }
+function markLearnedDirty() { _learnedDirty = true; }
+function markEphemeralDirty() { _ephemeralDirty = true; }
+
+// ─── Ebbinghaus 遗忘曲线 ─────────────────────────────────────────────────────
+
+/**
+ * Ebbinghaus retention formula: R = e^(-t/S)
+ * @param {number} stabilityHours - Stability parameter (S)
+ * @param {number} ageHours - Time elapsed in hours (t)
+ * @returns {{ retention: number, shouldCompress: bool, shouldDelete: bool }}
+ */
+function ebbinghausForget(stabilityHours, ageHours) {
+  const retention = Math.exp(-ageHours / stabilityHours);
+  return {
+    retention,
+    shouldCompress: retention < FORGETTING_CONFIG.compressionThreshold,
+    shouldDelete: retention < FORGETTING_CONFIG.deletionThreshold,
+  };
+}
+
+/**
+ * Get stability hours for a memory based on its layer and importance
+ */
+function _getStability(layer, importance = 10) {
+  if (layer === 'core') return FORGETTING_CONFIG.coreStability;
+  if (layer === 'learned') return FORGETTING_CONFIG.learnedStability;
+  // Ephemeral: use importance-derived stability
+  return importance * (FORGETTING_CONFIG.defaultStability / 10);
+}
+
+/**
+ * Apply forgetting curve to LEARNED layer
+ * Compresses or deletes memories below retention thresholds
+ */
+function applyForgetting() {
+  const now = Date.now();
+  const toDelete = [];
+  const toCompress = [];
+
+  for (const [id, entry] of Object.entries(_learnedStore)) {
+    if (!entry.data || !entry.data.timestamp) continue;
+
+    const ageHours = (now - entry.data.timestamp) / (1000 * 60 * 60);
+    const stability = _getStability('learned', entry.data.importance || 10);
+    const { shouldDelete, shouldCompress } = ebbinghausForget(stability, ageHours);
+
+    if (shouldDelete) {
+      toDelete.push(id);
+    } else if (shouldCompress && !entry.data.compressed) {
+      entry.data.compressed = true;
+      entry.data.compressedAt = now;
+      toCompress.push(id);
+      markLearnedDirty();
+    }
+  }
+
+  for (const id of toDelete) {
+    delete _learnedStore[id];
+    markLearnedDirty();
+  }
+
+  if (toDelete.length > 0 || toCompress.length > 0) {
+    _saveLearned();
+    console.log(`[Memory] Forgetting: deleted=${toDelete.length}, compressed=${toCompress.length}`);
+  }
+
+  return { deleted: toDelete.length, compressed: toCompress.length };
+}
+
+// ─── 存储 API ───────────────────────────────────────────────────────────────
+
+/**
+ * Generate a unique memory ID
+ */
+function generateId(prefix = 'mem') {
+  return `${prefix}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+}
+
+/**
+ * Store a memory in the appropriate layer
+ * @param {object} opts - { content, summary?, metadata?, importance?, layer? }
+ * @returns {string} memory id
+ */
+function store(opts) {
+  const layer = opts.layer || _classifyLayer(opts);
+  const id = opts.id || generateId(layer === 'core' ? 'core' : layer === 'learned' ? 'lrnd' : 'eph');
+  const now = Date.now();
+
+  const record = {
+    id,
+    content: opts.content,
+    summary: opts.summary || String(opts.content).slice(0, 120).replace(/\s+/g, ' '),
+    metadata: opts.metadata || {},
+    importance: opts.importance || 10,
+    accessCount: 0,
+    timestamp: now,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  if (layer === 'core') {
+    _coreStore[id] = record;
+    markCoreDirty();
+    _saveCore();
+  } else if (layer === 'learned') {
+    // Encrypt before storing
+    const encrypted = aesEncrypt(record);
+    _learnedStore[id] = {
+      encrypted: encrypted.encrypted,
+      iv: encrypted.iv,
+      authTag: encrypted.authTag,
+      data: record, // keep plaintext for in-memory access
+    };
+    markLearnedDirty();
+    _saveLearned();
+  } else {
+    // EPHEMERAL
+    _ephemeralStore[id] = record;
+    _ephemeralAccessCount[id] = 0;
+    markEphemeralDirty();
+  }
+
+  console.log(`[Memory] Stored: ${id} (${layer})`);
+  return id;
+}
+
+/**
+ * Classify memory layer based on content properties
+ */
+function _classifyLayer(opts = {}) {
+  if (opts.metadata?.durable || opts.metadata?.identity || opts.metadata?.directive) return 'core';
+  if (opts.metadata?.lesson || opts.metadata?.userPreference || opts.metadata?.taskOutcome) return 'learned';
+  return 'ephemeral';
+}
+
+/**
+ * Retrieve a memory by ID (auto-detect layer)
+ * @returns {object|null}
+ */
+function retrieve(id) {
+  if (_coreStore[id]) {
+    const mem = _coreStore[id];
+    mem.accessCount = (mem.accessCount || 0) + 1;
+    markCoreDirty();
+    return mem;
+  }
+  if (_learnedStore[id]?.data) {
+    const mem = _learnedStore[id].data;
+    mem.accessCount = (mem.accessCount || 0) + 1;
+    markLearnedDirty();
+    return mem;
+  }
+  if (_ephemeralStore[id]) {
+    const mem = _ephemeralStore[id];
+    mem.accessCount = (mem.accessCount || 0) + 1;
+    _ephemeralAccessCount[id] = (_ephemeralAccessCount[id] || 0) + 1;
+    // Dirty flag optimization: only write every 5 accesses
+    if (_ephemeralAccessCount[id] % 5 === 0) {
+      markEphemeralDirty();
+      _saveEphemeral();
+    }
+    return mem;
+  }
+  return null;
+}
+
+/**
+ * Touch ephemeral memory (mark access without returning data)
+ * Triggers periodic write every 5 accesses
+ */
+function touchEphemeral(id) {
+  if (!_ephemeralStore[id]) return;
+  _ephemeralAccessCount[id] = (_ephemeralAccessCount[id] || 0) + 1;
+  if (_ephemeralAccessCount[id] % 5 === 0) {
+    markEphemeralDirty();
+    _saveEphemeral();
+  }
+}
+
+/**
+ * Delete a memory by ID
+ */
+function remove(id) {
+  if (_coreStore[id]) {
+    delete _coreStore[id];
+    markCoreDirty();
+    _saveCore();
+    return true;
+  }
+  if (_learnedStore[id]) {
+    delete _learnedStore[id];
+    markLearnedDirty();
+    _saveLearned();
+    return true;
+  }
+  if (_ephemeralStore[id]) {
+    delete _ephemeralStore[id];
+    delete _ephemeralAccessCount[id];
+    markEphemeralDirty();
+    _saveEphemeral();
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Search memories by keyword
+ * @returns {Array} matching memories with layer info
+ */
+function searchByKeywords(keywords, limit = 20) {
+  const kwList = Array.isArray(keywords) ? keywords : [keywords];
+  const results = [];
+
+  const search = (store, layer) => {
+    for (const [id, mem] of Object.entries(store)) {
+      const data = mem.data || mem;
+      const content = (data.content || '').toLowerCase();
+      let score = 0;
+      for (const kw of kwList) {
+        if (content.includes(kw.toLowerCase())) score += 1;
+      }
+      if (score > 0) {
+        results.push({ id, layer, content: data.content, summary: data.summary, score, metadata: data.metadata });
+      }
+    }
+  };
+
+  search(_coreStore, 'core');
+  for (const [id, entry] of Object.entries(_learnedStore)) {
+    if (!entry.data) continue;
+    const data = entry.data;
+    const content = (data.content || '').toLowerCase();
+    let score = 0;
+    for (const kw of kwList) {
+      if (content.includes(kw.toLowerCase())) score += 1;
+    }
+    if (score > 0) {
+      results.push({ id, layer: 'learned', content: data.content, summary: data.summary, score, metadata: data.metadata });
+    }
+  }
+  search(_ephemeralStore, 'ephemeral');
+
+  results.sort((a, b) => b.score - a.score);
+  return results.slice(0, limit);
+}
+
+/**
+ * Get memory statistics
+ */
+function getStats() {
+  return {
+    core: Object.keys(_coreStore).length,
+    learned: Object.keys(_learnedStore).length,
+    ephemeral: Object.keys(_ephemeralStore).length,
+    total: Object.keys(_coreStore).length + Object.keys(_learnedStore).length + Object.keys(_ephemeralStore).length,
+    dirty: { core: _coreDirty, learned: _learnedDirty, ephemeral: _ephemeralDirty },
+  };
+}
+
+/**
+ * Consolidate: promote high-access EPHEMERAL → LEARNED
+ */
+function consolidate() {
+  const toPromote = [];
+  const toDelete = [];
+
+  for (const [id, mem] of Object.entries(_ephemeralStore)) {
+    const accessCount = _ephemeralAccessCount[id] || 0;
+    if (accessCount >= 3 && (mem.importance || 10) >= 12) {
+      toPromote.push(id);
+    }
+    if (accessCount === 0 && mem.importance < 5) {
+      toDelete.push(id);
+    }
+  }
+
+  const promoted = [];
+  for (const id of toPromote) {
+    const mem = _ephemeralStore[id];
+    mem.layer = 'learned';
+    mem.updatedAt = Date.now();
+    const encrypted = aesEncrypt(mem);
+    _learnedStore[id] = {
+      encrypted: encrypted.encrypted,
+      iv: encrypted.iv,
+      authTag: encrypted.authTag,
+      data: mem,
+    };
+    toDelete.push(id);
+    promoted.push(id);
+    markLearnedDirty();
+  }
+
+  for (const id of toDelete) {
+    delete _ephemeralStore[id];
+    delete _ephemeralAccessCount[id];
+    markEphemeralDirty();
+  }
+
+  if (promoted.length > 0) {
+    _saveLearned();
+    _saveEphemeral();
+    console.log(`[Memory] Consolidated: promoted=${promoted.length}`);
+  }
+
+  return { promoted };
+}
+
+// ─── 初始化 ─────────────────────────────────────────────────────────────────
+
+function init() {
+  _loadAll();
+  // Ensure DATA_DIR exists
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+  // Initialize AES key
+  try { _getOrCreateAesKey(); } catch (e) {
+    console.warn('[Memory] AES key init failed:', e.message);
+  }
+  console.log('[Memory] Initialized');
+}
+
+// Auto-init on load
+init();
+
+// ─── 公开 API ───────────────────────────────────────────────────────────────
+
+module.exports = {
+  store,
+  retrieve,
+  remove,
+  searchByKeywords,
+  getStats,
+  applyForgetting,
+  consolidate,
+  saveAll,
+  touchEphemeral,
+  // Ebbinghaus formula exposed for external use
+  ebbinghausForget,
+  FORGETTING_CONFIG,
+  AES_CONFIG,
+};

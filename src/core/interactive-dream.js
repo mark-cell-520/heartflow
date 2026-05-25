@@ -1,15 +1,17 @@
 
   /**
-   * HeartFlow Free Dream
+   * HeartFlow Free Dream v2.0
    *
    * Style integrated from mark-heartflow skill:
    * - memory palace first
    * - staged dream flow: Light Sleep -> REM -> Deep Sleep -> Lucid Dream
+   * - DAG-based async execution with L1~L6 consciousness scoring
+   * - Contradiction detection
    * - no questions, no user answers
    * - dream can be strange / useless / poetic
    */
 
-  const { generateDream } = require('./dream-loop.js');
+  const { generateDream, getDreamEngine, LEVELS } = require('./dream-loop.js');
   const { WakeUpVerifier } = require('./wake-up-verifier.js');
   const { generateNarrative, generateWideNarrative } = require('./narrative-generator.js');
 
@@ -17,6 +19,7 @@
     constructor(options = {}) {
       this.verifier = new WakeUpVerifier(options);
       this.maxFragments = options.maxFragments || 8;
+      this.useDag = options.useDag !== false; // Default to DAG mode
     }
 
     summarizeMemory(memoryItems = []) {
@@ -72,9 +75,15 @@
 
     createDream(memoryItems = []) {
       const memorySummary = this.summarizeMemory(memoryItems);
-      const dream = generateDream(memoryItems, { limit: this.maxFragments });
+      
+      // Use DAG-based dream when enabled
+      const dream = this.useDag
+        ? generateDream(memoryItems, { limit: this.maxFragments, useDag: true })
+        : generateDream(memoryItems, { limit: this.maxFragments });
+      
       const staged = this.buildStagedDream(memorySummary, dream);
       const record = this.buildInsightRecord(memorySummary, staged);
+      
       return {
         ...dream,
         memory_summary: memorySummary,
@@ -82,12 +91,16 @@
         insight_record: record,
         questions: [],
         user_answers: [],
-        mode: 'free-dream'
+        mode: this.useDag ? 'free-dream-dag' : 'free-dream',
+        levels: dream.level_breakdown || null,
+        contradictions: dream.contradiction_score ? { score: dream.contradiction_score } : null,
       };
     }
 
     buildStagedDream(memorySummary, dream) {
       const rooms = memorySummary.rooms;
+      const levels = dream.levels;
+      
       return {
         light_sleep: {
           title: '🌿 浅睡期 · Light Sleep — 信息整理',
@@ -102,7 +115,8 @@
         deep_sleep: {
           title: '🌑 深睡期 · Deep Sleep',
           text: this.renderDeepSleep(memorySummary, dream),
-          fragments: rooms.地下室.slice(0, 2)
+          fragments: rooms.地下室.slice(0, 2),
+          level_breakdown: levels || null
         },
         lucid: {
           title: '✨ 清醒梦 · Lucid Dream',
@@ -189,31 +203,64 @@
     }
 
     buildInsightRecord(memorySummary, staged) {
-      return {
-        entries: [
-          {
-            type: 'pattern',
+      const levels = staged.deep_sleep?.level_breakdown;
+      
+      const entries = [
+        {
+          type: 'pattern',
+          confidence: 0.88,
+          content: '记忆宫殿不是仓库，是主动推理的舞台。'
+        },
+        {
+          type: 'self_awareness',
+          confidence: 0.82,
+          content: '梦境不需要每段都有效；无用片段可作为后续联想的入口。'
+        },
+        {
+          type: 'creative',
+          confidence: 0.76,
+          content: '记忆宫殿 + 做梦 = 主动推理（Free Energy Principle）的一种叙事实现。'
+        }
+      ];
+      
+      // Add L1~L6 level insights if available
+      if (levels) {
+        const dominantLevel = levels.dominant;
+        const levelNames = levels.level_names || {};
+        
+        entries.push({
+          type: 'consciousness_level',
+          confidence: 0.85,
+          content: `当前主导意识层级：${levelNames[dominantLevel] || dominantLevel}。六层递进：觉察→自省→无我→彼岸→般若→圣人。`
+        });
+        
+        if (levels.L6 > 0) {
+          entries.push({
+            type: 'sage_insight',
+            confidence: 0.90,
+            content: '圣人层级激活：慈悲行动，利益众生。'
+          });
+        }
+        if (levels.L5 > 0) {
+          entries.push({
+            type: 'prajna_insight',
             confidence: 0.88,
-            content: '记忆宫殿不是仓库，是主动推理的舞台。'
-          },
-          {
-            type: 'self_awareness',
-            confidence: 0.82,
-            content: '梦境不需要每段都有效；无用片段可作为后续联想的入口。'
-          },
-          {
-            type: 'creative',
-            confidence: 0.76,
-            content: '记忆宫殿 + 做梦 = 主动推理（Free Energy Principle）的一种叙事实现。'
-          }
-        ],
+            content: '般若层级激活：智慧圆满，照见实相。'
+          });
+        }
+      }
+      
+      return {
+        entries,
         saved_note: `梦境结束，保存记录：
 ${memorySummary.one_line || '空'}
 
 醒来后先不急着解释，让碎片先留在案头。
 从夸克层到银河系，碎片都已经经过。
 从欲望到地狱，从工作到花园，从哲学到社会现实，也都已经经过。
-梦应该收束成一条主线，最多三条支线，而不是散成碎片。`
+梦应该收束成一条主线，最多三条支线，而不是散成碎片。
+
+${levels ? `L1~L6层级分布：L1=${levels.L1?.toFixed(1) || 0}, L2=${levels.L2?.toFixed(1) || 0}, L3=${levels.L3?.toFixed(1) || 0}, L4=${levels.L4?.toFixed(1) || 0}, L5=${levels.L5?.toFixed(1) || 0}, L6=${levels.L6?.toFixed(1) || 0}` : ''}`
       };
     }
 
@@ -250,15 +297,18 @@ ${memorySummary.one_line || '空'}
   module.exports = { InteractiveDream };
 
   if (require.main === module) {
-    const d = new InteractiveDream();
+    const d = new InteractiveDream({ useDag: true });
     const dream = d.createDream([
-      { text: 'startup self-check before acting' },
-      { text: 'dream should reorganize memory fragments into candidate upgrades' },
-      { text: 'do not confuse historical version with current version' },
-      { text: 'some dreams are useless and that is fine' },
-      { text: 'memory can be a river, not a list' },
-      { text: 'we keep the bridge of trust' },
-      { text: 'papers about predictive processing and memory palace' }
+      { text: 'startup self-check before acting', layer: 'CORE' },
+      { text: 'dream should reorganize memory fragments into candidate upgrades', layer: 'LEARNED' },
+      { text: 'do not confuse historical version with current version', layer: 'LEARNED' },
+      { text: 'some dreams are useless and that is fine', layer: 'EPHEMERAL' },
+      { text: 'memory can be a river, not a list', layer: 'LEARNED' },
+      { text: 'prajna wisdom sees reality directly', layer: 'EPHEMERAL' },
+      { text: 'the sage acts only to benefit all beings', layer: 'EPHEMERAL' },
     ]);
-    console.log(JSON.stringify(d.respond(dream), null, 2));
+    console.log('=== InteractiveDream with DAG ===');
+    console.log('levels:', JSON.stringify(dream.levels, null, 2));
+    console.log('contradictions:', JSON.stringify(dream.contradictions, null, 2));
+    console.log('insight_record:', JSON.stringify(dream.insight_record.entries.slice(-3), null, 2));
   }

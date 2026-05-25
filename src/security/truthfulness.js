@@ -1,8 +1,13 @@
 /**
- * TruthfulnessChecker — Avoid lying, no hedging, evidence-based conclusions
- *
- * From mark-improving-agent: "结论必须有证据，没证据就承认不知道，绝不编数字"
- * Detects absolute words without evidence, records lies, tracks lying rate.
+ * TruthfulnessChecker — 真实性核查器 v2.0
+ * Avoid lying, no hedging, evidence-based conclusions
+ * 
+ * 核心功能：
+ * 1. 数字核查 - 验证引用的数字是否合理
+ * 2. 引用溯源 - 检查声称是否有来源
+ * 3. 逻辑一致性检测 - 检测陈述中的逻辑矛盾
+ * 
+ * From mark-StillWater security.js: TruthfulnessChecker — 数字核查/引用溯源/逻辑一致性检测
  */
 
 const fs = require('fs');
@@ -13,6 +18,20 @@ class TruthfulnessChecker {
     this.rootPath = rootPath;
     this.filePath = path.join(rootPath, 'truthfulness-stats.json');
     this._state = this._load();
+    
+    // 逻辑矛盾模式库
+    this.contradictionPatterns = [
+      // 自我矛盾
+      { pattern: /(.*)但是(.*)\1/gi, type: '自我矛盾' },
+      { pattern: /(.*)然而(.*)\1/gi, type: '自我矛盾' },
+      { pattern: /(.*)不过(.*)\1/gi, type: '自我矛盾' },
+      // 因果矛盾
+      { pattern: /因为.*所以.*但是/gi, type: '因果矛盾' },
+      { pattern: /因此.*然而/gi, type: '因果矛盾' },
+      // 绝对化矛盾
+      { pattern: /所有.*都.*有些.*不/gi, type: '全称与特称矛盾' },
+      { pattern: /永远.*有时/gi, type: '绝对与相对矛盾' },
+    ];
   }
 
   _load() {
@@ -21,7 +40,15 @@ class TruthfulnessChecker {
         return JSON.parse(fs.readFileSync(this.filePath, 'utf8'));
       }
     } catch { /* ignore */ }
-    return { totalStatements: 0, liesCaught: 0, statements: [] };
+    return { 
+      totalStatements: 0, 
+      liesCaught: 0, 
+      statements: [],
+      numberChecks: 0,
+      sourceChecks: 0,
+      contradictionChecks: 0,
+      contradictionsFound: 0
+    };
   }
 
   _persist() {
@@ -54,7 +81,7 @@ class TruthfulnessChecker {
     }
 
     // Check for fabricated numbers
-    const numMatch = statement.match(/\d+%|\d+次|\d+个|\d+人/);
+    const numMatch = statement.match(/\d+%|\\d+次|\d+个|\d+人/);
     if (numMatch && !hasEvidence) {
       isLying = true;
       reason = '陈述包含数字但无证据支持';
@@ -87,32 +114,245 @@ class TruthfulnessChecker {
     return { isLying, confidence, reason };
   }
 
-  /**
-   * Annotate confidence level to statement
-   */
-  annotateConfidence(statement, confidence) {
-    if (confidence < 0.5) {
-      return statement + ' [置信度: 低]';
-    } else if (confidence < 0.8) {
-      return statement + ' [置信度: 中]';
-    }
-    return statement;
-  }
+  // ─── 数字核查 ─────────────────────────────────────────────────────────
 
   /**
-   * Record a lie that was caught externally
+   * 数字核查 - 验证引用的数字是否合理
+   * @param {string} statement - 待核查语句
+   * @returns {object} - { isValid, issues[], details }
    */
-  recordLie(statement, context) {
-    this._state.liesCaught++;
-    this._state.totalStatements++;
-    this._state.statements.push({
-      text: statement.substring(0, 200),
-      isLying: true,
-      reason: context || '外部确认',
-      timestamp: Date.now(),
-    });
-    this._persist();
-    return { liesCaught: this._state.liesCaught };
+  checkNumbers(statement) {
+    this._state.numberChecks++;
+    const issues = [];
+    
+    // 提取所有数字
+    const numbers = statement.match(/\d+\.?\d*/g) || [];
+    
+    for (const num of numbers) {
+      const numValue = parseFloat(num);
+      
+      // 检查不合理的百分比
+      if (statement.includes('%') && (numValue < 0 || numValue > 100)) {
+        issues.push({
+          type: 'impossible_percentage',
+          value: num,
+          issue: `百分比值${num}%超出0-100范围`
+        });
+      }
+      
+      // 检查不合理的数量级
+      if (numValue > 1e9) {
+        issues.push({
+          type: 'suspiciously_large',
+          value: num,
+          issue: `数字${num}非常大，需要确认来源`
+        });
+      }
+      
+      // 检查过于精确的数字 (如 67.823456%)
+      const decimalMatch = statement.match(new RegExp(`${num}\\.\\d+`));
+      if (decimalMatch && statement.includes('%')) {
+        issues.push({
+          type: 'overly_precise',
+          value: decimalMatch[0],
+          issue: '百分比精度过高，可能为估算'
+        });
+      }
+    }
+    
+    // 检查"所有"、"全部"等极端词与具体数字的矛盾
+    if ((statement.includes('所有') || statement.includes('全部')) && numbers.length > 0) {
+      issues.push({
+        type: 'absolute_with_specific',
+        value: statement.substring(0, 50),
+        issue: '使用绝对词同时给出具体数字，可能不准确'
+      });
+    }
+    
+    return {
+      isValid: issues.length === 0,
+      issues,
+      numbersFound: numbers.length
+    };
+  }
+
+  // ─── 引用溯源 ─────────────────────────────────────────────────────────
+
+  /**
+   * 引用溯源 - 检查声称是否有来源
+   * @param {string} statement - 待核查语句
+   * @returns {object} - { hasSource, sourceType, confidence }
+   */
+  checkSources(statement) {
+    this._state.sourceChecks++;
+    
+    const sourceIndicators = {
+      explicit: [
+        '根据', '依据', '来源于', '来自', '数据显示', '研究表明',
+        '据报道', '据悉', '官方数据显示', '统计显示'
+      ],
+      implicit: [
+        '据说', '听说', '有人认为', '有人说', '传言', '传闻'
+      ],
+      academic: [
+        '论文', '期刊', '学术', '研究', '实验', '调查', '数据显示',
+        'Nature', 'Science', 'arXiv'
+      ],
+      official: [
+        '官方', '政府', '部门', '机构', '组织', '委员会', '统计局'
+      ]
+    };
+    
+    let sourceType = 'unspecified';
+    let hasSource = false;
+    let confidence = 0.3;
+    
+    // 检查显式来源
+    for (const indicator of sourceIndicators.explicit) {
+      if (statement.includes(indicator)) {
+        hasSource = true;
+        sourceType = 'explicit';
+        confidence = 0.9;
+        break;
+      }
+    }
+    
+    // 检查隐式来源（降低置信度）
+    if (!hasSource) {
+      for (const indicator of sourceIndicators.implicit) {
+        if (statement.includes(indicator)) {
+          hasSource = true;
+          sourceType = 'implicit';
+          confidence = 0.5;
+          break;
+        }
+      }
+    }
+    
+    // 检查学术来源
+    for (const indicator of sourceIndicators.academic) {
+      if (statement.includes(indicator)) {
+        sourceType = 'academic';
+        confidence = Math.max(confidence, 0.85);
+        break;
+      }
+    }
+    
+    // 检查官方来源
+    for (const indicator of sourceIndicators.official) {
+      if (statement.includes(indicator)) {
+        sourceType = 'official';
+        confidence = Math.max(confidence, 0.8);
+        break;
+      }
+    }
+    
+    return { hasSource, sourceType, confidence };
+  }
+
+  // ─── 逻辑一致性检测 ──────────────────────────────────────────────────
+
+  /**
+   * 逻辑一致性检测 - 检测陈述中的逻辑矛盾
+   * @param {string} statement - 待核查语句
+   * @returns {object} - { isConsistent, contradictions[] }
+   */
+  checkLogicalConsistency(statement) {
+    this._state.contradictionChecks++;
+    const contradictions = [];
+    
+    // 自我矛盾检测
+    const selfContraPatterns = [
+      { pattern: /但不/gi, type: '转折矛盾' },
+      { pattern: /然而.*但/gi, type: '转折矛盾' },
+      { pattern: /虽然.*但是.*虽然/gi, type: '多重矛盾' },
+    ];
+    
+    for (const { pattern, type } of selfContraPatterns) {
+      if (pattern.test(statement)) {
+        contradictions.push({
+          type,
+          severity: 'medium',
+          detail: '检测到转折词矛盾'
+        });
+      }
+    }
+    
+    // 全称与特称矛盾
+    if (/所有.*都是.*有些.*不是/.test(statement)) {
+      contradictions.push({
+        type: '全称特称矛盾',
+        severity: 'high',
+        detail: '使用"所有"但又提及"有些不是"'
+      });
+    }
+    
+    // 绝对与相对矛盾
+    if (/永远.*有时/.test(statement) || /始终.*偶尔/.test(statement)) {
+      contradictions.push({
+        type: '绝对相对矛盾',
+        severity: 'medium',
+        detail: '使用绝对词同时暗示相对性'
+      });
+    }
+    
+    // 因果关系矛盾
+    if (/(因为|因此|所以).*(但是|然而)/gi.test(statement)) {
+      contradictions.push({
+        type: '因果矛盾',
+        severity: 'medium',
+        detail: '因果推理中包含转折'
+      });
+    }
+    
+    if (contradictions.length > 0) {
+      this._state.contradictionsFound++;
+    }
+    
+    return {
+      isConsistent: contradictions.length === 0,
+      contradictions
+    };
+  }
+
+  // ─── 综合核查 ─────────────────────────────────────────────────────────
+
+  /**
+   * 综合核查 - 数字核查 + 引用溯源 + 逻辑一致性
+   * @param {string} statement - 待核查语句
+   * @returns {object} - 完整核查结果
+   */
+  fullCheck(statement) {
+    const numberResult = this.checkNumbers(statement);
+    const sourceResult = this.checkSources(statement);
+    const logicalResult = this.checkLogicalConsistency(statement);
+    const lyingResult = this.checkStatement(statement);
+    
+    const issues = [
+      ...numberResult.issues.map(i => ({ ...i, category: 'number' })),
+      ...logicalResult.contradictions.map(c => ({ ...c, category: 'logic' }))
+    ];
+    
+    if (!sourceResult.hasSource) {
+      issues.push({
+        category: 'source',
+        type: 'no_source',
+        severity: 'low',
+        detail: '陈述无明确来源'
+      });
+    }
+    
+    return {
+      statement: statement.substring(0, 100),
+      isLying: lyingResult.isLying,
+      confidence: lyingResult.confidence,
+      numberCheck: numberResult,
+      sourceCheck: sourceResult,
+      logicalCheck: logicalResult,
+      overallIssues: issues.length,
+      issues,
+      timestamp: Date.now()
+    };
   }
 
   // ─── Stats ─────────────────────────────────────────────────────────
@@ -131,7 +371,42 @@ class TruthfulnessChecker {
   }
 
   getStats() {
-    return this.getLyingStats();
+    return {
+      ...this.getLyingStats(),
+      numberChecks: this._state.numberChecks,
+      sourceChecks: this._state.sourceChecks,
+      contradictionChecks: this._state.contradictionChecks,
+      contradictionsFound: this._state.contradictionsFound,
+      version: 'v2.0.0'
+    };
+  }
+
+  /**
+   * Record a lie that was caught externally
+   */
+  recordLie(statement, context) {
+    this._state.liesCaught++;
+    this._state.totalStatements++;
+    this._state.statements.push({
+      text: statement.substring(0, 200),
+      isLying: true,
+      reason: context || '外部确认',
+      timestamp: Date.now(),
+    });
+    this._persist();
+    return { liesCaught: this._state.liesCaught };
+  }
+
+  /**
+   * Annotate confidence level to statement
+   */
+  annotateConfidence(statement, confidence) {
+    if (confidence < 0.5) {
+      return statement + ' [置信度: 低]';
+    } else if (confidence < 0.8) {
+      return statement + ' [置信度: 中]';
+    }
+    return statement;
   }
 }
 
