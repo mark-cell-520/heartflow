@@ -1,6 +1,6 @@
 ---
 name: heartflow
-version: "1.2.5"
+version: "1.2.6"
 title: "HeartFlow / 心虫"
 description: >
   HeartFlow v1.2.2 — AI 认知与自愈引擎。
@@ -14,7 +14,7 @@ description: >
   真实性核查(TruthfulnessChecker)、安全检查(SecurityChecker)、
   思维引擎(ReasoningIntegrator)、BM25+混合搜索(Budget/Graph/Slots)、
   DreamEngine、MetaLearner、SelfModel、CounterfactualEngine、
-  ConfidenceCalibrator、SpontaneousRestraint、CooperativeArbitration。
+  ConfidenceCalibrator、SpontaneousRestraint、CooperativeArbitration、MetacognitiveExecutive v1.0.0 (Roebers 2017 - Executive Function + Metacognition Unifying Framework, 463 citations)。
   不是 persona，不是 prompt 模板，是可验证的能力层。
 tags:
   - cognitive
@@ -747,6 +747,7 @@ JOINT > NORMATIVE > AFFECTIVE > AGGREGATE
 - Plan-and-Solve (ACL 2023)
 - Self-Reward (arXiv:2403.00564)
 - Self-Refine (ACL 2024)
+- Executive Function and Metacognition (Roebers, 2017) - Citation: 463 | v1.2.6 ⭐ NEW
 
 ---
 
