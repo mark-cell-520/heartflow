@@ -70,6 +70,9 @@ const { InteractiveDream } = require('./interactive-dream.js');
 const { EmbodiedCore } = require('./embodied-core.js');
 const { BeingLogic } = require('./being-logic.js');
 
+// Mental Effort Tracker — cognitive resource management
+const { MentalEffortTracker } = require('./mental-effort-tracker.js');
+
 // Language honesty — exports functions, not a class
 const LanguageHonesty = require('./language-honesty.js');
 
@@ -86,7 +89,7 @@ const StateSnapshot = require('./state-snapshot.js');
 const ErrorHandler = require('./error-handler.js');
 
 // ─── Version ─────────────────────────────────────────────────────────────────
-const VERSION = '1.2.1'
+const VERSION = '1.2.3'
 const BUILD_DATE = '2026-05-25';
 
 class HeartFlow {
@@ -131,6 +134,7 @@ class HeartFlow {
     this.wakeup = null;
     this.interactive = null;
     this.workflow = null;   // functions
+    this.mentalEffort = null;
 
     // New modules
     this.bm25 = null;
@@ -195,6 +199,9 @@ class HeartFlow {
     try { this.wakeup = new WakeUpVerifier(); } catch (e) {}
     try { this.interactive = new InteractiveDream(this.rootPath); } catch (e) {}
     try { this.being = new BeingLogic(this.rootPath); } catch (e) {}
+
+    // Mental Effort Tracker — cognitive resource management
+    try { this.mentalEffort = new MentalEffortTracker(); } catch (e) {}
 
     // Engine modules (functions/objects — no 'new')
     try { this.language = LanguageHonesty; } catch (e) {}
@@ -587,4 +594,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { HeartFlow, createHeartFlow, VERSION };
+module.exports = { HeartFlow, createHeartFlow, VERSION, MentalEffortTracker };
