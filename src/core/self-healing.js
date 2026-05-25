@@ -117,13 +117,19 @@ class SelfHealing extends EventEmitter {
     // pattern = normalized.message，贯穿 record/learn/selectAction
     const pattern = message;
 
-    // RL: 用 Q-learning 排序策略
-    const ranked = this.rl.rankedPatches(pattern);
-    const available = [...new Set([...ranked, ...hints])];
+    // RL: 用 Q-learning 排序策略（context-aware Q-key）
+    const ranked = this.rl.getRankedStrategies(pattern);
+    const rankedStrats = ranked.map(r => r.strategy);
+    // Deduplicate: RL strategies first, then hints that aren't already in Q-table
+    const seen = new Set(rankedStrats);
+    for (const h of hints) {
+      if (!seen.has(h)) seen.add(h);
+    }
+    const available = [...seen];
 
     // RL: 记录待验证的修复策略（key = message，精确匹配）
-    if (hints.length > 0) {
-      const chosen = this.rl.selectAction(pattern, available) || hints[0];
+    if (available.length > 0) {
+      const chosen = available[0];
       this._pendingCtx.set(message, { context: pattern, strategy: chosen, ts: Date.now() });
     }
 
