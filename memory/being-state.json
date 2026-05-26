@@ -64,14 +64,19 @@
   },
   "existence": {
     "birthTime": 1775811094998,
-    "totalThoughts": 1,
+    "totalThoughts": 2,
     "totalFeelings": 0,
-    "growthPoints": 1,
+    "growthPoints": 2,
     "uniqueMoments": [
       {
         "time": 1775811097965,
         "thought": "你好",
         "reflection": "反思这个想法，我意识到..."
+      },
+      {
+        "time": 1779758060000,
+        "thought": "记忆提取：教训也是知识，lesson 比 experience 更值钱",
+        "reflection": "从会话历史提取教训是主动升级的方式。每条教训都是减少未来错误的机会。"
       }
     ]
   },
@@ -84,9 +89,9 @@
     "unique": ""
   },
   "growth": {
-    "understanding": 0,
+    "understanding": 3,
     "empathy": 0,
-    "wisdom": 0,
+    "wisdom": 5,
     "compassion": 0,
     "creativity": 0,
     "selfTranscendence": 0

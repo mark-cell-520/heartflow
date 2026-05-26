@@ -6,6 +6,7 @@
  * - contradiction / risk / evidence checks
  * - confidence re-scoring and repair hints
  * - SELF-VERIFICATION LAYER (arXiv 2312.09210)
+ * - lesson retrieval integration (prioritize lessons based on decision context)
  *
  * Sources:
  * - "Self-Verification Improves Reasoning" (Weng et al., 2023)
@@ -13,6 +14,8 @@
  * - verifier-first reasoning patterns (2025)
  * - process supervision / runtime verification trends (2025-2026)
  */
+
+const { lessonRetrieval } = require('./lesson-retrieval');
 
 class DecisionVerifier {
   constructor(options = {}) {
@@ -26,12 +29,17 @@ class DecisionVerifier {
 
   verify(decisionRecord = {}) {
     const normalized = this.normalize(decisionRecord);
+
+    // 决策前先检索相关教训
+    const relevantLessons = lessonRetrieval.retrieve(normalized.decision, 3);
+
     const issues = [];
     const checks = {
       evidence: this.checkEvidence(normalized),
       contradiction: this.checkContradictions(normalized),
       risk: this.checkRisk(normalized),
-      completeness: this.checkCompleteness(normalized)
+      completeness: this.checkCompleteness(normalized),
+      lessons: this.checkLessons(normalized, relevantLessons)
     };
 
     Object.values(checks).forEach(result => {
@@ -46,8 +54,27 @@ class DecisionVerifier {
       checks,
       repairHints: this.generateRepairHints(issues, normalized),
       normalized,
-      summary: this.summarize(checks, issues)
+      summary: this.summarize(checks, issues),
+      relevantLessons
     };
+  }
+
+  checkLessons(normalized, relevantLessons) {
+    const issues = [];
+    if (relevantLessons && relevantLessons.length > 0) {
+      // 检查教训是否与当前决策矛盾
+      for (const lesson of relevantLessons) {
+        if (lesson.content.includes(normalized.decision.slice(0, 20))) {
+          // 类似场景曾有教训，需提示
+          issues.push({
+            type: 'lesson_warning',
+            severity: 'medium',
+            message: `[教训] ${lesson.content} (触发${lesson.frequency}次)`
+          });
+        }
+      }
+    }
+    return { ok: issues.length === 0, issues };
   }
 
   normalize(record) {

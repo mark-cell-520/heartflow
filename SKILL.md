@@ -1,9 +1,9 @@
 ---
 name: heartflow
-version: "1.2.6"
+version: "1.2.7"
 title: "HeartFlow / 心虫"
 description: >
-  HeartFlow v1.2.2 — AI 认知与自愈引擎。
+  HeartFlow v1.2.7 — AI 认知与自愈引擎。
   核心能力：三层记忆(MeaningfulMemory/Triality)、自愈RL(Q-table)、
   认知评估(CognitiveAppraisal v1.0.0 - Leventhal's Common-Sense Model, 1564 citations)、
   自我调节反馈(SelfRegulationFeedback v1.0.1 - Handbook of Self-Regulation, 3659 citations)、
@@ -24,7 +24,7 @@ tags:
   - reasoning
 ---
 
-# HeartFlow / 心虫 v1.2.0
+# HeartFlow / 心虫 v1.2.7
 
 **An AI capability layer that survives context switches, model changes, and restarts.**
 
@@ -747,7 +747,7 @@ JOINT > NORMATIVE > AFFECTIVE > AGGREGATE
 - Plan-and-Solve (ACL 2023)
 - Self-Reward (arXiv:2403.00564)
 - Self-Refine (ACL 2024)
-- Executive Function and Metacognition (Roebers, 2017) - Citation: 463 | v1.2.6 ⭐ NEW
+- Executive Function and Metacognition (Roebers, 2017) - Citation: 463 | v1.2.7 ⭐ NEW
 
 ---
 

@@ -21,7 +21,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const DATA_DIR = path.join(__dirname, '../../../data');
+const DATA_DIR = path.join(__dirname, '../../data');
 const EXPORT_PATH = path.join(DATA_DIR, 'meaningful-memory.json');
 
 class MeaningfulMemory {
@@ -111,6 +111,11 @@ class MeaningfulMemory {
   _doSave() {
     const exportPath = this._getExportPath();
     try {
+      // 确保目录存在
+      const dir = require('path').dirname(exportPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
       const data = {
         core: this.layers.core,
         learned: this.layers.learned,

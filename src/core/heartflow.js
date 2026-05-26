@@ -1,5 +1,5 @@
 /**
- * HeartFlow v1.2.0 — 单一入口，统一路由
+ * HeartFlow v1.2.7 — 单一入口，统一路由
  *
  * 调用方式:
  *   hf.dispatch('subsystem.method', arg1, arg2)  // 统一路由
@@ -41,6 +41,7 @@ const { TrialityMemory } = require('../core/memory/triality-memory.js');
 // Evolution
 const { EvolutionLoop } = require('../evolution/loop.js');
 const { DreamEngine } = require('../dream/engine.js');
+const { DreamConsolidation } = require('./dream-consolidation.js');
 const { MetaLearner } = require('../evolution/meta-learner.js');
 
 // Identity
@@ -71,6 +72,11 @@ const { InteractiveDream } = require('./interactive-dream.js');
 const { EmbodiedCore } = require('./embodied-core.js');
 const { BeingLogic } = require('./being-logic.js');
 
+// Meta systems (v1.2.7 new)
+const { MetaJudgment } = require('./judgment.js');
+const { MetaMemory } = require('./metaMemory.js');
+const { SkillGenerator } = require('./skill-generator.js');
+
 // Mental Effort Tracker — cognitive resource management
 const { MentalEffortTracker } = require('./mental-effort-tracker.js');
 
@@ -90,8 +96,8 @@ const StateSnapshot = require('./state-snapshot.js');
 const ErrorHandler = require('./error-handler.js');
 
 // ─── Version ─────────────────────────────────────────────────────────────────
-const VERSION = '1.2.6';
-const BUILD_DATE = '2026-05-25';
+const VERSION = '1.2.7';
+const BUILD_DATE = '2026-05-30';
 
 class HeartFlow {
   constructor(config = {}) {
@@ -116,8 +122,12 @@ class HeartFlow {
     this.decisionVerifier = null;
     this.evolution = null;
     this.dream = null;
+    this.dreamConsolidation = null;
     this.lesson = null;
     this.meta = null;
+    this.metaJudgment = null;
+    this.metaMemory = null;
+    this.skillGenerator = null;
     this.self = null;
     this.being = null;
     this.psychology = null;
@@ -172,7 +182,11 @@ class HeartFlow {
     // Evolution
     this.evolution = new EvolutionLoop({ rootPath: this.rootPath, memory: this.memory }).boot();
     this.dream = new DreamEngine(this.memory, null);
+    this.dreamConsolidation = new DreamConsolidation(this.memory);
     this.lesson = new LessonBank(this.rootPath);
+    this.metaJudgment = new MetaJudgment(this.rootPath);
+    this.metaMemory = new MetaMemory(this.rootPath);
+    this.skillGenerator = new SkillGenerator(this.rootPath);
     this.meta = new MetaLearner({ rootPath: this.rootPath, memory: this.memory }).boot();
 
     // Identity
@@ -235,7 +249,7 @@ class HeartFlow {
       this.slots = new Slots({ dataDir: path.join(this.rootPath, 'data') });
     } catch (e) { console.warn('[HeartFlow] Slots init error:', e.message); }
     try {
-      this.observe = createObserve(this.memory, { autoConsolidate: false });
+      this.observe = createObserve(this.memory, { autoConsolidate: true });
       this.consolidate = {
         consolidate: (...args) => this.observe.consolidate(...args),
         stop: () => this.observe.stop(),
@@ -243,6 +257,10 @@ class HeartFlow {
       };
     } catch (e) { console.warn('[HeartFlow] Observe init error:', e.message); }
 
+    // ─── Diagnostic ───────────────────────────────────────────────────────────
+    const { runDiagnostic } = require('./self-diagnostic.js');
+    this.diagnostic = { run: runDiagnostic };
+    
     this._bootMindSpace();
     this._registerModules();
 
@@ -275,6 +293,7 @@ class HeartFlow {
       'snapshot', 'error', 'embodied', 'wakeup', 'interactive', 'workflow',
       // New modules
       'bm25', 'hybrid', 'budget', 'graph', 'utils', 'slots', 'observe', 'consolidate',
+      'metaJudgment', 'metaMemory', 'skillGenerator',
     ];
     for (const name of subsystemNames) {
       if (this[name] !== null && this[name] !== undefined) {
@@ -438,9 +457,27 @@ class HeartFlow {
     return this.evolution.heal(error);
   }
 
-  dreamNow() {
+  async dreamNow() {
     if (!this.started) throw new Error('HeartFlow not started');
-    return this.dream.dream();
+    // 1. Run dream generation
+    const dreamResult = this.dream.dream();
+    // 2. Run consolidation (prune + synthesize themes)
+    const consolidation = this.dreamConsolidation.dream({ consolidate: false, prune: true, synthesize: true });
+    // 3. Feed themes into evolution loop → generate upgrade goals
+    let evolutionResult = null;
+    if (consolidation.synthesis && consolidation.synthesis.themes && consolidation.synthesis.themes.length > 0) {
+      const themes = consolidation.synthesis.themes.slice(0, 3);
+      try {
+        evolutionResult = await this.evolution.evolve(themes.join(' '), { source: 'dream_consolidation', themes });
+      } catch (e) {
+        // Evolution failure is non-fatal
+      }
+    }
+    return {
+      dream: dreamResult,
+      consolidation,
+      evolution: evolutionResult,
+    };
   }
 
   detectIdentityDrift() {
@@ -493,6 +530,54 @@ class HeartFlow {
   getEvolutionStats() {
     if (!this.started) throw new Error('HeartFlow not started');
     return this.evolution.getStats();
+  }
+
+  /**
+   * 从自我反思历史生成技能
+   * 将 evolution loop 的改进建议转化为可安装技能
+   */
+  triggerSkillGeneration() {
+    if (!this.started) throw new Error('HeartFlow not started');
+    try {
+      const result = this.skillGenerator.processLatestReport();
+      return result;
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
+  }
+
+  /**
+   * 完整进化：evolve + 应用改进
+   * 输入上下文 → 生成改进 → 自动写入学教训库
+   */
+  async evolveImprove(input, context = {}) {
+    if (!this.started) throw new Error('HeartFlow not started');
+    // 1. 运行进化循环（async）
+    const evolveResult = await this.evolution.evolve(input, context);
+    const improvements = evolveResult.improvements || [];
+    
+    // 2. 将改进建议写入学教训库
+    const applied = [];
+    for (const imp of improvements) {
+      try {
+        this.lesson.addLesson({
+          errorPattern: `[${imp.area}] ${imp.action}`,
+          correction: imp.action,
+          rootCause: imp.area,
+          skill: imp.area,
+          confidence: imp.priority === 'high' ? 0.9 : imp.priority === 'medium' ? 0.7 : 0.5,
+        });
+        applied.push(imp);
+      } catch (e) {
+        // 失败不阻断
+      }
+    }
+    
+    return {
+      ...evolveResult,
+      improvementsApplied: applied.length,
+      improvementsTotal: improvements.length,
+    };
   }
 
   getDreamStats() {

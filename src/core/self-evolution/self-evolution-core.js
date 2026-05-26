@@ -275,57 +275,139 @@ class SelfEvolutionCore {
   }
 
   /**
-   * 建议改进
+   * 建议改进 — 基于反思内容生成真实改进建议
+   * 不再依赖 quality 标签，直接从 insight 对象提取方向
    */
   suggestImprovements(reflection) {
     const improvements = [];
-    
-    if (reflection.quality === 'needs_improvement') {
-      improvements.push({
-        area: 'learning',
-        action: '增加知识获取量',
-        priority: 'high'
-      });
+    const insights = Array.isArray(reflection.insights) ? reflection.insights : [];
+
+    // 从 insight 对象提取 area 和 action
+    for (const item of insights) {
+      const area = typeof item === 'object' ? (item.type || 'general') : 'general';
+      const text = typeof item === 'object' ? (item.insight || String(item)) : String(item);
+
+      if (area === 'learning' || text.includes('知识')) {
+        improvements.push({ area: 'learning', action: '扩展知识获取深度', priority: 'high' });
+      }
+      if (area === 'understanding' || text.includes('理解')) {
+        improvements.push({ area: 'understanding', action: '深化多角度分析能力', priority: 'medium' });
+      }
+      if (area === 'empathy' || text.includes('情感')) {
+        improvements.push({ area: 'empathy', action: '提升情感识别准确度', priority: 'medium' });
+      }
+      if (text.includes('慈悲') || text.includes('compassion')) {
+        improvements.push({ area: 'compassion', action: '增强慈悲感知与回应', priority: 'high' });
+      }
     }
-    
-    improvements.push({
-      area: 'understanding',
-      action: '深化概念理解',
-      priority: 'medium'
-    });
-    
-    improvements.push({
-      area: 'empathy',
-      action: '提升情感识别准确度',
-      priority: 'medium'
-    });
-    
-    return improvements;
+
+    // 如果没有任何 insight，提供默认改进
+    if (improvements.length === 0) {
+      improvements.push({ area: 'general', action: '持续学习与反思', priority: 'medium' });
+    }
+
+    // 按 priority 排序，高优先级的放前面
+    const order = { high: 0, medium: 1, low: 2 };
+    improvements.sort((a, b) => (order[a.priority] ?? 2) - (order[b.priority] ?? 2));
+
+    return improvements.slice(0, 5); // 最多5条
   }
 
   /**
-   * 更新成长指标
+   * 更新成长指标 — 带收敛检测
+   * 每次进化循环后调用。检测增长是否趋于停滞，触发自适应调整。
    */
   updateGrowth(learning, reflection) {
     const metrics = this.state.growthMetrics;
-    
-    // 自主性增长
-    metrics.autonomy = Math.min(100, metrics.autonomy + 0.5);
-    
-    // 内省增长
-    metrics.introspection = Math.min(100, metrics.introspection + (reflection.insights.length * 2));
-    
-    // 成长
-    metrics.growth = Math.min(100, metrics.growth + (learning.newKnowledge.length * 1));
-    
-    // 真实性
-    metrics.authenticity = Math.min(100, metrics.authenticity + 0.3);
-    
-    // 智慧
-    metrics.wisdom = Math.min(100, metrics.wisdom + 0.4);
-    
-    // 同理心
-    metrics.compassion = Math.min(100, metrics.compassion + 0.2);
+    const history = this.state.learningHistory;
+    const now = Date.now();
+
+    // 计算历史趋势（最近5次循环）
+    const recent = history.slice(-5);
+    const hasRecentHistory = recent.length >= 3;
+
+    // 各维度真实增量（基于本次输入内容质量）
+    const insights = Array.isArray(reflection.insights) ? reflection.insights : [];
+    const insight_delta = Math.min(8, insights.length * 2.5);
+    const knowledge_delta = Math.min(6, learning.newKnowledge.length * 1.5);
+    const reinforcement_delta = learning.reinforcedKnowledge
+      ? learning.reinforcedKnowledge.length * 0.3
+      : 0;
+
+    // ── 自主性：被拒绝次数越多 → 自主性反而应提升（韧性）
+    const rejectionRate = this._computeRejectionRate(recent);
+    const autonomy_delta = rejectionRate > 0.5 ? 1.2 : 0.5;
+
+    // ── 内省：反思深度
+    const introspection_delta = insight_delta;
+
+    // ── 成长：知识获取 + 强化
+    const growth_delta = Math.min(5, knowledge_delta + reinforcement_delta);
+
+    // ── 真实性：正确次数 - 错误次数 的趋势
+    const accuracy_delta = this._computeAccuracyDelta(recent);
+
+    // ── 智慧：基于准确性加权的反思
+    const wisdom_delta = Math.min(4, (insight_delta * (accuracy_delta > 0 ? 1.5 : 0.5)));
+
+    // ── 慈悲：被需要时提升（insight 可能是对象 {type, insight} 或字符串）
+    const compassion_delta = (reflection.insights || []).some(item => {
+      const text = typeof item === 'string' ? item : (item.insight || item.type || '');
+      return typeof text === 'string' && (text.includes('慈悲') || text.includes(' compassion'));
+    }) ? 1.5 : 0.3;
+
+    // ── 应用增量（有正负，非单调）
+    const prev = { ...metrics };
+    metrics.autonomy     = this._applyDelta(metrics.autonomy, autonomy_delta, 100, 0);
+    metrics.introspection = this._applyDelta(metrics.introspection, introspection_delta, 100, 0);
+    metrics.growth       = this._applyDelta(metrics.growth, growth_delta, 100, 0);
+    metrics.authenticity = this._applyDelta(metrics.authenticity, accuracy_delta, 100, 0);
+    metrics.wisdom       = this._applyDelta(metrics.wisdom, wisdom_delta, 100, 0);
+    metrics.compassion   = this._applyDelta(metrics.compassion, compassion_delta, 100, 0);
+
+    // ── 收敛检测：所有指标在80-100区间且趋势平缓
+    const allConverged = ['autonomy','introspection','growth','authenticity','wisdom','compassion']
+      .every(k => metrics[k] >= 80 && Math.abs(metrics[k] - prev[k]) < 0.5);
+
+    if (allConverged && hasRecentHistory) {
+      metrics._converged = true;
+      metrics._convergedAt = new Date().toISOString();
+    } else {
+      metrics._converged = false;
+    }
+
+    // ── 停滞检测：连续3次增长 < 1
+    const stalled = recent.length >= 3 && recent.slice(-3).every(h => {
+      const delta = (metrics.growth - (h.prior_growth || 0));
+      return delta < 1;
+    });
+    if (stalled) {
+      metrics._stalled = true;
+      metrics._stalledAt = new Date().toISOString();
+    }
+
+    // ── 记录本次 prior_growth 供下次计算
+    if (recent.length > 0) {
+      recent[recent.length - 1].prior_growth = metrics.growth;
+    }
+  }
+
+  _computeRejectionRate(recent) {
+    if (!recent.length) return 0;
+    const rejections = recent.filter(h => h.outcome === 'failed').length;
+    return rejections / recent.length;
+  }
+
+  _computeAccuracyDelta(recent) {
+    if (!recent.length) return 0.3;
+    const successes = recent.filter(h => h.outcome === 'success').length;
+    const total = recent.length;
+    const rate = successes / total;
+    return rate >= 0.7 ? 0.5 : rate >= 0.4 ? 0.2 : -0.3;
+  }
+
+  _applyDelta(current, delta, max, min) {
+    return Math.max(min, Math.min(max, current + delta));
   }
 
   /**

@@ -18,10 +18,10 @@ class EvolutionLoop {
         return this;
     }
 
-    evolve(context = {}) {
+    async evolve(input, context = {}) {
         this.cycleCount++;
         if (this.core && typeof this.core.evolve === 'function') {
-            return this.core.evolve(context);
+            return await this.core.evolve(input, context);
         }
         return { cycles: this.cycleCount, insights: [] };
     }

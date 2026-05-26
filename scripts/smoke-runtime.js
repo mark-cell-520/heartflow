@@ -6,8 +6,8 @@ const { HeartFlow, VERSION } = require('../src/core/heartflow.js');
   const health = await hf.healthCheck();
   const routes = hf.routes();
 
-  if (VERSION !== '1.2.6') {
-    throw new Error(`Expected VERSION 1.2.6, got ${VERSION}`);
+  if (VERSION !== '1.2.7') {
+    throw new Error(`Expected VERSION 1.2.7, got ${VERSION}`);
   }
   for (const subsystem of ['memory', 'security', 'emotion', 'decision', 'decisionVerifier', 'slots', 'observe']) {
     if (!health.subsystems || health.subsystems.missing.includes(subsystem)) {

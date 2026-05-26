@@ -4,6 +4,12 @@
  * Paper: Reflexion (2023), CRITIC (2024)
  */
 
+const fs = require('fs');
+const path = require('path');
+
+const MEMORY_DIR = path.join(__dirname, '../../memory');
+const QTABLE_FILE = path.join(MEMORY_DIR, 'q-table.json');
+
 class HealingMemoryRL {
   constructor(maxMemory = 100) {
     this.maxMemory = maxMemory;
@@ -15,6 +21,44 @@ class HealingMemoryRL {
     // History of (error, strategy, outcome)
     this.history = [];
     this.decorrelationWindow = 3; // 最近N次不同strategy才更新
+    // Load persisted Q-table on init
+    this._loadQTable();
+  }
+
+  _ensureMemoryDir() {
+    if (!fs.existsSync(MEMORY_DIR)) {
+      fs.mkdirSync(MEMORY_DIR, { recursive: true });
+    }
+  }
+
+  _loadQTable() {
+    try {
+      if (!fs.existsSync(QTABLE_FILE)) return;
+      const raw = fs.readFileSync(QTABLE_FILE, 'utf-8');
+      const data = JSON.parse(raw);
+      if (data.qTable) {
+        this.qTable = new Map(Object.entries(data.qTable));
+      }
+      if (data.history) {
+        this.history = data.history.slice(-this.maxMemory);
+      }
+    } catch (e) {
+      // Ignore load errors - start fresh
+    }
+  }
+
+  _saveQTable() {
+    try {
+      this._ensureMemoryDir();
+      const data = {
+        qTable: Object.fromEntries(this.qTable),
+        history: this.history.slice(-50),
+        savedAt: new Date().toISOString()
+      };
+      fs.writeFileSync(QTABLE_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    } catch (e) {
+      console.error('[HealingMemoryRL] _saveQTable failed:', e.message);
+    }
   }
 
   /**
@@ -50,6 +94,7 @@ class HealingMemoryRL {
     const reward = success ? 1.0 : -0.5;
     const learningRate = 0.2;
     entry[strategy] = currentQ + learningRate * (reward - currentQ);
+    this._saveQTable();
   }
 
   /**
