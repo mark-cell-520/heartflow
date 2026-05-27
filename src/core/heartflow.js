@@ -355,7 +355,7 @@ class HeartFlow {
     // decision
     'decision.decide', 'decision.getRecentStamps',
     // confidence
-    'confidence.calibrate', 'confidence.admit',
+    'confidence.calibrate',
     // restraint
     'restraint.shouldIntervene',
     // graph
