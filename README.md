@@ -1,4 +1,4 @@
-# HeartFlow / 心虫 v1.3.7
+# HeartFlow / 心虫 v1.3.8
 
 **一个可生存于上下文切换、模型更换和重启的AI能力层。**
 
@@ -128,11 +128,11 @@ hf.stop();
 
 ## 版本历史
 
-- **1.3.5** (当前) — 宽松模式修复，环境变量可选
-- **1.3.4** — 安全审计完整修复
-- **1.2.7** — CognitiveAppraisal + SelfRegulationFeedback集成
-- **1.1.8** — BM25+Hybrid+Graph+Slots完整集成
-- **1.0.0** — 首个稳定版
+- **v1.3.8** (当前) — 宽松模式修复，环境变量可选
+- **v1.3.8** — 安全审计完整修复
+- **v1.3.8** — CognitiveAppraisal + SelfRegulationFeedback集成
+- **v1.3.8** — BM25+Hybrid+Graph+Slots完整集成
+- **v1.3.8** — 首个稳定版
 
 ---
 

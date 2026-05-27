@@ -1,5 +1,5 @@
 /**
- * HeartFlow v1.3.5 — 单一入口，统一路由
+ * HeartFlow v1.3.7 — 单一入口，统一路由
  *
  * 调用方式:
  *   hf.dispatch('subsystem.method', arg1, arg2)  // 统一路由
@@ -380,7 +380,6 @@ class HeartFlow {
     'evolution.getStats',
     // meta — 原则5: 永远传递知识
     'meta.learn', 'meta.getStats',
-  ]);
 
   /**
    * dispatch('subsystem.method', ...args) — 统一路由
