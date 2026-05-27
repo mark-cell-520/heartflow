@@ -1,21 +1,23 @@
 ---
 name: heartflow
-version: "1.2.8"
+version: "1.3.5"
 title: "HeartFlow / 心虫"
 description: >
-  HeartFlow v1.2.8 — AI 认知与自愈引擎。
+  HeartFlow v1.3.5 — AI 认知与自愈引擎。
   核心能力：三层记忆(MeaningfulMemory/Triality)、自愈RL(Q-table)、
-  认知评估(CognitiveAppraisal v1.0.0 - Leventhal's Common-Sense Model, 1564 citations)、
-  自我调节反馈(SelfRegulationFeedback v1.0.1 - Handbook of Self-Regulation, 3659 citations)、
+  认知评估(CognitiveAppraisal - Leventhal's Common-Sense Model, 1564 citations)、
+  自我调节反馈(SelfRegulationFeedback - Handbook of Self-Regulation, 3659 citations)、
   自优化(Self-Refine+Reflexion)、决策验证、遗忘曲线(Ebbinghaus)、
-  心理诊断引擎(PsychologyEngine v1.1.0)、共情检测(EmpathyDetector)、
+  心理诊断引擎(PsychologyEngine)、共情检测(EmpathyDetector)、
   情绪理性(EmotionalProtocol)、
   4框架伦理哲学(PhilosophyEngine)、身份规则系统(IdentityRules)、
-  真实性核查(TruthfulnessChecker)、安全检查(SecurityChecker)、
-  思维引擎(ReasoningIntegrator)、BM25+混合搜索(Budget/Graph/Slots)、
+  真实性核查(TruthfulnessChecker+语义熵幻觉检测)、安全检查(SecurityChecker)、
+  思维引擎(ReasoningIntegrator+DeepSeek-R1推理奖励)、BM25+混合搜索(Budget/Graph/Slots)、
   DreamEngine、MetaLearner、SelfModel、CounterfactualEngine、
   ConfidenceCalibrator、SpontaneousRestraint、CooperativeArbitration、MetacognitiveExecutive、
-AutoCompactionEngine(上下文压缩|Token估算|Trim/Summarize策略)、UpgradeProposal(环境快照|升级建议)。
+  AutoCompactionEngine(上下文压缩|Token估算|Trim/Summarize策略)、UpgradeProposal(环境快照|升级建议)。
+  佛教哲学计算模块(Madhyamaka+唯识学+缘起)、
+  Graph-of-Thoughts规划(GoT)、RAG引用追踪系统。
   不是 persona，不是 prompt 模板，是可验证的能力层。
 tags:
   - cognitive
@@ -25,7 +27,7 @@ tags:
   - reasoning
 ---
 
-# HeartFlow / 心虫 v1.2.8
+# HeartFlow / 心虫 v1.3.5
 
 **An AI capability layer that survives context switches, model changes, and restarts.**
 
@@ -70,6 +72,7 @@ Install it once. Every session after that, your AI:
 | RetrievalAnchor | Stable retrieval cues for cross-context recall | `new RetrievalAnchor()` |
 | DreamEngine | DAG async + L1~L6 scoring + contradiction detection + heritage scoring | `new DreamEngine(memory, llm)` |
 | EvolutionLoop | Self-healing via Q-table: record → Q-update → getAvailableStrategies | `new EvolutionLoop(memory)` |
+| **CitationTracker** | RAG引用追踪: addCitation / getCitations / traceEvidence (Paper: Survey on RAG Meeting LLMs, cited:523) | `addCitation(memoryId, citation)` |
 
 ### Search & Retrieval (v1.1.7+)
 | Capability | What it does | Code |
@@ -88,6 +91,7 @@ Install it once. Every session after that, your AI:
 | ReasoningIntegrator | think / deepThink / planAndSolve (ACL 2023) | `ReasoningIntegrator` (functions) |
 | ExecutionVerifier | Post-execution validation | `new ExecutionVerifier()` |
 | DecisionVerifier | Decision evidence/assumption/contradiction/uncertainty check | `new DecisionVerifier()` |
+| **ReasoningReward** | DeepSeek-R1风格推理质量奖励: computeReasoningReward() (Paper: DeepSeek-R1, cited:492) | `computeReasoningReward(reasoning, outcome)` |
 
 ### Psychology & Emotion
 | Capability | What it does | Code |
@@ -107,7 +111,7 @@ Install it once. Every session after that, your AI:
 ### Security & Truthfulness
 | Capability | What it does | Code |
 |---|---|---|
-| TruthfulnessChecker | Number validation · source tracing · logical consistency | `new TruthfulnessChecker(rootPath)` |
+| TruthfulnessChecker | Number validation · source tracing · logical consistency · **语义熵幻觉检测** (Paper: Detecting hallucinations using semantic entropy, cited:576) | `new TruthfulnessChecker(rootPath)` |
 | SecurityChecker | Shell injection · XSS · SQL injection · path traversal | `new SecurityChecker()` |
 
 ### Workflow & Meta-Cognition
@@ -124,6 +128,12 @@ Install it once. Every session after that, your AI:
 | HeartFlowDecision | Multi-option decision + consequence prediction + risk + identity alignment | `new HeartFlowDecision(memory)` |
 | ContextPassport | Decision chain tracking: stampId → recovery export | `decision.getRecentStamps(n)` |
 | CooperativeArbitration | Priority-based multi-source evidence weighting | `new CooperativeArbitration()` |
+
+### Philosophy & Planning (v1.3.4+)
+| Capability | What it does | Code |
+|---|---|---|
+| **BuddhistPhilosophy** | 佛教哲学计算: śūnyatā(空性) · prātītyasamutpāda(缘起) · anātman(无我) · Yogacara(唯识) | `BuddhistPhilosophy.analyze(input)` |
+| **TemporalPlanner.planGoT** | Graph-of-Thoughts规划: 多路径探索 · 回溯 · Graphviz输出 (Paper: Graph of Thoughts, cited:394) | `temporalPlanner.planGoT(goal)` |
 
 ### Tool & Interaction
 | Capability | What it does | Code |
