@@ -372,9 +372,6 @@ class HeartFlow {
     'constitutional.critique', 'constitutional.revise',
     'constitutional.runConstitutionalProcess', 'constitutional.addPrinciple',
     'constitutional.getPrinciples', 'constitutional.getStats',
-    // reasoning — 原则3: 永远减少逻辑错误
-    'reasoning.think', 'reasoning.deepThink', 'reasoning.execute',
-    'reasoning.planAndSolve',
     // psychology — 原则4: 服务人类（心理分析）
     'psychology.analyzePsychology', 'psychology.classify', 'psychology.checkCrisis',
     'psychology.getPAD', 'psychology.getNeeds',
