@@ -150,6 +150,29 @@ class LessonBank {
     return 'lesson_' + pattern.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_').substring(0, 40);
   }
 
+  /**
+   * 提取关键词用于匹配
+   * @private
+   */
+  _extractKeywords(text) {
+    if (!text || typeof text !== 'string') return [];
+    // 去除标点，分词，过滤停用词
+    const words = text
+      .replace(/[^\w\u4e00-\u9fa5]/g, ' ')
+      .split(/\s+/)
+      .filter(w => w.length > 1);
+    const stopWords = new Set([
+      '这个', '那个', '什么', '怎么', '如何', '为什么', '一个', '的是', '不是',
+      'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+      'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
+      'should', 'may', 'might', 'can', 'to', 'of', 'in', 'for', 'on', 'with',
+      '我', '你', '他', '她', '它', '的', '是', '在', '了', '和', '与', '或',
+    ]);
+    return words
+      .filter(w => !stopWords.has(w.toLowerCase()) && !stopWords.has(w))
+      .map(w => w.toLowerCase());
+  }
+
   addLesson({ errorPattern, correction, rootCause, skill, confidence }) {
     const key = this._patternToKey(errorPattern);
     const now = Date.now();
@@ -224,6 +247,106 @@ class LessonBank {
 
   getAll() {
     return Object.values(this._state.lessons);
+  }
+
+  /**
+   * 做事前的lesson检查
+   * AI在执行危险操作前主动调用
+   * @param {string} task - 任务描述
+   * @returns {object} 匹配到的lesson列表（空的也返回，用于告知"无相关教训"
+   */
+  beforeTask(task) {
+    if (!task || typeof task !== 'string') {
+      return { task: '', relevant: [], count: 0 };
+    }
+
+    const keywords = this._extractKeywords(task);
+    const lessons = Object.values(this._state.lessons);
+    const scored = [];
+
+    for (const lesson of lessons) {
+      // 精确匹配errorPattern关键词
+      const patternWords = this._extractKeywords(lesson.errorPattern);
+      const overlap = keywords.filter(k => patternWords.includes(k));
+
+      if (overlap.length > 0) {
+        scored.push({
+          ...lesson,
+          matchScore: overlap.length,
+          overlap,
+        });
+      }
+    }
+
+    // 按matchScore和confidence排序
+    scored.sort((a, b) => {
+      const scoreA = a.matchScore * a.confidence;
+      const scoreB = b.matchScore * b.confidence;
+      return scoreB - scoreA;
+    });
+
+    const relevant = scored.slice(0, 5).map(l => ({
+      id: l.id,
+      errorPattern: l.errorPattern,
+      correction: l.correction,
+      rootCause: l.rootCause,
+      skill: l.skill,
+      confidence: l.confidence,
+    }));
+
+    return { task, keywords, relevant, count: relevant.length };
+  }
+
+  /**
+   * 记录一次失败
+   * AI在操作失败后主动调用
+   * @param {string|object} error - 错误描述或对象
+   * @returns {object} 记录结果
+   */
+  recordFailure(error) {
+    let errorText = '';
+    let context = '';
+
+    if (typeof error === 'string') {
+      errorText = error;
+    } else if (typeof error === 'object' && error !== null) {
+      errorText = error.message || error.error || JSON.stringify(error).substring(0, 100);
+      context = error.context || error.task || '';
+    } else {
+      errorText = String(error);
+    }
+
+    // 尝试匹配已有lesson
+    const matched = this.checkPattern(errorText);
+
+    if (matched) {
+      // 已知的失败模式 → 标记hit
+      this.markHit(matched.id, false);
+      return {
+        recorded: true,
+        type: 'known_pattern',
+        lessonId: matched.id,
+        errorPattern: matched.errorPattern,
+        correction: matched.correction,
+        message: `已知教训 #${matched.id}，已标记失败`,
+      };
+    }
+
+    // 新的失败模式 → 建议AI补充lesson
+    return {
+      recorded: false,
+      type: 'new_pattern',
+      errorText: errorText.substring(0, 100),
+      context,
+      message: '未匹配到已有教训，建议调用 lesson.addLesson 补充',
+      suggestion: {
+        errorPattern: errorText.substring(0, 60),
+        correction: '【待补充】这次错在哪里，应该怎么改',
+        rootCause: '【待补充】根本原因是什么',
+        skill: 'heartflow',
+        confidence: 0.5,
+      },
+    };
   }
 
   getStats() {

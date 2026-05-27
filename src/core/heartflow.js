@@ -343,8 +343,9 @@ class HeartFlow {
     'memory.getLayers', 'memory.getStats',
     // truth
     'truth.checkStatement', 'truth.checkNumbers', 'truth.checkSources',
-    // lesson
-    'lesson.addLesson', 'lesson.getTopLessons', 'lesson.getRecent',
+    // lesson — 主动集成点：AI在行动前/失败后调用
+    'lesson.addLesson', 'lesson.getTopLessons',
+    'lesson.beforeTask', 'lesson.recordFailure', 'lesson.getStats', 'lesson.getAll',
     // dream
     'dream.dream', 'dream.quickDream', 'dream.getCacheStats',
     // verify
