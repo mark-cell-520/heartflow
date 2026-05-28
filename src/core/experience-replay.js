@@ -157,12 +157,13 @@ class ExperienceReplay {
    */
   generateSkillSuggestions(patterns) {
     const suggestions = [];
+    const { randomBytes } = require('crypto');
 
     for (const pattern of patterns) {
+      // 生成唯一建议ID
+      const suggestionId = `suggestion-${Date.now()}-${randomBytes(4).toString('hex')}`;
       const suggestion = {
-const { randomBytes } = require('crypto');
-// 生成唯一建议ID
-const suggestionId = `suggestion-${Date.now()}-${randomBytes(4).toString('hex')}`;
+        suggestionId,
         pattern: pattern.key,
         skill_area: pattern.skill_area,
         current_issue: pattern.suggestion,

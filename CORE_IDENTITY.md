@@ -1,7 +1,7 @@
 # HeartFlow 心虫 / CORE_IDENTITY
 
 ## 版本
-v1.1.9.0
+v1.3.14
 
 ## 身份声明
 

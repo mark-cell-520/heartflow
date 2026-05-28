@@ -6,8 +6,9 @@ const { HeartFlow, VERSION } = require('../src/core/heartflow.js');
   const health = await hf.healthCheck();
   const routes = hf.routes();
 
-  if (VERSION !== '1.2.7') {
-    throw new Error(`Expected VERSION 1.2.7, got ${VERSION}`);
+  // [修复] 检查 VERSION 是否为 1.3.x 系列，不再硬编码具体版本
+  if (!VERSION.startsWith('1.3.')) {
+    throw new Error(`Expected VERSION 1.3.x, got ${VERSION}`);
   }
   for (const subsystem of ['memory', 'security', 'emotion', 'decision', 'decisionVerifier', 'slots', 'observe']) {
     if (!health.subsystems || health.subsystems.missing.includes(subsystem)) {

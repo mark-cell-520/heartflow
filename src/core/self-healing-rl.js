@@ -10,15 +10,45 @@ const crypto = require('crypto');
 
 const MEMORY_DIR = path.join(__dirname, '../../memory');
 const QTABLE_FILE = path.join(MEMORY_DIR, 'q-table.json');
-const QTABLE_HMAC_KEY = process.env.HEARTFLOW_QTABLE_HMAC_KEY || (() => {
-  const crypto = require('crypto');
-  const key = crypto.randomBytes(32).toString('base64');
-  console.warn(`[HealingMemoryRL] HEARTFLOW_QTABLE_HMAC_KEY not set, generated random key: ${key}`);
-  return key;
-})();
-if (!/^[A-Za-z0-9+/=_-]+$/.test(QTABLE_HMAC_KEY)) {
-  throw new Error('[HealingMemoryRL] HEARTFLOW_QTABLE_HMAC_KEY must contain only printable ASCII characters');
+
+// [修复] HMAC Key 缓存，避免每次导入生成新key
+let _cachedHmacKey = null;
+
+function _getHmacKey() {
+  if (_cachedHmacKey) return _cachedHmacKey;
+
+  const envKey = process.env.HEARTFLOW_QTABLE_HMAC_KEY;
+  if (envKey) {
+    if (!/^[A-Za-z0-9+/=_-]+$/.test(envKey)) {
+      throw new Error('[HealingMemoryRL] HEARTFLOW_QTABLE_HMAC_KEY must contain only printable ASCII characters');
+    }
+    _cachedHmacKey = envKey;
+    return _cachedHmacKey;
+  }
+
+  // 从文件加载或生成新key（仅在首次调用时）
+  const keyFile = path.join(MEMORY_DIR, '.hmac-key');
+  if (fs.existsSync(keyFile)) {
+    try {
+      const meta = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
+      if (meta.key && /^[A-Za-z0-9+/=_-]+$/.test(meta.key)) {
+        _cachedHmacKey = meta.key;
+        return _cachedHmacKey;
+      }
+    } catch { /* corrupted, regenerate */ }
+  }
+
+  // 生成新key并持久化
+  const newKey = crypto.randomBytes(32).toString('base64');
+  try {
+    fs.writeFileSync(keyFile, JSON.stringify({ key: newKey, createdAt: Date.now() }, null, 2), { mode: 0o600 });
+  } catch { /* ignore */ }
+  _cachedHmacKey = newKey;
+  console.warn(`[HealingMemoryRL] HEARTFLOW_QTABLE_HMAC_KEY not set, generated and saved new key`);
+  return _cachedHmacKey;
 }
+
+const QTABLE_HMAC_KEY = _getHmacKey();
 
 class HealingMemoryRL {
   constructor(maxMemory = 100) {

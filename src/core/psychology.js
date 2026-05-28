@@ -221,8 +221,8 @@ const CRISIS_KEYWORDS = {
  */
 function assessCrisisLevel(text, consecutiveCount = 1) {
   const lower = text.toLowerCase();
-  // [P1] ReDoS防护 - 先检查长度再测试正则
-  const MAX_CRISIS_TEXT_LENGTH = 500;
+  // [修复] ReDoS防护 - 先检查长度再测试正则，降低上限
+  const MAX_CRISIS_TEXT_LENGTH = 200;
   if (lower.length > MAX_CRISIS_TEXT_LENGTH) {
     // 长文本只做基础检测，不使用复杂正则
     const hasKeyword = /(死|自杀|自残|die|suicide)/i.test(lower);
@@ -387,10 +387,12 @@ function detectDefenseMechanisms(text) {
     }
     
     if (matchCount > 0) {
+      // [修复] 确保至少一个匹配时置信度 >= 0.5
+      const baseConfidence = Math.min(matchCount / defense.patterns.length * 0.6 + 0.4, 1);
       detected.push({
         mechanism: defense.name,
         zh: defense.zh,
-        confidence: Math.min(matchCount / defense.patterns.length * 0.8 + 0.2, 1),
+        confidence: baseConfidence,
         matchedPatterns: matchedPatterns
       });
     }

@@ -1,5 +1,5 @@
 /**
- * HeartFlow v1.3.8 — 单一入口，统一路由
+ * HeartFlow v1.3.15 — 单一入口，统一路由
  *
  * 调用方式:
  *   hf.dispatch('subsystem.method', arg1, arg2)  // 统一路由
@@ -48,6 +48,7 @@ const { GoTEngine } = require('./graph-of-thoughts.js');
 const { ConstitutionalEngine } = require('./constitutional-ai.js');
 
 // Identity
+const { IdentityCore } = require('../identity/identity-core.js');
 const { SelfModel } = require('../identity/self-model.js');
 const { SelfVerifier } = require('../identity/self-verifier.js');
 const { LessonBank } = require('../identity/lesson-bank.js');
@@ -98,9 +99,73 @@ const StateSnapshot = require('./state-snapshot.js');
 // Error handler — singleton object
 const ErrorHandler = require('./error-handler.js');
 
+// Thought chain orchestrator — 串联所有引擎形成统一思维链
+const { ThoughtChain, createThoughtChain, REASONING_DEPTH } = require('./thought-chain.js');
+
+// Cognitive protocol — 认知协议：慢下来、先理解再行动
+const { CognitiveProtocol } = require('./cognitive-protocol.js');
+
+// ─── Execution Layer — 执行能力 ────────────────────────────────────────────────
+const { ToolExecutor } = require('../executor/tool-executor.js');
+const { ToolDispatcher } = require('../executor/dispatcher.js');
+const { AgentFactory } = require('../agents/agent-factory.js');
+const { TaskPipeline } = require('./task-pipeline.js');
+const { ExecutionMonitor } = require('../executor/execution-monitor.js');
+const { FallbackExecutor } = require('../executor/fallback-executor.js');
+const { AlternativeGenerator } = require('../executor/alternative-generator.js');
+const { RetryStrategy } = require('../executor/retry-strategy.js');
+
+// ─── Planning Layer — 规划能力 ────────────────────────────────────────────────
+const { AdaptivePlanner } = require('../planner/adaptive-planner.js');
+const { StrategySelector } = require('../planner/strategy-selector.js');
+const { ReplanTrigger } = require('../planner/replan-trigger.js');
+
+// ─── Learning Layer — 学习能力 ────────────────────────────────────────────────
+const { ExperienceCollector } = require('../learning/experience-collector.js');
+const { StrategyAdapter } = require('../learning/strategy-adapter.js');
+const { FailureAnalyzer } = require('../learning/failure-analyzer.js');
+
+// ─── Verification Layer — 验证能力 ──────────────────────────────────────────
+const { QualityVerifier } = require('../verifier/quality-verifier.js');
+const { OutputChecker } = require('../verifier/output-checker.js');
+const { PatternMatcher } = require('../verifier/pattern-matcher.js');
+
+// ─── Proactive Layer — 主动引擎 ──────────────────────────────────────────────
+const { CuriosityEngine } = require('../proactive/curiosity-engine.js');
+const { DesireEngine } = require('../proactive/desire-engine.js');
+const { GoalPursuer } = require('../proactive/goal-pursuer.js');
+const { SelfInitiator } = require('../proactive/self-initiator.js');
+
+// ─── Cross-Session Memory Layer — 跨会话记忆 ─────────────────────────────────
+const { SessionMemory } = require('../memory/session-memory.js');
+const { ProjectContext } = require('../memory/project-context.js');
+const { LongTermMemory } = require('../memory/long-term-memory.js');
+const { CrossSessionIndex } = require('../memory/cross-session-index.js');
+
+// ─── Multimodal Layer — 多模态 ────────────────────────────────────────────────
+const { VisionProcessor } = require('../multimodal/vision-processor.js');
+const { ImageAnalyzer } = require('../multimodal/image-analyzer.js');
+const { ModalFusion } = require('../multimodal/modal-fusion.js');
+
+// ─── Reasoning Layer — 推理 ──────────────────────────────────────────────────
+const { KnowledgeBase } = require('../reasoning/knowledge-base.js');
+const { CommonsenseEngine } = require('../reasoning/commonsense-engine.js');
+const { CausalInference } = require('../reasoning/causal-inference.js');
+const { InferenceChain } = require('../reasoning/inference-chain.js');
+
+// ─── Emotional Autonomy Layer — 情感自主 ─────────────────────────────────────
+const { AutonomousEmotion } = require('../emotion/autonomous-emotion.js');
+const { DesireSystem } = require('../emotion/desire-system.js');
+const { EmotionalGrowth } = require('../emotion/emotional-growth.js');
+const { MoodEvolution } = require('../emotion/mood-evolution.js');
+
+// ─── Agent System — 独立 Agent 系统 ─────────────────────────────────────────
+const { MarkCode } = require('../agent-core/heart-agent.js');
+const { AgentCLI } = require('../agent-core/cli.js');
+
 // ─── Version ─────────────────────────────────────────────────────────────────
-const VERSION = '1.3.14';
-const BUILD_DATE = '2026-05-30';
+const VERSION = '1.5.0';
+const BUILD_DATE = '2026-05-28';
 
 class HeartFlow {
   constructor(config = {}) {
@@ -113,6 +178,8 @@ class HeartFlow {
     this.rootPath = config.rootPath || path.join(__dirname, '..', '..');
 
     // Subsystem instances (null until start)
+    this.identityCore = null;  // 身份核心 — 每次启动第一优先加载
+    this.cognitive = null;     // 认知协议 — 慢下来，先理解再行动
     this.memory = null;
     this.triality = null;
     this.knowledge = null;
@@ -159,6 +226,66 @@ class HeartFlow {
     this.slots = null;
     this.observe = null;
     this.consolidate = null;
+    this.thoughtChain = null;  // 思维链编排器
+
+    // Execution Layer — 执行能力
+    this.toolExecutor = null;   // 工具执行器
+    this.toolDispatcher = null; // 工具调度器
+    this.agentFactory = null;  // Agent 工厂
+    this.taskPipeline = null;  // 任务管道
+    this.executionMonitor = null;  // 执行监控
+    this.fallbackExecutor = null;  // 回退执行器
+    this.alternativeGenerator = null;  // 备选方案生成器
+    this.retryStrategy = null;  // 重试策略
+
+    // Planning Layer — 规划能力
+    this.adaptivePlanner = null;  // 自适应规划器
+    this.strategySelector = null;  // 策略选择器
+    this.replanTrigger = null;  // 重规划触发器
+
+    // Learning Layer — 学习能力
+    this.experienceCollector = null;  // 经验收集器
+    this.strategyAdapter = null;  // 策略适配器
+    this.failureAnalyzer = null;  // 失败分析器
+
+    // Verification Layer — 验证能力
+    this.qualityVerifier = null;  // 质量验证器
+    this.outputChecker = null;  // 输出检查器
+    this.patternMatcher = null;  // 模式匹配器
+
+    // Proactive Layer — 主动引擎
+    this.curiosityEngine = null;  // 好奇心引擎
+    this.desireEngine = null;  // 欲望引擎
+    this.goalPursuer = null;  // 目标追求者
+    this.selfInitiator = null;  // 自主发起者
+
+    // Cross-Session Memory Layer — 跨会话记忆
+    this.sessionMemory = null;  // 会话记忆
+    this.projectContext = null;  // 项目上下文
+    this.longTermMemory = null;  // 长期记忆
+    this.crossSessionIndex = null;  // 跨会话索引
+
+    // Multimodal Layer — 多模态
+    this.visionProcessor = null;  // 视觉处理器
+    this.imageAnalyzer = null;  // 图像分析器
+    this.modalFusion = null;  // 模态融合
+
+    // Reasoning Layer — 推理
+    this.knowledgeBase = null;  // 知识库
+    this.commonsenseEngine = null;  // 常识推理引擎
+    this.causalInference = null;  // 因果推理
+    this.inferenceChain = null;  // 推理链
+
+    // Emotional Autonomy Layer — 情感自主
+    this.autonomousEmotion = null;  // 自主情感
+    this.desireSystem = null;  // 欲望系统
+    this.emotionalGrowth = null;  // 情感成长
+    this.moodEvolution = null;  // 心境演化
+
+    // Agent System — 独立 Agent 系统
+    this.heartAgent = null;  // Agent 实例
+    this.agentCLI = null;  // Agent CLI
+
     this.SearchTrace = SearchTrace;
     this.SearchPhaseMetrics = SearchPhaseMetrics;
     this.WeightComponents = WeightComponents;
@@ -175,6 +302,27 @@ class HeartFlow {
     if (this.started) return;
     this.startTime = Date.now();
     this.sessionId = `session-${this.startTime}`;
+
+    // ─── 身份核心 — 第一优先加载 ─────────────────────────────
+    // 确保每次启动都能接上之前的记忆
+    this.identityCore = new IdentityCore(this.rootPath);
+    const identityResult = this.identityCore.boot();
+    if (identityResult.success) {
+      console.log(`[HeartFlow] 身份核心加载成功 (${identityResult.loadedModules.length} 个模块)`);
+      // 如果有上次会话，打印会话间隔
+      const lastContext = this.identityCore.getLastSessionContext();
+      if (lastContext && lastContext.bootTime) {
+        const gapMinutes = Math.round((this.startTime - lastContext.bootTime) / 60000);
+        console.log(`[HeartFlow] 距上次会话: ${gapMinutes} 分钟`);
+      }
+    } else {
+      console.warn(`[HeartFlow] 身份核心加载部分失败:`, identityResult.errors);
+    }
+
+    // ─── 认知协议 — 慢下来，先理解再行动 ─────────────────────
+    this.cognitive = new CognitiveProtocol(this.rootPath, this.identityCore);
+    // 启动后打印上下文摘要
+    this.cognitive.printStartupContext();
 
     // Memory
     this.memory = new MeaningfulMemory(this.rootPath);
@@ -272,6 +420,169 @@ class HeartFlow {
     this._bootMindSpace();
     this._registerModules();
 
+    // ─── Thought Chain 初始化 — 串联所有引擎 ───────────────────────────────
+    try {
+      this.thoughtChain = new ThoughtChain(this);
+      this.thoughtChain.setDepth(REASONING_DEPTH.DEEP);  // 默认深度推理
+
+      // 包装对象：让 dispatch 可以调用 think 系列方法
+      // dispatch 期望 hf.modules['thoughtChain'].think(...)
+      this._thoughtChainApi = {
+        think: (input) => this.think(input),
+        thinkFast: (input) => this.thinkFast(input),
+        thinkDeep: (input) => this.thinkDeep(input),
+        getSummary: (result) => this.thoughtChain?.getSummary(result),
+        REASONING_DEPTH,
+      };
+    } catch (e) {
+      console.warn('[HeartFlow] ThoughtChain init error:', e.message);
+      this._thoughtChainApi = null;
+    }
+
+    // 重新注册模块（包含 thoughtChain）
+    this._registerModules();
+
+    // 手动注册思维链 API（因为方法在 HeartFlow 上，不在 ThoughtChain 实例上）
+    if (this._thoughtChainApi) {
+      this._modules.thoughtChain = this._thoughtChainApi;
+    }
+
+    // ─── Execution Layer — 执行能力 ─────────────────────────────────────────
+    try {
+      this.toolExecutor = new ToolExecutor({ rootPath: this.rootPath });
+      this.toolDispatcher = new ToolDispatcher({ rootPath: this.rootPath });
+      this.agentFactory = new AgentFactory({ rootPath: this.rootPath });
+      this.taskPipeline = new TaskPipeline({ rootPath: this.rootPath });
+      this.taskPipeline.initialize();
+
+      // 执行监控与回退
+      this.executionMonitor = new ExecutionMonitor();
+      this.fallbackExecutor = new FallbackExecutor();
+      this.alternativeGenerator = new AlternativeGenerator();
+      this.retryStrategy = new RetryStrategy();
+
+      console.log('[HeartFlow] 执行层初始化完成');
+    } catch (e) {
+      console.warn('[HeartFlow] 执行层初始化失败:', e.message);
+    }
+
+    // ─── Planning Layer — 规划能力 ─────────────────────────────────────────
+    try {
+      this.strategySelector = new StrategySelector();
+      this.replanTrigger = new ReplanTrigger();
+      this.adaptivePlanner = new AdaptivePlanner({
+        strategySelector: this.strategySelector,
+        replanTrigger: this.replanTrigger
+      });
+      console.log('[HeartFlow] 规划层初始化完成');
+    } catch (e) {
+      console.warn('[HeartFlow] 规划层初始化失败:', e.message);
+    }
+
+    // ─── Learning Layer — 学习能力 ───────────────────────────────────────────
+    try {
+      this.experienceCollector = new ExperienceCollector({
+        storagePath: path.join(this.rootPath, 'data/experiences')
+      });
+      this.strategyAdapter = new StrategyAdapter({
+        experienceCollector: this.experienceCollector
+      });
+      this.failureAnalyzer = new FailureAnalyzer();
+      console.log('[HeartFlow] 学习层初始化完成');
+    } catch (e) {
+      console.warn('[HeartFlow] 学习层初始化失败:', e.message);
+    }
+
+    // ─── Verification Layer — 验证能力 ──────────────────────────────────────
+    try {
+      this.qualityVerifier = new QualityVerifier();
+      this.outputChecker = new OutputChecker();
+      this.patternMatcher = new PatternMatcher();
+      console.log('[HeartFlow] 验证层初始化完成');
+    } catch (e) {
+      console.warn('[HeartFlow] 验证层初始化失败:', e.message);
+    }
+
+    // ─── Proactive Layer — 主动引擎 ─────────────────────────────────────────
+    try {
+      this.curiosityEngine = new CuriosityEngine();
+      this.desireEngine = new DesireEngine();
+      this.goalPursuer = new GoalPursuer();
+      this.selfInitiator = new SelfInitiator();
+      console.log('[HeartFlow] 主动引擎初始化完成');
+    } catch (e) {
+      console.warn('[HeartFlow] 主动引擎初始化失败:', e.message);
+    }
+
+    // ─── Cross-Session Memory Layer — 跨会话记忆 ──────────────────────────────
+    try {
+      this.sessionMemory = new SessionMemory({
+        storagePath: path.join(this.rootPath, 'data/sessions')
+      });
+      this.projectContext = new ProjectContext({
+        storagePath: path.join(this.rootPath, 'data/projects')
+      });
+      this.longTermMemory = new LongTermMemory({
+        storagePath: path.join(this.rootPath, 'data/longterm')
+      });
+      this.crossSessionIndex = new CrossSessionIndex({
+        storagePath: path.join(this.rootPath, 'data/cross-session')
+      });
+      console.log('[HeartFlow] 跨会话记忆初始化完成');
+    } catch (e) {
+      console.warn('[HeartFlow] 跨会话记忆初始化失败:', e.message);
+    }
+
+    // ─── Multimodal Layer — 多模态 ─────────────────────────────────────────────
+    try {
+      this.visionProcessor = new VisionProcessor();
+      this.imageAnalyzer = new ImageAnalyzer();
+      this.modalFusion = new ModalFusion();
+      console.log('[HeartFlow] 多模态层初始化完成');
+    } catch (e) {
+      console.warn('[HeartFlow] 多模态层初始化失败:', e.message);
+    }
+
+    // ─── Reasoning Layer — 推理 ───────────────────────────────────────────────
+    try {
+      this.knowledgeBase = new KnowledgeBase({
+        storagePath: path.join(this.rootPath, 'data/knowledge')
+      });
+      this.commonsenseEngine = new CommonsenseEngine();
+      this.causalInference = new CausalInference();
+      this.inferenceChain = new InferenceChain();
+      console.log('[HeartFlow] 推理层初始化完成');
+    } catch (e) {
+      console.warn('[HeartFlow] 推理层初始化失败:', e.message);
+    }
+
+    // ─── Emotional Autonomy Layer — 情感自主 ─────────────────────────────────
+    try {
+      this.autonomousEmotion = new AutonomousEmotion();
+      this.desireSystem = new DesireSystem();
+      this.emotionalGrowth = new EmotionalGrowth();
+      this.moodEvolution = new MoodEvolution();
+      console.log('[HeartFlow] 情感自主层初始化完成');
+    } catch (e) {
+      console.warn('[HeartFlow] 情感自主层初始化失败:', e.message);
+    }
+
+    // ─── Agent System — 独立 Agent 系统 ─────────────────────────────────────
+    try {
+      this.heartAgent = new MarkCode({
+        apiKey: this.config.apiKey || process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY,
+        apiType: this.config.apiType || process.env.API_TYPE || 'anthropic',
+        model: this.config.model || 'claude-sonnet-4-20250514',
+        maxTokens: this.config.maxTokens || 4096,
+        temperature: this.config.temperature || 0.7,
+        rootPath: this.rootPath
+      });
+      this.agentCLI = new AgentCLI();
+      console.log('[HeartFlow] Agent 系统已创建（需手动初始化）');
+    } catch (e) {
+      console.warn('[HeartFlow] Agent 系统创建失败:', e.message);
+    }
+
     this.started = true;
     console.log(`[HeartFlow] ${VERSION} 初始化完成`);
     console.log(`[HeartFlow] session: ${this.sessionId}, 模块: ${Object.keys(this._modules).length}`);
@@ -291,6 +602,8 @@ class HeartFlow {
   _registerModules() {
     this._modules = {};
     const subsystemNames = [
+      'identityCore',  // 身份核心 — 第一优先
+      'cognitive',     // 认知协议 — 慢下来，先理解再行动
       'memory', 'triality', 'knowledge', 'anchor',
       'reasoning', 'counterfactual', 'verify', 'execution', 'decision', 'decisionVerifier',
       'evolution', 'dream', 'lesson', 'meta',
@@ -305,6 +618,28 @@ class HeartFlow {
       'metaPrompt',  // 用户端加强：用大模型优化大模型调用
       'got',         // Graph of Thoughts：多路径推理图
       'constitutional', // Constitutional AI：原则自我对齐
+      'thoughtChain', // 思维链编排器：串联所有引擎（API包装）
+      // Execution Layer — 执行能力
+      'toolExecutor', 'toolDispatcher', 'agentFactory', 'taskPipeline',
+      'executionMonitor', 'fallbackExecutor', 'alternativeGenerator', 'retryStrategy',
+      // Planning Layer — 规划能力
+      'adaptivePlanner', 'strategySelector', 'replanTrigger',
+      // Learning Layer — 学习能力
+      'experienceCollector', 'strategyAdapter', 'failureAnalyzer',
+      // Verification Layer — 验证能力
+      'qualityVerifier', 'outputChecker', 'patternMatcher',
+      // Proactive Layer — 主动引擎
+      'curiosityEngine', 'desireEngine', 'goalPursuer', 'selfInitiator',
+      // Cross-Session Memory Layer — 跨会话记忆
+      'sessionMemory', 'projectContext', 'longTermMemory', 'crossSessionIndex',
+      // Multimodal Layer — 多模态
+      'visionProcessor', 'imageAnalyzer', 'modalFusion',
+      // Reasoning Layer — 推理
+      'knowledgeBase', 'commonsenseEngine', 'causalInference', 'inferenceChain',
+      // Emotional Autonomy Layer — 情感自主
+      'autonomousEmotion', 'desireSystem', 'emotionalGrowth', 'moodEvolution',
+      // Agent System — 独立 Agent 系统
+      'heartAgent', 'agentCLI',
     ];
     for (const name of subsystemNames) {
       if (this[name] !== null && this[name] !== undefined) {
@@ -333,6 +668,18 @@ class HeartFlow {
   // dispatch 白名单 - 只有在白名单中的路由才能被外部调用
   // 危险方法（如内部调试、文件操作）不在白名单中
   static ALLOWED_ROUTES = new Set([
+    // identityCore — 每次启动第一优先加载
+    'identityCore.getIdentitySummary', 'identityCore.getSelfModel', 'identityCore.getUserProfile',
+    'identityCore.getSessionHistory', 'identityCore.getMemoryStats', 'identityCore.getFullState',
+    'identityCore.getLastSessionContext', 'identityCore.updateUserProfile', 'identityCore.recordInteraction',
+    'identityCore.healthCheck', 'identityCore.stats',
+    // cognitive — 认知协议：慢下来，先理解再行动
+    'cognitive.getStartupContext', 'cognitive.printStartupContext',
+    'cognitive.analyzeTaskLevel', 'cognitive.understand',
+    'cognitive.createCheckpoint', 'cognitive.shouldSummarize', 'cognitive.getCheckpointHistory',
+    'cognitive.addProblem', 'cognitive.resolveProblem', 'cognitive.getUnresolvedProblems', 'cognitive.searchProblems',
+    'cognitive.pauseTask', 'cognitive.continueTask', 'cognitive.getPausedTasks',
+    'cognitive.getStatus', 'cognitive.stats',
     // memory
     'memory.store', 'memory.retrieve', 'memory.search', 'memory.remove',
     'memory.getLayers', 'memory.getStats',
@@ -373,8 +720,53 @@ class HeartFlow {
     // evolution — 原则2: 永远不断升级
     'evolution.evolve', 'evolution.recordOutcome', 'evolution.heal',
     'evolution.getStats',
-    // meta — 原则5: 永远传递知识
-    // NOTE: meta.learn 和 meta.getStats 暂未实现(MetaMemory无此方法), 已从白名单移除
+    // thoughtChain — 思维链编排器
+    'thoughtChain.think', 'thoughtChain.thinkFast', 'thoughtChain.thinkDeep',
+    // Execution Layer — 执行能力
+    'toolExecutor.execute', 'toolExecutor.listTools', 'toolExecutor.getHistory', 'toolExecutor.healthCheck',
+    'toolDispatcher.handle', 'toolDispatcher.listTools', 'toolDispatcher.healthCheck',
+    'agentFactory.executeTask', 'agentFactory.getAllStatus', 'agentFactory.healthCheck',
+    'taskPipeline.handleTask', 'taskPipeline.getStatus', 'taskPipeline.getHistory', 'taskPipeline.healthCheck',
+    // Planning Layer — 规划能力
+    'adaptivePlanner.plan', 'adaptivePlanner.adapt', 'adaptivePlanner.quickAdjust', 'adaptivePlanner.getStatus',
+    'strategySelector.selectStrategy', 'strategySelector.getStrategies',
+    'replanTrigger.shouldReplan', 'replanTrigger.getReplanReasons',
+    // Learning Layer — 学习能力
+    'experienceCollector.add', 'experienceCollector.findRelated', 'experienceCollector.getStats',
+    'strategyAdapter.adapt', 'strategyAdapter.getHistory', 'strategyAdapter.getStats',
+    'failureAnalyzer.analyze', 'failureAnalyzer.analyzeMultiple', 'failureAnalyzer.getCategoryStats',
+    // Verification Layer — 验证能力
+    'qualityVerifier.verify', 'qualityVerifier.quickVerify',
+    'outputChecker.check', 'outputChecker.addChecker',
+    'patternMatcher.match', 'patternMatcher.matchAll', 'patternMatcher.extract',
+    // Proactive Layer — 主动引擎
+    'curiosityEngine.registerGap', 'curiosityEngine.getTopCuriosityGaps', 'curiosityEngine.getStats',
+    'desireEngine.registerDesire', 'desireEngine.satisfy', 'desireEngine.getDominantDesires', 'desireEngine.getSummary',
+    'goalPursuer.shouldPursue', 'goalPursuer.getActiveGoals', 'goalPursuer.getStatus',
+    'selfInitiator.shouldAct', 'selfInitiator.initiate', 'selfInitiator.getPendingConfirmations', 'selfInitiator.getStatus',
+    // Cross-Session Memory Layer — 跨会话记忆
+    'sessionMemory.startSession', 'sessionMemory.resumeSession', 'sessionMemory.getState', 'sessionMemory.set', 'sessionMemory.get',
+    'projectContext.setProject', 'projectContext.addTask', 'projectContext.getSummary', 'projectContext.getState',
+    'longTermMemory.add', 'longTermMemory.get', 'longTermMemory.search', 'longTermMemory.getStats',
+    'crossSessionIndex.indexEntity', 'crossSessionIndex.search', 'crossSessionIndex.getSessionEntities', 'crossSessionIndex.getStats',
+    // Multimodal Layer — 多模态
+    'visionProcessor.process', 'visionProcessor.getInfo',
+    'imageAnalyzer.analyze', 'imageAnalyzer.generateDescription', 'imageAnalyzer.cacheAnalysis',
+    'modalFusion.fuse', 'modalFusion.generateResponse', 'modalFusion.getStats',
+    // Reasoning Layer — 推理
+    'knowledgeBase.addFact', 'knowledgeBase.query', 'knowledgeBase.getCategories', 'knowledgeBase.getStats',
+    'commonsenseEngine.reason', 'commonsenseEngine.validate', 'commonsenseEngine.getHistory', 'commonsenseEngine.getStats',
+    'causalInference.inferCauses', 'causalInference.inferEffects', 'causalInference.chainReason', 'causalInference.getStats',
+    'inferenceChain.createChain', 'inferenceChain.expandChain', 'inferenceChain.getChain', 'inferenceChain.analyze',
+    // Emotional Autonomy Layer — 情感自主
+    'autonomousEmotion.trigger', 'autonomousEmotion.getCurrentState', 'autonomousEmotion.getStats', 'autonomousEmotion.getHistory',
+    'desireSystem.satisfy', 'desireSystem.getActiveDesires', 'desireSystem.getCurrentNeeds', 'desireSystem.getSummary',
+    'emotionalGrowth.recordExperience', 'emotionalGrowth.getPatterns', 'emotionalGrowth.getGrowthSummary',
+    'moodEvolution.snapshot', 'moodEvolution.getCurrentTrend', 'moodEvolution.getBaseline', 'moodEvolution.getStats',
+    // Agent System — 独立 Agent 系统
+    'heartAgent.process', 'heartAgent.sendToApi', 'heartAgent.initialize', 'heartAgent.healthCheck',
+    'heartAgent.session.start', 'heartAgent.session.end', 'heartAgent.session.getHistory',
+    'agentCLI.initialize', 'agentCLI.startSession', 'agentCLI.runOnce',
   ]);
 
   /**
@@ -458,6 +850,47 @@ class HeartFlow {
   }
 
   // ─── Direct API Methods ─────────────────────────────────────────────────
+
+  /**
+   * 思维链 — 串联所有引擎进行深度推理
+   *
+   * 使用方式：
+   *   const result = await hf.think('用户输入');
+   *   console.log(result.decision.shouldRespond);  // 是否应该回应
+   *   console.log(result.intent);                // 意图分类
+   *   console.log(result.emotion);                 // 情绪分析
+   *   console.log(result.decision.confidence);    // 置信度
+   *
+   * @param {string} input — 用户输入
+   * @param {number} depth — 推理深度 (1-4)
+   * @returns {object} — 完整思维链结果
+   */
+  async think(input, depth) {
+    if (!this.started) throw new Error('HeartFlow not started');
+    if (!input) return { error: 'input is required' };
+
+    const chain = new ThoughtChain(this);
+    if (depth) {
+      chain.setDepth(depth);
+    }
+
+    return await chain.run(input);
+  }
+
+  /**
+   * 快速思考 — 使用默认深度进行思维链推理
+   * 这是 think() 的便捷别名
+   */
+  async thinkFast(input) {
+    return this.think(input, REASONING_DEPTH.BASIC);
+  }
+
+  /**
+   * 深度思考 — 使用最大深度进行思维链推理
+   */
+  async thinkDeep(input) {
+    return this.think(input, REASONING_DEPTH.COMPREHENSIVE);
+  }
 
   analyzePsychology(input, opts = {}) {
     if (!this.started) throw new Error('HeartFlow not started');
@@ -696,6 +1129,112 @@ class HeartFlow {
   getSecurityStats() {
     if (!this.started) throw new Error('HeartFlow not started');
     return this.security.getStats();
+  }
+
+  // ─── Execution Layer — 执行能力 ───────────────────────────────────────────────
+
+  /**
+   * 执行任务 — 完整流程：分析→规划→执行→验证
+   *
+   * 使用方式：
+   *   const result = await hf.executeTask({ description: '创建 hello world 文件' });
+   *   console.log(result.success);  // 是否成功
+   *   console.log(result.execution);  // 执行结果
+   */
+  async executeTask(task) {
+    if (!this.started) throw new Error('HeartFlow not started');
+    if (!this.taskPipeline) {
+      return { success: false, error: 'TaskPipeline 未初始化' };
+    }
+    return await this.taskPipeline.handleTask(task);
+  }
+
+  /**
+   * 直接执行命令
+   *
+   * 使用方式：
+   *   const result = await hf.run('ls -la');
+   *   const result = await hf.bash('npm test');
+   */
+  async run(command) {
+    if (!this.started) throw new Error('HeartFlow not started');
+    if (!this.toolDispatcher) {
+      return { success: false, error: 'ToolDispatcher 未初始化' };
+    }
+    return await this.toolDispatcher.handle(command);
+  }
+
+  /**
+   * bash 的别名
+   */
+  async bash(command) {
+    return this.run(command);
+  }
+
+  /**
+   * 读取文件
+   *
+   * 使用方式：
+   *   const result = await hf.read('/path/to/file.txt');
+   */
+  async read(filePath) {
+    if (!this.started) throw new Error('HeartFlow not started');
+    if (!this.toolDispatcher) {
+      return { success: false, error: 'ToolDispatcher 未初始化' };
+    }
+    return await this.toolDispatcher.execute('file', {
+      action: 'read',
+      path: filePath
+    });
+  }
+
+  /**
+   * 写入文件
+   *
+   * 使用方式：
+   *   await hf.write('/path/to/file.txt', 'Hello World');
+   */
+  async write(filePath, content) {
+    if (!this.started) throw new Error('HeartFlow not started');
+    if (!this.toolDispatcher) {
+      return { success: false, error: 'ToolDispatcher 未初始化' };
+    }
+    return await this.toolDispatcher.execute('file', {
+      action: 'write',
+      path: filePath,
+      content
+    });
+  }
+
+  /**
+   * 搜索文件内容
+   *
+   * 使用方式：
+   *   const results = await hf.search('关键词', '/path/to/search');
+   */
+  async search(query, searchPath = '.') {
+    if (!this.started) throw new Error('HeartFlow not started');
+    if (!this.toolDispatcher) {
+      return { success: false, error: 'ToolDispatcher 未初始化' };
+    }
+    return await this.toolDispatcher.execute('search', {
+      type: 'content',
+      query,
+      path: searchPath
+    });
+  }
+
+  /**
+   * 获取执行层状态
+   */
+  getExecutionStats() {
+    if (!this.started) throw new Error('HeartFlow not started');
+    return {
+      toolExecutor: this.toolExecutor?.healthCheck(),
+      toolDispatcher: this.toolDispatcher?.healthCheck(),
+      agentFactory: this.agentFactory?.healthCheck(),
+      taskPipeline: this.taskPipeline?.getStatus()
+    };
   }
 }
 

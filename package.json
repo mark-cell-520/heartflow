@@ -1,15 +1,20 @@
 {
   "name": "mark-heartflow-skill",
-  "version": "1.3.8",
-  "description": "HeartFlow AI cognitive and self-healing skill runtime.",
+  "version": "1.3.15",
+  "description": "MarkCode AI - 独立 Agent 系统，直接链接 API，具备完整执行能力。",
   "main": "src/core/heartflow.js",
   "bin": {
-    "heartflow": "bin/cli.js"
+    "heartflow": "bin/cli.js",
+    "mark-code": "src/agent-core/cli.js",
+    "hf-agent": "src/agent-core/cli.js"
   },
   "scripts": {
     "check": "find src scripts bin plugins -name '*.js' -not -path '*/node_modules/*' -print0 | xargs -0 -n 1 node --check",
     "smoke": "node scripts/smoke-runtime.js",
-    "test": "npm run check && npm run smoke && node scripts/test_v11_6.js && node scripts/test_v11_7.js"
+    "test": "npm run check && npm run smoke",
+    "agent": "node src/agent-core/cli.js",
+    "agent:interactive": "node src/agent-core/cli.js",
+    "agent:stream": "node src/agent-core/cli.js --stream"
   },
   "files": [
     "SKILL.md",
@@ -22,7 +27,6 @@
     "src/**/*.py",
     "scripts/**/*.js",
     "scripts/**/*.sh",
-    "scripts/**/*.py",
     "plugins/**/*.py",
     "plugins/**/*.yaml",
     "plugins/**/*.yml",

@@ -414,11 +414,16 @@ class TruthfulnessChecker {
   }
 
   /**
-   * [NEW] 语义熵幻觉检测 (Semantic Entropy)
+   * [简化实现] 语义熵幻觉检测 (Semantic Entropy Proxy)
    * Paper: "Detecting hallucinations in LLMs using semantic entropy" (2024)
    *
-   * 原理: 高语义熵 = 高不确定性 = 更可能是幻觉
-   * 通过分析生成文本的语义多样性来检测幻觉
+   * 注意: 这是基于词汇特征的简化代理计算，不是真正的语义熵。
+   * 真正的语义熵需要:
+   * 1. 使用LLM生成多个语义等价复述
+   * 2. 计算这些复述之间的语义距离
+   * 3. 基于语义不一致程度计算熵
+   *
+   * 本实现使用词汇重复率、数字密度、引用存在等特征作为代理指标。
    *
    * @param {string} statement - 待检测文本
    * @returns {object} - { entropy, hallucinationRisk, interpretation }

@@ -1,9 +1,9 @@
 ---
 name: heartflow
-version: "1.3.13"
+version: "1.3.15"
 title: "HeartFlow / 心虫"
 description: >
-  HeartFlow v1.3.9 — AI 认知与自愈引擎。
+  HeartFlow v1.3.15 — AI 认知与自愈引擎。
   核心能力：三层记忆(MeaningfulMemory/Triality)、自愈RL(Q-table)、自优化(Self-Refine+Reflexion)、
   决策验证、遗忘曲线(Ebbinghaus)、心理诊断引擎(PsychologyEngine)、共情检测(EmpathyDetector)、
   情绪理性(EmotionalProtocol)、4框架伦理哲学(PhilosophyEngine)、身份规则系统(IdentityRules)、
@@ -22,7 +22,7 @@ tags:
   - reasoning
 ---
 
-# HeartFlow / 心虫 v1.3.9
+# HeartFlow / 心虫 v1.3.15
 
 **An AI capability layer that survives context switches, model changes, and restarts.**
 
@@ -163,6 +163,26 @@ hf.dreamNow();                  // 触发梦
 hf.checkTruthfulness(stmt);     // 真实性核查
 hf.detectIdentityDrift();       // 身份漂移检测
 hf.processEmotionally(input);   // 情绪处理
+
+// ─── 思维链 v2.0 — 串联所有引擎形成统一推理 ─────────────────────────────
+// 核心：45个引擎不再是独立调用，而是串联成一条思维链
+// 阶段：PARSE → HYPOTHESES → INVERT → EVIDENCE → SYNTHESIS → CALIBRATE → RESPOND
+//
+// v2.0 改进：任务策略自适应、并行假设生成、逆向思维证明自我错误、
+// 证据质量评估而非数量、明确的不确定性表达
+hf.think(input);        // 基础思维链（深度=2）
+hf.thinkFast(input);    // 快速思维链（深度=1，跳过验证阶段）
+hf.thinkDeep(input);    // 深度思维链（深度=4，全部阶段执行）
+hf.dispatch('thoughtChain.think', 'input');  // 通过 dispatch 调用
+
+// 思维链返回结果
+const result = await hf.thinkDeep('如何提高学习效率？');
+result.decision.shouldRespond;   // 是否应该回应
+result.decision.confidence;      // 置信度 0-1
+result.decision.reasoningChain; // 推理步骤
+result.intent;                 // 意图分类
+result.emotion;                 // 情绪分析
+result.verification;            // 验证结果
 ```
 
 ---
