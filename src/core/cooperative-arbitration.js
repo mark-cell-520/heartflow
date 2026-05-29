@@ -643,7 +643,7 @@ class CooperativeArbitration {
    */
   stats() {
     return {
-      version: '11.7.2',
+      version: '1.5.3',
       currentMode: this.state.mode,
       tension: this.state.tension,
       alignment: this.state.alignment,
