@@ -382,7 +382,7 @@ class ConfidenceCalibrator {
         records: this.records.slice(-50),
         weights: this.weights,
         thresholds: this.thresholds,
-        version: '11.6.2',
+        version: '11.7.2',
       }, null, 2));
     } catch (e) {
       // 忽略
@@ -407,7 +407,7 @@ class ConfidenceCalibrator {
 
   stats() {
     return {
-      version: '11.6.2',
+      version: '11.7.2',
       records: this.records.length,
       weights: this.weights,
       thresholds: this.thresholds,
