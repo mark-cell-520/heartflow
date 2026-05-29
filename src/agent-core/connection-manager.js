@@ -43,7 +43,6 @@ class ConnectionManager extends EventEmitter {
    */
   async connect(config) {
     if (this.state === 'connected' || this.state === 'connecting') {
-      console.log('[ConnectionManager] 已经连接或正在连接');
       return;
     }
 
@@ -109,8 +108,6 @@ class ConnectionManager extends EventEmitter {
    * 断开连接
    */
   async disconnect(reason = 'manual') {
-    console.log(`[ConnectionManager] 断开连接: ${reason}`);
-
     this._clearTimers();
     this.state = 'disconnected';
     this.connection = null;
@@ -152,7 +149,6 @@ class ConnectionManager extends EventEmitter {
     }
 
     if (this.reconnectAttempts >= this.options.maxReconnectAttempts) {
-      console.log('[ConnectionManager] 达到最大重连次数');
       this.emit('reconnect_failed', {
         attempts: this.reconnectAttempts
       });
@@ -162,8 +158,6 @@ class ConnectionManager extends EventEmitter {
 
     this.reconnectAttempts++;
     this.state = 'reconnecting';
-
-    console.log(`[ConnectionManager] 尝试重连 (${this.reconnectAttempts}/${this.options.maxReconnectAttempts})`);
 
     this.emit('reconnecting', {
       attempt: this.reconnectAttempts,
@@ -178,8 +172,6 @@ class ConnectionManager extends EventEmitter {
     try {
       await this.connect(this.config);
     } catch (error) {
-      console.log(`[ConnectionManager] 重连失败: ${error.message}`);
-
       // 继续重连
       if (this.options.reconnect) {
         this._scheduleReconnect();
@@ -217,11 +209,8 @@ class ConnectionManager extends EventEmitter {
         this.lastHeartbeat = Date.now();
         this.emit('heartbeat', { timestamp: this.lastHeartbeat });
       } catch (error) {
-        console.log('[ConnectionManager] 心跳失败:', error.message);
-
         // 检查是否超时
         if (Date.now() - this.lastHeartbeat > this.options.idleTimeout) {
-          console.log('[ConnectionManager] 连接空闲超时');
           this.emit('idle_timeout');
           await this.disconnect('idle_timeout');
         }
@@ -306,8 +295,8 @@ class WebSocketManager extends ConnectionManager {
 
       const mockConn = {
         id: `ws-${Date.now()}`,
-        send: (data) => console.log('[WS] 发送:', data),
-        close: () => console.log('[WS] 关闭')
+        send: (data) => {},
+        close: () => {}
       };
 
       resolve(mockConn);

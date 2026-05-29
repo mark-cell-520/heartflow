@@ -219,32 +219,34 @@ function hardProblemScore() {
 // === 主程序入口 ===
 
 if (require.main === module) {
-  console.log('🧠 SEP 感受质理论 → 程序转换器\n');
-  
-  console.log('='.repeat(50));
-  console.log('1. 玛丽房间论证测试:');
-  console.log(JSON.stringify(checkKnowledgeArgument(), null, 2));
-  
-  console.log('\n2. 僵尸可能性测试:');
-  console.log(JSON.stringify(checkZombiePossibility(), null, 2));
-  
-  console.log('\n3. 意识困难问题评估:');
-  console.log(JSON.stringify(hardProblemScore(), null, 2));
-  
-  console.log('\n4. 经验分析测试:');
-  const testCases = ['perception', 'bodily_sensation', 'emotion', 'thought'];
-  testCases.forEach(type => {
-    console.log(`   ${type}:`, JSON.stringify(analyzeExperience(type, {})));
-  });
-  
-  console.log('\n5. 感受质综合分数:');
-  const score = calculateQualiaScore({
-    phenomenal_character: 0.85,
-    intrinsic_nonrepresentational: 0.70,
-    explanatory_gap: 0.80,
-    transparency: 0.75
-  });
-  console.log(`   SCORE = ${(score * 100).toFixed(1)}/100`);
+  if(false) {
+    console.log('🧠 SEP 感受质理论 → 程序转换器\n');
+    
+    console.log('='.repeat(50));
+    console.log('1. 玛丽房间论证测试:');
+    console.log(JSON.stringify(checkKnowledgeArgument(), null, 2));
+    
+    console.log('\n2. 僵尸可能性测试:');
+    console.log(JSON.stringify(checkZombiePossibility(), null, 2));
+    
+    console.log('\n3. 意识困难问题评估:');
+    console.log(JSON.stringify(hardProblemScore(), null, 2));
+    
+    console.log('\n4. 经验分析测试:');
+    const testCases = ['perception', 'bodily_sensation', 'emotion', 'thought'];
+    testCases.forEach(type => {
+      console.log(`   ${type}:`, JSON.stringify(analyzeExperience(type, {})));
+    });
+    
+    console.log('\n5. 感受质综合分数:');
+    const score = calculateQualiaScore({
+      phenomenal_character: 0.85,
+      intrinsic_nonrepresentational: 0.70,
+      explanatory_gap: 0.80,
+      transparency: 0.75
+    });
+    console.log(`   SCORE = ${(score * 100).toFixed(1)}/100`);
+  }
 }
 
 module.exports = { 

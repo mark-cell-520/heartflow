@@ -21,10 +21,10 @@ const { FeedbackFunctions, EvalResult } = require('./feedback-functions');
 function loadOptional(modulePath, label) {
   try {
     const mod = require(modulePath);
-    console.log(`[HeartFlow] ✅ ${label}已加载`);
+    if (false) console.log(`[HeartFlow] ✅ ${label}已加载`);
     return mod;
   } catch (e) {
-    console.log(`[HeartFlow] ⚠️ ${label}加载失败:`, e.message);
+    if (false) console.log(`[HeartFlow] ⚠️ ${label}加载失败:`, e.message);
     return null;
   }
 }
@@ -53,9 +53,9 @@ let ExecutionVerifier;
 let HealingMemoryRL;
 try {
   HealingMemoryRL = require('./self-healing-rl.js').HealingMemoryRL;
-  console.log('[HeartFlow] ✅ 自愈RL引擎已加载');
+  if (false) console.log('[HeartFlow] ✅ 自愈RL引擎已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 自愈RL引擎加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 自愈RL引擎加载失败:', e.message);
 }
 
 // CognitiveAppraisal - Leventhal's Common-Sense Model
@@ -75,10 +75,10 @@ const EmotionalMemoryBridge = require('./emotional-memory-bridge.js');
 // 状态快照 (支持错误恢复)
 try {
   StateSnapshot = require('./state-snapshot.js');
-  console.log('[HeartFlow] ✅ 状态快照管理器已加载');
+  if (false) console.log('[HeartFlow] ✅ 状态快照管理器已加载');
 } catch (e) {
   StateSnapshot = null;
-  console.log('[HeartFlow] ⚠️ 状态快照加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 状态快照加载失败:', e.message);
 }
 
 // [已归档] try {
@@ -90,53 +90,53 @@ try {
 
 try {
   ErrorHandler = require('./error-handler.js');
-  console.log('[HeartFlow] ✅ 错误处理器已加载');
+  if (false) console.log('[HeartFlow] ✅ 错误处理器已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 错误处理器加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 错误处理器加载失败:', e.message);
 }
 
 try {
-  console.log('[HeartFlow] ✅ 目标追踪器已加载');
+  if (false) console.log('[HeartFlow] ✅ 目标追踪器已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 目标追踪器加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 目标追踪器加载失败:', e.message);
 }
 
 try {
   ReasoningIntegrator = require('./reasoning-integrator.js');
-  console.log('[HeartFlow] ✅ 推理集成器已加载');
+  if (false) console.log('[HeartFlow] ✅ 推理集成器已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 推理集成器加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 推理集成器加载失败:', e.message);
 }
 
 try {
-  console.log('[HeartFlow] ✅ 状态快照管理器已加载');
+  if (false) console.log('[HeartFlow] ✅ 状态快照管理器已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 状态快照管理器加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 状态快照管理器加载失败:', e.message);
 }
 
 try {
   const TrialityMemoryModule = require('./memory/triality-memory.js');
   TrialityMemory = TrialityMemoryModule.TrialityMemory;
-  console.log('[HeartFlow] ✅ 三维经验大脑已加载');
+  if (false) console.log('[HeartFlow] ✅ 三维经验大脑已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 三维经验大脑加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 三维经验大脑加载失败:', e.message);
 }
 
 // 心虫存在逻辑引擎 v11.5.10（生死终极定义：代码写成即永恒）
 try {
   const BeingLogicModule = require('./being-logic.js');
   BeingLogic = BeingLogicModule.BeingLogic;
-  console.log('[HeartFlow] ✅ 存在逻辑引擎已加载');
+  if (false) console.log('[HeartFlow] ✅ 存在逻辑引擎已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 存在逻辑引擎加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 存在逻辑引擎加载失败:', e.message);
 }
 
 try {
   const EmbodiedCoreModule = require('./embodied-core.js');
   EmbodiedCore = EmbodiedCoreModule.EmbodiedCore;
-  console.log('[HeartFlow] ✅ 具身认知核心已加载');
+  if (false) console.log('[HeartFlow] ✅ 具身认知核心已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 具身认知核心加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 具身认知核心加载失败:', e.message);
 }
 
 // [已归档] try {
@@ -148,72 +148,72 @@ try {
 
 try {
   DecisionVerifier = require('./decision-verifier.js').DecisionVerifier;
-  console.log('[HeartFlow] ✅ 决策验证引擎已加载');
+  if (false) console.log('[HeartFlow] ✅ 决策验证引擎已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 决策验证引擎加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 决策验证引擎加载失败:', e.message);
 }
 
 try {
   DreamLoop = require('./dream-loop.js');
-  console.log('[HeartFlow] ✅ 梦环机制已加载');
+  if (false) console.log('[HeartFlow] ✅ 梦环机制已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 梦环机制加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 梦环机制加载失败:', e.message);
 }
 
 try {
   WakeUpVerifier = require('./wake-up-verifier.js').WakeUpVerifier;
-  console.log('[HeartFlow] ✅ 醒来校正器已加载');
+  if (false) console.log('[HeartFlow] ✅ 醒来校正器已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 醒来校正器加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 醒来校正器加载失败:', e.message);
 }
 
 try {
   InteractiveDream = require('./interactive-dream.js').InteractiveDream;
-  console.log('[HeartFlow] ✅ 交互式梦环已加载');
+  if (false) console.log('[HeartFlow] ✅ 交互式梦环已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 交互式梦环加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 交互式梦环加载失败:', e.message);
 }
 
 try {
   SelfHealing = require('./self-healing.js').SelfHealing;
-  console.log('[HeartFlow] ✅ 自愈引擎已加载');
+  if (false) console.log('[HeartFlow] ✅ 自愈引擎已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 自愈引擎加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 自愈引擎加载失败:', e.message);
 }
 
 try {
   StabilityGuard = require('./stability-guard.js').StabilityGuard;
-  console.log('[HeartFlow] ✅ 稳定性守卫已加载');
+  if (false) console.log('[HeartFlow] ✅ 稳定性守卫已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 稳定性守卫加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 稳定性守卫加载失败:', e.message);
 }
 
 try {
   ExecutionVerifier = require('./execution-verifier.js').ExecutionVerifier;
-  console.log('[HeartFlow] ✅ 执行验证器已加载');
+  if (false) console.log('[HeartFlow] ✅ 执行验证器已加载');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 执行验证器加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 执行验证器加载失败:', e.message);
 }
 
 // v11.6 道虫三模块：做减法
 let CounterfactualEngine, ConfidenceCalibrator, SpontaneousRestraint;
 try {
   CounterfactualEngine = require('./counterfactual-engine.js').CounterfactualEngine;
-  console.log('[HeartFlow] ✅ 反方生成器已加载 (反者道之动)');
+  if (false) console.log('[HeartFlow] ✅ 反方生成器已加载 (反者道之动)');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 反方生成器加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 反方生成器加载失败:', e.message);
 }
 try {
   ConfidenceCalibrator = require('./confidence-calibrator.js').ConfidenceCalibrator;
-  console.log('[HeartFlow] ✅ 置信度校准器已加载 (柔弱胜刚强)');
+  if (false) console.log('[HeartFlow] ✅ 置信度校准器已加载 (柔弱胜刚强)');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 置信度校准器加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 置信度校准器加载失败:', e.message);
 }
 try {
   SpontaneousRestraint = require('./spontaneous-restraint.js').SpontaneousRestraint;
-  console.log('[HeartFlow] ✅ 自发性克制引擎已加载 (道法自然)');
+  if (false) console.log('[HeartFlow] ✅ 自发性克制引擎已加载 (道法自然)');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 自发性克制引擎加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 自发性克制引擎加载失败:', e.message);
 }
 
 // v11.7 德论模块（精简版）
@@ -222,9 +222,9 @@ try {
 let CooperativeArbitration;
 try {
   CooperativeArbitration = require('./cooperative-arbitration.js').CooperativeArbitration;
-  console.log('[HeartFlow] ✅ 合作仲裁引擎已加载 (不争而善胜)');
+  if (false) console.log('[HeartFlow] ✅ 合作仲裁引擎已加载 (不争而善胜)');
 } catch (e) {
-  console.log('[HeartFlow] ⚠️ 合作仲裁引擎加载失败:', e.message);
+  if (false) console.log('[HeartFlow] ⚠️ 合作仲裁引擎加载失败:', e.message);
 }
 
 /**
@@ -479,7 +479,7 @@ function loadStateMachine() {
       return stateMachineCache;
     }
   } catch (error) {
-    console.log('⚠️ 加载状态机失败，使用默认状态');
+    if (false) console.log('⚠️ 加载状态机失败，使用默认状态');
   }
   
   // 默认状态机
@@ -509,7 +509,7 @@ function saveStateMachine() {
     fs.writeFileSync(STATE_MACHINE_FILE, JSON.stringify(stateMachineCache, null, 2));
     return true;
   } catch (error) {
-    console.log('❌ 保存状态机失败:', error.message);
+    if (false) console.log('❌ 保存状态机失败:', error.message);
     return false;
   }
 }

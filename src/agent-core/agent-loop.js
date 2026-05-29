@@ -46,11 +46,8 @@ class AgentLoop extends EventEmitter {
    */
   async start() {
     if (this.isRunning) {
-      console.log('[AgentLoop] 已经在运行');
       return;
     }
-
-    console.log('[AgentLoop] 启动中...');
     this.isRunning = true;
     this.shouldStop = false;
     this.shouldPause = false;
@@ -63,14 +60,13 @@ class AgentLoop extends EventEmitter {
     // 开始处理循环
     await this._runLoop();
 
-    console.log('[AgentLoop] 已停止');
+
   }
 
   /**
    * 停止 Loop
    */
   async stop(reason = 'manual') {
-    console.log(`[AgentLoop] 停止中: ${reason}`);
     this.shouldStop = true;
     this.isRunning = false;
 
@@ -84,7 +80,6 @@ class AgentLoop extends EventEmitter {
    * 暂停 Loop
    */
   async pause(reason = 'manual') {
-    console.log(`[AgentLoop] 暂停中: ${reason}`);
     this.shouldPause = true;
     this.state = 'paused';
     this._clearTimers();
@@ -97,11 +92,8 @@ class AgentLoop extends EventEmitter {
    */
   async resume() {
     if (this.state !== 'paused') {
-      console.log('[AgentLoop] 当前未暂停');
       return;
     }
-
-    console.log('[AgentLoop] 恢复中...');
     this.shouldPause = false;
     this.state = 'running';
     this._startHeartbeat();
@@ -114,7 +106,6 @@ class AgentLoop extends EventEmitter {
    */
   async interrupt(reason = 'manual') {
     if (this.currentTask) {
-      console.log(`[AgentLoop] 中断任务: ${reason}`);
       this.currentTask.interrupted = true;
       this.currentTask.interruptReason = reason;
 
@@ -165,7 +156,6 @@ class AgentLoop extends EventEmitter {
     while (!this.shouldStop && !this.shouldPause) {
       // 检查迭代次数
       if (this.iterations >= this.options.maxIterations) {
-        console.log(`[AgentLoop] 达到最大迭代次数: ${this.iterations}`);
         await this.stop('max_iterations');
         break;
       }
@@ -271,7 +261,6 @@ class AgentLoop extends EventEmitter {
 
       // 检查是否超时
       if (Date.now() - this.lastActivity > this.options.idleTimeout) {
-        console.log('[AgentLoop] 空闲超时，停止');
         await this.stop('idle_timeout');
         break;
       }

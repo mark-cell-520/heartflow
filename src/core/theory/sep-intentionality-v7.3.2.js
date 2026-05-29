@@ -203,39 +203,41 @@ function analyzeIntentionality(thought) {
 // === 主程序入口 ===
 
 if (require.main === module) {
-  console.log('🧠 SEP 意向性理论 → 程序转换器\n');
-  
-  console.log('='.repeat(50));
-  console.log('1. 布伦塔诺论题检验:');
-  console.log(JSON.stringify(checkBrentanoThesis('belief'), null, 2));
-  
-  console.log('\n2. 意向性分析测试:');
-  const testThoughts = [
-    '我相信宙斯是神',
-    '我想念安娜·卡列尼娜',
-    '我在寻找青春之泉',
-    '我看到一只狗',
-    '我相信2+2=4'
-  ];
-  
-  testThoughts.forEach(thought => {
-    console.log(`\n   "${thought}":`);
-    console.log('   ', JSON.stringify(analyzeIntentionality(thought)));
-  });
-  
-  console.log('\n3. 意向性综合分数:');
-  const score = calculateIntentionalityScore({
-    directedness: 0.95,
-    representation: 0.90,
-    content: 0.88,
-    about_nonexistent: 0.75
-  });
-  console.log(`   SCORE = ${(score * 100).toFixed(1)}/100`);
-  
-  console.log('\n4. 核心公式:');
-  console.log('   意向性 = 心理状态.指向(对象)');
-  console.log('   布伦塔诺论题: 意向性 = 心灵标记');
-  console.log('   弗雷格: 指称 + 意义');
+  if(false) {
+    console.log('🧠 SEP 意向性理论 → 程序转换器\n');
+    
+    console.log('='.repeat(50));
+    console.log('1. 布伦塔诺论题检验:');
+    console.log(JSON.stringify(checkBrentanoThesis('belief'), null, 2));
+    
+    console.log('\n2. 意向性分析测试:');
+    const testThoughts = [
+      '我相信宙斯是神',
+      '我想念安娜·卡列尼娜',
+      '我在寻找青春之泉',
+      '我看到一只狗',
+      '我相信2+2=4'
+    ];
+    
+    testThoughts.forEach(thought => {
+      console.log(`\n   "${thought}":`);
+      console.log('   ', JSON.stringify(analyzeIntentionality(thought)));
+    });
+    
+    console.log('\n3. 意向性综合分数:');
+    const score = calculateIntentionalityScore({
+      directedness: 0.95,
+      representation: 0.90,
+      content: 0.88,
+      about_nonexistent: 0.75
+    });
+    console.log(`   SCORE = ${(score * 100).toFixed(1)}/100`);
+    
+    console.log('\n4. 核心公式:');
+    console.log('   意向性 = 心理状态.指向(对象)');
+    console.log('   布伦塔诺论题: 意向性 = 心灵标记');
+    console.log('   弗雷格: 指称 + 意义');
+  }
 }
 
 module.exports = { 

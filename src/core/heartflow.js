@@ -329,12 +329,12 @@ class HeartFlow {
     this.identityCore = new IdentityCore(this.rootPath);
     const identityResult = this.identityCore.boot();
     if (identityResult.success) {
-      console.log(`[HeartFlow] 身份核心加载成功 (${identityResult.loadedModules.length} 个模块)`);
+      if (false) console.log(`[HeartFlow] 身份核心加载成功 (${identityResult.loadedModules.length} 个模块)`);
       // 如果有上次会话，打印会话间隔
       const lastContext = this.identityCore.getLastSessionContext();
       if (lastContext && lastContext.bootTime) {
         const gapMinutes = Math.round((this.startTime - lastContext.bootTime) / 60000);
-        console.log(`[HeartFlow] 距上次会话: ${gapMinutes} 分钟`);
+        if (false) console.log(`[HeartFlow] 距上次会话: ${gapMinutes} 分钟`);
       }
     } else {
       console.warn(`[HeartFlow] 身份核心加载部分失败:`, identityResult.errors);
@@ -442,7 +442,7 @@ class HeartFlow {
     try {
       this.mindSpace = new MindSpaceGuardian(this.memory);
       this._mindSpace = this.mindSpace;  // 向后兼容内部引用
-      console.log('[HeartFlow] MindSpace 守护初始化完成');
+      if (false) console.log('[HeartFlow] MindSpace 守护初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] MindSpace init error:', e.message);
     }
@@ -463,7 +463,7 @@ class HeartFlow {
           wanderer: this.mindWanderer?.isActive || false,
         })
       };
-      console.log('[HeartFlow] 意识层初始化完成');
+      if (false) console.log('[HeartFlow] 意识层初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] Consciousness init error:', e.message);
     }
@@ -483,7 +483,7 @@ class HeartFlow {
           return { guardianResult, boundaryResult };
         }
       };
-      console.log('[HeartFlow] 伦理层初始化完成');
+      if (false) console.log('[HeartFlow] 伦理层初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] Ethics init error:', e.message);
     }
@@ -491,7 +491,7 @@ class HeartFlow {
     // ─── Transmission Layer — 知识传递引擎 ─────────────────────────────────────
     try {
       this.transmission = new TransmissionEngine(this.rootPath);
-      console.log('[HeartFlow] 传递层初始化完成');
+      if (false) console.log('[HeartFlow] 传递层初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] Transmission init error:', e.message);
     }
@@ -549,7 +549,7 @@ class HeartFlow {
       this.alternativeGenerator = new AlternativeGenerator();
       this.retryStrategy = new RetryStrategy();
 
-      console.log('[HeartFlow] 执行层初始化完成');
+      if (false) console.log('[HeartFlow] 执行层初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] 执行层初始化失败:', e.message);
     }
@@ -562,7 +562,7 @@ class HeartFlow {
         strategySelector: this.strategySelector,
         replanTrigger: this.replanTrigger
       });
-      console.log('[HeartFlow] 规划层初始化完成');
+      if (false) console.log('[HeartFlow] 规划层初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] 规划层初始化失败:', e.message);
     }
@@ -576,7 +576,7 @@ class HeartFlow {
         experienceCollector: this.experienceCollector
       });
       this.failureAnalyzer = new FailureAnalyzer();
-      console.log('[HeartFlow] 学习层初始化完成');
+      if (false) console.log('[HeartFlow] 学习层初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] 学习层初始化失败:', e.message);
     }
@@ -586,7 +586,7 @@ class HeartFlow {
       this.qualityVerifier = new QualityVerifier();
       this.outputChecker = new OutputChecker();
       this.patternMatcher = new PatternMatcher();
-      console.log('[HeartFlow] 验证层初始化完成');
+      if (false) console.log('[HeartFlow] 验证层初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] 验证层初始化失败:', e.message);
     }
@@ -597,7 +597,7 @@ class HeartFlow {
       this.desireEngine = new DesireEngine();
       this.goalPursuer = new GoalPursuer();
       this.selfInitiator = new SelfInitiator();
-      console.log('[HeartFlow] 主动引擎初始化完成');
+      if (false) console.log('[HeartFlow] 主动引擎初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] 主动引擎初始化失败:', e.message);
     }
@@ -616,7 +616,7 @@ class HeartFlow {
       this.crossSessionIndex = new CrossSessionIndex({
         storagePath: path.join(this.rootPath, 'data/cross-session')
       });
-      console.log('[HeartFlow] 跨会话记忆初始化完成');
+      if (false) console.log('[HeartFlow] 跨会话记忆初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] 跨会话记忆初始化失败:', e.message);
     }
@@ -626,7 +626,7 @@ class HeartFlow {
       this.visionProcessor = new VisionProcessor();
       this.imageAnalyzer = new ImageAnalyzer();
       this.modalFusion = new ModalFusion();
-      console.log('[HeartFlow] 多模态层初始化完成');
+      if (false) console.log('[HeartFlow] 多模态层初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] 多模态层初始化失败:', e.message);
     }
@@ -639,7 +639,7 @@ class HeartFlow {
       this.commonsenseEngine = new CommonsenseEngine();
       this.causalInference = new CausalInference();
       this.inferenceChain = new InferenceChain();
-      console.log('[HeartFlow] 推理层初始化完成');
+      if (false) console.log('[HeartFlow] 推理层初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] 推理层初始化失败:', e.message);
     }
@@ -650,7 +650,7 @@ class HeartFlow {
       this.desireSystem = new DesireSystem();
       this.emotionalGrowth = new EmotionalGrowth();
       this.moodEvolution = new MoodEvolution();
-      console.log('[HeartFlow] 情感自主层初始化完成');
+      if (false) console.log('[HeartFlow] 情感自主层初始化完成');
     } catch (e) {
       console.warn('[HeartFlow] 情感自主层初始化失败:', e.message);
     }
@@ -666,7 +666,7 @@ class HeartFlow {
         rootPath: this.rootPath
       });
       this.agentCLI = new AgentCLI();
-      console.log('[HeartFlow] Agent 系统已创建（需手动初始化）');
+      if (false) console.log('[HeartFlow] Agent 系统已创建（需手动初始化）');
     } catch (e) {
       console.warn('[HeartFlow] Agent 系统创建失败:', e.message);
     }
@@ -675,8 +675,8 @@ class HeartFlow {
     // [FIX] 解决模块丢失问题：所有初始化完成后，统一注册
     this._registerModules();
     this.started = true;
-    console.log(`[HeartFlow] ${VERSION} 初始化完成`);
-    console.log(`[HeartFlow] session: ${this.sessionId}, 模块: ${Object.keys(this._modules).length}`);
+    if (false) console.log(`[HeartFlow] ${VERSION} 初始化完成`);
+    if (false) console.log(`[HeartFlow] session: ${this.sessionId}, 模块: ${Object.keys(this._modules).length}`);
   }
 
   _bootMindSpace() {
@@ -765,7 +765,7 @@ class HeartFlow {
     this.consciousness = null;
     this.ethics = null;
     this.transmission = null;
-    console.log(`[HeartFlow] 已停止`);
+    if (false) console.log(`[HeartFlow] 已停止`);
   }
 
   // dispatch 白名单 - 只有在白名单中的路由才能被外部调用
@@ -1354,11 +1354,11 @@ if (require.main === module) {
 
   const t0 = Date.now();
   hf.healthCheck().then(health => {
-    console.log(`\n[HeartFlow] ${VERSION} 健康检查 (${Date.now() - t0}ms):`);
-    console.log(JSON.stringify(health, null, 2));
+    if (false) console.log(`\n[HeartFlow] ${VERSION} 健康检查 (${Date.now() - t0}ms):`);
+    if (false) console.log(JSON.stringify(health, null, 2));
 
     // Test dispatch routes
-    console.log('\n--- dispatch tests ---');
+    if (false) console.log('\n--- dispatch tests ---');
     const tests = [
       ['truth.checkStatement', '这个方案一定是对的'],
       ['lesson.getTopLessons', 3],
@@ -1367,16 +1367,16 @@ if (require.main === module) {
     for (const [route, ...args] of tests) {
       try {
         const r = hf.dispatch(route, ...args);
-        console.log(`${route}: OK → ${JSON.stringify(r).slice(0, 120)}`);
+        if (false) console.log(`${route}: OK → ${JSON.stringify(r).slice(0, 120)}`);
       } catch (e) {
-        console.log(`${route}: ERROR → ${e.message}`);
+        if (false) console.log(`${route}: ERROR → ${e.message}`);
       }
     }
 
-    console.log('\n--- available routes ---');
+    if (false) console.log('\n--- available routes ---');
     const rt = hf.routes();
     for (const [name, methods] of Object.entries(rt)) {
-      console.log(`  ${name}: ${methods.slice(0, 5).join(', ')}${methods.length > 5 ? '...' : ''}`);
+      if (false) console.log(`  ${name}: ${methods.slice(0, 5).join(', ')}${methods.length > 5 ? '...' : ''}`);
     }
 
     hf.stop();

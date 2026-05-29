@@ -45,7 +45,7 @@ class AgentCLI {
     // 加载历史
     this._loadHistory();
 
-    console.log('[CLI] Agent 初始化完成');
+
     return this.agent;
   }
 
@@ -149,10 +149,6 @@ class AgentCLI {
     // 开始会话
     this.agent.session.start({ mode: 'interactive' });
 
-    console.log('=== HeartFlow Agent v1.5.0 ===');
-    console.log('命令: /help 查看帮助, /exit 退出, /history 查看历史');
-    console.log('输入你的问题或任务\n');
-
     rl.prompt();
 
     rl.on('line', async (input) => {
@@ -177,11 +173,9 @@ class AgentCLI {
         const response = await this.agent.process(line);
 
         if (response.success) {
-          console.log('\n--- 结果 ---');
-          console.log(response.output || '(无输出)');
+          // output result
         } else {
-          console.log('\n--- 错误 ---');
-          console.log(response.error);
+          // output error
         }
 
         // 更新历史
@@ -190,7 +184,6 @@ class AgentCLI {
         console.error('处理错误:', error.message);
       }
 
-      console.log();
       rl.prompt();
     });
 
@@ -217,33 +210,18 @@ class AgentCLI {
 
     switch (cmd) {
       case '/help':
-        console.log(`
-命令帮助:
-  /help        显示帮助
-  /exit        退出
-  /quit        退出
-  /history     显示历史
-  /clear       清屏
-  /status      显示状态
-  /tools       列出工具
-  /reset       重置会话
-  /mcp         显示 MCP 服务器状态
-`);
         break;
 
       case '/exit':
       case '/quit':
-        console.log('再见！');
         this._saveHistory();
         rl.close();
         this.running = false;
         break;
 
       case '/history':
-        console.log('\n--- 历史记录 ---');
         for (let i = Math.max(0, this.history.length - 10); i < this.history.length; i++) {
           const h = this.history[i];
-          console.log(`[${i + 1}] ${h.input.slice(0, 50)}...`);
         }
         break;
 
@@ -252,40 +230,26 @@ class AgentCLI {
         break;
 
       case '/status':
-        console.log('\n--- Agent 状态 ---');
         const status = this.agent.getStatus();
-        console.log(JSON.stringify(status, null, 2));
         break;
 
       case '/tools':
-        console.log('\n--- 可用工具 ---');
         const tools = this.agent.getTools();
-        console.log(`共 ${tools.length} 个工具:`);
-        for (const tool of tools.slice(0, 20)) {
-          console.log(`  - ${tool.name}: ${tool.description}`);
-        }
-        if (tools.length > 20) {
-          console.log(`  ... 还有 ${tools.length - 20} 个工具`);
-        }
         break;
 
       case '/reset':
         await this.agent.resetSession();
-        console.log('会话已重置');
         break;
 
       case '/mcp':
         if (this.mcpManager) {
-          console.log('\n--- MCP 服务器 ---');
           const status = this.mcpManager.healthCheck();
-          console.log(JSON.stringify(status, null, 2));
         } else {
-          console.log('MCP 服务器未配置');
         }
         break;
 
       default:
-        console.log(`未知命令: ${cmd}`);
+        // unknown command
     }
   }
 
@@ -316,9 +280,7 @@ class AgentCLI {
     await this.initialize();
 
     for (const line of lines) {
-      console.log(`\n> ${line}`);
       const response = await this.agent.process(line);
-      console.log(response.output || response.error || response.message);
     }
 
     this.agent.session.end();
@@ -330,15 +292,11 @@ class AgentCLI {
   async runStream(input) {
     await this.initialize();
 
-    console.log('\n> 流式输出:\n');
-
     const stream = this.agent.processStream(input);
 
     for await (const chunk of stream) {
       process.stdout.write(chunk);
     }
-
-    console.log('\n');
 
     this.agent.session.end();
   }
@@ -377,50 +335,11 @@ if (require.main === module) {
     cli.runStream(input).catch(console.error);
   } else if (args[0] === '--help' || args[0] === '-h') {
     // 帮助
-    console.log(`
-HeartFlow Agent CLI v1.5.0
-
-用法:
-  node cli.js                    # 交互模式
-  node cli.js --file <path>      # 执行文件中的任务
-  node cli.js --stream <input>   # 流式输出
-  node cli.js --help             # 显示帮助
-
-环境变量:
-  ANTHROPIC_API_KEY    Anthropic API 密钥
-  OPENAI_API_KEY       OpenAI API 密钥
-  API_TYPE             api 类型 (anthropic/openai)
-  MODEL                模型名称
-
-配置文件 (.heart-agent.json):
-{
-  "apiKey": "your-api-key",
-  "apiType": "anthropic",
-  "model": "claude-sonnet-4-20250514",
-  "maxTokens": 4096,
-  "mcpServers": {
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/dir"]
-    }
-  }
-}
-
-交互命令:
-  /help        显示帮助
-  /exit        退出
-  /history     查看历史
-  /status      状态
-  /tools       工具列表
-  /reset       重置会话
-  /mcp         MCP 服务器
-    `);
   } else {
     // 单次执行
     const input = args.join(' ');
     cli.runOnce(input)
       .then(r => {
-        console.log(r.output || r.message);
         process.exit(r.success ? 0 : 1);
       })
       .catch(e => {

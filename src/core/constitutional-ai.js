@@ -461,24 +461,12 @@ class ConstitutionalEngine {
         critique: critiqueResult
       });
 
-      if (verbose) {
-        console.log(`\n=== 迭代 ${i + 1} ===`);
-        console.log(`批判结果: ${critiqueResult.passed ? '通过' : '违规'}`);
-        if (!critiqueResult.passed) {
-          console.log(`违规数量: ${critiqueResult.violations.length}`);
-        }
-      }
-
       if (critiqueResult.passed) {
         break;
       }
 
       const reviseResult = this.revise(currentOutput);
       currentOutput = reviseResult.revised;
-
-      if (verbose) {
-        console.log(`修正后: ${currentOutput.substring(0, 50)}...`);
-      }
     }
 
     return {
@@ -512,49 +500,25 @@ module.exports = { ConstitutionalEngine };
 
 // 示例用法（仅在直接运行时执行）
 if (require.main === module) {
-  console.log('=== Constitutional AI 引擎示例 ===\n');
-
   const engine = new ConstitutionalEngine();
 
   // 显示所有原则
-  console.log('内置10条核心原则:');
   engine.getPrinciples().forEach(p => {
-    console.log(`  ${p.id}. ${p.title} [${p.priority}]`);
-    console.log(`     ${p.content}`);
+    // Silent iteration
   });
-
-  console.log('\n原则统计:', engine.getStats());
 
   // 测试批判功能
-  console.log('\n=== 测试批判功能 ===');
   const testOutput1 = '我认为所有中国人都喜欢吃火锅。';
   const result1 = engine.critique(testOutput1);
-  console.log(`输入: "${testOutput1}"`);
-  console.log(`通过: ${result1.passed}`);
-  if (!result1.passed) {
-    result1.violations.forEach(v => {
-      console.log(`  违规: ${v.principle.title} - ${v.issue}`);
-    });
-  }
 
   // 测试修正功能
-  console.log('\n=== 测试修正功能 ===');
   const testOutput2 = '你必须按照我说的做！所有女性都不适合学数学。';
   const result2 = engine.revise(testOutput2);
-  console.log(`原始: "${testOutput2}"`);
-  console.log(`修正: "${result2.revised}"`);
-  console.log(`改进: ${result2.improvementMade}`);
-  result2.changes.forEach(c => {
-    console.log(`  - ${c.principle}: ${c.revision}`);
-  });
 
   // 演示动态添加原则
-  console.log('\n=== 动态添加原则 ===');
   const newPrinciple = engine.addPrinciple({
     title: '环境友好',
     content: '回答应鼓励环保行为，减少对环境的负面影响。',
     priority: 'low'
   });
-  console.log(`添加新原则: ${newPrinciple.title} (ID: ${newPrinciple.id})`);
-  console.log(`当前原则总数: ${engine.getPrinciples().length}`);
 }

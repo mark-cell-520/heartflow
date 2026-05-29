@@ -133,10 +133,6 @@ class MetaEngine {
     state.cycle_count++;
     this.currentCycle = state.cycle_count;
     
-    console.log(`[Meta] Cycle ${state.cycle_count} - Evaluating state...`);
-    console.log(`  Personality:`, state.personality_values);
-    console.log(`  Emotional:`, state.emotional_state);
-    
     return state;
   }
 
@@ -192,8 +188,6 @@ class MetaEngine {
     state.active_strategy = bestStrategy?.key || null;
     state.planning_score = bestScore;
     
-    console.log(`[Meta] Best strategy: ${bestStrategy?.key} (score: ${bestScore.toFixed(2)})`);
-    
     return {
       strategy: bestStrategy?.key,
       reason: this.explainChoice(bestStrategy, state),
@@ -230,8 +224,6 @@ class MetaEngine {
    * 执行策略
    */
   async execute(plan, context) {
-    console.log(`[Meta] Executing strategy: ${plan.strategy}`);
-    
     const strategy = this.strategies[plan.strategy];
     if (!strategy) {
       return { success: false, reason: 'strategy_not_found' };
@@ -262,7 +254,6 @@ class MetaEngine {
     
     if (outcome === 'positive') {
       strategy.success_rate = Math.min(1, strategy.success_rate + 0.05);
-      console.log(`[Meta] Strategy ${strategyKey} improved: ${strategy.success_rate.toFixed(2)}`);
     } else if (outcome === 'negative') {
       strategy.success_rate = Math.max(0.1, strategy.success_rate - 0.1);
       state.strategy_adjustments.push({
@@ -270,7 +261,6 @@ class MetaEngine {
         adjustment: 'reduced_success_rate',
         timestamp: new Date().toISOString()
       });
-      console.log(`[Meta] Strategy ${strategyKey} degraded: ${strategy.success_rate.toFixed(2)}`);
     }
     
     this.saveStrategies(this.strategies);
@@ -330,7 +320,6 @@ class MetaEngine {
       
       fs.writeFileSync(resolvedPath, content);
       
-      console.log(`[Meta] Self-edit completed: ${resolvedPath}`);
       return { success: true, path: resolvedPath };
     } catch (e) {
       console.error('[Meta] Self-edit error:', e.message);
@@ -345,7 +334,6 @@ class MetaEngine {
     if (this.strategies[strategyKey]) {
       this.strategies[strategyKey].enabled = false;
       this.saveStrategies(this.strategies);
-      console.log(`[Meta] Disabled strategy: ${strategyKey}`);
       return { success: true };
     }
     return { success: false, reason: 'strategy_not_found' };
@@ -358,7 +346,6 @@ class MetaEngine {
     if (this.strategies[strategyKey]) {
       this.strategies[strategyKey].enabled = true;
       this.saveStrategies(this.strategies);
-      console.log(`[Meta] Enabled strategy: ${strategyKey}`);
       return { success: true };
     }
     return { success: false, reason: 'strategy_not_found' };

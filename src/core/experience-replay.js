@@ -278,31 +278,7 @@ class ExperienceReplay {
    * 打印建议
    */
   printSuggestions(result) {
-    console.log('\n' + '='.repeat(60));
-    console.log('🔄 技能修改建议');
-    console.log('='.repeat(60));
-    
-    if (!result.success || !result.suggestions || result.suggestions.length === 0) {
-      console.log(`\n${result.message || '暂无建议'}\n`);
-      return;
-    }
-
-    console.log(`\n发现 ${result.suggestions.length} 个可改进模式:\n`);
-
-    result.suggestions.forEach((sug, i) => {
-      console.log(`【建议 ${i + 1}】`);
-      console.log(`  模式: ${sug.pattern}`);
-      console.log(`  技能区域: ${sug.skill_area}`);
-      console.log(`  当前问题: ${sug.current_issue}`);
-      console.log(`  优先级: ${sug.priority}`);
-      console.log(`  建议修改:`);
-      sug.proposed_change.changes?.forEach((change, j) => {
-        console.log(`    ${j + 1}. ${change}`);
-      });
-      console.log('');
-    });
-
-    console.log('='.repeat(60) + '\n');
+    return;
   }
 
   /**

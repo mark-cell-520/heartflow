@@ -51,7 +51,6 @@ class Reflector {
     const timestamp = new Date().toISOString();
     const entry = `[${timestamp}] ${message}\n`;
     fs.appendFileSync(this.logFile, entry);
-    console.log(`[Reflector] ${message}`);
   }
 
   /**
@@ -290,40 +289,7 @@ class Reflector {
    * 打印报告到控制台
    */
   printReport(report) {
-    console.log('\n' + '='.repeat(60));
-    console.log('📊 心流会话反思报告');
-    console.log('='.repeat(60));
-    
-    console.log('\n【基本信息】');
-    console.log(`  会话时间: ${report.session_time}`);
-    console.log(`  会话总数: ${report.total_sessions}`);
-    
-    console.log('\n【情绪分析】');
-    console.log(`  状态: ${report.emotionAnalysis.status}`);
-    console.log(`  波动: ${report.emotionAnalysis.volatility}`);
-    console.log(`  趋势: ${report.emotionAnalysis.trend}`);
-    console.log(`  总结: ${report.emotionAnalysis.summary}`);
-    
-    console.log('\n【任务完成】');
-    console.log(`  ${report.taskAnalysis.summary}`);
-    
-    console.log('\n【AI响应效果】');
-    console.log(`  有效性: ${report.aiResponseAnalysis.effectiveness}`);
-    console.log(`  总结: ${report.aiResponseAnalysis.summary}`);
-    
-    console.log('\n【人格状态】');
-    console.log(`  ${report.personalityAnalysis.summary}`);
-    
-    console.log('\n【综合评分】');
-    console.log(`  得分: ${report.overallScore.score}`);
-    console.log(`  心流状态: ${report.overallScore.flowState}`);
-    
-    console.log('\n【改进建议】');
-    report.improvements.forEach((imp, i) => {
-      console.log(`  ${i + 1}. [${imp.priority}] ${imp.area}: ${imp.suggestion}`);
-    });
-    
-    console.log('\n' + '='.repeat(60) + '\n');
+    return;
   }
 
   /**

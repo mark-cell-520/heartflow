@@ -237,7 +237,7 @@ function _loadAll() {
   if (fs.existsSync(CORE_PATH)) {
     try {
       _coreStore = JSON.parse(fs.readFileSync(CORE_PATH, 'utf-8'));
-      console.log(`[Memory] CORE loaded: ${Object.keys(_coreStore).length} records`);
+
     } catch (e) {
       console.warn('[Memory] CORE load failed:', e.message);
       _coreStore = {};
@@ -252,7 +252,7 @@ function _loadAll() {
       for (const [id, payload] of Object.entries(entries)) {
         _learnedStore[id] = payload;
       }
-      console.log(`[Memory] LEARNED loaded: ${Object.keys(_learnedStore).length} encrypted records`);
+
     } catch (e) {
       console.warn('[Memory] LEARNED load failed:', e.message);
       _learnedStore = {};
@@ -263,7 +263,7 @@ function _loadAll() {
   if (fs.existsSync(EPHEMERAL_PATH)) {
     try {
       _ephemeralStore = JSON.parse(fs.readFileSync(EPHEMERAL_PATH, 'utf-8'));
-      console.log(`[Memory] EPHEMERAL loaded: ${Object.keys(_ephemeralStore).length} records`);
+
     } catch (e) {
       console.warn('[Memory] EPHEMERAL load failed:', e.message);
       _ephemeralStore = {};
@@ -272,11 +272,10 @@ function _loadAll() {
 }
 
 function _saveCore() {
-  if (!_coreDirty) return;
-  atomicWriteJson(CORE_PATH, _coreStore);
-  _coreDirty = false;
-  console.log('[Memory] CORE saved');
-}
+ if (!_coreDirty) return;
+ atomicWriteJson(CORE_PATH, _coreStore);
+ _coreDirty = false;
+ }
 
 function _saveLearned() {
   if (!_learnedDirty) return;
@@ -289,7 +288,6 @@ function _saveLearned() {
   const data = { version: 1, entries, savedAt: new Date().toISOString() };
   atomicWriteJson(LEARNED_PATH, data);
   _learnedDirty = false;
-  console.log('[Memory] LEARNED saved (encrypted)');
 }
 
 function _saveEphemeral() {
@@ -370,7 +368,6 @@ function applyForgetting() {
 
   if (toDelete.length > 0 || toCompress.length > 0) {
     _saveLearned();
-    console.log(`[Memory] Forgetting: deleted=${toDelete.length}, compressed=${toCompress.length}`);
   }
 
   return { deleted: toDelete.length, compressed: toCompress.length };
@@ -440,7 +437,6 @@ function store(opts) {
     markEphemeralDirty();
   }
 
-  console.log(`[Memory] Stored: ${id} (${layer})`);
   return id;
 }
 
@@ -679,7 +675,6 @@ function consolidate() {
   if (promoted.length > 0) {
     _saveLearned();
     _saveEphemeral();
-    console.log(`[Memory] Consolidated: promoted=${promoted.length}`);
   }
 
   return { promoted };
@@ -697,7 +692,6 @@ function init() {
   try { _getOrCreateAesKey(); } catch (e) {
     console.warn('[Memory] AES key init failed:', e.message);
   }
-  console.log('[Memory] Initialized');
 }
 
 // Auto-init on load

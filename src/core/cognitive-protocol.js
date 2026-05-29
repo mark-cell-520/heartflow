@@ -72,7 +72,7 @@ class CognitiveProtocol {
     // 问题存储（问题+根因）- 在 files 初始化之后
     this.problemBank = this._loadProblemBank();
 
-    console.log('[CognitiveProtocol] 认知协议初始化完成');
+
   }
 
   // ─────────────────────────────────────────
@@ -155,19 +155,9 @@ class CognitiveProtocol {
    * 打印启动上下文（供人类阅读）
    */
   printStartupContext() {
-    const { summary, pausedTasksCount, unresolvedProblemsCount } = this.getStartupContext();
+  const { summary, pausedTasksCount, unresolvedProblemsCount } = this.getStartupContext();
 
-    console.log('\n' + '='.repeat(60));
-    console.log(' 启动上下文摘要 ');
-    console.log('='.repeat(60));
-    console.log(summary);
-    console.log('='.repeat(60));
-
-    if (pausedTasksCount > 0 || unresolvedProblemsCount > 0) {
-      console.log('\n📋 待处理：', pausedTasksCount + unresolvedProblemsCount, '项');
-    }
-
-    return summary;
+  return summary;
   }
 
   // ─────────────────────────────────────────
@@ -342,8 +332,6 @@ class CognitiveProtocol {
     // 持久化
     this._saveCheckpoints();
 
-    console.log(`\n📍 检查点 #${checkpoint.index}: ${summary}`);
-
     return checkpoint;
   }
 
@@ -413,11 +401,6 @@ class CognitiveProtocol {
 
     this.problemBank.push(entry);
     this._saveProblemBank();
-
-    console.log(`\n❓ 问题入库: ${problem}`);
-    if (rootCause) {
-      console.log(`   根因: ${rootCause}`);
-    }
 
     return entry;
   }
@@ -517,12 +500,6 @@ class CognitiveProtocol {
     this._savePausedTasks();
     this._saveCurrentSession();
 
-    console.log(`\n⏸️ 任务已暂停: ${this.currentTask}`);
-    console.log(`   卡在: ${stuckPoint}`);
-    if (nextStep) {
-      console.log(`   下次继续: ${nextStep}`);
-    }
-
     // 重置当前任务
     this.currentTask = null;
     this.currentLevel = null;
@@ -565,14 +542,6 @@ class CognitiveProtocol {
     // 从暂停列表移除
     this.pausedTasks = this.pausedTasks.filter(t => t.id !== taskToResume.id);
     this._savePausedTasks();
-
-    console.log(`\n▶️ 继续任务: ${taskToResume.task}`);
-    if (taskToResume.stuckPoint) {
-      console.log(`   之前卡在: ${taskToResume.stuckPoint}`);
-    }
-    if (taskToResume.nextStep) {
-      console.log(`   下一步: ${taskToResume.nextStep}`);
-    }
 
     return {
       success: true,
