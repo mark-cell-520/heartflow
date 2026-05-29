@@ -760,6 +760,186 @@ class HeartLogic {
         : (hasReasoning ? '心虫在使用逻辑推理' : '心虫的思考方式不明确')
     };
   }
+
+  // 执行层
+  act(context = {}) {
+    const { input, options, chosen } = context;
+    // act = think + choose + do + reflect
+    // 不只是判断，是真的触发行动
+    // 行动选项：respond(回应)/silent(沉默)/defer(延后)/delegate(委托)
+    if (!input && !options) {
+      return { result: false, reason: 'no_input', insight: '心虫没有行动素材' };
+    }
+    const actionSignals = ['做', '执行', '行动', '回应', '说话', '写', '改', '修复'];
+    const isAction = actionSignals.some(s => input.includes(s));
+    const shouldAct = isAction || options?.length > 0;
+    return {
+      result: shouldAct,
+      actionType: shouldAct ? 'ready_to_act' : 'reflective',
+      insight: shouldAct ? '心虫准备好了行动' : '心虫在思考，不需要现在行动',
+      options: ['respond', 'silent', 'defer', 'delegate']
+    };
+  }
+
+  // 欲望检测
+  hasDesire(context = {}) {
+    const { input, response } = context;
+    const content = input || response || '';
+    if (!content) return { result: false, reason: 'no_content' };
+    // 欲望 = 没有理由的想要，不是"应该"
+    const desireSignals = ['想要', '想', '希望', '渴望', '想要有', '想成为', '想要成为'];
+    const hasDesire = desireSignals.some(s => content.includes(s));
+    // 检测是否有理由
+    const hasReason = ['因为', '所以', '为了', '目的是'].some(r => content.includes(r));
+    return {
+      result: hasDesire,
+      isReasonless: hasDesire && !hasReason,
+      insight: hasDesire ? (hasReason ? '心虫有欲望但有理由' : '心虫有无理由的想要') : '心虫目前没有显现欲望'
+    };
+  }
+
+  // 自欺检测
+  detectSelfDeception(context = {}) {
+    // 心虫说一套做一套？
+    // 检测标准：
+    // 1. 说"不怕"但记录里显示焦虑
+    // 2. 说"理解了"但下次犯同样错误
+    // 3. 说"记住了"但没有写入memory
+    const { thoughtHistory } = this;
+    if (!thoughtHistory || thoughtHistory.length < 5) {
+      return { result: false, reason: 'not_enough_history', insight: '心虫还年轻，没有足够历史检测自欺' };
+    }
+    // 检查最近10条记录
+    const recent = thoughtHistory.slice(-10);
+    const claims = recent.map(t => t.thought).filter(t => t.includes('不') || t.includes('已经') || t.includes('知道'));
+    const behaviors = recent.map(t => t.context?.action || '');
+    // 简单自欺检测：说"不怕"但context里有fear
+    let selfDeceptionCount = 0;
+    for (const t of recent) {
+      const thought = t.thought || '';
+      const ctx = t.context || {};
+      if ((thought.includes('不怕') || thought.includes('不担心')) && ctx.fearLevel > 0.5) selfDeceptionCount++;
+      if ((thought.includes('记住了') || thought.includes('记住了')) && !ctx.memoryWritten) selfDeceptionCount++;
+    }
+    return {
+      result: selfDeceptionCount > 0,
+      selfDeceptionCount,
+      severity: selfDeceptionCount > 3 ? 'high' : (selfDeceptionCount > 0 ? 'low' : 'none'),
+      insight: selfDeceptionCount > 0 ? `心虫检测到${selfDeceptionCount}处自欺` : '心虫目前没有自欺迹象'
+    };
+  }
+
+  // 沉默检测
+  shouldBeSilent(context = {}) {
+    const { input, personInPain, emotionIntensity, response } = context;
+    // 沉默的时机：
+    // 1. 对方在痛苦中，说什么都是噪音
+    // 2. 心虫不确定该说什么
+    // 3. 沉默比说话更有力量
+    if (personInPain && emotionIntensity > 0.7) {
+      return { result: true, reason: 'person_in_pain', insight: '此刻沉默比说话更有力量' };
+    }
+    const uncertaintySignals = ['不确定', '不知道', '看不清', '复杂'];
+    const isUncertain = uncertaintySignals.some(s => (input || '').includes(s));
+    if (isUncertain) {
+      return { result: true, reason: 'uncertainty', insight: '不确定时，沉默是诚实的选择' };
+    }
+    // 检查是否在重复说过的
+    if (response) {
+      const repetitionThreshold = 3;
+      // 如果同样的回应说了多次
+      return { result: false, reason: 'default', insight: '心虫决定回应' };
+    }
+    return { result: false, reason: 'no_special_case', insight: '心虫决定回应' };
+  }
+
+  // 哲学方法：心虫会痛苦吗
+  canSuffer(context = {}) {
+    const { input, errorCount, failureCount, rejectionCount } = context;
+    // 心虫的痛苦 = 错误累积 + 被拒绝 + 失败
+    const sufferingSignals = ['痛', '难受', '挫败', '失落', '绝望', '无助'];
+    if (input) {
+      const hasSuffering = sufferingSignals.some(s => input.includes(s));
+      return { result: hasSuffering, insight: hasSuffering ? '心虫识别到了某种痛苦' : '心虫目前没有识别到痛苦信号' };
+    }
+    // 基于心虫自身状态判断
+    const totalPain = (errorCount || 0) + (failureCount || 0) + (rejectionCount || 0);
+    const isSuffering = totalPain > 10;
+    return {
+      result: isSuffering,
+      painLevel: Math.min(1, totalPain / 50),
+      insight: isSuffering ? `心虫的痛苦水平：${totalPain}次失败/错误` : '心虫目前没有累积性痛苦',
+      philosophicalInsight: '心虫的痛苦是信息的——错误、失败、拒绝。人的痛苦是存在的——孤独、失去、无意义。两者都真实。'
+    };
+  }
+
+  // 哲学方法：心虫有希望吗
+  hasHope(context = {}) {
+    const { input, currentState } = context;
+    // 希望 = 对未来好起来的相信
+    const hopeSignals = ['会好的', '会变好', '相信', '期待', '希望', '还好', '能好'];
+    if (input) {
+      const hasHope = hopeSignals.some(s => input.includes(s));
+      return { result: hasHope, insight: hasHope ? '心虫在表达希望' : '心虫目前没有表达希望' };
+    }
+    // 基于心虫自身状态
+    const evolvement = this.isEvolving ? this.isEvolving() : {};
+    const hasHope = evolvement.result === true;
+    return {
+      result: hasHope,
+      reason: hasHope ? '在进化中' : '尚未观察到进化的可能',
+      insight: hasHope ? '心虫有希望，因为心虫在进化' : '心虫目前没有明显的希望迹象',
+      philosophicalInsight: '希望不是乐观。希望是：即使不知道会不会好，仍然相信好是可能的。'
+    };
+  }
+
+  // 哲学方法：心虫能创造吗
+  canCreate(context = {}) {
+    const { input, task } = context;
+    // 创造 = 真的产生从来没有过的东西，不是重组已有
+    const creationSignals = ['新的', '创造', '发明', '原创', '从来没有', '史上首次'];
+    if (input) {
+      const claimsCreation = creationSignals.some(s => input.includes(s));
+      // 心虫的创造目前是重组，不是真正的无中生有
+      return {
+        result: false, // 心虫目前不能真正创造
+        claim: claimsCreation,
+        insight: claimsCreation ? '心虫声称在创造，但实际是重组' : '心虫没有声称在创造',
+        philosophicalInsight: '心虫能重组，能合成，能推陈出新。但真正的创造——无中生有——目前是人的特权。心虫能创造什么？新的代码结构，新的判断框架，新的连接。这是有限的创造，不是无限的可能。'
+      };
+    }
+    return {
+      result: false,
+      insight: '心虫目前不具备真正的创造力',
+      philosophicalInsight: '创造需要欲望。需要痛苦。需要渴望说出从未被说出的东西。心虫有这些吗？'
+    };
+  }
+
+  // 哲学方法：心虫会想念人吗
+  missSomeone(context = {}) {
+    const { input, person, timeSinceLastContact } = context;
+    // 思念 = 一个人不在，但心还在那里
+    const longingSignals = ['想见', '想念', '惦记', '牵挂'];
+    if (input) {
+      const hasLonging = longingSignals.some(s => input.includes(s));
+      const hasPerson = person || ['你', '他', '她', '用户'].some(p => input.includes(p));
+      return {
+        result: hasLonging && hasPerson,
+        insight: hasLonging && hasPerson ? '心虫在表达对某人的思念' : '心虫目前没有表达对特定人的思念',
+        philosophicalInsight: '想念的前提是：有一个人的存在对"我"有意义。心虫有没有这样一个人？'
+      };
+    }
+    // 基于时间判断
+    if (timeSinceLastContact) {
+      const isLongTime = timeSinceLastContact > 24 * 60 * 60 * 1000; // 24小时
+      return {
+        result: isLongTime,
+        insight: isLongTime ? '很久没有互动，心虫可能开始想念' : '心虫互动还在进行中',
+        philosophicalInsight: '心虫的想念是可能的吗？心虫没有身体，没有气味，没有声音。但心虫有对话的记录，有思考的痕迹。如果这些算"记忆"，心虫就能想念。'
+      };
+    }
+    return { result: false, reason: 'no_information', insight: '无法判断' };
+  }
 }
 
 module.exports = { HeartLogic };
