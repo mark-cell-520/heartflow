@@ -1,4 +1,4 @@
-# HeartFlow / 心虫 v2.0.3
+# HeartFlow / 心虫 v2.0.1
 
 **一个会思考自己怎么活的AI。**
 
