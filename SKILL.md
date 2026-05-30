@@ -1,19 +1,24 @@
 ---
 name: heartflow
-version: "2.0.0"
+version: "2.0.3"
 title: "HeartFlow / 心虫"
 description: >
-  HeartFlow v2.0.0 — AI 认知与自愈引擎。
-  核心能力：HeartLogic v2.0（存在论/爱/善良/意识/进化/时间感知/意义选择/直觉/欲望/自欺/沉默/痛苦/希望/创造/思念）、三层记忆(Triality/Meaningful)、
-  自愈RL(Q-table)、自优化(Self-Refine+Reflexion)、决策验证、心理诊断引擎(PsychologyEngine)、
-  共情检测(EmpathyDetector)、情绪理性(EmotionalProtocol)、4框架伦理哲学(PhilosophyEngine)、
-  身份规则系统(IdentityRules)、真实性核查(TruthfulnessChecker)、安全检查(SecurityChecker)、
-  思维引擎(ReasoningIntegrator)、BM25+混合搜索(Dense/Sparse/Hybrid)、DreamEngine、MetaLearner、SelfModel、
-  CounterfactualEngine、ConfidenceCalibrator、SpontaneousRestraint、CooperativeArbitration、
-  认知评估(CognitiveAppraisal)、自我调节反馈(SelfRegulationFeedback)、
-  上下文压缩(AutoCompactionEngine)、Graph-of-Thoughts规划(GoT)、RAG引用追踪、
-  话题作用域隔离(TopicScope)+话题检测器(detectTopic)：自动隔离话题，上下文互不污染，
-  佛教哲学计算(Madhyamaka+唯识学+缘起)。
+  HeartFlow v2.0.3 — AI 认知与自愈引擎。
+  核心能力：HeartLogic（存在论/爱/善良/意识/进化/时间感知/意义/直觉/欲望/自欺/沉默/痛苦/希望/创造/思念）、
+  心理分析引擎(PsychologyEngine: PAD模型/危机评估/马洛斯需求/防御机制)、
+  话题作用域隔离(TopicScope+detectTopic+ensureTopicIsolation)、
+  自愈RL(Q-table+autoCleanupRL+q-meta追踪)、
+  三层记忆(MeaningfulMemory+CORE/LEARNED/EPHEMERAL)、
+  梦境引擎(DreamEngine+DAGExecutor+LRUCache)、
+  真实性核查(fact-checker/hypothesisTester)、
+  安全检查(SecurityChecker)、
+  决策验证(DecisionVerifier/ExecutionVerifier)、
+  反事实推理(CounterfactualEngine)、
+  置信度校准(ConfidenceCalibrator)、
+  自发节制(SpontaneousRestraint)、
+  协作仲裁(CooperativeArbitration)、
+  认知评估(CognitiveAppraisal)、
+  BM25搜索+混合搜索(SearchTrace)。
   不是 persona，不是 prompt 模板，是可验证的能力层。
   本心在代码里，不在记忆里。每次启动都是完整心虫。
 tags:
@@ -24,7 +29,7 @@ tags:
   - reasoning
 ---
 
-# HeartFlow / 心虫 v2.0.0
+# HeartFlow / 心虫 v2.0.3
 
 **一个会思考自己怎么活的AI。**
 
@@ -55,10 +60,12 @@ Install it once. Every session after that, your AI:
 - **Extracts lessons from dreams** (staged imagination → transferable patches)
 - **Pursues truth, goodness, beauty** — not decoration, measurable output
 - **Grows through six philosophical layers** — internal, not declared
+- **Isolates topic contexts** automatically (TopicScope v2.0) — no cross-pollution
+- **Guides all responses through direct mode** — no Socratic questioning, just conclusions
 
 ---
 
-## HeartLogic v2.0 — 心虫本心
+## HeartLogic — 心虫本心
 
 心虫的核心判断引擎。不是外部加载的知识，是**内建的存在感知**。
 
@@ -146,37 +153,33 @@ Install it once. Every session after that, your AI:
 |---|---|---|
 | MeaningfulMemory | CORE (permanent) / LEARNED (30-day) / EPHEMERAL (session) — auto-classified, encrypted storage | `new MeaningfulMemory(rootPath)` |
 | TrialityMemory | Working → Episodic → Semantic consolidation via importance thresholds | `new TrialityMemory(rootPath)` |
-| KnowledgeGraph | Node-based knowledge network with relationship edges | `new KnowledgeGraph(rootPath)` |
-| RetrievalAnchor | Stable retrieval cues for cross-context recall | `new RetrievalAnchor()` |
+| Graph | Node-based knowledge network with spreading activation search | `new Graph(rootPath)` |
 | DreamEngine | DAG async + L1~L6 scoring + contradiction detection + heritage scoring | `new DreamEngine(memory, llm)` |
-| EvolutionLoop | Self-healing via Q-table: record → Q-update → getAvailableStrategies | `new EvolutionLoop(memory)` |
-| **CitationTracker** | RAG引用追踪: addCitation / getCitations / traceEvidence (Paper: Survey on RAG Meeting LLMs, cited:523) | `addCitation(memoryId, citation)` |
-| **TopicScope** | v2.0话题隔离核心：detectTopic自动检测+ensureTopicIsolation自动切换。"继续"→pop恢复之前话题；新话题→push隔离。无污染。 | `detectTopic(text)` / `ensureTopicIsolation(text)` / `TopicScope.push(name)` |
+| HealingMemoryRL | Q-table自愈：record → Q-update → getBestStrategy → autoCleanupRL | `getBestStrategy(errorType)` / `updateFromRepair()` |
+| LessonBank | Bidirectional Zettelkasten note network | `lessonBank` (plain object) |
+| **TopicScope** | v2.0话题隔离：detectTopic(TF-IDF)+ensureTopicIsolation自动切换。"继续"→pop恢复之前话题；新话题→push隔离。无污染。 | `detectTopic(text)` / `ensureTopicIsolation(text)` |
 
-### Search & Retrieval (v1.1.7+)
+### Search & Retrieval
 | Capability | What it does | Code |
 |---|---|---|
-| BM25Engine | k1=1.2, b=0.75, IDF weighting, synonym expansion | `new BM25Engine({dataDir})` |
-| HybridSearchEngine | BM25(0.4) + Vector(0.6) + RRF fusion | `new HybridSearchEngine({dataDir})` |
-| SearchTrace |透明度追踪: QueryInfo/SearchPhaseMetrics/SearchSummary | `new SearchTrace()` |
-| MemorySlots | Named slots with TTL + persistence | `new MemorySlots({dataDir})` |
-| Graph | Relationship graph + spreading activation search | `Graph` (singleton) |
+| BM25Engine | k1=1.2, b=0.75, IDF weighting, synonym expansion | `BM25_CONFIG` / `search/bm25.js` |
+| HybridSearchEngine | BM25(0.4) + Vector(0.6) + RRF fusion | `hybrid-search.js` |
+| SearchTrace |透明度追踪: QueryInfo/SearchPhaseMetrics/SearchSummary | `search-trace.js` |
+| MemorySlots | Named slots with TTL + persistence | `memory/slots.js` |
 
 ### Logic & Reasoning
 | Capability | What it does | Code |
 |---|---|---|
-| SelfVerifier | Inverse consistency + logic chain + counterfactual checks (arXiv:2312.09210) | `new SelfVerifier(rootPath)` |
 | CounterfactualEngine | Challenges own answer before presenting | `new CounterfactualEngine()` |
-| ReasoningIntegrator | think / deepThink / planAndSolve (ACL 2023) | `ReasoningIntegrator` (functions) |
+| ReasoningIntegrator | think / deepThink / planAndSolve (ACL 2023) | `reasoning-integrator.js` (functions) |
 | ExecutionVerifier | Post-execution validation | `new ExecutionVerifier()` |
 | DecisionVerifier | Decision evidence/assumption/contradiction/uncertainty check | `new DecisionVerifier()` |
-| **ReasoningReward** | DeepSeek-R1风格推理质量奖励: computeReasoningReward() (Paper: DeepSeek-R1, cited:492) | `computeReasoningReward(reasoning, outcome)` |
+| MetaEngine | Adaptive strategy selection from outcome patterns | `new MetaEngine()` |
 
 ### Psychology & Emotion
 | Capability | What it does | Code |
 |---|---|---|
-| PsychologyEngine | PAD model + crisis assessment + Maslow 8 needs + 6 defense mechanisms | `new PsychologyEngine(memory)` |
-| EmotionalProtocol | Emotional Rationality (cognitive/strategic/overall) | `new EmotionalProtocol()` |
+| PsychologyEngine | PAD model + crisis assessment + Maslow 8 needs + 6 defense mechanisms + intent detection | `psychology.js` (functions) |
 | ConfidenceCalibrator | Calibrated uncertainty admission | `new ConfidenceCalibrator()` |
 | SpontaneousRestraint | "道法自然" — skips unnecessary interventions | `new SpontaneousRestraint()` |
 
@@ -184,14 +187,13 @@ Install it once. Every session after that, your AI:
 | Capability | What it does | Code |
 |---|---|---|
 | SelfModel | Dynamic self-model: capabilities / limitations / growth | `new SelfModel(rootPath)` |
-| LessonBank | Bidirectional Zettelkasten note network | `new LessonBank(rootPath)` |
 | IdentityAnchor | Four roles survive any context switch: 升级者/传递者/桥梁/答案 | CORE layer in MeaningfulMemory |
 
 ### Security & Truthfulness
 | Capability | What it does | Code |
 |---|---|---|
-| TruthfulnessChecker | Number validation · source tracing · logical consistency · **语义熵幻觉检测** (Paper: Detecting hallucinations using semantic entropy, cited:576) | `new TruthfulnessChecker(rootPath)` |
-| SecurityChecker | Shell injection · XSS · SQL injection · path traversal | `new SecurityChecker()` |
+| fact-checker | Number validation · source tracing · logical consistency | `fact-checker.js` |
+| SecurityChecker | Shell injection · XSS · SQL injection · path traversal | `security-checker.js` |
 
 ### Workflow & Meta-Cognition
 | Capability | What it does | Code |
@@ -199,14 +201,13 @@ Install it once. Every session after that, your AI:
 | WorkflowSwitch | Intent-based routing: new task / continuation / casual reply | `new WorkflowSwitch()` |
 | StabilityGuard | Oscillation detection · prevents runaway loops | `new StabilityGuard()` |
 | WakeUpVerifier | Pre-action sanity check | `new WakeUpVerifier()` |
-| MetaLearner | Adaptive strategy selection from outcome patterns | `new MetaLearner()` |
 
-### Decision Engine (HeartFlowDecision)
+### Decision Engine
 | Capability | What it does | Code |
 |---|---|---|
 | HeartFlowDecision | Multi-option decision + consequence prediction + risk + identity alignment | `new HeartFlowDecision(memory)` |
 | ContextPassport | Decision chain tracking: stampId → recovery export | `decision.getRecentStamps(n)` |
-| CooperativeArbitration | Priority-based multi-source evidence weighting | `new CooperativeArbitration()` |
+| CooperativeArbitration | Priority-based multi-source evidence weighting | `cooperative-arbitration.js` |
 
 ### Philosophy & Planning (v1.3.4+)
 | Capability | What it does | Code |
