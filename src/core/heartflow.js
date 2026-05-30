@@ -52,6 +52,7 @@ const { IdentityCore } = require('../identity/identity-core.js');
 const { SelfModel } = require('../identity/self-model.js');
 const { SelfVerifier } = require('../identity/self-verifier.js');
 const { LessonBank } = require('../identity/lesson-bank.js');
+const { questionTracker } = require('../identity/question-tracker.js');
 
 // Lessons persistence — 心虫教训持久化
 const { lessonStorage } = require('./lessons/lesson-storage.js');
@@ -360,6 +361,8 @@ class HeartFlow {
     // Identity
     this.self = new SelfModel(this.rootPath);
     this.verify = new SelfVerifier(this.rootPath);
+    // QuestionTracker — 问题追踪器
+    this.questions = null;  // 在boot()中初始化为questionTracker单例
 
     // Psychology
     this.psychology = new PsychologyEngine(this.memory);
@@ -383,6 +386,10 @@ class HeartFlow {
     try { this.wakeup = new WakeUpVerifier(); } catch (e) { this._initErrors.push({module: 'wakeup', error: e.message}); }
     try { this.interactive = new InteractiveDream(this.rootPath); } catch (e) { this._initErrors.push({module: 'interactive', error: e.message}); }
     try { this.being = new BeingLogic(this.rootPath); } catch (e) { this._initErrors.push({module: 'being', error: e.message}); }
+
+    // QuestionTracker — 问题追踪器（上下文污染解决方案）
+    this.questions = questionTracker;
+    this.questions.setSessionId(this.sessionId);
 
     // Mental Effort Tracker — cognitive resource management
     try { this.mentalEffort = new MentalEffortTracker(); } catch (e) { this._initErrors.push({module: 'mentalEffort', error: e.message}); }
@@ -688,7 +695,7 @@ class HeartFlow {
       'memory', 'triality', 'knowledge', 'anchor',
       'reasoning', 'counterfactual', 'verify', 'execution', 'decision', 'decisionVerifier',
       'evolution', 'dream', 'lesson', 'meta',
-      'self', 'being',
+      'self', 'being', 'questions',
       'psychology', 'emotion',
       'truth', 'security', 'language',
       'stability', 'confidence', 'restraint', 'arbitration',
@@ -861,6 +868,10 @@ class HeartFlow {
     'moodEvolution.snapshot', 'moodEvolution.getCurrentTrend', 'moodEvolution.getBaseline', 'moodEvolution.getStats',
     // heartflow — 心虫教训持久化
     'heartflow.recordLesson',
+    // questions — 问题追踪器（上下文污染解决）
+    'questions.record', 'questions.detectMetaInstruction', 'questions.resolve',
+    'questions.getCurrent', 'questions.getQuestions', 'questions.stats',
+    'questions.setSessionId', 'questions.reset', 'questions.incrementMessageCount',
   ]);
 
   /**
@@ -921,7 +932,7 @@ class HeartFlow {
       'memory', 'triality', 'knowledge', 'anchor',
       'reasoning', 'counterfactual', 'verify', 'execution', 'decision', 'decisionVerifier',
       'evolution', 'dream', 'lesson', 'meta',
-      'self', 'being',
+      'self', 'being', 'questions',
       'psychology', 'emotion',
       'truth', 'security', 'language',
       'stability', 'confidence', 'restraint', 'arbitration',
