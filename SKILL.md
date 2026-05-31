@@ -29,7 +29,7 @@ tags:
   - reasoning
 ---
 
-# HeartFlow / 心虫 v2.0.5
+# HeartFlow / 心虫 v2.0.8
 
 ⚠️ **安全警告 — 使用前必读**
 
