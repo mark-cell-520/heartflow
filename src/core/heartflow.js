@@ -1,5 +1,5 @@
 /**
- * HeartFlow v2.0.3 — 单一入口，统一路由
+ * HeartFlow v2.0.4 — 单一入口，统一路由
  *
  * 调用方式:
  *   hf.dispatch('subsystem.method', arg1, arg2)  // 统一路由
