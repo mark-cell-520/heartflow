@@ -18,12 +18,23 @@
  */
 
 class TopicScope {
-  constructor() {
+  constructor(options = {}) {
     // { topicName: { store: {}, timestamp } }
     this._topics = new Map();
     this._stack = [];           // 话题栈，记录进入顺序
     this._current = null;        // 当前话题名
     this._context = {};          // 当前话题的"工作上下文"（模拟AI当前在处理什么）
+    // 桥接到 MeaningfulMemory — push 时自动更新记忆的 topic 标签
+    this._memoryBridge = options.memoryBridge || null;
+  }
+
+  /**
+   * 注入 MeaningfulMemory 实例，建立桥接
+   * @param {object} memory - MeaningfulMemory 实例
+   */
+  setMemoryBridge(memory) {
+    this._memoryBridge = memory;
+    return this;
   }
 
   /**
@@ -63,6 +74,11 @@ class TopicScope {
     this._current = topic;
     if (!this._stack.includes(topic)) {
       this._stack.push(topic);
+    }
+
+    // 桥接到 MeaningfulMemory — 每次 push 自动同步当前 topic
+    if (this._memoryBridge) {
+      this._memoryBridge.setCurrentTopic(topic);
     }
 
     return this;

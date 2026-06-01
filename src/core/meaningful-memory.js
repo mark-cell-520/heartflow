@@ -32,17 +32,20 @@ class MeaningfulMemory {
       learned: [],   // lessons, user preferences, verified knowledge
       ephemeral: []  // task context, working notes
     };
-    
+
     this.vectors = new Map();     // id -> embedding
     this.relationships = new Map(); // id -> [{targetId, type, strength}]
-    
+
+    // 当前话题 — 由 TopicScope 同步写入（单向）
+    this._currentTopic = null;
+
     this.stats = {
       totalMemories: 0,
       totalRelationships: 0,
       lastCleanup: null,
       lastSave: null
     };
-    
+
     // Ebbinghaus forgetting curve config
     this.forgettingConfig = {
       defaultStability: 10,
@@ -51,12 +54,40 @@ class MeaningfulMemory {
       compressionThreshold: 0.3,
       deletionThreshold: 0.1
     };
-    
+
     this._saveTimer = null;
     this._loadFromExport();
-    
+
     // Inject foundational CORE memories on first run
     this._ensureCoreMemories();
+  }
+
+  /**
+   * 由 TopicScope 调用 — 每次 push(topic) 时同步当前话题
+   * @param {string} topic
+   */
+  setCurrentTopic(topic) {
+    this._currentTopic = topic || null;
+  }
+
+  /**
+   * 获取当前话题
+   */
+  getCurrentTopic() {
+    return this._currentTopic;
+  }
+
+  /**
+   * 话题过滤的内部辅助
+   * @param {Array} memories - 记忆数组
+   * @param {string|null} topic - null = 不过滤
+   */
+  _filterByTopic(memories, topic) {
+    if (!topic) return memories;
+    return memories.filter(m => {
+      const t = m.metadata?.topic;
+      return t === topic || t === undefined; // 无 topic 标签的 = 默认，不过滤
+    });
   }
   
   // ─────────────────────────────────────────

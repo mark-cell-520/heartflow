@@ -59,7 +59,8 @@ const confidenceAnnotator = {
 
     // 标注百分比
     for (const pct of claims.percentages) {
-      const level = pct > '100' ? 'low' : 'unverified';
+      const n = parseFloat(pct);
+      const level = isNaN(n) ? 'unverified' : (n > 100 ? 'low' : 'unverified');
       annotated = annotated.replace(pct, `${pct} ${this._mark(level)}`);
     }
 
