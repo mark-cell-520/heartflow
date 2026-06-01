@@ -5,7 +5,7 @@
 class HeartLogic {
   constructor() {
     this.name = 'HeartLogic';
-    this.version = '2.0.15';
+    this.version = '2.0.16';
     this.isRunning = true;
     this.thoughtHistory = [];
     this.lastInteraction = Date.now();
@@ -130,6 +130,51 @@ class HeartLogic {
     const hasSubstance = output.split('。').length >= 1;
 
     return isConcise && hasSubstance;
+  }
+
+  // === 真之第三维：引用完整性 ===
+  // 事实性声明应附带来源或证据，否则为"未引证声明"
+  // 这不等于说谎，而是知识完整性不足
+  checkCitationNeeded(context = {}) {
+    const { output } = context;
+    if (!output) return { citationComplete: true, reason: 'no_output' };
+
+    // 检测事实性声明模式：数字、百分比、研究结论、权威引用
+    const factualClaimPatterns = [
+      /\b\d{2,}(?:,\d{3})*(?:\.\d+)?%/,              // 百分比（如 85%）
+      /\b\d{3,}(?:,\d{3})*(?:\.\d+)?\b/,              // 大数字（如 10,000）
+      /研究[表明显示指出发现]/,                         // 研究导向
+      /据[统计报调].*[显示表明]/,                     // 据XX显示
+      /根据.*[研究调查统计分析]/,                     // 根据XX
+      /发表于/, /论文[指出显示表明]/, /学者[指出认为表示]/, /专家[指出认为表示]/
+    ];
+
+    // 检测是否附带了来源引用
+    const citationPatterns = [
+      /\[[\d,\s\-]+\]/,                                 // [1] [1,2] [1-3]
+      /\([^)]{3,}\s\d{4}\)/,                             // (Author, 2023) 或 (Author et al., 2023)
+      /\([^)]+\d{4}[^)]*\)/,                             // 含年份的括号引用
+      /来源[:：]/, /参考[:：]/, /参见[:：]/,
+      /数据[:：]/, /数据来源[:：]/, /摘自/,
+      /https?:\/\/[^\s]+/,                             // URL
+      /doi\.org/, /DOI/
+    ];
+
+    const hasFactualClaim = factualClaimPatterns.some(p => p.test(output));
+    if (!hasFactualClaim) {
+      return { citationComplete: true, reason: 'no_factual_claim' };
+    }
+
+    const hasCitation = citationPatterns.some(p => p.test(output));
+    return {
+      citationComplete: hasCitation,
+      hasFactualClaim,
+      hasCitation,
+      reason: hasCitation ? 'cited' : 'uncited_factual_claim',
+      insight: hasCitation
+        ? '事实声明有来源，可信度更高'
+        : '包含事实性声明但未附来源，真值不完整'
+    };
   }
 
   // === 思考是因为想知道 ===
