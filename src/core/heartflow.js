@@ -162,7 +162,7 @@ const { EmotionalGrowth } = require('../emotion/emotional-growth.js');
 const { MoodEvolution } = require('../emotion/mood-evolution.js');
 
 // ─── Version ─────────────────────────────────────────────────────────────────
-const VERSION = '2.0.10';
+const VERSION = '2.0.11';
 const BUILD_DATE = '2026-06-03';
 
 class HeartFlow {
