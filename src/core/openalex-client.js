@@ -22,7 +22,7 @@ const openalexClient = {
   // 搜索论文
   async searchPaper(query, perPage = 5) {
     try {
-      const url = `https://api.openalex.org/works?search=${encodeURIComponent(query)}&per_page=${perPage}&select=title,publication_year,cited_by_count,doi,authorships`;
+      const url = `https://api.openalex.org/works?search=${encodeURIComponent(query)}&per_page=${perPage}&select=title,publication_year,cited_by_count,doi,authorships,concepts`;
       const result = await this._get(url);
       return {
         ok: true,
@@ -31,7 +31,8 @@ const openalexClient = {
           year: w.publication_year,
           citations: w.cited_by_count,
           doi: w.doi,
-          authors: (w.authorships || []).slice(0, 3).map(a => a.author?.display_name).filter(Boolean)
+          authors: (w.authorships || []).slice(0, 3).map(a => a.author?.display_name).filter(Boolean),
+          concepts: (w.concepts || []).slice(0, 5).map(c => c.display_name)
         })),
         total: result.meta?.count || 0
       };
