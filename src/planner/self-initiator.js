@@ -804,7 +804,7 @@ class FileToolkit {
   }
 
   list(dir = '.') {
-    const full = path.resolve(this.baseDir, dir);
+    const full = this._resolvePath(dir);
     if (!fs.existsSync(full)) return { success: false, error: '目录不存在' };
     return { success: true, files: fs.readdirSync(full) };
   }
