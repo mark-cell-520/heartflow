@@ -91,8 +91,8 @@ module.exports = function ({ test, assertEqual, assertTrue, assertDefined }) {
       return;
     }
 
-    // store
-    const storeResult = em.store('test error for integration test', 'test action', 'test outcome');
+    // store（用合法分类名；unknown 兜底映射到 hallucination 之外的通用类）
+    const storeResult = em.store('hallucination', 'test error for integration test', 'test action: test outcome');
     assertDefined(storeResult, 'store returned null');
     assertTrue(storeResult.stored === true, 'store should succeed');
 

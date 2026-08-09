@@ -95,6 +95,21 @@ class SelfScanner {
       // 去重超长函数
       result.longFunctions = result.longFunctions.filter((v, i, a) => a.findIndex(x => x.file === v.file) === i).slice(0, 20);
       result.untestedModules = result.untestedModules.slice(0, 30);
+
+      // 5. 能力探针（liveness probes）— 各子系统是否处于活动状态
+      const exploreEnv = process.env.HEARTFLOW_SELF_EVOLVE_EXPLORE;
+      result.livenessProbes = [
+        {
+          capability: 'arxiv_explore',
+          alive: exploreEnv !== '0' && exploreEnv !== 'false',  // v6.1.2 起默认开，仅显式 0/false 关闭
+          note: exploreEnv !== undefined ? `env=${exploreEnv}` : 'default-on',
+        },
+        {
+          capability: 'self_scanner',
+          alive: true,
+          note: 'scan() 执行成功',
+        },
+      ];
     } catch (e) {
       result.error = e.message;
     }

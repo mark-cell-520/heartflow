@@ -161,6 +161,14 @@ async function runAllTests() {
   for (const f of allTests) {
     const name = f.replace(/\.test\.js$/, '');
     if (explicit.has(name)) continue;
+    // 安全检查：跳过自执行测试文件（内部含 process.exit 会杀死整个 run-all 进程）。
+    // 自执行文件（如 mcp-discriminator.test.js、35dim-integration.test.js）应通过 runSubTest 独立运行。
+    let fileSrc = '';
+    try { fileSrc = fs.readFileSync(path.join(TEST_DIR, f), 'utf8').slice(0, 400); } catch (e) {}
+    if (!/module\.exports\s*=\s*function/.test(fileSrc)) {
+      console.log('  ⏭️ 跳过自执行 ' + name + '（用 runSubTest 独立运行）');
+      continue;
+    }
     try {
       require('./' + f)({ test, assertEqual, assertTrue, assertFalse, assertDefined, assertThrows });
       console.log('  + 接入 ' + name);

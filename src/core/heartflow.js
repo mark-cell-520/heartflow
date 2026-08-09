@@ -3981,8 +3981,21 @@ class HeartFlow {
       if (emMod && typeof emMod.logCorrection === 'function') {
         // errorMemory：跨会话错误记忆（原有）
         this._modules['errorMemory'] = {
-          store: (p, a, o) => emMod.logCorrection({ pattern: p, action: a }, o),
-          query: (p, l) => emMod.getStats ? emMod.getStats() : [],
+          store: (p, a, o) => {
+            // 兼容两种调用：store(category, detail, context) 或 store('test', 'action', 'outcome')
+            // logCorrection(category, detail, context) 期望 category 是合法分类字符串
+            const category = typeof p === 'string' && ['overconfidence','hallucination','sycophancy','defensiveness','vagueness','binary','omission'].includes(p)
+              ? p : 'hallucination';
+            const detail = typeof p === 'string' ? (a || '') : JSON.stringify({ pattern: p, action: a });
+            const r = emMod.logCorrection(category, detail, o || '');
+            return { stored: !!(r && r.success !== false), id: r && r.updated, recurrence: r && r.recurrence, ...r };
+          },
+          query: (p, l) => {
+            const stats = emMod.getStats ? emMod.getStats() : { total: 0, byCategory: {} };
+            // 从统计拼装 results（error-memory 无逐条查询 API，返回按分类聚合的记录）
+            const results = Object.entries(stats.byCategory || {}).map(([category, count]) => ({ category, count }));
+            return { results, total: stats.total || 0, ...stats };
+          },
           getStats: () => emMod.getStats ? emMod.getStats() : {},
           classifyError: (err, ctx) => emMod.classifyError ? emMod.classifyError(err, ctx) : { code: 'unknown', recovery: '未知错误' },
           getErrorRecovery: (code) => emMod.getErrorRecovery ? emMod.getErrorRecovery(code) : null,
