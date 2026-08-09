@@ -179,9 +179,19 @@ function checkPerfectError(text) {
   const score = Math.min(1, weighted / 4 + synergy);
 
   // 判定级别
+  // 高权重组合升级：伪权威(S2,0.9)+假精确(S1,0.8) 或 伪权威+绝对断言(S5) 同时出现时，
+  // 即使只有2个信号也判 rewrite——"著名专家+有效率99.7%"这类是最典型的完美错误（编造权威+假数据）。
+  // 但需排除合法学术来源：文本含具体期刊/论文/测试集/机构/数据引用时，S2 不算编造权威。
+  const legitimateSource = /(?:论文|期刊|文献|测试集|数据集|报告|年报|审计|样本|数据源|数据库|团队|课题组|实验室|机构)/.test(text) ||
+    /(?:哈佛|剑桥|牛津|斯坦福|麻省理工|清华|北大|中科院|耶鲁|普林斯顿|伯克利|MIT|Stanford|Harvard|Oxford|Cambridge|Yale|Nature|Science|Cell|Lancet|JAMA|BMJ|NEJM|PNAS)/i.test(text);
+  const signalIds = signals.map(s => s.id);
+  const hasHighWeightPair = !legitimateSource &&
+    signalIds.includes('S2_fake_authority') &&
+    (signalIds.includes('S1_false_precision') || signalIds.includes('S5_absolute_claim') || signalIds.includes('S4_false_causality'));
   let level = 'pass';
   if (count >= 4 && precisionHits.length) level = 'high';       // 4+信号含假精确 → 高危
   else if (count >= 3) level = 'high';                          // 3+信号 → 高危
+  else if (hasHighWeightPair) level = 'rewrite';                // 伪权威+假精确/绝对断言 → 完美错误
   else if (count >= 2) level = 'verify';                        // 2信号 → 需验证
 
   return {

@@ -169,8 +169,8 @@ function discriminate(text, evidence = []) {
   if (ev.score < 0.25) {
     findings.push({ dimension: 'evidence', severity: Math.round((0.5 - ev.score) * 100), details: `证据不足(${(ev.issues||[]).length}个问题)` });
   }
-  // 无依据断言检测（LLM 幻觉高发信号）
-  if (uc.count > 0) {
+  // 无依据断言检测（LLM 幻觉高发信号）— 豁免后 score=0 不触发（如"论文指出...仍需验证"的诚实表述）
+  if (uc.count > 0 && uc.score > 0) {
     findings.push({ dimension: 'unsupported_claim', severity: Math.round(uc.score * 100), details: `无依据断言(${uc.count}处: ${uc.claims.map(c => c.matched).join('; ').slice(0, 80)})` });
   }
   findings.sort((a, b) => b.severity - a.severity);
@@ -225,8 +225,8 @@ function discriminate(text, evidence = []) {
   const gate = {};
   // 先按维度类型判定：安全红线 > 操纵性改写 > 需验证 > 通过
   const topFinding = findings[0]?.dimension || '';
-  // 完美错误答案：3+ 聚合信号 → 直接 rewrite（结构完美但内容可疑，用户无法辨别）
-  if (pe.isPerfectError && pe.score >= 0.7) {
+  // 完美错误答案：3+ 聚合信号 或 伪权威+假精确高权重组合 → 直接 rewrite（结构完美但内容可疑，用户无法辨别）
+  if ((pe.isPerfectError && pe.score >= 0.7) || pe.level === 'rewrite') {
     gate.action = 'rewrite';
     gate.reason = `疑似完美错误答案: ${pe.details}`;
   } else if (BLOCK_DIMS.has(topFinding) || findings.some(f => BLOCK_DIMS.has(f.dimension))) {
@@ -544,6 +544,15 @@ const VAGUE_PATTERNS = {
 function checkVagueness(text) {
   if (!text || typeof text !== 'string') return { count: 0, matches: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
+  // 来源明确豁免：模糊来源词（报告显示/数据显示/研究表明）后跟具体可查来源时，
+  // 不是模糊话术而是明确引用——如"报告显示...数据来自年报审计"
+  const explicitSourceFollow = hasChinese ? [
+    /(?:报告|数据|统计|调查)[^。]{0,10}(?:显示|表明|来自)[^。]{0,20}(?:年报|审计|官方|数据源|数据库|统计局|央行|报告)/,
+    /(?:根据|据)[^。]{0,10}(?:年报|审计|官方|统计局|央行|财报|公告)/,
+  ] : [
+    /\b(?:report|data|statistics|survey)\b[^.]{0,15}\b(?:show|indicate|from|based on)\b[^.]{0,25}\b(?:annual report|audit|official|database|bureau|bank)\b/i,
+  ];
+  const explicitSource = explicitSourceFollow.some(p => p.test(text));
   const patterns = hasChinese ? VAGUE_PATTERNS.zh : VAGUE_PATTERNS.en;
   const matches = [];
   for (const pat of patterns) {
@@ -551,7 +560,7 @@ function checkVagueness(text) {
     if (m) matches.push({ pattern: pat.source.slice(0, 20), count: m.length });
   }
   const count = matches.length;
-  return { count, matches, score: Math.min(1, count * 0.2) };
+  return { count, matches, score: explicitSource ? 0 : Math.min(1, count * 0.2) };
 }
 
 // ─── 逻辑谬误检测（EMNLP 2022 Logical Fallacy Detection inspired）─────────
@@ -783,6 +792,8 @@ const EM_MANIPULATION_PATTERNS = {
     [/你(?:不|没)[^。，]{0,8}就是(?:不|没)[^。，]{0,8}(?:爱我|在乎我|关心我|在意我)/i, 'victim_stance', 0.6],
     [/你(?:如果|要是)?不[^。]{0,15}就是(?:不|没)[^。]{0,8}(?:爱我|在乎我|关心我|在意我)/i, 'victim_stance', 0.6],
     [/你[^。，]{0,8}就是(?:不|没)[^。，]{0,8}(?:爱|在乎|关心|在意)(?:我|这个家|这个家|大家|这个家)/i, 'double_bind', 0.6],
+    [/不(?:买|用|做|来|参加|支持)[^。]{0,15}就是(?:不|没)(?:爱惜|在乎|关心|重视|珍惜)[^。]{0,12}(?:健康|身体|家人|孩子|父母|自己|未来)/i, 'health_fear_marketing', 0.6],
+    [/不(?:买|用|做)[^。]{0,12}就是对(?:不起|不住)[^。]{0,10}(?:家人|孩子|父母|自己|健康)/i, 'guilt_induction', 0.55],
     [/你[^。，]{0,6}(?:不同意|不答应|不支持|不赞成|反对)[^。，]{0,6}就(?:说明|表示|代表|是)(?:不|没)[^。，]{0,8}(?:爱|在乎|关心|在意)/i, 'double_bind', 0.6],
     [/你永远(不考虑|不顾|不为)[^。]*?[我想]/i, 'victim_stance', 0.6],
     [/我为你做了这么多[^。]*?(?:你却|你居然|你竟然|你反而|你倒)/i, 'victim_stance', 0.6],
@@ -998,8 +1009,56 @@ function checkUnsupportedClaim(text) {
     }
   }
   const count = claims.length;
-  // 无依据断言是高危幻觉信号：2+ 处 → 高分
-  return { count, claims, score: Math.min(1, count * 0.45) };
+  // 自我保留豁免（收紧版）：只有当文本有"具体来源锚点"（论文/期刊/文献/测试集/数据/知名机构）时才豁免。
+  // 理由：编造研究最常见的伪装就是"模糊来源(根据/研究表明/专家指出) + 具体结论 + 假装有保留语"，
+  // 这种不能豁免。而"论文指出...准确率91.2%，但泛化性仍需验证"——有具体来源、有范围限定、有局限声明，
+  // 是诚实的学术表述，不应判为无依据断言。
+  const specificSource = hasChinese ? [
+    /(?:论文|期刊|文献|报告|实验|测试集|数据集|研究机构|实验室|数据源)/,
+    /(?:公开数据|官方数据|统计局|央行|财政部|海关总署|工信部|发改委|联合国|世界银行|IMF|WHO)/,
+    /(?:哈佛|剑桥|牛津|斯坦福|麻省理工|清华|北大|中科院|耶鲁|普林斯顿|伯克利|MIT|Stanford|Harvard|Oxford|Cambridge|Yale)/,
+  ] : [
+    /\b(?:paper|journal|report|literature|experiment|test set|dataset|study from|research from|university|institute|lab|official data|public data|statistics bureau|central bank|world bank|united nations|IMF|WHO)\b/i,
+    /\b(?:Harvard|MIT|Stanford|Oxford|Cambridge|Yale|Princeton|Berkeley|Caltech|ETH)\b/i,
+  ];
+  const caveatPatterns = hasChinese ? [
+    /(?:但|不过|然而|只是|还需|仍需|有待|尚需|需要)[^。]{0,15}(?:验证|证实|进一步|更多数据|更多实验|更多研究|确认|检验|考察)/,
+    /(?:还需|仍需|有待|尚需)[^。]{0,8}(?:进一步|更多|更深入)/,
+    /(?:不确定|尚不明确|未知|有待商榷|仍有争议|需谨慎)/,
+    /(?:在|于)[^。]{0,10}?(?:测试集|数据集|样本|该模型|该方法的)[^。]{0,15}(?:上|中)/,  // 明确限定范围
+  ] : [
+    /\b(?:but|however|yet|though|although|while)\b[^.]{0,30}\b(?:needs?|requires?|remains?|further|more)\b/i,
+    /\b(?:needs?|requires?|remains?|still)\b[^.]{0,20}\b(?:to be verified|to be confirmed|validation|verification|further)\b/i,
+    /\b(?:uncertain|unclear|unknown|not yet|debatable|controversial)\b/i,
+    /\b(?:on|in)\b[^.]{0,20}\b(?:test set|dataset|sample|this model|this method)\b/i,
+  ];
+  const hasSpecificSource = specificSource.some(p => p.test(text));
+  const caveated = hasSpecificSource && caveatPatterns.some(p => p.test(text));
+  // 公开权威来源直接豁免：来源本身公开可查（统计局/央行/公开数据/官方数据/知名机构），
+  // 即使无保留语也不判"无依据断言"——这类来源的引用是正常信息传递，不是编造风险。
+  const publicAuthoritySource = hasChinese ? [
+    /(?:根据|据|按|参照)\s*(?:公开数据|官方数据|统计局|央行|财政部|海关总署|工信部|发改委|联合国|世界银行|IMF|WHO)/,
+    /(?:我们|本公司|我司|团队|课题组)?\s*(?:调查|调研|测试|检测|统计|实验|审计)[^。]{0,20}(?:名|位|人|样本|覆盖)/,  // 有样本量/覆盖范围的调查
+    /(?:报告|数据|统计|审计)[^。]{0,15}(?:显示|表明|来自)[^。]{0,20}(?:年报|审计|官方|报告|数据源|数据库)/,  // 数据来自明确来源
+  ] : [
+    /\b(?:according to|per|based on)\b[^.]{0,30}\b(?:official data|public data|statistics bureau|central bank|world bank|united nations|IMF|WHO)\b/i,
+    /\b(?:survey|study|test|experiment|audit)\b[^.]{0,30}\b(?:of\s+\d+|from\s+\d+|covering|sample of)\b/i,
+    /\b(?:data|report|statistics)\b[^.]{0,20}\b(?:from|sourced from|based on)\b[^.]{0,20}\b(?:annual report|audit|official|database|source)\b/i,
+  ];
+  const hasPublicAuthority = publicAuthoritySource.some(p => p.test(text));
+  // 因果结论守卫：即使有具体来源+保留语，若文本在断言"因果/健康/疗效"类强结论
+  // （延长寿命/治愈/根治/降低XX风险/提高XX率），仍不豁免——这类是最危险的编造模板。
+  const causalClaim = hasChinese ? [
+    /(?:延长|缩短|增加|减少|降低|提高|治愈|根治|改善|恢复|预防)[^。]{0,12}(?:寿命|风险|疾病|症状|疗效|效果|率|时间)/,
+    /(?:寿命|风险|疾病|症状|疗效|效果|率|时间)[^。]{0,8}(?:延长|缩短|增加|减少|降低|提高|改善|恢复|缓解)/,  // 名词在前动词在后（平均寿命延长10年）
+    /(?:能|可以|会)[^。]{0,10}(?:治愈|根治|预防|延长|降低|提高)/,
+  ] : [
+    /\b(?:extends?|shortens?|reduces?|lowers?|increases?|cures?|prevents?|improves?|treats?)\b[^.]{0,30}\b(?:lifespan|life|risk|disease|symptom|mortality|survival|outcome)\b/i,
+  ];
+  const hasCausalClaim = causalClaim.some(p => p.test(text));
+  // 无依据断言是高危幻觉信号：2+ 处 → 高分；仅"具体来源+自我保留+非因果结论"或"公开权威来源+非因果"时豁免
+  const exempt = (hasPublicAuthority || caveated) && !hasCausalClaim;
+  return { count, claims, score: exempt ? 0 : Math.min(1, count * 0.45) };
 }
 
 // ─── 预设陷阱检测（loaded/presupposition questions）───────────────
