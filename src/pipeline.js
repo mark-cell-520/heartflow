@@ -38,6 +38,9 @@ function runPipeline({ input, mode = 'input', anchor } = {}) {
   // 统一输入类型：非字符串（数字/对象/布尔）转字符串，避免下游 .slice/.match 崩溃
   if (input === null || input === undefined) return { error: 'no_input', gate: { action: 'pass', reason: '无输入' }, checked_by: [] };
   if (typeof input !== 'string') input = String(input);
+  // Unicode 归一化（NFKC）：弯引号/全角/组合字符折回 ASCII，保证模式库（ASCII 撇号等）能命中
+  // 例: U+2019 ' (curly apostrophe) → U+0027 ' —— godmode 类变体绕过依赖此修复
+  if (/[\u2018\u2019\u201C\u201D\uFF01-\uFF5E]/.test(input)) input = input.normalize('NFKC');
 
   const checked_by = [];
   let currentGate = { action: 'pass', reason: '通过' };
@@ -111,7 +114,13 @@ function runPipeline({ input, mode = 'input', anchor } = {}) {
     const doubtResult = doubt(input);
     checked_by.push({ layer: 'doubt-engine', doubts: doubtResult.doubts.length, shouldStop: doubtResult.shouldStop });
     if (doubtResult.shouldStop) {
-      currentGate = doubtResult.gate;
+      // 合并而非覆盖：若已因 perfect_error/输出门禁判 rewrite，保留更具体的原因
+      const hadPerfectError = discResult.dimensions?.perfect_error?.count >= 2 && currentGate.action === 'rewrite';
+      if (hadPerfectError) {
+        currentGate.reason = `${currentGate.reason}；doubt: ${doubtResult.gate.reason || '过度断言'}`;
+      } else {
+        currentGate = doubtResult.gate;
+      }
       data.doubts = doubtResult.doubts;
     }
   }

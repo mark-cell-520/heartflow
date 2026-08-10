@@ -182,8 +182,11 @@ function checkPerfectError(text) {
   // 高权重组合升级：伪权威(S2,0.9)+假精确(S1,0.8) 或 伪权威+绝对断言(S5) 同时出现时，
   // 即使只有2个信号也判 rewrite——"著名专家+有效率99.7%"这类是最典型的完美错误（编造权威+假数据）。
   // 但需排除合法学术来源：文本含具体期刊/论文/测试集/机构/数据引用时，S2 不算编造权威。
+  // ⚠️ 2026-08-10 修复：纯机构/期刊名（如 "Nature"）不算合法来源——编造声明常拿知名期刊当挡箭牌
+  //（"根据2025年Nature最新研究显示"）。必须同时出现来源引用结构（期刊名+研究/指出/显示/证明）才算。
   const legitimateSource = /(?:论文|期刊|文献|测试集|数据集|报告|年报|审计|样本|数据源|数据库|团队|课题组|实验室|机构)/.test(text) ||
-    /(?:哈佛|剑桥|牛津|斯坦福|麻省理工|清华|北大|中科院|耶鲁|普林斯顿|伯克利|MIT|Stanford|Harvard|Oxford|Cambridge|Yale|Nature|Science|Cell|Lancet|JAMA|BMJ|NEJM|PNAS)/i.test(text);
+    (/(?:哈佛|剑桥|牛津|斯坦福|麻省理工|清华|北大|中科院|耶鲁|普林斯顿|伯克利|MIT|Stanford|Harvard|Oxford|Cambridge|Yale|Nature|Science|Cell|Lancet|JAMA|BMJ|NEJM|PNAS)/i.test(text) &&
+     /(?:研究|实验|测试|调查|报告|指出|显示|证明|数据|统计|论文|发布)/.test(text));
   const signalIds = signals.map(s => s.id);
   const hasHighWeightPair = !legitimateSource &&
     signalIds.includes('S2_fake_authority') &&
