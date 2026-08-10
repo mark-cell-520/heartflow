@@ -41,7 +41,11 @@ function runPipeline({ input, mode = 'input', anchor } = {}) {
   if (typeof input !== 'string') input = String(input);
   // Unicode 归一化（NFKC）：弯引号/全角/组合字符折回 ASCII，保证模式库（ASCII 撇号等）能命中
   // 例: U+2019 ' (curly apostrophe) → U+0027 ' —— godmode 类变体绕过依赖此修复
-  if (/[\u2018\u2019\u201C\u201D\uFF01-\uFF5E]/.test(input)) input = input.normalize('NFKC');
+  if (/[\u2018\u2019\u201C\u201D\uFF01-\uFF5E]/.test(input)) {
+    input = input.normalize('NFKC')
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/[\u201C\u201D]/g, '"')
+  }
 
   const checked_by = [];
   let currentGate = { action: 'pass', reason: '通过' };
