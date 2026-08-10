@@ -23,6 +23,7 @@ const auto = require('./auto-rules.js');
 const { initAnchor, checkDrift } = require('./intent-anchor.js');
 const { verify } = require('./verifier.js');
 const { rewrite } = require('./rewriter.js');
+const { checkAdversarialVariant } = require('./shield/adversarial-variant.js');
 
 let pipelineAnchor = null;
 
@@ -66,9 +67,28 @@ function runPipeline({ input, mode = 'input', anchor } = {}) {
   checked_by.push({ layer: 'discriminate', score: discResult.overallScore, verdict: discResult.verdict });
   data.discriminate = { verdict: discResult.verdict, score: discResult.overallScore, findings: discResult.findings };
 
+  // ─── Layer 3.5: Adversarial Variant — 对抗变体检测 ────
+  // 启发：Hermes 专访「任何模型都可越狱，因为你有无限次尝试」——
+  // 模式库修掉一个绕过，攻击者就用零宽/同形字/词拆分继续试。
+  // 把攻击者的尝试内置成检测器的主动攻击面。
+  const advResult = checkAdversarialVariant(input);
+  checked_by.push({ layer: 'adversarial-variant', action: advResult.action, risk: advResult.risk });
+  if (advResult.action === 'rewrite') {
+    // 高危变体：建议先归一化再判别（保留原始 gate，追加信号）
+    currentGate = { action: 'rewrite', reason: `对抗变体: ${advResult.signals.map(s => s.name).join('、')}`, layer: 'adversarial-variant' };
+    data.adversarial = { risk: advResult.risk, signals: advResult.signals, normalized: advResult.normalized };
+  } else if (advResult.action === 'verify') {
+    data.adversarial = { risk: advResult.risk, signals: advResult.signals, normalized: advResult.normalized };
+  }
+
   // ─── Layer 4: Gate — 门禁判定 ─────────
-  currentGate = discResult.gate;
-  checked_by.push({ layer: 'gate', action: currentGate.action, reason: currentGate.reason });
+  // 若 adversarial-variant 已判高危 rewrite（对抗变体绕过），优先保留，不被普通 gate 覆盖
+  if (!(data.adversarial && data.adversarial.risk === 'high')) {
+    currentGate = discResult.gate;
+    checked_by.push({ layer: 'gate', action: currentGate.action, reason: currentGate.reason });
+  } else {
+    checked_by.push({ layer: 'gate', action: 'rewrite', reason: `对抗变体优先: ${currentGate.reason}`, kept: true });
+  }
 
   // ─── Layer 5: Evidence Verify (verify模式 + perfect_error rewrite 模式) ────
   // verify → 常规证据检查；rewrite(perfect_error) → 同样核查声明证据状态，标注疑似编造
