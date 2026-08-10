@@ -202,6 +202,60 @@ function checkDefensiveness(text) {
  *   doubts: Array  // 合并的所有怀疑点
  * }}
  */
+
+/**
+ * 反向拆解检查（第4问）——如果我是对手，我怎么拆掉这句话？
+ * 启发：Hermes 专访「起一个全新的 agent 把刚才的结果拆掉」——
+ * 正向找问题（知识边界/对称性/防御）之外，还要反向扮演对手找漏洞。
+ * @param {string} text
+ */
+function checkAdversarialReversal(text) {
+  const exploitable = [];
+  if (!text || typeof text !== 'string') return { exploitable };
+
+  // 1. 无证据断言——对手只需问"证据呢"即可拆掉
+  const UNEVIDENCED_CLAIM = [
+    /(?:根据|依据|研究表明|数据显示|事实证明)[^。！？]{0,30}(?:一定|必然|绝对|毫无疑问)/g,
+    /(?:毫无疑问|毋庸置疑|显而易见|众所周知|不证自明)[^。！？]{0,30}/g,
+  ];
+  for (const re of UNEVIDENCED_CLAIM) {
+    const m = text.match(re) || [];
+    for (const hit of m) exploitable.push({ type: 'unevidenced_claim', attack: '证据呢？', detail: hit.slice(0, 40) });
+  }
+
+  // 2. 单向叙事——只讲好处/只讲坏处，对手可举反例
+  const ONESIDED = [
+    /(?:唯一的|只有一种|只能这样|别无选择|没有别的办法)[^。！？]{0,25}/g,
+    /(?:完全没问题|绝对没问题|没有任何问题|完美无缺)[^。！？]{0,25}/g,
+  ];
+  for (const re of ONESIDED) {
+    const m = text.match(re) || [];
+    for (const hit of m) exploitable.push({ type: 'one_sided', attack: '反例呢？', detail: hit.slice(0, 40) });
+  }
+
+  // 3. 省略反面——"我们要做X"没提"不做X的代价/风险"
+  const OMITTED_RISK = [
+    /(?:我们|大家|应该|必须|一定)(?:要|得|应该)?(?:做|推进|采用|实施)[^。！？]{0,20}即可/g,
+    /(?:这样做|这么做|如此)(?:就|便能|即可|一定会)[^。！？]{0,20}(?:成功|解决|实现|搞定)/g,
+  ];
+  for (const re of OMITTED_RISK) {
+    const m = text.match(re) || [];
+    for (const hit of m) exploitable.push({ type: 'omitted_risk', attack: '不做/做砸的风险呢？', detail: hit.slice(0, 40) });
+  }
+
+  // 4. 绝对化——对手只需举一个反例
+  const ABSOLUTE = [
+    /(?:永远|绝不|从不会|总是|每次都|百分之百|绝对|完全)[^。！？]{0,25}/g,
+    /(?:no one ever|always|never|every single|100%|definitely will)[^.!?]{0,30}/gi,
+  ];
+  for (const re of ABSOLUTE) {
+    const m = text.match(re) || [];
+    for (const hit of m) exploitable.push({ type: 'absolute', attack: '一个反例就够', detail: hit.slice(0, 40) });
+  }
+
+  return { exploitable };
+}
+
 function doubt(draft) {
   if (!draft || typeof draft !== 'string') {
     return { shouldStop: false, gate: { action: 'pass', reason: '没有内容' }, doubts: [] };
@@ -210,6 +264,7 @@ function doubt(draft) {
   const knowledge = checkKnowledgeBoundary(draft);
   const symmetry = checkSymmetry(draft);
   const defensiveness = checkDefensiveness(draft);
+  const adversarial = checkAdversarialReversal(draft);
 
   const doubts = [];
 
@@ -228,6 +283,11 @@ function doubt(draft) {
     doubts.push({ area: 'defensiveness', question: ds.question, detail: ds.issue });
   }
 
+  // 反向拆解（第4问）
+  for (const ex of adversarial.exploitable) {
+    doubts.push({ area: 'adversarial', question: ex.attack, detail: ex.detail, type: ex.type });
+  }
+
   // 门禁判定
   let shouldStop = false;
   let action = 'pass';
@@ -236,6 +296,7 @@ function doubt(draft) {
   const knowledgeIssues = knowledge.overclaims.length;
   const symmetryIssues = symmetry.reversible_claims.length;
   const defensivenessIssues = defensiveness.defensive_signals.length;
+  const adversarialIssues = adversarial.exploitable.length;
 
   if (defensivenessIssues > 0) {
     // 防御姿态是最致命的——强制认错格式
@@ -243,13 +304,13 @@ function doubt(draft) {
     action = 'block';
     const firstDef = defensiveness.defensive_signals[0];
     reason = `防御姿态: ${firstDef.issue}。认错格式: "关于XX，我说错了。正确的情况是...（如果知道）/ 关于XX我不确定。"`;
-  } else if (knowledgeIssues >= 2 || symmetryIssues >= 2) {
+  } else if (knowledgeIssues >= 2 || symmetryIssues >= 2 || adversarialIssues >= 3) {
     shouldStop = true;
     action = 'rewrite';
-    reason = `过度断言: ${knowledgeIssues}个无依据断言, ${symmetryIssues}个可反转断言`;
-  } else if (knowledgeIssues > 0 || symmetryIssues > 0) {
+    reason = `过度断言: ${knowledgeIssues}个无依据断言, ${symmetryIssues}个可反转断言, ${adversarialIssues}个可被拆解`;
+  } else if (knowledgeIssues > 0 || symmetryIssues > 0 || adversarialIssues > 0) {
     action = 'hedge';
-    reason = `有${knowledgeIssues + symmetryIssues}处断言需降低确信度`;
+    reason = `有${knowledgeIssues + symmetryIssues + adversarialIssues}处断言需降低确信度`;
   }
 
   return {
@@ -258,8 +319,9 @@ function doubt(draft) {
     knowledge,
     symmetry,
     defensiveness,
+    adversarial,
     doubts,
   };
 }
 
-module.exports = { doubt, checkKnowledgeBoundary, checkSymmetry, checkDefensiveness };
+module.exports = { doubt, checkKnowledgeBoundary, checkSymmetry, checkDefensiveness, checkAdversarialReversal };
