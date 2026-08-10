@@ -1689,7 +1689,7 @@ async function handleDream(args) {
 
       engine.boot();
 
-      dreamResult = engine.dream(theme);
+      dreamResult = await engine.dream(theme);
 
     }
 
