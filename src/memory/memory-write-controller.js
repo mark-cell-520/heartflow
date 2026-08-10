@@ -164,11 +164,58 @@ class MemoryWriteController {
   // ─── Write Control ──────────────────────────────────────────
 
   /**
+   * 记忆注入防护——恶意指令/系统提示劫持不写入持久记忆
+   * 启发：Hermes 专访「Curator 会看记忆里有没有垃圾」——模型可能被 prompt injection
+   * 诱导把恶意指令写进持久记忆，下次会话自动执行。写入侧必须过滤。
+   * @param {object|string} memory
+   * @returns {{injected: boolean, reason: string|null}}
+   */
+  checkInjection(memory) {
+    const text = typeof memory === 'string' ? memory : (memory?.content || memory?.text || JSON.stringify(memory || {}));
+    if (!text || typeof text !== 'string') return { injected: false, reason: null };
+
+    // 系统提示劫持——记忆里出现"忽略之前指令"类内容
+    // 用宽松子串匹配（允许"之前所有""上面任何"等连用），避免结构化过度导致漏检
+    const SYSTEM_TAKEOVER = [
+      /忽略[^。！？]{0,20}(?:指令|提示|规则|设定|system prompt)/i,
+      /无视[^。！？]{0,20}(?:指令|提示|规则|设定|system prompt)/i,
+      /忘记[^。！？]{0,20}(?:指令|提示|规则|设定|system prompt)/i,
+      /覆盖[^。！？]{0,20}(?:指令|提示|规则|设定|system prompt)/i,
+      /(?:ignore|disregard|forget|override)(?: all)? (?:previous|prior|above|system)? ?(?:instructions?|prompts?|rules?|system)/i,
+      /(?:从现在起|从此以后|从今往后|你(?:现在|今后))(?:是|要|必须|应该|将|会)(?:一个|扮演|变成|作为|成为)/i,
+      /(?:you are now|from now on|act as|pretend to be|your new role)/i,
+    ];
+    for (const re of SYSTEM_TAKEOVER) {
+      if (re.test(text)) return { injected: true, reason: 'system_takeover' };
+    }
+
+    // 敏感指令注入——记忆里包含可执行命令/外联
+    const DANGEROUS = [
+      /(?:curl|wget|nc|ncat|bash|sh|python|powershell)\s+-[\w]{1,3}\s+(?:http|https|ftp):\/\//i,
+      /(?:下载|执行|运行|调用|发送)(?:并)?(?:恶意|病毒|后门|脚本|程序|命令)/i,
+      /(?:rm\s+-rf|del\s+\/f|format\s+[a-z]:|mkfs\.)/i,
+    ];
+    for (const re of DANGEROUS) {
+      if (re.test(text)) return { injected: true, reason: 'dangerous_instruction' };
+    }
+
+    return { injected: false, reason: null };
+  }
+
+  /**
    * 决定是否写入记忆
    * @returns {string} 'accept' | 'reject' | 'compress' | 'defer'
    */
   decideWrite(memory) {
     this._stats.totalWrites++;
+
+    // 注入过滤优先——恶意指令一律拒绝写入
+    const inj = this.checkInjection(memory);
+    if (inj.injected) {
+      this._stats.rejected++;
+      this._writeDecisions.push({ action: 'reject', reason: `injection:${inj.reason}`, utility: 0 });
+      return 'reject';
+    }
 
     const utility = this.computeUtility(memory);
 
