@@ -761,6 +761,9 @@ class MeaningfulMemory {
       updatedAt: Date.now(),
 
       // [SIG] 写入时自动签名(store 自动签名, 调用方不碰密钥 — DanceNitra 洞见: 覆盖率靠自动写入, 不靠调用方自觉)
+      // 注(DanceNitra #34352 Abadi & Needham 原则3): 当前签名只覆盖内容哈希, 记录无 tenant 字段
+      //   所以暂不签 tenant; 一旦记忆加入多租户字段, 签名消息必须包含 tenant(byte-identical 原则),
+      //   否则记录可在租户间移动而签名仍验证通过 — 参照 openclaw#7707 DanceNitra 的 attested_key 修复
 
       signature: memory.signature || (_signMemory(memory.content || memory.summary) || {}),
 
