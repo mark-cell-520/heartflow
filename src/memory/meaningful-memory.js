@@ -42,6 +42,37 @@ const path = require('path');
 
 const crypto = require('crypto');
 
+// ─── [SIG] 记忆签名链 (2026-08-11, DanceNitra 洞见驱动) ───────────────
+// 之前回复承诺"每条记忆带写入者签名"但实际没有——本次补齐。
+// 原则: store 自动签名(调用方不碰密钥), getStats 报告签名覆盖率,
+//       防止"guard 从不触发=假安全"(DanceNitra #1121: 0/214,929 记录带签名)。
+let _verifierGrant = null;
+function _getVerifier() {
+  if (!_verifierGrant) {
+    try {
+      const { VerifierGrant } = require('../core/verifier-grant.js');
+      _verifierGrant = new VerifierGrant();
+    } catch (e) {
+      _verifierGrant = null; // 防御性: 签名不可用不影响记忆主功能
+    }
+  }
+  return _verifierGrant;
+}
+function _signMemory(content) {
+  try {
+    const vg = _getVerifier();
+    if (!vg) return { signed: false, signature: null, keyId: null };
+    // 用 root key 直接签名内容哈希(轻量, 不建 session)
+    const pair = vg._rootKey || null;
+    if (!pair) return { signed: false, signature: null, keyId: null };
+    const digest = crypto.createHash('sha256').update(String(content || '')).digest('hex');
+    const signature = crypto.createSign('RSA-SHA256').update(digest).sign(pair.privateKey, 'base64');
+    return { signed: true, signature, keyId: pair.publicKey.slice(-12) };
+  } catch (e) {
+    return { signed: false, signature: null, keyId: null };
+  }
+}
+
 
 
 // 语义搜索（懒加载，首次使用时才加载模型）
@@ -727,7 +758,13 @@ class MeaningfulMemory {
 
       createdAt: Date.now(),
 
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
+
+      // [SIG] 写入时自动签名(store 自动签名, 调用方不碰密钥 — DanceNitra 洞见: 覆盖率靠自动写入, 不靠调用方自觉)
+
+      signature: memory.signature || (_signMemory(memory.content || memory.summary) || {}),
+
+      _sigMeta: { autoSigned: true, signedAt: Date.now() }
 
     };
 
@@ -1783,6 +1820,17 @@ class MeaningfulMemory {
 
   getStats() {
 
+    // [SIG] 签名覆盖率 — DanceNitra #1121 洞见: "guard 从不触发=假安全"
+    // 统计实际带签名的记录占比, 让"签名链在工作"可被验证而不是假设
+    let signedCount = 0;
+    let totalCount = 0;
+    for (const layer of ['core', 'learned', 'ephemeral']) {
+      for (const m of (this.layers[layer] || [])) {
+        totalCount++;
+        if (m.signature && m.signature.signed) signedCount++;
+      }
+    }
+
     return {
 
       ...this.stats,
@@ -1797,7 +1845,12 @@ class MeaningfulMemory {
 
       },
 
-      totalMemories: this.layers.core.length + this.layers.learned.length + this.layers.ephemeral.length
+      totalMemories: this.layers.core.length + this.layers.learned.length + this.layers.ephemeral.length,
+
+      // [SIG] 覆盖率报告(0 表示签名未启用或从未写入 — 不再是"假装安全")
+      signatureCoverage: totalCount > 0 ? Math.round((signedCount / totalCount) * 1000) / 10 : 0,
+      signedMemories: signedCount,
+      totalMemoriesWithSig: totalCount
 
     };
 
