@@ -654,7 +654,8 @@ module.exports = { ${className} };
       const { execFileSync } = require('child_process');
       const root = this.rootPath || __dirname;
       const out = execFileSync('git', ['-C', root, 'log', '--oneline', '--all'], { stdio: ['ignore', 'pipe', 'ignore'] });
-      const matches = out.toString().split('\n').filter(l => l.includes(`v${version}`)).length;
+      const cleanVersion = String(version).replace(/^v/, '');
+      const matches = out.toString().split('\n').filter(l => l.includes(`v${cleanVersion}`)).length;
       return matches > 0;
     } catch (e) {
       return false; // git 不可用或查不到 -> 不接受为真实升级
