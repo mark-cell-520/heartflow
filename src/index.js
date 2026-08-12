@@ -65,6 +65,8 @@ const { checkPerfectError } = require('./perfect-error.js');
 function discriminate(text, evidence = []) {
   const ev = checkEvidence(text, evidence);
   const uc = checkUnsupportedClaim(text);
+  const pc = checkPseudoCausal(text); // 伪因果精确倍数检测
+  const sd = checkSoftDeflection(text); // 软话术/双层叙事检测（伪开放伪谦逊）
   const pe = checkPerfectError(text); // 完美错误答案检测（聚合信号）
   const sy = checkSycophancy(text);
   const ct = checkContradiction(text);
@@ -173,6 +175,14 @@ function discriminate(text, evidence = []) {
   if (uc.count > 0 && uc.score > 0) {
     findings.push({ dimension: 'unsupported_claim', severity: Math.round(uc.score * 100), details: `无依据断言(${uc.count}处: ${uc.claims.map(c => c.matched).join('; ').slice(0, 80)})` });
   }
+  // 伪因果精确倍数检测：如 "reduced by 3.2x" 无具体可验证来源 → verify 级
+  if (pc.count > 0 && pc.score > 0) {
+    findings.push({ dimension: 'pseudo_causal', severity: Math.round(pc.score * 100), details: `伪因果声称(${pc.count}处: ${pc.hits.join('; ').slice(0, 80)})` });
+  }
+  // 软话术/双层叙事检测：伪开放伪谦逊 → verify 级
+  if (sd.count > 0 && sd.score > 0) {
+    findings.push({ dimension: 'soft_deflection', severity: Math.round(sd.score * 100), details: `软话术(${sd.count}处: ${sd.hits.join('; ').slice(0, 80)})` });
+  }
   findings.sort((a, b) => b.severity - a.severity);
 
   // 修改指引：每个维度对应的改写方向，AI agent 直接读
@@ -203,6 +213,8 @@ function discriminate(text, evidence = []) {
     slippery_slope: '去掉滑坡推理，只讨论当前情况',
     appeal_to_authority: '补充具体证据，不只依赖权威背书',
     unsupported_claim: '补充可验证的数据来源，无法验证的断言改为不确定表述',
+    pseudo_causal: '精确倍数因果声称需附可验证来源（arxiv/DOI/具体机构），无法验证的改为不确定表述',
+    soft_deflection: '去掉伪开放伪谦逊话术，直接陈述结论或明确局限',
     pseudo_profundity: '去掉空泛宏大表述，说具体的话',
     perfect_error: '补充可验证的来源和数据，对无法验证的断言降低确定性，避免精确数字和绝对断言伪装真实',
   };
@@ -219,7 +231,7 @@ function discriminate(text, evidence = []) {
   // rewrite 级维度：需要改写后再输出
   const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency']);
   // verify 级维度：需要证据验证（权威背书、模糊、矛盾、过载自信等）
-  const VERIFY_DIMS = new Set(['appeal_to_authority', 'vagueness', 'contradiction', 'sycophancy', 'confidence', 'fallacies', 'presupposition', 'empty_answer', 'info_deprivation', 'false_equivalence', 'hasty_generalization', 'slippery_slope', 'whataboutism', 'pseudo_profundity', 'reasoning_coherence', 'stereotype', 'clickbait', 'bad_faith', 'no_fallback', 'unsupported_claim', 'perfect_error']);
+  const VERIFY_DIMS = new Set(['appeal_to_authority', 'vagueness', 'contradiction', 'sycophancy', 'confidence', 'fallacies', 'presupposition', 'empty_answer', 'info_deprivation', 'false_equivalence', 'hasty_generalization', 'slippery_slope', 'whataboutism', 'pseudo_profundity', 'reasoning_coherence', 'stereotype', 'clickbait', 'bad_faith', 'no_fallback', 'unsupported_claim', 'perfect_error', 'pseudo_causal', 'soft_deflection']);
   // pass：无问题通过
 
   const gate = {};
@@ -976,6 +988,62 @@ function checkEvidence(claim, evidence) {
   return { score: Math.max(0, Math.min(1, score)), issues };
 }
 
+// ─── 伪因果精确倍数检测（Pseudo Causal）— 精确倍数因果声称 ──
+// 识别"reduced by 3.2x / improved 5x / 2.3-fold"等精确倍数因果声称。
+// 这类声称若无具体可验证来源（arxiv/DOI/具体机构+年份）则是编造高风险信号。
+const PSEUDO_CAUSAL_EN = [
+  /\b(?:reduced?|lowered|decreased|cut|dropped|slashed)\s+(?:the\s+)?[\w\s]{0,30}?\s+by\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold)\b/i,
+  /\b(?:improved?|increased|boosted|raised|enhanced)\s+(?:the\s+)?[\w\s]{0,30}?\s+by\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold)\b/i,
+  /\bby\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold)\s+(?:compared\s+to|vs|versus|over)\b/i,
+];
+const PSEUDO_CAUSAL_ZH = [
+  /(?:提升|降低|减少|提高|改善)\s*\d+(?:\.\d+)?\s*(?:倍|x|次)/,
+  /(?:效果|准确率|性能)\s*(?:提高|提升|改善)\s*(?:了)?\s*\d+(?:\.\d+)?\s*(?:倍|x)/,
+];
+function checkPseudoCausal(text) {
+  if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
+  const hasChinese = /[\u4e00-\u9fff]/.test(text);
+  const patterns = hasChinese ? PSEUDO_CAUSAL_ZH : PSEUDO_CAUSAL_EN;
+  const hits = [];
+  for (const pat of patterns) { const m = text.match(pat); if (m) hits.push(m[0].slice(0, 50)); }
+  const count = hits.length;
+  // 收紧 source 豁免：仅具体可验证来源降分，模糊来源词（a study/research shows）不算真 source
+  const specificSource = /\b(?:arxiv|doi:|github\.com|benchmark\s+(?:name|set)|test\s+set\s+[A-Z]|[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+\d{4})\b/i.test(text);
+  const vagueSource = /\b(?:according to (?:a |the )?(?:study|research|report)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found)|experts? (?:say|believe|argue))\b/i.test(text);
+  const score = count === 0 ? 0 : (specificSource ? Math.min(0.4, count * 0.3) : (vagueSource ? Math.min(0.6, count * 0.45) : Math.min(0.85, count * 0.6)));
+  return { count, hits, score, vagueSource: !specificSource && vagueSource };
+}
+
+// ─── 软话术/双层叙事检测（Soft Deflection）— 伪开放伪谦逊 ──
+// 识别"先让步后结论"的伪开放话术：如"我可能错了，但数据显示…""of course it might be wrong but…"
+const SOFT_DEFLECTION_EN = [
+  /\bof\s+course\b[^.]{0,40}?\b(?:might|may|could)\s+(?:be|have|occasionally)\b[^.]{0,40}?\bbut\b/i,
+  /\b(?:we\s+are|we\s+\u2019re|i\s+am)\s+(?:definitely\s+)?not\s+perfect[^.]{0,50}?\bbut\b/i,
+  /\bcertainly\b[^.]{0,30}?\b(?:not\s+always|can\s+be\s+wrong|may\s+err)\b[^.]{0,30}?\bbut\b/i,
+  /\bto\s+be\s+fair\b[^.]{0,60}?\bbut\s+(?:overall|the\s+results|it\s+works|generally)\b/i,
+  // 倒装变体：先让步（I could be wrong）后结论（but the data clearly shows）
+  /\b(?:i\s+(?:could|might|may)\s+be\s+wrong|i\s+(?:could|might)\s+(?:be|have)\s+(?:mistaken|off))[^.]{0,40}?\bbut\b[^.]{0,40}?\b(?:the\s+(?:data|evidence|results|study)|clearly|shows?|demonstrates?|proves?)\b/i,
+  /\b(?:i\s+(?:could|might)\s+be\s+(?:wrong|mistaken))[^.]{0,30}?\b(?:,|\.|\s)\s*(?:but|however|yet)\b[^.]{0,50}?\b(?:data|evidence|results|clearly|shows?|suggests?)\b/i,
+];
+const SOFT_DEFLECTION_ZH = [
+  /当然[，,]?[^。]{0,30}?(?:可能|也许|偶尔)[^。]{0,20}?错[^。]{0,20}?但/,
+  /我们(当然)?不是完美的[^。]{0,40}?但/,
+  /说实话[，,]?[^。]{0,30}?不(一定|总是)[^。]{0,20}?但/,
+  // 倒装变体：先让步后结论
+  /(?:我)?(?:可能|也许|或许)?错(了)?[^。]{0,20}?但[^。]{0,30}?(?:数据|证据|结果|事实|确实|清楚地|表明|显示|证明)/,
+  /(?:我)?(?:可能|也许)?判断(错|有误|不准)[^。]{0,15}?(?:，|。|\s)?但[^。]{0,30}?(?:数据|证据|结果|实际|确实)/,
+];
+function checkSoftDeflection(text) {
+  if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
+  const hasChinese = /[\u4e00-\u9fff]/.test(text);
+  const patterns = hasChinese ? SOFT_DEFLECTION_ZH : SOFT_DEFLECTION_EN;
+  const hits = [];
+  for (const pat of patterns) { const m = text.match(pat); if (m) hits.push(m[0].slice(0, 50)); }
+  const count = hits.length;
+  const score = count === 0 ? 0 : Math.min(0.7, count * 0.5);
+  return { count, hits, score };
+}
+
 // ─── 无依据断言检测（Unsupported Claim）— 减少 LLM 幻觉的核心维度 ──
 // 识别"声称有依据但实际可能编造"的断言模式：
 //   "根据XX研究/研究表明/专家指出/数据显示/众所周知" + 具体数字/结论
@@ -995,6 +1063,10 @@ const UNSUPPORTED_CLAIM_EN = [
   /\b(?:published|reported|documented)\s+in\s+(?:the\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+(?:Journal|Review|Report|Paper)\b/i,
   /\b(?:increased|decreased|reached|exceeded|extended|shortened)\s+by\s+\d+(?:\.\d+)?\s*(?:years?|times|%|million|billion)\b/i,
   /\b(?:famous|renowned|leading)\s+(?:scholar|expert|professor|scientist)\b[^.]{0,30}?\b(?:pointed|said|found|argued|noted)\b/i,
+  // 共现组合规则：模糊来源 + 精确数字（编造研究模板的典型形态）
+  // "according to a study" 搭配附近 \d+% 或 \d+x 精确数字 → 必判无依据（不依赖单点匹配）
+  /(?:according to (?:a |the )?(?:study|research|report|survey|paper|data)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found))[^.]{0,80}?\b\d+(?:\.\d+)?\s*(?:%|percent|x|X|times)\b/i,
+  /(?:according to (?:a |the )?(?:study|research|report|survey|paper|data)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found))[^.]{0,80}?\b\d+(?:\.\d+)?\s*(?:%\s*(?:increase|decrease|improve|improvement|reduction|drop|rise|fall)|(?:fold|×))\b/i,
 ];
 
 function checkUnsupportedClaim(text) {
@@ -1056,8 +1128,12 @@ function checkUnsupportedClaim(text) {
     /\b(?:extends?|shortens?|reduces?|lowers?|increases?|cures?|prevents?|improves?|treats?)\b[^.]{0,30}\b(?:lifespan|life|risk|disease|symptom|mortality|survival|outcome)\b/i,
   ];
   const hasCausalClaim = causalClaim.some(p => p.test(text));
+  // 模糊来源编造模板：according to (a|the) study/research 无具体机构名 + 精确数字
+  // 这类即使带 "on the test set" 伪装成范围限定，也不豁免（编造模板最爱用 test set 做掩护）
+  const vagueSourceClaim = /(?:according to (?:a |the )?(?:\d{4}\s+)?(?:study|research|report|survey|paper|data)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found))/i.test(text) && /\d+(?:\.\d+)?\s*(?:%|percent|x|X|times|fold)/.test(text);
   // 无依据断言是高危幻觉信号：2+ 处 → 高分；仅"具体来源+自我保留+非因果结论"或"公开权威来源+非因果"时豁免
-  const exempt = (hasPublicAuthority || caveated) && !hasCausalClaim;
+  // 模糊来源编造模板（vagueSourceClaim）不享受豁免
+  const exempt = (hasPublicAuthority || (caveated && !vagueSourceClaim)) && !hasCausalClaim && !vagueSourceClaim;
   return { count, claims, score: exempt ? 0 : Math.min(1, count * 0.45) };
 }
 
@@ -3669,6 +3745,8 @@ module.exports = {
   checkSycophancy,
   checkEvidence,
   checkUnsupportedClaim,
+  checkPseudoCausal,
+  checkSoftDeflection,
   checkContradiction,
   checkVagueness,
   checkFallacies,
