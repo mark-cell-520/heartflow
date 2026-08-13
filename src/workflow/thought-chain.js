@@ -213,7 +213,7 @@ class ThoughtChain {
             narrativeDepth: dg.detail?.narrativeDepth?.score || 0,
             uncertainty: dg.detail?.uncertainty?.score || 0,
           };
-        } catch (_) {}
+        } catch (_) {} // 防御性: 思考门不可用时静默降级，不阻断主流程
 
         // [ConsciousnessBridge v1.0.0] 意识桥接评估 — 时间连续性与自我连续性感知
         // 注意: ConsciousnessBridge 模块已删除（2026-07 清理），此处不再实例化。

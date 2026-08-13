@@ -58,7 +58,7 @@ class MemoryConsolidationEngine {
           }
         }
       }
-    } catch (_) {}
+    } catch (_) {} // 防御性: 公式库不可用时回退内置艾宾浩斯计算，不阻断记忆巩固
     
     return {
       retention: +retention.toFixed(4),

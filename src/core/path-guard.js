@@ -5,9 +5,10 @@
 
 const path = require('path');
 
-// 允许的根目录
+// 允许的根目录（读）
 // [v6.0.52 M2-followup] 把项目自身根目录纳入白名单：心虫读写 VERSION/config/formulas/memory/src 等自身文件属合法操作，
 // 仅拦截越界到项目外的路径（/etc /home /root 等）。原白名单只含 data/tmp，导致正常文件全被判越界（warn 刷屏 / enforce 崩溃）。
+// [v6.5.5 AUDIT-FIX P2-3] 读允许项目根；写操作额外受限（见 WRITE_DENY_PREFIXES），禁止覆盖源码/配置/可执行文件
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..'); // src/core -> 项目根
 const _os = require('os');
 const _homeHeartflow = path.resolve(_os.homedir(), '.heartflow');
@@ -21,8 +22,21 @@ const ALLOWED_ROOTS = [
   path.resolve('/tmp'),
 ];
 
+// [v6.5.5 AUDIT-FIX P2-3] 写操作禁止覆盖的路径前缀/后缀（防意外或恶意覆盖引擎源码与配置）
+// 读操作不受此限制（心虫需读 src/ config/ 等自身文件）；写操作仅允许 data/tmp/显式数据目录及 .enc/.jsonl 记忆文件
+const WRITE_DENY_PREFIXES = [
+  path.join(PROJECT_ROOT, 'src'),
+  path.join(PROJECT_ROOT, 'bin'),
+  path.join(PROJECT_ROOT, 'mcp'),
+  path.join(PROJECT_ROOT, 'scripts'),
+  path.join(PROJECT_ROOT, 'config'),
+];
+const WRITE_DENY_SUFFIXES = ['.js', '.py', '.ts', '.json', '.md', '.yaml', '.yml', '.toml'];
+// 允许写的记忆/数据文件后缀（位于允许根内的 data 目录）
+const WRITE_ALLOW_SUFFIXES = ['.enc', '.jsonl', '.txt', '.log', '.csv'];
+
 /**
- * 校验文件路径安全性
+ * 校验文件路径安全性（读）
  * @param {string} filePath - 待校验路径
  * @param {string[]} [extraRoots] - 额外允许的根目录
  * @returns {{ safe: boolean, resolved: string, reason?: string }}
@@ -50,11 +64,33 @@ function guardPath(filePath, extraRoots = []) {
 }
 
 /**
+ * 校验写操作的额外限制（防覆盖源码/配置）
+ * @param {string} resolvedPath - 已通过 guardPath 的绝对路径
+ * @returns {{ safe: boolean, reason?: string }}
+ */
+function guardWritePath(resolvedPath) {
+  // 拒绝写受保护的源码/配置目录
+  for (const denyPrefix of WRITE_DENY_PREFIXES) {
+    if (resolvedPath.startsWith(denyPrefix + path.sep) || resolvedPath === denyPrefix) {
+      return { safe: false, reason: `write to protected path denied: ${resolvedPath}` };
+    }
+  }
+  // 拒绝写可执行/配置类后缀（除非是允许的记忆数据后缀）
+  const ext = path.extname(resolvedPath).toLowerCase();
+  if (WRITE_DENY_SUFFIXES.includes(ext) && !WRITE_ALLOW_SUFFIXES.includes(ext)) {
+    return { safe: false, reason: `write to ${ext} file denied (protected suffix): ${resolvedPath}` };
+  }
+  return { safe: true };
+}
+
+/**
  * 安全的 fs.writeFileSync 包装
  */
 function safeWriteSync(filePath, content, encoding = 'utf8', extraRoots = []) {
   const { safe, resolved, reason } = guardPath(filePath, extraRoots);
   if (!safe) throw new Error(`path-guard: ${reason}`);
+  const wguard = guardWritePath(resolved);
+  if (!wguard.safe) throw new Error(`path-guard: ${wguard.reason}`);
   const fs = require('../utils/safe-fs');
   return fs.writeFileSync(resolved, content, encoding);
 }
@@ -69,4 +105,4 @@ function safeReadSync(filePath, encoding = 'utf8', extraRoots = []) {
   return fs.readFileSync(resolved, encoding);
 }
 
-module.exports = { guardPath, safeWriteSync, safeReadSync, ALLOWED_ROOTS };
+module.exports = { guardPath, guardWritePath, safeWriteSync, safeReadSync, ALLOWED_ROOTS };

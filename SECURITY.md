@@ -16,7 +16,7 @@ HeartFlow is a **rule-based discrimination engine** (AGI Layer 1 discriminator).
 
 ### What HeartFlow does NOT do
 
-- ❌ No network requests (zero external API calls to run the engine)
+- ❌ No network requests by default (engine runs fully offline; outbound traffic only occurs when optional features are explicitly enabled — networked self-upgrade, LLM fallback, or OpenAlex lookup — all gated behind SSRF protection in `fetch-safe.js`)
 - ❌ No telemetry, analytics, or data collection
 - ❌ No file writes outside its own `data/` directory
 - ❌ No environment variable exfiltration
