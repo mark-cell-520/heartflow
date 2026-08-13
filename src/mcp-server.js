@@ -402,6 +402,17 @@ const TOOLS = [
 
   {
 
+    name: 'heartflow_boundary_check',
+    description: '心虫跨界写入门禁：检查一次文件写入是否越界到其他 agent 的地盘（.claude/.agents/.openclaw 等）。返回 BLOCK/WARN/ALLOW。用于 Hermes 等宿主在写文件前监督。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        filePath: { type: 'string', description: '要写入的目标路径' },
+        actor: { type: 'string', description: '执行写入的 agent 名' },
+        purpose: { type: 'string', description: '写入目的' }
+      },
+      required: ['filePath']
+    },
     name: 'heartflow_self_heal',
 
     description: '自愈策略推荐：基于历史经验为当前场景推荐最优策略。返回策略排名、置信度和执行建议。',
@@ -3262,6 +3273,13 @@ const HANDLERS = {
 
   heartflow_think: handleThink,
 
+  heartflow_boundary_check: (args, hf) => {
+    const bg = (hf && (hf.boundaryGuard || hf._modules?.boundaryGuard)) || null;
+    if (!bg) return { error: 'boundaryGuard not loaded' };
+    const fp = (args && args.filePath) || '';
+    const res = bg.checkWrite(fp, { actor: (args && args.actor) || 'mcp', purpose: (args && args.purpose) || 'check' });
+    return { verdict: res.verdict, reason: res.reason, targetAgent: res.targetAgent || null, resolvedPath: res.resolvedPath };
+  },
   heartflow_self_heal: handleSelfHeal,
 
   heartflow_provider_health: handleProviderHealth,

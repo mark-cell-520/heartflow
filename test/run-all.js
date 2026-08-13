@@ -117,6 +117,7 @@ async function runAllTests() {
   runSubTest('🔍 KnowledgeQuery', 'knowledge-query.test.js');
   runSubTest('⚖️ DualPerspectiveAuditor', 'dual-perspective.test.js');
   runSubTest('📡 SignalAbsorber', 'signal-absorber.test.js');
+  runSubTest('🛡️ AgentBoundaryGuard', 'agent-boundary-guard.test.js');
   runSubTest('🧠 MetacognitiveExecutive', 'metacognitive-executive.test.js');
   runSubTest('♻️ RecoveredModules', 'recovered-modules.test.js');
   runSubTest('♻️ RecoveredModules2', 'recovered-modules-2.test.js');

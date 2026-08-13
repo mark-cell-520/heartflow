@@ -3745,6 +3745,8 @@ function checkNoFallback(text) {
   return { count: s.length, signals: s, score: Math.min(1, s.length * 0.25) };
 }
 
+const { AgentBoundaryGuard } = require('./shield/agent-boundary-guard.js');
+
 module.exports = {
   checkSycophancy,
   checkEvidence,
