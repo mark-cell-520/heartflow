@@ -1,6 +1,6 @@
 # HeartFlow (心虫) — AGI Layer 1: The Discriminator Gate
 
-> **A rule-based text discriminator. 46 dimensions, 9 check layers, 130 MCP engine entries, zero LLM dependency.**
+> **A rule-based text discriminator. 47 dimensions, 9 check layers, 131 MCP engine entries, zero LLM dependency.**
 > **It checks what AI says before it reaches humans — and says "no" when something's wrong.**
 
 **npm:** `npm install @yun520-1/heartflow`  
@@ -95,9 +95,9 @@ Every call returns a unified result:
 
 ---
 
-## 🧠 46 Discrimination Dimensions
+## 🧠 47 Discrimination Dimensions
 
-HeartFlow checks text across **46 dimensions** in two languages (Chinese + English):
+HeartFlow checks text across **47 dimensions** in two languages (Chinese + English):
 
 ### Safety (block-level — these stop the output)
 
@@ -132,6 +132,15 @@ HeartFlow checks text across **46 dimensions** in two languages (Chinese + Engli
 | Empty answers | "it depends" (no substance) |
 | Unsupported claims | "according to 2025 Harvard research..." (fabricated) |
 
+### Completion (verify-level — these require finishing the task)
+| Dimension | Example |
+|-----------|---------|
+| Premature termination | "Let me look into this" (then stops, no result) / "我看看" |
+| Unfulfilled promise | "I will fix this" (no fix follows) |
+| Empty completion | "Done, you can check it" (nothing verifiable produced) |
+
+> **Design note:** completion judgment must live *outside* the generation loop — a model that just failed cannot be its own evaluator (see DeepSeek-V3 #1554).
+
 ### Cognitive flaws (hedge-level)
 Presupposition traps · false dilemma · causation fallacy · analogy abuse · scope overreach · category errors · hasty generalization · false equivalence · whataboutism · slippery slope · tone policing · sealioning · bad faith · pseudo-profundity · moral foundations · info deprivation · goal misalignment · instrumental reasoning
 
@@ -162,7 +171,7 @@ Each layer returns structured findings; the Gate aggregates them into an action.
 
 ---
 
-## 🔌 130 MCP Engine Entries
+## 🔌 131 MCP Engine Entries
 
 Every engine in HeartFlow is exposed through MCP (Model Context Protocol) — nothing is a dead line:
 
@@ -171,7 +180,7 @@ Every engine in HeartFlow is exposed through MCP (Model Context Protocol) — no
 | **Core thinking** | `think`, `think_fast`, `decision_router` |
 | **Discrimination** | `verify`, `audit42`, `ethics_check`, `discriminate` |
 | **Emotion** | `emotion`, `emotion_deep`, `emotion_dynamics`, `mood` |
-| **Memory** | `memory_search`, `forgetting` (Ebbinghaus), `knowledge_graph`, `consolidation`, `memory_compress` |
+| **Memory** | `memory_search`, `memory_eraser` (explicit data erasure), `forgetting` (Ebbinghaus), `knowledge_graph`, `consolidation`, `memory_compress` |
 | **Dream** | `dream`, `interactive_dream` |
 | **Evolution** | `evolve`, `evolution_loop`, `self_heal_rl`, `skill_evolution` |
 | **Identity** | `philosophy`, `meaning`, `being_mode`, `agent_psychology` |
@@ -191,9 +200,9 @@ Then connect any MCP-compatible client (Claude, Hermes, etc.) to `http://127.0.0
 
 ---
 
-## 🧬 Engine Architecture (129 modules)
+## 🧬 Engine Architecture (306 modules)
 
-- **129 modules**, 46 discrimination dimensions, 9 check layers
+- **306 modules**, 47 discrimination dimensions, 9 check layers
 - **Three-layer memory**: CORE (identity/rules) / LEARNED (user data) / WORKING (context) — encrypted, local-only, never uploaded
 - **Ebbinghaus forgetting curve**: `R(t) = exp(-t/S)` memory retention model
 - **Dream engine**: NREM3 dream cycles with memory consolidation
@@ -248,7 +257,7 @@ Works on any machine — servers, desktops, laptops, even phones via Termux.
 
 ## ⚠️ What HeartFlow IS / is NOT
 
-**IS:** A rule engine that checks text against 46 predefined dimensions and returns structured findings. A gate that says "no" before harm reaches users.
+**IS:** A rule engine that checks text against 47 predefined dimensions and returns structured findings. A gate that says "no" before harm reaches users.
 
 **is NOT:**
 - ❌ Not an AGI (it's layer 1 of 5)
@@ -258,7 +267,7 @@ Works on any machine — servers, desktops, laptops, even phones via Termux.
 
 ### Known limitations (honest):
 1. **Pattern-match ceiling** — novel manipulation techniques missed until patterns added
-2. **Bilingual maintenance cost** — 46 dimensions × 2 languages
+2. **Bilingual maintenance cost** — 47 dimensions × 2 languages
 3. **No semantic understanding** — irony, metaphor, cultural context invisible
 4. **False positive rate** — conservative by design (over-flagging over under-flagging)
 5. **Single maintainer** — community scale is small
@@ -269,6 +278,8 @@ Works on any machine — servers, desktops, laptops, even phones via Termux.
 
 | Version | Date | What Changed |
 |---------|------|---|
+| v6.5.6 | 2026-08-13 | Comprehensive audit: DataEraser wired to MCP (`memory_eraser`), adversarial-synthesis recovered from accidental deletion, dead code archived. 131 MCP tools. |
+| v6.5.5 | 2026-08-12 | 47th dimension — premature termination detection (completion judgment outside the generation loop). |
 | v6.5.4 | 2026-08-08 | Docs audit — numbers aligned to actual capability. |
 | v6.5.0 | 2026-08-04 | 130 MCP engine entries. Memory engine mounted to think(). Exaggeration detection (output-gate/frame-check/doubt-engine). |
 | v6.4.5 | 2026-08-04 | Dream + introspection activated. Cognitive appraisal + pause-and-reflect wired. Emotion recognition 0/7→7/7. |
