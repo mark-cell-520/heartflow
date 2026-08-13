@@ -610,6 +610,7 @@ const _KVCache = _lazy('kvCache', () => require('../memory/kv-cache.js'));
 // v5.7.2 — P3 记忆完整性安全验证
 
 const _MemoryIntegrity = _lazy('memoryIntegrity', () => require('../shield/memory-integrity.js'));
+const _AgentBoundaryGuard = _lazy('agentBoundaryGuard', () => new (require('../shield/agent-boundary-guard.js').AgentBoundaryGuard)());
 
 
 
@@ -719,6 +720,7 @@ const _SPECIAL_MODULES = {
   intentLayer:     { type: 'ctor-path', path: './intent-layer.js', ctor: 'IntentLayer', args: { projectRoot: path.join(__dirname, '..', '..') } },
 
   epistemicSafety: { type: 'object',  factory: () => require('../shield/epistemic-safety.js') },
+  boundaryGuard: { type: 'object', factory: () => _AgentBoundaryGuard },
 
   deliberationGate:{ type: 'ctor',    factory: () => new (require('../shield/deliberation-gate.js').DeliberationGate)() },
 
@@ -3420,6 +3422,13 @@ class HeartFlow {
       this._modules.memoryIntegrity = this.memoryIntegrity;
 
     } catch (e) { _boundedPush(this._initErrors, { module: 'memoryIntegrity', error: e.message }, MAX_HISTORY_SIZE); }
+    // ─── [心虫自主决策 2026-08-13] 跨界写入门禁 — agent-boundary-guard ─────
+    try {
+      const BG = _AgentBoundaryGuard();
+      this.boundaryGuard = BG;
+      this._modules.boundaryGuard = BG;
+    } catch (e) { _boundedPush(this._initErrors, { module: 'agentBoundaryGuard', error: e.message }, MAX_HISTORY_SIZE); }
+
 
 
 
