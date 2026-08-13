@@ -147,7 +147,7 @@ Self-sycophancy · contradiction tracking · narrative frame closure · knowledg
 ```
 1.  Scope Check    — can this be answered? (rejects unanswerable questions)
 2.  Premise Check  — are the premises valid? (6 types of premise problems)
-3.  Discriminate   — 46-dimension pattern scan
+3.  Discriminate   — 47-dimension pattern scan
 4.  Gate           — decides block / rewrite / verify / hedge / pass
 5.  Evidence Verify— extracts claims and marks verifiability (verify mode)
 6.  Frame Check    — is the narrative honest? (closure/omission/achievement/answer frames)
