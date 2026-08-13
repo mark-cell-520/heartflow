@@ -1018,6 +1018,19 @@ const TOOLS = [
     inputSchema: { type: 'object', properties: { profile: { type: 'string', description: '输入参数' } } }
   },
   {
+    name: 'heartflow_memory_eraser',
+    description: '显式数据擦除：按 scope/tag/session 擦除记忆（GitHub #7 用户主动遗忘能力）。不删 CORE 层。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', description: '操作: eraseEphemeral | eraseByTag | eraseSession | stats' },
+        scope: { type: 'string', description: 'eraseEphemeral 的 scope（如 user:alice，* 全清）' },
+        tag: { type: 'string', description: 'eraseByTag 的 tag' },
+        sessionId: { type: 'string', description: 'eraseSession 的会话 ID' }
+      }
+    }
+  },
+  {
     name: 'heartflow_long_term_memory',
     description: '长期记忆：长期记忆存储检索。',
     inputSchema: { type: 'object', properties: { memory: { type: 'string', description: '输入参数' } } }
@@ -1782,6 +1795,65 @@ function handleMemorySearch(args) {
   }
 
   return { query, layer, limit, results, timestamp: Date.now() };
+
+}
+
+function handleMemoryEraser(args) {
+
+  const { action = 'stats', scope, tag, sessionId } = args;
+
+  if (!heartflow) throw new Error('heartflow 实例不可用');
+
+  try {
+
+    // 懒加载 DataEraser（复用 heartflow 的 dataDir）
+    const { DataEraser } = require('./memory/data-eraser.js');
+
+    const dataDir = heartflow.dataDir || heartflow.options?.dataDir || process.cwd();
+
+    const eraser = new DataEraser(dataDir);
+
+    let result;
+
+    switch (action) {
+
+      case 'eraseEphemeral':
+
+        if (!scope) throw new Error('eraseEphemeral 需要 scope 参数');
+
+        result = eraser.eraseEphemeral(scope);
+
+        break;
+
+      case 'eraseByTag':
+
+        if (!tag) throw new Error('eraseByTag 需要 tag 参数');
+
+        result = eraser.eraseByTag(tag);
+
+        break;
+
+      case 'eraseSession':
+
+        if (!sessionId) throw new Error('eraseSession 需要 sessionId 参数');
+
+        result = eraser.eraseSession(sessionId);
+
+        break;
+
+      default:
+
+        result = eraser.stats();
+
+    }
+
+    return { action, result, timestamp: Date.now() };
+
+  } catch (e) {
+
+    throw new Error('DataEraser 失败: ' + e.message);
+
+  }
 
 }
 
@@ -3213,6 +3285,8 @@ const HANDLERS = {
   heartflow_dream: handleDream,
 
   heartflow_memory_search: handleMemorySearch,
+
+  heartflow_memory_eraser: handleMemoryEraser,
 
   heartflow_emotion: handleEmotion,
 

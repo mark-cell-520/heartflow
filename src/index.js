@@ -3800,5 +3800,6 @@ module.exports = {
   entropyAnalysis,
   discriminate,
   createEngine,
+  DataEraser: require('./memory/data-eraser.js').DataEraser,
   version: require('fs').readFileSync(require('path').join(__dirname, '..', 'VERSION'), 'utf8').trim(),
 };

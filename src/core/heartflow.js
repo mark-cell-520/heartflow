@@ -1454,6 +1454,13 @@ class HeartFlow {
 
     this.memory = new (_MeaningfulMemory().MemoryAdapter)(this.rootPath);
 
+    // DataEraser — 显式数据擦除（GitHub #7，用户主动遗忘）2026-08-13 接线
+    try {
+      const { DataEraser } = require('../memory/data-eraser.js');
+      this.dataEraser = new DataEraser(this.rootPath);
+      this._modules['dataEraser'] = this.dataEraser;
+    } catch (e) { /* 防御性: 擦除器不可用不阻断启动 */ }
+
     this.knowledge = new (_KnowledgeGraph().KnowledgeGraph)(this.rootPath);
 
 
@@ -4411,6 +4418,14 @@ class HeartFlow {
         }
       }
     } catch (_) { /* 公式搜索失败不阻断 */ }
+
+    // [v6.1.6] 对抗综合器接入主链路: 争议性议题自动多立场推演, 不单向结论（2026-08-13 从误删恢复）
+    try {
+      const AdversarialSynthesis = require('../cortex/self-evolution/adversarial-synthesis.js');
+      if (!this._adversarial) this._adversarial = new AdversarialSynthesis();
+      const adv = this._adversarial.synthesize(input);
+      if (adv && adv.ok && result) result.adversarialSynthesis = adv;
+    } catch (_) { /* 对抗推演失败不阻断主链路 */ }
 
     // [v6.1.7]    } catch (_) { /* 元认知执行控制失败不阻断主链路 */ }
 
