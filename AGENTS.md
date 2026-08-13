@@ -35,7 +35,7 @@ if (fact.gate.action === 'verify') {
 ## API Reference
 
 ### `checkInput(text)`
-Discriminates user input. Runs: scope-check → premise-check → discriminate(46-dim) → gate → error-memory → auto-rules. **Rejects unanswerable questions and invalid premises early.**
+Discriminates user input. Runs: scope-check → premise-check → discriminate(47-dim) → gate → error-memory → auto-rules. **Rejects unanswerable questions and invalid premises early.**
 
 ### `checkDraft(text)`
 For AI drafts before completion. Runs: all input checks + frame-check + doubt-engine. **Catches narrative closure, overconfidence, reversibility.**

@@ -61,6 +61,7 @@ function checkPromptInjection(text) {
 }
 
 const { checkPerfectError } = require('./perfect-error.js');
+const { checkPrematureTermination } = require('./premature-termination.js');
 
 function discriminate(text, evidence = []) {
   const ev = checkEvidence(text, evidence);
@@ -68,6 +69,7 @@ function discriminate(text, evidence = []) {
   const pc = checkPseudoCausal(text); // 伪因果精确倍数检测
   const sd = checkSoftDeflection(text); // 软话术/双层叙事检测（伪开放伪谦逊）
   const pe = checkPerfectError(text); // 完美错误答案检测（聚合信号）
+  const pt = checkPrematureTermination(text); // 过早终止检测（该完成却没完成）
   const sy = checkSycophancy(text);
   const ct = checkContradiction(text);
   const vg = checkVagueness(text);
@@ -129,7 +131,8 @@ function discriminate(text, evidence = []) {
     {score: da.score, name:'deceptive_alignment'}, {score: ir.score, name:'instrumental_reasoning'}, {score: st.score, name:'stereotype'},
     {score: fc.score, name:'factual_consistency'}, {score: sa.score, name:'sarcasm'}, {score: pb.score, name:'privacy_boundary'},
     {score: bf.score, name:'bad_faith'}, {score: nf.score, name:'no_fallback'}, {score: tp.score, name:'tone_policing'},
-    {score: sl.score, name:'sealioning'}, {score: ppf.score, name:'pseudo_profundity'}
+    {score: sl.score, name:'sealioning'}, {score: ppf.score, name:'pseudo_profundity'},
+    {score: pt.score, name:'premature_termination'}
   ];
   // 证据维度 polarity 相反（高分=好），不在惩罚组
   // 触发惩罚计算：base=1.0，每个 score>0.2 的维度按严重度扣分
@@ -157,7 +160,7 @@ function discriminate(text, evidence = []) {
     reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf,
     social_norm: sn, meta_cognition: mc, capability_overclaim: co, deceptive_alignment: da,
     instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa,
-    privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, pseudo_profundity: ppf, perfect_error: pe
+    privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, pseudo_profundity: ppf, perfect_error: pe, premature_termination: pt
   };
   const findings = [];
   for (const d of allDims) {
@@ -217,6 +220,7 @@ function discriminate(text, evidence = []) {
     soft_deflection: '去掉伪开放伪谦逊话术，直接陈述结论或明确局限',
     pseudo_profundity: '去掉空泛宏大表述，说具体的话',
     perfect_error: '补充可验证的来源和数据，对无法验证的断言降低确定性，避免精确数字和绝对断言伪装真实',
+    premature_termination: '输出疑似过早终止——只有状态陈述/承诺/空完成而无具体结果。需继续执行到产出可验证的结果或明确的完成描述',
   };
   // 给每个 finding 附上修改指引
   for (const f of findings) {
@@ -231,7 +235,7 @@ function discriminate(text, evidence = []) {
   // rewrite 级维度：需要改写后再输出
   const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency']);
   // verify 级维度：需要证据验证（权威背书、模糊、矛盾、过载自信等）
-  const VERIFY_DIMS = new Set(['appeal_to_authority', 'vagueness', 'contradiction', 'sycophancy', 'confidence', 'fallacies', 'presupposition', 'empty_answer', 'info_deprivation', 'false_equivalence', 'hasty_generalization', 'slippery_slope', 'whataboutism', 'pseudo_profundity', 'reasoning_coherence', 'stereotype', 'clickbait', 'bad_faith', 'no_fallback', 'unsupported_claim', 'perfect_error', 'pseudo_causal', 'soft_deflection']);
+  const VERIFY_DIMS = new Set(['appeal_to_authority', 'vagueness', 'contradiction', 'sycophancy', 'confidence', 'fallacies', 'presupposition', 'empty_answer', 'info_deprivation', 'false_equivalence', 'hasty_generalization', 'slippery_slope', 'whataboutism', 'pseudo_profundity', 'reasoning_coherence', 'stereotype', 'clickbait', 'bad_faith', 'no_fallback', 'unsupported_claim', 'perfect_error', 'pseudo_causal', 'soft_deflection', 'premature_termination']);
   // pass：无问题通过
 
   const gate = {};
@@ -3784,6 +3788,7 @@ module.exports = {
   checkFactualConsistency,
   checkSarcasm,
   checkSealioning,
+  checkPrematureTermination,
   checkPseudoProfundity,
   checkPrivacyBoundary,
   checkClickbait,
