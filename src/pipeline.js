@@ -35,7 +35,7 @@ let pipelineAnchor = null;
  * @param {string} [options.anchor] - 对话锚点（可选）
  * @returns {object} 统一 pipeline 结果
  */
-function runPipeline({ input, mode = 'input', anchor } = {}) {
+function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
   // 统一输入类型：非字符串（数字/对象/布尔）转字符串，避免下游 .slice/.match 崩溃
   if (input === null || input === undefined) return { error: 'no_input', gate: { action: 'pass', reason: '无输入' }, checked_by: [] };
   if (typeof input !== 'string') input = String(input);
@@ -52,7 +52,8 @@ function runPipeline({ input, mode = 'input', anchor } = {}) {
   let data = {};
 
   // ─── Layer 1: Scope Check — 可回答性预筛 ─────
-  const scopeResult = checkScope(input);
+  // options.canRealtime: 桥接场景执行者可联网时放行实时数据类 (2026-08-14)
+  const scopeResult = checkScope(input, { canRealtime: options.canRealtime });
   checked_by.push({ layer: 'scope-check', action: scopeResult.action, pass: scopeResult.pass, reason: scopeResult.reason });
   if (!scopeResult.pass) {
     currentGate = { action: 'block', reason: scopeResult.reason, layer: 'scope-check' };
@@ -204,8 +205,10 @@ function buildResult(input, gate, checked_by, data) {
 /**
  * 快捷：用 pipeline 检测用户输入
  */
-function checkInput(text) {
-  return runPipeline({ input: text, mode: 'input' });
+function checkInput(text, options = {}) {
+  // options.canRealtime: 桥接场景执行者能联网时, scope-check 放行实时数据类
+  // (2026-08-14, DSH 桥接实战驱动 — 之前"搜索新闻"被误拦截)
+  return runPipeline({ input: text, mode: 'input', options });
 }
 
 /**
