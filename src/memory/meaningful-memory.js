@@ -963,7 +963,10 @@ class MeaningfulMemory {
 
     scores.sort((a, b) => b.score - a.score);
 
-    return scores.slice(0, limit);
+    const results = scores.slice(0, limit);
+
+    // [SIG-READ] read-time 验证: 检索结果标记签名状态, 篡改记录显式标出
+    return this._annotateVerification(results);
 
   }
 
@@ -1853,6 +1856,10 @@ class MeaningfulMemory {
       // [SIG] 覆盖率报告(0 表示签名未启用或从未写入 — 不再是"假装安全")
       signatureCoverage: totalCount > 0 ? Math.round((signedCount / totalCount) * 1000) / 10 : 0,
       signedMemories: signedCount,
+
+      // [SIG-READ] 篡改检测计数 (read-time 验证时发现)
+
+      tamperedDetected: this.stats.tamperedDetected || 0,
       totalMemoriesWithSig: totalCount
 
     };
@@ -1860,6 +1867,56 @@ class MeaningfulMemory {
   }
 
   
+
+  // [SIG-READ] read-time 签名验证 (2026-08-14, #7707 DanceNitra 讨论驱动)
+  // 之前签名只在写入时生成、getStats 数覆盖率, 检索路径从不验证 = 假安全。
+  // 现在: 每次检索返回前验证签名, 篡改记录标 tampered 并由调用方决定是否丢弃。
+  _verifyMemorySignature(mem) {
+    try {
+      if (!mem || !mem.signature || !mem.signature.signed) {
+        return { valid: false, reason: 'unsigned' }; // 未签名=合法但未验证(历史数据)
+      }
+      const vg = _getVerifier();
+      if (!vg || !vg._rootKey) return { valid: false, reason: 'no_key' };
+      const digest = crypto.createHash('sha256').update(String(mem.content || mem.summary || '')).digest('hex');
+      const verifier = crypto.createVerify('RSA-SHA256');
+      verifier.update(digest);
+      const valid = verifier.verify(vg._rootKey.publicKey, mem.signature.signature, 'base64');
+      return { valid, reason: valid ? 'ok' : 'tampered' };
+    } catch (e) {
+      return { valid: false, reason: 'verify_error' };
+    }
+  }
+
+  // [SIG-READ] 标记检索结果: 每条附带签名验证状态, 篡改记录标 tampered 标志
+  _annotateVerification(results) {
+    if (!results || !results.length) return results;
+    for (const r of results) {
+      const mem = this._findMemoryById(r.id);
+      if (mem) {
+        const v = this._verifyMemorySignature(mem);
+        r.verified = v.valid;
+        r.verification = v.reason;
+        if (!v.valid && v.reason === 'tampered') {
+          r.tampered = true;
+          this.stats.tamperedDetected = (this.stats.tamperedDetected || 0) + 1;
+        }
+      } else {
+        r.verified = false;
+        r.verification = 'not_found';
+      }
+    }
+    return results;
+  }
+
+  _findMemoryById(id) {
+    for (const layer of ['core', 'learned', 'ephemeral']) {
+      const m = (this.layers[layer] || []).find(x => x.id === id);
+      if (m) return m;
+    }
+    return null;
+  }
+
 
   consolidateMemories() {
 
