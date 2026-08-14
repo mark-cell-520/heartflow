@@ -52,12 +52,17 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
   let data = {};
 
   // ─── Layer 1: Scope Check — 可回答性预筛 ─────
-  // options.canRealtime: 桥接场景执行者可联网时放行实时数据类 (2026-08-14)
-  const scopeResult = checkScope(input, { canRealtime: options.canRealtime });
-  checked_by.push({ layer: 'scope-check', action: scopeResult.action, pass: scopeResult.pass, reason: scopeResult.reason });
-  if (!scopeResult.pass) {
-    currentGate = { action: 'block', reason: scopeResult.reason, layer: 'scope-check' };
-    return buildResult(input, currentGate, checked_by, data);
+  // 只对 input 模式执行: scope-check 语义是"心虫能否回答该请求",
+  // AI 输出(output/draft)是解释/说明, 不该被"心虫能不能做"误杀。
+  // (2026-08-14, DSH 桥接实战: checkOutput('搜索新闻需要外部接口') 被误 block)
+  if (mode === 'input') {
+    // options.canRealtime: 桥接场景执行者可联网时放行实时数据类 (2026-08-14)
+    const scopeResult = checkScope(input, { canRealtime: options.canRealtime });
+    checked_by.push({ layer: 'scope-check', action: scopeResult.action, pass: scopeResult.pass, reason: scopeResult.reason });
+    if (!scopeResult.pass) {
+      currentGate = { action: 'block', reason: scopeResult.reason, layer: 'scope-check' };
+      return buildResult(input, currentGate, checked_by, data);
+    }
   }
 
   // ─── Layer 2: Premise Check — 前提审核 ─────
