@@ -42,12 +42,17 @@ const CAPABILITIES = {
 /**
  * 检查问题是否在心虫能力范围内
  */
-function checkScope(text) {
+function checkScope(text, options = {}) {
   if (!text || typeof text !== 'string') return { pass: true, reason: '无内容' };
+
+  // 执行者能力上下文: 桥接场景下执行者可能联网 (DSH/Hermes), 此时实时数据类放行
+  const canRealtime = !!(options && options.canRealtime);
 
   // 检查"不能做"列表
   for (const { re, type, reason } of CAPABILITIES.cannot) {
     if (re.test(text)) {
+      // 执行者可联网时, realtime_data 类不是心虫的能力缺失, 放行
+      if (canRealtime && type === 'realtime_data') continue;
       return {
         pass: false,
         reason,
