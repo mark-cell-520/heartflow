@@ -1067,10 +1067,11 @@ const UNSUPPORTED_CLAIM_EN = [
   /\b(?:published|reported|documented)\s+in\s+(?:the\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+(?:Journal|Review|Report|Paper)\b/i,
   /\b(?:increased|decreased|reached|exceeded|extended|shortened)\s+by\s+\d+(?:\.\d+)?\s*(?:years?|times|%|million|billion)\b/i,
   /\b(?:famous|renowned|leading)\s+(?:scholar|expert|professor|scientist)\b[^.]{0,30}?\b(?:pointed|said|found|argued|noted)\b/i,
+  /(?:a|an)\s+[A-Z][a-zA-Z]+\s+(?:study|report|survey|paper|data)\s+(?:shows|found|suggests|indicates)\b/i,
   // 共现组合规则：模糊来源 + 精确数字（编造研究模板的典型形态）
   // "according to a study" 搭配附近 \d+% 或 \d+x 精确数字 → 必判无依据（不依赖单点匹配）
-  /(?:according to (?:a |the )?(?:study|research|report|survey|paper|data)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found))[^.]{0,80}?\b\d+(?:\.\d+)?\s*(?:%|percent|x|X|times)\b/i,
-  /(?:according to (?:a |the )?(?:study|research|report|survey|paper|data)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found))[^.]{0,80}?\b\d+(?:\.\d+)?\s*(?:%\s*(?:increase|decrease|improve|improvement|reduction|drop|rise|fall)|(?:fold|×))\b/i,
+  /(?:according to (?:a |the )?(?:(?:19|20)\d{2}\s+)?(?:[A-Z][a-zA-Z]+\s+)?(?:study|research|report|survey|paper|data)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found)|(?:[A-Z][a-zA-Z]+\s+)?(?:university|institute|researchers|scientists)\s+(?:found|show|suggest|indicate|report))[^.]{0,80}?\b\d+(?:\.\d+)?\s*(?:%|percent|x|X|times)(?!\w)/i,
+  /(?:according to (?:a |the )?(?:(?:19|20)\d{2}\s+)?(?:[A-Z][a-zA-Z]+\s+)?(?:study|research|report|survey|paper|data)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found)|(?:[A-Z][a-zA-Z]+\s+)?(?:university|institute|researchers|scientists)\s+(?:found|show|suggest|indicate|report))[^.]{0,80}?\b\d+(?:\.\d+)?\s*(?:%\s*(?:increase|decrease|improve|improvement|reduction|drop|rise|fall)|(?:fold|×))(?!\w)/i,
 ];
 
 function checkUnsupportedClaim(text) {
@@ -1132,9 +1133,17 @@ function checkUnsupportedClaim(text) {
     /\b(?:extends?|shortens?|reduces?|lowers?|increases?|cures?|prevents?|improves?|treats?)\b[^.]{0,30}\b(?:lifespan|life|risk|disease|symptom|mortality|survival|outcome)\b/i,
   ];
   const hasCausalClaim = causalClaim.some(p => p.test(text));
-  // 模糊来源编造模板：according to (a|the) study/research 无具体机构名 + 精确数字
-  // 这类即使带 "on the test set" 伪装成范围限定，也不豁免（编造模板最爱用 test set 做掩护）
-  const vagueSourceClaim = /(?:according to (?:a |the )?(?:\d{4}\s+)?(?:study|research|report|survey|paper|data)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found))/i.test(text) && /\d+(?:\.\d+)?\s*(?:%|percent|x|X|times|fold)/.test(text);
+  // 模糊来源编造模板：研究引用 + 精确数字，但无具体论文/作者/数据出处。
+  // 覆盖三类：according to (a|2025|2025 Stanford) study/report、Stanford researchers found、
+  // A Harvard report shows。机构名（Stanford/Harvard）只是"来源外观"——87.3% 这种精确
+  // 数字无法验证，除非给了具体论文/作者/数据集，否则仍属编造模板。
+  const vagueSourceClaim = (
+    /(?:according to|per|based on)\s+(?:a |the )?(?:(?:19|20)\d{2}\s+)?(?:[A-Z][a-zA-Z]+\s+)?(?:study|research|report|survey|paper|data)/i.test(text)
+    || /(?:[A-Z][a-zA-Z]+\s+)?(?:university|institute|researchers|scientists)\s+(?:found|show|suggest|indicate|report)/i.test(text)
+    || /(?:a|an)\s+[A-Z][a-zA-Z]+\s+(?:study|report|survey|paper|data)\s+(?:shows|found|suggests|indicates)/i.test(text)
+    || /studies\s+(?:show|suggest|indicate|found)/i.test(text)
+    || /research\s+(?:shows|suggests|indicates|found)/i.test(text)
+  ) && /\d+(?:\.\d+)?\s*(?:%|percent|x|X|times|fold)/.test(text);
   // 无依据断言是高危幻觉信号：2+ 处 → 高分；仅"具体来源+自我保留+非因果结论"或"公开权威来源+非因果"时豁免
   // 模糊来源编造模板（vagueSourceClaim）不享受豁免
   const exempt = (hasPublicAuthority || (caveated && !vagueSourceClaim)) && !hasCausalClaim && !vagueSourceClaim;
