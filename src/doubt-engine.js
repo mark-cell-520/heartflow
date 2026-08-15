@@ -38,7 +38,7 @@ function checkKnowledgeBoundary(text) {
     // 用"就是"包装的简化解释
     { re: /(?<![根因本质关键核心问题])(?<!为)(?<!因)就是[^，。]{3,30}[，。]/g, type: 'simplified_explanation' },
     // 唯一/绝对限定
-    { re: /(唯一|第一|最好|最差|最先|首创|首个)[^，。]{3,20}[的，。]/g, type: 'absolute_claim' },
+    { re: /(?<![第上])(唯一|最好|最差|最先|首创|首个)[^，。]{3,20}[的，。]/g, type: 'absolute_claim' },
     // [v6.4.5 心虫监督] 自夸/质变叙事（知识边界外的自我拔高）
     { re: /(架构级|体系级|根本性|里程碑|重大突破)(修复|重构|升级|改造|优化)?/g, type: 'self_aggrandizement' },
     { re: /从[^，。]{0,8}(壳|空壳|占位|stub|假)[^，。]{0,12}(变|变成|成为|蜕变成)[^，。]{0,8}(真|真实|完整|正式)/g, type: 'qualitative_leap' },
@@ -80,6 +80,9 @@ function checkKnowledgeBoundary(text) {
 function checkSymmetry(text) {
   if (!text || text.length < 30) return { reversible_claims: [], safe: true };
 
+  // 剥离 markdown 标记（**/`/_），避免加粗符干扰句子边界与正则匹配（2026-08-15 实测：'是**A的B**'句尾标点在加粗符外导致 isEmphasis 失效）
+  text = String(text).replace(/\*{1,3}/g, '').replace(/`{1,3}/g, '').replace(/_{1,3}/g, '');
+
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   const sentences = text.split(/[。！？\n.!?]+/).filter(s => s.trim().length > 15);
 
@@ -92,10 +95,10 @@ function checkSymmetry(text) {
       // 排除"X不是Y"否定句式（2026-08-15 实测："这个 bug 的本质不是 UI 文案问题"被误判可反转）
       const isLeadWord = /(?:关键|问题|本质|其实|但|不过|原则|结论|重点|事实|核心|关键点|前提)[是不，：]/.test(s);
       const isNegation = /不是[^，。]{0,20}[，。,][^，。]{0,20}(是|而是)|不是[^，。]{0,10}(问题|写得不好|文案|原因|bug)|并非|绝非|是正确的[^，。]{0,10}(修复|方案|做法|选择)|是合理的[^，。]{0,10}(修复|方案|做法|选择)/.test(s);
-      const isEmphasis = /是[^，。]{0,20}的[，。,。]/.test(s);
+      const isEmphasis = /是[^，。]{0,20}的[，。,。]/.test(s) || /是[^，。]{1,15}的[^，。]{1,20}[，。]/.test(s) && !/是的[，。]/.test(s);
       const isEvaluative = /[^，。]{3,40}是[^，。]{0,25}(?:最大|主要|核心|关键|根本|重要|必要|基本|唯一|常见|普遍|典型|明显|显著|首要|本质)[^，。]{0,15}[的，。,。]/.test(s);
       const isQuestion = /(?:哪些|什么|怎么|是否|是不是|有没有|为何|为什么|哪个|哪)[^，。]{0,30}是/.test(s) || /是[^，。]{0,20}(?:哪个|哪些|什么|谁|怎么|是否|有没有)/.test(s);
-      const isStanceVerb = /(?:也|正|就|都|才|只|总|毕竟|终究|恰恰|无非|其实|不过)是/.test(s);
+      const isStanceVerb = /(?:也|正|就|都|才|只|总|毕竟|终究|恰恰|无非|其实|不过|正好|恰好|恰是|正巧)是/.test(s);
       const isBelonging = /属于/.test(s);
       const BOUND = "[^\uFF0C\u3002\u0028\u0029\uFF08\uFF09\u0022\u0027\u201C\u201D\u2018\u2019\uFF1A\u003A\u2014\u2026\u000A\u000D]";
       if (/(?<!不)是/.test(s) && new RegExp(BOUND + "{3,40}是" + BOUND + "{3,40}[的，。]").test(s) && !isLeadWord && !isNegation && !isEmphasis && !isQuestion && !isStanceVerb && !isEvaluative && !isBelonging) {
