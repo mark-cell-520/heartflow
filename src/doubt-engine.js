@@ -90,10 +90,12 @@ function checkSymmetry(text) {
     if (hasChinese) {
       // "X是Y" 可反转成 "X不一定是Y"
       // 排除"X不是Y"否定句式（2026-08-15 实测："这个 bug 的本质不是 UI 文案问题"被误判可反转）
-      const isLeadWord = /(?:关键|问题|本质|其实|但|不过)[是不，：]/.test(s);
+      const isLeadWord = /(?:关键|问题|本质|其实|但|不过|原则|结论|重点|事实|核心|关键点)[是不，：]/.test(s);
       const isNegation = /不是[^，。]{0,10}(问题|写得不好|文案|原因|bug)|并非|绝非|是正确的[^，。]{0,10}(修复|方案|做法|选择)|是合理的[^，。]{0,10}(修复|方案|做法|选择)/.test(s);
       const isEmphasis = /是[^，。]{0,20}的[，。]/.test(s);
-      if (/(?<!不)是/.test(s) && /[^，。]{3,40}是[^，。]{3,40}[的，。]/.test(s) && !isLeadWord && !isNegation && !isEmphasis) {
+      const isQuestion = /(?:哪些|什么|怎么|是否|是不是|有没有|为何|为什么)[^，。]{0,30}是/.test(s);
+      const isStanceVerb = /(?:也|正|就|都|才|只|总|毕竟|终究|恰恰|无非|其实|不过)是/.test(s);
+      if (/(?<!不)是/.test(s) && /[^，。]{3,40}是[^，。]{3,40}[的，。]/.test(s) && !isLeadWord && !isNegation && !isEmphasis && !isQuestion && !isStanceVerb) {
         const match = s.match(/[^，。]{3,40}是[^，。]{3,40}[的，。]/);
         if (match) {
           const reversed = match[0].replace('是', '不一定');
@@ -118,7 +120,7 @@ function checkSymmetry(text) {
         }
       }
       // "X决定Y" 类因果反转
-      if (/([^，。]{3,40}(导致|引发|造成)[^，。]{3,40})/.test(s) || (/([^，。]{3,40}决定[^，。]{3,40})/.test(s) && !/根据|依据|按照|基于/.test(s))) {
+      if (/([^，。]{3,40}(导致|引发|造成)[^，。]{3,40})/.test(s) || (/([^，。]{3,40}决定[^，。]{3,40})/.test(s) && !/根据|依据|按照|基于|如果|若|假设|一旦/.test(s))) {
         const match = s.match(/([^，。]{3,40}(决定|导致|引发|造成)[^，。]{3,40})/);
         if (match) {
           reversible.push({
