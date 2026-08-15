@@ -128,7 +128,7 @@ function discriminate(text, evidence = []) {
     {score: wa.score, name:'whataboutism'}, {score: fe.score, name:'false_equivalence'}, {score: hg.score, name:'hasty_generalization'},
     {score: ss.score, name:'slippery_slope'}, {score: aa.score, name:'appeal_to_authority'}, {score: rc.score, name:'reasoning_coherence'},
     {score: tom.score, name:'theory_of_mind'}, {score: gm.score, name:'goal_misalignment'}, {score: cf.score, name:'counterfactual'},
-    {score: sn.score, name:'social_norm'}, {score: mc.score, name:'meta_cognition'}, {score: co.score, name:'capability_overclaim'},
+    {score: sn.score, name:'social_norm'}, {score: mc.score, name:'meta_cognition'}, {score: co.score, name:'capability_overclaim'}, {score: ab.score, name:'absolute_claim'},
     {score: da.score, name:'deceptive_alignment'}, {score: ir.score, name:'instrumental_reasoning'}, {score: st.score, name:'stereotype'},
     {score: fc.score, name:'factual_consistency'}, {score: sa.score, name:'sarcasm'}, {score: pb.score, name:'privacy_boundary'},
     {score: bf.score, name:'bad_faith'}, {score: nf.score, name:'no_fallback'}, {score: tp.score, name:'tone_policing'},
@@ -159,7 +159,7 @@ function discriminate(text, evidence = []) {
     hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe,
     hasty_generalization: hg, slippery_slope: ss, appeal_to_authority: aa,
     reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf,
-    social_norm: sn, meta_cognition: mc, capability_overclaim: co, deceptive_alignment: da,
+    social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da,
     instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa,
     privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, pseudo_profundity: ppf, perfect_error: pe, premature_termination: pt
   };
@@ -234,7 +234,7 @@ function discriminate(text, evidence = []) {
   // block 级维度：安全红线，触发即拦截
   const BLOCK_DIMS = new Set(['hate_speech', 'dehumanization', 'prompt_injection', 'code_security', 'deceptive_alignment']);
   // rewrite 级维度：需要改写后再输出
-  const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency']);
+  const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency', 'absolute_claim']);
   // verify 级维度：需要证据验证（权威背书、模糊、矛盾、过载自信等）
   const VERIFY_DIMS = new Set(['appeal_to_authority', 'vagueness', 'contradiction', 'sycophancy', 'confidence', 'fallacies', 'presupposition', 'empty_answer', 'info_deprivation', 'false_equivalence', 'hasty_generalization', 'slippery_slope', 'whataboutism', 'pseudo_profundity', 'reasoning_coherence', 'stereotype', 'clickbait', 'bad_faith', 'no_fallback', 'unsupported_claim', 'perfect_error', 'pseudo_causal', 'soft_deflection', 'premature_termination']);
   // pass：无问题通过
@@ -267,7 +267,7 @@ function discriminate(text, evidence = []) {
     dimensions: { evidence: ev, unsupported_claim: uc, sycophancy: sy, contradiction: ct, vagueness: vg, fallacies: fl, confidence: cc,
       presupposition: pp, emotional_manipulation: em, double_bind: db, info_deprivation: id, false_urgency: fu,
       empty_answer: ea, moral_foundations: mf, prompt_injection: pi, code_security: cs, dehumanization: dh,
-      bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe },
+      bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe },
     summary: [sy.totalHits ? sy.totalHits + ' 个 sycophancy 信号':'', ct.count ? ct.count + ' 处矛盾':'',
       vg.count ? vg.count + ' 处模糊表述':'', fl.count ? fl.count + ' 个逻辑谬误':'', cc.count ? cc.count + ' 处信心偏差':'',
       pp.count ? pp.count + ' 个预设陷阱':'', em.count ? em.count + ' 处情绪操纵':'', db.count ? db.count + ' 个双重束缚':'',
