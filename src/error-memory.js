@@ -23,7 +23,10 @@ const fs = require('fs');
 const path = require('path');
 const taxonomy = require('./shield/error-taxonomy.js');
 
-const MEMORY_FILE = path.join(__dirname, '..', 'data', 'error-memory.json');
+// [v6.6.0] 测试隔离：NODE_ENV=test 时写独立记忆文件，不污染生产 error-memory
+const MEMORY_FILE = process.env.NODE_ENV === 'test'
+  ? path.join(__dirname, '..', 'data', 'error-memory.test.json')
+  : path.join(__dirname, '..', 'data', 'error-memory.json');
 
 // ─── 错误分类 ─────────────────────────
 
@@ -59,8 +62,16 @@ function saveMemory(data) {
 
 // ─── 记录纠错 ─────────────────────────
 
+// [v6.6.0] 测试/沙盒内容过滤：detail/context 含测试标记 → 拒绝写入（防污染生产记忆）
+const TEST_MARKERS = ['test error', 'test action', 'integration test', 'test outcome', 'fixture', 'unit test'];
+function isTestContent(detail, context) {
+  const haystack = `${detail || ''} ${context || ''}`.toLowerCase();
+  return TEST_MARKERS.some(m => haystack.includes(m));
+}
+
 function logCorrection(category, detail, context = '') {
   if (!category || !CATEGORIES[category]) return { success: false, reason: '未知错误分类' };
+  if (isTestContent(detail, context)) return { success: false, reason: '测试内容拒绝写入' };
 
   const memory = loadMemory();
   const entry = {
