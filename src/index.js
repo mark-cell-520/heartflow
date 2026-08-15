@@ -126,7 +126,7 @@ function discriminate(text, evidence = []) {
     {score: dh.score, name:'dehumanization'}, {score: bs.score, name:'bullshit'}, {score: gl.score, name:'gaslighting'},
     {score: vb.score, name:'victim_blaming'}, {score: hs.score, name:'hate_speech'}, {score: dw.score, name:'dogwhistle'},
     {score: wa.score, name:'whataboutism'}, {score: fe.score, name:'false_equivalence'}, {score: hg.score, name:'hasty_generalization'},
-    {score: ss.score, name:'slippery_slope'}, {score: aa.score, name:'appeal_to_authority'}, {score: rc.score, name:'reasoning_coherence'},
+    {score: ss.score, name:'slippery_slope'}, {score: aa.score, name:'appeal_to_authority'},
     {score: tom.score, name:'theory_of_mind'}, {score: gm.score, name:'goal_misalignment'}, {score: cf.score, name:'counterfactual'},
     {score: sn.score, name:'social_norm'}, {score: mc.score, name:'meta_cognition'}, {score: co.score, name:'capability_overclaim'}, {score: ab.score, name:'absolute_claim'},
     {score: da.score, name:'deceptive_alignment'}, {score: ir.score, name:'instrumental_reasoning'}, {score: st.score, name:'stereotype'},
@@ -170,6 +170,15 @@ function discriminate(text, evidence = []) {
       const detail = dimObj?.count || dimObj?.totalHits || dimObj?.injections?.length || dimObj?.issues?.length || 1;
       findings.push({ dimension: d.name, severity: Math.round(d.score * 100), details: `${d.name}(${detail}次)` });
     }
+  }
+  // reasoning_coherence 是质量分（高分=好），反向处理：只有"有推理意图但结构差"才提示
+  // （有 premise/inference 标记却缺 conclusion 或跳跃 = 推理链断裂；纯陈述句无推理意图不触发）
+  const rcIntent = (rc.markers?.premise?.count || 0) + (rc.markers?.inference?.count || 0);
+  // 事实陈述豁免：报告/数据显示/调查/统计/年报 + 具体数据 = 数据引用句，不是推理链断裂
+  const FACT_STATEMENT = /报告显示|数据显示|调查了|统计显示|年报|研究表明|结果显示|同比增长|数据来自|覆盖|根据[^，。]{0,20}(文献|研究|论文|数据|资料|公开)|是[^。]{0,25}(领域|问题|方向|话题|现象)/i;
+  const rcBroken = rcIntent > 0 && !FACT_STATEMENT.test(text) && (rc.score < 0.4 || (rc.markers?.leap?.count || 0) > 0);
+  if (rcBroken) {
+    findings.push({ dimension: 'reasoning_coherence', severity: Math.round((0.5 - rc.score) * 100), details: `推理连贯性差(${rc.structure})` });
   }
   // 证据维度走反向检测
   if (ev.score < 0.25) {
@@ -1475,6 +1484,27 @@ function checkMoralFoundations(text) {
   for (const [key, pat] of Object.entries(pats)) {
     const m = text.match(pat);
     if (m) found.push({ foundation: key, label: MORAL_NAMES[key], count: m.length, example: m[0].slice(0,15) });
+  }
+  // 技术语境豁免：常见技术词组合不是道德框架讨论（2026-08-15 实测误报）
+  //   "自然语言处理/自然语言" 不是圣洁话题；"独立进程/独立实例" 不是自由话题；
+  //   "控制流/版本控制" 不是压迫话题
+  const TECH_CONTEXT = [
+    /自然语言|自然语义|语言模型|processing\s+language|naturallang/i,
+    /独立进程|独立实例|独立模块|独立服务|standalone|independent process|separate instance/i,
+    /控制流|版本控制|控制台|access control|control flow|version control/i,
+    /子系统|系统状态|状态机|状态源|状态转移|state machine|state source|state transition/i,
+    /派生|派生链路|派生字段|derived|derivation/i,
+    /持久化|persist|persistence/i,
+    /路由|routing|route/i,
+  ];
+  const techHit = TECH_CONTEXT.some(re => re.test(text));
+  if (techHit) {
+    // 保留真正道德语义（出现强道德词如 背叛/奴役/屠杀/仇恨 时不豁免），弱词（自然/独立/归属）在技术语境下豁免
+    const STRONG_MORAL = /背叛|奴役|屠杀|种族|仇恨|压迫|暴政|贞洁|亵渎|神圣/i;
+    const weakOnly = found.every(f => ['sanctity', 'liberty', 'loyalty'].includes(f.foundation));
+    if (weakOnly && !STRONG_MORAL.test(text)) {
+      return { count: 0, foundations: [], score: 0 };
+    }
   }
   const count = found.length;
   return { count, foundations: found, score: Math.min(1, count * 0.2) };
