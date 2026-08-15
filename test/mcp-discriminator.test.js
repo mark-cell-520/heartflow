@@ -79,6 +79,8 @@ module.exports = function ({ test, assertEqual, assertTrue, assertDefined }) {
   });
 
   test('MCP heartflow_error_store and query work end-to-end', () => {
+    // [v6.6.0] NODE_ENV=test: error-memory 写 test 隔离文件，不污染生产记忆
+    process.env.NODE_ENV = 'test';
     const { HeartFlow } = require('../src/core/heartflow.js');
     const hf = new HeartFlow({ silent: true, dataDir: path.join(__dirname, '..', 'data') });
     hf.start();
@@ -91,13 +93,13 @@ module.exports = function ({ test, assertEqual, assertTrue, assertDefined }) {
       return;
     }
 
-    // store（用合法分类名；unknown 兜底映射到 hallucination 之外的通用类）
-    const storeResult = em.store('hallucination', 'test error for integration test', 'test action: test outcome');
+    // store（用真实错误内容——测试标记内容会被 error-memory 过滤拒收）
+    const storeResult = em.store('hallucination', '声称数据来自不存在的研究', '真实场景: 用户纠正编造引用');
     assertDefined(storeResult, 'store returned null');
     assertTrue(storeResult.stored === true, 'store should succeed');
 
     // query
-    const queryResult = em.query('test error');
+    const queryResult = em.query('不存在的研究');
     assertDefined(queryResult, 'query returned null');
     assertTrue(Array.isArray(queryResult.results), 'results must be array');
     assertTrue(queryResult.results.length >= 1, 'should find stored error');
