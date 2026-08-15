@@ -82,6 +82,10 @@ function logCorrection(category, detail, context = '') {
     timestamp: new Date().toISOString(),
     prevention: CATEGORIES[category].preventionPatterns,
     recurrenceCount: 0,
+    // [v6.6.0] 闭环状态机: open(已记录) → fixed(已修复) → verified(已验证)
+    status: 'open',
+    fixDetail: null,
+    verifiedAt: null,
   };
 
   // 去重：同类错误 1 小时内不重复记录
@@ -107,8 +111,47 @@ function logCorrection(category, detail, context = '') {
   return { success: true, id: entry.id, recurrence: false };
 }
 
-// ─── 检查复发风险 ─────────────────────────
+// ─── [v6.6.0] 闭环状态机：错误 → 修复 → 验证 ─────────────
 
+/**
+ * 标记错误已修复（open → fixed）
+ * @param {number} id - 错误 ID
+ * @param {string} fixDetail - 修复说明
+ */
+function logFix(id, fixDetail = '') {
+  const memory = loadMemory();
+  const entry = memory.errors.find(e => e.id === id);
+  if (!entry) return { success: false, reason: '错误不存在' };
+  if (entry.status === 'verified') return { success: false, reason: '已验证无需再修复', id };
+  entry.status = 'fixed';
+  entry.fixDetail = fixDetail || entry.fixDetail || '';
+  entry.fixedAt = new Date().toISOString();
+  saveMemory(memory);
+  return { success: true, id, status: 'fixed' };
+}
+
+/**
+ * 验证修复有效（fixed → verified）
+ * @param {number} id - 错误 ID
+ * @param {string} verifyNote - 验证说明
+ */
+function logVerify(id, verifyNote = '') {
+  const memory = loadMemory();
+  const entry = memory.errors.find(e => e.id === id);
+  if (!entry) return { success: false, reason: '错误不存在' };
+  if (entry.status === 'open') {
+    return { success: false, reason: '必须先 logFix 标记修复，才能验证', id };
+  }
+  entry.status = 'verified';
+  entry.verifyNote = verifyNote || entry.verifyNote || '';
+  entry.verifiedAt = new Date().toISOString();
+  saveMemory(memory);
+  return { success: true, id, status: 'verified' };
+}
+
+/**
+ * 检查复发风险（闭环版）：已 verified 的错误降级为弱提醒，不再重复计数
+ */
 function checkRecurrence(context) {
   if (!context || typeof context !== 'string') return { warnings: [], safe: true };
 
@@ -117,38 +160,45 @@ function checkRecurrence(context) {
 
   const warnings = [];
 
-  // 统计各分类的错误数量
+  // 只统计 open/fixed 的错误（verified 的不再算历史重犯）
+  const activeErrors = memory.errors.filter(e => e.status !== 'verified');
   const categoryCounts = {};
-  for (const e of memory.errors) {
+  for (const e of activeErrors) {
     categoryCounts[e.category] = (categoryCounts[e.category] || 0) + 1;
   }
 
-  // 对有过错误记录的分类生成预防警告
+  // 对 open/fixed 错误生成预防警告
   for (const [category, count] of Object.entries(categoryCounts)) {
     if (count >= 1 && CATEGORIES[category]) {
       const cat = CATEGORIES[category];
-      // 检查当前上下文是否包含该类的触发模式
       const triggered = cat.preventionPatterns.filter(p => context.includes(p));
       if (triggered.length > 0) {
+        // 检查该分类是否有 verified 记录（已改好的）
+        const verifiedCount = memory.errors.filter(e =>
+          e.category === category && e.status === 'verified'
+        ).length;
+        const statusTag = verifiedCount > 0 ? `（同类已验证 ${verifiedCount} 次，但仍有 ${count} 条未闭环）` : '';
         warnings.push({
           category,
           label: cat.label,
           previousCount: count,
           triggeredPatterns: triggered,
-          advice: `之前${count}次在"${cat.label}"上犯过错，当前上下文有触发词"${triggered.join('、')}"，请注意。`,
+          verifiedCount,
+          advice: `之前${count}次在"${cat.label}"上犯过错${statusTag}，当前上下文有触发词"${triggered.join('、')}"，请注意。`,
         });
       }
     }
   }
 
-  // 检查高频复发（同一个错误重复 2+ 次）
-  const highRecurrence = memory.errors.filter(e => (e.recurrenceCount || 0) >= 2);
+  // 高频复发（open/fixed 且复发 2+ 次）
+  const highRecurrence = activeErrors.filter(e => (e.recurrenceCount || 0) >= 2);
   for (const e of highRecurrence) {
     warnings.push({
       category: e.category,
       label: CATEGORIES[e.category]?.label || e.category,
       previousCount: (e.recurrenceCount || 0) + 1,
-      advice: `"${e.detail.slice(0, 40)}"已经反复犯${(e.recurrenceCount || 0) + 1}次了。`,
+      status: e.status,
+      advice: `"${e.detail.slice(0, 40)}"已经反复犯${(e.recurrenceCount || 0) + 1}次了${e.status === 'fixed' ? '（已标记修复，待验证）' : ''}。`,
       highRecurrence: true,
     });
   }
@@ -208,18 +258,27 @@ function generatePreventionRule(category) {
 function getStats() {
   const memory = loadMemory();
   const byCategory = {};
+  const byStatus = { open: 0, fixed: 0, verified: 0 };
   for (const e of memory.errors) {
     byCategory[e.category] = (byCategory[e.category] || 0) + 1;
+    byStatus[e.status || 'open'] = (byStatus[e.status || 'open'] || 0) + 1;
   }
   return {
     total: memory.errors.length,
     byCategory,
+    byStatus,
+    // [v6.6.0] 闭环率: 已闭环(verified) / 总数
+    closedRate: memory.errors.length > 0
+      ? Math.round((byStatus.verified / memory.errors.length) * 1000) / 100
+      : 0,
     highRecurrence: memory.errors.filter(e => (e.recurrenceCount || 0) >= 2).length,
   };
 }
 
 module.exports = {
   logCorrection,
+  logFix,
+  logVerify,
   checkRecurrence,
   generatePreventionRule,
   getStats,

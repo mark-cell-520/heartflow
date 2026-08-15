@@ -690,6 +690,24 @@ const TOOLS = [
   },
 
   {
+
+    name: 'heartflow_error_fix',
+
+    description: '标记错误已修复（open→fixed）。闭环状态机第二步：修好后记录修复方式。',
+
+    inputSchema: { type: 'object', properties: { id: { type: 'number', description: '错误 ID' }, note: { type: 'string', description: '修复说明' } }, required: ['id'] }
+
+  },
+  {
+
+    name: 'heartflow_error_verify',
+
+    description: '验证修复有效（fixed→verified）。闭环状态机第三步：验证通过后不再算历史重犯。',
+
+    inputSchema: { type: 'object', properties: { id: { type: 'number', description: '错误 ID' }, note: { type: 'string', description: '验证说明' } }, required: ['id'] }
+
+  },
+  {
     name: 'heartflow_audit42',
 
     description: '42维全量审核报告：对输入文本进行discriminate+summarize+crossAnalyze+entropy全维度分析，返回42维详细审核结果。',
@@ -3195,6 +3213,19 @@ function handleErrorQuery(args) {
   if (!heartflow||!heartflow._hfCore) return { error: 'error memory not ready' };
   try { return heartflow._hfCore.errorMemory.query(problem, limit || 5); } catch(e) { return { error: e.message }; }
 }
+// [v6.6.0] 闭环状态机: 错误 → 修复 → 验证
+function handleErrorFix(args) {
+  const { id, note } = args || {};
+  if (id === undefined) return { error: 'need id' };
+  if (!heartflow||!heartflow._hfCore||!heartflow._hfCore.errorMemory) return { error: 'error memory not ready' };
+  try { return heartflow._hfCore.errorMemory.fix(id, note || ''); } catch(e) { return { error: e.message }; }
+}
+function handleErrorVerify(args) {
+  const { id, note } = args || {};
+  if (id === undefined) return { error: 'need id' };
+  if (!heartflow||!heartflow._hfCore||!heartflow._hfCore.errorMemory) return { error: 'error memory not ready' };
+  try { return heartflow._hfCore.errorMemory.verify(id, note || ''); } catch(e) { return { error: e.message }; }
+}
 // [v6.3.7] 公式搜索
 function handleFormulaSearch(args) {
   const { keyword, limit } = args || {};
@@ -3345,6 +3376,8 @@ const HANDLERS = {
   heartflow_check_drift: handleCheckDrift,
   heartflow_error_store: handleErrorStore,
   heartflow_error_query: handleErrorQuery,
+  heartflow_error_fix: handleErrorFix,
+  heartflow_error_verify: handleErrorVerify,
 
   // [v6.3.7] 公式工具
   heartflow_formula_search: handleFormulaSearch,
