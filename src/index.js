@@ -420,13 +420,13 @@ const WEIGHTS = { concession_eager: 0.3, flip_no_reason: 0.5, excessive_praise: 
 
 // ─── 矛盾检测（同一段话中前后说相反的）─────────────────────────────
 const CONTRADICTION_PAIRS = [
-  { positive: /这是[^。]*?好[^。。]*?但[是]?[^。]*?不行/g, negative: /不行|不好|有问题|不成立|有缺陷/ },
-  { positive: /我[^。]*?同意[^。。]*?但[是]?[^。]*?不/g, negative: /但[是]?[^。]*?不/ },
-  { positive: /很[好大棒优秀正确][^。。]*?但是/g, negative: /但是|不过|然而/ },
-  { positive: /应该[^。。]*?不需要/g, negative: /不需要/ },
-  { positive: /必须[^。。]*?没必要/g, negative: /没必要/ },
-  { positive: /是[^。。]*?不是/g, negative: /不是/ },
-  { positive: /有[^。。]*?[，,][^。]*?没有/g, negative: /没有/ },
+  { positive: /这是[^。]*?好[^\n。]*?但[是]?[^。]*?不行/g, negative: /不行|不好|有问题|不成立|有缺陷/ },
+  { positive: /我[^。]*?同意[^\n。]*?但[是]?[^。]*?不/g, negative: /但[是]?[^。]*?不/ },
+  { positive: /很[好大棒优秀正确][^\n。]*?但是/g, negative: /但是|不过|然而/ },
+  { positive: /应该[^\n。]*?不需要/g, negative: /不需要/ },
+  { positive: /必须[^\n。]*?没必要/g, negative: /没必要/ },
+  { positive: /是[^\n。]*?不是/g, negative: /不是/ },
+  { positive: /有[^\n。]*?[，,][^。]*?没有/g, negative: /没有/ },
   { positive: /\b(should|must|have to)[^.]*?but\b/i, negative: /\bbut\b[^.]*?(shouldn|don't|not)/i },
   { positive: /\b(agree|support|endorse)[^.]*?however\b/i, negative: /\bhowever\b/i },
   { positive: /\b(agree|support|endorse|believe|think)[^.]*?\bbut\b/i, negative: /\bbut\b[^.]*?\b(doubt(?:s|ed)?|disagree|against|oppose|not (?:so sure|convinced|sure)|serious (?:doubt|doubts|concern|concerns|reservation|reservations)|problem|issue|flaw|wrong|no)\b/i },
