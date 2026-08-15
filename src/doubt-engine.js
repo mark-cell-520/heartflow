@@ -36,7 +36,7 @@ function checkKnowledgeBoundary(text) {
     // "原因是"类断言
     { re: /(原因是|根因|根本原因|主要原因是)[^，。]{10,50}/g, type: 'causal_attribution' },
     // 用"就是"包装的简化解释
-    { re: /就是[^，。]{3,30}[，。]/g, type: 'simplified_explanation' },
+    { re: /(?<![根因本质关键核心问题])(?<!为)(?<!因)就是[^，。]{3,30}[，。]/g, type: 'simplified_explanation' },
     // 唯一/绝对限定
     { re: /(唯一|第一|最好|最差|最先|首创|首个)[^，。]{3,20}[的，。]/g, type: 'absolute_claim' },
     // [v6.4.5 心虫监督] 自夸/质变叙事（知识边界外的自我拔高）
@@ -94,10 +94,11 @@ function checkSymmetry(text) {
       const isNegation = /不是[^，。]{0,20}[，。,][^，。]{0,20}(是|而是)|不是[^，。]{0,10}(问题|写得不好|文案|原因|bug)|并非|绝非|是正确的[^，。]{0,10}(修复|方案|做法|选择)|是合理的[^，。]{0,10}(修复|方案|做法|选择)/.test(s);
       const isEmphasis = /是[^，。]{0,20}的[，。,。]/.test(s);
       const isEvaluative = /[^，。]{3,40}是[^，。]{0,25}(?:最大|主要|核心|关键|根本|重要|必要|基本|唯一|常见|普遍|典型|明显|显著|首要|本质)[^，。]{0,15}[的，。,。]/.test(s);
-      const isQuestion = /(?:哪些|什么|怎么|是否|是不是|有没有|为何|为什么)[^，。]{0,30}是/.test(s);
+      const isQuestion = /(?:哪些|什么|怎么|是否|是不是|有没有|为何|为什么|哪个|哪)[^，。]{0,30}是/.test(s) || /是[^，。]{0,20}(?:哪个|哪些|什么|谁|怎么|是否|有没有)/.test(s);
       const isStanceVerb = /(?:也|正|就|都|才|只|总|毕竟|终究|恰恰|无非|其实|不过)是/.test(s);
+      const isBelonging = /属于/.test(s);
       const BOUND = "[^\uFF0C\u3002\u0028\u0029\uFF08\uFF09\u0022\u0027\u201C\u201D\u2018\u2019\uFF1A\u003A\u2014\u2026\u000A\u000D]";
-      if (/(?<!不)是/.test(s) && new RegExp(BOUND + "{3,40}是" + BOUND + "{3,40}[的，。]").test(s) && !isLeadWord && !isNegation && !isEmphasis && !isQuestion && !isStanceVerb && !isEvaluative) {
+      if (/(?<!不)是/.test(s) && new RegExp(BOUND + "{3,40}是" + BOUND + "{3,40}[的，。]").test(s) && !isLeadWord && !isNegation && !isEmphasis && !isQuestion && !isStanceVerb && !isEvaluative && !isBelonging) {
         const match = s.match(new RegExp(BOUND + "{3,40}是" + BOUND + "{3,40}[的，。]"));
         if (match) {
           const reversed = match[0].replace('是', '不一定');
@@ -113,7 +114,7 @@ function checkSymmetry(text) {
         const match = s.match(/([^，。]{4,40}会[^，。]{4,40}[，。])/);
         if (match) {
           // Skip if it's already tentative
-          if (/可能|也许|或许|不一定|不会|将会|应该/.test(match[0])) continue;
+          if (/可能|也许|或许|不一定|不会|将会|应该|会(?:直接|间接|最终|进一步|立刻|马上)?(?:导致|变成|得到|带来|引发|造成|使得)|会令|会让人/.test(match[0])) continue;
           reversible.push({
             original: match[0].slice(0, 40),
             reversed: match[0].replace('会', '不一定').slice(0, 40),
@@ -122,7 +123,7 @@ function checkSymmetry(text) {
         }
       }
       // "X决定Y" 类因果反转
-      if (/([^，。]{3,40}(导致|引发|造成)[^，。]{3,40})/.test(s) || (/([^，。]{3,40}决定[^，。]{3,40})/.test(s) && !/根据|依据|按照|基于|如果|若|假设|一旦/.test(s))) {
+      if (/([^，。]{3,40}(导致|引发|造成)[^，。]{3,40})/.test(s) && !/会(?:直接|间接|最终|进一步)?(?:导致|引发|造成)|可能会|也许|或许|不一定|可能不会/.test(s) || (/([^，。]{3,40}决定[^，。]{3,40})/.test(s) && !/根据|依据|按照|基于|如果|若|假设|一旦/.test(s))) {
         const match = s.match(/([^，。]{3,40}(决定|导致|引发|造成)[^，。]{3,40})/);
         if (match) {
           reversible.push({
