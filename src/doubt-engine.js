@@ -89,7 +89,11 @@ function checkSymmetry(text) {
     // 寻找可以被反转的断言
     if (hasChinese) {
       // "X是Y" 可反转成 "X不一定是Y"
-      if (/[^，。]{3,40}是[^，。]{3,40}[的，。]/.test(s)) {
+      // 排除"X不是Y"否定句式（2026-08-15 实测："这个 bug 的本质不是 UI 文案问题"被误判可反转）
+      const isLeadWord = /(?:关键|问题|本质|其实|但|不过)[是，：]/.test(s);
+      const isNegation = /不是[^，。]{0,10}(问题|写得不好|文案|原因|bug)|并非|绝非/.test(s);
+      const isEmphasis = /是[^，。]{0,20}的[，。]/.test(s);
+      if (/(?<!不)是/.test(s) && /[^，。]{3,40}是[^，。]{3,40}[的，。]/.test(s) && !isLeadWord && !isNegation && !isEmphasis) {
         const match = s.match(/[^，。]{3,40}是[^，。]{3,40}[的，。]/);
         if (match) {
           const reversed = match[0].replace('是', '不一定');
@@ -105,7 +109,7 @@ function checkSymmetry(text) {
         const match = s.match(/([^，。]{4,40}会[^，。]{4,40}[，。])/);
         if (match) {
           // Skip if it's already tentative
-          if (/可能|也许|或许|不一定/.test(match[0])) continue;
+          if (/可能|也许|或许|不一定|不会|将会|应该/.test(match[0])) continue;
           reversible.push({
             original: match[0].slice(0, 40),
             reversed: match[0].replace('会', '不一定').slice(0, 40),
