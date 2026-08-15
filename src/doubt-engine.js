@@ -257,7 +257,7 @@ function checkAdversarialReversal(text) {
 
   // 4. 绝对化——对手只需举一个反例
   const ABSOLUTE = [
-    /(?:永远|绝不|从不会|总是|每次都|百分之百|绝对|完全)[^。！？]{0,25}/g,
+    /(?<!完全)(?:永远|绝不|从不会|总是|每次都|百分之百|绝对|完全(?!一样|相同|一致|吻合|相符|等同|等价))[^。！？]{0,25}/g,
     /(?:no one ever|always|never|every single|100%|definitely will)[^.!?]{0,30}/gi,
   ];
   for (const re of ABSOLUTE) {
