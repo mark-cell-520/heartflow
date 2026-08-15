@@ -701,7 +701,7 @@ const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('
 
 
 
-const BUILD_DATE = '2026-08-08-6.5.4';
+const BUILD_DATE = '2026-08-15-6.5.8';
 
 
 
@@ -2540,7 +2540,7 @@ class HeartFlow {
     try {
 
       const { RuleGrowth } = require('../cortex/rule-growth.js');
-      this.ruleGrowth = new RuleGrowth(this.rootPath || this.projectRoot || process.cwd());
+      this.ruleGrowth = new RuleGrowth(this.rootPath || this.rootPath || process.cwd());
       // 把已学规则注入决策路由，使 learned 判断生效
       if (this.decisionRouter && typeof this.decisionRouter.addRule === 'function') {
         for (const r of this.ruleGrowth.toDecisionRouterRules()) {
@@ -3928,10 +3928,10 @@ class HeartFlow {
 
     // ─── [v6.1.0] WorldLandscape 世界格局分析引擎（AI人类核心认知能力）───
     try {
-      this.worldLandscape = new WorldLandscape({ projectRoot: this.projectRoot || process.cwd() });
+      this.worldLandscape = new WorldLandscape({ projectRoot: this.rootPath || process.cwd() });
       this._modules['worldLandscape'] = this.worldLandscape;
       // 世界感知战略推演层：让心虫对世界格局新闻产出自身进化优先级
-      this.worldAwareStrategy = createWorldAwareOrchestrator({ projectRoot: this.projectRoot || process.cwd() });
+      this.worldAwareStrategy = createWorldAwareOrchestrator({ projectRoot: this.rootPath || process.cwd() });
       this._modules['worldAwareStrategy'] = this.worldAwareStrategy;
       HeartFlow.ALLOWED_ROUTES.add('worldAwareStrategy.orchestrate');
       _log.info('init', 'WorldLandscape 加载成功');
@@ -3955,7 +3955,7 @@ class HeartFlow {
     // ─── [v6.2.4] KnowledgeSubsystem 知识子系统：14领域本体 + 世界知识框架 + 跨域推理 ──
     try {
       const { KnowledgeSubsystem } = _KnowledgeSubsystem();
-      this.knowledge = new KnowledgeSubsystem({ rootPath: this.projectRoot || process.cwd() });
+      this.knowledge = new KnowledgeSubsystem({ rootPath: this.rootPath || process.cwd() });
       this._modules['knowledgeSubsystem'] = this.knowledge;
       _log.info('init', 'KnowledgeSubsystem 加载成功', { domains: this.knowledge.ontology.domains.length, routes: 'knowledgeSubsystem.*, worldKnowledge.*' });
     } catch (e) { _boundedPush(this._initErrors, { module: 'knowledgeSubsystem', error: e.message }, MAX_HISTORY_SIZE); }
