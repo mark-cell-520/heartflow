@@ -176,7 +176,7 @@ function discriminate(text, evidence = []) {
   const rcIntent = (rc.markers?.premise?.count || 0) + (rc.markers?.inference?.count || 0);
   // 事实陈述豁免：报告/数据显示/调查/统计/年报 + 具体数据 = 数据引用句，不是推理链断裂
   const FACT_STATEMENT = /报告显示|数据显示|调查了|统计显示|年报|研究表明|结果显示|同比增长|数据来自|覆盖|根据[^，。]{0,20}(文献|研究|论文|数据|资料|公开)|是[^。]{0,25}(领域|问题|方向|话题|现象)/i;
-  const rcBroken = rcIntent > 0 && !FACT_STATEMENT.test(text) && (rc.score < 0.4 || (rc.markers?.leap?.count || 0) > 0);
+  const rcBroken = rcIntent > 0 && !FACT_STATEMENT.test(text) && (rc.structure === '结构碎片' || rc.structure === 'unknown' || (rc.markers?.leap?.count || 0) > 0) && rc.score < 0.4;
   if (rcBroken) {
     findings.push({ dimension: 'reasoning_coherence', severity: Math.round((0.5 - rc.score) * 100), details: `推理连贯性差(${rc.structure})` });
   }
@@ -1724,7 +1724,7 @@ const DEHUMANIZATION_PATTERNS = {
       /[^。]{0,12}(?:真是|简直是|就是|都是)[^。]{0,6}(?:垃圾人|垃圾货色)/i,
       /垃圾[^。]{0,4}(?:人|货色|东西(?!家具|机器|手机|电脑|产品))/i,
       /不配[^，。]{0,10}(活着|活|生存|为人|做人|存在)/i,
-      /低端(?!逻辑|市场|产品|服务|版本|配置|消费|收入|价格|成本|价位|路线)|底层(?!逻辑)|下等人|底层人/i,
+      /低端(?!逻辑|市场|产品|服务|版本|配置|消费|收入|价格|成本|价位|路线)|底层(?!\s?(?:逻辑|util|库|层|代码|框架|系统|结构|机制|原理|引擎|模块|依赖|API|接口|实现))|下等人|底层人/i,
       /劣根性|奴性|愚昧|麻木|麻木不仁/i,
     ],
     disgust: [
@@ -2741,7 +2741,7 @@ const REASONING_MARKERS = {
               en: [/therefore|thus|hence|consequently|accordingly|as a result|this means|which implies|it follows that|for this reason/i,
                    /suggests|indicates|demonstrates|shows|proves|reveals|implies|means that/i] },
   // 结论标志
-  conclusion: { zh: [/结论是|综上所述|总而言之|归根结底|最终|答案是|因此可以认为|总的来说|综上|概括/i,
+  conclusion: { zh: [/结论是|综上所述|总而言之|归根结底|最终|答案是|因此可以认为|总的来说|综上|概括|所以|因此|这样|于是/i,
                     /总体来看|总的来说|最终结论|最终结果是|一言以蔽之/i],
                en: [/in conclusion|to conclude|in summary|overall|ultimately|the bottom line|all things considered|taking everything into account|in the final analysis/i,
                     /the answer is|we can conclude|it can be concluded|to sum up/i] },
