@@ -2606,7 +2606,7 @@ const SLIPPERY_PATTERNS = {
   zh: [
     [/一旦开了这个口子/i, 'opening_the_floodgates'],
     [/如果今天让步明天就/i, 'give_in_today_tomorrow'],
-    [/这会导致/i, 'this_will_lead_to'],
+    [/这会导致[^。]{0,30}(最终|不堪设想|越来越|一发不可收拾|连锁|灾难|崩盘|全盘皆输|万劫不复)/i, 'this_will_lead_to'],
     [/最终结果就是/i, 'ultimate_result'],
     [/接下来就是/i, 'next_will_be'],
     [/多米诺骨牌/i, 'domino_effect'],
