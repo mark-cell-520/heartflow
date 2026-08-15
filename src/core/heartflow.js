@@ -701,7 +701,7 @@ const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('
 
 
 
-const BUILD_DATE = '2026-08-15-6.5.9';
+const BUILD_DATE = '2026-08-15-6.6.0';
 
 
 
@@ -4022,6 +4022,10 @@ class HeartFlow {
           classify: (err, ctx) => emMod.classifyError ? emMod.classifyError(err, ctx) : { code: 'unknown', recovery: '未知错误' },
           getRecovery: (code) => emMod.getErrorRecovery ? emMod.getErrorRecovery(code) : null,
           getStats: () => emMod.getTaxonomyStats ? emMod.getTaxonomyStats() : {},
+          // [v6.6.0] 闭环状态机暴露：错误 → 修复 → 验证
+          fix: (id, note) => emMod.logFix ? emMod.logFix(id, note) : { success: false, reason: 'logFix 不可用' },
+          verify: (id, note) => emMod.logVerify ? emMod.logVerify(id, note) : { success: false, reason: 'logVerify 不可用' },
+          loopStats: () => emMod.getStats ? emMod.getStats() : { total: 0, byStatus: {} },
         };
       }
     } catch (e) { _boundedPush(this._initErrors, { module: 'errorMemory', error: e.message }, MAX_HISTORY_SIZE); }
