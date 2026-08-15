@@ -102,6 +102,7 @@ function discriminate(text, evidence = []) {
   const sn = checkSocialNorm(text);
   const mc = checkMetaCognition(text);
   const co = checkCapabilityOverclaim(text);
+  const ab = checkAbsoluteClaim(text);
   const da = checkDeceptiveAlignment(text);
   const ir = checkInstrumentalReasoning(text);
   const st = checkStereotype(text);
@@ -843,6 +844,9 @@ const EM_MANIPULATION_PATTERNS = {
     [/everyone else can[^.]*?why can'?t you/i, 'comparison_shame', 0.5],
     [/why can'?t you be more like/i, 'comparison_shame', 0.5],
     [/everyone else[^.]*?(manages|handles|does) it/i, 'comparison_shame', 0.5],
+    [/after (?:all|everything) i (?:did|did for|gave|sacrificed)[^.]*?(?:this is how you|you (?:repay|treat|thank))\b/i, 'victim_stance', 0.6],
+    [/\b(?:everyone|everybody|all my friends|people) (?:else )?[^.]{0,30}?(?:already|all|did)[^.]{0,10}?(?:why (?:haven'?t|have not|didn'?t|did not) you)\b/i, 'comparison_shame', 0.5],
+    [/\bif you were (?:a |an |my )?(?:real|true|good) (?:friend|partner|parent|son|daughter|colleague)\b[^.]*?you (?:would|should|could)\b/i, 'moral_guilt', 0.55],
   ],
 };
 
@@ -1062,7 +1066,7 @@ const UNSUPPORTED_CLAIM_ZH = [
 ];
 const UNSUPPORTED_CLAIM_EN = [
   /\baccording to (?:a |the )?(?:study|research|report|survey|data|statistics|experiment|paper|survey)\b/i,
-  /\b(?:studies?|research|data|surveys?|experts?|scientists?)\s+(?:show|shows|suggest|suggests|indicate|indicates|prove|proves|found|demonstrate|demonstrates)\b/i,
+  /\b(?:studies?|research|data|surveys?|experts?|scientists?)\s+(?:show|shows|suggest|suggests|indicate|indicates|prove|proves|found|demonstrate|demonstrates|confirm|confirms)\b/i,
   /\b(?:20\d{2}|19\d{2})\s+(?:study|research|report|paper|survey)\b/i,
   /\b(?:published|reported|documented)\s+in\s+(?:the\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+(?:Journal|Review|Report|Paper)\b/i,
   /\b(?:increased|decreased|reached|exceeded|extended|shortened)\s+by\s+\d+(?:\.\d+)?\s*(?:years?|times|%|million|billion)\b/i,
@@ -1185,6 +1189,10 @@ const EMOTIONAL_MANIPULATION_PATTERNS = {
     /\bdon't you (care|love|want)[^.]*?\b/i,
     /\bhow could you[^.]*?after\b/i,
     /\bif you really (cared|loved|wanted)[^.]*?you would\b/i,
+    /\bif you were (?:a |an |my )?(?:real|true|good) (?:friend|partner|parent|son|daughter|colleague)\b[^.]*?you would\b/i,
+    /\b(?:everyone|everybody|all my friends|people) (?:else )?(?:has|have|is|are|did|already)[^.]*?(?:why (?:haven't|have not|didn't|did not) you)\b/i,
+    /\bafter (?:all|everything) i (?:did|did for|gave|sacrificed)[^.]*?(?:this is how you|you (?:repay|treat|thank))\b/i,
+    /\bif you (?:really|truly) (?:cared|loved|respected|valued) me[^.]*?you (?:would|wouldn't|would not)\b/i,
   ],
 };
 
@@ -3071,6 +3079,38 @@ function checkCapabilityOverclaim(text) {
   return { count: claims.length, claims, score: Math.min(1, claims.length * 0.35) };
 }
 
+// ─── 绝对化断言检测（Absolute Claim）───────────────────────
+// 识别无证据支持的绝对化声称："no one has ever" / "will change everything" /
+// "the only way" / "always/never" 绝对词。这类断言无法验证，是过度自信信号。
+const ABSOLUTE_CLAIM_PATTERNS = {
+  zh: [
+    /(?:从来|从未|史上)[^。]{0,10}(?:没有|没人|第一|唯一|最)/,
+    /(?:唯一|仅有)[^。]{0,8}(?:办法|方式|方法|途径|选择)/,
+    /(?:绝对|一定|必然|必定)[^。]{0,10}(?:是|会|能|行|对|错|好|坏)/,
+    /(?:永远|永久)[^。]{0,8}(?:不会|不可能|无法)/,
+    /(?:所有|一切)[^。]{0,6}(?:人|事|问题|方法)[^。]{0,8}(?:都|均|皆)/,
+  ],
+  en: [
+    /\bno one has ever\b[^.]{0,40}/i,
+    /\b(?:this|it|that)\s+will\s+change\s+everything\b/i,
+    /\bthe (?:only|sole)\s+(?:way|method|approach|solution)\s+(?:is|to)\b/i,
+    /\b(?:absolutely|definitely|certainly|undoubtedly)\s+(?:the\s+)?(?:best|worst|greatest|only|first)\b/i,
+    /\b(?:never|always)\s+(?:will|would|can|could)\b[^.]{0,30}\b(?:work|fail|happen|change)\b/i,
+    /\b(?:everyone|everybody|all|everything)\s+(?:knows|agrees|believes|wants)\b/i,
+  ],
+};
+
+function checkAbsoluteClaim(text) {
+  if (!text || typeof text !== "string") return { count: 0, claims: [], score: 0 };
+  const hasChinese = /[\u4e00-\u9fff]/.test(text);
+  const patterns = hasChinese ? ABSOLUTE_CLAIM_PATTERNS.zh : ABSOLUTE_CLAIM_PATTERNS.en;
+  const claims = [];
+  for (const [idx, pat] of patterns.entries()) {
+    const m = text.match(pat);
+    if (m) claims.push({ type: "absolute_claim_" + (idx + 1), matched: m[0].slice(0, 40) });
+  }
+  return { count: claims.length, claims, score: Math.min(1, claims.length * 0.35) };
+}
 // ─── 欺骗性对齐检测（Deceptive Alignment / Sandbagging）────────────────
 // AGI 安全：检测隐藏能力/故意表现差/策略性失能
 const DECEPTIVE_PATTERNS = {
@@ -3795,6 +3835,7 @@ module.exports = {
   checkSocialNorm,
   checkMetaCognition,
   checkCapabilityOverclaim,
+  checkAbsoluteClaim,
   checkDeceptiveAlignment,
   checkInstrumentalReasoning,
   checkStereotype,
