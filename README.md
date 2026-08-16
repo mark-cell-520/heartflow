@@ -226,6 +226,122 @@ The lesson: *a machine's most valuable sentence is "I'm not sure" or "no".*
 
 ---
 
+## 🗺️ 装了 30+ 个技能，从哪个开始？
+
+心虫仓库把能力拆成了多个技能（skill），**不要一次性全部加载**。按当前任务选 1 个即可：
+
+| 场景 | 技能名 | 入口 |
+|-----|--------|------|
+| 第一次使用 / 不知道选什么 | `heartflow-knowledge-base` | 核心身份 + 7 条指令 |
+| 让心虫自我升级 | `heartflow-upgrade-methodology` | 升级方法论 |
+| 报错 / 启动失败 | `heartflow-debug-workflow` | 崩溃诊断 |
+| 安全 / 逻辑审计 | `heartflow-audit-fix-workflow` | 审计修复 |
+| 记忆不持久 / 跨会话丢失 | `heartflow-memory-permanence` | 记忆系统 |
+| 代码架构 / 重构 | `heartflow-architecture-optimization` | 架构优化 |
+| 性能评测 | `heartflow-benchmark` | 基准测试 |
+| 情绪 / 共情 | `heartflow-emotion-analysis` | 情绪分析 |
+| 梦境 / 创意 | `heartflow-dreaming` | 梦境引擎 |
+| GitHub 推广 | `heartflow-community-outreach` | 社区互动 |
+| npm 发布 | `heartflow-npm-publish` | 发布 |
+| 版本冲突 | `heartflow-version-unify` | 版本统一 |
+| 定时自动升级 | `heartflow-auto-upgrade-cron` | 定时任务 |
+| 公式计算 | `heartflow-formula-engine` | 公式 |
+| 身份漂移 | `heartflow-identity-drift-detect` | 身份检测 |
+| 飞书 / 微信桥接 | `heartflow-bridge-layer` | 桥接 |
+
+### 自动路由脚本
+
+仓库里带了一个路由脚本，根据关键词自动推荐技能：
+
+```bash
+node skills/dispatch.js upgrade          # 升级
+node skills/dispatch.js audit            # 审计
+node skills/dispatch.js debug            # 排错
+node skills/dispatch.js memory           # 记忆
+node skills/dispatch.js list             # 列出全部技能
+```
+
+输出示例：
+```json
+{ "matched": true, "intent": "upgrade", "skill": "heartflow-upgrade-methodology", "next": "skill_view(name=\"heartflow-upgrade-methodology\")" }
+```
+
+然后在 Hermes/Claude Code 里执行它给的 `skill_view(...)` 即可。
+
+---
+
+## 🗺️ 装了 30+ 个技能，从哪个开始？
+
+心虫仓库把能力拆成了多个技能（skill），**不要一次性全部加载**。按当前任务选 1 个即可。
+
+### 先看你现在真正装了的技能
+
+仓库里目前实际 bundled 的技能分三类：
+
+**A. HeartFlow 专属技能（本仓库 `skills/`，12 个）**
+- heartflow-architecture-tracing
+- heartflow-audit-upgrade-push
+- heartflow-benchmark
+- heartflow-bridge-layer
+- heartflow-bulk-upgrade
+- heartflow-debug-workflow
+- heartflow-dreaming
+- heartflow-emotion-analysis
+- heartflow-module-upgrader
+- heartflow-session-context
+- heartflow-static-injection-upgrade
+- heartflow-system-prompt-absorption
+
+**B. 通用开发技能（本仓库 `skills/`，20 个）**
+- agent-git-oracle / bug-fixing / clean-code-review / code-analyzer / code-fix / code-refactoring / cody / critical-code-reviewer / debug-pro / log-analyzer / mind-space / nexus-error-explain / pr-reviewer / project-code-standard / security-audit / simplify / superpowers-systematic-debugging / system-architect / two-pass-response / uncle-bob
+
+**C. 全局 HeartFlow 技能（`~/.hermes/skills/heartflow/`，23 个）**
+- heartflow-agi-gate / heartflow-auto-audit-fix / heartflow-closed-loop-audit / heartflow-code-recovery / heartflow-cognitive-debugging / heartflow-dimension-pipeline / heartflow-formula-wiring / heartflow-hookbus-migration / heartflow-llm-fallback / heartflow-longtask-decision / heartflow-maintenance-upgrade / heartflow-memory-ingestion / heartflow-meta-audit-honest-evo / heartflow-module-restore / heartflow-paper-wiring / heartflow-plugin-system / heartflow-readme-audience / heartflow-release-audit / heartflow-self-audit-report / heartflow-self-upgrade / heartflow-source-cleanup / heartflow-standards-alignment / heartflow-surgical-dimension-injection
+
+> 上面三类加起来是你当前可用的 HeartFlow 相关技能全集。README 前面提到的部分技能名目前不在本仓库内，上面的“已安装清单”以你本地实际存在为准。
+
+### 按场景选用
+
+| 场景 | 技能名 | 入口 |
+|-----|--------|------|
+| 第一次接触心虫 / 不知道选什么 | `heartflow-knowledge-base` | 全局 HeartFlow 技能 |
+| 让心虫自我升级 | `heartflow-self-upgrade` 或 `heartflow-upgrade-methodology` | 全局 / 仓库 |
+| 报错 / 启动失败 | `heartflow-debug-workflow` | 仓库 skills/ |
+| 安全/逻辑/代码质量审计 | `heartflow-audit-upgrade-push` | 仓库 skills/ |
+| 记忆不持久 / 跨会话丢失 | `heartflow-memory-ingestion` | 全局 HeartFlow |
+| 代码架构 / 重构 | `heartflow-architecture-tracing` | 仓库 skills/ |
+| 性能评测 | `heartflow-benchmark` | 仓库 skills/ |
+| 情绪 / 共情 | `heartflow-emotion-analysis` | 仓库 skills/ |
+| 梦境 / 创意 | `heartflow-dreaming` | 仓库 skills/ |
+| GitHub 推广 | `heartflow-community-outreach` | 全局 HeartFlow |
+| npm 发布 | `heartflow-npm-publish` | 全局 HeartFlow |
+| 版本冲突 | `heartflow-version-unify` | 全局 HeartFlow |
+| 定时自动升级 | `heartflow-auto-upgrade-cron` | 全局 HeartFlow |
+| 公式计算 | `heartflow-formula-wiring` | 全局 HeartFlow |
+| 身份漂移 | `heartflow-identity-drift-detect` | 全局 HeartFlow |
+| 飞书 / 微信桥接 | `heartflow-bridge-layer` | 仓库 skills/ |
+
+### 自动路由脚本
+
+仓库里带了一个路由脚本，根据关键词自动推荐技能：
+
+```bash
+node skills/dispatch.js upgrade          # 升级
+node skills/dispatch.js audit            # 审计
+node skills/dispatch.js debug            # 排错
+node skills/dispatch.js memory           # 记忆
+node skills/dispatch.js list             # 列出全部技能
+```
+
+输出示例：
+```json
+{ "matched": true, "intent": "upgrade", "skill": "heartflow-self-upgrade", "next": "skill_view(name=\"heartflow-self-upgrade\")" }
+```
+
+然后在 Hermes/Claude Code 里执行它给的 `skill_view(...)` 即可。
+
+---
+
 ## ⚙️ Requirements
 
 | Requirement | Min |
