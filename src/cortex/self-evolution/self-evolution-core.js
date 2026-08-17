@@ -271,7 +271,7 @@ class SelfEvolutionCore {
     let converged = false;
 
     const iterationHistory = [];
-    const baselineWeaknessCount = (learning.weaknesses || []).length;
+    let baselineWeaknessCount = 0;
 
     
 
@@ -298,6 +298,9 @@ class SelfEvolutionCore {
       // 1. 先学习(扫描自身+联网对标), 拿到新鲜弱点
 
       const learning = await this.learn(input, context);
+      if (iterationCount === 1) {
+        baselineWeaknessCount = (learning.weaknesses || []).length;
+      }
 
       // 2. 目标生成(基于当轮扫描到的真实弱点+liveness探针, 不再用上一轮旧值)
 
