@@ -264,13 +264,14 @@ class SelfEvolutionCore {
 
     
 
-    let previousImprovement = Infinity;
+    let previousImprovement = null;
 
     let iterationCount = 0;
 
     let converged = false;
 
     const iterationHistory = [];
+    const baselineWeaknessCount = (learning.weaknesses || []).length;
 
     
 
@@ -338,7 +339,7 @@ class SelfEvolutionCore {
 
       // 7. 收敛检测：如果改进小于阈值，停止迭代
 
-      if (iterationCount > 1) {
+      if (iterationCount > 1 && previousImprovement !== null) {
 
         const improvementDelta = Math.abs(previousImprovement - currentImprovement);
 
