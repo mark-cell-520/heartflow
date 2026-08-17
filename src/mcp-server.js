@@ -198,13 +198,13 @@ const AUTH_TOKEN = process.env.HEARTFLOW_MCP_TOKEN || process.env.MCP_HEARTFLOW_
     try { env = fs2.readFileSync(envPath, 'utf8'); } catch (_) { /* 防御性: env读取失败用默认值 */ }
     if (!env.includes('MCP_HEARTFLOW_KEY=')) {
       fs2.appendFileSync(envPath, `\nMCP_HEARTFLOW_KEY=${token}\n`);
-      console.log('[MCP] Token auto-written to .env as MCP_HEARTFLOW_KEY');
+      if (process.env.HEARTFLOW_DEBUG) console.log('[MCP] Token auto-written to .env as MCP_HEARTFLOW_KEY');
     }
   } catch (_) { /* 防御性: 配置加载失败不阻断 */ }
 
-  console.log('[MCP] HEARTFLOW_MCP_TOKEN not set. Auto-generated ephemeral token (not printed for security).');
+  if (process.env.HEARTFLOW_DEBUG) console.log('[MCP] HEARTFLOW_MCP_TOKEN not set. Auto-generated ephemeral token (not printed for security).');
 
-  console.log('[MCP] Set HEARTFLOW_MCP_TOKEN env var for persistent auth across restarts.');
+  if (process.env.HEARTFLOW_DEBUG) console.log('[MCP] Set HEARTFLOW_MCP_TOKEN env var for persistent auth across restarts.');
 
   return token;
 
@@ -1286,7 +1286,7 @@ function initHeartFlow() {
 
   if (!fs.existsSync(HEARTFLOW_PATH)) {
 
-    console.error(`[HeartFlow MCP] 引擎不存在: ${HEARTFLOW_PATH}`);
+    console.error('[HeartFlow MCP] 引擎文件不存在');
 
     process.exit(1);
 
