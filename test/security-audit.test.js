@@ -66,8 +66,10 @@ t('S2: _verifyGitCommit 真实工作（参数化后仍命中版本）', () => {
   const pkg = require('../package.json');
   const { execFileSync } = require('child_process');
   const out = execFileSync('git', ['-C', PROJECT_ROOT, 'log', '--oneline', '--all'], { stdio: ['ignore', 'pipe', 'ignore'] });
-  const matches = out.toString().split('\n').filter(l => l.includes('v' + pkg.version)).length;
-  if (matches < 1) throw new Error(`git log 未命中 v${pkg.version}`);
+  const log = out.toString();
+  // 兼容两种 commit message 格式: "v6.6.1" 或 "6.6.1"
+  const matches = log.split('\n').filter(l => l.includes(pkg.version) || l.includes('v' + pkg.version)).length;
+  if (matches < 1) throw new Error(`git log 未命中 ${pkg.version}（共 ${log.split('\n').length} 条 commit）`);
 });
 
 // ─── I-4: fuser 无 2>/dev/null 藏错 + PORT 数字守卫 ───
