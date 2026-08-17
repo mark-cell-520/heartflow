@@ -1,6 +1,6 @@
 'use strict';
 /**
- * reference-impl/layer-bus.js
+ * DEPRECATED: reference-impl/layer-bus.js
  * 单一编排总线（LayerBus）—— 参考设计，当前未启用。
  *
  * ⚠️ 诚实声明：本模块是一个经过设计但尚未接入选入 think() 主路径的
