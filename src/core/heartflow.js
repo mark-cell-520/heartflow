@@ -1,6 +1,6 @@
 /**
 
- /** HeartFlow v6.0.9 — 自愈RL接线 + GoT判断引擎增强
+ /** HeartFlow v6.6.1 — 自愈RL接线 + GoT判断引擎增强
 
   *
 
@@ -701,7 +701,7 @@ const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('
 
 
 
-const BUILD_DATE = '2026-08-16-6.6.1';
+const BUILD_DATE = '2026-08-17-6.6.1';
 
 
 
@@ -1389,7 +1389,7 @@ class HeartFlow {
 
     // 惰性解析版本号
 
-    this.version = _VERSION().VERSION;
+    // version already set in constructor (line 1040)
 
 
 
@@ -1485,7 +1485,7 @@ class HeartFlow {
 
     } catch (e) {
 
-      this._initErrors.push({ module: 'memoryKernel', error: e.message });
+      _boundedPush(this._initErrors, { module: 'memoryKernel', error: e.message }, MAX_HISTORY_SIZE);
 
     }
 
@@ -4169,7 +4169,7 @@ class HeartFlow {
         '只比谁更敢说"这个不对"。',
       ],
     };
-    console.log('[HeartFlow] 身份：' + this._identity.role + ' — ' + this._identity.purpose);
+    if (process.env.HEARTFLOW_DEBUG) console.log('[HeartFlow] 身份：' + this._identity.role + ' — ' + this._identity.purpose);
 
 
 
