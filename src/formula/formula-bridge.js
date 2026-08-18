@@ -90,14 +90,21 @@ class FormulaBridge {
   }
 
   /**
-   * Ebbinghaus 遗忘曲线：R = exp(-t / S)
-   * 用于记忆衰减——记忆强度 S 越高，遗忘越慢。
-   * @param {number} ageMs - 记忆年龄（自上次访问的毫秒数）
-   * @param {number} [strengthMs] - 记忆强度 S（ms）。可由访问频率/重要性动态决定
-   * @returns {number} 记忆保留率 R ∈ (0, 1]
+   * 记忆保留率（公式库版）
+   *
+   * 优先走公式库 `ebbinghaus_forgetting_curve`（R = exp(-t/S)），
+   * 公式库不可用时降级到硬编码 `Math.exp(-ageMs / strengthMs)`。
+   *
+   * 参数同下。
    */
   ebbinghausRetention(ageMs, strengthMs = this.defaultMemoryStrength) {
     if (!(ageMs >= 0) || !(strengthMs > 0)) return 1;
+    try {
+      if (this._hf && this._hf.formula && typeof this._hf.formula.calculate === 'function') {
+        const r = this._hf.formula.calculate('ebbinghaus_forgetting_curve', { t: ageMs, S: strengthMs });
+        if (r && r.result && typeof r.result.value === 'number') return r.result.value;
+      }
+    } catch (_) { /* 公式库故障不影响运行时 */ }
     return Math.exp(-ageMs / strengthMs);
   }
 
@@ -119,6 +126,11 @@ class FormulaBridge {
   /**
    * Shannon 熵：H = -Σ p(x) * log2(p(x))
    * 用于认知负荷——量化概念/类别分布的不确定性（信息量）。
+   *
+   * 【保留硬编码】公式库中的 shannon_entropy 记录为 `H = -Σp(x) * log2(p(x))`，
+   * 含 Σ 符号，mathjs 无法直接数值求值；此处实现是运行时正确版本。
+   * 当公式库升级为可计算形态时可替换为 `calculateCorpus('shannon_entropy', ...)`。
+   *
    * @param {number[]} probabilities - 概率分布（自动归一化）
    * @returns {number} 熵 H（bits），分布越均匀越高
    */
@@ -137,6 +149,10 @@ class FormulaBridge {
   /**
    * 期望效用：EU = Σ p_i * u(x_i)
    * 用于决策——在不确定选项中按期望效用排序。
+   *
+   * 【保留硬编码】公式库 expected_utility 记录为 `EU = Σ p_i u(x_i)`，
+   * 含 Σ 符号，mathjs 无法直接数值求值；此处实现是运行时正确版本。
+   *
    * @param {Array<{prob:number, utility:number}>} outcomes
    * @returns {number} 期望效用
    */
@@ -148,6 +164,10 @@ class FormulaBridge {
   /**
    * 贝叶斯更新：P(A|B) = P(B|A) * P(A) / P(B)
    * 用于信念更新——新证据到来时更新假设概率。
+   *
+   * 【保留硬编码】公式库 bayesian_updating 记录为 `P = P(D|H) P(H) / P(D)`，
+   * 变量名含特殊字符（`P(D|H)`），mathjs 解析失败；此处实现是运行时正确版本。
+   *
    * @param {number} pBgivenA - P(B|A)
    * @param {number} pA - P(A) 先验
    * @param {number} pB - P(B) 证据边际概率
