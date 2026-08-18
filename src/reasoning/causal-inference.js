@@ -36,6 +36,9 @@ const COUNTERFACTUAL_SIGNALS = {
   zh: ['如果', '假如', '要是', '假设', '倘若', '若非', '否则', '取而代之']
 };
 
+const { getFormulaSafe } = require('../formula/formula-safe.js');
+const _formulaSafe = getFormulaSafe();
+
 class CausalInference {
   constructor(options = {}) {
     this.version = VERSION;

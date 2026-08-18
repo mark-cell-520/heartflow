@@ -12,6 +12,8 @@
  * 8. 随机抽样和多样化检索模式
  */
 const { lessonBank } = require('./lesson-bank');
+const { getFormulaSafe } = require('../formula/formula-safe.js');
+const _formulaSafe = getFormulaSafe();
 
 class LessonRetrievalEngine {
   constructor() {
@@ -203,12 +205,15 @@ class LessonRetrievalEngine {
       const baseB = b.importance * Math.log((b.frequency || 1) + 1);
 
       // 时间衰减因子：lastSeen 越近，衰减越小
+      // 使用 Ebbinghaus 遗忘曲线 R = exp(-t/S)，S 默认 1 天（86400000ms）
       const lastSeenA = a.lastSeen || a.createdAt || now;
       const lastSeenB = b.lastSeen || b.createdAt || now;
       const ageA = Math.min(1, (now - lastSeenA) / WEEK_MS);
       const ageB = Math.min(1, (now - lastSeenB) / WEEK_MS);
-      const decayA = Math.exp(-ageA * 2); // 指数衰减
-      const decayB = Math.exp(-ageB * 2);
+      const tA = ageA * WEEK_MS;
+      const tB = ageB * WEEK_MS;
+      const decayA = _formulaSafe.ebbinghausRetention(tA, WEEK_MS, () => Math.exp(-ageA * 2));
+      const decayB = _formulaSafe.ebbinghausRetention(tB, WEEK_MS, () => Math.exp(-ageB * 2));
 
       const scoreA = baseA * (0.6 + 0.4 * decayA);
       const scoreB = baseB * (0.6 + 0.4 * decayB);

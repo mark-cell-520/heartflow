@@ -1386,6 +1386,72 @@ class FormulaBridge {
     };
   }
 
+  // ─── 决策/学习/认知公式原语扩展 ──────────────────────────────────────────────
+  // 供 decision-engine / lesson-retrieval 等模块按公式 ID 统一接入
+  // ======================================================================
+
+  /**
+   * Rescorla-Wagner 条件化：ΔV = α × β × (λ - ΣV)
+   */
+  rescorlaWagner(alpha, beta, lambda, sumV) {
+    const a = Math.max(0, Math.min(1, alpha || 0));
+    const b = Math.max(0, Math.min(1, beta || 0));
+    const predictionError = (lambda || 0) - (sumV || 0);
+    const deltaV = a * b * predictionError;
+    return { deltaV: +deltaV.toFixed(6), newSumV: +(sumV + deltaV).toFixed(6), predictionError: +predictionError.toFixed(6) };
+  }
+
+  /**
+   * STDP 突触权重更新：Δw = A+·exp(-Δt/τ+) (pre→post), -A-·exp(Δt/τ-) (post→pre)
+   */
+  stdpUpdate(deltaT, aPlus = 0.01, aMinus = 0.012, tauPlus = 20, tauMinus = 20, currentWeight = 0.5) {
+    let deltaW = 0, isLTP = false, isLTD = false;
+    if (deltaT > 0) { deltaW = aPlus * Math.exp(-deltaT / tauPlus); isLTP = true; }
+    else if (deltaT < 0) { deltaW = -aMinus * Math.exp(deltaT / tauMinus); isLTD = true; }
+    const newWeight = Math.max(0, Math.min(1, currentWeight + deltaW));
+    return { deltaW: +deltaW.toFixed(6), newWeight: +newWeight.toFixed(4), isLTP, isLTD };
+  }
+
+  /**
+   * Hick 定律：RT = a + b·log2(n+1)
+   */
+  hickLaw(n, a = 0.2, b = 0.15) {
+    const nn = Math.max(1, Math.floor(n || 1));
+    const bits = Math.log2(nn + 1);
+    const rt = a + b * bits;
+    return { reactionTime: +rt.toFixed(4), informationBits: +bits.toFixed(2), n: nn };
+  }
+
+  /**
+   * Fitts 定律：MT = a + b·log2(2D/W)
+   */
+  fittsLaw(distance, width, a = 0.05, b = 0.1) {
+    const d = Math.max(0, distance || 0);
+    const w = Math.max(0.001, width || 0.001);
+    const id = Math.log2(2 * d / w);
+    const mt = a + b * id;
+    return { movementTime: +mt.toFixed(4), difficultyIndex: +id.toFixed(2), distance: d, width: w };
+  }
+
+  /**
+   * Weber-Fechner 感觉强度：S = k·ln(I/I0 + 1)
+   */
+  weberFechner(intensity, k = 1.0, i0 = 1.0) {
+    const I = Math.max(0, intensity || 0);
+    const perceived = k * Math.log(I / i0 + 1);
+    const jnd = (intensity || 0) * 0.02; // 近似韦伯分数
+    return { perceivedIntensity: +perceived.toFixed(4), jnd: +jnd.toFixed(6), intensity: I };
+  }
+
+  /**
+   * Q-Learning 更新：Q(s,a) += α[r + γ·max_a' Q(s',a') - Q(s,a)]
+   */
+  qUpdate(oldQ, reward, maxNextQ, alpha = 0.1, gamma = 0.95) {
+    const tdError = (reward || 0) + gamma * (maxNextQ || 0) - (oldQ || 0);
+    const newQ = (oldQ || 0) + alpha * tdError;
+    return { oldQ: +oldQ.toFixed(4), newQ: +newQ.toFixed(4), tdError: +tdError.toFixed(4) };
+  }
+
   // ─── v5.11.0 新公式 (arXiv 研究) ───
 
   /**

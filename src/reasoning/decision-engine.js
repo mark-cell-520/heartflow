@@ -196,11 +196,16 @@ class DecisionEngine {
    * @returns {object} { deltaV, newSumV, predictionError }
    */
   rescorlaWagner(alpha, beta, lambda, sumV) {
-    const predictionError = lambda - sumV;
-    const deltaV = alpha * beta * predictionError;
+    const bridge = this._bridge;
+    const predictionError = (lambda || 0) - (sumV || 0);
+    const deltaV = Math.max(0, Math.min(1, alpha || 0)) * Math.max(0, Math.min(1, beta || 0)) * predictionError;
+    const result = bridge.rescorlaWagner ? bridge.rescorlaWagner(alpha, beta, lambda, sumV) : null;
+    const useFormula = result && typeof result.deltaV === 'number' && isFinite(result.deltaV);
+    const finalDelta = useFormula ? result.deltaV : deltaV;
+    const finalSum = +(sumV + finalDelta).toFixed(6);
     return {
-      deltaV: +deltaV.toFixed(6),
-      newSumV: +(sumV + deltaV).toFixed(6),
+      deltaV: +finalDelta.toFixed(6),
+      newSumV: finalSum,
       predictionError: +predictionError.toFixed(6),
       isLearned: Math.abs(predictionError) < 0.01
     };
