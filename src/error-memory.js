@@ -275,11 +275,63 @@ function getStats() {
   };
 }
 
+function querySimilar(context, limit = 5) {
+  if (!context || typeof context !== 'string') return { warnings: [], safe: true };
+  const memory = loadMemory();
+  if (memory.errors.length === 0) return { warnings: [], safe: true };
+
+  const warnings = [];
+  const activeErrors = memory.errors.filter(e => e.status !== 'verified');
+  const categoryMatches = {};
+
+  for (const e of activeErrors) {
+    const cat = CATEGORIES[e.category];
+    if (!cat) continue;
+    const triggered = cat.preventionPatterns.filter(p => context.toLowerCase().includes(p.toLowerCase()));
+    if (triggered.length > 0) {
+      if (!categoryMatches[e.category]) categoryMatches[e.category] = { count: 0, patterns: [], detail: e.detail };
+      categoryMatches[e.category].count += 1;
+      categoryMatches[e.category].patterns.push(...triggered);
+    }
+  }
+
+  for (const [category, match] of Object.entries(categoryMatches)) {
+    const cat = CATEGORIES[category];
+    const verifiedCount = memory.errors.filter(e => e.category === category && e.status === 'verified').length;
+    const uniquePatterns = [...new Set(match.patterns)];
+    warnings.push({
+      category,
+      label: cat.label,
+      previousCount: match.count,
+      triggeredPatterns: uniquePatterns,
+      verifiedCount,
+      advice: `之前${match.count}次在"${cat.label}"上犯过错${verifiedCount > 0 ? `（同类已验证${verifiedCount}次，但仍有${match.count}条未闭环）` : ''}，当前上下文有触发词"${uniquePatterns.join('、')}"，请注意。`,
+    });
+  }
+
+  const highRecurrence = activeErrors.filter(e => (e.recurrenceCount || 0) >= 2);
+  for (const e of highRecurrence) {
+    warnings.push({
+      category: e.category,
+      label: CATEGORIES[e.category]?.label || e.category,
+      previousCount: (e.recurrenceCount || 0) + 1,
+      status: e.status,
+      detail: (e.detail || '').slice(0, 60),
+      advice: `"${(e.detail || '').slice(0, 40)}"已经反复犯${(e.recurrenceCount || 0) + 1}次了${e.status === 'fixed' ? '（已标记修复，待验证）' : ''}。`,
+      highRecurrence: true,
+    });
+  }
+
+  warnings.sort((a, b) => (b.previousCount || 0) - (a.previousCount || 0));
+  return { warnings: warnings.slice(0, limit), safe: warnings.length === 0 };
+}
+
 module.exports = {
   logCorrection,
   logFix,
   logVerify,
   checkRecurrence,
+  querySimilar,
   generatePreventionRule,
   getStats,
   classifyError,
