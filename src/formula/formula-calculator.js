@@ -303,6 +303,13 @@ class FormulaCalculator {
 
     let s = expr;
 
+    const s0 = s;
+    s = s.replace(/\be\^\{([^}]*)\}/g, (_, x) => `exp(${x})`);
+    s = s.replace(/\be\^(-?[^,; ]+)/g, (_, x) => `exp(${x})`);
+    s = s.replace(/([a-zA-Z0-9_]+)\^\{([^}]*)\}/g, (_, base, exp) => `pow(${base},${exp})`);
+    s = s.replace(/([a-zA-Z0-9_]+)\^([a-zA-Z0-9_]+)/g, (_, base, exp) => `pow(${base},${exp})`);
+    if (s !== s0 && process.env.HEARTFLOW_DEBUG) console.log('[formula-calculator] normalize:', s0, '=>', s);
+
     // [UPGRADE] 函数名归一化：ln -> log（自然对数），lg -> log10
 
     s = s.replace(/\bln\(/g, 'log(').replace(/\blg\(/g, 'log10(');
