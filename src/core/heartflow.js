@@ -4016,6 +4016,8 @@ class HeartFlow {
           classifyError: (err, ctx) => emMod.classifyError ? emMod.classifyError(err, ctx) : { code: 'unknown', recovery: '未知错误' },
           getErrorRecovery: (code) => emMod.getErrorRecovery ? emMod.getErrorRecovery(code) : null,
           getTaxonomyStats: () => emMod.getTaxonomyStats ? emMod.getTaxonomyStats() : {},
+          checkRecurrence: (ctx) => emMod.checkRecurrence ? emMod.checkRecurrence(ctx) : { warnings: [], safe: true },
+          querySimilar: (ctx, limit) => emMod.querySimilar ? emMod.querySimilar(ctx, limit) : { warnings: [], safe: true },
         };
         // 独立子系统 errorTaxonomy：错误分类学（不覆盖已有 error = ErrorHandler）
         this._modules['errorTaxonomy'] = {
