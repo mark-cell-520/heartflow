@@ -302,6 +302,12 @@ Works on any machine — servers, desktops, laptops, even phones via Termux.
 
 **📱 Community — QQ Group:** 416629185
 
+**📱 Community — WeChat Group:**
+
+<img src="https://github.com/yun520-1/mark-heartflow-skill/blob/main/assets/community-qr-wechat.jpg?raw=true" alt="WeChat Group QR" width="180"/>
+
+*WeChat group QR updated: 2026-08-18 (7-day expiry — replace after 2026-08-25)*
+
 **💖 Support HeartFlow — Donate via Alipay (QR code):**
 
 <img src="https://github.com/yun520-1/mark-heartflow-skill/blob/main/assets/alipay-donate-qr.jpg?raw=true" alt="Alipay Donate QR" width="180"/>
