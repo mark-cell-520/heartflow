@@ -1,6 +1,6 @@
 /**
- * Formula Search — 公式搜索引擎（修复搜索功能）
- * 修复：搜索现在也匹配 formula.id 和 formula.formula（LaTeX 字符串）
+ * Formula Search — 公式搜索引擎（全量公式库版本）
+ * 自动加载 formulas/ 目录下所有 JSON，不再只读 formulas.json
  */
 
 const fs = require('../utils/safe-fs');
@@ -8,22 +8,62 @@ const path = require('path');
 
 class FormulaSearch {
   constructor(options = {}) {
-    this.formulasFile = options.formulasFile || path.join(__dirname, '..', '..', 'formulas', 'formulas-core.json');
+    this.formulasFile = options.formulasFile || path.join(__dirname, '..', '..', 'formulas', 'formulas.json');
+    this.formulasDir = options.formulasDir || path.join(__dirname, '..', '..', 'formulas');
     this.formulas = null; // 懒加载
+    this._loadErrors = [];
+  }
+
+  _readJsonFile(filePath) {
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(content);
+      return data.formulas || [];
+    } catch (error) {
+      this._loadErrors.push({ file: path.basename(filePath), error: error.message });
+      return [];
+    }
   }
 
   loadFormulas() {
     if (this.formulas) return this.formulas;
+    const all = [];
+    const seen = new Set();
+    let files = 0;
+
     try {
-      const content = fs.readFileSync(this.formulasFile, 'utf-8');
-      const data = JSON.parse(content);
-      this.formulas = data.formulas || [];
-      return this.formulas;
+      const entries = fs.readdirSync(this.formulasDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
+        const filePath = path.join(this.formulasDir, entry.name);
+        const items = this._readJsonFile(filePath);
+        if (!Array.isArray(items)) continue;
+        files++;
+        for (const item of items) {
+          const id = item.id || null;
+          if (id && seen.has(id)) continue;
+          if (id) seen.add(id);
+          all.push(item);
+        }
+      }
     } catch (error) {
-      console.warn('[FormulaSearch] 无法加载公式库:', error.message);
-      this.formulas = [];
-      return this.formulas;
+      console.warn('[FormulaSearch] 目录扫描失败，回退单文件:', error.message);
+      const items = this._readJsonFile(this.formulasFile);
+      for (const item of items) {
+        const id = item.id || null;
+        if (id && seen.has(id)) continue;
+        if (id) seen.add(id);
+        all.push(item);
+      }
     }
+
+    this.formulas = all;
+    if (this._loadErrors.length) {
+      console.warn(`[FormulaSearch] 完成，${files} 个文件，${all.length} 条公式，${this._loadErrors.length} 个文件解析失败`);
+    } else {
+      console.log(`[FormulaSearch] 完成，${files} 个文件，${all.length} 条公式`);
+    }
+    return this.formulas;
   }
 
   _ensureLoaded() {
@@ -31,7 +71,7 @@ class FormulaSearch {
   }
 
   /**
-   * 搜索公式（关键词）—— 修复版
+   * 搜索公式（关键词）
    */
   search(keyword, options = {}) {
     const {
@@ -44,62 +84,58 @@ class FormulaSearch {
     this._ensureLoaded();
     let results = this.formulas;
 
-    // 1. 关键词过滤（修复：也搜索 id 和 formula 字段）
     if (keyword) {
       const lowerKeyword = keyword.toLowerCase();
       results = results.filter(formula => {
-        const nameMatch = 
+        const nameMatch =
             (formula.name && formula.name.toLowerCase().includes(lowerKeyword)) ||
             (formula.name_en && formula.name_en.toLowerCase().includes(lowerKeyword));
-        
-        const formulaMatch = 
+
+        const formulaMatch =
             (formula.formula && formula.formula.toLowerCase().includes(lowerKeyword));
-        
-        const idMatch = 
+
+        const idMatch =
             (formula.id && formula.id.toLowerCase().includes(lowerKeyword));
-        
+
         const descMatch =
             (formula.description && formula.description.toLowerCase().includes(lowerKeyword)) ||
             (formula.description_en && formula.description_en.toLowerCase().includes(lowerKeyword));
-        
-        const varMatch = 
-            (formula.variables && Object.values(formula.variables).some(v => 
+
+        const varMatch =
+            (formula.variables && Object.values(formula.variables).some(v =>
               (v.name && v.name.toLowerCase().includes(lowerKeyword)) ||
               (v.name_en && v.name_en.toLowerCase().includes(lowerKeyword))
             )) ||
-            (formula.constants && Object.values(formula.constants).some(c => 
+            (formula.constants && Object.values(formula.constants).some(c =>
               (c.name && c.name.toLowerCase().includes(lowerKeyword)) ||
               (c.name_en && c.name_en.toLowerCase().includes(lowerKeyword))
             ));
-        
-        const appMatch = 
-            (formula.applications && formula.applications.some(app => 
+
+        const appMatch =
+            (formula.applications && formula.applications.some(app =>
               app.toLowerCase().includes(lowerKeyword)
             )) ||
-            (formula.examples && formula.examples.some(ex => 
+            (formula.examples && formula.examples.some(ex =>
               (ex.problem && ex.problem.toLowerCase().includes(lowerKeyword)) ||
               (ex.solution && ex.solution.toLowerCase().includes(lowerKeyword))
             ));
-        
+
         return nameMatch || formulaMatch || idMatch || descMatch || varMatch || appMatch;
       });
     }
 
-    // 2. 分类过滤
     if (category) {
-      results = results.filter(f => 
-        f.category === category || 
+      results = results.filter(f =>
+        f.category === category ||
         f.subcategory === category ||
         (f.tags && f.tags.includes(category))
       );
     }
 
-    // 3. 难度过滤
     if (difficulty) {
       results = results.filter(f => f.difficulty === difficulty);
     }
 
-    // 4. 限制结果数
     if (limit && limit > 0) {
       results = results.slice(0, limit);
     }
@@ -146,8 +182,8 @@ class FormulaSearch {
    */
   getByCategory(category, limit = 0) {
     this._ensureLoaded();
-    let results = this.formulas.filter(f => 
-      f.category === category || 
+    let results = this.formulas.filter(f =>
+      f.category === category ||
       f.subcategory === category
     );
     if (limit > 0) {
@@ -161,7 +197,7 @@ class FormulaSearch {
   }
 
   /**
-   * 获取公式详情（包括变量说明）
+   * 获取公式详情
    */
   getDetails(id) {
     const formula = this.getById(id);
