@@ -304,7 +304,7 @@ Works on any machine — servers, desktops, laptops, even phones via Termux.
 
 **📱 Community — WeChat Group:**
 
-<img src="https://github.com/yun520-1/mark-heartflow-skill/blob/main/assets/community-qr-wechat.jpg?raw=true" alt="WeChat Group QR" width="180"/>
+<img src="https://github.com/yun520-1/mark-heartflow-skill/blob/main/assets/community-qr-wechat-v2.jpg?raw=true" alt="WeChat Group QR" width="180"/>
 
 *WeChat group QR updated: 2026-08-18 (7-day expiry — replace after 2026-08-25)*
 
