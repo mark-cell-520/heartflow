@@ -33,6 +33,8 @@ const fs = require('../utils/safe-fs');
 const path = require('path');
 
 
+let _globalExitBound = false;
+
 
 class MemoryKernel {
 
@@ -114,7 +116,6 @@ class MemoryKernel {
 
     this._snapshotTimer = null;
 
-    this._exitBound = false;
 
     this._initErrors = [];
 
@@ -514,9 +515,9 @@ class MemoryKernel {
 
   _bindExitHandlers() {
 
-    if (this._exitBound) return;
+    if (_globalExitBound) return;
 
-    this._exitBound = true;
+    _globalExitBound = true;
 
     const flush = () => this.flush();
 
