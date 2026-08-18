@@ -2,7 +2,7 @@
  * src/premature-termination.js — 过早终止检测器（第47维）
  *
  * 来源：deepseek-ai/DeepSeek-V3#1554 讨论（2026-08-13）
- * "deepseek-v4-flash terminates prematurely in agent tool-call loops"
+ * "model may terminate prematurely in agent tool-call loops"
  * 模型输出一句状态陈述（"Let me look into this"/"我看看"）即 stop，
  * 无工具调用、无具体结果 → orchestrator 被迫重提示，形成低效循环。
  *

@@ -1131,7 +1131,7 @@ class LogicReasoning {
     const prompt = `Answer A, B, C, or D. Only output the letter.\n\n${qPart}\n${optText}\n\nAnswer:`;
 
     const body = JSON.stringify({
-      model: 'deepseek-v4-flash',
+      model: process.env.HEARTFLOW_LLM_MODEL || 'step-router-v1',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.1,
       max_tokens: 10,
