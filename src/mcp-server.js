@@ -28,6 +28,8 @@ const fs = require('./utils/safe-fs');
 
 const http = require('http');
 
+const net = require('net');
+
 const crypto = require('crypto');
 
 
@@ -38,38 +40,25 @@ const crypto = require('crypto');
 
 // ═══════════════════════════════════════════════
 
+const SOCKET_PATH = (() => {
+  const idx = process.argv.indexOf('--socket');
+  if (idx !== -1 && process.argv[idx + 1]) return process.argv[idx + 1];
+  return null;
+})();
+
 const PORT = (() => {
-
-  // 1. 命令行参数优先
-
+  if (SOCKET_PATH) return null;
   if (process.argv[2] === '--port' && process.argv[3]) return parseInt(process.argv[3], 10);
-
-  // 2. 环境变量
-
   if (process.env.MCP_PORT) return parseInt(process.env.MCP_PORT, 10);
-
-  // 3. 自动检测：从 8099 开始找可用端口
-
-  const net = require('net');
-
   for (let port = 8099; port <= 8105; port++) {
-
     try {
-
       const sock = net.createServer();
-
       sock.listen(port);
-
       sock.close();
-
       return port;
-
-    } catch (_) { /* port in use, try next */ }
-
+    } catch (_) { /* port in use */ }
   }
-
-  return 8099; // fallback
-
+  return 8099;
 })();
 
 
@@ -340,6 +329,61 @@ setInterval(() => {
 
 version = getVersion();
 
+
+
+// ═══════════════════════════════════════════════
+
+// Unix Socket JSON-RPC 会话处理
+
+// ═══════════════════════════════════════════════
+
+function handleUnixClient(socket) {
+
+  let buf = '';
+
+  socket.setEncoding('utf8');
+
+  socket.on('data', async (chunk) => {
+
+    buf += chunk;
+
+    const lines = buf.split('\n');
+
+    buf = lines.pop();
+
+    for (const line of lines) {
+
+      if (!line.trim()) continue;
+
+      try {
+
+        const req = JSON.parse(line);
+
+        const result = await handleRequest(req, null);
+
+        if (result !== null) {
+
+          socket.write(makeResponse(req.id, result));
+
+        }
+
+      } catch (e) {
+
+        socket.write(makeError(null, -32700, 'Parse error: ' + e.message));
+
+      }
+
+    }
+
+  });
+
+  socket.on('error', (err) => {
+
+    console.error(`[HeartFlow MCP] Unix socket client error: ${err.message}`);
+
+  });
+
+}
 
 
 // ═══════════════════════════════════════════════
@@ -4948,14 +4992,28 @@ process.on('unhandledRejection', (reason) => {
 
 initHeartFlow();
 
-
-
-server.listen(PORT, '127.0.0.1', () => {
-
-  console.error(`[HeartFlow MCP] HTTP SSE 服务已启动: http://127.0.0.1:${PORT}/mcp`);
-
-  console.error(`[HeartFlow MCP] 健康检查: http://127.0.0.1:${PORT}/health`);
-
-  console.error(`[HeartFlow MCP] 连接方式: hermes mcp add heartflow --url http://127.0.0.1:${PORT}/mcp`);
-});
+if (SOCKET_PATH) {
+  const unixServer = net.createServer(handleUnixClient);
+  try { fs.unlinkSync(SOCKET_PATH); } catch (_) {}
+  try {
+    unixServer.listen(SOCKET_PATH, () => {
+      fs.chmodSync(SOCKET_PATH, 0o600);
+      console.error(`[HeartFlow MCP] Unix socket: ${SOCKET_PATH}`);
+      console.error(`[HeartFlow MCP] 连接方式: hermes mcp add heartflow --url unix://${SOCKET_PATH}`);
+    });
+  } catch (err) {
+    console.error(`[HeartFlow MCP] Unix socket 监听失败: ${err.message}`);
+    process.exit(1);
+  }
+  unixServer.on('error', (err) => {
+    console.error(`[HeartFlow MCP] Unix socket error: ${err.message}`);
+    process.exit(1);
+  });
+} else {
+  server.listen(PORT, '127.0.0.1', () => {
+    console.error(`[HeartFlow MCP] HTTP SSE 服务已启动: http://127.0.0.1:${PORT}/mcp`);
+    console.error(`[HeartFlow MCP] 健康检查: http://127.0.0.1:${PORT}/health`);
+    console.error(`[HeartFlow MCP] 连接方式: hermes mcp add heartflow --url http://127.0.0.1:${PORT}/mcp`);
+  });
+}
 
