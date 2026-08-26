@@ -14,9 +14,9 @@
  * 输出：formulas_more.json（追加到主库）
  */
 
-const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const { safeFetch } = require('./src/core/fetch-safe.js');
 
 const ROOT = process.env.HEARTFLOW_ROOT || __dirname;
 const UTF8 = 'utf-8';

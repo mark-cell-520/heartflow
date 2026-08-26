@@ -9,9 +9,9 @@
  * 每个页面提取前 50 个公式
  */
 
-const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const { safeFetch } = require('./src/core/fetch-safe.js');
 const { execSync } = require('child_process');
 
 const ROOT = process.env.HEARTFLOW_ROOT || __dirname;
