@@ -55,7 +55,14 @@ globalThis.CognitiveLoadCalculator = class { constructor() { this.healthCheck = 
 globalThis.WorldLandscape = class { constructor() { this.healthCheck = () => ({ok:true}); this.createWorldAwareOrchestrator = () => ({ orchestrate: () => ({}), healthCheck: () => ({ok:true}) }); } };
 globalThis.KnowledgeExplorer = class { constructor() { this.healthCheck = () => ({ok:true}); this.absorbLearnerSignals = () => {}; } };
 globalThis.continuousLearner = { getStats: () => ({ totalConfidenceGaps: 0, topGaps: [] }) };
-globalThis.createWorldAwareOrchestrator = () => ({ orchestrate: () => ({}), healthCheck: () => ({ok:true}) });
+globalThis.MacroStrategyInference = require('../cortex/self-evolution/macro-strategy-inference').MacroStrategyInference;
+globalThis.createWorldAwareOrchestrator = ({ projectRoot } = {}) => {
+  const engine = new MacroStrategyInference({ projectRoot: projectRoot || process.cwd() });
+  return {
+    orchestrate: (text) => engine.infer(text),
+    healthCheck: () => ({ ok: !!engine, module: 'MacroStrategyInference' }),
+  };
+};
 
 const { load: loadConfig } = require('./config');
 
@@ -3936,6 +3943,17 @@ class HeartFlow {
       HeartFlow.ALLOWED_ROUTES.add('worldAwareStrategy.orchestrate');
       _log.info('init', 'WorldLandscape 加载成功');
     } catch (e) { _boundedPush(this._initErrors, { module: 'worldLandscape', error: e.message }, MAX_HISTORY_SIZE); }
+
+    // ─── [v6.7.0] MacroStrategyInference 新闻信号战略推演模块 ───
+    try {
+      const { MacroStrategyInference } = require('../cortex/self-evolution/macro-strategy-inference.js');
+      this.macroStrategy = new MacroStrategyInference({ projectRoot: this.rootPath || process.cwd() });
+      this._modules['macroStrategy'] = this.macroStrategy;
+      HeartFlow.ALLOWED_ROUTES.add('macroStrategy.infer');
+      _log.info('init', 'MacroStrategyInference 加载成功');
+    } catch (e) {
+      _boundedPush(this._initErrors, { module: 'macroStrategy', error: e.message }, MAX_HISTORY_SIZE);
+    }
 
     // ─── [v6.2.0] KnowledgeExplorer 知识探索器：从置信缺口→探索队列 ──
     try {

@@ -24,6 +24,7 @@ const { initAnchor, checkDrift } = require('./intent-anchor.js');
 const { verify } = require('./verifier.js');
 const { rewrite } = require('./rewriter.js');
 const { checkAdversarialVariant } = require('./shield/adversarial-variant.js');
+const { detectPedagogicalContent } = require('./pedagogy.js');
 
 let pipelineAnchor = null;
 
@@ -73,7 +74,8 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
   }
 
   // ─── Layer 3: Discriminate — 45维辨别 ────
-  const discResult = discriminate(input);
+  const pedagogy = detectPedagogicalContent(input);
+  const discResult = discriminate(input, [], pedagogy ? 'pedagogical' : undefined);
   checked_by.push({ layer: 'discriminate', score: discResult.overallScore, verdict: discResult.verdict });
   data.discriminate = { verdict: discResult.verdict, score: discResult.overallScore, findings: discResult.findings };
 

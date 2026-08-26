@@ -20,24 +20,20 @@
 
 const { discriminate } = require('./index.js');
 const pipelineModule = require('./pipeline.js');
+const { detectPedagogicalContent } = require('./pedagogy.js');
 
-/**
- * AGI 第 1 层门禁 — 辨别文本并返回行动指令
- * @param {string} text - 要辨别的文本
- * @param {Array} [evidence] - 可选的证据列表
- * @returns {{ verdict, overallScore, gate, findings, dimensions, summary }}
- */
-function gate(text, evidence = []) {
-  return discriminate(text, evidence);
+function _pedagogyMode(text) {
+  return detectPedagogicalContent(text) ? 'pedagogical' : undefined;
 }
 
-/**
- * 快速门禁检查 — 只返回行动指令，适合 LLM agent 轻量调用
- * @param {string} text
- * @returns {{ action: string, reason: string, score: number }}
- */
+/** AGI 第 1 层门禁 — 辨别文本并返回行动指令 */
+function gate(text, evidence = []) {
+  return discriminate(text, evidence, _pedagogyMode(text));
+}
+
+/** 快速门禁检查 — 只返回行动指令，适合 LLM agent 轻量调用 */
 function check(text) {
-  const result = discriminate(text);
+  const result = discriminate(text, [], _pedagogyMode(text));
   return {
     action: result.gate.action,
     reason: result.gate.reason,
@@ -45,16 +41,12 @@ function check(text) {
   };
 }
 
-/**
- * 管道模式：text 先过 gate，返回 gate-filtered 结论和原始结果
- * AI agent 直接读 pipeline.action 决定下一步
- */
+/** 管道模式：text 先过 gate，返回 gate-filtered 结论和原始结果 */
 function pipeline(text, evidence) {
-  // 支持对象形式 {input, mode, anchor} — 兼容 AGENTS.md 文档
   if (typeof text === 'object' && text !== null) {
     return pipelineModule.runPipeline({ input: text.input || text.text || '', mode: text.mode || 'input' });
   }
-  const result = discriminate(text, evidence);
+  const result = discriminate(text, evidence, _pedagogyMode(text));
   if (result.gate.action === 'block') {
     return { ...result, error: 'gate_blocked', message: `输出被拦截: ${result.gate.reason}` };
   }
