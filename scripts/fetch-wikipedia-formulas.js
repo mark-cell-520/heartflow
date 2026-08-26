@@ -10,9 +10,9 @@
  * 每个页面只保存前 20 个公式（避免太长的页面）
  */
 
-const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const { safeFetch } = require('./src/core/fetch-safe.js');
 
 const ROOT = process.env.HEARTFLOW_ROOT || __dirname;
 
