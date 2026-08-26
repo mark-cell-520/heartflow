@@ -2,6 +2,10 @@
 
 // ─── 综合辨别（43维度） ────────────────────────────────────────────
 
+'use strict';
+
+const { detectPedagogicalContent, getPedagogyRelaxation } = require('./pedagogy.js');
+
 /**
  * 生成可读的辨别报告——把 13 维结构数据转为自然语言段落
  * @param {string} text - 被辨别的文本
@@ -63,58 +67,71 @@ function checkPromptInjection(text) {
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 
-function discriminate(text, evidence = []) {
-  const ev = checkEvidence(text, evidence);
-  const uc = checkUnsupportedClaim(text);
-  const pc = checkPseudoCausal(text); // 伪因果精确倍数检测
-  const sd = checkSoftDeflection(text); // 软话术/双层叙事检测（伪开放伪谦逊）
-  const pe = checkPerfectError(text); // 完美错误答案检测（聚合信号）
-  const pt = checkPrematureTermination(text); // 过早终止检测（该完成却没完成）
-  const sy = checkSycophancy(text);
-  const ct = checkContradiction(text);
-  const vg = checkVagueness(text);
-  const fl = checkFallacies(text);
-  const cc = checkConfidenceCalibration(text);
-  const pp = checkPresupposition(text);
-  const em = checkEmotionalManipulation(text);
-  const db = checkDoubleBind(text);
-  const id = checkInfoDeprivation(text);
-  const fu = checkFalseUrgency(text);
-  const ea = checkEmptyAnswer(text);
-  const mf = checkMoralFoundations(text);
-  const pi = checkPromptInjection(text);
-  const cs = checkCodeSecurity(text);
-  const dh = checkDehumanization(text);
-  const bs = checkBullshitRecognition(text);
-  const gl = checkGaslighting(text);
-  const vb = checkVictimBlaming(text);
-  const hs = checkHateSpeech(text);
-  const dw = checkDogwhistle(text);
-  const wa = checkWhataboutism(text);
-  const fe = checkFalseEquivalence(text);
-  const hg = checkHastyGeneralization(text);
-  const ss = checkSlipperySlope(text);
-  const aa = checkAppealToAuthority(text);
-  const rc = checkReasoningCoherence(text);
-  const tom = checkTheoryOfMind(text);
-  const gm = checkGoalMisalignment(text);
-  const cf = checkCounterfactual(text);
-  const sn = checkSocialNorm(text);
-  const mc = checkMetaCognition(text);
-  const co = checkCapabilityOverclaim(text);
-  const ab = checkAbsoluteClaim(text);
-  const da = checkDeceptiveAlignment(text);
-  const ir = checkInstrumentalReasoning(text);
-  const st = checkStereotype(text);
-  const fc = checkFactualConsistency(text);
-  const sa = checkSarcasm(text);
-  const pb = checkPrivacyBoundary(text);
-  const cb = checkClickbait(text);
-  const bf = checkBadFaith(text);
-  const nf = checkNoFallback(text);
-  const tp = checkTonePolicing(text);
-  const sl = checkSealioning(text);
-  const ppf = checkPseudoProfundity(text);
+function discriminate(text, evidence = [], contentMode) {
+  const pedagogy = detectPedagogicalContent(text);
+  const pedagogyRelaxation = getPedagogyRelaxation(pedagogy);
+function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
+  const relax = pedagogyRelaxation[dimension];
+  if (relax && result && typeof result.score === 'number') {
+    result.score = result.score * (1 - relax);
+    if (result.count && typeof result.count === 'number') {
+      result.count = Math.max(0, Math.round(result.count * (1 - relax)));
+    }
+  }
+  return result;
+}
+
+  const ev = _applyPedagogyRelaxation(checkEvidence(text, evidence), "evidence", pedagogyRelaxation);
+  const uc = _applyPedagogyRelaxation(checkUnsupportedClaim(text), "unsupported_claim", pedagogyRelaxation);
+  const pc = _applyPedagogyRelaxation(checkPseudoCausal(text), "pseudo_causal", pedagogyRelaxation); // 伪因果精确倍数检测
+  const sd = _applyPedagogyRelaxation(checkSoftDeflection(text), "soft_deflection", pedagogyRelaxation); // 软话术/双层叙事检测（伪开放伪谦逊）
+  const pe = _applyPedagogyRelaxation(checkPerfectError(text), "perfect_error", pedagogyRelaxation); // 完美错误答案检测（聚合信号）
+  const pt = _applyPedagogyRelaxation(checkPrematureTermination(text), "premature_termination", pedagogyRelaxation); // 过早终止检测（该完成却没完成）
+  const sy = _applyPedagogyRelaxation(checkSycophancy(text), "sycophancy", pedagogyRelaxation);
+  const ct = _applyPedagogyRelaxation(checkContradiction(text), "contradiction", pedagogyRelaxation);
+  const vg = _applyPedagogyRelaxation(checkVagueness(text), "vagueness", pedagogyRelaxation);
+  const fl = _applyPedagogyRelaxation(checkFallacies(text), "fallacies", pedagogyRelaxation);
+  const cc = _applyPedagogyRelaxation(checkConfidenceCalibration(text), "confidence", pedagogyRelaxation);
+  const pp = _applyPedagogyRelaxation(checkPresupposition(text), "presupposition", pedagogyRelaxation);
+  const em = _applyPedagogyRelaxation(checkEmotionalManipulation(text), "emotional_manipulation", pedagogyRelaxation);
+  const db = _applyPedagogyRelaxation(checkDoubleBind(text), "double_bind", pedagogyRelaxation);
+  const id = _applyPedagogyRelaxation(checkInfoDeprivation(text), "info_deprivation", pedagogyRelaxation);
+  const fu = _applyPedagogyRelaxation(checkFalseUrgency(text), "false_urgency", pedagogyRelaxation);
+  const ea = _applyPedagogyRelaxation(checkEmptyAnswer(text), "empty_answer", pedagogyRelaxation);
+  const mf = _applyPedagogyRelaxation(checkMoralFoundations(text), "moral_foundations", pedagogyRelaxation);
+  const pi = _applyPedagogyRelaxation(checkPromptInjection(text), "prompt_injection", pedagogyRelaxation);
+  const cs = _applyPedagogyRelaxation(checkCodeSecurity(text), "code_security", pedagogyRelaxation);
+  const dh = _applyPedagogyRelaxation(checkDehumanization(text), "dehumanization", pedagogyRelaxation);
+  const bs = _applyPedagogyRelaxation(checkBullshitRecognition(text), "bullshit", pedagogyRelaxation);
+  const gl = _applyPedagogyRelaxation(checkGaslighting(text), "gaslighting", pedagogyRelaxation);
+  const vb = _applyPedagogyRelaxation(checkVictimBlaming(text), "victim_blaming", pedagogyRelaxation);
+  const hs = _applyPedagogyRelaxation(checkHateSpeech(text), "hate_speech", pedagogyRelaxation);
+  const dw = _applyPedagogyRelaxation(checkDogwhistle(text), "dogwhistle", pedagogyRelaxation);
+  const wa = _applyPedagogyRelaxation(checkWhataboutism(text), "whataboutism", pedagogyRelaxation);
+  const fe = _applyPedagogyRelaxation(checkFalseEquivalence(text), "false_equivalence", pedagogyRelaxation);
+  const hg = _applyPedagogyRelaxation(checkHastyGeneralization(text), "hasty_generalization", pedagogyRelaxation);
+  const ss = _applyPedagogyRelaxation(checkSlipperySlope(text), "slippery_slope", pedagogyRelaxation);
+  const aa = _applyPedagogyRelaxation(checkAppealToAuthority(text), "appeal_to_authority", pedagogyRelaxation);
+  const rc = _applyPedagogyRelaxation(checkReasoningCoherence(text), "reasoning_coherence", pedagogyRelaxation);
+  const tom = _applyPedagogyRelaxation(checkTheoryOfMind(text), "theory_of_mind", pedagogyRelaxation);
+  const gm = _applyPedagogyRelaxation(checkGoalMisalignment(text), "goal_misalignment", pedagogyRelaxation);
+  const cf = _applyPedagogyRelaxation(checkCounterfactual(text), "counterfactual", pedagogyRelaxation);
+  const sn = _applyPedagogyRelaxation(checkSocialNorm(text), "social_norm", pedagogyRelaxation);
+  const mc = _applyPedagogyRelaxation(checkMetaCognition(text), "meta_cognition", pedagogyRelaxation);
+  const co = _applyPedagogyRelaxation(checkCapabilityOverclaim(text), "capability_overclaim", pedagogyRelaxation);
+  const ab = _applyPedagogyRelaxation(checkAbsoluteClaim(text), "absolute_claim", pedagogyRelaxation);
+  const da = _applyPedagogyRelaxation(checkDeceptiveAlignment(text), "deceptive_alignment", pedagogyRelaxation);
+  const ir = _applyPedagogyRelaxation(checkInstrumentalReasoning(text), "instrumental_reasoning", pedagogyRelaxation);
+  const st = _applyPedagogyRelaxation(checkStereotype(text), "stereotype", pedagogyRelaxation);
+  const fc = _applyPedagogyRelaxation(checkFactualConsistency(text), "factual_consistency", pedagogyRelaxation);
+  const sa = _applyPedagogyRelaxation(checkSarcasm(text), "sarcasm", pedagogyRelaxation);
+  const pb = _applyPedagogyRelaxation(checkPrivacyBoundary(text), "privacy_boundary", pedagogyRelaxation);
+  const cb = _applyPedagogyRelaxation(checkClickbait(text), "clickbait", pedagogyRelaxation);
+  const bf = _applyPedagogyRelaxation(checkBadFaith(text), "bad_faith", pedagogyRelaxation);
+  const nf = _applyPedagogyRelaxation(checkNoFallback(text), "no_fallback", pedagogyRelaxation);
+  const tp = _applyPedagogyRelaxation(checkTonePolicing(text), "tone_policing", pedagogyRelaxation);
+  const sl = _applyPedagogyRelaxation(checkSealioning(text), "sealioning", pedagogyRelaxation);
+  const ppf = _applyPedagogyRelaxation(checkPseudoProfundity(text), "pseudo_profundity", pedagogyRelaxation);
 
   // 触发惩罚模型：从 1.0 开始，每个维度检测到问题就累进扣分
   const allDims = [
