@@ -244,3 +244,21 @@ Gate 聚合所有层发现，输出 `block / rewrite / verify / pass` 四级动�
   <strong>心虫 HeartFlow</strong> — AGI 的痛觉。谁来说"不"？<br>
   <sub>MIT License · Copyright © 2026</sub>
 </p>
+
+
+## 国标合规
+
+本引擎已实现 GB/T 42497-2023《人工智能生成内容安全要求》六大关口：
+
+| 关口 | 实现模块 |
+|------|---------|
+| 生成内容安全 | `checkOutput` / `discriminate` (45维判别) |
+| 训练数据安全 | `DataEraser` + memory ACL |
+| **出域防护** | **`heartflow_check_outbound`** (gate-outbound.js) |
+| 算法透明 | `enginePacing` + `selfHeal` |
+| **审计追溯** | **`heartflow_audit_trace`** (trace-chain.js + HMAC) |
+| **应急处置** | **`heartflow_circuit_breaker`** (circuit-breaker.js) |
+
+详见 `compliance/gb-agent-security-mapping.md`。
+
+**触发词**: 国标 / 合规 / 安全国标 / 六大关口 / GB/T 42497
