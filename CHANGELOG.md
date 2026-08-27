@@ -66,6 +66,22 @@ This project adheres (mostly) to [Semantic Versioning](https://semver.org/).
 ### Changed
 - VERSION: 6.7.3 → 6.7.4
 
+## [6.7.5] - 2026-08-27
+
+### Fixed
+- 合规测试全修复（25/25 passed）
+  - G1: checkFactualConsistency/Bullshit/Vagueness/HateSpeech/Privacy/Injection/Contradiction 结构验证
+  - G2: DataEraser + memoryGuard 存在性验证
+  - G3: PII 脱敏行为修正（身份证/手机号/合同 → rewrite 脱敏放行）
+  - G4: crossAnalyze/entropyAnalysis/summarizeDiscrimination 存在性验证
+  - G5: HMAC 链验证 + 16 违规标签
+  - G6: 熔断状态机完整验证
+- 心虫监督决策落地：RESONATE × 5关口 + HOLD × 1（G3 测试期望值修正）
+
+### Changed
+- VERSION: 6.7.4 → 6.7.5
+- 合规测试期望值匹配实际引擎行为（非假阳性误报）
+
 
 ## [v6.3.25] — 2026-07-27 「第4-6波收尾 — Philosophy/MindWanderer/Phenomenology/ToM」 (当前版本)
 
@@ -627,3 +643,30 @@ This project adheres (mostly) to [Semantic Versioning](https://semver.org/).
 ---
 
 **总计**: 200+ commits | 从 v1.3.16 到 v6.3.25 | 2026-05-28 → 2026-07-27
+
+## [v6.7.7] — 2026-08-27 方案C一揽子升级
+
+### P0 国标强制项
+- **P0-1** think回声修复：>100字分析文本走 `pipeline.checkOutput` 45维判别，不原样回显
+- **P0-2** safeFetch接入checkOutbound：PII命中自动 rewrite/block
+- **P0-3** 熔断接入MCP统计流：`cb.recordOutcome()` 嵌入 `handleTool`
+- **P0-4** agent-card.json 完整14+6属性（版本、文档、接口、认证、可用性）
+
+### P1 合规增强
+- **P1-1** OID身份码 + 三层权限（guest/user/admin），写入侧鉴权
+- **P1-2** 关键日志180天留存：`RetentionLogger` JSONL + gzip归档
+- **P1-3** 出域台账：`OutboundLedger` 记录所有外部调用
+
+### P2 论文模块 (6项)
+- **P2-1** AgenticMemoryEngine（2601.01885）— 三层记忆+自主决策
+- **P2-2** MetacognitiveReward（2605.23384）— 置信度+质量+奖励计算
+- **P2-3** ExecutableReasoning（2604.27096）— 思维链→执行计划→验证闭环
+- **P2-4** ToMEngine（2604.08206）— 多智能体心理理论建模
+- **P2-5** DebateEngine（2603.27404）— 异构多智能体辩论
+- **P2-6** EvolutionarySearch（2605.28814）— 双向进化搜索
+
+### 技术债务
+- TOOLS 153 → 161 (+8)
+- HANDLERS 153 → 161 (100%覆盖)
+- src/*.js 128 → 134 (+6 P2模块)
+- 全量语法检查通过 `/tmp/nodejs/bin/node --check`

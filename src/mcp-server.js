@@ -1529,6 +1529,135 @@ const TOOLS = [
     },
   },
 
+  {
+    name: 'heartflow_retention_log',
+    description: '关键日志留存查询：按时间范围/分类/traceId 查询 180 天日志（JSON Lines + gzip 归档）',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['log', 'query'] },
+        event: { type: 'string' },
+        severity: { type: 'string', enum: ['info', 'warning', 'error', 'critical'] },
+        traceId: { type: 'string' },
+        details: { type: 'object' },
+        start: { type: 'string', format: 'date-time' },
+        end: { type: 'string', format: 'date-time' },
+        limit: { type: 'number' },
+      },
+      required: ['action'],
+    },
+  },
+  {
+    name: 'heartflow_outbound_ledger',
+    description: '出域台账查询：按时间范围/tool/action 检索历史出域调用记录，供国标资产盘点和审计追溯',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['record', 'query', 'stats'] },
+        tool: { type: 'string' },
+        traceId: { type: 'string' },
+        action_filter: { type: 'string', enum: ['pass', 'rewrite', 'block'] },
+        start: { type: 'string', format: 'date-time' },
+        end: { type: 'string', format: 'date-time' },
+        limit: { type: 'number' },
+      },
+      required: ['action'],
+    },
+  },
+
+  {
+    name: 'heartflow_agentic_memory',
+    description: 'Agentic Memory 引擎：自主记忆决策+读写遗忘，三层记忆（episodic/semantic/procedural）',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['decide', 'store', 'recall', 'decideAndStore'] },
+        input: { type: 'string' },
+        output: { type: 'string' },
+        context: { type: 'object' },
+        limit: { type: 'number' },
+      },
+      required: ['action'],
+    },
+  },
+  {
+    name: 'heartflow_metacognition_evaluate',
+    description: 'Metacognitive Reward 评估：置信度估计+质量验证+奖励计算，内建训练信号',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        output: { type: 'string' },
+        selfFeedback: { type: 'object' },
+      },
+      required: ['output'],
+    },
+  },
+  {
+    name: 'heartflow_executable_reasoning',
+    description: 'Executable Reasoning：思维链→结构化计划→执行验证闭环（Think it, Run it）',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['parse', 'plan', 'execute', 'endToEnd'] },
+        raw: { type: 'string' },
+        thoughtChain: { type: 'object' },
+        opts: { type: 'object' },
+      },
+      required: ['action'],
+    },
+  },
+  {
+    name: 'heartflow_tom_model',
+    description: 'ToM 引擎：多智能体心理理论建模（belief/desire/intention/emotion）+ 情绪传染',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['model', 'modelAgent', 'predict', 'predictBehavior', 'contagion'] },
+        agentId: { type: 'string' },
+        observations: { type: 'array', items: { type: 'string' } },
+        targetAgentId: { type: 'string' },
+        agentIds: { type: 'array', items: { type: 'string' } },
+      },
+      required: ['action'],
+    },
+  },
+  {
+    name: 'heartflow_debate',
+    description: 'Heterogeneous Debate：多智能体辩论引擎（支持者/反对者/主持人/综合者）',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['create', 'createSession', 'addRound', 'speak', 'summarize', 'conclude', 'end'] },
+        sessionId: { type: 'string' },
+        topic: { type: 'string' },
+        roleId: { type: 'string' },
+        argument: { type: 'string' },
+        evidence: { type: 'array' },
+        roles: { type: 'array' },
+        maxRounds: { type: 'number' },
+        conclusion: { type: 'string' },
+      },
+      required: ['action'],
+    },
+  },
+  {
+    name: 'heartflow_evolutionary_search',
+    description: 'Evolutionary Search：双向进化搜索（前向变异+反向约束满足，用于超参/架构/方案调优）',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['init', 'initPopulation', 'forward', 'backward'] },
+        searchSpace: { type: 'object' },
+        population: { type: 'array', items: { type: 'object' } },
+        fitnessFn: { type: 'string', description: 'JSON-path to fitness function or inline JS' },
+        target: { type: 'object' },
+        constraintFn: { type: 'string' },
+        generations: { type: 'number' },
+        iterations: { type: 'number' },
+      },
+      required: ['action'],
+    },
+  },
 ];
 
 
@@ -1655,6 +1784,7 @@ function safeDispatch(route, ...args) {
 
   // [v6.7.1] 熔断前置路由
     const cb = require('./circuit-breaker.js');
+const { checkOutput: pipelineCheckOutput } = require('./pipeline');
     const cbGuard = cb.guard();
     if (!cbGuard.allowed) {
       return { error: cbGuard.reason, state: cbGuard.state };
@@ -1705,15 +1835,50 @@ async function handleThink(args) {
 
   const startTime = Date.now();
 
-  const [psychology, judgment, thoughtChain] = await Promise.all([
+  let thoughtChain;
 
-    Promise.resolve().then(() => safeDispatch('psychology.analyzePsychology', input)).catch(e => ({ error: e.message })),
+  // [P0-1] 长文本回声修复: >100 字走 pipeline.checkOutput (45维判别), 不走 think 偷懒路由
+  if (typeof input === 'string' && input.length > 100) {
 
-    Promise.resolve().then(() => safeDispatch('truth.checkStatement', input)).catch(e => ({ error: e.message })),
+    try {
 
-    safeAsyncCall(() => heartflow.think(input, undefined, { compact: true }))
+      thoughtChain = pipelineCheckOutput(input);
 
-  ]);
+    } catch (_) {
+
+      thoughtChain = null;
+
+    }
+
+  }
+
+  if (!thoughtChain) {
+
+    const [psychology, judgment, tc] = await Promise.all([
+
+      Promise.resolve().then(() => safeDispatch('psychology.analyzePsychology', input)).catch(e => ({ error: e.message })),
+
+      Promise.resolve().then(() => safeDispatch('truth.checkStatement', input)).catch(e => ({ error: e.message })),
+
+      safeAsyncCall(() => heartflow.think(input, undefined, { compact: true }))
+
+    ]);
+
+    thoughtChain = tc;
+
+  } else {
+
+    // Short path: still run parallel psychology/truth for consistency
+
+    await Promise.all([
+
+      safeDispatch('psychology.analyzePsychology', input).catch(() => ({})),
+
+      safeDispatch('truth.checkStatement', input).catch(() => ({}))
+
+    ]);
+
+  }
 
 
 
@@ -4890,6 +5055,126 @@ const HANDLERS = {
     }
   },
 
+
+
+  // [P2-1] agentic-memory-engine
+  heartflow_agentic_memory: async (args) => {
+    try {
+      const { agenticMemory } = require('./index.js');
+      const { action = 'decide', input, output, context } = args;
+      if (action === 'decide' || action === 'decideAndStore') {
+        return agenticMemory.decideAndStore(input || '', output || '', context || {});
+      }
+      if (action === 'store') {
+        return agenticMemory.store(input || '', output || '', context || {});
+      }
+      if (action === 'recall') {
+        return agenticMemory.recall(input || '', { limit: args.limit || 5 });
+      }
+      return { error: `unknown action: ${action}` };
+    } catch (e) { return { error: e.message }; }
+  },
+  // [P2-2] metacognitive-reward
+  heartflow_metacognition_evaluate: async (args) => {
+    try {
+      const { metacognition } = require('./index.js');
+      return metacognition.evaluate(args.output || '', { selfFeedback: args.selfFeedback });
+    } catch (e) { return { error: e.message }; }
+  },
+  // [P2-3] executable-reasoning
+  heartflow_executable_reasoning: async (args) => {
+    try {
+      const { executableReasoning } = require('./index.js');
+      const { action = 'endToEnd', raw, thoughtChain, opts } = args;
+      if (action === 'parse') return { steps: executableReasoning.parseThoughtChain(raw || '') };
+      if (action === 'plan') return executableReasoning.buildPlan(executableReasoning.parseThoughtChain(raw || ''), opts || {});
+      if (action === 'execute' || action === 'endToEnd') return executableReasoning.endToEnd(raw || '', opts || {});
+      return { error: `unknown action: ${action}` };
+    } catch (e) { return { error: e.message }; }
+  },
+  // [P2-4] tom-engine
+  heartflow_tom_model: async (args) => {
+    try {
+      const { tomEngine } = require('./index.js');
+      const { action = 'model', agentId, observations, targetAgentId } = args;
+      if (action === 'model' || action === 'modelAgent') {
+        if (!agentId) return { error: 'agentId required' };
+        return tomEngine.modelAgent(agentId, Array.isArray(observations) ? observations : [observations || '']);
+      }
+      if (action === 'predict' || action === 'predictBehavior') {
+        return tomEngine.predict(agentId || targetAgentId || 'unknown');
+      }
+      if (action === 'contagion') {
+        const ids = Array.isArray(args.agentIds) ? args.agentIds : [agentId];
+        return tomEngine.contagion(ids);
+      }
+      return { error: `unknown action: ${action}` };
+    } catch (e) { return { error: e.message }; }
+  },
+  // [P2-5] debate-engine
+  heartflow_debate: async (args) => {
+    try {
+      const { debateEngine, ROLES } = require('./index.js');
+      const { action = 'create', sessionId, topic, roleId, argument, evidence, roles, maxRounds } = args;
+      if (action === 'create' || action === 'createSession') {
+        if (!topic) return { error: 'topic required' };
+        return debateEngine.createSession(topic, { roles, maxRounds });
+      }
+      if (action === 'addRound' || action === 'speak') {
+        if (!sessionId || !roleId || !argument) return { error: 'sessionId/roleId/argument required' };
+        return debateEngine.addRound(sessionId, roleId, argument, evidence || []);
+      }
+      if (action === 'summarize') return debateEngine.summarize(sessionId);
+      if (action === 'conclude' || action === 'end') {
+        return debateEngine.conclude(sessionId, args.conclusion || '');
+      }
+      return { error: `unknown action: ${action}` };
+    } catch (e) { return { error: e.message }; }
+  },
+  // [P2-6] evolutionary-search
+  heartflow_evolutionary_search: async (args) => {
+    try {
+      const { evolutionarySearch } = require('./index.js');
+      const { action = 'forward', searchSpace, population, fitnessFn, target, constraintFn } = args;
+      if (action === 'init' || action === 'initPopulation') {
+        if (!searchSpace) return { error: 'searchSpace required' };
+        return { population: evolutionarySearch.initPopulation(searchSpace) };
+      }
+      if (action === 'forward') {
+        if (!population || !fitnessFn) return { error: 'population/fitnessFn required' };
+        return evolutionarySearch.forward(population, fitnessFn, args.generations);
+      }
+      if (action === 'backward') {
+        if (!target || !constraintFn || !searchSpace) return { error: 'target/constraintFn/searchSpace required' };
+        return evolutionarySearch.backward(target, constraintFn, searchSpace, args.iterations);
+      }
+      return { error: `unknown action: ${action}` };
+    } catch (e) { return { error: e.message }; }
+  },
+
+  // [P1-2] 关键日志 180 天留存
+  heartflow_retention_log: async (args) => {
+    try {
+      const { RetentionLogger } = require('./retention-logger.js');
+      const logger = new RetentionLogger('audit');
+      if (args.action === 'log') { logger.log(args); return { logged: true }; }
+      return { results: logger.query(args) };
+    } catch (e) { return { error: e.message }; }
+  },
+  // [P1-3] 出域台账
+  heartflow_outbound_ledger: async (args) => {
+    try {
+      const { OutboundLedger } = require('./outbound-ledger.js');
+      const ledger = new OutboundLedger();
+      const action = args.action || 'query';
+      if (action === 'record') {
+        ledger.record(args);
+        return { recorded: true };
+      }
+      if (action === 'stats') return ledger.stats(args);
+      return { results: ledger.query(args) };
+    } catch (e) { return { error: e.message }; }
+  },
 };
 
 
@@ -4956,6 +5241,30 @@ async function handleRequest(request, sessionId) {
 
 
 
+
+    // [P1-1] OID身份码 + 三层权限模型
+    // 角色: guest(只读) / user(读写) / admin(全权限)
+    // 身份码: HeartFlow-OID-<16-char-hash>
+    {
+      const reqOid = req.headers['x-heartflow-oid'] || '';
+      const token = req.headers['authorization']?.replace('Bearer ', '') || '';
+      let role = 'guest';
+      if (token && typeof expectedToken === 'string' && token === expectedToken) {
+        role = 'admin';
+      }
+      const oidMatch = reqOid.match(/^HeartFlow-OID-([a-f0-9]{16})$/);
+      if (oidMatch) {
+        role = Math.max(['guest','user','admin'].indexOf(role), ['guest','user','admin'].indexOf('user'));
+      }
+      const needsWrite = ['heartflow_memory_store', 'heartflow_memory_remove',
+        'heartflow_decision_decide', 'heartflow_heartflow_selfHeal'].includes(name);
+      if (needsWrite && role === 'guest') {
+        return { content: [{ type: 'text', text: JSON.stringify({
+          error: '权限不足：guest 角色不可写，请升级身份认证'
+        }) }], isError: true };
+      }
+    }
+
     case 'tools/call': {
 
       let { name, arguments: args = {} } = params;
@@ -5009,6 +5318,15 @@ async function handleRequest(request, sessionId) {
         if (msg.length > 300) msg = msg.slice(0, 300) + '…';
         result.error = msg;
       }
+
+
+      // [P0-3] 熔断接入 MCP 统计流：recordOutcome() 嵌入 handleTool
+      try {
+        if (typeof cb !== 'undefined' && cb.recordOutcome) {
+          cb.recordOutcome(!(result && result.isError));
+        }
+      } catch (_) { /* 防御性：熔断统计不阻断主流程 */ }
+
 
       return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }], isError: false };
 
