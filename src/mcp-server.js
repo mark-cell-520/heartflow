@@ -1312,6 +1312,61 @@ const TOOLS = [
     inputSchema: { type: 'object', properties: { project: { type: 'string', description: '项目名' } } }
   }
 
+
+
+  // [v6.6.3] 心虫监督入口
+  {
+    name: 'heartflow_supervise',
+    description: '心虫监督入口：对用户输入(input)、AI输出(output)、草稿(draft)执行45维辨别+门禁，返回gate决策(allow/verify/block)、findings列表、修改建议。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        input: { type: 'string', description: '待监督文本' },
+        mode: { type: 'string', enum: ['input','output','draft'], description: '监督模式：input=用户输入, output=AI输出, draft=草稿' },
+        context: { type: 'string', description: '可选上下文，用于增强证据链判断' }
+      },
+      required: ['input']
+    }
+  },
+
+  {
+    name: 'heartflow_check_single',
+    description: '心虫单维判别：指定维度对文本做单维度鉴别，返回score/findings/guidance。维度：text全文、factual_consistency事实一致、vagueness模糊、bullshit空话、sarcasm讽刺、emotion情感。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检文本' },
+        dimension: { type: 'string', description: '维度名' }
+      },
+      required: ['text', 'dimension']
+    }
+  },
+
+  // [v6.6.3] 新闻信号战略推演（包装 MacroStrategyInference）
+  {
+    name: 'heartflow_macro_strategy',
+    description: '新闻信号战略推演：从新闻文本提取实体/趋势/时间锚点，推演机会/风险/时间线/对 HeartFlow 的影响，返回结构化结论与置信度。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '新闻摘要或信号拼接文本（≥40字）' }
+      },
+      required: ['text']
+    }
+  },
+
+  // [v6.6.3] 教育内容检测（包装 pedagogy 模块）
+  {
+    name: 'heartflow_pedagogy_detect',
+    description: '教学文本识别：检测课堂/教程/课件中的命令列表、配置示例、技术路径、问答模式等教学特征，返回教学类型标记与放松阈值。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测文本' }
+      },
+      required: ['text']
+    }
+  },
 ];
 
 
@@ -1830,6 +1885,88 @@ async function handleDream(args) {
 }
 
 
+
+
+
+// [v6.6.3] 心虫统一监督入口
+async function handleSupervise(args) {
+  const { input, mode = 'output', context } = args || {};
+  if (!input) throw new Error('input 是必填参数');
+  try {
+    const gate = require(HF_DIR + '/src/gate.js');
+    const result = gate.runPipeline({ input, mode, context });
+    const gate_action = result.gate?.action || 'unknown';
+    const verdict = result.verdict || 'unknown';
+    const score = result.overallScore || 0;
+    const findings = (result.findings || []).slice(0, 10).map(f => ({
+      dimension: f.dimension,
+      severity: f.severity,
+      details: f.details,
+      guidance: f.guidance
+    }));
+    const summary = result.summary || {};
+    return {
+      mode, input: input.slice(0, 200) + (input.length > 200 ? '...' : ''),
+      gate: gate_action,
+      verdict,
+      score,
+      findingsCount: (result.findings || []).length,
+      findings,
+      block: summary.block || false,
+      rewrite: summary.rewrite || false,
+      verify: summary.verify || false,
+      pass: summary.pass || false,
+      layers_passed: summary.layers_passed || 0,
+      timestamp: Date.now()
+    };
+  } catch (e) {
+    return { error: e.message, input: input.slice(0, 200) };
+  }
+}
+
+// [v6.6.3] 心虫单维判别入口
+async function handleCheckSingle(args) {
+  const { text, dimension } = args || {};
+  if (!text || !dimension) throw new Error('text 和 dimension 是必填参数');
+  try {
+    const hf = require(HF_DIR + '/src/index.js');
+    const fn = hf['check' + dimension.charAt(0).toUpperCase() + dimension.slice(1)];
+    if (!fn) {
+      return { error: `维度 ${dimension} 不存在，可用维度：text/factual_consistency/vagueness/bullshit/sarcasm/emotion` };
+    }
+    const result = await Promise.resolve(fn(text));
+    return { dimension, result, timestamp: Date.now() };
+  } catch (e) {
+    return { error: e.message, dimension };
+  }
+}
+
+// [v6.6.3] 新闻信号战略推演（包装 MacroStrategyInference）
+async function handleMacroStrategy(args) {
+  const { text } = args || {};
+  if (!text) throw new Error('text 是必填参数');
+  try {
+    const { MacroStrategyInference } = require('./cortex/self-evolution/macro-strategy-inference.js');
+    const engine = new MacroStrategyInference({ projectRoot: HF_DIR, signalStore: [] });
+    const result = engine.infer(text);
+    return { inference: result, timestamp: Date.now() };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+// [v6.6.3] 教育内容检测（包装 pedagogy）
+async function handlePedagogyDetect(args) {
+  const { text } = args || {};
+  if (!text) throw new Error('text 是必填参数');
+  try {
+    const { detectPedagogicalContent } = require('./pedagogy.js');
+    const result = detectPedagogicalContent(text);
+    return { text: text.slice(0, 200), pedagogy: result, timestamp: Date.now() };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
 
 function handleMemorySearch(args) {
 
@@ -3375,7 +3512,18 @@ const HANDLERS = {
 
   heartflow_think_fast: handleThinkFast,
 
-  heartflow_dream: handleDream,
+
+  // [v6.6.3] 心虫统一监督入口
+  heartflow_supervise: handleSupervise,
+
+  // [v6.6.3] 心虫单维判别入口
+  heartflow_check_single: handleCheckSingle,
+
+  // [v6.6.3] 新闻信号战略推演（包装 MacroStrategyInference）
+  heartflow_macro_strategy: handleMacroStrategy,
+
+  // [v6.6.3] 教育内容检测（包装 pedagogy）
+  heartflow_pedagogy_detect: handlePedagogyDetect,
 
   heartflow_memory_search: handleMemorySearch,
 
@@ -4033,14 +4181,7 @@ const HANDLERS = {
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
-  heartflow_decision_router: (args) => {
-    try {
-      const { DecisionRouter } = require('./core/decision-router.js');
-      const inst = new DecisionRouter({ silent: true, rootPath: HF_DIR });
-      const r = {};
-      return { result: r, timestamp: Date.now() };
-    } catch (e) { return { error: e.message }; }
-  },
+
   heartflow_action_tracker: (args) => {
     try {
       const { ActionTracker } = require('./core/action-tracker.js');
