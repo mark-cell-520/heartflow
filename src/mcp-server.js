@@ -1638,7 +1638,13 @@ function safeDispatch(route, ...args) {
 
   if (!heartflow) throw new Error('引擎未启动');
 
-  try {
+  // [v6.7.1] 熔断前置路由
+    const cb = require('./circuit-breaker.js');
+    const cbGuard = cb.guard();
+    if (!cbGuard.allowed) {
+      return { error: cbGuard.reason, state: cbGuard.state };
+    }
+    try {
 
     const result = heartflow.dispatch(route, ...args);
 
