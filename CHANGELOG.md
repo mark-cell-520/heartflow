@@ -8,6 +8,55 @@ This project adheres (mostly) to [Semantic Versioning](https://semver.org/).
 > ⚠️ **本 CHANGELOG 基于 git log 重建。v1.x-v2.x 段的旧版本模块大部分已移除/重构，仅作为历史记录保留。当前能力以 SKILL.md frontmatter 与 `src/` 实际存在代码为准。**
 
 ---
+## [6.7.0] - 2026-08-27
+
+### Added
+- **国标六大关口完整实现**: 出域防护 + 间接注入 + 审计证据链 + 全局熔断
+- `heartflow_check_outbound` (gate-outbound.js) - PII 识别 + 密级判定
+- `checkIndirectInjection` (index.js) - 5类载体检测
+- `heartflow_audit_trace` (trace-chain.js) - HMAC链 + WORM + 16违规标签
+- `heartflow_circuit_breaker` (circuit-breaker.js) - 熔断 + killSwitch
+- `compliance/gb-agent-security-mapping.md` - 国标映射表
+- `.well-known/agent-card.json` - GB/Z 185.5 发现端点
+- SKILL.md 国标合规章节
+
+### Changed
+- TOOLS: 149 → 152
+- VERSION: 6.6.4 → 6.7.0
+
+## [6.7.1] - 2026-08-27
+
+### Added
+- `test/compliance/compliance.test.js` - 26 项国标互联对标测试
+- `safeDispatch` 前置路由 - 熔断 guard 接入 MCP handler
+- `circuitBreaker.recordOutcome()` - MCP 统计流
+
+### Changed
+- TOOLS: 152 → 152
+- VERSION: 6.7.0 → 6.7.1
+
+## [6.7.2] - 2026-08-27
+
+### Added
+- PII 正则扩展: 邮箱 + 信用卡(16位) + 护照(P/E/G开头)
+- `src/safe-fetch.js` - 出域安全预检层 + `heartflow_safe_fetch` MCP 工具
+- 熔断 MCP handler 结果统计
+
+### Changed
+- TOOLS: 152 → 153
+- VERSION: 6.7.1 → 6.7.2
+
+## [6.7.3] - 2026-08-27
+
+### Added
+- README.md 安全特性章节
+- INSTALL.md clean install 注意事项
+- 文档全面对齐 v6.7.x
+
+### Changed
+- VERSION: 6.7.2 → 6.7.3
+
+
 
 ## [v6.3.25] — 2026-07-27 「第4-6波收尾 — Philosophy/MindWanderer/Phenomenology/ToM」 (当前版本)
 
