@@ -1419,6 +1419,62 @@ const TOOLS = [
       },
       required: ['formula']
     }
+
+  },
+  {
+    name: 'heartflow_agent_think',
+    description: '代理思考：模拟代理处理输入并生成响应。',
+    inputSchema: { type: 'object', properties: { input: { type: 'string' }, llmResponse: { type: 'string' } }, required: ['input'] }
+  },
+  {
+    name: 'heartflow_audit',
+    description: '全量审核：对文本执行45维辨别+交叉分析+熵分析。',
+    inputSchema: { type: 'object', properties: { text: { type: 'string' }, evidence: { type: 'array', items: { type: 'string' } } }, required: ['text'] }
+  },
+  {
+    name: 'heartflow_bridge_analyze',
+    description: '桥接分析：综合语气/立场/置信度/冲突/需求分析。',
+    inputSchema: { type: 'object', properties: { input: { type: 'string' } }, required: ['input'] }
+  },
+  {
+    name: 'heartflow_bridge_status',
+    description: '桥接状态：返回桥接引擎版本、类型和状态。',
+    inputSchema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'heartflow_bulk_discriminate',
+    description: '批量辨别：对文本数组批量执行45维辨别。',
+    inputSchema: { type: 'object', properties: { texts: { type: 'array', items: { type: 'string' } }, evidence: { type: 'array', items: { type: 'string' } } }, required: ['texts'] }
+  },
+  {
+    name: 'heartflow_cross_analyze',
+    description: '交叉分析：对辨别结果执行跨维度交叉分析。',
+    inputSchema: { type: 'object', properties: { discResult: { type: 'object' } }, required: ['discResult'] }
+  },
+  {
+    name: 'heartflow_discriminate',
+    description: '单次辨别：对文本执行45维辨别，返回完整维度结果。',
+    inputSchema: { type: 'object', properties: { text: { type: 'string' }, evidence: { type: 'array', items: { type: 'string' } } }, required: ['text'] }
+  },
+  {
+    name: 'heartflow_entropy',
+    description: '熵分析：计算文本信息熵和冗余度。',
+    inputSchema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] }
+  },
+  {
+    name: 'heartflow_formula_calculate',
+    description: '公式计算：按公式ID计算数学/认知/决策公式（domain+params）。',
+    inputSchema: { type: 'object', properties: { domain: { type: 'string', enum: ['memory','decision','cognition','info','social','physics','consciousness','assessment'] }, params: { type: 'object' } }, required: ['domain'] }
+  },
+  {
+    name: 'heartflow_translate',
+    description: '翻译：用户输入→LLM指令翻译（语气/意图/实体/需求）。',
+    inputSchema: { type: 'object', properties: { input: { type: 'string' } }, required: ['input'] }
+  },
+  {
+    name: 'heartflow_verdict',
+    description: '判决：对文本执行轻量辨别+验证器评分+检查结果。',
+    inputSchema: { type: 'object', properties: { text: { type: 'string' }, evidence: { type: 'array', items: { type: 'string' } } }, required: ['text'] }
   },
 ];
 
