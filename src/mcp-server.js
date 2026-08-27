@@ -24,6 +24,21 @@
 
 const path = require('path');
 
+
+// [v6.6.4] P0: gate.action → 决策类型映射（品牌四层理论）
+const DECISION_TYPE_MAP = {
+  pass: 'RESONATE',     // 通过 → 共振/加强
+  verify: 'HOLD',       // 需验证 → 坚守
+  rewrite: 'HEAL',      // 需改写 → 自愈/修复
+  block: 'HEAL',        // 拦截 → 自愈/修复
+  unknown: 'HOLD',      // 未知 → 坚守
+};
+
+function gateActionToDecisionType(gateAction) {
+  return DECISION_TYPE_MAP[gateAction] || DECISION_TYPE_MAP.unknown;
+}
+
+
 const fs = require('./utils/safe-fs');
 
 const http = require('http');
@@ -1352,6 +1367,69 @@ const TOOLS = [
       required: ['text']
     }
   },
+
+  // [v6.6.4] P2: gate.js 独立入口
+  {
+    name: 'heartflow_gate',
+    description: '心虫门禁：对文本做 AGI 第一层辨别，返回 gate.action(pass/verify/block/rewrite)、reason、score、overallScore。适用于快速门禁检查。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测文本' },
+        evidence: { type: 'array', description: '可选证据链（数组）' }
+      },
+      required: ['text']
+    }
+  },
+  {
+    name: 'heartflow_gate_check',
+    description: '心虫快速门禁：只返回行动指令 (action/reason/score)，适合 LLM agent 轻量调用。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测文本' }
+      },
+      required: ['text']
+    }
+  },
+  {
+    name: 'heartflow_gate_pipeline',
+    description: '心虫管道模式：text 先过 gate，返回 gate-filtered 结论和原始结果。支持 evidence 参数。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测文本' },
+        evidence: { type: 'array', description: '可选证据链' }
+      },
+      required: ['text']
+    }
+  },
+
+  // [v6.6.4] P3: formula-bridge 和 formula-calc 独立入口
+  {
+    name: 'heartflow_formula_bridge',
+    description: '公式桥接：认知科学公式计算（记忆/决策/认知/信息/社会/意识领域）。domain可选：memory/decision/cognition/info/social/consciousness，传params对象。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        domain: { type: 'string', description: '领域：memory/decision/cognition/info/social/consciousness' },
+        params: { type: 'object', description: '计算参数（根据 domain 不同而不同）' }
+      },
+      required: ['domain']
+    }
+  },
+  {
+    name: 'heartflow_formula_calc',
+    description: '公式计算器：数值求解、ODE/PDE 求解、线性方程组、符号计算。支持任意数学公式输入。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        formula: { type: 'string', description: '数学公式（如 "x^2 + 2x + 1"）' },
+        variables: { type: 'object', description: '变量值（如 {x: 5}）' }
+      },
+      required: ['formula']
+    }
+  },
 ];
 
 
@@ -1891,10 +1969,18 @@ async function handleSupervise(args) {
       guidance: f.guidance || ''
     }));
     const summary = result.summary || {};
+    const decisionType = gateActionToDecisionType(gate_action);
+    const brandLayer = {
+      RESONATE: '讲废话（重复→记住）',
+      HOLD: '讲无知（教用户建立专家形象）',
+      HEAL: '讲责任（敢兜底建立信任）',
+    }[decisionType] || '未知';
     return {
       mode,
       input,
       gate: gate_action,
+      decisionType,      // P0新增：决策类型 RESONATE/HOLD/HEAL
+      brandLayer,        // P0新增：对应品牌四层理论层级
       reason,
       verdict,
       score,
@@ -2363,21 +2449,77 @@ function handleDecisionRouter(args) {
 
   if (!input) throw new Error('input 是必填参数');
 
-  const result = safeDispatch('decisionRouter.evaluate', input, 'mcp');
+  
 
-  // v3.9.1: 吸收 AI Inner OS 协议，加 innerMonologue 字段
+  // P1: 自然文本路由 → 先过 gate 提取结构化信号
 
-  const innerMonologue = _generateInnerMonologue(result);
+  let decisionResult = null;
+
+  let innerMonologue = null;
+
+  
+
+  if (typeof input === 'string' && !input.startsWith('{') && !input.startsWith('{ cognitiveLoad')) {
+
+    try {
+
+      const gate = require(HF_DIR + '/src/gate.js');
+
+      const pipelineResult = gate.runPipeline({ input, mode: 'input' });
+
+      const gateAction = pipelineResult.gate?.action || 'unknown';
+
+      const score = pipelineResult.overallScore || 0;
+
+      
+
+      const structuredInput = JSON.stringify({
+
+        cognitiveLoad: score > 0.7 ? 0.3 : score > 0.4 ? 0.6 : 0.8,
+
+        dissonance: pipelineResult.findings?.length || 0,
+
+        quality: gateAction === 'pass' ? 0.9 : gateAction === 'verify' ? 0.6 : 0.3,
+
+        severity: gateAction === 'block' ? 0.9 : gateAction === 'rewrite' ? 0.7 : 0.4,
+
+        dimension: pipelineResult.findings?.[0]?.dimension || 'general',
+
+        text: input,
+
+      });
+
+      decisionResult = safeDispatch('decisionRouter.evaluate', structuredInput, 'mcp');
+
+      innerMonologue = _generateInnerMonologue(decisionResult);
+
+    } catch (e) {
+
+      decisionResult = safeDispatch('decisionRouter.evaluate', input, 'mcp');
+
+      innerMonologue = _generateInnerMonologue(decisionResult);
+
+    }
+
+  } else {
+
+    decisionResult = safeDispatch('decisionRouter.evaluate', input, 'mcp');
+
+    innerMonologue = _generateInnerMonologue(decisionResult);
+
+  }
+
+  
 
   return {
 
-    matched: result.matched,
+    matched: decisionResult.matched,
 
-    decision: result.decision || null,
+    decision: decisionResult.decision || null,
 
-    rules: (result.rules || []).slice(0, 5),
+    rules: (decisionResult.rules || []).slice(0, 5),
 
-    innerMonologue,  // 新增：内心独白（可选）
+    innerMonologue,
 
     timestamp: Date.now()
 
@@ -3471,7 +3613,116 @@ function handleBridgeAnalyze(args) {
   }
 }
 
+
+// [v6.6.4] P2: gate.js 独立入口
+function handleGate(args) {
+  const { text, evidence = [] } = args || {};
+  if (!text) throw new Error('text 是必填参数');
+  try {
+    const gate = require(HF_DIR + '/src/gate.js');
+    const result = gate.gate(text, evidence);
+    return {
+      text,
+      gate: result.gate,
+      score: result.score,
+      overallScore: result.overallScore,
+      verdict: result.verdict,
+      timestamp: Date.now()
+    };
+  } catch (e) {
+    return { error: e.message, text };
+  }
+}
+
+function handleGateCheck(args) {
+  const { text } = args || {};
+  if (!text) throw new Error('text 是必填参数');
+  try {
+    const gate = require(HF_DIR + '/src/gate.js');
+    return gate.check(text);
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+function handleGatePipeline(args) {
+  const { text, evidence = [] } = args || {};
+  if (!text) throw new Error('text 是必填参数');
+  try {
+    const gate = require(HF_DIR + '/src/gate.js');
+    return gate.pipeline(text, evidence);
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+// [v6.6.4] P3: formula-bridge 独立入口
+function handleFormulaBridge(args) {
+  const { domain, params = {} } = args || {};
+  if (!domain) return { error: 'domain 是必填参数 (memory/decision/cognition/info/social/consciousness)' };
+  try {
+    const { getFormulaBridge } = require(HF_DIR + '/src/formula/formula-bridge.js');
+    const bridge = getFormulaBridge();
+    const result = {};
+    if (domain === 'memory') {
+      result.ebbinghausRetention = bridge.ebbinghausRetention(params.ageMs || 86400000);
+      result.memoryStrength = bridge.memoryStrengthFromFrequency(params.frequency || 1);
+    } else if (domain === 'decision') {
+      result.prospectValue = bridge.prospectValue(params.x || 100);
+      result.prospectLoss = bridge.prospectValue(-Math.abs(params.x || 100));
+      result.subjectiveUtility = bridge.subjectiveUtility(params.probs || [0.5,0.3,0.2], params.utils || [100,50,0]);
+    } else if (domain === 'cognition') {
+      result.yerkesDodson = bridge.yerkesDodson(params.arousal || 0.5);
+      result.flowChannel = bridge.flowChannel(params.challenge || 5, params.skill || 5);
+    } else if (domain === 'info') {
+      result.shannonEntropy = bridge.shannonEntropy(params.distribution || [0.5,0.3,0.2]);
+      result.klDivergence = bridge.klDivergence(params.p || [0.5,0.3,0.2], params.q || [0.4,0.35,0.25]);
+    } else if (domain === 'social') {
+      result.socialInfluence = bridge.socialInfluence(params.state || [0.5,0.5], params.weights || [[0,0.3],[0.3,0]], params.lambda || 0.1);
+      result.bystanderEffect = bridge.bystanderEffect(params.p || 0.8, params.n || 5);
+    } else if (domain === 'consciousness') {
+      result.iitPhi = bridge.iitPhi(params.miWhole || 0.8, params.miParts || 0.3);
+      result.gwtAccessibility = bridge.gwtAccessibility(params.weights || [0.8,0.5,0.2], params.gwSignal || 1.0);
+    } else {
+      result.error = 'unknown domain: ' + domain;
+    }
+    return { domain, result, timestamp: Date.now() };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+// [v6.6.4] P3: formula-calc 独立入口
+function handleFormulaCalc(args) {
+  const { formula, variables = {} } = args || {};
+  if (!formula) return { error: 'formula 是必填参数' };
+  try {
+    const math = require('mathjs').create(require('mathjs').all, { matrix: 'Array', number: 'number' });
+    math.import({ 'import': function() { throw new Error('mathjs import disabled'); } }, { override: true });
+    const scope = { ...variables };
+    let result;
+    if (formula.includes('=')) {
+      const [left, right] = formula.split('=');
+      const solved = math.solve(math.parse(left), math.parse(right), Object.keys(variables));
+      result = { type: 'equation', solution: solved };
+    } else {
+      const value = math.evaluate(math.parse(formula), scope);
+      result = { type: 'expression', value };
+    }
+    return { formula, variables, result, timestamp: Date.now() };
+  } catch (e) {
+    return { error: e.message, formula };
+  }
+}
+
+
 const HANDLERS = {
+  heartflow_gate: handleGate,
+  heartflow_gate_check: handleGateCheck,
+  heartflow_gate_pipeline: handleGatePipeline,
+  heartflow_formula_bridge: handleFormulaBridge,
+  heartflow_formula_calc: handleFormulaCalc,
+
 
   heartflow_bridge_analyze: handleBridgeAnalyze,
 
