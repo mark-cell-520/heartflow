@@ -1309,8 +1309,8 @@ const TOOLS = [
   {
     name: 'heartflow_project_context',
     description: '项目上下文：设置/获取当前项目上下文。',
-    inputSchema: { type: 'object', properties: { project: { type: 'string', description: '项目名' } } }
-  }
+    inputSchema: { type: 'object', properties: { project: { type: 'string', description: '项目名' } } },
+  },
 
 
 
