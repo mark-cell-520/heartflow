@@ -1,0 +1,35 @@
+{
+  "name": "HeartFlow Agent",
+  "description": "安全合规的人工智能 Agent 执行引擎，45维判别 + 出域防护 + 审计追溯 + 全局熔断",
+  "version": "6.7.0",
+  "vendor": "mark-heartflow",
+  "license": "MIT",
+  "repository": "https://github.com/mark-HeartFlow/mark-heartflow-skill",
+  "security": {
+    "compliance": [
+      "GB/T 42497-2023",
+      "ISO/IEC 27001",
+      "NIST AI RMF"
+    ],
+    "features": [
+      "content-safety-filter",
+      "pii-detection",
+      "outbound-gate",
+      "audit-trace-hmac",
+      "circuit-breaker",
+      "kill-switch"
+    ]
+  },
+  "tools": {
+    "count": 152,
+    "prefix": "heartflow_",
+    "categories": [
+      "discriminator",
+      "gate",
+      "memory",
+      "audit",
+      "security",
+      "compliance"
+    ]
+  }
+}
