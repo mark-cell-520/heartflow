@@ -1502,7 +1502,18 @@ const TOOLS = [
         limit: { type: 'number', description: '返回条数上限' },
       },
     },
+  },  {
+    name: 'heartflow_circuit_breaker',
+    description: '全局熔断：查询当前熔断状态、强制 trip/闭锁/释放 Kill Switch，查看内存/CPU/失败率水位。国标关口6。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['status', 'trip', 'reset', 'health'], description: 'status=状态, trip=触发熔断, reset=释放, health=健康检查' },
+        reason: { type: 'string', description: '触发原因（action=trip 时）' },
+      },
+    },
   },
+
 ];
 
 
@@ -4833,7 +4844,19 @@ const HANDLERS = {
     } catch (e) {
       return { error: e.message };
     }
+  },  heartflow_circuit_breaker: (args) => {
+    try {
+      const cb = require('./circuit-breaker.js');
+      const action = args?.action || 'status';
+      if (action === 'trip') { cb.trip(args?.reason || 'manual'); return cb.getState(); }
+      if (action === 'reset') { cb.reset(); return cb.getState(); }
+      if (action === 'health') return cb.healthCheck();
+      return cb.getState();
+    } catch (e) {
+      return { error: e.message };
+    }
   },
+
 };
 
 
