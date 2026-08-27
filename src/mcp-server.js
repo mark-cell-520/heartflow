@@ -900,11 +900,6 @@ const TOOLS = [
     inputSchema: { type: 'object', properties: { action: { type: 'string', enum: ['record', 'query'], description: '记录或查询' }, event: { type: 'string', description: '事件描述' } } }
   },
   {
-    name: 'heartflow_module_health',
-    description: '模块健康：检查所有模块健康状态，返回健康评分和问题模块。',
-    inputSchema: { type: 'object', properties: {} }
-  },
-  {
     name: 'heartflow_stability',
     description: '稳定性守卫：评估引擎稳定性，输出稳定性评分和门控建议。',
     inputSchema: { type: 'object', properties: { metrics: { type: 'object', description: '稳定性指标' } } }
@@ -949,11 +944,6 @@ const TOOLS = [
     name: 'heartflow_self_healing',
     description: '自愈策略：获取/设置缓存修复策略。',
     inputSchema: { type: 'object', properties: { context: { type: 'string', description: '失败上下文' } } }
-  },
-  {
-    name: 'heartflow_agent_psychology',
-    description: '引擎心理学：7维认知心理状态评估（负荷/冲突/失调/漂移等）。',
-    inputSchema: { type: 'object', properties: {} }
   },
   {
     name: 'heartflow_philosophy_engine',
@@ -1122,11 +1112,6 @@ const TOOLS = [
     name: 'heartflow_observe_engine',
     description: '观察引擎：观察/记录工具调用。',
     inputSchema: { type: 'object', properties: { observation: { type: 'string', description: '输入参数' } } }
-  },
-  {
-    name: 'heartflow_decision_router',
-    description: '决策路由：字段计算与决策路由。',
-    inputSchema: { type: 'object', properties: { input: { type: 'string', description: '输入参数' } } }
   },
   {
     name: 'heartflow_action_tracker',
