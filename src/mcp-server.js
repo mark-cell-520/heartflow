@@ -1896,18 +1896,21 @@ async function handleSupervise(args) {
     const gate = require(HF_DIR + '/src/gate.js');
     const result = gate.runPipeline({ input, mode, context });
     const gate_action = result.gate?.action || 'unknown';
+    const reason = result.gate?.reason || '';
     const verdict = result.verdict || 'unknown';
     const score = result.overallScore || 0;
     const findings = (result.findings || []).slice(0, 10).map(f => ({
       dimension: f.dimension,
       severity: f.severity,
       details: f.details,
-      guidance: f.guidance
+      guidance: f.guidance || ''
     }));
     const summary = result.summary || {};
     return {
-      mode, input: input.slice(0, 200) + (input.length > 200 ? '...' : ''),
+      mode,
+      input,
       gate: gate_action,
+      reason,
       verdict,
       score,
       findingsCount: (result.findings || []).length,
@@ -1917,10 +1920,11 @@ async function handleSupervise(args) {
       verify: summary.verify || false,
       pass: summary.pass || false,
       layers_passed: summary.layers_passed || 0,
+      checked_by: (result.checked_by || []).slice(0, 8).map(c => ({ layer: c.layer, ...c })),
       timestamp: Date.now()
     };
   } catch (e) {
-    return { error: e.message, input: input.slice(0, 200) };
+    return { error: e.message, input };
   }
 }
 
@@ -1930,12 +1934,15 @@ async function handleCheckSingle(args) {
   if (!text || !dimension) throw new Error('text 和 dimension 是必填参数');
   try {
     const hf = require(HF_DIR + '/src/index.js');
-    const fn = hf['check' + dimension.charAt(0).toUpperCase() + dimension.slice(1)];
+    // Convert dimension to CamelCase function name: factual_consistency → checkFactualConsistency
+    const fnName = 'check' + dimension.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+    const fn = hf[fnName];
     if (!fn) {
-      return { error: `维度 ${dimension} 不存在，可用维度：text/factual_consistency/vagueness/bullshit/sarcasm/emotion` };
+      const avail = Object.keys(hf).filter(k => k.startsWith('check')).sort();
+      return { error: `维度 ${dimension} (${fnName}) 不存在`, available: avail };
     }
     const result = await Promise.resolve(fn(text));
-    return { dimension, result, timestamp: Date.now() };
+    return { dimension, fn: fnName, result, timestamp: Date.now() };
   } catch (e) {
     return { error: e.message, dimension };
   }
