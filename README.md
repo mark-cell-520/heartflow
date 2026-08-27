@@ -324,3 +324,20 @@ Works on any machine — servers, desktops, laptops, even phones via Termux.
 ## 📜 License
 
 MIT License · Copyright © 2026 · markcell@outlook.com
+
+## 安全特性
+
+心虫 HeartFlow 内置多层次安全防护，对齐 GB/T 42497-2023 国标要求：
+
+| 层级 | 模块 | 功能 |
+|------|------|------|
+| 内容安全 | `checkOutput` / `discriminate` | 45 维判别（事实性/有害/歧视/隐私/注入等） |
+| 出域防护 | `heartflow_check_outbound` | PII 识别（身份证/手机号/邮箱/信用卡/护照/合同金额） |
+| 注入防御 | `checkIndirectInjection` | 5 类载体（HTML注释/隐藏块/代码注释/零宽字符/表格指令） |
+| 审计追溯 | `heartflow_audit_trace` | HMAC 链 + WORM append + 16 违规标签 |
+| 全局熔断 | `heartflow_circuit_breaker` | 内存/CPU/失败率 + killSwitch + 健康检查 |
+| 数据安全 | `DataEraser` + `memoryGuard` | 记忆数据擦除 + 访问控制 |
+
+**国标六大关口**：生成内容安全 / 训练数据安全 / 出域防护 / 算法透明 / 审计追溯 / 应急处置
+
+详见 `compliance/gb-agent-security-mapping.md`。
