@@ -1513,6 +1513,21 @@ const TOOLS = [
       },
     },
   },
+  {
+    name: 'heartflow_safe_fetch',
+    description: '出域安全预检: 在 fetch 前自动检查 PII/密级内容，block/rewrite 自动处理。国标关口 3。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['preflight', 'batch'], description: 'preflight=单条预检, batch=批量预检' },
+        text: { type: 'string', description: '待发送内容' },
+        context: { type: 'string', description: '调用上下文' },
+        classification: { type: 'string', enum: ['公开', '内部', '敏感', '机密', '绝密'] },
+        texts: { type: 'array', items: { type: 'string' }, description: '批量文本（action=batch 时）' },
+      },
+      required: ['action'],
+    },
+  },
 
 ];
 
@@ -4858,6 +4873,18 @@ const HANDLERS = {
       if (action === 'reset') { cb.reset(); return cb.getState(); }
       if (action === 'health') return cb.healthCheck();
       return cb.getState();
+    } catch (e) {
+      return { error: e.message };
+    }
+  },
+  heartflow_safe_fetch: async (args) => {
+    try {
+      const { preflightCheck, batchCheck } = require('./safe-fetch.js');
+      const action = args?.action || 'preflight';
+      if (action === 'batch' && Array.isArray(args.texts)) {
+        return batchCheck(args.texts, { context: args.context, classification: args.classification });
+      }
+      return preflightCheck(args.text || '', { context: args.context, classification: args.classification });
     } catch (e) {
       return { error: e.message };
     }
