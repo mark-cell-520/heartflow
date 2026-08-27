@@ -87,7 +87,13 @@ function estimateClassification(text) {
 
 // ── PII 扫描 ──────────────────────────────────────────
 function scanPII(text) {
-  const findings = [];
+  const findings = [  // 邮箱
+  { pattern: /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g, type: 'email', level: '内部' },
+  // 信用卡 16位
+  { pattern: /\b[4-6]\d{15}\b/g, type: 'credit_card', level: '机密' },
+  // 护照
+  { pattern: /\b[PEG]\d{8}\b/g, type: 'passport', level: '机密' },
+];
   for (const [ruleId, rule] of Object.entries(PII_RULES)) {
     let m;
     const re = rule.pattern.global ? rule.pattern : new RegExp(rule.pattern.source, 'g');
