@@ -4507,14 +4507,16 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
   heartflow_dream_v2: (args) => {
-    try {
+
+  try {
       const { DreamEngineV2 } = require('./dream/dream-engine-v2.js');
       const inst = new DreamEngineV2({ silent: true, rootPath: HF_DIR });
       const r = inst.generate ? inst.generate(args?.theme || '') : {};
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
-  heartflow_active_inference: (args) => {
+
+  heartflow_dream: handleDream,  heartflow_active_inference: (args) => {
     try {
       const { ActiveInference } = require('./decision/active-inference.js');
       const inst = new ActiveInference({ silent: true, rootPath: HF_DIR });
