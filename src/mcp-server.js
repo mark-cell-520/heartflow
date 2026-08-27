@@ -1235,11 +1235,6 @@ const TOOLS = [
     inputSchema: { type: 'object', properties: { query: { type: 'string', description: '搜索关键词' } } }
   },
   {
-    name: 'heartflow_formula_calc',
-    description: '公式计算：按公式ID计算数学公式（先用 formula_search 查ID）。',
-    inputSchema: { type: 'object', properties: { formula: { type: 'string', description: '公式ID（如 shannon_entropy）' }, values: { type: 'object', description: '变量值' } } }
-  },
-  {
     name: 'heartflow_formula_engine',
     description: '公式引擎：初始化/搜索/获取公式详情。',
     inputSchema: { type: 'object', properties: { action: { type: 'string', enum: ['init', 'search'], description: '操作' }, query: { type: 'string', description: '搜索词' } } }
@@ -1259,11 +1254,6 @@ const TOOLS = [
     name: 'heartflow_response_intercept',
     description: '响应拦截：拦截/处理 LLM 响应。',
     inputSchema: { type: 'object', properties: { text: { type: 'string', description: '响应文本' } } }
-  },
-  {
-    name: 'heartflow_formula_bridge',
-    description: '公式桥接：从语料搜索/计算公式。',
-    inputSchema: { type: 'object', properties: { query: { type: 'string', description: '搜索词' }, formula: { type: 'string', description: '公式' } } }
   },
 
   {
@@ -3427,27 +3417,6 @@ function handleFullDiscriminate(args) {
 }
 
 // [v6.4.0] 全量审核 handler
-function handleFullAudit(args) {
-  const { text, evidence } = args || {};
-  if (!text) return { error: 'text required' };
- try {
- const idx = require('./index.js');
- const disc = idx.discriminate(text, evidence || []);
- const report = idx.summarizeDiscrimination ? idx.summarizeDiscrimination(text, disc) : null;
- const cross = idx.crossAnalyze ? idx.crossAnalyze(disc) : null;
- const entropy = idx.entropyAnalysis ? idx.entropyAnalysis(text, disc) : null;
- return {
-   verdict: disc.verdict,
-   overallScore: disc.overallScore,
-   dimensionCount: Object.keys(disc.dimensions).length,
-   summary: disc.summary,
-   readableReport: report,
-   crossPatterns: cross ? cross.patterns.filter(p => p.pattern !== '健康文本').map(p => p.pattern) : [],
-   entropyReduction: entropy ? entropy.entropyReduction : null,
-   timestamp: Date.now()
- };
- } catch(e) { return { error: e.message }; }
- }
 
  // [v6.6.0] 批量辨别 handler
  function handleBulkDiscriminate(args) {

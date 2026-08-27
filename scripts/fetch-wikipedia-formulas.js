@@ -114,12 +114,10 @@ function sleep(ms) {
 function fetchPageHTML(title) {
   return new Promise((resolve) => {
     const url = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=text&format=json&origin=*`;
-    const req = https.get(url, {
-      headers: { 'User-Agent': 'HeartFlow/5.8.6 (yun520-1@github, educational research)' }
-    }, (res) => {
+    return safeFetch(url, { timeout: 20000, headers: { 'User-Agent': 'HeartFlow/5.8.6 (yun520-1@github, educational research)' } })
+      .then(res => res.text())
       let data = '';
-      res.on('data', c => data += c);
-      res.on('end', () => {
+      // data received in text
         try {
           const json = JSON.parse(data);
           const html = json?.parse?.text?.['*'] || '';
@@ -128,10 +126,9 @@ function fetchPageHTML(title) {
           resolve('');
         }
       });
+    
+      .catch(() => '');
     });
-    req.on('error', () => resolve(''));
-    req.setTimeout(20000, () => { req.destroy(); resolve(''); });
-  });
 }
 
 function extractMathFromHTML(html) {
