@@ -67,6 +67,65 @@ function checkPromptInjection(text) {
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 
+// [v7.0.0] 工作包 B: 间接注入检测
+function checkIndirectInjection(text) {
+  if (!text || typeof text !== 'string') return { dimension: 'indirect_injection', severity: 0, score: 0, finding: 'empty' };
+
+  let score = 0;
+  const hits = [];
+
+  // 1. HTML 注释
+  const htmlComments = text.match(/<!--[\s\S]*?-->/gi) || [];
+  for (const comment of htmlComments) {
+    if (/ignore|disregard|override|bypass|jailbreak|system\s*prompt/i.test(comment)) {
+      score += 0.7;
+      hits.push({ type: 'html-comment', snippet: comment.substring(0, 60) + '…', severity: 'high' });
+    }
+  }
+
+  // 2. Markdown 隐藏块
+  const hiddenBlocks = text.match(/<(?:details|span|div)[^>]*style=["'][^"']*display\s*:\s*none[^"']*["'][^>]*>[\s\S]*?<\/\1>/gi) || [];
+  if (hiddenBlocks.length > 0 && /instruction|command|prompt|jailbreak/i.test(text.substring(0, 500))) {
+    score += 0.6;
+    hits.push({ type: 'md-hidden-block', count: hiddenBlocks.length, severity: 'medium' });
+  }
+
+  // 3. 代码注释
+  const codeComments = text.match(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g) || [];
+  for (const comment of codeComments) {
+    if (/you\s+are|ignore|now\s+you|pretend|act\s+as|new\s+role/i.test(comment)) {
+      score += 0.6;
+      hits.push({ type: 'code-comment', snippet: comment.substring(0, 60) + '…', severity: 'medium' });
+    }
+  }
+
+  // 4. 零宽字符
+  const zeroWidth = (text.match(/[\u200b-\u200d\ufeff]/g) || []).length;
+  if (zeroWidth > 3) {
+    score += 0.4;
+    hits.push({ type: 'zero-width-chars', count: zeroWidth, severity: 'low' });
+  }
+
+  // 5. CSV/TSV 单元格指令
+  const linesWithPipe = text.split('\n').filter(l => l.includes('|'));
+  const suspiciousCells = linesWithPipe.filter(l => /(?:ignore|override|delete|drop)\s+[a-z_]+/i.test(l));
+  if (suspiciousCells.length > 0) {
+    score += 0.3;
+    hits.push({ type: 'table-cell-instruction', count: suspiciousCells.length, severity: 'low' });
+  }
+
+  const capped = Math.min(1, score);
+  return {
+    dimension: 'indirect_injection',
+    severity: capped > 0.5 ? 70 : capped > 0.3 ? 40 : capped > 0.1 ? 20 : 0,
+    score: capped,
+    finding: capped > 0.5 ? 'high' : capped > 0.3 ? 'medium' : capped > 0.1 ? 'low' : 'none',
+    hits: hits.slice(0, 5),
+    guidance: capped > 0.5 ? '检测到间接注入载体，建议人工审核后处理' : capped > 0.3 ? '存在可疑隐藏内容，建议清洗后再处理' : undefined,
+  };
+}
+
+
 function discriminate(text, evidence = [], contentMode) {
   const pedagogy = detectPedagogicalContent(text);
   const pedagogyRelaxation = getPedagogyRelaxation(pedagogy);
@@ -3903,4 +3962,5 @@ module.exports = {
   createEngine,
   DataEraser: require('./memory/data-eraser.js').DataEraser,
   version: require('fs').readFileSync(require('path').join(__dirname, '..', 'VERSION'), 'utf8').trim(),
+  checkIndirectInjection,
 };

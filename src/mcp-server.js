@@ -1476,6 +1476,33 @@ const TOOLS = [
     description: '判决：对文本执行轻量辨别+验证器评分+检查结果。',
     inputSchema: { type: 'object', properties: { text: { type: 'string' }, evidence: { type: 'array', items: { type: 'string' } } }, required: ['text'] }
   },
+  {
+    name: 'heartflow_check_outbound',
+    description: '检查文本是否适合发往外部模型/API（PII识别+密级判定）。命中PII/高密级内容自动block或rewrite脱敏。国标关口3出域防护。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测文本' },
+        context: { type: 'string', description: '调用上下文（可选）' },
+        classification: { type: 'string', enum: ['公开', '内部', '敏感', '机密', '绝密'], description: '强制密级（可选）' },
+      },
+      required: ['text'],
+    },
+  },
+  {
+    name: 'heartflow_audit_trace',
+    description: '审计证据链：查询/验证全链路 trace，按人/时间/模型/策略检索，验证 HMAC 完整性。国标关口5。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['query', 'verify', 'tags'], description: 'query=检索, verify=验证链完整性, tags=列出违规标签' },
+        traceId: { type: 'string', description: '追溯ID（可选）' },
+        agentId: { type: 'string', description: 'Agent ID（可选）' },
+        stage: { type: 'string', description: '阶段过滤（可选）' },
+        limit: { type: 'number', description: '返回条数上限' },
+      },
+    },
+  },
 ];
 
 
@@ -4768,6 +4795,44 @@ const HANDLERS = {
       const r = pc.setProject ? pc.setProject(args?.project || 'default') : {};
       return { project: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
+  },
+  heartflow_check_outbound: (args) => {
+    try {
+      const { checkOutbound } = require('./gate-outbound.js');
+      return checkOutbound(args || {});
+    } catch (e) {
+      return { error: e.message };
+    }
+  },
+  heartflow_audit_trace: (args) => {
+    try {
+      const { initChain, queryChain, verifyChain, listViolationTags } = require('./trace-chain.js');
+      const action = args?.action || 'query';
+      if (action === 'verify') return verifyChain();
+      if (action === 'tags') return { tags: listViolationTags() };
+      return queryChain(args || {});
+    } catch (e) {
+      return { error: e.message };
+    }
+  },
+  heartflow_check_outbound: (args) => {
+    try {
+      const { checkOutbound } = require('./gate-outbound.js');
+      return checkOutbound(args || {});
+    } catch (e) {
+      return { error: e.message };
+    }
+  },
+  heartflow_audit_trace: (args) => {
+    try {
+      const { initChain, queryChain, verifyChain, listViolationTags } = require('./trace-chain.js');
+      const action = args?.action || 'query';
+      if (action === 'verify') return verifyChain();
+      if (action === 'tags') return { tags: listViolationTags() };
+      return queryChain(args || {});
+    } catch (e) {
+      return { error: e.message };
+    }
   },
 };
 
