@@ -3962,5 +3962,11 @@ module.exports = {
   createEngine,
   DataEraser: require('./memory/data-eraser.js').DataEraser,
   version: require('fs').readFileSync(require('path').join(__dirname, '..', 'VERSION'), 'utf8').trim(),
-  checkIndirectInjection,
+  checkIndirectInjection: require('./pipeline').checkIndirectInjection,
+  agenticMemory:      require('./memory/agentic-memory-engine.js'),
+  metacognition:    require('./cortex/metacognitive-reward.js'),
+  executableReasoning: require('./reasoning/executable-reasoning.js'),
+  tomEngine:        require('./consciousness/tom-engine.js'),
+  debateEngine:     require('./consciousness/debate-engine.js'),
+  evolutionarySearch: require('./planner/evolutionary-search.js'),
 };
