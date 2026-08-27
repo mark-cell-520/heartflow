@@ -57,6 +57,15 @@ This project adheres (mostly) to [Semantic Versioning](https://semver.org/).
 - VERSION: 6.7.2 → 6.7.3
 
 
+## [6.7.4] - 2026-08-27
+
+### Fixed
+- 合规测试修复合规测试（匹配实际函数返回结构）
+- HANDLERS 覆盖率修复（safe_fetch 异步 handler 识别）
+
+### Changed
+- VERSION: 6.7.3 → 6.7.4
+
 
 ## [v6.3.25] — 2026-07-27 「第4-6波收尾 — Philosophy/MindWanderer/Phenomenology/ToM」 (当前版本)
 
