@@ -77,33 +77,24 @@ function sleep(ms) {
 }
 
 function fetchWikitext(title) {
-  return new Promise((resolve) => {
-    // 先用 query API 拿重定向后的真实标题 + 内容
-    const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&redirects=1&prop=revisions&rvprop=content&format=json&origin=*`;
-    const req = https.get(url, {
-      headers: { 'User-Agent': 'HeartFlow/5.8.6 (yun520-1@github, educational research)' }
-    }, (res) => {
-      let data = '';
-      res.on('data', c => data += c);
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          const pages = json?.query?.pages || {};
-          for (const pid in pages) {
-            const page = pages[pid];
-            const revs = page.revisions || [];
-            if (revs.length > 0) {
-              resolve(revs[0]['*'] || '');
-              return;
-            }
+  const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&redirects=1&prop=revisions&rvprop=content&format=json&origin=*`;
+  return safeFetch(url, { timeout: 20000, headers: { 'User-Agent': 'HeartFlow/5.8.6 (yun520-1@github, educational research)' } })
+    .then(res => res.text())
+    .then(text => {
+      try {
+        const json = JSON.parse(text);
+        const pages = json?.query?.pages || {};
+        for (const pid in pages) {
+          const page = pages[pid];
+          const revs = page.revisions || [];
+          if (revs.length > 0) {
+            return revs[0]['*'] || '';
           }
-          resolve('');
-        } catch { resolve(''); }
-      });
-    });
-    req.on('error', () => resolve(''));
-    req.setTimeout(20000, () => { req.destroy(); resolve(''); });
-  });
+        }
+        return '';
+      } catch { return ''; }
+    })
+    .catch(() => '');
 }
 
 function parseMathTemplates(wikitext) {

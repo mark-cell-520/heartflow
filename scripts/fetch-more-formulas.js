@@ -224,7 +224,8 @@ console.log('开始抓取 Wikipedia 公式...');
 function fetchWikiPage(page, cat, sub) {
   return new Promise((resolve) => {
     const url = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(page)}&prop=wikitext&format=json&origin=*`;
-    const req = https.get(url, { headers: { 'User-Agent': 'HeartFlow/5.8.6 (educational)' } }, (res) => {
+    return safeFetch(url, { timeout: 20000, headers: { 'User-Agent': 'HeartFlow/5.8.6 (educational)' } })
+      .then(res => res.text())
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
