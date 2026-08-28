@@ -624,12 +624,15 @@ const TOOLS = [
 
     inputSchema: { type: 'object', properties: {} }
 
+
   },
-
-  // v3.1.0 新增工具
-
   {
-
+    name: 'heartflow_decision_decide',
+    description: '多选项决策：对给定任务和选项列表执行决策，返回 chosen/reasoning/consequences/risks/identity_alignment/composite_score。支持 constraints 过滤和身份对齐评分。',
+    inputSchema: { type: 'object', properties: { task: { type: 'string', description: '决策任务描述' }, options: { type: 'array', items: { type: 'object' }, description: '选项列表，每项含 id/label/feasibility/consequence_value/risk/confidence/promotes_upgrade/promotes_truth 等字段' }, constraints: { type: 'object', description: '硬约束（可选）' } }, required: ['task', 'options'] }
+  },
+  // v3.1.0 新增工具
+  {
     name: 'heartflow_module_health',
 
     description: '模块健康检查：检查所有已加载模块的健康状态，返回健康评分和问题模块列表。',
@@ -4341,9 +4344,12 @@ const HANDLERS = {
 
   heartflow_decision_feedback: (args) => {
     try {
-      const { DecisionFeedback } = require('./core/decision-feedback.js');
-      const df = new DecisionFeedback({ silent: true });
-      const r = df.recordOutcome ? df.recordOutcome({ type: 'mcp_feedback', ruleId: 'mcp', decision: args?.decision || '', confidence: 0.5 }, args?.outcome === 'success', '') : {};
+      const hf = require(HF_DIR + '/src/core/heartflow.js');
+      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
+      const fb = inst.decisionFeedback;
+      if (!fb) return { error: 'decisionFeedback not initialized' };
+      const decision = args?.decision || {};
+      const r = fb.recordOutcome ? fb.recordOutcome({ type: decision.type || 'mcp_feedback', ruleId: decision.ruleId || 'mcp', confidence: typeof decision.confidence === 'number' ? decision.confidence : 0.5, context: decision.context || {} }, args?.outcome === 'success', args?.notes || '') : {};
       return { feedback: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
@@ -4527,6 +4533,16 @@ const HANDLERS = {
       const de = new DecisionExecutor({ silent: true });
       const r = de.execute ? de.execute(args?.decision || '') : {};
       return { execution: r, timestamp: Date.now() };
+    } catch (e) { return { error: e.message }; }
+  },
+  heartflow_decision_decide: (args) => {
+    try {
+      const hf = require(HF_DIR + '/src/core/heartflow.js');
+      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
+      const hfd = inst.decision;
+      if (!hfd || !hfd.decide) return { error: 'decision.decide not available' };
+      const r = hfd.decide({ task: args?.task || '', options: args?.options || [], constraints: args?.constraints || {} });
+      return { decision: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
   heartflow_experience_collect: (args) => {
