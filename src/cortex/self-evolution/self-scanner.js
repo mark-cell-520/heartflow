@@ -99,16 +99,12 @@ class SelfScanner {
       // 5. 能力探针（liveness probes）— 各子系统是否处于活动状态
       const exploreEnv = process.env.HEARTFLOW_SELF_EVOLVE_EXPLORE;
       result.livenessProbes = [
-        {
-          capability: 'arxiv_explore',
-          alive: exploreEnv !== '0' && exploreEnv !== 'false',  // v6.1.2 起默认开，仅显式 0/false 关闭
-          note: exploreEnv !== undefined ? `env=${exploreEnv}` : 'default-on',
-        },
-        {
-          capability: 'self_scanner',
-          alive: true,
-          note: 'scan() 执行成功',
-        },
+        { capability: 'arxiv_explore', alive: exploreEnv !== '0' && exploreEnv !== 'false', note: exploreEnv !== undefined ? `env=${exploreEnv}` : 'default-on' },
+        { capability: 'self_scanner', alive: true, note: 'scan() 执行成功' },
+        { capability: 'gate_accessible', alive: fs.existsSync(path.join(this.root, 'src', 'gate.js')), note: 'gate.js 存在' },
+        { capability: 'memory_operational', alive: fs.existsSync(path.join(this.root, 'src', 'memory')), note: 'memory/ 目录存在' },
+        { capability: 'decision_router_operational', alive: fs.existsSync(path.join(this.root, 'src', 'core', 'decision-router.js')), note: 'decision-router.js 存在' },
+        { capability: 'mcp_tools_count', alive: true, note: `tools=${result.toolCount || 0}` },
       ];
     } catch (e) {
       result.error = e.message;

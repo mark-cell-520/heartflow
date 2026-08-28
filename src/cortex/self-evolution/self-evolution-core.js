@@ -299,7 +299,7 @@ class SelfEvolutionCore {
 
       const learning = await this.learn(input, context);
       if (iterationCount === 1) {
-        baselineWeaknessCount = (learning.weaknesses || []).length;
+        baselineWeaknessCount = (learning.weaknesses && typeof learning.weaknesses.todoCount === 'number') ? learning.weaknesses.todoCount : 0;
       }
 
       // 2. 目标生成(基于当轮扫描到的真实弱点+liveness探针, 不再用上一轮旧值)
@@ -340,13 +340,14 @@ class SelfEvolutionCore {
 
       
 
-      // 7. 收敛检测：如果改进小于阈值，停止迭代
+      // 7. 收敛检测：基于真实弱点数量下降或改进度收敛
 
       if (iterationCount > 1 && previousImprovement !== null) {
 
+        const currentWeaknessCount = (learning.weaknesses && typeof learning.weaknesses.todoCount === 'number') ? learning.weaknesses.todoCount : baselineWeaknessCount;
+        const weaknessDelta = baselineWeaknessCount - currentWeaknessCount;
         const improvementDelta = Math.abs(previousImprovement - currentImprovement);
-
-        if (improvementDelta < convergenceThreshold) {
+        if (weaknessDelta >= 3 || improvementDelta < convergenceThreshold) {
 
           converged = true;
 
