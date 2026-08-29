@@ -1,7 +1,7 @@
 ---
 name: heartflow-engine
 title: "心虫 HeartFlow — AGI 第 1 层辨别者"
-version: "6.6.1"
+version: "v6.7.7"
 description: |-
   心虫(HeartFlow)是AGI第1层——辨别者。纯规则引擎，判别对错/好坏/安全/危险。
   47维判别 × 9层管线 × 129模块 × 130 MCP工具，零LLM依赖。
@@ -229,6 +229,35 @@ Gate 聚合所有层发现，输出 `block / rewrite / verify / pass` 四级动�
 3. 无语义理解 — 反讽、隐喻、文化背景不可见
 4. 误报率 — 基准约 8%
 5. 单一维护者
+
+### Narrative Text Deep Analysis
+
+For opinion essays, case-study narratives, or long-form storytelling:
+
+1. Save the target text to a file first (avoids quoting/encoding issues).
+2. Run `gate.checkOutput(text)` for a quick gate verdict + findings.
+3. Run `hf.think(text)` for deeper structural analysis.
+4. Let the main agent handle rhetorical decomposition, argument-structure audit, and psychological/philosophical interpretation — HeartFlow's `think()` on third-person narrative returns low-confidence or empty results by design (rule engine boundary).
+5. Combine both layers into the final report: HeartFlow supplies the gate/dimension labels; the main agent supplies the substantive analysis.
+
+#### Chinese forum retrieval pattern (JJWXC / gb2312 sites)
+
+Some Chinese BBS pages are served as `gb2312/gbk` and may not decode correctly via default UTF-8 fetchers.
+Workable fallback:
+
+```bash
+curl -sL --max-time 15 'URL' | iconv -f gb2312 -t utf-8//IGNORE > /tmp/page.txt
+```
+
+Then strip HTML/regex cleanup before analysis.
+`web_extract` may also return garbled text for these sites; prefer the `curl + iconv` route when the page looks like mojibake.
+
+#### Essay vs Real-Post comparison
+
+When asked to analyze a literary essay and "find similar real cases":
+- The essay usually scores higher on HeartFlow (`verdict: 可信`) because its argument structure is intentional, even when it generalizes.
+- Real forum posts usually score lower (`需验证 / 不可信`) because they are emotional rants with sarcasm, double binds, and capability overclaims.
+- Use this gap deliberately: the essay is **包装过的洞察**, the forum posts are **未修饰的现场**. The real diagnostic value is in comparing the same underlying cognitive pattern across both registers.
 
 ---
 

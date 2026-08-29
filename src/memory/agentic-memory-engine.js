@@ -14,7 +14,7 @@
 
 const crypto = require('crypto');
 const path = require('path');
-const fs = require('./utils/safe-fs');
+const fs = require('../utils/safe-fs');
 
 const MEM_DIR = path.join(__dirname, '..', 'memory', 'agentic');
 

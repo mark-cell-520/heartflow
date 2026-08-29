@@ -14,7 +14,7 @@
 
 const crypto = require('crypto');
 const path = require('path');
-const fs = require('./utils/safe-fs');
+const fs = require('../utils/safe-fs');
 
 const DEBATE_DIR = path.join(__dirname, '..', 'data', 'debates');
 

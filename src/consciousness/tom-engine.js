@@ -15,7 +15,7 @@
 
 const crypto = require('crypto');
 const path = require('path');
-const fs = require('./utils/safe-fs');
+const fs = require('../utils/safe-fs');
 
 const TOM_DIR = path.join(__dirname, '..', 'data', 'tom');
 
@@ -75,7 +75,7 @@ class ToMEngine {
 
   _inferIntention(obs) {
     const texts = obs.map(String).join(' ');
-    const markers = [/计划|准备|打算|going to|plan to|intend/i, /将|会|将要|will/shall/i];
+    const markers = [/计划|准备|打算|going to|plan to|intend/i, /将|会|将要|will\/shall/i];
     for (const m of markers) {
       const hit = texts.match(m);
       if (hit) return { plan: hit[0].slice(0, 100), confidence: 0.6 };
