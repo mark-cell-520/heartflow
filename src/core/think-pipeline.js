@@ -10,6 +10,10 @@
 const path = require('path');
 const _FirewallCheck = () => require('../identity/identity-rules.js');
 
+// ── DeepEmotion 单例 ──────────────────────────────────────
+// 避免每次 think() 重复构造触发器与状态表
+let _deepEmotionInstance = null;
+
 /**
  * 运行 think() 后置检查流水线
  * @param {object} result — think() 的输出结果（可变，会被增强）
@@ -953,7 +957,10 @@ async function runThinkPipeline(result, input, engine) {
     const inputText = typeof input === 'string' ? input : (input?.text || '');
     if (inputText && inputText.trim().length > 1) {
       const DE = require('../emotion/deep-emotion.js');
-      const de = new DE.DeepEmotion(path.join(__dirname, '..', '..'));
+      if (!_deepEmotionInstance) {
+        _deepEmotionInstance = new DE.DeepEmotion(path.join(__dirname, '..', '..'));
+      }
+      const de = _deepEmotionInstance;
       const felt = de.feel(inputText, { important: result.confidence > 0.6 });
       result._deepEmotion = {
         emotion: felt.emotion,
