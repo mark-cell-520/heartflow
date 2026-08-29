@@ -30,8 +30,8 @@ module.exports = function ({ test }) {
     const engine = startHF();
     await new Promise(r => setTimeout(r, 2500));
     const p = await engine.dispatch('pipeline.run', { input: '根据2025年Nature研究，87.3%的用户产生认知依赖', mode: 'deep' });
-    if (!p || !p.stages) throw new Error('pipeline 返回无效');
-    const bad = p.stages.filter(s => !s.success);
+    if (!p || !p.pipeline || !p.pipeline.stages) throw new Error('pipeline 返回无效');
+    const bad = p.pipeline.stages.filter(s => !s.success);
     if (bad.length) throw new Error(`pipeline ${bad.length} 阶段失败: ${bad.map(s => `${s.id}:${s.error}`).join('; ')}`);
   });
 
@@ -46,6 +46,6 @@ module.exports = function ({ test }) {
     const engine = startHF();
     await new Promise(r => setTimeout(r, 2500));
     const p = await engine.dispatch('pipeline.run', 'AI是工具还是威胁');
-    if (!p || !p.stages) throw new Error('pipeline 字符串输入返回无效');
+    if (!p || !p.pipeline || !p.pipeline.stages) throw new Error('pipeline 字符串输入返回无效');
   });
 };

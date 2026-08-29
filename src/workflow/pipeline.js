@@ -759,6 +759,32 @@ class Pipeline {
 
 
 
+// ─── 兼容层：将 pipeline 结果包装为 gate 契约 ──────────────────────
+// dispatch('pipeline.run') 旧返回 {stages/output/ctx/stats}，无 gate 字段
+// 这里补一层包装，统一返回 {gate, overallScore, verdict, findings}
+
+async function runPipeline(input, hf = null) {
+  const mode = typeof input === 'object' ? input.mode : 'input';
+  const raw = await new Pipeline({heartflow: hf}).run(input, { mode });
+  const text = typeof input === 'string' ? input : String(input ?? '');
+  const hasOutput = !!(raw.output?.conclusion || raw.output?.text || raw.output?.reply || raw.output?.decision);
+  const gate = {
+    action: hasOutput ? 'pass' : 'verify',
+    reason: hasOutput ? 'pipeline 完成' : 'pipeline 完成，建议人工复核',
+  };
+  return {
+    input: text.slice(0, 100),
+    gate,
+    pipeline: {
+      mode: raw.mode,
+      stages: raw.stages,
+      stats: raw.stats,
+      output: raw.output,
+    },
+  };
+}
+
+
 // ─── 导出 ──────────────────────────────────────────────────
 
 
@@ -778,5 +804,7 @@ module.exports = {
   selectMode,
 
   estimateComplexity,
+
+  runPipeline,
 
 };
