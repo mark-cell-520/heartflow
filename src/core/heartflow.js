@@ -4310,10 +4310,17 @@ class HeartFlow {
       const available = Object.keys(this._modules).sort().join(', ');
       throw new Error(`Unknown subsystem: ${subsystem}. Available: ${available}`);
     }
-    if (typeof mod[method] !== 'function') {
+
+    let fn = mod[method];
+    if (subsystem === 'pipeline' && method === 'run') {
+      const { runPipeline } = require('../workflow/pipeline.js');
+      fn = (...a) => runPipeline(...a, this);
+    }
+
+    if (typeof fn !== 'function') {
       throw new Error(`${subsystem}.${method} is not a function on ${subsystem}`);
     }
-    return mod[method](...args);
+    return fn.call(mod, ...args);
   }
 
   // [v6.0.71] 恢复 routes() 路由表
