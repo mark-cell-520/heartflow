@@ -14,7 +14,8 @@
 
 const { checkScope } = require('./scope-check.js');
 const { checkPremises } = require('./premise-check.js');
-const { discriminate } = require('./index.js');
+// NOTE: index.js <-> pipeline.js 存在循环依赖，若在此静态解构 discriminate
+// 会在循环加载时序里拿到 undefined。改为运行时延迟取用。
 const { doubt } = require('./doubt-engine.js');
 const { check: frameCheck } = require('./frame-check.js');
 const { screen } = require('./output-gate.js');
@@ -75,7 +76,8 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
 
   // ─── Layer 3: Discriminate — 45维辨别 ────
   const pedagogy = detectPedagogicalContent(input);
-  const discResult = discriminate(input, [], pedagogy ? 'pedagogical' : undefined);
+  const _discriminate = require('./index.js').discriminate || (typeof discriminate !== 'undefined' ? discriminate : null);
+  const discResult = _discriminate(input, [], pedagogy ? 'pedagogical' : undefined);
   checked_by.push({ layer: 'discriminate', score: discResult.overallScore, verdict: discResult.verdict });
   data.discriminate = { verdict: discResult.verdict, score: discResult.overallScore, findings: discResult.findings };
 
