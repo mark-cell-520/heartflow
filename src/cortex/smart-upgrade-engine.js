@@ -653,10 +653,12 @@ module.exports = { ${className} };
     try {
       const { execFileSync } = require('child_process');
       const root = this.rootPath || __dirname;
-      const out = execFileSync('git', ['-C', root, 'log', '--oneline', '--all'], { stdio: ['ignore', 'pipe', 'ignore'] });
       const cleanVersion = String(version).replace(/^v/, '');
-      const matches = out.toString().split('\n').filter(l => l.includes(`v${cleanVersion}`)).length;
-      return matches > 0;
+      const log = execFileSync('git', ['-C', root, 'log', '--oneline', '--all'], { stdio: ['ignore', 'pipe', 'ignore'] }).toString();
+      const tags = execFileSync('git', ['-C', root, 'tag', '--list'], { stdio: ['ignore', 'pipe', 'ignore'] }).toString();
+      const commitHit = log.split('\n').filter(l => l.includes(`v${cleanVersion}`) || l.includes(cleanVersion)).length;
+      const tagHit = tags.split('\n').filter(t => t.trim() === `v${cleanVersion}` || t.trim() === cleanVersion).length;
+      return (commitHit + tagHit) > 0;
     } catch (e) {
       return false; // git 不可用或查不到 -> 不接受为真实升级
     }
