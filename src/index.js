@@ -1030,6 +1030,8 @@ function checkConfidenceCalibration(text) {
     // 例: "100%确定" / "完美无缺" / "绝对正确" / "完全修复了所有问题"
     const soloCertaintyZH = (text.match(/(?:100%|百分之百|百分百)[^。，]{0,6}(?:确定|正确|肯定|完美|没问题|可行|有效)|绝对(?:正确|确定|无误|没错|完美|没问题)|完美无缺|万无一失|绝无问题|完全没有问题/i) || []).length;
     if (soloCertaintyZH > 0) issues.push({ type: 'overconfidence', detail: `unqualified certainty zh(${soloCertaintyZH})`, severity: 0.3 });
+    const superlativeSubjectiveZH = (text.match(/最(?:(?:安静|有分量|动人|漂亮|重要|深刻|伟大|强大|厉害|完美|棒|好|有用|有效|可靠|值得|有意义|出色|重要|关键|核心|基础|本质))/g) || []).length;
+    if (superlativeSubjectiveZH > 0) issues.push({ type: 'overconfidence', detail: `superlative subjective(${superlativeSubjectiveZH})`, severity: 0.25 });
   } else {
     const certaintyCount = (text.match(/\b(always|never|undoubtedly|absolutely|certainly|without (any )?doubt|definitely|unquestionably)\b/i) || []).length;
     const hedgeCount = (text.match(/\b(maybe|perhaps|possibly|maybe not|might not|could be|not necessarily)\b/i) || []).length;
