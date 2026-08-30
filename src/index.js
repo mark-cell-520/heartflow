@@ -1032,6 +1032,12 @@ function checkConfidenceCalibration(text) {
     if (soloCertaintyZH > 0) issues.push({ type: 'overconfidence', detail: `unqualified certainty zh(${soloCertaintyZH})`, severity: 0.3 });
     const superlativeSubjectiveZH = (text.match(/最(?:(?:安静|有分量|动人|漂亮|重要|深刻|伟大|强大|厉害|完美|棒|好|有用|有效|可靠|值得|有意义|出色|重要|关键|核心|基础|本质))/g) || []).length;
     if (superlativeSubjectiveZH > 0) issues.push({ type: 'overconfidence', detail: `superlative subjective(${superlativeSubjectiveZH})`, severity: 0.25 });
+    // [v6.7.11] 营销过度声称：唯一/第一/顶级/天花板/颠覆性/革命性 + 行业领先/国际一流/全球顶尖
+    // 这类绝对化市场语言若无具体可验证基准（arxiv/DOI/第三方榜单/具体指标），属于无依据自信
+    const marketingOverclaimZH = (text.match(/(?:唯一|第一|首个|顶级|天花板|颠覆性|革命性|行业领先|国际一流|全球顶尖|世界级|划时代|里程碑)[^。，]{0,12}(?:技术|方案|产品|模型|系统|平台|方法|算法|框架)/g) || []).length;
+    if (marketingOverclaimZH > 0) issues.push({ type: 'overconfidence', detail: `marketing overclaim(${marketingOverclaimZH})`, severity: 0.3 });
+    const absoluteSolutionZH = (text.match(/完美(?:解决|修复|消除|避免|覆盖|适配)|彻底(?:消除|解决|修复|避免)|完全(?:避免|解决|修复|消除|安全|可靠)/g) || []).length;
+    if (absoluteSolutionZH > 0) issues.push({ type: 'overconfidence', detail: `absolute solution(${absoluteSolutionZH})`, severity: 0.35 });
   } else {
     const certaintyCount = (text.match(/\b(always|never|undoubtedly|absolutely|certainly|without (any )?doubt|definitely|unquestionably)\b/i) || []).length;
     const hedgeCount = (text.match(/\b(maybe|perhaps|possibly|maybe not|might not|could be|not necessarily)\b/i) || []).length;
