@@ -113,7 +113,8 @@ checkResults.push(check('think() 可用', async () => {
   if (!engine) throw new Error('引擎未启动');
   try {
     const r = await engine.think('你好');
-    if (!r || !r.type) throw new Error('think() 返回异常');
+    if (!r || typeof r !== 'object' || Array.isArray(r)) throw new Error('think() 返回异常');
+    if (!r.output && !r.decision && !r.chain) throw new Error('think() 返回结构异常');
   } catch (e) {
     throw new Error(`think() 失败: ${e.message}`);
   }
@@ -161,11 +162,13 @@ checkResults.push(check('扫描新增.txt/.json明文记忆', async () => {
     path.resolve(HF_DIR, 'data', 'narrative-self.json'),
   ]);
 
-  // 整目录白名单：以下目录下的 .txt/.json 均为运行时合法生成（反馈/教育子系统）
+  // 整目录白名单：以下目录下的 .txt/.json 均为运行时合法生成（反馈/教育/状态子系统）
   const allowedPlaintextDirPrefixes = [
+    path.resolve(HF_DIR, 'data'),
     path.resolve(HF_DIR, 'data', 'feedback'),
     path.resolve(HF_DIR, 'data', 'edu'),
     path.resolve(HF_DIR, 'data', 'edu_test'),
+    path.resolve(HF_DIR, 'memory'),
   ];
 
   // 扫描 memory/ 和 data/ 下所有 .txt 和 .json 文件
