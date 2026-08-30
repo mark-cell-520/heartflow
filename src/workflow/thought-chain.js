@@ -510,6 +510,17 @@ class ThoughtChain {
           decisionResult = null;
         }
 
+        // [v6.7.8] DecisionEngine 公式化决策增强（DDM/SDT/prospect/bayes/Q-learning等11种模型）
+        let decisionEngineAnalysis = null;
+        try {
+          if (hf.decisionEngineV2 && typeof hf.decisionEngineV2.analyze === 'function') {
+            const drift = decisionResult?.confidence ?? 0.5;
+            decisionEngineAnalysis = hf.decisionEngineV2.analyze('ddm', {
+              drift, threshold: 1.0, startingPoint: 0, nonDecisionTime: 0.3, noise: 1
+            });
+          }
+        } catch (e) { /* 公式决策增强失败不阻断主链路 */ }
+
         // 5.0 【AgentPhilosophy v2.0.0】调用 AI 哲学新增维度（自处/发展/存在）
         let agentPhilosophyResult = null;
         if (hf.agentPhilosophy) {
@@ -649,6 +660,8 @@ class ThoughtChain {
           wasInverted,
           hasStrongEvidence: !!strongHypothesis,
           decisionSubsystem: decisionResult ? { conclusion: decisionResult.conclusion, confidence: decisionResult.confidence } : null,
+          // [v6.7.8] DecisionEngine 公式化决策增强（DDM 决策时间/错误率/准确率）
+          decisionEngineAnalysis,
           // 【AgentPhilosophy v2.0.0】AI 哲学新增维度结果
           agentPhilosophy: agentPhilosophyResult,
           // [v5.17.19 S3] 主动推理EFE决策结果

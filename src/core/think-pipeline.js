@@ -144,6 +144,18 @@ async function runThinkPipeline(result, input, engine) {
       }
     }
   } catch (_) { /* 非关键 */ }
+
+  // [v6.7.8] DecisionFeedback 学习闭环：把 think 决策结果反馈给规则权重调整
+  try {
+    if (engine.decisionFeedback && vResult) {
+      engine.decisionFeedback.recordOutcome({
+        type: 'thought-chain-synthesis',
+        ruleId: 'thought-chain-synthesis',
+        confidence: record.confidence,
+        context: { source: 'think-pipeline', input: typeof input === 'string' ? input.substring(0, 50) : '' }
+      }, vResult.score >= 0.6, vResult.issues?.length > 0 ? `verify issues: ${vResult.issues.length}` : 'verified');
+    }
+  } catch (_) { /* 非关键 */ }
   try { if (engine.learningPulse) { engine.learningPulse.beat(result || {}); } } catch (_) { /* 非关键 */ }
   // 假设驱动：从 ContinuousLearner 累积摘要中提取模式，生成假设→探索队列
   try {
