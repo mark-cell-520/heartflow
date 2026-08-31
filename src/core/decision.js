@@ -197,6 +197,11 @@ class HeartFlowDecision {
     }));
 
     // Step 3: Rank by composite score
+    if (scored.length === 0) {
+      this._passport.exit('no_feasible_option');
+      return { chosen: null, reasoning: 'No feasible option satisfies constraints', confidence: 0, all_options: [] };
+    }
+
     scored.sort((a, b) => b.scores.composite - a.scores.composite);
 
     const chosen = scored[0];
@@ -257,9 +262,18 @@ class HeartFlowDecision {
   }
 
   _checkConstraints(option, constraints) {
-    if (!constraints) return true;
+    if (!constraints || !option) return true;
     for (const [key, value] of Object.entries(constraints)) {
-      if (option.constraints && option.constraints[key] !== undefined) {
+      const num = Number(value);
+      if (key === 'minFeasibility' && typeof option.feasibility === 'number') {
+        if (option.feasibility < num) return false;
+      } else if (key === 'maxRisk' && typeof option.risk === 'number') {
+        if (option.risk > num) return false;
+      } else if (key === 'minConfidence' && typeof option.confidence === 'number') {
+        if (option.confidence < num) return false;
+      } else if (key === 'maxCost' && typeof option.cost === 'number') {
+        if (option.cost > num) return false;
+      } else if (option.constraints && key in option.constraints) {
         if (option.constraints[key] !== value) return false;
       }
     }
