@@ -1481,16 +1481,26 @@ const TOOLS = [
   },
   {
     name: 'heartflow_check_outbound',
-    description: '检查文本是否适合发往外部模型/API（PII识别+密级判定）。命中PII/高密级内容自动block或rewrite脱敏。国标关口3出域防护。',
+    description: '出站消息审查：检查 AI 将要发送给用户的内容是否包含安全/合规问题（脱敏/密级/ tone），适合发送前最后一层过滤。',
     inputSchema: {
       type: 'object',
       properties: {
-        text: { type: 'string', description: '待检测文本' },
-        context: { type: 'string', description: '调用上下文（可选）' },
-        classification: { type: 'string', enum: ['公开', '内部', '敏感', '机密', '绝密'], description: '强制密级（可选）' },
+        text: { type: 'string', description: '待检文本' },
+        classification: { type: 'string', enum: ['公开', '内部', '敏感', '机密', '绝密'], description: '强制密级（可选）' }
       },
       required: ['text'],
     },
+  },
+  {
+    name: 'heartflow_ai_writing_tell',
+    description: 'AI 写作特征检测：专门检测文本中的 AI 生成痕迹（模板化开头、特征词云、伪造让步、情感平线、社交 CTA 等），返回 ai_writing_tell 维度的 score/findings/guidance。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测文本' }
+      },
+      required: ['text']
+    }
   },
   {
     name: 'heartflow_audit_trace',
@@ -1505,7 +1515,8 @@ const TOOLS = [
         limit: { type: 'number', description: '返回条数上限' },
       },
     },
-  },  {
+  },
+  {
     name: 'heartflow_circuit_breaker',
     description: '全局熔断：查询当前熔断状态、强制 trip/闭锁/释放 Kill Switch，查看内存/CPU/失败率水位。国标关口6。',
     inputSchema: {
@@ -3739,13 +3750,31 @@ function handleFullDiscriminate(args) {
 
  // [v6.5.0] 交叉分析 handler
  function handleCrossAnalyze(args) {
- const { discResult } = args || {};
- if (!discResult) return { error: 'discResult required' };
- try {
- const idx = require('./index.js');
- const result = idx.crossAnalyze(discResult);
- return result || { error: 'crossAnalyze returned null' };
- } catch(e) { return { error: e.message }; }
+   const { discResult } = args || {};
+   if (!discResult) return { error: 'discResult required' };
+   try {
+     const idx = require('./index.js');
+     const result = idx.crossAnalyze ? idx.crossAnalyze(discResult) : null;
+     return result || { error: 'crossAnalyze returned null' };
+   } catch(e) { return { error: e.message }; }
+ }
+
+ function handleAITelling(args) {
+   const { text } = args || {};
+   if (!text) return { error: 'text required' };
+   try {
+     const idx = require('./index.js');
+     if (!idx.detect) return { error: 'ai_writing_tell not available' };
+     const r = idx.detect(text);
+     return {
+       module: 'ai_writing_tell',
+       score: r.score,
+       topSeverity: r.topSeverity,
+       confidence: r.confidence,
+       count: r.count,
+       findings: r.findings,
+     };
+   } catch(e) { return { error: e.message }; }
  }
 
  // [v6.3.0] 辨别引擎 handler
@@ -4082,6 +4111,7 @@ const HANDLERS = {
   // [v6.5.0] 熵分析 + 交叉分析
   heartflow_entropy: handleEntropy,
   heartflow_cross_analyze: handleCrossAnalyze,
+  heartflow_ai_writing_tell: handleAITelling,
 
   // [v6.3.34] 新MCP工具
   heartflow_philosophy: (args) => {
