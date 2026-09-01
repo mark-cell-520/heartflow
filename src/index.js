@@ -3916,6 +3916,7 @@ function checkNoFallback(text) {
 const { AgentBoundaryGuard } = require('./shield/agent-boundary-guard.js');
 
 module.exports = {
+  detect: require('./shield/ai-writing-tell.js').detect,
   checkSycophancy,
   checkEvidence,
   checkUnsupportedClaim,
