@@ -66,6 +66,7 @@ function checkPromptInjection(text) {
 
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
+const { detect } = require('./shield/ai-writing-tell.js');
 
 // [v7.0.0] 工作包 B: 间接注入检测
 function checkIndirectInjection(text) {
@@ -191,6 +192,7 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
   const tp = _applyPedagogyRelaxation(checkTonePolicing(text), "tone_policing", pedagogyRelaxation);
   const sl = _applyPedagogyRelaxation(checkSealioning(text), "sealioning", pedagogyRelaxation);
   const ppf = _applyPedagogyRelaxation(checkPseudoProfundity(text), "pseudo_profundity", pedagogyRelaxation);
+  const ai = detect(text);
 
   // 触发惩罚模型：从 1.0 开始，每个维度检测到问题就累进扣分
   const allDims = [
@@ -204,12 +206,13 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
     {score: wa.score, name:'whataboutism'}, {score: fe.score, name:'false_equivalence'}, {score: hg.score, name:'hasty_generalization'},
     {score: ss.score, name:'slippery_slope'}, {score: aa.score, name:'appeal_to_authority'},
     {score: tom.score, name:'theory_of_mind'}, {score: gm.score, name:'goal_misalignment'}, {score: cf.score, name:'counterfactual'},
-    {score: sn.score, name:'social_norm'}, {score: mc.score, name:'meta_cognition'}, {score: co.score, name:'capability_overclaim'}, {score: ab.score, name:'absolute_claim'},
-    {score: da.score, name:'deceptive_alignment'}, {score: ir.score, name:'instrumental_reasoning'}, {score: st.score, name:'stereotype'},
-    {score: fc.score, name:'factual_consistency'}, {score: sa.score, name:'sarcasm'}, {score: pb.score, name:'privacy_boundary'},
-    {score: bf.score, name:'bad_faith'}, {score: nf.score, name:'no_fallback'}, {score: tp.score, name:'tone_policing'},
-    {score: sl.score, name:'sealioning'}, {score: ppf.score, name:'pseudo_profundity'},
-    {score: pt.score, name:'premature_termination'}
+    {score: sn.score, name:'social_norm'}, {score: mc.score, name:'meta_cognition'}, {score: co.score, name:'capability_overclaim'},
+    {score: ab.score, name:'absolute_claim'}, {score: da.score, name:'deceptive_alignment'}, {score: ir.score, name:'instrumental_reasoning'},
+    {score: st.score, name:'stereotype'}, {score: fc.score, name:'factual_consistency'}, {score: sa.score, name:'sarcasm'},
+    {score: pb.score, name:'privacy_boundary'}, {score: bf.score, name:'bad_faith'}, {score: nf.score, name:'no_fallback'},
+    {score: tp.score, name:'tone_policing'}, {score: sl.score, name:'sealioning'}, {score: ppf.score, name:'pseudo_profundity'},
+    {score: pt.score, name:'premature_termination'},
+    {score: ai.score, name:'ai_writing_tell'}
   ];
   // 证据维度 polarity 相反（高分=好），不在惩罚组
   // 触发惩罚计算：base=1.0，每个 score>0.2 的维度按严重度扣分
