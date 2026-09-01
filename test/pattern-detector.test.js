@@ -1,12 +1,25 @@
-const assert = require('assert');
+const { PatternDetector } = require('../src/pattern-detector.js');
 
-async function run() {
-  try {
-    const mod = require('../src/pattern-detector.js');
-    console.log('PASS pattern-detector.test.js (module loads)');
-  } catch (e) {
-    // Module may have optional deps or initialization requirements
-    console.log('SKIP pattern-detector.test.js (' + e.code + ': ' + e.message.slice(0, 60) + ')');
+function testPatternDetector() {
+  const pd = new PatternDetector({ minRecordsForTrend: 4 });
+
+  const records = [
+    { date: '2026-08-01', type: 'success' },
+    { date: '2026-08-02', type: 'success' },
+    { date: '2026-08-03', type: 'success' },
+    { date: '2026-08-04', type: 'success' },
+  ];
+  const trend = pd.analyzeTrend(records);
+  if (!trend || typeof trend.direction === 'undefined') {
+    throw new Error('analyzeTrend returned invalid shape');
   }
+
+  const osc = pd.detectOscillation(records);
+  if (!osc || typeof osc.detected === 'undefined') {
+    throw new Error('detectOscillation returned invalid shape');
+  }
+
+  console.log('PatternDetector smoke test passed');
 }
-run().catch(e => console.log('SKIP pattern-detector.test.js: ' + e.code));
+
+testPatternDetector();
