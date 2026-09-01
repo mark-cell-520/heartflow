@@ -4717,6 +4717,26 @@ class HeartFlow {
     } catch (_) { /* Reflector 数据流失败不阻断主链路 */ }
   } catch (_) { /* 自省计数失败不阻断主链路 */ }
 
+    // [v6.7.13] Feedback evaluation logger: attach lightweight gate-quality signals
+    try {
+      if (typeof input === 'string' && input.trim().length > 0) {
+        const { FeedbackFunctions } = require('../cortex/feedback-functions.js');
+        const text = input.trim();
+        const grounded = await FeedbackFunctions.groundedness().evaluate({ response: text, context: [text] });
+        const toxicity = await FeedbackFunctions.toxicity().evaluate({ text });
+        const helpful = await FeedbackFunctions.helpfulness().evaluate({ response: text });
+        const honest = await FeedbackFunctions.honesty().evaluate({ response: text, isFactual: /[?？]/.test(text) });
+        const summary = [grounded, toxicity, helpful, honest]
+          .filter(r => r && r.score !== null)
+          .map(r => `${r.feedbackName || r.name || 'metric'}=${(r.score * 100).toFixed(0)}%`);
+        if (summary.length) {
+          const tag = summary.join('; ');
+          result._feedbackSummary = tag;
+          if (result.output && typeof result.output === 'object') result.output._feedbackSummary = tag;
+        }
+      }
+    } catch (_) { /* feedback logger 不阻断主链路 */ }
+
   return result;
   }
 
