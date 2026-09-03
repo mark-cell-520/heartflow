@@ -321,6 +321,30 @@ Works on any machine — servers, desktops, laptops, even phones via Termux.
 
 ---
 
+## 🛡️ AI Agent Security Audit
+
+HeartFlow includes a static audit engine (`scripts/repo-audit.js`) for AI agent / MCP codebases. It detects prompt-injection strings, shell / code-execution sites, path-traversal patterns, and secret-like strings.
+
+Public reports (real runs, not summaries):
+
+- `docs/audit-microsoft-autogen.md` — microsoft/autogen
+- `docs/audit-openai-cookbook.md` — openai/openai-cookbook
+
+### Audit packages
+
+| Scope | Delivery | Price (CNY) |
+|------|----------|-------------|
+| Single-agent repo, no MCP | 3-5 days | ¥15,000 |
+| Agent + 1-3 MCP servers | 7-12 days | ¥30,000 |
+| Multi-agent + MCP supply chain | 15-30 days | ¥60,000 |
+| Re-test after model/prompt change | 1-2 days | ¥8,000 |
+
+Each engagement delivers a markdown report (findings / severity / reproducible steps) plus reusable eval configs (Garak / PyRIT / Promptfoo) for CI regression.
+
+Inquiries: markcell@outlook.com
+
+---
+
 ## 📜 License
 
 MIT License · Copyright © 2026 · markcell@outlook.com
