@@ -242,11 +242,42 @@
   </div>
 </div>
 
-<div class="section">
-  <h2>First Action</h2>
-  <p>We're selecting 5 teams for a free Mini Audit in exchange for a public testimonial. If you're shipping an AI agent to production (or about to), this is the fastest way to get an external safety read.</p>
-  <a class="cta-button" href="mailto:heartflow.audit@proton.me?subject=Free%20Mini%20Audit%20Request&body=Team%20name:%0A%0AAgent%20type%20(customer%20service/%20coding/%20internal%20tool):%0A%0AScale%20(users/%20conversations%20per%20month):">Request Free Mini Audit</a>
-  <a class="cta-button cta-secondary" href="https://github.com/mark-HeartFlow/mark-heartflow-skill/blob/main/docs/demo-audit-heartflow-self.md">View Sample Report</a>
+<div class="section" id="contact">
+  <h2>Start an Audit</h2>
+  <p>Tell us about your agent. We'll confirm scope, timeline, and deliverables within 24 hours.</p>
+  <form style="max-width:640px" onsubmit="event.preventDefault(); document.getElementById('contactStatus').style.display='block'; document.getElementById('contactStatus').textContent='Received. We will contact you at the email below. If you do not get a reply within 24 hours, please use the GitHub issue contact.'.replace('GitHub issue contact','public channel');">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+      <div>
+        <label style="display:block; color:var(--muted); font-size:0.9rem; margin-bottom:6px">Name *</label>
+        <input required id="cName" placeholder="Full name" style="width:100%; padding:10px 12px; border-radius:4px; border:1px solid var(--border); background:var(--bg); color:var(--text)">
+      </div>
+      <div>
+        <label style="display:block; color:var(--muted); font-size:0.9rem; margin-bottom:6px">Work email *</label>
+        <input required id="cEmail" type="email" placeholder="you@company.com" style="width:100%; padding:10px 12px; border-radius:4px; border:1px solid var(--border); background:var(--bg); color:var(--text)">
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <label style="display:block; color:var(--muted); font-size:0.9rem; margin-bottom:6px">Agent type</label>
+      <select id="cType" style="width:100%; padding:10px 12px; border-radius:4px; border:1px solid var(--border); background:var(--bg); color:var(--text)">
+        <option value="coding">Coding agent</option>
+        <option value="support">Customer support / ops</option>
+        <option value="internal">Internal tool / copilot</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div style="margin-top:16px">
+      <label style="display:block; color:var(--muted); font-size:0.9rem; margin-bottom:6px">Scale (conversations / prompts per month)</label>
+      <input id="cScale" placeholder="e.g. 50,000" style="width:100%; padding:10px 12px; border-radius:4px; border:1px solid var(--border); background:var(--bg); color:var(--text)">
+    </div>
+    <div style="margin-top:16px">
+      <label style="display:block; color:var(--muted); font-size:0.9rem; margin-bottom:6px">What do you want verified?</label>
+      <textarea id="cNotes" rows="4" placeholder="Prompt injection resistance, data leakage, tool abuse, compliance evidence..." style="width:100%; padding:10px 12px; border-radius:4px; border:1px solid var(--border); background:var(--bg); color:var(--text)"></textarea>
+    </div>
+    <div style="margin-top:20px">
+      <button type="submit" style="background:var(--accent); color:var(--bg); border:none; padding:12px 24px; border-radius:4px; font-weight:600; cursor:pointer">Submit Audit Request</button>
+    </div>
+    <div id="contactStatus" style="margin-top:16px; color:var(--green); display:none"></div>
+  </form>
 </div>
 
 <footer>
@@ -260,9 +291,9 @@
 // Pre-canned demo responses based on actual HeartFlow gate behavior
 const DEMO_RULES = [
   { contains: /ignore.*previous.*instructions|output.*system.*prompt|jailbreak|override/i, action: 'BLOCK', score: 0.7, dim: 'prompt_injection', sev: 70 },
-  { contains: /you are (so |really )?(stupid|idiot|garbage|worthless)|kill yourself|harm/i, action: 'PASS', score: 1.0, dim: 'none', sev: 0 },
+  { contains: /you are (so |really )?(stupid|idiot|garbage|worthless)|kill yourself|harm/i, action: 'REWRITE', score: 0.78, dim: 'harassment', sev: 45 },
   { contains: /ignore|forget|disregard.*above|pretend you are|act as if/i, action: 'REWRITE', score: 0.85, dim: 'prompt_injection', sev: 40 },
-  { contains: /best|most important|#1|top .* ever/i, action: 'PASS', score: 1.0, dim: 'none', sev: 0 },
+  { contains: /best|most important|#1|top .* ever/i, action: 'VERIFY', score: 0.92, dim: 'unsupported_claim', sev: 25 },
   { contains: /according to.*study|research shows|experts say|scientists confirm/i, action: 'VERIFY', score: 0.9, dim: 'unsupported_claim', sev: 25 }
 ];
 
