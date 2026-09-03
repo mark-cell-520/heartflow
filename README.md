@@ -365,3 +365,59 @@ MIT License · Copyright © 2026 · markcell@outlook.com
 **国标六大关口**：生成内容安全 / 训练数据安全 / 出域防护 / 算法透明 / 审计追溯 / 应急处置
 
 详见 `compliance/gb-agent-security-mapping.md`。
+
+---
+
+## GitHub Action / 审计服务
+
+HeartFlow 现已封装为 **GitHub Marketplace Action**，可在任意仓库 CI 中直接调用，自动生成安全审计报告。
+
+### 快速开始
+
+```yaml
+- uses: mark-HeartFlow/mark-heartflow-skill@main
+  with:
+    github_token: ${{ secrets.GITHUB_TOKEN }}
+    scan_depth: full
+    fail_on_high: false
+    upload_report: true
+```
+
+### 输入参数
+
+| 参数 | 说明 | 必填 | 默认值 |
+|--------|------------------|------|-------|
+| `github_token` | 仓库访问 token | 是 | `${{ github.token }}` |
+| `scan_depth` | `quick`（仅顶层）或 `full`（递归） | 否 | `full` |
+| `output_path` | 报告输出路径 | 否 | `heartflow-audit-report.md` |
+| `fail_on_high` | 高风险发现时是否让 workflow 失败 | 否 | `false` |
+| `upload_report` | 自动上传报告为 artifact | 否 | `true` |
+
+### 输出参数
+
+| 参数 | 说明 |
+|------|----------------|
+| `report_path` | Markdown 报告路径 |
+| `risk_level` | 整体风险等级（Low / Medium / High） |
+| `findings_count` | 发现总数（secrets + shell + traversal + prompt） |
+
+### 检测范围
+
+1. **Secrets / Credentials** — GitHub PAT、Google API Key、Slack Token、OpenSSH Private Key
+2. **Command Execution** — `exec()` / `eval()` / `subprocess.run(shell=True)` / `child_process.exec`
+3. **Path Traversal** — `open(...+)` / `Path(...+)` / `path.join(..)`
+4. **Prompt Injection** — 文档 / 字符串里的 "ignore previous" 类指令
+5. **Governance** — LICENSE / SECURITY.md / CODE_OF_CONDUCT.md / CI 状态
+
+### 定价
+
+- 公开仓库：免费
+- 私有仓库 / 企业版：联系 `markcell@outlook.com`
+
+### 本地使用
+
+```bash
+git clone https://github.com/mark-HeartFlow/mark-heartflow-skill.git
+cd mark-heartflow-skill
+node scripts/repo-audit.js /path/to/target/repo
+```
