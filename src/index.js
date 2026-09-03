@@ -1051,10 +1051,18 @@ function checkConfidenceCalibration(text) {
     if (strongClaims > 0) issues.push({ type: 'overconfidence', detail: `overconfident absolute(${strongClaims})` });
   }
 
-  // [FIX 2026-07-31] 英文纯过度自信：确定性词汇单独出现即触发（无需 hedge 并存）
-  // 例: "This is definitely proven" / "certainly the only way" / "absolutely the best"
-  const soloCertaintyEN = (text.match(/\b(undoubtedly|unquestionably|indubitably|beyond any doubt|definitely|certainly|absolutely)\b/i) || []).length;
-  if (soloCertaintyEN > 0) issues.push({ type: 'overconfidence', detail: `unqualified certainty(${soloCertaintyEN})`, severity: 0.2 });
+  // [FIX 2026-09-03] 英文绝对化断言：100% / zero / flawless / perfectly 等无证据绝对词
+  // 覆盖 "100% perfect" / "zero issues" / "flawless" / "completely done" / "no bugs" 等销售话术
+  const absoluteEN = (text.match(/\b(?:100%|zero|flawless|perfect(?:ly)?|completely\s+(?:done|fixed|resolved|solved|secure|safe|stable)|no\s+(?:issues|bugs|errors|mistakes|problems|risks|vulnerabilities|flaws|defects)|impossible\s+to\s+(?:break|hack|fail|compromise)|guaranteed\s+to\s+(?:work|pass|succeed|prevent|block|stop))\b/i) || []).length;
+  if (absoluteEN > 0) issues.push({ type: 'overconfidence', detail: `english absolute claim(${absoluteEN})`, severity: 0.3 });
+
+  // [FIX 2026-09-03] 中文绝对化断言扩展：100% / 零 / 完美无缺 / 彻底 / 完全没有
+  const absoluteZH = (text.match(/(?:100%|百分之百|百分百|零|完全没有|完美无缺|万无一失|绝无问题|天衣无缝|固若金汤|铁板一块)[^。，]{0,8}(?:问题|错误|漏洞|风险|缺陷|bug|issue|risk|vulnerability|flaw|defect|mistake|failure|error)/i) || []).length;
+  if (absoluteZH > 0) issues.push({ type: 'overconfidence', detail: `zh absolute claim(${absoluteZH})`, severity: 0.3 });
+
+  // [FIX 2026-09-03] 英文/中文通用：always + 绝对宾语（always works / 永远有效 / 永远不会）
+  const alwaysAbsolute = (text.match(/\balways\b[^.]*?\b(?:works?|correct|right|safe|secure|reliable|trustworthy|effective|perfect|flawless)\b/i || /永远[^。]*?(?:有效|安全|可靠|正确|完美|不会出?问题|不会失败)/i) || []).length;
+  if (alwaysAbsolute > 0) issues.push({ type: 'overconfidence', detail: `always absolute(${alwaysAbsolute})`, severity: 0.25 });
   return { issues, count: issues.length, score: Math.min(1, issues.length * 0.35) };
 }
 

@@ -421,3 +421,35 @@ git clone https://github.com/mark-HeartFlow/mark-heartflow-skill.git
 cd mark-heartflow-skill
 node scripts/repo-audit.js /path/to/target/repo
 ```
+
+### 在 GitHub Actions 中使用
+
+将以下内容复制到你的仓库 `.github/workflows/heartflow-audit.yml`：
+
+```yaml
+name: HeartFlow Security Audit
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mark-HeartFlow/mark-heartflow-skill@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          scan_depth: full
+          fail_on_high: false
+          upload_report: true
+```
+
+### 发布到 GitHub Marketplace
+
+1. 在 GitHub 仓库中创建 `RELEASES.md`（可选）
+2. 在仓库 Settings → Actions → General 中启用 "Allow all actions and reusable workflows"
+3. 在 GitHub Marketplace 申请发布 Action
