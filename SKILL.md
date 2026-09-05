@@ -156,11 +156,12 @@ node bin/cli.js status      # 查看状态
 
 ```javascript
 const hf = require('@yun520-1/heartflow');
+const gate = require('./src/gate.js');
 
-hf.checkInput(text)   // 判别用户输入
-hf.checkDraft(text)   // 判别 AI 草稿
-hf.checkOutput(text)  // 判别 AI 输出（发送前）
-hf.runPipeline({ input, mode, anchor })  // 完整管线
+gate.checkInput(text)   // 判别用户输入
+gate.checkDraft(text)   // 判别 AI 草稿
+gate.checkOutput(text)  // 判别 AI 输出（发送前）
+require('./src/pipeline.js').runPipeline({ input, mode, anchor })  // 完整管线
 ```
 
 ### MCP 工具（129 个）

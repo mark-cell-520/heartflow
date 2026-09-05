@@ -1,11 +1,11 @@
-# HeartFlow Changelog
 
-All notable changes to HeartFlow AI Cognitive Engine.
+## [6.7.13] - 2026-09-05
 
-Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-This project adheres (mostly) to [Semantic Versioning](https://semver.org/).
-
-> ⚠️ **本 CHANGELOG 基于 git log 重建。v1.x-v2.x 段的旧版本模块大部分已移除/重构，仅作为历史记录保留。当前能力以 SKILL.md frontmatter 与 `src/` 实际存在代码为准。**
+### Changed
+- 文档 API 修正：`hf.checkOutput` 等入口统一改为 `require('./src/gate.js').checkOutput`
+- transformers ESM 兼容：`@xenova/transformers` 改为可选加载，`require()` 失败时优雅降级
+- CLI 体验：无 LLM key 时补充配置指引
+- 测试基线更新：410/0
 
 ---
 ## [6.7.0] - 2026-08-27

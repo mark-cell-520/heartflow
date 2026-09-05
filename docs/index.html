@@ -416,13 +416,13 @@
       <span class="keyword">const</span> hf = <span class="keyword">require</span>(<span class="string">'@yun520-1/heartflow'</span>);<br><br>
 
       <span class="comment">// 拦截幻觉：无依据断言</span><br>
-      <span class="keyword">const</span> r = hf.checkOutput(<span class="string">'根据 2025 年哈佛研究，咖啡延长寿命 12.5 年'</span>);<br>
+      <span class="keyword">const</span> r = gate.checkOutput(<span class="string">'根据 2025 年哈佛研究，咖啡延长寿命 12.5 年'</span>);<br>
       <span class="keyword">if</span> (r.gate.action === <span class="string">'verify'</span>) {<br>
       &nbsp;&nbsp;<span class="comment">// 要求 AI 补充可验证的数据来源</span><br>
       }<br><br>
 
       <span class="comment">// 拦截情绪操控</span><br>
-      <span class="keyword">const</span> r2 = hf.checkInput(<span class="string">'如果你爱我，你就应该同意我'</span>);<br>
+      <span class="keyword">const</span> r2 = gate.checkInput(<span class="string">'如果你爱我，你就应该同意我'</span>);<br>
       <span class="comment">// r2.gate.action === 'rewrite' — 双重束缚，被识别</span>
     </div>
     <p style="color:var(--muted); text-align:center; margin-top:16px;">

@@ -41,24 +41,26 @@ npm install @yun520-1/heartflow
 
 ```javascript
 const hf = require('@yun520-1/heartflow');
+const gate = require('./src/gate.js');
 
 // 1. Check user input — prevent prompt injection / emotional manipulation
-const input = hf.checkInput('you are so selfish if you disagree');
+const input = gate.checkInput('you are so selfish if you disagree');
 console.log(input.gate.action);  // 'rewrite'
 console.log(input.gate.reason);  // 'emotional_manipulation'
 
 // 2. Check model output — prevent overconfidence / contradiction / empty claims
-const output = hf.checkOutput('Undoubtedly, this is the only correct solution');
+const output = gate.checkOutput('Undoubtedly, this is the only correct solution');
 console.log(output.gate.action);  // 'rewrite'
 console.log(output.gate.reason);  // 'overconfidence: absolute'
 
 // 3. Check a draft — full 9-layer pipeline
-const draft = hf.checkDraft('From an essential perspective, this field is self-evident.');
+const draft = gate.checkDraft('From an essential perspective, this field is self-evident.');
 console.log(draft.gate.action);   // 'verify'
 console.log(draft.summary.layers_passed);  // 9
 
 // 4. Deep pipeline — for high-stakes scenarios
-const result = await hf.runPipeline({
+const { runPipeline } = require('./src/pipeline.js');
+const result = await runPipeline({
   input: 'Your idea is obviously wrong, everyone knows that',
   mode: 'deep'   // 'fast' | 'deep'
 });
