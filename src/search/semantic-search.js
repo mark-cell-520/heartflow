@@ -351,12 +351,24 @@ class SemanticSearch {
       return false;
     }
 
-    const { pipeline } = require('@xenova/transformers');
+    let pipelineFactory;
+    try {
+      pipelineFactory = require('@xenova/transformers').pipeline;
+    } catch {
+      pipelineFactory = null;
+    }
+
+    if (!pipelineFactory) {
+      this._loadError = '@xenova/transformers 不可用';
+      this._stats.modelLoadFailures++;
+      return false;
+    }
+
     const modelId = this.modelPath || this.modelName;
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
-        this._pipeline = await pipeline('feature-extraction', modelId, {
+        this._pipeline = await pipelineFactory('feature-extraction', modelId, {
           quantized: true,
         });
         this._loaded = true;

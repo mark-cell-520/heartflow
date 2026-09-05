@@ -88,9 +88,19 @@ function getSemanticSearch() {
 
       const { SemanticSearch } = require('../search/semantic-search.js');
 
-      const { env } = require('@xenova/transformers');
+      let transformersEnv;
+      try {
+        transformersEnv = require('@xenova/transformers');
+      } catch {
+        transformersEnv = null;
+      }
 
-      env.allowRemoteModels = false; // 只用本地模型
+      if (transformersEnv) {
+        const env = transformersEnv.env || transformersEnv;
+        if (env && typeof env.allowRemoteModels === 'boolean') {
+          env.allowRemoteModels = false; // 只用本地模型
+        }
+      }
 
       _semanticSearch = new SemanticSearch({ model: 'Xenova/all-MiniLM-L6-v2' });
 

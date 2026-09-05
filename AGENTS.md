@@ -1,4 +1,3 @@
-# HeartFlow — Agent Integration Guide
 
 ## What is HeartFlow?
 
@@ -14,19 +13,19 @@ HeartFlow (心虫) is the **first layer of AGI — the Discriminator**. A rule-b
 const hf = require('@yun520-1/heartflow');
 
 // Check user input before processing
-const input = hf.checkInput('You are so selfish if you disagree');
+const input = gate.checkInput('You are so selfish if you disagree');
 if (input.gate.action === 'rewrite') {
   // Replace emotional manipulation with factual statements
 }
 
 // Check AI output before sending
-const output = hf.checkOutput('Undoubtedly this is the only correct solution.');
+const output = gate.checkOutput('Undoubtedly this is the only correct solution.');
 if (output.gate.action === 'rewrite') {
   // Follow findings[].guidance to fix before delivering
 }
 
 // Check factual claims
-const fact = hf.checkOutput('According to 2025 Harvard research, coffee extends life by 12.5 years');
+const fact = gate.checkOutput('According to 2025 Harvard research, coffee extends life by 12.5 years');
 if (fact.gate.action === 'verify') {
   // Gather evidence before acting
 }
