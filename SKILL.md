@@ -1,7 +1,7 @@
 ---
 name: heartflow-engine
 title: "心虫 HeartFlow — AGI 第 1 层辨别者"
-version: "6.7.13"
+version: "6.7.14"
 description: |-
   心虫(HeartFlow)是AGI第1层——辨别者。纯规则引擎，判别对错/好坏/安全/危险。
   47维判别 × 9层管线 × 129模块 × 130 MCP工具，零LLM依赖。
@@ -67,7 +67,7 @@ logicReasoning · judgmentEngine · mctsReasoning · counterfactualVerifier · d
 decisionRouter · decisionVerifier · decisionEngineV2 · activeInference · selfHealing · execution
 
 ### 3. 认知域
-cognitiveEngine · cognitiveLoad · metacognitiveRL · metacognitiveFeedback · confidence · metaJudgment · sustainedDriftDetector · wisdomEngine · focusOfAttention
+cognitiveEngine · cognitiveLoad · metacognitiveRL · metacognitiveFeedback · confidence · metaJudgment · sustainedDriftDetector · wisdomEngine · focusOfAttention · classicsRules
 
 ### 4. 情绪心理域
 emotion · emotionDynamics · psychology · psychologyDialogue · empathyDeepening · hopeEngine · griefEngine · sufferingResilience · postTraumaticGrowth · forgivenessEngine · traumaInformed · conflictResolution · loveCognition

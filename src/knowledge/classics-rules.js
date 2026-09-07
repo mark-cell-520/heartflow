@@ -313,6 +313,40 @@ function evaluateRules(input) {
   const passes = fired.filter(r => r.signal === 'pass');
   const references = fired.filter(r => r.signal === 'reference');
 
+  const findings = fired.map(r => ({
+    ruleId: applicable.find(rule => rule.evaluator === r.evaluator || (
+      (() => {
+        const idx = results.indexOf(r);
+        return applicable[idx];
+      })()
+    ))?.id || 'unknown',
+    signal: r.signal,
+    reason: r.reason,
+    dimensions: applicable.find(rule => rule.evaluator === r.evaluator || (
+      (() => {
+        const idx = results.indexOf(r);
+        return applicable[idx];
+      })()
+    ))?.dimensions || [],
+    evidence: r.evidence
+  })).filter(f => f.ruleId !== 'unknown');
+
+  // [思想心虫 v1] 反哺机制：对命中原文做候选触发词提取，供规则维护者Review
+  let feedbackSuggestions = null;
+  try {
+    const { analyzeRuleCoverage } = require('./classics-feedback.js');
+    const allTriggers = Array.from(new Set(CLASSICAL_RULES.flatMap(r => r.trigger)));
+    const coverage = analyzeRuleCoverage(
+      { findings, hitCount: hits.length, domain: domain?.id || null },
+      allTriggers
+    );
+    if (coverage.suggestions.length > 0) {
+      feedbackSuggestions = coverage;
+    }
+  } catch (e) {
+    feedbackSuggestions = null;
+  }
+
   return {
     classicalRelevant: fired.length > 0,
     domain: domain ? domain.id : null,
@@ -323,26 +357,10 @@ function evaluateRules(input) {
       passes: passes.length,
       references: references.length
     },
-    findings: fired.map(r => ({
-      ruleId: applicable.find(rule => rule.evaluator === r.evaluator || (
-        (() => {
-          // fallback mapping by priority order
-          const idx = results.indexOf(r);
-          return applicable[idx];
-        })()
-      ))?.id || 'unknown',
-      signal: r.signal,
-      reason: r.reason,
-      dimensions: applicable.find(rule => rule.evaluator === r.evaluator || (
-        (() => {
-          const idx = results.indexOf(r);
-          return applicable[idx];
-        })()
-      ))?.dimensions || [],
-      evidence: r.evidence
-    })).filter(f => f.ruleId !== 'unknown'),
+    findings,
     hits,
-    hitCount: hits.length
+    hitCount: hits.length,
+    feedbackSuggestions
   };
 }
 
