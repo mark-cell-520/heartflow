@@ -26,6 +26,7 @@ const { verify } = require('./verifier.js');
 const { rewrite } = require('./rewriter.js');
 const { checkAdversarialVariant } = require('./shield/adversarial-variant.js');
 const { detectPedagogicalContent } = require('./pedagogy.js');
+const { evaluateRules } = require('./knowledge/classics-value-mapper.js');
 
 let pipelineAnchor = null;
 
@@ -80,6 +81,13 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
   const discResult = _discriminate(input, [], pedagogy ? 'pedagogical' : undefined);
   checked_by.push({ layer: 'discriminate', score: discResult.overallScore, verdict: discResult.verdict });
   data.discriminate = { verdict: discResult.verdict, score: discResult.overallScore, findings: discResult.findings };
+
+  // ─── Layer 3.2: Classical Knowledge — 古籍思想维度 ─────
+  const classicalResult = evaluateRules(input);
+  if (classicalResult.classicalRelevant) {
+    checked_by.push({ layer: 'classical-knowledge', hits: classicalResult.hitCount, domain: classicalResult.domain });
+    data.classical = classicalResult;
+  }
 
   // ─── Layer 3.5: Adversarial Variant — 对抗变体检测 ────
   // 启发：Hermes 专访「任何模型都可越狱，因为你有无限次尝试」——
