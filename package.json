@@ -1,6 +1,6 @@
 {
   "name": "@mark-heartflow/heartflow",
-  "version": "6.7.16",
+  "version": "6.7.17",
   "description": "HeartFlow (心虫) — AGI Layer 1: the Discriminator. Rule-based engine that checks what AI says before it reaches humans. 45 discrimination dimensions, 12 check layers, 129 modules (logic/decision/cognition/emotion/memory/ethics/collaboration), 130 MCP tools. Zero LLM dependency. The gate that says NO when something is wrong.",
   "main": "src/gate.js",
   "bin": {
