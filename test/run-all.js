@@ -115,6 +115,8 @@ async function runAllTests() {
 
   runSubTest('📚 KnowledgeOntology', 'knowledge-ontology.test.js');
   runSubTest('🔍 KnowledgeQuery', 'knowledge-query.test.js');
+  runSubTest('📜 ClassicsValueMapper', 'knowledge/classics-value-mapper.test.js');
+  runSubTest('📜 ClassicsRules', 'knowledge/classics-rules.test.js');
   runSubTest('⚖️ DualPerspectiveAuditor', 'dual-perspective.test.js');
   runSubTest('📡 SignalAbsorber', 'signal-absorber.test.js');
   runSubTest('🛡️ AgentBoundaryGuard', 'agent-boundary-guard.test.js');
