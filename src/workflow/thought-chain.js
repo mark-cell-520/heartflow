@@ -175,6 +175,15 @@ class ThoughtChain {
           }
         } catch(e) { /* 知识检索降级 */ }
 
+        // [思想心虫 v1] 古典规则检索：对古典/伦理/治理类命题做可运行规则判别
+        let classicalRuleResult = null;
+        try {
+          const { evaluateRules } = require('../knowledge/classics-rules.js');
+          classicalRuleResult = evaluateRules(input);
+        } catch (e) {
+          classicalRuleResult = null;
+        }
+
         // 1.8 【AgentPsychology v2.0.0】调用 AI 心理学新增维度
         let agentPsychologyResult = null;
         if (hf.agentPsychology) {
@@ -228,6 +237,8 @@ class ThoughtChain {
           strategy,
           // [P2-T2-WF] 预取知识命中结果，供下游阶段复用
           knowledgeHits,
+          // [思想心虫 v1] 古典规则判别结果
+          classicalRuleResult,
           // 串联结果：心理分析 + 共情检测
           psychology: psychResult ? {
             intent: psychResult.intent,
