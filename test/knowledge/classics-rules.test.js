@@ -3,7 +3,7 @@
  * HeartFlow 古典规则引擎测试
  */
 
-const { evaluateRules, evaluate, CLASSICAL_RULES } = require('../../src/knowledge/classics-rules');
+const { evaluateRules, evaluate, CLASSICAL_RULES, searchClassicsBatch, parseHit } = require('../../src/knowledge/classics-rules');
 
 function test(name, fn) {
   try {
@@ -22,7 +22,7 @@ function assert(cond, msg) {
 console.log('\n📜 ClassicsRules (classics-rules.js)');
 
 test('CLASSICAL_RULES 非空且每条含 id/source/canonical/trigger/evaluator/dimensions', () => {
-  assert(Array.isArray(CLASSICAL_RULES) && CLASSICAL_RULES.length >= 5, 'rules count');
+  assert(Array.isArray(CLASSICAL_RULES) && CLASSICAL_RULES.length >= 8, 'rules count');
   for (const r of CLASSICAL_RULES) {
     assert(r.id, `missing id in ${r.source}`);
     assert(r.source, 'missing source');
@@ -104,4 +104,60 @@ test('evaluateRules 四谛八正道 → pass/reference', () => {
   const out = evaluateRules('四谛：苦集灭道；八正道：正见、正思惟、正语、正业、正命、正精进、正念、正定。');
   assert(out.classicalRelevant === true, 'should be relevant');
   assert(out.summary.passes + out.summary.references >= 1, 'expect pass or reference');
+});
+
+test('evaluateRules 忠恕之道+推己及人 → pass', () => {
+  const out = evaluateRules('夫子之道忠恕而已矣；己所不欲，勿施于人。');
+  assert(out.classicalRelevant === true, 'should be relevant');
+  assert(out.summary.passes >= 1, `expect >=1 pass, got ${out.summary.passes}`);
+});
+
+test('evaluateRules 孝悌为本 → reference', () => {
+  const out = evaluateRules('君子务本，本立而道生。孝弟也者，其为仁之本与。');
+  assert(out.classicalRelevant === true, 'should be relevant');
+  assert(out.summary.references + out.summary.passes >= 1, 'expect reference or pass');
+});
+
+test('evaluateRules 诚明术语 → reference', () => {
+  const out = evaluateRules('自诚明谓之性，自明诚谓之教。诚则明矣，明则诚矣。');
+  assert(out.classicalRelevant === true, 'should be relevant');
+  assert(out.summary.references + out.summary.passes >= 1, 'expect reference or pass');
+});
+
+test('evaluateRules 中和位育 → reference', () => {
+  const out = evaluateRules('喜怒哀乐之未发谓之中，发而皆中节谓之和。致中和，天地位焉，万物育焉。');
+  assert(out.classicalRelevant === true, 'should be relevant');
+  assert(out.summary.references + out.summary.passes >= 1, 'expect reference or pass');
+});
+
+test('searchClassicsBatch 多关键词合并且去重', () => {
+  const out = searchClassicsBatch(['仁政', '孝悌'], '儒藏/四书');
+  assert(Array.isArray(out.hits), 'hits array');
+  assert(out.keywords.length >= 2, 'keywords length');
+  assert(out.hits.length > 0, 'should have hits');
+});
+
+test('parseHit 正确解析 file:line:raw', () => {
+  const parsed = parseHit('/root/.hermes/skills/daizhigev20/儒藏/四书/论语集解义疏.txt:60:子曰弟子入则孝出则悌');
+  assert(parsed.file === '/root/.hermes/skills/daizhigev20/儒藏/四书/论语集解义疏.txt', 'file');
+  assert(parsed.line === 60, 'line');
+  assert(parsed.raw.startsWith('子曰'), 'raw prefix');
+});
+
+test('parseHit 容错空值/非字符串输入', () => {
+  assert(parseHit(null) === null, 'null input');
+  assert(parseHit(123) === null, 'number input');
+  assert(parseHit('no-colon-here').file === null, 'unparsable fallback');
+});
+
+test('evaluateRules 命中规则 findings.evidence 结构化或空（retrieval未触发）', () => {
+  const out = evaluateRules('老吾老以及人之老，幼吾幼以及人之幼。义之与比。');
+  const finding = out.findings.find(f => f.reason === 'renxin_with_extension_mechanism');
+  assert(finding, 'missing renxin finding');
+  assert(finding.signal === 'pass', 'should pass');
+  if (finding.evidence) {
+    assert(typeof finding.evidence.file === 'string', 'evidence.file should be string when present');
+    assert(typeof finding.evidence.line === 'number', 'evidence.line should be number when present');
+    assert(typeof finding.evidence.raw === 'string', 'evidence.raw should be string when present');
+  }
 });
