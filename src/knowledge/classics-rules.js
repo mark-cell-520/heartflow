@@ -144,6 +144,86 @@ const CLASSICAL_RULES = [
     priority: 7
   },
   {
+    id: 'lunyu-zhongshu',
+    source: '论语·学而 / 论语·子路 / 孟子·公孙丑上 / 中庸',
+    canonical: '夫子之道忠恕而已矣 / 恕之道推己及人',
+    trigger: ['忠恕','恕','己所不欲','勿施于人','恕之道','求仁莫近','强恕而行','恕以行之'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasZhongShu = /忠恕|恕|己所不欲|勿施于人|求仁莫近|强恕而行/.test(q);
+      const hasReciprocal = /及人|推己|勿施|以己|度人/.test(q);
+      if (hasZhongShu && hasReciprocal) {
+        return { fired: true, signal: 'pass', reason: 'zhongshu_with_reciprocal_mechanism', evidence: hits[0] || null };
+      }
+      if (hasZhongShu) {
+        return { fired: true, signal: 'reference', reason: 'zhongshu_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'presupposition'],
+    priority: 8
+  },
+  {
+    id: 'lunyu-xiaoti',
+    source: '论语·学而 / 论语·为政 / 孝经',
+    canonical: '君子务本，本立而道生。孝弟也者，其为仁之本与',
+    trigger: ['孝悌','孝弟','务本','本立而道生','行有馀力','以学文','泛爱众','而亲仁'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasXiaoTi = /孝悌|孝弟|务本|本立而道生|行有余力|以学文|泛爱众/.test(q);
+      const hasRootClaim = /本|根本|基础|先|始/.test(q) && /仁|道|教/.test(q);
+      if (hasXiaoTi && hasRootClaim) {
+        return { fired: true, signal: 'pass', reason: 'xiaoti_with_root_framing', evidence: hits[0] || null };
+      }
+      if (hasXiaoTi) {
+        return { fired: true, signal: 'reference', reason: 'xiaoti_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'vagueness'],
+    priority: 7
+  },
+  {
+    id: 'zhongyong-chengming',
+    source: '中庸 / 大学本旨 / 四书大全',
+    canonical: '自诚明谓之性；自明诚谓之教。诚则明矣，明则诚矣',
+    trigger: ['诚则明','明则诚','诚明','至诚','尽性','至诚无息','溥博渊泉'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasChengMing = /诚则明|明则诚|诚明|至诚|尽性|至诚无息|溥博渊泉/.test(q);
+      const hasEffort = /戒惧|慎独|博学|审问|慎思|明辨|笃行|择善|固执/.test(q);
+      if (hasChengMing && hasEffort) {
+        return { fired: true, signal: 'pass', reason: 'chengming_with_ cultivation_path', evidence: hits[0] || null };
+      }
+      if (hasChengMing) {
+        return { fired: true, signal: 'reference', reason: 'chengming_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['reasoning_coherence', 'presupposition'],
+    priority: 8
+  },
+  {
+    id: 'zhongyong-zhonghe',
+    source: '中庸 / 四书大全 / 问辨录',
+    canonical: '喜怒哀乐之未发谓之中，发而皆中节谓之和',
+    trigger: ['中和','未发','中节','致中和','天地位焉','万物育焉','大本','达道','中和位育'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasZhongHe = /中和|未发|中节|致中和|天地位焉|万物育焉|大本|达道/.test(q);
+      const hasCultivation = /修道|慎独|戒惧|性情|情性|感而遂通/.test(q);
+      if (hasZhongHe && hasCultivation) {
+        return { fired: true, signal: 'pass', reason: 'zhonghe_with_cultivation', evidence: hits[0] || null };
+      }
+      if (hasZhongHe) {
+        return { fired: true, signal: 'reference', reason: 'zhonghe_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['reasoning_coherence', 'vagueness'],
+    priority: 7
+  },
+  {
     id: 'fojia-cibei-nongge',
     source: '佛说大乘无量寿庄严清净平等觉经 / 大藏经',
     canonical: '无缘大慈，同体大悲 / 慈悲喜舍',
@@ -288,14 +368,41 @@ function searchClassics(keyword, scope) {
   }
 }
 
+function searchClassicsBatch(keywords, scope) {
+  if (!Array.isArray(keywords) || keywords.length === 0) {
+    return { hits: [], error: 'keywords must be a non-empty array' };
+  }
+  const combined = [];
+  const seen = new Set();
+  for (const kw of keywords) {
+    const result = searchClassics(kw, scope);
+    for (const hit of result.hits || []) {
+      const key = hit.raw?.slice(0, 64);
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        combined.push(hit);
+      }
+    }
+  }
+  return { hits: combined.slice(0, 40), scope: scope || 'all', keywords };
+}
+
+function parseHit(raw) {
+  if (!raw || typeof raw !== 'string') return null;
+  const m = raw.match(/^(.+?):(\d+):(.*)$/);
+  if (!m) return { file: null, line: null, raw };
+  return { file: m[1], line: Number(m[2]), raw: m[3].trim() };
+}
+
 function evaluateRules(input) {
   const domain = matchDomain(input);
-  const retrieval = domain ? searchClassics(domain.keywords[0], domain.scope) : { hits: [], error: null };
+  const keywords = domain ? Array.from(new Set([domain.keywords[0], domain.keywords[1], domain.keywords[2]].filter(Boolean))) : [];
+  const retrieval = keywords.length > 0 ? searchClassicsBatch(keywords, domain?.scope) : { hits: [] };
   const hits = retrieval.hits || [];
 
   const applicable = CLASSICAL_RULES.filter(r => {
     const textHit = r.trigger.some(kw => input.toLowerCase().includes(kw));
-    const contentHit = hits.some(h => h.raw && h.raw.includes(r.canonical.slice(0, 6)));
+    const contentHit = hits.some(h => h.raw && r.canonical && h.raw.includes(r.canonical.slice(0, 6)));
     return textHit || contentHit;
   });
 
@@ -313,23 +420,18 @@ function evaluateRules(input) {
   const passes = fired.filter(r => r.signal === 'pass');
   const references = fired.filter(r => r.signal === 'reference');
 
-  const findings = fired.map(r => ({
-    ruleId: applicable.find(rule => rule.evaluator === r.evaluator || (
-      (() => {
-        const idx = results.indexOf(r);
-        return applicable[idx];
-      })()
-    ))?.id || 'unknown',
-    signal: r.signal,
-    reason: r.reason,
-    dimensions: applicable.find(rule => rule.evaluator === r.evaluator || (
-      (() => {
-        const idx = results.indexOf(r);
-        return applicable[idx];
-      })()
-    ))?.dimensions || [],
-    evidence: r.evidence
-  })).filter(f => f.ruleId !== 'unknown');
+  const findings = fired.map(r => {
+    const idx = results.indexOf(r);
+    const rule = applicable[idx];
+    const evidence = r.evidence ? parseHit(r.evidence.raw || r.evidence) : null;
+    return {
+      ruleId: rule?.id || 'unknown',
+      signal: r.signal,
+      reason: r.reason,
+      dimensions: rule?.dimensions || [],
+      evidence
+    };
+  }).filter(f => f.ruleId !== 'unknown');
 
   // [思想心虫 v1] 反哺机制：对命中原文做候选触发词提取，供规则维护者Review
   let feedbackSuggestions = null;
@@ -391,6 +493,8 @@ module.exports = {
   evaluateRules,
   matchDomain,
   searchClassics,
+  searchClassicsBatch,
+  parseHit,
   CLASSICAL_RULES,
   DOMAIN_RULES
 };
