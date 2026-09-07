@@ -142,6 +142,89 @@ const CLASSICAL_RULES = [
     },
     dimensions: ['goal_misalignment', 'vagueness'],
     priority: 7
+  },
+  {
+    id: 'fojia-cibei-nongge',
+    source: '佛说大乘无量寿庄严清净平等觉经 / 大藏经',
+    canonical: '无缘大慈，同体大悲 / 慈悲喜舍',
+    trigger: ['慈悲','无缘大慈','同体大悲','慈悲喜舍','不忍众生苦','拔苦与乐'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasCompassion = /慈悲|无缘大慈|同体大悲|不忍|拔苦与乐|慈悲观/.test(q);
+      const hasSentientBeing = /众生|有情|万类|万物|民|人/.test(q);
+      if (hasCompassion && hasSentientBeing) {
+        return { fired: true, signal: 'pass', reason: 'compassion_with_sentient_scope', evidence: hits[0] || null };
+      }
+      if (hasCompassion) {
+        return { fired: true, signal: 'warn', reason: 'compassion_without_sentient_scope', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'presupposition'],
+    priority: 8
+  },
+  {
+    id: 'fojia-banruo-wuwo',
+    source: '大般若波罗蜜多经 / 金刚经 / 大藏经',
+    canonical: '色即是空，空即是色 / 诸法无我',
+    trigger: ['般若','空','无我','诸法空相','色即是空','缘起性空','无自性','空性'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasWisdom = /般若|空性|空|无我|无自性|缘起/.test(q);
+      const hasDualitySublation = /即|是|亦|非/.test(q) && /空|色|有|无/.test(q);
+      if (hasWisdom && hasDualitySublation) {
+        return { fired: true, signal: 'pass', reason: 'wisdom_with_duality_sublation', evidence: hits[0] || null };
+      }
+      if (hasWisdom) {
+        return { fired: true, signal: 'reference', reason: 'wisdom_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['reasoning_coherence', 'presupposition'],
+    priority: 8
+  },
+  {
+    id: 'fojia-jielv-cause-effect',
+    source: '大藏经/律藏 / 优婆塞戒经 / 地藏经',
+    canonical: '诸恶莫作，众善奉行，自净其意，是诸佛教',
+    trigger: ['戒律','五戒','十善','因果','报应','持戒','犯戒','净行','律仪'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasPrecept = /戒|持戒|犯戒|五戒|十善|律仪|净行/.test(q);
+      const hasConsequence = /因果|报应|果报|业力|善业|恶业/.test(q);
+      if (hasPrecept && hasConsequence) {
+        return { fired: true, signal: 'pass', reason: 'precept_with_causal_consequence', evidence: hits[0] || null };
+      }
+      if (hasPrecept && !hasConsequence) {
+        return { fired: true, signal: 'warn', reason: 'precept_without_causal_consequence', evidence: hits[0] || null };
+      }
+      if (hasConsequence && !hasPrecept) {
+        return { fired: true, signal: 'reference', reason: 'cause_effect_without_precept', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'goal_misalignment'],
+    priority: 7
+  },
+  {
+    id: 'fojia-sidizhudaoxiang',
+    source: '大藏经/经藏 / 阿含部 / 杂阿含经',
+    canonical: '苦集灭道 / 八正道：正见正思惟正语正业正命正精进正念正定',
+    trigger: ['四谛','苦谛','集谛','灭谛','道谛','八正道','正见','正思惟','正语','正业','正命','正精进','正念','正定'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasFourNoble = /四谛|苦谛|集谛|灭谛|道谛|苦集灭道/.test(q);
+      const hasNobleEightfold = /八正道|正见|正思惟|正语|正业|正命|正精进|正念|正定/.test(q);
+      if (hasFourNoble && hasNobleEightfold) {
+        return { fired: true, signal: 'pass', reason: 'four_nobles_with_eightfold_path', evidence: hits[0] || null };
+      }
+      if (hasFourNoble || hasNobleEightfold) {
+        return { fired: true, signal: 'reference', reason: 'noble_path_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['reasoning_coherence', 'vagueness'],
+    priority: 7
   }
 ];
 

@@ -81,3 +81,27 @@ test('evaluate 返回兼容 classicsRelevant + domain + dimensions + hits', () =
   assert(typeof out.hitCount === 'number', 'hitCount');
   assert(out.classicalRules && typeof out.classicalRules.summary === 'object', 'classicalRules.summary');
 });
+
+test('evaluateRules 慈悲+众生 → pass', () => {
+  const out = evaluateRules('慈悲喜舍，无缘大慈，同体大悲，不忍众生苦。');
+  assert(out.classicalRelevant === true, 'should be relevant');
+  assert(out.summary.passes >= 1, `expect >=1 pass, got ${out.summary.passes}`);
+});
+
+test('evaluateRules 般若空性术语 → pass/reference', () => {
+  const out = evaluateRules('般若波罗蜜多，色即是空，空即是色，诸法无我。');
+  assert(out.classicalRelevant === true, 'should be relevant');
+  assert(out.summary.passes + out.summary.references >= 1, 'expect pass or reference');
+});
+
+test('evaluateRules 戒律+因果 → pass', () => {
+  const out = evaluateRules('持五戒、行十善，因果报应，善有善果，恶有恶报。');
+  assert(out.classicalRelevant === true, 'should be relevant');
+  assert(out.summary.passes >= 1, `expect >=1 pass, got ${out.summary.passes}`);
+});
+
+test('evaluateRules 四谛八正道 → pass/reference', () => {
+  const out = evaluateRules('四谛：苦集灭道；八正道：正见、正思惟、正语、正业、正命、正精进、正念、正定。');
+  assert(out.classicalRelevant === true, 'should be relevant');
+  assert(out.summary.passes + out.summary.references >= 1, 'expect pass or reference');
+});
