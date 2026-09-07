@@ -837,6 +837,8 @@ class ThoughtChain {
           agentPsychology: parse?.agentPsychology || null,
           // 【AgentPhilosophy v2.0.0】AI 哲学新增维度
           agentPhilosophy: synthesis?.agentPhilosophy || null,
+          // [思想心虫 v1] 古典规则判别结果进入最终输出
+          classicalRuleResult: parse?.classicalRuleResult || null,
           // [v5.17.19 S4] 偏差自审计 — language-honesty扫描回应草稿
           biasCheck: (() => {
             try {
