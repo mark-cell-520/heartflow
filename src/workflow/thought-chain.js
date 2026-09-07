@@ -664,6 +664,43 @@ class ThoughtChain {
           }
         })();
 
+        // [思想心虫 v1] 古典规则综合：对古典/伦理/治理类命题做最终结论修正
+        let classicalRuleIntegration = null;
+        try {
+          const classical = parse?.classicalRuleResult;
+          if (classical?.classicalRelevant && classical.findings?.length > 0) {
+            const violations = classical.findings.filter(f => f.signal === 'violation');
+            const warnings = classical.findings.filter(f => f.signal === 'warn');
+            const references = classical.findings.filter(f => f.signal === 'reference');
+            const passes = classical.findings.filter(f => f.signal === 'pass');
+
+            // 如果有 violation，直接降级并修正结论
+            if (violations.length > 0) {
+              confidence = Math.min(confidence, 0.4);
+              reasoningChain.push(`古典规则拦截: ${violations.map(v => v.reason).join('; ')}`);
+              classicalRuleIntegration = { integrated: true, action: 'downgrade', violations: violations.map(v => v.reason) };
+            }
+            // 如果 warnings 存在，降低置信度并标注
+            else if (warnings.length > 0) {
+              confidence = Math.min(confidence, 0.6);
+              reasoningChain.push(`古典规则警示: ${warnings.map(w => w.reason).join('; ')}`);
+              classicalRuleIntegration = { integrated: true, action: 'flag', warnings: warnings.map(w => w.reason) };
+            }
+            // 如果有 references，增强结论的可引用性
+            else if (references.length > 0) {
+              reasoningChain.push(`古典规则参照: ${references.map(r => r.reason).join('; ')}`);
+              classicalRuleIntegration = { integrated: true, action: 'reference', references: references.map(r => r.reason) };
+            }
+            // passes 只记录不干预
+            else if (passes.length > 0) {
+              reasoningChain.push(`古典规则校验通过: ${passes.map(p => p.reason).join('; ')}`);
+              classicalRuleIntegration = { integrated: true, action: 'pass', passes: passes.map(p => p.reason) };
+            }
+          }
+        } catch (e) {
+          classicalRuleIntegration = null;
+        }
+
         return {
           conclusion,
           confidence,
@@ -683,6 +720,8 @@ class ThoughtChain {
           personalityPolish,
           // [P2-T2-WF] 知识检索接入主路径
           knowledgeSummary,
+          // [思想心虫 v1] 古典规则综合结果
+          classicalRuleIntegration,
           // [v6.3.27] 伦理拒答 + 说前反思（来自CognitiveLoop.phaseAction）
           _ethicsCheck: (() => {
             const threshold = (decisionResult?.riskLevel === 'high' || ctx._deliberation?.uncertainty > 0.7);
