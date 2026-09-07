@@ -87,6 +87,24 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
   if (classicalResult.classicalRelevant) {
     checked_by.push({ layer: 'classical-knowledge', hits: classicalResult.hitCount, domain: classicalResult.domain });
     data.classical = classicalResult;
+    if (classicalResult.findings?.length) {
+      const warns = classicalResult.findings.filter(f => f.signal === 'warn');
+      if (warns.length && currentGate.action === 'pass') {
+        currentGate = {
+          action: 'verify',
+          reason: `古典思想警示: ${warns[0].reason}`,
+          layer: 'classical-knowledge'
+        };
+      }
+      data.discriminate.findings.push(...classicalResult.findings.map(f => ({
+        dimension: f.dimensions?.[0] || 'classical_knowledge',
+        severity: f.signal === 'warn' ? 50 : f.signal === 'pass' ? 20 : 30,
+        details: `[古典${f.ruleId}] ${f.reason}`,
+        classical: true,
+        signal: f.signal,
+        evidence: f.evidence
+      })));
+    }
   }
 
   // ─── Layer 3.5: Adversarial Variant — 对抗变体检测 ────
