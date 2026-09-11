@@ -1514,6 +1514,17 @@ const TOOLS = [
     }
   },
   {
+    name: 'heartflow_check_coverage_completeness',
+    description: '覆盖完整性检测：枚举代码中的对称操作缺口/数据形态遗漏/分支空转/空catch四类覆盖缺口。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测代码/文本' }
+      },
+      required: ['text']
+    }
+  },
+  {
     name: 'heartflow_audit_trace',
     description: '审计证据链：查询/验证全链路 trace，按人/时间/模型/策略检索，验证 HMAC 完整性。国标关口5。',
     inputSchema: {
@@ -4128,6 +4139,20 @@ const HANDLERS = {
       const { checkAICodeAntiPattern } = require('./index.js');
       const text = args?.text || '';
       return checkAICodeAntiPattern(text);
+    } catch (e) { return { error: e.message }; }
+  },
+  heartflow_check_coverage_completeness: (args) => {
+    try {
+      const { checkCoverageCompleteness } = require('./index.js');
+      const text = args?.text || '';
+      return checkCoverageCompleteness(text);
+    } catch (e) { return { error: e.message }; }
+  },
+  heartflow_check_architecture_consistency: (args) => {
+    try {
+      const { checkArchitectureConsistency } = require('./index.js');
+      const text = args?.text || '';
+      return checkArchitectureConsistency(text);
     } catch (e) { return { error: e.message }; }
   },
 
