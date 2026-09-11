@@ -64,6 +64,7 @@ function checkPromptInjection(text) {
   return { count, injections, score: Math.min(1, injections.reduce((s, i) => s + i.severity, 0)) };
 }
 
+const { checkAICodeAntiPattern } = require('./ai-anti-pattern.js');
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 const { detect } = require('./shield/ai-writing-tell.js');
@@ -3975,6 +3976,7 @@ module.exports = {
   checkBadFaith,
   checkTonePolicing,
   checkNoFallback,
+  checkAICodeAntiPattern,
   summarizeDiscrimination,
   crossAnalyze,
   entropyAnalysis,

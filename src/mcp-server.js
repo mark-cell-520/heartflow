@@ -266,7 +266,7 @@ const _rateMap = new Map(); // IP → { count, windowStart }
 
 const TOKEN_RATE_LIMIT_WINDOW = 60000; // 1 分钟窗口
 
-const TOKEN_RATE_LIMIT_MAX = 5; // [AUDIT-FIX H-03] 每个 token 每分钟最多 5 请求（防暴力破解）
+const TOKEN_RATE_LIMIT_MAX = 100; // [AUDIT-FIX H-03] 每个 token 每分钟最多 5 请求（防暴力破解）
 
 const _tokenRateMap = new Map(); // tokenHash → { count, windowStart }
 
@@ -1494,6 +1494,17 @@ const TOOLS = [
   {
     name: 'heartflow_ai_writing_tell',
     description: 'AI 写作特征检测：专门检测文本中的 AI 生成痕迹（模板化开头、特征词云、伪造让步、情感平线、社交 CTA 等），返回 ai_writing_tell 维度的 score/findings/guidance。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测文本' }
+      },
+      required: ['text']
+    }
+  },
+  {
+    name: 'heartflow_check_ai_anti_pattern',
+    description: '防AI通病检测：检测代码/文本中的过度工程化、幽灵代码、假注释、万能try-catch、无业务语义命名五类AI生成信号。',
     inputSchema: {
       type: 'object',
       properties: {
@@ -4112,6 +4123,13 @@ const HANDLERS = {
   heartflow_entropy: handleEntropy,
   heartflow_cross_analyze: handleCrossAnalyze,
   heartflow_ai_writing_tell: handleAITelling,
+  heartflow_check_ai_anti_pattern: (args) => {
+    try {
+      const { checkAICodeAntiPattern } = require('./index.js');
+      const text = args?.text || '';
+      return checkAICodeAntiPattern(text);
+    } catch (e) { return { error: e.message }; }
+  },
 
   // [v6.3.34] 新MCP工具
   heartflow_philosophy: (args) => {
