@@ -67,6 +67,8 @@ function checkPromptInjection(text) {
 const { checkAICodeAntiPattern } = require('./ai-anti-pattern.js');
 const checkCoverageCompleteness = require('./coverage-completeness.js');
 const checkArchitectureConsistency = require('./architecture-consistency.js');
+const { checkPlanGate } = require('./plan-gate.js');
+const { checkForbiddenCall } = require('./forbidden-call.js');
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 const { detect } = require('./shield/ai-writing-tell.js');
@@ -3981,6 +3983,8 @@ module.exports = {
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
+  checkPlanGate,
+  checkForbiddenCall,
   summarizeDiscrimination,
   crossAnalyze,
   entropyAnalysis,
