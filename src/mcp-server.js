@@ -4155,6 +4155,20 @@ const HANDLERS = {
       return checkArchitectureConsistency(text);
     } catch (e) { return { error: e.message }; }
   },
+  heartflow_check_plan_gate: (args) => {
+    try {
+      const { checkPlanGate } = require('./index.js');
+      const plan = args?.plan || args?.text || '';
+      return checkPlanGate(typeof plan === 'string' ? { steps: [{ verify: plan }] } : plan);
+    } catch (e) { return { error: e.message }; }
+  },
+  heartflow_check_forbidden_call: (args) => {
+    try {
+      const { checkForbiddenCall } = require('./index.js');
+      const text = args?.text || '';
+      return checkForbiddenCall(text);
+    } catch (e) { return { error: e.message }; }
+  },
 
   // [v6.3.34] 新MCP工具
   heartflow_philosophy: (args) => {
