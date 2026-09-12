@@ -686,6 +686,11 @@ const DOMAIN_RULES = [
     scope: '佛藏/藏外'
   },
   {
+    id: 'daoist-naturalness',
+    keywords: ['道','自然','无为','清静','柔弱','不争','归朴','守静','致虚','守静笃','万物'],
+    scope: '道藏/道德经/南华经'
+  },
+  {
     id: 'justice-and-fate',
     keywords: ['命运','因果','报应','公平','正义','善恶','天理','公道','是非'],
     scope: ''
