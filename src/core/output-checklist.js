@@ -309,8 +309,13 @@ class OutputChecklist {
       }
       // 逻辑谬误
       if (dims.fallacies.count > 0) {
-        issues.push(`含逻辑谬误(${dims.fallacies.fallacies.map(f => f.type).join(',')})`);
+        const fallacyTypes = dims.fallacies.fallacies.map(f => f.type);
+        issues.push(`含逻辑谬误(${fallacyTypes.join(',')})`);
         triggeredDims.push('fallacies');
+        // 非黑即白/假二分法单独标记，便于输出回退建议
+        if (fallacyTypes.includes('false_dilemma') || fallacyTypes.includes('false_binary')) {
+          triggeredDims.push('false_dilemma');
+        }
       }
       // 信心偏差（情感操纵相关）
       if (dims.confidence.count > 0) {
@@ -457,6 +462,9 @@ class OutputChecklist {
           } else if (t === 'fallacies') {
             recommendation = 'rewrite';
             message = '回复含逻辑谬误，需修正论证';
+          } else if (t === 'false_dilemma') {
+            recommendation = 'rewrite';
+            message = '回复非黑即白/假二分，需补充中间选项或澄清立场';
           } else if (t === 'vagueness') {
             recommendation = 'rewrite';
             message = '回复过于模糊，需要具体化';
