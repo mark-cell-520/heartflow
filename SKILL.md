@@ -4,7 +4,7 @@ title: "心虫 HeartFlow — AGI 第 1 层辨别者"
 version: "6.7.23"
 description: |-
   心虫(HeartFlow)是AGI第1层——辨别者。纯规则引擎，判别对错/好坏/安全/危险。
-  47维判别 × 9层管线 × 129模块 × 130 MCP工具，零LLM依赖。
+  47维判别 × 9层管线 × 129模块 × 131 MCP工具，零LLM依赖。
 
   当用户需要以下能力时使用本技能:
   - 判别AI输出是否可信（幻觉/过度自信/矛盾/谬误拦截）
@@ -80,6 +80,12 @@ identityCore · personaCore · beingMode · virtueEthics · ethics · moralDevel
 
 ### 7. 创造协作域
 skillEvolution · skillGenerator · selfPlay · evolution · worldModel · worldLandscape · multiAgentDialogue · transmission · adaptivePlanner · hierarchicalPlanner · codeExecutor · codePlanner · codeWriter · codeSelfDebug · paperIndex · knowledgeExplorer · formula
+
+### 8. 古典文本域
+classics-value-mapper · classics-rules · classical-text-routing · heartflow_classics(MCP)
+
+### 8. 古典文本域
+classics-value-mapper · classics-rules · classical-text-routing
 
 ---
 
