@@ -646,16 +646,46 @@ function parseHit(raw) {
 }
 
 function evaluateRules(input) {
-  const domain = matchDomain(input);
-  const keywords = domain ? Array.from(new Set([domain.keywords[0], domain.keywords[1], domain.keywords[2]].filter(Boolean))) : [];
-  const retrieval = keywords.length > 0 ? searchClassicsBatch(keywords, domain?.scope) : { hits: [] };
-  const hits = retrieval.hits || [];
+  // ─── Confucian pre-check: avoid Buddhist domain stealing ───
+  // 《孟子》《论语》等先秦儒学文本含'道''仁''义'等字，易被 Buddhist keywords 匹配，
+  // 必须优先判断是否为强 Confucian 文本
+  let domain = null;
+  if (typeof input === 'string' && input.length >= 10) {
+    const confucianStrong = /射者|仁之道|射求正诸己|反求诸己|求其放心|恻隐之心|羞恶之心|辞让之心|是非之心|四端|浩然之气|集义|知言|养气|尽心知性|存心养性|知天|事天|立命|正命|万物皆备|反身而诚|强恕而行|求仁莫近|深造之以道|自得之|居安资深|左右逢源|博学详说|以友辅仁|尊德乐义|穷达/.test(input);
+    if (confucianStrong) {
+      domain = { id: 'confucian', keywords: ['仁','道','义','礼','智','信','心','性','命','天','己','射','求','正'], scope: '儒藏/四书' };
+    }
+  }
+  if (!domain) {
+    domain = matchDomain(input);
+  }
+  let keywords = domain ? Array.from(new Set([domain.keywords[0], domain.keywords[1], domain.keywords[2]].filter(Boolean))) : [];
+  let retrieval = keywords.length > 0 ? searchClassicsBatch(keywords, domain?.scope) : { hits: [] };
+  let hits = retrieval.hits || [];
+
+  // 后备：若域名匹配为空，但文本含明显先秦 markers，先以整句前 40 字在儒藏/四书做一次广检索
+  if (!domain && typeof input === 'string' && input.length >= 10) {
+    const classicalMarkers = /之|乎|者|也|矣|焉|哉|则|而|以|于|若|其|虽|亦|且|盖|夫|必|尝|昔|今|终|始|反|求|诸|己|射|仁|道|政|心|性|天|命|礼|义|利|名/.test(input);
+    if (classicalMarkers) {
+      const excerpt = input.replace(/[\\s,，。.？?！!；;：:、\\-—]/g, '').slice(0, 40);
+      const fallback = searchClassicsBatch([excerpt], '儒藏/四书');
+      if ((fallback.hits || []).length >= 3) {
+        domain = { id: 'confucian-fallback', keywords: [], scope: '儒藏/四书' };
+        keywords = [excerpt];
+        hits = fallback.hits;
+        retrieval = fallback;
+      }
+    }
+  }
 
   const applicable = CLASSICAL_RULES.filter(r => {
     const textHit = r.trigger.some(kw => input.toLowerCase().includes(kw));
     const contentHit = hits.some(h => h.raw && r.canonical && h.raw.includes(r.canonical.slice(0, 6)));
     return textHit || contentHit;
   });
+
+  // 后备：当检索已明确命中古典语料时，仍视为古典相关（不要求规则必须 fired）
+  const classicalByHitDensity = hits.length >= 3;
 
   const results = applicable.map(rule => {
     try {
@@ -701,16 +731,22 @@ function evaluateRules(input) {
   }
 
   return {
-    classicalRelevant: fired.length > 0,
+    classicalRelevant: fired.length > 0 || classicalByHitDensity,
     domain: domain ? domain.id : null,
-    ruleCount: fired.length,
+    ruleCount: fired.length > 0 ? fired.length : (classicalByHitDensity ? 1 : 0),
     summary: {
       violations: violations.length,
       warnings: warnings.length,
       passes: passes.length,
       references: references.length
     },
-    findings,
+    findings: findings.length > 0 ? findings : (classicalByHitDensity ? [{
+      ruleId: 'classical-hit-density',
+      signal: 'reference',
+      reason: 'high_density_hits_without_rule_match',
+      dimensions: ['reasoning_coherence', 'presupposition'],
+      evidence: null
+    }] : []),
     hits,
     hitCount: hits.length,
     feedbackSuggestions
