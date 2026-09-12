@@ -4183,6 +4183,13 @@ const HANDLERS = {
       return checkDecisionTrace(typeof decision === 'string' ? JSON.parse(decision) : decision);
     } catch (e) { return { error: e.message }; }
   },
+  heartflow_check_ai_misuse: (args) => {
+    try {
+      const { checkAIMisuse } = require('./index.js');
+      const text = args?.text || '';
+      return checkAIMisuse(text);
+    } catch (e) { return { error: e.message }; }
+  },
 
   // [v6.3.34] 新MCP工具
   heartflow_philosophy: (args) => {
