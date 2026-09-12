@@ -4169,6 +4169,13 @@ const HANDLERS = {
       return checkForbiddenCall(text);
     } catch (e) { return { error: e.message }; }
   },
+  heartflow_check_completion_evidence: (args) => {
+    try {
+      const { checkCompletionEvidence } = require('./index.js');
+      const text = args?.text || '';
+      return checkCompletionEvidence(text);
+    } catch (e) { return { error: e.message }; }
+  },
 
   // [v6.3.34] 新MCP工具
   heartflow_philosophy: (args) => {
