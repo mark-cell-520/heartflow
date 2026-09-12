@@ -4394,21 +4394,39 @@ class HeartFlow {
       const ClassicsValueMapper = require('../knowledge/classics-value-mapper.js');
       const ruleOut = ClassicsValueMapper.evaluateRules(input);
       if (ruleOut.classicalRelevant) {
+        const wisdomCounts = { practical_guidance: 0, value_alignment: 0, warning_sign: 0, paradox_acknowledgment: 0 };
+        for (const f of ruleOut.findings) {
+          if (f.wisdom_dimension && wisdomCounts[f.wisdom_dimension] !== undefined) wisdomCounts[f.wisdom_dimension]++;
+        }
+        let dominantWisdom = null;
+        let maxCount = -1;
+        for (const [k, v] of Object.entries(wisdomCounts)) {
+          if (v > maxCount) { maxCount = v; dominantWisdom = k; }
+        }
+        const wisdomNote = dominantWisdom === 'warning_sign'
+          ? '（古典指向风险/空泛/需补证据）'
+          : dominantWisdom === 'paradox_acknowledgment'
+            ? '（古典承认表面矛盾/相对性）'
+            : dominantWisdom === 'practical_guidance'
+              ? '（古典给出可操作行为指引）'
+              : dominantWisdom === 'value_alignment'
+                ? '（古典定义价值/正当性框架）'
+                : '';
         result = {
           output: {
-            conclusion: ruleOut.summary.passes > 0
-              ? 'passed classical value check'
-              : 'classical reference',
+            conclusion: (ruleOut.summary.passes > 0 ? 'passed classical value check' : 'classical reference') + wisdomNote,
             meta: {
               confidence: 0.7,
               taskType: 'classical_value_clarification',
               classical: true,
               domain: ruleOut.domain,
               ruleCount: ruleOut.ruleCount,
-              hitCount: ruleOut.hitCount
+              hitCount: ruleOut.hitCount,
+              wisdom: dominantWisdom
             }
           },
           classicalAnalysis: ruleOut,
+          wisdomSummary: { counts: wisdomCounts, dominant: dominantWisdom },
           _classicalShortcut: true
         };
       }

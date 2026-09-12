@@ -264,6 +264,146 @@ const CLASSICAL_RULES = [
     priority: 8
   },
   {
+    id: 'liji-datong',
+    source: '礼记·礼运 / 儒藏',
+    canonical: '大道之行也，天下为公。选贤与能，讲信修睦',
+    trigger: ['大道之行','天下为公','选贤与能','讲信修睦','故人不独亲其亲','不独子其子','男有分','女有归'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasDatong = /大道之行|天下为公|选贤与能|讲信修睦|故人不独亲其亲|不独子其子|男有分|女有归/.test(q);
+      const hasInstitution = /制度|公|选贤|与能|讲信|修睦|老有所终|壮有所用|幼有所长/.test(q);
+      if (hasDatong && hasInstitution) {
+        return { fired: true, signal: 'pass', reason: 'datong_with_institution', evidence: hits[0] || null };
+      }
+      if (hasDatong) {
+        return { fired: true, signal: 'reference', reason: 'datong_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'presupposition'],
+    priority: 8
+  },
+  {
+    id: 'liji-yueji',
+    source: '礼记·乐记 / 儒藏',
+    canonical: '乐者，天地之和也；礼者，天地之序也',
+    trigger: ['乐者天地之和','礼者天地之序','乐治同','礼别异','礼乐刑政','大乐必易','大礼必简','乐者德之华'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasYueJi = /乐者[，,]?天地之和|礼者[，,]?天地之序|乐治同|礼别异|礼乐刑政/.test(q);
+      const hasHarmony = /和|序|乐|礼|天地|治|同|异/.test(q);
+      if (hasYueJi && hasHarmony) {
+        return { fired: true, signal: 'pass', reason: 'yueji_with_harmony', evidence: hits[0] || null };
+      }
+      if (hasYueJi) {
+        return { fired: true, signal: 'reference', reason: 'yueji_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['value_alignment', 'reasoning_coherence'],
+    priority: 7
+  },
+  {
+    id: 'mengzi-xingben',
+    source: '孟子·公孙丑上 / 孟子·告子上',
+    canonical: '恻隐之心，仁之端也；羞恶之心，义之端也',
+    trigger: ['恻隐之心','羞恶之心','辞让之心','是非之心','四端','仁义礼智','非由外铄','我固有之','求其放心','存心养性'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasSiDuan = /恻隐之心|羞恶之心|辞让之心|是非之心|四端|仁义礼智|求其放心|存心养性/.test(q);
+      const hasInnate = /固有|非由外铄|端|本|心/.test(q);
+      if (hasSiDuan && hasInnate) {
+        return { fired: true, signal: 'pass', reason: 'xingben_with_innate', evidence: hits[0] || null };
+      }
+      if (hasSiDuan) {
+        return { fired: true, signal: 'reference', reason: 'xingben_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'presupposition'],
+    priority: 8
+  },
+  {
+    id: 'zhuangzi-qiushu',
+    source: '庄子·秋水 / 道藏',
+    canonical: '井蛙不可以语于海者，拘于虚也；夏虫不可以语于冰者，笃于时也',
+    trigger: ['井蛙不可语于海','夏虫不可语于冰','秋水时至','百川灌河','东面而视','不见水端','河伯','北海若','大方之家'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasQiushu = /井蛙|夏虫|秋水|河伯|北海若|百川灌河|大方之家/.test(q);
+      const hasLimitation = /不可语|拘于虚|笃于时|不见水端|东面而视|限制|时地|时也|虚也|语于海|语于冰/.test(q);
+      if (hasQiushu && hasLimitation) {
+        return { fired: true, signal: 'pass', reason: 'qiushu_with_limitation', evidence: hits[0] || null };
+      }
+      if (hasQiushu) {
+        return { fired: true, signal: 'reference', reason: 'qiushu_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['vagueness', 'presupposition', 'reasoning_coherence'],
+    priority: 7
+  },
+  {
+    id: 'diamond-sutra',
+    source: '金刚经 / 佛藏',
+    canonical: '应无所住而生其心',
+    trigger: ['应无所住','而生其心','凡所有相','皆是虚妄','若见诸相非相','即见如来','不应住色生心','不应住声香味触法'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasDiamond = /应无所住|而生其心|凡所有相|皆是虚妄|若见诸相非相|即见如来|不应住色生心|不应住声香味触法/.test(q);
+      const hasNonAttach = /无住|虚妄|非相|如来|色|声|香|味|触|法|心|无/.test(q);
+      if (hasDiamond && hasNonAttach) {
+        return { fired: true, signal: 'pass', reason: 'diamond_nonattach', evidence: hits[0] || null };
+      }
+      if (hasDiamond) {
+        return { fired: true, signal: 'reference', reason: 'diamond_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['value_alignment', 'presupposition'],
+    priority: 8
+  },
+  {
+    id: 'heart-sutra',
+    source: '般若波罗蜜多心经 / 佛藏',
+    canonical: '色不异空，空不异色；色即是空，空即是色',
+    trigger: ['色不异空','空不异色','色即是空','空即是色','照见五蕴皆空','度一切苦厄','心无挂碍','无挂碍故','无有恐怖'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasHeart = /色不异空|空不异色|色即是空|空即是色|照见五蕴皆空|度一切苦厄|心无挂碍|无挂碍故|无有恐怖/.test(q);
+      const hasEmptiness = /空|五蕴|色|心|挂碍|恐怖|颠倒|梦想/.test(q);
+      if (hasHeart && hasEmptiness) {
+        return { fired: true, signal: 'pass', reason: 'heart_emptiness', evidence: hits[0] || null };
+      }
+      if (hasHeart) {
+        return { fired: true, signal: 'reference', reason: 'heart_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['paradox_acknowledgment', 'value_alignment'],
+    priority: 8
+  },
+  {
+    id: 'platform-sutra',
+    source: '六祖坛经 / 佛藏',
+    canonical: '菩提本无树，明镜亦非台。本来无一物，何处惹尘埃',
+    trigger: ['菩提本无树','明镜亦非台','本来无一物','何处惹尘埃','不是风动','不是幡动','仁者心动','迷时师渡','悟了自渡'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasPlatform = /菩提本无树|明镜亦非台|本来无一物|何处惹尘埃|不是风动|不是幡动|仁者心动|迷时师渡|悟了自渡/.test(q);
+      const hasNoThing = /无树|无台|无一物|无尘埃|无心|无住|心动/.test(q);
+      if (hasPlatform && hasNoThing) {
+        return { fired: true, signal: 'pass', reason: 'platform_nothind', evidence: hits[0] || null };
+      }
+      if (hasPlatform) {
+        return { fired: true, signal: 'reference', reason: 'platform_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['paradox_acknowledgment', 'value_alignment'],
+    priority: 8
+  },
+  {
     id: 'daodejing-wu-wei',
     source: '道德经 / 道藏',
     canonical: '道常无为而无不为。侯王若能守之，万物将自化',
