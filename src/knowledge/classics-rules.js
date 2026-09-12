@@ -204,6 +204,31 @@ const CLASSICAL_RULES = [
     priority: 8
   },
   {
+    id: 'mengzi-archery-selfcultivation',
+    source: '孟子·公孙丑上 / 孟子·万章下',
+    canonical: '射者，仁之道也。射求正诸己，己正而后发，发而不中，则不怨胜己者，反求诸己而已矣',
+    trigger: ['射者','仁之道也','射求正诸己','己正而后发','发而不中','不怨胜己者','反求诸己','正诸己','求正诸己'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasArchery = /射者|射求正诸己|己正而后发|发而不中|不怨胜己者/.test(q);
+      const hasSelfReflection = /反求诸己|求正诸己|正诸己|正而后发/.test(q);
+      const hasRenDao = /仁之道|仁之道也/.test(q);
+      if (hasArchery && hasSelfReflection) {
+        return { fired: true, signal: 'pass', reason: 'archery_selfcultivation_full_chain', evidence: hits[0] || null };
+      }
+      if (hasRenDao && hasSelfReflection) {
+        return { fired: true, signal: 'pass', reason: 'ren_dao_with_self_reflection', evidence: hits[0] || null };
+      }
+      if (hasArchery) {
+        return { fired: true, signal: 'reference', reason: 'archery_metaphor_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'presupposition'],
+    priority: 8
+  },
+
+  {
     id: 'zhongyong-zhonghe',
     source: '中庸 / 四书大全 / 问辨录',
     canonical: '喜怒哀乐之未发谓之中，发而皆中节谓之和',
