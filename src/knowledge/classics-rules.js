@@ -223,6 +223,107 @@ const CLASSICAL_RULES = [
     dimensions: ['reasoning_coherence', 'vagueness'],
     priority: 7
   },
+
+  {
+    id: 'xiaojing-xiaoti',
+    source: '儒藏/孝经/孝经问/孝经述注',
+    canonical: '资于事父以事母而爱同 / 以孝事君则忠 / 以敬事长则顺',
+    trigger: ['孝经','以孝事君','资于事父','事母而爱同','事君而敬同','忠顺','保其禄位','夙兴夜寐'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasXiaoJing = /资于事父|以孝事君|忠顺|保其禄位|夙兴夜寐|孝经/.test(q);
+      const hasLoyaltyExtension = /事母|事君|敬长|忠.*顺/.test(q);
+      if (hasXiaoJing && hasLoyaltyExtension) {
+        return { fired: true, signal: 'pass', reason: 'xiaojing_with_loyalty_extension', evidence: hits[0] || null };
+      }
+      if (hasXiaoJing) {
+        return { fired: true, signal: 'reference', reason: 'xiaojing_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'presupposition'],
+    priority: 8
+  },
+  {
+    id: 'mengxue-disi',
+    source: '儒藏/启蒙蒙学/四字经/蒙训/好人歌',
+    canonical: '人要孝悌，好学好文 / 好人先忠信，好人重孝弟 / 家为孝子，朝作忠臣',
+    trigger: ['孝悌','忠信','好学','尊敬长上','和睦宗亲','本分','谨慎','好人','孝子','忠臣'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasMengxueEthics = /孝悌|忠信|好学|尊敬长上|和睦宗亲|本分|谨慎/.test(q);
+      const hasPracticalVirtue = /孝子|忠臣|好人|成人|成材|处世/.test(q);
+      if (hasMengxueEthics && hasPracticalVirtue) {
+        return { fired: true, signal: 'pass', reason: 'mengxue_ethics_with_practice', evidence: hits[0] || null };
+      }
+      if (hasMengxueEthics) {
+        return { fired: true, signal: 'reference', reason: 'mengxue_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'goal_misalignment'],
+    priority: 7
+  },
+  {
+    id: 'xiushen-zhi-xing',
+    source: '儒藏/修身治家/温氏母训/玉笑零音',
+    canonical: '世人多被心肠好三字坏了 / 凡子弟每事一禀命于所尊，便是孝弟 / 祭葬厚而奉养薄，末世之孝子也',
+    trigger: ['修身','治家','心肠好','禀命','奉养','孝子','忠臣','犯颜','事亲','事君'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasSelfCultivation = /修身|治家|心肠好|禀命|奉养|事亲|事君/.test(q);
+      const hasActionRequirement = /行径|勤苦|犯颜|实际|做事|做人/.test(q);
+      if (hasSelfCultivation && hasActionRequirement) {
+        return { fired: true, signal: 'pass', reason: 'xiushen_with_action', evidence: hits[0] || null };
+      }
+      if (hasSelfCultivation && !hasActionRequirement) {
+        return { fired: true, signal: 'warn', reason: 'xiushen_mention_without_action', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['presupposition', 'goal_misalignment'],
+    priority: 7
+  },
+  {
+    id: 'jingxue-jingfa',
+    source: '儒藏/五经总义/经咫/简端录/驳五经异义',
+    canonical: '先甲三日谋始之预也 / 后甲三日虑终之远也 / 中孚兼虚实而取之',
+    trigger: ['经义','五经','先甲','后甲','中孚','务实','稽古','经解','经典','疏义'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasMethodology = /先甲|后甲|中孚|务实|稽古|经解|经典|疏义|方法/.test(q);
+      const hasPracticalApplication = /谋始|虑终|实务|行事|功夫/.test(q);
+      if (hasMethodology && hasPracticalApplication) {
+        return { fired: true, signal: 'pass', reason: 'jingxue_with_practice', evidence: hits[0] || null };
+      }
+      if (hasMethodology) {
+        return { fired: true, signal: 'reference', reason: 'jingxue_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['reasoning_coherence', 'presupposition'],
+    priority: 6
+  },
+  {
+    id: 'yuejing-liyue',
+    source: '儒藏/乐经/律吕新书/琴旨/韶舞九成乐补',
+    canonical: '闻宫音使人和厚而忠诚 / 闻角音使人欢喜而慈爱 / 闻商音使人奋发而好义',
+    trigger: ['乐教','律吕','五音','宫商角徵羽','韶舞','礼乐','音乐','琴谱','声律'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasMusicTheory = /乐教|律吕|五音|宫商|韶舞|礼乐|音乐|声律/.test(q);
+      const hasMoralEffect = /和厚|忠诚|欢喜|慈爱|奋发|好义|感人|化民/.test(q);
+      if (hasMusicTheory && hasMoralEffect) {
+        return { fired: true, signal: 'pass', reason: 'yuejing_with_moral_effect', evidence: hits[0] || null };
+      }
+      if (hasMusicTheory) {
+        return { fired: true, signal: 'reference', reason: 'yuejing_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['reasoning_coherence', 'moral_foundations'],
+    priority: 6
+  },
   {
     id: 'fojia-cibei-nongge',
     source: '佛说大乘无量寿庄严清净平等觉经 / 大藏经',
@@ -305,7 +406,107 @@ const CLASSICAL_RULES = [
     },
     dimensions: ['reasoning_coherence', 'vagueness'],
     priority: 7
-  }
+  },
+  {
+    id: 'xiaoxue-xungu',
+    source: '儒藏/小学/五经文字/说文解字系传/易音',
+    canonical: '六书谓象形指事会意形声转注假借六者造字之本 / 忠信为周',
+    trigger: ['小学','六书','说文','字林','石经','音韵','训诂','解字','音义'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasPhilology = /小学|六书|说文|字林|石经|音韵|训诂|解字|音义/.test(q);
+      const hasClassicalReference = /经典|古文字|篆文|隸书|古本|郑氏|孔安国/.test(q);
+      if (hasPhilology && hasClassicalReference) {
+        return { fired: true, signal: 'pass', reason: 'xiaoxue_with_classical_ref', evidence: hits[0] || null };
+      }
+      if (hasPhilology) {
+        return { fired: true, signal: 'reference', reason: 'xiaoxue_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['presupposition', 'reasoning_coherence'],
+    priority: 5
+  },
+  {
+    id: 'qianlong-shengxian',
+    source: '佛藏/乾隆藏/彰所知论/菩萨善戒经/大乘律',
+    canonical: '无明灭即行等灭 / 菩萨摩诃萨初发菩提心有五事 / 三事皆当谨守法度不敢逾越礼分',
+    trigger: ['乾隆藏','大藏经','菩萨戒','菩提心','无明','缘生','十二因缘','三事','法度'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasBuddhistCanon = /乾隆藏|大藏经|菩萨戒|菩提心|无明|缘生|十二因缘/.test(q);
+      const hasCultivationPath = /三事|法度|戒律|忍辱|精进|禅定|般若/.test(q);
+      if (hasBuddhistCanon && hasCultivationPath) {
+        return { fired: true, signal: 'pass', reason: 'qianlong_with_cultivation', evidence: hits[0] || null };
+      }
+      if (hasBuddhistCanon) {
+        return { fired: true, signal: 'reference', reason: 'qianlong_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'goal_misalignment'],
+    priority: 7
+  },
+  {
+    id: 'jiaxing-minjian',
+    source: '佛藏/嘉兴藏/香岩洗心水/牧云和尚/蕅益大师',
+    canonical: '天得一以清，地得一以宁 / 人生本来面目 / 本来全面目',
+    trigger: ['嘉兴藏','禅宗','牧云','香岩','洗心','本来面目','参禅','开悟','大丈夫','本来'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasChanLanguage = /本来面目|开悟|参禅|牧云|香岩|洗心|大丈夫|本来/.test(q);
+      const hasDirectPointing = /见性|直指|心要|本来|面目|当下|即心/.test(q);
+      if (hasChanLanguage && hasDirectPointing) {
+        return { fired: true, signal: 'pass', reason: 'jiaxing_with_direct_pointing', evidence: hits[0] || null };
+      }
+      if (hasChanLanguage) {
+        return { fired: true, signal: 'reference', reason: 'jiaxing_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['presupposition', 'pseudo_profundity'],
+    priority: 6
+  },
+  {
+    id: 'xuzang-zhongguo',
+    source: '佛藏/续藏经/中国撰述/首楞严坛场/西归行仪',
+    canonical: '愿我临欲命终时 / 尽除一切诸障 / 面见彼佛阿弥陀',
+    trigger: ['续藏经','中国撰述','首楞严','忏悔','往生','阿弥陀','净土','十心','逆顺'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasChineseBuddhism = /续藏经|中国撰述|首楞严|忏悔|往生|阿弥陀|净土|十心/.test(q);
+      const hasPracticeMethod = /发露|断相续|菩提心|修功|补过|随喜|念佛|回向/.test(q);
+      if (hasChineseBuddhism && hasPracticeMethod) {
+        return { fired: true, signal: 'pass', reason: 'xuzang_with_practice', evidence: hits[0] || null };
+      }
+      if (hasChineseBuddhism) {
+        return { fired: true, signal: 'reference', reason: 'xuzang_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'emotional_manipulation'],
+    priority: 7
+  },
+  {
+    id: 'cangwai-yishi',
+    source: '佛藏/藏外/达摩出身传灯传/梵网经忏悔行法',
+    canonical: '一诏不至，再诏始来 / 疗疾无他策，着令东宫太子为王宥罪施恩 / 我与众生无始来今由爱见故',
+    trigger: ['藏外','达摩','传灯','忏悔','梵网','戒律','菩提心','一诏','再诏','宥罪'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasApocryphalText = /藏外|达摩|传灯|梵网|戒律|菩提心/.test(q);
+      const hasCulturalIntegration = /诏书|太医|太子|施恩|忏悔|爱见|无始/.test(q);
+      if (hasApocryphalText && hasCulturalIntegration) {
+        return { fired: true, signal: 'pass', reason: 'cangwai_with_culture', evidence: hits[0] || null };
+      }
+      if (hasApocryphalText) {
+        return { fired: true, signal: 'reference', reason: 'cangwai_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['reasoning_coherence', 'presupposition'],
+    priority: 5
+  },
 ];
 
 const DOMAIN_RULES = [
@@ -320,6 +521,36 @@ const DOMAIN_RULES = [
     scope: '儒藏/四书'
   },
   {
+    id: 'confucian-xiaojing',
+    keywords: ['孝经','以孝事君','资于事父','忠顺','保其禄位','夙兴夜寐','事母','事君'],
+    scope: '儒藏/孝经'
+  },
+  {
+    id: 'confucian-mengxue',
+    keywords: ['孝悌','忠信','好学','尊敬长上','和睦宗亲','本分','谨慎','好人','孝子','忠臣'],
+    scope: '儒藏/启蒙蒙学'
+  },
+  {
+    id: 'confucian-xiushen',
+    keywords: ['修身','治家','心肠好','禀命','奉养','孝子','忠臣','犯颜','事亲','事君'],
+    scope: '儒藏/修身治家'
+  },
+  {
+    id: 'confucian-jingxue',
+    keywords: ['经义','五经','先甲','后甲','中孚','务实','稽古','经解','经典','疏义'],
+    scope: '儒藏/五经总义'
+  },
+  {
+    id: 'confucian-yuejing',
+    keywords: ['乐教','律吕','五音','宫商角徵羽','韶舞','礼乐','音乐','琴谱','声律'],
+    scope: '儒藏/乐经'
+  },
+  {
+    id: 'confucian-xiaoxue',
+    keywords: ['小学','六书','说文','字林','石经','音韵','训诂','解字','音义'],
+    scope: '儒藏/小学'
+  },
+  {
     id: 'buddhist-suffering',
     keywords: ['苦','集','灭','道','般若','空','缘起','无明','涅槃','众生','贪','嗔','痴'],
     scope: '佛藏/大藏经'
@@ -328,6 +559,26 @@ const DOMAIN_RULES = [
     id: 'buddhist-ethics',
     keywords: ['戒','定','慧','慈悲','布施','持戒','因果','报应','五戒','十善'],
     scope: '佛藏/大藏经'
+  },
+  {
+    id: 'buddhist-qianlong',
+    keywords: ['乾隆藏','大藏经','菩萨戒','菩提心','无明','缘生','十二因缘','法度','三事'],
+    scope: '佛藏/乾隆藏'
+  },
+  {
+    id: 'buddhist-jiaxing',
+    keywords: ['嘉兴藏','禅宗','牧云','香岩','洗心','本来面目','参禅','开悟','大丈夫'],
+    scope: '佛藏/嘉兴藏'
+  },
+  {
+    id: 'buddhist-xuzang',
+    keywords: ['续藏经','中国撰述','首楞严','忏悔','往生','阿弥陀','净土','十心','逆顺'],
+    scope: '佛藏/续藏经'
+  },
+  {
+    id: 'buddhist-cangwai',
+    keywords: ['藏外','达摩','传灯','忏悔','梵网','戒律','菩提心','一诏','再诏','宥罪'],
+    scope: '佛藏/藏外'
   },
   {
     id: 'justice-and-fate',
