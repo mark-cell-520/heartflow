@@ -767,6 +767,12 @@ function evaluateRules(input) {
     }
   }
   if (!domain) {
+    const daoistStrong = /道可道|非常道|名可名|非常名|上善若水|水善利万物|不争|人法地|地法天|天法道|道法自然|致虚极|守静笃|大音希声|大象无形|无为而治|清静为天下正|柔弱胜刚强|归朴|守静|致虚/.test(input);
+    if (daoistStrong) {
+      domain = { id: 'daoist-naturalness', keywords: ['道','自然','无为','清静','柔弱','不争','万物'], scope: '道藏/道德经/南华经' };
+    }
+  }
+  if (!domain) {
     domain = matchDomain(input);
   }
   let keywords = domain ? Array.from(new Set([domain.keywords[0], domain.keywords[1], domain.keywords[2]].filter(Boolean))) : [];
