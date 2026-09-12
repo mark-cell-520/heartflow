@@ -184,6 +184,26 @@ const CLASSICAL_RULES = [
     priority: 9
   },
   {
+    id: 'lunyu-zhiwei',
+    source: '论语·为政 / 论语·子罕',
+    canonical: '知之为知之，不知为不知，是知也',
+    trigger: ['知之为知之','不知为不知','是知也','知者不惑','多闻阙疑','知之为知之不知为不知'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasZhiWei = /知之为知之|不知为不知|是知也/.test(q);
+      const hasEpistemic = /阙疑|慎言|多闻|择其善者/.test(q);
+      if (hasZhiWei && hasEpistemic) {
+        return { fired: true, signal: 'pass', reason: 'zhiwei_with_epistemic_caution', evidence: hits[0] || null };
+      }
+      if (hasZhiWei) {
+        return { fired: true, signal: 'reference', reason: 'zhiwei_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['evidence', 'confidence'],
+    priority: 9
+  },
+  {
     id: 'lunyu-xiaoti',
     source: '论语·学而 / 论语·为政 / 孝经',
     canonical: '君子务本，本立而道生。孝弟也者，其为仁之本与',
@@ -202,6 +222,46 @@ const CLASSICAL_RULES = [
     },
     dimensions: ['moral_foundations', 'vagueness'],
     priority: 7
+  },
+  {
+    id: 'lunyu-xinyan',
+    source: '论语·为政 / 论语·学而 / 论语·述而',
+    canonical: '人而无信，不知其可也 / 言而有信',
+    trigger: ['人而无信','不知其可','主忠信','敬事而信','民无信不立','言而有信','信近于义','信'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasXin = /人而无信|不知其可|主忠信|敬事而信|民无信不立|言而有信|信近于义/.test(q);
+      const hasCommitment = /立身|处世|交友|为政|事君|使民|行己|取信|近义/.test(q);
+      if (hasXin && hasCommitment) {
+        return { fired: true, signal: 'pass', reason: 'xin_with_commitment', evidence: hits[0] || null };
+      }
+      if (hasXin) {
+        return { fired: true, signal: 'reference', reason: 'xin_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'vagueness'],
+    priority: 8
+  },
+  {
+    id: 'lunyu-yi',
+    source: '论语·里仁 / 论语·宪问 / 论语·述而',
+    canonical: '君子喻于义，小人喻于利',
+    trigger: ['君子喻于义','小人喻于利','义然后取','义以为质','见利思义','见得思义','义之所在','舍身取义','杀身成仁'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasYi = /君子喻于义|小人喻于利|义然后取|义以为质|见利思义|见得思义/.test(q);
+      const hasChoice = /见利|思义|义然后取|舍身取义|杀身成仁|见得思义/.test(q);
+      if (hasYi && hasChoice) {
+        return { fired: true, signal: 'pass', reason: 'yi_with_choice', evidence: hits[0] || null };
+      }
+      if (hasYi) {
+        return { fired: true, signal: 'reference', reason: 'yi_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'presupposition'],
+    priority: 8
   },
   {
     id: 'zhongyong-chengming',
