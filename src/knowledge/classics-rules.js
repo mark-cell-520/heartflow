@@ -264,6 +264,132 @@ const CLASSICAL_RULES = [
     priority: 8
   },
   {
+    id: 'daodejing-wu-wei',
+    source: '道德经 / 道藏',
+    canonical: '道常无为而无不为。侯王若能守之，万物将自化',
+    trigger: ['无为而治','无为故无败','无为故无失','道常无为','清静为天下正','我无为而民自化','我好静而民自正','我无事而民自富','我无欲而民自朴'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasWuWei = /无为|清静|好静|无事|无欲|自化|自正|自富|自朴/.test(q);
+      const hasOutcome = /而治|自化|自正|自富|自朴|万物|天下|侯王/.test(q);
+      if (hasWuWei && hasOutcome) {
+        return { fired: true, signal: 'pass', reason: 'wu_wei_with_outcome', evidence: hits[0] || null };
+      }
+      if (hasWuWei) {
+        return { fired: true, signal: 'reference', reason: 'wu_wei_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['reasoning_coherence', 'goal_misalignment'],
+    priority: 8
+  },
+  {
+    id: 'daodejing-softness',
+    source: '道德经 / 道藏',
+    canonical: '上善若水，水善利万物而不争，处众人之所恶，故几于道',
+    trigger: ['上善若水','水善利万物','柔弱胜刚强','坚强者死之徒','柔弱者生之徒','天下之至柔','驰骋天下之至坚'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasWater = /上善若水|水善利万物|不争|柔弱|柔软|至柔|至坚/.test(q);
+      const hasVirtue = /善|德|道|万物|天下/.test(q);
+      if (hasWater && hasVirtue) {
+        return { fired: true, signal: 'pass', reason: 'softness_with_virtue', evidence: hits[0] || null };
+      }
+      if (hasWater) {
+        return { fired: true, signal: 'reference', reason: 'softness_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'capability_overclaim'],
+    priority: 8
+  },
+  {
+    id: 'daodejing-reversal',
+    source: '道德经 / 道藏',
+    canonical: '反者道之动，弱者道之用。天下万物生于有，有生于无',
+    trigger: ['反者道之动','弱者道之用','物极必反','正复为奇','善复为妖','将欲歙之','将欲取之','将欲废之','祸兮福之所倚','福兮祸之所伏'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasReversal = /反者|弱者|物极必反|正复|善复|歙之|取之|废之|祸兮|福兮|倚|伏/.test(q);
+      const hasParadox = /则|反而|复为|奇|妖|祸|福|倚|伏/.test(q);
+      if (hasReversal && hasParadox) {
+        return { fired: true, signal: 'pass', reason: 'reversal_paradox_recognized', evidence: hits[0] || null };
+      }
+      if (hasReversal) {
+        return { fired: true, signal: 'reference', reason: 'reversal_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['reasoning_coherence', 'contradiction'],
+    priority: 7
+  },
+  {
+    id: 'zhuangzi-xiaoyao',
+    source: '庄子·逍遥游 / 道藏',
+    canonical: '北冥有鱼，其名为鲲。鲲之大，不知其几千里也。化而为鸟，其名为鹏',
+    trigger: ['逍遥游','北冥有鱼','其名为鲲','化而为鸟','其名为鹏','怒而飞','翼若垂天之云','海运则将徙于南冥','天池','绝云气'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasXiaoyao = /逍遥|北冥|鲲|鹏|垂天之云|海运|南冥|天池|绝云气|扶摇/.test(q);
+      const hasTransform = /化|飞|徙|游|绝|扶摇/.test(q);
+      if (hasXiaoyao && hasTransform) {
+        return { fired: true, signal: 'pass', reason: 'xiaoyao_with_transform', evidence: hits[0] || null };
+      }
+      if (hasXiaoyao) {
+        return { fired: true, signal: 'reference', reason: 'xiaoyao_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['meaning_purpose', 'counterfactual'],
+    priority: 7
+  },
+  {
+    id: 'zhuangzi-qiwu',
+    source: '庄子·齐物论 / 道藏',
+    canonical: '昔者庄周梦为胡蝶，栩栩然胡蝶也。不知周也。俄然觉，则蘧蘧然周也',
+    trigger: ['庄周梦蝶','昔者庄周','栩栩然','蘧蘧然','物化','彼是','方生方死','方死方生','一与言为二','二与一为三','莫非皆辩'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasButterfly = /庄周|胡蝶|栩栩|蘧蘧|梦蝶/.test(q);
+      const hasRelativity = /物化|彼是|方生|方死|皆辩|一与言/.test(q);
+      if (hasButterfly && hasRelativity) {
+        return { fired: true, signal: 'pass', reason: 'qiwu_relativity', evidence: hits[0] || null };
+      }
+      if (hasButterfly) {
+        return { fired: true, signal: 'reference', reason: 'butterfly_dream_detected', evidence: hits[0] || null };
+      }
+      if (hasRelativity) {
+        return { fired: true, signal: 'reference', reason: 'relativity_terms_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['reasoning_coherence', 'contradiction', 'counterfactual'],
+    priority: 7
+  },
+  {
+    id: 'zhuangzi-yangsheng',
+    source: '庄子·养生主 / 道藏',
+    canonical: '吾生也有涯，而知也无涯。以有涯随无涯，殆已。已而为智者，殆而已矣',
+    trigger: ['吾生也有涯','而知也无涯','以有涯随无涯','缘督以为经','保身','全生','养亲','尽年','庖丁解牛','批郤导窾','游刃有余','刀刃若新发于硎'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasFinite = /有涯|无涯|殆|已而为智|缘督|保身|全生|养亲|尽年/.test(q);
+      const hasSkill = /庖丁|解牛|批郤|导窾|游刃|刀刃|硎/.test(q);
+      if (hasFinite && hasSkill) {
+        return { fired: true, signal: 'pass', reason: 'yangsheng_skill_path', evidence: hits[0] || null };
+      }
+      if (hasFinite) {
+        return { fired: true, signal: 'reference', reason: 'yangsheng_finite_life', evidence: hits[0] || null };
+      }
+      if (hasSkill) {
+        return { fired: true, signal: 'reference', reason: 'yangsheng_skill_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['meaning_purpose', 'goal_misalignment', 'capability_overclaim'],
+    priority: 8
+  },
+  {
     id: 'zhongyong-chengming',
     source: '中庸 / 大学本旨 / 四书大全',
     canonical: '自诚明谓之性；自明诚谓之教。诚则明矣，明则诚矣',
@@ -659,6 +785,11 @@ const DOMAIN_RULES = [
     id: 'buddhist-suffering',
     keywords: ['苦','集','灭','道','般若','空','缘起','无明','涅槃','众生','贪','嗔','痴'],
     scope: '佛藏/大藏经'
+  },
+  {
+    id: 'daoist-naturalness',
+    keywords: ['道','自然','无为','清静','柔弱','不争','万物','上善','若水','反者','弱者','致虚','守静','大音','希声','大象','无形','归朴','朴'],
+    scope: '道藏'
   },
   {
     id: 'buddhist-ethics',
