@@ -779,6 +779,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_classics',
+    description: '古典文本预路由：对儒学/佛学/古典文本做 domain 识别 + 规则评估，返回 classicalRelevant / domain / ruleCount / hitCount / findings。',
+    inputSchema: { type: 'object', properties: { text: { type: 'string', description: '待评估文本' } }, required: ['text'] }
+  },
+
+  {
     name: 'heartflow_philosophy',
     description: '哲学评估：返回AI自我定位、四框架伦理评估、决策指令',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
@@ -4126,6 +4132,25 @@ const HANDLERS = {
 
   // [v6.7.0] 42维全量审核
   heartflow_audit42: handleAudit42,
+
+  // [v6.7.x] 古典文本预路由
+  heartflow_classics: (args) => {
+    try {
+      const { evaluateRules } = require('./knowledge/classics-value-mapper.js');
+      const text = args?.text || '';
+      const r = evaluateRules(text);
+      return {
+        classicalRelevant: r.classicalRelevant,
+        domain: r.domain,
+        ruleCount: r.ruleCount,
+        hitCount: r.hitCount,
+        findings: r.findings,
+        summary: r.summary,
+        hits: r.hits,
+        timestamp: Date.now()
+      };
+    } catch (e) { return { error: e.message }; }
+  },
 
   // [v6.6.0] 批量辨别
   heartflow_bulk_discriminate: handleBulkDiscriminate,
