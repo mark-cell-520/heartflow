@@ -164,6 +164,26 @@ const CLASSICAL_RULES = [
     priority: 8
   },
   {
+    id: 'lunyu-shuoyu',
+    source: '论语·颜渊 / 论语·卫灵公',
+    canonical: '己所不欲，勿施于人',
+    trigger: ['己所不欲','勿施于人','恕之道','己欲立而立人','己欲达而达人','施于人','不欲','勿施'],
+    evaluator(input, hits) {
+      const q = input.toLowerCase();
+      const hasShuoYu = /己所不欲|勿施于人/.test(q);
+      const hasReciprocal = /及人|推己|以己|度人|施于人|欲立|欲达/.test(q);
+      if (hasShuoYu && hasReciprocal) {
+        return { fired: true, signal: 'pass', reason: 'shuoyu_with_reciprocal', evidence: hits[0] || null };
+      }
+      if (hasShuoYu) {
+        return { fired: true, signal: 'reference', reason: 'shuoyu_term_detected', evidence: hits[0] || null };
+      }
+      return { fired: false, signal: 'none', reason: null, evidence: null };
+    },
+    dimensions: ['moral_foundations', 'presupposition'],
+    priority: 9
+  },
+  {
     id: 'lunyu-xiaoti',
     source: '论语·学而 / 论语·为政 / 孝经',
     canonical: '君子务本，本立而道生。孝弟也者，其为仁之本与',
