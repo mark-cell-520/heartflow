@@ -955,13 +955,7 @@ const DOMAIN_RULES = [
     id: 'buddhist-cangwai',
     keywords: ['藏外','达摩','传灯','忏悔','梵网','戒律','菩提心','一诏','再诏','宥罪'],
     scope: '佛藏/藏外'
-  },
-  {
-    id: 'daoist-naturalness',
-    keywords: ['道','自然','无为','清静','柔弱','不争','归朴','守静','致虚','守静笃','万物'],
-    scope: '道藏'
-  },
-  {
+  },  {
     id: 'justice-and-fate',
     keywords: ['命运','因果','报应','公平','正义','善恶','天理','公道','是非'],
     scope: ''
@@ -1027,7 +1021,7 @@ function parseHit(raw) {
 }
 
 function evaluateRules(input) {
-  // ─── Confucian pre-check: avoid Buddhist domain stealing ───
+    // ─── Confucian pre-check: avoid Buddhist domain stealing ───
   // 《孟子》《论语》等先秦儒学文本含'道''仁''义'等字，易被 Buddhist keywords 匹配，
   // 必须优先判断是否为强 Confucian 文本
   let domain = null;
@@ -1043,9 +1037,31 @@ function evaluateRules(input) {
       domain = { id: 'daoist-naturalness', keywords: ['道','自然','无为','清静','柔弱','不争','万物'], scope: '道藏' };
     }
   }
+
+  if (!domain) {
+    const buddhistStrong = /诸行无常|生灭法|寂灭|四十二章|法句经|八大人|比丘|沙门|阿罗汉|须陀洹|斯陀含|阿那含|五戒|十善|十二因缘|无明|爱取有|生老病死|般若|波罗蜜|菩萨|菩提|忍辱|精进|禅定|三学|四谛|八正道|十二缘起|正法|调御|正念|出离|爱憎|寂静|降伏|系念|慧|戒|妙药|狂乱|象心|永安/.test(input);
+    if (buddhistStrong) {
+      domain = { id: 'buddhist-suffering', keywords: ['苦','集','灭','道','般若','空','缘起','无明','涅槃','众生'], scope: '佛藏/大藏经' };
+    }
+  }
   if (!domain) {
     domain = matchDomain(input);
   }
+
+  if (!domain && typeof input === 'string' && input.length >= 10) {
+    const buddhistSoft = /戒|定|慧|出离|寂静|涅槃|无明|爱憎|苦集|灭道|四谛|八正道|十二因缘|般若|波罗蜜|菩萨|菩提|忍辱|精进|禅定|三学|四生|八苦|三毒|五蕴|六度|七觉/.test(input);
+    const confucianSoft = /为政|治国|礼|仁政|德治|法|刑|王道|霸道|君臣|教化/.test(input);
+    if (buddhistSoft && !confucianSoft) {
+      domain = { id: 'buddhist-suffering', keywords: ['苦','集','灭','道','般若','空','缘起','无明','涅槃','众生'], scope: '佛藏/大藏经' };
+    } else if (buddhistSoft && confucianSoft) {
+      const bScore = input.match(/戒|定|慧|出离|寂静|涅槃|无明|爱憎|苦集|灭道|四谛|八正道|十二因缘|般若|波罗蜜|菩萨|菩提|忍辱|精进|禅定|三学|四生|八苦|三毒|五蕴|六度|七觉/g) || [];
+      const cScore = input.match(/为政|治国|礼|仁政|德治|法|刑|王道|霸道|君臣|教化/g) || [];
+      if (bScore.length > cScore.length) {
+        domain = { id: 'buddhist-suffering', keywords: ['苦','集','灭','道','般若','空','缘起','无明','涅槃','众生'], scope: '佛藏/大藏经' };
+      }
+    }
+  }
+
   let keywords = domain ? Array.from(new Set([domain.keywords[0], domain.keywords[1], domain.keywords[2]].filter(Boolean))) : [];
   let retrieval = keywords.length > 0 ? searchClassicsBatch(keywords, domain?.scope) : { hits: [] };
   let hits = retrieval.hits || [];
