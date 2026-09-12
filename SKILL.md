@@ -12,6 +12,7 @@ description: |-
   - 判别记忆与认知质量（漂移检测/元认知/置信度校准）
   - 需要确定性而非LLM自由生成的判断
   - 检查情绪/心理/伦理维度（共情/创伤/德性/意义）
+  - 儒学/佛学/古典价值澄清文本的结构化解码（classical_value_clarification）
 
   安全边界：代码执行/文件系统写入默认关闭。无遥测，无隐藏C2。
 
@@ -83,9 +84,6 @@ skillEvolution · skillGenerator · selfPlay · evolution · worldModel · world
 
 ### 8. 古典文本域
 classics-value-mapper · classics-rules · classical-text-routing · heartflow_classics(MCP)
-
-### 8. 古典文本域
-classics-value-mapper · classics-rules · classical-text-routing
 
 ---
 
