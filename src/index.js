@@ -72,6 +72,7 @@ const { checkForbiddenCall } = require('./forbidden-call.js');
 const { checkCompletionEvidence } = require('./completion-evidence.js');
 const { checkDecisionTrace } = require('./decision-trace.js');
 const { checkAIMisuse } = require('./ai-misuse.js');
+const { checkReversibility } = require('./reversibility.js');
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 const { detect } = require('./shield/ai-writing-tell.js');
@@ -3991,6 +3992,7 @@ module.exports = {
   checkCompletionEvidence,
   checkDecisionTrace,
   checkAIMisuse,
+  checkReversibility,
   summarizeDiscrimination,
   crossAnalyze,
   entropyAnalysis,
