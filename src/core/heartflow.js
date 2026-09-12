@@ -4387,10 +4387,39 @@ class HeartFlow {
       }
     } catch (_) { /* 输入检测不阻断 */ }
 
-    const TCMod = _ThoughtChain();
-    const chain = this.thoughtChain || new (TCMod.ThoughtChain)(this);
-    if (depth) chain.setDepth(depth);
-    const result = await chain.run(input);
+    // ─── 古典文本软着陆路由 ──
+    // 对儒学/佛学/古典价值澄清文本，不强行走 generic task → "不知道"
+    let result;
+    try {
+      const ClassicsValueMapper = require('../knowledge/classics-value-mapper.js');
+      const ruleOut = ClassicsValueMapper.evaluateRules(input);
+      if (ruleOut.classicalRelevant) {
+        result = {
+          output: {
+            conclusion: ruleOut.summary.passes > 0
+              ? 'passed classical value check'
+              : 'classical reference',
+            meta: {
+              confidence: 0.7,
+              taskType: 'classical_value_clarification',
+              classical: true,
+              domain: ruleOut.domain,
+              ruleCount: ruleOut.ruleCount,
+              hitCount: ruleOut.hitCount
+            }
+          },
+          classicalAnalysis: ruleOut,
+          _classicalShortcut: true
+        };
+      }
+    } catch (_) { /* 古典路由失败，走正常链路 */ }
+
+    if (!result) {
+      const TCMod = _ThoughtChain();
+      const chain = this.thoughtChain || new (TCMod.ThoughtChain)(this);
+      if (depth) chain.setDepth(depth);
+      result = await chain.run(input);
+    }
     // ─── 合并输入辨别检测结果到 result ──
     if (this._pendingInputCheck) {
       try {

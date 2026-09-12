@@ -7,22 +7,13 @@
  * 3. 提供 evaluateWithClassics(input) 供 pipeline/thought-chain 统一调用
  */
 
-const { evaluateRules, searchClassicsBatch, parseHit, CLASSICAL_RULES, DOMAIN_RULES } = require('./classics-rules');
+const { evaluateRules, searchClassicsBatch, parseHit, CLASSICAL_RULES, DOMAIN_RULES, matchDomain } = require('./classics-rules');
 
 module.exports = {
   evaluateRules,
   searchClassicsBatch,
   parseHit,
-  matchDomain: (input) => {
-    const q = input.toLowerCase();
-    let best = null;
-    let bestScore = 0;
-    for (const rule of DOMAIN_RULES) {
-      const score = rule.keywords.reduce((acc, kw) => acc + (q.includes(kw) ? 1 : 0), 0);
-      if (score > bestScore) { bestScore = score; best = rule; }
-    }
-    return bestScore > 0 ? best : null;
-  },
+  matchDomain,
   searchClassics: (keyword, scope) => searchClassicsBatch([keyword], scope),
   mapToDimensions: (rule) => rule ? rule.dimensions : [],
   CLASSICAL_RULES,
