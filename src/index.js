@@ -70,6 +70,7 @@ const checkArchitectureConsistency = require('./architecture-consistency.js');
 const { checkPlanGate } = require('./plan-gate.js');
 const { checkForbiddenCall } = require('./forbidden-call.js');
 const { checkCompletionEvidence } = require('./completion-evidence.js');
+const { checkDecisionTrace } = require('./decision-trace.js');
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 const { detect } = require('./shield/ai-writing-tell.js');
@@ -3987,6 +3988,7 @@ module.exports = {
   checkPlanGate,
   checkForbiddenCall,
   checkCompletionEvidence,
+  checkDecisionTrace,
   summarizeDiscrimination,
   crossAnalyze,
   entropyAnalysis,

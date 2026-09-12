@@ -4176,6 +4176,13 @@ const HANDLERS = {
       return checkCompletionEvidence(text);
     } catch (e) { return { error: e.message }; }
   },
+  heartflow_check_decision_trace: (args) => {
+    try {
+      const { checkDecisionTrace } = require('./index.js');
+      const decision = args?.decision || args?.text || {};
+      return checkDecisionTrace(typeof decision === 'string' ? JSON.parse(decision) : decision);
+    } catch (e) { return { error: e.message }; }
+  },
 
   // [v6.3.34] 新MCP工具
   heartflow_philosophy: (args) => {
