@@ -58,9 +58,10 @@
   },
   "license": "MIT",
   "dependencies": {
-    "mathjs": "~15.2.0",
     "@xenova/transformers": "~2.17.2",
-    "pm2": "~7.0.3"
+    "js-yaml": "^4.3.2",
+    "mathjs": "~15.2.0",
+    "pm2": "^5.3.1"
   },
   "repository": {
     "type": "git",
