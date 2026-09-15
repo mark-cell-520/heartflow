@@ -977,8 +977,10 @@ function matchDomain(input) {
 }
 
 function searchClassics(keyword, scope) {
+  // NOTE: search_guji.sh is not bundled; this is dead code pending future integration.
+  // When enabled, replace execSync string interpolation with parameterized array to prevent shell injection.
   if (!fs.existsSync(SCRIPT)) {
-    return { hits: [], error: 'search_guji.sh not found' };
+    return { hits: [], error: 'searchClassics disabled: search_guji.sh not found' };
   }
   try {
     const cmd = scope ? `bash "${SCRIPT}" "${keyword}" "${scope}"` : `bash "${SCRIPT}" "${keyword}"`;
