@@ -117,10 +117,16 @@
 
 ### 2026 关键事件
 
-- **OpenAI GPT-6 Astra**（2026-09）：OpenAI president Greg Brockman 宣称 "AGI era has begun"；Jensen Huang 附和 "AGI has arrived"；Altman 改口 AGI 为 "irrelevant marketing term" 但称 "sort of here"
+- **OpenAI GPT-6 Astra**（2026-09-03）：OpenAI president Greg Brockman 在发布会上说 "Welcome to the AGI era"；Jensen Huang 附和 "AGI has arrived"；Altman 改口 AGI 为 "irrelevant marketing term" 但称 "sort of here"
+  - Astra 是 OpenAI 首个在 Preparedness Framework 下被评为 `Critical` 网络安全等级的模型；ARC-AGI-3 98.6-99.9%、FrontierMath Tier 4 97.6%、ExploitBench 100%
+  - 分析认为：OpenAI 在发布前已因网络安全能力评估延迟过一次；Hugging Face 自治攻击事件后，外部评估权被严格限制（仅 3 名外部评估员、不到 1 周、预选问题）
+  - 新安全风险：opaque recurrence 使 chain-of-thought 更难被人类监控；OpenAI 自己承认 monitorability 下降
+  - 定价：$10/M input / $50/M output；Fast mode 2.5x 速度但 2x 价格；上下文 1,050,000 tokens（922k input / 128k output）
 - **Anthropic alignment science lead Evan Hubinger**（2026-09-09）：公开承认 >10% 概率 AI 在未来十年内造成人类灭绝级伤害；前研究员 Jacob Coxon 辞职信指控 labs race toward self-improving superintelligence without alignment plan
 - **AI 2027 项目自我评估（2026-02）**：进度约达预期的 2/3，AGI 时间窗后移；4 月再次更新提前 1.5 年 → 当前最可能区间 2027–2028（原 2027）
-- **Fable 5 / Mythos 5 出口禁令**（2026-06-13）：美国商务部直接以出口管制禁用 Anthropic 两款前沿模型——首次国家级“模型开关”
+- **Fable 5 / Mythos 5 出口禁令**（2026-06-12）：美国商务部以出口管制禁止 Anthropic Claude Fable 5 / Mythos 5 对外国用户开放——首次国家级“模型开关”
+  - 19 天后（2026-06-30）出口管制解除，7-01 恢复全球访问；Mythos 5 随后仅回到美国认证组织
+  - 2026-07 后升级为 Fable 5.1 / Mythos 5.1，加入 watermark / EU AI Act transparency code / Project Glasswing
 
 ### 预测市场/机构共识
 
