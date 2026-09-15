@@ -28,7 +28,12 @@
 
 - **2026 年的 BCI 不再是实验室原型**：双向系统（记录+刺激）、AI 信号解码、无线传输、边缘计算已形成商用闭环（Neuroba 2026 综述）
 - **AI 是 BCI 的架构基础**：神经信号是高维非平稳时间序列， classical signal processing alone 不可靠；深度学习提供三样东西：神经解码规模化、实时降噪、跨被试迁移（PMC11557214）
-- **Neuralink 类植入体**：2026 进入批量 human trial 阶段（Forbes Africa）；但真正拐点来自**无创/微创**方案——neural dust / stentrodes 2028–2035 扩展至增强（Ian Khan prediction）
+- **Neuralink**：2026-01 起已累计植入 21+ 人；FDA Breakthrough Device Designation
+- **Paradromics**（2026-08-26）：FDA 批准 Connect-One 临床研究扩展至个人计算设备（笔记本/平板/手机），Convey 系统负责神经意图→数字设备控制
+- **CorTec Brain Interchange**：FDA 第二例 Breakthrough Device Designation（2026-08-30），用于四肢瘫痪沟通；首例 Breakthrough 是 2026-04 的中风运动康复
+- **中国 BCI 爆发**：截至 2026-06 134 注册临床研究；NMPA 首批 5 个 BCI 产品获批（Neuracle 半侵入 ECoG 2026-03 Class III 为首例）
+- **BCI 志愿者数量翻倍**：MIT Technology Review 2026-06 报道，全球带电极 BCI 试验人数从 67（2023 底）激增
+- **侵入性梯度**：非侵入 EEG → 半侵入 ECoG/endovascular → 全植入 closed-loop DBS；每级都进入真实临床
 
 ### 2026–2028 里程碑
 
@@ -52,9 +57,16 @@
 ### 技术现状
 
 - **两个 FDA 批准疗法落地**：Casgevy（Vertex/CRISPR Therapeutics）和 EDIT-101（Intellia/Regeneron）标志着 in vivo 编辑从概念进入临床现实
+- **Casgevy 商业现实**：已在 10+ 国家获批；sickle cell 100%  crisis-free（中位 35+ 个月）；beta-thalassemia 98.2% 输血独立；2026 年 FDA 扩展至 2 岁以上儿童
 - **碱基编辑进入人类胚胎**：2026 年首次在人类胚胎中实现 precise single-base editing 且避免大染色体异常（Nature 级成果，但 mosaicism/off-target 仍存）
-- **prime editing**：理论可治 89% 已知人类单基因突变
-- **市场预测**：2030 年 CRISPR 市场预测 $13B（CAGR ~16%），2026 年约 $7.6B
+- **prime editing 首次人体治愈**：2025-12 NEJM 报道 19 岁 CGD 患者 Ty Sperle 被治愈（2026-02-28 公开）；原理是 autologous ex vivo correction（取细胞→修复→回输）
+- **VERVE-102**：PCSK9 base editing，LDL-C 降低 53%（最高 69%），Phase 1b
+- **Intellia lonvo-z**：in vivo CRISPR for hereditary angioedema，2026-04 滚动 BLA 提交，87% HAE attack reduction
+- **Prime Medicine PM577**：FDA IND cleared，Wilson disease，LNP-delivered prime editor，late 2026 trial start，2027 初 data
+- **Beam Therapeutics BEAM-302**：AATD base editing， durable AAT protein increase，FDA accelerated approval alignment
+- **Precision Biosciences PBGENE-HBV**：first clinical evidence of directly eliminating hepatitis B cccDNA
+- **CS-101 transformer base editor**：first clinical success in β-thalassaemia (Nature 2026-04-16)
+- **市场与管线**：~250 gene editing clinical trials active in 2026；2030 年 CRISPR 市场预测 $13B（CAGR ~16%），2026 年约 $7.6B
 
 ### 进化含义
 
@@ -73,6 +85,10 @@
   - 分析认为：immune-based senolysis（CAR-T 清除 SnC）这类免疫编辑策略在肿瘤学以外用作衰老干预，仍在临床前阶段
   - transient reprogramming（部分重编程，不经过 iPSC 阶段）
   - senomorphic（抑制 SASP 而非杀死细胞）
+- **TAME 试验**（Targeting Aging with Metformin）：NIH 资助 Phase III，3,000 受试者，复合终点（心血管/癌症/痴呆/死亡率），结果预计 2028；若阳性 = FDA 首次承认 aging 本身可治疗
+- **PEARL 试验**（Participatory Evaluation of Aging with Rapamycin for Longevity）：低剂量 rapamycin 长寿信号，多项小型人类试验进行中
+- **D+Q 人体数据**：梅奥诊所 Phase 1（IPF 患者，开放标签，约 12 人）显示 senescent cell burden 下降；2026-02 骨健康 Phase 2（60 名绝经后女性）主要终点未达标但 2/4/20 周次级终点有信号
+- **NMN / NR**：2026 头对头临床数据确认两者均在 14 天内翻倍 circulating NAD+；下游信号不同，但均未出现 rodent 级的 dramatic 抗衰效果
 - **健康寿命（healthspan）取代寿命（lifespan）成为政策目标**：WHO 2026 报告将健康寿命纳入国家发展指标
 
 ### 进化含义
@@ -86,9 +102,12 @@
 
 ### 技术现状
 
-- **SpaceX Starship**：月球货运 2028 起步，火星 2029 窗口开启
-- **NASA Artemis**：2026–2027 载人绕月/登月 rehearsal，建立 Lunar Gateway 轨道站
-- **商业月球资源**：AstroForge（铂族金属提炼）、ispace（水冰开采）2026–2028 试着陆
+- **NASA Artemis II**（2026-04）：首次载人绕月，4 名宇航员飞行 252,756 英里，创人类离开近地轨道最远距离记录
+- **Artemis III**：计划 2027-2028 登月，SpaceX Starship HLS / Blue Origin 竞标
+- **Artemis IV**：NASA 维持 2028 首次登月着陆目标不变
+- **SpaceX Starship**：2026 年重心短暂转向月球基地（Moon Base Alpha）；2028 无人 Starship HLS 着陆测试；2028/2029 火星窗口计划 20 艘 Starship
+- **中国**：嫦娥 7 号 2027 月球南极探测（含着陆器+轨道器+释放探测器）；天问 3 号火星采样 2028 发射、2031 返回
+- **商业月球**：AstroForge（铂族金属）、ispace（水冰开采）2026–2028 试着陆
 
 ### 进化含义
 
@@ -97,7 +116,18 @@
 
 ---
 
-## 六、量子计算 — 从 NISQ 到容错过渡期
+## 六、量子计算 — 从 NISQ 到容错过渡期 + 密码学奇点
+
+### 技术现状
+
+- **IBM Quantum**：2026-08-19 连接首批低温模块化系统；路线图指向 2029 年约 2,000 逻辑量子比特（Blue Jay），2033 年商用容错
+- **QuEra Libra**：2026-06-16 宣布 2028 年在 Amazon Braket 提供 256 个逻辑量子比特服务
+- **IonQ**：目标 2028 年 1,600 逻辑量子比特，2030 年 80,000 逻辑量子比特
+- **密码学奇点窗口**：2026-05 Harvard 评估把 breaking RSA-2048 的物理量子比特需求从 ~20M 降至 <100,000；对应估算时间窗提前到 2029–2033
+- **NIST 后量子标准落地**：FIPS 203 (ML-KEM) / FIPS 204 (ML-DSA) / FIPS 205 (SLH-DSA) 已于 2024-08 定稿；2026 进入强制迁移阶段
+- **美国联邦迁移令**：2026-06-22 Executive Order 14412 + OMB M-26-15 要求高价值资产 2030-12-31 完成密钥迁移，2031-12-31 完成数字签名迁移，2035 年 RSA/ECC 完全禁用
+- **NSA CNSA 2.0**：2027-01-01 起新国家安全系统必须采用后量子算法；2030 软件/固件签名必须量子安全
+- **欧盟/行业**：EU NIS Cooperation Group 要求 2026 底前完成国家密码学战略与资产清单；G7 金融路线图 2026-2027 启动迁移
 
 ### 技术现状
 
@@ -162,6 +192,13 @@
 - **法律人格讨论进入主流**：分析认为 personhood for AI-enhanced humans? 已在法学研讨会出现
 - **“人类”定义的收缩与扩张**：保守派退回生物本质主义，进步派主张认知/意识标准，中间派求“尊严门槛”
 - **宗教回应滞后但真实**：天主教堂 2026 通谕是 20 年来第一次系统性回应生物技术
+
+### 军事增强 / 战场外骨骼
+
+- **乌克兰实战验证**：2026-04 第 7 空中突击旅在 Pokrovsk 使用 Hypershell X Pro（消费级 AI 外骨骼，$1,000）执行火炮装填/机动任务；30% 负载降低、最高 20 km/h、单次充电 17 km
+- **美国陆军**：Warrior Web / DARPA Soft Exosuit 持续 funding；Anduril+Meta $159M AR 头盔合同（2026-03）集成 Gemini/Llama/Claude 做语音→无人机/传感器指令
+- **市场数据**：2025 年全球军事外骨骼 $1.02B → 2026 $1.21B → 2028 $1.68B → 2034 $4.98B（CAGR 18%）；美国占 42% 份额
+- **人体增强市场整体**：2025 $3.2B → 2034 $18.9B（CAGR 21.5%），工业/医疗/国防三驾马车
 
 ---
 
@@ -300,6 +337,12 @@
 44. PNAS "Could humans and AI become a new evolutionary individual?" (2026)
 
 ### 人形机器人 / 具身智能
+
+- **Tesla Optimus**：2026-07 Q2 更新确认 Fremont 工厂 7-8 月启动量产线；2026 年底前供应商订单 ~15,000 台（~1,000/周 9 月→2,500/周 12 月）；2027 年 Giga Texas 二工厂扩产；Musk 称 "biggest product ever" 且 2027 年外售
+- **Figure AI**：唯一美国突破 1,000 台量产的人形机器人公司；获 Nvidia/OpenAI/Bezos 支持；Figure 02 在宝马工厂部署
+- **Agility Robotics Digit**：已商业部署（Amazon/GXO/Schaeffler/Toyota），$300M 合同额；2026-07 在 Fremont 开设 60,000 平方英尺训练设施（紧邻特斯拉 Optimus 工厂）
+- **中国集群**：Unitree H1/H1-2（$90K-$148K，30kg 负载）、XPeng Iron、AGIBOT 等主打成本下探
+- **定价与可用性**：Unitree G1 $19.3K（研究），Booster K1 $5,999（教育），Optimus/Figure 02 未公开售价但瞄准工业租赁（RaaS）
 45. Tesla "Optimus Gen 3" production line (Fremont 2026, Texas 2027)
 46. Business Insider "Everything We Know About Tesla's Optimus Humanoid Robot" (2026-07)
 47. Teslarati "Tesla AI boss reveals how big Optimus is going to get" (2026-07-31)
@@ -313,7 +356,13 @@
 55. TechEconomics "Full-Body Human Augmentation: Exoskeletons and Powered Prosthetics Enter the Mainstream" (2026)
 56. FutureWarns "The Future of Human Augmentation: What's Actually Coming by 2035" (2026-08)
 
-### 数字意识 / 心智上传
+### 数字意识 / 心智上传 / 数字孪生
+
+- **IBS 虚拟细胞项目**（2026-04-27）：用空间转录组+AI 构建人类数字孪生，目标是在药物测试/疾病预测中替代真实人体实验
+- **EU Virtual Human Twins Roadmap**（2026-06  webinar）：800+ 贡献者六部分路线图（科学/技术/基础设施/伦理/社会经济/可持续），把个人生理实时数据→可计算模型→个性化治疗
+- **Twelfth Brain**（2026 成立）：将个人决策模式/专业判断/认知工作流建模成可继承的数字认知资产（给继任者用）
+- **MIT McGovern**（2026-09-02）+ Gizmodo（2026-04-16）+ Zenodo 意识移植论文（2026-03-31）：意识上传从纯哲学进入工程化讨论
+- **GIUP Gradual Identity Upload**（DEV Community）：认知数字孪生的安全层——不是 snapshot 是渐进式身份迁移
 57. MIT McGovern Institute "Can (and should) consciousness be uploaded to a machine?" (2026-09-02)
 58. Gizmodo "Could This AI-Simulated Brain Lead to Human Mind-Uploading?" (2026-04-16)
 59. Nova Spivack "What Mind Uploading Would Actually Require"
@@ -336,6 +385,12 @@
 74. Cartagena Protocol on Biosafety "Ad Hoc Technical Expert Group on Synthetic Biology" (Montreal, May 19-22, 2026)
 
 ### AI 安全 / 治理
+
+- **OpenAI**：2026-02 从 Anthropic 挖走 Dylan Scandinaro 担任 Head of Preparedness（$555K base）；Astra pause（2026-08-07）证明 Preparedness Framework 真触发暂停
+- **Anthropic**：Claude Opus 4.5（2026-11-24）ARC-AGI 8.6%；FLI Summer 2026 AI Safety Index 评级 C+（9 实验室最高）；Dario Amodei 预测 AGI 2026-2027
+- **Google DeepMind**：Gemini 3 Pro（2026-11-18）ARC-AGI 31.1% → Deep Think 45.1%；145 页安全框架预测 AGI 2030  plausible；Josh Engels 2026-09-12 离职安全团队加入 METR
+- **监管框架**：EU AI Act 执行框架已建立（AI Office + 国家主管机关 + EDPS 三分权）；US Executive Order 14412（2026-06-22）+ OMB M-26-15 联邦 PQC/AGI 安全双轨推进
+- **市场信号**：OpenAI  projected $225B revenue 2030；Anthropic projected $75B；$3.1B model development spend (2025)
 75. EU Digital Omnibus on AI (adopted 2026-06-16, enforcement pending)
 76. New York RAISE Act (signed 2026-03-27, effective 2027-01-01)
 77. Google DeepMind "Global AGI Safety Proposal" (2026)
@@ -353,4 +408,5 @@
 - 2026-09-15 v0.1.0：初始版本，6 层覆盖（地缘/气候/技术/经济/治理/社会心理）
 - 2026-09-15 v0.2.0：升级为“人类进化”主线，新增 BCI/CRISPR/长寿/太空/量子/AGI 时间窗/超人类主义
 - 2026-09-15 v0.3.0：HeartFlow 全文本 gate 监督 + 逐节探测 + 假阳性分类
-- 2026-09-15 v0.4.0：新增人形机器人/具身智能、数字意识/心智上传、军事增强、合成生物学、AI 安全治理细化；来源扩展至 83+ 条
+|- 2026-09-15 v0.4.0：新增人形机器人/具身智能、数字意识/心智上传、军事增强、合成生物学、AI 安全治理细化；来源扩展至 83+ 条
+|- 2026-09-16 v0.5.0：多维度细化（BCI/CRISPR/长寿/太空/量子/人形机器人/数字孪生/军事增强/AI治理）+ 新增量子密码学奇点独立节 + 市场数据补强
