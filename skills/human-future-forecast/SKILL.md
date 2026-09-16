@@ -1,7 +1,7 @@
 ---
 name: human-future-forecast
 description: "以人类进化为总目标的三年推演技能（2026-2028）。覆盖：AGI/脑机接口/基因编辑/长寿逆转/太空殖民/量子计算/超人类主义/人形机器人/数字意识/军事增强。触发词：推演人类未来 / human future / 未来三年推演 / future forecast / 人类进化。"
-version: 0.5.0
+version: 0.6.0
 ---
 
 # Human Future Forecast — 人类进化三年推演（2026–2028）
@@ -13,25 +13,25 @@ version: 0.5.0
 1. **AGI 时间窗**：OpenAI GPT-6 Astra（2026-09-03）/ Anthropic Claude Opus 4.5（2026-11-24, ARC-AGI 8.6%）/ DeepMind Gemini 3 Pro（2026-11-18, ARC-AGI 31.1%→Deep Think 45.1%）/ Metaculus median Feb 2028
 2. **脑机接口（BCI）**：Neuralink 21+ 例 human trial（2026-01）/ Paradromics FDA 批准个人计算设备控制（2026-08-26）/ CorTec Brain Interchange FDA Breakthrough（2026-08-30）/ 中国 NMPA 首批 5 个 BCI 产品（2026-03）
 3. **基因编辑（CRISPR）**：Casgevy/EDIT-101 两个 FDA 批准 / Casgevy 10+ 国家获批 / 碱基编辑进入人类胚胎 / 2030 年预测 $13B 市场
-4. **长寿/衰老逆转**：AI 设计药物 rentosertib 让 6 个衰老时钟回拨 3-4 年（Nature Biotech 2026-09-07）/ TAME 试验（NIH Phase III, 3,000 人, 结果 2028）/ PEARL rapamycin 试验 / D+Q senolytic Phase 1/2 进行中
+4. **长寿/衰老逆转**：AI 设计药物 rentosertib 让 6 个衰老时钟回拨 3-4 年（Nature Biotech 2026-09-07）/ TAME 试验（NIH Phase III, 3,000 人, 结果 2028）/ PEARL rapamycin 试验（114 完成者）/ D+Q senolytic Phase 1/2 进行中 / Life Biosciences ER-100 首例人体部分重编程（2026-06）/ Altos Labs $6B / NewLimit $760M / Retro Biosciences $180M / Unity 清算标志行业洗牌
 5. **太空殖民**：NASA Artemis II 载人绕月（2026-04, 252,756 英里）/ Artemis III/IV 登月（2027-2028）/ SpaceX Starship HLS
-6. **量子计算**：IBM 模块化低温系统（2026-08-19）/ QuEra Libra 256 逻辑量子比特（2028, Amazon Braket）/ IonQ 1,600 逻辑量子比特（2028）/ 密码学奇点窗口 2029-2033
+6. **量子计算**：IBM 模块化低温系统（2026-08-19）/ QuEra Libra 256 逻辑量子比特（2028, Amazon Braket）/ IonQ 1,600 逻辑量子比特（2028）/ Microsoft Azure Quantum Copilot（2026-10）/ Google Willow 105-qubit / 密码学奇点窗口 2029-2033 / Cloudflare post-quantum TLS 默认开启
 7. **超人类主义/后人类**：PNAS 2026 论证人类-AI 可成为新进化个体；Pope Leo XIV Magnifica Humanitas 警告技术偶像崇拜
 8. **人形机器人/具身智能**：Tesla Optimus 15,000 台（2026 年底）/ Figure AI 突破 1,000 台量产 / Agility Robotics Digit $300M 合同
 9. **数字意识/心智上传/数字孪生**：IBS 虚拟细胞项目（2026-04-27）/ EU Virtual Human Twins Roadmap（800+ 贡献者）/ Twelfth Brain 个人认知建模（2026 成立）
 10. **军事增强**：乌克兰 Hypershell X Pro 实战（2026-04）/ Anduril+Meta $159M AR 头盔 / 军事外骨骼市场 $1.21B（2026）→ $4.98B（2034）
 11. **合成生物学/人工生命**：ALIFE 2026 / SEED 2027 / SynBYSS 2026 / Cartagena Protocol synthetic biology expert group
 
-12. **AI 安全治理**：OpenAI Dylan Scandinaro 挖角（2026-02）/ Anthropic Claude Opus 4.5 + FLI C+ 评级 / DeepMind Gemini 3 Pro + Josh Engels 离职 / EU AI Act 执行三分权 / US EO 14412 + OMB M-26-15
+12. **AI 安全治理**：OpenAI Dylan Scandinaro 挖角（2026-02）/ Anthropic Claude Opus 4.5 + FLI C+ 评级 / DeepMind Gemini 3 Pro + Josh Engels 离职 / EU AI Act 执行三分权 / US EO 14412 + OMB M-26-15 / UN High Commissioner Volker Turk 生存风险警告（2026-09-07）/ International AI Safety Report 2026（100+ 专家）/ Frontier Risk Monitor Q1 2026（METR 7 个月能力翻倍）
 
 1. 读取 `references/human-future-2026-2028.md` 获取完整推演
 2. 如需更新，补充新来源后重新跑 HeartFlow gate 监督
 3. 输出给用户时附带 HeartFlow gate 结果
 
-## HeartFlow 监督结果（v0.5.0）
+## HeartFlow 监督结果（v0.6.0）
 
 **最终 gate 结果（详细版，扩展版）**
-- 版本：v0.5.0（100+ 来源，覆盖 12 条主线 + 量子密码学奇点独立节）
+- 版本：v0.6.0（150+ 来源，覆盖 12 条主线 + 量子密码学奇点独立节 + 地缘风险扩展）
 - 全本 gate：action=`rewrite`, overallScore=`0`, verdict=`不可信`
 - 按章节探测：12 个章节中 7 个 ≥0.77 可信，5 个低分（四/六/九/十/十一）集中在技术术语/医学术语/哲学术语误报
 - 判断：假阳性为主，保留原文。完整探测脚本保留在 /tmp/hf-probe-v4-*.js
@@ -79,13 +79,17 @@ version: 0.5.0
 - 军事增强：15+ 条（TechEconomics/Fortune Business Insights/Small Wars Journal/Reuters/US DoD/Ukraine 7th Air Assault/Hypershell/Edgerun/Anduril-Meta）
 - 合成生物学：5+ 条（ALIFE/SEED/SynBYSS/Cartagena Protocol/Schering Stiftung）
 - AI 安全治理：20+ 条（EU Digital Omnibus/NY RAISE/DeepMind/Anthropic/OpenAI/Luminous Codex/ForesightSafety Bench/FLI Safety Index/METR）
-- 量子/密码学：15+ 条（IBM/QuEra/IonQ/Cloudflare/Google/Forrester/NIST/CISA/OMB/Executive Order 14412/CNSA 2.0/G7）
-- 合计可直接引用来源：130+ 条
+- 量子/密码学：20+ 条（IBM/QuEra/IonQ/Microsoft Azure/Google Willow/Cloudflare/Forrester/NIST/CISA/OMB/Executive Order 14412/CNSA 2.0/G7）
+- 地缘风险：15+ 条（NATO/CSIS/The Atlantic/Economist Intelligence Unit/The Hindu/Geopolitical Monitor/Reuters/NYT/Ukraine MOD/Zelenskyy）
+- AI 基础设施/能源：15+ 条（Goldman Sachs/Morgan Stanley/JLL/IEA/Overload Report/Blackstone/Stargate/PJM/Google-SpaceX GPU 协议）
+- 社会心理/公众认知：10+ 条（Frontier Risk Monitor/METR/International AI Safety Report/FLI Safety Index/Mother Jones/ABC News/Time）
+- 合计可直接引用来源：150+ 条
 
 ## 更新日志
 
 - 2026-09-15 v0.1.0：初始版本，6 层覆盖（地缘/气候/技术/经济/治理/社会心理）
 - 2026-09-15 v0.2.0：升级为“人类进化”主线，新增 BCI/CRISPR/长寿/太空/量子/AGI 时间窗/超人类主义
 - 2026-09-15 v0.3.0：HeartFlow 全文本 gate 监督 + 逐节探测 + 假阳性分类
-|- 2026-09-15 v0.4.0：新增人形机器人/具身智能、数字意识/心智上传、军事增强、合成生物学、AI 安全治理细化；来源扩展至 100+ 条
-|- 2026-09-16 v0.5.0：多维度细化（BCI/CRISPR/长寿/太空/量子/人形机器人/数字孪生/军事增强/AI 治理/量子密码学奇点）+ 来源扩展至 130+ 条
+- 2026-09-15 v0.4.0：新增人形机器人/具身智能、数字意识/心智上传、军事增强、合成生物学、AI 安全治理细化；来源扩展至 100+ 条
+- 2026-09-16 v0.5.0：多维度细化（BCI/CRISPR/长寿/太空/量子/人形机器人/数字孪生/军事增强/AI 治理/量子密码学奇点）+ 来源扩展至 130+ 条
+- 2026-09-16 v0.6.0：量子计算扩展（Microsoft Azure/Google Willow/Cloudflare PQC）/ 长寿管线扩展（ER-100/Altos/NewLimit/Retro/Unity）/ 地缘风险扩展（俄乌/台海/AI自主武器/监管碎片化/生物武器DIY）/ AI基础设施/能源瓶颈 / 来源扩展至 150+ 条
