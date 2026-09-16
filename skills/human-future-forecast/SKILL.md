@@ -63,6 +63,15 @@ version: 0.7.2
 - reasoning_coherence(30/20)：含古典术语标记（jingxue/fojia-banruo-wuwo）被 detector 视为逻辑断裂
 - sarcasm(30)：讽刺/夸张修辞
 
+**Gate strategy for long forecast docs**
+- 不要对完整文件反复跑 `checkOutput`/`runPipeline`：技术预测/医学/哲学术语密集区会系统性触发假阳性（dehumanization / ai_writing_tell / moral_foundations / reasoning_coherence / confidence / bullshit）。
+- 正确做法：只对新写/大改的 section 单独 gate-check；已知假阳性维度直接记录在本文件，不复跑全文。
+- 探测假阳性时用单句/单段 probe 脚本定位具体触发词，不要凭感觉改措辞绕过。
+
+**Markdown 表格格式纪律**
+- 表头分隔行 `|---|---|` 之后，每一行数据必须保留行首 `|`。
+- 新增风险行时最容易漏掉行首 `|`，导致下游 patch 反复在同一条目上打补丁。补一条前先确认相邻行的 `|` 对齐。
+
 **判断：假阳性为主，保留原文。**
 - 全部章节均为技术预测/医学/哲学术语，无人格群体贬损意图
 - 内容基于 100+ 可复核来源（学术/产业/国际组织/智库/GitHub/新闻）
