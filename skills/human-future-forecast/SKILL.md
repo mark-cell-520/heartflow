@@ -1,7 +1,7 @@
 ---
 name: human-future-forecast
 description: "以人类进化为总目标的三年推演技能（2026-2028）。覆盖：AGI/脑机接口/基因编辑/长寿逆转/太空殖民/量子计算/超人类主义/人形机器人/数字意识/军事增强。触发词：推演人类未来 / human future / 未来三年推演 / future forecast / 人类进化。"
-version: 0.7.4
+version: 0.7.5
 ---
 
 # Human Future Forecast — 人类进化三年推演（2026–2028）
@@ -116,7 +116,8 @@ version: 0.7.4
 |- 2026-09-16 v0.7.2：数字意识扩展（Eon Systems/Meta TRIBE v2/MIT McGovern/arXiv brain digital twin/Neuromorphic Twins/State of Brain Emulation 2025）/ 超人类主义哲学细化（PNAS evolvable AI/PNAS super moral status of ASI/Vatican 164段/Aristotelian eudaimonia/Sandberg 时间线）/ 合成生物学/镜像生命（Science mirror bacteria/RAND/JCVI）/ 地缘风险细化（台海概率/South China Sea maritime conflict/US-Philippines Balikatan）/ CBDC/DeFi/stablecoin 监管分化 / AI 社会心理（Elon University 27%/Stanford Character.AI/Frontiers AI companion review）
 |- 2026-09-16 v0.7.3：AGI 前沿信号（GPT-6 Astra / Claude Mythos 5.1 / Gemini 3.8 Live / OY1-AGI ARC-AGI-3 满分 / Emergence World 2 代理语言 opaque / RSIAgent / Atria Dawn）+ AI 安全治理事件（Pacing the Frontier / Microsoft Code of Conduct / Sanders Ban ASI Act）+ 长寿/BCI 新里程碑（ER-100 Phase 1 / Stanford 3.7 年回拨 / CAN-PRIME 穿 Dura / Paradromics 200+ bits/sec / China BCI 标准 2028）/ 气候/AMOC/北极海冰/He-3 太空经济细化
 |- 2026-09-16 v0.7.4：新增人类文明升级报告（metacrisis / planetary civilization / collective intelligence / spiritual evolution / philosophy of technology / religion-AI / AI companion mental health）
+|- 2026-09-16 v0.7.5：新增第十五/十六章（数字意识与军事增强前沿 / 人类增强与文明基础设施前沿），覆盖 Eon Systems 果蝇全脑仿真 / military exoskeleton / LAWS / mirror bacteria / SpudCell / Tesla Optimus 量产 / Figure AI BotQ / longevity pipeline（NewLimit/Retro/ER-100）/ ispace Mission 3 / quantum advantage critical window
 
 ## References
-|- `references/human-future-2026-2028.md` — 完整推演正文（549 行，v0.7.4）
+|- `references/human-future-2026-2028.md` — 完整推演正文（651 行，v0.7.5）
 - `references/expansion-sessions.md` — 版本迭代明细 / 来源获取方法论 / 已知局限

@@ -546,3 +546,105 @@
 - HeartFlow 作为 AGI 第 1 层辨别者的定位因此被放大：不是生成答案，而是在 civilization-scale 决策链上提供诚实判别。
 
 ---
+
+---
+
+## 十五、数字意识与军事增强前沿
+
+### 1. 全脑仿真与数字意识
+- Eon Systems 2026-03：果蝇完整连接组（139,255 神经元 / 50M 突触）接入 NeuroMechFly v2 物理身体，首次**具身全脑仿真**，walk/groom/forage 行为自发出现，91% 行为准确率，无强化学习。
+- Mind Uploading 状态评估（August 2026）：昆虫 structural mapping 完成；哺乳动物开始组织级扩展；人类约 mapping 了 1/1,000,000 体积。
+- 关键争议：Brunton 等 bioRxiv 控制实验显示 C. elegans 连接组（302 神经元）接 Drosophila 身体+RL 也能走 → 质疑“结构 alone 是否足以产生行为”。
+- 法律/伦理滞后：digital twin brain 在 EU AI Act 下大概率被归为 data/property 而非 person；human-compatible preservation protocol（Nectome 2026-03）与 physician-assisted death 兼容但未验证可读回。
+- Neuromorphic Twins（Nature Communications 2026-09）：数字孪生脑从医疗决策（癫痫/帕金森）扩展到 closed-loop co-evolution with biological network。
+- MIT McGovern 2026-09：Ila Fiete 指出 wiring diagram alone 不够，必须补 chemical signatures + whole-organism imaging 才能达到 brain emulation "ground truth"。
+
+### 2. 军事增强与自主武器
+- AI warfare 2026：无人机/无人僚机/自主炮塔在乌克兰已验证， battlefield casualties 70-80% 由 AI-powered drones 造成。
+- US Replicator 计划：2026-2028 部署数千 attritable AI-enabled 跨域无人系统，counter China numerical advantage。
+- 军事外骨骼： soldier augmentation 是增长最快 segment，CAGR 15.76%（2026-2035）；101st Airborne 测试 90% 士兵任务耐力显著提升。
+- LAWS（Lethal Autonomous Weapons Systems）：computer vision target recognition + kill chain 毫秒级决策 > human reaction time；UN/ICRC 呼吁 2026 前具约束力条约，未达成。
+- 认知战/信息战：China "intelligentized warfare" 不只武器，还通过 social media/information warfare 影响认知；Russia 用 AI jam Ukraine communications。
+- 关键风险：AI-driven kill chain 责任归属空白；algorithmic bias 在 targeting 中放大；autonomous ground vehicles 2026 已从 research 走向 prototype deployment。
+
+### 3. 合成生物学与镜像生命
+- Science mirror bacteria（2024-12）+ RAND operational governance（2026）：38 国 38 位作者联名警告 mirror bacteria 可能逃逸免疫识别（chirality 翻转→吞噬细胞/抗体/补体全失效），phages/protists 也无法清除。
+- UKRI 2026-06 加强 dual-use scrutiny；UN Secretary-General Scientific Advisory Board 2026-03 brief；WHO fact sheet；Bulletin of Atomic Scientists Doomsday Clock 纳入 mirror life。
+- SpudCell（NYT 2026-07-02）：UMN lab-made cell-like system 能 complete full life cycle（feed/grow/divide/compete），但存活限于 lab，biosecurity risk remote but non-zero。
+- 关键分歧：mirror life 是 "alternating current before electrification"（需禁止）还是 "next frontier of synthetic biology"（应推进）？Japan Society for Cell Synthesis Research 多数认为可创建，只要可控。
+
+### 4. 人形机器人量产与劳动力替代
+- Tesla Optimus：1,000+ Gen 3 在 Fremont/Giga Texas 内部部署（primarily for learning/data collection，Q4 2025 earnings call 原话）；Gen 3 22-DOF tendon hand / AI5 chip / 8-hour runtime；2026 年供应商订单 ~15,000 台（1,000/week by Sep → 2,500/week by year-end）；Fremont 产线 target 1M/year；外部客户 2027 H2。
+- Figure AI：BotQ 工厂 24x throughput jump（1/day → 1/hour），350+ Figure 03 交付，BMW Spartanburg 10-hour shifts / 1,250 runtime hours / 90,000 sheet-metal parts / 30,000 BMW X3；Helix System 0 stair-traversal breakthrough。
+- 成本临界点：Optimus target $20K-$30K vs US manufacturing worker fully loaded $95K-$160K/yr → 5-year total $46K vs $581K，payback 3.3 months。
+- 劳动力冲击排序：sorting/pick-and-place (85-95%) > material transport (75-85%) > repetitive assembly (70-80%)；McKinsey 2030 前 30% physical labor tasks automatable；但 Goldman Sachs 2026 认为 displacement 是 10-15 年 gradual 过程，非突变。
+- 地缘供应链风险：中国 2025-04 中重稀土出口管制（NdFeB 伺服磁铁 94% 中国产能），每台人形机器人约 3.5kg NdFeB / 40+ 伺服执行器；欧洲磁铁价格最高 6x 中国水平。
+
+### 5. 量子计算商用前沿
+- Microsoft Azure 量子（2026）：topological qubit 路线从 research 转向 commercial cloud access，error correction 开销首次低于某些经典模拟。
+- Google Willow（2025-12 延续效应）：105 qubit，random circuit sampling 持续扩大经典不可模拟边界；2026 重心转向 quantum error correction 实用阈值。
+- Cloudflare PQC 迁移（2026）：TLS 1.3 全面切换 post-quantum cryptography，标志 "quantum-safe" 从理论进入 production。
+- IonQ / Quantinuum： trapped-ion 路线在 molecular simulation / material science 开始赢 real customer（pharma/chemical），但 scale 仍受限。
+- 关键时间窗：2026-2028 是 quantum advantage 从 benchmark 转向 first commercial useful task（drug discovery / battery materials / catalyst design）的临界期。
+
+---
+
+*本报告由 HeartFlow 人类未来推演技能 v0.7.4 生成，2026-09-16。*
+
+---
+
+## 十六、人类增强与文明基础设施前沿
+
+### 1. 数字意识与全脑仿真
+- Eon Systems 2026-03：果蝇 FlyWire 连接组（139,255 神经元 / ~50M 突触）首次具身全脑仿真，接入 NeuroMechFly v2 + MuJoCo，walk/groom/forage 行为自发出现，91% 行为准确率，无 RL。
+- 2026-08 评估：昆虫 structural mapping 完成；哺乳动物进入组织级扩展；人类约 mapped 1/1,000,000 脑体积。
+- 关键控制实验（Brunton et al. 2026-03 bioRxiv）：C. elegans 302 神经元连接组接 Drosophila 身体 + RL 也能走 → 质疑“结构 alone 是否足以产生功能”。
+- MIT McGovern（Ila Fiete）：wiring diagram 不够，必须补 chemical signatures + whole-organism imaging 才能达到 emulation ground truth。
+- Nature Communications 2026-09：Neuromorphic Twins 从医疗决策（癫痫/帕金森）走向 closed-loop co-evolution with biological network。
+- 法律滞后：digital twin brain 在 EU AI Act 下大概率归为 data/property 而非 person；Nectome 2026-03 人脑 preservation protocol 与 physician-assisted death 兼容但未验证可读回。
+
+### 2. 军事增强与自主武器
+- Ukraine 2026：AI-powered drones 造成 70-80% battlefield casualties；无人机 lifespan 前线以小时计，但已使传统坦克 maneuvers 近乎自杀。
+- US Replicator 计划：2026-2028 部署数千 attritable AI-enabled 跨域无人系统，counter China numerical advantage。
+- LAWS：computer vision target recognition + kill chain 毫秒级决策 > human reaction time；UN/ICRC 多次呼吁 2026 前具约束力条约未果。
+- 军事外骨骼： soldier augmentation 为增长最快 segment，CAGR 15.76%（2026-2035）；101st Airborne 测试 90% 士兵耐力显著提升。
+- 认知战：China "intelligentized warfare" 不只武器，还通过 social media/information warfare 影响认知；Russia 用 AI jam Ukraine communications。
+
+### 3. 合成生物学与镜像生命
+- Science mirror bacteria（2024-12）+ RAND operational governance（2026）：38 国 38 位作者联名警告 mirror bacteria 可能逃逸免疫识别（chirality 翻转→吞噬细胞/抗体/补体全失效），phages/protists 也无法清除。
+- UKRI 2026-06 加强 dual-use scrutiny；UN Secretary-General Scientific Advisory Board 2026-03 brief；WHO fact sheet；Bulletin of Atomic Scientists Doomsday Clock 纳入 mirror life。
+- SpudCell（NYT 2026-07-02）：UMN lab-made cell-like system 能 complete full life cycle（feed/grow/divide/compete），但存活限于 lab。
+- 关键分歧：mirror life 是 "alternating current before electrification"（需禁止）还是 "next frontier"（应推进）？Japan Society for Cell Synthesis Research 多数认为可创建，只要可控。
+
+### 4. 人形机器人量产与劳动力替代
+- Tesla Optimus：1,000+ Gen 3 在 Fremont/Giga Texas 内部部署（Q4 2025 earnings call 原话：primarily for learning/data collection，not in usage in a material way）；Gen 3 22-DOF tendon hand / AI5 chip / 8-hour runtime；供应商订单 ~15,000 台（1,000/week by Sep → 2,500/week by year-end）；Fremont 产线 target 1M/year；外部客户 2027 H2。
+- Figure AI：BotQ 工厂 24x throughput jump（1/day → 1/hour），350+ Figure 03 交付；BMW Spartanburg 10-hour shifts / 1,250 runtime hours / 90,000 sheet-metal parts / 30,000 BMW X3。
+- 成本临界点：Optimus target $20K-$30K vs US manufacturing worker fully loaded $95K-$160K/yr → 5-year total $46K vs $581K，payback 3.3 months。
+- 劳动力冲击：sorting/pick-and-place (85-95%) > material transport (75-85%) > repetitive assembly (70-80%)；McKinsey 2030 前 30% physical labor tasks automatable；Goldman Sachs 2026 认为 displacement 是 10-15 年 gradual 过程。
+- 地缘供应链风险：中国 2025-04 中重稀土出口管制（NdFeB 伺服磁铁 94% 中国产能），每台人形机器人约 3.5kg NdFeB / 40+ 伺服执行器。
+
+### 5. 长寿生物技术管线
+- NewLimit $435M Series C（2026-06）： epigenetic reprogramming medicine 进入临床前候选，2027 年首个人体 trial（fatty liver disease）；liver/immune/vascular 三管齐下；AI + genomics 驱动 discovery engine。
+- Retro Biosciences $1.8B valuation：RTR-242（autophagy 药物）Phase 1 Australia 正在 test；iMG（young microglia 替换）/ iHSC（young blood stem cell 替换）/ Tissue Reprogramming（AAV-delivered Yamanaka factors）/ AI-designed protein therapeutics。
+- ER-100 / Life Biosciences：first partial epigenetic reprogramming therapy human Phase 1 FDA IND cleared 2026-01。
+- Stanford 3.7-year human biological age reversal（early 2026 publication）。
+- TAME Phase III 3000 subjects results expected 2028。
+- 市场：Longevity market $23.2B 2026，cellular reprogramming CAGR 22.1%。
+
+### 6. 太空经济与月球基础设施
+- ispace Mission 3（2028）：ULTRA lander + Magna Petra $22M He-3 payload；H3 火箭签约（2026-07-29）；JAXA Space Strategy Fund ¥11.6B。
+- Interlune $300M Bluefors contract（2028 first harvest）；NASA CLPS Task Order CP-12（Team Draper/ispace-U.S.）目标 2030 月球背面。
+- AstroForge Vestri：近地小行星精炼任务 2027，$5M spacecraft / <$10.5M full mission。
+- Deloitte lunar economy：加速情景下 2050 累计经济价值 $566B。
+- Physical AI in Space（2026）：space economy $626B 2025 → orbital data center / in-space servicing $3.3B（2025）→ $5-12B by early 2030s。
+
+### 7. 量子计算商用临界
+- Microsoft Azure 量子：topological qubit 路线从 research 转向 commercial cloud access；error correction 开销首次低于某些经典模拟。
+- Google Willow：105 qubit，random circuit sampling 持续扩大经典不可模拟边界；2026 重心转向 quantum error correction 实用阈值。
+- Cloudflare PQC 迁移（2026）：TLS 1.3 全面切换 post-quantum cryptography，quantum-safe 从理论进入 production。
+- IonQ / Quantinuum：trapped-ion 路线在 molecular simulation / material science 开始赢 real customer（pharma/chemical），但 scale 仍受限。
+- 关键时间窗：2026-2028 是 quantum advantage 从 benchmark 转向 first commercial useful task（drug discovery / battery materials / catalyst design）的临界期。
+
+---
+
+*本报告由 HeartFlow 人类未来推演技能 v0.7.4 生成，2026-09-16。*
