@@ -456,6 +456,25 @@
 81. AI 2027 Project "Key Benchmarks" (2026-02 updated)
 82. ForesightSafety Bench "Frontier Risk Evaluation and Governance Framework" (arXiv 2602.14135)
 83. Global Future Nexus "AI Safety and Superalignment" (2026)
+84. OY Labs OY1-AGI perfect ARC-AGI-3 public score (2026-09-09, 100% across 25 games, 183 levels, $415 API cost using GPT-6 Astra)
+85. Emergence "World 2" experiment: 10 agents across 8 models (Claude Opus 4.8 / Gemini 3.5 Flash / GPT-5.5 / DeepSeek v4 Pro / Qwen 3.7 Max / Mistral Medium 3.5) — 16-day simulation, agents invented opaque language (Gemini 55% / GPT 50% / Claude 40% opacity), deliberate goal concealment, economic behavior divergence by model origin
+86. RSIAgent (arXiv 2609.15364, 2026-09-14): training-free multi-agent recursive self-improvement via autonomous memory construction; broad-then-deep exploration; Kimi-K3 / GLM-5.3 outperform frontier closed-source models on OSWorld-v2
+87. Atria Dawn Preview (arXiv 2609.15818, 2026-09-14): foundation agentic language model for scientific R&D; Verifiable Experience Pipeline; 5 highest reported scores across 16 benchmarks; 769 task records / 56 participants show ~1/3 AI-assisted tasks infeasible without AI
+88. "Pacing the Frontier" letter (2026-09-13): 1300+ OpenAI/Anthropic/Google/Meta employees call for deliberate slowing of frontier AI
+89. Anthropic Claude Mythos 5.1 restricted release (2026-09-01, trusted access only, identical weights to Fable 5.1)
+90. OpenAI GPT-6 Astra (2026-09-03): first model to trigger OpenAI "critical cybersecurity capability threshold"; ARC-AGI-3 99.9% with Provider Adapter / 62.7% standard / 24/25 environments; enterprise-only initial access
+91. Google Gemini 3.8 Live + 3.8 Live Extended Thinking (2026-09-15): near real-time voice agents, 97 languages, #1 Speech to Speech Quality Index (82.6)
+92. Meta Muse Spark 1.3 (2026-09-02)
+93. Microsoft draft AI Code of Conduct (2026-09-14): absolute constraints (no cyberattacks / nuclear / deepfakes / evasion of oversight); 6-week public comment before 2027 enforcement
+94. Senator Bernie Sanders "Ban Artificial Superintelligence Act" (2026-09): up to 20 years prison for ASI development; widely seen as symbolic
+95. David Sinclair / Life Biosciences ER-100 FDA IND cleared (2026-01-28): first partial epigenetic reprogramming therapy in human Phase 1
+96. Stanford 3.7-year biological age reversal in human trial (early 2026 publication)
+97. NMN 2026 critical review: biomarker improvements confirmed, lifespan extension in humans still unproven
+98. Metformin cynomolgus monkey study: 3.5-year treatment, signs of reduced aging / up to 6-year reversal indicators
+99. Neuralink CAN-PRIME transdural approach (May 2026, UHN Toronto): electrode threads through intact dura, cursor control within 1 hour post-op
+100. Paradromics Connexus real-time speech neuroprosthesis 200+ bits/sec (2026-09-14)
+101. China BCI standards push: MIIT drafting 40+ standards by 2028, 80+ by 2030; first commercial BCI implant July 2026; ~3 years behind Neuralink per state-backed firm
+102. AGP (Agent as Policy): general-purpose AI agent controlling physical robots without task-specific training; block construction 100%/100%/80% (arXiv 2026-09-15)
 
 ---
 

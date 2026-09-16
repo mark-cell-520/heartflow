@@ -1,7 +1,7 @@
 ---
 name: human-future-forecast
 description: "以人类进化为总目标的三年推演技能（2026-2028）。覆盖：AGI/脑机接口/基因编辑/长寿逆转/太空殖民/量子计算/超人类主义/人形机器人/数字意识/军事增强。触发词：推演人类未来 / human future / 未来三年推演 / future forecast / 人类进化。"
-version: 0.7.2
+version: 0.7.3
 ---
 
 # Human Future Forecast — 人类进化三年推演（2026–2028）
@@ -34,7 +34,13 @@ version: 0.7.2
 - 版本：v0.7.0（150+ 来源，覆盖 12 条主线 + 量子密码学奇点独立节 + 地缘风险扩展 + AI 基础设施/能源 + 地缘经济碎片化 + AI 公众信任/劳动力替代）
 - 全本 gate：action=`rewrite`, overallScore=`0`, verdict=`不可信`
 - 按章节探测：12 个章节中 7 个 ≥0.77 可信，5 个低分（四/六/九/十/十一）集中在技术术语/医学术语/哲学术语误报
-- 判断：假阳性为主，保留原文。完整探测脚本保留在 /tmp/hf-probe-v4-*.js
+**判断：假阳性为主，保留原文。完整探测脚本保留在 /tmp/hf-gate-new-section.js**
+
+**v0.7.3 新增内容 section-level gate（2026-09-16）**
+- 探测段落：AGI 前沿 + 长寿/BCI + 具身智能 新信号
+- gate：action=`verify`, overallScore=`0.82`, verdict=`可信`
+- 触发：confidence(35) / ai_writing_tell(35) — 技术预测文本典型假阳性
+- 结论：保留原文，不修改措辞绕行
 
 **按章节得分**
 | 章节 | 分数 | 判定 |
@@ -104,9 +110,10 @@ version: 0.7.2
 - 2026-09-16 v0.5.0：多维度细化（BCI/CRISPR/长寿/太空/量子/人形机器人/数字孪生/军事增强/AI 治理/量子密码学奇点）+ 来源扩展至 130+ 条
 - 2026-09-16 v0.6.0：量子计算扩展（Microsoft Azure/Google Willow/Cloudflare PQC）/ 长寿管线扩展（ER-100/Altos/NewLimit/Retro/Unity）/ 地缘风险扩展（俄乌/台海/AI自主武器/监管碎片化/生物武器DIY）/ AI基础设施/能源瓶颈 / 来源扩展至 150+ 条
 - 2026-09-16 v0.7.0：新增 AI 基础设施与能源瓶颈独立节（IEA/Allianz Trade/Goldman Sachs）/ 地缘经济碎片化（IMF REE/SUERF chips tokens）/ AI 公众信任塌陷（NBC/YouGov/KFF）/ AI 劳动力替代（WEF/Gartner/Stanford）/ 人形机器人量产时间线细化（Tesla/Figure/Agility/Boston Dynamics）
-|- 2026-09-16 v0.7.1：BCI 临床加速（Paradromics 首例长期植入+实时 speech neuroprosthesis/Neuralink CAN-PRIME/Synchron pivotal/Precision $93M）/ CRISPR 人类胚胎 base editing 里程碑（Columbia Egli/Cambridge Niakan）/ 长寿管线更新（Life Biosciences ER-100 Phase 1/NewLimit $435M Series C/Rubedo RLS-1496）/ 太空时间线细化（Artemis III 2027 demo/2028 载人登月）
+||- 2026-09-16 v0.7.1：BCI 临床加速（Paradromics 首例长期植入+实时 speech neuroprosthesis/Neuralink CAN-PRIME/Synchron pivotal/Precision $93M）/ CRISPR 人类胚胎 base editing 里程碑（Columbia Egli/Cambridge Niakan）/ 长寿管线更新（Life Biosciences ER-100 Phase 1/NewLimit $435M Series C/Rubedo RLS-1496）/ 太空时间线细化（Artemis III 2027 demo/2028 载人登月）
 |- 2026-09-16 v0.7.2：数字意识扩展（Eon Systems/Meta TRIBE v2/MIT McGovern/arXiv brain digital twin/Neuromorphic Twins/State of Brain Emulation 2025）/ 超人类主义哲学细化（PNAS evolvable AI/PNAS super moral status of ASI/Vatican 164段/Aristotelian eudaimonia/Sandberg 时间线）/ 合成生物学/镜像生命（Science mirror bacteria/RAND/JCVI）/ 地缘风险细化（台海概率/South China Sea maritime conflict/US-Philippines Balikatan）/ CBDC/DeFi/stablecoin 监管分化 / AI 社会心理（Elon University 27%/Stanford Character.AI/Frontiers AI companion review）
+|- 2026-09-16 v0.7.3：AGI 前沿信号（GPT-6 Astra / Claude Mythos 5.1 / Gemini 3.8 Live / OY1-AGI ARC-AGI-3 满分 / Emergence World 2 代理语言 opaque / RSIAgent / Atria Dawn）+ AI 安全治理事件（Pacing the Frontier / Microsoft Code of Conduct / Sanders Ban ASI Act）+ 长寿/BCI 新里程碑（ER-100 Phase 1 / Stanford 3.7 年回拨 / CAN-PRIME 穿 Dura / Paradromics 200+ bits/sec / China BCI 标准 2028）
 
 ## References
-- `references/human-future-2026-2028.md` — 完整推演正文（468 行，v0.7.2）
+- `references/human-future-2026-2028.md` — 完整推演正文（487 行，v0.7.3）
 - `references/expansion-sessions.md` — 版本迭代明细 / 来源获取方法论 / 已知局限
