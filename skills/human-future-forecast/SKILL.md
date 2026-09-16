@@ -92,4 +92,8 @@ version: 0.6.0
 - 2026-09-15 v0.3.0：HeartFlow 全文本 gate 监督 + 逐节探测 + 假阳性分类
 - 2026-09-15 v0.4.0：新增人形机器人/具身智能、数字意识/心智上传、军事增强、合成生物学、AI 安全治理细化；来源扩展至 100+ 条
 - 2026-09-16 v0.5.0：多维度细化（BCI/CRISPR/长寿/太空/量子/人形机器人/数字孪生/军事增强/AI 治理/量子密码学奇点）+ 来源扩展至 130+ 条
-- 2026-09-16 v0.6.0：量子计算扩展（Microsoft Azure/Google Willow/Cloudflare PQC）/ 长寿管线扩展（ER-100/Altos/NewLimit/Retro/Unity）/ 地缘风险扩展（俄乌/台海/AI自主武器/监管碎片化/生物武器DIY）/ AI基础设施/能源瓶颈 / 来源扩展至 150+ 条
+|- 2026-09-16 v0.6.0：量子计算扩展（Microsoft Azure/Google Willow/Cloudflare PQC）/ 长寿管线扩展（ER-100/Altos/NewLimit/Retro/Unity）/ 地缘风险扩展（俄乌/台海/AI自主武器/监管碎片化/生物武器DIY）/ AI基础设施/能源瓶颈 / 来源扩展至 150+ 条
+
+## References
+- `references/human-future-2026-2028.md` — 完整推演正文（412 行，v0.6.0）
+- `references/expansion-sessions.md` — 版本迭代明细 / 来源获取方法论 / 已知局限
