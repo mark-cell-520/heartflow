@@ -1,14 +1,14 @@
 # Human Future 2026–2028 — 综合推演
 
 > 多源综合推演（GitHub 开放来源 + 实时新闻 + 学术论文），HeartFlow gate 监督版。
-> 当前日期锚点：2026-09-15
-> 升级范围：人类进化主线（BCI / CRISPR / 长寿 / 太空 / 量子 / AGI / 超人类主义 / 人形机器人 / 数字意识 / 军事增强）
+> 当前日期锚点：2026-09-16
+> 升级范围：人类进化主线（BCI / CRISPR / 长寿 / 太空 / 量子 / AGI / 超人类主义 / 人形机器人 / 数字意识 / 军事增强）+ 地缘经济碎片化 + AI 能源瓶颈 + 合成生物学
 
 ---
 
 ## 一、执行摘要
 
-未来三年（2026–2028）是人类进化路径的**多线程分岔年**。七条主线不再只是预测，而是进入可验证的工程化阶段：
+未来三年（2026–2028）是人类进化路径的**多线程分岔年**。十二条主线不再只是预测，而是进入可验证的工程化阶段：
 
 1. **脑机接口（BCI）**：2026 年成为商用/临床拐点。非侵入式信号解码 + AI 神经映射 + 微型传感 converging，双向系统从实验室进入消费医疗。
 2. **基因编辑（CRISPR）**：从“技术奇观”转向“可商业化的疗法”。两个 FDA 批准疗法落地，碱基编辑进入人类胚胎，2027 年罕见病 first trial 密集上线。
@@ -17,6 +17,11 @@
 5. **量子计算**：IBM Starling（2029）和 QuEra Libra（2028）争相兑现“容错”定义——不是逻辑比特数，是百万级可靠操作。
 6. **AGI 时间窗压缩至 2027–2028**：Anthropic / OpenAI / xAI / DeepMind 多条内部线均指向此区间；Metaculus 预测市场 median = 2028 年 2 月。
 7. **人形机器人/具身智能**：Tesla Optimus 2026 年订单 15,000 台、2027 年产能 1M/年、2028 年 10M/年；Figure AI / Agility Robotics / Boston Dynamics 已进入工厂/物流部署。
+8. **超人类主义/后人类**：Pope Leo XIV Magnifica Humanitas（2026-05）+ Vatican 164段文件系统性回应 transhumanism；PNAS evolvable AI / super moral status of ASI 两篇论文把后人类从哲学推向演化理论硬科学。
+9. **数字意识/心智上传**：Eon Systems 果蝇 embodied WBE（2026-03, 139k 神经元自然涌现 walking/grooming）；Meta TRIBE v2 70k-voxel 全脑 fMRI 数字孪生；MIT McGovern 公开讨论 consciousness upload 可行性。
+10. **军事增强**：乌克兰 Hypershell X Pro 实战验证（2026-04, $1K 消费级 AI 外骨骼）；Anduril+Meta $159M AR 头盔；市场 $1.21B→$4.98B（2034）。
+11. **合成生物学/人工生命**：Science mirror bacteria 风险评估（2024-12）+ RAND 预防战略（2026-07）+ JCVI 警告 mirror life 10–30 年可行性；D-ribosome / L-DNA nanodevices 从分子工具走向 mirror cell 蓝图。
+12. **AI 安全治理**：OpenAI GPT-6 Astra Preparedness Framework Critical 触发 / Anthropic Claude Opus 4.5 FLI C+ / EU AI Act 三分权执行 / US EO 14412 联邦 PQC/AGI 双轨 / UN Volker Turk 生存风险警告。
 
 **人类进化的核心悖论**：技术增强（BCI/CRISPR/长寿/机器人）和 AI 替代（AGI 认知外包）在同一时间窗交汇——不是二选一，是同一个压力源的两面。前者改变人体本身，后者改变“人体还有没有必要保持当前形态”这个问题。
 
@@ -222,10 +227,14 @@
 
 ### 关键事件
 
-- **Pope Leo XIV 通谕 Magnifica Humanitas**（2026-05-15）：明确警告技术偶像崇拜风险，要求以共同善和人格尊严检验技术进步
-- **PNAS 论文 "Could humans and AI become a new evolutionary individual?"**（2026）：用演化理论论证人类-AI 可能形成新的选择层级——不是 metaphor，是 selection level
-- **Frontiers in Psychology "Becoming human in the age of AI"**（2026-01）：认知共进化——人类认知始终通过技术中介演化，AI 只是最新中介
-- **MIT McGovern Institute "Can (and should) consciousness be uploaded to a machine?"**（2026-09-02）：首次由顶尖神经科学机构公开讨论意识上传可行性
+|- **Pope Leo XIV 通谕 Magnifica Humanitas**（2026-05-15）：明确警告技术偶像崇拜风险，要求以共同善和人格尊严检验技术进步
+|- **Vatican Dicastery for the Doctrine of the Faith 长篇文件**（2026-03）：164段系统性回应 transhumanism/posthumanism/AI， five central claims：身体不是待解决的问题 / 技术自带的 ambivalence / 优化作为价值框架的灵性缺陷 / 具身性构成人格 / 个人责任优先于算法道德
+|- **PNAS 论文 "Evolvable AI: Threats of a new major transition in evolution"**（2026-03-24 accepted）：把 eAI 定义为重大进化转换——不是 metaphor，是新的选择层级；提出 gating replication / treating model variants as genetic material / reshaping selection pressures 三层干预
+|- **PNAS 论文 "The super moral status of artificial superintelligence"**（2026）：从 foundationalist / gradualist 两维度分析 ASI 道德地位，引入 debunking argument——即使道德地位不确定，superior moral consideration 本身已构成三类 harm（status degradation / social alienation / domination）
+|- **Frontiers in Psychology "Becoming human in the age of AI: cognitive co-evolutionary processes"**（2026-01）：认知共进化——人类认知始终通过技术中介演化，AI 只是最新中介
+|- **Journal of Posthumanism / AI and Faith**（2026）：后人类主义从学术边缘进入主流神学辩论；Pope Leo XIV 2026 通谕是 20 年来天主教第一次系统性回应生物技术
+|- **Anders Sandberg (Oxford FHI) podcast**（2026-06-16）：公开承认对 consciousness upload 时间线无把握；认为 partial/full brain emulation 会重塑哲学辩论，even if consciousness transfer 不可验证
+|- **Aristotelian eudaimonia adapted for radical technological change**（Springer 2026）：从“最大化效用/尊重权利”转向“enhancement 是否支持 human flourishing”——提出 narrative continuity / relational identity / temporal depth / reflective autonomy 四维评估框架
 
 ### 进化含义
 
@@ -258,6 +267,8 @@
 | AI 自主武器失控 | 2027–2028 | Anduril/Meta AR 头盔 / 无人机群 AI 目标识别 | 中 |
 | 全球 AI 监管碎片化 | 2026–2027 | EU AI Act 执行 / US NY RAISE 2027 / 中国未同步 | 高 |
 | 生物武器 DIY | 2027–2028 | AI 设计蛋白质 + 基因编辑 Democratization | 低–中 |
+|| 镜像生命细菌 | 2027–2030 | mirror biomolecules 组装 / D-ribosome / synthetic cell 蓝图 | 低–中（JCVI/RAND 10–30 年） |
+|| 数字意识身份危机 | 2028–2030 | 第一个“数字人”法律诉讼 / digital mind copy 被归类为 property | 中 |
 
 ---
 
@@ -391,11 +402,14 @@
 
 ### 数字意识 / 心智上传 / 数字孪生
 
-- **IBS 虚拟细胞项目**（2026-04-27）：用空间转录组+AI 构建人类数字孪生，目标是在药物测试/疾病预测中替代真实人体实验
-- **EU Virtual Human Twins Roadmap**（2026-06  webinar）：800+ 贡献者六部分路线图（科学/技术/基础设施/伦理/社会经济/可持续），把个人生理实时数据→可计算模型→个性化治疗
-- **Twelfth Brain**（2026 成立）：将个人决策模式/专业判断/认知工作流建模成可继承的数字认知资产（给继任者用）
-- **MIT McGovern**（2026-09-02）+ Gizmodo（2026-04-16）+ Zenodo 意识移植论文（2026-03-31）：意识上传从纯哲学进入工程化讨论
-- **GIUP Gradual Identity Upload**（DEV Community）：认知数字孪生的安全层——不是 snapshot 是渐进式身份迁移
+|- **Eon Systems 果蝇全脑仿真**（2026-03-16）：FlyWire connectome（139,255 神经元）+ NeuroMechFly v2 物理身体 = 首个 embodied whole-brain emulation；walking/grooming 从电路结构自然涌现，zero training；CEO Michael Andregg "The ghost is no longer in the machine; the machine is becoming the ghost"
+|- **Meta TRIBE v2**（2026-03）：70,000-voxel 全脑 fMRI 数字孪生；输入任意 video/audio/text → 预测全脑血氧响应，无需扫描被模拟者；1,115 小时 / 700+ 志愿者训练；分辨率提升 70 倍
+|- **MIT McGovern Institute**（2026-09-02）公开讨论：Davy Deng 指出 C. elegans 全连接图已知但仍无法仿真其脑活动 = connectome alone 不足；提出需加 chemical signatures + whole-organism imaging；Ila Fiete 认为 consciousness transfer 理论上可能
+|- **arXiv brain digital twin**（2609.13973）：Random Neural Networks + Markov-Modulated Poisson Processes 组合模型；首次在单一框架内同时捕捉单神经元 + 群体电活动；映射到 DEVS 可执行仿真
+|- **Neuromorphic Twins**（2026）：双向耦合数字孪生——生物脑活动更新数字模型，数字模型预测返回刺激模式；实现从生物到数字认知的渐进式迁移而非 abrupt upload
+|- **State of Brain Emulation 2025**（10 月发布）：18 年来首次全面 reassessment；结论：人类 WBE 即使乐观仍 30-40 年； nematode 仍未验证 emulation
+|- **法律/伦理滞后**：LinkedIn legal report（2025）指出当前全球法律框架会把 digital mind copy 归类为 data/property 而非 person；EU AI Act 未覆盖 digital consciousness status
+|- **技术乐观主义者 vs 神经科学家温差**：Transhumanist.org / mindtransfer.me 预期 2040-2070 gradual migration；MIT 受访者普遍认为 10-15 年只能完成 mouse brain mapping，human 更远
 57. MIT McGovern Institute "Can (and should) consciousness be uploaded to a machine?" (2026-09-02)
 58. Gizmodo "Could This AI-Simulated Brain Lead to Human Mind-Uploading?" (2026-04-16)
 59. Nova Spivack "What Mind Uploading Would Actually Require"

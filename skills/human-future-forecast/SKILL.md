@@ -16,7 +16,7 @@ version: 0.7.1
 4. **长寿/衰老逆转**：AI 设计药物 rentosertib（Nature Biotech 2026-09-07）/ Life Biosciences ER-100 Phase 1 首例患者入组（2026-06）/ NewLimit $435M Series C（2026-06）/ Retro Biosciences reported $5B valuation / Rubedo RLS-1496 Phase 1 / 市场 $23.2B→$58.7B（2034, CAGR 11%）
 5. **太空殖民**：NASA Artemis II 载人绕月（2026-04）/ Artemis III 2027 无人演示 + 2028 载人登月 / SpaceX Starship HLS / 嫦娥 7 号 2027 / 天问 3 号 2028
 6. **量子计算**：IBM 模块化低温系统（2026-08-19）/ QuEra Libra 256 逻辑量子比特（2028, Amazon Braket）/ IonQ 1,600 逻辑量子比特（2028）/ Microsoft Azure Quantum Copilot（2026-10）/ Google Willow 105-qubit / 密码学奇点窗口 2029-2033 / Cloudflare post-quantum TLS 默认开启
-7. **超人类主义/后人类**：PNAS 2026 论证人类-AI 可成为新进化个体；Pope Leo XIV Magnifica Humanitas 警告技术偶像崇拜
+7. **超人类主义/后人类**：PNAS evolvable AI（重大进化转换）/ PNAS super moral status of ASI（debunking argument）/ Pope Leo XIV Magnifica Humanitas + Vatican 164段文件（2026-03）/ Aristotelian eudaimonia 四维评估框架 / Anders Sandberg 承认 consciousness upload 时间线无把握
 8. **人形机器人/具身智能**：Tesla Optimus 15,000 台（2026 年底）/ Figure AI 突破 1,000 台量产 / Agility Robotics Digit $300M 合同
 9. **数字意识/心智上传/数字孪生**：IBS 虚拟细胞项目（2026-04-27）/ EU Virtual Human Twins Roadmap（800+ 贡献者）/ Twelfth Brain 个人认知建模（2026 成立）
 10. **军事增强**：乌克兰 Hypershell X Pro 实战（2026-04）/ Anduril+Meta $159M AR 头盔 / 军事外骨骼市场 $1.21B（2026）→ $4.98B（2034）
