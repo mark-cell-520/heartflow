@@ -121,9 +121,30 @@
 - **多行星物种**：分析认为月球是试验场，火星是目的地。一旦建立自维持前哨，Homo sapiens 变成“多星球物种”
 - **重力环境改变生理**：月球 1/6g / 火星 1/3g 对骨骼/肌肉/心血管/前庭的长期影响尚不可知——这本身就是定向进化压力
 
----
+|---
 
-## 六、量子计算 — 从 NISQ 到容错过渡期 + 密码学奇点
+## 六-A、AI 基础设施与能源瓶颈 — 气候/经济交叉
+
+### 技术现状
+
+|- **全球电力消耗**：IEA 估计 2024 年数据中心约 415 TWh（占全球用电 1.5%），2030 年 Base Case 翻倍到 945 TWh（占 3%）；AI 服务器用电年增 30%，传统服务器仅 9%
+|- **美国集中度**：美国占全球数据中心用电 45%；2023 年数据 centers 占美国用电 4.4%，2028 年预计 6.7–12.0%；Virginia Data Center Alley 占全球云基础设施 35%
+|- **碳成本**：Allianz Trade 2026-06 报告指出数据中心真实碳足迹 286 MtCO₂（2025），比 IEA 估计高 57%；若无电网脱碳，2030 年将翻倍到 643 MtCO₂，年气候损害 $154B（2025 为 $68B）
+|- **用水压力**：标准数据中心日耗 300,000 加仑水（相当于 1,000 户家庭）；大型中心可达 500 万加仑/天（相当于 50,000 人城镇）
+|- **芯片功率密度**：NVIDIA Blackwell B300 单 GPU 约 15 petaflops FP4；GB300 NVL72 机架 72 GPU， Rubin 架构 190-230 kW/机架，是 pre-2015 设施的 10-40 倍
+|- **资本支出**：Big-5  hyperscaler 2026 年 AI capex ~$775-800B（Goldman/Morgan Stanley），2027 年估计 $880B，2028 年 ~$1.06T；全球数据中心总 capex 2030 年需 $6.7T（McKinsey）
+|- **电网瓶颈**：美国 PJM 2027/28 交付年容量拍卖失败（仅 14.8% 备用Margin，需 20%）；Northern Virginia 并网队列 40+ GW，新设施 2028 年前无法通电；Texas ERCOT 队列 474 GW（ overlapping/speculative ）
+|- **核能转身**：Microsoft $1.6B 重启三里岛（2027 在线）；Google 500 MW Kairos Power 高温气冷堆；Amazon $500M SMR；Meta 多家核能供应商 6.6 GW； hyperscaler 核能合同合计 >9 GW
+|- **中国规模**：北京 $295B 五年计划构建国家算力 backbone；中国数据中心用电 2026–2028 预计增长 170%
+
+### 进化含义
+
+|- **AI 增长从“算力瓶颈”转向“能源/电网/水/法规瓶颈”**：GPU 供应已解决，新约束是物理基础设施（power/cooling/water/permits）
+|- **电网集中度风险**：数据集中落户特定区域（Virginia/Texas）可能引发局部停电/电价飙升/社区反对
+|- **气候承诺与实际排放背离**：Microsoft 考虑推迟清洁能源目标以保持 AI 竞争力；15 座原定退役煤电厂 2025 年继续运行给数据中心供电
+|- **AI 作为气候工具**：IEA Widespread Adoption Case 显示现有 AI 应用 2035 年可减碳 1,400 Mt CO₂（甲烷泄漏检测/工业优化/建筑 HVAC），但数据中心自身排放增长更快
+
+---
 
 ### 技术现状
 
@@ -392,11 +413,16 @@
 
 ### AI 安全 / 治理
 
-- **OpenAI**：2026-02 从 Anthropic 挖走 Dylan Scandinaro 担任 Head of Preparedness（$555K base）；Astra pause（2026-08-07）证明 Preparedness Framework 真触发暂停
-- **Anthropic**：Claude Opus 4.5（2026-11-24）ARC-AGI 8.6%；FLI Summer 2026 AI Safety Index 评级 C+（9 实验室最高）；Dario Amodei 预测 AGI 2026-2027
-- **Google DeepMind**：Gemini 3 Pro（2026-11-18）ARC-AGI 31.1% → Deep Think 45.1%；145 页安全框架预测 AGI 2030  plausible；Josh Engels 2026-09-12 离职安全团队加入 METR
-- **监管框架**：EU AI Act 执行框架已建立（AI Office + 国家主管机关 + EDPS 三分权）；US Executive Order 14412（2026-06-22）+ OMB M-26-15 联邦 PQC/AGI 安全双轨推进
-- **市场信号**：OpenAI  projected $225B revenue 2030；Anthropic projected $75B；$3.1B model development spend (2025)
+|- **OpenAI**：2026-02 从 Anthropic 挖走 Dylan Scandinaro 担任 Head of Preparedness（$555K base）；Astra pause（2026-08-07）证明 Preparedness Framework 真触发暂停
+|- **Anthropic**：Claude Opus 4.5（2026-11-24）ARC-AGI 8.6%；FLI Summer 2026 AI Safety Index 评级 C+（9 实验室最高）；Dario Amodei 预测 AGI 2026-2027
+|- **Google DeepMind**：Gemini 3 Pro（2026-11-18）ARC-AGI 31.1% → Deep Think 45.1%；145 页安全框架预测 AGI 2030  plausible；Josh Engels 2026-09-12 离职安全团队加入 METR
+|- **监管框架**：EU AI Act 执行框架已建立（AI Office + 国家主管机关 + EDPS 三分权）；US Executive Order 14412（2026-06-22）+ OMB M-26-15 联邦 PQC/AGI 安全双轨推进
+|- **市场信号**：OpenAI  projected $225B revenue 2030；Anthropic projected $75B；$3.1B model development spend (2025)
+|- **能源/气候交叉**：IEA 2024 数据中心 415 TWh（1.5% 全球用电），2030 年 Base Case 翻倍到 945 TWh（3%）；Allianz Trade 2026-06 报告真实碳足迹 286 MtCO₂（比 IEA 高 57%）；Big-5 hyperscaler 2026 年 AI capex ~$775-800B
+|- **地缘经济碎片化**：IMF WP/26/72（2026-07）稀土供应链动态模型；SUERF Policy Note No. 416（2026-08-27）Chips & tokens at fault lines；US-China 关税僵持（10% 临时停火延至 2025-11-10）；China REE 出口管制 HREE 限制日本
+|- **AI 公众信任**：NBC News net favorability -20（2026-06）；YouGov 仅 5%美国人 trust AI "a lot"；Economist/YouGov 2026-05 多数派认为 AI 发展太快；KFF poll 63%公众不信任 AI 健康信息
+|- **AI 劳动力替代**：WEF Future of Jobs 2025 2020-2025 净替代 1400 万岗位；Goldman Sachs 2026-04 美国月替代 16,000 岗位；Gartner 2026-09 30% AI 替代员工 2029 年前需回流；Stanford 22-25 岁 AI 暴露岗位就业 -13%
+|- **人形机器人/具身智能量产**：Tesla Optimus 2026 年底 ~15,000 台供应商订单（~1,000/周 9 月→2,500/周 12 月）/ Figure AI 2026-12 BMW Spartanburg 试点 / Agility Robotics Digit 2026-09 商业部署 / Boston Dynamics Atlas 电动版 2026-11
 75. EU Digital Omnibus on AI (adopted 2026-06-16, enforcement pending)
 76. New York RAISE Act (signed 2026-03-27, effective 2027-01-01)
 77. Google DeepMind "Global AGI Safety Proposal" (2026)
