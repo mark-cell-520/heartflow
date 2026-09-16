@@ -1,7 +1,7 @@
 ---
 name: human-future-forecast
 description: "以人类进化为总目标的三年推演技能（2026-2028）。覆盖：AGI/脑机接口/基因编辑/长寿逆转/太空殖民/量子计算/超人类主义/人形机器人/数字意识/军事增强。触发词：推演人类未来 / human future / 未来三年推演 / future forecast / 人类进化。"
-version: 0.7.0
+version: 0.7.1
 ---
 
 # Human Future Forecast — 人类进化三年推演（2026–2028）
@@ -11,10 +11,10 @@ version: 0.7.0
 ## 主线覆盖
 
 1. **AGI 时间窗**：OpenAI GPT-6 Astra（2026-09-03）/ Anthropic Claude Opus 4.5（2026-11-24, ARC-AGI 8.6%）/ DeepMind Gemini 3 Pro（2026-11-18, ARC-AGI 31.1%→Deep Think 45.1%）/ Metaculus median Feb 2028
-2. **脑机接口（BCI）**：Neuralink 21+ 例 human trial（2026-01）/ Paradromics FDA 批准个人计算设备控制（2026-08-26）/ CorTec Brain Interchange FDA Breakthrough（2026-08-30）/ 中国 NMPA 首批 5 个 BCI 产品（2026-03）
-3. **基因编辑（CRISPR）**：Casgevy/EDIT-101 两个 FDA 批准 / Casgevy 10+ 国家获批 / 碱基编辑进入人类胚胎 / 2030 年预测 $13B 市场
-4. **长寿/衰老逆转**：AI 设计药物 rentosertib 让 6 个衰老时钟回拨 3-4 年（Nature Biotech 2026-09-07）/ TAME 试验（NIH Phase III, 3,000 人, 结果 2028）/ PEARL rapamycin 试验（114 完成者）/ D+Q senolytic Phase 1/2 进行中 / Life Biosciences ER-100 首例人体部分重编程（2026-06）/ Altos Labs $6B / NewLimit $760M / Retro Biosciences $180M / Unity 清算标志行业洗牌
-5. **太空殖民**：NASA Artemis II 载人绕月（2026-04, 252,756 英里）/ Artemis III/IV 登月（2027-2028）/ SpaceX Starship HLS
+2. **脑机接口（BCI）**：Neuralink 21+ 例 human trial / CAN-PRIME 2026 Health Canada 批准 / Paradromics Connexus 首例长期植入（2026-06）+ 实时 speech neuroprosthesis（2026-09-14, 200+ bits/sec）/ Precision Neuroscience $93M Series B / Synchron ~$200M Series D / 截至 2026-09 无任何永久植入运动/语音 BCI 获 FDA 上市前批准
+3. **基因编辑（CRISPR）**：Casgevy/EDIT-101 两个 FDA 批准 / Columbia Egli 团队 2026-06 人类胚胎 base editing 突破（ABE protein 直接注射，绕过 mRNA 毒性）/ Cambridge Niakan 团队 2026-06-25 Nature NANOG 研究 / Intellia lonvo-z 滚动 BLA / Prime Medicine PM577 / ~250 gene editing trials active
+4. **长寿/衰老逆转**：AI 设计药物 rentosertib（Nature Biotech 2026-09-07）/ Life Biosciences ER-100 Phase 1 首例患者入组（2026-06）/ NewLimit $435M Series C（2026-06）/ Retro Biosciences reported $5B valuation / Rubedo RLS-1496 Phase 1 / 市场 $23.2B→$58.7B（2034, CAGR 11%）
+5. **太空殖民**：NASA Artemis II 载人绕月（2026-04）/ Artemis III 2027 无人演示 + 2028 载人登月 / SpaceX Starship HLS / 嫦娥 7 号 2027 / 天问 3 号 2028
 6. **量子计算**：IBM 模块化低温系统（2026-08-19）/ QuEra Libra 256 逻辑量子比特（2028, Amazon Braket）/ IonQ 1,600 逻辑量子比特（2028）/ Microsoft Azure Quantum Copilot（2026-10）/ Google Willow 105-qubit / 密码学奇点窗口 2029-2033 / Cloudflare post-quantum TLS 默认开启
 7. **超人类主义/后人类**：PNAS 2026 论证人类-AI 可成为新进化个体；Pope Leo XIV Magnifica Humanitas 警告技术偶像崇拜
 8. **人形机器人/具身智能**：Tesla Optimus 15,000 台（2026 年底）/ Figure AI 突破 1,000 台量产 / Agility Robotics Digit $300M 合同
@@ -94,7 +94,8 @@ version: 0.7.0
 - 2026-09-16 v0.5.0：多维度细化（BCI/CRISPR/长寿/太空/量子/人形机器人/数字孪生/军事增强/AI 治理/量子密码学奇点）+ 来源扩展至 130+ 条
 - 2026-09-16 v0.6.0：量子计算扩展（Microsoft Azure/Google Willow/Cloudflare PQC）/ 长寿管线扩展（ER-100/Altos/NewLimit/Retro/Unity）/ 地缘风险扩展（俄乌/台海/AI自主武器/监管碎片化/生物武器DIY）/ AI基础设施/能源瓶颈 / 来源扩展至 150+ 条
 - 2026-09-16 v0.7.0：新增 AI 基础设施与能源瓶颈独立节（IEA/Allianz Trade/Goldman Sachs）/ 地缘经济碎片化（IMF REE/SUERF chips tokens）/ AI 公众信任塌陷（NBC/YouGov/KFF）/ AI 劳动力替代（WEF/Gartner/Stanford）/ 人形机器人量产时间线细化（Tesla/Figure/Agility/Boston Dynamics）
+- 2026-09-16 v0.7.1：BCI 临床加速（Paradromics 首例长期植入+实时 speech neuroprosthesis/Neuralink CAN-PRIME/Synchron pivotal/Precision $93M）/ CRISPR 人类胚胎 base editing 里程碑（Columbia Egli/Cambridge Niakan）/ 长寿管线更新（Life Biosciences ER-100 Phase 1/NewLimit $435M Series C/Rubedo RLS-1496）/ 太空时间线细化（Artemis III 2027 demo/2028 载人登月）
 
 ## References
-- `references/human-future-2026-2028.md` — 完整推演正文（439 行，v0.7.0）
+- `references/human-future-2026-2028.md` — 完整推演正文（450 行，v0.7.1）
 - `references/expansion-sessions.md` — 版本迭代明细 / 来源获取方法论 / 已知局限

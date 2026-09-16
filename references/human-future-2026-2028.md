@@ -32,8 +32,13 @@
 - **Paradromics**（2026-08-26）：FDA 批准 Connect-One 临床研究扩展至个人计算设备（笔记本/平板/手机），Convey 系统负责神经意图→数字设备控制
 - **CorTec Brain Interchange**：FDA 第二例 Breakthrough Device Designation（2026-08-30），用于四肢瘫痪沟通；首例 Breakthrough 是 2026-04 的中风运动康复
 - **中国 BCI 爆发**：截至 2026-06 134 注册临床研究；NMPA 首批 5 个 BCI 产品获批（Neuracle 半侵入 ECoG 2026-03 Class III 为首例）
-- **BCI 志愿者数量翻倍**：MIT Technology Review 2026-06 报道，全球带电极 BCI 试验人数从 67（2023 底）激增
-- **侵入性梯度**：非侵入 EEG → 半侵入 ECoG/endovascular → 全植入 closed-loop DBS；每级都进入真实临床
+|- **BCI 志愿者数量翻倍**：MIT Technology Review 2026-06 报道，全球带电极 BCI 试验人数从 67（2023 底）激增
+|- **侵入性梯度**：非侵入 EEG → 半侵入 ECoG/endovascular → 全植入 closed-loop DBS；每级都进入真实临床
+|- **Paradromics Connexus**：2026-06 完成首例长期植入（Connect-One EFS，University of Michigan）；2026-09-14 实现实时 speech neuroprosthesis（thought-to-text 200+ bits/sec）；FDA IDE 已批，但仍为 investigational
+|- **Neuralink CAN-PRIME**：2026 获 Health Canada 批准，多国（U.S./U.K./Canada/UAE）PRIME 试验 ~21 例；Blindsight 视觉皮层植入获 FDA breakthrough device
+|- **Precision Neuroscience**：$93M Series B（~$500M 估值），临时皮质接口 510(k) cleared
+|- **Synchron**：~$200M Series D（2025-11），pivotal trial targeting 2026 FDA submission；stentrode 经血管植入，无需开颅
+|- **关键监管边界**：截至 2026-09，无任何永久植入运动/语音 BCI 获 FDA 上市前批准（Premarket Approval）；全部处于 EFS/IDE 阶段。Morgan Stanley 估值 $400B 但管线零商业化
 
 ### 2026–2028 里程碑
 
@@ -58,7 +63,7 @@
 
 - **两个 FDA 批准疗法落地**：Casgevy（Vertex/CRISPR Therapeutics）和 EDIT-101（Intellia/Regeneron）标志着 in vivo 编辑从概念进入临床现实
 - **Casgevy 商业现实**：已在 10+ 国家获批；sickle cell 100%  crisis-free（中位 35+ 个月）；beta-thalassemia 98.2% 输血独立；2026 年 FDA 扩展至 2 岁以上儿童
-- **碱基编辑进入人类胚胎**：2026 年首次在人类胚胎中实现 precise single-base editing 且避免大染色体异常（Nature 级成果，但 mosaicism/off-target 仍存）
+- **碱基编辑进入人类胚胎**：2026 年首次在人类胚胎中实现 precise single-base editing 且避免大染色体异常（Columbia Egli 团队 2026-06-01 bioRxiv：直接注射合成 ABE protein + guide RNA，绕过 mRNA 毒性；靶向 PCSK9/HBG1/2；mosaicism/off-target 仍存；Cambridge Niakan 团队 2026-06-25 Nature：NANOG 基因敲除揭示早期胚胎细胞命运决定；两篇独立研究均确认 base editing 比 standard CRISPR-Cas9 大幅降低染色体异常风险）
 - **prime editing 首次人体治愈**：2025-12 NEJM 报道 19 岁 CGD 患者 Ty Sperle 被治愈（2026-02-28 公开）；原理是 autologous ex vivo correction（取细胞→修复→回输）
 - **VERVE-102**：PCSK9 base editing，LDL-C 降低 53%（最高 69%），Phase 1b
 - **Intellia lonvo-z**：in vivo CRISPR for hereditary angioedema，2026-04 滚动 BLA 提交，87% HAE attack reduction
@@ -89,12 +94,13 @@
 |- **PEARL 试验**（Participatory Evaluation of Aging with Rapamycin for Longevity）：低剂量 rapamycin 长寿信号，114 名完成者（NCT04488601，2025-04 Aging 论文），48 周安全但无 proven lifespan 效应
 |- **D+Q 人体数据**：梅奥诊所 Phase 1（IPF 患者，开放标签，约 12 人）显示 senescent cell burden 下降；2026-02 骨健康 Phase 2（60 名绝经后女性）主要终点未达标但 2/4/20 周次级终点有信号
 |- **NMN / NR**：2026 头对头临床数据确认两者均在 14 天内翻倍 circulating NAD+；下游信号不同，但均未出现 rodent 级的 dramatic 抗衰效果
-|- **Life Biosciences ER-100**（2026-01 FDA IND）：首个部分表观遗传重编程人体试验，AAV2 递送 OSK 到视网膜神经节细胞，治疗青光眼/NAION；2026-06 首例患者入组（ClinicalTrials.gov）
-|- **Altos Labs**：~$6B 资金，Joan Mannick（前 resTORbio CMO）2025 入职，2026-2027 首批人体安全数据读出（皮肤/视网膜终点）
-|- **NewLimit**：$760M Series C（Kleiner Perkins/Founders Fund），AI 发现 reprogramming 药物，肝脏为首个适应症，2027 进入 Phase I
-|- **Retro Biosciences**：Sam Altman $180M seed，目标延长健康寿命 10 年，autophagy/cell replacement 领先，Phase 1 进行中
+|- **Life Biosciences ER-100**（2026-01 FDA IND clearance）：首个部分表观遗传重编程人体试验，AAV2 递送 OSK（OCT4/SOX2/KLF4）到视网膜神经节细胞，治疗青光眼/NAION；2026-06 首例患者入组（David Sinclair 联合创办，CSO Sharon Rosenzweig-Lipson）
+|- **Altos Labs**：~$6B 资金，Joan Mannick（前 resTORbio CMO）2025 入职，截至 mid-2026 未披露命名临床候选物/适应症/监管申请；2026-2027 首批人体安全数据读出（皮肤/视网膜终点）
+|- **NewLimit**：$760M+（$435M Series C 2026-06，Kleiner Perkins/Founders Fund），AI 发现 reprogramming 药物，肝脏为首个适应症，2027 进入 Phase I；valuation $1.62B（2025-10 extension）
+|- **Retro Biosciences**：Sam Altman $180M seed，目标延长健康寿命 10 年，autophagy/cell replacement 领先，Phase 1 进行中；reported $5B valuation（2026 fundraising）
 |- **Unity Biotechnology**：2025-09 清算（NASDAQ: UBX），first-gen senolytic 临床失败标志行业从 broad 转向 precision
-|- **Longevity 市场**：2026 年 $23.2B → 2034 年 $58.7B（CAGR 11%）；cellular reprogramming 子市场 $14.8B→$177.8B（CAGR 22.1%）；Q1 2026 单季 $3.74B/41 交易
+|- **Rubedo Life Sciences**：RLS-1496（GPX4 modulator senolytic）Phase 1 首例患者入组（2024-12， plaque psoriasis/skin aging）；AI-enabled ALEMBIC platform
+|- **Longevity 市场**：2026 年 $23.2B → 2034 年 $58.7B（CAGR 11%）；cellular reprogramming 子市场 $25.8B→$177.8B（CAGR 22.1%，2026 baseline $25.8B）；Q1 2026 单季 $3.74B/41 交易；2026 上半年 global investment >$7.4B
 
 ### 进化含义
 
@@ -110,7 +116,7 @@
 ### 技术现状
 
 - **NASA Artemis II**（2026-04）：首次载人绕月，4 名宇航员飞行 252,756 英里，创人类离开近地轨道最远距离记录
-- **Artemis III**：计划 2027-2028 登月，SpaceX Starship HLS / Blue Origin 竞标
+|- **Artemis III**：2027 demonstration mission（无人测试版，练习 Orion 与 commercial human landing systems 对接）；2028 载人登月（SpaceX Starship HLS + Blue Origin 竞标，NASA 维持 2028 目标不变）
 - **Artemis IV**：NASA 维持 2028 首次登月着陆目标不变
 - **SpaceX Starship**：2026 年重心短暂转向月球基地（Moon Base Alpha）；2028 无人 Starship HLS 着陆测试；2028/2029 火星窗口计划 20 艘 Starship
 - **中国**：嫦娥 7 号 2027 月球南极探测（含着陆器+轨道器+释放探测器）；天问 3 号火星采样 2028 发射、2031 返回
