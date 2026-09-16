@@ -1,7 +1,7 @@
 ---
 name: human-future-forecast
 description: "以人类进化为总目标的三年推演技能（2026-2028）。覆盖：AGI/脑机接口/基因编辑/长寿逆转/太空殖民/量子计算/超人类主义/人形机器人/数字意识/军事增强。触发词：推演人类未来 / human future / 未来三年推演 / future forecast / 人类进化。"
-version: 0.7.1
+version: 0.7.2
 ---
 
 # Human Future Forecast — 人类进化三年推演（2026–2028）
@@ -76,13 +76,14 @@ version: 0.7.1
 - 实时新闻：50+ 条（2026-09-15/16 滚动搜索）
 - 哲学/法学：15+（Pope Leo XIV/PNAS/Wikipedia/Noema/UPI/Philosophy Institute/Sandberg-Bostrom/GIUP）
 - 数字意识/心智上传/数字孪生：20+ 条（MIT/IBS/EU Roadmap/Twelfth Brain/Eon Systems/mind-upload.com/Zenodo/Afterlife AI/DEV Community/Pattern Nexus/arXiv master plan）
-- 军事增强：15+ 条（TechEconomics/Fortune Business Insights/Small Wars Journal/Reuters/US DoD/Ukraine 7th Air Assault/Hypershell/Edgerun/Anduril-Meta）
-- 合成生物学：5+ 条（ALIFE/SEED/SynBYSS/Cartagena Protocol/Schering Stiftung）
-- AI 安全治理：20+ 条（EU Digital Omnibus/NY RAISE/DeepMind/Anthropic/OpenAI/Luminous Codex/ForesightSafety Bench/FLI Safety Index/METR）
-- 量子/密码学：20+ 条（IBM/QuEra/IonQ/Microsoft Azure/Google Willow/Cloudflare/Forrester/NIST/CISA/OMB/Executive Order 14412/CNSA 2.0/G7）
-- 地缘风险：15+ 条（NATO/CSIS/The Atlantic/Economist Intelligence Unit/The Hindu/Geopolitical Monitor/Reuters/NYT/Ukraine MOD/Zelenskyy）
-- AI 基础设施/能源：15+ 条（Goldman Sachs/Morgan Stanley/JLL/IEA/Overload Report/Blackstone/Stargate/PJM/Google-SpaceX GPU 协议）
-- 社会心理/公众认知：10+ 条（Frontier Risk Monitor/METR/International AI Safety Report/FLI Safety Index/Mother Jones/ABC News/Time）
+|- 军事增强：15+ 条（TechEconomics/Fortune Business Insights/Small Wars Journal/Reuters/US DoD/Ukraine 7th Air Assault/Hypershell/Edgerun/Anduril-Meta）
+|- 合成生物学：10+ 条（ALIFE/SEED/SynBYSS/Cartagena Protocol/Schering Stiftung/Science mirror bacteria/RAND prevention strategy/JCVI）
+|- AI 安全治理：20+ 条（EU Digital Omnibus/NY RAISE/DeepMind/Anthropic/OpenAI/Luminous Codex/ForesightSafety Bench/FLI Safety Index/METR）
+|- 量子/密码学：20+ 条（IBM/QuEra/IonQ/Microsoft Azure/Google Willow/Cloudflare/Forrester/NIST/CISA/OMB/Executive Order 14412/CNSA 2.0/G7）
+|- 地缘风险：15+ 条（NATO/CSIS/The Atlantic/Economist Intelligence Unit/The Hindu/Geopolitical Monitor/Reuters/NYT/Ukraine MOD/Zelenskyy）
+|- AI 基础设施/能源：15+ 条（Goldman Sachs/Morgan Stanley/JLL/IEA/Overload Report/Blackstone/Stargate/PJM/Google-SpaceX GPU 协议）
+|- 社会心理/公众认知：20+ 条（Frontiers Psychology/Frontiers Sociology/Elon University/Stanford Character.AI study/APA/CNBC/Northeastern/AI anxiety/discontinuance intention/algorithmic anxiety）
+|- 货币/金融基础设施：15+ 条（BIS Project Agora/e-CNY/Digital Euro/Digital Ruble/Drex/MiCA/US anti-CBDC/IMF/San Francisco Fed DSGE）
 - 合计可直接引用来源：150+ 条
 
 ## 更新日志
@@ -94,8 +95,9 @@ version: 0.7.1
 - 2026-09-16 v0.5.0：多维度细化（BCI/CRISPR/长寿/太空/量子/人形机器人/数字孪生/军事增强/AI 治理/量子密码学奇点）+ 来源扩展至 130+ 条
 - 2026-09-16 v0.6.0：量子计算扩展（Microsoft Azure/Google Willow/Cloudflare PQC）/ 长寿管线扩展（ER-100/Altos/NewLimit/Retro/Unity）/ 地缘风险扩展（俄乌/台海/AI自主武器/监管碎片化/生物武器DIY）/ AI基础设施/能源瓶颈 / 来源扩展至 150+ 条
 - 2026-09-16 v0.7.0：新增 AI 基础设施与能源瓶颈独立节（IEA/Allianz Trade/Goldman Sachs）/ 地缘经济碎片化（IMF REE/SUERF chips tokens）/ AI 公众信任塌陷（NBC/YouGov/KFF）/ AI 劳动力替代（WEF/Gartner/Stanford）/ 人形机器人量产时间线细化（Tesla/Figure/Agility/Boston Dynamics）
-- 2026-09-16 v0.7.1：BCI 临床加速（Paradromics 首例长期植入+实时 speech neuroprosthesis/Neuralink CAN-PRIME/Synchron pivotal/Precision $93M）/ CRISPR 人类胚胎 base editing 里程碑（Columbia Egli/Cambridge Niakan）/ 长寿管线更新（Life Biosciences ER-100 Phase 1/NewLimit $435M Series C/Rubedo RLS-1496）/ 太空时间线细化（Artemis III 2027 demo/2028 载人登月）
+|- 2026-09-16 v0.7.1：BCI 临床加速（Paradromics 首例长期植入+实时 speech neuroprosthesis/Neuralink CAN-PRIME/Synchron pivotal/Precision $93M）/ CRISPR 人类胚胎 base editing 里程碑（Columbia Egli/Cambridge Niakan）/ 长寿管线更新（Life Biosciences ER-100 Phase 1/NewLimit $435M Series C/Rubedo RLS-1496）/ 太空时间线细化（Artemis III 2027 demo/2028 载人登月）
+|- 2026-09-16 v0.7.2：数字意识扩展（Eon Systems/Meta TRIBE v2/MIT McGovern/arXiv brain digital twin/Neuromorphic Twins/State of Brain Emulation 2025）/ 超人类主义哲学细化（PNAS evolvable AI/PNAS super moral status of ASI/Vatican 164段/Aristotelian eudaimonia/Sandberg 时间线）/ 合成生物学/镜像生命（Science mirror bacteria/RAND/JCVI）/ 地缘风险细化（台海概率/South China Sea maritime conflict/US-Philippines Balikatan）/ CBDC/DeFi/stablecoin 监管分化 / AI 社会心理（Elon University 27%/Stanford Character.AI/Frontiers AI companion review）
 
 ## References
-- `references/human-future-2026-2028.md` — 完整推演正文（450 行，v0.7.1）
+- `references/human-future-2026-2028.md` — 完整推演正文（468 行，v0.7.2）
 - `references/expansion-sessions.md` — 版本迭代明细 / 来源获取方法论 / 已知局限

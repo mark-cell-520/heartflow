@@ -265,10 +265,12 @@
 | 俄乌冲突外溢 | 2026–2027 | 俄罗斯 NATO 领土误击 / 西巴尔干破坏 | 中–高 |
 | 台海误判 | 2026–2028 | 中国 GPSRL 近距离围台 + 美军双线作战 | 中 |
 | AI 自主武器失控 | 2027–2028 | Anduril/Meta AR 头盔 / 无人机群 AI 目标识别 | 中 |
-| 全球 AI 监管碎片化 | 2026–2027 | EU AI Act 执行 / US NY RAISE 2027 / 中国未同步 | 高 |
+|| 全球 AI 监管碎片化 | 2026–2027 | EU AI Act 执行 / US NY RAISE 2027 / 中国未同步 | 高 |
+|| CBDC/ programmable money 主权货币重构 | 2027–2028 | 24 国零售 CBDC / Digital Euro 2029 / US 联邦反 CBDC 与州级试验并存 | 高 |
+|| 社会心理/ AI 亲密关系 | 2026–2027 | 27% 美国成人有显著 LLM 社交 / Stanford Character.AI 孤独化 / AI dependence 成瘾 | 高 |
 | 生物武器 DIY | 2027–2028 | AI 设计蛋白质 + 基因编辑 Democratization | 低–中 |
-|| 镜像生命细菌 | 2027–2030 | mirror biomolecules 组装 / D-ribosome / synthetic cell 蓝图 | 低–中（JCVI/RAND 10–30 年） |
-|| 数字意识身份危机 | 2028–2030 | 第一个“数字人”法律诉讼 / digital mind copy 被归类为 property | 中 |
+| 镜像生命细菌 | 2027–2030 | mirror biomolecules 组装 / D-ribosome / synthetic cell 蓝图 | 低–中（JCVI/RAND 10–30 年） |
+| 数字意识身份危机 | 2028–2030 | 第一个“数字人”法律诉讼 / digital mind copy 被归类为 property | 中 |
 
 ---
 
@@ -440,6 +442,8 @@
 |- **市场信号**：OpenAI  projected $225B revenue 2030；Anthropic projected $75B；$3.1B model development spend (2025)
 |- **能源/气候交叉**：IEA 2024 数据中心 415 TWh（1.5% 全球用电），2030 年 Base Case 翻倍到 945 TWh（3%）；Allianz Trade 2026-06 报告真实碳足迹 286 MtCO₂（比 IEA 高 57%）；Big-5 hyperscaler 2026 年 AI capex ~$775-800B
 |- **地缘经济碎片化**：IMF WP/26/72（2026-07）稀土供应链动态模型；SUERF Policy Note No. 416（2026-08-27）Chips & tokens at fault lines；US-China 关税僵持（10% 临时停火延至 2025-11-10）；China REE 出口管制 HREE 限制日本
+|- **CBDC / programmable money 重构主权货币**：137 国探索 / 11 国已上线 / 36 国 pilot；e-CNY 1.8B wallets / $28B monthly；Digital Euro 2027 pilot / 2029 target（€1.3B）；Digital Ruble 2026-09-01 大规模启动；Brazil Drex 2026 centralized rollout；US 联邦 anti-CBDC 与州级试验并存
+|- **DeFi / stablecoin 监管分化**：EU MiCA 2024 生效后进入合规筛选期（2026-2027 是 stablecoin reserve/enforcement deadline）；US SEC 对 crypto 交易所/stablecoin issuer 采取分散执法；机构资金从 DeFi 回流到 permissioned tokenized fund
 |- **AI 公众信任**：NBC News net favorability -20（2026-06）；YouGov 仅 5%美国人 trust AI "a lot"；Economist/YouGov 2026-05 多数派认为 AI 发展太快；KFF poll 63%公众不信任 AI 健康信息
 |- **AI 劳动力替代**：WEF Future of Jobs 2025 2020-2025 净替代 1400 万岗位；Goldman Sachs 2026-04 美国月替代 16,000 岗位；Gartner 2026-09 30% AI 替代员工 2029 年前需回流；Stanford 22-25 岁 AI 暴露岗位就业 -13%
 |- **人形机器人/具身智能量产**：Tesla Optimus 2026 年底 ~15,000 台供应商订单（~1,000/周 9 月→2,500/周 12 月）/ Figure AI 2026-12 BMW Spartanburg 试点 / Agility Robotics Digit 2026-09 商业部署 / Boston Dynamics Atlas 电动版 2026-11
