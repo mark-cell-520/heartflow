@@ -99,6 +99,8 @@ version: 0.7.3
 |- AI 基础设施/能源：15+ 条（Goldman Sachs/Morgan Stanley/JLL/IEA/Overload Report/Blackstone/Stargate/PJM/Google-SpaceX GPU 协议）
 |- 社会心理/公众认知：20+ 条（Frontiers Psychology/Frontiers Sociology/Elon University/Stanford Character.AI study/APA/CNBC/Northeastern/AI anxiety/discontinuance intention/algorithmic anxiety）
 |- 货币/金融基础设施：15+ 条（BIS Project Agora/e-CNY/Digital Euro/Digital Ruble/Drex/MiCA/US anti-CBDC/IMF/San Francisco Fed DSGE）
+|- 气候/AMOC/北极海冰：15+ 条（Nature Climate Change/Nature Communications/Annual Reviews/Phys.org/Copernicus/NSIDC/NASA/IOPscience/Global Tipping Points/Nordic Perspective）
+|- 太空经济/ISRU/He-3：20+ 条（NASA Artemis/Interlune/Magna Petra/AstroForge/ispace/SpaceX/Blue Origin/Industry Research Biz/Fact MR/Orbital Economy/space4peace）
 - 合计可直接引用来源：150+ 条
 
 ## 更新日志
