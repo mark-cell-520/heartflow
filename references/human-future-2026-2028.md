@@ -125,7 +125,10 @@
 - **Artemis IV**：NASA 维持 2028 首次登月着陆目标不变
 - **SpaceX Starship**：2026 年重心短暂转向月球基地（Moon Base Alpha）；2028 无人 Starship HLS 着陆测试；2028/2029 火星窗口计划 20 艘 Starship
 - **中国**：嫦娥 7 号 2027 月球南极探测（含着陆器+轨道器+释放探测器）；天问 3 号火星采样 2028 发射、2031 返回
-- **商业月球**：AstroForge（铂族金属）、ispace（水冰开采）2026–2028 试着陆
+|- **商业月球**：AstroForge（铂族金属）、ispace（水冰开采）2026–2028 试着陆
+|- **He-3 / ISRU 市场化**：Interlune $300M Bluefors 合同（2025-09）/ 2028 首采；Magna Petra NASA CRADA / ispace Mission 3（2027）；AstroForge/Odin 失败后 Vestri 计划；Space-Based Metal Mining 2026 $4.8M→2034 $29.8M（CAGR 22.5%）
+|- **轨道经济/太空制造**：Starlink V3 / lunar propellant depot / microgravity semiconductor/pharma 路线图；Orbital Economy 2026–2060 四阶段框架把 2026–2028 定位 Foundations
+|- **法律碎片化**：Artemis Accords / 1967 Outer Space Treaty non-appropriation / 1979 Moon Agreement 仅 17–18 方 / US 2015 + Luxembourg 2017 + UAE 2019 + Japan 2021 国家法形成 patchwork；2026 年 NASA 暂停 Lunar Gateway 改走 surface-first
 
 ### 进化含义
 
@@ -154,6 +157,10 @@
 |- **电网集中度风险**：数据集中落户特定区域（Virginia/Texas）可能引发局部停电/电价飙升/社区反对
 |- **气候承诺与实际排放背离**：Microsoft 考虑推迟清洁能源目标以保持 AI 竞争力；15 座原定退役煤电厂 2025 年继续运行给数据中心供电
 |- **AI 作为气候工具**：IEA Widespread Adoption Case 显示现有 AI 应用 2035 年可减碳 1,400 Mt CO₂（甲烷泄漏检测/工业优化/建筑 HVAC），但数据中心自身排放增长更快
+|- **AMOC 减速/崩溃风险**：Nature Climate Change 2026-05 显示快速增温（2.5 ppm/yr）下 AMOC 可在 +2°C 崩溃，慢速增温（0.5 ppm/yr）下 +5.5°C 仍稳定；Gulf Stream 近 Cape Hatteras 1993–2024 显著北移（p<0.05）被指为 AMOC 崩溃前兆；IPCC AR6 仍判断 2100 前崩溃 unlikely，但 2026 多篇 Nature/Annual Reviews 认为风险被低估
+|- **北极海冰/永久冻土**：2026-03 Arctic 海冰最大值 tied 卫星史最低（5.52M km²）；8 月中旬 Chukchi/Beaufort 海冰 extent 排名第 8/9 低；Nature Communications 2026 permafrost carbon release 与 overshoot warming 线性相关（每 100 degree-years 11–21 PgC）；AMOC slowdown 带来的北半球相对冷却可部分 offset 冻土融化，但本身造成欧洲/热带暴雨带位移
+|- **格陵兰冰盖**：当前消融速率是 1980 年代的 6 倍；+2.7°C 场景下 2100 海平面贡献 ~20 cm（与 1900 年以来累计上升相当）；Ice sheet 完全融化需数百年，但 2026–2028 是决定是否触发 irreversibility 的关键窗口
+|- **气候干预技术**：2026 年讨论从理论转向工程准备（Stratospheric aerosol injection / Marine cloud brightening 小规模 field trials 得到更多资助），但国际治理框架仍缺位
 
 ---
 
