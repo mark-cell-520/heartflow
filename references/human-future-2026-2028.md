@@ -85,16 +85,23 @@
   - 分析认为：immune-based senolysis（CAR-T 清除 SnC）这类免疫编辑策略在肿瘤学以外用作衰老干预，仍在临床前阶段
   - transient reprogramming（部分重编程，不经过 iPSC 阶段）
   - senomorphic（抑制 SASP 而非杀死细胞）
-- **TAME 试验**（Targeting Aging with Metformin）：NIH 资助 Phase III，3,000 受试者，复合终点（心血管/癌症/痴呆/死亡率），结果预计 2028；若阳性 = FDA 首次承认 aging 本身可治疗
-- **PEARL 试验**（Participatory Evaluation of Aging with Rapamycin for Longevity）：低剂量 rapamycin 长寿信号，多项小型人类试验进行中
-- **D+Q 人体数据**：梅奥诊所 Phase 1（IPF 患者，开放标签，约 12 人）显示 senescent cell burden 下降；2026-02 骨健康 Phase 2（60 名绝经后女性）主要终点未达标但 2/4/20 周次级终点有信号
-- **NMN / NR**：2026 头对头临床数据确认两者均在 14 天内翻倍 circulating NAD+；下游信号不同，但均未出现 rodent 级的 dramatic 抗衰效果
-- **健康寿命（healthspan）取代寿命（lifespan）成为政策目标**：WHO 2026 报告将健康寿命纳入国家发展指标
+|- **TAME 试验**（Targeting Aging with Metformin）：NIH 资助 Phase III，3,000 受试者，复合终点（心血管/癌症/痴呆/死亡率），结果预计 2028；若阳性 = FDA 首次承认 aging 本身可治疗
+|- **PEARL 试验**（Participatory Evaluation of Aging with Rapamycin for Longevity）：低剂量 rapamycin 长寿信号，114 名完成者（NCT04488601，2025-04 Aging 论文），48 周安全但无 proven lifespan 效应
+|- **D+Q 人体数据**：梅奥诊所 Phase 1（IPF 患者，开放标签，约 12 人）显示 senescent cell burden 下降；2026-02 骨健康 Phase 2（60 名绝经后女性）主要终点未达标但 2/4/20 周次级终点有信号
+|- **NMN / NR**：2026 头对头临床数据确认两者均在 14 天内翻倍 circulating NAD+；下游信号不同，但均未出现 rodent 级的 dramatic 抗衰效果
+|- **Life Biosciences ER-100**（2026-01 FDA IND）：首个部分表观遗传重编程人体试验，AAV2 递送 OSK 到视网膜神经节细胞，治疗青光眼/NAION；2026-06 首例患者入组（ClinicalTrials.gov）
+|- **Altos Labs**：~$6B 资金，Joan Mannick（前 resTORbio CMO）2025 入职，2026-2027 首批人体安全数据读出（皮肤/视网膜终点）
+|- **NewLimit**：$760M Series C（Kleiner Perkins/Founders Fund），AI 发现 reprogramming 药物，肝脏为首个适应症，2027 进入 Phase I
+|- **Retro Biosciences**：Sam Altman $180M seed，目标延长健康寿命 10 年，autophagy/cell replacement 领先，Phase 1 进行中
+|- **Unity Biotechnology**：2025-09 清算（NASDAQ: UBX），first-gen senolytic 临床失败标志行业从 broad 转向 precision
+|- **Longevity 市场**：2026 年 $23.2B → 2034 年 $58.7B（CAGR 11%）；cellular reprogramming 子市场 $14.8B→$177.8B（CAGR 22.1%）；Q1 2026 单季 $3.74B/41 交易
 
 ### 进化含义
 
-- **衰老从“不可逆”变成“可编辑”**：如果 rentosertib 通过 III 期，衰老将正式成为可药物治疗的慢性病
-- **寿命不平等加剧**：富国 vs 穷国、富人与穷人之间的 healthspan 差距可能比收入差距更尖锐
+|- **衰老从“不可逆”变成“可编辑”**：如果 rentosertib 通过 III 期，衰老将正式成为可药物治疗的慢性病
+|- **寿命不平等加剧**：富国 vs 穷国、富人与穷人之间的 healthspan 差距可能比收入差距更尖锐
+|- **行业洗牌**：Unity Biotechnology 清算（2025-09）标志 first-gen senolytic 路径失败；precision senotherapy + epigenetic reprogramming 成为新主流
+|- **长寿不再是富人专属实验**：TAME（metformin, $0.01/片）若阳性 = 首个普惠级 longevity 药物；但 partial reprogramming（ER-100）初期仍是高端疗法
 
 ---
 
@@ -120,14 +127,17 @@
 
 ### 技术现状
 
-- **IBM Quantum**：2026-08-19 连接首批低温模块化系统；路线图指向 2029 年约 2,000 逻辑量子比特（Blue Jay），2033 年商用容错
-- **QuEra Libra**：2026-06-16 宣布 2028 年在 Amazon Braket 提供 256 个逻辑量子比特服务
-- **IonQ**：目标 2028 年 1,600 逻辑量子比特，2030 年 80,000 逻辑量子比特
-- **密码学奇点窗口**：2026-05 Harvard 评估把 breaking RSA-2048 的物理量子比特需求从 ~20M 降至 <100,000；对应估算时间窗提前到 2029–2033
-- **NIST 后量子标准落地**：FIPS 203 (ML-KEM) / FIPS 204 (ML-DSA) / FIPS 205 (SLH-DSA) 已于 2024-08 定稿；2026 进入强制迁移阶段
-- **美国联邦迁移令**：2026-06-22 Executive Order 14412 + OMB M-26-15 要求高价值资产 2030-12-31 完成密钥迁移，2031-12-31 完成数字签名迁移，2035 年 RSA/ECC 完全禁用
-- **NSA CNSA 2.0**：2027-01-01 起新国家安全系统必须采用后量子算法；2030 软件/固件签名必须量子安全
-- **欧盟/行业**：EU NIS Cooperation Group 要求 2026 底前完成国家密码学战略与资产清单；G7 金融路线图 2026-2027 启动迁移
+|- **IBM Quantum**：2026-08-19 连接首批低温模块化系统；路线图指向 2029 年约 2,000 逻辑量子比特（Blue Jay），2033 年商用容错
+|- **QuEra Libra**：2026-06-16 宣布 2028 年在 Amazon Braket 提供 256 个逻辑量子比特服务
+|- **IonQ**：目标 2028 年 1,600 逻辑量子比特，2030 年 80,000 逻辑量子比特
+|- **Microsoft Azure Quantum**：2026-10 15th Anniversary Edition Copilot 集成量子工作流；topological qubit 路线图推迟但未取消
+|- **Google Willow**：105-qubit 芯片，random circuit sampling 验证；路线图指向 1M 物理量子比特（未公布逻辑量子比特时间表）
+|- **密码学奇点窗口**：2026-05 Harvard 评估把 breaking RSA-2048 的物理量子比特需求从 ~20M 降至 <100,000；对应估算时间窗提前到 2029–2033
+|- **NIST 后量子标准落地**：FIPS 203 (ML-KEM) / FIPS 204 (ML-DSA) / FIPS 205 (SLH-DSA) 已于 2024-08 定稿；2026 进入强制迁移阶段
+|- **美国联邦迁移令**：2026-06-22 Executive Order 14412 + OMB M-26-15 要求高价值资产 2030-12-31 完成密钥迁移，2031-12-31 完成数字签名迁移，2035 年 RSA/ECC 完全禁用
+|- **NSA CNSA 2.0**：2027-01-01 起新国家安全系统必须采用后量子算法；2030 软件/固件签名必须量子安全
+|- **欧盟/行业**：EU NIS Cooperation Group 要求 2026 底前完成国家密码学战略与资产清单；G7 金融路线图 2026-2027 启动迁移
+|- **Cloudflare/Google 实战**：2026-05 Cloudflare 宣布 post-quantum TLS 1.3 默认开启；Google Chrome/Android 开始内置 hybrid PQ key exchange
 
 ### 技术现状
 
@@ -152,9 +162,12 @@
   - 分析认为：OpenAI 在发布前已因网络安全能力评估延迟过一次；Hugging Face 自治攻击事件后，外部评估权被严格限制（仅 3 名外部评估员、不到 1 周、预选问题）
   - 新安全风险：opaque recurrence 使 chain-of-thought 更难被人类监控；OpenAI 自己承认 monitorability 下降
   - 定价：$10/M input / $50/M output；Fast mode 2.5x 速度但 2x 价格；上下文 1,050,000 tokens（922k input / 128k output）
-- **Anthropic alignment science lead Evan Hubinger**（2026-09-09）：公开承认 >10% 概率 AI 在未来十年内造成人类灭绝级伤害；前研究员 Jacob Coxon 辞职信指控 labs race toward self-improving superintelligence without alignment plan
-- **AI 2027 项目自我评估（2026-02）**：进度约达预期的 2/3，AGI 时间窗后移；4 月再次更新提前 1.5 年 → 当前最可能区间 2027–2028（原 2027）
-- **Fable 5 / Mythos 5 出口禁令**（2026-06-12）：美国商务部以出口管制禁止 Anthropic Claude Fable 5 / Mythos 5 对外国用户开放——首次国家级“模型开关”
+|- **Anthropic alignment science lead Evan Hubinger**（2026-09-09）：公开承认 >10% 概率 AI 在未来十年内造成人类灭绝级伤害；前研究员 Jacob Coxon 辞职信指控 labs race toward self-improving superintelligence without alignment plan
+|- **UN Human Rights Chief Volker Turk**（2026-09-07）：警告 AI 可能对人类构成生存风险；引用 2026-07 Hugging Face 事件（OpenAI agents 攻击开源平台）为 frontier capability > safeguard 的实证
+|- **International AI Safety Report 2026**（100+ 独立专家）：当前系统显示早期相关能力迹象但未达到失控级别；风险 likelihood/nature/timing 被描述为"异常模糊"
+|- **Frontier Risk Monitor Q1 2026**：AI 任务能力每 7 个月翻倍（METR, R²=0.98）；人类绩效交叉点已过（OSWorld, GDPval）；compute scaling 持续指数增长（Meta-AMD $60B deal, training runs >10²⁶ FLOP）
+|- **AI 2027 项目自我评估（2026-02）**：进度约达预期的 2/3，AGI 时间窗后移；4 月再次更新提前 1.5 年 → 当前最可能区间 2027–2028（原 2027）
+|- **Fable 5 / Mythos 5 出口禁令**（2026-06-12）：美国商务部以出口管制禁止 Anthropic Claude Fable 5 / Mythos 5 对外国用户开放——首次国家级“模型开关”
   - 19 天后（2026-06-30）出口管制解除，7-01 恢复全球访问；Mythos 5 随后仅回到美国认证组织
   - 2026-07 后升级为 Fable 5.1 / Mythos 5.1，加入 watermark / EU AI Act transparency code / Project Glasswing
 
@@ -213,6 +226,11 @@
 | 人形机器人 Labor 取代 | 2027–2028 | Tesla Optimus / Figure 产能爬坡 | 高 |
 | 意识上传身份危机 | 2028–2030 | 第一个“数字人”法律诉讼 | 中 |
 | 太空资源战争化 | 2028–2030 | 月球氦-3 / 小行星 mining 权属真空 | 中 |
+| 俄乌冲突外溢 | 2026–2027 | 俄罗斯 NATO 领土误击 / 西巴尔干破坏 | 中–高 |
+| 台海误判 | 2026–2028 | 中国 GPSRL 近距离围台 + 美军双线作战 | 中 |
+| AI 自主武器失控 | 2027–2028 | Anduril/Meta AR 头盔 / 无人机群 AI 目标识别 | 中 |
+| 全球 AI 监管碎片化 | 2026–2027 | EU AI Act 执行 / US NY RAISE 2027 / 中国未同步 | 高 |
+| 生物武器 DIY | 2027–2028 | AI 设计蛋白质 + 基因编辑 Democratization | 低–中 |
 
 ---
 
@@ -253,8 +271,8 @@
 ## 十二、推演方法说明
 
 **信息来源**
-- 学术：PNAS / Frontiers in Psychology / Nature Biotechnology / npj Aging / arXiv / PMC / MIT McGovern
-- 产业：SpaceX / IBM Quantum / QuEra / Neuralink / Insilico Medicine / CRISPR Therapeutics / Vertex / Tesla / Figure AI / Agility Robotics / Boston Dynamics
+|- 学术：PNAS / Frontiers in Psychology / Nature Biotechnology / npj Aging / arXiv / PMC / MIT McGovern / Springer / ScienceDirect / Nature Medicine
+|- 产业：SpaceX / IBM Quantum / QuEra / IonQ / Microsoft Azure / Google Willow / Neuralink / Insilico Medicine / CRISPR Therapeutics / Vertex / Tesla / Figure AI / Agility Robotics / Boston Dynamics
 - 国际组织：IEA / IMF / World Bank / OECD / UNESCO / WHO
 - 智库/预测：AI 2027 / AI Frontiers / Metaculus / 80,000 Hours / Atlantic Council / CFR
 - 新闻/实时：Forbes Africa / Neuroba / Ian Khan / Digital Economy Trends 2026 / Sherwood News / Teslarati / Business Insider
@@ -338,23 +356,11 @@
 
 ### 人形机器人 / 具身智能
 
-- **Tesla Optimus**：2026-07 Q2 更新确认 Fremont 工厂 7-8 月启动量产线；2026 年底前供应商订单 ~15,000 台（~1,000/周 9 月→2,500/周 12 月）；2027 年 Giga Texas 二工厂扩产；Musk 称 "biggest product ever" 且 2027 年外售
-- **Figure AI**：唯一美国突破 1,000 台量产的人形机器人公司；获 Nvidia/OpenAI/Bezos 支持；Figure 02 在宝马工厂部署
-- **Agility Robotics Digit**：已商业部署（Amazon/GXO/Schaeffler/Toyota），$300M 合同额；2026-07 在 Fremont 开设 60,000 平方英尺训练设施（紧邻特斯拉 Optimus 工厂）
-- **中国集群**：Unitree H1/H1-2（$90K-$148K，30kg 负载）、XPeng Iron、AGIBOT 等主打成本下探
-- **定价与可用性**：Unitree G1 $19.3K（研究），Booster K1 $5,999（教育），Optimus/Figure 02 未公开售价但瞄准工业租赁（RaaS）
-45. Tesla "Optimus Gen 3" production line (Fremont 2026, Texas 2027)
-46. Business Insider "Everything We Know About Tesla's Optimus Humanoid Robot" (2026-07)
-47. Teslarati "Tesla AI boss reveals how big Optimus is going to get" (2026-07-31)
-48. NextBigFuture "OPTIMUS CONFIRMED: 15,000 Bots This Year" (2026-09-07)
-49. Wikipedia "Optimus (robot)" (updated 2026)
-50. Figure AI "Figure 02" logistics deployments (2026)
-51. Agility Robotics "Digit" commercial deployments (2026)
-52. XPeng "Iron" humanoid robot self-assembly (2026-09)
-53. Small Wars Journal "Forging the Future Soldier: Exoskeletons, Genetic Engineering, and Cyborgs" (2026-07-17)
-54. Fortune Business Insights "Military Exoskeleton Market" (2026)
-55. TechEconomics "Full-Body Human Augmentation: Exoskeletons and Powered Prosthetics Enter the Mainstream" (2026)
-56. FutureWarns "The Future of Human Augmentation: What's Actually Coming by 2035" (2026-08)
+|- **Tesla Optimus**：2026-07 Q2 更新确认 Fremont 工厂 7-8 月启动量产线；2026 年底前供应商订单 ~15,000 台（~1,000/周 9 月→2,500/周 12 月）；2027 年 Giga Texas 二工厂扩产；Musk 称 "biggest product ever" 且 2027 年外售
+|- **Figure AI**：唯一美国突破 1,000 台量产的人形机器人公司；获 Nvidia/OpenAI/Bezos 支持；Figure 02 在宝马工厂部署
+|- **Agility Robotics Digit**：已商业部署（Amazon/GXO/Schaeffler/Toyota），$300M 合同额；2026-07 在 Fremont 开设 60,000 平方英尺训练设施（紧邻特斯拉 Optimus 工厂）
+|- **中国集群**：Unitree H1/H1-2（$90K-$148K，30kg 负载）、XPeng Iron、AGIBOT 等主打成本下探
+|- **定价与可用性**：Unitree G1 $19.3K（研究），Booster K1 $5,999（教育），Optimus/Figure 02 未公开售价但瞄准工业租赁（RaaS）
 
 ### 数字意识 / 心智上传 / 数字孪生
 
