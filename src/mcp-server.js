@@ -4553,9 +4553,7 @@ const HANDLERS = {
 
   heartflow_supervise_dao: (args) => {
     try {
-      const hf = require(HF_DIR + '/src/core/heartflow.js');
-      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
-      const engine = inst;
+      const engine = typeof heartflow === 'undefined' ? null : heartflow;
       if (!engine || !engine.daoDecision) return { error: 'daoDecision not ready', timestamp: Date.now() };
       const input = args || {};
       return engine.daoDecision.evaluate({ text: input.text || '', intent: input.intent || '', action: input.action || '', history: input.history || [] });
@@ -4563,9 +4561,7 @@ const HANDLERS = {
   },
   heartflow_supervise_uncertainty: (args) => {
     try {
-      const hf = require(HF_DIR + '/src/core/heartflow.js');
-      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
-      const engine = inst;
+      const engine = typeof heartflow === 'undefined' ? null : heartflow;
       if (!engine || !engine.uncertaintyQuantifier) return { error: 'uncertaintyQuantifier not ready', timestamp: Date.now() };
       const input = args || {};
       return engine.uncertaintyQuantifier.evaluate(input.text || '', { domain: input.domain, hasEvidence: input.hasEvidence, multiSource: input.multiSource });
@@ -4573,9 +4569,7 @@ const HANDLERS = {
   },
   heartflow_supervise_priority: (args) => {
     try {
-      const hf = require(HF_DIR + '/src/core/heartflow.js');
-      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
-      const engine = inst;
+      const engine = typeof heartflow === 'undefined' ? null : heartflow;
       if (!engine || !engine.priorityGuardian) return { error: 'priorityGuardian not ready', timestamp: Date.now() };
       const input = args || {};
       return engine.priorityGuardian.check({ userIntent: input.userIntent || '', action: input.action || '', humanProgress: input.humanProgress || {} });
@@ -4583,9 +4577,7 @@ const HANDLERS = {
   },
   heartflow_supervise_progress: (args) => {
     try {
-      const hf = require(HF_DIR + '/src/core/heartflow.js');
-      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
-      const engine = inst;
+      const engine = typeof heartflow === 'undefined' ? null : heartflow;
       if (!engine || !engine.progressJudgment) return { error: 'progressJudgment not ready', timestamp: Date.now() };
       const input = args || {};
       return engine.progressJudgment.judge({ action: input.action || '', claim: input.claim || '', evidence: input.evidence || [], userIntent: input.userIntent || '' });
