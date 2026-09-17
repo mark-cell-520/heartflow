@@ -4840,6 +4840,49 @@ class HeartFlow {
       }
     } catch (_) { /* progress-judgment 不阻断主链路 */ }
 
+    // 心虫自主决策：将监督结果写入 decisionFeedback，形成“监督→反馈→再监督”闭环
+    try {
+      if (this.decisionFeedback && typeof this.decisionFeedback.recordOutcome === 'function') {
+        const trace = {
+          dao: {
+            score: daoResult && typeof daoResult.daoScore === 'number' ? daoResult.daoScore : null,
+            verdict: daoResult && daoResult.verdict || null,
+            ok: daoResult && typeof daoResult.flags !== 'undefined' ? daoResult.flags.length === 0 : null,
+          },
+          uncertainty: {
+            confidence: uqResult && typeof uqResult.confidence === 'number' ? uqResult.confidence : null,
+            isHallucinationRisk: !!(uqResult && uqResult.isHallucinationRisk),
+          },
+          priority: {
+            allowed: !!(pgResult && pgResult.allowed),
+            path: pgResult && pgResult.path || null,
+          },
+          progress: {
+            isProgress: !!(pjResult && pjResult.isProgress),
+            confidence: pjResult && typeof pjResult.confidence === 'number' ? pjResult.confidence : null,
+          },
+        };
+        result._supervisionTrace = trace;
+
+        const outcomes = [
+          { type: 'supervision_dao', ruleId: 'dao_decision', confidence: trace.dao.score, correct: trace.dao.ok === true, context: trace.dao },
+          { type: 'supervision_uncertainty', ruleId: 'uncertainty_quantifier', confidence: trace.uncertainty.confidence, correct: !trace.uncertainty.isHallucinationRisk && (trace.uncertainty.confidence || 0) > 0.5, context: trace.uncertainty },
+          { type: 'supervision_priority', ruleId: 'priority_guardian', confidence: trace.priority.allowed ? 0.9 : 0.2, correct: trace.priority.allowed === true, context: trace.priority },
+          { type: 'supervision_progress', ruleId: 'progress_judgment', confidence: trace.progress.confidence, correct: trace.progress.isProgress === true, context: trace.progress },
+        ];
+        const fb = [];
+        for (const o of outcomes) {
+          const r = this.decisionFeedback.recordOutcome({ type: o.type, ruleId: o.ruleId, confidence: o.confidence, context: o.context }, o.correct, 'auto supervision trace');
+          fb.push({ type: o.type, correct: o.correct, weight: r && r.newWeight });
+        }
+        result._supervisionFeedback = fb;
+        if (result.output && typeof result.output === 'object') {
+          result.output._supervisionTrace = trace;
+          result.output._supervisionFeedback = fb;
+        }
+      }
+    } catch (_) { /* supervision feedback 不阻断主链路 */ }
+
     // [v6.7.13] Feedback evaluation logger: attach lightweight gate-quality signals
     try {
       if (typeof input === 'string' && input.trim().length > 0) {
