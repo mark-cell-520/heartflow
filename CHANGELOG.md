@@ -1,3 +1,45 @@
+## [6.7.24] - 2026-09-17
+
+### Fixed
+- **Gate/verdict consistency**: `verdict` is now derived from `gate.action`, so
+  `verdict=可信` can no longer appear alongside `action=rewrite`. Previously a
+  fabricated claim ("According to 2025 Harvard research...") scored a constant 0.82
+  and was labelled 可信.
+- **Fact-check scoring**: `unsupported_claim`, `pseudo_causal`, and `soft_deflection`
+  were missing from the penalty table, so the highest-severity finding had zero effect
+  on `overallScore`. Added them with graded weights and per-dimension caps, preserving
+  the existing contract that a *sourced, caveated* claim stays at `verify`.
+- **Chinese tokenisation in the reasoning chain**: `_generateHypotheses()` split input
+  on whitespace, so any Chinese sentence produced one token, returned zero hypotheses,
+  and the pipeline collapsed to the constant fallback "不知道，缺少关键信息" for every
+  input. Added CJK-aware extraction (greedy longest-match with a stopword list) and
+  made hypothesis text a readable claim instead of a raw token dump.
+- **Circuit breaker memory accounting**: `checkMemory()` used `heapUsed / heapTotal`,
+  which sits above 0.9 during normal V8 operation and latched the breaker permanently
+  into `TRIPPED` — blocking even read-only calls such as `memory.getStats` (MCP
+  `heartflow_status` reported 0 memories as a result). Switched to RSS against a memory
+  budget, and added a 60-second cooldown auto-reset.
+- **Blocking busy-wait in `checkCPU()`**: a synchronous `while (Date.now() < deadline)`
+  spin blocked the event loop, turning a protective component into a hang. Replaced with
+  non-blocking sampling between calls.
+- **Child-safety age detection was Chinese-only**: `childSafetyScan()` matched only
+  `我25岁`, so `I am 25 years old` or `Tengo 25 años` yielded `age: null` and minors went
+  undetected in every non-Chinese input. Added 10-language age patterns.
+- **Nested tests never executed**: `test/run-all.js` scanned `test/` non-recursively, so
+  50 tests under `test/core/`, `test/memory/`, `test/utils/`, and others never ran — and
+  their `require('../src/...')` paths were one level too shallow to run standalone.
+  Made discovery recursive and corrected the relative depths. Suite went from
+  410 to 459 passing.
+
+### Changed
+- Version sources unified at 6.7.24 (`VERSION`, `package.json`, `SKILL.md`,
+  `src/core/version.js` fallback). The `version.js` fallback had drifted to 6.0.5 —
+  23 minor versions behind — and would have been reported if `VERSION` failed to load.
+- Removed the stale hardcoded version string from the `heartflow.js` header comment.
+- Documentation rewritten in English (`SKILL.md`, `README.md`, `AGENTS.md`) with
+  measured metrics instead of claimed ones.
+
+---
 
 ## [6.7.13] - 2026-09-05
 

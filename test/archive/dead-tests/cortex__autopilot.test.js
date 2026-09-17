@@ -2,7 +2,7 @@ const assert = require('assert');
 
 async function run() {
   try {
-    const mod = require('../src/cortex/autopilot.js');
+    const mod = require('../../src/cortex/autopilot.js');
     console.log('PASS autopilot.test.js (module loads)');
   } catch (e) {
     // Module may have optional deps or initialization requirements

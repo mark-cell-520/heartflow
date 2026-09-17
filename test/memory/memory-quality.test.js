@@ -2,7 +2,7 @@ const assert = require('assert');
 
 async function run() {
   try {
-    const mod = require('../src/memory/memory-quality.js');
+    const mod = require('../../src/memory/memory-quality.js');
     console.log('PASS memory-quality.test.js (module loads)');
   } catch (e) {
     // Module may have optional deps or initialization requirements

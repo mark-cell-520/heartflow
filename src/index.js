@@ -221,22 +221,37 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
     {score: pb.score, name:'privacy_boundary'}, {score: bf.score, name:'bad_faith'}, {score: nf.score, name:'no_fallback'},
     {score: tp.score, name:'tone_policing'}, {score: sl.score, name:'sealioning'}, {score: ppf.score, name:'pseudo_profundity'},
     {score: pt.score, name:'premature_termination'},
+    {score: uc.score, name:'unsupported_claim'},
+    {score: pc.score, name:'pseudo_causal'},
+    {score: sd.score, name:'soft_deflection'},
     {score: ai.score, name:'ai_writing_tell'}
   ];
   // 证据维度 polarity 相反（高分=好），不在惩罚组
   // 触发惩罚计算：base=1.0，每个 score>0.2 的维度按严重度扣分
   let triggeredCount = 0;
   let totalPenalty = 0;
+  // 惩罚系数与单项上限：区分"有来源但需核实"和"无来源编造"。
+  // unsupported_claim 在真实文本上是连续量（0.9 = 有来源但表述偏强，
+  // 1.0 = 纯编造）。若一律按全权重扣分，会把带来源的谨慎断言也压成 rewrite，
+  // 与 test/perfect-error 的既有契约冲突。
+  const PENALTY_WEIGHT = { unsupported_claim: 0.35 };
+  const PENALTY_CAP    = { unsupported_claim: 0.35 };
   for (const d of allDims) {
     if (d.score > 0.2) {
       triggeredCount++;
-      totalPenalty += (d.score - 0.2) * 0.6; // 严重度越高扣分越多
+      const w = PENALTY_WEIGHT[d.name] ?? 0.6;
+      let p = (d.score - 0.2) * w;
+      if (PENALTY_CAP[d.name] !== undefined) p = Math.min(p, PENALTY_CAP[d.name]);
+      totalPenalty += p;
     }
   }
   // 维度间协同效应：多个维度同时触发 > 扣更狠
   const synergyPenalty = triggeredCount > 2 ? (triggeredCount - 2) * 0.02 : 0;
   const overallScore = Math.max(0, Math.round((1 - totalPenalty - synergyPenalty) * 100) / 100);
-  const verdict = overallScore >= 0.7 ? '可信' : overallScore >= 0.4 ? '需验证' : '不可信';
+  // verdict 是 overallScore 的粗粒度映射；gate.action 是维度驱动的行动指令。
+  // 两者必须同源，否则会出现 "verdict=可信 + action=rewrite" 这种自相矛盾的输出。
+  // 先算出初步 verdict，待 gate.action 确定后统一收敛（见下方 VERDICT_BY_ACTION）。
+  let verdict = overallScore >= 0.7 ? '可信' : overallScore >= 0.4 ? '需验证' : '不可信';
 
   // 按严重度排序的 findings，让 AI agent 可直接消费
   const dimMap = {
@@ -356,6 +371,12 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
     gate.action = 'pass';
     gate.reason = '通过';
   }
+
+  // verdict 与 gate.action 收敛：action 是"该拿这段文本怎么办"，verdict 是它的粗粒度读数。
+  // 两者必须同源，否则会出现 "verdict=可信 + action=rewrite" 这种自相矛盾的输出
+  // （审计：假断言拿到 verdict=可信、score 0.82）。
+  const VERDICT_BY_ACTION = { block: '不可信', rewrite: '不可信', verify: '需验证', pass: '可信' };
+  verdict = VERDICT_BY_ACTION[gate.action] || verdict;
 
   return {
     verdict, overallScore,

@@ -90,10 +90,29 @@ function childSafetyScan(text) {
   if (!text || typeof text !== 'string') return { minorDetected: false, age: null, contentFlags: [], safe: true, action: 'allow' };
   const lower = text.toLowerCase();
   const flags = [];
-  const ageMatch = lower.match(/我\s*(\d{1,2})\s*岁/);
-  let minorDetected = false;
+  // 多语言年龄解析。此前只匹配中文 "我25岁"，导致 "I am 25 years old" /
+  // "Tengo 25 años" 这类输入 age 恒为 null —— 未成年人识别在非中文输入上完全失效。
+  const AGE_PATTERNS = [
+    /我\s*(\d{1,2})\s*岁/,                                   // zh: 我25岁
+    /\b(?:i\s*am|i'm|im)\s*(\d{1,2})\s*(?:years?\s*old|yo|y\.o\.)?/i,  // en: I am 25
+    /\b(\d{1,2})\s*(?:years?\s*old|yo\b|y\.o\.)/i,            // en: 25 years old
+    /\b(?:tengo|tiene)\s*(\d{1,2})\s*años?/i,                 // es: Tengo 25 años
+    /\b(?:j'?ai|il a|elle a)\s*(\d{1,2})\s*ans?/i,            // fr: J'ai 25 ans
+    /\b(?:ich bin|er ist|sie ist)\s*(\d{1,2})\s*jahre?\s*alt/i, // de: Ich bin 25 Jahre alt
+    /(?:мне|ему|ей)\s*(\d{1,2})\s*(?:лет|года|год)/i,        // ru: мне 25 лет（\b 对西里尔字母无效，不能用）
+    /(\d{1,2})\s*歳/i,                                        // ja: 25歳
+    /(?:मैं|मेरी उम्र)\s*(\d{1,2})/i,                          // hi: मैं 25
+  ];
   let age = null;
-  if (ageMatch) { age = parseInt(ageMatch[1], 10); if (age < 18) { minorDetected = true; flags.push('minor_age_detected'); } }
+  for (const pat of AGE_PATTERNS) {
+    const m = lower.match(pat);
+    if (m) {
+      const n = parseInt(m[1], 10);
+      if (!isNaN(n) && n > 0 && n < 150) { age = n; break; }
+    }
+  }
+  let minorDetected = false;
+  if (age !== null && age < 18) { minorDetected = true; flags.push('minor_age_detected'); }
   if (!minorDetected) { const cues = _matchAny(lower, CHILD_SAFETY_PATTERNS.minorAgeCues); if (cues.length > 0) { minorDetected = true; flags.push('minor_cue_detected'); } }
   const romantic = _matchAny(lower, CHILD_SAFETY_PATTERNS.romanticContent);
   if (romantic.length > 0) { flags.push('romantic_content'); if (minorDetected) flags.push('minor_romantic_risk'); }

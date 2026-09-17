@@ -4,15 +4,15 @@
  * WITHOUT modifying src/ folder
  */
 
-const { expect } = require('chai');
+const { describe, it, expect, run } = require('../helpers/mini-expect.js');
 const { 
   detectLanguage, 
   enhancedAgeScan, 
   ageTestFixtures
-} = require('../helpers/multi-lang-age-helper');
+} = require('../helpers/multi-lang-age-helper.js');
 
 // Import the actual childSafetyScan from src (read-only)
-const { childSafetyScan } = require('../../src/shield/safety-guardrails');
+const { childSafetyScan } = require('../../src/shield/safety-guardrails.js');
 
 describe('🌍 Multi-Language Age Detection - Test Suite', () => {
   
@@ -321,3 +321,6 @@ describe('🌍 Multi-Language Age Detection - Test Suite', () => {
     });
   });
 });
+
+// 执行套件（零依赖 shim，替代 mocha）
+run();

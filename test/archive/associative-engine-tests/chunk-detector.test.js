@@ -2,7 +2,7 @@ const assert = require('assert');
 
 async function run() {
   try {
-    const mod = require('../src/reasoning/associative-engine/chunk-detector.js');
+    const mod = require('../../../src/archive/associative-engine/chunk-detector.js');
     console.log('PASS chunk-detector.test.js (module loads)');
   } catch (e) {
     // Module may have optional deps or initialization requirements

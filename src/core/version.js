@@ -16,8 +16,11 @@
 const fs = require('../utils/safe-fs');
 const path = require('path');
 
-// 从 VERSION 文件读取版本号（唯一真相源）
-let VERSION = '6.0.5';  // 兜底版本
+// 从 VERSION 文件读取版本号（唯一真相源）。
+// 兜底值必须与 VERSION 保持同步 —— 否则 VERSION 文件读失败时（打包遗漏/权限问题）
+// 引擎会自报一个落后几十个版本的号，且外部没有任何提示。
+// scripts/sync-version.js 负责在发布前把这里和 VERSION 一起写。
+let VERSION = '6.7.24';  // 兜底版本（与 VERSION 文件一致）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

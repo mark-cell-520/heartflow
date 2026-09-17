@@ -2,7 +2,7 @@ const assert = require('assert');
 
 async function run() {
   try {
-    const mod = require('../src/search/semantic-search.js');
+    const mod = require('../../src/search/semantic-search.js');
     console.log('PASS semantic-search.test.js (module loads)');
   } catch (e) {
     // Module may have optional deps or initialization requirements
