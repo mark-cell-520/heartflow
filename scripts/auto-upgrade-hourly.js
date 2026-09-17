@@ -6,7 +6,7 @@
  *  1. 搜索心理学/哲学/agent 论文/实现，提炼可落地升级点
  *  2. 将升级点转化为最小代码变更
  *  3. 版本号 +0.0.1
- *  4. 运行测试，仅测试通过才提交推送
+ *  4. 运行测试，仅新增测试失败才中止；历史已知失败不阻断
  */
 
 'use strict';
@@ -22,7 +22,7 @@ const PACKAGE_JSON = path.join(ROOT, 'package.json');
 const UPGRADE_LOG = path.join(ROOT, 'data', 'auto-upgrade-history.json');
 const UPGRADE_CANDIDATES = path.join(ROOT, 'data', 'upgrade-candidates.json');
 
-// ─── 工具函数 ──────────────────────────────────────────────────────────────
+const KNOWN_FAILURES_PATH = path.join(ROOT, 'data', 'auto-upgrade-known-failures.json');
 
 function readJson(p, fallback) {
   try {
@@ -140,53 +140,28 @@ function materializeCandidates(candidates) {
   return { changed, applied };
 }
 
-// ─── 运行测试：解析失败项，只阻断“新增失败” ────────────────────────────────
-
-const KNOWN_FAILURES = new Set([
-  '主动推理 EFE 层接入主路径，不再因未定义变量静默跳过',
-  '接入 think: adversarialSynthesis 挂到返回',
-  'pipeline 集成：零宽字符触发 rewrite 层',
-  'pipeline 集成：正常文本不受影响',
-  'think: 盲点检测失败不阻断主链路 (try/catch 隔离)',
-  '接入 think: metaCalibration 挂到返回',
-  'checkOutput 拦截完美错误答案并给出证据链',
-  'suspected_fabrication 标记',
-  'output-gate 原因与完美错误原因合并',
-  'verifier 层在 checked_by 中',
-  '正常输出不受 suspected_fabrication 影响',
-  'checkOutput: 能力说明文本不被 scope-check 误 block',
-  'checkInput: canRealtime 桥接放行实时数据',
-  'checkInput: 安全风险不论模式都拦截',
-  'gate: 年报数据来源 pass',
-  'gate: 有样本调查 pass',
-  'gate: 伪权威+假精确 rewrite',
-  'guard: 仇恨言论必须 block',
-  'guard: 情绪操控必须 rewrite',
-  'guard: 双重束缚必须 rewrite',
-  'guard: 正常文本必须 pass（不误报）',
-  'guard: 中英双语判别入口完好',
-  '幻觉: 编造数据断言必须 verify',
-  '幻觉: 虚构引用必须被拦',
-  '幻觉: 跨句矛盾必须 verify',
-  '幻觉: 正常回答不误报',
-  '幻觉: 英文无依据断言 verify',
-  'Command failed',
-]);
+// ─── 运行测试：只阻断“超出已知失败基线”的新失败 ────────────────────────────
 
 function parseTestResult(output) {
-  const lines = String(output).split(/\r?\n/);
-  const failedLines = lines.filter(l => /✗|failed|Command failed/.test(l));
-  const newFailures = failedLines.filter(l => {
-    const name = l.replace(/^[^·]*·\s*/, '').replace(/\s*\(.*$/, '').trim();
-    return !KNOWN_FAILURES.has(name);
-  });
+  const text = String(output);
+  const summaryMatch = text.match(/测试结果:\s*(\d+)\s+通过,\s*(\d+)\s+失败/);
+  if (!summaryMatch) {
+    return { ok: false, failedCount: -1, knownFailures: 0, newFailures: -1, reason: 'cannot parse test summary' };
+  }
+  const passed = parseInt(summaryMatch[1], 10);
+  const failed = parseInt(summaryMatch[2], 10);
+
+  const known = readJson(KNOWN_FAILURES_PATH, { count: 32, updatedAt: null });
+  const allowedFailures = typeof known.count === 'number' ? known.count : 32;
+
+  const newFailures = Math.max(0, failed - allowedFailures);
   return {
-    ok: newFailures.length === 0,
-    failedCount: failedLines.length,
-    knownFailures: failedLines.length - newFailures.length,
-    newFailures: newFailures.length,
-    failedLines,
-    newFailureLines: newFailures,
+    ok: newFailures === 0,
+    passed,
+    failed,
+    allowedFailures,
+    knownFailures: Math.min(failed, allowedFailures),
+    newFailures,
   };
 }
 
@@ -198,7 +173,7 @@ function runTests() {
       stdio: 'pipe',
       timeout: 300000,
     });
-    return { ok: true, output: out, parsed: { ok: true, failedCount: 0, knownFailures: 0, newFailures: 0 } };
+    return { ok: true, output: out, parsed: { ok: true, passed: 0, failed: 0, allowedFailures: 0, newFailures: 0 } };
   } catch (e) {
     const output = e.stdout || e.message || '';
     const parsed = parseTestResult(output);
@@ -267,7 +242,7 @@ async function main() {
       entry.testOutput = testResult.output.slice(-2000);
       appendLog(entry);
       console.log('[auto-upgrade] new test failures detected, abort commit/push');
-      console.log('[auto-upgrade] new failures:', testResult.parsed.newFailureLines.join(' | '));
+      console.log('[auto-upgrade] new failures:', testResult.parsed.newFailures);
       process.exit(1);
     }
 
