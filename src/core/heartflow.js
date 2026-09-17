@@ -4903,6 +4903,23 @@ class HeartFlow {
       }
     } catch (_) { /* feedback logger 不阻断主链路 */ }
 
+  // 心虫执行决策：把当前 think 结果送决策路由，形成明确决策并记录反馈
+  try {
+    if (result && this.decisionRouter && typeof this.decisionRouter.evaluate === 'function') {
+      const evalResult = this.decisionRouter.evaluate(result, 'think');
+      result._decision = evalResult && evalResult.decision ? evalResult.decision : null;
+      result._decisionConfidence = evalResult && typeof evalResult.confidence === 'number' ? evalResult.confidence : null;
+      result._decisionRationale = evalResult && typeof evalResult.rationale === 'function' ? (evalResult.rationale({}) || '').slice(0, 120) : null;
+      if (this.decisionExecutor && typeof this.decisionExecutor.apply === 'function' && result._decision) {
+        const applied = this.decisionExecutor.apply(result._decision, { depth: 1, _routeHint: { type: 'general', confidence: 0.5 }, input });
+        result._decisionApplied = applied;
+      }
+      if (this.decisionFeedback && typeof this.decisionFeedback.recordOutcome === 'function' && result._decision) {
+        this.decisionFeedback.recordOutcome({ type: 'think_decision', ruleId: result._decision, confidence: result._decisionConfidence || 0.5, context: { rationale: result._decisionRationale } }, true, 'auto decision execution');
+      }
+    }
+  } catch (_) { /* decision execution 不阻断主链路 */ }
+
   return result;
   }
 
