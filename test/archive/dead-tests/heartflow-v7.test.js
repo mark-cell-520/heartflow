@@ -1,3 +1,9 @@
+// ARCHIVED 2026-09-17 — targets a HeartFlow v7 API that this engine does not
+// implement. It requires { HeartFlow, ErrorMemory, MCP_TOOLS, createMCPHandlers }
+// from src/index.js and asserts `s.version === '7.0.0'`; the engine reports 6.7.x.
+// It was previously a silent 'mount error'; a path remap revived it and turned it
+// into 6 hard failures, so it is archived instead.
+
 /**
  * HeartFlow v7 — AGI Error Memory
  *
@@ -5,7 +11,7 @@
  */
 
 const assert = require('assert');
-const { HeartFlow, ErrorMemory, MCP_TOOLS, createMCPHandlers } = require('../src/heartflow/index.js');
+const { HeartFlow, ErrorMemory, MCP_TOOLS, createMCPHandlers } = require('../src/index.js');
 
 module.exports = function ({ test }) {
 

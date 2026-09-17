@@ -2,7 +2,7 @@ const assert = require('assert');
 
 async function run() {
   try {
-    const mod = require('../src/utils/safe-regex.js');
+    const mod = require('../../src/utils/safe-regex.js');
     console.log('PASS safe-regex.test.js (module loads)');
   } catch (e) {
     // Module may have optional deps or initialization requirements

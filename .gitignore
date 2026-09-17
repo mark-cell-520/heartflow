@@ -107,3 +107,6 @@ data/autopilot-log.jsonl
 memory/dialogue-history.jsonl
 
 memory/q-table.json
+
+# 模型权重（86MB 级，绝不入库）
+*.onnx

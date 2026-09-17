@@ -2,7 +2,7 @@ const assert = require('assert');
 
 async function run() {
   try {
-    const mod = require('../src/reasoning/associative-engine/associative-engine.js');
+    const mod = require('../../../src/archive/associative-engine.js');
     console.log('PASS associative-engine.test.js (module loads)');
   } catch (e) {
     // Module may have optional deps or initialization requirements

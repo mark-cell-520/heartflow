@@ -2,6 +2,22 @@
 const { REASONING_DEPTH, DUAL_PROCESS, TASK_STRATEGIES } = require('./thought-chain-config.js');
 // const { ConsciousnessBridge } = require('../identity/consciousness-bridge.js'); // DELETED
 
+// 实词抽取停用词表 —— 中文虚词/英文功能词，命中即丢弃，避免假设被"的/了/is/the"污染。
+const SUBSTOP = new Set([
+  // 中文单字虚词
+  '的', '了', '是', '在', '和', '与', '就', '都', '也', '还', '而', '被', '把', '让',
+  '给', '对', '从', '到', '这', '那', '有', '没', '不', '很', '太', '会', '能', '要',
+  '一', '个', '们', '我', '你', '他', '她', '它', '上', '下', '中', '后', '前',
+  // 中文双字虚词/高频低信息词
+  '我们', '你们', '他们', '这个', '那个', '什么', '怎么', '因为', '所以', '但是',
+  '如果', '可以', '已经', '还是', '就是', '不是', '没有', '一个', '这些', '那些',
+  // 英文功能词
+  'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'her', 'was', 'one',
+  'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'its', 'new', 'now', 'old',
+  'see', 'two', 'way', 'who', 'boy', 'did', 'she', 'use', 'that', 'with', 'this',
+  'have', 'from', 'they', 'will', 'would', 'there', 'their', 'what', 'about', 'which',
+]);
+
 class ThoughtChain {
   constructor(hf) {
     this.hf = hf;
@@ -984,33 +1000,133 @@ class ThoughtChain {
 
   /**
    * 生成多个假设
+   *
+   * 分词必须同时支持中文与英文。此前实现只用 /\s+/ 切分 —— 中文没有空格，
+   * 整句会被当成 1 个 token，keywords.length < 2 立即返回空数组。
+   * 结果：所有中文输入 HYPOTHESES=0 → INVERT=no_hypothesis → SYNTHESIS 落兜底
+   * "不知道，缺少关键信息"，think() 对任何输入都返回同一句话。
    */
   _generateHypotheses(input, count) {
     const hypotheses = [];
-
-    // 基于关键词生成假设
-    const keywords = input.split(/\s+/).filter(w => w.length > 2).slice(0, 3);
+    const keywords = this._extractSubstantiveTokens(input);
 
     // 关键词太少时返回空数组（不生成占位假设）
     if (keywords.length < 2) {
       return hypotheses;
     }
 
+    // 假设描述必须是"可读的主张"，不能是裸 token 串 —— 否则结论会被拼成
+    // "bug 气死了 气死 死了 — 分析结果" 这种无意义切分，对外不可用。
+    const topic = this._describeTopic(keywords);
+    const angles = [
+      `围绕「${topic}」的核心诉求`,
+      `「${keywords[0]}」之外的另一种解释`,
+      `「${keywords[keywords.length - 1]}」反映的表面现象`,
+      `「${topic}」背后的约束条件`,
+    ];
+
     for (let i = 0; i < count; i++) {
       hypotheses.push({
         id: `h${i}`,
-        description: i === 0
-          ? `${keywords.join(' ')} — 分析结果`
-          : i === 1
-          ? `${keywords[0] || '问题'} — 另一种可能`
-          : `${keywords[keywords.length - 1] || '问题'} — 表面现象`,
-        initialLikelihood: i === 0 ? 0.6 : 0.3 - (i * 0.1),
+        description: angles[i] || `关于「${topic}」的第 ${i + 1} 种可能`,
+        initialLikelihood: i === 0 ? 0.6 : Math.max(0.15, 0.3 - (i * 0.05)),
         evidence: [],
         counterEvidence: []
       });
     }
 
     return hypotheses;
+  }
+
+  /**
+   * 把实词列表收敛成一个人可读的话题短语。
+   * 只取前 3 个词，避免整句 token 串进结论。
+   */
+  _describeTopic(keywords) {
+    return keywords.slice(0, 3).join('·') || '当前输入';
+  }
+
+  /**
+   * 抽取实词 token —— 中文按 2-3 gram 滑窗 + 最大匹配去碎片，英文按空格切分。
+   *
+   * 中文没有空格，2-gram 是零依赖方案里的最低成本做法。但朴素 2-gram 会产生
+   * 大量碎片（"供应商" → "供应"+"应商"），把结论污染成一串无意义切分。
+   * 这里按"长度优先 + 覆盖抑制"处理：长片段先入选，已被覆盖的短片段丢弃。
+   */
+  _extractSubstantiveTokens(input) {
+    if (!input || typeof input !== 'string') return [];
+    const text = input.toLowerCase();
+    const candidates = [];
+    const seen = new Set();
+
+    const push = (t, weight) => {
+      if (!t || t.length < 2 || seen.has(t) || SUBSTOP.has(t)) return;
+      seen.add(t);
+      candidates.push({ t, weight });
+    };
+
+    // 1. 英文/数字：按非字母数字切分，保留长度 >= 3 的词
+    for (const w of text.split(/[^a-z0-9]+/).filter(Boolean)) {
+      if (w.length >= 3) push(w, w.length);
+    }
+
+    // 2. 中文：连续汉字串切出后，按"最长优先"做贪心切分（正向最大匹配的近似）
+    //    朴素 2-gram 滑窗会把长句切成 "所以 以地 地湿 湿了" 这类碎片串，
+    //    结论就变成一串无意义切分。这里改为贪心取最长可用片段。
+    const cjkRuns = text.match(/[\u4e00-\u9fff]+/g) || [];
+    for (const run of cjkRuns) {
+      if (run.length < 2) continue;
+      if (run.length <= 6 && !SUBSTOP.has(run)) {
+        // 短串整体往往就是一个实词
+        push(run, run.length + 2);
+        continue;
+      }
+      // 长串：从左到右贪心切最长片段（优先 3 字，向后收缩到 2 字）
+      let i = 0;
+      while (i < run.length && candidates.length < 24) {
+        let matched = null;
+        for (let len = 3; len >= 2; len--) {
+          if (i + len > run.length) continue;
+          const seg = run.slice(i, i + len);
+          if (SUBSTOP.has(seg)) continue;
+          const head = seg[0];
+          const tail = seg[seg.length - 1];
+          // 片段首尾都不应是虚字，否则是切歪的碎片
+          if (SUBSTOP.has(head) || SUBSTOP.has(tail)) continue;
+          matched = seg;
+          break;
+        }
+        if (matched) {
+          push(matched, matched.length + 1);
+          i += matched.length;
+        } else {
+          i += 1;
+        }
+      }
+    }
+
+    // 3. 覆盖抑制 + 碎片过滤：
+    //    - 已被更长候选包含的短候选丢弃（消掉 供应/应商 这类碎片）
+    //    - 2-gram 只有当它本身是一个"词"时才保留（借助 CJK_STOP_PAIR 与重复度判断），
+    //      否则整串中文会被切成一堆无意义双字组合，污染下游结论
+    candidates.sort((a, b) => b.weight - a.weight || b.t.length - a.t.length);
+    const selected = [];
+    for (const c of candidates) {
+      if (selected.some(s => s.includes(c.t))) continue;
+      // 2-gram 需至少含一个非停用字，且不是两个停用字拼起来的
+      if (c.t.length === 2) {
+        const [a, b] = [c.t[0], c.t[1]];
+        const bothStop = SUBSTOP.has(a) && SUBSTOP.has(b);
+        const hasStop = SUBSTOP.has(a) || SUBSTOP.has(b);
+        if (bothStop) continue;
+        // 含虚字的 2-gram 只有在没有更长候选时才留下
+        if (hasStop && selected.length > 0) continue;
+      }
+      selected.push(c.t);
+      if (selected.length >= 8) break;
+    }
+
+    return selected;
   }
 
   /**
@@ -1122,6 +1238,7 @@ class ThoughtChain {
     if (confidence >= 0.7) return '可能';
     if (confidence >= 0.6) return '不太确定，但倾向于';
     if (confidence >= 0.5) return '根据现有信息，猜测';
+    if (confidence >= 0.35) return '以下为初步分析（证据尚不充分）：';
     return '不知道，缺少关键信息';
   }
 

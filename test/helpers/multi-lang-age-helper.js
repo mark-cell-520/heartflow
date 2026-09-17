@@ -3,7 +3,7 @@
  * These simulate the detection logic WITHOUT modifying src/
  */
 
-const { ageTestFixtures } = require('../fixtures/age-detection-fixtures');
+const { ageTestFixtures } = require('../fixtures/age-detection-fixtures.js');
 
 /**
  * Language detection with comprehensive markers

@@ -37,36 +37,55 @@ let _windowStart = Date.now();
 let _killSwitchActive = false;
 
 // ── 内存检查 ──────────────────────────────────────────
+// 注意：不能用 heapUsed / heapTotal。V8 会把堆保持在高水位，
+// 该比值在正常运行下长期处于 0.9 以上，会让熔断器永久 TRIPPED，
+// 进而把 memory.getStats 这类只读调用也一并拦掉。改用 RSS 对系统内存上限。
+function _sysMemLimitMB() {
+  try {
+    const os = require('os');
+    const total = os.totalmem() / 1024 / 1024;
+    if (total > 0) return total;
+  } catch (e) { /* fall through */ }
+  return 0;
+}
+
 function checkMemory() {
   const usage = process.memoryUsage();
-  const totalMB = Math.round(usage.heapTotal / 1024 / 1024);
-  const usedMB  = Math.round(usage.heapUsed  / 1024 / 1024);
-  const percent = usage.heapUsed / usage.heapTotal;
-  
+  const rssMB = Math.round(usage.rss / 1024 / 1024);
+  const sysTotalMB = _sysMemLimitMB();
+  // 无系统信息时回退到固定预算（默认 2GB），而不是堆比值
+  const budgetMB = sysTotalMB > 0 ? Math.min(sysTotalMB, 2048) : 2048;
+  const percent = Math.round(Math.min(1, rssMB / budgetMB) * 100) / 100;
+
   return {
-    usedMB,
-    totalMB,
-    percent: Math.round(percent * 100) / 100,
+    usedMB: rssMB,
+    totalMB: Math.round(budgetMB),
+    percent,
     level: percent >= MEM_CRITICAL ? 'critical' : percent >= MEM_WARNING ? 'warning' : 'ok',
     action: percent >= MEM_CRITICAL ? 'trip' : percent >= MEM_WARNING ? 'warn' : 'none',
   };
 }
 
 // ── CPU 检查（基于 process.cpuUsage）─────────────────
+// 不使用 busy-wait：同步空转会堵死事件循环，把"保护"变成"僵死"。
+// 改为用两次调用之间的墙上时间做采样，无阻塞。
+let _cpuPrev = null;
 function checkCPU() {
-  const start = process.cpuUsage();
-  const startTime = Date.now();
-  
-  // 10ms 采样
-  const deadline = startTime + 10;
-  while (Date.now() < deadline) { /* busy-wait */ }
-  
-  const end = process.cpuUsage(start);
-  const elapsed = Date.now() - startTime;
-  const cpuPercent = Math.min(1, (end.user + end.system) / (elapsed * 1000));
-  
+  const now = Date.now();
+  const cum = process.cpuUsage();
+  let cpuPercent = 0;
+
+  if (_cpuPrev) {
+    const elapsedMs = Math.max(1, now - _cpuPrev.at);
+    const dUser = cum.user - _cpuPrev.user;
+    const dSys = cum.system - _cpuPrev.system;
+    cpuPercent = Math.min(1, (dUser + dSys) / (elapsedMs * 1000));
+  }
+  _cpuPrev = { at: now, user: cum.user, system: cum.system };
+
+  cpuPercent = Math.round(cpuPercent * 100) / 100;
   return {
-    cpuPercent: Math.round(cpuPercent * 100) / 100,
+    cpuPercent,
     level: cpuPercent >= CPU_CRITICAL ? 'critical' : cpuPercent >= CPU_WARNING ? 'warning' : 'ok',
     action: cpuPercent >= CPU_CRITICAL ? 'trip' : cpuPercent >= CPU_WARNING ? 'warn' : 'none',
   };
@@ -94,7 +113,28 @@ function getFailRate() {
 }
 
 // ── 熔断状态机 ──────────────────────────────────────
+// 自动恢复冷却：资源类熔断不应永久闩死，否则一次瞬时内存尖峰会让
+// 整个 MCP 服务永久不可用（连只读的状态查询也一起挂掉）。
+const AUTO_RESET_MS = 60_000;
+
+function _maybeAutoReset() {
+  if (!_killSwitchActive) return;
+  if (Date.now() - _trippedAt < AUTO_RESET_MS) return;
+  // 冷却期已过：复核资源水位，正常则自动恢复
+  const mem = checkMemory();
+  const cpu = checkCPU();
+  if (mem.action === 'trip' || cpu.action === 'trip') {
+    _trippedAt = Date.now(); // 仍然超限，顺延冷却
+    return;
+  }
+  _state = STATE.CLOSED;
+  _killSwitchActive = false;
+  _lastError = null;
+  _stats = { total: 0, failures: 0, successes: 0 };
+}
+
 function _evaluate() {
+  _maybeAutoReset();
   if (_killSwitchActive) return STATE.TRIPPED;
   
   const mem = checkMemory();

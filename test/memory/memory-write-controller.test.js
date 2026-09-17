@@ -2,7 +2,7 @@ const assert = require('assert');
 
 async function run() {
   try {
-    const mod = require('../src/memory/memory-write-controller.js');
+    const mod = require('../../src/memory/memory-write-controller.js');
     console.log('PASS memory-write-controller.test.js (module loads)');
   } catch (e) {
     // Module may have optional deps or initialization requirements

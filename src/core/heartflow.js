@@ -1,6 +1,6 @@
 /**
 
- /** HeartFlow v6.6.1 — 自愈RL接线 + GoT判断引擎增强
+ /** HeartFlow — engine entry point
 
   *
 

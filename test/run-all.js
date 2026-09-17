@@ -1,200 +1,165 @@
 /**
- * test-runner.js — 简易测试运行器（无外部依赖）
+ * test-runner.js — zero-dependency test runner
  *
- * 用法：
- *   node test/run-all.js
+ * Design notes (2026-09-17):
+ *
+ * 1. Recursive discovery. This previously used a non-recursive readdirSync, so the
+ *    50 tests under test/core/, test/memory/, test/utils/ and others never executed.
+ *
+ * 2. test/archive/ is skipped. It holds historical tests whose target modules were
+ *    deleted; their MODULE_NOT_FOUND is not a regression signal.
+ *
+ * 3. Every test file runs in its own child process. Requiring ~137 engine-loading
+ *    files into the runner process exhausted the heap and got the runner OOM-killed
+ *    mid-run, which is why the reported totals used to vary between runs.
+ *
+ * Usage: node test/run-all.js
  */
+'use strict';
 
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
 const TEST_DIR = __dirname;
+const ROOT = path.join(__dirname, '..');
+const CHILD_TIMEOUT = 90000;
 
-// 统计
 let passed = 0;
 let failed = 0;
-let pending = 0;
 const failures = [];
-const asyncPromises = [];
 
-function test(name, fn) {
-  try {
-    const ret = fn();
-    if (ret && typeof ret.then === 'function') {
-      pending++;
-      const p = ret.then(() => {
-        pending--;
-        passed++;
-        console.log(`  ✓ ${name}`);
-      }).catch((err) => {
-        pending--;
-        failed++;
-        console.log(`  ✗ ${name}`);
-        console.log(`    ${err.message}`);
-        failures.push({ name, error: err.message });
-      });
-      asyncPromises.push(p);
-      return p;
+/** 递归收集测试文件，跳过 test/archive/（历史失效测试，目标模块已删除） */
+function collectTestFiles(dir, base = dir) {
+  const out = [];
+  let entries = [];
+  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return out; }
+  for (const ent of entries) {
+    const full = path.join(dir, ent.name);
+    if (ent.isDirectory()) {
+      if (ent.name === 'archive') continue;
+      out.push(...collectTestFiles(full, base));
+    } else if (ent.name.endsWith('.test.js') && ent.name !== 'run-all.test.js') {
+      out.push(path.relative(base, full).split(path.sep).join('/'));
     }
-    passed++;
-    console.log(`  ✓ ${name}`);
-  } catch (err) {
-    failed++;
-    console.log(`  ✗ ${name}`);
-    console.log(`    ${err.message}`);
-    failures.push({ name, error: err.message });
   }
+  return out.sort();
 }
 
-function assertEqual(actual, expected, msg = '') {
-  if (actual !== expected) {
-    throw new Error(`期望 ${expected}，实际 ${actual}。${msg}`);
-  }
-}
-
-function assertTrue(value, msg = '') {
-  if (!value) {
-    throw new Error(`期望 truthy，实际 ${value}。${msg}`);
-  }
-}
-
-function assertFalse(value, msg = '') {
-  if (value) {
-    throw new Error(`期望 falsy，实际 ${value}。${msg}`);
-  }
-}
-
-function assertDefined(value, msg = '') {
-  if (value === undefined || value === null) {
-    throw new Error(`期望有值，实际 ${value}。${msg}`);
-  }
-}
-
-function assertThrows(fn, msg = '') {
-  let threw = false;
-  try { fn(); } catch { threw = true; }
-  if (!threw) {
-    throw new Error(`期望抛出异常。${msg}`);
-  }
-}
-
-// 运行子测试脚本并解析结果
-function runSubTest(name, testFile, timeout = 30000) {
-  console.log(`\n${name}`);
+/** 在子进程中执行一条命令，解析其 `N 通过, M 失败` 汇总行 */
+function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
+  console.log(`\n${label}`);
+  let out = '';
   try {
-    const result = execSync(`node ${path.join(__dirname, testFile)}`, {
-      cwd: path.join(__dirname, '..'), encoding: 'utf8', timeout
+    out = execSync(cmd, {
+      cwd: ROOT,
+      encoding: 'utf8',
+      timeout,
+      maxBuffer: 48 * 1024 * 1024,
     });
-    const match = result.match(/(\d+) 通过, (\d+) 失败/);
-    if (match) {
-      passed += parseInt(match[1]); failed += parseInt(match[2]);
-      console.log(result.split('\n').filter(l => l.includes('通过') || l.includes('失败')).join('\n'));
-    } else {
-      console.log(result.trim());
-    }
   } catch (e) {
-    console.log(`  ⚠️ ${name} 测试异常: ${(e.message || '').split('\n')[0]}`);
-    failed++;
+    out = (e.stdout || '').toString();
+    if (!/(\d+) 通过, (\d+) 失败/.test(out)) {
+      console.log(`  [异常] ${label.trim()}: ${(e.message || '').split('\n')[0]}`);
+      failed++;
+      failures.push({ name: label.trim(), error: (e.message || '').split('\n')[0] });
+      return;
+    }
   }
+  const m = out.match(/(\d+) 通过, (\d+) 失败/);
+  if (!m) {
+    const tail = out.trim().split('\n').slice(-3).join('\n');
+    if (tail) console.log(tail);
+    return;
+  }
+  passed += parseInt(m[1], 10);
+  failed += parseInt(m[2], 10);
+  for (const line of out.split('\n')) {
+    const fm = line.match(/^\s*✗\s+(.+?)\s*$/);
+    if (fm) failures.push({ name: fm[1], error: `(${label.trim()})` });
+  }
+  const keep = out.split('\n').filter(l => l.includes('通过') || l.includes('✗') || l.includes('失败'));
+  console.log(keep.join('\n') || '  (无输出)');
+}
+
+function runSubTest(name, relPath, timeout = CHILD_TIMEOUT) {
+  runChild(name, `node ${JSON.stringify(path.join(TEST_DIR, relPath))}`, timeout);
+}
+
+/** 执行导出 mount 函数的测试文件（子进程 + 注入 test harness） */
+function runMountTest(name, relPath, timeout = CHILD_TIMEOUT) {
+  runChild(
+    name,
+    `node ${JSON.stringify(path.join(TEST_DIR, '_mount.js'))} ${JSON.stringify(path.join(TEST_DIR, relPath))}`,
+    timeout
+  );
 }
 
 // === MAIN ===
 async function runAllTests() {
-  console.log('\n🧪 HeartFlow 模块测试\n');
+  console.log('\n=== HeartFlow module tests ===\n');
 
-  // 1-2. CodeWriter, CodeGenerator (模块已被清理，保留空占位)
-  console.log('📝 CodeWriter (code-writer.js)');
-  console.log('🔧 CodeGenerator (code-generator.js)');
+  // 1-4. 已清理模块，保留占位说明历史
+  console.log('CodeWriter / CodeGenerator / HeartLogic / DesireCognition — 模块已清理');
 
-  // 3. HeartLogic
-  console.log('\n❤️ HeartLogic (heart-logic.js)');
-
-  // 4. DesireCognition
-  console.log('\n💭 DesireCognition (desire-cognition.js)');
-
-  runSubTest('📚 KnowledgeOntology', 'knowledge-ontology.test.js');
-  runSubTest('🔍 KnowledgeQuery', 'knowledge-query.test.js');
-  runSubTest('📜 ClassicsValueMapper', 'knowledge/classics-value-mapper.test.js');
-  runSubTest('📜 ClassicsRules', 'knowledge/classics-rules.test.js');
-  runSubTest('⚖️ DualPerspectiveAuditor', 'dual-perspective.test.js');
-  runSubTest('📡 SignalAbsorber', 'signal-absorber.test.js');
-  runSubTest('🛡️ AgentBoundaryGuard', 'agent-boundary-guard.test.js');
-  runSubTest('🧠 MetacognitiveExecutive', 'metacognitive-executive.test.js');
-  runSubTest('♻️ RecoveredModules', 'recovered-modules.test.js');
-  runSubTest('♻️ RecoveredModules2', 'recovered-modules-2.test.js');
-  runSubTest('🕸️ KnowledgeGraphAdapter', 'knowledge-graph-adapter.test.js');
-  runSubTest('🏷️ SourceAnnotator', 'source-annotator.test.js');
-  runSubTest('🔐 SecurityAudit', 'security-audit.test.js');
-
-  // 5. IdentityCore + BigFive + SelfModel
-  runSubTest('🧩 IdentityCore', 'identity-core.test.js');
-  runSubTest('🌱 BigFivePersonality', 'big-five.test.js');
-  runSubTest('🪞 SelfModel', 'self-model.test.js');
-
-  // 6. Reasoning
-  runSubTest('🧩 LogicReasoning', 'logic-reasoning.test.js');
-
-  // 7. ReflectionLoop
-  runSubTest('🔄 ReflectionLoop', 'reflection-loop.test.js');
-
-  // 8. PersonaEngine + PersonaProfile + StyleEngine (模块已清理)
-  console.log('\n🎭 PersonaEngine / PersonaProfile / StyleEngine (已清理)');
-
-  // 9. P4 回归测试
-  console.log('\n🛡️ P4 回归测试');
-  try {
-    const result = execSync(`node ${path.join(__dirname, 'module-registry.test.js')} && node ${path.join(__dirname, 'route-whitelist.test.js')} && node ${path.join(__dirname, 'safe-fs.test.js')}`, {
-      cwd: path.join(__dirname, '..'), encoding: 'utf8', timeout: 30000
-    });
-    console.log(result.trim());
-  } catch (e) {
-    console.log(`  ⚠️ P4 回归测试异常: ${(e.message || '').split('\n')[0]}`);
-    failed++;
+  // 显式列出的核心测试（与历史覆盖保持一致）
+  const CORE_TESTS = [
+    ['KnowledgeOntology', 'knowledge-ontology.test.js'],
+    ['KnowledgeQuery', 'knowledge-query.test.js'],
+    ['ClassicsValueMapper', 'knowledge/classics-value-mapper.test.js'],
+    ['ClassicsRules', 'knowledge/classics-rules.test.js'],
+    ['DualPerspectiveAuditor', 'dual-perspective.test.js'],
+    ['SignalAbsorber', 'signal-absorber.test.js'],
+    ['AgentBoundaryGuard', 'agent-boundary-guard.test.js'],
+    ['MetacognitiveExecutive', 'metacognitive-executive.test.js'],
+    ['RecoveredModules', 'recovered-modules.test.js'],
+    ['RecoveredModules2', 'recovered-modules-2.test.js'],
+    ['KnowledgeGraphAdapter', 'knowledge-graph-adapter.test.js'],
+    ['SourceAnnotator', 'source-annotator.test.js'],
+    ['SecurityAudit', 'security-audit.test.js'],
+    ['IdentityCore', 'identity-core.test.js'],
+    ['BigFivePersonality', 'big-five.test.js'],
+    ['SelfModel', 'self-model.test.js'],
+    ['LogicReasoning', 'logic-reasoning.test.js'],
+    ['ReflectionLoop', 'reflection-loop.test.js'],
+    ['ModuleRegistry (P4)', 'module-registry.test.js'],
+    ['RouteWhitelist (P4)', 'route-whitelist.test.js'],
+    ['SafeFS (P4)', 'safe-fs.test.js'],
+  ];
+  const explicit = new Set();
+  for (const [label, rel] of CORE_TESTS) {
+    if (!fs.existsSync(path.join(TEST_DIR, rel))) continue;
+    explicit.add(rel);
+    runSubTest(`  ${label}`, rel);
   }
 
-  // 10. MCP 测试
-  console.log('\n🔍 MCP Discriminator (mcp-discriminator.test.js)');
-
-  // 11. 动态接入未显式 require 的测试文件
-  console.log('\n📦 动态接入遗漏测试 (D4 fix)');
-  const runAllSrc = fs.readFileSync(__filename, 'utf8');
-  const explicit = new Set([...runAllSrc.matchAll(/require\('\.\/([a-zA-Z0-9_-]+)'\)/g)].map(m => m[1]));
-  const allTests = fs.readdirSync(TEST_DIR).filter(f => f.endsWith('.test.js') && f !== 'run-all.test.js');
-  for (const f of allTests) {
-    const name = f.replace(/\.test\.js$/, '');
-    if (explicit.has(name)) continue;
-    // 安全检查：跳过自执行测试文件（内部含 process.exit 会杀死整个 run-all 进程）。
-    // 自执行文件（如 mcp-discriminator.test.js、35dim-integration.test.js）应通过 runSubTest 独立运行。
-    let fileSrc = '';
-    try { fileSrc = fs.readFileSync(path.join(TEST_DIR, f), 'utf8').slice(0, 400); } catch (e) {}
-    if (!/module\.exports\s*=\s*function/.test(fileSrc)) {
-      console.log('  ⏭️ 跳过自执行 ' + name + '（用 runSubTest 独立运行）');
+  // 动态接入其余测试文件（全部子进程隔离）
+  console.log('\n=== 动态接入其余测试文件 ===');
+  const allTests = collectTestFiles(TEST_DIR);
+  for (const rel of allTests) {
+    if (explicit.has(rel)) continue;
+    if (rel.includes('/')) {
+      runSubTest('  · ' + rel, rel);
       continue;
     }
-    try {
-      require('./' + f)({ test, assertEqual, assertTrue, assertFalse, assertDefined, assertThrows });
-      console.log('  + 接入 ' + name);
-    } catch (e) {
-      console.log('  ⚠️ ' + name + ' 接入异常: ' + (e.message || '').split('\n')[0]);
+    let head = '';
+    try { head = fs.readFileSync(path.join(TEST_DIR, rel), 'utf8').slice(0, 400); } catch (e) {}
+    if (/module\.exports\s*=\s*function/.test(head)) {
+      runMountTest('  + ' + rel, rel);
+    } else {
+      runSubTest('  · ' + rel, rel);
     }
-  }
-
-  // 汇总前等待 async 测试结算
-  if (asyncPromises.length) {
-    await Promise.all(asyncPromises);
-    console.log('[harness] async 测试已结算, passed=' + passed + ' failed=' + failed);
   }
 
   // 汇总
   console.log('\n' + '='.repeat(50));
-  console.log(`\n📊 测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
+  console.log(`\n测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
   if (failures.length > 0) {
-    console.log('\n❌ 失败的测试:');
-    failures.forEach(f => console.log(`  - ${f.name}: ${f.error}`));
+    console.log('\n失败的测试:');
+    for (const f of failures) console.log(`  - ${f.name} ${f.error}`);
     process.exitCode = 1;
   } else {
-    console.log('\n✅ 全部通过！');
+    console.log('\n全部通过。');
   }
 }
 
