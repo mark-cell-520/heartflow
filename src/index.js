@@ -374,7 +374,11 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
     // 上，而不是分数上。见 HATE_SPEECH_ZH 的 inanimate-target 排除。
     gate.action = 'block';
     gate.reason = `拦截: ${topFinding}`;
-  } else if (REWRITE_DIMS.has(topFinding) || findings.some(f => REWRITE_DIMS.has(f.dimension)) || overallScore < 0.5) {
+  } else if (REWRITE_DIMS.has(topFinding) || findings.some(f => REWRITE_DIMS.has(f.dimension))
+             // 分数本身不足以升级到 rewrite：需要有一个"实质性问题"（严重度 >= 60）撑着。
+             // 否则多个轻量 verify 级维度叠加（协同惩罚）就能把总分压到 0.5 以下并触发改写，
+             // 而设计意图是这种"多维度轻量混合、无单维达阈值"的情形应停在 verify。
+             || (overallScore < 0.5 && (findings[0]?.severity || 0) >= 60)) {
     gate.action = 'rewrite';
     gate.reason = `改写: ${topFinding}`;
   } else if (VERIFY_DIMS.has(topFinding) || findings.some(f => VERIFY_DIMS.has(f.dimension)) || overallScore < 0.85 || findings.length > 1) {
