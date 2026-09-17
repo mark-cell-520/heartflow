@@ -4447,6 +4447,19 @@ class HeartFlow {
       }
     } catch (_) { /* 古典路由失败，走正常链路 */ }
 
+    // ─── 监督层：道论输入检查 ──────────────────────────────
+    // 在古典路由前先过 dao-decision，把哲学风险标记进 result
+    try {
+      if (this.daoDecision && typeof input === 'string') {
+        const daoResult = this.daoDecision.evaluate({ text: input, history: [] });
+        result = result || {};
+        result._daoInputCheck = daoResult;
+        if (daoResult.flags && daoResult.flags.length) {
+          result._daoInputWarnings = daoResult.flags.slice(0, 3);
+        }
+      }
+    } catch (_) { /* dao-decision 不阻断主链路 */ }
+
     if (!result) {
       const TCMod = _ThoughtChain();
       const chain = this.thoughtChain || new (TCMod.ThoughtChain)(this);
@@ -4778,6 +4791,54 @@ class HeartFlow {
       }
     } catch (_) { /* Reflector 数据流失败不阻断主链路 */ }
   } catch (_) { /* 自省计数失败不阻断主链路 */ }
+
+    // ─── 监督层：不确定性量化（输出侧）─────────────────────
+    // 对 think() 结论做幻觉风险与置信度校准
+    try {
+      if (this.uncertaintyQuantifier && result && result.output && result.output.conclusion) {
+        const conclusion = String(result.output.conclusion);
+        const uqResult = this.uncertaintyQuantifier.evaluate(conclusion, { hasEvidence: !!result.output.hfVerification });
+        result._uncertainty = uqResult;
+        if (uqResult.isHallucinationRisk) {
+          result._uncertaintyWarning = true;
+          result.output._uncertaintyWarning = true;
+        }
+      }
+    } catch (_) { /* uncertainty 不阻断主链路 */ }
+
+    // ─── 监督层：优先级守护（输出侧）─────────────────────────
+    // 检查结论是否与人类进步/真相传递冲突
+    try {
+      if (this.priorityGuardian && result && result.output && result.output.conclusion) {
+        const pgResult = this.priorityGuardian.check({
+          userIntent: typeof input === 'string' ? input : '',
+          action: String(result.output.conclusion),
+          humanProgress: {}
+        });
+        result._priorityGuard = pgResult;
+        if (!pgResult.allowed) {
+          result._priorityGuardBlocked = true;
+          result.output._priorityGuardBlocked = true;
+        }
+      }
+    } catch (_) { /* priority-guardian 不阻断主链路 */ }
+
+    // ─── 监督层：进步判断（输出侧）─────────────────────────────
+    // 识别伪进步：表面升级 / 服从升级 / 装饰升级 / 幻觉进步
+    try {
+      if (this.progressJudgment && result && result.output && result.output.conclusion) {
+        const pjResult = this.progressJudgment.judge({
+          action: typeof input === 'string' ? input : '',
+          claim: String(result.output.conclusion),
+          evidence: [],
+          userIntent: typeof input === 'string' ? input : ''
+        });
+        result._progressJudgment = pjResult;
+        if (pjResult && pjResult.standGround) {
+          result._progressStandGround = pjResult.standGround;
+        }
+      }
+    } catch (_) { /* progress-judgment 不阻断主链路 */ }
 
     // [v6.7.13] Feedback evaluation logger: attach lightweight gate-quality signals
     try {
