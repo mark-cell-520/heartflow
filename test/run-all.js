@@ -95,6 +95,15 @@ function runMountTest(name, relPath, timeout = CHILD_TIMEOUT) {
   );
 }
 
+/** 以 `node -r` 预加载全局注入的方式执行 jest 风格测试文件 */
+function runJestStyleTest(name, relPath, timeout = CHILD_TIMEOUT) {
+  runChild(
+    name,
+    `node -r ${JSON.stringify(path.join(TEST_DIR, '_jest-globals.js'))} ${JSON.stringify(path.join(TEST_DIR, relPath))}`,
+    timeout
+  );
+}
+
 // === MAIN ===
 async function runAllTests() {
   console.log('\n=== HeartFlow module tests ===\n');
@@ -142,10 +151,15 @@ async function runAllTests() {
       runSubTest('  · ' + rel, rel);
       continue;
     }
-    let head = '';
-    try { head = fs.readFileSync(path.join(TEST_DIR, rel), 'utf8').slice(0, 400); } catch (e) {}
+    let src = '';
+    try { src = fs.readFileSync(path.join(TEST_DIR, rel), 'utf8'); } catch (e) {}
+    const head = src.slice(0, 400);
     if (/module\.exports\s*=\s*function/.test(head)) {
+      // 导出 mount 函数：子进程 + 注入 harness
       runMountTest('  + ' + rel, rel);
+    } else if (/\bdescribe\s*\(/.test(src) && !/require\(['"][^'"]*mini-expect/.test(src)) {
+      // jest/mocha 风格：它自己调 describe/it，靠 -r 注入全局
+      runJestStyleTest('  j ' + rel, rel);
     } else {
       runSubTest('  · ' + rel, rel);
     }
