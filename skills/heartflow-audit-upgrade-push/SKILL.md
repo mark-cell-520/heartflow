@@ -192,7 +192,7 @@ grep -n 'decisionRouter.evaluate' src/core/heartflow.js
 }
 ```
 
-**⚠️ 不要依赖 self-audit.js 做全量审计**：`self-audit.js` 的 `runAudit({mode:'full'})` 会触发以下已知挂起/OOM：
+**⚠️ `src/core/self-audit.js` 已不存在**（2026-09-17 核实）：`runAudit({mode:'full'})` 会触发以下已知挂起/OOM：
 1. **`auditCodebase()` → `_estimateDuplication()` 无限挂起**：O(n²) 全量函数两两比较（167文件 × 5391函数），无法在合理时间内完成。触发维度：依赖审计。
 2. **`reviewCode()` 在 code-engine.js (129KB/3528行) 上 OOM 崩溃**：`_checkTypeCoercion` 的 `line.match()` 循环在大文件上触发堆内存溢出（4GB+），不仅是挂起。Node.js 默认 2GB 堆上限 + `--max-old-space-size=512` 均不够。触发维度：代码质量审计。
 3. **`extractExports()` regex 漏检 `module.exports = {...}`**：只找到 9 个文件有导出（实际远多于 9），导致死代码审计精度极低。
@@ -1106,7 +1106,8 @@ grep -h "version" package.json VERSION VERSION.txt README.md SKILL.md | sort | u
 ### 使用方式
 
 ```javascript
-const { runAudit } = require('./src/core/self-audit.js');
+// 已失效：src/core/self-audit.js 不存在。请改用下方轻量脚本或 delegate_task 扫描。
+// const { runAudit } = require('./src/core/self-audit.js');
 const report = runAudit({ mode: 'full' });
 console.log(report.summary);
 ```
@@ -1175,6 +1176,10 @@ delegate_task tasks=[...3 more]
 6. **git commit** — 不自动 push，等有意义的里程碑再 bump
 
 ### 参考
+
+> ⚠️ 2026-09-17 核实：本文件中提到的 `src/core/self-audit.js`、`src/core/code-engine.js`、
+> `scripts/lightweight-audit.js`、`scripts/manual-audit.sh` **均已不存在**。
+> 审计请改用 `delegate_task` 分派子代理逐子系统扫描，或直接手动检查。
 
 `references/cron-safe-audit-recipes.md` — 5种经实战验证的 cron-safe 审计配方
 `scripts/lightweight-audit.js` — 完整6维度轻量审计脚本

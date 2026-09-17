@@ -57,7 +57,10 @@ function checkKnowledgeBoundary(text) {
     let m;
     while ((m = re.exec(text)) !== null) {
       const match = m[0].slice(0, 50).trim();
-      if (match.length > 5) {
+      // 长度下限必须是 4，不能是 6（即 >5）。
+      // 中文短语高度紧凑，"架构级重构" 恰好 5 字 —— 一个明确的自我拔高声明
+      // 会被 >5 的过滤直接丢弃，导致 self_aggrandizement 漏检。
+      if (match.length >= 4) {
         overclaims.push({
           type,
           match,

@@ -63,8 +63,11 @@ module.exports = function ({ test }) {
 
   // 多信号 → rewrite
   test('多信号判定为 rewrite', () => {
-    // "好的" (T1) + 短 + 无结果 → 至少2信号
-    const r = checkPrematureTermination('好的，我看看');
+    // "好的" (T1) + 短 + 无结果 → 至少2信号。
+    // T2（极短输出）现在只在明确的 agent 循环上下文里生效：脱离该上下文时
+    // 任何短句都会被判 verify，这是误报主因（例如"他妈妈做的饭很好吃"）。
+    // "好的，我看看" 本身就是 agent 循环里的过渡语，因此显式声明该上下文。
+    const r = checkPrematureTermination('好的，我看看', { expectedAction: true });
     if (r.level !== 'rewrite') throw new Error('多信号应为 rewrite: ' + r.level + ' ' + r.details);
   });
 

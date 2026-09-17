@@ -15,7 +15,10 @@ const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'hf-upg-'));
 const e = new SmartUpgradeEngine(tmpRoot);
 
 ok('recordSelfUpgrade 返回记录对象', () => {
-  const r = e.recordSelfUpgrade({ version: '6.0.11', description: 'test', impact: 0.5 });
+  // requireGitVerify:false —— recordSelfUpgrade 默认会调 _verifyGitCommit(version) 做防自欺
+  // 校验，未在 git 历史里出现的 version 会被拒绝写入（返回 rejected:true）。本测试
+  // 针对的是持久化路径本身，因此显式关闭该校验，避免依赖真实 commit 历史。
+  const r = e.recordSelfUpgrade({ version: '6.0.11', description: 'test', impact: 0.5, requireGitVerify: false });
   assert.ok(r && r.version === '6.0.11' && r.timestamp > 0);
 });
 
@@ -33,7 +36,7 @@ ok('历史持久化到磁盘', () => {
 });
 
 ok('多次记录累积', () => {
-  e.recordSelfUpgrade({ version: '6.0.12', description: 'second', impact: 0.3 });
+  e.recordSelfUpgrade({ version: '6.0.12', description: 'second', impact: 0.3, requireGitVerify: false });
   const s = e.getStats();
   assert.strictEqual(s.selfUpgrades, 2);
   assert.strictEqual(s.totalUpgrades, 2);

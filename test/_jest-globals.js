@@ -17,10 +17,12 @@ global.describe = M.describe;
 global.it = M.it;
 global.test = M.it;
 global.expect = M.expect;
-global.beforeEach = () => {};
-global.afterEach = () => {};
-global.beforeAll = () => {};
-global.afterAll = () => {};
+// 必须是真实实现：stub 成空函数会让所有依赖 beforeEach 构造被测对象的测试
+// 拿到 undefined（decision-verifier / engine-reasoner 的失败根因）。
+global.beforeEach = M.beforeEach;
+global.afterEach = M.afterEach;
+global.beforeAll = M.beforeAll;
+global.afterAll = M.afterAll;
 
 let _printed = false;
 process.on('exit', () => {
