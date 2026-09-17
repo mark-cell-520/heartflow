@@ -8,7 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 function getInput(name) {
   const key = `INPUT_${name.replace(/-/g, '_').toUpperCase()}`;
@@ -54,16 +54,28 @@ async function run() {
   const scriptPath = path.join(__dirname, '..', 'src', 'repo-audit.js');
   const reportPath = path.join(workspace, outputPath);
 
+  // 报告可能落在子目录中；不创建父目录会让写入直接 ENOENT 崩溃
+  // （例如 output_path: reports/audit.md）。
+  try {
+    fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  } catch (err) {
+    warning(`Could not create report directory: ${err.message}`);
+  }
+
   if (scanDepth === 'quick') {
-    warning('quick mode requested but not implemented; running full scan');
+    warning('scan_depth "quick" is accepted for compatibility but not implemented; running the full recursive scan');
   }
 
   info(`Starting HeartFlow audit on ${repoName}`);
 
   let stdout;
   try {
-    stdout = execSync(
-      `node "${scriptPath}" "${workspace}" "${repoName}" "${reportPath}"`,
+    // 必须用 execFileSync 传参数数组，不能把 workspace/repoName/reportPath
+    // 拼进 shell 字符串 —— 这些值来自 GITHUB_REPOSITORY 与用户输入，
+    // 含引号或 $(...) 时会变成命令注入。对一个安全审计 action 尤其不能有。
+    stdout = execFileSync(
+      process.execPath,
+      [scriptPath, workspace, repoName, reportPath],
       { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 600000 }
     );
   } catch (err) {

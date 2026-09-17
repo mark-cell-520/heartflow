@@ -110,3 +110,7 @@ memory/q-table.json
 
 # 模型权重（86MB 级，绝不入库）
 *.onnx
+
+# Action 运行产物（默认报告名 + 自定义报告目录）
+heartflow-audit-report.md
+reports/
