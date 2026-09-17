@@ -21,6 +21,7 @@ const REQUEST_WINDOW  = 60_000;  // 1 分钟滑动窗口
 const FAIL_RATE_WARN  = 0.30;  // 30% 失败率 → warn
 const FAIL_RATE_TRIP  = 0.50;  // 50% 失败率 → trip
 const MIN_SAMPLES     = 10;    // 最少采样数才触发
+const CPU_TRIP_STREAK = 3;     // CPU 连续饱和多少次才跳闸（防瞬时误判）
 
 const STATE = Object.freeze({
   CLOSED:    'CLOSED',      // 正常
@@ -70,6 +71,7 @@ function checkMemory() {
 // 不使用 busy-wait：同步空转会堵死事件循环，把"保护"变成"僵死"。
 // 改为用两次调用之间的墙上时间做采样，无阻塞。
 let _cpuPrev = null;
+let _cpuCriticalStreak = 0;
 function checkCPU() {
   const now = Date.now();
   const cum = process.cpuUsage();
@@ -141,10 +143,22 @@ function _evaluate() {
   const cpu = checkCPU();
   const failRate = getFailRate();
   
-  // Memory/CPU critical → immediate trip
-  if (mem.action === 'trip' || cpu.action === 'trip') {
-    trip('Resource exhausted: ' + (mem.action === 'trip' ? `mem ${mem.percent}` : `cpu ${cpu.cpuPercent}`));
+  // Memory/CPU critical → trip, but CPU only after SUSTAINED saturation.
+  // 单次瞬时 CPU 采样在 1ms 粒度下极易读出 1.0（两次调用间隔内的真实 CPU 时间
+  // 相对墙钟时间被放大），据此跳闸会让熔断器在无真实过载时闩死，
+  // 连 memory.getStats 这类只读调用也一并被拦掉。
+  if (mem.action === 'trip') {
+    trip(`Resource exhausted: mem ${mem.percent}`);
     return STATE.TRIPPED;
+  }
+  if (cpu.action === 'trip') {
+    _cpuCriticalStreak++;
+    if (_cpuCriticalStreak >= CPU_TRIP_STREAK) {
+      trip(`Resource exhausted: cpu ${cpu.cpuPercent} (${_cpuCriticalStreak} consecutive samples)`);
+      return STATE.TRIPPED;
+    }
+  } else {
+    _cpuCriticalStreak = 0;
   }
   
   // High failure rate → open circuit
@@ -178,6 +192,7 @@ function reset() {
   _lastError = null;
   _killSwitchActive = false;
   _stats = { total: 0, failures: 0, successes: 0 };
+  _cpuCriticalStreak = 0;
 }
 
 function isTripped() { return _killSwitchActive; }
