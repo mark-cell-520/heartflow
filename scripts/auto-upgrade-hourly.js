@@ -187,7 +187,7 @@ function gitCommitPush(message) {
   try {
     execSync('git add -A', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
     execSync(`git commit -m "${message}"`, { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
-    execSync('git push origin main', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', timeout: 120000 });
+    execSync('git push heartflow main', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', timeout: 120000 });
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e.message };
