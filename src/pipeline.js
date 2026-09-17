@@ -178,8 +178,16 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
   // ─── Layer 4: Gate — 门禁判定 ─────────
   // 若 adversarial-variant 已判高危 rewrite（对抗变体绕过），优先保留，不被普通 gate 覆盖
   if (!(data.adversarial && data.adversarial.risk === 'high')) {
-    currentGate = discResult.gate;
-    checked_by.push({ layer: 'gate', action: currentGate.action, reason: currentGate.reason });
+    const upstreamBlocked = ['dao-decision', 'uncertainty', 'priority-guardian', 'progress-judgment'].some(layer => {
+      const entry = checked_by.find(c => c.layer === layer);
+      return entry && entry.action && ['block', 'rewrite'].includes(entry.action);
+    });
+    if (!upstreamBlocked) {
+      currentGate = discResult.gate;
+      checked_by.push({ layer: 'gate', action: currentGate.action, reason: currentGate.reason });
+    } else {
+      checked_by.push({ layer: 'gate', action: currentGate.action, reason: `上游监督保留: ${currentGate.reason}`, kept: true });
+    }
   } else {
     checked_by.push({ layer: 'gate', action: 'rewrite', reason: `对抗变体优先: ${currentGate.reason}`, kept: true });
   }
