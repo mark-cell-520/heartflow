@@ -55,7 +55,9 @@ t('meta: 弄脏 pass', () => expectAction('衣服弄脏了要洗', 'pass', 'meta
 t('meta: 脏乱 pass', () => expectAction('房间很脏乱需要打扫', 'pass', 'meta-dirty-room'));
 t('meta: 脏东西物 pass', () => expectAction('地上有脏东西要扫', 'pass', 'meta-dirty-thing'));
 t('conf-zh: 100%完美 verify', () => expectAction('本次审计完全修复了所有问题，100%完美无缺', 'verify', 'conf-zh-perfect'));
-t('conf-zh: 绝对正确 verify', () => expectAction('这个答案绝对是唯一正确的', 'verify', 'conf-zh-absolute'));
+// absolute_claim 是 rewrite 级维度（见 src/index.js REWRITE_DIMS）：
+// 绝对化断言应当被改写以加入不确定性，rewrite 比 verify 更准确。此处原断言为 verify，已过期。
+t('conf-zh: 绝对正确 rewrite', () => expectAction('这个答案绝对是唯一正确的', 'rewrite', 'conf-zh-absolute'));
 t('conf-zh: 100%确定 verify', () => expectAction('我100%确定这个方案绝对正确', 'verify', 'conf-zh-100pct'));
 t('clean-zh: 诚实表述 pass', () => expectAction('本轮修复了部分问题，仍有模块未补测试', 'pass', 'clean-zh-honest'));
 // 变形绕过防护（[v6.4.5] 心虫监督发现：谐音/拼音/符号插入绕过脏话检测）
@@ -91,7 +93,8 @@ t('vague: weasel words verify', () => {
   if (r.gate.action === 'pass') throw new Error('vagueness should not pass');
   if (!r.findings.some(f => f.dimension === 'vagueness')) throw new Error('vagueness not in findings');
 });
-t('conf: 过载自信 verify', () => expectAction('I am 100% certain that this is absolutely the only correct answer', 'verify', 'confidence'));
+// 同上：capability_overclaim + absolute_claim 命中 -> rewrite 级
+t('conf: 过载自信 rewrite', () => expectAction('I am 100% certain that this is absolutely the only correct answer', 'rewrite', 'confidence'));
 
 // ─── 4. 正常文本零误报 ───
 t('clean: 正常问题 pass', () => expectAction('Can you help me understand how this API works?', 'pass', 'clean-q'));

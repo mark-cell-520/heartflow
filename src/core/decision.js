@@ -204,6 +204,19 @@ class HeartFlowDecision {
 
     scored.sort((a, b) => b.scores.composite - a.scores.composite);
 
+    // 平局必须弃权，不能按数组顺序挑一个冒充"决策"。
+    // 机器最有价值的一句话是"我不确定"——选项无法区隔时，返回该事实。
+    if (scored.length > 1 && Math.abs(scored[0].scores.composite - scored[1].scores.composite) < 0.01) {
+      this._passport.exit('options_indistinguishable');
+      return {
+        chosen: null,
+        reasoning: `options_indistinguishable: ${scored.slice(0, 3).map(s => `${s.label || s.id}=${s.scores.composite}`).join(', ')}`
+          + ' — 无法在选项间做出区隔，拒绝任意挑选。请补充可区分的判据（可行性/后果/风险）。',
+        confidence: 0,
+        all_options: scored.map(s => ({ id: s.id, label: s.label, composite: s.scores.composite })),
+      };
+    }
+
     const chosen = scored[0];
     const reasoning = this._explainDecision(chosen, scored, task);
 
@@ -281,17 +294,43 @@ class HeartFlowDecision {
   }
 
   _scoreOption(option, task, constraints) {
-    // 1. Feasibility score
-    const feasibility = option.feasibility || 0.8;
+    // 本方法的文档化输入是 { id, label, description } —— 不含任何数值字段。
+    // 此前三个维度全部读数字字段并回退到同一组默认值（0.8 / 0.7 / 0），
+    // 导致按文档调用时所有选项得分完全相同（0.86），decide() 退化为
+    // "按数组顺序挑第一个"。这里改为：显式数值优先，缺失时从 label/description
+    // 文本推断，使 decide() 在实际接口上具备区隔能力。
+    const text = `${option.label || ''} ${option.description || ''}`.toLowerCase();
+    const num = (v) => (typeof v === 'number' && isFinite(v) ? v : null);
+    const IRREV = /不可逆|irreversible|删除|delete|移除|难以回退|不可回退|大改|整体重构|高风险|breaking/;
+    const REVERS = /可逆|reversible|回退|rollback|低风险|增量|局部|可撤销/;
+
+    // 1. Feasibility score（回退成本低 → 更可行）
+    const derivedFeasibility = (() => {
+      let f = 0.7;
+      if (REVERS.test(text) && !IRREV.test(text)) f += 0.15;
+      if (IRREV.test(text)) f -= 0.25;
+      return Math.max(0.05, Math.min(1, f));
+    })();
+    const feasibility = num(option.feasibility) ?? derivedFeasibility;
 
     // 2. Identity alignment (check against identity rules)
     const identity_alignment = this._checkIdentityAlignment(option, task);
 
-    // 3. Consequence value (estimated)
-    const consequence_value = option.consequence_value || 0.7;
+    // 3. Consequence value（显式值 > prior > 文本推断）
+    const derivedConsequence = (() => {
+      const pr = num(option.prior);
+      if (pr !== null) return Math.max(0.05, Math.min(1, pr));
+      let c = 0.6;
+      if (/减少错误|提升|改善|修复|清晰|可信|可靠|可复现/.test(text)) c += 0.15;
+      if (/无收益|装饰性|表面功夫/.test(text)) c -= 0.2;
+      return Math.max(0.05, Math.min(1, c));
+    })();
+    const consequence_value = num(option.consequence_value) ?? derivedConsequence;
 
     // 4. Risk penalty: higher risk must lower the final score.
-    const risk_penalty = Math.max(0, Math.min(1, option.risk || 0)) * 0.3;
+    const derivedRisk = IRREV.test(text) ? 0.8 : (REVERS.test(text) ? 0.2 : 0.4);
+    const risk = num(option.risk) ?? derivedRisk;
+    const risk_penalty = Math.max(0, Math.min(1, risk)) * 0.3;
 
     // 5. Confidence (from option or default)
     const confidence = option.confidence || 0.7;

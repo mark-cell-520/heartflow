@@ -23,7 +23,13 @@ let _current = null;
 
 function describe(name, fn) {
   const prev = _current;
-  _current = { name: prev ? `${prev.name} › ${name}` : name, tests: [] };
+  const parentHooks = prev ? { beforeEach: prev.beforeEach, afterEach: prev.afterEach } : { beforeEach: [], afterEach: [] };
+  _current = {
+    name: prev ? `${prev.name} › ${name}` : name,
+    tests: [],
+    beforeEach: [...parentHooks.beforeEach],
+    afterEach: [...parentHooks.afterEach],
+  };
   _suites.push(_current);
   try {
     fn();
@@ -35,6 +41,14 @@ function describe(name, fn) {
 function it(name, fn) {
   if (_current) _current.tests.push({ name, fn });
 }
+
+// beforeEach/afterEach 必须真的执行。此前在 test/_jest-globals.js 里把它们 stub 成
+// 空函数，导致所有用 beforeEach 构造被测对象的测试拿到 undefined —— decision-verifier
+// 的 10 项失败和 engine-reasoner 的 1 项失败全部由此而来，并非被测代码有问题。
+function beforeEach(fn) { if (_current) _current.beforeEach.push(fn); }
+function afterEach(fn)  { if (_current) _current.afterEach.push(fn); }
+function beforeAll(fn)  { if (_current) _current.beforeEach.unshift(fn); }
+function afterAll(fn)   { if (_current) _current.afterEach.push(fn); }
 
 function _fail(msg) {
   const e = new Error(msg);
@@ -154,10 +168,13 @@ function run({ silent = false } = {}) {
   for (const suite of _suites) {
     for (const t of suite.tests) {
       try {
+        for (const h of (suite.beforeEach || [])) h();
         t.fn();
         passed++;
       } catch (e) {
         failures.push({ name: `${suite.name} › ${t.name}`, error: e.message });
+      } finally {
+        for (const h of (suite.afterEach || [])) { try { h(); } catch (e) { /* 清理失败不影响判定 */ } }
       }
     }
   }
@@ -172,4 +189,4 @@ function run({ silent = false } = {}) {
   return { passed, failed: failures.length, failures };
 }
 
-module.exports = { describe, it, test: it, expect, run, _suites };
+module.exports = { describe, it, test: it, expect, run, beforeEach, afterEach, beforeAll, afterAll, _suites };

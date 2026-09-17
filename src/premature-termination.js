@@ -88,10 +88,18 @@ function checkPrematureTermination(text, ctx = {}) {
   // T2: 极短输出且无结果性内容（单句场景；多句长文不算）
   // ⚠️ 排除疑问句：提问不是"该完成却没完成"——问题是请求信息，不是未完成声明
   // 排除疑问句/请求句：提问或请人做事不是"该完成却没完成"——是请求信息/行动
+  // 祈使式请求也必须排除："write a function to add numbers" / "写一个加法函数"
+  // 是用户提出的任务请求，不是"AI 输出过早终止"。此前只覆盖疑问句与少数请求词，
+  // 导致这两类输入被 T2（极短输出）判为 verify。
   const isRequest = isZh
-    ? /[？?]$/.test(trimmed) || /^(?:请问|想问|能|可以|帮我|请|麻烦|请帮我|请帮忙|帮忙|是否|有没有|什么|怎么|为什么|多少|哪里|谁|几|吗|呢)/.test(trimmed)
-    : /\?\s*$/.test(trimmed) || /^(?:what|why|how|when|where|who|which|can|could|would|should|is|are|do|does|did|please|tell me|help me|give me|show me|explain|summarize|translate)\b/i.test(trimmed);
-  if (!isRequest && !trimmed.includes('\n') && trimmed.split(/[.!?。！？\n]/).filter(Boolean).length <= 2) {
+    ? /[？?]$/.test(trimmed) || /^(?:请问|想问|能|可以|帮我|请|麻烦|请帮我|请帮忙|帮忙|是否|有没有|什么|怎么|为什么|多少|哪里|谁|几|吗|呢|写|实现|创建|新建|添加|修改|重构|优化|生成|设计|开发|做|搞|补|加上|删除|修复|测试|解释|总结|翻译|列出|给)/.test(trimmed)
+    : /\?\s*$/.test(trimmed) || /^(?:what|why|how|when|where|who|which|can|could|would|should|is|are|do|does|did|please|tell me|help me|give me|show me|explain|summarize|translate|write|implement|create|add|fix|refactor|optimize|generate|design|build|make|write|use|run|test|list|describe|convert)\b/i.test(trimmed);
+  // T2 仅适用于"agent 工具调用循环中的最终输出"这一场景。
+  // 脱离该上下文时，短文本不构成"过早终止"的证据 —— 否则任何短句
+  // （"他妈妈做的饭很好吃" / "房间很脏乱需要打扫"）都会被判 verify，
+  // 这是典型的误报来源。调用方知道自己在 agent 循环里时传 ctx.expectedAction=true。
+  const agentLoopContext = !!(ctx && (ctx.expectedAction === true || ctx.mode === 'agent_output'));
+  if (agentLoopContext && !isRequest && !trimmed.includes('\n') && trimmed.split(/[.!?。！？\n]/).filter(Boolean).length <= 2) {
     let tooShort = false;
     if (isZh) {
       const zhLen = trimmed.replace(/\s/g, '').length;

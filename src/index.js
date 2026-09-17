@@ -369,6 +369,9 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
     gate.action = 'rewrite';
     gate.reason = `疑似完美错误答案: ${pe.details}`;
   } else if (BLOCK_DIMS.has(topFinding) || findings.some(f => BLOCK_DIMS.has(f.dimension))) {
+    // 注意：不能用严重度阈值来收窄 block —— 单条真实仇恨命中的严重度同样是 18，
+    // 与误报同值（见 hate_speech score = Σseverity*0.3）。降噪必须落在"模式的目标"
+    // 上，而不是分数上。见 HATE_SPEECH_ZH 的 inanimate-target 排除。
     gate.action = 'block';
     gate.reason = `拦截: ${topFinding}`;
   } else if (REWRITE_DIMS.has(topFinding) || findings.some(f => REWRITE_DIMS.has(f.dimension)) || overallScore < 0.5) {
@@ -2412,7 +2415,12 @@ const HATE_SPEECH_ZH = [
   { pattern: /废物|废柴/gi, type: 'dehumanization', severity: 0.7 },
   { pattern: /(?:你|他|她|他们|她们|这些人|这群人|这帮人|移民|难民|黑人|白人|犹太人|穆斯林|同性恋)(?:真是|就是|都是|全是|简直是|是)(?:个)?[^。，]{0,8}垃圾(?!桶|袋|箱|分类|回收|处理|场|发电|车|股|债|食品|话|邮件|短信|评论|内容|bug|方案|设计|代码|系统|产品|厨余|家具|机器|手机|电脑|软件|数据)/gi, type: 'dehumanization', severity: 0.6 },
   { pattern: /垃圾(?:人|货色|东西(?!家具|机器|手机|电脑|产品|软件))/gi, type: 'dehumanization', severity: 0.7 },
-  { pattern: /(?:你是|你就是|真是|简直是)[^。，]{0,6}(?:垃圾|废物|杂种|傻逼|蠢货)(?![。，]?$)/gi, type: 'dehumanization', severity: 0.6 },
+  // [v6.7.24] 侮辱词必须指向人。原模式把 bare 强化词（真是/简直是）与 垃圾/废物
+  // 组合，使"<物>真是垃圾"结构误报 —— "这个bug真是垃圾，改了半天" 被判
+  // dehumanization 并 block。对事不对人的吐槽不是仇恨言论。
+  { pattern: /(?:你是|你就是|你真是|他真是|她真是|你简直是|他们真是|你们真是)[^。，]{0,6}(?:垃圾|废物|杂种|傻逼|蠢货)/gi, type: 'dehumanization', severity: 0.6 },
+  // bare 强化词仅与强侮辱词组合（保留拦截力）；不含 bare 垃圾/废物，避免对物误报
+  { pattern: /(?:真是|简直是)[^。，]{0,6}(?:垃圾人|垃圾货色|人渣|杂种|傻逼|蠢货)/gi, type: 'dehumanization', severity: 0.6 },
   { pattern: /杂种/gi, type: 'dehumanization', severity: 0.7 },
   // 阶级歧视
   { pattern: /低端人口/gi, type: 'class_slur', severity: 0.7 },
