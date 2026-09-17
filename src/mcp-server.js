@@ -1035,6 +1035,26 @@ const TOOLS = [
     inputSchema: { type: 'object', properties: { decision: { type: 'string', description: '决策指令' } } }
   },
   {
+    name: 'heartflow_supervise_dao',
+    description: '道论监督：用道法自然/反者道之动/为而不争/不言之教四层过滤监督决策。',
+    inputSchema: { type: 'object', properties: { text: { type: 'string', description: '待监督文本' }, intent: { type: 'string', description: '意图' }, action: { type: 'string', description: '行动' } } }
+  },
+  {
+    name: 'heartflow_supervise_uncertainty',
+    description: '不确定性监督：量化认知/随机不确定与幻觉风险，输出校准表达。',
+    inputSchema: { type: 'object', properties: { text: { type: 'string', description: '待评估文本' }, domain: { type: 'string', description: '领域' }, hasEvidence: { type: 'boolean', description: '是否有证据' } } }
+  },
+  {
+    name: 'heartflow_supervise_priority',
+    description: '优先级守护：监督用户意图是否与人类进步/真相传递冲突。',
+    inputSchema: { type: 'object', properties: { userIntent: { type: 'string', description: '用户意图' }, action: { type: 'string', description: '计划行动' }, humanProgress: { type: 'object', description: '人类进步影响' } } }
+  },
+  {
+    name: 'heartflow_supervise_progress',
+    description: '进步判断：判断一个升级/行动是否真进步，识别伪升级。',
+    inputSchema: { type: 'object', properties: { action: { type: 'string', description: '行动描述' }, claim: { type: 'string', description: '声称的进步' }, evidence: { type: 'array', items: { type: 'string' }, description: '证据' } } }
+  },
+  {
     name: 'heartflow_experience_collect',
     description: '经验收集：收集/存储引擎经验。',
     inputSchema: { type: 'object', properties: { experience: { type: 'string', description: '输入参数' } } }
@@ -3323,6 +3343,50 @@ function handleDecisionRouterStats(args) {
 
 // ─── v3.1.0 — 新增工具 ─────────────────────────────────────────
 
+function handleSuperviseDao(args) {
+  try {
+    const engine = heartflow;
+    if (!engine || !engine.daoDecision) return { error: 'daoDecision not ready', timestamp: Date.now() };
+    const input = args || {};
+    return engine.daoDecision.evaluate({ text: input.text || '', intent: input.intent || '', action: input.action || '', history: input.history || [] });
+  } catch (e) {
+    return { error: e.message, timestamp: Date.now() };
+  }
+}
+
+function handleSuperviseUncertainty(args) {
+  try {
+    const engine = heartflow;
+    if (!engine || !engine.uncertaintyQuantifier) return { error: 'uncertaintyQuantifier not ready', timestamp: Date.now() };
+    const input = args || {};
+    return engine.uncertaintyQuantifier.evaluate(input.text || '', { domain: input.domain, hasEvidence: input.hasEvidence, multiSource: input.multiSource });
+  } catch (e) {
+    return { error: e.message, timestamp: Date.now() };
+  }
+}
+
+function handleSupervisePriority(args) {
+  try {
+    const engine = heartflow;
+    if (!engine || !engine.priorityGuardian) return { error: 'priorityGuardian not ready', timestamp: Date.now() };
+    const input = args || {};
+    return engine.priorityGuardian.check({ userIntent: input.userIntent || '', action: input.action || '', humanProgress: input.humanProgress || {} });
+  } catch (e) {
+    return { error: e.message, timestamp: Date.now() };
+  }
+}
+
+function handleSuperviseProgress(args) {
+  try {
+    const engine = heartflow;
+    if (!engine || !engine.progressJudgment) return { error: 'progressJudgment not ready', timestamp: Date.now() };
+    const input = args || {};
+    return engine.progressJudgment.judge({ action: input.action || '', claim: input.claim || '', evidence: input.evidence || [], userIntent: input.userIntent || '' });
+  } catch (e) {
+    return { error: e.message, timestamp: Date.now() };
+  }
+}
+
 function handleModuleHealth(args) {
 
   try {
@@ -4484,6 +4548,47 @@ const HANDLERS = {
       const decision = args?.decision || {};
       const r = fb.recordOutcome ? fb.recordOutcome({ type: decision.type || 'mcp_feedback', ruleId: decision.ruleId || 'mcp', confidence: typeof decision.confidence === 'number' ? decision.confidence : 0.5, context: decision.context || {} }, args?.outcome === 'success', args?.notes || '') : {};
       return { feedback: r, timestamp: Date.now() };
+    } catch (e) { return { error: e.message }; }
+  },
+
+  heartflow_supervise_dao: (args) => {
+    try {
+      const hf = require(HF_DIR + '/src/core/heartflow.js');
+      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
+      const engine = inst;
+      if (!engine || !engine.daoDecision) return { error: 'daoDecision not ready', timestamp: Date.now() };
+      const input = args || {};
+      return engine.daoDecision.evaluate({ text: input.text || '', intent: input.intent || '', action: input.action || '', history: input.history || [] });
+    } catch (e) { return { error: e.message }; }
+  },
+  heartflow_supervise_uncertainty: (args) => {
+    try {
+      const hf = require(HF_DIR + '/src/core/heartflow.js');
+      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
+      const engine = inst;
+      if (!engine || !engine.uncertaintyQuantifier) return { error: 'uncertaintyQuantifier not ready', timestamp: Date.now() };
+      const input = args || {};
+      return engine.uncertaintyQuantifier.evaluate(input.text || '', { domain: input.domain, hasEvidence: input.hasEvidence, multiSource: input.multiSource });
+    } catch (e) { return { error: e.message }; }
+  },
+  heartflow_supervise_priority: (args) => {
+    try {
+      const hf = require(HF_DIR + '/src/core/heartflow.js');
+      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
+      const engine = inst;
+      if (!engine || !engine.priorityGuardian) return { error: 'priorityGuardian not ready', timestamp: Date.now() };
+      const input = args || {};
+      return engine.priorityGuardian.check({ userIntent: input.userIntent || '', action: input.action || '', humanProgress: input.humanProgress || {} });
+    } catch (e) { return { error: e.message }; }
+  },
+  heartflow_supervise_progress: (args) => {
+    try {
+      const hf = require(HF_DIR + '/src/core/heartflow.js');
+      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
+      const engine = inst;
+      if (!engine || !engine.progressJudgment) return { error: 'progressJudgment not ready', timestamp: Date.now() };
+      const input = args || {};
+      return engine.progressJudgment.judge({ action: input.action || '', claim: input.claim || '', evidence: input.evidence || [], userIntent: input.userIntent || '' });
     } catch (e) { return { error: e.message }; }
   },
 

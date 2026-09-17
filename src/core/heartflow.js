@@ -386,6 +386,11 @@ const _BoundaryNegotiation = _lazy('boundaryNegotiation', () => require('../shie
 
 const _ValueInternalizer = _lazy('valueInternalizer', () => require('../shield/ethics/value-internalizer.js'));
 
+const _DaoDecision = _lazy('daoDecision', () => require('./dao-decision.js'));
+const _UncertaintyQuantifier = _lazy('uncertaintyQuantifier', () => require('./uncertainty-quantifier.js'));
+const _PriorityGuardian = _lazy('priorityGuardian', () => require('./priority-guardian.js'));
+const _ProgressJudgment = _lazy('progressJudgment', () => require('./progress-judgment.js'));
+
 // ★ 时间延伸分析层 — v1.0.0
 
 const _TimeExtension = _lazy('timeExtension', () => require('../workflow/time-extension.js'));
@@ -1137,6 +1142,11 @@ class HeartFlow {
     this.decision = null;
 
     this.decisionVerifier = null;
+
+    this.daoDecision = null;
+    this.uncertaintyQuantifier = null;
+    this.priorityGuardian = null;
+    this.progressJudgment = null;
 
     this.evolution = null;
 
@@ -1905,6 +1915,11 @@ class HeartFlow {
     try { this.decision = new (_HeartFlowDecision().HeartFlowDecision)(this.memory); } catch (e) { _boundedPush(this._initErrors, {module: 'decision', error: e.message}, MAX_HISTORY_SIZE); }
 
     try { this.decisionVerifier = new (_DecisionVerifier().DecisionVerifier)(); } catch (e) { _boundedPush(this._initErrors, {module: 'decisionVerifier', error: e.message}, MAX_HISTORY_SIZE); }
+
+    try { this.daoDecision = new (_DaoDecision().DaoDecision)(); } catch (e) { _boundedPush(this._initErrors, {module: 'daoDecision', error: e.message}, MAX_HISTORY_SIZE); }
+    try { this.uncertaintyQuantifier = new (_UncertaintyQuantifier().UncertaintyQuantifier)(); } catch (e) { _boundedPush(this._initErrors, {module: 'uncertaintyQuantifier', error: e.message}, MAX_HISTORY_SIZE); }
+    try { this.priorityGuardian = new (_PriorityGuardian().PriorityGuardian)(); } catch (e) { _boundedPush(this._initErrors, {module: 'priorityGuardian', error: e.message}, MAX_HISTORY_SIZE); }
+    try { this.progressJudgment = new (_ProgressJudgment().ProgressJudgment)(); } catch (e) { _boundedPush(this._initErrors, {module: 'progressJudgment', error: e.message}, MAX_HISTORY_SIZE); }
 
     // ★ 深层推理 + 公正决策（拆分自原 heartflow.js）
 
