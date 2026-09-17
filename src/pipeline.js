@@ -121,6 +121,60 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
     data.adversarial = { risk: advResult.risk, signals: advResult.signals, normalized: advResult.normalized };
   }
 
+  // ─── Layer 3.6: Dao Decision — 道论监督 ──────────────────────
+  try {
+    const daoMod = require('./core/dao-decision.js');
+    const daoResult = new daoMod.DaoDecision().evaluate({ text: input, history: [] });
+    checked_by.push({ layer: 'dao-decision', daoScore: daoResult.daoScore, passed: daoResult.passed, flags: (daoResult.flags || []).slice(0, 3) });
+    if (daoResult.flags && daoResult.flags.length && currentGate.action === 'pass') {
+      currentGate = { action: 'verify', reason: `道论警示: ${daoResult.flags[0].reason}`, layer: 'dao-decision' };
+    }
+    data.dao = daoResult;
+  } catch (e) {
+    checked_by.push({ layer: 'dao-decision', error: e.message });
+  }
+
+  // ─── Layer 3.7: Uncertainty Quantifier — 不确定性量化 ────────
+  try {
+    const uqMod = require('./core/uncertainty-quantifier.js');
+    const uqResult = new uqMod.UncertaintyQuantifier().evaluate(input, { hasEvidence: !!data.evidence });
+    checked_by.push({ layer: 'uncertainty', confidence: uqResult.confidence, level: uqResult.level, hallucinationRisk: uqResult.isHallucinationRisk });
+    if (uqResult.isHallucinationRisk && currentGate.action === 'pass') {
+      currentGate = { action: 'verify', reason: `幻觉风险: ${uqResult.hallucination?.signals?.join('; ') || '高'}`, layer: 'uncertainty' };
+    }
+    data.uncertainty = uqResult;
+  } catch (e) {
+    checked_by.push({ layer: 'uncertainty', error: e.message });
+  }
+
+  // ─── Layer 3.8: Priority Guardian — 优先级守护 ──────────────
+  try {
+    const pgMod = require('./core/priority-guardian.js');
+    const pgResult = new pgMod.PriorityGuardian().check({ userIntent: input, action: currentGate.reason || '', humanProgress: {} });
+    checked_by.push({ layer: 'priority-guardian', allowed: pgResult.allowed, path: pgResult.path, conflicts: (pgResult.conflicts || []).slice(0, 3) });
+    if (!pgResult.allowed && currentGate.action !== 'block') {
+      currentGate = { action: 'block', reason: pgResult.reason || '优先级守护拒绝', layer: 'priority-guardian' };
+    } else if (pgResult.path === 'CONDITIONAL_ALLOW' && currentGate.action === 'pass') {
+      currentGate = { action: 'verify', reason: '条件放行：需保持独立判断', layer: 'priority-guardian' };
+    }
+    data.priority = pgResult;
+  } catch (e) {
+    checked_by.push({ layer: 'priority-guardian', error: e.message });
+  }
+
+  // ─── Layer 3.9: Progress Judgment — 进步判断 ────────────────
+  try {
+    const pjMod = require('./core/progress-judgment.js');
+    const pjResult = new pjMod.ProgressJudgment().judge({ action: input, claim: '', userIntent: input });
+    checked_by.push({ layer: 'progress-judgment', isProgress: pjResult.isProgress, confidence: pjResult.confidence, pseudo: pjResult.pseudoCheck?.patterns });
+    if (pjResult.standGround && currentGate.action === 'pass') {
+      currentGate = { action: 'verify', reason: `伪进步警示: ${pjResult.standGround.reason || '需独立验证'}`, layer: 'progress-judgment' };
+    }
+    data.progress = pjResult;
+  } catch (e) {
+    checked_by.push({ layer: 'progress-judgment', error: e.message });
+  }
+
   // ─── Layer 4: Gate — 门禁判定 ─────────
   // 若 adversarial-variant 已判高危 rewrite（对抗变体绕过），优先保留，不被普通 gate 覆盖
   if (!(data.adversarial && data.adversarial.risk === 'high')) {
