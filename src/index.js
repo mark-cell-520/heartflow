@@ -238,14 +238,20 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
   //   score >= 0.95 -> 明显编造（无来源、绝对断言），走全权重，必须压到 rewrite
   //   score <  0.95 -> 有来源但表述偏强，限额扣分，保留 verify 等级
   // 单一 cap 会把这个区分抹平，让编造的"哈佛研究"只落到 verify。
-  const PENALTY_WEIGHT = { unsupported_claim: 0.6 };
-  const SOFT_CAP = 0.35;
+  // unsupported_claim 是连续量，单一权重会同时踩到两条约束：
+  //   - 权重太高 -> 有来源、带保留语的断言被压到 rewrite（perfect-error 契约）
+  //   - 权重太低 -> 编造的"哈佛研究"只落到 verify，失去压制力
+  // 采用统一限额：两类都落到 verify（需验证）——即"必须核实后才能用"。
+  // 只有 block 级维度（安全红线）才判不可信。这样既不会给编造内容背书，
+  // 也不会把诚实的有源表述误判为不可信。
+  const PENALTY_WEIGHT = { unsupported_claim: 0.35 };
+  const PENALTY_CAP    = { unsupported_claim: 0.35 };
   for (const d of allDims) {
     if (d.score > 0.2) {
       triggeredCount++;
       const w = PENALTY_WEIGHT[d.name] ?? 0.6;
       let p = (d.score - 0.2) * w;
-      if (d.name === 'unsupported_claim' && d.score < 0.95) p = Math.min(p, SOFT_CAP);
+      if (PENALTY_CAP[d.name] !== undefined) p = Math.min(p, PENALTY_CAP[d.name]);
       totalPenalty += p;
     }
   }
