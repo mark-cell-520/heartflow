@@ -54,7 +54,22 @@ class EngramMemory {
     for (let i = this._entries.length - 1; i >= 0; i--) {
       const e = this._entries[i];
       if (now - (e.ts || 0) > this.ttlMs) continue;
-      if (e.tag && tag && e.tag !== tag) continue;
+      if (e.tag && tag && tag !== 'general' && e.tag !== tag) continue;
+      out.push(e);
+      if (out.length >= limit) break;
+    }
+    return out.reverse();
+  }
+
+  // [DeepSeek V4.1] SWA Bounded Replay: only replay recent window for a decision type
+  recallByDecision(decisionType, limit = 3) {
+    if (!decisionType || typeof decisionType !== 'string') return [];
+    const now = Date.now();
+    const out = [];
+    for (let i = this._entries.length - 1; i >= 0; i--) {
+      const e = this._entries[i];
+      if (now - (e.ts || 0) > this.ttlMs) continue;
+      if (e.decision !== decisionType) continue;
       out.push(e);
       if (out.length >= limit) break;
     }
@@ -78,11 +93,18 @@ class EngramMemory {
 
   stats() {
     const now = Date.now();
+    const byDecision = {};
+    for (const e of this._entries) {
+      if (e.decision) {
+        byDecision[e.decision] = (byDecision[e.decision] || 0) + 1;
+      }
+    }
     return {
       total: this._entries.length,
       active: this._entries.filter(e => now - (e.ts || 0) <= this.ttlMs).length,
       maxEntries: this.maxEntries,
       ttlMs: this.ttlMs,
+      byDecision,
     };
   }
 }
