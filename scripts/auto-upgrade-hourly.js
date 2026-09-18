@@ -65,6 +65,19 @@ function applyVersionBump(newVersion) {
   writeJson(PACKAGE_JSON, pkg);
 }
 
+function revertVersionBump(originalVersion) {
+  applyVersionBump(originalVersion);
+}
+
+function gitResetHard() {
+  try {
+    execSync('git reset --hard HEAD', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
 // ─── 论文/资料搜索：生成候选升级点 ─────────────────────────────────────────
 
 function searchUpgradeCandidates() {
@@ -230,6 +243,15 @@ async function main() {
     entry.applied = applied.length;
     entry.changed = changed;
 
+    // 没有真实变更就不升级版本，不提交
+    if (!changed) {
+      entry.status = 'success';
+      entry.finishedAt = now();
+      appendLog(entry);
+      console.log(`[auto-upgrade] no material change, skip version bump and commit`);
+      return;
+    }
+
     applyVersionBump(newVersion);
 
     entry.phase = 'test';
@@ -237,11 +259,14 @@ async function main() {
     entry.tests = { ok: testResult.ok, parsed: testResult.parsed };
 
     if (!testResult.ok) {
+      // 回滚版本和工作区
+      revertVersionBump(currentVersion);
+      gitResetHard();
       entry.status = 'failed';
       entry.error = 'new test failures detected';
       entry.testOutput = testResult.output.slice(-2000);
       appendLog(entry);
-      console.log('[auto-upgrade] new test failures detected, abort commit/push');
+      console.log('[auto-upgrade] new test failures detected, rollback version and workdir');
       console.log('[auto-upgrade] new failures:', testResult.parsed.newFailures);
       process.exit(1);
     }
@@ -251,10 +276,12 @@ async function main() {
     entry.git = gitResult;
 
     if (!gitResult.ok) {
+      // 推送失败也回滚版本，避免版本号上升但远程没有对应提交
+      revertVersionBump(currentVersion);
       entry.status = 'failed';
       entry.error = 'git push failed';
       appendLog(entry);
-      console.log('[auto-upgrade] git push failed:', gitResult.error);
+      console.log('[auto-upgrade] git push failed, rollback version:', gitResult.error);
       process.exit(1);
     }
 
