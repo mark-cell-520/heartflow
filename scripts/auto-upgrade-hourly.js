@@ -405,7 +405,7 @@ function runTests() {
       cwd: ROOT,
       encoding: 'utf8',
       stdio: 'pipe',
-      timeout: 300000,
+      timeout: 120000,
     });
     return { ok: true, output: out, parsed: { ok: true, passed: 0, failed: 0, allowedFailures: 0, newFailures: 0 } };
   } catch (e) {

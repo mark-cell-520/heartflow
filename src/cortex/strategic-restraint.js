@@ -363,5 +363,5 @@ class StrategicRestraint {
     return [...new Set(results.filter(r => r.length >= 2))];
   }
 }
-
+// [auto-upgrade] free-will candidate from research: consider responsibility-aware restraint heuristics
 module.exports = { StrategicRestraint };

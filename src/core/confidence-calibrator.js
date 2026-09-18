@@ -76,7 +76,7 @@ class ConfidenceCalibrator {
 
     this._load();
     // [v5.14.1] 共享认知桥接
-    this._bridge = (typeof globalThis !== 'undefined' && globalThis.getCognitiveBridge) ? globalThis.getCognitiveBridge() : null;
+    this._bridge = (typeof globalThis !== 'undefined' && globalThis.getCognitiveBridge) ? globalThis.getCognitiveBridge() : (() => { try { return require('../formula/cognitive-bridge.js').getCognitiveBridge(); } catch (e) { return null; } })();
   }
 
   /**
