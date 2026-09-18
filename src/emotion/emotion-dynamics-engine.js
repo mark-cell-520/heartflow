@@ -463,5 +463,5 @@ class EmotionDynamicsEngine {
     };
   }
 }
-
+// [auto-upgrade] emotion-regulation candidate from research: consider affective-state gating before high-stakes output
 module.exports = { EmotionDynamicsEngine };
