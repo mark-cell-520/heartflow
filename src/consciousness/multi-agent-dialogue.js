@@ -254,5 +254,5 @@ class MultiAgentDialogue {
     }
   }
 }
-
+// [auto-upgrade] tool-grounding candidate from research: consider grounded tool verification before execution
 module.exports = { MultiAgentDialogue, VERSION };
