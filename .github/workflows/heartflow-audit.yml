@@ -31,7 +31,7 @@ jobs:
 
       - name: Run HeartFlow audit
         id: audit
-        run: node .github/audit-runner.js
+        run: bash .github/run-audit.sh
 
       - name: Upload report
         if: always()
