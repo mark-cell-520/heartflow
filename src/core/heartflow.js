@@ -4362,9 +4362,16 @@ class HeartFlow {
     if (!this.started) throw new Error('HeartFlow not started');
     if (!input) return { error: 'input is required' };
 
+    const effort = this._normalizeEffort(opts?.effort);
+    const effortMode = effort <= 40 ? 'low' : effort <= 75 ? 'high' : 'max';
+
     // 跨session学习：如上次session经验不好则本次自动提升深度
     if (this._bootDepth && (!depth || depth < this._bootDepth)) {
       depth = this._bootDepth;
+    }
+
+    if (effortMode === 'low') {
+      depth = Math.min(depth || 1, 2);
     }
 
     // ─── 前置自我反馈：检查上一次 think 是否产生行为建议 ────────
@@ -4920,6 +4927,8 @@ class HeartFlow {
     }
   } catch (_) { /* decision execution 不阻断主链路 */ }
 
+  result._reasoningEffort = effort;
+  result._reasoningEffortMode = effortMode;
   return result;
   }
 
@@ -4929,6 +4938,14 @@ class HeartFlow {
 
   async thinkDeep(input) {
     return this.think(input, _ThoughtChain().REASONING_DEPTH.COMPREHENSIVE);
+  }
+
+  _normalizeEffort(raw) {
+    if (typeof raw === 'number' && Number.isFinite(raw)) {
+      const clamped = Math.max(1, Math.min(100, Math.round(raw)));
+      return clamped;
+    }
+    return 50;
   }
 
   // [v6.0.71] 优雅关闭：保存记忆并停止后台任务
