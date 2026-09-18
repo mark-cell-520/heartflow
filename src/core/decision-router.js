@@ -1,4 +1,5 @@
 // [v6.0.71] 常量已提取到 decision-router-config.js
+const { DecisionDomainClassifier, FIELD } = require('./decision-domain-classifier.js');
 const { VERSION, FIELD_WEIGHTS, SCENE_WEIGHTS, FLIP_THRESHOLDS, MODEL_PROFILES, DEFAULT_PROFILE, DECISION, DECISION_PRIORITY } = require('./decision-router-config.js');
 
 class DecisionRouter {
@@ -58,6 +59,9 @@ class DecisionRouter {
 
     };
 
+    this._domainClassifier = new DecisionDomainClassifier();
+    this._domainHint = options.domainHint || null;
+    this._domainFallbackEnabled = true;
 
 
     this._thresholds = {
@@ -1867,7 +1871,7 @@ class DecisionRouter {
 
    */
 
-  evaluate(result, source = 'unknown') {
+  evaluate(result, source = 'unknown', input = '', domainHint = null) {
 
     this._stats.totalEvaluations++;
 
@@ -1943,15 +1947,35 @@ class DecisionRouter {
 
 
 
-    // 找到所有匹配的规则
+    // ─── v6.7.70: Hierarchical Sparse Indexer — 3-level domain filtering ──
+    let domainCtx = null;
+    if (this._domainClassifier) {
+      const hint = domainHint || this._domainHint || null;
+      domainCtx = this._domainClassifier.classify(input || '', result);
+      if (hint) {
+        domainCtx.primary = hint;
+        domainCtx.candidates = [hint, ...(domainCtx.candidates || [])];
+        domainCtx.confidence = Math.max(domainCtx.confidence || 0, 0.85);
+      }
+      const matchedRules = this._rules.filter(rule => {
+        if (!domainCtx.primary) return true;
+        const ruleDomain = rule.domain || null;
+        if (!ruleDomain) return true;
+        return ruleDomain === domainCtx.primary;
+      });
+      if (matchedRules.length > 0) {
+        this._stats.domainFilteredCount = (this._stats.domainFilteredCount || 0) + (this._rules.length - matchedRules.length);
+      }
+      this._activeRulesForEval = matchedRules.length > 0 ? matchedRules : this._rules;
+    } else {
+      this._activeRulesForEval = this._rules;
+    }
 
     const matches = [];
-
     const now = Date.now();
+    const activeRules = this._activeRulesForEval || this._rules;
 
-
-
-    for (const rule of this._rules) {
+    for (const rule of activeRules) {
 
       try {
 
@@ -2080,6 +2104,8 @@ class DecisionRouter {
         rules: [],
 
         field: fieldData,
+        domain: domainCtx ? { primary: domainCtx.primary, confidence: domainCtx.confidence } : null,
+        sparseFiltered: this._stats.domainFilteredCount || 0,
 
       };
 
@@ -2366,6 +2392,8 @@ class DecisionRouter {
       rules: matches.slice(0, 5),
 
       field: fieldData,
+        domain: domainCtx ? { primary: domainCtx.primary, confidence: domainCtx.confidence } : null,
+        sparseFiltered: this._stats.domainFilteredCount || 0,
 
     };
 
