@@ -1,3 +1,25 @@
+## [6.7.69] - 2026-09-18
+
+### Added
+- **Reasoning effort control**: `think(input, { effort })` with 1-100 scalar, mapped to low/high/max modes
+- **Sparse module activation**: tier1-tier4 module activation based on effort, reducing inactive module overhead
+- **Discriminative result cache**: sha256-keyed result cache with TTL by effort mode, FP4-style compressed fields
+- **Async supervision layer**: critical supervision (dao/uncertainty) runs synchronously, non-critical (priority/progress) runs via setImmediate
+- **Autonomous decision execution**: engine self-decides whether to execute decisions based on confidence, historical success rate, stakes, and input length
+- **Decision consequence tracking**: `_trackDecisionConsequence` updates `_decisionSuccessRate` and `_decisionTypeStats` after each execution
+- **Engram conditional memory**: sparse task-conditioned recall with TTL, persists to `data/engram-index.json`
+- **SWA bounded replay**: `recallByDecision(decisionType, limit)` replays only recent relevant memory window
+- **Per-decision-type stats**: `_decisionTypeStats` tracks success rate per decision type for bounded replay
+- **MCP tools**: `heartflow_modules_status`, `heartflow_cache_stats`, `heartflow_decision_history`
+
+### Changed
+- `_autoDecideExecution` now uses per-decision-type success rate instead of global average
+- Decision history capped at 50 entries with sliding window
+- BlindSpotBreaker restored to main path with correct `process()` API
+
+### Fixed
+- behavior-tracker smoke test resets state before execution
+- async supervision block variable capture via `_sv` shared state container
 ## [6.7.24] - 2026-09-17
 
 ### Fixed

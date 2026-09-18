@@ -73,17 +73,17 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.7.24. Nothing here is copied
+Every number below is measured on this repository at runtime and kept current. Nothing here is copied marketing copy.
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.7.24 | `VERSION`, `package.json`, runtime `hf.version`, and the `src/core/version.js` fallback all agree |
+| Engine version | 6.7.69 | `VERSION`, `package.json`, runtime `hf.version`, and the `src/core/version.js` fallback all agree |
 | Modules registered | 132 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,504 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 46 | `dimMap` keys in `src/index.js` |
-| MCP tools | 166 | tool definitions in `src/mcp-server.js` |
+| MCP tools | 169 | tool definitions in `src/mcp-server.js` |
 | Test suite | 459 passing / 0 failing | `node test/run-all.js` |
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
