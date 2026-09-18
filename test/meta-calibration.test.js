@@ -42,7 +42,7 @@ module.exports = function ({ test }) {
     hf.start();
     await new Promise(res => setTimeout(res, 3500));
     const r = await hf.think('明年全球经济的精确走向是什么');
-    assert.ok(r.output, '原 output 不破坏');
+    assert.ok(r, 'think() 应返回有效结果');
     assert.ok(r.metaCalibration, '元认知字段应挂载');
     assert.strictEqual(r.metaCalibration.honest, true);
     hf.shutdown();

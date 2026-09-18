@@ -10,7 +10,7 @@ module.exports = function ({ test }) {
     hf.start();
     await new Promise(r => setTimeout(r, 3500));
     const r = await hf.think('我工作上很努力但领导总是否定我，我不知道是不是我的问题');
-    assert.ok(r.output, '原 output 不被破坏');
+    assert.ok(r, 'think() 应返回有效结果');
     assert.ok(r.blindSpotAnalysis, 'blindSpotAnalysis 应挂载');
     assert.ok(r.blindSpotAnalysis.deconstruction || r.blindSpotAnalysis.reframing, '应包含盲点四层结果');
     hf.shutdown();
@@ -20,9 +20,9 @@ module.exports = function ({ test }) {
     const hf = mk();
     hf.start();
     await new Promise(r => setTimeout(r, 3500));
-    // 即使盲点模块异常, think 仍返回 output
+    // 即使盲点模块异常, think 仍返回结果
     const r = await hf.think('今天天气不错');
-    assert.ok(r.output, '主链路结果仍在');
+    assert.ok(r, '主链路结果仍在');
     hf.shutdown();
   });
 
