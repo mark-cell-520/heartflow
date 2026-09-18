@@ -145,7 +145,8 @@ function checkAutoRules(text) {
   const triggered = [];
 
   for (const rule of existing.rules) {
-    for (const trigger of rule.triggers) {
+    const triggers = Array.isArray(rule.triggers) ? rule.triggers : [];
+    for (const trigger of triggers) {
       if (text.includes(trigger)) {
         triggered.push({
           rule: rule.name,

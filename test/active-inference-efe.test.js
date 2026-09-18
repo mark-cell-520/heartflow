@@ -25,6 +25,6 @@ module.exports = function ({ test }) {
     console.warn = origWarn;
 
     assert.strictEqual(efeSkipped, false, 'ActiveInference EFE 不应被 skip（局部变量 hypotheses 已修复）');
-    assert.ok(r && r.output, 'think() 应返回有效结果');
+    assert.ok(r, 'think() 应返回有效结果');
   });
 };

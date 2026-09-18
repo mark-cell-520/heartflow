@@ -29,8 +29,9 @@ module.exports = function ({ test, assertTrue, assertEqual, assertDefined }) {
   test('mcp server: handleAITelling + heartflow_ai_writing_tell 已接线', () => {
     const mcpSrc = fs.readFileSync(path.join(HF_DIR, 'src', 'mcp-server.js'), 'utf8');
     assertTrue(mcpSrc.includes('function handleAITelling'), 'handler function missing');
-    assertTrue(mcpSrc.includes("name: 'heartflow_ai_writing_tell'"), 'TOOL definition missing');
     assertTrue(mcpSrc.includes('heartflow_ai_writing_tell: handleAITelling'), 'handler mapping missing');
+    const toolsSrc = fs.readFileSync(path.join(HF_DIR, 'src', 'mcp', 'tools-registry.js'), 'utf8');
+    assertTrue(toolsSrc.includes("name: 'heartflow_ai_writing_tell'"), 'TOOL definition missing');
   });
 
   test('discriminate: ai_writing_tell 维度出现在 findings', () => {

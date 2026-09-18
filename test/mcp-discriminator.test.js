@@ -142,9 +142,10 @@ module.exports = function ({ test, assertEqual, assertTrue, assertDefined }) {
 
   test('MCP TOOLS count increased with discriminator additions', () => {
     const mcpSrc = fs.readFileSync(path.join(HF_DIR, 'src', 'mcp-server.js'), 'utf8');
-    // Count tool definitions (name: 'heartflow_*' occurrences)
-    const matches = mcpSrc.match(/name:\s*'heartflow_\w+'/g) || [];
+    // Count tool definitions (heartflow_*: handler occurrences)
+    const matches = mcpSrc.match(/heartflow_[a-z_]+:/g) || [];
+    const unique = new Set(matches.map(s => s.replace(':', '')));
     // Should be 25+ original + 5 new = 30+
-    assertTrue(matches.length >= 25, `Only ${matches.length} tools defined`);
+    assertTrue(unique.size >= 25, `Only ${unique.size} tools defined`);
   });
 };
