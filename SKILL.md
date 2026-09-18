@@ -5,8 +5,13 @@ version: "6.7.69"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  it reaches a human. 46 discrimination dimensions x 9-layer pipeline x 132 modules x
-  166 MCP tools. Zero LLM dependency.
+  it reaches a human. 46 discrimination dimensions × 9-layer pipeline × 132 modules ×
+  169 MCP tools. Zero LLM dependency.
+
+  Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
+  discriminative result cache, async supervision layer, autonomous decision execution
+  with consequence tracking, Engram conditional memory, SWA bounded replay, and
+  hierarchical sparse decision routing.
 
   Use this skill when you need to:
   - judge whether AI output is trustworthy (hallucination / overconfidence /
@@ -73,23 +78,64 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below is measured on this repository at runtime and kept current. Nothing here is copied marketing copy.
+Every number below was measured on this repository at v6.7.69. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.7.69 | `VERSION`, `package.json`, runtime `hf.version`, and the `src/core/version.js` fallback all agree |
+| Engine version | 6.7.69 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 132 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,504 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 46 | `dimMap` keys in `src/index.js` |
-| MCP tools | 169 | tool definitions in `src/mcp-server.js` |
-| Test suite | 459 passing / 0 failing | `node test/run-all.js` |
+| MCP tools | 169 | tool definitions exposed via `tools/list` |
+| Test suite | 547 passing / 0 failing | `node test/run-all.js` |
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
 Dimensions are grouped by the action they can trigger: **5 can `block`**, **7 can force
 a `rewrite`**, **24 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
+
+---
+
+## Upgraded capabilities (v6.7.69)
+
+**Reasoning effort control**
+`think(input, { effort })` accepts a 1-100 scalar and maps it to low / high / max modes.
+Low effort uses minimal supervision; max effort activates all modules and async
+supervision.
+
+**Sparse module activation**
+Modules are registered in tiers 1-4. At low effort only tier 1 modules run; higher
+effort loads deeper tiers. This reduces inactive overhead without breaking defaults.
+
+**Discriminative result cache**
+`think()` results are cached by input fingerprint with TTL by effort mode. Repeated
+identical checks return instantly with a `fromCache` flag.
+
+**Async supervision layer**
+Critical supervision paths run synchronously (dao-decision, uncertainty-quantifier).
+Non-critical supervision paths run via `setImmediate` (priority-guardian,
+progress-judgment), keeping the main path fast.
+
+**Autonomous decision execution**
+The engine can self-execute decisions. `_autoDecideExecution()` scores confidence,
+historical success rate, stakes, and input length. High scores apply automatically;
+low scores degrade to advice. `_trackDecisionConsequence()` updates success-rate
+stats after each execution.
+
+**Engram conditional memory**
+Sparse task-conditioned recall with TTL, persisted to `data/engram-index.json`.
+Supports `store`, `recall`, `recallByDecision`, and `sparseAccess`.
+
+**SWA bounded replay**
+Decision memory is replayed within a bounded recent window. `recallByDecision(type,
+limit)` replays only relevant recent memory, preventing stale advice.
+
+**Hierarchical sparse decision routing**
+`DecisionRouter.evaluate()` now accepts `input` and `domainHint`. A 3-level domain
+classifier narrows rule matching by domain (emotion / cognition / behavior / safety),
+falling back to full rules when confidence is low.
 
 ---
 
@@ -127,6 +173,22 @@ if (claim.gate.action === 'verify') {
 }
 ```
 
+### Reasoning effort and autonomous decisions
+
+```javascript
+const hf = require('./src/core/heartflow.js');
+const engine = new hf.HeartFlow({ dataDir: './data', silent: true });
+engine.start();
+
+// Low effort: fast, minimal supervision
+const quick = await engine.think('Is this safe?', undefined, { effort: 20 });
+
+// Max effort: all modules, async supervision, autonomous decisions allowed
+const deep = await engine.think('Should we publish this claim?', undefined, { effort: 90 });
+console.log(deep._reasoningEffortMode); // 'max'
+console.log(deep._decisionApplied);      // { applied: true/false, decision: {...}, auto: true/false }
+```
+
 ### Return value
 
 ```javascript
@@ -143,7 +205,14 @@ if (claim.gate.action === 'verify') {
   checked_by: [
     { layer: 'scope-check', action: 'pass' },
     { layer: 'discriminate', score: 0.56 }
-  ]
+  ],
+  // v6.7.69+ fields
+  _reasoningEffort: 75,
+  _reasoningEffortMode: 'high',
+  _decision: { type, confidence, rationale, ruleId, source, timestamp },
+  _decisionApplied: { applied, decision, auto, reason },
+  _fromCache: false,
+  _engramRecall: null
 }
 ```
 
@@ -203,6 +272,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 - **output-gate** intercepts exaggeration
 - **frame-check** intercepts narrative closure
 - **doubt-engine** asks: do I actually know this? Is it symmetric? Is it defensive?
+- **autonomous decision audit** logs every self-executed decision with consequence tracking
 
 > The most valuable sentence a machine can produce is "I am not sure", or "no".
 
@@ -215,6 +285,13 @@ node src/mcp-server.js --port 8588
 # Connect from Hermes:
 hermes mcp add heartflow --url http://localhost:8588/mcp
 ```
+
+Available tools include:
+- `heartflow_think` — full discrimination with effort control
+- `heartflow_think_fast` — low-effort fast path
+- `heartflow_modules_status` — sparse mode, active tier, module counts
+- `heartflow_cache_stats` — cache hit rate and TTL breakdown
+- `heartflow_decision_history` — recent autonomous decisions and outcomes
 
 ---
 
