@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — before it reaches a human. **Zero LLM dependency.**
 
 ```
-46 discrimination dimensions  ×  9-layer pipeline  ×  132 modules  ×  166 MCP tools
+46 discrimination dimensions  ×  9-layer pipeline  ×  132 modules  ×  169 MCP tools
 ```
 
 ---
@@ -122,7 +122,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at v6.7.24. Not marketing copy.
+Measured on this repository at v6.7.69. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -130,7 +130,7 @@ Measured on this repository at v6.7.24. Not marketing copy.
 | Module init errors | 0 |
 | Dispatch routes | 1,504 |
 | Discrimination dimensions | 46 |
-| MCP tools | 166 |
+| MCP tools | 169 |
 | Test suite | 459 passing / 0 failing |
 | Runtime dependencies | 0 |
 
@@ -189,6 +189,7 @@ Known limits:
 ---
 
 ## Version history
+| 6.7.69 | 2026-09-18 | DeepSeek V4.1 alignment: reasoning effort control, sparse module activation, discriminative result cache, async supervision layer, autonomous decision execution with consequence tracking, Engram conditional memory, SWA bounded replay, per-decision-type stats |
 
 | Version | Date | Change |
 |---------|------|--------|
