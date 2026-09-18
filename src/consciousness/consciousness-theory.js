@@ -64,5 +64,5 @@ const ConsciousnessTheory = {
         level: (alpha * iit + (1 - alpha) * gwt) > 0.6 ? '高阶意识' : (alpha * iit + (1 - alpha) * gwt) > 0.3 ? '中等意识' : '基础意识' },
     };
   },
-};
+};// [auto-upgrade] theory-of-mind candidate from research: consider ToM grounding from psychology/philosophy sources
 module.exports = ConsciousnessTheory;
