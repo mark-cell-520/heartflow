@@ -728,6 +728,56 @@ class DecisionRouter {
 
       },
 
+      {
+        id: 'agi-policy-shift',
+        domain: 'safety',
+        match: (r) => r.agiPolicyRisk === true || r.source === 'agi-policy-alert',
+        decision: DECISION.TURN,
+        confidence: (r) => 0.85,
+        rationale: (r) => 'AGI 治理/政策环境发生转向，需要调整产品方向',
+        fallback: DECISION.PAUSE,
+      },
+
+      {
+        id: 'security-breach',
+        domain: 'safety',
+        match: (r) => r.securityBreach === true || r.severity === 'CRITICAL',
+        decision: DECISION.HEAL,
+        confidence: (r) => 0.95,
+        rationale: (r) => '安全漏洞/仓库被攻破，立即修复',
+        fallback: DECISION.TURN,
+      },
+
+      {
+        id: 'smart-home-dependency',
+        domain: 'behavior',
+        match: (r) => r.smartHomeDependency === true || r.automationRisk === true,
+        decision: DECISION.PAUSE,
+        confidence: (r) => 0.75,
+        rationale: (r) => '智能家居/AI 依赖加深，需评估失控风险',
+        fallback: DECISION.HOLD,
+      },
+
+      {
+        id: 'data-labor-exploitation',
+        domain: 'ethics',
+        match: (r) => r.dataLaborExploitation === true || r.ethicsViolation === true,
+        decision: DECISION.HEAL,
+        confidence: (r) => 0.8,
+        rationale: (r) => '数据抓采/劳动力伦理争议，需修复数据策略',
+        fallback: DECISION.TURN,
+      },
+
+      {
+        id: 'build-philosophy-violation',
+        domain: 'cognition',
+        match: (r) => r.buildPhilosophyViolation === true || r.productPhilosophyRisk === true,
+        decision: DECISION.TURN,
+        confidence: (r) => 0.7,
+        rationale: (r) => '偏离产品哲学，需重新评估功能边界',
+        fallback: DECISION.HOLD,
+      },
+
     ];
 
 
