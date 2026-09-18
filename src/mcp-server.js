@@ -2024,6 +2024,44 @@ function handleDecisionRouterStats(args) {
 
 }
 
+function handleModulesStatus(args) {
+
+  const hf = (typeof safeDispatch === 'function' && safeDispatch.length ? safeDispatch('heartflow.getStatus') : null) || globalThis.heartflow || null;
+
+  if (!hf) {
+
+    return { sparse_mode: false, reason: 'heartflow_instance_not_found' };
+
+  }
+
+  const activeModules = hf._modules ? Object.keys(hf._modules).sort() : [];
+
+  const sparse = {
+
+    sparse_mode: !!hf._sparseMode,
+
+    effort: hf._sparseEffort || null,
+
+    mode: hf._reasoningEffortMode || null,
+
+    activeModules,
+
+    skippedModules: [],
+
+    executionThreshold: 76,
+
+  };
+
+  if (hf._activeModules && typeof hf._activeModules.has === 'function') {
+
+    sparse.skippedModules = activeModules.filter(m => !hf._activeModules.has(m));
+
+  }
+
+  return sparse;
+
+}
+
 
 
 // ─── v3.1.0 — 新增工具 ─────────────────────────────────────────
@@ -2810,6 +2848,8 @@ const HANDLERS = {
   heartflow_decision_router: handleDecisionRouter,
 
   heartflow_decision_router_stats: handleDecisionRouterStats,
+
+  heartflow_modules_status: handleModulesStatus,
 
   heartflow_think_fast: handleThinkFast,
 
