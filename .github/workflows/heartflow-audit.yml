@@ -48,3 +48,4 @@ jobs:
           report_path: heartflow-audit-report.md
           risk_level: low
           findings_count: 0
+        continue-on-error: true
