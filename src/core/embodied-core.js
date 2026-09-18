@@ -869,5 +869,5 @@ class EmbodiedCore {
     return { success: true };
   }
 }
-
+// [auto-upgrade] embodied-cognition candidate from research: consider situated-context weighting for grounding
 module.exports = { EmbodiedCore, ExecutionStatus, ErrorCategory, RetryStrategy, classifyError, selectRetryStrategy };
