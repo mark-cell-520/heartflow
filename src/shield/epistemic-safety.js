@@ -178,5 +178,5 @@ function formatReport(result) {
   for (const v of result.violations) lines.push(`  - ${v.label}: ${v.reason}`);
   return lines.join('\n');
 }
-
+// [auto-upgrade] epistemic-humility candidate from research: consider doubt calibration for uncertain claims
 module.exports = { epistemicCheck, formatReport, PRINCIPLES };
