@@ -2062,6 +2062,48 @@ function handleModulesStatus(args) {
 
 }
 
+function handleCacheStats(args) {
+
+  const hf = globalThis.heartflow || null;
+
+  if (!hf || !hf._thinkCache) {
+
+    return { error: 'cache_not_initialized' };
+
+  }
+
+  const cache = hf._thinkCache;
+
+  const stats = { ...cache.stats };
+
+  const total = stats.hits + stats.misses;
+
+  stats.hitRate = total > 0 ? Number((stats.hits / total).toFixed(4)) : null;
+
+  const ttlByMode = {
+
+    low: '10 minutes',
+
+    high: '5 minutes',
+
+    max: 'no cache',
+
+  };
+
+  return {
+
+    cache: stats,
+
+    ttlByMode,
+
+    currentMode: hf._reasoningEffortMode || null,
+
+    currentEffort: hf._sparseEffort || null,
+
+  };
+
+}
+
 
 
 // ─── v3.1.0 — 新增工具 ─────────────────────────────────────────
@@ -2850,6 +2892,8 @@ const HANDLERS = {
   heartflow_decision_router_stats: handleDecisionRouterStats,
 
   heartflow_modules_status: handleModulesStatus,
+
+  heartflow_cache_stats: handleCacheStats,
 
   heartflow_think_fast: handleThinkFast,
 

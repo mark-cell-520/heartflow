@@ -32,6 +32,16 @@ const TOOLS = [
 
   {
 
+    name: 'heartflow_cache_stats',
+
+    description: '判别结果缓存统计：返回缓存大小、命中次数、未命中次数、命中率，以及当前 effort 模式的 TTL 设置。',
+
+    inputSchema: { type: 'object', properties: {} }
+
+  },
+
+  {
+
     name: 'heartflow_dream',
 
     description: '梦境升华（炼金）：从多个记忆碎片中提取共同模式，熔炼为新的认知洞察。不是叙事生成，是记忆的升华与重构。',
