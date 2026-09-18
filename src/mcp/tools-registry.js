@@ -42,6 +42,16 @@ const TOOLS = [
 
   {
 
+    name: 'heartflow_decision_history',
+
+    description: '心虫自主决策历史：返回最近决策记录、成功率、当前自动决策开关。',
+
+    inputSchema: { type: 'object', properties: { limit: { type: 'number', description: '返回条数上限（可选，默认 20）' } } }
+
+  },
+
+  {
+
     name: 'heartflow_dream',
 
     description: '梦境升华（炼金）：从多个记忆碎片中提取共同模式，熔炼为新的认知洞察。不是叙事生成，是记忆的升华与重构。',
