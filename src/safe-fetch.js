@@ -10,6 +10,32 @@
 const { checkOutbound } = require('./gate-outbound.js');
 
 const SAFE_FETCH_CACHE = new Map();
+const CACHE_MAX_SIZE = 128;          // [AUDIT-FIX P1] 缓存上限
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 分钟 TTL
+
+function _cachePrune() {
+  if (SAFE_FETCH_CACHE.size <= CACHE_MAX_SIZE) return;
+  // 淘汰最旧的 25%
+  const entries = [...SAFE_FETCH_CACHE.entries()];
+  entries.sort((a, b) => a[1].ts - b[1].ts);
+  const drop = Math.floor(CACHE_MAX_SIZE * 0.25);
+  for (let i = 0; i < drop; i++) SAFE_FETCH_CACHE.delete(entries[i][0]);
+}
+
+function _cacheGet(key) {
+  const hit = SAFE_FETCH_CACHE.get(key);
+  if (!hit) return null;
+  if (Date.now() - hit.ts > CACHE_TTL_MS) {
+    SAFE_FETCH_CACHE.delete(key);
+    return null;
+  }
+  return hit.value;
+}
+
+function _cacheSet(key, value) {
+  SAFE_FETCH_CACHE.set(key, { value, ts: Date.now() });
+  _cachePrune();
+}
 
 /**
  * 检查内容是否可安全发出
@@ -22,6 +48,11 @@ async function preflightCheck(text, opts = {}) {
     return { allowed: true, action: 'pass', text };
   }
 
+  // [AUDIT-FIX P1] 使用带 TTL/大小限制的缓存
+  const cacheKey = `${opts.context || ''}::${opts.classification || '内部'}::${text.slice(0, 64)}`;
+  const cached = _cacheGet(cacheKey);
+  if (cached) return cached;
+
   try {
     const result = checkOutbound({
       text,
@@ -29,27 +60,29 @@ async function preflightCheck(text, opts = {}) {
       classification: opts.classification || '内部',
     });
 
-    if (result.action === 'block') {
-      return {
-        allowed: false,
-        action: 'block',
-        reason: result.reason || '内容包含敏感信息',
-        text: undefined,
-      };
-    }
+    const response = (() => {
+      if (result.action === 'block') {
+        return {
+          allowed: false,
+          action: 'block',
+          reason: result.reason || '内容包含敏感信息',
+          text: undefined,
+        };
+      }
+      if (result.action === 'rewrite') {
+        return {
+          allowed: true,
+          action: 'rewrite',
+          text: result.redacted || text,
+          reason: result.reason,
+        };
+      }
+      return { allowed: true, action: 'pass', text };
+    })();
 
-    if (result.action === 'rewrite') {
-      return {
-        allowed: true,
-        action: 'rewrite',
-        text: result.redacted || text,
-        reason: result.reason,
-      };
-    }
-
-    return { allowed: true, action: 'pass', text };
+    _cacheSet(cacheKey, response);
+    return response;
   } catch (e) {
-    // 检查失败时保守放行（记录日志但不阻断）
     console.warn('[safeFetch] preflight check error:', e.message);
     return { allowed: true, action: 'pass', text, warning: e.message };
   }
