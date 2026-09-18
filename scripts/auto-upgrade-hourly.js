@@ -127,7 +127,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /theory of mind|mentalizing|false belief/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'cognition', 'theory-of-mind.js');
+      const file = path.join(ROOT, 'src', 'consciousness', 'consciousness-theory.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] theory-of-mind candidate from research';
@@ -140,7 +140,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /self-reflection|iterative improvement|reflexion/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'cortex', 'self-reflection.js');
+      const file = path.join(ROOT, 'src', 'cortex', 'reflection-loop.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] self-reflection candidate from research';
@@ -153,7 +153,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /curiosity|intrinsic motivation|exploration bonus/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'cortex', 'curiosity.js');
+      const file = path.join(ROOT, 'src', 'emotion', 'psychology.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] curiosity candidate from research';
@@ -166,7 +166,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /continual|lifelong|catastrophic forgetting/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'cortex', 'continual-learning.js');
+      const file = path.join(ROOT, 'src', 'memory', 'agentic-memory-engine.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] continual-learning candidate from research';
@@ -179,7 +179,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /causal inference|counterfactual/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'reasoning', 'causal-reasoner.js');
+      const file = path.join(ROOT, 'src', 'reasoning', 'causal-inference.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] causal candidate from research';
@@ -192,7 +192,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /moral psychology|virtue ethics|AI alignment/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'ethics', 'moral-foundations.js');
+      const file = path.join(ROOT, 'src', 'emotion', 'engine.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] moral-philosophy candidate from research';
@@ -205,7 +205,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /embodied cognition|situated cognition/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'cognition', 'embodied-core.js');
+      const file = path.join(ROOT, 'src', 'core', 'embodied-core.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] embodied-cognition candidate from research';
@@ -218,7 +218,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /free will|determinism|moral responsibility/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'ethics', 'strategic-restraint.js');
+      const file = path.join(ROOT, 'src', 'cortex', 'strategic-restraint.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] free-will candidate from research';
@@ -231,7 +231,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /emotional regulation|affective computing/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'emotion', 'emotion-optimizer.js');
+      const file = path.join(ROOT, 'src', 'emotion', 'emotion-dynamics-engine.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] emotion-regulation candidate from research';
@@ -244,7 +244,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /LLM agent tool use grounding/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'agent', 'tool-grounding.js');
+      const file = path.join(ROOT, 'src', 'consciousness', 'multi-agent-dialogue.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] tool-grounding candidate from research';
@@ -257,7 +257,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /multi-agent coordination|debate/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'multi-agent', 'coordinator.js');
+      const file = path.join(ROOT, 'src', 'consciousness', 'multi-agent-dialogue.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] multi-agent candidate from research';
@@ -270,7 +270,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /agent memory retrieval augmented generation/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'memory', 'retrieval-augmentation.js');
+      const file = path.join(ROOT, 'src', 'memory', 'semantic-anchor.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] retrieval-augmentation candidate from research';
@@ -283,7 +283,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /planning acting LLM/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'planning', 'reactive-planner.js');
+      const file = path.join(ROOT, 'src', 'planner', 'evolutionary-search.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] planning candidate from research';
@@ -296,7 +296,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /agent safety alignment/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'safety', 'alignment-checker.js');
+      const file = path.join(ROOT, 'src', 'shield', 'safety-guardrails.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] safety-alignment candidate from research';
@@ -309,7 +309,7 @@ const MATERIALIZATION_RULES = [
   {
     match: /epistemic humility|intellectual virtue/i,
     patch: () => {
-      const file = path.join(ROOT, 'src', 'epistemology', 'intellectual-virtue.js');
+      const file = path.join(ROOT, 'src', 'shield', 'epistemic-safety.js');
       if (!fs.existsSync(file)) return false;
       let text = fs.readFileSync(file, 'utf8');
       const marker = '// [auto-upgrade] epistemic-humility candidate from research';
