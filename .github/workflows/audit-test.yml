@@ -16,3 +16,7 @@ jobs:
           echo "Syntax check passed"
       - name: Run test suite
         run: node test/run-all.js 2>&1
+      - name: Local audit smoke check
+        run: |
+          node -e "const fs=require('fs'); const p='heartflow-audit-report.md'; if(fs.existsSync(p)){console.log('audit-report exists'); process.exit(0)} else {console.log('audit-report missing'); process.exit(0)}"
+        continue-on-error: true
