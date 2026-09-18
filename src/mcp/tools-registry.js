@@ -6,7 +6,7 @@ const TOOLS = [
 
     description: '完整思维链：分类输入→路由→推理→输出。返回结构化分析结果，包含类型、置信度和思维链。',
 
-    inputSchema: { type: 'object', properties: { input: { type: 'string', description: '需要分析的输入文本' } }, required: ['input'] }
+    inputSchema: { type: 'object', properties: { input: { type: 'string', description: '需要分析的输入文本' }, effort: { type: 'number', description: '推理努力 1-100（可选），默认 50' } }, required: ['input'] }
 
   },
 

@@ -572,9 +572,11 @@ async function safeAsyncCall(fn) {
 
 async function handleThink(args) {
 
-  const { input } = args;
+  const { input, effort } = args;
 
   if (!input) throw new Error('input 是必填参数');
+
+  const normalizedEffort = typeof effort === 'number' ? Math.max(1, Math.min(100, Math.round(effort))) : null;
 
 
 
@@ -605,7 +607,7 @@ async function handleThink(args) {
 
       Promise.resolve().then(() => safeDispatch('truth.checkStatement', input)).catch(e => ({ error: e.message })),
 
-      safeAsyncCall(() => heartflow.think(input, undefined, { compact: true }))
+      safeAsyncCall(() => heartflow.think(input, undefined, { compact: true, effort: normalizedEffort || undefined }))
 
     ]);
 
@@ -876,7 +878,7 @@ async function handleThinkFast(args) {
 
   if (!input) throw new Error('input 是必填参数');
 
-  const result = await safeAsyncCall(() => heartflow.think(input, 1, { compact: true }));
+  const result = await safeAsyncCall(() => heartflow.think(input, 1, { compact: true, effort: 20 }));
 
   return { input, result: result || {}, timestamp: Date.now() };
 
