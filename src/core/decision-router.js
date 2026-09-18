@@ -1,5 +1,6 @@
 // [v6.0.71] 常量已提取到 decision-router-config.js
 const { DecisionDomainClassifier, FIELD } = require('./decision-domain-classifier.js');
+const { ConditionalExpertDispatch } = require('./conditional-expert-dispatch.js');
 const { VERSION, FIELD_WEIGHTS, SCENE_WEIGHTS, FLIP_THRESHOLDS, MODEL_PROFILES, DEFAULT_PROFILE, DECISION, DECISION_PRIORITY } = require('./decision-router-config.js');
 
 class DecisionRouter {
@@ -62,6 +63,10 @@ class DecisionRouter {
     this._domainClassifier = new DecisionDomainClassifier();
     this._domainHint = options.domainHint || null;
     this._domainFallbackEnabled = true;
+
+    // [v6.7.72] CED: 条件专家路由，根据输入复杂度动态激活规则子集
+    this._ced = new ConditionalExpertDispatch(this);
+    this._cedEnabled = options.cedEnabled !== false; // 默认开启
 
 
     this._thresholds = {
@@ -1921,7 +1926,7 @@ class DecisionRouter {
 
    */
 
-  evaluate(result, source = 'unknown', input = '', domainHint = null) {
+  evaluate(result, source = 'unknown', input = '', domainHint = null, cedHint = null) {
 
     this._stats.totalEvaluations++;
 
@@ -2021,11 +2026,28 @@ class DecisionRouter {
       this._activeRulesForEval = this._rules;
     }
 
+    // ─── v6.7.72: CED conditional expert dispatch based on input complexity ──
+    if (this._ced && this._cedEnabled && domainCtx && domainCtx.primary) {
+      const complexity = this._ced.assessComplexity(input || '', domainCtx);
+      const strategy = this._ced.decideStrategy(complexity);
+      const cedFiltered = this._ced.filterRules(activeRules, strategy);
+      if (cedFiltered.length < activeRules.length) {
+        this._stats.cedFilteredCount = (this._stats.cedFilteredCount || 0) + (activeRules.length - cedFiltered.length);
+        this._activeRulesForEval = cedFiltered;
+      } else {
+        this._activeRulesForEval = activeRules;
+      }
+      this._lastCedStrategy = strategy;
+      this._lastComplexity = complexity;
+    } else {
+      this._activeRulesForEval = activeRules;
+    }
+
     const matches = [];
     const now = Date.now();
-    const activeRules = this._activeRulesForEval || this._rules;
+    const finalRules = this._activeRulesForEval || this._rules;
 
-    for (const rule of activeRules) {
+    for (const rule of finalRules) {
 
       try {
 
@@ -2755,6 +2777,7 @@ class DecisionRouter {
 
 
   getStats() {
+    const cedStats = this._ced ? this._ced.getStats() : null;
 
     return {
 
