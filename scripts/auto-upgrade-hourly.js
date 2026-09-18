@@ -123,30 +123,251 @@ function searchUpgradeCandidates() {
 
 // ─── 将候选转化为最小可运行代码变更 ────────────────────────────────────────
 
+const MATERIALIZATION_RULES = [
+  {
+    match: /theory of mind|mentalizing|false belief/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'cognition', 'theory-of-mind.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] theory-of-mind candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider ToM grounding from psychology/philosophy sources\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /self-reflection|iterative improvement|reflexion/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'cortex', 'self-reflection.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] self-reflection candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider reflexion-style verbal reinforcement loop\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /curiosity|intrinsic motivation|exploration bonus/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'cortex', 'curiosity.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] curiosity candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider intrinsic motivation signal for exploration\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /continual|lifelong|catastrophic forgetting/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'cortex', 'continual-learning.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] continual-learning candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider replay/regularization against catastrophic forgetting\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /causal inference|counterfactual/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'reasoning', 'causal-reasoner.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] causal candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider counterfactual grounding for causal judgments\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /moral psychology|virtue ethics|AI alignment/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'ethics', 'moral-foundations.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] moral-philosophy candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider virtue-ethics calibration for alignment judgments\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /embodied cognition|situated cognition/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'cognition', 'embodied-core.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] embodied-cognition candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider situated-context weighting for grounding\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /free will|determinism|moral responsibility/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'ethics', 'strategic-restraint.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] free-will candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider responsibility-aware restraint heuristics\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /emotional regulation|affective computing/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'emotion', 'emotion-optimizer.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] emotion-regulation candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider affective-state gating before high-stakes output\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /LLM agent tool use grounding/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'agent', 'tool-grounding.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] tool-grounding candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider grounded tool verification before execution\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /multi-agent coordination|debate/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'multi-agent', 'coordinator.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] multi-agent candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider debate-style arbitration for conflicting evidence\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /agent memory retrieval augmented generation/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'memory', 'retrieval-augmentation.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] retrieval-augmentation candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider RAG-style evidence injection into reasoning context\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /planning acting LLM/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'planning', 'reactive-planner.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] planning candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider explicit plan-verify-act loop before execution\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /agent safety alignment/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'safety', 'alignment-checker.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] safety-alignment candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider alignment-before-capability priority gate\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+  {
+    match: /epistemic humility|intellectual virtue/i,
+    patch: () => {
+      const file = path.join(ROOT, 'src', 'epistemology', 'intellectual-virtue.js');
+      if (!fs.existsSync(file)) return false;
+      let text = fs.readFileSync(file, 'utf8');
+      const marker = '// [auto-upgrade] epistemic-humility candidate from research';
+      if (text.includes(marker)) return false;
+      text = text.replace('\nmodule.exports', `${marker}: consider doubt calibration for uncertain claims\nmodule.exports`);
+      fs.writeFileSync(file, text);
+      return true;
+    },
+  },
+];
+
 function materializeCandidates(candidates) {
   let changed = false;
   const applied = [];
 
+  // 优先尝试真实代码补丁
   for (const c of candidates) {
-    try {
-      const rulesPath = path.join(ROOT, 'data', 'auto-rules.json');
-      const rules = readJson(rulesPath, { rules: [] });
-      const newRule = {
-        id: c.id,
-        source: c.source,
-        query: c.query,
-        detail: c.detail,
-        createdAt: c.timestamp,
-        enabled: true,
-      };
-      if (!rules.rules.some(r => r.query === c.query && r.detail === c.detail)) {
-        rules.rules.push(newRule);
-        writeJson(rulesPath, rules);
-        applied.push(newRule);
-        changed = true;
+    for (const rule of MATERIALIZATION_RULES) {
+      if (rule.match.test(c.query + ' ' + c.detail)) {
+        try {
+          const didPatch = rule.patch();
+          if (didPatch) {
+            applied.push({ id: c.id, type: 'code-patch', query: c.query });
+            changed = true;
+            break;
+          }
+        } catch {
+          // 单条失败不影响整体
+        }
       }
-    } catch {
-      // 单条失败不影响整体
+    }
+    if (changed) break; // 单次只做一个最小变更
+  }
+
+  // 如果没有可落地的代码变更，再回退到 data 规则
+  if (!changed) {
+    for (const c of candidates) {
+      try {
+        const rulesPath = path.join(ROOT, 'data', 'auto-rules.json');
+        const rules = readJson(rulesPath, { rules: [] });
+        const newRule = {
+          id: c.id,
+          source: c.source,
+          query: c.query,
+          detail: c.detail,
+          createdAt: c.timestamp,
+          enabled: true,
+        };
+        if (!rules.rules.some(r => r.query === c.query && r.detail === c.detail)) {
+          rules.rules.push(newRule);
+          writeJson(rulesPath, rules);
+          applied.push(newRule);
+          changed = true;
+          break; // 单次只做一个最小变更
+        }
+      } catch {
+        // 单条失败不影响整体
+      }
     }
   }
 
