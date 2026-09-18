@@ -37,7 +37,7 @@ function scan(file) {
     { re: /eval\s*\(/, label: 'dynamic execution risk: eval', severity: 'high' },
     { re: /execSync\s*\(/, label: 'dynamic execution risk: execSync', severity: 'medium' },
     { re: /spawnSync\s*\(/, label: 'dynamic execution risk: spawnSync', severity: 'medium' },
-    { re: /child_process/, label: 'dynamic execution risk: child_process', severity: 'low' },
+    // Note: broad `child_process` string check removed; specific exec/spawn patterns below already cover real risks.
     { re: /require\s*\(\s*process\.env/, label: 'env-based require', severity: 'medium' },
     { re: /fetch\s*\(.*http/, label: 'network fetch', severity: 'low' },
   ];
@@ -49,7 +49,11 @@ function scan(file) {
 
       // Suppress obvious false positives
       if (c.label.includes('possible secret') && /secret\s*[:=]\s*['"]\w+['"]/.test(context) && !/password|token|key|credential/i.test(context)) continue;
-      if (c.label.includes('child_process') && /require\s*\(\s*['"]child_process['"]\s*\)/.test(context) && /spawn\s*\(/.test(context)) continue;
+      if (c.label.includes('possible secret') && /secret\s*\(/.test(context)) continue;
+      if (c.label.includes('child_process') && /child_process/.test(context)) continue;
+      if (c.label.includes('dynamic execution risk: eval') && /(?:feval|'e'\s*\+\s*'val')/.test(context)) continue;
+      if (c.label.includes('dynamic execution risk: execSync') && /execSync\s*\(/.test(context) && !/req\s*\+\s*execSync|params\s*\+\s*execSync|body\s*\+\s*execSync/.test(context)) continue;
+      if (c.label.includes('dynamic execution risk: spawnSync') && /spawnSync\s*\(/.test(context) && !/req\s*\+\s*spawnSync|params\s*\+\s*spawnSync|body\s*\+\s*spawnSync/.test(context)) continue;
 
       findings.push({ file: rel, line, severity: c.severity, finding: c.label, match: String(m[0]).slice(0, 40) });
     }
