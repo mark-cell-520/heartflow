@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
- * HeartFlow 每小时自动升级脚本
+ * HeartFlow 自动升级脚本（优化版）
  *
- * 职责：
- *  1. 搜索心理学/哲学/agent 论文/实现，提炼可落地升级点
- *  2. 将升级点转化为最小代码变更
- *  3. 版本号 +0.0.1
- *  4. 运行测试，仅新增测试失败才中止；历史已知失败不阻断
+ * 优化点：
+ *  1. 有真实代码变更才升级版本
+ *  2. 单次只做一个最小变更
+ *  3. 已知失败基线不阻断，新增失败才中止并回滚
+ *  4. 推送失败指数退避重试
+ *  5. 变更后自动校验：node --check、版本同步、git diff 记录
  */
 
 'use strict';
@@ -21,7 +22,6 @@ const VERSION_JS = path.join(ROOT, 'src/core/version.js');
 const PACKAGE_JSON = path.join(ROOT, 'package.json');
 const UPGRADE_LOG = path.join(ROOT, 'data', 'auto-upgrade-history.json');
 const UPGRADE_CANDIDATES = path.join(ROOT, 'data', 'upgrade-candidates.json');
-
 const KNOWN_FAILURES_PATH = path.join(ROOT, 'data', 'auto-upgrade-known-failures.json');
 
 function readJson(p, fallback) {
@@ -69,12 +69,31 @@ function revertVersionBump(originalVersion) {
   applyVersionBump(originalVersion);
 }
 
+// ─── Git 操作 ──────────────────────────────────────────────────────────────
+
 function gitResetHard() {
   try {
     execSync('git reset --hard HEAD', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e.message };
+  }
+}
+
+function gitStatus() {
+  try {
+    const out = execSync('git status --porcelain', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
+    return out.trim().split('\n').filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function gitDiffStat() {
+  try {
+    return execSync('git diff --cached --stat', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' }).trim();
+  } catch {
+    return '';
   }
 }
 
@@ -421,8 +440,23 @@ function gitCommitPush(message) {
   try {
     execSync('git add -A', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
     execSync(`git commit -m "${message}"`, { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
-    execSync('git push heartflow main', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', timeout: 120000 });
-    return { ok: true };
+    // 推送失败时重试，指数退避
+    let lastError = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        execSync('git push heartflow main', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', timeout: 120000 });
+        return { ok: true };
+      } catch (e) {
+        lastError = e.message;
+        if (attempt < 2) {
+          const backoff = 5000 * Math.pow(2, attempt);
+          console.log(`[auto-upgrade] push failed, retry ${attempt + 1}/3 after ${backoff}ms...`);
+          const start = Date.now();
+          while (Date.now() - start < backoff) {}
+        }
+      }
+    }
+    return { ok: false, error: lastError };
   } catch (e) {
     return { ok: false, error: e.message };
   }
@@ -442,9 +476,20 @@ async function main() {
     applied: 0,
     tests: null,
     git: null,
+    diffStat: null,
   };
 
   try {
+    // 预检：确保工作区干净
+    const dirty = gitStatus();
+    if (dirty.length > 0) {
+      entry.status = 'failed';
+      entry.error = 'dirty working tree';
+      appendLog(entry);
+      console.log('[auto-upgrade] dirty working tree, abort:', dirty.join(', '));
+      process.exit(1);
+    }
+
     const currentVersion = fs.readFileSync(VERSION_FILE, 'utf8').trim();
     entry.versionBefore = currentVersion;
     const newVersion = bumpPatch(currentVersion);
@@ -475,6 +520,34 @@ async function main() {
 
     applyVersionBump(newVersion);
 
+    // 预校验：检查语法
+    entry.phase = 'precheck';
+    const changedFiles = gitStatus();
+    const syntaxErrors = [];
+    for (const line of changedFiles) {
+      const file = line.slice(3).trim();
+      if (!file.endsWith('.js')) continue;
+      try {
+        execSync(`node --check "${file}"`, { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
+      } catch (e) {
+        syntaxErrors.push(file + ': ' + (e.stdout || e.message).split('\n')[0]);
+      }
+    }
+    if (syntaxErrors.length > 0) {
+      revertVersionBump(currentVersion);
+      gitResetHard();
+      entry.status = 'failed';
+      entry.error = 'syntax error in patched files';
+      entry.syntaxErrors = syntaxErrors;
+      appendLog(entry);
+      console.log('[auto-upgrade] syntax error, rollback:', syntaxErrors.join(', '));
+      process.exit(1);
+    }
+
+    // 记录 diff stat
+    entry.diffStat = gitDiffStat();
+
+    // 运行测试
     entry.phase = 'test';
     const testResult = runTests();
     entry.tests = { ok: testResult.ok, parsed: testResult.parsed };
@@ -510,6 +583,7 @@ async function main() {
     entry.finishedAt = now();
     appendLog(entry);
     console.log(`[auto-upgrade] success: v${currentVersion} -> v${newVersion}, ${applied.length} candidates, tests passed`);
+    console.log('[auto-upgrade] diff:', entry.diffStat);
   } catch (e) {
     entry.status = 'error';
     entry.error = e.message;
