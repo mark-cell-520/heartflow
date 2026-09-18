@@ -43,9 +43,4 @@ jobs:
 
       - name: Comment on PR
         if: github.event_name == 'pull_request'
-        uses: mark-HeartFlow/mark-heartflow-skill/.github/comment-action@main
-        with:
-          report_path: heartflow-audit-report.md
-          risk_level: low
-          findings_count: 0
-        continue-on-error: true
+        run: bash .github/pr-comment.sh "${{ github.workspace }}/heartflow-audit-report.md"
