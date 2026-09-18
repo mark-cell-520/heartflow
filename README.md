@@ -9,16 +9,8 @@ or dangerous — before it reaches a human. **Zero LLM dependency.**
 46 discrimination dimensions  ×  9-layer pipeline  ×  132 modules  ×  169 MCP tools
 ```
 
----
-
-## Why this exists
-
-Large language models are excellent at generating and weak at knowing what they do not
-know. They will state a fabricated fact with the same confidence as a verified one.
-
-HeartFlow adds the missing layer: it **judges what was already produced** and says
-"no" when something is wrong. It does not generate. It does not compete with an LLM.
-It stands between the LLM and the human.
+HeartFlow does not generate. It does not compete with an LLM. It stands between the
+LLM and the human, like a pain receptor that says "no" when something is wrong.
 
 | Layer | Capability | Who builds it |
 |-------|-----------|---------------|
@@ -27,6 +19,9 @@ It stands between the LLM and the human.
 | 3 | Reason | Built into models |
 | 2 | Remember | Large labs + startups |
 | **1** | **Discriminate** | **HeartFlow** |
+
+HeartFlow takes layer 1 because this layer does not depend on compute, code volume,
+or framework ecosystems. It depends on judgment alone.
 
 ---
 
@@ -93,14 +88,14 @@ Four possible actions:
 input
   |
   v
-scope-check ──> premise-check ──> discriminate (46 dimensions) ──> gate
-                                                                     |
-  +------------------------------------------------------------------+
+scope-check -> premise-check -> discriminate (46 dimensions) -> gate
+                                                                   |
+  +----------------------------------------------------------------+
   v
-evidence verify ──> frame-check ──> output-gate ──> doubt-engine
+evidence verify -> frame-check -> output-gate -> doubt-engine
   |
   v
-intent-anchor ──> rewriter ──> error-memory ──> self-diagnosis ──> output
+intent-anchor -> rewriter -> error-memory -> self-diagnosis -> output
 ```
 
 The gate aggregates findings from every layer and emits a single action:
@@ -109,7 +104,7 @@ The gate aggregates findings from every layer and emits a single action:
 ### Capability domains (7 domains, 132 modules)
 
 | Domain | Representative modules |
-|--------|-----------------------|
+|--------|------------------------|
 | Logic | logicReasoning, judgmentEngine, debateConductor, counterfactualVerifier |
 | Decision | decisionRouter, decisionVerifier, activeInference, selfHealing |
 | Cognition | cognitiveEngine, cognitiveLoad, metacognitiveRL, sustainedDriftDetector |
@@ -189,10 +184,10 @@ Known limits:
 ---
 
 ## Version history
-| 6.7.69 | 2026-09-18 | DeepSeek V4.1 alignment: reasoning effort control, sparse module activation, discriminative result cache, async supervision layer, autonomous decision execution with consequence tracking, Engram conditional memory, SWA bounded replay, per-decision-type stats |
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.7.69 | 2026-09-18 | DeepSeek V4.1 alignment: reasoning effort control, sparse module activation, discriminative result cache, async supervision layer, autonomous decision execution with consequence tracking, Engram conditional memory, SWA bounded replay, per-decision-type stats |
 | 6.7.24 | 2026-09-17 | Audit remediation: gate/verdict consistency, fact-check scoring, Chinese tokenisation in the hypothesis pipeline, circuit-breaker memory accounting and non-blocking CPU sampling, recursive test discovery, multi-language child-safety age detection, version-source unification, English documentation rewrite |
 | 6.7.13 | 2026-09-05 | Documentation API alignment; optional ESM transformers loading; CLI guidance without an LLM key |
 | 6.6.1 | 2026-08-18 | Formula library fully integrated (1,334 formulas); formula-bridge extended with 6 decision and learning primitives |
