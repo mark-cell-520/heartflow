@@ -283,7 +283,7 @@ class MemoryConsolidator {
     try {
 
 
-      const b = (typeof globalThis !== 'undefined' && globalThis.getCognitiveBridge) ? globalThis.getCognitiveBridge() : null;
+      const b = (typeof globalThis !== 'undefined' && globalThis.getCognitiveBridge) ? globalThis.getCognitiveBridge() : (() => { try { return require('../formula/cognitive-bridge.js').getCognitiveBridge(); } catch (e) { return null; } })();
 
       return b.experienceReplay(buffer, batchSize);
 
