@@ -2104,6 +2104,38 @@ function handleCacheStats(args) {
 
 }
 
+function handleDecisionHistory(args) {
+
+  const hf = globalThis.heartflow || null;
+
+  if (!hf) {
+
+    return { error: 'heartflow_instance_not_found' };
+
+  }
+
+  const limit = typeof args?.limit === 'number' ? Math.max(1, Math.min(100, Math.round(args.limit))) : 20;
+
+  const history = (hf._decisionHistory || []).slice(-limit).reverse();
+
+  return {
+
+    history,
+
+    stats: {
+
+      total: (hf._decisionHistory || []).length,
+
+      successRate: hf._decisionSuccessRate || 0,
+
+      autoEnabled: !!hf._autoDecisionsEnabled,
+
+    },
+
+  };
+
+}
+
 
 
 // ─── v3.1.0 — 新增工具 ─────────────────────────────────────────
@@ -2894,6 +2926,8 @@ const HANDLERS = {
   heartflow_modules_status: handleModulesStatus,
 
   heartflow_cache_stats: handleCacheStats,
+
+  heartflow_decision_history: handleDecisionHistory,
 
   heartflow_think_fast: handleThinkFast,
 
