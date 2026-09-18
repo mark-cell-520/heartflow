@@ -129,7 +129,7 @@ t('I2: tools/call 含中央参数 schema 校验', () => {
 });
 
 t('I2: TOOLS 工具定义均含 inputSchema.properties', () => {
-  const src = fs.readFileSync(path.join(PROJECT_ROOT, 'src', 'mcp-server.js'), 'utf-8');
+  const src = fs.readFileSync(path.join(PROJECT_ROOT, 'src', 'mcp', 'tools-registry.js'), 'utf-8');
   const toolsStart = src.indexOf('const TOOLS = [');
   const toolsEnd = src.indexOf('];', toolsStart);
   const block = src.slice(toolsStart, toolsEnd);
