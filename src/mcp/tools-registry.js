@@ -22,6 +22,16 @@ const TOOLS = [
 
   {
 
+    name: 'heartflow_modules_status',
+
+    description: '稀疏模块激活状态：返回当前 effort 模式、激活/跳过的模块列表、决策执行门槛。',
+
+    inputSchema: { type: 'object', properties: {} }
+
+  },
+
+  {
+
     name: 'heartflow_dream',
 
     description: '梦境升华（炼金）：从多个记忆碎片中提取共同模式，熔炼为新的认知洞察。不是叙事生成，是记忆的升华与重构。',

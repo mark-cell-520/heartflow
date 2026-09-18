@@ -159,6 +159,24 @@ function _boundedPush(arr, item, maxSize = MAX_ARRAY_SIZE) {
 
 
 
+// ─── [DeepSeek V4.1 alignment] Sparse module activation tiers ──────
+const MODULE_TIERS = {
+  tier1: new Set(['gate', 'discriminate', 'auto-rules', 'psychology', 'truth', 'translator']),
+  tier2: new Set(['dao-decision', 'uncertainty', 'priority-guardian', 'progress-judgment', 'pipeline', 'feedback']),
+  tier3: new Set(['adversarial-synthesis', 'meta-calibration', 'blindspot', 'worldtree', 'knowledgeExplorer']),
+  tier4: new Set(['decisionRouter', 'decisionExecutor', 'decisionFeedback', 'selfDiagnosis', 'hypothesisDriver']),
+};
+
+function _resolveModuleTier(effort) {
+  if (typeof effort !== 'number' || effort < 1 || effort > 100) return null;
+  const mode = effort <= 40 ? 'low' : effort <= 75 ? 'high' : 'max';
+  const active = new Set();
+  active.add(...MODULE_TIERS.tier1);
+  if (mode === 'high' || mode === 'max') active.add(...MODULE_TIERS.tier2);
+  if (mode === 'max') { active.add(...MODULE_TIERS.tier3); active.add(...MODULE_TIERS.tier4); }
+  return { mode, active };
+}
+
 const _lazyAccessCount = new Map();  // 容量边界：由 _boundedSet 控制，上限 MAX_MAP_SIZE
 
 // LRU 顺序：Map 保持插入顺序，头部 = 最久未使用，尾部 = 最近使用
@@ -1361,6 +1379,9 @@ class HeartFlow {
     this.moodEvolution = null;  // 心境演化
 
     this._modules = {};           // 容量边界：由子模块注册控制，通常 < 100 个条目
+    this._sparseMode = false;
+    this._activeModules = null;
+    this._sparseEffort = null;
 
     this._mindSpace = null;   // 内部引用（向后兼容），实际模块用 this.mindSpace
 
@@ -4313,6 +4334,12 @@ class HeartFlow {
   // [v6.0.71] 恢复 dispatch 路由核心（被重构误删）
   dispatch(route, ...args) {
     if (!this.started) throw new Error('HeartFlow not started');
+    if (this._sparseMode && this._activeModules) {
+      const subsystem = route.includes('.') ? route.slice(0, route.indexOf('.')) : route;
+      if (!this._activeModules.has(subsystem)) {
+        return { skipped: true, reason: 'module_not_active', module: subsystem, effort: this._sparseEffort };
+      }
+    }
     if (!HeartFlow.ALLOWED_ROUTES.has(route)) {
       throw new Error(`dispatch: route '${route}' not allowed. Use routes() to see available routes.`);
     }
@@ -4364,6 +4391,19 @@ class HeartFlow {
 
     const effort = this._normalizeEffort(opts?.effort);
     const effortMode = effort <= 40 ? 'low' : effort <= 75 ? 'high' : 'max';
+
+    // [DeepSeek V4.1] Sparse activation: only enable when explicit effort is set
+    const tierResult = _resolveModuleTier(effort);
+    if (tierResult && opts?.effort !== undefined) {
+      this._sparseMode = true;
+      this._sparseEffort = effort;
+      this._activeModules = tierResult.active;
+      this._reasoningEffortMode = tierResult.mode;
+    } else {
+      this._sparseMode = false;
+      this._activeModules = null;
+      this._sparseEffort = null;
+    }
 
     // 跨session学习：如上次session经验不好则本次自动提升深度
     if (this._bootDepth && (!depth || depth < this._bootDepth)) {
@@ -4918,8 +4958,13 @@ class HeartFlow {
       result._decisionConfidence = evalResult && typeof evalResult.confidence === 'number' ? evalResult.confidence : null;
       result._decisionRationale = evalResult && typeof evalResult.rationale === 'function' ? (evalResult.rationale({}) || '').slice(0, 120) : null;
       if (this.decisionExecutor && typeof this.decisionExecutor.apply === 'function' && result._decision) {
-        const applied = this.decisionExecutor.apply(result._decision, { depth: 1, _routeHint: { type: 'general', confidence: 0.5 }, input });
-        result._decisionApplied = applied;
+        const effortOk = !this._sparseMode || (this._sparseEffort && this._sparseEffort >= 76);
+        if (!effortOk) {
+          result._decisionApplied = { applied: false, reason: 'effort_below_execution_threshold', effort: this._sparseEffort, decision: result._decision };
+        } else {
+          const applied = this.decisionExecutor.apply(result._decision, { depth: 1, _routeHint: { type: 'general', confidence: 0.5 }, input });
+          result._decisionApplied = applied;
+        }
       }
       if (this.decisionFeedback && typeof this.decisionFeedback.recordOutcome === 'function' && result._decision) {
         this.decisionFeedback.recordOutcome({ type: 'think_decision', ruleId: result._decision, confidence: result._decisionConfidence || 0.5, context: { rationale: result._decisionRationale } }, true, 'auto decision execution');
