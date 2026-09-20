@@ -3,10 +3,11 @@
 **AGI Layer 1 — the Discriminator.**
 
 A pure rule engine that judges whether a statement or an action is right, wrong, safe,
-or dangerous — before it reaches a human. **Zero LLM dependency.**
+or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 46 discrimination dimensions  ×  9-layer pipeline  ×  132 modules  ×  179 MCP tools
+×  1,506 dispatch routes  ×  547 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -67,7 +68,8 @@ Four possible actions:
 | `rewrite` | Must be rewritten. Follow `findings[].guidance`. |
 | `block` | Stop. Do not output. Use `gate.reason`. |
 
-`verdict` is derived from `gate.action`, so the two never contradict each other.
+`verdict` is derived from `gate.action`, so the two never contradict each other. If you
+read only one field, read `gate.action`.
 
 ---
 
@@ -117,7 +119,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at v6.7.69. Not marketing copy.
+Measured on this repository at **v6.7.69**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -126,7 +128,9 @@ Measured on this repository at v6.7.69. Not marketing copy.
 | Dispatch routes | 1,506 |
 | Discrimination dimensions | 46 |
 | MCP tools | 179 |
-| Test suite | 459 passing / 0 failing |
+| Test suite | 547 passing / 0 failing |
+| Capability guard | 18 / 18 checks |
+| Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
 
 ---
@@ -137,6 +141,8 @@ HeartFlow exposes its engine as an MCP server, so any MCP-capable agent can call
 
 ```bash
 node src/mcp-server.js --port 8588
+# or a Unix socket:
+node src/mcp-server.js --socket /tmp/heartflow.sock
 ```
 
 Then connect:
@@ -148,6 +154,46 @@ hermes mcp add heartflow --url http://localhost:8588/mcp
 The server authenticates with a bearer token generated on first start and written to
 `.env` (never committed). A request without a valid token returns `401`.
 
+### Three-tier write permission model
+
+`tools/call` enforces a role model so that state-mutating tools cannot be invoked by an
+unauthenticated caller:
+
+| Role | Source | Capability |
+|------|--------|------------|
+| `guest` | no credentials | read-only tools |
+| `user` | `HeartFlow-OID-<16-hex>` header | read + write |
+| `admin` | valid bearer token | full |
+
+The write-protected set is `heartflow_memory_write_control`,
+`heartflow_memory_eraser`, `heartflow_decision_decide`, `heartflow_self_heal`. A guest
+calling any of them gets `isError: true` with `权限不足`. This behaviour is covered by an
+end-to-end regression test that speaks real JSON-RPC over a real Unix socket
+(`test/mcp-guest-permission.test.js`), because the earlier failure mode was a permission
+block that was syntactically valid but unreachable — tests that only inspected the
+tool-name whitelist passed while the gate never ran.
+
+---
+
+## Agent-facing checks
+
+Beyond text discrimination, HeartFlow ships checks aimed at how AI agents behave — the
+failure modes that show up when an agent reports work it did not do.
+
+| Check | What it catches |
+|-------|-----------------|
+| `checkCompletionEvidence` | Empty completion claims ("done", "fixed", "all passing") without a git hash, test count, file path, or PR link |
+| `checkArchitectureConsistency` | A function whose name promises one thing and whose body does another (named `validate`, no validation) |
+| `checkDecisionTrace` | A "decision" with fewer than 2 options, no explicit choice, or no stated reason — pseudo-decisions |
+| `checkPlanGate` | A plan entering a complex task without steps, acceptance criteria, rollback, or safety strategy |
+| `checkForbiddenCall` | Delegating before the target, boundary, and acceptance criteria are confirmed |
+| `checkAIMisuse` | Human-side misuse patterns: oversized context dumps, errors without repro steps, adopting output unverified |
+
+Each is available as an MCP tool (`heartflow_check_completion_evidence`,
+`heartflow_check_architecture_consistency`, `heartflow_check_decision_trace`,
+`heartflow_check_plan_gate`, `heartflow_check_forbidden_call`,
+`heartflow_check_ai_misuse`).
+
 ---
 
 ## Tests
@@ -155,10 +201,16 @@ The server authenticates with a bearer token generated on first start and writte
 ```bash
 node test/run-all.js          # full suite (recursive over test/, including subdirectories)
 node bin/verify.js            # installation checks
+node scripts/guard-abilities.js   # capability guardian (18 checks)
 ```
 
 `test/run-all.js` walks `test/` recursively, so tests in `test/core/`, `test/memory/`,
 `test/utils/`, and other subdirectories run alongside the top-level files.
+
+`scripts/guard-abilities.js` runs before any upgrade commit. It verifies entry points,
+discrimination against a fixed sample set, the engine main chain, **text searchability**
+(no NUL bytes or CRLF in core sources — a bare NUL parses fine in Node but makes every
+text-search tool treat the file as binary), and the full regression suite.
 
 ---
 
@@ -180,6 +232,12 @@ Known limits:
 5. Single maintainer.
 6. Chinese tokenisation is heuristic (greedy longest-match with a stopword list, not a
    full dictionary), so unusual phrasings can segment imperfectly.
+7. **Silent failure is its blind spot.** Three real defects in this repository — a bare
+   NUL byte in the engine source, an unreachable permission block, and contradictory
+   documentation numbers — were all invisible to a 547-test green suite, because none of
+   them produced wrong runtime behaviour. The text-searchability guard and the
+   end-to-end permission test exist because of them; treat "tests pass" as necessary,
+   never sufficient.
 
 ---
 
@@ -187,6 +245,7 @@ Known limits:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.7.69 | 2026-09-20 | MCP guest write-permission block was unreachable dead code (100% of guest write attempts passed); moved into `case 'tools/call'`, token comparison switched to `safeCompare()`. Added end-to-end permission regression test and the guard's text-searchability check (13 → 18). 547 tests. |
 | 6.7.69 | 2026-09-18 | DeepSeek V4.1 alignment: reasoning effort control, sparse module activation, discriminative result cache, async supervision layer, autonomous decision execution with consequence tracking, Engram conditional memory, SWA bounded replay, per-decision-type stats |
 | 6.7.24 | 2026-09-17 | Audit remediation: gate/verdict consistency, fact-check scoring, Chinese tokenisation in the hypothesis pipeline, circuit-breaker memory accounting and non-blocking CPU sampling, recursive test discovery, multi-language child-safety age detection, version-source unification, English documentation rewrite |
 | 6.7.13 | 2026-09-05 | Documentation API alignment; optional ESM transformers loading; CLI guidance without an LLM key |
