@@ -125,8 +125,21 @@ at runtime, no runtime dependencies.
 git clone https://github.com/yun520-1/mark-heartflow-skill.git
 cd mark-heartflow-skill
 node src/mcp-server.js --port 8588
+# or a Unix socket:
+node src/mcp-server.js --socket /tmp/heartflow.sock
 # Connect: hermes mcp add heartflow --url http://localhost:8588/mcp
 ```
+
+`tools/call` enforces a three-tier write permission model. `guest` (no credentials) can
+call read-only tools; the four state-mutating tools — `heartflow_memory_write_control`,
+`heartflow_memory_eraser`, `heartflow_decision_decide`, `heartflow_self_heal` — require
+a `HeartFlow-OID-<16-hex>` header (`user`) or a valid bearer token (`admin`).
+
+If you change this permission set, change it in **three** places or the test will fail:
+the `needsWrite` array in `handleRequest`, `test/mcp-guest-permission.test.js`
+(`WRITE_TOOLS`), and the documentation tables. The permission block must live *inside*
+`case 'tools/call'` — it was previously a bare block between two case labels, which made
+it unreachable dead code while every unit test stayed green.
 
 ## Repository conventions
 

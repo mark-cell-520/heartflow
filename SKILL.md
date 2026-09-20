@@ -90,6 +90,8 @@ from marketing copy.
 | Discrimination dimensions | 46 | `dimMap` keys in `src/index.js` |
 | MCP tools | 179 | tool definitions exposed via `tools/list` |
 | Test suite | 547 passing / 0 failing | `node test/run-all.js` |
+| Capability guard | 18 / 18 checks | `node scripts/guard-abilities.js` |
+| Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
 Dimensions are grouped by the action they can trigger: **5 can `block`**, **7 can force
@@ -265,6 +267,20 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 > **Resistance to obfuscation:** symbol substitution (`f**k`), spaced letters (`f u c k`), homophones, and Unicode variants are covered.
 
+### Agent-facing checks (separate from the 46 text dimensions)
+
+These judge how an AI agent behaves rather than what a sentence says — the failure
+modes where an agent reports work it did not do. Each is exposed as an MCP tool.
+
+| Check | MCP tool | Catches |
+|-------|----------|---------|
+| `checkCompletionEvidence` | `heartflow_check_completion_evidence` | Empty completion claims ("done", "fixed", "all passing") with no git hash, test count, file path, or PR link |
+| `checkArchitectureConsistency` | `heartflow_check_architecture_consistency` | A function whose name promises one thing and whose body does another (named `validate`, no validation) |
+| `checkDecisionTrace` | `heartflow_check_decision_trace` | A "decision" with fewer than 2 options, no explicit choice, or no stated reason — pseudo-decisions |
+| `checkPlanGate` | `heartflow_check_plan_gate` | A plan entering a complex task without steps, acceptance criteria, rollback, or safety strategy |
+| `checkForbiddenCall` | `heartflow_check_forbidden_call` | Delegating before the target, boundary, and acceptance criteria are confirmed |
+| `checkAIMisuse` | `heartflow_check_ai_misuse` | Human-side misuse: oversized context dumps, errors without repro steps, adopting output unverified |
+
 ---
 
 ## HeartFlow checks itself
@@ -273,8 +289,33 @@ The gate aggregates every layer's findings and emits one of four actions:
 - **frame-check** intercepts narrative closure
 - **doubt-engine** asks: do I actually know this? Is it symmetric? Is it defensive?
 - **autonomous decision audit** logs every self-executed decision with consequence tracking
+- **text-searchability guard** rejects core sources containing NUL bytes or CRLF — a bare
+  NUL parses fine in Node but makes every text-search tool treat the file as binary, so
+  a green test suite cannot see it
+- **end-to-end permission test** speaks real JSON-RPC over a real Unix socket, because the
+  earlier failure mode was a permission block that was syntactically valid but unreachable
 
 > The most valuable sentence a machine can produce is "I am not sure", or "no".
+
+---
+
+## Three-tier write permission model
+
+`tools/call` enforces roles so state-mutating tools cannot be invoked unauthenticated:
+
+| Role | Credential | Capability |
+|------|-----------|------------|
+| `guest` | none | read-only tools |
+| `user` | `HeartFlow-OID-<16-hex>` header | read + write |
+| `admin` | valid bearer token | full |
+
+Write-protected: `heartflow_memory_write_control`, `heartflow_memory_eraser`,
+`heartflow_decision_decide`, `heartflow_self_heal`. A guest calling one gets
+`isError: true` with `权限不足`.
+
+Covered by `test/mcp-guest-permission.test.js`, which asserts both directions — the four
+write tools must be blocked **and** two read-only tools must still pass, so the gate
+cannot be "fixed" by blocking everything.
 
 ---
 
