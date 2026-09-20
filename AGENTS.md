@@ -12,7 +12,7 @@ wrong.
 HeartFlow adds the discrimination layer, so your agent doesn't just *say* things — it
 says things that are *right*.
 
-**Zero LLM dependency.** 46 dimensions, 132 modules, 169 MCP tools, 1,504 dispatch
+**Zero LLM dependency.** 46 dimensions, 132 modules, 180 MCP tools, 1,506 dispatch
 routes. Pure rule engine.
 
 ## Quick start

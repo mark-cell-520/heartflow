@@ -1172,6 +1172,72 @@ const TOOLS = [
     }
   },
   {
+    name: 'heartflow_check_architecture_consistency',
+    description: '架构一致性检测：识别函数名承诺与函数体实际行为错位（名为 validate 却无校验逻辑、名为 retry 却无重试等 8 类），防止接口撒谎。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测代码/文本' }
+      },
+      required: ['text']
+    }
+  },
+  {
+    name: 'heartflow_check_plan_gate',
+    description: '计划门禁：进入复杂任务前校验计划是否含完整步骤/验收/回滚/安全/批处理策略，缺项即拦截。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        plan: { type: 'object', description: '计划对象：{ steps: [{ verify, rollback, security }], batch: { checkpoint, strategy } }' },
+        text: { type: 'string', description: '简写形式：把整段计划当作文本传入，自动包成单步计划' }
+      },
+    }
+  },
+  {
+    name: 'heartflow_check_forbidden_call',
+    description: '禁止未确认即委派检测：主 Agent 未先确认目标/边界/验收口径就直接 delegate_task、spawn agent 或自动委派时命中。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测的计划/指令/代码文本' }
+      },
+      required: ['text']
+    }
+  },
+  {
+    name: 'heartflow_check_completion_evidence',
+    description: '完成证据验证：识别"已完成/已修复/全部通过/已提交"等空口声明，要求附带 git hash、测试通过数、文件路径或 PR 链接等实据。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测的完成汇报文本' }
+      },
+      required: ['text']
+    }
+  },
+  {
+    name: 'heartflow_check_decision_trace',
+    description: '决策轨迹验证：校验一条决策记录是否含 ≥2 个选项、明确选择、理由，以及风险/可行性/置信度/后果至少一项；识别伪决策与打分无区分度。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        decision: { type: 'object', description: '决策对象：{ options, chosen/selected/decision, reasoning/rationale, risk|feasibility|confidence|consequence }' },
+        text: { type: 'string', description: '简写形式：JSON 字符串形式的决策记录' }
+      },
+    }
+  },
+  {
+    name: 'heartflow_check_ai_misuse',
+    description: '人机交互误区检测：识别 5 类常见误用——一次喂超大上下文、只贴报错不给复现信息、未核对直接采用、反复小改碰运气、让 AI 全权兜底。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '待检测的用户请求/对话文本' }
+      },
+      required: ['text']
+    }
+  },
+  {
     name: 'heartflow_audit_trace',
     description: '审计证据链：查询/验证全链路 trace，按人/时间/模型/策略检索，验证 HMAC 完整性。国标关口5。',
     inputSchema: {
