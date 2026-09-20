@@ -107,11 +107,46 @@ function checkEngine() {
   }
 }
 
+function checkTextSearchability() {
+  const results = [];
+  // [AUDIT-FIX 2026-09-20] 心虫主引擎文件曾被写入裸 NUL 字节，Node 能正常解析
+  // （所以 547 个测试全绿），但 grep 会判定为 binary file matches，导致所有
+  // 文本检索工具对它失效。这类"行为正确但工具链失效"的缺陷测试测不出来，
+  // 必须单独作为能力检查项。
+  const targets = [
+    'src/core/heartflow.js',
+    'src/mcp-server.js',
+    'src/index.js',
+    'src/gate.js',
+    'src/core/version.js',
+  ];
+  for (const rel of targets) {
+    const p = path.join(ROOT, rel);
+    try {
+      if (!fs.existsSync(p)) continue;
+      const buf = fs.readFileSync(p);
+      const nulCount = buf.reduce((n, b) => n + (b === 0 ? 1 : 0), 0);
+      const crlf = buf.reduce((n, _, i) => n + (buf[i] === 0x0d && buf[i + 1] === 0x0a ? 1 : 0), 0);
+      const issues = [];
+      if (nulCount > 0) issues.push(`NUL×${nulCount}`);
+      if (crlf > 0) issues.push(`CRLF×${crlf}`);
+      results.push({
+        name: `文本可检索 ${rel}`,
+        ok: issues.length === 0,
+        detail: issues.length ? issues.join(' ') : 'clean',
+      });
+    } catch (e) {
+      results.push({ name: `文本可检索 ${rel}`, ok: false, detail: e.message });
+    }
+  }
+  return results;
+}
+
 function checkTests() {
   return new Promise(resolve => {
     const { execSync } = require('child_process');
     try {
-      const out = execSync(`node ${path.join(ROOT, 'test/run-all.js')}`, { cwd: ROOT, encoding: 'utf8', timeout: 180000 });
+      const out = execSync(`node ${path.join(ROOT, 'test/run-all.js')}`, { cwd: ROOT, encoding: 'utf8', timeout: 420000 });
       const passMatch = out.match(/(\d+)\s+passed/);
       const failMatch = out.match(/(\d+)\s+failed/);
       const passed = passMatch ? parseInt(passMatch[1]) : 0;
@@ -155,8 +190,16 @@ async function main() {
   }
   results.push(...engineResults);
 
-  // 4. 全量测试
-  console.log('\n【4】全量回归测试');
+  // 5. 文本可检索性（防 NUL/CRLF 让检索工具失效）
+  console.log('\n【5】文本可检索性检查');
+  const textResults = checkTextSearchability();
+  for (const r of textResults) {
+    console.log(`  ${r.ok ? '✅' : '❌'} ${r.name}: ${r.detail}`);
+  }
+  results.push(...textResults);
+
+  // 6. 全量测试
+  console.log('\n【6】全量回归测试');
   const testResults = await checkTests();
   for (const r of testResults) {
     console.log(`  ${r.ok ? '✅' : '❌'} ${r.name}: ${r.detail}`);

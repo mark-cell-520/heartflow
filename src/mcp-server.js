@@ -4293,14 +4293,18 @@ async function handleRequest(request, sessionId) {
 
 
 
-    // [P1-1] OID身份码 + 三层权限模型
-    // 角色: guest(只读) / user(读写) / admin(全权限)
-    // 身份码: HeartFlow-OID-<16-char-hash>
-    {
-      const reqOid = req.headers['x-heartflow-oid'] || '';
-      const token = req.headers['authorization']?.replace('Bearer ', '') || '';
+    case 'tools/call': {
+      // [P1-1] OID身份码 + 三层权限模型（[AUDIT-FIX 2026-09-20] 移入 case 内）
+      // 原实现把权限块放在 switch 里两个 case 标签之间且无自己的 case 标签，
+      // 前一个 case 已 return，因此这段 100% 是死代码——guest 拦截从未生效。
+      // 角色: guest(只读) / user(读写) / admin(全权限)
+      // 身份码: HeartFlow-OID-<16-char-hash>
+      let { name, arguments: args = {} } = params;
+
+      const reqOid = request.headers?.['x-heartflow-oid'] || '';
+      const token = request.headers?.authorization?.replace('Bearer ', '') || '';
       let role = 'guest';
-      if (token && typeof expectedToken === 'string' && token === expectedToken) {
+      if (token && typeof AUTH_TOKEN === 'string' && safeCompare(token, AUTH_TOKEN)) {
         role = 'admin';
       }
       const oidMatch = reqOid.match(/^HeartFlow-OID-([a-f0-9]{16})$/);
@@ -4314,11 +4318,6 @@ async function handleRequest(request, sessionId) {
           error: '权限不足：guest 角色不可写，请升级身份认证'
         }) }], isError: true };
       }
-    }
-
-    case 'tools/call': {
-
-      let { name, arguments: args = {} } = params;
 
       const handler = HANDLERS[name];
 
