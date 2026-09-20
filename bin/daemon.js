@@ -58,6 +58,26 @@ function removePid() {
   try { fs.unlinkSync(PID_FILE); } catch (_) {}
 }
 
+// [FIX 2026-09-19] 端口探测提取为公共函数：PM2 路径原来硬编码 8099，
+// 端口被占用时 PM2 只会崩溃重启，永远起不来。nohup 路径本来就有探测，现在两条路都走它。
+async function detectFreePort(startPort = 8099, endPort = 8105) {
+  const net = require('net');
+  for (let p = startPort; p <= endPort; p++) {
+    const ok = await new Promise((resolve) => {
+      const s = net.createServer();
+      const timer = setTimeout(() => { try { s.close(); } catch (_) { } resolve(false); }, 200);
+      s.once('error', () => { clearTimeout(timer); try { s.close(); } catch (_) { } resolve(false); });
+      s.listen(p, () => {
+        clearTimeout(timer);
+        s.close();
+        s.once('close', () => resolve(true));
+      });
+    });
+    if (ok) return p;
+  }
+  return startPort; // last resort
+}
+
 function isProcessAlive(pid) {
   if (!pid) return false;
   try {
@@ -81,14 +101,16 @@ function getProcessInfo(pid) {
 
 const ECOSYSTEM_PATH = path.join(HF_DIR, 'ecosystem.config.js');
 
-function ensureEcosystemConfig() {
-  if (fs.existsSync(ECOSYSTEM_PATH)) return;
+function ensureEcosystemConfig(port = 8099) {
+  // [FIX 2026-09-19] 模板里原来漏了 const path = require('path')，
+  // 之前只因为 ecosystem.config.js 已被 git 跟踪 + 上面的提前 return 而没暴露。
+  fs.writeFileSync(ECOSYSTEM_PATH, `const path = require('path');
 
-  fs.writeFileSync(ECOSYSTEM_PATH, `module.exports = {
+module.exports = {
   apps: [{
     name: 'heartflow-mcp',
     script: path.join(__dirname, 'mcp', 'mcp-server-http.js'),
-    args: '--port 8099',
+    args: '--port ${port}',
     cwd: __dirname,
     instances: 1,
     autorestart: true,
@@ -111,8 +133,11 @@ async function pm2Disconnect() {
 }
 
 async function pm2Start() {
-  ensureEcosystemConfig();
+  const port = await detectFreePort();
+  ensureEcosystemConfig(port);
   return new Promise((resolve, reject) => {
+    // [FIX 2026-09-19] 旧实例可能绑着失效端口，先删再用新配置起
+    pm2.delete('heartflow-mcp', () => {
     pm2.start(ECOSYSTEM_PATH, (err) => {
       if (err) return reject(err);
       pm2.list((err, list) => {
@@ -120,8 +145,9 @@ async function pm2Start() {
         const app = list.find(a => a.name === 'heartflow-mcp');
         if (!app) { pm2Disconnect(); return reject(new Error('PM2 未找到 heartflow-mcp 进程')); }
         pm2Disconnect();
-        resolve({ pid: app.pid, pm2Id: app.pm_id, status: app.status });
+        resolve({ pid: app.pid, pm2Id: app.pm_id, status: app.status, port });
       });
+    });
     });
   });
 }
@@ -165,22 +191,7 @@ async function nohupStart() {
   const errLog = fs.openSync(path.join(LOG_DIR, 'heartflow-error.log'), 'a');
 
   // 检测可用端口，传给 mcp-server-http.js 避免竞态
-  const net = require('net');
-  let detectedPort = null;
-  for (let p = 8099; p <= 8105; p++) {
-    const ok = await new Promise((resolve) => {
-      const s = net.createServer();
-      const timer = setTimeout(() => { try { s.close(); } catch(_){} resolve(false); }, 200);
-      s.once('error', () => { clearTimeout(timer); try { s.close(); } catch(_){} resolve(false); });
-      s.listen(p, () => {
-        clearTimeout(timer);
-        s.close();
-        s.once('close', () => resolve(true));
-      });
-    });
-    if (ok) { detectedPort = p; break; }
-  }
-  if (!detectedPort) detectedPort = 8099; // last resort
+  const detectedPort = await detectFreePort();
 
   // [SECURITY-FIX] H-3: 子进程环境变量白名单
   // 只允许必要的环境变量传播到子进程，避免泄露 API Key 等敏感信息
