@@ -4307,8 +4307,8 @@ async function handleRequest(request, sessionId) {
       if (oidMatch) {
         role = Math.max(['guest','user','admin'].indexOf(role), ['guest','user','admin'].indexOf('user'));
       }
-      const needsWrite = ['heartflow_memory_store', 'heartflow_memory_remove',
-        'heartflow_decision_decide', 'heartflow_heartflow_selfHeal'].includes(name);
+      const needsWrite = ['heartflow_memory_write_control', 'heartflow_memory_eraser',
+        'heartflow_decision_decide', 'heartflow_self_heal'].includes(name);
       if (needsWrite && role === 'guest') {
         return { content: [{ type: 'text', text: JSON.stringify({
           error: '权限不足：guest 角色不可写，请升级身份认证'
