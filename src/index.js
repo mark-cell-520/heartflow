@@ -65,8 +65,8 @@ function checkPromptInjection(text) {
 }
 
 const { checkAICodeAntiPattern } = require('./ai-anti-pattern.js');
-const checkCoverageCompleteness = require('./coverage-completeness.js');
-const checkArchitectureConsistency = require('./architecture-consistency.js');
+const { checkCoverageCompleteness } = require('./coverage-completeness.js');
+const { checkArchitectureConsistency } = require('./architecture-consistency.js');
 const { checkPlanGate } = require('./plan-gate.js');
 const { checkForbiddenCall } = require('./forbidden-call.js');
 const { checkCompletionEvidence } = require('./completion-evidence.js');
