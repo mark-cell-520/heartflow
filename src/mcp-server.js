@@ -47,6 +47,7 @@ const net = require('net');
 
 const crypto = require('crypto');
 const { TOOLS } = require('./mcp/tools-registry.js');
+const handleCrowdtestEvaluate = require('./mcp/handlers/crowdtest-evaluate.js');
 
 
 
@@ -2890,6 +2891,7 @@ const HANDLERS = {
   heartflow_gate: handleGate,
   heartflow_gate_check: handleGateCheck,
   heartflow_gate_pipeline: handleGatePipeline,
+  heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,
   heartflow_formula_bridge: handleFormulaBridge,
   heartflow_formula_calc: handleFormulaCalc,
 

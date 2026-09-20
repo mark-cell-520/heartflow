@@ -14,7 +14,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const CLASSICS_BASE = path.join(__dirname, '..', '..', '..', '..', 'daizhigev20');
+// [FIX 2026-09-19] 通用路径解析，支持环境变量覆盖与多個安装位置
+const { CLASSICS_BASE } = require('./classics-base.js');
 
 /**
  * 从原始命中文本中提取高频候选词（2-4字中文词）

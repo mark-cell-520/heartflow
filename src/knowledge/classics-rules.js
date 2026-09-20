@@ -14,8 +14,8 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const CLASSICS_BASE = path.join(__dirname, '..', '..', '..', '..', 'daizhigev20');
-const SCRIPT = path.join(CLASSICS_BASE, 'scripts', 'search_guji.sh');
+// [FIX 2026-09-19] 通用路径解析，支持环境变量覆盖与多個安装位置
+const { CLASSICS_BASE, SCRIPT } = require('./classics-base.js');
 
 /**
  * 规则结构：
@@ -984,7 +984,11 @@ function searchClassics(keyword, scope) {
   }
   try {
     const cmd = scope ? `bash "${SCRIPT}" "${keyword}" "${scope}"` : `bash "${SCRIPT}" "${keyword}"`;
-    const out = execSync(cmd, { encoding: 'utf-8', timeout: 15000 });
+    // [FIX 2026-09-19] 脚本内部硬编码了 ${HOME}/.hermes/skills/daizhigev20，
+    // 引擎以其他用户运行时会找不到语料库；把解析出的路径逊给脚本。
+    const env = Object.assign({}, process.env);
+    if (CLASSICS_BASE) env.DAIZHIGEV20_PATH = CLASSICS_BASE;
+    const out = execSync(cmd, { encoding: 'utf-8', timeout: 15000, env });
     const lines = out.split(/\r?\n/).filter(Boolean);
     return {
       keyword,

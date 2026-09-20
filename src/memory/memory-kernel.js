@@ -32,6 +32,10 @@ const fs = require('../utils/safe-fs');
 
 const path = require('path');
 
+// [FIX 2026-09-19] 本文件有 4 处调用 _log.warn 但从未定义 _log，
+// 导致 MemoryKernel 构造时抵押缺失（“_log is not defined”），记忆核心整个不加载。
+const _log = require('../utils/logger').logger;
+
 
 let _globalExitBound = false;
 
