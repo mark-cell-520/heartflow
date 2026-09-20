@@ -39,11 +39,21 @@ class FormulaCalculator {
 
     this.search = new FormulaSearch(options);
 
-    this._math = getMath();
+    // [启动优化] mathjs 惰性化 v2：_math 改为 getter（见下），首次真正计算时才加载。
+    // 实测 mathjs 冷加载 ~837ms，而绝大多数启动（含整个 MCP 判定链路）用不到公式符号计算。
+    this._mathInstance = null;
 
   }
 
 
+
+  get _math() {
+    if (this._mathInstance) return this._mathInstance;
+    this._mathInstance = getMath();
+    return this._mathInstance;
+  }
+
+  [Symbol.for('nodejs.util.inspect.custom')]() { return '[FormulaCalculator]'; }
 
   // [AUDIT-FIX] 转义正则元字符，防止用户控制的 key/variable 触发 ReDoS 或正则语法错误
 
