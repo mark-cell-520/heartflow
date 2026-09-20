@@ -114,3 +114,5 @@ memory/q-table.json
 # Action 运行产物（默认报告名 + 自定义报告目录）
 heartflow-audit-report.md
 reports/
+.mcp-server.pid
+ecosystem.config.js
