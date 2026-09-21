@@ -2557,6 +2557,8 @@ function handleFullAudit(args) {
     const cross = idx.crossAnalyze ? idx.crossAnalyze(disc) : null;
     const entropy = idx.entropyAnalysis ? idx.entropyAnalysis(text, disc) : null;
     return {
+      // [v6.7.70] gate 必须透出，否则 MCP 统一硬闸门认不出 block 判定
+      gate: disc.gate,
       verdict: disc.verdict,
       overallScore: disc.overallScore,
       dimensionCount: Object.keys(disc.dimensions).length,
@@ -2605,6 +2607,8 @@ function handleAudit42(args) {
       dimensions: entropy.dimensionEntropies || null
     } : null;
     return {
+      // [v6.7.70] gate 必须透出，否则 MCP 统一硬闸门认不出 block 判定
+      gate: disc.gate,
       meta: {
         tool: 'heartflow_audit42',
         version: '42-dim',
@@ -2702,12 +2706,17 @@ function handleFullDiscriminate(args) {
    try {
      const idx = require('./index.js');
      const results = [];
+     let anyBlocked = false;
      for (let i = 0; i < texts.length; i++) {
        const text = texts[i];
        const disc = idx.discriminate ? idx.discriminate(text, evidence || []) : null;
+       // [v6.7.70] 每条都透出 gate，让 MCP 统一硬闸门能识别；
+       // 任一条 block 则整个结果标记 block（批量场景部分有毒即整体不可用）
+       if (disc && disc.gate && disc.gate.action === 'block') anyBlocked = true;
        results.push({
          index: i,
          text: text.substring(0, 200),
+         gate: disc ? disc.gate : undefined,
          verdict: disc ? disc.verdict : 'error',
          overallScore: disc ? disc.overallScore : null,
          dimensions: disc ? disc.dimensions : null,
@@ -2716,7 +2725,11 @@ function handleFullDiscriminate(args) {
          error: disc ? undefined : 'discriminate not available',
        });
      }
-     return { results, total: results.length };
+     return {
+       results, total: results.length,
+       // 顶层 gate 供统一闸门识别（批量里有 block 就整体拦）
+       gate: anyBlocked ? { action: 'block', reason: `批量文本中含 ${results.filter(r => r.gate && r.gate.action === 'block').length} 条阻断级内容` } : undefined,
+     };
    } catch(e) { return { error: e.message }; }
  }
 
@@ -2919,7 +2932,10 @@ function handleGateCheck(args) {
   if (!text) throw new Error('text 是必填参数');
   try {
     const gate = require(HF_DIR + '/src/gate.js');
-    return gate.check(text);
+    const r = gate.check(text);
+    // [v6.7.70] gate.check() 返回扁平结构（action 在顶层），统一硬闸门
+    // 只认 result.gate.action，故在此包成标准形状让它能拦
+    return { gate: { action: r.action, reason: r.reason }, score: r.score, action: r.action, reason: r.reason };
   } catch (e) {
     return { error: e.message };
   }
