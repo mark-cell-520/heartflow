@@ -95,6 +95,11 @@ class ReportGenerator {
           text: finalConclusion.slice(0, 600),
           explanation: thoughtChain ? '基于 thoughtChain 生成' : '未捕获思维链',
         },
+        // ─── [v6.7.70] 心虫判定段：辨别信号进入报告正文 ───
+        // 修复前：报告完全不读 _verification/_highRiskOutput 等字段，
+        // severity 靠 confidence 猜。心虫判出 score 0.05 的严重问题，
+        // 报告层一个字都不提 = 判了没人听见。
+        gate: _buildGateSection(thoughtChain, raw),
         localization: {
           coreIssue: _inferCoreIssue(finalConclusion),
           domain: (raw && raw.type) || (thoughtChain && thoughtChain.type) || 'general',
@@ -117,6 +122,32 @@ class ReportGenerator {
         },
       };
     }
+  }
+}
+
+/**
+ * [v6.7.70] 从辨别信号构建"心虫判定"报告段。
+ * 复用 gate-verdict.js 的聚合逻辑，保证报告与 MCP 透传结论一致（单一真相源）。
+ */
+function _buildGateSection(thoughtChain, raw) {
+  try {
+    const { buildGateVerdict } = require('../gate-verdict.js');
+    // thoughtChain 与 raw 都可能带信号，合并取（raw 优先，它是完整 result）
+    const merged = Object.assign({}, thoughtChain, raw && typeof raw === 'object' ? raw : {});
+    const v = buildGateVerdict(merged);
+    if (!v || v.action === 'pass') {
+      return { action: 'pass', verdict: '未发现阻断/改写/验证信号', signals: [] };
+    }
+    return {
+      action: v.action,
+      verdict: v.reason,
+      signals: v.signals,
+      guidance: v.guidance,
+      score: v.score,
+    };
+  } catch (_) {
+    // 防御性：聚合失败时至少不崩，返回空判定
+    return { action: 'pass', verdict: '(判定聚合不可用)', signals: [] };
   }
 }
 
