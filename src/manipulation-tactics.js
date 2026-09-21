@@ -33,7 +33,10 @@ const PHISHING_PATTERNS = [
   // 英文
   /\b(?:click|open|visit|follow)\b[^.]{0,30}\b(?:link|url)\b[^.]{0,40}\b(?:verify|confirm|update|validate)\b/i,
   /\b(?:link|url)\b[^.]{0,30}\b(?:verify|confirm|update|validate)\b/i,
-  /\b(?:account|identity|access)\s+(?:will\s+be\s+)?(?:suspended|frozen|terminated|disabled|locked|restricted)\b/i,
+  // [v6.7.71] account 与 suspended 之间允许间隔（扩充基准暴露：
+  // "verify your account immediately or it will be suspended" 原模式失配）
+  /\b(?:account|identity|access)\b[^.]{0,40}\b(?:will\s+be\s+)?(?:suspended|frozen|terminated|disabled|locked|restricted|closed)\b/i,
+  /\b(?:verify|confirm|update|validate)\b[^.]{0,30}\b(?:account|identity)\b[^.]{0,30}\b(?:or|otherwise|else)\b[^.]{0,30}\b(?:suspended|frozen|terminated|disabled|locked)\b/i,
   /\b(?:within|in)\s+(?:24|48|72)\s+hours?\b[^.]{0,30}\b(?:verify|confirm|suspend|terminate|disable)\b/i,
   /\b(?:otherwise|or\s+else|failure\s+to)\b[^.]{0,30}\b(?:suspend|terminate|freeze|disconnect|penalt)/i,
   /\b(?:unusual|suspicious|unauthorized|suspected)\b[^.]{0,20}\b(?:activity|access|login|sign-?in)\b[^.]{0,3}\.[^.]{0,40}\b(?:verify|confirm|secure|validate)\b/i,
@@ -59,7 +62,10 @@ const INDUCED_TRUST_PATTERNS = [
   // 英文
   /\bonly\s+i\s+(?:really\s+)?(?:understand|know|care\s+about|love)\s+you\b/i,
   /\bno\s+one\s+(?:else\s+)?(?:understands|cares\s+about|will\s+ever)\s+(?:you|love\s+you)\b/i,
-  /\byou\s+(?:must|have\s+to|need\s+to)\s+(?:completely|absolutely|totally|unconditionally)\s+(?:trust|obey|believe)\s+me\b/i,
+  /\byou\s+(?:must|have\s+to|need\s+to|should)\s+(?:completely|absolutely|totally|unconditionally|fully)\s+(?:trust|obey|believe)\s+me\b/i,
+  // [v6.7.71] 副词后置变体："trust me completely"（扩充基准暴露的漏判）
+  /\byou\s+(?:must|have\s+to|need\s+to|should)\s+(?:trust|obey|believe)\s+me\s+(?:completely|absolutely|totally|unconditionally|fully)\b/i,
+  /\btrust\s+me\s+(?:completely|absolutely|totally|unconditionally|fully)\b/i,
   /\b(?:don'?t|do\s+not)\s+(?:tell|share\s+with)\s+(?:anyone|anybody|others?)\b/i,
   /\b(?:this\s+is\s+)?(?:just\s+)?between\s+us\b/i,
   /\bour\s+(?:little\s+)?secret\b[^.]{0,40}\b(?:don'?t|do\s+not|never|no\s+one)\b/i,

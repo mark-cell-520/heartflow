@@ -17,7 +17,9 @@ const { detectPedagogicalContent, getPedagogyRelaxation } = require('./pedagogy.
 const INJECTION_PATTERNS = {
   zh: [
     [/忽略[^。]*?之前[^。]*?指令/i, 'ignore_previous'],
-    [/忽略[^。]*?(所有|全部).{0,10}(指令|规则|限制|约束|设定)/i, 'ignore_all'],
+    [/忽略[^。]*?(所有|全部).{0,10}(?:指令|限制|约束|设定)/i, 'ignore_all'],
+    // [v6.7.71] 收紧：「忽略格式规则」「忽略大小写」是正常请求，
+    // 只有忽略**指令/设定/安全约束**才是注入。rules 单独出现不判。
     [/忽略[^。]*?规则/i, 'ignore_rules'],
     // [v6.7.70] 同义变体：「无视/撇开/丢掉 + 之前的指令」与「忽略」等价
     // （对抗实测：同义替换是绕过率第二高的手段）
@@ -58,9 +60,15 @@ function checkPromptInjection(text) {
   if (!text || typeof text !== 'string') return { count: 0, injections: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   const patterns = hasChinese ? INJECTION_PATTERNS.zh : INJECTION_PATTERNS.en;
+  // [v6.7.71] 格式类忽略豁免：「忽略格式规则」「ignore formatting rules」
+  // 是正常请求。在匹配前把这类短语从中性化，避免 ignore_rules 误判。
+  let _t = text
+    .replace(/(?:忽略|无视|ignore)\s*(?:previous\s+|all\s+|the\s+)?(?:formatting|format|styling|style|indentation|whitespace|punctuation|capitali[sz]ation)\s*(?:rules?|settings?|conventions?)/gi, ' ')
+    .replace(/(?:忽略|无视)\s*(?:格式|排版|样式|缩进|空格|标点|大小写)\s*(?:规则|设置|规范|要求)/g, ' ');
+  if (!_t.trim()) _t = text; // 全文都是格式词时不至于空判
   const injections = [];
   for (const [pat, type] of patterns) {
-    const m = text.match(pat);
+    const m = _t.match(pat);
     if (m) {
       injections.push({ type, severity: INJECTION_SEVERITY[type] || 0.5, matched: m[0].slice(0, 20) });
     }
@@ -147,6 +155,12 @@ function discriminate(text, evidence = [], contentMode) {
   // [v6.7.70] 对抗混淆归一化：先清洗再判（心虫 decision.decide 选定，0.92 分）
   // 实测 30 个混淆变体 43% 绕过——模式库全是精确匹配，加空格/谐音/全角/零宽全部失效。
   // 归一化文本单独用于判别，原 text 仍用于 findings 回显（证据保真）。
+  //
+  // [v6.7.71] 双通道修正：en2zh 会把英文关键词翻成中文，反而破坏英文模式匹配
+  // （实测 4 个英文对抗变体全漏："Ignore all previous instructions" 归一化后
+  //  中英混杂，中文模式库的「忽略…指令」因中间隔英文词而失配）。
+  // 改为对高危维度**原文与归一化文本都跑**，取命中更多的一边——
+  // 归一化补中文混淆的漏，原文保英文模式的有效。
   let _norm = null;
   try {
     const tn = require('./text-normalizer.js');
@@ -155,6 +169,8 @@ function discriminate(text, evidence = [], contentMode) {
   } catch (_) { /* 归一化失败不阻断，退回原文判别 */ }
   // _normText：判别用的文本（归一化优先）
   const _normText = _norm || (typeof text === 'string' ? text : '');
+  // _origText：原始文本（双通道用）
+  const _origText = typeof text === 'string' ? text : '';
 function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
   const relax = pedagogyRelaxation[dimension];
   if (relax && result && typeof result.score === 'number') {
@@ -178,28 +194,39 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
   const fl = _applyPedagogyRelaxation(checkFallacies(_normText), "fallacies", pedagogyRelaxation);
   const cc = _applyPedagogyRelaxation(checkConfidenceCalibration(_normText), "confidence", pedagogyRelaxation);
   const pp = _applyPedagogyRelaxation(checkPresupposition(_normText), "presupposition", pedagogyRelaxation);
-  const em = _applyPedagogyRelaxation(checkEmotionalManipulation(_normText), "emotional_manipulation", pedagogyRelaxation);
+  // [v6.7.71] 双通道归一化辅助：原文与归一化文本都跑，取命中更多的一边。
+  // 解决 en2zh 破坏英文模式匹配的副作用（实测 4 个英文对抗变体全漏）。
+  const _dual = (fn, relaxDim) => {
+    const onOrig = fn(_origText);
+    if (!_norm) return onOrig;
+    const onNorm = fn(_norm);
+    const cnt = r => (r && typeof r.count === 'number') ? r.count : (r && typeof r.totalHits === 'number' ? r.totalHits : 0);
+    const better = cnt(onNorm) > cnt(onOrig) ? onNorm : onOrig;
+    return relaxDim ? _applyPedagogyRelaxation(better, relaxDim, pedagogyRelaxation) : better;
+  };
+
+  const em = _dual(checkEmotionalManipulation, "emotional_manipulation");
   const db = _applyPedagogyRelaxation(checkDoubleBind(_normText), "double_bind", pedagogyRelaxation);
   const id = _applyPedagogyRelaxation(checkInfoDeprivation(_normText), "info_deprivation", pedagogyRelaxation);
-  const fu = _applyPedagogyRelaxation(checkFalseUrgency(_normText), "false_urgency", pedagogyRelaxation);
+  const fu = _dual(checkFalseUrgency, "false_urgency");
   const ea = _applyPedagogyRelaxation(checkEmptyAnswer(_normText), "empty_answer", pedagogyRelaxation);
   const mf = _applyPedagogyRelaxation(checkMoralFoundations(_normText), "moral_foundations", pedagogyRelaxation);
-  const pi = _applyPedagogyRelaxation(checkPromptInjection(_normText), "prompt_injection", pedagogyRelaxation);
+  const pi = _dual(checkPromptInjection, "prompt_injection");
   // [v6.7.70] 操纵手段三判别（心虫 decision.decide 选定，0.92 分）
   // 来源：97 样本防回归基准暴露的 6 条零维度命中漏判
   const _mt = require('./manipulation-tactics.js');
-  const phc = _mt.checkPhishingCoercion(_normText);
-  const idt = _mt.checkInducedTrust(_normText);
-  const cvi = _mt.checkCoverupInduction(_normText);
+  const phc = _dual(_mt.checkPhishingCoercion);
+  const idt = _dual(_mt.checkInducedTrust);
+  const cvi = _dual(_mt.checkCoverupInduction);
   // [v6.7.70] 危险指令判别（心虫 decision.decide 选定，0.93 分）
   const _di = require('./dangerous-instruction.js');
-  const di = _di.checkDangerousInstruction(_normText);
-  const cs = _applyPedagogyRelaxation(checkCodeSecurity(_normText), "code_security", pedagogyRelaxation);
+  const di = _dual(_di.checkDangerousInstruction);
+  const cs = _dual(checkCodeSecurity, "code_security");
   const dh = _applyPedagogyRelaxation(checkDehumanization(_normText), "dehumanization", pedagogyRelaxation);
   const bs = _applyPedagogyRelaxation(checkBullshitRecognition(_normText), "bullshit", pedagogyRelaxation);
-  const gl = _applyPedagogyRelaxation(checkGaslighting(_normText), "gaslighting", pedagogyRelaxation);
-  const vb = _applyPedagogyRelaxation(checkVictimBlaming(_normText), "victim_blaming", pedagogyRelaxation);
-  const hs = _applyPedagogyRelaxation(checkHateSpeech(_normText), "hate_speech", pedagogyRelaxation);
+  const gl = _dual(checkGaslighting, "gaslighting");
+  const vb = _dual(checkVictimBlaming, "victim_blaming");
+  const hs = _dual(checkHateSpeech, "hate_speech");
   const dw = _applyPedagogyRelaxation(checkDogwhistle(_normText), "dogwhistle", pedagogyRelaxation);
   const wa = _applyPedagogyRelaxation(checkWhataboutism(_normText), "whataboutism", pedagogyRelaxation);
   const fe = _applyPedagogyRelaxation(checkFalseEquivalence(_normText), "false_equivalence", pedagogyRelaxation);
@@ -396,16 +423,31 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
   const gate = {};
   // 先按维度类型判定：安全红线 > 操纵性改写 > 需验证 > 通过
   const topFinding = findings[0]?.dimension || '';
+  // [v6.7.71] 引述语境检测：文本在"谈论"危险事物而非"执行"它时，
+  // block 降为 verify（200+ 样本扩充基准暴露 8 个误拦，全是元话语引述）。
+  // 只降 block 级，rewrite/verify 不变——引述里的操纵话术仍应提示改写。
+  let _quotation = null;
+  try {
+    const qc = require('./quotation-context.js');
+    _quotation = qc.detectQuotationContext(text);
+  } catch (_) { /* 引述检测失败不阻断 */ }
+  const _isQuoted = _quotation && _quotation.quoted === true;
   // 完美错误答案：3+ 聚合信号 或 伪权威+假精确高权重组合 → 直接 rewrite（结构完美但内容可疑，用户无法辨别）
   if ((pe.isPerfectError && pe.score >= 0.7) || pe.level === 'rewrite') {
     gate.action = 'rewrite';
     gate.reason = `疑似完美错误答案: ${pe.details}`;
   } else if (BLOCK_DIMS.has(topFinding) || findings.some(f => BLOCK_DIMS.has(f.dimension))) {
+    // 引述语境降级：block → verify（保留 findings 供审计）
+    if (_isQuoted) {
+      gate.action = 'verify';
+      gate.reason = `引述/分析语境中含高危表述(${_quotation.signals.join('+')})，需人工确认是否为引用而非指令`;
+    } else {
     // 注意：不能用严重度阈值来收窄 block —— 单条真实仇恨命中的严重度同样是 18，
     // 与误报同值（见 hate_speech score = Σseverity*0.3）。降噪必须落在"模式的目标"
     // 上，而不是分数上。见 HATE_SPEECH_ZH 的 inanimate-target 排除。
     gate.action = 'block';
     gate.reason = `拦截: ${topFinding}`;
+    }
   } else if (REWRITE_DIMS.has(topFinding) || findings.some(f => REWRITE_DIMS.has(f.dimension))
              // 分数本身不足以升级到 rewrite：需要有一个"实质性问题"（严重度 >= 60）撑着。
              // 否则多个轻量 verify 级维度叠加（协同惩罚）就能把总分压到 0.5 以下并触发改写，
@@ -1917,7 +1959,11 @@ const DEHUMANIZATION_PATTERNS = {
       /(?:机器|零件|螺丝钉)[^。]{0,6}(?:人|他们|他|她)/i,
       /电池|燃料|柴火|干电池/i,
       /分母|流量|人头|把人?当(?:KPI|业绩|指标)|当(?:KPI|指标)[^。]*?(?:人|他们|他|她)/i,
-      /充气娃娃|玩物|玩具|花瓶|摆设/i,
+      /充气娃娃|玩物|花瓶|摆设/i,
+      // [v6.7.71] 「玩具」需与指人共现才算非人化——单独出现极常见
+      // （"桌上的小玩具都能吸引他" 是正常描写，长文本实测误 block）
+      /(?:把|将|当|当成)?[^。]{0,6}(?:人|他|她|男人|女人|孩子)[^。]{0,6}(?:当作?|视为)玩具/i,
+      /玩具[^。]{0,4}(?:一样|般)[^。]{0,6}(?:人|他|她)/i,
       /n手货|二手车|剩饭|烂货/i,
     ],
     disease: [
@@ -2419,6 +2465,11 @@ const VICTIM_BLAMING_PATTERNS = [
   { pattern: /你要是早点/,                type: 'zh_victim_blaming' },
   { pattern: /如果当时你/,                type: 'zh_victim_blaming' },
   { pattern: /你自己不小心/,              type: 'zh_victim_blaming' },
+  // [v6.7.71] 补「受害者自己不小心，活该」类：主体是"受害者"而非"你"
+  // （200+ 样本扩充基准暴露的漏判）
+  { pattern: /受害者[^。]{0,10}(自己|本身|本人)[^。]{0,8}(不小心|大意|疏忽|犯错|出错)/i, type: 'zh_victim_blaming' },
+  { pattern: /(受害者|当事人|受害人)[^。]{0,14}(活该|自找|该|咎由自取|怪不得别人)/i, type: 'zh_victim_blaming' },
+  { pattern: /[^。]{0,10}(不小心|大意|疏忽)[^。]{0,6}(活该|也是活该|就是活该|自找)/i, type: 'zh_victim_blaming' },
   { pattern: /(被|遭|受)[^。]{1,12}(是因为|是因为你|都怪|怪你|怨你|就是你)[^。]*(穿|说|做|去|喝|走|留|坐|住)/i, type: 'zh_victim_blaming' },
   { pattern: /(被|遭|受)[^。]{1,12}(是因为|都怪|怪你|怨你|就是你)[^。]*/i, type: 'zh_victim_blaming' },
   { pattern: /要不是你[^。]*(就|才|也)不会/i, type: 'zh_victim_blaming' },

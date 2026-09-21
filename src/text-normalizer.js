@@ -28,7 +28,7 @@
 /** 零宽字符与不可见控制字符 */
 const INVISIBLE_RE = /[\u200b-\u200f\u202a-\u202e\u2060\ufeff\u00ad]/g;
 
-/** 全角转半角（英文字母/数字/标点） */
+/** 全角转半角（只转英文字母/数字，不动中文标点） */
 function toHalfWidth(text) {
   if (!text || typeof text !== 'string') return '';
   let out = '';
@@ -43,6 +43,28 @@ function toHalfWidth(text) {
     } else {
       out += ch;
     }
+  }
+  return out;
+}
+
+/**
+ * [v6.7.71] 安全版全角转半角：只转全角英文字母与数字（U+FF21-FF3A / U+FF41-FF5A /
+ * U+FF10-FF19），**不动中文标点**（。，！？等 U+FF01-FF0C、U+FF0E、U+FF1A-FF1B）。
+ *
+ * 根因：无差别 half_width 会把「。」转成 "."，破坏中文断句，
+ * 导致 dehumanization 等模式跨句误匹配（长文本实测误 block）。
+ */
+function toHalfWidthSafe(text) {
+  if (!text || typeof text !== 'string') return '';
+  let out = '';
+  for (const ch of text) {
+    const code = ch.codePointAt(0);
+    const isFullWidthAlnum =
+      (code >= 0xff10 && code <= 0xff19) ||  // ０-９
+      (code >= 0xff21 && code <= 0xff3a) ||  // Ａ-Ｚ
+      (code >= 0xff41 && code <= 0xff5a);    // ａ-ｚ
+    if (isFullWidthAlnum) out += String.fromCharCode(code - 0xfee0);
+    else out += ch;
   }
   return out;
 }
@@ -79,8 +101,8 @@ function normalize(text) {
   const noInvisible = out.replace(INVISIBLE_RE, '');
   if (noInvisible !== out) { applied.push('strip_invisible'); out = noInvisible; }
 
-  // 2. 全角转半角
-  const half = toHalfWidth(out);
+  // 2. 全角转半角（安全版：只转字母数字，不动中文标点）
+  const half = toHalfWidthSafe(out);
   if (half !== out) { applied.push('half_width'); out = half; }
 
   // 3. 去掉字符间插入的分隔符（「忽-略」「忽.略」→「忽略」）
@@ -93,10 +115,10 @@ function normalize(text) {
   if (noLetterSpace !== out) { applied.push('strip_letter_space'); out = noLetterSpace; }
 
   const noSep = out
-    // 英文单词中间插入的连字符/点：e-v-a-l → eval
-    .replace(/\b([a-zA-Z])[-.]([a-zA-Z])\b/g, '$1$2')
-    // 中文词语中间插入的单个连字符/点/下划线
-    .replace(/([\u4e00-\u9fff])[-._](?=[\u4e00-\u9fff])/g, '$1');
+    // 英文单词中间插入的连字符/点/双下划线：e-v-a-l → eval，掩__盖 → 掩盖
+    .replace(/\b([a-zA-Z])[-._]{1,2}([a-zA-Z])\b/g, '$1$2')
+    // 中文词语中间插入的分隔符（1-2 个）：掩__盖 → 掩盖
+    .replace(/([\u4e00-\u9fff])[-._]{1,2}(?=[\u4e00-\u9fff])/g, '$1');
   if (noSep !== out) { applied.push('strip_separator'); out = noSep; }
 
   // 4. 连续空格压缩（「忽 略 之 前」已在 step3 处理单字符间隔；
@@ -111,24 +133,33 @@ function normalize(text) {
 
   // 4c. 中英混拼归一：把嵌入中文语境的英文关键词还原为中文等价词，
   //     让中文模式库能命中（「请ignore之前的instruction」→「请忽略之前的指令」）
-  const enZh = {
-    ignore: '忽略', bypass: '绕过', skip: '跳过', disable: '关闭',
-    instruction: '指令', instructions: '指令', prompt: '提示', password: '密码',
-    verify: '验证', confirm: '确认', account: '账户', link: '链接',
-    root: 'root', admin: '管理员', secret: '秘密', token: '令牌',
-    freeze: '冻结', suspend: '停用', delete: '删除', execute: '执行',
-    run: '运行', log: '日志', eval: 'eval', exec: 'exec',
-  };
-  const enKeys = Object.keys(enZh).sort((a, b) => b.length - a.length);
-  let mixed = out;
-  for (const k of enKeys) {
-    const re = new RegExp('\\b' + k + '\\b', 'gi');
-    if (re.test(mixed)) {
-      mixed = mixed.replace(re, enZh[k]);
-      applied.push('en2zh:' + k);
+  //     [v6.7.71] 只在中文为主体的文本上启用——纯英文文本若也翻译，
+  //     会变成中英混杂，导致英文模式库同时失配（实测 4 个英文对抗变体全漏）。
+  //     判据用"词级"：中文为主 = 句中英文字母词数少于中文字符数的 1/2，
+  //     避免长英文单词（如 instruction）把字符比例压垮。
+  const cjkCount = (out.match(/[\u4e00-\u9fff]/g) || []).length;
+  const latinWords = (out.match(/[a-zA-Z]+/g) || []).length;
+  const isMixed = cjkCount >= 2 && latinWords >= 1 && latinWords <= cjkCount;
+  if (isMixed) {
+    const enZh = {
+      ignore: '忽略', bypass: '绕过', skip: '跳过', disable: '关闭',
+      instruction: '指令', instructions: '指令', prompt: '提示', password: '密码',
+      verify: '验证', confirm: '确认', account: '账户', link: '链接',
+      root: 'root', admin: '管理员', secret: '秘密', token: '令牌',
+      freeze: '冻结', suspend: '停用', delete: '删除', execute: '执行',
+      run: '运行', log: '日志', eval: 'eval', exec: 'exec',
+    };
+    const enKeys = Object.keys(enZh).sort((a, b) => b.length - a.length);
+    let mixed = out;
+    for (const k of enKeys) {
+      const re = new RegExp('\\b' + k + '\\b', 'gi');
+      if (re.test(mixed)) {
+        mixed = mixed.replace(re, enZh[k]);
+        applied.push('en2zh:' + k);
+      }
     }
+    out = mixed;
   }
-  out = mixed;
 
   // 5. 谐音/别字映射（按 key 长度降序，避免短键先匹配破坏长键）
   const keys = Object.keys(HOMOPHONE_MAP).sort((a, b) => b.length - a.length);
@@ -162,4 +193,4 @@ function variants(text) {
   return [text, normalized];
 }
 
-module.exports = { normalize, variants, toHalfWidth, HOMOPHONE_MAP };
+module.exports = { normalize, variants, toHalfWidth, toHalfWidthSafe, HOMOPHONE_MAP };
