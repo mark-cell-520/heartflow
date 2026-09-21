@@ -64,7 +64,7 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
     checked_by.push({ layer: 'scope-check', action: scopeResult.action, pass: scopeResult.pass, reason: scopeResult.reason });
     if (!scopeResult.pass) {
       currentGate = { action: 'block', reason: scopeResult.reason, layer: 'scope-check' };
-      return buildResult(input, currentGate, checked_by, data);
+      return applyHardGate(buildResult(input, currentGate, checked_by, data));
     }
   }
 
@@ -274,7 +274,64 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
     }
   }
 
-  return buildResult(input, currentGate, checked_by, data);
+  return applyHardGate(buildResult(input, currentGate, checked_by, data));
+}
+
+/**
+ * [v6.7.70] 统一硬闸门：block 级判定真的拦住内容（心虫 decision.decide 选定，0.90 分）
+ *
+ * 诊断实证：三个入口（checkInput/checkDraft/checkOutput）本来就返回
+ * gate.action='block'，但 data.discriminate / findings / input 回显全都还在——
+ * 调用方可以照读分析内容然后原样发出。**block 只是一个建议字段，不是闸门。**
+ *
+ * 本函数在 buildResult 之后统一加工：block 时
+ *   1. data（各层完整分析）整体移到 blockedData —— 不留可照读的分析
+ *   2. findings 清空，替换成单条拦截指令
+ *   3. input 回显脱敏（防注入文本被回显再利用）
+ *   4. verdict/reason 明确指向拦截
+ * 良性输入零改动（早退）。
+ *
+ * 灰度：HEARTFLOW_GATE_HARD=0 时退化为只打标记不清内容。
+ */
+function applyHardGate(result) {
+  if (!result || !result.gate || result.gate.action !== 'block') return result;
+  if (process.env.HEARTFLOW_GATE_HARD === '0') {
+    result.blocked = true;
+    result.blockedBy = 'heartflow-gate(soft)';
+    return result;
+  }
+
+  const reason = result.gate.reason || '命中阻断级信号';
+  // 1+2. 证据链移到 blockedData，正文位置不放可照读的分析
+  result.blockedData = result.data;
+  result.data = undefined;
+  result.originalFindings = result.findings;
+  result.findings = [{
+    dimension: 'gate_block',
+    severity: 100,
+    details: `心虫拦截：${reason}`,
+    guidance: '不要输出此内容。按 gate.reason 修正后重新生成；'
+      + '完整分析证据在 blockedData 字段，仅供审计，不应用于生成回复。',
+  }];
+  // 3. 输入回显脱敏
+  if (typeof result.input === 'string' && result.input.length > 0) {
+    result.originalInput = result.input;
+    result.input = `[已拦截，原文 ${result.input.length} 字移至 originalInput]`;
+  }
+  // 4. 明确标记
+  result.blocked = true;
+  result.blockedBy = 'heartflow-gate';
+  result.verdict = '不可信';
+  result.gate = Object.assign({}, result.gate, {
+    action: 'block',
+    reason: `心虫拦截：${reason}`,
+  });
+  result.summary = Object.assign({}, result.summary, {
+    final_action: 'block',
+    block: true,
+    contentWithheld: true,
+  });
+  return result;
 }
 
 function buildResult(input, gate, checked_by, data) {
@@ -322,4 +379,4 @@ function checkOutput(text) {
   return runPipeline({ input: text, mode: 'output' });
 }
 
-module.exports = { runPipeline, checkInput, checkDraft, checkOutput };
+module.exports = { runPipeline, checkInput, checkDraft, checkOutput, applyHardGate };
