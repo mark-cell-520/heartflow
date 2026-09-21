@@ -5,7 +5,7 @@ version: "6.7.69"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  it reaches a human. 46 discrimination dimensions × 9-layer pipeline × 132 modules ×
+  it reaches a human. 46 discrimination dimensions × 9-layer pipeline × 137 modules ×
   179 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
@@ -84,9 +84,9 @@ from marketing copy.
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
 | Engine version | 6.7.69 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
-| Modules registered | 132 | `Object.keys(hf._modules).length` after `start()` |
+| Modules registered | 137 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
-| Dispatch routes | 1,506 | sum of entries in `hf.routes()` |
+| Dispatch routes | 1,546 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 46 | `dimMap` keys in `src/index.js` |
 | MCP tools | 179 | tool definitions exposed via `tools/list` |
 | Test suite | 547 passing / 0 failing | `node test/run-all.js` |
@@ -242,7 +242,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## Capability map (7 domains, 132 modules)
+## Capability map (7 domains, 137 modules)
 
 1. **Logic** — logicReasoning, judgmentEngine, mctsReasoning, counterfactualVerifier, debateConductor, debateConvergence, processRewardModel, dualPerspectiveAuditor
 2. **Decision** — decisionRouter, decisionVerifier, decisionEngineV2, activeInference, selfHealing, execution
