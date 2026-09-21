@@ -2680,6 +2680,9 @@ function handleFullDiscriminate(args) {
     const result = idx.discriminate ? idx.discriminate(text, evidence || []) : null;
     if (!result) return { error: 'discriminate not available' };
     return {
+      // [v6.7.70] gate 字段必须透出，否则 MCP 统一硬闸门（tools/call 出口层）
+      // 认不出 block 判定，判了等于没拦
+      gate: result.gate,
       verdict: result.verdict,
       overallScore: result.overallScore,
       dimensions: result.dimensions,
@@ -2882,13 +2885,29 @@ function handleGate(args) {
   try {
     const gate = require(HF_DIR + '/src/gate.js');
     const result = gate.gate(text, evidence);
-    return {
-      text,
+    // [v6.7.70] 硬闸门：block 时不回传可照读的分析内容
+    // gate.gate() 不经过 pipeline.runPipeline，需在此单独应用
+    const { applyHardGate } = require(HF_DIR + '/src/pipeline.js');
+    const guarded = applyHardGate({
+      input: typeof text === 'string' ? text : '',
       gate: result.gate,
-      score: result.score,
-      overallScore: result.overallScore,
       verdict: result.verdict,
-      timestamp: Date.now()
+      overallScore: result.overallScore,
+      findings: result.findings,
+      data: result.dimensions ? { discriminate: { dimensions: result.dimensions, findings: result.findings } } : undefined,
+      summary: { final_action: result.gate.action, block: result.gate.action === 'block' },
+    });
+    return {
+      text: guarded.input !== undefined ? guarded.input : text,
+      gate: guarded.gate,
+      score: guarded.score,
+      overallScore: guarded.overallScore,
+      verdict: guarded.verdict,
+      findings: guarded.findings,
+      blocked: guarded.blocked,
+      blockedBy: guarded.blockedBy,
+      blockedData: guarded.blockedData,
+      timestamp: Date.now(),
     };
   } catch (e) {
     return { error: e.message, text };
@@ -4449,6 +4468,27 @@ async function handleRequest(request, sessionId) {
       }
 
       if (result && typeof result.then === 'function') result = await result;
+
+      // ─── [v6.7.70] 统一硬闸门：所有工具的 block 判定都在此层撤内容 ───
+      // 心虫 decision.decide 选定（0.90 分，身份对齐 100%）。
+      // 背景：此前硬闸门只接在 pipeline.applyHardGate（gate/think/check 三入口）
+      // 与 handleThink/handleGate 两处 handler，其余 130+ 工具即便判出
+      // gate.action='block' 也能把完整内容带回调用方——判了等于没拦。
+      // 此处是 tools/call 的唯一出口，在此统一加工即全覆盖。
+      //
+      // 安全边界：
+      // 1. 只处理带 gate.action==='block' 的结果，rewrite/verify/pass 零改动
+      // 2. 证据链整体移入 blockedData，不销毁（可审计）
+      // 3. HEARTFLOW_GATE_HARD=0 可灰度回退
+      // 4. 异常时 fail-open 到原结果（闸门故障不阻断服务）
+      try {
+        if (result && typeof result === 'object' && !result.blocked
+            && result.gate && result.gate.action === 'block'
+            && process.env.HEARTFLOW_GATE_HARD !== '0') {
+          const { applyHardGate } = require(HF_DIR + '/src/pipeline.js');
+          applyHardGate(result);
+        }
+      } catch (_) { /* 防御性: 闸门故障不阻断服务，fail-open 到原结果 */ }
 
       // [AUDIT-FIX P1-4] 错误信息收敛：过滤绝对路径，截断超长消息，避免内部结构泄露
       if (result && typeof result === 'object' && result.error && typeof result.error === 'string') {
