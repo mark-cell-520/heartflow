@@ -3012,11 +3012,44 @@ function handleFormulaCalc(args) {
 }
 
 
+// ─── [v6.7.70] 实测确认的手工接线 handler（3 个）────────────
+// 每个都经过 dispatch 实测验证（非猜路由）。
+
+/** 多选项决策 */
+function handleDecisionDecideTool(args) {
+  const { task, options, constraints } = args || {};
+  if (!task || !Array.isArray(options) || options.length === 0) {
+    return { error: 'task 与 options[] 为必填（options 元素需 label/feasibility/consequence_value/risk/confidence）' };
+  }
+  return safeDispatch('decision.decide', { task, options, constraints: constraints || {} });
+}
+
+/** 记忆巩固 */
+function handleMemoryConsolidateTool(args) {
+  const limit = args && typeof args.limit === 'number' ? args.limit : 50;
+  return safeDispatch('memory.consolidate', { limit });
+}
+
+/** 执行效果验证 */
+function handleExecutionVerifyTool(args) {
+  const { action, result, expected } = args || {};
+  if (!action) return { error: 'action 是必填参数' };
+  return safeDispatch('execution.verify', { action, result: result || null, expected: expected || null });
+}
+
 const HANDLERS = {
+  // ─── [v6.7.70] 实测确认的手工接线（3 个）──
+  // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
+  // 只接 100% 确认的（心虫 decision.decide 选定 0.94 分：
+  // 「绝不留错路由」——调用方以为拿到 A 能力实际是 B，比空壳更危险）。
+  // 其余 121 个已从 tools-registry 移除（见 scripts/clean-tool-registry.js）
   heartflow_gate: handleGate,
   heartflow_gate_check: handleGateCheck,
   heartflow_gate_pipeline: handleGatePipeline,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,
+  heartflow_decision_decide: handleDecisionDecideTool,
+  heartflow_memory_consolidate: handleMemoryConsolidateTool,
+  heartflow_execution_verify: handleExecutionVerifyTool,
   heartflow_formula_bridge: handleFormulaBridge,
   heartflow_formula_calc: handleFormulaCalc,
 
