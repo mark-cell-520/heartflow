@@ -122,8 +122,8 @@ at runtime, no runtime dependencies.
 ## MCP integration
 
 ```bash
-git clone https://github.com/yun520-1/mark-heartflow-skill.git
-cd mark-heartflow-skill
+git clone https://github.com/mark-cell-520/heartflow.git
+cd heartflow
 node src/mcp-server.js --port 8588
 # or a Unix socket:
 node src/mcp-server.js --socket /tmp/heartflow.sock
@@ -184,4 +184,4 @@ These are the rules this codebase actually follows. Follow them when changing it
 
 ## GitHub
 
-https://github.com/yun520-1/mark-heartflow-skill
+https://github.com/mark-cell-520/heartflow
