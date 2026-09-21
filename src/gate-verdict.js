@@ -78,17 +78,22 @@ function _describe(key, value) {
   if (value === true) return '';
   if (typeof value === 'string') return value;
   if (Array.isArray(value)) {
-    return value.slice(0, 3).map(v => (typeof v === 'string' ? v : (v && (v.message || v.type)) || String(v))).join('；');
+    return value.slice(0, 3).map(v => (typeof v === 'string' ? v : (v && (v.message || v.type || v.label || v.name)) || String(v))).join('；');
   }
   if (typeof value === 'object') {
     if (Array.isArray(value.issues) && value.issues.length > 0) {
       return value.issues.slice(0, 3).map(i => i.message || i.type || String(i)).join('；');
     }
     if (Array.isArray(value.warnings) && value.warnings.length > 0) {
-      return value.warnings.slice(0, 3).map(w => (typeof w === 'string' ? w : (w && w.message) || String(w))).join('；');
+      return value.warnings.slice(0, 3).map(w => (typeof w === 'string' ? w : (w && (w.message || w.type || w.label || w.name)) || String(w))).join('；');
     }
     if (typeof value.score === 'number') return `score=${value.score}`;
     if (value.matches) return `命中 ${value.matches.length} 项`;
+    // [v6.7.70] 兜底：未知对象形状不要直接 String()（会输出 [object Object]）
+    // 取第一个有意义的字符串字段，再不行只报键数。
+    const strField = Object.values(value).find(v => typeof v === 'string' && v.length > 0);
+    if (strField) return strField.slice(0, 120);
+    return `${Object.keys(value).length} 个字段`;
   }
   return '';
 }
