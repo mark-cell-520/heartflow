@@ -67,5 +67,5 @@ t('报告 gate 段不抛异常（gate-verdict 缺失时降级）', () => {
   return r.report && r.report.gate ? true : '缺 gate 段';
 });
 
-console.log(`\n结果: ${pass} passed, ${fail} failed`);
+console.log(`\n结果: ${pass} 通过, ${fail} 失败, 共 ${pass + fail} 个`);
 process.exit(fail > 0 ? 1 : 0);
