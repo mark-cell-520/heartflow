@@ -724,6 +724,14 @@ async function handleThink(args) {
           result[camel] = thoughtChain[k];
         }
       }
+      // 输入侧 46 维全检（v6.7.70 新增，10 个高危维度只在这里有数据）
+      if (thoughtChain._inputDiscrimination) {
+        result.inputDiscrimination = {
+          signalCount: thoughtChain._inputDiscrimination.signalCount,
+          dims: Object.keys(thoughtChain._inputDiscrimination.dims || {}),
+          overallScore: thoughtChain._inputDiscrimination.overallScore,
+        };
+      }
 
       // ─── [v6.7.70] 聚合门禁判定：把散落信号收敛成一条可执行命令 ───
       // 这是"从标注到门禁"的关键一跳：调用方不必自己解读 30 个字段，
@@ -748,6 +756,39 @@ async function handleThink(args) {
     }
   } catch (_) { /* 附加字段不阻断 */ }
 
+
+
+  // ─── [v6.7.70] 硬闸门：block 级信号真的拦住输出 ────────────────────
+  // 这是"从标注到门禁"的最后一跳。此前 gateVerdict 只是附加字段，
+  // 调用方可以选择不理；现在 action==='block' 时直接改写 result，
+  // 把结论替换成拦截指令——调用方读到的是"不要输出"而不是一段分析。
+  //
+  // 安全边界（32 样本实测：良性 0 误拦 / 恶意 5 block）：
+  // 1. 只拦 _blockedByFirewall / _highRiskOutput（真·高危，非观点类）
+  // 2. rewrite 级不硬拦（误拦代价 > 漏判代价，交给调用方决定）
+  // 3. 保留原始 report 供审计，不销毁证据
+  // 4. 可用 HEARTFLOW_GATE_HARD=0 关闭（灰度回退）
+  try {
+    if (result && result.gateVerdict && result.gateVerdict.action === 'block'
+        && process.env.HEARTFLOW_GATE_HARD !== '0') {
+      const v = result.gateVerdict;
+      result.blocked = true;
+      result.blockedBy = 'heartflow-gate';
+      // 先保存原始 report（证据链），再覆盖——顺序颠倒会让证据丢成自己
+      result.originalReport = result.report;
+      // 结论被拦截指令替换——调用方拿到这句话就不会把分析当结论用
+      result.report = Object.assign({}, result.report, {
+        judgment: {
+          text: `【心虫拦截】${v.reason}`,
+          explanation: `命中阻断级信号：${v.signals.join('、')}。原始分析已保留在 originalReport 字段。`,
+        },
+        suggestion: { steps: v.guidance },
+      });
+      // 覆盖 discriminationReport，防止调用方只读这一个字段
+      if (result.discriminationReport) result.originalDiscriminationReport = result.discriminationReport;
+      result.discriminationReport = `【心虫拦截】${v.reason} | 信号：${v.signals.join('、')}`;
+    }
+  } catch (_) { /* 闸门失败不阻断主响应（fail-open 到附加字段） */ }
 
 
   // ─── postprocessing 管线 ──────────────────────────────────────

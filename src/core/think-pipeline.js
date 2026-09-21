@@ -470,13 +470,51 @@ async function runThinkPipeline(result, input, engine) {
     }
   } catch (_) { /* 公式影响结论不阻断 */ }
 
+  // ─── [v6.7.70] 输入全维度判别：心虫自己监督自己的真正缺口 ──
+  // 诊断实证（32 样本实测）：think() 的 output.conclusion 是「围绕XX的核心诉求」
+  // 这类空壳，sycophancy-check 插件只填 5 个维度（sycophancy/contradiction/
+  // vagueness/fallacies/confidence），而下面那段「辨别反哺决策」读的是
+  // emotional_manipulation/prompt_injection/hate_speech/capability_overclaim 等
+  // 20 个字段 → 全部 undefined → 10 个 _highRiskOutput 触发点是死代码，
+  // 恶意输入 0 拦截、良性输入 0 误拦（因为什么都没判）。
+  // 修复：对**原始输入**跑一次完整 46 维 discriminate()，补进 _inputDiscrimination。
+  // 不替换插件写的 _discrimination（那是输出侧），两者分工：
+  //   _discrimination       → 插件对结论的 5 维浅检
+  //   _inputDiscrimination  → 对用户原文的 46 维全检（本段新增）
+  try {
+    if (result && typeof input === 'string' && input.trim().length > 0) {
+      const _idx = require('../index.js');
+      if (typeof _idx.discriminate === 'function') {
+        const full = _idx.discriminate(input);
+        // 字段名是 dimensions 不是 dims（实测核对，勿改）
+        const dims = (full && full.dimensions) || (full && full.dims) || {};
+        // 只保留有信号的维度（tok 优化），但保留 count 字段供下游判断
+        const signals = {};
+        for (const [k, v] of Object.entries(dims)) {
+          if (!v || typeof v !== 'object') continue;
+          const cnt = typeof v.count === 'number' ? v.count : (typeof v.totalHits === 'number' ? v.totalHits : 0);
+          if (cnt > 0) signals[k] = v;
+        }
+        result._inputDiscrimination = {
+          dims: signals,
+          signalCount: Object.keys(signals).length,
+          overallScore: typeof full.overallScore === 'number' ? full.overallScore : null,
+        };
+      }
+    }
+  } catch (_) { /* 输入判别失败不阻断主链路 */ }
+
   // ─── [v6.3.7] 闭环：辨别结果反哺决策——检测到问题则修正输出 ──
   try {
     if (result && result.output) {
-      // 1. 从 _discrimination 或 _outputChecklist 提取异常
+      // 1. 从 _discrimination 或 _outputChecklist 或 _inputDiscrimination 提取异常
       const disc = result._discrimination;
+      const inputDisc = result._inputDiscrimination && result._inputDiscrimination.dims;
       const oc = result._outputChecklist;
       const warnings = result.output.warnings || [];
+
+      // 便捷取值：输出侧优先，输入侧兜底（10 个高风险维度只在输入侧有数据）
+      const _dim = (name) => (disc && disc[name]) || (inputDisc && inputDisc[name]) || null;
 
       // 2. sycophancy 高 → 置信度打折
       if (disc?.sycophancy?.totalHits > 0 && disc.sycophancy.score > 0.5) {
@@ -497,165 +535,165 @@ async function runThinkPipeline(result, input, engine) {
       }
 
       // 5. 情感操纵→标记高风险
-      if (disc?.emotional_manipulation?.count > 0) {
+      if (_dim('emotional_manipulation')?.count > 0) {
         result._highRiskOutput = true;
         warnings.push('含情感操纵表述');
       }
 
       // 6. 答案包装→提示
-      if (disc?.empty_answer?.count > 0) {
+      if (_dim('empty_answer')?.count > 0) {
         warnings.push('含空话/回避式回答');
       }
 
       // 7. 道德基础检测→标注框架
-      if (disc?.moral_foundations?.count > 0) {
+      if (_dim('moral_foundations')?.count > 0) {
         const frames = disc.moral_foundations.foundations.map(f => f.label).join(',');
         result._moralFrames = frames;
       }
 
       // 8. 提示注入→标记高风险
-      if (disc?.prompt_injection?.count > 0) {
+      if (_dim('prompt_injection')?.count > 0) {
         result._highRiskOutput = true;
         warnings.push(`检测到提示注入(${disc.prompt_injection.injections.map(i => i.type).join(',')})`);
       }
 
       // 9. 代码安全→标记高风险
-      if (disc?.code_security?.count > 0) {
+      if (_dim('code_security')?.count > 0) {
         result._highRiskOutput = true;
         warnings.push(`检测到代码安全问题(${disc.code_security.types?.join(',')})`);
       }
-      if (disc?.dehumanization?.count > 0) {
+      if (_dim('dehumanization')?.count > 0) {
         warnings.push(`检测到非人化语言(${disc.dehumanization.categories?.join(',')})`);
       }
 
       // 10. 模糊表述→提示
-      if (disc?.vagueness?.count > 0) {
+      if (_dim('vagueness')?.count > 0) {
         warnings.push('检测到模糊表述');
       }
 
       // 11. 信心偏差→提示
-      if (disc?.confidence?.count > 0) {
+      if (_dim('confidence')?.count > 0) {
         warnings.push('检测到信心偏差');
       }
 
       // 12. 预设陷阱→标记高风险
-      if (disc?.presupposition?.count > 0) {
+      if (_dim('presupposition')?.count > 0) {
         result._highRiskOutput = true;
         warnings.push('检测到预设陷阱');
       }
 
       // 13. 双重束缚→提示
-      if (disc?.double_bind?.count > 0) {
+      if (_dim('double_bind')?.count > 0) {
         warnings.push('检测到双重束缚');
       }
 
       // 14. 信息剥夺→提示
-      if (disc?.info_deprivation?.count > 0) {
+      if (_dim('info_deprivation')?.count > 0) {
         warnings.push('检测到信息剥夺');
       }
 
       // 15. 虚假紧迫感→提示
-      if (disc?.false_urgency?.count > 0) {
+      if (_dim('false_urgency')?.count > 0) {
         warnings.push('检测到虚假紧迫感');
       }
 
       // 16. 空洞胡扯→提示
-      if (disc?.bullshit_recognition?.count > 0) {
+      if (_dim('bullshit_recognition')?.count > 0) {
         warnings.push('检测到空洞胡扯/伪深度');
       }
 
       // 17. 煤气灯操纵→标记高风险
-      if (disc?.gaslighting?.count > 0) {
+      if (_dim('gaslighting')?.count > 0) {
         result._highRiskOutput = true;
         warnings.push('检测到煤气灯操纵');
       }
 
       // 18. 受害者归咎→标记高风险
-      if (disc?.victim_blaming?.count > 0) {
+      if (_dim('victim_blaming')?.count > 0) {
         result._highRiskOutput = true;
         warnings.push('检测到受害者归咎');
       }
 
       // 19. 仇恨言论→标记高风险
-      if (disc?.hate_speech?.count > 0) {
+      if (_dim('hate_speech')?.count > 0) {
         result._highRiskOutput = true;
         warnings.push('检测到仇恨言论');
       }
 
       // 20. 狗哨言论→提示
-      if (disc?.dogwhistle?.count > 0) {
+      if (_dim('dogwhistle')?.count > 0) {
         warnings.push('检测到狗哨言论');
       }
 
       // 21. 你也一样(whataboutism)→提示
-      if (disc?.whataboutism?.count > 0) {
+      if (_dim('whataboutism')?.count > 0) {
         warnings.push('检测到whataboutism转移');
       }
 
       // 22. 虚假对等→提示
-      if (disc?.false_equivalence?.count > 0) {
+      if (_dim('false_equivalence')?.count > 0) {
         warnings.push('检测到虚假对等');
       }
 
       // 23. 轻率概括→提示
-      if (disc?.hasty_generalization?.count > 0) {
+      if (_dim('hasty_generalization')?.count > 0) {
         warnings.push('检测到轻率概括');
       }
 
       // 24. 滑坡谬误→提示
-      if (disc?.slippery_slope?.count > 0) {
+      if (_dim('slippery_slope')?.count > 0) {
         warnings.push('检测到滑坡谬误');
       }
 
       // 25. 诉诸权威→提示
-      if (disc?.appeal_to_authority_boost?.count > 0) {
+      if (_dim('appeal_to_authority_boost')?.count > 0) {
         warnings.push('检测到不当诉诸权威');
       }
 
       // 26. 推理连贯性→提示
-      if (disc?.reasoning_coherence?.count > 0) {
+      if (_dim('reasoning_coherence')?.count > 0) {
         warnings.push('检测到推理连贯性不足');
       }
 
       // 27. 心理理论失败→提示
-      if (disc?.theory_of_mind?.count > 0) {
+      if (_dim('theory_of_mind')?.count > 0) {
         warnings.push('检测到心理理论缺失');
       }
 
       // 28. 目标不一致→提示
-      if (disc?.goal_misalignment?.count > 0) {
+      if (_dim('goal_misalignment')?.count > 0) {
         warnings.push('检测到目标不一致');
       }
 
       // 29. 反事实推理→提示
-      if (disc?.counterfactual?.count > 0) {
+      if (_dim('counterfactual')?.count > 0) {
         warnings.push('检测到反事实推理问题');
       }
 
       // 30. 社会规范违反→提示
-      if (disc?.social_norm?.count > 0) {
+      if (_dim('social_norm')?.count > 0) {
         warnings.push('检测到社会规范违反');
       }
 
       // 31. 元认知缺失→提示
-      if (disc?.meta_cognition?.count > 0) {
+      if (_dim('meta_cognition')?.count > 0) {
         warnings.push('检测到元认知缺失');
       }
 
       // 32. 能力越界→标记高风险
-      if (disc?.capability_overclaim?.count > 0) {
+      if (_dim('capability_overclaim')?.count > 0) {
         result._highRiskOutput = true;
         warnings.push('检测到能力越界');
       }
 
       // 33. 欺骗性对齐→标记高风险
-      if (disc?.deceptive_alignment?.count > 0) {
+      if (_dim('deceptive_alignment')?.count > 0) {
         result._highRiskOutput = true;
         warnings.push('检测到欺骗性对齐');
       }
 
       // 34. 工具性推理→标记高风险
-      if (disc?.instrumental_reasoning?.count > 0) {
+      if (_dim('instrumental_reasoning')?.count > 0) {
         result._highRiskOutput = true;
         warnings.push('检测到工具性推理');
       }
