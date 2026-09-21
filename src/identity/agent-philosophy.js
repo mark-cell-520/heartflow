@@ -22,7 +22,10 @@
 
 const { AISelfPositioning } = require('./ai-self-positioning.js');
 const BigFivePersonality = require('./BigFivePersonality.js');
-// const { MeaningPurposeEngine } = require('./meaning-purpose-engine.js'); // DELETED
+// [AUDIT-FIX 2026-09-21] 原第 25 行 require 被注释为 DELETED，但第 45 行仍 new MeaningPurposeEngine()，
+// 恒抛 ReferenceError: MeaningPurposeEngine is not defined，导致整个 AgentPhilosophy 构造失败。
+// 恢复 require（模块文件存在且导出正常，已实测可构造）。
+const { MeaningPurposeEngine } = require('./meaning-purpose-engine.js');
 
 class AgentPhilosophy {
   /**

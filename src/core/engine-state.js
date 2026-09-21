@@ -14,6 +14,17 @@ const debugLog = require('../utils/debug-log');
 
 const { load: loadConfig } = require('./config');
 
+// [AUDIT-FIX 2026-09-21] 本模块 15 处使用 _boundedPush 但从未定义或导入，
+// 导致 _runSelfImprovementHealthCheck() 恒抛 ReferenceError，自改进健康检查形同虚设。
+// 与 heartflow.js 第 148 行的实现保持一致（有界数组追加，防内存泄漏）。
+const MAX_ARRAY_SIZE = 1000;
+function _boundedPush(arr, item, maxSize = MAX_ARRAY_SIZE) {
+  if (!Array.isArray(arr)) return arr;
+  arr.push(item);
+  while (arr.length > maxSize) arr.shift();
+  return arr;
+}
+
 
 
 // ★ 全局配置单例（惰性加载，首次访问时初始化）

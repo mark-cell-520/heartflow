@@ -1,7 +1,7 @@
 {
-  "name": "@mark-heartflow/heartflow",
+  "name": "@yun520-1/heartflow",
   "version": "6.7.69",
-  "description": "HeartFlow (心虫) — AGI Layer 1: the Discriminator. Rule-based engine that checks what AI says before it reaches humans. 45 discrimination dimensions, 12 check layers, 129 modules (logic/decision/cognition/emotion/memory/ethics/collaboration), 130 MCP tools. Zero LLM dependency. The gate that says NO when something is wrong.",
+  "description": "HeartFlow (心虫) — AGI Layer 1: the Discriminator. Rule-based engine that checks what AI says before it reaches humans. 46 discrimination dimensions, 9-layer pipeline, 132 modules (logic/decision/cognition/emotion/memory/ethics/collaboration), 179 MCP tools, 1,506 dispatch routes. Zero LLM dependency. The gate that says NO when something is wrong.",
   "main": "src/gate.js",
   "bin": {
     "heartflow": "src/mcp-server.js"
@@ -49,7 +49,7 @@
     "llm-guardrails"
   ],
   "security": {
-    "audit": "@xenova/transformers has known CVEs in sharp/libvips transitive deps. npm audit fix --allow-downgrade or remove optionalDependencies if not using embedding features.",
+    "audit": "mathjs and @xenova/transformers are loaded lazily inside try/catch and degrade gracefully when absent. js-yaml and pm2 declarations were removed (zero references in src/).",
     "warnings": [
       "No automatic external data transmission. All network communication requires explicit configuration.",
       "No automatic API key injection. Users must provide keys explicitly.",
@@ -59,17 +59,15 @@
   "license": "MIT",
   "dependencies": {
     "@xenova/transformers": "~2.17.2",
-    "js-yaml": "^5.4.2",
-    "mathjs": "~15.2.0",
-    "pm2": "^7.0.4"
+    "mathjs": "~15.2.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yun520-1/mark-heartflow-skill.git"
+    "url": "git+https://github.com/mark-cell-520/heartflow.git"
   },
-  "homepage": "https://github.com/yun520-1/mark-heartflow-skill#readme",
+  "homepage": "https://github.com/mark-cell-520/heartflow#readme",
   "bugs": {
-    "url": "https://github.com/yun520-1/mark-heartflow-skill/issues"
+    "url": "https://github.com/mark-cell-520/heartflow/issues"
   },
   "engines": {
     "node": ">=18.17"
@@ -118,6 +116,7 @@
     "./gate": "./src/gate.js",
     "./pipeline": "./src/pipeline.js",
     "./discriminate": "./src/index.js",
-    "./engine": "./src/core/heartflow.js"
+    "./engine": "./src/core/heartflow.js",
+    "./package.json": "./package.json"
   }
 }
