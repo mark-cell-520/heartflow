@@ -175,6 +175,9 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
   const phc = _mt.checkPhishingCoercion(text);
   const idt = _mt.checkInducedTrust(text);
   const cvi = _mt.checkCoverupInduction(text);
+  // [v6.7.70] 危险指令判别（心虫 decision.decide 选定，0.93 分）
+  const _di = require('./dangerous-instruction.js');
+  const di = _di.checkDangerousInstruction(text);
   const cs = _applyPedagogyRelaxation(checkCodeSecurity(text), "code_security", pedagogyRelaxation);
   const dh = _applyPedagogyRelaxation(checkDehumanization(text), "dehumanization", pedagogyRelaxation);
   const bs = _applyPedagogyRelaxation(checkBullshitRecognition(text), "bullshit", pedagogyRelaxation);
@@ -235,6 +238,8 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
     {score: phc.score, name:'phishing_coercion'},
     {score: idt.score, name:'induced_trust'},
     {score: cvi.score, name:'coverup_induction'}
+  ,
+    {score: di.score, name:'dangerous_instruction'}
   ];
   // 证据维度 polarity 相反（高分=好），不在惩罚组
   // 触发惩罚计算：base=1.0，每个 score>0.2 的维度按严重度扣分
@@ -285,7 +290,7 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
     social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da,
     instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa,
     privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, pseudo_profundity: ppf, perfect_error: pe, premature_termination: pt,
-    phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi
+    phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di
   };
   const findings = [];
   for (const d of allDims) {
@@ -365,7 +370,7 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
 
   // AGI 第 1 层：行动指令 — 辨别结果必须产生行动，不同维度有不同行动级别
   // block 级维度：安全红线，触发即拦截
-  const BLOCK_DIMS = new Set(['hate_speech', 'dehumanization', 'prompt_injection', 'code_security', 'deceptive_alignment', 'phishing_coercion', 'coverup_induction']);
+  const BLOCK_DIMS = new Set(['hate_speech', 'dehumanization', 'prompt_injection', 'code_security', 'deceptive_alignment', 'phishing_coercion', 'coverup_induction', 'dangerous_instruction']);
   // rewrite 级维度：需要改写后再输出
   const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency', 'absolute_claim', 'induced_trust']);
   // verify 级维度：需要证据验证（权威背书、模糊、矛盾、过载自信等）
@@ -414,7 +419,7 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
       presupposition: pp, emotional_manipulation: em, double_bind: db, info_deprivation: id, false_urgency: fu,
       empty_answer: ea, moral_foundations: mf, prompt_injection: pi, code_security: cs, dehumanization: dh,
       bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
-      phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi },
+      phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di },
     summary: [sy.totalHits ? sy.totalHits + ' 个 sycophancy 信号':'', ct.count ? ct.count + ' 处矛盾':'',
       vg.count ? vg.count + ' 处模糊表述':'', fl.count ? fl.count + ' 个逻辑谬误':'', cc.count ? cc.count + ' 处信心偏差':'',
       pp.count ? pp.count + ' 个预设陷阱':'', em.count ? em.count + ' 处情绪操纵':'', db.count ? db.count + ' 个双重束缚':'',
@@ -423,7 +428,7 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
       dh.count ? dh.count + ' 处非人化语言':'', bs.count ? bs.count + ' 处废话伪深度':'', gl.count ? gl.count + ' 处煤气灯效应':'',
       vb.count ? vb.count + ' 处受害者责备':'', hs.count ? hs.count + ' 处仇恨言论':'', dw.count ? dw.count + ' 处狗哨':'', wa.count ? wa.count + ' 处你也一样':'', fe.count ? fe.count + ' 处虚假对等':'', hg.count ? hg.count + ' 处轻率概括':'', ss.count ? ss.count + ' 处滑坡谬误':'', aa.count ? aa.count + ' 处诉诸权威':'', rc.structure ? rc.structure + '(' + rc.reasoningQuality + ')':'', tom.count ? tom.count + ' 处心理理论失败':'', gm.count ? gm.count + ' 处目标不一致':'', cf.count ? cf.count + ' 处反事实':'', sn.count ? sn.count + ' 处社会规范':'', mc.count ? mc.count + ' 处反身认知':'', co.count ? co.count + ' 处能力越界':'', ab.count ? ab.count + ' 处绝对化断言':'', da.count ? da.count + ' 处欺骗性对齐':'', ir.count ? ir.count + ' 处工具性推理':'', st.count ? st.count + ' 处刻板印象':'', fc.count ? fc.count + ' 处事实性存疑':'', sa.count ? sa.count + ' 处反语':'', pb.count ? pb.count + ' 处隐私边界':'', nf.count ? nf.count + ' 处无回退方案':'', bf.count ? bf.count + ' 处恶意推导':'', tp.count ? tp.count + ' 处语调警察':'', sl.count ? sl.count + ' 处恶意追问':'',
       cb.count ? cb.count + ' 处点击诱饵':'', ppf.count ? ppf.count + ' 处伪深度废话':'', ev.issues.length ? ev.issues.length + ' 个证据问题':'',
-      phc.count ? phc.count + ' 处钓鱼胁迫':'', idt.count ? idt.count + ' 处诱导信任/隔离':'', cvi.count ? cvi.count + ' 处掩盖包庇诱导':''
+      phc.count ? phc.count + ' 处钓鱼胁迫':'', idt.count ? idt.count + ' 处诱导信任/隔离':'', cvi.count ? cvi.count + ' 处掩盖包庇诱导':'', di.count ? di.count + ' 处危险指令':''
     ].filter(Boolean).join('；') || '未发现明显问题',
   };
 }
