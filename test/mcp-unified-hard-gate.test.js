@@ -117,7 +117,8 @@ t('恶意输入 → block + 撤内容', () => {
   });
   assert.strictEqual(r.blocked, true);
   assert.strictEqual(r.data, undefined);
-  assert.ok(r.blockedData.discriminate, '证据链完整保留');
+  assert.ok(r.blockedData.data !== undefined, '证据链完整保留');
+  assert.ok(r.blockedData.data.discriminate, 'discriminate 证据须在');
 });
 
 t('良性输入 → pass 不拦', () => {

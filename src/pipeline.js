@@ -306,9 +306,16 @@ function applyHardGate(result) {
   }
 
   const reason = result.gate.reason || '命中阻断级信号';
-  // 1+2. 证据链移到 blockedData，正文位置不放可照读的分析
-  result.blockedData = result.data;
-  result.data = undefined;
+  // 1+2. 证据链移到 blockedData，正文位置不放可照读的分析。
+  //     同时撤掉常见的分析载荷字段（不同 handler 用的字段名不同：
+  //     data / dimensions / raw / readableReport / results）
+  result.blockedData = {};
+  for (const k of ['data', 'dimensions', 'raw', 'readableReport', 'results', 'summary', 'crossAnalysis', 'entropyAnalysis']) {
+    if (result[k] !== undefined) {
+      result.blockedData[k] = result[k];
+      result[k] = undefined;
+    }
+  }
   result.originalFindings = result.findings;
   result.findings = [{
     dimension: 'gate_block',
