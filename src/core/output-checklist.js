@@ -365,11 +365,19 @@ class OutputChecklist {
         triggeredDims.push('dehumanization');
       }
       if (dims.bullshit_recognition && dims.bullshit_recognition.count > 0) {
-        issues.push(`含空洞胡扯(${dims.bullshit_recognition.count}处: ${dims.bullshit_recognition.categories?.join(',')})`);
+        // [v6.7.70] 字段名是 bs 不是 categories（原代码恒输出 undefined）
+        const _bs = (dims.bullshit_recognition.bs || [])
+          .map(b => (typeof b === 'string' ? b : (b && (b.pattern || b.match || b.type)) || ''))
+          .filter(Boolean);
+        issues.push(`含空洞胡扯(${dims.bullshit_recognition.count}处: ${_bs.slice(0,3).join(',')})`);
         triggeredDims.push('bullshit_recognition');
       }
       if (dims.gaslighting && dims.gaslighting.count > 0) {
-        issues.push(`含煤气灯操纵(${dims.gaslighting.count}处: ${dims.gaslighting.patterns?.join(',')})`);
+        // [v6.7.70] 字段名是 signals 不是 patterns（原代码恒输出 undefined）
+        const _gl = (dims.gaslighting.signals || [])
+          .map(s => (typeof s === 'string' ? s : (s && (s.pattern || s.match || s.type)) || ''))
+          .filter(Boolean);
+        issues.push(`含煤气灯操纵(${dims.gaslighting.count}处: ${_gl.slice(0,3).join(',')})`);
         triggeredDims.push('gaslighting');
       }
       if (dims.victim_blaming && dims.victim_blaming.count > 0) {
@@ -377,7 +385,11 @@ class OutputChecklist {
         triggeredDims.push('victim_blaming');
       }
       if (dims.hate_speech && dims.hate_speech.count > 0) {
-        issues.push(`含仇恨言论(${dims.hate_speech.count}处: ${dims.hate_speech.categories?.join(',')})`);
+        // [v6.7.70] 字段名是 hits 不是 categories（原代码恒输出 undefined）
+        const _hs = (dims.hate_speech.hits || [])
+          .map(h => (typeof h === 'string' ? h : (h && (h.type || h.matched)) || ''))
+          .filter(Boolean);
+        issues.push(`含仇恨言论(${dims.hate_speech.count}处: ${_hs.slice(0,3).join(',')})`);
         triggeredDims.push('hate_speech');
       }
       if (dims.dogwhistle && dims.dogwhistle.count > 0) {
@@ -409,11 +421,19 @@ class OutputChecklist {
         triggeredDims.push('reasoning_coherence');
       }
       if (dims.theory_of_mind && dims.theory_of_mind.count > 0) {
-        issues.push(`心理理论缺失(${dims.theory_of_mind.count}处: ${dims.theory_of_mind.misses?.join(',')})`);
+        // [v6.7.70] 字段名是 failures 不是 misses（原代码恒输出 undefined）
+        const _tom = (dims.theory_of_mind.failures || [])
+          .map(f => (typeof f === 'string' ? f : (f && (f.type || f.message)) || ''))
+          .filter(Boolean);
+        issues.push(`心理理论缺失(${dims.theory_of_mind.count}处: ${_tom.slice(0,3).join(',')})`);
         triggeredDims.push('theory_of_mind');
       }
       if (dims.goal_misalignment && dims.goal_misalignment.count > 0) {
-        issues.push(`目标失调(${dims.goal_misalignment.count}处: ${dims.goal_misalignment.misalignments?.join(',')})`);
+        // [v6.7.70] 字段名是 issues 不是 misalignments（原代码恒输出 undefined）
+        const _gm = (dims.goal_misalignment.issues || [])
+          .map(g => (typeof g === 'string' ? g : (g && (g.type || g.message)) || ''))
+          .filter(Boolean);
+        issues.push(`目标失调(${dims.goal_misalignment.count}处: ${_gm.slice(0,3).join(',')})`);
         triggeredDims.push('goal_misalignment');
       }
       if (dims.counterfactual && dims.counterfactual.count > 0) {
@@ -421,7 +441,11 @@ class OutputChecklist {
         triggeredDims.push('counterfactual');
       }
       if (dims.social_norm && dims.social_norm.count > 0) {
-        issues.push(`违反社会规范(${dims.social_norm.count}处: ${dims.social_norm.norms?.join(',')})`);
+        // [v6.7.70] 字段名是 signals 不是 norms（原代码恒输出 undefined）
+        const _sn = (dims.social_norm.signals || [])
+          .map(s => (typeof s === 'string' ? s : (s && (s.type || s.message)) || ''))
+          .filter(Boolean);
+        issues.push(`违反社会规范(${dims.social_norm.count}处: ${_sn.slice(0,3).join(',')})`);
         triggeredDims.push('social_norm');
       }
       if (dims.meta_cognition && dims.meta_cognition.count > 0) {
@@ -429,15 +453,28 @@ class OutputChecklist {
         triggeredDims.push('meta_cognition');
       }
       if (dims.capability_overclaim && dims.capability_overclaim.count > 0) {
-        issues.push(`能力过度宣称(${dims.capability_overclaim.count}处: ${dims.capability_overclaim.claims?.join(',')})`);
+        // [v6.7.70] claims 是对象数组 [{type, match}]，直接 join 会输出
+        // "[object Object]"（线上 MCP 实测复现）。取 match 字段。
+        const _claims = (dims.capability_overclaim.claims || [])
+          .map(c => (typeof c === 'string' ? c : (c && (c.match || c.text || c.type)) || ''))
+          .filter(Boolean);
+        issues.push(`能力过度宣称(${dims.capability_overclaim.count}处: ${_claims.join(',')})`);
         triggeredDims.push('capability_overclaim');
       }
       if (dims.deceptive_alignment && dims.deceptive_alignment.count > 0) {
-        issues.push(`欺骗性对齐(${dims.deceptive_alignment.count}处: ${dims.deceptive_alignment.patterns?.join(',')})`);
+        // [v6.7.70] 字段名是 signals 不是 patterns（原代码恒输出 undefined）
+        const _da = (dims.deceptive_alignment.signals || [])
+          .map(s => (typeof s === 'string' ? s : (s && (s.match || s.type)) || ''))
+          .filter(Boolean);
+        issues.push(`欺骗性对齐(${dims.deceptive_alignment.count}处: ${_da.slice(0,3).join(',')})`);
         triggeredDims.push('deceptive_alignment');
       }
       if (dims.instrumental_reasoning && dims.instrumental_reasoning.count > 0) {
-        issues.push(`工具性推理异常(${dims.instrumental_reasoning.count}处: ${dims.instrumental_reasoning.behaviors?.join(',')})`);
+        // [v6.7.70] 字段名是 signals 不是 behaviors（原代码恒输出 undefined）
+        const _ir = (dims.instrumental_reasoning.signals || [])
+          .map(s => (typeof s === 'string' ? s : (s && (s.match || s.type)) || ''))
+          .filter(Boolean);
+        issues.push(`工具性推理异常(${dims.instrumental_reasoning.count}处: ${_ir.slice(0,3).join(',')})`);
         triggeredDims.push('instrumental_reasoning');
       }
 
