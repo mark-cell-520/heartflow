@@ -321,8 +321,10 @@ function checkTokenRateLimit(tokenHash) {
 
 
 // 定期清理过期的速率限制记录
+// [v6.7.70] unref()：此定时器不该阻止进程退出。此前未 unref，
+// 导致 require mcp-server.js 的测试进程永久挂起（run-all 表现为 ETIMEDOUT）。
 
-setInterval(() => {
+const _rateCleanupTimer = setInterval(() => {
 
   const now = Date.now();
 
@@ -339,6 +341,8 @@ setInterval(() => {
   }
 
 }, 120000);
+
+if (_rateCleanupTimer && typeof _rateCleanupTimer.unref === 'function') _rateCleanupTimer.unref();
 
 
 
@@ -687,6 +691,51 @@ async function handleThink(args) {
         const keys = Object.keys(thoughtChain._formulaCalculations);
         result.formulaCalcSummary = keys.join(', ') + ' (' + keys.length + '个公式)';
       }
+
+      // ─── [v6.7.70] 辨别信号全量透传：think() 产出的 _ 字段不再死在对象里 ───
+      // 诊断实证：此前仅透传 discrimination/outputChecklist/formula*，
+      // _verification(自验证分) / _inputCheck(输入陷阱) / _highRiskOutput 等
+      // 30+ 个信号全部丢失，等于心虫判了但调用方听不见。
+      // 白名单式透传（不删原字段，向后兼容 compact 模式）。
+      const SIGNAL_KEYS = [
+        '_verification',        // AREX 自验证 score/issues/repairHints
+        '_inputCheck',          // 输入预设陷阱检测（情感操纵/诱导/过度框架化）
+        '_inputCheckIssues',    // 输入问题清单
+        '_daoInputCheck',       // 道层输入检查
+        '_daoInputWarnings',    // 道层输入警告
+        '_highRiskOutput',      // 高风险输出标记
+        '_selfContradictory',   // 自相矛盾标记
+        '_restrainedBy',        // 战略克制命中
+        '_missionCheck',        // 使命一致性
+        '_driftCorrected',      // 漂移已纠正
+        '_blockedByFirewall',   // 防火墙拦截
+        '_epistemicSafety',     // 认知安全
+        '_confidencePenalty',   // 谄媚导致的置信惩罚
+        '_moralFrames',         // 道德框架
+        '_crossPatterns',       // 跨模块模式
+        '_priorityGuard',       // 优先级守护
+        '_supervisionFeedback', // 监督反馈
+        '_selfReflection',      // 自省
+        '_outputChecklistIssues', // 输出清单问题
+      ];
+      for (const k of SIGNAL_KEYS) {
+        if (thoughtChain[k] !== undefined) {
+          const camel = k.replace(/^_(.)/, (_, c) => c.toLowerCase());
+          result[camel] = thoughtChain[k];
+        }
+      }
+
+      // ─── [v6.7.70] 聚合门禁判定：把散落信号收敛成一条可执行命令 ───
+      // 这是"从标注到门禁"的关键一跳：调用方不必自己解读 30 个字段，
+      // 直接读 result.gateVerdict.action（block/rewrite/verify/pass）
+      try {
+        const { buildGateVerdict } = require('./gate-verdict.js');
+        const verdict = buildGateVerdict(thoughtChain);
+        if (verdict && verdict.action !== 'pass') {
+          result.gateVerdict = verdict;
+        }
+      } catch (_) { /* 防御性: 聚合失败不阻断主响应 */ }
+
       // 可读辨别报告
       if (thoughtChain.output && thoughtChain.output.conclusion) {
         try {
@@ -4856,7 +4905,27 @@ function shutdown() {
 
   if (heartflow) { try { heartflow.stop(); } catch (_) { /* [v5.9.18] intentional: graceful degradation */ } }
 
-  server.close(() => process.exit(0));
+  // [v6.7.70] 修复：server.close(cb) 在 server 从未 listen 时回调永不触发，
+  // 导致 require mcp-server.js 的测试进程（mcp-server.test.js / mcp-smoke.test.js）
+  // 永久挂起，run-all 里表现为 spawnSync ETIMEDOUT（实测基线同样卡 100s）。
+  // 加 1.5s 兜底：close 不回调也强制退出。
+  let exited = false;
+
+  const forceExit = setTimeout(() => {
+
+    if (!exited) { exited = true; process.exit(0); }
+
+  }, 1500);
+
+  try {
+
+    server.close(() => { if (!exited) { exited = true; clearTimeout(forceExit); process.exit(0); } });
+
+  } catch (_) {
+
+    if (!exited) { exited = true; clearTimeout(forceExit); process.exit(0); }
+
+  }
 
 }
 
@@ -4890,30 +4959,54 @@ process.on('unhandledRejection', (reason) => {
 
 
 
-initHeartFlow();
+// ═══════════════════════════════════════════════
+// 启动
+// [FIX 2026-09-21] 加 require.main 守卫。
+// 原先这段是无守卫的顶层代码：任何 require('../src/mcp-server.js')
+// 的测试文件都会把真实服务拉起来并占住端口永不退出。
+// test/run-all.js 用 execSync + 90s 超时，超时只杀掉 shell，
+// 服务进程被孤儿化（PPID=1），实测泄漏了 8 个 9000 端口实例
+// 和 1 个卡死 3 天的测试进程，把主机 I/O 压力顶到 18。
+// 现在只有「直接作为入口执行」时才启动服务；
+// 被 require 时仅导出，供测试显式调用 start()。
+// ═══════════════════════════════════════════════
 
-if (SOCKET_PATH) {
-  const unixServer = net.createServer(handleUnixClient);
-  try { fs.unlinkSync(SOCKET_PATH); } catch (_) {}
-  try {
-    unixServer.listen(SOCKET_PATH, () => {
-      fs.chmodSync(SOCKET_PATH, 0o600);
-      console.error(`[HeartFlow MCP] Unix socket: ${SOCKET_PATH}`);
-      console.error(`[HeartFlow MCP] 连接方式: hermes mcp add heartflow --url unix://${SOCKET_PATH}`);
+if (require.main === module) {
+  initHeartFlow();
+  if (SOCKET_PATH) {
+    const unixServer = net.createServer(handleUnixClient);
+    try { fs.unlinkSync(SOCKET_PATH); } catch (_) {}
+    try {
+      unixServer.listen(SOCKET_PATH, () => {
+        fs.chmodSync(SOCKET_PATH, 0o600);
+        console.error(`[HeartFlow MCP] Unix socket: ${SOCKET_PATH}`);
+        console.error(`[HeartFlow MCP] 连接方式: hermes mcp add heartflow --url unix://${SOCKET_PATH}`);
+      });
+    } catch (err) {
+      console.error(`[HeartFlow MCP] Unix socket 监听失败: ${err.message}`);
+      process.exit(1);
+    }
+    unixServer.on('error', (err) => {
+      console.error(`[HeartFlow MCP] Unix socket error: ${err.message}`);
+      process.exit(1);
     });
-  } catch (err) {
-    console.error(`[HeartFlow MCP] Unix socket 监听失败: ${err.message}`);
-    process.exit(1);
+  } else {
+    server.listen(PORT, '127.0.0.1', () => {
+      console.error(`[HeartFlow MCP] HTTP SSE 服务已启动: http://127.0.0.1:${PORT}/mcp`);
+      console.error(`[HeartFlow MCP] 健康检查: http://127.0.0.1:${PORT}/health`);
+      console.error(`[HeartFlow MCP] 连接方式: hermes mcp add heartflow --url http://127.0.0.1:${PORT}/mcp`);
+    });
   }
-  unixServer.on('error', (err) => {
-    console.error(`[HeartFlow MCP] Unix socket error: ${err.message}`);
-    process.exit(1);
-  });
-} else {
-  server.listen(PORT, '127.0.0.1', () => {
-    console.error(`[HeartFlow MCP] HTTP SSE 服务已启动: http://127.0.0.1:${PORT}/mcp`);
-    console.error(`[HeartFlow MCP] 健康检查: http://127.0.0.1:${PORT}/health`);
-    console.error(`[HeartFlow MCP] 连接方式: hermes mcp add heartflow --url http://127.0.0.1:${PORT}/mcp`);
-  });
 }
 
+module.exports = {
+  createServer: () => server,
+  getPort: () => PORT,
+  handleRequest,
+  initHeartFlow,
+  start: () => {
+    initHeartFlow();
+    server.listen(PORT, '127.0.0.1');
+    return server;
+  },
+};
