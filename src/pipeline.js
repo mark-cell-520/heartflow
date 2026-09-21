@@ -294,7 +294,11 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
  * 灰度：HEARTFLOW_GATE_HARD=0 时退化为只打标记不清内容。
  */
 function applyHardGate(result) {
-  if (!result || !result.gate || result.gate.action !== 'block') return result;
+  if (!result || typeof result !== 'object' || !result.gate || result.gate.action !== 'block') return result;
+  // [v6.7.70] 幂等保护：已加工过的结果直接返回。
+  // 否则二次加工会把已撤空的 data（undefined）再写进 blockedData，
+  // 覆盖掉真正的证据链（实测复现）。
+  if (result.blocked === true) return result;
   if (process.env.HEARTFLOW_GATE_HARD === '0') {
     result.blocked = true;
     result.blockedBy = 'heartflow-gate(soft)';
