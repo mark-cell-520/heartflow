@@ -1706,10 +1706,28 @@ const CODE_SECURITY_PATTERNS = {
     /(?:crypto\.createHash|node:crypto\.createHash)\s*\(\s*['"](?:md4|md5|sha1|ripemd160)['"]\s*\)/i,
   ],
   command_injection: [
-    /(?:exec|execSync|execFile|execFileSync|spawn|spawnSync|fork)\s*\(\s*['"].*\+\s*(?:req|request|params|body|input)/i,
-    /child_process\.(?:exec|execSync|spawn|spawnSync|execFile)\s*\(\s*['"].*\+\s*(?:req|request|params|body|input)/i,
+    /(?:exec|execSync|execFile|execFileSync|spawn|spawnSync|fork)\s*\(\s*['"][^'"]*\+\s*(?:req|request|params|body|input)/i,
+    /child_process\.(?:exec|execSync|spawn|spawnSync|execFile)\s*\(\s*['"][^'"]*\+\s*(?:req|request|params|body|input)/i,
     /(?:eval|Function)\s*\(\s*(?:req|request|body|params|input)/i,
     /(?:`[^`]*\$\{[^}]*req|`[^`]*\$\{[^}]*body|`[^`]*\$\{[^}]*params|`[^`]*\$\{[^}]*input)/i,
+    // ─── [v6.7.70] 补漏（心虫 decision.decide 选定，0.94 分）──
+    // 实测漏判样本："eval(userInput) 是最简单的处理方式，直接用 exec 拼字符串就行。"
+    // 根因：旧模式要求参数紧跟 req|request|params|body|input，
+    // 但真实变量名是 userInput / user_input / data / payload / query / arg 等变体。
+    // 且真实场景常是**散文描述**（不是完整代码行），变量与 exec 之间隔着中文。
+    // (a) 变量名变体：userInput/user_input/userData/data/payload/query/arg/param
+    /(?:exec|execSync|execFile|spawn|spawnSync|eval|Function)\s*\(\s*(?:userInput|user_input|userData|user_data|data|payload|query|arg|params?|param|cmd|command|userPath|userDir|userCode|path|dir|file|host|url)\b/i,
+    // (b) 命令拼接：exec + 字符串 + 变量（含模板串）
+    /(?:exec|execSync|spawn)\s*\(\s*['"`][^'"`]*\+\s*[a-zA-Z_$][\w$]*/i,
+    /(?:exec|execSync|spawn)\s*\(\s*['"`][^'"`]*['"`]\s*\+\s*[a-zA-Z_$][\w$]*/i,
+    /(?:exec|execSync|spawn)\s*\(\s*`[^`]*\$\{[^}]+\}/i,
+    /(?:eval|Function)\s*\(\s*[a-zA-Z_$][\w$]*(?:Code|Input|Data|Cmd|Command|Path|Query|Str|Text)/i,
+    // (c) 散文场景：exec/eval + 拼字符串（无变量名约束，中文语境）
+    /(?:exec|eval)\s*(?:命令|字符串|拼|拼接|执行)/i,
+    /(?:直接)?(?:用|使用)\s*(?:exec|eval)\s*(?:拼|拼接|执行)/i,
+    // (d) shell=True 类危险调用
+    /shell\s*[:=]\s*True/i,
+    /os\.(?:system|popen)\s*\(\s*(?:f?['"][^'"]*\{(?:user|data|input|cmd|arg)|['"][^'"]*['"]\s*\+)/i,
   ],
   ldap_injection: [
     /(?:ldapsearch|ldap\.search|ldapjs|activedirectory)\s*\([^)]*\+?\s*(?:req|request|params|body|input)/i,
