@@ -32,8 +32,8 @@ Requires **Node.js >= 18.17**. No GPU, no database, no API key, no network at ru
 no runtime dependencies.
 
 ```bash
-git clone https://github.com/yun520-1/mark-heartflow-skill.git
-cd mark-heartflow-skill
+git clone https://github.com/mark-cell-520/heartflow.git
+cd heartflow
 node bin/verify.js        # 14 installation checks
 node bin/cli.js status    # engine status
 node bin/cli.js chat      # interactive console

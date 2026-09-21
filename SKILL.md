@@ -144,8 +144,8 @@ falling back to full rules when confidence is low.
 ## Quick start
 
 ```bash
-git clone https://github.com/yun520-1/mark-heartflow-skill.git
-cd mark-heartflow-skill
+git clone https://github.com/mark-cell-520/heartflow.git
+cd heartflow
 node bin/verify.js          # verify the installation (14 checks)
 node bin/cli.js status      # engine status
 node bin/cli.js chat        # interactive console
@@ -364,7 +364,7 @@ right and wrong, good and bad, safe and dangerous.
 ## Contact
 
 - Email: markcell@outlook.com
-- Issues: https://github.com/yun520-1/mark-heartflow-skill/issues
+- Issues: https://github.com/mark-cell-520/heartflow/issues
 - npm: https://www.npmjs.com/package/@yun520-1/heartflow
 
 ---
