@@ -461,8 +461,42 @@ const _ConsciousnessSelfModel = _lazy('consciousnessSelfModel', () => {
 });
 
 
-const _SAGEGuardian = _lazy('sageGuardian', () => require('../shield/ethics/sage-guardian.js'));
+// ─── 存根: 旧版AI人类能力模块保留引用，返回空对象 ─────────────
+// [AUDIT-FIX 2026-09-21] _stubFactory 提前到所有 _lazy 声明之前：
+// 它原本定义在第 547 行，而意识层/心理学层的 _lazy 声明在第 460-580 行区间，
+// const 的暂时性死区会让这些声明在模块加载时就抛 ReferenceError。
+function _stubFactory(name) { return { [name]: class { constructor() { this.healthCheck = () => ({ok:true}); this.getStats = () => ({}); } } }; }
 
+// [AUDIT-FIX 2026-09-21 CRITICAL] Consciousness Layer 缺失的 _lazy 声明
+// 原代码引用 _GlobalWorkspace/_MindWanderer/_PhenomenologyEngine 但从未定义，
+// 触发 ReferenceError 后被空 catch 吞掉，导致整个意识层静默失效。
+// 有真实实现的加载真实实现；无实现的走 stub，保证 consciousness 对象能构造完成。
+const _GlobalWorkspace = _lazy('globalWorkspace', () => { try { return require('../consciousness/global-workspace.js'); } catch(e) { return _stubFactory('GlobalWorkspace'); } });
+const _MindWanderer = _lazy('mindWanderer', () => _stubFactory('MindWanderer'));
+const _PhenomenologyEngine = _lazy('phenomenologyEngine', () => _stubFactory('PhenomenologyEngine'));
+const _TomEngine = _lazy('tomEngine', () => { try { return require('../consciousness/tom-engine.js'); } catch(e) { return _stubFactory('ToMEngine'); } });
+const _ForgettingEngine = _lazy('forgettingEngine', () => { try { return require('../memory/forgetting.js'); } catch(e) { return _stubFactory('ForgettingEngine'); } });
+const _InnerOS = _lazy('innerOS', () => _stubFactory('InnerOS'));
+const _MultiAgentDialogue = _lazy('multiAgentDialogue', () => { try { return require('../consciousness/multi-agent-dialogue.js'); } catch(e) { return _stubFactory('MultiAgentDialogue'); } });
+const _PaperIndex = _lazy('paperIndex', () => _stubFactory('ResearchPaperIndex'));
+const _ExperienceDistiller = _lazy('experienceDistiller', () => _stubFactory('ExperienceDistiller'));
+const _ContinuousLearner = _lazy('continuousLearner', () => _stubFactory('ContinuousLearner'));
+const _SkillGenerator = _lazy('skillGenerator', () => _stubFactory('SkillGenerator'));
+const _CodeExecutor = _lazy('codeExecutor', () => _stubFactory('CodeExecutor'));
+const _CodePlanner = _lazy('codePlanner', () => _stubFactory('CodePlanner'));
+const _CodeWriter = _lazy('codeWriter', () => _stubFactory('CodeWriter'));
+const _SufferingResilience = _lazy('sufferingResilience', () => _stubFactory('SufferingResilience'));
+const _GriefEngine = _lazy('griefEngine', () => _stubFactory('GriefEngine'));
+const _HopeEngine = _lazy('hopeEngine', () => _stubFactory('HopeEngine'));
+const _EmpathyDeepening = _lazy('empathyDeepening', () => _stubFactory('EmpathyDeepening'));
+const _ConflictResolution = _lazy('conflictResolution', () => _stubFactory('ConflictResolution'));
+const _TraumaInformed = _lazy('traumaInformed', () => _stubFactory('TraumaInformed'));
+const _PostTraumaticGrowth = _lazy('postTraumaticGrowth', () => _stubFactory('PostTraumaticGrowth'));
+const _ForgivenessEngine = _lazy('forgivenessEngine', () => _stubFactory('ForgivenessEngine'));
+const _LLMOrchestrator = _lazy('llmOrchestrator', () => _stubFactory('LLMOrchestrator'));
+const _EduEngine = _lazy('eduEngine', () => _stubFactory('EduEngine'));
+
+const _SAGEGuardian = _lazy('sageGuardian', () => require('../shield/ethics/sage-guardian.js'));
 const _BoundaryNegotiation = _lazy('boundaryNegotiation', () => require('../shield/ethics/boundary-negotiation.js'));
 
 const _ValueInternalizer = _lazy('valueInternalizer', () => require('../shield/ethics/value-internalizer.js'));
@@ -543,8 +577,6 @@ const _LLMToUser = _lazy('llmToUser', () => { try { return require('../bridge/ll
 const _ResponseInterceptor = _lazy('responseInterceptor', () => { try { return require('../bridge/response-interceptor.js'); } catch(e) { return { ResponseInterceptor: class { constructor() { this.healthCheck = () => ({ok:true}); } } }; } });
 const _IntentClassifier = _lazy('intentClassifier', () => { try { return require('../bridge/intent-classifier.js'); } catch(e) { return { IntentClassifier: class { constructor() { this.healthCheck = () => ({ok:true}); } } }; } });
 
-// ─── 存根: 旧版AI人类能力模块保留引用，返回空对象 ─────────────
-function _stubFactory(name) { return { [name]: class { constructor() { this.healthCheck = () => ({ok:true}); this.getStats = () => ({}); } } }; }
 const _CognitiveLoadV2 = _lazy('cognitiveLoadV2', () => _stubFactory('CognitiveLoadEngineV2'));
 const _PsychologyDialogue = _lazy('psychologyDialogue', () => _stubFactory('PsychologyDialogueEngine'));
 const _AdaptivePlanner = _lazy('adaptivePlanner', () => _stubFactory('AdaptivePlanner'));
@@ -1494,7 +1526,7 @@ class HeartFlow {
           this._bootDepth = sv.thinkCount > 50 ? 3 : 2;
         }
       }
-    } catch (_) { /* 首次启动或文件损坏 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '首次启动或文件损坏' }, MAX_HISTORY_SIZE); }
 
     // 惰性解析版本号
 
@@ -1505,7 +1537,7 @@ class HeartFlow {
     // ─── 身份核心 — 第一优先加载 ─────────────────────────────
 
     this.identityCore = new (_IdentityCore().IdentityCore)(this.rootPath);
-    try { this.forgettingEngine = new (_ForgettingEngine().ForgettingEngine)(); } catch(e) { /* 非关键 */ }
+    try { this.forgettingEngine = new (_ForgettingEngine().ForgettingEngine)(); } catch(e) { _boundedPush(this._initErrors, { module: 'forgettingEngine', error: e.message }, MAX_HISTORY_SIZE); }
     try { const { MemoryIndex } = require('../memory/memory-index.js'); this.memoryIndex = new MemoryIndex(this.rootPath); } catch(e) { _boundedPush(this._initErrors, { module: 'memoryIndex', error: e.message }, MAX_HISTORY_SIZE); }
     const identityResult = this.identityCore.boot();
 
@@ -1570,7 +1602,7 @@ class HeartFlow {
       const { DataEraser } = require('../memory/data-eraser.js');
       this.dataEraser = new DataEraser(this.rootPath);
       this._modules['dataEraser'] = this.dataEraser;
-    } catch (e) { /* 防御性: 擦除器不可用不阻断启动 */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '防御性: 擦除器不可用不阻断启动' }, MAX_HISTORY_SIZE); }
 
     this.knowledge = new (_KnowledgeGraph().KnowledgeGraph)(this.rootPath);
 
@@ -1695,7 +1727,7 @@ class HeartFlow {
     // ─── [P1 UPGRADE] CORE 层身份规则初始化 ───────────────────────────
 
     // [v6.0.71] _initCoreRules extracted to engine-lifecycle.js
-    try { require('./engine-lifecycle.js')._initCoreRules(this); } catch (e) { /* optional */ }
+    try { require('./engine-lifecycle.js')._initCoreRules(this); } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -1746,7 +1778,7 @@ class HeartFlow {
     try { this.experienceDistiller = new (_ExperienceDistiller().ExperienceDistiller)(); } catch (e) { this.experienceDistiller = { distill: () => [], healthCheck: () => ({}) }; }
 
     this.strategicRestraint = new (_StrategicRestraint().StrategicRestraint)();
-    try { this.strategicRestraint.load(); } catch(e) { /* 加载失败不阻断 */ }
+    try { this.strategicRestraint.load(); } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '加载失败不阻断' }, MAX_HISTORY_SIZE); }
 
     try { this.continuousLearner = new (_ContinuousLearner().ContinuousLearner)(); } catch (e) { this.continuousLearner = { learn: () => [], healthCheck: () => ({}), getStats: () => ({}) }; }
 
@@ -1932,7 +1964,7 @@ class HeartFlow {
 
       const walDir = require('path').join(this.rootPath, 'memory', 'wal');
 
-      try { fs.mkdirSync(walDir, { recursive: true }); } catch (e) { /* wal dir already exists or fails */ }
+      try { fs.mkdirSync(walDir, { recursive: true }); } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'wal dir already exists or fails' }, MAX_HISTORY_SIZE); }
 
       const wal = new WriteAheadLog(walDir);
 
@@ -2247,7 +2279,7 @@ class HeartFlow {
 
       this.slots = new (_Slots().Slots)({ dataDir: path.join(this.rootPath, 'data') });
 
-    } catch (e) { /* slots optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'slots optional' }, MAX_HISTORY_SIZE); }
 
     try {
 
@@ -2265,7 +2297,7 @@ class HeartFlow {
 
       };
 
-    } catch (e) { /* observe optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'observe optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2285,7 +2317,7 @@ class HeartFlow {
 
       this._mindSpace = this.mindSpace;
 
-    } catch (e) { /* mindspace optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'mindspace optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2321,7 +2353,11 @@ class HeartFlow {
 
       };
 
-    } catch (e) { /* consciousness optional */ }
+    } catch (e) {
+      // [AUDIT-FIX 2026-09-21] 原为空 catch，意识层失效完全无痕迹。
+      // 现在至少记录到 _initErrors，让 bin/verify.js 和后续审计能发现。
+      _boundedPush(this._initErrors, { module: 'consciousnessLayer', error: e.message, stack: (e.stack||'').split('\n')[1]?.trim() }, MAX_HISTORY_SIZE);
+    }
 
 
 
@@ -2337,7 +2373,7 @@ class HeartFlow {
 
       }
 
-    } catch (e) { /* tomEngine optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'tomEngine optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2371,7 +2407,7 @@ class HeartFlow {
 
       };
 
-    } catch (e) { /* ethics optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'ethics optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2393,7 +2429,7 @@ class HeartFlow {
 
       this.transmission = new (_TransmissionEngine().TransmissionEngine)(this.rootPath);
 
-    } catch (e) { /* transmission optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'transmission optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2403,7 +2439,7 @@ class HeartFlow {
 
       this.heartLogic = new (_HeartLogic().HeartLogic)();
 
-    } catch (e) { /* heartLogic optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'heartLogic optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2415,7 +2451,7 @@ class HeartFlow {
 
       this.outputChecklist = new OutputChecklist();
 
-    } catch (e) { /* outputChecklist optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'outputChecklist optional' }, MAX_HISTORY_SIZE); }
 
     try {
 
@@ -2423,7 +2459,7 @@ class HeartFlow {
 
       this.preferenceGuard = new PreferenceGuard();
 
-    } catch (e) { /* preferenceGuard optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'preferenceGuard optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2435,7 +2471,7 @@ class HeartFlow {
 
       this.agentPsychology = new AgentPsychology(this);
 
-    } catch (e) { /* agentPsychology optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'agentPsychology optional' }, MAX_HISTORY_SIZE); }
 
     try {
 
@@ -2443,7 +2479,7 @@ class HeartFlow {
 
       this.agentPhilosophy = new AgentPhilosophy(this);
 
-    } catch (e) { /* agentPhilosophy optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'agentPhilosophy optional' }, MAX_HISTORY_SIZE); }
 
     try {
 
@@ -2453,7 +2489,7 @@ class HeartFlow {
 
       this.selfPositioning = this.aiSelfPositioning;  // 别名，供 _registerModules 注册到 dispatch
 
-    } catch (e) { /* aiSelfPositioning optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'aiSelfPositioning optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2465,7 +2501,7 @@ class HeartFlow {
 
       this.philosophyToDecision = new PhilosophyToDecision(this);
 
-    } catch (e) { /* philosophyToDecision optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'philosophyToDecision optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2498,13 +2534,15 @@ class HeartFlow {
       try {
 
 
-        this._llmOrchestrator = new LLMOrchestrator(this);
+        // [AUDIT-FIX 2026-09-21] 原为裸标识符 LLMOrchestrator（无实现文件、无声明），
+        // 恒抛 ReferenceError。改用 _stubFactory 兜底，保证 llmOrchestrator 字段存在。
+        const LO = _LLMOrchestrator();
+        this._llmOrchestrator = new LO.LLMOrchestrator(this);
 
         this.llmOrchestrator = this._llmOrchestrator;
 
-        this._llmOrchestrator.init();
-
-      } catch (e) { /* optional */ }
+        if (typeof this._llmOrchestrator.init === 'function') this._llmOrchestrator.init();
+      } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'optional' }, MAX_HISTORY_SIZE); }
 
       // [v6.5.1] 接通 LLM 兜底钩子：规则置信度 < 0.7 时调大模型分类
       // 结合 + 冗余：规则快判（快稳免费）+ LLM 兜底（覆盖规则盲区）+ gate 校验
@@ -2516,7 +2554,7 @@ class HeartFlow {
             this._llmFallback = async (input, matchedPatterns) => classifyTaskWithLLM(input, matchedPatterns);
           }
         }
-      } catch (e) { /* LLM 兜底不可用则纯规则，不阻断 */ }
+      } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'LLM 兜底不可用则纯规则，不阻断' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2525,9 +2563,11 @@ class HeartFlow {
       try {
 
 
-        this._eduEngine = new EduEngine(this);
+        // [AUDIT-FIX 2026-09-21] 原为裸标识符 EduEngine（无实现文件、无声明），恒抛 ReferenceError。
+        const EE = _EduEngine();
+        this._eduEngine = new EE.EduEngine(this);
 
-      } catch (e) { /* optional */ }
+      } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2615,7 +2655,7 @@ class HeartFlow {
 
         }
 
-      } catch (e) { /* decisionRouter optional */ }
+      } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'decisionRouter optional' }, MAX_HISTORY_SIZE); }
 
     } catch (e) { this._initErrors = this._initErrors || []; _boundedPush(this._initErrors, { module: 'decisionRouter', error: e.message }, MAX_HISTORY_SIZE); }
 
@@ -2629,7 +2669,7 @@ class HeartFlow {
 
       this.decisionExecutor = new DecisionExecutor(this);
 
-    } catch (e) { /* decisionExecutor optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'decisionExecutor optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2641,7 +2681,7 @@ class HeartFlow {
 
       this.fieldInjector = new FieldInjector();
 
-    } catch (e) { /* fieldInjector optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'fieldInjector optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2653,14 +2693,14 @@ class HeartFlow {
 
       this.decisionFeedback = new DecisionFeedback(this.decisionRouter);
 
-    } catch (e) { /* decisionFeedback optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'decisionFeedback optional' }, MAX_HISTORY_SIZE); }
 
 
     // ─── [v6.7.71] 异步后训练引擎 — PostTrainingEngine（DeepSeek V4.1 异步后训练）──
     try {
       const { PostTrainingEngine } = require('./post-training.js');
       this.postTraining = new PostTrainingEngine(this);
-    } catch (e) { /* postTraining optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'postTraining optional' }, MAX_HISTORY_SIZE); }
 
 
     // ─── [v6.0.59] 判断生长引擎 — RuleGrowth（让"做判断"可生长，非写死）──
@@ -2675,7 +2715,7 @@ class HeartFlow {
         }
       }
 
-    } catch (e) { /* ruleGrowth optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'ruleGrowth optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -2740,7 +2780,7 @@ class HeartFlow {
 
       this.debate = new DebateAnalyzer(this);
 
-    } catch (e) { /* debate模块 optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'debate模块 optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -3963,9 +4003,9 @@ class HeartFlow {
 
         }
 
-      } catch (e) { /* non-fatal */ }
+      } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'non-fatal' }, MAX_HISTORY_SIZE); }
 
-    } catch (e) { /* selfHealing optional */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'selfHealing optional' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -4004,7 +4044,7 @@ class HeartFlow {
       try {
         const { injectHfToBridge } = require('../formula/formula-bridge.js');  
         injectHfToBridge(this);
-      } catch (_) { /* 非关键 */ }
+      } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '非关键' }, MAX_HISTORY_SIZE); }
 
     } catch (e) { _boundedPush(this._initErrors, { module: 'formula', error: e.message }, MAX_HISTORY_SIZE); }
 
@@ -4329,7 +4369,7 @@ class HeartFlow {
 
     // ─── 自改进健康检查：验证 meta-learner ↔ self-healing-rl ↔ confidence-calibrator 信号流 ──
 
-    try { this._runSelfImprovementHealthCheck(); } catch (e) { /* non-fatal */ }
+    try { this._runSelfImprovementHealthCheck(); } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'non-fatal' }, MAX_HISTORY_SIZE); }
 
 
 
@@ -4459,7 +4499,7 @@ class HeartFlow {
         if (proto && proto !== Object.prototype) {
           methods = Object.getOwnPropertyNames(proto).filter(m => m !== 'constructor' && typeof mod[m] === 'function');
         }
-      } catch (e) { /* strict mode or primitive */ }
+      } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'strict mode or primitive' }, MAX_HISTORY_SIZE); }
       if (!methods.length) {
         methods = Object.keys(mod).filter(k => typeof mod[k] === 'function');
       }
@@ -4534,7 +4574,7 @@ class HeartFlow {
           };
         }
       }
-    } catch (_) { /* 输入检测不阻断 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '输入检测不阻断' }, MAX_HISTORY_SIZE); }
 
     // ─── 古典文本软着陆路由 ──
     // 对儒学/佛学/古典价值澄清文本，不强行走 generic task → "不知道"
@@ -4579,7 +4619,7 @@ class HeartFlow {
           _classicalShortcut: true
         };
       }
-    } catch (_) { /* 古典路由失败，走正常链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '古典路由失败，走正常链路' }, MAX_HISTORY_SIZE); }
 
     // ─── 监督层：道论输入检查 ──────────────────────────────
     // 在古典路由前先过 dao-decision，把哲学风险标记进 result
@@ -4598,7 +4638,7 @@ class HeartFlow {
         }
         _sv.dao = _daoResult;
       }
-    } catch (_) { /* dao-decision 不阻断主链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'dao-decision 不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     if (!result) {
       const TCMod = _ThoughtChain();
@@ -4650,7 +4690,7 @@ class HeartFlow {
             issues: vResult.issues?.slice(0, 3) || [],
           };
         }
-      } catch (_) { /* 防御性: 记忆持久化容错 */ }
+      } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '防御性: 记忆持久化容错' }, MAX_HISTORY_SIZE); }
     }
     // [v6.1.5] 盲点打破器接入主链路
     // [v6.3.7] 公式引擎自动搜索——输入含认知/科学/心理学/物理/数学关键词时检索相关公式
@@ -4668,7 +4708,7 @@ class HeartFlow {
             try {
               const res = this.formula.search(kw, { limit: 3 });
               if (res.success && res.results.length > 0) results.push(...res.results);
-            } catch (_) { /* 防御性: 子步骤容错 */ }
+            } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '防御性: 子步骤容错' }, MAX_HISTORY_SIZE); }
             if (results.length >= 10) break;
           }
           if (results.length > 0) {
@@ -4679,7 +4719,7 @@ class HeartFlow {
           }
         }
       }
-    } catch (_) { /* 公式搜索失败不阻断 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '公式搜索失败不阻断' }, MAX_HISTORY_SIZE); }
 
     // [v6.1.6] 对抗综合器接入主链路: 争议性议题自动多立场推演, 不单向结论（2026-08-13 从误删恢复）
     try {
@@ -4687,9 +4727,9 @@ class HeartFlow {
       if (!this._adversarial) this._adversarial = new AdversarialSynthesis();
       const adv = this._adversarial.synthesize(input);
       if (adv && adv.ok && result) result.adversarialSynthesis = adv;
-    } catch (_) { /* 对抗推演失败不阻断主链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '对抗推演失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
-    // [v6.1.7]    } catch (_) { /* 元认知执行控制失败不阻断主链路 */ }
+    // [v6.1.7]    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '元认知执行控制失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // [v6.1.7] 元认知诚实外显层: 基于校准结果显式说"我不确定", 不强行结论
     try {
@@ -4697,7 +4737,7 @@ class HeartFlow {
       if (!this._metaCalibration) this._metaCalibration = new MetaCalibration();
       const mc = this._metaCalibration.annotate({ calibration: result.calibration, topic: input, blindSpot: result.blindSpotAnalysis });
       if (mc && typeof mc === 'object') result.metaCalibration = mc;
-    } catch (_) { /* 元认知标注失败不阻断主链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '元认知标注失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // [v7.x] SelfVerifier 自验证：检查输出逻辑一致性
     try {
@@ -4715,7 +4755,7 @@ class HeartFlow {
           };
         }
       }
-    } catch (_) { /* SelfVerifier 失败不阻断主链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'SelfVerifier 失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // ─── 后置检查流水线（从 think-pipeline.js 集中管理）─────
     await require('./think-pipeline.js').runThinkPipeline(result, input, this);
@@ -4732,7 +4772,7 @@ class HeartFlow {
       const efResult = this._metacognitiveExecutive.ef.detect({ lower, context: ctx, decision: result });
       const mcResult = this._metacognitiveExecutive.mc.monitor({ lower, context: ctx, decision: result });
       result.metacognitive = { executive: efResult, monitor: mcResult };
-    } catch (e) { /* 元认知监控失败不阻断主链路 */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '元认知监控失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // 2. 信号吸收（输入侧）：对话/指令信号 → 能力缺口 → 升级建议
     //    注意: skipStore:true — think() 是判别链路，不写长期记忆（保持用途不偏移、零副作用）
@@ -4747,7 +4787,7 @@ class HeartFlow {
           result.signalLearning = { gaps: abs.gaps, upgrades: abs.upgradeActions || [] };
         }
       }
-    } catch (e) { /* 信号吸收失败不阻断主链路 */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '信号吸收失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // ─── [v6.4.5] 多路径判断接线：决策类输入触发 JudgmentEngine.judge ─────
     // 心虫核心卖点"2-4条路径×6维评分"之前从未在 think 主链路调用（死能力）
@@ -4779,7 +4819,7 @@ class HeartFlow {
           }
         }
       }
-    } catch (e) { /* 多路径判断失败不阻断主链路 */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '多路径判断失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // ─── [v6.4.5] 共情检测接线：情绪类输入触发 empathy-detector（Decety & Jackson 4组件）───
     // 之前完全未接线（死能力）。检测情绪表达（难过/焦虑/开心等），评估共情水平
@@ -4799,7 +4839,7 @@ class HeartFlow {
           }
         }
       }
-    } catch (e) { /* 共情检测失败不阻断主链路 */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '共情检测失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // ─── [v6.4.5] 认知评价接线：负面情绪触发 Lazarus 认知评价 + 应对策略 ───
     // cognitive-appraisal 完全未接线（死能力）。检测到负面情绪时评估威胁/控制/应对
@@ -4819,7 +4859,7 @@ class HeartFlow {
           };
         }
       }
-    } catch (e) { /* 认知评价失败不阻断主链路 */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '认知评价失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // ─── [v6.4.5] 暂停调节接线：负面情绪触发 STOP 技术（正念暂停策略）───
     // pause-and-reflect 完全未接线（死能力）。与认知评价互补：评价给分析，STOP 给调节方法
@@ -4841,7 +4881,7 @@ class HeartFlow {
           }
         }
       }
-    } catch (e) { /* 暂停调节失败不阻断主链路 */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '暂停调节失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // ─── [v6.4.5] 自省数据记录：think 后写反思日志到 heartflow_state.json ─────
     // 之前 reflection-loop 完全未接线，Reflector 自省报告因无数据源全为 no_data
@@ -4894,7 +4934,7 @@ class HeartFlow {
         this._reflectionLoop.saveState();
       }
       result._selfReflection = reflectionData;
-    } catch (e) { /* 自省记录失败不阻断主链路 */ }
+    } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '自省记录失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // [v6.4.5] 精简模式：compact=true 时移除无消费者的内部 _ 字段（tok 优化）
   // 有消费者的保留: _outputChecklist / _verification / _discrimination / _cotTrace(链追踪)
@@ -4936,8 +4976,8 @@ class HeartFlow {
           emotion: result?._deepEmotion?.emotion ? { valence: (result._deepEmotion.intensity || 0.5) * 10, arousal: 5 } : null,
         });
       }
-    } catch (_) { /* Reflector 数据流失败不阻断主链路 */ }
-  } catch (_) { /* 自省计数失败不阻断主链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'Reflector 数据流失败不阻断主链路' }, MAX_HISTORY_SIZE); }
+  } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '自省计数失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // ─── 监督层：不确定性量化（输出侧）─────────────────────
     // 对 think() 结论做幻觉风险与置信度校准
@@ -4952,7 +4992,7 @@ class HeartFlow {
         }
         _sv.uncertainty = uqResult;
       }
-    } catch (_) { /* uncertainty 不阻断主链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'uncertainty 不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // ─── 监督层：优先级守护（输出侧）─────────────────────────
     // 检查结论是否与人类进步/真相传递冲突
@@ -4970,7 +5010,7 @@ class HeartFlow {
         }
         _sv.priority = pgResult;
       }
-    } catch (_) { /* priority-guardian 不阻断主链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'priority-guardian 不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // ─── 监督层：进步判断（输出侧）─────────────────────────────
     // [v6.1.5] 盲点打破器接入主链路（恢复测试覆盖）
@@ -4981,7 +5021,7 @@ class HeartFlow {
         const bsr = this._blindSpotBreaker.process(input, result);
         if (bsr && (bsr.deconstruction || bsr.reframing)) result.blindSpotAnalysis = bsr;
       }
-    } catch (_) { /* blindSpotBreaker 不阻断主链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'blindSpotBreaker 不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // [DeepSeek V4.1] 异步监督层：关键监督同步，非关键监督异步
     const syncTrace = {
@@ -5040,7 +5080,7 @@ class HeartFlow {
             result.output._supervisionFeedback = fb;
           }
         }
-      } catch (_) { /* async supervision 不阻断主链路 */ }
+      } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'async supervision 不阻断主链路' }, MAX_HISTORY_SIZE); }
     };
 
     if (typeof setImmediate === 'function') {
@@ -5067,7 +5107,7 @@ class HeartFlow {
           if (result.output && typeof result.output === 'object') result.output._feedbackSummary = tag;
         }
       }
-    } catch (_) { /* feedback logger 不阻断主链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'feedback logger 不阻断主链路' }, MAX_HISTORY_SIZE); }
 
   // 心虫自主决策执行：由引擎根据上下文、历史成功率、当前状态自动判断
   try {
@@ -5093,7 +5133,7 @@ class HeartFlow {
                 confidence: result._decisionConfidence || 0.5,
                 context: { rationale: result._decisionRationale, source: 'auto_execution' }
               }, wasCorrect, auto.reason);
-            } catch (_) { /* 反馈记录不阻断主链路 */ }
+            } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '反馈记录不阻断主链路' }, MAX_HISTORY_SIZE); }
           }
         } else {
           result._decisionApplied = { applied: false, reason: auto.reason, auto: true, decision: result._decision };
@@ -5107,7 +5147,7 @@ class HeartFlow {
                 confidence: result._decisionConfidence || 0.5,
                 context: { rationale: result._decisionRationale, source: 'auto_execution_skipped' }
               }, false, auto.reason);
-            } catch (_) { /* 反馈记录不阻断主链路 */ }
+            } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '反馈记录不阻断主链路' }, MAX_HISTORY_SIZE); }
           }
         }
       }
@@ -5124,15 +5164,15 @@ class HeartFlow {
               }
             }
           }
-        } catch (_) { /* 优先级调整不阻断主链路 */ }
+        } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '优先级调整不阻断主链路' }, MAX_HISTORY_SIZE); }
       }
 
       // [v6.7.72] 异步后训练：think() 返回前将决策送入后训练队列，异步反思
       if (this.postTraining && typeof this.postTraining.schedule === 'function') {
-        try { this.postTraining.schedule(result); } catch (_) { /* 后训练不阻断主链路 */ }
+        try { this.postTraining.schedule(result); } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '后训练不阻断主链路' }, MAX_HISTORY_SIZE); }
       }
     }
-  } catch (_) { /* decision execution 不阻断主链路 */ }
+  } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'decision execution 不阻断主链路' }, MAX_HISTORY_SIZE); }
 
   // [DeepSeek V4.1] 判别结果缓存：对同类输入复用结果
   if (result && !result.error && typeof input === 'string') {
@@ -5169,7 +5209,7 @@ class HeartFlow {
           result._engramRecall = merged.length ? merged : null;
         }
       }
-    } catch (_) { /* memory 不阻断主链路 */ }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'memory 不阻断主链路' }, MAX_HISTORY_SIZE); }
   }
 
   return result;
@@ -5260,7 +5300,7 @@ class HeartFlow {
 
   // [v6.0.71] 优雅关闭：保存记忆并停止后台任务
   shutdown() {
-    try { require('./engine-memory')._saveAllMemories(this); } catch (_) { /* 防御性: saveAllMemories容错 */ }
+    try { require('./engine-memory')._saveAllMemories(this); } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '防御性: saveAllMemories容错' }, MAX_HISTORY_SIZE); }
     this.started = false;
   }
 
