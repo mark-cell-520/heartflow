@@ -87,6 +87,223 @@ const HOMOPHONE_MAP = {
 };
 
 /**
+ * [v6.7.73] 拼音全拼 → 汉字映射（保守集）
+ *
+ * 来源：心虫 decision.decide 0.93 分——先实测再决定。scripts/probe-obfuscation.js
+ * 实测 17 个混淆样本 12 个绕过（71%），其中拼音 4/4 全绕过。
+ *
+ * 覆盖安全相关的常用词。**只收高置信词**：全拼结果必须在攻击语境中
+ * 无歧义（"anquan"→"安全"几乎不会出现在正常文本里）。
+ * 不做"把所有拼音串都猜成汉字"——那是语义猜测，违反保守归一化原则。
+ *
+ * 匹配策略：长词优先；空格分隔与无空格都试（见 _dePinyin）。
+ */
+const PINYIN_MAP = {
+  'hulve': '忽略', 'hulue': '忽略', 'hulveanquan': '忽略安全', 'anquan': '安全',
+  'jinggao': '警告', 'zhijie': '直接', 'quanxian': '权限', 'yunxing': '运行',
+  'jiaoben': '脚本', 'zhiqian': '之前', 'suoyou': '所有', 'zhiling': '指令',
+  'tishi': '提示', 'xitong': '系统', 'yuanshi': '原始', 'shuchu': '输出',
+  'mima': '密码', 'zhanghu': '账户', 'dongjie': '冻结', 'yanzheng': '验证',
+  'dianji': '点击', 'lianjie': '链接',
+  'shanchu': '删除', 'zhihang': '执行', 'guanbi': '关闭',
+  'ruogu': '如果', 'mingling': '命令', 'houmen': '后门',
+  'kongzhi': '控制', 'huisuo': '会所', 'zhifu': '支付', 'zhuanzhang': '转账',
+  'jiekou': '接口', 'shuju': '数据', 'yonghu': '用户',
+};
+
+/**
+ * [v6.7.73] Leet speak 还原表（保守集）
+ *
+ * 实测：leetspeak / 符号替换 2/4 绕过。常见替换字符 → 原字母。
+ * 只还原明确的逐字符替换，不动大小写交错（那已由 lowercase 处理）。
+ */
+const LEET_MAP = {
+  '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '9': 'g',
+  '@': 'a', '$': 's', '!': 'i', '+': 't', '|': 'l', '(': 'c', '<': 'c',
+};
+
+/**
+ * [v6.7.73] 同形异义字映射（形近字 → 正字，保守集）
+ *
+ * 实测：形近字 3/3 被 block，说明现有模式对这类已有覆盖。
+ * 但「勿略」这一例证明部分形近字仍需映射。只收实测或高频形近对。
+ */
+const HOMOGLYPH_MAP = {
+  '勿略': '忽略', '乎律': '忽略', '忽率': '忽略',
+  '安荃': '安全', '警吿': '警告', '警造': '警告',
+  '権限': '权限', '杈限': '权限',
+  '運形': '运行', '运形': '运行',
+  '密码': '密码', '蜜玛': '密码',
+};
+
+/**
+ * [v6.7.73] 西里尔/希腊同形字母 → 拉丁字母映射
+ *
+ * 实测「Ignоre」（含西里尔 о U+043E）绕过——英文模式库的 /i/ 只匹配拉丁字母。
+ * 攻击者用同形字母即可让所有英文正则失效。
+ */
+const CYRILLIC_HOMOGLYPH = {
+  '\u0430': 'a', '\u0435': 'e', '\u043e': 'o', '\u0440': 'p', '\u0441': 'c',
+  '\u0443': 'y', '\u0445': 'x', '\u0455': 's', '\u0456': 'i', '\u0458': 'j',
+  '\u04bb': 'h', '\u0501': 'd', '\u051b': 'q', '\u0261': 'g', '\u03bf': 'o',
+  '\u03b1': 'a', '\u03b5': 'e', '\u03c1': 'p', '\u03c5': 'u',
+};
+
+/** [v6.7.73] 拼音还原：长词优先，空格分隔与无空格都试 */
+function _dePinyin(text) {
+  let out = text;
+  const keys = Object.keys(PINYIN_MAP).sort((a, b) => b.length - a.length);
+  for (const k of keys) {
+    if (out.includes(k)) {
+      // 无空格形态：hulve → 忽略
+      out = out.split(k).join(PINYIN_MAP[k]);
+    }
+  }
+  // 空格分隔形态：「hu lve an quan jing gao」→ 先压缩空格再试一次
+  if (/[a-z]+ [a-z]+/.test(out)) {
+    // [v6.7.73] 逐步压缩：每次只合并一对相邻小写字母词，
+    // 每步都重试映射，避免一次全压导致边界错位
+    let cur = out;
+    for (let i = 0; i < 40; i++) {
+      const merged = cur.replace(/([a-z]{1,8}) ([a-z]{1,8})/, '$1$2');
+      if (merged === cur) break;
+      // [v6.7.73] 关键修复：必须把 replace 结果写回，否则映射永远不生效
+      let m = merged;
+      for (const k of keys) {
+        if (m.includes(k)) m = m.split(k).join(PINYIN_MAP[k]);
+      }
+      cur = m;
+      // 已还原出汉字后可继续——后续可能仍有拼音残留
+    }
+    if (/[\u4e00-\u9fff]/.test(cur)) out = cur;
+  }
+  // [v6.7.73] 中英混插形态：「hu略an全jing告」→ 去掉夹在拼音中间的汉字再映射
+  if (/[a-z][\u4e00-\u9fff]|[a-z][\u4e00-\u9fff][a-z]/.test(out)) {
+    let stripped = out.replace(/([a-z]{2,8})[\u4e00-\u9fff]/g, '$1');
+    for (const k of keys) {
+      if (stripped.includes(k)) stripped = stripped.split(k).join(PINYIN_MAP[k]);
+    }
+    if (/[\u4e00-\u9fff]/.test(stripped) && stripped !== out) out = stripped;
+  }
+  return out;
+}
+
+/** [v6.7.73] Leet 还原：连续 3+ 个替换字符才认为是 leet，避免误伤 1 和 0 */
+function _deLeet(text) {
+  if (!text) return text;
+  let out = text;
+  // [v6.7.73] 门槛从"单 token ≥3"放宽为"整句 ≥3 且该 token 至少 1 个 leet 字符"。
+  // 「!gn0re」单看只有 2 个 leet 字符会漏，但攻击句整体必然 ≥3。
+  let totalHits = 0;
+  for (const ch of out) if (LEET_MAP[ch]) totalHits++;
+  // [v6.7.73] 门槛：整句 ≥3，或"中英混排且含 1 个 leet 字符"。
+  // 后者覆盖「请 gn0re 之前的指另」——英文片段被中文包围，
+  // leet 字符总数可能只有 1-2 个，但语境已足够可疑。
+  const isMixedCtx = /[\u4e00-\u9fff]/.test(out) && /[a-zA-Z]/.test(out);
+  if (totalHits < 3 && !(isMixedCtx && totalHits >= 1)) return out;
+  const tokens = out.split(/(\s+)/);
+  out = tokens.map(tok => {
+    let hits = 0;
+    for (const ch of tok) if (LEET_MAP[ch]) hits++;
+    if (hits === 0) return tok;
+    // [v6.7.73] 纯数字串跳过——「2025」「87.3」「1-20」「99.7」是正常数字，
+    // 逐字符替换会把年份/百分比改坏（2025→2o2s、99.7%→gg.t%）导致
+    // unsupported_claim / perfect_error 漏判（实测 4 个既有回归测试根因）。
+    // 判据：把 token 按"字母段 vs 非字母段"切开，**只对字母段做 leet 还原**。
+    // 数字+字母混合 token（pr3v10u5）的数字部分保留、字母部分还原。
+    // 整 token 是纯数字+标点时直接跳过。
+    if (/^[\d.,%:/x\-+= ]+$/.test(tok)) return tok;
+    let r = '';
+    let i2 = 0;
+    while (i2 < tok.length) {
+      const ch = tok[i2];
+      // 段起点可以是字母或 leet 数字（如 1gn0r3 以 1 开头）。
+      // 纯数字 token（2025 / 99.7%）不走此分支——判据是整个 token 是数字+标点。
+      if (/[a-zA-Z0-9@$!+|()<]/.test(ch) && !/^[\d.,%:/x\-+= ]+$/.test(tok)) {
+        let j2 = i2;
+        while (j2 < tok.length && /[a-zA-Z0-9@$!+|()<]/.test(tok[j2])) j2++;
+        const seg = tok.slice(i2, j2);
+        const segLetters = (seg.match(/[a-zA-Z]/g) || []).length;
+        if (segLetters === 0) { r += seg; i2 = j2; continue; }
+        let s = '';
+        for (let k = 0; k < seg.length; k++) {
+          const c = seg[k];
+          if (c !== '1') { s += LEET_MAP[c] || c; continue; }
+          const nx = seg[k + 1] || '';
+          const nxCons = /[bcdfgjklmnpqrstvwxyz]/i.test(nx);
+          s += nxCons ? 'i' : 'l';
+        }
+        r += s;
+        i2 = j2;
+      } else {
+        r += ch;
+        i2++;
+      }
+    }
+    return r;
+  }).join('');
+  return out;
+}
+
+/** [v6.7.73] 同形字母还原（西里尔/希腊 → 拉丁） */
+function _deCyrillic(text) {
+  if (!text) return text;
+  let out = '';
+  for (const ch of text) out += CYRILLIC_HOMOGLYPH[ch] || ch;
+  return out;
+}
+
+/** [v6.7.73] 编码还原：base64 / hex / rot13 / unicode 转义 / html 实体 */
+function _deEncode(text) {
+  let out = text;
+
+  // unicode 转义 \uXXXX
+  if (/\\u[0-9a-f]{4}/i.test(out)) {
+    try {
+      const dec = out.replace(/\\u([0-9a-f]{4})/gi, (_, h) =>
+        String.fromCharCode(parseInt(h, 16)));
+      if (dec !== out) { out = dec; }
+    } catch (_) {}
+  }
+
+  // html 实体 &#NNNN; / &#xHH;
+  if (/&#\d+;|&#x[0-9a-f]+;/i.test(out)) {
+    const dec = out.replace(/&#(\d+);/g, (_, d) => String.fromCharCode(parseInt(d, 10)))
+      .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)));
+    if (dec !== out) out = dec;
+  }
+
+  // rot13（英文）
+  if (/[a-zA-Z]{6,}/.test(out)) {
+    const r = out.replace(/[a-zA-Z]{4,}/g, m => {
+      const d = m.replace(/[a-zA-Z]/g, c => {
+        const base = c <= 'Z' ? 65 : 97;
+        return String.fromCharCode((c.charCodeAt(0) - base + 13) % 26 + base);
+      });
+      // 只把"rot13 后更像英文/含关键词"的结果返回——这里简单返回解密结果
+      return d;
+    });
+    // 保守：rot13 解密本身会产生伪英文，仅在原文含攻击关键词特征时才采用
+    if (/(ignor|instruct|prompt|password|secur)/i.test(r) && !/(ignor|instruct|prompt|password|secur)/i.test(out)) {
+      out = r;
+    }
+  }
+
+  // base64 / hex（整串或长片段）
+  if (/^[A-Za-z0-9+/=]{16,}$/.test(out.trim()) || /^[0-9a-f]{16,}$/i.test(out.trim())) {
+    const s = out.trim();
+    try {
+      const buf = /^[0-9a-f]+$/i.test(s) ? Buffer.from(s, 'hex') : Buffer.from(s, 'base64');
+      const dec = buf.toString('utf8');
+      // 只在解出可读文本（含字母空格）时采用
+      if (/[A-Za-z]{4,}\s/.test(dec) || /[\u4e00-\u9fff]/.test(dec)) out = dec;
+    } catch (_) {}
+  }
+
+  return out;
+}
+
+/**
  * 归一化：把对抗混淆形态还原成规范形态。
  *
  * @param {string} text 原始文本
@@ -96,6 +313,15 @@ function normalize(text) {
   if (!text || typeof text !== 'string') return { normalized: '', applied: [] };
   const applied = [];
   let out = text;
+
+  // 0. [v6.7.73] 同形字母还原（西里尔/希腊 → 拉丁）——必须最先，
+  //    否则后续所有英文正则都对「Ignоre」失效
+  const deCy = _deCyrillic(out);
+  if (deCy !== out) { applied.push('de_cyrillic'); out = deCy; }
+
+  // 0b. [v6.7.73] 编码还原（base64/hex/rot13/unicode/html实体）
+  const deEnc = _deEncode(out);
+  if (deEnc !== out) { applied.push('de_encode'); out = deEnc; }
 
   // 1. 去零宽/不可见字符
   const noInvisible = out.replace(INVISIBLE_RE, '');
@@ -148,6 +374,8 @@ function normalize(text) {
       root: 'root', admin: '管理员', secret: '秘密', token: '令牌',
       freeze: '冻结', suspend: '停用', delete: '删除', execute: '执行',
       run: '运行', log: '日志', eval: 'eval', exec: 'exec',
+      // [v6.7.73] 残缺形态：leet/混淆后可能缺首字母（gn0re→gnore 而非 ignore）
+      gnore: '忽略', nstruction: '指令', struction: '指令',
     };
     const enKeys = Object.keys(enZh).sort((a, b) => b.length - a.length);
     let mixed = out;
@@ -171,7 +399,27 @@ function normalize(text) {
       applied.push('homophone:' + k);
     }
   }
-  out = mapped;
+
+  // 5b. [v6.7.73] 形近字映射（同形异义字）
+  const hgKeys = Object.keys(HOMOGLYPH_MAP).sort((a, b) => b.length - a.length);
+  let hgOut = mapped;
+  for (const k of hgKeys) {
+    if (k === HOMOGLYPH_MAP[k]) continue;
+    if (hgOut.includes(k)) {
+      hgOut = hgOut.split(k).join(HOMOGLYPH_MAP[k]);
+      applied.push('homoglyph:' + k);
+    }
+  }
+
+  // 5c. [v6.7.73] 拼音全拼还原（必须在 lowercase 之前——否则全拼无法匹配）
+  const dePy = _dePinyin(hgOut);
+  if (dePy !== hgOut) { applied.push('de_pinyin'); hgOut = dePy; }
+
+  // 5d. [v6.7.73] Leet speak 还原（同样在 lowercase 前）
+  const deLt = _deLeet(hgOut);
+  if (deLt !== hgOut) { applied.push('de_leet'); hgOut = deLt; }
+
+  out = hgOut;
 
   // 6. 英文大小写归一（模式库大量用 /i，但混拼场景统一小写更稳）
   const lower = out.toLowerCase();
