@@ -19,11 +19,14 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 
 const TEST_DIR = __dirname;
 const ROOT = path.join(__dirname, '..');
 const CHILD_TIMEOUT = 90000;
+// [FIX 2026-09-21] execSync 的 timeout 只杀掉外层 shell，测试自己 spawn 的
+// 服务进程会被孤儿化（PPID=1）并继续监听端口，实测泄漏了 8 个 mcp-server
+// 实例、连续跑了 3 天没人发现。见 runChild() 里的 killOrphans() 清理。
 
 let passed = 0;
 let failed = 0;
@@ -46,6 +49,32 @@ function collectTestFiles(dir, base = dir) {
   return out.sort();
 }
 
+/**
+ * [FIX 2026-09-21] 杀掉本 runner 派生的、仍然活着的孙进程。
+ * 背景：execSync 超时只杀掉外层 shell，测试自己 spawn 的服务进程
+ * （例如 mcp-server）会被孤儿化（PPID=1）并继续监听端口。
+ * 实测因此泄漏了 8 个 mcp-server 实例、连续跑了 3 天没人发现。
+ * 只杀本 runner 的后代，绝不碰别的用户的进程。
+ */
+function killOrphans() {
+  let pids = [];
+  try {
+    const r = spawnSync('pgrep', ['-P', String(process.pid)], { encoding: 'utf8' });
+    if (r.status !== 0 || !r.stdout) return;
+    pids = r.stdout.trim().split('\n').filter(Boolean);
+  } catch (_) { return; }
+  const all = [...pids];
+  for (const p of pids) {
+    try {
+      const r2 = spawnSync('pgrep', ['-P', p], { encoding: 'utf8' });
+      if (r2.status === 0 && r2.stdout) all.push(...r2.stdout.trim().split('\n').filter(Boolean));
+    } catch (_) {}
+  }
+  for (const pid of all) {
+    try { process.kill(Number(pid), 'SIGKILL'); } catch (_) {}
+  }
+}
+
 /** 在子进程中执行一条命令，解析其 `N 通过, M 失败` 汇总行 */
 function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
   console.log(`\n${label}`);
@@ -59,6 +88,8 @@ function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
     });
   } catch (e) {
     out = (e.stdout || '').toString();
+    // 超时/被杀后清理孙进程，避免孤儿服务进程长期占用端口
+    killOrphans();
     if (!/(\d+) 通过, (\d+) 失败/.test(out)) {
       console.log(`  [异常] ${label.trim()}: ${(e.message || '').split('\n')[0]}`);
       failed++;

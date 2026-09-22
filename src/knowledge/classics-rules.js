@@ -1026,6 +1026,21 @@ function parseHit(raw) {
   return { file: m[1], line: Number(m[2]), raw: m[3].trim() };
 }
 
+// [FIX 2026-09-21] 古典语体识别
+// 原先「命中密度 >= 3 即算古典相关」是个恒真条件：任何文本只要在 儒藏/四书
+// 里检索 仁/道/义 之类，都会返回 >=3 条，于是现代汉语里写一句含「法」「礼」
+// 「刑」的话也会被判成古典文本。
+// 现代汉语仍然高频使用的 之/也/乎/者/而/以/其/则 一律不计入判据，
+// 只认两类高精度证据：
+//   1) 现代汉语几乎不用的文言语气词（焉/哉/矣/兮/而已/之于）
+//   2) 文言固定句式（多字组合，现代行文不会自然拼出来）
+function looksClassicalRegister(input) {
+  if (typeof input !== 'string' || input.length === 0) return false;
+  if (/[焉哉矣碅]|而己|之于/.test(input)) return true;
+  if (/不亦[悦说]乎|己所不欲|反求诸己|求其放心|万物皆备|施仁政|省刑罚|薄税正|运于掌|古之|不以[仁义]为|以[仁义]为[仁义]|是以|故曰|也者/.test(input)) return true;
+  return false;
+}
+
 function evaluateRules(input) {
     // ─── Confucian pre-check: avoid Buddhist domain stealing ───
   // 《孟子》《论语》等先秦儒学文本含'道''仁''义'等字，易被 Buddhist keywords 匹配，
@@ -1053,6 +1068,11 @@ function evaluateRules(input) {
   if (!domain) {
     domain = matchDomain(input);
   }
+  // [FIX 2026-09-21] 记录领域是否由「多字关键词」确立。
+  // 单字关键词（法/礼/刑/道/苦/义/利…）在现代汉语里是高频常用字，
+  // 只命中单字证明不了输入是古典语体，不能据此打开古典通道。
+  const _strongDomainHit = !!(domain && Array.isArray(domain.keywords)
+    && domain.keywords.some(kw => typeof kw === 'string' && kw.length >= 2 && input.includes(kw)));
 
   if (!domain && typeof input === 'string' && input.length >= 10) {
     const buddhistSoft = /戒|定|慧|出离|寂静|涅槃|无明|爱憎|苦集|灭道|四谛|八正道|十二因缘|般若|波罗蜜|菩萨|菩提|忍辱|精进|禅定|三学|四生|八苦|三毒|五蕴|六度|七觉/.test(input);
@@ -1094,7 +1114,11 @@ function evaluateRules(input) {
   });
 
   // 后备：当检索已明确命中古典语料时，仍视为古典相关（不要求规则必须 fired）
-  const classicalByHitDensity = hits.length >= 3;
+  // [FIX 2026-09-21] 但必须同时证明「输入本身是古典语体」或「领域由多字关键词
+  // 确立」。否则任何含 法/礼/刑/道 的现代文本都会因 儒藏/四书 必然 >=3 命中
+  // 而被误判为古典相关，上游 heartflow 会把整个结论短路成一句路由标签。
+  const classicalByHitDensity = hits.length >= 3
+    && (_strongDomainHit || looksClassicalRegister(input));
 
   const results = applicable.map(rule => {
     try {
