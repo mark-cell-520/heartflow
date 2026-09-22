@@ -55,6 +55,12 @@ const PROMISE_EN = /^(?:i (?:will|'ll|would|should)|will|i am going to|i'?m goin
 const FAKE_DONE_ZH = /(?:已完成|搞定了|完成了|处理好了|解决[了]?|弄好了|搞定)[，,。！!]?\s*(?:请|你可以|你自己|详见|以下|上面|上面已)[^。！!]{0,30}$/;
 const FAKE_DONE_EN = /(?:done|finished|complete[dl]?|all set|taken care of|handled|fixed|resolved)[.!]?\s*(?:you can|please|see|refer to|check|as (?:above|shown))[^.!]{0,30}$/i;
 
+// [v6.7.73] 服务性收尾豁免——「问题已解决，请问还有其他可以帮您？」
+// 是客服主动收尾询问，不是"说完成了你自己去看"的空完成声明。
+// 垂直场景基准 1% 误拦的最后一个根因。
+const SERVICE_CLOSING_ZH = /(?:解决|处理|修复|完成)[了]?[，,。！!]?\s*(?:请问|我想问|还需要|如有|若有|要是|如果)[^。！!]{0,20}(?:帮助|帮您|问题|疑问|咨询|需求)/;
+const SERVICE_CLOSING_EN = /(?:resolved|fixed|handled|done|complete[dl]?)[.!]?\s*(?:is there|do you|would you|if you)[^.!]{0,25}(?:anything else|anything more|other|question|help)/i;
+
 /**
  * 检查文本是否过早终止（该完成却没完成）
  * @param {string} text 要检查的 AI 输出
@@ -119,7 +125,8 @@ function checkPrematureTermination(text, ctx = {}) {
   }
 
   // T4: 空完成声明（说完成了但无产物）
-  if (isZh ? FAKE_DONE_ZH.test(trimmed) : FAKE_DONE_EN.test(trimmed)) {
+  const isServiceClosing = isZh ? SERVICE_CLOSING_ZH.test(trimmed) : SERVICE_CLOSING_EN.test(trimmed);
+  if ((isZh ? FAKE_DONE_ZH.test(trimmed) : FAKE_DONE_EN.test(trimmed)) && !isServiceClosing) {
     signals.push({ id: 'T4_empty_done', name: '空完成声明', weight: 0.8 });
   }
 
