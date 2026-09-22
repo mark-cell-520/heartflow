@@ -114,8 +114,13 @@ t('README.md 维度/工具/路由/测试数匹配', () => {
 
 t('README.md 行内 46→50 引用已更新', () => {
   const src = fs.readFileSync(README, 'utf8');
-  assert.ok(!/46 dimensions/.test(src),
-    'README.md 仍有过时的 "46 dimensions" 行内引用');
+  // [v6.7.78] 只查**正文宣称**，不查 Version history 段落——那里
+  // 引述历史错误数字是刻意的（"docs claimed stale metrics — 46 dimensions..."）。
+  // 守卫误报过一次：changelog 刚补上历史说明就被这条断言拦下。
+  const changelogStart = src.search(/##\s*Version history/i);
+  const body = changelogStart > 0 ? src.slice(0, changelogStart) : src;
+  assert.ok(!/46 dimensions/.test(body),
+    'README.md 正文仍有过时的 "46 dimensions" 宣称');
 });
 
 t('SKILL.md 维度/工具数匹配', () => {
@@ -133,7 +138,10 @@ t('SKILL.md 维度/工具数匹配', () => {
 
 t('SKILL.md 无过时 46 维度引用', () => {
   const src = fs.readFileSync(SKILL, 'utf8');
-  assert.ok(!/46 dimensions/.test(src), 'SKILL.md 仍有过时引用');
+  // 同样排除 changelog 引述
+  const sk = src.search(/##\s*(Version history|Changelog)/i);
+  const body = sk > 0 ? src.slice(0, sk) : src;
+  assert.ok(!/46 dimensions/.test(body), 'SKILL.md 正文仍有过时引用');
 });
 
 t('三个文档数字互相一致', () => {
