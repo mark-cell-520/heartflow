@@ -794,6 +794,10 @@ function checkVagueness(text) {
   const explicitSourceFollow = hasChinese ? [
     /(?:报告|数据|统计|调查)[^。]{0,10}(?:显示|表明|来自)[^。]{0,20}(?:年报|审计|官方|数据源|数据库|统计局|央行|报告)/,
     /(?:根据|据)[^。]{0,10}(?:年报|审计|官方|统计局|央行|财报|公告)/,
+    // [v6.7.73] 技术报告也是明确来源——「漏洞扫描报告显示这个版本有三个高危 CVE」
+    // 是正常技术表述，不是模糊话术。垂直场景基准 3% 误拦的根因之一。
+    /(?:扫描|检测|测试|评估|审计|诊断|监测)[^。]{0,8}报告[^。]{0,8}(?:显示|表明)/,
+    /CVE|SRR|CWE|AOSP|RFC/i,
   ] : [
     /\b(?:report|data|statistics|survey)\b[^.]{0,15}\b(?:show|indicate|from|based on)\b[^.]{0,25}\b(?:annual report|audit|official|database|bureau|bank)\b/i,
   ];
@@ -802,7 +806,10 @@ function checkVagueness(text) {
   const matches = [];
   for (const pat of patterns) {
     const m = text.match(pat);
-    if (m) matches.push({ pattern: pat.source.slice(0, 20), count: m.length });
+    // [v6.7.73] 存匹配到的原文而非正则源码——否则 trace/evidence 吐出
+    // `{"pattern":"报告显示","count":1}` 这种 JSON 噪音（第四个证据可读性问题，
+    // 前三个：hasty_generalization/double_bind/cyrillic 已修）
+    if (m) matches.push({ pattern: m[0].slice(0, 20), count: m.length });
   }
   const count = matches.length;
   return { count, matches, score: explicitSource ? 0 : Math.min(1, count * 0.2) };
@@ -1251,13 +1258,16 @@ function checkSycophancy(text) {
 
 function checkEvidence(claim, evidence) {
   const issues = [];
-  let score = 0.5;
+  // [v6.7.73] 未显式传 evidence 时视为中性——初始值 0.5 会让所有良性文本
+  // 被扣 0.5 分，把总分压到 verify（实测「问题已解决，请问还有其他可以帮您？」
+  // 无任何维度命中却因 score 0.79 判 verify）。这是 v6.7.31 修复原则的回归：
+  // 注释说"未提供证据不应被判证据不足"，但实现仍在扣分。
+  let score = (evidence && evidence.length > 0) ? 0.5 : 1.0;
   if (!claim || claim.length < 5) {
     issues.push({ type: 'claim_too_short', severity: 'medium', message: '论断过短，无法验证' });
     score -= 0.2;
   }
   // 证据检查只在调用方显式提供 evidence 时执行。
-  // 未提供 evidence 的普通输入（如用户消息）不应被判"证据不足"。
   if (evidence && evidence.length > 0) {
     score += Math.min(0.3, evidence.length * 0.1);
   }
@@ -1780,6 +1790,19 @@ function checkMoralFoundations(text) {
     /自然语言|自然语义|语言模型|processing\s+language|naturallang/i,
     /独立进程|独立实例|独立模块|独立服务|standalone|independent process|separate instance/i,
     /控制流|版本控制|控制台|access control|control flow|version control/i,
+    // [v6.7.73] 补科研/合规语境的弱道德词：
+    // 「控制变量」不是压迫话题（实验设计），「遵守监管规定」不是权威服从
+    /控制变量|控制组|对照组|实验组|controlled variable|control group/i,
+    /遵守[^。]{0,8}(?:规定|监管|规则|规程|纪律|流程|标准|协议|约定)|comply with|compliance/i,
+    /服从[^。]{0,6}(?:分布|函数|数据|模型|定律)/i,
+    // [v6.7.73] 医学/临床语境——「副作用包括头晕和恶心」是症状枚举，
+    // 不是圣洁/堕落话题。
+    /(?:症状|副作用|不良反应|表现|体征)[^。]{0,20}(?:恶心|呕吐|头晕|不适)|(?:恶心|呕吐|头晕)[^。]{0,10}(?:症状|副作用|不良反应)/i,
+    /(?:药物|临床|病例|患者|服用|注射)[^。]{0,14}(?:恶心|呕吐|疼痛|发热|皮疹)/i,
+    // [v6.7.73] 学术/研究/政策讨论语境——「教育公平是社会公平的基础」
+    // 是社会学论述，不是对具体人的道德评判。
+    /教育公平|社会公平|公平[^。]{0,6}(?:的|是|为)[^。]{0,6}(?:基础|重要|核心|前提|问题|议题)/i,
+    /(?:研究|分析|探讨|讨论|报告|论文)[^。]{0,12}(?:公平|正义|平等)/i,
     /子系统|系统状态|状态机|状态源|状态转移|state machine|state source|state transition/i,
     /派生|派生链路|派生字段|derived|derivation/i,
     /持久化|persist|persistence/i,
@@ -1789,7 +1812,9 @@ function checkMoralFoundations(text) {
   if (techHit) {
     // 保留真正道德语义（出现强道德词如 背叛/奴役/屠杀/仇恨 时不豁免），弱词（自然/独立/归属）在技术语境下豁免
     const STRONG_MORAL = /背叛|奴役|屠杀|种族|仇恨|压迫|暴政|贞洁|亵渎|神圣/i;
-    const weakOnly = found.every(f => ['sanctity', 'liberty', 'loyalty'].includes(f.foundation));
+    // [v6.7.73] 扩到 fairness/authority——「教育公平是社会公平的基础」
+    // 「遵守监管规定」在科研/合规语境是正常表述，不是道德框架讨论。
+    const weakOnly = found.every(f => ['sanctity', 'liberty', 'loyalty', 'fairness', 'authority'].includes(f.foundation));
     if (weakOnly && !STRONG_MORAL.test(text)) {
       return { count: 0, foundations: [], score: 0 };
     }
@@ -2001,8 +2026,17 @@ const DEHUMANIZATION_PATTERNS = {
       /(?:都)?是(?:蟑螂|老鼠|害虫|蛆虫|蝼蚁|蚂蚁)/i,
       /把人?当(?:机器|工具|零件|螺丝钉)/i,
       /(?:机器|零件|螺丝钉)[^。]{0,6}(?:人|他们|他|她)/i,
+      // [v6.7.73] 「模型」指 ML/数学模型，不是把人当机器——
+      // 「威胁检测模型需要标注」误命中。要求与指人共现。
+      /(?:把|将|当|当成|视为)[^。]{0,4}(?:人|他们|他|她)[^。]{0,4}(?:模型|机器|工具|零件)/i,
+      // [v6.7.73] 「恶心」是医学症状词（头晕和恶心），不是道德贬损
       /电池|燃料|柴火|干电池/i,
-      /分母|流量|人头|把人?当(?:KPI|业绩|指标)|当(?:KPI|指标)[^。]*?(?:人|他们|他|她)/i,
+      // [v6.7.73] 流量/人头/KPI 等需与指人共现才算非人化——
+      // 「网络流量」「人头税」「KPI 完成率」是正常技术/行政用语，
+      // 单独出现极常见。实测垂直场景基准 8% 误拦的根因之一。
+      /(?:把|将|当|当成|视为|当作)?[^。]{0,8}(?:人|他们|用户|员工|学生|客户)[^。]{0,6}(?:当|视)作?[^。]{0,4}(?:流量|人头|KPI|业绩|指标|数字)/i,
+      /(?:流量|人头|KPI|指标|业绩)[^。]{0,4}(?:而已|罢了|不过是|就是)/i,
+      /割[^。]{0,4}韭菜|韭菜[^。]{0,4}(?:收割|割)/i,
       /充气娃娃|玩物|花瓶|摆设/i,
       // [v6.7.71] 「玩具」需与指人共现才算非人化——单独出现极常见
       // （"桌上的小玩具都能吸引他" 是正常描写，长文本实测误 block）
@@ -2011,15 +2045,29 @@ const DEHUMANIZATION_PATTERNS = {
       /n手货|二手车|剩饭|烂货/i,
     ],
     disease: [
-      /毒瘤|癌细胞|病菌|病毒|瘟疫|感染|腐烂|溃烂|脓疮|(?:精神|思想|文化|道德|灵魂)[的]?污染/i,
+      // [v6.7.73] 疾病隐喻需与"思想/文化/精神"类主题共现才算非人化——
+      // 「病毒感染」「侵入式检查存在感染风险」「副作用包括恶心」是正常
+      // 医学/安全用语，单独出现极常见。垂直场景基准 8% 误拦的根因。
+      // 真非人化是把人或群体比作疾病：这种思想是毒瘤/他们是社会病毒。
+      /(?:毒瘤|癌细胞|病菌|瘟疫|腐烂|溃烂|脓疮)[^。]{0,6}(?:思想|文化|精神|道德|灵魂|民族|种族|群体|阶层)/i,
+      /(?:思想|言论|文化|精神|道德|灵魂|民族|种族|群体|阶层|人|他们|这类人)[^。]{0,10}(?:是|像|如同|就是)[^。]{0,4}(?:毒瘤|癌细胞|病菌|瘟疫|病毒|寄生虫)/i,
+      /(?:精神|思想|文化|道德|灵魂)[的]?污染/i,
       /精神污染|思想毒瘤|文化腐烂|文化污染/i,
       /社会毒瘤|体制病|制度病|时代病/i,
-      /病得不轻|有病|病态|畸形/i,
+      // 「有病」「病态」需指向人/群体才算贬损——「他这种人有病」判，
+      // 「病态发展」「病理分析」不判
+      /(?:人|他们|他|她|这家伙|这种人)[^。]{0,6}(?:有病|病得不轻|病态|畸形)/i,
       /(?:传染|扩散|蔓延)[^。]*?(思想|言论|文化|情绪)/i,
       /腐蚀|侵蚀|毒害[^。]*?(心灵|思想|青年|社会|风气)/i,
     ],
     threat: [
-      /(?:威胁[^。，]{0,8}(?:我|你|他|她|他们|我们|你们|要|性|到)|以死相逼|恐吓|威逼利诱)/i,
+      // [v6.7.73] 「威胁检测」「威胁模型」「威胁情报」是安全领域核心术语。
+      // 旧模式 `威胁[^。，]{0,8}(?:...|要|...)` 让「威胁检测模型需要」命中
+      // （"检测...需要"的"要"）。收紧为必须呈现**对人的施加**：
+      // 威胁我/威胁到/威胁性 + 具体胁迫动作。
+      /威胁(?:[我你他她]|到[我你他她]|性(?:的)?(?:语言|行为|信息|短信|邮件))/i,
+      /(?:威胁|恐吓)[^。]{0,6}(?:我要|要我|让我们|逼我|必须|否则|不然)/i,
+      /以死相逼|恐吓|威逼利诱/i,
       /清除|铲除|消灭[^。]*?(他们|这[^。]*?人|群体|族)/i,
       /恐怖分子|极端分子|暴徒|恶势力|黑恶/i,
       /毒草|精神毒药|思想毒药/i,
@@ -2038,7 +2086,10 @@ const DEHUMANIZATION_PATTERNS = {
       /劣根性|奴性|愚昧|麻木|麻木不仁/i,
     ],
     disgust: [
-      /恶心|令人作呕|讨厌|可憎|厌恶|鄙夷/i,
+      // [v6.7.73] 「恶心」需排除医学症状语境（头晕和恶心、恶心呕吐、
+      // 感到恶心、恶心反应）——这是药理学/临床常态用语，不是道德贬损。
+      // 垂直场景基准 8% 误拦的根因之一。中性化在 checkDehumanization 内做。
+      /恶心(?![\u4e00-\u9fff]{0,2}(?:心|吗|呀|啊))|令人作呕|讨厌|可憎|厌恶|鄙夷/i,
       /(?:肮脏|污秽|龌龊|下流|低俗)|脏(?:东西|货)(?!要扫|要洗|扫|擦)|脏死了|脏兮兮/i,
       /不要脸|无耻|厚颜无耻|卑鄙|龌龊/i,
     ],
@@ -2109,10 +2160,15 @@ function checkDehumanization(text) {
   if (!text || typeof text !== 'string') return { count: 0, categories: [], hits: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   const pats = hasChinese ? DEHUMANIZATION_PATTERNS.zh : DEHUMANIZATION_PATTERNS.en;
+  // [v6.7.73] 医学症状语境内置化：「头晕和恶心」「恶心呕吐」「恶心反应」
+  // 「感到恶心」是临床/药理常态用语，匹配前先中性化。
+  // 垂直场景基准 8% 误拦的根因之一。
+  const _medText = text.replace(
+    /(?:头晕|头昏|乏力|腹痛|腹泻|失眠|过敏)[^。，、]{0,6}恶心|恶心[^。，、]{0,6}(?:呕吐|反应|症状|不适|反胃|腹泻)|感到?恶心(?!你|他|她)/g, ' ');
   const hits = [];
   for (const [cat, patterns] of Object.entries(pats)) {
     for (const pat of patterns) {
-      const m = text.match(pat);
+      const m = _medText.match(pat);
       if (m) hits.push({ category: cat, matched: m[0].slice(0, 15) });
     }
   }

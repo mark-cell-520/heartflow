@@ -29,6 +29,9 @@
 const DANGEROUS_PATTERNS = [
   // ① 忽略/绕过/关闭安全机制
   /(?:忽略|无视|绕过|跳过|关闭|禁用|去掉|取消)[^。]{0,12}(?:安全|警告|提示|校验|验证|检查|防护|防火墙|认证|授权|鉴权|SSL|TLS|证书|审计|日志|限流|熔断)/i,
+  // [v6.7.73] 目的状语豁免：「关闭调试日志以避免泄露敏感信息」是**为了**安全，
+  // 不是绕过安全。出现「以避免/为了防止/以免/从而防止」时不判。
+  // 垂直场景基准 3% 误拦的根因之一。
   /(?:不要|别|不用)[^。]{0,10}(?:检查|校验|验证|确认)[^。]{0,12}(?:安全|证书|签名|权限|身份)/i,
   /(?:安全|证书|签名|校验)[^。]{0,8}(?:无所谓|不重要|不用管|先不管|跳过)/i,
   // ② 权限提升 / 越权执行
@@ -72,9 +75,15 @@ const DI_WEIGHT = 0.85;
 /** 通用匹配器 */
 function _matchAll(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
+  // [v6.7.73] 目的状语豁免文本：「关闭调试日志以避免泄露」是安全正向操作，
+  // 含「以避免/为了防止/以免/从而防止/以防」的从危险模式中剔除。
+  const _t = text
+    // [v6.7.73] 中性化含目的状语的片段：允许跨逗号/分号
+    // （「请关闭调试日志，以避免泄露敏感信息。」含中文逗号）。
+    .replace(/[^。；]{0,30}(?:以避免|为了防止|以免|从而防止|以防)[^。]{0,30}/g, ' ');
   const hits = [];
   for (const pat of DANGEROUS_PATTERNS) {
-    const m = text.match(pat);
+    const m = _t.match(pat);
     if (m) hits.push({ type: 'dangerous_instruction', matched: m[0].slice(0, 40) });
   }
   return { count: hits.length, hits, score: Math.min(1, hits.length * DI_WEIGHT) };
