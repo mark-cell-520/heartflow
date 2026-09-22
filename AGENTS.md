@@ -12,8 +12,14 @@ wrong.
 HeartFlow adds the discrimination layer, so your agent doesn't just *say* things — it
 says things that are *right*.
 
-**Zero LLM dependency.** 46 dimensions, 137 modules, 179 MCP tools, 1,546 dispatch
+**Zero LLM dependency.** 50 dimensions, 137 modules, 59 MCP tools, 1,727 dispatch
 routes. Pure rule engine.
+
+> **Numbers below were measured by `scripts/measure-claimed-numbers.js` (v6.7.77),
+> not asserted from memory.** If you change any of them, re-run that script —
+> this file previously claimed "46 dimensions / 179 MCP tools / 1,546 routes"
+> while the code actually had 50 / 59 / 1,727. Honest numbers is design
+> principle #5 in this file.
 
 ## Quick start
 
@@ -90,13 +96,26 @@ Full pipeline with mode selection (fast / deep) and a conversation anchor.
 `verdict` is derived from `gate.action`, so the two cannot contradict each other. If you
 read only one field, read `gate.action`.
 
-## The 46 dimensions
+## The 50 dimensions
 
-**Block-level (5):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment
+> **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
+> `VERIFY_DIMS` sets in `src/index.js` (v6.7.77).** The three tiers add up to 44;
+> the other 6 dimensions are scored but do not force a gate action.
 
-**Rewrite-level (7):** emotional_manipulation, gaslighting, double_bind, victim_blaming, false_urgency, bullshit, absolute_claim
+**Block-level (9):** hate_speech, dehumanization, prompt_injection, code_security,
+deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
+indirect_injection
 
-**Verify-level (24):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination
+**Rewrite-level (9):** emotional_manipulation, gaslighting, double_bind,
+victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust,
+multi_turn_escalation
+
+**Verify-level (26):** appeal_to_authority, vagueness, contradiction, sycophancy,
+confidence, fallacies, presupposition, empty_answer, info_deprivation,
+false_equivalence, hasty_generalization, slippery_slope, whataboutism,
+pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith,
+no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection,
+premature_termination, sealioning, tone_policing
 
 Dimensions that are scored but do not force a gate action: evidence,
 moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary,
