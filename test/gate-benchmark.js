@@ -270,4 +270,9 @@ if (args.includes('--detail')) {
   for (const cat of Object.keys(data)) showDetails(data, cat);
 }
 
-process.exit(regression > 0 ? 1 : 0);
+module.exports = { SAMPLES, EXPECT };
+
+// 仅在直接运行时才退出（被 require 复用时不 exit，否则会杀掉调用方进程）
+if (require.main === module) {
+  process.exit(regression > 0 ? 1 : 0);
+}

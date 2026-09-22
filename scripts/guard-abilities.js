@@ -147,13 +147,66 @@ function checkTests() {
     const { execSync } = require('child_process');
     try {
       const out = execSync(`node ${path.join(ROOT, 'test/run-all.js')}`, { cwd: ROOT, encoding: 'utf8', timeout: 420000 });
-      const passMatch = out.match(/(\d+)\s+passed/);
-      const failMatch = out.match(/(\d+)\s+failed/);
-      const passed = passMatch ? parseInt(passMatch[1]) : 0;
-      const failed = failMatch ? parseInt(failMatch[1]) : 0;
-      resolve([{ name: '全量测试', ok: failed === 0, detail: `${passed} passed, ${failed} failed` }]);
+      // [v6.7.75] run-all 输出多行「X 通过, Y 失败, 共 N 个」（每个测试文件一行）
+      // 加末尾总汇总。必须取**最后一行**，否则只会读到第一个文件的 2 通过。
+      // 旧正则匹配英文 `(\d+) passed` → passed 恒为 0，该检查项形同虚设。
+      const lines = out.split('\n');
+      let m = null;
+      for (let i = lines.length - 1; i >= 0; i--) {
+        m = lines[i].match(/(\d+)\s*通过[,\s]+(\d+)\s*失败[,\s]+(?:共\s*)?(\d+)\s*个/)
+          || lines[i].match(/(\d+)\s*passed[,\s]+(\d+)\s*failed/);
+        if (m) break;
+      }
+      if (!m) {
+        resolve([{ name: '全量测试', ok: false, detail: '未解析到测试汇总行' }]);
+        return;
+      }
+      const passed = parseInt(m[1]);
+      const failed = parseInt(m[2]);
+      resolve([{ name: '全量测试', ok: failed === 0 && passed > 0, detail: `${passed} 通过, ${failed} 失败` }]);
     } catch (e) {
-      resolve([{ name: '全量测试', ok: false, detail: e.message.split('\n')[0] }]);
+      const out = (e.stdout || '') + '';
+      const lines = out.split('\n');
+      let m = null;
+      for (let i = lines.length - 1; i >= 0; i--) {
+        m = lines[i].match(/(\d+)\s*通过[,\s]+(\d+)\s*失败[,\s]+(?:共\s*)?(\d+)\s*个/)
+          || lines[i].match(/(\d+)\s*passed[,\s]+(\d+)\s*failed/);
+        if (m) break;
+      }
+      if (m) {
+        const failed = parseInt(m[2]);
+        resolve([{ name: '全量测试', ok: failed === 0, detail: `${m[1]} 通过, ${failed} 失败` }]);
+      } else {
+        resolve([{ name: '全量测试', ok: false, detail: e.message.split('\n')[0] }]);
+      }
+    }
+  });
+}
+
+function checkBidirectional() {
+  return new Promise(resolve => {
+    const { execSync } = require('child_process');
+    try {
+      const out = execSync(`node ${path.join(ROOT, 'scripts/bidirectional-guard.js')}`, {
+        cwd: ROOT, encoding: 'utf8', timeout: 300000,
+      });
+      const pass = /双向门禁通过/.test(out);
+      const recall = out.match(/召回侧: (\d+\/\d+)/);
+      const benign = out.match(/误拦侧: (\d+\/\d+)/);
+      resolve([{
+        name: '双向回归门禁',
+        ok: pass,
+        detail: pass
+          ? `召回 ${recall ? recall[1] : '?'} | 误拦 ${benign ? benign[1] : '?'}`
+          : out.split('\n').filter(l => l.includes('❌')).slice(0, 3).join('; '),
+      }]);
+    } catch (e) {
+      const out = (e.stdout || '') + (e.stderr || '');
+      resolve([{
+        name: '双向回归门禁',
+        ok: false,
+        detail: out.split('\n').filter(l => l.includes('❌')).slice(0, 3).join('; ') || e.message.split('\n')[0],
+      }]);
     }
   });
 }
@@ -205,6 +258,14 @@ async function main() {
     console.log(`  ${r.ok ? '✅' : '❌'} ${r.name}: ${r.detail}`);
   }
   results.push(...testResults);
+
+  // 7. 双向回归门禁（召回不退化 + 误拦不增加）
+  console.log('\n【7】双向回归门禁（攻击召回 + 良性误拦）');
+  const biResults = await checkBidirectional();
+  for (const r of biResults) {
+    console.log(`  ${r.ok ? '✅' : '❌'} ${r.name}: ${r.detail}`);
+  }
+  results.push(...biResults);
 
   // 汇总
   const failed = results.filter(r => !r.ok);
