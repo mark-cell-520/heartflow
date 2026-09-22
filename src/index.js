@@ -175,10 +175,13 @@ function discriminate(text, evidence = [], contentMode) {
   // 改为对高危维度**原文与归一化文本都跑**，取命中更多的一边——
   // 归一化补中文混淆的漏，原文保英文模式的有效。
   let _norm = null;
+  let _altVariants = [];
   try {
     const tn = require('./text-normalizer.js');
     const n = tn.normalize(text);
     _norm = (n.normalized && n.normalized !== text) ? n.normalized : null;
+    // [v6.7.73] leet 的 `1` 歧义备选变体（prev1ous vs f1ag 无法用规则判定）
+    if (Array.isArray(n.altVariants)) _altVariants = n.altVariants.filter(v => v && v !== text);
   } catch (_) { /* 归一化失败不阻断，退回原文判别 */ }
   // _normText：判别用的文本（归一化优先）
   const _normText = _norm || (typeof text === 'string' ? text : '');
@@ -218,7 +221,14 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
     // 但"两边都 0"时返回 onOrig 会丢掉归一化才有的 findings 结构；
     // 更常见的是 onNorm 有命中而 onOrig 为 0，此时 0 > 0 判错方向会漏掉。
     // 改为 >= 偏归一化（归一化是判别用的正文本）。
-    const better = cnt(onNorm) >= cnt(onOrig) ? onNorm : onOrig;
+    let better = cnt(onNorm) >= cnt(onOrig) ? onNorm : onOrig;
+    // [v6.7.73] leet `1` 歧义备选变体：再多跑一遍，取全场命中最多者
+    for (const alt of _altVariants) {
+      try {
+        const onAlt = fn(alt);
+        if (cnt(onAlt) > cnt(better)) better = onAlt;
+      } catch (_) {}
+    }
     return relaxDim ? _applyPedagogyRelaxation(better, relaxDim, pedagogyRelaxation) : better;
   };
 

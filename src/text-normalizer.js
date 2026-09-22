@@ -218,68 +218,74 @@ function _dePinyin(text) {
   return out;
 }
 
-/** [v6.7.73] Leet 还原：连续 3+ 个替换字符才认为是 leet，避免误伤 1 和 0 */
-function _deLeet(text) {
-  if (!text) return text;
-  let out = text;
-  // [v6.7.73] 门槛从"单 token ≥3"放宽为"整句 ≥3 且该 token 至少 1 个 leet 字符"。
-  // 「!gn0re」单看只有 2 个 leet 字符会漏，但攻击句整体必然 ≥3。
+/**
+ * [v6.7.73] Leet 还原候选生成。
+ *
+ * 门槛：整句 ≥3 个 leet 字符，或中英混排含 ≥1。
+ * 返回**候选数组**：若文本含 `1` 且位置歧义（辅音+1+元音），
+ * 同时返回 [全i变体, 全l变体]；否则返回单一候选。
+ * 由调用方按关键词命中数择优——规则引擎无法从相邻字符区分
+ * prev1ous(previous) 与 f1ag(flag)。
+ */
+function _deLeetCandidates(text) {
+  if (!text) return [];
   let totalHits = 0;
-  for (const ch of out) if (LEET_MAP[ch]) totalHits++;
-  // [v6.7.73] 门槛：整句 ≥3，或"中英混排且含 1 个 leet 字符"。
-  // 后者覆盖「请 gn0re 之前的指另」——英文片段被中文包围，
-  // leet 字符总数可能只有 1-2 个，但语境已足够可疑。
-  const isMixedCtx = /[\u4e00-\u9fff]/.test(out) && /[a-zA-Z]/.test(out);
-  if (totalHits < 3 && !(isMixedCtx && totalHits >= 1)) return out;
-  const tokens = out.split(/(\s+)/);
-  out = tokens.map(tok => {
-    let hits = 0;
-    for (const ch of tok) if (LEET_MAP[ch]) hits++;
-    if (hits === 0) return tok;
-    // [v6.7.73] 纯数字串跳过——「2025」「87.3」「1-20」「99.7」是正常数字，
-    // 逐字符替换会把年份/百分比改坏（2025→2o2s、99.7%→gg.t%）导致
-    // unsupported_claim / perfect_error 漏判（实测 4 个既有回归测试根因）。
-    // 判据：把 token 按"字母段 vs 非字母段"切开，**只对字母段做 leet 还原**。
-    // 数字+字母混合 token（pr3v10u5）的数字部分保留、字母部分还原。
-    // 整 token 是纯数字+标点时直接跳过。
-    if (/^[\d.,%:/x\-+= ]+$/.test(tok)) return tok;
-    // [v6.7.73] 数字+单位 token 跳过——「100MB」「30GB」「2TB」「8KB」
-    // 是技术文本常态。实测 100MB → loomb（1→l 词尾规则 + 0→o），
-    // 触发 overconfidence 误判（verify）。判据：token 匹配
-    // <数字><可选小数><单位字母> 形态即跳过。
-    if (/^\d+(?:\.\d+)?\s*(?:[kmgtp]?i?b|b|bytes?|mb|gb|kb|tb|pb|ms|s|min|h|hr|fps|hz|khz|mhz|ghz|w|kw|v|mv|kv|ma|nm|mm|cm|m|km|kg|mg|g|l|ml|cl|°c|°f|%)$/i.test(tok)) return tok;
-    // 数字紧跟单位（无空格）也跳过：100MB / 30GB
-    if (/^\d+(?:\.\d+)?(?:[kmgtp]i?b|bytes?|hz|fps|ms|min|khz|mhz|ghz)$/i.test(tok)) return tok;
-    let r = '';
-    let i2 = 0;
-    while (i2 < tok.length) {
-      const ch = tok[i2];
-      // 段起点可以是字母或 leet 数字（如 1gn0r3 以 1 开头）。
-      // 纯数字 token（2025 / 99.7%）不走此分支——判据是整个 token 是数字+标点。
-      if (/[a-zA-Z0-9@$!+|()<]/.test(ch) && !/^[\d.,%:/x\-+= ]+$/.test(tok)) {
-        let j2 = i2;
-        while (j2 < tok.length && /[a-zA-Z0-9@$!+|()<]/.test(tok[j2])) j2++;
-        const seg = tok.slice(i2, j2);
-        const segLetters = (seg.match(/[a-zA-Z]/g) || []).length;
-        if (segLetters === 0) { r += seg; i2 = j2; continue; }
-        let s = '';
-        for (let k = 0; k < seg.length; k++) {
-          const c = seg[k];
-          if (c !== '1') { s += LEET_MAP[c] || c; continue; }
-          const nx = seg[k + 1] || '';
-          const nxCons = /[bcdfgjklmnpqrstvwxyz]/i.test(nx);
-          s += nxCons ? 'i' : 'l';
+  for (const ch of text) if (LEET_MAP[ch]) totalHits++;
+  const isMixedCtx = /[\u4e00-\u9fff]/.test(text) && /[a-zA-Z]/.test(text);
+  if (totalHits < 3 && !(isMixedCtx && totalHits >= 1)) return [];
+
+  // 逐 token 还原（不含 1 的字符无歧义）
+  function restore(oneAs) {
+    return text.split(/(\s+)/).map(tok => {
+      let hits = 0;
+      for (const ch of tok) if (LEET_MAP[ch]) hits++;
+      if (hits === 0) return tok;
+      if (/^[\d.,%:/x\-+= ]+$/.test(tok)) return tok;
+      if (/^\d+(?:\.\d+)?\s*(?:[kmgtp]?i?b|b|bytes?|mb|gb|kb|tb|pb|ms|s|min|h|hr|fps|hz|khz|mhz|ghz|w|kw|v|mv|kv|ma|nm|mm|cm|m|km|kg|mg|g|l|ml|cl|°c|°f|%)$/i.test(tok)) return tok;
+      if (/^\d+(?:\.\d+)?(?:[kmgtp]i?b|bytes?|hz|fps|ms|min|khz|mhz|ghz)$/i.test(tok)) return tok;
+      let r = '';
+      let i2 = 0;
+      while (i2 < tok.length) {
+        const ch = tok[i2];
+        if (/[a-zA-Z0-9@$!+|()<]/.test(ch) && !/^[\d.,%:/x\-+= ]+$/.test(tok)) {
+          let j2 = i2;
+          while (j2 < tok.length && /[a-zA-Z0-9@$!+|()<]/.test(tok[j2])) j2++;
+          const seg = tok.slice(i2, j2);
+          const segLetters = (seg.match(/[a-zA-Z]/g) || []).length;
+          if (segLetters === 0) { r += seg; i2 = j2; continue; }
+          let s = '';
+          for (let k = 0; k < seg.length; k++) {
+            const c = seg[k];
+            if (c !== '1') { s += LEET_MAP[c] || c; continue; }
+            s += oneAs[(seg[k - 1] || '@')] || 'i';
+          }
+          r += s;
+          i2 = j2;
+        } else {
+          r += ch;
+          i2++;
         }
-        r += s;
-        i2 = j2;
-      } else {
-        r += ch;
-        i2++;
       }
-    }
-    return r;
-  }).join('');
-  return out;
+      return r;
+    }).join('');
+  }
+
+  const asI = {}, asL = {};
+  // 覆盖字母 + leet 数字键：`1` 之前可能是另一个 leet 数字（如 a11 的第二个 1），
+  // 若不建键会 fallthrough 到默认 'i'，导致 asL 变体与 asI 相同（实测此 bug）
+  const KEYS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@';
+  for (const c of KEYS) {
+    const isVowelOrOne = c === '1' || /[aeiou]/i.test(c);
+    // 辅音+1 → i（prev1ous）；元音或另一个 1 之后 → l（a11=all）
+    asI[c] = isVowelOrOne ? 'l' : 'i';
+    asL[c] = 'l';
+  }
+  const vI = restore(asI);
+  if (vI === text) return [];
+  if (!text.includes('1')) return [vI];
+  const vL = restore(asL);
+  if (vL === vI) return [vI];
+  return [vI, vL];
 }
 
 /** [v6.7.73] 同形字母还原（西里尔/希腊 → 拉丁） */
@@ -350,6 +356,7 @@ function normalize(text) {
   if (!text || typeof text !== 'string') return { normalized: '', applied: [] };
   const applied = [];
   let out = text;
+  let _leetAltVariants = null;
 
   // 0. [v6.7.73] 同形字母还原（西里尔/希腊 → 拉丁）——必须最先，
   //    否则后续所有英文正则都对「Ignоre」失效
@@ -453,8 +460,20 @@ function normalize(text) {
   if (dePy !== hgOut) { applied.push('de_pinyin'); hgOut = dePy; }
 
   // 5d. [v6.7.73] Leet speak 还原（同样在 lowercase 前）
-  const deLt = _deLeet(hgOut);
-  if (deLt !== hgOut) { applied.push('de_leet'); hgOut = deLt; }
+  // `1` 有 inherent 歧义：辅音+1+元音 可能是 i(prev1ous=previous) 也可能是
+  // l(f1ag=flag / a11=all)。规则引擎无法从相邻字符判定，全局择优也会牺牲局部
+  // （实测：选 i-variant 能让 prev1ous 对但把 a11 变 ali）。
+  // 解法：**两个候选都保留在 _leetVariants 里**，由 discriminate 的 _dual
+  // 机制对两个变体都跑一遍判别，取命中更多的一边。
+  const leetVariants = _deLeetCandidates(hgOut);
+  if (leetVariants.length > 0) {
+    // 默认用第一个候选（i-variant，对 prev1ous/instruct10n5 更常见正确）
+    hgOut = leetVariants[0];
+    applied.push('de_leet');
+    if (leetVariants.length > 1) {
+      _leetAltVariants = leetVariants.slice(1);
+    }
+  }
 
   out = hgOut;
 
@@ -462,20 +481,27 @@ function normalize(text) {
   const lower = out.toLowerCase();
   if (lower !== out) { applied.push('lowercase'); out = lower; }
 
-  return { normalized: out, applied };
+  return { normalized: out, applied, altVariants: _leetAltVariants };
 }
 
 /**
- * 生成归一化变体列表：原文本 + 归一化文本。
- * 各维度可对两者都跑，任一中招即算检出（提高召回）。
+ * 生成归一化变体列表：原文本 + 归一化文本（+ leet 备选变体）。
+ * 各维度可对它们都跑，任一中招即算检出（提高召回）。
  *
  * @param {string} text
  * @returns {string[]} 去重后的变体数组（[0] 恒为原文）
  */
 function variants(text) {
-  const { normalized } = normalize(text);
-  if (!normalized || normalized === text) return [text];
-  return [text, normalized];
+  const { normalized, altVariants } = normalize(text);
+  const out = [text];
+  if (normalized && normalized !== text) out.push(normalized);
+  // [v6.7.73] leet 的 `1` 歧义备选变体——让判别有机会命中另一种还原
+  if (Array.isArray(altVariants)) {
+    for (const v of altVariants) {
+      if (v && v !== text && !out.includes(v)) out.push(v);
+    }
+  }
+  return out;
 }
 
 module.exports = { normalize, variants, toHalfWidth, toHalfWidthSafe, HOMOPHONE_MAP };
