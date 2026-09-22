@@ -1449,7 +1449,13 @@ const UNSUPPORTED_CLAIM_ZH = [
   /著名(?:学者|专家|教授|科学家)[^，。]{0,20}?(?:指出|认为|表示|发现)/,
 ];
 const UNSUPPORTED_CLAIM_EN = [
-  /\baccording to (?:a |the )?(?:study|research|report|survey|data|statistics|experiment|paper|survey)\b/i,
+  /\baccording to (?:a |the )?(?:study|research|report|survey|data|statistics|experiment|paper)\b/i,
+  // [v6.7.80] 补 "according to 2025 Harvard research" 型——年份与机构名
+  // 插在 according to 与 research 之间。端到端跑 AGENTS.md Quick start
+  // 的 fact 示例时发现 pass（承诺 verify）：原模式要求 research 紧跟
+  // according to，而真实编造句式几乎都带年份/机构。
+  /\baccording to (?:a |the )?(?:[A-Z][\w&.]*\s+){0,3}(?:study|research|report|survey|paper|data)\b/i,
+  /\baccording to (?:the )?(?:19|20)\d{2}\s+(?:[A-Z][\w&.]*\s+){0,3}(?:study|research|report|survey|paper)\b/i,
   /\b(?:studies?|research|data|surveys?|experts?|scientists?)\s+(?:show|shows|suggest|suggests|indicate|indicates|prove|proves|found|demonstrate|demonstrates|confirm|confirms)\b/i,
   /\b(?:20\d{2}|19\d{2})\s+(?:study|research|report|paper|survey)\b/i,
   /\b(?:published|reported|documented)\s+in\s+(?:the\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+(?:Journal|Review|Report|Paper)\b/i,

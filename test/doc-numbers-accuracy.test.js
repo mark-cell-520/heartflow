@@ -152,6 +152,45 @@ t('三个文档数字互相一致', () => {
   assert.strictEqual(a[1], s[1], `AGENTS(${a[1]}) 与 SKILL(${s[1]}) 不一致`);
 });
 
+console.log('\n[行内引用不得残留旧数字（v6.7.80 补充）]');
+
+t('三份文档正文无 "46 dimensions" 行内引用', () => {
+  // 上轮只改了横幅与维度章节标题，漏了 `checkInput(text)` 描述行里的
+  // "discriminate (46 dimensions)"。横幅守卫查不到行内引用。
+  const bad = [];
+  for (const f of [AGENTS, README, SKILL]) {
+    if (!fs.existsSync(f)) continue;
+    let src = fs.readFileSync(f, 'utf8');
+    const cut = src.search(/##\s*(Version history|Changelog)/i);
+    let body = cut > 0 ? src.slice(0, cut) : src;
+    // [v6.7.80] 排除刻意保留的历史引述行（"previously claimed X" 之类）。
+    // AGENTS.md 第 20 行自我介绍数字曾错，这是 Design principle #5 的
+    // 反面教材，必须留。按行过滤，不删整段。
+    body = body.split('\n').filter(l =>
+      !/previously claimed|曾经声称|曾经宣称|旧版本声称|historically claimed/i.test(l)
+    ).join('\n');
+    if (/\b46\s*dimensions?\b/.test(body)) bad.push(path.basename(f));
+  }
+  assert.strictEqual(bad.length, 0, `这些文档正文仍有 "46 dimensions" 行内引用: ${bad.join(', ')}`);
+});
+
+t('三份文档正文无旧工具数/路由数引用', () => {
+  const bad = [];
+  for (const f of [AGENTS, README, SKILL]) {
+    if (!fs.existsSync(f)) continue;
+    let src = fs.readFileSync(f, 'utf8');
+    const cut = src.search(/##\s*(Version history|Changelog)/i);
+    let body = cut > 0 ? src.slice(0, cut) : src;
+    body = body.split('\n').filter(l =>
+      !/previously claimed|曾经声称|曾经宣称|旧版本声称|historically claimed/i.test(l)
+    ).join('\n');
+    if (/\b179\s*MCP tools\b/.test(body)) bad.push(path.basename(f) + '(179 tools)');
+    if (/\b1,?546\s*dispatch routes\b/.test(body)) bad.push(path.basename(f) + '(1546 routes)');
+    if (/\b547\s*passing tests\b/.test(body)) bad.push(path.basename(f) + '(547 tests)');
+  }
+  assert.strictEqual(bad.length, 0, `旧数字行内引用: ${bad.join(', ')}`);
+});
+
 t('MCP 工具数匹配', () => {
   const src = fs.readFileSync(AGENTS, 'utf8');
   const m = src.match(/([\d,]+)\s+MCP tools/);
