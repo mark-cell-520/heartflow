@@ -21,23 +21,53 @@
 const { discriminate } = require('./index.js');
 const pipelineModule = require('./pipeline.js');
 const { detectPedagogicalContent } = require('./pedagogy.js');
+const { buildTrace, summarizeTrace } = require('./discrimination-trace.js');
+const { normalize } = require('./text-normalizer.js');
 
 function _pedagogyMode(text) {
   return detectPedagogicalContent(text) ? 'pedagogical' : undefined;
 }
 
+/** 归一化信息（供 trace 记录判定所基于的文本形态） */
+function _normInfo(text) {
+  try {
+    const n = normalize(text);
+    return (n.normalized && n.normalized !== text)
+      ? { normalized: n.normalized, applied: n.applied }
+      : { normalized: null, applied: [] };
+  } catch (_) { return { normalized: null, applied: [] }; }
+}
+
+/**
+ * [v6.7.72] 给判别结果附加可解释性 trace。
+ * 透出哪些维度命中、命中的原文片段、以及归一化手段链。
+ */
+function _withTrace(result, text) {
+  if (!result || typeof result !== 'object') return result;
+  try {
+    const n = _normInfo(text);
+    result.trace = buildTrace(result, n);
+    result.traceSummary = summarizeTrace(result.trace);
+  } catch (_) { /* 防御性: trace 失败不阻断判定 */ }
+  return result;
+}
+
 /** AGI 第 1 层门禁 — 辨别文本并返回行动指令 */
 function gate(text, evidence = []) {
-  return discriminate(text, evidence, _pedagogyMode(text));
+  const r = discriminate(text, evidence, _pedagogyMode(text));
+  return _withTrace(r, text);
 }
 
 /** 快速门禁检查 — 只返回行动指令，适合 LLM agent 轻量调用 */
 function check(text) {
   const result = discriminate(text, [], _pedagogyMode(text));
+  const n = _normInfo(text);
   return {
     action: result.gate.action,
     reason: result.gate.reason,
     score: result.overallScore,
+    // [v6.7.72] 快速入口也带 trace 摘要，避免"只给结论不给理由"
+    traceSummary: summarizeTrace(buildTrace(result, n)),
   };
 }
 
@@ -48,12 +78,12 @@ function pipeline(text, evidence) {
   }
   const result = discriminate(text, evidence, _pedagogyMode(text));
   if (result.gate.action === 'block') {
-    return { ...result, error: 'gate_blocked', message: `输出被拦截: ${result.gate.reason}` };
+    return _withTrace({ ...result, error: 'gate_blocked', message: `输出被拦截: ${result.gate.reason}` }, text);
   }
   if (result.gate.action === 'rewrite') {
-    return { ...result, warning: `需改写: ${result.gate.reason}` };
+    return _withTrace({ ...result, warning: `需改写: ${result.gate.reason}` }, text);
   }
-  return result;
+  return _withTrace(result, text);
 }
 
 // 从 pipeline 重新导出完整版
