@@ -2681,7 +2681,9 @@ function handleFullDiscriminate(args) {
   if (!text) return { error: 'text required' };
   try {
     const idx = require('./index.js');
-    const result = idx.discriminate ? idx.discriminate(text, evidence || []) : null;
+    // [v6.7.72] 走 gate.gate() 而非 idx.discriminate()——前者附加 trace
+    const gateMod = require('./gate.js');
+    const result = gateMod.gate ? gateMod.gate(text, evidence || []) : (idx.discriminate ? idx.discriminate(text, evidence || []) : null);
     if (!result) return { error: 'discriminate not available' };
     return {
       // [v6.7.70] gate 字段必须透出，否则 MCP 统一硬闸门（tools/call 出口层）
@@ -2691,6 +2693,9 @@ function handleFullDiscriminate(args) {
       overallScore: result.overallScore,
       dimensions: result.dimensions,
       summary: result.summary,
+      // [v6.7.72] 可解释性 trace
+      trace: result.trace,
+      traceSummary: result.traceSummary,
       readableReport: idx.summarizeDiscrimination ? idx.summarizeDiscrimination(text, result) : null,
       crossPatterns: idx.crossAnalyze ? idx.crossAnalyze(result) : null,
     };
@@ -2920,6 +2925,9 @@ function handleGate(args) {
       blocked: guarded.blocked,
       blockedBy: guarded.blockedBy,
       blockedData: guarded.blockedData,
+      // [v6.7.72] 可解释性 trace：block 时说明"为什么拦、改了文本才拦住"
+      trace: result.trace,
+      traceSummary: result.traceSummary,
       timestamp: Date.now(),
     };
   } catch (e) {
