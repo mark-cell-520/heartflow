@@ -4486,32 +4486,44 @@ class HeartFlow {
     if (typeof fn !== 'function') {
       throw new Error(`${subsystem}.${method} is not a function on ${subsystem}`);
     }
-    // [v6.7.74] 入口参数归一化（心虫 decision.decide 0.90）。
-    // 1727 条白名单路由黑盒探测：491 个抛错，其中 187 个是
-    // `xxx is not a function` / `input.split is not a function` 之类——
-    // 全部因调用方传了**对象/数组**而子系统方法期望字符串。
-    // 这与 v6.4.x 修的 checkInput(123) 是同一类问题：**入口缺归一化**。
+    // [v6.7.75] 入口参数归一化（心虫 decision.decide 0.90）。
     //
-    // 原则：只在"明显是参数类型用错"时兜底，不猜业务语义——
-    //   - 非 undefined/null 的 object/array 首个参数 → 提取 text/input/query/content
-    //     字段，或 JSON 兜底
-    //   - 字符串/数字/布尔原样传（子系统自己处理）
-    // 不在 dispatch 层做完整 sanitize：那会让"故意传对象"的调用方
-    // （如 decision.decide 的 options 数组）被破坏。
-    const normArgs = args.map((a, i) => {
-      if (i === 0 && a !== null && typeof a === 'object' && !Array.isArray(a)
-          && !(a instanceof Date)) {
-        // 首参是普通对象：提取最常见的文本字段
+    // **上一版（v6.7.74）有一个严重 bug，本轮实测发现**：
+    //   它见首参是对象就提取 text/input/query 字段并**只传那个字符串**，
+    //   导致 decision.decide 的 {task, options} 被砍成 task 字符串，
+    //   options 数组丢失 → 返回 "No options provided"。
+    //   更糟的是当时写的测试"结构化参数不被破坏"断言的是
+    //   `!r.error.includes('not a function')`——那个 bug 报的是
+    //   "No options provided"，断言照样通过。**测试写错了口径**。
+    //
+    // 新原则（v6.7.75）：
+    //   1. **原样传参是默认**，不猜调用方意图
+    //   2. 只有当"原样传会导致类型错误"时才兜底——即子系统方法
+    //      的形参名是明确的文本参数（text/input/query/content/message）
+    //      且调用方传了不含该字段的对象
+    //   3. 决策：**先按原样调用，崩了再降级**。这样结构化参数
+    //      （decision 的 options、pipeline 的 mode）永远不被破坏，
+    //      而 `dispatch('memory.search', {text:'x'})` 这种仍能工作
+    //      （因为子系统方法本身就接受 {text} 对象）。
+    let result;
+    try {
+      result = fn.call(mod, ...args);
+    } catch (e) {
+      const isTypeError = /is not a function|Cannot read prop|is not iterable|\.split|\.match|\.includes|\.toLowerCase/.test(e.message || '');
+      if (isTypeError && args.length === 1 && args[0] !== null && typeof args[0] === 'object') {
+        // 降级：把对象展平成方法的第一个文本形参
+        const flat = args[0];
+        let extracted = '';
         for (const k of ['text', 'input', 'query', 'content', 'message', 'task']) {
-          if (typeof a[k] === 'string') return a[k];
+          if (typeof flat[k] === 'string') { extracted = flat[k]; break; }
         }
-        // 没有已知文本字段：若非空对象则保留原样（可能是结构化参数），
-        // 空对象则给空串（避免 split/undefined 崩）
-        return Object.keys(a).length === 0 ? '' : a;
+        if (extracted) result = fn.call(mod, extracted);
+        else throw e;
+      } else {
+        throw e;
       }
-      return a;
-    });
-    return fn.call(mod, ...normArgs);
+    }
+    return result;
   }
 
   // [v6.0.71] 恢复 routes() 路由表

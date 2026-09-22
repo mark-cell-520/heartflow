@@ -4489,6 +4489,27 @@ async function handleRequest(request, sessionId, httpHeaders) {
         args = cleaned;
       }
 
+      // [v6.7.75] 空参数保护：schema 过滤后若 args 变空对象，说明调用方
+      // 传的参数名**全都不在 schema 里**（拼写错误/用了别名字段）。
+      // 此前直接跑 handler，返回空 text——调用方收到完全空白，
+      // 无法区分"参数名写错"和"结果为空"。
+      // 实测：heartflow_gate 传 {txt:'...'} 或 {} 都返回空响应。
+      //
+      // 不依赖 inputSchema.required（实测 59 个工具的 schema 都没声明
+      // required，依赖它会完全失效）。改为：**schema 有 properties 但
+      // 过滤后 args 为空**就报错——合法调用不可能一个参数都不传。
+      if (toolDef && toolDef.inputSchema && toolDef.inputSchema.properties
+          && Object.keys(toolDef.inputSchema.properties).length > 0
+          && Object.keys(args).length === 0) {
+        const expected = Object.keys(toolDef.inputSchema.properties);
+        return { content: [{ type: 'text', text: JSON.stringify({
+          error: '未收到任何有效参数（传入的参数名都不在工具的 schema 里？）',
+          expectedParams: expected,
+          receivedKeys: Object.keys(args),
+          timestamp: Date.now(),
+        }) }], isError: true };
+      }
+
 
 
       let result;

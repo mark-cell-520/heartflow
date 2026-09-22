@@ -87,10 +87,16 @@ t('结构化参数不被破坏（decision.decide 的 options 数组）', () => {
     task: '探针',
     options: [{ label: 'a', feasibility: 0.9, consequence_value: 0.9, risk: 0.1, confidence: 0.9 }],
   });
-  // 归一化不应把整个对象变成字符串——decision 需要 options 数组
+  // [v6.7.75 修正断言口径] 上一版只断言"不含 not a function"，
+  // 而 v6.7.74 的 bug 报的是 "No options provided"——断言照样通过。
+  // 现在必须断言**真的选出了东西**（decision 引擎真的读到了 options）。
   assert.ok(r && typeof r === 'object', `返回异常: ${typeof r}`);
-  assert.ok(!r.error || !String(r.error).includes('not a function'),
-    `归一化破坏了结构化参数: ${r.error}`);
+  // 返回值用 label（不是 chosen）——从返回体读，字段名随实现走
+  const picked = r.label !== undefined ? r.label
+    : (r.chosen !== undefined ? r.chosen : (r.decision && r.decision.chosen));
+  assert.ok(picked, `decision 没选出结果: ${JSON.stringify(r).slice(0, 120)}`);
+  assert.ok(!String(r.reasoning || '').includes('No options'),
+    `options 丢失：${r.reasoning}`);
   hf.shutdown && hf.shutdown();
 });
 
