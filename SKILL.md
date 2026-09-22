@@ -5,8 +5,8 @@ version: "6.7.70"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  it reaches a human. 46 discrimination dimensions × 9-layer pipeline × 137 modules ×
-  179 MCP tools. Zero LLM dependency.
+  it reaches a human. 50 discrimination dimensions × 11-layer pipeline × 137 modules ×
+  59 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
   discriminative result cache, async supervision layer, autonomous decision execution
@@ -255,7 +255,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 46 dimensions
+## The 50 dimensions
 
 **Block-level (5):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment
 
@@ -383,7 +383,7 @@ GB/T 42497-2023 (*Security Requirements for AI-Generated Content*):
 
 | Checkpoint | Module |
 |-----------|--------|
-| Generated-content safety | `checkOutput` / `discriminate` (46 dimensions) |
+| Generated-content safety | `checkOutput` / `discriminate` (50 dimensions) |
 | Training-data safety | `DataEraser` + memory ACL |
 | **Outbound protection** | **`heartflow_check_outbound`** (gate-outbound.js) |
 | Algorithmic transparency | `enginePacing` + `selfHeal` |

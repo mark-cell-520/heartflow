@@ -98,6 +98,52 @@ t('维度总数匹配', () => {
     `AGENTS.md 说 ${m[1]} dimensions，实测 ${M.dimensions}`);
 });
 
+console.log('\n[README.md 与 SKILL.md 宣称值必须匹配（v6.7.78 补充）]');
+
+const README = path.join(HF, 'README.md');
+const SKILL = path.join(HF, 'SKILL.md');
+
+t('README.md 维度/工具/路由/测试数匹配', () => {
+  const src = fs.readFileSync(README, 'utf8');
+  const m = src.match(/(\d+)\s+discrimination dimensions\s*[×x]\s*(\d+)-layer pipeline\s*[×x]\s*(\d+)\s+modules\s*[×x]\s*([\d,]+)\s+MCP tools\s*[×x]\s*([\d,]+)\s+dispatch routes\s*[×x]\s*([\d,]+)\s+passing tests/);
+  assert.ok(m, 'README.md 找不到数字横幅（格式可能变了）');
+  assert.strictEqual(parseInt(m[1], 10), M.dimensions, `README 维度 ${m[1]} != ${M.dimensions}`);
+  assert.strictEqual(parseInt(m[4].replace(/,/g, ''), 10), M.mcpTools, `README 工具 ${m[4]} != ${M.mcpTools}`);
+  assert.strictEqual(parseInt(m[5].replace(/,/g, ''), 10), M.routes, `README 路由 ${m[5]} != ${M.routes}`);
+});
+
+t('README.md 行内 46→50 引用已更新', () => {
+  const src = fs.readFileSync(README, 'utf8');
+  assert.ok(!/46 dimensions/.test(src),
+    'README.md 仍有过时的 "46 dimensions" 行内引用');
+});
+
+t('SKILL.md 维度/工具数匹配', () => {
+  const src = fs.readFileSync(SKILL, 'utf8');
+  const m = src.match(/(\d+)\s+discrimination dimensions/);
+  assert.ok(m, 'SKILL.md 找不到 dimensions 数字');
+  assert.strictEqual(parseInt(m[1], 10), M.dimensions,
+    `SKILL.md 说 ${m[1]} dimensions，实测 ${M.dimensions}`);
+  const t = src.match(/([\d,]+)\s+MCP tools/);
+  if (t) {
+    assert.strictEqual(parseInt(t[1].replace(/,/g, ''), 10), M.mcpTools,
+      `SKILL.md 说 ${t[1]} MCP tools，实测 ${M.mcpTools}`);
+  }
+});
+
+t('SKILL.md 无过时 46 维度引用', () => {
+  const src = fs.readFileSync(SKILL, 'utf8');
+  assert.ok(!/46 dimensions/.test(src), 'SKILL.md 仍有过时引用');
+});
+
+t('三个文档数字互相一致', () => {
+  const a = fs.readFileSync(AGENTS, 'utf8').match(/(\d+)\s+dimensions/);
+  const r = fs.readFileSync(README, 'utf8').match(/(\d+)\s+discrimination dimensions/);
+  const s = fs.readFileSync(SKILL, 'utf8').match(/(\d+)\s+discrimination dimensions/);
+  assert.strictEqual(a[1], r[1], `AGENTS(${a[1]}) 与 README(${r[1]}) 不一致`);
+  assert.strictEqual(a[1], s[1], `AGENTS(${a[1]}) 与 SKILL(${s[1]}) 不一致`);
+});
+
 t('MCP 工具数匹配', () => {
   const src = fs.readFileSync(AGENTS, 'utf8');
   const m = src.match(/([\d,]+)\s+MCP tools/);
