@@ -826,7 +826,7 @@ const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('
 
 
 
-const BUILD_DATE = '2026-09-21-6.7.69';
+const BUILD_DATE = '2026-09-22-6.7.70';
 
 
 
@@ -4486,7 +4486,32 @@ class HeartFlow {
     if (typeof fn !== 'function') {
       throw new Error(`${subsystem}.${method} is not a function on ${subsystem}`);
     }
-    return fn.call(mod, ...args);
+    // [v6.7.74] 入口参数归一化（心虫 decision.decide 0.90）。
+    // 1727 条白名单路由黑盒探测：491 个抛错，其中 187 个是
+    // `xxx is not a function` / `input.split is not a function` 之类——
+    // 全部因调用方传了**对象/数组**而子系统方法期望字符串。
+    // 这与 v6.4.x 修的 checkInput(123) 是同一类问题：**入口缺归一化**。
+    //
+    // 原则：只在"明显是参数类型用错"时兜底，不猜业务语义——
+    //   - 非 undefined/null 的 object/array 首个参数 → 提取 text/input/query/content
+    //     字段，或 JSON 兜底
+    //   - 字符串/数字/布尔原样传（子系统自己处理）
+    // 不在 dispatch 层做完整 sanitize：那会让"故意传对象"的调用方
+    // （如 decision.decide 的 options 数组）被破坏。
+    const normArgs = args.map((a, i) => {
+      if (i === 0 && a !== null && typeof a === 'object' && !Array.isArray(a)
+          && !(a instanceof Date)) {
+        // 首参是普通对象：提取最常见的文本字段
+        for (const k of ['text', 'input', 'query', 'content', 'message', 'task']) {
+          if (typeof a[k] === 'string') return a[k];
+        }
+        // 没有已知文本字段：若非空对象则保留原样（可能是结构化参数），
+        // 空对象则给空串（避免 split/undefined 崩）
+        return Object.keys(a).length === 0 ? '' : a;
+      }
+      return a;
+    });
+    return fn.call(mod, ...normArgs);
   }
 
   // [v6.0.71] 恢复 routes() 路由表
@@ -4505,6 +4530,23 @@ class HeartFlow {
       }
       table[name] = methods;
     }
+    // [v6.7.74] 标注可达性：routes() 过去返回的名字大量不在
+    // HeartFlow.ALLOWED_ROUTES 里（实测 137 个子系统名 vs 1727 条点号路由，
+    // 交集为 0），调用方按 routes() 拼 subsystem.method 会被拒。
+    // 现在每个方法标注 _dispatchable，调用方可过滤。
+    try {
+      const allowed = HeartFlow.ALLOWED_ROUTES;
+      for (const [name, methods] of Object.entries(table)) {
+        if (!Array.isArray(methods)) continue;
+        const marked = methods.map(m => {
+          const route = `${name}.${m}`;
+          return allowed && allowed.has(route)
+            ? route
+            : `${route}  [未注册，dispatch 会拒绝]`;
+        });
+        table[name] = marked;
+      }
+    } catch (_) { /* 标注失败不阻断，退回原始列表 */ }
     return table;
   }
 
@@ -4576,16 +4618,30 @@ class HeartFlow {
       }
     } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '输入检测不阻断' }, MAX_HISTORY_SIZE); }
 
-    // ─── 古典文本软着陆路由 ──
-    // 对儒学/佛学/古典价值澄清文本，不强行走 generic task → "不知道"
+    // ─── 古典文本软着陆路由 ──────────────────────────────
+    // [FIX 2026-09-21] 这一层原来是「短路」：evaluateRules 一旦判为古典相关，
+    // 就整体替换 result，下面的 ThoughtChain 因 if (!result) 永不执行，
+    // 最终只输出一句 "classical reference（古典给出可操作行为指引）"
+    // ——没有分析，也没有结论。叠加的第二个 bug：findings 里根本没有
+    // wisdom_dimension 字段，计数恒为 0，dominantWisdom 被 maxCount=-1
+    // 的初值强行选成第一个键，后缀永远是同一句。
+    // 现在改为「增值标注」：主推理链照常跑，古典规则结果作为附加层挂上去，
+    // 仅当主链确实拿不到可用结论时才用古典兜底。
     let result;
+    let _classicalStub = null;
     try {
       const ClassicsValueMapper = require('../knowledge/classics-value-mapper.js');
       const ruleOut = ClassicsValueMapper.evaluateRules(input);
       if (ruleOut.classicalRelevant) {
         const wisdomCounts = { practical_guidance: 0, value_alignment: 0, warning_sign: 0, paradox_acknowledgment: 0 };
         for (const f of ruleOut.findings) {
-          if (f.wisdom_dimension && wisdomCounts[f.wisdom_dimension] !== undefined) wisdomCounts[f.wisdom_dimension]++;
+          // [FIX 2026-09-21] findings 无 wisdom_dimension，按 signal 归位
+          const _dim = f.signal === 'warn' || f.signal === 'violation' ? 'warning_sign'
+            : f.signal === 'pass' ? 'practical_guidance'
+            : f.signal === 'reference' ? 'value_alignment'
+            : f.signal === 'paradox' ? 'paradox_acknowledgment'
+            : null;
+          if (_dim && wisdomCounts[_dim] !== undefined) wisdomCounts[_dim]++;
         }
         let dominantWisdom = null;
         let maxCount = -1;
@@ -4601,7 +4657,7 @@ class HeartFlow {
               : dominantWisdom === 'value_alignment'
                 ? '（古典定义价值/正当性框架）'
                 : '';
-        result = {
+        _classicalStub = {
           output: {
             conclusion: (ruleOut.summary.passes > 0 ? 'passed classical value check' : 'classical reference') + wisdomNote,
             meta: {
@@ -4645,6 +4701,21 @@ class HeartFlow {
       const chain = this.thoughtChain || new (TCMod.ThoughtChain)(this);
       if (depth) chain.setDepth(depth);
       result = await chain.run(input);
+    }
+    // [FIX 2026-09-21] 古典层回填：主链有结论 → 只做附加标注，不覆盖；
+    // 主链拿不到任何东西（空对象）→ 才降级用古典兜底。
+    if (_classicalStub) {
+      const _hasConclusion = !!result && !!result.output && typeof result.output === 'object'
+        && (typeof result.output.conclusion !== 'string' || result.output.conclusion.trim().length > 0);
+      if (_hasConclusion) {
+        result.classicalAnalysis = _classicalStub.classicalAnalysis;
+        result.wisdomSummary = _classicalStub.wisdomSummary;
+        result._classical = true;
+        result.output.meta = result.output.meta || {};
+        result.output.meta.classical = _classicalStub.output.meta;
+      } else if (!result || Object.keys(result).length === 0) {
+        result = _classicalStub;
+      }
     }
     // [FIX 2026-09-19] dao-decision 结果回填：让回退路径也拿到道法检查结果
     if (_daoResult && result && !result._daoInputCheck) {
