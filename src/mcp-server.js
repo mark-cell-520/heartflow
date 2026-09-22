@@ -3045,6 +3045,33 @@ function handleExecutionVerifyTool(args) {
   return safeDispatch('execution.verify', { action, result: result || null, expected: expected || null });
 }
 
+/** [v6.7.72] 误报反馈闭环：report / stats / suggest / confirm */
+function handleFalsePositiveTool(args) {
+  const { action } = args || {};
+  const mod = require(HF_DIR + '/src/false-positive-feedback.js');
+  switch (action) {
+    case 'report':
+      // judgedAction 是当时的 gate 判定，避免与工具自身的 action 字段撞名
+      return mod.report({
+        text: args.text,
+        action: args.judgedAction,
+        dimension: args.dimension,
+        trace: args.trace,
+        reason: args.reason,
+        note: args.note,
+        fullText: args.fullText,
+      });
+    case 'stats':
+      return mod.stats();
+    case 'suggest':
+      return mod.suggest();
+    case 'confirm':
+      return mod.confirm(args);
+    default:
+      return { error: `action 必须是 report / stats / suggest / confirm（收到: ${action}）` };
+  }
+}
+
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
@@ -3054,6 +3081,8 @@ const HANDLERS = {
   heartflow_gate: handleGate,
   heartflow_gate_check: handleGateCheck,
   heartflow_gate_pipeline: handleGatePipeline,
+  // [v6.7.72] 误报反馈闭环（心虫 decision.decide 选定 0.92）
+  heartflow_false_positive: handleFalsePositiveTool,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,
   heartflow_decision_decide: handleDecisionDecideTool,
   heartflow_memory_consolidate: handleMemoryConsolidateTool,

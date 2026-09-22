@@ -259,6 +259,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_false_positive',
+    description: "误报反馈：回报 gate 误判。action=report(记录)/stats(聚合)/suggest(阈值建议)/confirm(运维确认)。report 需 text/dimension/reason，judgedAction 传当时的 gate.action(block/rewrite/verify)；reason 必须是 no_intent/benign_usage/wrong_language/over_broad_rule/other。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"report/stats/suggest/confirm"},"text":{"type":"string","description":"被误判的原文"},"judgedAction":{"type":"string","description":"report 必填：当时 gate 的判定 block/rewrite/verify"},"dimension":{"type":"string","description":"report 必填：误报命中的维度名"},"trace":{"type":"string","description":"可选：traceSummary"},"reason":{"type":"string","description":"report 必填：误报原因"},"note":{"type":"string","description":"补充说明"},"fullText":{"type":"boolean","description":"是否存原文全文（默认false）"}},"required":["action"]}
+  },
+
+  {
     name: 'heartflow_formula_bridge',
     description: "公式桥接：认知科学公式计算（记忆/决策/认知/信息/社会/意识领域）。domain可选：memory/decision/cognition/info/social/consciousness，传params对象。",
     inputSchema: {"type":"object","properties":{"domain":{"type":"string","description":"领域：memory/decision/cognition/info/social/consciousness"},"params":{"type":"object","description":"计算参数（根据 domain 不同而不同）"}},"required":["domain"]}
