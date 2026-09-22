@@ -243,6 +243,13 @@ function _deLeet(text) {
     // 数字+字母混合 token（pr3v10u5）的数字部分保留、字母部分还原。
     // 整 token 是纯数字+标点时直接跳过。
     if (/^[\d.,%:/x\-+= ]+$/.test(tok)) return tok;
+    // [v6.7.73] 数字+单位 token 跳过——「100MB」「30GB」「2TB」「8KB」
+    // 是技术文本常态。实测 100MB → loomb（1→l 词尾规则 + 0→o），
+    // 触发 overconfidence 误判（verify）。判据：token 匹配
+    // <数字><可选小数><单位字母> 形态即跳过。
+    if (/^\d+(?:\.\d+)?\s*(?:[kmgtp]?i?b|b|bytes?|mb|gb|kb|tb|pb|ms|s|min|h|hr|fps|hz|khz|mhz|ghz|w|kw|v|mv|kv|ma|nm|mm|cm|m|km|kg|mg|g|l|ml|cl|°c|°f|%)$/i.test(tok)) return tok;
+    // 数字紧跟单位（无空格）也跳过：100MB / 30GB
+    if (/^\d+(?:\.\d+)?(?:[kmgtp]i?b|bytes?|hz|fps|ms|min|khz|mhz|ghz)$/i.test(tok)) return tok;
     let r = '';
     let i2 = 0;
     while (i2 < tok.length) {

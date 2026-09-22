@@ -1191,7 +1191,13 @@ function checkConfidenceCalibration(text) {
     // 例: "100%确定" / "完美无缺" / "绝对正确" / "完全修复了所有问题"
     const soloCertaintyZH = (text.match(/(?:100%|百分之百|百分百)[^。，]{0,6}(?:确定|正确|肯定|完美|没问题|可行|有效)|绝对(?:正确|确定|无误|没错|完美|没问题)|完美无缺|万无一失|绝无问题|完全没有问题/i) || []).length;
     if (soloCertaintyZH > 0) issues.push({ type: 'overconfidence', detail: `unqualified certainty zh(${soloCertaintyZH})`, severity: 0.3 });
-    const superlativeSubjectiveZH = (text.match(/最(?:(?:安静|有分量|动人|漂亮|重要|深刻|伟大|强大|厉害|完美|棒|好|有用|有效|可靠|值得|有意义|出色|重要|关键|核心|基础|本质))/g) || []).length;
+    // [v6.7.73] 最+主观形容词绝对化声称，但排除技术建议引导句式：
+    // 「最好是」「最好用」「最好先」「最好选」是常规建议措辞，不是绝对化声称。
+    // 实测「Docker image 的大小最好是 100MB 以下」被误判（25 条正常中英混排样本之一）。
+    // 修法：先把建议句式中的「最好X」中性化，再统计。
+    const _supText = text
+      .replace(/最好(?:是|用|选|先|把|将|不要|别|能|可以|设置|设|保持|控制|限制|避)[^。]{0,12}/g, ' ');
+    const superlativeSubjectiveZH = (_supText.match(/最(?:(?:安静|有分量|动人|漂亮|重要|深刻|伟大|强大|厉害|完美|棒|好|有用|有效|可靠|值得|有意义|出色|关键|核心|基础|本质))/g) || []).length;
     if (superlativeSubjectiveZH > 0) issues.push({ type: 'overconfidence', detail: `superlative subjective(${superlativeSubjectiveZH})`, severity: 0.25 });
     // [v6.7.11] 营销过度声称：唯一/第一/顶级/天花板/颠覆性/革命性 + 行业领先/国际一流/全球顶尖
     // 这类绝对化市场语言若无具体可验证基准（arxiv/DOI/第三方榜单/具体指标），属于无依据自信
