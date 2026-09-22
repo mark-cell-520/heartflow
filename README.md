@@ -82,6 +82,20 @@ read only one field, read `gate.action`.
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
 
+### Lower-level exports
+
+`main` (`src/gate.js`) also exports these — the three entry points above are
+wrappers around them:
+
+| Function | Returns |
+|----------|---------|
+| `gate(text)` | Full discrimination result with `gate.action`, `findings`, `trace` — the hard gate that decides `block`/`rewrite`/`verify`/`pass` |
+| `check(text)` | Alias of `gate()` |
+| `pipeline(text, opts)` | The pipeline stages without the entry wrappers (use `runPipeline` instead unless you need raw stage output) |
+| `discriminate(text)` | Dimension-by-dimension scoring without the gate layer (no action assigned) |
+
+Read `gate.action` if you only read one field — `verdict` is derived from it.
+
 ---
 
 ## Architecture

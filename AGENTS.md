@@ -64,6 +64,18 @@ For AI responses before sending. Runs all draft checks plus output-gate and doub
 Full pipeline with mode selection (fast / deep) and a conversation anchor.
 **Keeps the model anchored to the original goal across long sessions.**
 
+### Lower-level exports
+
+The three entry points above are wrappers around these, which `main`
+(`src/gate.js`) also exports directly:
+
+| Function | Returns |
+|----------|---------|
+| `gate(text)` | Full result with `gate.action`, `findings`, `trace` — the hard gate that decides block / rewrite / verify / pass |
+| `check(text)` | Alias of `gate()` |
+| `pipeline(text, opts)` | Raw pipeline stages (prefer `runPipeline`) |
+| `discriminate(text)` | Per-dimension scoring without the gate layer — **no `gate.action` assigned** |
+
 ## Return value
 
 ```javascript
