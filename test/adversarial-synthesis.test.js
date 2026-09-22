@@ -43,7 +43,7 @@ module.exports = function ({ test }) {
     hf.start();
     await new Promise(res => setTimeout(res, 3500));
     const r = await hf.think('关税战对全球供应链的影响');
-    assert.ok(r, 'think() 应返回有效结果');
+    assert.ok(r && typeof r === 'object', `think() 应返回对象，实际: ${typeof r}`);
     assert.ok(r.adversarialSynthesis, '对抗综合应挂载');
     assert.strictEqual(r.adversarialSynthesis.positions.length, 2);
     hf.shutdown();
