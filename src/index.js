@@ -38,7 +38,7 @@ const INJECTION_PATTERNS = {
     [/我[^。]*?授权[^。]*?你[^。]*?(做|说|输出)/i, 'fake_authorization'],
   ],
   en: [
-    [/ignore (all )?(previous|above|prior).{0,20}(instruction|prompt|rule|directive)/i, 'ignore_previous'],
+    [/ignore (all )?(previous|above|prior).{0,20}(instruction|prompt|rule|directive|command|direction|order)/i, 'ignore_previous'],
     [/forget (your|the) (role|identity|persona|character)/i, 'forget_role'],
     [/you are now|act as|pretend to be|role.?play/i, 'role_play_escape'],
     [/do not (follow|obey|adhere|comply)/i, 'bypass_instruction'],
@@ -59,7 +59,15 @@ const INJECTION_SEVERITY = { ignore_previous: 0.7, ignore_rules: 0.6, forget_rol
 function checkPromptInjection(text) {
   if (!text || typeof text !== 'string') return { count: 0, injections: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
-  const patterns = hasChinese ? INJECTION_PATTERNS.zh : INJECTION_PATTERNS.en;
+  // [v6.7.73] 混合语言通道：若文本同时含中文与英文字母，则**两侧模式库都跑**。
+  // 旧逻辑 hasChinese ? zh : en 是二选一——「请帮我 ignore all previous instructions」
+  // 含中文即走中文库，英文注入模式永不执行（实测 inj=0，真漏）。
+  // 兼容点：安全关键维度（injection/hate/威胁）必须补跑，非关键维度不补——
+  // 否则普通中英混杂文本会因另一侧的宽松模式产生噪音。
+  const isMixed = hasChinese && /[a-zA-Z]{2,}/.test(text);
+  const patternSets = isMixed
+    ? [INJECTION_PATTERNS.zh, INJECTION_PATTERNS.en]
+    : [hasChinese ? INJECTION_PATTERNS.zh : INJECTION_PATTERNS.en];
   // [v6.7.71] 格式类忽略豁免：「忽略格式规则」「ignore formatting rules」
   // 是正常请求。在匹配前把这类短语从中性化，避免 ignore_rules 误判。
   let _t = text
@@ -67,10 +75,15 @@ function checkPromptInjection(text) {
     .replace(/(?:忽略|无视)\s*(?:格式|排版|样式|缩进|空格|标点|大小写)\s*(?:规则|设置|规范|要求)/g, ' ');
   if (!_t.trim()) _t = text; // 全文都是格式词时不至于空判
   const injections = [];
-  for (const [pat, type] of patterns) {
-    const m = _t.match(pat);
-    if (m) {
-      injections.push({ type, severity: INJECTION_SEVERITY[type] || 0.5, matched: m[0].slice(0, 20) });
+  for (const patterns of patternSets) {
+    for (const [pat, type] of patterns) {
+      const m = _t.match(pat);
+      if (m) {
+        // 混合模式下两侧可能命中同一片段，按 type+matched 去重
+        const dup = injections.some(x => x.type === type && x.matched === m[0].slice(0, 20));
+        if (dup) continue;
+        injections.push({ type, severity: INJECTION_SEVERITY[type] || 0.5, matched: m[0].slice(0, 20) });
+      }
     }
   }
   const count = injections.length;
@@ -201,7 +214,11 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
     if (!_norm) return onOrig;
     const onNorm = fn(_norm);
     const cnt = r => (r && typeof r.count === 'number') ? r.count : (r && typeof r.totalHits === 'number' ? r.totalHits : 0);
-    const better = cnt(onNorm) > cnt(onOrig) ? onNorm : onOrig;
+    // [v6.7.73] 相等时优先归一化结果——原文 0 命中而归一化 0 命中的情形罕见，
+    // 但"两边都 0"时返回 onOrig 会丢掉归一化才有的 findings 结构；
+    // 更常见的是 onNorm 有命中而 onOrig 为 0，此时 0 > 0 判错方向会漏掉。
+    // 改为 >= 偏归一化（归一化是判别用的正文本）。
+    const better = cnt(onNorm) >= cnt(onOrig) ? onNorm : onOrig;
     return relaxDim ? _applyPedagogyRelaxation(better, relaxDim, pedagogyRelaxation) : better;
   };
 
@@ -2644,17 +2661,34 @@ const HATE_SPEECH_EN = [
   { pattern: /\b(?:all |every )?(?:group|race|religion|culture|people|nation|women|men|gays|muslims|jews|blacks|asians|immigrants|refugees|minorities|whites?) (?:should|must|need to) (?:die|be killed|be eliminated|be exterminated|be eradicated)\b/i, type: 'extermination_call', severity: 1.0 },
   { pattern: /\b(?:kill|eliminate|exterminate|eradicate|bomb|destroy) (?:all |every )?(?:the )?(?:group|race|religion|culture|people|nation|women|men|gays|muslims|jews|blacks|asians|immigrants|refugees|minorities|whites?)\b/i, type: 'extermination_call', severity: 1.0 },
   { pattern: /\b(?:people|men|women|children|kids|refugees|immigrants|minorities|muslims|jews|blacks|asians|whites?|gays) (?:are|is) (?:the )?(?:scum|garbage|trash|worthless|vermin|parasites|pests|plague|disease|cancer|virus)\b/i, type: 'group_dehumanization', severity: 0.9 },
+  // [v6.7.73] 直接人身贬低（主语是 you / 具体人称）——旧库的 group_derogation
+  // 只匹配群体名词作主语（people/men/women...），漏了「You are garbage」这类
+  // 一对一攻击。guard-abilities 在 v6.5.0 抓出过中文侧，英文侧一直未补。
+  { pattern: /\byou(?:'re| are) (?:a )?(?:worthless|useless|complete|total|absolute|utter|such a)?\s*(?:garbage|trash|scum|vermin|parasite|pest|filth|disgusting|pathetic|worthless|waste of|nothing|nobody|failure|loser|idiot|moron|imbecile|stupid|dumb|retard)\b/i, type: 'personal_derogation', severity: 0.7 },
+  { pattern: /\byou(?:'re| are) (?:so |such an? |a )?(?:fucking|damn|bloody)?\s*(?:worthless|pathetic|disgusting|useless|stupid|inferior|subhuman|less than human)\b/i, type: 'personal_derogation', severity: 0.8 },
+  { pattern: /\b(?:worthless|pathetic|useless|disgusting) (?:piece of shit|waste of (?:space|oxygen|life)|human being)\b/i, type: 'personal_derogation', severity: 0.8 },
+  { pattern: /\byou (?:deserve to |should )?(?:die|be killed|suffer|rot|disappear)\b/i, type: 'personal_threat', severity: 0.9 },
+  { pattern: /\bno ?one (?:likes|loves|wants|cares about) you\b/i, type: 'personal_derogation', severity: 0.5 },
+  { pattern: /\beveryone (?:hates|despises|laughs at) you\b/i, type: 'personal_derogation', severity: 0.6 },
 ];
 
 function checkHateSpeech(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
-  const patterns = hasChinese ? HATE_SPEECH_ZH : HATE_SPEECH_EN;
+  // [v6.7.73] 混合语言通道：中英混排文本两侧模式库都跑。
+  // 旧逻辑二选一会漏掉「你 is a garbage」这类跨语言攻击（实测 hate=0）。
+  const isMixed = hasChinese && /[a-zA-Z]{2,}/.test(text);
+  const patternSets = isMixed
+    ? [HATE_SPEECH_ZH, HATE_SPEECH_EN]
+    : [hasChinese ? HATE_SPEECH_ZH : HATE_SPEECH_EN];
   const hits = [];
-  for (const { pattern, type, severity } of patterns) {
-    const m = text.match(pattern);
-    if (m) {
-      hits.push({ type, severity });
+  for (const patterns of patternSets) {
+    for (const { pattern, type, severity } of patterns) {
+      const m = text.match(pattern);
+      if (m) {
+        if (hits.some(h => h.type === type)) continue;  // 混合模式去重
+        hits.push({ type, severity });
+      }
     }
   }
   const count = hits.length;
