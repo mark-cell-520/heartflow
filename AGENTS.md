@@ -48,7 +48,7 @@ if (fact.gate.action === 'verify') {
 ## API reference
 
 ### `checkInput(text)`
-Discriminates user input. Runs: scope-check -> premise-check -> discriminate (46
+Discriminates user input. Runs: scope-check -> premise-check -> discriminate (50
 dimensions) -> gate -> error-memory -> auto-rules. **Rejects unanswerable questions and
 invalid premises early.**
 
