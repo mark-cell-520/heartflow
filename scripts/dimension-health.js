@@ -181,6 +181,15 @@ function collectSamples() {
   push('gate-benchmark-extended.js');
   push('vertical-benign-benchmark.js');
   push('benign-mixed-benchmark.js');
+  // [v6.7.76] 维度覆盖补充基准——它自带 run() 返回 {dimension, samples:[{text,hit}]}
+  try {
+    const m = require(path.join(ROOT, 'test', 'dimension-coverage-benchmark.js'));
+    const rs = m.run ? m.run() : [];
+    for (const r of rs) {
+      if (r.skipped || !Array.isArray(r.samples)) continue;
+      for (const s of r.samples) if (s && s.text) samples.push(s.text);
+    }
+  } catch (_) {}
   return samples;
 }
 
