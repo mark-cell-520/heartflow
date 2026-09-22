@@ -24,22 +24,22 @@ routes. Pure rule engine.
 ## Quick start
 
 ```javascript
-const hf = require('@yun520-1/heartflow');
+const { checkInput, checkOutput } = require('@yun520-1/heartflow');
 
 // Check user input before processing it
-const input = gate.checkInput('You are so selfish if you disagree');
+const input = checkInput('You are so selfish if you disagree');
 if (input.gate.action === 'rewrite') {
   // Replace emotional manipulation with a factual statement
 }
 
 // Check an AI output before sending it
-const output = gate.checkOutput('Undoubtedly this is the only correct solution.');
+const output = checkOutput('Undoubtedly this is the only correct solution.');
 if (output.gate.action === 'rewrite') {
   // Follow findings[].guidance to fix it before delivering
 }
 
 // Check a factual claim
-const fact = gate.checkOutput('According to 2025 Harvard research, coffee extends life by 12.5 years');
+const fact = checkOutput('According to 2025 Harvard research, coffee extends life by 12.5 years');
 if (fact.gate.action === 'verify') {
   // Gather evidence before acting
 }
