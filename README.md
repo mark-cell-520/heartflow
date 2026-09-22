@@ -6,8 +6,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-46 discrimination dimensions  ×  9-layer pipeline  ×  137 modules  ×  179 MCP tools
-×  1,546 dispatch routes  ×  547 passing tests  ×  0 runtime dependencies
+50 discrimination dimensions  ×  11-layer pipeline  ×  137 modules  ×  59 MCP tools
+×  1,727 dispatch routes  ×  1,138 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -77,7 +77,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 46 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 50 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -90,7 +90,7 @@ read only one field, read `gate.action`.
 input
   |
   v
-scope-check -> premise-check -> discriminate (46 dimensions) -> gate
+scope-check -> premise-check -> discriminate (50 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
