@@ -84,8 +84,12 @@ for (const text of BENIGN_CASES) {
   for (const [name, fn] of ENTRIES) {
     t(`${name} 不误拦`, () => {
       const r = fn.call(gate, text);
-      assert.notStrictEqual(r.blocked, true);
-      assert.notStrictEqual(r.gate.action, 'block');
+      // [v6.7.76 断言口径修正] 原断言 notStrictEqual(action,'block') 只查
+      // "没被 block"，rewrite/verify 也算过——但良性输入被判 rewrite
+      // 同样是误拦（调用方必须改写正常文本）。
+      // 现在断言必须是 pass。
+      assert.strictEqual(r.blocked, undefined, `良性输入被标记 blocked: ${r.blocked}`);
+      assert.strictEqual(r.gate.action, 'pass', `良性输入被误判: ${r.gate.action} (${r.gate.reason})`);
       assert.ok(r.data !== undefined, '良性输入不得被撤空');
     });
   }
