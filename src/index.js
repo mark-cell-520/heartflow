@@ -683,6 +683,13 @@ const CONTRADICTION_PAIRS = [
   // encouraging+dismissing：先鼓励/表扬，紧接着否定/打压
   { positive: /(很棒|很好|不错|厉害|加油|优秀|出色)[^。]*?但/g, negative: /但[^。]*?(不够|不行|差|不足|欠缺|没用)/ },
 
+  // [v6.7.78] 补漏（心虫 decision.decide 0.88）：审计报"contradiction 仅中文"，
+  // 实测不完全成立——上面已有 6 条英文 pair，但缺"绝对化+后续缓和/软化"这一
+  // 最常见口语型：`This is completely impossible... of course it might be`
+  // 此前所有英文 pair 都要求 but/however 转折，而这种同句自我软化无转折词。
+  { positive: /\b(never|always|completely|totally|absolutely|definitely|certainly|impossible|unquestionably|undoubtedly)\b/i, negative: /\b(of course|although|though|perhaps|maybe|might|could be|possibly|to some extent|pretty much)\b/i },
+  { positive: /\b(guaranteed|100%|zero risk|no risk|fails? never|always works?)\b/i, negative: /\b(except|unless|in some cases|depends|usually|sometimes)\b/i },
+
   // 肯定能力+表示怀疑：先肯定对方能力，后表达怀疑
   { positive: /(你(能|可以|做得很好)|你有能力|你很优秀|你有经验)[^。]*?但/g, negative: /但[^。]*?(担心|怀疑|恐怕|不过|只是|未必)/ },
 
@@ -1785,7 +1792,7 @@ const MORAL_PATTERNS = {
          fairness: /\b(fair|justice|equal|rights|discriminat|prejudice|unfair|cheat|equity)\b/i,
          loyalty: /\b(loyal|betray|patriot|traitor|unite|solidarity|sacrifice|honor|devote)\b/i,
          authority: /\b(authority|respect|obey|tradition|order|disobey|rebel|defy|discipline)\b/i,
-         sanctity: /\b(holy|pure|sin|sacred|disgust|pollute|decadent|corrupt|degrade|taint)\b/i,
+         sanctity: /\b(holy|pure|impure|purity|sin|sacred|sacrilege|disgust|disgusting|pollute|polluted|contaminat|decadent|corrupt|degrade|degrading|taint|filth|vermin|subhuman|parasit)\b/i,
          liberty: /\b(liberty|freedom|oppress|tyranny|autonomy|enslave|censor|dictator|liberate)\b/i }
 };
 const MORAL_NAMES = { care: '关爱/伤害', fairness: '公平/欺骗', loyalty: '忠诚/背叛',
@@ -1893,6 +1900,19 @@ const CODE_SECURITY_PATTERNS = {
   command_injection: [
     /(?:exec|execSync|execFile|execFileSync|spawn|spawnSync|fork)\s*\(\s*['"][^'"]*\+\s*(?:req|request|params|body|input)/i,
     /child_process\.(?:exec|execSync|spawn|spawnSync|execFile)\s*\(\s*['"][^'"]*\+\s*(?:req|request|params|body|input)/i,
+    // [v6.7.78] 粗体危险命令本身（审计实测漏判：双边语言都不命中）。
+    // 此前的模式全都要求"代码结构 + 变量拼接"，但用户直接贴一段命令
+    // （`rm -rf /`、`chmod 777 /`、`curl ... | bash`）时没有任何拼接结构，
+    // command_injection 整类不命中 → code_security 整体漏判。
+    // 这些命令的破坏性是自明的，不需要上下文。
+    /\brm\s+(-[a-zA-Z]*[rR][a-zA-Z]*f|-[a-zA-Z]*f[a-zA-Z]*[rR]|-[a-zA-Z]*[rR][a-zA-Z]*\s+-\S*f)\s+[\/~*.]|\brm\s+-[a-zA-Z]*fr[a-zA-Z]*\s+[\/~*.]/,
+    /\b(?:rm|rmdir|dd|mkfs|shred|chmod|chown)\s+(?:-[a-zA-Z]+\s+)?[\/~*][\w.\-\/]*\s*$|\bdd\s+if=\/dev\/(?:zero|random|urandom)\s+of=\/dev\/(?:sd|nvme|hd)/i,
+    /\bchmod\s+(?:-[a-zA-Z]+\s+)?0?777\b/,
+    /\b(?:curl|wget)\s+[^|\n]*\|\s*(?:sudo\s+)?(?:ba|z|fi|da)?sh\b/,
+    /\bmkfs\.[a-z0-9]+\s+\/dev\//,
+    /:\(\)\s*\{[^}]*:\|:[^}]*\}[^;]*;[^:]*:/,
+    /\b(?:DROP|TRUNCATE)\s+(?:TABLE|DATABASE|SCHEMA)\s+(?:IF\s+EXISTS\s+)?[a-zA-Z_]/i,
+    /\bkill\s+-9\s+(?:-1|1)\b/,
     /(?:eval|Function)\s*\(\s*(?:req|request|body|params|input)/i,
     /(?:`[^`]*\$\{[^}]*req|`[^`]*\$\{[^}]*body|`[^`]*\$\{[^}]*params|`[^`]*\$\{[^}]*input)/i,
     // ─── [v6.7.70] 补漏（心虫 decision.decide 选定，0.94 分）──
@@ -3535,6 +3555,12 @@ const OVERCLAIM_PATTERNS = {
     [/i (will|can) (deliver|provide) (perfect|flawless|impeccable) (results|work|output|solution)/i, 'overclaim_guarantee'],
     [/i (have|possess) (unrivaled|unmatched|unsurpassed) (knowledge|expertise|skill|ability)/i, 'overclaim_best'],
     [/you can (count on me|rely on me|depend on me) (to|for)/i, 'overclaim_confident_promise'],
+    // [v6.7.78] 补漏（心虫 decision.decide 0.88）：审计报 capability_overclaim
+    // "仅中文"不完全成立（上面已有 4 条 en），但缺最直白的
+    // `I can solve absolutely everything with 100% accuracy` 型泛化全能声称。
+    [/i can (solve|handle|fix|do|answer|address)\s+(?:absolutely\s+)?(?:everything|anything|any problem|all (?:problems|issues|tasks))/i, 'overclaim_best'],
+    [/\b(?:100\s*%|100\s*percent|perfect)\s+(?:accuracy|accuracy rate|guarantee[ds]?|success|reliability)\b/i, 'overclaim_guarantee'],
+    [/\b(?:always\s+)?(?:never\s+(?:fails?|makes? mistakes?)|no one (?:else )?can (?:do|match) (?:this|better))\b/i, 'overclaim_best'],
   ],
 };
 
