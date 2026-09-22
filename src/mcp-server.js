@@ -3766,16 +3766,13 @@ const HANDLERS = {
       return { execution: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
-  heartflow_decision_decide: (args) => {
-    try {
-      const hf = require(HF_DIR + '/src/core/heartflow.js');
-      const inst = new hf.HeartFlow({ rootPath: HF_DIR, silent: true });
-      const hfd = inst.decision;
-      if (!hfd || !hfd.decide) return { error: 'decision.decide not available' };
-      const r = hfd.decide({ task: args?.task || '', options: args?.options || [], constraints: args?.constraints || {} });
-      return { decision: r, timestamp: Date.now() };
-    } catch (e) { return { error: e.message }; }
-  },
+  // [v6.7.73 移除] heartflow_decision_decide 的坏实现曾在这里重复定义：
+  //   每次调用都 `new HeartFlow({rootPath, silent})` 造**全新实例**，
+  //   而 decision 引擎要在 start() 之后才初始化 → inst.decision 恒为
+  //   undefined → 永远返回 { error: 'decision.decide not available' }，
+  //   且外层不标 isError，调用方看到的是"成功但内容为空"。
+  // 正确实现是上面的 handleDecisionDecideTool（用 safeDispatch 走常驻实例）。
+  // 对象字面量后定义的键会**覆盖**前面的，所以这个重复定义曾让正确实现失效。
   heartflow_experience_collect: (args) => {
     try {
       const { ExperienceCollector } = require('./cortex/experience-collector.js');
@@ -3788,7 +3785,7 @@ const HANDLERS = {
     try {
       const { SelfBenchmark } = require('./cortex/self-benchmark.js');
       const inst = new SelfBenchmark({ silent: true, rootPath: HF_DIR });
-      const r = {};
+      const r = inst.assess ? inst.assess() : inst.getStats();
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
@@ -3812,7 +3809,7 @@ const HANDLERS = {
     try {
       const { AgentCard } = require('./identity/agent-card.js');
       const inst = new AgentCard({ silent: true, rootPath: HF_DIR });
-      const r = {};
+      const r = inst.getCard ? inst.getCard() : (inst.loadOrCreate ? inst.loadOrCreate() : {});
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
@@ -3860,7 +3857,7 @@ const HANDLERS = {
     try {
       const { PsychologyEngine } = require('./emotion/engine.js');
       const inst = new PsychologyEngine({ silent: true, rootPath: HF_DIR });
-      const r = {};
+      const r = inst.analyzePsychology ? inst.analyzePsychology(args?.text || '') : {};
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
@@ -3868,15 +3865,7 @@ const HANDLERS = {
     try {
       const { MemoryBank } = require('./memory/memory-bank.js');
       const inst = new MemoryBank({ silent: true, rootPath: HF_DIR });
-      const r = {};
-      return { result: r, timestamp: Date.now() };
-    } catch (e) { return { error: e.message }; }
-  },
-  heartflow_memory_consolidate: (args) => {
-    try {
-      const { MemoryConsolidator } = require('./memory/memory-consolidator.js');
-      const inst = new MemoryConsolidator({ silent: true, rootPath: HF_DIR });
-      const r = {};
+      const r = inst.getStats ? inst.getStats() : (inst.recall ? inst.recall(args?.query || '') : {});
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
@@ -3892,7 +3881,7 @@ const HANDLERS = {
     try {
       const { LongTermMemory } = require('./memory/long-term-memory.js');
       const inst = new LongTermMemory({ silent: true, rootPath: HF_DIR });
-      const r = {};
+      const r = args?.query ? (inst.search ? inst.search(args.query) : {}) : (inst.getStats ? inst.getStats() : {});
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
@@ -3926,14 +3915,6 @@ const HANDLERS = {
       const { ActionTracker } = require('./core/action-tracker.js');
       const inst = new ActionTracker({ silent: true, rootPath: HF_DIR });
       const r = inst.commit ? inst.commit(args?.action || '') : {};
-      return { result: r, timestamp: Date.now() };
-    } catch (e) { return { error: e.message }; }
-  },
-  heartflow_execution_verify: (args) => {
-    try {
-      const { ExecutionVerifier } = require('./core/execution-verifier.js');
-      const inst = new ExecutionVerifier({ silent: true, rootPath: HF_DIR });
-      const r = inst.verify ? inst.verify(args?.result || '') : {};
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
@@ -3973,7 +3954,7 @@ const HANDLERS = {
     try {
       const { MetaMemory } = require('./core/metaMemory.js');
       const inst = new MetaMemory({ silent: true, rootPath: HF_DIR });
-      const r = {};
+      const r = inst.getMemoryStats ? inst.getMemoryStats() : (inst.reflect ? inst.reflect() : {});
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
@@ -3997,7 +3978,7 @@ const HANDLERS = {
     try {
       const { SelfDiagnosis } = require('./core/self-diagnosis.js');
       const inst = new SelfDiagnosis({ silent: true, rootPath: HF_DIR });
-      const r = {};
+      const r = inst.run ? inst.run() : {};
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
@@ -4005,7 +3986,7 @@ const HANDLERS = {
     try {
       const { WhatLearned } = require('./core/what-learned.js');
       const inst = new WhatLearned({ silent: true, rootPath: HF_DIR });
-      const r = {};
+      const r = inst.brief ? inst.brief(args?.limit || 20) : (inst.report ? inst.report() : {});
       return { result: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
@@ -4089,23 +4070,7 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
 
-  heartflow_formula_search: (args) => {
-    try {
-      const { FormulaSearch } = require('./formula/formula-search.js');
-      const fs = new FormulaSearch({ rootPath: HF_DIR, silent: true });
-      const r = fs.search ? fs.search(args?.query || '') : [];
-      return { results: (r.results || r).slice(0, 10), timestamp: Date.now() };
-    } catch (e) { return { error: e.message }; }
-  },
 
-  heartflow_formula_calc: (args) => {
-    try {
-      const { FormulaCalculator } = require('./formula/formula-calculator.js');
-      const fc = new FormulaCalculator({ rootPath: HF_DIR, silent: true });
-      const r = fc.calculate ? fc.calculate(args?.formula || '', args?.values || {}) : {};
-      return { result: r, timestamp: Date.now() };
-    } catch (e) { return { error: e.message }; }
-  },
 
   heartflow_formula_engine: (args) => {
     try {
@@ -4149,14 +4114,6 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
 
-  heartflow_formula_bridge: (args) => {
-    try {
-      const { FormulaBridge } = require('./formula/formula-bridge.js');
-      const fb = new FormulaBridge({ rootPath: HF_DIR, silent: true });
-      const r = fb.searchFromCorpus ? fb.searchFromCorpus(args?.query || '') : {};
-      return { formula: (r.results || r).slice(0, 10), timestamp: Date.now() };
-    } catch (e) { return { error: e.message }; }
-  },
 
   // [v6.4.5] 第七批 — 心理/负载/护照/评论/语料/教训/项目
   heartflow_agent_psychology_full: (args) => {
@@ -4239,25 +4196,6 @@ const HANDLERS = {
       const r = pc.setProject ? pc.setProject(args?.project || 'default') : {};
       return { project: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
-  },
-  heartflow_check_outbound: (args) => {
-    try {
-      const { checkOutbound } = require('./gate-outbound.js');
-      return checkOutbound(args || {});
-    } catch (e) {
-      return { error: e.message };
-    }
-  },
-  heartflow_audit_trace: (args) => {
-    try {
-      const { initChain, queryChain, verifyChain, listViolationTags } = require('./trace-chain.js');
-      const action = args?.action || 'query';
-      if (action === 'verify') return verifyChain();
-      if (action === 'tags') return { tags: listViolationTags() };
-      return queryChain(args || {});
-    } catch (e) {
-      return { error: e.message };
-    }
   },
   heartflow_check_outbound: (args) => {
     try {
