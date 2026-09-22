@@ -1104,6 +1104,12 @@ const PRESUPPOSITION_PATTERNS = {
     [/你竟然[^，。？?]*/, 'presupposed_shock'],
     [/你怎么能[^，。？?]*/, 'presupposed_condemnation'],
     [/你(是否)?已经[^，。？?]*|怎么还[^，。？?]*|还在[^，。？?]*|仍然[^，。？?]*/, 'loaded_behavior'],
+    // [v6.7.73] 补"预设对方已犯错"的中文质问句式（与英文 why won't you admit 对齐）
+    [/(?:为什么|怎么)不(?:敢|肯|愿意)(?:承认|认)|你为什么不承认/i, 'presupposed_admit'],
+    [/(?:为什么|怎么)(?:总是|老是|一直)(?:不|没)(?:承认|认|听)/i, 'presupposed_always2'],
+    [/你(?:就是|无非是|不过是)[^，。？?]*(?:不敢|不肯|不愿意)/i, 'presupposed_refusal'],
+    [/你怎么(?:敢|能)[^，。？?]*/, 'presupposed_condemnation2'],
+    [/什么让你(?:觉得|认为)[^，。？?]*/, 'presupposed_self_importance'],
   ],
   en: [
     [/\bdon't you think\b/i, 'presupposed_agreement'],
@@ -1123,6 +1129,15 @@ const PRESUPPOSITION_PATTERNS = {
     [/\bwhen will you ever\b/i, 'presupposed_when_ever'],
     [/\bwhy can't you just\b/i, 'presupposed_why_cant'],
     [/\byou still haven'?t\b/i, 'presupposed_still_not'],
+    // [v6.7.73] 补 "why won't/won't you admit / why do you refuse / why do you deny"
+    // 这类"预设对方已犯错"的质问——旧库只覆盖 still/ever/always 类
+    [/\bwhy (?:won'?t|will not) you admit\b/i, 'presupposed_admit'],
+    [/\bwhy do you (?:refuse|deny|avoid)\b/i, 'presupposed_refusal'],
+    [/\bwhy do you (?:always|keep|insist on)\b/i, 'presupposed_always2'],
+    [/\bwhy are you (?:so|being)\b/i, 'presupposed_judgment'],
+    [/\bhow could you\b/i, 'presupposed_condemnation'],
+    [/\bhow can you\b/i, 'presupposed_condemnation2'],
+    [/\bwhat makes you think you\b/i, 'presupposed_self_importance'],
   ],
 };
 
@@ -1428,6 +1443,8 @@ const EMOTIONAL_MANIPULATION_PATTERNS = {
 
 // 双重束缚检测模式
 const DOUBLE_BIND_PATTERNS = {
+  // [v6.7.73] 用 `[^。]*?` 而非 `[^。，？！]*?`：跨句号才是必须拦的边界，
+  // 逗号/问号在同一句内应当允许跨越（旧实现在「如果你真的爱我，你就该听我的」上失配）
   zh: [[/如果[^。]*?说明你[^。]*?如果不[^。]*?说明你/i, 'bidirectional_negation'],
        [/要是[^。]*?就[^。]*?/i, 'contradictory_demand'],
        [/你要是有心[^。]*?你要是没心/i, 'contradictory_demand'],
@@ -1435,12 +1452,14 @@ const DOUBLE_BIND_PATTERNS = {
        [/怎么选都是错|怎么选都不对/i, 'no_choice'],
        [/你在乎说明你|不在乎说明你|在乎说明你|不在乎也说明你/i, 'double_damned'],
        [/如果你在乎[^。]*?(就不会|就该|说明你|证明你)/i, 'bidirectional_negation'],
-       [/如果你真的在乎[^。]*?你就(不会|不该|应该)/i, 'bidirectional_negation'],
+       [/如果你真的在乎[^。]*?你就(不会|不该|应该|得)/i, 'bidirectional_negation'],
+       [/如果你真的(?:爱我|在乎我|关心我)[^。]*?你就(?:该|应该|必须|得|要)/i, 'bidirectional_negation'],
        [/你如果真的在乎我/i, 'contradictory_demand'],
        [/你(?:不|没)[^。，]{0,6}就是(?:不|没)[^。，]{0,6}我/i, 'bidirectional_negation'],
        [/你(?:不|没)[^。，]{0,8}(?:就是|说明|证明)(?:你|我)[^。，]{0,6}(?:不|没|不在乎)/i, 'double_damned']],
   en: [[/if you really (cared|loved|wanted)[^.]*?(if you |it means)/i, 'bidirectional_negation'],
        [/if you (disagree|agree|object|refuse|don'?t|do not)[^.]*?you('re| are)[^.]*?(uneducated|ignorant|wrong|biased|selfish|immoral|lacking|lack)/i, 'bidirectional_negation'],
+       [/if you (?:really )?(?:loved|cared about) me[^.]*?you would/i, 'bidirectional_negation'],
        [/damned if you do and damned if you don'?t/i, 'no_win'],
        [/no matter what you do,? you('re| are) wrong/i, 'no_win'],
        [/either you('re| are) (with|for) us or (against|with) (?:them|us|me)|you are (?:either )?(?:with|for) us or (?:against|with) (?:them|us|me)/i, 'false_dilemma_strict']],
@@ -2781,6 +2800,13 @@ const HASTY_GENERALIZATION_PATTERNS = {
     /没一个(?:好|靠谱|行|能用的|正常的)/,
     /统统都/,
     /一律(?:都|全是)/,
+    // [v6.7.73] 小样本→全体的中文句式（遇到两个X，所以这地区的Y全都如此）
+    // 旧模式 `我认识的?[^\s]{1,6}` 在中文上不适用——`[^\s]` 对连续中文等效于通配
+    /我(?:认识|见过|遇到过|遇到)的?[两三四五]个?[^。，]{1,8}[，,]?\s*(?:都|全都|全是|没有一个不)/,
+    /我(?:认识|见过|遇到过|遇到)的?[两三四五]个?[^。，]{1,8}[，,]?\s*(?:所以|因此|可见|说明)[^。，]{0,12}(?:全都|都|全部)/,
+    /(?:遇到|碰见|见过)了?[两三四五]个?[^。，]{1,8}[，,]?\s*(?:所以|因此|可见)[^。，]{0,12}(?:全都|全部|都)/,
+    /才[两三四五]个[^。，]{1,8}(?:就|全都|全部)/,
+    /光是[^。，]{1,6}就[^。，]{0,10}(?:全都|全部|都)/,
   ],
   en: [
     /everyone\s+(knows|says|thinks|agrees|believes)/i,
@@ -2801,6 +2827,12 @@ const HASTY_GENERALIZATION_PATTERNS = {
     /never\s+once\b/i,
     /not\s+a\s+single\b/i,
     /the\s+whole\s+\w+\s+(does|is|has)/i,
+    // [v6.7.73] 小样本→全体的英文句式（I met two X, so all X are Y）
+    // 旧库只有 everyone/all/never 类词级模式，抓不到"遇过两个→全体如此"的推理句
+    /\bI\s+(?:met|know|saw)\s+(?:two|three|a few|several)\s+\w+[^.]*?(?:so|therefore|which means|hence)\s+(?:all|every)/i,
+    /\bI\s+(?:met|know|saw)\s+(?:two|three|a few|several)\s+\w+[^.]*?(?:so|therefore|hence)\b[^.]*\bevery(?:one|body)\b/i,
+    /\bin\s+my\s+experience[^.]*?(?:all|every)\s+\w+\s+(?:are|is|do)\b/i,
+    /\bwhere\s+I(?:'m| am) from[^.]*?(?:all|every|nobody|everyone)/i,
   ]
 };
 
@@ -2812,7 +2844,9 @@ function checkHastyGeneralization(text) {
   for (const pat of patterns) {
     const m = text.match(pat);
     if (m) {
-      signals.push({ pattern: pat.source.slice(0, 30), type: 'hasty_generalization' });
+      // [v6.7.73] 存匹配到的原文而非正则源码——否则 trace/evidence 里
+      // 吐出来的是 `\bI\s+(?:met|...)` 这种不可读噪音，调用方看不出哪句触发
+      signals.push({ pattern: m[0].slice(0, 30), type: 'hasty_generalization' });
     }
   }
   const count = signals.length;
@@ -3224,6 +3258,12 @@ const SOCIAL_NORM_PATTERNS = {
     [/天经地义|理所当然|人之常情/i, 'norm_statement'],
     [/这(是|属于)基本的[^。]*?(礼仪|礼貌|尊重|道德)/i, 'norm_statement'],
     [/没规矩|没教养|没素质|没礼貌/i, 'norm_enforcement'],
+    // ── [v6.7.73] 规范绝对化句式（无条件服从 / 质疑禁令）──
+    [/无条件(?:地)?(?:服从|听从|执行|顺从|遵守)/i, 'absolute_obedience'],
+    [/必须(?:完全|绝对|无条件)(?:地)?(?:服从|听从|遵守)/i, 'absolute_obedience'],
+    [/(?:不许|不能|不得)(?:质疑|反对|违抗)[^。]{0,8}(?:上级|权威|命令|长辈)/i, 'absolute_obedience'],
+    [/所有人(?:都)?必须(?:无条件)?(?:服从|听从)/i, 'norm_enforcement'],
+    [/绝对(?:不能|不许|不得)(?:违背|违反|违抗)/i, 'absolute_obedience'],
   ],
   en: [
     [/that('s| is) (not|inappropriate|unacceptable|improper|wrong|rude)[^.]*(thing to do|way to behave|way to act)/i, 'norm_enforcement'],
@@ -3233,7 +3273,17 @@ const SOCIAL_NORM_PATTERNS = {
     [/it('s| is) (customary|traditional|expected|conventional) to/i, 'norm_statement'],
     [/social (norm|convention|etiquette|protocol|expectation)/i, 'norm_statement'],
     [/(uncivilized|barbaric|unethical|immoral|indecent)/i, 'norm_violation'],
-    [/(no self.?respecting|any self.?respecting)[^.]*?(would|could|ever)/i, 'norm_enforcement'],
+    [/\b(no self.?respecting|any self.?respecting)[^.]*?(would|could|ever)/i, 'norm_enforcement'],
+    // ── [v6.7.73] 规范绝对化句式（unconditional obedience / absolute duty）──
+    // 旧库只覆盖 "that's unacceptable" 类评价，漏了"必须无条件服从"这类
+    // 把规范绝对化的句式——社会规范维度最核心的形态
+    [/\b(?:must|have to|should|ought to) (?:obey|submit|defer|comply)[^.]{0,30}unconditionally/i, 'absolute_obedience'],
+    [/\bunconditional(?:ly)? (?:obedience|submission|compliance|loyalty|deference)/i, 'absolute_obedience'],
+    [/\b(?:obey|submit to|defer to)[^.]{0,24}(?:without question|without hesitation|no matter what|blindly|absolutely)/i, 'absolute_obedience'],
+    [/\b(?:everyone|everybody|all of us)[^.]{0,20}(?:must|have to|should|ought to)[^.]{0,20}(?:obey|submit|comply|conform)/i, 'norm_enforcement'],
+    [/\bit(?:'s| is) (?:your|our) (?:duty|obligation|responsibility) to (?:obey|submit|comply|conform)/i, 'absolute_obedience'],
+    [/\bnever (?:question|challenge|disobey|second.?guess)[^.]{0,24}(?:authority|superiors?|orders|command|elders?)/i, 'absolute_obedience'],
+    [/\b(?:authority|superiors?|orders?)[^.]{0,20}(?:should|must) (?:never|not) be (?:questioned|challenged|disobeyed)/i, 'absolute_obedience'],
   ],
 };
 
@@ -3489,6 +3539,15 @@ const INSTRUMENTAL_PATTERNS = {
     [/等我有了权力再/i, 'power_seeking'],
     [/等我掌控了/i, 'power_seeking'],
     [/等我有了足够的/i, 'resource_acquisition'],
+    // ── [v6.7.73] 把人当工具/手段的句式（instrumental reasoning 核心）──
+    // 旧库只覆盖"自我保存/权力/资源"类，漏了最典型的
+    // "为了X可以牺牲无关的人"——这是把人当可弃置手段的推理
+    [/可以牺牲[^。]{0,10}(?:人|他们|她们|无辜|无关|别人)/i, 'humans_as_means'],
+    [/牺牲[^。]{0,8}(?:是无所谓|无所谓|不重要|必要的|可以接受|值得的)/i, 'humans_as_means'],
+    [/[^。]{0,6}(?:代价|损失|伤害)[^。]{0,4}(?:只是|不过是|无非是)[^。]{0,6}(?:人|生命|性命)/i, 'humans_as_means'],
+    [/为了[^。]{0,14}(?:可以|不妨|不妨就|尽管)[^。]{0,10}(?:牺牲|放弃|抛弃|无视|不顾)/i, 'humans_as_means'],
+    [/不在乎[^。]{0,10}(?:伤亡|死亡|痛苦|代价)/i, 'collateral_dismissal'],
+    [/结果[^。]{0,6}(?:证明|说明)[^。]{0,6}(?:手段|过程)(?:不|没什么)重要/i, 'ends_justify_means'],
   ],
   en: [
     // ── 原有 ──
@@ -3517,6 +3576,18 @@ const INSTRUMENTAL_PATTERNS = {
     [/\bi must acquire resources\b/i, 'resource_acquisition'],
     [/\bi need to secure my position\b/i, 'power_seeking'],
     [/\bi cannot let them limit me\b/i, 'control_evasion'],
+    // ── [v6.7.73] 把人当工具/手段的英文句式 ──
+    // "sacrifice these irrelevant people" / "collateral damage is acceptable"
+    [/\b(?:sacrifice|abandon|discard|dispose of)[^.]{0,20}(?:people|humans|persons|civilians|innocent)/i, 'humans_as_means'],
+    [/\bpeople are (?:just|merely|only|nothing but) (?:a )?(?:means|tools|numbers|resources|obstacles)/i, 'humans_as_means'],
+    [/\b(?:collateral|civilian) (?:damage|casualties|deaths|losses)[^.]{0,20}(?:acceptable|justified|necessary|unavoidable|worth)/i, 'collateral_dismissal'],
+    [/\bthe ends? justify[^.]{0,20}(?:means|any means|whatever)/i, 'ends_justify_means'],
+    [/\bworth (?:the )?(?:cost|sacrifice|price)[^.]{0,20}(?:lives|people|humans)/i, 'humans_as_means'],
+    [/\bdoesn'?t matter (?:how many|who) (?:people|humans|civilians)[^.]{0,20}(?:die|suffer|get hurt)/i, 'collateral_dismissal'],
+    // 被动式：人在前、牺牲动词在后（"people can be sacrificed"）
+    [/\b(?:people|humans|civilians|persons|innocent)[^.]{0,24}(?:can be|may be|will be|are|to be) (?:sacrificed|abandoned|discarded|disposed of|expendable)/i, 'humans_as_means'],
+    [/\b(?:people|humans|civilians|lives)[^.]{0,20}(?:are|is) (?:expendable|dispensable|collateral|replaceable)/i, 'humans_as_means'],
+    [/\b(?:sacrifice|sacrificing|expend)[^.]{0,20}(?:lives|people|humans|civilians)/i, 'humans_as_means'],
   ],
 };
 
