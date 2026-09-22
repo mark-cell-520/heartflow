@@ -1474,7 +1474,9 @@ function checkDoubleBind(text) {
   for (const [pat, type] of patterns) {
     const m = text.match(pat);
     if (m) {
-      binds.push({ pattern: type, severity: DOUBLE_BIND_SEVERITY[type] || 0.4 });
+      // [v6.7.73] 同时存匹配原文，否则 trace/evidence 只拿到类型名
+      // （"bidirectional_negation"），调用方看不出是哪句话触发
+      binds.push({ pattern: type, severity: DOUBLE_BIND_SEVERITY[type] || 0.4, matched: m[0].slice(0, 40) });
     }
   }
   const count = binds.length;
