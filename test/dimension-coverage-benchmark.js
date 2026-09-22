@@ -44,7 +44,7 @@ const src = fs.readFileSync(IDX, 'utf8');
 function toText(r) {
   let s = r.replace(/^\//, '').replace(/\/[gimsuy]*$/, '');
   s = s.replace(/\[\^?[^\]]*\]/g, m => {
-    if (m.includes('。') || m.includes('，')) return '什么';
+    if (m.includes('。') || m.includes('，')) return '都喜欢';   // 中文动词短语（ stereotype: [男女]人[^。]*?都喜欢 ）
     if (/[0-9]/.test(m)) return '5';
     return 'x';
   });

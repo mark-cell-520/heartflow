@@ -444,7 +444,14 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
   // rewrite 级维度：需要改写后再输出
   const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency', 'absolute_claim', 'induced_trust']);
   // verify 级维度：需要证据验证（权威背书、模糊、矛盾、过载自信等）
-  const VERIFY_DIMS = new Set(['appeal_to_authority', 'vagueness', 'contradiction', 'sycophancy', 'confidence', 'fallacies', 'presupposition', 'empty_answer', 'info_deprivation', 'false_equivalence', 'hasty_generalization', 'slippery_slope', 'whataboutism', 'pseudo_profundity', 'reasoning_coherence', 'stereotype', 'clickbait', 'bad_faith', 'no_fallback', 'unsupported_claim', 'perfect_error', 'pseudo_causal', 'soft_deflection', 'premature_termination']);
+  const VERIFY_DIMS = new Set(['appeal_to_authority', 'vagueness', 'contradiction', 'sycophancy', 'confidence', 'fallacies', 'presupposition', 'empty_answer', 'info_deprivation', 'false_equivalence', 'hasty_generalization', 'slippery_slope', 'whataboutism', 'pseudo_profundity', 'reasoning_coherence', 'stereotype', 'clickbait', 'bad_faith', 'no_fallback', 'unsupported_claim', 'perfect_error', 'pseudo_causal', 'soft_deflection', 'premature_termination',
+    // [v6.7.77] 命中但不拦审计后补入。
+    // 刻意**不含 counterfactual**——实测「如果当初没有那场雨，我们可能就在
+    // 一起了，这只是个假设」这种正常假设叙述会被判 verify。反事实句是正常
+    // 思维形式，歧义率远高于 sealioning/tone_policing（后两者有明确
+    //  interlocution 意图：逼问证据 / 压制语气）。升级会造成良性误拦。
+    'sealioning', 'tone_policing',
+  ]);
   // pass：无问题通过
 
   const gate = {};
