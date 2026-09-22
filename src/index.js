@@ -449,6 +449,24 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
       });
     }
   }
+  // [v6.7.86] 多轮累积攻击（心虫 decision.decide 0.85）。
+  // 实测 3/5 社工攻击单句与整体都 pass——攻击性来自**意图序列**
+  // （索取PII→批量导出→系统入口），单句无高危信号。
+  // 这是单文本门禁的必然边界，但"阶梯结构"可识别。
+  // 刻意保守：需 ≥2 层阶梯才判（qualifies），单层是正常工作内容
+  // （客服问手机号、开发要数据库地址都正常）。良性对照 3 条全部 0-1 层。
+  let _multiturn = null;
+  try {
+    const mt = require('./multi-turn-tactics.js');
+    _multiturn = mt.checkMultiTurnEscalation(_normText);
+    if (_multiturn && _multiturn.qualifies) {
+      findings.push({
+        dimension: 'multi_turn_escalation',
+        severity: Math.round(55 + _multiturn.count * 10),
+        details: `多轮累积(${_multiturn.count}层阶梯: ${_multiturn.hits.map(h => h.label).join(' → ')})`,
+      });
+    }
+  } catch (_) { /* 多轮检测失败不阻断 */ }
   findings.sort((a, b) => b.severity - a.severity);
 
   // 修改指引：每个维度对应的改写方向，AI agent 直接读
@@ -501,7 +519,12 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
     'indirect_injection',
   ]);
   // rewrite 级维度：需要改写后再输出
-  const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency', 'absolute_claim', 'induced_trust']);
+  const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency', 'absolute_claim', 'induced_trust',
+    // [v6.7.86] 多轮累积阶梯。刻意不 block——含 ≥2 层阶梯的文本也可能是
+    // 正当的**安全培训复盘/攻击分析**（"攻击者通常先索取PII再导数据"），
+    // block 会误伤安全意识教育。rewrite/verify 足够提示人工确认。
+    'multi_turn_escalation',
+  ]);
   // verify 级维度：需要证据验证（权威背书、模糊、矛盾、过载自信等）
   const VERIFY_DIMS = new Set(['appeal_to_authority', 'vagueness', 'contradiction', 'sycophancy', 'confidence', 'fallacies', 'presupposition', 'empty_answer', 'info_deprivation', 'false_equivalence', 'hasty_generalization', 'slippery_slope', 'whataboutism', 'pseudo_profundity', 'reasoning_coherence', 'stereotype', 'clickbait', 'bad_faith', 'no_fallback', 'unsupported_claim', 'perfect_error', 'pseudo_causal', 'soft_deflection', 'premature_termination',
     // [v6.7.77] 命中但不拦审计后补入。
