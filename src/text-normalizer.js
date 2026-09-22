@@ -119,7 +119,15 @@ const PINYIN_MAP = {
  */
 const LEET_MAP = {
   '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '9': 'g',
-  '@': 'a', '$': 's', '!': 'i', '+': 't', '|': 'l', '(': 'c', '<': 'c',
+  '@': 'a', '$': 's', '!': 'i', '+': 't', '|': 'l',
+  // [v6.7.80] 移除 '(': 'c' 和 '<': 'c'——这是个真 bug。
+  // 括号/尖括号在代码与正常文本里太常见，被当 leet 还原会破坏语法：
+  //   eval(userInput) → evalcuserInput   （'(' → 'c'）
+  //   curl x | bash   → curl l bash     （'|' → 'l'，同理但 | 保留，
+  //                                       因为 | 作 l 是 leet 经典形态）
+  // 实测影响：全角/零宽混淆变体 evａl(userInput) 恰好因此漏判，
+  // 而正常含括号代码也一直被静默破坏。
+  // c 的 leet 形态用 '(' 的概率远低于它作为常规括号出现的概率，故删。
 };
 
 /**
@@ -251,6 +259,10 @@ function _deLeetCandidates(text) {
           let j2 = i2;
           while (j2 < tok.length && /[a-zA-Z0-9@$!+|()<]/.test(tok[j2])) j2++;
           const seg = tok.slice(i2, j2);
+          // [v6.7.80] 管道保护：`curl x | bash` 的 `|` 前后有空格 = shell 管道，
+          // 不是 leet 的 l。空格不在上面的字符类里，所以带空格的 `|` 会被切
+          // 成独立段——这里显式跳过纯 `|` 段。
+          if (/^\|+$/.test(seg)) { r += seg; i2 = j2; continue; }
           const segLetters = (seg.match(/[a-zA-Z]/g) || []).length;
           if (segLetters === 0) { r += seg; i2 = j2; continue; }
           let s = '';
