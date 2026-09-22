@@ -32,6 +32,9 @@ const ROOT = path.join(__dirname, '..');
 const IDX = path.join(ROOT, 'src/index.js');
 const gate = require(path.join(ROOT, 'src/gate.js'));
 const idx = require(IDX);
+// [v6.7.82] 共享的正则→字面量转换（benchmark 与面板必须用同一份，
+// 否则面板的 BROKEN 判定会因字符类被删而误报——见 regexToTexts 注释）
+const { toTexts } = require(path.join(ROOT, 'test/regex-to-text.js'));
 const src = fs.readFileSync(IDX, 'utf8');
 
 /** snake/camel → 常量名候选 */
@@ -44,6 +47,14 @@ function constNameCandidates(dim) {
   const base = snake.replace(/S$/, '');
   if (ALIAS[snake]) cands.unshift(`${ALIAS[snake]}_PATTERNS`);
   else if (snake.endsWith('S')) cands.push(`${base}_PATTERNS`);
+  // [v6.7.82] 多维共用常量——多个 checkXxx 共享同一份信号表，
+  // 名字与维度名完全无关（sycophancy → ZH_SIGNALS/EN_SIGNALS）。
+  // 无法从维度名推导，显式映射。
+  const SHARED = {
+    SYCOPHANCY: ['ZH_SIGNALS', 'EN_SIGNALS'],
+    SOFT_DEFLECTION: ['SOFT_DEFLECTION_ZH', 'SOFT_DEFLECTION_EN'],
+  };
+  if (SHARED[snake]) cands.unshift(...SHARED[snake]);
   return cands;
 }
 
@@ -131,23 +142,16 @@ function probeFromPattern(dim) {
 }
 
 /** 正则 source → 字面量测试文本 */
+// [v6.7.82] 改为调用共享的 test/regex-to-text.js。
+// 原先这里有一份自己的实现，会把字符类 `[...]` **直接删掉**：
+//   `您说得完全对，[^，]*您太聪明了` → 「您说得完全对，宝」（残缺，必然不命中）
+// 导致 sycophancy / pseudoProfundity / softDeflection 被误报成 BROKEN，
+// 而这 3 个维度第 23 轮已逐个验证全部活着（sycophancy totalHits、
+// pseudoProfundity 5/5、softDeflection 2/2）。
+// 同一逻辑写两遍必然漂移——第 22 轮给 benchmark 修过一次（给字符类填值），
+// 面板这份没跟上。抽成共享模块根治。
 function regexesToTexts(regexes) {
-  const texts = [];
-  // [v6.7.75] 从"前 8 条"改为"全量"——实测 stereotype/sealioning/dogwhistle
-  // 的命中模式排在第 6+ 位，只测前 8 条会漏（前 8 条全是概括类不命中）。
-  // 面板的目的是判死活，不是性能测试，宁可多跑。
-  for (const r of regexes) {
-    const inner = r.replace(/^\//, '').replace(/\/[gimsuy]*$/, '');
-    const lit = inner
-      .replace(/\\[bBsSdDwW]/g, '')
-      .replace(/\(\?:[^)]*\)/g, '|')
-      .replace(/\([^)]*\)/g, '|')
-      .replace(/\[[^\]]*\]/g, '')
-      .replace(/[\\^$.*+?{}|]/g, ' ')
-      .trim();
-    if (lit.length >= 2) texts.push(lit.slice(0, 30));
-  }
-  return texts;
+  return toTexts(regexes);
 }
 
 /** 检查维度是否有 checkXxx 函数 */
