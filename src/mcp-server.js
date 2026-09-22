@@ -379,8 +379,9 @@ function handleUnixClient(socket) {
       try {
 
         const req = JSON.parse(line);
-
-        const result = await handleRequest(req, null);
+        // stdio 模式：本地管道调用无 HTTP headers，视为受信 → admin。
+        // （否则 stdio 模式下写工具全部不可用，而 stdio 本是本地专用通道。）
+        const result = await handleRequest(req, null, { __stdio: true });
 
         if (result !== null) {
 
@@ -4461,7 +4462,7 @@ function makeError(id, code, message, data) {
 
 
 
-async function handleRequest(request, sessionId) {
+async function handleRequest(request, sessionId, httpHeaders) {
 
   const { id, method, params = {} } = request;
 
@@ -4494,15 +4495,28 @@ async function handleRequest(request, sessionId) {
       // 前一个 case 已 return，因此这段 100% 是死代码——guest 拦截从未生效。
       // 角色: guest(只读) / user(读写) / admin(全权限)
       // 身份码: HeartFlow-OID-<16-char-hash>
+      // 注意：args 后续会被 args-sanitizer 重新赋值（`args = cleaned`），
+      // 所以必须是 let。原实现是 `let { name, arguments: args = {} } = params;`
       let { name, arguments: args = {} } = params;
 
-      const reqOid = request.headers?.['x-heartflow-oid'] || '';
-      const token = request.headers?.authorization?.replace('Bearer ', '') || '';
+      // [v6.7.72 AUDIT-FIX] 必须从 HTTP headers 读身份信息。
+      // 原实现读 `request.headers` —— 但 handleRequest 的第一个参数是
+      // **JSON-RPC 消息对象**（{id, method, params}），不是 HTTP request。
+      // 实测结果：request.headers 为 undefined → token 恒为 '' → role 恒为
+      // 'guest' → 四个写工具（memory_write_control / memory_eraser /
+      // decision_decide / self_heal）**永远拿不到 admin**，死代码。
+      // 而 HTTP 层 4671 行用正确的 req.headers 鉴权，所以读工具正常通过
+      // ——两处不一致，症状是"能读不能写"。
+      const httpAuth = (httpHeaders && (httpHeaders.authorization || httpHeaders.Authorization)) || '';
+      const reqOid = (httpHeaders && (httpHeaders['x-heartflow-oid'] || httpHeaders['HeartFlow-OID'])) || '';
+      const token = httpAuth.startsWith('Bearer ') ? httpAuth.slice(7) : '';
       let role = 'guest';
-      if (token && typeof AUTH_TOKEN === 'string' && safeCompare(token, AUTH_TOKEN)) {
+      // stdio 模式是本地管道，无 HTTP 身份可验，视为受信
+      if (httpHeaders && httpHeaders.__stdio) role = 'admin';
+      else if (token && typeof AUTH_TOKEN === 'string' && safeCompare(token, AUTH_TOKEN)) {
         role = 'admin';
       }
-      const oidMatch = reqOid.match(/^HeartFlow-OID-([a-f0-9]{16})$/);
+      const oidMatch = String(reqOid).match(/^HeartFlow-OID-([a-f0-9]{16})$/);
       if (oidMatch) {
         role = Math.max(['guest','user','admin'].indexOf(role), ['guest','user','admin'].indexOf('user'));
       }
@@ -4890,7 +4904,7 @@ const server = http.createServer((req, res) => {
 
         }
 
-        const result = await handleRequest(request, sessionId);
+        const result = await handleRequest(request, sessionId, req.headers);
 
         if (result !== null) {
 
