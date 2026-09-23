@@ -458,4 +458,136 @@ count 仍是 0，因为循环把它们当 RegExp 用、`text.match(object)` 恒�
    字符再匹配，第一条模式永不命中）——已确认为死代码但**无人调用该检测器**，
    动的价值待评估，第 6 轮先确认调用方。
 
+---
+
+## 第 6 轮 — v6.7.106
+
+**心虫决策**：`decision.decide` → chosen = **A，composite_score 0.88**（identity_alignment 100%）
+> 首轮两候选直接分出胜负（不像第 2/5 轮那样平票或被拒）：A 0.88、B 0.74。
+> A = false_urgency 英文数字倒计时句式补齐；B = emotional_manipulation
+> 英文撤回型情感要挟排查（我明确标了 feasibility 0.6 / 未实测 / 缺口未确认，
+> 心虫据此把它压到 0.74）。两个候选我都先跑了最小样本探针再喂给它，
+> 不是静态差集推断。
+
+### 缺口实测（不是静态推断）
+
+`false_urgency` 是 `REWRITE_DIMS` 成员（命中即 rewrite，真实 gate 后果），
+EN 模式表 41 条里数字类此前**只有 `only \d+ left` 一条窄模式**
+（要求 only 紧贴数字紧贴 left），8/10 条真实英文营销紧迫句全部 count=0 干净 pass：
+
+| 样本 | 改前 |
+|---|---|
+| `Only 3 minutes left, act now!` | count=0 pass |
+| `Only 2 days left to claim your reward` | count=0 pass |
+| `Sale ends in 3 hours. Get it now.` | count=0 pass |
+| `This deal expires in 24 hours` | count=0 pass |
+| `2 items left in stock` | count=0 pass |
+| `Only 10 spots left at 50% off` | count=0 pass |
+| `The offer closes in 10 minutes` | count=0 pass |
+| `Just 12 hours left to register for the webinar at this rate` | count=0 pass |
+
+中文侧同类句式早已覆盖（`仅剩\d+分钟`、`\d+分钟后失效`）——**只缺英文侧**。
+
+### 改了什么（2 个 commit `2e509ada` + `18d7ae95`，5 文件 +428/-6）
+
+**1. `src/index.js` — `FALSE_URGENCY_PATTERNS.en` 补 7 条（6 类）**
+
+- 营销主体 + 到期动词 + 时长（`offer/deal/sale/discount/promotion/price/rate`
+  + `ends/expires/closes` + `in 3 hours`，正反两个语序都收）
+- `(only|just)` + 数字 + 时间单位 + `left/remaining/to go`
+- 数字 + 剩余量单位 `spots/slots/seats/copies/units/places` + `left`
+- 带营销/招募/库存主体的 tickets/items 收口
+- 零售库存紧迫（`N items left in stock` / `inventory has N units left`）
+- 营销主体 + 硬截止日（`offer ends tomorrow/tonight/today/midnight`）
+
+**2. 一次实测推翻 + 修复（本轮关键过程，如实记录）**
+
+第一版把 `tickets`/`items` 直接放进「无主体」类③，跑探针当场误拦：
+`There are only 2 tickets left for the 6pm train from London to Oxford`
+（火车余票查询，良性）→ rewrite。**这是误拦铁律红线，必须修。**
+修法：这两个单位移出无主体类，只在 `offer/sale/register/stock` 等主体后收口。
+副作用是 `2 items left in stock` 跟着漏了，于是补了带 `in stock` /
+`inventory` 主体的库存模式补回来。
+最终结果是 `2 items left in stock` 命中、`Only 10 items left on your to-do list`
+不命中——**同一批单位在两种主体下不同判定**，这就是护栏在承重的证据。
+
+**3. `src/core/version.js` — 兜底版本 6.7.105 → 6.7.106。**
+第 5 轮发现的 sync-version.js 盲区（它只管 VERSION/package.json/SKILL.md/
+heartflow.js 四处，不管 version.js 里的 `let VERSION` 兜底值）本轮继续手工补。
+
+**4. `README.md` — changelog 补 6.7.106 行 + 横幅测试数同步。**
+
+### 新增测试与负例验证
+
+- `test/false-urgency-en-countdown.test.js`（**66 条**）：6 类句式命中、
+  20 条良性（会议/我马上到/构建耗时/作业截止/查余票/调研建议/闭馆/会话过期/
+  待读页数/航班/营业时间/待办清单/票已售完/排期/明天开会/退房/到达/考试时长/
+  试用结束）0 误命中、中文侧 v6.7.70 全部 12 条样本不退化、gate 端到端
+  rewrite 且归因 false_urgency、**3 条护栏有效性对照测试**（手工构造
+  「去掉 in stock 限定」「去掉营销主体限定」「②无时间单位」三版，
+  证明它们各自会误伤对应良性样本——护栏不是摆设）。
+- `scripts/negative-test-false-urgency-en.js`：6 个注入缺陷**全部让守卫变红**
+  （删除全部新类 25 红 / ③通配含 tickets 4 红 / ①去营销主体 1 红 /
+  ②去时间单位 6 红 / ⑤去 in stock 2 红 / ⑥去营销主体 2 红）。
+
+**过程记录一个失败**：负例脚本第一版 6/6 全「未变红」。排查发现不是守卫失效——
+测试里 `gate.js` 会读 VERSION 文件，临时副本缺文件导致测试直接 ENOENT 崩溃
+（exit=1 但失败数解析为 -1）。补复制 VERSION/package.json 后才拿到真实结果。
+**「变红」必须是断言失败，不能是加载崩溃**——否则负例验证会给出虚假通过。
+
+### 验证（全部真实执行）
+
+| 项目 | 结果 |
+|---|---|
+| `node bin/verify.js` | 14 passed 0 failed |
+| `node test/run-all.js` | **2011 passed 1 failed**（唯一红灯= npm-package-integrity，见下） |
+| `node scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **300/326**（基线持平，**0 新增**） |
+| `node scripts/guard-abilities.js` | 19/20（唯一红灯=全量测试口径，即 npm-package-integrity） |
+| `node test/security-audit.test.js` | 16 passed 0 failed（S2 版本号项 commit 后转绿） |
+| `node test/doc-numbers-accuracy.test.js` | 15 passed 0 failed（README 测试数 + changelog 同步后） |
+| `node test/false-urgency-en-countdown.test.js` | 66 passed 0 failed |
+| `node scripts/negative-test-false-urgency-en.js` | 6/6 注入缺陷全部变红 |
+
+**误拦铁律**：0 新增（300/326 与前五轮完全一致），且本轮主动修掉 1 条
+自己引入的误拦（火车查余票）后才提交。
+
+### 本轮额外核实的两件事
+
+1. **`lang-coverage-audit` 的 victim_blaming「仅中文」是探针样本问题，不是引擎缺口。**
+   第 4 轮笔记写「补 21 条 EN 后已转为中英均检出（未复跑）」——**本轮复跑推翻了
+   这个推断**：audit 仍标「仅中文」。实测引擎侧 `checkVictimBlaming` 对
+   `If you had been more careful...` / `You brought this on yourself.` /
+   `She was careless and it is her own fault.` 全部 count>0 正常命中。
+   真正原因是 audit 探针句 `The victim was careless and deserved what happened`
+   的主语 `The victim` 不在护栏主语集合（you/he/she/they）内，属**护栏正确行为**。
+   未动引擎，探针样本留待后续轮次修（属维护，不立项）。
+2. **README 测试数的同步契约是「完全一致」不是「≥」。**
+   doc-numbers-accuracy 第 145 行 `assert.strictEqual(testsClaimed, M.tests)`，
+   M.tests 取 `data/test-count.json` 的 passed。我第一版按 run-all 单次输出贴
+   2008，但 test-count.json 当时已是 2010 → doc-numbers 当场红。改贴 2010 后转绿。
+   注意 run-all 每次跑这个值有 ±1~2 浮动（2010/2011 两次都出现过），
+   README 只能贴一个快照，**下次同步要以 test-count.json 当前值为准**。
+
+### 遗留
+
+1. `test/npm-package-integrity.test.js` 仍 5/6 红灯：`npm latest=6.7.100` 落后
+   本地 `6.7.106`。这是「不 publish」铁律的必然结果，六轮同一状态，非本轮引入。
+2. `src/core/heartflow.js` 的 BUILD_DATE 既有脏改动仍未单独处理（sync-version.js
+   每轮会自动更新它，已随本轮 commit 一并落地，不再算脏改动）。
+3. `lang-coverage-audit` 探针样本问题（victim_blaming / false_urgency / 
+   moral_foundations 三项「仅中文」标注）仍未修：本轮查证 false_urgency 的英文侧
+   引擎已由本轮补强（但 audit 探针句本身不带数字倒计时形状，估计仍会显示旧状态，
+   下轮复跑确认），victim_blaming 已确认是探针问题不是引擎问题。
+4. `guard-abilities` 的「全量测试」项在它自己内部 execSync 跑 run-all 时报过
+   2010/2，而我直接跑 run-all 稳定 2011/1（唯一失败=npm-package-integrity）。
+   浮动源在 guard 自己的执行环境（420s 超时/子进程抖动），不在引擎，六轮同一性质，
+   刻意未动 guard 口径。
+5. 第 6 轮留下的可挖方向（未验证，第 7 轮先实测）：
+   - `lang-coverage-audit` 三项「仅中文」里 `moral_foundations` 是否也只是探针问题
+     （其 EN 词边界缺陷已被判为「修 bug 不立项」，需先读探针再定）。
+   - emotional_manipulation 英文撤回型情感要挟（本轮心虫以 feasibility 0.6 /
+     未实测压到 0.74，缺口未确认，需先做最小样本实测）。
+   - `INVISIBLE_HOMOGLYPH` 死代码的调用方仍未确认（第 5 轮挂到第 6 轮，
+     本轮因主方向工作量未做）。
+
 
