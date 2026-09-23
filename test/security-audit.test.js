@@ -38,25 +38,40 @@ t('S1: guardPath 放行项目内 src 文件', () => {
 
 t('S1: guardPath 拒绝路径穿越 ..', () => {
   const { guardPath } = require('../src/core/path-guard.js');
-  // [v6.7.98] 原断言写错了：`PROJECT_ROOT/data/../../etc/passwd` 的解析结果
-  // 依赖 PROJECT_ROOT 的深度——装在 /root/.hermes/skills/ai/.../（深）时
-  // 越出 root 被拒，但装在 node_modules/@scope/pkg/（浅）时仍落在 root 内，
-  // 而 guardPath 放行**自家 root 内的任何路径**是正确设计。
-  // 第 75 轮在包内复跑时它 FAIL 过一次，根因是断言假设「穿越必越界」。
-  // 改用与安装深度无关的构造：相对 PROJECT_ROOT 逐级上跳直到越界为止。
+  // [v6.7.98→v6.7.99] 原断言假设「任何 .. 穿越都会越出 allowed roots」——
+  // 这是错的，原因有两层：
+  //   ① guardPath 的 ALLOWED_ROOTS 除 PROJECT_ROOT 外还显式含 /tmp
+  //      （v6.0.52 起的设计：tmp 是数据缓存目录）。所以从 root 上跳一级
+  //      若落在 /tmp 下，会被正确放行。
+  //   ② 浅安装路径（node_modules/@scope/pkg/）上跳后仍常在某条 allowed root 内。
+  // 第 75 轮重写为「逐级上跳直到越界」，第 76 轮在 /tmp 下的浅安装里又失败——
+  // 因为 /tmp 本身就在白名单里，**测试场景选错位置**，不是 guardPath 有错。
+  // 最终构造：直接用绝对路径打 allowed roots 之外的敏感位置（/etc/passwd、
+  // /root/.ssh/id_rsa、/home/<user>/.bashrc），这是最直接也最稳定的断言。
   const root = path.resolve(PROJECT_ROOT);
-  let deep = root;
-  for (let i = 0; i < 64 && path.resolve(deep).startsWith(root + path.sep); i++) deep = path.join(deep, '..');
-  deep = path.join(deep, '..', 'etc', 'passwd');
-  const resolved = path.resolve(deep);
-  const r = guardPath(resolved);
-  if (!resolved.startsWith(root + path.sep)) {
+  const os = require('os');
+  const outside = [
+    '/etc/passwd',
+    '/etc/shadow',
+    path.join(os.homedir(), '.ssh', 'id_rsa'),
+    path.join(os.homedir(), '.bashrc'),
+    path.join(root, '..', '..', '..', '..', 'etc', 'passwd'), // 深上跳（尽力）
+  ];
+  const allowedRoots = ['/tmp', root, path.resolve(process.cwd(), 'data'),
+    path.resolve(process.cwd(), 'tmp'), path.resolve(os.homedir(), '.heartflow'),
+    path.resolve(os.homedir(), '.hermes', 'heartflow')];
+  let checked = 0;
+  for (const p of outside) {
+    const r = guardPath(p);
+    const resolved = path.resolve(p);
+    const inAllowed = allowedRoots.some(a => resolved === a || resolved.startsWith(a + path.sep));
+    if (inAllowed) continue; // 恰好落在白名单根内的，跳过（设计上允许）
+    checked++;
     if (r.safe !== false) {
-      throw new Error(`traversal escaping project root should be rejected: ${r.resolved} (got safe=${r.safe})`);
+      throw new Error(`allowed-roots 外的路径应被拒: ${resolved} (got safe=${r.safe})`);
     }
-    return;
   }
-  throw new Error(`测试构造失败：无法构造越出 project root 的路径（root=${root}）`);
+  if (checked === 0) throw new Error('测试构造失败：没有构造出任何 allowed-roots 外的路径');
 });
 
 // ─── S-1: MCP 三个 benchmark handler 均含 guardPath 调用 ───
