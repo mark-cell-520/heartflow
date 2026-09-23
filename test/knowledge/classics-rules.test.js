@@ -5,15 +5,23 @@
 
 const { evaluateRules, evaluate, CLASSICAL_RULES, searchClassicsBatch, parseHit } = require('../../src/knowledge/classics-rules');
 
+// [v6.7.83] 加标准汇总行：原文件只打 ✓/✗ 列表，run-all.js 抓不到
+// 「N 通过, M 失败」就被判为"静默跳过"（该测试长期不被计数）。
+let _clsPass = 0, _clsFail = 0;
 function test(name, fn) {
   try {
     fn();
+    _clsPass++;
     console.log(`  ✓ ${name}`);
   } catch (e) {
+    _clsFail++;
     console.log(`  ✗ ${name}: ${e.message}`);
     process.exitCode = 1;
   }
 }
+process.on('exit', () => {
+  console.log(`\nclassics-rules: ${_clsPass} 通过, ${_clsFail} 失败, 共 ${_clsPass + _clsFail} 个`);
+});
 
 function assert(cond, msg) {
   if (!cond) throw new Error(msg || 'assertion failed');

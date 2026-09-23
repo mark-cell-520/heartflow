@@ -48,7 +48,13 @@ module.exports = function({ test }) {
     ['parseHit tolerates null/number/unparsable', () => {
       if (parseHit(null) !== null) throw new Error('null');
       if (parseHit(123) !== null) throw new Error('number');
-      if (!parseHit('no-colon-here').file) throw new Error('unparsable');
+      // [v6.7.83] 修断言以匹配真实契约：无法解析时实现返回
+      // { file: null, line: null, raw }（保留原文，不假装有文件）。
+      // 原断言要求 .file truthy 是过头要求——该失败此前的自造汇总
+      // 让它长期隐形，本轮 run-all 静默跳过排查才暴露。
+      const r = parseHit('no-colon-here');
+      if (!r || r.file !== null) throw new Error('unparsable should keep file null');
+      if (r.raw !== 'no-colon-here') throw new Error('unparsable should keep raw');
     }],
     ['evaluateWithClassics alias works', () => {
       const out = evaluateWithClassics('老吾老以及人之老，幼吾幼以及人之幼。');
@@ -69,13 +75,11 @@ module.exports = function({ test }) {
     }]
   ];
 
+  // [v6.7.83] 每个 case 注册进 harness，不再自造汇总。
+  // 原来只 print FAILURES + exitCode：mount 视角报「0 通过, 0 失败」，
+  // 裸跑视角无「N 通过, M 失败」行 → run-all.js 两条路都抓不到，
+  // 一个真实失败（parseHit tolerates unparsable）长期隐形。
   for (const [name, fn] of cases) {
-    try { fn(); } catch (e) { failures.push(`${name}: ${e.message}`); }
-  }
-  if (failures.length) {
-    console.log('FAILURES:', failures.join('\n'));
-    process.exitCode = 1;
-  } else {
-    console.log(`classics-value-mapper: ${cases.length} cases passed`);
+    test(name, () => { fn(); });
   }
 };
