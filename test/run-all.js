@@ -272,6 +272,17 @@ async function runAllTests() {
   // 汇总
   console.log('\n' + '='.repeat(50));
   console.log(`\n测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
+  // [v6.7.87] 落一份用例数缓存，供 doc-numbers-accuracy 守卫与
+  // measure-claimed-numbers 读取——README 横幅的 "N passing tests"
+  // 从此有实测值可比对（此前只有测试文件数，用例数无从校验，
+  // 从 1,138 胀到 1754 都没人发现）。
+  try {
+    fs.mkdirSync(path.join(__dirname, '..', 'data'), { recursive: true });
+    fs.writeFileSync(
+      path.join(__dirname, '..', 'data', 'test-count.json'),
+      JSON.stringify({ passed, failed, total: passed + failed, at: new Date().toISOString() }, null, 2)
+    );
+  } catch (_) { /* 缓存写失败不影响测试结果 */ }
   if (failures.length > 0) {
     console.log('\n失败的测试:');
     for (const f of failures) console.log(`  - ${f.name} ${f.error}`);
