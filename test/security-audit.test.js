@@ -38,9 +38,25 @@ t('S1: guardPath 放行项目内 src 文件', () => {
 
 t('S1: guardPath 拒绝路径穿越 ..', () => {
   const { guardPath } = require('../src/core/path-guard.js');
-  const r = guardPath(path.join(PROJECT_ROOT, 'data', '..', '..', 'etc', 'passwd'));
-  // path.resolve 已规范化，最终落在 /etc/passwd → 应被拒
-  if (r.safe !== false) throw new Error(`traversal should be rejected, got safe=${r.safe}`);
+  // [v6.7.98] 原断言写错了：`PROJECT_ROOT/data/../../etc/passwd` 的解析结果
+  // 依赖 PROJECT_ROOT 的深度——装在 /root/.hermes/skills/ai/.../（深）时
+  // 越出 root 被拒，但装在 node_modules/@scope/pkg/（浅）时仍落在 root 内，
+  // 而 guardPath 放行**自家 root 内的任何路径**是正确设计。
+  // 第 75 轮在包内复跑时它 FAIL 过一次，根因是断言假设「穿越必越界」。
+  // 改用与安装深度无关的构造：相对 PROJECT_ROOT 逐级上跳直到越界为止。
+  const root = path.resolve(PROJECT_ROOT);
+  let deep = root;
+  for (let i = 0; i < 64 && path.resolve(deep).startsWith(root + path.sep); i++) deep = path.join(deep, '..');
+  deep = path.join(deep, '..', 'etc', 'passwd');
+  const resolved = path.resolve(deep);
+  const r = guardPath(resolved);
+  if (!resolved.startsWith(root + path.sep)) {
+    if (r.safe !== false) {
+      throw new Error(`traversal escaping project root should be rejected: ${r.resolved} (got safe=${r.safe})`);
+    }
+    return;
+  }
+  throw new Error(`测试构造失败：无法构造越出 project root 的路径（root=${root}）`);
 });
 
 // ─── S-1: MCP 三个 benchmark handler 均含 guardPath 调用 ───
@@ -65,6 +81,16 @@ t('S2: smart-upgrade-engine 不再用 execSync shell 拼接', () => {
 t('S2: _verifyGitCommit 真实工作（参数化后仍命中版本）', () => {
   const pkg = require('../package.json');
   const { execFileSync } = require('child_process');
+  const fsx = require('fs');
+  const pathx = require('path');
+  // [v6.7.98] 独立安装的 node_modules 不是 git 仓库（npm 包不带 .git），
+  // 无从验证「版本号已提交」。第 75 轮在包内复跑 run-all 时它计 1 失败——
+  // 那是**包内无 git 上下文**的预期，不是代码缺陷。显式 SKIP 而不是 FAIL。
+  if (!fsx.existsSync(pathx.join(PROJECT_ROOT, '.git'))) {
+    console.log(`SKIP S2 (当前目录非 git 仓库：npm 安装场景无从验证版本提交历史)`);
+    console.log(`     在 git 检出中运行时本项生效；v6.7.94 起由 publish 前流程保证`);
+    return;
+  }
   const log = execFileSync('git', ['-C', PROJECT_ROOT, 'log', '--oneline', '--all'], { stdio: ['ignore', 'pipe', 'ignore'] }).toString();
   const tags = execFileSync('git', ['-C', PROJECT_ROOT, 'tag', '--list'], { stdio: ['ignore', 'pipe', 'ignore'] }).toString();
   const commitHit = log.split('\n').filter(l => l.includes(pkg.version) || l.includes('v' + pkg.version)).length;
