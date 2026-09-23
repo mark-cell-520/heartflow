@@ -147,3 +147,93 @@ detect() 确实永不命中 invisible-homoglyph（ZWSP / 西里尔样本均 0 �
    属装饰性改动。已记录，等有真实收益的时机再动。
 3. `data/test-count.json` 已由 run-all 自动更新为 1856；README 横幅同步为 1,856。
 
+---
+
+## 第 3 轮 — v6.7.103
+
+**心虫决策**：`decision.decide` → chosen = **A，composite_score 0.91**（identity_alignment 100%）
+> 首轮 4 个候选直接分出胜负（不像第 2 轮那样平局）：A 0.91、B 0.80、C 0.77、D 被 feasibility 0.5 + risk 0.45 压掉。
+> A 原描述是「修 bullshit 误拦 + 补中文空话词表」，**实测后发现还有第二个同源根因**（按出现次数计），见下。
+
+### 改了什么（2 个 commit）
+
+**根因（实测定位，不是静态推断）**：`checkBullshitRecognition` 的英文 buzzword 词表里混进了
+4 个**正当工程动词**（scale/optimize/leverage/pivot），且 count 按**出现次数**计。
+两个问题叠加产生真实误拦：
+
+1. 4 个工程动词单独命中 score=0.1（进不了 findings 的 0.15 门槛，pass）；
+   两个叠加就到 0.2 → 进 findings → bullshit 命中 `REWRITE_DIMS` → 纯良性英文工程句 rewrite。
+   实测 3 组：`We should scale the service and optimize the query to reduce latency`、
+   `The team decided to pivot the roadmap and leverage the existing API layer`、
+   `To scale this system we optimize the hot path and pivot the design`。
+   **双向门禁 326 条良性样本里 0 条含 2 个英文 buzzword**，所以这个误拦从词表建立起
+   就没被抓到过——静态差集测不出来，必须用真实工程句式去撞。
+
+2. 按出现次数计，同一个空话词重复用两次也翻倍：
+   `需求颗粒度太粗，拆细到二级颗粒度`（正常需求文档表达）被判 rewrite。
+
+**1. `2658fdad` fix(bullshit)** — 四处改动：
+
+- 4 个工程动词移出 buzzword 表，单列 `ENGINEERING_VERBS` 独立记账，
+  返回 `engineering_verbs` 字段供审计，**不影响 count/score**。
+  `\b` 词边界保证 `scalable cache` / `query optimizer` 不被误伤
+  （未加边界前 scale 会吃掉 scalable）。
+- 空话浓度改按**去重词种**计，两道剔重，顺序不可换：
+  第一道同词条去重（不同位置重复用同一个词不翻倍）；
+  第二道最长匹配优先（`paradigm` 是 `paradigm shift` 的超串，无词边界可依赖，只能靠区间剔重）。
+  第二道是实测逼出来的——第一版只用字符串去重，`paradigm` 与 `paradigm shift`
+  同句命中仍计 2 种，断言当场抓红。
+- score 封顶从 1.0 收到 0.6：空话再多也不是安全红线，堆砌不该逼近 block 级的 1.0。
+- 中文词表补 15 个 2016+ 企业空话。**链路/打法/心智/落地经实测主动剔除**——
+  第一版收进去了，实测链路×2/打法×2/心智×2/落地×2 全部 rewrite，
+  这些词在施工报告、复盘文档里高频合法重复，收进去就是制造新误拦。
+
+**2. 新增 `test/bullshit-engineering-context.test.js`（27 条）**：工程动词独立记账、
+良性工程句 8 条全 pass/verify、真空话召回不退化（英文 6 + 中文 3）、
+中文高频重复词不翻倍、score 封顶、双向门禁良性侧不得因 bullshit 改写。
+
+**3. `3e895325` docs(readme)** — 测试数 1,856 → 1,884（新测试文件进 run-all 计入口径，
+commit 后从 1883 涨到 1884，同步两处）。
+
+### 负例验证（5 个注入缺陷，拒绝自证）
+
+| 注入缺陷 | 结果 |
+|---|---|
+| 工程动词放回 buzzword 表 | 10 条变红 ✅ |
+| 恢复按出现次数计 | 1 条变红 ✅ |
+| 区间剔重整体旁路 | 1 条变红 ✅ |
+| score 封顶放宽回 1.0 | 1 条变红 ✅ |
+| 中文补词删除 | 2 条变红 ✅ |
+
+5/5 全部让守卫变红，说明测试真的在守门。
+（过程记录：第一个负例「sort 改稳定排序」**没有**让测试变红——因为 paradigm(8) 与
+paradigm shift(14) 长度不同，等长才需要排序保证。换成正真实的「区间剔重旁路」后才红。
+反例选得不对会比没有反例更危险。）
+
+### 验证（全部真实执行）
+
+| 项目 | 结果 |
+|---|---|
+| `node bin/verify.js` | 14 passed 0 failed |
+| `node test/run-all.js` | **1884 passed 1 failed** |
+| `node scripts/bidirectional-guard.js` | 召回 52/52、误拦 **300/326**（基线持平，**0 新增**） |
+| `node scripts/guard-abilities.js` | 19/20（唯一红灯是全量测试口径，即下方 npm 既有项） |
+| `node test/security-audit.test.js` | **16 passed 0 failed**（S2 版本号项在 commit 落地后由红转绿） |
+| `node test/doc-numbers-accuracy.test.js` | 15 passed 0 failed |
+| `node test/bullshit-engineering-context.test.js` | 27 passed 0 failed |
+
+**误拦铁律**：0 新增（300/326 与改动前完全一致），并修掉 3 类此前未被任何基准覆盖的误拦。
+
+### 遗留
+
+1. `test/npm-package-integrity.test.js` 仍 5/6 红灯：`npm latest` 落后本地 `6.7.103`。
+   这是「不 publish」铁律的必然结果，第 1、2 轮 bump 时已是同一状态，非本轮引入。
+   guard-abilities 19/20 的唯一红灯就是它（全量测试口径）。
+2. `src/core/heartflow.js` 有一处既有的 BUILD_DATE 脏改动，与三轮都无关，未动、未提交。
+3. `dimension-health.js` 的 2 个 BROKEN（bullshitRecognition / pseudoCausal）中，
+   **bullshitRecognition 本轮已证伪**——它活着（中文 buzzword 命中正常），
+   面板的 BROKEN 判定来自探针正则反推文本，与真实句式分布不一致，属面板口径限制。
+   pseudoCausal 的 BROKEN 同理（维度本身按「精确倍数因果」设计，中文只有 2 条窄模式）。
+   「修引擎 2 个」这个面板结论**不成立**，第 4 轮若要动 dimension-health，
+   应该修面板口径而不是修引擎。
+
