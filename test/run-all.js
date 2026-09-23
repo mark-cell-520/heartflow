@@ -97,20 +97,83 @@ function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
       return;
     }
   }
-  const m = out.match(/(\d+) 通过, (\d+) 失败/);
+  // [v6.7.83] 同时识别三种汇总格式：
+  //   「N 通过, M 失败」   —— harness 标准中文汇总
+  //   「N passed, M failed」—— 自建 harness 的英文汇总
+  //   「N/M passed」        —— 只报通过数的分数式（如 blindspot-upgrade）
+  // 只认第一种曾让多个测试文件长期隐形：它们跑完了、有汇总、有 exit code。
+  let m = out.match(/(\d+)\s*(?:通过|passed),?\s*(\d+)\s*(?:失败|failed)/);
+  let ratio = null;
   if (!m) {
+    const r = out.match(/(\d+)\s*\/\s*(\d+)\s*(?:passed|通过)/);
+    if (r) {
+      const pass = parseInt(r[1], 10), total = parseInt(r[2], 10);
+      ratio = { passed: pass, failed: Math.max(0, total - pass) };
+    }
+  }
+  const parsed = m
+    ? { passed: parseInt(m[1], 10), failed: parseInt(m[2], 10) }
+    : ratio;
+  if (!parsed) {
+    // [v6.7.83] 吐不出结果行 = 静默。实测四类探针：exit1 被 execSync 的
+    // 异常路径捕获（正确），但「跑完断言却不吐 N 通过, M 失败」的测试
+    // 走到这里只打印尾巴就 return —— 不计入 passed、不计入 failed，
+    // 永久隐形。一个写了断言却忘了汇总的测试文件，等于没写。
+    // 处置：计入 1 个失败，并要求可见原因。
     const tail = out.trim().split('\n').slice(-3).join('\n');
     if (tail) console.log(tail);
+    failed += 1;
+    failures.push({
+      name: label.trim(),
+      error: '(未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)',
+    });
     return;
   }
-  passed += parseInt(m[1], 10);
-  failed += parseInt(m[2], 10);
+  passed += parsed.passed;
+  failed += parsed.failed;
+  // [v6.7.83] 「0 通过, 0 失败, 共 0 个」= mount 函数定义了但一个 test
+  // 都没注册。这在数字上合法（0 失败），实际等于该文件什么都没测。
+  // 实测探针 silent.test.js 就是如此。计入 1 个失败，逼它要么注册用例、
+  // 要么改名（不带 .test.js 后缀就不会被扫）。
+  if (parsed.passed === 0 && parsed.failed === 0) {
+    failed += 1;
+    failures.push({
+      name: label.trim(),
+      error: '(注册了 0 个用例——mount 函数未调用 test()；请补用例或移出 test/ 目录)',
+    });
+  }
   for (const line of out.split('\n')) {
     const fm = line.match(/^\s*✗\s+(.+?)\s*$/);
     if (fm) failures.push({ name: fm[1], error: `(${label.trim()})` });
   }
   const keep = out.split('\n').filter(l => l.includes('通过') || l.includes('✗') || l.includes('失败'));
   console.log(keep.join('\n') || '  (无输出)');
+}
+
+/**
+ * [v6.7.83] 按文件实际形态选 runner。
+ *
+ * 原来 CORE_TESTS 显式列表和动态接入段各写一遍三分支，且显式列表
+ * 恒用 runSubTest（裸 node）——导致 21 个核心测试里凡是 mount/jest
+ * 形态的都不吐标准结果行，被静默跳过（实测 6 个长期隐形）。
+ * 抽成一处，两条路都走它。
+ */
+function runWithBestRunner(name, rel) {
+  let src = '';
+  try { src = fs.readFileSync(path.join(TEST_DIR, rel), 'utf8'); } catch (e) {}
+  // [v6.7.83] 三种 mount 写法都要认：
+  //   module.exports = function (...)
+  //   module.exports = run                    （命名函数导出）
+  //   module.exports = ({ test }) => { ... }  （箭头函数导出）
+  // 漏认任一种都会走裸 node 而文件自己不执行 → 零输出 → 隐形。
+  const isMount = /module\.exports\s*=\s*(?:function\b|[A-Za-z_$][\w$]*\s*;|\(?[^)]*\)?\s*=>)/.test(src);
+  if (isMount) {
+    runMountTest(name, rel);
+  } else if (/\bdescribe\s*\(/.test(src) && !/require\(['"][^'"]*mini-expect/.test(src)) {
+    runJestStyleTest(name, rel);
+  } else {
+    runSubTest(name, rel);
+  }
 }
 
 function runSubTest(name, relPath, timeout = CHILD_TIMEOUT) {
@@ -170,7 +233,7 @@ async function runAllTests() {
   for (const [label, rel] of CORE_TESTS) {
     if (!fs.existsSync(path.join(TEST_DIR, rel))) continue;
     explicit.add(rel);
-    runSubTest(`  ${label}`, rel);
+    runWithBestRunner(`  ${label}`, rel);
   }
 
   // 动态接入其余测试文件（全部子进程隔离）
@@ -178,26 +241,12 @@ async function runAllTests() {
   const allTests = collectTestFiles(TEST_DIR);
   for (const rel of allTests) {
     if (explicit.has(rel)) continue;
-    if (rel.includes('/')) {
-      runSubTest('  · ' + rel, rel);
-      continue;
-    }
-    let src = '';
-    try { src = fs.readFileSync(path.join(TEST_DIR, rel), 'utf8'); } catch (e) {}
-    // [v6.7.81] 全文判断，不只看前 400 字符——mcp-guest-permission.test.js
-    // 的 module.exports 在第 79 行（前 400 字符只有注释），导致它被误判为
-    // runSubTest，子进程只定义函数不执行，输出 0 个用例被静默跳过。
-    // 一个守护 guest 权限的关键测试因此从未真正跑过。
-    const isMount = /module\.exports\s*=\s*function/.test(src);
-    if (isMount) {
-      // 导出 mount 函数：子进程 + 注入 harness
-      runMountTest('  + ' + rel, rel);
-    } else if (/\bdescribe\s*\(/.test(src) && !/require\(['"][^'"]*mini-expect/.test(src)) {
-      // jest/mocha 风格：它自己调 describe/it，靠 -r 注入全局
-      runJestStyleTest('  j ' + rel, rel);
-    } else {
-      runSubTest('  · ' + rel, rel);
-    }
+    // [v6.7.83] 子目录文件也走选 runner 逻辑。
+    // 原来 `rel.includes('/')` 恒用 runSubTest，导致子目录里的
+    // mount/jest 形态测试（如 knowledge/classics-value-mapper.test.js）
+    // 同样静默跳过——这与「前 400 字符误判」是同一家族：
+    // 用路径特征代替文件形态判断。
+    runWithBestRunner('  · ' + rel, rel);
   }
 
   // 汇总
