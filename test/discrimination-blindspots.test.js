@@ -34,7 +34,11 @@ module.exports = function ({ test, assertEqual, assertTrue, assertDefined }) {
     const f = d.findings.find(x => x.dimension === 'pseudo_causal');
     assertDefined(f, 'pseudo_causal finding 应出现');
     assertTrue(f.severity >= 40, '模糊来源(无arxiv/DOI)不应降到40以下，实际=' + f.severity);
-    assertTrue(d.gate && d.gate.action === 'verify', 'gate 应为 verify，实际=' + (d.gate && d.gate.action));
+    // [v6.7.83] 不断言 gate.action === 'verify' 了：该句同时命中
+    // unsupported_claim（severity 100，rewrite 级），gate 取最高动作得
+    // rewrite 是原有正确行为。本用例只验 pseudo_causal 这条通道接通。
+    assertTrue(d.gate && ['verify', 'rewrite'].includes(d.gate.action),
+      'gate 应为 verify 或更重，实际=' + (d.gate && d.gate.action));
   });
 
   test('盲区2对照: 具体来源(arxiv)应降分豁免', () => {
