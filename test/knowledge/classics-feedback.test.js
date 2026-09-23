@@ -10,15 +10,23 @@ const {
   suggestFromHits
 } = require('../../src/knowledge/classics-feedback');
 
+// [v6.7.86] 加标准汇总行：原先只打 ✓/✗ 列表，run-all.js 抓不到
+// 「N 通过, M 失败」判为静默跳过（该测试长期不被计数）。
+let _cfPass = 0, _cfFail = 0;
 function test(name, fn) {
   try {
     fn();
+    _cfPass++;
     console.log(`  ✓ ${name}`);
   } catch (e) {
+    _cfFail++;
     console.log(`  ✗ ${name}: ${e.message}`);
     process.exitCode = 1;
   }
 }
+process.on('exit', () => {
+  console.log(`\nclassics-feedback: ${_cfPass} 通过, ${_cfFail} 失败, 共 ${_cfPass + _cfFail} 个`);
+});
 
 function assert(cond, msg) {
   if (!cond) throw new Error(msg || 'assertion failed');

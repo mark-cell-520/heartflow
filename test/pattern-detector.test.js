@@ -22,4 +22,14 @@ function testPatternDetector() {
   console.log('PatternDetector smoke test passed');
 }
 
-testPatternDetector();
+// [v6.7.86] 补标准汇总行（同 behavior-tracker）：原先无「N 通过, M 失败」，
+// run-all.js 判为静默跳过，该测试长期不被计数。
+let _pdOk = 1;
+try {
+  testPatternDetector();
+} catch (e) {
+  _pdOk = 0;
+  console.error('PatternDetector smoke test FAILED:', e.message);
+  process.exitCode = 1;
+}
+console.log(`pattern-detector: ${_pdOk} 通过, ${1 - _pdOk} 失败, 共 1 个`);

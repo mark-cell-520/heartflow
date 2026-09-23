@@ -97,15 +97,19 @@ function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
       return;
     }
   }
-  // [v6.7.83] 同时识别三种汇总格式：
-  //   「N 通过, M 失败」   —— harness 标准中文汇总
-  //   「N passed, M failed」—— 自建 harness 的英文汇总
-  //   「N/M passed」        —— 只报通过数的分数式（如 blindspot-upgrade）
-  // 只认第一种曾让多个测试文件长期隐形：它们跑完了、有汇总、有 exit code。
-  let m = out.match(/(\d+)\s*(?:通过|passed),?\s*(\d+)\s*(?:失败|failed)/);
+  // [v6.7.86] 同时识别多种汇总格式：
+  //   「N 通过, M 失败」       —— harness 标准中文汇总
+  //   「N passed, M failed」   —— 自建 harness 英文汇总
+  //   「N passed / M failed」  —— 带斜杠分隔（compliance.test.js）
+  //   「N/M passed」           —— 只报通过数的分数式（blindspot-upgrade）
+  //   「PASS/SKIP 单行」       —— 裸跑型 smoke test
+  // 只认第一种曾让 6+ 个测试文件长期隐形：它们跑完了、有汇总、有 exit code。
+  let m = out.match(/(\d+)\s*(?:通过|passed)\s*[/,]?\s*(\d+)\s*(?:失败|failed)/);
   let ratio = null;
   if (!m) {
-    const r = out.match(/(\d+)\s*\/\s*(\d+)\s*(?:passed|通过)/);
+    // 分数式：N/M passed、N/M tests passed、合计 N/M、N/总数
+    const r = out.match(/(\d+)\s*\/\s*(\d+)\s*(?:passed|通过|tests?\b|个|条)/)
+      || out.match(/合计\s*(\d+)\s*\/\s*(\d+)/);
     if (r) {
       const pass = parseInt(r[1], 10), total = parseInt(r[2], 10);
       ratio = { passed: pass, failed: Math.max(0, total - pass) };
@@ -115,6 +119,22 @@ function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
     ? { passed: parseInt(m[1], 10), failed: parseInt(m[2], 10) }
     : ratio;
   if (!parsed) {
+    // [v6.7.83] 第四种格式：裸跑型测试的 PASS/SKIP 单行报告。
+    // 形如 `console.log('PASS version.test.js (module loads)')` 或
+    // `console.log('SKIP x (' + code + ')')`。这类文件语义上是"通过"
+    // 但完全没有计数——core/ utils/ memory/ 下 40+ 个测试全属此类。
+    // PASS → 计 1 个通过；SKIP → 不计失败但打出来（环境依赖缺失时
+    // 模块加载不了，判失败会掩盖真实情况）。
+    const passLines = (out.match(/^\s*PASS\b.*$/gm) || []).length;
+    const skipLines = (out.match(/^\s*SKIP\b.*$/gm) || []);
+    if (passLines > 0 || skipLines.length > 0) {
+      passed += passLines;
+      if (skipLines.length > 0) {
+        console.log(skipLines.slice(0, 2).join('\n'));
+      }
+      // 有输出但全 SKIP：不计失败，但要可见（已在上面打出）
+      return;
+    }
     // [v6.7.83] 吐不出结果行 = 静默。实测四类探针：exit1 被 execSync 的
     // 异常路径捕获（正确），但「跑完断言却不吐 N 通过, M 失败」的测试
     // 走到这里只打印尾巴就 return —— 不计入 passed、不计入 failed，
