@@ -116,3 +116,9 @@ heartflow-audit-report.md
 reports/
 .mcp-server.pid
 ecosystem.config.js
+
+# 运行时快照产物（src/core/state-snapshot.js 写入，非源码）
+src/core/snapshots/
+
+# TOM 引擎运行时数据（src/consciousness/tom-engine.js 写入）
+src/data/tom/
