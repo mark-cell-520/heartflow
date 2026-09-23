@@ -269,5 +269,20 @@ t('新增维度已写进文档列举（indirect_injection / multi_turn_escalatio
   }
 });
 
+t('README changelog 覆盖当前版本（v6.7.87 补充）', () => {
+  // [v6.7.87] changelog 停在 6.7.77 期间，git 已前进 8 个版本号。
+  // 数字类守卫查不到这类腐化（它不管 changelog），需单独守。
+  // 口径：README 的 Version history 必须出现当前 VERSION 号。
+  // 用 includes 而非 new RegExp——动态正则的转义层在本仓库已咬过三次
+  // （v6.7.83 的 \\b、v6.7.84 的 calledInBody、本轮初版）。
+  const ver = fs.readFileSync(path.join(HF, 'VERSION'), 'utf8').trim();
+  const src = fs.readFileSync(README, 'utf8');
+  const vStart = src.indexOf('## Version history');
+  assert.ok(vStart > 0, 'README 找不到 Version history 章节');
+  const hist = src.slice(vStart);
+  assert.ok(hist.includes('| ' + ver + ' |') || hist.includes('|' + ver + '|'),
+    `README Version history 缺少当前版本 ${ver} 的记录——changelog 落后了`);
+});
+
 console.log(`\n结果: ${pass} 通过, ${fail} 失败, 共 ${pass + fail} 个`);
 process.exit(fail > 0 ? 1 : 0);
