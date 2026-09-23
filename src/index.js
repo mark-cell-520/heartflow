@@ -1886,6 +1886,50 @@ const FALSE_URGENCY_PATTERNS = {
     /\bact fast\b/i,
     /\bonly \d+ left\b/i,
     /\bquantities limited\b/i,
+    // ─── [v6.7.106] EN 数字倒计时（心虫 decision.decide 选定 0.88 分）──
+    // 实测缺口：8/10 条真实英文营销紧迫句 count=0 干净 pass——
+    //   Only 3 minutes left, act now! / Only 2 days left to claim your reward /
+    //   Sale ends in 3 hours / This deal expires in 24 hours / 2 items left in stock /
+    //   Only 10 spots left at 50% off / The offer closes in 10 minutes /
+    //   Just 12 hours left to register at this rate
+    // 根因：EN 表数字类此前只有 `only \d+ left` 一条窄模式
+    //       （要求 only 紧贴数字紧贴 left），匹配不到「数字 + 时间单位 + 剩余」。
+    // 中文侧同类句式早已覆盖（`仅剩\d+分钟`、`\d+小时后失效`）。
+    //
+    // 护栏设计（全部实测印证，非推测）：
+    // 新模式一律要求 **营销主体语义** 共现——offer/deal/sale/discount/price/
+    // promotion/stock/spot/slot 等。良性时间句式（The meeting starts in 10
+    // minutes / The library closes in 45 minutes / The flight departs in 2
+    // hours / Your session will expire in 60 minutes）主语是会议/闭馆/航班/
+    // 会话，天然不落在营销主体集合内。
+    // ① 「营销主体 + 到期动词 + 时长」：
+    //    (this )?(offer|deal|sale|discount|promotion) (ends|expires|closes|is over) in 3 hours
+    /\b(?:offer|deal|sale|discount|promotion|price|rate)\b[^.!?]{0,40}?\b(?:ends?|expires?|closes?|end(?:ing)?|good)\b[^.!?]{0,20}?\b(?:in|within)\s*\d+\s*(?:minutes?|mins?|hours?|hrs?|days?|weeks?|seconds?|secs?)\b/i,
+    //    反向语序：in 3 hours, this offer ends
+    /\b(?:in|within)\s+\d+\s*(?:minutes?|mins?|hours?|hrs?|days?|weeks?|seconds?|secs?)\b[^.!?]{0,30}?\b(?:offer|deal|sale|discount|promotion)\b[^.!?]{0,30}?\b(?:ends?|expires?|closes?)\b/i,
+    // ② 「(only|just) + 数字 + 时间单位 + left/remaining」——不要求营销主体，
+    //    因为「只剩 X 分钟/小时」在营销外极少以 only/just 开头（实测 benign 全 pass）
+    /\b(?:only|just)\s+\d+\s*(?:minutes?|mins?|hours?|hrs?|days?|weeks?|seconds?|secs?)\s+(?:left|remaining|to go)\b/i,
+    // ③ 「数字 + 剩余量单位 + left」——spots/slots/seats/copies/units/places。
+    //    **刻意排除 tickets/items**：实测 `There are only 2 tickets left for the
+    //     6pm train from London to Oxford`（火车票余票查询，良性）被③命中，
+    //     `Only 10 items left on your to-do list` 同理。spots/slots/seats 只在
+    //     offer/register/sign up/enroll 等招募语境出现，tickets/items 在交通、
+    //     票务、任务清单语境高频合法出现，故不纳入无主体模式。
+    /\b\d+\s*(?:spots?|slots?|seats?|copies|units?|places?)\s+left\b/i,
+    //    带营销主体的限量才收 tickets/items：offer/sale/register/enroll/sign up
+    /\b(?:offer|sale|deal|discount|promotion|event|webinar|course|contests?|register|registration|enroll|enrolment?|enrollment|sign ?up)\b[^.!?]{0,40}?\b(?:only\s+)?\d+\s*(?:tickets?|items?|spots?|slots?|seats?|copies|units?|places?)\s+left\b/i,
+    // ④ 「(only|just) + 数字 + spots/slots/... + left」显式限量。
+    //    同样排除 tickets/items（同③的实测护栏依据）
+    /\b(?:only|just)\s+\d+\s*(?:spots?|slots?|seats?|copies|units?|places?)\s+left\b/i,
+    // ⑤ 库存紧迫：主体限定在 stock/inventory/warehouse/store（电商库存）。
+    //    修③排除 items 后 `2 items left in stock` 漏检的补回。`in stock`
+    //    这个词组只在零售语境出现，`Only 10 items left on your to-do list`
+    //    不含 in stock，不受影响。
+    /\b(?:only\s+|just\s+)?\d+\s*(?:items?|units?|copies|pairs?|boxes?|kits?)\s+left\s+in\s+(?:stock|inventory|our\s+warehouse|the\s+warehouse)\b/i,
+    /\b(?:stock|inventory)\b[^.!?]{0,25}?\b(?:only\s+|just\s+)?\d+\s*(?:items?|units?|copies|pairs?|boxes?|kits?)\s+left\b/i,
+    // ⑥ 「ends/expires + 营销主体 + today/tomorrow」截止日
+    /\b(?:offer|deal|sale|discount|promotion)\b[^.!?]{0,30}?\b(?:ends?|expires?)\b[^.!?]{0,20}?\b(?:today|tomorrow|tonight|midnight)\b/i,
   ],
 };
 
