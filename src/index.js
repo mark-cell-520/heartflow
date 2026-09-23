@@ -1413,9 +1413,22 @@ function checkEvidence(claim, evidence) {
 // 这类声称若无具体可验证来源（arxiv/DOI/具体机构+年份）则是编造高风险信号。
 const PSEUDO_CAUSAL_EN = [
   /\b(?:reduced?|lowered|decreased|cut|dropped|slashed)\s+(?:the\s+)?[\w\s]{0,30}?\s+by\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold)\b/i,
-  /\b(?:improved?|increased|boosted|raised|enhanced)\s+(?:the\s+)?[\w\s]{0,30}?\s+by\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold)\b/i,
+  // [v6.7.83] 补第三人称单数 + 过去分词。分支顺序：长的必须在前（improves
+  // 在 improve 前），否则 improve 先匹配吃掉一个 s，剩余 "s by 5x" 不满足
+  // \s+by，"Our product improves by 5x" 因此漏判。
+  // 与过去分词 improved/increased/...。原模式只有 `improved?`（improve/
+  // improved），"Our product improves by 5x" 与 "This release increases
+  // throughput by 3x" 都漏——grep 不到任何 hits。
+  /\b(?:improves?|improved|increases?|increased|boosts?|boosted|raises?|raised|enhances?|enhanced)\b[^.!?]{0,32}?\bby\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold|%)\b/i,
   /\bby\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold)\s+(?:compared\s+to|vs|versus|over)\b/i,
 ];
+
+// [v6.7.83] 技术基准句白名单：improves <可度量对象> by Nx 是标准性能声明
+// （latency / throughput / accuracy / rate / memory / cost 都算），
+// 不是伪因果夸大。原模式一律命中导致 "The new vLLM release improves
+// throughput by 3x"（良性技术句）被判 pseudo_causal → verify，即误拦。
+// 判别口径：无度量对象的 "improved by 5x" 才是无依据夸大。
+const METRIC_NOUNS_EN = /\b(?:throughput|latency|accuracy|precision|recall|f1|rate|speed|performance|memory|footprint|cost|price|size|capacity|bandwidth|usage|consumption|duration|time|error|revenue|growth|margin|yield|throughput)\b/i;
 const PSEUDO_CAUSAL_ZH = [
   /(?:提升|降低|减少|提高|改善)\s*\d+(?:\.\d+)?\s*(?:倍|x|次)/,
   /(?:效果|准确率|性能)\s*(?:提高|提升|改善)\s*(?:了)?\s*\d+(?:\.\d+)?\s*(?:倍|x)/,
@@ -1423,9 +1436,26 @@ const PSEUDO_CAUSAL_ZH = [
 function checkPseudoCausal(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
+  // [v6.7.83] 技术基准句豁免：**整句**含可度量对象（throughput/latency/
+  // accuracy/rate/cost...）时不算伪因果。只查命中片段不够——第 3 条模式的
+  // 匹配串是 "by 3x over"，度量对象在句子别处（"improves throughput by 3x
+  // over the previous version"）。原实现一律命中导致该良性技术句被判
+  // pseudo_causal → verify（误拦）。
+  // 反向保证：句中无可度量对象时（"Our product improves by 5x"）仍命中。
+  const hasMetric = !hasChinese && METRIC_NOUNS_EN.test(text);
+  // [v6.7.83] 夸张倍数不豁免：≥10x/times/fold 或带感叹号的性能声明
+  // 是典型营销夸大（"improves performance by 50 times!"），即使有度量
+  // 对象也不算可信基准。1-9x 的常规声明仍然豁免。
+  const isGrandiose = !hasChinese && /(?:by\s+)?\d{2,}(?:\.\d+)?\s*(?:x|times|fold)\b/i.test(text)
+    || /\d+\s*(?:x|times|fold)\s*!/.test(text)
+    || /(?:improves?|increased?|boosted?)\b[^.!?]*![^.!?]*\d+\s*(?:x|times|fold)/i.test(text);
+  const exempt = hasMetric && !isGrandiose;
   const patterns = hasChinese ? PSEUDO_CAUSAL_ZH : PSEUDO_CAUSAL_EN;
   const hits = [];
-  for (const pat of patterns) { const m = text.match(pat); if (m) hits.push(m[0].slice(0, 50)); }
+  for (const pat of patterns) {
+    const m = text.match(pat);
+    if (m && !exempt) hits.push(m[0].slice(0, 50));
+  }
   const count = hits.length;
   // 收紧 source 豁免：仅具体可验证来源降分，模糊来源词（a study/research shows）不算真 source
   const specificSource = /\b(?:arxiv|doi:|github\.com|benchmark\s+(?:name|set)|test\s+set\s+[A-Z]|[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+\d{4})\b/i.test(text);

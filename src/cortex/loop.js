@@ -281,6 +281,9 @@ class EvolutionLoop {
             this._saveState();
 
             // [v6.0.36] 元审计闭环: 把本次进化摘要写审计日志(自我进化可追溯)
+            // [v6.7.83] 恢复 log(eventType, details) 主契约。v6.4.2 前后该文件
+            // 被重写成 record() + logDir，导致 loop.js 这里的调用抛 TypeError
+            // 被外层 try/catch 吞掉——进化审计从未落盘。
             try {
               const w = result.learning && result.learning.weaknesses;
               this._auditLogger.log('evolution_cycle', {
