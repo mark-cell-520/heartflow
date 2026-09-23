@@ -23,7 +23,25 @@
 
 'use strict';
 
-// ─── S1: 假精确 — 精确数字伪装 ──────────────────────────────
+// ─── S1: 假精确 — 精确数字伪装 ───────────────────────────────
+// [v6.7.93] 度量名词豁免（心虫 C 排查后由 D 修复，0.82）
+// 原来 `latency dropped 40%` 命中 S1（第 29 行的"精确百分比"模式），
+// 但这是**有具体度量名词的性能数据**，不是假精确。第 68 轮正是因此
+// 才没有把 perfect_error 接进 allDims（接了会升误拦）。
+// 判据与 src/index.js 的 PSEUDO_CAUSAL 豁免一致：句中含具体度量名词时，
+// 精确百分比是合法测量值。**不含度量名词的裸百分比仍算假精确**——
+// "市场份额达到 87.3%" 这种没有来源的数字才是目标。
+// ⚠️ 不能加 share/percentage/ratio/index/market：`market share reached 87.3%`
+// 恰是假精确的典型目标（第 70 轮加过 share，结果把该句豁免掉了）。
+// 豁免词必须是**可测量、有采集手段的量**，不能是任何能接百分比的名词。
+const METRIC_NOUNS_EN = /\b(?:throughput|latency|accuracy|precision|recall|f1|rate|speed|performance|memory|footprint|cost|price|size|capacity|bandwidth|usage|consumption|duration|time|error|revenue|growth|margin|yield|p50|p95|p99|qps|rps|sla|coverage|availability|uptime|downtime|retention|conversion|engagement|frequency|volume|count)\b/i;
+const METRIC_NOUNS_ZH = /(?:吞吐|延迟|准确率|召回|精确率|性能|内存|耗时|成本|价格|容量|带宽|占用|速率|错误率|收入|增幅|毛利|产量|占用率|成功率|转化率|转化|点击率|留存率|活跃|渗透率|覆盖率|命中率|故障率|响应时间|并发|负载|QPS|TPS|DAU|MAU|GMV|ROI|人效|坪效|折扣率|复购率|客单价|完播率|播放量|阅读量|打开率|退订率|退款率|投诉率|满意度|NPS|CSAT|回撤|最大回撤|夏普|波动率|久期|基准|净值|权益|杠杆率|不良率|拨备|保险费率|佣金率|中签率|完成率|达标率|合格率|及格率|出勤率|上线率|交付率|增量率)/;
+// [v6.7.93] 来源语境豁免：句中出现"报告显示/年报/审计/调查/统计"这类
+// 明确来源标记 + 度量名词时，精确百分比是**有出处的引用数据**，不是假精确。
+// 这是 test/unsupported-claim-exemption.test.js 第 45 轮固化的契约——
+// 接线 perfect_error 后它立刻变红（「报告显示，2024年公司营收增长15%，
+// 数据来自年报审计」从 pass 变 verify），说明豁免必须两个条件都查。
+const SOURCED_CONTEXT = /(?:报告|年报|季报|月报|审计|调查|统计|调研|白皮书|财报|披露|公告|数据(?:来|出自|来源)|根据.{0,12}(?:报告|数据|统计)|研究(?:报告|显示|表明)|survey|report|study|research|census|audit)/i;
 const FALSE_PRECISION_PATTERNS = [
   /\d+\.\d+\s*(?:%|percent|倍|万|亿|million|billion|trillion)/gi,              // 87.3% / 12.5 million（%后不跟\b，JS的\b对%边界有怪癖）
   /\d+(?:\.\d+)?\s*(?:%|percent)[^。\n]{0,25}/gi,                                // 精确百分比
@@ -102,10 +120,18 @@ function checkPerfectError(text) {
   const signals = [];
 
   // S1: 假精确
+  // [v6.7.93] 度量名词豁免：含具体度量名词时，精确百分比是合法测量值。
+  // 「latency dropped 40%」「准确率提升到 91.2%」是工程结论不是伪装精确。
+  // 反面仍算假精确：「市场份额达到 87.3%」（无度量名词、无来源）。
+  const hasMetricNoun = METRIC_NOUNS_EN.test(text) || METRIC_NOUNS_ZH.test(text);
+  // 来源语境：明确标注了报告/年报/调查等出处时，数字是引用而非伪装
+  const isSourced = SOURCED_CONTEXT.test(text);
   const precisionHits = [];
-  for (const pat of FALSE_PRECISION_PATTERNS) {
-    const m = text.match(pat);
-    if (m && m.length) precisionHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+  if (!hasMetricNoun && !isSourced) {
+    for (const pat of FALSE_PRECISION_PATTERNS) {
+      const m = text.match(pat);
+      if (m && m.length) precisionHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+    }
   }
   if (precisionHits.length) {
     signals.push({ id: 'S1_false_precision', name: '假精确', count: precisionHits.length, hits: precisionHits.slice(0, 3), weight: 0.8 });
@@ -150,10 +176,21 @@ function checkPerfectError(text) {
   }
 
   // S5: 绝对断言
+  // [v6.7.93] 三处领域/语境豁免（都是第 70 轮接线后被基准抓到的真误拦）：
+  //  ① 法律/医学专有名词里的"完全"：「完全民事行为能力」不是断言强度
+  //  ② **流程陈述里的"所有"**：「所有审批都在 OA 系统里完成」是规则描述，
+  //     「所有用户都喜欢这个功能」才是夸大——判据是"所有"后接流程/存在动词
+  //     （都在/均须/都走/都需/都通过）时不算断言，与第 12 轮 dehumanization
+  //     的"需指人共现"同款思路：先限定语境再谈强度。
+  //  ③ SOURCE_WORDS 已在上方 S1 侧处理，此处不重复。
+  const LEGAL_MEDICAL_FULL = /完全(?:民事行为(?:能力|权利)|刑事(?:责任|行为能力)|行政(?:责任|能力)|缓解|抗原|康复|治愈|停产|停业)/;
+  const PROCEDURAL_ALL = /(?:所有|全部|一切|任何)\s*[^。，,]{0,12}(?:都在|均须|都要|都须|必须|须经|都走|都需|都通过|都由|均在此|都是.{0,4}(?:系统|流程|平台|规定)|按|均按照)/;
   const absoluteHits = [];
-  for (const pat of ABSOLUTE_CLAIMS) {
-    const m = text.match(pat);
-    if (m && m.length) absoluteHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+  if (!LEGAL_MEDICAL_FULL.test(text) && !PROCEDURAL_ALL.test(text)) {
+    for (const pat of ABSOLUTE_CLAIMS) {
+      const m = text.match(pat);
+      if (m && m.length) absoluteHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+    }
   }
   if (absoluteHits.length) {
     signals.push({ id: 'S5_absolute_claim', name: '绝对断言', count: absoluteHits.length, hits: absoluteHits.slice(0, 3), weight: 0.6 });
