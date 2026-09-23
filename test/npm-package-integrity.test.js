@@ -70,6 +70,19 @@ t('files 含 src/', () => {
     `files=${JSON.stringify(pkg.files)}，缺 src/`);
 });
 
+// [v6.7.94] 验收工具链必须进发布包。
+// 第 73 轮的教训：test/run-all.js 改过（零输出重试），但 files 白名单从来
+// 不含 test/——"本地修好了、用户没拿到"。本地复验因为 require 的是本仓库
+// 的 gate.js，根本看不出包内容缺失；只有独立安装后读
+// node_modules/@yun520-1/heartflow/test/run-all.js 才暴露。
+t('files 含 bin/ test/ scripts/（验收工具链随包发布）', () => {
+  const need = ['bin/', 'test/', 'scripts/'];
+  const missing = need.filter(x => !(pkg.files || []).includes(x));
+  assert.strictEqual(missing.length, 0,
+    `files 缺 ${missing.join(', ')} —— 这些是用户跑验收用的工具链，` +
+    `不进包等于本地修好但用户拿不到（v6.7.94 踩过）`);
+});
+
 t('本地 pack 包含 index.js require 的每个 src 兄弟模块', () => {
   const r = cp.spawnSync('npm', ['pack', '--dry-run'],
     { encoding: 'utf8', timeout: 200000, cwd: HF, maxBuffer: 1e8 });
