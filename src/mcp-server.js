@@ -358,6 +358,23 @@ version = getVersion();
 
 // ═══════════════════════════════════════════════
 
+/**
+ * [v6.7.81] Unix socket 通道的身份提取。
+ *
+ * socket 没有 HTTP headers，身份只能来自 JSON-RPC 消息自身的 meta 字段
+ * （若客户端传了 `_meta.authorization` / `_meta.oid`）。没传就是 guest。
+ *
+ * 不再传 `{__stdio: true}`：那会让 Unix socket 无条件获得 admin，
+ * 使 tools/call 的 guest 写权限拦截对 socket 通道完全不可达。
+ */
+function httpHeadersFor(req) {
+  const meta = (req && (req._meta || (req.params && req.params._meta))) || {};
+  const out = {};
+  if (meta.authorization) out.authorization = meta.authorization;
+  if (meta.oid) out['x-heartflow-oid'] = meta.oid;
+  return out;
+}
+
 function handleUnixClient(socket) {
 
   let buf = '';
@@ -379,9 +396,16 @@ function handleUnixClient(socket) {
       try {
 
         const req = JSON.parse(line);
-        // stdio 模式：本地管道调用无 HTTP headers，视为受信 → admin。
-        // （否则 stdio 模式下写工具全部不可用，而 stdio 本是本地专用通道。）
-        const result = await handleRequest(req, null, { __stdio: true });
+        // [v6.7.81] Unix socket 通道不再复用 stdio 的 `{__stdio: true}`。
+        // 原代码把 socket 与 stdio 同等对待 → 无条件 admin → 第 4463 行
+        // 的 guest 写权限拦截对 socket 通道 100% 不可达。
+        // 症状：HTTP 层正确拦截 guest，Unix socket 层四个写工具全部放行。
+        // 该缺陷长期潜伏，因为唯一守护它的测试（mcp-guest-permission.test.js）
+        // 被 run-all.js 的"前 400 字符判断 module.exports"误判成子进程直跑，
+        // 输出 0 用例被静默跳过——测试自己也没跑过。
+        // stdio 是 stdin 管道，天然本地独占；Unix socket 是文件系统节点，
+        // 本机任何进程都能连，必须按普通通道验身份。
+        const result = await handleRequest(req, null, httpHeadersFor(req));
 
         if (result !== null) {
 

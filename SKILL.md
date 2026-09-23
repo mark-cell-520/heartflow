@@ -127,8 +127,10 @@ low scores degrade to advice. `_trackDecisionConsequence()` updates success-rate
 stats after each execution.
 
 **Engram conditional memory**
-Sparse task-conditioned recall with TTL, persisted to `data/engram-index.json`.
-Supports `store`, `recall`, `recallByDecision`, and `sparseAccess`.
+Sparse task-conditioned recall with TTL, persisted to `data/engram-index.json`
+(created on first `store` — the file does not exist in a fresh checkout, and code
+must not assume it is there). Supports `store`, `recall`, `recallByDecision`, and
+`sparseAccess`.
 
 **SWA bounded replay**
 Decision memory is replayed within a bounded recent window. `recallByDecision(type,
