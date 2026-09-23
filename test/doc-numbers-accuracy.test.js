@@ -72,6 +72,21 @@ function measure() {
   `], { encoding: 'utf8', timeout: 60000 });
   const routes = parseInt((r.stdout || '').trim().split('\n').pop(), 10) || 0;
 
+  // [v6.7.87] 用例数：读 run-all.js 每次跑完写下的 data/test-count.json。
+  // 与 scripts/measure-claimed-numbers.js 保持同一口径。
+  let testCases = 0;
+  let testFailed = 0;
+  {
+    const cf = path.join(HF, 'data/test-count.json');
+    try {
+      if (fs.existsSync(cf)) {
+        const d = JSON.parse(fs.readFileSync(cf, 'utf8'));
+        testCases = d.passed || 0;
+        testFailed = d.failed || 0;
+      }
+    } catch (_) { /* 无缓存 → 0，下面断言会提示先跑 run-all */ }
+  }
+
   return {
     dimensions: checkFns.size,
     block: tier('BLOCK_DIMS'),
@@ -80,6 +95,8 @@ function measure() {
     mcpTools: tools.size,
     handlers: handlerKeys.size,
     routes,
+    tests: testCases,
+    testFailed,
   };
 }
 
@@ -110,6 +127,17 @@ t('README.md 维度/工具/路由/测试数匹配', () => {
   assert.strictEqual(parseInt(m[1], 10), M.dimensions, `README 维度 ${m[1]} != ${M.dimensions}`);
   assert.strictEqual(parseInt(m[4].replace(/,/g, ''), 10), M.mcpTools, `README 工具 ${m[4]} != ${M.mcpTools}`);
   assert.strictEqual(parseInt(m[5].replace(/,/g, ''), 10), M.routes, `README 路由 ${m[5]} != ${M.routes}`);
+  // [v6.7.87] 补校验第 6 个字段（测试数）——此前守卫只查前三个，
+  // 横幅里的 "1,138 passing tests" 从未被比对过，于是从 1,138 一路
+  // 胀到 1754 都没人发现。这是第 45 轮「横幅守卫查不到行内引用」
+  // 的同一家族：守卫没覆盖横幅的每个字段。
+  const testsClaimed = parseInt(m[6].replace(/,/g, ''), 10);
+  assert.ok(testsClaimed >= M.tests,
+    `README 测试数 ${testsClaimed} < 实际 ${M.tests}（宣称少于实际=少报）`);
+  assert.ok(testsClaimed <= M.tests + 50,
+    `README 测试数 ${testsClaimed} 远超实际 ${M.tests}（多报 ${testsClaimed - M.tests} 个）`);
+  assert.strictEqual(testsClaimed, M.tests,
+    `README 测试数 ${testsClaimed} != 实际 ${M.tests}（应完全一致）`);
 });
 
 t('README.md 行内 46→50 引用已更新', () => {

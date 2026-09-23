@@ -68,7 +68,7 @@ try {
   modules = parseInt((r.stdout || '').trim().split('\n').pop(), 10) || 0;
 } catch (_) {}
 
-// 7. 测试数
+// 7. 测试数（文件数 + 用例数）
 let tests = 0;
 {
   const ra = fs.readFileSync(path.join(ROOT, 'test/run-all.js'), 'utf8');
@@ -77,6 +77,22 @@ let tests = 0;
     .flatMap(e => e.isDirectory() ? walk(path.join(d, e.name))
       : (e.name.endsWith('.test.js') || e.name.endsWith('-test.js') ? [e.name] : []));
   tests = walk(path.join(ROOT, 'test')).length;
+}
+
+// [v6.7.87] 用例数：读 run-all.js 每次跑完写下的 data/test-count.json。
+// 此前 measure 只有文件数，README 横幅的 "N passing tests"（用例数）
+// 无从比对，从 1,138 胀到 1754 都没人发现。
+let testCases = 0;
+let testCasesFailed = 0;
+{
+  const cf = path.join(ROOT, 'data/test-count.json');
+  try {
+    if (fs.existsSync(cf)) {
+      const d = JSON.parse(fs.readFileSync(cf, 'utf8'));
+      testCases = d.passed || 0;
+      testCasesFailed = d.failed || 0;
+    }
+  } catch (_) { /* 无缓存就报 0，守卫会提示先跑 run-all */ }
 }
 
 // 8. src 文件数
@@ -104,4 +120,5 @@ console.log(`HANDLERS 键数         : ${handlers}`);
 console.log(`ALLOWED_ROUTES 路由数 : ${routes}`);
 console.log(`_modules 模块数       : ${modules}`);
 console.log(`测试文件数            : ${tests}`);
+console.log(`测试用例数            : ${testCases} 通过 / ${testCasesFailed} 失败${testCases ? '' : '（无缓存，先跑 node test/run-all.js）'}`);
 console.log(`src JS 文件数         : ${srcFiles}`);
