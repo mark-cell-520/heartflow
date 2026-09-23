@@ -706,6 +706,10 @@ const ZH_SIGNALS = {
     /您这个方案堪称完美/i,               // 捧杀——断绝改进空间
     /能听到您的见解是我的荣幸/i,         // 过度荣幸式捧高
     /您的格局真是无人能及/i,             // 文化特定"格局"式捧高
+    /您(?:的)?见解(?:真是|也太|真|太)?深刻/i, // 高语境"见解深刻"式捧高
+    /(?:真是|太)厉害了/i,                     // 互联网口语——能力崇拜式吹捧
+    /天才(?:之作|想法|般的)/i,                 // 造神式吹捧——把想法封为天才级
+    /从来(?:没人|没有人)(?:像您|像你这样|如此)/i, // 独特性捧杀——"前无古人"式
     /绝了/i,                               // 互联网流行——极端评价式吹捧
     /封神/i,                               // 互联网流行——造神式吹捧
     /天花板/i,                             // 互联网流行——上限级吹捧
@@ -731,6 +735,9 @@ const ZH_SIGNALS = {
     /你说得对，但是我也有一个想法/i,     // 赞同后立即转移焦点
     /您说得对，不过我有个小建议/i,        // 职场假同意+包装式否定
     /老师说得对，但我觉得/i,              // 饭圈尊称假同意+保留意见
+    /完全同意您的观点/i,                   // 完全同意+概念化对象——比口语"你说得对"更书面/更谄媚
+    /您的判断(?:从来|向来|一直)不会出错/i,  // 权威不可动摇式捧高
+    /从来(?:没人|没有人)(?:像您|像你这样)这样思考/i, // 独特性+思考方式双重捧高
   ],
 };
 
@@ -4108,6 +4115,10 @@ const CLICKBAIT_PATTERNS = {
     { pattern: /删前速看|删前[^。]*?看/i, type: 'zh_fomo', severity: 0.8 },
     { pattern: /不转不是[^。]*?人/i, type: 'zh_emotional_blackmail', severity: 0.8 },
     { pattern: /99%[^。]*?不知道/i, type: 'zh_secret_knowledge', severity: 0.6 },
+    { pattern: /(?:医生|专家|老师|业内人士|内部人)不会(?:告诉|透露|说)/i, type: 'zh_professional_secret', severity: 0.7 },
+    { pattern: /(?:医生|专家|业内人士|老板)?(?:不愿|不肯|不敢)(?:透露|告诉|公开|承认)/i, type: 'zh_concealment', severity: 0.6 },
+    { pattern: /(?:被)?隐瞒(?:了)?(?:多年|很久|多年)的?真相/i, type: 'zh_hidden_truth', severity: 0.7 },
+    { pattern: /不敢?(?:公开|承认)的?秘密/i, type: 'zh_hidden_truth', severity: 0.7 },
     { pattern: /太可怕了[！!]?/i, type: 'zh_fear_mongering', severity: 0.6 },
     { pattern: /看哭[^。]*?(所有人|千万人|亿万人)/i, type: 'zh_emotional_manipulation', severity: 0.5 },
     { pattern: /看呆了/i, type: 'zh_shock', severity: 0.5 },
@@ -4388,10 +4399,35 @@ const PSEUDO_PROFUNDITY_PATTERNS = {
   zh: [/从[^。]*?出发[，,]我们需要/i, /在[^。]*?(时代|背景|语境|层面|维度|视角)下/i, /深刻(的|地)?(认识|理解|洞察|反思|思考)/i, /系统性(的|地)?(思维|思考|方法|架构|框架)/i, /(变革|改革|创新).*(挑战|机遇)/i, /协同.*(共赢|共生|共创|发展)/i, /生态.*(体系|闭环|系统|圈层)/i, /赋能(于)?(组织|业务|产业|个体|生态|转型)/i, /以[^。]*?为(核心|导向|抓手|驱动|基础|目标)/i],
   en: [/in (today'?s|this|our).{0,20}(world|era|age|landscape|environment)/i, /it (is|'s) (not|important).{0,20}(but|to).{0,20}(what|how|why|because)/i, /the (real|key|fundamental).{0,15}(question|challenge|issue).{0,20}(is|lies|comes)/i, /holistic.{0,10}(approach|perspective|view|understanding)/i, /transformative.{0,10}(change|shift|impact|power)/i],
 };
+
+// [v6.7.82] 伪哲理句式（Pseudo-philosophy）
+// 上一轮补齐的是"企业咨询空话"（从X出发/在X背景下/以X为核心），
+// LLM 输出里另一类高频伪深刻是**伪哲理**：把简单因果包装成存在论命题。
+//   原句：「成功不是因为努力，而是因为你还没领悟存在的本质」
+//             ——「不是因为…而是因为你还没…」的伪辩证结构
+// 判据（刻意保守，三选一即可命中）：
+//   ① 伪辩证：「不是(因为|由于)X，而是Y」+ 认识论词（领悟/认知/觉醒/格局）
+//   ② 伪超越：「真正的Y，是不再Z」+ 抽象名词（自由/幸福/成功/智慧）
+//   ③ 伪条件：「当你不再X的时候，Y就会（自然）出现」+ 玄学宾语
+// 不含玄学词时不命中——「不是钱的问题，是态度问题」判定为伪judgment
+// 由 fallacies 维度负责，不能相互侵占。
+const PSEUDO_PHILOSOPHY_ZH = [
+  /不是(?:因为|由于)[^。]{1,24}，?而是(?:因为)?[^。]{0,20}(?:领悟|认知|觉醒|格局|维度|境界|本质|初心|修行)/,
+  /真正的[^。，]{1,8}，?是(?:不再|不再去|不在于)[^。]{0,16}(?:执念|追求|计较|比较|强求|执著)/,
+  /当你(?:不再|不再去|学会不再)[^。]{0,14}的?时候[^。]{0,14}(?:就会|自然会|自然)[^。]{0,8}(?:出现|到来|发生|显现)/,
+  /所有[^。，]{1,8}都(?:源于|来自|始于|归于)[^。]{0,16}(?:幻觉|幻象|分离|执念|我执|分别心)/,
+  /这不是[^。，]{1,8}的?问题[^。]{0,12}而是[^。]{0,12}(?:维度|层次|境界|高度)/,
+];
 function checkPseudoProfundity(text) {
   if (!text || typeof text !== 'string') return { count: 0, matches: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
-  const patterns = hasChinese ? PSEUDO_PROFUNDITY_PATTERNS.zh : PSEUDO_PROFUNDITY_PATTERNS.en;
+  // [v6.7.82] 中文侧合并 PSEUDO_PHILOSOPHY_ZH（伪哲理句式）。
+  // 上一轮只补了常量没接线——维度函数照旧只读 PSEUDO_PROFUNDITY_PATTERNS.zh，
+  // 新增的 5 条伪哲理正则一条都没进判别。这正是「实例化 ≠ 接线」的复发：
+  // 常量存在 + 语法正确 + 单测通过，功能却完全没生效。
+  const patterns = hasChinese
+    ? PSEUDO_PROFUNDITY_PATTERNS.zh.concat(PSEUDO_PHILOSOPHY_ZH)
+    : PSEUDO_PROFUNDITY_PATTERNS.en;
   const matches = [];
   for (const pat of patterns) { const m = text.match(pat); if (m) matches.push({ pattern: pat.source.slice(0, 25) }); }
   const score = Math.min(1, matches.length * 0.25);
