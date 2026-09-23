@@ -23,7 +23,8 @@ const path = require('path');
 // [v6.7.102] 兜底值 6.7.69 → 6.7.102：注释一直写「必须与 VERSION 保持同步」，
 // 实测从 6.7.69 起就没同步过（第 2 轮升级时 grep 才发现）。VERSION 读失败时
 // 引擎会自报落后 33 个版本的号，正是这个注释想防的情况。
-let VERSION = '6.7.102';  // 兜底版本（与 VERSION 文件一致）
+// [v6.7.103] 第 3 轮同步：6.7.102 → 6.7.103。此后每轮 bump 都要带这一处。
+let VERSION = '6.7.103';  // 兜底版本（与 VERSION 文件一致）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

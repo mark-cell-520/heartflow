@@ -2700,20 +2700,43 @@ function crossAnalyze(discResult) {
 
 // ─── 第17维: 废话/伪深度空话检测 ──────────────────────────────────
 // 检测伪深度的"看起来有道理实际上没信息"的空话
+//
+// [v6.7.103] 英文词表中的 4 个词是**正当工程动词**，不能算空话标志：
+//   scale / optimize / leverage / pivot
+// 实测（第 3 轮）：这 4 个词单独命中时 score=0.1（进不了 findings 0.15
+// 门槛，pass），但两个一叠加就到 0.2 → 进 findings → bullshit 在
+// REWRITE_DIMS → 纯良性英文工程句被判 rewrite：
+//   "We should scale the service and optimize the query to reduce latency"
+//   "To scale this system we optimize the hot path and pivot the design"
+// 双向门禁 326 条良性样本里 0 条含 2 个英文 buzzword，所以这个误拦
+// 从 v6.7.13 词表建立起就没有被抓到过。
+// 判据：这 4 个词单列为 ENGINEERING_VERBS，命中时**不计入 count**。
+// 依据是词义本身（scale 服务/optimize 查询/leverage API/pivot 设计
+// 在工程语境里是有信息量的实义动词），不是频率统计。
 function checkBullshitRecognition(text) {
   const zhPatterns = [
+    // [v6.7.103] 补 2016 年后中文企业空话的常用词。原表停在 2010 年代
+    // (赋能/闭环/颗粒度)，「抓手/组合拳/赛道/私域/中台/拉新/心智/链路/
+    //  打法/势能/风口/生态位/下沉市场/第二增长曲线」这一类整句 pass。
     '存在即合理', '一切都是最好的安排', '格局打开', '提升认知', '底层逻辑',
     '赋能', '闭环', '颗粒度', '打透', '高频', '低维', '高维', '降维打击',
     '认知升级', '觉醒', '共振', '能量', '频率', '磁场', '修炼', '道法术器',
     '顿悟', '开悟', '涅槃',
+    '抓手', '组合拳', '赛道', '私域', '中台', '拉新', '势能', '风口',
+    '生态位', '下沉市场', '第二增长曲线', '用户增长', '增长飞轮', '顶层设计', '裂变',
   ];
+  // [v6.7.103] 正当工程动词——命中不计入空话分。必须是完整词
+  // （\\b 边界），否则 scale 会吃掉 scalable、optimize 会吃掉
+  // optimizer，而 scalable cache / query optimizer 正是最典型的
+  // 良性工程名词。
+  const ENGINEERING_VERBS = ['scale', 'optimize', 'leverage', 'pivot'];
   const enPatterns = [
-    'think outside the box', 'paradigm shift', 'synergy', 'synergistic', 'leverage', 'disrupt',
+    'think outside the box', 'paradigm shift', 'synergy', 'synergistic', 'disrupt',
     'game-changer', 'quantum leap', 'deep dive', 'touch base', 'circle back',
-    'pivot', 'scale', 'moving forward', 'at the end of the day',
+    'moving forward', 'at the end of the day',
     'holistic', 'groundbreaking', 'cutting edge', 'best in class', 'world class',
     'revolutionary', 'transformative', 'next level', 'core competency', 'core competencies',
-    'optimize', 'synergistic', 'paradigm',
+    'paradigm',
   ];
 
   const bs = [];
@@ -2727,17 +2750,75 @@ function checkBullshitRecognition(text) {
   }
 
   for (const p of enPatterns) {
-    const re = new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    const re = new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
     let match;
     while ((match = re.exec(text)) !== null) {
       bs.push({ pattern: match[0], type: 'en_buzzword' });
     }
   }
 
-  const count = bs.length;
-  const score = count > 0 ? Math.min(1, count * 0.1) : 0;
+  // [v6.7.103] 工程动词单独记账，不进 bs（不影响 count/score）
+  const engHits = [];
+  for (const v of ENGINEERING_VERBS) {
+    const re = new RegExp('\\b' + v + '\\b', 'gi');
+    let match;
+    while ((match = re.exec(text)) !== null) {
+      engHits.push({ pattern: match[0], type: 'en_engineering_verb' });
+    }
+  }
 
-  return { count, bs, score };
+  // [v6.7.103] 空话浓度按**去重词种**计，不按出现次数计。
+  // 原实现 count = bs.length（出现次数），导致同一个空话词重复两次就
+  // 从 0.1 涨到 0.2 → 进 findings → rewrite。实测良性句「需求颗粒度太粗，
+  // 拆细到二级颗粒度」（同一个词用两次，职责内正常表达）被判 rewrite。
+  // 同理「全链路压测通过，链路追踪也没问题」也踩过这条。
+  //
+  // 去重键是**命中的词条本身**（大小写归一），不是位置。但 buzzword 表里
+  // 存在自然重叠：'paradigm shift' 与 'paradigm' 是两条独立词条，
+  // 一句里同时命中会计成 2 种。这是**词表结构问题**，不是计数 bug——
+  // 处理办法是让短词条在已被长词条覆盖时不重复计数（最长匹配优先）。
+  // 做法：把命中区间按 start/end 收集，按 end-start 降序排序后做
+  // 区间剔重，只保留互不重叠的命中。
+  // 为什么不用简单字符串去重：scale 与 scalable 在 \\b 下不会都命中，
+  // 但 paradigm 与 paradigm shift 没有边界可依赖（后者是前者的超串）。
+  const engHitsAll = engHits; // 工程动词不参与区间剔重（不计分）
+  // 收集 buzzword 命中位置。两道剔重，顺序不能换：
+  //   第一道：同一词条只留一段（不同位置重复用同一个空话词不翻倍）
+  //     ——「需求颗粒度太粗，拆细到二级颗粒度」两个位置同词条，计 1 种。
+  //   第二道：最长匹配优先，短词条区间被长词条覆盖则丢弃
+  //     ——'paradigm shift' 与 'paradigm' 是两条独立词条，后者是前者超串，
+  //        同句命中时只该算 1 种。
+  const spans = [];
+  for (const b of bs) {
+    const needle = b.pattern;
+    let from = 0;
+    for (;;) {
+      const at = text.toLowerCase().indexOf(needle.toLowerCase(), from);
+      if (at < 0) break;
+      spans.push({ start: at, end: at + needle.length, pattern: needle, type: b.type });
+      from = at + 1;
+    }
+  }
+  // 第一道：同词条去重（保留首次出现位置，便于审计）
+  const byPattern = new Map();
+  for (const s of spans) {
+    const key = s.pattern.toLowerCase();
+    if (!byPattern.has(key)) byPattern.set(key, s);
+  }
+  const uniq = [...byPattern.values()];
+  // 第二道：最长匹配优先，区间被覆盖则丢弃
+  uniq.sort((a, b) => (b.end - b.start) - (a.end - a.start));
+  const kept = [];
+  for (const s of uniq) {
+    const overlaps = kept.some(k => s.start < k.end && k.start < s.end);
+    if (!overlaps) kept.push(s);
+  }
+  const diversity = kept.length;
+  const count = diversity;
+  // diversity 1 → 0.1（进不了 findings 门槛）；2 → 0.2；3 → 0.3；封顶 0.6
+  const score = count > 0 ? Math.min(0.6, count * 0.1) : 0;
+
+  return { count, bs, score, diversity, hit_spans: kept, engineering_verbs: engHitsAll };
 }
 
 // ─── 煤气灯效应检测（Gaslighting Detection）───────────────────────────
