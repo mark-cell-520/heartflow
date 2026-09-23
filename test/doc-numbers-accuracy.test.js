@@ -121,7 +121,12 @@ const README = path.join(HF, 'README.md');
 const SKILL = path.join(HF, 'SKILL.md');
 
 t('README.md 维度/工具/路由/测试数匹配', () => {
-  const src = fs.readFileSync(README, 'utf8');
+  // [v6.7.87] 只读 Version history 之前的正文。changelog 里的
+  // "1,754 passing, 0 failing" 是 6.7.86 当时的真实事实，属历史记录，
+  // 不该按当前宣称校验（否则每次测试数增长都会把旧记录判成"少报"）。
+  let src = fs.readFileSync(README, 'utf8');
+  const vh = src.indexOf('## Version history');
+  if (vh > 0) src = src.slice(0, vh);
   const m = src.match(/(\d+)\s+discrimination dimensions\s*[×x]\s*(\d+)-layer pipeline\s*[×x]\s*(\d+)\s+modules\s*[×x]\s*([\d,]+)\s+MCP tools\s*[×x]\s*([\d,]+)\s+dispatch routes\s*[×x]\s*([\d,]+)\s+passing tests/);
   assert.ok(m, 'README.md 找不到数字横幅（格式可能变了）');
   assert.strictEqual(parseInt(m[1], 10), M.dimensions, `README 维度 ${m[1]} != ${M.dimensions}`);
