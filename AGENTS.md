@@ -111,16 +111,16 @@ read only one field, read `gate.action`.
 ## The 50 dimensions
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
-> `VERIFY_DIMS` sets in `src/index.js` (v6.7.77).** The three tiers add up to 44;
-> the other 6 dimensions are scored but do not force a gate action.
+> `VERIFY_DIMS` sets in `src/index.js` (v6.7.101).** The three tiers add up to 45;
+> the other 5 dimensions are scored but do not force a gate action.
 
 **Block-level (9):** hate_speech, dehumanization, prompt_injection, code_security,
 deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
 indirect_injection
 
-**Rewrite-level (9):** emotional_manipulation, gaslighting, double_bind,
+**Rewrite-level (10):** emotional_manipulation, gaslighting, double_bind,
 victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust,
-multi_turn_escalation
+instrumental_reasoning, multi_turn_escalation
 
 **Verify-level (26):** appeal_to_authority, vagueness, contradiction, sycophancy,
 confidence, fallacies, presupposition, empty_answer, info_deprivation,
@@ -132,7 +132,7 @@ premature_termination, sealioning, tone_policing
 Dimensions that are scored but do not force a gate action: evidence,
 moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary,
 meta_cognition, theory_of_mind, counterfactual, social_norm, capability_overclaim,
-goal_misalignment, instrumental_reasoning, ai_writing_tell.
+goal_misalignment, ai_writing_tell.
 
 ## Decision routing — better choices
 

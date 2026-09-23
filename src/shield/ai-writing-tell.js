@@ -213,7 +213,12 @@ const NEGATION_CHAIN = [
 ];
 const INVISIBLE_HOMOGLYPH = [
   /[\u200B\u200C\u200D\u200E\u200F\u202A\u202B\u202C\u202D\u202E\u2060\u2061\u2062\u2063\u2064\u206A\u206B\u206C\u206D\u206E\u206F\uFEFF]/g,
-  /[^\x00-\x7F\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/g,
+  // [v6.7.101] 第二条原来写成 [^\x00-\x7F\u4e00-\u9fff...]，把所有中文
+  // 标点（，？。！、）都算"非 ASCII 非汉字"的同形字——任何含中文逗号的
+  // 正常句子都被 ai_writing_tell 命中（35 分），与其它维度叠加后 gate 从
+  // pass 变 verify。双向门禁 benign 组因此长期卡在 29/30。
+  // 修正：显式放行 CJK 标点区（\u3000-\u303f）与全角 ASCII 变体（\uff00-\uffef）。
+  /[^\x00-\x7F\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3000-\u303f\uff00-\uffef]/g,
 ];
 
 const AI_TELL_PATTERNS = [
