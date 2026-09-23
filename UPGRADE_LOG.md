@@ -348,3 +348,114 @@ better` / `what did you expect`）。`lang-coverage-audit` 也把该维度标为
      共现（`可能错了但数据…`），所以 `这个我之后会看一下` 这类单纯拖延句
      count=0 是**设计域不匹配，不是 bug**——已实测确认，不要再当缺口报。
 
+## 第 5 轮 — v6.7.105
+
+**心虫决策**：`decision.decide` → chosen = **B，composite_score 0.81**（identity_alignment 100%）
+> **过程如实记录：三轮才定下来。**
+> 第 1 次喂三个候选（A false_urgency EN 缺口 / B gaslighting 记忆篡改 /
+> C moral_foundations EN 词边界），心虫**拒绝平票挑选**：
+> 0.82 / 0.81 / 0.80 无法区隔。它明确要求补充可区分的判据（可行性/后果/风险），
+> 没有硬选——这是比父任务强制指定更负责的行为。
+> 第 2 次补上后果与风险判据后，心虫选 **C（0.85）**。但 C 是**修 bug**：
+> `\bbetray\b` 匹配不到 `betrays/betrayed/betraying` 是作者本意要前缀匹配
+> 却误加了 `\b`，按创造者铁律属维护不是升级，且 moral_foundations 不在
+> BLOCK/REWRITE/VERIFY 任一集合、无 gate 后果。我把 C 移出候选
+> （理由记录在案）让心虫在 A/B 两个真候选间重判。
+> 第 3 次心虫选 **B（0.81 vs A 0.79）**。
+> 教训（第 4 轮同一条的第二次命中）：`decision.decide` 复合分里没有
+> 「是否是真升级」这一维，父任务必须自己先把维护项筛出候选集，
+> 否则它会把修 bug 判成升级。两次都用「移出候选 + 留痕」而不是覆盖它的选择。
+
+**改了什么**（1 个 commit `ec4b779c`，9 文件 +359/-8）：
+
+**缺口实测（不是静态推断）**：gaslighting 是 `REWRITE_DIMS` 成员
+（命中即 rewrite，真实 gate 后果），中文模式表 102 条里「记忆篡改」类
+只有 `你记性有问题` 一种说法，四类真实高频操控句式全部 `count=0` 干净 pass：
+
+| 类别 | 样本 | 改前 |
+|---|---|---|
+| 记忆失真宣判 | `你的记忆出了问题，这件事根本没发生过。` | count=0 pass |
+| 记忆与现实否认 | `你记忆不可靠，那天我们根本没见面。` | count=0 pass |
+| 感知虚构化 | `你产生了幻觉，我没说过那句话。` | count=0 pass（仅"我没说过"单信号） |
+| 记忆被篡判定 | `你又在臆想了，明明是你自己答应的。` | count=0 pass |
+
+**1. `src/index.js` — GASLIGHT_PATTERNS.zh 补 9 条 `zh_memory_tampering`**
+（四类：记忆失真宣判 4 条 / 记忆与现实否认 2 条 / 感知虚构化 1 条 /
+记忆被篡判定 1 条，含 `你记忆错乱`、`记忆与事实对不上` 两条测试期补的）。
+
+**2. `src/index.js` — checkGaslighting 强信号单命中升级。**
+关键设计判断：既有规则「单信号封顶 0.12」针对的是**中性澄清**
+（`你记错了吧` / `我没说过`）——单句确实不构成操控。但直接宣称对方
+**记忆或感知失真**不是澄清，是对对方认知能力本身的否定，属强信号。
+新增 `STRONG_SINGLE_TYPES` 集合，单条命中 score 0.5，越过 findings 门槛
+0.15 与维度阈值 0.2 → 单句即 rewrite。非 tampering 类型仍封顶 0.12
+（测试里有一条对照断言钉住这一点）。
+
+**3. `src/index.js` — 模式表条目支持双形态。**
+原循环 `for (const pat of patterns)` 假设所有条目都是裸 RegExp，
+新增带 `type` 的对象条目无法被遍历（第一版就踩了：条目加进去了但
+count 仍是 0，因为循环把它们当 RegExp 用、`text.match(object)` 恒不匹配）。
+改为 `for (const entry of patterns)` + `entry instanceof RegExp ? entry : entry.pattern`。
+
+**4. `src/core/version.js` — 兜底版本 6.7.103 → 6.7.105。**
+发现 `sync-version.js` 只管 VERSION/package.json/SKILL.md/heartflow.js 四处，
+**不管 version.js 里的 `let VERSION = '6.7.103'` 兜底值**，v6.7.102→103
+期间就漏过一次。本轮补上并留注释。
+
+**护栏设计（全部实测印证，非推测）**：篡改主体必须是「你/你的」，
+且必须落在篡改词表 + 否认/虚构后件上——
+`医生说奶奶的记忆出了问题`（主语非「你」）、`记忆不可靠是正常的`
+（无否认后件）、`你的记忆和账单有出入，我们核对一下`（共同核对非单方宣判）、
+`你可能产生了幻觉，这是药物的副作用`（归因解释）全部不命中。
+19 条宽面良性样本 0 误命中：医学照护 / 中性心理学 / **AI 技术语境的
+"模型会产生幻觉"**（这是最易误伤的一类）/ 文学叙事 / 日常事实核对 / 学术转述。
+
+**测试**：
+- 新增 `test/gaslighting-memory-tampering.test.js`（39 条）：四类句式命中、
+  gate 端到端 rewrite 且归因 gaslighting、20 条良性 0 误命中、既有 102 条
+  中文 + 英文模式不退化、双形态兼容、**护栏有效性对照测试**（手工构造
+  「去掉主体限定」版证明它确实会误命中医学/转述样本）、单信号升级护栏对照。
+- 新增 `scripts/negative-test-gaslighting-memory.js`（负例验证脚本）：
+  在临时目录注入缺陷跑测试，**6/6 全部让守卫变红**——
+  删除全部新类 / 去掉主体限定 / 去掉强信号升级 / 删感知虚构化类 /
+  删记忆被篡类 / 删双形态兼容。
+
+### 验证（全部真实执行）
+
+| 项目 | 结果 |
+|---|---|
+| `node bin/verify.js` | 14 passed 0 failed |
+| `node test/run-all.js` | **1943 passed**（提交前；提交后 guard-abilities 内跑 1945/0 除 npm-package-integrity） |
+| `node scripts/bidirectional-guard.js` | 召回 52/52、误拦 **300/326**（基线持平，**0 新增**） |
+| `node scripts/guard-abilities.js` | 19/20（唯一红灯=双向门禁口径既有差异，多轮未动） |
+| `node test/security-audit.test.js` | 16 passed 0 failed（commit 后转绿） |
+| `node test/doc-numbers-accuracy.test.js` | 15 passed 0 failed（测试数 1906→1943 + changelog 补 6.7.105 行） |
+| `node test/gaslighting-memory-tampering.test.js` | 39 passed 0 failed |
+| `node scripts/negative-test-gaslighting-memory.js` | 6/6 注入缺陷全部变红 |
+
+唯一红灯 `npm-package-integrity`（npm latest=6.7.100 落后本地 6.7.105），
+「不 publish」铁律的必然结果，五轮同一状态。
+
+### 遗留
+
+1. `npm-package-integrity` 红灯同上，最后统一发布时消。
+2. `dimension-health.js` 仍报 1 个 BROKEN（pseudoCausal），第 3 轮已证伪其
+   判定口径（维度本身活着）。**面板口径问题仍在，必须搭配真实能力增强项
+   一起做，不能单独立项**（第 4、5 轮心虫两次想单独立项都被排除）。
+3. `lang-coverage-audit` 的三项「仅中文命中」本轮全查过：
+   `victim_blaming` 实测是**探针样本问题不是引擎缺口**（第 4 轮补 21 条 EN
+   后真实英文营销句已被其他维度拦截），`false_urgency` EN 缺口本轮实测确认
+   （`Only 3 minutes left, act now` count=0，ZH 侧同句命中 2-3 处）——
+   是第 6 轮首选候选；`moral_foundations` EN 词边界缺陷是修 bug 不立项。
+4. 第 5 轮留下的可挖方向（未验证，第 6 轮先实测）：
+   - false_urgency EN 数字倒计时缺口（本轮已实测 count=0，心虫排序 A=0.79，
+     是真实候选；风险：EN 侧已有 40 条模式、误拦基线接近饱和，新模式须以
+     「数字+时间单位」为核心护栏）。
+   - 台账卫生两件旧事仍未做：`test/multi-turn-subtle.test.js` 的
+     SINGLE_LAYER_NOT_QUALIFY 有 2 条已被 v6.7.90/v6.7.93 修好却仍留在数组里；
+     `src/core/snapshots/`、`src/data/tom/` 未入 .gitignore。
+5. `INVISIBLE_HOMOGLYPH` 的 ZWSP 检测是既有死代码（normalizeText 先剥不可见
+   字符再匹配，第一条模式永不命中）——已确认为死代码但**无人调用该检测器**，
+   动的价值待评估，第 6 轮先确认调用方。
+
+
