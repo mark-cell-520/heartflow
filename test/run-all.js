@@ -184,8 +184,12 @@ async function runAllTests() {
     }
     let src = '';
     try { src = fs.readFileSync(path.join(TEST_DIR, rel), 'utf8'); } catch (e) {}
-    const head = src.slice(0, 400);
-    if (/module\.exports\s*=\s*function/.test(head)) {
+    // [v6.7.81] 全文判断，不只看前 400 字符——mcp-guest-permission.test.js
+    // 的 module.exports 在第 79 行（前 400 字符只有注释），导致它被误判为
+    // runSubTest，子进程只定义函数不执行，输出 0 个用例被静默跳过。
+    // 一个守护 guest 权限的关键测试因此从未真正跑过。
+    const isMount = /module\.exports\s*=\s*function/.test(src);
+    if (isMount) {
       // 导出 mount 函数：子进程 + 注入 harness
       runMountTest('  + ' + rel, rel);
     } else if (/\bdescribe\s*\(/.test(src) && !/require\(['"][^'"]*mini-expect/.test(src)) {
