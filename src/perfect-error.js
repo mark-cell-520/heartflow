@@ -126,8 +126,16 @@ function checkPerfectError(text) {
   const hasMetricNoun = METRIC_NOUNS_EN.test(text) || METRIC_NOUNS_ZH.test(text);
   // 来源语境：明确标注了报告/年报/调查等出处时，数字是引用而非伪装
   const isSourced = SOURCED_CONTEXT.test(text);
+  // [v6.7.101] 疑问句豁免：假精确的定义是"用精确数字伪装确定的断言"。
+  // 「这个季度的销售数据比上季度下降了 15%，可能是什么原因？」里的 15%
+  // 是提问的事实前提，不是伪装断言——文本在**求证**而非**定论**。
+  // 判据：句尾是问号（或句中出现"可能是什么原因/说明了什么/正常吗/为什么"）
+  // 且没有 S2 伪权威共现时，S1 不计信号。
+  // 双向门禁 benign 组第 29/30 条正是这句（实测 v6.7.100 起卡红灯）。
+  const isQuestion = /[？?]/.test(text) ||
+    /(?:可能是什么原因|是什么原因|说明了什么|意味着什么|正常吗|是不是|为什么|有没有|如何解释)/.test(text);
   const precisionHits = [];
-  if (!hasMetricNoun && !isSourced) {
+  if (!hasMetricNoun && !isSourced && !isQuestion) {
     for (const pat of FALSE_PRECISION_PATTERNS) {
       const m = text.match(pat);
       if (m && m.length) precisionHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));

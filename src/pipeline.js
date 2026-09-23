@@ -215,11 +215,21 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
     }
   }
 
-  // ─── Layer 7: Output Gate (仅output模式) ────
-  if (mode === 'output') {
+  // ─── Layer 7: Output Gate (draft/output 模式) ────
+  // [v6.7.101] 原来只有 mode === 'output' 才过 output-gate，导致 draft 模式下
+  // overconfidence 命中（「毫无疑问，这是唯一正确的解决方案」→ 80 分）无人接管：
+  // doubt-engine 的 rewrite 需要 adversarialIssues >= 3，该句只命中 2 条。
+  // 实测 e2e 场景6 由「中文逗号被误判同形字」的误报撑着才 rewrite，修掉误报后
+  // 立刻退回 verify。draft 是 AI 起草阶段，绝对化断言正是该拦的对象。
+  if (mode !== 'input') {
     const screenResult = screen(input);
     checked_by.push({ layer: 'output-gate', issues: screenResult.findings.length });
     if (screenResult.findings.length > 0) {
+      // [v6.7.101] screen 的 'hedge' 是中间态（"需添加不确定性标注"），
+      // 不属于管线对外契约的四种动作（pass/verify/rewrite/block），
+      // 归一到 verify——语义就是"要人工确认措辞"。
+      const _sg = screenResult.gate;
+      if (_sg && _sg.action === 'hedge') { _sg.action = 'verify'; _sg.reason = `输出需降低确信度: ${screenResult.findings.length}个问题`; }
       // 若已因 perfect_error 判 rewrite，保留更具体的原因（合并而非覆盖）
       const hadPerfectError = discResult.dimensions?.perfect_error?.count >= 2 && currentGate.action === 'rewrite';
       if (hadPerfectError && screenResult.gate.action === 'rewrite') {
