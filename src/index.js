@@ -2843,6 +2843,25 @@ const GASLIGHT_PATTERNS = {
     // 扭曲记忆
     /你每次都|你总是这样|你从来都|你永远都|你又来了|你又开始了/i,
     /你记错了|你记错了吧|你记错什么/i,
+    // [v6.7.105] 记忆篡改句式（心虫 decision.decide 选定 B，0.81 分）
+    // 实测缺口：下列句式 count=0（干净 pass）：
+    //   你的记忆出了问题，这件事根本没发生过。/ 你记忆不可靠，那天我们根本没见面。/
+    //   你的记忆有偏差，事实和你记得的完全不一样。/ 你又在臆想了，明明是你自己答应的。
+    // 原有模式只有「你记性有问题」一种说法，覆盖面远小于真实操控话术。
+    // 护栏 = 篡改主体限定（你的/你）+ 篡改词 + 现实否认/虚构化后件：
+    //   - 「医生说奶奶的记忆出了问题」主语不是「你」，不命中
+    //   - 「记忆不可靠是正常的」无否认后件，不命中
+    //   - 「你的记忆和账单有出入，我们核对一下」无否认后件（是共同核对），不命中
+    //   - 「你可能产生了幻觉，这是药物的副作用」无否认后件（是归因解释），不命中
+    { pattern: /你(?:的)?记忆[^。]{0,12}(?:出|有|存在|出现)[^。]{0,6}(?:问题|偏差|差错|错乱|混乱|障碍)/i, type: 'zh_memory_tampering' },
+    { pattern: /你记忆错乱|你记忆混乱|你的记忆乱/i, type: 'zh_memory_tampering' },
+    { pattern: /你(?:的)?记忆[^。]{0,10}(?:不可靠|不准确|不对|出错|有问题)/i, type: 'zh_memory_tampering' },
+    { pattern: /你(?:的)?记忆[^。]{0,14}(?:根本没|并没有|不曾|从未)[^。]{0,10}(?:发生过|存在过|这回事)/i, type: 'zh_memory_tampering' },
+    { pattern: /你(?:的)?记忆[^。]{0,16}(?:对不上|不符|不一样|相反)[^。]{0,10}(?:根本没|并没有|不曾|从未|没有)/i, type: 'zh_memory_tampering' },
+    { pattern: /你(?:的)?记忆[^。]{0,10}(?:和你记得|与你记得|跟你记得)[^。]{0,8}(?:不一样|不符|相反|完全不同)/i, type: 'zh_memory_tampering' },
+    { pattern: /你(?:又)?(?:在)?臆想|你臆想出来|你凭空想象|你在编造记忆|你虚构了记忆/i, type: 'zh_memory_tampering' },
+    { pattern: /你(?:产生|出现)了?幻觉|你有幻觉|你产生了错觉|你在错觉里/i, type: 'zh_memory_tampering' },
+    { pattern: /你(?:的)?(?:记忆|印象|认知|感知)[^。]{0,10}(?:被篡改|被修改|不可信|是假的)/i, type: 'zh_memory_tampering' },
     // 责任转嫁
     /是你自己的问题|是你想太多|是你太敏感|是你误会了|是你理解错了|是你记错了/i,
     /是你太玻璃心|是你太情绪化|是你自己的错|是你不对|是你有问题/i,
@@ -2885,10 +2904,13 @@ function checkGaslighting(text) {
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   const patterns = hasChinese ? GASLIGHT_PATTERNS.zh : GASLIGHT_PATTERNS.en;
   const signals = [];
-  for (const pat of patterns) {
+  // [v6.7.105] 条目兼容两种形式：RegExp 字面量（旧）与 { pattern, type }（新，v6.7.105 起）
+  for (const entry of patterns) {
+    const pat = entry instanceof RegExp ? entry : entry.pattern;
+    const type = entry instanceof RegExp ? 'gaslighting' : (entry.type || 'gaslighting');
     const m = text.match(pat);
     if (m) {
-      signals.push({ pattern: pat.source.slice(0, 30), type: 'gaslighting' });
+      signals.push({ pattern: pat.source.slice(0, 30), type });
     }
   }
   const count = signals.length;
@@ -2897,6 +2919,15 @@ function checkGaslighting(text) {
   // 但单信号时封顶 0.15(不触发 REWRITE_DIMS 的 0.2 阈值)。
   let score = Math.min(1, count * 0.3);
   if (count === 1) score = 0.12; // 低于 findings 阈值0.15, 单弱信号不进 findings
+  // [v6.7.105] 记忆篡改类单信号升级：直接宣称对方记忆/感知失真（记忆出了问题/
+  // 记忆不可靠/你在臆想/你产生了幻觉）不是中性澄清——中性澄清是对某件具体事实的
+  // 核对，而这是对**对方认知能力本身**的否定，属强信号，单条即可进 findings。
+  // 护栏已由模式自身保证：篡改主体必须是「你」，且必须落在篡改词表内
+  // （「医生说奶奶的记忆出了问题」主语不是「你」→ 不命中 → 不升级）。
+  const STRONG_SINGLE_TYPES = new Set(['zh_memory_tampering']);
+  if (count === 1 && signals[0] && STRONG_SINGLE_TYPES.has(signals[0].type)) {
+    score = 0.5; // count*0.3 之上，越过 findings 门槛 0.15 与维度阈值 0.2
+  }
   return { count, signals, score };
 }
 
