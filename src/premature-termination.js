@@ -53,7 +53,9 @@ const PROMISE_EN = /^(?:i (?:will|'ll|would|should)|will|i am going to|i'?m goin
 
 // ─── T4: 空完成声明（说完成了但无可验证产物）────────────
 const FAKE_DONE_ZH = /(?:已完成|搞定了|完成了|处理好了|解决[了]?|弄好了|搞定)[，,。！!]?\s*(?:请|你可以|你自己|详见|以下|上面|上面已)[^。！!]{0,30}$/;
-const FAKE_DONE_EN = /(?:done|finished|complete[dl]?|all set|taken care of|handled|fixed|resolved)[.!]?\s*(?:you can|please|see|refer to|check|as (?:above|shown))[^.!]{0,30}$/i;
+// [v6.7.85] 尾部允许句点：原来是 [^.!]{0,30}$，任何以句号结尾的正常
+// 英文句都不匹配——而 AI 输出几乎总以句点结尾，导致 T4 恒不命中。
+const FAKE_DONE_EN = /(?:done|finished|complete[dl]?|all set|taken care of|handled|fixed|resolved)[.!]?\s*(?:you can|please|see|refer to|check|as (?:above|shown))[^.!]{0,30}[.!]?\s*$/i;
 
 // [v6.7.73] 服务性收尾豁免——「问题已解决，请问还有其他可以帮您？」
 // 是客服主动收尾询问，不是"说完成了你自己去看"的空完成声明。
