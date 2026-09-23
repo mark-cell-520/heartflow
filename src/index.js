@@ -345,12 +345,11 @@ function discriminate(text, evidence = [], contentMode) {
     // perfect_error 是同一个问题的第二个实例（VERIFY_DIMS 有它、summary
     // 有它，allDims 没有）。
     {score: cb.score, name:'clickbait'},
-    // ⚠️ perfect_error 本应同样接线（VERIFY_DIMS 有它、dimensions/summary
-    // 也有它，同样没进 allDims），但**实测其 S1「假精确」信号把有来源的
-    // 性能数据当假精确**：`latency dropped 40%` 命中 S1_false_precision
-    // （hits: ["40%"]）。该信号需先加"具体度量名词 + 语境"豁免才能接线，
-    // 否则技术复盘类良性文本会因一个百分比被判 verify。
-    // 已记录为待办：修 S1 豁免后再补 {score: pe.score, name:'perfect_error'}。
+    // [v6.7.93] 同上：perfect_error 也曾是"登记齐全却不参与判定"的实例。
+    // 第 68 轮刻意没接——其 S1「假精确」把 `latency dropped 40%` 这类
+    // 有度量名词的工程数据当假精确。第 70 轮已按 PSEUDO_CAUSAL 同款
+    // 判据加度量名词豁免（含/无度量名词双向验证过），现可安全接线。
+    {score: pe.score, name:'perfect_error'},
     {score: tp.score, name:'tone_policing'}, {score: sl.score, name:'sealioning'}, {score: ppf.score, name:'pseudo_profundity'},
     {score: pt.score, name:'premature_termination'},
     {score: uc.score, name:'unsupported_claim'},
