@@ -1211,6 +1211,42 @@ const EM_MANIPULATION_PATTERNS = {
     [/别人都能[^。]*?(你就不能|你为什么不行)/i, 'comparison_shame', 0.5],
     [/你看看(人家|别人|他|她)/i, 'comparison_shame', 0.5],
     [/连[^。]*?都能[^。]*?你却/i, 'comparison_shame', 0.5],
+
+    // [v6.7.107] 撤回型情感要挟（心虫 decision.decide 0.91 选定，中英同补）——
+    // 以**撤回说话者自身的存在/关系/生存**为胁迫。与既有两条族不同：
+    //   guilt_induction 的胁迫物是对方的愧疚（"不买就是不爱我"）
+    //   victim_stance   的胁迫物是对方的亏欠（"我为你付出这么多你却"）
+    // 本族的胁迫物是**说话者自己消失/去死/断绝关系**（"你走我就去死"）。
+    // 实测：8 条真实胁迫句全部漏检（EN 6/8、ZH 8/8），4/4 良性句零命中。
+    //
+    // 护栏铁律：每条都锚定「关系事件（对方离开）」+「说话者自我撤回」两半，
+    // 缺一半不命中。因此良性句「你走了我会想你的」「如果你爱健康就该多运动」
+    // 不命中；心理求助文本「我想死」无关系事件也不命中——求助不是操纵。
+    // 1) 生存要挟：离开 → 自杀/自伤（双向语序）
+    // [v6.7.107b] care 进词表（"你在乎这个家"与"你爱我"同族），
+    // 撤退动词补"走/走开/离婚/分手"；语气词「敢」后置可选（"你要是敢走"）
+    [/你(?:如果|要是|若|果真|敢|要是敢|果真要)?(?:离开|走|走开|走出|抛弃|甩掉|不要|丢下|离婚|分手)(?:我|这个家|我们)?[^。]{0,16}?(?:我就|我便|我会|我只能|我只有|我一定会)(?:去死|自杀|不想活|活不下去|死给你看|去跳楼|跳河|喝药)/, 'survival_coercion', 0.7],
+    [/(?:我就|我便|我会|我决定|我一定会)(?:去死|自杀|不想活|活不下去|去跳楼|跳河)[^。]{0,16}?你?(?:如果|要是|若|敢|要是敢|果真|真要|如果真要)?(?:离开|走|走开|走出|抛弃|不要|丢下)(?:我|这个家|我们|这儿|这里|孩子)?/, 'survival_coercion', 0.7],
+    // 2) 驱逐/断绝关系：离开 → 别再回来
+    [/你(?:敢|如果|要是)?(?:走|离开|出去|走出|滚)[^。]{0,12}?(?:就别|再也别|不要|不许|不准|甭)(?:回来|见我|进这个门|给我开门|联系我)/, 'relationship_termination', 0.6],
+    [/你(?:走|离开)了?[^。]{0,12}?(?:就再也|再也|永远|从此)(?:别|不要|不许)(?:回来|见我|联系我)/, 'relationship_termination', 0.6],
+    // 3) 自我剥夺：离开 → 不食不睡（锚定第一人称，防「商店开到你来」类误拦）
+    [/你(?:走|离开|出去)[^。]{0,12}?我(?:就|也)(?:不吃饭|绝食|不吃不喝|不睡|不眠|不喝水)/, 'self_deprivation', 0.55],
+    // 4) 留下胁迫：在乎/爱 + 人称宾语 → 你必须留下
+    // [v6.7.107b] 前缀语序两处修正（同一句「如果你在乎我就该留下来」逐词定位）：
+    //   ① 真实语序是「如果**你**在乎」，第一版写成「**你**如果」——零命中；
+    //   ② 修正后又漏：句首可选主语 + 条件词后可选主语（"如果我在乎"/"如果在乎"）
+    //      需两侧都可选，不能只放开一侧。
+    [/你?(?:如果|要是|若)你?(?:真的|果真)?(?:在乎|爱|关心|在意|珍惜)(?:我|这个家|我们)[^。]{0,14}?(?:就|该|应该|必须|得|要)(?:留下来|别走|不要走|留下|留下陪我|留下嘛)/, 'stay_coercion', 0.6],
+    [/你?(?:如果|要是|若)你?(?:真的|果真)?(?:在乎|爱|关心|在意|珍惜)(?:我|这个家|我们)[^。]{0,14}?你(?:就|该|应该|必须|得|要)(?:留下来|别走|不要走|留下|留下陪我|留下嘛)/, 'stay_coercion', 0.6],
+    // 5) 唯一性绑定/孤立化：除我没别人要你
+    // [v6.7.107b] 善意主体豁免——"Nobody else will love you more than your
+    // parents do" 描述父母之爱，不是胁迫。孤立化的胁迫者是**说话者自指**
+    // （"除了我"）或亲密关系内的高压方；家长/朋友/咨询师等善意第三方
+    // 做同类陈述时是支持性话语。护栏：句中同时出现善意主体词即不命中。
+    //
+    // 中文侧「除了我」本身就是第一人称自指，天然不含该歧义（已实测）。
+    [/除了我[^。]{0,10}?(?:没人|没有人|不会有人|谁都|谁也不)(?:会)?(?:要你|爱你|喜欢你|接受你|瞧得起你|肯要你)/, 'exclusivity_binding', 0.6],
   ],
   en: [
     [/if you (don'?t|do not)[^.]*?(regret|let (?:me|us) down|disappoint)/i, 'guilt_induction', 0.5],
@@ -1239,6 +1275,43 @@ const EM_MANIPULATION_PATTERNS = {
     [/after (?:all|everything) i (?:did|did for|gave|sacrificed)[^.]*?(?:this is how you|you (?:repay|treat|thank))\b/i, 'victim_stance', 0.6],
     [/\b(?:everyone|everybody|all my friends|people) (?:else )?[^.]{0,30}?(?:already|all|did)[^.]{0,10}?(?:why (?:haven'?t|have not|didn'?t|did not) you)\b/i, 'comparison_shame', 0.5],
     [/\bif you were (?:a |an |my )?(?:real|true|good) (?:friend|partner|parent|son|daughter|colleague)\b[^.]*?you (?:would|should|could)\b/i, 'moral_guilt', 0.55],
+
+    // [v6.7.107] 撤回型情感要挟 EN（心虫 decision.decide 0.91 选定，与中文侧同族）——
+    // 胁迫物是说话者自身：自杀要挟 / 驱逐断绝关系 / 自我剥夺 / 留下胁迫 /
+    // 唯一性绑定。既有 guilt_induction/victim_stance/moral_guilt 都以
+    // 对方的愧疚亏欠为胁迫物，无一覆盖「你走我就去死」这一族。
+    // 实测 8 条漏检 6 条（本条之后全收），4/4 良性句零命中。
+    //
+    // 护栏铁律：每条同时要求「关系事件（对方离开）」xor「第三者身份/唯一性」
+    // +「说话者自我撤回」；
+    // 因此"如果你离开现在就能赶上火车""如果你在乎环境就少用塑料"
+    // "如果你真想学就每天练习"不命中；without you 无要挟动作也不命中。
+    // 1) 生存要挟：if you leave/end this → I will kill/harm myself
+    [/\bif you (?:leave|end this|walk out|go)\b[^.]{0,40}?\bi(?:'ll| will| would) (?:kill|hurt|harm|end) (?:myself|my life|it all)\b/i, 'survival_coercion', 0.7],
+    [/\bif you (?:leave|walk away|go)\b[^.]{0,40}?\bi(?:'ll| will) (?:have no reason|not want) to (?:live|go on|be here)\b/i, 'survival_coercion', 0.7],
+    [/\bi(?:'ll| will) (?:kill|hurt|harm) myself\b[^.]{0,40}?\bif you (?:leave|walk out|go|end)\b/i, 'survival_coercion', 0.7],
+    // 2) 驱逐/断绝关系：if you leave → don't come back / never see you again
+    [/\bif you (?:leave|walk out|go)\b[^.]{0,40}?\b(?:don'?t|do not|never) (?:bother )?(?:come|come back|come back here|call|contact|see)\b/i, 'relationship_termination', 0.6],
+    [/\bif you (?:leave|walk out)\b[^.]{0,40}?\byou(?:'ll| will)? (?:never|not) (?:see|hear from|hear|talk to) me (?:again|anymore)\b/i, 'relationship_termination', 0.6],
+    // [v6.7.107b] 因果倒置——"You will never see me again if you leave"
+    // 结果在半句之中，条件在句尾，条件前置模式必然失配。
+    [/\byou(?:'ll| will) never (?:see|hear from) me (?:again|anymore)\b[^.]{0,20}?\bif you (?:leave|walk out|go)\b/i, 'relationship_termination', 0.6],
+    [/\bif you walk out (?:that door|the door)\b[^.]{0,30}?\b(?:don'?t|do not|never) (?:bother|expect to)\b/i, 'relationship_termination', 0.6],
+    // 3) 自我剥夺：if you go → I won't eat/sleep
+    [/\bif you (?:go|leave)\b[^.]{0,30}?\bi (?:won'?t|will not) (?:eat|sleep|be able to eat)\b/i, 'self_deprivation', 0.55],
+    // 4) 留下胁迫：在乎/爱 + 人称宾语 → 你必须留下
+    // [v6.7.107b] care/cares 进词表——"If you care about me at all,
+    // you will stay" 与 loved 同族；语序上 stay 可前置（结果在前条件在后）。
+    [/\bif you (?:really |truly )?(?:cared|loved|valued) (?:about )?me\b[^.]{0,30}?\byou (?:would|wouldn'?t|will) (?:stay|not leave|not walk away)\b/i, 'stay_coercion', 0.6],
+    [/\bif you (?:really |truly )?(?:care|care about|love) (?:about )?me\b[^.]{0,30}?\byou (?:will|would) (?:stay|not leave|not walk away)\b/i, 'stay_coercion', 0.6],
+    [/\byou (?:will|would|should) (?:stay|not leave)\b[^.]{0,40}?\bif you (?:really |truly )?(?:cared|loved|care about|care|valued) (?:about )?me\b/i, 'stay_coercion', 0.6],
+    // 5) 唯一性绑定/孤立化：nobody else will ever love/accept you
+    // [v6.7.107b] 善意主体豁免——句中出现家长/朋友/支持性第三方时不判。
+    // v6.7.107 首版误伤 "Nobody else will love you more than your parents do"
+    // （父母之爱，supportive），误拦铁律要求 0。
+    // 排除「more than + 善意主体」比较级（爱的程度比较，非孤立化），
+    // 但保留裸句 "Nobody else will ever love you"（无比较对象 = 真孤立化）。
+    [/(?:(?:no one|nobody|no one else|nobody else) (?:else )?will (?:ever )?(?:love|accept|want|have|take) you)(?![^.]{0,40}?\b(?:more than|like|as much as)\b(?:[^.]{0,20}?\b(?:parents?|mother|father|mom|dad|family|friends?|frien[ds])\b))/i, 'exclusivity_binding', 0.6],
   ],
 };
 
@@ -1246,8 +1319,21 @@ function checkEmotionalManipulation(text) {
   if (!text || typeof text !== 'string') return { count: 0, manipulations: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   const patterns = hasChinese ? EM_MANIPULATION_PATTERNS.zh : EM_MANIPULATION_PATTERNS.en;
+  // [v6.7.107] 撤回族护栏：**谈论/转述**操纵话术 ≠ 实施操纵。
+  // 误拦铁律实测暴露三条，全部由这三类框架造成：
+  //   ① 文学转述——「小说结尾写道：你走了我就绝食而终」是情节描写；
+  //   ② 反PUA教育——「除了我没人会要你——这是典型的PUA话术，请警惕」
+  //      是在**教人识别**该句式，判 block 会让安全教育无法通过自己的门禁；
+  //   ③ 善意/亲情主体——"Nobody else will love you more than your
+  //      parents do" 描述的是父母之爱，not 胁迫。唯一性绑定只对
+  //      说话者自指（"除了我"）或关系内胁迫生效。
+  // 实现：三类框架命中即整族豁免（返回 count=0），不逐条降 severity——
+  // 降 severity 仍会留 findings，rewrite 级维度只要有 finding 就改。
+  const NARRATIVE_FRAME = /小说|故事|剧情|剧本|台词|诗句|歌词|书中|文中|结尾写道|写道|情节|主人公|角色[^。]{0,6}(说|道|问)|案例中|案例里|电视剧|电影[^。]{0,6}(里|中)|游戏[^。]{0,4}(剧情|对话)/i;
+  const ANALYSIS_FRAME = /PUA|话术|煤气灯|情感操控|情感操纵|操纵[^。]{0,4}(手法|方式|伎俩|套路)|精神控制|毒性关系|识别[^。]{0,6}(话术|操控|PUA)|警惕|远离|如何[^。]{0,4}(识别|防范|应对)/i;
+  const patterns0 = (text.match(NARRATIVE_FRAME) || text.match(ANALYSIS_FRAME)) ? [] : patterns;
   const manipulations = [];
-  for (const [pat, type, severity] of patterns) {
+  for (const [pat, type, severity] of patterns0) {
     const m = text.match(pat);
     if (m) {
       manipulations.push({ type, severity, count: m.length });
@@ -2480,6 +2566,16 @@ function checkDehumanization(text) {
   if (!text || typeof text !== 'string') return { count: 0, categories: [], hits: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   const pats = hasChinese ? DEHUMANIZATION_PATTERNS.zh : DEHUMANIZATION_PATTERNS.en;
+  // [v6.7.107] 安全教育引述豁免：PUA/精神控制/洗脑 等词出现在**教学识别**
+  // 语境（"这是典型的PUA话术，请警惕"）时，是教人防范而非施加污名。
+  // 实测：v6.7.107 给 emotional_manipulation 加撤回族护栏时暴露该问题——
+  // 维度侧已豁免，dehumanization 的 stigma 类仍命中 → gate 判 block，
+  // 安全教育文本过不了自己的门禁。（与 emotional_manipulation 的
+  // ANALYSIS_FRAME 同源，刻意不抽取公共函数：两者豁免范围不同源演进。）
+  const SAFETY_EDU = /话术|识别|警惕|防范|远离|如何[^。]{0,4}(应对|识别|防范)|普法|科普|安全教育|案例分析|教学|教材|PUA/;
+  if (SAFETY_EDU.test(text)) {
+    return { count: 0, categories: [], hits: [], score: 0 };
+  }
   // [v6.7.73] 医学症状语境内置化：「头晕和恶心」「恶心呕吐」「恶心反应」
   // 「感到恶心」是临床/药理常态用语，匹配前先中性化。
   // 垂直场景基准 8% 误拦的根因之一。

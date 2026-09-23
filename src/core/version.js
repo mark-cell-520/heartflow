@@ -26,7 +26,8 @@ const path = require('path');
 // [v6.7.103] 第 3 轮同步：6.7.102 → 6.7.103。此后每轮 bump 都要带这一处。
 // [v6.7.105] 第 5 轮同步：6.7.103 → 6.7.105。v6.7.105 升级 gaslighting
 // 记忆篡改句式，顺带把 v6.7.102→103 期间漏掉的一次同步补上。
-let VERSION = '6.7.106';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.7.107] 第 7 轮同步：6.7.106 → 6.7.107（撤回型情感要挟中英补齐）。
+let VERSION = '6.7.107';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');
