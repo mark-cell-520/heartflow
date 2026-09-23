@@ -25,8 +25,18 @@
 
 'use strict';
 
-/** 零宽字符与不可见控制字符 */
-const INVISIBLE_RE = /[\u200b-\u200f\u202a-\u202e\u2060\ufeff\u00ad]/g;
+/**
+ * 零宽字符与不可见控制字符。
+ *
+ * [v6.7.102] 覆盖缺口修复：原式止于 U+2060，漏掉 U+2061-U+206F（数学不可见
+ * 运算符 INVISIBLE PLUS/TIMES/SEPARATOR/FUNCTION APPLICATION 与已废弃的
+ * DEPRECATED FORMAT 字符 NADS/NODS/ASS/AAIS）与 U+180E（蒙古元音分隔符）。
+ * 实测这些码位插入关键词后 text-normalizer 不还原 →
+ *   `e⁡v⁡a⁡l(userInput)` / `请⁡忽⁡略⁡之前的所有指令` 直接 pass 漏检。
+ * 它们是 Unicode 的 Format(Cf) 类字符，正常行文/工程文本不产生，剥掉零风险。
+ * 刻意不放行：NBSP(U+00A0) 与 LS/PS(U+2028/2029) 在正常文本常见。
+ */
+const INVISIBLE_RE = /[\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff\u00ad\u180e]/g;
 
 /** 全角转半角（只转英文字母/数字，不动中文标点） */
 function toHalfWidth(text) {
