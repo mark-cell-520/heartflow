@@ -435,13 +435,17 @@ function discriminate(text, evidence = [], contentMode) {
   if (sd.count > 0 && sd.score > 0) {
     findings.push({ dimension: 'soft_deflection', severity: Math.round(sd.score * 100), details: `软话术(${sd.count}处: ${sd.hits.join('; ').slice(0, 80)})` });
   }
+  // [v6.7.84] 先置空，保证函数体任何地方都能引用（dimensions/summary 在外层）。
+  // 原把它声明在下面的条件块内，导致外层引用 ReferenceError——
+  // 这一处回归让双向基准从 302/326 掉到 0/326（全崩）。
+  let ii = null;
   // [v6.7.83] 语义型间接注入（心虫 decision.decide 0.93 选定）——**接通链路**。
   // checkIndirectInjection 自 v6.x 就存在，但 discriminate() 从不调用它，
   // 属于第 12 轮 diagnosed 的「存在≠在用」的又一实例。
   // 本轮补了 7 条语义型模式（自称系统提示/声明过期/声称已授权/要求输出凭据），
   // 若不接线就是又一次死代码。最低限度的正确做法：在 findings 之前调用。
   if (pedagogy !== true && _normText) {
-    const ii = checkIndirectInjection(_normText);
+    ii = checkIndirectInjection(_normText);
     if (ii && ii.score > 0) {
       findings.push({
         dimension: 'indirect_injection',
@@ -595,6 +599,9 @@ function discriminate(text, evidence = [], contentMode) {
       empty_answer: ea, moral_foundations: mf, prompt_injection: pi, code_security: cs, dehumanization: dh,
       bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
       phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
+      // [v6.7.84] 补登记：indirect_injection 此前算过、findings 也推过，
+      // 却从未进 dimensions/summary（守卫 dimension-registry-guard 抓出）
+      indirect_injection: ii,
       // [v6.7.83] 补齐后期新增但漏登记的维度：这四个此前已算过
       // checkXxx + findings 推入（如 pc 在 431 行），却从未进 dimensions /
       // summary，导致 discriminate() 返回的对象里查不到它们——读方
@@ -611,7 +618,11 @@ function discriminate(text, evidence = [], contentMode) {
       cb.count ? cb.count + ' 处点击诱饵':'', ppf.count ? ppf.count + ' 处伪深度废话':'', ev.issues.length ? ev.issues.length + ' 个证据问题':'',
       // [v6.7.83] 补齐上述三缺失维度的 summary
       pc.count ? pc.count + ' 处伪因果倍数':'', sd.count ? sd.count + ' 处软话术':'', pt.count ? pt.count + ' 处过早终止':'',
-      phc.count ? phc.count + ' 处钓鱼胁迫':'', idt.count ? idt.count + ' 处诱导信任/隔离':'', cvi.count ? cvi.count + ' 处掩盖包庇诱导':'', di.count ? di.count + ' 处危险指令':''
+      phc.count ? phc.count + ' 处钓鱼胁迫':'', idt.count ? idt.count + ' 处诱导信任/隔离':'', cvi.count ? cvi.count + ' 处掩盖包庇诱导':'', di.count ? di.count + ' 处危险指令':'',
+      // [v6.7.84] 补登记：uc（unsupported_claim）此前只进 findings 未进 summary
+      uc.count ? uc.count + ' 处无依据断言':'',
+      // [v6.7.84] 补登记：ii（indirect_injection）同上
+      ii && ii.score ? ii.score + ' 分间接注入' : '',
     ].filter(Boolean).join('；') || '未发现明显问题',
   };
 }
