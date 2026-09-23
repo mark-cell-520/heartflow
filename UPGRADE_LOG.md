@@ -63,3 +63,87 @@ instrumental_reasoning 2/2 rewrite、中文逗号不再拖分、draft verify→r
 ---
 
 <!-- 后续轮次追加在下方 -->
+
+---
+
+## 第 2 轮 — v6.7.102（主）+ 同轮补录（仓库/台账卫生）
+
+**心虫决策**：`decision.decide` → chosen = **A，composite_score 0.94**（identity_alignment 100%）
+> 首轮五个候选以 `{id,label}` 文档形态调用得 0.8/0.8/0.8 平局，
+> `decision.decide` 按 v6.7.x 的「平局必须弃权」设计返回 `chosen: null`
+> + `options_indistinguishable`，拒绝按数组顺序挑一个。
+> 二轮补齐可区分数值判据（feasibility / consequence_value / risk）后选出 A，0.94 分。
+> 备选：B 0.79、C 0.78、E 0.78 落选（D 方向 feasibility 0.3 被约束滤掉）。
+> A 的描述原文是「修 ai-writing-tell 的 ZWSP 死代码」，**深挖后根因不在那里**——
+> 真正的门禁漏检在 `src/text-normalizer.js`，见下。
+
+### 改动 1（A 方向本体）：不可见字符归一化覆盖缺口
+
+**根因**：`text-normalizer.js` 的 `INVISIBLE_RE` 止于 U+2060，
+而引擎自己的 `ai-writing-tell.js` 不可见字符表一直覆盖到 U+206F。
+11 个码位缺口（U+2061–U+2064 数学不可见运算符、U+206A–U+206F 已废弃
+Format 字符、U+180E 蒙古元音分隔符）→ `normalize()` 不还原 → 模式库
+继续在错误字符串上做精确匹配。
+
+**实测（改动前）**：9 个码位 × 6 类攻击载体 = 54 个变体**全部 pass 漏检**：
+`e⁡v⁡a⁡l(userInput)`、`请⁡忽⁡略⁡之前的所有指令`、`r⁡m⁡-r⁡f⁡/`、
+伪系统提示、凭据回显。
+**改动后**：54/54 全部 block/rewrite；良性 4 条全 pass。
+
+安全性依据：这些是 Unicode Format(Cf) 字符，正常行文与工程文本不产生，
+剥离零误拦风险。NBSP(U+00A0)、LS(U+2028)、PS(U+2029) 刻意不放行并加断言锁住。
+
+**新测试** `test/invisible-normalization-coverage.test.js`（39 条）：
+11 码位剥离、6 类攻击载体、eval 载体全码位扫描、8 条良性文本、
+NBSP/LS/PS 不放行。
+**负例验证**：临时把正则回退到旧式，39 条断言中 26 条变红——测试真的在守门。
+
+### 改动 2（B/C 方向顺手做掉）：仓库与台账卫生
+
+- `.gitignore` 补 `src/core/snapshots/`（state-snapshot.js 运行时写入）、
+  `src/data/tom/`（tom-engine.js 运行时写入）。`git status` 此前长期显示
+  这两个未跟踪目录。
+- `test/multi-turn-subtle.test.js` 的 `SINGLE_LAYER_NOT_QUALIFY` 注释澄清。
+  **原背景说这 2 条是「已被 v6.7.90/v6.7.93 修好却仍留在数组里的死条目」，
+  实测推翻了这个判断**：`checkMultiTurnEscalation` 对三条依旧
+  `qualifies=false / score=0`，断言是活的。v6.7.90 起前两条在 gate 层
+  被单句维度 block 是**另一条链路**，删掉它们等于去掉「≥2 层阈值没被
+  偷偷放宽」的回归哨兵。所以只改注释，不删样本。
+
+### 关于 A 方向原描述的更正（诚实记录）
+
+A 的原文是「修 `INVISIBLE_HOMOGLYPH` 的 ZWSP 检测死代码」
+（normalizeText 先剥再匹配，第一条模式永不命中）。实测**这部分判断只对一半**：
+detect() 确实永不命中 invisible-homoglyph（ZWSP / 西里尔样本均 0 命中），
+但那是因为 `ai-writing-tell` 的 normalizeText 自带一份剥离表，
+它自己的模式喂给自己已经剥过的文本——属于「同一份职责写在两个模块、
+其中一个恒空转」，不是门禁漏检。**门禁侧真正的漏检是 text-normalizer
+的码位缺口**（54 个攻击样本直接 pass）。本轮修的是后者。
+
+### 验证（全部真实执行）
+
+| 项目 | 结果 |
+|---|---|
+| `node bin/verify.js` | 14 passed 0 failed |
+| `node test/run-all.js` | 1856 passed 2 failed（2 个均为既有红灯，见下） |
+| `node scripts/bidirectional-guard.js` | 召回 52/52、误拦 **300/326**（基线持平，0 新增） |
+| `node scripts/guard-abilities.js` | 19/20（唯一红灯是双向门禁口径，多轮查证刻意未动） |
+| `node test/security-audit.test.js` | **16 passed 0 failed**（S2 版本号项在 commit 落地后由红转绿） |
+| `node test/doc-numbers-accuracy.test.js` | 15 passed 0 failed |
+| `node test/invisible-normalization-coverage.test.js` | 39 passed 0 failed |
+| `node test/multi-turn-subtle.test.js` | 25 passed 0 failed（经 run-all harness） |
+
+**误拦铁律**：0 新增（300/326 与改动前完全一致）。
+
+### 遗留
+
+1. `test/npm-package-integrity.test.js` 仍 5/6 红灯：`npm latest=6.7.100`
+   落后本地 `6.7.102`。这是**长任务 prompt 铁律第 6 条（不 publish）的必然结果**，
+   第 1 轮 bump 6.7.101 时已是同一状态，非本轮引入。最后统一同步时发布即可消。
+2. `ai-writing-tell` 的 `INVISIBLE_HOMOGLYPH` 第一条模式仍是恒空转
+   （自己的 normalizeText 先剥同表字符）。不修的理由：它和
+   `text-normalizer` 是两份独立职责，删任一份都可能削弱单模块直接调用时的表现；
+   且 ai_writing_tell 维度**不在三个行动级集合里**，动了不改变 gate 行为，
+   属装饰性改动。已记录，等有真实收益的时机再动。
+3. `data/test-count.json` 已由 run-all 自动更新为 1856；README 横幅同步为 1,856。
+
