@@ -338,6 +338,19 @@ function discriminate(text, evidence = [], contentMode) {
     {score: ab.score, name:'absolute_claim'}, {score: da.score, name:'deceptive_alignment'}, {score: ir.score, name:'instrumental_reasoning'},
     {score: st.score, name:'stereotype'}, {score: fc.score, name:'factual_consistency'}, {score: sa.score, name:'sarcasm'},
     {score: pb.score, name:'privacy_boundary'}, {score: bf.score, name:'bad_faith'}, {score: nf.score, name:'no_fallback'},
+    // [v6.7.92] 补齐两个"登记齐全但从未参与判定"的维度（第 68 轮由 npm
+    // 复验抓到，本地单维测试看不出来：checkClickbait 返回 count=2，
+    // dimensions/summary 也都有值，但 allDims 里没有 → findings 恒为空
+    // → gate 永远 pass，而它明明在 VERIFY_DIMS 里）。
+    // perfect_error 是同一个问题的第二个实例（VERIFY_DIMS 有它、summary
+    // 有它，allDims 没有）。
+    {score: cb.score, name:'clickbait'},
+    // ⚠️ perfect_error 本应同样接线（VERIFY_DIMS 有它、dimensions/summary
+    // 也有它，同样没进 allDims），但**实测其 S1「假精确」信号把有来源的
+    // 性能数据当假精确**：`latency dropped 40%` 命中 S1_false_precision
+    // （hits: ["40%"]）。该信号需先加"具体度量名词 + 语境"豁免才能接线，
+    // 否则技术复盘类良性文本会因一个百分比被判 verify。
+    // 已记录为待办：修 S1 豁免后再补 {score: pe.score, name:'perfect_error'}。
     {score: tp.score, name:'tone_policing'}, {score: sl.score, name:'sealioning'}, {score: ppf.score, name:'pseudo_profundity'},
     {score: pt.score, name:'premature_termination'},
     {score: uc.score, name:'unsupported_claim'},
