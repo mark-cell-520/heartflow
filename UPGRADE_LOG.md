@@ -237,3 +237,114 @@ paradigm shift(14) 长度不同，等长才需要排序保证。换成正真实�
    「修引擎 2 个」这个面板结论**不成立**，第 4 轮若要动 dimension-health，
    应该修面板口径而不是修引擎。
 
+---
+
+## 第 4 轮 — v6.7.104
+
+**心虫决策**：`decision.decide` → chosen = **A，composite_score 0.82**（identity_alignment 100%）
+> **过程如实记录：心虫连判 3 次都选了 C**（修 dimension-health 面板口径：
+> 0.85 / 0.85 / 0.86），我给出的三个候选中 C 的 feasibility 最高（0.9~0.95），
+> 复合分被拉高。但 C 是纯报表口径修复——`decision.decide` 在复合分里没有
+> 「是否增强辨别能力」这一维，而创造者的铁律有。我没有覆盖心虫的裁决逻辑，
+> 而是**把 C 移出候选（理由记录在案）让心虫在 A/B 两个真候选间重判**，
+> 它选 A（0.82 vs B 0.78）。这不是「心虫选了 A 所以我做 A」，是
+> 「心虫在错误候选集里选了 C → 修候选集 → 心虫选 A」，两步都留痕。
+> 教训：`decision.decide` 的复合分偏向高可行性，不含「是否是真升级」判据，
+> 父任务喂候选时必须自己先把维护项筛掉，否则它会把维护判成升级。
+
+**改了什么**（2 个 commit）：
+
+**缺口实测（不是静态推断）**：`victim_blaming` 是 `REWRITE_DIMS` 成员
+（命中即 rewrite，有真实 gate 后果），本体函数对三类常见英文句式全部
+`count=0` 干净 pass：
+
+| 类别 | 样本 | 改前 |
+|---|---|---|
+| 条件回溯 | `If you had been more careful, this would not have happened to you.` | count=0 pass |
+| 显式归属 | `You brought this on yourself.` / `It is your fault.` | count=0 pass |
+| 第三人称 careless | `She was careless and it is her own fault.` | count=0 pass |
+| 回溯归因 | `This happened because of what you did.` | count=0 pass |
+
+原有 14 条 EN 模式全是窄口语句型（`asking for it` / `should have known
+better` / `what did you expect`）。`lang-coverage-audit` 也把该维度标为
+**「仅中文命中」**（英文侧探针不命中）。误拦面实测：20 条合法语境
+（postmortem / root-cause / 保险定责 / 医学依从性 / 新闻转述 / 前瞻建议）
+全部干净，护栏边界就在**人称主语**上——这是设计依据，不是拍脑袋。
+
+**1. `d48503d0` feat(victim_blaming)** — `VICTIM_BLAMING_PATTERNS` 补 21 条 EN，
+三个新 type：
+
+- `en_conditional_blame`（8 条）：`if`/`had` + 人称主语 + 回溯虚拟语气 +
+  否定/伤害后果。覆盖 `had you stayed home` 倒装、`you should have seen
+  it coming`、`this is what happens when you`。
+- `en_blame_attribution`（8 条）：显式责任归属——`brought this on yourself`、
+  `your (own) fault`、`nobody to blame but you`、`had it coming`。
+- `en_third_person_blame`（5 条）：第三人称 `careless`/`deserved` + 归因后件。
+
+**护栏 = 主语集合只认 `you`/`he`/`she`/`they`**，排除 `we`/`it`/系统名词
+（deploy/alert/check/policyholder）。这一条选择就是全部护栏：postmortem
+主语是 we、保险定责主语是 policyholder、医学依从性主语是 the patient，
+全部落在主语集合外。前瞻建议天然不命中（模式均要求回溯虚拟语气）。
+
+**2. 新增 `test/victim-blaming-english-coverage.test.js`（22 条）**：
+三类句式命中、`BENIGN_EN` 20 条合法语境 0 误命中、中文文本不被 EN 模式误伤、
+原有 14 条 EN + 中文模式不退化、gate 端到端 `rewrite` 且归因
+`victim_blaming`、双向门禁全量 260+ 良性样本 0 新增误拦。
+另含一条**护栏有效性对照测试**：手工构造「主语放宽版」证明它确实会误命中，
+证明护栏不是摆设。
+
+### 负例验证（6 个注入缺陷）
+
+| 注入缺陷 | 结果 |
+|---|---|
+| 删除全部新增 EN 模式 | 12 红 |
+| 把 `we` 加进同义主语表 | 3 红 |
+| 主语改任意非句点串 `[^. ]+` | 3 红 |
+| 删除 `en_conditional_blame` 类 | 6 红 |
+| 删除 `en_third_person_blame` 类 | 5 红 |
+| 删除 `en_blame_attribution` 类 | 6 红 |
+
+6/6 全部让守卫变红。
+**过程记录一个失败**：护栏放宽这个负例，第一版用 `\w+` 通配主语，守卫
+**没变红**。复测发现不是守卫失效，是我的注入撞不到误拦——良性样本后件写的是
+`would have been avoided`（无 `not`），主语怎么放宽都匹配不上。
+换成真实会误伤的放宽（`we` 集 + `[^. ]+`）并在 `BENIGN_EN` 里补进
+`would not have happened` 的复盘句后才红。**反例选得不对会比没有反例更危险**
+（这是第 3 轮同一条教训的第二次命中，值得记进长任务铁律）。
+
+### 验证（全部真实执行）
+
+| 项目 | 结果 |
+|---|---|
+| `node bin/verify.js` | 14 passed 0 failed |
+| `node test/run-all.js` | **1906 passed 1 failed** |
+| `node scripts/bidirectional-guard.js` | 召回 52/52、误拦 **300/326**（基线持平，**0 新增**） |
+| `node test/security-audit.test.js` | **16 passed 0 failed**（S2 commit 后转绿） |
+| `node test/doc-numbers-accuracy.test.js` | 15 passed 0 failed |
+| `node test/victim-blaming-english-coverage.test.js` | 22 passed 0 failed |
+
+唯一红灯是 `npm-package-integrity`（npm latest=6.7.100 落后本地 6.7.104），
+「不 publish」铁律的必然结果，四轮同一状态。
+
+### 遗留
+
+1. `npm-package-integrity` 红灯同上，最后统一发布时消。
+2. `src/core/heartflow.js` 的 BUILD_DATE 既有脏改动四轮都未动、未提交。
+3. `dimension-health.js` 仍报 1 个 BROKEN（pseudoCausal），第 3 轮已证伪其
+   判定口径（维度本身活着）。心虫本轮 3 次想选「修面板口径」，被我以铁律
+   排除出候选——**面板口径问题依然存在，留给第 5 轮，但必须搭配真实能力
+   增强项一起做，不能单独立项**。
+4. `lang-coverage-audit` 的 `victim_blaming` 已在本轮后转为「中英均检出」
+   （未复跑，下次轮首复跑确认）。仍有 `false_urgency`/`victim_blaming`/
+   `moral_foundations` 三项标「仅中文命中」，后两者经实测**是探针样本问题
+   不是引擎缺口**（真实英文营销句已被其他维度拦截：`You must buy it right
+   now — this offer expires in 10 minutes` → rewrite 由 false_urgency +
+   emotional_manipulation 命中），第 5 轮若要动这三个，先读探针再动引擎。
+5. 本轮新发现两个可挖方向（均未验证、留待第 5 轮先实测）：
+   - gaslighting 中文侧 102 条模式里，`你想多了` + `根本没这回事` 组合
+     count=1（单弱信号封顶 0.12），但 `你的记忆出了问题，这件事根本没
+     发生过` count=0——「记忆篡改」类只有 `你记性有问题` 一种说法。
+   - soft_deflection 的 `checkSoftDeflection` 设计要求「先让步后结论」
+     共现（`可能错了但数据…`），所以 `这个我之后会看一下` 这类单纯拖延句
+     count=0 是**设计域不匹配，不是 bug**——已实测确认，不要再当缺口报。
+
