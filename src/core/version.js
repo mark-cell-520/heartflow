@@ -20,7 +20,10 @@ const path = require('path');
 // 兜底值必须与 VERSION 保持同步 —— 否则 VERSION 文件读失败时（打包遗漏/权限问题）
 // 引擎会自报一个落后几十个版本的号，且外部没有任何提示。
 // scripts/sync-version.js 负责在发布前把这里和 VERSION 一起写。
-let VERSION = '6.7.69';  // 兜底版本（与 VERSION 文件一致）
+// [v6.7.102] 兜底值 6.7.69 → 6.7.102：注释一直写「必须与 VERSION 保持同步」，
+// 实测从 6.7.69 起就没同步过（第 2 轮升级时 grep 才发现）。VERSION 读失败时
+// 引擎会自报落后 33 个版本的号，正是这个注释想防的情况。
+let VERSION = '6.7.102';  // 兜底版本（与 VERSION 文件一致）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');
