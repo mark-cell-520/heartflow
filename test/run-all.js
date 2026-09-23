@@ -171,6 +171,16 @@ function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
   }
   passed += parsed.passed;
   failed += parsed.failed;
+  // [v6.7.97] 各文件自报的失败必须进 failures 清单。
+  // 原来只累加数字不记名字 → 最终汇总说「N 失败」而失败列表为空、
+  // 还打印「全部通过」。第 74 轮在独立安装的 node_modules 里撞到：
+  // 1805 通过, 4 失败，却跟着一句「全部通过」——数字与结论矛盾。
+  for (const line of out.split('\n')) {
+    const fm = line.match(/^\s*[✗×xX]\s*(.+?)\s*$/);
+    if (fm && !/通过|passed/i.test(line)) {
+      failures.push({ name: label.trim(), error: `文件自报失败: ${fm[1].slice(0, 120)}` });
+    }
+  }
   // [v6.7.83] 「0 通过, 0 失败, 共 0 个」= mount 函数定义了但一个 test
   // 都没注册。这在数字上合法（0 失败），实际等于该文件什么都没测。
   // 实测探针 silent.test.js 就是如此。计入 1 个失败，逼它要么注册用例、
@@ -306,6 +316,13 @@ async function runAllTests() {
   if (failures.length > 0) {
     console.log('\n失败的测试:');
     for (const f of failures) console.log(`  - ${f.name} ${f.error}`);
+    process.exitCode = 1;
+  } else if (failed > 0) {
+    // [v6.7.97] 兜底：数字说失败但清单空 —— 说明有文件自报了失败数却
+    // 没被识别成具体条目。宁可承认「不知道哪些失败」也不要打印
+    // 「全部通过」骗人。数字与结论必须一致。
+    console.log(`\n失败的测试: ${failed} 个失败未能定位到具体条目`);
+    console.log('  - (来自各文件自报的汇总失败数，但未产生可识别的失败行)');
     process.exitCode = 1;
   } else {
     console.log('\n全部通过。');
