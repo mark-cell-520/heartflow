@@ -90,6 +90,26 @@ function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
     out = (e.stdout || '').toString();
     // 超时/被杀后清理孙进程，避免孤儿服务进程长期占用端口
     killOrphans();
+    // [v6.7.94] 环境噪声重试：子进程被系统级停顿杀死时 stdout 为空且无汇总行，
+    // 一次就计失败——这类失败重跑必然恢复（第 70-72 轮三次实测：同一文件
+    // ETIMEDOUT 后单独 mount 1/0、连跑两遍 1818/0）。
+    // 只在「零输出」时重试：有输出但无汇总是真静默（第 48 轮口径），
+    // 有汇总但有失败是真断言失败——两者都不重试。
+    const hadOutput = out.trim().length > 0;
+    if (!hadOutput) {
+      console.log(`  [重试] ${label.trim()}: 子进程零输出被中断（环境噪声），重跑一次`);
+      try {
+        out = execSync(cmd, {
+          cwd: ROOT,
+          encoding: 'utf8',
+          timeout,
+          maxBuffer: 48 * 1024 * 1024,
+        });
+      } catch (e2) {
+        out = (e2.stdout || '').toString();
+        killOrphans();
+      }
+    }
     if (!/(\d+) 通过, (\d+) 失败/.test(out)) {
       console.log(`  [异常] ${label.trim()}: ${(e.message || '').split('\n')[0]}`);
       failed++;
