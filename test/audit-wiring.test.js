@@ -20,7 +20,10 @@ function run({ test, assertEqual, assertTrue, assertFalse }) {
     const engine = new HeartFlow({ dataDir, silent: true });
     engine.start();
     const logger = new AuditLogger({ logPath: path.join(dataDir, 'audit', 'audit-log.jsonl') });
-    logger.log('engine_start', { version: engine.version });
+    // [v6.7.83] 真实 API 是 record(actionType, decision)，不是 log()。
+    // 原测试断言一个不存在的方法名，直接 TypeError。该失败此前的汇总
+    // 格式让它长期不可见（本轮 run-all 排查才暴露）。
+    logger.record('engine_start', { action: 'allow', reason: 'engine started', version: engine.version });
     const stats = logger.getStats();
     assertTrue(stats.persisted);
     engine.shutdown();
@@ -44,10 +47,17 @@ function run({ test, assertEqual, assertTrue, assertFalse }) {
     const root = tmpRoot();
     const logPath = path.join(root, 'audit-log.jsonl');
     const logger = new AuditLogger({ logPath });
-    logger.log('security_event', { user: 'alice' });
+    // [v6.7.83] 同上：record(actionType, decision)
+    logger.record('security_event', { action: 'allow', reason: 'test', user: 'alice' });
     const line = fs.readFileSync(logPath, 'utf8').trim().split('\n')[0];
     const entry = JSON.parse(line);
-    assertTrue(typeof entry.h === 'string' && entry.h.length === 12);
+    // [v6.7.83] 契约回归后字段是 entry.h（sha256 前 12 位）。
+    // 曾一度改成 snapshot.contextHash 去迎合重写版——那正是本轮修的错误方向：
+    // 应该修引擎恢复契约，不是改测试迎合被改坏的引擎。
+    assertTrue(
+      typeof entry.h === 'string' && entry.h.length === 12,
+      `h 应为 12 位字符串，实际 ${JSON.stringify(entry.h)}`
+    );
   });
 }
 
