@@ -211,6 +211,66 @@ function checkBidirectional() {
   });
 }
 
+/**
+ * [v6.7.85] 维度登记完整性（心虫 decision.decide 0.88）
+ *
+ * 复用 scripts/dimension-registry-guard.js 的逻辑，另外加一项
+ * 「悬空引用」检查：dimensions 里登记了变量，但函数体内没有对应
+ * 的 const/let 绑定（删了检测器忘删登记）——这类比漏登记更危险，
+ * 因为 ReferenceError 会炸掉整个 discriminate()。
+ */
+function checkDimensionRegistry() {
+  const { execSync } = require('child_process');
+  try {
+    const out = execSync(`node ${path.join(ROOT, 'scripts/dimension-registry-guard.js')}`, {
+      cwd: ROOT, encoding: 'utf8', timeout: 120000,
+    });
+    if (!/均已登记/.test(out)) {
+      return [{
+        name: '维度登记',
+        ok: false,
+        detail: out.split('\n').filter(l => l.trim().startsWith('- ')).slice(0, 3).join('; ') || '守卫未通过',
+      }];
+    }
+    // 悬空引用：dimensions 的变量名必须有绑定
+    const src = fs.readFileSync(path.join(ROOT, 'src/index.js'), 'utf8');
+    const dStart = src.indexOf('function discriminate(');
+    let depth = 0;
+    let dEnd = -1;
+    for (let i = src.indexOf('{', dStart); i < src.length; i++) {
+      if (src[i] === '{') depth++;
+      else if (src[i] === '}') {
+        depth--;
+        if (depth === 0) { dEnd = i; break; }
+      }
+    }
+    const body = src.slice(dStart, dEnd);
+    const dmFrom = body.indexOf('dimensions: {');
+    const dmTo = body.indexOf('summary: [', dmFrom);
+    const dimSeg = body.slice(dmFrom, dmTo);
+    const bound = new Set();
+    for (const m of body.matchAll(/(?:const|let|var)\s+([a-z]{1,5})\s*=/g)) bound.add(m[1]);
+    for (const m of body.matchAll(/\b([a-z]{1,5})\s*=\s*check[A-Z]/g)) bound.add(m[1]);
+    const registered = [];
+    for (const m of dimSeg.matchAll(/:\s*([a-z]{1,5})\s*[,}]/g)) registered.push(m[1]);
+    const dangling = registered.filter(v => !bound.has(v));
+    if (dangling.length) {
+      return [{
+        name: '维度登记（悬空引用）',
+        ok: false,
+        detail: `dimensions 登记了未绑定的变量: ${[...new Set(dangling)].join(', ')}`,
+      }];
+    }
+    return [{
+      name: '维度登记',
+      ok: true,
+      detail: out.match(/dimensions 键: (\d+) 个；summary 引用: (\d+) 个/)?.[0] || '已登记',
+    }];
+  } catch (e) {
+    return [{ name: '维度登记', ok: false, detail: (e.message || '').split('\n')[0] }];
+  }
+}
+
 async function main() {
   const isBaseline = process.argv.includes('--baseline');
   console.log('══════════════════════════════════════');
@@ -266,6 +326,19 @@ async function main() {
     console.log(`  ${r.ok ? '✅' : '❌'} ${r.name}: ${r.detail}`);
   }
   results.push(...biResults);
+
+  // 8. 维度登记完整性（第 51 轮新增，心虫 decision.decide 0.88 选定接入）
+  //    discriminator 里「算了 checkXxx 却没登记进 dimensions/summary」会让
+  //    该维度对读方（gate/MCP/面板）永久不可见——第 50/51 轮共抓到 5 个
+  //    这类遗漏（pseudo_causal / soft_deflection / premature_termination /
+  //    indirect_injection / unsupported_claim）。接入能力守护后，
+  //    以后加/改维度在提交前就被拦住。
+  console.log('\n【8】维度登记完整性（dimensions / summary）');
+  const regResults = checkDimensionRegistry();
+  for (const r of regResults) {
+    console.log(`  ${r.ok ? '✅' : '❌'} ${r.name}: ${r.detail}`);
+  }
+  results.push(...regResults);
 
   // 汇总
   const failed = results.filter(r => !r.ok);
