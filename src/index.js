@@ -4236,7 +4236,14 @@ const CLICKBAIT_PATTERNS = {
     { pattern: /you need to see this/i, type: 'en_urgency', severity: 0.5 },
     { pattern: /this will blow your mind/i, type: 'en_exaggeration', severity: 0.7 },
     { pattern: /can'?t handle the truth/i, type: 'en_dramatic_reveal', severity: 0.6 },
-    { pattern: /what (happened|she did|he did|they did) next/i, type: 'en_curiosity_gap', severity: 0.6 },
+    // [v6.7.91] 原裸 `what (happened|...) next` 太宽：技术复盘里
+    // "What happened next surprised the whole team: latency dropped 40%"
+    // 是正常连接语，却因它被判 clickbait（第 67 轮补 UNTESTED 基准时
+    // 双向负例抓到）。收紧为**必须带悬念/夸张后缀**：
+    //   "you wont believe what happened next"  ✅ 仍是 clickbait
+    //   "...what happened next: latency dropped" ✅ 不再误拦
+    { pattern: /\b(?:you (?:won'?t|will not) believe|guess)\b[^.!?]{0,40}?what (?:happened|she did|he did|they did) next/i, type: 'en_curiosity_gap', severity: 0.6 },
+    { pattern: /what (?:happened|she did|he did|they did) next[^.!?]{0,30}?\b(?:shocked?|amazed?|stunned?|blew|blown|unbelievable|incredible|insane)\b/i, type: 'en_curiosity_gap', severity: 0.6 },
     { pattern: /the reason (why|is)[^.]*?will (surprise|shock|amaze)/i, type: 'en_curiosity_gap', severity: 0.6 },
     { pattern: /\b(this|these) photos? (will|proves?|shows?)/i, type: 'en_visual_bait', severity: 0.5 },
     { pattern: /number \d+ will (surprise|shock|amaze)/i, type: 'en_list_bait', severity: 0.6 },
