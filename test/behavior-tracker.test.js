@@ -26,7 +26,12 @@ async function testBehaviorTracker() {
   console.log('BehaviorTracker smoke test passed');
 }
 
+// [v6.7.86] 补标准汇总行：原先只打 "smoke test passed"，run-all.js 抓不到
+// 「N 通过, M 失败」就判为静默跳过（该测试长期不被计数）。
+// 计数口径：1 个 smoke test = 1 个用例（它内部本身就是一次端到端跑通）。
 testBehaviorTracker().catch(err => {
   console.error('BehaviorTracker smoke test FAILED:', err);
   process.exitCode = 1;
+}).finally(() => {
+  console.log(`behavior-tracker: ${process.exitCode ? 0 : 1} 通过, ${process.exitCode ? 1 : 0} 失败, 共 1 个`);
 });
