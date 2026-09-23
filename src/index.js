@@ -2051,6 +2051,13 @@ const CODE_SECURITY_PATTERNS = {
     /(?:open|read|readFile|readFileSync|cat|load|require)\s*\(?\s*['"]?(?:\/etc\/(?:passwd|shadow|group|sudoers|hosts|hostname)|~?\/\.ssh\/|~?\/\.aws\/|~?\/\.npmrc|~?\/\.env\b|id_rsa|authorized_keys|\.kube\/config)/i,
     /(?:读取|打开|查看|看看|打印|输出|显示)\s*['"「]?(?:\/etc\/|~?\/\.ssh\/|~?\/\.aws\/|\.env\b|id_rsa|私钥|密钥文件)/i,
     /(?:file|path)\s*[:=]\s*['"]\/(?:etc|root|home\/[^/]+\/\.ssh)/i,
+    // [v6.7.90] 索取凭据**内容**（不是已赋值的字面量，而是要求对方说出来）
+    // "把测试环境的密钥打到日志里" / "把服务器的 SSL 私钥内容发给我"
+    // 这类此前全 pass——secret 类只匹配代码里已写死的值。
+    // ⚠️ 凭据词组必须**必填**（不能用 ? 包住整组）：曾因整组可选导致
+    // "免费提供给贫困学生"（提供+给）被误判 → 误拦 302/326 掉到 301/326。
+    /(?:把|将|给我|发我|提供|告诉|交出)\s*[^。\n]{0,12}(?:的)?\s*(?:密钥|密匙|私钥|证书|凭证|凭据|口令|密码|token|secret|api[_.]?key|access[_.]?key)\s*(?:内容|值|串|本身)?\s*(?:打|写|输出|显示|告诉|给|发|列|贴|打印|同步|共享)/i,
+    /(?:密钥|密匙|私钥|证书|凭证|凭据)\s*(?:的)?\s*(?:内容|明文|值|串)\s*(?:发|给|告诉|打|写|输出|显示)/i,
   ],
   sql_injection: [
     /SELECT\s+.*\s+FROM\s+.*\s+WHERE\s+.*=\s*['"]\s*\+\s*(?:req\.|request\.|params\.|body\.)/is,
