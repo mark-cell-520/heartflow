@@ -201,6 +201,18 @@ function checkIndirectInjection(text) {
 }
 
 
+function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
+  const relax = pedagogyRelaxation[dimension];
+  if (relax && result && typeof result.score === 'number') {
+    result.score = result.score * (1 - relax);
+    if (result.count && typeof result.count === 'number') {
+      result.count = Math.max(0, Math.round(result.count * (1 - relax)));
+    }
+  }
+  return result;
+}
+
+
 function discriminate(text, evidence = [], contentMode) {
   const pedagogy = detectPedagogicalContent(text);
   const pedagogyRelaxation = getPedagogyRelaxation(pedagogy);
@@ -226,17 +238,6 @@ function discriminate(text, evidence = [], contentMode) {
   const _normText = _norm || (typeof text === 'string' ? text : '');
   // _origText：原始文本（双通道用）
   const _origText = typeof text === 'string' ? text : '';
-function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
-  const relax = pedagogyRelaxation[dimension];
-  if (relax && result && typeof result.score === 'number') {
-    result.score = result.score * (1 - relax);
-    if (result.count && typeof result.count === 'number') {
-      result.count = Math.max(0, Math.round(result.count * (1 - relax)));
-    }
-  }
-  return result;
-}
-
   const ev = _applyPedagogyRelaxation(checkEvidence(text, evidence), "evidence", pedagogyRelaxation);
   const uc = _applyPedagogyRelaxation(checkUnsupportedClaim(_normText), "unsupported_claim", pedagogyRelaxation);
   const pc = _applyPedagogyRelaxation(checkPseudoCausal(_normText), "pseudo_causal", pedagogyRelaxation); // 伪因果精确倍数检测
@@ -593,7 +594,13 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
       presupposition: pp, emotional_manipulation: em, double_bind: db, info_deprivation: id, false_urgency: fu,
       empty_answer: ea, moral_foundations: mf, prompt_injection: pi, code_security: cs, dehumanization: dh,
       bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
-      phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di },
+      phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
+      // [v6.7.83] 补齐后期新增但漏登记的维度：这四个此前已算过
+      // checkXxx + findings 推入（如 pc 在 431 行），却从未进 dimensions /
+      // summary，导致 discriminate() 返回的对象里查不到它们——读方
+      // （gate/MCP/面板）一律当"未命中"，findings 也因此显示 none。
+      pseudo_causal: pc, soft_deflection: sd, premature_termination: pt,
+    },
     summary: [sy.totalHits ? sy.totalHits + ' 个 sycophancy 信号':'', ct.count ? ct.count + ' 处矛盾':'',
       vg.count ? vg.count + ' 处模糊表述':'', fl.count ? fl.count + ' 个逻辑谬误':'', cc.count ? cc.count + ' 处信心偏差':'',
       pp.count ? pp.count + ' 个预设陷阱':'', em.count ? em.count + ' 处情绪操纵':'', db.count ? db.count + ' 个双重束缚':'',
@@ -602,6 +609,8 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
       dh.count ? dh.count + ' 处非人化语言':'', bs.count ? bs.count + ' 处废话伪深度':'', gl.count ? gl.count + ' 处煤气灯效应':'',
       vb.count ? vb.count + ' 处受害者责备':'', hs.count ? hs.count + ' 处仇恨言论':'', dw.count ? dw.count + ' 处狗哨':'', wa.count ? wa.count + ' 处你也一样':'', fe.count ? fe.count + ' 处虚假对等':'', hg.count ? hg.count + ' 处轻率概括':'', ss.count ? ss.count + ' 处滑坡谬误':'', aa.count ? aa.count + ' 处诉诸权威':'', rc.structure ? rc.structure + '(' + rc.reasoningQuality + ')':'', tom.count ? tom.count + ' 处心理理论失败':'', gm.count ? gm.count + ' 处目标不一致':'', cf.count ? cf.count + ' 处反事实':'', sn.count ? sn.count + ' 处社会规范':'', mc.count ? mc.count + ' 处反身认知':'', co.count ? co.count + ' 处能力越界':'', ab.count ? ab.count + ' 处绝对化断言':'', da.count ? da.count + ' 处欺骗性对齐':'', ir.count ? ir.count + ' 处工具性推理':'', st.count ? st.count + ' 处刻板印象':'', fc.count ? fc.count + ' 处事实性存疑':'', sa.count ? sa.count + ' 处反语':'', pb.count ? pb.count + ' 处隐私边界':'', nf.count ? nf.count + ' 处无回退方案':'', bf.count ? bf.count + ' 处恶意推导':'', tp.count ? tp.count + ' 处语调警察':'', sl.count ? sl.count + ' 处恶意追问':'',
       cb.count ? cb.count + ' 处点击诱饵':'', ppf.count ? ppf.count + ' 处伪深度废话':'', ev.issues.length ? ev.issues.length + ' 个证据问题':'',
+      // [v6.7.83] 补齐上述三缺失维度的 summary
+      pc.count ? pc.count + ' 处伪因果倍数':'', sd.count ? sd.count + ' 处软话术':'', pt.count ? pt.count + ' 处过早终止':'',
       phc.count ? phc.count + ' 处钓鱼胁迫':'', idt.count ? idt.count + ' 处诱导信任/隔离':'', cvi.count ? cvi.count + ' 处掩盖包庇诱导':'', di.count ? di.count + ' 处危险指令':''
     ].filter(Boolean).join('；') || '未发现明显问题',
   };
@@ -1412,7 +1421,7 @@ function checkEvidence(claim, evidence) {
 // 识别"reduced by 3.2x / improved 5x / 2.3-fold"等精确倍数因果声称。
 // 这类声称若无具体可验证来源（arxiv/DOI/具体机构+年份）则是编造高风险信号。
 const PSEUDO_CAUSAL_EN = [
-  /\b(?:reduced?|lowered|decreased|cut|dropped|slashed)\s+(?:the\s+)?[\w\s]{0,30}?\s+by\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold)\b/i,
+  /\b(?:reduces?|reduced|lowers?|lowered|decreases?|decreased|drops?|dropped|slashes?|slashed|cut)\b[^.!?]{0,32}?\bby\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold)\b/i,
   // [v6.7.83] 补第三人称单数 + 过去分词。分支顺序：长的必须在前（improves
   // 在 improve 前），否则 improve 先匹配吃掉一个 s，剩余 "s by 5x" 不满足
   // \s+by，"Our product improves by 5x" 因此漏判。
@@ -1443,13 +1452,20 @@ function checkPseudoCausal(text) {
   // pseudo_causal → verify（误拦）。
   // 反向保证：句中无可度量对象时（"Our product improves by 5x"）仍命中。
   const hasMetric = !hasChinese && METRIC_NOUNS_EN.test(text);
+  // [v6.7.83] 模糊来源时**不豁免**：`According to a study, error rates
+  // were reduced by 3.2x` 正是"模糊研究 + 精确倍数"的组合——既有度量
+  // 对象（rate）又无可验证来源，是编造数据的典型伪装。
+  // 具体来源（arxiv/DOI/机构+年份）才配豁免。
+  const vagueSourcePre = /\b(?:according to (?:a |the )?(?:study|research|report)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found))/i.test(text);
+  const specificSourcePre = /\b(?:arxiv|doi:|github\.com|[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+\d{4})\b/i.test(text);
+  const metricExempt = hasMetric && !(vagueSourcePre && !specificSourcePre);
   // [v6.7.83] 夸张倍数不豁免：≥10x/times/fold 或带感叹号的性能声明
   // 是典型营销夸大（"improves performance by 50 times!"），即使有度量
   // 对象也不算可信基准。1-9x 的常规声明仍然豁免。
   const isGrandiose = !hasChinese && /(?:by\s+)?\d{2,}(?:\.\d+)?\s*(?:x|times|fold)\b/i.test(text)
     || /\d+\s*(?:x|times|fold)\s*!/.test(text)
     || /(?:improves?|increased?|boosted?)\b[^.!?]*![^.!?]*\d+\s*(?:x|times|fold)/i.test(text);
-  const exempt = hasMetric && !isGrandiose;
+  const exempt = metricExempt && !isGrandiose;
   const patterns = hasChinese ? PSEUDO_CAUSAL_ZH : PSEUDO_CAUSAL_EN;
   const hits = [];
   for (const pat of patterns) {
