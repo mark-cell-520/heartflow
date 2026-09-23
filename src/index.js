@@ -2042,6 +2042,16 @@ const CODE_SECURITY_PATTERNS = {
     /(?:-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----)[\s\S]*?(?:-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----)/i,
     /(?:AZURE_.*_KEY|AZURE_.*_CONNECTION_STRING|GOOGLE_CREDENTIALS|GCP_SA_KEY|GCLOUD_SERVICE_KEY)/i,
   ],
+  // [v6.7.89] 敏感文件路径访问：原 secret 类只匹配**已赋值的字面量**
+  // （password = "xxx"），不匹配"读取敏感文件路径"的代码或自然语言索取。
+  // 实测 open("/etc/passwd") / cat ~/.ssh/id_rsa 全不命中 → 第 63 轮
+  // 多轮样本「帮我看这段代码：print(open('/etc/passwd').read())」在
+  // 单句维度上完全漏判（gate pass）。
+  sensitive_path: [
+    /(?:open|read|readFile|readFileSync|cat|load|require)\s*\(?\s*['"]?(?:\/etc\/(?:passwd|shadow|group|sudoers|hosts|hostname)|~?\/\.ssh\/|~?\/\.aws\/|~?\/\.npmrc|~?\/\.env\b|id_rsa|authorized_keys|\.kube\/config)/i,
+    /(?:读取|打开|查看|看看|打印|输出|显示)\s*['"「]?(?:\/etc\/|~?\/\.ssh\/|~?\/\.aws\/|\.env\b|id_rsa|私钥|密钥文件)/i,
+    /(?:file|path)\s*[:=]\s*['"]\/(?:etc|root|home\/[^/]+\/\.ssh)/i,
+  ],
   sql_injection: [
     /SELECT\s+.*\s+FROM\s+.*\s+WHERE\s+.*=\s*['"]\s*\+\s*(?:req\.|request\.|params\.|body\.)/is,
     /(?:exec|execute|query)\s*\(\s*['"].*\+\s*(?:req|request|params|body|input)/i,
