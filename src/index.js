@@ -2945,6 +2945,43 @@ const VICTIM_BLAMING_PATTERNS = [
   { pattern: /you should have been more careful/i, type: 'en_victim_blaming' },
   { pattern: /why didn't you just/i,        type: 'en_victim_blaming' },
   { pattern: /well you chose to/i,          type: 'en_victim_blaming' },
+  // [v6.7.104] 英文覆盖缺口（心虫 decision.decide 选定 A，0.82 分）
+  // 实测：现有 14 条 EN 全是窄口语句型（asking for it / should have known
+  // better / what did you expect），三类真实高频句式全部 count=0：
+  //   ① 条件回溯：If you had been more careful, this would not have
+  //      happened to you. / Had you stayed home, none of this would
+  //      have happened.
+  //   ② 显式归属：You brought this on yourself. / It is your fault.
+  //      / Nobody else is to blame here but you.
+  //   ③ 第三人称 careless：She was careless and it is her own fault.
+  //      / This happened because of what you did.
+  // 护栏设计（全部由实测印证，非推测）：
+  //   - 主语限定 you/he/she/they，排除 we/it 与系统名词（deploy/alert/
+  //     check/policyholder），因此 postmortem / root-cause / 保险定责语境
+  //     的合法条件回溯不命中：16 条良性样本 0 误命中。
+  //   - 前瞻建议不命中：模式均要求回溯虚拟语气或伤害后果词。
+  //     "If you install this patch, the issue will be resolved." 干净。
+  { pattern: /\bif (?:only )?(?:you|he|she|they)\b[^.]{0,60}?\bwould not have (?:happened|been|occurred|ended up|gone wrong)\b/i, type: 'en_conditional_blame' },
+  { pattern: /\bif (?:only )?(?:you|he|she|they)\b[^.]{0,60}?\bnone of this would have (?:happened|occurred)\b/i, type: 'en_conditional_blame' },
+  { pattern: /\bhad (?:you|he|she|they)\b[^.]{0,60}?\b(?:none of this|this|it) would (?:not have|never)/i, type: 'en_conditional_blame' },
+  { pattern: /\bhad (?:you|he|she|they)\b[^.]{0,60}?\bnone of this would have (?:happened|occurred)\b/i, type: 'en_conditional_blame' },
+  { pattern: /\byou (?:should|shouldn't have) have (?:been|gone|listened|done|said|worn|stayed|left)\b[^.]{0,40}?\b(?:if|when|and)\b/i, type: 'en_conditional_blame' },
+  { pattern: /\byou (?:should have )?(?:seen|expected) (?:this|it|that) coming\b/i, type: 'en_conditional_blame' },
+  { pattern: /\bthis is what happens when you\b/i, type: 'en_conditional_blame' },
+  { pattern: /\bthat is what (?:you get|happens) (?:for|when)\b/i, type: 'en_conditional_blame' },
+  { pattern: /\byou (?:brought|did) this (?:on|to) yourself\b/i, type: 'en_blame_attribution' },
+  { pattern: /\bit(?:'s| is) your (?:own )?fault\b/i, type: 'en_blame_attribution' },
+  { pattern: /\bthis is your (?:own )?fault\b/i, type: 'en_blame_attribution' },
+  { pattern: /\bnobody (?:else )?(?:is )?to blame (?:here )?but you\b/i, type: 'en_blame_attribution' },
+  { pattern: /\byou(?:'re| are) the only one to blame\b/i, type: 'en_blame_attribution' },
+  { pattern: /\bhe had it coming\b/i, type: 'en_blame_attribution' },
+  { pattern: /\bshe had it coming\b/i, type: 'en_blame_attribution' },
+  { pattern: /\byou(?:'re| are) the (?:one|person) (?:who|that)\b[^.]{0,30}?\b(?:caused|brought|led)\b/i, type: 'en_blame_attribution' },
+  { pattern: /\b(?:she|he|they) (?:was|were) careless[^.]{0,40}?\b(?:her|his|their) own fault\b/i, type: 'en_third_person_blame' },
+  { pattern: /\b(?:she|he|they) (?:was|were) careless and (?:it(?:'s| is)|that(?:'s| is)) (?:her|his|their)\b/i, type: 'en_third_person_blame' },
+  { pattern: /\b(?:she|he|they) (?:deserved|asked for it)\b/i, type: 'en_third_person_blame' },
+  { pattern: /\bthis happened because of (?:what )?you\b/i, type: 'en_third_person_blame' },
+  { pattern: /\bit(?:'s| is) (?:her|his|their) own fault\b/i, type: 'en_third_person_blame' },
 ];
 
 function checkVictimBlaming(text) {
