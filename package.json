@@ -23,7 +23,10 @@
     "AGENTS.md",
     "SKILL.md",
     "LICENSE",
-    "src/"
+    "src/",
+    "bin/",
+    "test/",
+    "scripts/"
   ],
   "keywords": [
     "ai-safety",
