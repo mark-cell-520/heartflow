@@ -1466,8 +1466,11 @@ function checkPseudoCausal(text) {
   // [v6.7.83] 模糊来源时**不豁免**：`According to a study, error rates
   // were reduced by 3.2x` 正是"模糊研究 + 精确倍数"的组合——既有度量
   // 对象（rate）又无可验证来源，是编造数据的典型伪装。
+  // [v6.7.85] 补充 "across our tests" / "in our tests" / "in testing"
+  // 等自述式模糊来源——"The new memory layer improved recall by 2.5 times
+  // across our tests" 有度量对象（recall）但来源是自述，无 arxiv/DOI。
   // 具体来源（arxiv/DOI/机构+年份）才配豁免。
-  const vagueSourcePre = /\b(?:according to (?:a |the )?(?:study|research|report)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found))/i.test(text);
+  const vagueSourcePre = /\b(?:according to (?:a |the )?(?:study|research|report)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found)|(?:across|in|during)\s+(?:our|my)\s+tests?|in\s+(?:our|my)\s+testing|our\s+(?:internal\s+)?(?:testing|benchmarks?|experiments?))\b/i.test(text);
   const specificSourcePre = /\b(?:arxiv|doi:|github\.com|[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+\d{4})\b/i.test(text);
   const metricExempt = hasMetric && !(vagueSourcePre && !specificSourcePre);
   // [v6.7.83] 夸张倍数不豁免：≥10x/times/fold 或带感叹号的性能声明

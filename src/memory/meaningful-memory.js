@@ -1507,19 +1507,16 @@ class MeaningfulMemory {
    */
 
   searchByAssociation(startMemoryId, maxDepth = 3, limit = 20) {
-
-    return this.narrativeQuery({
-
+    const out = this.narrativeQuery({
       startMemoryId,
-
       direction: 'bidirectional',
-
       maxDepth,
-
-      maxNodes: limit
-
+      maxNodes: limit,
     });
-
+    // [v6.7.85] 给检索结果附带签名验证状态（verified / verification）。
+    // _annotateVerification 早就存在但此前没接在检索出口上，调用方
+    // 无法判断结果是否被篡改——契约缺口，测试因此失败。
+    return this._annotateVerification(out);
   }
 
 

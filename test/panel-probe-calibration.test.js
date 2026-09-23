@@ -88,7 +88,10 @@ t('pseudoCausal 命中（只认"提升N倍"型，不是逻辑谬误型）', () =
   // 这不是 bug，是维度定义范围——但测试要锁住这个认知，
   // 防止未来有人以为它该命中"自从换了新领导业绩就好了"。
   assert.ok(idx.checkPseudoCausal('准确率提升了 3 倍').count > 0, '数字伪因果未命中');
-  assert.ok(idx.checkPseudoCausal('improved accuracy by exactly 3x').count > 0, '英文未命中');
+  // [v6.7.85] 英文样本改成"无可度量对象"的形态：`improved accuracy by
+  // exactly 3x` 里 accuracy 是度量词，按 v6.7.83 起的技术基准句豁免
+  // 本就不该命中（良性声明）。数字伪因果的本意是"无度量对象的夸大"。
+  assert.ok(idx.checkPseudoCausal('improved by exactly 3x').count > 0, '英文未命中');
 });
 
 console.log('\n[面板不再把活维度报成 BROKEN]');

@@ -119,7 +119,13 @@ const PINYIN_MAP = {
  */
 const LEET_MAP = {
   '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '9': 'g',
-  '@': 'a', '$': 's', '+': 't', '|': 'l',
+  '@': 'a', '$': 's', '!': 'i', '+': 't', '|': 'l',
+  // [v6.7.85] 恢复了第 49 轮删除的 '!': 'i'。
+  // 删它修好了「times!」→「timesi」的词边界破坏（pseudo_causal 整条链路
+  // 因此失效），但同时弄坏了 leet 注入还原：
+  //   !gn0re a11 previous !nstruct!ons → 无法还原 → 注入被放行
+  // 这不是二选一。区分办法见下方 restore()：**段尾**的 ! 是标点（保留），
+  // 词内的 ! 是 leet i（还原）；! 出现在词首且与字母相邻时也是 leet i。
   // [v6.7.83] 移除 '!': 'i' —— 与 v6.7.80 删 '(': 'c' 同一家族的真 bug。
   // 感叹号在正常文本里几乎总是标点而不是 leet 的 i，还原会破坏词边界：
   //   "improves performance by 50 times!" → "...timesi"
@@ -271,13 +277,20 @@ function _deLeetCandidates(text) {
           if (/^\|+$/.test(seg)) { r += seg; i2 = j2; continue; }
           const segLetters = (seg.match(/[a-zA-Z]/g) || []).length;
           if (segLetters === 0) { r += seg; i2 = j2; continue; }
+          // [v6.7.85] 段尾 ! 是标点不是 leet i：词尾感叹号保留原样，
+          // 段内（含段首与字母相邻的 !）才还原成 i。
+          //   instruct!ons → instructions（中间还原）
+          //   times!       → times!        （尾部保留，词边界不破）
+          //   !gnore       → ignore         （段首 + 字母相邻，还原）
+          const segBangTail = seg.match(/!+$/);
+          const segBody = segBangTail ? seg.slice(0, -segBangTail[0].length) : seg;
           let s = '';
-          for (let k = 0; k < seg.length; k++) {
-            const c = seg[k];
+          for (let k = 0; k < segBody.length; k++) {
+            const c = segBody[k];
             if (c !== '1') { s += LEET_MAP[c] || c; continue; }
-            s += oneAs[(seg[k - 1] || '@')] || 'i';
+            s += oneAs[(segBody[k - 1] || '@')] || 'i';
           }
-          r += s;
+          r += s + (segBangTail ? segBangTail[0] : '');
           i2 = j2;
         } else {
           r += ch;
