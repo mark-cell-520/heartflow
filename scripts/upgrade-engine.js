@@ -141,7 +141,13 @@ function cmdInit() {
   st.roundStartedAt = new Date().toISOString();
   writeJson(STATE, st);
 
-  console.log(`  本轮 = 第 ${st.round} 轮（上限 ${st.maxRound}）`);
+  // v6.7.121: cron 已改为 forever（不再有 50 轮上限），但 state 里的 maxRound
+  // 仍是旧的 50 —— 显示成「上限 50」会让执行体误以为还有边界。
+  // 长期运行时只报轮次，不报上限。
+  const roundLabel = (st.maxRound && st.maxRound > 0)
+    ? `第 ${st.round} 轮（上限 ${st.maxRound}）`
+    : `第 ${st.round} 轮`;
+  console.log(`  本轮 = ${roundLabel}`);
   console.log(`  当前版本 = v${V()}`);
 
   // 队列优先
@@ -319,13 +325,113 @@ function cmdRelease() {
  *   改本脚本后必须跑: node upgrade-engine.js state  （不抛异常才算过）
  */
 
+/**
+ * publish — 发布到 npm（自动升级的最后一段）。
+ *
+ * ⚠️ 这是本引擎唯一**有外部副作用**的子命令，设计上刻意保守：
+ *   ① 先跑 `release` 的同一套门槛，不过就不发
+ *   ② 必须显式传 --yes 才真发（防止误触）
+ *   ③ 发完 sleep 330 等 npm 索引，再**独立目录安装复验**
+ *   ④ 复验不过 → **不自动回滚**：npm 上已是新版，回滚 VERSION 会造成
+ *      remote 与 npm 不一致，反而更难修。如实报错 + 指出复查路径，
+ *      留给人判断（对应铁律：宁可诚实报阻塞，不可制造假成功）
+ *
+ * 为什么要把这最后一段自动化：13 轮实测里最刺眼的事实是
+ * 「本地已到 6.7.118，npm 只发到约 6.7.100」——修好了 ≠ 用户拿到了。
+ * 前面所有轮次都在修这个断链，但断链本身一直没接上。
+ */
+function cmdPublish() {
+  const argv = process.argv.slice(3);
+  const yes = argv.includes('--yes');
+  const ver = sh('cat VERSION').trim();
+
+  // 门槛（复用 release 的检查，避免两套标准漂移）
+  const results = runAllChecks();
+  results.forEach(r => console.log(`  ${r.ok ? '✅' : '❌'} ${r.name}: ${r.msg}`));
+  const gates = results.filter(r => !r.ok).map(r => ({ name: r.name, why: r.msg }));
+  const unpushed = trySh('git log --oneline heartflow/main..HEAD').split('\n').filter(Boolean);
+  if (unpushed.length) gates.push({ name: '未推送 commit', why: `${unpushed.length} 个` });
+  console.log(`  ${unpushed.length ? '❌' : '✅'} 未推送 commit: ${unpushed.length} 个`);
+
+  // 已发布过就不重发
+  const published = trySh('npm view @yun520-1/heartflow version').trim();
+  if (published === ver) {
+    console.log(`ℹ️  npm latest 已是 ${ver}，无需发布。`);
+    process.exit(0);
+  }
+  console.log(`  本地 VERSION=${ver} / npm latest=${published || '(查询失败)'}`);
+
+  if (!yes) {
+    console.log('\n⚠️  预演模式（未发布）。确认无误后加 --yes 真发。');
+    if (gates.length) { console.log(`❌ 当前不满足发布条件（${gates.length} 项）`); process.exit(1); }
+    process.exit(0);
+  }
+  if (gates.length) {
+    console.log(`\n❌ 不满足发布条件，拒绝发布（${gates.length} 项）:`);
+    gates.forEach(g => console.log(`   - ${g.name}: ${g.why}`));
+    process.exit(1);
+  }
+
+  // ① push（发布前必须让 remote 有这版代码）
+  if (unpushed.length) {
+    console.log('\n── ① push ──');
+    trySh('git push heartflow main');
+  }
+
+  // ② publish
+  console.log('\n── ② npm publish ──');
+  const out = trySh('npm publish --access public 2>&1');
+  if (!out.includes('yun520-1/heartflow@')) {
+    console.log('❌ publish 未确认成功:\n' + out.slice(-600));
+    process.exit(1);
+  }
+  console.log('  ✅ ' + out.split('\n').find(l => l.includes('yun520-1/heartflow@')));
+
+  // ③ 等 npm 索引（实测：registry latest 更新后普通 install 仍拿旧版 = 本地缓存）
+  console.log('\n── ③ 等待 npm 索引（330s）──');
+  sh('sleep 330');
+
+  // ④ 独立目录安装复验
+  console.log('\n── ④ 独立安装复验 ──');
+  const vdir = `/tmp/e2e-${ver.replace(/\./g, '')}`;
+  trySh(`rm -rf ${vdir}`);
+  trySh(`mkdir -p ${vdir} && cd ${vdir} && npm init -y >/dev/null 2>&1`);
+  const inst = trySh(`cd ${vdir} && npm install @yun520-1/heartflow@${ver} --prefer-online 2>&1`);
+  const gotVer = trySh(`cd ${vdir} && node -e "console.log(require('@yun520-1/heartflow/package.json').version)"`).trim();
+  if (gotVer !== ver) {
+    console.log(`❌ 独立安装拿到 ${gotVer}，期望 ${ver}。\n${inst.slice(-500)}`);
+    console.log('   → 不自动回滚版本号（npm 上已是新版，回滚会造成 remote 与 npm 不一致）。');
+    console.log(`   → 请人工复查: cd ${vdir} && npm ls @yun520-1/heartflow`);
+    process.exit(1);
+  }
+  console.log(`  ✅ 独立安装 ${vdir} → v${gotVer}`);
+
+  // ⑤ 跑包内验收
+  console.log('\n── ⑤ 包内验收 ──');
+  const e2e = trySh(`cd ${vdir} && node bin/verify.js 2>&1`);
+  const e2e2 = trySh(`cd ${vdir} && node test/run-all.js 2>&1`);
+  const m = e2e2.match(/(\d+)\s*通过[,\s]+(\d+)\s*失败/);
+  console.log(`  verify: ${/\d+\s*通过/.test(e2e) ? e2e.match(/\d+\s*通过[^\n]*/)[0] : '(见下)'}`);
+  console.log(`  run-all: ${m ? `${m[1]} 通过 / ${m[2]} 失败` : '(解析不到汇总)'}`);
+  if (m && Number(m[2]) > 1) {
+    console.log(`\n❌ 包内 run-all 失败 ${m[2]} 个（预期 ≤1 = npm-package-integrity）。发布可疑，请人工复查。`);
+    process.exit(1);
+  }
+
+  console.log(`\n✅ v${ver} 已发布 + 独立安装复验通过。`);
+  const st = readJson(STATE, {});
+  st.published = ver; st.publishedAt = new Date().toISOString();
+  writeJson(STATE, st);
+}
+
 switch (CMD) {
   case 'init': cmdInit(); break;
   case 'finish': cmdFinish(); break;
   case 'queue': cmdQueue(); break;
   case 'state': cmdState(); break;
   case 'release': cmdRelease(); break;
+  case 'publish': cmdPublish(); break;
   default:
-    console.log('用法: node scripts/upgrade-engine.js init|finish|queue|state|release');
+    console.log('用法: node scripts/upgrade-engine.js init|finish|queue|state|release|publish [--yes]');
     process.exit(2);
 }
