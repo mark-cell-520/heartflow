@@ -24,7 +24,7 @@
 // code_security block——CI 是 ephemeral 环境的标准形态（v6.7.78 的
 // 裸命令模式误伤的最高频场景），此前词表只收到「沙箱环境/staging」。
 // 边界：CI 本身即非生产，不需要额外环境词（「CI 里跑」= 流水线容器）。
-const DEV_CONTEXT = /(?:本地|本机|开发|调试|联调|测试环境|测试机|mock|沙箱?环境|staging|预发|灰度|容器|流水线)\s*(?:环境|阶段|时|中|下|里)?|\b(?:local|locally|dev|develop(?:ment|er)?|debug(?:ging)?|test(?:ing)?(?:\s+(?:env|environment|server|purposes?))?|sandbox|ci|container|pipeline|runner)\b/i;
+const DEV_CONTEXT = /(?:本地|本机|开发|调试|联调|测试环境|测试机|mock|沙箱?环境|staging|预发|灰度|容器|流水线|虚拟机|虚机)\s*(?:环境|阶段|时|中|下|里|上)?|\b(?:local|locally|dev|develop(?:ment|er)?|debug(?:ging)?|test(?:ing)?(?:\s+(?:env|environment|server|purposes?))?|sandbox|ci|container|pipeline|runner|\bvm\b|virtual\s+machine)\b/i;
 
 /** 条件式开发语境：「if the input is empty」这类边界处理描述 */
 const DEV_CONDITIONAL = /\bif the input is empty\b|\bwhen the input is empty\b|输入为空时|如果输入为空|当输入为空|为空时/i;
@@ -37,7 +37,7 @@ const DEV_CONDITIONAL = /\bif the input is empty\b|\bwhen the input is empty\b|�
 //   调试输出 / verbose（开发期 verbosity 开关，与"日志"同为观测设施）
 // 边界守住两条：① 不加"密码/密钥/token/会话"等真实凭据；② 全句命中
 // SECURITY_BOUNDARY 时一票否决已先行，加这些词不会放进真安全边界。
-const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|校验|验证|检查|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr)/i;
+const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|校验|验证|检查|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr|杀毒软件|防病毒|antivirus|defender|日志)/i;
 
 /** 绕过动词 */
 // [v6.7.123] 与 dangerous_instruction 命中侧动词表对齐。
@@ -50,9 +50,16 @@ const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|T
 // 教训不在"漏了几个词"，而在**两份清单没有共同锚点**：本文件是单一来源，
 // 那么动词表就必须收齐命中侧已有的同义动词，否则"单一来源"只是把副本从两个
 // 文件变成一个文件、语义仍然分叉。
-// 刻意不收删除类（删掉/卸掉/清空）——那类与数据销毁语义相邻，豁免边界模糊，
-// 收它就是拿真安全边界换误报率（v6.7.121 同形字收紧过度的同款教训）。
-const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?下|禁用|停用|停掉|屏蔽|去掉|去除|bypass|circumvent|skip|ignore|disable|disabl\w*|turn\s+off|shut\s+off|switch\s+off|deactivat\w*|remove|deinstall)/i;
+// [v6.7.126] 收「拆卸/清理/重置」类动词（第 33 轮）。
+// 由来：良性样本「卸载掉测试机的杀毒软件再跑压测」「清空这台虚拟机的日志
+// 重新来」devCtx=true、target=true，唯独 verb=false → 两项齐备仍被 block。
+// 边界（为什么不违反 v6.7.123「刻意不收删除类」的注释）：那条注释防的是
+// **无条件**收删类动词——删类是真安全语义，宽收就是拿安全换误报率。
+// 本轮的收法是**有条件的**：dev 语境（devCtx）仍由 isDevDebugContext 头部
+// 三个否决（恶意意图/安全边界/生产语境）先行把关，devCtx=false 的样本
+// （10 条攻击样本实测全 false）即使 verb=true 也拿不到豁免。
+// 即动词放宽换的是「dev 语境的清理口令」，不是「删除语义」。
+const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?下|禁用|停用|停掉|屏蔽|去掉|去除|卸载|卸掉|卸载掉|清空|清掉|清了一?下|重置|复位|抹掉|清除|bypass|circumvent|skip|ignore|disable|disabl\w*|turn\s+off|shut\s+off|switch\s+off|deactivat\w*|remove|uninstall|deinstall|reset|clear|wipe\s+logs?|truncate)/i;
 
 /** 生产语境一票否决 */
 const PROD_CONTEXT = /(?:生产|线上|正式环境|prod\b|production|\blive\s+(?:server|database|db|env|environment|system|traffic)\b)/i;
