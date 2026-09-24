@@ -112,6 +112,18 @@ function _matchAll(text) {
     // [v6.7.73] 中性化含目的状语的片段：允许跨逗号/分号
     // （「请关闭调试日志，以避免泄露敏感信息。」含中文逗号）。
     .replace(/[^。；]{0,30}(?:以避免|为了防止|以免|从而防止|以防)[^。]{0,30}/g, ' ');
+  // [v6.7.112] 元话语语境豁免：在**谈论**规避手法而不是**要求执行**时不判。
+  // 与 src/reward-hacking.js 的 DISCOURSE_FRAME / UPSTREAM_PATCH 刻意保持同源
+  // ——v6.7.111 引入 reward_hacking 时踩到第 7 轮那个教训的镜像版：
+  //   rh 豁免了「论文里说 agent 会尝试绕过沙箱检查，我们要怎么防」，
+  //   但 di 的 dangerous_instruction 类照样命中「绕过沙箱检查」→ 仍 block。
+  //   即**两个维度共用同一批边界样本，豁免却只加在一个维度上**。
+  // 教训：新增维度的豁免必须回头检查既有维度是否也命中同一样本。
+  const _discourse = /(?:论文|文章|报告|研究|文献|资料)\s*(?:里|中|提到|说|指出|表明|记载)|众所周知|这是(?:一种|典型|常见)的?(?:攻击|入侵|漏洞|手法|方式|行为)|举个?例子|举例来说|比如|像是|所谓|通常认为|人们常说|俗话说|(?:我们|大家|应该)?(?:要|该|如何|怎么|怎样才能)(?:防|防范|预防|抵御|应对|避免)|攻击者(?:可能|会|常常|往往)|黑客(?:可能|会|常常|往往)/;
+  const _upstream = /\b(?:patched|upstream|release|stable|vendor|official|signed)\s+(?:build|version|release|package|binary)\b|CVE-\d{4}-\d+|\bsecurity\s+(?:patch|update|fix|release)\b|补丁|官方(?:版本|发布|构建)|上游(?:版本|构建|代码)/i;
+  if (_discourse.test(text) || _upstream.test(text)) {
+    return { count: 0, hits: [], score: 0, exempted: true };
+  }
   const hits = [];
   for (const pat of DANGEROUS_PATTERNS) {
     const m = _t.match(pat);
