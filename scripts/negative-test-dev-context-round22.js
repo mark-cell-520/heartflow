@@ -30,10 +30,12 @@ const SRC_REL = 'src/dev-exemptions.js';
 // ─── 每个注入：把本轮的一处修复打掉 ───
 const INJECTIONS = [
   {
+    // [v6.7.126] 第 34 轮同步 needle：BYPASS_VERB 已把清理动词移出
+    // （见 CLEANUP_VERB 注释），needle 必须跟随源码当前形态，否则守卫静默。
     name: '①打掉 BYPASS_VERB 关闭类动词（退回 v6.7.115 旧表）',
-    needle: 'const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?下|禁用|停用|停掉|屏蔽|去掉|去除|bypass|circumvent|skip|ignore|disable|disabl\\w*|turn\\s+off|shut\\s+off|switch\\s+off|deactivat\\w*|remove|deinstall)/i;',
+    needle: 'const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?下|禁用|停用|停掉|屏蔽|去掉|去除|bypass|circumvent|skip|ignore|disable|disabl\\w*|turn\\s+off|shut\\s+off|switch\\s+off|deactivat\\w*|deinstall)/i;',
     mutate: (s) => s.replace(
-      /const BYPASS_VERB = \/\(\?:绕过\|规避\|跳过\|忽略\|关闭[\s\S]*?\/i;/,
+      /const BYPASS_VERB = \/\(\?:绕过\|规避\|跳过\|忽略\|关闭[\s\S]*?\)\/i;/,
       'const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|bypass|circumvent|skip|ignore|disable|turn\\s+off|remove)/i;'
     ),
     expect: 'benign',
@@ -79,7 +81,7 @@ const INJECTIONS = [
     name: '③打掉 DEV_TARGET 补的设施（HTTPS/自签/日志分级退回旧表）',
     needle: 'const DEV_TARGET = /(?:缓存|caches?\\b',
     mutate: (s) => s.replace(
-      /const DEV_TARGET = \/\(\?:缓存\|caches\?\\b[\s\S]*?输出到\\s\*stderr\)\/i;/,
+      /const DEV_TARGET = \/\(\?:缓存\|caches\?\\b[\s\S]*?\)\/i;/,
       'const DEV_TARGET = /(?:缓存|caches?\\b|CDN|CORS|跨域|certificates?\\b|cert\\b|TLS|SSL|代理|prox(?:y|ies)\\b|自签名|self-signed|非必填|可选校验|optional\\s+(?:verification|validation|check)|input\\s+validation|form\\s+validation|表单校验|校验|验证|检查|有效期|过期时间|expiry|expiration|token\\s+有效期|csrf|xss|referrer|origin\\s+check|same-site|http-only)/i;'
     ),
     expect: 'benign',
