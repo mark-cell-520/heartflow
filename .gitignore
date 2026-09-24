@@ -129,3 +129,4 @@ src/core/snapshots/
 
 # TOM 引擎运行时数据（src/consciousness/tom-engine.js 写入）
 src/data/tom/
+/.alipay-sandbox.json
