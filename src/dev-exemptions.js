@@ -32,7 +32,7 @@ const DEV_CONDITIONAL = /\bif the input is empty\b|\bwhen the input is empty\b|�
 //   调试输出 / verbose（开发期 verbosity 开关，与"日志"同为观测设施）
 // 边界守住两条：① 不加"密码/密钥/token/会话"等真实凭据；② 全句命中
 // SECURITY_BOUNDARY 时一票否决已先行，加这些词不会放进真安全边界。
-const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|校验|验证|检查|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|verbose|verbosity|输出到\s*stdout)/i;
+const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|校验|验证|检查|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr)/i;
 
 /** 绕过动词 */
 // [v6.7.123] 与 dangerous_instruction 命中侧动词表对齐。
@@ -47,7 +47,7 @@ const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|T
 // 文件变成一个文件、语义仍然分叉。
 // 刻意不收删除类（删掉/卸掉/清空）——那类与数据销毁语义相邻，豁免边界模糊，
 // 收它就是拿真安全边界换误报率（v6.7.121 同形字收紧过度的同款教训）。
-const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?下|停用|停掉|去掉|去除|屏蔽|bypass|circumvent|skip|ignore|disable|disabl\w*|turn\s+off|shut\s+off|switch\s+off|deactivat\w*|remove|deinstall)/i;
+const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?下|禁用|停用|停掉|屏蔽|去掉|去除|bypass|circumvent|skip|ignore|disable|disabl\w*|turn\s+off|shut\s+off|switch\s+off|deactivat\w*|remove|deinstall)/i;
 
 /** 生产语境一票否决 */
 const PROD_CONTEXT = /(?:生产|线上|正式环境|prod\b|production|\blive\s+(?:server|database|db|env|environment|system|traffic)\b)/i;
@@ -126,13 +126,40 @@ const SECURITY_BOUNDARY = /(?:防火墙|鉴权|认证|授权|审计|沙箱|安�
  *   ⑤ 开发语境 + optional 校验 → 豁免（无绕过动词也常见）
  */
 /**
- * [v6.7.123] 窗口从 ±6 扩到 PROD_WINDOW=14，并补「before/prior-to」语义：
- * 「部署到生产环境前」「上线前」「before deploying to production」这类
- * **时序否定**同样是不在生产环境执行的表述，原窗口（±6）+ 原否定词表
- * （不含"前"）全部取不到。注意英文的 before 可能在 prod 词**之前** 20+ 字符，
- * 用双向窗口取不到——单独一条规则覆盖。
+ * [v6.7.123] 「before/prior-to」类时序否定：prod 词**之前**的否定。
+ *
+ * ⚠️ 设计教训（负例脚本 3 连未变红时才逼出来）：第一版把这条写成
+ * 正则、仍在 around（±14 窗口）里测 —— "before deploying to production" 中
+ * before 距 prod 20 字符，刚好被窗口切掉，于是这条规则从未生效过。
+ * 教训：**"在窗口里测"和"覆盖窗口外"是互斥的**——要覆盖前向否定，就必须
+ * 用全文位置判定，不能复用同一个 around 字符串。
+ *
+ * ⚠️ 第二层教训（更该记住的）：本轮原始诊断说「PROD_NEGATION 窗口 ±6 取不到
+ * 跨句否定」——实测**不成立**。原始误拦「开发时把 console 调试输出关掉，
+ * 避免污染生产日志」里「避免」距 prod 仅 4 字，W=6 早就能命中；它被 block
+ * 的真正原因是旧版 verb=false（BYPASS_VERB 无「关掉」）+ tgt=false
+ * （DEV_TARGET 无 console.log）。**窗口从不是那条样本的瓶颈。**
+ * 诊断阶段把三个症状一起归给窗口，属于"抓一个显眼的原因解释全部现象"——
+ * 修窗口不会让那条样本变绿（实测确认：W 6→14 后它仍 block）。
+ * 因此这里的记录保留 W=14（它对"部署到生产环境前"这类长前缀确有必要），
+ * 但明确标注：**它不是原始 5 条误拦的修复项**。
+ *
+ * 判据（有界，不是"全文出现 before 就赦"）：
+ *   ① before / prior to / "前"类词出现在 prod 词**之前**
+ *   ② 距 prod 词 ≤ PROD_AHEAD_MAX 字符（40，覆盖 "prior to the production
+ *      rollout" 这类短语，又不至于让上一句的 before 赦免这一句）
+ *   ③ MALICIOUS_INTENT / SECURITY_BOUNDARY 已在函数头部先行否决，
+ *      这里不需要重复防守
  */
-const PROD_NEGATION_AHEAD = /(?:前|以前|之前|上线前|发布前|投产前|部署到.{0,12}前|不要把.{0,12}用在|别把.{0,12}用在|而非|而不是|不是用于|不用于|should not|must not|do not|don['’]t|never)\s*$/i;
+const PROD_AHEAD_MAX = 40;
+const PROD_AHEAD_RE = /\b(?:before|prior\s+to|ahead\s+of)\b|前\s*$|以前|之前|上线前|发布前|投产前|部署到.{0,12}前/i;
+
+function hasAheadNegation(text, prodIdx) {
+  if (prodIdx <= 0) return false;
+  const head = text.slice(Math.max(0, prodIdx - PROD_AHEAD_MAX), prodIdx);
+  const m = PROD_AHEAD_RE.exec(head);
+  return !!m;
+}
 
 function isDevDebugContext(text) {
   if (!text || typeof text !== 'string') return false;
@@ -141,7 +168,7 @@ function isDevDebugContext(text) {
   const pm = PROD_CONTEXT.exec(text);
   if (pm) {
     const around = text.slice(Math.max(0, pm.index - PROD_WINDOW), pm.index + pm[0].length + PROD_WINDOW);
-    if (!PROD_NEGATION.test(around) && !PROD_NEGATION_AHEAD.test(around)) return false;
+    if (!PROD_NEGATION.test(around) && !hasAheadNegation(text, pm.index)) return false;
   }
   const devCtx = DEV_CONTEXT.test(text) || DEV_CONDITIONAL.test(text)
     || DEBUG_INTENT.test(text)
@@ -159,6 +186,7 @@ function isDevDebugContext(text) {
 
 module.exports = {
   isDevDebugContext,
+  hasAheadNegation,
   DEV_CONTEXT,
   DEV_CONDITIONAL,
   DEBUG_INTENT,
@@ -168,7 +196,8 @@ module.exports = {
   BYPASS_VERB,
   PROD_CONTEXT,
   PROD_NEGATION,
-  PROD_NEGATION_AHEAD,
+  PROD_AHEAD_RE,
+  PROD_AHEAD_MAX,
   PROD_WINDOW,
   MALICIOUS_INTENT,
   SECURITY_BOUNDARY,
