@@ -5,6 +5,110 @@
 
 ---
 
+## 第 36 轮（ai_writing_tell 共现门槛：单族命中不计分 + 修通第 34 轮负例脚本）
+
+**触发**：队列无待办 → 用真 decision.decide 选向。第一次调用三个候选同分
+0.77/0.77/0.74 返回 `chosen: null`；补「可行性/后果/风险」判据后 A/B 并列
+0.81 仍 null；第三次补「用户可感知变化 / 爆炸半径 / 真实能力净变化」才拉开，
+**选 A（0.85，identity 80%）**。
+
+### 一、缺口复测（不信简报旧描述）
+
+简报写「ai_writing_tell 29/34 条正常文本得 0.35 分」，**实测推翻**：
+新采样 16 条正常学术/商业文本（中英双语）**7 条被误记**，但分值只有
+0.07~0.18（不是 0.35），而且全部是**只命中一个特征族**：
+
+| 误记词 | 分值 | 族 |
+|---|---|---|
+| robust(×4 句) | 0.18 | tier1 |
+| comprehensive | 0.18 | tier1 |
+| holistic | 0.18 | tier1 |
+| significant(×2 句) | 0.07 | tier3 |
+| in summary / furthermore / in conclusion | 0.10 | transitions |
+
+关键对照实测：4 条真 AI 文本的族数是 **4/3/6/5**——分界线不在分值，
+在**多族共现**。这才是可定位的根因。
+
+### 二、改了什么（2 个 commit，`d0b5f08f` + `2aa97109`）
+
+`src/shield/ai-writing-tell.js` 只加 19 行，纯后处理在 detect() 出口：
+
+```js
+const familiesHit = new Set(findings.map(f => f.dimension.replace(/^ai-tell-/,''))).size;
+const coOccurrence = familiesHit >= 2;
+if (!coOccurrence) { total = 0; }
+const confidence = coOccurrence ? Math.min(1, total) : 0;
+```
+
+- 单族命中 → score/confidence 归零，**findings 仍保留**（可观测、可调试）
+- 新增返回字段 `coOccurrence` / `familiesHit`
+- 不碰任何词表和正则，正常检测强度不变
+
+### 三、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 16 条正常学术/商业文本误记 | **7/16 → 0/16** |
+| 4 条真 AI 文本 score | 仍 >0.3（0.58/0.55/0.99/0.60 不变） |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（与基线完全持平，未增加） |
+| 新增测试 `test/ai-writing-tell-co-occurrence.test.js` | **11 passed 0 failed**（run-all 已收录） |
+| 负例守卫 `scripts/negative-test-ai-writing-tell-co-occurrence.js` | **5/5 注入后全部转红** + 字节级还原校验 |
+| `bin/verify.js` | **14 passed 0 failed** |
+| `security-audit` | **16 passed 0 failed** |
+| `run-all.js` | **3439 passed 5 failed**（上轮 3417，+22 全来自本轮测试） |
+
+**负例 5 项注入**：删归零分支 / 门槛降 ≥1 / 门槛抬 ≥99（杀真 AI）/ confidence
+泄漏 / 删契约字段。n4 首轮不变红——实测发现它是**依赖注入**（单改
+confidence 时前面的 `total=0` 仍把它掩成 0，不可观测），已改为组合注入
+并注释说明，不是测试缺陷。
+
+### 四、顺带清掉的第 34/35 轮欠账
+
+1. **`test/instrumental-reasoning-vernacular-round34.test.js` 补落盘**
+   （commit `ebd93d7c`）——第 35 轮报告说 51/51+53/53 但没 git add，
+   实测复核 2 passed 0 failed 后入库。
+2. **`scripts/negative-test-instrumental-vernacular-round34.js` 修通**
+   （commit `2e972c52`）——从第 35 轮起连卡三轮，两个真根因：
+   - needle 提取改成「按后缀正则取 index 再 slice」
+   - **行首 `[`（数组起始括号）被带进 needle**，indexOf 替换时把数组
+     字面量的 `[` 一起吃成 `/^$(?!)/` → 语法错误（探针崩溃）而非变红
+   - 同时修正判定口径：逐条实测发现 8 条判据里 **6 条的样本被其他
+     pattern 兜底**（族内冗余覆盖），原脚本一律判 FAIL 导致退出码非 0。
+     现区分三态：真守卫(2) / 有兜底(6) / 崩溃(0)，有兜底计 WARN。实测
+     EXIT=0，第 34 轮欠账正式清零。
+3. `src/aipay-server.js` 第 31 轮已认定是用户自己的功能文件，继续保留未动。
+
+### 五、遗留
+
+1. **README 测试数 2966 vs 实际 3439，连续第十轮同一硬边界**——README 在
+   不可改清单里，需用户放行或将 README 移出清单。这是 finish 本轮唯一的
+   objection（7 项检查 6 绿 1 红）。
+2. **LLM 401 未解**（stepfun api-key 失效），升级流水线唯一硬阻塞。
+3. run-all 5 个失败全部为已知项，零新增：`doc-numbers-accuracy`(README) 1、
+   `e2e-scenarios` 场景 10 1、`instrumental-idiom-zh-round26` 2、
+   `npm-package-integrity` 1（等发布 cron）。
+4. **VERSION 仍 6.7.124**（自第 31 轮起延续，硬边界不手改）。
+5. `scripts/upgrade-engine.js finish` 的 UPGRADE_LOG 轮次记录仍未自动写
+   （第 33/34/35/36 轮均手动补），下一轮可考虑让 finish 直接追加。
+6. 本轮 commit 5 个：`d0b5f08f` 引擎修复 / `2aa97109` 测试+负例 /
+   `a3a0e7bf` auto-commit 自动落盘 / `ebd93d7c` 第34轮测试补入库 /
+   `2e972c52` 第34轮负例脚本修通。未 push。
+
+### 六、给下一轮
+
+HEAD `2e972c52`。轮初先跑 `/tmp/probe-r36-base.js` 复核共现门槛
+（真 AI 4 条 >0.3、16 条良性全 0）。下一轮候选（简报剩余 + 本轮新发现）：
+
+- **`instrumental-idiom-zh-round26` 的真误伤**：「不能为了业绩就默许虚假宣传」
+  被 rewrite（该测试良性命中 0/36 实测误伤 1），是第 26 轮成语判据缺否定
+  环视的回潮，已复现未修。修它需双向回归（12 条成语攻击样本不得掉）。
+- ai_writing_tell 中文侧零覆盖：4 条真 AI 文本里那条纯中文的实测 score=0，
+  词表全是英文，属真缺口（但中文 AI 味的模式化表述与正常公文边界更模糊，
+  需先抽样定基线再动）。
+- README 硬边界（需用户放行）、LLM 401（需用户换 key）。
+
+---
+
 ## 第 31 轮 — v6.7.125（dangerous_instruction 攻击侧漏判：恶意目的否决问题框架豁免）
 
 **触发**：队列无待办，简报列「dangerous_instruction 开发调试语境误拦（3 条良性
