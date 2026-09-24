@@ -351,7 +351,23 @@ function detect(text) {
 
   findings.sort((a, b) => b.severity - a.severity);
   const top = findings[0]?.severity || 0;
-  const confidence = Math.min(1, total);
+
+  // [v6.7.125 第 36 轮] 共现门槛：单族命中不计分。
+  // 实测（2026-09-25，16 条正常学术/商业文本）7 条被误记：
+  //   robust(0.18) / comprehensive(0.18) / holistic(0.18) / significant(0.07) /
+  //   in summary / furthermore / in conclusion(0.10) —— 全是正常学术英语，
+  //   每条**只命中一个特征族**。
+  // 而真 AI 文本实测族数 3-6（4 条样本：4/3/6/5 族）。
+  // 判据：AI 写作痕迹的本质是**多特征共现**，单个高频学术词不构成
+  // AI 指纹。单族命中 → score 归零但仍进 findings（可观测、可调试），
+  // 不再拉低 overallScore、不再污染 discriminate 的 findings 聚合。
+  // 反向确认：真 AI 文本族数全部 >=3，门槛取 2 不影响它们任何一条。
+  const familiesHit = new Set(findings.map((f) => f.dimension.replace(/^ai-tell-/, ''))).size;
+  const coOccurrence = familiesHit >= 2;
+  if (!coOccurrence) {
+    total = 0;
+  }
+  const confidence = coOccurrence ? Math.min(1, total) : 0;
 
   return {
     module: 'ai-writing-tell',
@@ -359,6 +375,8 @@ function detect(text) {
     topSeverity: top,
     confidence,
     count: findings.length,
+    coOccurrence,
+    familiesHit,
     findings: findings.slice(0, 12),
   };
 }
