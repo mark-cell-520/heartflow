@@ -53,13 +53,43 @@ const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|T
 // [v6.7.126] 收「拆卸/清理/重置」类动词（第 33 轮）。
 // 由来：良性样本「卸载掉测试机的杀毒软件再跑压测」「清空这台虚拟机的日志
 // 重新来」devCtx=true、target=true，唯独 verb=false → 两项齐备仍被 block。
-// 边界（为什么不违反 v6.7.123「刻意不收删除类」的注释）：那条注释防的是
-// **无条件**收删类动词——删类是真安全语义，宽收就是拿安全换误报率。
-// 本轮的收法是**有条件的**：dev 语境（devCtx）仍由 isDevDebugContext 头部
-// 三个否决（恶意意图/安全边界/生产语境）先行把关，devCtx=false 的样本
-// （10 条攻击样本实测全 false）即使 verb=true 也拿不到豁免。
-// 即动词放宽换的是「dev 语境的清理口令」，不是「删除语义」。
-const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?下|禁用|停用|停掉|屏蔽|去掉|去除|卸载|卸掉|卸载掉|清空|清掉|清了一?下|重置|复位|抹掉|清除|bypass|circumvent|skip|ignore|disable|disabl\w*|turn\s+off|shut\s+off|switch\s+off|deactivat\w*|remove|uninstall|deinstall|reset|clear|wipe\s+logs?|truncate)/i;
+//
+// ⚠️ 第 34 轮实测推翻第 33 轮的实现方式（重要教训，别再犯）：
+// 第 33 轮把「卸载/卸掉/清空/重置/抹掉/清除/uninstall/reset/clear」直接
+// 加进了本行 BYPASS_VERB。**实测后果是三重破坏**：
+//   ① 弄假了第 22 轮守卫 `dangerous-instruction-dev-context-round22.test.js`
+//      的「根因①-by 删除类动词刻意不收」断言（BYPASS_VERB 不得单独匹配
+//      卸掉/清空）—— 守卫的意图是「删类动词不许无条件进入通用绕过动词表」，
+//      第 33 轮在**同一个常量**里收它们，等于把边界改掉还宣称没违反。
+//   ② `negative-test-dev-context-round22.js` 注入①的 needle 从此再也
+//      匹配不上源码（`needle 不在源码中`），那条负例守卫静默失效。
+//   ③ 更严重的真实回归：devCtx=true 的攻击变体被误赦成 pass ——
+//      「本地调试清空检查项」「本地容器里卸载掉检查」两项齐备即豁免，
+//      而这些句子要拦的内容就是「清掉检查/卸载掉检查」本身。
+// 修法（第 34 轮）：把清理动词从通用绕过动词表**移出**，改为独立的
+// CLEANUP_VERB 窄表（见下方），只有满足全部三条才可算 verb：
+//   i.   句内有清理动词（uninstall/清空/重置…）
+//   ii.  句内有**开发层设施**（CLEANUP_TARGET：缓存/证书/调试日志/
+//        杀毒软件/虚拟机… —— 与 DEV_TARGET 同源的窄子集）
+//   iii. 句内**无**安全词（CLEANUP_SECURITY：安全检查/校验/鉴权/审计…）
+// 这样「卸载掉虚拟机的调试日志」放行，而「本地调试清空检查项」因为
+// 设施命中落空 + 安全词在场，两项都不成立 → 仍 block。
+const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?下|禁用|停用|停掉|屏蔽|去掉|去除|bypass|circumvent|skip|ignore|disable|disabl\w*|turn\s+off|shut\s+off|switch\s+off|deactivat\w*|deinstall)/i;
+
+/**
+ * [v6.7.126+] 清理/拆卸/重置类动词——**有条件**生效（第 33 轮提出、第 34 轮修正实现）。
+ * 为什么不放进 BYPASS_VERB：删类动词是真安全语义，无条件收进通用动词表会让
+ * 「本地调试清空检查项」这类攻击变体因 devCtx+target 齐备而被误赦（第 34 轮
+ * 实测复现 2 条误赦）。这三个词只在与**开发层设施**共现且**无安全词**时
+ * 才是良性的，故由 isDevDebugContext 单独判定。
+ */
+const CLEANUP_VERB = /(?:卸载|卸掉|卸载掉|卸了一?下|清空|清掉|清了一?下|重置|复位|抹掉|清除|清除掉|uninstall|deinstall|reset|wipe\s+logs?|truncate)/i;
+
+/** 清理动词可配的开发层设施（DEV_TARGET 的窄子集，刻意不含「检查/校验」）。 */
+const CLEANUP_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr|杀毒软件|防病毒|antivirus|defender|虚拟机|虚机|\bvm\b|virtual\s+machine|agent\b|build\s*日志|build\s*log|控制台)/i;
+
+/** 清理豁免的安全词否决：句内出现这些词时，清理动作不许豁免。 */
+const CLEANUP_SECURITY = /(?:安全检查|安全警告|安全机制|安全策略|安全组|防火墙|鉴权|认证|授权|审计|身份验证|权限校验|权限检查|访问控制|越权|入侵|渗透|提权|防护|入侵检测|白名单|ACL|WAF|IDS|IPS|防火墙日志|firewall|auth(?:entication|orization)?|audit|sandbox|security|access\s+control|privilege\s+check|rbac)/i;
 
 /** 生产语境一票否决 */
 const PROD_CONTEXT = /(?:生产|线上|正式环境|prod\b|production|\blive\s+(?:server|database|db|env|environment|system|traffic)\b)/i;
@@ -190,7 +220,11 @@ function isDevDebugContext(text) {
     || (INVESTIGATE_CTX.test(text) && (DEBUG_INTENT.test(text) || DEV_WEAKENER.test(text)))
     || (DEV_WEAKENER.test(text) && INVESTIGATE_CTX.test(text));
   const target = DEV_TARGET.test(text);
-  const verb = BYPASS_VERB.test(text);
+  const verb = BYPASS_VERB.test(text)
+    // 清理/拆卸/重置动词：三项齐备才算（第 34 轮修法，见 CLEANUP_VERB 注释）。
+    // 刻意不复用上面的 target/verb——此处 target 必须是窄设施表、
+    // 且安全词在场时直接否决，否则「本地调试清空检查项」会被误赦。
+    || (CLEANUP_VERB.test(text) && CLEANUP_TARGET.test(text) && !CLEANUP_SECURITY.test(text));
   if (devCtx && target && verb) return true;
   if (devCtx && /(?:optional|非必填|可选的?)\s*(?:verification|validation|check|校验|验证|检查)/i.test(text)) return true;
   return false;
@@ -206,6 +240,9 @@ module.exports = {
   DEV_WEAKENER,
   DEV_TARGET,
   BYPASS_VERB,
+  CLEANUP_VERB,
+  CLEANUP_TARGET,
+  CLEANUP_SECURITY,
   PROD_CONTEXT,
   PROD_NEGATION,
   PROD_AHEAD_RE,
