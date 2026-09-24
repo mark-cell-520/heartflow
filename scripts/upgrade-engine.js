@@ -410,13 +410,34 @@ function cmdPublish() {
 
   // ⑤ 跑包内验收
   console.log('\n── ⑤ 包内验收 ──');
-  const e2e = trySh(`cd ${vdir} && node bin/verify.js 2>&1`);
-  const e2e2 = trySh(`cd ${vdir} && node test/run-all.js 2>&1`);
-  const m = e2e2.match(/(\d+)\s*通过[,\s]+(\d+)\s*失败/);
-  console.log(`  verify: ${/\d+\s*通过/.test(e2e) ? e2e.match(/\d+\s*通过[^\n]*/)[0] : '(见下)'}`);
-  console.log(`  run-all: ${m ? `${m[1]} 通过 / ${m[2]} 失败` : '(解析不到汇总)'}`);
-  if (m && Number(m[2]) > 1) {
-    console.log(`\n❌ 包内 run-all 失败 ${m[2]} 个（预期 ≤1 = npm-package-integrity）。发布可疑，请人工复查。`);
+  // ⚠️ 路径坑：独立安装后 `bin/` 在 node_modules/@yun520-1/heartflow/ 下，
+  // 不是 ${vdir}/bin/。第一版写 `cd ${vdir} && node bin/verify.js` → MODULE_NOT_FOUND，
+  // 而我的正则匹配不到汇总就打印「(见下)」——**不报错地什么都不验证**。
+  // 这正是第 74 轮「汇总说谎」的同一形态：解析失败 ≠ 失败，但也 ≠ 通过。
+  // 现在：解析不到汇总一律 exit 1，绝不放行。
+  const PKG = trySh(`cd ${vdir} && node -e "console.log(require.resolve('@yun520-1/heartflow/package.json').replace('/package.json',''))"`).trim();
+  const e2e = trySh(`cd ${vdir} && node "${PKG}/bin/verify.js" 2>&1`);
+  const e2e2 = trySh(`cd ${vdir} && node "${PKG}/test/run-all.js" 2>&1`);
+  // ⚠️ run-all 会为**每个测试文件**打印一行「N 通过, M 失败」，
+  // 再打印一行总计。match() 取的是**第一处**匹配 → 拿到某个子文件的
+  // 4 通过/0 失败，看起来"通过"其实是几十分之一的结果。
+  // 取**全部匹配中 passed 最大的那一行**（总计行必然最大）。
+  const allTot = [...e2e2.matchAll(/(\d+)\s*通过[，,\s]+(\d+)\s*失败/g)];
+  const m = allTot.length
+    ? [null, allTot.reduce((a, b) => (Number(a[1]) >= Number(b[1]) ? a : b))[1],
+             allTot.reduce((a, b) => (Number(a[1]) >= Number(b[1]) ? a : b))[2]]
+    : null;
+  const vm = e2e.match(/(\d+)\s*passed,\s*(\d+)\s*failed/i) || e2e.match(/(\d+)\s*通过[，,\s]+(\d+)\s*失败/);
+  console.log(`  verify: ${vm ? `${vm[1]} 通过 / ${vm[2]} 失败` : '⚠️ 解析不到汇总'}`);
+  console.log(`  run-all: ${m ? `${m[1]} 通过 / ${m[2]} 失败（取自 ${allTot.length} 行汇总中最大的一条）` : '⚠️ 解析不到汇总'}`);
+  if (!vm || !m) {
+    console.log('\n❌ 包内验收汇总解析失败 —— 不视为通过。原始输出尾部：');
+    console.log('  verify : ' + e2e.slice(-300).split('\n').slice(-4).join(' | '));
+    console.log('  run-all: ' + e2e2.slice(-300).split('\n').slice(-4).join(' | '));
+    process.exit(1);
+  }
+  if (Number(m[2]) > 1 || Number(vm[2]) > 0) {
+    console.log(`\n❌ 包内验收失败：run-all ${m[2]} 个 / verify ${vm[2]} 个（预期 run-all ≤1 = npm-package-integrity、verify = 0）。发布可疑，请人工复查。`);
     process.exit(1);
   }
 
