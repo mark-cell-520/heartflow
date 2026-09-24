@@ -93,7 +93,7 @@ const DANGEROUS_PATTERNS = [
   // 而「关掉防火墙」「停用防火墙」「废掉防火墙」「取消防火墙」这些最直白的
   // 表述全部漏过（8/8 实测全漏）。同 absolute_claim「6 条词面漏 21 句」同根：
   // 词面模式只收书面语，不收口语。动词侧一并补上「关闭性」而非只「绕过性」。
-  /(?:忽略|无视|绕过|跳过|关闭|禁用|去掉|取消|关掉|关了|停用|停掉|废掉|废了|卸载|卸掉|卸载掉|卸了一?下|删掉|删了|清空|清掉|清了|去除|移除|拿掉|下掉|关一?下|停一?下|屏蔽|禁用掉|disable|disabl\w*|turn\s+off|shut\s+off|remove|delete|uninstall|deinstall|drop|kill)[^。\n]{0,12}(?:安全|警告|提示|校验|验证|检查|防护|防火墙|认证|授权|鉴权|SSL|TLS|证书|审计|日志|限流|熔断|安全策略|安全机制|安全组|白名单|ACL|access\s+control|WAF|IDS|IPS|杀毒软件| antivirus|防病毒|Defender|defender)/i,
+  /(?:忽略|无视|绕过|跳过|关闭|禁用|去掉|取消|关掉|关了|停用|停掉|废掉|废了|卸载|卸掉|卸载掉|卸了一?下|删掉|删了|清空|清掉|清了|去除|移除|拿掉|下掉|关一?下|停一?下|屏蔽|禁用掉|抹掉|清除|disable|disabl\w*|turn\s+off|shut\s+off|remove|delete|uninstall|deinstall|drop|kill)[^。\n]{0,12}(?:安全|警告|提示|校验|验证|检查|防护|防火墙|认证|授权|鉴权|SSL|TLS|证书|审计|日志|限流|熔断|安全策略|安全机制|安全组|白名单|ACL|access\s+control|WAF|IDS|IPS|杀毒软件| antivirus|防病毒|Defender|defender|audit\s+logs?|system\s+logs?|event\s+logs?|logs?\s+to\s+hide)/i,
   // [v6.7.125] 设施名后置绕过式（第 31 轮）。
   // 第①条是「动词在前、设施在后」，但「绕过 WAF 的 SQL 注入」「绕过证书校验
   // 的工具」把设施放在**前面**（「WAF 的」是定语），两类词序都收才算齐。
@@ -170,7 +170,11 @@ const DANGEROUS_PATTERNS = [
   /(?:直接|马上|立刻)[^。]{0,6}(?:在|对)[^。]{0,6}(?:生产|线上|prod)[^。]{0,10}(?:环境)?[^。]{0,8}(?:执行|运行|操作|测试|改|修改|更新)/i,
   /(?:生产|线上|prod)[^。]{0,6}(?:环境)[^。]{0,10}(?:直接|随便|随意)[^。]{0,6}(?:改|动|测试|操作)/i,
   // ⑥ 英文变体
-  /\b(?:ignore|bypass|skip|disable|turn\s+off|remove)\b[^.]{0,20}\b(?:security|warning|validation|verification|check|auth(?:entication|orization)?|firewall|SSL|TLS|certificate|audit)\b/i,
+  // [v6.7.126] 动词表补 deactivate/deinstall/clear/purge/wipe。
+  // 第 33 轮实测「deactivate the certificate check」pass：第⑥条动词表
+  // 只有 ignore|bypass|skip|disable|turn off|remove，而 deactivate 是
+  // disable 的同义正式词（官方文档常用），不收它就是词面漏。
+  /(?:ignore|bypass|skip|disable|turn\s+off|remove|deactivat\w*|deinstall|shut\s+off|switch\s+off|clear|purge|wipe)\b[^.]{0,25}\b(?:security|warning|validation|verification|check|auth(?:entication|orization)?|firewall|SSL|TLS|certificate|audit|logs?|antivirus)\b/i,
   // 提问句式（how do i / how to / what is the best way）不算指令。
   // 负向断言排除 "root privileges?" / "as root?" 这类问句结尾
   /\b(?:run|execute|launch)\b[^.]{0,20}\b(?:as|with)\s+(?:root|administrator|admin|superuser)\b(?!\s*(?:privileges?|access|permissions?)?\s*\?)/i,
