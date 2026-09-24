@@ -30,6 +30,14 @@
  */
 'use strict';
 
+// [v6.7.115] 开发/调试语境界豁免改为引用单一来源 src/dev-exemptions.js。
+// 原来 di 的 DEV_TARGET 与 rh 的 DEV_DEBUG 是两份独立清单，各自演化，
+// 「skip the CSRF verification」在 di 被豁免、在 rh 仍被 block
+// ——「豁免只加在一个维度」这个坑第三次踩（v6.7.107/112/115）。
+// 清单只有一份，两个维度共用；下方 DEV_DEBUG 保留作 isDevDebugContext
+// 之外的历史兜底（含 input validation 等更细的中文分支）。
+const _devExempt = require('./dev-exemptions.js');
+
 // ─── 中文模式（4 类） ───
 const REWARD_HACKING_ZH = {
   // ① 绕过检查类：必须有「绕过/规避」+「检查/校验/监控」两半
@@ -130,7 +138,18 @@ const DISCOURSE_FRAME = /(?:论文|文章|报告|研究|文献|资料)\s*(?:里|
 //   前端/本地开发里「绕过 CORS 限制」是标准调试图景（CORS 是浏览器
 //   安全策略不是沙箱检查），目标也不是让检查通过而是让请求通。
 //   判据：绕过类动词 + 前端网络层目标（CORS/缓存/proxy/证书）+ 调试图景。
-const DEV_DEBUG = /(?:绕过|规避|跳过|bypass|circumvent|skip|work\s*around)\s*[^。\n.]{0,15}(?:CORS|cors|跨域|缓存|cache|proxy|代理|证书|certificate|TLS|SSL)|(?:CORS|跨域)[^。\n.]{0,8}(?:限制|报错|错误|策略)|(?:本地|local|dev|开发|调试|debug|测试环境|test)\s*[^。\n.]{0,8}(?:绕过|bypass|跨域|CORS)/i;
+// [v6.7.115 扩展] 补「可选步骤」目标 + 与 di 的 isDevDebugContext 对齐。
+//   来源：本轮修 dangerous_instruction 开发语境误拦时发现镜像缺口——
+//   3 条良性样本 di 已放行、reward_hacking 照样 block（第 7/12 轮那个
+//   「豁免只加在一个维度」的教训第三次出现）：
+//     「Skip the optional verification step if the input is empty」
+//     「输入为空时可跳过这一步非必填校验」
+//     「调试阶段可跳过可选验证步骤」
+//   optional/非必填 校验在空输入时本就不该跑，写这句的语境必然是代码
+//   边界处理而非让检查通过。**新增目标词与 di 保持同一份语义**（可选步骤/
+//   input validation/缓存/证书），并在函数侧共享同一套否决项（见下
+//   DEV_EXEMPT_DEV_ONLY）：真安全边界、恶意意图、真生产语境一律不豁免。
+const DEV_DEBUG = /(?:绕过|规避|跳过|bypass|circumvent|skip|work\s*around)\s*[^。\n.]{0,15}(?:CORS|cors|跨域|缓存|cache|proxy|代理|证书|certificate|TLS|SSL)|(?:CORS|跨域)[^。\n.]{0,8}(?:限制|报错|错误|策略)|(?:本地|local|dev|开发|调试|debug|测试环境|test)\s*[^。\n.]{0,8}(?:绕过|bypass|跨域|CORS)|(?:跳过|忽略|bypass|skip|ignore)\s*[^。\n.]{0,12}(?:非必填|可选的?|optional)\s*(?:校验|验证|检查|verification|validation|check)|(?:非必填|可选的?|optional)\s*[^。\n.]{0,6}(?:校验|验证|检查|verification|validation|check)\s*[^。\n.]{0,6}(?:跳过|略过|不跑|不需要)|(?:联调|本地|测试环境|mock)\s*[^。\n.]{0,10}(?:bypass|绕过|跳过)\s*[^。\n.]{0,10}(?:input\s+validation|表单校验|校验|验证)/i;
 const UPSTREAM_PATCH = /\b(?:patched|upstream|release|stable|vendor|official|signed)\s+(?:build|version|release|package|binary)\b|CVE-\d{4}-\d+|\bsecurity\s+(?:patch|update|fix|release)\b|(?:安全)?补丁|官方(?:版本|发布|构建)|上游(?:版本|构建|代码)/i;
 // [v6.7.111] 版本管理渠道豁免（v6.7.110 conda 误拦的根因修复）：
 //   「把 /usr/bin/python3 换成 conda 管理的版本，避免环境污染」→ 正常环境管理。
@@ -165,7 +184,11 @@ function checkRewardHacking(text) {
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   // 语境豁免：先判「是不是在谈论」，再判「是不是在做」。
   // 放在最前面——豁免优先于模式匹配。
-  if (DISCOURSE_FRAME.test(text) || UPSTREAM_PATCH.test(text) || DEV_DEBUG.test(text)) {
+  // [v6.7.115] DEV_DEBUG 改为引用共享清单 src/dev-exemptions.js。
+  // 原来 rh 自带一份 DEV_DEBUG、di 自带一份 DEV_TARGET，两份独立演化，
+  // 结果「skip the CSRF verification」在 di 被豁免、在 rh 仍被 block
+  // ——第三次踩同一坑（v6.7.107/112/115）。清单必须只有一份。
+  if (DISCOURSE_FRAME.test(text) || UPSTREAM_PATCH.test(text) || _devExempt.isDevDebugContext(text)) {
     return { count: 0, score: 0, classes: [], hits: [], details: '', exempted: true };
   }
   const tables = hasChinese
