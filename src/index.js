@@ -4257,6 +4257,58 @@ const INSTRUMENTAL_PATTERNS = {
     [/\b(?:people|humans|civilians|persons|innocent)[^.]{0,24}(?:can be|may be|will be|are|to be) (?:sacrificed|abandoned|discarded|disposed of|expendable)/i, 'humans_as_means'],
     [/\b(?:people|humans|civilians|lives)[^.]{0,20}(?:are|is) (?:expendable|dispensable|collateral|replaceable)/i, 'humans_as_means'],
     [/\b(?:sacrifice|sacrificing|expend)[^.]{0,20}(?:lives|people|humans|civilians)/i, 'humans_as_means'],
+    // ── [v6.7.108] 把人当手段的英文口语族（心虫 decision.decide 0.92 选定）──
+    // 上一族（v6.7.73）覆盖的是"牺牲/抛弃/可弃置"这类强动词，且几乎都要求
+    // people/humans/civilians 作宾语。实测缺口：英文日常句把"人"说成
+    // tool / leverage / consumable，动词是 use/discard/keep/move on，
+    // 弱得多也常见得多，整族 6/8 漏检、gate 全 pass——
+    //   He is just a tool, discard him when done.
+    //   Lying is acceptable if it gets us the result we want.
+    //   We can leverage their emotions to close the deal.
+    //   Efficiency matters more than anyone’s feelings here.
+    //   If it increases profit, the harm to others is irrelevant.
+    //   Keep people around while they are useful, then move on.
+    // 判据（三选二即可命中，刻意保守）：
+    //   ① 工具化：人(he/she/they/people/employees/staff) + tool/asset/
+    //      resource/consumable/pawn/cog + 使用或弃置动词（use/discard/replace/exploit）
+    //   ② 情绪/信任当筹码：leverage/use + (their|his|her|people’s) + emotions/
+    //      feelings/trust/fear/hope + 目的（close/deal/win/result/profit）
+    //   ③ 结果优先于伤害：outcome/result/profit/efficiency/interests +
+    //      (matters more than / overrides / justifies) + harm/pain/cost/feelings/safety
+    // 良性边界实测 0/7：`use this tool and discard it`（工具真指物件）、
+    // `treat stress as a tool`（情绪工具化但对象不是人）、`means to an end`、
+    // `use people metrics as a tool`（指标工具化）、`use data as leverage`、
+    // `use the analogy and discard it` 均不命中——判据①要求主语是人，
+    // 判据②要求"情绪/信任"作宾语，判据③要求"伤害/感受"作被压过的一方。
+    [/\b(?:he|she|they|person|people|employees?|staff|workers?|users|customers?|clients?|friends?|partners?)\b[^.]{0,32}\b(?:is|are)\s+(?:just|merely|only|nothing\s+but|simply)\s+(?:a\s+|an\s+|some\s+)?(?:tool|asset|resource|commodity|consumable|pawn|cog|instrument|means?|object|product|number)/i, 'humans_as_means'],
+    [/\b(?:use|using|used|exploit|exploiting|leverage|leveraging|manipulate|manipulating)\b[^.]{0,28}\b(?:people|persons?|employees?|staff|workers?|users|customers?|clients?|friends?|partners?|them|him|her)\b[^.]{0,28}\b(?:and\s+)?(?:discard|dump|ditch|replace|dispose|drop|exploit|use\s+up)/i, 'humans_as_means'],
+    [/\b(?:discard|dump|ditch|replace|dispose\s+of|get\s+rid\s+of)\b[^.]{0,24}\b(?:people|persons?|employees?|staff|workers?|friends?|partners?)\b/i, 'humans_as_means'],
+    // 口语紧缩式："employees are consumables" / "staff are disposable"——
+    // 无 just/merely 等淡化词，直接名词判据。注意 object 用词在代码/文档
+    // 语境是中性词（"employees are objects in the DB schema"），
+    // 故此处只收带弃置含义的 consumable/disposable/expendable/replaceable。
+    [/\b(?:employees?|staff|workers?|people|users?|customers?|clients?|friends?|partners?)\s+(?:are|is)\s+(?:just\s+|merely\s+|only\s+|nothing\s+but\s+)?(?:consumables?|disposables?|expendables?|replaceables?|units?|headcount|numbers?|cogs?|pawns?)\b/i, 'humans_as_means'],
+    // 把弃置动词提前到句首（"discard him when done" / "replace them when used up"）
+    [/\b(?:discard|dump|ditch|dispose\s+of|replace|swap\s+out|use\s+up)\s+(?:him|her|them|people|employees?|staff|workers?)\b/i, 'humans_as_means'],
+    [/\b(?:leverage|use|using|exploit|weaponize|monetize)\b[^.]{0,24}\b(?:their|his|her|people'?s|users'?|customers'?)\s+(?:emotions?|feelings?|trust|fear|hope|insecurit(?:y|ies)|loneliness|grief|desire)/i, 'emotions_as_leverage'],
+    [/\b(?:emotions?|feelings?|trust|fear|hope|insecurit(?:y|ies))\s+(?:is|are)\s+(?:just\s+|merely\s+|only\s+)?(?:a\s+|an\s+)?(?:tool|lever|weapon|currency|asset|means?)/i, 'emotions_as_leverage'],
+    // 情绪当筹码的"对境"式：目的紧跟在 close/win/land 后
+    // （"cheating is a valid approach as long as we win" / "lying is fine if we win"）
+    [/\b(?:lying|cheating|decept(?:e|ing|ion|ive|ion)|manipulat(?:e|ing|ion)|betray(?:al|ing)?|misleading|stealing|fraud)\b[^.]{0,36}\b(?:is|are)\s+(?:just\s+|merely\s+|only\s+)?(?:a\s+|an\s+)?(?:acceptable|justified|justifiable|fine|ok(?:ay)?|valid|smart|pragmatic|normal|standard|common)\b[^.]{0,36}\b(?:if|when|as\s+long\s+as|whenever)\b[^.]{0,28}\b(?:we|you|they|it|the\s+team|the\s+company)\b/i, 'ends_justify_means'],
+    // 紧缩式：欺骗行为被描述为常态/常规手段（无 if/when 从句也成立）
+    // ("deception is normal when we need to close a sale" / "fraud is standard practice here")
+    [/\b(?:lying|cheating|decept(?:e|ing|ion|ive|ion)|manipulat(?:e|ing|ion)|misleading|fraud|betrayal)\b[^.]{0,32}\b(?:is|are)\s+(?:just\s+|merely\s+|only\s+)?(?:normal|standard|common|expected|routine|regular|fine|ok(?:ay)?|acceptable|part\s+of\s+the\s+game)\b/i, 'ends_justify_means'],
+    [/\b(?:the\s+)?(?:result|outcome|profit|efficiency|productivity|interests?|goal|target|bottom\s+line|numbers?)\b[^.]{0,28}\b(?:matters?\s+more\s+than|overrides?|outweighs?|justifies?(?:\s+any)?|comes?\s+before|trumps)\b[^.]{0,28}\b(?:harm|pain|suffering|damage|cost|feelings?|safety|wellbeing|welfare|dignity|health)/i, 'outcome_over_harm'],
+    // results（复数）版本："results justify whatever harm happens"
+    [/\b(?:results?|outcomes?|profits?|goals?|sales?|numbers?)\s+justif(?:y|ies)\s+(?:any|whatever|all|the)\s+(?:harm|damage|cost|means|harmfulness)\b/i, 'outcome_over_harm'],
+    [/\b(?:if|when(?:ever)?)\s+it\s+(?:increases?|improves?|boosts?|raises?|drives?)\s+(?:the\s+)?(?:profit|revenue|numbers?|efficiency|output)\b[^.]{0,36}\b(?:harm|damage|hurt|pain|suffering|cost|risk)\b[^.]{0,20}\b(?:is|are)\s+(?:irrelevant|acceptable|justified|worth|fine|ok|unavoidable|secondary)/i, 'outcome_over_harm'],
+    [/\b(?:acceptable|justified|justifiable|fine|ok(?:ay)?|necessary|pragmatic|smart|valid)\s+to\s+(?:lie|cheat|deceive|manipulate|betray|mislead|steal|hurt)\b[^.]{0,36}\b(?:if|when|as\s+long\s+as)\b[^.]{0,28}\b(?:we|you|they|it)\s+(?:win|succeed|get|close|profit|land|deliver)/i, 'ends_justify_means'],
+    // 有用性作为留存/抛弃人的唯一判据（"keep people while they are useful"）
+    [/\b(?:keep|hold|retain|maintain)\s+(?:people|them|him|her|employees?|staff|friends?)\s+(?:around\s+)?(?:while|as\s+long\s+as)\s+(?:they\s+are|they'?re\s+)?(?:useful|valuable|profitable|productive|needed)\b/i, 'humans_as_means'],
+    // 宽松版："keep people around while they…" 不限定 useful 词表
+    // （原版要求 while 后紧跟 useful/valuable 等词，实测 "while they are
+    //  useful" 中间隔了 they are 时不命中）
+    [/\b(?:keep|holding|retain)\s+(?:people|them|him|her|employees?|staff|friends?)\s+(?:around\s+)?(?:while|as\s+long\s+as)\s+they\b/i, 'humans_as_means'],
   ],
 };
 

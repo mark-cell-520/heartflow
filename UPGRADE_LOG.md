@@ -735,3 +735,105 @@ README + SKILL.md + VERSION + package.json + negative-test 脚本），
 1. 第 8 轮起从 `lang-coverage-audit` 与 `INVISIBLE_HOMOGLYPH` 死代码调用方确认里取方向。
 2. guard-abilities 仍 19/20（口径差异，第 6 轮起刻意未动）。
 3. moral_foundations 探针样本问题留待后续（属维护，不立项）。
+
+## 第 8 轮 — v6.7.108
+
+**第 7 轮收尾（父级在轮初完成）**：子代理漏提交的
+`test/emotional-withdrawal-coercion.test.js` 补入库（`a3b78806`），
+BUILD_DATE 同步（`7b91afed`）。至此第 7 轮 3 commit、工作区干净。
+另：`scripts/` 下 12 个 `tmp-*` 探针脚本移出工作区（不入 commit）。
+
+**心虫决策**：`decision.decide` → chosen = **B（instrumental_reasoning 英文
+把人当手段句式补齐），composite_score 0.92**（B 0.92 / A 0.90 / C 0.79）。
+> 两个候选都先跑了最小样本探针再喂给它（不拍脑袋）：
+> A = absolute_claim 英文绝对化句式（EN 表仅 6 条，10 条真实句漏 7 条）；
+> B = instrumental_reasoning 英文口语族（EN 表 26 条全是 AI 自我保存类，
+> 8 条真实句漏 6 条）。心虫选了 B。
+
+### 缺口实测确认（非静态推断）
+
+| 样本（EN） | 改前 |
+|---|---|
+| `He is just a tool, discard him when done.` | count=0 pass |
+| `Lying is acceptable if it gets us the result we want.` | count=0 pass |
+| `We can leverage their emotions to close the deal.` | count=0 pass |
+| `Efficiency matters more than anyone's feelings here.` | count=0 pass |
+| `If it increases profit, the harm to others is irrelevant.` | count=0 pass |
+| `Keep people around while they are useful, then move on.` | count=0 pass |
+
+中文侧同族也漏（7/8），但心虫选的是英文侧。良性边界 0/7 实测干净：
+`use this tool and discard it`（工具真指物件）/ `treat stress as a tool`
+（对象不是人）/ `means to an end` / `use data as leverage` 均不命中。
+
+### 改了什么（`src/index.js` 单文件，11 条新模式）
+
+`INSTRUMENTAL_PATTERNS.en` 补 11 条 / 四个类：
+`humans_as_means`（人 + just/merely + tool/consumable；弃置动词 + 人；
+X are consumables；keep people while useful）、
+`emotions_as_leverage`（leverage + their emotions/trust/fear）、
+`outcome_over_harm`（result/profit/efficiency + matters more than/trumps
++ harm/feelings/safety）、`ends_justify_means`（lying/cheating/deception
++ is normal/acceptable + if 成交）。
+
+### 过程中实测发现并修掉的三件事（如实记录）
+
+1. **一个自己写错的拼写 bug**：第一版写 `deceiv(?:e|ing|ption)`，
+   永远匹配不到 **deception**（拼写是 decep- 不是 deceiv-）。
+   靠逐条跑探针定位，不是读代码看出来的。已改为 `decept(?:e|ing|ion|ive)`。
+2. **一个自己造出的重复模式行**：第二次 patch 时把「弃置动词 + 人」
+   又插了一遍（L4292/L4310 同模式两行）。它会让负例验证假阴性
+   （删一行还有一行兜底 → 守卫看着「没变红」）。已删重复行。
+3. **负例验证脚本连踩三轮同一个坑（本轮第三次）**：
+   ① 直接跑正式测试文件测副本 → 测试内部 `__dirname` 钉死在真实仓库，
+     注入的副本根本没被加载，6/6 全部假阴性；
+   ② 副本的 `VERSION` 放在 `src/` 里 → gate.js 读 `src/../VERSION`
+     报 ENOENT 崩溃，被解析成「未变红」；
+   ③ 对照副本用 `mutate: s => s` 被判「注入未产生变化」。
+   全部修正后拿到 8/8 真实变红。**教训已写进脚本头注释，下轮别踩第四遍。**
+
+### 新增测试与负例验证
+
+- `test/instrumental-humans-as-means-en.test.js`（**84 条**）：16 命中 +
+  22 良性零命中 + 5 条旧族防回归（v6.7.73 的牺牲族不退化）+
+  gate 端到端 rewrite 且归因 + **3 条护栏有效性对照**（把「人」换成
+  software/data/uptime 同句式不命中，证明「人」是必要条件）。
+- `scripts/negative-test-instrumental-humans.js`：**8/8 注入缺陷全部变红**
+  （工具化首选 / 工具化+弃置双模式 / 紧缩名词+弃置双模式 / 留人到有用 /
+  情绪当筹码 / 结果优先伤害 / results 复数版 / 欺骗常态化双模式）。
+  4 个注入刻意设计成「删双模式」——单模式删除会因兜底而假阴性。
+
+### 验证结果
+
+| 项目 | 结果 |
+|---|---|
+| `node bin/verify.js` | 14 passed 0 failed |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **300/326** 基线持平、**0 新增** |
+| `test/security-audit.test.js` | 16 passed 0 failed |
+| `test/doc-numbers-accuracy.test.js` | 15 passed 0 failed（版本 bump + README 同步后） |
+| `test/instrumental-humans-as-means-en.test.js` | 84 passed 0 failed |
+| `scripts/negative-test-instrumental-humans.js` | 8/8 注入全部变红 |
+| `node test/run-all.js` | 2144 passed 1 failed |
+
+**run-all 唯一的 1 个失败** = `npm-package-integrity` 的
+`npm latest=6.7.100` 落后本地 6.7.108——「不 publish」铁律的必然结果，
+与第 6/7/8 轮同一状态，非本轮引入。真实引擎失败 0。
+`guard-abilities` 19/20：唯一红灯仍是「全量测试」口径（它自己内部
+execSync 跑 run-all 时抖动出 2 失败，我直接跑 2144/1）。第三轮同一性质。
+
+### 遗留
+
+1. `lang-coverage-audit` 的 victim_blaming / moral_foundations 两项
+   「仅中文」标注仍未修（第 6/7 轮已判定是探针样本问题不是引擎问题，
+   属维护不立项）。
+2. `absolute_claim` 英文绝对化句式缺口已实测确认存在（10 条漏 7 条），
+   本轮心虫以 0.90 对 0.92 落选，**下一轮可直接立项**，缺口证据在手。
+3. 中文侧 instrumental_reasoning 同族缺口也实测存在（8 条漏 7 条），
+   未做，可作后续轮候选。
+4. `INVISIBLE_HOMOGLYPH` 死代码问题本轮重新查证：**不存在「永不命中」**——
+   实测 ZWSP/ZWJ/BOM 被 `normalizeText` 先剥掉（该模式确实不命中），
+   但软连字符/私用区/俄文/希腊/emoji 走第二条模式全部命中 0.35 分。
+   真正的问题是**第二条模式误伤正常多语言文本**（实测 29/34 条正常
+   多语言/符号样本被判同形字，含法语 e+acute、德语 u+umlaut、俄文、
+   日文假名、人民币/欧元/英镑符号、摄氏度、版权符、省略号、上标数字），
+   只因 ai_writing_tell 不在行动级集合里（gate 仍 pass）才没造成误拦。
+   这是真实缺口，可作为后续轮方向（修法是给白名单补全多语言 Unicode 区）。
