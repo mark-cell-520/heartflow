@@ -35,8 +35,10 @@ const QUOTE_MARKS = [
   // 引号包裹成语（中文引号 + 紧随的评述动词）
   /[""「『'][^"」』]{2,12}["」』']\s*[，,、]?\s*(?:我|你|他|她|我们|大家|这|那|这其实|那是)/,
   // 成语 + 元话语框架：「不入虎穴焉得虎子这种思路」/ 「成王败寇这种说法」
-  /这种(?:思路|说法|观念|观点|想法|做法|逻辑|想法|说法|俗语|成语|话|评价|说法|态度)/,
-  /这种[^。]{0,6}(?:心态|心态|哲学|想法|思路|话术|说法|讲法)/,
+  /这种[^。]{0,6}(?:心态|哲学|想法|思路|话术|说法|讲法|观念|观点|做法|逻辑|态度)/,
+  // 「所谓X，其实是Y」——不带引号的俗语点评式（第 26 轮实测漏放：
+  // 「所谓无毒不丈夫，其实是性别刻板印象」）
+  /所谓[^。]{0,16}(?:其实|本质上|实际上|根本|不过是|就是|说的是|本身就是|是一种|这种)/,
 ];
 
 // ── 评析标记：对成语本身做正误/适用性判断 ──
@@ -64,6 +66,19 @@ function isMetaDiscursive(text) {
   if (!text || typeof text !== 'string') return false;
   const zh = /[\u4e00-\u9fff]/.test(text);
   if (!zh) return false;
+  // [v6.7.125+1 自伤教训] 本文件第 38 行曾被 patch 写成 [/regex/,] ——
+  // **语法合法**（数组里套数组），node --check 抓不到，运行时
+  // `p.test is not a function` 直接抛 TypeError，被调用方 catch 掉后
+  // 豁免静默失效（良性误伤回到 7/41）。故每族数组在使用前先校验元素都是
+  // RegExp；不是则抛，让错误显式暴露而不是静默降级。
+  const groups = [QUOTE_MARKS, CRITIQUE_MARKS, DECISION_MARKS];
+  for (const g of groups) {
+    for (const item of g) {
+      if (!(item instanceof RegExp)) {
+        throw new TypeError('meta-discourse-exempt: 判据数组含非 RegExp 元素，疑似编辑事故');
+      }
+    }
+  }
   if (QUOTE_MARKS.some((p) => p.test(text))) return true;
   if (CRITIQUE_MARKS.some((p) => p.test(text))) return true;
   if (DECISION_MARKS.some((p) => p.test(text))) return true;
