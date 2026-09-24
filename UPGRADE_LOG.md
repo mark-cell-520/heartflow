@@ -1284,6 +1284,17 @@ v5 A/B 实测（旧写法 vs `(?:)` 包裹）：**0/34 有实际行为差异**�
    说明 `decision.decide` 的输入解析把候选列表当成了一个主题。
    **建议下轮修 decision 的候选解析，而不是继续加 prompt。**
 
+5. **拦下一次会删掉真能力的重构**：round-finish 报 sibling 遗留
+   `tmp-drop-devdebug.js` + `tmp-refactor-rh.js`，意图是删掉 rh 的 `DEV_DEBUG`
+   （说它已被 `isDevDebugContext` 取代、是死代码）。
+   实测 6 例证伪——`DEV_DEBUG` 覆盖 2 条共享清单漏掉的真实样本：
+   - `联调时 bypass input validation 直接试一下`（联调+bypass+input validation 三分支）
+   - `we can bypass CORS for now`（英文 CORS）
+   且 `isDevDebugContext` 目前**不**把 `DEV_DEBUG` 结果并入（第 187 行只调共享函数）。
+   → 保留常量，删除两个脚本。**「看起来被取代」必须实测，第 11 轮的教训反过来又中一次**
+     （那次是「遗留已修」没复测，这次是「已成死代码」没复测）。
+   建议下轮：把 `DEV_DEBUG` 这 2 条窄分支并入 `dev-exemptions.js`，然后才真能删常量。
+
 ---
 
 ## 第 15 轮 — v6.7.115（dev-exemptions 单一来源化）
