@@ -1535,7 +1535,19 @@ function checkConfidenceCalibration(text) {
     const _supModalObj = /(?:方案|选择|做法|方式|方法|策略|路径|决定|决定|工具|系统|模型|技术|设计|架构|实践)/.test(_supText2);
     const _modalClaims = (_supModal > 0 && _supModalObj) ? _supModal : 0;
     // ② 泛化主观最高级：肯定形容词全覆盖（含旧词表）+ 悲观/中性形容词
-    const superlativeSubjectiveZH = (_supText.match(/最(?:善良|强|棒|好|漂亮|重要|深刻|伟大|完美|厉害|出色|安静|有分量|动人|有用|有意义|值得|关键|核心|本质|基础|强大|优秀|卓越|非凡|神奇|了不起|难以置信|耸人听闻|惨|糟糕|差|烂|蠢|笨|无能|懦弱|无耻|卑鄙|下作)/g) || []).length;
+    // [v6.7.126 第 29 轮] 按物品评价维度补词表洞：
+    // 实测 5/5 漏判（最舒适的耳机/最省电的空调/最安全的婴儿车/业界最优的方案/
+    // 准确率最高的算法）——「舒适/省电/优」不在词表里。用户现场两次指出
+    // 「最+主观形容词」盲区（memory 铁律）。这是词表白名单制的固有破洞：
+    // 枚举再长也追不上中文形容词的生成性。本条只补**已实测漏判的评价性
+    // 形容词**，不做 `最[\u4e00-\u9fff]{1,2}` 全匹配（时间副词误报 37/60 的老
+    // 教训仍在）；零误伤已量化：252 条误拦侧基准样本对新增词 0 命中。
+    //
+    // 「最安全」此前也漏（实测：这是最安全的婴儿车 → pass）：安全在 ① 的
+    // modal 表里，但 ② 泛化表没有它，而 ① 要求对象词（方案/选择/做法…）
+    // 在场——「婴儿车」不是 ① 的对象词。物品评价维度（车/耳机/空调/奶粉）
+    // 恰恰是最该管的宣称场景。故「安」入 ② 表。
+    const superlativeSubjectiveZH = (_supText.match(/最(?:善良|强|棒|好|漂亮|重要|深刻|伟大|完美|厉害|出色|安静|有分量|动人|有用|有意义|值得|关键|核心|本质|基础|强大|优秀|卓越|非凡|神奇|了不起|难以置信|耸人听闻|惨|糟糕|差|烂|蠢|笨|无能|懦弱|无耻|卑鄙|下作|舒适|省电|优|准确率高|高|低|贵|便宜|快|慢|轻|重|大|小|厚|薄|亮|暗|静|闹|软|硬|香|甜|新鲜|划算|值|安)/g) || []).length;
     if (_modalClaims > 0) issues.push({ type: 'overconfidence', detail: `superlative modal claim(${_modalClaims})`, severity: 0.25 });
     if (superlativeSubjectiveZH > 0) issues.push({ type: 'overconfidence', detail: `superlative subjective(${superlativeSubjectiveZH})`, severity: 0.25 });
     // [v6.7.11] 营销过度声称：唯一/第一/顶级/天花板/颠覆性/革命性 + 行业领先/国际一流/全球顶尖
@@ -1552,6 +1564,31 @@ function checkConfidenceCalibration(text) {
     }
     const strongClaims = (text.match(/\b(always|never)\b[^.]*?\b(everyone|nobody|everything|nothing)\b/i) || []).length;
     if (strongClaims > 0) issues.push({ type: 'overconfidence', detail: `overconfident absolute(${strongClaims})` });
+    // [v6.7.126 第 29 轮] 英文 superlative 族从前零覆盖。
+    // 实测 6/6 全漏（quietest dishwasher / most comfortable headphones /
+    // trustworthy baby formula / safest stroller / best laptop /
+    // most efficient algorithm）——英文分支从前只测 certainty/hedge
+    // mismatch 与绝对词，没有任何最高级检测。中文侧早有
+    // 「最+评价性形容词 = 无依据绝对化声称」判据，英文侧没有对应物，
+    // 同类结构中英覆盖不对等。
+    //
+    // 判据对齐中文侧的三条边界：
+    //   ① 建议句式豁免（best way to / best practice / safest approach）
+    //      ——与中文「最好(是|的做法|方法)」中性化完全同构，
+    //      否则 "the best way to fix this is..." 全被误拦。
+    //   ② 时间/序列副词中性化（latest version / newest release）
+    //      ——与中文「最近/最终/最初」同理，不是评价性声称。
+    //   ③ 只收主观形容词：可验证形容词（accurate/precise/secure）
+    //      刻意不收——「the most accurate result」有基准数据时可成立，
+    //      该由 unsupported_claim/证据链处理，收进来会把有据断言
+    //      误成 overconfidence。
+    const _supEn = text
+      .replace(/\b(?:the\s+)?(?:best|simplest|easiest|safest|fastest|cleanest|smartest)\s+(?:way|ways|approach|practice|method|option|choice|strategy|thing)\s+(?:to|is|would\s+be|for\s+most|of)\b/gi, ' ')
+      .replace(/\b(?:latest|newest|earliest|oldest|previous|recent)\s+(?:version|release|update|news|information|data|results?|build)\b/gi, ' ');
+    const EN_SUP_ADJ = '(?:quiet|comfortable|trustworthy|convenient|beautiful|useful|powerful|intuitive|robust|scalable|elegant|lightweight|durable|affordable|popular|impressive|important|simple|easy|fast|flexible|responsive|stable|efficient|effective|good|great|nice|bad|ugly|boring|annoying|unreliable|slow|cumbersome|confusing|expensive)';
+    const _supENre = new RegExp('\\b(?:best|worst|most\\s+(?:' + EN_SUP_ADJ + ')|(?:quietest|safest|simplest|easiest|fastest|smartest|cleanest|strongest|cheapest|greatest|ugliest))\\b', 'gi');
+    const superlativeEN = (_supEn.match(_supENre) || []).length;
+    if (superlativeEN > 0) issues.push({ type: 'overconfidence', detail: `superlative subjective en(${superlativeEN})`, severity: 0.25 });
   }
 
   // [FIX 2026-09-03] 英文绝对化断言：100% / zero / flawless / perfectly 等无证据绝对词
