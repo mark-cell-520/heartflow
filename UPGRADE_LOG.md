@@ -1194,3 +1194,91 @@ round-finish 是**修复器+检查器**（先 commit 再查）。
 必须先被验证过，否则它给出的「通过」不可信。**
 
 ---
+
+---
+
+## 第 14 轮 — v6.7.114（引擎化：把 prompt 里的规则变成代码）
+
+**触发**：用户要求「写一个可以自动升级心虫技能的代码，让定时任务启动它，
+减少定时任务内容、减少错误，每次定时任务还能对这个自动升级代码进行
+微调修复审核」。
+
+### 诊断：13 轮实测，prompt 规则治不了重复错误
+
+| 症状 | 出现轮次 | 已有对策 | 为什么还犯 |
+|---|---|---|---|
+| 零提交 | 1/7/8/13（4 轮） | auto-commit-round + round-finish | 治住了 |
+| 只看 `gate.action` 不核归因 | 7/12 + 11 轮的 conda（3 次） | 归因哨兵 | 靠 LLM 自觉跑 |
+| 负例验证假阴性 | 6/7/13（3 次） | 模板脚本 | 同类坑不同化身 |
+| 版本漏同步 version.js | 多轮 | 无 | 靠记性 |
+| **LLM 401 空转一整轮** | 11:01 | 无 | prompt 管不了 LLM 挂掉 |
+
+根子：**规则靠 LLM 自觉执行，而 prompt 有 5231 字符、每轮重读一遍。**
+规则越写越长，遵守率不升反降。
+
+### 方案：upgrade-engine.js（五个子命令）
+
+```
+init     轮初：flock 拿锁 → 轮次+1 → 队列待办 → 交接簿遗留
+         → 7 项机器检查 → 打印验证清单
+finish   轮末：自动落盘 → 全量检查 → 归因哨兵 → 记账 → 放锁
+         （有 objection 就 exit 1，不靠 LLM 判断哪些能放过）
+queue    人工下单 / list / done
+state    只读进度
+release  发布前门禁：本地全绿 + 无未推送 + 队列空
+```
+
+**把 7 项可机器判定的规则固化为代码**：版本四处一致、版本已进 git log、
+工作区干净、README 测试数与缓存 strictEqual、changelog 覆盖当前版本、
+交接簿已记录、探针已清理。**3 条归因哨兵**（第 12 轮修的两条 + 论文引述）
+每轮强制核对，不再靠自觉。
+
+### prompt 5231 → ~1200 字符
+
+规则全进代码后，prompt 只剩：读 init 输出 → 选方向 → 做透 → `finish`。
+硬边界压到 6 条一句话。**下次改规则改代码，不改 prompt。**
+
+### LLM 401 熔断（preamble.sh v4）
+
+11:01 那次 `api-key 无效`，LLM 一步没动但白烧一轮——而 init 是本地脚本
+照样跑，看起来"正常"。现在：`last_status=error` → strike+1；
+连续 2 次 → 自动 pause 任务 + 记录原因 + 给出恢复命令。
+
+**这是 prompt 永远治不了的一类：规则管不到"执行体本身挂掉"。**
+
+### 所有权模型（写进脚本注释）
+
+```
+手动方   ✅ 读 state.json / queue add / queue done / release 检查
+         ✅ 修 scripts/upgrade-engine.js 自身（自审）
+         ❌ 不碰 src/、test/、VERSION
+生产线   cron，唯一写引擎的
+```
+第 12 轮父级差点 amend 掉第 13 轮的 commit、第 13 轮 sibling warning，
+根子都是两个执行体竞争同一份工作。**所有权划清比流程规则管用。**
+
+### 负例验证（不是装饰）
+
+| 场景 | 结果 |
+|---|---|
+| 锁互斥 | init 后再 init → 被拒退出，不硬写 |
+| init | 7 项体检 + 队列 + 遗留 + 验证清单全打出 |
+| finish | 十项全绿，锁释放，exit 0 |
+| 熔断一级 | 模拟 error → strike 1/2，不暂停 |
+| 熔断二级 | strikes=1 + error → 自动 pause + 恢复指引 |
+| queue | add/list/done 正确落盘 |
+
+测试后已还原：jobs.json 的 `last_status: error` 经 `cronjob list`
+确认为**系统真实状态**（401 是真实故障，非我污染），`paused` 已恢复 False。
+
+### 遗留
+
+1. **LLM 401 未解** —— stepfun 的 api-key 失效，需要用户更新凭据。
+   熔断只是让它不空转，不解决根因。**这是当前升级流水线唯一的硬阻塞。**
+2. `data/upgrade-state.json` 的 round 已按 UPGRADE_LOG 校准为 13。
+3. 队列里那条测试用的 q1-dljb 已标记 done，未污染下一轮方向。
+4. 引擎侧真缺口仍未动：`dangerous_instruction` 开发调试语境误拦
+   （3 条良性 block，第 11 轮起挂了三轮）、中文 instrumental_reasoning、
+   `ai_writing_tell` 多语言误伤、reward_hacking 剩余 6 类。
+
+---
