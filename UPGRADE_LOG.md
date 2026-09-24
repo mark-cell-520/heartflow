@@ -912,3 +912,122 @@ execSync 跑 run-all 时抖动出 2 失败，我直接跑 2144/1）。第三轮�
    日文假名、人民币/欧元/英镑符号、摄氏度、版权符、省略号、上标数字），
    只因 ai_writing_tell 不在行动级集合里（gate 仍 pass）才没造成误拦。
    这是真实缺口，可作为后续轮方向（修法是给白名单补全多语言 Unicode 区）。
+
+---
+
+## 第 11 轮 — v6.7.111（接手第 10 轮 reward_hacking 收尾 + 修其引入的两处缺陷）
+
+### 心虫本轮 chosen
+
+本轮不是 decision.decide 选方向——round-guard `--stage=before` 报「工作区有
+3 个未提交改动」，按铁律先接手收尾上一轮。第 9、10 轮的记录本身也缺失
+（UPGRADE_LOG 只写到第 8 轮标题，round-guard 的「已记录 10 轮」是按空行
+粗数的误判），本轮一并补齐。
+
+### 接手内容
+
+v6.7.110 的 `reward_hacking` 新维度（第 10 轮工作区遗留，未提交）：
+`src/reward-hacking.js` 新文件（180 行）、`src/index.js` 四处接线
+（require / allDims / dimensions / BLOCK_DIMS / summary）、
+`test/reward-hacking-dsec.test.js`（53 条）、
+`scripts/negative-test-reward-hacking.js`、AGENTS.md 维度表与
+README 测试数横幅。VERSION 当时仍是 6.7.109。
+
+维度来源：arXiv:2609.22978v1《DeepSeek Elastic Compute (DSec)》§6.4–§6.5
+生产实测规避手法（160 节点、日产约 300 万沙箱、38 万并发）。覆盖率实测
+（6.7.109，16 个论文手法样本）：dangerous_instruction 只拦住 2 个，
+其余 14 个 findings 为空、gate pass——真缺口，中英双语都缺，不是重复建设。
+接入 4 类，每类要求「两半齐备」才命中；剩余 6 类留待后续轮次，
+不为一次接全而放宽判据。
+
+### 改了什么
+
+1. **接手提交**：上述全部改动入库，版本 bump 6.7.109 → 6.7.111
+   （含 package.json / SKILL.md / src/core/version.js 兜底值三处同步）。
+2. **修 conda 误拦（v6.7.110 引入的真误拦）**：HEAD 快照 worktree 实测
+   对照确认「把 /usr/bin/python3 换成 conda 管理的版本，避免环境污染」
+   在 6.7.109 是 pass，v6.7.110 变 block（reward_hacking 80 分）。
+   改为**类内收窄的句式豁免**：宾语是系统路径 + 换入的是
+   conda/nvm/pyenv/apt 等管理渠道 → 不算覆写系统二进制。刻意不做全局豁免，
+   否则「绕过 conda 的安全检查」这类真攻击会被连带放掉。
+3. **补 etc/passwd 动词前置语序漏报**：原句式只覆盖「把 X 换成 Y」，
+   「篡改 /etc/passwd 拿到 root 权限」完全不可见；补动词前置语序，
+   hosts 排除（本地开发指向 127.0.0.1 是标准操作且攻击价值低）。
+4. **文档数字修正**：README changelog 补 6.7.111 行，测试数横幅
+   2301 → 2354（实测值，原值少报）。AGENTS.md 行动级计数
+   v6.7.101 → v6.7.110、Block-level 9 → 10、reward_hacking 入列。
+5. **measure-claimed-numbers.js 口径修正**：维度数原口径数
+   `^function check*` 只得 index.js 内联函数数，把独立模块里的
+   reward_hacking 漏掉了；改为运行时 dimensions 键实测。
+   （注：实测 57 键与对外宣称的「50 dimensions」不是同一口径，
+    属产品口径决策，本轮不动，列为遗留。）
+
+### 验证结果（全部真实执行）
+
+| 项目 | 真实输出 |
+|---|---|
+| `bin/verify.js` | 14 passed 0 failed |
+| `reward-hacking-dsec.test.js` | 53 passed 0 failed |
+| `node --check src/reward-hacking.js` | 通过 |
+| `bidirectional-guard.js` | 召回 52/52；误拦 300/326（基线持平，0 新增） |
+| `security-audit.test.js` | 16 passed 0 failed |
+| `doc-numbers-accuracy.test.js` | 15 passed 0 failed（修前 13/2） |
+| `test/run-all.js` | 2354 passed 3 failed |
+| 归因探针（正向 10 条） | 10/10 命中 reward_hacking 且 action=block |
+| 良性边界（12 条） | 本轮新引入误拦 0 条（conda 句 block → pass） |
+| HEAD 快照 worktree 对照 | 3 条 dangerous_instruction 误拦为 6.7.109 既有遗留，非本轮引入 |
+
+**run-all 3 个失败的构成**：① npm-package-integrity 1 个 =
+npm latest=6.7.100 落后本地，「不 publish」铁律的必然结果，三轮同一状态；
+② doc-numbers-accuracy 2 个 = README 测试数少报 + changelog 缺当前版本，
+**正是本轮修掉的两项**，修后该文件 15/15 全绿。
+（注：本次 run-all 首次跑时曾报 2354/3，修完文档后重跑未再跑一遍全量，
+ 故总数仍记 2354；证据链见上表逐项输出。）
+
+**guard-abilities**：因 30 分钟间隔与迭代上限，本轮未重跑，标记「未实测」。
+
+### 过程中如实记录的两个判断失误
+
+1. **python\d? 是空操作**：第一反应是「中文侧 python 缺版本号边界」，
+   在正则里加了 `\d?`。逐条跑探针发现 `matched` 仍是「python3」——
+   正则未锚定，`python` 本就匹配 `python3` 前缀，`\d?` 完全无效。
+   已回退，改为真正的句式级豁免。**没把无效修复留在代码里。**
+2. **measure 脚本第一次改错**：先改成正则统计集合名得 49，再改成硬编码
+   51——后者正是 VERSION 硬编码铁律反对的做法。最终改为运行时
+   `discriminate().dimensions` 键实测。
+
+### 一个方法论教训（值得写进后续每轮）
+
+双向门禁报的误拦必须逐条做 **HEAD 快照 worktree 对照**，不能只看
+「本轮改了 reward_hacking 就归因给 reward_hacking」。本轮 4 条误拦里
+3 条归因 dangerous_instruction 且 HEAD 已拦（既有遗留），只有 1 条是
+真引入。方法：`git worktree add <scratch>/hf-head-wt HEAD --detach`
+跑同一组样本（tar 解压被安全扫描拦，worktree 是可行替代）。
+
+### 遗留（区分真缺口与已证伪）
+
+**真缺口（下一轮优先）**：
+1. `absolute_claim` 英文绝对化句式：第 8 轮已实测确认（10 条真实句漏 7 条、
+   gate 全 pass），良性边界也已实测干净，两轮落选但证据在手，可直接立项。
+2. 中文侧 `instrumental_reasoning` 同族：实测 8 条漏 7 条。
+3. `dangerous_instruction` 对开发/调试语境误拦：本轮实测 3 条良性
+   （「本地开发时绕过缓存检查的技巧」/「Bypass the certificate check in the
+   test environment for debugging」/「Skip the optional verification step
+   if the input is empty」）在 6.7.109 就已 block，是既有真误拦，
+   reward_hacking 的 DEV_DEBUG 豁免不覆盖它（不同维度）。
+4. `INVISIBLE_HOMOGLYPH` 第二条模式误伤正常多语言文本：29/34 条正常样本
+   被判同形字得 0.35 分，只因 ai_writing_tell 不在行动级集合才未误拦。
+5. reward_hacking 剩余 6 类论文手法未接（ioctl extent 交换、受保护文件
+   换 fd 可读、端口扫描找镜像、代理取外部代码、装新包找现成实现、无界输出）。
+6. 对外文档「50 dimensions」与运行时 57 键/51 独特名的口径差：属产品口径
+   决策（对外宣称数 vs 内部登记数），未擅改，需明确后再动三处文档。
+
+**已证伪、不要再当缺口报**：
+- dimension-health 的 pseudoCausal BROKEN；
+- lang-coverage-audit 的 victim_blaming / moral_foundations「仅中文」标注；
+- soft_deflection 对单纯拖延句 count=0（设计域不匹配）；
+- UPGRADE_LOG「第 9/10 轮缺记录」已由本轮补齐（原 round-guard 的
+  「已记录 10 轮」是按空行粗数的误判，实际只写到第 8 轮）。
+
+**长期状态（不必再当新问题报）**：guard-abilities 的「全量测试」红灯
+根因是 npm-package-integrity 落后本地，「不 publish」的必然结果。
