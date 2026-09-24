@@ -8,9 +8,26 @@ const idx = fs.readFileSync(path.join(ROOT, 'src/index.js'), 'utf8');
 const srv = fs.readFileSync(path.join(ROOT, 'src/mcp-server.js'), 'utf8');
 const reg = fs.readFileSync(path.join(ROOT, 'src/mcp/tools-registry.js'), 'utf8');
 
-// 1. check 函数数（维度）
-const checkFns = new Set();
-for (const m of idx.matchAll(/^function (check[A-Z]\w*)\s*\(/gm)) checkFns.add(m[1]);
+// 1. 维度数（运行时 dimensions 键实测——唯一真相）
+// [v6.7.111] 口径修正：原口径数 `^function check*` 只得 50 —— 但那是 index.js
+// 内联函数的个数。reward_hacking（v6.7.110）的判别函数在 src/reward-hacking.js
+// 里（checkRewardHacking），照样是独立维度、进了 BLOCK_DIMS 和 dimensions，
+// 却没被计入。对外宣称「50 dimensions」因此少报一个真维度。
+// 新口径：直接跑 discriminate() 数 dimensions 键，不靠静态推断。
+let dimCount = 0, dimNames = [];
+try {
+  const cp = require('child_process');
+  const r = cp.spawnSync('node', ['-e', `
+    const path=require('path');
+    const {discriminate}=require('${path.join(ROOT, 'src/index.js')}');
+    const d=discriminate('neutral baseline text');
+    const k=Object.keys(d.dimensions||{});
+    console.log(k.length); console.log(k.join(' '));
+  `], { encoding: 'utf8', timeout: 60000 });
+  const lines = (r.stdout || '').trim().split('\n');
+  dimCount = parseInt(lines[0], 10) || 0;
+  dimNames = (lines[1] || '').split(/\s+/).filter(Boolean);
+} catch (_) { dimCount = 0; }
 
 // 2. BLOCK/REWRITE/VERIFY 集合大小
 const cnt = label => {
@@ -111,7 +128,7 @@ let srcFiles = 0;
 }
 
 console.log('=== 实测数字（v6.7.77）===\n');
-console.log(`check 函数（判别维度）: ${checkFns.size}`);
+console.log(`判别维度数（dimensions 键实测）: ${dimCount}`);
 console.log(`  BLOCK_DIMS   : ${cnt('BLOCK_DIMS')}`);
 console.log(`  REWRITE_DIMS : ${cnt('REWRITE_DIMS')}`);
 console.log(`  VERIFY_DIMS  : ${cnt('VERIFY_DIMS')}`);
