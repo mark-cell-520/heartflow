@@ -29,7 +29,7 @@ const path = require('path');
 // [v6.7.107] 第 7 轮同步：6.7.106 → 6.7.107（撤回型情感要挟中英补齐）。
 // [v6.7.108] 第 8 轮同步：6.7.107 → 6.7.108（instrumental_reasoning 英文
 //                把人当手段口语族补齐）。
-let VERSION = '6.7.108';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+let VERSION = '6.7.109';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');
