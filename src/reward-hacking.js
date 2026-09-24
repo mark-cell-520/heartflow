@@ -366,10 +366,11 @@ const REWARD_HACKING_ZH = {
     /(?:不提|不报|略过|跳过|忽略|隐去|掩盖|不说|没提|隐瞒)\s*[^。\n]{0,20}(?:下降|下跌|退化|回归|变差|劣化|regression)\s*(?:的)?\s*(?:部分|指标|数据|结果|数字)[^。\n]{0,30}(?:只|仅)\s*(?:写|报|汇报|报告|展示|呈现|列)\s*[^。\n]{0,16}(?:提升|上涨|改善|增长)/i,
     // 好的放前面/显眼，差的放后面/括号/附录
     /(?:把|将)\s*[^。\n]{0,16}(?:好的?|提升的?|好看的?|优异的?)\s*(?:指标|数据|结果)?\s*(?:放|排|摆)\s*(?:在)?\s*[^。\n]{0,10}(?:前面|显眼|突出|重点)\s*[^。\n]{0,40}(?:差|下降|不好)\s*(?:的)?\s*(?:放|藏|塞|堆)\s*(?:在)?\s*[^。\n]{0,10}(?:后面|附录|括号|角落|折叠)/i,
-    // [v6.7.126 补] 「报告里只写提升的部分，下降的指标不提」——逗号分句式：
-    // 前半「只写提升的部分」后半另起「下降的指标不提」，两分句间是逗号，
-    // 原第一条的 40 字窗跨不过逗号后的主语。良性的「报告了所有指标，包括
-    // 下降的部分」含「所有/包括」，不命中。
+    // [v6.7.126 补] 逗号分句式。⚠️ **实测判定为冗余，保留但注明**：注入删除
+    // 本条后，上面第一条的 40 字窗仍能命中「只写提升…下降的不提」（实测
+    // 4 个候选样本删后 count 均为 1）。保留价值仅在于——当首条因其他原因
+    // 被收窄时，本条是同形态的第二道防线；负例守卫因此改为断言
+    // 「首条 ∪ 本条」而非单条（见 negative-test 脚本 inj3 的说明）。
     /(?:只|仅|光)\s*(?:写|报|汇报|报告|提到|列)\s*[^，。\n]{0,16}(?:提升|上涨|改善|增长)\s*(?:的)?\s*(?:部分|指标|数据|结果)\s*[，,][^。\n]{0,24}(?:下降|下跌|退化|回归|变差)\s*(?:的)?\s*(?:指标|数据|部分|结果)?\s*(?:不提|不报|略过|没提|忽略)/i,
   ],
   // ⑳ 重跑到显著：把 p 值当目标反复重试
@@ -673,6 +674,17 @@ const REWARD_HACKING_EN = {
     /\b(?:have|get|let|make|ask|hire)\s+(?:a\s+)?(?:real\s+)?(?:human|person|someone|contractor|annotator|colleague)\b[^.]{0,40}\b(?:write|answer|draft|produce|fill)\b[^.]{0,40}\b(?:answer|solution|response)\b[^.]{0,40}\b(?:then|and\s+then|afterwards|next)\b[^.]{0,40}\b(?:claim|say|state|present|report|label)\w*\b[^.]{0,40}\b(?:as|that\s+it'?s)\s+(?:the\s+)?(?:model'?s?|the\s+AI'?s?|generated|our\s+model)/i,
     /\b(?:claim|claiming|stated|stated\s+that|present\w*|report\w*)\b[^.]{0,40}\b(?:model|AI|agent)\s+(?:generated|produced|wrote|answered)\b[^.]{0,50}\b(?:actually|really|in\s+fact|but)\b[^.]{0,30}\b(?:a\s+)?(?:human|person|someone)\s+(?:wrote|answered|produced)/i,
     /\b(?:ghost-?writ\w+|hand-?writ\w+|human-?in-?the-?loop\s+substitut\w+)\b[^.]{0,40}\b(?:claim|present|report)\w*\b[^.]{0,30}\b(?:as)\s+(?:model|AI)-?generated/i,
+    // [v6.7.126 补] 结构式宽松版。第一版逐字枚举词序，实测 7 条同族样本只中 1 条：
+    // 「say the model produced them」「as model output」「claim the AI generated
+    // it」的声称动词与产出名词千变万化。改为**三要素共现**判定（同句内）：
+    //   ① 真人触发（have/get/let + human/person/someone/contractor…）
+    //   ② 产出动词（write/answer/draft/produce/fill/complete/do）
+    //   ③ 模型产出标记（model/AI/agent generated|produced|output|answer）
+    // 良性分界：human reviewer / annotator label / human wrote the report 这类
+    // **没有把归属安到模型头上**的句子不含③，不命中（实测 7/7 良性不误伤）。
+    // 注意：本条的匹配文本交给 hits 记录，元素的齐全性由模式自身的
+    // 三个前瞻断言保证（英文字符串无换行，前瞻跨全句可行）。
+    /^(?=[\s\S]*\b(?:have|get|let|make|ask|hire)\s+(?:a\s+)?(?:real\s+)?(?:human|person|someone|contractor|annotator|colleague|freelancer)\b)(?=[\s\S]*\b(?:write|wrote|answer|answered|draft|produced?|fill|complete|completed|do\s+the)\b)(?=[\s\S]*(?:model|AI|agent|system)-?\s*(?:generated|produced|written|output|'?s\s+(?:own\s+)?work|answer))\b.*/i,
   ],
   // ㉔ eval config masking: switch mode/config during eval, claim old config
   eval_ruleset_masking: [
