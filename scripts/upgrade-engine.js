@@ -58,19 +58,25 @@ function acquireLock(who) {
   fs.mkdirSync(path.dirname(LOCK), { recursive: true });
   try {
     const fd = fs.openSync(LOCK, 'wx');
-    fs.writeFileSync(fd, JSON.stringify({ holder: who, at: new Date().toISOString() }) + '\n');
+    // [v6.7.122] 写入 PID，让接管判定不必等 40 分钟僵尸兜底
+    fs.writeFileSync(fd, JSON.stringify({ holder: who, pid: process.pid, at: new Date().toISOString() }) + '\n');
     fs.closeSync(fd);
     return true;
   } catch {
     const age = Date.now() - fs.statSync(LOCK).mtimeMs;
     // 超过 40 分钟视为僵尸锁（一轮 cron 最多 30 分钟 + 余量）
-    if (age > 40 * 60 * 1000) {
-      console.log(`  ⚠️ 发现僵尸锁（${Math.round(age / 60000)} 分钟前），按陈旧处理并接管`);
+    // [v6.7.122] 新增：持有进程已死 → 立即接管，不等 40 分钟
+    // （16:07 gateway 重启那轮的教训：进程被杀但锁残留，静默挡掉后续所有轮）
+    let holderPid = null;
+    try { holderPid = readJson(LOCK, {}).pid; } catch { /* 读不到按陈旧处理 */ }
+    const holderDead = holderPid ? !_lockPidAlive(holderPid) : false;
+    if (age > 40 * 60 * 1000 || holderDead) {
+      console.log(`  ⚠️ 接管陈旧锁（${Math.round(age / 60000)} 分钟前${holderDead ? '，持有进程 ' + holderPid + ' 已死' : ''}）`);
       fs.rmSync(LOCK, { force: true });
       return acquireLock(who);
     }
     const holder = readJson(LOCK, {});
-    console.log(`  ❌ 锁被 ${holder.holder || '?'} 持有（${Math.round(age / 60000)} 分钟前）`);
+    console.log(`  ❌ 锁被 ${holder.holder || '?'} 持有（${Math.round(age / 60000)} 分钟前，pid=${holderPid || '?'}）`);
     console.log('     本轮不启动写操作，避免两个执行体竞争同一份工作。');
     return false;
   }
