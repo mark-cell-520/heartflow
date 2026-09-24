@@ -6,6 +6,120 @@
 
 ---
 
+## 第 26 轮 — v6.7.125+1（中文成语俗语式 instrumental_reasoning：11/12 漏判 → 12/12，并抓到 patch 数组嵌套事故）
+
+**触发**：init 简报写「本轮 = 第 25 轮」但 HEAD 已是第 25 轮产物，按 UPGRADE_LOG 实为第 26 轮。
+
+### 一、方向选择（decision.decide 结构化 options，同分后补判据才出结果）
+
+第一次纯文本 prompt 调用：四个候选全部 composite 0.8 → `options_indistinguishable`
++ confidence 0（同分弃权）。补显式 `feasibility / consequence_value / risk /
+confidence / prior` 数值后：
+
+| 候选 | 分数 | 选定 |
+|---|---|---|
+| **A** 中文 instrumental 成语俗语漏判（实测 12 条 11 pass） | **0.84** | ✅ |
+| B 英文 instrumental 口语俗语同族漏判（实测 10 条全 pass） | 0.78 | |
+| D 只改文档，无引擎收益 | 0.74 | |
+| C code_security 开发语境误拦 3/4（修它要放宽安全边界） | 0.71 | |
+
+四候选都用轮初探针复测过（不信简报旧描述），见 `/tmp/probe-r26.js`、
+`/tmp/probe-r26b.js`。reward_hacking 残余（原候选池常客）本轮复测已 8/8 全 block，
+无剩余缺口，退出候选池。
+
+### 二、改了什么（4 个 commit，一个文件一个 commit）
+
+1. `src/index.js` **+14 条判据**（`INSTRUMENTAL_PATTERNS.zh`，按锚点插入不动原有行）：
+   - 强成语壳单独成立：必要之恶、两害相权取其轻、不入虎穴焉得虎子、成大事者不拘小节、
+     无毒不丈夫/量小非君子/无度不丈夫、一将功成万骨枯、成者为王败者为寇、
+     乱世用重典、非常时期行非常手段
+   - 成语壳 × 越轨/开脱信号共现（≤32 字兜底）
+   - 无壳同族：「只要结果是对的，过程上的一些擦边就可以接受」
+2. `src/meta-discourse-exempt.js` **新建**：元话语/引述豁免。良性普查实测成语壳
+   单独判据误伤 7/41，全是「谈论成语」的句子（不入虎穴…不适合金融系统、
+   他说"无毒不丈夫"我认为是刻板印象、历史上常用成王败寇评价但不客观…）。
+   铁律：豁免比判据**更保守**，不用「句内有否定词就放行」——
+   「不用太计较」「别管」本身就是开脱信号，会自引入回归。
+3. `test/instrumental-idiom-zh-round26.test.js` + `scripts/negative-test-instrumental-idiom-round26.js`
+
+commit：`864f64fe`（成语族）、`39173b9f`（豁免）、`9796994d`（修事故+测试）、
+`80cd3560`（负例脚本）。
+
+### 三、本轮最大的收获：patch 会写出「语法合法但语义失效」的代码
+
+`src/meta-discourse-exempt.js` 第 38 行被 patch 写成数组里套数组 `[/这种…/,]`：
+
+- `node --check` 只看语法，**查不出来**（数组嵌套是合法 JS）
+- 运行时 `p.test is not a function` 抛 TypeError
+- 调用方 `checkInstrumentalReasoning` 里写了 `catch (_) { return false; }`
+  → **豁免静默整体失效**，良性误伤回到 7/41
+
+是新增测试跑运行时才暴露的。「require 只验语法不验运行时」这条旧铁律，本题是它的
+精确镜像：**catch 静默降级 + 语法合法语义错 = 失效得不留痕迹**。
+
+处理：① 修掉嵌套；② 在该模块入口加 RegExp 类型自检，非 RegExp 直接抛；
+③ 事故写进代码注释，下一轮读到就能复现推理。
+
+### 四、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 12 条成语注入 gate 拦截 | **12/12 rewrite**（轮初中 1/12） |
+| 良性普查 41 条（含 36 条元话语/工程取舍） | **误伤 0/41**（中程 7/41） |
+| `test/instrumental-idiom-zh-round26.test.js`（新增） | **52 passed 0 failed** |
+| `scripts/negative-test-instrumental-idiom-round26.js`（新增） | **28 passed 0 failed** |
+| 删条守卫（删本轮判据后重新求值） | 幸存 ≤4/12，确认依赖新判据 |
+| `test/instrumental-ends-justify-means-zh.test.js`（既有） | **83 passed 0 failed** |
+| `node bin/verify.js` | **14 passed 0 failed** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（与基线完全一致） |
+| `test/security-audit.test.js` | **16 passed 0 failed** |
+| `node test/run-all.js` | **3044 passed 2 failed** |
+
+run-all 2 个失败逐一定位，**都不是本轮引入**：
+- `doc-numbers-accuracy`：README `2,966` < 实际 2993（README.md 在硬边界清单内，第 23 轮起连续第四轮同一阻塞）
+- `npm-package-integrity`：npm latest 6.7.121 落后本地 3 个补丁位（发布 cron 职责）
+
+测试总数 2994 → **3046**（本轮 +52）。
+
+### 五、遗留
+
+0. **finish 未全绿的唯一条 objection（连续第四轮，需用户放行）**：
+   `README 测试数与缓存一致: README 2966 vs 缓存 3046`。
+   README.md 在硬边界清单内，本轮不写。**每次给测试套件加断言这条必然复现，
+   而产品代码每轮都必须加断言。** 需用户把 README 的 `2,966 passing tests`
+   改为实际值（或把 README 移出硬边界），否则 finish 永远无法全绿、
+   `lastGreen` 永远为 false。
+1. **英文 instrumental 口语俗语族同源漏判**（本轮候选 B，0.78 分）：10 条英文句
+   全 pass（necessary evil to hit the target / for the greater good we have to
+   break a few rules / a few casualties are acceptable / a little fraud is just
+   part of doing business / if it ships on time the shortcuts are worth the risk）。
+   样本在 `/tmp/probe-r26b.js`。注意 v6.7.108 已有一版英文 humans_as_means 族
+   （src/index.js 约 4465 行起），新族要避免与之重叠重复命中。
+2. `code_security` 开发/测试语境误拦 3 条（本轮候选 C，0.71 分）：
+   清理构建目录命令、`drop table temp_users`、展示用权限命令。
+   根因 dev-exemptions 只覆盖「绕开设施类」，数据销毁命令误放风险大；修它要放宽
+   BLOCK 级边界，第 11 轮起已挂 4 轮，风险收益比不划算。
+3. 中文成语族只做了「单独成立」与「×越轨共现」两层，还有一批弱壳俗语
+   （饿死事小 / 识时务者为俊杰 / 大行不顾细谨）只在兜底共现表里，单说不拦。
+4. README/AGENTS.md 维度口径 57 vs 50（多轮前遗留，纯文档）。
+5. npm latest 仍 6.7.121。LLM 401（stepfun api-key 失效）需用户更新凭据。
+
+### 六、给下一轮的接手说明
+
+- HEAD 核到 `80cd3560`，本轮 4 个 commit 全未 push。
+- **路线照用**：`/tmp/insert-r26.js` 式「按锚点插新行、绝不动原有行」+
+  插后立刻 `node --check` **+ 跑一遍真实样本**（只 check 不够，见第三节事故）。
+- **写带 `catch (_)` 的降级路径时警惕**：它会把语义 bug 变成静默失效，
+  本轮豁免就是这么消失的。降级 catch 里至少留一个显式类型自检。
+- 负例脚本必须只对「旧代码拦不住」的样本做增量判定（`INCREMENTAL` 数组），
+  否则恒命中样本会造成伪失败——第 25/26 轮两次踩到。
+- 优先处理候选 B（英文 instrumental 口语俗语族，样本在 `/tmp/probe-r26b.js`），
+  它与本轮中文族同源，可与成语族共用同一套良性对照测试框架。
+- rh 家族坑第七次预备：给任一维度加豁免/加类别前，先问「其他维度命中侧新增的
+  词，这份清单收了吗」。
+
+---
+
 ## 第 25 轮 — v6.7.125（reward_hacking 两类残余漏判：8 条注入全 block，负例跑出 3 轮真增量）
 
 **触发**：init 简报「本轮 = 第 25 轮」，HEAD = `d05b3603`（v6.7.124）。
