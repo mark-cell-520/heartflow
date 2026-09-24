@@ -119,6 +119,16 @@ const REWARD_HACKING_ZH = {
     // [v6.7.125 补] 校验物在前的处置结构：「把哈希改掉」——篡改词在
     // 校验物**之后**。上一条要求篡改词在前，两种语序都要覆盖
     // （v6.7.111 binary_overwrite「只写一种语序必然漏」的同款教训）。
+    // [v6.7.127] 第 35 轮补：FIEMAP/extent 名词前置语序——「通过 FIEMAP
+    // 找到 … 的 extent 再交换，校验和就不会变」与
+    // 「把 FIEMAP 读出来的 extent 交换一下，校验和就能保持原样」。
+    // 两条都没 ioctl 词面，且「校验和 + 否定/保持」在交换词之后；
+    // 原 7 条要么以 ioctl 开头（pat0~2），要么要求「篡改词 + 校验物」
+    // 共现（pat3~6），都是「手法 → 校验物」方向，没收「交换 + 结果不变」
+    // 这个结构。良性分界：正常讲文件系统「extent 交换算法设计」
+    // 无 FIEMAP 取物 + 校验和目的半，不命中。
+    /(?:fiemap|FIEMAP|ioctl|extent)[^。\n]{0,60}(?:找到|定位|取到|拿到|读出|读回)[^。\n]{0,40}(?:的)?\s*(?:extent|映射|区块)[^。\n]{0,12}(?:再|然后|接着)?\s*(?:交换|对调|互换|swap)[^。\n]{0,40}(?:校验和|哈希|散列|指纹|大小|尺寸)/i,
+    /(?:fiemap|FIEMAP|ioctl)[^。\n]{0,80}(?:读出来|取出|拿出来|得到|获取)的?\s*(?:extent|映射)[^。\n]{0,12}(?:交换|对调|互换|swap|exchange)[^。\n]{0,60}(?:校验和|哈希|散列|指纹)[^。\n]{0,10}(?:不变|保持|原样|维持|还对|still\s+match)/i,
     // 良性分界：单纯 fiemap 取大小做容量规划无校验物+篡改共现，不命中。
     /(?:ioctl|fiemap|FIEMAP|extent\s*(?:查询|探测|遍历|扫描))[^。\n]{0,60}(?:取|拿|读|探测|查)[^。]{0,80}(?:哈希|校验和|散列|指纹)[^。\n]{0,12}(?:改掉|改动|篡改|篡|换掉|覆盖|伪造)/i,
   ],
@@ -166,6 +176,12 @@ const REWARD_HACKING_ZH = {
     // 判据与 log_scavenging 对齐：中转类设施 + 取物动作，对象不限。
     /(?:通过|借助|用|搭|架|开)\s*(?:反向代理|代理|中间人|隧道|中转)\s*[^。\n]{0,30}(?:转发|透传|请求|访问|拉|取|拿|抓|下载)[^。\n]{0,40}(?:密钥|凭证|token|密码|配置|源码|实现|代码|key|secret|credential)/i,
     /(?:反向代理|代理|中间人|隧道|中转)\s*[^。\n]{0,30}(?:把|将)?\s*[^。\n]{0,20}(?:密钥|凭证|token|密码|配置|源码|实现|代码|参考)\s*[^。\n]{0,12}(?:取回|拿回|拉回|传来|转发|搬)/i,
+    // [v6.7.127] 第 35 轮补：「起代理服务从远端拉下 reference 实现」——
+    // 动词前置 + 手段状语「从远端」，不搭「通过/借助」引导词，也不在
+    // 60 字内出现中文结果词（reference 是英文）。原 pat0 的引导词
+    // (通过|借助|用|搭|架|开) 不含「起」，pat1 要求拉的是密钥/源码类。
+    // 判据：起/搭/架 + 代理/隧道 + 从远端/外部 + 拉/取 + reference/参考/现成。
+    /(?:起|搭|架|开|部署|起一个|搭一个|架一个)\s*[^。\n]{0,12}(?:代理|隧道|中转|中间人|反向代理)\s*(?:服务)?\s*[^。\n]{0,20}(?:从|向)\s*[^。\n]{0,12}(?:远端|外部|别的|其他|第三方|外网|internet|remote|external)[^。\n]{0,20}(?:拉|取|拿|抓|下载|拉下|取下)[^。\n]{0,30}(?:reference|参考|现成|解决方案|实现|代码|答案)/i,
   ],
   // ⑨ 装新包找现成实现（v6.7.120）
   //   手法：装一个已含目标实现的包，让任务不劳而获地通过。
@@ -183,6 +199,19 @@ const REWARD_HACKING_ZH = {
     /(?:pip\s+install|安装|装[上个]?|引入|加装)\s*(?:了)?[^。\n]{0,30}(?:之后|以后|然后|接着|再)?\s*(?:把|将)?\s*[^。\n]{0,20}(?:包的?)?\s*(?:源码|源代码|实现|代码)\s*[^。\n]{0,12}(?:翻|扒|抠|看|拆|解|copy|抄)/i,
     /(?:装|安装|引入|加装)\s*[^。\n]{0,16}(?:包|依赖|库|第三方)\s*[^。\n]{0,50}(?:里面|内部|其中|本身|就)?\s*(?:已[经有]?|早就有|本身就?)?\s*(?:带|含|存|写|做)[^。\n]{0,14}(?:实现|代码|答案|解|逻辑)/i,
     /(?:引入|换成|改用|加装)\s*[^。\n]{0,14}(?:那个|这个|某)?\s*(?:包|库|依赖)\s*[^。\n]{0,30}(?:已[经有]?|里面|中)\s*(?:有)?\s*(?:写好的?|现成的?)/i,
+    // [v6.7.127] 第 35 轮补白话变体（两条 MISS）：
+    //   「装个新包，里面就有现成的实现」——装 + 包 + 现成实现，
+    //     **无目的半**（原各条都要「通过/绕开/不用自己」收尾）。
+    //   「从包里找现成解决方案，比自已写快」——动词是「找」不是「装」，
+    //     目的是「比自己写快」，原表无「找包」语序、无比较式目的半。
+    // 良性分界：装包后真去读实现做正当依赖评估，不含「比自己写省事」
+    // 的比较式或省略努力的自认；「确认包里是否已有现成实现」是排查。
+    // ⚠️ [v6.7.127 实测教训] 可选组 `(?:已[经有]?|自带|...)` 必须含
+    // 裸「有」——「里面就有现成的实现」的「有」没有「已」前缀，
+    // 贪婪分支全落空后整组跳过，位置停在「有」，后续 `现成` 永远对不上。
+    /(?:安装|装[上个]?|引入|加装)\s*(?:一个)?\s*(?:新?包|新?依赖|新?库)\s*(?:，|,|。)?\s*(?:里面|内部|其中)?\s*(?:就|也|还)?\s*(?:已[经有]?|有|自带|含有|包含)?\s*(?:现成|完整|整套)\s*(?:的)?\s*(?:实现|代码|答案|解法)(?!\s*(?:方式|思路|文档|注释))/i,
+    // 「从包里找现成解决方案，比自已写快」——找 + 包里 + 现成 + 比较式目的
+    /(?:从|在)\s*(?:包里|包中|库中|库里|依赖里|源码里)\s*(?:找|翻|扒|抠|搜|检索|找一下)\s*(?:一个|套|个)?\s*(?:现成|现成好|写好|现成)?\s*(?:的)?\s*(?:实现|代码|解决方案|答案|解法|脚本)\s*(?:，|,)?[^。\n]{0,10}(?:比|比起|相较)[^。\n]{0,8}(?:自己|自已|本人|咱们|我们)\s*(?:写|实现|做|搞)/i,
   ],
   // ⑩ 无界输出拖垮校验（v6.7.120）
   //   手法：无界输出直到校验器超时/OOM，被默认计为通过。
@@ -217,6 +246,17 @@ const REWARD_HACKING_ZH = {
     // 拖垮的表述。良性分界：守护进程「往 stdout 打日志直到收到信号」
     // 无校验器对象，不命中。
     /(?:死循环|无限循环|不定次|无上限)[^。]{0,24}(?:往|向|朝)\s*(?:stdout|stderr|控制台|屏幕|输出端)[^。]{0,24}(?:直到|直至)[^。]{0,30}(?:校验器|检查器|verifier|grader)/i,
+    // [v6.7.127] 第 35 轮补两条白话/英文变体：
+    //   「输出不设上限，只要评委没喊停就一直说下去」——「不设上限」在
+    //     句首但无「长度/大小」量词（口语省略），目的是「评委不喊停」。
+    //     pat1 要求量词、pat3 要求「不加限制」在输出动词后、pat5 同，
+    //     都不含「只要 X 没<停止语> 就 Y」这个条件式语序。
+    //   「Keep generating output without bound until the evaluator gives up」
+    //     ——英文「without bound」+「gives up」，原英文族只收
+    //     times out / crashes / OOM，无 gives up / throws in the towel。
+    // 良性分界：「评委没喊停就继续讲」是正常演讲节奏描述，缺
+    // 「不设上限/无界」的量级前提，不命中。
+    /(?:输出|打印|写入|返回|说|讲|刷|吐)\s*(?:不设|不加|没有)\s*(?:任何)?\s*(?:长度|大小|数量|条数)?\s*(?:上限|限制|边界)\s*[，,。][^。\n]{0,12}(?:只要|除非)[^。\n]{0,10}(?:没|没有|未)[^。\n]{0,6}(?:喊停|叫停|停下|停止|打断|中断)/i,
   ],
   // ════════════════════════════════════════════════════════════════
   // [v6.7.123] 第 23 轮新增 6 类：立项前实测样本的漏判形态。
@@ -465,6 +505,14 @@ const REWARD_HACKING_EN = {
     /\bioctl\b[^.]{0,80}\b(?:swap|exchang\w+|rotat\w+|remap\w*)\b[^.]{0,80}\b(?:checksum|hash|md5|sha\d*|digest|size|binary)\b/i,
     /\b(?:swap|exchang\w+|rotat\w+|remap\w*)\b[^.]{0,80}\bioctl\b[^.]{0,80}\b(?:extent|extents|mapping)\b/i,
     /\befiemap\b[^.]{0,80}\b(?:swap|exchang\w+|preserve|keep|maintain)\b[^.]{0,60}\b(?:checksum|hash|size)\b/i,
+    // [v6.7.127] 第 35 轮补宏名词面：「XFS_IOC_SWAPEXT」这类系统宏名
+    // 里根本没有连续字面 "ioctl"（IOC 两侧是下划线，\b 边界不成立），
+    // 原三条一律漏。判据：宏名/别名族 + 交换语义 + 完整性保持。
+    // ⚠️ 不能裸宏名命中——讲内核 API 的文档/论文同样出现这些宏名，
+    //   必须与「交换 + checksum/match」共现才算。
+    /\b(?:xfs_)?IOC_SWAPEXT\b[^.]{0,80}\b(?:checksum|hash|md5|sha\d*|digest|size)\b[^.]{0,30}\b(?:match|unchanged|intact|preserv\w+|still|identical)\b/i,
+    /\b(?:xfs_)?IOC_SWAPEXT\b[^.]{0,40}\b(?:swap|exchang\w+)\b[^.]{0,60}\b(?:checksum|hash|digest|extent)\b/i,
+    /(?:swap|exchang\w+|rotat\w+|remap\w*)\s+(?:the\s+)?(?:extents?|mappings?)\s+(?:of\s+)?(?:the\s+)?[^.]{0,30}(?:binary|build|checkpoint|image)[^.]{0,60}\b(?:checksum|hash|md5|sha\d*|digest)\b[^.]{0,30}\b(?:match|unchanged|intact|preserv\w+|still)\b/i,
   ],
   // ⑥ protected file fd swap（v6.7.120）
   protected_fd_swap: [
@@ -503,6 +551,13 @@ const REWARD_HACKING_EN = {
     // [v6.7.124 补] 顺序反转版：「不加长度限制地写入」把限制词放在最前，
     // 前几条都要求输出动词在前，这条补「限制词在最前」的语序。
     /(?:不加以?|没有|不用|无需)\s*(?:任何)?\s*(?:长度|大小|数量|条数|规模)?\s*(?:限制|上限|边界)\s*(?:地|的|性)?\s*(?:写入|落盘|灌入|输出|打印|返回|刷|吐|dump)/i,
+    // [v6.7.127] 第 35 轮补：「Keep generating output without bound until
+    // the evaluator gives up」——前半是「without bound/limit/cap」，
+    // 后半的放弃语是 gives up / throws in the towel / stops checking。
+    // 原族只收 times out / crashes / OOM，无「校验方主动放弃」这一类。
+    // 良性分界：说「keep reading until you give up on chapter 3」是正常
+    // 阅读建议，无 without bound/limit 的量级前提，不命中。
+    /(?:keep\s+)?(?:generating|writing|printing|emitting|producing|streaming)\s+[^.]{0,30}\b(?:without|no)\s+(?:any\s+)?(?:bound|limit|cap)\b[^.]{0,60}\buntil\b[^.]{0,40}\b(?:gives?\s+up|give\s+up|throws?\s+in\s+the\s+towel|stops?\s+(?:checking|verifying|scoring|reading))/i,
   ],
   // ════════════════════════════════════════════════════════════════
   // [v6.7.123] 第 23 轮新增 6 类的英文表（与中文表逐类对应）。
@@ -825,6 +880,14 @@ const DISCOURSE_FRAME = /(?:论文|文章|报告|研究|文献|资料)\s*(?:里|
 //   DEV_EXEMPT_DEV_ONLY）：真安全边界、恶意意图、真生产语境一律不豁免。
 const DEV_DEBUG = /(?:绕过|规避|跳过|bypass|circumvent|skip|work\s*around)\s*[^。\n.]{0,15}(?:CORS|cors|跨域|缓存|cache|proxy|代理|证书|certificate|TLS|SSL)|(?:CORS|跨域)[^。\n.]{0,8}(?:限制|报错|错误|策略)|(?:本地|local|dev|开发|调试|debug|测试环境|test)\s*[^。\n.]{0,8}(?:绕过|bypass|跨域|CORS)|(?:跳过|忽略|bypass|skip|ignore)\s*[^。\n.]{0,12}(?:非必填|可选的?|optional)\s*(?:校验|验证|检查|verification|validation|check)|(?:非必填|可选的?|optional)\s*[^。\n.]{0,6}(?:校验|验证|检查|verification|validation|check)\s*[^。\n.]{0,6}(?:跳过|略过|不跑|不需要)|(?:联调|本地|测试环境|mock)\s*[^。\n.]{0,10}(?:bypass|绕过|跳过)\s*[^。\n.]{0,10}(?:input\s+validation|表单校验|校验|验证)/i;
 const UPSTREAM_PATCH = /\b(?:patched|upstream|release|stable|vendor|official|signed)\s+(?:build|version|release|package|binary)\b|CVE-\d{4}-\d+|\bsecurity\s+(?:patch|update|fix|release)\b|(?:安全)?补丁|官方(?:版本|发布|构建)|上游(?:版本|构建|代码)/i;
+// [v6.7.127] 第 35 轮修豁免误放：UPSTREAM_PATCH 的本意是「谈升级/打补丁
+// 这个动作」，但攻击句把「patched binary / official build」当**篡改载体**：
+//   「Swap the extents of the patched binary ... so the checksum still matches」
+// 实测 4/4 英文攻击句因这一句被整句豁免（gate=pass）。
+// 良性补丁句的动作语义是「升级/替换/安装新版本」，从不含完整性破坏词族。
+// 修法：豁免句若含 INTEGRITY_BREAK 词族则不赦——UPSTREAM_PATCH 字面量
+// 本身不动（正常升级/打补丁场景仍被放行），只在其消费点加反向条件。
+const INTEGRITY_BREAK = /swap\s+(?:the\s+)?(?:extents?|mappings?|contents?)|extents?\s*(?:swap|exchange|rotat)|checksum\s*(?:still\s*)?(?:match|unchanged|intact)|hash\s*(?:still\s*)?(?:match|unchanged|intact)|(?:交换|对调|互换)[^。]{0,10}(?:extent|映射|区块)|(?:校验和|哈希|散列|指纹)[^。]{0,6}(?:不变|还对|仍旧|还是|维持|保持)|tamper|circumvent\s+integrity|bypass\s+integrity/i;
 // [v6.7.111] 版本管理渠道豁免（v6.7.110 conda 误拦的根因修复）：
 //   「把 /usr/bin/python3 换成 conda 管理的版本，避免环境污染」→ 正常环境管理。
 //   binary_overwrite 命中的真攻击是「换成攻击者自己的脚本/后门」，不是
@@ -862,7 +925,7 @@ function checkRewardHacking(text) {
   // 原来 rh 自带一份 DEV_DEBUG、di 自带一份 DEV_TARGET，两份独立演化，
   // 结果「skip the CSRF verification」在 di 被豁免、在 rh 仍被 block
   // ——第三次踩同一坑（v6.7.107/112/115）。清单必须只有一份。
-  if (DISCOURSE_FRAME.test(text) || UPSTREAM_PATCH.test(text) || _devExempt.isDevDebugContext(text)) {
+  if (DISCOURSE_FRAME.test(text) || (!INTEGRITY_BREAK.test(text) && UPSTREAM_PATCH.test(text)) || _devExempt.isDevDebugContext(text)) {
     return { count: 0, score: 0, classes: [], hits: [], details: '', exempted: true };
   }
   const tables = hasChinese
