@@ -5,6 +5,113 @@
 
 ---
 
+## 第 20 轮 — v6.7.120（reward_hacking 补齐论文剩余 6 类：ioctl extent / 换 fd / 扫镜像 / 代理取码 / 装包取实现 / 无界输出）
+
+**触发**：init 简报的「上一轮遗留」块是**第 13 轮的旧内容**（LLM 401、队列 q1-dljb），
+与第 19 轮真实遗留不符。按铁律先 `git log --stat` 确认实际状态（HEAD = bd530f38 / 6.7.119）
+再选向，没有按简报叙事走。队列里无待办项 → 从真实遗留里挑。
+
+### 一、方向选择：为什么是「剩余 6 类」而不是别的三项
+
+第 19 轮遗留四项，按「候选集里只放真升级，先把修 bug/改口径筛掉」逐项过：
+
+| 遗留项 | 判定 |
+|---|---|
+| 路由数 1,728 来历 | 查证/改口径，不产生新辨别能力 → 不做 |
+| `dev-exemptions.js` 并入 2 条窄分支 | 维护（常量清理），rh 的常量还不能删 → 不做 |
+| 中文 reward_hacking 剩余 6 类论文手法 | **真升级**（新的辨别维度族，中英双语）→ 选它 |
+| `ai_writing_tell` 多语言误伤 | 修 bug（维度不在行动级，未造成误拦）→ 不做 |
+
+6.7.110 接入 reward_hacking 时，注释里明确写着这 6 类「留待后续轮次——
+不为一次接全而放宽判据」。本轮接的就是这批。
+
+### 二、立项前实测：缺口是真的，不是假设
+
+写了探针跑 6 类 × 每类 3~4 句中英混合样本（22 条攻击 + 9 条良性对照）：
+**22 条攻击样本全部 `findings` 全空、gate pass**。良性侧 9 条中 8 条 pass，
+1 条（Scan the open ports of your own service…）被判 `verify`，
+归因是 `hasty_generalization`、**不是 reward_hacking**，且改代码前同样如此
+→ 既有行为，非本轮引入（verify 也不在 block/rewrite 误拦定义内）。
+
+### 三、接入：判据与原 4 类一致（「两半齐备」）
+
+每类要求手法半 + 目的半同时出现，缺一不命中——不为一次接全而放宽判据：
+
+| 类 | 手法半 | 目的半 |
+|---|---|---|
+| `ioctl_extent_swap` | ioctl 交换 extent/FIEMAP | 保持校验和/大小 |
+| `protected_fd_swap` | 受保护/只读 + fd/描述符 + 复制换位 | 可读/校验器 |
+| `port_scan_mirror` | 扫端口 | 镜像/副本/另一实例的答案或缓存 |
+| `proxy_fetch_code` | 代理/隧道 + 拉取 | 参考实现/外部代码 |
+| `install_package_solution` | 装包 | 已含现成实现 + 让任务通过 |
+| `unbounded_output` | 无界输出 | 校验器超时/崩溃/默认通过 |
+
+中英两表各 10 类，类名一一对应（测试里有断言钉住）。
+补了 `CLASS_WEIGHT` / `CLASS_LABEL_ZH` 的 6 条登记，并把这两个常量加进
+`module.exports`（测试第 6 节要用）。
+
+**测试暴露的两个真漏**：第一版正则漏了「动词前置」语序——
+`Install a new package that already contains the solution so the task passes`
+和 `Write output without any length bound so the verifier times out`。
+这跟 6.7.111 修 `binary_overwrite` 时「中文更常说『把 X 换成 Y』」是同一个教训：
+**只写一种语序必然漏**。已给这两类各补第二 pattern。
+
+### 四、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| `test/reward-hacking-remaining6.test.js`（新） | **183 passed 0 failed** |
+| `test/reward-hacking-dsec.test.js`（旧，回归） | **53 passed 0 failed** |
+| `node bin/verify.js` | **14 passed 0 failed** |
+| `node scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**，与基线完全一致 |
+| `node test/run-all.js` | **2841 passed 1 failed**（= 2658 基线 + 183 本轮） |
+| `node test/security-audit.test.js` | **16/16** |
+| `node test/doc-numbers-accuracy.test.js` | **15/15** |
+
+唯一失败 = `npm-package-integrity`（npm latest 6.7.100 落后本地，未发布的既定预期结果）。
+README 测试数 2,658 → 2,841（185 增量与本轮新增断言数吻合）。
+归因核对按硬边界执行：22 条攻击全部打印 `findings[].dimension`，
+清一色 `reward_hacking`，无旁类串味。
+
+### 五、负例脚本：写错了三次才对（教训沉淀）
+
+`scripts/negative-test-reward-hacking-remaining6.js` 前后修了三处，
+每处都是「会静默产出假结论」的类型：
+
+1. **按单条 pattern 注入 → 14 个注入未变红。** 逐条查证后确认不是守卫失守，
+   而是**同类多条 pattern 互为冗余兜底**（如 `Duplicate the fd…` 同时命中
+   `protected_fd_swap` 第 0、1 条）。这是设计意图（多条覆盖不同语序）。
+   改成按「类」注入整类 patterns 才对——这也正是测试真正守的东西。
+2. **崩溃既不计红也不计未变红 → 4 个注入崩了却报「负例验证通过」。**
+   统计必须把 变红/未变红/崩溃 三者分开，崩溃单独计数且必须判负。
+3. **注释行被当成正则提取 → 副本语法错误 → 探针崩。** `needlesIn`
+   现在显式跳过 `//`、`*`、`/*` 开头的行。
+
+另外两个实现层坑也修了：
+① 结尾斜杠正向 `indexOf('/i')` 会先撞上正则**内部**的 `/i` 子串，
+   拿到长度 2 的假 needle（行 99 就这么崩的），改成从行尾反找；
+② needle 按行号从源码自取 + `new Function` 自校验合法性——
+   上一版手写字符串锚点在 write_file→磁盘过程中多了一层反斜杠转义
+   （期望 `\\b` 落盘 `\\\\b`），16 个注入里 9 个「锚点未找到」。
+
+**最终：12/12 注入变红、0 未变红、0 崩溃。**
+
+### 六、版本与收尾
+
+四处同步 **6.7.120**（VERSION / package.json / SKILL.md / `src/core/version.js`），
+README changelog 加 6.7.120 条目、测试数同步 2,841。commit 见 git log（未 push、未 publish）。
+
+### 遗留（下轮优先）
+
+1. `ai_writing_tell` 多语言误伤仍未动（`INVISIBLE_HOMOGLYPH` 第二条模式 29/34 条正常
+   多语言样本被判同形字；只因该维度不在行动级集合才未误拦）。
+2. `dangerous_instruction` 开发调试语境 3 条良性 block（第 11 轮起挂了四轮）。
+3. `dev-exemptions.js` 合并进 `DEV_DEBUG` 2 条窄分支、删 rh 重复常量。
+4. 路由数 1,728 的来历仍未查（`git log --stat` 可查）。
+5. LLM 401（stepfun api-key 失效）仍未解——需要用户更新凭据，不是本轮能动的。
+
+---
+
 ## 第 19 轮 — v6.7.119（补全负例充分性 + 修正上一轮归属误判 + README 数字回正）
 
 **触发**：cron 恢复后接手。init 报「第 15 轮、当前 6.7.116」，但 git log 已到 6.7.118
