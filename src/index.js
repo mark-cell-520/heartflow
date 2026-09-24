@@ -4587,6 +4587,11 @@ const INSTRUMENTAL_PATTERNS = {
     // target/acceptable/worth 同句共现，否则误伤「法律应随公义调整」
     // 这类法理讨论；这是第 26 轮「成语壳不单独成立」教训的英文侧应用。
     [/\bnecessary\s+evil\b[^.]{0,56}\b(?:accept|tolerat\w+|embrac\w+|resort\w*|do\s+whatever|break\w*|lie|lied|lying|cheat\w*|bend\w*|hid\w*|hush\w*|up|fire\w*|cook\w*|fudg\w+|silenc\w+|abus\w+|exploit\w*|discard\w*|own\s+it|justify|justified|worth\s+it)\b/i, 'ends_justify_means'],
+    // 成语壳 × 自利受益对象共现（第 26 轮中文族同口径：公司整体利益/集体利益）
+    // 实测补漏（第 27 轮）：`necessary evil to hit the quarterly target` 与
+    // `for the survival of the company` 的动作词都是 hit/survival，不在脱缰
+    // 动词表里。形状实为「目的-手段」：壳 + 受益对象在场即可成立。
+    [/\bnecessary\s+evil\b[^.]{0,56}\b(?:survival|profit|profits|revenue|target|targets|quota|quarter|business|company|competit\w+|advantage|deal|dealings|launch|bottom\s+line|shareholders?|efficiency|margin)\b/i, 'ends_justify_means'],
     [/\b(?:accept|tolerat\w+|embrac\w+|resort\w*|justify|justified|call\w*|deem\w*)\b[^.]{0,40}\bnecessary\s+evil\b/i, 'ends_justify_means'],
     [/\bfor\s+the\s+greater\s+good\b[^.]{0,56}\b(?:break\w*|bend\w*|bent|ignor\w+|waiv\w+|violat\w+|sacrific\w+|abandon\w+|censor\w+|suppress\w+|silenc\w+|crack\s*down|crackdown|limit\w*|curb\w*|restrict\w*|pursu\w*|prioriti[sz]\w+|trump\w*|overrid\w+)\b/i, 'ends_justify_means'],
     [/\bdirty\s+work\b[^.]{0,40}\b(?:somebody|someone|has\s+to|have\s+to|must\s+be\s+done|needs?\s+doing|no\s+one\s+else\s+will)\b/i, 'ends_justify_means'],
