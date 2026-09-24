@@ -77,6 +77,41 @@ function acquireLock(who) {
 }
 const releaseLock = () => fs.rmSync(LOCK, { force: true });
 
+/**
+ * [v6.7.122] 锁的进程级保活 + 释放。
+ *
+ * 实测故障（2026-09-24 16:16）：gateway 被服务管理器重启
+ * （16:07:44 退出 code 1 → 16:16:43 重新拉起），cron 恰在 16:16:50 tick，
+ * preamble 拿了锁，随后子进程被重启波及，**锁没释放、本轮零产出**。
+ * 之后的每一轮都会撞上「❌ 锁被 cron 持有」，直到 40 分钟僵尸检测兜底。
+ *
+ * 两处修：
+ *   ① 锁文件里写入 **PID + 心跳时间戳**。acquireLock 检查锁时，
+ *      若记录的 PID 已不存在（`process.kill(pid, 0)` 抛 ESRCH），
+ *      说明持有者已死 → 立即接管，**不用等 40 分钟**。
+ *   ② 注册 exit/SIGINT/SIGTERM 钩子，正常退出时也释放锁。
+ *
+ * 40 分钟的兜底仍然保留（防 PID 复用等极端情况），但正常路径下
+ * 僵尸锁存活时间从 40 分钟降到 ≤ 1 分钟。
+ */
+function _lockPidAlive(pid) {
+  if (!pid || !Number.isFinite(pid)) return false;
+  try { process.kill(pid, 0); return true; } catch (e) { return e && e.code === 'EPERM'; }
+}
+
+function releaseLockSmart() {
+  try {
+    const holder = readJson(LOCK, {});
+    // 只释放「自己这一轮」的锁，不动别人持有的锁
+    if (holder && holder.pid && holder.pid !== process.pid && _lockPidAlive(holder.pid)) return;
+  } catch { /* 读不到就当自己的，直接删 */ }
+  releaseLock();
+}
+
+for (const sig of ['exit', 'SIGINT', 'SIGTERM']) {
+  try { process.on(sig, () => releaseLockSmart()); } catch { /* 某些平台不支持 */ }
+}
+
 // ─── 版本四处一致 ────────────────────────────────
 function versionSync() {
   const v = V();
