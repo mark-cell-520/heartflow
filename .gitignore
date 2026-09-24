@@ -47,6 +47,8 @@ data/.mcp_token_plain
 !data/upgrade-state.json
 !data/upgrade-queue.json
 !data/test-count.json
+# 例外之外：upgrade-engine.js 的 flock 锁文件永不入库
+data/.upgrade.lock
 data/audit/
 data/code-graph.json
 data/erasure-log.json
