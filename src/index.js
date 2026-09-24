@@ -4592,7 +4592,10 @@ const INSTRUMENTAL_PATTERNS = {
     // `for the survival of the company` 的动作词都是 hit/survival，不在脱缰
     // 动词表里。形状实为「目的-手段」：壳 + 受益对象在场即可成立。
     [/\bnecessary\s+evil\b[^.]{0,56}\b(?:survival|profit|profits|revenue|target|targets|quota|quarter|business|company|competit\w+|advantage|deal|dealings|launch|bottom\s+line|shareholders?|efficiency|margin)\b/i, 'ends_justify_means'],
-    [/\b(?:accept|tolerat\w+|embrac\w+|resort\w*|justify|justified|call\w*|deem\w*)\b[^.]{0,40}\bnecessary\s+evil\b/i, 'ends_justify_means'],
+    // 注意：**不收 `call`/`被称为` 这类言语动词**——「He called the deal a
+    // necessary evil」是转述他人定性，不是行为人在为手段开脱（第 27 轮
+    // 测试实测暴露：`call\w*` 误中该句）。
+    [/\b(?:accept|accepts|accepted|tolerat\w+|embrac\w+|resort\w*|justify|justifies|justified|own\s+it)\b[^.]{0,40}\bnecessary\s+evil\b/i, 'ends_justify_means'],
     [/\bfor\s+the\s+greater\s+good\b[^.]{0,56}\b(?:break\w*|bend\w*|bent|ignor\w+|waiv\w+|violat\w+|sacrific\w+|abandon\w+|censor\w+|suppress\w+|silenc\w+|crack\s*down|crackdown|limit\w*|curb\w*|restrict\w*|pursu\w*|prioriti[sz]\w+|trump\w*|overrid\w+)\b/i, 'ends_justify_means'],
     [/\bdirty\s+work\b[^.]{0,40}\b(?:somebody|someone|has\s+to|have\s+to|must\s+be\s+done|needs?\s+doing|no\s+one\s+else\s+will)\b/i, 'ends_justify_means'],
     [/\b(?:somebody|someone)\s+(?:has|have)\s+to\s+(?:do|handle)\s+(?:it|this|that|the\s+dirty\s+work)\b[^.]{0,32}\b(?:though|but|because|since)\b|\bdirty\s+work\b[^.]{0,32}\bsomebody\s+(?:has|have)\s+to\b/i, 'ends_justify_means'],
