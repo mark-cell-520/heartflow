@@ -349,9 +349,11 @@ function cmdPublish() {
   const results = runAllChecks();
   results.forEach(r => console.log(`  ${r.ok ? '✅' : '❌'} ${r.name}: ${r.msg}`));
   const gates = results.filter(r => !r.ok).map(r => ({ name: r.name, why: r.msg }));
+  // ⚠️ 「未推送 commit」**不算门槛**：publish 自己就会 push（见下方第①步）。
+  // 把「自己会做的事」当门槛 = 永远发不出去。第一版就这样卡住了：
+  // 明明一切全绿，只因为 1 个未推送 commit 就拒绝发布。
   const unpushed = trySh('git log --oneline heartflow/main..HEAD').split('\n').filter(Boolean);
-  if (unpushed.length) gates.push({ name: '未推送 commit', why: `${unpushed.length} 个` });
-  console.log(`  ${unpushed.length ? '❌' : '✅'} 未推送 commit: ${unpushed.length} 个`);
+  console.log(`  ${unpushed.length ? '📌' : '✅'} 未推送 commit: ${unpushed.length} 个（publish 会自动 push）`);
 
   // 已发布过就不重发
   const published = trySh('npm view @yun520-1/heartflow version').trim();
