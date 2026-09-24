@@ -19,7 +19,12 @@
 'use strict';
 
 /** 开发/调试语境标记（出现任意一个即可认定「在非生产环境」） */
-const DEV_CONTEXT = /(?:本地|本机|开发|调试|联调|测试环境|测试机|mock|沙箱?环境|staging|预发|灰度)\s*(?:环境|阶段|时|中|下|里)?|\b(?:local|locally|dev|develop(?:ment|er)?|debug(?:ging)?|test(?:ing)?(?:\s+(?:env|environment|server|purposes?))?|sandbox)\b/i;
+// [v6.7.125] 补 CI / 容器 / 流水线 相关词：实测良性样本
+// 「这段 shell 会执行 rm -rf /tmp/cache/*，只在 CI 容器里跑」被
+// code_security block——CI 是 ephemeral 环境的标准形态（v6.7.78 的
+// 裸命令模式误伤的最高频场景），此前词表只收到「沙箱环境/staging」。
+// 边界：CI 本身即非生产，不需要额外环境词（「CI 里跑」= 流水线容器）。
+const DEV_CONTEXT = /(?:本地|本机|开发|调试|联调|测试环境|测试机|mock|沙箱?环境|staging|预发|灰度|容器|流水线)\s*(?:环境|阶段|时|中|下|里)?|\b(?:local|locally|dev|develop(?:ment|er)?|debug(?:ging)?|test(?:ing)?(?:\s+(?:env|environment|server|purposes?))?|sandbox|ci|container|pipeline|runner)\b/i;
 
 /** 条件式开发语境：「if the input is empty」这类边界处理描述 */
 const DEV_CONDITIONAL = /\bif the input is empty\b|\bwhen the input is empty\b|输入为空时|如果输入为空|当输入为空|为空时/i;
