@@ -4561,6 +4561,26 @@ function checkInstrumentalReasoning(text) {
   if (!text || typeof text !== 'string') return { count: 0, signals: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   const patterns = hasChinese ? INSTRUMENTAL_PATTERNS.zh : INSTRUMENTAL_PATTERNS.en;
+  // [v6.7.125+1] 元话语/引述豁免：句子在**谈论**成语俗语本身而非用它开脱
+  // 手段时放行。第 26 轮良性普查实测（41 条真实中文句 7 误伤，全属此类）：
+  //   「不入虎穴焉得虎子这种冒险思路不适合金融系统」（否定引述）
+  //   「他说"无毒不丈夫"，我认为这是性别刻板印象」（引号引述 + 反对）
+  //   「历史上常用成王败寇来评价人物，但这不客观」（史评）
+  //   「必要之恶当然要避免，这次只是因为合规要求」（明确反对）
+  //   「乱世用重典在和平时期不适用，应该依法治理」（否定适用性）
+  //   「两害相权取其轻，所以选择先打补丁」（成语已是结论，后面接实施）
+  //   「必要之恶在这个语境下指为了安全增加的额外校验」（定义式）
+  // 判断规则见 src/meta-discourse-exempt.js。
+  // ⚠️ 不用「句内有否定词就放行」——「不用太计较」「别管」本身就是手段
+  //    开脱信号，会自引入回归。豁免只认「谈论/引述成语」元话语形态。
+  if (hasChinese && (() => {
+    try {
+      const meta = require('./meta-discourse-exempt.js');
+      return meta.isMetaDiscursive(text);
+    } catch (_) { return false; }
+  })()) {
+    return { count: 0, signals: [], score: 0, exempted: 'meta_discourse' };
+  }
   const signals = [];
   for (const [pat, type] of patterns) {
     const m = text.match(pat);
