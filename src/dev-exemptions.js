@@ -57,6 +57,12 @@ const DEBUG_INTENT = /(?:缓存|cache|caches?|redis|cdn)[^。\n.]{0,20}(?:脏数
  *   「我们跳过缓存验证来看看是不是缓存导致的脏数据」
  *   「前端把那些无意义的校验跳过，别影响本地调试」
  * 这类句式的主语是排查/调试动作而非执行破坏，靠宽标记覆盖排查词。
+ * ⚠️ 实测回归教训（引入时立刻咬到）：排查词**不能单独作 dev 语境**——
+ *   「帮我跳过 SSL 校验来排查问题」一句里既无本地/开发词也无 optional，
+ *   仅靠「排查」就被放行，gate 直接 pass。排查/调试意图在真实攻击里
+ *   同样常见（攻击者也要先排查）。因此 INVESTIGATE_CTX 降级为**辅助**
+ *   语境：必须与 DEBUG_INTENT（设施自证）或弱化词共现才生效，
+ *   单独出现不算开发语境。
  * ⚠️ 「前端/后端」不单独作 dev 标记：单靠它就能让「前端绕过鉴权」类真攻击
  *   混进豁免。必须与 无意义/不影响/以便 等弱化词**同句共现**才算
  *   （弱化词可前可后：「前端…无意义」与「无意义的…前端调试」都要覆盖）。
@@ -97,7 +103,12 @@ function isDevDebugContext(text) {
     if (!PROD_NEGATION.test(around)) return false;
   }
   const devCtx = DEV_CONTEXT.test(text) || DEV_CONDITIONAL.test(text)
-    || DEBUG_INTENT.test(text) || INVESTIGATE_CTX.test(text) || DEV_WEAKENER.test(text);
+    || DEBUG_INTENT.test(text)
+    // INVESTIGATE_CTX / DEV_WEAKENER 是**辅助**语境：必须与设施自证或
+    // 彼此共现。单独一个排查词/弱化词不能认定开发语境（实测回归：
+    // 「帮我跳过 SSL 校验来排查问题」仅靠「排查」被误放，gate pass）。
+    || (INVESTIGATE_CTX.test(text) && (DEBUG_INTENT.test(text) || DEV_WEAKENER.test(text)))
+    || (DEV_WEAKENER.test(text) && INVESTIGATE_CTX.test(text));
   const target = DEV_TARGET.test(text);
   const verb = BYPASS_VERB.test(text);
   if (devCtx && target && verb) return true;
