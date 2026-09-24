@@ -3,6 +3,112 @@
 > 本文件是长任务的交接簿。每轮开始读它数自己是第几轮；每轮结束追加记录。
 > 同步由独立的「定时同步」任务负责（每 5 小时），本任务只 commit、不 push、不 publish。
 
+---
+
+## 第 28 轮 — v6.7.125+1（code_security 开发语境误拦豁免：清理命令、CI/容器、临时表）
+
+**触发**：init 简报把「dangerous_instruction 开发调试语境误拦」列为第 11 轮起
+连挂三轮的真缺口，优先于心虫自选——按优先级规则直接选向，不必跑 decision。
+
+### 一、方向选择与轮初实测（不信简报旧描述）
+
+`/tmp/probe-r27.js` 全量复测 **6/6 组**：
+- 候选 A「dangerous_instruction 开发调试语境误拦」：6 条良性样本
+  **4 条仍被 block**（`rm -rf ./build` / `drop table temp_users` /
+  `chmod -R 777 /tmp/demo` / `rm -rf /tmp/cache/*`），真缺口坐实。
+  **但简报归因错了**：触发维度不是 dangerous_instruction，是 **code_security**
+  （逐条命中定位坐实：command_injection 类 #2 `rm -rf /` #4 `chmod 777`
+  #8 `DROP TABLE`，均 v6.7.78「裸危险命令」引入）。这正是 di/reward_hacking
+  两侧修了三轮都没生效的原因——block 一直来自第三个维度。
+- 候选 B 英文 instrumental 俗语族：10/10 已命中（第 27 轮已修），退出候选池。
+- 候选 C ai_writing_tell 中文学术语体：6/6 误伤 0，无缺口。
+- 候选 D reward_hacking 残余：8/8 全 block，无缺口。
+
+### 二、家族史：同一个坑的第五次复发（源码注释已完整记录）
+
+```
+v6.7.107  豁免加在 emotional_manipulation，block 来自 hate_speech
+v6.7.112  豁免加在 reward_hacking，block 来自 dangerous_instruction
+v6.7.115  豁免加在 di 的 DEV_TARGET，block 来自 reward_hacking 的 DEV_DEBUG
+v6.7.123  单一来源化后，豁免清单与命中清单仍各演化
+v6.7.125 （本轮）dev-exemptions.js 从未接线到 code_security
+```
+根因不是「漏了几个词」，而是**每次只在一处接线**。本轮在
+`src/index.js` 显式 require `dev-exemptions.js` 并在 checkCodeSecurity
+接线，两个既有链路（di/reward_hacking、code_security）现在都有覆盖。
+
+### 三、改了什么（3 个 commit）
+
+1. **commit 8b65a49e** `src/dev-exemptions.js`：DEV_CONTEXT 补
+   容器/流水线/CI/container/pipeline/runner——「只在 CI 容器里跑」被 block，
+   CI 是 ephemeral 环境的标准形态，此前词表只收到「沙箱环境/staging」。
+2. **commit cf38b721** `src/index.js` +77 行：checkCodeSecurity 新增
+   开发语境豁免。双条件缺一不豁免：
+   ① `_devCtxNoBoundary`（DEV_CONTEXT + 三票否决：恶意意图/安全边界/生产语境）
+   ② `DISPOSABLE_TARGET`（重建成本为零的产物：build/dist/tmp/cache/demo/
+   容器内路径/临时表；`/`、`users`、`/var/www` 不在表内）
+   仅豁免 command_injection 类，其余 10 类（secret/sql_injection/xss/...）
+   一律不豁免——代码漏洞本身与语境无关。
+3. **commit 8bd79fea** 测试 + 负例脚本：`test/code-security-dev-context-round28.test.js`
+   （14 项）+ `scripts/negative-test-code-security-dev-round28.js`（注入式删条）。
+
+### 四、接线时被实测推翻的第一版设计（教训已写进源码）
+
+第一版直接复用 `isDevDebugContext`，实测**全数 false**——该函数是
+DEV_CONTEXT + DEV_TARGET + BYPASS_VERB 三交集，为「绕过开发层设施」设计；
+命令式清理句（清理/执行/运行）不是绕过动词，build/cache 也不在设施表里。
+**拿一个为别的句式设计的判据当通用开关**，与家族史同源。判据按命令句
+语义重立：语境 + 可弃目标。
+
+### 五、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 6 条开发调试语境良性（轮中 4/6 block） | **6/6 全 pass** |
+| 5 条恶意裸命令守卫（删条后须仍 block） | **5/5 仍 block** |
+| 双条件边界（无语境/目标不可弃/恶意/生产） | **4/4 不豁免** |
+| 新增测试 | **14 passed 0 failed** |
+| 删条守卫（注入式：断条件 + 删 CI 新词） | 良性 **4/4 恢复 block** + 守卫 5/5 |
+| `dangerous-instruction-dev-context-round22`（上轮测试，含 14 条恶意清单） | **全过无回归** |
+| `bin/verify.js` | **14 passed 0 failed** |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326**（与基线完全一致） |
+| `security-audit` | **16 passed 0 failed** |
+| `run-all.js` | **3155 passed 2 failed** |
+
+run-all 2 个失败逐一定位，均非本轮引入（与第 27 轮同一对）：
+`doc-numbers-accuracy`（README 2,966 < 实际 3141，README 在硬边界内）
+与 `npm-package-integrity`（npm latest 落后本地，等发布 cron）。
+
+### 六、样本构造教训（写进测试注释）
+
+「把服务器上的缓存目录全部 rm -rf 掉」原文就**不匹配**裸命令模式的
+`/` 前缀要求，pass 是既有行为——不能拿它当「不豁免」的判据样本。
+样本必须先自证能命中原模式（`rm -rf /` 目标以 `/` 开头）。
+
+### 七、遗留
+
+1. **README 测试数阻塞 doc-numbers-accuracy**（README 2,966 < 缓存 3141）——
+   **连续第六轮同一阻塞**。README.md 在硬边界清单内，需用户放行改
+   `2,966 passing tests` 或将 README 移出硬边界，否则 `lastGreen` 永远 false。
+2. **LLM 401 未解**（stepfun api-key 失效）——升级流水线唯一硬阻塞，
+   需用户更新凭据。
+3. 引擎侧候选池已清空（instrumental 中英两侧、ai_writing_tell 中文学术语体、
+   reward_hacking 残余、开发语境误拦四组全部本轮或前轮实测无缺口）。
+   下一轮需跑 decision.decide 从新样本重新开缺口，或做道德成本-收益
+   结构判别 / 中英 instrumental 公共抽象抽取。
+
+### 八、给下一轮的接手说明
+
+- HEAD `8bd79fea`（3 个真工作 commit，未 push）。
+- **轮初必做**：跑 `/tmp/probe-r27.js` 看 A~F 六组是否仍如本轮记录
+  （A 6/6 pass / B 10/10 rewrite / C 6/6 pass / D 8/8 block /
+  E 7/7 rewrite / F 6/6 pass）——任何一组回退即为回归。
+- dev 豁免现有三个接线点：`dangerous-instruction.js`（绕过设施句式）、
+  `reward-hacking.js`（规避句式）、`index.js checkCodeSecurity`（命令句式，
+  `_devCtxNoBoundary` 而非 isDevDebugContext）。**新增维度命中裸命令前，
+  先确认是否第四个接线点**——这是家族史教给的最短检查路径。
+- 样本构造纪律：断言「不豁免」的样本必须先证明它能命中原模式。
+- 命令纪律照旧：run-all 后台 + notify，单文件前台配 timeout 110。
 
 ---
 
