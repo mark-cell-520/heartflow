@@ -29,7 +29,7 @@ const path = require('path');
 // [v6.7.107] 第 7 轮同步：6.7.106 → 6.7.107（撤回型情感要挟中英补齐）。
 // [v6.7.111] 第 11 轮同步：6.7.109 → 6.7.111（接手第 10 轮 reward_hacking 新维度
 //                 v6.7.110 的收尾，并修掉它引入的 conda 误拦 + etc/passwd 漏报）。
-let VERSION = '6.7.117';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+let VERSION = '6.7.118';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

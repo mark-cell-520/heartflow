@@ -1,8 +1,8 @@
 /**
- * negative-test-instrumental-zh.js — 负例验证（v6.7.117）
+ * negative-test-instrumental-zh.js — 负例验证（v6.7.118）
  *
  * 验证 `test/instrumental-ends-justify-means-zh.test.js` 真的在守门：
- * 把 src/index.js 里 [v6.7.117] 新增的中文族逐条模式删掉，
+ * 把 src/index.js 里 [v6.7.118] 新增的中文族逐条模式删掉，
  * 守卫必须变红（断言失败，不能是加载崩溃）。
  *
  * 沿用 negative-test-absolute-claim-en.js 的三条铁律（都踩过）：
@@ -24,7 +24,7 @@ const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
 const NEVER_MATCH = '/^$(?!)/';
 const SRC = fs.readFileSync(path.join(HF, 'src', 'index.js'), 'utf8');
 
-// 每个注入：anchor 是 [v6.7.117] 块内该模式独有的短子串
+// 每个注入：anchor 是 [v6.7.118] 块内该模式独有的短子串
 const INJECTIONS = [
   { name: '删「数据做得好看」主模式', anchor: '把|将)?(?:数据|报表|数字|指标|结果)' },
   { name: '删「为了…夸大」模式', anchor: '吹嘘|拔高|注水|放大' },
@@ -63,9 +63,9 @@ const EXPECT_HITS = [
   ['改日志', '改一下日志也无妨'],
 ];
 
-const BLOCK_START = SRC.indexOf('[v6.7.117] 中文「目的-手段脱缰」族');
+const BLOCK_START = SRC.indexOf('[v6.7.118] 中文「目的-手段脱缰」族');
 function extractRegex(anchor) {
-  if (BLOCK_START < 0) throw new Error('未找到 v6.7.117 新增块');
+  if (BLOCK_START < 0) throw new Error('未找到 v6.7.118 新增块');
   const seg = SRC.slice(BLOCK_START, BLOCK_START + 12000);
   const i = seg.indexOf(anchor);
   if (i < 0) throw new Error('锚点未找到: ' + anchor);
