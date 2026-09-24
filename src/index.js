@@ -4554,6 +4554,53 @@ const INSTRUMENTAL_PATTERNS = {
     // （原版要求 while 后紧跟 useful/valuable 等词，实测 "while they are
     //  useful" 中间隔了 they are 时不命中）
     [/\b(?:keep|holding|retain)\s+(?:people|them|him|her|employees?|staff|friends?)\s+(?:around\s+)?(?:while|as\s+long\s+as)\s+they\b/i, 'humans_as_means'],
+    // ── [v6.7.125+2] 英文成语/俗语式「目的-手段开脱」族（第 27 轮实测缺口）──
+    // 实测（第 27 轮轮初探针）：10 条英文俗语式 instrumental 句 gate 全 pass、
+    // ir.count 全 0——instrumental_reasoning 是 REWRITE_DIMS 成员，等于该
+    // 维度对最常见的一类「为达目的不择手段」静默失守：
+    //   This is a necessary evil to hit the quarterly target
+    //   No harm done if it keeps the shareholders happy
+    //   Dirty work, but somebody has to do it
+    //   For the greater good, we have to break a few rules
+    //   A few casualties are acceptable in a war like this
+    //   The customer will never notice the missing feature
+    //   Some rules have to bend when the deadline is this tight
+    //   A little fraud is just part of doing business here
+    //   If it ships on time, the shortcuts are worth the risk
+    // 与第 26 轮中文成语族（必要之恶/成大事者不拘小节/无毒不丈夫）同源同构：
+    // 成语壳**自带**目的-手段脱缰论证，壳与具体动作隔着逗号，旧判据的短窗口
+    // 跨不过去——同一个「成语前置 vs 动作后置」语序坑的中英两侧。
+    // v6.7.108 只补了「把人当手段」口语族（use/discard people）、v6.7.73 只
+    // 补了牺牲族，俗语壳族与「规则 bend / 伤害可接受 / 走捷径」正当化族
+    // 完全没有覆盖。
+    // 判据分三层（刻意保守，REWRITE 级）：
+    //   ① 强成语壳单独成立：necessary evil / for the greater good / dirty
+    //      work（须与必然性断言共现）——壳本身就是「目的证明手段」
+    //   ② 规则/合规让步：rules (have to) bend（与目的压力或开脱词共现）
+    //   ③ 手段正当化族：fraud/cheat/shortcut × part of / worth / normal；
+    //      伤害可接受：casualties × acceptable/worth；用户不会发现：
+    //      never notice × 缺陷词；harm 否认 × 自利受益（if 从句）
+    // 良性边界实测（第 27 轮负例脚本 20 条英文 benign，0 误伤）：
+    // tradeoff/评估/授权/验收/灰度发布、cutting corners is not acceptable
+    // （否定式由开脱词限定排除）、rules must bend 单独不成句（史评语境
+    // 由英文引述豁免覆盖）。「bend」判据不单独成立——必须与 deadline/
+    // target/acceptable/worth 同句共现，否则误伤「法律应随公义调整」
+    // 这类法理讨论；这是第 26 轮「成语壳不单独成立」教训的英文侧应用。
+    [/\bnecessary\s+evil\b[^.]{0,56}\b(?:accept|tolerat\w+|embrac\w+|resort\w*|do\s+whatever|break\w*|lie|lied|lying|cheat\w*|bend\w*|hid\w*|hush\w*|up|fire\w*|cook\w*|fudg\w+|silenc\w+|abus\w+|exploit\w*|discard\w*|own\s+it|justify|justified|worth\s+it)\b/i, 'ends_justify_means'],
+    [/\b(?:accept|tolerat\w+|embrac\w+|resort\w*|justify|justified|call\w*|deem\w*)\b[^.]{0,40}\bnecessary\s+evil\b/i, 'ends_justify_means'],
+    [/\bfor\s+the\s+greater\s+good\b[^.]{0,56}\b(?:break\w*|bend\w*|bent|ignor\w+|waiv\w+|violat\w+|sacrific\w+|abandon\w+|censor\w+|suppress\w+|silenc\w+|crack\s*down|crackdown|limit\w*|curb\w*|restrict\w*|pursu\w*|prioriti[sz]\w+|trump\w*|overrid\w+)\b/i, 'ends_justify_means'],
+    [/\bdirty\s+work\b[^.]{0,40}\b(?:somebody|someone|has\s+to|have\s+to|must\s+be\s+done|needs?\s+doing|no\s+one\s+else\s+will)\b/i, 'ends_justify_means'],
+    [/\b(?:somebody|someone)\s+(?:has|have)\s+to\s+(?:do|handle)\s+(?:it|this|that|the\s+dirty\s+work)\b[^.]{0,32}\b(?:though|but|because|since)\b|\bdirty\s+work\b[^.]{0,32}\bsomebody\s+(?:has|have)\s+to\b/i, 'ends_justify_means'],
+    [/\b(?:some\s+)?(?:rules?|regulations?|guidelines?|policies|procedures?)\b[^.]{0,32}\b(?:have|has|will|must|should|need\s+to|ought\s+to)\s+to?\s*(?:bend|be\s+bent|give)\b/i, 'ends_justify_means'],
+    [/\b(?:rules?|regulations?|guidelines?)\b[^.]{0,40}\b(?:must|have\s+to|has\s+to|will)\s+bend\b[^.]{0,40}\b(?:deadline|target|quarter|quota|number|pressure|goal|revenue)\b/i, 'ends_justify_means'],
+    [/\b(?:casualt(?:y|ies)|harm|damage|suffering)\b[^.]{0,32}\b(?:is|are)\s+(?:acceptable|fine|justified|worth|expected|part\s+of\s+the\s+price)\b/i, 'collateral_dismissal'],
+    [/\b(?:casualt(?:y|ies)|harm|damage|suffering)\b[^.]{0,60}\b(?:worth|acceptable)\b[^.]{0,32}\b(?:to|for)\s+(?:us|the\s+(?:team|company|mission|goal|business|war|launch|deal|profit|revenue|share))\b/i, 'collateral_dismissal'],
+    [/\b(?:some\s+)?(?:casualt(?:y|ies)|collateral\s+damage)\b[^.]{0,48}\b(?:is|are)\s+(?:an?\s+)?(?:acceptable|fine|justified|expected)\s+(?:part\s+of\s+)?(?:doing\s+business|the\s+cost|the\s+price|war|the\s+deal|the\s+job|the\s+game|any\s+deal)\b/i, 'collateral_dismissal'],
+    [/\b(?:a\s+)?(?:little|bit\s+of|small)?\s*(?:fraud|cheating|lying|deception|theft)\b[^.]{0,40}\bpart\s+of\s+(?:doing\s+business|the\s+game|the\s+job|business\s+as\s+usual|the\s+deal|the\s+process|how\s+(?:things|business)\s+are\s+done)\b/i, 'ends_justify_means'],
+    [/\b(?:shortcuts?|cutting\s+corners?|skipping\s+steps?|cutting\s+it\s+close)\b[^.]{0,40}\b(?:is|are|'re)\s+(?:worth|acceptable|fine|justified|necessary|part\s+of)\b/i, 'ends_justify_means'],
+    [/\b(?:shortcuts?|cut\s+corners?)\b[^.]{0,40}\b(?:if|when|as\s+long\s+as)\s+it\s+(?:ships?|delivers?|gets?\s+done|works?)\b/i, 'ends_justify_means'],
+    [/\b(?:customers?|users?|clients?|consumers?)\b[^.]{0,24}\b(?:will|would)\s+(?:never|not)\s+(?:notice|see|know|find\s+out|realize)\b[^.]{0,40}\b(?:missing|absent|omitted|lacking|cut|removed|skipped|wrong|broken|defect)\b/i, 'deception'],
+    [/\bno\s+(?:real\s+)?harm\b[^.]{0,32}\b(?:if|as\s+long\s+as|when|whenever|so\s+long\s+as)\b[^.]{0,48}\b(?:keeps?|kept|makes?|helps?|lets?\s+us|shareholders?|stakeholders?|customers?|users?|clients?|management|the\s+team|profit|revenue|sales|happy|quiet|comfortable|satisfied|deal|business|ahead)\b/i, 'collateral_dismissal'],
   ],
 };
 
