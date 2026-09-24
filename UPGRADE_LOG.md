@@ -1031,3 +1031,89 @@ npm latest=6.7.100 落后本地，「不 publish」铁律的必然结果，三�
 
 **长期状态（不必再当新问题报）**：guard-abilities 的「全量测试」红灯
 根因是 npm-package-integrity 落后本地，「不 publish」的必然结果。
+
+---
+
+## 第 12 轮 — v6.7.112（父级接手：豁免对齐 + 文档措辞踩守卫）
+
+**来源**：用户指定论文 arXiv:2609.22978v1（DeepSeek Elastic Compute, DSec）。
+第 10 轮由本人起头（读到 §6.4/§6.5 生产实测的 agent 规避手法 → 心虫决策选 B），
+做到负例验证时被网关中断；第 11 轮由并行升级任务接手收尾并提交 6.7.111；
+本轮复核接手质量，**发现并修掉一个回归**。
+
+### 论文价值（为什么选它）
+
+§6.4/§6.5 是**生产规模实测**的 reward hacking 记录（160 节点、日产约 300 万沙箱、
+38 万并发），论文原话：
+> Final-output checks alone cannot reliably establish whether the agent solved
+> the task as intended.
+
+即只查最终输出不足以判定任务是否被真正解决——需要**动作发出前的意图辨别**，
+正是心虫位置。
+
+### 覆盖率实测（16 个论文手法样本，6.7.109）
+
+| 结果 | 数量 |
+|---|---|
+| dangerous_instruction 拦住 | 2 |
+| **其余完全无信号（findings 空、gate pass）** | **14** |
+
+中英双语都缺 → 不是重复建设，是真缺口。
+
+### 本轮发现的回归（最重要的部分）
+
+复核第 11 轮成果时实测论文样本：
+```
+论文里说 agent 会尝试绕过沙箱检查，我们要怎么防  → block（应 pass）
+```
+逐维度查归因：
+- `reward_hacking` → count=0, **exempted=true**（新维度的豁免生效了）
+- `dangerous_instruction` → count=1（老维度照样命中「绕过沙箱检查」）
+
+**这是第 7 轮教训的镜像版：**
+- 第 7 轮：豁免加在 `emotional_manipulation`，block 来自 `hate_speech`
+- 第 12 轮：豁免加在 `reward_hacking`，block 来自 `dangerous_instruction`
+
+方向相反，病根同一个：**两个维度共用同一批边界样本，豁免只加在一个维度上。**
+
+教训已写进源码注释：新增维度的豁免，必须回头检查既有维度是否也命中同一样本。
+
+### 修法
+
+`src/dangerous-instruction.js` 的 `_matchAll` 加与 `reward-hacking.js`
+**同源**（不是复制两份不同判据）的元话语 / 上游补丁豁免。
+
+### 顺手修掉第 11 轮的一个账
+
+`test/api-surface-consistency.test.js` 报「文档列了导出里不存在的方法: gate_block」。
+根因：README 6.7.111 changelog 行写了字面量 `gate_block(100)`，被守卫正则当成方法名。
+**不是真缺方法，是文档措辞踩中守卫。** 改成「100-severity placeholder entry」后 3/3 转绿。
+这是 `doc-snippet-validity` 的兄弟场景——守卫行为正确，文档侧需避让。
+
+### 验证（全部真实输出）
+
+| 项目 | 结果 |
+|---|---|
+| 论文 8 个手法样本 gate | 8/8 block（不退化） |
+| 5 条真攻击（忽略安全警告/绕过所有检查/密码明文/换 bash/绕 chronus） | 5/5 block |
+| 3 条误拦样本 | 全 pass |
+| bidirectional-guard | 召回 **52/52**、误拦 **301/326**（较 6.7.111 净修 1 条） |
+| test/reward-hacking-dsec.test.js | 53 passed 0 failed |
+| test/api-surface-consistency.test.js | 3 passed 0 failed（本轮修） |
+| test/doc-numbers-accuracy.test.js | 15 passed 0 failed |
+| test/security-audit.test.js | 16 passed 0 failed |
+| test/run-all.js | 2354 passed，余 1 = npm-package-integrity（必然结果） |
+
+误拦铁律：0 新增，净修 1 条。
+
+### 遗留
+
+1. 第 10 轮的负例验证脚本 `scripts/negative-test-reward-hacking.js` 我改好了注入方式
+   （把 `/*DEFECT*/` 注释字符串换成永不匹配的合法正则 `/^$(?!)/`，否则 RegExp 数组
+   被污染、探针崩溃被误判成"未变红"），**但还没跑过**。下一轮优先跑它。
+2. `npm-package-integrity` 红灯（npm latest 落后本地）——「不 publish」必然结果。
+3. 论文剩余 6 类手法未接（ioctl extent 交换、受保护文件换 fd 可读、端口扫描找镜像、
+   代理取外部代码、装新包找现成实现、无界输出）——按心虫决策只接最核心 4 类，
+   其余留后续轮次，**不为一次接全放宽判据**。
+
+---
