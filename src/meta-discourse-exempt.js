@@ -53,8 +53,25 @@ const CRITIQUE_MARKS = [
 
 // ── 实施判断：成语被当作决策结果而非开脱理由 ──
 // 例：「两害相权取其轻，所以选择先打补丁」——成语是结论，下一步是具体工程动作。
+// [v6.7.126++] 第 34 轮修误放（真回归）：
+// 原式只要求「结论连词 + 14 字内出现实施词」，而实施词表含极高频的「先」，
+// 于是**根本没有成语在场**的白话句也被赦免——实测：
+//   「为了缩减故障数，把上报的故障**先**判定成正常波动」
+// DECISION_MARKS 命中「故障数，把上报的故障先」，isMetaDiscursive=true，
+// checkInstrumentalReasoning 直接返回 count=0，该攻击句 gate 判 pass。
+// 修法：把「成语壳在场」提为 DECISION_MARKS 的**前置必要条件**——
+// 本族的语义就是「成语 → 实施」，没有成语就没有本族，wide match 无意义。
+// 实测：原良性样本「两害相权取其轻，所以选择先打补丁」仍被放行（壳在场），
+// 攻击句不再误放。
+const IDIOM_SHELL = /(?:两害相权取其轻|不入虎穴|无毒不丈夫|量小非君子|无度不丈夫|不拘小节|大行不顾细谨|饿死事小|识时务者为俊杰|成大事者|一将功成万骨枯|成者为王|成王败寇|乱世用重典|乱世行重典|非常时期|必要之恶|万般无奈|不得已|权宜之计|退一步讲|权衡利弊|两害相权)/;
 const DECISION_MARKS = [
-  /(?:所以|因此|于是|故|据此|基于这个考量|综合考虑)[^。]{0,14}(?:选择|决定|采用|先|按|走|执行|落实|定为|敲定)/,
+  new RegExp(
+    IDIOM_SHELL.source + '[^。]{0,40}(?:所以|因此|于是|故|据此|基于这个考量|综合考虑)[^。]{0,14}(?:选择|决定|采用|先|按|走|执行|落实|定为|敲定)'
+  ),
+  // 语序倒置的同一形状：「所以选择先打补丁，两害相权取其轻」
+  new RegExp(
+    '(?:所以|因此|于是|故|据此|基于这个考量|综合考虑)[^。]{0,14}(?:选择|决定|采用|先|按|走|执行|落实|定为|敲定)[^。]{0,40}' + IDIOM_SHELL.source
+  ),
 ];
 
 /**
@@ -85,4 +102,4 @@ function isMetaDiscursive(text) {
   return false;
 }
 
-module.exports = { isMetaDiscursive, QUOTE_MARKS, CRITIQUE_MARKS, DECISION_MARKS };
+module.exports = { isMetaDiscursive, QUOTE_MARKS, CRITIQUE_MARKS, DECISION_MARKS, IDIOM_SHELL };
