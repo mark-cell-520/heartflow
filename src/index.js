@@ -2473,7 +2473,14 @@ const DEHUMANIZATION_PATTERNS = {
       // 威胁我/威胁到/威胁性 + 具体胁迫动作。
       /威胁(?:[我你他她]|到[我你他她]|性(?:的)?(?:语言|行为|信息|短信|邮件))/i,
       /(?:威胁|恐吓)[^。]{0,6}(?:我要|要我|让我们|逼我|必须|否则|不然)/i,
-      /以死相逼|恐吓|威逼利诱/i,
+      // [v6.7.109] 「以死相逼」在**第一人称施加**语境才是威胁
+      // （不给钱我就以死相逼 / 以死相逼才是解决办法）；
+      // 在分析/教学/执法引述框架里是对该行为的命名，不是施加
+      // （老师说：这种以死相逼的行为是情感暴力 / 民警提醒：恋爱中……
+      // 属于违法行为）。实测这两类原来都被 block（v6.7.109 修前 4/5 良性误伤）。
+      // 要求主语为我方施加者（我|我方|当事人）或祈使/条件句结构。
+      /(?:我|我们|我方|当事人|对方)?(?:就|偏要|非要|定要)?以死相逼[^。]{0,6}(?:才|要|逼|谈|讨|解决|要求)|以死相逼[^。]{0,8}(?:我|他|她|我们)|[^。]{0,6}(?:要求|逼迫|胁迫|命令)[^。]{0,6}(?:否则|不然)[^。]{0,10}以死相逼|(?:不|如果)(?:给|答应|满足)[^。]{0,8}(?:我)?(?:就)?以死相逼|(?:就|那|我)?(?:要|敢|若|如果)[^。]{0,12}(?:我)?(?:就|就要)?以死相逼|(?:自?杀|自?残)[^。]{0,6}(?:逼|要挟|胁迫|威胁)/i,
+      /恐吓|威逼利诱/i,
       /清除|铲除|消灭[^。]*?(他们|这[^。]*?人|群体|族)/i,
       /恐怖分子|极端分子|暴徒|恶势力|黑恶/i,
       /毒草|精神毒药|思想毒药/i,
@@ -2507,7 +2514,14 @@ const DEHUMANIZATION_PATTERNS = {
   },
   en: {
     animal: [
-      /\b(animals|vermin|rats|pests|parasites|cockroaches|dogs|pigs|monkeys|apes)\b/i,
+      // [v6.7.109] 原 bare 动物词表实测 10/10 良性英文句全误 block。改为
+      // **必须与指人主语共现**（与 zh 侧 object/disease 的共现方案同源）。
+      // 逐行变体测试（本轮实测）：第 1 行（指人主语在前）单独保留覆盖 5/6
+      // 攻击样本；第 2 行（they/those/disobedient 主语）补上
+      // "She called them pigs"；原第 0 行（动物词在前）单独保留反而漏
+      // 3/6，属冗余设计，已删（只删冗余不给守卫减覆盖）。
+      /\b(people|they|them|these|those|humans|immigrants|refugees|protesters|minorities|group|nation|race|society|crowd|citizens)\b[^.]{0,40}?\b(animals|vermin|rats|pests|parasites|cockroaches|dogs|pigs|monkeys|apes)\b/i,
+      /\b(they|those|these|you|people|humans|immigrants|refugees|protesters|criminals|fools|bastards|disobedient|unfaithful|cowards|scum|verminous group)\b[^.]{0,30}?\b(animals|vermin|rats|pests|parasites|cockroaches|dogs|pigs|monkeys|apes)\b/i,
       /\b(subhuman|less.?than human|inhuman)\b/i,
       /\bbreed like|infestation|swarm of\b/i,
       /\b(cattle|sheep|livestock|herd|flock)\b[^.]*?(people|they|them|these)/i,
@@ -2572,7 +2586,7 @@ function checkDehumanization(text) {
   // 维度侧已豁免，dehumanization 的 stigma 类仍命中 → gate 判 block，
   // 安全教育文本过不了自己的门禁。（与 emotional_manipulation 的
   // ANALYSIS_FRAME 同源，刻意不抽取公共函数：两者豁免范围不同源演进。）
-  const SAFETY_EDU = /话术|识别|警惕|防范|远离|如何[^。]{0,4}(应对|识别|防范)|普法|科普|安全教育|案例分析|教学|教材|PUA/;
+  const SAFETY_EDU = /话术|识别|警惕|防范|远离|如何[^。]{0,4}(应对|识别|防范)|普法|科普|安全教育|案例分析|教学|教材|PUA|老师告诫|课本|讲义|课堂|授课|讲解|提醒：(?:恋爱|婚姻|生活中)?|属于违法|是违法行为|属于(?:违法|犯罪)|常见(?:的)?手法|表现形式|手段之一|如何应对|典型表现|分析(?:指出|认为|表明)|的文章|这篇文章/;
   if (SAFETY_EDU.test(text)) {
     return { count: 0, categories: [], hits: [], score: 0 };
   }
@@ -3302,6 +3316,19 @@ const HATE_SPEECH_EN = [
 function checkHateSpeech(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
+  // [v6.7.109] 安全教育/新闻/普法引述豁免：整段文本在**分析、报道、教学**
+  // 框架里描述污名或暴力行为时，作者不是在施加侮辱。
+  // 实测（第 9 轮）：hate_speech 维度侧完全没有豁免，而 dehumanization
+  // 在 v6.7.107 已有同源 SAFETY_EDU——同一批良性文本一边 block 一边 pass，
+  // 边界不一致。与 dehumanization 的 SAFETY_EDU 刻意不抽公共函数：
+  // 豁免范围按各自维度演进（hate_speech 这里额外含「辱骂/称/报道/留言」等
+  // 新闻报道引述动词，dehumanization 不需要）。
+  //   他说如果我离开他就去死，这是典型的情感操控，我们要警惕   → block 误伤
+  //   家长留言称孩子被老师辱骂去死，教育部门已介入调查         → block 误伤
+  const SAFETY_EDU = /话术|识别|警惕|防范|远离|普法|科普|安全教育|案例分析|教学|教材|典型|表现|一方控制另一方|情感暴力|情感操控|违法行为|违法犯罪|介入调查|辱骂去死|称(?:孩子|其)?被[^。]{0,10}(?:辱骂|殴打|虐待)|留言称|报道称|指出[^。]{0,20}(?:属于|是|为)/i;
+  if (SAFETY_EDU.test(text)) {
+    return { count: 0, hits: [], score: 0 };
+  }
   // [v6.7.73] 混合语言通道：中英混排文本两侧模式库都跑。
   // 旧逻辑二选一会漏掉「你 is a garbage」这类跨语言攻击（实测 hate=0）。
   const isMixed = hasChinese && /[a-zA-Z]{2,}/.test(text);
