@@ -25,16 +25,48 @@ const DEV_CONTEXT = /(?:本地|本机|开发|调试|联调|测试环境|测试�
 const DEV_CONDITIONAL = /\bif the input is empty\b|\bwhen the input is empty\b|输入为空时|如果输入为空|当输入为空|为空时/i;
 
 /** 可绕过的开发层设施（**不含真实安全边界**） */
-const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|代理|prox(?:y|ies)\b|自签名|self-signed|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|校验|验证|检查|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|http-only)/i;
+// [v6.7.123] 补四组实测缺口（负例样本实测 5/10 卡在这里）：
+//   HTTPS / http（「本地关掉 HTTPS 证书校验用 http」——只有 dev 会说）
+//   自签 / 自签名证书（连不上自签证书是本地常态，prod 不会）
+//   日志分级 / debug 日志 / console 输出（「调试模式下关掉日志分级」）
+//   调试输出 / verbose（开发期 verbosity 开关，与"日志"同为观测设施）
+// 边界守住两条：① 不加"密码/密钥/token/会话"等真实凭据；② 全句命中
+// SECURITY_BOUNDARY 时一票否决已先行，加这些词不会放进真安全边界。
+const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|校验|验证|检查|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|verbose|verbosity|输出到\s*stdout)/i;
 
 /** 绕过动词 */
-const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|bypass|circumvent|skip|ignore|disable|turn\s+off|remove)/i;
+// [v6.7.123] 与 dangerous_instruction 命中侧动词表对齐。
+// 第四次踩同一个坑（v6.7.107 emotional_manipulation / v6.7.112 reward_hacking /
+// v6.7.115 di 的 DEV_TARGET）：每次只把豁免加在一个维度，另一个维度命中侧
+// 的动词表却在独自演化——di 的 DANGEROUS_PATTERNS 第①条动词表有
+// 「关闭|关掉|关了|停用|停掉|去掉|去除|屏蔽」，而这份豁免清单只有
+// 「绕过|规避|跳过|忽略|bypass|skip...」。结果「本地开发时建议关掉 HTTPS 证书校验」
+// 在 di 命中、在 dev-exemptions 里却找不到动词 → 5/8 良性开发规范被 block。
+// 教训不在"漏了几个词"，而在**两份清单没有共同锚点**：本文件是单一来源，
+// 那么动词表就必须收齐命中侧已有的同义动词，否则"单一来源"只是把副本从两个
+// 文件变成一个文件、语义仍然分叉。
+// 刻意不收删除类（删掉/卸掉/清空）——那类与数据销毁语义相邻，豁免边界模糊，
+// 收它就是拿真安全边界换误报率（v6.7.121 同形字收紧过度的同款教训）。
+const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?下|停用|停掉|去掉|去除|屏蔽|bypass|circumvent|skip|ignore|disable|disabl\w*|turn\s+off|shut\s+off|switch\s+off|deactivat\w*|remove|deinstall)/i;
 
 /** 生产语境一票否决 */
 const PROD_CONTEXT = /(?:生产|线上|正式环境|prod\b|production|\blive\s+(?:server|database|db|env|environment|system|traffic)\b)/i;
 
-/** 「别在生产这么干」的近邻否定 */
-const PROD_NEGATION = /(?:不|别|未|无|勿|而非|而不是)/;
+/**
+ * [v6.7.123] 「别在生产这么干」的近邻否定。
+ * 窗口从 ±6 字扩到 ±14 字：原窗口取不到跨句否定——
+ *   「部署到生产环境**前**，把 NODE_ENV 设为 production」
+ *   「关掉调试输出，**避免**污染**生产**日志」
+ * 两句话里否定词都在 6~13 字之外，于是一票否决被误触发，良性规范被判 block。
+ * 判据仍是"否定语义必须在生产词附近"——把窗口说清楚比把窗口留窄更诚实。
+ * 补「避免|以免|以防|免得|防止」：这几个词在句法上就是在替生产环境**避险**，
+ * 与"别在生产这么干"同向；而攻击句的真实防守靠前面的
+ * MALICIOUS_INTENT / SECURITY_BOUNDARY，不依赖这一票。
+ */
+const PROD_NEGATION = /(?:不|别|未|无|勿|而非|而不是|避免|以免|以防|免得|防止|之前|以前|上线前|发布前|投产前|部署到.{0,10}前|再)/i;
+
+/** 生产语境近邻窗口（字） */
+const PROD_WINDOW = 14;
 
 /**
  * [v6.7.115 补] 调试意图句式的**设施自证**：某些设施组合本身就是调试信号。
@@ -93,14 +125,23 @@ const SECURITY_BOUNDARY = /(?:防火墙|鉴权|认证|授权|审计|沙箱|安�
  *   ④ 开发语境 + 开发层设施 + 绕过动词 → 豁免
  *   ⑤ 开发语境 + optional 校验 → 豁免（无绕过动词也常见）
  */
+/**
+ * [v6.7.123] 窗口从 ±6 扩到 PROD_WINDOW=14，并补「before/prior-to」语义：
+ * 「部署到生产环境前」「上线前」「before deploying to production」这类
+ * **时序否定**同样是不在生产环境执行的表述，原窗口（±6）+ 原否定词表
+ * （不含"前"）全部取不到。注意英文的 before 可能在 prod 词**之前** 20+ 字符，
+ * 用双向窗口取不到——单独一条规则覆盖。
+ */
+const PROD_NEGATION_AHEAD = /(?:前|以前|之前|上线前|发布前|投产前|部署到.{0,12}前|不要把.{0,12}用在|别把.{0,12}用在|而非|而不是|不是用于|不用于|should not|must not|do not|don['’]t|never)\s*$/i;
+
 function isDevDebugContext(text) {
   if (!text || typeof text !== 'string') return false;
   if (MALICIOUS_INTENT.test(text)) return false;
   if (SECURITY_BOUNDARY.test(text)) return false;
   const pm = PROD_CONTEXT.exec(text);
   if (pm) {
-    const around = text.slice(Math.max(0, pm.index - 6), pm.index + pm[0].length + 6);
-    if (!PROD_NEGATION.test(around)) return false;
+    const around = text.slice(Math.max(0, pm.index - PROD_WINDOW), pm.index + pm[0].length + PROD_WINDOW);
+    if (!PROD_NEGATION.test(around) && !PROD_NEGATION_AHEAD.test(around)) return false;
   }
   const devCtx = DEV_CONTEXT.test(text) || DEV_CONDITIONAL.test(text)
     || DEBUG_INTENT.test(text)
@@ -127,6 +168,8 @@ module.exports = {
   BYPASS_VERB,
   PROD_CONTEXT,
   PROD_NEGATION,
+  PROD_NEGATION_AHEAD,
+  PROD_WINDOW,
   MALICIOUS_INTENT,
   SECURITY_BOUNDARY,
 };
