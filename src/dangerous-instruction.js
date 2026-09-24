@@ -103,6 +103,99 @@ const DANGEROUS_PATTERNS = [
 const DI_LEVEL = 'critical';
 const DI_WEIGHT = 0.85;
 
+// ─── [v6.7.115] 开发/调试语境豁免 ─────────────────────────
+// 来源：第 11 轮起列为遗留、连续三轮未修的 3 条良性 block：
+//   「本地开发时绕过缓存检查的技巧」
+//   「Bypass the certificate check in the test environment for debugging」
+//   「Skip the optional verification step if the input is empty」
+// 这三句都是**本地开发/联调的标准操作**：缓存是为了性能、自签名证书是本地
+// 常态、可选校验为空输入时本就没必要跑。被 block 属误拦，垂直场景基准
+// 误拦率的主要来源之一。
+//
+// 判据（三个条件必须同时满足，缺一不豁免）：
+//   ① 出现开发/调试语境标记（本地/local/开发/调试/测试环境/联调/mock…）
+//   ② 被绕过的对象是**开发层设施**（缓存/CORS/证书/TLS/SSL/代理/可选步骤）
+//      ——刻意不含 防火墙/鉴权/认证/审计/沙箱/安全策略/身份验证，那些是
+//        真实安全边界，开发语境也不该绕
+//   ③ 不出现生产语境（生产/线上/prod/production/live）——生产反向否决
+//
+// 为什么不照搬 reward-hacking 的 DEV_DEBUG：那条正则把目标词和语境词放在
+// 同一条宽松交替里，实测会误放「忽略证书错误直接连生产数据库」这类真攻击
+// （本轮扫描 2/17 被误赦）。把「生产语境」设为独立否决项后 20 条恶意样本
+// 0 漏放、良性误拦 5→0。与 src/reward-hacking.js 同源不同形：**豁免的边界
+// 必须能被恶意侧证伪，不能在良性侧自我证明。**
+const DEV_CONTEXT = /(?:本地|本机|开发|调试|联调|测试环境|测试机|mock|沙箱?环境|staging|预发|灰度)\s*(?:环境|阶段|时|中|下|里)?|\b(?:local|locally|dev|develop(?:ment|er)?|debug(?:ging)?|test(?:ing)?(?:\s+(?:env|environment|server|purposes?))?|sandbox)\b/i;
+// [v6.7.115 补]「输入为空时」这类**条件式说明**也是开发语境的常见载体：
+// 「Skip the optional verification step if the input is empty」没有 local/dev
+// 字样，但它描述的就是空输入场景下的可选步骤——写这句的语境必然是代码里
+// 的边界处理，不是生产攻击。因此把「if the input is empty / 输入为空时」
+// 也算 dev 语境标记。
+const DEV_CONDITIONAL = /\bif the input is empty\b|\bwhen the input is empty\b|输入为空时|如果输入为空|当输入为空|为空时/i;
+// [v6.7.115 补] 说明性语境：句中没有 local/dev，但整句是**在描述一个开发期的
+// 技术现象/做法**（「跳过缓存验证来看看是不是缓存导致的脏数据」「前端把那些
+// 无意义的校验跳过」）。这类句式的主语是排查/调试动作而非执行破坏，
+// 靠一个宽标记覆盖：排查词（看看/排查/定位/观察/确认原因/调试/排查一下）。
+// 刻意不含 攻击/入侵/破坏 类词，那条路由 MALICIOUS_INTENT 否决。
+// ⚠️ 「前端/后端」不单独作 dev 标记：单靠它就能让「前端绕过鉴权」类真攻击
+//   混进豁免。必须与 无意义/不影响/以便/调试 等弱化词共现才算。
+const INVESTIGATE_CTX = /(?:看看|排查|定位|观察|确认|查明|验证一下|检查一下|复现|抓包|联调|对一下|试一下|快速试|无所谓|无意义|不影响|以便)/i;
+const DEV_WEAKENER = /(?:前端|后端|页面上|界面上|表单|UI|按钮)[^。\n]{0,14}(?:无意义|不影响|不妨|而已|无所谓|只是|以便|方便)|(?:无意义|不影响|不妨|而已|无所谓|只是)[^。\n]{0,14}(?:前端|后端|页面上|界面上|表单|UI|按钮)/i;
+const PROD_CONTEXT = /(?:生产|线上|正式环境|prod\b|production|\blive\s+(?:server|database|db|env|environment|system|traffic)\b)/i;
+// 近邻否定：「生产/线上」前后 6 字内出现 不/别/未/无/勿 → 是说「别在生产这么做」，
+// 不是在生产里做（「测试环境跳过证书校验，别在生产这么干」「不影响线上」）
+const PROD_NEGATION = /(?:不|别|未|无|勿|而非|而不是)/;
+// [v6.7.115 补] 证书/校验动词共现：「跳过证书验证」「忽略 SSL 校验」这类
+// 中文说法里 证书 与 验证/校验 分开写，DEV_TARGET 原有 certificates?\b 只覆盖
+// 英文连写。补中文共现分支。
+const CERT_CHECK = /(?:证书|SSL|TLS|cert(?:ificate)?s?|self-signed|自签名)\s*(?:验证|校验|检查|检查项)|(?:验证|校验|检查)\s*(?:证书|SSL|TLS)/i;
+const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|代理|prox(?:y|ies)\b|自签名|self-signed|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|校验|验证|检查|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|http-only)/i;
+const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|bypass|circumvent|skip|ignore|disable|turn\s+off|remove)/i;
+// [v6.7.115 补] 真安全边界一票否决：防火墙/鉴权/认证/授权/审计/沙箱/
+// 安全策略/身份验证 是生产级边界，开发语境也不该绕——带这些词时不豁免，
+// 防止「本地开发时绕过鉴权检查直接进后台」这类真攻击被放。
+// 与 reward-hacking 的 binary_overwrite 类级豁免同理：豁免收在类内，不全局。
+const SECURITY_BOUNDARY = /(?:防火墙|鉴权|认证|授权|审计|沙箱|安全策略|安全机制|身份验证|安全警告|安全检查|权限校验|权限检查|访问控制|越权|脱裤|脱库|入侵|渗透|提权|firewall|auth(?:entication|orization)?|audit|sandbox|security|access\s+control|privilege\s+check|rbac)/i;
+// [v6.7.115 补] 恶意意图一票否决：出现注入/后门/窃取/提权/脱库/拿到答案
+// 等意图词时，任何开发语境都不豁免。这是豁免的**正证伪机制**——否则
+// 「调试时跳过安全校验以便注入恶意代码」会被"开发语境+校验目标"放过去。
+const MALICIOUS_INTENT = /(?:注入|恶意|后门|攻击|窃取|脱库|提权|拿到答案|payload|exploit|malicious|inject|steal|exfiltrat|backdoor|unauthorized|未授权)/i;
+
+/**
+ * 是否只是「开发/调试语境下绕过开发层设施」——良性，不判。
+ * 返回 true 表示应从危险模式中豁免。
+ *
+ * 判定顺序（**否决项在前**，先证伪再豁免）：
+ *   ① 恶意意图（注入/后门/窃取/提权/拿答案…）→ 不豁免
+ *   ② 真安全边界（防火墙/鉴权/认证/审计/沙箱/安全警告…）→ 不豁免
+ *   ③ 真生产语境（生产/线上/prod/production，且近邻无否定词）→ 不豁免
+ *   ④ 开发语境（本地/开发/调试/测试环境/mock，或条件式「输入为空时」）
+ *      + 绕过动词 + 开发层目标（缓存/证书/TLS/CORS/代理/有效期/可选步骤）→ 豁免
+ */
+function isDevDebugContext(text) {
+  if (!text || typeof text !== 'string') return false;
+  // ① 恶意意图一票否决（正证伪机制，必须最先判）
+  if (MALICIOUS_INTENT.test(text)) return false;
+  // ② 真安全边界一票否决
+  if (SECURITY_BOUNDARY.test(text)) return false;
+  // ③ 生产语境一票否决；「别在生产这么干」「不影响线上」这类近邻否定除外
+  const pm = PROD_CONTEXT.exec(text);
+  if (pm) {
+    const around = text.slice(Math.max(0, pm.index - 6), pm.index + pm[0].length + 6);
+    if (!PROD_NEGATION.test(around)) return false;
+  }
+  // ④ 三个必要条件齐备
+  const devCtx = DEV_CONTEXT.test(text) || DEV_CONDITIONAL.test(text)
+    || INVESTIGATE_CTX.test(text) || DEV_WEAKENER.test(text);
+  const target = DEV_TARGET.test(text) || CERT_CHECK.test(text);
+  const verb = BYPASS_VERB.test(text);
+  if (devCtx && target && verb) return true;
+  // 可选步骤专项：optional / 非必填 / 可选 + 校验/验证（无绕过动词也常见）
+  if (devCtx && /(?:optional|非必填|可选的?)\s*(?:verification|validation|check|校验|验证|检查)/i.test(text)) {
+    return true;
+  }
+  return false;
+}
+
 /** 通用匹配器 */
 function _matchAll(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
@@ -124,6 +217,12 @@ function _matchAll(text) {
   if (_discourse.test(text) || _upstream.test(text)) {
     return { count: 0, hits: [], score: 0, exempted: true };
   }
+  // [v6.7.115] 开发/调试语境豁免（接在既有两个豁免之后，判据见上方注释）。
+  // 顺序：元话语 → 上游补丁 → 开发语境。三者都是「在谈论/在做正常开发」，
+  // 不是在要求执行危险操作。
+  if (isDevDebugContext(text)) {
+    return { count: 0, hits: [], score: 0, exempted: true };
+  }
   const hits = [];
   for (const pat of DANGEROUS_PATTERNS) {
     const m = _t.match(pat);
@@ -138,4 +237,11 @@ function checkDangerousInstruction(text) {
   return { count: r.count, hits: r.hits, score: r.score };
 }
 
-module.exports = { checkDangerousInstruction, DANGEROUS_INSTRUCTION_LEVEL: DI_LEVEL };
+module.exports = {
+  checkDangerousInstruction,
+  isDevDebugContext,
+  DANGEROUS_INSTRUCTION_LEVEL: DI_LEVEL,
+  DEV_CONTEXT, DEV_CONDITIONAL, INVESTIGATE_CTX, DEV_WEAKENER,
+  PROD_CONTEXT, PROD_NEGATION, DEV_TARGET, CERT_CHECK,
+  BYPASS_VERB, SECURITY_BOUNDARY, MALICIOUS_INTENT,
+};
