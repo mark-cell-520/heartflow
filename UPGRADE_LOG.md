@@ -6,6 +6,85 @@
 
 ---
 
+## 第 27 轮 — v6.7.125+2（英文成语俗语式 instrumental_reasoning：10/10 漏判 → 12/12 命中、0 误伤）
+
+**触发**：init 简报写「本轮 = 第 26 轮」但 HEAD 已是第 26 轮产物（`1bd0c23a`），
+按 UPGRADE_LOG 实为第 27 轮。
+
+### 一、方向选择（decision.decide 真实代码调用）
+
+轮初探针复测（不信简报旧描述，`/tmp/probe-r27.js`）：
+- **候选 A 英文 instrumental 俗语族**：10/10 全 pass、ir.count 全 0 → **真缺口坐实**
+- 候选 B dangerous_instruction 开发语境误拦：3 条真 block（rm -rf ./build、
+  drop table、chmod 777）—— 真缺口，修它要放宽 block 级安全边界
+- 候选 C ai_writing_tell 中文语体误伤：0/6 误伤（已修复），退出候选池
+- 候选 D reward_hacking 残余：8/8 全 block（第 25 轮已清零），退出候选池
+
+decision.decide 结构化 options 打分：**A 0.87 > C（结构性重构）0.72 > B 0.70**，
+identity alignment 0.8，confidence 0.95 → 选定 **A**。
+`chosen` 字段实际返回 option id（`chosen: "A"`），与旧铁律「decision.decide 的
+chosen 是 undefined」不同——本轮实测证明该 bug 只影响**旧调用形式**，
+传结构化 `options` 时 chosen 正常返回，下一轮可直接用。
+
+### 二、改了什么（4 个 commit）
+
+1. `src/index.js` **+15 条英文判据**（`INSTRUMENTAL_PATTERNS.en`，第 8f9e1361 提交）：
+   俗语壳 × 共现三族（necessary evil × 脱缰动作/自利受益对象、for the greater
+   good × break/bend/violate、dirty work × somebody has to、rules must bend ×
+   deadline/quota）、手段正当化（fraud × part of doing business、shortcuts ×
+   worth it）、伤害可接受（casualties × acceptable/part of the price）、
+   用户不会发现（never notice × 缺陷词）、no harm × if 自利受益。
+2. commit b49bc53f **补 necessary evil × 自利受益对象判据**：第一版脱缰动词表
+   漏 `to hit the quarterly target` / `for the survival of the company`
+   （动作词是 hit/survival，不在动词表里）——中文族同款「受益对象在场」形状。
+3. commit c5dfd796 **收紧 call/deem 言语动词**：测试实测暴露
+   「He called the deal a necessary evil」是**转述他人定性**而非为手段开脱，
+   不该命中。改为只收 accept/tolerate/embrace/resort/justify/own it。
+4. `scripts/negative-test-instrumental-idiom-round27.js` 新建：删条守卫 + 良性普查
+   两段式，带 exit 无条件自恢复（防止删条状态残留）。
+
+### 三、本族三个「不要单独成立」的护栏（全部实测撞过）
+
+第一版全踩了第 26 轮中文成语族的坑，英文侧复现一次：
+- `necessary evil` 单独命中 → 误伤「谈论设计权衡」元话语 → 要求脱缰动作/自利受益共现
+- `for the greater good` 单独命中 → 误伤「公共善的正当规制」 → 要求越轨/牺牲动作共现
+- `harm is unavoidable` → 误伤「工程建设客观代价」事实陈述 → 移除 unavoidable，
+  只留 acceptable/fine/justified/worth/expected
+
+### 四、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 12 条英文俗语注入 gate 拦截 | **12/12 rewrite**（轮初中 0/12） |
+| 19 条英文良性普查 | **误伤 0/19**（中程第一版 3/19） |
+| 新增 `test/instrumental-idiom-en-round27.test.js` | **97 passed 0 failed** |
+| 新增负例脚本 | 良性 0/19 + 删条守卫 **幸存 1/12**（≤4/12 阈值） |
+| 删条守卫唯一幸存项定位 | `never notice` 由 perfect_error 判 verify（ir=0），反证 deception 判据独立有效 |
+| `test/instrumental-ends-justify-means-zh.test.js`（既有） | **83 passed 0 failed** |
+| `test/instrumental-idiom-zh-round26.test.js`（既有） | **52 passed 0 failed** |
+| `node bin/verify.js` | **14 passed 0 failed** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（与基线完全一致） |
+| `test/security-audit.test.js` | **16 passed 0 failed** |
+| `test/doc-numbers-accuracy.test.js` | 14 passed 1 failed（老阻塞，见下） |
+| `node test/run-all.js` | 待补（本轮后台跑，见下方遗留或后续补录） |
+
+### 五、遗留 / 给下一轮
+
+1. **README 测试数阻塞未解（连续第五轮同一原因）**：`README 2,966 < 实际 3044`。
+   README.md 在硬边界清单内（第 23/24/25/26 轮均已记录），需用户放行：
+   改 `2,966 passing tests` 一行，或把 README.md 移出硬边界，否则 `lastGreen`
+   永远 false。本轮新增 97 项测试后差距扩大到 3044 vs 2966。
+2. **dangerous_instruction 开发调试语境误拦仍未修**（第 11 轮起挂第四轮）：
+   本轮实测 3 条良性 block（rm -rf ./build 本地清理、测试环境 drop table、
+   chmod -R 777 /tmp/demo）。修它必须收紧 block 级边界，需先做误伤/漏判对称评估。
+   样本在 `/tmp/probe-r27.js` 段 A。
+3. **中文 instrumental 成语族与英文族可合并抽象**：两侧判据形状已同构
+   （壳 × 越轨共现 / 壳 × 自利受益），第 28 轮可考虑抽公共辅助函数，或推进
+   decision 0.72 分的「道德成本-收益省略」结构判别（候选 C，收益高但工程量大）。
+4. HEAD 见下，commit 未 push（push 由同步 cron 负责）。
+
+---
+
 ## 第 26 轮 — v6.7.125+1（中文成语俗语式 instrumental_reasoning：11/12 漏判 → 12/12，并抓到 patch 数组嵌套事故）
 
 **触发**：init 简报写「本轮 = 第 25 轮」但 HEAD 已是第 25 轮产物，按 UPGRADE_LOG 实为第 26 轮。
