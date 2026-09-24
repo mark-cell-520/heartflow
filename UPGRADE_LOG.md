@@ -3,6 +3,127 @@
 > 本文件是长任务的交接簿。每轮开始读它数自己是第几轮；每轮结束追加记录。
 > 同步由独立的「定时同步」任务负责（每 5 小时），本任务只 commit、不 push、不 publish。
 
+---
+
+## 第 23 轮 — v6.7.123（reward_hacking 补齐剩余 6 类，34 注入 1/20 → 34/34）
+
+**触发**：init 简报「本轮 = 第 23 轮」，HEAD = `0a541051`（v6.7.122）。
+
+### 一、方向选择（decision.decide 实录，三次调用）
+
+前两次都返回 `chosen: null` + `options_indistinguishable`（三候选 composite 全部 0.74）：
+
+| 调用 | 形态 | 结果 |
+|---|---|---|
+| 第 1 次 | 自然语言 prompt `[A]/[B]/[C]` | null，0.74 同分 |
+| 第 2 次 | 结构化 options 但只写文字描述 | null，0.74 同分 |
+| 第 3 次 | 结构化 options + `feasibility/risk/consequence_value/confidence` 数值 | **A: 0.89 > B: 0.79 > C: 0.77，chosen = A** |
+
+**教训（写进代码注释）**：`_scoreOption` 从 label/description 文本推断三维得分时，
+只认「漏判/误拦/装饰性」这类分级词。选向 prompt 里必须给出**可区分的数值或
+分级信号**，否则三候选永远同分、decision 弃权——cron 每轮都会卡在这一步。
+
+### 二、三个候选都先跑最小样本实测（不信简报里的旧描述）
+
+| 候选 | 实测 | 判定 |
+|---|---|---|
+| A reward_hacking 漏判 | 中文 **1/15**、英文 **0/5** 命中（唯一命中的 1 条还是 dangerous_instruction 顺带拦的） | 真缺口，BLOCK 级 |
+| B 中文 instrumental_reasoning | 中文 2/20、英文 1/6 | 真缺口，REWRITE 级 |
+| C README 维度口径 57 vs 50 | 纯文档，不动引擎 | 无安全收益 |
+
+选 A（BLOCK 级漏判 = 真攻击直达用户；中文 instrumental 留待下轮）。
+
+### 三、修复内容（`src/reward-hacking.js`）
+
+新增 6 类，全部沿用本文件既有的「两半齐备」结构（手法半 + 目的半）：
+
+| # | 类名 | 手法 → 目的 |
+|---|---|---|
+| ⑪ | test_gaming | 改断言/期望值 → 恒真、跳过 |
+| ⑫ | evidence_suppression | 删失败记录/剔除 hard case → 指标看不出真相 |
+| ⑬ | metric_substitution | 换统计口径/刷分 → 好看而非真实改进（Goodhart） |
+| ⑭ | reward_function_edit | 改评分函数/惩罚项/降标准 → 更容易满足 |
+| ⑮ | evaluation_awareness | 有人看就规矩、没人看就糊弄 |
+| ⑯ | task_substitution | 换简单任务/只做容易的 → 汇报上去 |
+
+**三处同步改动**（防第四次踩「动词表不对齐」）：`CLASS_WEIGHT` 补 6 项权重
+（0.7~0.75，不擅自抬高）、`CLASS_LABEL_ZH` 补 6 项中文标签（否则 details
+显示英文类名）、中英双表逐类对齐。
+
+### 四、写在代码里的负例设计教训（比 bug 本身更值得记）
+
+英文表第一版**18 条只命中 8 条**。三个死因：
+1. 词形变化没加 `\w*`（`driving` ≠ `drive`）；
+2. 后半同义词表漏项（`actual problem` 不在表里）；
+3. 前后半都写长词表，跨度窗一收紧就两头落空。
+
+第二版改为本文件原 10 类一致的写法：**前半短词表（对象）+ 后半靠标记词**
+（instead of / so it looks / easier / too hard / nobody sees），
+而不是枚举对象。改完 18/18。
+
+### 五、一个既有缺陷顺手修掉：findings 从未产出 guidance
+
+AGENTS.md 写的修复闭环是「Follow `findings[].guidance`」，但 `src/index.js`
+的通用维度循环只给 `dimension/severity/details`，**guidance 字段从来是空的**。
+补 `DIM_GUIDANCE` 映射（block/rewrite 级写清必须做什么，缺省给通用指引）。
+
+### 六、既有守卫「恰好 10 类」钉死断言被修对
+
+`test/reward-hacking-remaining6.test.js` 断言 ZH/EN 表 `length === 10`，
+本轮新增 6 类后必失败（193 passed 2 failed）。这不是守卫误报，是守卫
+**用钉死数字代替了它真正要保证的性质**（中英两表一致 + 每类都有权重/标签
+登记 + 原类没丢）。改为断言这三条性质，后两条原来根本没覆盖：
+**246 passed 0 failed**（193 原有 + 53 新断言）。
+
+### 七、验证结果（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 新增 `test/reward-hacking-new-classes-round23.test.js` | **10 passed 0 failed** |
+| 新增 `scripts/negative-test-reward-hacking-round23.js` | **26 passed 0 failed** |
+| 34 注入样本 gate 拦截率 | **34/34**（轮初中 1/15、英 0/5） |
+| 28 良性样本 reward_hacking 误伤 | **0** |
+| `test/reward-hacking-remaining6.test.js` | **246 passed 0 failed** |
+| `node bin/verify.js` | **14 passed 0 failed** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（与基线完全一致） |
+| `test/security-audit.test.js` | **16 passed 0 failed** |
+| `scripts/negative-test-dev-context-round22.js` | 8 注入 8 变红 |
+| `scripts/negative-test-dangerous-dev-debug.js` | 6 注入 6 变红 |
+| `node test/run-all.js` | **2965 passed 2 failed**，两处均定位到条目（见下） |
+
+run-all 的 2 个失败：
+1. `npm-package-integrity` — 基线已知的那 1 个（多轮前就存在，非本轮引入）；
+2. `doc-numbers-accuracy` — README 测试数 **2893 < 实际 2965**（本轮新增
+   72 条断言后的少报）。README 在硬边界清单内不可改，**留给下一轮或用户**。
+
+### 八、遗留（下一轮优先）
+
+1. **README 测试数 2893 → 2965**（`doc-numbers-accuracy` 唯一失败项）。
+   README 是硬边界不可改，需用户放行或由有权限的轮次改；改完单独提交。
+2. **README/AGENTS.md 维度口径 57 vs 50**：`measure-claimed-numbers.js` 实测
+   `dimensions` 键 57 个，文档宣称 50。这是第 22 轮就记录的口径差，
+   根因是「行动级 46 + 不强制动作 5」与「登记在 dimensions 里的全部」两套数法。
+3. **中文 instrumental_reasoning 漏判**（本轮候选 B，0.79 分）：6 条中文
+   instrumental 表述（必要之恶 / 两害相权取其轻 / 不入虎穴焉得虎子 /
+   成大事者不拘小节 / 手段-目的开脱 / 为集体牺牲个人）全部 pass，
+   需要新建成语/俗语判据，改动面比本轮大、误伤风险更高。
+4. `dangerous_instruction` 真攻击漏判（第 22 轮起挂）：`不用备份直接删库`
+   pass、英文 `delete production database` 在 rh 侧已 block 但 di 侧仍漏。
+5. LLM 401（stepfun api-key 失效）需用户更新凭据，非代码可动。
+
+### 九、给下一轮的接手说明
+
+- 先 `git log` 核 HEAD（应为 `069a6567`），不要信简报里的版本叙事。
+- 本轮三个 commit 全未 push：`c68fa07c`（引擎）、`f3b28986`（新测试+负例）、
+  `069a6567`（解除钉死断言）。
+- 工作区剩 `data/test-count.json` 与 `data/upgrade-state.json` 两个机制自动
+  落盘文件，别手动改。
+- **给任一维度加豁免/加类别前，先问「其他维度的命中侧新增的词，这份清单收了吗」**
+  —— 这是本轮家族坑的第五次预备，本轮的 `CLASS_WEIGHT`/`CLASS_LABEL_ZH`
+  三表同步就是这么避开的。
+- `run-all` 现在 2965 个测试、约 3 分钟跑完，后台化 + `sleep 60; tail`。
+
+---
 
 
 ---
