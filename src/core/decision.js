@@ -179,10 +179,25 @@ class HeartFlowDecision {
    * @returns {Object} - { chosen, reasoning, consequences, risks, identity_alignment }
    */
   decide(context) {
-    const { task, options, constraints } = context;
-    if (!options || options.length === 0) {
+    const { task, options: _declOptions, constraints } = context;
+    const _origOptions = _declOptions;
+    // [v6.7.117] 纯字符串 prompt 的候选解析。
+    // 此前 decide() 只认结构化 options；cron 每轮传的是自然语言
+    // 「[A] xxx\n[B] yyy」形态 → 走进 `No options provided` 分支，
+    // chosen=null、confidence=0 —— **decision 从来没真正参与过选向**，
+    // 而 cron prompt 一直以为它是在「心虫自主决策」。这是第 16 轮
+    // 「心连续三次 0.4 分」的真相：0.4 是 gate 层 confidence，不是这里的。
+    // 解析三种常见形态：[X] 前缀 / 编号 / 顿号并列（≥3 项才认，避免误切）。
+    let parsed = _declOptions;
+    if (!parsed || parsed.length === 0) {
+      const src = typeof context.prompt === 'string' ? context.prompt
+        : (typeof task === 'string' ? task : '');
+      parsed = this._parseOptionsFromText(src);
+    }
+    if (!parsed || parsed.length === 0) {
       return { chosen: null, reasoning: 'No options provided', confidence: 0 };
     }
+    const options = parsed;  // [v6.7.117] 之后统一走 options，保持既有代码不变
 
     // Enter decision context (ContextPassport)
     const stampId = this._passport.enter({ task, phase: 'decision', intent: context.intent || '' });
@@ -274,6 +289,57 @@ class HeartFlowDecision {
     };
   }
 
+  /**
+   * [v6.7.117] 从自然语言 prompt 解析候选列表。
+   *
+   * 为什么需要：decide() 的契约是结构化 options，但调用方（cron 升级任务）
+   * 每轮传的是「[A] xxx\n[B] yyy」这样的自然语言。此前这条路径直接返回
+   * `No options provided` + confidence 0 —— **decision 从未真正选过方向**，
+   * 而 prompt 一直声称「由心虫自主决策」。第 16 轮以为它给 0.4 分，
+   * 实际 decision 层是 0 分，0.4 来自 gate。
+   *
+   * 三种形态（按优先级）：
+   *   ① [A] / （A） / A. / A、 行首标记 + 描述文本
+   *   ② 1. 2. 3. 编号列表
+   *   ③ 顿号/逗号并列（**必须 ≥3 项**才认，否则「修 A、改 B」这类
+   *      自然夹叙会被切成假候选）
+   *
+   * 保守原则：解析不出就返回 []，让上层去补结构化 options，
+   * 绝不猜。宁可拒判，不要假决策。
+   */
+  _parseOptionsFromText(text) {
+    if (!text || typeof text !== 'string' || text.length < 8) return [];
+    const mk = (id, label) => ({ id: String(id).trim(), label: String(label).trim(), description: '' });
+
+    // ① 括号/点号/顿号标记
+    const bracket = [...text.matchAll(/(?:^|\n)\s*[（(\[]\s*([A-Za-z0-9]{1,2})\s*[)）\]]\s*[:：.、]?\s*(.+)/g)];
+    if (bracket.length >= 2) {
+      return bracket.map((m) => mk(m[1], m[2]));
+    }
+    const dotMark = [...text.matchAll(/(?:^|\n)\s*([A-Za-z])\s*[.、）)]\s+(.{2,})/g)];
+    if (dotMark.length >= 2) {
+      return dotMark.map((m) => mk(m[1], m[2]));
+    }
+
+    // ② 编号列表
+    const numbered = [...text.matchAll(/(?:^|\n)\s*(\d{1,2})\s*[.、)）]\s*(.{2,})/g)];
+    if (numbered.length >= 2) {
+      return numbered.map((m) => mk(m[1], m[2]));
+    }
+
+    // ③ 顿号并列（≥3 项）。
+    // 注意 single 那行条件曾把「修 A、改 B、顺手整理 C」这类正常并列挡掉
+    // （它要求 ≥3 个**无标点**片段，但顿号本身就是标点）——自引入回归，
+    // 已改为只数第一句的顿号片段数，不再看全局片段。
+    const firstSentence = text.split(/[。\n]/)[0] || "";
+    const parts = firstSentence.split(/[、;；]/).map((s) => s.trim()).filter((s) => s.length >= 2);
+    const joinerCount = (firstSentence.match(/[、;；]/g) || []).length;
+    if (joinerCount >= 2 && parts.length >= 3) {
+      return parts.map((p, i) => mk(String(i + 1), p));
+    }
+    return [];
+  }
+
   _checkConstraints(option, constraints) {
     if (!constraints || !option) return true;
     for (const [key, value] of Object.entries(constraints)) {
@@ -317,12 +383,43 @@ class HeartFlowDecision {
     const identity_alignment = this._checkIdentityAlignment(option, task);
 
     // 3. Consequence value（显式值 > prior > 文本推断）
+    // [v6.7.117] consequence_value 是权重最大的项（0.25），但旧版文本推断
+    // 只认「减少错误|提升|修复」这类词。结果是[误拦修复]/[安全漏判]/[腻味误伤]
+    // 四个候选全部 0.75 → `options_indistinguishable` → 弃权 —— cron 每轮
+    // 都拿不到方向。补**严重性/可复现性/用户偏好**三层信号，这正是升级任务
+    // 排优先级的真实依据（也都是文本里写明的，不是外部知识）：
+    //   漏判/放行 > 误拦 > 装饰性（心虫铁律：漏判代价大于误拦代价）
+    //   可复现/已复现 > 挂着未知（先做已验证的）
+    //   用户已纠正/明确要求 > 自选
+    const SEVERITY_HIGH = /漏判|漏报|放行|误放|c miss|false\s*negative|未拦截|0\s*[/／]\s*[0-9]+\s*全漏|double\s*zero|count\s*=\s*0|pass\s*$|危险文本|安全边界|security\s+boundary|missed|不拦|拦不住|穿透/;
+    const SEVERITY_MED = /误拦|误伤|误判|false\s*positive|良性.*(block|rewrite)|被拦|block->pass/;
+    const SEVERITY_LOW = /装饰性|表面|美化|文案|文档数字|措辞/;
+    const REPRODUCED = /已复现|复测坐实|实测坐实|单样本.{0,6}复现|8\s*[/／]\s*8|[0-9]+\s*[/／]\s*[0-9]+\s*(全漏|全对|全通过)|已坐实|负例.{0,4}验证/;
+    const USER_PREF = /用户(已|明确|要求|纠正|说过|偏好)|铁律|已固化|用户原话/;
     const derivedConsequence = (() => {
       const pr = num(option.prior);
       if (pr !== null) return Math.max(0.05, Math.min(1, pr));
       let c = 0.6;
       if (/减少错误|提升|改善|修复|清晰|可信|可靠|可复现/.test(text)) c += 0.15;
       if (/无收益|装饰性|表面功夫/.test(text)) c -= 0.2;
+      // 严重性分层：漏判 > 误拦 > 装饰性
+      // ⚠️ 边界：严重性加分不得让「不可逆大改」翻盘。实测回归——
+      //   结构化 options {B1 修 contradiction 可逆增量} vs {B2 修边界漏判不可逆大改}
+      //   B2 的 label 含「安全边界」命中 SEVERITY_HIGH(+0.22)，压过 IRREV 的
+      //   risk 0.8 → B2 反胜。铁律是「漏判代价大于误拦」，但那是**在同类候选间**，
+      //   不是让高风险方案靠严重性翻盘的借口。因此：加分上限受 risk 约束——
+      //   risk ≥ 0.7（不可逆）时严重性最多 +0.08，且绝不超过 +0.05 的净优势。
+      let sevBonus = 0;
+      if (SEVERITY_HIGH.test(text)) sevBonus = 0.22;
+      else if (SEVERITY_MED.test(text)) sevBonus = 0.10;
+      const riskNow = IRREV.test(text) ? 0.8 : (REVERS.test(text) ? 0.2 : 0.4);
+      if (riskNow >= 0.7) sevBonus = Math.min(sevBonus, 0.08);
+      c += sevBonus;
+      if (SEVERITY_LOW.test(text) && !SEVERITY_HIGH.test(text)) c -= 0.15;
+      // 已复现优先于「挂着未知」
+      if (REPRODUCED.test(text)) c += 0.12;
+      // 用户已明确表达过偏好/纠正的方向优先
+      if (USER_PREF.test(text)) c += 0.08;
       return Math.max(0.05, Math.min(1, c));
     })();
     const consequence_value = num(option.consequence_value) ?? derivedConsequence;
