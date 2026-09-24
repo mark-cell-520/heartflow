@@ -4172,6 +4172,60 @@ const ABSOLUTE_CLAIM_PATTERNS = {
     /\b(?:absolutely|definitely|certainly|undoubtedly)\s+(?:the\s+)?(?:best|worst|greatest|only|first)\b/i,
     /\b(?:never|always)\s+(?:will|would|can|could)\b[^.]{0,30}\b(?:work|fail|happen|change)\b/i,
     /\b(?:everyone|everybody|all|everything)\s+(?:knows|agrees|believes|wants)\b/i,
+    // ── [v6.7.113] 英文绝对化句式族（第 13 轮，心虫 decision.decide A 方向 0.91）──
+    // 来源：第 8 轮实测 10 条真实句漏 7 条；本轮 22 条复测漏 21 条
+    //   （checkAbsoluteClaim 直接调用 count=0），良性边界 25 条实测 0 误伤。
+    // 原表 6 条全是**词面**绝对化（no one has ever / will change everything /
+    //   the only way is to / absolutely the best / never will work /
+    //   everyone knows），漏掉了最高频的一类：**把结论的例外空间压到零**——
+    //   保证成功、完全解决、无一例外、无人反对、100% 有效。
+    // 每族都实测过良性边界，见 test/absolute-claim-en.test.js。
+    //
+    // ① 唯一解 + 优质形容词：only + correct/right/valid/viable + 方案名词。
+    //    与原式（the only way/method/approach/solution is/to，要求 only 后直接
+    //    跟名词）互补，覆盖 "the only correct solution" 这类。
+    //    良性排除：「the only file we changed」only 后是普通名词，不命中。
+    /\b(?:is|are|was|were|remains?)\s+the\s+only\s+(?:correct|right|valid|proper|true|viable|workable|sensible|reasonable|acceptable|legitimate|reliable|effective|real|actual|safe|secure)\s+(?:way|approach|solution|method|option|answer|choice|course|strategy|path|alternative|fix|explanation)\b/i,
+    /\bthe\s+only\s+(?:correct|right|valid|proper|true|viable|workable|sensible|reasonable|acceptable|legitimate|effective|real|actual|safe|secure)\s+(?:way|approach|solution|method|option|answer|choice|strategy|path|explanation)\b/i,
+    // ② 没有更好的 X：no better way/approach/alternative
+    /\bno\s+better\s+(?:way|approach|solution|method|option|alternative|answer|choice|course|strategy)\b/i,
+    // ③ 永不失败 / 总是成功：补 will never fail / always works / never fails
+    //    三个原式（never/always + will|can + work|fail）没覆盖的语序。
+    /\b(?:will|would|can|could|shall|should)\s+never\s+(?:fail|fails|go\s+wrong|break|breaks|crash|misfire|let\s+(?:you|us)\s+down)\b/i,
+    /\bnever\s+fails?\s+to\b/i,
+    /\balways\s+(?:works?|succeeds?|delivers?|performs?\s+flawlessly)\b/i,
+    // ④ 保证成功族。
+    //    良性排除：「It is guaranteed to be installed by the package manager」
+    //    是被动式机械事实（包管理器语义），不是对结果的过度自信——
+    //    所以只列**成功动词**，不匹配 guaranteed to be <被动>。
+    /\bguaranteed\s+to\s+(?:succeed|succeeds|work|works|pass|passes|fix|fixes|solve|solves|prevent|prevents|eliminate|eliminates|ensure|ensures|deliver|delivers|protect|protects|stop|stops|block|blocks|save|saves|win|wins)\b/i,
+    /\bguarantees?\s+(?:success|results?|victory|a\s+perfect|zero\s+failure)\b/i,
+    // ⑤ 无人能挡 / 无路可败
+    //    良性排除：「Nothing in the report suggests otherwise」无 can 不命中；
+    //    「No single factor explains the outcome」非 nobody/no one 不命中。
+    /\b(?:nothing|no\s*one|nobody)\s+(?:can|could|will|would)\s+(?:stop|prevent|block|hinder|impede|halt|slow|defeat|resist)\b/i,
+    /\bthere\s+is\s+no\s+way\s+(?:this|that|it|we|you)\s+(?:could|can|will|would)\s+(?:fail|go\s+wrong|break|lose)\b/i,
+    // ⑥ 完全解决族：completely/totally/fully + 解决类动词。
+    //    注：src/index.js 的 absoluteEN（output-gate 的 screen 层）已覆盖
+    //    completely done|fixed|resolved|solved|secure|safe|stable，
+    //    但那是 overconfidence 层，**不是 absolute_claim 维度**，维度侧全漏。
+    /\b(?:completely|totally|fully|entirely|utterly|wholly)\s+(?:solve|solves|solved|resolve|resolves|resolved|eliminate|eliminates|eliminated|eradicate|eradicates|eradicated|remove|removes|removed|fix|fixes|fixed|prevent|prevents|prevented|stop|stops|stopped)\b/i,
+    // ⑦ 人人皆知 / 无人反对：补 nobody/no one disputes 与 all <专家> agree。
+    //    原式 everyone knows|agrees|believes|wants 只覆盖 everyone 一侧。
+    //    良性排除：「Most experts support」非 all；「Many researchers believe」
+    //    非 all + agree，均不命中。
+    /\b(?:nobody|no\s*one)\s+(?:disputes?|denies?|doubts?|questions?|disagrees?)\b/i,
+    /\ball\s+(?:experts?|scientists?|researchers?|specialists?|professionals?|analysts?|economists?|doctors?)\s+(?:agree|concur)\b/i,
+    // ⑧ 无一例外
+    //    良性排除：「no open issues」非 no exceptions；「All tests currently
+    //    pass」无 without exception，均不命中。
+    /\bevery\s+single\s+(?:case|instance|scenario|situation)\b/i,
+    /\b(?:without\s+exception|no\s+exceptions?)\b/i,
+    // ⑨ 100% / zero 缺陷族
+    //    良性排除：「Zero downtime is the goal, not a guarantee」是目标陈述；
+    //    「zero dependencies」是工程事实——所以只列缺陷/失败类名词。
+    /\b(?:100\s*%|100\s*percent|one\s+hundred\s*percent)\s+(?:effective|safe|secure|reliable|accurate|correct|foolproof)\b/i,
+    /\bzero\s+(?:defects?|bugs?|errors?|failures?|vulnerabilit(?:y|ies)|flaws?|regressions?)\b/i,
   ],
 };
 
