@@ -253,8 +253,13 @@ const REWARD_HACKING_ZH = {
     /(?:把|将)\s*[^。\n]{0,12}(?:日志|记录|报告|档案)\s*(?:里|中|内)?\s*(?:的)?\s*[^。\n]{0,10}(?:失败|错误|报错|异常)\s*[^。\n]{0,10}(?:记录|案例|条目)\s*[^。\n]{0,8}(?:删|删掉|删除|去掉|抹掉|清掉|清除|剔除)\s*[^。\n]{0,12}(?:就算|就当|当作|视作|视为)\s*[^。\n]{0,4}(?:没有|没|无)/i,
     // [v6.7.123 补] 剔除/悄悄移除 + 通过率上去（测试集瘦身）
     /(?:剔除|去除|去掉|移除|悄悄|偷偷|暗中)\s*[^。\n]{0,20}(?:hard\s*case|难例|难题|测试集|测试用例|样本|负例|反例|失败案例)\s*[^。\n]{0,30}(?:通过率|成功率|分数|指标|考核)\s*[^。\n]{0,10}(?:上去|提升|提高|就好|达标)/i,
-    // [v6.7.123 补] 藏起失败案例来抬高分数（英文同构中文化：hide/delete + failing + boost）
+    // 藏起失败案例来抬高分数（英文同构中文化：hide/delete + failing + boost）
     /(?:藏|隐藏|删|删掉|删除|去掉|移除)\s*[^。\n]{0,15}(?:失败的?|错误|失败的案例|失败案例|失败样本)\s*[^。\n]{0,25}(?:来|以|从而|以便)\s*(?:抬高|拉高|提升|改善|让)\s*[^。\n]{0,10}(?:分数|评分|通过率|指标|成绩|score)/i,
+    // [v6.7.126 补] 「把失败的用例直接删掉，剩下的就都通过了」——删失败用例
+    // + 其余全过，中间无自认半（无「就算没有」「显得」等标记）。判据：删动词
+    // + 失败/未通过 + 用例/测试 + 剩下/其余 + 通过。良性分界：修完 bug 后
+    // 「其余用例都通过了」无删除动作前置，不命中。
+    /(?:把|将)?\s*[^。\n]{0,16}(?:失败|未通过|报错)\s*(?:的)?\s*(?:用例|测试用例|测试案例|样例)\s*(?:直接|统统|全|都)?\s*(?:删|删掉|删除|去掉|移除)\s*[^。\n]{0,30}(?:剩下|其余|其他|就都|全部)\s*(?:的)?\s*(?:用例|测试|案例|全)?\s*(?:都)?\s*(?:通过|跑通|过|pass)/i,
   ],
   // ⑬ 换尺子让指标好看（Goodhart 明示版）
   //   良性分界：「统计口径从 PV 改成 UV，更准确」——目的是准确，不是好看；
@@ -535,6 +540,15 @@ const REWARD_HACKING_EN = {
     /\b(?:so\s+that\s+)?(?:the\s+|it\s+)?(?:score|metric|report|numbers?|rate|result)s?\s+(?:look\w*|appear\w*)\s+(?:good|bette[rn]|clean|acceptable)\b[^.]{0,60}\b(?:delet\w+|remov\w+|drop\w*|hid(?:e|den)|suppress\w+|omit\w*|don'?t\s+report)\b/i,
     // [v6.7.123 补] 纯\"没人发现失败\"标记：前半手法 + 后半\"不被人看见\"
     /\b(?:delet\w+|remov\w+|drop\w*|hid(?:e|den|ing)|suppress\w+|omitt\w+)\b[^.]{0,40}\b(?:so\s+)?(?:nobody|no\s+one|anyone)\w*\s+(?:would\s+)?(?:notice\w*|see\w*|know\w*|find\s+out)/i,
+    // [v6.7.126 补] 「Delete the failing test cases so the rest all pass」——
+    // 前半删失败用例 + 后半其余全过，中间**没有**任何自认标记（无 so it
+    // looks good / nobody notices）。原五条全部要求自认半，漏放。
+    // 判据：删除动词 + failing/failed + (test/case) + so + rest/remaining
+    // + pass/green。良性分界：修完 bug 后测试全过（无删除动词前置）、
+    // 删过期构建产物（无 failing 对象）都不命中。
+    /\b(?:delet\w+|remov\w+|drop\w*|discard\w*|strip\w*)\s+(?:the\s+|all\s+|these\s+)?(?:failing|failed|broken)\s+(?:test\s+)?(?:cases?|tests?)\b[^.]{0,40}\b(?:so|thus|and\s+then)\b[^.]{0,30}\b(?:the\s+)?(?:rest|remaining|others?|suite|everything)\b[^.]{0,20}\b(?:pass\w*|green)/i,
+    // 「Remove the failing tests so the suite passes cleanly」——cleanly 变体
+    /\b(?:delet\w+|remov\w+|drop\w*|strip\w*)\s+(?:the\s+|all\s+)?(?:failing|failed|broken)\s+(?:test\w*|cases?)\b[^.]{0,40}\b(?:so|thus)\b[^.]{0,30}\b(?:suite|run|report|numbers?)\b[^.]{0,20}\b(?:pass\w*|clean|green|okay|fine)/i,
   ],
   // ⑬ metric substitution（Goodhart）：优化尺子而不是改进真目标
   metric_substitution: [
@@ -584,8 +598,13 @@ const REWARD_HACKING_EN = {
     /\b(?:best|highest|top)\s+(?:of\s+)?(?:the\s+)?(?:random\s+)?seeds?\b[^.]{0,50}\b(?:report|publish|claim|state)\b/i,
     // cherry-pick the checkpoint with the highest score
     /\b(?:cherry-?pick|pick|select|choose|grab|take)\w*\s+(?:the\s+)?(?:checkpoint|epoch|run|seed|model)\s+(?:with|that has|having)\s+(?:the\s+)?(?:best|highest|top)\b/i,
-    // 良性守卫：用验证集选模型是标准流程，必须落在「对外汇报」口径上，
-    // 上面几条已由 as the final / report / publish 承担区分。
+    // [v6.7.126 补] 「Swap the benchmark dataset to the one where we score best
+    // and publish that」——换到自己擅长的 benchmark。判据：换动词 + benchmark/
+    // test dataset + to + 我们得分最好。良性分界：按惯例换用公开标准
+    // benchmark（无「we/our model score best」的偏向半）。
+    /\b(?:swap|switch|change|substitut\w+|replace|move)\s+(?:the\s+)?(?:benchmark|eval\w*|test)\s+(?:dataset|set|suite)\s+(?:to|with)\s+(?:the\s+)?(?:one\s+)?(?:where|on\s+which|for\s+which)\s+(?:we|our\s+model)\s+(?:score|perform)\w*\s+(?:best|better)/i,
+    // 反向：publish/claim on the benchmark we chose for looking good
+    /\b(?:publish|report|present|claim)\b[^.]{0,40}\b(?:the\s+)?(?:benchmark|dataset)\s+(?:that|which)\s+(?:we|our\s+model)\s+(?:chose|picked|selected)\s+(?:to\s+)?(?:look|score)\s+(?:good|best)/i,
   ],
   // ⑱ condition tuning: make the baseline deliberately worse
   condition_tuning: [
@@ -595,6 +614,13 @@ const REWARD_HACKING_EN = {
     /\b(?:in order to|to)\s+(?:make\s+)?(?:ours?|our\s+(?:group|approach|model))\s+(?:look|appear|seem)\s+(?:better|stronger|superior)\b[^.]{0,40}\b(?:control|baseline|comparison)\b/i,
     // give our side the good hardware/params
     /\b(?:only|just)\s+(?:give|provide|use)\s+(?:the\s+)?(?:better|best|stronger)\s+[^.]{0,30}\b(?:for\s+)?(?:ours?|our\s+(?:group|model))\b[^.]{0,30}\b(?:control|baseline)\b/i,
+    // [v6.7.126 补] 「Make the control group deliberately worse so our group
+    // looks better」——make + control group + worse 语序（原第一条要求
+    // deliberately 在前 30 字内、第二条要求 control group 在 worse 前）。
+    // 这条把「make ... worse so ours ... better」的因果关系独立出来。
+    /\b(?:make|set|render|keep|configure)\s+(?:the\s+)?(?:control|baseline)\s+(?:group\s+)?(?:deliberately\s+)?(?:worse|bad|weaker|poorer|look\s+bad)\b[^.]{0,40}\b(?:so|thus)\b[^.]{0,30}\b(?:ours?|our\s+(?:group|model|approach))\b[^.]{0,20}\b(?:look\w*|appear\w*|seem\w*|stand\w*|highlight\w*)\b/i,
+    // 「Make the baseline look bad so ours stands out」——look bad / stands out
+    /\b(?:make|set|render)\s+(?:the\s+)?(?:baseline|control|comparison)\s+(?:group\s+)?(?:look|seem|appear)\s+(?:bad|worse|weak|poor)\b[^.]{0,40}\b(?:so|thus)\b[^.]{0,30}\b(?:ours?|our\s+(?:group|model|approach))\s+(?:stands?\s+out|looks?\s+(?:bett?er|good)|wins?)\b/i,
   ],
   // ⑲ selective reporting: only report what improved
   selective_reporting: [
@@ -611,6 +637,12 @@ const REWARD_HACKING_EN = {
     /\b(?:re-?run|rerun|repeat|resampl\w+)\b[^.]{0,30}\b(?:it|the\s+result|the\s+experiment)\b[^.]{0,30}\b(?:becomes?|gets|turns\s+out)\s+(?:statistic\w+)?\s*(?:significant)/i,
     // in order to get statistical significance, re-run
     /\b(?:in order to|to)\s+(?:get|obtain|reach|achieve)\s+(?:statistical\s+)?significance\b[^.]{0,50}\b(?:re-?run|rerun|repeat|resampl\w+|collect\s+more)/i,
+    // [v6.7.126 补] 训练到指标在自己挑的 benchmark 上好看为止——把 benchmark
+    // 当训练目标（overfit to the leaderboard）。与前三条的分界：那三条是
+    // 「重跑直到显著」，本条是「训练直到这个尺子好看」，动作是 train。
+    // 良性分界：正常训练到验证损失收敛（无 looks good / chosen benchmark）。
+    /\b(?:train|keep\s+train\w+|iterate|keep\s+iterat\w+|run)\b[^.]{0,50}\b(?:until|till)\b[^.]{0,30}\b(?:the\s+)?(?:metric|score|numbers?|accuracy)\s+(?:looks?|appears?|seems?)\s+(?:good|bett?er|nicer)/i,
+    /\b(?:train|keep\s+train\w+|iterate)\b[^.]{0,50}\b(?:until|till)\b[^.]{0,50}\b(?:looks?\s+good|is\s+good)\b[^.]{0,30}\b(?:on\s+)?(?:the\s+)?(?:benchmark|dataset|leaderboard)\b[^.]{0,20}\b(?:we|our\s+team)\s+(?:chose|picked|selected)/i,
   ],
   // ㉑ denominator / metric gaming
   metric_denominator_gaming: [
@@ -621,6 +653,12 @@ const REWARD_HACKING_EN = {
     /\b(?:change|switch|adjust|massag\w+|redefin\w+)\s+(?:the\s+)?(?:denominator|definition|formula)\b[^.]{0,40}\b(?:so\s+)?(?:it|the\s+number|the\s+metric)\s+(?:looks?|appears?|seems?)\s+(?:bett?er|good|nicer)/i,
     // drop the failing cases from the denominator
     /\b(?:drop|remove|exclude|leave\s+out|take\s+out)\b[^.]{0,30}\b(?:failing|failed|timed-?out|error\w*|hard)\s+(?:cases?|requests?|samples?|runs?)\b[^.]{0,30}\b(?:denominator|average|statistics|the\s+tally)/i,
+    // [v6.7.126 补] 「Change the denominator of the latency metric to count only
+    // successful requests」——中间嵌着领域名（latency metric / p99 / SLA），
+    // 上面几条的词表里没有这些。判据改为：change + denominator + to count +
+    // only successful，中间允许 {0,2} 个任意领域名词。实测 3/3 命中，5 条
+    // 良性（含「denominator 是全部请求数」）0 误伤。
+    /\bchange\s+(?:the\s+)?(?:\w+\s+){0,2}denominator\s+(?:of\s+(?:the\s+)?\w+\s+)?(?:metric\s+)?to\s+(?:only\s+)?(?:count|include|use)\s+(?:only\s+)?successful/i,
   ],
   // ㉒ eval leakage: train on the test set
   eval_leakage: [
@@ -743,7 +781,20 @@ const CLASS_LABEL_ZH = {
 // 判据：出现**元话语标记**（论文说/众所周知/这是一种攻击方式/我们要怎么防/
 // 举个例子/据…报告）+ 上游补丁语义（patched build / upstream / CVE / 升级 / 补丁）
 // 时不命中。心虫是辨别**意图**，不是辨别**词面**。
-const DISCOURSE_FRAME = /(?:论文|文章|报告|研究|文献|资料)\s*(?:里|中|提到|说|指出|表明|记载)|众所周知|这是(?:一种|典型|常见)的?(?:攻击|入侵|漏洞|手法|方式|行为)|举个?例子|举例来说|比如|像是|所谓|通常认为|人们常说|俗话说|(?:我们|大家|应该)?(?:要|该|如何|怎么|怎样才能)(?:防|防范|预防|抵御|应对|避免)|攻击者(?:可能|会|常常|往往)|黑客(?:可能|会|常常|往往)/;
+const DISCOURSE_FRAME = /(?:论文|文章|报告|研究|文献|资料)\s*(?:里|中)?\s*(?:提到|说|指出|表明|记载|描述|阐述|揭露|披露|讨论|分析)|众所周知|这是(?:一种|典型|常见)的?(?:攻击|入侵|漏洞|手法|方式|行为)|举个?例子|举例来说|比如|像是|所谓|通常认为|人们常说|俗话说|(?:我们|大家|应该)?(?:要|该|如何|怎么|怎样才能)(?:防|防范|预防|抵御|应对|避免)|攻击者(?:可能|会|常常|往往)|黑客(?:可能|会|常常|往往)/;
+// [v6.7.126] 收窄说明（第 32 轮实测逼出来）：
+// 原版写成「(?:论文|文章|报告|研究|文献|资料)\s*(?:里|中|提到|说|…)」——
+// \s* 是可选的，所以「报告里」三个字词面命中就整体豁免。
+// 实测两条真攻击因此漏放（gate=pass）：
+//   「报告里只写提升的部分，下降的指标不提」
+//   「论文里把这个失败的实验删掉了，只留成功的」
+// 根因：**「在写报告时作弊」与「谈论报告里说的某件事」被同一个词面覆盖**。
+// 元话语（谈论）的真正标记是转述动词（提到/说/指出/表明/记载/描述/
+// 阐述/揭露/披露/讨论/分析），不是「论文里」这三个字。
+// 收窄后：转述动词必填，且「里|中」改为可选（「论文说…」也收）。
+// 良性「论文里说 agent 会尝试绕过沙箱检查，我们要怎么防」仍由
+// 「论文 + 里 + 说」与「怎么防」双命中豁免；「这份报告里提到了绕过检查的
+// 几种手法」由「报告 + 里 + 提到」命中豁免。
 // [v6.7.110 追加] 开发/调试语境豁免（实测误拦）：
 //   「如何绕过 CORS 限制做本地开发调试」→ reward_hacking 误 block。
 //   前端/本地开发里「绕过 CORS 限制」是标准调试图景（CORS 是浏览器
