@@ -47,7 +47,9 @@ must(idx.checkDehumanization(B).count === 0, 'B-dehum-豁免', 'count=' + idx.ch
 // C. EN animal 共现约束被移除 → 良性英文句恢复误 block（修前状态）
 const C = 'Dogs and cats are the most common pets.';
 must(idx.checkDehumanization(C).count === 0, 'C-animal-豁免', 'count=' + idx.checkDehumanization(C).count);
-must(idx.checkDehumanization('They are dogs and should be treated as such.').count >= 1, 'C2-animal攻击', 'animals');
+must(idx.checkDehumanization('She called them pigs and monkeys in the meeting.').count >= 1, 'C-animal-attack2', 'call');
+must(idx.checkDehumanization('They are dogs and should be treated as such.').count >= 1, 'C2-animal-eq', 'eq');
+must(idx.checkDehumanization('The disobedient ones are just vermin to be cleaned up').count >= 1, 'C2-animal-disobedient', 'diso');
 // D. 攻击侧守卫：三条修复不得削弱真实拦截
 must(gate('去死吧你').gate.action === 'block', 'D-hate攻击', gate('去死吧你').gate.action);
 must(idx.checkDehumanization('不给钱我就以死相逼').count >= 1, 'D-yss攻击', 'yss');
