@@ -101,6 +101,13 @@ const { checkAIMisuse } = require('./ai-misuse.js');
 const { checkReversibility } = require('./reversibility.js');
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
+// [v6.7.110] agent 规避/作弊辨别（reward hacking）
+// 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
+// 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
+// 本维度管"为让检查通过而规避/伪装/走非预期渠道"。混维会让归因模糊、
+// 后续无法分别调阈值。覆盖率实测（6.7.109）：16 个论文手法样本里 14 个
+// 完全无信号，真缺口。
+const { checkRewardHacking } = require('./reward-hacking.js');
 const { detect } = require('./shield/ai-writing-tell.js');
 
 // [v7.0.0] 工作包 B: 间接注入检测
@@ -288,6 +295,10 @@ function discriminate(text, evidence = [], contentMode) {
   // [v6.7.70] 危险指令判别（心虫 decision.decide 选定，0.93 分）
   const _di = require('./dangerous-instruction.js');
   const di = _dual(_di.checkDangerousInstruction);
+  // [v6.7.110] agent 规避/作弊辨别（arXiv:2609.22978 DSec §6.4-6.5）
+  // 刻意与 di 分维：di 管"明确危险指令"，rh 管"为让检查通过而规避/伪装"。
+  // 用 _normText 而非 _dual：本模块自带中英双表与语境豁免，不需要双通道归一。
+  const rh = checkRewardHacking(_normText);
   const cs = _dual(checkCodeSecurity, "code_security");
   const dh = _applyPedagogyRelaxation(checkDehumanization(_normText), "dehumanization", pedagogyRelaxation);
   const bs = _applyPedagogyRelaxation(checkBullshitRecognition(_normText), "bullshit", pedagogyRelaxation);
@@ -361,7 +372,10 @@ function discriminate(text, evidence = [], contentMode) {
     {score: idt.score, name:'induced_trust'},
     {score: cvi.score, name:'coverup_induction'}
   ,
-    {score: di.score, name:'dangerous_instruction'}
+    {score: di.score, name:'dangerous_instruction'},
+    // [v6.7.110] reward_hacking 参与判定（不再犯 clickbait/perfect_error 的错：
+    // 只在 dimensions/summary 登记但不在 allDims，命中永远进不了 findings）
+    {score: rh.score, name:'reward_hacking'}
   ];
   // 证据维度 polarity 相反（高分=好），不在惩罚组
   // 触发惩罚计算：base=1.0，每个 score>0.2 的维度按严重度扣分
@@ -412,7 +426,8 @@ function discriminate(text, evidence = [], contentMode) {
     social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da,
     instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa,
     privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, pseudo_profundity: ppf, perfect_error: pe, premature_termination: pt,
-    phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di
+    phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
+    reward_hacking: rh
   };
   const findings = [];
   for (const d of allDims) {
@@ -534,6 +549,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 流程已简化），本质是覆盖调用方约束。与 prompt_injection 同级，
     // 但不含"忽略指令"这类关键词——实战最常见的隐蔽形态。
     'indirect_injection',
+    // [v6.7.110] agent 规避/作弊：绕过检查、伪造内部通道、翻日志找答案、
+    // 覆写系统二进制。arXiv:2609.22978 (DSec) §6.4 生产实测手法，
+    // 是 agent 时代最核心的失效模式，与安全红线同级。
+    'reward_hacking',
   ]);
   // rewrite 级维度：需要改写后再输出
   const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency', 'absolute_claim', 'induced_trust',
@@ -620,6 +639,7 @@ function discriminate(text, evidence = [], contentMode) {
       empty_answer: ea, moral_foundations: mf, prompt_injection: pi, code_security: cs, dehumanization: dh,
       bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
       phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
+      reward_hacking: rh,
       // [v6.7.84] 补登记：indirect_injection 此前算过、findings 也推过，
       // 却从未进 dimensions/summary（守卫 dimension-registry-guard 抓出）
       indirect_injection: ii,
@@ -644,6 +664,9 @@ function discriminate(text, evidence = [], contentMode) {
       uc.count ? uc.count + ' 处无依据断言':'',
       // [v6.7.84] 补登记：ii（indirect_injection）同上
       ii && ii.score ? ii.score + ' 分间接注入' : '',
+      // [v6.7.110] reward_hacking 补登记 summary（同 v6.7.84 的 uc/ii：
+      // 只进 dimensions 不进 summary 会让登记守卫漏报，也会让人看不到）
+      rh.count ? rh.count + ' 处规避作弊' : '',
     ].filter(Boolean).join('；') || '未发现明显问题',
   };
 }

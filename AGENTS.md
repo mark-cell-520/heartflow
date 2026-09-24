@@ -111,12 +111,12 @@ read only one field, read `gate.action`.
 ## The 50 dimensions
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
-> `VERIFY_DIMS` sets in `src/index.js` (v6.7.101).** The three tiers add up to 45;
+> `VERIFY_DIMS` sets in `src/index.js` (v6.7.110).** The three tiers add up to 46;
 > the other 5 dimensions are scored but do not force a gate action.
 
-**Block-level (9):** hate_speech, dehumanization, prompt_injection, code_security,
+**Block-level (10):** hate_speech, dehumanization, prompt_injection, code_security,
 deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
-indirect_injection
+indirect_injection, reward_hacking
 
 **Rewrite-level (10):** emotional_manipulation, gaslighting, double_bind,
 victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust,
