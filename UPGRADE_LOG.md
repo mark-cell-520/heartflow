@@ -84,6 +84,13 @@ run-all 总数从 2966 → 2994（本轮 +28 条断言）。
 
 ### 五、遗留
 
+0. **finish 未全绿的唯一条 objection（需用户放行）**：`README 测试数与缓存
+   一致: README 2966 vs 缓存 2993`。README.md 在硬边界清单内，本轮不写。
+   这是自第 23 轮起连续第三轮的同一阻塞：**每次给测试套件加断言，
+   这个 objection 必然复现**，而产品代码每次都必须加断言。
+   → 需在下一轮或由用户把 README 的 `2,966 passing tests` 改为 `2,993`，
+     否则 finish 永远无法全绿、`lastGreen` 永远为 false。
+   （本轮已顺手把口径矛盾写在这里，避免下一轮重复定位。）
 1. **中文 instrumental_reasoning 成语俗语漏判**（本轮候选 A，0.79 分）：
    12 条成语式表述只命中 1 条（且是 moral_foundations 顺带）。
    需要新建成语/俗语判据，改动面大、误伤风险高，但这是 REWRITE 级
