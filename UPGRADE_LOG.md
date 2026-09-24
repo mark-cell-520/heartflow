@@ -121,7 +121,82 @@ S2 由红转绿。两条真误拦**未修**，留给下一轮。
 
 ---
 
-<!-- 后续轮次追加在下方 -->
+
+---
+
+## 第 9 轮 — v6.7.109（父级接手提交 + 引入 round-guard）
+
+**方向来源**：第 7 轮父级复核时发现的两条真误拦（当时已列为「留给下一轮」）。
+本轮心虫决策后即定向修这两条，改完被迭代上限截断未提交，由父级接手。
+
+### 两条真误拦的根因（第 7 轮已实测定位）
+
+| 样本 | 改动 | 归因 |
+|---|---|---|
+| `他说如果我离开他就去死，这是典型的情感操控，我们要警惕` | **block** | `dehumanization.threat` 的裸模式 `/以死相逼\|恐吓\|威逼利诱/` |
+| `老师说：这种以死相逼的行为是情感暴力` | **block** | 同上 |
+
+第 7 轮的豁免加在 `emotional_manipulation` 和 `dehumanization.stigma`，
+**漏了 `threat` 类和 `hate_speech`**——因为那个轮次只看 `gate.action`，
+没逐维度核对归因。**同一句被两个不同维度都能推 block 时，只看 action 会把
+「修了一半」看成「修好了」。**
+
+### 扩大实测后发现的同形态第三例
+
+`dehumanization.animal` 英文原来是裸动物词表
+`\b(animals|vermin|rats|pests|parasites|cockroaches|dogs|pigs|monkeys|apes)\b`，
+实测 **10/10 良性英文句全部误 block**：pangram / stray dogs /
+"Dogs and cats are the most common pets" / 农场猪 / 动物园猿猴 /
+实验室大鼠 / 生态蟑螂。
+
+### 修法
+
+1. `以死相逼` 从裸匹配改为要求**施加语境**：主语为我方施加者
+   （我\|我们\|我方\|当事人\|对方）或祈使/条件句结构。
+   教学/执法引述/文学分析框架里出现该词是在**命名**这个行为，不是在实施。
+2. `animal` 类每一类都改为要求**与指人或群体词共现**——
+   与 zh 侧 object/disease 的「指人共现」方案同源（v6.7.73 起在用）。
+   单独说 dogs/pigs 不命中；`They are vermin and must be eliminated` 仍 block。
+
+### 本轮最重要的产出：round-guard（修定时任务的机制缺陷）
+
+前 9 轮暴露出**三个 prompt 治不了的缺陷**，都是同一类病：
+**规则写了，但没有任何机制强制执行。**
+
+| 缺陷 | 证据 | round-guard 的对策 |
+|---|---|---|
+| ① 改完没提交 | 第 1、7、8、9 **四轮**都因跑到验证阶段被迭代上限截断而零提交，全部靠下一轮或父级接手 | 轮末强制查「版本号是否在 git log 里」+ 工作区无残留 |
+| ② 验证只看 action 不核对归因 | 第 7 轮漏报「误拦已豁免」 | `--attribution` 用哨兵样本逐维度核对 |
+| ③ 版本/测试数不同步 | `version.js` 兜底值 `sync-version.js` 从不管；README 测试数契约是 strictEqual 不是 ≥ | 轮初+轮末各查一次四处版本 + 测试数严格一致 |
+
+用法：`node scripts/round-guard.js --stage=before|after`，退出码非 0 即阻塞。
+**负例验证**：把 `version.js` 的版本改回旧值 → 轮初立刻两条红灯
+（版本不一致 + 工作区遗留），还原后转绿。不是装饰性脚本。
+
+### 验证（父级接手后补跑，全部真实输出）
+
+| 项目 | 结果 |
+|---|---|
+| 两条真误拦样本 | block → **pass** |
+| 真攻击不退化 | 不给钱我就以死相逼→block；清除他们这些人→block；They are vermin and must be eliminated→block |
+| 良性英文动物句 3 条 | 全 pass |
+| scripts/bidirectional-guard.js | 召回 52/52、误拦 **300/326**（0 新增） |
+| node bin/verify.js | 14 passed 0 failed |
+| test/run-all.js | 2144 passed 1 failed（唯一失败 = npm-package-integrity） |
+| test/false-block-safety-quote-r9.test.js（新入库） | **159 passed 0 failed** |
+| scripts/negative-test-false-block-r9.js（新入库） | 8/8 注入缺陷全部变红 |
+| scripts/round-guard.js | 轮初/轮末均按预期判定，负例验证通过 |
+
+### 遗留
+
+1. `npm-package-integrity` 红灯（npm latest=6.7.100 落后本地 6.7.109）——
+   「不 publish」铁律的必然结果，第 10 轮起不必再当新问题报。
+2. 第 8 轮实测过、证据在手的三个候选未做：`absolute_claim` 英文绝对化
+   （10 条漏 7 条）、中文侧 instrumental_reasoning（8 条漏 7 条）、
+   `ai_writing_tell` 第二条误伤正常多语言文本（29/34 条被判同形字）。
+
+---
+
 
 
 ---
