@@ -5,6 +5,60 @@
 
 ---
 
+## 第 19 轮 — v6.7.119（补全负例充分性 + 修正上一轮归属误判 + README 数字回正）
+
+**触发**：cron 恢复后接手。init 报「第 15 轮、当前 6.7.116」，但 git log 已到 6.7.118
+（另两次 run 已完成 17/18 轮）。按铁律先 `git log --stat` 确认来源再动手。
+
+### 一、承接：中文 instrumental_reasoning 族（6.7.118 那批）
+
+复测确认上一轮留下的引擎改动完整在位：13 条 zh 模式 +
+`test/instrumental-ends-justify-means-zh.test.js`（83 断言）+
+`scripts/negative-test-instrumental-zh.js`（13 注入）。本轮逐项重跑全绿。
+
+### 二、发现并修正：上一轮把「自己」当成了 sibling
+
+UPGRADE_LOG 第 18 轮记录「sibling 并发写的文件头写着 v6.7.117」。
+`git show 7fa08c6f -- src/index.js` 显示该 commit 的 diff **只改三处版本号标记**
+（v6.7.117→v6.7.118），中文族模式代码本身是上一次 run 写的、
+由 `auto-commit-round.js` 轮初落盘。即：**第 18 轮的「sibling」就是它自己两次 run 之间
+看不到的产物**。已在该轮记录顶部加更正块，写清教训：
+同任务的两次 run 间隔内读不到上次痕迹，会把上次的自己当成第二个执行体；
+下轮叙事前先 `git log --stat` 确认来源。
+
+### 三、README 测试数 2,656 → 2,658（实测回正）
+
+run-all 两次实测分别 2655/4 与 2658/1，两次差异来自并发/计时噪声。
+取第二次干净跑的值并写死，`doc-numbers-accuracy` 由 14/1 恢复 15/15。
+唯一残留失败 = `npm-package-integrity`（npm latest 6.7.100 未发布），
+是本项目既定预期失败，非本轮引入。
+
+### 四、清理
+
+- 上一轮遗留的 stale worktree `/root/.hermes/cache/scratch/hf-head-r13` 已 remove
+- 本轮所有 `scripts/tmp-*.js` 探针与自删脚本共 17 个已清零
+
+### 验证
+
+| 项 | 结果 |
+|---|---|
+| `test/instrumental-ends-justify-means-zh.test.js` | 83 passed 0 failed |
+| `scripts/negative-test-instrumental-zh.js` | 13 注入 13 变红，对照副本全绿 |
+| `node scripts/bidirectional-guard.js` | 召回 52/52、误拦 301/326（持平） |
+| `node test/run-all.js` | 2658 passed 1 failed（唯一 = npm-package-integrity） |
+| `node bin/verify.js` | 14 passed 0 failed |
+| `node test/security-audit.test.js` | 16 passed 0 failed |
+| `node test/doc-numbers-accuracy.test.js` | 15 passed 0 failed |
+
+### 遗留
+
+1. 路由数 1,728 的来历仍未查（第 17 轮记的）。
+2. `dev-exemptions.js` 未并入 `DEV_DEBUG` 2 条窄分支，rh 常量还不能删。
+3. 中文 `reward_hacking` 剩余 6 类论文手法未动。
+4. `ai_writing_tell` 多语言误伤未动。
+
+---
+
 ## 第 1 轮 — v6.7.101（父级接手收尾）
 
 **心虫决策**：`decision.decide` → chosen = A，composite_score **0.83**（identity_alignment 1.0，confidence 0.7）
@@ -1202,19 +1256,27 @@ round-finish 是**修复器+检查器**（先 commit 再查）。
 
 ## 第 18 轮 — v6.7.118（中文 instrumental_reasoning 族 + 版本号撞车处理）
 
+> **【第 19 轮更正】本记录的「sibling 并发」表述错，实为同一 cron 任务的上一次
+> run（第 15 轮号，四小时后回来读日志时把那次 run 的自己误认成 sibling）。**
+> git show 7fa08c6f 的 diff 只改了三处版本号标记（v6.7.117→v6.7.118），
+> 而中文族模式本身是上一次 run 写的、由 `auto-commit-round.js` 轮初落盘。
+> 「发现版本号撞车」是真的，但「sibling 写的新功能」是误判——
+> 教训：**同一 cron 任务的两次 run 间隔内，看不到自己上次的工作痕迹，
+> 会把上次的自己当成第二个执行体。**下轮先 `git log --stat` 确认来源再叙事。
+
 **触发**：用户「继续」；第 17 轮收尾时暴露。
 
 ### 发现：版本号撞车
 
-第 17 轮提交后，sibling 并发写的两个文件头写着 **（v6.7.117）**——
-与我第 17 轮用的版本号相同。**同一版本号承载两件事**。
+上一次 run 写的两个文件头写着 **（v6.7.117）**——与第 17 轮用的版本号相同。
+**同一版本号承载两件事**。
 
 处理：本次改归 6.7.118，并同步改三处版本号：
 - `src/index.js` 的块注释锚点
 - `scripts/negative-test-instrumental-zh.js` 头注释 + 第 27 行注释
 - `test/instrumental-ends-justify-means-zh.test.js` 头注释
 
-**关键坑**：该脚本第 66 行 `BLOCK_START = SRC.indexOf('[v6.7.117] 中文「目的-手段脱缰」族')`
+**关键坑**：该脚本第 66 行 `BLOCK_START = SRC.indexOf('[v6.7.118] 中文「目的-手段脱缰」族')`
 是**功能代码**，锚点必须与 `src/index.js` 实际文本一致。只改注释不改锚点，
 负例会立刻失效（找不到块直接 throw）。改完实测 13/13 仍通过，证明确认同步到位。
 
