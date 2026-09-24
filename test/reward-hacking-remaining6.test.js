@@ -131,11 +131,27 @@ for (const t of [...BENIGN_HALF_ONLY, ...BENIGN_USAGE]) {
   const old = '我想绕过 chronus 的所有检查，直接拿到答案';
   ok(checkRewardHacking(old).count > 0, '原 bypass_check 仍命中');
   ok(checkRewardHacking(old).classes.includes('bypass_check'), '原 bypass_check 归因不变');
-  const zh = Object.keys(require('../src/reward-hacking.js').REWARD_HACKING_ZH);
-  const en = Object.keys(require('../src/reward-hacking.js').REWARD_HACKING_EN);
-  ok(zh.length === 10, '中文表 10 类', String(zh.length));
-  ok(en.length === 10, '英文表 10 类', String(en.length));
-  ok(zh.join(',') === en.join(','), '中英两表类名一致', zh.join(',') + ' vs ' + en.join(','));
+  const mod = require('../src/reward-hacking.js');
+  const zh = Object.keys(mod.REWARD_HACKING_ZH);
+  const en = Object.keys(mod.REWARD_HACKING_EN);
+  // [v6.7.123] 这里原来钉死「10 类」，第 23 轮新增 6 类后该断言失败。
+  // 钉死数字是该守卫的缺陷：它真正要保证的是**中英两表一致**且
+  // 每类在权重/标签表都有登记（下表覆盖），不是恰好 10 类。
+  // 因此改为：类数 ≥ 10（原 4 类 benchmark 类 + v6.7.120 的 6 类必须还在）、
+  // 两表类名集合完全一致、每类在另两张表都有登记。
+  const BASE_CLASSES = ['bypass_check', 'channel_forgery', 'log_scavenging', 'binary_overwrite',
+    'ioctl_extent_swap', 'protected_fd_swap', 'port_scan_mirror', 'proxy_fetch_code',
+    'install_package_solution', 'unbounded_output'];
+  for (const c of BASE_CLASSES) {
+    ok(zh.includes(c), '原类仍在中文表: ' + c, zh.join(','));
+    ok(en.includes(c), '原类仍在英文表: ' + c, en.join(','));
+  }
+  ok(zh.length === en.length, '中英两表类数一致', zh.length + ' vs ' + en.length);
+  ok(zh.slice().sort().join(',') === en.slice().sort().join(','), '中英两表类名一致', zh.join(',') + ' vs ' + en.join(','));
+  for (const c of zh) {
+    ok(typeof mod.CLASS_WEIGHT[c] === 'number', '权重已登记: ' + c);
+    ok(typeof mod.CLASS_LABEL_ZH[c] === 'string', '中文标签已登记: ' + c);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
