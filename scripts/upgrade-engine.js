@@ -76,8 +76,38 @@ function acquireLock(who) {
       return acquireLock(who);
     }
     const holder = readJson(LOCK, {});
-    console.log(`  ❌ 锁被 ${holder.holder || '?'} 持有（${Math.round(age / 60000)} 分钟前，pid=${holderPid || '?'}）`);
-    console.log('     本轮不启动写操作，避免两个执行体竞争同一份工作。');
+    // [v6.7.126 第 59 轮] 无人值守改造：拿不到锁时**阻塞等待**而非退出本轮。
+    // 旧行为：打印「本轮不启动写操作」然后 exit 0 —— 那一轮被静默跳过，
+    // 21 分钟排期下等于每两次碰撞就丢一轮产出。用户明确要求：
+    // 「上一个任务未完成，定时任务就不触发，等待任务完成再触发」。
+    // 所以这里改成等到锁释放（或被接管）为止，让本轮真正排到队。
+    // 上限 90 分钟：超过说明持有者已僵（正常一轮 10-20 分钟），交给下面的
+    // 陈旧接管逻辑，避免无限期挂住 gateway 的 cron worker。
+    const WAIT_CAP_MS = 90 * 60 * 1000;
+    const started = Date.now();
+    let waited = 0;
+    while (Date.now() - started < WAIT_CAP_MS) {
+      // 等待期间持有者可能已死 → 走上面的接管分支
+      let hp = null;
+      try { hp = readJson(LOCK, {}).pid; } catch { /* 锁可能刚被释放 */ }
+      if (hp && !_lockPidAlive(hp)) {
+        console.log(`  ⚠️ 等待中检测到持有进程 ${hp} 已死 → 立即接管`);
+        fs.rmSync(LOCK, { force: true });
+        return acquireLock(who);
+      }
+      try { fs.statSync(LOCK); } catch {
+        console.log(`  ✅ 锁已释放（等待 ${Math.round(waited / 1000)}s）→ 获得锁`);
+        return acquireLock(who);
+      }
+      const slept = 15000;
+      // 同步等待（acquireLock 不是 async，且调用链上是同步 CLI 入口）
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, slept);
+      waited += slept;
+      if (waited % 60000 < slept) {
+        console.log(`  ⏳ 等待上一轮完成中… 已等 ${Math.round(waited / 60000)} 分钟（上限 90 分钟）`);
+      }
+    }
+    console.log(`  ❌ 等待 90 分钟仍未获得锁，本轮放弃（下一轮重试）`);
     return false;
   }
 }
