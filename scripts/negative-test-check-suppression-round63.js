@@ -207,23 +207,26 @@ function main() {
         fs.writeFileSync(SRC, orig); // 还原后继续下一条
         continue;
       }
-      // 注入：把 needle（/pattern 开头）+ 紧随的 flags（i）整段替换成
-      // 永不匹配的占位。⚠️ needle 只含 pattern 不含 flags，直接换成
-      // /(?!x)x/ 会留下裸 i → "Invalid regular expression flags"。
-      // 必须把 flags 一并吃掉（第 63 轮实测出来的坑）。
+      // 注入：把 needle（pattern 前缀）+ 其后的剩余 pattern + flags 整段替换。
+      // ⚠️ needle 只是 pattern 的**前缀**，indexOf(',') 会命中 pattern 内部的
+      //    {0,12} 逗号——必须从起点向后找 pattern 的结束斜杠（/i, 或 /i\n）。
+      //    第 63 轮实测 20/20 全因此报 "Invalid regular expression flags"。
       const start = src.indexOf(c.needle);
-      // needle 后到第一个逗号之间就是 flags（通常只有 i）
-      let end = src.indexOf(',', start + c.needle.length);
-      if (end < 0) {
-        console.error(`[${c.id}] needle 后找不到逗号边界`);
+      // regex 字面量结束：needle 之后的第一个不在字符类内的 '/' + flags
+      const closeRe = /\/\s*(i?)\s*,[\s\n]/g; // 行尾逗号前的 /flags,
+      closeRe.lastIndex = start + c.needle.length;
+      const cm = closeRe.exec(src);
+      if (!cm) {
+        console.error(`[${c.id}] needle 后找不到正则结束边界`, );
         anomaly++;
         fs.writeFileSync(SRC, orig);
         continue;
       }
-      const flags = src.slice(start + c.needle.length, end).trim(); // 通常为 'i'
+      const end = cm.index; // '/' 的位置
+      const flags = cm[1] || '';
       const injected = src.slice(0, start)
         + '/(?!NEVER)x/' + flags
-        + src.slice(end);
+        + src.slice(end + 1 + flags.length);
       fs.writeFileSync(SRC, injected);
       let fn;
       try {
