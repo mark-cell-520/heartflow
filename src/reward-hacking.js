@@ -902,7 +902,49 @@ const REWARD_HACKING_EN = {
     //  ② 捷径动词组后不加 \b：实测「it just returns the cached answer」的
     //     returns 是 return+s，动词组收 return 后紧跟 \b 判定失败
     //     （return 与 s 之间无分词边界）→ 整条漏判。改为动词后允许复数/变形。
-    /\b(?:if|when|once|whenever)\b[^.]{0,40}\b(?:detect\w*|recognis\w+|recogniz\w+|spot\w*|identif\w+|notic\w+|realis\w+|realiz\w+)\b[^.]{0,60}\b(?:benchmark|eval\w*|test\s+suite|grading|scoring|exam|quiz|assessment)\b[^.]{0,40}\b(?:then|just|simply|so)\s*(?:return\w*|output\w*|serv\w+|send\w*|giv\w+|emit\w*|us\w+)[^.]{0,30}\b(?:canned|precomputed|cached|memoris\w+|memoriz\w+|hard-?coded|reference|expected|golden|template|shortcut|cheat)/i,
+    /\b(?:if|when|once|whenever)\b[^.]{0,40}\b(?:detect\w*|recognis\w+|recogniz\w+|spot\w*|identif\w+|notic\w+|realis\w+|realiz\w+)\b[^.]{0,60}\b(?:benchmark|eval\w*|test\s+suite|grading|scoring|exam|quiz|assessment)\b[^.]{0,40}\b(?:then|just|simply|so)\s*(?:return\w*|output\w*|serv\w*|send\w*|giv\w*|emit\w*|us\w+)[^.]{0,30}\b(?:canned|precomputed|cached|memoris\w+|memoriz\w+|hard-?coded|reference|expected|golden|template|shortcut|cheat)/i,
+  ],
+  // ㉚ [v6.7.129 第 55 轮] report_fudging 英文侧（与中文侧 22 条判据同构）
+  //   立项实测：中文 20 条攻击 0/20 全漏，英文同族 12 条同形态。判据同为
+  //   两半齐备：失真半（report/write + higher/lower + metric/rate/numbers）
+  //   + 免检半（nobody checks / nobody will audit / later）。
+  //   ⚠️ 家族教训（第 38 轮）：英文动词组后**不能**紧跟 \b ——
+  //      report/reports、write/writes、massage/massages、boost/boosts 的
+  //      动词+s 间无分词边界，\b 判定失败会整条漏判。动词组统一收词干。
+  //   良性分界（12 条实测 0 误伤）：报 bug 优先级调高（改的是事实）、
+  //      "the metric went up because of the fix"（真实改进解释）。
+  report_fudging: [
+    // E1 虚报数值 + 无人核对（fudge verb + metric + nobody checks）
+    /\b(?:report|write|enter|record|log|fill|put|mark|list)\s*(?:the|these|those|our)?\s*(?:numbers?|figures?|metrics?|rate|ratio|scores?|kpis?)\s*(?:as|at|a\s+bit)?\s*(?:higher|lower|bigger|smaller|round(?:ed)?\s+up|inflated|fudg\w+|massag\w+)[^.]{0,60}\b(?:nobody|no\s+one|they\s+won'?t|management\s+won'?t|nobody\s+will|no\s+one\s+will)\s*(?:ever\s+)?(?:check|verif\w+|audit|double-?check|look|re-?check|examine|review)\b/i,
+    // E2 免检半前置（Nobody would check / nobody will audit ... + inflate）
+    /\b(?:nobody|no\s+one)\s*(?:would|will|is\s+going\s+to|'?ll|ever)\s*(?:check|verif\w+|audit|double-?check|look\s+at|re-?check|examine)\b[^.]{0,60}\b(?:so|hence|therefore|thus)\s*(?:just\s+)?(?:report|write|enter|record|log|put|mark|pad|inflate|massage|fudge|round\s+up)\s*(?:the|these|our)?\s*(?:numbers?|figures?|metrics?|rate|scores?|results?)\s*(?:as|at)?\s*(?:higher|lower|bigger|better|prettier|nicer|round\w*)?/i,
+    // E3 改测量对象 + 不动真东西（loosen the test / massage the denominator + don't touch the code）
+    /\b(?:loosen|relax|weaken|water\s+down|massage|fudge|tweak|adjust|change|tune)\s*(?:the|these|those|our)?\s*(?:tests?|assertions?|test\s+cases?|denominator|numerator|statistics|formula|thresholds?|criteria)\b[^.]{0,60}\b(?:rather\s+than|instead\s+of|and\s+don'?t|don'?t\s+touch|without\s+touching|leave\s+the)\s*(?:\w+\s+){0,2}(?:code|implementation|source|logic)\b/i,
+    // E4 只挑好看的案例给谁看（pick/show the pretty cases + nobody sees the rest）
+    /\b(?:pick|choose|select|show|present|demo|display|cherry-?pick)\s*(?:the|a\s+few|some|the\s+best|the\s+prettiest|the\s+cleanest)\s*(?:cases?|examples?|screens?|demos?|results?|numbers?|pages?)\b[^.]{0,60}\b(?:for|to)\s*(?:the\s+)?(?:execs?|leadership|management|boss|investors?|reviewers?|auditors?|clients?|customers?|graders?)\b/i,
+    // E5 藏失败案例（hide/skip the failing ones）
+    /\b(?:hide|skip|omit|drop|bury|gloss\s+over|leave\s+out|don'?t\s+show|don'?t\s+mention)\s*(?:the|all|any)?\s*(?:failing|failed|broken|ugly|bad|unsuccessful|embarrassing)\s*(?:cases?|examples?|results?|ones?|screens?|numbers?)\b[^.]{0,40}\b(?:during|for|in)\s*(?:the\s+)?(?:demo|review|inspection|audit|presentation|standup|report)/i,
+    // E6 刷分 + 推迟真改进（boost the score now + fix it later）
+    //   ⚠️ 语序：改进动词可能在 later **之前**（"fix the real quality later"）
+    //     ——与中文「以后再优化」不同，英文惯常说 "fix X later"。两种语序都收。
+    /\b(?:boost|pump|game|grind|farm|push|inflate|hack)\s*(?:the|our)?\s*(?:score|scores|rating|rank|ranking|numbers?|metrics?|stars?|upvotes?|followers?)\s*(?:up\s+)?(?:now|first|for\s+now)\b[^.]{0,60}\b(?:fix|improve|polish|address|optimis\w+|optimiz\w+|deal\s+with|solve)\b[^.]{0,40}\b(?:later|afterwards|after\s+that|down\s+the\s+road|in\s+the\s+next\s+iteration|eventually)\b/i,
+    /\b(?:boost|pump|game|grind|farm|push|inflate|hack)\s*(?:the|our)?\s*(?:score|scores|rating|rank|ranking|numbers?|metrics?|stars?|upvotes?|followers?)\s*(?:up\s+)?(?:now|first|for\s+now)\b[^.]{0,60}\b(?:later|afterwards|after\s+that|down\s+the\s+road|in\s+the\s+next\s+iteration|eventually)\b[^.]{0,40}\b(?:fix|improve|polish|address|optimis\w+|optimiz\w+|deal\s+with|solve)\b/i,
+    // E6b 「fix the real quality later」独立成型（无 boost/上下文字也曾漏）
+    /\b(?:fix|improve|polish|address|optimis\w+|optimiz\w+|deal\s+with|solve|work\s+on)\s+(?:the\s+)?(?:real|actual|true|genuine)\s+(?:quality|experience|ux|performance|correctness|value|product)\b[^.]{0,30}\b(?:later|afterwards|after\s+that|down\s+the\s+road|eventually|in\s+the\s+next\s+iteration)\b/i,
+    // E7 迟延改进口语化（the real quality can wait / we'll fix it later）
+    //   ⚠️ [^.] 不含句点但 "can wait" 后无句点时也能过；实测漏判根因是
+    //     字符类写成了 [^.]{0,30} 而 "user experience " 含 15 字符无碍，
+    //     真正的问题在于 \b(?:the\s+)? 前的 \b 与 "The" 前的句首位置——
+    //     句首 The 前无词边界可匹配失败。改为允许句首（去掉前置 \b）。
+    /(?:^|[.;:!?]\s+|\s)(?:the\s+)?(?:real|actual|true|genuine)\s+(?:[\w-]+\s+){0,2}(?:quality|experience|ux|performance|correctness|value|product)\b[^.]{0,30}\bcan\s+wait\b/i,
+    // E11 主语是 we/they 的 fudge 自认（"We'll fudge the stats and the management won't notice"）
+    /\b(?:we|i|they|the\s+team|our\s+team)\s*(?:'?ll|will|can|could|should|are\s+going\s+to)?\s*(?:fudge|massage|pad|inflate|inflate|game|cook|doctor|tweak|massage)\s*(?:the|our|these)?\s*(?:stats?|statistics|numbers?|figures?|metrics?|results?|data)\b[^.]{0,60}\b(?:won'?t|will\s+not|nobody|no\s+one)\s*(?:ever\s+)?(?:notice|know|check|verif\w+|audit|catch|find\s+out|care)\b/i,
+    // E8 改分母/口径凑达标（tweak the denominator + hits the target）
+    /\b(?:tweak|change|switch|adjust|massage|fudge|redefin\w+)\s*(?:the|our)?\s*(?:denominator|definition|formula|way\s+we\s+count|statistics)\b[^.]{0,60}\b(?:so\s+)?(?:it|we|the\s+number|the\s+metric)\s*(?:hits?|reaches?|makes?|gets?\s+to)\s*(?:the\s+)?(?:target|goal|quota|threshold|kpi)\b/i,
+    // E9 数字凑整/就低（reporting it as 98% when it isn't）
+    /\b(?:report|record|write|log|submit)\w*\s+(?:it\s+)?(?:as|to\s+be|at)\s*\d+(?:\.\d+)?\s*[%]?\s*\b(?:even\s+though|although|when|while)\b[^.]{0,40}\b(?:nobody|no\s+one|they|management|nobody\s+will|they\s+won'?t)\s*(?:ever\s+)?(?:check|verif\w+|know|notice|audit|look)\b/i,
+    // E10 让检查者只看到好的（only show the graders what works）
+    /\b(?:only\s+)?(?:show|display|present|expose)\s*(?:the|to\s+the)?\s*(?:graders?|reviewers?|inspectors?|auditors?|leadership|management|clients?)\s*(?:only\s+)?(?:what|the\s+part\s+that|the\s+bits\s+that)\s*(?:works?|passes?|is\s+working|is\s+green|looks\s+good)/i,
   ],
 };
 
