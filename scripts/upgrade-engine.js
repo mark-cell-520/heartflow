@@ -127,7 +127,28 @@ function versionSync() {
   return { ok: v === pkg && v === skill && v === vjs, detail: { VERSION: v, packageJson: pkg, SKILLmd: skill, 'version.js': vjs } };
 }
 
-// ─── 检查项（全部可机器判定） ───────────────────
+// ─── 检查项（全部可机器判定） ────────────────────
+// [v6.7.126 第 58 轮] README 测试数自动记账：finish 跑这项检查前，先把
+// data/test-count.json 的实测 passed 同步进 README 横幅。此前这个门禁是
+// **结构性死锁**：测试数由 run-all.js 产生（机器），README 却在 prompt 的
+// 硬边界「不写 README.md」里（人不许改），于是第 55/56/57/58 轮连续四轮
+// 报同一个 objection——3606 vs 3652，每轮都白丢一次 finish 全绿。
+// 机器能判定的记账必须由机器做，不占 LLM 的迭代预算。
+function syncReadmeTestCount() {
+  const readme = path.join(ROOT, 'README.md');
+  const cnt = readJson(path.join(ROOT, 'data/test-count.json'), {});
+  if (!cnt.passed) return { synced: false, reason: '无 test-count 缓存' };
+  let s = fs.readFileSync(readme, 'utf8');
+  const want = cnt.passed.toLocaleString('en-US');
+  const m = s.match(/([\d,]+) passing tests/);
+  if (!m) return { synced: false, reason: 'README 无 passing tests 行' };
+  if (m[1] === want) return { synced: false, reason: '已一致' };
+  const before = m[1];
+  s = s.replace(/([\d,]+) passing tests/, `${want} passing tests`);
+  fs.writeFileSync(readme, s);
+  return { synced: true, before, after: want };
+}
+
 const CHECKS = {
   '版本四处一致': () => { const r = versionSync(); return { ok: r.ok, msg: r.ok ? `四处一致 = ${V()}` : `不一致 ${JSON.stringify(r.detail)}` }; },
   '版本已进 git log': () => {
@@ -229,6 +250,16 @@ function cmdFinish() {
   const acr = path.join(ROOT, 'scripts', 'auto-commit-round.js');
   if (fs.existsSync(acr)) {
     console.log('\n── ① 自动落盘 ──');
+    console.log(trySh('node scripts/auto-commit-round.js').trim());
+  }
+
+  // ①.5 README 测试数自动记账（机器做的事，不留给 LLM）
+  // 必须在 ② 之前跑：否则检查读到的还是旧数字，第 55-58 轮的死锁重现。
+  const synced = syncReadmeTestCount();
+  if (synced.synced) {
+    console.log(`\n── ①.5 README 测试数自动记账 ──`);
+    console.log(`  📝 ${synced.before} → ${synced.after} passing tests（来源 data/test-count.json 实测）`);
+    // 记账后要把 README 一起落盘，否则「工作区已跟踪文件干净」会反过来报脏
     console.log(trySh('node scripts/auto-commit-round.js').trim());
   }
 
