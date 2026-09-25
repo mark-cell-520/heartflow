@@ -446,7 +446,12 @@ const PORT = Number(process.argv.includes('--port')
   ? process.argv[process.argv.indexOf('--port') + 1] : process.env.PORT) || 4318;
 const HOST = '127.0.0.1';
 
-http.createServer(async (req, res) => {
+// 异步通知模块（官方上线必做项）。仅在配置了支付宝公钥时启用；
+// 未配置时服务仍可运行，但不算生产就绪。
+const notifyModule = require('./a2m-notify.js');
+const NOTIFY_ENABLED = Boolean(AIPAY.alipayPublicKey);
+
+const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
@@ -489,6 +494,15 @@ http.createServer(async (req, res) => {
   console.log('端点:');
   console.log('  GET  /health           免费');
   console.log('  POST /v1/check/output  付费 ' + (PAID_RESOURCES['/v1/check/output'].price) + ' CNY/次');
+  if (NOTIFY_ENABLED) {
+    notifyModule.setupNotifyEndpoint(server, {
+      repo: orderRepository,
+      alipayExec,
+      alipayPublicKey: AIPAY.alipayPublicKey,
+    });
+  } else {
+    console.log('  ⚠️  异步通知未启用（缺 AIPAY_ALIPAY_PUBLIC_KEY）——生产上线前必须配置');
+  }
   console.log('');
   console.log('测试: curl -i -X POST http://127.0.0.1:' + PORT + '/v1/check/output -H "Content-Type: application/json" -d \'{"text":"毫无疑问这是唯一正确的解决方案"}\'');
 });
