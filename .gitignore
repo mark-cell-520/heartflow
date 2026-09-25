@@ -101,6 +101,11 @@ memory/.q-meta*
 memory/wal/*.log
 node_modules/
 run_bb_test.js
+
+# A2M 按量付费运行时产物（含订单与用户付费记录，禁止入库）
+data/aipay-orders/
+data/keys/
+.alipay-sandbox.json
 run_test.js
 self-verification.json
 src/utils/src/utils/
