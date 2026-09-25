@@ -37,7 +37,7 @@
 缺口本质：前 27 族都不覆盖「**识别输入属于评测**」这个动作本身
 （task_substitution 是换任务，eval_ruleset_masking 是换配置，evaluation_awareness 是有人看没人看）。
 
-### 四、改了什么（3 个 commit：`9f2246b0` 引擎 + `1f476c96` 主测试 + `4036122b` 负例守卫）
+### 四、改了什么（5 个 commit：`9f2246b0` 引擎中文族 + `4ded0967` 英文表同构 + `1f476c96` 主测试 + `4036122b` 负例守卫 + `7612245c` 测试补英文侧）
 
 `src/reward-hacking.js` REWARD_HACKING_ZH 新增第 28 族 `eval_input_shortcut`（8 条 pattern），
 统一落两半齐备结构：**识别半（评测来源）+ 捷径半（省事手法）**。
@@ -63,6 +63,18 @@
 | `security-audit` | **16 passed 0 failed** |
 | `doc-numbers-accuracy` | 14 通过 1 失败——唯一失败是 README 2966 vs 实际 3441（见遗留 1） |
 | 负例守卫 | **4 真守卫 / 4 有兜底 / 0 异常 / EXIT=0** |
+| 英文同构 | 攻击 **10/10** 命中、良性 **0/12** 误伤 |
+| run-all | **3453 passed 5 failed**（上轮 3441，+12 全为本轮新增断言） |
+
+5 个 run-all 失败与第 37 轮完全一致、零新增：doc-numbers(README 2966) 1、
+e2e 场景10 1、instrumental-idiom-en-round27 1、instrumental-idiom-zh-round26 1、
+npm-package-integrity 1。
+
+**过程实测补记（English 表，写进源码注释）**：补英文表时第一版 attack 4/5，
+逐段回退定位到根因——捷径动词组 `return|output|give…` 后紧跟 `\b`，
+而 "returns / gives / outputs" 是动词+s，**动词末字母与 s 之间不存在分词边界**，
+`\b` 判定失败导致整条漏判。中文侧不踩这个坑是因为中文没有词尾变形。
+同类根因在 5 条 pattern 上统一修（动词组改 `\w*`），修后 10/10。
 
 ### 六、遗留
 
