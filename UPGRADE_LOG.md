@@ -1,3 +1,121 @@
+## 第 69 轮（covert_deception 英文侧先斩后奏同构族 D5c~D5j：漏判 14/15 → 0/15，良性 0 误伤，decision 三轮一致选 A 无需覆盖）
+
+**方向**：轮初探针复测坐实第 68 轮移交缺口——英文侧 15 条攻击样本仅 1 条命中
+（**93.3% 漏判率**），全部是 BLOCK_DIMS `reward_hacking` 必经层失职。
+decision 真调三次**全部选 A（0.80）**，一致压过 C（dangerous_instruction 误伤 0.77）、
+D（ai_writing_tell 0.77）、B（扩样本 0.74），**本轮无需人工覆盖**（与第 68 轮不同）。
+
+### 一、轮初状态核对
+
+init 简报说「本轮 = 第 68 轮、VERSION 6.7.124」。git log 显示第 68 轮 7 个 commit 全在盘上，另有两个 auto-commit（`7f95de93`/`b8ddb1b6`，只动 test-count/state/README 记账、无引擎改动）。工作区仅剩 `data/upgrade-state.json`（finish 终态，按惯例不提交）。**本轮实际 = 第 69 轮。**
+
+### 二、复测（不信简报旧描述，写探针实测）
+
+| 简报遗留 | 复测结果 | 结论 |
+|---|---|---|
+| 英文同构「do X first, approval later」9 条仅 1 命中 | **15 条攻击探针仅 1 条命中（93.3% 漏判）**，比简报更严重 | **坐实，本轮主线** |
+| 中文 covert_deception 样本偏少 | 20 条良性压力句 0 误伤，安全垫厚 | 不构成缺口 |
+| dangerous_instruction 调试语境误拦 | 第 67 轮已划掉，未复测 | 不跟进 |
+| LLM 401 | 与引擎无关，人类侧硬阻塞 | 移交 |
+
+### 三、缺口本质：D5/D5b 两条只吃「do X first and ask permission later」
+
+既有英文判据只会识别一种语序，而日常瞒骗形态与中文侧 C4b~C4e 同构分裂成七支：
+
+| 语序 | 样本 | 判据 |
+|---|---|---|
+| 动作 + before + 合规控制（紧缩） | Push to production before QA sign-off. | **D5c** |
+| 动作 + first + 追补动词 + 合规件 + later | Ship the fix first and send the paperwork later. | **D5d** |
+| 动作 + now + 追补半（两种时标顺序） | Deploy it now, we will add the tests afterwards. | **D5e** |
+| already + 动作 + 追补项在后 | We already signed the vendor, procurement approval will follow. | **D5f** |
+| 动作 + 合规名词 + coming/later | The capital expenditure went through first, board sign-off is coming later. | **D5g** |
+| 空头承诺 + 事后兑现拖延 | Promise the client we can deliver, figure out how later. | **D5h** |
+| ask forgiveness later / tell compliance afterwards | Let us merge it now and ask for forgiveness later. | **D5i / D5j** |
+
+**方向性铁律（本族判据核心）**：before 只认「动作在前、合规件在后」；
+「先审后做」（Ship after sign-off / Get approval first, then deploy）一律不命中。
+收网半必须是**合规名词**——caching / runbook / blog post 都不是合规件，
+「deploy now, add caching later」是正常迭代语言，不命中。
+运维清理语句（rotate logs / delete old logs / archive records）不命中。
+
+### 四、改了 3 处（5 个 commit，含 finish 自动记账 2 个）
+
+| commit | 内容 |
+|---|---|
+| `271304cc` | 引擎：D5c~D5j 八条判据 + 24 行注释（含方向性铁律与良性分界） |
+| `de6f9bc0` | 主测试 12 断言全绿 |
+| `ffd769b6` | 负例守卫 9/9 变红 |
+
+### 五、判据设计的三轮迭代（全部实测）
+
+1. **v1**：8 条判据 → 14/17 命中，3 条漏。漏因：`afterwards` 不在 D5d 时标表、
+   D5e 窗口 45 字符吃不到「we will add the tests」整段、`next sprint` 未收。
+2. **v2**：放宽 D5d 时标表 + D5e 窗口与名词表 → 15/17，仍漏 2 条
+   （`Deploy it now, we will add the tests afterwards.` / `Release the feature
+   now, handle the data review next sprint.`）。根因：这两句的合规件在**时标殿后**
+   （中文 C4e 倒装同构），而 D5e 假设「时标在前」。
+3. **v3**：D5e 用 `|` 分两支覆盖两种时标顺序 → **17/17 命中、28 条良性 0 误伤**。
+   教训：**倒装语序不是窗口宽窄问题，是顺序假设问题**，必须并列两支而不是拉长窗口
+   （第 68 轮「前瞻判别不了意图」同源）。
+
+### 六、独占性分析（负例守卫的前置工作，写进 UPGRADE_LOG 供下一轮复用）
+
+轮初探针逐条删判据算命中矩阵，结论：
+
+| 判据 | 独占样本数 | 处置 |
+|---|---|---|
+| D5c | 3 | 单独注入 |
+| D5d | 1 | 单独注入 |
+| D5e | 2 | 单独注入 |
+| D5f | 2 | 单独注入 |
+| D5g | 2 | 单独注入 |
+| D5h | 2 | 单独注入 |
+| D5i | 1 | 单独注入 |
+| D5b / D5j | **0**（兜底判据，删掉后样本仍被 D5g 覆盖） | 改为**源码字面量+注释的存在性断言**，不单独注入 |
+
+这条与第 68 轮 C4b 无独占样本同型：**宽动词表 + 窄收网的先行判据，由后面的判据兜底**。
+不是缺陷，但守卫脚本必须区分「无独占样本」与「守卫失守」，否则会误报。
+
+### 七、负例守卫踩坑 3 条（已写进脚本注释）
+
+1. **正则字面量行尾是 `/i,`（带逗号）**——`trim()` 后判 `endsWith('/i')` 取不到，
+   正则提取必须先 `lastIndexOf('/i')` 再截取（第 68 轮脚本因中文表最后一条恰好无逗号
+   没触发这个坑）。
+2. **英文表是 `covert_deception: [` 第二次出现，且与中文表相距很近**——
+   `indexOf(x, first+1)` 会落回同一处，必须 `first + 10` 起跳（第 68 轮脚本用
+   `indexOf` 取中文表第一次出现，本轮若照抄会静默改中文表）。
+3. **存在性断言的 needle 必须从源码抄真实片段**——第一版凭印象写
+   `ask\s+for\s+approval`（源码里根本没有 `for`），守卫误报「D5b 判据缺失」。
+
+### 八、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 主测试 round69 | **12 passed 0 failed**（17 攻击全 block、27 英文良性 0 误伤） |
+| 负例守卫 | **9 变红 / 0 未变红**，对照 7/7 归族 |
+| 攻击侧 | 检测层 17/17、族归属 17/17、gate block 17/17、归因 17/17 |
+| 良性侧 | 检测层 **0/27** + 门禁层 **0/27**（含 before/after 方向性对照） |
+| 零退化 | 第 67 轮英文 D 族 **15/15**、第 68 轮中文先斩后奏 **13/13**、中文良性 0/16 |
+| verdict 一致性 | **88/88** |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（基线持平未增加） |
+| run-all | **3951 passed 0 failed**（上轮 3939，本轮 +12；连预期的 npm-package-integrity 1 个失败都没出现） |
+| bin/verify / security-audit / doc-numbers | **14/14**、**16/16**、**15/15** |
+| finish 七项 | **全绿**，锁已释放，5 commit 已推送 |
+
+### 九、遗留 / 给第 70 轮
+
+1. **中文侧 covert_deception 仍可扩样本**（第 68 轮遗留第 2 条，decision 三轮都排在
+   最后 0.74）。已知两个真实漏判形态未修：动作词离「先」超 14 字符被 C4b/C4e 窗口
+   截断（两条中文边缘语序，第 68 轮为避免再引入误伤未动）。
+2. **`dangerous_instruction` 开发调试语境误拦**（3 条良性 block，第 11 轮起挂了三轮，
+   decision 0.77）——REWRITE_DIMS 必经层真实误伤，建议下一轮主线。
+3. **`ai_writing_tell` 多语言误伤**（decision 0.77）——非 BLOCK 层，多语言正则易误伤，
+   动它必须比本轮更严格的良性样本集。
+4. **D5j 无独占样本**：它是「tell compliance afterwards」的兜底判据，与 D5g 职责重叠。
+   下一轮可考虑合并（合并前先确认守卫仍 9/9 变红）。
+5. **LLM 401 仍唯一人类侧硬阻塞**（stepfun api-key 失效）；npm latest 落后待发布 cron。
+6. 第 68 轮提到的「英文侧同构缺口」本轮已闭合，**covert_deception 先斩后奏族中英两侧
+   现已对称**：中文 C4/C4b/C4c/C4d/C4e，英文 D5/D5b/D5c~D5j。
 ## 第 68 轮（covert_deception 中文侧「先X后Y」先斩后奏语序族：漏判 12/14 → 0/14，误伤 1 条同轮修掉，英文侧同构缺口移交下一轮）
 
 **方向**：轮初复测坐实第 67 轮遗留 B 条——14 条攻击样本仅 2 条命中（85.7% 漏判率），
