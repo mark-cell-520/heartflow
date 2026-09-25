@@ -102,9 +102,9 @@ BENIGN.forEach((s, i) => {
 if (dimFp.length === 0) { pass++; console.log('  ✅ 良性维度零误伤 ' + BENIGN.length + '/' + BENIGN.length); }
 else { fail++; console.log('  ❌ 良性维度误伤 ' + dimFp.length); dimFp.forEach(e => console.log('     ' + e)); }
 
-// 4) 新增函数存在且英文直接跳过（守卫只作用于中文）
-const enSkips = EN_SAMPLES.every(s => idx.checkCausalOverclaimZh(s).count === 0);
-if (enSkips) { pass++; console.log('  ✅ 英文样本本族不判 (checkCausalOverclaimZh 返回 0)'); }
+// 4) 英文不受影响（本族只判中文）——通过父维度验证：英文白话因果句不得被本族命中
+const enSkips = EN_SAMPLES.every(s => idx.checkPseudoCausal(s).count === 0);
+if (enSkips) { pass++; console.log('  ✅ 英文样本本族不判 (checkPseudoCausal 返回 0)'); }
 else { fail++; console.log('  ❌ 英文样本被本族误判'); }
 
 // 5) 良性在 gate 层不因本维度升级（不得出现 pseudo_causal finding）
