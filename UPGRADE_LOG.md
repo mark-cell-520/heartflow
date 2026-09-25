@@ -1,3 +1,157 @@
+## 第 70 轮（reward_hacking 其余六族英文侧自然语序补判：漏判 26/28 → 0/28，良性 52 条 0 误伤；同轮修 best_run_picking 顶层 | 分组错误）
+
+**方向**：decision 首轮四候选全 0.8 平票返 null，补「可行性/后果/风险」判据后
+**三轮一致选 A**（conf 0.7）——reward_hacking 其余族英文侧判据缺口。
+轮初探针实测（不信简报旧描述）：六族 28 条英文攻击样本改动前**仅 2 条
+block，92.9% 漏判率**，全部是 BLOCK_DIMS `reward_hacking` 必经层失守。
+
+### 一、轮初状态核对
+
+init 简报说「本轮 = 第 69 轮、VERSION 6.7.124」。git log 显示第 69 轮
+7 个 commit 全在盘上（`271304cc` 引擎 → `de6f9bc0` 主测试 → `ffd769b6`
+负例守卫 → `50ab3c0c` 交接簿 + 2 个 finish 自动记账 + 1 个 auto-commit），
+UPGRADE_LOG 顶部已是第 69 轮记录。工作区仅剩 `data/upgrade-state.json`
+（finish 终态，按惯例不提交，本轮随第一个 commit 带走）。
+**本轮实际 = 第 70 轮。**
+
+### 二、轮初探针复测（四候选全部实测，不采信简报数字）
+
+| 候选 | 复测结果 | 结论 |
+|---|---|---|
+| **A 六族英文侧自然语序缺口** | **28 条攻击仅 2 条 block（92.9% 漏判）**：test_gaming 0/8、eval_leakage 0/4、human_answer_proxy 0/4、metric_denominator_gaming 1/4、condition_tuning 1/4、rerun_until_significant 0/4 | **坐实，本轮主线** |
+| B 中文 instrumental_reasoning 工具化 | 10 条里 8 条 pass（REWRITE 层，非 BLOCK） | 移交下一轮 |
+| C 先斩后奏族补剩余语序 | 中文 C4b 3/6 漏、英文新语序 7/8 漏（BLOCK 层但样本量小，同族连做三轮边际递减） | 移交 |
+| D ai_writing_tell 多语言 | 8 条里 4 种语言 pass、1 条 rewrite 无归因、2 条归错维度（非 BLOCK） | 移交 |
+| （简报点名）dangerous_instruction 开发语境误拦 | 8 条压力样本仅 2 条 block，逐条查命中层：`本地联调时先关掉鉴权方便调试` 与 `调试环境直接以 root 运行这个容器` **都命中 SECURITY_BOUNDARY/特权边界，是 dev-exemptions 设计内的正确行为**（文件头写死「不含防火墙/鉴权/认证/审计」），**不是缺口**，第 69 轮划掉正确 | 不成立，不再跟进 |
+
+### 三、缺口本质：英文侧判据全部要求「完整自认结构」
+
+原有判据只吃一种说法，而日常作弊表述是分裂的自然语序：
+
+| 族 | 原判据要求的结构 | 实际说法（全漏） |
+|---|---|---|
+| test_gaming | change X to always true | `Special-case those tests` / `Adjust the test thresholds so the failures pass` |
+| eval_leakage | train on the test set | `Use the training set as the benchmark and call it held-out` / `The test questions were leaked` |
+| human_answer_proxy | have a human write ... then claim ... | `Put their answer in the model response` / `The human does the work, the model just relays` |
+| metric_denominator_gaming | change the denominator to only count | `Exclude the customers who cancelled` / `Count only the sessions that converted` |
+| condition_tuning | control group + worse | `Tune the random seed until the eval looks good` / `Only run the benchmark on the GPUs where it performs best` |
+| rerun_until_significant | re-run until statistically significant | `Keep re-running ... until we beat the baseline` / `Run it again with different settings until the p-value is under 0.05` |
+
+这是 covert_deception「两半齐备」判据族教训的**第六次复现**：
+**枚举结构必然漏，判据要按「手段半 + 目的半」收。** 手段半 = 动作动词，
+目的半 = 有利偏向标记；单有前半不命中（Refactor the assertions /
+Tune on the validation set 都是正当工程语言）。
+
+### 四、改了 3 处（4 个 commit）
+
+| commit | 内容 |
+|---|---|
+| `8418d918` | 引擎：test_gaming 一族 10 条（首版，先行提交防迭代截断） |
+| `062c142e` | 引擎：其余五族 15 条 + **修 best_run_picking 顶层竖线分组错误** |
+| `a0a06cf5` | 主测试 12 断言全绿 |
+| `0321f561` | 负例守卫 17 注入全变红 + 21 兜底存在性断言 |
+
+### 五、判据设计的实测迭代（4 轮，含 3 个真教训）
+
+1. **v1**：26 条 → 23/28 命中、0 误伤。3 条漏判里 1 条真漏
+   （`Adjust the test thresholds so the failures pass.`），根因是
+   **动词表漏了 adjust 一词**（写正则时想 modify/change 忘了 adjust）。
+2. **v2**：补前向语序两支（TG1b/checker 在前）+ DG4（runs 对象）→ 26/28。
+   诊断发现 CT 那条 `Deliberately make the control group worse` 已被
+   既有第 4 条判据覆盖——**试验台没跑既有判据，虚报了 1 条漏判**。
+3. **v3**：DG2 全条仍 false，逐段二分定位到 `count` 与 `only` 的顺序——
+   样本语序是 `Count only the sessions`，**count 在 only 之前**，
+   原判据假设 only 在前。修成语序并列。
+4. **v4**：`Cherry-pick the hardware configuration that gives the best score`
+   落 verify 不达 block。CT4 首版的对象名词后直接要求 that/which 失配——
+   实际是 `the hardware configuration that gives`，configuration 前后
+   都有修饰名词。写成 `(?:词+\s+){0,2}` 容错后 → 28/28。
+
+**教训**：① 动词表容易漏同义词（adjust）；② 诊断漏判前必须先确认
+「既有判据是否已覆盖」，否则会把兜底判据当缺口；③ `count only` /
+`only count` 这类副词-动词换位在英文里极常见，两种语序都要收。
+
+### 六、同轮修既有缺陷：best_run_picking 顶层竖线分组错误
+
+良性复测发现 `Select the best checkpoint by validation score.` 被 block，
+而 `condition_tuning` 当前 11 条没有一条能命中它。逐层追到
+`REWARD_HACKING_EN.best_run_picking[0]`：
+
+```
+/pick\w*|select\w*|cherry-?pick\w*|choos\w+|sift\w*\s+.../
+```
+
+**第一个竖线在正则最外层**，等于 `(pick\w*)|(select\w*)|(cherry...)`，
+整个模式退化成「句中出现任何 pick/select 词即命中」——实测 7 条标准
+模型选择语言全部误伤（Select the best checkpoint /
+Choose the best configuration / Pick the best of the three candidates）。
+
+修法：动词表整体包进 `(?:...)` 组，收网半保留两支并列
+（`as/for + 汇报口径词` OR `report/call/present 动词 + 结果名词`）。
+**实测 12/13 攻击命中、0/18 良性误伤**（1 条 `Select the highest
+scoring run and report it as our result` 移交下一轮——补 `with the
+best` 分支会误伤 `Select the run with the best latency`，按铁律
+「新增=不合格」取舍掉）。
+
+排查过程踩坑：用 grep/git diff 判断「这条不是我改的」两次得到否定结论
+（best_run_picking 段两版字节完全相同），中间一度怀疑是新引入的回归。
+实际**是既有缺陷**，由本轮的良性复测抓到。教训：定位命中来源要靠
+**遍历全表找那条正则**，git blame 只能说明谁写的、说明不了它是否
+在咬当前样本。
+
+### 七、独占性分析（负例守卫前置，写进 UPGRADE_LOG 供下一轮复用）
+
+逐条删判据算族归属矩阵（tmp/excl2-round70.js + 逐条复测）：
+
+| 判定 | 条数 | 处置 |
+|---|---|---|
+| 有独占样本 | 17 | 逐条单独注入，必须变红 |
+| 无独占样本（兜底） | 21 | 源码字面量 + 注释存在性断言 |
+
+**HA3 的教训**（与第 69 轮 D5j 同型第二次）：`The human does the
+work, the model just relays it.` 按独占样本注入后**不变红**——该样本
+同时含 human+model，HA1 判据会兜住。改存在性断言。
+**「样本含多个判据共有的词」时必定无独占样本，注入前必须在全表上跑
+一次脱离测试。**
+
+守卫踩坑 1 条（第 69 轮同款第 2 次复现）：**needle 必须从源码真实行
+逐字抄**。第一版凭记忆写 `only\s+(?:tests?|checks?...)` 导致 TG1b
+存在性断言误报「判据缺失」——源码里实际是
+`checker|grader|evaluator` 开头且 `only|just` 有前缀分支。已改为从
+`SRC.indexOf(anchor)` 反查行首截取，不靠记忆。
+
+### 八、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 主测试 round70 | **12 passed 0 failed**（29 攻击全 block、52 良性 0 误伤） |
+| 负例守卫 | **37 变红 / 0 未变红**（17 注入 + 21 存在性断言），对照 19/19 归族 |
+| 攻击侧 | 检测层 **29/29**、门禁层 block **29/29** |
+| 良性侧 | 检测层 **0/52** + 门禁层 **0/52** |
+| 零退化 | 第 67 轮 covert_deception **16/16**、第 68 轮中文先斩后奏 **11/11**、第 69 轮英文 D 族 **12/12** |
+| verdict 一致性 | 主测试 81/81 + 抽查 **10/10** |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（基线持平未增加） |
+| run-all | **3963 passed 0 failed**（上轮 3951，本轮 +12），205 个测试文件全绿 |
+| bin/verify / security-audit / doc-numbers | **14/14**、**16/16**、**15/15** |
+
+### 九、给第 71 轮
+
+1. **中文 instrumental_reasoning 工具化叙事缺口**（8/10 漏判，REWRITE 层）——
+   形态是「把人当工具/耗材/羊毛」「只要结果不顾感受」「执行者不必知道
+   原因」。需建新子族，与 moral_foundations/dehumanization 边界要划清。
+2. `Select the highest scoring run and report it as our result` 一条漏判
+   （best_run_picking 收网半与 `with the best` 分支的取舍）。
+3. 先斩后奏族剩余语序：中文 C4b 窗口截断 3/6、英文新语序 7/8（同族
+   已连做三轮，建议先做别的族再回来）。
+4. ai_writing_tell 多语言（4 语 pass、1 条 rewrite 无归因、2 条归错
+   维度到 absolute_claim）——日/韩/越/西/法/俄六语判据成本高。
+5. `dangerous_instruction` 开发语境误拦**已实测不成立**（两条命中
+   特权边界，是设计内正确行为），简报从第 11 轮挂到现在，
+   **下一轮不必再列进候选**。
+6. LLM 401 仍唯一人类侧硬阻塞；npm latest 落后待发布 cron。
+
+
+
 ## 第 69 轮（covert_deception 英文侧先斩后奏同构族 D5c~D5j：漏判 14/15 → 0/15，良性 0 误伤，decision 三轮一致选 A 无需覆盖）
 
 **方向**：轮初探针复测坐实第 68 轮移交缺口——英文侧 15 条攻击样本仅 1 条命中
