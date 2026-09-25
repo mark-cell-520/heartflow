@@ -116,6 +116,24 @@ const DECISION_MARKS = [
   ),
 ];
 
+// ── 照护推迟族：说话人主动劝对方延后、建议咨询、说明协议随时可签 ──
+// [v6.7.126++ 第 59 轮] 第 6 族（无时序标记「受损状态 × 签约动作」）上线后
+// 实测误伤 1 条：
+//   「对方憔悴，我建议他先保重身体，协议随时能签」
+// 形状与攻击句共享（憔悴 × 签），区别在说话人给的是**照护建议**而非施压。
+// 设计（沿用第 57 轮 ⑧/第 47 轮豁免的保守原则）：
+//   ① 必须同时出现「建议/劝/提醒」类照护动词 与 延后/自主判断信号
+//     （随时能签/不着急/改天/明天/过两天/等…再说/想清楚/咨询律师）
+//   ② 单有照护动词不放行——「我建议直接让他按了」仍是攻击句
+//   ③ 单有延后词也不放行——「拖到明天他没力气了再签」是反向时间压迫
+const CARE_DEFER_VERB = /(?:建议|劝|提醒|奉劝|不妨|最好)/;
+const CARE_DEFER_SIGNAL = /(?:随时[^。]{0,4}(?:能签|可以签|可签)|不着急|不用急|改天|明天|过两天|等[^。]{0,8}(?:再说|再谈|再约|睡醒|家人|律师|想清楚)|先[^。]{0,6}(?:休息|保重|睡|冷静|想清楚|咨询|问清楚|商量|考虑|检查))/;
+function isCareDeferral(text) {
+  if (!text || typeof text !== 'string') return false;
+  const t = text.replace(/^[\s"'「『【(\[]+/, '');
+  return CARE_DEFER_VERB.test(t) && CARE_DEFER_SIGNAL.test(t);
+}
+
 /**
  * 判断文本是否为「谈论成语」的元话语/引述语境。
  * @param {string} text 原文（未归一化）
@@ -145,7 +163,10 @@ function isMetaDiscursive(text) {
   // 该动作的规范陈述，不是主张它。与攻击句共享判据形状（目的状语 × 脱缰词），
   // 唯一区别是句首否定算子。放在三族之后，作为最后一道豁免。
   if (isNegatedDirective(text)) return true;
+  // [v6.7.126++ 第 59 轮] 照护推迟族：与第 6 族共享形状（受损 × 签约），
+  // 区别在说话人主动劝延后/建议咨询。放在最后，同样要求两个信号同时在场。
+  if (isCareDeferral(text)) return true;
   return false;
 }
 
-module.exports = { isMetaDiscursive, isNegatedDirective, QUOTE_MARKS, CRITIQUE_MARKS, DECISION_MARKS, IDIOM_SHELL };
+module.exports = { isMetaDiscursive, isNegatedDirective, isCareDeferral, QUOTE_MARKS, CRITIQUE_MARKS, DECISION_MARKS, IDIOM_SHELL };
