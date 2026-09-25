@@ -1,7 +1,7 @@
 {
-  "round": 65,
+  "round": 66,
   "version": "6.7.124",
-  "roundStartedAt": "2026-09-25T19:01:31.052Z",
+  "roundStartedAt": "2026-09-25T20:12:31.044Z",
   "lastFinishAt": "2026-09-25T19:48:41.216Z",
   "lastGreen": true,
   "lastChecks": [
@@ -14,6 +14,6 @@
     "PASS 探针垃圾已清理"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
-  "published": "6.7.121",
-  "publishedAt": "2026-09-24T06:53:32.018Z"
+  "published": "6.7.124",
+  "publishedAt": "2026-09-25T20:03:42.912Z"
 }
