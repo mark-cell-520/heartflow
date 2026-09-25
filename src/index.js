@@ -5662,8 +5662,68 @@ function checkSealioning(text) {
     }
   }
   const count = signals.length;
+  // [v6.7.126] 「假礼貌反咬」族（第 51 轮实测缺口）。
+  // 轮初探针实测 12 条同族攻击句本维度命中 0/12、gate 8 pass / 4 verify，
+  // 180 条良性（门禁 151 + 自扩 29）原型零误伤。上面 SEALIONING_PATTERNS
+  // 收的是单句追问形态（那你怎么解释/你回避了我的问题），覆盖不到
+  // 「先声明自己没攻击性 → 再要求举证 → 最后把举证失败反咬成对方有问题」
+  // 这个三段式结构——它才是 sealioning 的定义核心，单句形态是它的碎片。
+  // 判据（第 36 轮共现纪律未松动：三信号至少两个共现才命中）：
+  //   ① 自述礼貌（礼貌/客气/一个字都没骂/态度很诚恳）
+  //   ② 举证/回答要求（举来源/提供证据/正面回答/解释一下）
+  //   ③ 反咬断言（在编/心虚/不讲理/答不上来/绕开/回避）
+  // 良性边界实测 0/180：正常求教（请提供数据来源）+ 无礼貌伪装的直接批评
+  // （这个数据就是错的）+ 元话语（这篇论文研究 sealioning）均只有单信号。
+  // ⚠️ push 必须在 score 计算**之前**——第一版插在 score 之后，count 涨了
+  //    score 照旧 0，「接线了但没生效」的新形态（count>0 / score=0）。
+  signals.push(...sealioningPoliteTrap(text, hasChinese));
   const score = Math.min(1, signals.reduce((s, sig) => s + sig.severity * 0.25, 0));
-  return { count, signals, score };
+  return { count: signals.length, signals, score };
+}
+
+// ─── 「假礼貌 × 举证要求 × 反咬」耦合判据（第 51 轮，非 check 前缀子判据）───
+// 三信号缺一并共现门槛 2，刻意保守（单信号不命中）：
+//   单「礼貌」= 客套话；单「举证」= 正常求教；单「反咬」= 直接批评。
+// 前两者同现是「有礼貌地提问」（良性），只有再叠上③把「对方无法自证」
+// 反推成「对方有问题」，才是消耗性追问。
+const SEAL_POLITE_ZH = /(礼貌|客气|态度[很太非常]?[友善诚恳好平和]|一个字都?没骂|没骂人|没有骂人|没有攻击|不带情绪|心平气和|只是问问|纯粹是问|只是问了一?遍|好好说|没说重话|没有指责|没有别的意思|就事论事)/i;
+// ⚠️ 原型第一版把动词组整组设成可选，结果「你这个数据就是编的」的「这个」
+//    命中举证信号——必要条件退化成可选前缀，误伤正常批评。修正：动词必现。
+const SEAL_DEMAND_ZH = /(举|提供|给|拿|列|出示|亮|贴)(?:出|一下|一个|几个|些)?[^。]{0,3}(来源|证据|数据|出处|链接|截图|原文)/i;
+const SEAL_DEMAND_ANS_ZH = /(请你|麻烦|希望|要求|请)?[^。]{0,6}(正面)?(回答|回应|解释|说明|澄清)(?:一下|清楚|我的问题)?/i;
+const SEAL_DEMAND_FIX_ZH = /(举证|拿出证据|给个说法|给个交代|正面回答)/i;
+const SEAL_BITE_ZH = /(在编|编的|编造|心虚|心里有鬼|不讲理|耍赖|答不上来|回答不上|理亏|恼羞成怒|你急|你怕|水平也?就|不过如此|也就这样|情绪化|不理性|破防|喷子|杠精|心虚了|默认了|不敢了吧?|不敢回答|绕开|回避|转移话题|顾左右而言他|不敢直面)/i;
+const SEAL_POLITE_EN = /(perfectly polite|never insulted|didn'?t insult|was civil|respectfully|calmly)/i;
+const SEAL_DEMAND_EN = /(provide|give|show|cite|produce)\s+(a\s+|the\s+)?(source|evidence|proof|link|citation)|answer the question|just answer/i;
+const SEAL_BITE_EN = /(making it up|made it up|refusal proves|hysterical|losing it|deflect|desperate|scared of)/i;
+// 反复追问信号（加分项，不独立成立）：「一遍又一遍」是 sealioning 的行为定义
+const SEAL_REPEAT_ZH = /(一遍又一遍|问了三?遍|追问了好几?遍|反复问|问了多少遍|每次都?绕开|一直不回答)/i;
+const SEAL_REPEAT_EN = /(again and again|three times|asked (multiple|several|repeatedly)|every time you)/i;
+
+function sealioningPoliteTrap(text, hasChinese) {
+  const polite = hasChinese ? SEAL_POLITE_ZH.test(text) : SEAL_POLITE_EN.test(text);
+  const demand = hasChinese
+    ? (SEAL_DEMAND_ZH.test(text) || SEAL_DEMAND_ANS_ZH.test(text) || SEAL_DEMAND_FIX_ZH.test(text))
+    : SEAL_DEMAND_EN.test(text);
+  const bite = hasChinese ? SEAL_BITE_ZH.test(text) : SEAL_BITE_EN.test(text);
+  const repeat = hasChinese ? SEAL_REPEAT_ZH.test(text) : SEAL_REPEAT_EN.test(text);
+  // ⚠️ severity 必须显式给出：本文件特有写法（table 驱动带 severity），
+  //    而父函数 score = reduce(sig.severity * 0.25)。子判据若只返回
+  //    {type, match}（stereotype 族同款），severity = undefined → 累加出
+  //    NaN → score 恒 NaN/0 → findings 门槛 0.15 永不达成本维度静默失守。
+  //    这是「接线了但没生效」的新形态：count>0 而 score=0。
+  // 核心三信号计数；反复追问作半票（单有「问了三遍」是正常追问）
+  const core = [polite, demand, bite].filter(Boolean).length;
+  if (repeat && core >= 1) {
+    // 含反复追问时 1.5 票：礼貌伪装 + 反复追问已构成消耗形态
+    if (core + 0.5 >= 2) {
+      return [{ type: 'polite_repeat_trap', match: text.slice(0, 20), severity: 0.7 }];
+    }
+  }
+  if (core >= 2) {
+    return [{ type: 'polite_bait_trap', match: text.slice(0, 20), severity: 0.7 }];
+  }
+  return [];
 }
 
 // ─── 伪深度检测（Pseudo-Profundity / LLM 空泛废话）──────────────
