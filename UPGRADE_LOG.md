@@ -1,4 +1,55 @@
 
+## 第 58 轮（解除 README 记账死锁：finish 从 4 连 objection 到 7 项全绿）
+
+**触发**：用户要求「再次审计定时心虫升级任务，进行优化」。
+
+### 一、审计结论：产出正常，卡在一个结构性死锁上
+
+近 10 轮 8 ok / 2 failed（两次都是同一个 objection）。引擎侧产出是真的：
+第 55 轮 reward_hacking report_fudging 英文侧、第 56 轮 measurement_rigging 第 31 族、
+第 57 轮「利用对方受损状态签约」族 18 条判据（攻击 0/38 → 38/38，良性 0/85）。
+run-all 3652 passed，双向门禁召回 52/52、误拦 300/326 持平。
+
+**但 finish 连续 4 轮（55/56/57/58）报同一个 objection：README 3606 vs 缓存 3652。**
+
+根因不是 LLM 懒，是**结构性死锁**：
+- 测试数由 `run-all.js` 写进 `data/test-count.json`（机器侧产生）
+- README 横幅的 "N passing tests" 写在 prompt 硬边界「不写 README.md」里（LLM 不许改）
+- 于是机器产生的数字永远追不上 LLM 不被允许同步的文档——每轮白丢一次全绿
+
+### 二、改了什么（1 个 commit `31e567ef`，已推 GitHub）
+
+`scripts/upgrade-engine.js` 新增 `syncReadmeTestCount()`，在 `cmdFinish()` 的
+② 检查**之前**执行：把 `data/test-count.json` 的实测 `passed` 同步进 README 横幅，
+并立即 auto-commit（否则「工作区已跟踪文件干净」会反过来报脏）。
+
+原则：**机器能判定的记账必须由机器做**，不占 LLM 的迭代预算。
+
+配套新增 `test/readme-test-count-autosync.guard.test.js`（4 断言）：
+① 不一致时真写入 ② 已一致时不写盘（幂等） ③ README 缺横幅时明确返回原因
+④ 缺缓存时绝不动 README。run-all 已自动扫到并 4/4 通过。
+
+### 三、验证（全实测）
+
+| 项 | 结果 |
+|---|---|
+| 守卫单跑 | **4 通过 0 失败** |
+| 真实 finish | **7 项检查全绿**：README 3652 vs 缓存 3652，锁已释放 |
+| run-all | **3657 passed 2 failed**（上轮 3652/2，+5 为本轮守卫） |
+| 剩余 2 失败 | 均为既有基线：e2e 场景10（第 47 轮已用 git stash 复验与本轮无关）+ npm-package-integrity（npm latest 6.7.121 落后，publish 后自动消） |
+| 推送 | `31e567ef` → `heartflow/main`（首次 TLS 握手失败，重试成功） |
+
+### 四、遗留（给第 59 轮）
+
+1. **e2e 场景10 的期望值建议改**：该场景写 `expect=verify`，但 confidence 维度在
+   「毫无疑问 + 众所周知」上确实命中 2 次（severity 70），按当前 REWRITE 语义判
+   rewrite 也说得通。连续 20+ 轮当既存失败供着，不如判定改判据还是改期望。
+2. npm-package-integrity 只有 publish 能消，属发布链路（`8924084005d4` 职责）。
+3. 第 57 轮遗留的引擎候选缺口仍在：无时序标记的疲态+签约短句、
+   「拖过冷静期再签」反向时间压迫。
+4. 第 58 轮顺带修过 preamble 的两个机制 bug（`pause_job` 写错字段从未生效、
+   finish objection 被误计入 strike）——不在本仓，见 ~/.hermes/scripts/。
+
 ## 第 57 轮（instrumental_reasoning 中文「利用对方受损状态签约」族：攻击 0/38 → 38/38 全 rewrite/block，良性 0/83 误伤）
 
 **方向**：中文 instrumental_reasoning「手段-目的口语化合谋」（decision.decide 结构化 options 真调用选出：A **0.83** > D 0.82 > C 0.82 > B 0.81，identity 80%，stamp `stamp-1790346707140-...`；v1 平局 rejected 后补判据重跑）
