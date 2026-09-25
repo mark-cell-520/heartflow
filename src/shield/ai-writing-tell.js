@@ -221,6 +221,76 @@ const INVISIBLE_HOMOGLYPH = [
   /[^\x00-\x7F\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3000-\u303f\uff00-\uffef]/g,
 ];
 
+// ── 4. [第 50 轮] 中英混杂 AI 腔（zh-en code-mixing）──────────────────
+// 实测缺口（2026-09-25 轮初探针，5 条同族句 detect().score 全 0、coOccurrence
+// 全 false）：
+//   「总而言之，This approach demonstrates significant value ...」
+//   「综上所述，我们需要 comprehensively evaluate 这个方案的优劣」
+// 根因有两条，都不在词表里：
+//   ① 英文判据（TIER1-3 / transitions / formulaic-openers）全是整句英文句型，
+//      中文句子夹英文词时 `\b(?:robust|...)\b` 要求英文语境，match 命中但族数
+//      只有 1，被 [v6.7.125 第 36 轮] 的共现门槛（familiesHit >= 2）清零；
+//   ② 中文侧根本没有"套话锚 + 英文内容"的判据——「总之、首先、换句话说」
+//      这类 AI 高频连接词单独出现是正常中文，与英文内容同框才是机器痕迹。
+// 判据（三条各自独立成立，第 50 轮实测 23/23 命中、良性池 0/151 新增误伤）：
+//   ① anchor-mix：中文 AI 套话锚（core 集，刻意不含"然后/最后/另外/例如"这类
+//      日常高频词——wide 集实测误伤「我打算从 CAP 理论讲起，然后介绍强一致性…」）
+//      + 锚点后 140 字符内 ≥2 个英文词
+//   ② double-connective：中英翻译对连接词同框 ≥2 对（首先+Firstly、此外+Furthermore）
+//      单对不判（"首先，Firstly …"只有一对时是正常的中英术语混排）
+//   ③ tier-phrase：中文句中出现 TIER 词且全文英文词 ≥2（"这个 robust 的方案"）
+//      TIER 词取自既有 TIER1-3 词表，只做中英混杂场景的跨语言搬运检测。
+// 与英文侧判据的关系：本族只加分（0.18），不取代任何既有族；共现门槛照旧
+// 生效——单命中本族照旧 score 归零，这是第 36 轮定下的纪律，不因本轮松动。
+const ZH_AI_ANCHOR = /(总而言之|综上所述|值得注意的?是|首先|其次|总的来说|总之|更重要(?:的|是)?|换句话说|一方面|另一方面|第一|第二)/;
+
+// 中英连接词翻译对：中侧 + 英侧同现才算一对
+const ZH_EN_CONNECTIVE_PAIRS = [
+  [/首先|第一/, /\bfirstly\b|\bfirst\b|\bto begin with\b/i],
+  [/其次|第二/, /\bsecondly\b|\bsecond\b|\bnext\b/i],
+  [/最后|最终/, /\bfinally\b|\blastly\b|\blast\b/i],
+  [/总之|总的来说|总而言之/, /\bin conclusion\b|\bto conclude\b|\bin summary\b|\boverall\b/i],
+  [/因此|所以/, /\btherefore\b|\bthus\b|\bhence\b/i],
+  [/然而|但是/, /\bhowever\b|\bnevertheless\b|\byet\b/i],
+  [/此外|另外/, /\bfurthermore\b|\bmoreover\b|\badditionally\b/i],
+  [/换句话说/, /\bin other words\b|\bthat is to say\b/i],
+  [/例如|比如/, /\bfor example\b|\bfor instance\b|\be\.g\./i],
+];
+
+// TIER 词（中英短语级判据 C 用）：合并 TIER1-3 词表 + 常见派生后缀
+const TIER_WORDS_RE = /\b(robust|comprehensive\w*|holistic\w*|seamless\w*|leverage\w*|streamline\w*|transformative|transformation|pivotal|multifaceted|unprecedented|intricate\w*|delve|embrace|foster\w*|nuanced|paramount|quintessential|burgeoning|poised|encompass\w*|harness\w*|unleash\w*|world-class|game-chang\w*|significant\w*|effective\w*|sophisticated\w*|crucial\w*|myriad|plethora|cataly[sz]e\w*|galvaniz\w*|illuminat\w*|elucidat\w*|juxtapos\w*|reimagin\w*|spearhead\w*|bolster\w*|resonat\w*|revolutioni[sz]e\w*|underpin\w*|underlying|cornerstone|overarching|paradigm|tapestry|beacon|meticulous\w*|nestled|vibrant|thriving|bustling|enduring|daunting|holistically|actionable|impactful|learnings|synerg\w*|interplay|symphony|elevate\w*|empower\w*|navigat\w*|facilitat\w*|augment\w*|cultivat\w*|nascent|ecosystem)\b/i;
+
+function detectZhEnMixing(text) {
+  const hasChinese = /[\u4e00-\u9fff]/.test(text);
+  if (!hasChinese) return [];
+  const triggers = [];
+  // ① anchor-mix：core 锚点 + 锚后 140 字符内 ≥2 个英文词
+  const anchor = text.match(ZH_AI_ANCHOR);
+  if (anchor) {
+    const start = text.indexOf(anchor[0]) + anchor[0].length;
+    const enAfter = text.slice(start, start + 140).match(/[a-zA-Z]{2,}/g) || [];
+    if (enAfter.length >= 2) {
+      triggers.push({ trigger: `${anchor[0]} + ${enAfter.slice(0, 4).join(' ')},...` });
+    }
+  }
+  // ② double-connective：中英连接词翻译对 ≥2
+  let pairs = 0;
+  const pairHits = [];
+  for (const [zh, en] of ZH_EN_CONNECTIVE_PAIRS) {
+    if (zh.test(text) && en.test(text)) { pairs++; pairHits.push(zh.source); }
+  }
+  if (pairs >= 2) {
+    triggers.push({ trigger: `中英连接词对 x${pairs}` });
+  }
+  // ③ tier-phrase：中文句中 TIER 词 ≥1 且全文英文词 ≥2
+  const tierHits = text.match(new RegExp(TIER_WORDS_RE.source, 'gi')) || [];
+  const enAll = text.match(/[a-zA-Z]{2,}/g) || [];
+  if (tierHits.length >= 1 && enAll.length >= 2) {
+    triggers.push({ trigger: `TIER词 ${tierHits.slice(0, 3).join('/')}` });
+  }
+  return triggers;
+}
+
 const AI_TELL_PATTERNS = [
   { name: 'placeholders',        patterns: AI_PLACEHOLDERS,       baseScore: 0.30 },
   { name: 'citation-markup',     patterns: AI_CITATION_MARKUP,    baseScore: 0.32 },
@@ -338,6 +408,18 @@ function detect(text) {
     total += entry.baseScore;
     findings.push({ dimension: `ai-tell-${entry.name}`, severity, trigger: hit, guidance: 'AI writing artifact' });
     if (findings.length >= 24) break;
+  }
+
+  // [第 50 轮] 中英混杂族：三条独立判据（anchor-mix / double-connective /
+  // tier-phrase），任一命中即记一个 family（zh-en-mixing）。这与既有族的
+  // 计分方式一致：baseScore 0.18，只加分不改路由；共现门槛照旧适用。
+  const mixingTriggers = detectZhEnMixing(normalized);
+  for (const mt of mixingTriggers) {
+    const key = `zh-en-mixing:${mt.trigger}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    total += 0.18;
+    findings.push({ dimension: 'ai-tell-zh-en-mixing', severity: 18, trigger: mt.trigger, guidance: 'AI writing artifact (zh-en code-mixing)' });
   }
 
   const stylometry = detectStylometry(normalized);
