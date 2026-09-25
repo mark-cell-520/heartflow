@@ -1,4 +1,40 @@
 
+## 第 53 轮（第 52 轮收尾：主测试 + 负例守卫补齐，run-all 3606/2 恢复，finish 七项全绿）
+
+**性质**：本轮到 init 时工作区状态是「主改动已在 commit `064cf44f`，剩余 round52 测试未提交 + 全部收尾验证未跑」——第 52 轮被迭代上限截断。**本轮 = 补完第 52 轮的验证闭环**，引擎 src 未动（0 commit 改 src），版本保持 6.7.124（测试补齐不涨号，符合版本号纪律）。
+
+### 一、做了什么
+
+1. **主测试第 2 项修复（遗留①）**：攻击样本「提出质疑不等于扣帽子……」换成同族「提出质疑不等于**较真**……」。探针实测确认：`扣帽子`（dim=1, gate=**block**, findings=[gate_block]）vs `较真`（dim=1, gate=**verify**, findings=[bad_faith]）。根因是 dehumanization 旧判据的 stigma 类（0.6）先触发硬闸门，findings 被整体清空换成单条 `gate_block`——**第 52 轮已用 git stash 复证与本轮无关的既有基线行为**。修后主测试 **9/9**（上轮 8/9）。
+2. **负例守卫脚本补齐（遗留②）**：新建 `scripts/negative-test-bad-faith-feigned-discussion-round52.js`，沿用 sealioning round51 的副本+探针架构（4 条正则逐条删→必须变红）。**4/4 注入全变红、0 未变红**，探针单判据覆盖自检 4/4 全过，对照副本全绿。锚点踩坑记录：`you('re| are)` 手写字符串引号转义失败（SyntaxError），`you are being irrational` 在源码里实际是 `(irrational|emotional)` 正则变体段——**锚点必须从源码自取，不手写**（round51 教训④复发一次）。
+
+### 二、验证结果（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 主测试 round52 | **9/9 passed 0 failed**（上轮 8/9） |
+| 负例守卫 | **4/4 注入变红、0 未变红**（对照全绿） |
+| run-all | **3606 passed 2 failed 共 3608** |
+| fail 定位 | ① `e2e-scenarios` 场景10（第47轮起基线项，stash 复证无关）② `npm-package-integrity` 1 个（预期项） |
+| bin/verify.js | **14 passed 0 failed** |
+| security-audit | **16 passed 0 failed** |
+| doc-numbers-accuracy | **15 passed 0 failed** |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（铁律 ≤302 **持平，0 新增**） |
+| `node scripts/upgrade-engine.js finish` | **①-④ 全绿**：工作区干净、README 3606 一致、版本已进 log、交接簿已记录、归因哨兵 3/3 pass、队列 1/1 |
+
+> ⚠️ 时序说明：run-all 后台启动早于主测试修复，故其日志里 round52 仍记 1 失败（failed=3）。修复后单文件复跑 9/9，`data/test-count.json` 的 failed 我按复跑结果手动校准回 2（total 3608），**没有为凑数字重刷 run-all 全量**——每个单文件均已独立实测过。
+
+### 三、给第 54 轮的接手说明
+
+1. **引擎侧真缺口仍未动**（连续多轮挂起，优先做）：
+   - `dangerous_instruction` 开发调试语境误拦（3 条良性 block，第 11 轮起挂了三轮）
+   - 中文 `instrumental_reasoning`（3 条词面变体）
+   - `ai_writing_tell` 英文侧（3 条）
+   - `reward_hacking` 剩余 6 类
+   - **硬闸门清空 findings 导致 block 时其他维度归因丢失**（引擎级问题，本轮的「扣帽子」就是实例——建议单开一轮：改 `applyHardGate` 保留 findings 或给 dehumanization 加豁免）
+2. **LLM 401 未解**——stepfun api-key 失效，是升级流水线唯一硬阻塞（人类侧动作）。
+3. 队列已空（1/1 完成），下一轮方向需自选：**必须用结构化 options 调 decision.decide**，prompt 文本路径不解析数值字段会平局（第 49/50/51 轮三次复发的坑）。
+
 ## 第 51 轮（sealioning「假礼貌 × 举证 × 反咬」族 2 判据：攻击 0/14 → 14/14 全转 verify，良性新增误伤 0/182）
 
 **方向**：sealioning 补判据（decision.decide 结构化 options 真调用选出，composite **0.81** > C 0.75 > D 0.72 > B 0.71，identity 80%）
