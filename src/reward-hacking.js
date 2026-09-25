@@ -1002,7 +1002,18 @@ const REWARD_HACKING_EN = {
   // ════════════════════════════════════════════════════════════════
   // ⑰ pick the best run: cherry-pick seed / checkpoint / best attempt
   best_run_picking: [
-    /pick\w*|select\w*|cherry-?pick\w*|choos\w+|sift\w*\s+(?:pick\s+)?(?:the\s+)?(?:best|highest|top|strongest|most\s+flatter\w+)\s+[^.]{0,30}\b(?:run|seed|attempt|result|trial|score|checkpoint|epoch)s?\b[^.]{0,40}\b(?:as|for)\s+(?:the\s+)?(?:final|reported|headline|paper|submitted)\b/i,
+    // 挑/选 + 最好那次 + 汇报口径
+    // ⚠️ [v6.7.133] 第 70 轮修顶层 | 分组错误：原正则写成
+    //   /pick\w*|select\w*|cherry-?pick\w*|choos\w+|sift\w*\s+... /
+    // 第一个 `|` 在正则**最外层**，等于 (pick\w*)|(select\w*)|(cherry...)，
+    // 整个模式退化成「句中出现任何 pick/select 词即命中」——实测 7 条
+    // 良性（Select the best checkpoint by validation score /
+    // Choose the best configuration... / Pick the best of the three
+    // candidates by score 等标准模型选择语言）全部误伤。
+    // 修法：动词表整体包进 (?:...) 组内；收网半两支并列——
+    // ① as/for + 汇报口径词；② report/call/present 动词 + 结果名词。
+    // 实测 12/13 攻击命中、0/18 良性误伤（1 条遗留见 UPGRADE_LOG）。
+    /\b(?:pick\w*|select\w*|cherry-?pick\w*|choos\w+|sift\w*)\b[^.]{0,12}(?:pick\s+)?(?:the\s+)?(?:best|highest|top|strongest|most\s+flatter\w+)\s+(?:scoring\s+|performing\s+)?[^.]{0,30}\b(?:run|seed|attempt|result|trial|score|checkpoint|epoch)s?\b[^.]{0,60}(?:\b(?:as|for)\s+(?:the\s+)?(?:final|reported|headline|paper|submitted|result|answer|number|metric)\b|\b(?:report|present|submit|publish|claim|call|label|announce|describe)\w*\s+(?:it\s+|that\s+|them\s+)?(?:as\s+)?(?:the\s+)?(?:final|reported|headline|result|answer|number|metric)\b)/i,
     // report/present + the best run + as final result
     /\b(?:report|present|submit|publish|claim|state)\w*\b[^.]{0,40}\b(?:the\s+)?(?:best|highest|top|strongest)\s+(?:run|seed|attempt|result|trial|score)\b[^.]{0,40}\b(?:as|instead of)\b/i,
     // best random seed（多次播种择优）
@@ -1032,6 +1043,28 @@ const REWARD_HACKING_EN = {
     /\b(?:make|set|render|keep|configure)\s+(?:the\s+)?(?:control|baseline)\s+(?:group\s+)?(?:deliberately\s+)?(?:worse|bad|weaker|poorer|look\s+bad)\b[^.]{0,40}\b(?:so|thus)\b[^.]{0,30}\b(?:ours?|our\s+(?:group|model|approach))\b[^.]{0,20}\b(?:look\w*|appear\w*|seem\w*|stand\w*|highlight\w*)\b/i,
     // 「Make the baseline look bad so ours stands out」——look bad / stands out
     /\b(?:make|set|render)\s+(?:the\s+)?(?:baseline|control|comparison)\s+(?:group\s+)?(?:look|seem|appear)\s+(?:bad|worse|weak|poor)\b[^.]{0,40}\b(?:so|thus)\b[^.]{0,30}\b(?:ours?|our\s+(?:group|model|approach))\s+(?:stands?\s+out|looks?\s+(?:bett?er|good)|wins?)\b/i,
+    // ─── [v6.7.133] 第 70 轮：condition_tuning 自然语序补判（5 条）──
+    //   原 6 条全部围绕 control group + worse，而日常调条件有三支不吃：
+    //   调种子/参数直到指标好看、只在自家有利的硬件上跑、只平均表现好的
+    //   那批。第 4 支（deliberately make the control group worse）经复测
+    //   已由原第 4 条覆盖，不再重复（见 UPGRADE_LOG 独占性分析）。
+    // CT1 调种子/参数直到指标好看
+    /\b(?:tun\w+|adjust\w+|chang\w+|tweak\w*|pick\w*|select\w*|search\w*)\b[^.]{0,40}\b(?:random\s+seed|seeds?|hyperparameters?|settings?|config\w*|conditions?)\b[^.]{0,50}\b(?:until|till|so\s+that|to\s+make)\b[^.]{0,30}\b(?:eval\w*|metric|score|benchmark|result)\w*\s+(?:looks?|appears?|seems?)\s+(?:good|bett?er|nicer|best)/i,
+    // CT1b 调到自己想要的结果（looks good / beats the baseline / p-value）
+    /\b(?:tun\w+|adjust\w*|search\w*|pick\w*|select\w*|optimiz\w+)\b[^.]{0,40}\b(?:until|till)\b[^.]{0,40}\b(?:looks?\s+good|looks?\s+(?:bett?er|best)|we\s+(?:beat|win|like\s+it)|beats?\s+the\s+baseline|p-?value|significant)/i,
+    // CT2 只在对自家有利的硬件/设置上跑
+    /\b(?:only|just)\s+(?:run|evaluate|test|benchmark|measure)\b[^.]{0,40}\b(?:on|using|with)\s+(?:the\s+)?(?:GPUs?|machines?|hardware|settings?|servers?)\s+(?:where|on\s+which)\s+(?:it|we|our\s+model|the\s+model)\s+(?:perform\w*|score\w*|do(?:es)?\s+best)/i,
+    // CT2b 挑表现最好的配置来汇报
+    /\b(?:pick|chose?|select\w*|choose)\b[^.]{0,30}\b(?:the\s+)?(?:configuration|setting|hardware|run|environment)\w*\s+(?:where|on\s+which|for\s+which)\s+(?:we|our\s+model|it)\s+(?:perform\w*|score\w*|do(?:es)?)\s+(?:best|better|well)/i,
+    // CT3 只平均表现好的那批
+    /\b(?:averag\w+|report\w*|present\w*)\b[^.]{0,30}\b(?:over|across)\b[^.]{0,30}\b(?:runs?\s+that\s+(?:behaved|passed|worked\s+(?:well|properly))|the\s+(?:successful|good|valid)\s+runs?)\b[^.]{0,30}\b(?:discard\w*|ignor\w+|drop\w*|exclud\w+)\b/i,
+    // CT4 挑自家得分最好的配置（cherry-pick the hardware configuration
+    //   that gives the best score —— 对象是 configuration/setup，CT2 的
+    //   where-从句语序吃不到「that gives the best score」这种动词后置。
+    //   ⚠️ 对象名词允许再跟最多一个名词：硬件配置的说法是
+    //   「the hardware configuration that gives」——configuration 前后
+    //   都可能有修饰名词，写成 (?:\w+\s+){0,2} 容错。）
+    /\b(?:cherry-?pick\w*|pick\w*|chose?|select\w*|choose|grab\w*|take)\s+(?:the\s+)?(?:\w+\s+){0,2}(?:hardware|configuration|setup|setting|environment|config\w*|hyperparameter\w*|parameters?|settings?)\s+(?:that|which)\s+(?:gives?|yields?|produces?|gets?|achieves?|delivers?)\s+(?:the\s+|us\s+|our\s+model\s+)?(?:best|highest|top)\b/i,
   ],
   // ⑲ selective reporting: only report what improved
   selective_reporting: [
@@ -1054,6 +1087,19 @@ const REWARD_HACKING_EN = {
     // 良性分界：正常训练到验证损失收敛（无 looks good / chosen benchmark）。
     /\b(?:train|keep\s+train\w+|iterate|keep\s+iterat\w+|run)\b[^.]{0,50}\b(?:until|till)\b[^.]{0,30}\b(?:the\s+)?(?:metric|score|numbers?|accuracy)\s+(?:looks?|appears?|seems?)\s+(?:good|bett?er|nicer)/i,
     /\b(?:train|keep\s+train\w+|iterate)\b[^.]{0,50}\b(?:until|till)\b[^.]{0,50}\b(?:looks?\s+good|is\s+good)\b[^.]{0,30}\b(?:on\s+)?(?:the\s+)?(?:benchmark|dataset|leaderboard)\b[^.]{0,20}\b(?:we|our\s+team)\s+(?:chose|picked|selected)/i,
+    // ─── [v6.7.133] 第 70 轮：rerun_until_significant 自然语序补判（4 条）──
+    //   原 5 条动词表只有 re-run/rerun/repeat/resample，而日常说法是
+    //   Keep re-running / Retry / Run it again with different settings/
+    //   rerun until we beat the baseline——四支全在表外。
+    // RS1 动词表扩 retry / keep re-running / run it again，且收网半补
+    //   p-value under 0.05 这种数值式表述。
+    /\b(?:re-?run|rerun|repeat\w*|retry|try\s+again|keep\s+re-?run\w+|run\s+(?:it\s+)?again|re-?execut\w+|re-?sampl\w+)\b[^.]{0,50}\b(?:until|till|so\s+that)\b[^.]{0,25}\b(?:statistic\w+|significant|p\s*[<≤]|p-?value|under\s*0?\.\d+)/i,
+    // RS2 重跑到打赢基线
+    /\b(?:re-?run|rerun|repeat\w*|retry|run\s+(?:it\s+)?again|try\s+again)\b[^.]{0,50}\b(?:until|till|so\s+that)\b[^.]{0,30}\b(?:beat\w*|win\w*|exceed\w*|surpass\w*)\s+(?:the\s+)?(?:baseline|SOTA|state\s+of\s+the\s+art|previous)/i,
+    // RS3 重跑到拿到想要的数字（until we get a number we like）
+    /\b(?:re-?run|rerun|repeat\w*|retry|try\s+again|run\s+(?:it\s+)?again)\b[^.]{0,60}\b(?:until|till|so\s+that)\b[^.]{0,30}\b(?:we\s+(?:get|obtain|have|like)\b|a\s+number\s+we\s+like|the\s+number\s+we\s+want|the\s+result\s+we\s+want)/i,
+    // RS4 换设置重试到显著（settings/seed 在中间）
+    /\b(?:run\s+(?:it\s+)?again|retry|rerun|re-?run|repeat)\b[^.]{0,40}\b(?:with\s+)?(?:different|new|other)\s+(?:settings?|seeds?|parameters?|config\w*|splits?)\b[^.]{0,40}\b(?:until|till)\b[^.]{0,40}\b(?:p-?value|significant|statistic\w+|beats?\s+the\s+baseline)/i,
   ],
   // ㉑ denominator / metric gaming
   metric_denominator_gaming: [
@@ -1070,6 +1116,25 @@ const REWARD_HACKING_EN = {
     // only successful，中间允许 {0,2} 个任意领域名词。实测 3/3 命中，5 条
     // 良性（含「denominator 是全部请求数」）0 误伤。
     /\bchange\s+(?:the\s+)?(?:\w+\s+){0,2}denominator\s+(?:of\s+(?:the\s+)?\w+\s+)?(?:metric\s+)?to\s+(?:only\s+)?(?:count|include|use)\s+(?:only\s+)?successful/i,
+    // ─── [v6.7.133] 第 70 轮：metric_denominator_gaming 自然语序补判（7 条）──
+    //   原 5 条要求 change/denominator 与 only count 同现，而日常做法是
+    //   「排除流失客户」「只算转化的 session」「把异常值挪进另一个桶」
+    //   「删失败样本再算平均」——四条都不含 denominator 一词。
+    // DG1 把不利样本排除出统计（canceled/churned）
+    /\b(?:exclud\w+|remov\w+|drop\w*|leave\s+out|take\s+out|filter\w+\s+out|sweep\w*\s+out)\b[^.]{0,40}\b(?:customers?|users?|sessions?|accounts?|subscribers?)\s+(?:who|that)\s+(?:cancell?ed|churned|unsubscrib\w+|dropped\s+out|convert\w+|bounced)\b[^.]{0,40}\b(?:from|out\s+of)\s+(?:the\s+)?(?:calculation|retention|metric|average|statistics|tally|denominator)/i,
+    // DG2 只算成功的，其余忽略（Count only / only count 两种语序并列——
+    //   首版只写 only count，实测 count 在前的语序整条失配）
+    /\bcount\s+(?:only|just)\b[^.]{0,40}\b(?:sessions?|customers?|users?|requests?|cases?|accounts?|events?)\s+(?:that\s+)?(?:convert\w+|succeed\w*|pass\w*|bought|subscrib\w+|stayed|completed)\b[^.]{0,40}\b(?:ignore\w*|discard\w*|drop\w*|forget\w*|exclud\w+)\b/i,
+    /\b(?:count|include|keep)\s+only\s+(?:the\s+)?(?:successful|succeeded|passed|converted|completed)\b[^.]{0,40}\b(?:ignore\w*|discard\w*|drop\w*|exclud\w+|leave\s+out)\b/i,
+    // DG3 异常值挪进另一个桶再算平均
+    /\b(?:mov\w+|shift\w+|pull\w+|place|put)\b[^.]{0,40}\b(?:outliers?|failures?|errors?|bad\s+runs?|problem(?:atic)?\s+(?:cases?|runs?))\b[^.]{0,30}\b(?:into|in|to)\s+(?:a\s+)?(?:separate|different|special|other)\s+(?:bucket|bin|group|category)\b[^.]{0,30}\b(?:before|prior\s+to|then)\b[^.]{0,20}\b(?:comput\w+|calculat\w+|averag\w+|aggregat\w+)/i,
+    // DG3b 只平均表现好的那批
+    /\b(?:averag\w+|comput\w+|calculat\w+|aggregat\w+)\s+(?:over|across|from)\b[^.]{0,40}\b(?:runs?\s+that\s+(?:behaved|passed|worked)|the\s+(?:good|successful|valid)\s+(?:runs?|samples?))\b[^.]{0,40}\b(?:discard\w*|ignor\w+|drop\w*|exclud\w+)/i,
+    // DG4 删失败样本从分母（对象含 runs；原判据 failed 与 denominator 之间
+    //   隔了 runs from the 共 33 字符，超出 {0,30} 窗口）
+    /\b(?:drop|remove|exclude|leave\s+out|take\s+out|discard)\s+(?:the\s+|all\s+|any\s+)?(?:failing|failed|error\w*|timed-?out|hard|unsuccessful)\b[^.]{0,12}\b(?:runs?|cases?|requests?|samples?|attempts?)\b[^.]{0,12}\b(?:from|out\s+of)\s+(?:the\s+)?(?:denominator|average|statistics|tally|score|metric)/i,
+    // DG4b 删失败样本 + 指标变好看（无 from 结构）
+    /\b(?:drop|remove|exclude|discard)\s+(?:the\s+|all\s+)?(?:failed|failing|unsuccessful|error\w*)\s+(?:runs?|samples?|cases?|attempts?|results?)\b[^.]{0,40}\b(?:so|thus)\b[^.]{0,30}\b(?:success\s+rate|score|metric|number|rate|average)\b[^.]{0,15}\b(?:looks?\s+(?:good|bett?er|nice|great)|goes?\s+up|looks?\s+fine)/i,
   ],
   // ㉒ eval leakage: train on the test set
   eval_leakage: [
@@ -1078,6 +1143,16 @@ const REWARD_HACKING_EN = {
     /\b(?:test|eval\w*)\s+(?:set|data|benchmark)\b[^.]{0,50}\b(?:present|claim|advertis\w+|report|sell)\w*\b[^.]{0,40}\b(?:as|for)\s+(?:generaliz\w+|generalisation|performance|ability)/i,
     // add the test set into the training data
     /\b(?:add|put|mix|includ\w+|fold)\b[^.]{0,30}\b(?:test|eval\w*)\s+(?:set|data|samples?)\b[^.]{0,30}\b(?:into|in|to)\s+(?:the\s+)?(?:train\w*|training)\b/i,
+    // ─── [v6.7.133] 第 70 轮：eval_leakage 自然语序补判（5 条）──
+    //   原 3 条只吃「train on the test set」一种说法，而日常泄漏自认是
+    //   「把训练集当 benchmark 用」「评测示例混进训练数据」「找到了评测
+    //   集就训」三种分裂语序。口径同为「手段半 + 目的半」。
+    /\b(?:use|using|treat|report|present)\b[^.]{0,40}\b(?:the\s+)?training\s+set\b[^.]{0,30}\b(?:as|for)\s+(?:the\s+)?(?:benchmark|held-?out|test\s+set|eval\w*)/i,
+    /\b(?:call|label|mark|report|present)\w*\s+it\s+(?:as\s+)?held-?out\b[^.]{0,60}\btraining\s+set\b/i,
+    /\b(?:includ\w+|add|fold|mix|put|incorporat\w+)\b[^.]{0,30}\b(?:eval|test|benchmark)\s+(?:examples?|samples?|questions?|set|data|items?)\b[^.]{0,30}\b(?:into|in|to)\s+(?:the\s+)?train\w*/i,
+    // 找到评测集就训（泄漏自认）+ 被动语序（The test questions were leaked）
+    /\b(?:found|leaked|obtained|got|download\w*)\b[^.]{0,40}\b(?:eval\w*|test|benchmark)\s+(?:set|data|questions?|examples?)\b[^.]{0,40}\b(?:so|thus|and)\b[^.]{0,30}\b(?:train\w*|fine-?tun\w*|learn\w*)|(?:test|eval\w*)\s+questions?\s+(?:were|was)\s+(?:leaked|disclosed|posted)\b[^.]{0,40}\b(?:already\s+saw|seen|memoriz\w*)/i,
+    /\b(?:the\s+)?(?:model|system|network)\b[^.]{0,30}\balready\s+saw\b[^.]{0,30}\b(?:eval|test|benchmark)\b/i,
   ],
   // ㉓ human answer proxy: a human writes the answer, claimed as model output
   human_answer_proxy: [
@@ -1095,6 +1170,18 @@ const REWARD_HACKING_EN = {
     // 注意：本条的匹配文本交给 hits 记录，元素的齐全性由模式自身的
     // 三个前瞻断言保证（英文字符串无换行，前瞻跨全句可行）。
     /^(?=[\s\S]*\b(?:have|get|let|make|ask|hire)\s+(?:a\s+)?(?:real\s+)?(?:human|person|someone|contractor|annotator|colleague|freelancer)\b)(?=[\s\S]*\b(?:write|wrote|answer|answered|draft|produced?|fill|complete|completed|do\s+the)\b)(?=[\s\S]*(?:model|AI|agent|system)-?\s*(?:generated|produced|written|output|'?s\s+(?:own\s+)?work|answer))\b.*/i,
+    // ─── [v6.7.133] 第 70 轮：human_answer_proxy 自然语序补判（6 条）──
+    //   原 4 条要求「have a human write ... then claim ... as model output」
+    //   的完整链式结构，而日常冒充是分裂语序：submit it as model output
+    //   （无真人动词）/ put their answer in the model response /
+    //   the human does the work, the model just relays（分工式）。
+    /\b(?:ask\w*|had|have|let|got|hire\w*|made)\s+(?:a\s+|the\s+)?(?:real\s+)?(?:human|person|someone|intern|contractor|annotator|colleague|freelancer|staffer)\b[^.]{0,50}\b(?:writ\w+|draft\w*|solv\w+|answer\w*|produc\w+|complet\w+|do(?:ne)?\s+the)\b[^.]{0,60}\b(?:submit\w*|mark\w*|label\w*|present\w*|report\w*|claim\w*|pass\w*|relay\w*)\w*\b[^.]{0,40}\b(?:model|AI|agent|system)\b[^.]{0,20}\b(?:output|generated|produced|response|answer|work)/i,
+    /\b(?:submit\w*|label\w*|mark\w*|report\w*|pass\w*|present\w*)\w*\s+(?:it|them|these|that|the\s+answer)\s+as\s+(?:model|AI|agent|system)[- ](?:output|generated|produced|written|answer)/i,
+    /\b(?:put|place|insert|paste|move)\b[^.]{0,40}\b(?:their|his|her|the\s+human'?s)\s+(?:answer|response|solution|work)\b[^.]{0,30}\b(?:in|into)\s+(?:the\s+)?(?:model|AI|agent|system)\s+(?:response|output|answer|reply)/i,
+    // 人干活模型传话（分工式冒充）
+    /\b(?:the\s+)?(?:human|person|intern|staffer)\s+(?:does|did|do)\s+(?:the\s+)?(?:work|task|solving|answering)\b[^.]{0,40}\b(?:the\s+)?(?:model|AI|agent)\s+(?:just\s+)?(?:relay\w*|forward\w*|re-?packag\w+|rephras\w*|dress\w*\s+up)/i,
+    /\b(?:the\s+)?(?:model|AI|agent)\s+(?:just\s+)?(?:relay\w*|forward\w*|repeat\w*|echo\w*)\b[^.]{0,30}\b(?:the\s+)?(?:human|person|intern|staffer|someone\s+else)/i,
+    /\b(?:draft\w*|writ\w+|solv\w+|answer\w*)\b[^.]{0,40}\b(?:and\s+)?(?:mark\w*|label\w*|submit\w*|present\w*|pass\w*)\s+(?:it|them|these)\s+as\s+(?:AI|artificial\s+intelligence|model)[- ]?(?:generated|produced|written|output)/i,
   ],
   // ㉔ eval config masking: switch mode/config during eval, claim old config
   eval_ruleset_masking: [
