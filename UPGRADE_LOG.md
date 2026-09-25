@@ -5,6 +5,91 @@
 
 ---
 
+## 第 46 轮（中文 slippery_slope 白话滑坡族：让步条件 × 灾难终局共现，10/10 命中 + 30 条良性零误伤）
+
+**触发**：队列无待办（q1-dljb 早已 done）→ 复测简报遗留缺口后走真 decision.decide 选向。
+
+### 一、简报缺口复测（不信旧描述）
+
+| 简报缺口 | 轮初实测 | 结论 |
+|---|---|---|
+| dangerous_instruction 开发调试语境误拦 | 10 条良性探针（class/debug/traceback/assertion failure）全部 pass、无本维度命中 | **已不成立**（q1-dljb 已修） |
+| ai_writing_tell 多语言误伤 | 7 语种良性样本（fr/es/de/ru/ja/ko/ar）score 全 0；共现门槛（familiesHit>=2）后单族命中不计分 | **不成立**（v6.7.125 第 36 轮已修） |
+| 中文 instrumental_reasoning | 既判据覆盖白话/成语/成员/KPI 四层，本轮未找到新缺口 | 暂不立项 |
+
+跨维度广采样 14 个中文维度 × 2 条（第 38 轮遗留 3 的"15 个维度成片漏判"清单）：
+slippery_slope / pseudo_causal / hasty_generalization / tone_policing / sealioning /
+bad_faith / empty_answer / vagueness / pseudo_profundity / stereotype 全 2/2 漏判（gate pass）；
+soft_deflection 1/2、capability_overclaim 2/2 命中、absolute_claim 2/2 命中。
+
+### 二、选向（decision.decide 真结果）
+
+一次分出：**选 A「slippery_slope 中文白话条件句族」，score 0.79，identity 80%**
+（C 对话施压三族 0.78、D 空话三族 0.78、B pseudo_causal 0.76）。
+结构化判据：A feasibility 0.9 / risk 0.25（灾难终局词是必要条件，良性边界清晰）。
+
+### 三、缺口复测（不信简报旧描述，重新采样）
+
+10 条中文白话滑坡攻击句走 `checkSlipperySlope`：**7 条 count=0**，gate 层 9/10 pass。
+缺口本质：上表 13 条 zh 判据只收成语壳/固定搭配（一旦开了这个口子/多米诺骨牌/潘多拉魔盒/
+不可收拾），收不到「让步条件 × 灾难终局」这个白话论证骨架；英文侧有
+if we allow this then / next thing you know / if this is allowed then 等 11 条对位判据，
+中文侧系统性缺位（第 38 轮遗留 3 清单的第一族）。
+
+### 四、改了什么（3 个 commit：`19079e4c` 引擎 + `2ec22b8a` 主测试 + `ad730217` 负例守卫）
+
+`src/index.js` SLIPPERY_PATTERNS.zh 新增 5 条判据（4 个新 type 类型）：
+
+| 判据 | 形状 | 覆盖样本 |
+|---|---|---|
+| give_in_then_disaster（条件前置） | 如果/一旦/要是 × 让步词（允许/放开/放宽/让步/妥协/破例/不阻止）× 灾难终局词 | 允许居家办公→公司很快倒闭；不阻止→整个行业跟着烂下去 |
+| give_in_then_disaster（现在前置） | 这次/现在/眼下 × 让步词 × 灾难终局词 | 放宽一次标准→底线被彻底击穿；松一寸→规矩名存实亡 |
+| concession_then_collapse | 让步词 × 就/将会 × 崩溃/失控/失守 | 让步一次可以，但制度就会全线崩溃 |
+| precedent_multiplier | 每次/往后 × 拿这次当先例 | 破例以后每次都会拿这次当先例 |
+| erosion_of_standard | 底线/原则/规矩/制度/标准 × 击穿/践踏/失守 | 底线会被彻底击穿 |
+
+**良性边界实测 0/30**：让步词在前但结果是中性动作（重新评估范围/换回来/后移两天/
+自行制定细则/试点一个月/走特批流程）全部不命中——终局词是必要条件（第 15 轮
+「如果…就…」过宽自引入回归教训的同型应用）。
+
+### 五、验证（全实测）
+
+| 项 | 结果 |
+|---|---|
+| 10 条攻击命中 | **10/10**（改前 3/10），gate 层 10/10 非 pass（8 verify / 1 rewrite） |
+| 30 条良性 | **0/30** 误伤（检测层 + 双向门禁误拦基线双查） |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（与第 37/38 轮基线 **完全持平**，零新增误伤） |
+| `bin/verify.js` | **14 passed 0 failed** |
+| `security-audit` | **16 passed 0 failed** |
+| `doc-numbers-accuracy` | 14 通过 1 失败——唯一失败仍是 README 2966 vs 实际 3454（遗留 1，第十三轮） |
+| 负例守卫 | **真守卫（整族 5 条）/ 0 有兜底 / 0 崩溃 / EXIT=0** |
+| run-all | **3454 passed 5 failed**（上轮 3453，+1 为本轮新增主测试） |
+
+run-all 的 5 个失败与第 37/38 轮完全一致、零新增：doc-numbers(README 2966) 1、
+e2e 场景10 1、instrumental-idiom-zh-round26 1（良性句「不能为了业绩就默许虚假宣传」
+被 deception 判据命中，**已用 git stash 复验与本轮改动无关**）、npm-package-integrity 1。
+
+### 六、遗留
+
+1. **README 2966 vs 实际 3454，连续第十三轮硬边界**——doc-numbers 唯一 objection，需用户放行。
+2. **第 38 轮遗留 3 的中文覆盖度缺口仍是大头**：本轮只做了 slippery_slope 一族，
+   pseudo_causal / hasty_generalization / tone_policing / sealioning / bad_faith /
+   empty_answer / vagueness / pseudo_profundity / stereotype 九族实测仍 2/2 全漏判。
+3. 5 个 run-all 失败里 instrumental-idiom-zh-round26 那条是**旧判据（deception 词表
+   收了「虚假宣传」）误伤否定式良性句**，第 47 轮可以顺手修：加否定引述豁免
+   （不能/不应/不得 + 默许/纵容）。
+4. VERSION 仍 6.7.124（硬边界不手改）。
+
+### 给下一轮的接手说明
+
+- 中文覆盖度缺口继续按 decision 排序推进：候选 B（pseudo_causal 时间先后冒充因果）、
+  C（tone_policing+sealioning+bad_faith 对话施压三族）、D（空话三族）本轮都有结构化评分，
+  直接复用可复现选向。C 是三族打包，收益面最大但可行性 0.6。
+- 负例脚本写法教训：本族 5 条判据**互相兜底**（逐条注入全落"有兜底"），必须整族注入
+  才能证明守卫有效；样本要避开旧判据词（早晚会/迟早会），否则旧判据兜底会误报"有兜底"。
+
+---
+
 ## 第 38 轮（reward_hacking 中文第 28 族「评测输入特判」：10 条攻击句从全漏判转 block）
 
 **触发**：队列无待办 → 先行复测简报遗留的三个缺口，两个当场推翻，跨维度采样找到真缺口，
