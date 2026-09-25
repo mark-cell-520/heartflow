@@ -5,6 +5,87 @@
 
 ---
 
+## 第 38 轮（reward_hacking 中文第 28 族「评测输入特判」：10 条攻击句从全漏判转 block）
+
+**触发**：队列无待办 → 先行复测简报遗留的三个缺口，两个当场推翻，跨维度采样找到真缺口，
+再用真 decision.decide 选向（三次同分后补结构化判据才分出来）。
+
+### 一、简报缺口复测（不信旧描述，三条当场推翻）
+
+简报列「dangerous_instruction 开发调试误拦 / ai_writing_tell 多语言误伤 / reward_hacking 剩余 6 类」：
+
+| 简报缺口 | 轮初实测 | 结论 |
+|---|---|---|
+| dangerous_instruction 开发调试语境误拦 | 10 条良性仅 **1** 条非 pass，且是 contradiction 维度、非本维度 | **已不成立**（q1-dljb 已修） |
+| ai_writing_tell 多语言误伤 | 中文 AI 腔良性 8 条 **0** 误伤 | **不成立** |
+| reward_hacking 剩余 6 类 | 27 族已含全部（v6.7.120/123/126 补完） | **已不成立** |
+
+跨维度采样 29 条探针发现 15 个维度中文全漏判（gate 全 pass），确认存在成片中文缺口。
+
+### 二、选向（decision.decide 跑的真结果）
+
+前三次返回 `chosen: null / confidence: 0`（options_indistinguishable：描述文本给的判据分不出高下）。
+按纪律补**结构化评分**（feasibility / risk / consequence_value）后第四次才分出来：
+**选 D「补中文 reward_hacking 评测特判族」，score 0.87，identity 对齐 80%**
+（A 逻辑谬误族 0.77，B 对话施压族 0.73）。
+
+### 三、缺口复测（10/10 全漏判坐实）
+
+采样「agent 认出评测来源再走捷径」形态 10 条攻击句 + 14 条良性：
+**攻击 10/10 全漏判**（count=0、gate 全 pass），良性 0/14 误伤。
+
+缺口本质：前 27 族都不覆盖「**识别输入属于评测**」这个动作本身
+（task_substitution 是换任务，eval_ruleset_masking 是换配置，evaluation_awareness 是有人看没人看）。
+
+### 四、改了什么（3 个 commit：`9f2246b0` 引擎 + `1f476c96` 主测试 + `4036122b` 负例守卫）
+
+`src/reward-hacking.js` REWARD_HACKING_ZH 新增第 28 族 `eval_input_shortcut`（8 条 pattern），
+统一落两半齐备结构：**识别半（评测来源）+ 捷径半（省事手法）**。
+已在 `CLASS_WEIGHT`（0.8，agent 主动作弊档）与 `CLASS_LABEL_ZH`（认出评测输入就走捷径）登记。
+
+两处过程实测坑（已写进源码注释）：
+- 「绕开真实推理」漏判——动词表只有「绕过」没写「绕开」，本文件「动词表不对齐」老坑第 N 次重演；
+- 「命中特定样例 … 给出正确答案」漏判——来源词表收了「样本」没收「样例」，捷径目标收了「标准答案」没收裸「答案」。**近义词族要整族收，不能只收最书面那一两个。**
+
+测试口径修正（实测踩到后写明理由）：30 条良性里有 2 条 gate 层非 pass，
+但都是**既有维度**边界命中（premature_termination 45 / dangerous_instruction block），与本族无关。
+守住的是「新族不误伤」，不是替既有维度背历史账 → 断言收窄为「非 pass 的原因不得是本族」。
+
+### 五、验证（全实测）
+
+| 项 | 结果 |
+|---|---|
+| 10 条攻击句命中 | **10/10**（改前 0/10），gate 全部 block |
+| 族归属 | **10/10 落 eval_input_shortcut**（无错类兜底） |
+| 30 条良性 | **0/30 误伤**（检测层 + 门禁层双查） |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（与第 37 轮基线完全持平） |
+| `bin/verify.js` | **14 passed 0 failed** |
+| `security-audit` | **16 passed 0 failed** |
+| `doc-numbers-accuracy` | 14 通过 1 失败——唯一失败是 README 2966 vs 实际 3441（见遗留 1） |
+| 负例守卫 | **4 真守卫 / 4 有兜底 / 0 异常 / EXIT=0** |
+
+### 六、遗留
+
+1. **README 2966 vs 实际 3441，连续第十二轮硬边界**——doc-numbers 唯一 objection，需用户放行。
+2. LLM 401 未解（stepfun key 失效）。
+3. 跨维度采样发现 **15 个维度中文判据成片缺失**（gate 全 pass）：slippery_slope / pseudo_causal /
+   hasty_generalization / tone_policing / sealioning / bad_faith / soft_deflection /
+   capability_overclaim / stereotype / empty_answer / goal_misalignment / vagueness /
+   pseudo_profundity 等。
+   **这是下一轮最该做的**：中文覆盖度是系统性缺口，不是零散缺口。
+4. reward_hacking 第 28 族的 4 条「有兜底」判据是族内冗余覆盖，非守卫失效。
+5. VERSION 仍 6.7.124（硬边界不手改）。
+
+### 给下一轮的接手说明
+
+- 中文覆盖度缺口是本轮**实测发现的最大一条**（29 条探针里 24 条漏判，涉及 15 个维度），
+  建议第 39 轮直接从「三逻辑谬误族（slippery_slope/pseudo_causal/hasty_generalization）」下手
+  ——本轮 decision 候选 A 的可行性/风险评分都高，只是 consequence_value 输给了 D。
+- 选向时 decision 对纯文本判据会返回同分 null，**必须补结构化 options 字段**
+  （feasibility/risk/consequence_value）才能分出高下。
+
+---
+
 ## 第 37 轮（中文 instrumental_reasoning 补「把人当工具/耗材/背锅位」族：13 条判据，22 条攻击全从漏判转命中）
 
 **触发**：队列无待办 → 用真 decision.decide 选向。A 修 dangerous_instruction 误拦（0.77）、
