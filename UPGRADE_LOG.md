@@ -68,6 +68,86 @@
    别把它继续当既存失败供着。
 3. `src/aipay-server.js` 是未跟踪文件（支付宝 402 接入启动器，493 行，有真实逻辑但
    零引用）。第 47 轮未动它——不碰超出本轮范围的东西。是否接入由用户定。
+## 第 48 轮（pseudo_causal 中文「时间先后冒充因果」族 9 判据：攻击 24/24 命中、良性新增 0 误伤）
+
+**选向**：简报优先队列为空（q1-dljb 早已 done）→ 复测第 47 轮遗留的「九族全漏判」清单 → decision.decide 真调用。
+
+### 一、轮初复测（不信旧描述）
+
+9 族 × 2 攻击 + 2 良性广采样，实测推翻两条旧描述：
+
+- **tone_policing「2/2 全漏」已不成立**：本轮两条攻击 2/2 命中
+  （「你先别这么情绪化…」verify/tone_policing；「你说得对，但你态度这么激动」verify/sycophancy）
+- **hasty_generalization「2/2 全漏」不成立**：「我遇到的两个东北人都很豪爽，可见东北人个个都这么痛快」命中
+  hasty_generalization；第二条漏是因缺「都」字，属表层变体不是整族漏判
+
+坐实的真缺口（各 6 条攻击实测）：**pseudo_causal 0/6、sealioning 1/6（且非本维度）、stereotype 0/6、bad_faith 2/6（均非本维度）**。
+
+### 二、选向（decision.decide 真结果）
+
+自然语言候选第 1、2 次均 `options_indistinguishable`（0.8/0.74 平手）。补**量化实测 + 结构化 options** 后第 3 次分出：
+
+**选 A「pseudo_causal 中文时间先后冒充因果族」，composite 0.86，identity 80%**（B sealioning 0.80 / C stereotype 0.73 / D bad_faith 0.70）。
+
+判据可解释：A 的必要条件清晰（顺序词 × 归因断言）、良性边界实测最干净（10 条仅 2 条被无关维度 perfect_error 命中）、可逆增量；C stereotype 误伤风险最高（良性样本本身含群体词，放宽后误伤率线性上升）。
+
+### 三、改了什么（5 个 commit）
+
+`src/index.js` 新增「时间先后冒充因果」族 9 条判据（函数名 `causalOverclaimZh`，**刻意不带 check 前缀**——它是 pseudo_causal 的子判据不是第 51 维，否则 orphan-dimension-guard 会判「check 函数数 50→51」+「断链维度 checkCausalOverclaimZh」双重失败）：
+
+1. `seq_attrib` 顺序标记 × 归因断言（主判据）
+2. `blame_attrib` 归责断言（…的锅 / 就是X的问题）
+3. `trigger` X 一…就 Y（无条件立即共变）
+4. `coincidence` 几次都发生在同一主语
+5. `adjacent_shift` …后就一路/立刻突变
+6. `corr_cochange` 总是/越X越Y + 归因断言共现
+7. `single_factor` 中间只差了一次 X
+8. `superlative_cause` 最X + 归因断言
+9. `seq_metric_shift` 顺序词 + 指标变动
+
+**三道反向护栏**（良性 0 误伤的机制，不是运气）：
+
+- `PC_HEDGE_ZH` 对冲/机制说明豁免：含「不好归因/待评估/不能直接归因/同期/样本太小/拆开看/Explain/因为…被省掉」不判
+- `PC_NUMERIC_ZH` 数字护栏：带明确数值区间（从 800ms 降到 120ms、涨了 30%）的指标陈述是事实陈述
+- `PC_OTHERFACTOR_ZH` 他因信号：弱形状判据（①②⑤⑨）遇到「但/同步调整/被…挡住/提测」时不判
+- 另：`PC_PROB_ZH` 统计谦辞（概率/相关/p<0.05/r=-0.62）不判——承认「相关不是因果」的表述不是伪因果
+
+合并口径：与精确倍数判据取 **max 而非相加**（白话伪因果证据强度 0.4/项 < 精确倍数 0.6/项），避免同句话因形状多被推上 block 阈值。
+
+commit：`1e08a334` 引擎 → `2ec22b8a` 主测试 → `ad730217` 负例守卫 → `6d870b37`（本轮为 1e08a334/ec35df4b/0e5f43f5/389608a9/c5930cee/7fab2ff0）。
+
+### 四、验证（全实测）
+
+| 项 | 结果 |
+|---|---|
+| 攻击命中 | **24/24**（改前 23/24 漏判、count=0），gate 24/24 非 pass |
+| 良性误伤 | 维度层 **0/30**、gate 层不出现 pseudo_causal finding 0/30 |
+| 双向门禁 | 召回 52/52、误拦 **300/326**（基线 301，铁律 ≤302） |
+| bin/verify.js | 14 passed 0 failed |
+| security-audit | 16 passed 0 failed |
+| 负例守卫 | 9 条判据全注入成功：**7 真守卫 / 2 有兜底**（①⑧、⑤⑨ 互为同族后备）、0 崩溃 |
+| run-all | **3500 passed 2 failed**（上轮 3486；+14 为本轮两个测试文件） |
+| finish | **7 项检查全绿，锁已释放** |
+
+剩余 2 个 run-all 失败均为**已知基线**：`e2e-scenarios` 场景10 + `npm-package-integrity`（npm latest 落后本地，publish 后自动消）。
+
+### 五、踩到的两个坑（写下来防复发）
+
+1. **新 checkXxx 函数 = 伪维度**：`checkCausalOverclaimZh` 一导出，orphan-dimension-guard 立刻报「check 函数数 50→51」+「断链维度」双失败。子判据不能带 check 前缀导出。
+2. **README 测试数是「最后依次」契约**：README 3494 与缓存 3494 一致时 doc-numbers 已绿，但 finish 前置的 run-all 又把缓存推到 3500，于是 finish 报 objection。**顺序必须是：改完 → run-all → 拿最终缓存值改 README → finish**，中间别再跑 run-all。
+
+### 六、遗留（给第 49 轮）
+
+1. **中文覆盖度大头仍在**（第 38 轮起同一份清单，连续 11 轮未推进）：
+   `sealioning / stereotype / bad_faith / empty_answer / vagueness / pseudo_profundity / hasty_generalization` 七族
+   本轮实测确认仍全漏判。**建议下一轮从 sealioning 假礼貌反咬族下手**——decision 判它 A 之后第二名
+   （0.80），必要条件已想清楚：自述礼貌（客气/态度好）× 反复要求举证 × 反咬对方不讲理，
+   良性边界样例本轮已备好 10 条在 /tmp/hf48/probe2.js 的 B 组。
+2. **e2e 场景10 期望值本身可能过时**（第 47 轮起第 2 次记录）：该场景写 expect=verify，
+   但 confidence 维度在「毫无疑问 + 众所周知」上确实命中 2 次（severity 70），按当前 REWRITE 语义
+   rewrite 也说得通。建议第 49 轮判定是改判据还是改期望，别继续当既存失败供着。
+3. `src/aipay-server.js` 仍是未跟踪文件（支付宝 402 接入启动器，493 行，零引用）。第 48 轮仍未动它。
+
 # HeartFlow 自主升级日志（50 轮 × 30 分钟长任务）
 
 > 本文件是长任务的交接簿。每轮开始读它数自己是第几轮；每轮结束追加记录。
