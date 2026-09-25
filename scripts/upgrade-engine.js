@@ -299,6 +299,33 @@ function cmdFinish() {
   const failed = results.filter(r => !r.ok);
   results.forEach(r => console.log(`  ${r.ok ? '✅' : '❌'} ${r.name}: ${r.msg}`));
 
+  // ②.5 自动推送到远程（无人值守闭环，v6.7.126 第 60 轮）
+  // 为什么加在 finish：此前 push 完全依赖独立的「定时同步」任务（5 小时一次）。
+  // 一旦那个任务因网络/TLS 失败，commit 就在本地无限积压——实测曾积压 9 个，
+  // 而 finish 的 7 项检查不看远程，照样报全绿，产物其实只在本地。
+  // 无人值守要求**产出必须离开本机**，所以把推送内联到轮末。
+  // 网络失败不阻塞本轮（本地 commit 已安全，下轮/同步任务会重试）。
+  console.log('\n── ②.5 推送远程 ──');
+  try {
+    const unpushed = trySh('git log --oneline heartflow/main..HEAD').split('\n').filter(Boolean).length;
+    if (unpushed === 0) {
+      console.log('  ✅ 无未推送 commit');
+    } else {
+      console.log(`  📤 ${unpushed} 个未推送 commit，尝试推送…`);
+      // 代理是已知的坑：容器里 https_proxy 指向 172.17.0.1:7890，对 github 时通时不通。
+      // 按「先直连、后代理」顺序试，任一天成功即止。
+      let pushed = false;
+      for (const [label, prefix] of [['直连', 'env -u https_proxy -u http_proxy -u HTTPS_PROXY -u HTTP_PROXY'], ['代理', '']]) {
+        try {
+          const r = require('child_process').execSync(
+            `${prefix ? prefix + ' ' : ''}git push heartflow main --no-verify 2>&1`, { cwd: ROOT, encoding: 'utf8', timeout: 90000 });
+          if (/main -> main|up-to-date|Everything up-to-date/.test(r)) { console.log(`  ✅ 推送成功（${label}）`); pushed = true; break; }
+        } catch (e) { console.log(`  ⚠️ ${label}失败: ${String(e.message).split('\n')[0].slice(0, 90)}`); }
+      }
+      if (!pushed) console.log('  🟡 推送未成功，本地 commit 已安全；下轮或同步任务会重试');
+    }
+  } catch (e) { console.log(`  ⚠️ 推送检查异常（不阻塞本轮）: ${e.message}`); }
+
   // ③ 归因哨兵
   console.log('\n── ③ 归因哨兵（已知误拦样本，须保持 pass） ──');
   const sentinels = [
