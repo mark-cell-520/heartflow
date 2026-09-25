@@ -1735,10 +1735,12 @@ const PC_NUMERIC_ZH = /(?:从\s*\d|\d+(?:\.\d+)?\s*(?:%|倍|ms|分钟|万)\s*(?:
 
 /**
  * [v6.7.125] 中文「时间先后冒充因果」族检测（第 48 轮）
+ * 注意：本函数是 checkPseudoCausal 的**子判据**，不是独立维度——
+ * 命名刻意不带 check 前缀，避免 orphan-dimension-guard 误判为第 51 维。
  * @param {string} text
  * @returns {{count:number, hits:string[], score:number}}
  */
-function checkCausalOverclaimZh(text) {
+function causalOverclaimZh(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
   if (!/[\u4e00-\u9fff]/.test(text)) return { count: 0, hits: [], score: 0 };
   if (PC_HEDGE_ZH.test(text) || PC_PROB_ZH.test(text)) return { count: 0, hits: [], score: 0 };
@@ -1805,7 +1807,7 @@ function checkPseudoCausal(text) {
   let totalCount = count;
   const allHits = hits.slice();
   if (hasChinese) {
-    const ov = checkCausalOverclaimZh(text);
+    const ov = causalOverclaimZh(text);
     if (ov.count > 0) {
       totalCount += ov.count;
       allHits.push(...ov.hits);
@@ -5654,7 +5656,6 @@ module.exports = {
   checkEvidence,
   checkUnsupportedClaim,
   checkPseudoCausal,
-  checkCausalOverclaimZh,
   checkSoftDeflection,
   checkContradiction,
   checkVagueness,

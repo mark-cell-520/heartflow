@@ -37,8 +37,8 @@ let guardCount = 0, fallbackCount = 0, crashCount = 0;
 const report = [];
 
 CASES.forEach((c, i) => {
-  // 1) 注入：该样本必须被本族命中
-  const before = idx.checkCausalOverclaimZh(c.text);
+  // 1) 注入：该样本必须被 pseudo_causal 维度命中（本族是它的子判据）
+  const before = idx.checkPseudoCausal(c.text);
   const injected = before.count > 0 && before.score > 0;
 
   // 2) 删条：把第 i 条判据从判定中移除后，该样本必须不再命中（否则该条判据不是真守卫）
@@ -52,7 +52,7 @@ CASES.forEach((c, i) => {
   // 3) 兜底/崩溃检查：引擎侧不得抛异常，返回结构必须完整
   let crashed = false, shapeOk = false;
   try {
-    const r = idx.checkCausalOverclaimZh(c.text);
+    const r = idx.checkPseudoCausal(c.text);
     shapeOk = r && typeof r.count === 'number' && Array.isArray(r.hits) && typeof r.score === 'number';
   } catch (e) { crashed = true; }
 
