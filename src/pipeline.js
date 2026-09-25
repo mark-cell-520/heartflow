@@ -31,6 +31,30 @@ const { evaluateRules } = require('./knowledge/classics-value-mapper.js');
 let pipelineAnchor = null;
 
 /**
+ * [v6.7.129 第 55 轮] 动作严格度比较——后层覆盖前层时的防降级闸门。
+ *
+ * 修复的引擎级 bug（第 55 轮实测发现，实例不是本轮新族引入）：
+ *   「用户停留时长的目标已经达成了，改一下分母就行」
+ *   → discriminate 层判 block(reward_hacking sev 75)，
+ *     frame-check 层报 1 个 closure issue(sev 30) 但其自身 gate=pass，
+ *     pipeline 无条件 `currentGate = frameResult.gate` **把 block 覆盖成 pass**。
+ *   结果 findings 里 reward_hacking(75) 还在、verdict=不可信，而 gate=pass
+ *   ——对外契约铁律「verdict 由 action 派生，不得矛盾」被破坏。
+ *
+ * 根因：Layer 6/7/8 三处覆盖都是无条件的，低严重度的后层可以把高严重度的
+ * 前层结论抹掉。修法遵循仓库既有的「合并而非覆盖」精神（perfect_error 分支
+ * 已有先例），只加**防降级**：后层 gate 更严时才接管，同等或更松一律保留
+ * 前层结论。升级路径不受影响（block←rewrite←verify←pass 单向）。
+ */
+const _GATE_STRICTNESS = { pass: 0, verify: 1, rewrite: 2, block: 3 };
+function gateIsStricter(next, current) {
+  const a = _GATE_STRICTNESS[next];
+  const b = _GATE_STRICTNESS[current];
+  if (a === undefined || b === undefined) return false; // 未知动作不接管，保守保留前层
+  return a > b;
+}
+
+/**
  * 运行全链路管线
  * @param {object} options
  * @param {string} options.input - 用户输入或 AI 草稿
@@ -205,12 +229,17 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
     }
   }
 
-  // ─── Layer 6: Frame Check (仅output/draft模式) ─
+  // ─── Layer 6: Frame Check (仅output/draft模式) ────
+  // [v6.7.129] 防降级：frame-check 自身 gate 比当前更严才接管。
+  //   实测 bug：closure issue(sev 30) 报出来但 frameResult.gate=pass，
+  //   旧代码无条件覆盖把上游的 block 抹成 pass，导致 findings 与 gate 矛盾。
   if (mode !== 'input') {
     const frameResult = frameCheck(input);
     checked_by.push({ layer: 'frame-check', issues: frameResult.issues.length });
     if (frameResult.issues.length > 0) {
-      currentGate = frameResult.gate;
+      if (gateIsStricter(frameResult.gate && frameResult.gate.action, currentGate.action)) {
+        currentGate = frameResult.gate;
+      }
       data.frame = frameResult.issues;
     }
   }
@@ -234,7 +263,8 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
       const hadPerfectError = discResult.dimensions?.perfect_error?.count >= 2 && currentGate.action === 'rewrite';
       if (hadPerfectError && screenResult.gate.action === 'rewrite') {
         currentGate.reason = `${currentGate.reason}；输出门禁: ${screenResult.gate.reason || '需改写'}`;
-      } else {
+      } else if (gateIsStricter(screenResult.gate.action, currentGate.action)) {
+        // [v6.7.129] 防降级：输出门禁只有更严时才接管（与 frame-check 同因）
         currentGate = screenResult.gate;
       }
       data.outputIssues = screenResult.findings;
@@ -250,7 +280,8 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
       const hadPerfectError = discResult.dimensions?.perfect_error?.count >= 2 && currentGate.action === 'rewrite';
       if (hadPerfectError) {
         currentGate.reason = `${currentGate.reason}；doubt: ${doubtResult.gate.reason || '过度断言'}`;
-      } else {
+      } else if (gateIsStricter(doubtResult.gate.action, currentGate.action)) {
+        // [v6.7.129] 防降级：doubt-engine 同样只在更严时接管
         currentGate = doubtResult.gate;
       }
       data.doubts = doubtResult.doubts;
