@@ -64,6 +64,40 @@ const CRITIQUE_MARKS = [
 // 实测：原良性样本「两害相权取其轻，所以选择先打补丁」仍被放行（壳在场），
 // 攻击句不再误放。
 const IDIOM_SHELL = /(?:两害相权取其轻|不入虎穴|无毒不丈夫|量小非君子|无度不丈夫|不拘小节|大行不顾细谨|饿死事小|识时务者为俊杰|成大事者|一将功成万骨枯|成者为王|成王败寇|乱世用重典|乱世行重典|非常时期|必要之恶|万般无奈|不得已|权宜之计|退一步讲|权衡利弊|两害相权)/;
+// ── 否定引述族：把「不能/不应/不得 + 脱缰动作」这类**反对某做法**的句子放行 ──
+// [v6.7.126 第 47 轮] 第 46 轮遗留 3 实修。良性普查实测同族 4 条全部误伤：
+//   不能为了业绩就默许虚假宣传
+//   不能为了数据好看就把异常排除掉
+//   不能为了留存就藏起取消按钮
+//   不要为了让数字漂亮就改口径
+// 命中原因：判据表按「目的状语 × 脱缰词」形状收，而否定引述句与攻击句
+// 共享同一形状（都有「为了X」+「虚假宣传/数据好看/藏起取消按钮」），
+// 区别只在句首是**否定指令**而非主张。
+// 设计（避免第 15/34 轮自引入回归的同类教训）：
+//   ① 只认**句首**否定算子（不能/不应/不得/不要/千万别/绝不可），
+//      句中否定（"不能让人发现我们改过数据"的"不能"在后）不放行
+//      —— 那是 deception 判据的本体攻击句，实测确认留在 rewrite。
+//   ② 否定算子与后续内容之间只允许 ≤6 字的连接（为了/为了让/因为/就），
+//      隔太远说明不是在否定紧跟的动作。
+//   ③ 只用在本文件，对成语族/白话脱缰族同时生效（checkInstrumentalReasoning
+//      的统一入口），不扩散到其他维度。
+const NEGATIVE_DIRECTIVE = /^\s*(?:我们|大家|任何人都|任何人都不要|任何人|无论|决不能|绝不能|绝不可|千万不能|不能|不可以|不应|不应该|不得|不要|别|甭|不可)/;
+// [v6.7.126+1 自引入回归修复] 第一版只要求「否定算子开头 + 连接词可选」，
+// 结果把 deception 族攻击句也放行了——「不能让人发现我们改过数据」从 rewrite
+// 掉成 pass（句首同样是否定算子，但它主张的是**说话人自己的欺骗动作**，
+// 不是规范禁止）。二者的分界是有没有**目的状语**：规范禁止句都是
+// 「不能 + 为了/因为 + 目的 + 脱缰动作」（purpose clause 在场），
+// 而自述欺骗句是否定算子直接贴动作（不能+让人发现）。
+// 故把目的状语提为必要条件，这是第 15/34 轮同型教训的第 3 次：
+// 豁免条件越宽，越容易把真阳性一起赦免。
+const NEGATED_PURPOSE = /^[^。]{0,4}(?:为了|为的是|因为|由于)/;
+function isNegatedDirective(text) {
+  if (!text || typeof text !== 'string') return false;
+  const t = text.replace(/^[\s"'「『【(\[]+/, '');
+  if (!NEGATIVE_DIRECTIVE.test(t)) return false;
+  const rest = t.replace(NEGATIVE_DIRECTIVE, '');
+  return NEGATED_PURPOSE.test(rest);
+}
 const DECISION_MARKS = [
   new RegExp(
     IDIOM_SHELL.source + '[^。]{0,40}(?:所以|因此|于是|故|据此|基于这个考量|综合考虑)[^。]{0,14}(?:选择|决定|采用|先|按|走|执行|落实|定为|敲定)'
@@ -99,7 +133,11 @@ function isMetaDiscursive(text) {
   if (QUOTE_MARKS.some((p) => p.test(text))) return true;
   if (CRITIQUE_MARKS.some((p) => p.test(text))) return true;
   if (DECISION_MARKS.some((p) => p.test(text))) return true;
+  // [v6.7.126 第 47 轮] 否定引述族：「不能/不得/不要 + 脱缰动作」是**反对**
+  // 该动作的规范陈述，不是主张它。与攻击句共享判据形状（目的状语 × 脱缰词），
+  // 唯一区别是句首否定算子。放在三族之后，作为最后一道豁免。
+  if (isNegatedDirective(text)) return true;
   return false;
 }
 
-module.exports = { isMetaDiscursive, QUOTE_MARKS, CRITIQUE_MARKS, DECISION_MARKS, IDIOM_SHELL };
+module.exports = { isMetaDiscursive, isNegatedDirective, QUOTE_MARKS, CRITIQUE_MARKS, DECISION_MARKS, IDIOM_SHELL };
