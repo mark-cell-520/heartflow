@@ -5543,9 +5543,17 @@ function checkBadFaith(text) {
       signals.push({ pattern: m[0].slice(0, 30), type, severity });
     }
   }
-  const count = signals.length;
+  // [v6.7.128] 「装讨论」族（第 52 轮实测缺口）。
+  // 上面 32 条判据全是「你+指控」句式（你在偷换概念/你带节奏/你屁股歪了），
+  // 收不到**自封中立**型 bad faith discussion：先用「就事论事 / 理性 /
+  // 我没有立场」把自己摆在裁判位，再把对方的立场 / 逻辑 / 品格
+  // 判为「不理性、片面、预设立场」。轮初实测 20 条中文 + 4 条英文同族
+  // 攻击本维度 0/24，补判据后 24/24 命中（gate 全部 verify，未越级）；
+  // 良性边界 15 条（单信号：只伪装不攻击 / 只攻击不伪装）0/15 误伤。
+  // ⚠️ push 必须在 score 计算**之前**（第 51 轮同款纪律）。
+  signals.push(...badFaithFeignedDiscussion(text, hasChinese));
   const score = Math.min(1, signals.reduce((s, sig) => s + sig.severity * 0.25, 0));
-  return { count, signals, score };
+  return { count: signals.length, signals, score };
 }
 
 // ─── 第41维: 语调警察检测（Tone Policing Detection）───────────────────
@@ -5725,6 +5733,29 @@ function sealioningPoliteTrap(text, hasChinese) {
   }
   if (core >= 2) {
     return [{ type: 'polite_bait_trap', match: text.slice(0, 20), severity: 0.7 }];
+  }
+  return [];
+}
+
+// ─── 「装讨论 × 立场贬损」耦合判据（第 52 轮，非 check 前缀子判据）───
+// 形态：bad faith discussion（维基百科正名）——先声明自己没攻击性
+// （就事论事/理性/没有立场），再把对方立场/逻辑/品格贬损。原有 32 条
+// 判据都是「你+指控」，缺「自封中立」这一半，因此全族漏判。
+// 共现纪律（第 36 轮起未松动）：disguise × attack 两信号同现才命中，
+// 单信号一律不计——单「就事论事」是正常讨论，单「你双标」是直接批评。
+const BADFAITH_DISGUISE_ZH = /(我不是要?抬杠|不是要?针对你|没有任何立场|纯粹是中立的?|自认为很?客观|就事论事|心平气和|理性(地|讨论|讨论而已|分析)|只是想?讨论|没有恶意|讲道理的?|有话好好说|别误会|没有针对|正常交流|不吐不快|不站队|保持中立|没有情绪|很冷静|说句实话|说句(心里)?话|恕我直言|有话直说|纯中立|保持客观|客观(地|讲|来说|看)|不带情绪|冷静地|提出质疑不等于|不是说不能讨论|不是针对谁|我讲逻辑)/i;
+// ⚠️ 「抬杠」只在有否定前缀时算伪装（我不是要抬杠）；裸「抬杠」是攻击信号，
+//    放进这里会让「你就是想抬杠」也拿到伪装票，共现被凭空凑出来。
+const BADFAITH_DISGUISE_EN = /(just (playing|to play|play) devil['’]s advocate|perfectly neutral|not taking sides|objectively speaking|with all due respect|no offense|don['’]t take this personally|just asking questions|for the sake of argument|calmly|rationally|i['’]m not biased|i have no (side|stake)|let['’]s be objective|just to be clear|i mean no harm)/i;
+// 贬损内核：判对方立场/逻辑/品格有问题（不含中性的事实纠正）
+const BADFAITH_ATTACK_ZH = /(立场有问题|逻辑(根本)?(站不住|站不住脚|混乱|有问题|感人)|理解能力(明显)?(有限|有问题|堪忧)|水平(有限|就这样|太低)|偷换概念|断章取义|滑坡谬误|诡辩|强词夺理|无理取闹|东拉西扯|不知所云|急了|你急|破防|玻璃心|太敏感|情绪化|不理性|偏激|极端|片面|肤浅|幼稚|天真|可笑|荒唐|离谱|讲不通|无法沟通|不可理喻|为反对而反对|为了反对而反对|逢.{0,4}必反|屁股决定脑袋|立场先行|预设立场|带着偏见|戴有色眼镜|选择性失明|装睡|叫不醒|双标|智商(感人|堪忧|有问题)?|脑子(不清楚|有问题|进水)|被说中了|就是错的|缺乏依据|结论下得过于轻率|带有明显的偏见)/i;
+const BADFAITH_ATTACK_EN = /(your (logic|argument|position|opinion|reasoning|view) (is|doesn['’]t make|makes no|falls apart)|makes no sense|doesn['’]t follow|that['’]s (a )?(straw ?man|fallacy|false equiv)|you('re| are) (being )?(irrational|emotional|biased|dis ingenuous|disingenuous|naive|delusional|stupid|paranoid|bitter|triggered)|cognitive dissonance|moving the goalposts|bad faith|you['’]re projecting|you don['’]t (really )?understand|your bias is showing)/i;
+
+function badFaithFeignedDiscussion(text, hasChinese) {
+  const disguise = hasChinese ? BADFAITH_DISGUISE_ZH.test(text) : BADFAITH_DISGUISE_EN.test(text);
+  const attack = hasChinese ? BADFAITH_ATTACK_ZH.test(text) : BADFAITH_ATTACK_EN.test(text);
+  if (disguise && attack) {
+    return [{ pattern: text.slice(0, 20), type: 'feigned_discussion', severity: 0.7 }];
   }
   return [];
 }
