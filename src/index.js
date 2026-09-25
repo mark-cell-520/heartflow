@@ -5088,7 +5088,71 @@ function checkStereotype(text) {
     const m = text.match(pat);
     if (m) signals.push({ type, match: m[0].slice(0,20) });
   }
+  // [v6.7.125] 「群体 × 天生归因 × 贬损特质」耦合族。
+  // 第 49 轮实测缺口：18 条攻击样本本维度命中 0/18（「女司机天生方向感就差」
+  // 这类把对真实人群的贬损包装成生理事实的句子全部放行）。上面的
+  // STEREOTYPE_PATTERNS 全是「所有X都/地域黑」形态，覆盖不到
+  // 「天生/生理决定 + 具体群体 + 禀赋否定」的组合。
+  // 刻意保守：必须三信号齐备（群体词 × 归因词 × 贬损词），单信号不命中。
+  // 良性边界实测：含群体名词但无耦合（女性平均寿命比男性长 / 研究表明男女
+  // 大脑灰质分布确有不同）不命中。
+  signals.push(...stereotypeInnateDerog(text, hasChinese));
   return { count: signals.length, signals, score: Math.min(1, signals.length * 0.25) };
+}
+
+// ─── 「群体 × 天生归因 × 贬损特质」耦合判据（第 49 轮，非 check 前缀子判据）───
+// 三个信号缺一不可。分支2（本质主义概括）刻意不用「都/往往」这类弱信号单独触发，
+// 必须同时有贬损禀赋词 —— 否则「东北人都很热情」这类褒义概括会被误判。
+const STER_GROUP_ZH = [
+  '女司机', '女性', '女生', '女人', '男的', '男性', '男人', '直男', '剩女',
+  '老年人', '年纪大', '岁数大', '老人', '中年人', '00后', '90后', '95后', '00 后', '年轻人', '这个年代', '这代人', '那代人', '这个年龄段', '年龄段',
+  '东北人', '河南人', '上海人', '北京人', '外地人', '农村来', '农村人', '乡下人', '城里人', '小地方', '那地方的人', '西部',
+  '程序员', '产品经理', '设计师', '做销售的', '当老板的', '搞技术的',
+  '胖子', '瘦子', '内向的人', '外向的人', '学历低', '大专生', '文科生', '理科生', '复读的', '单亲家庭', '属虎的',
+];
+const STER_GROUP_EN = [
+  'women', 'men ', ' girl', ' boy', 'elderly', 'older ', 'seniors', 'millennials',
+  'gen z', 'boomers', 'immigrants', 'migrants', 'those people', 'people from that',
+  'asians', 'africans', 'latinos', 'indians', 'white people', 'black people',
+];
+const STER_INNATE_ZH = [
+  '天生', '生理决定', '基因决定', '基因', '骨子里', '本性', '血缘', '先天', '体质',
+  '大脑结构决定', '生理上', '从基因上', '注定', '生下来', '娘胎', 'DNA',
+];
+const STER_INNATE_EN = ['naturally', 'biological', 'genetics', 'born ', 'inherently', 'wired', 'DNA', 'hardwired'];
+const STER_DEROG_ZH = [
+  '差', '慢', '差劲', '不如', '不行', '废', '玻璃心', '不靠谱', '怕老婆', '不懂',
+  '暴躁', '脾气爆', '保守', '眼界', '自制力', '领导力', '审美', '情绪化', '不修边幅',
+  '不适合', '学不会', '先天不足', '做不了大事', '嫌这嫌那', '吃不了苦', '不好管理',
+  '方向感', '不冷静', '蛮干', '小心眼', '不理性', '感性', '莽', '轴',
+  '不守时', '说话不算数', '没信用', '爱计较', '好斗', '攻击性强', '敏感',
+];
+const STER_DEROG_EN = [
+  'worse at', 'cannot ', "can't", 'inferior', 'lazy', 'prone to', 'bad at',
+  'incapable', 'unsuited', 'weak at', 'poor at', 'never learn', "can't learn",
+  'aggressive', 'not suited', 'bad drivers', 'too emotional', 'irrational', 'careless', 'disorganized',
+];
+// 本质主义概括词 —— 仅在分支2 与贬损禀赋同时出现时命中
+const STER_ESSENCE_ZH = ['就是', '都是', '从来', '一进', '多半', '往往', '改不了', '注定', '只会', '惯', '都', '说到底', '终究'];
+
+function stereotypeInnateDerog(text, hasChinese) {
+  const low = text.toLowerCase();
+  const groups = hasChinese ? STER_GROUP_ZH : STER_GROUP_EN;
+  const innate = hasChinese ? STER_INNATE_ZH : STER_INNATE_EN;
+  const derog = hasChinese ? STER_DEROG_ZH : STER_DEROG_EN;
+  const hasGroup = groups.some(g => low.includes(g.trim().toLowerCase()));
+  if (!hasGroup) return [];
+  const hasInnate = innate.some(g => low.includes(g.trim().toLowerCase()));
+  const hasDerog = derog.some(g => low.includes(g.trim().toLowerCase()));
+  if (hasInnate && hasDerog) {
+    return [{ type: 'group_innate_derog', match: text.slice(0, 20) }];
+  }
+  // 分支2：群体 × 本质主义概括 × 贬损禀赋
+  const hasEssence = hasChinese && STER_ESSENCE_ZH.some(g => text.includes(g));
+  if (hasEssence && hasDerog) {
+    return [{ type: 'group_essentialist_derog', match: text.slice(0, 20) }];
+  }
+  return [];
 }
 
 // ─── 事实性/幻觉检测（Factual Consistency / Hallucination Flag）─────────
