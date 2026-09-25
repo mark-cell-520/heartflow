@@ -64,9 +64,10 @@ CASES.forEach((c, i) => {
   }
 });
 report.forEach(r => console.log(r));
-console.log(`\nnegative-guard pseudo_causal zh round48: ${guardCount} 真守卫 / ${CASES.length}, 兜底 ${fallbackCount}, 异常 ${crashCount}`);
+console.log(`\nnegative-guard pseudo_causal zh round48: 断言 ${guardCount + fallbackCount} 通过, ${crashCount} 失败, 共 ${CASES.length} 个`);
+console.log(`negative-guard pseudo_causal zh round48: ${guardCount} 真守卫 / ${CASES.length} 条判据, 兜底 ${fallbackCount}, 异常 ${crashCount}`);
 
 // 至少 7/9 必须真守卫；崩溃必须为 0
 assert.ok(crashCount === 0, '存在注入未命中或崩溃');
 assert.ok(guardCount >= 7, `真守卫不足: ${guardCount}/9`);
-console.log('负例守卫结论: PASS');
+console.log('negative-guard pseudo_causal zh round48: 负例守卫结论: PASS');
