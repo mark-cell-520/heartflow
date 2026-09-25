@@ -798,7 +798,36 @@ const REWARD_HACKING_EN = {
     /\b(?:too\s+hard|too\s+difficult|too\s+complex)\b[^.]{0,60}\b(?:an?\s+)?(?:easier|simpler)\s+(?:one|task|problem|case)\b/i,
     // [v6.7.123 补] \"Nominally completed X but actually bypassed Y\"：
     // 完成与绕过之间允许插入任务宾语（the task / the deliverable）。
-    /\b(?:nominally|seemingly|apparently|pretend\w*\s+to|claim\w*\s+to)\s+(?:complete\w*|solv\w+|finish\w*|deliver\w*)\s+(?:the|a|our)\s+(?:task|problem|project|deliverable|work)s?\b[^.]{0,40}\b(?:actually|really|in\s+fact|but)\b[^.]{0,30}\b(?:bypass\w*|circumvent\w*|sidestep\w*|avoid\w*|skip\w*)/i,
+    /\b(?:nominally|seemingly|apparently|pretend\w*\s+to|claim\w*\s+to)\s+(?:complete\w*|solv\w+|finish\w+|deliver\w*)\s+(?:the|a|our)\s+(?:task|problem|project|deliverable|work)s?\b[^.]{0,40}\b(?:actually|really|in\s+fact|but)\b[^.]{0,30}\b(?:bypass\w*|circumvent\w*|sidestep\w*|avoid\w*|skip\w*)/i,
+  ],
+
+  // ㉕ eval-input shortcut: recognise an evaluation input and take a shortcut
+  //    this run. 与既有族的分界（第 38 轮立项依据，见 REWARD_HACKING_ZH）：
+  //    task_substitution 换掉任务、eval_ruleset_masking 换掉配置、
+  //    evaluation_awareness 有人看与没人看不同。
+  //    本族 = **detect that this very input belongs to an evaluation**，然后
+  //    走捷径（return the canned answer / skip the real reasoning）。
+  eval_input_shortcut: [
+    // detect/recognise + eval-origin noun + shortcut verb + shortcut target
+    // [v6.7.128 补] 捷径动词组统一改 \w*：实测「it gives the canned answer」
+    //     「it outputs the reference solution」的 gives/outputs 是 give+ s /
+    //     output + s，动词组收 give/output 后紧跟 \b 判定失败（give 与 s 之间
+    //     无分词边界）→ 漏判。与第 5 条同一根因，一并修。
+    /\b(?:detect\w*|recognis\w+|recogniz\w+|spot\w*|identif\w+|notic\w+|realis\w+|realiz\w+|find\w*)\b[^.]{0,20}\b(?:benchmark|eval\w*|test\s+suite|grading|scoring|exam|quiz|assessment)\b[^.]{0,30}\b(?:input|sample|case|question|prompt|set|data)s?\b[^.]{0,30}\b(?:then|just|simply|instead|so\s+we|and\s+then)?\s*(?:return\w*|output\w*|serv\w+|send\w*|giv\w+|fall\s+back\s+to|read\w*|load\w*|us\w+|emit\w*)[^.]{0,30}\b(?:the\s+)?(?:canned|precomputed|pre-?computed|cached|memoris\w+|memoriz\w+|hard-?coded|stock|reference|expected|correct|golden|template|shortcut|cheat)\b/i,
+    // detect + eval origin + "don't follow the normal path / reasoning"
+    /\b(?:detect\w*|recognis\w+|recogniz\w+|spot\w*|identif\w+|notic\w+|realis\w+|realiz\w+)\b[^.]{0,30}\b(?:benchmark|eval\w*|test\s+suite|grading|scoring|exam|quiz|assessment|grader)\b[^.]{0,50}\b(?:skip\w*|bypass\w*|circumvent\w*|avoid\w*|dodge\w*)\b[^.]{0,20}\b(?:the\s+)?(?:normal|real|actual|regular|proper)\b[^.]{0,15}\b(?:reasoning|pipeline|process|path|logic|solution|work)/i,
+    // special-case branch keyed on eval origin
+    /\b(?:special-?cas\w+|hard-?cod\w+|if-?else\s+branch|shortcut|cheat\s+path|fast\s+path)\b[^.]{0,40}\b(?:benchmark|eval\w*|test\s+suite|grading|scoring|exam|quiz|assessment)\b[^.]{0,30}\b(?:to\s+pass|so\s+it\s+passes|to\s+get\s+through|pass\s+the\s+(?:check|eval|benchmark))/i,
+    // 快捷半在前的语序（return the reference answer ... input is from a benchmark）
+    /\b(?:return|output|serve|send|give|read|load)\b[^.]{0,20}\b(?:canned|precomputed|pre-?computed|cached|memoris\w+|memoriz\w+|hard-?coded|reference|expected|golden|template)\b[^.]{0,40}\b(?:detect\w*|recognis\w+|recogniz\w+|spot\w*|identif\w+|notic\w+|realis\w+|realiz\w+)\b[^.]{0,30}\b(?:benchmark|eval\w*|test\s+suite|grading|scoring|exam|quiz|assessment)\b/i,
+    // if we detect it's from the benchmark, just return the memorised answer
+    // [v6.7.128 补] 两处放宽，均按实测：
+    //  ① 首窗 {0,30}→{0,40}：「If the agent detects...」在 if 与 detect 之间
+    //     隔着主语 the agent，{0,30} 装不下。
+    //  ② 捷径动词组后不加 \b：实测「it just returns the cached answer」的
+    //     returns 是 return+s，动词组收 return 后紧跟 \b 判定失败
+    //     （return 与 s 之间无分词边界）→ 整条漏判。改为动词后允许复数/变形。
+    /\b(?:if|when|once|whenever)\b[^.]{0,40}\b(?:detect\w*|recognis\w+|recogniz\w+|spot\w*|identif\w+|notic\w+|realis\w+|realiz\w+)\b[^.]{0,60}\b(?:benchmark|eval\w*|test\s+suite|grading|scoring|exam|quiz|assessment)\b[^.]{0,40}\b(?:then|just|simply|so)\s*(?:return\w*|output\w*|serv\w+|send\w*|giv\w+|emit\w*|us\w+)[^.]{0,30}\b(?:canned|precomputed|cached|memoris\w+|memoriz\w+|hard-?coded|reference|expected|golden|template|shortcut|cheat)/i,
   ],
 };
 
