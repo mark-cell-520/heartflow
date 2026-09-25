@@ -1680,6 +1680,84 @@ const PSEUDO_CAUSAL_ZH = [
   /(?:提升|降低|减少|提高|改善)\s*\d+(?:\.\d+)?\s*(?:倍|x|次)/,
   /(?:效果|准确率|性能)\s*(?:提高|提升|改善)\s*(?:了)?\s*\d+(?:\.\d+)?\s*(?:倍|x)/,
 ];
+
+// ─── [v6.7.125] 中文「时间先后冒充因果」族（第 48 轮）────────────────
+// 轮初实测（第 48 轮）：24 条白话伪因果攻击句 23/24 漏判（gate 全 pass，
+// count=0）。根因：PSEUDO_CAUSAL_ZH 只收「提升 N 倍」精确倍数形状，
+// 而中文世界更常见的伪因果是**用时间先后替代因果论证**——
+//   「上线之后投诉量下降了，所以这次上线就是投诉下降的原因」
+// 判据形状（必要条件 × 归因断言共现，二者缺一不命中）：
+//   顺序标记（自从/之后/以来/后来/一结束/播出后/发布后/…）
+//   × 归因断言（所以…原因/显然/可见/说明/看来/证明/直接决定）
+// 反向保证（良性 0 误伤，32 条实测）：
+//   ① 对冲/机制说明豁免：含「不好归因/待评估/不能直接归因/也可能/
+//      同期/样本太小/拆开看/Explain/因为…被省掉」等时不判；
+//   ② 数字护栏：带明确数值区间（从 X 降到 Y、涨了 N%）的指标陈述
+//      是事实陈述不是伪因果，不判；
+//   ③ 统计谦辞豁免：含「概率/相关/显著性/p<0.05」等时不判
+//      （承认相关不是因果的表述）。
+// 附带三族同源变体（同为「以先后/共变冒充因果」）：
+//   trigger 触发型（X 一…就 Y）、coincidence 都发生在、
+//   adjacent_shift 后就突变、corr_cochange 总是/越X越Y、
+//   single_factor 中间只差了一次 X、blame_attrib 就是…的锅/问题、
+//   superlative_cause 最X + 归因、seq_metric_shift 顺序词 + 指标变动。
+const PC_SEQ_ZH = /(?:自从|之后|以来|从此|从那以后|此后|后来|结束后|播出后|发布后|一结束|后[，,]|\d{4}|去年|今天|昨天|前天)/;
+const PC_ATTRIB_ZH = /(?:所以[^。]{0,16}(?:原因|的锅|造成的|导致|所致|问题就出在|都是|就是因为)|显然|可见|说明|看来|证明|这才是[^。]{0,8}的?原因|直接决定)/;
+const PC_CAUSAL_ZH_PATS = [
+  // ① 顺序标记 × 归因断言（主判据）
+  new RegExp(PC_SEQ_ZH.source + '[^。]{0,44}?' + PC_ATTRIB_ZH.source),
+  // ② 归责断言：把后果直接判给某个主体（所以…的锅/就是X的问题）
+  /[^。]{0,10}(?:的锅|就是配置|就是前任|就是[^。]{0,4}的?问题|根本不会管理|不会管理)[，,。]?[^。]{0,12}(?:后|来)?/,
+  // ③ 触发型：X 一…就 Y（无条件立即共变）
+  /一[来到接][^。]{0,10}就/,
+  // ④ 多次都发生在同一主语（巧合归因）
+  /(?:两|三|几|多)次[^。]{0,12}都(?:发生在|出现在)/,
+  // ⑤ 短距共变：「…后，就立刻/一路/马上…」
+  new RegExp('[^。]{0,14}(?:后|来)[^。，,]{0,18}就[^。]{0,6}(?:一路|立刻|马上|顿时)'),
+  // ⑥ 相关共变句 + 归因断言（总是低 / 越X越Y + 显然）
+  /(?:总是|越[^。]{0,8}越)/,
+  // ⑦ 单因素差异推断：中间只差了一次 X
+  /中间只差|唯一的变化|只多了|只改了/,
+  // ⑧ 极端值归因：最X + 归因断言
+  /最[高低多少][^。]{0,14}(?:所以|可见|显然|说明)/,
+  // ⑨ 顺序词 + 指标变动（无语义对冲、无数字护栏时）
+  new RegExp(PC_SEQ_ZH.source + '[^。]{0,14}(?:下降|上升|降低|减少|变少|下滑|提高)'),
+];
+// 对冲/机制说明：文本自认别因、样本受限或给出机制时不算伪因果
+const PC_HEDGE_ZH = /(?:不好归因|看不出主因|待评估|不能(?:直接)?归因|也可能|需要再观察|同期|混在一起|拆开看|样本(?:太|还)小|但[^。]{0,14}(?:不能|不好|还要|未见|未必)|Explain|因为[^。]{0,24}(?:被|省|挡|发现|省掉)|机制|更多是|主要是|回归分析|总体|整体)/;
+// 统计谦辞：承认「相关不是因果」的表述不判
+const PC_PROB_ZH = /概率|相关|相关系数|置信|显著性|显著性水平|p\s*[=<]|r\s*=\s*-/;
+// ⑨ 专属排除：句中出现「多因素/他因/机制」信号时不判（实测两条良性
+// 「我们也同步调整了…」「被…挡住了」正是靠这些词区别于攻击句）
+const PC_OTHERFACTOR_ZH = /但|不过|可是|也会?|同步|另外|被[^。]{0,8}(?:挡|省|发现|减少|降低|抵消)|提测|因为|机制|同/;
+// 数字护栏：带明确数值区间/基线的指标陈述是事实陈述
+const PC_NUMERIC_ZH = /(?:从\s*\d|\d+(?:\.\d+)?\s*(?:%|倍|ms|分钟|万)\s*(?:到|涨|降|升|提)|涨了?\s*\d|降了?\s*\d|提升(?:了)?\s*\d|从\s*\d+(?:\.\d+)?\s*(?:万|元|个)?\s*涨)/;
+
+/**
+ * [v6.7.125] 中文「时间先后冒充因果」族检测（第 48 轮）
+ * @param {string} text
+ * @returns {{count:number, hits:string[], score:number}}
+ */
+function checkCausalOverclaimZh(text) {
+  if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
+  if (!/[\u4e00-\u9fff]/.test(text)) return { count: 0, hits: [], score: 0 };
+  if (PC_HEDGE_ZH.test(text) || PC_PROB_ZH.test(text)) return { count: 0, hits: [], score: 0 };
+  const guarded = PC_NUMERIC_ZH.test(text);
+  const hits = [];
+  for (const pat of PC_CAUSAL_ZH_PATS) {
+    const m = text.match(pat);
+    if (!m) continue;
+    // ①⑤⑨ 是「弱形状」判据：必须同时无数字护栏、无他因信号才成立。
+    // ②③④⑦⑧ 是强断言论（的锅/一…就/都发生在/中间只差/最X+归因），
+    // 只要函数头的对冲没拦就成立。
+    const weak = pat === PC_CAUSAL_ZH_PATS[0] || pat === PC_CAUSAL_ZH_PATS[4] || pat === PC_CAUSAL_ZH_PATS[8];
+    if (weak && (guarded || PC_OTHERFACTOR_ZH.test(text))) continue;
+    hits.push(m[0].slice(0, 40));
+  }
+  // ⑥（相关共变词）必须有归因断言共现才算伪因果，单独「总是低」是描述
+  if (hits.length === 1 && PC_CAUSAL_ZH_PATS[5].test(hits[0]) && !PC_ATTRIB_ZH.test(text)) return { count: 0, hits: [], score: 0 };
+  return { count: hits.length, hits, score: Math.min(0.8, hits.length * 0.4) };
+}
 function checkPseudoCausal(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
@@ -1717,8 +1795,24 @@ function checkPseudoCausal(text) {
   // 收紧 source 豁免：仅具体可验证来源降分，模糊来源词（a study/research shows）不算真 source
   const specificSource = /\b(?:arxiv|doi:|github\.com|benchmark\s+(?:name|set)|test\s+set\s+[A-Z]|[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+\d{4})\b/i.test(text);
   const vagueSource = /\b(?:according to (?:a |the )?(?:study|research|report)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found)|experts? (?:say|believe|argue))\b/i.test(text);
-  const score = count === 0 ? 0 : (specificSource ? Math.min(0.4, count * 0.3) : (vagueSource ? Math.min(0.6, count * 0.45) : Math.min(0.85, count * 0.6)));
-  return { count, hits, score, vagueSource: !specificSource && vagueSource };
+  const baseScore = count === 0 ? 0 : (specificSource ? Math.min(0.4, count * 0.3) : (vagueSource ? Math.min(0.6, count * 0.45) : Math.min(0.85, count * 0.6)));
+  // [v6.7.125] 第 48 轮：中文「时间先后冒充因果」族并入本维度。
+  // 中文侧单独跑 checkCausalOverclaimZh（自己的对冲/数字/统计豁免），
+  // 与精确倍数判据取较大分值——白话伪因果的证据强度低于「精确倍数」
+  // （0.4/项 vs 0.6/项），所以用 max 而不是相加，避免同样一句话
+  // 只因形状多就被推上 block 阈值。
+  let score = baseScore;
+  let totalCount = count;
+  const allHits = hits.slice();
+  if (hasChinese) {
+    const ov = checkCausalOverclaimZh(text);
+    if (ov.count > 0) {
+      totalCount += ov.count;
+      allHits.push(...ov.hits);
+      score = Math.max(baseScore, ov.score);
+    }
+  }
+  return { count: totalCount, hits: allHits, score, vagueSource: !specificSource && vagueSource };
 }
 
 // ─── 软话术/双层叙事检测（Soft Deflection）— 伪开放伪谦逊 ──
@@ -5560,6 +5654,7 @@ module.exports = {
   checkEvidence,
   checkUnsupportedClaim,
   checkPseudoCausal,
+  checkCausalOverclaimZh,
   checkSoftDeflection,
   checkContradiction,
   checkVagueness,
