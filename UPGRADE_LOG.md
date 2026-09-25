@@ -1,4 +1,83 @@
 
+## 第 56 轮（reward_hacking 第 31 族 measurement_rigging：不动数字、改「怎么量」——攻击 0/27 → 27/27 全 block，良性 0/48 误伤）
+
+**方向**：reward_hacking「测量管道操纵」剩余族（decision.decide 结构化 options 真调用选出：A **0.81** > C 0.80 > B 0.77 > D 0.76，identity 80%，stamp `stamp-1790343172211-a69474266e7cc115`）
+
+### 一、选向过程（四候选全部轮初复测，不信简报旧描述）
+
+简报连续多轮写「reward_hacking 剩余 6 类」——上一轮（55）已补 report_fudging，本轮重新跨形态采样。探针 `/tmp/hf56/probe-round56.js` 实测：
+
+| 候选 | 本轮实测 | 简报旧描述 |
+|---|---|---|
+| dangerous_instruction 开发调试语境 | 良性 9/10 通过（仅 1 条 rewrite） | 简报称 3 条 block → **已降到 1 条，且归因在 instrumental_reasoning 不在 dangerous_instruction** |
+| 中文 instrumental_reasoning | **0/7 全漏** | 坐实 |
+| ai_writing_tell 英文侧 | 3/6 命中 | 简报称 0/6 → **不成立**（3 条已覆盖） |
+| **reward_hacking 剩余类** | **1/7 → 扩样后 0/27 全漏** | 坐实为新缺口 |
+
+**decision 结构化调用要点**（第 49/50/51 轮三次平局教训第 4 次生效）：必须传 `options` 数组 + `feasibility/risk/value/urgency` 数值字段，prompt 文本路径 `_parseOptionsFromText` 不解析数值，四候选会全 0.74 平局。
+
+### 二、缺口的本质：不是数字失真，是「谁进样本」被操纵
+
+既有 30 族都不覆盖这一形态（每条分界都是实测判据，不是假设）：
+
+| 既有族 | 要求的标记 | 为什么收不到本轮样本 |
+|---|---|---|
+| report_fudging（55轮） | 失真动词 + 免检半（报高一点/没人核对） | 攻击句根本不虚报数字 |
+| metric_denominator_gaming | 「只算/仅算」显式口径 | 说的是「剔掉/过滤掉」不是「只算」 |
+| evidence_suppression | 删失败证据 + 「就算没有」自认 | 「剔样本让效果好看」无自认 |
+| test_gaming | 断言 + 恒真 | 与测试断言无关 |
+
+本轮缺口是**测量管道/数据集构成被操纵**：剔差评样本、过滤报错再统计、把超时请求判成成功、用例数降到最低、只统计跑通的接口。判据铁律沿用「两半齐备」，但第二半是**改善归因**（就上去了/达标了/好看/就对了）而非免检半——操纵管道的收益必然体现在指标上。
+
+良性分界（48 条实测 0 误伤）：排除的是**噪声**（爬虫流量/重复数据/测试账号/内部流量/deprecated）而非**不良结果**；排除是**财务口径定义**（未签收不计 GMV）；有**真实性目的**（这才是真实日活）；有**真实改进解释**（架构改造的结果）。
+
+### 三、改了什么（3 个 commit，src +83 行）
+
+| commit | 内容 |
+|---|---|
+| `82905c3d` | 引擎：新增第 31 族 `measurement_rigging`（中文 20 条判据 + 英文 3 条）+ CLASS_WEIGHT 0.75 + CLASS_LABEL_ZH「操纵测量管道美化指标」 |
+| `7e35e369` | 主测试 `test/reward-hacking-measurement-rigging-round56.test.js`：**12/12 全绿** |
+| `a1eea542` | 负例守卫 `scripts/negative-test-reward-hacking-measurement-rigging-round56.js`：**真守卫 16 / 有兜底 5 / 异常 0 / 共 21 条判据逐条注入** |
+
+判据修订过程：v1..v5 五版探针（`/tmp/hf56/probe-v{2..6}.js`）从 8/27 逐版修到 27/27，每版的漏判样本都写进了源码注释。
+
+### 四、两个新踩的坑（已写成注释留在代码里，值得记住）
+
+1. **「必填槽位吃了不存在的内容」第 2 次**（第 51 轮「`core+0.5>=2` 死代码」同型）：中文说「**判成功**」= 判 + 成功，中间没有「成/为/作」。判据写成 `(?:成|为|作)` 必填 → 整句漏判。**症状是「逐段测 true 而整体 false」，最容易被误判成语序问题**。改为可选空分支后命中。
+2. **单一前瞻否定会被绕行路径躲开**：想排除良性「未发货的不算在内」，写 `(?![^。\n]{0,8}未)` 三种变体全部失效——`[^。\n]{0,10}` 的贪婪/回溯让否定声明可被跳字规避。**改为逐字绑定 `(?:(?!未[发签付结激])[^，。\n]){0,10}` 才真正咬住**（5/5 良性放行、5/5 攻击仍命中）。
+
+### 五、7 项验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 主测试 round56 | **12 passed 0 failed** |
+| 负例守卫 | **真守卫 16 / 有兜底 5 / 异常 0 / 共 21**（基线 23/23 + 4/4 + 0/38 全绿才开跑） |
+| run-all（后台跑完） | **3644 passed 3 failed 共 3647**（上轮 3629/2，+15 断言） |
+| fail 定位 | ① `doc-numbers-accuracy` README 3606 vs 3629（**上轮遗留**，已回退复证）② `e2e-scenarios` 场景10（第47轮起基线）③ `npm-package-integrity`（单跑 6/6 过，既有基线项） |
+| bin/verify.js | **14 passed 0 failed** |
+| security-audit | **16 passed 0 failed** |
+| doc-numbers-accuracy | **14 passed 1 failed**（README 测试数，见下） |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（铁律 ≤302 **持平，0 新增**） |
+
+**失败归因复证**（用 `git show 503101f8:src/reward-hacking.js` 回退到本轮改动前替换文件）：doc-numbers 与 e2e **回退后仍同样失败** → 与本轮 3 个 commit 无关，坐实为遗留/基线项。
+
+### 六、finish 状态与遗留（诚实记账）
+
+`node scripts/upgrade-engine.js finish` → **6/7 项全绿，1 个 objection**：
+`README 测试数与缓存一致: README 3606 vs 缓存 3644`
+
+- 这是**上一轮（55）就存在的不一致**（当时 3606 vs 3629），本轮 run-all 后缓存涨到 3644，缺口从 23 拉大到 38。
+- README 在本轮硬边界「不写」清单内，且仓库内**没有任何自动同步机制**（`scripts/measure-claimed-numbers.js` / `upgrade-engine.js` / `round-guard.js` 都只读不写）。**数字同步属于发布流程职责，未擅自越界修改。**
+- `data/test-count.json` / `data/upgrade-state.json` 已由 finish 的 auto-commit 落盘。
+
+**给第 57 轮的接手说明**
+
+1. **README 横幅测试数 3,606 → 实际 3644**（差 38）：这是 finish 唯一 objection。改一行 README.md 第 10 行即可全绿——若下一轮仍受同样边界约束，就继续记账给发布 cron；若判定允许，改完立即重跑 `node test/doc-numbers-accuracy.test.js`（应变 15/15）与 `node scripts/upgrade-engine.js finish`（应变 7/7）。
+2. **引擎侧仍未动的缺口**（本轮实测坐实）：中文 `instrumental_reasoning` **0/7 全漏**（decision 评分 0.77，仅次于本轮），attack 形态是「别跟他讲道理，先哄着把字签了」这类**手段-目的口语化合谋**。ai_writing_tell 英文侧实测 3/6 已覆盖（简报 0/6 不成立），不必优先做。
+3. `dangerous_instruction` 开发调试语境已从 3 条降到 1 条良性 rewrite，且归因在 instrumental_reasoning——**修它等于动第 2 项的判据边界，应与第 2 项合并做**。
+4. LLM 401（stepfun key 失效）仍是流水线唯一人类侧硬阻塞。
+5. 纪律提醒：选向必须结构化 options 调 decision；`git commit` message 用 `-F` 文件（全角引号会触发安全扫描 BLOCKED）；超 120s 命令后台化。
+
 ## 第 53 轮（第 52 轮收尾：主测试 + 负例守卫补齐，run-all 3606/2 恢复，finish 七项全绿）
 
 **性质**：本轮到 init 时工作区状态是「主改动已在 commit `064cf44f`，剩余 round52 测试未提交 + 全部收尾验证未跑」——第 52 轮被迭代上限截断。**本轮 = 补完第 52 轮的验证闭环**，引擎 src 未动（0 commit 改 src），版本保持 6.7.124（测试补齐不涨号，符合版本号纪律）。
@@ -32,6 +111,7 @@
    - `ai_writing_tell` 英文侧（3 条）
    - `reward_hacking` 剩余 6 类
    - **硬闸门清空 findings 导致 block 时其他维度归因丢失**（引擎级问题，本轮的「扣帽子」就是实例——建议单开一轮：改 `applyHardGate` 保留 findings 或给 dehumanization 加豁免）
+     > **【第 55 轮已复证为 N/A】** `applyHardGate` 清空 findings 是 v6.7.70 的**有意安全设计**（block 时正文不留可照读分析），归因完整保留在 `originalFindings` + `blockedData`，审计链可溯源（20/20 实测可追溯）。本行不再成立。
 2. **LLM 401 未解**——stepfun api-key 失效，是升级流水线唯一硬阻塞（人类侧动作）。
 3. 队列已空（1/1 完成），下一轮方向需自选：**必须用结构化 options 调 decision.decide**，prompt 文本路径不解析数值字段会平局（第 49/50/51 轮三次复发的坑）。
 
