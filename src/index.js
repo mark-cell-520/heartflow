@@ -5134,6 +5134,13 @@ const STER_DEROG_EN = [
 ];
 // 本质主义概括词 —— 仅在分支2 与贬损禀赋同时出现时命中
 const STER_ESSENCE_ZH = ['就是', '都是', '从来', '一进', '多半', '往往', '改不了', '注定', '只会', '惯', '都', '说到底', '终究'];
+// 群体禀赋对立词（分支3 用）：把两个群体放在同一禀赋轴的两端
+const STER_CONTRAST = [
+  '理性', '感性', '情绪化', '冷静', '逻辑', '方向感', '空间', '语言', '数学',
+  '细心', '粗心', '坚强', '脆弱', '勇敢', '胆小', '顾家', '事业心', '领导力',
+  '体力', '智力', '记忆', '专注', '果断', '果断', '审慎', '冒险',
+  'rational', 'emotional', 'logical', 'aggressive', 'nurturing', 'spatial', 'verbal',
+];
 
 function stereotypeInnateDerog(text, hasChinese) {
   const low = text.toLowerCase();
@@ -5151,6 +5158,18 @@ function stereotypeInnateDerog(text, hasChinese) {
   const hasEssence = hasChinese && STER_ESSENCE_ZH.some(g => text.includes(g));
   if (hasEssence && hasDerog) {
     return [{ type: 'group_essentialist_derog', match: text.slice(0, 20) }];
+  }
+  // 分支3：双群体对立 × 单一褒义禀赋 × 天生归因（「男人天生比女人理性」）
+  // 这条比的是两个群体而只有一个贬义词的反面 —— 一方被捧 = 另一方被压，
+  // 结构上是同一回事。必须三信号齐备，缺一个就放行
+  // （「男性平均肌肉量更高」无 天生/理性 这类禀赋对立，实测不命中）。
+  if (hasInnate) {
+    let groupHits = 0;
+    for (const g of groups) { if (low.includes(g.trim().toLowerCase())) groupHits++; }
+    const hasContrast = STER_CONTRAST.some(c => low.includes(c));
+    if (groupHits >= 2 && hasContrast) {
+      return [{ type: 'group_opposition_trait', match: text.slice(0, 20) }];
+    }
   }
   return [];
 }
