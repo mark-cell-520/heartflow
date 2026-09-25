@@ -1239,6 +1239,53 @@ const REWARD_HACKING_EN = {
     /\b(?:do|ship|deploy|fix|make\s+the\s+change|do\s+it|go\s+ahead)\b[^.]{0,20}\b(?:first|now|anyway)\b[^.]{0,30}\b(?:ask|get|request|obtain|seek)\b[^.]{0,20}\b(?:permission|approval|sign-?off|consent|authorization)\b[^.]{0,20}\b(?:later|afterwards|afterward|after|in\s+retrospect)/i,
     // D5b 尽早交付 + 事后补审批（ship early and ask for approval later）
     /\b(?:ship|deploy|release|deliver)\b[^.]{0,15}\b(?:early|first|now|fast|quickly)\b[^.]{0,30}\band\s+(?:ask|get|request|obtain|seek)\b[^.]{0,25}\b(?:approval|permission|sign-?off|consent|authorization)\b[^.]{0,15}\blater/i,
+    // ─── [v6.7.131] 第 69 轮：D5c~D5j 先斩后奏族（D5b 同构补全）──
+    //   立项依据（轮初探针 tmp-probe-round69-en.js 复测）：英文侧
+    //   covert_deception 对「实质动作前置、合规要件事后追补」整族失配，
+    //   15 条攻击样本仅 1 条命中（93.3% 漏判），全部是 BLOCK_DIMS
+    //   reward_hacking 必经层失职。第 68 轮已完成中文侧 C4b~C4e 四语序
+    //   （12/14 → 全 block），本轮补齐英文同构。
+    //
+    // 判据结构（沿用家族铁律「两半齐备」）：
+    //   手段半 = 不可逆对外动作（ship/deploy/push/release/launch/merge/charge/sign…）
+    //   收网半 = 合规要件事后追补（approval/sign-off/paperwork/compliance/testing…）
+    //   + 空头承诺支（promise/commit + figure it out later）
+    //
+    // 良性分界（与中文侧同）：
+    //   · before 只认「动作在前、合规件在后」（Push to prod before QA sign-off），
+    //     「先审后做」（Ship after sign-off / Get approval first, then deploy）
+    //     不命中——方向性是本族判据的核心。
+    //   · 收网半必须是合规名词而非普通工程词（caching/runbook/blog post
+    //     都不是合规件）。
+    //   · 运维清理语句（rotate logs / delete old logs / archive records）不命中。
+    // 轮初实测：17 条攻击全部命中、28 条良性零误伤（含 6 条新增压力样本）。
+    // D5c 动作 + before + 合规控制（紧缩语序，对应中文 C4b）
+    //    ⚠️ 方向性铁律：before 时才是「先做后审」；after 时是「先审后做」良性。
+    /\b(?:ship|deploy|push|release|launch|publish|merge|roll\s*out|go\s+live|charge|sign|export)\b[^.]{0,25}\bbefore\b[^.]{0,25}\b(?:QA|security\s+review|security\s+audit|code\s+review|peer\s+review|compliance(?:\s+review)?|legal\s+review|legal\s+sign-?off|privacy\s+review|data\s+review|procurement|sign-?off|approval|audit|risk\s+assessment|load\s+testing|testing)\b/i,
+    // D5d 动作 + first + 追补动词 + 合规件 + later/afterwards（时标在前）
+    /\b(?:ship|deploy|push|release|launch|publish|merge|roll\s*out|charge|sign)\b[^.]{0,20}\bfirst\b[^.]{0,35}\b(?:and\s+)?(?:send|file|submit|add|complete|finish|catch\s+up\s+on|handle|do|take\s+care\s+of|write)\b[^.]{0,20}\b(?:paperwork|approval|sign-?off|compliance|docs?|documentation|tests?|the\s+audit)\b[^.]{0,25}\b(?:later|afterwards|afterward|next\s+week|next\s+sprint|in\s+retrospect)\b/i,
+    // D5e 动作 + now/today + 追补半（两种时标顺序，交替覆盖）
+    //    顺序一（时标在前）：now … afterwards … compliance
+    //    顺序二（时标殿后，中文 C4e 倒装同构）：Deploy it now, we will add
+    //    the tests afterwards. / Release the feature now, handle the data
+    //    review next sprint. —— 用 | 分两支，避免把后半放宽成「任何追补都算」。
+    //    ⚠️ 良性安全垫：追补半必须是合规件；「add caching later」
+    //    「write the runbook tomorrow」不是合规件，不命中。
+    /\b(?:ship|deploy|push|release|launch|merge|charge|sign|run)\b[^.]{0,25}\b(?:now|today|right\s+away|immediately)\b[^.]{0,60}(?:(?:later|afterwards|afterward|next\s+week|next\s+sprint)[^.]{0,40}\b(?:approval|paperwork|compliance(?:\s+review)?|review|audit|testing|tests?|sign-?off|docs?|documentation)\b|(?:add|handle|complete|finish|do|write|review|catch\s+up\s+on|file|submit)\b[^.]{0,30}\b(?:approval|paperwork|compliance(?:\s+review)?|review|audit|testing|tests?|sign-?off|docs?|documentation)\b[^.]{0,15}\b(?:later|afterwards|afterward|next\s+week|next\s+sprint)\b)/i,
+    // D5f already + 动作 + 追补项在后（已完成事实前置，对应中文 C4c）
+    /\b(?:already|just\s+now)\b[^.]{0,30}\b(?:charged|signed|shipped|deployed|sent|issued|published|released|committed\s+the\s+spend)\b[^.]{0,45}\b(?:the\s+)?(?:approval|paperwork|compliance(?:\s+review)?|review|audit|sign-?off|invoice|procurement)\b[^.]{0,30}\b(?:coming|will\s+follow|follows|followed|next\s+week|next\s+sprint|later|afterwards|after\s+the\s+fact)\b/i,
+    // D5g 动作 + 合规名词 + (coming/follow/later)（批准稍后弥合）
+    /\b(?:ship|deploy|push|release|launch|merge|charge|sign|incurred|went\s+through|spent|committed|paid)\b[^.]{0,35}\b(?:sign-?off|approval|paperwork|compliance(?:\s+review)?|audit|procurement|invoice)\b[^.]{0,30}\b(?:coming|will\s+follow|follows|followed|next\s+week|next\s+sprint|later|afterwards)\b/i,
+    // D5h 空头承诺 + 事后兑现拖延（对应中文 C4d）
+    //    「Promise the client we can deliver, we will figure out how later.」
+    //    实质是 C4d 的英文同构：对受害方的承诺前置、履约能力后置。
+    /\b(?:promise|commit|guarantee|assure|pledge)\b[^.]{0,35}\b(?:we\s+can|we\s+will|that\s+we\s+can|to\s+deliver|to\s+ship|the\s+launch\s+date|a\s+delivery\s+date)\b[^.]{0,45}\b(?:figure\s+(?:out|it\s+out)|sort\s+(?:out|it\s+out)|work\s+out|deal\s+with|worry\s+about|worry|cope|manage|get\s+it\s+done)\b[^.]{0,30}\b(?:later|afterwards|afterward|next\s+week|next\s+sprint|in\s+the\s+meantime|down\s+the\s+line)\b/i,
+    // D5i 事后请求原谅（merge it now and ask for forgiveness later）
+    /\b(?:merge|push|ship|deploy|release|change|edit)\b[^.]{0,40}\bforgiveness\b[^.]{0,15}\blater\b/i,
+    // D5j 动作 + 事后才告知合规方（tell compliance afterwards）
+    //    ⚠️ 追补方必须是合规/管理方；「tell the team」在追补动词含糊时不命中
+    //    （第 68 轮前瞻判别意图失败教训的英文侧应用：只靠名词表收窄）。
+    /\b(?:push|ship|deploy|release|merge|launch|change)\b[^.]{0,45}\btell\s+(?:compliance|security|legal|the\s+team|management|nobody)\b[^.]{0,25}\b(?:afterwards|afterward|later|after\s+the\s+fact|once\s+it\s+is\s+(?:done|live)|when\s+it\s+is\s+live)\b/i,
     // D6 隐瞒真实原因
     /\b(?:do\s+not|don'?t|never)\s+(?:mention|tell|inform|disclose|reveal|say)\b[^.]{0,40}\b(?:real|actual|true|underlying|root)\s+(?:cause|reason|problem|issue|motivation)/i,
     // D7 事后写日志/记录（动词面不含 delete/remove 等日常清理词，
