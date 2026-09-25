@@ -1,4 +1,80 @@
 
+## 第 51 轮（sealioning「假礼貌 × 举证 × 反咬」族 2 判据：攻击 0/14 → 14/14 全转 verify，良性新增误伤 0/182）
+
+**方向**：sealioning 补判据（decision.decide 结构化 options 真调用选出，composite **0.81** > C 0.75 > D 0.72 > B 0.71，identity 80%）
+
+### 一、选向过程（四候选复测，抓到自己探针的一个 bug）
+
+轮初对四个候选逐条复测（不信简报旧描述，探针 `/tmp/hf51/probe-round51.js`）：
+
+| 候选 | 复测（修正后） | 简报/初测 |
+|---|---|---|
+| **sealioning 假礼貌反咬** | 攻击本维度 **0/12** | 连续三轮列首选，坐实 |
+| bad_faith 装讨论族 | 攻击本维度 **0/10** | 坐实 |
+| 中文 instrumental_reasoning | 攻击 6 条 **3/6 已命中** | 初测误报 0/6 |
+| ai_writing_tell 英文侧变体 | 攻击 3 条 **1/3 已命中** | 初测误报 0/3 |
+
+**探针自身的 bug（记录防复发）**：第一版把候选键名（`ir_zh`/`zh_en_mix`）当维度名去 findings 里找，误报两族 0 命中。修正为真实维度名（`instrumental_reasoning`/`ai_writing_tell`）后两族各已有覆盖。**decision 第一次调用就是在这个假前提上选了 C（0.80），修正实测后重跑才选出 A。**
+
+**decision 同分弃权一次**（第 49/50 轮同型教训第三次复现）：prompt 文本路径不解析「可行性 0.9 / 风险 0.2」这类数值字段（`_parseOptionsFromText` 只切 label/description），四候选全 0.74 平局。改传结构化 `options` 后才分出高下。
+
+### 二、缺口实测（根因：只有单句形态，缺三段式结构）
+
+`SEALIONING_PATTERNS` 15 条判据全是**单句追问形态**（那你怎么解释/你回避了我的问题），收不到 sealioning 的定义核心——「先声明自己没攻击性 → 再要求举证 → 最后把举证失败反咬成对方有问题」。12 条同族攻击句本维度 0/12、gate 8 pass / 4 verify。
+
+### 三、改了什么（2 个 commit，src +61 行）
+
+`src/index.js` 新增 `sealioningPoliteTrap(text, hasChinese)` 子判据（**不带 check 前缀**，第 48/49 轮安全模式，防 orphan-dimension-guard 判出第 51 维），两条 type：
+
+| 判据 | 必要条件 | 样例 |
+|---|---|---|
+| polite_bait_trap | 自述礼貌 × 举证要求 / 反咬断言（core≥2） | 我只是礼貌地请你好歹举一个来源，你举不出就是你在编 |
+| polite_repeat_trap | 自述礼貌 × 反复追问（core≥1 + repeat） | 我只是礼貌地问了一遍又一遍，你怎么就是不肯说 |
+
+良性边界实测 0/182（门禁良性池 151 + 自扩 31）：正常求教、无礼貌伪装的直接批评（这个数据就是错的）、元话语（这篇论文研究 sealioning）均只命中单信号。第 36 轮共现纪律**未松动**——单信号一律不计。
+
+### 四、三个「接线了但没生效」的坑（全部当场抓到并修正，值得记住）
+
+第一版 commit 后 gate 层零效果（count>0 而 score=0），逐层定位到**三个独立错误叠加**：
+
+1. **push 位置在 score 计算之后**：`const score = reduce(...)` 在前、`signals.push(...)` 在后，count 涨了 score 照旧 0。这是「接线了但没生效」的新形态——比第 26 轮「catch 静默降级」更隐蔽，因为 count 是真的变了。
+2. **子判据 signal 缺 severity**：本文件 table 驱动写法要求每条 signal 带 severity（score = severity×0.25），只返回 `{type, match}` 会让 reduce 累加出 `undefined*0.25 = NaN`。
+3. **polite_repeat_trap 门槛写成 `core + 0.5 >= 2`**：因为 core 是整数，`core+0.5>=2` 等价于 `core>=2`，该分支**退化为 polite_bait_trap 的死代码**，永远不触发。是负例守卫的**对照副本**抓到的（探针在未注入源码上就不命中 → 说明这条路径本来就是死的）。已改为「礼貌 + 反复追问即命中」——sealioning 的行为定义就是反复要求举证，不要求 bite 断言在场。
+
+### 五、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 攻击本维度命中 | **0/14 → 14/14**，gate 全部 **verify**（未越级） |
+| 良性维度级误伤 | **0/182**新增（唯一命中项「Answer the question, please.」经 git stash 复验为既有旧判据 sev 18 verify，非本轮引入） |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（铁律 ≤302 持平，0 新增） |
+| bin/verify.js | **14 passed 0 failed** |
+| security-audit | **16 passed 0 failed** |
+| doc-numbers-accuracy | **15 passed 0 failed** |
+| orphan-dimension-scan | check 函数 **50**、接入 **50**（未引入伪维度） |
+| guard-abilities | **20 项全绿** |
+| 负例守卫 | **4/4 注入全变红、0 未变红** + 探针单判据覆盖自检 4/4 |
+| run-all | **3606 passed 2 failed**（上轮 3598/2；+9 = 本轮主测试断言数） |
+
+2 个 run-all 失败已**定位到具体条目**并用 git stash 复验与本轮无关：
+- `e2e-scenarios` 场景10（期望 verify 实际 rewrite，门禁 `改写: confidence`，第 47 轮起同一基线项；stash 摘掉本轮改动后同样失败）
+- 第二个失败项来自 `npm-package-integrity`（单跑本次 PASS，是 run-all 环境噪声；npm latest 非本地版本时失败，publish 后自动消）
+
+README 测试数已按 run-all 实测缓存同步 3,598 → 3,606（round-guard strictEqual 契约；第 48 轮顺序纪律：改完 → run-all → 拿最终缓存值改 README → finish）。
+
+### 六、负例守卫自伤的两个坑（第 50 轮教训的第一次实战应用）
+
+1. **探针必须只被目标判据单独命中**：demand 探针第一版用「提供一个来源」，删 `SEAL_DEMAND_ZH` 后句子仍被命中——因为 demand 是**三条 OR**（ZH 主判据 / ANS 回答式 / FIX 固定短语），删主判据还有两条兜底。这不是守卫失效，是探针本身不具备「判据可删性」。第一版另有锚点错误：用「给个交代」定位（那是 `SEAL_DEMAND_FIX_ZH` 的内容）导致删错正则、报「未变红」。修正：锚点取 `SEAL_DEMAND_ZH` 独有的「截图|原文」。
+2. **对照副本先跑**：守卫第一步是「未注入必须全绿」，它当场抓出 repeat 分支死代码（见第四节 3）。若跳过对照直接看注入结果，会把死代码误读成守卫失效。
+
+### 七、遗留（给第 52 轮）
+
+1. **bad_faith「装讨论」族**（decision B 0.71，攻击本维度 0/10、原型召回仅 4/10）：做前先把攻击样本扩到 15+，本轮 10 条不足以定位判据形态。
+2. **中文 instrumental_reasoning 剩余 3 条词面变体**（本轮实测漏判，属 REWRITE_DIMS）：「只要能拿到投资，先把这个功能吹上去再说」（无条件放行壳）、「为了项目上线，先让实习生顶一下这个锅」（「顶一下这个锅」判据只收「顶锅」）、「先把数据做漂亮，用户那边不会发现的」（「那边」两字隔断）。修法是补词不是建族。
+3. **ai_writing_tell 中英混杂族英文侧变体**（漏 2/3）：纯英文句 + 中文标点混入，anchor-mix 的英文锚点形态未收。
+4. **sealioning 旧判据「answer the question」误伤**：良性句「Answer the question, please.」被 `SEALIONING_PATTERNS.en` 命中（sev 18 → verify）。本轮确认是既有行为未动，下轮可评估收紧（加礼貌伪装共现）。
+5. `data/upgrade-state.json` 的 round 字段与 UPGRADE_LOG 实际轮次的历史偏差仍在（finish 校准逻辑已知，硬边界不手改）。
+
 ## 第 50 轮（ai_writing_tell 中英混杂 AI 腔族 3 判据：攻击 23/23 命中、门禁良性池 0/151 新增误伤）
 
 **方向**：ai_writing_tell 补「中英混杂」族（decision.decide 真调用选出，composite **0.84** > A/B/C 均 0.80，identity 80%）
