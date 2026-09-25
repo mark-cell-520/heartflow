@@ -101,17 +101,20 @@ function getProcessInfo(pid) {
 
 const ECOSYSTEM_PATH = path.join(HF_DIR, 'ecosystem.config.js');
 
-function ensureEcosystemConfig(port = 8099) {
-  // [FIX 2026-09-19] 模板里原来漏了 const path = require('path')，
-  // 之前只因为 ecosystem.config.js 已被 git 跟踪 + 上面的提前 return 而没暴露。
-  fs.writeFileSync(ECOSYSTEM_PATH, `const path = require('path');
+// [FIX 2026-09-25] ecosystem.config.js 常以 root 身份创建（git 跟踪），而引擎以
+// 非特权用户运行时 writeFileSync 直接 EACCES，整个 PM2 启动链崩在这。
+// 规范路径不可写时，回退写到 tmp 下可写副本；模板里的 __dirname 要换成 HF_DIR
+// 字面量，否则 PM2 会按 tmp 目录去找 mcp-server-http.js。
+function ecosystemTemplate(port) {
+  return `const path = require('path');
+const HF_DIR = '${HF_DIR.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}';
 
 module.exports = {
   apps: [{
     name: 'heartflow-mcp',
-    script: path.join(__dirname, 'mcp', 'mcp-server-http.js'),
+    script: path.join(HF_DIR, 'mcp', 'mcp-server-http.js'),
     args: '--port ${port}',
-    cwd: __dirname,
+    cwd: HF_DIR,
     instances: 1,
     autorestart: true,
     max_restarts: 10,
@@ -119,11 +122,33 @@ module.exports = {
     max_memory_restart: '512M',
     env: { NODE_ENV: 'production' },
     log_date_format: 'YYYY-MM-DD HH:mm:ss',
-    error_file: path.join(__dirname, 'data', 'logs', 'heartflow-error.log'),
-    out_file: path.join(__dirname, 'data', 'logs', 'heartflow-out.log'),
+    error_file: path.join(HF_DIR, 'data', 'logs', 'heartflow-error.log'),
+    out_file: path.join(HF_DIR, 'data', 'logs', 'heartflow-out.log'),
   }]
 };
-`);
+`;
+}
+
+// 返回实际可用的 ecosystem 配置文件路径
+function ensureEcosystemConfig(port = 8099) {
+  // [FIX 2026-09-19] 模板里原来漏了 const path = require('path')，
+  // 之前只因为 ecosystem.config.js 已被 git 跟踪 + 上面的提前 return 而没暴露。
+  const content = ecosystemTemplate(port);
+  try {
+    fs.writeFileSync(ECOSYSTEM_PATH, content);
+    return ECOSYSTEM_PATH;
+  } catch (err) {
+    const fallbackDir = path.join(os.tmpdir(), 'heartflow-daemon');
+    const fallbackPath = path.join(fallbackDir, `ecosystem.${port}.js`);
+    try {
+      fs.mkdirSync(fallbackDir, { recursive: true });
+      fs.writeFileSync(fallbackPath, content);
+      console.warn(`[HeartFlow Daemon] ⚠️ ${ECOSYSTEM_PATH} 不可写 (${err.code})，改用 ${fallbackPath}`);
+      return fallbackPath;
+    } catch (fallbackErr) {
+      throw new Error(`ecosystem 配置写入失败: ${err.code} / ${fallbackErr.code}`);
+    }
+  }
 }
 
 async function pm2Disconnect() {
@@ -134,11 +159,11 @@ async function pm2Disconnect() {
 
 async function pm2Start() {
   const port = await detectFreePort();
-  ensureEcosystemConfig(port);
+  const ecosystemPath = ensureEcosystemConfig(port);
   return new Promise((resolve, reject) => {
     // [FIX 2026-09-19] 旧实例可能绑着失效端口，先删再用新配置起
     pm2.delete('heartflow-mcp', () => {
-    pm2.start(ECOSYSTEM_PATH, (err) => {
+    pm2.start(ecosystemPath, (err) => {
       if (err) return reject(err);
       pm2.list((err, list) => {
         if (err) return reject(err);
@@ -266,23 +291,27 @@ async function main() {
     case 'start': {
       console.log(`[HeartFlow Daemon] 启动中... (${pm2Available ? 'PM2' : 'nohup'})`);
 
+      let info;
       try {
-        let info;
         if (pm2Available) {
           info = await pm2Start();
         } else {
           info = await nohupStart();
         }
-
-        console.log(`[HeartFlow Daemon] ✅ 已启动`);
-        console.log(`  PID:     ${info.pid}`);
-        console.log(`  方法:    ${info.method || 'pm2'}`);
-        console.log(`  日志:    ${LOG_DIR}/`);
-        console.log(`  管理:    node bin/daemon.js status`);
-      } catch (err) {
-        console.error(`[HeartFlow Daemon] ❌ ${err.message}`);
-        process.exit(1);
+      } catch (pm2Err) {
+        // [FIX 2026-09-25] 原来 PM2 一失败就直接 exit(1)——但回退 nohup 明明
+        // 是设计目标（注释和文档都写了 PM2 > nohup），只是没实现。ecosystem
+        // 不可写、PM2 daemon 未起、端口竞态都会走到这，全部该走 nohup。
+        if (!pm2Available) throw pm2Err;
+        console.warn(`[HeartFlow Daemon] ⚠️ PM2 启动失败 (${pm2Err.message})，回退 nohup`);
+        info = await nohupStart();
       }
+
+      console.log(`[HeartFlow Daemon] ✅ 已启动`);
+      console.log(`  PID:     ${info.pid}`);
+      console.log(`  方法:    ${info.method || 'pm2'}`);
+      console.log(`  日志:    ${LOG_DIR}/`);
+      console.log(`  管理:    node bin/daemon.js status`);
       break;
     }
 
@@ -304,6 +333,7 @@ async function main() {
 
     case 'restart': {
       console.log('[HeartFlow Daemon] 重启中...');
+      let info;
       try {
         if (pm2Available) {
           await new Promise((resolve, reject) => {
@@ -313,23 +343,37 @@ async function main() {
             });
           });
           pm2Disconnect();
+          info = await pm2Status();
         } else {
           nohupStop();
           await new Promise(r => setTimeout(r, 1000));
-          await nohupStart();
+          info = await nohupStart();
         }
-        console.log('[HeartFlow Daemon] ✅ 已重启');
-      } catch (err) {
-        console.error(`[HeartFlow Daemon] ❌ ${err.message}`);
-        process.exit(1);
+      } catch (pm2Err) {
+        // [FIX 2026-09-25] 同 start：PM2 restart 失败（如进程从未被 PM2 管过）
+        // 不应让 restart 整体失败，回退 nohup 拉起。
+        if (!pm2Available) throw pm2Err;
+        console.warn(`[HeartFlow Daemon] ⚠️ PM2 重启失败 (${pm2Err.message})，回退 nohup`);
+        nohupStop();
+        await new Promise(r => setTimeout(r, 1000));
+        info = await nohupStart();
       }
+
+      console.log('[HeartFlow Daemon] ✅ 已重启');
+      if (info && info.pid) console.log(`  PID: ${info.pid}`);
       break;
     }
 
     case 'status': {
       let info = null;
       if (pm2Available) {
-        info = await pm2Status();
+        try {
+          info = await pm2Status();
+        } catch (_) {
+          // [FIX 2026-09-25] PM2 daemon 没起时 pm2.list 会挂住/抛错，
+          // status 不该因此不可用，退回 PID 文件判断。
+          info = null;
+        }
       }
       if (!info) {
         const pid = readPid();
