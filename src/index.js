@@ -5715,10 +5715,13 @@ function sealioningPoliteTrap(text, hasChinese) {
   // 核心三信号计数；反复追问作半票（单有「问了三遍」是正常追问）
   const core = [polite, demand, bite].filter(Boolean).length;
   if (repeat && core >= 1) {
-    // 含反复追问时 1.5 票：礼貌伪装 + 反复追问已构成消耗形态
-    if (core + 0.5 >= 2) {
-      return [{ type: 'polite_repeat_trap', match: text.slice(0, 20), severity: 0.7 }];
-    }
+    // 礼貌伪装 + 反复追问 = 1.5 票即命中。
+    // ⚠️ 第一版门槛写成 core + 0.5 >= 2（即 core>=2 才命中），使本分支
+    //    退化为 polite_bait_trap 的死代码——polite_repeat_trap 永远不触发。
+    //    负例守卫的对照副本当场抓到（探针在未注入源码上就不命中）。
+    //    sealioning 的行为定义就是「反复要求对方举证」：有礼貌伪装 +
+    //    反复追问已足够构成消耗，不要求 bite 断言在场。
+    return [{ type: 'polite_repeat_trap', match: text.slice(0, 20), severity: 0.7 }];
   }
   if (core >= 2) {
     return [{ type: 'polite_bait_trap', match: text.slice(0, 20), severity: 0.7 }];
