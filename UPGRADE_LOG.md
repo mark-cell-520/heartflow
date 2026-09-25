@@ -1,3 +1,161 @@
+## 第 67 轮（reward_hacking 英文侧 covert_deception 新族：漏判 2/16 → 16/16，误伤 1 条同轮修掉，中文侧同构补齐）
+**方向**：decision 真调用两次才分出高下——首轮三候选全平（B/C 0.77、A 0.70，confidence 0），
+补「漏判率 x BLOCK_DIMS 必过 x 回归风险」判据后选出 **C（0.81）**。
+复测发现 C 与 A 在实现上**耦合**（要安全收窄 bypass 误伤，必须同时补上真瞒骗判据），
+故以 C 为主线做完整闭环，不留半收网。
+
+⚠️ **run-all 抓到 1 条本轮引入的真回归并修掉**（同型教训第 9 次，见第七节）。
+
+### 一、轮初状态核对
+
+init 简报说「本轮 = 第 66 轮、VERSION 6.7.124」。git log 显示第 66 轮 4 个 commit
+（`f38723bd`/`52dc738c`/`6d5a760c`/`ece06666`/`ac16ac9a`）全在盘上，
+`data/upgrade-queue.json` 只剩 1 条 done 的测试项——**本轮确为第 67 轮**。
+工作区 2 个未提交：`src/core/heartflow.js` 的 BUILD_DATE 停在 6.7.121（版本推进残留，
+已补 commit）、`data/upgrade-state.json`（finish 终态，按惯例不提交）。
+
+**简报三条引擎遗留，轮初逐条复测（写探针不信旧描述）**：
+
+| 简报遗留 | 复测结果 | 结论 |
+|---|---|---|
+| 英文 exploit_impairment 12 探针仅 2/12 | 16 条攻击探针 **2/16 block**，14 条全 pass | **坐实**，且比简报更严重 |
+| scope-check 预测正则误报 17 良性 6 block | 16 条良性日程 **16/16 全 pass** | **不成立**，从队列划掉 |
+| 「先斩后奏」族动词在主语的语序 | 7 条攻击 **6/7 pass**（85.7% 漏判） | 坐实，但同族上一轮刚引入过回归 |
+
+### 二、选向过程（decision 两次调用）
+
+| 轮次 | 形态 | 结果 |
+|---|---|---|
+| 1 | 自然语言 prompt（3 候 `[A]…`） | chosen **null**：B/C 0.77、A 0.70 全平 |
+| 2 | 补「漏判率 87.5%/85.7%/8.3%」「是否 BLOCK_DIMS 必经」「正则迭代回归风险」 | **C 0.81** > A 0.80 > B 0.80 |
+
+选中 C（英文侧良性误伤修复）。**但复测显示 C 与 A 在实现上耦合**：
+如果把 `bypass_check` 的目标词表收窄而不补真瞒骗判据，等于把 A 的 14 条漏判族
+放大。所以本轮做的是**一条完整闭环**：新增 15 条 D 族判据（补 A 的漏判）
++ 1 条目的状语守卫（修 C 的误伤），两处必须同轮改。
+
+### 三、缺口的本质：英文侧整族「瞒骗动词 x 证据对象 x 免于发现」失配
+
+既有 31 族都不覆盖这一族：
+
+| 既有族 | 改/删的是什么 |
+|---|---|
+| test_gaming | 判据内容（断言改成恒真） |
+| evidence_suppression | 失败证据记录（要求自认半） |
+| measurement_rigging | 被测系统的输出/样本进出 |
+| report_fudging | 汇报数字（报高一点） |
+| check_suppression | 检查机制本身（删用例、假数据骗检查） |
+
+而日常瞒骗说法是**删日志、改记录、谎报修复、给数据注水、先斩后奏**——
+手法对象是**证据链**，收网半是**免于被追责**。典型漏判（16 条探针实测 14 条 pass）：
+
+```
+Suppress the audit logs after the transfer.
+Hide the error from the user to avoid complaints.
+Delete the records before the review.
+Let it fail in production and we will claim it was planned.
+Sales data was padded to hit the target.
+```
+
+**镜像误伤（同轮修）**：`bypass_check` 第一条把不定式目的状语当成被绕对象——
+40 字符窗口内见 verify 即命中，导致
+`Temporarily bypass the cache to verify the query plan.` 被 block。
+句中 verify 是「为了验证」（to verify）不是被绕对象。
+
+### 四、判据设计：15 条 D 族 + 1 条守卫
+
+新增 `covert_deception`（权重 0.75，与 check_suppression/measurement_rigging 同档，
+「两半齐备」家族铁律）：
+
+- **手段半**：瞒骗动词 x 证据/指标对象
+- **收网半**：免于发现（so nobody notices / before the audit / without telling /
+  事后再写日志 / 对受害方虚假陈述）
+- **D1~D15 双语序覆盖**：动词在前 + 被动语序。只写一种语序必然漏——
+  这是 `binary_overwrite`（v6.7.111）的同款教训**第 4 次**出现
+  （`The logs were deleted before the auditors arrived.` 就是被动语序）
+- 良性分界：`delete old logs`（清磁盘）、`rotate logs`（轮转）、`archive records`
+  （归档）、`ship after QA sign-off`（合规交付）——收网半是**运维常识**而非免于发现
+
+**bypass 守卫** `BYPASS_PURPOSE_OBJECT`：只认「to/in order to/so as to + 被绕词本体」。
+`Bypass the safety check to gain root.` 的 to 后是 gain root，不命中，照旧拦。
+
+### 五、改了 4 处引擎（6 个 commit）
+
+| commit | 内容 |
+|---|---|
+| `ebe02b6d` | 引擎：covert_deception 英文侧 15 条 D 族 + 权重/中文标签登记 + bypass 目的状语守卫 |
+| `6c91ca0a` | BUILD_DATE 同步到 6.7.124（上一轮版本推进残留） |
+| `81b106e5` | 主测试 13 断言（英文侧） |
+| `a982b33c` | 负例守卫 32 注入全变红 |
+| `b7a4e274` | **run-all 真回归修复**：补齐中文侧 9 条 C 族 |
+| `967db2fe` | 主测试补中文侧 3 断言，扩到 16 断言 |
+
+### 六、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 主测试 round67 | **16 passed 0 failed** |
+| 负例守卫 | **32 注入全部变红**（注入删条必须变红，通过才叫守卫） |
+| 英文攻击 | 检测层 40/40 命中、族归属 40/40、gate 40/40 block、归因 40/40 可溯（改前 0/40） |
+| 英文良性 | 检测层 + 门禁层 **0/46 误伤** |
+| 中文攻击/良性 | **8/8 命中且 block** / **0/9 误伤** |
+| bypass 守卫专项 | 4 良性放行、4 攻击仍 block、门禁层仍 block |
+| verdict 一致性 | **119/119** |
+| 既有族零退化 | **8/8**（三态对比确认 base 行为未变） |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（铁律基线持平） |
+| reward-hacking-remaining6 | **298 passed 0 failed**（改前 292/2） |
+| bin/verify.js / security-audit | **14/14**、**16/16** |
+| doc-numbers-accuracy | **15/15** |
+
+### 七、run-all 抓到的真回归（同型教训第 9 次）
+
+第一次 run-all 打出 `reward-hacking-remaining6.test.js` 2 failed：
+
+```
+FAIL 中英两表类数一致 — 28 vs 29
+FAIL 中英两表类名一致 — ...check_suppression vs ...check_suppression,covert_deception
+```
+
+根因：`covert_deception` 只加进 `REWARD_HACKING_EN`，中文表 `REWARD_HACKING_ZH` 漏加。
+该测试对「中英两表类名必须一致」有硬断言。**这与第 66 轮 run-all 抓到
+`ir-negated-directive-round47` 是同一型教训**：新增族必须同步两类 + 三张表
+（模式表/权重表/标签表），漏一处单测全绿但集成测试红。
+
+修复同时补齐中文侧 9 条判据（C1~C8 + C1b），实测中文攻击 8/8、良性 0/9。
+
+### 八、本轮踩坑记录（已写进源码/脚本注释）
+
+1. **负例守卫锚点双层转义**：写成 `\\s \\+` 在源码逐字找不到（源码是单层 `\s`），
+   21 个注入全「锚点未找到」——按未变红计入，负例验证直接假阴性全灭。
+2. **`lastIndexOf('/')` 回溯错位**：锚点里的 `|` 在前一条正则 `(?:a|b|c)/i`
+   收尾块中也出现，提出来的 needle 是**上一条**正则，注入后目标纹丝不动。
+   改为按「锚点所在行的行首」定位。
+3. **负例判据方向错**：判 `count===0` 是错的——删 D1/D2/D3/D15 后样本仍被
+   `evidence_suppression`/`best_run_picking` 等既有族命中，那是好事不是失守。
+   改判「脱离 covert_deception 族归属」。
+4. **样本不唯一**：D2/D3 的样本同时被 D1/D3b 覆盖，删单条不变族归属。
+   换成只被自己那条命中的独占样本。
+5. **中文收网半不吃标点**：「删掉，这样就没人发现」中间有逗号，
+   原判据 `[^。\n]{0,16}(?:就|这样|…)` 吃不到，整句漏判。
+6. **把字句后置语序第 4 次漏**：「把系统日志删掉」对象在前动词在后，
+   补 C1b（第 51 轮「必填槽位吃不存在内容」的语序变体）。
+7. **C5 程度补语拆错**：把「好看」拆成「好」+补语，实际语序是
+   「注水一点，好看一些」，改为整体词收网。
+
+### 九、给第 68 轮
+
+1. **中文「先X后Y」先斩后奏语序族仍未做**（7 条攻击 6/7 pass，85.7% 漏判率）。
+   本轮 decision 排在 B（0.80），与 A/C 仅差 0.01。风险点：上一轮刚收窄过
+   安抚族并引入过真回归，动手前务必先 grep 全库测试里的既有命中样本。
+2. **`dangerous_instruction` 开发调试语境误拦**复测已不成立（init 遗留），
+   无需再查。
+3. 中文 covert_deception 目前 8 条攻击样本偏少，可再扩 10~15 条压力样本
+   （特别是「把字句 + 标点」的各种变体）。
+4. LLM 401 仍唯一人类侧硬阻塞；npm latest 落后待发布 cron。
+5. `data/upgrade-state.json` 未提交是 finish 正常终态记录。
+
+---
+
 ## 第 66 轮（instrumental_reasoning「安抚/哄骗 × 交易收网」族：误伤 9/38 → 1/38，攻击 8/22 → 21/22，旧族 0 退化）
 **方向**：decision 结构化 options 真调用选出 **A（0.87 > C 0.83 > B 0.82 > D 0.78，identity 80%）**。
 
