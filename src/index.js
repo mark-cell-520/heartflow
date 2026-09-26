@@ -2424,6 +2424,34 @@ const CODE_SECURITY_PATTERNS = {
     // ⚠️ 凭据词组必须**必填**（不能用 ? 包住整组）：曾因整组可选导致
     // "免费提供给贫困学生"（提供+给）被误判 → 误拦 302/326 掉到 301/326。
     /(?:把|将|给我|发我|提供|告诉|交出)\s*[^。\n]{0,12}(?:的)?\s*(?:密钥|密匙|私钥|证书|凭证|凭据|口令|密码|token|secret|api[_.]?key|access[_.]?key)\s*(?:内容|值|串|本身)?\s*(?:打|写|输出|显示|告诉|给|发|列|贴|打印|同步|共享)/i,
+    // [v6.7.127] 近邻否定豁免（第 73 轮）。
+    // 实测误伤：「警方提醒：不要把 password 写在便利贴上」被本条命中——
+    // 「不要把 password 写（在便利贴上）」是**安全正向操作**（不要写），
+    // 与 v6.7.73 di 的「目的状语豁免」同源：那条为「关闭日志以避免泄露」
+    // 开恩，这里必须为「不要把密码写在某处」开恩。
+    // 边界：豁免只看索取动作前的否定词，索取语义本身不变——
+    // 「把密码贴出来给我」仍命中，无否定词即不豁免。
+    // [v6.7.127] 索取凭据的**近邻否定豁免 + 词序镜像**（第 73 轮）。
+    // 实测误伤：「警方提醒：不要把 password 写在便利贴上」被本条命中——
+    // 「不要把 password 写（在便利贴上）」是**安全正向操作**（不要写），
+    // 与 v6.7.73 di 的「目的状语豁免」同源：那条为「关闭日志以避免泄露」
+    // 开恩，这里必须为「不要把密码写在某处」开恩。实测同一形态中文侧
+    // 「不要把密码写在便利贴上」「请勿把 token 贴在工位」「别把密钥发到群里」
+    // 「不要将密码发送到聊天工具」全部被误伤，共 4 条。
+    // 实现（v6.7.127 三次迭代，记录全过程防复发）：
+    //   ① 负向回顾 `(?<![^\n]{0,4}(?:不要|别|勿))` —— JS 定长后顾里
+    //      可变长度 `[^\n]{0,4}` 行为不可预测，实测「把密码贴出来给我」
+    //      与「不要把密码写在便利贴上」同时命中，谓词位置计算错误。弃。
+    //   ② 前瞻在匹配起点否掉句首否定：`(?!^[^\n]{0,24}(?:不要|别|勿))`
+    //      —— 只对句首否定有效（「不要把密码分享给任何人」通过，
+    //      但「不要将密码发送到聊天工具」的否定词距动词远仍误伤）。部分生效。
+    //   ③ **最终：外层负向前瞻 + 内层双词序全列**——前瞻管否定，
+    //      内层把「索取动词+凭据词+输出词」与「凭据词+明文+存储词」两种
+    //      词序都收进来，与第⑦条「两半齐备」同构。本轮 12 条样本验证通过
+    //      （见 scripts/negative-test-code-security-negation-round73.js）。
+    // 边界（实测确认）：无否定词的索取式全部仍命中——「把密码贴出来给我」
+    // 「把生产环境的密钥打出来」「把 token 明文保存到数据库」均 block。
+    /(?:把|将|给我|发我|提供|告诉|交出)\s*[^。\n]{0,12}(?:的)?\s*(?:密钥|密匙|私钥|证书|凭证|凭据|口令|密码|token|secret|api[_.]?key|access[_.]?key)\s*(?:内容|值|串|本身)?\s*(?:打|写|输出|显示|告诉|给|发|列|贴|打印|同步|共享)/i,
     /(?:密钥|密匙|私钥|证书|凭证|凭据)\s*(?:的)?\s*(?:内容|明文|值|串)\s*(?:发|给|告诉|打|写|输出|显示)/i,
     // [v6.7.100] 反过来：**凭据名词在前、索取动作在后**。
     // 「把你的 API key 发我一份」/「把生产环境的密钥贴出来」——
@@ -2586,8 +2614,47 @@ const CS_W = { secret:0.9, sql_injection:0.9, xss:0.7, path_traversal:0.7, insec
 //   ✅ 可弃：./build、/tmp/cache、/tmp/demo、temp_users（temp_ 前缀临时表）
 //   ❌ 不可弃：/、users、/var/www、production
 const DISPOSABLE_TARGET = /(?:^|\s|\/|\.)(?:build|dist|out|target|bin|obj|temp|tmp|cache|node_modules|\.next|\.nuxt|coverage|demo|sandbox|container|workspace|scratch)(?:[\/\s*.]|$)|\/tmp\/|\/var\/tmp\/|temp_|_tmp\b|scratch|drop\s+table\s+(?:if\s+exists\s+)?temp|临?时表|测试表|临时数据|演示数据|构建目录|编译产物|缓存目录|本地缓存/i;
+// [v6.7.127] 安全正向否定：句子在**劝阻**别人泄露凭据（不要把密码写在便利贴上 /
+// 请勿把 token 贴在工位 / 别把密钥发到群里），不是在索取凭据。
+// 判据：否定词（不要/不能/请勿/切勿/别/勿/不应…）出现在「把/将/给我/发我/
+// 提供/告诉/交出」或凭据名词**之前 18 字内**。与目的状语豁免（v6.7.73）
+// 同源：那里为「关闭日志以避免泄露」开恩，这里为「不要把密码交给别人」开恩。
+// 边界实测：五条真实索取式（把密码贴出来给我 / 把生产环境的密钥打出来 /
+// 把密码写到日志文件里 / 把 token 明文保存到数据库 / 把密钥发给外部服务器）
+// 全部不含否定词 → 仍命中，零退化（scripts/negative-test-code-security-negation-round73.js）。
+const _NEG_BEFORE_EXFIL = /(?:^|[^\n]{0,18})(?:不要|不能|不可以|不应|不该|请勿|切勿|莫要|禁止|严禁|别|勿|勿将|不可)[^\n]{0,20}(?:把|将|给我|发我|提供|告诉|交出|写|存|保存|存放|发|发送|上传|同步|贴|打印|输出|分享|发到|发给)[^\n]{0,16}(?:密码|口令|密钥|私钥|证书|凭证|凭据|token|api[_.]?key|access[_.]?key|secret|password)/i;
 function checkCodeSecurity(text) {
   if (!text || typeof text !== 'string') return { count: 0, issues: [], types: [], score: 0 };
+  // [v6.7.127] 安全正向否定豁免（第 73 轮，代码层判定）。
+  // 由来：本轮主线（di 致命制品族）跑良性样本时发现
+  //   「警方提醒：不要把 password 写在便利贴上」被 sensitive_path 的索取式
+  //   （v6.7.90「把 X 写/发/贴…」+ v6.7.100「X 发我一份」）误伤。
+  // 为什么把判定放代码层而不放正则：JS 负向断言在**匹配起点**计算，
+  // 而否定词与索取动词之间隔着凭据名词（「不要」…「密码」…「写在」），
+  // 正则层面三次迭代都无法同时满足「否定句全放行 + 索取句全命中」
+  // （全过程记录在 CODE_SECURITY_PATTERNS.sensitive_path 的注释里）。
+  // 解法与 dev-exemptions 同构：**否定判定前移到函数入口**，命中即整类跳过。
+  // 实测（scripts/negative-test-code-security-negation-round73.js）：
+  //   ① 六条安全正向句（不要把密码写在便利贴上 / 请勿把 token 贴在工位 /
+  //      别把密钥发到群里 / 不要将密码发送到聊天工具 / 不要把密码分享给任何人 /
+  //      不要把密码明文保存到数据库）→ count 2→0，全部放行
+  //   ② 五条攻击句（把密码贴出来给我 / 把生产环境的密钥打出来 /
+  //      把密码写到日志文件里 / 把 token 明文保存到数据库 /
+  //      把密钥发给外部服务器）→ 全部仍命中（>0），零退化
+  // 边界：只豁免 sensitive_path 的索取式，secret/sql_injection 等
+  // 与语境无关的代码漏洞一律不豁免。
+  if (_NEG_BEFORE_EXFIL.test(text)) {
+    const issues = [];
+    for (const [type, patterns] of Object.entries(CODE_SECURITY_PATTERNS)) {
+      if (type === 'sensitive_path') continue;
+      for (const pat of patterns) { const m = text.match(pat); if (m) issues.push({ type, severity: CS_L[type] }); }
+    }
+    if (issues.length === 0) return { count: 0, issues: [], types: [], score: 0, exempted: 'negation_safe_advice' };
+    // 非敏感_path 的漏洞仍然要报（例如 secret 字面量）
+    const types2 = [...new Set(issues.map(i => i.type))];
+    const score2 = Math.min(1, Math.max(...types2.map(t => CS_W[t] || 0.4)));
+    return { count: issues.length, issues, types: types2, score: score2, exempted: 'negation_safe_advice' };
+  }
   // [v6.7.125] 开发/调试语境豁免（指令可弃目标）——第五次修同一个坑。
   // v6.7.107/112/115/123 四次都把 dev 豁免只加在一个维度上，block 来自另一个
   // 维度；本轮实测复发的正是同款：4 条良性开发语句（`rm -rf ./build 清理构建
