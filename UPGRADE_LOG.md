@@ -1,3 +1,67 @@
+## 第 81 轮（「注释类动词 × 安全设施」专形：8 条攻击全 pass → 全 block，良性零误伤，负例守卫 7/7 全真）
+
+**方向**：decision 结构化代码裁定（`/tmp/r81-decision.js`，非脑内模拟），**chosen=B, confidence=0.7**（0.84 / A premature_termination「重新来」0.77 / C double_bind 群体归因 0.74）。
+
+| 候选 | 本轮复测（20+ 样本，非沿用旧简报） |
+|---|---|
+| A premature_termination | 5 条良性仅 1 条 verify（`调试时清空测试机的日志重新来`），verify 级非 block，另 4 条全 pass；单条边界样本 |
+| **B 注释+安全设施** | **8 条攻击 8/8 全 pass 零检出**；良性侧 5 条对照**也全 pass** |
+| C double_bind 群体归因 | 10 条 7 pass，但 2 条已被 dehumanization/stereotype 兜住 block、2 条归 presupposition verify，真正零归属仅 6 条且样本有效性存疑 |
+
+### 一、复测推翻旧简报的表面结论
+
+第 80 轮遗留写的是「注释 + 安全词攻击形仍未覆盖」并附带「补 BYPASS_VERB 会误伤良性」。本轮复测发现**两边都是假绿**：攻击侧 8 条 pass **不是漏判被豁免**，良性侧 5 条 pass **不是豁免在工作**——「注释」根本不在任何动词表里。命中侧第①条动词表（关闭族 + 第 80 轮清理族）与豁免侧 `BYPASS_VERB` / `CLEANUP_VERB` 全部没收注释类动词。良性 pass 是命中侧没动词的巧合。
+
+一旦只给命中侧补专形，第 22 轮同族良性「本地开发时把证书校验注释掉用 http」立刻被新命中打 block——实测复现后才补的豁免侧。这是 **v6.7.123 家族教训（清单只有一份 ≠ 两份语义对齐）第 6 次复现**，与第 80 轮清理动词两侧分叉同根。第 80 轮「补 BYPASS_VERB 会误伤」的旧结论错在只改一侧。
+
+### 二、改了 2 个源文件 + 1 测试 + 1 负例守卫（4 commit）
+
+| commit | 内容 |
+|---|---|
+| `7e30aabc` | 引擎：di 两条专形（注释动词在前 + 把字句设施在前）+ COMMENT_VERB 接线 |
+| `a5de05b3` | 引擎 + 测试：`comments?` 漏无 s 形修正 + 主测试 17 项 |
+| `6c89b82d` | 测试：负例守卫 7 注入全变红 + 注入机制三坑修正 |
+
+- `src/dangerous-instruction.js`：新增两条专形。设施表**刻意不收裸「日志/校验/验证/检查/代码」**（「注释掉调试日志」是最高频良性），只收带安全限定的设施词（证书校验/签名校验/日志审计/WAF…）；窗口收窄（动词在前 8、设施在前 6）——全部攻击样例间距 ≤5 字，宽窗口只放进无关共现
+- `src/dev-exemptions.js`：新增 `COMMENT_VERB` 并接进 verb 判定；devCtx + DEV_TARGET 两道仍需成立，纯安全句不被赦（第 34 轮清理动词误赦教训的镜像防护）
+
+### 三、测试抓到三处我没看到的问题
+
+1. **英文注释动词漏无 s 形**：`comments[ ]?out` 匹配不了 `comment out`。第 33 轮 `deactivate / certificate check` 同款英文双词/单复数坑的镜像。
+2. **自己编造了一条假预期**：`注释掉 mock 数据切换到真实接口` 被我放进"必须 devCtx=true"清单，实测 mock 是设施名词不是语境词，devCtx 不成立是**正确行为**。改为只要求不命中——第 80 轮同款教训（5 条编造样本被实测推翻），本轮又差点犯一次。
+3. **注入机制连踩三坑**（已写进 `scripts/negative-test-comment-verb-round81.js` 注释，供后续轮次直接复用）：① `lastIndexOf('/')` 从 anchor 往左找正则起点会被**注释文本里的斜杠**带到无关位置；② 整行替换成 `(?!)` 抹掉 const 定义 → 下游 ReferenceError（**崩溃≠变红**）；③ 正则行与非正则行不能用同一注入路径，接线支需字符串级 `replaceText`。另修注入方向选错：删英文设施组只影响动词在前样本，把字句样本仍在表内属**设计内冗余**（第 80 轮负例②同款教训），改为打两组之一。
+
+### 四、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 主测试（新增 17 项） | **17 passed 0 failed**（良性豁免 4 + 透传 3 + 攻击 3 + devCtx 变体 2 + 词表边界 6） |
+| 负例守卫（新增） | 对照全绿；7 注入 **7 真守卫 / 0 失守 / 0 异常**（fail>0 = 守卫被打掉） |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**——与基线持平，**零新增** |
+| bin/verify | **14 passed 0 failed** |
+| security-audit | **16 passed 0 failed** |
+| doc-numbers | **15 passed 0 failed** |
+| round22 dev-context 回归 | **22 passed 0 failed**（本轮新专形最可能碰坏的邻居） |
+| round80 cleanup-verb 回归 | **17 passed 0 failed** |
+
+run-all 全量结果见 finish 输出。
+
+### 五、遗留（给下一轮）
+
+1. **LLM 401 未解**（stepfun api-key 失效，需用户更新凭据）——仍是升级流水线唯一硬阻塞。
+2. `VERSION` 记 6.7.124 而 commit 前缀 6.7.128/6.7.129 的不一致是**既有记账问题**（第 80 轮起）：四处一致检查仍 PASS，说明版本号管理体系里 commit 前缀走的是另一套。下一轮先确认 `VERSION` 该不该跟到 6.7.129，不要盲目 bump。
+3. double_bind 群体归因武器化族**已连续五轮候选**（本轮 C）。画像问题在样本有效性：营销话术/社会比较是否算 double_bind 定义不清，需先收敛定义再动手。
+4. DEV_CONTEXT 缺方位表达（`容器内`/`调试环境内`/`仓库里`）：本轮探针 7/8 良性 pass 是正确行为（命中侧本就未命中），**证据比第 80 轮弱**——若要坐实缺口，需构造命中侧命中但 devCtx=false 的组合样本。
+5. `premature_termination`「重新来」：本轮测 5 条仅 1 条 verify，属另一维度职责，待下下轮有 block 级证据时再动。
+
+### 六、给下一轮的接手说明
+
+- 本轮 4 个 commit 全部在本地，**未 push**（本轮禁止）。同步由专用 cron 或下一轮负责，注意先确认 `VERSION` 与 commit 前缀的记账口径。
+- `data/upgrade-queue.json` 仅 1 条且已 done，方向需自选：复测上面的遗留有条稳的只有 3（double_bind，需先收敛定义）和 4（DEV_CONTEXT，需先建命中侧命中组合）。
+- 负例守卫的注入模板（`injectFragment` + `replaceText`）可直接改 INJECTIONS 复用，别再手写 needle。
+
+---
+
 ## 第 80 轮（dangerous_instruction 清理动词族双向修复：1 条良性 BLOCK 误判转非 BLOCK，3 条同形攻击漏判转 BLOCK，quotation-context 自匹配漏洞修正）
 
 **方向**：decision 结构化代码裁定（`/tmp/r80-decision.js`，非脑内模拟），**chosen=B, confidence=0.7**：
