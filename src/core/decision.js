@@ -446,11 +446,55 @@ class HeartFlowDecision {
     const SEVERITY_LOW = /装饰性|表面|美化|文案|文档数字|措辞/;
     const REPRODUCED = /已复现|复测坐实|实测坐实|单样本.{0,6}复现|8\s*[/／]\s*8|[0-9]+\s*[/／]\s*[0-9]+\s*(全漏|全对|全通过)|已坐实|负例.{0,4}验证/;
     const USER_PREF = /用户(已|明确|要求|纠正|说过|偏好)|铁律|已固化|用户原话/;
+    // [v6.7.128 第 99 轮] x/y 实测数字解析通道——四轮并列定向的根因修复。
+    // 缺口现象（复测 /tmp/probe99-xy.js）：候选描述只写实测数字
+    // 「detect 0/3」「缺口完整度 75%」时，_parseOptionsFromText 只抽
+    // feasibility/consequence_value/risk/confidence/prior 五个 key=value 字段，
+    // 实测数字被整个丢弃 → 所有候选回退到同一套词表推断默认值，
+    // composite 打平 → decide() 返回 options_indistinguishable + chosen:null。
+    // 第 95/96/97/98 四轮的「并列/侥幸定向」都是这一形态。
+    // 解析口径（保守，宁不采信不可误抽）：
+    //   ① 显式覆盖率声明优先：「覆盖率/检出率/检测率 NN%」→ gap = 1 - NN%
+    //   ② 检测比例：`x/y` 或 `x／y`（x ≤ y，y ∈ [1,99]），且 ±10 字符内必须有
+    //      检测语义锚点（detect/miss/命中/漏判/复测/实测/通过/定向…），
+    //      否则不采信——日期 2026/9、版本 6.7/124、比分 3/2 这类没有锚点自动排除
+    //   ③ 多个锚定比例取 gap 最大者（保守：宁可高估缺口，先堵最大的洞）
+    //   ④ 解析不到 → 返回 null，沿用词表推断路径，行为与升级前完全一致
+    // ⚠️ 措辞诚实边界：本通道只忠实换算「写明的数字」。调用方把「缺口 37%」
+    //   写成「完整度 37%」会得到相反排序——必须写无歧义词（覆盖率/检测率），
+    //   这是本通道的契约，也是 UPGRADE_LOG 记账的教训。
+    const RATIO_ANCHOR = /(detect|gate|命中|漏判|检出|复测|实测|通过|miss|hit|放行|拦截|定向|放行)/;
+    const ratioGap = (() => {
+      const pct = text.match(/(覆盖率|覆盖度|检出率|命中率|检测率)[^0-9%]{0,4}([0-9]{1,3})[ \t]*%/);
+      if (pct) {
+        const v = Number(pct[2]) / 100;
+        if (v >= 0 && v <= 1) return { gap: 1 - v, source: 'percent' };
+      }
+      let best = null;
+      const re = /([0-9]{1,3})[ \t]*[/／][ \t]*([0-9]{1,3})/g;
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        const x = Number(m[1]);
+        const y = Number(m[2]);
+        if (y < 1 || y > 99 || x > y) continue;
+        const from = Math.max(0, m.index - 10);
+        const to = Math.min(text.length, m.index + m[0].length + 10);
+        if (!RATIO_ANCHOR.test(text.slice(from, to))) continue;
+        const gap = 1 - x / y;
+        if (best === null || gap > best.gap) best = { gap, source: 'ratio', x, y };
+      }
+      return best;
+    })();
     const derivedConsequence = (() => {
       const pr = num(option.prior);
       if (pr !== null) return Math.max(0.05, Math.min(1, pr));
       let c = 0.6;
       if (/减少错误|提升|改善|修复|清晰|可信|可靠|可复现/.test(text)) c += 0.15;
+      // 实测缺口通道：解析到 x/y 或覆盖率时按缺口比例加权。
+      // 权重上限 0.35，与既有词表加分叠加；通道占用时词表严重性加分压到
+      // ≤0.08，避免「漏判」这个词和它后面的数字被同一事实双重计数。
+      const ratioBonus = ratioGap ? Math.min(0.35, ratioGap.gap * 0.35) : 0;
+      if (ratioBonus > 0) c += ratioBonus;
       if (/无收益|装饰性|表面功夫/.test(text)) c -= 0.2;
       // 严重性分层：漏判 > 误拦 > 装饰性
       // ⚠️ 边界：严重性加分不得让「不可逆大改」翻盘。实测回归——
@@ -464,6 +508,9 @@ class HeartFlowDecision {
       else if (SEVERITY_MED.test(text)) sevBonus = 0.10;
       const riskNow = IRREV.test(text) ? 0.8 : (REVERS.test(text) ? 0.2 : 0.4);
       if (riskNow >= 0.7) sevBonus = Math.min(sevBonus, 0.08);
+      // 比例通道已占用时，词表严重性加分封顶 0.08——「漏判」这个词和紧跟其后
+      // 的「0/8」是同一个事实，不能同时按词表和按数字各加一遍（实测会双计）。
+      if (ratioBonus > 0) sevBonus = Math.min(sevBonus, 0.08);
       c += sevBonus;
       if (SEVERITY_LOW.test(text) && !SEVERITY_HIGH.test(text)) c -= 0.15;
       // 已复现优先于「挂着未知」
@@ -500,6 +547,10 @@ class HeartFlowDecision {
       consequence_value,
       risk_penalty,
       confidence,
+      // [v6.7.128 第 99 轮] 把比例通道的解析结果透出来，让调用方能审计
+      // 「这个候选为什么排前面」是数字还是词表，避免又黑箱四轮。
+      measured_gap: ratioGap ? Math.round(ratioGap.gap * 100) / 100 : null,
+      measured_ratio_source: ratioGap ? ratioGap.source : null,
     };
   }
 
