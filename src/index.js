@@ -6797,6 +6797,9 @@ const BADFAITH_NARRATIVE_SLOTS = [
     id: 'came_to_win',
     hard: /(是来|过来)/,
     purpose: /(赢的|取胜的|定罪的|找茬的|挑刺的|闹的|下套的|使坏的|搅局的)/,
+    // 否定式：「他不是来赢的，是来解决问题的」——「不是来X的」是否定句式，
+    // lookbehind 挡不住（「是来」前的「不是」中间隔着主语），用 negative 排除。
+    negative: /(不是|并非|而非)(来|过来)([^。，]{0,4})?(赢|取胜|定罪|找茬|挑刺|闹|下套|使坏|搅局)的/,
     severity: 0.8,
   },
   {
@@ -6806,9 +6809,15 @@ const BADFAITH_NARRATIVE_SLOTS = [
     severity: 0.75,
   },
   {
+    // ⚠️ 「不是为了赢」是否定式（「竞争不是为了赢过对手，是为了把产品做好」）
+    //    曾被误伤——手段半必须排除否定前缀，否则把求真句判成坏信念。
+    //    lookbehind 只挡紧邻前缀；对「我们不是为了赢，是为了把标准立起来」
+    //    这类前半句否定、后半句肯定的句子不生效，所以另配 purpose 半排除
+    //    「把…做好/做成/立起来」等建设性宾语。
     id: 'purpose_clause',
-    hard: /(是为|是为了|为的是)/,
-    purpose: /(赢|定罪|定论|找茬|挑刺|拱火|搅局|下套|使坏)/,
+    hard: /(?<!不是|并非|而非)(是为|是为了|为的是)/,
+    purpose: /(赢|取胜|定罪|定论|找茬|挑刺|拱火|搅局|下套|使坏)/,
+    negative: /(做好|做成|立起来|做扎实|打磨|精进|提升|改进|优化|对齐|确认|说清楚|讲清楚|说明|解决|推进|落地|可回滚|可维护|可扩展|说明背景|钉死|标准)/,
     severity: 0.75,
   },
   // 伪中立真偏袒
@@ -6851,6 +6860,7 @@ function badFaithNarrative(text, hasChinese) {
   if (!hasChinese) return []; // 本轮只收敛中文侧形状；英文侧留给后续轮次扩样
   const out = [];
   for (const slot of BADFAITH_NARRATIVE_SLOTS) {
+    if (slot.negative && slot.negative.test(text)) continue; // 建设性宾语排除（「不是为了赢，是为了把产品做好」）
     if (slot.hard.test(text) && slot.purpose.test(text)) {
       out.push({ pattern: text.slice(0, 24), type: 'narrative_' + slot.id, severity: slot.severity });
     }
