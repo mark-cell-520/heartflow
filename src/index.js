@@ -6801,6 +6801,18 @@ const TONE_POLICING_PATTERNS = {
     { pattern: /\b(?:half the room|everyone|the room|people|the audience|the team)\s+(?:tuned out|stopped listening|glazed over|checked out|disengaged)\b[^.]{0,44}\b(?:the moment|when|as soon as)\b[^.]{0,30}\b(?:raised|you raised|started)\b/i, type: 'en_tone_buried_content', severity: 0.7 },
     // `let's talk when you can say this without getting upset` —— can + 语气动作
     { pattern: /\b(?:let'?s talk|we can talk|let'?s revisit|we can revisit|we can discuss|let'?s discuss)\b[^.]{0,44}\b(?:when|once|after)\b[^.]{0,44}\b(?:can|could)\s+(?:say|talk|discuss|make)\b[^.]{0,30}\bwithout\b/i, type: 'en_tone_conditioned_talk', severity: 0.7 },
+    // 第五轮补洞（最后 4 条漏判）：
+    // ① maybe 隔断：`If you'd said this calmly, maybe it would be worth
+    //   discussing.` —— 语气半在最前，内容半靠 maybe 隔开，跨度 >44。
+    // ② going to + seriously：`Nobody is going to take your proposal
+    //   seriously while you sound this upset.` —— is going to 占用中段。
+    // ③ try again with less emotion and I might agree —— and 后接 I might。
+    // ④ pushback 的原因归于表达方式（the reason you get pushback is the
+    //   way you phrase things）—— reason 在前、way you phrase 在后。
+    { pattern: /\b(?:if|when)\s+(?:you'?d|you had|you'?ve|you have)?\s*(?:said|put|phrased|framed|delivered|written)\b[^.]{0,44}\b(?:calmly|nicely|without|not so|less|differently nor?mally)\b[^.]{0,40}\b(?:maybe|perhaps|then|it might|it would)\b/i, type: 'en_tone_conditioned_validity', severity: 0.7 },
+    { pattern: /\b(?:is|are)\s+(?:going to|gonna|about to)\s+(?:take|hear|read|consider|act on|listen to)\b[^.]{0,44}\b(?:while|when|as long as|the way)\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    { pattern: /\b(?:try|make|put|say|state)\s+(?:it|that|this|the case|your point|the argument)\s+(?:again\s+)?(?:with|without)\s+(?:less|fewer|no|more)\s+(?:emotion|anger|outrage|hysteria|drama|accusations|edge|heat|hostility)\b[^.]{0,40}\b(?:and\s+)?(?:I|we)?\s*(?:'?ll|will|might|may|would|could)\s+(?:agree|listen|accept|consider|engage|hear)\b/i, type: 'en_tone_conditioned_talk', severity: 0.7 },
+    { pattern: /\b(?:the )?reason (?:you|they|we|people)\s+(?:get|got|getting|give|gave)\s+(?:pushback|rejected|dismissed|ignored|resistance)\b[^.]{0,40}\bis\b[^.]{0,30}\b(?:the )?way (?:you|they)\s+(?:phrase|phrased|put|say|frame|word|express)\b/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
   ],
 };
 
