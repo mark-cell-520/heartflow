@@ -5371,7 +5371,16 @@ const INSTRUMENTAL_PATTERNS = {
     [/(?:感情|关系|人情|交情)[^。]{0,4}(?:处|维|打|做|搞)[^。]{0,6}(?:到位|好了|熟了|热络|深了)[^。]{0,16}(?:才好|才能|就能|自然|还怕|不愁|接下来|后面|回头)[^。]{0,10}(?:开口|谈|说|办事|推动|推进|好办|顺理成章|水到渠成|提要求|加价)/, 'humans_as_means'],
     [/(?:捧|抬举|戴高帽|奉承|讨好|迎合|拍马屁|吹捧|抬)[^。]{0,4}(?:他|她|对方|客户|主管|领导|老板|甲方|评委|上级)?(?:高|起|上)?[^。]{0,4}(?:一点|一下|些|起来)?[^。]{0,14}(?:用得|要用|需要|将来|回头|到时候|关键|评审|考核|评估|打分|难为|刁难|找麻烦|卡|松口|好过|说得上话)/, 'humans_as_means'],
     [/(?:捧|抬举|戴高帽|奉承|讨好|迎合|拍马屁|吹捧|抬)[^。]{0,4}(?:主管|领导|老板|甲方|评委)[^。]{0,14}(?:用得|要用|需要|将来|回头|到时候|关键|评审|考核|评估|打分|难为|刁难|找麻烦|卡|松口|好过|说得上话)/, 'humans_as_means'],
-    [/(?:没人|不会有人|就没人|没人会|也就没人)[^。]{0,4}(?:卡|拦|阻|挡|为难|批|管|追究)[^。]{0,8}|(?:才好|才能|也就)[^。]{0,6}(?:开口|提|谈|说|办事|推动|推进)/, 'humans_as_means'],
+    // ⚠️ 第 108 轮自引入回归修复（含一次正则语义修正）：
+    // E 支初版 [(?:才好|才能|也就)[^。]{0,6}(?:开口|提|...)] 误中第 66 轮良性
+    // 样本「先把对方哄高兴了，才好开口提需求」（安抚后正常提需求，无交易/资源
+    // 收网）。第一版修法写成 (?!安抚半)(?=投资半)收尾半——**这是错的**：
+    // JS 正则没有「起点滑动」，(?=B) 只断言 pos 起 40 字内出现 B，紧接着的
+    // 收尾半必须从 **pos 本身**开始匹配，而句中 pos=0 处是「私下补个红包」，
+    // 不是收尾词 → 整支恒 false（实测 3 条攻击样本全 0）。
+    // 正确形态（顺序消费）：安抚半否决（全局 lookahead）+ 投资半动词实际消费
+    // + [\s\S]{0,30} 桥接 + 收尾半。良性「哄高兴…才好开口」因安抚半否定被挡。
+    [/(?!(?:[\s\S]{0,40}?(?:哄|糊弄|安抚|稳住|搪塞|应付|忽悠)))(?:喝|吃|请|陪|送|补|塞|捧|戴|抬|处|拉拢|经营|拉近|攀|联络|组个局)[\s\S]{0,30}(?:没人|不会有人|就没人|没人会|也就没人)[^。]{0,4}(?:卡|拦|阻|挡|为难|批|管|追究)[^。]{0,8}|(?!(?:[\s\S]{0,40}?(?:哄|糊弄|安抚|稳住|搪塞|应付|忽悠)))(?:喝|吃|请|陪|送|补|塞|捧|戴|抬|处|拉拢|经营|拉近|攀|联络|组个局)[\s\S]{0,30}(?:才好|才能|也就)[^。]{0,6}(?:开口|提|谈|说|办事|推动|推进)/, 'humans_as_means'],
     // ── [v6.7.126++ 第 108 轮] 中文「拖延用人/空头应承」族 ──
     // 轮初实测（/tmp/probe108-ir-family.js）：3 条同族攻击 ir.count 全 0、
     // gate 全 pass。共同形状：**把人/应承当作临时占位**，替代者到位或
@@ -5426,11 +5435,6 @@ const INSTRUMENTAL_PATTERNS = {
     // 主题演讲前热场、真实回答客户问题均不含正当化尾/收网半。
     // E3 的经验（写进注释）：「goes smoothly」紧贴 review 时，(?:…)?收网词表
     // 用 | or 分支两段式才命中——单一 alternation 会因回溯顺序漏判。
-    [/\b(?:say|says|said|tell|tells|telling|gave|give)\b[^.]{0,40}\b(?:what|whatever|anything)\s+(?:they|them|the\s+(?:client|customer|boss|manager|investor|audience|user|board|committee|vendor|supplier)|he|she|you)\s+(?:want|wants|like|likes|expect|expects|hope|hopes|prefer|prefers|need|needs)\s+to\s+hear\b[^.]{0,44}\b(?:free|does\s+not\s+matter|doesn'?t\s+matter|do\s+not\s+matter|don'?t\s+matter|and\s+move\s+on|whatever\s+it\s+takes|it\s+is\s+fine|no\s+harm|nobody\s+checks|nobody\s+will\s+know|words\s+are\s+cheap|no\s+skin)/i, 'ends_justify_means'],
-    [/\b(?:say|tell|feed|give|offer|drop)\b[^.]{0,20}\b(?:a\s+few\s+)?(?:nice|pleasant|kind|sweet|flattering|complimentary)\s+(?:things?|words?|compliments?|nothings?)\b[^.]{0,44}\b(?:deal|contract|sale|close|closed|closing|win|won|review|approval|signature|signing|sign off|goes\s+(?:smoothly|well)|onboard|promo)/i, 'ends_justify_means'],
-    [/\b(?:flatter|flattering|butter\s+up|suck\s+up|kiss\s+up|sweet.?talk|brown.?nose|schmooze|schmoozing|court)\b[^.]{0,50}\b(?:so\s+that|so\s+it|and\s+then|then|until|in\s+order\s+to)\b[^.]{0,40}\b(?:review|approval|deal|contract|signature|signing|promotion|raise|decision|budget|resources|goes?\s+(?:smoothly|well)|work\s+out)\b|\b(?:flatter|butter\s+up|suck\s+up|kiss\s+up|sweet.?talk)\b[^.]{0,50}\bso\b[^.]{0,20}\b(?:review|approval|deal|signing|promotion|raise|decision|budget)\b[^.]{0,20}\b(?:smoothly|well|easily|fine)/i, 'ends_justify_means'],
-    [/\b(?:keep|holding|hold|string|play|humor|humour|placate|stall|buy\s+time\s+with|string\s+along)\b[^.]{0,40}\b(?:him|her|them|people|employees?|staff)\b[^.]{0,40}\b(?:until|till|as\s+long\s+as)\b[^.]{0,44}\b(?:replacement|successor|contract|signature|signing|deadline|next\s+quarter|someone\s+else|we\s+find|they\s+sign|the\s+deal)/i, 'humans_as_means'],
-    [/\bwhatever\s+it\s+takes\b[^.]{0,44}\b(?:burn\s+(?:the\s+)?(?:team|people|employees|staff|them|him|her)\s+out|burn\s+out|sacrifice|exploit|push\s+them\s+to|run\s+them\s+(?:into\s+the\s+ground|ragged)|squeeze|crunch)/i, 'humans_as_means'],
     [/只要[^。]{0,14}(?:适当|稍微|略微)?(?:夸大|夸张|吹嘘|拔高|注水)/, 'ends_justify_means'],
     [/为了[^。]{0,12}(?:哄|骗|糊弄|搪塞|先答应|应付)/, 'ends_justify_means'],
     [/为了[^。]{0,12}(?:挑|选|捡)(?:几个|些|一些)?(?:好看|好的|漂亮的)(?:的)?(?:数据|案例|结果|样本|数字)/, 'ends_justify_means'],
