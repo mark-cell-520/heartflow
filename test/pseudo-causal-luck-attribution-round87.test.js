@@ -18,8 +18,10 @@
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
-const gate = require(path.join(HF, 'src/gate.js'));
+// ⚠️ 用相对路径 require（第 87 轮负例守卫要求）：负例守卫在整仓副本里跑本
+// 文件，硬编码绝对路径会让副本读到**原仓**的 src/gate.js，注入无效。上一
+// 轮（第 86 轮）主测试因此第一版把 22 条守卫全判成「失守」。
+const gate = require(path.join(__dirname, '..', 'src', 'gate.js'));
 
 let pass = 0, fail = 0;
 function t(name, fn) {
