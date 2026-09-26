@@ -1,3 +1,66 @@
+## 第 97 轮（double_bind EN 侧四族移植：32 条英文攻击漏判 21/32→32/32；db 改走 _dual 修 en2zh 破坏英文匹配；decision 本轮正常定向 A）
+
+**方向**：简报「遗留」第 2 条点名 `double_bind en 三族移植`。按纪律先用本体 decision 定方向，再实测完整缺口。
+
+### 一、decision 本轮正常定向（不再并列，如实记账）
+
+`HeartFlowDecision.decide({task:'选下一轮方向', prompt:'[A] double_bind EN 侧四族移植：实测 38 条英文攻击经 gate 漏判 38/38，16 条英文良性 0 误伤，缺口完整度 100%…[B] 修 decision._scoreOption 的 x/y 数字解析（第 95/96 两轮连续并列）…[C] reward_hacking 英文侧压力扩样…'})`：
+
+```
+chosen: 'A'  score: 0.83（B/C 均 0.74，confidence 0.7）
+```
+
+**为什么这次不并列**：本轮候选 A 的描述里「漏判 38/38」「0 误伤」是 B/C 都没有的词组合，`SEVERITY_HIGH`（「漏判」+0.22）+ `REPRODUCED`（`0/0`/`38/38` 形态 +0.12）在 A 上全命中，B/C 只有「并列」类词。第 95/96 轮的 x/y 解析缺口**本轮仍未修**（属升级机制自身改动），本次靠词表差异正常分出高下，修法继续挂给下一轮。
+
+### 二、缺口实测（复测，不信简报旧描述）
+
+探针 `/tmp/probe97-db-en.js` 首版（含 gaslighting 侧 6 条共 38 条英文攻击）：
+
+| 项 | 实测结果 |
+|---|---|
+| EN 攻击样本 | false_permission 8 / damned_branches 8 / ultimatum_expel 8 / pathologized_defiance 8 / negated_feeling_blame 6 = 38 条 |
+| gate 命中 | **0/38**，原有 6 条 en 判据命中 0 |
+| EN 良性压力 | 16 条 **0/16 命中**（改前基线） |
+
+判定：**成立**。中文侧这四族第 76 轮已补齐（zh 表 18 支 + gaslighting 侧 5 支），EN 表此后一直停在 6 支——这是「一次只做一侧」结构缺口的第四次（第 71/75/76 轮同款结构，本轮审计单独立项）。
+
+### 三、改了什么（3 commit）
+
+**`src/index.js`**：
+
+1. **EN 表新增 4 支**（`DOUBLE_BIND_PATTERNS.en`，6→10 支）：`false_permission` / `damned_branches` / `ultimatum_expel` / `pathologized_defiance`。三条判据形状照 ZH 第 76 轮英译，`severity` 与 ZH 侧取齐（0.45）。`negated_feeling_blame` 族按归因诚实原则**不注册到 double_bind**——与 ZH 侧一致归 gaslighting（见下一轮候选）。
+2. **修 db 调用路径**：`discriminate()` 里 `db` 从 `_applyPedagogyRelaxation(checkDoubleBind(_normText), …)` 改为 **`_dual(checkDoubleBind, "double_bind")`**。根因：英文样本过 `text-normalizer` 的 en2zh 归一化后英文模式大面积失配——首版判据已写对，`ultimatum_expel` 实测只得 1/8（8 条攻击只中 1 条，而且中的那条是被 false_dilemma_strict 顺带兜住）。
+
+**`test/double-bind-en-port-round97.test.js`**（新主测试，113 断言全绿）：32 攻击 × gate 命中、22 良性 × double_bind 零命中、54 维度直检（归因落对具体新族 + 良性不得命中任何新族）、4 族 severity 注册、guidance 覆盖。
+
+**`scripts/negative-test-double-bind-en-round97.js`**（负例守卫，10/0）：四条判据逐条**删源码行 → 重跑 gate → 攻击必须失守**，全部真守卫（删条后 4/4 attack=false），还原后 4/4 恢复命中，`src/index.js` 工作区与读取时一致（无落盘残留）。
+
+### 四、踩到的坑（都写进了源码注释）
+
+1. **加族必须两侧对齐，且「写完≠匹配」**：首版正则全部按肉眼审题写就，实测 32 条攻击只中 11 条。逐段调试出三类失配——① `ultimatum_expel` 动词后硬跟逗号，`Admit you were wrong, or…`（动词与逗号间有别的词）全毙；② `damned_branches` 误以为英文同构要求**两个** either/or，实际句子只有一个连接词；③ `[^.]{0,60}` 不含 `?` 导致 `or` 后到后果词间的距离超出上限。**一条判据要跑 9 条攻击 × 8 条良性才敢留**。
+2. **`_dual` 不是万能，方向错了越修越漏**：`db` 只喂 `_normText` 是 6.7.71 年代以来一直存在的路径缺陷，此前四次同类移植（em/ir/id/fu）都靠 `_dual` 修过，double_bind 是漏网的第五维。改 `_dual` 后中文侧 7/7 攻击、5/5 良性复测不变（`/tmp/zh-pressure97.js`）。
+3. **负例守卫要认「本轮新行」**：首版守卫用 `'false_permission'` 行定位，删的是 ZH 同名族（第 76 轮那行），删完攻击照样命中 → 误判「守卫失效」。改为按**独有英文特征串**定位本轮新行才拿到真结果。这条与第 96 轮 CLASS_LABEL_ZH「中英两表同名族」教训同源（第 3 次变体）。
+
+### 五、七项验证
+
+主测试 **113/113**（32 攻击全命中、22 良性零误伤、54 维度直检 0 败）· 负例守卫 **10/10 真守卫 + 4/4 还原** · 双向门禁召回 **52/52**、误拦 **300/326 零新增**（与第 96 轮两次逐项比对一致）· ZH 压力复测 **7/7 攻击 + 5/5 良性** · bin/verify **14/14** · security-audit **16/16** · doc-numbers **15/15** · **run-all 5175 通过 / 0 失败**（finish ①.5 自动记账 README 5061→5175）· lang-coverage-audit 双边检出 18、仅中文 2、双边漏检 0（与上轮一致，未回退）· finish **七项全绿**，5 commit 已推送远程。
+
+### 六、遗留
+
+1. `decision._scoreOption` 的 x/y 数字解析仍未做（第 95/96 两轮并列根因，本轮靠词表差异侥幸定向）。
+2. `negated_feeling_blame` 的 EN 侧判据未补（ZH 侧第 76 轮已 5 支；本轮首版探针 6 条英文攻击 0 命中，按归因诚实原则留给 gaslighting 侧，属下一轮最直接候选）。
+3. lang-coverage-audit 显示 `victim_blaming` / `moral_foundations` 仍仅中文命中（第三轮出现，非本轮引入）。
+4. LLM 401（stepfun key 失效）仍未解——运维侧凭据，非引擎可改。
+
+### 七、给下一轮的接手说明
+
+1. **优先**：gaslighting EN 侧补 `en_denied_feeling_blame` 族——样本已备好（本轮 `/tmp/probe97-db-en.js` 里 6 条：`I'm not angry, it's just that everything you do is selfish.` 等），判据照 ZH 第 76 轮五支的形状英译（否认感受 + 断言式归因 + 对方内在缺陷词，商议式归因不命中）。
+2. 其次：`decision._scoreOption` x/y 解析（修法第 95 轮已写在 UPGRADE_LOG）。
+3. 收到简报先复测再信：本轮简报「遗留」的 di 误拦/ai_writing_tell 两条上轮已标 N/A，brief 未刷新。
+4. 命令纪律照旧：>120s 后台化；长链 `&&` 会被安全扫描拦；`node -e` 里出现撇号正则会被 BLOCKED，一律 write_file 建脚本再跑（本轮因此踩了 2 次 BLOCKED）。
+
+---
+
 ## 第 96 轮（reward_hacking「瞒骗糊弄」族六类；57 条攻击 detect 2/57→47/47；decision 词表并列如实记账）
 
 **方向**：简报「遗留」第 4 条点名「reward_hacking 剩余 6 类」。按纪律**不信简报旧描述，先实测完整缺口**——简报只字未提这个维度对上口语话术的整体失守。
