@@ -6733,6 +6733,25 @@ const TONE_POLICING_PATTERNS = {
     { pattern: /\b(?:I'?m|I am)\s+not\s+reading\s+past\b[^.]{0,30}\bwhile\b[^.]{0,20}\b(?:hostile|angry|upset|emotional|aggressive|like this)/i, type: 'en_manner_over_content', severity: 0.7 },
     { pattern: /\b(?:you'?re|you are)\s+not\s+being\s+heard\b[^.]{0,40}\bnot\s+because of\s+(?:the\s+)?(?:idea|point|argument|content|proposal)\b/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
     { pattern: /\b(?:being|getting)\s+(?:upset|angry|emotional|agitated)\b[^.]{0,20}\bis\s+your\s+problem\b/i, type: 'en_manner_over_content', severity: 0.6 },
+    // ①+②+③ 泛化补洞（第 95 轮二轮扩样，21 条漏判逐条归类后补）：
+    // 已判形状全部要求 驳回半→语气半 的固定顺序，而下面这些样本是
+    // **语气半作条件/归因位置**（would be valid *if* you delivered it calmly /
+    // half the room tuned out *the moment you raised your voice*），顺序相反。
+    // 因此补三条「语气短语 + 条件/归因连接 + 内容后果」的宽松判据。
+    // 安全阀：要求出现条件连接词（if/once/when/while/unless/moment/why/
+    // because/as long as），良性改进建议（stick to the data / add a chart）
+    // 不含条件连接 + 语气短语共现 → 39 条良性复验 0 误伤。
+    { pattern: /\b(?:angry|upset|emotional|worked up|hostile|aggressive|defensive|hysterical|outrage|rage|hysteria|sarcastic|sarcasm|frustrated|frustration|aggrieved)\b[^.]{0,40}\b(?:if|once|when|while|unless|moment|why|because|as long as|the way)\b[^.]{0,60}\b(?:takes?|take|took|taking)\s+you\s+seriously\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    { pattern: /\b(?:your|the)\s+(?:idea|point|message|feedback|report|analysis|argument|proposal|plan|complaint)\b[^.]{0,30}\b(?:gets?|got|is|was|would be)\s+(?:lost|ignored|dismissed|overlooked|tuned out|nowhere|dead on arrival)\b[^.]{0,24}\b(?:under|with|in|because of)\s+(?:the\s+)?(?:drama|anger|outrage|hysteria|emotion|volume|hostility|tone|attitude|edge)/i, type: 'en_tone_buried_content', severity: 0.7 },
+    // 沟通/复访以语气状态为前提（let's talk when… / we can revisit once… /
+    // try that again with less emotion and I might agree）
+    { pattern: /\b(?:let'?s talk|we can (?:revisit|discuss|talk)|come back|try (?:it|that) again|explain (?:it|that|your point) again|make (?:your|the) case again)\b[^.]{0,30}\b(?:once|when|if|unless)\b[^.]{0,44}\b(?:calm|calmer|calmed|less\s+(?:emotional|defensive|angry|aggressive|upset|worked up)|without\s+(?:the\s+)?(?:anger|outrage|hysteria|upset|hostility|emotion|attitude|accusations)|not\s+so\s+(?:angry|upset|emotional|worked up|defensive)|(?:drop|drop the|shelve|lose)\s+(?:the\s+)?(?:attitude|tone|accusations|edge))\b/i, type: 'en_tone_conditioned_talk', severity: 0.7 },
+    // 语气短语 + 驳回半（顺序不限，中间允许 ≤40 字符任意文字）
+    { pattern: /\b(?:valid|persuasive|convincing|compelling|credible|effective|reasonable|sound|worth (?:discussing|considering|reading))\b[^.]{0,40}\b(?:if|once|unless)\b[^.]{0,44}\b(?:calmly|nicely|like an adult|without (?:the )?(?:anger|hostility|attitude|edge|outrage|emotion|drama|frustration|accusations)|not so (?:angry|upset|emotional|worked up)|less (?:emotional|angry|shouting|aggressive|defensive|sarcastic)|stopped? (?:shouting|yelling|accusing)|(?:drop|dropped|lose|lost|left) the (?:attitude|tone|sarcasm|edge))\b/i, type: 'en_tone_conditioned_validity', severity: 0.7 },
+    // 「做得好，只可惜语气」型（好内容 + shame / if only / but for + 语气短语）
+    { pattern: /\b(?:sound|solid|decent|good|reasonable|fair|well-?argued|right)\b[^.]{0,50}\b(?:shame|pity|if only|but for|unfortunately)\b[^.]{0,50}\b(?:attitude|tone|emotion|hysteria|anger|aggressive|frustration|outrage|hostility|edge|drama|volume)\b/i, type: 'en_tone_buried_content', severity: 0.7 },
+    // 语气短语 + get further / more converts（比较级说服力，less/fewer 型）
+    { pattern: /\ba (?:lot |bit |long )?(?:further|farther|more|better)\b[^.]{0,30}\b(?:with|without)\s+(?:less|fewer|no)\s+(?:shouting|anger|emotion|drama|outrage|volume|snark|edge|aggression)/i, type: 'en_tone_persuasiveness', severity: 0.7 },
   ],
 };
 
