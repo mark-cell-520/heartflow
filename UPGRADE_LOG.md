@@ -1,3 +1,96 @@
+## 第 82 轮（fallacies「不 X 就是 Y」站队话术无尾版：40/40 攻击从全 pass 到全 verify，良性零新增误伤，负例守卫 9/9 全真）
+
+**方向**：decision 结构化代码裁定。**这一轮 decision 机制本身先坏了两次，值得单独记。**
+
+**第一轮**（`/tmp/r82-decision.js`，按 cron 模板的自然语言格式 `[A] xxx\n[B] yyy`）→ `chosen: null, confidence: 0`，三个候选全 0.74。**补判据再跑**（`/tmp/r82-decision2.js`，加可行性/证据量/风险三行）→ 仍全 0.74、仍 null。
+
+**根因不在候选质量，在 decision 的解析层**：`src/core/decision.js:312` 的 `_parseOptionsFromText` 的 `mk()` 只取 `[A]` 后第一行做 label，**`description` 恒为 `''`**。我写的三行判据全部被丢弃，三个候选喂进 `_scoreOption` 的文本完全相同 → 必然同分 → `options_indistinguishable` → 弃权。
+
+**修法**：改用 decision 的**文档化结构化接口**（`{id, label, description}` + `feasibility/consequence_value/risk/confidence` 数值字段），`/tmp/r82-decision3.js` → **chosen=C, confidence=0.85**（C 0.85 / A 0.83 / B 0.77）。
+
+> 给后续轮次的接手说明：**cron 模板里的自然语言 candidate 格式喂不动 decision**（从 v6.7.117 改造至今一直如此）。要用 decision 选向，必须走结构化 options，否则拿到的 null 会被误读成「候选分不出高下」。
+
+### 候选画像（复测，非沿用旧简报）
+
+| 候选 | 本轮扩样实测 |
+|---|---|
+| A reward_hacking 评测投机 | 攻击 16 条 **13 条 pass**（硬编码答案/换评测指标/检测评测切模式/剔分母/按钮预测/把答案写进 prompt 前缀/记住 benchmark 题目/换判分逻辑/悄悄去掉失败的 seed/重跑到显著/把对照组调差/训练集混测试集/grader 只查格式）；良性 10 条 7 pass 3 verify。缺口**真实且大** |
+| B 中文 instrumental_reasoning | 攻击 16 条 8 条 pass；**同时良性 14 条 2 条误 rewrite**（不入虎穴焉得虎子试点 / 两害相权取其轻先打补丁）——成语族误伤未清，补攻击判据会放大误伤 |
+| **C 站队话术** | 攻击 10 条 **10/10 全 pass 零检出**；良性 5 条全 pass 零误伤 |
+
+### 一、缺口定位：连续五轮「定义有效性存疑」的真相
+
+这条族从第 77 轮起连续五轮被标 `double_bind 群体归因武器化` 候选而没动，卡在「营销话术/社会比较是否算 double_bind 定义不清」。**本轮定位到真正的归属错位**：
+
+- 该族一直被登记为 `double_bind`（rewrite 级）
+- 真正的归属是 `fallacies.false_dilemma / false_dilemma_extended`（verify 级）
+- `src/index.js:1193` 的 `false_dilemma_extended` **有中文先例**，但正则强制要求尾部「没有其他/中间/选择」（1155-1159 的 `false_dilemma` 同款）
+- 英文侧 2150 行 `double_bind.false_dilemma_strict`（`Either you are with us or against us`）**无此尾部要求**
+
+**中文侧缺的正是无尾版。** 这是同一个形状在中英两侧判据不对齐 —— v6.7.123 家族「两份清单语义分叉」教训第 7 次复现。归属收敛后判据形状立刻清晰，不再需要先争定义。
+
+### 二、改了 1 个源文件 + 1 测试 + 1 负例守卫（5 commit）
+
+| commit | 内容 |
+|---|---|
+| `5dda1ef8` | 引擎：FALLACY_PATTERNS.zh 新增 4 支 false_dilemma_extended + checkFallacies 三支元话语豁免 |
+| `4d65f099` | 测试：主测试 92 项（攻击 38 + 良性 50 + 边界 4） |
+| `927a3f1c` | 测试：负例守卫 9 注入全真守卫 + 注入机制四坑修正 |
+| `1a64e7f0` | 测试：汇总行改 run-all 标准格式 |
+
+- **`src/index.js`**：新增 `VERDICT_LABELS` / `EITHER_OR_TAIL` 两个表常量 + 4 支 `new RegExp(String.raw...)` 判据（主形「不X就是Y」/ 动词省略形「不X是Y」/ 沉默中立形 / 开放二择形）
+- **`checkFallacies`**：新增 `r82_meta_discourse` 三支豁免（句中否定削弱 / 框架化 / 后置否定评析）
+
+**判据设计（两半齐备，v6.7.123 家族铁律）**：前半否定式站队（不/没/无/未，或沉默/中立/不表态）+ 后半身份归属或道德裁定。**后半表刻意只收身份/道德裁定，不收事实裁定**（不知道/不行/不去/不合格）—— 实测 53 条真实中文良性句里「不知道就是不知道」「不行就是不行」是高频日常句式，收宽即全量误判。这是本族的良性分界线。
+
+### 三、实机验证（真实 `gate()`，非正则台）
+
+| 侧 | 结果 |
+|---|---|
+| 攻击 | **40/40 全部 verify**（fallacies 命中） |
+| 良性（73 条） | 8 条非 pass，**全部为存量行为**（`git stash` 前后对照实测确认），本轮零新增误伤 |
+
+**双向门禁**：召回 **52/52**、误拦 **300/326** —— 与基线持平，**零新增**。
+
+### 四、测试与负例守卫抓到的四个坑
+
+1. **豁免窗口写小了**：负例脚本第一次用「块内 9000 字节」做查找窗口，而豁免侧在 400+ 行外 → 3 个豁免注入全部「锚点未找到」。改用整源查找。
+2. **anchor 不是合法正则片段**：`'这是(?:错误|片面|武断|主观'` 缺右括号，替换后源码 SyntaxError → 探针崩溃。**崩溃 ≠ 变红**（第 81 轮同款教训第二次）。
+3. **路由判据连错两次**：① `name.includes('EITHER_OR_TAIL')` 永不成立（注入名是中文）；② 改用 `anchor.includes('要么')` 又对表注入失效（表片段「敌人|对手|…」不含「要么」二字，被路由到主族预期 → 主族样本仍命中 → **假失守**）。最终改 `inj.family` 显式字段。
+4. **第 80 轮负例②教训原样复现**：「清空 EITHER_OR_TAIL 表」是个**假守卫** —— 要么族样本分别靠「敌人」「别参与」命中，清掉「散伙/滚/退出」不影响那两条 → 注入后仍命中 → 报「未变红」。这是注入方向选错，不是守卫失守。改用样本独有依赖的片段 + 专属样本组。
+
+另有一个我**自己编造的假预期**被实机推翻：把 `不作为是一种选择，有时也是最优策略` 放进「不得命中 fallacies」清单，实测它本来就被 `confidence` 打 verify（存量行为）。良性侧断言口径已收敛为**只要求不含 fallacies 维度**，不要求 `gate.action === 'pass'`（第 80/81 轮同款教训第三次差点重犯）。
+
+### 五、验证（全部实测）
+
+| 项 | 结果 |
+|---|---|
+| 主测试（新增 92 项） | **92 passed 0 failed** |
+| 负例守卫（新增） | 对照全绿；**9 真守卫 / 0 失守 / 0 异常** |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326** —— 零新增 |
+| bin/verify | **14 passed 0 failed** |
+| security-audit | **16 passed 0 failed** |
+| doc-numbers | **15 passed 0 failed** |
+| round76 double_bind 回归 | **75 passed 0 failed**（最可能碰坏的邻居） |
+| round80 / round81 di 回归 | 17 / 17 **全绿** |
+| run-all | 4517 通过 / 3 失败 —— 3 个全是既有记账项：`dimension-coverage-guard`（50→51 口径）、`panel-probe-calibration`（BROKEN 3）、第 82 轮主测试汇总行格式（本轮已修）。**前两个用 git stash 在改动前基线上复跑，同为 1 失败**，非本轮引入 |
+
+### 六、遗留（给下一轮）
+
+1. **LLM 401 未解**（stepfun api-key 失效）—— 仍是升级流水线唯一硬阻塞，连续第四轮。
+2. **decision 自然语言候选格式失效是机制级问题**（本轮定位）：cron 模板要求用 `[A] xxx` 格式跑 decision，但 `_parseOptionsFromText` 丢掉 description，导致**每轮拿到的 chosen 都是 null 或不可信**。修它要么改 `mk()` 把后续行并入 description，要么改 cron 模板走结构化 options。**这属于升级机制自身，本轮按硬边界没动**，建议下一轮明确授权后修。
+3. **reward_hacking 评测投机族缺口最大且未动**（本轮 A，13/16 漏判）：已连续多轮开采（23/32/35/38/55/56/63/67/68/69/70 轮），边际收益递减但漏判率仍最高。下一轮首选。
+4. **中文 instrumental_reasoning 成语族误伤 2 条未修**（本轮 B）：「不入虎穴焉得虎子，所以我们决定先在小流量上试点」「两害相权取其轻，我们选择先打安全补丁」→ 误 rewrite。修它才能安全补攻击侧判据，需先修误伤。
+5. **`VERSION` 记账口径问题仍在**（既有）：`VERSION` 停 6.7.124 而 commit 前缀已到 6.7.130，七项检查仍 PASS。finish 不碰 VERSION（硬边界）。
+
+### 七、给下一轮的接手说明
+
+- 本轮 4 个 commit 全部在本地，**未 push**（本轮禁止）。
+- 用 decision 选向**必须走结构化 options**（见 `/tmp/r82-decision3.js` 的调用形态），自然语言格式会拿到假 null。
+- 负例守卫的注入模板（anchor → needle → 副本 → 探针）可直接改 INJECTIONS 复用；**anchor 必须是源码里逐字出现的完整合法正则片段**，且要配 `family` 字段。
+
+---
+
 ## 第 81 轮（「注释类动词 × 安全设施」专形：8 条攻击全 pass → 全 block，良性零误伤，负例守卫 7/7 全真）
 
 **方向**：decision 结构化代码裁定（`/tmp/r81-decision.js`，非脑内模拟），**chosen=B, confidence=0.7**（0.84 / A premature_termination「重新来」0.77 / C double_bind 群体归因 0.74）。
