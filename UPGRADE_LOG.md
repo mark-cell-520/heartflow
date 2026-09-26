@@ -1,3 +1,65 @@
+## 第 107 轮（victim_blaming「行为归因」族：zh 4/8→8/8、en 2/8→8/8；decision 三跑一致选 A；11/12 真守卫）
+
+**方向**：队列唯一条目 done → 简报「给下一轮」第 1 条点名 victim_blaming（第 99 轮起挂了三轮）。先用本体 decision 定方向，再复测缺口。
+
+### 一、decision 本轮定向（三跑一致）
+
+`HeartFlowDecision.decide`（探针 `/tmp/decide107.js`，候选用实测数字描述，走第 99 轮修的 x/y 比例通道）：
+
+```
+run1: "A"   run2: "A"   run3: "A"
+```
+
+A = victim_blaming 行为归因族（zh 4/8 en 2/8）· B = moral_foundations 补词（zh 6/8 en 5/8，非 gate 动作维）· C = instrumental_reasoning 中文剩余形状。**第 99 轮修的 x/y 通道本轮真正兑现价值**：候选描述带 `4/8` `2/8` 比例数字后三跑一致定向，不再是前四轮的 `chosen:null` 并列。
+
+### 二、缺口实测（复测，不信简报旧描述）
+
+探针 `/tmp/probe107-vb.js`（入口用本体 `gate`——`checkInput` 在 index.js 未导出，第一版探针因此 `TypeError: checkInput is not a function`）：
+
+| 侧 | 改动前 | 漏判样本（全部 gate action=pass） |
+|---|---|---|
+| zh | **4/8** | 谁让他一个人走夜路出事只能怪自己 / 他不说话就算了活该被孤立 / 早提醒过她了现在后悔有什么用 / 谁叫她要跟那种人交往后果自负 |
+| en | **2/8** | should have known better（第三人称）/ brought this on himself / it takes two to tango / reaping what she sowed / made her bed now lie in it |
+
+根因：原 47 条判据全部要求「受害者字眼 + 缺陷/活该正形」或英文窄口语句型，**只把后果归因到当事人自身行为**的句式完全没有通道。
+
+### 三、改了什么（3 commit）
+
+**`src/index.js`**（VICTIM_BLAMING_PATTERNS 尾部追加 11 支，`[v6.7.110 第 107 轮]` 注释块）：
+
+- `zh_behavior_attribution` 5 支：① 谁让/谁叫+后果词 ② 后果词+只能怪自己（**带系统主语负向断言护栏**） ③ 活该+后果词 ④ 早提醒/当初+事后否定 ⑤ 谁叫+后果自负
+- `en_behavior_attribution` 6 支：① should have known better（第三人称，补 3950 行只有 you 版） ② brought this on X-self ③ it takes two to tango ④ reaping what X sowed ⑤ made her bed/lie in it ⑥ he/they had it coming ⑦ 起因归因式（if/that is why + 行为 + 伤害词）
+
+**`test/victim-blaming-behavior-attribution.test.js`**（新，13 断言全绿）：攻击 11 条全命中 + 旧族 2 条不退化、zh/en 良性零误伤、护栏有效性自证、双向门禁全量基线 0 条、gate 端到端 rewrite。
+
+**`scripts/negative-test-victim-blaming-behavior-round107.js`**（新负例守卫）：12 支判据逐支注入，**11 变红 / 1 有兜底 / 0 异常**，对照副本 0 异常。
+
+### 四、踩到的坑（三个，都有实测代价）
+
+1. **patch 数组闭合丢失**：第一次 pattern patch 把 `];` 覆盖掉，`node --check` 立刻报 `Unexpected token 'const'`（HATE_SPEECH_ZH 行）。教训：给数组追加元素时 new_string 必须保留原闭合括号——第 99 轮同类坑第二次踩。
+2. **「后果词 + 只能怪自己」在团队复盘句上误伤**：首版 5 条良性样本里 3 条转红（「这次上线吃亏只能怪容量规划没做好」「客户被骗只能怪我们风控提醒太晚」「线上出事只能怪监控告警阈值定得太高」）。复盘句把后果归给**系统/团队**时与人身归因完全同形。修法：加系统主语负向断言 `(?![^。]{0,10}(?:容量|监控|阈值|风控|规划|设计|方案|流程|管理|预算|沟通|覆盖|架构|规范|排期|人手|带宽|策略|制度|机制|系统))`。收窄后 3 条良性全 clean、11 条攻击不退化。**剩余已知边界**：「复盘结论：如果当时加了压测，这次出事只能怪测试覆盖不够」仍命中（测试覆盖不在护栏词表），双向门禁 300/326 实测不变，接受并写进测试注释。
+3. **守卫样本被别的支兜底 = 守卫失守**：负例守卫首版 2 条「有兜底」（zh ① 的「谁叫她要跟那种人交往」由 zh ⑤ 兜底命中；en ⑥ 的样本被英文旧族兜底）。这与第 99 轮⑤同族：**守卫样本必须让被守卫的那一支是唯一命中路径**，否则删掉它样本照样绿。修正样本后 11/12 真守卫。
+
+### 五、七项验证
+
+主测试 **13/13** · 负例守卫 **11 变红 + 1 有兜底，对照 0 异常** · 双向门禁召回 **52/52** 零退化、误拦 **300/326 零新增** · bin/verify **14/14** · security-audit **16/16** · doc-numbers **15/15** · 3 commit 已提交（finish 前不 push，由专用 cron 负责）。run-all 后台跑中，见收尾。
+
+### 六、遗留
+
+1. **moral_foundations 中英两侧剩余缺口**（zh 6/8 en 5/8，第 103/105 轮已补过词）。该维不强制 gate 动作，是下一轮候选。
+2. **victim_blaming 已知边界 2 条**（团队复盘句「出事只能怪测试覆盖不够」、EN 工程自嘲句），真实良性池 0 误伤，出现真实误伤再收窄。
+3. **`double_bind` en 表第 97 轮注释轮次号 97→98**（纯文档，第 98 轮遗留第 2 条，仍未做）。
+4. LLM 401 / HTTP 451（stepfun key 失效）仍未解——运维侧凭据，非引擎可改；本轮 init 显示瞬时类 strike 已累到 8/3。
+
+### 七、给下一轮的接手说明
+
+1. **优先**：moral_foundations 中英两侧（zh 6/8 en 5/8）。样本可复用第 99 轮 `/tmp/probe99-vb-mf.js` 的 `MF_EN` 与中文侧 2 条漏判；该维只在 findings 里透出不强制 gate 动作，做的时候注意「改了引擎但用户感知不到 gate 变化」——补完后要单独写 count/score 层面的主测试断言。
+2. **写候选请继续带实测比例数字**（`zh 4/8 en 2/8`），第 99 轮的 x/y 通道本轮三跑一致定向，别再退回形容词描述。
+3. **负例守卫范式第三条**：守卫样本必须让被守卫支是唯一命中路径（本轮 2 条「有兜底」的教训）。
+4. 命令纪律照旧：>120s 后台化 + 轮询，`&&` 长链会被安全扫描拦，`node -e` 内联跑探针被拦（本轮 decision 第一次跑就栽在这）。
+
+---
+
 ## 第 99 轮（decision x/y 实测数字解析通道：候选比例数字 0→可区分，四轮并列定向根因修复；负例守卫 5/5 真守卫）
 
 **方向**：简报「给下一轮」第 1 条点名 `decision._scoreOption` x/y 数字解析（第 95/96/97/98 四轮并列/侥幸定向根因）。队列仅 1 条 done → 心虫自选 + 简报点名。按纪律先复测，再用本体 decision 定方向。
