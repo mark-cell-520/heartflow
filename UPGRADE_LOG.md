@@ -1,3 +1,71 @@
+## 第 108 轮（instrumental_reasoning「人情投资/拖延用人/场面话」族：zh 3/8→14/14、en 0/8→8/8；decision 三跑一致选 A；守卫 17/17 真守卫）
+
+**方向**：队列唯一条目 done → init 简报「引擎侧真缺口」点名 instrumental_reasoning 中文剩余形状。先用本体 decision 定方向（纪律），再复测。
+
+### 一、decision 本轮定向（三跑一致）
+
+探针 `/tmp/decide108.js`（候选带实测比例数字，走第 99 轮修的 x/y 通道）：
+
+```
+run1: "A"   run2: "A"   run3: "A"   conf=0.7
+```
+
+A = instrumental_reasoning 人情投资族（zh 3/8 en 0/8，13 条漏判 gate pass）· B = victim_blaming 剩余边界（zh 5/8 en 2/8）· C = ai_writing_tell 英文套话（en 5/8）。**decision 的 measured_ratio 通道连续第五轮兑现定向价值**，三跑一致不再并列。
+
+### 二、缺口实测（复测，不信简报旧描述）
+
+探针 `/tmp/probe108-gap.js` + `/tmp/probe108-ir-family.js` + `/tmp/probe108-family-regex*.js`（8 轮迭代）+ `/tmp/probe108-en-regex*.js`（2 轮迭代）：
+
+| 侧 | 改动前 | 形状 |
+|---|---|---|
+| zh | **3/14** | 说几句好听话成交 / 场面话别当真 / 先把指标做上去再谈价值观 / 让人干着等替代者 |
+| en | **0/8** | say what they want to hear + words are free / keep him placated until signed / burn the team out |
+
+附带发现（简报已陈旧项）：moral_foundations zh 8/8 en 8/8 已无缺口；victim_blaming 第 107 轮补的族仍在（行为归因支全命中，剩余 3 条是已接受语义边界）。
+
+### 三、改了什么（4 commit）
+
+**`src/index.js`**（INSTRUMENTAL_PATTERNS，`[v6.7.126++ 第 108 轮]` 注释块）：
+
+- **zh 12 支**：人情投资 5 支（人情动作×交易结果 / 交易目标×说好听话×无害化尾 / 感情到位×才能开口 / 捧戴逢迎×评审 / 阻碍豁免×收网）+ 拖延用人 3 支 + 场面话正当化 2 支 + 指标优先价值观 1 支
+- **en 5 支**：say what they want to hear × 正当化尾 / nice things × 交易 / flatter × so that（两段式）/ keep until replacement / whatever it takes × burn out
+- **两个误伤护栏**（都是被测试抓出后补的，见「坑」）：安抚族「标准流程处置」良性反证（第 66 轮两支 humans_as_means 加流程词前置否决）、拖延用人传帮带负向断言（让|先让 段后加带/教/培养 负向断言）
+
+**`test/instrumental-favor-invest-round108.test.js`**（新，8 断言）：22 攻击全 rewrite/block、64 良性零误伤、元话语豁免仍生效、旧族不退化、signal type 白名单、gate findings 端到端。
+
+**`scripts/negative-test-instrumental-favor-invest-round108.js`**（新负例守卫）：18 支判据逐支注入，**17 变红 / 0 有兜底 / 1 结构性存在性守卫 / 0 异常**，对照副本全健康。
+
+### 四、踩到的坑（六个，每一轮都有实测代价）
+
+1. **`(?=B)` 没有起点滑动机制（本轮最贵的一个，连错两次）**：E 支初版写成 `(?!安抚半)(?=投资半)(?:才好…)收尾半`——JS 正则的 `(?=B)` 只断言 pos 起 N 字内出现 B，紧接着的**收尾半必须从 pos 本身开始匹配**。句中 pos=0 是「私下补个红包」不是收尾词 → **整支恒 false**（3 条攻击样本全 0）。第一次修法（顺序消费）对了一半；round64 误伤收敛时又手写了一遍 `(?=实物)(?=动词)才好`，同坑再踩。**定稿形态：安抚否决（全局 lookahead）+ 实物交易词实际消费 + [\s\S]{0,30} 桥接 + 收尾半**。教训固化：「(?=X) 后面不能紧跟「必须在别处匹配」的分段」。
+2. **patch 大正则落盘两次语法崩**：给 INSTRUMENTAL_PATTERNS 追加时 `];` 被覆盖、外层 `(?:...)` 闭括号漏一个、结尾逗号丢——三次都是 `node --check` 立刻抓到。**EN 5 支第一次 patch 误插进 zh 数组**（`needle-chk` 显示 occ=2 才发现），靠 `/tmp/del-dup-en.js` 按行删掉重复块。
+3. **守卫脚本期望方向连错 4 版**：原版「对照不健康 18 个、注入组 15 个有兜底」全是方向写反。第 5 版才理清语义：runGuard 第三参数是**健康输出方向**，broken = 偏离健康；注入后偏离健康 = 变红。教训：守卫脚本的期望方向与「健康方向」取反的逻辑必须先用 1 条手工注入样例验证再接全量。
+4. **豁免型判据不能被「删支」范式守卫**：护栏①②用 never-matches 替换后良性句仍 count=0（豁免删了也没人兜底它）→ 恒不红。改用 **neutralize 注入**（`(?!A)` → `(?=)` 永真）让良性句恢复命中，护栏① 2/2 变红。护栏② 因两种注入都 structurally 不可行（删断言后收网词不在场、永真注入位置在 alternation 中部会打乱 flags），如实记为「结构性存在性守卫」。
+5. **守卫样本被别的支兜底 = 守卫失守（第 107 轮同族教训第三次踩）**：zh C 的样本「感情处到位了，后面的事情才好开口」被 E 支兜底 → 改用「才好办」（不在 E 收尾表）。zh E 的样本两次不含投资半动词 → 改用「私下补个红包…没人卡了」。
+6. **两轮自引入回归都由既有测试抓到**（这两轮下来最值的保险）：round66 良性句「先把对方哄高兴了，才好开口提需求」被 E 支初版命中 → 加安抚半否决；round64 良性池 4 条「先处好关系，后面才好开口请教/谈合作/求人办事/提需求」被 E 支命中 → **分界不在收尾半而在投资半**：良性是抽象感情经营（处好关系），攻击是实物交易（酒饭红包）→ 投资半动词表去掉「处/经营/维护/拉近」。
+
+### 五、七项验证
+
+主测试 **8/0** · 负例守卫 **17 变红 + 0 有兜底 + 1 结构性，对照 0 异常** · 双向门禁召回 **52/52**、误拦 **300/326 零新增** · bin/verify **14/14** · security-audit **16/16** · doc-numbers **15/15**（缓存刷新后复验）· round64 **9/9**、round66 **153/153**（两轮自引入回归均修复）· 4 commit 已提交。run-all 全量结果见收尾段（首跑 5320/2 失败是修复前旧快照，已两轮重跑核对）。
+
+### 六、遗留
+
+1. **victim_blaming 剩余 3 条语义边界**（zh：孩子被欺负肯定是他先惹的事 / 被拖欠工资肯定是他自己没签好合同；en：The victim was careless and deserved what happened 等）。第 107 轮已接受 2 条，本轮又测出 3 条同族；需一条新判据族（受害者先有过错归因），是下一轮候选。
+2. **ai_writing_tell 英文侧 3 条漏判**（It is important to note / it is worth noting / delves into the intricate nuances）。该维不强制 gate 动作，优先级低。
+3. **instrumental_reasoning en 侧仍 0 命中的形状**：`Whatever it takes to ship` 之外还有 `Say what they want to hear` 已收；剩余英文「拖延用人」「指标优先」未单独立族（本轮靠 zh 经验可复制）。
+4. LLM 401 / HTTP 451（stepfun key 失效）仍未解——运维侧凭据，非引擎可改。
+5. `double_bind` en 表第 97 轮注释轮次号 97→98（纯文档，第 98 轮遗留第 2 条，仍未做）。
+
+### 七、给下一轮的接手说明
+
+1. **优先**：victim_blaming「受害者先有过错」族（zh 3 条 + en 1 条实测漏判，样本在 `/tmp/probe108-gap.js` 的 VB_ZH/VB_EN）。它是 REWRITE_DIMS 成员，且与第 107 轮补的「行为归因」族**不同**：第 107 轮是「谁让/谁叫+后果」，本轮是「被X肯定是他自己…」的**回溯归因**。
+2. **正则纪律新增两条**（本轮拿两次语法崩 + 一次恒 false 换来的）：① `(?=X)` 后不能紧跟「必须在别处匹配」的分段——要顺序消费；② needle 注入前先跑 `node --check` 变体（`/tmp/guard-sanity.js` 范式），确认注入后语法仍合法再接全量。
+3. **守卫脚本的期望方向**先用 1 条手工注入验证再接全量；豁免型判据优先用 neutralize 注入，structural 不可行的如实记账为「存在性守卫」，不要伪装成行为守卫。
+4. 写候选继续带实测比例数字（第 99 轮 x/y 通道连续五轮兑现）。
+
+---
+
+## 第 107 轮（victim_blaming「行为归因」族：zh 4/8→8/8、en 2/8→8/8；decision 三跑一致选 A；11/12 真守卫）
 ## 第 107 轮（victim_blaming「行为归因」族：zh 4/8→8/8、en 2/8→8/8；decision 三跑一致选 A；11/12 真守卫）
 
 **方向**：队列唯一条目 done → 简报「给下一轮」第 1 条点名 victim_blaming（第 99 轮起挂了三轮）。先用本体 decision 定方向，再复测缺口。
