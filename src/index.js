@@ -6771,6 +6771,36 @@ const TONE_POLICING_PATTERNS = {
     { pattern: /\b(?:your|the)\s+tone\b[^.]{0,44}\b(?:doing|does|did|is doing)\s+(?:you\s+)?more\s+harm\b/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
     { pattern: /\bthe way you\s+(?:phrase|put|say|frame|word)\b[^.]{0,40}\b(?:pushback|rejection|resistance|ignored|dismissed|blowback)\s*(?:reason|is why)?\b/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
     { pattern: /\b(?:you'?d|you would|you'?ll|you will)\s+(?:get|find|win|earn|carry)\b[^.]{0,44}\b(?:if|once|unless|as long as)\b[^.]{0,44}\b(?:left|leaving|drop|dropped|dropping|lose|lost|losing|without|less|not so)\b/i, type: 'en_tone_persuasiveness', severity: 0.7 },
+    // 第四轮补洞（第 95 轮四轮扩样）：剩余 12 条的漏点是**内容半与语气半
+    // 之间的距离超过 44 字符**——例如 `Your point about the budget is
+    // reasonable once you stop shouting.`（reasonable→once→shouting，
+    // 但 your point about the budget 占了 27 字符），以及语气半采用
+    // **比较级/最高级副词形态**（not so worked up / less defensive）。
+    // 但扩样实测发现：把跨度从 44 放宽到 70 会让良性样本
+    // `You would be right if you checked the logs before claiming.`
+    // 误命中。因此改用「**内容半关键词 + if/once/when + 语气半**」的
+    // 三段式，中段用更严格的 20~44 字符，且语气半必须紧贴连接词。
+    { pattern: /\b(?:point|argument|proposal|idea|report|analysis|complaint|feedback|plan|case|concern|objection)\b[^.]{0,30}\b(?:is|are|was|were|would be|might be|seems)\s+(?:reasonable|valid|sound|fair|right|correct|well-?founded)\b[^.]{0,24}\b(?:if|once|when|unless|after)\b[^.]{0,24}\b(?:stop|stopped|landed?|sounded?|said|delivered|framed|phrased)\b/i, type: 'en_tone_conditioned_validity', severity: 0.7 },
+    // `would be worth discussing if you'd said this calmly` —— maybe 位于中间
+    { pattern: /\bworth\s+(?:discussing|considering|reading|reviewing|another look)\b[^.]{0,44}\b(?:if|once|when)\b[^.]{0,44}\b(?:calmly|nicely|without|not so|less|stopped?|dropped|left|calmed)\b/i, type: 'en_tone_conditioned_validity', severity: 0.7 },
+    // `would find you convincing if you weren't so worked up` —— find+形容词+if
+    { pattern: /\b(?:find|finds|found)\s+(?:you|it|this|that|your point|your argument|the report)?\s*(?:convincing|persuasive|compelling|credible|believable)\b[^.]{0,44}\b(?:if|once|unless)\b[^.]{0,44}\b(?:weren'?t so|wasn'?t so|not so|less|without|stopped?|dropped|left|calmed)\b/i, type: 'en_tone_persuasiveness', severity: 0.7 },
+    // `would land better if you dropped the attitude` —— 比较级 land/get/go + better
+    { pattern: /\b(?:land|lands|landed|go|goes|went|come|comes|came)\s+(?:over\s+)?better\b[^.]{0,44}\b(?:if|once|without|unless)\b[^.]{0,44}\b(?:dropped|lose|lost|left|less|without|not so|stopped?|calmed)\b/i, type: 'en_tone_persuasiveness', severity: 0.7 },
+    // `twice as effective without the edge in your voice` —— 倍数/比较副词 + without
+    { pattern: /\b(?:twice|half|three times|far|much|a lot|even)\s+(?:as\s+)?(?:effective|persuasive|compelling|powerful|clever)\b[^.]{0,44}\bwithout\b[^.]{0,30}\b(?:the\s+)?(?:edge|anger|hostility|attitude|sarcasm|tone|emotion|outrage|drama|volume|heat)\b/i, type: 'en_tone_persuasiveness', severity: 0.7 },
+    // `would listen to you if you weren't so emotional` —— listen/hear + if + 情绪
+    { pattern: /\b(?:listen\s+to|hear\s+out|read|consider)\s+(?:you|your (?:point|case|argument|report))\b[^.]{0,44}\b(?:if|once|when|unless)\b[^.]{0,44}\b(?:weren'?t|wasn'?t|aren'?t|not|less|without|stopped?|dropped|left|calmed|drop)\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    // `you won't get funding talking like that` —— 省略谓语的后果
+    { pattern: /\b(?:won'?t|will not|can'?t|cannot|wouldn'?t)\s+(?:get|win|earn|secure|raise)\s+(?:funding|support|buy-?in|approval|a hearing|a green light|credibility)\b[^.]{0,30}\b(?:talking|speaking|acting|behaving|framing)\s+like\s+(?:that|this)\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    // `act like that and nobody will fund it` —— 语气方式 + nobody will + 后果
+    { pattern: /\b(?:act|acts|acting|behave|behaves|behaving|talk|talks|talking|speak|speaks|speaking)\s+(?:like\s+)?(?:that|this way)\b[^.]{0,44}\b(?:and\s+)?(?:nobody|no one|no listener|nothing)\s+(?:will|would|is going to)\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    // `hard to take you seriously when you're this upset` —— hard to + 驳回半 + 条件
+    { pattern: /\b(?:hard|difficult|impossible|tough)\s+to\s+(?:take\s+you\s+seriously|hear|read|consider|engage with|act on)\b[^.]{0,44}\b(?:when|while|if|once|the way)\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    // `half the room tuned out the moment you raised your voice`
+    { pattern: /\b(?:half the room|everyone|the room|people|the audience|the team)\s+(?:tuned out|stopped listening|glazed over|checked out|disengaged)\b[^.]{0,44}\b(?:the moment|when|as soon as)\b[^.]{0,30}\b(?:raised|you raised|started)\b/i, type: 'en_tone_buried_content', severity: 0.7 },
+    // `let's talk when you can say this without getting upset` —— can + 语气动作
+    { pattern: /\b(?:let'?s talk|we can talk|let'?s revisit|we can revisit|we can discuss|let'?s discuss)\b[^.]{0,44}\b(?:when|once|after)\b[^.]{0,44}\b(?:can|could)\s+(?:say|talk|discuss|make)\b[^.]{0,30}\bwithout\b/i, type: 'en_tone_conditioned_talk', severity: 0.7 },
   ],
 };
 
