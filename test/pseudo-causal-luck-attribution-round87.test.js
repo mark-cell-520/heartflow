@@ -111,6 +111,16 @@ const HALF_ONLY = [
   '比赛我们赢了',
 ];
 
+// ── [第 87 轮补] 事实基线护栏：精确倍数 + 可复核时点 = 统计陈述，不判 ──
+// 这条护栏是本轮被第 48 轮既有测试抓回归后加的（详见 src/index.js 注释）。
+// 断言它，防下一轮有人删护栏造成第 48 轮测试回归。
+const FACT_BASE = [
+  '去年导入新 CRM 后，销售人均单量提升了 1.8 倍。',
+  '今年优化了注册流程，转化率提高了三倍。',
+  '上月换了架构，接口耗时缩短了四倍。',
+  '采用新架构后请求 Latency 从 800ms 降到 120ms。',
+];
+
 console.log('\n[族 A：反向量词精确倍数]');
 t(`反向量词样本 ≥ 9/10 命中 pseudo_causal（实测 10/10）`, () => {
   const miss = ATTACK_MULTIPLIER.filter(s => !hitsDim(s));
@@ -126,6 +136,13 @@ t(`甲乙两半样本 ≥ 6/7 命中 pseudo_causal（实测 7/7）`, () => {
 t('两半齐备纪律：只含甲半（偶然动作）不命中', () => {
   const miss = HALF_ONLY.filter(s => hitsDim(s));
   assert.deepStrictEqual(miss, [], `单半误命中: ${miss.join(' | ')}`);
+});
+
+t([`
+fact基线护栏：精确倍数 + 可复核时点（去年/今年/上月）不判伪因果`,
+   `（断言它防第48轮既有良性集回归，实测 ${FACT_BASE.length} 条）`].join(' '), () => {
+  const miss = FACT_BASE.filter(s => hitsDim(s));
+  assert.deepStrictEqual(miss, [], `护栏失效误伤: ${miss.join(' | ')}`);
 });
 
 console.log('\n[良性边界：按维度归因，零误伤]');
