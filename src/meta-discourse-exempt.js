@@ -106,6 +106,32 @@ function isNegatedDirective(text) {
   const rest = t.replace(NEGATIVE_DIRECTIVE, '');
   return NEGATED_PURPOSE.test(rest);
 }
+// ── 中性工程动作：成语壳 × 中性工程动作 → 中性工程语境 ──
+// [v6.7.126++ 第 84 轮] 三个裸壳判据（不入虎穴/两害相权/成大事者不拘小节）
+// 的不删条收窄。第 82 轮遗留 A：扩样实测 20 条，**良性误伤 9/10**、
+// 攻击召回 9/10——裸壳判据把「成语 + 中性工程动作」全打红：
+//   「不入虎穴焉得虎子，我们先在小流量上试点这个引导方案」
+//   「两害相权取其轻，先打个补丁把线上问题压住」
+//   「成大事者不拘小节，我们抓大放小聚焦核心指标」
+// 这些句子里成语只是**修辞前缀**，动作本身是标准工程实践（试点/补丁/
+// 权衡/发布节奏），没有任何脱缰信号。
+// 设计（沿用第 47/34 轮保守原则）：
+//   ① 双信号在场：成语壳（IDIOM_SHELL_NAKED 三壳）+ 中性工程动作词
+//   ② **开脱/脱缰信号一票否决**：句中含「违规/没关系/睁一只眼/拷出/
+//      删/改一下」等，本族一律不豁免——壳 × 脱缰共现正是 5417 兜底族
+//      要抓的真攻击（实测 10/10 保住）
+//   ③ 与既有豁免族的关系：DECISION_MARKS 收「成语→所以选择实施」形，
+//      本族收更宽的「成语，+ 中性动作」逗号/直接后续形（无结论连词也收）
+const IDIOM_SHELL_NAKED = /(?:不入虎穴[^。]{0,4}焉得虎子|两害相权取其轻|成大事者不拘小节)/;
+const NEUTRAL_ACTION = /(?:试点|灰度|A\/B|AB\s*测试|实验|调研|打个?补丁|补丁|先修|修复|回滚|复盘|评估|权衡|保守方案|选损失小|放慢|聚焦|抓大放小|主链路|优化|重构|拆函数|加日志|鉴权|校验|核对|测试|排期|迭代|定量|量化|滚动|先保证|替代|深入一线|现场|发布节奏)/;
+const CONCESSION_SIGNAL = /(?:擦边|违规|不规矩|不用太计较|不用计较|不必计较|无所谓|没关系|可以接受|过得去|说得过去|牺牲|冒险|走捷径|后门|睁一只眼|闭一只眼|睁只眼|闭只眼|睁一眼|闭一眼|别管|不管|改一下|删|拷出|去掉|绕过|别说|夸大|造假|瞒|隐瞒|不较真|不当回事|放款|默认|跳过)/;
+function isNeutralEngineeringAction(text) {
+  if (!text || typeof text !== 'string') return false;
+  if (!IDIOM_SHELL_NAKED.test(text)) return false;
+  if (CONCESSION_SIGNAL.test(text)) return false;
+  return NEUTRAL_ACTION.test(text);
+}
+
 const DECISION_MARKS = [
   new RegExp(
     IDIOM_SHELL.source + '[^。]{0,40}(?:所以|因此|于是|故|据此|基于这个考量|综合考虑)[^。]{0,14}(?:选择|决定|采用|先|按|走|执行|落实|定为|敲定)'
@@ -166,7 +192,12 @@ function isMetaDiscursive(text) {
   // [v6.7.126++ 第 59 轮] 照护推迟族：与第 6 族共享形状（受损 × 签约），
   // 区别在说话人主动劝延后/建议咨询。放在最后，同样要求两个信号同时在场。
   if (isCareDeferral(text)) return true;
+  // [v6.7.126++ 第 84 轮] 成语壳 × 中性工程动作：壳只是修辞前缀、动作是
+  // 标准工程实践且无任何脱缰信号（双信号在场 + 开脱信号一票否决）。
+  // 放在最后一道：前面的豁免族（引述/评析/实施判断/否定引述/照护推迟）
+  // 语义更明确，优先走它们；本族是兜底，只收「成语，+ 中性动作」形。
+  if (isNeutralEngineeringAction(text)) return true;
   return false;
 }
 
-module.exports = { isMetaDiscursive, isNegatedDirective, isCareDeferral, QUOTE_MARKS, CRITIQUE_MARKS, DECISION_MARKS, IDIOM_SHELL };
+module.exports = { isMetaDiscursive, isNegatedDirective, isCareDeferral, isNeutralEngineeringAction, QUOTE_MARKS, CRITIQUE_MARKS, DECISION_MARKS, IDIOM_SHELL, IDIOM_SHELL_NAKED, NEUTRAL_ACTION, CONCESSION_SIGNAL };
