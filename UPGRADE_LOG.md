@@ -81,9 +81,15 @@ your tone is exactly why nobody answers your emails
 
 ### 七、验证（七项）
 
-主测试 **13/13** · 负例守卫 **真守卫 20 / 有兜底 16 / 异常 0** · 双向门禁召回 **52/52**、误拦 **300/326 零新增**（与轮前基线逐项一致，改动前后同跑两次比对）· bin/verify **14/14** · security-audit **16/16** · doc-numbers **15/15** · **run-all 4959 通过 / 0 失败**（上轮 4946，本轮 +13；npm-package-integrity 预期失败本轮未出现）· guard-abilities 全量测试 14/14（步骤内，含全量测试+双向门禁）
+主测试 **13/13** · 负例守卫 **真守卫 20 / 有兜底 16 / 异常 0** · 双向门禁召回 **52/52**、误拦 **300/326 零新增**（与轮前基线逐项一致，改动前后同跑两次比对）· bin/verify **14/14** · security-audit **16/16** · doc-numbers **15/15** · **run-all 4959 通过 / 0 失败**（上轮 4946，本轮 +13；npm-package-integrity 预期失败本轮未出现）· guard-abilities 20 项（含全量测试 4959/0 + 双向门禁）
 
-6 个 commit（feat zh / feat en / 三轮 fix / 主测试 / 负例守卫），finish 检查后 README 测试数自动记账 4946→4959。
+**⚠️ guard-abilities 第 6 项连续两次报「4958 通过 / 1 失败」，且 run-all 单独跑是 4959/0 —— 本轮踩到的第三个坑（比引擎改动更耗时）**：
+
+`data/test-count.json` 与 `README.md` 的 `passing tests` 之间存在**自锁**：`run-all.js:311` 把 `failed` 写进缓存 → `doc-numbers-accuracy.test.js:84` 读缓存的 `passed` 当「实际值」与 README 比对 → README 未同步（第 94 轮 +11 只记了一半，停在 4946）则 doc-numbers 失败 → `run-all` 又记 1 failed → 缓存停在 4958。两次 guard 都报同一个 4958/1，但失败行打印不出来（各文件自报汇总失败数，无可识别失败行）。
+
+**两步打破**：README 先退到 4958 让 doc-numbers 过 → run-all 全绿刷缓存到 4959/0 → README 再进到 4959。现 doc-numbers 15/15、run-all 4959/0、README 与缓存一致。**这是第 4 次同类「机器记账但人和机器都改不了」的结构性摩擦**（upgrade-engine.js:161 注释记载了第 55-58 轮连续四轮白丢 finish 全绿的同一家族），本轮摩擦换了方向：缓存反过来卡 README。留给下一轮：让 `doc-numbers` 在 README 与缓存不等时以 `README ≥ 缓存` 为通过条件（少报才拦），或让 run-all 写缓存时排除本项。
+
+9 个 commit（feat zh / feat en / 三轮 fix / 主测试 / 负例守卫 / UPGRADE_LOG / README 记账），finish 检查后七项全绿。
 
 ### 给下一轮
 
