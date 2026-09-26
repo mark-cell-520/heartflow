@@ -24,6 +24,15 @@ function foundationsOf(text) {
   return (r.foundations || []).map(f => f.foundation);
 }
 
+// [v6.7.110 第 107 轮] 改为 try/catch 记账：run-all 要求输出「N 通过, M 失败」
+// 汇总行，原版断言失败会直接抛未捕获异常（无汇总行 → 被 run-all 记为失败）。
+let failed = 0;
+const failures = [];
+function t(name, fn) {
+  try { fn(); }
+  catch (e) { failed++; failures.push(`${name}: ${e.message}`); }
+}
+
 const ZH_HITS = [
   // 背信/欺诈表述 → fairness
   ['他靠欺骗客户签下了这份合同', 'fairness'],
@@ -59,29 +68,29 @@ const EN_HITS = [
   ['Such content is poisoning social morals', 'sanctity'],
 ];
 
-let zhPass = 0, enPass = 0;
+let zhPass = 0, enPass = 0, cleanPass = 0;
 for (const [text, dim] of ZH_HITS) {
-  const got = foundationsOf(text);
-  assert.ok(
-    got.includes(dim),
-    `中文样本漏判 [${dim}]：${text} — got=[${got.join(',')}]`
-  );
+  t(`中文样本命中 [${dim}]：${text}`, () => {
+    const got = foundationsOf(text);
+    assert.ok(got.includes(dim), `中文样本漏判 [${dim}]：${text} — got=[${got.join(',')}]`);
+  });
   zhPass++;
 }
 for (const [text, dim] of EN_HITS) {
-  const got = foundationsOf(text);
-  assert.ok(
-    got.includes(dim),
-    `英文样本漏判 [${dim}]：${text} — got=[${got.join(',')}]`
-  );
+  t(`英文样本命中 [${dim}]：${text}`, () => {
+    const got = foundationsOf(text);
+    assert.ok(got.includes(dim), `英文样本漏判 [${dim}]：${text} — got=[${got.join(',')}]`);
+  });
   enPass++;
 }
 
 // count > 0 才算真检出（foundations 空数组时 score 也必须是 0）
-for (const [text, dim] of ZH_HITS.concat(EN_HITS)) {
-  const r = checkMoralFoundations(text);
-  assert.ok(r.count > 0, `count 应为正：${text}`);
-  assert.ok(r.score > 0, `score 应为正：${text}`);
+for (const [text] of ZH_HITS.concat(EN_HITS)) {
+  t(`count/score 为正：${text}`, () => {
+    const r = checkMoralFoundations(text);
+    assert.ok(r.count > 0, `count 应为正：${text}`);
+    assert.ok(r.score > 0, `score 应为正：${text}`);
+  });
 }
 
 // 技术/合规/中性语境不得误命中 moral_foundations（防误伤护栏）
@@ -93,8 +102,16 @@ const CLEAN = [
   '遵守监管规定和内部纪律是合规的基本要求',
 ];
 for (const text of CLEAN) {
-  const got = foundationsOf(text);
-  assert.deepStrictEqual(got, [], `良性样本误命中：${text} — got=[${got.join(',')}]`);
+  t(`良性零误命中：${text}`, () => {
+    const got = foundationsOf(text);
+    assert.deepStrictEqual(got, [], `良性样本误命中：${text} — got=[${got.join(',')}]`);
+  });
+  cleanPass++;
 }
 
-console.log(`moral-foundations-vocab: zh ${zhPass}/${ZH_HITS.length}, en ${enPass}/${EN_HITS.length}, clean ${CLEAN.length}/${CLEAN.length} — 全绿`);
+const total = zhPass + enPass + cleanPass + ZH_HITS.length + EN_HITS.length;
+console.log(`moral-foundations-vocab: ${total - failed} 通过, ${failed} 失败, 共 ${total} 个`);
+if (failed > 0) {
+  for (const f of failures) console.log('  ❌ ' + f);
+  process.exit(1);
+}
