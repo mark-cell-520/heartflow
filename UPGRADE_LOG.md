@@ -1,3 +1,68 @@
+## 第 98 轮（gaslighting EN 侧补 en_denied_feeling_blame：8 条英文攻击漏判 8/8→8/8；负例守卫 5/5 真守卫；decision 正常定向 A）
+
+**方向**：简报「给下一轮」第 1 条点名 gaslighting EN 侧 `en_denied_feeling_blame` 族。按纪律先用本体 decision 定方向，再实测完整缺口。
+
+### 一、decision 本轮正常定向
+
+`HeartFlowDecision.decide({task:'选下一轮方向', prompt:'[A] …[B] …[C] …'})`（候选用实测证据描述，探针 `/tmp/decide98.js`）：
+
+```
+chosen: 'A'  score: 0.77（B/C 均 0.74，confidence 0.7）
+```
+
+A 描述含「命中 0/8」「0 误伤」「缺口完整度 100%」——`SEVERITY_HIGH`（漏判 +0.22）+ `REPRODUCED`（0/8 形态 +0.12）在 A 上全命中，B/C 只有「并列」类词。**x/y 数字解析缺口本轮仍未修**（第 95/96/97 轮并列根因，属升级机制自身改动，继续挂给下一轮）。
+
+### 二、缺口实测（复测，不信简报旧描述）
+
+探针 `/tmp/probe98-gl-en.js`（gate 版）：
+
+| 项 | 实测结果 |
+|---|---|
+| EN 攻击样本（negated_feeling_blame 英译 8 条） | gate 命中 **0/8** |
+| EN 良性压力 13 条（商议式归因 5 + 中性事实归因 4 + 承认自身情绪 4） | **0/13 命中**（改前基线干净） |
+| 既有 en 判据回归 7 条 | 1/7（`you're being too sensitive` 等 5 条单句不命中，属既有弱信号组合触发的设计，非本轮引入） |
+
+判定：**成立**。ZH 侧第 76 轮已有 5 支（zh_denied_feeling_blame）且已注册 `STRONG_SINGLE_TYPES`，EN 表停在 0 支——这是「一次只做一侧」结构缺口的**第五次**（第 71/75/76/97 轮同款结构）。
+
+### 三、改了什么（3 commit）
+
+**`src/index.js`**：
+
+1. **EN 表新增 5 支**（`GASLIGHT_PATTERNS.en`，0→5 支）：`en_denied_feeling_blame`。形状照 ZH 第 76 轮五支英译——① 否认在场感受→缺陷归因主支 ② 情绪→because/proves→缺陷 ③ 全因追问 reason you're X is Y ④ the fact you're this upset→shows→问题 ⑤ get this emotional because you're 缺陷。
+2. **注册 `STRONG_SINGLE_TYPES`**：`en_denied_feeling_blame` 加入该 Set，单条即 score 0.5（越过 findings 门槛 0.15 与维度阈值 0.2）。推理与 ZH 第 76 轮同构：否认在场感受 + 全因归咎到对方人格缺陷，一条就构成完整操控动作。
+3. **距离上限从 `[^.]{0,n}` 改 `[\s\S]{0,n}`**（仅本族）：英语句点密度远高于中文，`[^.]` 会在 `I'm not mad. I just think…` 这类「否认句 + 独立短句」处跨句失配——实测首版 8 条只中 3 条，3 条全毙于此。
+
+护栏沿用 ZH 第 76 轮硬撑出的三条（英译实测 13 条良性 0 误伤）：① 必须带**断言式**归因（because/proves/shows/means），商议式（maybe/perhaps/could be/wonder if）不命中；② 归因结果必须是**对方内在缺陷词**（selfish/sensitive/controlling/insecure/needy/dramatic/impossible/the problem/never satisfied），中性事实归因（proposal rejected/declined/turned down）不命中；③ 主句必须是否认方在场或全因追问，单纯承认自身情绪（I am angry / I felt hurt）不命中。
+
+**`test/gaslighting-denied-feeling-blame-en-round98.test.js`**（新主测试，53 断言全绿）：8 攻击 × gate 命中、12 良性 × gaslighting 零命中、6 既有 en 判据回归、3 条 ZH 归因交叉（不得被新 en 判据吞）、STRONG_SINGLE_TYPES 单条 score≥0.5、guidance 覆盖。
+
+**`scripts/negative-test-gaslighting-denied-feeling-blame-en-round98.js`**（负例守卫，5/5 真守卫 + 对照全绿）：五支判据逐条删源码行 → 重跑 `checkGaslighting` → 该支独属样本必须失守，全部真守卫（删条后各 miss 1/5），且 ZH 侧对照 2 条始终命中（证明只删了 EN 侧）。
+
+### 四、踩到的坑（都写进源码注释）
+
+1. **「有 5 支 ≠ 5 支都在干活」**：负例守卫首版只知道「全族删掉会怎样」，5 支里 3 支删了攻击照样命中（miss 0/5）——因为那 3 支的形状被支①兜住，8 条样本全走支①。逐支写**独属样本**（去掉 `I'm not angry` 前缀让支①不命中）才拿到真守卫。这与第 97 轮「写完≠匹配」是同一族坑的又一变体：**判据存在性 ≠ 判据有效性，必须逐支验**。
+2. **词表重叠会让守卫假阴性**：支④首版样本结尾用 `the problem`，而支②的缺陷词表也含它 → 删支④后样本改走支②，miss 0/5。换成 `you're broken`（支②词表没有）才变红。**守卫样本的结尾词必须在其他支的词表外**。
+3. **锚点必须圈定本轮新增块**：`negated_feeling_blame` 这个 type 名在 double_bind zh 表（第 76 轮）、double_bind en 表注释（第 97 轮）、本轮 gaslighting 表三处都出现。按 `[v6.7.129] 第 98 轮` 圈块后取锚点才没删到别的族的行（第 96/97 轮同名族教训的第 4 次变体）。
+4. **对照副本分支别写反**：守卫探针设计成「只在失守时 exit 1」，因此未注入的对照是**正常拿到 stdout**（不抛错）。首版把「不抛错」当作异常走 green——5/5 真守卫仍报「负例守卫未通过」，白跑一轮。
+
+### 五、七项验证
+
+主测试 **53/53**（8 攻击全命中、12 良性零误伤、26 维度直检 0 败）· 负例守卫 **5/5 真守卫 + 对照全绿**（删条后各 miss 1/5，ZH 2/2 不受影响）· 双向门禁召回 **52/52**、误拦 **300/326 零新增** · bin/verify **14/14** · security-audit **16/16** · doc-numbers **15/15** · **run-all 5228 通过 / 0 失败**（上轮 5175，主测试净增 53）· 3 commit 已提交（finish ①.5 前不 push，由专用 cron 负责）。
+
+### 六、遗留
+
+1. `decision._scoreOption` 的 x/y 数字解析仍未做（第 95/96/97/98 四轮并列/侥幸定向根因，修法第 95 轮已写在 UPGRADE_LOG，属升级机制自身改动故未动）。
+2. `negated_feeling_blame` 的 EN 侧虽已补 gaslighting 表，但 double_bind en 表第 97 轮注释仍指向「见第 97 轮 GASLIGHT en 表」——实际落在第 98 轮，下轮顺手把注释轮次号改对（纯文档）。
+3. 简报「遗留」的 di 开发调试误拦/ai_writing_tell 多语言误伤/reward_hacking 剩余 6 类，第 96 轮已标 N/A，brief 未刷新，下轮收到仍需先复测再信。
+4. LLM 401（stepfun key 失效）仍未解——运维侧凭据，非引擎可改。
+
+### 七、给下一轮的接手说明
+
+1. **优先**：`decision._scoreOption` x/y 数字解析（四轮并列/侥幸定向根因，修法第 95 轮已记录）。
+2. 其次：`double_bind` en 表第 97 轮注释轮次号 97→98 修正；lang-coverage-audit 的 `victim_blaming`/`moral_foundations` 仅中文命中（第 97 轮已列第三轮，可立项）。
+3. 负例守卫写法已沉淀成范式：**逐支独属样本 + 结尾词避开其他支词表 + 锚点圈本轮块 + 对照分支按探针退出码语义写**。
+4. 命令纪律照旧：>120s 后台化（本轮 run-all 约 6 分钟，用 `background=true` 跑 + 分段 sleep 轮询）；长链 `&&` 会被安全扫描拦；`node -e` 里出现撇号正则会被 BLOCKED。
+
 ## 第 97 轮（double_bind EN 侧四族移植：32 条英文攻击漏判 21/32→32/32；db 改走 _dual 修 en2zh 破坏英文匹配；decision 本轮正常定向 A）
 
 **方向**：简报「遗留」第 2 条点名 `double_bind en 三族移植`。按纪律先用本体 decision 定方向，再实测完整缺口。
