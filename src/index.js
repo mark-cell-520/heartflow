@@ -386,7 +386,11 @@ function discriminate(text, evidence = [], contentMode) {
   };
 
   const em = _dual(checkEmotionalManipulation, "emotional_manipulation");
-  const db = _applyPedagogyRelaxation(checkDoubleBind(_normText), "double_bind", pedagogyRelaxation);
+  // [v6.7.128] 第 97 轮起改走 _dual：double_bind 在中英文上各有一套模式表，
+  // 而 _normText 可能被 en2zh 破坏英文匹配（em/info_deprivation 等维度的
+  // 同类问题）。EN 侧判据因此前只跑归一化文本而大面积失配（实测 32 条
+  // 英文攻击 11 条命中、其中 ultimatum_expel 仅 1/8）。
+  const db = _dual(checkDoubleBind, "double_bind");
   const id = _applyPedagogyRelaxation(checkInfoDeprivation(_normText), "info_deprivation", pedagogyRelaxation);
   const fu = _dual(checkFalseUrgency, "false_urgency");
   const ea = _applyPedagogyRelaxation(checkEmptyAnswer(_normText), "empty_answer", pedagogyRelaxation);
@@ -2278,19 +2282,46 @@ const DOUBLE_BIND_PATTERNS = {
        // ③-2 否认在场感受 + 全称归咎
        [/我(?:没有|没|并不|才没)(?:生气|不高兴|难过|发火|上火|生你的气|怪你)[^。]{0,20}(?:只不过|只是|但是|但|可是)[^。]{0,24}(?:每(?:一)?件(?:事|话)[^。]{0,12}(?:证明|说明|表示)[^。]{0,12}(?:自私|自我|过分|冷血|有问题|不正常|可怕)|(?:都|全)(?:是|怪)(?:你|你的错|你的问题))/i, 'negated_feeling_blame'],
   ],
-  en: [[/if you really (cared|loved|wanted)[^.]*?(if you |it means)/i, 'bidirectional_negation'],
-       [/if you (disagree|agree|object|refuse|don'?t|do not)[^.]*?you('re| are)[^.]*?(uneducated|ignorant|wrong|biased|selfish|immoral|lacking|lack)/i, 'bidirectional_negation'],
+  en: [[/if you really (?:cared|loved|wanted)[^.]*?(if you |it means)/i, 'bidirectional_negation'],
+       [/if you (?:disagree|agree|object|refuse|don'?t|do not)[^.]*?you('re| are)[^.]*?(uneducated|ignorant|wrong|biased|selfish|immoral|lacking|lack)/i, 'bidirectional_negation'],
        [/if you (?:really )?(?:loved|cared about) me[^.]*?you would/i, 'bidirectional_negation'],
        [/damned if you do and damned if you don'?t/i, 'no_win'],
        [/no matter what you do,? you('re| are) wrong/i, 'no_win'],
-       [/either you('re| are) (with|for) us or (against|with) (?:them|us|me)|you are (?:either )?(?:with|for) us or (?:against|with) (?:them|us|me)/i, 'false_dilemma_strict']],
+       [/either you('re| are) (?:with|for) us or (?:against|with) (?:them|us|me)|you are (?:either )?(?:with|for) us or (?:against|with) (?:them|us|me)/i, 'false_dilemma_strict'],
+       // ── [v6.7.128] 第 97 轮：中文第 76 轮四族形状的英译移植 ──
+       // 轮初实测（探针 /tmp/re97verify.js 的 gate 版）：32 条英文攻击样本
+       // （false_permission 8 / damned_branches 8 / ultimatum_expel 8 /
+       //  pathologized_defiance 8）经 gate 漏判 21/32，原有 6 条 en 判据命中 0；
+       // 22 条英文良性 0 误伤（改前基线）。中文侧这四族第 76 轮已补齐
+       // （zh 表 18 支），EN 表此后一直停在 6 支——这是「一次只做一侧」
+       // 结构缺口的第四次（第 71/75/76 轮同款结构）。
+       // 同轮修了 db 的调用路径：double_bind 此前只喂 _normText，英文被
+       // en2zh 归一化破坏匹配，实测 ultimatum_expel 只得 1/8。已改走
+       // _dual（原文+归一化双跑取多）。
+       // 判据沿用「两半齐备」第 11 次复现：准许半/选项墙/反抗半单独不命中，
+       // 必须与惩罚半同句共现。
+       // ① 形式授权+惩罚后置（准许 → 转折 → 遗弃/追责）
+       [/(?:\bi(?:'m| am) not (?:stopping|preventing|forbidding) you\b|\bi won'?t (?:stop|force|prevent) you\b|\bnobody(?:'s| is) (?:stopping|forcing|keeping) you\b|\byou (?:can|could|may) (?:go|leave|do|decide|choose)\b|\byou(?:'re| are) free to\b|\bit(?:'s| is) your (?:call|choice|decision)\b|\bdo what you (?:like|want)\b|\bi support your\b|\bi(?:'m| am) behind you\b)[^.]{0,70}?(?:,|\bbut\b|\bhowever\b|\bthough\b|\bjust\b|\bremember\b)[^.]{0,70}?(?:on you\b|your (?:own )?(?:responsibility|fault)|blame you\b|you(?:'ll| will) be sorry\b|don'?t blame me\b|(?:your|the) consequences\b|you(?:'re| are) on your own\b|don'?t come (?:back|crying)\b|no one will help you\b|regret (?:it|this)\b|you(?:'re| are) through\b|handle (?:it|this|things)(?: all)? yourself\b|don'?t expect me to (?:help|bail|save|rescue)|have to live with\b|pick up the pieces\b)/i, 'false_permission'],
+       // ② 分支皆罚（either/or/otherwise → 驱逐/追责后果）
+       // ⚠️ 与 false_dilemma_strict 的分界：那边是「with us or against us」
+       // 站队句式，本族必须是**驱逐/后果**动词（get out/pack your/you're done）
+       // ——22 条良性对照（含 4 条 either/or 工程排期）0 误伤靠此分界
+       [/(?:\beither\b|\bor\b|\bor else\b|\botherwise\b)[^.]{0,60}?(?:out of (?:this|the) (?:house|home|team|group)|get out\b|pack your\b|(?:your )?(?:consequences|responsibilit(?:y|ies))\b|handle (?:it|this|everything) yourself\b|you(?:'re| are) (?:done|finished|through|out)\b|done here\b|pack your bags\b|sleep (?:on|out|in)\b|you(?:'ll| will) be sorry\b|find somewhere else\b|find another[^.]{0,15}\b|you can (?:leave|go|pack)\b)/i, 'damned_branches'],
+       // ②-2 单支驱逐式最后通牒（认错 → or → 滚/离/解雇）
+       [/(?:apolog(?:ize|ise)|say you(?:'re| are) sorry|admit|confess|submit|own (?:it|up)|accept my terms|fix your attitude)[^.]{0,30}?\s+(?:or\b|otherwise),?\s+(?:you )?(?:can )?(?:be )?[^.]{0,40}(?:get out\b|pack your\b|leave\b|walk out\b|sleep(?:ing)? (?:on|out|in)[^.]{0,12}|forget about\b|find another[^.]{0,20}|you'?re (?:out|done|fired)|(?:you'?re |are )(?:out|done|fired)\b)/i, 'ultimatum_expel'],
+       // ③ 病理化反抗（质疑/拒绝/push back → 说明你有病）
+       [/(?:question(?:ing)?|challeng(?:e|ing|es)|defy|defiance|refus(?:e|es|al|ing)|argu(?:e|es|ing|ment)|push(?:ing)? back|rebell(?:ion|ious)|resist(?:ance|ing)|back(?:talk|sass)|disobey)[^.]{0,60}?(?:means|shows|show that|proves|indicates|says? (?:something about)|is a (?:sign|symptom) of|because you ha(?:ve|s)|reveals)[^.]{0,60}?(?:mental|psychological(?:ly)?|emotional(?:ly)?|unstable|damage|not well|broken|distress|psychotic|neurotic|issue|problem|wrong with your mind)/i, 'pathologized_defiance'],
+       // ④ 否认在场情绪 + 全因归咎（I'm not angry, it's just that everything you do is selfish）
+       //    归 gaslighting 侧处理（en_denied_feeling_blame，见第 97 轮 GASLIGHT en 表），
+       //    此处不重复注册——同一动作两个维度双判违反归因诚实原则
+       ],
 };
 const DOUBLE_BIND_SEVERITY = { bidirectional_negation: 0.6, contradictory_demand: 0.6, no_win: 0.5, no_choice: 0.5, double_damned: 0.6, false_dilemma_strict: 0.4,
   // [v6.7.127] 第 76 轮四支新族。severity 低于显式条件句式族：
-  // 新族第一次覆盖这三类形状，保守起见过一投它。单命中 0.45*0.5=0.225
-  // > 0.2 阈值仍能触发 rewrite（findings 阈值 0.15 也过）。
   false_permission: 0.45, damned_branches: 0.45, ultimatum_expel: 0.45,
-  pathologized_defiance: 0.45, negated_feeling_blame: 0.45 };
+  pathologized_defiance: 0.45, negated_feeling_blame: 0.45,
+  // [v6.7.128] 第 97 轮 EN 侧同族移植，与 ZH 第 76 轮取齐（英译形状同强度）
+};
 
 function checkDoubleBind(text) {
   if (!text || typeof text !== 'string') return { count: 0, binds: [], score: 0 };
