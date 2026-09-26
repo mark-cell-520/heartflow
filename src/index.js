@@ -6752,6 +6752,25 @@ const TONE_POLICING_PATTERNS = {
     { pattern: /\b(?:sound|solid|decent|good|reasonable|fair|well-?argued|right)\b[^.]{0,50}\b(?:shame|pity|if only|but for|unfortunately)\b[^.]{0,50}\b(?:attitude|tone|emotion|hysteria|anger|aggressive|frustration|outrage|hostility|edge|drama|volume)\b/i, type: 'en_tone_buried_content', severity: 0.7 },
     // 语气短语 + get further / more converts（比较级说服力，less/fewer 型）
     { pattern: /\ba (?:lot |bit |long )?(?:further|farther|more|better)\b[^.]{0,30}\b(?:with|without)\s+(?:less|fewer|no)\s+(?:shouting|anger|emotion|drama|outrage|volume|snark|edge|aggression)/i, type: 'en_tone_persuasiveness', severity: 0.7 },
+    // 第三轮补洞（第 95 轮三轮扩样）：上面所有判据都依赖语气形容词
+    // （angry/upset/hostile…），而下面这些样本用的是**语气动作/名词短语**
+    // （stop shouting / left the sarcasm / raised your voice / reek of
+    // frustration / talking like that），以及**省略主语的被动语气后果**
+    // （trying to take you seriously / get funding talking like that）。
+    // 判据统一为「语气动作/名词 + 条件连接（if/once/when/while/moment）+
+    // 内容后果（valid/take seriously/listen/fund/get further/land better/
+    // worth discussing）」，顺序不限。
+    // 安全阀：必须出现条件连接词且同时有内容后果词；良性改进建议
+    // （stick to the data / add a chart / park the topic / send the
+    // invoice）既无条件连接+语气动作也无内容后果 → 复验 0 误伤。
+    { pattern: /\b(?:stop|stopped|stopping|keep|kept|drop|dropped|dropping|lose|lost|losing|left|leaving|leave)\s+(?:shouting|yelling|screaming|accusing|the sarcasm|the attitude|the tone|snarking|the edge|the volume|the accusations)\b[^.]{0,44}\b(?:if|once|when|while|and)\b/i, type: 'en_tone_conditioned_validity', severity: 0.7 },
+    { pattern: /\b(?:raise|raised|raising)\s+your\s+(?:voice|tone)\b[^.]{0,44}\b(?:moment|the moment|instant|nobody|no one|they|you '?ll lose|you will lose)\b/i, type: 'en_tone_buried_content', severity: 0.7 },
+    { pattern: /\b(?:reek|reeks|reeking|smell|smells|stink|stinks)\b[^.]{0,30}\b(?:of|with)\s+(?:frustration|anger|hostility|bitterness|resentment|contempt|emotion|desperation)\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    { pattern: /\btake\s+you\s+seriously\b[^.]{0,44}\b(?:while|when|if|unless|as long as|the way|when you'?re|when you are)\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    { pattern: /\b(?:talking|speaking|acting|behaving|framing|delivering|presenting)\s+like\s+(?:that|this)\b[^.]{0,30}\b(?:nobody|no one|nobody will|won'?t|will not|you won'?t|you will not)\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    { pattern: /\b(?:your|the)\s+tone\b[^.]{0,44}\b(?:doing|does|did|is doing)\s+(?:you\s+)?more\s+harm\b/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
+    { pattern: /\bthe way you\s+(?:phrase|put|say|frame|word)\b[^.]{0,40}\b(?:pushback|rejection|resistance|ignored|dismissed|blowback)\s*(?:reason|is why)?\b/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
+    { pattern: /\b(?:you'?d|you would|you'?ll|you will)\s+(?:get|find|win|earn|carry)\b[^.]{0,44}\b(?:if|once|unless|as long as)\b[^.]{0,44}\b(?:left|leaving|drop|dropped|dropping|lose|lost|losing|without|less|not so)\b/i, type: 'en_tone_persuasiveness', severity: 0.7 },
   ],
 };
 
