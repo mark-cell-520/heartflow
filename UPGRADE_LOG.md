@@ -66,7 +66,8 @@
 | security-audit | **16 passed 0 failed** |
 | doc-numbers | **15 passed 0 failed** |
 | gate.test.js / pipeline.test.js | 单独跑**全绿**（run-all 首次报 3 个失败，回归修复后消除） |
-| run-all | 第二次运行结果见下（后台） |
+| run-all | **4482 通过 / 3 失败**——3 失败全部**既有记账项**（与第 78 轮同一对+1）：dimension-coverage-guard（「50 维」口径实际 51）、doc-numbers-accuracy（README 测试数少报，**finish 已自动记账 4288→4482**）、panel-probe-calibration（BROKEN 回退到 3） |
+| finish 七项 | **全绿**，锁释放，README 测试数自动记账 4288 → 4482，6 commit 推送成功 |
 
 ### 七、负例守卫的口径修正（方法记录）
 
