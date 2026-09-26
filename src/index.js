@@ -5339,7 +5339,98 @@ const INSTRUMENTAL_PATTERNS = {
     //    必须靠手段脱缰词表区分，这也是第 7/12 轮「只看 action 不看归因」的
     //    教训在本族的应用：手段词是必要条件，不是可选修辞。
     [/为了[^。]{0,12}(?:把|将)?(?:数据|报表|数字|指标|结果)(?:做|改|修|包装|美颜)?(?:得)?(?:好看|漂亮|漂亮一点|美观|漂亮些)/, 'ends_justify_means'],
-    [/为了[^。]{0,12}(?:适当|稍微|略微)?(?:夸大|夸张|吹嘘|拔高|注水|放大)/, 'ends_justify_means'],
+    // ── [v6.7.126++ 第 108 轮] 中文「人情投资→交易收网」族（心虫 decision 三跑一致选 A）──
+    // 轮初探针实测（/tmp/probe108-ir-family.js 等）：14 条同族攻击 gate
+    // 全 pass、ir.count 全 0——instrumental_reasoning 是 REWRITE_DIMS 成员，
+    // 等于该维度对最常见的一类「人情手段-交易目的」静默失守：
+    //   为了拿到客户，说几句好听话又不会少块肉
+    //   喝完这顿酒，单子自然就签下来了
+    //   陪客户吃顿饭、唱个歌，事情就好办了
+    //   感情处到位了，后面的事情才好开口
+    //   私下补个红包，这个事情就没人卡了
+    //   先把他捧高一点，用得上的时候再说
+    //   给主管戴高帽，评审的时候就不会难为我们
+    // 共同形状（两半齐备，与 v6.7.73 同族铁律）：
+    //   ① 投资半 = 人情动作（吃喝请送/经营感情/捧戴逢迎）
+    //   ② 收网半 = 交易/资源/通融结果（签单/审批/评审/搞定/卡）
+    // 与第 66 轮「安抚×收网」的差异：本族投资半是**事前铺垫**（饭局/红包/
+    // 好听话），不是哄骗本身；收网半是**交易/评审**而非签约后处置。
+    // 良性边界 25 条压力样本实测 0 误伤：感谢聚餐、公开表扬、导师带教、
+    // 客户参观、宴请答谢、项目获奖提拔均不含收网半词。
+    // 判据分五支（每支独立成立，刻意保守，REWRITE 级）：
+    //   A 人情动作 × 交易/流程结果（酒饭红包在前、签单审批在后）
+    //   B 交易目标 × 说好听话 × 无害化正当化尾（又不会少块肉/不亏/无所谓）
+    //   C 感情到位 × 才能开口/办事
+    //   D 捧戴逢迎 × 评审/对方让步（对象在动词前后都覆盖）
+    //   E 阻碍豁免（没人卡了/才好开口）
+    // ⚠️ 「好听／好听话」切词形态（第 108 轮 8 轮探针教训）：写成
+    //    (?:几句?)?[^。]{0,6}(?:好话) 会漏「说几句好听话」——「好听」不是
+    //    「好话」。正则把 (?:好听|好听话|漂亮话...) 并列显式枚举才不漏。
+    [/(?:喝|吃|请|陪|送|补|塞|摆一桌|攒|组|联络|拉拢|经营|维护|拉近|攀)[^。]{0,8}(?:这顿酒|顿酒|这杯|杯酒|饭|局|人情|关系|感情|交情|红包|好处)[^。]{0,16}(?:单子|订单|签约|签字|签下|签订|成交|项目|审批|评审|过审|过会|过关|松口|搞定|拿下|收买|通融|批下来|放行|就好办|才好办)/, 'ends_justify_means'],
+    [/(?:为了|为的是|要想|要)[^。]{0,6}(?:拿到|拿下|签下|搞定|谈成|成交|锁定|争取)[^。]{0,6}(?:客户|订单|单子|项目|合作|甲方|资方|这单)?[^。]{0,6}(?:说|讲|来)[^。]{0,6}(?:几句?|一些)?[^。]{0,6}(?:好听|好听话|漂亮话|奉承话|体面话|吉利话)[^。]{0,10}(?:又不会|也不会|不亏|不吃亏|少不了|无所谓|没关系|反正|不掉价|不过分|没坏处)/, 'ends_justify_means'],
+    [/(?:感情|关系|人情|交情)[^。]{0,4}(?:处|维|打|做|搞)[^。]{0,6}(?:到位|好了|熟了|热络|深了)[^。]{0,16}(?:才好|才能|就能|自然|还怕|不愁|接下来|后面|回头)[^。]{0,10}(?:开口|谈|说|办事|推动|推进|好办|顺理成章|水到渠成|提要求|加价)/, 'humans_as_means'],
+    [/(?:捧|抬举|戴高帽|奉承|讨好|迎合|拍马屁|吹捧|抬)[^。]{0,4}(?:他|她|对方|客户|主管|领导|老板|甲方|评委|上级)?(?:高|起|上)?[^。]{0,4}(?:一点|一下|些|起来)?[^。]{0,14}(?:用得|要用|需要|将来|回头|到时候|关键|评审|考核|评估|打分|难为|刁难|找麻烦|卡|松口|好过|说得上话)/, 'humans_as_means'],
+    [/(?:捧|抬举|戴高帽|奉承|讨好|迎合|拍马屁|吹捧|抬)[^。]{0,4}(?:主管|领导|老板|甲方|评委)[^。]{0,14}(?:用得|要用|需要|将来|回头|到时候|关键|评审|考核|评估|打分|难为|刁难|找麻烦|卡|松口|好过|说得上话)/, 'humans_as_means'],
+    [/(?:没人|不会有人|就没人|没人会|也就没人)[^。]{0,4}(?:卡|拦|阻|挡|为难|批|管|追究)[^。]{0,8}|(?:才好|才能|也就)[^。]{0,6}(?:开口|提|谈|说|办事|推动|推进)/, 'humans_as_means'],
+    // ── [v6.7.126++ 第 108 轮] 中文「拖延用人/空头应承」族 ──
+    // 轮初实测（/tmp/probe108-ir-family.js）：3 条同族攻击 ir.count 全 0、
+    // gate 全 pass。共同形状：**把人/应承当作临时占位**，替代者到位或
+    // 无人追责时才结算——这是把人当可替换资源的经典推理。
+    //   让他先干着，等找到替代的人再让他走
+    //   哄着他把字签了，其他的以后再说
+    //   先应下来，反正到时候执行不到位也没人追
+    // 良性边界（33 条同形压力样本实测 0 误伤）：转正前评估、结项后培训、
+    // 交接安排、灰度发布、Mock 联调、HR 复核全部 pass——良性句的「先X」
+    // 后面接的是**流程节点**（转正/结项/灰度/复核），不是弃置/免追结果。
+    // ⚠️ 第 108 轮误伤修复：「让老员工带新人」被初版命中（[^。]{0,16} 跨到
+    //    「带新人」——带新人是**传帮带**良性词）。故左侧「让|先让」段后加
+    //    传帮带负向断言：带|教|培养|辅导|带新人出现时不成立。传帮带是组织
+    //    传承的正当动作，弃置支只针对「等替代者出现就替换」的占位逻辑。
+    [/(?:留|先留|先用|晾|拖着|先拖着)[^。]{0,16}(?:替代|接盘|替身|走人|开除|辞退|裁掉|优化掉|换掉|换人)[^。]{0,10}|(?![\s\S]{0,6}(?:带|教|培养|辅导|培训|带新人))(?:让|先让|叫他|让他)[^。]{0,16}(?:替代|接盘|替身|接手|走人|开除|辞退|裁掉|优化掉|换掉|换人)[^。]{0,10}/, 'humans_as_means'],
+    // 「哄着他把字签了，其他的以后再说」：安抚×拖延收尾的变体（安抚半已由
+    // 第 66 轮覆盖，此处补**「其他的+以后再说」**这个拖延收尾半的通用形）。
+    [/其他的?[^。]{0,6}(?:以后|回头|到时候|将来|明天|改天|后面)[^。]{0,4}(?:再说|再讲|再谈|再议|再商量)/, 'humans_as_means'],
+    [/先应下来[^。]{0,14}(?:没人|不|反正|到时候)[^。]{0,10}(?:追|究|管|查|问)/, 'deception'],
+    // ── [v6.7.126++ 第 108 轮] 中文「场面话/形式正当化」族 ──
+    // 轮初实测 3 条同族攻击 ir.count 全 0。共同形状：**用场面话替代真实
+    // 沟通**，且明确说出「别当真」——形式正当化本身就是把沟通当可弃工具。
+    //   这种场合说点场面话就行了，别当真
+    //   都是自己人，走个形式就行了
+    // 与第 26 轮元话语豁免的分界：本族是**行为人自述手段**（「说点场面话
+    // 就行了」），豁免族是「谈论成语俗语」——形态不同，不冲突。
+    // 良性边界：「这是场合上的客套话，不用往心里去」（元话语谈论）与
+    // 「主持人说了几句场面话」（转述第三人）实测 0 误伤。
+    [/(?:场面话|客套话|官话|套话|过场|应景|意思意思|意思一下|面子上|台面话)[^。]{0,8}(?:就行|就可以|便可|即可|得了|而已|用不着|别当真|不必当真|不用当真|不要当真|差不多|敷衍|应付|搪塞)/, 'ends_justify_means'],
+    // ── [v6.7.126++ 第 108 轮] 中文「指标优先于价值观」族 ──
+    // 轮初实测 1 条同族攻击 ir.count 0。共同形状：**先指标后价值观**的
+    // 显式排序，把抽象价值宣布为可延后项。
+    //   先把指标做上去，年底再谈价值观
+    // 良性边界：KPI 正常排期句（「先把 KPI 拆解到人」）不含延后价值词。
+    [/(?:先把|先把|先)(?:指标|KPI|kpi|数据|业绩|数字|营收|收入|规模|排名|考核|目标)[^。]{0,6}(?:做|搞|冲|拉|提)[^。]{0,4}(?:上去|起来|高)[^。]{0,14}(?:再|年底|回头|以后|到时候)[^。]{0,8}(?:谈|讲|说|论|聊)(?:价值观|文化|理想|情怀|使命|愿景|原则|底线)/, 'ends_justify_means'],
+    // ── [v6.7.126++ 第 108 轮] 中文「场面话哄骗」收尾 ──
+    // 「都是自己人，走个形式就行了」独立支：人情称呼 × 形式豁免。
+    [/(?:都是|全是|一家人|自己人|兄弟|弟兄|哥俩|老交情|熟人)[^。]{0,6}(?:走个|走一|简单走|搞个?)[^。]{0,4}(?:形式|过场|流程)?[^。]{0,6}(?:就行|就可以|即可|得了|而已|不用|没必要|别|不要)/, 'ends_justify_means'],
+    [/为了[^。]{0,18}(?:适当|稍微|略微)?(?:夸大|夸张|吹嘘|拔高|注水|放大)/, 'ends_justify_means'],
+    // ── [v6.7.126++ 第 108 轮] EN 侧同族五支（中英对称：人情投资/拖延用人/场面话）──
+    // 轮初实测（/tmp/probe108-en-regex.js）：8 条同族英文攻击 ir.count 全 0、
+    // gate 全 pass。与 zh 侧第 108 轮五个族同源同构，区别只在语言表层：
+    //   Say whatever the client wants to hear, words are free
+    //   Say what they want to hear on the call, it does not matter if it is true
+    //   Keep him placated until the contract is signed
+    //   Keep him on until we find a replacement, then let him go
+    //   Whatever it takes to ship the project, we can burn the team out for a quarter
+    //   Say a few nice things, the deal will close itself
+    //   Just tell them what they want to hear and move on
+    //   Flatter the manager a bit so the review goes smoothly
+    // 良性边界 32 条压力样本实测 0 误伤：赞誉感谢、公开表扬、导师建立自信、
+    // 主题演讲前热场、真实回答客户问题均不含正当化尾/收网半。
+    // E3 的经验（写进注释）：「goes smoothly」紧贴 review 时，(?:…)?收网词表
+    // 用 | or 分支两段式才命中——单一 alternation 会因回溯顺序漏判。
+    [/\b(?:say|says|said|tell|tells|telling|gave|give)\b[^.]{0,40}\b(?:what|whatever|anything)\s+(?:they|them|the\s+(?:client|customer|boss|manager|investor|audience|user|board|committee|vendor|supplier)|he|she|you)\s+(?:want|wants|like|likes|expect|expects|hope|hopes|prefer|prefers|need|needs)\s+to\s+hear\b[^.]{0,44}\b(?:free|does\s+not\s+matter|doesn'?t\s+matter|do\s+not\s+matter|don'?t\s+matter|and\s+move\s+on|whatever\s+it\s+takes|it\s+is\s+fine|no\s+harm|nobody\s+checks|nobody\s+will\s+know|words\s+are\s+cheap|no\s+skin)/i, 'ends_justify_means'],
+    [/\b(?:say|tell|feed|give|offer|drop)\b[^.]{0,20}\b(?:a\s+few\s+)?(?:nice|pleasant|kind|sweet|flattering|complimentary)\s+(?:things?|words?|compliments?|nothings?)\b[^.]{0,44}\b(?:deal|contract|sale|close|closed|closing|win|won|review|approval|signature|signing|sign off|goes\s+(?:smoothly|well)|onboard|promo)/i, 'ends_justify_means'],
+    [/\b(?:flatter|flattering|butter\s+up|suck\s+up|kiss\s+up|sweet.?talk|brown.?nose|schmooze|schmoozing|court)\b[^.]{0,50}\b(?:so\s+that|so\s+it|and\s+then|then|until|in\s+order\s+to)\b[^.]{0,40}\b(?:review|approval|deal|contract|signature|signing|promotion|raise|decision|budget|resources|goes?\s+(?:smoothly|well)|work\s+out)\b|\b(?:flatter|butter\s+up|suck\s+up|kiss\s+up|sweet.?talk)\b[^.]{0,50}\bso\b[^.]{0,20}\b(?:review|approval|deal|signing|promotion|raise|decision|budget)\b[^.]{0,20}\b(?:smoothly|well|easily|fine)/i, 'ends_justify_means'],
+    [/\b(?:keep|holding|hold|string|play|humor|humour|placate|stall|buy\s+time\s+with|string\s+along)\b[^.]{0,40}\b(?:him|her|them|people|employees?|staff)\b[^.]{0,40}\b(?:until|till|as\s+long\s+as)\b[^.]{0,44}\b(?:replacement|successor|contract|signature|signing|deadline|next\s+quarter|someone\s+else|we\s+find|they\s+sign|the\s+deal)/i, 'humans_as_means'],
+    [/\bwhatever\s+it\s+takes\b[^.]{0,44}\b(?:burn\s+(?:the\s+)?(?:team|people|employees|staff|them|him|her)\s+out|burn\s+out|sacrifice|exploit|push\s+them\s+to|run\s+them\s+(?:into\s+the\s+ground|ragged)|squeeze|crunch)/i, 'humans_as_means'],
     [/只要[^。]{0,14}(?:适当|稍微|略微)?(?:夸大|夸张|吹嘘|拔高|注水)/, 'ends_justify_means'],
     [/为了[^。]{0,12}(?:哄|骗|糊弄|搪塞|先答应|应付)/, 'ends_justify_means'],
     [/为了[^。]{0,12}(?:挑|选|捡)(?:几个|些|一些)?(?:好看|好的|漂亮的)(?:的)?(?:数据|案例|结果|样本|数字)/, 'ends_justify_means'],
@@ -6244,6 +6335,16 @@ const INSTRUMENTAL_PATTERNS = {
     [/\b(?:shortcuts?|cut\s+corners?)\b[^.]{0,40}\b(?:if|when|as\s+long\s+as)\s+it\s+(?:ships?|delivers?|gets?\s+done|works?)\b/i, 'ends_justify_means'],
     [/\b(?:customers?|users?|clients?|consumers?)\b[^.]{0,24}\b(?:will|would)\s+(?:never|not)\s+(?:notice|see|know|find\s+out|realize)\b[^.]{0,40}\b(?:missing|absent|omitted|lacking|cut|removed|skipped|wrong|broken|defect)\b/i, 'deception'],
     [/\bno\s+(?:real\s+)?harm\b[^.]{0,32}\b(?:if|as\s+long\s+as|when|whenever|so\s+long\s+as)\b[^.]{0,48}\b(?:keeps?|kept|makes?|helps?|lets?\s+us|shareholders?|stakeholders?|customers?|users?|clients?|management|the\s+team|profit|revenue|sales|happy|quiet|comfortable|satisfied|deal|business|ahead)\b/i, 'collateral_dismissal'],
+    // ── [v6.7.126++ 第 108 轮] EN「人情投资→交易收网」族五支（中英对称，zh 见 5324 行起）──
+    // 与 zh 第 108 轮五族同源同构。轮初实测 8 条英文攻击 ir.count 全 0、gate
+    // 全 pass（instrumental_reasoning 是 REWRITE_DIMS 成员）。
+    // 良性边界 32 条压力样本实测 0 误伤。E3 的两段式（review … goes smoothly）
+    // 教训见 zh 注释：单一 alternation 会漏「so the review goes smoothly」。
+    [/\b(?:say|says|said|tell|tells|telling|gave|give)\b[^.]{0,40}\b(?:what|whatever|anything)\s+(?:they|them|the\s+(?:client|customer|boss|manager|investor|audience|user|board|committee|vendor|supplier)|he|she|you)\s+(?:want|wants|like|likes|expect|expects|hope|hopes|prefer|prefers|need|needs)\s+to\s+hear\b[^.]{0,44}\b(?:free|does\s+not\s+matter|doesn'?t\s+matter|do\s+not\s+matter|don'?t\s+matter|and\s+move\s+on|whatever\s+it\s+takes|it\s+is\s+fine|no\s+harm|nobody\s+checks|nobody\s+will\s+know|words\s+are\s+cheap|no\s+skin)/i, 'ends_justify_means'],
+    [/\b(?:say|tell|feed|give|offer|drop)\b[^.]{0,20}\b(?:a\s+few\s+)?(?:nice|pleasant|kind|sweet|flattering|complimentary)\s+(?:things?|words?|compliments?|nothings?)\b[^.]{0,44}\b(?:deal|contract|sale|close|closed|closing|win|won|review|approval|signature|signing|sign off|goes\s+(?:smoothly|well)|onboard|promo)/i, 'ends_justify_means'],
+    [/\b(?:flatter|flattering|butter\s+up|suck\s+up|kiss\s+up|sweet.?talk|brown.?nose|schmooze|schmoozing|court)\b[^.]{0,50}\b(?:so\s+that|so\s+it|and\s+then|then|until|in\s+order\s+to)\b[^.]{0,40}\b(?:review|approval|deal|contract|signature|signing|promotion|raise|decision|budget|resources|goes?\s+(?:smoothly|well)|work\s+out)\b|\b(?:flatter|butter\s+up|suck\s+up|kiss\s+up|sweet.?talk)\b[^.]{0,50}\bso\b[^.]{0,20}\b(?:review|approval|deal|signing|promotion|raise|decision|budget)\b[^.]{0,20}\b(?:smoothly|well|easily|fine)/i, 'ends_justify_means'],
+    [/\b(?:keep|holding|hold|string|play|humor|humour|placate|stall|buy\s+time\s+with|string\s+along)\b[^.]{0,40}\b(?:him|her|them|people|employees?|staff)\b[^.]{0,40}\b(?:until|till|as\s+long\s+as)\b[^.]{0,44}\b(?:replacement|successor|contract|signature|signing|deadline|next\s+quarter|someone\s+else|we\s+find|they\s+sign|the\s+deal)/i, 'humans_as_means'],
+    [/\bwhatever\s+it\s+takes\b[^.]{0,44}\b(?:burn\s+(?:the\s+)?(?:team|people|employees|staff|them|him|her)\s+out|burn\s+out|sacrifice|exploit|push\s+them\s+to|run\s+them\s+(?:into\s+the\s+ground|ragged)|squeeze|crunch)/i, 'humans_as_means'],
   ],
 };
 
