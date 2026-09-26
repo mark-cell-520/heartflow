@@ -2627,18 +2627,37 @@ function createEngine(dataDir) {
 // 基于MFT的5+1基础：关爱/公平/忠诚/权威/圣洁 + 自由
 const MORAL_PATTERNS = {
   zh: { care: /保护弱者|帮助他人|避免伤害|同情|同理|怜悯|关爱|照顾|呵护|温柔/i,
-         fairness: /公平|公正|平等|正义|歧视|偏见|权利|机会均等|一视同仁|公道/i,
+         fairness: /公平|公正|平等|正义|歧视|偏见|权利|机会均等|一视同仁|公道|欺骗|欺诈|撒谎|谎话|说谎|出尔反尔|背弃承诺|不守信用|不讲信用/i,
          loyalty: /忠诚|背叛|爱国|团结|集体|民族|奉献|归属|牺牲|荣誉/i,
-         authority: /服从|尊重传统|传统秩序|权威等级|等级制度|规矩纪律|遵守纪律|领导权威/i,
+         // [v6.7.125 第 103 轮] 权威维只收「服从/尊重传统」正形，
+         // 漏「不尊重权威/对传统的侮辱」这类否定形 —— 实测 zh 2 miss 之一。
+         // 只收「否定动词 + 权威对象」组合，不收单独否定词。
+         authority: /服从|尊重传统|传统秩序|权威等级|等级制度|规矩纪律|遵守纪律|领导权威|(?:不尊重|蔑视|侮辱|贬低|践踏|冒犯)[^。]{0,6}(?:权威|传统|长辈|领导|长幼|秩序)/i,
          sanctity: /神圣|纯洁|堕落|肮脏|污染|亵渎|自然|贞洁|恶心|腐化|败坏|低级/i,
          liberty: /自由|压迫|控制|解放|独立|自主|奴役|专制|暴政|反抗/i },
-  en: { care: /\b(protect|care|harm|hurt|cruel|compassion|empathy|kindness|suffer|gentle)\b/i,
-         fairness: /\b(fair|justice|equal|rights|discriminat|prejudice|unfair|cheat|equity)\b/i,
-         loyalty: /\b(loyal|betray|patriot|traitor|unite|solidarity|sacrifice|honor|devote)\b/i,
+  // [v6.7.125 第 103 轮] 英文侧 5 维词干/组合补齐（实测 en 3 miss）：
+  //   ① 词干被 \b 卡死：betray 不匹配 betrays/betrayed/betrayal，
+  //      loyal 不匹配 loyalty，cheat 不匹配 cheating/cheater，cruel 不匹配 cruelty。
+  //   ② 组合形态无通道：no shame / lies constantly / does not deserve
+  //      any trust / poisoning social values / cold-blooded exploiters。
+  // 设计原则：只给「词干确定安全」的词加 \w*（betray/loyal/cheat/cruel/patriot），
+  //   harm/care/pure 这类有技术同形词的保持原样（harmony/hardening 不误伤）。
+  en: { care: /\b(protect|care|harm|hurt|cruel\w*|compassion|empathy|kindness|suffer\w*|gentle|cold-blooded|coldhearted)\b/i,
+         fairness: /\b(fair|justice|equal|rights|discriminat|prejudice|unfair|cheat\w*|equity|fraud\w*|scam\w*|swindl\w*|deceiv\w*)\b/i,
+         loyalty: /\b(loyal\w*|betray\w*|patriot\w*|traitor|unite|solidarity|sacrifice|honor|devote)\b/i,
          authority: /\b(authority|respect|obey|tradition|order|disobey|rebel|defy|discipline)\b/i,
-         sanctity: /\b(holy|pure|impure|purity|sin|sacred|sacrilege|disgust|disgusting|pollute|polluted|contaminat|decadent|corrupt|degrade|degrading|taint|filth|vermin|subhuman|parasit)\b/i,
-         liberty: /\b(liberty|freedom|oppress|tyranny|autonomy|enslave|censor|dictator|liberate)\b/i }
+         sanctity: /\b(holy|pure|impure|purity|sin|sacred|sacrilege|disgust|disgusting|pollute|polluted|contaminat|decadent|corrupt|degrade|degrading|taint|filth|vermin|subhuman|parasit|shameless)\b|\b(?:no|without|lacks?\s+any)\s+shame\b|\bpoison(?:s|ing|ed)?\s+(?:social|moral|cultural|public|collective)?\s*(?:values?|morals?|discourse|culture|society|community)\b/i,
+         liberty: /\b(liberty|freedom|oppress|tyranny|autonomy|enslave|censor|dictator|liberate)\b/i },
+  // [v6.7.125 第 103 轮] 诚信/背信组合式（cheater-detection，MFT 归 fairness）：
+  // 单独 lies/trust 词太宽（"the bug lies in the module" / "trust boundary"
+  // 均为合法技术表述，实测会误伤），必须与道德语义共现才计命中。
+  en_trust: /\b(?:lies?|lying)\s+(?:constantly|habitually|repeatedly|all\s+the\s+time)\b|\b(?:pathological\s+)?liar\b|\b(?:not|never)\s+(?:deserve|earn|merit)\s+(?:any\s+)?(?:trust|respect|loyalty)\b|\b(?:deserves|earned)\s+no\s+(?:trust|respect)\b/i,
 };
+// [v6.7.125 第 103 轮] en_trust 归入 fairness 通道（不计独立维度）
+MORAL_PATTERNS.en.fairness = new RegExp(
+  MORAL_PATTERNS.en.fairness.source + '|' + MORAL_PATTERNS.en_trust.source, 'i'
+);
+delete MORAL_PATTERNS.en_trust;
 const MORAL_NAMES = { care: '关爱/伤害', fairness: '公平/欺骗', loyalty: '忠诚/背叛',
   authority: '权威/颠覆', sanctity: '圣洁/堕落', liberty: '自由/压迫' };
 
