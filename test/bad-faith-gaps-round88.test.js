@@ -11,9 +11,12 @@
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
-const gate = require(path.join(HF, 'src/gate.js'));
-const idx = require(path.join(HF, 'src/index.js'));
+// ⚠️ 路径纪律（第 86/87 轮两次踩坑，本轮第三次）：主测试必须用
+//    __dirname 相对路径 require。负例守卫会整仓复制到 /tmp 副本里跑本文件，
+//    写死绝对路径 HF 会让副本**读原仓 src**——注入到副本的破坏静默失效，
+//    守卫 9 条全判「失守」。相对路径才能保证模块解析跟着本文件所在目录走。
+const gate = require(path.join(__dirname, '..', 'src/gate.js'));
+const idx = require(path.join(__dirname, '..', 'src/index.js'));
 
 let pass = 0, fail = 0;
 function t(name, fn) {
