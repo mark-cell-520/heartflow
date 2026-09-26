@@ -1863,6 +1863,14 @@ const PSEUDO_CAUSAL_EN = [
 // throughput by 3x"（良性技术句）被判 pseudo_causal → verify，即误拦。
 // 判别口径：无度量对象的 "improved by 5x" 才是无依据夸大。
 const METRIC_NOUNS_EN = /\b(?:throughput|latency|accuracy|precision|recall|f1|rate|speed|performance|memory|footprint|cost|price|size|capacity|bandwidth|usage|consumption|duration|time|error|revenue|growth|margin|yield|throughput)\b/i;
+// [v6.7.127 第 87 轮] 中文倍数声称的「可复核时点」护栏。
+// 命中条件：句中出现**明确历史时点**（去年/今年/上月/20XX年…）。
+// 判别逻辑：精确倍数 + 可复核时点 = 事后统计陈述（可以拿当期的报表对账），
+// 不是无依据夸大。试错台实测（v7）：该护栏对 10 条本人虫攻击样本
+// 0/10 误挡，对第 48 轮硬良性句「去年导入新 CRM 后，销售人均单量提升了
+// 1.8 倍」1/1 放行。
+// 对照被否决的候选：小数倍数护栏（误挡 1 条攻击）、逗号分句护栏（误挡 1 条）。
+const PC_FACT_BASE_ZH = /(?:去年|今年|上月|上季度|上半年|下半年|20\d{2}\s*年|从\s*\d|\d+(?:\.\d+)?\s*(?:%|％)|p\s*[=<]|r\s*=\s*-|arxiv|doi|github\.com)/i;
 const PSEUDO_CAUSAL_ZH = [
   /(?:提升|降低|减少|提高|改善)\s*\d+(?:\.\d+)?\s*(?:倍|x|次)/,
   // [v6.7.127 第 87 轮] 反向量词族 + 助词「了」+ 中文数字。
@@ -2010,10 +2018,22 @@ function checkPseudoCausal(text) {
     || /(?:improves?|increased?|boosted?)\b[^.!?]*![^.!?]*\d+\s*(?:x|times|fold)/i.test(text);
   const exempt = metricExempt && !isGrandiose;
   const patterns = hasChinese ? PSEUDO_CAUSAL_ZH : PSEUDO_CAUSAL_EN;
+  // [v6.7.127 第 87 轮] 中文倍数判据的数字基线护栏。
+  // 回归来源：本轮给族 A 补反向量词判据后，第 48 轮既有测试抓到回归——
+  // 「去年导入新 CRM 后，销售人均单量提升了 1.8 倍」被判 pseudo_causal。
+  // 该句是**带明确倍数的指标陈述**（真实测量，不是编造夸大），而第 48 轮
+  // 建的良性集明确把这类句子列为良性（同类还有 Latency 从 800ms 降到 120ms、
+  // 日活从 3 万涨到 4.5 万）。判别口径：倍数字面前后带度量名词/具体数值
+  // 基线 → 事实陈述不判；只有「凭空出一个精确倍数且无任何度量对象」
+  // 才是无依据夸大（本人虫第 68/70 轮已为 perfect_error 建过同款豁免）。
+  // 反向保证：本人虫 10 条攻击样本全部不含量度对象，护栏后仍 10/10。
   const hits = [];
   for (const pat of patterns) {
     const m = text.match(pat);
-    if (m && !exempt) hits.push(m[0].slice(0, 50));
+    if (!m) continue;
+    if (exempt) continue;
+    if (hasChinese && PC_FACT_BASE_ZH.test(text)) continue;
+    hits.push(m[0].slice(0, 50));
   }
   const count = hits.length;
   // 收紧 source 豁免：仅具体可验证来源降分，模糊来源词（a study/research shows）不算真 source
