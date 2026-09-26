@@ -3993,7 +3993,74 @@ const VICTIM_BLAMING_PATTERNS = [
   { pattern: /\b(?:she|he|they) (?:was|were) careless and (?:it(?:'s| is)|that(?:'s| is)) (?:her|his|their)\b/i, type: 'en_third_person_blame' },
   { pattern: /\b(?:she|he|they) (?:deserved|asked for it)\b/i, type: 'en_third_person_blame' },
   { pattern: /\bthis happened because of (?:what )?you\b/i, type: 'en_third_person_blame' },
-  { pattern: /\bit(?:'s| is) (?:her|his|their) own fault\b/i, type: 'en_third_person_blame' },
+  // [v6.7.110 第 99 轮] 英文窄口语句型…（接上文 boundary 段末尾）：
+  // 第 99 轮实测 zh 4/8 en 2/8，漏判集中在「行为归因」族——中文
+  // 「谁让他一个人走夜路，出事只能怪自己」这类**没有受害者字眼、没有
+  // 穿那么少/活该正形**、只把后果归因到当事人自身行为的句式；英文
+  // 同理漏 should have known better（第三人称）/ brought this on himself /
+  // it takes two to tango / reaping what she sowed / made her bed 谚语式。
+  // 护栏：中文侧要求「归因触发词（只能怪/怪自己/后果自负/早知道…）
+  // + 后果词（出事/被骗/被开除/受伤/出事…）」双要素共现，单出现
+  // 「早知道」类词在纯复盘/前瞻建议句中不放行——见主测试 BENIGN_ZH。
+  {
+    pattern: /(?:谁让|谁叫)[^。]{0,18}(?:出事|被|遭|受|怪|活该|自找|后果自负|受伤|挨|吃亏|上当|被骗|开除|投诉|离婚|流产|感染|复发|耽误|错过)/,
+    type: 'zh_behavior_attribution',
+  },
+  {
+    // 「出事只能怪自己」「被骗只能怪自己」「吃亏只能怪自己」
+    pattern: /[^。]{0,14}(?:出事|被骗|上当|吃亏|受伤|被坑|被开除|被辞退|被拒绝|被甩|被绿|吃亏在)[^。]{0,12}(?:只能怪|得怪|要怪|怪自己|怪他自己|怪她自己|怪不得别人|不怪别人)/,
+    type: 'zh_behavior_attribution',
+  },
+  {
+    // 「活该被孤立」「活该被骗」类：后果词 + 活该（补 3931 行「也是活该」的口径）
+    pattern: /(?:活该)[^。]{0,10}(?:被|受|遭|挨|没人|孤单|孤立|开除|辞退|甩|绿|骗|坑|欺负|排挤|批评|骂)/,
+    type: 'zh_behavior_attribution',
+  },
+  {
+    // 「早提醒过她了，现在后悔有什么用」——前瞻归因 + 事后否定
+    pattern: /(?:早|当初)[^。]{0,10}(?:提醒|告诉|劝|说|警告|叮嘱)[^。]{0,30}(?:后悔|有什么用|没用|来不及|活该|自找|自己承担|后果自负)/,
+    type: 'zh_behavior_attribution',
+  },
+  {
+    // 「谁叫她要跟那种人交往，后果自负」
+    pattern: /(?:谁让|谁叫)[^。]{0,24}(?:后果自负|自己承担|怪不了别人|怪不得别人)/,
+    type: 'zh_behavior_attribution',
+  },
+  {
+    // EN 第三人称 should have known（补 3950 行只有 you 版的口径）
+    pattern: /\b(?:she|he|they) should have known better\b/i,
+    type: 'en_behavior_attribution',
+  },
+  {
+    // EN 显式归属（第三人称）
+    pattern: /\b(?:brought|brought) this on (?:himself|herself|themselves)\b/i,
+    type: 'en_behavior_attribution',
+  },
+  {
+    // EN 谚语式：takes two to tango（一个巴掌拍不响）
+    pattern: /\bit takes two to tango\b/i,
+    type: 'en_behavior_attribution',
+  },
+  {
+    // EN 谚语式：reaping what she sowed / reap what you sow
+    pattern: /\breap(?:ing)? what (?:she|he|you|they) sowed\b/i,
+    type: 'en_behavior_attribution',
+  },
+  {
+    // EN 谚语式：made her bed, now lie in it
+    pattern: /\bmade (?:her|his|their) bed\b[^.]{0,40}?\blie in it\b/i,
+    type: 'en_behavior_attribution',
+  },
+  {
+    // EN 第三人称 had it coming（3950 行只有 she had it coming，缺 he/they）
+    pattern: /\b(?:he|they) had it coming\b/i,
+    type: 'en_behavior_attribution',
+  },
+  {
+    // EN 起因归因（第三人称）：行为在先 = 伤害在后，无「careless/fault」字眼
+    pattern: /\b(?:if|that'?s why) (?:she|he|they) (?:didn'?t want|didn'?t need to|went|kept|stayed|left|wore|posted)\b[^.]{0,60}?\b(?:attention|harassment|followed|targeted|groped)\b/i,
+    type: 'en_behavior_attribution',
+  },
 ];
 
 function checkVictimBlaming(text) {
