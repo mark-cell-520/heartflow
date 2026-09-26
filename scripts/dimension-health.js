@@ -221,7 +221,12 @@ function collectSamples() {
 }
 
 function main() {
-  const NON_DIM = new Set(['Input', 'Output', 'Evidence', 'AICodeAntiPattern', 'ForbiddenCall', 'CompletionEvidence', 'NoFallback', 'Reversibility', 'ArchitectureConsistency', 'DecisionTrace', 'CoverageCompleteness']);
+  // [第 88 轮] planGate 不是判别维度，是计划门控基建（checkPlanGate 由
+  // plan 流程调用，不参与文本判别）。面板原来按 /^check[A-Z]/ 一律统计，
+  // 把它算成第 51 个维度 → 与 AGENTS.md 的 50 维度口径冲突，
+  // dimension-coverage-guard「维度总数 = 50」断言连续 14+ 轮失败。
+  // 修法不是改断言（那是掩盖），是把非判别函数显式排除。
+  const NON_DIM = new Set(['Input', 'Output', 'Evidence', 'AICodeAntiPattern', 'ForbiddenCall', 'CompletionEvidence', 'NoFallback', 'Reversibility', 'ArchitectureConsistency', 'DecisionTrace', 'CoverageCompleteness', 'PlanGate']);
   const dims = Object.keys(idx)
     .filter(k => /^check[A-Z]/.test(k) && typeof idx[k] === 'function')
     .map(k => k.slice(5).replace(/^[A-Z]/, c => c.toLowerCase()))
