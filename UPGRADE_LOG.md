@@ -1,3 +1,101 @@
+## 第 95 轮（tone_policing「语气归因→驳回内容」中英两侧同构补齐；decision 五跑并列如实记账；双向门禁零回归）
+
+**方向**：队列仅 q1-dljb 且已 done → 心虫自选。init 标「本轮 = 第 94 轮」，但 git log 顶部已是第 94 轮 4 commit + UPGRADE_LOG 第 94 轮完整记录 + README 4946 已落盘。**真实起点是第 95 轮。** init 的「遗留」段仍是第 13 轮旧文本。
+
+### 一、轮次对账与缺口复测（不信简报旧描述）
+
+按第 94 轮留下的接手说明，先复测两个方向，**都不信简报里的旧数字**：
+
+| 方向 | 攻击样本 | detect | gate 放行 | 别维兜住 |
+|---|---|---|---|---|
+| double_bind en | 12 条 | 0/12 | 6/12 | 6 条（perfect_error / emotional_manipulation / victim_blaming） |
+| **tone_policing en** | 42 条 | 1/42 | **41/42** | 仅 1 条 |
+| tone_policing zh | 12 条 | 1/12 | 11/12 | 仅 1 条 |
+
+顺带发现**中文侧同款缺口**（简报只提了英文侧）：zh 12 条同形状攻击 detect 同样只有 1/12。
+良性 39 条（中英混合，含 6 条真正提沟通建议的样本）零误伤。缺口比简报描述更大——英文侧漏 41 条而非 12 条。
+
+### 二、decision 连续五跑并列 0.80（如实记账，不粉饰）
+
+按纪律用本体 `HeartFlowDecision.decide` 选方向，**五跑全部 `chosen: null` + `confidence: 0`**：
+
+| 跑次 | 候选 | 结果 |
+|---|---|---|
+| 1 | A double_bind en / B tone_policing en / C no_fallback 留白 | B 0.84 / A 0.77 / C 0.74 → **B，非并列** |
+| 2 | A / B1 中英两侧 / B2 只做 en | 全 0.80 并列 |
+| 3 | 补「缺口完整度 %」判据 | 全 0.80 并列 |
+| 4 | 去掉 B2 只留 A/B1 | 全 0.80 并列 |
+| 5 | 干净口径（共用描述框架，只换事实） | 全 0.77 并列 |
+
+**根因（读 `src/core/decision.js:412-503` 确认，非猜测）**：`_scoreOption` 的文本推断靠一组正则词表（`SEVERITY_HIGH` 命中漏判/放行 +0.22、`REPRODUCED` 命中已复现 +0.12…）。第一跑能分出 0.84 vs 0.77，是因为 B 的描述含「缺口完整度最高」命中词表而 A 的「另外 6 条已被别维兜住」命中了 `SEVERITY_MED`（误拦 +0.10），**分差来自词表命中与否，不是来自事实优劣**。一旦把所有候选都改写成含同一组高频词的干净口径，三个候选拿同一组分 → 同分。这是该机制的已知上限（第 70 轮已为 consequence_value 补过三层信号，本轮暴露第四层：**候选间若无词表可辨的差异，decide 就分不出高下**）。
+
+**处置**：按无人值守铁律不空转，用第 1 跑的真实输出 + 实测缺口完整度定方向（B：tone_policing 中英两侧同构：缺口完整度 93% vs A 的 50%，无兜底放行 50/54 vs 6/12）。该机制缺口已记入第 7 节遗留，留给下一轮修（修法：给 `_scoreOption` 增加从候选文本解析「x/y」数字并按 1-y/x 加权的通道，绕开词表精确匹配）。
+
+### 三、缺口本质：描述情绪 vs 语气抵扣内容
+
+原有 en 12 支 + zh 14 支判据**全是「描述对方情绪」的直译**（`you are overreacting` / 你这么激动），而本维度真正的修辞形状是——
+
+**把内容的有效性或是否被倾听，挂在对方的语气上**：
+
+```
+your argument would be valid if you delivered it calmly
+nobody takes you seriously while you sound this upset
+your tone is exactly why nobody answers your emails
+你心平气和地说，这个观点才站得住脚
+只有你不再激动，你的反馈才会被采纳
+```
+
+这是**论证谬误**（用语气抵扣内容），不是沟通建议。判据沿用「两半齐备」（本轮第 N 次复现）：**内容半**（valid / take seriously / listen / fund / worth discussing / 被采纳）必须与**语气半**（angry / attitude / stop shouting / 情绪化 / 大声）同句共现。良性句只陈述改进建议（`stick to the data` / 加个图表），内容半缺位 → 天然不命中。
+
+### 四、改了什么（6 commit）
+
+**`src/index.js`**（`TONE_POLICING_PATTERNS`，两侧原地扩展，`score` 公式未动）：
+
+| 侧 | 原 | 现 | 新增族 |
+|---|---|---|---|
+| en | 12 | **48** | 有效性条件式 / 比较级说服力 / 待遇归因 / 驳回归因 / 内容埋没 / 方式优先 |
+| zh | 14 | **30** | 上列五族的中文同构 + 倒装形状 |
+
+**五轮补洞过程**（每轮都有 git trace，全部先 commit 再继续）：
+
+1. 首轮 19 支（en 六族）→ en 2/42
+2. +6 支：语气半作条件/归因位置（`stop shouting` 在 `if` 之后）→ en 24/42
+3. +8 支：语气半是**动作/名词短语**（stop shouting / raised your voice / reek of frustration / talking like that）→ en 28/42
+4. +11 支：三段式「内容半 → if/once/when → 紧贴连接词的语气半」（跨度 >44 字符，但实测放宽到 70 会让良性 `You would be right if you checked the logs` 误命中，故改三段式而非放宽）→ en 37/42
+5. +4 支：maybe 隔断 / `is going to` 占中段 / `try again and I might agree` → **en 41/42**
+   zh +7 支倒装形状（语气半在前、内容后果靠 才/再/就 连接）→ **zh 12/12**
+
+**`test/tone-policing-round95.test.js`**（新，13 断言全绿）
+**`scripts/negative-test-tone-policing-round95.js`**（新，36 注入点：真守卫 20 / 有兜底 16 / 异常 0）
+
+### 五、踩到的坑（本轮 2 个，已写进源码注释）
+
+1. **放宽跨度的诱惑（实测证伪）**：第四轮本想直接把 `[^.]{0,44}` 放宽到 `{0,70}` 一把收完。实测发现良性 `You would be right if you checked the logs before claiming.` 会因此误命中——放宽让「内容半+语气词」的偶然共现越过阈值。改用三段式（内容半关键词 → 条件连接 → **紧贴连接词**的语气半）才既收攻击又不误伤。**教训：判据不够时先想「收紧哪一半」，不是先想「放宽哪一半」。**
+2. **对象字面量注入与数组注入不同型**：第 94 轮 `EN_FALLBACK` 是 `[/regex/, 'type', sev],` 数组行，本轮 `TONE_POLICING_PATTERNS` 是 `{ pattern: /.../i, type: '...', severity: 0.7 },` 对象行。负例守卫的注入串必须整行替换对象字面量；且 `/` 前是空格而非 `[`，所以不触发第 94 轮 `//` 行注释坑（**这是第 94 轮该坑第一次没踩到，原因是数据结构变了，不是记住了**）。
+
+### 六、剩余缺口（如实记账，不强行收）
+
+1. **en 42 条收 41，留 1 条**：`I don't have time for this tone.` 无内容后果词，与良性「我没空聊这个」不可分。已在主测试断言 ② 显式记账（要求 ≥ 56/57 而非 57/57）。
+2. **「not because of + 客观事件」同形**：`You're not being heard because the meeting ended early.` 与攻击句 `You're not being heard because of how you're acting, not because of the idea.` 同形，差别在 not because of 之后是 idea 还是客观事件。本轮只收 idea 型（驳回半含 idea/point/argument 词表）。
+3. **decision 词表分不出高下**（第 2 节）：候选描述若不含彼此可辨的词表差异，`decide` 连续返回并列。这是机制缺口不是候选问题。
+
+### 七、验证（七项）
+
+主测试 **13/13** · 负例守卫 **真守卫 20 / 有兜底 16 / 异常 0** · 双向门禁召回 **52/52**、误拦 **300/326 零新增**（与轮前基线逐项一致，改动前后同跑两次比对）· bin/verify **14/14** · security-audit **16/16** · doc-numbers **15/15** · **run-all 4959 通过 / 0 失败**（上轮 4946，本轮 +13；npm-package-integrity 预期失败本轮未出现）· guard-abilities 全量测试 14/14（步骤内，含全量测试+双向门禁）
+
+6 个 commit（feat zh / feat en / 三轮 fix / 主测试 / 负例守卫），finish 检查后 README 测试数自动记账 4946→4959。
+
+### 给下一轮
+
+**接手优先级（实测强度排序）**：
+1. **修 `decision._scoreOption` 的词表并列缺陷**（本轮第 2 节）：给它加一条「解析候选文本里的 `x/y` / `x/yy%` 数字，按 `1 - y/x` 给 consequence_value 加权」的通道。这样 A/B1 的 50% vs 93% 缺口完整度能直接转成分差，不再依赖词表巧合。这是本轮五跑 `null` 的根因，修掉后每轮选方向都能拿到真信号。
+2. **double_bind 英文侧第 76 轮三族移植**（本轮 A 候选，缺口完整度 50%，detect 0/12、gate 放行 6/12，其余 6 条已被 perfect_error 等兜住）。照 zh 侧 `DOUBLE_BIND_PATTERNS.zh` 第 76 轮五族的形状移植，**注意 en 侧良性边界是普通商务劝阻**（`you can leave, but finish the deliverable first`），比 zh 侧窄。
+3. no_fallback 的同形留白若要做，先解决「and 之后有无真实补救动作」——需要动作词表（write/add/prepare/set up + fallback/backup/plan），语义门槛高于单文本门禁，建议作为下一维度族而非本轮补丁。
+
+**纪律提醒**：decision 的候选 prompt 里写可测判据（gate 放行数、detect 数、缺口完整度百分比）确实能提高分出高下的概率（本轮第一跑因此拿到 0.84 真结果），**但不要误以为那是机制正常工作**——它只是恰好命中词表。真正的修法见第 1 条。
+
+---
+
 ## 第 94 轮（no_fallback 英文侧三族 + 中文侧同构对齐；decision 0.81 选 B；护栏零新增）
 
 **方向**：队列仅 q1-dljb 且已 done → 心虫自选。init 标「本轮 = 第 93 轮」，但 git log 顶部已是第 93 轮 6 commit + UPGRADE_LOG 第 93 轮完整记录 + `state.json` `round:93` + README 4935 已落盘。**真实起点是第 94 轮。** init 的「遗留」段仍是第 13 轮旧文本（「round 校准为 13」「dangerous_instruction 误拦挂三轮」——第 90 轮已复测不成立）。
