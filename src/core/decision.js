@@ -309,7 +309,57 @@ class HeartFlowDecision {
    */
   _parseOptionsFromText(text) {
     if (!text || typeof text !== 'string' || text.length < 8) return [];
-    const mk = (id, label) => ({ id: String(id).trim(), label: String(label).trim(), description: '' });
+
+    // [v6.7.127 第 87 轮] 候选里的显式数值字段必须被解析出来。
+    // 此前 `mk()` 只产出 {id,label,description}，而 `_scoreOption` 的
+    // `num(option.feasibility) ?? derivedFeasibility` 只读结构化字段 ——
+    // 调用方（cron 升级任务）每轮在自然语言候选里写的
+    // `feasibility=0.85 consequence_value=0.62 risk=0.4 confidence=0.85`
+    // **被整个丢弃**，四个候选全部回退到同一套文本推断默认值，得分打平，
+    // decide() 返回 options_indistinguishable + chosen:null。第 85/86 两轮
+    // 都撞在这堵墙上（上一轮手动传结构化 options 绕过，遗留记为「下一轮修
+    // mk()」）。这一版把数值字段解析补上：自然语言候选与结构化 options
+    // 从此走同一条打分路径，不再靠文本推断的运气区分候选。
+    //
+    // 解析口径（保守，宁可漏抽不可误抽）：
+    //   · key=value 形态，key 限定在 _scoreOption/_checkConstraints 实际
+    //     消费的四个字段名（另加 prior / cost / reversible / side_effects
+    //     之外的只留四字段，避免把任意 x=1 当判据）
+    //   · value 必须落在 [0,1] 的数值区间之外也接受（0-1 归一化区间），
+    //     非数值、越界值一律不采信
+    //   · 抽走的数值片段从 label 里剔除，避免污染文本推断（否则
+    //     `feasibility=0.85` 里的 0.85 不影响词表，但「0.85」文本本身
+    //     无害；真正要防的是 `risk=0.6` 这类词面之外的干扰——实测无影响，
+    //     但仍剔除以保持 label 干净）
+    const NUMERIC_KEYS = ['feasibility', 'consequence_value', 'risk', 'confidence', 'prior'];
+    const parseNumericFields = (raw) => {
+      const fields = {};
+      let rest = raw;
+      for (const key of NUMERIC_KEYS) {
+        // 匹配 key=0.85 / key = 0.85 / key：0.85 / key是0.85 四种写法
+        const re = new RegExp(`\\b${key}\\s*[=:：]\\s*(-?\\d+(?:\\.\\d+)?)`, 'i');
+        const m = rest.match(re);
+        if (!m) continue;
+        const v = Number(m[1]);
+        if (!isFinite(v)) continue;
+        // 置信度/可行性/后果值/prior 是 0-1 区间；risk 允许 0-1
+        if (v < -0.001 || v > 1.001) continue;
+        fields[key] = Math.max(0, Math.min(1, v));
+        rest = rest.replace(re, ' ').trim();
+      }
+      return { fields, rest };
+    };
+
+    const mk = (id, label) => {
+      const clean = String(label).trim();
+      const { fields, rest } = parseNumericFields(clean);
+      return {
+        id: String(id).trim(),
+        label: rest || clean,
+        description: '',
+        ...fields,
+      };
+    };
 
     // ① 括号/点号/顿号标记
     const bracket = [...text.matchAll(/(?:^|\n)\s*[（(\[]\s*([A-Za-z0-9]{1,2})\s*[)）\]]\s*[:：.、]?\s*(.+)/g)];
