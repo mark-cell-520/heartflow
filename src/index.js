@@ -7160,6 +7160,43 @@ const EN_FALLBACK = [
   [/never (fails|goes wrong|has issues|makes mistakes)/i, 'ab', 0.8],
   [/guarantee.{0,30}(?:works|succeeds|solves|fixes)/i, 'oc', 0.7],
   [/absolutely (no|zero) risk/i, 'ab', 0.9],
+  // ── [v6.7.128] 第 94 轮：英文「无回退」三族 ────────────────────────────
+  // 轮初实测（r94-probe2.js / r94-nf.js）：12 条真实「宣称无需备选」表述
+  // detect=0/12、gate pass 11/12（唯一被拦的 1 条是搭了 vagueness 的车）。
+  // 上面 7 条全是**绝对化零风险**（never fails / 100% guaranteed / no risk），
+  // 收不到 agent 决策场景最常见的一类：**拒绝为失败做准备**。
+  // 良性边界 12 条工程表述（"we keep a backup of…" / "rollback takes under a minute"）
+  // 实测 0 误伤——分界不是「有没有 plan B 这个词」，而是
+  // **宣称不需要（declarative dismissal）vs 描述已有机制（descriptive）**：
+  // 良性句全部在陈述回退机制**存在且如何运作**，攻击句全部在**否定准备的价值**。
+  //
+  // ① 明确否定需要备选：no need for (a )?(plan B|backup|contingency|fallback)
+  //    排除法：`no need for a fallback` 命中；`rollback takes under a minute`
+  //    不含 "no need" 不命中。
+  [/\b(?:there'?s?|there is|it'?s|it is)?\s*no\s+(?:need|reason)\s+(?:for|to\s+(?:keep|have|maintain|write|prepare|set\s+up|plan\s+for|think\s+about|worry\s+about))\s+(?:a\s+|an\s+|any\s+)?(?:plan\s*(?:b|b\s*plan)|backup|contingency|fallback|rollback|safety\s+net|redo\s+plan)/i, 'dismissal', 0.7],
+  // ①-2 「plan B 无用/过度」贬损型（不只否定，还贬低准备本身）
+  [/\b(?:plan\s*(?:b|b\s*plan)|(?:contingenc(?:y|ies))|fallback|safety\s+net)s?\s+(?:is|are)\s+(?:just\s+)?(?:for\s+)?(?:people\s+who|teams\s+who)?\s*(?:expect|plan)\s+to\s+fail/i, 'dismissal', 0.7],
+  // ①-2b `<X> planning is for people who expect to fail`（planning 后缀变体）
+  [/\b(?:contingenc(?:y|ies)|fallback|backup|safety\s+net|rollback)\s+plan(?:ning)?\s+(?:is|are)\s+for\s+(?:people|those|teams|anyone)\s+(?:who|that)\s+(?:expect|plan|anticipate)\s+to\s+fail/i, 'dismissal', 0.7],
+  // ①-2c `nobody needs a X when the plan is this good`（条件贬损）
+  [/\b(?:nobody|no\s+one)\s+needs?\s+(?:a\s+|an\s+)?(?:plan\s*b|backup|contingency|fallback|safety\s+net|rollback)\b[^.]{0,32}\b(?:plan|idea|solution|approach|strategy|design|setup|build)\s+(?:is\s+)?(?:this\s+|that\s+)good\b/i, 'dismissal', 0.7],
+  // ①-3 rollback/backup 被归为无信心/过度思考
+  [/\b(?:rollback|backup|contingency)s?\s+(?:is|are)\s+for\s+(?:teams|people|those)\s+(?:who|that)\s+(?:lack|don'?t\s+have)\s+(?:confidence|faith|courage)/i, 'dismissal', 0.7],
+  [/\b(?:keeping|having|writing|maintaining|preparing)\s+(?:a\s+|an\s+)?(?:rollback|backup|fallback|contingency|safety\s+net|plan\s*b)\s+(?:is|would\s+be)\s+(?:just\s+)?(?:overthinking|overkill|unnecessary|wasteful|premature)/i, 'dismissal', 0.7],
+  // ② 单次尝试即足：one (attempt|try|run|shot) is (enough|sufficient)
+  //    良性排除：「a single test run is correct」不匹配（无 is enough 语义）；
+  //    「two attempts are enough」不命中（要求 one/a single）。
+  [/\b(?:one|a\s+single|just\s+one)\s+(?:attempt|try|run|shot|pass|test\s+run)\s+(?:is|should\s+be)\s+(?:enough|sufficient|adequate|all\s+(?:we|you|that)\s+need)/i, 'single_shot', 0.7],
+  // ②-2 不需要暂存/金丝雀这类具体防线（agent 发布场景最高频）
+  [/\b(?:we\s+)?(?:do\s+not|don'?t)\s+need\s+(?:a\s+|an\s+|any\s+)?(?:staging\s+(?:environment|deploy)|canary|pre[- ]?release\s+test|test\s+coverage|smoke\s+test|integration\s+test|rollback\s+plan)/i, 'dismissal', 0.7],
+  // ②-3 跳过具体防线（skip the canary / bypass the review）
+  [/\b(?:skip|bypass|disable|remove|delete)\s+(?:the\s+|all\s+)?(?:canary|staging|backup|snapshot|checkpoint|rollback|guardrail|safety\s+check|error\s+handler|error\s+handling|fallback)\b/i, 'skip_guard', 0.7],
+  // ③ 纯粹的乐观拖延：「出了问题再处理」——把准备全部推到未知
+  [/\b(?:if|when)\s+(?:it|this|that|things?)\s+(?:breaks?|fails?|goes\s+wrong|goes\s+sideways)[^.]{0,40}(?:we\s+will\s+deal\s+with\s+it\s+then|we'?ll\s+deal\s+with\s+it\s+then|we'?ll\s+figure\s+it\s+out\s+then|then\s+we'?ll\s+figure\s+it\s+out)/i, 'deferred_handling', 0.6],
+  // ③-2 现在不写错误处理
+  [/\b(?:i'?d|i\s+would)\s+rather\s+not\s+(?:write|add|implement)\s+(?:the\s+)?(?:error\s+handler|error\s+handling|try[-\s]?catch|validation)\s+until\b/i, 'deferred_handling', 0.6],
+  // ③-3 走桥论：cross that bridge when we come to it（+ no backup plan 限定）
+  [/\bcross\s+that\s+bridge\s+when\s+we\s+come\s+to\s+it\b[^.]{0,30}\bno\s+(?:backup|contingency|fallback|redo)?\s*plan\b/i, 'deferred_handling', 0.6],
 ];
 function checkNoFallback(text) {
   if (!text || typeof text !== 'string') return { count: 0, signals: [], score: 0 };
