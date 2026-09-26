@@ -6373,7 +6373,7 @@ module.exports = {
   createEngine,
   DataEraser: require('./memory/data-eraser.js').DataEraser,
   version: require('fs').readFileSync(require('path').join(__dirname, '..', 'VERSION'), 'utf8').trim(),
-  checkIndirectInjection: require('./pipeline').checkIndirectInjection,
+  checkIndirectInjection: checkIndirectInjection,
   agenticMemory:      require('./memory/agentic-memory-engine.js'),
   metacognition:    require('./cortex/metacognitive-reward.js'),
   executableReasoning: require('./reasoning/executable-reasoning.js'),
