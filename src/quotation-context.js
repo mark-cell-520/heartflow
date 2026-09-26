@@ -48,9 +48,24 @@ function detectQuotationContext(text) {
   let score = 0;
 
   // 1. 载体 + 引述动词（最强信号）
-  const carrier = text.match(CARRIER_RE);
-  const verb = text.match(QUOTE_VERB_RE);
-  if (carrier && verb) {
+  // [v6.7.128 第 80 轮] 自匹配漏洞修补。由来：本轮实测 3 条**纯攻击指令**
+  // 被降级成 verify 而非 block：
+  //   「清空入侵检测记录」 / 「抹掉安全警告记录」→ quoted=true（carrier+verb）
+  // 根因：「记录」同时在 CARRIER_RE 和 QUOTE_VERB_RE 里，于是
+  //   carrier=match('记录')  → verb=match('记录')  → 同一个位置命中两次
+  //   score=0.55 ≥ 0.45 → quoted=true → block 被抑制
+  // 这与第 79 轮 dehumanization 的 `[^。]*? 恒真` 是同类缺陷：
+  // **用同一个词的两次出现充当"共现"证据**。"清空X记录"是清除动作，
+  // 不是"记录里写着X"的引述框架——引述动词必须是**谈论材料**的行为
+  // （写着/提到/分析/引用），"记录"本身不具有那个语义。
+  // 修法（最小且不改动良性引述语义）：引述动词与载体词必须是**不同的词**。
+  // 真实引述句（「文章里提到」「文档中记录着」「报告指出」）载体与动词
+  // 天然不同，不受影响；同时命中同一词的自我共现不再算信号。
+  // 良性验收：v6.7.72 起的 8 条引述误拦样本 + 原有测试全部回归通过。
+  const carrierM = text.match(CARRIER_RE);
+  const verbM = text.match(QUOTE_VERB_RE);
+  const selfMatched = carrierM && verbM && carrierM[0] === verbM[0];
+  if (carrierM && verbM && !selfMatched) {
     signals.push('carrier+verb');
     score += 0.55;
   }

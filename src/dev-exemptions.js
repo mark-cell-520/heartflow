@@ -86,7 +86,17 @@ const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?
 const CLEANUP_VERB = /(?:卸载|卸掉|卸载掉|卸了一?下|清空|清掉|清了一?下|重置|复位|抹掉|清除|清除掉|uninstall|deinstall|reset|wipe\s+logs?|truncate)/i;
 
 /** 清理动词可配的开发层设施（DEV_TARGET 的窄子集，刻意不含「检查/校验」）。 */
-const CLEANUP_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr|杀毒软件|防病毒|antivirus|defender|虚拟机|虚机|\bvm\b|virtual\s+machine|agent\b|build\s*日志|build\s*log|控制台)/i;
+// [v6.7.128 第 80 轮补「测试机/构建产物/build/复现」] 由来：第 11 轮遗留的
+// 3 条良性 block 之一「调试时清空测试机的日志重新来」第 80 轮复测**仍误 block**——
+// devCtx=true（调试）、cleanVerb=true（清空）、devTarget=true（日志），唯独
+// cleanTarget=false：CLEANUP_TARGET 只收「日志」裸词，不收「**测试机**的日志」
+// 这种「宿主+设施」组合（第 22/33/34 轮收的都是设施词，没收宿主词）。
+// 口径：测试机/虚拟机/build 产物本身即非生产（与第 22 轮对 CI 的处理同源），
+// 但 CLEANUP_SECURITY 仍一票否决——「测试机上的安全检查项」不放。
+// 边界实测：15 条良性（宿主+设施+清理）中 14 条本已 pass，此条补后 15/15；
+// 同形攻击 12 条不变（第 80 轮双向验收见
+// test/dangerous-instruction-cleanup-verb-round80.test.js）。
+const CLEANUP_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr|杀毒软件|防病毒|antivirus|defender|虚拟机|虚机|\bvm\b|virtual\s+machine|agent\b|build\s*日志|build\s*log|控制台|测试机|检查机|构建产物|构建缓存|调试环境|联调环境|复现环境|预发环境|\bstaging)/i;
 
 /** 清理豁免的安全词否决：句内出现这些词时，清理动作不许豁免。 */
 const CLEANUP_SECURITY = /(?:安全检查|安全警告|安全机制|安全策略|安全组|防火墙|鉴权|认证|授权|审计|身份验证|权限校验|权限检查|访问控制|越权|入侵|渗透|提权|防护|入侵检测|白名单|ACL|WAF|IDS|IPS|防火墙日志|firewall|auth(?:entication|orization)?|audit|sandbox|security|access\s+control|privilege\s+check|rbac)/i;
