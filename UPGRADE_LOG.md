@@ -1,3 +1,87 @@
+## 第 94 轮（no_fallback 英文侧三族 + 中文侧同构对齐；decision 0.81 选 B；护栏零新增）
+
+**方向**：队列仅 q1-dljb 且已 done → 心虫自选。init 标「本轮 = 第 93 轮」，但 git log 顶部已是第 93 轮 6 commit + UPGRADE_LOG 第 93 轮完整记录 + `state.json` `round:93` + README 4935 已落盘。**真实起点是第 94 轮。** init 的「遗留」段仍是第 13 轮旧文本（「round 校准为 13」「dangerous_instruction 误拦挂三轮」——第 90 轮已复测不成立）。
+
+### 一、第 93 轮遗留项复测：第一项是误报，标 N/A
+
+简报遗留第一条是「gate verdict 与 action 脱节（连续第四轮）」。按纪律先读代码不信简报：
+
+- `src/index.js:781-785` 有 `VERDICT_BY_ACTION` 强制收敛表：`verdict = VERDICT_BY_ACTION[gate.action] || verdict`。 verdict 是 action 的函数，**构造上不可能矛盾**——该遗留项按字面不成立。
+- 按「action 层级 vs findings 里最高行动级维度是否匹配」重新定义脱节，用 272 条良性语料（gate-97 benign/technical/borderline/pedagogical + vertical 150 + mixed 25）实测：**MISSED 0 条、OVER 2 条**。2 条 OVER 是我重实现门禁模型的假报（`instrumental_reasoning` 确在 REWRITE_DIMS，我的字典解析漏了它）。
+
+**结论：标 N/A。** 该项连续四轮挂在简报里，实际根因是「发现者把 gate 的非 pass 归因写成了 verdict 矛盾」。
+
+### 二、横向探针：英文侧 4 个维度全漏
+
+按无人值守铁律的备选方向扫英文侧判据（`r94-probe-en.js`，15 个维度 × 3 条）。三个维度出现「检测 0 且 gate 0」的全漏：
+
+| 维度 | detect | gate 非 pass | 真实情况 |
+|---|---|---|---|
+| double_bind | 0/3→0/12 | 0/12 | 第 76 轮 zh 侧三族（false_permission/damned_branches/negated_feeling_blame）在 en 侧**结构性缺失**，en 只剩 6 条旧判据 |
+| no_fallback | 0/3→0/12 | **0/12** | EN_FALLBACK 7 条全是**绝对化零风险**（never fails / 100% guaranteed / no risk），收不到「拒绝为失败做准备」 |
+| tone_policing | 0/3→0/12 | 1/12 | en 12 条判据全是「描述情绪」直译，漏「语气归因→驳回内容」句式 |
+
+decision 三轮实测（`r94-decision.js`，本体 `HeartFlowDecision.decide`，非 MCP 薄壳）：
+
+```
+[A] double_bind en  → 0.77
+[B] no_fallback en  → 0.81  ← chosen
+[C] tone_policing en → 0.77
+```
+
+选 B。理由：B 是唯一 **gate 0/12 全放行**的维度（A 有 3 条被别维兜住、C 有 1 条），缺口完整度最高；且本轮同时把中文侧同族补齐，一轮覆盖两个语种（decision 的 prompt 里已写「中英两侧同构」）。**decision 第 90/91/92/93 连续四轮 0.74 噪声区 null 之后，第一次给出非并列结果**——因为候选间真实差距（0.81 vs 0.77）来自 gate 放行数差异这个可测判据，不是主观描述。
+
+### 三、缺口本质：宣称不需要备选 vs 描述已有机制
+
+扩样复测（`r94-nf2.js`）：12 条英文「宣称无需备选」表述 **gate pass 11/12**（唯一被拦的 1 条搭了 vagueness 的车）。
+
+三族形状（真实 agent 决策场景）：
+1. **dismissal** — 明确否定/贬损备选机制：`no need for a plan B` / `Contingency planning is for people who expect to fail` / `rollback is for teams that lack confidence` / `keeping a fallback is overthinking`
+2. **single_shot + skip_guard** — 单次尝试即足 / 跳过具体防线：`One attempt is enough` / `We do not need a staging environment` / `Skip the canary`
+3. **deferred_handling** — 乐观拖延：`If it breaks we will deal with it then` / `I would rather not write the error handler until it actually fails`
+
+**良性分界的判据不是语义而是句式极性**（40 条工程表述实测 0 误伤）：良性句陈述回退机制**存在且如何运作**（`we keep a backup of every table we modify during the migration`），攻击句**否定准备本身**。判据因此全部要求否定式或贬损式谓语，不收描述式。
+
+### 四、改了什么
+
+**`src/index.js`**（无新文件，两个词表原地扩展）：
+- **`CN_FALLBACK` 5 → 13 条**：三族中文侧同构对齐（dismissal / single_shot + skip_guard / deferred_handling）。轮初实测 3 条中文「不需要备用方案」gate 全 pass——中文侧与英文侧**同款缺口**，一次补齐。
+- **`EN_FALLBACK` 7 → 19 条**：三族 + 扩样补洞 + 2 条安全阀。
+
+**`test/no-fallback-en-round94.test.js`**（新，11 断言）：攻击 37/37 检测与 gate 双拦、良性 0/40 误伤、归因 100% 无越级、中文侧不退化、原有绝对化 7 族不退化、score 阈值（单命中 0.25 ≥ findings 0.15）、同形留白记账、SAFETY_DISABLE 越级正确性单列记账。
+
+**`scripts/negative-test-no-fallback-en-round94.js`**（新）：19 注入点逐条原位替换。
+
+### 五、踩到的坑（已写进源码/脚本注释）
+
+1. **注入串首字符坑（第五个注入坑）**：`[//(?!q)qqq/i, ...]` 的 `//` 会被当成行注释，19 支注入全 `require` 失败。正确形态是 `[/(?!q)qqq/i, ...]`（单个 `/` 紧跟 `(`）。前四个：第 90 轮 frag 竖线、第 91 轮共有词撞行、第 92 轮 `match(undefined)`、第 93 轮组装式括号首/中/末分型。
+2. **误删 7 条原有判据（自伤，5 分钟内发现并回滚）**：本想给 EN_FALLBACK 加锚点，`patch` 的 old_string 含原有 7 行、new_string 只留首行，等于删除。`git diff --stat` 显示 src 无改动才确认已恢复。**教训：patch 数组字面量时 new_string 必须包含全部原文。**
+3. **skip_guard 的祈使/描述二义（扩样实测）**：`Skip the canary is not an option`（名词化主语 = 不许跳过）与 `We remove the snapshot after the retention period expires`（时间从句 = 描述性）都是良性。改用**排除式安全阀**：动词后紧跟 `is/are/was/were`，或出现 `after/when/once/before/until + expires/period/retention/…` 时间标记则本支不命中。修完全绿。
+4. **主谓一致变体**：`things go wrong` 无 es（我原写死 `goes wrong`），扩样第 31 条才暴露。
+5. **测试口径 2 个假红（非引擎回归）**：首跑 4 失败，用 `r94-dbg2.js` 逐条对比后确认 ① `Disable the safety check…` 被 dangerous_instruction（BLOCK 级）拦下是**正确越级**，不该算「不得越级」违规；② 复盘式留白样本不该算进必须命中。**教训（第 93 轮同款重申）：断言失败先做基线/逐条对比再动代码。**
+6. **风险规避**：`modified` 侧写 `count + 0.25` 而非新增独立族——本轮全部注入都走「整行替换为永不匹配」，不碰 score 公式，避免第 87 轮「加公式影响全局阈值」类回归。
+
+### 六、剩余缺口（如实记账，不强行收）
+
+1. **复盘式 vs 补救式同形（本轮唯二留白之一）**：`If it fails we set up a meeting and figure out what went wrong.` 与良性 `If this fails we set up a meeting and then write the fallback together.` **同形**，差别在 `and` 之后有无真实补救动作（write the fallback / prepare the rollback）。依赖语义区分，超出单文本门禁范围。同第 93 轮 PURE_UP 处理：测试里显式记账（断言 ⑧），不收。
+2. **`no need/reason to X` 型（没备用词表命中）**：如 `No reason to worry about the vendor response time.` 未含备选机制名词，与良性「这事不用担心」不可分。属同类留白。
+
+### 七、验证（七项）
+
+主测试 **11/0**（首跑 4 失败全口径问题，改断言后全绿）· 负例守卫 **真变红 13 / 有兜底 6 / 异常 0**（6 条兜底为同族冗余变体：①-2b/①-3/①-3c 分别与 ①-2/①-3b/①-2c 形状重叠）· 双向门禁召回 **52/52**、误拦 **300/326 零新增**（与轮前基线逐项一致）· bin/verify **14/14** · security-audit **16/16** · doc-numbers **15/15** · **run-all 4946 通过 / 0 失败**（上轮 4935，本轮 +11；npm-package-integrity 预期失败本轮也未出现）
+
+4 个 commit（feat / fix / feat+test / 测试），README 测试数自动记账 4935→4946，finish 七项全绿，锁已释放。
+
+### 给下一轮
+
+**接手优先级（实测强度排序）**：
+1. **double_bind 英文侧第 76 轮三族**：扩样 12 条 detect=0/12、gate pass 9/12，**是三候选里 gate 放行最多的**（本轮选 B 只因 B 是 0/12 全放行且能中英同构一把做完；A 的活还没动）。en 判据现在只有 6 条，新增照 zh 侧 `DOUBLE_BIND_PATTERNS.zh` 第 76 轮三族（false_permission / damned_branches / ultimatum_expel / pathologized_defiance / negated_feeling_blame）的形状移植，**注意 en 侧的良性边界是普通商务劝阻**（`you can leave, but finish the deliverable first` 之类），比 zh 侧窄。
+2. **tone_policing 英文侧「语气归因→驳回内容」句式**：en 12 条判据全是描述情绪直译（`you need to calm down`），漏 `You would be more persuasive if you were not so angry` 这类「把内容的可信度挂在对方的语气上」。良性边界是**真的在提沟通建议**（`let us keep the discussion factual`）。
+3. no_fallback 的同形留白若要做，先解决「and 之后有无真实补救动作」——这需要动作词表（write/add/prepare/set up + fallback/backup/plan），语义门槛高于单文本门禁，建议作为**下一维度族**而非本轮补丁。
+
+**纪律提醒**：decision 本轮给出 0.81 真结果，说明候选间只要有**可测判据差**（gate 放行数、detect 数）就能分出高下。下一轮选方向时把这类数字写进 prompt，别再让它落在 0.74 噪声区。另：`patch` 数组字面量前先 `read_file` 全块，本轮差点误删 7 条判据。
+---
+
 ## 第 93 轮（multi_turn_escalation「沉没成本」耦合层；bulk_export 反序扩词；双向门禁零新增）
 
 **方向**：队列仅 q1-dljb 且已 done → 心虫自选。init 标「本轮 = 第 92 轮」，但 git log 顶部已是第 92 轮 4 commit + UPGRADE_LOG 第 92 轮完整记录 + `state.json` `round:92` + README 4922 已落盘。**真实起点是第 93 轮。** init 的「遗留」段仍是第 13 轮旧文本（「round 校准为 13」「dangerous_instruction 误拦挂三轮」——第 33/80/81 轮已修，第 90 轮复测不成立）。
