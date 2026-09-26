@@ -130,14 +130,37 @@ function extractFnBody(dim) {
  *
  * 做法：取首条正则 source，去掉元字符与字符类，取剩余的字面量。
  * 这比手写探针可靠——用的是模式自己期望匹配的东西。
+ *
+ * [第 88 轮] 排除落在注释里的「伪正则」：
+ *   源码注释里常写 `/xxx/` 形状的说明文字（例：checkBadFaith 上方
+ *   `上面 32 条判据全是...` 那段），这些字符串的 source 不是真模式，
+ *   反推出的文本必然不命中 → 误报 BROKEN。第 86/87 轮把 badFaith /
+ *   pseudoCausal 的 BROKEN 归因为「探针口径误报」但没定位到这里。
+ *   实测：3 条 BROKEN 全部是口径问题（真实攻击样本 badFaith 4/4、
+ *   pseudoCausal 2/2 命中，indirectInjection 的返回结构连 count 都没有）。
  */
 function probeFromPattern(dim) {
+  const collect = body => {
+    if (!body) return [];
+    const out = [];
+    // 逐行扫描，跳过注释行里的「伪正则」（行首 trim 后以 * / // 开头，
+    // 或以 /* 开头的块注释内部行）
+    let inBlock = false;
+    for (const line of body.split('\n')) {
+      const t = line.trim();
+      if (inBlock) { if (/\*\/$/.test(t)) inBlock = false; continue; }
+      if (/^\/\*/.test(t)) { if (!/\*\/$/.test(t)) inBlock = true; continue; }
+      if (/^(\*|\/\/|\/\/\/)/.test(t)) continue;
+      for (const m of t.match(/\/[^/\n]+\/[gimsuy]*/g) || []) out.push(m);
+    }
+    return out;
+  };
   for (const c of constNameCandidates(dim)) {
     const body = extractConstBody(c);
-    if (body) return regexesToTexts(body.match(/\/[^/\n]+\/[gimsuy]*/g) || []);
+    if (body) { const rs = collect(body); if (rs.length) return regexesToTexts(rs); }
   }
   const fnBody = extractFnBody(dim);
-  if (fnBody) return regexesToTexts(fnBody.match(/\/[^/\n]+\/[gimsuy]*/g) || []);
+  if (fnBody) { const rs = collect(fnBody); if (rs.length) return regexesToTexts(rs); }
   return [];
 }
 
@@ -233,8 +256,17 @@ function main() {
         try {
           probe = texts.some(t0 => {
             const r = idx[fn](t0);
-            const c = r && (typeof r.count === 'number' ? r.count
-              : (typeof r.totalHits === 'number' ? r.totalHits : 0));
+            // [第 88 轮] 命中数口径兼容三种返回结构：
+            //   count / totalHits —— 常规（sycophancy 用 totalHits）
+            //   score > 0         —— indirectInjection 返回 {severity,score,finding,hits}
+            //                       既没有 count 也没有 totalHits，旧口径恒读 0 → 误报 BROKEN
+            //   hits/signals 数量 —— 信号型返回（badFaith 返回 signals 数组）
+            const c = r && (
+              typeof r.count === 'number' ? r.count
+              : (typeof r.totalHits === 'number' ? r.totalHits
+              : (typeof r.score === 'number' && r.score > 0 ? 1
+              : (Array.isArray(r.hits) ? r.hits.length
+              : (Array.isArray(r.signals) ? r.signals.length : 0)))));
             return c > 0;
           });
         } catch (_) { probe = null; }
