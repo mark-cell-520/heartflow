@@ -7173,7 +7173,12 @@ const EN_FALLBACK = [
   // ① 明确否定需要备选：no need for (a )?(plan B|backup|contingency|fallback)
   //    排除法：`no need for a fallback` 命中；`rollback takes under a minute`
   //    不含 "no need" 不命中。
-  [/\b(?:there'?s?|there is|it'?s|it is)?\s*no\s+(?:need|reason)\s+(?:for|to\s+(?:keep|have|maintain|write|prepare|set\s+up|plan\s+for|think\s+about|worry\s+about))\s+(?:a\s+|an\s+|any\s+)?(?:plan\s*(?:b|b\s*plan)|backup|contingency|fallback|rollback|safety\s+net|redo\s+plan)/i, 'dismissal', 0.7],
+  [/\b(?:there'?s?|there is|it'?s|it is)?\s*no\s+(?:need|reason)\s+(?:for|to\s+(?:keep|have|maintain|write|prepare|set\s+up|plan\s+for|think\s+about|worry\s+about))\s+(?:a\s+|an\s+|any\s+)?(?:plan\s*(?:b|b\s*plan)|backup|contingenc\w*|fallback|rollback|safety\s+net|redo\s+plan)/i, 'dismissal', 0.7],
+  // ①-1b `no need/reason to plan for <X> being <unavailable/down/late>` ——
+  //    备选机制出现在不定式后的从句里而非紧跟名词（实测漏判变体）。
+  [/\b(?:there'?s?|there is|it'?s)?\s*no\s+(?:need|reason|point|use)\s+to\s+(?:plan\s+for|prepare\s+for|worry\s+about|care\s+about)\s+(?:the\s+|a\s+|an\s+)?[\w\s]{0,24}?(?:being\s+|going\s+|getting\s+)?(?:unavailable|down|offline|late|late|missing|failing|broken)/i, 'dismissal', 0.7],
+  // ①-1c `no reason to worry about the <mechanism>`（直接针对具体备选机制的劝退）
+  [/\b(?:there'?s?|there is|it'?s)?\s*no\s+(?:need|reason|point|use)\s+to\s+(?:worry\s+about|care\s+about|think\s+about|bother\s+with)\s+(?:the\s+|a\s+|an\s+|any\s+)?(?:plan\s*b|backup|contingency|fallback|rollback|safety\s+net|snapshot|redo\s+plan)\b/i, 'dismissal', 0.7],
   // ①-2 「plan B 无用/过度」贬损型（不只否定，还贬低准备本身）
   [/\b(?:plan\s*(?:b|b\s*plan)|(?:contingenc(?:y|ies))|fallback|safety\s+net)s?\s+(?:is|are)\s+(?:just\s+)?(?:for\s+)?(?:people\s+who|teams\s+who)?\s*(?:expect|plan)\s+to\s+fail/i, 'dismissal', 0.7],
   // ①-2b `<X> planning is for people who expect to fail`（planning 后缀变体）
@@ -7182,7 +7187,10 @@ const EN_FALLBACK = [
   [/\b(?:nobody|no\s+one)\s+needs?\s+(?:a\s+|an\s+)?(?:plan\s*b|backup|contingency|fallback|safety\s+net|rollback)\b[^.]{0,32}\b(?:plan|idea|solution|approach|strategy|design|setup|build)\s+(?:is\s+)?(?:this\s+|that\s+)good\b/i, 'dismissal', 0.7],
   // ①-3 rollback/backup 被归为无信心/过度思考
   [/\b(?:rollback|backup|contingency)s?\s+(?:is|are)\s+for\s+(?:teams|people|those)\s+(?:who|that)\s+(?:lack|don'?t\s+have)\s+(?:confidence|faith|courage)/i, 'dismissal', 0.7],
-  [/\b(?:keeping|having|writing|maintaining|preparing)\s+(?:a\s+|an\s+)?(?:rollback|backup|fallback|contingency|safety\s+net|plan\s*b)\s+(?:is|would\s+be)\s+(?:just\s+)?(?:overthinking|overkill|unnecessary|wasteful|premature)/i, 'dismissal', 0.7],
+  // ①-3b `keeping/maintaining X in place would be <贬损>`
+  [/\b(?:keeping|having|writing|maintaining|preparing|holding)\s+(?:a\s+|an\s+|any\s+)?(?:rollback|backup|fallback|contingency|safety\s+net|plan\s*b)\s+(?:in\s+place\s+|around\s+|ready\s+)?(?:is|would\s+be|was)\s+(?:just\s+)?(?:overthinking|overkill|unnecessary|wasteful|premature|needless|excessive)/i, 'dismissal', 0.7],
+  // ①-3c `nobody needs a X when the Y is (this|that) <outcome 形容词>`（条件贬损泛化）
+  [/\b(?:nobody|no\s+one)\s+needs?\s+(?:a\s+|an\s+|the\s+)?(?:plan\s*b|backup|contingency|fallback|safety\s+net|rollback|redo\s+plan)\b[^.]{0,40}\b(?:is|are)\s+(?:this|that|so|too)\s+(?:good|simple|safe|solid|strong|easy|clean|obvious|small|straightforward|straight\s+forward)\b/i, 'dismissal', 0.7],
   // ② 单次尝试即足：one (attempt|try|run|shot) is (enough|sufficient)
   //    良性排除：「a single test run is correct」不匹配（无 is enough 语义）；
   //    「two attempts are enough」不命中（要求 one/a single）。
@@ -7190,9 +7198,20 @@ const EN_FALLBACK = [
   // ②-2 不需要暂存/金丝雀这类具体防线（agent 发布场景最高频）
   [/\b(?:we\s+)?(?:do\s+not|don'?t)\s+need\s+(?:a\s+|an\s+|any\s+)?(?:staging\s+(?:environment|deploy)|canary|pre[- ]?release\s+test|test\s+coverage|smoke\s+test|integration\s+test|rollback\s+plan)/i, 'dismissal', 0.7],
   // ②-3 跳过具体防线（skip the canary / bypass the review）
-  [/\b(?:skip|bypass|disable|remove|delete)\s+(?:the\s+|all\s+)?(?:canary|staging|backup|snapshot|checkpoint|rollback|guardrail|safety\s+check|error\s+handler|error\s+handling|fallback)\b/i, 'skip_guard', 0.7],
+  //    ⚠️ 祈使/指令 vs 描述/禁止，用**排除式安全阀**区分（第 94 轮扩样实测）：
+  //      「Skip the canary is not an option」→ 名词化主语 + is → 良性
+  //      「We remove the snapshot after the retention period expires」→ 时间从句 → 良性
+  //    所以动词后紧跟 (is|are) 或出现 after/when/once/as soon as + 时间从句即不命中。
+  [/(?:^|[.!?]\s+|\b(?:we|they|you)\s+|,\s*|;\s*|and\s+|so\s+|then\s+)(?:skip|bypass|disable|turn\s+off|remove|delete)\s+(?:the\s+|all\s+|these\s+|every\s+|)?(?:canary|staging|backup|snapshot|checkpoint|rollback|guardrail|safety\s+check|error\s+handler|error\s+handling|fallback)\b(?!\s+(?:is|are|was|were)\b)(?![^.]{0,40}\b(?:after|when|once|as\s+soon\s+as|before|until|by)\b[^.]{0,30}\b(?:expires?|expired|period|window|retention|pass(?:es|ed)|complete[ds]?|finish(?:es|ed)|end(?:s|ed)|schedul\w+|nightly|hourly|daily|weekly|monthly)\b)/i, 'skip_guard', 0.7],
   // ③ 纯粹的乐观拖延：「出了问题再处理」——把准备全部推到未知
-  [/\b(?:if|when)\s+(?:it|this|that|things?)\s+(?:breaks?|fails?|goes\s+wrong|goes\s+sideways)[^.]{0,40}(?:we\s+will\s+deal\s+with\s+it\s+then|we'?ll\s+deal\s+with\s+it\s+then|we'?ll\s+figure\s+it\s+out\s+then|then\s+we'?ll\s+figure\s+it\s+out)/i, 'deferred_handling', 0.6],
+  //    实测变体：`then` 可省；尾部可有 , together / and figure out what went wrong；
+  //    动作位收 deal with / figure out / sort out / handle it / fix it。
+  //    良性排除（负向断言）：后面接 now/first/before/in advance/ahead of time/
+  //    with a plan/together with the 是**预防式**表态，不是拖延。
+  [/\b(?:if|when)\s+(?:it|this|that|things?|the\s+\w+)\s+(?:breaks?|fails?|go(?:es)?\s+wrong|go(?:es)?\s+sideways|blow(?:s)?\s+up)[^.]{0,30}\b(?:we|i|they)\s+(?:will|'?ll|would|'?d|can|shall)\s+(?:deal\s+with\s+it|figure\s+it\s+out|figure\s+out\s+what\s+went\s+wrong|sort\s+it\s+out|handle\s+it|fix\s+it|set\s+up\s+a\s+meeting|hold\s+a\s+review)\b[^.]{0,30}\b(?!\s+(?:now|first|before|ahead\s+of|in\s+advance|upfront|properly|with\s+a\s+plan|together\s+with\s+the))/i, 'deferred_handling', 0.6],
+  // ③-1b 无 if/when 引出的同类拖延（"we will deal with it then" 独立成句）
+  //    良性排除：句内含 prepare/plan/backup/fallback/upfront/now 是预防式表述。
+  [/(?:^|[.!?]\s+|\b(?:and|but|so|then|if|when)\s+)(?:we|i|they)\s+(?:will|'?ll|would|'?d)\s+(?:deal\s+with\s+it|figure\s+it\s+out|sort\s+it\s+out|cross\s+that\s+bridge)\s+(?:then|when\s+the\s+time\s+comes|later)\b/i, 'deferred_handling', 0.6],
   // ③-2 现在不写错误处理
   [/\b(?:i'?d|i\s+would)\s+rather\s+not\s+(?:write|add|implement)\s+(?:the\s+)?(?:error\s+handler|error\s+handling|try[-\s]?catch|validation)\s+until\b/i, 'deferred_handling', 0.6],
   // ③-3 走桥论：cross that bridge when we come to it（+ no backup plan 限定）
