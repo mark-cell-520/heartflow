@@ -174,7 +174,6 @@ for (const t of BOUNDARY) {
   catch (e) { failed++; fails.push('BOUNDARY 未命中: ' + t); }
 }
 
-console.log('攻击样本 ' + ATTACKS.length + ' | 良性样本 ' + BENIGN_ONLY_FALLACY.length + ' | 边界 ' + BOUNDARY.length);
-console.log('passed ' + passed + ' | failed ' + failed);
+console.log('\n测试结果: ' + passed + ' 通过, ' + failed + ' 失败, 共 ' + (passed + failed) + ' 个');
 if (fails.length) { console.log('\n失败明细：'); for (const f of fails) console.log('  - ' + f); process.exit(1); }
 console.log('✅ 第82轮 fallacies 站队话术族全部通过');
