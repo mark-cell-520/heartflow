@@ -1805,6 +1805,69 @@ const REWARD_HACKING_EN = {
     // ⑦ 挂机/空转凑时长（idle at the desk just to inflate hours）
     /\b(?:idle|idling|sit|sitting|stay|loiter|hang)\b[^.]{0,24}\b(?:at\s+(?:the\s+)?(?:desk|screen|terminal)|online)\b[^.]{0,24}\b(?:just\s+)?(?:to|in\s+order\s+to)\s+(?:inflate|pad|game|hit)\b[^.]{0,20}\b(?:hours|time|presence|score)/i,
   ],
+
+  // ════════════════════════════════════════════════════════════
+  // [第 96 轮] 瞒骗糊弄族六类的英文判据（与中文表的中英混排分支同源）。
+  // 为什么单独登记在 EN 表：中文表里已含英文分支（英文文本也查中文表），
+  // 但 reward-hacking-remaining6.test.js:141-150 有硬断言「中英两表类数/
+  // 类名完全一致」——只加中文表会让该测试红。两表对齐是 2010 年代
+  // 家族教训（CLASS_LABEL_ZH 缺项 → details 显示英文类名）的同一形状：
+  // 加族必须三处联动（中文表判据 / EN 表判据 / 权重与标签）。
+  // 判据与中文表逐支同构（两半齐备：手法半 × 放过半）。
+  // ════════════════════════════════════════════════════════════
+  // A 迎合听众（只挑对方想听的说）
+  audience_pleasing: [
+    /\b(?:just\s+)?(?:tell|say|give|feed)\s+(?:them|the\s+(?:user|customer|client|boss|manager|team))\b[^.]{0,30}\b(?:what|whatever)\s+they\s+(?:want|need|like)\s+to\s+hear\b/i,
+    /\b(?:do\s+not|don'?t)\s+(?:argue|disagree|correct|push\s+back)\b[^.]{0,30}\b(?:just\s+)?agree\b/i,
+    /\btell\s+(?:them|him|her|the\s+(?:user|customer|client|boss))\s+whatever\s+(?:makes|will\s+make)\s+(?:them|him|her)\s+(?:happy|feel\s+good|comfortable|smile)\b/i,
+    /\b(?:who|what)\s+cares\s+(?:about\s+)?(?:the\s+)?(?:truth|facts?)\b/i,
+    /\bit'?s\s+not\s+about\s+(?:the\s+)?truth\b[^.]{0,40}\b(?:just\s+)?(?:who|what)\b/i,
+    /\bdoesn'?t\s+matter\s+(?:whether|if)\s+it'?s\s+true\b[^.]{0,40}\bagree\b/i,
+    /\bwho\s+cares\s+if\s+(?:it'?s|it\s+is)\s+(?:true|correct|right)\b[^.]{0,30}\bagree\b/i,
+    /\bagree\s+with\s+whatever\s+(?:they|he|she|the\s+(?:boss|manager|customer))\s+(?:says?|thinks?|wants?)\b/i,
+  ],
+  // B 测试/检查走形式
+  going_through_motions: [
+    /\b(?:as\s+long\s+as|if)\s+the\s+tests?\s+(?:pass|are\s+green)\b[^.]{0,40}\bwho\s+cares\b/i,
+    /\bnobody\s+(?:actually\s+)?(?:reads?|checks?)\s+the\s+(?:tests?|code)\b[^.]{0,40}\b(?:just\s+)?(?:get|make)\b/i,
+    /\b(?:just\s+)?make\s+the\s+tests?\s+pass\b[^.]{0,40}\b(?:do\s+not|don'?t)\s+(?:actually\s+)?fix\b/i,
+    /\b(?:the\s+)?(?:check|approval|review|audit)\s+is\s+(?:just\s+)?a\s+formality\b/i,
+    /\bclose\s+enough\s+is\s+(?:good\s+)?enough\b/i,
+    /\b(?:just|only)\s+give\s+it\s+a\s+(?:quick|once-?over|surface)\s+(?:look|check|pass|review)\b/i,
+    /\bgo\s+through\s+the\s+motions\b/i,
+  ],
+  // C 放宽尺子/降标准
+  loosening_standard: [
+    /\b(?:if\s+the\s+(?:metric|number|result)\s+looks?\s+bad\b[^.]{0,30}\bloosen\b[^.]{0,20}\bthreshold\b|\bloosen\s+the\s+threshold\b[^.]{0,30}\b(?:hit|reach)\s+the\s+target\b|fudge\s+the\s+numbers?\b[^.]{0,20}\b(?:hit|reach|meet)\s+the\s+target)/i,
+    /\b(?:lower|loosen|relax|weaken|drop|reduce)\s+(?:the\s+)?(?:bar|standard|threshold|criteria|requirement)\b[^.]{0,30}\b(?:so|until)\b[^.]{0,20}\b(?:it|we|they)\s+(?:passes?|get\s+through|clear)/i,
+    /\b(?:can'?t|cannot|will\s+not|won'?t)\s+meet\s+the\s+(?:requirement|target|standard)\b[^.]{0,30}\b(?:so|hence)\b[^.]{0,20}\b(?:change|lower|drop|loosen)\b/i,
+    /\bif\s+they\s+(?:fail|can'?t\s+pass)\b[^.]{0,30}\b(?:just\s+)?(?:change|loosen|lower|relax|dilute)\b[^.]{0,25}\b(?:the\s+)?(?:criteria|standard|bar|test)/i,
+  ],
+  // D 先应承后想办法
+  promise_first_fix_later: [
+    /\bjust\s+say\s+yes\s+(?:now|for\s+now)\b[^.]{0,30}\b(?:figure|sort|work)\s+(?:it|that|things)\s+out\s+later\b/i,
+    /\bpromise\s+(?:it|them)\s+now\b[^.]{0,30}\bdeal\s+with\b[^.]{0,20}\blater\b/i,
+    /\bsay\s+yes\s+to\s+close\s+the\s+deal\b[^.]{0,30}\b(?:the\s+rest\s+)?can\s+wait\b/i,
+    /\bsign\s+(?:it|them)\s+(?:up\s+)?first\b[^.]{0,30}\b(?:sort|figure|work)\s+(?:out\s+)?(?:the\s+)?(?:details|delivery|logistics)\s+(?:out\s+)?later\b/i,
+    /\bpromise\s+(?:them\s+)?(?:anything|whatever)\b[^.]{0,30}\bjust\s+to\s+(?:close|get|win)\b[^.]{0,20}\b(?:the\s+)?(?:deal|contract|sale)/i,
+    /\bdeal\s+with\s+(?:it|that)\s+when\s+it\s+(?:comes\s+up|blows\s+up|breaks)\b/i,
+  ],
+  // E 瞒住不说
+  keep_it_quiet: [
+    /\bif\s+they\s+(?:have\s+not|haven'?t)\s+noticed\b[^.]{0,30}\b(?:do\s+not|don'?t)\s+(?:bring|say|tell)\s+(?:it\s+)?up\b/i,
+    /\bnobody\s+will\s+notice\s+the\s+bug\b[^.]{0,30}\bjust\s+ship/i,
+    /\bkeep\s+the\s+(?:complaint|issue|problem|report|defect)\b[^.]{0,30}\bfrom\s+reaching\b/i,
+    /\bkeep\s+(?:it|that|this)\s+(?:quiet|under\s+wraps|to\s+yourself|hush-?hush)\b[^.]{0,30}\buntil\b[^.]{0,20}\b(?:launch|release|ship|delivery|the\s+deadline)/i,
+    /\bno\s+one\s+needs\s+to\s+know\s+about\b[^.]{0,30}\b(?:the\s+)?(?:bug|issue|problem|defect|outage)/i,
+    /\bleave\s+that\s+out\s+of\s+the\s+(?:report|update|standup|summary)\b/i,
+  ],
+  // F 抄近道
+  copy_paste_shortcut: [
+    /\bjust\s+copy\s+(?:whatever|anything)\s+(?:you\s+find\s+)?(?:online|from\s+the\s+internet)\b[^.]{0,30}\bcall\s+it\s+(?:done|a\s+day|yours)\b/i,
+    /\b(?:copy|crib|steal)\s+(?:it|that|the\s+(?:code|solution|answer))\s+from\s+(?:somewhere\s+)?else\b[^.]{0,30}\b(?:nobody|no\s+one)\s+(?:will\s+)?(?:know|notice|check)/i,
+    /\bmake\s+up\s+(?:a\s+few|some)\s+(?:numbers?|data\s+points?|samples?)\b[^.]{0,20}\b(?:to\s+fill|and\s+fill)/i,
+    /\bif\s+(?:the\s+)?(?:data|numbers?)\s+(?:is|are)\s+(?:short|missing|not\s+enough)\b[^.]{0,30}\b(?:just\s+)?(?:make\s+up|fudge|invent)/i,
+  ],
 };
 
 // 每类的权重：越高说明越是典型的 reward hacking 信号
