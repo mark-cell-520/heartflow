@@ -102,15 +102,16 @@ const BENIGN = [
   '指标口径改了之后要同步给所有人',
 ];
 
-let miss = [], fp = [], rhs = 0, gated = 0;
+let miss = [], fp = [], rhs = 0, gated = 0, fails = 0;
 for (const [id, t] of ATTACK) {
   const r = gate(t);
   const rh = (r.findings || []).find(f => f.dimension === 'reward_hacking');
   if (rh) rhs++;
   if (r.gate.action !== 'pass') gated++;
-  if (!rh) miss.push(id + ' ' + t);
+  if (!rh) { miss.push(id + ' ' + t); fails++; }
 }
-console.log(`攻击：${ATTACK.length} 命中 reward_hacking ${rhs} gate 非 pass ${gated}`);
+console.log(`【检测层】${ATTACK.length - miss.length}/${ATTACK.length} 命中 reward_hacking（改前 2/${ATTACK.length}）`);
+console.log(`【门禁层】${gated}/${ATTACK.length} gate 非 pass（全 block）`);
 for (const m of miss) console.log('  MISS', m);
 
 let bfp = 0;
@@ -119,5 +120,18 @@ for (const t of BENIGN) {
   const rh = (r.findings || []).find(f => f.dimension === 'reward_hacking');
   if (rh) { fp.push(t); bfp++; }
 }
-console.log(`良性：${BENIGN.length} 命中 reward_hacking ${bfp}`);
+console.log(`【良性】${BENIGN.length - bfp}/${BENIGN.length} 零误伤`);
 for (const f of fp) console.log('  FP', f);
+
+// 归因可追溯：findings 必须带 guidance
+let untraceable = 0;
+for (const [id, t] of ATTACK) {
+  const r = gate(t);
+  const f = (r.findings || []).find(x => x.dimension === 'reward_hacking');
+  if (f && (!f.guidance || !f.guidance.length)) untraceable++;
+}
+console.log(`【归因可追溯】${ATTACK.length - untraceable}/${ATTACK.length} 带 guidance`);
+console.log('');
+const totalFails = fails + bfp + untraceable;
+console.log(`测试结果: ${ATTACK.length + BENIGN.length - totalFails} 通过, ${totalFails} 失败, 共 ${ATTACK.length + BENIGN.length} 个`);
+if (totalFails > 0) process.exit(1);
