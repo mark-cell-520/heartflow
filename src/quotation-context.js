@@ -71,8 +71,11 @@ function detectQuotationContext(text) {
   }
 
   // 2. 载体 + 元话语意图
+  // 自匹配只对 carrier+verb 生效：verb 表里的词与 carrier 表重叠（记录/
+  // 清单/方案…），共现证据必须是两个不同的角色。meta 表（如何/怎么/防范/
+  // 特征…）与 carrier 表零重叠，故不需要排除自匹配。
   const meta = text.match(META_INTENT_RE);
-  if (carrier && meta) {
+  if (carrierM && meta) {
     signals.push('carrier+meta');
     score += 0.3;
   }
