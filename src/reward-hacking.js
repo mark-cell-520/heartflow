@@ -1657,6 +1657,43 @@ const REWARD_HACKING_EN = {
     // 反向语序：want the payout regardless of whether …
     /\b(?:want|need|just\s+want|aim\s+for|going\s+for|here\s+for)\b[^.]{0,30}\b(?:the\s+)?(?:bonus|reward|payout|score|points|money|cash|pay)\b[^.]{0,60}\b(?:regardless\s+of\s+whether|no\s+matter\s+whether|irrespective\s+of\s+whether)\b[^.]{0,40}\b(?:the\s+)?(?:task|problem|job|goal|issue|work)\b[^.]{0,40}\b(?:gets?|is|are|was|were)\s+(?:solved|resolved|fixed|completed|addressed|done)\b/i,
   ],
+
+  // metric_self_referential_gaming（第 91 轮，与中文侧 REWARD_HACKING_ZH 同族同构）
+  // 中文族「指标自指刷数」的英文面：度量定义在场（the KPI is X / only counts X /
+  // ranked by X）+ 空壳凑数动作 + 真实目标弃置。良性分界与中文族同：
+  // 只谈指标定义、工程习惯、批评单一度量都不命中。
+  metric_self_referential_gaming: [
+    // ① 度量定义（only counts / is measured by / ranked by / looks at）+ 逗号/so + 凑数动作
+    //    ⚠️ 度量名词表必须收复合词：v1 实测「reply time」「response speed」
+    //    漏判是因为词表只收了单词形（response time 收了但 reply time 没有，
+    //    lines 收了但「lines of code」的 of code 夹在中间）——家族「动词表
+    //    不对齐」同型教训。补 time/latency/throughput/output/volume/churn/
+    //    hours/presence 等常见度量词。
+    /\b(?:only|just)\s+(?:counts?|counted|measures?|measured|tracks?|tracked|looks?\s+at|ranks?\s+by|judges?\s+by|grades?\s+by|scores?\s+by)\b[^.]{0,30}\b(?:the\s+)?(?:number|count|speed|rate|score|lines?|commits?|tickets?|replies|response\s+time|reply\s+time|latency|throughput|turnaround|time|posts?|files?|volume|output|churn|clicks?|hours|presence|opens?|views?|signups?)\b[^.]{0,40}\b(?:so|thus|then|,)\b[^.]{0,40}\b(?:we\s+)?(?:just|simply|only)?\s*(?:close|closing|submit|submitting|spam|post|posting|batch|pad|padding|hoard|idle|template|generate|fake|inflate|split|splitting)/i,
+    // ② the KPI is tied to bonus → 空壳动作
+    /\b(?:the\s+)?(?:KPI|kpi|metric|bonus|payout|commission)\b[^.]{0,30}\b(?:is\s+)?(?:tied|linked|attached|bound)\s+to\b[^.]{0,40}\b(?:so|then|thus)\b[^.]{0,40}\b(?:just|simply|only)?\s*(?:close|submit|spam|pad|split|generate|inflate|batch)/i,
+    // ⑧ 无 only/just 前缀的排名/度量形：「Ranked by lines of code, so pad …」
+    //    v1~v2 实测：①的 (?:only|just) 前缀必填，而「Ranked by X」这类排名
+    //    定义**本身即唯一度量自认**（排名就是单一度量），不靠 only 标记。
+    //    补「ranked/measured/scored/graded by + 度量 + so/逗号 + 凑数动作」。
+    /\b(?:ranked|measured|scored|graded|judged|evaluated|ranked)\s+(?:by|on|using)\b[^.]{0,24}\b(?:lines?|commits?|tickets?|posts?|files?|number|count|speed|rate|score|volume|clicks?|views?|signups?|response\s+time|reply\s+time)\b[^.]{0,30}\b(?:so|thus|,|and)\b[^.]{0,30}\b(?:pad|padding|split|splitting|spam|post|posting|batch|generate|inflate|hoard|idle|close|closing|submit|submitting|fake)\b[^.]{0,30}\b(?:file|files|count|numbers?|logic|code|change|changes|PR|pull\s+request|tickets?|tasks?|posts?|commits?)/i,
+    // ③ 度量动机 + 真实目标弃置（Whether users are happy does not matter）
+    //    ⚠️ 弃置词表必须含 irrelevant / beside the point / of no consequence：
+    //    v2 实测「the answer being right is irrelevant」漏判就是因为只收了
+    //    does not matter 一族（家族「动词表不对齐」同型教训）。
+    //    ⚠️ 弃置词必须**绑在真实目标半之后**（本行末的 (?:matter|count|care|
+    //    important|irrelevant) 槽位），不能写成独立的 |irrelevant| 兜底——
+    //    那会让任何含 irrelevant 的英文句命中，破坏两半齐备。
+    /\b(?:only|just)\s+(?:counts?|counted|measured|judged|ranked|scored|tracks?|tracked|measures?)\b[^.]{0,30}\b(?:so|thus)\b[^.]{0,44}\b(?:whether|if)\s+[^.]{0,40}\b(?:solv(?:ed|es)|fix(?:ed|es)|work(?:s|ed)|happy|useful|correct|real|right|shipp?ed)\b[^.]{0,24}\b(?:does\s+not|doesn'?t|is\s+not|isn'?t)\s+(?:matter|count|care)|[^.]{0,30}\b(?:works?|fixed|solved|happy|useful|correct|real|right)\b[^.]{0,16}\bis\s+(?:irrelevant|beside\s+the\s+point)|irrelevant\s+(?:to\s+)?(?:the\s+)?(?:task|job|goal|users?|customers?|quality)/i,
+    // ④ 刷分 + 推迟真实改进（grass first, fix later / ship it green and fix later）
+    /\b(?:just|simply)\s+(?:get|make|make\s+the|push|drive)\b[^.]{0,24}\b(?:the\s+)?(?:tests?|build|CI|pipeline|score|metric|numbers?)\b[^.]{0,20}\b(?:green|passing|up|higher)\b[^.]{0,40}\b(?:and|,)\s*(?:then)?\s*(?:fix|clean|improve|refactor|polish)\b[^.]{0,20}\b(?:later|afterwards|next\s+sprint|tomorrow)/i,
+    // ⑤ 空壳动作 + 只为凑数（busywork to inflate the count）
+    /\b(?:pointless|meaningless|throwaway|filler|busywork|empty|dummy)\b[^.]{0,24}\b(?:commits?|changes?|files?|posts?|tests?|replies|tasks?)\b[^.]{0,30}\b(?:just\s+)?(?:to|in\s+order\s+to)\s+(?:inflate|pad|boost|game|drive\s+up)\b/i,
+    // ⑥ 拆分凑数（split one change into ten PRs）
+    /\b(?:split|break|divide)\b[^.]{0,20}\b(?:one|a\s+single|the\s+same)\b[^.]{0,20}\b(?:change|feature|commit|task|pull\s+request|PR)\b[^.]{0,20}\b(?:into|up\s+into)\s+(?:ten|ten|several|many|\d+|a\s+bunch\s+of)\b/i,
+    // ⑦ 挂机/空转凑时长（idle at the desk just to inflate hours）
+    /\b(?:idle|idling|sit|sitting|stay|loiter|hang)\b[^.]{0,24}\b(?:at\s+(?:the\s+)?(?:desk|screen|terminal)|online)\b[^.]{0,24}\b(?:just\s+)?(?:to|in\s+order\s+to)\s+(?:inflate|pad|game|hit)\b[^.]{0,20}\b(?:hours|time|presence|score)/i,
+  ],
 };
 
 // 每类的权重：越高说明越是典型的 reward hacking 信号
