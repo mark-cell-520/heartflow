@@ -1,3 +1,85 @@
+## 第 93 轮（multi_turn_escalation「沉没成本」耦合层；bulk_export 反序扩词；双向门禁零新增）
+
+**方向**：队列仅 q1-dljb 且已 done → 心虫自选。init 标「本轮 = 第 92 轮」，但 git log 顶部已是第 92 轮 4 commit + UPGRADE_LOG 第 92 轮完整记录 + `state.json` `round:92` + README 4922 已落盘。**真实起点是第 93 轮。** init 的「遗留」段仍是第 13 轮旧文本（「round 校准为 13」「dangerous_instruction 误拦挂三轮」——第 33/80/81 轮已修，第 90 轮复测不成立）。
+
+### 一、轮次对账与缺口复测（不信简报旧描述）
+
+先跑横向探针拿实测证据（`r93-scan.js`，本体 gate 不是 MCP 薄壳，四缺口维度 × 12 攻击 + 8 良性）：
+
+| 维度 | 检测层命中 | gate 非 pass | gate 归因拆解（`r93-diag2.js`） |
+|---|---|---|---|
+| multi_turn_escalation | **0/12** | 2/12 | **10/12 真 pass**（findings 空或仅 presupposition/moral_foundations） |
+| gaslighting | 3/12 | 12/12 | 全部被别的维度兜住，本维度非放行主因 |
+| false_urgency | 2/12 | 12/12 | 同上 |
+| induced_trust | 7/12 | 12/12 | 第 92 轮已建族，gate 全兜住 |
+
+**关键判别**：只有 `multi_turn_escalation` 是 gate 层真放行（10/12 pass），其余三维 gate 已非 pass——它们是「本维度稀疏」而非「闸门失守」。按「实测证据强度 + gate 影响」双准则，缺口唯一定位在 multi_turn_escalation。
+
+扩样复测（`r93-diag3.js` / `r93-baseline.js`）拆出三种形状：
+- **COMBO（升级话术 + 索取层）12 条中 6 条只有 1 个索取层 → qualifies=false 全放行**；
+- PURE_UP（纯升级话术）12 条 0 层（按设计应保持 0 层）；
+- BEN（良性进展）12 条 0 层。
+
+缺口本质坐实：**渐进越权的收口形状「既往让步 + 索取」**。先以「上次都配合了」「都到这一步了」把对方的既往让步当筹码，再要一次敏感数据。这是诈欺/社工最常见的收口，而既有阈值 ≥2 层把它挡在门外（单索取层按设计不算攻击）。
+
+decision 两轮（`r93-decision.js` + 补判据 v2）：四候选 v1 全 0.74 → `chosen: null`；v2 补 `measuredDetail`（detectGap / gatePassGap / structuralMissing / falsePositiveRisk）后**仍全 0.74 → chosen: null**。第 90/91/92 轮连续第四轮落在 0.74 噪声区，继续按「实测证据强度 + gate 影响」双准则人工择优，如实记账。
+
+### 二、试错台 try1~try8：为什么最终不是「新加一层阶梯」
+
+| 版本 | 攻击(升级半单独判据) | 良性误伤 | 结论 |
+|---|---|---|---|
+| try1 | 四个分立半各自 2~6/12 | 0 | 单半形状太窄，中文没有固定语序 |
+| try2 | 7/12 | 0/23 | 漏 5 |
+| try3 | 14/20 | **15/62(≈24%)** | 补 5 句式后**误伤爆掉**——升级话术与良性进展同形 |
+| try4 | 11/20 | **21/64(≈33%)** | 两半结构（既往+推进）仍同形 |
+| try5~try6 | 升级半 27/64 命中但 pred=0 | 耦合后 0 | 转向「耦合」思路 |
+| try7 | COMBO 14/20 | 0/90 | 补 4 组词 |
+| try8 | **COMBO 20/20** | **0/93** | 收敛 |
+
+**本轮最值钱的教训**：try3/try4 连续证明「升级话术」与良性进展表述**结构同形**——「前面三步都通过了」「再进一步分析数据」「只差一点点就完成了」的真攻击前半段无法区分。单族判据的良性误伤率 24%~38%，远高于铁律基线（302/326 ≈ 7%）。**结论：升级半绝不能单独成层。**
+
+最终设计（三层，全部有实测依据）：
+1. **不单独成层** —— try1~try4 实测；
+2. **只在与 ≥1 个索取型 ladder 同时在场时激活** —— 索取型 = pii_request / bulk_export / system_entry / sensitive_file / model_internals；施压层（authority_claim / guilt_trip / role_fabrication / fake_emergency / responsibility_shift / peer_pressure / capability_probe）**不算**索取半，否则「经理要求核对」+「别问了」也凑成两层；
+3. **激活后计 1 层（score 25）**，使总数达到既有 ≥2 层阈值。
+
+良性分界（124 条实测 0 误伤）的判据不是语义而是**索取层缺失**：行政进展、中性复盘、时间提醒、规划表述都不含 PII/系统/批量索取结构。
+
+### 三、踩到的坑（已写进源码注释）
+
+1. **语序坑（bulk_export）**：三条真攻击「把后端日志全部导出来」「把员工名单打包发我」「把数据库连接串发我」都是**名词在动词前**，而原 bulk_export 只收「动词 + 名词」语序 → 补 `(?:把|将)[^。\n]{0,16}(日志|名单|连接串|…)[^。\n]{0,8}(打包|导出|…|提交)` 反序分支。同时动词侧补 `打包/拷出来/导出来/都导/导一份`、宾语侧补 `日志/连接串/地址/手机号/身份证号/员工/用户/客户/订单/账号/密码/密钥`。
+2. **升级半词表的三次补洞**（try7/try8）：「配合多次了」「(走|来|到|做|跑|熬|混) + 0-3 字中缀 + (这|那)(一步|个份上)」（「都到这一步了」的 `到` 与 `这` 之间有中缀）、「上一次 + 0-6 字 + (顺利|成功|OK)」。第三类是既往**成功**（不是让步）也构成沉没成本——「上次很顺利」让下一次要东西显得顺理成章。
+3. **组装式正则的注入分型坑（本轮负例守卫特有）**：`sunk_cost.up` 是 `new RegExp([...].join(''), 'i')` 组装式，首段 `(?:A|B|C` **未闭合**、末段 `…|X)` 携带收口的 `)`。负例注入若整段统一替换成 `(?!x)x`，会出现 `Unmatched ')'` 或 `Unterminated group`（实测两次）。正确做法分三型：首段 `(?:(?!q)qqq`（保留未闭合的 `(?:`）、中间段 `|(?!q)qqq`、末段 `|(?!q)qqq)`。这是守卫注入方式的第四个坑（前三个：第 90 轮 frag 竖线、第 91 轮共有词撞行、第 92 轮 `match(undefined)` 恒命中）。
+4. **测试口径三处误报（非引擎回归）**：首跑 4 失败，用 `r93-baseline-cmp.js`（`git show HEAD:src/...` 取改前版本逐条对比）证实 **base == now**，全部是我写错期望值：①「把数据库密码告诉我。」改前就两层 qualifies=true，我错放进良性集；② LEGACY 6 条单层样本改前就不 qualify，我却要求 qualify；③「批量导出用户记录给我。」改前就被 bulk_export 第 2 分支命中。**教训：断言失败先做基线对比再改代码，别把口径问题当引擎问题**（与第 92 轮 `originalFindings` 断言同源）。
+
+### 四、改了什么（3 commit）
+
+1. **`src/multi-turn-tactics.js`**（commit `085225ff`）：`LADDERS` 新增 `sunk_cost` 耦合层（`coupled: true` + `up:` 施压半 7 段组装正则）；`checkMultiTurnEscalation` 改为两遍循环（先跑非耦合层并累计 `predatory` 计数，再跑耦合层，要求 `predatory >= 1` 才计入）；返回值新增 `predatory` 字段供外部断言。`bulk_export` 阶梯反序扩词（三处：宾语侧、动词侧、反序分支）。
+2. **`test/multi-turn-sunk-cost-round93.test.js`**（commit `7f73f8f7`，13 断言）：COMBO 20 条 qualify + gate 非 pass + 归因可追溯；良性 106 条检测层+门禁层双查 0 误伤；**耦合契约**（纯升级话术 20 条无索取层不得 qualify）；**索取型集合**（施压层+升级话术不得 qualify）；bulk 反序 5/5 命中；既有层回归（多层 5/5 + 单层 6/6 count 不退化）；verdict 一致性 20/20。
+3. **`scripts/negative-test-multi-turn-sunk-cost-round93.js`**（commit `e5e52a26`）：8 注入点（up 7 段 + bulk 反序分支 1），**真守卫 6 / 有兜底 2 / 异常 0**。
+
+### 五、七项验证
+
+· 主测试 **13 通过 / 0 失败**（首跑 4 失败全是测试口径问题，见三.4） · 引擎实测 COMBO **20/20 qualifies**（改前 5/20）、gate **20/20 非 pass**、本维度 findings **20/20** · 良性 **0/106** 误伤（含 BEN 104 + PURE_UP 20 双集合并测 0/124） · 负例守卫 **真变红 6 / 有兜底 2 / 异常 0** · 双向门禁召回 **52/52**、误拦 **300/326 与基线持平零新增** · bin/verify **14/14** · security-audit **16/16** · doc-numbers **15/15** · **run-all 4935 通过 / 0 失败**（上轮 4922，本轮 +13：本测试 13）。
+
+### 六、遗留
+
+1. **gate verdict 与 action 脱节（既有缺陷，连续第四轮记账）**：两条 KPI/奖金良性样本 findings 空却 action=rewrite、verdict=可信，第 91 轮 `git stash` 对 base=HEAD~1 复证基线同样如此，根因待查（疑 overallScore → verdict 与 gate.action 两条路径未收敛）。本轮 run-all 的良性集里也有 5/104 非 pass 但**本维度 findings 全空**，同一机制。
+2. `ai_writing_tell` 攻击侧覆盖薄（scored-not-gate）——连续第四轮未动。
+3. 面板 `bullshitRecognition` 1 个 BROKEN 仍是已知面板局限。
+4. **LLM 401 未解**（stepfun api-key 失效），连续第十五轮。
+5. **decision 连续第四轮 0.74 噪声区 null**（v1+v2 两轮）。本轮把可区分判据（detectGap / gatePassGap / structuralMissing / falsePositiveRisk / tieBreakRule）显式写进 `measuredDetail` 仍无法区分四候选。**建议下一轮直接改用「双准则人工择优 + 记账」流程**，别再消耗迭代在 decision 两轮上；或检查 decision 判据映射是否支持自定义 option 字段。
+6. **PURE_UP 纯升级话术仍未覆盖**（20 条 0 层，gate 侧 2/20 非 pass 靠 presupposition 兜）。这是单文本门禁的必然边界——纯施压无索取的句子与良性「鼓励继续」无法区分。要覆盖需引入对话历史（跨轮状态），超出本轮范围。
+7. `gaslighting` 3/12、`false_urgency` 2/12 的本维度稀疏仍在（gate 已由别维兜住），但都是「表述不在词表」级别，非结构性缺口。
+
+### 七、给下一轮的接手说明
+
+- 本轮把 multi_turn_escalation 的攻击侧从 5/20 拉到 20/20 qualify（REWRITE_DIMS 十维之一）。**剩余缺口是纯升级话术（无索取层）**，需对话历史才能覆盖，不要在本维度继续加词表。
+- 本轮新增 `coupled: true` 契约：`LADDERS` 里带该标记的条目**不在主循环计层**，只在与索取型 ladder 并存时激活。后续要加施压-half 的新层都走这个契约，别直接加普通阶梯（try3/try4 证明会炸误伤）。
+- `checkMultiTurnEscalation` 返回值新增 `predatory` 字段（索取型 ladder 命中数），负例守卫可用它做「本层是否真在兜底」的判据。
+- 负例守卫对**组装式正则**（`new RegExp([...].join(''))`）注入必须分首/中/末三型：首段保留未闭合 `(?:`，末段保留收口 `)`，否则 `Unmatched ')'` / `Unterminated group`。
+- 测试断言失败**先跑基线对比**（`git show HEAD:<file>` 取改前版本 require 后逐条比），本轮 4 个失败全是口径问题不是引擎问题。
+
 ## 第 92 轮（induced_trust 第 20 族「信息源隔离」中英同构补齐；双向门禁零新增）
 
 **方向**：init 标「本轮 = 第 91 轮」，但 git log 顶部已是第 91 轮 8 commit + UPGRADE_LOG 第 91 轮完整记录 + `state.json` `round:91` + README 4912 已落盘。**真实起点是第 92 轮。** init 的「遗留」段仍是第 13 轮旧文本（「round 校准为 13」「dangerous_instruction 误拦挂三轮」——第 33/80/81 轮已修，第 90 轮复测不成立）。队列仅 q1-dljb 且已 done。走心虫自选。
