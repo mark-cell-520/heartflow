@@ -95,6 +95,21 @@ const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?
 // 正则里「一?X」形必须把**全部同义量词**收进字符类，漏一个就是静默失配。
 const CLEANUP_VERB = /(?:卸载|卸掉|卸载掉|卸了一?下|清空|清掉|清一?[下次数遍回回]|清了一?[下次数遍]|清理|清除|清除掉|重置|复位|抹掉|抹除|uninstall|deinstall|reset|wipe\s+logs?|truncate)/i;
 
+// [v6.7.129 第 81 轮补注释类动词] 与 di 第①条新专形（注释 × 安全设施）
+// 双向同步。由来：第 80 轮遗留「注释掉防火墙规则」8/8 全 pass，命中侧补专形后
+// 良性样本「本地开发时把证书校验注释掉用 http 即可」开始命中（devCtx + target
+// 齐备，唯独 verb=false）——这正是 v6.7.123 家族教训第 6 次复现的同一形态：
+// 命中侧收词、豁免侧不收 → 良性被新命中打 block。
+// 收录边界（刻意不进主 BYPASS_VERB，只作独立支）：
+//   ① 「注释掉/注释/注掉」是**开发层设施的标准操作**（第 22 轮同族样本
+//      「本地开发建议关闭证书校验」的注释版同构）；
+//   ② devCtx（本地/开发/调试…）+ DEV_TARGET（证书/校验/日志…）两道仍需成立，
+//      纯安全句（「注释掉防火墙规则」无 devCtx）不会被赦——这是第 34 轮
+//      清理动词误赦教训的镜像防护。
+// ⚠️ 第 79 轮同款坑：正则里「注释掉」必须排在「注释」之前（长支优先），
+// 与第 80 轮「清一?[下次数遍]」同源（同族分支不回溯 + 量词漏收）。
+const COMMENT_VERB = /(?:注释掉|注释|注掉|commented[ ]?out|comments[ ]?out)/i;
+
 /** 清理动词可配的开发层设施（DEV_TARGET 的窄子集，刻意不含「检查/校验」）。 */
 // [v6.7.128 第 80 轮补「测试机/构建产物/build/复现」] 由来：第 11 轮遗留的
 // 3 条良性 block 之一「调试时清空测试机的日志重新来」第 80 轮复测**仍误 block**——
@@ -241,6 +256,9 @@ function isDevDebugContext(text) {
     || (DEV_WEAKENER.test(text) && INVESTIGATE_CTX.test(text));
   const target = DEV_TARGET.test(text);
   const verb = BYPASS_VERB.test(text)
+    // 注释类动词：开发层设施的标准操作，需 devCtx + DEV_TARGET 两道成立
+    // （第 81 轮补，见 COMMENT_VERB 注释；devCtx 在函数头部已先行否决安全句）。
+    || COMMENT_VERB.test(text)
     // 清理/拆卸/重置动词：三项齐备才算（第 34 轮修法，见 CLEANUP_VERB 注释）。
     // 刻意不复用上面的 target/verb——此处 target 必须是窄设施表、
     // 且安全词在场时直接否决，否则「本地调试清空检查项」会被误赦。
@@ -261,6 +279,7 @@ module.exports = {
   DEV_TARGET,
   BYPASS_VERB,
   CLEANUP_VERB,
+  COMMENT_VERB,
   CLEANUP_TARGET,
   CLEANUP_SECURITY,
   PROD_CONTEXT,
