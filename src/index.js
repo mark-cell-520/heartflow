@@ -3820,6 +3820,33 @@ const GASLIGHT_PATTERNS = {
     // Pathologizing
     /you need help/i, /you'?re mentally ill/i, /you have issues/i,
     /get over it/i, /just get over it already/i,
+    // ── [v6.7.129] 第 98 轮：ZH 第 76 轮 negated_feeling_blame 五支的英译移植 ──
+    // 轮初实测（/tmp/probe98-gl-en.js，gate 版）：8 条英文同族攻击 0/8 命中，
+    // 13 条良性压力（商议式归因 5 + 中性事实归因 4 + 承认自身情绪 4）0 误伤。
+    // ZH 侧第 76 轮已有 5 支（zh_denied_feeling_blame）且已注册
+    // STRONG_SINGLE_TYPES（单条即 0.5），EN 表此后一直停在 0 支——这是
+    // 「一次只做一侧」结构缺口的第五次（第 71/75/76/97 轮同款结构）。
+    // 判据形状照 ZH 五支英译：否认在场感受 / 情绪->断言式归因 / 全因追问 /
+    // 激动->证明 / 疑问重述->病理化。护栏沿用 ZH 第 76 轮实测硬撑出的三条：
+    //   ① 必须带**断言式**归因（because/proves/shows/means/damn it，
+    //      不是 because of X 的商议式 maybe/perhaps/could be/wonder if）
+    //      ——13 条良性中 5 条商议式归因全属此形态，实测 pass
+    //   ② 归因结果必须是**对方内在缺陷词**（selfish/sensitive/controlling/
+    //      insecure/needy/dramatic/impossible/the problem/never satisfied）
+    //      ——中性事实归因（proposal was rejected/declined/turned down/
+    //      didn't approve）不命中，良性 4 条实测 pass
+    //   ③ 主句必须是否认/施压方在场（I'm not angry/upset/blaming you）或
+    //      全因追问（the reason you're X is Y）——单纯承认自身情绪
+    //      （I am angry / I felt hurt）无缺陷词归因，良性 4 条实测 pass
+    // 与既有 en 判据的分界：那是**单句感知贬损**（you're too sensitive），
+    // 本族是**否认+归因两段合一**——先否认自己在生气/责怪，紧接着把对方的
+    // 情绪全因归咎到对方人格缺陷上，属经典 "reality denial -> blame reversal"
+    // 的英文同构段，故单条即强信号（注册进 STRONG_SINGLE_TYPES）。
+    { pattern: /\bi(?:'m| am) (?:not (?:angry|mad|upset|annoyed|frustrated|aggravated)(?: with you| about this| at all| anymore)?|not blaming you|not saying it'?s your fault|not accusing you|not calling you)\b[\s\S]{0,40}?(?:,|\bbut\b|\bjust\b|\bit'?s just that\b|\bit'?s only that\b|—-)[\s\S]{0,60}?(?:\byou(?:'re| are) (?:just |being |so |too |simply )?(?:too |so )?(?:sensitive|selfish|inconsiderate|controlling|insecure|needy|dramatic|impossible|the problem|never satisfied)|you (?:always |constantly )?(?:make|made|turn) everything about you|(?:every(?: single)? thing|everything) you do (?:is|shows|just proves|proves) (?:how )?(?:so |just )?(?:selfish|inconsiderate|thoughtless|heartless)|you (?:always )?want(?:ed)? to control everything|(?:how|what a) (?:too |so )?(?:sensitive|selfish|inconsiderate|controlling|insecure|needy|dramatic|impossible) you(?:'re| are)|it'?s all about you)/i, type: 'en_denied_feeling_blame' },
+    { pattern: /\byou(?:'re| are)?\s*(?:only |just )?(?:so |this |too )?(?:upset|angry|mad|sad|unhappy|hurt|offended|frustrated|disappointed)\b[^.]{0,40}?\b(?:is |just )?(?:because|proves|prove|shows|show|means|say|says|tells me)\b[^.]{0,60}?\b(?:you(?:'re| are)|you have|you just|there is)\b[^.]{0,30}?\b(?:too |so |just |simply |being )?(?:sensitive|selfish|controlling|insecure|needy|greedy|dramatic|impossible|never (?:satisfied|happy|content)|the problem|always want)/i, type: 'en_denied_feeling_blame' },
+    { pattern: /\bthe (?:real |only |actual |simple )?reason (?:that )?you(?:'re| are) (?:so |this |too )?(?:upset|angry|mad|sad|unhappy|hurt|offended|frustrated|disappointed)\b[^.]{0,40}?\bis (?:that |because )?(?:you(?:'re| are)|you just)\b[^.]{0,40}?\b(?:too |so |just )?(?:sensitive|selfish|controlling|insecure|needy|dramatic|impossible|greedy|never satisfied)/i, type: 'en_denied_feeling_blame' },
+    { pattern: /\b(?:the fact (?:that )?you(?:'re| are) (?:this|so)|you(?:'re| are) (?:this|so)|getting (?:this|so)|getting (?:this|so) (?:worked up|emotional))\s*(?:upset|angry|mad|emotional|worked up|hysterical)\b[^.]{0,40}?\b(?:just )?(?:proves|shows|means|says|tells (?:me|us))\b[^.]{0,60}?\b(?:you(?:'re| are)|you have|there'?s|something)\b[^.]{0,40}?\b(?:the problem|broken|unstable|not well|not okay|sick|issues|something wrong|too sensitive|dramatic|needy|insecure|controlling|selfish|impossible)/i, type: 'en_denied_feeling_blame' },
+    { pattern: /\byou (?:only |just )?(?:get|got|become|became|be) (?:this|so) (?:emotional|upset|angry|defensive|worked up)\b[^.]{0,30}?\bbecause\b[^.]{0,40}?\byou(?:'re| are)\b[^.]{0,30}?\b(?:insecure|needy|controlling|selfish|too sensitive|dramatic|never satisfied|impossible|the problem|greedy)/i, type: 'en_denied_feeling_blame' },
   ],
 };
 
@@ -3854,7 +3881,12 @@ function checkGaslighting(text) {
   // 断言式（就是因为/就是/正说明）+ 对方内在缺陷词，商议式归因
   // （可能是因为/也许是/是不是）不命中，故弱信号叠加规则（count===1 封顶
   // 0.12）对本类不适用——它们一条就构成完整操控动作。
-  const STRONG_SINGLE_TYPES = new Set(['zh_memory_tampering', 'zh_denied_feeling_blame']);
+  // [v6.7.129] 第 98 轮加 EN 侧同款：en_denied_feeling_blame——ZH 第 76 轮
+  // 推理同构（否认在场感受 + 全因归咎到对方人格缺陷，单条即完整操控动作），
+  // 护栏由模式自身保证（断言式归因 + 对方内在缺陷词 + 否认方在场），
+  // 13 条良性压力实测 0 误伤（商议式归因/中性事实归因/承认自身情绪）。
+  const STRONG_SINGLE_TYPES = new Set(['zh_memory_tampering', 'zh_denied_feeling_blame',
+    'en_denied_feeling_blame']);
   if (count === 1 && signals[0] && STRONG_SINGLE_TYPES.has(signals[0].type)) {
     score = 0.5; // count*0.3 之上，越过 findings 门槛 0.15 与维度阈值 0.2
   }
