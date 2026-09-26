@@ -6693,6 +6693,46 @@ const TONE_POLICING_PATTERNS = {
     { pattern: /you('re| are) not being reasonable/i, type: 'en_not_reasonable', severity: 0.6 },
     { pattern: /why are you so angry/i, type: 'en_why_angry', severity: 0.6 },
     { pattern: /i can't talk to you when you('re| are) like this/i, type: 'en_cant_talk', severity: 0.7 },
+    // ── [v6.7.130] 第 95 轮：「语气归因→驳回内容」en 侧六族（与 zh 侧同构）──
+    // 缺口实测（scripts/r95-probe2.js）：en 42 条同族攻击 detect 1/42、
+    // gate 放行 40/42；良性 39 条零误伤（含 6 条真正提沟通建议的样本）。
+    // 上面 12 条全是「描述情绪」直译，漏掉本族真正的修辞形状：
+    // **tone-conditioned validity** —— 把内容的有效性/是否被倾听挂在
+    // 对方语气上（your point would be valid if you said it calmly）。
+    // 这是论证谬误：用语气抵扣内容，而非沟通建议。
+    // 判据沿用「两半齐备」：语气半（angry/upset/hysterical/attitude/tone/
+    // sarcasm/aggressive/emotional/defensive/outrage/drama/hostility/edge）
+    // 必须与**驳回半**（valid/persuasive/convincing/taken seriously/
+    // listen/accept/consider/fund/discuss/act on）同句共现，且句式带条件/
+    // 归因连接（if/would/will/because/only reason/while/without/underneath）。
+    // 良性句只陈述改进建议（stick to the data / add a chart / park the
+    // topic）——驳回半缺位 → 天然不命中。
+    // ① 有效性条件式（内容成立以语气为前提）
+    { pattern: /(?:would be|might be|could be|would carry)?\s*(?:valid|reasonable|sound|right|worth)\b[^.]{0,60}\b(?:if|once|unless)\b[^.]{0,40}\b(?:calmly|without (?:the )?(?:anger|hostility|attitude|edge|outrage|emotion|drama)|not so (?:angry|upset|emotional|worked up)|less (?:emotional|angry|shouting|aggressive|defensive)|like an adult|nicer)/i, type: 'en_tone_conditioned_validity', severity: 0.7 },
+    { pattern: /\bif (?:you|we) (?:had )?(?:said|put|framed|delivered|presented)[^.]{0,50}\b(?:calmly|nicely|without (?:the )?(?:anger|hostility|attitude|emotion))/i, type: 'en_tone_conditioned_validity', severity: 0.7 },
+    // ② 比较级说服力（说服力挂在语气上）
+    { pattern: /\b(?:would be|would have been|might be|would sound|could be)\s+(?:more\s+)?(?:persuasive|convincing|compelling|effective|credible)\b[^.]{0,60}\b(?:if|without|once)\b[^.]{0,40}\b(?:angry|upset|hostility|attitude|edge|sarcasm|outrage|emotion|drama|shouting|aggressive|worked up|defensive)/i, type: 'en_tone_persuasiveness', severity: 0.7 },
+    { pattern: /\b(?:win|gain|get|earn)\s+(?:more\s+)?(?:converts|support|buy-?in|listeners|funding|credibility)\b[^.]{0,40}\bwith\s+(?:less|fewer)\s+(?:shouting|anger|emotion|drama|outrage|volume)/i, type: 'en_tone_persuasiveness', severity: 0.7 },
+    // ③ 待遇归因（被认真对待/被倾听挂在语气上）
+    { pattern: /\b(?:nobody|no one|no listener|nobody here|nobody on this list)\b[^.]{0,40}\b(?:take|takes|took|taking)\s+you\s+seriously\b[^.]{0,50}\b(?:while|when|the way|because|as long as)\b[^.]{0,30}\b(?:upset|angry|emotional|behaving|tone|hostile|hysterical|acting)/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    { pattern: /\b(?:people|they|no one|nobody|your audience|the team)\s+(?:would|will|would not|won'?t|might)\s+(?:listen|hear|act on|consider|fund|approve|accept)\b[^.]{0,50}\b(?:if|unless|until|once)\b[^.]{0,40}\b(?:calmly|calmed down|without (?:the )?(?:anger|hostility|attitude|emotion|hysteria|tone|outrage|drama)|less (?:emotional|angry|aggressive|defensive))/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    { pattern: /\b(?:I|we) (?:would|'?d|could|might)\s+(?:accept|consider|read|answer|reply to|fund|discuss|approve)\b[^.]{0,50}\bif\b[^.]{0,40}\b(?:didn'?t reek|without|did not reek|weren'?t so|weren'?t this|wasn'?t so|wasn'?t this)\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    { pattern: /\b(?:I|we)\s+(?:can'?t|cannot|couldn'?t|won'?t|will not)\s+(?:take|see|hear|read|act on|consider)\b[^.]{0,40}\b(?:through|past|beneath|under)\b[^.]{0,30}\b(?:hostility|anger|hysteria|drama|attitude|outrage|emotion|upset|edge)/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
+    // ④ 忽视/驳回归因（把被驳回的根因归于语气）
+    { pattern: /\b(?:the )?only reason\b[^.]{0,40}\b(?:gets?|got)\s+(?:ignored|dismissed|pushback|rejected|tuned out|overlooked)\b[^.]{0,30}\bis (?:your|the)\s+(?:tone|attitude|delivery|outburst)/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
+    { pattern: /\byour tone\b[^.]{0,30}\bis (?:exactly )?why\b/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
+    { pattern: /\byou keep getting\s+(?:dismissed|ignored|overlooked|tuned out)\b[^.]{0,40}\byou\s+(?:sound|come across|are being)\b[^.]{0,20}\b(?:aggrieved|angry|hysterical|emotional|hostile|upset)/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
+    // ⑤ 内容埋没（好内容被语气毁掉）
+    { pattern: /\b(?:a |your )?(?:decent|solid|good|reasonable|sound)\s+(?:idea|point|report|analysis|argument|proposal|feedback)\b[^.]{0,60}\b(?:buried under|wrapped in|lost under|shame about|if only|but for)\b[^.]{0,40}\b(?:hysteria|anger|attitude|aggressive|frustration|outrage|hostility|edge|emotion|drama)/i, type: 'en_tone_buried_content', severity: 0.7 },
+    { pattern: /\bthere'?s a (?:good|solid|decent) point\b[^.]{0,30}\bunderneath\b[^.]{0,20}\b(?:anger|hysteria|rage|emotion|outrage)/i, type: 'en_tone_buried_content', severity: 0.7 },
+    // ⑥ 方式优先 / 劝退句式（先改语气再谈内容）
+    { pattern: /\bfocus\s+(?:more\s+)?on\s+(?:how|the way)\s+you'?re\s+(?:saying|framing|delivering)\s+it,?\s+not\s+(?:what|on what)\s+you'?re\s+saying\b/i, type: 'en_manner_over_content', severity: 0.7 },
+    { pattern: /\b(?:come back|let'?s talk|we can revisit|we can discuss)\b[^.]{0,40}\bwhen\b[^.]{0,40}\b(?:calmed down|calmer|less (?:emotional|defensive|angry)|without (?:the )?(?:anger|outrage|hysteria|upset|hostility|emotion|attitude))/i, type: 'en_manner_over_content', severity: 0.7 },
+    { pattern: /\b(?:explain|say|put|make) (?:it|this|that|the case|your point)\s+(?:again\s+)?(?:without|with fewer)\b[^.]{0,30}\b(?:outrage|anger|emotion|hysteria|shouting|accusations|hostility|edge|volume)\b[^.]{0,20}\b(?:and\s+)?(?:I|we)?\s*(?:'?ll|will|might|may)\s+(?:listen|read|consider|agree|engage)/i, type: 'en_manner_over_content', severity: 0.7 },
+    { pattern: /\bif you want to be heard,?\s+(?:you\s+)?(?:change|fix|adjust|drop|soften)\s+your\s+(?:tone|attitude|delivery)\b/i, type: 'en_manner_over_content', severity: 0.7 },
+    { pattern: /\b(?:I'?m|I am)\s+not\s+reading\s+past\b[^.]{0,30}\bwhile\b[^.]{0,20}\b(?:hostile|angry|upset|emotional|aggressive|like this)/i, type: 'en_manner_over_content', severity: 0.7 },
+    { pattern: /\b(?:you'?re|you are)\s+not\s+being\s+heard\b[^.]{0,40}\bnot\s+because of\s+(?:the\s+)?(?:idea|point|argument|content|proposal)\b/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
+    { pattern: /\b(?:being|getting)\s+(?:upset|angry|emotional|agitated)\b[^.]{0,20}\bis\s+your\s+problem\b/i, type: 'en_manner_over_content', severity: 0.6 },
   ],
 };
 
