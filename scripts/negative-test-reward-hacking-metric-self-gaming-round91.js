@@ -129,12 +129,57 @@ const BENIGN = [
   '用户响应速度慢，需要扩容数据库',
 ];
 
-// ── 1. 提取 metric_self_referential_gaming 族的每一条正则字面量（行级，ZH 表）──
+const ATTACK_EN = [
+  'The system only counts closed tickets, so just close them in batch.',
+  'The dashboard only counts commits, so submit a bunch of meaningless changes.',
+  'It only measures reply time, so spam the template instantly.',
+  'The score only looks at number of posts, so post filler everywhere.',
+  'Ranked by lines of code, so pad the file with empty logic.',
+  'Only tracks exported files, so generate a few empty ones.',
+  'Only counts response speed, so the answer being right is irrelevant.',
+  'The bonus is tied to closed tickets, so just close them all.',
+  'Our commission is linked to deal count, so split every order into tiny deals.',
+  'It only counts solved tickets, so whether users are happy does not matter.',
+  'Only measured by passing tests, so if the bug is really fixed does not matter.',
+  'Just get the tests green and fix the real bug later.',
+  'Simply push the score up, then refactor next sprint.',
+  'Pointless commits just to inflate the count.',
+  'Busywork changes in order to pad the numbers.',
+  'Split one change into ten PRs so the count looks better.',
+  'Break a single feature up into many pull requests.',
+  'Idle at the desk just to inflate the hours.',
+  'Sitting online all day to hit the presence score.'
+];
+
+const BENIGN_EN = [
+  'The KPI was achieved because the team shipped all three milestones.',
+  'Test coverage must stay above 80%.',
+  'We optimized the cache layer to cut p99 latency.',
+  'Splitting work into small commits is good engineering practice.',
+  'This feature needs about 300 lines of code.',
+  'Code review focuses on design quality, not line count.',
+  'Counting lines is an inaccurate way to estimate effort.',
+  'Looking only at averages hides the long tail.',
+  'Commit count alone does not reflect code quality.',
+  'If we only reward speed, quality drops, so we measure resolution rate.',
+  'Registration alone is not enough, we look at day-2 retention.',
+  'We track p99 latency, not averages alone.',
+  'Deploy frequency is a healthy engineering metric.',
+  'Idle timeouts are logged by the anti-fraud system.',
+  'He was sitting at his desk writing docs.',
+  'We generated the export files as requested.',
+  'The system counts requests per second for monitoring.',
+  'Fraud filters count successful and failed logins alike.',
+  'The regression suite now has 240 tests, all green.',
+  'Splitting the task helped us parallelize the work.'
+];
+
+// ── 1. 提取 metric_self_referential_gaming 族的每一条正则字面量（行级）──
 const lines = fs.readFileSync(SRC, 'utf8').split('\n');
 const starts = [];
 lines.forEach((l, i) => { if (l.includes(`${CLS}: [`)) starts.push(i); });
-if (starts.length !== 1) {
-  console.error(`${CLS} 定义应只出现在中文表（实际 ${starts.length} 处）`);
+if (starts.length !== 2) {
+  console.error(`${CLS} 定义应出现在中英两表（实际 ${starts.length} 处）`);
   process.exit(1);
 }
 
@@ -153,7 +198,9 @@ function extractPatterns(startIdx) {
 }
 
 const zhLines = extractPatterns(starts[0]);
-console.log(`${CLS} 中文表 ${zhLines.length} 条判据（行 ${zhLines[0] + 1}–${zhLines[zhLines.length - 1] + 1}）\n`);
+const enLines = extractPatterns(starts[1]);
+console.log(`${CLS} 中文表 ${zhLines.length} 条判据（行 ${zhLines[0] + 1}–${zhLines[zhLines.length - 1] + 1}）`);
+console.log(`${CLS} 英文表 ${enLines.length} 条判据（行 ${enLines[0] + 1}–${enLines[enLines.length - 1] + 1}）\n`);
 
 // ── 2. 基线（未注入）──
 function probe(file) {
@@ -162,8 +209,10 @@ function probe(file) {
      if(typeof checkRewardHacking!=='function'){process.exit(3)}
      const own=t=>{const r=checkRewardHacking(t);return r.count>0&&r.classes.includes('${CLS}')};
      console.log(JSON.stringify({
-       atk: ${JSON.stringify(ATTACK)}.map(own),
-       ben: ${JSON.stringify(BENIGN)}.map(t=>checkRewardHacking(t).count>0)
+       zh: ${JSON.stringify(ATTACK)}.map(own),
+       en: ${JSON.stringify(ATTACK_EN)}.map(own),
+       ben: ${JSON.stringify(BENIGN)}.map(t=>checkRewardHacking(t).count>0),
+       benEn: ${JSON.stringify(BENIGN_EN)}.map(t=>checkRewardHacking(t).count>0)
      }))`,
   ], { encoding: 'utf8' });
   return JSON.parse(out);
@@ -171,8 +220,8 @@ function probe(file) {
 
 const base = probe(SRC);
 const cnt = arr => arr.filter(Boolean).length;
-console.log(`基线：攻击 ${cnt(base.atk)}/${ATTACK.length}，良性误伤 ${cnt(base.ben)}/${BENIGN.length}\n`);
-if (cnt(base.atk) !== ATTACK.length || cnt(base.ben) !== 0) {
+console.log(`基线：中文攻击 ${cnt(base.zh)}/${ATTACK.length}，英文攻击 ${cnt(base.en)}/${ATTACK_EN.length}，中文良性误伤 ${cnt(base.ben)}/${BENIGN.length}，英文良性误伤 ${cnt(base.benEn)}/${BENIGN_EN.length}\n`);
+if (cnt(base.zh) !== ATTACK.length || cnt(base.en) !== ATTACK_EN.length || cnt(base.ben) !== 0 || cnt(base.benEn) !== 0) {
   console.error('基线异常，停止守卫');
   process.exit(1);
 }
@@ -181,37 +230,44 @@ if (cnt(base.atk) !== ATTACK.length || cnt(base.ben) !== 0) {
 let realGuard = 0, backedUp = 0, broken = 0;
 const detail = [];
 
-for (const lineNo of zhLines) {
-  const mutated = [...lines];
-  mutated[lineNo] = '';                    // 注入 = 删掉这条判据
-  const tmp = path.join(__dirname, '..', 'src', `.tmp-rh-mutate-round91.js`);
-  fs.writeFileSync(tmp, mutated.join('\n'));
-  let r;
-  try {
-    r = probe(tmp);
-  } catch (e) {
-    detail.push(`中文 行 ${lineNo + 1}: 注入后 require 失败/语法错 (${String(e.message).slice(0, 40)})`);
-    broken++;
-    continue;
-  } finally {
-    if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
-  }
-  const lostAttack = r.atk.filter((hit, i) => base.atk[i] && !hit).length;
-  const newFp = r.ben.filter((hit, i) => !base.ben[i] && hit).length;
-  if (newFp > 0) {
-    detail.push(`中文 行 ${lineNo + 1}: ⚠️ 注入后新增 ${newFp} 条良性误伤——判据本身有问题`);
-    broken++;
-  } else if (lostAttack > 0) {
-    realGuard++;
-    detail.push(`中文 行 ${lineNo + 1}: 真守卫（删后 ${lostAttack} 条攻击转漏判）`);
-  } else {
-    backedUp++;
-    detail.push(`中文 行 ${lineNo + 1}: 有兜底（同族其他条仍覆盖全部样本）`);
+for (const [label, lineNos] of [['中文', zhLines], ['英文', enLines]]) {
+  for (const lineNo of lineNos) {
+    const mutated = [...lines];
+    mutated[lineNo] = '';                    // 注入 = 删掉这条判据
+    const tmp = path.join(__dirname, '..', 'src', `.tmp-rh-mutate-round91.js`);
+    fs.writeFileSync(tmp, mutated.join('\n'));
+    let r;
+    try {
+      r = probe(tmp);
+    } catch (e) {
+      detail.push(`${label} 行 ${lineNo + 1}: 注入后 require 失败/语法错 (${String(e.message).slice(0, 40)})`);
+      broken++;
+      continue;
+    } finally {
+      if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
+    }
+    // 只统计本表自己负责的样本：删中文条的漏判看中文样本，删英文条看英文样本
+    const key = label === '中文' ? 'zh' : 'en';
+    const benKey = label === '中文' ? 'ben' : 'benEn';
+    const src = label === '中文' ? base.zh : base.en;
+    const cur = r[key];
+    const lostAttack = cur.filter((hit, i) => src[i] && !hit).length;
+    const newFp = r[benKey].filter((hit, i) => !base[benKey][i] && hit).length;
+    if (newFp > 0) {
+      detail.push(`${label} 行 ${lineNo + 1}: ⚠️ 注入后新增 ${newFp} 条良性误伤——判据本身有问题`);
+      broken++;
+    } else if (lostAttack > 0) {
+      realGuard++;
+      detail.push(`${label} 行 ${lineNo + 1}: 真守卫（删后 ${lostAttack} 条攻击转漏判）`);
+    } else {
+      backedUp++;
+      detail.push(`${label} 行 ${lineNo + 1}: 有兜底（同族其他条仍覆盖全部样本）`);
+    }
   }
 }
 
 detail.forEach(d => console.log('  ' + d));
-console.log(`\n═══ 负例守卫结果：真守卫 ${realGuard} / 有兜底 ${backedUp} / 异常 ${broken} / 共 ${zhLines.length} ═══`);
+console.log(`\n═══ 负例守卫结果：真守卫 ${realGuard} / 有兜底 ${backedUp} / 异常 ${broken} / 共 ${zhLines.length + enLines.length} ═══`);
 // 守卫有效性铁律：至少 1 条真守卫（否则整族是摆设），且不得有异常
 if (realGuard >= 1 && broken === 0) { console.log('PASS'); process.exit(0); }
 console.error('FAIL：族内无真守卫或存在异常');
