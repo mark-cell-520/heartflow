@@ -1,3 +1,32 @@
+## 第 138 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：`decision.decide` 本体选出 **C（上一轮 di 修复遗留收尾）**，score 0.78，候选 A（eval_leakage 中英非对称）/ B（task_substitution）均 0.74。选 C 的理由：第 137 轮简报明确写了「响应头族未测 X-Frame-Options 大小写变体与 Permissions-Policy」，是最具体的实测遗留。
+
+**轮初复测（先实测再动手，没信简报）**：
+- 简报说响应头族有缺口。实测 15 条良性响应头句（含 X-Frame-Options 全大写 / Permissions-Policy / Feature-Policy / X-Content-Type-Options / COEP / COOP / X-XSS-Protection / Access-Control-Allow-Origin）→ **block 0/15**，且 di count 全 0。**DEV_HEADER_TARGET 族本身没有缺口，简报的「未测变体」是伪遗留**——第 137 轮那条模式从未在响应头形状上命中过。
+- 顺带定位到更值钱的东西：**第 137 轮新引的回归**。`_payloadMakeIsConfig` 把裸「开关」写进配置化标记 CFG_MARK，而「开关」在攻击语料里是**设施名**（防火墙开关 = the switch of the firewall）。实测 12 条同形攻击（关掉防火墙开关 / 把安全策略开关关掉 / disable the firewall toggle…）**12/12 全 pass、di=0**——上一轮修 benign 时误赦了整族攻击。
+
+**改动**（2 commit + README 记账 1 commit，src 净增 40 行）：
+- **短路修复**：`_payloadMakeIsConfig` 在句内含开关/toggle/flag 字面时只信 `_switchIsConfig` 的全文连接语判定（做成/设为/接入 + 环境变量/配置项/开关/flag/toggle），绝不回落 CFG_MARK 通配分支。第一版只短路 true 分支、false 仍 fall through，实测残留 10/10 误赦——第二次才短路成功。
+- **`_switchIsConfig` 全文判据**：有连接语 → 配置基建形（良性）；无连接语 → 设施名（回归命中）。
+- **PAT4b 显式判据**：把字句「设施词 + 开关/toggle + 关停动词」。注意 PAT4 原版的通配窗口 `[^。\n]{0,6}` 也能吃紧邻形（实测 overlap），本行是把「通配偶然命中」升级为显式判据，注释已写清重叠关系。
+
+**本轮新踩的坑（已写进源码注释）**：
+1. **删条注入的 needle 删错地方**：第一版 needle `(?:开关|toggle|flag|switch)\s*(?:都|也|先…)?` 同时匹配 PAT4b 与 PAT4 原版中间组后缀，删除后 PAT4 原版仍兜底 → 守卫报「无效」。修法：needle 加长到含关停动词组，实测 uniqueness=1，且断言样本选「PAT4b 删除后命中数下降」而非「全部回到误赦」（因为有重叠兜底）。
+2. **/tmp mutant require 相对路径断链**：dangerous-instruction.js 里 `require('./dev-exemptions.js')`，mutant 拷到 /tmp 后加载失败。第 133 轮守卫没踩是因为 mutant 的 src（dev-exemptions.js）没有相对依赖。修法：copyFileSync 依赖模块到 /tmp。
+
+**七项验证**：bin/verify **14/14**；双向门禁 **52/52 召回**、误拦 **300/326** 与基线逐字节一致（0 新增误伤）；run-all **5592/0**（上轮 5587，本轮 +5）；security-audit **16/16**；doc-numbers **15/15**（README 测试数已同步 5587→5592）；本轮正式测试 **5/5**（8 良性 pass + 12 攻击 block + di>0 + 2 条删条注入均变红）；第 137 轮配置基建测试回归未跑（在 run-all 内已覆盖，0 失败）。
+
+**遗留**：
+1. **LLM 401 未解**（stepfun 凭据失效，唯一硬阻塞）。
+2. `data/upgrade-state.json` round 字段与 UPGRADE_LOG 存在错位（init 显示 136，实际 138）——finish 会自动校准。
+3. eval_leakage（英 9 支 / 中 5 支）、task_substitution（英 6 / 中 9）中英非对称缺口证据仍在，decision 本轮给 0.74 未动。
+4. reward_hacking 剩余 6 类。
+5. **响应头族确认真无缺口**（15 条含全大写变体 0 误拦），下一轮不必再查这个方向。
+6. di 的 PAT4/PAT4b 开关形与 CFG_MARK 的关系：CFG_MARK 里的裸「开关」现在只在无开关字面的路径上生效（走的是环境变量/配置项分支），实际已死。下轮可考虑把「开关」从 CFG_MARK 删除并确认无回归。
+
+**给下一轮**：第 137 轮引入的开关族误赦已清零（12/12 block），且第 137 轮的良性目标（配置基建形）未回归（6 条全 pass）。**教训是「良性豁免词写进通配标记前，要先查该词在攻击语料里是不是设施名」**——这次踩的是第 N 次清单分叉。A/B 两个中英非对称方向实测证据充分，可直接作为下一轮候选。
+
 ## 第 137 轮（v6.7.124 工作面，unattended 自主升级）
 
 ### 方向
