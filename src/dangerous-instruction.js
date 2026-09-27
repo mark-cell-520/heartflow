@@ -693,7 +693,7 @@ const CFG_WINDOW = 16;
 // 而「开关」在攻击语料里是**设施名**（防火墙开关 = the firewall switch /
 // the auth toggle）。第 137 轮为「把 CSRF 校验做成开关」配置基建形放行时
 // 把裸「开关」写进配置化标记，第 138 轮复测实测误赦 11/12 条同形攻击
-// （形状见 scripts/probe-di-final-138.js ATTACK 下标），全部 gate pass。
+// （形状见第 138 轮 probe-di-final ATTACK 下标），全部 gate pass。
 // 这是「良性豁免词与设施名没分开」的清单分叉复发。
 // 修法（不是删词）：开关/toggle/flag 字面**降级为有条件配置化标记**，
 // 必须带配置化连接语才算配置语义；无连接语即判为设施名，回归命中。
@@ -727,7 +727,7 @@ function _payloadMakeIsConfig(text, start, len) {
   // 开关族短路：句内存在开关/toggle/flag 字面时，只信 _switchIsConfig 的
   // 精确判定（带连接语才算配置化）。**绝不再回落到 CFG_MARK 通配分支** ——
   // 第 137 轮把裸「开关」写进 CFG_MARK，导致「关掉防火墙开关」族 11 条
-  // 攻击全部误赦（第 138 轮实测见 scripts/probe-di-final-138.js）。
+  // 攻击全部误赦（第 138 轮实测见 probe-di-final 探针）。
   //
   // ⚠️ 第 138 轮补丁（短路第一版后实测）：只测 text 不够 —— 把字句
   // 「把防火墙开关关掉」「把防火墙 toggle 关掉」里开关在句首，而命中段
