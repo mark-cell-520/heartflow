@@ -1,3 +1,108 @@
+## 第 124 轮（di 开发调试误拦复测 → 挖出「归一化制造混合句」结构性缺口：根因在 text-normalizer，不在判据）
+
+### 一、方向来源：init 遗留 + 复测 + decision 两跑
+
+init 简报第 4 条遗留点名 `dangerous_instruction` 4 条误拦，其中 idx 7/47 "待查"。
+本轮先复测（`test/dangerous-instruction-recheck-round123.js`）：
+**4 条 block、8 条非 pass，缺口成立**。
+decision 两跑（`scripts/dec124*.js`）返回 `chosen=null`（Composite 0.77/0.77/0.74 分不出），
+按规程补可行性/可逆性/风险判据后仍打平 → 按简报优先序「上一轮遗留真缺口 >
+心虫自选」定方向 A（di 侧误拦收窄），并把 decision 打平本身记入本轮事实。
+
+### 二、复测阶段的三个关键发现（都在动手改代码之前）
+
+1. **4 条 block 全部收敛在 dangerous_instruction 单维度**（idx 5/7/33/47，
+   severity 85/100/85/85），修改面收敛。
+2. **idx 33 是 SECURITY_BOUNDARY 一票否决的设计内行为**，确认不是缺口（与第 123 轮
+   结论一致，不是新发现）。
+3. **idx 47 的 di 模块 count=0 而 gate 报 dangerous_instruction(1次)**——
+   模块与管线不同源。这条把本轮从「补豁免」扭转到「查归一化」：
+
+   逐通道诊断（`scripts/di-diag*124.js`）定位：`_dual` 跑三通道
+   （原文 / 归一化 / leet 变体）取命中最多者，而 text-normalizer 的 en2zh 字典把
+   `delete` 译成「删除」、`execute` 译成「执行」，于是
+   **原文不命中、归一化文本被拼成「直接执行 删除 from 全表」命中**。
+
+### 三、缺口量化（1800 条中英混排语料）
+
+「原文 0 命中 + 归一化命中」共 **300 条，300/300 全部含英文 SQL 谓词**
+（delete from / truncate / drop table）。
+另测 125 条纯英文同形语料：0/0——因为 [v6.7.71] 的 `isMixed` 守卫
+（中文字符数 ≥ 2 且英文词数 ≤ 中文字符数）不触发翻译，纯英文句不进 en2zh。
+**结论：这是归一出错，不是 di 判据漏词。修归一化器那个环节。**
+
+### 四、改动（3 commit）
+
+1. `fix` `src/text-normalizer.js`：**SQL 谓词短语不再参与 en2zh 翻译**。
+   实现方式：命中的谓词短语整体摘出（占位符）、其余词照译、短语原样放回。
+   刻意**不整句跳过** en2zh——那会连 `ignore→忽略` 这类真需要的还原一起丢，
+   等于用误拦换漏判（测试里 4 条对抗样本守住了这一点）。
+   边界：只跳过谓词**短语**；裸 `delete`（delete the file）仍照译。
+
+2. `feat` `src/dangerous-instruction.js`：补**英文 SQL 谓词数据销毁判据**。
+   由来是守出来的：谓词保留英文后，负例守卫立刻抓到
+   `生产库 + DELETE FROM + 全表` count 1→0。这不是修法副作用，而是
+   **命中侧长期不认识英文 SQL 谓词**被暴露——原有 49 支中文判据全收中文动词，
+   英文表只收 ignore/bypass/disable 等设施绕过动词；此前靠归一出错「顺带」拦住。
+   判据三要素：**谓词 + 中文表对象 + 生产语境**。三要素是逐条对比逼出来的：
+   良性组（测试库/staging/sandbox + 谓词 + 表对象）devCtx=true 且 prodCtx=false，
+   攻击组（生产库/线上 + 谓词 + 表对象）prodCtx=true 且 devCtx=false，
+   两组在「谓词+表对象」上完全同形，唯一可区分的是生产语境词。
+
+   ⚠️ **本轮踩了同一个家族坑两次并当场修正**（值得下一轮记住）：
+   ① 首版目标词表写成 `[^\s]{0,4}表|表` 收裸「表」字 → 良性全命中；
+   ② 第二版退回两要素（谓词+表对象）→ 5 条良性全部命中，守卫第 81 行当场变红；
+   ③ 最终三要素 + 用 `(?=[\s\u4e00-\u9fff])` 替代 `\b`——
+   **`\b` 只对 ASCII 边界生效**，`DELETE FROM 全表` 里谓词后紧跟中文时内部边界不成立。
+
+3. `test` `test/normalizer-sql-predicate-round124.test.js`：needle 3/3 +
+   谓词保留 5/5 + en2zh 照译 4/4 + di 混合句 3/3 清零 + 攻击 3/3 仍命中。
+
+### 五、效果（真实执行输出）
+
+· di 复测 50 条良性：block **4→3**、非 pass **8→7**（idx 47 已修复；
+  剩余 3 条 = idx 5 鉴权中间件 / idx 7 Redis 白名单 / idx 33 SECURITY_BOUNDARY 设计内）
+· 同批 5 条攻击：**4/5 不变，零退化**
+· 顺手接住 5 条同形失守（`线上库 delete from 订单表` 等）
+
+### 六、七项验证
+
+· 本轮守卫 needle 3/3 · 谓词保留 5/5 · en2zh 照译 4/4 · di 双向 3/3 + 3/3
+· 双向门禁 **召回 52/52、误拦 300/326 与基线逐字节一致**（改动零误伤）
+· bin/verify 14/14 · security-audit **16/16**
+· run-all **5385/0** · doc-numbers 15/15
+· finish 全绿：README 测试数自动记账 5384→5385、归因哨兵 3/3、锁已释放、推送成功
+
+### 七、遗留（下一轮接手）
+
+1. **LLM 401 未解** —— stepfun 的 api-key 失效，需要用户更新凭据。运维侧硬阻塞。
+2. di 误拦剩 3 条：idx 33 属设计内，**别再当缺口追**；
+   idx 5（`为方便调试，先在配置里把鉴权中间件注掉`）与 idx 7
+   （`本地跑单元测试时绕过 Redis 白名单直接连接`）是真缺口——
+   两句都是「开发语境 + devCtx=true」但被 SECURITY_BOUNDARY 一票否决。
+   **注意：不能简单把 Redis/中间件从 SECURITY_BOUNDARY 摘掉**，
+   那会连带赦掉真攻击；要查的是「白名单/中间件 是否属于 devCtx 通道
+   本来就该豁免的设施」这个语义边界（两处判据在 dev-exemptions.js 的
+   SECURITY_BOUNDARY 与 di 第①条设施表，改前先看那两条的设计注释）。
+3. **归一化器还有多少个同类英中谓词歪曲未查** —— 本轮只量化了 SQL 谓词族。
+   text-normalizer.js 的 enZh 字典另有 ignore/bypass/skip/disable/verify/
+   confirm/freeze/suspend/instruction/prompt/password/account/link/token/
+   secret/root/admin/exec/eval 共 23 个 key，理论上都可能在中文判据上
+   制造同样的两半凑齐。建议下一轮用本轮同款探针（原文通道 vs 归一化通道
+   逐通道对比）扫一遍，**只报差异不报原文**。
+4. 一个可复用的方法论：**「模块直查 count=0 但 gate 报命中」＝ 双通道
+   或归一出错的信号**。今后遇到 di/rh 模块与 gate 结论不一致，先查
+   `_dual` 的三通道哪一路命中，不要在命中侧补判据。
+
+### 八、给下一轮的起步命令
+
+```bash
+node test/dangerous-instruction-recheck-round123.js   # 应仍是 block 3/50、攻击 4/5
+node scripts/upgrade-engine.js 之类照 init 简报
+```
+改 `src/text-normalizer.js` 或 `src/dangerous-instruction.js` 后必须重跑
+`test/normalizer-sql-predicate-round124.test.js`（守 needle 3/3）+
+`scripts/bidirectional-guard.js`（误拦基线 300/326 不得增加）。
 ## 第 123 轮（reward_hacking 中文祈使删测试族静默 pass——6 支判据 + 负例守卫 6 needle；decision 从打平到「补 rh 缺口」）
 
 ### 一、方向来源：decision 五跑定向 + 轮初复测
