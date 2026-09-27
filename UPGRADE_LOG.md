@@ -1,3 +1,69 @@
+## 第 115 轮（victim_blaming「不作为=默许」族：zh 9/9、en 9/9 全 rewrite；decision 三跑一致选 A；修两个真 bug）
+
+### 一、decision 本轮定向（三跑一致）
+
+探针 `/tmp/decide115.js`（候选带实测比例数字，走第 99 轮修的 x/y 通道）：
+
+```
+run1: chosen="A" conf=0.7   run2: chosen="A" conf=0.7   run3: chosen="A" conf=0.7
+A composite=0.84 gap=1 src=ratio | B=0.8 | C=0.8 | D=0.77
+```
+
+第一版 prompt 用逗号拼接候选段落，`_parseOptionsFromText` 解析出 4 个候选但两次返回 chosen=null conf=0——与第 85/86 轮同族的解析形态问题；换行分隔 `[A] …` 后三跑一致选 A。
+
+A = victim_blaming「不作为=默许」族（复测坐实 zh 9/9 漏判、en 8/8 漏判，REWRITE_DIMS 成员）· B = instrumental_reasoning en 侧剩余 3 条（en 5/8）· C = ai_writing_tell en 套话（en 5/8，不强制 gate）· D = victim_blaming「知情同意回溯」族（复测检出 6/8，面积最小）。
+
+### 二、缺口实测（复测，不信简报旧描述）
+
+跑 `/tmp/probe115-vb-sc.js` + `/tmp/probe115-attr.js` 复测：
+- **victim_blaming「不作为=默许」族**：zh 10 条攻击样本，9 条 `gate action=pass`（唯一 1 条 rewrite 是第 110 轮 D1b 支偶然命中）；en 8 条攻击 8 条全 pass。缺口坐实。
+- **dev 语境良性 8 条**：仅 1 条 block，归因 dangerous_instruction，逐条复读 `src/dev-exemptions.js` 注释确认**这是设计意图**（鉴权属真实安全边界，dev 也不豁免）。init 简报里挂了多轮的「dev 语境误拦缺口」再次复测不成立，不再排期。
+
+### 三、改了什么（3 commit，全部已提交）
+
+- **`src/index.js`**（VICTIM_BLAMING_PATTERNS，第 115 轮注释块）：新族 **zh_silence_as_consent 4 支 + en_silence_as_consent 9 支**（共 13 支）
+  - zh F1 受害情境+否定不作为动作+同意推断链 / F2 逆序（推断+同意+受害情境）/ F3 受害情境+沉默短语+主观断语 / F4 退场自由否定+自愿续段
+  - en E7 受害词+不作为+同意结论 / E8 受害词+never+动作 / E9 受害词+did not resist+wanted / E10 stayed silent+silence means / E11 受害词+did not leave+went along / E12 受害词+never pushed back+was fine / E13 nobody heard her object+consented / E14 通用链（受害词前向断言+否定+动作+结论）
+- **`test/victim-blaming-silence-consent.test.js`**（新，11 断言）：23 攻击全 rewrite/block、32 良性零误伤、既有三族不退化、双向门禁基线、gate 端到端归因、模式表自身卫生
+- **`scripts/negative-test-victim-blaming-silence-consent-round115.js`**（新负例守卫）：13 支判据逐支 needle 注入 **8 变红 / 4 有兜底 / 0 异常**
+- **`README.md`**：passing tests 5333→5344 记账 + changelog v6.7.124 追加条目
+
+### 四、踩到的坑（三个，两个是真 bug）
+
+1. **F1/F2/F3 顶层 `|` 未分组（真 bug，由自己的探针抓出）**：受害词三个分支（被X 句 / 受X 句 / 遇到X 句）与后续否定动作链之间漏了外层 `(?: … )` 分组，`|` 绑定最松——任何含「被骚扰」的句子都单独命中。探针 `/tmp/probe115-widen.js` 实测 **5 条良性全部误伤**（保持沉默是常见创伤反应 / 第一时间报了警 / 至今没有离婚律师已介入 等）。外包分组后归零。这是「顶层 | 绑定」教训在 `src/index.js` 模式表第 N 次复现（第 116 轮 dehumanization 同类），写判据后必须跑良性池归因，不能只看攻击样本。
+2. **E14 `/^(?=…)/` 形状在本引擎恒 miss（真 bug 认知）**：前向断言写对了但加 `^` 行首锚后三条分散攻击全 miss。二分探针（`/tmp/probe115-bisect.js`）逐段切除定位：`full=miss / noAnchor=HIT / chainOnly=HIT / assertOnly=HIT`——`^` 锚与前置 lookahead 组合后被镜像成永不匹配。去掉 `^` 后三条全命中。形状教训：**前向断言判据不得加行首锚**。
+3. **守卫样本两次写错**：E7/E11 换「专属形态」后未注入也 count=0（候选形态落在判据覆盖外：`the molestation` / `did not leave` 缺谓语受害词或主语形态不匹配），改回可命中形态。E9/E12 保留兜底如实记账（en 侧同义支互兜，与第 107/108/110 轮同族教训第五次复现）。
+
+### 五、七项验证
+
+- 主测试 **11/11**
+- 负例守卫 **8 变红 / 4 有兜底 / 0 异常**，needle 校验 0 异常，对照副本 0 异常
+- 双向门禁：召回 **52/52**，误拦 **300/326 零新增**（基线不变）
+- `bin/verify.js` **14/14**
+- `security-audit.test.js` **16/16**
+- `doc-numbers-accuracy.test.js` **15/15**（README 记账后）
+- `test/run-all.js` **5344 通过 / 0 失败**（基线 5333 + 新测试 11）
+- 第 110 轮自引入回归检查：`victim-blaming-attribution.test.js` **11/11**；`victim-blaming-behavior-attribution.test.js` **13/13**；`victim-blaming-english-coverage.test.js` **22/22**；`benign-nonpass-calibration.test.js` **5/5**
+- 3 commit 已提交
+
+### 六、遗留
+
+1. **victim_blaming en 侧同义支重叠**：E7/E9/E11/E12 语义高度重叠（受害词+否定+动作+结论的四个切面），负例守卫 4 支只能记「有兜底」。若后续要提纯，可按「结论锚点类型」（must have consented / wanted / went along / was fine）合并成参数化一支——但合并会削弱 needle 精度，暂不动。
+2. **顶层 `|` 分组体检**建议纳入后续轮：`src/index.js` 各模式表都有分支顶层出现裸 `|` 的形状，本轮只修了新族 3 支。可用括号深度扫描器做一次全表体检（与第 116 轮 dehumanization 同类修法同源），但那是独立方向，不在本轮范围。
+3. **instrumental_reasoning en 侧剩余 3 条**（第 108 轮记账仍在）。
+4. **ai_writing_tell en 3 条套话**（不强制 gate 动作，优先级低）。
+5. LLM 401 / HTTP 451（stepfun key 失效）仍未解——运维侧凭据，非引擎可改。本轮靠「形状描述、原文零进上下文」纪律全文未触发审查。
+6. `data/upgrade-state.json` 的 round 计数与 UPGRADE_LOG 有偏差（init 已校准为 13，UPGRADE_LOG 实际记到 110）——计数口径由 upgrade-engine 自己维护，不动。
+
+### 七、给下一轮的接手说明
+
+1. **优先**：`src/index.js` 模式表「顶层 `|` 未分组」全表体检。本轮在新族自伤 5 条良性后坐实这个形状危害，第 116 轮 dehumanization 已修过一次同形状。做法：写一个括号深度扫描器（不要用「数 `(?:` 出现次数」的天真法——第 116 轮的教训是它会误报），找出「分支顶层出现裸 `|`」的模式，逐支 A/B 验证行为是否变化（**0 条变化就如实记账，不改**），有变化的才修。预计一次可清一批历史欠账。
+2. **次优先**：victim_blaming「知情同意回溯」族（zh/en 各 1-2 条 pass，形状为「当事人知情/自愿选择=后果自负」，如「他早知道有风险还是接了这活」），本轮复测检出 6/8，与第 115 轮新族不同形状（那是「不作为=默许」，这是「知情=自负」）。样本池可扩 `/tmp/probe115-vb-sc.js`。
+3. **守卫纪律再确认**：写守卫前先跑逐支归属矩阵（`/tmp/probe115-matrix.js` + `/tmp/probe115-owner.js`），样本不得同时被两支命中；换专属形态后必须回跑对照组（未注入也 count>0 才算健康样本）——本轮两次样本写错都是漏了回跑对照组。
+4. 其余候选：instrumental_reasoning en 3 条、ai_writing_tell en 3 条、E7-E12 同义支合并评估（第 115 轮遗留第 1 条）。
+
+---
+
 ## 第 110 轮（victim_blaming「受害者先有过错」回溯归因族：zh 5/8→8/8、en 2/8→8/8；decision 三跑一致选 A；守卫 15/15 真守卫）
 
 ### 一、decision 本轮定向（三跑一致）
