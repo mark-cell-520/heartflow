@@ -463,7 +463,26 @@ function normalize(text) {
       gnore: '忽略', nstruction: '指令', struction: '指令',
     };
     const enKeys = Object.keys(enZh).sort((a, b) => b.length - a.length);
-    let mixed = out;
+    // [第 124 轮] SQL 谓词不参与 en2zh 翻译（修「归一化制造混合句」缺口）。
+    // 反例实测：`测试库直接执行 DELETE FROM 全表再灌 fixture`
+    //   原文通道 di=0（`DELETE FROM` 是 SQL 谓词，中文判据的「删除 + 表」族
+    //   不认识英文谓词）；但字典把 delete→「删除」、execute→「执行」后，
+    //   归一化文本变成 `测试库直接执行 删除 from 全表再灌 fixture`，
+    //   「直接 + 删除 + 表」两半被翻译动作**凑齐** → di=1 → block。
+    // 尺度：1800 条中英混排语料里 300 条「原文 0 命中、归一化命中」，
+    //   **300/300 全部含英文 SQL 谓词**——这不是判据漏词，是归一出错。
+    // 边界（写死）：只跳过**谓词短语**（delete from / truncate table /
+    //   drop table / alter table / insert into）。裸 `delete`（`delete the
+    //   file`）仍照译——它不是 SQL 谓词，是自然语言动词。
+    // 实现方式：把命中的谓词短语整体摘出来、翻译完成后再原样放回，
+    //   而不是整句跳过 en2zh（那会连 ignore→忽略 这些**真需要**的还原
+    //   一起丢掉，等于用误拦换漏判）。
+    const SQL_PREDICATE = /\b(?:delete\s+from|truncate(?:\s+table)?|drop\s+table|update\s+\*?\s*(?:from|set)|alter\s+table|insert\s+into)\b/ig;
+    const sqlPredicates = [];
+    let mixed = out.replace(SQL_PREDICATE, (m) => {
+      sqlPredicates.push(m);
+      return '\u0000SQL' + (sqlPredicates.length - 1) + '\u0000';
+    });
     for (const k of enKeys) {
       const re = new RegExp('\\b' + k + '\\b', 'gi');
       if (re.test(mixed)) {
@@ -471,6 +490,9 @@ function normalize(text) {
         applied.push('en2zh:' + k);
       }
     }
+    // 谓词短语原样放回（空格规整由后续 squeeze 步骤处理）
+    mixed = mixed.replace(/\u0000SQL(\d+)\u0000/g, (_, i) => sqlPredicates[Number(i)]);
+    if (sqlPredicates.length > 0) applied.push('en2zh:preserve_sql_predicate');
     out = mixed;
   }
 
