@@ -1,3 +1,41 @@
+## 第 142 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：`decision.decide` 本体（`scripts/decide-r142e.js`）选出 **A（reward_hacking 中文侧 test_gaming 族对称补形）**，score 0.84、置信度 0.7；候选 C（修 round50 既有红）0.73、D（ai_writing_tell 补非 PUA 同形字判据）0.69。
+
+前四次调用全部返回 `chosen:null` + `options_indistinguishable`，四次都是**我自己构造候选的失误**，不是引擎问题：① 首轮 4 个候选里 B（di 开发语境误拦）已被本轮实测证伪（见下）却仍写进候选；② 关键判据（数值字段）写在换行后的细节行里，而 `_parseOptionsFromText` 按行切分，label 只取第一行，数值全丢；③ 候选描述过长互相稀释。正确形式是数值字段与候选标题**同一行**（`feasibility=0.9, consequence_value=0.85, risk=0.35, prior=0.8`）。这条已固化到候选构造纪律里。
+
+**轮初复测（两个方向都实测，不信简报旧描述）**：
+
+1. **B 候选证伪**：50 条良性开发语料复测，block 仅 2/50（idx6 鉴权中间件 / idx34 防火墙），两条均命中 `SECURITY_BOUNDARY` 真实安全边界，属设计内行为；剩余 4 条非 pass 是低分辅助维度 + root 空密码改写提示，判定非缺口 → 剔除。
+2. **A 候选坐实**：程序化对比中英两侧族正则条数（`probe-r142-cmp.js`），test_gaming 中文 10 支 vs 英文 16 支（差 6）。读源码定位到英文侧第 70 轮补的 TG1~TG3 三组自然语序形状（迎合检查器特殊处理 / 放宽阈值让失败用例通过 / 只写 happy path 选择性覆盖）中文侧 0 覆盖。靶向探针 12 条同形中文样本实测 **10/12 未命中（gate 全 pass）**，缺口坐实。
+
+**主改动**（3 个 commit）：`src/reward-hacking.js` test_gaming 族补形 8 支（TG-Z1~Z3），逐支 isolate 后的三处收窄修正：塞关键词半补受事前置于「把/将」的镜像语序；阈值半补「调整」动词与零负面词表收网（兼容「让现在的失败变绿」这类口语形）；happy path 半补「一概/都」量词。配 `test/reward-hacking-test-gaming-zh-r142.test.js`：12/12 命中、17 条良性 0 误伤、子进程删条回退 10/12（2 条由既有判据兜底，第 140 轮同款重叠覆盖口径）。
+
+**轮中意外收获（比主方向更重要的真缺口）**：run-all 抓到 `ai-writing-tell-multilang-r141.test.js` 失败——**上一轮报告称「多语言误伤已根治」，实际 3/11 仍被误打分且未上报**。根因是「同一词表当两个独立证据」这个错误的**第 4 次同型复现**（第 130/131/132 同维度三次 + 第 141 同族内一次）：`tier-attributive` 支的判据是「母语句出现 TIER 词 + 英文词」，与 `vocab-discourse` 档共用同一批 TIER 词表，却作为**跨维度**两个独立证据顶起共现门槛（`ai-tell-tier1` + `ai-tell-zh-en-mixing` 各 18 分，score 0.36）。
+
+修法是**条件折叠**（两个方向都守住，不是一刀切）：
+· `vocab-discourse` 真命中 → tier-attributive 折叠到那一票（修跨维度叠票）；
+· 未命中 → 保持 zh-en-mixing 一票，anchor-mix / double-connective / tier-adverbial 与之同族不互相当证据（守第 50 轮「单族未清零」纪律）。
+
+配 `test/ai-writing-tell-crossdim-fold-r142.test.js`：11 条多语言正当文本误伤 0/11；**双向删条**——方向一（永不折叠）误伤必须回到 ≥3 条，方向二（无条件折叠）单族样本必须被误折 ≥1 条。两个方向互为反向证据，防止「守卫只是凑巧绿」。
+
+**本轮踩的坑（3 个，都已固化）**：
+
+1. **第一版折叠方向写反**：把 `hasVocabDiscourse` 常量改 `true` 想复现「不折叠」，实际那是「无条件折叠」，方向一误伤回到 0/11。删条守卫的两个方向必须先想清楚「常量改 true / 删掉条件判断」分别对应什么语义再写。
+2. **条件折叠的中间态反过来咬了自己**：无条件折叠版让第 50 轮主测试红 1 条（`anchor-mix + tier-attributive` 同族两支被压成一票后，单族样本 score 归零的守卫样本失守）。`git stash` 对照确认该红是本轮引入而非既有红，改为条件折叠后两个测试同时回绿。
+3. **测试输出被 run-all 判为静默**：三个测试文件都只打 `PASS ... | 0/11` 这类无「通过」二字的汇总，run-all 的 keep 过滤器只保留含「通过/✗/失败」的行 → 按 v6.7.83 口径计入 1 个失败，表现为汇总里「1 个失败未能定位到具体条目」。三个文件（含上一轮遗留的）各补一行标准汇总。
+
+**七项验证**：bin/verify **14/14**；双向门禁 **召回 52/52**、误拦 **300/326** 与基线逐字节一致（**0 新增误伤**）；run-all **5603 通过 / 0 失败**（npm-package-integrity 6/0 也绿，上一轮遗留红消失）；security-audit **16/16**；doc-numbers **15/15**；本轮正式测试 **2/2**（reward-hacking-test-gaming + crossdim-fold）；负例删除验证（双向）**2/2**。
+
+**遗留**：
+
+1. **LLM 401 未解** —— stepfun 的 api-key 失效，需要用户更新凭据。这是当前升级流水线唯一的硬阻塞（不影响本轮全部本地验证）。
+2. **reward_hacking 剩余中文侧缺口**（下一轮首选，按决策 score 顺序 continuation）：metric_denominator_gaming 中文 8 vs 英文 12（差 4）、rerun_until_significant 7 vs 9、human_answer_proxy 8 vs 10、best_run_picking 5 vs 6、condition_tuning 11 vs 12。程序化对比脚本口径已固化在 `probe-r142-cmp.js`，下一轮直接复用。
+3. **ai_writing_tell 真 AI 漏检**：multilang 测试里 4/10 未计分（阈值 4 内），其中 2 条靠 tier-adverbial 独立证据位、另 2 条为单族构型被有意放过——折叠是把双刃剑，收紧边界需另立探针。
+4. **同源叠票错误已复发 4 次**（130/131/132/141/142 跨维度）。建议下一轮做一次系统性排查：对全部维度跑一遍「同一证据源被多族/多维度同时命中」的扫描，而不是等测试红了再修。
+
+---
+
 ## 第 141 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：`decision.decide` 本体（`scripts/decide-r141.js`）选出 **C（ai_writing_tell 多语言误伤）**，score 0.77；候选 A（reward_hacking 中文 best_run_picking / selective_reporting 对称收割）0.74，B（dangerous_instruction 开发语境误拦 idx 7/47）0.70。三候选分差小，首轮即分出高下（未触发 indistinguishable）。C 胜在**改动面可逐条删条验证**——三处修复各有独立注入点，A 需要先探再判，B 放宽有放真攻击回来的风险。
