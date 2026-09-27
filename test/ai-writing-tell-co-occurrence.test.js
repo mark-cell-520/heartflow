@@ -101,16 +101,40 @@ module.exports = function ({ test, assertTrue, assertEqual, assertDefined }) {
   test('co-occurrence: familiesHit 与归并档位后的 findings 一致', () => {
     const text = AI_TEXTS[0];
     const r = detect(text);
-    // [v6.7.127 第 130 轮] familiesHit 语义改为「归一族数」：
-    // TIER1/2/3 合并为 vocab-tier，不再等于 findings 的原始族数。
-    const vocabTiers = new Set(['tier1', 'tier2', 'tier3']);
+    // [v6.7.127 第 130 轮] familiesHit 语义改为「归一族数」：TIER1/2/3 合并
+    // 为 vocab-tier，不再等于 findings 的原始族数。
+    // [v6.7.128 第 131 轮] transitions 也并入同档（vocab-discourse）——
+    // 「普通书面词汇 + 话语标记」同源，只记一票。
+    const vocabDiscourse = new Set(['tier1', 'tier2', 'tier3', 'transitions']);
     const actual = new Set(
       r.findings.map((f) => {
         const fam = f.dimension.replace(/^ai-tell-/, '');
-        return vocabTiers.has(fam) ? 'vocab-tier' : fam;
+        return vocabDiscourse.has(fam) ? 'vocab-discourse' : fam;
       })
     ).size;
     assertEqual(r.familiesHit, actual, 'familiesHit 必须是 findings 的归一族数');
+  });
+
+  test('co-occurrence: 纯词表 × transitions 不算共现（第 131 轮 vocab-discourse 修法）', () => {
+    // [v6.7.128 第 131 轮] 实测缺口：20 条正常英文技术写作 18 条被
+    // 「vocab-tier × transitions」二票共现命中（score 0.22-0.28）——
+    // moreover/furthermore/in conclusion/in summary 是通用学术书面语，
+    // 与 TIER 词表同源，叠起来不构成两个独立证据。
+    // transitions 并入 vocab-discourse 档后应 score 归零。
+    const r = detect('Robust consensus protocols require careful analysis. Furthermore, they must tolerate crash faults.');
+    assertEqual(r.familiesHit, 1, `词表×transitions 应归并为 1 个 vocab-discourse，实得 ${r.familiesHit}`);
+    assertEqual(r.score, 0, '词表×transitions 不应计分');
+    assertEqual(r.coOccurrence, false, '词表×transitions 不算共现');
+  });
+
+  test('co-occurrence: 真 AI 文本的模板族共现不因 transitions 归并而塌', () => {
+    // 反向确认：真 AI 文本带 tier + transitions 时必额外带模板族
+    // （formulaic-openers / vague-attributions / generic-conclusions），
+    // 归并后 familiesHit 仍 >=2，score 不塌。
+    const r = detect("In today's rapidly evolving digital landscape, it's important to note that robust solutions play a pivotal role. Furthermore, this comprehensive approach leverages synergy to unlock value. Moreover, the future looks bright as we move forward.");
+    assertTrue(r.coOccurrence === true, '模板族+词表必须判共现');
+    assertTrue(r.familiesHit >= 2, `归并后 familiesHit 仍应 >=2，实得 ${r.familiesHit}`);
+    assertTrue(r.score > 0.3, `模板族共现 score 不应塌，实得 ${r.score}`);
   });
 
   test('co-occurrence: 双族共现（词表档 + 模板族）必须计分', () => {

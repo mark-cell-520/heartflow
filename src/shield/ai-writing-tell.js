@@ -445,7 +445,10 @@ function detect(text) {
   // 不再拉低 overallScore、不再污染 discriminate 的 findings 聚合。
   // 反向确认：真 AI 文本族数全部 >=3，门槛取 2 不影响它们任何一条。
   //
-  // [v6.7.127 第 130 轮] TIER1/2/3 合并为一个 vocab-tier 族：
+  // [v6.7.127 第 130 轮] TIER1/2/3 合并为一个 vocab-tier 族；
+  // [v6.7.128 第 131 轮] transitions 并入，统称 vocab-discourse 档：
+  // 见下方注释——TIER 三档 + transitions 同属「普通书面词汇/话语标记」，
+  // 统计证据量时只记一票。单个档位的 baseScore 不变，得分结构不动。
   // 实测（2026-09-27 探针）正常英文技术写作仍有 2/20 被共现计分命中，
   // 误伤句全是纯词表共现（tier1+tier2、tier1+tier2+transitions），
   // 而 7/8 真 AI 文本必带公式化模板族（formulaic-openers /
@@ -453,11 +456,21 @@ function detect(text) {
   // 三个档位（TIER1/2/3）当作三个独立证据，词表叠词表族数虚高。
   // TIER1/2/3 同源，统计证据量时只记一个 vocab-tier 档位族；
   // 单个档位的 baseScore 不变，得分结构不动。
-  const vocabTiers = new Set(['tier1', 'tier2', 'tier3']);
+  // [v6.7.128 第 131 轮] transitions 归入 vocab-discourse 档：
+  // 实测（2026-09-27 探针）第 130 轮只归并了 TIER 三档，但同源叠票未修完——
+  // 20 条正常英文技术写作有 18 条被「vocab-tier × transitions」二票共现
+  // 命中（score 0.22-0.28）：moreover / furthermore / in conclusion /
+  // in summary 是学术与工程写作的通用书面语，与 TIER 词表同属
+  // 「普通书面词汇/话语标记」来源，不构成两个独立证据。
+  // 反向确认（探针 2）：真 AI 文本带 tier + transitions 时必额外带模板族
+  // （formulaic-openers / vague-attributions / generic-conclusions），
+  // 归并后 familiesHit 仍 >=3，门槛 >=2 不影响检出。
+  // 单档 baseScore 不变、得分结构不动、findings 仍按原族名输出。
+  const vocabDiscourse = new Set(['tier1', 'tier2', 'tier3', 'transitions']);
   const normalizedFams = new Set(
     (findings || []).map((f) => {
       const fam = f.dimension.replace(/^ai-tell-/, '');
-      return vocabTiers.has(fam) ? 'vocab-tier' : fam;
+      return vocabDiscourse.has(fam) ? 'vocab-discourse' : fam;
     })
   );
   const familiesHit = normalizedFams.size;
