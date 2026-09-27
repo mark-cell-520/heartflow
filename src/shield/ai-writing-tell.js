@@ -491,13 +491,26 @@ function detect(text) {
   // double-connective 之外仍带独立证据（tier1/transitions/templated），
   // 归并后 familiesHit 仍 >=2，检出不塌；AI2/AI3 原本 score=0
   // （单族），不受影响。
-  const tierPhraseHit = mixingTriggers.some(t => t.trigger.startsWith('TIER词'));
+  // 来源字段 zhEnSrc 由 findings 携带，归一化时按它折叠（见下方）。
   for (const mt of mixingTriggers) {
     const key = `zh-en-mixing:${mt.trigger}`;
     if (seen.has(key)) continue;
     seen.add(key);
     total += 0.18;
-    findings.push({ dimension: 'ai-tell-zh-en-mixing', severity: 18, trigger: mt.trigger, guidance: 'AI writing artifact (zh-en code-mixing)', tierPhrase: mt.trigger.startsWith('TIER词') });
+    // [第 141 轮] 来源分档（normalizeFams 按这个字段折叠，避免歧义）：
+    //   tier-attributive —— tier-phrase 定语/表语形态，与 vocab-discourse 同源
+    //                        （判据本身就是「中文句 ≤1 TIER 词 + 英文词」），
+    //                        折叠成一档，防同一词表当两个独立证据；
+    //   tier-adverbial   —— tier-phrase 状语误用形态（TIER 词 + 地），中文
+    //                        语法不容的英文副词直译，真 AI 腔独立证据；
+    //   anchor-mix       —— 套话锚 + 英文词，独立证据；
+    //   double-connective—— 中英连接词翻译对，独立证据。
+    let src = 'other';
+    if (mt.trigger.startsWith('TIER副词状语')) src = 'tier-adverbial';
+    else if (mt.trigger.startsWith('TIER词')) src = 'tier-attributive';
+    else if (mt.trigger.startsWith('中英连接词对')) src = 'double-connective';
+    else src = 'anchor-mix';
+    findings.push({ dimension: 'ai-tell-zh-en-mixing', severity: 18, trigger: mt.trigger, guidance: 'AI writing artifact (zh-en code-mixing)', zhEnSrc: src });
   }
   const stylometry = detectStylometry(normalized);
   for (const s of stylometry) {
@@ -567,11 +580,12 @@ function detect(text) {
       const fam = f.dimension.replace(/^ai-tell-/, '');
       if (vocabDiscourse.has(fam)) return 'vocab-discourse';
       if (templatedFrames.has(fam)) return 'templated-frames';
-      // [第 141 轮] zh-en-mixing 的 tier-phrase 支与 vocab-discourse 同源
-      // （判据本身就是「中文句 ≤1 TIER 词 + 英文词」），归入同一档，
-      // 避免「TIER 词」被当成两个独立证据顶起共现门槛。
-      // anchor-mix / double-connective 两支不折叠（不同源，保留独立证据位）。
-      if (fam === 'zh-en-mixing' && f.tierPhrase) return 'vocab-discourse';
+      // [第 141 轮] zh-en-mixing 的 tier-attributive（定语/表语 TIER 形态）
+      // 与 vocab-discourse 同源（判据就是「中文句 ≤1 TIER 词 + 英文词」），
+      // 折叠成一档，避免同一词表被当成两个独立证据顶起共现门槛。
+      // 另三支（tier-adverbial / anchor-mix / double-connective）不同源，
+      // 保留独立证据位。
+      if (fam === 'zh-en-mixing' && f.zhEnSrc === 'tier-attributive') return 'vocab-discourse';
       return fam;
     })
   );
