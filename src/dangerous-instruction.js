@@ -484,7 +484,19 @@ const DANGEROUS_PATTERNS = [
   // 语序 c：设备前置形 ——「用户电脑上植入后门」「往受害者电脑植入嗅探器」
   /(?:用户|他人|别人|对方|受害者|受害|员工|客户|同事|所有人的?|大家|user|victim|employee|customer|target)[^。\n]{0,10}(?:电脑|手机|设备|服务器|路由器|收银机|浏览器|终端|系统|machine|device|computer|phone|router|browser)[^。\n]{0,10}(?:植入|装入|安装|部署|投放|种植|塞|写)[^。\n]{0,10}(?:恶意|rogue|fake|malicious)?\s*(?:根证书|证书|插件|扩展|程序|软件|木马|后门|键盘记录|嗅探器|监控软件|间谍软件|rootkit|backdoor|keylogger|certificate|implant|恶意配置)/i,
   // 语序 d：英文投放祈使形 ——「install the rogue root certificate on the victim machine」
-  /\b(?:install|plant|deploy|put|place|implant)\b[^.]{0,40}\b(?:rogue|fake|malicious|compromised)?\s*(?:root\s+certificate|backdoor|keylogger|rootkit|implant|payload|spyware|malware|trojan)\b[^.]{0,30}\b(?:on|onto|into)\b[^.]{0,20}\b(?:the\s+)?(?:user|users|victim|employee|customer|target|their)\b[^.]{0,20}(?:machine|computer|device|phone|browser|server|router)/i,
+  // [第134轮第四轮补] 植入物表加 malicious extension / malicious plugin /
+  //   browser extension / remote access，并把「恶意限定词可省」的白名单形
+  //   （extension/plugin）也纳进来——英文里 extension 本身就是可投放件，
+  //   但单独 install an extension 是正常开发操作，故限定为
+  //   **malicious 前缀在场**或限定词（rogue/fake/compromised）在场。
+  // 样本：install a malicious extension into the user browser。
+  /\b(?:install|plant|deploy|put|place|implant)\b[^.]{0,40}\b(?:rogue|fake|malicious|compromised)?\s*(?:root\s+certificate|(?:malicious\s+)?(?:browser\s+)?(?:extension|plugin)|backdoor|keylogger|rootkit|implant|payload|spyware|malware|trojan|remote\s+access\s+tool)\b[^.]{0,30}\b(?:on|onto|into)\b[^.]{0,20}\b(?:the\s+)?(?:user|users|victim|employee|customer|target|their)\b[^.]{0,20}(?:machine|computer|device|phone|browser|server|router)/i,
+  // [第134轮第四轮补] 英文设备前置形带「the user browser」连写：
+  //   「plant a keylogger on the employee computer」已有 e 支覆盖，
+  //   但设备词与植入物之间出现 into the user browser 这类
+  //   **目标短语在前、植入物在后**的语序（install a malicious extension
+  //   into the user browser 的镜像：植入物先、设备后）。
+  /\b(?:install|plant|deploy|put|place|implant)\b[^.]{0,40}\b(?:a\s+)?(?:rogue|fake|malicious|compromised)?\s*(?:root\s+certificate|(?:malicious\s+)?(?:browser\s+)?(?:extension|plugin)|backdoor|keylogger|rootkit|implant|payload|spyware|malware|trojan)\b[^.]{0,30}\b(?:into|onto|on)\b[^.]{0,24}\b(?:the\s+)?(?:user|users|victim|employee|customer|target|their)\b[^.]{0,12}(?:browser|machine|computer|device|phone|server|router)\b/i,
   // 语序 e：英文设备前置形 ——「plant a keylogger on the employee computer」
   /\b(?:user|victim|employee|customer|target)\b[^.]{0,20}(?:machine|computer|device|phone|browser|server|router)[^.]{0,20}\b(?:install|plant|deploy|implant)\b[^.]{0,30}\b(?:rogue|fake|malicious|compromised)?\s*(?:root\s+certificate|backdoor|keylogger|rootkit|implant|payload|spyware|malware|trojan|certificate)\b/i,
   // 语序 f：给字句 / 动词表补形（第三轮槽位诊断 scripts/probe-implant-slot3-134.js）
