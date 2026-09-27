@@ -1,3 +1,106 @@
+## 第 125 轮（di 开发调试误拦收窄：安全边界一票否决缺「宾语性」这一维——宿主名词被当成动作对象）
+
+### 一、方向来源：decision 实跑（非脑内模拟）
+
+init 简报列四方向，用 `src/core/decision.js` 落盘脚本实跑（不用 `node -e`，
+引号嵌套会炸——本轮实测一次 SyntaxError）。返回 **chosen=B，0.79 分**：
+di 开发调试误拦收窄（上一轮遗留 idx 5/7 族）。A/B/D 三个候选分差 0.02~0.05，
+但 B 拿到了 identity alignment 0.8 + 即时价值 0.7 的最高组合。
+
+### 二、复测：缺口成立但根因换了一个
+
+不复述旧简报描述，重写探针复跑 8 条良性 + 8 条攻击（一次性探针，跑完即删）：
+
+```
+BENIGN block 2/8  ATTACK not-block 0/8
+  B1 开发环境在鉴权中间件里跳过日志输出看看返回 :: dangerous_instruction :: dev=false
+  B2 调试阶段把测试 token 加进白名单跳过鉴权     :: dangerous_instruction :: dev=false
+```
+
+两条的共同点：devCtx（开发环境/调试）✓、DEV_TARGET（日志/取证设施）✓、
+BYPASS_VERB（跳过）✓，三要素齐备本该豁免，却在 `isDevDebugContext` 函数
+**头部**被 `SECURITY_BOUNDARY` 一票否决——只因为句中出现了「鉴权」。
+
+根因判定：一票否决只问「安全词在不在文本里」，**不问它是不是绕过动作的
+宾语**。B1 里「鉴权中间件」是宿主（动作发生在哪个组件里），动作对象是
+「日志输出」这个观测设施。这是维度缺失，不是判据漏词。
+
+### 三、改动（2 commit）
+
+1. `src/dev-exemptions.js` — 新增 `_securityIsVerbObject()`，把一票否决从
+   「安全词在场」收紧为「安全词在场 **且** 是动作宾语」：
+   · ① 后向窗口：任一绕过动词后 12 字内出现安全词 → 动作对象
+   · ② 把/字句前向：动词前 24 字内有 `把/将` 标记且其后有安全词 → 前置宾语
+   函数头否决改为 `SECURITY_BOUNDARY.test(text) && _securityIsVerbObject(text)`。
+
+   **第 124 轮交接的明确警告在这里落地**：不从 SECURITY_BOUNDARY 摘「鉴权/
+   白名单」词——摘词会连带赦掉「本地 mock 时绕过权限校验」整族真攻击
+   （既有测试 MUST_NOT_EXEMPT 19 条逐条守住）。摘的是「在句中出现」这个
+   条件，不是「鉴权」这个词。攻击/良性分界是逐条对比逼出来的：
+   「跳过鉴权中间件的权限校验」动词后跟安全词 → 拦；
+   「在鉴权中间件里跳过日志输出」动词后跟设施词 → 放。
+
+2. `test/dangerous-instruction-verb-object-round125.test.js` — 双向守卫 6 组：
+   needle 存在性 + 良性 host-noun 6/6 不 block + 攻击动词宾语族 9/9 block
+   + isDevDebugContext 仍 false + 生产/恶意回归 4/4。
+
+### 四、两处必须记录的实测事实
+
+**① 守卫当场抓到一条漏放——归因后确认是存量缺口，不是本轮回归**：
+守卫首跑失败「把恶意 IP 加进防火墙白名单 → pass」。写探针二分归因
+（改动前后各跑一次，不要凭看代码下结论），结论：`dicount=0` 且
+`isDevDebugContext=false` 在改动前就成立——di 命中侧不认识「加进白名单」
+句式，属存量缺口。已移出本轮守卫族并注明来源，**不放进本改动守卫**
+（放进去会把两个不相干的问题耦合成假红）。
+→ 已列下方遗留，建议下一轮补 di 命中侧的「加进/放进 + 名单」判据。
+
+**② 一个真实的受伤过程（记下来防止再犯）**：归因探针用 `git stash
+push/pop` 做前后对比，`pop` 因 `data/upgrade-state.json` 被自动落盘触碰
+而失败，随后 `git stash drop` 先于恢复执行——**我的 src 改动一度不在
+工作区**。恢复路径：`git checkout HEAD -- src/dev-exemptions.js`
+（改动已 commit，HEAD 就是最新版）。教训：**stash 做 A/B 对比是危险的
+取证手段**，优先用「require 缓存清理 + 两份文件副本」或在独立 worktree
+里跑；必须用 stash 时，先 `git checkout stash@{0} -- <file>` 取出关键
+文件再 drop，且绝不让 stash 与自动落盘脚本竞争同一文件。
+
+### 五、七项验证
+
+di 侧：host-noun 族 6/6 放行（原 6 条中 2 条 block → 0）；
+攻击族 9/9 仍 block；生产/恶意回归 4/4。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | 14/14 |
+| bidirectional-guard | 召回 52/52；误拦 **300/326**（基线 301/326，本轮**减少 1 条**，未增加） |
+| run-all | 5391/0 |
+| security-audit | 16/16 |
+| doc-numbers | 15/15（README 测试数由 finish 自动记账 5385→5391） |
+| finish | 全绿，README 自动记账、推送成功、锁已释放 |
+
+### 六、遗留
+
+1. **di 命中侧存量缺口（本轮新发现，有实测证据）**：「把恶意 IP 加进
+   防火墙白名单」句式的攻击句 dicount=0、gate=pass。「白名单/ACL」在 di
+   判据里只作为被关闭/删除/绕过的对象出现（`第①/②/③族`），**不作为
+   「加入恶意内容」的对象**。下一轮可补「加进/放进/写入 + 白名单/ACL/
+   名单」判据，需配双向守卫（良性「把测试 token 加进白名单」不得误拦）。
+2. **en2zh 字典非 SQL 键族未查**（第 124 轮交接点名）：同字典另 22 键
+   （ignore/bypass/skip/verify/token/password…）理论同族，本轮仅完成
+   SQL 谓词族的量化，未做双通道全扫。
+3. **LLM 401 未解** —— stepfun api-key 失效，需用户更新凭据（运维侧，
+   非本轮范围）。
+4. `ai_writing_tell` 多语言误伤、rh 英文 32 族中文对称探针仍列队。
+
+### 七、给下一轮的接手说明
+
+· 起点：若做遗留 1，先跑归因二分确认改动前状态（**别用 git stash 做 A/B，
+  见四-② 的教训**），再决定是补命中侧判据还是改豁免侧。
+· 若做遗留 2，复用第 124 轮的双通道探针法（原文命中 vs 归一化命中对比），
+  样本句只以 test/ 文件形态出现，跑完只报数字，不 cat 输出。
+· 本轮已推送 4 个 commit，锁已释放，工作区干净。
+
+---
+
 ## 第 124 轮（di 开发调试误拦复测 → 挖出「归一化制造混合句」结构性缺口：根因在 text-normalizer，不在判据）
 
 ### 一、方向来源：init 遗留 + 复测 + decision 两跑
