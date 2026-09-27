@@ -1,3 +1,63 @@
+## 第 130 轮（ai_writing_tell 英文侧误伤：TIER1/2/3 归并 vocab-tier，误伤 2/20→0/20）
+
+### 一、方向来源与选择过程
+
+按纪律用 `src/core/decision.js` 实跑三候选选向（A=di 开发调试语境误拦、
+B=ai_writing_tell 多语言误伤、C=reward_hacking 剩余 6 类），返回
+**`chosen: "B"` + `confidence: 0.7`（composite 0.77）**——本轮决策引擎有区分度
+（127/129 两轮 null 之后第一次正常分出高下），直接按它的结论走 B。
+
+### 二、复测（不信简报旧描述，先跑探针）
+
+`probe-en-ai-tell` / `probe-en-threshold` / `probe-en-occ` 三支探针
+（20 条正常英文技术写作 + 8 条真 AI 文本）实测：
+
+- 正常英文技术写作 **2/20 被共现计分命中**（纯词表叠词句 score 0.30-0.40）
+- 真 AI 文本 7/8 命中，**且 7/8 必带公式化模板族**（formulaic-openers /
+  generic-conclusions / vague-attributions）
+- 关键发现：两者在 `familiesHit=3 / score≈0.4` 区间**完全重叠**——靠族数
+  阈值区分不开；分开它们的是**族构成**：误伤句全是纯词表族共现
+  （tier1+tier2、tier1+tier2+transitions），真 AI 文本除词表外必有模板族
+
+根因：共现门槛（v6.7.125 第 36 轮）把同一词表的三个档位（TIER1/2/3）当作
+**三个独立证据**，词表叠词表族数虚高。
+
+### 三、改动（commit `d265d538`）
+
+`src/shield/ai-writing-tell.js` 的共现统计：TIER1/2/3 归并为单一 `vocab-tier`
+证据档，统计证据量时只记一票。单档 baseScore 不变、得分结构不动、findings
+仍按原族名输出（可观测性不降）。
+
+契约随之更新（`test/ai-writing-tell-co-occurrence.test.js`）：
+- 真 AI 文本档位数断言 `>=3` → `>=2`（归并后上限降 1）
+- `familiesHit` 语义改为「归一族数」，契约断言同步改
+- 原「tier1+tier2 双族计分」断言改为「词表档 + 模板族（speculative-openers）」
+  组合——共现门槛的语义本就是「两个不同来源的证据」，同源三档叠词不算
+- 新增核心断言：纯词表三档叠词 familiesHit=1、score=0、coOccurrence=false
+
+### 四、测试与验证
+
+`test/ai-writing-tell-vocab-tier-round130-guard.test.js`（13 断言）：注入-删条
+两轮（删归并映射 / 删整段归一逻辑）后纯词表句必须重新计分转红，模板+词表句
+不受影响，源码完整还原。
+
+七项验证：bin/verify **14/14**；双向门禁召回 **52/52**、误拦 **300/326**
+（与基线持平，新增 0）；run-all **5465/0**；security-audit **16/16**；
+doc-numbers **15/15**；本轮守卫 **13/13**；注入-删条负例 **13/13**。
+
+### 五、给下一轮的接手说明
+
+① **误伤确认为 0**：纯词表叠词族共现已清零，但这是本轮最小修法，只治
+   「词典三档同源」这一条根因。**其它同源重叠尚未查**——建议下一轮扫
+   `transitions` 与 `tier3` 的重叠、以及 `lets-patterns`/`chatbot-artifacts`
+   与模板族之间的同源叠票，方法同本轮：组内分布探针 + 归并。
+② `decision.decide` 本轮有区分度（0.77 vs 0.74 vs 0.7），「候选必须带
+   可量化权重」的约定可以先不记死；但三候选分差仅 0.03-0.07，仍是弱区分。
+③ LLM 401 仍阻塞（需用户更新 stepfun 凭据）。
+④ 遗留第 123 轮 idx 7（Redis 白名单）/ idx 47（测试库全表删除）性质待核。
+
+---
+
 ## 第 129 轮（SQL 剩余三形状：C 非缺口不动，A/B 两真缺口已补，双向门禁持平）
 
 ### 一、方向来源与选择过程
