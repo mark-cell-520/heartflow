@@ -56,8 +56,8 @@ if (!SRC_ORIGINAL.includes(CUT)) {
   console.log(`  FAIL: 删条片段未在源文件中找到「${CUT}」`);
 } else {
   const mutated = SRC_ORIGINAL.replace(
-    "return vocabDiscourse.has(fam) ? 'vocab-discourse' : fam;",
-    'return vocabDiscourse.has(fam) ? fam : fam;'
+    "      if (vocabDiscourse.has(fam)) return 'vocab-discourse';\n      if (templatedFrames.has(fam)) return 'templated-frames';\n      return fam;",
+    "      if (templatedFrames.has(fam)) return 'templated-frames';\n      return vocabDiscourse.has(fam) ? fam : fam;"
   );
   fs.writeFileSync(SRC, mutated, 'utf8');
   try {
