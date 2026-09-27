@@ -105,14 +105,39 @@ module.exports = function ({ test, assertTrue, assertEqual, assertDefined }) {
     // 为 vocab-tier，不再等于 findings 的原始族数。
     // [v6.7.128 第 131 轮] transitions 也并入同档（vocab-discourse）——
     // 「普通书面词汇 + 话语标记」同源，只记一票。
+    // [v6.7.129 第 132 轮] formulaic-openers / generic-conclusions 并入
+    // templated-frames 档——「开放式套话框架」同源，只记一票。
     const vocabDiscourse = new Set(['tier1', 'tier2', 'tier3', 'transitions']);
-    const actual = new Set(
-      r.findings.map((f) => {
-        const fam = f.dimension.replace(/^ai-tell-/, '');
-        return vocabDiscourse.has(fam) ? 'vocab-discourse' : fam;
-      })
-    ).size;
+    const templatedFrames = new Set(['formulaic-openers', 'generic-conclusions']);
+    const norm = (f) => {
+      const fam = f.replace(/^ai-tell-/, '');
+      if (vocabDiscourse.has(fam)) return 'vocab-discourse';
+      if (templatedFrames.has(fam)) return 'templated-frames';
+      return fam;
+    };
+    const actual = new Set(r.findings.map((f) => norm(f.dimension))).size;
     assertEqual(r.familiesHit, actual, 'familiesHit 必须是 findings 的归一族数');
+  });
+
+  test('co-occurrence: 模板族框架二票不算共现（第 132 轮 templated-frames 修法）', () => {
+    // [v6.7.129 第 132 轮] 实测缺口：51 条正常英文写作 4 条**同一文本片段**
+    // 被「formulaic-openers × generic-conclusions」同时命中（score 0.30，
+    // 全部只含这两族）——「in the ... world of / as we move forward」这类
+    // 句型自己既是 opener 又是 conclusion 的措辞。两族同属开放式套话框架，
+    // 归并后 familiesHit 应为 1、score 归零、不判共现。
+    const r = detect('As we move forward, the team will prioritize the migration work in the next sprint.');
+    assertEqual(r.familiesHit, 1, `模板框架二票应归并为 1 个 templated-frames，实得 ${r.familiesHit}`);
+    assertEqual(r.score, 0, '模板框架二票不应计分');
+    assertEqual(r.coOccurrence, false, '模板框架二票不算共现');
+  });
+
+  test('co-occurrence: 真 AI 文本的模板族共现不因 templated-frames 归并而塌', () => {
+    // 反向确认：真 AI 文本带 formulaic-openers + generic-conclusions 时
+    // 仍另带独立证据（speculative-openers / chatbot-artifacts / 词表档），
+    // 归并后 familiesHit 仍 >=2，score 不塌。
+    const r = detect("Imagine a world where every team ships faster. As we move forward, the possibilities are endless.");
+    assertTrue(r.coOccurrence === true, '模板族框架+独立证据必须判共现');
+    assertTrue(r.score > 0.3, `模板族共现 score 不应塌，实得 ${r.score}`);
   });
 
   test('co-occurrence: 纯词表 × transitions 不算共现（第 131 轮 vocab-discourse 修法）', () => {
