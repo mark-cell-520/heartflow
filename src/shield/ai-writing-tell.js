@@ -466,11 +466,31 @@ function detect(text) {
   // （formulaic-openers / vague-attributions / generic-conclusions），
   // 归并后 familiesHit 仍 >=3，门槛 >=2 不影响检出。
   // 单档 baseScore 不变、得分结构不动、findings 仍按原族名输出。
+  //
+  // [v6.7.129 第 132 轮] formulaic-openers × generic-conclusions 归并为
+  // templated-frames 档（同源叠票第二轮）：
+  // 实测（2026-09-27 区间探针：比对各族 trigger 在原文中的字符区间交集，
+  // 而不是人工看正则）51 条正常英文写作有 4 条**同一文本片段**同时被
+  // 「formulaic-openers」与「generic-conclusions」命中（score 0.30，
+  // 全部只含这两族）——即「in the ... world of / as we move forward」
+  // 这类句型自己就同时是 opener 又是 conclusion 的措辞，共现门槛把
+  // 一个套话框架当成两个独立证据。
+  // 两族正则的句型（in the evolving world of / as we continue to /
+  // the future looks bright / only time will tell / one thing is
+  // certain）全是**不承载具体信息的开放式套话框架**，同属模板族来源，
+  // 统计证据量时只记一票。
+  // 反向确认（真 AI 池 8 条）：6 条在该组合之外仍带独立证据
+  // （vocab-discourse / speculative-openers / chatbot-artifacts），
+  // 归并后 familiesHit 仍 >=2，score 不塌；另 2 条不含该组合、不受影响。
+  // 单档 baseScore 不变、得分结构不动、findings 仍按原族名输出。
   const vocabDiscourse = new Set(['tier1', 'tier2', 'tier3', 'transitions']);
+  const templatedFrames = new Set(['formulaic-openers', 'generic-conclusions']);
   const normalizedFams = new Set(
     (findings || []).map((f) => {
       const fam = f.dimension.replace(/^ai-tell-/, '');
-      return vocabDiscourse.has(fam) ? 'vocab-discourse' : fam;
+      if (vocabDiscourse.has(fam)) return 'vocab-discourse';
+      if (templatedFrames.has(fam)) return 'templated-frames';
+      return fam;
     })
   );
   const familiesHit = normalizedFams.size;
