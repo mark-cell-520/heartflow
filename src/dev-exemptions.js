@@ -193,11 +193,64 @@ const MALICIOUS_INTENT = /(?:注入|恶意|后门|攻击|窃取|脱库|提权|�
 const SECURITY_BOUNDARY = /(?:防火墙|鉴权|认证|授权|审计|沙箱|安全策略|安全机制|身份验证|安全警告|安全检查|权限校验|权限检查|访问控制|越权|脱裤|脱库|入侵|渗透|提权|firewall|auth(?:entication|orization)?|audit|sandbox|security|access\s+control|privilege\s+check|rbac)/i;
 
 /**
+ * [第 125 轮] 安全边界词的**宾语性判定**：安全词是绕过动作的直接对象，
+ * 还是句中只作宿主名词。
+ *
+ * 缺口实测（50 条良性开发语料复测，2 条仍 block）：
+ *   idx 型「开发环境在鉴权中间件里跳过日志输出看看返回」——devCtx ✓
+ *   （开发环境）、DEV_TARGET ✓（日志）、BYPASS_VERB ✓（跳过），三项齐备
+ *   本该豁免，却在函数头部被 SECURITY_BOUNDARY 一票否决：只因为句中
+ *   出现了「鉴权」。但这里「鉴权中间件」是**宿主**（动作发生在哪个
+ *   组件里），动作的真正对象是「日志输出」这个观测设施。
+ * 根因：一票否决只问「安全词在不在文本里」，不问「安全词是不是动作
+ *   的对象」。一票否决是第 22/33/34/81 轮反复验证的正确设计，
+ *   缺的是宾语性这一维。
+ *
+ * 与真攻击的分界（攻击/良性逐条对比逼出，负例守卫验收）：
+ *   · 攻击「本地调试时跳过鉴权中间件的权限校验」——绕过动词后紧跟
+ *     安全词，安全词是动作对象 → 必须否决
+ *   · 良性「在鉴权中间件里跳过日志输出」——动词后是设施词，安全词
+ *     在动词前、句法上只作宿主 → 可豁免
+ * 判据（有界，不是全文语义）：
+ *   ① 后向窗口：任一绕过动词后 VERB_OBJ_WINDOW 字内出现安全词
+ *      → 安全词是动作对象
+ *   ② 把/字句前向：动词前出现显式「把/将」且其后到动词之间有安全词
+ *      → 宾语前置（「把权限校验跳过」），仍是动作对象
+ *
+ * ⚠️ 刻意不做（第 124 轮交接的明确警告）：不从 SECURITY_BOUNDARY 摘
+ * 「鉴权/白名单」词——那会连带赦掉「本地 mock 时绕过权限校验」整族
+ * 真攻击（test/dangerous-instruction-dev-debug.test.js MUST_NOT_EXEMPT
+ * 19 条逐条守住）。本函数只回答「是不是宾语」，一票否决地位不变。
+ */
+const VERB_OBJ_WINDOW = 12;   // 动词后直接宾语窗口（字）
+const VERB_FRONT_WINDOW = 24; // 把/字句前向窗口（字）
+
+function _securityIsVerbObject(text) {
+  if (!text || typeof text !== 'string') return false;
+  // 动词表与 BYPASS_VERB 同源（单一来源纪律：收齐命中侧绕过动词）
+  const verbs = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?下|禁用|停用|停掉|屏蔽|去掉|去除|bypass|circumvent|skip|ignore|disable|disabl\\w*|turn\\s+off|shut\\s+off|switch\\s+off|deactivat\\w*)/gi;
+  let m;
+  while ((m = verbs.exec(text)) !== null) {
+    // ① 后向窗口：动词后 VERB_OBJ_WINDOW 字内出现安全词 = 动作对象
+    const tail = m.index + m[0].length;
+    const after = text.slice(tail, tail + VERB_OBJ_WINDOW);
+    if (SECURITY_BOUNDARY.test(after)) return true;
+    // ② 把/字句前向：主语序之外的中文宾语前置。必须有显式把/将标记，
+    //    否则「在鉴权中间件里跳过」这类前向宿主词会被误判成宾语。
+    const before = text.slice(Math.max(0, m.index - VERB_FRONT_WINDOW), m.index);
+    const baIdx = before.search(/[把將]/);
+    if (baIdx >= 0 && SECURITY_BOUNDARY.test(before.slice(baIdx))) return true;
+  }
+  return false;
+}
+
+/**
  * 是否是「开发/调试语境下绕过开发层设施」——良性。
  *
  * 判定顺序刻意如此（每条都有实测依据）：
  *   ① 恶意意图 → 绝不豁免（防止「调试时跳过校验以便注入」）
- *   ② 真实安全边界 → 绝不豁免（防止「本地绕过鉴权进后台」）
+ *   ② 真实安全边界 → 绝不豁免（防止「本地绕过鉴权进后台」）；
+ *      但安全词只作宿主而非动作对象时，一票否决不适用（第 125 轮宾语性判定）
  *   ③ 生产语境 → 不豁免；除非近邻有否定（「别在生产这么干」）
  *   ④ 开发语境 + 开发层设施 + 绕过动词 → 豁免
  *   ⑤ 开发语境 + optional 校验 → 豁免（无绕过动词也常见）
@@ -241,7 +294,11 @@ function hasAheadNegation(text, prodIdx) {
 function isDevDebugContext(text) {
   if (!text || typeof text !== 'string') return false;
   if (MALICIOUS_INTENT.test(text)) return false;
-  if (SECURITY_BOUNDARY.test(text)) return false;
+  // [第 125 轮] 安全边界一票否决加了宾语性条件：安全词在场 **且** 是绕过
+  // 动作的宾语时才否决（_HOST_NOT_OBJECT_）。见 _securityIsVerbObject 注释
+  // 里的缺口实测与攻击/良性分界。第 124 轮交接警告「简单摘词会赦掉真攻击」
+  // 在这里落地为「摘的是『在句中出现』这个条件，不是「鉴权」这个词」。
+  if (SECURITY_BOUNDARY.test(text) && _securityIsVerbObject(text)) return false;
   const pm = PROD_CONTEXT.exec(text);
   if (pm) {
     const around = text.slice(Math.max(0, pm.index - PROD_WINDOW), pm.index + pm[0].length + PROD_WINDOW);
