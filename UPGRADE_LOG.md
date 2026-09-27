@@ -1,3 +1,69 @@
+## 第 122 轮（EN 侧 instrumental_reasoning 三族静默 pass——中英不对称补齐；判据误插 zh 数组的自引入回归，有惊无险）
+
+### 一、方向来源：decision 三跑定向
+
+init 简报的 4 条遗留里 3 条已过期或未复测，选不出单一真缺口。按铁律先跑
+`decision`（候选 A=EN ir 三族 / B=reward_hacking / C=ai_writing_tell / D=dangerous_instruction）。
+第一跑 4 候选打平（0.74/0.74/0.77/0.77）、第二跑补「代价/阻塞性/实测状态」判据后
+仍打平（0.81/0.81/0.77），第三跑收成二选一（纯召回增量不碰基线 vs 碰基线需先复测）才定向：
+**A 中选（0.81 > 0.77）**。这与第 120 轮「decision 三跑打平后补判据才定向」同型。
+
+### 二、缺口复测（不信简报旧描述）
+
+`scripts/probe-r122-en-gan.js`：24 条同族英文攻击（形状与第 121 轮中文三族一一对应）
+**23 条 ir.count=0、gate 全 pass**（唯一命中那条是既有 `whatever it takes` 判据捎带）；
+10 条良性压力样本 0 误伤。坐实「zh 第 121 轮三族落地后留下的中英不对称」。
+
+### 三、改动（2 commit）
+
+1. `feat` `src/index.js`：EN 侧三族 **20 支判据**（族 A 7 / 族 B 8 / 族 C 5），
+   全部沿用「两半齐备」铁律。主测试
+   `test/instrumental-en-gan-three-families-round122.test.js` 10 断言：
+   24 攻击 ir 命中 24/24 + gate rewrite/block 24/24；**良性 20 条零误伤**；
+   元话语豁免 2/2 不破；EN 既有族（第 108/27 轮）4/4 不回归；
+   ZH 三族（第 121 轮）3/3 不回归。
+   首跑 7 条未命中（A#4/A#6、B#2/B#3/B#4、C#3/C#4）→ 回补 A6/A7/B5/B6/B7/B8/C4/C5
+   八支后才 24/24——**英文侧的语序变体比中文多**（cut-and-backfill / anyone can be
+   swapped out / measured in / drawn down / no-I-know 引导语 / 发展权否定形）。
+2. `test` `scripts/negative-test-instrumental-en-gan-round122.js`：20 支逐条注入
+   （删该判据 → 主测试必须变红），**真守卫 20/20、0 兜底、0 异常**，源码还原逐字节一致。
+   ⚠️ v1 版 5 条 needle 漏了 `)` 后紧跟的 `\b` 导致 ×0 误报 ANOMALY——
+   **needle 落盘前必须先逐字校验 ×1**（本轮用 check-needles.js 先验再改，v2 一次通过）。
+
+### 四、本轮自引入回归（第 5 种形态，写进交接）
+
+**判据误插语言侧数组：把 20 支英文判据插进了 `INSTRUMENTAL_PATTERNS.zh`。**
+`checkInstrumentalReasoning` 按 `hasChinese` 二选一分流，英文文本永远走不到 zh 数组
+→ 主测试 6 族全红但**插入位置完全正确、语法也过**。发现方式：跑完首轮 24 条探针
+「命中数没有变化」才回头查插入点——不是靠测试报错定位的。
+修法：patch 整体回滚该插入，重新插进 `en` 数组末尾（6654 行 `],` 前）。
+**教训升级**：`src/index.js` 里 zh/en 双数组结构下，patch 只认 old_string 唯一，
+**不校验语言归属**——插入英文判据前先确认目标行附近有中文标点（`[^。]`）还是有
+`[\\s\\S]`/`[^.]`。本轮是把这条写进 patch 前自检。
+
+### 五、七项验证
+
+主测试 10/10 · 守卫 20 支真守卫 · bin/verify 14/14 · security-audit 16/16 ·
+doc-numbers 15/15 · 双向门禁**召回 52/52、误拦 300/326 与基线逐字节一致** ·
+run-all（见下）。
+
+### 六、遗留
+
+1. **LLM/EN 401 未解** —— stepfun 的 api-key 失效，需用户更新凭据（运维侧，非引擎问题）。
+2. EN 侧三族的**口语变体**仍可扩：本轮 20 支覆盖书面/标准语序，英式俚语与
+   HR 行话（headcount freeze / PIP / performance improvement plan 这类缩写黑话）未收。
+3. `ai_writing_tell` 多语言误伤、`reward_hacking` 剩余 6 类仍未实测（本轮未排到）。
+
+### 七、给下一轮
+
+1. **中英对称审计可以批量做**：本轮证明「zh 补完一族，EN 同族大概率也缺」。
+   可对 zh 侧已固化的各族（第 108 人情投资、第 118 目的-手段脱缰、第 65 拖延族）
+   逐个跑 EN 侧同族探针，一次补齐剩下的不对称——这是当前最高确定性的召回增量。
+2. patch 英文判据前，先 grep 目标行含 `[^。]`（zh）还是 `[\\s\\S]`（en），再插。
+3. needle 型守卫脚本落盘前，先用 split 计数校验每一条 ×1（本轮 v1 5 条 ×0 的教训）。
+
+---
+
 ## 第 121 轮（中文 instrumental_reasoning 三族静默 pass；patch 顶层 `|` 自引入语法回归第 4 种形态，靠基线逐行比对还原）
 
 ### 一、方向来源：主动普查 + 实测复测
