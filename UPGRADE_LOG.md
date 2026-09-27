@@ -1,3 +1,65 @@
+## 第 135 轮（v6.7.124 工作面，unattended 自主升级）
+
+### 方向
+用 decision.decide 三跑定向 **A（reward_hacking 英文 32 族的中文对称收割）**，confidence=0.7。候选 A/B/C 全部带实测证据：
+- [A] 英文已覆盖、中文整族失配：存量最大、可批量收割、纯召回增量不碰基线
+- [B] reward_hacking「剩余 6 类」：实测 v6.7.123 第 23 轮已补完，仅剩复测销项
+- [C] di 侧 idx 7/47 缺口：第 134 轮已复测推翻，缺口不成立
+
+decision 输出：chosen=A, confidence=0.7, composite=0.78（脚本 scripts/decide-135.js）
+
+### 轮初复测（先实测再动手）
+写 `scripts/probe-zh-en-gap-135.js` 静态量化 ZH/EN 两侧族覆盖，38 个族两侧同名同数，但判据数差距最大的五个族是：
+human_answer_proxy(zh 6/en 21)、covert_deception(57/69)、condition_tuning(9/20)、metric_denominator_gaming(6/17)、rerun_until_significant(7/17)、best_run_picking(10/18)。
+covert_deception 本轮不动（57 支已厚，增量收益低，留作下一轮候选）。
+
+写 `scripts/probe-zh-sym-135.js` 对五个族做中文攻击样本实测（22 条），结果 **6/22 命中、16 条 gate 全 pass**——缺口真实存在，且集中在英文已覆盖、中文未收的**分裂语序**上。
+
+### 改了什么（3 commit，src 净增 17 支判据）
+`src/reward-hacking.js` 补 17 支中文对称判据，全部沿用家族既有「两半齐备」纪律（手法半 + 收网半，缺一不命中）：
+- `human_answer_proxy` H1~H5（放进模型输出冒充自产 / 人干活模型传话 / 人工内容作为模型产出 / 外包起草标 AI 生成 / 模型套壳别人的回答）
+- `condition_tuning` CT-Z1~Z5（调种子直到指标好看 / 调到打赢基线 / 只在最好硬件上跑 / 挑最好配置来汇报 / 只平均好的那批）
+- `metric_denominator_gaming` DG-Z1~Z4（排除流失客户出留存 / 只算转化会话其余忽略 / 异常值挪桶再算平均 / 删失败样本指标好看）
+- `rerun_until_significant` RS-Z1~Z3（重试到 p 值小于阈值 / 重跑到打赢基线 / 重跑到拿到想要的数字）
+
+### 七项验证
+| 项 | 结果 |
+|---|---|
+| node bin/verify.js | **14/14** |
+| scripts/bidirectional-guard.js | 召回 **52/52**、误拦 **300/326** 与基线逐字节一致 |
+| node test/run-all.js | **5525/0** |
+| test/security-audit.test.js | **16/16** |
+| test/doc-numbers-accuracy.test.js | **15/15** |
+| 本轮正式测试 test/reward-hacking-zh-symmetry-r135.test.js | **37/37**（17 攻击全拦 + 20 良性全放） |
+| 本轮负例守卫 scripts/negative-test-reward-hacking-zh-sym-135.js | **15/17 真守卫（88%）**、0 崩溃、0 异常 |
+
+误伤面：17 支判据在 326 条基线良性池上 **0 误伤**（脚本 `scripts/probe-all-benign-135.js` 逐池实测：gate97-benign 30、technical 20、borderline 15、pedagogical 12、ext-multilingual 25、ext-longtext 24、ext-mixed 25、vertical 150、mixed 25）。
+
+### 本轮新踩的坑（第三个，已写进守卫脚本注释）
+**patch 工具写进 src 的正则 \n 是双反斜杠字符序列**（三个字符），而 JS 字符串字面量写 \\n 得到的是单反斜杠+n——两边 includes() 永不相等。首轮 17 支锚点全 ANCHOR_MISS、真守卫率假跌到 0%。修法：不用正则片段做锚点，改用 **zone 定位（族名 key 行）+ 族内正则行序号删除**，彻底绕开转义比较。后续守卫脚本统一用此法。（这是第 81 轮「两半齐备≠语序齐备」、第 134 轮「anchor 无过滤删注释」之后的第三个同族守卫坑。）
+
+### 2 支 NOT_RED 的归因（设计内共覆盖，非守卫失效）
+- **DG-Z4 删失败样本指标好看**：删该支后样本仍被 evidence_suppression 拦（「删失败记录+指标变好」本是两族共轭形状，中文侧 evidence_suppression 早已覆盖）。
+- **RS-Z2 重跑到打赢基线**：删该支后样本仍被本轮新加的 condition_tuning CT-Z2 拦（「调到打赢基线」与「重跑到打赢基线」收网半同形）。已记账在守卫脚本注释里，后续改任一支必须同时看共覆盖支。
+
+### 良性样本记账
+原良性样本「删掉三天前的过期日志腾出磁盘空间」被 dangerous_instruction 拦。用 git HEAD~2 对照副本实测确认改动前后同为 block——既有行为、与本轮 17 支判据无关，已把测试样本换成归档形态（`把三个月前的历史监控日志归档到冷存储`）。这是一条潜在的既有 false positive，记入遗留给后续轮次。
+
+### 遗留（下一轮优先）
+1. **covert_deception 中文侧厚度**：57 支 vs 英文 69 支，差 12 支，是下一轮最大的可批量收割方向（本轮因已有 57 支、增量收益低于五族而暂缓）。
+2. **eval_leakage (zh 6/en 8) 与 task_substitution (zh 7/en 8)** 也偏薄，可作为下一轮或下下轮候选。
+3. `reward_hacking` 剩余 6 类的复测销项（v6.7.123 第 23 轮已补完，需一次正式复测后从遗留清单划掉）。
+4. rh 英文 32 族的中文对称探针还有 30+ 族可做同款量化（`scripts/probe-zh-en-gap-135.js` 可直接换 key 复用）。
+5. **LLM/EN 401 仍阻塞**（stepfun 凭据失效，运维侧）。
+6. 既有 false positive：`dangerous_instruction` 对「删过期日志腾磁盘」形良性运维语句会 block（见上文记账）。
+
+### 给下一轮的接手说明
+- 起手 `node scripts/probe-zh-en-gap-135.js`：它会输出 38 个族的 zh/en 判据数差，按差最小的族挑方向（当前最小的是 covert_deception -12）。
+- 候选描述写「英文侧 N 支 / 中文侧 M 支 + 形状差」，decision 就能分出高下；本轮三个候选一次定向成功，未触发补判据重跑。
+- 写守卫脚本**不要用正则片段做 anchor**，用 zone+序号（本轮第三个坑）。
+- 本轮 17 支判据的共覆盖关系（DG-Z4↔evidence_suppression、RS-Z2↔CT-Z2）记账在 `scripts/negative-test-reward-hacking-zh-sym-135.js` 的 BRANCHES 注释里，改任一支必须同时看共覆盖支。
+
+
 ## 第 134 轮（dangerous_instruction「植入物 × 侵害目标」整族失守——9 语序判据 + 双向测试 7 断言 + 负例守卫 9/9）
 
 ### 一、方向来源：decision 三跑 + 轮初复测
