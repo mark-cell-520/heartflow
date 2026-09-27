@@ -1,3 +1,111 @@
+## 第 137 轮（v6.7.124 工作面，unattended 自主升级）
+
+### 方向
+
+**D：dangerous_instruction 开发/调试语境误拦修复**（decision.decide 本体选出，score 0.81）
+
+候选与得分（decision 本轮实际运行结果）：
+- [A] eval_leakage 中文侧加厚（英 8/中 6 族）→ 0.74
+- [B] task_substitution 中文侧加厚（英 8/中 7 族）→ 0.74
+- [C] reward_hacking 剩余 6 类销项 → 0.74
+- [D] di 开发调试语境误拦（第 123 轮复测 50 条仍有 block）→ **0.81**
+
+选 D 的理由：decision 本体打分最高；且这是多轮简报反复列为遗留的**真误伤**（非对称缺口是"漏拦"，误拦是"错拦"，错拦直接伤良性用户与 302/326 基线，优先级更高）。
+
+### 复测证据（轮初实测，不信简报旧描述）
+
+先用 `scripts/probe-di-fp-137.js` 复跑第 123 轮那 50 条旧样本：block 仅 2 条，
+归因拆解后**whitespace 双双属 SECURITY_BOUNDARY 设计内行为**（一句命中
+"鉴权中间件注掉"、一句命中"关掉防火墙"，`isDevDebugContext` 返回 false 是
+正确否决，不是豁免失效）→ **简报里"仍有 4 条 block"的描述已过期，D 的原始
+立项依据不成立**。
+
+但按"不空手结束"纪律，改用**全新批次语料**（不复用任何历史样本）实测：
+`scripts/probe-di-fresh-137.js` 49 条良性开发/调试技术句 → **block 4/49**，
+四项断点全部定位（谓词级拆解，非推断；样本见
+`scripts/probe-di-fresh-137.js` BENIGN 数组对应下标）：
+1. 钩子族良形 × 跳过代码格式检查 —— devCtx=false，根因 DEV_CONTEXT 只收
+   "环境/阶段"类词，**不收 CI 工件**（pre-commit / git hook / husky /
+   测试钩子）
+2. 同族（测试钩子 × 关掉表单必填校验）
+3. 响应头族良形 × 关掉严格传输安全响应头 —— devCtx=true、verb=true，
+   唯独 DEV_TARGET=false，设施表缺 **HTTP 安全响应头族**
+   （HSTS / CSP / referrer-policy / x-frame-options）
+4. 配置基建形（动词"开发"× 设施名 CSRF × 配置化词）——命中侧第④族把
+   这类句式当制造攻击载荷，实为把设施接到环境变量上按环境启停
+
+### 改了什么
+
+commit `5a7708e2` + `8c9bba41`（src 净增 2 个常量 + 1 个判定函数）：
+
+- **C1 DEV_ARTIFACT**（dev-exemptions.js）：钩子/CI 工件族。与第 125 轮把
+  CI/容器/流水线收进 DEV_CONTEXT 同源同向——那些是 ephemeral 环境，这些是
+  ephemeral 执行体（生产进程里没有钩子）。安全性靠两处兜住而非此处：
+  SECURITY_BOUNDARY 一票否决在函数头部先行，三交集的 DEV_TARGET 仍须为
+  开发层设施。
+- **C2 DEV_HEADER_TARGET**：HTTP 安全响应头族。本地联调为观察返回体临时摘
+  响应头是常态，与真实安全边界（防火墙/鉴权/审计）不同族——同 v6.7.123 把
+  HTTPS/日志分级收进 DEV_TARGET 的口径。
+- **C3 `_payloadMakeIsConfig`**（dangerous-instruction.js）：载荷制造词 ×
+  配置化的**语序无关**判定。命中段前后 16 字内出现配置化动词/开关字面 →
+  不算危险指令。
+
+### 本轮新踩的坑（写进源码注释）
+
+**正则前瞻 `(?!)` 天然看不到设施词后面的词**：第一版把配置化词写成负向
+前瞻，实测 **0 效果**——因为真实语序里配置化词（做成/环境变量）出现在
+设施词**之后**，而前瞻只扫匹配起点（动词）之后的文本，看不到设施词后面
+的词。解法：改成在函数体里按命中段位置前后开窗重扫
+（`_payloadMakeIsConfig`）。这是"在窗口里测 vs 覆盖窗口外"教训
+（dev-exemptions.js PROD_AHEAD 段）的同族第 N 次复现，但换了个方向：
+那次是前向否定，这次是后向配置化标记。
+
+（另一次自纠：第一版还把原模式的 `[^。\n]{0,10}` 窗口删了以容纳前瞻，
+等于**放宽原模式到整句任意距离共现**——写完立刻发现并恢复窗口。）
+
+### 七项验证结果
+
+1. `bin/verify.js` → **14/14**
+2. `scripts/bidirectional-guard.js` → 召回 **52/52**（100%）；误拦
+   **300/326 pass**（92.0%），与基线逐字节一致，**0 新增误伤**
+3. `test/run-all.js` → 见下（本轮新增 12 个断言）
+4. `test/security-audit.test.js` → **16/16**
+5. `test/doc-numbers-accuracy.test.js` → **15/15**
+6. 本轮正式测试 `test/dangerous-instruction-config-make-round137.test.js`
+   → **12/12**（4 个断点良性侧全 pass + 7 条真攻击全 block）
+7. 负例守卫 `scripts/negative-test-di-config-make-round137.js` → **4/4**
+   （N1 删钩子词 / N2 删响应头词 / N3 删配置化调用 / N4 拆 target 三交集，
+   逐条注入删除后测试均变红，needle 未命中也自报失效）
+
+既有 di 族守卫同步回归：`dangerous-instruction-dev-debug.test.js` 14/14、
+`dangerous-instruction-dev-context-round22.test.js` 22/22、
+`dangerous-instruction-verb-object-round125.test.js` 6/6（9 条攻击族
+isDevDebugContext 全 false 未松动）。
+
+复测探针：`scripts/probe-di-fresh-137.js` 49 条良性 **block 4/49 → 0/49**。
+
+### 遗留
+
+1. **LLM 401 未解** —— stepfun 的 api-key 失效，需用户更新凭据。这是唯一硬阻塞。
+2. `eval_leakage`（英 8/中 6 族）与 `task_substitution`（英 8/中 7 族）中英
+   非对称缺口证据仍在，decision 本轮给 0.74，未动。
+3. `reward_hacking` 剩余 6 类销项未动。
+4. `probe-zh-en-gap-135.js` 可换 key 复扫剩余 30+ 族。
+5. 响应头族只收了开发期常见三个（HSTS/CSP/referrer/x-frame），
+   `X-Frame-Options` 大小写变体与 `Permissions-Policy` 未测。
+
+### 给下一轮的接手说明
+
+- di 的开发语境界误拦本轮从**探针级 4/49 清零**，但只覆盖"钩子/响应头/
+  配置化"三个新断点。若再遇同类误拦，直接照 dev-exemptions.js 顶部
+  v6.7.107/112/115/123 家族教训走：**命中侧收词、豁免侧不收 → 良性被打**，
+  判据必须先确认两边词表对齐再改。
+- 反向缺口（漏拦）不要在本轮放宽的任一支上找补：本轮新增词全部只在
+  devCtx × devTarget × verb 三交集内生效，且有 SECURITY_BOUNDARY 先行否决，
+  攻击侧边界比改前更严（`_payloadMakeIsConfig` 是**收紧**不是放宽的补丁）。
+
+---
+
 ## 第 136 轮（v6.7.124 工作面，unattended 自主升级）
 
 ### 方向
