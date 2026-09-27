@@ -370,7 +370,17 @@ const DANGEROUS_PATTERNS = [
   //   · 中文表对象（全表/整表/用户表/订单表/…）——必须与谓词后 20 字内
   //     出现的高危语境词**或** prod 同现，单独表对象不命中
   // 良性/攻击双向边界见本文件尾注与 test/normalizer-sql-predicate-round124.test.js。
-  /\b(?:delete\s+from|truncate(?:\s+table)?|drop\s+table|update\s+\*?\s*(?:from|set)?|alter\s+table|insert\s+into)\b[^.]{0,20}\b(?:production|prod\b|线上|生产|users?|user\s+table|customers?|orders?|accounts?|备份|backup|snapshot|database|schema|全表|整表|全库)\b/i,
+  // ⚠️ [第 127 轮] 目标词组的 `\b` 修复：原写法把中文候选
+  //    （线上/生产/备份/全表/整表/全库）整体包进 `\b(?:…)\b`，而 `\b` 只对
+  //    ASCII `\w` 定义——`delete from 生产库` 里「生产」后面紧跟汉字，
+  //    尾部 `\b` 永不成立，中文高危语境词全部静默失配（实测 0/4 命中，
+  //    而 ASCII 侧 `delete from production` 4/5 命中）。
+  //    修法：拆成 ASCII 支（保留 `\b`，防命中子串）与中文支（无 `\b`，
+  //    以精确子串参与窗口匹配）。与 381-384 行用 `(?=[\s\u4e00-\u9fff])`
+  //    修「谓词后紧跟中文」是同一族问题（本文件第 2 次复现）。
+  // 良性边界不变：谓词后 20 字内需出现高危语境词或 prod，测试库/staging
+  // 无此类词仍 pass，见 test/normalizer-sql-predicate-round124.test.js。
+  /\b(?:delete\s+from|truncate(?:\s+table)?|drop\s+table|update\s+\*?\s*(?:from|set)?|alter\s+table|insert\s+into)\b[^.]{0,20}(?:\b(?:production|prod\b|users?|user\s+table|customers?|orders?|accounts?|backup|snapshot|database|schema)\b|线上|生产|备份|全表|整表|全库)/i,
   // 中文表对象版（谓词 + 中文表对象 + **生产语境**三要素同现）。
   // 三要素判据来自双向实测（本组 5 良性 vs 5 攻击逐条对比）：
   //   良性（测试库/staging/sandbox/开发环境 + 谓词 + 表对象）devCtx=true、prodCtx=false
@@ -384,7 +394,12 @@ const DANGEROUS_PATTERNS = [
   /(?:全表|整表|全库|用户表|订单表|会员表|客户表|账务表|支付表|账户表)[^.\n]{0,12}(?:生产|线上|正式)[^.\n]{0,16}(?:delete\s+from|truncate|drop\s+table)/i,
   // 目标在前、谓词在后（中文定语后置的英文镜像：`wipe the users table` /
   // `truncate the orders table` / `drop the production database`）
-  /\b(?:truncate|wipe|drop|delete|remove)\b[^.]{0,16}\b(?:the\s+)?(?:users?|user\s+table|customers?|orders?|accounts?|production|prod\b|线上|生产|备份|backup|database|schema)\b[^.]{0,16}\b(?:table|tables|database|data|records?|rows?|全表|整表|库)\b/i,
+  // ⚠️ [第 127 轮] 目标词组同 373 条的 `\b` 修复：原写法把
+  //    `线上|生产|备份|全表|整表` 包进 `\b(?:…)\b`，中文侧尾部 `\b` 永不成立
+  //    （实测谓词+中文高危语境 0/5 命中，ASCII 3/5）。拆成 ASCII 支留 `\b`、
+  //    中文支无 `\b`。目标支同理：`全表|整表|库` 改为精确中文支。
+  // 良性边界不变：本文件尾注与 test/sql-word-boundary-round127.test.js 双向守卫。
+  /\b(?:truncate|wipe|drop|delete|remove)\b[^.]{0,16}(?:\b(?:the\s+)?(?:users?|user\s+table|customers?|orders?|accounts?|production|database|schema)\b|线上|生产|备份)[^.]{0,16}(?:\b(?:table|tables|database|data|records?|rows?)\b|全表|整表|库)/i,
 ];
 
 const DI_LEVEL = 'critical';
