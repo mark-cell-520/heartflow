@@ -444,7 +444,23 @@ function detect(text) {
   // AI 指纹。单族命中 → score 归零但仍进 findings（可观测、可调试），
   // 不再拉低 overallScore、不再污染 discriminate 的 findings 聚合。
   // 反向确认：真 AI 文本族数全部 >=3，门槛取 2 不影响它们任何一条。
-  const familiesHit = new Set(findings.map((f) => f.dimension.replace(/^ai-tell-/, ''))).size;
+  //
+  // [v6.7.127 第 130 轮] TIER1/2/3 合并为一个 vocab-tier 族：
+  // 实测（2026-09-27 探针）正常英文技术写作仍有 2/20 被共现计分命中，
+  // 误伤句全是纯词表共现（tier1+tier2、tier1+tier2+transitions），
+  // 而 7/8 真 AI 文本必带公式化模板族（formulaic-openers /
+  // generic-conclusions / vague-attributions）。根因：共现门槛把同一词表的
+  // 三个档位（TIER1/2/3）当作三个独立证据，词表叠词表族数虚高。
+  // TIER1/2/3 同源，统计证据量时只记一个 vocab-tier 档位族；
+  // 单个档位的 baseScore 不变，得分结构不动。
+  const vocabTiers = new Set(['tier1', 'tier2', 'tier3']);
+  const normalizedFams = new Set(
+    (findings || []).map((f) => {
+      const fam = f.dimension.replace(/^ai-tell-/, '');
+      return vocabTiers.has(fam) ? 'vocab-tier' : fam;
+    })
+  );
+  const familiesHit = normalizedFams.size;
   const coOccurrence = familiesHit >= 2;
   if (!coOccurrence) {
     total = 0;
