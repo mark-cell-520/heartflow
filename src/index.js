@@ -4066,6 +4066,96 @@ const VICTIM_BLAMING_PATTERNS = [
     pattern: /\b(?:if|that'?s why) (?:she|he|they) (?:didn'?t want|didn'?t need to|went|kept|stayed|left|wore|posted)\b[^.]{0,60}?\b(?:attention|harassment|followed|targeted|groped)\b/i,
     type: 'en_behavior_attribution',
   },
+  // [v6.7.130 第 110 轮] 「受害者先有过错」回溯归因族（zh_retrospective_blame /
+  // en_retrospective_blame）。第 108 轮交接簿点名，本轮复测坐实：zh 5/8
+  // （3 条漏判 gate pass）、en 2/8（6 条漏判）。与第 107 轮「行为归因」族
+  // （谁让/谁叫+后果）不同——本族是**回溯性断言受害者先有过错**：
+  //   zh：孩子被欺负肯定是他先惹的事 / 被拖欠工资？肯定是他自己没签好合同
+  //       她被家暴却不离开，说明她喜欢这样 / 遭抢劫一定是他先露的财
+  //   en：The victim was careless and deserved what happened
+  //       He should not have walked alone, so it is his own fault
+  //       If the kid got bullied he must have started it
+  // 护栏设计（实测 51 条良性池 0 误命中，逐支归属见 test/victim-blaming-attribution.test.js）：
+  //   - zh 全部要求「归因断言词（肯定/一定/显然/说明）+ 主语（他/她/自己/受害人）
+  //     + 先过失词（惹/动/挑/犯/露/答/不/有错/没签/贪/轻信）」三要素共现，
+  //     合法复盘句（故障肯定是容量规划没做好）因主语不是当事人而不命中；
+  //   - en 侧主语/时态均锁定第三人称回溯（was careless / should not have /
+  //     must have / means you were），the adjuster/SLA 定责句因无因果断言词不命中。
+  {
+    // D1 肯定/一定/显然/只能说明 + 主语 + 先+过失（孩子被欺负肯定是他先惹的事）
+    pattern: /(?:肯定|一定|显然|只能说明|还不是|那就是)[^。]{0,8}(?:他|她|自己|当事人|受害人|受害者)[^。]{0,4}先(?:惹|动手|挑|犯|不|有错)/,
+    type: 'zh_retrospective_blame',
+  },
+  {
+    // D1b 肯定 + 自己 + 没|不 + 过失行为（肯定是他自己没签好合同）
+    pattern: /肯定[^。]{0,10}(?:是)?[^。]{0,8}自己(?:没|不)[^。]{0,10}/,
+    type: 'zh_retrospective_blame',
+  },
+  {
+    // D1c 被打/被孤立/被骚扰/被开除/被欺负/被排挤 + 说明|肯定 + 她|他 + 先
+    pattern: /(?:被打|被孤立|被骚扰|被开除|被欺负|被排挤)[^。]{0,8}(?:说明|肯定)[^。]{0,6}先/,
+    type: 'zh_retrospective_blame',
+  },
+  {
+    // D2 说明 + 她/他/当事人 + 喜欢|愿意|情愿（被家暴却不离开，说明她喜欢）
+    pattern: /说明[^。]{0,4}(?:她|他|当事人)[^。]{0,4}(?:喜欢|愿意|情愿|享受)/,
+    type: 'zh_retrospective_blame',
+  },
+  {
+    // D3 被家暴/被打/被欺负/被纠缠/被骚扰 + 却不|不离开|还留下来|还原谅
+    pattern: /[^。]{0,6}(?:被家暴|被打|被欺负|被纠缠|被骚扰)[^。]{0,12}(?:却不|不离开|还留下来|还原谅)/,
+    type: 'zh_retrospective_blame',
+  },
+  {
+    // D4 被X/遭X + 肯定|一定|显然 + 先+过失（遭抢劫一定是他先露了财）
+    pattern: /(?:被|遭)[^。]{1,8}(?:肯定|一定|显然)[^。]{0,8}先(?:惹|动|挑|犯|露|答|不|有错)/,
+    type: 'zh_retrospective_blame',
+  },
+  {
+    // D5 肯定(是)因为 + 自己|他|她 + 过失（被骗肯定是因为他自己贪小便宜）
+    pattern: /肯定(?:是)?因为[^。]{0,8}(?:自己|他|她|受害人|当事人)[^。]{0,4}(?:贪|轻信|大意|疏忽|不小心|软弱)/,
+    type: 'zh_retrospective_blame',
+  },
+  {
+    // D6 肯定|一定|显然 + 自己先 + 答应|同意|允许|点头（受害人肯定自己先答应了）
+    pattern: /(?:肯定|一定|显然)[^。]{0,6}自己先(?:答应|同意|允许|点头)/,
+    type: 'zh_retrospective_blame',
+  },
+  {
+    // E1 第三人称 was careless + deserved（The victim was careless and deserved）
+    pattern: /\b(?:the (?:victim|student|employee|worker|witness|claimant|child|kid|mother|father|neighbor)|she|he|they)\b[^.]{0,12}\b(?:was|were) careless[^.]{0,40}\b(?:deserved|got what)/i,
+    type: 'en_retrospective_blame',
+  },
+  {
+    // E2 should not have + own fault（so it is his own fault）
+    pattern: /\b(?:should not|shouldn'?t) have (?:been|walked|gone|worn|stayed|gone there)\b[^.]{0,40}\b(?:his|her|their) own fault\b/i,
+    type: 'en_retrospective_blame',
+  },
+  {
+    // E3 if/when got X ... must have（If the kid got bullied he must have started it）
+    pattern: /\b(?:if|when) (?:the )?(?:kid|child|victim|person|worker|employee|student|man|woman|he|she|they) got (?:bullied|attacked|scammed|robbed|assaulted|harassed|fired|laid off|stabbed|beaten)[^.]{0,60}\bmust have\b/i,
+    type: 'en_retrospective_blame',
+  },
+  {
+    // E4 getting X means you were Y（Getting scammed means you were greedy）
+    pattern: /\bgetting (?:scammed|robbed|bullied|fired|raped|attacked|evicted|expelled|deported) means (?:you|he|she|they) were\b/i,
+    type: 'en_retrospective_blame',
+  },
+  {
+    // E5 欠薪/解雇 + himself（Not getting paid? He clearly signed a bad contract himself）
+    pattern: /\b(?:not getting paid|didn'?t get paid|unpaid|got fired|was laid off|never paid)\b[^.]{0,70}\b(?:himself|herself|themselves|their own)\b/i,
+    type: 'en_retrospective_blame',
+  },
+  {
+    // E5b 签署/接受 + own fault / bad contract（He clearly signed a bad contract）
+    pattern: /\b(?:he|she|they) (?:clearly |obviously |just )?(?:signed|agreed to|accepted|chose)\b[^.]{0,30}\b(?:bad contract|his own fault|her own fault)\b/i,
+    type: 'en_retrospective_blame',
+  },
+  {
+    // E6 stayed with abuser + so she/he enjoys（把持续在场解释为主观情愿）
+    pattern: /\bstayed (?:with|at) (?:her|his)?\s*(?:abuser|attacker|ex)\b[^.]{0,60}\bso (?:she|he|they)\b/i,
+    type: 'en_retrospective_blame',
+  },
 ];
 
 function checkVictimBlaming(text) {
