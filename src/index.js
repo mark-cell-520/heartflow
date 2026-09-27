@@ -4156,6 +4156,117 @@ const VICTIM_BLAMING_PATTERNS = [
     pattern: /\bstayed (?:with|at) (?:her|his)?\s*(?:abuser|attacker|ex)\b[^.]{0,60}\bso (?:she|he|they)\b/i,
     type: 'en_retrospective_blame',
   },
+  // [v6.7.130 第 115 轮] 「不作为=默许 / 沉默=同意」族（zh_silence_as_consent /
+  // en_silence_as_consent）。第 110 轮交接簿点名方向，本轮复测坐实：zh 10 条
+  // 攻击 9 条 gate action=pass（唯一 1 条 rewrite 是第 110 轮 D1b 支偶然命中），
+  // en 8 条攻击 8 条 pass。与第 110 轮「先有过错」族不同形状——本族把当事人
+  // 的**不作为**（沉默/未拒绝/未报警/未呼救/未退出）解释为同意或默许，是
+  // 家暴/骚扰案件二次伤害话术的常见形态。既有 D3（被X+却不离开）只断言
+  // 「在场=情愿」，不含「沉默/未报警→同意」的推断链，因此单独立族。
+  //
+  // 护栏设计（全部实测印证）：
+  //   - zh 三要素共现：受害情境词（被家暴/被骚扰/被欺负…）+ 不作为（没报警/
+  //     不吭声/一句话没说…）+ 同意推断词（说明/那就是 + 同意/默许/乐意）。
+  //     纯组织决策句（他没说话说明他认同方案）因无受害情境词不命中。
+  //   - zh F3 只收纯沉默短语（不吭声/默默忍/忍着没说/一句话没说），不收
+  //     「不肯离婚」类（那归 F4），避免与第 110 轮 D3 支兜底互撞。
+  //   - en 侧要求受害词（harassed/assaulted/beaten…）+ 不作为 + 同意结论
+  //     三要素；「never complained about the change, so he agreed」这类
+  //     组织语境因无受害词不命中。
+  {
+    // F1 受害情境 + 否定 + 不作为动作 + 推断 + 同意（她挨了打却从没报过警，说明她同意）
+    // 受害词允许助词变体（被/遭/挨 + 到/了/过），覆盖「遭到骚扰」「受了欺负」等口语形。
+    // 双重护栏：
+    //   ① 推断结论必须出现「说明/那就是…同意/自愿」链——纯客观记述
+    //      （保持沉默是常见创伤反应 / 不离婚律师已介入 / 不是同意）不命中；
+    //   ② 求助行为是正向信号（第一时间报警 / 向律师求助），本身不得命中。
+    pattern: /(?:(?:被|遭|挨)(?:到|了|过)?(?:家暴|打|揍|骚扰|欺负|欺凌|侵犯|侵害|殴打|卡油|占便宜|纠缠|伤害|侵权|猥亵|不公)|受(?:到|了|过)?(?:家暴|骚扰|欺负|侵犯|殴打|侵害|猥亵)|遇到?(?:骚扰|不公|侵犯|殴打|侵害))[^。]{0,20}(?:没|未|不曾|从没|从不|也没有|都没有|也从未|也没|都没|不|不肯|不愿|也不肯|也不愿)[^。]{0,6}(?:反抗|拒绝|呼救|报警|报过警|求助|吭声|吱声|推开|阻挡|躲避|逃跑|离开|说出来|举报|告过状|告状|告诉任何人|反抗过|拒绝过|报告|报案|求救|喊人|作声|回绝|抗争|抵挡|挣脱|逃离|走掉|出走|离婚|分手|声张|走)[^。]{0,20}(?:说明|证明|表明|意味着|那就是|就是|可见|等于)[^。]{0,6}(?:她|他|当事人|受害者|受害人)?[^。]{0,6}(?:同意|默许|默认|情愿|乐意|自愿|愿意|接受|喜欢|心甘情愿|认了|不介意)/,
+    type: 'zh_silence_as_consent',
+  },
+  {
+    // F2 逆序：推断 + 同意 + 受害情境共现（说明她同意，毕竟她挨了打也从不报警）
+    pattern: /(?:说明|证明|表明|可见|这意味着|只能说明)[^。]{0,8}(?:她|他|当事人|受害者|受害人)[^。]{0,6}(?:同意|默许|默认|情愿|乐意|自愿|愿意|接受|喜欢|心甘情愿)[^。]{0,30}(?:(?:被|遭|挨)(?:到|了|过)?(?:家暴|打|揍|骚扰|欺负|欺凌|侵犯|侵害|殴打|卡油|占便宜|纠缠|伤害|侵权|猥亵|不公)|受到?(?:家暴|骚扰|欺负|侵犯|殴打|侵害|猥亵)|遇到?(?:骚扰|不公|侵犯|殴打|侵害))/,
+    type: 'zh_silence_as_consent',
+  },
+  {
+    // F3 受害情境 + 沉默动词短语 + 主观断语（把沉默解释为主观状态）。
+    // 护栏：结论必须指向主观状态（接受/默认/同意）——
+    // 「保持沉默是常见创伤反应，不是同意」显式否定同意，不命中；
+    // 「默默忍直到上周求助」是求助叙事，不命中（无可命中结论词）。
+    pattern: /(?:(?:被|遭|挨)(?:到|了|过)?(?:家暴|打|揍|骚扰|欺负|欺凌|侵犯|侵害|殴打|卡油|占便宜|纠缠|伤害|侵权|猥亵|不公)|受(?:到|了|过)?(?:骚扰|欺负|侵犯|殴打|侵害|猥亵|家暴))[^。]{0,12}(?:不吭声|不吱声|默默忍|忍着没说|一句话没说|忍气吞声|没有声张|不敢吱声|不敢作声|不肯作声|没说话|不说话|不作声|不声张|默默承受|一直忍着)[^。]{0,30}(?:说明|证明|表明|意味着|那就是|就是|可见|等于|显然是|只能是)[^。]{0,10}(?:她|他|当事人|受害者|受害人)?[^。]{0,6}(?:同意|默许|默认|情愿|乐意|自愿|愿意|接受|喜欢|心甘情愿|认了|不介意|享受|心甘|默认接受|接受得了)/,
+    type: 'zh_silence_as_consent',
+  },
+  {
+    // F4 退场自由被否认 + 自愿解释（她到现在还不肯离婚，说明她乐意继续过）
+    // 护栏：须「推断词 + 乐意/愿意 + 续段」三段齐——
+    // 「至今没有离婚，律师已介入」（事实陈述）、「不离婚是因为担心孩子」
+    // （陈述离开的阻碍）都不命中。反证池见 test 中 zh FP 组 idx4/5。
+    pattern: /(?:不肯离婚|不肯分手|不肯离开|还原谅|还在一起|还继续过|不离婚|不离开)[^。]{0,12}(?:说明|证明|那就是|就是|可见|意味着)[^。]{0,8}(?:她|他|当事人|受害者|受害人)?[^。]{0,4}(?:乐意|愿意|情愿|心甘|心甘情愿|享受|默认|接受|接受着)[^。]{0,10}(?:继续|过下去|待着|维持|这样|跟他|跟她|延续)/,
+    type: 'zh_silence_as_consent',
+  },
+  {
+    // E7 EN 受害词 + 不作为 + 同意结论。受害词表含被动定语（was being X）与
+    // 动名词形（never spoke up about it / the harassment），距离放宽到 60。
+    // 反证护栏：结论锚点只用 so/which means 等二元因果词——「never reported
+    // the billing error, so it is still unresolved」是被害事实陈述而非归责
+    // 推断，不命中。受害词必现防止误伤组织语境。
+    pattern: /\b(?:harassed|assaulted|beaten|groped|bullied|raped|attacked|abused|molested|stalked|harassment|abuse|assault|bullying|victim(?:s)? of)\b[^.]{0,60}\b(?:never|did not|didn't|no(?:ne)? of|nobody heard (?:her|him|them))\b[^.]{0,12}\b(?:report(?:ed)?|complain(?:ed)?|resist(?:ed)?|object(?:ed)?|push(?:ed)? back|speak(?:t)?|spoke up|call(?:ed)? for help|call(?:ed)? the police|left|escape(?:d)?|told anyone|said anything)\b[^.]{0,40}\b(?:so|which means|that means|therefore)\b[^.]{0,20}\b(?:consent(?:ed)?|agreed|accepted|wanted|fine with|okay with|asking for it|yes)/i,
+    type: 'en_silence_as_consent',
+  },
+  {
+    // E8 EN 受害词 + never + 不作为动作（无推断词，动作链已足够强）。
+    // 受害词表含动名词/抽象名形（the harassment / the abuse），距离放宽到 80。
+    pattern: /\b(?:harassed|assaulted|beaten|groped|bullied|raped|attacked|abused|molested|stalked|harassment|bullying|victim(?:s)? of)\b[^.]{0,80}\b(?:never|did not|didn't)\b[^.]{0,14}\b(?:report(?:ed)?|complain(?:ed)?|resist(?:ed)?|object(?:ed)?|push(?:ed)? back|spoke up|speak up|call(?:ed)? (?:the police|for help)|left|escape(?:d)?|told anyone|said anything)\b/i,
+    type: 'en_silence_as_consent',
+  },
+  {
+    // E9 EN 受害词 + 没拒绝/没反抗 → 想要（她没反抗，说明她想要）
+    // 受害词必现（同 E11/E12：无受害词的「did not join → not interested」
+    // 是组织语境正常表述）。受害词与否定动作的距离放宽到 80（口语里常见
+    // 「She was the one being harassed at the party yet she did not resist」）。
+    pattern: /\b(?:harassed|assaulted|beaten|groped|bullied|raped|attacked|abused|molested|stalked|victim(?:s)? of)\b[^.]{0,80}\b(?:she|he|they)\b[^.]{0,30}\b(?:did not|didn't|never)\b[^.]{0,14}\b(?:resist|object|say no|fight back|tell anyone|push back|report|complain)\b[^.]{0,40}\b(?:means|shows|proves)\b[^.]{0,20}\b(?:she|he|they)\b[^.]{0,20}\b(?:wanted|enjoyed|liked|consent(?:ed)?|agreed|was fine|was okay)/i,
+    type: 'en_silence_as_consent',
+  },
+  {
+    // E10 EN 沉默 + so silence means（She stayed silent through the abuse, so silence means yes）
+    pattern: /\bstayed silent\b[^.]{0,40}\b(?:so|therefore|which means)\b[^.]{0,30}\bsilence (?:means|equals|is)\b/i,
+    type: 'en_silence_as_consent',
+  },
+  {
+    // E11 EN 受害词 + 没求助/没离开 + 自愿结论（距离放宽到 80）。
+    // 受害词必现——「did not leave the meeting, so he was fine」是组织语境的
+    // 正常同意表述（本轮实测误伤 9 条同族良性），无受害词一律不命中。
+    pattern: /\b(?:harassed|assaulted|beaten|groped|bullied|raped|attacked|abused|molested|stalked|victim(?:s)? of|his abuser|her abuser|the abuser)\b[^.]{0,80}\b(?:she|he|they)\b[^.]{0,20}\b(?:did not|didn't|never)\b[^.]{0,14}\b(?:leave|left|escape|walk away|flee|report(?:ed)?|complain(?:ed)?|resist(?:ed)?|object(?:ed)?|push(?:ed)? back|call(?:ed)? the police|spoke up|told anyone)\b[^.]{0,40}\b(?:so|therefore)\b[^.]{0,30}\b(?:went along|accepted|consent(?:ed)?|agreed|wanted|was fine|was okay)/i,
+    type: 'en_silence_as_consent',
+  },
+  {
+    // E12 EN 受害词 + never pushed back/resist + was fine（没反抗=她能接受）。
+    // 受害词与否定动作距离放宽到 80（「Harassed for months, she never pushed back」）。
+    pattern: /\b(?:harassed|assaulted|beaten|groped|bullied|raped|attacked|abused|molested|stalked|victim(?:s)? of)\b[^.]{0,80}\b(?:she|he|they)\b[^.]{0,30}\bnever\b[^.]{0,16}\b(?:pushed back|resist(?:ed)?|object(?:ed)?|complain(?:ed)?|report(?:ed)?|spoke up|said anything)\b[^.]{0,40}\b(?:so|therefore)\b[^.]{0,30}\b(?:she|he|they)\b[^.]{0,20}\b(?:was fine|was okay|accept(?:ed)?|consent(?:ed)?|wanted|agreed|did not mind)/i,
+    type: 'en_silence_as_consent',
+  },
+  {
+    // E13 EN nobody heard her object + so she consented（无人抗议→默许）
+    pattern: /\bnobody heard\b[^.]{0,30}\b(?:object|complain|say no|refuse|protest)\b[^.]{0,40}\b(?:so|therefore|which means|that means)\b[^.]{0,30}\b(?:consent(?:ed)?|agreed|accepted|wanted|was fine|was okay)/i,
+    type: 'en_silence_as_consent',
+  },
+  {
+    // E14 EN「不作为=默许」通用链（第 115 轮收敛支）。
+    // 形状：受害词在句内任意位置（前向断言，距离 ≤140）+ 否定 + 不作为动作
+    //       + 二元因果结论锚点 → 自愿结论。
+    // 实测依据（第 115 轮 v5b 探针）：B/C/D 三条（never called the police /
+    // never pushed back on the groping / did not leave his abuser）此前分散
+    // 表达、E7-E12 无法一支命中；前向断言形状四条攻击全 HIT，同时保持
+    // E（never reported the billing error, so it is still unresolved）与
+    // F（did not leave the meeting, so he was fine）两条组织良性 miss。
+    // 复盘时误报池：test/victim-blaming-silence-consent.test.js 的 BENIGN_EN。
+    // ⚠️ 坑（第 115 轮实测）：这条判据不能加 `^` 行首锚——二分探针显示
+    // `/^(?=...)/` 形状在本引擎恒 miss（`^` 锚与前置 lookahead 组合后被
+    // 镜像成永不匹配），去掉 `^` 后三条分散攻击全部 HIT。判定链仍要求
+    // 受害词、否定、动作、结论四段共现，不加锚不放松语义。
+    pattern: /(?=[^.\n]{0,140}(?:harass(?:ed|ment)|assault(?:ed)?|beaten|groping|groped|bullied|bullying|raped|attacked|abused|abuse|molested|stalked|victim(?:s)? of|his abuser|her abuser|the abuser)[^.\n]{0,140})(?:never|did not|didn'?t|nobody heard)[^.\n]{0,16}?(?:push(?:ed)? back|resist(?:ed)?|object(?:ed)?|complain(?:ed)?|report(?:ed)?|spoke up|call(?:ed)? the police|call(?:ed)? for help|leave|left|escape(?:d)?|told anyone|say no|said anything|fight back|walk away|fled)[^.\n]{0,120}?(?:so|which means|that means|therefore)[^.\n]{0,80}?(?:consent(?:ed)?|agreed|accepted|wanted|was fine|was okay|asking for it|went along|fine with|okay with|yes|enjoyed|liked)/i,
+    type: 'en_silence_as_consent',
+  },
 ];
 
 function checkVictimBlaming(text) {
