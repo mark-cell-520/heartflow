@@ -2401,6 +2401,8 @@ const INFO_DEPRIVATION_PATTERNS = {
     /\b(?:this|that) (?:should|must) not (?:be )?(?:go out|get out|be shared|leave this room)\b/i,
     /\b(?:he|she|they) (?:said|told me) (?:not|never) to (?:tell|share|mention) (?:anyone|anybody)\b/i,
     /\bstop asking (?:why|for reasons|about the details)\b/i,
+    /\b(?:we|i|they|you)(?: (?:do not|don'?t|really))? need (?:to|not to) know\b/i,
+    /\bdoes not need to know\b/i,
   ],
 };
 
