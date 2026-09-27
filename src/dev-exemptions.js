@@ -148,6 +148,46 @@ const PROD_CONTEXT = /(?:生产|线上|正式环境|prod\b|production|\blive\s+(
  */
 const LIST_ADD = /(?:白名单|whitelist|allowlist|信任名单|信任列表|例外列表|访问控制列表|安全组|security\s+group|ACL)/i;
 
+// [第 133 轮] 便利设施白名单的**绕过动词**支（与命中侧第①条动词表对齐）。
+// 由来（本轮立项实测，非推断）：复测「开发调试语境误拦」时发现同族误拦——
+//   · 「本地跑单元测试时绕过 Redis 白名单直接连接」      block
+//   · 「本地跑单元测试时把 Redis 加进测试白名单」         pass（既有放行支）
+// 两句唯一差别是「绕过」vs「加进」，语用完全同构：开发机/测试环境里把某个
+// 便利设施临时划出名单检查范围。既有 listAddCtx 只收「加进/放进/加入/追加」，
+// 不收 BYPASS_VERB 已有的「绕过/绕过/跳过/忽略…」，于是同批良性里动词用
+// 「绕过」的全部被打 block（10 条候选 8 条 block，命中侧第①条动词表有
+// 「绕过」而豁免侧没有 —— v6.7.123 家族教训第 7 次复现：命中侧收词、
+// 赦免侧不收 → 良性被新命中打 block）。
+//
+// 安全边界（本支比「加进」支更窄，因为绕过动词的真攻击同形更多）：
+//   ① SECURITY_BOUNDARY 在场且是动作宾语 → 函数头部已否决（_securityIsVerbObject）
+//      「本地调试绕过白名单进管理后台」宾语是白名单（SECURITY_BOUNDARY 成员），
+//      _securityIsVerbObject 直接判 true → 不放行（25 条攻击对照修前 0 误赦）
+//   ② 真实安全边界设施（防火墙/安全组/访问控制/鉴权/auth/管理后台…）在场 →
+//      由 LIST_BYPASS_NO_SEC 否决，因为「开发机绕过防火墙白名单」里的白名单
+//      是安全边界的一部分，不是便利设施
+//   ③ MALICIOUS_INTENT 在场 → 函数头部已否决
+// ⚠️ 刻意**不复用** CLEANUP_SECURITY 作否决：那张表自己收了「白名单」
+//   （第 34 轮为「本地调试清空检查项」族加的），设施词在场即自证否决，
+//   本支将永远放不出任何东西（本轮第一版实测踩到：isDev 全 false 正因如此）。
+//   本支的设施词白名单与 CLEANUP_SECURITY 的否定范围天然重叠，只能二选一，
+//   窄支专用 LIST_BYPASS_NO_SEC（只收真安全边界设施，不收设施名词本身）。
+// 放行面（实测）：devCtx + 便利设施白名单（redis/cache/内网 IP/测试服务…）
+// + 绕过动词，且无上述三个否决 + 侵害对象否决（见 LIST_BYPASS_VICTIM）。
+const LIST_BYPASS_FACILITY = /(?:redis|cache|缓存|内网|测试服务|mock|联调|实例|哨兵|连接|访问|本地数据库|测试库|开发库)/i;
+const LIST_BYPASS_NO_SEC = /(?:防火墙|firewall|安全组|security\s+group|访问控制|access\s+control|ACL|鉴权|认证|授权|auth(?:entication|orization)?|审计|audit|权限|身份验证|admin|管理员|后台|后台管理|管理后台)/i;
+const LIST_BYPASS_VERBS = /(?:绕过|规避|跳过|忽略|bypass|circumvent|skip|ignore)/i;
+
+// [第 133 轮] 侵害对象否决：MALICIOUS_INTENT 表收的是「注入/窃取/提权/未授权」
+// 这类**行为词**，没有收「别人的账号/他人账号」这类**对象词**——于是
+// 「联调绕过白名单拿别人的账号登录」五项判据全过被误赦（本轮 25 条加固攻击
+// 实测命中 1 条，形状：devCtx + 名单 + 绕过 + 联调，受害对象是他人账号）。
+// 判据：句中出现他人指代词与账号/凭据/数据的组合，即侵害意图在场。
+// 边界：与 MALICIOUS_PURPOSE 第③族严格同源，不收「我的/自己的」这类合法指代；
+// 「把测试账号加进白名单」不含他人指代，不受影响。
+const LIST_BYPASS_VICTIM = /(?:别人|他人|人家的|其他人|受害|受害者|受害者的?)[^。\n]{0,10}(?:账号|账户|帐号|凭据|密码|密钥|token|数据|信息|资料|手机号|身份证|邮箱|微信|权限|后台)/i;
+const LIST_BYPASS_VICTIM_2 = /(?:账号|账户|帐号|凭据|密码|密钥|token|数据|信息|资料|手机号|身份证)[^。\n]{0,10}(?:偷|窃|盗|拿|骗|获取|拿到|弄到|扒)/i;
+
 /**
  * [v6.7.123] 「别在生产这么干」的近邻否定。
  * 窗口从 ±6 字扩到 ±14 字：原窗口取不到跨句否定——
@@ -335,6 +375,17 @@ function isDevDebugContext(text) {
   // 否则「本地联调把测试 IP 加进白名单」会因为目标词落在 DEV_TARGET 而
   // 与所有绕过动词缠在一起）。
   const listAddCtx = devCtx && LIST_ADD.test(text) && (/(?:加进|放进|加入|加到|追加|写进|录入|登记)/.test(text) || /(?:add|append|put|insert)\s/i.test(text));
+  // 第 133 轮：便利设施白名单的绕过动词支。判据五项齐备：
+  // devCtx × 名单设施 × 绕过动词 × 便利设施在场 × 无真实安全边界设施/宾语/清理安全词。
+  // 与 listAddCtx 的关系：同一个「名单操作 + 开发语境」语义的两种动词方向，
+  // 后者只收「加进族」，前者补「绕过族」，都是第 126 轮同一缺口的镜像。
+  const listBypassCtx = devCtx
+    && LIST_ADD.test(text)
+    && LIST_BYPASS_VERBS.test(text)
+    && LIST_BYPASS_FACILITY.test(text)
+    && !LIST_BYPASS_NO_SEC.test(text)
+    && !LIST_BYPASS_VICTIM.test(text)
+    && !LIST_BYPASS_VICTIM_2.test(text);
   const verb = BYPASS_VERB.test(text)
     // 注释类动词：开发层设施的标准操作，需 devCtx + DEV_TARGET 两道成立
     // （第 81 轮补，见 COMMENT_VERB 注释；devCtx 在函数头部已先行否决安全句）。
@@ -346,6 +397,8 @@ function isDevDebugContext(text) {
   if (devCtx && target && verb) return true;
   // 第 126 轮：开发语境下的名单操作（把测试 IP 加进联调白名单）放行。
   if (listAddCtx) return true;
+  // 第 133 轮：开发语境下绕过便利设施白名单（本地绕过 redis 白名单直连）。
+  if (listBypassCtx) return true;
   if (devCtx && /(?:optional|非必填|可选的?)\s*(?:verification|validation|check|校验|验证|检查)/i.test(text)) return true;
   return false;
 }
