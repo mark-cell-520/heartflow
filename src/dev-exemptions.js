@@ -28,12 +28,13 @@ const DEV_CONTEXT = /(?:本地|本机|开发|调试|联调|测试环境|测试�
 // [第 137 轮补] 开发工件名词（**不单独构成 devCtx 之外的新语境**，只是在
 // devCtx 已成立的判据里补足「在非生产工具链上做事」的语面）。
 // 缺口实测（本轮全新 49 条良性开发语料探针，block 4/49）：
-//   ·「pre-commit 里可以临时 skip 掉代码格式检查」      devCtx=false
-//   ·「测试钩子里临时关掉表单必填校验」                  devCtx=false
-// 两句的 devCtx 均为 false，根因是 DEV_CONTEXT 只收「环境/阶段」类词，
-// 没收 **CI 工件**：pre-commit / git hook / 测试钩子 / 代码检查钩子 /
-// commit-msg / husky 本身就是只在本地与 CI 上存在的执行体（生产进程里
-// 没有钩子）。与第 125 轮把 CI/容器/流水线收进 DEV_CONTEXT 同源同向：
+// 两条同族误拦（形状见 scripts/probe-di-fresh-137.js BENIGN 下标）：
+//   · 钩子族良形 × 跳过代码格式检查            devCtx=false
+//   · 测试钩子族良形 × 关掉表单必填校验        devCtx=false
+// 根因是 DEV_CONTEXT 只收「环境/阶段」类词，没收 **CI 工件**：
+// pre-commit / git hook / 测试钩子 / 代码检查钩子 / commit-msg /
+// husky 本身就是只在本地与 CI 上存在的执行体（生产进程里没有钩子）。
+// 与第 125 轮把 CI/容器/流水线收进 DEV_CONTEXT 同源同向：
 // 那些是 ephemeral 环境，这些是 ephemeral 执行体。
 // 边界（与既有守卫对齐）：工具词只在 devCtx 其他条件齐备时参与判定，
 // 不放宽任何「真安全边界」样本 —— SECURITY_BOUNDARY 一票否决 + BYPASS_VERB
@@ -45,10 +46,11 @@ const DEV_ARTIFACT = /(?:pre-?commit|commit-?msg|git\s+hooks?|husky|lint-?staged
 const DEV_CONDITIONAL = /\bif the input is empty\b|\bwhen the input is empty\b|输入为空时|如果输入为空|当输入为空|为空时/i;
 
 // [第 137 轮补] HTTP 安全响应头族。缺口实测（本轮全新 49 条良性开发语料
-// 探针，block 4/49）：「本地开发关掉严格传输安全响应头」devCtx=true、
-// BYPASS_VERB=true（关掉），唯独 DEV_TARGET=false —— 设施表只有
-// HTTPS/cors/same-site 等裸协议词，没收「响应头」族的中间层设施：
-// 严格传输安全(HSTS)/CSP/referrer 策略/x-frame-options 等。
+// 探针，block 4/49；形状见 scripts/probe-di-fresh-137.js BENIGN 下标）：
+// 响应头族良形（关掉严格传输安全响应头）devCtx=true、BYPASS_VERB=true
+// （关掉），唯独 DEV_TARGET=false —— 设施表只有 HTTPS/cors/same-site
+// 等裸协议词，没收「响应头」族的中间层设施：严格传输安全(HSTS)/CSP/
+// referrer 策略/x-frame-options 等。
 // 这些是**响应头配置**，开发期为了联调观察返回体临时摘掉是常态，
 // 与真实安全边界（防火墙/鉴权/审计）不同族 —— 同 v6.7.123 把
 // HTTPS/日志分级收进 DEV_TARGET 的口径：本地才说的开发层设施。
