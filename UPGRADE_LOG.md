@@ -1,3 +1,93 @@
+## 第 132 轮（ai_writing_tell 英文侧同源叠票第二轮：formulaic-openers × generic-conclusions 归并为 templated-frames 档，误伤 4/51→0/51）
+
+### 一、方向来源与选择过程
+
+按纪律用 `src/core/decision.js` 实跑五候选选向（A=lets×chatbot 同源、
+B=formulaic-openers × generic-conclusions 同源、C=dangerous_instruction
+开发语境误拦、D=reward_hacking 剩余 6 类、E=中文侧同源复查）。
+返回 **`chosen: "B"` + `confidence: 0.7`（composite 0.84，其余 0.74-0.77）**，
+一次跑出，无需补判据。
+
+判据差异在「误伤绝对量级 + 是否可单轮回归验证」：B 是上一轮留待办中
+唯一已有实测误伤数据的方向；A 无分布数据、C 属 block 级闸门改错代价
+高、D 属新增判据非误伤修复。
+
+### 二、复测（不信简报旧描述，先跑探针）
+
+写了两支新探针，都不是人工比对正则：
+
+1. **组内分布探针**（50 条良性英文写作 + 8 条真 AI 模板句）：
+   良性池 4/50 被计分（score 0.30），命中的族组合清一色
+   `formulaic-openers + generic-conclusions`；单族命中全部 score=0
+   （共现门槛已拦住）。
+2. **区间交集探针**（本轮新增的判据方法）：不在族名层面比对，而是取
+   各族 trigger 在原文中的字符区间，算**同一文本片段被多个族同时命中**。
+   51 条良性中 4 条命中，全部指向 `formulaic-openers × generic-conclusions`
+   一对；真 AI 池 8 条中 2 条命中该对。
+
+**根因**：`in the ... world of` / `as we move forward` 这类句型自己
+既是 opener 又是 conclusion 的措辞，同一片段被两族各记一票，共现门槛把
+一个套话框架当成两个独立证据。两族正则（in the evolving world of /
+as we continue to / the future looks bright / only time will tell /
+one thing is certain）全是**不承载具体信息的开放式套话框架**，同源。
+
+**反向确认**（归并前/后对比探针，内存改写源码）：
+- 良性池 51 条：归并关 **4 条计分** → 归并开 **0 条计分**
+- 真 AI 池 10 条：归并关 **9 条计分** → 归并开 **9 条计分**，
+  归并致塌 **0 条**（6 条在该组合之外另带独立证据：vocab-discourse /
+  speculative-openers / chatbot-artifacts）
+
+### 三、改动（commit `3b75fd59`）
+
+`src/shield/ai-writing-tell.js`：归并层从「vocab-discourse 单档」扩为
+两档——新增 **`templated-frames` 档 = {formulaic-openers, generic-conclusions}**
+（开放式套话框架同源，只记一票）。vocab-discourse 档不动。
+单档 baseScore 不变、得分结构不动、findings 仍按原族名输出（可观测性不降）。
+
+契约更新（`test/ai-writing-tell-co-occurrence.test.js`，commit `e0763e6b`）：
+14 → **16 断言**：
+- 新增「模板族框架二票不算共现」（误伤侧复现）
+- 新增「真 AI 文本的模板族共现不因 templated-frames 归并而塌」（攻击侧复现）
+- familiesHit 契约断言同步扩集
+
+负例守卫（`test/ai-writing-tell-templated-frames-round132-guard.test.js`，
+新建）：**21 断言**，两轮删条——
+① 只删 templated-frames 归并分支（vocab-discourse 保留）：模板框架
+   二票句必须重新计分转红，且 vocab-discourse 归并仍生效、真 AI 句不塌
+② 把 familiesHit 回退为 findings 原始族数（归并全关）：模板框架
+   二票句必须转红，真 AI 句与词表+模板句均不塌
+另含还原后重新生效与源码完整还原断言。
+
+### 四、七项验证结果
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁召回 | **52/52** |
+| 双向门禁误拦 | **300/326**（与基线持平，新增 0） |
+| run-all | **5489/0**（新增 21 守卫断言） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| 本轮负例守卫 | **21/21**（模板框架二票两轮删条） |
+
+误伤结果：模板框架二票组合 **4/51 → 0/51**；真 AI 文本复跑 **9/10 不塌**
+（与归并前持平，0 塌陷）。
+
+### 五、遗留（给下一轮）
+
+① **区间交集探针可作为标准工具复用**：本轮用「各族 trigger 字符区间
+   交集」替代人工比对正则，一次性锁定唯一剩余同片段叠票族。下一轮
+   扩池（真 AI 长文本 / 更多良性源）重跑该探针即可确认是否还有漏网。
+② **lets-patterns × chatbot-artifacts 仍未查**（区间探针 0 命中，
+   说明该族对不是同片段叠票形式，但可能存在跨句同源叠票，需另行判据）。
+③ `dangerous_instruction` 开发调试语境误拦（4/50 block）、
+   reward_hacking 剩余 6 类、第 123 轮 idx 7 / idx 47 未动。
+④ LLM 401 仍阻塞（需用户更新 stepfun 凭据）。
+⑤ VERSION 仍为 6.7.124（本轮为内部优化，按版本号纪律不涨号）。
+
+---
+
+
 ## 第 131 轮（ai_writing_tell 英文侧误伤：transitions 并入 vocab-discourse 档，误伤 18/20→0/20）
 
 ### 一、方向来源与选择过程
