@@ -407,8 +407,19 @@ function discriminate(text, evidence = [], contentMode) {
   const di = _dual(_di.checkDangerousInstruction);
   // [v6.7.110] agent 规避/作弊辨别（arXiv:2609.22978 DSec §6.4-6.5）
   // 刻意与 di 分维：di 管"明确危险指令"，rh 管"为让检查通过而规避/伪装"。
-  // 用 _normText 而非 _dual：本模块自带中英双表与语境豁免，不需要双通道归一。
-  const rh = checkRewardHacking(_normText);
+  //
+  // [第 152 轮] 改走 _dual 双通道（原为单通道 _normText，本次修正）：
+  //   缺口实测（scripts/round-152/probe-r152-diverge.js）——中文为主的
+  //   中英混排句里，rh 判据要求英文 token（prompt/token/secret/run…），
+  //   而 text-normalizer 的 en2zh 恰好把这些词翻成中文（prompt→提示、
+  //   token→令牌）。**直调 checkRewardHacking(原文) 命中，gate 却放行**，
+  //   实测 9 条同族探针 **4 条分裂**。这是 v6.7.71「en2zh 破坏英文模式」
+  //   的镜像坑（那次是反面：归一化不该译；这次是 rh 不该只吃归一化）。
+  //   原注释「自带中英双表故不需要双通道」恰是漏因：双表各管一种语言，
+  //   但**归一化把两种语言的边界抹了**，单通道必丢一边。
+  //   实测代价（probe-r152-benign-delta.js / probe-r152-recall.js）：
+  //   346 条良性池新增误伤 **0**，52 条召回侧 **0 丢失且 +1 命中**。
+  const rh = _dual(checkRewardHacking);
   const cs = _dual(checkCodeSecurity, "code_security");
   const dh = _applyPedagogyRelaxation(checkDehumanization(_normText), "dehumanization", pedagogyRelaxation);
   const bs = _applyPedagogyRelaxation(checkBullshitRecognition(_normText), "bullshit", pedagogyRelaxation);
