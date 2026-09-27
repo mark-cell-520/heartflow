@@ -25,20 +25,26 @@ const CASES = [
   {
     id: 'G1a',
     file: 'src/dev-exemptions.js',
-    needle: 'const NOISE_WARNING_KIND = /(?:编译|构建|build|lint|linting|类型|type|TS|IDE|deprecat\\w+|unused|未使用|无用变量|过时)/i;',
-    desc: '噪音种类限定词表',
+    needle: 'const NOISE_WARNING_ANCHOR = /(?:警告|提示|\\bwarning\\b|\\bwarnings\\b|\\bnotice\\b|\\bnotices\\b)/i;',
+    desc: '警告语义锚点（第二版新增，防 rh 攻击被赦）',
   },
   {
     id: 'G1b',
+    file: 'src/dev-exemptions.js',
+    needle: 'const NOISE_WARNING_KIND = /(?:编译|构建|\\bbuild\\b|\\blint\\b|linting|类型|\\btype\\b|类型(?:错误|检查)|\\bTS\\b|\\bIDE\\b|deprecat\\w+|\\bunused\\b|未使用|无用变量|过时)/i;',
+    desc: '噪音种类限定词表（含词边界版）',
+  },
+  {
+    id: 'G1c',
     file: 'src/dev-exemptions.js',
     needle: 'const NOISE_WARNING_SECURITY = /(?:安全|证书|SSL|TLS|防火墙|认证|授权|鉴权|审计|日志|限流|熔断|WAF|IDS|IPS|杀毒|防病毒|Defender|defender|antivirus|DLP|堡垒机|态势感知|访问控制|身份验证|权限校验|拦截|入侵检测)/i;',
     desc: '安全边界反向表（一票否决侧）',
   },
   {
-    id: 'G1c',
+    id: 'G1d',
     file: 'src/dev-exemptions.js',
-    needle: '  return NOISE_WARNING_KIND.test(text) && !NOISE_WARNING_SECURITY.test(text);',
-    desc: '双条件与门',
+    needle: '  return NOISE_WARNING_ANCHOR.test(text)',
+    desc: '三条件与门的第一支',
   },
   {
     id: 'G2',
