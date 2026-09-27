@@ -320,7 +320,10 @@ function scoreFragment(fragment, memoryContext = '') {
   const overlap = tokens.filter(t => ctxTokens.has(t.toLowerCase())).length;
 
   // 矛盾检测 — 多关键词扩展
-  const contradictionKeywords = /\b(not|never|no|cannot|wrong|false|但|不是|没有|错误|矛盾|反对|否定)\b/i;
+  // ⚠️ ASCII 支保留 \b 防子串命中（如 "not" 命中 "note" 之外的反面）；
+  //    中文支无 \b —— \b 只对 ASCII \w 定义，中文词面后跟汉字时无边界，
+  //    实测混合组里中文候选 0/6 命中、ASCII 4/4（拆支后中文 6/6、ASCII 不变）。
+  const contradictionKeywords = /(?:\b(?:not|never|no|cannot|wrong|false)\b|但|不是|没有|错误|矛盾|反对|否定)/i;
   const contradiction = contradictionKeywords.test(text) ? 1 : 0;
 
   // 新颖度
@@ -329,7 +332,9 @@ function scoreFragment(fragment, memoryContext = '') {
     : 0;
 
   // 显著性
-  const salienceKeywords = /\b(version|error|fix|upgrade|dream|memory|logic|truth|升级|错误|修复|记忆|逻辑)\b/i;
+  // ⚠️ 同 contradictionKeywords：ASCII 支留 \b、中文支无 \b（实测混合组
+  //    中文 0/5 命中、ASCII 5/5；拆支后中文 5/5、ASCII 不变）。
+  const salienceKeywords = /(?:\b(?:version|error|fix|upgrade|dream|memory|logic|truth)\b|升级|错误|修复|记忆|逻辑)/i;
   const salience = salienceKeywords.test(text) ? 1 : 0.3;
 
   // 长度因子 — 避免过短片段的过拟合
