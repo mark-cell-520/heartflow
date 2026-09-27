@@ -585,7 +585,16 @@ function detect(text) {
       // 折叠成一档，避免同一词表被当成两个独立证据顶起共现门槛。
       // 另三支（tier-adverbial / anchor-mix / double-connective）不同源，
       // 保留独立证据位。
-      if (fam === 'zh-en-mixing' && f.zhEnSrc === 'tier-attributive') return 'vocab-discourse';
+      // [v6.7.126 第 141 轮修回归] 但**同维度多支必须先折叠成一个值**：
+      // 上面让 tier-attributive → 'vocab-discourse'、其余支保持 'zh-en-mixing'，
+      // 于是「anchor-mix + tier-attributive」同句命中时记两票，
+      // 单族句 score 0 → 0.36、coOccurrence 被顶成 true，
+      // 违反第 50 轮「单族未清零」纪律（实测样本见 round50 主测试）。
+      // 修法：zh-en-mixing 全部支统一映射到 'zh-en-mixing' 一票；
+      // tier-attributive 与词表同源这件事由 vocabDiscourse 分支在
+      // **跨维度**时体现（tier1/tier2/tier3 命中才另起一票），
+      // 不该让同维度的两支互相当作独立证据。
+      if (fam === 'zh-en-mixing') return 'zh-en-mixing';
       return fam;
     })
   );
