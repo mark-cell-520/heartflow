@@ -1,3 +1,45 @@
+## 第 141 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：`decision.decide` 本体（`scripts/decide-r141.js`）选出 **C（ai_writing_tell 多语言误伤）**，score 0.77；候选 A（reward_hacking 中文 best_run_picking / selective_reporting 对称收割）0.74，B（dangerous_instruction 开发语境误拦 idx 7/47）0.70。三候选分差小，首轮即分出高下（未触发 indistinguishable）。C 胜在**改动面可逐条删条验证**——三处修复各有独立注入点，A 需要先探再判，B 放宽有放真攻击回来的风险。
+
+**轮初复测（先实测再动手）**：自造 12 条多语言正当文本（日/韩/俄/阿拉伯/泰 + 英文术语混排的技术说明 + 中英定语混排），`detect()` 实测 **9/12 被打分**（score 0.36~0.71，族数 2~3，共现门槛全过）。缺口坐实，不是简报旧描述。
+
+**根因诊断（逐条定位，未整体猜）**：分三类，各有独立成因：
+
+1. **`invisible-homoglyph` 第二条排除集写死「ASCII + 汉字 + CJK 标点 + 全角变体」**——日文假名、谚文、西里尔、阿拉伯、泰文等所有非拉丁非汉字字符全被判成「同形字伪装」。这不是 homoglyph 攻击（同形字是用视觉相似字符冒充拉丁字母），是正常自然语言文字。伤及 8/12。
+2. **`zh-en-mixing` 的 tier-phrase 支与 `vocab-discourse` 共享 TIER 词表**——TIER 词命中时两族同时成立，共现门槛把同一来源当成两个独立证据。这是第 130/131/132 三轮同源叠票归一化在 zh-en 场景的重演。伤及 3/12。
+3. **`normalizeText` 同形字映射表只覆盖约 90 个字符**——俄语常用字母 п(U+43f)/б/г 不在表内，折叠后残留西里尔字母夹在拉丁词中间，正好撞上新加的边界判据。
+
+**改动**（2 个 commit，src 净增 ~50 行 + test 127 行 + 负例脚本 118 行）：
+
+- `src/shield/ai-writing-tell.js` 三处修复：
+  1. homoglyph 判据改为**按字符功能判别**：放行自然语言区块，只保留 PUA + 「夹在拉丁字母间隙的非 ASCII 字符」边界（真正的同形字伪装签名）。
+  2. tier-phrase 拆出**状语误用形态**（TIER 词后紧跟「地」）保留独立证据位——中文语法不容「robust 地」这种英文副词直译，是真 AI 腔特征；定语/表语形态（「的」/名词前）折叠进 vocab-discourse 同源归一化。
+  3. 同形字映射表按 Unicode 对照补齐俄语 33 小写 + 22 大写 + 希腊剩余字母。
+- 补正式测试 `test/ai-writing-tell-multilang-r141.test.js`：三项断言——多语言误伤 0/11、真 AI 混排漏检 ≤4/10、删条回退 ≥1（子进程法）。
+- 补负例脚本 `scripts/negative-test-ai-writing-tell-multilang-r141.js`：**三处修复逐一删条**（inj1 移除 п 映射 / inj2 还原排除集 / inj3 移除状语折叠），每组对应误伤必须回退。
+
+**本轮踩的坑与修正（3 个，都已固化）**：
+
+1. **修过头的中间态**：第一版把所有 TIER 形态（含状语）一律折叠，真 AI 检出从 8/10 掉到 5/10——AI7/AI8（`multifaceted 地解决问题`）靠的正是状语形态的独立证据位。修正为只折定语/表语。**这是典型的「为消误伤把真信号一起压掉」，双向验证（攻击侧+良性侧同时跑）当场抓住了它。**
+2. **探针索引误读浪费了 3 次诊断**：两次探针的 CASES 数组顺序不同，我按 multilang 探针的编号去读 diag2 的输出，得出「中文+robust 命中 homoglyph」的错误结论，绕了一圈才对齐索引。教训：跨探针对照前先打印索引确认。
+3. **同形字召回「塌到 1/8」是假象**：改 homoglyph 后我用自造攻击样本复测，发现连零宽字符都不命中，一度以为引入回归。`git stash` 对照原版发现**原版同样 1/8**——`normalizeText` 先折叠西里尔/希腊映射再进判据，喂给 homoglyph 的文本里同形字已不存在；该族现在实际只对 PUA 生效。同形字主防线在 `src/shield/adversarial-variant.js`（`checkAdversarialVariant`），ai-writing-tell 这一族只是辅助信号。**这是既有结构性事实，不是本轮回归。**
+
+**已知边界（DELIBERATE_SKIP，登记不修）**：中文连接词 + 紧贴英文对应词的双语对照句（「总之 overall…此外 moreover…」）会命中 anchor-mix + double-connective。实测它与第 50 轮判定为**攻击**的「首先 Firstly…其次 Secondly…」**构造完全同形**（连接词对间距均为 1 个中文标点），无可区分特征。第 50 轮把它归为 AI 翻译腔自认，故不列为误伤；测试里以 `DELIBERATE_SKIP` 常量登记并要求它仍保持命中态（防止判据悄悄失效）。
+
+**七项验证**：bin/verify **14/14**；双向门禁 **召回 52/52 保持**、误拦 **300/326** 与基线逐字节一致（**0 新增误伤**）；security-audit **16/16**；doc-numbers **15/15**；本轮正式测试 **1/1**；负例删除验证 **3/3**；finish 七项检查全绿，3 个 commit 已推送。
+
+**遗留**：
+1. **LLM 401 未解**（stepfun 凭据失效，唯一硬阻塞，多轮未变）。
+2. `reward_hacking` 剩余 6 类未动；「结果筛选/测量操纵」一族（best_run_picking / selective_reporting 等）中英已各有判据，**下一轮先做中文侧对称探针**——照 `probe-el-candidate-r140.js` 的三组良性压力池结构逐类测「攻击命中 + 良性零误伤」。
+3. `dangerous_instruction` 开发调试语境误拦（idx 7 Redis 白名单 / idx 47 测试库全表删除）仍未动。
+4. `ai_writing_tell` 的 homoglyph 族实际只对 PUA 生效（既有事实，同形字主防线在 adversarial-variant.js）——若要让 ai-writing-tell 这一族也真能抓同形字，需要重新设计喂给它的归一化路径（`normalizeText` 折叠 vs 判据检测的目标冲突）。这不是误伤问题，是能力设计问题，**留给后续轮次单独评估**。
+5. decision 首轮三候选分差 0.07，未触发 indistinguishable。下一轮若再遇，按第 140 轮验证过的流程补可行性/后果/风险三项可验证事实后重跑。
+
+**给下一轮**：接手取第 2 条遗留——reward_hacking「结果筛选/测量操纵」一族中文侧对称收割。轮初照 `scripts/probe-rh-zh-139.js` + `probe-el-candidate-r140.js` 的结构写中文探针（只输出形状编号 + 数字，不打印样本原文，防 451），坐实漏判数量后按 EL-Z 系列同一套方法论：候选正则先过「攻击命中 + 三组良性压力池零误伤」，两半齐备确认后入库，配负例守卫（子进程 + 写「显著下降」不写「全部回退」）。判据入库后**务必复查注释里有没有引用其他家族的编号前缀**（第 140 轮教训）。
+
+---
+
 ## 第 140 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：`decision.decide` 本体选出 **A（reward_hacking 中文 eval_leakage 对称收割）**，score 0.83；候选 D（ai_writing_tell 多语言误伤）0.77、B（rh 剩余 6 类中英非对称）0.74、C（di 开发语境误拦收尾）0.70。
