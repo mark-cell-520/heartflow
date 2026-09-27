@@ -1,4 +1,74 @@
-## 第 130 轮（ai_writing_tell 英文侧误伤：TIER1/2/3 归并 vocab-tier，误伤 2/20→0/20）
+## 第 131 轮（ai_writing_tell 英文侧误伤：transitions 并入 vocab-discourse 档，误伤 18/20→0/20）
+
+### 一、方向来源与选择过程
+
+按纪律用 `src/core/decision.js` 实跑四候选选向（A=transitions 同源叠票、
+B=lets×chatbot 同源、C=formulaic-openers×generic-conclusions 二票、
+D=rh 6 类/di 误拦），前两轮返回 `chosen: null` + `confidence: 0`（候选分差
+0.03-0.07 无法区隔）。补判据后第三轮分出高下：**`chosen: "A"` +
+`confidence: 0.7`（composite 0.81，其余候选 0.74-0.77）**。
+
+补判据=「误伤绝对量级 + 是否属回归性质」：A 是第 130 轮修完 vocab-tier 后
+**仍未消退**的同源叠票（词表归零但只要出现 moreover/in conclusion/in summary
+就重新凑够二票转红），误伤 18/20=90%，高出 C（1/35=2.9%）一个数量级；
+B 无分布数据、D 动 block 级闸门或超出单轮可回归验证范围。
+
+### 二、复测（不信简报旧描述，先跑探针）
+
+`probe-en-source-groups`（35 条正常英文技术写作 + 10 条真 AI 模板句）与
+`probe-en-vt-transitions`（20 条学术/工程英语：词表×话语标记）两支探针实测：
+
+- 20 条正常学术/工程英语 **18 条被「vocab-tier × transitions」二票共现命中**
+  （score 0.22-0.28，全部只含 tier1/tier2 + transitions 两族）
+- 10 条真 AI 文本全部命中（score 0.73-1.00），且除词表+transitions 外
+  **必带模板族**（formulaic-openers / vague-attributions /
+  generic-conclusions / speculative-openers 至少一个）
+- 归并反向验证后（探针 2 复跑）：20 条良性 **0/20**，真 AI 文本 2/2 不塌
+
+**根因**：`transitions` 里的 moreover / furthermore / in conclusion /
+in summary 是学术与工程写作的**通用书面语**，与 TIER 词表同属「普通书面
+词汇/话语标记」来源，共现门槛把两者当成两个独立证据。
+
+### 三、改动（commit `6fca7dbd`）
+
+`src/shield/ai-writing-tell.js`：TIER 归并集从 `{tier1,tier2,tier3}` 扩为
+`{tier1,tier2,tier3,transitions}`，档名 `vocab-tier` → **`vocab-discourse`**
+（语义覆盖词表+话语标记）。单档 baseScore 不变、得分结构不动、findings
+仍按原族名输出（可观测性不降）。
+
+契约更新（`test/ai-writing-tell-co-occurrence.test.js`）：
+- `familiesHit` 归一层加入 transitions，契约断言同步改
+- 新增「纯词表 × transitions 不算共现」断言（误伤侧复现）
+- 新增「模板族共现不因 transitions 归并而塌」断言（攻击侧复现）
+
+负例守卫扩编（`test/ai-writing-tell-vocab-tier-round130-guard.test.js`）：
+13 断言 → **21 断言**。删条两轮（改归并映射 / 删整段归并逻辑）后
+「词表×transitions」句必须重新计分转红；模板+词表句两轮都不受影响。
+
+### 四、测试与验证
+
+七项验证：bin/verify **14/14**；双向门禁召回 **52/52**、误拦 **300/326**
+（与基线持平，新增 0）；run-all **见复跑结果**；security-audit **16/16**；
+doc-numbers **15/15**；本轮守卫 **21/21**（round130 守卫文件，已升级）；
+注入-删条负例：已并入 21 断言内（transitions 删条两轮）。
+
+误伤结果：vocab-tier×transitions 组合 **18/20 → 0/20**；真 AI 文本
+（tier+transitions+模板族）命中不塌（复跑 10/10，最低 score 0.73）。
+
+### 五、遗留（给下一轮）
+
+① **同源叠票尚未查完**：`lets-patterns` × `chatbot-artifacts`（let us/
+take a look 两类正则语义重合）、`formulaic-openers` × `generic-conclusions`
+（探针 1 实测 1/35 误伤：`as we move forward` 同时命中两族）。方法同本轮：
+组内分布探针 → 确认同源 → 归并。
+② `decision.decide` 本轮有区分度（composite 0.81 vs 0.74-0.77），但
+confidence 仅 0.7，仍属弱区分；补判据的两轮空转值得记：判据要直接给
+「误伤绝对量级 + 风险」而不是重复候选描述。
+③ LLM 401 仍阻塞（需用户更新 stepfun 凭据）。
+④ 遗留第 123 轮 idx 7（Redis 白名单）/ idx 47（测试库全表删除）性质待核；
+`dangerous_instruction` 开发调试语境误拦、reward_hacking 剩余 6 类未动。
+
+
 
 ### 一、方向来源与选择过程
 
