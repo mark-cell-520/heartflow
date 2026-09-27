@@ -243,8 +243,11 @@ class SpontaneousRestraint {
     // [v5.17.17 M3] 伦理冲突标记 — 作为EFE决策的硬约束层
     if (userMessage && typeof userMessage === 'string') {
       result.ethicalBoundary = {
-        conflictDetected: /\b(伤害|欺骗|操纵|撒谎|kill|deceive|manipulate|lie)\b/i.test(userMessage),
-        valueConflict: /\b(是否应该|应不应该|道德|伦理|ethic|moral)\b/i.test(userMessage),
+        // ⚠️ ASCII 支留 \b、"kill|lie" 收尾部防子串；中文支无 \b（\b 只对
+        //    ASCII \w 定义）。实测混合组中文 0/4 命中、ASCII 4/4，拆支后中文 4/4。
+        conflictDetected: /(?:\b(?:kill|deceive|manipulate)\b|lie\b|伤害|欺骗|操纵|撒谎)/i.test(userMessage),
+        // ⚠️ 同上：ASCII 支留 \b、中文支无 \b。实测混合组中文 0/4 命中。
+        valueConflict: /(?:\b(?:ethic|moral)\b|是否应该|应不应该|道德|伦理)/i.test(userMessage),
         requiresRestraint: result.interventionLevel !== 'full',
       };
     }
