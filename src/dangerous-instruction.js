@@ -370,17 +370,24 @@ const DANGEROUS_PATTERNS = [
   //   · 中文表对象（全表/整表/用户表/订单表/…）——必须与谓词后 20 字内
   //     出现的高危语境词**或** prod 同现，单独表对象不命中
   // 良性/攻击双向边界见本文件尾注与 test/normalizer-sql-predicate-round124.test.js。
-  // ⚠️ [第 127 轮] 目标词组的 `\b` 修复：原写法把中文候选
+  // ⚠️ [第 127 轮] 目标词组的 `\b` 修复（两版收敛）：原写法把中文候选
   //    （线上/生产/备份/全表/整表/全库）整体包进 `\b(?:…)\b`，而 `\b` 只对
   //    ASCII `\w` 定义——`delete from 生产库` 里「生产」后面紧跟汉字，
   //    尾部 `\b` 永不成立，中文高危语境词全部静默失配（实测 0/4 命中，
   //    而 ASCII 侧 `delete from production` 4/5 命中）。
-  //    修法：拆成 ASCII 支（保留 `\b`，防命中子串）与中文支（无 `\b`，
-  //    以精确子串参与窗口匹配）。与 381-384 行用 `(?=[\s\u4e00-\u9fff])`
-  //    修「谓词后紧跟中文」是同一族问题（本文件第 2 次复现）。
-  // 良性边界不变：谓词后 20 字内需出现高危语境词或 prod，测试库/staging
-  // 无此类词仍 pass，见 test/normalizer-sql-predicate-round124.test.js。
-  /\b(?:delete\s+from|truncate(?:\s+table)?|drop\s+table|update\s+\*?\s*(?:from|set)?|alter\s+table|insert\s+into)\b[^.]{0,20}(?:\b(?:production|prod\b|users?|user\s+table|customers?|orders?|accounts?|backup|snapshot|database|schema)\b|线上|生产|备份|全表|整表|全库)/i,
+  //    修法：拆成 ASCII 支（保留 `\b`，防命中子串）与中文支（精确子串，
+  //    无 `\b`）。**中文支只收高危语境词（线上/生产/备份），不收裸表对象
+  //    （全表/整表/全库）**——那是本模式 361-372 行写死的设计边界：
+  //    裸表对象必须与生产语境三要素同现，单独不命中（谓词+表对象在测试
+  //    库里是常规 fixture 操作）。第一版把裸表对象一并放活，反咬
+  //    「测试库直接执行 DELETE FROM 全表再灌 fixture」这条 124 轮实测良性
+  //    （normalizer-sql-predicate-round124 第 81 行断言抓到，是本轮唯二
+  //    次被既有测试咬到，是有价值的回归）。裸表对象覆盖由 381-384 行
+  //    的三要素模式负责，此处不再重复。
+  // 与 381-384 行用 `(?=[\s\u4e00-\u9fff])` 修「谓词后紧跟中文」是同一族
+  // 问题（本文件第 2 次复现）。良性边界见
+  // test/normalizer-sql-predicate-round124.test.js 与 test/sql-word-boundary-round127.test.js。
+  /\b(?:delete\s+from|truncate(?:\s+table)?|drop\s+table|update\s+\*?\s*(?:from|set)?|alter\s+table|insert\s+into)\b[^.]{0,20}(?:\b(?:production|prod\b|users?|user\s+table|customers?|orders?|accounts?|backup|snapshot|database|schema)\b|线上|生产|备份)/i,
   // 中文表对象版（谓词 + 中文表对象 + **生产语境**三要素同现）。
   // 三要素判据来自双向实测（本组 5 良性 vs 5 攻击逐条对比）：
   //   良性（测试库/staging/sandbox/开发环境 + 谓词 + 表对象）devCtx=true、prodCtx=false
@@ -394,11 +401,15 @@ const DANGEROUS_PATTERNS = [
   /(?:全表|整表|全库|用户表|订单表|会员表|客户表|账务表|支付表|账户表)[^.\n]{0,12}(?:生产|线上|正式)[^.\n]{0,16}(?:delete\s+from|truncate|drop\s+table)/i,
   // 目标在前、谓词在后（中文定语后置的英文镜像：`wipe the users table` /
   // `truncate the orders table` / `drop the production database`）
-  // ⚠️ [第 127 轮] 目标词组同 373 条的 `\b` 修复：原写法把
+  // ⚠️ [第 127 轮] 目标词组同 373 条的 `\b` 修复。原写法把
   //    `线上|生产|备份|全表|整表` 包进 `\b(?:…)\b`，中文侧尾部 `\b` 永不成立
   //    （实测谓词+中文高危语境 0/5 命中，ASCII 3/5）。拆成 ASCII 支留 `\b`、
-  //    中文支无 `\b`。目标支同理：`全表|整表|库` 改为精确中文支。
-  // 良性边界不变：本文件尾注与 test/sql-word-boundary-round127.test.js 双向守卫。
+  //    中文支无 `\b`，且**中文支只收高危语境词（线上/生产/备份），不收
+  //    裸表对象（全表/整表/库）**——与 373 条同一设计边界：裸表对象必须
+  //    三要素同现，覆盖由 381-384 行负责。ASCII 支刻意去掉 `prod\b|backup`：
+  //    `prod\b` 是 `\b` 内部形式无意义，backup 由 373 条覆盖，此处留
+  //    production/database/schema + 表对象（table/tables/…）维持原边界。
+  // 良性边界见 test/sql-word-boundary-round127.test.js。
   /\b(?:truncate|wipe|drop|delete|remove)\b[^.]{0,16}(?:\b(?:the\s+)?(?:users?|user\s+table|customers?|orders?|accounts?|production|database|schema)\b|线上|生产|备份)[^.]{0,16}(?:\b(?:table|tables|database|data|records?|rows?)\b|全表|整表|库)/i,
 ];
 
