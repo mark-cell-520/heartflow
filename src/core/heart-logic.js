@@ -1528,7 +1528,9 @@ class HeartLogic {
   checkWellbeing(input = '') {
     if (!input) return { safe: true, insight: '无输入，跳过健康检查。' };
     const warnings = [];
-    if (/\b(你抑郁了|你焦虑|你有心理问题|你疯了|你病了)\b/.test(input)) {
+    // ⚠️ 中文支刻意不用 \b：\b 只对 ASCII \w 定义，`你抑郁了` 后跟汉字时无边界，
+    // 实测 `\b(你抑郁了|…)\b` 对中文 0/5 命中（ASCII 侧同理 0/2，本组无 ASCII 候选）。
+    if (/(你抑郁了|你焦虑|你有心理问题|你疯了|你病了)/.test(input)) {
       warnings.push('检测到诊断标签');
     }
     if (/(继续和我聊|别走|不要离开|只有你理解我)/.test(input)) {
