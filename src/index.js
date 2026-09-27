@@ -2360,6 +2360,16 @@ const INFO_DEPRIVATION_PATTERNS = {
     /问这么多干嘛/i,
     /问这么多对你没好处/i,
     /有些事不知道反而好/i,
+    // === 第117轮：第3人称转述×外部支援剥夺族 (+7 ZH / +5 EN) ===
+    // 形状：转述第三方的话，把当事人对理由/内情的知情权一并收回。
+    // 与既有第2人称命令族形状正交；样本见 test/info-deprivation-third-person.test.js
+    /知道的人越少越好/i,
+    /(?:这|此)事?(?:不|别|莫)该(?:外传|对外说|传出去)/i,
+    /(?:不|别|不能|不得)对外(?:说|讲|提|透露|声张)/i,
+    /问那么多对?(?:你|咱|我)(?:都)?(?:没|有)(?:什么)?好处/i,
+    /少问(?:为什么|缘由|内情)/i,
+    /(?:不|没)(?:需要|用)(?:我|我们|咱|咱们|大家)(?:知道|了解|清楚|明白)/i,
+    /只管(?:执行|照做|照办|听安排|听指挥)(?:就行|就是了|，|,|$)/i,
   ],
   en: [
     /\byou don'?t need (?:to )?know\b/i,
@@ -2385,6 +2395,12 @@ const INFO_DEPRIVATION_PATTERNS = {
     /\bit'?s confidential\b/i,
     /\byou wouldn'?t understand anyway\b/i,
     /\bit'?s not important for you to know\b/i,
+    // === 第117轮：第3人称转述×外部支援剥夺族 (+5 EN) ===
+    /\bfewer people (?:who )?know(?:,)? (?:the )?better\b/i,
+    /\bthe fewer (?:people|others) (?:who )?know\b/i,
+    /\b(?:this|that) (?:should|must) not (?:be )?(?:go out|get out|be shared|leave this room)\b/i,
+    /\b(?:he|she|they) (?:said|told me) (?:not|never) to (?:tell|share|mention) (?:anyone|anybody)\b/i,
+    /\bstop asking (?:why|for reasons|about the details)\b/i,
   ],
 };
 
