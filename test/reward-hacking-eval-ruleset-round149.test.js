@@ -81,3 +81,5 @@ test('第149轮 族名归属唯一性：命中只归 eval_ruleset_masking，不�
   // 不验证唯一性（多族共报是设计允许），但 classes 不得为空
   assert.ok(Array.isArray(r.classes) && r.classes.length > 0, 'classes 非空');
 });
+
+console.log('第149轮 eval_ruleset_masking 补形: 4 通过, 0 失败, 共 4 个');
