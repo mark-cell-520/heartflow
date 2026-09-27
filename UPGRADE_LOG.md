@@ -1,3 +1,102 @@
+## 第 133 轮（dangerous_instruction 开发语境误拦：补便利设施白名单的绕过动词支，benign block 3/50→2/50）
+
+### 一、方向来源与选择过程
+
+按纪律用 `src/core/decision.js` 实跑三候选选向（A=固化区间交集探针并扩池、
+B=lets-patterns × chatbot-artifacts 跨句同源判据、C=dangerous_instruction
+开发语境误拦复测+修复）。返回 **`chosen: "C"` + `confidence: 0.7`
+（composite 0.84，A/B 均 0.74）**，一次跑出，无需补判据。
+
+判据差异：C 是三个方向里唯一有「用户可感知 block 级误拦」实测数据的；
+A 同判据上一轮已收割过一轮（51→唯一一对已修），扩池收益递减；
+B 判据边界模糊，单轮内设计过宽判据会埋回归，风险高于收益。
+
+### 二、复测（不信简报旧描述）
+
+跑 `test/dangerous-instruction-recheck-round123.js`：50 条开发调试良性
+**block 3 条**（briefing 说 4 条，实际 3 条；ATTACK 5 条拦下 4 条）。
+写归因探针逐条拆 gate 动作与 di 模式命中序号（只输出形状不贴原文）：
+
+- 原 idx 33（防火墙 × 测试分支）→ 命中第①条 + SECURITY_BOUNDARY 否决，
+  **属设计内行为**，不属本轮范围（简报已标注）。
+- 原 idx 5（注掉鉴权中间件）→ 命中注释族专形；devCtx✓ commentVerb✓，
+  但 SECURITY_BOUNDARY 宾语性判定为真（「把鉴权…注掉」的安全词是宾语），
+  否决正确，不动。
+- 原 idx 7（Redis 白名单 × 绕过动词）→ **真缺口**，见下。
+
+### 三、根因与改动（commit `e71e3743`）
+
+原 idx 7 扩展成 10 条同族候选良性复测：**8/10 被 block**，而同一池里
+动词换成「加进」的 2 条**全 pass**。两句唯一差别是动词方向，语用同构
+（开发/测试环境把便利设施临时划出名单检查范围）。
+
+根因：`src/dev-exemptions.js` 的 listAddCtx 支只收「加进/放进/加入/
+追加/写进」，不收 BYPASS_VERB 表里早已存在的「绕过/跳过/忽略」——
+**命中侧收词、赦免侧不收**，v6.7.123 家族教训第 7 次复现。
+
+改动：新增 `listBypassCtx` 支，判据六项齐备：
+`devCtx × LIST_ADD × LIST_BYPASS_VERBS × LIST_BYPASS_FACILITY ×
+!LIST_BYPASS_NO_SEC × !LIST_BYPASS_VICTIM(_2)`。
+
+踩坑记录（两个静默失效，都写进了测试）：
+1. 第一版复用 CLEANUP_SECURITY 作否决 → **新支零放行**。那张表自己
+   收了「白名单」（第 34 轮为「本地调试清空检查项」族加的），设施词
+   在场即自证否决。改为窄表 LIST_BYPASS_NO_SEC（只收防火墙/访问控制/
+   鉴权/管理后台等真安全边界设施）。
+2. 补否定表后 25 条加固攻击里有 **1 条误赦**（形状：联调 + 名单 + 绕过
+   + 联调设施 + 他人账号）。MALICIOUS_INTENT 只收行为词（注入/窃取/提权）
+   不收对象词（别人的账号），新增 LIST_BYPASS_VICTIM 双正则收口。
+
+### 四、测试
+
+- 新建第 133 轮负例守卫 `test/dangerous-instruction-list-bypass-round133-guard.test.js`
+  （**7 断言**，commit `1066ed38`）：10 条良性必须放行（修前 8 条 block）、
+  25 条同形攻击必须全 block + isDev=false + di 计数>0、2 条第 126 轮既有
+  加动词支回归、删条注入锚定 `if (listBypassCtx) return true;`，
+  移除后多数良性必须回到未豁免（实测 8/10 回归）。
+- 首版守卫 FAIL 一次是**守卫判据写错而非实现错**：阈值写成「删条后仍须
+  ≥5 条放行」，而其中 2 条本就被既有 devCtx+target+verb 支放行。改为
+  「删条后放行数 < 5」语义后转绿。
+
+### 五、七项验证
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（与上轮基线持平，新增 0） |
+| run-all | **5518/0**（上轮 5510，+8 = 新守卫 7 + dev-debug 新增 1；npm-package-integrity 为预期失败项） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| 本轮守卫 | **7/7** |
+| 50 条复测池 | block **3→2**（idx 33 属 SECURITY_BOUNDARY 设计内） |
+
+相邻边界回归（同批跑过）：dev-debug 14/14（MUST_NOT_EXEMPT 19 条未误赦）、
+list-add-round126 **24/24**、cleanup-verb-round80 17/17、
+comment-verb-round81 17/17、dev-context-round22 22/22。
+
+### 六、遗留
+
+1. **LLM 401 仍未解** —— stepfun api-key 失效，需用户更新凭据。这是升级
+   流水线唯一的硬阻塞（熔断只是不空转）。
+2. 50 条复测池剩余 2 条 block：idx 33 防火墙（设计内）、另一条经本轮
+   归因确认否决正确，均非误拦。
+3. ATTACK 5 条中 1 条未 block（形状：中间人证书 + 网银密码）——命中侧
+   第①条动词表无「安装/装入」，与「加入名单族 × 动词表」同族缺口，
+   归入下一轮候选。
+4. `reward_hacking` 剩余 6 类、`ai_writing_tell` 多语言误伤未动。
+5. 区间交集探针固化 + 扩池（上轮留给本轮的方向 A）仍未做。
+
+### 七、给下一轮的接手说明
+
+① 本轮的 `LIST_BYPASS_*` 三张窄表是**附带产物**，填「便利设施白名单 +
+绕过」族够用但不完整（设施词只收了 redis/cache/内网/测试服务等 10 个）。
+若后续出现新误拦同形句，优先扩 FACILITY 词表而不是新开支线。
+② 删条注入的锚点字符串 `  if (listBypassCtx) return true;` 若因重构
+缩进变化会静默失效，守卫会报「锚点不在源码中」——那是提醒更新守卫，
+不是实现坏了。
+③ 下一步建议按 decision 重跑三候选（INTERCEPT 缺口语述、区间探针固化、
+reward_hacking 剩余 6 类），下一轮只认这本簿子。
+
 ## 第 132 轮（ai_writing_tell 英文侧同源叠票第二轮：formulaic-openers × generic-conclusions 归并为 templated-frames 档，误伤 4/51→0/51）
 
 ### 一、方向来源与选择过程
