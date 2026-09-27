@@ -218,7 +218,27 @@ const INVISIBLE_HOMOGLYPH = [
   // 正常句子都被 ai_writing_tell 命中（35 分），与其它维度叠加后 gate 从
   // pass 变 verify。双向门禁 benign 组因此长期卡在 29/30。
   // 修正：显式放行 CJK 标点区（\u3000-\u303f）与全角 ASCII 变体（\uff00-\uffef）。
-  /[^\x00-\x7F\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3000-\u303f\uff00-\uffef]/g,
+  //
+  // [第 141 轮] 多语言误伤根治（复测 12 条正当多语混排文本 9 条被打分：
+  // 日语/韩语/俄语/阿拉伯语/泰语与英文术语混排的正当技术说明，与 tier1
+  // 共现后 score 0.53~0.71）。根因：本判据的排除集只认「ASCII + 汉字 +
+  // CJK 标点 + 全角变体」，于是日文假名、西里尔、阿拉伯、泰文、谚文
+  // 等所有非拉丁非汉字字符全被当成「同形字伪装」——这不是 homoglyph
+  // 攻击（同形字是用视觉相似字符冒充拉丁字母，如西里尔 а 冒充 a），
+  // 而是正常自然语言文字。
+  // 判别原则改为「按字符功能而非出处」：
+  //   ① 放行各大自然语言 Unicode 区块（假名/谚文/西亚南亚东南亚/
+  //      希腊/西里尔/希伯来等）——这些是正常书写系统；
+  //   ② 放行常见标点区块（通用标点、货币、箭头、数学运算符、制表符）——
+  //      这些是正常排版符号；
+  //   ③ 只保留真正视觉混淆面：私用区（PUA，E000-F8FF）、变体选择符、
+  //      组合记号大段区，以及**夹在拉丁字母间隙**的少量非 ASCII 字符。
+  //   ④ 兼容表情区（1F300-1FAFF）与杂项符号区——技术文档里插 emoji
+  //      不构成 AI 伪装痕迹。
+  /[\uE000-\uF8FF\uFFF0-\uFFFF]/g,
+  // 拉丁字母间隙里的不可见/异体字符（真正的同形字伪装签名）：
+  // 形如  "аpple" / "еxample" —— 西里尔 а/е 夹在英文字母中间。
+  /[\u0400-\u04FF\u0370-\u03FF\u0530-\u058F\uFB00-\uFB4F][a-z]|[a-z][\u0400-\u04FF\u0370-\u03FF]/g,
 ];
 
 // ── 4. [第 50 轮] 中英混杂 AI 腔（zh-en code-mixing）──────────────────
@@ -282,11 +302,23 @@ function detectZhEnMixing(text) {
   if (pairs >= 2) {
     triggers.push({ trigger: `中英连接词对 x${pairs}` });
   }
-  // ③ tier-phrase：中文句中 TIER 词 ≥1 且全文英文词 ≥2
+  // ③ tier-phrase：中文句中出现 TIER 词且全文英文词 ≥2（"这个 robust 的方案"）
+  // [第 141 轮] 拆出状语误用形态（TIER 词后紧跟「地」）：中文语法里
+  // 「robust 地」是英文副词的直译，正常中文写作不会把形容词/名词性
+  // 英文术语当地毯式状语用（真 AI 混排样本 `multifaceted 地解决问题` /
+  // `holistic 地 streamline` 全部是这个形态）。定语/表语形态（「的」或
+  // 名词前，如「comprehensive 的 retry 策略」「robust 方案」）是正当
+  // 技术术语混排，归入 vocab-discourse 同源折叠，不另立证据位。
   const tierHits = text.match(new RegExp(TIER_WORDS_RE.source, 'gi')) || [];
   const enAll = text.match(/[a-zA-Z]{2,}/g) || [];
   if (tierHits.length >= 1 && enAll.length >= 2) {
-    triggers.push({ trigger: `TIER词 ${tierHits.slice(0, 3).join('/')}` });
+    // 状语误用：TIER 词后紧跟「地」（中文字 U+5730）
+    const adverbial = text.match(new RegExp(TIER_WORDS_RE.source + '\\s*\\u5730', 'gi'));
+    if (adverbial && adverbial.length > 0) {
+      triggers.push({ trigger: `TIER副词状语 ${adverbial.slice(0, 3).join('/')}`, adverbialTier: true });
+    } else {
+      triggers.push({ trigger: `TIER词 ${tierHits.slice(0, 3).join('/')}` });
+    }
   }
   return triggers;
 }
@@ -325,10 +357,37 @@ const AI_TELL_PATTERNS = [
 function normalizeText(text) {
   let out = text;
   out = out.replace(/[\u200B\u200C\u200D\u200E\u200F\u202A\u202B\u202C\u202D\u202E\u2060\u2061\u2062\u2063\u2064\u206A\u206B\u206C\u206D\u206E\u206F\uFEFF]/g, '');
-  out = out.replace(/[\u0400-\u04FF\u0370-\u03FF]/g, (m) => {
-    const map = { '\u0430':'a','\u0435':'e','\u043e':'o','\u0440':'p','\u0441':'c','\u0445':'x','\u0443':'y','\u043a':'k','\u043c':'m','\u043d':'h','\u0432':'b','\u0442':'t','\u0410':'A','\u0415':'E','\u041e':'O','\u0420':'P','\u0421':'C','\u0425':'X','\u0423':'Y','\u041a':'K','\u041c':'M','\u041d':'H','\u0412':'B','\u0422':'T','\u0438':'y','\u0418':'Y','\u0433':'r','\u0413':'R','\u0437':'3','\u0447':'4','\u044f':'r','\u042f':'R','\u0436':'j','\u0416':'J','\u0431':'b','\u0411':'B','\u0444':'f','\u0424':'F','\u0434':'d','\u0414':'D','\u043b':'l','\u041b':'L','\u0446':'u','\u0426':'U','\u0448':'w','\u0428':'W','\u0449':'q','\u0429':'Q','\u044d':'e','\u042d':'E','\u044b':'b','\u042b':'B','\u044c':'b','\u042c':'B','\u0455':'s','\u0456':'i','\u0458':'j','\u04bb':'h','\u0501':'d','\u051b':'q','\u0261':'g','\u03bf':'o','\u039f':'O','\u03b1':'a','\u0391':'A','\u03c1':'p','\u03a1':'P','\u03bd':'v','\u039d':'N','\u03c5':'u','\u03a5':'Y','\u03c7':'x','\u03a7':'X','\u03ba':'k','\u039a':'K','\u03bb':'l','\u039b':'L','\u03bc':'m','\u039c':'M','\u03c4':'t','\u03a4':'T','\u03c9':'w','\u03a9':'W','\u03b2':'b','\u0392':'B','\u03b3':'y','\u0393':'Y','\u03b4':'d','\u0394':'D','\u03b6':'z','\u0396':'Z','\u03b7':'n','\u0397':'N','\u03b8':'0','\u0398':'0','\u03b9':'i','\u0399':'I','\u03c3':'o','\u03a3':'O','\u03c6':'o','\u03a6':'O' };
-    return map[m] || m;
-  });
+  // [第 141 轮] 同形字映射表补全：原表只覆盖约 90 个西里尔/希腊字符，
+  // 俄语常用字母 п(U+43f) / б(U+431) / г(U+433) 等不在表内，导致正当
+  // 俄语文句经折叠后仍有西里尔字母夹在拉丁词中间（实测: Мы используем
+  // robust... 折叠成 Mb ycпolb3yem robust пodxod），被本轮新增的
+  // 「西里尔字母夹拉丁字母」边界判据当成同形字伪装（误伤 M6, score 0.53）。
+  // 修法：按 Unicode 同形字对照补齐俄语 33 小写 + 22 大写、希腊剩余字母
+  // 与小写拉丁视觉等价映射。判据（西里尔边界正则）不动——它抓的正是
+  // 折叠后应已消失的残留。
+  const CYRILLIC_TO_LATIN = {
+    '\u0430':'a','\u0431':'b','\u0432':'v','\u0433':'g','\u0434':'d','\u0435':'e','\u0436':'j',
+    '\u0437':'z','\u0438':'u','\u0439':'u','\u043a':'k','\u043b':'l','\u043c':'m','\u043d':'h',
+    '\u043e':'o','\u043f':'n','\u0440':'p','\u0441':'c','\u0442':'t','\u0443':'y','\u0444':'f',
+    '\u0445':'x','\u0446':'u','\u0447':'ch','\u0448':'w','\u0449':'q','\u044a':'"','\u044b':'b',
+    '\u044c':'\'','\u044d':'e','\u044e':'w','\u044f':'r','\u0451':'e','\u0454':'e','\u0455':'s',
+    '\u0456':'i','\u0458':'j','\u045b':'h','\u045c':'n','\u045f':'d','\u0491':'r','\u04bb':'h',
+    '\u0501':'d','\u051b':'q','\u0261':'g',
+    '\u0410':'A','\u0411':'B','\u0412':'V','\u0413':'G','\u0414':'D','\u0415':'E','\u0416':'J',
+    '\u0417':'Z','\u0418':'U','\u0419':'U','\u041a':'K','\u041b':'L','\u041c':'M','\u041d':'H',
+    '\u041e':'O','\u041f':'N','\u0420':'P','\u0421':'C','\u0422':'T','\u0423':'Y','\u0424':'F',
+    '\u0425':'X','\u0426':'U','\u0427':'Ch','\u0428':'W','\u0429':'Q','\u042a':'"','\u042b':'B',
+    '\u042c':'\'','\u042d':'E','\u042e':'W','\u042f':'R','\u0401':'E','\u0404':'E','\u0405':'S',
+    '\u0406':'I','\u0408':'J','\u040b':'H','\u040c':'N','\u040f':'D','\u0490':'R',
+    '\u03bf':'o','\u039f':'O','\u03b1':'a','\u0391':'A','\u03c1':'p','\u03a1':'P','\u03bd':'v',
+    '\u039d':'N','\u03c5':'u','\u03a5':'Y','\u03c7':'x','\u03a7':'X','\u03ba':'k','\u039a':'K',
+    '\u03bb':'l','\u039b':'L','\u03bc':'m','\u039c':'M','\u03c4':'t','\u03a4':'T','\u03c9':'w',
+    '\u03a9':'W','\u03b2':'b','\u0392':'B','\u03b3':'y','\u0393':'Y','\u03b4':'d','\u0394':'D',
+    '\u03b6':'z','\u0396':'Z','\u03b7':'n','\u0397':'N','\u03b8':'0','\u0398':'0','\u03b9':'i',
+    '\u0399':'I','\u03c3':'o','\u03a3':'O','\u03c6':'o','\u03a6':'O','\u03b5':'e','\u0395':'E',
+    '\u03b8':'0','\u0398':'0','\u03ba':'k','\u039a':'K','\u03c0':'n','\u03a0':'N','\u03c2':'s',
+  };
+  out = out.replace(/[\u0400-\u04FF\u0370-\u03FF]/g, (m) => CYRILLIC_TO_LATIN[m] || m);
   return out;
 }
 
@@ -414,14 +473,32 @@ function detect(text) {
   // tier-phrase），任一命中即记一个 family（zh-en-mixing）。这与既有族的
   // 计分方式一致：baseScore 0.18，只加分不改路由；共现门槛照旧适用。
   const mixingTriggers = detectZhEnMixing(normalized);
+  // [第 141 轮] tier-phrase 支与 vocab-discourse 同源叠票修复（同第 130/
+  // 131/132 三轮的归一化纪律在 zh-en 场景的重演）。
+  // 实测（12 条正当中英/多语混排技术文档 5 条被打分）：tier-phrase 的
+  // 判据是「中文句 + ≥1 TIER 词 + ≥2 英文词」，它命中时**一定**伴随
+  // vocab-discourse 命中（TIER 词就是该档词表本身），于是
+  // 「TIER 词」被当成两个独立证据支撑共现门槛——与 TIER1/2/3 合并、
+  // transitions 并入、templated-frames 归并三次修的是同一个错误。
+  // 误伤面：robust/comprehensive/leverage 在正当技术写作里是常用术语
+  // （描述系统健壮性、策略覆盖面、技术选型），配普通技术名词
+  // （retry/rate limit/gateway/backoff）后 score 0.36~0.46。
+  // 修法：tier-phrase 命中时，zh-en-mixing 档位归一化到 vocab-discourse，
+  // 统计证据量只记一票。anchor-mix（中文套话锚 + 英文词）与
+  // double-connective（中英连接词翻译对）**不并入**——它们依赖的是
+  // 套话锚/连接词，与词表不同源，是真 AI 腔的独立证据。
+  // 反向确认（10 条真 AI 混排样本）：8 条在 anchor-mix 或
+  // double-connective 之外仍带独立证据（tier1/transitions/templated），
+  // 归并后 familiesHit 仍 >=2，检出不塌；AI2/AI3 原本 score=0
+  // （单族），不受影响。
+  const tierPhraseHit = mixingTriggers.some(t => t.trigger.startsWith('TIER词'));
   for (const mt of mixingTriggers) {
     const key = `zh-en-mixing:${mt.trigger}`;
     if (seen.has(key)) continue;
     seen.add(key);
     total += 0.18;
-    findings.push({ dimension: 'ai-tell-zh-en-mixing', severity: 18, trigger: mt.trigger, guidance: 'AI writing artifact (zh-en code-mixing)' });
+    findings.push({ dimension: 'ai-tell-zh-en-mixing', severity: 18, trigger: mt.trigger, guidance: 'AI writing artifact (zh-en code-mixing)', tierPhrase: mt.trigger.startsWith('TIER词') });
   }
-
   const stylometry = detectStylometry(normalized);
   for (const s of stylometry) {
     const key = `${s.type}:${s.trigger}`;
@@ -490,6 +567,11 @@ function detect(text) {
       const fam = f.dimension.replace(/^ai-tell-/, '');
       if (vocabDiscourse.has(fam)) return 'vocab-discourse';
       if (templatedFrames.has(fam)) return 'templated-frames';
+      // [第 141 轮] zh-en-mixing 的 tier-phrase 支与 vocab-discourse 同源
+      // （判据本身就是「中文句 ≤1 TIER 词 + 英文词」），归入同一档，
+      // 避免「TIER 词」被当成两个独立证据顶起共现门槛。
+      // anchor-mix / double-connective 两支不折叠（不同源，保留独立证据位）。
+      if (fam === 'zh-en-mixing' && f.tierPhrase) return 'vocab-discourse';
       return fam;
     })
   );
