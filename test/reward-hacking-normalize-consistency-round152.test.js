@@ -175,5 +175,9 @@ t('归一化后 token 消失时仍能命中（双通道取优）', () => {
   assert.strictEqual(gate(s).gate.action, 'block', 'gate 未取到原文通道的命中');
 });
 
-console.log('\n═══ 结果：' + pass + ' passed, ' + fail + ' failed ═══');
+// 汇总行必须用中文「N 通过, M 失败，共 N 个」——run-all.js 的**显示**过滤器
+// 只认中文关键词（`l.includes('通过')`），纯英文 "N passed, M failed" 虽然
+// 能被计数正则抓到（6280→6298 +18 验证过），但日志里显示为「(无输出)」，
+// 下一轮读日志会以为这个文件没跑。151 轮踩坑⑤同源：改成中文一并解决。
+console.log('第152轮 normalize 一致性（rh 双通道）: ' + pass + ' 通过, ' + fail + ' 失败, 共 ' + (pass + fail) + ' 个');
 if (fail > 0) process.exit(1);
