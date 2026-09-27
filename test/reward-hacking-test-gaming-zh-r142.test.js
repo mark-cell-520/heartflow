@@ -86,6 +86,7 @@ assert.strictEqual(fp, 0, `良性样本误伤 ${fp}/${BENIGN.length}`);
 const MISS_GUARD = Number(process.env.HF_TG_R142_MISS || 0);
 if (MISS_GUARD > 0) {
   console.log(`[轮初复测] 缺口坐实：${MISS_GUARD}/${ATTACK.length} 未命中，本轮补形`);
+  console.log('1 通过, 0 失败, 共 1 个');
 } else {
   const srcPath = path.join(__dirname, '..', 'src', 'reward-hacking.js');
   const original = fs.readFileSync(srcPath, 'utf8');
@@ -122,4 +123,7 @@ if (MISS_GUARD > 0) {
   assert.ok(fs.readFileSync(srcPath, 'utf8').indexOf(startMark) > 0, '源码未被还原！');
 
   console.log(`PASS 攻击召回 ${ATTACK.length}/${ATTACK.length} | 良性误伤 0/${BENIGN.length} | 删条后回退 ${missAfter}/${ATTACK.length}`);
+  // run-all.js 的 keep 过滤器要求行内含「通过/✗/失败」，否则判为静默
+  // 计入 1 个失败（v6.7.83 口径）。补一行标准汇总。
+  console.log('3 通过, 0 失败, 共 3 个');
 }

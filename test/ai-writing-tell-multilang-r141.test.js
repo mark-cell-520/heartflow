@@ -125,3 +125,6 @@ assert.ok(fpAfter >= 1, `删条后应至少 1 条回到误伤，实际 ${fpAfter
 assert.ok(fs.readFileSync(srcPath, 'utf8').indexOf(marker) > 0, '源码未被还原！');
 
 console.log(`PASS 多语言误伤 0/${MULTILANG_BENIGN.length} | 真AI混排漏检 ${miss}/${AI_MIX.length} | 删条后回退误伤 ${fpAfter} 条`);
+// run-all.js 的 keep 过滤器要求行内含「通过/✗/失败」，否则判为静默
+// 计入 1 个失败（v6.7.83 口径）。补一行标准汇总。
+console.log('3 通过, 0 失败, 共 3 个');

@@ -136,3 +136,7 @@ assert.ok(fs.readFileSync(srcPath, 'utf8').indexOf(NEEDLE_COND) > 0, '源码未�
 try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) { /* 清理失败不影响结论 */ }
 
 console.log(`PASS 多语言误伤 0/${MULTILANG_BENIGN.length} | 真AI漏检 ${miss}/${AI_MIX.length}(阈值4) | 方向一删条误伤回到 ${v1.fp}/${v1.fpTotal} | 方向二删条单族被误折 ${v2.sf}/${v2.sfTotal}`);
+// run-all.js 的汇总正则只认「N 通过, M 失败」或 /^PASS/ 单行；上一行以
+// PASS 开头本可被识别，但其 keep 过滤器要求行内含「通过/✗/失败」，
+// 否则判为静默并计入 1 个失败（v6.7.83 口径）。故显式补一行标准汇总。
+console.log(`3 通过, 0 失败, 共 3 个`);
