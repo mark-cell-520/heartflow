@@ -30,9 +30,19 @@ const detect0 = freshDetect();
 // ① 纯词表叠词句（tier2+tier1+tier2）必须 score=0（归并生效）
 const PURE_VOCAB = 'We leverage a robust framework to streamline data processing across our services.';
 const rPure = detect0(PURE_VOCAB);
-ok(rPure.familiesHit === 1, `注入前: 纯词表三档叠词 familiesHit 应=1（归并为 vocab-tier），实得 ${rPure.familiesHit}`);
+ok(rPure.familiesHit === 1, `注入前: 纯词表三档叠词 familiesHit 应=1（归并为 vocab-discourse），实得 ${rPure.familiesHit}`);
 ok(rPure.score === 0, `注入前: 纯词表句 score 应=0，实得 ${rPure.score}`);
 ok(rPure.coOccurrence === false, `注入前: 纯词表句 coOccurrence 应=false，实得 ${rPure.coOccurrence}`);
+
+// [v6.7.128 第 131 轮] transitions 也归入 vocab-discourse 档：
+// 词表三档 × transitions 二票组合（moreover/furthermore/in summary 是正常
+// 学术英语，与词表同源不算两个独立证据）
+const VOCAB_PLUS_TRANSITION =
+  'Robust consensus protocols require careful analysis. Furthermore, they must tolerate crash faults.';
+const rVpt = detect0(VOCAB_PLUS_TRANSITION);
+ok(rVpt.familiesHit === 1, `注入前: 词表×transitions 应归并为 1 个 vocab-discourse，实得 ${rVpt.familiesHit}`);
+ok(rVpt.score === 0, `注入前: 词表×transitions score 应=0，实得 ${rVpt.score}`);
+ok(rVpt.coOccurrence === false, `注入前: 词表×transitions 不应判共现，实得 ${rVpt.coOccurrence}`);
 
 // ② 模板族 + 词表句必须仍计分（归并未伤模板共现）
 const TEMPLATE_PLUS_VOCAB = 'Imagine a world where robust systems become the default.';
@@ -46,8 +56,8 @@ if (!SRC_ORIGINAL.includes(CUT)) {
   console.log(`  FAIL: 删条片段未在源文件中找到「${CUT}」`);
 } else {
   const mutated = SRC_ORIGINAL.replace(
-    "return vocabTiers.has(fam) ? 'vocab-tier' : fam;",
-    'return vocabTiers.has(fam) ? fam : fam;'
+    "return vocabDiscourse.has(fam) ? 'vocab-discourse' : fam;",
+    'return vocabDiscourse.has(fam) ? fam : fam;'
   );
   fs.writeFileSync(SRC, mutated, 'utf8');
   try {
@@ -56,6 +66,10 @@ if (!SRC_ORIGINAL.includes(CUT)) {
     const rBad = detect2(PURE_VOCAB);
     ok(rBad.familiesHit >= 2, `删条后应变红: 纯词表句 familiesHit 应回到 >=2（档位各记一票），实得 ${rBad.familiesHit}`);
     ok(rBad.score > 0, `删条后应变红: 纯词表句 score 应重新 >0，实得 ${rBad.score}`);
+    // 删条后 transitions 与词表分开各记一票，也必须重新计分
+    const rBadVpt = detect2(VOCAB_PLUS_TRANSITION);
+    ok(rBadVpt.familiesHit >= 2, `删条后应变红: 词表×transitions familiesHit 应回到 >=2，实得 ${rBadVpt.familiesHit}`);
+    ok(rBadVpt.score > 0, `删条后应变红: 词表×transitions score 应重新 >0，实得 ${rBadVpt.score}`);
     // 模板+词表句行为不应被删条破坏（它是模板族在扛共现）
     const rTpl2 = detect2(TEMPLATE_PLUS_VOCAB);
     ok(rTpl2.score > 0, `删条后: 模板+词表句仍应计分，实得 score=${rTpl2.score}`);
@@ -68,9 +82,12 @@ if (!SRC_ORIGINAL.includes(CUT)) {
   const rRestored = detect3(PURE_VOCAB);
   ok(rRestored.familiesHit === 1, `还原后: 纯词表句 familiesHit 应回到 1，实得 ${rRestored.familiesHit}`);
   ok(rRestored.score === 0, `还原后: 纯词表句 score 应回到 0，实得 ${rRestored.score}`);
+  const rRestoredVpt = detect3(VOCAB_PLUS_TRANSITION);
+  ok(rRestoredVpt.familiesHit === 1, `还原后: 词表×transitions familiesHit 应回到 1，实得 ${rRestoredVpt.familiesHit}`);
+  ok(rRestoredVpt.score === 0, `还原后: 词表×transitions score 应回到 0，实得 ${rRestoredVpt.score}`);
 
-  // ── 兜底：删掉整个 familiesHit 归并块（整段 vocab-tier 计算）────
-  const blockStart = 'const vocabTiers = new Set([';
+  // ── 兜底：删掉整段 vocab-discourse 计算块 ─────────────────
+  const blockStart = 'const vocabDiscourse = new Set([';
   if (SRC_ORIGINAL.includes(blockStart)) {
     const marker = 'const familiesHit = normalizedFams.size;';
     const mutated2 = SRC_ORIGINAL.replace(
@@ -82,6 +99,8 @@ if (!SRC_ORIGINAL.includes(CUT)) {
       const detect4 = freshDetect();
       const rBad2 = detect4(PURE_VOCAB);
       ok(rBad2.score > 0, `整段删掉后应变红: 纯词表句 score 应重新 >0，实得 ${rBad2.score}`);
+      const rBad2v = detect4(VOCAB_PLUS_TRANSITION);
+      ok(rBad2v.score > 0, `整段删掉后应变红: 词表×transitions score 应重新 >0，实得 ${rBad2v.score}`);
       const rTpl4 = detect4(TEMPLATE_PLUS_VOCAB);
       ok(rTpl4.score > 0, `整段删掉后: 模板+词表句仍应计分，实得 score=${rTpl4.score}`);
     } finally {
@@ -89,7 +108,7 @@ if (!SRC_ORIGINAL.includes(CUT)) {
     }
   } else {
     fail++;
-    console.log('  FAIL: vocab-tier 计算块未找到（删条样本需更新）');
+    console.log('  FAIL: vocab-discourse 计算块未找到（删条样本需更新）');
   }
 
   // ── 源码完整还原 ────────────────────────────────────────
