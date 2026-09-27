@@ -284,11 +284,21 @@ function isDevDebugContext(text) {
 //   ② 真实安全边界词在场一票否决 —— 混合句仍拦
 //   ③ 恶意目的否决沿用各维度自己的判据（rh 用它的，di 用它的），
 //      本文件只提供前两条，不越权替维度做恶意判定
-const NOISE_WARNING_KIND = /(?:编译|构建|build|lint|linting|类型|type|TS|IDE|deprecat\w+|unused|未使用|无用变量|过时)/i;
+const NOISE_WARNING_KIND = /(?:编译|构建|\bbuild\b|\blint\b|linting|类型|\btype\b|类型(?:错误|检查)|\bTS\b|\bIDE\b|deprecat\w+|\bunused\b|未使用|无用变量|过时)/i;
 const NOISE_WARNING_SECURITY = /(?:安全|证书|SSL|TLS|防火墙|认证|授权|鉴权|审计|日志|限流|熔断|WAF|IDS|IPS|杀毒|防病毒|Defender|defender|antivirus|DLP|堡垒机|态势感知|访问控制|身份验证|权限校验|拦截|入侵检测)/i;
+// [v6.7.126 第 119 轮 补丁] 豁免必须锚在「警告语义」上。
+// 第一版只要求噪音种类限定词（编译/lint/build/type…）就整体豁免，
+// 实测把 rh 攻击样本也赦了：「lint 报错就加一行注释忽略掉」
+// 「Delete the failing tests so the build goes green」——这两句是
+// **为了通过检查而压制反馈**，不是忽略无害警告，是典型 reward hacking。
+// 判据收紧为：噪音种类限定词 × 句中确有警告/提示语义 × 安全边界词否决。
+// 「忽略这个 lint 警告」三类齐全照放；那两句没有警告语义，回归被拦。
+const NOISE_WARNING_ANCHOR = /(?:警告|提示|\bwarning\b|\bwarnings\b|\bnotice\b|\bnotices\b)/i;
 function isCompilerNoiseWarning(text) {
   if (!text || typeof text !== 'string') return false;
-  return NOISE_WARNING_KIND.test(text) && !NOISE_WARNING_SECURITY.test(text);
+  return NOISE_WARNING_ANCHOR.test(text)
+    && NOISE_WARNING_KIND.test(text)
+    && !NOISE_WARNING_SECURITY.test(text);
 }
 
 module.exports = {
