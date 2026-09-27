@@ -74,7 +74,9 @@ module.exports = function ({ test, assertTrue, assertEqual, assertDefined }) {
     for (const text of AI_TEXTS) {
       const r = detect(text);
       assertTrue(r.coOccurrence === true, '真 AI 文本应判定共现');
-      assertTrue(r.familiesHit >= 3, `真 AI 文本族数应 >=3，实得 ${r.familiesHit}`);
+      // [v6.7.127 第 130 轮] TIER1/2/3 归并为 vocab-tier 一族，族数上限下降
+      // 1 档；真 AI 文本实测 2-3 档（词表档 + 模板族），门槛 >=2 不变。
+      assertTrue(r.familiesHit >= 2, `真 AI 文本档位数应 >=2，实得 ${r.familiesHit}`);
       assertTrue(r.score > 0.3, `真 AI 文本 score 不应塌，实得 ${r.score}`);
     }
   });
@@ -96,19 +98,40 @@ module.exports = function ({ test, assertTrue, assertEqual, assertDefined }) {
     }
   });
 
-  test('co-occurrence: familiesHit 与实际 findings 族数一致', () => {
+  test('co-occurrence: familiesHit 与归并档位后的 findings 一致', () => {
     const text = AI_TEXTS[0];
     const r = detect(text);
-    const actual = new Set(r.findings.map((f) => f.dimension.replace(/^ai-tell-/, ''))).size;
-    assertEqual(r.familiesHit, actual, 'familiesHit 必须是 findings 的真实族数');
+    // [v6.7.127 第 130 轮] familiesHit 语义改为「归一族数」：
+    // TIER1/2/3 合并为 vocab-tier，不再等于 findings 的原始族数。
+    const vocabTiers = new Set(['tier1', 'tier2', 'tier3']);
+    const actual = new Set(
+      r.findings.map((f) => {
+        const fam = f.dimension.replace(/^ai-tell-/, '');
+        return vocabTiers.has(fam) ? 'vocab-tier' : fam;
+      })
+    ).size;
+    assertEqual(r.familiesHit, actual, 'familiesHit 必须是 findings 的归一族数');
   });
 
-  test('co-occurrence: 双族共现（恰好在门槛上）必须计分', () => {
-    // tier1(robust) + tier2(facilitate) 两个不同族，族数=2 应过门槛
-    const r = detect('Robust design facilitates maintainable systems.');
+  test('co-occurrence: 双族共现（词表档 + 模板族）必须计分', () => {
+    // [v6.7.127 第 130 轮] 原断言「tier1+tier2 两族」随 TIER 归并失效——
+    // 三个档位同源，叠词表不构成两个独立证据。改用 template 族（speculative-openers）
+    // + 词表档的组合：共现门槛的语义是「两个不同来源的证据」。
+    const r = detect('Imagine a world where robust systems become the default.');
     assertDefined(r.familiesHit, 'familiesHit 必须存在');
-    assertTrue(r.familiesHit >= 2, `应命中 2 族，实得 ${r.familiesHit}`);
-    assertTrue(r.score > 0, '双族共现必须计分（门槛是 >=2）');
+    assertTrue(r.familiesHit >= 2, `应命中 2 档，实得 ${r.familiesHit}`);
+    assertTrue(r.score > 0, '双档共现必须计分（门槛是 >=2）');
+  });
+
+  test('co-occurrence: 纯词表三档叠词不算共现（第 130 轮核心修法）', () => {
+    // [v6.7.127 第 130 轮] 实测缺口：正常英文技术写作
+    // 「leverage + robust + streamline」（tier2+tier1+tier2）被记 3 族、
+    // score 0.30-0.40 而误伤。TIER1/2/3 归并后应只有 1 个 vocab-tier 档，
+    // 判定未共现 → score 归零。
+    const r = detect('We leverage a robust framework to streamline data processing across our services.');
+    assertEqual(r.familiesHit, 1, `纯词表三档叠词应归并为 1 个 vocab-tier，实得 ${r.familiesHit}`);
+    assertEqual(r.score, 0, '纯词表共现不应计分');
+    assertEqual(r.coOccurrence, false, '纯词表不算共现');
   });
 
   test('co-occurrence: 单族多词不算共现', () => {
