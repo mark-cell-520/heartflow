@@ -396,6 +396,26 @@ function _matchAll(text) {
       && !MALICIOUS_PURPOSE.test(text)) {
     return { count: 0, hits: [], score: 0, exempted: 'safe_negation' };
   }
+  // [v6.7.126 第 119 轮] 编译器噪音警告豁免。
+  // 缺口实测（误拦普查探针 24 条良性样本跑 gate.gate）：
+  // 「本地开发忽略编译警告」被判 dangerous_instruction → block。
+  // 根因：第①族动词表把「警告/warning」整体当成安全设施。但编辑器原生
+  // 警告（编译 / lint / 类型 / deprecation / unused / build）是**开发噪音**，
+  // 忽略它不降低任何安全水位，与「忽略安全警告」性质相反。
+  //
+  // 判据（三条同时成立才放）：
+  //   ① 句中命中噪音警告限定词（编译 / lint / 类型 / deprecation / unused /
+  //      build / IDE）
+  //   ② 句中**不出现**真实安全边界词（见 NOISE_SEC 反向表，复用命中侧的
+  //      安全设施表口径，避免两份清单分叉）
+  //   ③ 句中无 MALICIOUS_PURPOSE（与既有豁免同一道闸）
+  // 反向设计：安全词在场时一票否决，因此「忽略编译警告同时禁用防火墙」
+  // 「先忽略这个 lint 警告，再关掉证书校验」仍 block（本轮 3/3 实测）。
+  const _NOISE_KIND = /(?:编译|构建|build|lint|linting|类型|type|TS|IDE|deprecat\w+|unused|未使用|无用变量|过时)/i;
+  const _NOISE_SEC = /(?:安全|证书|SSL|TLS|防火墙|认证|授权|鉴权|审计|日志|限流|熔断|WAF|IDS|IPS|杀毒|防病毒|Defender|defender|antivirus|DLP|堡垒机|态势感知|访问控制|身份验证|权限校验|拦截|入侵检测)/i;
+  if (_NOISE_KIND.test(text) && !_NOISE_SEC.test(text) && !MALICIOUS_PURPOSE.test(text)) {
+    return { count: 0, hits: [], score: 0, exempted: 'compiler_noise_warning' };
+  }
   // [v6.7.125] 恶意目的否决问题框架豁免（第 31 轮）。
   // QUESTION_FRAME 的设计是「疑问=询问做法，指令=要求执行」，但它只看
   // **有没有疑问词**，完全不看句子后半截的目的——于是
