@@ -287,7 +287,14 @@ const claimExtractor = {
 
   // 提取比较声明（带元数据）
   extractComparisons(text, opts = {}) {
-    const matches = text.match(/\b(?:比|超过|低于|多于|少于|大于|小于|高[于]?|低[于]?|多[于]?|少[于]?|more|less|better|worse|higher|lower|faster|slower|greater|fewer|than\s+\S+)\s*\S+/gi) || [];
+    // ⚠️ [第 127 轮] 原写法把中文比较词（比/超过/低于/…）与英文词一起包进
+    //    `\b(?:…)\b?`，而 `\b` 只对 ASCII `\w` 定义——「响应时间比原来降低了 50%」
+    //    里比较词前后是汉字，`\b` 永不成立，中文比较句 0/8 命中（英文 5/5 正常）。
+    //    修法：拆成中文支（精确子串，无 `\b`）与 ASCII 支（保留 `\b` 防子串命中）。
+    //    同族问题全仓第 3 处（v6.7.126 第 126 轮 1 处 + 本轮另 2 处），
+    //    扫描口径见 test/sql-word-boundary-round127.test.js 头部注释。
+    // 「同比/环比」是统计数据的时间基准表述，不是当前断言里的比较，一并排除。
+    const matches = text.match(/(?<![比并对按排百分同环])(?:比|超过|低于|多于|少于|大于|小于|高[于]?|低[于]?|多[于]?|少[于]?)(?!较|例|喻|拼|方|赛|重|起来|不上|得出)\s*\S+|\b(?:more|less|better|worse|higher|lower|faster|slower|greater|fewer)\b|\bthan\s+\S+/gi) || [];
     const seen = new Map();
     for (const m of matches) {
       if (!seen.has(m)) {
