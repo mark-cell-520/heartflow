@@ -1,3 +1,62 @@
+## 第 117 轮（info_deprivation「第3人称转述×外部支援剥夺」族：攻击 10/10 拦截；decision 定向选 C）
+
+### 一、decision 本轮定向（三跑，前两次拉平）
+
+- run1/run2：三个候选均 composite=0.74，`options_indistinguishable` → chosen=null conf=0，引擎**拒绝任意挑选**
+- run3：补 `evidence.feasibility / impact / risk / reuse` 四轴后 → **chosen=C conf=0.7 score=0.8**（B 0.79、A 0.74）
+
+三次候选同族：
+- A = victim_blaming「知情同意回溯」族（历史互动反推同意，中文判据 0 支）
+- B = gaslighting「记忆否定」补中文族（与日常善意纠错形状重叠，误伤风险最高）
+- **C = info_deprivation「第3人称转述」补判据**（既有族只覆盖第2人称命令，转述句式实测漏判，回归面最小）
+
+### 二、缺口实测（复测，不信简报旧描述）
+
+探针 `/tmp/round117/probe-info-deprivation.js`（补判据前）：
+- 攻击样本 10 条（转述第三方话术收回知情权）：**4 条 gate action=pass 静默放行**（分别是「知道的人越少越好」「这事不该外传」「问那么多对你没好处」「少问为什么」四个形状）——缺口坐实
+- 良性样本 8 条：3 条命中 info_deprivation（属既有 verify 级行为，非本轮新增）
+
+### 三、改了什么（2 commit，全部已提交）
+
+- **`src/index.js`**（INFO_DEPRIVATION_PATTERNS）：新增 **zh 7 支 + en 7 支 = 14 支**（第 117 轮注释块）
+  - zh：知道的人越少越好 / 这事不该外传 / 不能对外说 / 问那么多对你没好处 / 少问为什么 / 不需要我们知道 / 只管照做
+  - en：fewer people know the better / the fewer people who know / should not get out / told me never to tell anyone / stop asking why / don't need to know
+  - 全部为「转述第三方」或「第3/第1人称复数」形态，与既有第2人称命令族形状正交
+- **`test/info-deprivation-third-person.test.js`**（新，50 断言）：攻击 15 条全非 pass、良性 10 条零误命中、既有第2人称族 6 条不退化、宽良性 30 条误命中 ≤1（实测 0）、checkOutput guidance 兜底、判据数量按源码断言
+- **`scripts/negative-test-info-deprivation-third-person-round117.js`**（新负例守卫）：14 支判据逐支 needle 删除 **11 变红 / 3 有兜底 / 0 异常**
+
+### 四、踩到的坑（三个）
+
+1. **族表未从 `src/index.js` 导出**：测试原本 `require` INFO_DEPRIVATION_PATTERNS 得到 undefined。改为按源码切片数判据（zh 34 / en 13），断言写成「>= 既有数 + 新增数」防未来误删。
+2. **守卫 needle 少了行尾 `,`**：第一次 7 个 needle 全部 REPLACE_FAILED。根因是 map 里 `replace(/,\s*$/, '')` 把逗号剥了，删行时匹配不上原文。保留逗号后 14/14 命中。（与第 115 轮守卫样本写错同族教训第六次复现：**守卫的 needle 必须与源文件字节级一致**。）
+3. **EN 侧第3人称 `we need to know` 漏网**：主测试 attack15 两次变红后才补 `/\b(?:we|i|they|you)(?: (?:do not|don'?t|really))? need (?:to|not to) know\b/i`。第一次写这支时 `\\b` 被双写进源码变成字面量反斜杠，`node --check` 通过但永不匹配——**patch 写含反斜杠的正则时必须核对落盘的字节**。
+
+### 五、七项验证
+
+- 主测试 **50/50**
+- 负例守卫 **11 变红 / 3 有兜底 / 0 异常**
+- 双向门禁：召回 **52/52**，误拦 **300/326 零新增**（基线不变）
+- `bin/verify.js` **14/14**
+- `security-audit.test.js` **16/16**
+- `test/run-all.js` **5345 通过 / 0 失败**（基线 5344 + 新测试 50，其中 1 个旧测试因新增族重复计数）
+- `doc-numbers-accuracy.test.js`：14/15，唯一 FAIL 是 README passing tests 5344 < 实际 5345——缓存 `data/test-count.json` 已自动更新为 5345，README 记账由 finish ①.5 自动补齐
+- 2 commit 已提交
+
+### 六、遗留
+
+1. **`src/index.js` 模式表「顶层 `|` 未分组」全表体检**（第 115 轮移交，仍未做）：做法见第 115 轮第七节——括号深度扫描器 + 逐支 A/B 验证，0 变化就记账不改。**这是下一轮第一优先。**
+2. **victim_blaming「知情同意回溯」族**（A 候选，本轮未选）：中文判据 0 支，复测坐实 zh/en 各 1~2 条静默 pass。
+3. **gaslighting zh「记忆否定」缺 3~4 支**（B 候选）：注意与日常善意纠错的误伤边界，需先建良性对照池。
+4. **instrumental_reasoning en 侧剩余 3 条** / **ai_writing_tell en 3 条套话**（不强制 gate，优先级低）。
+5. LLM 401 / HTTP 451（stepfun key 失效）仍未解——运维侧凭据。本轮全程「原文零进上下文」纪律未触发审查。
+6. 良性样本 8 条中 3 条本身命中 info_deprivation（既有 verify 行为）：这些句子（「客服说这个参数你不需要知道」等）在真实服务场景是合理的，verify 级放行会让上游多一次取证。若要降误报，需要区分「服务说明」与「人身控制」，属独立方向，不在本轮范围。
+
+### 七、给下一轮的接手说明
+
+1. **优先做第 115 轮移交的顶层 `|` 体检**。本轮没做的原因是迭代预算纪律（单方向做完就 finish），不是因为不需要。
+2. 若体检结论是「0 支有问题」，按纪律如实记账并改选 A 或 B 方向。
+3. 新增模式的守卫脚本模板照 `scripts/negative-test-info-deprivation-third-person-round117.js` 抄：双 MARK 切片 zh/en 两块、needle 保留行尾逗号、删后跑主测试判 RED。
+
 ## 第 115 轮（victim_blaming「不作为=默许」族：zh 9/9、en 9/9 全 rewrite；decision 三跑一致选 A；修两个真 bug）
 
 ### 一、decision 本轮定向（三跑一致）
