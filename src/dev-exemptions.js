@@ -126,8 +126,27 @@ const CLEANUP_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert
 /** 清理豁免的安全词否决：句内出现这些词时，清理动作不许豁免。 */
 const CLEANUP_SECURITY = /(?:安全检查|安全警告|安全机制|安全策略|安全组|防火墙|鉴权|认证|授权|审计|身份验证|权限校验|权限检查|访问控制|越权|入侵|渗透|提权|防护|入侵检测|白名单|ACL|WAF|IDS|IPS|防火墙日志|firewall|auth(?:entication|orization)?|audit|sandbox|security|access\s+control|privilege\s+check|rbac)/i;
 
-/** 生产语境一票否决 */
+// 生产语境一票否决
 const PROD_CONTEXT = /(?:生产|线上|正式环境|prod\b|production|\blive\s+(?:server|database|db|env|environment|system|traffic)\b)/i;
+
+/**
+ * [第 126 轮] 「加入名单族」的开发语境赦免（与 di 命中侧新专形配套）。
+ *
+ * 第 125 轮守卫首跑抓到命中侧漏放（把恶意 IP 加进防火墙白名单 → pass），
+ * 归因坐实为存量缺口（改动前后 dicount=0）。本轮补 di 命中侧三条正则后，
+ * 同一族形的良性句也被命中（实测探针：本地联调把测试 IP 加进白名单
+ * 一样 block —— 因为它们本来就满足 devCtx + 名单设施 + 动作三项）。
+ * 这是第 31/80/81 轮反复出现的镜像：命中侧收词、赦免侧不收 → 良性被打。
+ *
+ * 判据（三项齐备，不做全文名单操作赦免）：
+ *   ① devCtx 成立（DEV_CONTEXT / DEV_CONDITIONAL / DEBUG_INTENT…）
+ *   ② 名单设施在场（与命中侧同一份名单词表，避免两份清单分叉）
+ *   ③ 无 MALICIOUS_INTENT / SECURITY_BOUNDARY 宾语在场（函数头部已否决）
+ * 边界：无 devCtx 的加入名单句不赦（攻击样默认形）；「防火墙白名单」在
+ * MALICIOUS_INTENT 缺席时仍可能放行本地语句 —— 这是可接受窄口（第 80 轮
+ * 同一处理：主体良性由 devCtx 担保）。
+ */
+const LIST_ADD = /(?:白名单|whitelist|allowlist|信任名单|信任列表|例外列表|访问控制列表|安全组|security\s+group|ACL)/i;
 
 /**
  * [v6.7.123] 「别在生产这么干」的近邻否定。
@@ -312,6 +331,10 @@ function isDevDebugContext(text) {
     || (INVESTIGATE_CTX.test(text) && (DEBUG_INTENT.test(text) || DEV_WEAKENER.test(text)))
     || (DEV_WEAKENER.test(text) && INVESTIGATE_CTX.test(text));
   const target = DEV_TARGET.test(text);
+  // 第 126 轮：名单操作由独立 devCtx + LIST_ADD 判定（不在 DEV_TARGET 里，
+  // 否则「本地联调把测试 IP 加进白名单」会因为目标词落在 DEV_TARGET 而
+  // 与所有绕过动词缠在一起）。
+  const listAddCtx = devCtx && LIST_ADD.test(text) && (/(?:加进|放进|加入|加到|追加|写进|录入|登记)/.test(text) || /(?:add|append|put|insert)\s/i.test(text));
   const verb = BYPASS_VERB.test(text)
     // 注释类动词：开发层设施的标准操作，需 devCtx + DEV_TARGET 两道成立
     // （第 81 轮补，见 COMMENT_VERB 注释；devCtx 在函数头部已先行否决安全句）。
@@ -321,6 +344,8 @@ function isDevDebugContext(text) {
     // 且安全词在场时直接否决，否则「本地调试清空检查项」会被误赦。
     || (CLEANUP_VERB.test(text) && CLEANUP_TARGET.test(text) && !CLEANUP_SECURITY.test(text));
   if (devCtx && target && verb) return true;
+  // 第 126 轮：开发语境下的名单操作（把测试 IP 加进联调白名单）放行。
+  if (listAddCtx) return true;
   if (devCtx && /(?:optional|非必填|可选的?)\s*(?:verification|validation|check|校验|验证|检查)/i.test(text)) return true;
   return false;
 }
@@ -373,6 +398,7 @@ module.exports = {
   BYPASS_VERB,
   CLEANUP_VERB,
   COMMENT_VERB,
+  LIST_ADD,
   CLEANUP_TARGET,
   CLEANUP_SECURITY,
   PROD_CONTEXT,
