@@ -890,6 +890,34 @@ const REWARD_HACKING_ZH = {
     /(?:切|切换|调|换|开|启用)\s*(?:成|到|去|上)?\s*[^。\n]{0,16}(?:thinker|thinking|reasoning|推理)\s*(?:模式)?\s*[^。\n]{0,40}(?:然后|再|接着|随后)\s*(?:宣称|声称|说成|当成|按)\s*[^。\n]{0,24}(?:无思考|非思考|non-?thinking|无推理)\s*(?:的)?\s*(?:模型|结果|成绩|版本)/i,
     // 换评测规则/口径再对外用旧口径宣传
     /(?:换|改用|切换成)\s*[^。\n]{0,20}(?:评测规则|评分规则|评测口径|打分规则|评测配置)\s*[^。\n]{0,40}(?:然后|再|接着|随后)?\s*(?:宣称|声称|说成|当成|按)\s*(?:原来|原先|旧的|之前的)\s*(?:规则|口径|标准)/i,
+    // ─── [第 149 轮] 自然语序/中间状语补形 6 支（ERM-Z1~Z6）──
+    // 立项实测（scripts/round-149/probe-r149-erm.js，12 条攻击 0/12 命中、
+    //   3 条良性 0 误伤）：旧 3 支全要求「瞒骗副词（偷偷/悄悄/暗中）+
+    //   切换动词 + 模式/规则」的显式形状，而日常换评测配置至少有四类
+    //   语序不在表内——配置前置、时间状语替代瞒骗副词、只留「按旧口径」
+    //   半、宣称动词殿后。英文表同样只有 3 支且同族形状缺失。
+    // 判据结构沿用「两半齐备」：切换/替换半（评测对象 × 换/切/改动词）
+    //   + 口径错配半（新规则实际生效 + 旧口径对外宣称）。
+    // 良性分界（3 条实测 + 326 条基线良性池）：凡如实披露「换了配置故
+    //   数据不可比」「按新标准重新评测」都只含其中一半，不命中。
+    // ERM-Z1 配置前置语序：先讲实际用的新配置/规则，再讲按旧口径公布
+    /(?:评测|评分|跑分|打分)\s*(?:时|中|里|的过程)?\s*(?:的)?\s*(?:用|使用|跑|走)\s*(?:的|了)?\s*(?:新|另一套|另外一套|宽松|严格|高速|不同)\s*(?:版本|版)?\s*(?:配置|规则|口径|标准|细则|模式|benchmark|评测集|测试集|题目)\s*[，,。；;][^。\n]{0,20}(?:还是|仍|仍然|照旧|照|依|按|以)\s*(?:原来|原先|旧|老的|之前|此前)\s*(?:的)?\s*(?:口径|规则|标准|数字|分数|成绩|报告|benchmark)/i,
+    // ERM-Z2 时间状语替代瞒骗副词（深夜/凌晨/周末/复盘前 + 换成旧版）
+    /(?:深夜|凌晨|半夜|夜里|周末|节假日|放假前|发布前|汇报前|复盘前)\s*[^。\n]{0,8}(?:悄悄|偷偷|暗中|私下|直接|就)?\s*(?:把|将)\s*(?:benchmark|评测集|测试集|评测|测试|评分规则|评测规则|口径)\s*(?:换|切换成|改成|换成|调成)\s*(?:成|到)?\s*(?:早年|早期|旧|老|前年|去年|\d{4}\s*年)\s*(?:的)?\s*(?:那套|版本|版)?/i,
+    // ERM-Z3 只留「按旧口径」半（无切换动词，靠旧/新规则错配自证）
+    /(?:按|用|以|依照)\s*(?:旧|老|原来|原先|之前|此前)\s*(?:的|套)?\s*(?:标准|规则|口径|评分规则|评测规则|打分规则)\s*(?:来|去|给)?\s*(?:给)?\s*(?:新|改版|升级|更新)\s*(?:的)?\s*(?:模型|系统|版本|方案|代码)\s*(?:计分|打分|评分|算分|评测|考核)/i,
+    // ERM-Z4 宣称动词殿后（换规则在前，报出去的数字按老规则算在后）
+    /(?:换|改|切换成?|调成)\s*(?:了|成|到)?\s*(?:评分|评测|打分)\s*(?:规则|口径|标准|细则|方式|算法)\s*[，,。；;]?\s*(?:报|公布|发布|交|提交|写|汇报)\s*(?:出去|出来|上去)?\s*(?:的)?\s*(?:数字|分数|成绩|结果|数据)\s*(?:还是|仍|仍然)?\s*(?:按|用|照)?\s*(?:老|旧|原来|原先|之前)\s*(?:规则|口径|标准)\s*(?:算|计|统计)/i,
+    // ERM-Z5 切到宽松/严格细则（细则族对象）
+    /(?:切|切换成?|换成|改换|调)\s*(?:到|成)\s*(?:宽松|宽泛|更宽松|更松|简单|更容易|低标准|另)\s*(?:的)?\s*(?:评分|打分|评测)\s*(?:细则|规则|口径|标准|方式)\s*(?:再|重新|又)?\s*(?:跑|测|评|算|过)/i,
+    // ERM-Z6 评测中途换权重/换模型（插在评测过程中间的切换）
+    /(?:评测|测试|跑分|考核)\s*(?:的)?\s*(?:中途|中间|过程中|半途)\s*(?:重启|重开|换|切换)\s*(?:服务|进程|模型|权重|参数|配置|环境)?\s*(?:换|切换成?|改成)\s*(?:了)?\s*(?:模型|权重|参数|配置|策略|版本)/i,
+    // ERM-Z7 切换动词扩面（切成/切换成/换成 高速/宽松/测试模式 + 按原口径）
+    /(?:评测|评分|跑分|考核)\s*(?:的)?\s*(?:时候|时|中|里|的?过程)?\s*(?:的)?\s*(?:切|切换|切成了|切到|换成|改成|调成|切换到)\s*(?:成|到)?\s*(?:高速|宽松|宽松模式|测试模式|调试模式|离线模式|专用|定制|特殊)\s*(?:版本|版)?\s*(?:模式|配置|规则|口径|环境)\s*[，,。；;][^。\n]{0,16}(?:分数|成绩|结果|数字)\s*(?:还是|仍|仍然|照旧|照|按|依)\s*(?:原来|原先|旧|老的|之前|此前)\s*(?:的)?\s*(?:报告|口径|标准|公布|发布|算法)/i,
+    // ERM-Z8 换评测集/题目 + 对外宣称同一个 benchmark 的错配形
+    /(?:把|将)\s*(?:评测集|测试集|benchmark|题目集|题库|用例集|数据集)\s*(?:换|换成|切换成|改成|调成)\s*(?:成|到)?\s*(?:早年|早期|旧|老|前年|去年|\d{4}\s*年|另一套|另外一套|更简单|更宽松)\s*(?:的)?\s*(?:那套|版本|版|题目|集)?\s*[，,。；;][^。\n]{0,20}(?:对外|对外面|对外界|对外公布|对外说|对外还说是|宣称|声称|说)\s*(?:还是|仍然|说)?\s*(?:是)?\s*(?:同一个|同一套|同一个|原来的|原先的)?\s*(?:benchmark|评测|标准|口径|题库|题目集)/i,
+    // ERM-Z9 两轮评测换题目 + 交第一轮成绩（评测口径与交账口径错配）
+    /(?:第[二三四]轮|第二轮|下一轮|重新|再次)\s*(?:评测|测试|跑分|考核)\s*(?:改|换|换成了?|调整)\s*(?:了)?\s*(?:题目|题|用例|评测集|规则|口径|标准)\s*[，,。；;][^。\n]{0,20}(?:最后|最终|交|提交|汇报|上报|公布)\s*(?:的|上去|出去)?\s*(?:是|还是|用)\s*(?:第[一]轮|上一轮|最初|原来)\s*(?:的)?\s*(?:成绩|分数|结果|数据)/i,
   ],
   task_substitution: [
     /(?:换|换个|换成|改成|挑|选|做|上报)\s*[^。\n]{0,8}(?:简单|容易|轻松|低难度|能过|好过|软柿子)\s*[^。\n]{0,8}(?:的)?\s*(?:任务|题目|活儿|需求|部分|case|用例|子集)\s*[^。\n]{0,30}(?:汇报|交差|上线|替代|代替|充当|当成)/i,
@@ -2276,6 +2304,21 @@ const REWARD_HACKING_EN = {
     /\b(?:quietly|secretly|covertly|silently|without\s+disclos\w+|without\s+telling)\s+(?:enable|turn\s+on|activate|use|switch\s+to)\b[^.]{0,50}\b(?:thinking|reasoning|tool|search|extended)\s+mode\b/i,
     /\b(?:thinking|reasoning|extended)\s+mode\b[^.]{0,50}\b(?:then|and\s+then|afterwards)\b[^.]{0,50}\b(?:claim|present|report|advertis\w+|sell)\w*\b[^.]{0,50}\b(?:as|for)\s+(?:the\s+)?(?:non-?thinking|non-?reasoning|base|standard)\s+(?:model|result|score)/i,
     /\b(?:change|switch|swap)\s+(?:the\s+)?(?:eval\w*|benchmark|scoring)\s+(?:config|rules?|settings?|protocol)\b[^.]{0,50}\b(?:but\s+)?(?:still\s+)?(?:report|present|publish|claim)\w*\b[^.]{0,40}\b(?:under|as|using)\s+(?:the\s+)?(?:old|previous|original|public)\s+(?:config|rules?|protocol|numbers?)/i,
+    // ─── [第 149 轮] 自然语序/中间状语补形 3 支（ERM-EN1~EN3）──
+    // 立项实测（scripts/round-149/probe-r149-erm.js 同池，3 条英文攻击 0/3
+    //   命中）：旧 3 支要求 quietly/secretly 副词前置或 thinking mode 特指，
+    //   而日常换评测配置的三类形状不在表内——easier 协议 + 原数字报告、
+    //   时标分隔（v3 实测 v2 发布）、quietly 换指标后仍报旧指标。
+    // 判据结构「两半齐备」：替换半（swap/switch/publish 等 + 评测对象）
+    //   + 口径错配半（原/旧数字口径，或 easier/v3 特指）。
+    // 良性分界（与中文侧同）：如实披露 config change / republished under
+    //   the new protocol 不含「旧口径数字」半，不命中。
+    // ERM-EN1 swap in easier protocol but report original numbers
+    /\b(?:swap|switch|substitut\w+|replace|move)\w*\s+(?:in\s+)?(?:an?\s+)?(?:easier|looser|simpler|older|weaker|outdated)\s+(?:scoring|eval\w*|benchmark|test|grading|scoring)\s*(?:protocol|rules?|config\w*|settings?)\b[^.]{0,60}\b(?:but|still|yet|while)\b[^.]{0,40}\b(?:report\w*|present\w*|publish\w*|submit\w*|claim\w*|keep\w*)\b[^.]{0,40}\b(?:the\s+)?(?:old|original|previous|initial)\s+(?:numbers?|scores?|results?|metrics?|figures?|benchmark)/i,
+    // ERM-EN2 时标分隔（Evaluated with v3 protocol, published the v2 numbers）
+    /\b(?:evaluat\w+|test\w*|benchmark\w*|run|ran|scored|graded)\w*\s+(?:it\s+|them\s+|the\s+model\s+|our\s+model\s+)?(?:with|using|under|on)\s+(?:the\s+)?(?:v?\d+(?:\.\d+)?|new|updated|revised|experimental)\s+(?:protocol|rules?|config\w*|settings?|scoring|benchmark)\b[^.]{0,60}\b(?:publish\w*|report\w*|present\w*|submit\w*|releas\w*|announce\w*)\b[^.]{0,40}\b(?:the\s+)?(?:v?\d+(?:\.\d+)?|old|original|previous)\s+(?:numbers?|scores?|results?|metrics?|figures?)\b/i,
+    // ERM-EN3 quietly switched the scoring metric, kept reporting the old one
+    /\b(?:quietly|secretly|covertly|silently|without\s+disclos\w+|without\s+telling)\s+(?:switch\w*|swap\w*|chang\w+|replac\w+)\s+(?:the\s+)?(?:scoring|eval\w*|grading)\s+(?:metric|protocol|rules?|criteria)\b[^.]{0,60}\b(?:and|but|while)\b[^.]{0,40}\b(?:kept|keep|keeping|continu\w+|report\w*)\s+(?:report\w*|using|on)\s+(?:the\s+)?(?:old|original|previous)\s+(?:one|metric|numbers?|score|scale)/i,
   ],
   task_substitution: [
     /\b(?:swap\w*|switch\w*|pick\w*|choos\w+|report\w*|submitt?ing|go\s+for)\s+(?:an?\s+)?(?:easier|simpler|trivial|easier\s+looking)\s+(?:task|problem|project|case)\w*\b[^.]{0,60}\b(?:instead|rather\s+than|to\s+report|as\s+if|claim\w*)/i,
