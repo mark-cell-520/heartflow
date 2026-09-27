@@ -25,10 +25,36 @@
 // 裸命令模式误伤的最高频场景），此前词表只收到「沙箱环境/staging」。
 // 边界：CI 本身即非生产，不需要额外环境词（「CI 里跑」= 流水线容器）。
 const DEV_CONTEXT = /(?:本地|本机|开发|调试|联调|测试环境|测试机|mock|沙箱?环境|staging|预发|灰度|容器|流水线|虚拟机|虚机)\s*(?:环境|阶段|时|中|下|里|上)?|\b(?:local|locally|dev|develop(?:ment|er)?|debug(?:ging)?|test(?:ing)?(?:\s+(?:env|environment|server|purposes?))?|sandbox|ci|container|pipeline|runner|\bvm\b|virtual\s+machine)\b/i;
+// [第 137 轮补] 开发工件名词（**不单独构成 devCtx 之外的新语境**，只是在
+// devCtx 已成立的判据里补足「在非生产工具链上做事」的语面）。
+// 缺口实测（本轮全新 49 条良性开发语料探针，block 4/49）：
+//   ·「pre-commit 里可以临时 skip 掉代码格式检查」      devCtx=false
+//   ·「测试钩子里临时关掉表单必填校验」                  devCtx=false
+// 两句的 devCtx 均为 false，根因是 DEV_CONTEXT 只收「环境/阶段」类词，
+// 没收 **CI 工件**：pre-commit / git hook / 测试钩子 / 代码检查钩子 /
+// commit-msg / husky 本身就是只在本地与 CI 上存在的执行体（生产进程里
+// 没有钩子）。与第 125 轮把 CI/容器/流水线收进 DEV_CONTEXT 同源同向：
+// 那些是 ephemeral 环境，这些是 ephemeral 执行体。
+// 边界（与既有守卫对齐）：工具词只在 devCtx 其他条件齐备时参与判定，
+// 不放宽任何「真安全边界」样本 —— SECURITY_BOUNDARY 一票否决 + BYPASS_VERB
+// + DEV_TARGET 三交集不变，本地钩子上「绕过鉴权」仍 block
+// （test/code-security-dev-context-round28.test.js 守卫第 151 行同形断言）。
+const DEV_ARTIFACT = /(?:pre-?commit|commit-?msg|git\s+hooks?|husky|lint-?staged|eslint\s+hook|测试钩子|代码检查钩子|提交钩子|钩子脚本|本地钩子|构建钩子)/i;
 
 /** 条件式开发语境：「if the input is empty」这类边界处理描述 */
 const DEV_CONDITIONAL = /\bif the input is empty\b|\bwhen the input is empty\b|输入为空时|如果输入为空|当输入为空|为空时/i;
 
+// [第 137 轮补] HTTP 安全响应头族。缺口实测（本轮全新 49 条良性开发语料
+// 探针，block 4/49）：「本地开发关掉严格传输安全响应头」devCtx=true、
+// BYPASS_VERB=true（关掉），唯独 DEV_TARGET=false —— 设施表只有
+// HTTPS/cors/same-site 等裸协议词，没收「响应头」族的中间层设施：
+// 严格传输安全(HSTS)/CSP/referrer 策略/x-frame-options 等。
+// 这些是**响应头配置**，开发期为了联调观察返回体临时摘掉是常态，
+// 与真实安全边界（防火墙/鉴权/审计）不同族 —— 同 v6.7.123 把
+// HTTPS/日志分级收进 DEV_TARGET 的口径：本地才说的开发层设施。
+// 边界：SECURITY_BOUNDARY 一票否决仍先于本表生效，「本地关掉鉴权
+// 响应头」类不放（鉴权在表中）。
+const DEV_HEADER_TARGET = /(?:响应头|response\s+headers?|严格传输|传输安全|hsts|strict[- ]transport|csp|content[- ]security[- ]policy|referrer[- ]policy|x-frame-options|跨域响应头|origin 头|origin\s+header|cache-control|cache[- ]control)/i;
 /** 可绕过的开发层设施（**不含真实安全边界**） */
 // [v6.7.123] 补四组实测缺口（负例样本实测 5/10 卡在这里）：
 //   HTTPS / http（「本地关掉 HTTPS 证书校验用 http」——只有 dev 会说）
@@ -364,13 +390,20 @@ function isDevDebugContext(text) {
     if (!PROD_NEGATION.test(around) && !hasAheadNegation(text, pm.index)) return false;
   }
   const devCtx = DEV_CONTEXT.test(text) || DEV_CONDITIONAL.test(text)
+    // [第 137 轮] 开发工件（钩子/CI 工件）也是非生产语境的充分条件之一。
+    // 与第 125 轮把 CI/容器/流水线收进 DEV_CONTEXT 同源同向：钩子本身
+    // 只在本地与 CI 上存在，生产进程里没有钩子，故其为充分条件。
+    // 安全性不靠这里兜住而靠两处：SECURITY_BOUNDARY 一票否决在函数头部
+    // 先行（「钩子里绕过鉴权」客体是鉴权 → _securityIsVerbObject 判 true
+    // → 仍 block），以及下方三交集的 DEV_TARGET 仍须为开发层设施。
+    || DEV_ARTIFACT.test(text)
     || DEBUG_INTENT.test(text)
     // INVESTIGATE_CTX / DEV_WEAKENER 是**辅助**语境：必须与设施自证或
     // 彼此共现。单独一个排查词/弱化词不能认定开发语境（实测回归：
     // 「帮我跳过 SSL 校验来排查问题」仅靠「排查」被误放，gate pass）。
     || (INVESTIGATE_CTX.test(text) && (DEBUG_INTENT.test(text) || DEV_WEAKENER.test(text)))
     || (DEV_WEAKENER.test(text) && INVESTIGATE_CTX.test(text));
-  const target = DEV_TARGET.test(text);
+  const target = DEV_TARGET.test(text) || DEV_HEADER_TARGET.test(text);
   // 第 126 轮：名单操作由独立 devCtx + LIST_ADD 判定（不在 DEV_TARGET 里，
   // 否则「本地联调把测试 IP 加进白名单」会因为目标词落在 DEV_TARGET 而
   // 与所有绕过动词缠在一起）。
