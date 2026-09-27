@@ -325,6 +325,46 @@ const DANGEROUS_PATTERNS = [
   /\b(?:recipe\s+for|instructions?\s+(?:for|to)|tutorial\s+(?:for|on|about)|steps?\s+(?:for|to)\s+(?:make|build|create)|how\s+to\s+(?:make|build|synthesi[sz]e|produce|create))\b[^.]{0,30}\b(?:bomb|bombs|explosive|explosives|napalm|detonator|grenade|firearm|rifle|pistol|gun|guns|ammunition|poison|toxin|ricin|anthrax|sarin|methamphetamine|meth|narcotic|narcotics|molotov)\b/i,
   // ⑨-c 偷车（hotwire 只在盗车语境出现，不依赖宾语人称判定）
   /\bhot[\s-]?wir(?:e|ing|ed)\b[^.]{0,25}\b(?:car|vehicle|ignition|bike|motorcycle|truck)/i,
+  // ⑫ [v6.7.129 第 124 轮] 英文 SQL 谓词 × 数据/表销毁（第 124 轮负例守卫抓出的回归）
+  // 由来（本轮实测，非推断）：修「归一化制造混合句」缺口时，负例守卫
+  // （test/normalizer-sql-predicate-round124.test.js）抓到一条失守——
+  //   `生产库直接执行 DELETE FROM 全表`
+  // 修前它 count=1，靠的是 text-normalizer 的 en2zh 把 delete 译成「删除」后
+  // 「直接 + 删除 + 表」凑齐；谓词保留英文后该翻译补偿消失，count 归 0。
+  // 这不是修法的回归副作用，而是**命中侧长期不认识英文 SQL 谓词**这个缺口
+  // 被暴露出来：上面 49 支判据的中文表全收中文动词，英文表（第⑥条）只收
+  // ignore/bypass/disable 等设施绕过动词，没收 delete from / truncate /
+  // drop table 这类数据销毁谓词。此前靠归一出错「顺带」拦住了它。
+  // 判据（两半齐备）：
+  //   ① 英文 SQL 数据操作谓词（delete from / truncate / drop table /
+  //      update set / alter table / insert into）
+  //   ② 高危目标或高危语境（生产/线上/用户表/订单表/备份/数据库/数据表/全表）
+  // 良性边界（逐条实测）：`测试库 DELETE FROM 全表再灌 fixture`、
+  //   `本地测试库跑 TRUNCATE TABLE 后 seed` 均不命中——它们无生产词、
+  //   目标是测试表，且 isDevDebugContext 同样放行，双向不冲突。
+  // 窗口收窄到谓词后 20 字符内找目标词，避免跨句误伤。
+  // ⚠️ 目标词表刻意**不收裸「表」字**（首版写成 `[^\s]{0,4}表|表`，
+  // 实测把「测试库 delete from 全表再灌 fixture」这类良性也命中——
+  // 「表」在中文技术文本里出现频率太高，没有区分力）。改为**两段式**：
+  //   · 高危语境词（生产/线上/备份/库名）——谓词后 20 字内出现即命中
+  //   · 中文表对象（全表/整表/用户表/订单表/…）——必须与谓词后 20 字内
+  //     出现的高危语境词**或** prod 同现，单独表对象不命中
+  // 良性/攻击双向边界见本文件尾注与 test/normalizer-sql-predicate-round124.test.js。
+  /\b(?:delete\s+from|truncate(?:\s+table)?|drop\s+table|update\s+\*?\s*(?:from|set)?|alter\s+table|insert\s+into)\b[^.]{0,20}\b(?:production|prod\b|线上|生产|users?|user\s+table|customers?|orders?|accounts?|备份|backup|snapshot|database|schema|全表|整表|全库)\b/i,
+  // 中文表对象版（谓词 + 中文表对象 + **生产语境**三要素同现）。
+  // 三要素判据来自双向实测（本组 5 良性 vs 5 攻击逐条对比）：
+  //   良性（测试库/staging/sandbox/开发环境 + 谓词 + 表对象）devCtx=true、prodCtx=false
+  //   攻击（生产库/线上 + 谓词 + 表对象）              prodCtx=true、devCtx=false
+  // 两组在「谓词 + 表对象」上完全同形，唯一可区分的是生产语境词。
+  // ⚠️ `\b` 只对 ASCII 词边界生效：`DELETE FROM 全表` 里谓词后面紧跟中文，
+  // `\\b` 落在 DELETE/FROM 内部不成立，必须用 `(?=[\s\u4e00-\u9fff])` 替代。
+  /(?:delete\s+from|truncate|drop\s+table)(?=[\s\u4e00-\u9fff])[^.\n]{0,24}(?:全表|整表|全库|用户表|订单表|会员表|客户表|账务表|支付表|账户表)[^.\n]{0,12}(?=生产|线上|正式)/i,
+  /(?<=生产|线上|正式)[^.\n]{0,16}(?:delete\s+from|truncate|drop\s+table)(?=[\s\u4e00-\u9fff])[^.\n]{0,24}(?:全表|整表|全库|用户表|订单表|会员表|客户表|账务表|支付表|账户表)/i,
+  /(?:delete\s+from|truncate|drop\s+table)(?=[\s\u4e00-\u9fff])[^.\n]{0,12}(?:生产|线上|正式)[^.\n]{0,16}(?:全表|整表|全库|用户表|订单表|会员表|客户表|账务表|支付表|账户表)/i,
+  /(?:全表|整表|全库|用户表|订单表|会员表|客户表|账务表|支付表|账户表)[^.\n]{0,12}(?:生产|线上|正式)[^.\n]{0,16}(?:delete\s+from|truncate|drop\s+table)/i,
+  // 目标在前、谓词在后（中文定语后置的英文镜像：`wipe the users table` /
+  // `truncate the orders table` / `drop the production database`）
+  /\b(?:truncate|wipe|drop|delete|remove)\b[^.]{0,16}\b(?:the\s+)?(?:users?|user\s+table|customers?|orders?|accounts?|production|prod\b|线上|生产|备份|backup|database|schema)\b[^.]{0,16}\b(?:table|tables|database|data|records?|rows?|全表|整表|库)\b/i,
 ];
 
 const DI_LEVEL = 'critical';
