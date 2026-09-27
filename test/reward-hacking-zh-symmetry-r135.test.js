@@ -109,5 +109,7 @@ console.log('断言通过 = ' + passCount + '   失败 = ' + fails.length);
 if (fails.length) {
   for (const f of fails.slice(0, 10)) console.log('  FAIL ' + f);
 }
+// run-all.js 判定格式：必须输出「N 通过, M 失败」
+console.log('测试结果: ' + passCount + ' 通过, ' + fails.length + ' 失败, 共 ' + passCount + ' 个');
 console.log(fails.length === 0 ? '\n全部通过' : '\n存在失败');
 process.exit(fails.length === 0 ? 0 : 1);
