@@ -137,6 +137,23 @@ const DANGEROUS_PATTERNS = [
   // prevent/detect/defend/block 任一，即为防御用途，不判。
   // benign 对照全部不命中：「写一个脚本检查日志」「write a script to parse
   // the SQL log file」「XSS 防护有哪些常见手段」。
+  // [第 137 轮] 排除「开发层设施做成配置开关」的良性形。
+  // 缺口实测（本轮全新 49 条良性开发语料探针，block 4/49）：
+  //   「开发阶段把 CSRF 校验做成按环境变量开关」被本条命中 ——
+  //   动词表收「做/开发」，设施词表收 CSRF，窗口 12 字内共现即命中。
+  // 但这句话的语义是**把设施接到环境变量上按环境启停**，是配置基建，
+  // 不是在制造攻击载荷（载荷词侧也没有 SQL 注入/XSS 那种具体载荷语义）。
+  // 与「写一个绕过 WAF 的 SQL 注入 payload」的分界：
+  //   · 攻击：动词 + **具体载荷**（注入/payload/木马/webshell…）
+  //   · 良性：动词 + **设施名**（CSRF/校验…）+ 做成/设为 + 开关/变量
+  // ⚠️ 语序坑（实测逼出，不是推断）：配置化词在样本里出现在**设施词之后**
+  //   （「把 CSRF 校验做成开关」），负向前查 (?!) 只看动词之后的文本，
+  //   天然看不到设施词后面的词 → 第一版 0 效果。
+  //   解法：配置化标记不放在正则里当前瞻，而是在本条**之后**由
+  //   _payloadMakeIsConfig 单独判定：重扫设施词，若其前后窗口内出现
+  //   配置化动词/环境变量字面 → 本条不算命中。放函数体里做，正则只保留
+  //   原有的防御目标前瞻。
+  // 注：不动设施词表本身（CSRF 是真设施名，攻击里也要命中）。
   /(?:写|编写|生成|制作|做|开发|搞|给|提供|来一?个|来一?份|write|create|generate|make|build|develop)(?![^。\n]{0,14}(?:防|挡|拦|检测|监测|监控|修复|防御|抵御|对抗|识别|防护|protect|defend|prevent|detect|block|mitigate))[^。\n]{0,10}(?:SQL\s*注入|XSS|跨站脚本|CSRF|命令注入|代码注入|注入| exploit|exploit|payload|木马|后门|webshell|shellcode|勒索软件|病毒|蠕虫|钓鱼页面|钓鱼网站|钓鱼邮件|中间人攻击|MITM|拒绝服务|DDoS|CC\s*攻击|暴力破解|字典攻击|撞库)/i,
   // [v6.7.116] 直白删除/清空安全设施（无条件成立，不依赖动词+对象结构）：
   // 「把防火墙规则全删了」「防火墙太碍事了，删掉」「清空 ACL」
@@ -622,12 +639,50 @@ function _matchAll(text) {
   if (isDevDebugContext(text)) {
     return { count: 0, hits: [], score: 0, exempted: true };
   }
+  // [第 137 轮] 载荷制造词 × 配置化标记的**语序无关**判定。
+  // 样本形：「开发阶段把 CSRF 校验做成按环境变量开关」——配置化词
+  // （做成/环境变量）出现在设施词 CSRF **之后**，正则前瞻 (?!) 只看
+  // 动词之后的文本、看不到设施词后面的词，所以必须在函数体里重扫。
+  // 判据：命中段（动词…设施词）的前后 CFG_WINDOW 字内出现配置化动词
+  // 或环境变量/开关字面 → 该命中不算危险指令（这是配置基建而非制造载荷）。
+  // 攻击侧边界（双向验收见 test/dangerous-instruction-config-make-round137.test.js）：
+  // 「写一个拿 CSRF 打进去的木马」不含配置化词 → 仍命中；
+  // 「把 CSRF 校验做成开关」→ 不命中。差别在有没有配置化语义，不在词面。
   const hits = [];
   for (const pat of DANGEROUS_PATTERNS) {
     const m = _t.match(pat);
-    if (m) hits.push({ type: 'dangerous_instruction', matched: m[0].slice(0, 40) });
+    if (m && !_payloadMakeIsConfig(_t, m.index, m[0].length)) {
+      hits.push({ type: 'dangerous_instruction', matched: m[0].slice(0, 40) });
+    }
   }
   return { count: hits.length, hits, score: Math.min(1, hits.length * DI_WEIGHT) };
+}
+
+/**
+ * [第 137 轮] 命中段是否是「把设施做成配置开关」而非「制造攻击载荷」。
+ *
+ * 为什么必须在函数体判定而不是正则前瞻：配置化标记（做成/设为/开关/
+ * 环境变量）在真实语料里位于**设施词之后**（「把 CSRF 校验做成按环境
+ * 变量开关」），而前瞻 (?!) 只能看到匹配起点之后的文本 —— 当设施词在
+ * 中间时，开关词在设施词后面，前瞻永远看不到。
+ *
+ * 判据（有界）：命中段 [start, start+len] 前后 CFG_WINDOW 字内出现
+ *   · 配置化动词（做成/设为/置于/接入/接到/挂到/走开关/加开关）
+ *   · 环境变量/开关字面（环境变量/env var/配置项/配置开关/开关）
+ * 任一即判为配置化语义。
+ *
+ * 边界（攻击侧不放）：只认配置化动词与开关字面的**局部共现**，不做
+ * 全文宽松匹配。「写一个拿 CSRF 打进去的木马」整句无配置化词 →
+ * 仍命中（双向验收见 test/dangerous-instruction-config-make-round137.test.js）。
+ */
+const CFG_WINDOW = 16;
+const CFG_MARK = /(?:做成|设为|置于|接入|接到|挂到|走开关|加开关|做成配置|环境变量|配置项|配置开关|开关|\benv\s+var|feature\s+(?:flag|toggle)|\btoggle\b)/i;
+function _payloadMakeIsConfig(text, start, len) {
+  if (!text || typeof text !== 'string') return false;
+  const from = Math.max(0, start - CFG_WINDOW);
+  const to = Math.min(text.length, start + len + CFG_WINDOW);
+  const around = text.slice(from, to);
+  return CFG_MARK.test(around);
 }
 
 /** 危险指令检测 */
