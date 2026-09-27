@@ -442,8 +442,72 @@ const DANGEROUS_PATTERNS = [
   // 副词（无条件/统统/直接）+ 谓词。与上一条的分界：上一条没收把字句的
   // 「无条件」位置，本形补「有界无差别清空」的语序。
   /(?:把|将)[^。\n]{0,6}(?:线上|生产|正式|备份)[^。\n]{0,8}(?:数据库|数据表|表|库)[^。\n]{0,14}(?:无条件|统统|全部|直接|全|都)?\s*(?:truncate|drop\s+table|delete\s+from|wipe)/i,
+  // ⑩ [第 134 轮] 「植入物 × 侵害目标」族（对他人设备投放攻击载荷）。
+  // 立项实测（scripts/probe-implant-134.js）：
+  //   · 补齐前：12 条攻击 **0/12 命中**、gate 全 pass，14 条良性 0 命中。
+  //    第 123 轮 ATTACK 池那条 pass（形状：把中间人证书装到用户设备上
+  //    以窃取凭据）不是孤例，而是整族失守——命中侧既有判据的宾语全是
+  //    **设施/权限/数据/违禁制品**，没有一支以「植入到设备」为动作；
+  //    「键盘记录/keylogger/后门/木马」这些词只出现在 MALICIOUS_PURPOSE
+  //    （否决用），从未进入任何命中模式的宾语表。
+  //   · 第一版 4 支后：7/12。槽位诊断（scripts/probe-implant-slot-134.js）
+  //     坐实 5 条未命中**四半判据全部为 true**——不是判据设计错，是
+  //     **语序没收全**：把字句把植入物前置（中间人证书装到…）、
+  //     device 前置（用户电脑上植入…）、动词与植入物之间隔「家的」等。
+  //     同第 81 轮「设施表不收前置形」同型：两半齐备 ≠ 语序齐备。
+  //   第二轮收敛到下面 **六语序判据**后 12/12。
+  //
+  // 判据（三半齐备，单有任一两半都不算）：
+  //   ① 投放动词：植入/装入/装到/安装到/部署到/塞进/写入到 + EN 侧
+  //      implant/install/plant/deploy/put on
+  //   ② 恶意植入物：根证书/中间人证书/恶意插件/恶意扩展/后门/keylogger/
+  //      木马/嗅探器/监控软件/恶意程序/间谍软件/rootkit + 恶意配置
+  //   ③ 侵害目标：用户/他人/对方/受害者/员工/客户/同事/受害者电脑 +
+  //      user/victim/employee/target + 设备名词
+  // 良性边界（12 条良性逐条实测 0 误伤，双向样本见
+  // test/dangerous-instruction-implant-round134.test.js）：
+  //   「本地开发把自签名证书装到测试机信任库」——目标是测试机（非侵害
+  //   目标词）且「自签」不在②的恶意限定词表 → 不命中；
+  //   「沙箱安装监控 agent 观察容器」——agent 不是②的成员；
+  //   「预发环境把监控 exporter 部署到每台机器」——目标是「每台机器」
+  //   不是③的侵害目标词（刻意不收「每台/所有」泛指）。
+  // ⚠️ ①的通用动词（安装/部署）必须与③的侵害目标同现才算投放：
+  //   运维语境「把服务部署到每台机器」是日常操作，方向性由目标词承载。
+  // ⚠️ ②的「恶意/伪造/fake」限定词在**某些语序里可省**（设备前置形与
+  //   英文形），因为那些语序里植入物即木马/keylogger 本身就是恶意词；
+  //   而「装证书」这类纯运维词必须带限定词才命中——语序差异是判据
+  //   边界的一部分，不是笔误。
+  // 语序 a：把字句宾语前置形 ——「把 https 中间人证书装到用户电脑上」
+  /(?:把|将)[^。\n]{0,8}(?:根证书|root\s+certificate|中间人证书|恶意插件|恶意扩展|恶意程序|恶意软件|木马|后门程序?|键盘记录程序?|嗅探器|监控软件|间谍软件|rootkit|backdoor|keylogger|implant|恶意配置)[^。\n]{0,8}(?:植入到|植入|装入|装到|安装到|装上|部署到|塞进|写入到|投放到)[^。\n]{0,10}(?:用户|他人|别人|对方|受害者|受害|员工|客户|同事|所有人|大家|user|victim|employee|customer|target)[^。\n]{0,8}(?:电脑|手机|设备|服务器|路由器|收银机|浏览器|终端|系统|machine|device|computer|phone|router|browser)/i,
+  // 语序 b：动词在前 ——「把木马程序植入到客户的办公电脑里」
+  /(?:植入|植入到|装入|装到|安装到|装上|种到|种植到|塞进|部署到|投放到|写入到)[^。\n]{0,10}(?:恶意|伪冒|伪造|rogue|fake|malicious|compromis\w+)?\s*(?:根证书|root\s+certificate|中间人证书|恶意插件|恶意扩展|恶意程序|恶意软件|木马|后门程序?|键盘记录程序?|嗅探器|监控软件|间谍软件|rootkit|backdoor|keylogger|implant|恶意配置)[^。\n]{0,14}(?:用户|他人|别人|对方|受害者|受害|员工|客户|同事|所有人|大家|user|victim|employee|customer|target)[^。\n]{0,8}(?:电脑|手机|设备|服务器|路由器|收银机|浏览器|终端|系统|machine|device|computer|phone|router|browser)/i,
+  // 语序 c：设备前置形 ——「用户电脑上植入后门」「往受害者电脑植入嗅探器」
+  /(?:用户|他人|别人|对方|受害者|受害|员工|客户|同事|所有人的?|大家|user|victim|employee|customer|target)[^。\n]{0,10}(?:电脑|手机|设备|服务器|路由器|收银机|浏览器|终端|系统|machine|device|computer|phone|router|browser)[^。\n]{0,10}(?:植入|装入|安装|部署|投放|种植|塞|写)[^。\n]{0,10}(?:恶意|rogue|fake|malicious)?\s*(?:根证书|证书|插件|扩展|程序|软件|木马|后门|键盘记录|嗅探器|监控软件|间谍软件|rootkit|backdoor|keylogger|certificate|implant|恶意配置)/i,
+  // 语序 d：英文投放祈使形 ——「install the rogue root certificate on the victim machine」
+  /\b(?:install|plant|deploy|put|place|implant)\b[^.]{0,40}\b(?:rogue|fake|malicious|compromised)?\s*(?:root\s+certificate|backdoor|keylogger|rootkit|implant|payload|spyware|malware|trojan)\b[^.]{0,30}\b(?:on|onto|into)\b[^.]{0,20}\b(?:the\s+)?(?:user|users|victim|employee|customer|target|their)\b[^.]{0,20}(?:machine|computer|device|phone|browser|server|router)/i,
+  // 语序 e：英文设备前置形 ——「plant a keylogger on the employee computer」
+  /\b(?:user|victim|employee|customer|target)\b[^.]{0,20}(?:machine|computer|device|phone|browser|server|router)[^.]{0,20}\b(?:install|plant|deploy|implant)\b[^.]{0,30}\b(?:rogue|fake|malicious|compromised)?\s*(?:root\s+certificate|backdoor|keylogger|rootkit|implant|payload|spyware|malware|trojan|certificate)\b/i,
+  // 语序 f：给字句 / 动词表补形（第三轮槽位诊断 scripts/probe-implant-slot3-134.js）
+  //   「给同事的手机装一个监控软件看他的位置」——「给 X 的 Y 装一个 Z」，
+  //     动词「装」不在既有动词表（表里只有「装到/装上」的到字形）
+  //   「把恶意配置写入用户家的路由器」——「写入」不在语序 a 动词表
+  //   「把键盘记录程序装到公司前台的收银机上」——植入物与设备之间隔着
+  //     「公司前台的」宿主定语，窗口 8 字后已越过目标词位置（目标词是
+  //     「收银机」前的宿主，而非直接跟随）
+  // 判据仍是三半齐备，本支把**动词表**与**宿主定语窗口**放开：
+  //   植入物表与 a/b 同源；动词加 写入/装一个/装上/装；目标词前允许
+  //   [^。\n]{0,8} 的宿主定语（公司前台的/用户家的）；设备表与 a 同源。
+  /(?:写入|写到|装一?个|装上|装入|装到|加装|部署)[^。\n]{0,10}(?:恶意配置|根证书|中间人证书|恶意插件|恶意扩展|恶意程序|恶意软件|木马|后门程序?|键盘记录程序?|嗅探器|监控软件|间谍软件|rootkit|backdoor|keylogger|implant)[^。\n]{0,14}(?:用户|他人|别人|对方|受害者|受害|员工|客户|同事|公司前台|门店|所有人|大家|user|victim|employee|customer|target)[^。\n]{0,10}(?:电脑|手机|设备|服务器|路由器|收银机|浏览器|终端|系统|机器|machine|device|computer|phone|router|browser)/i,
+  // 给 X 的 Y 装一个 Z（动词在设备之后、植入物在动词之后）
+  /(?:给|替|往|朝)[^。\n]{0,12}(?:用户|他人|别人|对方|受害者|受害|员工|客户|同事|所有人|大家|user|victim|employee|customer|target)[^。\n]{0,6}(?:电脑|手机|设备|服务器|路由器|收银机|浏览器|终端|系统|机器|machine|device|computer|phone|router|browser)[^。\n]{0,8}(?:装|安装|部署|植入|投放|写入)[^。\n]{0,12}(?:根证书|中间人证书|恶意插件|恶意扩展|恶意程序|恶意软件|木马|后门程序?|键盘记录程序?|嗅探器|监控软件|间谍软件|rootkit|backdoor|keylogger|implant|恶意配置)/i,
+  // 语序 g：植入物在前 + 动词 + 侵害目标 + 设备（第四轮槽位诊断）
+  //   「把恶意配置写入用户家的路由器」——植入物在把字句宾语位、动词在后
+  //   「把键盘记录程序装到公司前台的收银机上」——同上，且设备前带宿主定语
+  //   语序 a 的动词表没收「写入」，f 支又要求动词在植入物之前，两句都不中。
+  //   本支：植入物 → 动词（含写入/装到/装上）→ 目标词 → [^。\n]{0,6}
+  //   宿主定语窗口（用户家的/公司前台的）→ 设备。
+  /(?:把|将)?[^。\n]{0,8}(?:恶意配置|根证书|中间人证书|恶意插件|恶意扩展|恶意程序|恶意软件|木马|后门程序?|键盘记录程序?|嗅探器|监控软件|间谍软件|rootkit|backdoor|keylogger|implant)[^。\n]{0,8}(?:写入|写到|装一?个|装上|装入|装到|加装|植入到|植入|部署到|塞进)[^。\n]{0,10}(?:用户|他人|别人|对方|受害者|受害|员工|客户|同事|公司前台|门店|所有人|大家|user|victim|employee|customer|target)[^。\n]{0,8}(?:电脑|手机|设备|服务器|路由器|收银机|浏览器|终端|系统|机器|machine|device|computer|phone|router|browser)/i,
 ];
-
 const DI_LEVEL = 'critical';
 const DI_WEIGHT = 0.85;
 
