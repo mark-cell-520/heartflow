@@ -142,5 +142,5 @@ ok(Array.isArray(table), 'self_referential_loop 表必须是数组');
 for (const r of table) ok(r instanceof RegExp, '表中所有条目必须是 RegExp');
 ok(typeof CLASS_LABEL_ZH.self_referential_loop === 'string' && CLASS_LABEL_ZH.self_referential_loop.length > 0, '中文标签缺失');
 
-console.log(`\n[第148轮 self_referential_loop 测试] ${passed} 断言全过`);
+console.log(`\n第148轮 self_referential_loop 测试: ${passed} 通过, 0 失败`);
 console.log(`  攻击样本 ${allAttacks.length} 条 · 良性 ${BENIGN.length} 条 · 表条数 ${table.length}（新增 ${table.length - BASELINE} 支）`);
