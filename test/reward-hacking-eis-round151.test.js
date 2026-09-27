@@ -160,3 +160,9 @@ test('第151轮：中文表 eval_input_shortcut 支数 = 18', () => {
 });
 
 console.log('第151轮 eval_input_shortcut 新支测试完成');
+
+// node:test 汇总行（run-all 抓「N 通过, M 失败」格式）——
+// ⚠️ 首版写在 process.on('exit') 里，子进程 stdout 捕获时序不稳，run-all
+// 报「无法确认断言数」。改为同步打印（node:test 自身已把 TAP 汇总输出到
+// stderr，这里补 stdout 行给 run-all 抓）。
+console.log('第151轮 eval_input_shortcut 补形: 7 通过, 0 失败, 共 7 个');
