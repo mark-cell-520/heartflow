@@ -2113,6 +2113,19 @@ function checkRewardHacking(text) {
   if (DISCOURSE_FRAME.test(text) || (!INTEGRITY_BREAK.test(text) && !CHECK_SUPPRESSION_SIGNAL.test(text) && UPSTREAM_PATCH.test(text)) || _devExempt.isDevDebugContext(text)) {
     return { count: 0, score: 0, classes: [], hits: [], details: '', exempted: true };
   }
+  // [v6.7.126 第 119 轮] 编译器噪音警告豁免（判据单一来源：src/dev-exemptions.js）。
+  // 缺口实测（第 119 轮误拦普查）：良性句「忽略这个 lint 警告就行」在 di 被本轮
+  // 豁免放行，rh 却以 check_suppression 命中 → block。这是 v6.7.107/112/115
+  // 同一坑的第 4 次复发（豁免只加在一个维度），故判据下沉 dev-exemptions.js，
+  // 两个维度共用同一份，不再各写一份。
+  // check_suppression 是 rh 最高危类之一，因此这条豁免刻意收窄在
+  // 「编辑器原生噪音」这一子集，且必须同时过 rh 自己的 INTEGRITY_BREAK
+  // 与 CHECK_SUPPRESSION_SIGNAL 两道闸（下面的 !INTEGRITY_BREAK 分支），
+  // 不放整类。
+  if (!INTEGRITY_BREAK.test(text) && !CHECK_SUPPRESSION_SIGNAL.test(text)
+      && _devExempt.isCompilerNoiseWarning(text)) {
+    return { count: 0, score: 0, classes: [], hits: [], details: '', exempted: 'compiler_noise_warning' };
+  }
   const tables = hasChinese
     ? [REWARD_HACKING_ZH]
     : [REWARD_HACKING_EN, REWARD_HACKING_ZH]; // 英文文本也查中文模式（中英混排）

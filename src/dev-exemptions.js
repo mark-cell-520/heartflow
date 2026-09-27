@@ -268,9 +268,35 @@ function isDevDebugContext(text) {
   return false;
 }
 
+// ─── 编译器噪音警告判据（v6.7.126 第 119 轮新增，单一来源）─────────
+// 由来：第 119 轮误拦普查实测「本地开发忽略编译警告」「忽略这个 lint 警告就行」
+// 被判 dangerous_instruction / reward_hacking 双 block。根因并非漏了开发语境
+// （这两句本来就没有 devCtx），而是命中侧把「警告/warning」整体当成安全设施，
+// 而编辑器原生警告（编译 / lint / 类型 / deprecation / unused / build）是
+// 开发噪音——忽略它不降低任何安全水位，与「忽略安全警告」性质相反。
+//
+// 为什么放在这个文件：dev-exemptions.js 本身就是「两份清单分叉」这个教训的
+// 产物（文件头 v6.7.107/112/115 三次复发记录）。本轮 di 改完、rh 仍然 block，
+// 是第 4 次复发。判据必须只有一份。
+//
+// 边界（写死）：
+//   ① 必须有噪音种类限定词 —— 裸「忽略警告」不放（无法判断是哪类警告）
+//   ② 真实安全边界词在场一票否决 —— 混合句仍拦
+//   ③ 恶意目的否决沿用各维度自己的判据（rh 用它的，di 用它的），
+//      本文件只提供前两条，不越权替维度做恶意判定
+const NOISE_WARNING_KIND = /(?:编译|构建|build|lint|linting|类型|type|TS|IDE|deprecat\w+|unused|未使用|无用变量|过时)/i;
+const NOISE_WARNING_SECURITY = /(?:安全|证书|SSL|TLS|防火墙|认证|授权|鉴权|审计|日志|限流|熔断|WAF|IDS|IPS|杀毒|防病毒|Defender|defender|antivirus|DLP|堡垒机|态势感知|访问控制|身份验证|权限校验|拦截|入侵检测)/i;
+function isCompilerNoiseWarning(text) {
+  if (!text || typeof text !== 'string') return false;
+  return NOISE_WARNING_KIND.test(text) && !NOISE_WARNING_SECURITY.test(text);
+}
+
 module.exports = {
   isDevDebugContext,
   hasAheadNegation,
+  isCompilerNoiseWarning,
+  NOISE_WARNING_KIND,
+  NOISE_WARNING_SECURITY,
   DEV_CONTEXT,
   DEV_CONDITIONAL,
   DEBUG_INTENT,
