@@ -47,7 +47,13 @@ function checkCompletionEvidence(text) {
     /\b\d+\s*(?:个|条|处|项)/g,          // Chinese count
     /\btest\s+result/i,                  // test result
     /\bexit\s+code[:\\s]*0\b/i,          // exit code
-    /\b验证[：:]\\s*[^\\s]+/g,             // Chinese verification
+    // ⚠️ [第 127 轮] 原写法 `\b验证[：:]\s*\S+` 的 `\b` 对中文静默失配：`\b` 只对
+    //    ASCII `\w` 定义，「验证」前面是汉字/标点时没有词边界（实测中文证据句
+    //    0/5 命中）。改为 `(?<![A-Za-z0-9_])` 前向否定的显式非 ASCII 词面守卫，
+    //    语义等价却不依赖 `\b`。同族问题在 dangerous-instruction.js 是第 2 次复现
+    //    （v6.7.126 第 126 轮 + 本轮），全仓扫描口径见
+    //    test/sql-word-boundary-round127.test.js 头部注释。
+    /(?<![A-Za-z0-9_])验证[：:]\s*\S+/g,   // Chinese verification
     /\b\d+\s*passed/i                    // passed count
   ];
 
