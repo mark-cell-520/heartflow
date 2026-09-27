@@ -61,14 +61,21 @@ if (!SRC_ORIGINAL.includes(CUT)) {
   console.log(`  FAIL: 删条片段未在源文件中找到「${CUT_TO_MERGE}」`);
 } else {
   // 删轮 1：只删 templated-frames 归并分支，保留 vocab-discourse
-  const mutated = SRC_ORIGINAL.replace(
-    "      if (vocabDiscourse.has(fam)) return 'vocab-discourse';\n      if (templatedFrames.has(fam)) return 'templated-frames';\n      return fam;",
-    "      return vocabDiscourse.has(fam) ? 'vocab-discourse' : fam;"
-  );
-  if (mutated === SRC_ORIGINAL) {
+  // [第 141 轮修] 旧版把「vocab 归并行 + templated 归并行 + return fam」当成
+  // 一段连续文本替换。第 141 轮在 vocab 行后插入了 zh-en-mixing 折叠注释块，
+  // 连续文本被打断，String.replace 静默失配（不抛错、只是没替换）→ 删轮 1
+  // 报「替换未生效」。修法同第 131 轮修 round130 守卫：改用**单行锚点**，
+  // 只替换 templated 归并那一行，不受相邻注释/分支变化影响。
+  const TPL_ANCHOR = "      if (templatedFrames.has(fam)) return 'templated-frames';";
+  if (!SRC_ORIGINAL.includes(TPL_ANCHOR)) {
     fail++;
-    console.log('  FAIL: 删轮 1 替换未生效（源码片段变了，需更新守卫）');
+    console.log('  FAIL: templated 归并单行锚点未在源文件中找到（归并逻辑又被重构了？需更新守卫）');
   } else {
+    const mutated = SRC_ORIGINAL.replace(TPL_ANCHOR, "      /* [删轮1] templated 归并被禁用 */");
+    if (mutated === SRC_ORIGINAL) {
+      fail++;
+      console.log('  FAIL: 删轮 1 替换未生效（源码片段变了，需更新守卫）');
+    } else {
     fs.writeFileSync(SRC, mutated, 'utf8');
     try {
       const detect2 = freshDetect();
@@ -85,6 +92,7 @@ if (!SRC_ORIGINAL.includes(CUT)) {
       ok(rAi2.score > 0.3, `删轮1后: 真AI句 score 应仍>0.3，实得 ${rAi2.score}`);
     } finally {
       fs.writeFileSync(SRC, SRC_ORIGINAL, 'utf8');
+    }
     }
   }
 

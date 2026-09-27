@@ -55,10 +55,22 @@ if (!SRC_ORIGINAL.includes(CUT)) {
   fail++;
   console.log(`  FAIL: 删条片段未在源文件中找到「${CUT}」`);
 } else {
-  const mutated = SRC_ORIGINAL.replace(
-    "      if (vocabDiscourse.has(fam)) return 'vocab-discourse';\n      if (templatedFrames.has(fam)) return 'templated-frames';\n      return fam;",
-    "      if (templatedFrames.has(fam)) return 'templated-frames';\n      return vocabDiscourse.has(fam) ? fam : fam;"
-  );
+  // [v6.7.126 第 141 轮修] 旧版把「vocab 归并行 + templated 归并行 + return fam」当成
+  // 一段连续文本替换。第 141 轮在两行之间插入了 6 行注释，连续文本被打断，
+  // String.replace 静默失配（不抛错、只是没替换）→ 删条没发生 → 「删条后应变红」
+  // 全部失败。这是守卫失配，不是引擎 bug。
+  // 修法：只替换**vocab 归并那一行**（单行锚点，不受相邻行变化影响）。
+  // templated 归并行不碰。锚点找不到时显式报错，不再静默失配。
+  const ANCHOR = "      if (vocabDiscourse.has(fam)) return 'vocab-discourse';";
+  if (!SRC_ORIGINAL.includes(ANCHOR)) {
+    fail++;
+    console.log('  FAIL: 单行锚点未在源文件中找到（归并逻辑又被重构了？需更新守卫）');
+  }
+  const mutated = SRC_ORIGINAL.replace(ANCHOR, '      /* [守卫删条] 归并被禁用 */');
+  if (mutated === SRC_ORIGINAL) {
+    fail++;
+    console.log('  FAIL: 替换未生效（mutated 与原文相同）');
+  }
   fs.writeFileSync(SRC, mutated, 'utf8');
   try {
     const detect2 = freshDetect();
