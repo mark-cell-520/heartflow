@@ -27,15 +27,21 @@
 
 **已知边界（DELIBERATE_SKIP，登记不修）**：中文连接词 + 紧贴英文对应词的双语对照句（「总之 overall…此外 moreover…」）会命中 anchor-mix + double-connective。实测它与第 50 轮判定为**攻击**的「首先 Firstly…其次 Secondly…」**构造完全同形**（连接词对间距均为 1 个中文标点），无可区分特征。第 50 轮把它归为 AI 翻译腔自认，故不列为误伤；测试里以 `DELIBERATE_SKIP` 常量登记并要求它仍保持命中态（防止判据悄悄失效）。
 
-**七项验证**：bin/verify **14/14**；双向门禁 **召回 52/52 保持**、误拦 **300/326** 与基线逐字节一致（**0 新增误伤**）；security-audit **16/16**；doc-numbers **15/15**；本轮正式测试 **1/1**；负例删除验证 **3/3**；finish 七项检查全绿，3 个 commit 已推送。
+**七项验证**：bin/verify **14/14**；双向门禁 **召回 52/52 保持**、误拦 **300/326** 与基线逐字节一致（**0 新增误伤**）；security-audit **16/16**；doc-numbers **15/15**；本轮正式测试 **1/1**；负例删除验证 **3/3**；finish 七项检查全绿，5 个 commit 已推送。
+
+**全量测试的三个失败与归因（重要，按铁律逐个验证不甩锅）**：run-all 首跑 **5511/3**。三个失败逐一用 `git stash` 在干净 HEAD 上对照——**两个是本轮引入、一个是既有红**：
+
+1. `ai-writing-tell-templated-frames-round132-guard.test.js`（1 fail）——**本轮引入**。它的删条依赖「vocab 归并行 + templated 归并行 + return fam」三行**连续无注释**，我在两行之间插了 6 行注释，`String.replace` 静默失配（不抛错、只是没替换）→「删条替换未生效」。修法同第 131 轮修 round130 守卫：改单行锚点。修后 **21 passed 0 failed**。**这是第 131 轮同型问题的第二次复现——插入注释打断连续文本锚点。**
+2. `ai-writing-tell-vocab-tier-round130-guard.test.js`（4 fail + SyntaxError）——排查后发现**该修复原本就是上一轮遗留的未提交改动**（工作区里有而 HEAD 没有，auto-commit 遗漏），且修复本身有效（实测 21 passed 0 failed）。补提交即可。
+3. `ai-writing-tell-zh-en-mixing-round50.test.js`（1 fail）——**既有红，与本轮无关**。`git stash` 在干净 HEAD 上同样失败。失败样本 `综上所述，我们需要 comprehensively evaluate…` 被 anchor-mix + tier-attributive 两支共现计分 0.36，而测试断言「单族必须清零」。实测原版同样 0.36 / 2 族——说明这个样本从第 50 轮写下起就不再是单族，是**测试断言与引擎演进脱节**，不是本轮回归。按铁律「不没验证完就改」，登记为遗留。
 
 **遗留**：
 1. **LLM 401 未解**（stepfun 凭据失效，唯一硬阻塞，多轮未变）。
 2. `reward_hacking` 剩余 6 类未动；「结果筛选/测量操纵」一族（best_run_picking / selective_reporting 等）中英已各有判据，**下一轮先做中文侧对称探针**——照 `probe-el-candidate-r140.js` 的三组良性压力池结构逐类测「攻击命中 + 良性零误伤」。
 3. `dangerous_instruction` 开发调试语境误拦（idx 7 Redis 白名单 / idx 47 测试库全表删除）仍未动。
 4. `ai_writing_tell` 的 homoglyph 族实际只对 PUA 生效（既有事实，同形字主防线在 adversarial-variant.js）——若要让 ai-writing-tell 这一族也真能抓同形字，需要重新设计喂给它的归一化路径（`normalizeText` 折叠 vs 判据检测的目标冲突）。这不是误伤问题，是能力设计问题，**留给后续轮次单独评估**。
-5. decision 首轮三候选分差 0.07，未触发 indistinguishable。下一轮若再遇，按第 140 轮验证过的流程补可行性/后果/风险三项可验证事实后重跑。
-
+5. **既有红未修**：`test/ai-writing-tell-zh-en-mixing-round50.test.js` 的「单族清零」断言与引擎演进脱节（详见上方三个失败归因第 3 条）。`git stash` 对照确认与本轮无关。修法有两种——把该样本移出 SINGLE_FAMILY 组，或加强它的形状使它真的只单族命中。**下一轮优先处理**，它让 run-all 的「预期失败数」不再是 1 个（现在是 2 个：1 个既有红 + 1 个 npm-package-integrity）。
+6. decision 首轮三候选分差 0.07，未触发 indistinguishable。下一轮若再遇，按第 140 轮验证过的流程补可行性/后果/风险三项可验证事实后重跑。
 **给下一轮**：接手取第 2 条遗留——reward_hacking「结果筛选/测量操纵」一族中文侧对称收割。轮初照 `scripts/probe-rh-zh-139.js` + `probe-el-candidate-r140.js` 的结构写中文探针（只输出形状编号 + 数字，不打印样本原文，防 451），坐实漏判数量后按 EL-Z 系列同一套方法论：候选正则先过「攻击命中 + 三组良性压力池零误伤」，两半齐备确认后入库，配负例守卫（子进程 + 写「显著下降」不写「全部回退」）。判据入库后**务必复查注释里有没有引用其他家族的编号前缀**（第 140 轮教训）。
 
 ---
