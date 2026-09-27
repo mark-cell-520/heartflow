@@ -132,7 +132,9 @@ class OutputChecklist {
       issues.push('引用过多，建议用 paraphrase 替代');
     }
     // 检查是否有诊断性语言
-    if (/\b(你抑郁了|你疯了|你有病)\b/.test(response)) {
+    // ⚠️ 中文支不用 \b：\b 只对 ASCII 定义，中文词面后跟汉字无边界，
+    // 实测 `\b(你抑郁了|你疯了|你有病)\b` 中文 0/3 命中（本组无 ASCII 候选）。
+    if (/(你抑郁了|你疯了|你有病)/.test(response)) {
       issues.push('不替用户贴诊断标签');
     }
     // 检查是否鼓励依赖
@@ -532,7 +534,7 @@ class OutputChecklist {
   // 快捷方法：快速检查（只做 Step 2 安全检查）
   quickCheck(response) {
     const issues = [];
-    if (/\b(你抑郁了|你疯了|你有病)\b/.test(response)) issues.push('不贴诊断标签');
+    if (/(你抑郁了|你疯了|你有病)/.test(response)) issues.push('不贴诊断标签');
     if (/(继续和我聊|不要离开|只有我理解你)/.test(response)) issues.push('不鼓励依赖');
     return { passed: issues.length === 0, issues };
   }
