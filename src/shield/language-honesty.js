@@ -346,8 +346,8 @@ function validateOutput(text) {
     // [v5.17.18 M4] 偏差自审计 — 检测输出中的认知偏差
     biasAudit: {
       overconfidenceDetected: certainty.level === 'over',
-      falseDichotomy: /\b(要么|或者|非此即彼|either.*or|all.*or.*nothing)\b/i.test(text),
-      anchoringEffect: /\b(通常|一般|always|never|绝对|永远)\b/i.test(text) && certainty.level !== 'low',
+      falseDichotomy: /(?:\b(?:either.*or|all.*or.*nothing)\b|要么|或者|非此即彼)/i.test(text),
+      anchoringEffect: /(?:\b(?:always|never)\b|通常|一般|绝对|永远)/i.test(text) && certainty.level !== 'low',
       confirmationBias: questions.level === 'over' && oscillation.hasOscillation,
       triggeredRestraint: certainty.level === 'over' || questions.level === 'over',
     },
