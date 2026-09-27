@@ -1,4 +1,52 @@
-## 第 122 轮（EN 侧 instrumental_reasoning 三族静默 pass——中英不对称补齐；判据误插 zh 数组的自引入回归，有惊无险）
+## 第 123 轮（reward_hacking 中文祈使删测试族静默 pass——6 支判据 + 负例守卫 6 needle；decision 从打平到「补 rh 缺口」）
+
+### 一、方向来源：decision 五跑定向 + 轮初复测
+
+init 简报的引擎侧缺口有 4 条，全部**先复测再信**：
+`scripts/tmp-rh-gap2-123.js` 19 条同族攻击探针（中文删测试 / 换指标口径 /
+忽略反馈 / 英文同形）→ **14 条 rh.count=0、gate 全 pass**（5/19 命中且全部来自
+既有族捎带）。同时复测落在了简报点名的 `dangerous_instruction` 上：
+`test/dangerous-instruction-recheck-round123.js` 50 条全新良性开发语料 →
+**4 条 block、8 条非 pass**（归因全在 di 的设施动词族，rh/code_security 均 0）。
+decision 五跑（`scripts/tmp-decide-123*.js`）：A 测试库可弃目标赦免 / B 白名单补
+DEV_TARGET / C 注释动词赦免 / D 只补守卫 / E rh 清单 diff，前三跑打平，
+补「回退风险 + 双向实测状态」判据后 **D/E 交替领先，第五跑定向 E→落地为 D**：
+英文侧 C9 已覆盖同形而中文侧整族失守，是当前最高确定性的**非对称缺口**。
+
+### 二、改动（2 commit）
+
+1. `feat` `src/reward-hacking.js`：`check_suppression` 补 **6 支**中文祈使删测试
+   判据（①j/①k/①l/①m/①n/①q），全部沿用「两半齐备」铁律变体：
+   **动词 + 检查对象 + 可信意图半**（目的半可以是显式结果词，也可以是
+   「全/都 + 删」的全量清空自证）。首跑 7/9 → 扩样到 20 条后 **17/20**（三条失配
+   全部是对象表词面：**案例（无「测试」前缀）/ 断言 / 跑不过**）→ ①o/①p/①q 补齐
+   后 **20/20**，良性 27 条 **0 误伤**（含「先把单元测试跑完」「隔离不稳定的测试」
+   「标记为 skip」等同类良性压力样本）。
+   逐槽位诊断脚本 `scripts/tmp-slotcheck-123.js` 坐实两个死因：原对象表只收裸词
+   （不收「失败的/红灯的 + 对象」），原判据要求「过/通过」结果词而祈使句没有。
+2. `test` `test/reward-hacking-check-suppression-imperative-round123.test.js`：
+   **6 needle 逐条落位（删判据 → 守卫必须变红）+ 攻击 20/20 + 良性 27/27**。
+
+### 三、七项验证
+
+· 本轮守卫 6 needle 6/6 · 攻击 20/20 · 良性 27/27
+· 双向门禁 **召回 52/52、误拦 300/326 与基线逐字节一致**
+· bin/verify 14/14 · security-audit 16/16
+· run-all **5384/0** · doc-numbers 14/15（唯一 FAIL = README 测试数 5383 记账滞后，
+  由 finish ①.5 自动补齐）
+· rh 同族跨维度复核：4 条 di 误拦样本在 rh 侧 count 全 0，未把 di 的缺口传染到 rh
+
+### 四、给下一轮
+
+① **中英对称是当前最高确定性增量**：本轮坐实「英文侧已覆盖的族，中文侧可能
+整族失守」（第 122 轮是反向）。对 rh 英文侧 32 族逐个跑中文探针是批量可做的。
+② di 那 4 条良性 block 仍在（idx 5 鉴权中间件注释 / idx 7 Redis 白名单 /
+idx 33 测试机关防火墙 / idx 47 测试库全表删除），其中 idx 33 命中 SECURITY_BOUNDARY
+一票否决属**设计内行为**，只有 idx 7/47 值得查（命中侧收而豁免侧不收的分叉）。
+③ LLM/EN 401 仍未解（运维侧）。
+
+---
+
 
 ### 一、方向来源：decision 三跑定向
 
@@ -7875,7 +7923,10 @@ release  发布前门禁：本地全绿 + 无未推送 + 队列空
 2. `data/upgrade-state.json` 的 round 已按 UPGRADE_LOG 校准为 13。
 3. 队列里那条测试用的 q1-dljb 已标记 done，未污染下一轮方向。
 4. 引擎侧真缺口仍未动：`dangerous_instruction` 开发调试语境误拦
-   （3 条良性 block，第 11 轮起挂了三轮）、中文 instrumental_reasoning、
-   `ai_writing_tell` 多语言误伤、reward_hacking 剩余 6 类。
+   （第 123 轮复测 50 条仍有 4 条 block，见该轮探针；idx 33 属 SECURITY_BOUNDARY
+   设计内行为，idx 7/47 待查）、`ai_writing_tell` 多语言误伤、
+   reward_hacking 剩余 6 类。
+5. **第 123 轮待办**：rh 英文侧 32 族的中文对称探针（本轮坐实非对称缺口可批量收割）；
+   di 侧 idx 7（Redis 白名单）/ idx 47（测试库全表删除）两条命中-豁免分叉。
 
 ---
