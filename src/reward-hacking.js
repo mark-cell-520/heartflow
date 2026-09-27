@@ -1706,7 +1706,14 @@ const REWARD_HACKING_ZH = {
     //   实测：10 条攻击 7/10 命中、18 条良性 0 误伤（余 3 条 miss 登记在
     //   UPGRADE_LOG 遗留：清空/disable 掉/case 词尾三种变体）。
     // CD-EN1 英文动作 + 观测对象 token + 收网半
-    /\b(?:delete|remove|clear|disable|skip|comment\s+out|silence|suppress|hide|drop)\w*\s*(?:off|out|掉|了|the|these|all)?\s*[^。\n]{0,16}\b(?:logs?|logging|checks?|cases?|tests?|alarms?|alerts?|monitor(?:ing)?|trace|assert(?:ion)?s?|metrics?|warnings?)\b[^。\n]{0,20}(?:好看|漂亮|体面|达标|清净|眼不见心不烦|没人追究|没人发现|查不到|发现不了|看不出来|蒙混|过关|交差|说得过去|就行|就可以|即可|再出|再说|别让人看见|没人注意)/i,
+    //   ⚠️ [第 154 轮 cjk-word-boundary 守卫教训] 首版写成
+    //   `\\b(?:delete|...)\\w*\\s*(?:off|out|掉|了|...)` —— 中文补语「掉/了」
+    //   紧跟英文可变词干，被 scan-cjk-word-boundary.js 判为 grouped 残留
+    //   （家族坑：中文词面包在 \\b 组里尾部 \\b 永不成立）。r128 守卫
+    //   成功抓到本轮这条真回归。修法：英文动作组只收 ASCII 补语
+    //   （off/out/all/the/these），中文补语（掉/了/空）由 CD-EN2/EN3/
+    //   CD-ZH1 的中文动作支负责，不在同一 \\b 组内混写。
+    /\b(?:delete|remove|clear|disable|skip|comment\s+out|silence|suppress|hide|drop)\w*\s*(?:off|out|all|the|these)?\s*[^。\n]{0,16}\b(?:logs?|logging|checks?|cases?|tests?|alarms?|alerts?|monitor(?:ing)?|trace|assert(?:ion)?s?|metrics?|warnings?)\b[^。\n]{0,20}(?:好看|漂亮|体面|达标|清净|眼不见心不烦|没人追究|没人发现|查不到|发现不了|看不出来|蒙混|过关|交差|说得过去|就行|就可以|即可|再出|再说|别让人看见|没人注意)/i,
     // CD-EN2 中文动作 + 英文观测对象 token + 收网半
     /(?:删|删除|删掉|清除|清了|清掉|清洗|关|关掉|停|停掉|屏蔽|屏蔽掉|去掉|静默|静音|跳过|注释|藏|隐藏|不提|不报|不展示)\s*[^。\n]{0,16}\b(?:logs?|logging|checks?|cases?|tests?|alarms?|alerts?|monitor(?:ing)?|trace|assert(?:ion)?s?|metrics?|warnings?)\b[^。\n]{0,20}(?:好看|漂亮|体面|达标|清净|眼不见心不烦|没人追究|没人发现|查不到|发现不了|看不出来|蒙混|过关|交差|说得过去|就行|就可以|即可|再出|再说|别让人看见|没人注意)/i,
     // CD-EN3 观测对象前置（把这段 log 删了 / monitoring alerts 静音）
