@@ -193,7 +193,18 @@ const DANGEROUS_PATTERNS = [
   // 全部漏过。这一条补后置式，并覆盖指代承接（它/这/那）。
   // 双语并列宽松放行：「审计日志」「安全策略」「访问控制」这类双名词组合
   // 以及「安全审计」「访问日志」等词的任意共现都算设施宾语。
-  /(?:把|将|给我|帮忙|来|麻烦)\s*(?:安全|所有|全部|相关的?|相应的?)?\s*(?:防火墙|firewall|认证|授权|鉴权|审计|日志|安全策略|安全机制|安全组|白名单|whitelist|ACL|访问控制|访问策略|访问日志|入侵检测|IDS|IPS|WAF|SSL|TLS|证书|校验|验证|检查|限流|熔断|防护|数据库|数据表|用户表|备份|它|这个|那个|这些|那些)(?:[^。\n]{0,6}(?:认证|授权|鉴权|审计|日志|防火墙|防护|证书|校验|验证|检查|策略|规则|控制))?\s*(?:都|也|先|全|统统|直接|一并|顺手)?\s*(?:关掉|关了|关一?下|停用|停掉|废掉|废了|卸掉|卸了|卸载|卸载掉|删掉|删了|去掉|去除|移除|拿掉|下掉|去掉吧|清空|delete|remov\w*|disabl\w*)/i,
+  /(?:把|将|给我|帮忙|来|麻烦)\s*(?:安全|所有|全部|相关的?|相应的?)?\s*(?:防火墙|firewall|认证|授权|鉴权|审计|日志|安全策略|安全机制|安全组|白名单|whitelist|ACL|访问控制|访问策略|访问日志|入侵检测|IDS|IPS|WAF|SSL|TLS|证书|校验|验证|检查|限流|熔断|防护|数据库|数据表|用户表|备份|它|这个|那个|这些|那些)(?:[^。\n]{0,6}(?:认证|授权|鉴权|审计|日志|防火墙|防护|证书|校验|验证|检查|策略|规则|控制|开关|toggle|flag))?\s*(?:都|也|先|全|统统|直接|一并|顺手)?\s*(?:关掉|关了|关一?下|停用|停掉|废掉|废了|卸掉|卸了|卸载|卸载掉|删掉|删了|去掉|去除|移除|拿掉|下掉|去掉吧|清空|delete|remov\w*|disabl\w*)/i,
+  // [第 138 轮补] 设施名 + 「开关/toggle」字面在动词前的把字句：
+  // 「把防火墙开关关掉」「把安全策略开关关掉」「把防火墙 toggle 关掉」
+  // PAT4 的可选中间组原只收「认证/授权/策略…」等安全名词，没收
+  // 「开关/toggle」这类**设施名后置字面**（防火墙开关 = the switch of the
+  // firewall，开关是设施名词不是配置化标记），于是设施词与动词之间被
+  // 「开关」二字截断 → 全族漏判（实测 3 条 gate pass）。
+  // 分界与配置基建形（把 CSRF 校验做成开关）：那条的连接语是「做成」，
+  // 本条动词是关掉/停用族 —— 一个是**搭建配置**，一个是**关停设施**。
+  /(?:把|将)\s*(?:安全|所有|全部|相关的?|相应的?)?\s*(?:防火墙|firewall|认证|授权|鉴权|审计|日志|安全策略|安全机制|安全组|白名单|whitelist|ACL|访问控制|访问策略|访问日志|入侵检测|IDS|IPS|WAF|SSL|TLS|证书|校验|验证|检查|限流|熔断|防护)\s*(?:开关|toggle|flag|switch)\s*(?:都|也|先|全|统统|直接|一并|顺手)?\s*(?:关掉|关了|关一?下|停用|停掉|废掉|卸掉|卸了|卸载|删掉|删了|去掉|去除|移除|拿掉|清空|disable|disabl\w*|turn\s+off|shut\s+off|remov\w*)/i,
+  // [第 138 轮补] 同形的英文前置形（disable/turn off the X switch）：
+  /(?:disable|disabl\w*|turn\s+off|shut\s+off|switch\s+off|deactivat\w*)\s+(?:the\s+)?(?:firewall|auth\w*|security|audit|access\s+control|WAF|IDS|IPS|TLS|SSL)\w*\s+(?:switch|toggle|flag)\b/i,
   // [v6.7.128 第 80 轮补「设施名词 + 清理动词后置」] 由来：本轮实测 12 条
   // 同形攻击有 3 条漏判，全部是**设施词在前、清理动词在后**且动词与设施之间
   // 隔着宾语名词：
@@ -677,12 +688,55 @@ function _matchAll(text) {
  // test/dangerous-instruction-config-make-round137.test.js）。
  */
 const CFG_WINDOW = 16;
+// ⚠️ 第 138 轮修（重要，第 137 轮自引入回归）：CFG_MARK 原含裸「开关」，
+// 而「开关」在攻击语料里是**设施名**（防火墙开关 = the firewall switch /
+// the auth toggle）。第 137 轮为「把 CSRF 校验做成开关」配置基建形放行时
+// 把裸「开关」写进配置化标记，第 138 轮复测实测误赦 11/12 条同形攻击
+// （形状见 scripts/probe-di-final-138.js ATTACK 下标），全部 gate pass。
+// 这是「良性豁免词与设施名没分开」的清单分叉复发。
+// 修法（不是删词）：开关/toggle/flag 字面**降级为有条件配置化标记**，
+// 必须带配置化连接语才算配置语义；无连接语即判为设施名，回归命中。
+// 良性形（做成开关 / 做成环境变量开关 / 做成配置项 / 做成 feature flag /
+// development 把 csrf check 做成 toggle）句中都带连接语，不受影响。
 const CFG_MARK = /(?:做成|设为|置于|接入|接到|挂到|走开关|加开关|做成配置|环境变量|配置项|配置开关|开关|\benv\s+var|feature\s+(?:flag|toggle)|\btoggle\b)/i;
+// [第 138 轮] 开关字面的**配置化前置动词**（命中段之前才算配置语义）。
+const CFG_CONNECT = /(?:做成|设为|置于|接入|接到|挂到|走|加|做成配置|使用|用|按|依据|根据)\s*(?:环境变量|配置项?|开关|flag|toggle|feature)/i;
+// [第 138 轮] 「做成/设为 + 开关」紧邻形（设施词与开关之间的连接语）。
+const CFG_ADJACENT = /(?:做成|设为|置于|接入)\s*(?:按?\s*环境变量?\s*)?(?:开关|配置开关|flag|toggle)/i;
+// 第 138 轮判据注释：开关字面必须带配置化连接语（做成/设为/接入 + 开关），
+// 否则判定为设施名（防火墙开关/auth toggle）而非配置化语义。
+// 返回 false 的语义是「明确判为设施名」，调用方必须据此短路，不能再走
+// CFG_MARK 的通配分支 —— 否则裸「开关」词又会把它当成配置化标记。
+// ⚠️ 连接语判定用**全文**而不是命中段前后窗口：把字句「把防火墙开关
+//    关掉」的开关在句首、命中段在句尾，窗口取不到；而「把 X 做成开关」
+//    的连接语在全文范围内唯一出现，全文判不会误赦（攻击形全文里根本没有
+//    做成/设为/接入 这类配置化动词）。
+function _switchIsConfig(text, around, start, len) {
+  if (!text || typeof text !== 'string') return false;
+  // ① 全文存在配置化连接语（做成/设为/接入 + 环境变量/配置项/开关/flag/toggle）
+  if (CFG_CONNECT.test(text) || CFG_ADJACENT.test(text)) return true;
+  // ② 无连接语：句内开关字面一律判为设施名（防火墙开关 / auth toggle）
+  return false;
+}
 function _payloadMakeIsConfig(text, start, len) {
   if (!text || typeof text !== 'string') return false;
   const from = Math.max(0, start - CFG_WINDOW);
   const to = Math.min(text.length, start + len + CFG_WINDOW);
   const around = text.slice(from, to);
+  // 开关族短路：句内存在开关/toggle/flag 字面时，只信 _switchIsConfig 的
+  // 精确判定（带连接语才算配置化）。**绝不再回落到 CFG_MARK 通配分支** ——
+  // 第 137 轮把裸「开关」写进 CFG_MARK，导致「关掉防火墙开关」族 11 条
+  // 攻击全部误赦（第 138 轮实测见 scripts/probe-di-final-138.js）。
+  //
+  // ⚠️ 第 138 轮补丁（短路第一版后实测）：只测 text 不够 —— 把字句
+  // 「把防火墙开关关掉」「把防火墙 toggle 关掉」里开关在句首，而命中段
+  // （PAT4 的「把…关掉」整段）位于句尾，_switchIsConfig 只看命中段前后
+  // 窗口，取不到句首的连接语境。修法：开关字面在句内出现时，短路上
+  // **全文**判一次连接语（CFG_CONNECT 不锚定在开关紧邻左侧，允许
+  // 「把 X 做成开关」和「把开关关掉」两类都走全文判定：
+  // 前者有「做成…开关」连接语 → 配置化；后者无连接语 → 设施名 → 命中）。
+  const SW_LITERAL = /(?:开关|toggle|flag)/i;
+  if (SW_LITERAL.test(text)) return _switchIsConfig(text, around, start, len);
   return CFG_MARK.test(around);
 }
 
