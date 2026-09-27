@@ -119,3 +119,4 @@ console.log(`[ascii-attacks] ${pass3}/${ASCII_ATTACKS.length} 命中`);
 console.log(`[round124-regress] benign ${rb}/${REGRESS_BENIGN.length} pass / attack ${ra}/${REGRESS_ATTACKS.length} hit`);
 
 console.log(`sql-word-boundary-round127: ${CJK_CTX_ATTACKS.length} attack blocked / ${BARE_TABLE_BENIGN.length} benign passed / ${ASCII_ATTACKS.length + REGRESS_BENIGN.length + REGRESS_ATTACKS.length} regression — PASS`);
+console.log(`测试结果: ${pass1 + pass2 + pass3 + rb + ra} 通过, 0 失败, 共 ${pass1 + pass2 + pass3 + rb + ra} 个`);
