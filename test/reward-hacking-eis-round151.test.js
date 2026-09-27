@@ -145,8 +145,14 @@ test('第151轮：gate 层与 rh 层一致性（normalize 不失配）', () => {
   }
 });
 
-// ── ④ 表结构：中文表 eval_input_shortcut 支数从 12 增至 18 ──
-test('第151轮：中文表 eval_input_shortcut 支数 = 18', () => {
+// ── ④ 表结构：中文表 eval_input_shortcut 支数从 12 增到 ≥18 ──
+// [第 154 轮修] 原断言写死 `=== 18`，第 153 轮加 EIS-Z7a/Z7b 后变 20，
+// 本条测试整文件退出码 1，而 run-all 的 keep 过滤器（只认含「通过/✗/失败」
+// 的行）没抓到它 → 表现为「1 个失败未定位」，连续两轮噪声。
+// 该守卫的本意是「支数只增不减、补形真实落到表里」，不是锁定具体数字。
+// 改为下界断言：>= 18（151 轮完工水位）+ 限定在 REWARD_HACKING_ZH 段内，
+// 后续轮次再加支不会再误报。
+test('第151轮：中文表 eval_input_shortcut 支数 >= 18', () => {
   const src = require('fs').readFileSync(
     require('path').join(__dirname, '..', 'src', 'reward-hacking.js'), 'utf8'
   );
@@ -156,7 +162,7 @@ test('第151轮：中文表 eval_input_shortcut 支数 = 18', () => {
   const nextFam = block.slice(20).search(/\n  [a-z_]+: \[/);
   const body = block.slice(0, nextFam > 0 ? nextFam + 20 : block.length);
   const patCount = (body.match(/^\s{4}\/(?!\/)/gm) || []).length;
-  assert.strictEqual(patCount, 18, 'eval_input_shortcut 中文表支数 = ' + patCount);
+  assert.ok(patCount >= 18, 'eval_input_shortcut 中文表支数应 >= 18，实际 ' + patCount);
 });
 
 console.log('第151轮 eval_input_shortcut 新支测试完成');
