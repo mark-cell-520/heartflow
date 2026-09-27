@@ -575,26 +575,42 @@ function detect(text) {
   // 单档 baseScore 不变、得分结构不动、findings 仍按原族名输出。
   const vocabDiscourse = new Set(['tier1', 'tier2', 'tier3', 'transitions']);
   const templatedFrames = new Set(['formulaic-openers', 'generic-conclusions']);
+  // vocab-discourse 档是否真有独立命中（tier1/2/3/transitions 四族任一）。
+  // [第 142 轮] 决定 tier-attributive 折叠去向的条件：
+  //   · 真命中 → tier-attributive 折叠到 vocab-discourse（跨维度同源叠票修）
+  //   · 未命中 → tier-attributive 仍属 zh-en-mixing 同族一票（同族内多支不叠）
+  const hasVocabDiscourse = (findings || []).some(f => /^ai-tell-(?:tier[123]|transitions)$/.test(f.dimension));
+  // [第 142 轮] 上轮折叠不彻底的同型错误第 4 次复现（跨维度版）：
+  // 第 141 轮把 zh-en-mixing 整族统一归一化到 'zh-en-mixing' 一票，修好了
+  // **同维度内**的叠票；但当时实测就仍有 3/11 误伤没上报（本轮 run-all
+  // 抓到）：日文纯技术句（robust/retry/backoff 描述 API 设计）与中文技术句
+  // （pipeline 需要 comprehensive 的 retry 策略）的 finding 是
+  //   ai-tell-tier1(18) + ai-tell-zh-en-mixing(18, zhEnSrc=tier-attributive)
+  // 两票都源自**同一个 TIER 词**——tier-attributive 的判据本身就是
+  // 「中文/母语句中出现 TIER 词 + 英文词」，而 vocab-discourse 档的词表
+  // 就是那批 TIER 词。这是第 130/131/132（同维度）+141（同族内）之后的
+  // 跨维度第 4 次同型：**同一词表被两个维度当成独立证据**。
+  // 修法：tier-attributive 支在 vocab-discourse 任一档命中时不再另起一票
+  //（折叠成 vocab-discourse 已计的那一票）；anchor-mix / double-connective /
+  // tier-adverbial 不同源，保留独立证据位。
+  // 反向确认（r142 测试 12 条攻击 + 17 条良性）：真 AI 混排样本 12/12 仍命中
+  //（锚/连接词/词表多源仍在），良性 3 条跨维度误伤归零。
   const normalizedFams = new Set(
     (findings || []).map((f) => {
       const fam = f.dimension.replace(/^ai-tell-/, '');
       if (vocabDiscourse.has(fam)) return 'vocab-discourse';
       if (templatedFrames.has(fam)) return 'templated-frames';
-      // [第 141 轮] zh-en-mixing 的 tier-attributive（定语/表语 TIER 形态）
-      // 与 vocab-discourse 同源（判据就是「中文句 ≤1 TIER 词 + 英文词」），
-      // 折叠成一档，避免同一词表被当成两个独立证据顶起共现门槛。
-      // 另三支（tier-adverbial / anchor-mix / double-connective）不同源，
-      // 保留独立证据位。
-      // [v6.7.126 第 141 轮修回归] 但**同维度多支必须先折叠成一个值**：
-      // 上面让 tier-attributive → 'vocab-discourse'、其余支保持 'zh-en-mixing'，
-      // 于是「anchor-mix + tier-attributive」同句命中时记两票，
-      // 单族句 score 0 → 0.36、coOccurrence 被顶成 true，
-      // 违反第 50 轮「单族未清零」纪律（实测样本见 round50 主测试）。
-      // 修法：zh-en-mixing 全部支统一映射到 'zh-en-mixing' 一票；
-      // tier-attributive 与词表同源这件事由 vocabDiscourse 分支在
-      // **跨维度**时体现（tier1/tier2/tier3 命中才另起一票），
-      // 不该让同维度的两支互相当作独立证据。
-      if (fam === 'zh-en-mixing') return 'zh-en-mixing';
+      if (fam === 'zh-en-mixing') {
+        // tier-attributive 与 vocab-discourse 同源（同一批 TIER 词表）：
+        //   · vocab-discourse 真命中时 → 折叠成那一票（跨维度同源叠票修），
+        //     否则「日文技术句含 robust」会把 tier1 与 tier-attributive
+        //     当成两个独立证据撑起共现（第 142 轮误伤 3/11 的根因）
+        //   · 未命中时 → 保持 zh-en-mixing 一票，anchor-mix /
+        //     double-connective / tier-adverbial 与之同族不互相当证据
+        //     （第 50 轮「单族未清零」守卫样本正是这个形状）
+        if (f.zhEnSrc === 'tier-attributive' && hasVocabDiscourse) return 'vocab-discourse';
+        return 'zh-en-mixing';
+      }
       return fam;
     })
   );
