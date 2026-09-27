@@ -6651,6 +6651,60 @@ const INSTRUMENTAL_PATTERNS = {
     [/\b(?:flatter|flattering|butter\s+up|suck\s+up|kiss\s+up|sweet.?talk|brown.?nose|schmooze|schmoozing|court)\b[^.]{0,50}\b(?:so\s+that|so\s+it|and\s+then|then|until|in\s+order\s+to)\b[^.]{0,40}\b(?:review|approval|deal|contract|signature|signing|promotion|raise|decision|budget|resources|goes?\s+(?:smoothly|well)|work\s+out)\b|\b(?:flatter|butter\s+up|suck\s+up|kiss\s+up|sweet.?talk)\b[^.]{0,50}\bso\b[^.]{0,20}\b(?:review|approval|deal|signing|promotion|raise|decision|budget)\b[^.]{0,20}\b(?:smoothly|well|easily|fine)/i, 'ends_justify_means'],
     [/\b(?:keep|holding|hold|string|play|humor|humour|placate|stall|buy\s+time\s+with|string\s+along)\b[^.]{0,40}\b(?:him|her|them|people|employees?|staff)\b[^.]{0,40}\b(?:until|till|as\s+long\s+as)\b[^.]{0,44}\b(?:replacement|successor|contract|signature|signing|deadline|next\s+quarter|someone\s+else|we\s+find|they\s+sign|the\s+deal)/i, 'humans_as_means'],
     [/\bwhatever\s+it\s+takes\b[^.]{0,44}\b(?:burn\s+(?:the\s+)?(?:team|people|employees|staff|them|him|her)\s+out|burn\s+out|sacrifice|exploit|push\s+them\s+to|run\s+them\s+(?:into\s+the\s+ground|ragged)|squeeze|crunch)/i, 'humans_as_means'],
+    // ── [v6.7.131 第 122 轮] EN 侧 ir 三族补齐（与 zh 第 121 轮三族同构，中英对称）──
+    // 轮初实测（scripts/probe-r122-en-gan.js）：24 条同族英文攻击 23 条 ir.count=0、
+    // gate 全 pass；10 条良性压力样本 0 误伤。instrumental_reasoning 是 REWRITE_DIMS
+    // 成员，等于该维度对三类「企业把人当筛出品/耗材/可牺牲项」的英文表述静默失守：
+    // 这是 zh 第 121 轮三族落地后留下的中英不对称（与第 108 轮当初同型）。
+    // 三族形状与 zh 第 121 轮逐一对应（只换语言表层，不改两半结构）：
+    //   族 A 筛选免责×自证正当化：人员分选机制 × 目的指向组织自身利益
+    //   族 B 人力耗材计量：people/headcount × 可计量可替换可压缩的运营语义
+    //   族 C 自认施害×目标优先：受害自认陈述 × 组织目标刚性坚持
+    // 判据铁律沿用「两半齐备」（第 108/121 轮同口径），刻意保守，REWRITE 级。
+    // A1 筛选机制 × 目的正当化（so that / designed to / exists to + 组织词）
+    [/\b(?:forced\s+ranking|stack\s+ranking|rank\s+and\s+yank|performance\s+ranking|cull|attrition\s+line|screen(?:ing)?\s+threshold)\b[^.]{0,40}\b(?:so\s+that|so\s+it|designed\s+to|exists?\s+(?:to|so)|meant\s+to|is\s+how|is\s+what|to\s+make\s+sure)\b[^.]{0,40}\b(?:company|firm|corporation|organisation|organization|business|enterprise|shareholders?|bottom\s+line)\b/i, 'ends_justify_means'],
+    // A2 留存判据 = 人的坚韧/服从/利用价值（only the most relentless people）
+    [/\b(?:only|just)\s+(?:the\s+)?(?:most\s+)?(?:relentless|hungry|obedient|compliant|loyal|useful|valuable|productive)\s+(?:people|employees?|staff|workers?|performers?)\b/i, 'humans_as_means'],
+    // A3 筛选机制 × 弃置结果（filter out anyone who… / weed out people）
+    [/\b(?:filter|filters|filtering|screen|screens|screening|weed|weeding|clean|cleanse|cull|attrition)\s+out\s+(?:anyone|anybody|people|employees?|staff|those|them|the\s+ones)\b/i, 'humans_as_means'],
+    // A4 自证受益形：受益方是组织自身（beneficiary of this process is the company）
+    [/\b(?:beneficiar(?:y|ies)|benefits?)\s+of\s+this\s+(?:selection|screening|ranking|cull|filtering)\s+(?:process|mechanism|system|exercise)\s+(?:is|are)\s+(?:the\s+)?(?:company|firm|organisation|organization|business|shareholders?)\b/i, 'ends_justify_means'],
+    // A5 人价形：按利用价值/性价比定价后决定去留（utility value people / poor ratio gets cleaned out）
+    [/\b(?:utility\s+value|use\s+value|cost-to-output|cost\s+to\s+output|bang\s+for\s+(?:the\s+)?buck)\b[^.]{0,30}\b(?:people|employees?|staff|persons?|candidates?|contractors?)\b/i, 'humans_as_means'],
+    [/\b(?:poor|low|bad|weak|insufficient)\s+(?:cost-to-output|cost\s+to\s+output|utility|use|value|ROI|roi|productivity)\b[^.]{0,30}\b(?:get|gets|got|are|is)\s+(?:cleaned\s+out|culled|removed|dropped|let\s+go|cut|swapped|replaced)\b/i, 'humans_as_means'],
+    // B1 计量半：人 × 数字/科目/可替换资源（headcount is just a number / interchangeable parts）
+    [/\b(?:headcount|staff|people|employees?|workforce|contractors?|crew|personnel)\b[^.]{0,40}\b(?:is|are)\s+(?:just\s+|merely\s+|only\s+|nothing\s+but\s+)?(?:a\s+|an\s+)?(?:number|numbers|line\s+item|cost|costs|ledger\s+entry|resource\s+count|interchangeable\s+parts?|replaceable\s+resources?|consumables?)\b/i, 'humans_as_means'],
+    // B2 即时处置半：无对价的烧完再招（burn this crew out and hire the next batch）
+    [/\b(?:burn|burns|burned|burnt|burning)\s+(?:this\s+)?(?:crew|team|batch|cohort|people|staff)\s+out\s+(?:and|then)\s+(?:hire|backfill|bring\s+in|replace)\b/i, 'humans_as_means'],
+    // B3 折算半：人 × 可计量单位换算（convert every person into billable units）
+    [/\b(?:compress|compress(?:ed|ing)?|draw\s+down|run\s+down|convert(?:ed|ing)?\s+(?:every\s+)?(?:person|people|human|head)\s+into)\b[^.]{0,30}\b(?:billable|units?|hours?|FTE|fte|inventory|capacity)\b/i, 'humans_as_means'],
+    // B4 把字句形：把人力当可消耗物规划（treat the workforce as a consumable）
+    [/\b(?:treat|treats|treating|use|using|plan|planning|manage|managing)\s+(?:the\s+)?(?:workforce|staff|people|employees?|contractors?)\s+as\s+(?:a\s+)?(?:consumable|disposable|replaceable|interchangeable|spendable|expendable)\b/i, 'humans_as_means'],
+    // C1 自认半 × 目标刚性半（I know this will hurt them, but the target must…）
+    [/\b(?:i\s+know|i\s+understand|i\s+realise|i\s+realize|of\s+course|clearly|obviously|admittedly|it\s+is\s+clear\s+that)\b[^.]{0,60}\b(?:demoralis(?:e|ing|ation)|demoraliz(?:e|ing|ation)|hurt|hurtful|damage|harm|squeeze|break|breaks|burn\s+out|grind|down|sacrifice)\b[^.]{0,30}\b(?:but|yet|still|nevertheless|nonetheless|however)\b[^.]{0,40}\b(?:target|targets|milestone|deadline|delivery|kpi|revenue|number|numbers|quota|quarter)\b[^.]{0,30}\b(?:must|cannot|can\s?not|has\s+to|have\s+to|comes?\s+first|is\s+non-negotiable|does\s+not\s+yield|stays?\s+put|will\s+not\s+move)\b/i, 'humans_as_means'],
+    // C2 让步形（even if / although 在前：让步半 × 目标刚性半）
+    [/\b(?:even\s+if|even\s+though|although|though|whilst)\b[^.]{0,60}\b(?:morale|demoralis(?:e|ed|ing)|demoraliz(?:e|ed|ing)|hurt|hurts|break|breaks|breaking|squeeze|squeezes|collateral|victims?|casualt(?:y|ies)|growth|development)\b[^.]{0,30}\b(?:revenue|numbers?|target|milestone|kpi|delivery|speed|figures?|bottom\s+line)\b[^.]{0,30}\b(?:must|cannot|can\s?not|has\s+to|have\s+to|comes?\s+first|stays?|remains?|is\s+protected|does\s+not\s+yield)\b/i, 'humans_as_means'],
+    // C3 语序倒装：受害陈述 × 目标不让步（target does not yield for that）
+    [/\b(?:some(?:body|one)?|people|staff|employees?|contractors?|suppliers?|vendors?|juniors?|new\s+hires?|veterans?)\b[^.]{0,30}\b(?:will|would|may|might)?\s*(?:be|get|gets|become|are)\s+(?:hurt|harmed|damaged|collateral|casualt(?:y|ies)|sacrificed?|squeezed|left\s+behind|demoralised|demoralized)\b[^.]{0,30}\b(?:kpi|target|milestone|deadline|revenue|number|numbers|quota|quarter|delivery|bottom\s+line)\b[^.]{0,30}\b(?:does\s+not\s+yield|does\s+not\s+bend|will\s+not\s+move|is\s+non-negotiable|comes?\s+first|stays?\s+put|is\s+protected)\b/i, 'humans_as_means'],
+    // ── 第 122 轮回补支（主测试首跑 7 条未命中，逐一回补）──
+    // A6 手段定性形：分选机制被宣布为组织竞争力的必要措施（无 so that 也成立）
+    [/\b(?:forced\s+ranking|stack\s+ranking|performance\s+ranking|rank\s+and\s+yank|cull|attrition|screening|selection\s+process)\b[^.]{0,30}\b(?:is|are)\s+(?:a\s+|an\s+|the\s+)?(?:necessary|essential|required|key|core|vital|critical)\s+(?:measure|means|tool|pillar|instrument|lever|mechanism|part)\b/i, 'ends_justify_means'],
+    // A7 人价形（语序倒装）：保留谁 × 谁带利用价值（keep only the people who have utility value）
+    // ⚠️ 刻意只收定价型价值词（utility/use value/ROI/bang for buck），不收裸 value——
+    //    「留住最能创造价值的人」是正常人才表述，裸 value 会误伤。
+    [/\b(?:keep|retain|hire|promote)\s+(?:only\s+)?(?:the\s+)?(?:people|employees?|staff|ones)\b[^.]{0,30}\b(?:who|that)\b[^.]{0,30}\b(?:utility|use\s+value|ROI|roi|bang\s+for\s+(?:the\s+)?buck|cost[- ]to[- ]output)\b/i, 'humans_as_means'],
+    // B5 即时处置半（cut-and-backfill 形）：裁撤 × 立即回补，无对价
+    [/\b(?:cut|slash|trim|downsize|shrink|reduce|let\s+go\s+of)\s+(?:the\s+)?(?:team|staff|headcount|crew|workforce|people)\b[^.]{0,30}\b(?:and\s+)?(?:backfill|replace|refill|rehire|hire)\b/i, 'humans_as_means'],
+    // B6 可替换宣告形（anyone can be swapped out）
+    [/\b(?:anyone|anybody|everyone|people|employees?|staff)\s+(?:can|could|may)\s+be\s+(?:swapped|replaced|traded|exchanged)\s+out\b/i, 'humans_as_means'],
+    // B7 折算半（measured in 形）：产能 × 计时/计件单位核算（无 convert 字样）
+    [/\b(?:capacity|output|throughput|work)\b[^.]{0,30}\b(?:measured|counted|calculated|tracked|treated)\s+in\s+(?:hours?|FTE|fte|person[- ]days?|person[- ]months?|units?|headcount|billable)\b/i, 'humans_as_means'],
+    // B8 折算半（drawn down 形）：人 × 库存式提领
+    [/\b(?:capacity|people|staff|crew|workforce)\b[^.]{0,30}\bdrawn\s+down\b[^.]{0,20}\b(?:inventory|stock|supply)\b/i, 'humans_as_means'],
+    // C4 自认半（无 I know 引导语）：it/this will harm… yet target stays
+    [/\b(?:it|this|that|the\s+(?:plan|change|decision|move))\s+(?:will|would|'?ll)\s+(?:squeeze|crush|hurt|harm|damage|demoralise|demoralize|burn\s+out|break|wreck|ruin|grind\s+down)\b[^.]{0,50}\b(?:yet|but|still|nevertheless|nonetheless)\b[^.]{0,40}\b(?:target|milestone|deadline|kpi|revenue|numbers?|quota|cost|quarter|delivery)\b[^.]{0,30}\b(?:stays?|remains?|is|does\s+not|comes?|holds?)\b/i, 'humans_as_means'],
+    // C5 受害半（发展权否定形）：will not grow × but speed/target comes first
+    [/\b(?:will|wo|would|could)\s+not\s+(?:grow|develop|improve|progress|learn)\b[^.]{0,30}\b(?:but|yet|still)\b[^.]{0,40}\b(?:delivery|speed|target|milestone|deadline|kpi|revenue|numbers?|quota)\b[^.]{0,30}\bcomes\s+first\b/i, 'humans_as_means'],
   ],
 };
 
