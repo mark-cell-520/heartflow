@@ -1,3 +1,80 @@
+## 第 119 轮（误拦普查跑出真缺口：编译器噪音警告被当安全设施；判断单一来源修两处才闭环）
+
+### 一、方向来源：不用 decision 脑内模拟，用探针实测
+
+init 简报列了 4 条「遗留真缺口」，逐条复测发现**全是过期描述**：
+`dangerous-instruction-dev-debug.test.js` 14/14 已绿（第 22 轮修过并有守卫）。
+所以改用**主动普查**：24 条正常工程/商业/社会表述跑 `gate.gate`，
+检出 1 条 block → 「本地开发忽略编译警告」被判 dangerous_instruction。
+
+定位链：di.count=1 → `DANGEROUS_PATTERNS` 第①族动词表把「警告/warning」
+整体当安全设施。但编辑器原生警告（编译/lint/类型/deprecation/unused/build）
+是**开发噪音**，忽略它不降低任何安全水位，与「忽略安全警告」性质相反。
+既有豁免三关（元话语/上游补丁/isDevDebugContext）全不成立——
+这两句本来就没有 devCtx，问题不在漏开发语境，在命中侧词表过宽。
+
+### 二、改动（5 commit）
+
+1. `scripts/scan-toplevel-pipes.js` + `scripts/scan-concat-regex-pipes.js`（新）
+   第 115 轮移交「模式表顶层 | 未分组体检」。第一版扫全表报 209 个候选，
+   复核实为误报：数组里独立正则的顶层 `|` 无害，**只有拼接点危险**。
+   重写为扫 `X.source` 拼接引用 + 括号深度回溯定义处，40 个引用全查
+   → 0 处未分组。该移交项**记账关闭**（32 个"未解析"是 `rel.sourceId`
+   这类对象属性名误命中，非正则）。
+2. `src/dev-exemptions.js`：新增 `isCompilerNoiseWarning()` 判据（单一来源）
+3. `src/dangerous-instruction.js`：接入豁免
+4. `src/reward-hacking.js`：接入豁免（否则 di 放行 rh 仍 block）
+5. `test/di-compiler-noise-warning-round119.test.js`（新，9 断言）
+   + `scripts/negative-test-di-compiler-noise-round119.js`（6 支守卫）
+
+### 三、两个真 bug（都是本轮自己踩的，写下来防再犯）
+
+**① 裸短词无词边界 = 灾难级放宽。** 第一版 `NOISE_WARNING_KIND` 里
+裸 `ts` 匹配到 "por**ts**"/"endpoin**ts**"/"clu**ts**ter"，
+把 rh 攻击样本 `port_scan_mirror` / `proxy_fetch_code` / `unbounded_output`
+全部赦成 pass（run-all 12 个测试红）。修法：英文短词全部加 `\b`。
+
+**② 有噪音词 ≠ 在忽略警告。** 加了词边界后仍有 5 个断言红：
+「lint 报错就加一行注释忽略掉」「Delete the failing tests so the build
+goes green」——这两句是**为了通过检查而压制反馈**，典型 reward hacking。
+修法：判据加第三条件，必须锚定警告语义（警告/提示/warning/notice）。
+这是第 117 轮「必填槽位吃不存在内容」教训的同型：槽位判据只看词面共现，
+不看语义是否成立。
+
+**③ 单一来源不是可选项。** di 改完、rh 仍 block——
+`v6.7.107/112/115` 同一坑的第 4 次复发（豁免只加在一个维度）。
+故判据下沉 `dev-exemptions.js`，两个维度共用同一个函数，
+不再各写一份正则。
+
+### 四、七项验证
+
+| 项 | 结果 |
+|---|---|
+| 主测试（新） | 9/9 |
+| 负例守卫 | 6 支全真守卫，0 摆设 |
+| 双向门禁 | 召回 52/52、误拦 300/326（零新增，与基线逐字节一致） |
+| bin/verify | 14/14 |
+| security-audit | 16/16 |
+| run-all | 5349 通过 / 3 失败 |
+| doc-numbers | 14/15（README 记账由 finish 补齐，与 init 改前一致） |
+
+run-all 的 3 个失败定位：`evolution-audit` / `evolution-state` 为
+`spawnSync ETIMEDOUT`（并发子进程超时，与改动无关，单跑均 exit 0
+无输出）；第 3 处同源。**不是断言失败**。基线预期失败
+`npm-package-integrity` 本轮单跑反而 6/6 通过。
+
+### 五、给下一轮
+
+1. **主动普查比读遗留清单有效**：本轮 4 条遗留全过期，一条 24 样本探针就
+   找出真缺口。下一轮先跑同类普查（不同领域各一批良性样本），别信简报旧描述。
+2. 英文短词进中文维度正则前，**必须先在 grep 里搜一遍会误匹配的英文词**
+   （ts→ports/endpoints）。本轮这个错让 12 个测试红了一轮。
+3. 第 115 轮移交的顶层 `|` 体检已关闭；A/B 两个未选方向仍未动。
+4. LLM 401 仍未解（stepfun key 失效，运维侧），本轮靠「原文零进上下文」
+   纪律未触发 451。
+
+---
+
 ## 第 117 轮（info_deprivation「第3人称转述×外部支援剥夺」族：攻击 10/10 拦截；decision 定向选 C）
 
 ### 一、decision 本轮定向（三跑，前两次拉平）
