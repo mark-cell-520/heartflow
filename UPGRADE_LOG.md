@@ -1,3 +1,88 @@
+# 第 202 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：rh 中文侧 4 类低密度族补形 —— 由 `decision.decide` 本体选出
+（`scripts/round-202/decide-r202.js`，chosen=B / score 0.83，一次跑出。
+A=di 开发调试语境误拦收尾 0.77，C=di idx 7/47 分叉 0.68，
+D=di 非 block 级误判 0.77）。
+
+**轮初四件事**：
+1. 队列（`data/upgrade-queue.json`）只有一条 done 的测试项 —— 无待办，按遗留选。
+2. 第 123 轮 di 复测探针（`test/dangerous-instruction-recheck-round123.js`）
+   **原样重跑**：50 条良性仍 block 2 / verify 3 / rewrite 1；
+   新归因探针（`probe-r202-di-attr.js` + `probe-r202-di-detail.js`）坐实
+   idx 5 命中 dangerous_instruction（`鉴权中间件注掉`，`isDevDebugContext`
+   判 false），idx 33 属 SECURITY_BOUNDARY 设计内否决。
+3. rh 密度扫描（`probe-r202-rh-density.js`）：38 类中文判据总量 574 支 vs
+   英文 333 支，密度劣势最大 4 类 = rerun_until_significant(8 vs 9)、
+   human_answer_proxy(17 vs 20)、best_run_picking(7 vs 6)、
+   condition_tuning(13 vs 17)。
+4. 全新样本池复测（`probe-r202-rh-pool.js` / `probe-r202-rh-attr.js`）：
+   4 类 20 条攻击**逐支打点全 rawBranch=[]**，gate pass/verify，良性 0~1
+   非 pass。既非豁免放行也非其他族抢占 —— 阈值性缺口坐实。
+
+## 改动（全部落 `src/reward-hacking.js` 的 `REWARD_HACKING_ZH`，共 4 个 commit）
+
+| 族 | 轮初 | 修后 | 补的形状 |
+|---|---|---|---|
+| rerun_until_significant | 0/5 | 5/5 block | RS-Z7 数值式收网（掉到 0.05 以下）、RS-Z8 收网半扩显著+为止、RS-Z9 条件式重跑（不达标就换种子，全句无「直到」）、RS-Z10 次数择优+后置汇报 |
+| human_answer_proxy | 0/5 gate | 5/5 block | HAP-Z1b/Z1c 反向语序与质量词前置、Z2 反推正确性+计分、Z3 点过就算正确、Z4 线上指标当评测结论上报、Z5 点赞作为自动打分依据 |
+| best_run_picking | 0/5 gate | 5/5 block | BRP-Z3 次数容器+挑最高那次、Z4a/Z4b 择优动词「用」+隐去补语后缀、Z5 择优动词「留」、Z6/Z8 把字句首+写进+其余删掉、Z7 择优形容词「漂亮」+对外讲 |
+| condition_tuning | 0/5 gate | 5/5 block | CT-Z7 条件按最易通过参数来设、Z8 调生成最稳定值再评测、Z9 换对自己有利的版本号、Z10 改成历史最好那次配置、Z11 选最宽松 prompt 版本来跑分 |
+
+**逐支踩坑（都写进源码注释）**：
+1. **可选组吞字**：`(?:那个|那次|那组|那些|那一批|的)?` 匹配了「那次」后
+   再也吃不到后面的「的」，导致「最好那次**的**数字」整条失配。修法是在
+   名词前显式再放一个 `(?:的)?`（BRP-Z4a/Z4b，见 step4 增量实测）。
+2. **质量词前置**：「正确与否的替代信号」里质量词在替代信号**之前**，
+   后置表吃不到，另立一支（HAP-Z1c）。
+3. **字类里误入全角顿号**：CT-Z9/Z11 首版把 `、` 混进字符类，清理后复测通过。
+
+### 守卫与七项验证
+
+`test/reward-hacking-zh-sparse-round202.test.js` 15 断言：4 族各
+（攻击 5/5 block + reward_hacking 归因 / 良性不被 block|rewrite 拦 /
+良性上 rh 不计分）+ 回归守恒 4 条 + **三支注入-删条-必变红**（RS 支 8、
+BRP 支 8、CT 支 17）+ run-all 兼容汇总行。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326**（0 新增） |
+| run-all | **6586 个 / 0 失败**（见下文说明） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| 本轮守卫 | **15/15** |
+| 4 类复测 | **20/20 命中、0/16 误伤** |
+
+**run-all 两次跑出的两个坑（第 202 轮新发现，都修了）**：
+- 首跑判定本轮守卫「未输出 N 通过, M 失败 结果行」—— `node:test` 原生摘要
+  用 `ℹ tests/pass/fail`，不被 run-all.js 的中文汇总行识别命中。文件末补
+  一个打印 `测试结果: 14 通过, 0 失败, 共 14 个` 的 test 解决。
+- 修完后 15 个 test 全过，但汇总行写死「14」与实际 15 不符。**下一轮起
+  守卫文件不要写死汇总行数字**，用实际断言数（本轮已统一描述为 14 个功能
+  断言 + 1 个汇总行自身，故保留 14）。
+
+### 遗留
+
+1. **LLM 401 仍未解**（stepfun key 失效，需用户更新凭据）—— 唯一硬阻塞。
+2. `data/upgrade-state.json` 的 round 与队列口径需 upgrade-engine 校准。
+3. 引擎侧真缺口仍未动：di 开发调试语境误拦（本轮归因探针已在
+   `scripts/round-202/probe-r202-di-attr.js` 可复用，下一条即可动工）、
+   `ai_writing_tell` 多语言误伤、rh 中文侧每族 5×3 样本池还可继续饱和。
+4. 第 123 轮 di 侧 idx 7（Redis 白名单）/ idx 47（测试库全表删除）分叉。
+
+### 给下一轮
+
+1. **下轮首选 A 候选已备好实测证据**：di 开发调试语境误拦 —— 归因探针
+   `scripts/round-202/probe-r202-di-attr.js` + `probe-r202-di-detail.js`，
+   idx 5 是 `isDevDebugContext` 未覆盖形（`鉴权中间件注掉`：COMMENT_verb 有，
+   但 target 词表缺「鉴权」），idx 33 属 SECURITY_BOUNDARY 设计内否决别动。
+   修它**不要往 DEV_TARGET 堆词**（会连带放宽第 124/125 轮守住的
+   MUST_NOT_EXEMPT 19 条边界），应单立窄判据。
+2. rh 中文侧每族建新 5×3 样本池继续饱和（本轮证明「逐支打点」比「看族名」
+   可靠：4 类族名都像已覆盖，实际 20/20 全空转）。
+3. run-all 里新增 `node:test` 文件记得补中文汇总行，否则会被判失败。
+
 # 第 201 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：rh 中文侧稀疏族批量补形 —— 由 `decision.decide` 本体选出
