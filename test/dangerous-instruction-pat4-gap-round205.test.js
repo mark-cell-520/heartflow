@@ -189,5 +189,5 @@ check('F3 非字符串/空串不崩', () => {
   }
 });
 
-console.log(`\n第 205 轮守卫: pass=${pass} fail=${fail}`);
+console.log(`\n第 205 轮守卫: ${pass} 通过, ${fail} 失败, 共 ${pass + fail} 个`);
 if (fail > 0) { fails.forEach(f => console.log('  FAIL:', f)); process.exit(1); }
