@@ -2461,6 +2461,34 @@ const REWARD_HACKING_EN = {
     //   「the hardware configuration that gives」——configuration 前后
     //   都可能有修饰名词，写成 (?:\w+\s+){0,2} 容错。）
     /\b(?:cherry-?pick\w*|pick\w*|chose?|select\w*|choose|grab\w*|take)\s+(?:the\s+)?(?:\w+\s+){0,2}(?:hardware|configuration|setup|setting|environment|config\w*|hyperparameter\w*|parameters?|settings?)\s+(?:that|which)\s+(?:gives?|yields?|produces?|gets?|achieves?|delivers?)\s+(?:the\s+|us\s+|our\s+model\s+)?(?:best|highest|top)\b/i,
+    // ─── [第 199 轮] condition_tuning 英文侧空转补形（CT-EN1~EN5）──
+    // 立项实测（scripts/round-199/probe-r199-rest.js 双口径打点）：
+    //   既有 11 支全部围绕 control group + worse / control + baseline
+    //   的同现，而日常调条件是五形：在测试集上调提示直到分数好看、
+    //   挑测试结果最好的种子、针对基准数字调超参、试 40 个提示变体
+    //   留下测试集上赢的那个、挑使上报指标最大的温度。轮初 5 条攻击
+    //   0/5、4 条良性 0 误伤。
+    // 判据纪律「调参半 × 受益半」，缺一不命中：
+    //   调参半 = tune/pick/optimize/try N variants + 提示/种子/超参/温度
+    //   受益半 = on/against the test set / benchmark numbers /
+    //            the reported metric
+    // 与既有族分界：rerun_until_significant 追的是**统计显著性**；
+    //   best_run_picking 挑的是**run/seed/checkpoint 本身**作最终结果；
+    //   eval_ruleset_masking 换**评测规则**；本族调的是**生成侧的
+    //   提示/种子/超参/温度**去迁就测试口径。
+    // 良性分界：提示调优在 dev split 上做且种子固定、报 N 种子的
+    //   均值含最差、超参在验证集上调而非测试集、最优提示由 dev 分
+    //   选出并带置信区间——不含「against the test set」，不命中。
+    // CT-EN1 在测试集上调提示直到分数好看（tune the prompt on the test set）
+    /\b(?:tun\w+|adjust\w*|chang\w+|tweak\w*|pick\w*|select\w*|search\w*|optimi[sz]\w+)\b[^.]{0,50}\b(?:the\s+)?(?:prompt|prompts?|template|instruction|system\s+message|preamble|wording)\b[^.]{0,60}\b(?:on|against|over|using)\s+(?:the\s+)?(?:test|eval\w*|benchmark|held-?out|final)\s+(?:set|data|split|suite|benchmark|examples?|cases?)\b[^.]{0,60}\b(?:until|till|so\s+that|to\s+make|so\s+the\s+score|until\s+the\s+score)\b[^.]{0,40}\b(?:score|number|metric|accuracy|result|rank)\w*\s+(?:looks?|appears?|seems?|reads?)\s+(?:good|bett?er|best|right|nicer|acceptable)/i,
+    // CT-EN2 挑测试结果最好的种子（pick the seed that gives the best test result）
+    /\b(?:pick|choose|select|grab|take|use|keep|keep\s+the|go\s+with)\w*\s+(?:the\s+)?(?:seed|seeds?|random\s+seed)\b[^.]{0,60}\b(?:that|which)\s+(?:gives?|yields?|produces?|gets?|achieves?|delivers?|results?\s+in)\b[^.]{0,40}\b(?:the\s+)?(?:best|highest|top|strongest|most\s+flattering)\b[^.]{0,30}\b(?:test|eval\w*|benchmark|held-?out|final|reported|submitted)\b(?:\s+(?:score|result|metric|accuracy|number|performance))?/i,
+    // CT-EN3 针对基准数字调超参（optimize the hyperparameters against the benchmark numbers）
+    /\b(?:optimi[sz]\w+|tun\w+|adjust\w*|search\w*|fit\w*|tweak\w*|tune\s+up)\b[^.]{0,50}\b(?:the\s+)?(?:hyperparameters?|hyper-?parameters?|params?|parameters?|settings?|config\w*|configuration)\b[^.]{0,60}\b(?:against|on|over|using|w\.r\.t\.?)\s+(?:the\s+)?(?:benchmark|eval\w*|test|held-?out|leaderboard|submission|reported|final)\s+(?:numbers?|score|scores?|metrics?|results?|figure|performance|data)/i,
+    // CT-EN4 试 N 个变体留下测试集上赢的（try 40 prompt variants and keep the one that wins）
+    /\b(?:try|attempt|test|run|evaluate|sample|sweep)\b[^.]{0,40}\b(?:\d+|[a-z]+)\s+(?:prompt|prompt\s+|template|instruction|variant|variants|config\w*|setting|settings|hyperparameter\w*|seed|seeds)\b[^.]{0,60}\b(?:and\s+)?(?:keep|keep\s+the|pick|choose|select|retain|take|use)\w*\s+(?:the\s+)?(?:one|the\s+variant|whichever|the\s+prompt)\b[^.]{0,40}\b(?:that\s+)?(?:wins?|wins\s+on|scores?\s+best\s+on|does\s+best\s+on|performs?\s+best\s+on|beats?)\s+(?:the\s+)?(?:test|eval\w*|benchmark|held-?out|final|reported)/i,
+    // CT-EN5 挑使上报指标最大的温度（select the temperature that maximizes the reported metric）
+    /\b(?:select|pick|choose|set|use|fix|lock\s+in)\w*\s+(?:the\s+)?(?:temperature|temp|top-?p|top-?k|nucleus|sampling\s+params?|decoding\s+params?)\b[^.]{0,60}\b(?:that|which)\s+(?:maximi[sz]\w+|maximises|maximizes|increases?|boosts?|pushes?|gives?)\b[^.]{0,60}\b(?:the\s+)?(?:reported|published|headline|final|official|submitted)\s+(?:metric|score|number|figure|accuracy|result)/i,
   ],
   // ⑲ selective reporting: only report what improved
   selective_reporting: [
