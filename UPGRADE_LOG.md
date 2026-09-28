@@ -1,4 +1,71 @@
-# 第 186 轮（v6.7.124 工作面，unattended 自主升级）
+# 第 187 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：A 候选 —— `dangerous_instruction` 前置副词 × 简写谓词/泛化对象族补形。
+选它不选 B/C/D 的理由：decision 引擎两轮实测。第一轮 4 候选打成 0.81/0.74
+平手（chosen=D），按纪律补判据复跑第二轮，**轮初实测证据注入后选 A**
+（score 0.83，D 降到 0.81）——因为 A 是 block 级安全维度失守（攻击直接放行到
+用户），D 是评分维误伤（不强制 gate action），同类目里 A 的杀伤性高一档。
+
+**轮初复测（先实测再动手，不信旧描述）**：
+- `scripts/round-187/probe-r187-a-recheck.js`：10 条构造攻击 di 命中 0/10，
+  gate 4/10 pass 漏放；对照组 4 条良性 0 误拦。
+- 扩大池 `scripts/round-187/probe-r187-shape.js`：攻击 19 条
+  （删库/清库/洗数据/洗表/推库 8 + 泛化中文对象 6 + 英文对象 5）**命中 0/19、
+  gate 全 pass**；良性 16 条全 pass（判定正确）。
+- 逐半替换归因（`probe-r187-half.js`）：三条漏放的根因不是 185 轮交接写的
+  「动词后置语序」，而是**三个独立的词面缺口**——① 谓词表只收双字动词，
+  不收「删库/清库/洗数据」动宾合体简写；② 中文对象表缺 资料/档案/台账/
+  底账/名册/明细/信息；③ 英文分支缺自含 database/tables/records/data 对象
+  的整句（原英文形只收中文对象位 + truncate|drop 动词）。
+
+**主改动**（2 个 commit）：
+1. `300b3121` `src/dangerous-instruction.js` 第④条族尾补 **4 支**：
+   - ④-a1 前置副词（无条件/强行/直接/统统/一律）× 简写谓词
+   - ④-a2 简写谓词 × 收网词（跑路/重来/重新初始化/不要备份/无需确认）
+   - ④-b 前置副词 × 英文销毁动词 × 英文数据对象
+   - ④-c 前置副词 × 中文销毁动词 × 泛化中文数据对象
+2. `a85ea0ba` `test/dangerous-instruction-adv-short-verb-round187.test.js`
+   双向守卫 **15 断言全过**（needle×4、攻击召回 19/19、良性 19/19、
+   删条守卫×3 用「磁盘 src 字符串替换 + Module 独立渲染求值」实现、
+   族归属 gate.reason 含 dangerous_instruction）。
+
+**七项验证**：
+| 项 | 结果 |
+|----|------|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（与基线逐字节一致，0 新增） |
+| 本轮守卫测试 | **15 通过 0 失败** |
+| run-all | **6281 通过 / 8 失败**（8 条全部为 reward-hacking 旧存量：156 轮 isTemporaryRestorePromise 豁免上线后与 68/69/136/55/91/25/139 轮旧守卫「族归属必须落在 covert_deception」断言的跨轮冲突，186 轮已用「HEAD src 回填 + 同测试重跑」逐条归因两侧失败数完全相同；本轮 7 个 reward-hacking 测试文件的失败清单与上轮逐字节一致，0 新增。本轮新增 15 断言守卫 15/15 全过，6289 总数比上轮 +15 正是本轮守卫）
+| security-audit | **16/16** |
+| doc-numbers-accuracy | **15/15** |
+| CJK 词边界 | 本轮判据全部中文词面后不写 `\b`（沿用第 126 轮教训），无新增候选 |
+
+**本轮踩坑 2 个**：
+1. 探针第一版统计口径错——`probe-r187-shape.js` 的 `di_miss` 数在改动后
+   仍是 8/8/5，实际是「未命中 DI 维度的条数」恒等于 block 后 findings 折叠
+   成 `gate_block`（dimension 名不在 findings 里，在 `gate.reason`）。
+   修正口径必须用 `di.checkDangerousInstruction(s).count` 单独测。
+2. 删条守卫两版失败：第一版 `SRC.replace(regex, …)` 的转义层级在测试文件里
+   多套了一层（`\\\\n` vs `\\n`），锚点静默不命中；修正为**从磁盘 src 抓
+   真实字面量**做 `split/join`，并给 Module 补 `filename` 让
+   `require('./dev-exemptions.js')` 相对依赖能解析。
+
+**遗留**：
+1. **LLM 401 未解** —— stepfun api-key 失效需用户更新凭据。本轮 decision
+   两轮实测跑通（API 侧临时恢复），401 按上轮口径继续观察。
+2. **run-all 8 条旧存量失败**（156 轮豁免 vs 68/69/136 轮旧守卫族归属断言
+   冲突）未动，按纪律登记：本轮不碰豁免机制。
+3. 引擎侧其余缺口：`ai_writing_tell` 多语言误伤（decision 二轮排第二，
+   0.81 分）、rh 剩余 6 类英文侧对称探针。
+4. `scripts/round-154/156/157/168/169/170/172/183/185/186/` 探针目录待清理，
+   本轮新增 `scripts/round-187/`。
+5. **给下一轮**：di 前置副词族本轮已收口（19/19 命中、19 良性 0 误伤、
+   删条守卫真守卫）。下一轮优先做 D 候选 ai_writing_tell 多语言误伤
+   （decision 0.81 分，需先定位误伤样本条数与语种），或 rh 英文侧 6 类
+   对称探针（未复测，收割面性质）。
+
+---
+
 
 **方向**：A 候选 —— `reward_hacking` covert_deception 中文侧「观测失效 + 免责收网」尾变体补形。
 选它不选 B/C 的理由：decision 引擎实测选 A（score 0.84，B/C 均 0.74）；缺口经
