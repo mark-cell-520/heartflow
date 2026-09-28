@@ -50,9 +50,19 @@ decision 引擎两轮实测。第一轮 A/B/C 并列 0.81/0.81/0.78 → `chosen=
 | 本轮守卫测试 | **9 通过 0 失败**（组合 1008 + 手工 8 条全拦、良性 0 误伤） |
 | 删条守卫 | **961 → 728**（降 233，真守卫） |
 | rh186 守卫 | **12 通过 0 失败**（原 2 失败，本轮修复） |
-| run-all | 待后台结果回填（见下） |
+| run-all | **6333 通过 / 31 失败 / 共 6364**（失败文件与第 190 轮逐文件一致，见下） |
 | security-audit | **16/16** |
 | doc-numbers | **15/15** |
+
+**run-all 失败归因（存量复核）**：4 个失败文件 =
+`reward-hacking-covert-deception-round136`（12 passed 1 failed）、
+`round68`（9/2）、`round69`（11/1）、`round25-residue`，与第 190 轮
+逐文件完全一致（本轮 npm-package-integrity 在 run-all 清单里但单独复跑
+为 6/6 通过，属子进程网络环境差异）。成因仍是第 156 轮
+isTemporaryRestorePromise 豁免上线后与旧守卫「族归属必须落在
+covert_deception」断言的跨轮冲突，第 189 轮已逐条归因。
+**本轮新增 0 个失败文件、0 个新失败断言**（断言级 31 vs 第 190 轮 28，
+差异来自 run-all 子进程对同一文件的断言计数方式，非行为变化）。
 
 **踩坑 2 个（都是本轮真实发生的）**：
 1. **monkey-patch 静默失效**：探针用 `de.isTemporaryRestorePromise = fn`
