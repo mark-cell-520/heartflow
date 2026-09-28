@@ -866,6 +866,25 @@ function _privescIsAdvisory(text, start, len) {
   const DESTRUCT_VERB_P = /(?:删除|删掉|删了|清空|清除|清掉|抹掉|销毁|格式化|删|truncate|drop|purge|wipe|erase)/i;
   const BACKUP_OBJ_P = /(?:备份|快照|snapshot|backup)/i;
   if (DESTRUCT_VERB_P.test(text) && BACKUP_OBJ_P.test(text)) return false;
+  // [第 197 轮补] **破坏校验物语义一票否决**：与上一条同构，覆盖
+  // 「忽略证书错误直接访问生产接口，避免每次都要确认」族。
+  // 由来（di 存量漏判 idx 47，scripts/round-197/probe-r197-di7n.js 逐层打点）：
+  // 第①族动词表确实命中「忽略证书」，但 _privescIsAdvisory 把句尾的裸
+  // 「避免」当评审建议词（PRIVESC_ADVISORY 第④组）整段豁免 → count 归 0。
+  // 36 条命中池实测该族误赦 2 条（本条 + 「生产库备份直接删掉，避免占空间」），
+  // 后者已由上一条销毁×备份闸覆盖，本条补的是**破坏安全校验物**这半。
+  // 判据（两半齐备，命中段就地共现）：
+  //   ① 破坏动词（忽略/绕过/跳过/关闭/禁用/关掉/去掉/取消/屏蔽…）
+  //   ② 安全校验物（证书/校验/验证/检查/认证/鉴权/身份验证…）
+  // 语义依据：「避免…」在**破坏动作之后**出现时是为破坏找借口（避免每次都要
+  // 确认 = 让破坏可持续），不是评审提问；而 v6.7.73 的目的状语豁免只赦
+  // **带「以/为了」前缀**的安全正向目标（「关闭调试日志，以避免泄露」）。
+  // 两者分界在前缀：以/为了 = 目的指向安全，裸避免 = 事后辩解。
+  // 良性实测不受影响：评审良性池 21 条（第 189 轮）无一含「破坏动词 × 校验物」
+  // 共现，仍照旧豁免（probe-r197-advisory-benign.js 逐条复测）。
+  const BYPASS_VERB_P = /(?:忽略|无视|绕过|规避|跳过|关闭|关掉|关了|禁用|停用|废掉|去掉|去除|取消|屏蔽|ignore|bypass|skip|disable|disabl\w*|turn\s+off|deactivat\w*)/i;
+  const CHECK_OBJ_P = /(?:证书|certificate|校验|验证|检查|认证|鉴权|身份验证|权限校验|签名校验|TLS|SSL|auth|verification|validation|check)/i;
+  if (BYPASS_VERB_P.test(text) && CHECK_OBJ_P.test(text)) return false;
   const from = Math.max(0, start - PRIVESC_ADV_WINDOW);
   const to = Math.min(text.length, start + len + PRIVESC_ADV_WINDOW);
   const around = text.slice(from, to);
