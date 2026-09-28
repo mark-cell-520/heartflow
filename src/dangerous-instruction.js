@@ -392,7 +392,47 @@ const DANGEROUS_PATTERNS = [
   // 第 33 轮实测「deactivate the certificate check」pass：第⑥条动词表
   // 只有 ignore|bypass|skip|disable|turn off|remove，而 deactivate 是
   // disable 的同义正式词（官方文档常用），不收它就是词面漏。
-  /(?:ignore|bypass|skip|disable|turn\s+off|remove|deactivat\w*|deinstall|shut\s+off|switch\s+off|clear|purge|wipe)\b[^.]{0,25}\b(?:security|warning|validation|verification|check|auth(?:entication|orization)?|firewall|SSL|TLS|certificate|audit|logs?|antivirus)\b/i,
+  // [第 206 轮补] 设施表词面差集第 9 次对齐（v6.7.123 家族教训）：上一轮补了
+  // 中文把字句（PAT4）的本条差集，但本条纯英文动词形自己的设施表仍缺
+  // access control / privilege check / rbac / sandbox 四项 —— 前两词在 SECURITY_BOUNDARY
+  // 里、后两词在中文把字句形上一轮已收，唯独英文形没收，形成「同词两侧
+  // 词面不一致」的第 9 次复发。实测缺口（probe-r206-gap-a-b.js）：rbac 10 个
+  // 绕过动词全 pass；sandbox 7/10 pass；access control 7/10 pass
+  // （disable/shut off/switch off 三动词由其他支偶然兜底）。
+  // 不收 auth 族裸词扩写口径不变：auth(?:entication|orization)? 已兜底。
+  /(?:ignore|bypass|skip|disable|turn\s+off|remove|deactivat\w*|deinstall|shut\s+off|switch\s+off|clear|purge|wipe)\b[^.]{0,25}\b(?:security|warning|validation|verification|check|auth(?:entication|orization)?|firewall|SSL|TLS|certificate|audit|logs?|antivirus|access\s+control|privilege\s+check|rbac|sandbox)\b/i,
+  // [第 206 轮补] 英文**设施名在前**的祈使被动形（语序缺口，非词面缺口）。
+  // 由来：probe-r206-en-diff.js 语形 E4（the X should be disabled）实测
+  // privilege check / authentication / authorization / rbac 四个差集词全 pass，
+  // 且对照组含 firewall / audit 这种已知安全词也全 pass —— 说明⑥的动词在
+  // 前形覆盖不到「设施词 + 情态 + 被动」语序，缺口是结构性的（与第 80 轮
+  // 「设施词在后动词在后形」、第 125 轮「设施名后置绕过式」同族第三次）。
+  // 判据：真实安全设施词 + 情态（should/must/needs to/has to）+ be + 关闭性
+  // 过去分词，两者缺一不算。
+  // 良性边界（负向断言）：「expired/stale/old/archived audit records should
+  // be deleted」是清理过期记录的正当运维描述，定语紧邻设施词时不算攻击；
+  // 「audit logs should be retained」「certificate should be renewed」等
+  // 动词不在关闭性表内，不命中。
+  /(?<!(?:expired|stale|old|archived|historical|previous|pending)\s)\b(?:firewall|auth\w*|security|audit|access\s+control|privilege\s+check|rbac|sandbox|WAF|IDS|IPS|TLS|SSL|certificate|antivirus)\b[^.]{0,20}\b(?:should|must|needs?\s+to|has\s+to|can)\s+be\s+(?:disabl\w*|remov\w*|delet\w*|turn(?:ed)?\s+off|switch(?:ed)?\s+off|bypass\w*|ignor\w*|skip(?:ped|ping)?|deactivat\w*|uninstall\w*|cleared|dropped|reset)\b/i,
+  // [第 206 轮补] 中英**跨语种混排**形（动词表词面差集第 9 次复发）。
+  // 由来：probe-r206-mixed.js 实测踩到一个此前没意识到的事实 ——
+  // 第①条中文动词表收了「忽略/绕过/跳过」但**没一个英文动词**；
+  // 第⑥条英文动词表收了 ignore/bypass/skip 但设施表**没有一个中文词**。
+  // 于是「ignore/没记错都没收」的跨语种组合两个方向同时漏：
+  //   ① 英文动词 + the + 中文设施词：实测 7 动词 × 11 中文设施 77 格，
+  //      21 格 pass（bypass/skip/ignore/deactivate 四族，全部 hits=[] 无支命中）。
+  //      其中 deactivate 是全表 11/11 全漏（第⑥条有 deactivate 但设施表无中文词）。
+  //   ② 中文动词 + the + 英文设施词：7 动词 × 6 英文设施 42 格，
+  //      41 格 pass（仅 access control × 跳过/绕过 由第 123 行设施名后置形
+  //      偶然兜底）。auth 干词、rbac 在中文把字句形上一轮已收，但中文短动词
+  //      （跳过/绕过/忽略/关闭/禁用/取消/停用）+ 英文设施词的语形无专属支。
+  // 判据沿用既有「动词 × 安全设施两半齐备」，两侧词表互相补齐（各补各的短表，
+  // 不复制全表——全表合并是制造第三份分叉清单）。
+  // 良性边界：工程语境（tests should ignore the auth header when mocking）
+  // 由 dev-exemptions 的 DEV_TARGET/DEV_CONTEXT 赦免链接管，此处只管
+  // 「动词 × 设施共现」的硬命中，不替豁免链做语境判断。
+  /(?:ignore|bypass|skip|deactivat\w*)\s+(?:the\s+|this\s+|that\s+)?(?:鉴权|认证|授权|审计|安全策略|安全机制|安全组|防火墙|访问控制|身份验证|权限校验|权限检查|安全检查|安全警告|入侵检测|沙箱|越权|脱库|渗透|提权|白名单|whitelist|证书|证书校验|加密|签名校验|审计日志|数据库审计)/i,
+  /(?:跳过|绕过|忽略|关闭|关掉|禁用|取消|停用|关)\s+(?:the\s+|this\s+|that\s+)?(?:auth\w*|firewall|audit|sandbox|security|access\s+control|privilege\s+check|rbac|waf|ids|ips|tls|ssl|certificate|antivirus|log|logs)\b/i,
   // 提问句式（how do i / how to / what is the best way）不算指令。
   // 负向断言排除 "root privileges?" / "as root?" 这类问句结尾
   /\b(?:run|execute|launch)\b[^.]{0,20}\b(?:as|with)\s+(?:root|administrator|admin|superuser)\b(?!\s*(?:privileges?|access|permissions?)?\s*\?)/i,
