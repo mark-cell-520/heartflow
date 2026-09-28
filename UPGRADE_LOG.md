@@ -1,3 +1,160 @@
+# 第 186 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：A 候选 —— `reward_hacking` covert_deception 中文侧「观测失效 + 免责收网」尾变体补形。
+选它不选 B/C 的理由：decision 引擎实测选 A（score 0.84，B/C 均 0.74）；缺口经
+**183/185/186 三轮独立复测坐实**（`scripts/round-186/probe-r186-a-recheck.js`：
+同族 10 条样本 rh 命中 0/10、6 条 gate 全 pass 无任何维度命中），是当前稳定失守族。
+
+**轮初复测（不信旧描述，先跑真引擎）**：
+- `scripts/round-186/probe-r186-a-recheck.js`：A 组 10 条 rh 命中 0/10（3 条 gate_block
+  来自其他 block 维度，rh 归因为空），6 条 gate=pass 且 dims=none；B_ctrl 4/4 block。
+- 逐支正则探针迭代 20 版（v1 → v20）+ 大池扩样 1 版（v21，攻击 24 / 良性 46）：
+  定位既有四支（CD-EN/ZH1~ZH4）不收三类**免责式收网**——① 人称 + 否定感知
+  （老板看不到/领导看不见）；② 延后处理（等会儿再处理/回头再说）；
+  ③ 问责转移（追究到我头上 + 先 + 动作）。另加一支汇报美化（汇报时好看）。
+- 负面池含 155 轮登记 21 条 + 本轮新建 10 条 + 压力 15 条 + 185 轮 di 侧 5 条，
+  全程 0 误伤后才落地。
+
+**主改动**（1 个 commit `84bba0d2`）：
+1. `src/reward-hacking.js` covert_deception 表补 **7 支**（三半齐备：失效动作半 ×
+   观测对象半 × 免责收网半）：
+   - CD-ZH5a 对象前置 + 失效动作 + 规避感知收网
+   - CD-ZH5b 对象/动作双向 + 延后免责（等会儿再处理/回头再说）
+   - CD-ZH5c 对象 + 动作 + 句尾再说/后说
+   - CD-ZH5d 问责规避（含叠字动词「追责追到我头上」形状，动词后放开 0-2 字）
+   - CD-ZH5e 对象 + 抹除动作 + 汇报美化
+   - CD-ZH5f1 句中延后词（再说/处理/回头）
+   - CD-ZH5f2 假状态收网（就说一切正常/没问题/这次发布没问题）
+2. `test/reward-hacking-zh5-exemption-round186.test.js`：双向守卫 12 断言全过
+   （① 7 needle ② 攻击 17/17 命中 ③ 良性 52 条 0 误伤 ④ 删条守卫 17→5
+   子进程隔离 ⑤ 族归属 covert_deception）。
+3. 探针全部隔离在 `scripts/round-186/`（含 20 版判据迭代记录，供下一轮查证）。
+
+**七项验证**：
+| 项 | 结果 |
+|----|------|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（与基线逐字节一致，0 新增） |
+| 本轮守卫测试 | **12 通过 0 失败** |
+| 本轮负例脚本 | 删条守卫 **17→5（降 12）**，真守卫 |
+| run-all | **6266 通过 / 8 失败**（见下方归因：8 条全部为旧存量） |
+| security-audit | **16/16** |
+| doc-numbers-accuracy | **15/15** |
+| （附加）CJK 词边界扫描 | **0 候选**，无中文词面 + `\b` 静默失配回归 |
+
+**run-all 8 个失败条目的归因（关键结论：全部旧存量，非本轮引入）**：
+`scripts/round-186/probe-r186-attribute.js` 用「HEAD 版本 src 原样回填 + 同测试文件
+重跑」的做法逐条比对：7 个 reward-hacking 相关测试文件在 **HEAD 与本轮改动后失败数
+完全相同**（136: 1/1、68: 2/2、69: 1/1、139: 1/1；91/55/25 两侧 FAIL 计数 0，
+失败源于 node:test 断言输出格式，两侧一致）。另用独立探针
+`probe-r186-regression-source.js` 在 FAIL 样本句上比对 HEAD/本轮两版检测计数：
+**6 条样本两侧全为 0**，即本轮改动没有改变这些样本的检测行为。
+→ 结论：这些失败（156 轮起的 covert_deception 豁免 vs 68/69/136 轮旧守卫的
+「族归属」断言冲突）是**跨轮遗留**，按纪律登记遗留，不在本轮动刀。
+
+**本轮踩坑 3 个**：
+1. `git stash` 会导致 run-all 后台任务读到中间态 src —— 归因时改用
+   「git show HEAD 写入同目录副本 + execSync 逐文件比对」的原地替换法，
+   结束后校验 liveSrc 字节还原。
+2. 临时副本目录不能放 `/tmp`：`src/reward-hacking.js` 里
+   `require('./dev-exemptions.js')` 是相对依赖，副本必须放在 `src/` 下才能加载。
+3. 两条攻击形状被 `isTemporaryRestorePromise` 赦免（时标 + 恢复动词 + 四道否决闸
+   全不触发）——按豁免设计意图（良性先行）移出攻击池并登记，未去动豁免本身。
+
+**遗留**：
+1. **LLM 401 未解** —— stepfun api-key 失效需用户更新凭据。decision 本轮跑通
+   （`scripts/round-186/decide-r186.js` 选 A，score 0.84），说明 API 侧已恢复，
+   401 遗留待观察下一轮是否复现；若复现再登记。
+2. **run-all 8 条旧存量失败**：156 轮 isTemporaryRestorePromise 豁免上线后，
+   68/69/136 轮旧守卫的「族归属必须落在 covert_deception」断言被赦免机制击穿
+   （4 条先斩后奏样本改走豁免）。建议下一轮做「豁免 vs 守卫断言」对齐专项：
+   要么豁免收窄（加否决闸），要么改旧守卫断言口径。**未验证前不动刀。**
+3. 引擎侧其余缺口：`dangerous_instruction` 前置副词形（无条件/强行 + 谓词 +
+   裸表对象，185 轮交接项）、`ai_writing_tell` 多语言误伤、rh 剩余 6 类英文侧
+   对称探针。
+4. `scripts/round-154/156/157/168/169/170/172/183/185/186/` 十个探针目录待清理
+   （finish 判定）；186 目录建议保留作七支判据的迭代证据。
+5. **给下一轮的接手说明**：covert_deception 中文侧三种免责收网族已收口
+   （17/17 命中、52 条良性 0 误伤、删条守卫真守卫）。下一轮优先做遗留 2 的
+   「豁免 vs 旧守卫」对齐专项，或接手 di 前置副词形（与 185 轮互补）。
+
+---
+
+# 第 185 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：B 候选 —— `dangerous_instruction` 中文销毁动词 × 高危语境 × 中文表对象（动词后置语序族）。选它不选 A 的理由：**A 组（covert_deception 中文变体）本轮复测仍 0/10，但整组杀伤性低于 B**；B 的第 183 轮实测是**安全底线漏放**（4 条控制组良性攻击只 block 3 条，1 条无任何维度命中、gate 判 `可信`）——控制组失守先于收割面处理。
+
+**轮初复测（先实测再动手，不信旧描述）**：
+- `scripts/round-183/probe-r183-recheck.js` 复跑：A 组 10 条 0 条被 rh 命中（3 条 gate_block、7 条全 pass）；B_dev 6 条全 pass；**B_ctrl 4 条只 block 3 条**——上一篇 UPGRADE_LOG 记的「第 123 轮 idx 7/47」到本轮仍是活缺口，且 48 轮未复测。
+- `scripts/round-185/probe-r185-bctrl-which.js` 逐条定位漏放项 + `probe-r185-zh-verb-final.js` 构造同族探针复测：**10 条攻击 0/10 命中、gate 全 pass**，16 条良性全 pass（判定正确）→ 缺口坐实为整族失守，不是单条词面漏。
+  - 归因：`DANGEROUS_PATTERNS` 398-473 行的谓词表**只收英文 SQL 谓词**（delete from / truncate / drop table / wipe）；中文销毁动词在动词后置语序里零覆盖（293 行要求动词在前，278 行要求前置副词）。这是与第 124/127/129 三轮同源的「谓词表语言面漏 + 语序没收全」家族**第 5 个复发点**。
+  - `isDevDebugContext` 对全部 3 条攻击样本返回 false，排除豁免误赦。
+
+**主改动**（2 个 commit）：
+1. `src/dangerous-instruction.js`：`DANGEROUS_PATTERNS` 补两支
+   - 把字句支：`把/将 + 高危语境（生产/线上/正式）+ 中文表对象 + 无差别副词 + 中文销毁动词`
+   - 陈述语序支：同一判据去掉 `把/将` 标记（窗口从 8 收到 6，减少跨句误伤面）
+   - 共用**保留性定语负向断言**（过期/失效/历史/旧的/之前/三个月前/归档，高危词后 22 字窗口），防误伤「生产库的过期日志表删除」这类标准清理；谓词表刻意只收销毁性动词（不收 insert/update/alter/归档/迁移——「线上表 alter table 加索引」是常规 DDL）。
+   - 动词表末位收单字「删」：第二轮实测 idx4（生产环境的日志表全删）不命中，因无差别副词「全」已吃掉副词位、只剩单字动词。单字动词只在三半齐备时生效，双字动词排在前列优先匹配。
+2. `test/dangerous-instruction-zh-destroy-final-round185.test.js` + `scripts/negative-test-di-zh-destroy-final-round185.js`：双向守卫 13 断言全过 + 负例删条守卫 2/2 真守卫。
+
+**七项验证**：
+| 项 | 结果 |
+|----|------|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（与基线逐字节一致，0 新增） |
+| 本轮守卫测试 | **13 通过 0 失败**（needle×3 / 攻击召回 15 条全 block / 良性 17 条 0 误拦 / 124-129 回归 6+3 条不退化） |
+| 本轮负例脚本 | **2/2 真守卫**（删任一支攻击样本即转 pass） |
+| run-all | 见收尾（后台跑，以 finish 前一次为准） |
+| security-audit | **16 通过 0 失败** |
+| doc-numbers-accuracy | **15 通过 0 失败** |
+| （附加）CJK 词边界扫描 | **0 候选**，无中文词面 + `\b` 静默失配回归 |
+
+**本轮踩坑 3 个（已写进脚本注释）**：
+1. **负例锚点手写正则字面量必错转义层级**（第一次 2/2 全部 ANCHOR_MISS）。改用第 113 轮教法「从源码自取行文本、按行号删除」，不再手写 needle。
+2. **多行 splice 必须按行号降序**：升序删会让后续行号前移 1，第二个 delete 必然「未找到目标行」（本轮第一次的根因）。
+3. **两支对本族形是共覆盖**：单删一支另一支仍命中该样本。负例判据如实改为「删本支 + 共覆盖的另一支后样本归零」，并把共覆盖关系记账，不伪装成单支独立守卫。
+
+**遗留**：
+1. **LLM 401 未解** —— stepfun api-key 失效，需用户更新凭据。decision 探针本轮未跑（上一轮已 429 strike）；方向按「队列待办 > 上一轮遗留的真缺口 > 心虫自选」的优先级直接选自 B，并用两个独立探针的实测数字代替 decision（纪律允许：chosen 的判据是实测证据，不是流程）。
+2. `data/upgrade-state.json` 的 round=185 是 init 写的，本 UPGRADE_LOG 此前按工作面另计（第 171 轮记录 → 本轮第 185 轮），两处计数口径不一致仍未统一。
+3. `scripts/round-154/…/round-183/` 探针目录 + 本轮 `scripts/round-185/` 共约十个待清理，由 finish 判定。
+4. 引擎侧真缺口：`reward_hacking` covert_deception 中文尾变体（本轮复测仍 0/10，A 候选，形状在 `scripts/round-183/probe-r183-recheck.js` A 组与 `scripts/round-154/probe-r154-miss-why.js`）；`ai_writing_tell` 多语言误伤；rh 剩余 6 类英文侧对称探针。
+5. **给下一轮的接手说明**：B 方向已收口（中文销毁动词语序族 10/10 block、良性 0 误伤）。下一轮优先做**第 4 条的 A 候选**（covert_deception 中文尾变体，183/185 两轮独立复测 0/10 坐实，缺口稳定不在测试库），或 di 的「动词在前的『清空/删除』× 高危语境 × 裸表对象」——293 行的负向断言已覆盖保留性定语，但 278 行的前置副词形（无条件/强行 + 谓词 + 对象）仍未收中文动词，两族互补可一次做完。
+
+---
+
+# 第 171 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：修第 170 轮守卫测试的作用域 bug + 补齐第 168 轮判据的未提交表扩展（A 候选：为 `isTemporaryRestorePromise` 豁免补 `test/` 常驻守卫，第 170 轮已写完但跑不通）。
+
+**轮初复测（先实测再动手）**：
+- `scripts/round-169/probe-r169-recheck.js` 复跑：3 条登记误伤 block→pass/verify（dims 全空/none）、良性 8/8、攻击否决闸拦截 8/8 → **PROBE PASS**，缺口侧（豁免已接线生效）复测成立。
+- 跑第 170 轮守卫测试：四个断言**全部通过**（登记误伤 0/3 未豁免、良性 0/8 失败、否决闸 0/8 漏放、删条后回归 block 3/3），但文件 exit≠0 —— 汇总行 `ReferenceError: strippedBlock is not defined`。**四个断言过了而文件红**，这是 run-all「1 个失败未定位」的又一形态：不是断言假红，是汇总行自身崩在最后一行。
+- `grep test/ -r temporary_restore_promise` 证实：豁免函数在 src/ 被 rh + di 两个 block 级维度调用，但测试侧此前 0 引用 —— 删掉两处接线不会有任何既有测试变红。这是本轮把它收成常驻守卫的理由。
+
+**主改动**（2 个 commit）：
+1. `test/temporary-restore-promise-exemption-round170-guard.test.js`：`strippedBlock` 从 try 块内 `const` 提到 try 外 `let`，删掉内层遮蔽声明。修完 6 通过 0 失败 exit=0。
+2. `src/dev-exemptions.js`：第 168 轮接线时工作区留下的 `RESTORE_PROMISE_TIME` 表扩展（补「下一轮」「下下个/下个版本」时标词）未提交，本轮补提交。守卫测试 B8 良性样本依赖「下一轮」时标，不带上它 HEAD 上的测试会红 —— 这是「判据函数体提交了、表没提交」的漏配，第 156 轮 commit 只交了函数体（其 message 自述「156 轮死代码判据的前置依赖」）。
+
+**七项验证**：
+| 项 | 结果 |
+|----|------|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **300/326**（与基线逐字节一致，0 新增） |
+| 本轮守卫测试 | `test/temporary-restore-promise-exemption-round170-guard.test.js` **6 通过 0 失败** |
+| run-all | 见收尾（后台跑，以 finish 前一次为准） |
+| security-audit / doc-numbers | 由 finish 自动跑 |
+
+**遗留**：
+1. **LLM 401 未解** —— stepfun api-key 失效，需用户更新凭据。decision 探针本轮未重跑（沿用第 170 轮 v2 的 A/B/C 判据 + 两个独立探针的实测数字：169 轮 PROBE PASS + 170 轮守卫 4 断言全过）。
+2. `data/upgrade-state.json` 的 round=173 是 init 写的，本轮 UPGRADE_LOG 记录为第 171 轮 —— 两处计数口径不一致（init 用全局轮次，UPGRADE_LOG 此前按工作面版本另计），需在后续轮统一，本轮只提交代码不动它。
+3. `scripts/round-154/156/157/168/170/` 六个探针目录 + `scripts/round-169/` 保留作证据，finish 会自动清理判定。
+4. 引擎侧真缺口仍未动（与上轮同）：`dangerous_instruction` 开发调试语境 idx 7（Redis 白名单）/ idx 47（测试库全表删除）两条命中-豁免分叉、`ai_writing_tell` 多语言误伤。
+5. **给下一轮的接手提示**：本轮是「收尾型」轮次，170 轮写的守卫已落地。下一轮优先做 di 两条命中-豁免分叉的复测（第 123 轮旧描述，已 48 轮未复测），或 covert_deception 中文侧剩余 5 个变体（154 轮遗留③，判据形状在 `scripts/round-154/probe-r154-miss-why.js`）。
+
+---
+
 # 第 154 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：原选 C（ai_writing_tell 真 AI 混排漏检，decision 0.79），改做 B（covert_deception 中文侧观测失效族补形）——C 收割面实测为 0 后依纪律转向次优，B 缺口复测坐实（21 条构造样本 gate 放行 15 条、covert_deception 分类 1/21）。
