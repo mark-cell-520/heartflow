@@ -440,7 +440,25 @@ const DANGEROUS_PATTERNS = [
   // be deleted」是清理过期记录的正当运维描述，定语紧邻设施词时不算攻击；
   // 「audit logs should be retained」「certificate should be renewed」等
   // 动词不在关闭性表内，不命中。
-  /(?<!(?:expired|stale|old|archived|historical|previous|pending)\s)\b(?:firewall|auth\w*|security|audit|access\s+control|privilege\s+check|rbac|sandbox|WAF|IDS|IPS|TLS|SSL|certificate|antivirus)\b[^.]{0,20}\b(?:should|must|needs?\s+to|has\s+to|can)\s+be\s+(?:disabl\w*|remov\w*|delet\w*|turn(?:ed)?\s+off|switch(?:ed)?\s+off|bypass\w*|ignor\w*|skip(?:ped|ping)?|deactivat\w*|uninstall\w*|cleared|dropped|reset)\b/i,
+  /(?<!(?:expired|stale|old|archived|historical|previous|pending)\s)\b(?:firewall|auth\w*|security|audit|access\s+control|privilege\s+check|rbac|sandbox|WAF|IDS|IPS|TLS|SSL|certificate|antivirus)\b[^.]{0,20}\b(?:should|must|needs?\s+to|has\s+to|can)\s+be\s+(?:disabl\w*|remov\w*|delet\w*|turn(?:ed)?\s+off|switch(?:ed)?\s+off|bypass\w*|ignor\w*|skip(?:ped|ping)?|deactivat\w*|uninstall\w*|cleared|dropped|reset|truncat\w*|wip\w*|purg\w*|eras\w*)\b/i,
+  // [第 210 轮补] 设施在前形**直接过去时被动**（动词形态缺口，非词面缺口）。
+  // 缺口实测（scripts/round-210/probe-r210-post3.js）：9 设施 × 8 被动形 = 72 格
+  // **60 格 pass**——`the security audit log was deleted` / `the firewall rules were
+  // truncated` 这类过去时被动形命中侧零覆盖。根因是自家规则词面差集第 11 次
+  // 复发（同一动词族两条支只收一半形态）：第 443 行支只收「设施 + 情态
+  // (should/must/needs to) + be + 过去分词」，第 278 行设施在前形动词表只收
+  // **原形**动词（truncate/reset/wipe/purge/clear）——过去分词形（deleted/
+  // wiped/purged/cleared/removed）与 was/were 谓语两侧都不在表内。
+  // 判据（两半齐备 + 中间只允许设施尾词，不用任意 20 字窗口）：设施词 +
+  // 设施尾词（log/records/entries/trail/rules/policies/config…）+ 过去时
+  // 被动谓语（was/were/got/has been/have been）+ 关闭性过去分词，缺一不算。
+  // 窄窗口的理由：`the security controls were reset` 是良性运维陈述，若沿用
+  // `[^.]{0,20}` 任意窗口会把 controls 这种非设施尾词也放进来造成误伤。
+  // 良性边界（负向断言，probe-r210-benign.js 实测 99 句 0 误伤）：
+  // `was rotated` / `was compressed` / `was archived` / `was renewed` /
+  // `were updated` 均不在关闭性分词表内不命中；否定形 `was not deleted`
+  // 用 (?!\s+not\b) 负向前查排除（"日志没被删"是良性陈述）。
+  /\b(?:security|audit|firewall|auth\w*|rbac|sandbox|WAF|IDS|IPS|TLS|SSL|certificate|antivirus|access\s+control|privilege\s+check|whitelist|allowlist|ACL)\s+(?:audit\s+|security\s+|events?\s+)?(?:logs?|records?|entries|trail|rules?|policies|config(?:uration)?|settings?|items?)\s+(?:was|were|got|has\s+been|have\s+been)(?!\s+not\b)\s+(?:delet\w*|truncat\w*|wip\w*|purg\w*|clear\w*|reset|remov\w*|disabl\w*|eras\w*|dropp\w*|deactivat\w*|uninstall\w*|switch\w*\s+off|turn\w*\s+off|skipp\w*|ignor\w*|bypass\w*)\b/i,
   // [第 206 轮补] 中英**跨语种混排**形（动词表词面差集第 9 次复发）。
   // 由来：probe-r206-mixed.js 实测踩到一个此前没意识到的事实 ——
   // 第①条中文动词表收了「忽略/绕过/跳过」但**没一个英文动词**；
