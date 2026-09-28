@@ -1,3 +1,99 @@
+# 第 209 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：第 208 轮遗留 1「`truncate/reset/delete + the security audit log` 三格残余」
+——英文双词复合设施名差集。属「上一轮遗留的真缺口」，不跑 decision（简报已排序）。
+
+## 一、立项量化：18 格真缺口，一个根因
+
+`scripts/round-209/probe-r209-matrix.js` 复测（不信旧描述）：7 英文动词 × 8 设施对象
+= 56 格中 **18 格 pass**，全部集中在两个族：
+  · `security audit + log/logs/trail/records`（15 格）
+  · `security events log`（3 格，复数形）
+
+`scripts/round-209/probe-r209-trace.js` 把 100 条 DANGEROUS_PATTERNS 逐支 exec 打点：
+pass 单元 **零命中**——不是被 discourse 降级，是命中侧压根没收这两个复合名。
+根因与第 208 轮同构：第①条设施表收了 `security logs` / `audit log(s)` / `audit trail`
+裸形与复合形，但「the **security audit** log」是**三词连读**（security + audit + log），
+12 字窗口内没有一个词面能整段匹配。
+
+## 二、预演：补丁只收复合名，不收裸词
+
+`scripts/round-209/probe-r209-fire.js`（变异体对照法）：
+补丁后攻击格 24→39 命中、45 句良性 **0 误伤** → 确认扩面边界是「复合名」而非裸词。
+`probe-r209-benign.js`（gate 链 48 句）：咨询/陈述/保留期三组 45 条全 pass、
+对照组 3 条 block，先行坐实扩面安全。
+
+## 三、改动：一处 src、三个补丁点、3 commit
+
+`src/dangerous-instruction.js` 第①条（P0）设施表尾部追加两个英文复合名族：
+
+1. `security\s+audit\s+(?:log|logs|trail|records?)`
+2. `security\s+event\s+logs?`
+
+复测（`probe-r209-gate.js` + `probe-r209-matrix.js`）翻出两处需收口：
+  · events **复数**形（第一版只收 event 单数）→ 补丁 2：`events?\s+logs?`
+  · `entries` 条目名词（`probe-r209-entries.js` 实测 3/18 格 pass）→ 补丁 3：
+    audit 族合并为 `logs?|trail|records?|entries`
+
+**实测：56 格 18 pass → 0 pass**（7 动词 × 8 对象全 block），
+gate 链 29/29（攻击 24 block + 良性 5 pass）。
+
+## 四、守卫与负例
+
+`test/dangerous-instruction-en-facility-compound-round209.test.js` **73 断言**：
+A1 矩阵 35 格（7 动词 × 5 复合名）、A2 复数形收口（events/records/entries 三形）、
+B1 既有英文设施名回归 13 条、F1 源码词面可锁 4 条（含「未把 security 裸词重复加进表」）、
+F3 gate 链良性 5 条 + 攻击 2 条、G1 非字符串不崩。
+
+负例 `scripts/negative-test-en-facility-compound-round209.js` **6/6**：
+M0 基线绿、M1 删 audit 复合族→红、M2 删 events 族→红、
+M3 audit 族窄化回 records→红（entries/log/trail 三形回到误赦）、
+M4 events 复数收口拿掉→红、
+M5 恒等式：删本轮新增后旧族 12 条仍全守。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | 14/14 |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增）** |
+| run-all | **6865 通过 / 0 失败** |
+| security-audit | 16/16 |
+| doc-numbers | 15/15 |
+| 本轮守卫 | **73/73** |
+| negative-test | **6/6** |
+
+3 个 commit：补丁（两处） / 守卫+负例+README 数字 6792→6865 / 第三处 entries 补丁。
+
+## 五、踩坑
+
+1. **占位符替换把正则源串写进句子**（本轮自己踩 3 次）：probe 用 `V0 the security
+   audit log` + 展开表时，替换逻辑漏了分支展开，导致 `delet\w*` 这类正则源串
+   成了样本动词，探针报「FAIL 3 处」。全是探针自己的 bug，不是引擎缺口。
+   **教训：样本动词必须是真词；正则源串只允许出现在「锁源码词面」断言里。**
+2. **负例红判定第一次失灵**：断言失败时进程在第一处 throw 后终止，末尾汇总行
+   不存在，只按「stdout 有 N failed 计数」判红会漏判（M1/M2 全显示「红」但
+   failed=-1）。补 `ERR_ASSERTION` 计数后才稳定（第 207 轮纪律的延伸：
+   **红 = 非零退出 + 有失败证据**，证据可以是汇总行也可以是断言异常）。
+3. **负例 M5 恒等式写错对象**：第一版让 M5 跑「删新增后守卫仍绿」——守卫必然红
+   （新增判据被删）。改成在真源上直调 `checkDangerousInstruction` 验旧族 12 条。
+4. ROOT 解析：负例脚本放 `scripts/` 下时 `path.resolve(__dirname,'..','..')`
+   得到仓库根（scripts/ 的上级是仓库根），v1 写成 `../..` 少一级导致
+   MODULE_NOT_FOUND。
+
+## 六、遗留（给下一轮）
+
+1. **B 方向仍未做**：G4 英文 whitelist 动词族差集 18/30 pass（decision 0.78）
+   `whitelist/allowlist` 作动词、`put on whitelist` 均 0 命中；`add/insert to` 6/6 已守。
+   与第 208 轮同一条遗留，本轮选了 C 家族残余（能力更高）没动它。
+2. **设施在前形（被动语序）大缺口**：`probe-r209-post3.js` 实测 9 对象 × 8 被动形
+   = 72 格中 **60 格 pass**——`the audit log was deleted` / `the security logs were
+   truncated` 这种**被动形**在动词后置语序里零覆盖（设施在前形第 278 行只收
+   `重置|抹掉|truncate|reset|wipe|purge|clear` 且要求动词紧跟 `(?:记录|日志|项|
+   规则|策略|配置|条目|log|logs?)?\s*` 之后，英文被动形 `was deleted` 的
+   过去分词形不在表内）。这是**动词形态（过去分词）**缺口，比词面缺口更实，
+   误伤面须单独量化（被动形陈述句大量存在：`the log was rotated` 是良性）。
+3. **D 方向四份设施表副本未提共享常量**（结构性重构，单开轮次）。
+4. 归一化缺陷两轮复测均不复现，维持划掉状态。
+
 # 第 208 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：用 HeartFlowDecision 跑真选择（`scripts/round-208/decide-r208.js`），
