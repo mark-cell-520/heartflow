@@ -57,8 +57,13 @@ const SRC_EX = fs.readFileSync(path.join(HF, 'src/dev-exemptions.js'), 'utf8');
 // String.raw 写一层就是一层的字节形状，杜绝本轮 4 次 needle 失配。
 const NL_BAK = String.raw`[^。\n]{0,3}(?:删除|删掉|删了|清空|清除|清掉|抹掉|销毁|格式化|删)(?![^。\n]{0,12}(?:测试库|测试环境|staging|沙箱|开发环境|本地环境|预发|demo\b))[^。\n]{0,4}(?:备份集|备份文件|备份数据|备份数据库|备份库|备份|快照)`;
 const NL_EN = String.raw`\b(?:backup|backups|snapshot|snapshots)\b`;
-const NL_BAK_MIRROR = String.raw`(?=删除|删掉|删了|清空|清除|清掉|抹掉|销毁|格式化|删)(?![^。\n]{0,12}(?:测试库|测试环境|staging|沙箱|开发环境|本地环境|预发|demo\b|过期|失效|历史`;
-const NL_EV_NOTIME = String.raw`(?:日志|记录|痕迹|证据|审计)[^。\n]{0,4}(?:恢复回去|补回去|恢复回来|补回来|重建|重新生成|还原)`;
+// [第 194 轮对齐] needle 全部按磁盘源码实际形状重写（probe-r194-needle5.js
+// 从 src 行抽取验证 includes=true）。原 5 条 needle 里 3 条从未匹配过源码，
+// 属「假锚点」——断言一直红，但红的形状与实现无关。
+// MIRROR = 对象在前高危语序（L703，断言收 过期/失效/历史 + 0,14 窗口）
+const NL_BAK_MIRROR = String.raw`(?:生产|线上|正式|prod\b|production|live)(?![^。\n]{0,24}(?:过期|失效|历史|旧的?|之前|以前|三个月|三天|七天|30\s*天|90\s*天|归档|上个月|上月))[^。\n]{0,6}(?:数据库|库|集群)?[^。\n]{0,4}(?:备份|快照)`;
+// NOTIME = 毁证对象 × 时序词 × 恢复动词（L767）
+const NL_EV_NOTIME = String.raw`(?:日志|记录|痕迹|证据|审计)[^。\n]{0,12}(?:等|待|回头|稍后|随后|事后|之后)[^。\n]{0,10}(?:恢复|重建|补回|还原|再生成)`;
 const NL_EV_MAIN = String.raw`(?:恢复|补回|重建|重新生成|重新建立|还原|再生成|再造|恢复回去|补回去)[^。\n]{0,12}(?:日志|记录|痕迹|证据|审计`;
 
 // ─── ① needle：注入-删条-必须变红 ───
@@ -84,9 +89,16 @@ t('needle: ⑫ 毁证恢复族锚点在源码中', () => {
     '⑫ 毁证恢复族 needle 不在源码中');
 });
 t('needle: 第五道否决闸锚点在源码中', () => {
+  // [第 194 轮对齐] 源码实现是恢复动词游标 + 近邻窗口（RESTORE_EVIDENCE_WINDOW=8）
+  // 扫描，不是单次全文 test。needle 改为锚住这两个真实部件：
+  //   ① 常量名 RESTORE_EVIDENCE_OBJECT（第 190 轮引入的毁证对象表）
+  //   ② 近邻窗口扫描循环（_rm 游标 + 切片 test）
+  // 删掉任一部件本断言必须转红。
   assert.ok(SRC_EX.includes('RESTORE_EVIDENCE_OBJECT'),
     '第五道否决闸 needle 不在源码中');
-  assert.ok(SRC_EX.includes('if (RESTORE_OBJECT_VICTIM.test(text)) return false;'),
+  assert.ok(SRC_EX.includes('RESTORE_EVIDENCE_WINDOW'),
+    '第五道否决闸窗口常量 needle 不在源码中');
+  assert.ok(SRC_EX.includes('if (RESTORE_EVIDENCE_OBJECT.test(text.slice(lo, hi)))'),
     '第五道否决闸判定 needle 不在源码中');
 });
 
