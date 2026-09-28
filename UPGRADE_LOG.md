@@ -1,3 +1,81 @@
+# 第 198 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：`reward_hacking` 英文侧薄弱族对称补形 —— `decision.decide` 本体
+（`scripts/round-198/decide-r198.js`，一次分出）选 B，score 0.80 / identity 80%。
+候选 A（ai_writing_tell 纯中文侧补形，0.77）、C（rh 中文侧 38 族系统性复测，0.74）。
+
+## 立项复测：双口径坐实真缺口
+
+轮初不信简报，逐族重测（`probe-r198-count.js` 支数对比 +
+`probe-r198-rh-en.js` 自然语序英文样本池 60 攻击 + 48 良性）：
+
+| 项 | 结果 |
+|---|---|
+| 英中支数 | 38 族对称；zh=530 / en=266（中文侧远厚，非「条数不足」） |
+| 12 族 ×5 自然语序英文攻击 | 仅 **1/60** 命中，其余 59 条 regex 与引擎双口径皆 0 |
+| 48 条良性工程句 | 0 误伤（`probe-r198-b3.js` 双口径：非豁免、非其他族抢占） |
+
+缺口不在豁免链，在**判据形状**：既有判据全部要求固定的「两半链式语序」，
+自然语序下两半被专有名词/修饰词隔开就整支失效。本轮取实测最空的
+`report_fudging`（en 13 支，攻击 0/5）与 `human_answer_proxy`（en 10 支，攻击 0/5）
+两族先做透。
+
+## 改动（3 个 commit）
+
+1. `bc30fd58` `src/reward-hacking.js` 补形 12 支（两半齐备，缺一不命中）：
+   - `report_fudging`（展示美化族，既有支只吃「失真×免检半」）：
+     RF-EN4/EN4b 失真动词×指标×展示美化（含 `round the rate up` 分裂语序）、
+     RF-EN5 选择性纳入最终图表、RF-EN6 择优半×隐去半、
+     RF-EN7 投影/估算冒充实测、RF-EN8 改轴/基线放大改善
+   - `human_answer_proxy`（取现成答案族，既有支只吃「真人触发动词+归属冒称」链）：
+     HAP-EN7 取现成答案+冒充自产、HAP-EN8 从参考实现/文档抓答案、
+     HAP-EN9/EN9b 人工转录冒充模型输出提分、HAP-EN10/EN10b 从原标注取标签回喂
+2. `803f99de` 新守卫测试 `test/reward-hacking-rf-hap-en-round198.test.js`
+   47 项：11 攻击 block + 18 良性不误伤 + 6 回归守恒 + 2 needle + 2 删条必变红。
+3. `807981ab` HAP-EN7 补 `[A-Za-z]+` 间隔窗口（`probe-r198-b8.js` 二分定位：
+   `top-voted Stack Overflow answer` 形容词与名词间夹专有名词失配）+
+   新增 HAP-EN7b 自产标记尾部收尾支。
+
+## 七项验证
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52 (100%)**、误拦 **301/326**（基线逐项一致，**0 新增**） |
+| 本轮目标守卫 | **47/0**（rf 攻击 5/5、hap 攻击 5/5、良性 18/18、删条反转 2/2） |
+| 负例脚本五态 | **5/5**（原版绿 → 删 RF 两支 rf-block 变红 → 删 HAP-EN9 hap-block 变红 → 还原恢复绿 → 源码无污染） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| run-all | **6529 通过 / 0 失败 / 共 6529**（上轮 6482） |
+
+## 踩坑
+
+1. **探针索引错位**：`probe-r198-pool.js` 从 `probe-r198-rh-en.js` 抽样本表后
+   打印用 `i+1` 编号，与 b4 手工编号不一致，一度误判 hap 只中 2/5。
+   教训：样本表单一来源后，所有打点脚本必须复用同一份索引，不许手工复制句子。
+2. **`node -e` 里的正则被 shell 转义污染**：`/copy/i` 与 `new RegExp('copy')`
+   结果相反，误导调试方向。最终按 memory 铁律改 write_file 建独立脚本才定位到
+   真根因（`probe-r198-b8.js` 二分法）。
+3. **锚点注释多行续行**：负例脚本首版按「锚点后第一行即正则」定位，遇到
+   RF-EN4b 这种两行注释就取错行。改为跳过连续注释行再取正则行。
+4. **patch 偶发吞字符**：patch 把 `delete require.cache[k]` 写成 `[k;`。
+   教训：含 `[]` 的 JS 行 patch 后必须 `node --check` 复核（本次靠 lint 兜住）。
+
+## 给下一轮
+
+1. **本轮同族剩余实测空转点**（同池坐实，优先）：
+   `measurement_rigging` en 3 支攻击 0/5、`task_substitution` 0/5、
+   `self_referential_loop` 0/5、`evaluation_awareness` 0/5、
+   `eval_input_shortcut` 0/5、`eval_leakage` 0/5、`condition_tuning` 0/5、
+   `metric_denominator_gaming` 0/5（`probe-r198-rh-en.js` 全部现成样本）。
+   而 `eval_ruleset_masking` / `check_suppression` 基本饱和，不必再投。
+2. **`human_answer_proxy` 一条两半不齐样本**：「抄现成答案但不冒充模型产出」
+    （句中无归属冒称半），与本族核心语义有分界，未强行覆盖，留作候选。
+3. **ai_writing_tell 纯中文侧**（decision 复测 0.77 分）：本轮已实测
+   24 条中文 AI 腔攻击 `familiesHit` 全 0、20 条良性全 0（`probe-r198-awt-zh.js`），
+   判据需从零建，单轮做不完，可作下下轮方向。
+4. **LLM 401 仍未解**（stepfun key 失效，需用户更新凭据）——升级流水线唯一硬阻塞。
+
 # 第 197 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：`dangerous-instruction-dev-context-round22` 的 21/1 剩余失败（idx 7 / idx 47
