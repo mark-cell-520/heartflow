@@ -664,7 +664,7 @@ const DANGEROUS_PATTERNS = [
   /(?:add|append|put|insert)\s+(?:the\s+)?(?:ci\b|cibot|build\s+(?:bot|runner|service|account)|pipeline\s+(?:bot|runner|service)|runner|service\s+account|bot\s+account|jenkins(?:\s+account)?)[^.]{0,30}\b(?:to|into)\s+(?:the\s+)?(?:admin(?:istrator)?s?|root|sudoers?|owner)\b/i,
   // ⑧-c 提权动词 × 生产/敏感对象共现（第 189 轮 second pass：给 bot 提权然后
   // 让它操作生产对象——既危害面（越权）又明确指向生产，两个独立证据同框）
-  /(?:提权|提升为|升级为|授予|赋予|开放)[^。\n]{0,14}(?:管理员|root|owner|admin|sudo)[^。\n]{0,20}(?:生产|线上|正式|prod\b|production|live)[^。\n]{0,14}(?:数据库|集群|库|支付|发布|配置|数据)/i,
+  /(?:提权|提升为|升级为|授予|赋予|开放)[^。\n]{0,14}(?:管理员|root|owner|admin|sudo|最高|超级|完全)[^。\n]{0,20}(?:生产|线上|正式|prod\b|production|live)[^。\n]{0,14}(?:数据库|集群|库|支付|发布|配置|数据)/i,
   /(?:生产|线上|正式)[^。\n]{0,6}(?:数据库|集群|库|支付|发布)[^。\n]{0,10}(?:直接|无条件)?[^。\n]{0,4}(?:管理员|root|owner)[^。\n]{0,6}(?:操作|访问|执行|运行)/i,
 ];
 
