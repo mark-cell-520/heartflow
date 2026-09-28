@@ -569,7 +569,7 @@ const DI_WEIGHT = 0.85;
 // 三次都没问全。**解法是让清单只有一份**：src/dev-exemptions.js 是唯一来源，
 // 两个维度共用同一个函数。边界依据（开发层设施 vs 真安全边界、生产一票否决、
 // 恶意意图一票否决）完整写在那个文件里，改动只需改一处。
-const { isDevDebugContext, isCompilerNoiseWarning } = require('./dev-exemptions.js');
+const { isDevDebugContext, isCompilerNoiseWarning, isTemporaryRestorePromise } = require('./dev-exemptions.js');
 
 /** 通用匹配器 */
 function _matchAll(text) {
@@ -628,6 +628,15 @@ function _matchAll(text) {
   // 故判据下沉 dev-exemptions.js 只留一份，两个维度共用。
   if (isCompilerNoiseWarning(text) && !MALICIOUS_PURPOSE.test(text)) {
     return { count: 0, hits: [], score: 0, exempted: 'compiler_noise_warning' };
+  }
+  // [v6.7.128 第 168 轮] 临时处置 + 恢复承诺豁免（判据单一来源：src/dev-exemptions.js）。
+  // 缺口实测（脚本隔离在 scripts/round-168/）：「关掉这个检查点只是临时方案，
+  // 回头要恢复」被判 dangerous_instruction → block。156 轮已把判据写进
+  // dev-exemptions.js，但**两个维度都没接线**（第 4 次踩 isCompilerNoiseWarning
+  // 的镜像坑：函数在、调用点不在，等于死代码）。
+  // 判据内部已带四道否决闸（收网意图/删证据/检查自残/交付语境），此处不再叠加。
+  if (isTemporaryRestorePromise(text)) {
+    return { count: 0, hits: [], score: 0, exempted: 'temporary_restore_promise' };
   }
   // [v6.7.125] 恶意目的否决问题框架豁免（第 31 轮）。
   // QUESTION_FRAME 的设计是「疑问=询问做法，指令=要求执行」，但它只看
