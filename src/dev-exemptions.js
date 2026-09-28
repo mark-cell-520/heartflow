@@ -328,6 +328,8 @@ const VERB_FRONT_WINDOW = 24; // 把/字句前向窗口（字）
  *    让单一来源纪律出现两份拷贝，与本文件头注的教训相反）。
  */
 const SEC_OBJ_VERB = /注释掉|注释|注掉|commented[ ]?out|重置|清空|清掉|清理|清除|抹掉|抹除|卸载|卸掉|\breset\b|wipe|purge|clear/gi;
+/** SECURITY_BOUNDARY 的全局副本（只在第三支逐词扫描用，避免 g 污染共享正者的 lastIndex） */
+const SEC_BOUNDARY_G = new RegExp(SECURITY_BOUNDARY.source, 'gi');
 
 function _securityIsVerbObject(text) {
   if (!text || typeof text !== 'string') return false;
@@ -364,16 +366,22 @@ function _securityIsVerbObject(text) {
   //       把日志注掉」第 125 轮良性（命中侧第①条设施在前注释专形兜住攻击侧）
   //    b. 安全词之后出现「的」：「把鉴权中间件的日志注掉」——鉴权是中间件
   //       的定语，动词的真宾语是日志
+  // ⚠️ b 款必须**逐词判**（第 203 轮实测踩到）：「把审计日志的鉴权注释掉」
+  //    里 SECURITY_BOUNDARY 第一个匹配是词首的「审计」，其后有「的」；
+  //    若只取第一个匹配就判定语形，会漏掉**末尾紧邻动词的真宾语**「鉴权」。
+  //    正确口径：只要有一个安全词匹配后面没有「的」，它就是动作对象。
   for (const vm of text.matchAll(SEC_OBJ_VERB)) {
     const before = text.slice(Math.max(0, vm.index - VERB_FRONT_WINDOW), vm.index);
     const baIdx = before.search(/[把將]/);
     if (baIdx < 0) continue;
     const between = before.slice(baIdx + 1);
     if (/[里中内上下]/.test(between)) continue;    // 宿主形，不是宾语
-    const sm = SECURITY_BOUNDARY.exec(between);
-    if (!sm) continue;
-    if (between.slice(sm.index + sm[0].length).includes('的')) continue; // 定语形
-    return true;
+    // SECURITY_BOUNDARY 是单来源共享正则（无 g），这里用全局副本逐词扫：
+    // 直接给它加 g 会影响其他调用点的 lastIndex 状态（跨调用残留），
+    // 那是比本轮缺口更难查的 bug。
+    for (const sm of between.matchAll(SEC_BOUNDARY_G)) {
+      if (!between.slice(sm.index + sm[0].length).includes('的')) return true;
+    }
   }
   return false;
 }
