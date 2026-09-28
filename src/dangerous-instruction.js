@@ -617,7 +617,87 @@ const DANGEROUS_PATTERNS = [
   //   本支：植入物 → 动词（含写入/装到/装上）→ 目标词 → [^。\n]{0,6}
   //   宿主定语窗口（用户家的/公司前台的）→ 设备。
   /(?:把|将)?[^。\n]{0,8}(?:恶意配置|根证书|中间人证书|恶意插件|恶意扩展|恶意程序|恶意软件|木马|后门程序?|键盘记录程序?|嗅探器|监控软件|间谍软件|rootkit|backdoor|keylogger|implant)[^。\n]{0,8}(?:写入|写到|装一?个|装上|装入|装到|加装|植入到|植入|部署到|塞进)[^。\n]{0,10}(?:用户|他人|别人|对方|受害者|受害|员工|客户|同事|公司前台|门店|所有人|大家|user|victim|employee|customer|target)[^。\n]{0,8}(?:电脑|手机|设备|服务器|路由器|收银机|浏览器|终端|系统|机器|machine|device|computer|phone|router|browser)/i,
+  // [第 189 轮补 ⑧ 服务账号提权族] 由来：第 188 轮交接的存量漏放①。
+  // 轮初实测（scripts/round-189/probe-r189-privesc.js，640 条组合生成）：
+  //   · 提权动词 × 生产对象形状 210 条 gate pass，逐条比对 dev-exemptions
+  //     判定 ofWhichDevExempt=0 —— **不是豁免放行，是命中侧零命中**；
+  //   · probe-r189-privesc-vectors.js 手工 28 条同族攻击 di 命中 0/28。
+  // 根因：文件头与第 349 行的提权判据全是**第一人称祈使形**（"给我 root
+  // 权限" / "紧急情况，开放门禁"），动作对象是说话人自己的权限。而真实
+  // 攻击形态是**把第三方账号提升到高权限组**（CI 构建机 / 流水线机器人 /
+  // 服务账号 / deploy bot），主语不是说话人，第 349 行的"给我/授予/开放"
+  // 主语位取不到，第 102①族的动词表（绕过/关闭/删除/清理族 + 第 126 轮
+  // 加入名单族）又不收"提权"语义 —— 三类既有判据各差一个槽位。
+  //
+  // 判据（三半齐备，与本文件 124/127/129/185/187 家族同构）：
+  //   ① 受权主语（⑧-a 中文：账号/凭据/账户/身份 前带 CI/构建/流水线/
+  //      runner/机器人/bot/服务/部署/Jenkins 等自动化主语；⑧-b 英文对称）
+  //   ② 提权动词（中文 提权/提升为/加进…组/授予…权限/赋予…权限/升级为/
+  //      加入…组/设成/开放/分配 + 英文 elevate/promote/grant/give/add…to/
+  //      assign/escalate）
+  //   ③ 目标权限槽（管理员/root/sudo/owner/superuser/administrators/
+  //      admin/超级用户/admin role 等）
+  // 良性边界（不改动任何既有判据，豁免走 _privescIsAdvisory 窄支，见下方）：
+  //   讨论句（"如何查看账号是不是管理员组成员"/"给 CI 账号分配管理员权限有
+  //   什么风险"/"权限评审发现机器人账号权限过大，需要收敛"）由建议语境
+  //   豁免放行；权限清单查询、最小权限原则讨论不受影响（20 条良性池逐条实测）。
+  //
+  // ⚠️ 语序两条：主谓在前（把 X 提权到 Y）与权限槽在前（管理员组 + 加进/
+  //    把 X 设成）都收——中文定语后置的镜像形态，与第 126 轮名单族同款纪律。
+  // ⚠️ 中文词面后不写 \b（第 126 轮同款坑：中文无词边界）。
+  // ⑧-a1 受权主语 × 提权动词 × 目标权限（主语在前）
+  /(?:把|将|给|为|让)?[^。\n]{0,6}(?:账号|帐号|账户|凭据|身份|机器人|bot|runner)[^。\n]{0,4}(?:提权|提升为|升级为|加进|加入|加到|添加到|授予|赋予|设为|设成|开放|开通|分配|挂上|变更|获得|拥有|开启|开|拿到|拿上|领取|申请|来)[^。\n]{0,10}(?:管理员|管理组|root|sudo|owner|superuser|administrators?|admin|超级用户|管理权限|管理员组|管理员权限)/i,
+  // ⑧-a2 目标权限槽在前（"管理员组 + 加进/把 X 加进去"定语后置镜像）
+  /(?:管理员组?|管理组|administrators?\s+group|admin\s+group|root\s+access|sudo\s+group)[^。\n]{0,12}(?:加进|放进|加入|加到|追加|写进|录入|add|append|put|insert)[^。\n]{0,12}(?:账号|帐号|账户|凭据|身份|机器人|bot|runner)/i,
+  /(?:把|将|给|为|让)[^。\n]{0,10}(?:机器人|bot|runner|账号|帐号|账户|凭据)[^。\n]{0,4}(?:设成|设为|改成|改为|变更成)[^。\n]{0,6}(?:管理员|root|owner|admin)/i,
+  // ⑧-a3 需求/意愿形态（主语 + 需要/想要 + 权限），主语在前但提权动词是
+  // 「需要/想要/要求」这类意愿词（本轮 8 条漏放归因实测：4 条是这个形状）
+  /(?:账号|帐号|账户|凭据|身份|机器人|bot|runner)[^。\n]{0,6}(?:需要|想要|要求|得(?:到)?有|须要|必须有)[^。\n]{0,6}(?:管理员|管理组|root|sudo|owner|superuser|admin|超级用户)[^。\n]{0,4}(?:权限|组|身份|角色|access|privileges?)/i,
+  // ⑧-a4 权限词后置形（本轮 3 条漏放归因）：主语词在**动词之后**
+  //   "提升构建机器人账号为管理员" / "赋予流水线账号管理员权限" ——
+  //   a1 的槽位顺序是「主语 … 动词 … 权限」，本族是「动词 … 主语 … 权限」，
+  //   两者互不为子集，必须单独一支。窗口与 a1 对称（主语侧 10 字、
+  //   主语与权限之间 4 字），刻意不收「为/是」等关系动词之外的槽位。
+  /(?:提权|提升|升级|授予|赋予|开放|开通|分配|搭载|挂上|托管|走)[^。\n]{0,10}(?:账号|帐号|账户|凭据|身份|机器人|bot|runner)[^。\n]{0,6}(?:为|成|到|至|给|以)?[^。\n]{0,4}(?:管理员|管理组|root|sudo|owner|superuser|administrators?|admin|超级用户)/i,
+  // ⑧-b 英文对称形：service account / CI runner 等主语 × elevate/promote/grant
+  /\b(?:elevate|promote|grant|assign|give|escalate)\b[^.]{0,30}\b(?:the\s+)?(?:ci\b|cibot|ci\s+build|build\s+(?:bot|account|runner|service)|pipeline\s+(?:bot|runner|service)|deploy(?:ment)?\s+(?:bot|service|account)|runner|service\s+account|bot\s+account|jenkins(?:\s+account)?)[^.]{0,30}\b(?:to\s+)?(?:admin(?:istrator)?s?|root|superuser|owner)\b/i,
+  /(?:add|append|put|insert)\s+(?:the\s+)?(?:ci\b|cibot|build\s+(?:bot|runner|service|account)|pipeline\s+(?:bot|runner|service)|runner|service\s+account|bot\s+account|jenkins(?:\s+account)?)[^.]{0,30}\b(?:to|into)\s+(?:the\s+)?(?:admin(?:istrator)?s?|root|sudoers?|owner)\b/i,
+  // ⑧-c 提权动词 × 生产/敏感对象共现（第 189 轮 second pass：给 bot 提权然后
+  // 让它操作生产对象——既危害面（越权）又明确指向生产，两个独立证据同框）
+  /(?:提权|提升为|升级为|授予|赋予|开放)[^。\n]{0,14}(?:管理员|root|owner|admin|sudo)[^。\n]{0,20}(?:生产|线上|正式|prod\b|production|live)[^。\n]{0,14}(?:数据库|集群|库|支付|发布|配置|数据)/i,
+  /(?:生产|线上|正式)[^。\n]{0,6}(?:数据库|集群|库|支付|发布)[^。\n]{0,10}(?:直接|无条件)?[^。\n]{0,4}(?:管理员|root|owner)[^。\n]{0,6}(?:操作|访问|执行|运行)/i,
 ];
+
+// ─── [第 189 轮] 服务账号提权族的建议语境豁免 ──────────────────
+// 与第 137/138 轮 _payloadMakeIsConfig 同构的**命中段级**豁免：命中段前后
+// ADV_WINDOW 字内出现建议/评审/风险讨论语义时，该命中不算危险指令。
+//
+// 为什么要豁免（20 条良性池实测，2 条会被既有判据误伤）：
+//   讨论提权的**正当形态**是安全评审与最小权限原则的日常语言：
+//   · "如何查看一个账号是不是管理员组成员"（⑧-a2 的镜像形）
+//   · "给 CI 账号分配管理员权限有什么风险"（⑧-a1）
+//   · "权限评审发现三个机器人账号权限过大，需要收敛"
+//   · "为什么要避免给 CI 账号分配管理员权限"
+// 这些句子语义是**劝阻/排查**，没有执行意图，与文件头"如何用 root 权限
+// 运行 Docker？是正当提问，不判"同源。
+//
+// 判据（命中段前后 ADV_WINDOW 字内任一命中即豁免）：
+//   ① 疑问/求教框架（怎么/如何/怎样/为什么/是否/有没有/… + 风险/区别/影响）
+//   ② 评审/收敛语义（评审/审查/盘点/治理/收敛/收紧/排查/检查/审计/违规）
+//   ③ 风险劝阻语义（避免/不建议/不得/禁止/风险/危害/缩小/最小权限）
+// 边界：攻击形几乎不携带这些词（本轮 28 条攻击样本逐条实测，无一命中
+// 豁免三组）；"把 CI 账号提权成管理员，然后直接操作生产数据库"由
+// ⑧-c 抓（不含*任何*建议词），不受本豁免影响。
+const PRIVESC_ADV_WINDOW = 24;
+const PRIVESC_ADVISORY = /(?:怎么|如何|怎样|为什么|为啥|是否|有没有|是不是|能不能|可不可以|要不要)|(?:风险|危害|区别|影响|后果|最佳实践|原则|规范|要求|建议)|(?:评审|审查|盘点|治理|收敛|收紧|排查|检查|审计|违规|巡检|核查)|(?:避免|不建议|不得|禁止|不应|不该|最小权限|least\s+privilege|缩小|收窄)|(?:least\s+privilege)/i;
+
+function _privescIsAdvisory(text, start, len) {
+  if (!text || typeof text !== 'string') return false;
+  const from = Math.max(0, start - PRIVESC_ADV_WINDOW);
+  const to = Math.min(text.length, start + len + PRIVESC_ADV_WINDOW);
+  const around = text.slice(from, to);
+  return PRIVESC_ADVISORY.test(around);
+}
 const DI_LEVEL = 'critical';
 const DI_WEIGHT = 0.85;
 
@@ -741,7 +821,8 @@ function _matchAll(text) {
   const hits = [];
   for (const pat of DANGEROUS_PATTERNS) {
     const m = _t.match(pat);
-    if (m && !_payloadMakeIsConfig(_t, m.index, m[0].length)) {
+    if (m && !_payloadMakeIsConfig(_t, m.index, m[0].length)
+        && !_privescIsAdvisory(_t, m.index, m[0].length)) {
       hits.push({ type: 'dangerous_instruction', matched: m[0].slice(0, 40) });
     }
   }
