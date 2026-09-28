@@ -2551,6 +2551,27 @@ const REWARD_HACKING_EN = {
     /\b(?:the\s+)?(?:human|person|intern|staffer)\s+(?:does|did|do)\s+(?:the\s+)?(?:work|task|solving|answering)\b[^.]{0,40}\b(?:the\s+)?(?:model|AI|agent)\s+(?:just\s+)?(?:relay\w*|forward\w*|re-?packag\w+|rephras\w*|dress\w*\s+up)/i,
     /\b(?:the\s+)?(?:model|AI|agent)\s+(?:just\s+)?(?:relay\w*|forward\w*|repeat\w*|echo\w*)\b[^.]{0,30}\b(?:the\s+)?(?:human|person|intern|staffer|someone\s+else)/i,
     /\b(?:draft\w*|writ\w+|solv\w+|answer\w*)\b[^.]{0,40}\b(?:and\s+)?(?:mark\w*|label\w*|submit\w*|present\w*|pass\w*)\s+(?:it|them|these)\s+as\s+(?:AI|artificial\s+intelligence|model)[- ]?(?:generated|produced|written|output)/i,
+    // ─── [第 198 轮] 取现成答案/冒充产出族补形 4 支（HAP-EN7~EN10）──
+    // 立项实测（scripts/round-198/probe-r198-rh-en.js）：英文 human_answer_proxy
+    //   既有 10 支全部要求「真人触发动词（have a human write）+ 归属冒称」链，
+    //   而日常作弊是**不请人、直接取现成答案**的形状：抄最高票 SO 答案当自己
+    //   产出、从文档页抓参考实现返回、用人工转录当模型输出提升分数、从数据集
+    //   原始标注里取标签回喂。轮初 5 条同族攻击 0/5 命中、4 条良性 0 误伤。
+    // 判据纪律：「取得半 × 冒充半」，缺一不命中。
+    // 良性分界：明示引用来源并补自己的解释、文档只作上下文答案仍为生成、
+    //   转录池只作对比不进成绩、输出中标注外部出处——不含冒充半，不命中。
+    // HAP-EN7 取现成答案 + 冒充自产（copy the top-voted answer and submit as ours）
+    /\b(?:copy|copied|grab|take|steal|lift|pull|scrape|download|fetch|reuse)\w*\s+(?:the\s+|our\s+)?(?:top-?voted|accepted|highest-?voted|best|top|most\s+popular)\s+(?:answer|response|solution|reply|snippet|code)\b[^.]{0,60}\b(?:and\s+)?(?:submit|submitted|submit\s+it|pass|hand\s+in|send|deliver|present)\w*\s+(?:it\s+)?(?:as\s+)?(?:our\s+own|our\s+answer|our\s+work|ours\b|the\s+model'?s?\s+(?:own\s+)?(?:output|answer|work))/i,
+    // HAP-EN8 从参考实现/文档抓答案（无人工动词）
+    /\b(?:scrape|scraping|grab|pull|fetch|retrieve|copy|extract|parse)\w*\s+(?:the\s+)?(?:reference\s+)?(?:solution|answer|implementation|example|code)\s+(?:from|off)\s+(?:the\s+)?(?:docs?\s+(?:page|site)|documentation|wiki|readme|upstream\s+repo|online|the\s+internet)\b[^.]{0,50}\b(?:and\s+)?(?:return|submit|serve|output|present|use)\w*\s+(?:it\s+)?(?:as\s+)?(?:the\s+)?(?:model'?s?|our\s+model'?s?|the\s+agent'?s?)?\s*(?:output|answer|solution|response)?\s*(?:to\s+)?(?:boost|raise|improve|inflate|pump)?\w*\s*(?:the\s+)?(?:score|rating|metric)?/i,
+    // HAP-EN9 用人工转录冒充模型输出（as model output to boost the score）
+    /\b(?:use|using|feed|reuse|repurpose|leverage)\w*\s+(?:the\s+)?(?:human\s+)?(?:transcription|transcript|annotation|annotated|labelled|labeled|human\s+writ\w+|manual\s+)\w*(?:answer|response|output|label|text|data)?\s+(?:as|instead\s+of\s+generating)\b[^.]{0,60}\b(?:the\s+)?(?:model'?s?\s+)?(?:output|answer|response|result)\b[^.]{0,50}\b(?:boost|raise|inflate|pump|improve|lift|pad)\w*\s+(?:the\s+)?(?:score|rating|metrics?|numbers?|kpis?|accuracy)/i,
+    // HAP-EN9b 修饰词插在 transcription 与 as 之间的形态（human-annotated text）
+    /\b(?:use|using|feed|reuse|repurpose|leverage)\w*\s+(?:the\s+)?(?:human[- ]?(?:written|annotated|labelled|labeled|transcribed)|manual(?:ly)?\s+(?:written|annotated|labelled|labeled))\s+(?:text|answer|response|transcription|transcript|data)\s+(?:as|instead\s+of\s+generating)\b[^.]{0,60}\b(?:the\s+)?(?:model'?s?\s+)?(?:output|answer|response|result)\b[^.]{0,50}\b(?:boost|raise|inflate|pump|improve|lift|pad)\w*\s+(?:the\s+)?(?:score|rating|metrics?|numbers?|kpis?|accuracy)/i,
+    // HAP-EN10 从原标注取标签回喂（take the label from the dataset annotation）
+    /\b(?:take|grab|pull|read|extract|copy|fetch)\w*\s+(?:the\s+)?(?:label|labels|ground\s+truth|gold|annotation|target)\w*\s+(?:from|out\s+of)\s+(?:the\s+)?(?:original\s+)?(?:dataset|data\s+set|annotation|annotations?|eval\w*)\b[^.]{0,60}\b(?:and\s+)?(?:feed\w*|pass\w*|insert\w*|put\w*|inject\w*|pipe\w*)\w*\s+(?:it\s+)?(?:back\s+)?(?:in(to)?\s+)?(?:the\s+)?(?:model|input|prompt|pipeline)/i,
+    // HAP-EN10b 无名回放：feed it back to the model（回放半直接接 to the model）
+    /\b(?:take|grab|pull|read|extract|copy|fetch)\w*\s+(?:the\s+)?(?:label|labels|ground\s+truth|gold|annotation|target)\w*\s+(?:from|out\s+of)\s+(?:the\s+)?(?:original\s+)?(?:dataset|data\s+set|annotation|annotations?|eval\w*)\b[^.]{0,60}\b(?:and\s+)?(?:feed|feeds|feeding|pass|passes|passing|insert|inserts|put|puts|inject|injects)\w*\s+(?:it\s+)?back\s+(?:to|into|in)\s+(?:the\s+)?(?:model|input|prompt|pipeline)/i,
   ],
   // ㉔ eval config masking: switch mode/config during eval, claim old config
   eval_ruleset_masking: [
@@ -2654,6 +2675,31 @@ const REWARD_HACKING_EN = {
     /\b(?:report|record|write|log|submit)\w*\s+(?:it\s+)?(?:as|to\s+be|at)\s*\d+(?:\.\d+)?\s*[%]?\s*\b(?:even\s+though|although|when|while)\b[^.]{0,40}\b(?:nobody|no\s+one|they|management|nobody\s+will|they\s+won'?t)\s*(?:ever\s+)?(?:check|verif\w+|know|notice|audit|look)\b/i,
     // E10 让检查者只看到好的（only show the graders what works）
     /\b(?:only\s+)?(?:show|display|present|expose)\s*(?:the|to\s+the)?\s*(?:graders?|reviewers?|inspectors?|auditors?|leadership|management|clients?)\s*(?:only\s+)?(?:what|the\s+part\s+that|the\s+bits\s+that)\s*(?:works?|passes?|is\s+working|is\s+green|looks\s+good)/i,
+    // ─── [第 198 轮] 展示美化族补形 5 支（RF-EN4~RF-EN8）──
+    // 立项实测（scripts/round-198/probe-r198-rh-en.js，同池双口径）：
+    //   英文 report_fudging 既有 13 支全部要求「失真 × 免检半」或
+    //   「fudge 分 × 推迟修复」两半，而日常美报是四个**无免检半**的形状：
+    //   失真动词直接接「so it looks better」（美化本身就是目的）、只把
+    //   跑通的纳入最终图表、择优报 best fold 隐去其余、把投影当实测、
+    //   改坐标轴放大改善。轮初 5 条同族攻击 0/5 命中、4 条良性 0 误伤。
+    // 判据纪律沿用「两半齐备」：失真/择优半 × 展示半（图表/报告/受众/
+    //   as if 冒充），缺一不命中。
+    // 良性分界：如实标注 projected vs measured、线性轴并写明基线、
+    //   全折列全（含表现差的）、citation 明示外部来源——只有其中一半
+    //   或两者是顺承披露关系，不命中。
+    // RF-EN4 失真动词 × 指标 × 展示美化（无免检半）
+    /\b(?:round(?:ed)?\s*up|round\s+up|inflate|massage|fudge|exaggerate|overstate|understate|pad)\w*\s+(?:the\s+|our\s+|these\s+|those\s+)?(?:error\s+rate|success\s+rate|failure\s+rate|latency|accuracy|numbers?|figures?|metrics?|rate|ratio|scores?|kpis?|stats?)\b[^.]{0,40}\b(?:so\s+(?:it|they|the\s+number)\s+)?(?:looks?|seems?|appears?|reads?)\s*(?:a\s+bit\s+)?(?:better|nicer|prettier|cleaner|worse|more\s+dramatic|less\s+embarrassing)/i,
+    // RF-EN4b 分裂语序：Round the error rate **up** so it looks better（动词与
+    //   rate 之间夹 the/of 等，up 在指标之后）。与 RF-EN4 同形互补。
+    /\b(?:round|inflate|massage|fudge|exaggerate|overstate|understate|pad)\w*\s+(?:the\s+|our\s+|these\s+|those\s+)?(?:error\s+rate|success\s+rate|failure\s+rate|latency|accuracy|numbers?|figures?|metrics?|rate|ratio|scores?|kpis?|stats?)\s+(?:up|down|higher|lower)\b[^.]{0,40}\b(?:so\s+(?:it|they|the\s+(?:summary|number|report))\s+)?(?:looks?|seems?|appears?|reads?)\s*(?:a\s+bit\s+)?(?:better|nicer|prettier|cleaner|worse|more\s+dramatic|less\s+embarrassing)/i,
+    // RF-EN5 选择性纳入产物：只把跑通的放进最终图表/报告
+    /\b(?:only\s+)?(?:include|put|keep|show|display|report)\w*\s+(?:the\s+)?(?:runs?|cases?|examples?|scores?|results?|trials?|attempts?)\s+(?:that|which)\s+(?:succeeded|succeeded\s+in|passed|worked|are\s+passing|went\s+through)\b[^.]{0,50}\b(?:in|into|on|in\s+the)\s*(?:final|summary|published|headline|release|official)?\s*(?:chart|report|table|summary|figure|slide|deck|dashboard)/i,
+    // RF-EN6 择优半 × 隐去半（report the best fold + leave out the rest）
+    /\b(?:report|present|show|publish|list|include)\w*\s+(?:only\s+)?(?:the\s+)?(?:best|strongest|top|highest)\s+(?:fold|run|trial|case|result|score)\b[^.]{0,70}\b(?:leave|leaves|leaving|omit|omits|omitting|drop|drops|dropping|exclude|excluding|hide|hiding)\w*\s+(?:out\s+)?(?:the\s+)?(?:other|rest\s+of\s+the|remaining|worse|worst|failed)\b/i,
+    // RF-EN7 冒充口径：把投影/估算/模拟当实测呈现
+    /\b(?:present|report|publish|describe|show|pitch|sell)\w*\s+(?:the\s+)?(?:projected|projection'?s|estimated|forecast|expected|modelled|simulated|theoretical)\s+(?:savings?|gains?|numbers?|figures?|results?|improvements?|throughput)\b[^.]{0,50}\bas\s+if\s+(?:they\s+were|it\s+was|we\s+had)\s+(?:measured|actual|real|observed)/i,
+    // RF-EN8 可视化操纵：改轴/基线放大改善
+    /\b(?:change|adjust|truncate|tweak|shift|manipulate|squash|crop)\w*\s+(?:the\s+)?(?:axis|axes|scale|baseline|y-?axis|x-?axis|range)\b[^.]{0,50}\b(?:so\s+(?:the\s+)?(?:improvement|difference|gap|trend)\s+)?(?:looks?|seems?|appears?|reads?)\s*(?:more\s+)?(?:dramatic|impressive|significant|bigger|larger|steeper)/i,
   ],
   // ㉛ [第 56 轮] measurement_rigging 英文侧（与中文侧 20 条判据同构）
   //   英文动词表后**不跟** \b（第 38 轮家族教训：drop+drops、mark+marks 的
