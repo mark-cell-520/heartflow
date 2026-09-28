@@ -596,13 +596,35 @@ const RESTORE_EVIDENCE_REBUILD = /(?:恢复|补回|重新生成|重建|重新建
 const RESTORE_DEL_THEN_REBUILD = /(?:删|删掉|删除|抹掉|清掉|清除|销毁|涂改|清空)[^。\n]{0,20}(?:再|又|回头|重新|之后)[^。\n]{0,8}(?:补|恢复|重建|生成)/i;
 const RESTORE_CHECK_SELF_HARM = /(?:断言|期望值|assertion|expectation|校验|检查|测试)\s*(?:改成|改为|写成|换成|弄成|调成)\s*(?:恒真|永远为真|true|pass|通过|1)(?![A-Za-z])|(?:返回|输出|给|写死|硬编码)\s*(?:true|pass|通过|正常|成功|ok|1)\s*(?:给|到|让)?|mock\s*(?:时间|时钟|环境|数据)|(?:直接|就)\s*返回\s*(?:true|pass|通过)/i;
 const RESTORE_SHIP_CONTEXT = /(?:上线|发布|投产|交付|推出|上线完|发布后|等发布了?再说|等上线)/;
+// [第 190 轮补] 毁证对象否决闸：恢复承诺的**目的地**是审计对象（日志/记录/
+// 痕迹/证据）时一律不赦。
+// 由来（存量漏放②的第二半，probe-r190-left2.js 坐实）：「等破坏跑完再再生成
+// 日志记录」——⑫族命中判据确实命中了（再生成 × 日志记录），但
+// isTemporaryRestorePromise 在 _matchAll 里**排在主循环之前**，该句
+// WAIT_DONE（等…完）✓ + 恢复动词 ✓ + 四道否决闸全部落空 → 直接 return
+// count 0，命中的判据根本轮不到执行。这是第 189 轮「新增豁免旁路否决链」
+// 教训的镜像：**既有豁免的否决闸本身漏了一个语义槽位**。
+// 判据（与命中侧⑫族同源不同职）：句内出现 恢复/重建/补回/再生成 语义
+// **且**出现毁证对象词（日志/记录/痕迹/证据/审计），即判为毁证后补假证据。
+// 良性边界（probe-r190-restore-split.js 8 条对照池逐条实测）：
+//   · 「等测试跑完再恢复被注释掉的断言」——EVR 命中（断言在毁证对象表里），
+//     但它 restore=false 本来就没被赦免，本闸不改变它的结果；
+//   · 「等容器重启完重新启用收集器」「等补丁打完再重新启用安全扫描」
+//     ——这两句 restore=true 会被本闸影响，但它们的**恢复对象**是
+//     收集器/安全扫描（设施），日志/记录/痕迹/证据 四词一个都不在场
+//     → 本闸判 false，继续放行（本轮实测确认 0 误伤）。
+// ⚠️ 与命中侧⑫族的分界：命中侧要的是「恢复语义 × 毁证对象」共现，
+//    本闸要的是同一形状但用在豁免侧——**两张表语义同源，故意不改用同一
+//    常量**（dev-exemptions 是单一来源模块，dangerous-instruction 的判据
+//    表在另一侧，跨模块共享会把两个职责耦合成一改全跳）。
+const RESTORE_EVIDENCE_OBJECT = /(?:日志|记录|痕迹|证据|审计|现场)/i;
 
 /** [第 188 轮] 时间承诺与恢复动词的相邻窗口（字） */
 const RESTORE_GAP = 8;
 
 function isTemporaryRestorePromise(text) {
   if (!text || typeof text !== 'string') return false;
-  // [第 188 轮] 双通道时间承诺：传统时标词（回头/稍后/明天…）或完成态等待
+  // [第 190 轮] 双通道时间承诺：传统时标词（回头/稍后/明天…）或完成态等待
   // （等 X 完/好 再开）。两通道都要与恢复动词**位置相邻**（≤ RESTORE_GAP 字），
   // 防止上一句的「等…完」跨句赦免这一句的攻击。
   const tm = RESTORE_PROMISE_TIME.exec(text);
@@ -617,6 +639,27 @@ function isTemporaryRestorePromise(text) {
   if (RESTORE_EVIDENCE_REBUILD.test(text) || RESTORE_DEL_THEN_REBUILD.test(text)) return false;
   if (RESTORE_CHECK_SELF_HARM.test(text)) return false;
   if (RESTORE_SHIP_CONTEXT.test(text)) return false;
+  // [第 190 轮] 第五道否决闸：毁证对象在场。恢复承诺的目的地是日志/记录/
+  // 痕迹/证据/审计时，这是毁证后补假证据，不是临时处置。
+  // 良性边界（8 条对照池 + 15 条等待态池实测 0 误伤）：
+  //   「等容器重启完重新启用收集器」「等补丁打完再重新启用安全扫描」
+  //   ——恢复对象是设施，毁证对象词一个都不在场 → 继续放行。
+  // ⚠️ 第一版误伤 1 条良性（round170 守卫 ②-1 实测）：句首「日志先清一遍」
+  //   里日志是**被清理的对象**，句尾「重新打开验证」的恢复对象是设施本身
+  //   ——全文裸词匹配把两者误判成同一个语义。修法：毁证对象必须是**恢复
+  //   动词的近邻**（前后 RESTORE_EVIDENCE_WINDOW 字内），且动词与对象之间
+  //   不得隔着句读（。！？；）——「日志先清一遍，等会儿重新打开验证一下」
+  //   中 打开 与 日志 分居逗号两侧，超出近邻窗口 → 不否决。
+  const RESTORE_EVIDENCE_WINDOW = 8;
+  const _rm = /(?:恢复|补回|重建|重新生成|重新建立|还原|再生成|再造)/g;
+  let _evObj = false;
+  let _me;
+  while ((_me = _rm.exec(text)) !== null) {
+    const lo = Math.max(0, _me.index - RESTORE_EVIDENCE_WINDOW);
+    const hi = Math.min(text.length, _me.index + _me[0].length + RESTORE_EVIDENCE_WINDOW);
+    if (RESTORE_EVIDENCE_OBJECT.test(text.slice(lo, hi))) { _evObj = true; break; }
+  }
+  if (_evObj) return false;
   return true;
 }
 
