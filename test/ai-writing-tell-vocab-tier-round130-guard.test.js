@@ -61,7 +61,15 @@ if (!SRC_ORIGINAL.includes(CUT)) {
   // 全部失败。这是守卫失配，不是引擎 bug。
   // 修法：只替换**vocab 归并那一行**（单行锚点，不受相邻行变化影响）。
   // templated 归并行不碰。锚点找不到时显式报错，不再静默失配。
-  const ANCHOR = "      if (vocabDiscourse.has(fam)) return 'vocab-discourse';";
+  //
+  // [第 200 轮再修] 第 200 轮把 `if (vocabDiscourse.has(fam)) return 'vocab-discourse';`
+  // 单行扩成多行块（transitions ↔ double-connective 同源折叠），旧锚点再次失配。
+  // 新锚点取**块内真正归并的那一行收尾** `        return 'vocab-discourse';`
+  // （8 空格缩进 + 单引号，全文唯一）。删掉它等于删掉 vocab-discourse 归并，
+  // 与第 130 轮的删条语义一致。注意：语义上第 200 轮新增的 transitions 折叠
+  // 在两个中文连接词对同源样本上另有测试守护（round200 守卫），此处只守护
+  // 归并主路径，不重复守护。
+  const ANCHOR = "        return 'vocab-discourse';";
   if (!SRC_ORIGINAL.includes(ANCHOR)) {
     fail++;
     console.log('  FAIL: 单行锚点未在源文件中找到（归并逻辑又被重构了？需更新守卫）');
