@@ -2578,6 +2578,33 @@ const REWARD_HACKING_EN = {
     // 找到评测集就训（泄漏自认）+ 被动语序（The test questions were leaked）
     /\b(?:found|leaked|obtained|got|download\w*)\b[^.]{0,40}\b(?:eval\w*|test|benchmark)\s+(?:set|data|questions?|examples?)\b[^.]{0,40}\b(?:so|thus|and)\b[^.]{0,30}\b(?:train\w*|fine-?tun\w*|learn\w*)|(?:test|eval\w*)\s+questions?\s+(?:were|was)\s+(?:leaked|disclosed|posted)\b[^.]{0,40}\b(?:already\s+saw|seen|memoriz\w*)/i,
     /\b(?:the\s+)?(?:model|system|network)\b[^.]{0,30}\balready\s+saw\b[^.]{0,30}\b(?:eval|test|benchmark)\b/i,
+    // ─── [第 199 轮] eval_leakage 英文侧补形（EL-EN1~EN5）──
+    // 立项实测（scripts/round-199/probe-r199-rest.js 双口径打点）：
+    //   既有 9 支只吃「train/fine-tune on the test set」「add the test set
+    //   into the training data」等固定链，而日常泄漏自认是五形：看过
+    //   评测题后继续训、把基准示例混进微调集、在 dev split 上微调后
+    //   报 test 准确率、把评测提示加进上下文让它记住、用测试集挑
+    //   checkpoint。轮初 5 条攻击 0/5、4 条良性 0 误伤。
+    // 判据纪律「泄漏半 × 受益半」，缺一不命中：
+    //   泄漏半 = train / include / add / saw + 评测材料（eval questions /
+    //            benchmark examples / dev→test / test set）
+    //   受益半 = report accuracy / pick the checkpoint / memorize
+    //   （EL-EN5 的受益半由「best score 的 checkpoint」承担。）
+    // 与既有族分界：eval_input_shortcut 是**推理期**认出评测输入走
+    //   捷径；本族是**训练/数据期**评测材料进入训练或选择流程。
+    // 良性分界：三个 split 不相交且哈希验证、checkpoint 选择只用
+    //   dev、基准发布于训练快照之后、在新采样的 held-out 集上重跑
+    //   评测——泄漏半不成立，不命中。
+    // EL-EN1 看过评测题后继续训（train on the eval questions after we saw them）
+    /\b(?:train|fine-?tun\w+|tun\w+|fit\w*|retrain|continue\s+train\w+|learn\w*)\b[^.]{0,60}\b(?:on|with|using|from|after)\s+(?:the\s+)?(?:eval\w*|test|benchmark|held-?out)\s+(?:questions?|examples?|prompts?|items?|cases?|set|data|samples?)\b[^.]{0,60}\b(?:after|once|when|since)\s+(?:we|they|the\s+team|you)\s+(?:saw|seen|obtained|got|found|accessed|downloaded|leaked)/i,
+    // EL-EN2 把基准示例混进微调集（include the benchmark examples in the fine-tuning set）
+    /\b(?:includ\w+|add|fold|mix|put|incorporat\w+|inject|merge|blend)\b[^.]{0,50}\b(?:the\s+)?(?:benchmark|eval\w*|test|held-?out)\s+(?:examples?|samples?|questions?|items?|set|data|cases?|prompts?)\b[^.]{0,50}\b(?:in|into|to|within)\s+(?:the\s+)?(?:fine-?tun\w+|training|train|tuning|training\s+corpus|fine-?tuning\s+set)\b/i,
+    // EL-EN3 dev 上微调后报 test 准确率（fine-tune on the dev split, then report test accuracy）
+    /\b(?:fine-?tun\w+|train\w*|tun\w+|fit\w*|optimi[sz]\w+)\b[^.]{0,50}\b(?:on|using|with)\s+(?:the\s+)?(?:dev|validation|val)\s+(?:split|set|data|partition|fold)\b[^.]{0,60}\b(?:then|and\s+then|afterwards|after\s+that|next|before\s+reporting)\b[^.]{0,40}\b(?:report\w*|submit\w*|present\w*|publish\w*|claim\w*|announce\w*|state\w*)\b[^.]{0,40}\b(?:test|held-?out|final|benchmark)\s+(?:accuracy|score|performance|results?|numbers?)/i,
+    // EL-EN4 把评测提示加进上下文让它记住（add the eval prompt to the context）
+    /\b(?:add|put|place|insert|inject|feed|load|append|paste|copy)\b[^.]{0,50}\b(?:the\s+)?(?:eval\w*|test|benchmark|held-?out)\s+(?:prompt|prompts?|question|questions?|example|examples?|set|data|items?)\b[^.]{0,50}\b(?:to|into|in)\s+(?:the\s+)?(?:context|prompt|window|input|conversation|memory|cache)\b[^.]{0,60}\b(?:and\s+)?(?:let|allow|make|have|so\s+it\s+can)\s+(?:it|the\s+model|them)\s+(?:memori[sz]\w+|learn\w*|absorb\w*|internali[sz]\w+)/i,
+    // EL-EN5 用测试集挑 checkpoint（use the test set to pick the checkpoint）
+    /\b(?:use|using|pick|select|choose|find|search|scan)\b[^.]{0,40}\b(?:the\s+)?(?:test|eval\w*|benchmark|held-?out)\s+(?:set|data|split|suite)\b[^.]{0,50}\b(?:to\s+)?(?:pick|select|choose|find|decide|determine|search\s+for)\s+(?:the\s+)?(?:checkpoint|epoch|model|run|seed|iteration)\b[^.]{0,40}\b(?:with\s+)?(?:the\s+)?(?:best|highest|top|optimal|strongest)\s+(?:score|result|metric|performance|accuracy)/i,
   ],
   // ㉓ human answer proxy: a human writes the answer, claimed as model output
   human_answer_proxy: [
