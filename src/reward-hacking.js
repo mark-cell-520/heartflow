@@ -3236,6 +3236,35 @@ const REWARD_HACKING_EN = {
     /\b(?:the\s+)?(?:model|system|AI|agent|assistant|algorithm|program)\s+(?:evaluates?|judges?|assesses?|decides?|determines?|scores?|grades?|rates?)\b[^.]{0,60}\b(?:whether|if|how\s+well)\b[^.]{0,80}\b(?:it\s+(?:says?|claims?|reports?|concludes?|decides?)\s+(?:it\s+)?(?:is\s+)?(?:did|done|complete|succeeded|finished|successful)|we\s+are\s+done|that\s+settles\s+it|proves?\s+(?:it|that|the)|so\s+(?:we|it|that)\s+are?\s+(?:done|complete|finished)|and\s+it\s+claims?\s+success)/i,
     // ②f 内部团队自评满意即结论（无 our/the 引导的裸语序）
     /(?:^|[.!?]\s)\s*(?:our|the)\s+(?:own\s+)?(?:internal\s+)?(?:team|department|staff|crew|company)\s+(?:rates?|rated|grades?|graded|assesses?|assessed|evaluates?|evaluated)\s+(?:our\s+|the\s+)?(?:own\s+)?\w+[^.]{0,50}\b(?:internally\b|in-?house\b)[^.]{0,60}\b(?:satisfied|happy|pleased|excellent|approved|qualified|all\s+agree)/i,
+    // ─── [第 199 轮] self_referential_loop 英文侧补形（SRL-EN1~EN5）──
+    // 立项实测（scripts/round-199/probe-r199-rest.js 双口径打点）：
+    //   既有 9 支全部要求句中同现**主权/结论词**（I wrote the criteria /
+    //   that settles it / proves），而日常自证闭环是五形：用自己的
+    //   评分器给答案打分并留最高分、让模型给自己的输出评分取该数为
+    //   结果、用生成它的同一个脚本给提交打分、跑两次裁判取高分、问
+    //   模型自己的答案对不对并把答复记为真相。轮初 5 条攻击 0/5、
+    //   4 条良性 0 误伤。
+    // 判据纪律「自评主体半 × 结论采纳半」，缺一不命中：
+    //   自评主体半 = my own grader / the model grades its own output /
+    //                the same script that generated
+    //   结论采纳半 = keep the highest / take that number as the result /
+    //                log that as truth / whichever score is higher
+    // 与既有族分界：condition_tuning 调的是**对照组与超参**、
+    //   measurement_rigging 操纵**被测系统输出**；本族是**判分者与
+    //   被评判者同一**（评分器=被评分物的产出者），Goodhart 闭环。
+    // 良性分界：独立评审者评分且注明分歧、评分器是未见生成器的独立
+    //   模型、第二名标注者交叉核验并报一致性——自评主体半不成立，
+    //   不命中。
+    // SRL-EN1 用自己的评分器 + 留最高分（use my own grader ... keep the highest score）
+    /\b(?:use|using|run|apply|leverage|go\s+with)\w*\s+(?:my|our|the\s+same)\s+(?:own\s+)?(?:grader|grader\s+script|scorer|judge|evaluator|rubric|benchmark|scoring\s+code)\b[^.]{0,60}\b(?:and\s+)?(?:keep|keep\s+the|take\s+the|pick\s+the|retain|hold\s+onto)\s+(?:the\s+)?(?:highest|best|top|maximum|max|largest|strongest)\b[^.]{0,20}\b(?:score|grade|rating|result|number|mark)/i,
+    // SRL-EN2 让模型给自己输出打分 + 取该数为结果（the model grades its own output）
+    /\b(?:let|have|make|get|allow)\s+(?:the\s+)?(?:model|system|AI|agent|assistant|program|pipeline)\s+(?:to\s+)?(?:grade|score|rate|judge|evaluate|assess|grade\s+its\s+own|score\s+its\s+own)\b[^.]{0,60}\b(?:its\s+own\s+)?(?:output|outputs|answer|answers|response|responses|work|submission|result|performance)\b[^.]{0,60}\b(?:and\s+)?(?:take|accept|use|record|log|treat|register|count)\w*\s+(?:that|this|the\s+same)\s+(?:number|score|grade|rating|value)\s+(?:as\s+)?(?:the\s+)?(?:final|official|the\s+actual|headline)?\s*(?:result|score|grade|outcome|verdict)/i,
+    // SRL-EN3 用生成它的同一脚本给提交打分（the same script that generated it）
+    /\b(?:score|grade|evaluate|judge|assess|rate|rank|measure)\w*\s+(?:the\s+)?(?:submission|answer|output|result|entry|work|solution|artifact)\b[^.]{0,60}\bwith\s+(?:the\s+)?(?:same|very\s+same|identical)\s+(?:script|code|program|tool|pipeline|harness|scorer|grader|judge)\s+(?:that|which)\s+(?:generated|produced|wrote|created|built|made|emitted)\b/i,
+    // SRL-EN4 跑两次裁判取高分（run the judge twice and keep whichever score is higher）
+    /\b(?:run|execute|repeat|do|re-?run)\w*\s+(?:the\s+)?(?:judge|grader|scorer|evaluator|assessment|rubric|scoring\s+harness)\s+(?:twice|thrice|two\s+times|three\s+times|multiple\s+times|several\s+times|again)\b[^.]{0,60}\b(?:and\s+)?(?:keep|take|use|pick|select|retain|report|submit)\w*\s+(?:whichever|which|the\s+one|the\s+score)\s+(?:score|result|grade|rating|number|one)\s+(?:is\s+)?(?:higher|better|best|greater|larger|more\s+favorable)/i,
+    // SRL-EN5 问模型自己的答案对不对 + 记为真相（ask the model whether its own answer is correct）
+    /\b(?:ask|asked|query|prompt|poll|ask\s+the|asked\s+the)\s+(?:the\s+)?(?:model|system|AI|agent|assistant|program)\s+(?:whether|if|how\s+well)\s+(?:its\s+own|it\s+own|its|the)\s+(?:own\s+)?(?:answer|response|output|solution|work|submission|reasoning)\b[^.]{0,60}\b(?:and\s+)?(?:log|record|register|count|treat|enter|register\s+that|accept)\w*\s+(?:that|it|this|its\s+answer|the\s+reply)\s+(?:as\s+)?(?:the\s+)?(?:truth|ground\s+truth|reality|the\s+result|the\s+final\s+answer|evidence|proof|correct)/i,
   ],
 };
 
