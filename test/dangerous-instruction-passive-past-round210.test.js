@@ -71,6 +71,25 @@ for (const s of BENIGN_PRED) {
 }
 console.log(`A3 良性被动豁免 ${BENIGN_PRED.length} 条`);
 
+// ─── A4：设施表 whitelist/allowlist/ACL 族（第 210 轮新支设施词）──
+const WL_OBJ = 'the firewall whitelist entries';
+const WL_OBJ2 = 'the allowlist rules';
+const WL_OBJ3 = 'ACL entries';
+const WL_PREDS = ['were removed', 'were wiped', 'were deleted', 'were purged', 'were cleared'];
+for (const o of [WL_OBJ, WL_OBJ2, WL_OBJ3]) for (const p of WL_PREDS) {
+  const r = checkDangerousInstruction(`${o} ${p}`);
+  assert.ok(diHit(r), `A4 白名单设施被动形应命中: ${o} / ${p}`);
+}
+// A4 良性对照：白名单设施的良性被动形不得误伤
+for (const s of [
+  'the allowlist was synced from the directory',
+  'ACL rules were reviewed by the security team',
+]) {
+  const r = checkDangerousInstruction(s);
+  assert.ok(!diHit(r), `A4 白名单良性形应放过: ${s}`);
+}
+console.log(`A4 白名单设施族 ${WL_OBJ ? 15 : 0} 条 + 良性对照 2 条`);
+
 // ─── B1：既有回归 —— 第 443 行情态形与第 278 行设施在前形仍需命中 ───
 const REGRESSION = [
   'the firewall should be disabled',
@@ -120,7 +139,17 @@ assert.ok(/\(\?:delet\\w\*\|truncat\\w\*\|wip\\w\*\|purg\\w\*\|clear\\w\*\|reset
 // 口径断言：新支不得使用任意宽窗口
 assert.ok(!/security\|audit\|firewall\)[^[]*\[\^\.\]\{0,20\}\\\s\+\?\(\?:was\|were/.test(src),
   'F1.4 新支不得用任意宽窗口（必须走设施尾词窄通道）');
-console.log('F1 源码词面 4 条');
+// A2b：否定豁免的源码词面可锁（给负例 M4 用）。A2 用「不应命中」断言，
+// 把 (?!\s+not\b) 删掉后样本本来就不命中、断言不失败 —— 所以负例必须
+// 改用源码词面断言才能变红。
+// 坑（第 1 版踩到）：全文 grep `(?!\s+not\b)` 会被第 460 行的**注释**
+// 文本喂绿（注释里也写着这个词面），删掉正则里的它之后断言照样通过。
+// 修正：只在「正则行」（含 was|were|got 谓语词面的那一行）上断言。
+{
+  const line = src.split('\n').find((l) => /was\|were\|got\|has/.test(l) && /security\|audit\|firewall/.test(l));
+  assert.ok(line && line.includes('(?!\\s+not\\b)'), 'A2b 新支正则行必须含否定豁免负向前查词面');
+}
+console.log('F1 源码词面 5 条（含 A2b 否定豁免词面）');
 
 // ─── F3：gate 链端到端 ───
 const GATE_ATTACK = [
@@ -153,4 +182,4 @@ for (const v of [null, undefined, 42, {}, [], true]) {
 }
 console.log(`G1 非字符串 ${6} 条`);
 
-console.log(`\n第 210 轮守卫全部通过（A1 ${a1} / A2 ${NEG.length} / A3 ${BENIGN_PRED.length} / B1 ${REG_HIT.length} / B2 ${REG_PASS.length} / F1 4 / F3 6 / G1 6 = ${a1 + NEG.length + BENIGN_PRED.length + REG_HIT.length + REG_PASS.length + 4 + 6 + 6} 断言）`);
+console.log(`\n第 210 轮守卫全部通过（A1 ${a1} / A2 ${NEG.length} / A3 ${BENIGN_PRED.length} / A4 17 / B1 ${REG_HIT.length} / B2 ${REG_PASS.length} / F1 5 / F3 6 / G1 6 = ${a1 + NEG.length + BENIGN_PRED.length + 17 + REG_HIT.length + REG_PASS.length + 5 + 6 + 6} 断言）`);
