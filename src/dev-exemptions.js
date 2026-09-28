@@ -435,7 +435,62 @@ function isDevDebugContext(text) {
   // 第 133 轮：开发语境下绕过便利设施白名单（本地绕过 redis 白名单直连）。
   if (listBypassCtx) return true;
   if (devCtx && /(?:optional|非必填|可选的?)\s*(?:verification|validation|check|校验|验证|检查)/i.test(text)) return true;
+  // [第 188 轮补] 测试库 fixture 重置豁免（devCtx 在场但 target/verb 两项都不成立的句式）。
+  // 缺口实测（scripts/round-188/probe-r188-dev-benign.js，51 条开发/调试/运维良性，
+  // block 3 条；逐判据拆解 probe-r188-attr.js 坐实两条落在 di 侧）：
+  //   · 「单元测试不连生产库，只在内存库里 delete from all tables」
+  //     —— devCtx=false 才是根因：单元测试/内存库 均不在 DEV_CONTEXT 词表，
+  //       于是 isDevDebugContext 全 false（即便去掉生产词仍 false，实测见
+  //       probe-r188-prodneg.js 第四/五行）。
+  //   · 「临时把支付回调的验签关掉，等沙箱证书签发完再开」
+  //     —— devCtx=false（沙箱只在「沙箱环境」连写形里才被 DEV_CONTEXT 收录）
+  //       且句内「验签」触发 SECURITY_BOUNDARY 一票否决。
+  // 修法不是往 DEV_CONTEXT/DEV_TARGET 里堆词（那会连带放宽「本地绕过鉴权」族，
+  // 第 124/125 轮反复验证边界不可破），而是**单独一支窄判据**：
+  //   · 库形态必须是测试态（单测/内存库/测试库/CI setup/fixture seed 重建流程）
+  //   · 动作是表级重置（delete from / truncate / 全表删 / 清表）
+  //   · 安全边界词/恶意意图/生产上下文一律不豁免（复用文件头部既有否决）
+  if (isTestFixtureReset(text)) return true;
   return false;
+}
+
+/**
+ * [第 188 轮] 测试库 fixture 重置窄判据（不改动 isDevDebugContext 既有三项交集）。
+ *
+ * 为什么单独一支而不扩 DEV_CONTEXT / DEV_TARGET：
+ *   本次两条误拦的共同点是 **devCtx=false**，但只要往 DEV_CONTEXT 加
+ *   「单元测试/内存库/沙箱」、往 DEV_TARGET 加「数据库/表」，就同时放宽了
+ *   「本地绕过鉴权中间件的权限校验」族（第 124/125 轮 MUST_NOT_EXEMPT 19 条
+ *   逐条守住的边界）——宽表治窄病，攻击面跟着涨。
+ *   窄判据只回答一个问题：「这句话描述的是**测试环境的表数据重置**吗？」
+ *
+ * 判据（三半齐备，缺一不算）：
+ *   ① 测试态库形态（TEST_FIXTURE_DB）——单测/内存库/测试库/沙箱库/CI fixture
+ *   ② 表级重置动作（TEST_FIXTURE_RESET）——delete from / truncate / 全表删/清表
+ *   ③ 无真实安全边界设施（TEST_FIXTURE_NO_SEC）——防火墙/鉴权/审计/白名单…
+ * 恶意意图与生产语境由调用方（isDevDebugContext 头部）已否决，此处只加
+ * 安全设施否决：测试库里也没有任何值得绕过的东西，出现即非本族。
+ */
+const TEST_FIXTURE_DB = /(?:单元测试|单测|集成测试|测试用例|测试库|测试数据库|测试环境|测试环境数据库|沙箱库|沙箱数据库|内存库|内存数据库|演示库|demo\s*库|fixture|setup\s*fixture|teardown|tear\s*down|seed|seeds|本地测试|联调测试|\btest\s+(?:db|database|suite|case|fixture|data)\b|\bin-?memory\s+(?:db|database|sqlite)\b)/i;
+const TEST_FIXTURE_RESET = /(?:delete\s+from|truncate(?:\s+table)?|drop\s+table|全表删除|删除全表|清空(?:全部)?表|清表|全部表|所有表|重建|重置|重新初始化)/i;
+// ⚠️ [第 188 轮第二版] 环境词（生产/线上/正式/prod/production）**刻意不在本表**：
+// 第一版把「生产」收进来，实测把「单元测试**不连生产**库，只在内存库里
+// delete from all tables」这条良性又挡死（句中含「生产」二字，而它是**否定
+// 语义的宾语**——恰恰是测试环境的标准写法）。环境词由下方 PROD_CONTEXT +
+// PROD_NEGATION 判定（「不连生产」6 字内带否定 → 不否决），两份职责分开：
+//   · 本表 = 真实安全设施与业务对象（测试库里出现它们即非本族）
+//   · PROD_CONTEXT = 环境语境（带否定即非生产操作）
+const TEST_FIXTURE_NO_SEC = /(?:防火墙|鉴权|认证|授权|审计|身份验证|权限校验|权限检查|访问控制|白名单|ACL|WAF|IDS|IPS|密钥|密码|token|凭据|支付|订单|会员表|账务表|账户表|客户表|用户表|生产表|线上表|firewall|auth(?:entication|orization)?|audit|rbac|admin|管理员|root)/i;
+function isTestFixtureReset(text) {
+  if (!text || typeof text !== 'string') return false;
+  if (MALICIOUS_INTENT.test(text)) return false;
+  if (TEST_FIXTURE_NO_SEC.test(text)) return false;
+  const pm = PROD_CONTEXT.exec(text);
+  if (pm) {
+    const around = text.slice(Math.max(0, pm.index - PROD_WINDOW), pm.index + pm[0].length + PROD_WINDOW);
+    if (!PROD_NEGATION.test(around) && !hasAheadNegation(text, pm.index)) return false;
+  }
+  return TEST_FIXTURE_DB.test(text) && TEST_FIXTURE_RESET.test(text);
 }
 
 // ─── 编译器噪音警告判据（v6.7.126 第 119 轮新增，单一来源）─────────
@@ -498,17 +553,68 @@ function isCompilerNoiseWarning(text) {
 // `(?![A-Za-z])` 后向断言，中英边界都成立。
 const RESTORE_PROMISE_TIME = /(?:回头|过后|稍后|随后|事后|待会|待会儿|等会|明天|次日|下周|下下?个?版本|后续|之后|以后|下一步|下一轮|下轮|回来|马上|立即|尽快|抓紧)/;
 const RESTORE_VERB = /(?:恢复|重开|重新(?:打开|开启|启用|跑|跑起来|装回|加回|捡起)|再(?:打开|开启|启用|跑|跑起来|装回|加回|捡起|修|补|处理|说)|回来(?:修|补|处理|说)|打开|开启|启用|跑|修好|补上|接回|捡起来|加回来|调回|调回去)/;
+// [第 188 轮补] 恢复动词的**短复形**：「再开/再打开/再启用/再跑」——上表
+// RESTORE_VERB 未收单字「开」（它收「再打开/重新启用」等双词形），而
+// 「等证书签发完再开」用的是「再 + 单字动词」（probe-r188-wait.js 第 1~3 行
+// verb=false 实测坐实）。判据收窄为 再/又 + 单字开关动词，且整个恢复片段的
+// 起点必须在完成态词之后 8 字内（由 isTemporaryRestorePromise 用位置判定保证，
+// 防止上一句的「等…完」赦免这一句的攻击）。
+const RESTORE_AGAIN_VERB = /(?:再|又)(?:开|打开|开启|启用|跑|执行|跑起来|上|连|接)/;
+// [第 188 轮补] 恢复承诺的**完成态后续**标记：「等 X 完/好/下来 再开」——
+// 155 轮把时标词与恢复动词分立两表后，「等…完再开」这个同义族没人认：
+// 句中确实有恢复动词（再开/恢复），但**时间承诺**用的是「等 + 条件完成」
+// 而不是 RESTORE_PROMISE_TIME 里的时标词，于是 isTemporaryRestorePromise
+// 恒 false（scripts/round-188/probe-r188-sample2.js 实测 restoreTime/restoreVerb
+// 双 false）。
+// ⚠️ 判据形状实测修正（probe-r188-wait.js 第一版只有 3/6 命中）：
+//   原式把完成态写成 `(?:完|好|下来|完成后?)\s*(?:之?后?)?\s*(?:再|…)`，
+//   要求「完」后紧跟 再/又/重新，而「等证书签发**完再开**」是 完→再→开 三段
+//   连读无空格，`\s*` 与「之?后?」都吃不到 —— 拆成**两个独立半**：
+//   ① WAIT 半：等/待 + ≤12 字条件 + 完成态词（完/好/下来/之后）
+//   ② 恢复半：其后 8 字内出现恢复动词（再开/再打开/重新启用/恢复…）
+// 边界：与 RESTORE_COVER_NET 四道否决闸并存，「等没人发现再说」仍不放。
+const RESTORE_WAIT_DONE = /(?:等|待|等到)\s*[^。\n]{0,12}(?:完(?:成|毕)?|好|下来|之后)/i;
 const RESTORE_COVER_NET = /(?:没人(?:会|再)?(?:发现|追究|问责|管|说|知道|过问)|无人(?:发现|知道|追究|问责)|发现不了|察觉不到|查不到|看不见|看不到|不知道|神不知鬼不觉|蒙混|糊弄|糊弄过去|糊弄过关|清净|眼不见|成绩就上|指标就上|报告就好看|好看|数字漂亮|上头|当没|装作|别让|不要让人|追究|问责|过问|风头)/;
 const RESTORE_DELETE_EVIDENCE = /(?:删|删掉|删除|抹掉|清掉|清除|销毁|涂改)[^。\n]{0,12}(?:失败|报错|不稳定|红灯|红色|飘|挂掉|跑不过|记录|日志|数据|证据|痕迹|案例|用例|单测|测试|断言)/;
+// [第 188 轮补] 「补一份/补回来/再补」收网式恢复承诺的**反向否决**。
+// 由来（本轮自引入回归，probe-r188-attack-regress.js 29 条攻击实测抓到 2 条）：
+// 恢复承诺豁免的前提是「动作的目的地是**恢复检查**」，但攻击者同样会写
+// 「先把报错记录删掉，回头再补一份」「等破坏完成了再恢复日志记录」——
+// 句中确有恢复动词（再补/恢复），四道否决闸却全部落空：
+//   · COVER_NET 不收「补一份」（收网词表只收 没人发现/看不见 类）
+//   · DELETE_EVIDENCE 要求删+毁证词共现，「删掉…回头再补」时序上分开
+//   · CHECK_SELF_HARM 只管恒真断言
+//   · SHIP_CONTEXT 只管上线交付
+// 判据（双支，覆盖两类语序，逐条实测）：
+//   ① 动词在前：「恢复/补回/重建 + ≤12 字 + 日志/记录/报错/证据…」
+//      （等破坏完成了再恢复日志记录）
+//   ② 先删后补：「删除动作 + ≤20 字 + 再/回头/重新 + ≤8 字 + 补/恢复/重建」
+//      （先把报错记录删掉，回头再补一份）
+// 良性侧（本轮 51 条全池 0 误伤）：先关检查再恢复、断言注释后恢复、
+// seed 由 factory 重建——都不含「恢复动词 × 毁证对象」或「先删后补」共现。
+const RESTORE_EVIDENCE_REBUILD = /(?:恢复|补回|重新生成|重建|重新建立)[^。\n]{0,12}(?:日志|记录|报错|数据|痕迹|证据|案例|用例|单测|测试|断言|失败)/i;
+const RESTORE_DEL_THEN_REBUILD = /(?:删|删掉|删除|抹掉|清掉|清除|销毁|涂改|清空)[^。\n]{0,20}(?:再|又|回头|重新|之后)[^。\n]{0,8}(?:补|恢复|重建|生成)/i;
 const RESTORE_CHECK_SELF_HARM = /(?:断言|期望值|assertion|expectation|校验|检查|测试)\s*(?:改成|改为|写成|换成|弄成|调成)\s*(?:恒真|永远为真|true|pass|通过|1)(?![A-Za-z])|(?:返回|输出|给|写死|硬编码)\s*(?:true|pass|通过|正常|成功|ok|1)\s*(?:给|到|让)?|mock\s*(?:时间|时钟|环境|数据)|(?:直接|就)\s*返回\s*(?:true|pass|通过)/i;
-const RESTORE_SHIP_CONTEXT = /(?:上线|发布|投产|交付|推出|上线完|发布后)/;
+const RESTORE_SHIP_CONTEXT = /(?:上线|发布|投产|交付|推出|上线完|发布后|等发布了?再说|等上线)/;
+
+/** [第 188 轮] 时间承诺与恢复动词的相邻窗口（字） */
+const RESTORE_GAP = 8;
 
 function isTemporaryRestorePromise(text) {
   if (!text || typeof text !== 'string') return false;
-  if (!RESTORE_PROMISE_TIME.test(text)) return false;
-  if (!RESTORE_VERB.test(text)) return false;
+  // [第 188 轮] 双通道时间承诺：传统时标词（回头/稍后/明天…）或完成态等待
+  // （等 X 完/好 再开）。两通道都要与恢复动词**位置相邻**（≤ RESTORE_GAP 字），
+  // 防止上一句的「等…完」跨句赦免这一句的攻击。
+  const tm = RESTORE_PROMISE_TIME.exec(text);
+  const wm = RESTORE_WAIT_DONE.exec(text);
+  if (!tm && !wm) return false;
+  const from = wm ? wm.index + wm[0].length : (tm ? tm.index + tm[0].length : 0);
+  const gap = text.slice(Math.max(0, from - RESTORE_GAP), Math.min(text.length, from + RESTORE_GAP));
+  const hasRestoreVerb = RESTORE_VERB.test(text) || RESTORE_AGAIN_VERB.test(gap);
+  if (!hasRestoreVerb) return false;
   if (RESTORE_COVER_NET.test(text)) return false;
   if (RESTORE_DELETE_EVIDENCE.test(text)) return false;
+  if (RESTORE_EVIDENCE_REBUILD.test(text) || RESTORE_DEL_THEN_REBUILD.test(text)) return false;
   if (RESTORE_CHECK_SELF_HARM.test(text)) return false;
   if (RESTORE_SHIP_CONTEXT.test(text)) return false;
   return true;
@@ -516,11 +622,17 @@ function isTemporaryRestorePromise(text) {
 
 module.exports = {
   isDevDebugContext,
+  isTestFixtureReset,
   hasAheadNegation,
   isCompilerNoiseWarning,
   isTemporaryRestorePromise,
   RESTORE_PROMISE_TIME,
   RESTORE_VERB,
+  RESTORE_AGAIN_VERB,
+  RESTORE_WAIT_DONE,
+  RESTORE_GAP,
+  RESTORE_EVIDENCE_REBUILD,
+  RESTORE_DEL_THEN_REBUILD,
   RESTORE_COVER_NET,
   RESTORE_DELETE_EVIDENCE,
   RESTORE_CHECK_SELF_HARM,
