@@ -588,13 +588,20 @@ function detect(text) {
   //   证据撑起共现门槛（familiesHit=2 → score 0.46）。
   //   这是「同一词表当两个独立证据」错误的第 5 次同型复现
   //   （130/131/132 同维度三轮 + 141/142 跨维度两轮之后的又一次）。
-  // 修法沿用同一纪律：double-connective 命中且 transitions 真命中时，
-  // 折叠到 vocab-discourse 那一票，不再另起独立证据。
-  // 反向确认：第 50 轮 double-connective 攻击池 5 条的英侧词全部是
-  //   firstly/secondly/then/to begin with/in conclusion，与 TRANSITIONS
-  //   交集只有「in conclusion」一条；anchor-mix 与 tier-phrase 两条独立
-  //   支仍在，攻击池命中不塌（见 round200 守卫测试逐条断言）。
-  const hasTransitionsDiscourse = (findings || []).some(f => f.dimension === 'ai-tell-transitions');
+  // 修法沿用同一纪律，但**折叠方向与上一版相反**：
+  //   第一版把 double-connective 折向 vocab-discourse，实测无效
+  //   （probe-r200-awt3.js：normalizedFams 仍为 [zh-en-mixing,
+  //   vocab-discourse]）——因为真正被重复计数的是 transitions 那一票
+  //   （命中的 moreover/furthermore 就是连接词对英侧的那个词）。
+  //   改为把 transitions 折进 zh-en-mixing（连接词对是更窄的判据，作代表票）。
+  // 反向确认（probe-r200-awt4.js，6 个形状逐条实测）：
+  //   · 锚单独在场、无英文词 → 0（不变）
+  //   · 第 50 轮 double-connective 攻击池 5 条 → 仍计分（英侧 firstly/
+  //     secondly/then/to begin with 不在 TRANSITIONS 内，hasConnectivePair
+  //     条件成立但 transitions 未命中，折叠不触发）
+  //   · 锚 + 3 个英文词无连接词对 → 0（不变，anchor-mix 单支不撑共现）
+  //   · 边界样本（锚 + 连接词对 x2）→ 0（本轮修复目标）
+  const hasConnectivePair = (findings || []).some(f => f.dimension === 'ai-tell-zh-en-mixing' && f.zhEnSrc === 'double-connective');
   // [第 142 轮] 上轮折叠不彻底的同型错误第 4 次复现（跨维度版）：
   // 第 141 轮把 zh-en-mixing 整族统一归一化到 'zh-en-mixing' 一票，修好了
   // **同维度内**的叠票；但当时实测就仍有 3/11 误伤没上报（本轮 run-all
@@ -613,7 +620,22 @@ function detect(text) {
   const normalizedFams = new Set(
     (findings || []).map((f) => {
       const fam = f.dimension.replace(/^ai-tell-/, '');
-      if (vocabDiscourse.has(fam)) return 'vocab-discourse';
+      // [第 200 轮] 先算连接词对是否在场（下方向 folds 用它做方向判定）：
+      //   double-connective 支命中 → zh-en-mixing hasConnective 一票存在
+      const hasConnectivePair = (findings || []).some(x => x.dimension === 'ai-tell-zh-en-mixing' && x.zhEnSrc === 'double-connective');
+      if (vocabDiscourse.has(fam)) {
+        // [第 200 轮 第 6 次同型] transitions 词与 double-connective 英侧逐字
+        // 同源（ZH_EN_CONNECTIVE_PAIRS 英侧含 moreover/furthermore/
+        // additionally/in conclusion/in summary，TRANSITIONS 同样含这些词）：
+        // 正当中英对照句「总之，overall…；此外，moreover…」同时被
+        // zh-en-mixing(double-connective) 与 transitions 命中，familiesHit=2
+        // → score 0.46 → gate verify（第 200 轮误伤，probe-r200-gate.js 实测）。
+        // 修法：连接词对在场时，transitions 那一票折进 zh-en-mixing
+        //（连接词对是更窄的判据，作代表票）；无连接词对时 transitions
+        // 保留 vocab-discourse 本位（第 131 轮归并纪律不受影响）。
+        if (fam === 'transitions' && hasConnectivePair) return 'zh-en-mixing';
+        return 'vocab-discourse';
+      }
       if (templatedFrames.has(fam)) return 'templated-frames';
       if (fam === 'zh-en-mixing') {
         // tier-attributive 与 vocab-discourse 同源（同一批 TIER 词表）：
@@ -624,10 +646,10 @@ function detect(text) {
         //     double-connective / tier-adverbial 与之同族不互相当证据
         //     （第 50 轮「单族未清零」守卫样本正是这个形状）
         if (f.zhEnSrc === 'tier-attributive' && hasVocabDiscourse) return 'vocab-discourse';
-        // [第 200 轮] double-connective ↔ transitions 同源（交集词见上方
-        // hasTransitionsDiscourse 注释）：transitions 真命中时折叠过去，
-        // 否则保留独立证据位（第 50 轮「单对中英连接词」留白正是这个形状）。
-        if (f.zhEnSrc === 'double-connective' && hasTransitionsDiscourse) return 'vocab-discourse';
+        // [第 200 轮] transitions ↔ double-connective 同源（见上方
+        // hasConnectivePair 处注释）：折叠在 transitions 分支完成（那里是
+        // 真正该消除的那一票）。此处不再折 zh-en-mixing 自己的支——
+        // anchor-mix 与 double-connective 本就在同族内只算一票。
         return 'zh-en-mixing';
       }
       return fam;
