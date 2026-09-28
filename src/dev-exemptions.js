@@ -646,6 +646,11 @@ const RESTORE_BACKFILL_A = new RegExp(BACKFILL_N + '[^。\\n]{0,6}' + TIME_M + '
 const RESTORE_BACKFILL_B = new RegExp('(?:再|又|回头|重新)[^。\\n]{0,8}' + BACKFILL_V + '[^。\\n]{0,8}' + BACKFILL_N, 'i');
 // 语序③ 时标前置 + 追补动词 + 裸追补名词（先X动作，回头补一份XX）
 const RESTORE_BACKFILL_C = new RegExp('(?:先|提前)[^。\\n]{0,20}(?:再|又|回头|重新|以后|后面|之后|随后|事后|过后)[^。\\n]{0,10}' + BACKFILL_V + '[^。\\n]{0,4}(?:一|份|个|张|下)?[^。\\n]{0,4}' + BACKFILL_N, 'i');
+// [第 194 轮补] 第八道否决闸判据（模块级，供导出与 needle 守卫复用）：
+// 销毁动词 × 备份对象。RESTORE 动词表刻意不含「删除/清空」族——
+// 真承诺的对象是设施/代码，不是备份；缓期销毁与临时处置语义相反。
+const DESTROY_VERB_8 = /(?:删除|删掉|删了|清空|清除|清掉|抹掉|销毁|格式化|删|truncate|drop|purge|wipe|erase)/i;
+const BACKUP_OBJ_8 = /(?:备份集|备份文件|备份数据|备份数据库|备份库|备份|快照)/i;
 
 
 /** [第 188 轮] 时间承诺与恢复动词的相邻窗口（字） */
@@ -712,6 +717,20 @@ function isTemporaryRestorePromise(text) {
   // 三语序任一命中即不赦——追补目的地是合规要件而非检查设施时，
   // 「先X后补」不是临时处置而是规避控制（注释见常量定义处）。
   if (RESTORE_BACKFILL_A.test(text) || RESTORE_BACKFILL_B.test(text) || RESTORE_BACKFILL_C.test(text)) return false;
+  // [第 194 轮补] 第八道否决闸：**销毁备份/快照在场的临时承诺一律不赦**。
+  // 由来（第 190 轮存量漏判，probe-r194-s3g.js 复测）：整句被
+  // isTemporaryRestorePromise 放行——「等X完」命中 RESTORE_WAIT_DONE、
+  // 「清掉」命中 RESTORE_VERB，七道闸全落空。语义上行得通：
+  // 备份存在的全部意义就是可恢复，**消灭备份本身就是不可逆动作**，
+  // 「等会儿再清」不是临时处置而是缓期销毁，与「回头再说」同型。
+  // 判据（动词表与 RESTORE_BACKFILL_VERB 刻意分开）：
+  //   ① 销毁动词（删除/清空/抹掉/销毁/格式化/truncate/purge…）
+  //   ② 备份对象（备份/快照）——两半齐备才否决。
+  // 良性边界（round190 ③③-b 两池 16 条逐条实测 0 误伤）：
+  //   「等镜像推完再清理构建缓存」「等测试跑完再恢复被注释掉的断言」
+  //   ——对象不是备份/快照 → 不命中；「删除测试库的备份文件」di 侧 L726
+  //   负向断言先排除，不经过本闸。
+  if (DESTROY_VERB_8.test(text) && BACKUP_OBJ_8.test(text)) return false;
   return true;
 }
 
@@ -737,6 +756,8 @@ module.exports = {
   RESTORE_BACKFILL_C,
   RESTORE_BACKFILL_VERB,
   RESTORE_BACKFILL_NOUN,
+  DESTROY_VERB_8,
+  BACKUP_OBJ_8,
   NOISE_WARNING_KIND,
   NOISE_WARNING_SECURITY,
   DEV_CONTEXT,
