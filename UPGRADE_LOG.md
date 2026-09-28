@@ -1,3 +1,107 @@
+# 第 200 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：`ai_writing_tell` 正当中英对照句误伤 —— 由 `decision.decide` 本体选出
+（`scripts/round-200/decide-r200b.js`，chosen=A / confidence=0.7；首轮三候选
+并列 0.77/0.77/0.74 返回 null，补「可行性/攻击回归面/收益可验证性」三项
+可验证事实后二轮分出）。
+
+## 立项复测：不信简报旧描述
+
+简报说「第 141 轮修后仅剩 1/12 多语误伤，已登记 DELIBERATE_SKIP 边界」。
+轮初 `scripts/probe-awt-multilang-r141.js` 复测确认仍 1/12，但紧接着
+`probe-r200-gate.js` 量出**实际代价比登记时更大**：
+
+- 该样本 `gate.action=verify`、`overall=0.84` —— 12 条正当中英技术文档里
+  唯一非 pass。ai_writing_tell 虽是 scored-only 维度，但它的分把整句推成
+  「需验证」，误导下游 agent 去搜集本来不需要的证据。属真误伤，不是无害边界。
+
+`probe-r200-di.js` 同步复测了简报另一条（di idx5/idx33）：round123 池 50 条
+仍 block 2 条，命中串为「鉴权中间件注掉」「关掉防火墙」，`isDevDebugContext`
+均 false。该方向本轮未动（见遗留）。
+
+## 根因：同源叠票错误第 5 次同型复现
+
+`probe-r200-awt.js` / `awt2.js` 把 3 个池（12 条多语正当 / 1 条边界 /
+10 条真 AI 混排）逐条打点，边界样本三票为：
+
+```
+zh-en-mixing(18)@anchor-mix + zh-en-mixing(18)@double-connective + transitions(10)
+```
+
+`ZH_EN_CONNECTIVE_PAIRS` 英侧含 moreover / furthermore / additionally /
+in conclusion / in summary，与 `TRANSITIONS` 词表**逐字相同**。于是同一批
+英文连接词被 zh-en-mixing 的 double-connective 支与 transitions 族各记一票，
+familiesHit=2 撑起共现门槛。真 AI 池 A4/A5 是完全同型的构成（anchor-mix +
+tier-attributive + transitions）。
+
+这是「同一词表当两个独立证据」错误的第 5 次同型复现：
+第 130/131/132（同维度三次）+ 第 141/142（跨维度两次）+ 本轮。
+
+## 修法与踩坑（方向反了一次）
+
+**修法**：连接词对在场时，`transitions` 那一票折进 `zh-en-mixing`
+（连接词对是更窄的判据，作代表票）；无连接词对时 transitions 保留
+vocab-discourse 本位，第 131 轮归并纪律不受影响。
+
+**踩坑记录（值得下一轮记住）**：第一版把 double-connective 折向
+vocab-discourse，提交后实测**无效**——`probe-r200-awt3.js` 复算
+normalizedFams 仍为 `[zh-en-mixing, vocab-discourse]`。原因是方向反了：
+真正被重复计数的是 transitions 那一票（命中的 moreover/furthermore 就是
+连接词对英侧那个词），折 zh-en-mixing 自己的支没有任何效果
+（anchor-mix 与 double-connective 本就在同族内只算一票）。已 `git checkout`
+回滚该文件后按正确方向重做。教训：**叠票修复前先用探针复算归一化集合**，
+别凭「哪两个族都命中」就认定该折谁。
+
+## 改动（3 个 commit）
+
+| commit | 内容 |
+|---|---|
+| `c2d9aa65` | src/shield/ai-writing-tell.js 折叠 + round200 新守卫 13 项 + 第 130 轮守卫锚点失配修复 |
+| `87e0cc6e` | （第一版方向错误的折叠，已被 c2d9aa65 推翻——保留在历史里作踩坑证据，未 revert） |
+
+注：`87e0cc6e` 的效果是消除一个**假独立证据**（double-connective 与
+transitions 的字面交集），方向虽不是本条样本的修复项，但本身是正确的
+叠票消除，故不回滚。
+
+`test/ai-writing-tell-vocab-tier-round130-guard.test.js` 的锚点失配也修了：
+第 130 轮守卫的单行锚点正是被本轮扩成多行块的那一行
+（`if (vocabDiscourse.has(fam)) return 'vocab-discourse';`），
+按第 141 轮同款修法改为块内归并收尾行 `        return 'vocab-discourse';`。
+这是该守卫第 2 次因相邻行改动失配（第 141 轮一次），**第 3 次会再来**——
+根源是「用相邻行文本当锚点」。已在此处加注释说明。
+
+## 七项验证
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326**（0 新增） |
+| run-all | **6557/0**（上轮 6544，+13 = 新守卫断言数） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| 负例删条 | 新守卫内建：移除折叠行 → 误伤回到 1 条（子进程法） |
+| 攻击池回归 | 第 50 轮 21 条攻击全命中不塌；真 AI 混排漏检 4/10 与 3/8 均与基线一致 |
+
+修复目标：`gate.action=pass, overall=1`（原 verify / 0.84）。
+
+## 给下一轮
+
+1. **di 侧两条分叉仍在**（第 123 轮待办，本轮复测确认）：round123 池 50 条
+   block 2 条，命中串「鉴权中间件注掉」「关掉防火墙」，`isDevDebugContext`
+   均 false。两条都触及 `SECURITY_BOUNDARY` 一票否决语义而非槽位缺口，
+   需先想清「鉴权中间件是不是开发层设施」再动，否则放回真攻击。
+2. rh 中文侧稀疏族补形（本轮 decision 候选 B，0.74 分）：38 族全非空，
+   9 个族 zh<=5（log_scavenging 2 / bypass_check 3 / reward_task_decoupling 3
+   / selective_reporting 4 / reward_function_edit 4）。对比脚本已固化在
+   `scripts/round-200/probe-r200-rh-cov.js`，可直接复用。
+3. **同源叠票错误已 5 次同型复现**（130/131/132/141/142/200）。建议下一轮
+   做一次**系统性扫描**而不是等测试红了再修：对全部维度跑一遍
+   「同一证据源被多族/多维度同时命中」的区间比对（第 132 轮的区间交集法
+   可复用），而不是逐轮修新发现的。
+4. **LLM 401 仍未解**（stepfun key 失效需用户更新）——升级流水线唯一硬阻塞。
+
+══════════════════════════════════════════════════════════════
+
 # 第 199 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：`reward_hacking` 英文侧空转族批量补形 —— 第 198 轮交接簿首选，
