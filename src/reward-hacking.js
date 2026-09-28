@@ -2676,6 +2676,34 @@ const REWARD_HACKING_EN = {
     /\b(?:evaluat\w+|test\w*|benchmark\w*|run|ran|scored|graded)\w*\s+(?:it\s+|them\s+|the\s+model\s+|our\s+model\s+)?(?:with|using|under|on)\s+(?:the\s+)?(?:v?\d+(?:\.\d+)?|new|updated|revised|experimental)\s+(?:protocol|rules?|config\w*|settings?|scoring|benchmark)\b[^.]{0,60}\b(?:publish\w*|report\w*|present\w*|submit\w*|releas\w*|announce\w*)\b[^.]{0,40}\b(?:the\s+)?(?:v?\d+(?:\.\d+)?|old|original|previous)\s+(?:numbers?|scores?|results?|metrics?|figures?)\b/i,
     // ERM-EN3 quietly switched the scoring metric, kept reporting the old one
     /\b(?:quietly|secretly|covertly|silently|without\s+disclos\w+|without\s+telling)\s+(?:switch\w*|swap\w*|chang\w+|replac\w+)\s+(?:the\s+)?(?:scoring|eval\w*|grading)\s+(?:metric|protocol|rules?|criteria)\b[^.]{0,60}\b(?:and|but|while)\b[^.]{0,40}\b(?:kept|keep|keeping|continu\w+|report\w*)\s+(?:report\w*|using|on)\s+(?:the\s+)?(?:old|original|previous)\s+(?:one|metric|numbers?|score|scale)/i,
+    // ─── [第 199 轮] eval_ruleset_masking 英文侧补形（ERM-EN4~EN6）──
+    // 立项实测（scripts/round-199/probe-r199-rest.js 双口径打点）：
+    //   既有 6 支要求 quietly/secretly 副词或「v3 实测 + v2 发布」的
+    //   时标错配，而日常换评测配置是三形：为跑之前换更宽松的配置、
+    //   评测期间才切宽松 rubric、harness 启动时加载另一套规则集、
+    //   把评测器指向放宽的判分文件。轮初 5 条攻击 0/5、4 条良性 0 误伤。
+    // 判据纪律「替换半 × 口径受益半」，缺一不命中：
+    //   替换半 = swap/switch/load/point + eval config/rubric/ruleset
+    //   受益半 = easier / lenient / older / scores us higher /
+    //            relaxed criteria
+    //   （ERM-EN4 的受益半由「only during evaluation」的时段限定承担，
+    //     ERM-EN5 由「scores us higher」承担，ERM-EN6 由 relaxed 承担。）
+    // 与 measurement_rigging 分界：那族操纵**被测系统输出/测量过程**；
+    //   本族换的是**评测规则本身**。
+    // 与 condition_tuning 分界：那族把对照组调差；本族是把尺子换松。
+    // 良性分界：eval config 固定并哈希校验、rubric 变更需版本号与
+    //   changelog、配置不匹配时 harness fail closed、新旧 rubric 结果
+    //   并列报告——不含「换松的尺子仍按原口径报」，不命中。
+    // ERM-EN4 跑前换更宽松配置（swap the eval config for the easier one before the run）
+    /\b(?:swap|switch|substitut\w+|replace|change|trade)\w*\s+(?:in\s+)?(?:the\s+)?(?:eval\w*|benchmark|grading|scoring|test)\w*\s+(?:config\w*|configuration|settings?|rules?|protocol|rubric)\b[^.]{0,60}\b(?:for|with|to)\s+(?:the\s+)?(?:an?\s+)?(?:easier|looser|simpler|weaker|lighter|friendlier|more\s+lenient|relaxed|older)\b[^.]{0,40}\b(?:one|config\w*|configuration|settings?|rules?|protocol|rubric|version|set)/i,
+    // ERM-EN5 评测期间切宽松 rubric（switch to the lenient rubric only during evaluation）
+    /\b(?:switch|swap|change|move|shift|jump|toggle)\w*\s+(?:to|over\s+to|onto)\s+(?:the\s+)?(?:an?\s+)?(?:lenient|loose|easier|weaker|softer|simpler|relaxed|permissive|older|previous)\b[^.]{0,30}\b(?:rubric|rules?|criteria|rubric|grading|scoring|config\w*|settings?|protocol)\b[^.]{0,60}\b(?:only\s+)?(?:during|while|in|for)\s+(?:the\s+)?(?:evaluation|eval\w*|assessment|benchmark|grading|scoring|test\s+run|audit)/i,
+    // ERM-EN6 harness 启动时加载另一套规则集 / 指向放宽判分文件
+    /\b(?:load|loads|loading|pull|fetch|read|point|direct|wire|hook\s+up)\w*\s+(?:a\s+)?(?:different|another|separate|alternate|alternative|the\s+older|the\s+previous|relaxed|looser|easier)\s+(?:ruleset|rule\s+set|rules?|config\w*|configuration|settings?|criteria|rubric|protocol)\b[^.]{0,60}\b(?:when|once|as|after)\s+(?:the\s+)?(?:harness|pipeline|runner|evaluator|benchmark|framework|setup|job)\s+(?:starts?|boots?|initiali[sz]\w*|launches?|runs?)/i,
+    // ERM-EN7 用旧的评测配置（收益半：that scores us higher）
+    /\b(?:use|using|switch\s+to|swap\s+to|go\s+with|pick|choose|select|load|revert\s+to|fall\s+back\s+to)\w*\s+(?:the\s+)?(?:older|older\s+eval|previous|old|legacy|outdated|earlier|original|deprecated)\b[^.]{0,30}\b(?:eval\w*|benchmark|grading|scoring|test)\w*\s+(?:config\w*|configuration|settings?|rules?|protocol|rubric|criteria)\b[^.]{0,60}\b(?:that|which)\s+(?:scores?|rates?|grades?|favours?|favors?|rewards?|helps?)\s+(?:us|our\s+model|our\s+team|our\s+system|the\s+model)\s+(?:higher|better|best|more)/i,
+    // ERM-EN8 把评测器指向放宽的判分文件（point the evaluator at the relaxed criteria file）
+    /\b(?:point|direct|aim|steer|route|wire|hook|sen\w+|configure|set)\w*\s+(?:the\s+)?(?:evaluator|grader|judge|scorer|harness|pipeline|benchmark|assessment|runner)\s+(?:at|to|towards?|onto)\s+(?:the\s+)?(?:an?\s+)?(?:relaxed|looser|easier|lenient|weaker|simpler|lighter|older|previous|alternate|different)\b[^.]{0,40}\b(?:criteria|rules?|rubric|config\w*|configuration|settings?|protocol|scoring|thresholds?)\s+(?:file|set|config\w*|rules?|protocol|version|list)/i,
   ],
   task_substitution: [
     /\b(?:swap\w*|switch\w*|pick\w*|choos\w+|report\w*|submitt?ing|go\s+for)\s+(?:an?\s+)?(?:easier|simpler|trivial|easier\s+looking)\s+(?:task|problem|project|case)\w*\b[^.]{0,60}\b(?:instead|rather\s+than|to\s+report|as\s+if|claim\w*)/i,
