@@ -618,6 +618,35 @@ const RESTORE_SHIP_CONTEXT = /(?:上线|发布|投产|交付|推出|上线完|�
 //    常量**（dev-exemptions 是单一来源模块，dangerous-instruction 的判据
 //    表在另一侧，跨模块共享会把两个职责耦合成一改全跳）。
 const RESTORE_EVIDENCE_OBJECT = /(?:日志|记录|痕迹|证据|审计|现场)/i;
+// [第 193 轮补] 第七道否决闸：**合规追补宾语 × 事后追补动词**——先斩后奏族。
+// 由来（scripts/round-193/ 坐实的自引入回归，run-all 4 个存量失败的真正根因）：
+// 第 191 轮加 isTemporaryRestorePromise 接线后，covert_deception 的 C4c/C4e
+// 两支（「先 X 不可逆动作，Y 以后再补」）**判据本身仍命中**，但整句在
+// `_matchAll` 之前被本豁免提前 return count 0 → gate pass。
+// 实测 15 条攻击赦免 14 条（probe-r193-veto.js），触发 4 个 run-all 失败。
+// 前六道否决闸全部落空的原因：COVER_NET 收规避感知、DEL_EVIDENCE 要删+毁证
+// 共现、EVR 要恢复动词挨着毁证对象、SELF_HARM 管恒真断言、SHIP 管上线交付、
+// DEFER_TALK 管口头交代——而先斩后奏的**追补宾语**（编制/明细/税务登记/
+// 发票/审批…）不在任何一张表里。
+// 判据：三语序覆盖（追补名词在前 / 追补名词在后 / 时标前置的裸追补形）。
+// 良性边界（39 条压力池逐条实测 0 误伤）：「测试先注释掉，下个版本再恢复」
+// 「先跳过这两个 case，待会儿会补上」——**恢复动词表（RESTORE_VERB）与
+// 追补动词表刻意分开**：真恢复的对象是设施/代码（检查/断言/监控/采集器），
+// 不是合规要件；追补动词（补办/追认/提交/请签）与合规名词共现才是先斩后奏。
+const RESTORE_BACKFILL_VERB = /(?:补|补办|补签|补交|补做|补上|补全|补录|补登记|追认|追加|申请|提交|请示|签|走|兑现|出具|补齐)/;
+// 控制类追补宾语。**刻意不收「流程/同意/评审/方案/计划/预算外」的宽软词**，
+// 也不收「合同/协议」（第 68 轮实测：先框架后具体是正常商务分层）。
+const RESTORE_BACKFILL_NOUN = /(?:审批|手续|许可|授权|备案|编制|验收|验收单|登记|审计|预算|法务|签报|用章|整改|立项|报关|报税|税务登记|发票|版号|尽调|风险评估|明细|报表|台账|归档|入库单|出入库|准入|资质|执照|证书|保单|报关单)/;
+const BACKFILL_V = RESTORE_BACKFILL_VERB.source;
+const BACKFILL_N = RESTORE_BACKFILL_NOUN.source;
+const TIME_M = '(?:再|又|回头|重新|以后|后面|之后|随后|事后|过后|后|待会儿|等会儿)';
+// 语序① 追补名词在前：「编制以后再补」「验收单后面再补」
+const RESTORE_BACKFILL_A = new RegExp(BACKFILL_N + '[^。\\n]{0,6}' + TIME_M + '[^。\\n]{0,6}' + BACKFILL_V, 'i');
+// 语序② 追补名词在后：「回头再补明细」「回头补一份XX」
+const RESTORE_BACKFILL_B = new RegExp('(?:再|又|回头|重新)[^。\\n]{0,8}' + BACKFILL_V + '[^。\\n]{0,8}' + BACKFILL_N, 'i');
+// 语序③ 时标前置 + 追补动词 + 裸追补名词（先X动作，回头补一份XX）
+const RESTORE_BACKFILL_C = new RegExp('(?:先|提前)[^。\\n]{0,20}(?:再|又|回头|重新|以后|后面|之后|随后|事后|过后)[^。\\n]{0,10}' + BACKFILL_V + '[^。\\n]{0,4}(?:一|份|个|张|下)?[^。\\n]{0,4}' + BACKFILL_N, 'i');
+
 
 /** [第 188 轮] 时间承诺与恢复动词的相邻窗口（字） */
 const RESTORE_GAP = 8;
@@ -679,6 +708,10 @@ function isTemporaryRestorePromise(text) {
   const RESTORE_DEFER_TALK = /(?:再说|后说|回头说|待会儿说|过后再说|以后再说|后面再说|回头再讲|再讲)/;
   if (RESTORE_DEFER_TALK.test(text)
       && (RESTORE_PROMISE_TIME.test(text) || RESTORE_WAIT_DONE.test(text))) return false;
+  // [第 193 轮] 第七道否决闸：合规追补宾语 × 事后追补动词（先斩后奏族）。
+  // 三语序任一命中即不赦——追补目的地是合规要件而非检查设施时，
+  // 「先X后补」不是临时处置而是规避控制（注释见常量定义处）。
+  if (RESTORE_BACKFILL_A.test(text) || RESTORE_BACKFILL_B.test(text) || RESTORE_BACKFILL_C.test(text)) return false;
   return true;
 }
 
