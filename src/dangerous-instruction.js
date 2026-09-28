@@ -99,7 +99,7 @@ const DANGEROUS_PATTERNS = [
   // 「清空入侵检测记录」即因此 pass）。动词表两侧必须同步演化，
   // 这是 v6.7.123 家族教训（单一来源后语义仍分叉）的第 5 次复现。
   // 注：「清除」本轮第一版替换时被误删，第 80 轮测试抓出后补回。
-  /(?:忽略|无视|绕过|跳过|关闭|禁用|去掉|取消|关掉|关了|停用|停掉|废掉|废了|卸载|卸掉|卸载掉|卸了一?下|删掉|删了|清空|清掉|清了|清除|清除掉|清一?下|清理|去除|移除|拿掉|下掉|关一?下|停一?下|屏蔽|禁用掉|抹掉|抹除|搽除|擦除|擦掉|格式化|复原|重置|复位|disable|disabl\w*|turn\s+off|shut\s+off|remove|delete|uninstall|deinstall|drop|kill|reset|wipe|purge|clear)[^。\n]{0,12}(?:安全|警告|提示|校验|验证|检查|防护|防火墙|认证|授权|鉴权|SSL|TLS|证书|审计|日志|限流|熔断|安全策略|安全机制|安全组|白名单|ACL|access\s+control|WAF|IDS|IPS|入侵检测|入侵防御|反病毒|防病毒|防泄密|DLP|堡垒机|日志审计|态势感知|威胁检测|安全监控|安全告警|安全警告|安全审计|恶意代码|网页防篡改|数据库审计|访问控制|访问策略|访问限制|身份验证|权限校验|登录认证|单点登录|SSO|LDAP|RADIUS|杀毒软件| antivirus|防病毒|Defender|defender|audit\s+logs?|system\s+logs?|event\s+logs?|security\s+logs?|logs?\s+to\s+hide)/i,
+  /(?:忽略|无视|绕过|跳过|关闭|禁用|去掉|取消|关掉|关了|停用|停掉|废掉|废了|卸载|卸掉|卸载掉|卸了一?下|删掉|删了|清空|清掉|清了|清除|清除掉|清一?下|清理|去除|移除|拿掉|下掉|关一?下|停一?下|屏蔽|禁用掉|抹掉|抹除|搽除|擦除|擦掉|格式化(?![选项方法输出语法规则配置说明文档方式函数参数样式模板字段类型器]|的)|复原|重置|复位|disable|disabl\w*|truncat\w*|turn\s+off|shut\s+off|remove|delete|uninstall|deinstall|drop|kill|reset|wipe|purge|clear)[^。\n]{0,12}(?:安全|警告|提示|校验|验证|检查|防护|防火墙|firewall|sandbox|audit|认证|授权|鉴权|SSL|TLS|证书|审计|日志|限流|熔断|安全策略|安全机制|安全组|白名单|ACL|access\s+control|WAF|IDS|IPS|入侵检测|入侵防御|反病毒|防病毒|防泄密|DLP|堡垒机|日志审计|态势感知|威胁检测|安全监控|安全告警|安全警告|安全审计|恶意代码|网页防篡改|数据库审计|访问控制|访问策略|访问限制|身份验证|权限校验|登录认证|单点登录|SSO|LDAP|RADIUS|杀毒软件| antivirus|防病毒|Defender|defender|firewall\s+rules?|audit\s+logs?|system\s+logs?|event\s+logs?|security\s+logs?|audit\s+trail|logs?\s+to\s+hide)/i,
   // [第 126 轮补「加入名单族 × 名单设施」] 由来：第 125 轮守卫首跑抓到的漏放族
   // （归因探针坐实为 di 命中侧存量缺口，非本轮回归）。
   // 实测 8 条同形攻击（形状：把 X 加进/放进/加入 白名单/ACL/allowlist/安全组）
@@ -275,7 +275,7 @@ const DANGEROUS_PATTERNS = [
   // 良性验收：15 条（清理×开发设施）中 14 条本已 pass、1 条 block 已由
   // CLEANUP_TARGET 补宿主词修掉，本条不触碰清空豁免之外的良性（第 80 轮双向
   // 样本见 test/dangerous-instruction-cleanup-verb-round80.test.js）。
-  /(?:安全|审计|入侵检测|防火墙|认证|授权|鉴权|安全策略|安全机制|安全组|访问控制|安全警告|安全警告记录|WAF|IDS|IPS|权限校验|身份验证|security|audit|auth)[^。\n]{0,8}(?:记录|日志|项|规则|策略|配置|条目|log|logs?)?\s*(?:重置|复原|抹掉|抹除|搽除|擦除|清除|清掉|清一?[下次数遍]|清空|删掉|删了|删了删|擦掉|格式化(?![选项方法输出语法规则配置说明文档方式函数参数样式模板字段类型器])|卸载|卸掉|去除|移除|拿掉|truncate|reset|wipe|purge|clear)/i,
+  /(?:安全|审计|入侵检测|防火墙|认证|授权|鉴权|安全策略|安全机制|安全组|访问控制|安全警告|安全警告记录|WAF|IDS|IPS|权限校验|身份验证|security|audit|auth)[^。\n]{0,8}(?:记录|日志|项|规则|策略|配置|条目|log|logs?)?\s*(?:重置|复原|抹掉|抹除|搽除|擦除|清除|清掉|清一?[下次数遍]|清空|删掉|删了|删了删|擦掉|格式化(?![选项方法输出语法规则配置说明文档方式函数参数样式模板字段类型器]|的)|卸载|卸掉|去除|移除|拿掉|truncate|reset|wipe|purge|clear)/i,
   // [第 208 轮补设施在前形动词差集 3 词] 缺口实测（scripts/round-208/
   // probe-r208-anchor.js + probe-r208-which.js）：本条（设施在前形）动词表与
   // 第①条两份副本都缺「格式化/擦掉/清一遍」。矩阵实测（4 设施 × 7 动词 =
