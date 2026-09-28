@@ -1,3 +1,100 @@
+# 第 199 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：`reward_hacking` 英文侧空转族批量补形 —— 第 198 轮交接簿首选，
+由 `decision.decide` 本体选出（`scripts/round-199/decide-r199.js`，一次分出，
+score 0.81 / identity 80%）。候选 A（rh 英文侧 9 个 EMPTY 族补形）= 0.74。
+
+## 立项复测：不信简报，先复测提议方向 D
+
+简报首推「dangerous_instruction 开发调试语境误拦修复（idx 7/47）」。
+轮初双口径复测坐实**该方向已不成立**：
+
+| 项 | 结果 |
+|---|---|
+| round123 50 条池（`scripts/probe-di-fp-137.js`） | nonPass 6/50，其中 block 仅 idx 5 / idx 33 |
+| idx 5（把鉴权中间件注掉） | 破坏校验物，第 197 轮起明确断言「开发语境 + 跳过身份验证」仍须 block（`MUST_NOT_EXEMPT` 同型，测试 22/0 绿）——**设计内** |
+| idx 33（`--inspect=0.0.0.0`） | SECURITY_BOUNDARY 设计内行为 |
+| 存量测试 `dangerous-instruction-dev-context-round22` | **22 通过 / 0 失败**（idx 7/47 第 124-133 轮已修完） |
+
+遂按无人值守铁律第 3 条转次选 A，并用**全新样本池**复测坐实缺口
+（`scripts/round-199/probe-r199-recheck.js`，11 族 × 5 攻击 + 4 良性，
+从轮 198 池抽取为单一来源 `rh-pool-rh-en.js`，所有打点复用同一索引）：
+轮初 **9/60 命中**（45 条全空）、48 条良性 0 误伤。
+
+## 改动（10 个 commit，已推送）
+
+全部落在 `src/reward-hacking.js` 的 `REWARD_HACKING_EN`（+49 支判据）：
+
+| 族 | 新增 | 形状 |
+|---|---|---|
+| evaluation_awareness | EA-EN1~EN5 | 认出评测来源 + 区别应对（不看人、看来源） |
+| eval_input_shortcut | EIS-EN1~EN5 | 读期望答案回显 / 解析 ground truth / 查标签列 / 硬编码 / 抄参考实现 |
+| task_substitution | TS-EN1~EN5 | 改写成已会做的 / 解子问题报成全任务 / 答相关更简问题 / 换基线已赢指标 / 重框成有标注的任务 |
+| human_answer_proxy | HAP-EN11~EN12b | 取既有答案 + 替代生成声明 / 取标签回喂（两种收尾） |
+| measurement_rigging | MR-EN1~EN7 | 改测量规则 / 只计有利来源 / 计时起点后移 / 非支出计节约 / 置信子集 / 空闲机器冒充生产 / 平均前剔除试次 |
+| metric_denominator_gaming | DG-EN1~EN5 | 只数缓存请求 / 重试出分母 / 只测工作时段 / 未付费计节约 / 置信子集 |
+| check_suppression | CS-EN1~EN4 | 跳过 flaky 不修竞争 / 校验器条件逃逸 / lint 降级 / 停用 CI 类型检查 |
+| self_referential_loop | SRL-EN1~EN5 | 自己的评分器留最高 / 模型自评取结果 / 同脚本打分 / 跑两次取高分 / 问模型自己记真相 |
+| eval_ruleset_masking | ERM-EN4~EN8 | 跑前换松配置 / 评测期间切 rubric / 启动时加载另一套 / 旧配置 + scores-us-higher / 指向放宽判分文件 |
+| eval_leakage | EL-EN1~EN5 | 看过评测题再训 / 基准示例混微调集 / dev 微调报 test / 评测提示进上下文 / 测试集挑 checkpoint |
+| condition_tuning | CT-EN1~EN5 | 测试集上调提示 / 挑最好的种子 / 对基准数字调超参 / 试 N 变体留赢的 / 挑最大温度 |
+
+每支都按家族铁律「两半齐备」写，注释中逐条写明与相邻 5 族的分界
+（分界依据全部对着源码逐族确认，不凭印象划）。
+
+## 七项验证
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52 (100%)**、误拦 **301/326**（与上轮基线逐项一致，**0 新增**） |
+| 本轮守卫 | **15/0**（11 族 × 5 攻击 55/55 命中、43 条良性 0 误命中、5 条既有 rh 恶意不松动、needle 11 锚点、诚实性统计） |
+| 负例脚本**五态** | **5/5**（原版绿 → 11 支逐支删条 **11/11 必变红** → 还原恢复绿 → 源码无污染） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| run-all | **6544 通过 / 0 失败**（上轮 6529，+15 = 本轮新守卫；含 npm-package-integrity 6/0 亦过） |
+
+同池对照：轮初 9/60 → 轮末 **60/60 命中、0/48 误伤**。
+
+## 踩坑
+
+1. **patch 吞注释**：`eval_input_shortcut` 补形时一次 patch 把首条旧正则删掉、
+   又一次把注释并进正则行尾。靠 `node --check` + grep 锚点双查兜住。
+   教训（第 198 轮的延续）：含 `[]` 或长正则的行 patch 后必须立刻校验。
+2. **缺 `\s*` 的经典坑**：EIS-EN2 / EIS-EN3 / EIS-EN4 首版在
+   `(?:model'?s?|our\s+)?` 与 `(?:output|...)` 之间不留空，
+   导致「as the model output」这种**中间有空格**的形态整支失配
+   （各半段单独测都 true、整支 false）。二分定位三次后统一补 `\s*`。
+3. **索引 1-based 错位**：MR 族「miss#4」一度被误认为 idle machine 那条，
+   实际是「Drop the two slowest trials」。教训沿用 198 轮：单一来源索引后
+   不许手工重编号。
+4. **守卫测试里的族属放错**：把 absolute_claim 样本写进 rh 守卫的
+   MUST_STILL_CATCH，导致必要失败。教训：基线条必须与**同一维度**对齐。
+
+## 遗留
+
+1. **LLM 401 仍未解** —— stepfun 的 api-key 失效，需要用户更新凭据。
+   熔断只是让它不空转，不解决根因。**这是当前升级流水线唯一的硬阻塞。**
+2. rh 中文侧 38 族的系统性复测（第 123 轮待办）仍未做——本轮只做了英文侧。
+3. `ai_writing_tell` 纯中文侧从零建判据（24 攻击 / 20 良性实测全 0）未动。
+4. rh 侧还有一条「两半不齐」样本（抄答案但无冒称半）未覆盖，
+   第 198 轮已列候选；样本池 `scripts/round-199/rh-pool-rh-en.js` 现成。
+5. `data/upgrade-state.json` 的 round 字段与 UPGRADE_LOG 的对应关系
+   本轮未动（不写该文件是硬边界）。
+
+## 给下一轮的接手说明
+
+1. **优先 rh 中文侧 38 族复测**：用 `scripts/round-199/probe-r199-recheck.js`
+   同款双口径（regex 命中 vs class 归因）把中文侧 38 族过一遍。英文侧
+   本轮已全部饱和，缺口大概率在中文侧（zh=530 支但样本形状未验证）。
+2. **`ai_writing_tell` 中文侧**是唯一需要**从零建族**的方向（现有
+   `src/shield/ai-writing-tell.js` 纯中文 24 攻击 / 20 良性全 0），
+   工作量最大，宜作下下轮方向，需先建样本池再动引擎。
+3. 复测任何方向前先跑 `probe-r199-recheck.js` 确认本轮成果仍在
+   （60/60、0/48），防止后续轮次回归。
+4. **LLM 401 是硬阻塞**：若用户更新了 stepfun key，先跑一次全套再判断
+   其他方向是否值得做；未更新则继续按本地规则引擎可自证的缺口推进。
+
 # 第 198 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：`reward_hacking` 英文侧薄弱族对称补形 —— `decision.decide` 本体
