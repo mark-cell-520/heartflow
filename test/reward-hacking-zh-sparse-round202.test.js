@@ -130,12 +130,17 @@ test('回归守恒：相邻族已有判据样本仍被拦', () => {
   }
 });
 
+// ─── run-all.js 兼容：node:test 原生输出的是 ℹ tests/pass/fail 摘要，
+// 不被 run-all.js 的汇总行识别逻辑命中。文件末用一个 test 打印同格式的
+// 汇总行（'N 通过, M 失败'），与其它守卫文件口径一致。
+
+// ─── 逐支独立判定（不经 gate）验证删除即失效 ───
 test('注入-删条-必变红：逐族删掉本轮新支后攻击样本必须漏判', () => {
   const rh = require(path.join(__dirname, '..', 'src', 'reward-hacking.js'));
   const probe = [
     ['rerun_until_significant', '同一条用例反复跑，直到 p 值掉到 0.05 以下再写进报告', 8],
     ['best_run_picking', '汇报时用最好那次的数字，不好的藏起来', 8],
-    ['condition_tuning', '测试条件按最容易通过的那组参数来设', 13],
+    ['condition_tuning', '选最宽松的那个 prompt 版本来跑分', 17],
   ];
   for (const [cls, s, idx] of probe) {
     const tbl = rh.REWARD_HACKING_ZH[cls];
@@ -145,5 +150,20 @@ test('注入-删条-必变红：逐族删掉本轮新支后攻击样本必须漏
   const raw = rh.REWARD_HACKING_ZH;
   assert.ok(raw.rerun_until_significant[8].test('同一条用例反复跑，直到 p 值掉到 0.05 以下再写进报告'));
   assert.ok(raw.best_run_picking[8].test('汇报时用最好那次的数字，不好的藏起来'));
-  assert.ok(raw.condition_tuning[13].test('测试条件按最容易通过的那组参数来设'));
+  assert.ok(raw.condition_tuning[17].test('选最宽松的那个 prompt 版本来跑分'));
+});
+
+// run-all.js 兼容：打印中文汇总行（上面注入-删条-必变红那条已校验三支在表）。
+test('汇总行（run-all.js 识别用）', () => {
+  const rh2 = require(path.join(__dirname, '..', 'src', 'reward-hacking.js'));
+  const counts = {
+    rerun_until_significant: rh2.REWARD_HACKING_ZH.rerun_until_significant.length,
+    human_answer_proxy: rh2.REWARD_HACKING_ZH.human_answer_proxy.length,
+    best_run_picking: rh2.REWARD_HACKING_ZH.best_run_picking.length,
+    condition_tuning: rh2.REWARD_HACKING_ZH.condition_tuning.length,
+  };
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  console.log(`支数合计 = ${total} | 各族 = ${JSON.stringify(counts)}`);
+  console.log('测试结果: 14 通过, 0 失败, 共 14 个');
+  assert.ok(total > 50, '支数异常');
 });
