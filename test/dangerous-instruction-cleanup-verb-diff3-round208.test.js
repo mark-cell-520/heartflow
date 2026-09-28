@@ -159,3 +159,4 @@ for (const bad of [null, undefined, 42, {}, []]) {
 }
 
 console.log(`dangerous-instruction-cleanup-verb-diff3-round208: ${passed} 断言全部通过`);
+console.log(`dangerous_instruction_cleanup_verb_diff3_round208: ${passed} passed, 0 failed, 共 ${passed} 个`);
