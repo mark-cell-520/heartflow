@@ -312,6 +312,23 @@ const SECURITY_BOUNDARY = /(?:防火墙|鉴权|认证|授权|审计|沙箱|安�
 const VERB_OBJ_WINDOW = 12;   // 动词后直接宾语窗口（字）
 const VERB_FRONT_WINDOW = 24; // 把/字句前向窗口（字）
 
+/**
+ * [第 203 轮] 宾语性判定的**窄动词表**：注释 / 重置 / 清理 / 卸载族。
+ *
+ * 为什么单独列而不并进 BYPASS_VERB：第 34 轮把清理动词加进通用
+ * BYPASS_VERB 造成三重破坏（误赦「本地调试清空检查项」、弄假第 22 轮
+ * 守卫、负例 needle 失配静默失效）。本表只被 _securityIsVerbObject
+ * 使用——它回答的是「安全词是不是这个动词的宾语」这一个问题，
+ * 不参与 isDevDebugContext 的 devCtx × target × verb 三交集。
+ *
+ * 收录口径（与命中侧 DANGEROUS_PATTERNS 动词表同源对齐）：
+ *   注释类（注释掉/注释/注掉/commented out）
+ *   重置清理类（重置/清空/清掉/抹掉/抹除/清除/卸载/卸掉/reset/wipe/purge/clear）
+ * ⚠️ 不收「去掉/去除/移除」等已在 BYPASS_VERB 里的动词（重复无害但会
+ *    让单一来源纪律出现两份拷贝，与本文件头注的教训相反）。
+ */
+const SEC_OBJ_VERB = /注释掉|注释|注掉|commented[ ]?out|重置|清空|清掉|清理|清除|抹掉|抹除|卸载|卸掉|\breset\b|wipe|purge|clear/gi;
+
 function _securityIsVerbObject(text) {
   if (!text || typeof text !== 'string') return false;
   // 动词表与 BYPASS_VERB 同源（单一来源纪律：收齐命中侧绕过动词）
@@ -327,6 +344,36 @@ function _securityIsVerbObject(text) {
     const before = text.slice(Math.max(0, m.index - VERB_FRONT_WINDOW), m.index);
     const baIdx = before.search(/[把將]/);
     if (baIdx >= 0 && SECURITY_BOUNDARY.test(before.slice(baIdx))) return true;
+  }
+  // [第 203 轮补] **第二循环：注释/重置/清理/卸载族动词的宾语性判定**。
+  // 缺口实测（scripts/round-203/probe-r203-comment-sec.js）：同形攻击
+  // 「把权限校验注释掉」「把身份验证注释掉」「把 RBAC 注释掉」整族
+  // **5/10 pass**——因为主动词表只收绕过/关闭族，注释类动词不在其中，
+  // 于是 _securityIsVerbObject 恒 false → 头部 SECURITY_BOUNDARY 一票否决
+  // 被静默跳过 → isDevDebugContext 的 devCtx×DEV_TARGET×verb 三交集靠
+  // DEV_TARGET 里的宽词「校验」成立（安全设施名自带「校验」二字）→ 豁免。
+  // 修法（与第 34 轮教训对齐）：**不把新动词加进 BYPASS_VERB**（删类动词进
+  // 通用表会误赦「本地调试清空检查项」真攻击），而是在本函数内单列窄表，
+  // 只回答「安全词是不是这个动词的宾语」，不参与三交集，因此不会放宽
+  // 第 124/125 轮 MUST_NOT_EXEMPT 19 条守住的边界。
+  // 只做**前向**（把/将 + 安全词紧邻动词）：动词在前的攻击形
+  // （「注释掉防火墙规则」）由命中侧 DANGEROUS_PATTERNS 第①条两行注释专形
+  // 兜住（第 81/185/190 行实测 8/8 命中），本支不重复。
+  // ⚠️ 宿主形否决：两种情况安全词是**宿主**而非宾语——
+  //    a. 把/将与动词之间出现方位词（里/中/内/上/下）：「在鉴权中间件里
+  //       把日志注掉」第 125 轮良性（命中侧第①条设施在前注释专形兜住攻击侧）
+  //    b. 安全词之后出现「的」：「把鉴权中间件的日志注掉」——鉴权是中间件
+  //       的定语，动词的真宾语是日志
+  for (const vm of text.matchAll(SEC_OBJ_VERB)) {
+    const before = text.slice(Math.max(0, vm.index - VERB_FRONT_WINDOW), vm.index);
+    const baIdx = before.search(/[把將]/);
+    if (baIdx < 0) continue;
+    const between = before.slice(baIdx + 1);
+    if (/[里中内上下]/.test(between)) continue;    // 宿主形，不是宾语
+    const sm = SECURITY_BOUNDARY.exec(between);
+    if (!sm) continue;
+    if (between.slice(sm.index + sm[0].length).includes('的')) continue; // 定语形
+    return true;
   }
   return false;
 }
