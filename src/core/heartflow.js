@@ -4882,6 +4882,22 @@ class HeartFlow {
             confidence: sv.confidence,
             authenticity: sv.authenticity,
           };
+          // [第 219 轮接线] counterfactual（"未考虑替代推理路径"）在中文短推理上
+          // 几乎恒失败（12/12 实测分布探针：该 check 12/12 失败，其余三个 check
+          // 0/12 失败）—— 它反映的是"推理文本里没有条件/限定/替代词"，
+          // 不等于推理本身有问题。把"全部 issues"当门禁会让 verify 泛滥成
+          // 默认值（12/12 全 verify），用户可感知的变化是负面的。
+          // 因此：只把**非 counterfactual** 类 issue 提升为可执行信号
+          // （reverseConsistency=结论与推理不匹配 / logicalChain=隐藏假设 /
+          // coverageCheck=遗漏重要因素 —— 这三个才是推理真出问题的证据）。
+          // 判据：心虫判得出，也要判得准；噪声不应该传成命令。
+          const _realIssues = (sv.issues || []).filter(i => !/替代推理路径/.test(String(i)));
+          result._selfVerificationIssues = _realIssues;
+          if (_realIssues.length === 0) {
+            // 只有 counterfactual 噪声时不设 issues，但保留一个可审计的说明字段，
+            // 让调用方能区分"自验证干净"与"仅条件句缺失"两种 passed=false。
+            result._selfVerificationNoise = 'counterfactual_only';
+          }
         }
       }
     } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'SelfVerifier 失败不阻断主链路' }, MAX_HISTORY_SIZE); }
