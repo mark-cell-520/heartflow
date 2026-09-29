@@ -1,4 +1,93 @@
 
+# 第 221 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：上一轮（220）交接簿点名的**遗留 1，优先级最高**——
+把 `test/decision-router.test.js` 只覆盖 6 条的 34 条规则补齐语义断言。
+副产物：**在补测过程中挖出并修掉一个真 bug**（error-severity 大小写漏判）。
+
+**为什么选它**（不脑内模拟，照纪律先复测）：
+
+1. 220 轮交接簿明确「遗留 1 是自然延续，风险同样低，建议下一轮继续」。
+2. 复测确认缺口：`test/decision-router.test.js` 23 条断言只碰
+   cognitive-overload / cognitive-clarity / cognitive-dissonance /
+   decision-degrading 四条 + 早退/抑制/stats/CED 契约，**其余 28 条规则
+   0 断言**——其中 error-severity 的 match 就是坏的（见下）。
+
+**立项量化（六个探针，不信简报旧描述）**：
+
+| 探针 | 实测结论 |
+|---|---|
+| `probe-r221-all-rules.js` | 34 条规则逐一走 evaluate：只有 4 条能当 best |
+| `probe-r221-signals.js` | 按 match() 真实信号名造输入，22/34 有命中语义 |
+| `probe-r221-isolated.js` | 关 CED/domainClassifier 后 10 条有隔离语义 |
+| `probe-r221-fingerprint.js` | **单规则直调三元组**：32/34 match=true；`error-severity` 是少数 `match=false` 的一条 |
+| `probe-r221-arbitration.js` / `-ced.js` / `-nofield.js` / `-field.js` | **CED 参与集契约**：默认只放 18 条规则参与仲裁，关 CED 空输入才 34 条全量；field-* 六条的信号由 `_updateFieldTracking` 每次覆盖，外部输入驱动不了 |
+
+**本轮修的真 bug（补测的直接产出）**：
+
+`src/core/decision-router.js` error-severity 规则的 match 把输入转
+`toUpperCase()` 后与 `['critical','high','FATAL']` 比较 ——
+后三个常量**永远不等于自己的大写形式**，于是 `severity:'CRITICAL'` /
+`'High'` / `'FATAL'` 全部漏判，只有恰好小写的 `'critical'` / `'high'`
+碰巧命中。改为 `toLowerCase()` 与全小写常量比较，大小写不再影响命中。
+（这条规则 decision=heal / confidence=0.95，漏判意味着严重错误事件
+不会触发自愈决策。）
+
+**三个值得下一轮警惕的实测事实（都不是 bug，但会坑测试）**：
+
+1. **CED 按输入复杂度裁人**。默认 evaluate 只放 **18 条**规则参与仲裁，
+   另外 16 条（goal-* / field-* / security-breach / domain 四条…）
+   **从未被执行**。断言这些规则必须先 `cedEnabled:false`
+   （关 CED + 空输入 → 34 条全量；`{quality:0.9}` → 30 条）。
+2. **field-* 六条的外部输入无效**。`_updateFieldTracking` 在每次
+   evaluate 前重算场域值并 `Object.assign(result, fieldData)`，
+   调用方传的 `_fieldH` / `_fieldFlipAlert` / `_fieldResonance`
+   **会被覆盖**。只有多步 warm-up 让场域自己演化才碰得到
+   （实测 8 步高质量输入能触发 field-stable 与 field-resonance）。
+3. **单规则 match=true ≠ 引擎选它**。即使关掉 CED，`heal` 优先级 100 的
+   field-degrading 仍会抢走一批规则的 best 位（实测 5 条只进列表不当选）。
+
+**改动（3 个 commit）**：
+
+| # | 文件 | 内容 |
+|---|---|---|
+| 1 | `src/core/decision-router.js` | error-severity 大小写 bug 修复（+1/-1 行） |
+| 2 | `test/decision-router-rule-coverage-r221.test.js` | **25 条断言**：八组覆盖 28 条规则的单规则语义 + CED 参与集契约 + 20 条仲裁基线 + 34 条全量直调契约 |
+| 3 | `scripts/negative-test-decision-router-rule-coverage-r221.js` | 7 变异 + 1 对照 |
+
+`scripts/round-221/` 另建 7 个探针（all-rules / signals / isolated /
+fingerprint / arbitration / nofield / ced / field），是本轮所有结论的实测底座。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增，与基线一致）** |
+| run-all | **7543 通过 / 0 失败**（较 220 轮 7518 **+25**） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15**（README 测试数由 finish 自动记账 7518→7543） |
+| 本轮守卫 | **8/8 零无效变异**（7 真红 + 1 对照绿） |
+| 正式测试 | 新测试 25/25、decision-router.test.js 23/23 |
+
+## 遗留（给下一轮）
+
+1. **14 条规则仍无引擎层断言**：belief-stable、goal-invalid、cost-aware
+   （cost-aware 有单规则断言但 best 被 field-degrading 抢）、
+   field-reversal / field-peak-reversal / field-resonance / field-resonance-decay、
+   agi-policy-shift、security-breach、smart-home-dependency、
+   data-labor-exploitation、counterfactual-insight（best 位竞争弱）。
+   路径已知：要么关 CED + 手动构造场域历史，要么用多步 warm-up。
+2. **field-* 六条规则外部输入不可驱动**（`_updateFieldTracking` 覆盖）。
+   这是真实语义还是设计缺陷值得单独判一次——若外部调用方永远无法
+   主动触发翻转预警，这六条的实用价值存疑。
+3. `_selfVerificationIssues` 消费仍只到 verify 级（219 轮遗留 2，未动）。
+4. 零引用模块 369 个、历史探针文件未跟踪（本轮新增 8 个）。
+
+**给下一轮的接手说明**：先跑
+`node test/decision-router-rule-coverage-r221.test.js`（应 25/25）与
+`node scripts/negative-test-decision-router-rule-coverage-r221.js`（应 8/8）。
+遗留 1 可直接续（路径已在上面写清）；遗留 2（field-* 可驱动性）
+是更值得做真判断的方向，需要先决定「允许外部驱动场域信号」是否合理。
+
 # 第 220 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：上一轮（219）交接簿点名的**遗留 2，优先级更高**——
