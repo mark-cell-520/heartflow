@@ -411,6 +411,10 @@ const _StabilityGuard = _lazy('stabilityGuard', () => require('./stability-guard
 
 const _ExecutionVerifier = _lazy('executionVerifier', () => require('./execution-verifier.js'));
 
+// [第 216 轮接线] verification-engine：技能文档/代码/声明三类验证的单一入口
+// （原本全仓 0 引用，5 处契约 bug 导致 verifySkill/fullVerification 全崩）。
+const _VerificationEngine = _lazy('verificationEngine', () => require('./verification-engine.js'));
+
 const _DecisionVerifier = _lazy('decisionVerifier', () => require('./decision-verifier.js'));
 
 const _HeartFlowDecision = _lazy('heartFlowDecision', () => require('./decision.js'));
@@ -1156,6 +1160,8 @@ class HeartFlow {
     'graph.addNode', 'graph.search',
     // slots
     'slots.get', 'slots.set', 'slots.delete',
+    // [第 216 轮接线] 综合验证引擎（SKILL.md 结构 / 代码语法 / 声明可信度）
+    'verification.verifySkill', 'verification.verifyCode', 'verification.healthCheck',
   ]);
 
   constructor(config = {}) {
@@ -2042,6 +2048,10 @@ class HeartFlow {
 
     try { this.execution = new (_ExecutionVerifier().ExecutionVerifier)(); } catch (e) { _boundedPush(this._initErrors, {module: 'execution', error: e.message}, MAX_HISTORY_SIZE); }
 
+    // [第 216 轮接线] verification-engine 是纯对象单例（非 constructor），
+    // 直接取其导出。失败同样进 _initErrors，不影响其他模块启动。
+    try { this.verification = _VerificationEngine().verificationEngine; } catch (e) { _boundedPush(this._initErrors, {module: 'verification', error: e.message}, MAX_HISTORY_SIZE); }
+
     try { this.decision = new (_HeartFlowDecision().HeartFlowDecision)(this.memory); } catch (e) { _boundedPush(this._initErrors, {module: 'decision', error: e.message}, MAX_HISTORY_SIZE); }
 
     try { this.decisionVerifier = new (_DecisionVerifier().DecisionVerifier)(); } catch (e) { _boundedPush(this._initErrors, {module: 'decisionVerifier', error: e.message}, MAX_HISTORY_SIZE); }
@@ -2918,7 +2928,11 @@ class HeartFlow {
 
       // [v6.0.5 教育模式] 感知情感课程引擎
 
-      'eduEngine'];
+      'eduEngine',
+
+      // [第 216 轮接线] 综合验证引擎（skill-verifier 契约修复后才可用）
+
+      'verification'];
 
     for (const name of LATE_ADDITIONS) {
 

@@ -3070,6 +3070,40 @@ function handleExecutionVerifyTool(args) {
   return safeDispatch('execution.verify', { action, result: result || null, expected: expected || null });
 }
 
+/**
+ * [第 216 轮] 综合验证引擎（verification-engine 接线）
+ * 注意：与 handleExecutionVerifyTool 是两回事 —— 那个走 dispatch('execution.verify')
+ * 校验单次动作的效果；本工具验证「内容本身」（SKILL.md 结构 / 代码语法 / 声明可信度），
+ * 底层是 src/core/verification-engine.js 的对象单例（不是 constructor）。
+ */
+function handleVerificationVerifyTool(args) {
+  const { content, kind } = args || {};
+  if (typeof content !== 'string' || content.length === 0) return { error: 'content 是必填参数（非空字符串）' };
+  const hf = heartflow;
+  const ve = hf && hf.verification;
+  if (!ve || typeof ve.verifySkill !== 'function') return { error: 'verification-engine 未加载' };
+  const type = (kind === 'code' || kind === 'general') ? kind : 'skill';
+  try {
+    if (type === 'code') {
+      const r = ve.verifyCode(content, 'js');
+      return { kind: 'code', ok: r.ok, severityCount: r.severityCount, score: r.score, errors: r.errors };
+    }
+    const r = ve.verifySkill(content);
+    return {
+      kind: 'skill',
+      ok: r.ok,
+      score: r.score,
+      summary: r.summary,
+      severityCount: r.severityCount,
+      errors: r.errors,
+      warnings: r.warnings,
+      suggestions: r.suggestions
+    };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
 /** [v6.7.72] 误报反馈闭环：report / stats / suggest / confirm */
 function handleFalsePositiveTool(args) {
   const { action } = args || {};
@@ -3112,6 +3146,7 @@ const HANDLERS = {
   heartflow_decision_decide: handleDecisionDecideTool,
   heartflow_memory_consolidate: handleMemoryConsolidateTool,
   heartflow_execution_verify: handleExecutionVerifyTool,
+  heartflow_verification_verify: handleVerificationVerifyTool,
   heartflow_formula_bridge: handleFormulaBridge,
   heartflow_formula_calc: handleFormulaCalc,
 

@@ -200,7 +200,38 @@ ok('G2 skill-verifier 九个方法齐全', () => {
   }
 });
 
-dGroup().then(() => {
+// ── H 组：引擎接线验收（第 216 轮新增 wire + dispatch 两处）────────
+async function hGroup() {
+  ok('H1 start() 后 verification 挂上引擎', async () => {
+    const { HeartFlow } = require('../src/core/heartflow.js');
+    const hf = new HeartFlow();
+    await hf.start();
+    assert.ok(hf.verification, 'hf.verification 必须存在');
+    assert.strictEqual(typeof hf.verification.verifySkill, 'function');
+  });
+  ok('H2 dispatch 三条路由可用', async () => {
+    const { HeartFlow } = require('../src/core/heartflow.js');
+    const hf = new HeartFlow();
+    await hf.start();
+    assert.strictEqual(hf.dispatch('verification.verifySkill', GOOD).ok, true);
+    assert.strictEqual(hf.dispatch('verification.verifyCode', 'function f(){ return 1', 'js').ok, false);
+    assert.strictEqual(hf.dispatch('verification.healthCheck').healthy, true);
+  });
+  ok('H3 未注册的 verification 路由被拒', async () => {
+    const { HeartFlow } = require('../src/core/heartflow.js');
+    const hf = new HeartFlow();
+    await hf.start();
+    assert.throws(() => hf.dispatch('verification.nope'), /not allowed/, '未注册路由必须抛 not allowed');
+  });
+  ok('H4 _modules 注册 verification（dispatch 前置条件）', async () => {
+    const { HeartFlow } = require('../src/core/heartflow.js');
+    const hf = new HeartFlow();
+    await hf.start();
+    assert.strictEqual(hf._modules['verification'], hf.verification, 'LATE_ADDITIONS 必须注册 verification');
+  });
+}
+
+dGroup().then(hGroup).then(() => {
   console.log('---');
   console.log('本轮守卫: ' + (pass + fails.length) + ' 断言, PASS ' + pass + ' / FAIL ' + fails.length);
   if (fails.length) { fails.forEach(f => console.log('  FAIL ' + f)); process.exit(1); }
