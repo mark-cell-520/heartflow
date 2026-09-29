@@ -570,7 +570,9 @@ const assert = {
   // SKILL.md frontmatter 完整性
   skillFrontmatter(content) {
     const hasName = /^name:\s*.+$/m.test(content);
-    const hasVersion = /^version:\s*v?[\d.]+$/m.test(content);
+    // [第 216 轮修复] 原 `^version:\s*v?[\d.]+$` 不匹配带引号的合法 YAML
+    // （SKILL.md 实际写法 `version: "6.7.124"`），导致合规文档被判缺字段。
+    const hasVersion = /^version:\s*["']?v?[\d.]+["']?\s*$/m.test(content);
     const hasDesc = /^description:\s*.+$/m.test(content);
     if (!hasName) return _result(false, '缺少 name 字段');
     if (!hasVersion) return _result(false, '缺少 version 字段');

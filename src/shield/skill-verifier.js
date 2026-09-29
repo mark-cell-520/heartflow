@@ -42,19 +42,33 @@ const skillVerifier = {
    * 严重性分级 — 为验证结果标记严重性级别
    */
   _classifyResult(error) {
-    if (error.startsWith('[Frontmatter]') || error.startsWith('[版本]') || error.startsWith('[路径]')) {
-      return { ...error, severity: SEVERITY.ERROR };
+    // [第 216 轮修复] 原来是 `{ ...error }` —— 字符串展开成字符下标对象
+    // ({0:'[',1:'F',...})，severity 挂到字符属性上，下游
+    // `issue.includes(...)` / `bySeverity[sev]` 全部读不到，verify()
+    // 的每条 error 被静默污染；verification-engine._classifyIssue()
+    // 收到该对象即抛 `issue.includes is not a function`，
+    // verifySkill / fullVerification 全流程不可用（本模块全仓 0 引用
+    // 的真实原因：功能崩着，没人敢接）。
+    // 契约统一为 `{ message: string, severity: Severity }`。
+    const message = (error && typeof error === 'object' && typeof error.message === 'string')
+      ? error.message
+      : String(error);
+    if (error && typeof error === 'object' && error.severity) {
+      return { message, severity: error.severity };
     }
-    if (error.startsWith('[数据]') || error.startsWith('[表述]') || error.startsWith('[结构]')) {
-      return { ...error, severity: SEVERITY.WARNING };
+    if (message.startsWith('[Frontmatter]') || message.startsWith('[版本]') || message.startsWith('[路径]')) {
+      return { message, severity: SEVERITY.ERROR };
     }
-    if (error.startsWith('[链接]') || error.startsWith('[代码块]') || error.startsWith('[交叉引用]')) {
-      return { ...error, severity: SEVERITY.WARNING };
+    if (message.startsWith('[数据]') || message.startsWith('[表述]') || message.startsWith('[结构]')) {
+      return { message, severity: SEVERITY.WARNING };
     }
-    if (error.startsWith('[重复]') || error.startsWith('[描述]')) {
-      return { ...error, severity: SEVERITY.INFO };
+    if (message.startsWith('[链接]') || message.startsWith('[代码块]') || message.startsWith('[交叉引用]')) {
+      return { message, severity: SEVERITY.WARNING };
     }
-    return { ...error, severity: SEVERITY.WARNING };
+    if (message.startsWith('[重复]') || message.startsWith('[描述]')) {
+      return { message, severity: SEVERITY.INFO };
+    }
+    return { message, severity: SEVERITY.WARNING };
   },
 
   /**
@@ -67,9 +81,15 @@ const skillVerifier = {
     let match;
 
     // 收集所有锚点位置
+    // [第 216 轮修复] 原 normalize：`replace(/[^\w-]/g, '')` 会把中文全删
+    // （\w 不含 CJK），于是「## 触发条件」→ 空串锚点，而普通链接
+    // `[x](#foo)` 的目标也常被清成空串 → 每条中文小节都被判「重复锚点 #」。
+    // 修复：保留 CJK 与中文标点，中文按 GitHub 风格锚点只做小写+连字符。
     const headerRegex = /^#{1,6}\s+(.+)$/gm;
     while ((match = headerRegex.exec(content)) !== null) {
-      const anchor = match[1].trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+      const anchor = match[1].trim().toLowerCase()
+        .replace(/[^\w\u4e00-\u9fff-]+/g, '')
+        .replace(/\s+/g, '-');
       if (!anchorPositions[anchor]) {
         anchorPositions[anchor] = [];
       }
@@ -362,7 +382,11 @@ const skillVerifier = {
     }
 
     // 3. 版本号一致性
-    const frontmatterVer = content.match(/^version:\s*v?([\d.]+)/m);
+    // [第 216 轮修复] 原正则 `^version:\s*v?([\d.]+)` 不匹配带引号的 YAML
+    // （`version: "6.7.124"` 是合法且本仓 SKILL.md 实际使用的写法），
+    // frontmatterVer 取空 → 直接跳过版本比对，于是版本不一致的真问题
+    // 反而查不出。放开引号匹配。
+    const frontmatterVer = content.match(/^version:\s*["']?v?([\d.]+)["']?\s*$/m);
     const headerVer = content.match(/^#\s+.+?\s+v([\d.]+)/m);
     if (frontmatterVer && headerVer) {
       if (frontmatterVer[1] !== headerVer[1]) {
@@ -431,7 +455,7 @@ const skillVerifier = {
       errors.push(classified);
     }
 
-    // 生成修复建议
+    // 生成修复建议（吃原文字符串，不是分级后的对象）
     const suggestions = this._generateSuggestions(rawErrors);
 
     // 计算验证评分
@@ -441,6 +465,13 @@ const skillVerifier = {
       ok: errors.length === 0,
       errors,
       warnings: errors.filter(e => e.severity === 'warning'),
+      // [第 216 轮修复] 原为 `r.warnings.length`：skillVerifier.verify() 的
+      // warnings 从 errors 派生（filter severity==='warning'），调用方
+      // `r.warnings` 恒等于 errors 的 warning 子集，取 length 语义没错但
+      // 与验证引擎 `results.warnings.push(...r.warnings)` 的下游展开冲突
+      // —— push 的是字符串而 _classifyIssue 需要 string。这里显式给
+      // messages 数组，供要原文字符串的消费方使用。
+      warningMessages: errors.filter(e => e.severity === 'warning').map(e => e.message),
       suggestions,
       score,
       summary: this._generateSummary(errors, score)
