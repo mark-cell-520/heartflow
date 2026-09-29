@@ -1,0 +1,21 @@
+修复 SelfVerifier 恒崩 reasoning.toLowerCase is not a function（第 218 轮）
+
+heartflow.js SelfVerifier 段原本把 result.chain 直接当 reasoning 传给
+verify()。探针实测 chain 是 {stages:[...7 个 stage...], totalDuration,
+depth, taskType, errors} 对象，SYNTHESIS stage 的 result 才有
+reasoningChain/conclusion 字符串字段，而 self-verifier 四个 check 都要对
+reasoning 调 toLowerCase/includes/test，于是每次 think() 抛
+TypeError，result._selfVerification 字段从不落地，v7.x 自验证能力
+100% 失效（2 次 think() 2 次抛、0 成功）。
+
+修法：入口归一化 reasoning 为字符串——从 SYNTHESIS stage 取
+reasoningChain 优先，依次回退 stage name 串 / JSON 摘要；conclusion 也
+改为按字符串类型取值（原来 || 链会把非字符串值透传下去）。
+
+修复后实测（scripts/round-218/probe-r218-selfverifier-postfix.js）：
+2 次 think() 全成功，_selfVerification 落地且 passed/checks/issues/
+confidence 四字段可读，optional 层 initErrors 归零。
+
+新增 test/decision-router-selfverifier-r218.test.js（26 断言）覆盖
+evaluate 与 verify 两条路径，文件形态照 217 轮 reflection-loop-wiring
+（单个 async IIFE + 汇总行），确保 run-all 的子进程能跑完 IIFE 段。
