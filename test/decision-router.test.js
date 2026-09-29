@@ -111,6 +111,16 @@ ok('cognitiveLoad 超过 high → pause，confidence 0.9', () => {
   assert.deepStrictEqual(r.rules.map(x => x.ruleId), ['cognitive-overload']);
 });
 
+ok('cognitiveLoad 高于 standard 的任一档都显式收敛（0.01 档 + 0.6 档 + 0.8 档三点）', () => {
+  // 用独立实例：抑制窗口会跨调用污染语义（第 220 轮探针 3 实测教训）
+  const low = newDr().evaluate({ cognitiveLoad: 0.01 }, 'probe', 'overload-low');
+  const mid = newDr().evaluate({ cognitiveLoad: 0.6 }, 'probe', 'overload-mid');
+  const high = newDr().evaluate({ cognitiveLoad: 0.8 }, 'probe', 'overload-high');
+  assert.strictEqual(low.matched, false, '低档 confidence 为 0 应不命中');
+  assert.strictEqual(mid.matched, true, '中档 confidence 0.6 应命中');
+  assert.strictEqual(high.matched, true, '高档 confidence 0.9 应命中');
+});
+
 ok('cognitiveLoad 落 standard~high 之间 → confidence 0.6，仍命中 pause', () => {
   const dr = newDr();
   const r = dr.evaluate({ cognitiveLoad: 0.6 }, 'probe', 'overload-mid');
@@ -190,20 +200,70 @@ ok('抑制窗口内同规则二次命中被抑制并转 hold', () => {
   assert.strictEqual(dr.getStats().suppressedCount, 1, 'suppressedCount 应记 1 次');
 });
 
+ok('兜底 hold 决策的 confidence 契约为 0.3（两次独立路径显式收敛）', () => {
+  // 两条走到兜底的路径都必须给出 0.3 —— 单条断言挡不住改值，
+  // 因为改值只影响你测过的那一条路径
+  const viaSuppress = newDr();
+  viaSuppress.evaluate({ cognitiveLoad: 0.8 }, 'probe', 'via-sup-1');
+  const r1 = viaSuppress.evaluate({ cognitiveLoad: 0.8 }, 'probe', 'via-sup-2');
+  assert.strictEqual(r1.decision.type, 'hold');
+  assert.ok(Math.abs(r1.decision.confidence - 0.3) < 1e-9,
+    `抑制路径兜底 confidence 应 0.3，实际 ${r1.decision.confidence}`);
+
+  const viaNoMatch = newDr().evaluate({ cognitiveLoad: 0.01 }, 'probe', 'via-nomatch');
+  assert.strictEqual(viaNoMatch.decision.type, 'hold');
+  assert.ok(Math.abs(viaNoMatch.decision.confidence - 0.3) < 1e-9,
+    `无匹配路径兜底 confidence 应 0.3，实际 ${viaNoMatch.decision.confidence}`);
+
+  const viaEarlyExit = newDr().evaluate(null, 'probe', 'via-early');
+  assert.strictEqual(viaEarlyExit.decision, null, '早退路径不得造兜底 hold');
+});
+
 // ── 7. 恶意规则容错（match/confidence 抛错不炸掉整次 evaluate） ────
 ok('单条规则 match() 抛错不阻断其余规则与整次 evaluate', () => {
-  const dr = newDr();
+  // 前置纪律（第 220 轮实测教训）：CED 会过滤规则集（35→18），
+  // 若不关掉 CED，塞进去的恶意规则**根本没进循环**，catch 吞不吞都测不出来 ——
+  // 那就是一个空转的假绿用例。这里显式关掉 CED 与 domain 过滤，
+  // 并断言恶性规则确实在 activeRules 里，保证用例真的走到了 per-rule try/catch。
+  const dr = new DecisionRouter({}, { modelProfile: 'flash', cedEnabled: false });
+  dr._domainClassifier = null;
   dr._rules.push({
     id: 'evil-throw-rule', decision: 'heal',
     match: () => { throw new Error('boom'); },
     confidence: () => 0.9, rationale: () => 'x', fallback: null,
   });
+  dr.evaluate({ cognitiveLoad: 0.8 }, 'probe', 'evil-warm');
+  assert.ok(dr._activeRulesForEval.some(x => x.id === 'evil-throw-rule'),
+    '前置条件：恶意规则必须在 activeRules 中（否则本用例空转）');
   let threw = null, r = null;
   try { r = dr.evaluate({ cognitiveLoad: 0.8 }, 'probe', 'evil'); }
   catch (e) { threw = e.message; }
   assert.strictEqual(threw, null, `evaluate 不应抛错: ${threw}`);
   assert.ok(r && r.matched === true, '恶意规则之外的正常规则仍应命中');
   assert.ok(!r.rules.some(x => x.ruleId === 'evil-throw-rule'), '抛错规则不应进命中列表');
+});
+
+ok('单条规则 confidence() 抛错同样被 per-rule try/catch 吞掉', () => {
+  // 这一条专门守 catch 块本身：若 per-rule catch 被移除（或改成 rethrow），
+  // confidence 阶段的异常会冒出 evaluate，本条必红。
+  // 同样先关 CED 让规则真进循环（见上一例的前置纪律）。
+  const dr = new DecisionRouter({}, { modelProfile: 'flash', cedEnabled: false });
+  dr._domainClassifier = null;
+  dr._rules.push({
+    id: 'evil-conf-rule', decision: 'heal',
+    match: () => true,
+    confidence: () => { throw new Error('conf-boom'); },
+    rationale: () => 'x', fallback: null,
+  });
+  dr.evaluate({ cognitiveLoad: 0.8 }, 'probe', 'evil-conf-warm');
+  assert.ok(dr._activeRulesForEval.some(x => x.id === 'evil-conf-rule'),
+    '前置条件：恶意规则必须在 activeRules 中（否则本用例空转）');
+  let threw = null, r = null;
+  try { r = dr.evaluate({ cognitiveLoad: 0.8 }, 'probe', 'evil-conf'); }
+  catch (e) { threw = e.message; }
+  assert.strictEqual(threw, null, `confidence 抛错不应冒出 evaluate: ${threw}`);
+  assert.ok(r && typeof r === 'object', '仍应返回结构化结果');
+  assert.ok(!r.rules.some(x => x.ruleId === 'evil-conf-rule'), '抛错规则不应进命中列表');
 });
 
 // ── 8. stats 递增契约 ────────────────────────────────────────────

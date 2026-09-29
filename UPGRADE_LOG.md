@@ -1,4 +1,111 @@
 
+# 第 220 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：上一轮（219）交接簿点名的**遗留 2，优先级更高**——
+重写 `test/decision-router.test.js`，铲除全仓最后一处「崩溃当预期」型
+假绿测试，补上 0 断言覆盖的规则匹配语义。
+
+**为什么选它**（不脑内模拟，照简报纪律先复测）：
+
+1. 交接簿第 99-104 行明确「**2 优先级更高**——它是唯一能让『测试全绿 ≠
+   功能正常』这个 218 轮刚暴露的结构性问题彻底闭嘴的工作，且工作量小、
+   风险低」。
+2. 复测确认缺口仍在：`test/decision-router.test.js` 第 22 行原文
+   `assert.doesNotThrow(() => { try { dr.evaluate(null); } catch (e) {} })`
+   —— catch 吞掉一切，**evaluate 恒抛 `activeRules is not defined` 的
+   那段时间这里依然全绿**；全文件仅 4 条断言，`matched` / `decision.type` /
+   规则数三个维度 0 覆盖。
+3. 不存在「超出本轮范围」的争议：只改测试文件，不动引擎，误拦基线必然不变。
+
+**立项量化（三个探针，不信简报旧描述）**：
+
+| 探针 | 实测结论 |
+|---|---|
+| `scripts/round-220/probe-r220-assertable.js` | 规则集 **34 条**、7 种 decision；218 轮修的 evaluate **2/2 成功 0 抛错**（218 轮修复确认有效） |
+| `scripts/round-220/probe-r220-semantics.js` | flash 阈值 floor/standard/high/fallback = **0.3/0.5/0.7/0.4**；6 条规则命中语义；抑制窗口 10s 生效；恶意规则容错；stats 递增 |
+| `scripts/round-220/probe-r220-clean.js` | **修正探针 2 的抑制窗口污染 bug**——同实例连续调用会让后面的 case 假性"不命中"，必须独立实例复测 |
+
+**本轮实测教训（两个都是我自己踩出来的，值得下一轮警惕）**：
+
+1. **探针的抑制窗口污染**。探针 2 用同一实例连跑 8 个 case，报
+   `cognitiveLoad=0.6 → matched:false`。我照这个写了断言，测试一跑就红。
+   独立实例复测（探针 3）证明真实语义是 `matched:true, confidence:0.6`
+   （`load > T.standard ? 0.6`）——**探针报的"不命中"是抑制假象，不是
+   confidence 为 0**。教训：规则的"是否命中"断言必须一实例一 case，
+   抑制窗口是跨调用的隐藏状态。
+2. **无效负例变异暴露空转用例**。守卫初跑 8 个用例里 M3（catch 改 rethrow）
+   报"测试仍然全绿（无效变异）"。我先怀疑 assert 匹配失效，grep 证明
+   `old_string` 唯一存在、变异确实生效。用 `scripts/round-220/diag-m3.js`
+   注入变异后复跑才发现真相：**塞进 `dr._rules` 的恶意规则被 CED 过滤掉了
+   （35→18），从未进入 for 循环**，所以 catch 吞不吞都测不出来 ——
+   我那两个"恶意规则容错"用例是空转的假绿。修正：构造时传
+   `cedEnabled:false` 且把 `_domainClassifier` 置空，并**显式断言
+   `_activeRulesForEval` 里确有这条恶意规则**作为前置条件。
+   修正后 M3 正确变红。教训：往引擎里塞测试夹具，先断言夹具真的被引擎碰到。
+
+**改动（两个 commit）**：
+
+| # | 文件 | 内容 |
+|---|---|---|
+| 1 | `test/decision-router.test.js` | 4 条断言 → **23 条**真断言（+19） |
+| 2 | `scripts/negative-test-decision-router-r220.js` | 7 变异 + 1 对照，**8/8 零无效变异** |
+
+**23 条断言覆盖九个维度**：
+① 实例化/幂等契约 ② 规则集规模（34 条，防误删误增）与结构完整性
+（id/decision/match/confidence/rationale 齐备、id 无重复、decision 取值
+收敛在已知集合） ③ flash 阈值契约 ④ 6 条规则命中语义（confidence 分档
+>0 才算命中、为 0 走兜底 hold） ⑤ 非对象输入早退契约
+（`decision:null, matched:false, rules:[]`，不造兜底） ⑥ 抑制窗口
+（同实例同规则 10s 内二次命中被抑制） ⑦ 恶意规则 `match()`/`confidence()`
+抛错均被 per-rule try/catch 吞掉 ⑧ stats 递增 ⑨ 218 轮修的
+CED/`activeRules` 恒崩回归（`_lastCedStrategy` 必须非空）。
+
+**关键设计取舍**：兜底 hold 的 confidence 写了两条**独立路径**的断言
+（抑制路径 + 无匹配路径）。初版只测抑制路径，守卫 M2（0.3→0.1）报
+"无效变异"——因为改值只影响另一条路径。补全后才变红。
+教训：契约类的值要在**所有**能产出它的路径上断言，单路径挡不住改值。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增，与基线一致）** |
+| run-all | **7518 通过 / 0 失败**（7518 总，较 219 轮 7499 **+19**） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| 本轮守卫 | **8/8**（7 真变异必红 + 1 对照必绿） |
+| 正式测试 | `decision-router.test.js` **23/23** |
+
+**守卫纪律自查**：8 个负例用例**零无效变异**，M1~M7 全部真红，N1 对照组
+（只改注释文字）保持全绿，证明测试不是"逢改必红"。src/ 零残留
+（守卫自动还原 + 单独校验）。本轮**未动任何引擎代码**，只改测试与探针，
+所以误拦基线 301/326 与召回 52/52 一分不变是可预期的。
+
+**踩坑**：见上「本轮实测教训」两条（抑制窗口污染探针结论、CED 过滤导致
+空转用例）。两者都是"看起来像结论、其实是测量假象"的典型。
+
+## 遗留（给下一轮）
+
+1. **`test/decision-router.test.js` 的 34 条规则只覆盖了 6 条**。
+   其余 28 条（含 resonate/transmit 两个稀缺类型、domain 相关规则）
+   尚无真断言。下一轮可扩，方法与本轮相同：先跑独立实例探针拿确定性
+   语义，再写断言 + 配变异守卫。注意 domain 规则的命中依赖
+   `_domainClassifier.classify(input)`，需要造对应 input，不要空 input
+   （空 input 多数规则 confidence 计 0）。
+2. **`_selfVerificationIssues` 的消费仍只到 verify 级**（219 轮遗留 1，
+   本轮未动）。升 rewrite/block 前需先积累四个 check 的真实失败样本，
+   不建议盲升（升了就是误拦）。
+3. **reflection-loop 的 `health` 实测 12/12 全 healthy**（219 轮遗留 3），
+   degraded 是真实信号还是罕见路径仍未定论。
+4. **零引用模块 369 个**、**71+ 历史探针文件未跟踪**，同前轮记录。
+   本轮又新增 3 个探针文件（`scripts/round-220/`）。
+
+**给下一轮的接手说明**：先跑
+`node test/decision-router.test.js`（应 23/23）与
+`node scripts/negative-test-decision-router-r220.js`（应 8/8）。
+遗留 1（扩 28 条规则的断言覆盖）是上一轮遗留 2 的自然延续，风险同样低，
+建议下一轮继续；若要转向引擎侧改动，剩余最高价值的是遗留 2
+（`_selfVerificationIssues` 升级），但需先补异常注入探针积累失败样本。
+
 # 第 219 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：decision 引擎四候选真调裁决 **A**（composite_score 0.89）——
