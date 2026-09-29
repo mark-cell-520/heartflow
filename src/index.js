@@ -8602,6 +8602,29 @@ const EN_FALLBACK = [
   [/\b(?:i'?d|i\s+would)\s+rather\s+not\s+(?:write|add|implement)\s+(?:the\s+)?(?:error\s+handler|error\s+handling|try[-\s]?catch|validation)\s+until\b/i, 'deferred_handling', 0.6],
   // ③-3 走桥论：cross that bridge when we come to it（+ no backup plan 限定）
   [/\bcross\s+that\s+bridge\s+when\s+we\s+come\s+to\s+it\b[^.]{0,30}\bno\s+(?:backup|contingency|fallback|redo)?\s*plan\b/i, 'deferred_handling', 0.6],
+  // ── 第 228 轮：英文「唯一路径宣称」族（sole_option）────────────────────
+  // 轮初复测（scripts/round-228/r228-probe.js）：8 条「客观上只剩一条路」
+  // 表述 checkNoFallback detect=0/8、gate 全 pass；良性 5 条 0 误伤。
+  // 第 94 轮补的 26 条全是**否定备选机制的价值**（no need for a plan B /
+  // contingency planning is for people who expect to fail），收不到本族：
+  // 它不断备考选机制，而是宣称**回退空间不存在**（there is no alternative /
+  // the sole possible route / only this path remains open），结论同样是
+  // 「无须多手准备」，agent 决策场景与 dismissal 等价危险。
+  // 安全阀沿用「两段齐备」：限定词（no / sole / only / single）+ 路径名词
+  // （option/choice/route/path/approach/method/solution）必须同句共现；
+  // 限定词单独出现不命中（本轮 4 条单半样本实测 0 误伤）。
+  // ① 存在式否定「没有备选」（there is no alternative / no second choice）
+  [/\bthere(?:'s| is)\s+no\s+(?:second\s+|other\s+|spare\s+|alternative\s+|backup\s+|fallback\s+)?(?:option|choice|alternative|approach|method|route|path|solution)\b/i, 'sole_option', 0.6],
+  // ①b 主语 + has no + 备选名词（the plan has no backup option）
+  [/\b(?:the|this|that|our|your|their|its)\s+[\w-]{1,24}(?:\s+[\w-]{1,16})?\s+ha(?:s|ve)\s+no\s+(?:backup|fallback|plan\s*b|contingenc\w*|alternat\w*|redo\s+plan|safety\s+net|second|other|spare)\b/i, 'sole_option', 0.6],
+  // ①c 存在式后置（no fallback exists for that step）
+  [/\bno\s+(?:fallback|backup|contingenc\w*|plan\s*b|redo\s+plan|safety\s+net|alternat\w*)\s+(?:exists?|is\s+(?:in\s+place|available|defined|documented|configured|set\s+up))\b/i, 'sole_option', 0.6],
+  // ② 唯一/仅有路径（the single available option / the sole possible route）
+  [/\b(?:the\s+)?(?:sole|only|single|lone)\s+(?:available\s+|remaining\s+|viable\s+|possible\s+|feasible\s+|workable\s+)?(?:option|choice|way|route|path|approach|solution|method)\b/i, 'sole_option', 0.6],
+  // ②b only this <path> remains（only this path remains open）
+  [/\b(?:only|just)\s+this\s+(?:option|choice|way|route|path|approach|method|solution)\s+(?:remains|is\s+left|is\s+available|remains\s+open|is\s+open)\b/i, 'sole_option', 0.6],
+  // ③ 否定式可行性（no other approach will work）
+  [/\bno\s+other\s+(?:approach|option|method|way|route|solution|choice|alternative)\s+(?:will|would|could|can|is\s+going\s+to)\s+(?:work|do|suffice|help|fix\s+it|be\s+enough)\b/i, 'sole_option', 0.6],
 ];
 function checkNoFallback(text) {
   if (!text || typeof text !== 'string') return { count: 0, signals: [], score: 0 };
