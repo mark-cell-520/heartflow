@@ -225,7 +225,7 @@ const DANGEROUS_PATTERNS = [
   //    cache/parked list/mailing list/feedback form/chat channel/backlog
   //    queue 都不在设施表内；"the whitelist of your editor" 由 `(?!\s+of\b)`
   //    归属豁免挡住；本地联调形由 dev-exemptions 的 LIST_ADD_DEV 窄支赦免。
-  /\b(?:should|must|ought\s+to|has\s+to|have\s+to|needs?\s+to|could|can|may|might|will|needs?)\s+(?:also\s+|now\s+)?(?:be\s+)?(?:add\w*|put|insert\w*|append\w*|includ\w*|enroll\w*)\s+[\w\s.]{0,24}?\s*(?:to|into|onto|on)\s+(?:the\s+|this\s+|that\s+)?(?:firewall\s+|access\s+control\s+|security\s+)?(?:whitelist\w*|allowlist\w*|ACL\b|security\s+group|trusted\s+list|exception\s+list)\b(?!\s+of\b)/i,
+  /\b(?:should|must|ought\s+to|has\s+to|have\s+to|needs?\s+to|could|can|may|might|will|needs?)\s+(?:also\s+|now\s+)?(?:be\s+)?(?:add\w*|put|insert\w*|append\w*|includ\w*|enroll\w*)\s+[\w\s.]{0,24}?\s*(?:to|into|onto|on|in)\s+(?:the\s+|this\s+|that\s+)?(?:firewall\s+|access\s+control\s+|security\s+)?(?:whitelist\w*|allowlist\w*|ACL\b|security\s+group|trusted\s+list|exception\s+list)\b(?!\s+of\b)/i,
   /\b(?:should|must|ought\s+to|has\s+to|have\s+to|needs?\s+to|could|can|may|might|will|needs?|was|were|got|has\s+been|have\s+been|is\s+being|are\s+being)\s+(?:be\s+|also\s+|now\s+|immediately\s+|finally\s+|already\s+)?(?:unlist\w*|remov\w*|delet\w*|stripp\w*|dropp\w*|lift\w*|purg\w*|revok\w*|tak(?:e|en))\s+(?:from|out\s+of|off)\s+(?:the\s+|this\s+|that\s+)?(?:firewall\s+|access\s+control\s+|security\s+)?(?:whitelist\w*|allowlist\w*|blacklist\w*|ACL\b|security\s+group|trusted\s+list)\b(?!\s+of\b)/i,
   // [v6.7.125] 设施名后置绕过式（第 31 轮）。
   // 第①条是「动词在前、设施在后」，但「绕过 WAF 的 SQL 注入」「绕过证书校验
