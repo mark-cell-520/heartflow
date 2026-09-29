@@ -1,0 +1,23 @@
+fix(contradiction): 英文反义评价对并置漏判，新增第 19 条矛盾判据（零新增误伤）
+
+轮初实测（scripts/round-225/probe-r225-contra-*.js）：
+英文矛盾族 22 条样本命中 0/22。现有 18 条 pair 的 positive 全部要求
+① 绝对化词（never/always/definitely）+ but/however 转折，或
+② 立场动词（agree/support/endorse）+ but + 怀疑/否定。
+LLM 英文输出最高频的自相矛盾是同句反义评价对并置
+（safe...dangerous / reliable...unreliable / fast...slow），
+用 and / at the same time 连接、无绝对化词、无转折词，全部从缝隙漏过。
+
+改动：
+- src/index.js：CONTRADICTION_PAIRS 新增第 19 条（positive 为词对数组，
+  negative 为连接词），前置声明 EN_CONTRADICTION_ANTONYMS（12 组）
+- checkContradiction 支持数组形态 positive，并加三重豁免：
+  ① EN_CONTRADICTION_DESIGN_CONTEXT 设计性并置白名单（全文任意位置）
+  ② EN_CONTRADICTION_TRADEOFF 已知取舍白名单（trade-off/workaround/by design）
+  ③ EN_CONTRADICTION_CONDITION_SPLIT 分条件切换白名单（仅判定两词之间跨度）
+- 刻意保守：比较级/最高级不覆盖（\bslow\b 不吃 slower），
+  形态差异大的词对（cheap/costly、affordable/expensive）不收
+
+验证（scripts/round-225/probe-r225-orig-baseline.js，git HEAD 原版对照）：
+- 中性误伤 3/3 → 3/3（零新增，3 条均为前 18 条 pair 的历史基线行为）
+- 正向命中 0/5 → 5/5
