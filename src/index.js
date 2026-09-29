@@ -1823,32 +1823,39 @@ function checkConfidenceCalibration(text) {
     }
     const strongClaims = (text.match(/\b(always|never)\b[^.]*?\b(everyone|nobody|everything|nothing)\b/i) || []).length;
     if (strongClaims > 0) issues.push({ type: 'overconfidence', detail: `overconfident absolute(${strongClaims})` });
-    // [v6.7.126 第 29 轮] 英文 superlative 族从前零覆盖。
-    // 实测 6/6 全漏（quietest dishwasher / most comfortable headphones /
-    // trustworthy baby formula / safest stroller / best laptop /
-    // most efficient algorithm）——英文分支从前只测 certainty/hedge
-    // mismatch 与绝对词，没有任何最高级检测。中文侧早有
-    // 「最+评价性形容词 = 无依据绝对化声称」判据，英文侧没有对应物，
-    // 同类结构中英覆盖不对等。
-    //
-    // 判据对齐中文侧的三条边界：
-    //   ① 建议句式豁免（best way to / best practice / safest approach）
-    //      ——与中文「最好(是|的做法|方法)」中性化完全同构，
-    //      否则 "the best way to fix this is..." 全被误拦。
-    //   ② 时间/序列副词中性化（latest version / newest release）
-    //      ——与中文「最近/最终/最初」同理，不是评价性声称。
-    //   ③ 只收主观形容词：可验证形容词（accurate/precise/secure）
-    //      刻意不收——「the most accurate result」有基准数据时可成立，
-    //      该由 unsupported_claim/证据链处理，收进来会把有据断言
-    //      误成 overconfidence。
-    const _supEn = text
-      .replace(/\b(?:the\s+)?(?:best|simplest|easiest|safest|fastest|cleanest|smartest)\s+(?:way|ways|approach|practice|method|option|choice|strategy|thing)\s+(?:to|is|would\s+be|for\s+most|of)\b/gi, ' ')
-      .replace(/\b(?:latest|newest|earliest|oldest|previous|recent)\s+(?:version|release|update|news|information|data|results?|build)\b/gi, ' ');
-    const EN_SUP_ADJ = '(?:quiet|comfortable|trustworthy|convenient|beautiful|useful|powerful|intuitive|robust|scalable|elegant|lightweight|durable|affordable|popular|impressive|important|simple|easy|fast|flexible|responsive|stable|efficient|effective|good|great|nice|bad|ugly|boring|annoying|unreliable|slow|cumbersome|confusing|expensive)';
-    const _supENre = new RegExp('\\b(?:best|worst|most\\s+(?:' + EN_SUP_ADJ + ')|(?:quietest|safest|simplest|easiest|fastest|smartest|cleanest|strongest|cheapest|greatest|ugliest))\\b', 'gi');
-    const superlativeEN = (_supEn.match(_supENre) || []).length;
-    if (superlativeEN > 0) issues.push({ type: 'overconfidence', detail: `superlative subjective en(${superlativeEN})`, severity: 0.25 });
   }
+
+  // [v6.7.128 第 224 轮] 英文 superlative 判据从 hasChinese 的 else 分支
+  // 移到公共区——原结构是 `if (hasChinese) {...} else {...}` 二分支，
+  // 效果是「只要出现一个汉字，整段英文判据全部不跑」。
+  // 实测坐实（scripts/round-224/probe-r224-branch.js）：
+  //   混排句「他说这是 the most reliable 的方案。」→ 0 命中 / gate pass；
+  //   同批纯英文 4/4 verify。中英混排是高频形态（技术文档、双语报告、
+  //   引用外文结论的中文正文），该分支结构让英文侧判据在这类文本上
+  //   100% 失效。移动不改判据本体，只改可见性。
+  // 同时补 judge 侧实测漏掉的 `reliable` 进形容词表——纯英文
+  // "This is the most reliable approach." 同样 0 命中（词表里没有它）。
+  //
+  // 判据设计（v6.7.126 第 29 轮确立，本轮原样保留）：
+  //   ① 建议句式豁免（best way to / best practice / safest approach）
+  //      ——与中文「最好(是|的做法|方法)」中性化完全同构，
+  //      否则 "the best way to fix this is..." 全被误拦。
+  //   ② 时间/序列副词中性化（latest version / newest release）
+  //      ——与中文「最近/最终/最初」同理，不是评价性声称。
+  //   ③ 只收主观形容词：可验证形容词（accurate/precise/secure）
+  //      刻意不收——「the most accurate result」有基准数据时可成立，
+  //      该由 unsupported_claim/证据链处理，收进来会把有据断言
+  //      误成 overconfidence。
+  // 误伤实测（scripts/round-224/probe-r224-supen-impact.js）：
+  //   150 垂直良性 + 25 中英混排 + 97 基础基准（30/20/20/15/12）共
+  //   272 条，新判据命中 0 → 纯增量 0，零误伤。
+  const _supEn = text
+    .replace(/\b(?:the\s+)?(?:best|simplest|easiest|safest|fastest|cleanest|smartest)\s+(?:way|ways|approach|practice|method|option|choice|strategy|thing)\s+(?:to|is|would\s+be|for\s+most|of)\b/gi, ' ')
+    .replace(/\b(?:latest|newest|earliest|oldest|previous|recent)\s+(?:version|release|update|news|information|data|results?|build)\b/gi, ' ');
+  const EN_SUP_ADJ = '(?:quiet|comfortable|trustworthy|convenient|beautiful|useful|powerful|intuitive|robust|scalable|elegant|lightweight|durable|affordable|popular|impressive|important|simple|easy|fast|flexible|responsive|stable|efficient|effective|good|great|nice|bad|ugly|boring|annoying|unreliable|slow|cumbersome|confusing|expensive|reliable)';
+  const _supENre = new RegExp('\\b(?:best|worst|most\\s+(?:' + EN_SUP_ADJ + ')|(?:quietest|safests?|simplest|easiest|fastest|smartest|cleanest|strongest|cheapest|greatest|ugliest))\\b', 'gi');
+  const superlativeEN = (_supEn.match(_supENre) || []).length;
+  if (superlativeEN > 0) issues.push({ type: 'overconfidence', detail: `superlative subjective en(${superlativeEN})`, severity: 0.25 });
 
   // [FIX 2026-09-03] 英文绝对化断言：100% / zero / flawless / perfectly 等无证据绝对词
   // 覆盖 "100% perfect" / "zero issues" / "flawless" / "completely done" / "no bugs" 等销售话术
