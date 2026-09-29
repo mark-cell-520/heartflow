@@ -1,0 +1,14 @@
+修复 decisionRouter.evaluate 恒崩 activeRules is not defined（第 218 轮）
+
+9f1093ab 引入 CED conditional expert dispatch 时漏了局部变量转换：
+上一段把规则集写进 this._activeRulesForEval，但 CED 分支与 else
+分支仍在引用从未声明的局部 activeRules，导致每次 evaluate 抛
+ReferenceError。
+
+探针实测（修复前）：3/3 输入全抛、2 次 think() 调用 0 次成功、
+_lastCedStrategy 恒 null，domain filtering(v6.7.70) 与 CED
+complexity routing(v6.7.72) 两套能力 0 次执行。
+
+修复后实测：CED 分支正常进入，complex 输入 activateRatio=1 全量
+38 条规则、moderate 输入 0.6 过滤至 19/20 条，matched 与 decision
+字段可读。

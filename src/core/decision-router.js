@@ -2027,6 +2027,16 @@ class DecisionRouter {
     }
 
     // ─── v6.7.72: CED conditional expert dispatch based on input complexity ──
+    // [第 218 轮修复] 上一段把结果写进 this._activeRulesForEval，但从未声明局部
+    // activeRules。原 9f1093ab 引入 CED 时漏了转换：旧代码是
+    //   const activeRules = this._activeRulesForEval || this._rules;
+    //   for (const rule of activeRules) { ... }
+    // 改成 this._activeRulesForEval 后就没人再定义这个局部名，导致 CED 分支
+    // （以及 else 分支）每次 evaluate 都抛 activeRules is not defined ——
+    // 实测：3/3 输入全抛、2 次 think() 0 次成功、_lastCedStrategy 恒 null，
+    // domain filtering 与 CED 两套能力 0 次执行。这里补局部变量（语义等价于
+    // 原 this._activeRulesForEval || this._rules，保留两级回退）。
+    const activeRules = this._activeRulesForEval || this._rules;
     if (this._ced && this._cedEnabled && domainCtx && domainCtx.primary) {
       const complexity = this._ced.assessComplexity(input || '', domainCtx);
       const strategy = this._ced.decideStrategy(complexity);
