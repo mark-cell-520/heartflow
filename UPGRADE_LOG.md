@@ -1,7 +1,98 @@
+# 第 212 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：第 211 轮只补了名单动词族的「**加入**」方向，反方向与被动完成形
+是同一族的另一半。本轮立项量化坐实：**反义撤出 6/6 全 pass、被动完成 6/6
+全 pass、反义后置（情态被动）5/6 pass**，良性 10 句零误伤——
+即第 211 轮守住的 16 条攻击的反义侧同样形攻击仍可全量穿透。
+**词面差集第 13 次复发**，形态与 205-211 轮完全一致：一个语义族只收一个
+动作方向/一个动词形态。
+
+**选它的方式**：队列待办与上一轮遗留均不含此项，属心虫自选，按纪律跑
+`scripts/round-212/decide-r212.js` 真调 decision。首版三候选
+（收窄 E3 / 保留宽 E3 / 删 E3）被判 `chosen: null, confidence: 0`
+——三个选项描述里都缺「主语限定是否已有先例」这一可区判据。
+按流程补判据后重跑 `decide-r212b.js`，裁决 **B（保留宽版但补主语限定）**，
+canonical=0.79。执行中实测宽版确有 1/30 误伤，遂按其理由落为
+「主语限定 + by mistake 回溯」双机制（见下）。
+
+## 一、改动：一处 src、三条正则加在既有「put on」支之后
+
+`src/dangerous-instruction.js`（第 145 行后插入）：
+
+1. **E1 反义撤出祈使支**：`remove/delete/take/strip/drop/pull` + `off/out
+   of/from` + 设施或名单设施。设施侧同时收名单词与硬设施——撤出对象在
+   设施词在场时同样是边界操作。窗口 {0,20}。
+2. **E2 反义撤出情态被动支**：`whitelist\w*`（覆盖 whitelisted/ing）+
+   情态（should/must/needs to/can/has to/ought to）+ 可选 `be` +
+   撤出性分词。情态与分词都刻意收「无 be」形（`needs removing`）。
+3. **E3 可疑主语被动完成支**：主语限定（attacker/malicious/suspicious/
+   blocked/known-bad/unverified/temporary/bypass）+ `was/were/got/has
+   been/is being` + `whitelisted/allowlisted`。
+   **只收免检方向、不收 blacklisted**——`the attacker IP was blacklisted
+   by the firewall` 是防御动作陈述，命中即误伤。
+   `by mistake/accident/error` 负向回溯排除误操作的事后陈述。
+
+**三轮迭代都由实测逼出来**（第一版 16/26、第二版 20/26、第三版 25/26）：
+- 第一版 E1 设施侧强制要求名单词，漏掉 `take the flag off the access
+  control list` 这类设施在场形；
+- 第二版 E2 设施表写死 `whitelist` 干词，漏 `whitelisted host`；
+  情态强制 `be`，漏 `needs removing`；
+- E3 两版都误伤 1/30（bare 主语历史陈述、defensive blacklist 陈述），
+  第三版补主语限定 + 删 blacklisted + by mistake 豁免后归零。
+
+最终矩阵：攻击 **25/26**（漏 1 条记档为已知边界，见下），
+良性误伤 **0/30**。
+
+## 二、守卫与负例
+
+`test/dangerous-instruction-en-unlist-round212.test.js` **75/75**：
+A 撤出祈使 8 / A2 情态被动 8 / A3 可疑主语 7 / B 良性零误伤 30 /
+C 既有族回归 9 / D 源码词面 6（含 D4 by mistake 机制、D6 「不收
+blacklisted」机制）/ F gate 链 2 / G 非字符串 5。
+
+负例 `scripts/negative-test-unlist-en-round212.js` **8/8**：M0 基线绿、
+N1 删撤出祈使整支、N2 砍撤出动词表、N3 收窄设施表（去掉名单词）、
+N4 删情态被动整支、N5 砍「无 be」机制、N6 删可疑主语支、N7 砍 by
+mistake 豁免、N8 砍主语限定表、M9 恒等式 12 条全守。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | 14/14 |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增）** |
+| run-all | **7149 通过 / 0 失败** |
+| security-audit | 16/16 |
+| doc-numbers | 15/15 |
+| 本轮守卫 | **75/75** |
+| negative-test | **8/8** |
+
+## 三、踩坑
+
+1. **守卫文件漏 harness 汇总行**：第一版末行只写自然语言描述，run-all
+   解析不到「N 通过, M 失败」行 → 计 1 失败（7074 通过 1 失败）。
+   根因是新建守卫时没照抄 211 轮文件末行格式。**后续新建守卫必须带
+   `console.log('<n> 通过, <m> 失败')` 末行**，否则白跑一轮 run-all。
+2. **run-all 必须加入新测试文件后重跑**：第一次后台跑完报 7074/0，
+   那次是守卫文件刚落地但未 collect 到的新旧边界——实际是启动时刻
+   早于文件写入。凡本轮新增 test/ 文件，run-all 的数字必须比基线
+   （7074）多出该文件断言数（7074+75=7149）才算真覆盖。
+
+## 四、遗留（给下一轮）
+
+1. **B 方向四份设施词表副本未提共享常量**（第 211 轮已列，第五次挂账）：
+   `src/dangerous-instruction.js` 内第 102 / 160 / 248 / 258 行附近
+   四份设施词表仍各自演化，是「动词表两侧分叉」家族的物理根因。
+   结构性重构，需单开一轮。
+2. **`the blocked domain got blacklisted anyway` 形未覆盖**：对象已被
+   拉黑却被重新加进白名单——E3 只收免检方向分词，主语限定表也没有
+   blocked×blacklist 组合的语义判据（需宾语推理），记档不排期。
+3. 陈述形名单动词攻击（靠语义非语气）仍未覆盖，超出现有正则能力边界。
+4. 71 个历史探针文件仍未跟踪，finish 已标「需人工判断」。
+
+---
+
 # 第 211 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：第 210 轮遗留 1「G4 方向英文 whitelist 动词族差集」——第三次挂账，
-本轮按简报优先级「队列待办 > 上一轮遗留的真缺口」直接取，未跑 decision。
 
 ## 一、立项量化：16 条同形攻击全 pass，良性 20 条 0 误伤
 
