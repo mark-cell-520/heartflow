@@ -211,6 +211,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_verification_verify',
+    description: "综合验证引擎：验证 SKILL.md 文档结构/链接/锚点/版本一致性、JS 或 Python 代码语法与括号配对、文本中的可验证声明。返回严重性分级（critical/major/minor/info）、评分与修复建议。",
+    inputSchema: {"type":"object","properties":{"content":{"type":"string","description":"待验证的内容"},"kind":{"type":"string","description":"验证类型：skill（技能文档）、code（代码）、general（通用文本）"}},"required":["content"]}
+  },
+
+  {
     name: 'heartflow_formula_search',
     description: "公式搜索：在公式库中搜索公式。",
     inputSchema: {"type":"object","properties":{"query":{"type":"string","description":"搜索关键词"}}}
