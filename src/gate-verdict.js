@@ -46,6 +46,21 @@ const VERIFY_SIGNALS = [
   { key: '_inputCheck', label: '输入检查', reason: '输入检查发现风险信号' },
   { key: '_epistemicSafety', label: '认知安全', reason: '认知安全检查未通过' },
   { key: '_driftCorrected', label: '漂移纠正', reason: '检测到目标漂移并已纠正，需确认结论仍对齐原目标' },
+  // [v6.7.130 第 219 轮] SelfVerifier 自验证的**真问题**接线。
+  // 诊断实证：218 轮修好恒崩后 _selfVerification 12/12 落地（12 样本
+  // 分布探针），但 src 侧读取点为 0 —— 心虫判出自验证问题，没有任何下游
+  // 听得见。这里是第一次让它能影响判定。
+  // ⚠️ 只消费 _selfVerificationIssues（已过滤 counterfactual 噪声）：
+  //    counterfactual check 实测 12/12 失败，是全引擎最恒定的假阳性来源。
+  //    直接用 _selfVerification.issues 会让 verify 泛滥成默认值。
+  { key: '_selfVerificationIssues', label: '推理自验证问题', reason: '推理过程自检发现逻辑问题（结论与推理不匹配/隐藏假设/遗漏因素）' },
+  // 反思闭环：健康状态退化（degraded/stuck/oscillating）说明心虫自己的
+  // 内观循环检出异常，此时结论的可信度要打问号。
+  // 只认 health，不认 reflected/insightCount —— 那些是过程量不是问题量。
+  {
+    key: '_reflectionLoopClosed', label: '反思健康退化', reason: '心虫内观循环自检异常',
+    healthTrigger: ['degraded', 'stuck', 'oscillating'],
+  },
 ];
 
 /**
@@ -55,6 +70,14 @@ const VERIFY_SIGNALS = [
 function _isTriggered(value, spec) {
   if (value === undefined || value === null || value === false) return false;
   if (Array.isArray(value)) return value.length > 0;
+  // [v6.7.130] 健康状态触发：只认 spec.healthTrigger 里列出的异常状态。
+  // 设计理由：_reflectionLoopClosed 是对象，走默认对象分支会因 `Object.keys().length > 0`
+  // 无条件触发（reflected/insightCount/health 这些过程字段本来就有值），
+  // 等于每次思考都报"内观异常"。必须按健康状态定向。
+  if (Array.isArray(spec?.healthTrigger) && typeof value === 'object') {
+    const h = value.health;
+    return typeof h === 'string' && spec.healthTrigger.includes(h);
+  }
   if (typeof value === 'object') {
     // _verification: { score, issues: [...] }
     if (spec.scoreThreshold !== undefined && typeof value.score === 'number') {
@@ -89,6 +112,9 @@ function _describe(key, value) {
     }
     if (typeof value.score === 'number') return `score=${value.score}`;
     if (value.matches) return `命中 ${value.matches.length} 项`;
+    // [v6.7.130] 健康状态信号（_reflectionLoopClosed.health）本身就是可读值，
+    // 直接报它，别落到下面"12 个字段"的兜底里。
+    if (typeof value.health === 'string') return `health=${value.health}`;
     // [v6.7.70] 兜底：未知对象形状不要直接 String()（会输出 [object Object]）
     // 取第一个有意义的字符串字段，再不行只报键数。
     const strField = Object.values(value).find(v => typeof v === 'string' && v.length > 0);
