@@ -4797,6 +4797,39 @@ const HASTY_GENERALIZATION_PATTERNS = {
     /\bI\s+(?:met|know|saw)\s+(?:two|three|a few|several)\s+\w+[^.]*?(?:so|therefore|hence)\b[^.]*\bevery(?:one|body)\b/i,
     /\bin\s+my\s+experience[^.]*?(?:all|every)\s+\w+\s+(?:are|is|do)\b/i,
     /\bwhere\s+I(?:'m| am) from[^.]*?(?:all|every|nobody|everyone)/i,
+    // [第 229 轮] 「全称量化词 × 人类群体名词 × 具体行为谓词」三族缺口。
+    // 复测（scripts/round-229/probe-r229.js）：12 条全称量化口语 gate 归因
+    // hasty_generalization 仅 2/12。旧判据有三类缺口：
+    //   ① `everyone/everybody` 只接了 knows|says|thinks|agrees|believes 五词，
+    //      接「wants / hates / ignores / refuses」等具体行为谓词时漏判；
+    //   ② `all X do/are` 的 do/are 之后没有谓词，`all customers complained`
+    //      （过去式）、`all developers fail the review`（实义动词）漏判；
+    //   ③ `no X ever` 只覆盖 no \w+ ever 模糊形，`no customer ever asked`
+    //      能中，但 `nobody wants / nobody questions` 的 nobody 只接了 ever。
+    // 分界（零误伤关键）：三半齐备才命中——量化半 × 群体半 × 行为谓词半。
+    //   群体半限人类集合名词（users/customers/developers/managers/teams/…），
+    //   「every request / every field / each service」这类工程对象不命中；
+    //   谓词半限态度或行为动词，AND 语义的「每步都做」陈述不命中
+    //   （工程句里 every X 常搭配 validated/retried/checked 这类完成态）。
+    // 单半实测：10 条良性（含 4 条工程全称句）0 命中。
+    // ① every/each + 群体 + 行为/态度动词（直接接，无需 knows/says 白名单）
+    //    分界：谓词槽后必须接**指人宾语或态度宾语**。工程全称句（every request
+    //    is retried / every field is validated）的宾语是流程对象，不命中。
+    //    实测 20 条良性工程全称句 0 误伤（第 229 轮 probe2 扩样）。
+    //    维护教训：宾语槽曾试过窄到 me/us/them/him/her，结果把 hates this /
+    //    ignores that / cares about 三形态全砍掉（recall 12→8）；现为
+    //    指人宾语 + 态度宾语并集。
+    /\bevery(?:\s+\w+){0,2}\s+(?:user|customer|developer|manager|team|engineer|employee|worker|student|member|person|people|guy|reviewer|maintainer|admin|client|patient|driver|player|voter|reader)s?\s+[a-z]+(?:s|ed|ing)?\s+(?:this\b|that\b|about\b|me\b|us\b|them\b|him\b|her\b|you\b|without\b|the\b|\.\s*$)/i,
+    // ② all + 群体 + 具体行为动词；工程谓词排除表防止把数据对象当人群。
+    //    谓词槽用 [a-z]+ 通配，但后接必须是**指人宾语 + 态度标记或具体宾语**
+    //    （\s+the\b 收掉，那是工程句式的地基：all headers are lowercased before
+    //    the check）。229 轮 probe4 定位：`All metrics are exported` / `All
+    //    headers are lowercased` / `All rows are checksummed` 三条工程良性
+    //    命中来自**旧判据** `all \w+ are`，非本轮新判据，故排除表只需覆盖
+    //    工程完成态谓词即可，不需要在宾语槽上退让。
+    /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?!exported|imported|validated|logged|indexed|partitioned|hashed|encrypted|truncated|deduplicated|rotated|archived|compressed|cached|queued|pipelined|migrated|backfilled|retried|throttled|serialized|deserialized|normalized|tokenized|escaped|wrapped|streamed|sharded|replicated|snapshotted|checksummed|rendered|templated|compiled|bundled|minified|transpiled|linted|formatted|lowercased|uppercased|trimmed|sorted|filtered|mapped|reduced|grouped|aggregated|paged|paginated|triggered|registered|exposes?|exposed|cuts?|cover(?:s|ed)?|returns?|requires?|applies?|lives?|hold(?:s)?|flows?|pass(?:es|ed)?|decoded|deploy(?:ed)?|scaled|built)[a-z]*\s+(?:this\b|that\b|me\b|us\b|them\b|him\b|her\b|you\b|about\s+\w+|to\s+(?:pay|support|help|fix|replace|upgrade|renew|wait|talk|share|review|test|deploy|switch|move|change|read|sign|answer|reply|comply|listen|trust|believe|join|leave|stay|go|do|use|try|buy|cancel|opt|agree|accept|renew))/i,
+    // ③ nobody / no one + 具体行为动词（不受白名单限制）
+    /\b(?:nobody|no\s+one)\s+(?:\w+\s+){0,3}(?:reads?|wants?|hates?|ignores?|refuses?|questions?|asks?|asked|cares?|bothered|checking|verified?|bother|question|responds?|replies|understands?|learns?|complains?|complained|listens?|trusts?|believes?|knows?|mentioned|mention|tried|trying|notices?|noticed|remembers?|skips?|skipped|ships?|shipped|expects?|expected|calls?|called|emails?|emailed|files?|filed|opens?|opened|uses?|used|follows?|followed|checks?)\b/i,
   ]
 };
 
