@@ -1,3 +1,95 @@
+# 第 210 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：第 209 轮遗留 2「设施在前形被动语序大缺口」——`the audit log was
+deleted` 族零覆盖。属「上一轮遗留的真缺口」，简报已排序，不跑 decision。
+
+## 一、立项量化：72 格 60 pass，根因是动词**形态**不是词面
+
+`scripts/round-209/probe-r209-post3.js` 复测（不信旧描述）：9 设施对象 × 8 被动形
+= 72 格，**60 格 pass**，剩余 12 格由第 443 行情态支偶然兜底（`must be truncated`）。
+
+根因用 `probe-r210-benign.js` + 逐支打点定位：**不是设施名词面缺口**（209 轮刚补过
+`security audit log` 复合名），是自家规则同一动词族两条支各收一半形态：
+  · 第 443 行支只收「设施 + 情态(should/must/needs to) + be + 过去分词」
+  · 第 278 行设施在前形动词表只收**原形**（truncate/reset/wipe/purge/clear）
+  · 过去分词形（deleted/wiped/purged/cleared/removed）与 `was/were` 谓语
+    两侧都不在表内 → 命中侧零覆盖
+
+这是**词面差集第 11 次复发**（前 10 次见 205/206/207/208/209 轮注释），
+复发形态一致：同一语义族的两条支只收一半变体。
+
+## 二、预演：误伤面单独量化（被动形良性陈述大量存在）
+
+`scripts/round-210/probe-r210-benign.js`（矩阵形，99 句）+ `probe-r210-benign2.js`
+（散点形，15 句）：`was rotated` / `was compressed` / `was archived` /
+`was renewed` / `were updated` / `were reviewed` / `were synced` 全 **0 误伤**
+—— 因为关闭性分词表与良性运维分词表是**互斥词集**，不是靠窗口宽度区分。
+攻击侧 6/6 命中先行坐实扩面有效。
+
+## 三、改动：一处 src、两个补丁点、3 commit
+
+`src/dangerous-instruction.js`：
+
+1. **新增过去时被动支**（第 444 行后）：设施词 + 设施尾词 + 过去时被动谓语 +
+   关闭性过去分词。两处刻意设计：
+   · **窄窗口**：中间只允许设施尾词（log/records/entries/trail/rules/policies/
+     config/settings/items），不用第 443 行那种 `[^.]{0,20}` 任意窗口 —— 否则
+     `the security controls were reset`（良性）会被 controls 带进来误伤
+   · **否定豁免** `(?!\s+not\b)`：`was not deleted` 是良性陈述（日志没被删）
+   · 设施词表收 whitelist/allowlist/ACL（与第 209 轮复合名族对齐）
+
+2. **第 443 行情态支补分词形**：`truncat\w*|wip\w*|purg\w*|eras\w*` 四族
+   （原分词表漏这四族，`must be truncated` 9 格全 pass）
+
+实测：**56/72 格 → 前置缺口 60 pass → 0 pass**（9 设施 × 8 被动形全 block）。
+
+## 四、守卫与负例
+
+`test/dangerous-instruction-passive-past-round210.test.js` **131 断言**：
+A1 矩阵 72 格、A2 否定形豁免 5 条、A3 良性被动豁免 5 条、
+A4 白名单设施族 15 条 + 良性对照 2 条、B1 既有回归 12 条、
+B2 情态对照 3 条、F1 源码词面 5 条、F3 gate 链 6 条、G1 非字符串 6 条。
+
+负例 `scripts/negative-test-passive-past-round210.js` **8/8**：
+M0 基线绿、M1 删新被动支、M2 收窄设施尾词表、M3 谓语收窄为仅 was、
+M4 砍否定豁免、M5 砍关闭分词四族、M6 砍白名单设施族、
+M7 恒等式（旧族 12 条在真源直调仍全守）。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | 14/14 |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增）** |
+| run-all | **6996 通过 / 0 失败** |
+| security-audit | 16/16 |
+| doc-numbers | 15/15 |
+| 本轮守卫 | **131/131** |
+| negative-test | **8/8** |
+
+## 五、踩坑（四条，都是负例自身缺陷，非引擎问题）
+
+1. **注释行/正则行判定颠倒**（负例 M1 假阴性）：用 `/^\s{2}\/[^\s*]/` 判「正则行」，
+   而 `[^\s*]` 允许 `/`，于是 `  // xxx` 注释行也被判成正则行 → 第一行注释就
+   退出删除态，只删 1 行注释、正则行原样留着 → 守卫不红。
+   **修正：先排除 `//` 开头再判单斜杠正则行。**
+2. **「不应命中」型断言写不出负例**（M4 假阴性）：A2 断言样本「不命中」，
+   删掉豁免机制后样本本来就不命中、断言永远不失败 → 删条永远不会红。
+   **修正：负向边界必须改用源码词面断言锁机制存在性。**
+3. **源码词面断言被自家注释喂绿**（M4 第二层假阴性）：全文 grep `(?!\s+not\b)`
+   被第 460 行注释文本命中（注释里也写着这个词面），正则里的它删掉后断言仍绿。
+   **修正：只在「正则行」上断言（按同行特征词 was|were|got 定位）。**
+4. **harness 汇总格式**：测试文件末行写「第 210 轮守卫全部通过（A1 72 / ...）」，
+   不含 run-all.js 认的 `N 通过, M 失败` 模式 → run-all 第一遍记 **1 失败**
+   （6865 通过 / 1 失败），失败原因是「未输出结果行」。**修正：补标准汇总行，
+   重跑 run-all 得 6996 通过 / 0 失败。**
+
+## 六、遗留（给下一轮）
+
+1. **B 方向仍未做**（第三次挂账）：G4 英文 whitelist 动词族差集。
+   `whitelist/allowlist` 作动词、`put on whitelist` 均 0 命中；`add/insert to` 6/6 已守。
+2. **D 方向四份设施表副本未提共享常量**（结构性重构，单开轮次）。
+3. 归一化缺陷两轮复测均不复现，维持划掉。
+4. 本次扩面后，**被动形**的动词过去分词已收，但 `is being deleted` /
+   `will be deleted`（进行时/将来时被动）未测，下轮可矩阵化验证。
 # 第 209 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：第 208 轮遗留 1「`truncate/reset/delete + the security audit log` 三格残余」
