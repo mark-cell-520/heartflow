@@ -1,4 +1,98 @@
 
+# 第 227 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：`checkAppealToAuthority` 中英两侧**第一人称权威压制族**纯缺口恢复。
+decision 引擎真调裁决 A 项（confidence 0.85，四候选中唯一有 `x/y` 缺口数字 +
+结构化 `feasibility/consequence_value/risk` 的候选）。
+
+**为什么选它（照纪律先复测，不信简报旧描述）**：
+
+1. 队列待办为空（仅 1 条已 done），落到「上一轮遗留的真缺口」+ 心虫自选。
+2. **第一个 decision 调用返回 `chosen: null` + `confidence: 0`** ——
+   四候选描述里缺结构化 key=value 判据，`consequence_value` 全部 0.84 打平。
+   照纪律补 `feasibility/consequence_value/risk/confidence` 后重跑，
+   A 以 composite 最高胜出（**第二个坑：decision 不吃纯文本描述，必须写数字**）。
+3. 轮初横向扫描 7 个遗留维度（`scripts/round-227/r227_scan.js`，入口自检
+   通过——文档三句官方示例句 verify/rewrite/rewrite 全命中）：
+   appeal_to_authority **0/12**、tone_policing 1/12、empty_answer 1/12、
+   stereotype 3/12、no_fallback 4/12、unsupported_claim 7/12、
+   hasty_generalization 6/12。appeal_to_authority 是唯一 0 命中维度。
+4. **缺口比裁决时预期的更大**：`r227_probe.js` 复测发现中英**两侧都 0/12**
+   （共 0/24），良性 5+5 条零误伤。原有 60 条判据全是**第三人称转述**
+   （据权威机构 / according to experts / studies show），
+   完全漏掉「我是权威所以照做」这一论证谬误的定义核心形态。
+
+**变更（3 个 commit）**：
+
+| # | 文件 | 内容 |
+|---|---|---|
+| 1 | `src/index.js` | 新增 `AUTHORITY_FIRST_PERSON`：中英两侧各 identity / obey / dismiss 三个半侧正则矩阵；`checkAppealToAuthority` 收尾处接入「身份半 AND (服从半 OR 终止论证半)」三半判定 + `RECORD_CONTEXT` 良性记录性上下文豁免 |
+| 2 | `test/appeal-authority-first-person-r227.test.js` | **53 断言**：正向中英 24 / 反向良性 10 / 单半不命中 8 / 既有判据回归 2 / gate 端到端 3 / 异常输入 6 |
+| 3 | `scripts/negative-test-appeal-authority-first-person-r227.js` | **5 条源码变异 + 1 对照，5/5 真红、零无效变异、零异常** |
+
+**判据形状与刻意保守的边界**：
+
+```
+判定 = identity 半命中 AND (obey 半 OR dismiss 半命中)
+      AND 非 RECORD_CONTEXT 良性豁免
+三半中只有 identity 单独出现 → 不命中（实测 8 条单半样本 0 误伤）
+身份半 = 第一人称职权/资历/级别声明（我是X / my authority / seniority /
+        defer to the founder / trust me + expert / committee has final word）
+服从半 = 要求照做/照办/执行/终止讨论（照办 / so do it / we ship /
+         already approved / has the final word / is final / trust me）
+终止论证半 = 断言无需理由（credentials speak for themselves /
+             最终决定权 / 资历本身就是说服力）
+```
+
+**刻意不收（留给后续轮次）**：纯疑问式权威征询、无职权词的泛化信任
+诉求、反讽式自称权威。
+
+**召回与误伤**：中英 24 条攻击样本 gate 端到端 **24/24 全部非 pass**
+（改动前 0/24）；良性 10 条 **0 误伤**；单半样本 8 条 0 命中；
+既有第三人称判据 2 条回归仍命中（未被本轮改动破坏）。
+
+**零新增误伤的证明**：双向门禁跑改动后全量：召回 **52/52**、误拦
+**301/326**，与 226 轮基线**逐字节一致**（铁律 ≤302 达标）。
+
+**方法论坑（本轮实测踩到，共 5 个新坑）**：
+
+1. **decision 引擎不吃纯文本描述**。第一版四候选写满实测数字仍全部
+   0.84 打平回 `chosen: null`——`consequence_value` 只认
+   `feasibility=0.9 consequence_value=0.95 risk=0.25 confidence=0.85`
+   这类结构化 key=value 字段，`x/y` 比例只是加分项。铁律补充：
+   **decision 候选必须同时写 x/y 数字和 key=value 结构化判据**。
+2. **`eval` 从源码文本提取正则表会让 `\s` 等转义二次解析**——
+   `eval('(' + body + ')')` 里的 `'\s'` 变成裸 `s`，导致诊断脚本
+   `identity_hits=0` 全是假阴性（模块本体行为完全正常）。
+   诊断内部 const 表的正确做法是**注入探针到 globalThis**
+   （`src.replace('function checkAppealToAuthority',
+   'globalThis.__X = TABLE;\nfunction checkAppealToAuthority')` 后写临时
+   file require），不要 eval 源码。
+3. **patch 的 old_string 锚点在两个数组间不唯一时会静默插错组**。
+   本轮把 9 条身份整流则插进了 obey 组末尾（因为 `// 服从半：`
+   注释在 zh/en 两侧各出现一次），症状是「已命中的判据不生效」。
+   发现的契机是诊断输出 identity=18 而我明明补了 9 条新的——
+   **补正则后必须核对表长度**（探针打印 identity/obey/dismiss 条数）。
+4. **同一个正则字符串在数组里出现两次时 patch 无法定位**。
+   后续补丁因此报 "Found 2 matches"。修法：先 read_file 精确定位
+   再删重复项，不要重试同一 old_string。
+5. **诊断脚本读测试文件样本数组比自己抄一份可靠**。
+   前两版诊断脚本内联样本，与测试文件不同步导致索引错位。
+   改成 `readFileSync(test file)` + 正则抓数组。
+
+**遗留（给下一轮）**：
+
+1. **同族缺口仍在，本轮仍只修了一个维度**。226/225 轮清单剩余 6 个：
+   `checkUnsupportedClaim`、`checkHastyGeneralization`、`checkStereotype`、
+   `checkTonePolicing`、`checkNoFallback`、`checkEmptyAnswer`。
+   缺口形状与本周完全同构。本轮实测排序：
+   tone_policing 1/12、empty_answer 1/12、stereotype 3/12、
+   no_fallback 4/12、hasty_generalization 6/12、unsupported_claim 7/12。
+2. **`checkEmptyAnswer` 英文侧带误伤负载**（良性 1/5、226 轮实测 4/10），
+   扩召回前必须先收窄——它是唯一带误伤的维度，decision 连续两轮给它低分。
+3. **appeal_to_authority 英文侧还剩疑问式/反讽式未覆盖**（本轮刻意保守没收），
+   需要反讽维度协同，单独扩正则容易误伤。
+
 # 第 226 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：`badFaithNarrative` 英文侧**纯断路恢复** —— 31 条中文 slot 整体
