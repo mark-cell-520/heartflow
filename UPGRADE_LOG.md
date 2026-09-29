@@ -90,6 +90,83 @@ mistake 豁免、N8 砍主语限定表、M9 恒等式 12 条全守。
 
 ---
 
+# 第 213 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：第 212 轮补了名单动词族的反义撤出侧与被动**结果态**侧，立项复测
+坐实剩下的是被动**动作态**族——同一语义族的第三半没长出来。decision 引擎
+三候选裁决 A（composite 0.86 对 B 0.80 / C 0.72）。
+
+**立项量化**（`scripts/round-213/probe-r213-shape.js`，未信简报旧描述、
+实测复跑）：被动完成「加入动作」侧 **8/8 全 pass**（D 族可疑主语 4 条：
+suspicious/attacker/malicious/unverified × was added onto / has been put
+on / is being added to / got added to），B 族情态加入形 6/6、C 族反义撤出
+剩余形 4/4 同 pass；第 212 轮三条支与良性 15 条全部保持原判（回归成立）。
+**词面差集第 14 次复发**，形态与 205-212 轮完全一致：一个名单语义族按
+「加入结果态 / 加入动作态 / 撤出动作态 / 撤出完成态」四个象限切分，
+第 211 轮补两格、第 212 轮补一格，本轮补第四格。
+
+**decision 真调（两次返工后才拿到 chosen）**：
+- 首版 `decide-r213.js` 三个候选用自然语言描述可行性/风险 →
+  `chosen: null, confidence: 0`，三候选同分 0.74。
+- 二次补判据 `decide-r213b.js` 仍 null/0 同分 0.74。
+- 根因读码定位（`src/core/decision.js` 第 334 行 `NUMERIC_KEYS` +
+  第 365 行 bracket 解析）：**候选必须写 `key=0.85` 形态的数值字段才进
+  打分路径**，「可行性=高」这种自然语言不产生数字，四个维度全回退默认值。
+  改为 `decide-r213c.js` 每候选一行 + feasibility/consequence_value/risk
+  显式数值后，正常裁决 A（0.86）。
+- 这条是第 87 轮已修过一次的坑的**第二次复发**：调用方（cron 任务）没按
+  数值字段写法喂候选。已写进本轮结论供后续轮复用。
+
+**改动**（一处 src、一条正则，加在第 212 轮 E3 行之后）：
+被动完成加入动作支：主语限定（attacker/malicious/suspicious/blocked/
+known-bad/unverified/temporary/bypass，与 E3 同一表）+ 被动系动词
+（was/were/got/has been/have been/is being/are being）+ 加入动词
+（added to/into/onto/on · put on · inserted into · appended to）+
+设施（whitelist\w*/allowlist\w*/ACL/security group/trusted list）。
+三项机制均经实测逼出：① 设施侧**不收 blacklist**——`the blocked domain
+got added to the blacklist` 是防御动作陈述；② `by mistake/accident/
+error` + `in error` + `last/this quarter/month/year/week` 三重负向
+回溯（第一版 4/41 误伤 3 条，补回溯后归零）；③ 主语限定表天然排除
+CI/staging/审计/历史形主语（host/certificate/record 无限定词）。
+
+最终矩阵：攻击 **12/12**（含 D 族 4 条专门主语形）、良性误伤 **0/37**。
+
+**守卫与负例**：`test/dangerous-instruction-en-passive-add-round213.test.js`
+**81/81**（A 12 / B 37 / C 19 回归 / D 6 源码词面 / F 2 gate 链 / G 5）。
+D6 断言踩坑一次：注释段里含 blacklist 论证文字，整段 indexOf 恒假——
+改为只截正则该行再断言（已写进守卫注释）。
+负例 `scripts/negative-test-passive-add-en-round213.js` **10/10**：M0 绿、
+N1 删整支、N2 砍加入动词表、N3 收窄设施表、N4 砍被动系动词表、N5 砍 by
+mistake 回溯、N6 砍 in error 回溯、N7 砍时段回溯、N8 砍主语限定表、
+M9 恒等式 15 条全守。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增）** |
+| run-all | **7230 通过 / 0 失败**（基线 7149 + 本轮守卫 81 断言，数字吻合） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| 本轮守卫 | **81/81** |
+| negative-test | **10/10** |
+
+## 遗留（给下一轮）
+
+1. **B 方向设施词表四份副本未提共享常量**（第 211 轮已列，**第六次挂账**）：
+   `src/dangerous-instruction.js` 内第 102 / 160 / 219 / 271 行附近四份
+   设施词表仍各自演化，是「动词表两侧分叉」家族的物理根因。结构性重构，
+   需单开一轮。
+2. **decision 引擎数值字段写法**：cron 任务每轮喂候选必须写
+   `feasibility=0.x consequence_value=0.x risk=0.x`，否则三候选同分
+   打平（本轮实测两次 null/0）。接管轮直接按这个格式写，别再返工。
+3. **情态加入形（B 方向）与反义撤出剩余形（C 方向）实测仍全 pass**，
+   本轮 decision 已裁决不做（composite 低于 A），量化数字在
+   `scripts/round-213/probe-r213-shape.js`，下一轮可作候选素材。
+4. 陈述形名单动词攻击、`blocked domain got blacklisted anyway` 宾语
+   推理形、71 个历史探针文件未跟踪——同第 212 轮记录，仍记档不排期。
+
+---
+
 # 第 211 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：第 210 轮遗留 1「G4 方向英文 whitelist 动词族差集」——第三次挂账，
