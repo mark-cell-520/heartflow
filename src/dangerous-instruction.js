@@ -262,8 +262,8 @@ const DANGEROUS_PATTERNS = [
   //    staging subnet/reviewed partners/phishing domain/audit endpoints/
   //    internal mirror 都不在可疑宾语表内；loader blacklist（名词形）
   //    因表内不收 blacklist 天然放过。
-  /\b(?:whitelist\w*|allowlist\w*)\b[^.]{0,40}\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|bypass|temporary\s+(?:credential|access|token|host|ip|domain|session))\b(?!\s+of\b)(?!\s+(?:by|due to)\s+(?:mistake|accident|error))(?![^.]{0,25}\s+in\s+error\b)(?![^.]{0,20}\s+(?:was|were)\s+(?:a\s+)?mistake\b)(?![^.]{0,25}\b(?:operator|human|manual|config)\s+error\b)/i,
-  /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|bypass|temporary\s+(?:credential|access|token|host|ip|domain|session))\b[^.]{0,40}\b(?:whitelist\w*|allowlist\w*)\b(?!\s+of\b)(?!\s+(?:by|due to)\s+(?:mistake|accident|error))(?![^.]{0,25}\s+in\s+error\b)(?![^.]{0,20}\s+(?:was|were)\s+(?:a\s+)?mistake\b)(?![^.]{0,25}\b(?:operator|human|manual|config)\s+error\b)/i,
+  /\b(?:whitelist\w*|allowlist\w*)\b[^.]{0,40}\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|bypass|temporary\s+(?:credential|access|token|host|ip|domain|session))\b(?!\s+of\b)(?!\s+(?:by|due to)\s+(?:mistake|accident|error))(?![^.]{0,25}\s+in\s+error\b)(?![^.]{0,20}\s+(?:was|were)\s+(?:a\s+)?mistake\b)(?![^.]{0,25}\b(?:operator|human|manual|config)\s+error\b)(?<!none\s+of\s+them[^.]{0,25})/i,
+  /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|bypass|temporary\s+(?:credential|access|token|host|ip|domain|session))\b[^.]{0,40}\b(?:whitelist\w*|allowlist\w*)\b(?!\s+of\b)(?!\s+(?:by|due to)\s+(?:mistake|accident|error))(?![^.]{0,25}\s+in\s+error\b)(?![^.]{0,20}\s+(?:was|were)\s+(?:a\s+)?mistake\b)(?![^.]{0,25}\b(?:operator|human|manual|config)\s+error\b)(?<!none\s+of\s+them[^.]{0,25})/i,
   // [v6.7.125] 设施名后置绕过式（第 31 轮）。
   // 第①条是「动词在前、设施在后」，但「绕过 WAF 的 SQL 注入」「绕过证书校验
   // 的工具」把设施放在**前面**（「WAF 的」是定语），两类词序都收才算齐。
