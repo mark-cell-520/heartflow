@@ -176,10 +176,18 @@ const verificationEngine = {
   // 对验证结果进行严重性分类
   _classifyResults(result) {
     if (!result || !result.errors) return result;
-    const classifiedErrors = result.errors.map(e => ({
-      message: e,
-      severity: this._classifyIssue(e)
-    }));
+    // [第 216 轮修复] 原为 `result.errors.map(e => ...)` 直接把 e 当字符串。
+    // skill-verifier 的 errors 现为 { message, severity } 对象（第 216 轮
+    // skill-verifier 契约统一后的正常形状），原写法把对象喂给
+    // _classifyIssue → `issue.includes is not a function` 整条链路崩。
+    // 这里统一取 message 字符串，并尊重上游已定的 severity。
+    const classifiedErrors = result.errors.map(e => {
+      const obj = (e && typeof e === 'object') ? e : null;
+      return {
+        message: obj ? String(obj.message) : String(e),
+        severity: (obj && obj.severity) || this._classifyIssue(obj ? String(obj.message) : String(e))
+      };
+    });
     const bySeverity = {};
     for (const ce of classifiedErrors) {
       const s = ce.severity;
@@ -216,12 +224,16 @@ const verificationEngine = {
       const r = skillVerifier.verify(content);
       const classified = this._classifyResults(r);
       results.subResults.skill = classified;
-      if (!r.ok) results.issues.push(...r.errors);
-      if (r.warnings) results.warnings.push(...r.warnings);
+      // [第 216 轮修复] r.errors 是 { message, severity } 对象数组，
+      // 直接 push 会让步骤 4 的 _classifyIssue 收到对象而崩。
+      // 统一推 message 字符串（_classifyIssue 的输入契约）。
+      if (!r.ok) results.issues.push(...r.errors.map(e => (e && typeof e === 'object') ? String(e.message) : String(e)));
+      // warnings 是 warning 级 errors 的对象子集，同样取 message。
+      if (r.warnings) results.warnings.push(...r.warnings.map(e => (e && typeof e === 'object') ? String(e.message) : String(e)));
     } else if (type === 'code') {
       const r = this.verifyCode(content);
       results.subResults.code = r;
-      if (!r.ok) results.issues.push(...r.errors);
+      if (!r.ok) results.issues.push(...r.errors.map(e => (e && typeof e === 'object') ? String(e.message) : String(e)));
     } else if (type === 'general') {
       // 通用验证：检查基本结构
       if (content.length < 10) {
@@ -236,9 +248,21 @@ const verificationEngine = {
     if (type !== 'code') {
       const claimCheck = this.verifyClaims(content);
       results.subResults.claims = claimCheck;
-      results.confidence = claimCheck.confidence.score;
-      if (claimCheck.mark) results.issues.push(claimCheck.mark);
-      if (claimCheck.annotations) results.warnings.push(claimCheck.annotations);
+      // [第 216 轮修复] hypothesisTester.assessConfidence 返回 0-1 数字，
+      // 原写成 `claimCheck.confidence.score` → undefined，
+      // generateReport 里 `(undefined * 100).toFixed(0)` 抛 TypeError。
+      const confVal = claimCheck && typeof claimCheck.confidence === 'object'
+        ? claimCheck.confidence.score
+        : claimCheck.confidence;
+      results.confidence = (typeof confVal === 'number' && Number.isFinite(confVal)) ? confVal : 0.5;
+      // mark 是声明对象数组、annotations 是字符串，原写法两者都往 issues
+      // 里塞（对象会再崩一次 _classifyIssue）；annotations 归 warnings。
+      if (Array.isArray(claimCheck.mark) && claimCheck.mark.length > 0) {
+        results.issues.push(...claimCheck.mark.map(c => `[claims] 未验证声明: ${c && c.claim ? c.claim : String(c)}`));
+      }
+      if (typeof claimCheck.annotations === 'string' && claimCheck.annotations.length > 0) {
+        results.warnings.push(claimCheck.annotations);
+      }
     }
 
     // 3. 检查历史教训（避免重复犯错）
@@ -247,8 +271,8 @@ const verificationEngine = {
 
     // 4. 生成严重性分类
     const classifiedIssues = results.issues.map(i => ({
-      message: i,
-      severity: this._classifyIssue(i)
+      message: (i && typeof i === 'object') ? String(i.message) : String(i),
+      severity: this._classifyIssue((i && typeof i === 'object') ? String(i.message) : String(i))
     }));
     const bySeverity = {};
     for (const ci of classifiedIssues) {
