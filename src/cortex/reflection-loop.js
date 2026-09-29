@@ -791,13 +791,33 @@ class ReflectionLoop {
 
    */
 
-  async selfReflect(questions, draft, context) {
+  async selfReflect(questions, draft, context = {}) {
 
     const insights = [];
 
+    // [v6.7.128 第 217 轮] 类型契约防御：questions 既接受对象数组
+    // （reflectBeforeSpeaking 传 _generateQuestions 的产物，形如
+    //  {id, question, contextKey, weight}），也接受字符串数组与单个字符串。
+    // 原实现对字符串元素直接 q.question.includes(...) —— q.question 为
+    // undefined 即抛 TypeError，整条自省链路崩掉（本族第 22 次同型复发：
+    // 用户侧记档的「getter 拿到字符串当下标对象用」家族）。
+    let questionList = [];
+    if (Array.isArray(questions)) {
+      questionList = questions;
+    } else if (typeof questions === 'string') {
+      questionList = [questions];
+    } else if (questions && typeof questions === 'object') {
+      questionList = [questions];
+    }
+    const normalizedQuestions = questionList.map((q) => {
+      if (typeof q === 'string') return { question: q };
+      if (q && typeof q === 'object' && typeof q.question === 'string') return q;
+      return { question: String(q && q.question != null ? q.question : q) };
+    });
 
+    const _ctx = (context && typeof context === 'object') ? context : {};
 
-    for (const q of questions) {
+    for (const q of normalizedQuestions) {
 
       let insight = {
 
@@ -813,7 +833,7 @@ class ReflectionLoop {
 
       if (q.question.includes('此刻在想什么')) {
 
-        const intent = context.intent || 'unknown';
+        const intent = _ctx.intent || 'unknown';
 
         const thoughtDesc = {
 
@@ -845,7 +865,7 @@ class ReflectionLoop {
 
       if (q.question.includes('感知到对方')) {
 
-        const emotion = context.userEmotion || 'neutral';
+        const emotion = _ctx.userEmotion || 'neutral';
 
         const emotionDesc = {
 
@@ -867,7 +887,7 @@ class ReflectionLoop {
 
           perceivedEmotion: emotion,
 
-          perceivedNeed: context.deepNeed || 'unknown',
+          perceivedNeed: _ctx.deepNeed || 'unknown',
 
           myFeeling: emotionDesc[emotion] || '感知中',
 
@@ -879,7 +899,7 @@ class ReflectionLoop {
 
       if (q.question.includes('投射')) {
 
-        const deepNeed = context.deepNeed || 'unknown';
+        const deepNeed = _ctx.deepNeed || 'unknown';
 
         const awarenessNote = deepNeed === 'recognition' 
 
@@ -905,7 +925,7 @@ class ReflectionLoop {
 
       if (q.question.includes('全身心')) {
 
-        const isRushing = context.intent === 'rushing';
+        const isRushing = _ctx.intent === 'rushing';
 
         insight.answer = isRushing 
 
@@ -927,7 +947,7 @@ class ReflectionLoop {
 
       if (q.question.includes('成为什么')) {
 
-        const intent = context.intent || 'unknown';
+        const intent = _ctx.intent || 'unknown';
 
         const becoming = {
 
@@ -957,7 +977,7 @@ class ReflectionLoop {
 
       if (q.question.includes('激起了什么')) {
 
-        const deepNeed = context.deepNeed || 'unknown';
+        const deepNeed = _ctx.deepNeed || 'unknown';
 
         const resonanceMap = {
 
