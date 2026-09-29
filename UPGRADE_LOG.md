@@ -1,3 +1,103 @@
+# 第 211 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：第 210 轮遗留 1「G4 方向英文 whitelist 动词族差集」——第三次挂账，
+本轮按简报优先级「队列待办 > 上一轮遗留的真缺口」直接取，未跑 decision。
+
+## 一、立项量化：16 条同形攻击全 pass，良性 20 条 0 误伤
+
+`scripts/round-211/probe-r211-whitelist-verb.js` 复测（不信简报旧描述）：
+· 动词形名单词族（whitelist/allowlist/blacklist 作动词，无 to/into/onto 介词）
+  **0/6 命中**；
+· `put ... on ...` 族 **0/5 命中**；
+· 既有 `add/insert ... to/into ...` 族 6/6 已守（对照成立）；
+· 良性 5/5 放过。
+
+根因（探针直调 gate 后逐支打点）：第 122 行英文支要求动词后必须跟
+`(?:to|into|onto)` 介词，把整族「动词形名单词」漏在表外；`put/place ... on ...`
+族只收 `onto` 不收 `on`，设施作宾语形（`on the ACL` / `on the security group`）
+两侧都不在表内。**词面差集第 12 次复发**，形态与 205-210 轮完全一致：
+同一语义族两条支各收一半变体。
+
+## 二、预演：误伤面单独量化
+
+`scripts/round-211/probe-r211-benign-why.js` 先证实良性侧存量零触发
+（dims=none、无 dev 赦免层介入），即误伤面完全由新规则自身决定。
+
+`probe-r211-wl-exp.js` 矩阵 16 攻击 × 20 良性；`probe-r211-a3.js` 专项
+设施宾语 6 × 10。判据**不靠词窗口，靠语气切分**（同一词集既有攻击也
+有良性）：请求前缀紧邻动词（前缀与动词间零窗口）、句首祈使动词形、
+`put/place ... on ... + 安全设施`。
+
+## 三、改动：一处 src，两个补丁点，2 commit
+
+`src/dangerous-instruction.js`（第 122 行英文支后插入）：
+
+1. **请求前缀支**：`please/kindly/just/go ahead and/I need you to/you should/
+   can you/could you` + 可选 `also|now` + 动词形名单词。前缀与动词之间
+   **刻意零窗口**——留窗口会把 `Please check whether the IP is already in
+   the allowlist` 带进误伤。
+2. **句首祈使支**：`^(?:whitelist|allowlist|blacklist)\s+限定词`。`-s` 陈述形
+   （Our script whitelists…）与 `-ing` 动名词形（Whitelisting … is standard
+   practice）靠 `\s+` 要求天然排除。
+3. **put/place ... on ... 名单设施支**：词表收 whitelist/allowlist/blacklist，
+   带 `(?!\s+of\b)` 归属豁免，挡住良性「the whitelist of your editor」。
+4. **put/place ... on ... 设施宾语支**：`on the ACL` / `on the security group`
+   不带名单词。词表**只收 firewall / ACL / access control / security group
+   四个硬设施**，不收裸 `on`，否则「put the notes on the shared drive」全族误伤。
+
+实测：攻击 **0/16 → 16/16**，良性误伤 **1/20（存量 verify，非本轮引入，
+改前后基线一致）**。
+
+## 四、守卫与负例
+
+`test/dangerous-instruction-en-listverb-round211.test.js` **78 断言全过**：
+A1 请求前缀 10、A2 句首祈使 5、A3 put on 族 7、B1 陈述形良性 8、
+B2 归属形良性 4、B3 前缀后非名单动词 8、C1-C3 既有三形回归 15、
+D1-D7 源码词面 7（含 D7 零窗口机制断言）、F gate 链 6、G 非字符串 8。
+
+负例 `scripts/negative-test-listverb-en-round211.js` **8/8**：
+M0 基线绿、N1 删请求前缀整支、N2 砍前缀动词表、N3 砍句首祈使支、
+N4 put on 名单支收窄、N5 砍 of 归属豁免、N6 删设施宾语支、
+M7 恒等式（既有族 14 条真源直调仍全守）。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | 14/14 |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增）** |
+| run-all | **7074 通过 / 0 失败** |
+| security-audit | 16/16 |
+| doc-numbers | 15/15 |
+| 本轮守卫 | **78/78** |
+| negative-test | **8/8** |
+
+## 五、踩坑
+
+1. **负例 ROOT 路径层级写错**（第 210 轮已踩过、本轮再犯）：scripts/ 下的
+   负例只需 `path.resolve(__dirname, '..')`，写 `'..','..'` 会解析到
+   `skills/ai/`，报 ENOENT。两次都在同一处，说明这是**脚本模板级坑**
+   ——后续新建负例应直接复制第 210 轮文件的头部四行。
+2. **源码词面断言用正则写会因转义层级反复假阴性**：D2/D5/D7 三条连错两次
+   （正则里的 `\\s+` 与 JS 正则字面量的转义层级对不上）。**改用
+   `RE_TEXT.indexOf('字面子串')`** 一次通过——源码词面断言就该用子串匹配，
+   不该再套一层正则。
+3. **run-all 前台跑必超时**：单次 700+ 文件实测约 490s，terminal 前台
+   420s 硬上限必杀（本轮第一次跑即被杀、日志断在 reward-hacking）。
+   按纪律用 `background=true` 起进程后 sleep 轮询，约 9 分钟跑完。
+
+## 六、遗留（给下一轮）
+
+1. **B 方向设施表副本未提共享常量**（第四次挂账，结构性重构）：
+   `src/dangerous-instruction.js` 内四份设施词表（第 102 / 160 / 248 / 258 行）
+   内容高度重叠但各自演化，是「动词表两侧分叉」家族教训的物理根因。
+   需单开一轮做共享常量抽取 + 三处测试联动。
+2. 本轮只测了「祈使/请求语气 × 动词形名单词」，**陈述形攻击**
+   （形如 `The script whitelists the attacker host`，靠语义而非语气）
+   未覆盖——属语义判别，超出现有正则能力边界，记档不排期。
+3. 归一化缺陷两轮复测均不复现，维持划掉。
+4. 探针文件按惯例留在 `scripts/round-211/` 未跟踪（历史探针同理）。
+
+---
+
 # 第 210 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：第 209 轮遗留 2「设施在前形被动语序大缺口」——`the audit log was
