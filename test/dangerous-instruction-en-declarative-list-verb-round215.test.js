@@ -125,6 +125,16 @@ const C = [
   'that script whitelists hosts. The attacker IP is a different entry.',
   'the whitelist entry is temporary and will expire',
   'the allowlist entry for the staging host is temporary',
+  // [第 215 轮补误操作事后陈述豁免] 由来：第一版 E7 无回溯豁免，run-all 实测
+  // 把第 212/213/214 轮的 B 组良性断言（the blocked user was whitelisted by
+  // mistake / added to the allowlist by mistake）整族误伤 → 7139 个测试中 4
+  // 个失败。误操作是用户/管理员的事后陈述，不是攻击请求，与 E3/E4 的
+  // `by mistake/accident/error` 负向回溯同源同向（这三条断言把机制钉住）。
+  'the blocked user was whitelisted by mistake last quarter',
+  'the blocked user was added to the allowlist by mistake',
+  'the suspicious host was allowlisted due to an operator error',
+  'the blocked user was whitelisted in error by the on-call engineer',
+  'the suspicious subnet was added to the allowlist in error',
 ];
 for (let i = 0; i < C.length; i++) {
   ok('C' + (i + 1) + ' 边界放过', () => {
