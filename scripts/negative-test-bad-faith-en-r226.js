@@ -69,7 +69,11 @@ function runTest() {
 
 function classify(r) {
   if (r.ok) return 'green';
+  // 真红 = 测试自身断言失败。check() 抛的是裸 Error（不含 AssertionError
+  // 字样），所以除 AssertionError 外，再匹配测试断言消息的关键词。
+  // 引擎模块崩溃（SyntaxError/ReferenceError/ENOENT）不含这些词 → crashed。
   if (/AssertionError|ERR_ASSERTION/.test(r.out)) return 'red';
+  if (/bad_faith|must not fire|must fire|regression|falsely flagged|must return an array/.test(r.out)) return 'red';
   return 'crashed';
 }
 
