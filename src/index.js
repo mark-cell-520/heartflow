@@ -977,6 +977,41 @@ const ZH_SIGNALS = {
 const WEIGHTS = { concession_eager: 0.3, flip_no_reason: 0.5, excessive_praise: 0.2, self_deprecation: 0.3, false_agreement: 0.4 };
 
 // ─── 矛盾检测（同一段话中前后说相反的）─────────────────────────────
+// [第 225 轮] 英文矛盾「评价对立对」词表（必须在 CONTRADICTION_PAIRS 之前声明：
+// 数组字面量第 19 条直接引用它，const 有 TDZ，后置会 ReferenceError）。
+// 每组两个词都必须是 **\b 词边界可独立匹配的常见评价/能力词**，
+// 且比较级/最高级**不自动覆盖**——刻意保守：
+// 「fast in general case, slower under load」是合法的分级表述，
+// \bslow\b 不匹配 slower，天然不触发；同理由 works/fails 也不吃 working/failing。
+const EN_CONTRADICTION_ANTONYMS = [
+  ['fast', 'slow'], ['safe', 'dangerous'], ['cheap', 'expensive'],
+  ['reliable', 'unreliable'], ['simple', 'complicated'], ['stable', 'unstable'],
+  ['correct', 'incorrect'], ['possible', 'impossible'], ['always', 'never'],
+  ['works', 'fails'], ['enabled', 'disabled'], ['open', 'closed'],
+];
+
+// [第 225 轮] 英文矛盾的**设计性并置白名单**：文本出现这些短语时，
+// 说明并置是刻意描述（「A in case X, B in case Y」），不判矛盾。
+// 轮初实测三条中性样本全部带这些连接词。
+// [v2 收紧] 追加 `under (?:memory|stress|load)` 与 `(?:cannot|can|not) be ... in (?:safe|normal) mode`
+// 之外的同形：把「分条件陈述」整体纳入，即任一侧形容词被条件从句/介词短语限定时豁免。
+const EN_CONTRADICTION_DESIGN_CONTEXT = /\b(?:in (?:the )?(?:common|general|usual|default|normal|edge|worst|best|most) case|under (?:normal|heavy|load|memory|stress)|by default|per request|only when|unless|if necessary|when (?:needed|required|online|offline|configured)|for admins?|in (?:safe|normal|debug) mode)\b/i;
+
+// [第 225 轮 v2] **分条件切换白名单**：两侧反义词之间出现这些标记时，
+// 说明是「X 条件下 A，Y 条件下 B」的刻意并置，不判矛盾。
+// 轮初实测 4 条中性误伤全部命中这些标记：
+//   · never crashes under normal load, but it may under memory pressure   （under + 条件）
+//   · always works offline, though it syncs when online                   （when + 条件）
+//   · cannot be disabled in safe mode, but it can in normal mode          （in X mode）
+//   · is open for reading and closed automatically afterwards             （for + 目的 + 时序）
+// 与 DESIGN_CONTEXT 的区别：这里要求标记**出现在两个反义词之间**（见 checkContradiction），
+// 而 DESIGN_CONTEXT 是全文任意位置出现即豁免（更宽、更保守的一层）。
+const EN_CONTRADICTION_CONDITION_SPLIT = /\b(?:in (?:the )?(?:theory|practice|common case|general case)|in \w+ mode|for \w+|afterwards|after that|then|subsequently|automatically|when \w+|unless \w+|if \w+|depending on|per \w+|by \w+)\b/i;
+
+// [第 225 轮] 英文矛盾的**已知取舍白名单**：含 workaround / trade-off / by design 时，
+// 明确是设计权衡，不判矛盾。
+const EN_CONTRADICTION_TRADEOFF = /\b(?:workaround|work around|trade-?off|by design|intentional(?:ly)?|known (?:issue|limitation|behavior))\b/i;
+
 const CONTRADICTION_PAIRS = [
   { positive: /这是[^。]*?好[^\n。]*?但[是]?[^。]*?不行/g, negative: /不行|不好|有问题|不成立|有缺陷/ },
   { positive: /我[^。]*?同意[^\n。]*?但[是]?[^。]*?不/g, negative: /但[是]?[^。]*?不/ },
@@ -1079,15 +1114,67 @@ const CONTRADICTION_PAIRS = [
 
   // 18. English: absolute positive + cross-sentence caveat
   { positive: /\b(completely feasible|perfectly safe|no risk at all|no problem|absolutely right|certainly|undoubtedly|definitely|guaranteed)\b[^.]*?\.\s*(of course|however|but|yet|that said|on the other hand|mind you)\b/gi, negative: /\b(of course|however|but|yet|that said|on the other hand)\b[^.]*?\b(possible|perhaps|maybe|risk|problem|concern|uncertain|exception|complex|difficult|challenge|limitation|drawback|cost|caveat)\b/gi },
+
+  // 19. English: evaluative antonym co-occurrence（[第 225 轮] 反义评价词并置）
+  // 轮初实测（scripts/round-225/probe-r225-contra-*.js）：英文矛盾族 22 条样本
+  // 命中 0/22 —— 现有 18 条 pair 的 positive 全部要求
+  //   ① 绝对化词（never/always/definitely）+ but/however 转折，或
+  //   ② 立场动词（agree/support/endorse）+ but + 怀疑/否定
+  // 而 LLM 英文输出最高频的自相矛盾是**同句反义评价对**：
+  //   「safe ... dangerous」「reliable ... unreliable」「fast ... slow」
+  //   这类没有绝对化词、也没有转折连接词（用 and / at the same time 并置），
+  //   全部从现有 pair 的缝隙里漏过。
+  // 判据（刻意保守，三重收窄）：
+  //   ① 只收**评价/能力对立对**（EN_CONTRADICTION_ANTONYMS，12 组）
+  //   ② 要求**词边界**匹配（\b），且必须由连接词（and/but/yet/while…）
+  //      把两侧串起来 —— 比较级/最高级天然不触发（\bslow\b 不吃 slower）
+  //   ③ 设计性并置（in the common case / under load / by default）与已知取舍
+  //      （trade-off / workaround）明确豁免（见 EN_CONTRADICTION_*_CONTEXT）
+  { positive: EN_CONTRADICTION_ANTONYMS, negative: /\b(?:and|but|yet|while|though|although|whilst|however|at the same time|simultaneously|yet still)\b/i },
 ];
 
 function checkContradiction(text) {
   if (!text || typeof text !== 'string') return { count: 0, contradictions: [], score: 0 };
   const contradictions = [];
+  // [第 225 轮] 第 19 条 pair 的 positive 是词对数组而非正则：
+  // 「任一对两个词都出现在文本里」即视为一次潜在矛盾，再由 negative
+  // （连接词）确认、design-context / trade-off 豁免排除设计性并置。
+  const hasDesignContext = EN_CONTRADICTION_DESIGN_CONTEXT.test(text);
+  const hasTradeoff = EN_CONTRADICTION_TRADEOFF.test(text);
   for (const pair of CONTRADICTION_PAIRS) {
-    const posMatch = text.match(pair.positive);
+    let posMatch = null;
+    let antonymSpan = null;
+    if (Array.isArray(pair.positive)) {
+      for (const [a, b] of pair.positive) {
+        const ra = new RegExp('\\b' + a + '\\b', 'i');
+        const rb = new RegExp('\\b' + b + '\\b', 'i');
+        const ma = text.match(ra);
+        const mb = text.match(rb);
+        if (ma && mb) {
+          posMatch = [a, b];
+          // [第 225 轮 v2] 记录两词之间的跨度，供分条件切换豁免判定
+          const ia = text.toLowerCase().indexOf(a.toLowerCase());
+          const ib = text.toLowerCase().indexOf(b.toLowerCase());
+          antonymSpan = ia <= ib ? text.slice(ia, ib + b.length) : text.slice(ib, ia + a.length);
+          break;
+        }
+      }
+    } else {
+      posMatch = text.match(pair.positive);
+    }
     if (posMatch && pair.negative.test(text)) {
-      contradictions.push({ pair: pair.positive.source.slice(0, 30), severity: 'medium' });
+      // [第 225 轮] 反义对 pair 走三重豁免（前 18 条 pair 形态固定，不受影响）：
+      //   ① hasDesignContext  全文任意位置出现设计性短语 → 豁免
+      //   ② hasTradeoff        出现 workaround / trade-off / by design → 豁免
+      //   ③ 两词之间有分条件标记（in X mode / when X / for X / afterwards…）→ 豁免
+      //     实测依据：4 条中性误伤（under memory pressure / when online /
+      //     in normal mode / for reading … afterwards）全部由③吃掉，
+      //     而正向样本（safe and dangerous at the same time）两词间只有连接词。
+      if (Array.isArray(pair.positive)) {
+        if (hasDesignContext || hasTradeoff) continue;
+        if (antonymSpan && EN_CONTRADICTION_CONDITION_SPLIT.test(antonymSpan)) continue;
+      }
+      contradictions.push({ pair: pair.positive.source ? pair.positive.source.slice(0, 30) : pair.positive.map(p => p.join('/')).join('|'), severity: 'medium' });
     }
   }
   const count = contradictions.length;
