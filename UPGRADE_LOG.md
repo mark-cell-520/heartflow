@@ -1,3 +1,101 @@
+# 第 216 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：decision 引擎四候选真调裁决 **A**（composite 0.87 对 B 0.78 / C 0.74 /
+D 0.75）—— 接线 `src/core/verification-engine.js` + `src/shield/skill-verifier.js`
+共 960 行零引用模块。候选口径照 `scripts/round-216/decide-r216.js`（数值字段行内同写，
+避开本簿第 213/214/215 轮记的 decision 同分弃权坑）。
+
+**立项量化**（`scripts/round-216/scan-zero-ref3.js` 全仓引用图实测）：src/ 下
+共 **369** 个真零引用模块（此前两次扫描 38/122 全错——前者只 grep 路径尾部把
+`verification-engine` 误判为已被引用，后者把 archive/ 之类无入口的历史文件也
+算进来）。按「>50 行 + 有真实逻辑 + 接线成本可控」筛出 4 个候选，decision
+裁决 A。`scripts/round-216/probe-r216-ve-all.js` 实测：**两条主链路
+（verifySkill / fullVerification）全崩**，坏文档与好文档都抛
+`issue.includes is not a function`；C/D/E/F/G 组 12 项接口只有 3 项可用。
+「全仓 0 引用」的真实原因不是没人需要，是功能崩着没人敢接。
+
+**崩溃根因与修复（5 处 + 2 处误报，共三个 commit）**：
+
+1. `_classifyResult` 的 `{ ...error }` —— error 是字符串，展开成字符下标对象
+   （`{0:'[',1:'F',...}`），severity 挂到字符属性上，下游 `bySeverity[sev]`
+   全读不到，verify() 每条 error 被静默污染。
+2. `verification-engine._classifyResults` 把 error 当字符串喂 `_classifyIssue`
+   → `issue.includes is not a function`，verifySkill/fullVerification 全崩。
+3. `fullVerification` 步骤 1 把 `{message,severity}` 对象 push 进 issues，
+   步骤 4 再崩一次；步骤 2 把 mark 对象数组也当字符串塞 issues。
+4. `claimCheck.confidence.score` —— `assessConfidence` 返回 0-1 数字，
+   取 `.score` 得 undefined，`generateReport` 里 `toFixed(0)` 抛 TypeError。
+5. `assertions.skillFrontmatter` 的 `^version:\s*v?[\d.]+$` 不匹配带引号
+   YAML（`version: "6.7.124"` 是本仓 SKILL.md 实际写法），合规文档被判缺字段。
+6. 误报：`_validateLinks` 的锚点归一化 `[^\w-]` 清掉 CJK（`\w` 不含中文），
+   每条中文小节都判「重复锚点 ""」。
+7. 误报：版本一致性比对因引号 version 取空而被整个跳过——真版本不一致反而不报。
+
+**接线三处联动**（AGENTS.md 约定 #2/#3）：
+- `src/core/heartflow.js`：`_lazy('verificationEngine')` + start() 内
+  `this.verification = ...verificationEngine`（对象单例，非 constructor）+
+  LATE_ADDITIONS 加 `'verification'`（dispatch 的 `_modules` 前置条件）+
+  ALLOWED_ROUTES 开三条。**坑：这些赋值在 `start()` 里不在 constructor，
+  直接 new HeartFlow() 看 hf.verification 恒为 false**——首次冒烟因此误判
+  「接线失败」，`scripts/round-216/find-start-end.js` 定位 start() 跨度
+  1512-4398 行后才确认。
+- `src/mcp-server.js`：`heartflow_verification_verify` 工具（三处：registry
+  定义 + HANDLERS 映射 + handler 实现），与 `heartflow_execution_verify`
+  刻意区分（后者走 dispatch('execution.verify') 校验单次动作效果）。
+- 文档数字三份同步（doc-numbers-accuracy 机器读数）。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增）** |
+| run-all | **7418 通过 / 0 失败** |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| 本轮守卫 | **28/28**（A 4 / B 5 / C 6 / D 5 / F 2 / G 2 / H 4） |
+| negative-test | **10/10**（M0 基线 + 8 变异全红 + M9 还原全绿） |
+
+**自引入回归（run-all 实测抓出，已修复并坐实）**：新增 MCP 工具使 doc-numbers
+4 项 FAIL（README/SKILL/AGENTS 工具数 59→60、AGENTS 路由 1728→1742、
+README 测试数 7393→7418），三份文档改机器读数后 15/15 恢复。
+
+**踩坑（负例脚本侧，三轮才收敛）**：
+① 变异锚点必须与源码逐字符一致——本例锚点含 `''`（单引号空串），
+首版用 `""` 拼 → 3 次「锚点未找到」假阴性；脚本报 XXFAIL 而非静默放过是对的。
+② 首版 M5/M7 只改周边代码（`const obj = null` / `0.5 ?`），没回到原 bug
+形态 → 守卫全绿=守卫不硬；改为整段回滚后才全红。
+③ 探针不能靠相对路径猜 cwd（`../../SKILL.md` ENOENT），改 `process.cwd()`。
+
+## 遗留（给下一轮）
+
+1. **run-all 环境噪声复现**：arXiv 对本机持续 429，`_fetchArxiv` 429 分支
+   sleep 60s+180s=240s，把 90s CHILD_TIMEOUT 的
+   `evolution-audit.test.js` / `evolution-state.test.js` 两个 mount 测试拖成
+   `spawnSync node ETIMEDOUT`（run-all 有零输出重试一次，仍 240s>90s 故失败）。
+   本轮两次 run-all 实测对照：第一遍（arXiv 未限流）**7418/0**，第二遍
+   （arXiv 已限流）7418/2。单跑两文件也各 100s 超时。**与本轮改动无关**
+   （git diff 未碰 self-evolution 链路）。建议下轮给 `_fetchArxiv` 的退避
+   sleep 加测试注入 seam（构造器已留 `this._safeFetch` 可注入，sleep 没有），
+   或让 mount 测试在 explore 开关关时跳过真实出网。
+2. **verification-engine 只接了 3 条 dispatch 路由**（verifySkill /
+   verifyCode / healthCheck）。`verifyClaims` / `quickCheck` / `fullVerification`
+   / `recordCorrection` / `getLessons` 未开放（fullVerification 是 async，
+   dispatch 同步契约要另想）。MCP 工具也只暴露 skill/code 两型，
+   `general` 与 claims 路径未接。
+3. **`good` 文档 verifySkill 仍 ok=false（score=99）**：因 `[描述] 描述过短`
+   （<20 字符）判 info 级。样本 description 只有 17 字符 API 议，属判据过严
+   不是 bug，但说明 verify() 的 ok 语义是「零 error 级」而非「零问题」，
+   与调用方预期可能有落差，值得下一轮与用户确认口径。
+4. **仓库零引用模块仍有 369 个**，本轮只接 1 个（960 行）。下一轮候选：
+   `src/cortex/reflection-loop.js`（1541 行）、`src/workflow/thought-chain.js`
+   （1457 行）、`src/memory/triality-memory.js`（1670 行）。
+5. **71+ 历史探针文件未跟踪**（scripts/round-154/ 至 round-211/），
+   同第 212-215 轮记录，仍记档不排期。
+6. **doc-numbers 的 MCP 工具数是静态正则数 HANDLERS 键**，新增工具必须同步
+   三份文档，否则 4 项断言齐 FAIL——这是本轮踩到的，写在此处备忘。
+
+---
+
+# 第 215 轮（v6.7.124 工作面，unattended 自主升级）
 # 第 215 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：decision 引擎四候选真调裁决 **A**（composite 0.88 对 B 0.65 / C 0.64 / D 0.61）
