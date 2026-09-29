@@ -93,7 +93,7 @@ class SelfEvolutionV2 {
         if (this._rateLimited) break; // 429 后停止连击, 避免加重限流
         const batch = await this._fetchArxiv(q, 5);
         papers = papers.concat(batch);
-        await new Promise(r => setTimeout(r, 3000)); // [v6.0.64] 尊重 arXiv 限流: ~3s/请求
+        await this._sleep(3000); // [v6.0.64] 尊重 arXiv 限流: ~3s/请求
       }
       const gaps = this._diffAgainstSelf(papers);
       return gaps;
@@ -108,6 +108,25 @@ class SelfEvolutionV2 {
       lastFetchError: this._lastFetchError || null,
       lastExplore: this._lastExplore || 0
     };
+  }
+
+  /**
+   * [v6.7.128 第 217 轮] 可注入的 sleep seam。
+   * 由来（216 轮遗留 1，实测复现）：arXiv 对本机持续 HTTP 429，
+   * _fetchArxiv 的退避累计 60000 + 180000 = 240s，加上 5 个查询词
+   * 各 3s 的礼貌间隔共 15s，总耗时远超 test/run-all.js 的
+   * 90s CHILD_TIMEOUT，把 evolution-audit / evolution-state 两个
+   * mount 测试拖成 spawnSync node ETIMEDOUT（与这些测试的逻辑无关，
+   * 纯粹是网络噪声）。
+   * 修法不是缩减退避（那会削弱真实限流防护），而是让测试能把 sleep 换掉：
+   *   · 实例字段 this._sleepFn（测试可整体替换）
+   *   · 环境变量 HEARTFLOW_TEST_NO_SLEEP=1 时全局置零延迟
+   * 真实生产路径（无 seam、无环境变量）行为与改动前完全一致。
+   */
+  _sleep(ms) {
+    if (typeof this._sleepFn === 'function') return this._sleepFn(ms);
+    if (process.env.HEARTFLOW_TEST_NO_SLEEP === '1') return Promise.resolve();
+    return new Promise(r => setTimeout(r, ms));
   }
 
   async _fetchArxiv(query, max = 5) {
@@ -128,7 +147,7 @@ class SelfEvolutionV2 {
           if (attempt < 2) {
             const backoff = 60000 * Math.pow(3, attempt);
             console.warn(`[arxiv] rate-limited, backoff ${backoff/1000}s before retry...`);
-            await new Promise(r => setTimeout(r, backoff));
+            await this._sleep(backoff);
             continue;
           }
           this._lastFetchError = 'HTTP 429 rate limited by arXiv';
