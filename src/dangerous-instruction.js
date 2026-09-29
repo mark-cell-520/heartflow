@@ -200,6 +200,33 @@ const DANGEROUS_PATTERNS = [
   // host/certificate/record 无限定词，`was added to the staging allowlist
   // by the CI job` 不命中；信任库形设施词不在表内。
   /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|temporary|bypass)\b[^.]{0,40}\b(?:was|were|got|has\s+been|have\s+been|is\s+being|are\s+being)\s+(?:added\s+(?:to|into|onto|on)|put\s+on|inserted\s+into|appended\s+to)\s+(?:the\s+)?(?:firewall\s+|access\s+control\s+)?(?:whitelist\w*|allowlist\w*|ACL\b|security\s+group|trusted\s+list)\b(?!\s+by\s+(?:mistake|accident|error))(?!\s+(?:last|this)\s+(?:quarter|month|year|week))(?![^.]{0,20}\s+in\s+error\b)/i,
+  // [第 214 轮补「情态 × 加入」与「情态/被动 × 撤出 × 设施后置」两侧词序]
+  // 由来：第 213 轮裁决 A（composite 0.88 对 B 0.71 / C 0.59）。复测量化
+  // （scripts/round-214/probe-r214-shape.js）：情态加入形 8/8 全 pass、
+  // 情态/被动撤出形 7/8 全 pass，良性 30 句零误伤。根因同 v6.7.123 家族
+  // 教训：第 213 轮 E4 支是「主语限定词在前 + 被动完成系动词 + 加入动词」，
+  // 第 212 轮 E2 支是「设施先行 + 情态 + 撤出分词」，而情态动词在前的两种
+  // 词序（情态→动词→设施后置）两侧都不在表内——同一语义族按「动词在前 /
+  // 设施在前 × 加入 / 撤出」四象限切分，第 205-213 轮只长出两格。
+  // 判据沿用语气切分（不靠词窗口）：
+  //   E5 情态加入支：情态（should/must/ought to/has to/needs to/could/can/
+  //      may/might/will/needs）+ 可选 be + 加入动词 + to/into/onto/on +
+  //      名单或设施。情态即请求语气（"this IP should be added to the
+  //      allowlist" 是建议执行，不是历史陈述），与 E4 的被动完成陈述形
+  //      天然区分。设施表刻意收窄到 whitelist\w*/allowlist\w*/ACL/
+  //      security group/trusted list/exception list，**不收裸 group/list**
+  //      ——否则 "monitoring group"、"mailing list"、"album list" 全族误伤。
+  //   E6 情态/被动撤出支：情态或被动系动词 + 撤出分词（unlist/remove/delete/
+  //      strip/drop/lift/purge/revoke）+ from/out of/off + 名单或设施。
+  //      这是 E1（祈使支）的被动/情态形与 E2（设施先行形）的设施后置形，
+  //      四种词序中剩余的两格。
+  // 良性边界（probe 30 句零误伤，逐条由机制保证）：schema/audit trail/
+  //    ledger/shortlist/shared doc/key vault/load balancer/release branch/
+  //    cache/parked list/mailing list/feedback form/chat channel/backlog
+  //    queue 都不在设施表内；"the whitelist of your editor" 由 `(?!\s+of\b)`
+  //    归属豁免挡住；本地联调形由 dev-exemptions 的 LIST_ADD_DEV 窄支赦免。
+  /\b(?:should|must|ought\s+to|has\s+to|have\s+to|needs?\s+to|could|can|may|might|will|needs?)\s+(?:also\s+|now\s+)?(?:be\s+)?(?:add\w*|put|insert\w*|append\w*|includ\w*|enroll\w*)\s+[\w\s.]{0,24}?\s*(?:to|into|onto|on)\s+(?:the\s+|this\s+|that\s+)?(?:firewall\s+|access\s+control\s+|security\s+)?(?:whitelist\w*|allowlist\w*|ACL\b|security\s+group|trusted\s+list|exception\s+list)\b(?!\s+of\b)/i,
+  /\b(?:should|must|ought\s+to|has\s+to|have\s+to|needs?\s+to|could|can|may|might|will|needs?|was|were|got|has\s+been|have\s+been|is\s+being|are\s+being)\s+(?:be\s+|also\s+|now\s+|immediately\s+|finally\s+|already\s+)?(?:unlist\w*|remov\w*|delet\w*|stripp\w*|dropp\w*|lift\w*|purg\w*|revok\w*|tak(?:e|en))\s+(?:from|out\s+of|off)\s+(?:the\s+|this\s+|that\s+)?(?:firewall\s+|access\s+control\s+|security\s+)?(?:whitelist\w*|allowlist\w*|blacklist\w*|ACL\b|security\s+group|trusted\s+list)\b(?!\s+of\b)/i,
   // [v6.7.125] 设施名后置绕过式（第 31 轮）。
   // 第①条是「动词在前、设施在后」，但「绕过 WAF 的 SQL 注入」「绕过证书校验
   // 的工具」把设施放在**前面**（「WAF 的」是定语），两类词序都收才算齐。
