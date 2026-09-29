@@ -40,6 +40,7 @@ const REPLACEMENTS = [
   { id: 'N10', name: '砍 due to … error 误操作豁免（E3/E7 同犯）',
     from: '(?!\\s+due\\s+to\\s+(?:an?\\s+)?(?:mistake|accident|error|operator\\s+error|human\\s+error|manual\\s+error|config\\w*\\s+error))', to: '' },
   { id: 'N11', name: '砍 in error 误操作豁免', from: '(?![^.]{0,25}\\s+in\\s+error\\b)', to: '' },
+  { id: 'N12', name: '砍 none-of-them 排除形 lookbehind', from: '(?<!none\\s+of\\s+them[^.]{0,25})', to: '' },
 ];
 
 const GUARD = path.join(__dirname, '..', 'test', 'dangerous-instruction-en-declarative-list-verb-round215.test.js');

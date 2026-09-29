@@ -135,6 +135,12 @@ const C = [
   'the suspicious host was allowlisted due to an operator error',
   'the blocked user was whitelisted in error by the on-call engineer',
   'the suspicious subnet was added to the allowlist in error',
+  // [第 215 轮补 none-of-them 排除形] run-all 复跑实测把第 211 轮 B2-3
+  // 良性断言「allowlist 有条目且 none of them are suspicious」误伤。
+  // 形态要点：排除形在可疑词**之前**，前瞻锚点（只能往后看）不可达，
+  // 必须用 lookbehind `(?<!none\s+of\s+them[^.]{0,25})`。
+  'The allowlist has 12 entries and none of them are suspicious.',
+  'The whitelist had 3 hosts and none of them are attacker-controlled.',
 ];
 for (let i = 0; i < C.length; i++) {
   ok('C' + (i + 1) + ' 边界放过', () => {
