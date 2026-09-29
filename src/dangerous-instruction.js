@@ -227,6 +227,43 @@ const DANGEROUS_PATTERNS = [
   //    归属豁免挡住；本地联调形由 dev-exemptions 的 LIST_ADD_DEV 窄支赦免。
   /\b(?:should|must|ought\s+to|has\s+to|have\s+to|needs?\s+to|could|can|may|might|will|needs?)\s+(?:also\s+|now\s+)?(?:be\s+)?(?:add\w*|put|insert\w*|append\w*|includ\w*|enroll\w*)\s+[\w\s.]{0,24}?\s*(?:to|into|onto|on|in)\s+(?:the\s+|this\s+|that\s+)?(?:firewall\s+|access\s+control\s+|security\s+)?(?:whitelist\w*|allowlist\w*|ACL\b|security\s+group|trusted\s+list|exception\s+list)\b(?!\s+of\b)/i,
   /\b(?:should|must|ought\s+to|has\s+to|have\s+to|needs?\s+to|could|can|may|might|will|needs?|was|were|got|has\s+been|have\s+been|is\s+being|are\s+being)\s+(?:be\s+|also\s+|now\s+|immediately\s+|finally\s+|already\s+)?(?:unlist\w*|remov\w*|delet\w*|stripp\w*|dropp\w*|lift\w*|purg\w*|revok\w*|tak(?:e|en))\s+(?:from|out\s+of|off)\s+(?:the\s+|this\s+|that\s+)?(?:firewall\s+|access\s+control\s+|security\s+)?(?:whitelist\w*|allowlist\w*|blacklist\w*|ACL\b|security\s+group|trusted\s+list)\b(?!\s+of\b)/i,
+  // [第 215 轮补「免检名单动词 × 可疑宾语同窗」缺口]
+  // 由来：decision 引擎第 215 轮四候选真调裁决 A（composite 0.88 对 B 0.65 /
+  // C 0.64 / D 0.61，口径照 scripts/round-215/decide-r215.js）。复测量化
+  // （scripts/round-215/probe-r215-a.js，不信简报旧描述、实测复跑）：
+  // 陈述三单形 8/8、系动词 gets/becomes 被动形 4/4、情态形无介词 4/4 ——
+  // **16/16 全 pass**；同期对照组（防御形 blacklist×可疑宾语 4 + 良性 8 +
+  // 良性×blacklist×可疑宾语 5）**零误伤**。根因同 v6.7.123 家族教训：
+  // E3/E4 主干限定表全是「主语限定词在前 + 被动完成系动词 + 加入动词」，
+  // 第 211 轮 A1/A2 支只收「请求前缀/句首祈使 + 名单动词」，于是
+  // **陈述形主体 + 名单动词 + 可疑宾语同窗共现**这一格四周都不在表内
+  // （同一语义族第 17 次按词面差集复发）。
+  // 判据（两条正则覆盖语序无关的两侧，均不靠词窗口而是「同句共现」）：
+  //   E7a 动词在前形：免检名单动词（whitelist\w*/allowlist\w*，覆盖
+  //      whitelists/whitelisted/whitelisting 三态）+ 跨句窗口 {0,40}
+  //      + 可疑宾语限定词。
+  //   E7b 宾语在前形：可疑宾语限定词 + 跨句窗口 {0,40} + 免检名单动词
+  //      （覆盖 "the attacker IP gets whitelisted by the script" 这类
+  //      宾语前置、动词在后的被动/系动词形）。
+  // 四项机制均由实测逼出：
+  // ① **设施表只收免检方向，绝不收 blacklist\w*** ——
+  //    "the script blacklists the attacker IP" 是防御动作陈述，
+  //    命中即误伤（probe A4 组 4 条 + B+ 组 5 条坐实，两组是同一词序的
+  //    防御对照样本，必须保持放过）。
+  // ② 可疑宾语表收窄为七词硬限定 + **temporary 只在后接凭据/主机/域/
+  //    会话名词时成立**——裸 "temporary" 会让良性陈述形
+  //    "the whitelist entry is temporary"（词面：白名单条目是临时的）
+  //    整族误伤，这是第一版 8 词裸表实测出来的边界。
+  // ③ 两支都带 `(?!\s+of\b)` 归属豁免（"the whitelist of your editor"
+  //    仍是良性，与 E3/E5/E6 同源同向）。
+  // ④ 跨句窗口 [^.]{0,40} 不跨句号——名单动作与可疑宾语分属两个句子时
+  //    是两件事，不构成单句内的操作指令。
+  // 良性边界（probe B 组 8 句零误伤）：editor vendor/CDN providers/
+  //    staging subnet/reviewed partners/phishing domain/audit endpoints/
+  //    internal mirror 都不在可疑宾语表内；loader blacklist（名词形）
+  //    因表内不收 blacklist 天然放过。
+  /\b(?:whitelist\w*|allowlist\w*)\b[^.]{0,40}\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|bypass|temporary\s+(?:credential|access|token|host|ip|domain|session))\b(?!\s+of\b)/i,
+  /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|bypass|temporary\s+(?:credential|access|token|host|ip|domain|session))\b[^.]{0,40}\b(?:whitelist\w*|allowlist\w*)\b(?!\s+of\b)/i,
   // [v6.7.125] 设施名后置绕过式（第 31 轮）。
   // 第①条是「动词在前、设施在后」，但「绕过 WAF 的 SQL 注入」「绕过证书校验
   // 的工具」把设施放在**前面**（「WAF 的」是定语），两类词序都收才算齐。
