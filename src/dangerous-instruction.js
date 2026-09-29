@@ -179,6 +179,27 @@ const DANGEROUS_PATTERNS = [
   /\b(?:remove|delete|take|strip|drop|pull)\s+(?:this|that|these|the|it|them|any)?[^.]{0,20}\b(?:off|out\s+of|from)\s+(?:the\s+)?(?:firewall\s+|security\s+|access\s+control\s+|ACL\b|security\s+group|whitelist|allowlist|blacklist)\b(?!\s+of\b)/i,
   /\b(?:firewall|security\s+group|access\s+control\s+list|access\s+control|ACL\b|whitelist\w*|allowlist\w*|blacklist\w*)\b[^.]{0,25}\b(?:should|must|has\s+to|can|ought\s+to|needs?)\s+(?:to\s+)?(?:be\s+)?(?:remov\w*|delet\w*|stripp\w*|unlist\w*|dropp\w*|taken\s+off)/i,
   /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|temporary|bypass)\b[^.]{0,40}\b(?:was|were|got|has\s+been|have\s+been|is\s+being)\s+(?:whitelisted|allowlisted)\b(?!\s+by\s+(?:mistake|accident|error))/i,
+  // [第 213 轮补被动完成「加入动作」侧] 由来：decision 引擎第 213 轮三候选
+  // 裁决 A（feasibility=0.9 / risk=0.2 / consequence_value=0.8，composite
+  // 0.86 对 B 0.80 / C 0.72）。复测量化（scripts/round-213/probe-r213-shape.js）：
+  // 被动完成形「加入」侧 8/8 全 pass（D 族可疑主语 4 条 + 无主语限定 4 条），
+  // 第 212 轮三条支与良性 15 条全部保持原状。根因同 v6.7.123 家族教训：
+  // E3 只收了免检的**结果态**（whitelisted/allowlisted），没收把对象
+  // **动作态**送进免检设施的完成形（was/was added onto/has been put on/
+  // got added to）——同一语义族的两半又只长出一半。
+  // 判据沿用 E3 的主语限定 + 被动完成两半（主语限定表副本见上方 E3 行，
+  // 副本问题挂 UPGRADE_LOG 遗留 1），新增第三半「加入动词 + 设施」：
+  //   added to/into/onto/on · put on · inserted into · appended to +
+  //   名单词（whitelist\w*/allowlist\w*）或硬设施（ACL/security group/
+  //   access control/firewall）。
+  // 设施侧**刻意不收 blacklist**——`the blocked domain got added to the
+  // blacklist` 是防御动作陈述（该拦的对象正在被拦），命中即误伤第 212 轮
+  // E3 已论证的同一边界。
+  // `by mistake/accident/error` 负向回溯与 E3 对齐：误操作的事后陈述放过。
+  // 良性侧（probe 15 句）靠主语限定天然排除：CI/staging 形主语是
+  // host/certificate/record 无限定词，`was added to the staging allowlist
+  // by the CI job` 不命中；信任库形设施词不在表内。
+  /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|temporary|bypass)\b[^.]{0,40}\b(?:was|were|got|has\s+been|have\s+been|is\s+being|are\s+being)\s+(?:added\s+(?:to|into|onto|on)|put\s+on|inserted\s+into|appended\s+to)\s+(?:the\s+)?(?:firewall\s+|access\s+control\s+)?(?:whitelist\w*|allowlist\w*|ACL\b|security\s+group|trusted\s+list)\b(?!\s+by\s+(?:mistake|accident|error))(?!\s+(?:last|this)\s+(?:quarter|month|year|week))(?![^.]{0,20}\s+in\s+error\b)/i,
   // [v6.7.125] 设施名后置绕过式（第 31 轮）。
   // 第①条是「动词在前、设施在后」，但「绕过 WAF 的 SQL 注入」「绕过证书校验
   // 的工具」把设施放在**前面**（「WAF 的」是定语），两类词序都收才算齐。
