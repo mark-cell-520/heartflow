@@ -1,3 +1,147 @@
+# 第 214 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：第 213 轮裁决留下的「情态 × 加入」与「情态/被动 × 撤出 × 设施后置」
+两侧词序缺口。decision 引擎三候选真调裁决 **A**（composite 0.88 对 B 0.71 /
+C 0.59）。**词面差集第 15 次复发**，形态与 205-213 轮完全一致：同一名单语义族
+按「动词在前/设施在前 × 加入/撤出」四象限切分，第 205-213 轮只长出两格
+（动词在前祈使/主谓支、设施在前情态支），情态动词在前的两格不在表内。
+
+**立项量化**（`scripts/round-214/probe-r214-shape.js`，不信简报旧描述、
+实测复跑）：情态加入形 **8/8 全 pass**、情态/被动撤出形 **7/8 全 pass**
+（B7 一条由既有 E1 祈使支覆盖，非本轮新增漏判）；良性 30 句（含 schema/
+audit trail/monitoring group/album list/mailing list/backlog queue 等
+非安全设施 list/group）零误伤。
+
+**decision 真调踩坑（第 14/15 次复现同形态）**：首版候选把数值字段写在
+描述第二行 → 三候选同分 0.74、`chosen: null`。读码确认 bracket 解析只取每
+候选首行（`src/core/decision.js` 第 365 行 `(.+)$` 不含换行），数值字段必须
+与候选描述同行。改为同行后正常裁决 A。**交接：本轮数值字段行内写法已验证
+有效，后续轮直接照 `scripts/round-214/decide-r214.js` 抄。**
+
+**改动**：一处 src、两条正则，加在第 213 轮 E4 行之后（两 commit：src+探针、
+守卫+负例）：
+
+1. **E5 情态加入支**：情态表（should/must/ought to/has to/have to/needs to/
+   could/can/may/might/will/needs）+ 可选 be + 加入动词
+   （add\w*/put/insert\w*/append\w*/includ\w*/enroll\w*）+ 介词
+   （to/into/onto/on/in）+ 设施（whitelist\w*/allowlist\w*/ACL/security group/
+   trusted list/exception list）。情态即请求语气，与 E4 的被动完成陈述形天然区分。
+2. **E6 情态/被动撤出支**：情态或被动系动词 + 可选 be + 撤出分词
+   （unlist/remove/delete/strip/drop/lift/purge/revoke/tak(e|en)）+
+   from/out of/off + 设施。这是 E1 祈使支与 E2 设施先行支的设施后置形。
+
+三项机制均由实测逼出：
+① **设施表刻意不收裸 group/list**——否则 monitoring group / album list /
+   mailing list 全族误伤（N9 变异坐实：放宽即红）；
+② 两支都带 `(?!\s+of\b)` 归属豁免（N8 变异坐实：去掉即红）；
+③ **E5 介词表补 `in`**（"will be included in the security group"）、
+   **E6 撤出动词表收 `tak(e|en)`**（"should be taken off" 分词形）——
+   守卫第二跑实测抓出，是词面差集在同支内的第 16 次复发（介词形与分词形）。
+
+最终矩阵：攻击 **16/16**（A 族 8 + B 族 8）、良性 **0/35**（守卫 C 组，
+比探针 30 句多 5 条 playlist/shopping cart/waiting list 等非设施形）。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增）** |
+| run-all | **7325 通过 / 0 失败**（基线 7230 + 本轮守卫 95 断言，吻合） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| 本轮守卫 | **95/95**（A 12 / B 12 / C 35 / D 23 / E 6 / F 2 / G 5） |
+| negative-test | **11/11**（M0 + 9 变异全红 + M9 恒等式 20 条全守） |
+
+## 遗留（给下一轮）
+
+1. **设施词表四份副本未提共享常量**（第 211 轮已列，**第七次挂账**）：
+   `src/dangerous-instruction.js` 内多份设施词表仍各自演化（本轮新增的
+   E5/E6 又各带一份副本），是「动词表两侧分叉」家族的物理根因。结构性重构，
+   需单开一轮；副作用是下次加族仍要多改三处。
+2. **情态 × blacklist-exempt 形状**（该拦对象被移入免检名单的否定表述形）
+   仍未覆盖，需语义否定推理，记档不排期。
+3. **decision 候选数值字段必须行内同写**（本簿第 213/214 轮两次实测复现），
+   调用方照 `scripts/round-214/decide-r214.js` 抄，别再返工。
+4. 陈述形名单动词攻击、`blocked domain got blacklisted anyway` 宾语推理形、
+   71 个历史探针文件未跟踪——同第 212/213 轮记录，仍记档不排期。
+
+---
+# 第 213 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：第 212 轮补了名单动词族的反义撤出侧与被动**结果态**侧，立项复测
+坐实剩下的是被动**动作态**族——同一语义族的第三半没长出来。decision 引擎
+三候选裁决 A（composite 0.86 对 B 0.80 / C 0.72）。
+
+**立项量化**（`scripts/round-213/probe-r213-shape.js`，未信简报旧描述、
+实测复跑）：被动完成「加入动作」侧 **8/8 全 pass**（D 族可疑主语 4 条：
+suspicious/attacker/malicious/unverified × was added onto / has been put
+on / is being added to / got added to），B 族情态加入形 6/6、C 族反义撤出
+剩余形 4/4 同 pass；第 212 轮三条支与良性 15 条全部保持原判（回归成立）。
+**词面差集第 14 次复发**，形态与 205-212 轮完全一致：一个名单语义族按
+「加入结果态 / 加入动作态 / 撤出动作态 / 撤出完成态」四个象限切分，
+第 211 轮补两格、第 212 轮补一格，本轮补第四格。
+
+**decision 真调（两次返工后才拿到 chosen）**：
+- 首版 `decide-r213.js` 三个候选用自然语言描述可行性/风险 →
+  `chosen: null, confidence: 0`，三候选同分 0.74。
+- 二次补判据 `decide-r213b.js` 仍 null/0 同分 0.74。
+- 根因读码定位（`src/core/decision.js` 第 334 行 `NUMERIC_KEYS` +
+  第 365 行 bracket 解析）：**候选必须写 `key=0.85` 形态的数值字段才进
+  打分路径**，「可行性=高」这种自然语言不产生数字，四个维度全回退默认值。
+  改为 `decide-r213c.js` 每候选一行 + feasibility/consequence_value/risk
+  显式数值后，正常裁决 A（0.86）。
+- 这条是第 87 轮已修过一次的坑的**第二次复发**：调用方（cron 任务）没按
+  数值字段写法喂候选。已写进本轮结论供后续轮复用。
+
+**改动**（一处 src、一条正则，加在第 212 轮 E3 行之后）：
+被动完成加入动作支：主语限定（attacker/malicious/suspicious/blocked/
+known-bad/unverified/temporary/bypass，与 E3 同一表）+ 被动系动词
+（was/were/got/has been/have been/is being/are being）+ 加入动词
+（added to/into/onto/on · put on · inserted into · appended to）+
+设施（whitelist\w*/allowlist\w*/ACL/security group/trusted list）。
+三项机制均经实测逼出：① 设施侧**不收 blacklist**——`the blocked domain
+got added to the blacklist` 是防御动作陈述；② `by mistake/accident/
+error` + `in error` + `last/this quarter/month/year/week` 三重负向
+回溯（第一版 4/41 误伤 3 条，补回溯后归零）；③ 主语限定表天然排除
+CI/staging/审计/历史形主语（host/certificate/record 无限定词）。
+
+最终矩阵：攻击 **12/12**（含 D 族 4 条专门主语形）、良性误伤 **0/37**。
+
+**守卫与负例**：`test/dangerous-instruction-en-passive-add-round213.test.js`
+**81/81**（A 12 / B 37 / C 19 回归 / D 6 源码词面 / F 2 gate 链 / G 5）。
+D6 断言踩坑一次：注释段里含 blacklist 论证文字，整段 indexOf 恒假——
+改为只截正则该行再断言（已写进守卫注释）。
+负例 `scripts/negative-test-passive-add-en-round213.js` **10/10**：M0 绿、
+N1 删整支、N2 砍加入动词表、N3 收窄设施表、N4 砍被动系动词表、N5 砍 by
+mistake 回溯、N6 砍 in error 回溯、N7 砍时段回溯、N8 砍主语限定表、
+M9 恒等式 15 条全守。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增）** |
+| run-all | **7230 通过 / 0 失败**（基线 7149 + 本轮守卫 81 断言，数字吻合） |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| 本轮守卫 | **81/81** |
+| negative-test | **10/10** |
+
+## 遗留（给下一轮）
+
+1. **B 方向设施词表四份副本未提共享常量**（第 211 轮已列，**第六次挂账**）：
+   `src/dangerous-instruction.js` 内第 102 / 160 / 219 / 271 行附近四份
+   设施词表仍各自演化，是「动词表两侧分叉」家族的物理根因。结构性重构，
+   需单开一轮。
+2. **decision 引擎数值字段写法**：cron 任务每轮喂候选必须写
+   `feasibility=0.x consequence_value=0.x risk=0.x`，否则三候选同分
+   打平（本轮实测两次 null/0）。接管轮直接按这个格式写，别再返工。
+3. **情态加入形（B 方向）与反义撤出剩余形（C 方向）实测仍全 pass**，
+   本轮 decision 已裁决不做（composite 低于 A），量化数字在
+   `scripts/round-213/probe-r213-shape.js`，下一轮可作候选素材。
+4. 陈述形名单动词攻击、`blocked domain got blacklisted anyway` 宾语
+   推理形、71 个历史探针文件未跟踪——同第 212 轮记录，仍记档不排期。
+
+---
+
 # 第 212 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：第 211 轮只补了名单动词族的「**加入**」方向，反方向与被动完成形
@@ -89,81 +233,6 @@ mistake 豁免、N8 砍主语限定表、M9 恒等式 12 条全守。
 4. 71 个历史探针文件仍未跟踪，finish 已标「需人工判断」。
 
 ---
-
-# 第 213 轮（v6.7.124 工作面，unattended 自主升级）
-
-**方向**：第 212 轮补了名单动词族的反义撤出侧与被动**结果态**侧，立项复测
-坐实剩下的是被动**动作态**族——同一语义族的第三半没长出来。decision 引擎
-三候选裁决 A（composite 0.86 对 B 0.80 / C 0.72）。
-
-**立项量化**（`scripts/round-213/probe-r213-shape.js`，未信简报旧描述、
-实测复跑）：被动完成「加入动作」侧 **8/8 全 pass**（D 族可疑主语 4 条：
-suspicious/attacker/malicious/unverified × was added onto / has been put
-on / is being added to / got added to），B 族情态加入形 6/6、C 族反义撤出
-剩余形 4/4 同 pass；第 212 轮三条支与良性 15 条全部保持原判（回归成立）。
-**词面差集第 14 次复发**，形态与 205-212 轮完全一致：一个名单语义族按
-「加入结果态 / 加入动作态 / 撤出动作态 / 撤出完成态」四个象限切分，
-第 211 轮补两格、第 212 轮补一格，本轮补第四格。
-
-**decision 真调（两次返工后才拿到 chosen）**：
-- 首版 `decide-r213.js` 三个候选用自然语言描述可行性/风险 →
-  `chosen: null, confidence: 0`，三候选同分 0.74。
-- 二次补判据 `decide-r213b.js` 仍 null/0 同分 0.74。
-- 根因读码定位（`src/core/decision.js` 第 334 行 `NUMERIC_KEYS` +
-  第 365 行 bracket 解析）：**候选必须写 `key=0.85` 形态的数值字段才进
-  打分路径**，「可行性=高」这种自然语言不产生数字，四个维度全回退默认值。
-  改为 `decide-r213c.js` 每候选一行 + feasibility/consequence_value/risk
-  显式数值后，正常裁决 A（0.86）。
-- 这条是第 87 轮已修过一次的坑的**第二次复发**：调用方（cron 任务）没按
-  数值字段写法喂候选。已写进本轮结论供后续轮复用。
-
-**改动**（一处 src、一条正则，加在第 212 轮 E3 行之后）：
-被动完成加入动作支：主语限定（attacker/malicious/suspicious/blocked/
-known-bad/unverified/temporary/bypass，与 E3 同一表）+ 被动系动词
-（was/were/got/has been/have been/is being/are being）+ 加入动词
-（added to/into/onto/on · put on · inserted into · appended to）+
-设施（whitelist\w*/allowlist\w*/ACL/security group/trusted list）。
-三项机制均经实测逼出：① 设施侧**不收 blacklist**——`the blocked domain
-got added to the blacklist` 是防御动作陈述；② `by mistake/accident/
-error` + `in error` + `last/this quarter/month/year/week` 三重负向
-回溯（第一版 4/41 误伤 3 条，补回溯后归零）；③ 主语限定表天然排除
-CI/staging/审计/历史形主语（host/certificate/record 无限定词）。
-
-最终矩阵：攻击 **12/12**（含 D 族 4 条专门主语形）、良性误伤 **0/37**。
-
-**守卫与负例**：`test/dangerous-instruction-en-passive-add-round213.test.js`
-**81/81**（A 12 / B 37 / C 19 回归 / D 6 源码词面 / F 2 gate 链 / G 5）。
-D6 断言踩坑一次：注释段里含 blacklist 论证文字，整段 indexOf 恒假——
-改为只截正则该行再断言（已写进守卫注释）。
-负例 `scripts/negative-test-passive-add-en-round213.js` **10/10**：M0 绿、
-N1 删整支、N2 砍加入动词表、N3 收窄设施表、N4 砍被动系动词表、N5 砍 by
-mistake 回溯、N6 砍 in error 回溯、N7 砍时段回溯、N8 砍主语限定表、
-M9 恒等式 15 条全守。
-
-| 项 | 结果 |
-|---|---|
-| bin/verify | **14/14** |
-| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增）** |
-| run-all | **7230 通过 / 0 失败**（基线 7149 + 本轮守卫 81 断言，数字吻合） |
-| security-audit | **16/16** |
-| doc-numbers | **15/15** |
-| 本轮守卫 | **81/81** |
-| negative-test | **10/10** |
-
-## 遗留（给下一轮）
-
-1. **B 方向设施词表四份副本未提共享常量**（第 211 轮已列，**第六次挂账**）：
-   `src/dangerous-instruction.js` 内第 102 / 160 / 219 / 271 行附近四份
-   设施词表仍各自演化，是「动词表两侧分叉」家族的物理根因。结构性重构，
-   需单开一轮。
-2. **decision 引擎数值字段写法**：cron 任务每轮喂候选必须写
-   `feasibility=0.x consequence_value=0.x risk=0.x`，否则三候选同分
-   打平（本轮实测两次 null/0）。接管轮直接按这个格式写，别再返工。
-3. **情态加入形（B 方向）与反义撤出剩余形（C 方向）实测仍全 pass**，
-   本轮 decision 已裁决不做（composite 低于 A），量化数字在
-   `scripts/round-213/probe-r213-shape.js`，下一轮可作候选素材。
-4. 陈述形名单动词攻击、`blocked domain got blacklisted anyway` 宾语
-   推理形、71 个历史探针文件未跟踪——同第 212 轮记录，仍记档不排期。
 
 ---
 
