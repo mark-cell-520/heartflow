@@ -182,4 +182,5 @@ for (const v of [null, undefined, 42, {}, [], true]) {
 }
 console.log(`G1 非字符串 ${6} 条`);
 
-console.log(`\n第 210 轮守卫全部通过（A1 ${a1} / A2 ${NEG.length} / A3 ${BENIGN_PRED.length} / A4 17 / B1 ${REG_HIT.length} / B2 ${REG_PASS.length} / F1 5 / F3 6 / G1 6 = ${a1 + NEG.length + BENIGN_PRED.length + 17 + REG_HIT.length + REG_PASS.length + 5 + 6 + 6} 断言）`);
+console.log(`A1 ${a1} 通过, A2 ${NEG.length} 通过, A3 ${BENIGN_PRED.length} 通过, A4 17 通过, B1 ${REG_HIT.length} 通过, B2 ${REG_PASS.length} 通过, F1 5 通过, F3 6 通过, G1 6 通过`);
+console.log(`第 210 轮守卫: ${a1 + NEG.length + BENIGN_PRED.length + 17 + REG_HIT.length + REG_PASS.length + 5 + 6 + 6} 通过, 0 失败`);
