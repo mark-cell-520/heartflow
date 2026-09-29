@@ -1,4 +1,93 @@
 
+# 第 226 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：`badFaithNarrative` 英文侧**纯断路恢复** —— 31 条中文 slot 整体
+对英文失效（`if (!hasChinese) return []`）。decision 引擎真调裁决 A 项
+（composite 0.84，候选 C 0.83 / D 0.80 / B 0.79）。
+
+**为什么选它（照纪律先复测，不信简报旧描述）**：
+
+1. 队列待办为空（仅 1 条已 done），落到「上一轮遗留的真缺口」+ 心虫自选。
+2. **第一个 decision 调用返回 `chosen: null` + `confidence: 0`** ——
+   四候选描述里都缺实测比例数字，`consequence_value` 解析不到 `x/y`
+   缺口比，全部落在同一基线打平。照纪律补实测数字后重跑，A 以 0.84 胜出。
+3. 轮初扫缺口规模（`probe-r226-gap-scan.js`）：`badFaithNarrative` 是
+   唯一英文侧**完全阻断**（early-return 1 处），`checkStereotype`
+   英文正则 1 条 vs 中文 5 条，其余维度均为正则补薄形态。
+4. **关键坑：第一批基线数据全是假的**。`probe-r226-baseline.js` 第一版
+   用 `require('src/index.js').checkOutput(...)` 实测出「bad_faith 0/26、
+   appeal_to_authority 0/3」——连 AGENTS.md 官方示例句都 0 命中，
+   暴露探测入口错了（`src/index.js` 不导出 `checkOutput`，只导出各
+   check* 维度函数；正确入口是 `src/gate.js` 的 `checkOutput`）。
+   修正后真实基线：bad_faith 英文 **0/26**（良性基线 0/10，是干净的
+   纯召回缺口），empty_answer 6/12 但良性侧已有 4/10 误报，
+   tone_policing 0/5（样本少），appeal_to_authority 2/3（缺口小）。
+
+**变更（4 个 commit）**：
+
+| # | 文件 | 内容 |
+|---|---|---|
+| 1 | `src/index.js` | 新增 `BADFAITH_NARRATIVE_SLOTS_EN`（+227 行）：31 条 slot 逐条对应中文侧，保留 hard/purpose/negative 三半 AND 结构与同值 severity，一条不删不增；`badFaithNarrative` 改为 `hasChinese ? ZH : EN` |
+| 2 | `src/index.js` | 逐半补同义动词矩阵（+22 -22）：label_first/label_then_justify/backdoor_rephrase/fake_neutral_bias/conclusion_first/moral_high_ground/hedge_rephrase |
+| 3 | `test/bad-faith-en-r226.test.js` | **45 断言**（正向 12 / 反向 14 / 中文侧回归 6 / 逐半诊断 4 / 异常输入 5） |
+| 4 | `scripts/negative-test-bad-faith-en-r226.js` | **7 条源码变异 + 1 对照，7/7 真红、零无效变异** |
+
+**判据形状与刻意保守的边界**：
+
+```
+结构 = 与中文表逐条同构（hard 半行为标记 × purpose 半目的揭示，AND）
+单半不命中；negative 半逐条对应中文侧的建设性宾语排除
+刻意不收（留给后续轮次）：无人称泛指、完全被动句、slot 之外的新族
+```
+
+**召回与误伤**：en 攻击样本 **0/26 → 10/16**（诊断池口径）；
+良性高危混淆样本（escape hatch / verdict / neutral / walk back /
+scoring / high ground flooding）**0/30 误伤**；中文侧 6 条回归全命中。
+
+**零新增误伤的证明**：双向门禁跑改动后全量：召回 **52/52**、误拦
+**301/326**，与 225 轮基线**逐字节一致**（铁律 ≤302 达标）。
+
+**方法论坑（本轮实测踩到，共 5 个新坑）**：
+
+1. **探测入口错会让整轮基线数据全假**。用不存在的
+   `require('src/index.js').checkOutput` 跑出 0/26、0/3 假数据；
+   连文档官方示例句都 0 命中才发现入口错。铁律补充：
+   **批量实测前先用文档示例句自检入口**。
+2. **patch 的 old_string 含真实换行会静默错位**。第一次改
+   `label_first` 的 hard 正则时漏了一个右括号，第二次 patch 把两行
+   合并成一行且没补括号 → 整个模块 SyntaxError。语法检查立刻抓到
+   （比静默失效安全），但重建时踩了 memory 已记录的坑：
+   **old_string 里的 `\n` 要写成 JS 字符串的 `\\n`**，写成真实换行
+   patch 匹配不到。
+3. **负例变异在对象里插第二个同名键是无效变异**。守卫第二版给
+   slot 插了第二个 `hard: /(?!x)x/`，JS 对象字面量重复键取**最后一个**，
+   原判据仍生效 → 测试仍绿 = 假阴性。正确形态是在
+   `badFaithNarrative` 循环入口 `splice` 掉目标 slot（判据真的
+   不进判定流程）。5/7 条变异都栽在这一条。
+4. **classify 只匹配 `AssertionError` 会漏真红**。`check()` 抛的是
+   裸 Error（不含 AssertionError 字样），守卫把 7 条真红全判成
+   `crashed(无效)`。补断言消息关键词后才恢复 7/7。
+5. **run-all 要求 "N 通过, M 失败" 汇总行**。自定义
+   `console.log('✅ xxx: 40 断言全部通过')` 不被解析，被判为
+   「跑了但无法确认断言数」的失败条目。测试必须用统一汇总格式。
+
+**遗留（给下一轮）**：
+
+1. **同族缺口仍在，本轮只修了 badFaithNarrative 一个维度**。
+   已定位未做的（225 轮清单仍然有效）：
+   `checkUnsupportedClaim`、`checkHastyGeneralization`、
+   `checkStereotype`、`checkTonePolicing`、`checkNoFallback`、
+   `checkEmptyAnswer`、`checkAppealToAuthority`。
+   缺口形状与本周完全同构（`hasChinese ? zh : en` 三分结构），可整族推进。
+2. **en 攻击样本还剩 6/16 纯措辞变体未覆盖**（本轮实测确认的 MISS 形态）：
+   `first slaps a label on you`（语序）、`was already fixed`、
+   `what matters here is winning`、`walk everything back`、
+   `only being polite and having a reasonable discussion`、
+   `From the moral high ground he lectures everyone else`。
+3. **`checkEmptyAnswer` 英文侧良性 4/10 误报** —— 这是误伤问题不是
+   召回问题，扩召回前必须先收窄现判据（本轮 decision 评分 B 项 0.79
+   最低就是这个原因）。
+
 # 第 225 轮（v6.7.128 工作面，unattended 自主升级）
 
 **方向**：`checkContradiction` 英文侧**反义评价对并置**漏判 —— 新增
