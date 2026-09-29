@@ -4837,12 +4837,44 @@ class HeartFlow {
     } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '元认知标注失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // [v7.x] SelfVerifier 自验证：检查输出逻辑一致性
+    // [第 218 轮修复] heartflow.js:4842 原本把 result.chain 直接当 reasoning 传入，
+    // 而 chain 是 {stages:[...], totalDuration, depth, taskType, errors} 对象
+    // （探针实测 7 个 stage，无 text 字段）—— self-verifier 四个 check 都要对
+    // reasoning 调 .toLowerCase()/.includes()/.test()，于是每次 verify 都抛
+    // reasoning.toLowerCase is not a function，_selfVerification 字段从不落地，
+    // v7.x 自验证能力 100% 失效（2 次 think() 2 次抛、0 成功）。
+    // 修法：从 chain 里取真正可读的推理文本（SYNTHESIS.reasoningChain 优先，
+    // 依次回退 stage name 串 / JSON 摘要），非字符串一律归一化为 ''。
     try {
       if (this.verify && result && typeof this.verify.verify === 'function') {
-        const reasoning = result.chain || result.analysis?.reasoning || result.output?.meta?.reasoningChain || '';
-        const conclusion = result.output?.conclusion || result.output?.text || result.conclusion || '';
-        if (reasoning && conclusion) {
-          const sv = this.verify.verify(reasoning, conclusion);
+        const _r218ToText = (v, depth) => {
+          if (typeof v === 'string') return v;
+          if (v == null || depth <= 0) return '';
+          if (Array.isArray(v)) return v.map(x => _r218ToText(x, depth - 1)).filter(Boolean).join('\n');
+          if (typeof v === 'object') {
+            for (const k of ['reasoningChain', 'reasoning', 'conclusion', 'text', 'summary', 'inverted']) {
+              if (typeof v[k] === 'string' && v[k]) return v[k];
+            }
+            return Object.values(v).map(x => _r218ToText(x, depth - 1)).filter(Boolean).join('\n').slice(0, 4000);
+          }
+          return String(v);
+        };
+        const _chain = result.chain;
+        let _reasoning = '';
+        if (_chain && typeof _chain === 'object' && Array.isArray(_chain.stages)) {
+          // SYNTHESIS 阶段的 reasoningChain 是最贴近「推理过程」的字段
+          const _synth = _chain.stages.find(s => s && s.name === 'SYNTHESIS');
+          if (_synth && _synth.result) _reasoning = _r218ToText(_synth.result, 2);
+          if (!_reasoning) _reasoning = _chain.stages.map(s => s && s.name).filter(Boolean).join(' -> ');
+          if (!_reasoning) _reasoning = _r218ToText(_chain, 2);
+        } else {
+          _reasoning = _r218ToText(result.analysis?.reasoning || result.output?.meta?.reasoningChain || '', 2);
+        }
+        const conclusion = typeof result.output?.conclusion === 'string' ? result.output.conclusion
+          : (typeof result.output?.text === 'string' ? result.output.text
+            : (typeof result.conclusion === 'string' ? result.conclusion : ''));
+        if (_reasoning && conclusion) {
+          const sv = this.verify.verify(_reasoning, conclusion);
           result._selfVerification = {
             passed: sv.passed,
             checks: sv.checks,
