@@ -1,3 +1,108 @@
+
+# 第 219 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：decision 引擎四候选真调裁决 **A**（composite_score 0.89）——
+把 218 轮修活的 `_selfVerification` / `_reflectionLoopClosed` 接到
+gate-verdict、MCP 透传、报告层，让心虫判出来的东西**真的有人听**。
+裁决口径照 `scripts/round-219/decide-r219-d.js`。
+
+**立项量化（探针复跑，不信简报旧描述）**：
+
+1. `scripts/round-219/probe-r219-consumers.js`：`_selfVerification` 12/12 落地，
+   但 **src 侧读取点 = 0**（5 个命中全是注释与测试）；`_reflectionLoopClosed`
+   同样 12/12 落地、src 读取点 = 0。gate-verdict VERIFY_SIGNALS 5 条不含它们，
+   MCP SIGNAL_KEYS 18 项不含，report 段不含 —— 即「心虫判了但没有任何下游听得见」。
+2. `scripts/round-219/probe-r219-dist.js`（12 样本）：`passed=true` 仅 **0/12**；
+   counterfactual check **12/12 失败**，其余三个 check（reverseConsistency /
+   logicalChain / coverageCheck）**0/12 失败**。
+   这个分布决定了本轮的核心设计取舍（见下）。
+3. 顺带修正上一轮遗留 2：全仓「`doesNotThrow(() => { try`」型假绿测试实测
+   **只剩 1 处**（`test/decision-router.test.js:22`，即 218 轮已修的那条恒崩），
+   不需要专门排一轮 —— 记档即可。
+
+**核心设计取舍（本轮最关键的一处判断）**：
+分布探针显示 counterfactual（"未考虑替代推理路径"）在中文短推理上几乎恒失败。
+若把 `_selfVerification.issues` 全量当门禁，**12/12 样本全部变 verify**——
+verify 从"需要证据的信号"退化成"默认值"，用户可感知的变化是负面的
+（每条输出都要人工复核）。因此本轮只把**非 counterfactual 的真问题**
+（结论与推理不匹配 / 隐藏假设 / 遗漏重要因素）提升为可执行信号，
+counterfactual 以 `note` 形式保留可审计、但不伪装成问题。
+判据：心虫判得出，也要判得准——噪声不应该传成命令。
+
+**四个 commit**：
+
+| # | 文件 | 内容 |
+|---|---|---|
+| 1 | `src/core/heartflow.js` | 新增 `_selfVerificationIssues`（过滤 counterfactual 后的真问题）+ `_selfVerificationNoise='counterfactual_only'` 标记（+16 行） |
+| 2 | `src/gate-verdict.js` | VERIFY_SIGNALS 增两条 + `healthTrigger` 定向触发分支（+26 行） |
+| 3 | `src/mcp-server.js` + `src/report/report-generator.js` | MCP 透传 2 字段 + report.selfVerification 段（+58 行） |
+| 4 | `test/self-verification-consumers-r219.test.js` + `scripts/negative-test-self-verification-r219.js` | 27 断言正式防线 + 7 用例负例守卫 |
+
+**细节**：
+
+- **gate-verdict 两条新信号**：`_selfVerificationIssues`（推理自验证问题）
+  与 `_reflectionLoopClosed.health`∈{degraded,stuck,oscillating}（反思健康退化）。
+  后者必须新增 `healthTrigger` 定向分支——`_reflectionLoopClosed` 是对象，
+  走默认对象分支会因 `Object.keys().length > 0` **无条件触发**
+  （reflected/insightCount/health 这些过程字段本来就有值），
+  等于每次思考都报"内观异常"。
+- **report 段**：报 confidence（0-1 连续量）与四个 check 逐项布尔，
+  **不报 passed 聚合布尔**（12/12 实测恒 false，聚合布尔没有信息量）；
+  字段缺失返回 null，不造空壳段。
+- **防降级**：新增 verify 信号不得压过既有 rewrite / block（测试断言覆盖）。
+
+| 项 | 结果 |
+|---|---|
+| bin/verify | **14/14** |
+| 双向门禁 | 召回 **52/52**、误拦 **301/326（0 新增）** |
+| security-audit | **16/16** |
+| doc-numbers | **15/15** |
+| 本轮守卫 | **7/7**（6 真变异必红 + 1 对照必绿） |
+| 正式测试 | `self-verification-consumers-r219.test.js` **27/27** |
+
+**守卫纪律自查（照 216/217/218 轮教训）**：7 个负例用例**零无效变异**，
+全部真红/真绿。其中 M6（gate 改读全量 `_selfVerification`）是专门为
+"counterfactual 噪声会不会灌满 verify"设计的：它变红正说明过滤逻辑是真防线。
+N1 对照组（只改注释）保持全绿，证明测试不是"逢改必红"。
+跑完后 src/ 与 test/ 零残留（git status 干净），变异全部自动还原。
+
+**踩坑**：
+
+1. **`_describe(key, value)` 没有 spec 参数**。我在 `_describe` 里加了
+   `spec?.healthTrigger` 判据，一跑就 `ReferenceError: spec is not defined`。
+   改成直接判 `typeof value.health === 'string'`（health 本身就是可读值，
+   不需要 spec 才知道怎么描述）。教训：grep 函数签名再改函数体。
+2. **commit message 用错文件**。第二个 commit 把 mcp-server + report 两个文件
+   用成了 gate-verdict 的消息文件（`git commit -F` 复用了 msg219.txt），
+   已 `--amend` 修正。教训：`-F` 之后不要复用同一个消息文件。
+
+## 遗留（给下一轮）
+
+1. **`_selfVerificationIssues` 的消费目前只到 verify 级**。gate-verdict 的
+   action 只到 verify（不 rewrite/block），MCP 硬闸门只拦 block。
+   若某天真问题需要更强的动作，要走 `heartflow.js` 的消费者设计——
+   现在四个 check 的失败模式还没积累出足够样本支撑升到 rewrite，
+   不建议盲升（升了就是误拦）。
+2. **`test/decision-router.test.js:22` 的假绿测试仍是 1 处**
+   （`doesNotThrow(() => { try{...}catch{})`）。218 轮已修掉它守护的恒崩，
+   但断言仍然是"崩溃当预期"形态，且该文件**0 断言覆盖规则匹配**
+   （r218 探针：`matched` / `decision.type` / 规则数三个维度都没断）。
+   下一轮值得补真断言 —— 工作量小（约 60 行），但收益是"测试全绿"不再
+   掩盖"功能全崩"。
+3. **reflection-loop 的 `health` 实测 12/12 全 healthy**，本轮只接不验证
+   degraded 路径的真实发生率。它是真信号还是罕见路径，需要更多样本或
+   专门的异常注入探针才能定。
+4. **零引用模块 369 个**（216 轮口径），候选 `src/workflow/thought-chain.js`
+   （1457 行）、`src/memory/triality-memory.js`（1670 行），同前轮记录。
+5. **71+ 历史探针文件未跟踪**（scripts/round-154/ 至 round-218/），同前记录。
+
+**给下一轮的接手说明**：先跑
+`node test/self-verification-consumers-r219.test.js`（应 27/27）与
+`node scripts/negative-test-self-verification-r219.js`（应 7/7）。
+本轮方向（自验证接线）的后半段是遗留 1 与 2：**2 优先级更高**——
+它是唯一能让"测试全绿 ≠ 功能正常"这个 218 轮刚暴露的结构性问题
+彻底闭嘴的工作，且工作量小、风险低。
+
 # 第 218 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：decision 引擎四候选真调裁决 **A**（composite_score 0.88）——
