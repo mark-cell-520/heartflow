@@ -112,7 +112,7 @@ console.log('=== decision-router / self-verifier 恒崩修复回归（第 218 �
     assert(false, '引擎侧断言失败: ' + (e && e.message));
   }
 
-  console.log(`测试结果: ${passed + failed} 个，通过 ${passed}，失败 ${failed}`);
+  console.log(`测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
   process.exit(failed > 0 ? 1 : 0);
 })().catch(e => {
   console.error('FATAL:', e && e.message);

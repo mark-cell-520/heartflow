@@ -14,8 +14,8 @@ const write = (p, s) => fs.writeFileSync(p, s);
 function runTest(label) {
   try {
     const r = execFileSync(process.execPath, [TEST], { encoding: 'utf8', timeout: 120000, cwd: ROOT });
-    const m = r.match(/测试结果: (\d+) 个，通过 (\d+)，失败 (\d+)/);
-    return { label, pass: m ? parseInt(m[2], 10) : -1, fail: m ? parseInt(m[3], 10) : -1 };
+    const m = r.match(/测试结果: (\d+) 通过, (\d+) 失败/);
+    return { label, pass: m ? parseInt(m[1], 10) : -1, fail: m ? parseInt(m[2], 10) : -1 };
   } catch (e) {
     const out = (e.stdout || '') + String(e.message || '');
     return { label, pass: Math.max(0, 26 - (out.match(/FAIL:/g) || []).length), fail: (out.match(/FAIL:/g) || []).length };
