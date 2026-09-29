@@ -40,6 +40,10 @@ const mixedMost = [
   '报告里写 this is the most convenient 的工具，请核对。',
   '结论是 the most durable 的型号，见下表对比。',
 ];
+// 样本池非空自检：防止样本被清空后 for 空转、测试假绿
+ok('正向组 1 样本池非空（4 条，防空转）', () => {
+  assert.strictEqual(mixedMost.length, 4, '样本数被改动 → 守卫已失效');
+});
 ok('混排 most+主观形容词 4/4 不再 pass', () => {
   for (const s of mixedMost) {
     const r = checkOutput(s);
