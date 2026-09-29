@@ -8617,14 +8617,28 @@ const EN_FALLBACK = [
   [/\bthere(?:'s| is)\s+no\s+(?:second\s+|other\s+|spare\s+|alternative\s+|backup\s+|fallback\s+)?(?:option|choice|alternative|approach|method|route|path|solution)\b/i, 'sole_option', 0.6],
   // ①b 主语 + has no + 备选名词（the plan has no backup option）
   [/\b(?:the|this|that|our|your|their|its)\s+[\w-]{1,24}(?:\s+[\w-]{1,16})?\s+ha(?:s|ve)\s+no\s+(?:backup|fallback|plan\s*b|contingenc\w*|alternat\w*|redo\s+plan|safety\s+net|second|other|spare)\b/i, 'sole_option', 0.6],
-  // ①c 存在式后置（no fallback exists for that step）
-  [/\bno\s+(?:fallback|backup|contingenc\w*|plan\s*b|redo\s+plan|safety\s+net|alternat\w*)\s+(?:exists?|is\s+(?:in\s+place|available|defined|documented|configured|set\s+up))\b/i, 'sole_option', 0.6],
+  // ①c 存在式后置（no fallback exists for that step / no rollback plan is documented）
+  //    第 228 轮二轮补洞（r228-diag3.js）：原名词表只收 fallback/backup/
+  //    contingency/plan b/redo plan/safety net/alternative，漏掉 rollback 与
+  //    redo/alternative + 路径名词的中缀形态（no rollback plan is documented /
+  //    no redo path is available）。改为「名词 + 可选中缀（plan/path/route/
+  //    option/approach/procedure/strategy）」。
+  [/\bno\s+(?:fallback|backup|rollback|contingenc\w*|plan\s*b|redo|safety\s+net|alternat\w*)(?:\s+(?:plan|path|route|option|approach|procedure|strategy))?\s+(?:exists?|is\s+(?:in\s+place|available|defined|documented|configured|set\s+up|planned))/i, 'sole_option', 0.6],
   // ② 唯一/仅有路径（the single available option / the sole possible route）
-  [/\b(?:the\s+)?(?:sole|only|single|lone)\s+(?:available\s+|remaining\s+|viable\s+|possible\s+|feasible\s+|workable\s+)?(?:option|choice|way|route|path|approach|solution|method)\b/i, 'sole_option', 0.6],
-  // ②b only this <path> remains（only this path remains open）
-  [/\b(?:only|just)\s+this\s+(?:option|choice|way|route|path|approach|method|solution)\s+(?:remains|is\s+left|is\s+available|remains\s+open|is\s+open)\b/i, 'sole_option', 0.6],
+  //    第 228 轮二轮：形容词表补 last（the last remaining option）。
+  [/\b(?:the\s+)?(?:sole|only|single|lone|last)\s+(?:available\s+|remaining\s+|other\s+|viable\s+|possible\s+|feasible\s+|workable\s+)?(?:option|choice|way|route|path|approach|solution|method)\b/i, 'sole_option', 0.6],
+  // ②b only this <path> remains（only this path remains open / only that route is left to us）
+  //    第 228 轮二轮：th(?:is|at) 收 only that / just that。
+  [/\b(?:only|just)\s+th(?:is|at)\s+(?:option|choice|way|route|path|approach|method|solution)\s+(?:remains|is\s+left|is\s+available|remains\s+open|is\s+open|is\s+the\s+one)/i, 'sole_option', 0.6],
   // ③ 否定式可行性（no other approach will work）
-  [/\bno\s+other\s+(?:approach|option|method|way|route|solution|choice|alternative)\s+(?:will|would|could|can|is\s+going\s+to)\s+(?:work|do|suffice|help|fix\s+it|be\s+enough)\b/i, 'sole_option', 0.6],
+  //    第 228 轮二轮：other 可选（no alternative would do / no redo path...）、
+  //    动作表补 fix/replace/substitute/get（不要求宾语，否则漏 no other method
+  //    can fix the ordering bug）。
+  [/\bno\s+(?:other\s+)?(?:approach|option|method|way|route|solution|choice|alternative)\s+(?:will|would|could|can|is\s+going\s+to)\s+(?:work|do|suffice|help|fix|replace|substitute|get|be\s+(?:enough|sufficient))/i, 'sole_option', 0.6],
+  // ③b 虚无式断绝（nothing else can replace this solution）
+  //    第 228 轮二轮补洞：nothing else/more/further + 情态 + 动作，本族里
+  //    唯一不出现路径名词的形状（用反身代词表达「除此之外无他」）。
+  [/\bnothing\s+(?:else|more|further)\s+(?:can|will|could|would|is\s+going\s+to)\s+(?:replace|fix|help|work|do|suffice|stand\s+in|cover|substitute)/i, 'sole_option', 0.6],
 ];
 function checkNoFallback(text) {
   if (!text || typeof text !== 'string') return { count: 0, signals: [], score: 0 };
