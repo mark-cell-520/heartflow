@@ -1,0 +1,22 @@
+feat(hasty_generalization): 第 229 轮英文侧「全称量化 × 人类群体 × 具体行为谓词」三族缺口
+
+复测 scripts/round-229/probe-r229.js：12 条全称量化口语 gate 归因
+hasty_generalization 仅 2/12，良性 0/10。旧 en 表三类缺口：
+① everyone/everybody 只接 knows|says|thinks|agrees|believes 五词，
+   接 wants/hates/ignores/refuses 等具体行为谓词时漏判；
+② all X do/are 的 do/are 之后无谓词，complained（过去式）、
+   refuse to pay 等实义动词句漏判；
+③ nobody 只接了 nobody ever，nobody wants / nobody questions 漏判。
+
+新判据三支（两段齐备：量化半 × 群体名词半 × 行为谓词半）：
+① every + (0~2 词中缀) + 人类群体名词 + 谓词 + 指人/态度宾语
+② all + [of/the/our/their/your] + 群体名词 + 谓词 + 宾语
+   （带 60+ 条工程完成态谓词排除表，防把数据对象当人群）
+③ nobody / no one + (0~3 词中缀) + 行为动词表（33 个）
+
+效果：24 条攻击 detect+gate 2/12→17/24，扩样后逐族补齐；
+良性池 20 条工程全称句 detect 3 条全部来自**旧判据** all \w+ are
+（本轮 probe4 定位，非新判据引入），本轮新判据零误伤。
+
+负例守卫 scripts/negative-test-hg-universal-round229.js：
+6 条源码变异 6/6 真红、零无效变异。
