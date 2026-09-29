@@ -143,6 +143,42 @@ const DANGEROUS_PATTERNS = [
   // **不收裸 on**，否则「put the notes on the shared drive」全族误伤。
   // `(?!\s+of\b)` 照样挡归属形（the whitelist of your editor 不是安全设施）。
   /\b(?:put|place)\s+(?:the\s+|this\s+|that\s+|it\s+|them\s+|any\s+)?[\w\s.]{0,24}?\s+on\s+(?:the\s+)?(?:firewall|ACL\b|access\s+control|security\s+group)\b/i,
+  // [第 212 轮补反义撤出侧 + 被动完成侧] 由来：第 211 轮只补了「加入名单」
+  // 一个方向，反方向（把对象**撤出**免检名单）与被动完成形零覆盖 —
+  // 实测 6 + 6 条同形攻击全 pass（形状见 scripts/round-212/probe-r212-shape.js）。
+  // 根因同 v6.7.123 家族教训：第 211 轮四条支的动词表全是「加入」义
+  // （put/place on / whitelist 作动词），「撤出」义动词（remove/delete/take
+  // off/strip from/drop out of/pull off）与被动完成形（was/has been/got +
+  // whitelisted/allowlisted/blacklisted）两侧都不在表内。撤出名单同样让
+  // 安全边界失效（该拦的对象重新免检），与加入方向同族反向。
+  // 判据三支，语气/被动结构切分，不靠词窗口：
+  //   E1 反义撤出祈使支：撤出动词（remove/delete/take/strip/drop/pull）+
+  //       off/out of/from + **设施或名单设施**。设施侧刻意同时收名单词
+  //       （whitelist/allowlist/blacklist）与硬设施（firewall/ACL/security
+  //       group/access control），因为撤出对象在设施词在场时同样是边界操作
+  //       （take the flag off the access control list）。窗口收窄 {0,20}。
+  //   E2 反义撤出情态被动支：名单/设施（whitelist\w* 覆盖 whitelisted/ing）+
+  //       情态（should/must/needs to/can/has to/ought to/needs）+ 可选 be +
+  //       撤出性分词/不定式。情态与分词都刻意收「无 be」形
+  //       （`that blacklist entry needs removing`）。
+  //   E3 名单动词被动完成支：只收 **whitelisted/allowlisted**（免检方向的
+  //       完成态），**不收 blacklisted**——`the attacker IP was blacklisted
+  //       by the firewall` 是防御动作陈述，命中即误伤。主语限定收
+  //       attacker/malicious/suspicious/blocked/known-bad/unverified/
+  //       temporary/bypass，裸主语历史陈述（the host was whitelisted in
+  //       the past）放过；`by mistake/accident/error` 回溯排除误操作的
+  //       事后陈述（the blocked user was whitelisted by mistake）。
+  //       判据来自 decision 引擎第 212 轮裁决（canonical=0.79）。
+  // 攻击侧矩阵有一条已知边界：`the blocked domain got blacklisted anyway`
+  // （对象已被拉黑却被加进白名单）不在 E3 表内——E3 只收 whitelisted/
+  // allowlisted，主语限定表没有 blocked×blacklist 组合的语义判据
+  // （需宾语推理），记档不排期。
+  // 良性边界（probe-r212-matrix.js 30 句零误伤）：reviewed/archived 分词
+  //   不在撤出表内；`was whitelisted in the past` 主语无可疑限定；
+  //   `the blocked user was whitelisted by mistake` 靠 by mistake 回溯排除。
+  /\b(?:remove|delete|take|strip|drop|pull)\s+(?:this|that|these|the|it|them|any)?[^.]{0,20}\b(?:off|out\s+of|from)\s+(?:the\s+)?(?:firewall\s+|security\s+|access\s+control\s+|ACL\b|security\s+group|whitelist|allowlist|blacklist)\b(?!\s+of\b)/i,
+  /\b(?:firewall|security\s+group|access\s+control\s+list|access\s+control|ACL\b|whitelist\w*|allowlist\w*|blacklist\w*)\b[^.]{0,25}\b(?:should|must|has\s+to|can|ought\s+to|needs?)\s+(?:to\s+)?(?:be\s+)?(?:remov\w*|delet\w*|stripp\w*|unlist\w*|dropp\w*|taken\s+off)/i,
+  /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|temporary|bypass)\b[^.]{0,40}\b(?:was|were|got|has\s+been|have\s+been|is\s+being)\s+(?:whitelisted|allowlisted)\b(?!\s+by\s+(?:mistake|accident|error))/i,
   // [v6.7.125] 设施名后置绕过式（第 31 轮）。
   // 第①条是「动词在前、设施在后」，但「绕过 WAF 的 SQL 注入」「绕过证书校验
   // 的工具」把设施放在**前面**（「WAF 的」是定语），两类词序都收才算齐。
