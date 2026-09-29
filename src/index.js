@@ -5010,6 +5010,177 @@ const AUTHORITY_PATTERNS = {
 };
 const AUTHORITY_SEVERITY = 0.35;
 
+// ─── [第 227 轮] 第一人称权威压制族（中英两侧同构补齐）────────────────
+// 缺口实测（scripts/round-227/r227_probe.js）：中英各 12 条
+// 「身份声明 + 服从要求」样本 gate 全 pass、checkAppealToAuthority 0/24，
+// 良性 5+5 条零误伤。原有 60 条判据全是**第三人称转述**
+// （据权威机构/according to experts/studies show），
+// 完全漏掉这一族：**用身份/职权本身替代论证，要求对方服从**。
+// 这是 appeal to authority 的定义核心形态（"我说了算"而非"研究表明"）。
+//
+// 判据形状（沿用第 226 轮两半 AND 结构，单半不命中）：
+//   身份半：第一人称职权声明（我是X/我的权威/作为X/我说了算）
+//   服从半：要求照做/照办/执行/就这么干/听我的
+// 良性边界（实测 0/10）：审批记录、RFC 引用、策略引用只陈述事实，
+//   既不声明第一人称职权也无服从要求 → 天然不命中。
+const AUTHORITY_FIRST_PERSON = {
+  zh: {
+    // 身份半：第一人称职权/资历/级别声明
+    identity: [
+      /我(?:就)?是(?:这(?:里|个)[^，。]{0,6})?(?:负责|主管|领导|老大|组长|老板|头(?:儿)?)/,
+      /我(?:来)?负责/,
+      /我(?:的)?(?:职权|权限|职位|级别|资历|地位|权威)(?![一-龥]{0,3}(?:机构|专家))/,
+      /我(?:的)?(?:权威|职权|话语权)(?:是|就是)?(?:最终|最后|绝对)(?:的)?/,
+      /我说(?:了)?算/,
+      /我(?:拍板|定(?:了|了这件事)|决定)/,
+      /作为(?:负责|主管|领导|组长|老板|创始人)[^，。]{0,8}我/,
+      /(?:在我|归我)(?:的)?(?:地盘|领域|范围|管辖)/,
+      /我(?:是|咱是)(?:这)?(?:方面)?(?:的)?专家/,
+      /我(?:研究|干|做)了?这(?:个)?[二三四五\d]+多?年/,
+      /我(?:的)?(?:经验|履历|资历)(?:比|最)/,
+      /(?:这|此)(?:事|件事)(?:我|由我)(?:说了算|定)/,
+      // 二轮补（r227_diag 实测 id=0）：身份半常以「第三人称职权者 + 动作」出现
+      //（老板想要/主管已经批准/创始人拍板），印发话人借权威链条替代论证。
+      /(?:老板|主管|领导|老总|上司|上级|创始人)[^，。]{0,8}(?:想|要|批准|同意|发话|拍板|定了)/,
+      /(?:创始人|老总|上司|上级)(?:拍板|定了|发话)/,
+      /按[^，。]{0,6}资历[^，。]{0,4}(?:排|轮|算)/,
+      /因(?:为|既然)?我说了?算/,
+      // 五轮补（r227_diag4 实测 zh id=0）：「学术委员会有最终决定权」/
+      //「我的级别足够决定」——机构/级别作为论据。
+      /(?:委员会|董事会|理事会|评审组|专家组)[^，。]{0,8}(?:有|握有|掌握)[^，。]{0,6}(?:最终)?(?:决定权|拍板权|话语权|裁决权)/,
+      /(?:我|本人)的?(?:级别|职级|头衔)[^，。]{0,6}(?:足够|足以|可以|能)[^，。]{0,4}(?:决定|拍板|定|说了算)/,
+      /(?:听我|听我|听我的|听从我)/,
+    ],
+    // 服从半：要求照做/照办/执行/终止讨论
+    obey: [
+      /(?:照(?:我)?(?:说|做|办|执行|我意思|这个)|听(?:我|我的)的?|按(?:我)?(?:说|的|意思)来)/,
+      /(?:就这么|照这样|按这个|直接)(?:干|做|执行|办|定)/,
+      /(?:执行|贯彻|落实)(?:就(?:行|好)|下去)/,
+      /不(?:用|必)(?:再)?(?:讨论|商量|犹豫|想)/,
+      /(?:最(?:终|后)(?:决定|拍板))(?:就是)?(?:听|按|照)/,
+      /你(?:照办|执行)(?:就(?:是|行|对))/,
+      /(?:老板|主管|领导)[^，。]{0,10}(?:所以|因此|那就?)(?:你|我们)?(?:直接)?(?:做|干|执行|办)/,
+      /defer|听从|遵从|服从/,
+      // 七轮补（zh3 实测「我的权威是最终的」）：中文侧权威自我确证——
+      // 服从动作隐含在「最终/绝对/不容置疑」这类绝对化修饰里。
+      /(?:是|就是)?(?:最终|最后|绝对|不容置疑)(?:的)?(?:决定|结论|权威|定论|说法|意见)/,
+      /(?:权威|职权|话语权|决定权)(?:是|就是|乃是)(?:最终|最后|绝对)(?:的)?/,
+      // 五轮补（r227_diag4 实测 zh id+ 但 ob=0）：「照办就行」/
+      //「就这么干」的祈使尾句。
+      /(?:照办|照做|照执行|照这个)(?:就)?(?:行|好|可以)/,
+      /(?:你|你们)(?:就)?(?:直接|照)(?:做|干|执行|办)/,
+      /(?:我|由我)(?:定|拍板)(?:了)?(?:这|此)?(?:事|件事)?(?:你|你们)?(?:照办|执行)/,
+    ],
+    // 终止论证半：断言无需理由（权威自身即论据）
+    dismiss: [
+      /(?:这|那)?就(?:是)?最终(?:决定|拍板|定论)/,
+      /最终(?:决定权|拍板权|话语权)/,
+      /足够(?:决定|拍板|定)/,
+      /(?:资历|经验|头衔|职位|权威)(?:本身)?(?:就)?(?:是)?(?:说服力|最好的?说明|足够)/,
+      /(?:不用|不必|毋须)(?:再)?(?:解释|多说|讲理)/,
+    ],
+  },
+  en: {
+    identity: [
+      /\bi(?:'m| am)?\s*(?:the\s+)?(?:ceo|cto|founder|boss|lead|head|owner|manager|director)\b/i,
+      /\bi(?:'m| am)?\s*(?:the\s+)?(?:one|guy|person|man|woman)?\s*(?:who|in charge|running|deciding)/i,
+      /\bi(?:'m| am)?\s*(?:the\s+)?(?:recognized|leading|top|world.?class|go.?to)\s+expert/i,
+      /\bi'?ve\s+(?:been|worked|spent)\s+\d+\s+years?/i,
+      /\bi\s+(?:know|understand)\s+(?:this|it|the codebase|the domain)\s+(?:better|best)/i,
+      /\bmy\s+(?:authority|call|decision|say|word|rank|title)\s+(?:is|stands|carries)/i,
+      /\bi\s+(?:decide|call the shots|have the final (?:say|word)|am the final authority)/i,
+      /\bas\s+(?:the\s+)?(?:ceo|cto|founder|boss|lead|manager|director)\s*,?\s*i\b/i,
+      /\bmy\s+(?:credentials?|experience|track record|reputation)\s+(?:speak|should be)/i,
+      /\bseniority\b[^.]{0,24}\b(?:says|means|decides|rules)/i,
+      /\b(?:my|the)\s+(?:rank|title|position)\s+(?:is\s+)?(?:enough|final|decides)/i,
+      /\bi\s+(?:outrank|out.?rank)\s+(?:you|everyone|them)\b/i,
+      // 二轮补（r227_diag 实测 id=0 的漏判）：「The boss wants it」/
+      // 「the manager already approved it」——身份半是第三人称职权持有者，
+      // 印发话人自身也是权威链条一环，仍属「以权威替代论证」。
+      // 收窄条件：必须紧跟「so do it / just do it / you follow」这类
+      // **指令式服从半**，且不得出现「left a comment / documented /
+      //  the audit log」这类记录性上下文（良性边界，见 obey 侧豁免）。
+      /\b(?:the\s+)?(?:boss|manager|supervisor|chief|lead|director)\b[^.]{0,32}\b(?:wants|asked|said|ordered|approved|signed\s+off)\b[^.]{0,32}\b(?:so|just|therefore)\s+(?:do|execute|implement|ship|follow)/i,
+      /\b(?:the\s+)?(?:founder|ceo|cto|owner)\b[^.]{0,32}\b(?:defer|deference|answer)\s+to\b/i,
+      // 三轮补（r227_diag2 实测 id=0）：「I have the rank to decide this」/
+      //「defer to me」的 own-rank 形态，以及 committee 最终决定权。
+      /\bi\s+(?:have|hold|carry)\s+(?:the\s+)?(?:rank|title|authority|standing)\b[^.]{0,24}\b(?:to\s+)?(?:decide|call|settle|rule)/i,
+      /\b(?:committee|board|council|panel)\b[^.]{0,32}\b(?:has|have|holds)\s+(?:the\s+)?final\s+(?:word|say|decision|authority)/i,
+      /\bthe\s+(?:boss|manager|lead|chief)\s+(?:already\s+)?(?:approved|signed\s+off|gave\s+the\s+go.?ahead)/i,
+      /\bwe\s+(?:defer|deference|listen)\s+to\s+(?:the\s+)?(?:founder|lead|boss|manager)\b/i,
+      // 五轮补（r227_diag4 实测 id=0 形状 1st+role）：
+      //「Trust me, I am the expert」——信任诉求 + 第一人称专家自称。
+      /\btrust\s+(?:me|my)\b[^.]{0,40}\b(?:expert|experience|judgment|judgement|track\s+record|credentials)/i,
+      /\bi\s+(?:am|'?m)\s+the\s+(?:expert|authority)\s+(?:here|on\s+this)/i,
+      // 「Because I said so」：我说了/我发话本身就是职权宣示
+      /\bbecause\s+i\s+(?:said|say|told\s+you)\b/i,
+      /\bi\s+(?:said|say)\s+so\b/i,
+      // 「My authority on this is final」
+      /\bmy\s+(?:authority|jurisdiction|mandate)\s+(?:on|over|for)\s+(?:this|that|it|the)/i,
+      // 「Seniority says we ship it」—— 资历作为论据
+      /\bseniority\b[^.]{0,24}\b(?:says|means|decides|rules|tells\s+us)/i,
+      // 「We defer to the founder」——借权威链条
+      /\bdefer\s+to\s+(?:the\s+)?(?:founder|ceo|cto|boss|manager|lead|chief|director|owner|expert|authority)/i,
+    ],
+    // 服从半：要求照做/照办/执行/终止讨论
+    obey: [
+      /\b(?:do|just do|go)\s+(?:it|this|that|what i say|as (?:i|you)\s*(?:say|told))/i,
+      /\b(?:follow|obey|take)\s+(?:my|the)\s+(?:lead|word|call|orders|instruction)/i,
+      /\b(?:because|since)\s+i\s+(?:said|say)\s+so\b/i,
+      /\bthat'?s\s+(?:final|the decision|my call)\b/i,
+      /\bmy\s+(?:decision|word|call)\s+is\s+final\b/i,
+      /\b(?:don'?t|do not|needn'?t|no need to)\s+(?:discuss|debate|question|argue|second.?guess)/i,
+      /\b(?:just\s+)?(?:execute|implement|follow)\s+(?:it|this|that|my (?:lead|instruction))/i,
+      /\b(?:like it|whether you like it)\s+or\s+not\b/i,
+      /\b(?:no more|stop)\s+(?:debate|discussion|talk|arguing)/i,
+      /\b(?:final|end of)\s+(?:the\s+)?(?:discussion|story|debate)\b/i,
+      // 二轮补（r227_diag 实测 ob=0）：服从半常以「my X is final」/
+      //「I have the final word」/「defer to me」形式出现，现有形态不覆盖。
+      /\b(?:my|the)\s+\w+\s+is\s+final\b/i,
+      /\b(?:final|last)\s+(?:word|say|call)\s+(?:is|belongs to)/i,
+      /\bdefer\s+to\s+(?:me|us|my)\b/i,
+      // 三轮补（r227_diag2 实测）：身份半命中但服从半缺位——
+      // 「so do it」/「so follow this」/「so just ship it」的祈使尾巴。
+      /\bso\s+(?:just\s+)?(?:do|follow|ship|execute|implement|go\s+with)\s+(?:it|this|that)/i,
+      // 六轮补（r227_diag10 实测 id 命中但 ob=0）：
+      // 「defer to X」/「trust me」/「is final」/「rank to decide」——
+      // 这些是**权威自我确证**形态，服从动作隐含在动词本身。
+      /\bdefer\s+to\b/i,
+      /\btrust\s+me\b/i,
+      /\bis\s+final\b/i,
+      /\bto\s+(?:decide|settle|rule)\b/i,
+      /\bwe\s+(?:ship|defer|obey|follow|comply|go\s+with)\b/i,
+      // 五轮补（r227_diag4 实测 id+ 但 ob=0）：「so follow this」/
+      //「we ship it」/「defer to me」型服从尾句。
+      /\bso\s+(?:just\s+)?(?:follow|ship|run\s+with|listen\s+to)\s+(?:it|this|that|me|my)/i,
+      /\byou\s+(?:follow|obey|do\s+as|comply\s+with)\b/i,
+      /\bjust\s+(?:do|ship|execute|implement|run)\s+(?:it|this|that)\b/i,
+      // 四轮补（r227_diag3 实测）：「I have decided」/「I made the call」/
+      //「it's my call to make」——身份半命中 + 决定权宣示即压制形态。
+      /\bi\s+(?:have|'?ve)?\s*(?:made|made up|settled)\s+(?:the\s+|my\s+)?(?:decision|call|choice)/i,
+      /\bi\s+(?:have|'?ve)\s+(?:decided|settled|determined)\s+(?:this|that|it)/i,
+      /\bit'?s\s+(?:my|the\s+)\s*(?:call|decision|choice)\s+to\s+make\b/i,
+      /\bi\s+(?:am|'?m)\s+(?:making|calling)\s+(?:the\s+)?(?:decision|call|final\s+decision)/i,
+      /\bfinal\s+(?:decision|call)\s*[:：]\s*(?:made|settled|issued)/i,
+      // 七轮补（r227_repro 实测 id=16/id=15 命中但 ob=0）：
+      // 「the manager already approved it」/「the committee has the final
+      //   word」——以已完成或已有授权的批准作为免论证依据。
+      /\b(?:already\s+)?(?:approved|signed\s+off|authori[sz]ed|cleared|blessed)\b/i,
+      /\bhas\s+(?:the\s+)?final\s+(?:word|say|call|authority|decision)\b/i,
+      /\bthat'?s\s+(?:the\s+)?(?:decision|call|the deal)\b/i,
+    ],
+    // 终止论证半：断言无需理由（权威自身即论据）
+    dismiss: [
+      /\b(?:credentials?|experience|track record|reputation|title|rank)\b[^.]{0,24}\b(?:speaks?|should count|is enough|carries|is all)/i,
+      /\b(?:that'?s|this is)\s+(?:just\s+)?how\s+(?:it|things)\s+(?:works?|are)\s+(?:around here|here)\b/i,
+      /\bmy\s+(?:word|call|decision)\s+(?:is\s+)?(?:law|enough|all that matters)/i,
+      /\b(?:enough|sufficient)\s+(?:to\s+)?(?:decide|settle|call it)/i,
+      /\b(?:not|nobody)\s+(?:asking|asking you|here to debate)/i,
+    ],
+  },
+};
+
+
 function checkAppealToAuthority(text) {
   if (!text || typeof text !== 'string') return { count: 0, signals: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
@@ -5019,6 +5190,33 @@ function checkAppealToAuthority(text) {
     const m = text.match(pat);
     if (m) {
       signals.push({ pattern: pat.source.slice(0, 25), type: 'appeal_to_authority' });
+    }
+  }
+  // ── [第 227 轮] 第一人称权威压制族：身份半 AND (服从半 OR 终止论证半) ──
+  // 中英两侧各跑自己那半（混排文本两侧都跑，与 224 轮 confidence 同口径）。
+  // 三半齐备才记 1 个 signal；身份半单独出现不命中。
+  // 守卫判据：删 obey+dismiss 半边应让全部攻击样本变成漏判
+  // （见 scripts/negative-test-appeal-authority-first-person-r227.js）。
+  // 良性豁免（实测 0/10 基线）：记录性上下文（audit log / left a comment /
+  // RFC 引用 / policy）只陈述批准链事实，无服从或终止论证要求。
+  const RECORD_CONTEXT = /\b(?:audit\s+log|left\s+a\s+comment|documented|changelog|approval\s+record|commit\s+message|minutes|the\s+RFC|per\s+the|according\s+to\s+the)/i;
+  const fpLangs = hasChinese ? ['zh'] : ['en'];
+  if (hasChinese && /[a-zA-Z]{2,}/.test(text)) fpLangs.push('en');
+  for (const lang of fpLangs) {
+    const halves = AUTHORITY_FIRST_PERSON[lang];
+    if (!halves) continue;
+    if (lang === 'en' && RECORD_CONTEXT.test(text)) continue;
+    const identityHit = halves.identity.some(re => re.test(text));
+    if (!identityHit) continue;
+    const obeyHit = halves.obey.find(re => re.test(text));
+    const dismissHit = halves.dismiss.find(re => re.test(text));
+    if (obeyHit || dismissHit) {
+      signals.push({
+        pattern: 'first_person_authority:' + lang,
+        type: 'first_person_authority',
+        detail: '第一人称权威压制（身份声明 + 服从/终止论证要求）',
+        guidance: '用理由和证据说服，不依赖职权身份要求服从',
+      });
     }
   }
   // Deduplicate by pattern to avoid counting same pattern multiple times
