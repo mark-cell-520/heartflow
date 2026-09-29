@@ -742,6 +742,11 @@ async function handleThink(args) {
         '_supervisionFeedback', // 监督反馈
         '_selfReflection',      // 自省
         '_outputChecklistIssues', // 输出清单问题
+        // [v6.7.130 第 219 轮] 自验证/反思闭环信号接线（此前只写在 result 里，
+        // MCP 调用方拿不到）。透传的是**已过滤 counterfactual 噪声**的真问题，
+        // 不是 _selfVerification.issues 全量（那个 12/12 恒非空，透传等于传噪声）。
+        '_selfVerificationIssues', // 推理自验证真问题（去 counterfactual）
+        '_selfVerificationNoise',  // 'counterfactual_only' 说明字段（可审计）
       ];
       for (const k of SIGNAL_KEYS) {
         if (thoughtChain[k] !== undefined) {

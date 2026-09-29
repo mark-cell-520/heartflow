@@ -100,6 +100,12 @@ class ReportGenerator {
         // severity 靠 confidence 猜。心虫判出 score 0.05 的严重问题，
         // 报告层一个字都不提 = 判了没人听见。
         gate: _buildGateSection(thoughtChain, raw),
+        // [v6.7.130 第 219 轮] 推理自验证段：SelfVerifier 的四个 check 结果
+        // 与反思闭环健康状态进报告。此前这两个字段 100% 产出但零读者。
+        // 判据纪律：报 confidence（0-1 连续量）与 health 状态，
+        // 不只报 passed 布尔 —— 12/12 实测 passed 恒 false，光报布尔等于
+        // 每次都说"自验证失败"，没有信息量。
+        selfVerification: _buildSelfVerificationSection(raw || thoughtChain),
         localization: {
           coreIssue: _inferCoreIssue(finalConclusion),
           domain: (raw && raw.type) || (thoughtChain && thoughtChain.type) || 'general',
@@ -148,6 +154,53 @@ function _buildGateSection(thoughtChain, raw) {
   } catch (_) {
     // 防御性：聚合失败时至少不崩，返回空判定
     return { action: 'pass', verdict: '(判定聚合不可用)', signals: [] };
+  }
+}
+
+/**
+ * [v6.7.130 第 219 轮] 推理自验证报告段。
+ * 诊断实证：218 轮修活 _selfVerification / _reflectionLoopClosed 后，
+ * 两者 12/12 落地（scripts/round-219/probe-r219-dist.js）但 src 侧读者为 0。
+ * 本函数把它们变成报告里可读的一段。
+ *
+ * 设计取舍（不做装饰性透传）：
+ *   · 报 confidence（0-1 连续量）+ 四个 check 逐项布尔，不报 passed 聚合布尔——
+ *     实测 passed 恒 false（counterfactual 12/12 失败），聚合布尔没有信息量。
+ *   · issues 只报已过滤 counterfactual 的真问题；counterfactual 单独以
+ *     note 形式出现，不伪装成问题。
+ *   · 字段缺失时返回 null，调用方按"无数据"处理，不造空壳段。
+ */
+function _buildSelfVerificationSection(src) {
+  try {
+    const sv = src && src._selfVerification;
+    const rl = src && src._reflectionLoopClosed;
+    if (!sv && !rl) return null;
+    const out = {};
+    if (sv) {
+      out.confidence = typeof sv.confidence === 'number' ? sv.confidence : null;
+      out.checks = sv.checks && typeof sv.checks === 'object'
+        ? {
+            reverseConsistency: !!sv.checks.reverseConsistency,
+            logicalChain: !!sv.checks.logicalChain,
+            counterfactual: !!sv.checks.counterfactual,
+            coverageCheck: !!sv.checks.coverageCheck,
+          }
+        : null;
+      const realIssues = Array.isArray(src._selfVerificationIssues)
+        ? src._selfVerificationIssues
+        : [];
+      out.issues = realIssues.slice(0, 5);
+      out.passed = realIssues.length === 0;
+      out.note = Array.isArray(sv.issues) && sv.issues.length > realIssues.length
+        ? '另有条件句缺失提示（counterfactual），不计入问题'
+        : null;
+    }
+    if (rl && typeof rl.health === 'string') {
+      out.reflectionHealth = rl.health;
+    }
+    return Object.keys(out).length > 0 ? out : null;
+  } catch (_) {
+    return null; // 防御性：报告不可用优于报告崩溃
   }
 }
 
