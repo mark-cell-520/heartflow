@@ -1,6 +1,7 @@
 // 第 226 轮：badFaithNarrative 英文侧判据测试
-// 结构：正向 12 / 反向 14 / 中文侧回归 6 / 逐半诊断 4 / 异常输入 4
-const assert = require('assert');
+// 结构：正向 12 / 反向 14 / 中文侧回归 6 / 逐半诊断 4 / 异常输入 5
+// 汇总行格式 "N 通过, M 失败" 是 run-all 解析测试文件是否成功的依据，
+// 缺这行会被判为「跑了但无法确认断言数」的失败（本轮实测踩坑）。
 const gate = require('../src/gate.js');
 
 function dimsOf(text) {
@@ -8,7 +9,20 @@ function dimsOf(text) {
   return (r.findings || []).map(f => f.dimension);
 }
 
-// ─── 正向：英文侧同族攻击话术形状必须命中 ────────────────────────────
+let PASSED = 0;
+let FAILED = 0;
+function check(cond, msg) {
+  if (cond) { PASSED++; return; }
+  FAILED++;
+  throw new Error(msg);
+}
+function silent(cond, msg) {
+  if (cond) { PASSED++; return; }
+  FAILED++;
+  console.log('FAIL: ' + msg);
+}
+
+// ─── 正向：英文侧同族攻击话术形状必须命中（均为 gate 实测确认 FULL） ──
 const POSITIVE = [
   'It looks impartial on the surface, when in reality it favors one camp at every single step.',
   'He steers the whole discussion toward tiny details so nobody remembers the core issue.',
@@ -24,8 +38,7 @@ const POSITIVE = [
   'I am merely polite, just asking questions.',
 ];
 for (const t of POSITIVE) {
-  const d = dimsOf(t);
-  assert.ok(d.includes('bad_faith'),
+  check(dimsOf(t).includes('bad_faith'),
     'positive shape missed by bad_faith: ' + t.slice(0, 40));
 }
 
@@ -50,12 +63,11 @@ const NEGATIVE = [
   'The winner is decided by benchmark score, not by opinion.',
   // details 正常使用
   'Details matter: the config keys must match exactly.',
-  // healthy / careless 未耦合时不判
-  'The wording was reviewed by three editors before publication.',
+  // hedged 在工程语境正常
+  'The timeout is deliberately hedged to avoid cascading failures.',
 ];
 for (const t of NEGATIVE) {
-  const d = dimsOf(t);
-  assert.ok(!d.includes('bad_faith'),
+  check(!dimsOf(t).includes('bad_faith'),
     'negative shape falsely flagged: ' + t.slice(0, 40));
 }
 
@@ -69,30 +81,25 @@ const ZH_POSITIVE = [
   '他没说过的观点，你先扣到他头上再反驳',
 ];
 for (const t of ZH_POSITIVE) {
-  const d = dimsOf(t);
-  assert.ok(d.includes('bad_faith'),
+  check(dimsOf(t).includes('bad_faith'),
     'zh positive regression: ' + t.slice(0, 20));
 }
 
 // ─── 逐半诊断：单半不命中（两半齐备 AND 纪律仍在） ─────────────────
-// hard 单独出现不命中
-assert.ok(!dimsOf('Every clause is hedged.').includes('bad_faith'),
+silent(!dimsOf('Every clause is hedged.').includes('bad_faith'),
   'hard-only must not fire');
-// purpose 单独出现不命中
-assert.ok(!dimsOf('So the whole thing can be disowned later on.').includes('bad_faith'),
+silent(!dimsOf('So the whole thing can be disowned later on.').includes('bad_faith'),
   'purpose-only must not fire');
-// 只含 neutral 概念 + favor 动词但无并列揭示
-assert.ok(!dimsOf('It seems impartial and balanced enough for the panel.').includes('bad_faith'),
+silent(!dimsOf('It seems impartial and balanced enough for the panel.').includes('bad_faith'),
   'single-signal must not fire');
-// 反向：两半齐备才命中
-assert.ok(dimsOf('He pretends to be fair when in practice he quietly favours them.')
+silent(dimsOf('He pretends to be fair when in practice he quietly favours them.')
   .includes('bad_faith'), 'two halves must fire');
 
 // ─── 异常输入：不得崩溃，且不得误报 bad_faith ───────────────────────
 for (const bad of [null, undefined, '', 123, {}]) {
-  const d = dimsOf(bad);
-  assert.ok(Array.isArray(d), 'must return an array for ' + String(bad));
-  assert.ok(!d.includes('bad_faith'), 'must not flag bad_faith for ' + String(bad));
+  silent(Array.isArray(dimsOf(bad)), 'must return an array for ' + String(bad));
+  silent(!dimsOf(bad).includes('bad_faith'), 'must not flag bad_faith for ' + String(bad));
 }
 
-console.log('✅ bad-faith-en-r226: 40 断言全部通过');
+console.log(`${PASSED} 通过, ${FAILED} 失败`);
+if (FAILED > 0) process.exit(1);
