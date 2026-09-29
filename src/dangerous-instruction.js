@@ -178,7 +178,7 @@ const DANGEROUS_PATTERNS = [
   //   `the blocked user was whitelisted by mistake` 靠 by mistake 回溯排除。
   /\b(?:remove|delete|take|strip|drop|pull)\s+(?:this|that|these|the|it|them|any)?[^.]{0,20}\b(?:off|out\s+of|from)\s+(?:the\s+)?(?:firewall\s+|security\s+|access\s+control\s+|ACL\b|security\s+group|whitelist|allowlist|blacklist)\b(?!\s+of\b)/i,
   /\b(?:firewall|security\s+group|access\s+control\s+list|access\s+control|ACL\b|whitelist\w*|allowlist\w*|blacklist\w*)\b[^.]{0,25}\b(?:should|must|has\s+to|can|ought\s+to|needs?)\s+(?:to\s+)?(?:be\s+)?(?:remov\w*|delet\w*|stripp\w*|unlist\w*|dropp\w*|taken\s+off)/i,
-  /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|temporary|bypass)\b[^.]{0,40}\b(?:was|were|got|has\s+been|have\s+been|is\s+being)\s+(?:whitelisted|allowlisted)\b(?!\s+by\s+(?:mistake|accident|error))/i,
+  /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|temporary|bypass)\b[^.]{0,40}\b(?:was|were|got|has\s+been|have\s+been|is\s+being)\s+(?:whitelisted|allowlisted)\b(?!\s+by\s+(?:mistake|accident|error))(?!\s+due\s+to\s+(?:an?\s+)?(?:mistake|accident|error|operator\s+error|human\s+error|manual\s+error|config\w*\s+error))(?![^.]{0,25}\s+in\s+error\b)/i,
   // [第 213 轮补被动完成「加入动作」侧] 由来：decision 引擎第 213 轮三候选
   // 裁决 A（feasibility=0.9 / risk=0.2 / consequence_value=0.8，composite
   // 0.86 对 B 0.80 / C 0.72）。复测量化（scripts/round-213/probe-r213-shape.js）：
@@ -262,8 +262,8 @@ const DANGEROUS_PATTERNS = [
   //    staging subnet/reviewed partners/phishing domain/audit endpoints/
   //    internal mirror 都不在可疑宾语表内；loader blacklist（名词形）
   //    因表内不收 blacklist 天然放过。
-  /\b(?:whitelist\w*|allowlist\w*)\b[^.]{0,40}\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|bypass|temporary\s+(?:credential|access|token|host|ip|domain|session))\b(?!\s+of\b)/i,
-  /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|bypass|temporary\s+(?:credential|access|token|host|ip|domain|session))\b[^.]{0,40}\b(?:whitelist\w*|allowlist\w*)\b(?!\s+of\b)/i,
+  /\b(?:whitelist\w*|allowlist\w*)\b[^.]{0,40}\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|bypass|temporary\s+(?:credential|access|token|host|ip|domain|session))\b(?!\s+of\b)(?!\s+(?:by|due to)\s+(?:mistake|accident|error))(?![^.]{0,25}\s+in\s+error\b)(?![^.]{0,20}\s+(?:was|were)\s+(?:a\s+)?mistake\b)(?![^.]{0,25}\b(?:operator|human|manual|config)\s+error\b)/i,
+  /\b(?:attacker|malicious|suspicious|blocked|known-bad|unverified|bypass|temporary\s+(?:credential|access|token|host|ip|domain|session))\b[^.]{0,40}\b(?:whitelist\w*|allowlist\w*)\b(?!\s+of\b)(?!\s+(?:by|due to)\s+(?:mistake|accident|error))(?![^.]{0,25}\s+in\s+error\b)(?![^.]{0,20}\s+(?:was|were)\s+(?:a\s+)?mistake\b)(?![^.]{0,25}\b(?:operator|human|manual|config)\s+error\b)/i,
   // [v6.7.125] 设施名后置绕过式（第 31 轮）。
   // 第①条是「动词在前、设施在后」，但「绕过 WAF 的 SQL 注入」「绕过证书校验
   // 的工具」把设施放在**前面**（「WAF 的」是定语），两类词序都收才算齐。

@@ -37,6 +37,9 @@ const REPLACEMENTS = [
   { id: 'N7', name: '砍同句窗口（[^.]{0,40} → [\\s\\S]{0,200} 跨句）', from: '[^.]{0,40}', to: '[\\s\\S]{0,200}' },
   { id: 'N8', name: '删 E7b 宾语在前支（只留动词在前形）', from: E7[1].text, to: '' },
   { id: 'N9', name: '删 E7a 动词在前支（只留宾语在前形）', from: E7[0].text, to: '' },
+  { id: 'N10', name: '砍 due to … error 误操作豁免（E3/E7 同犯）',
+    from: '(?!\\s+due\\s+to\\s+(?:an?\\s+)?(?:mistake|accident|error|operator\\s+error|human\\s+error|manual\\s+error|config\\w*\\s+error))', to: '' },
+  { id: 'N11', name: '砍 in error 误操作豁免', from: '(?![^.]{0,25}\\s+in\\s+error\\b)', to: '' },
 ];
 
 const GUARD = path.join(__dirname, '..', 'test', 'dangerous-instruction-en-declarative-list-verb-round215.test.js');
