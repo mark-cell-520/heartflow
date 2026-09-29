@@ -120,6 +120,29 @@ const DANGEROUS_PATTERNS = [
   /(?<=(?:^|[^加增收]))(?:加进|放进|加入|加到|添加到|追加到|追加进|写进|录入|登记到|计入|挂进)[^。\n]{0,12}(?:白名单|whitelist|allowlist|信任名单|信任列表|例外列表|访问控制列表|安全组|security\s+group|ACL)/i,
   /(?:白名单|whitelist|allowlist|信任名单|信任列表|例外列表|访问控制列表|安全组|security\s+group|ACL)[^。\n]{0,10}(?:加进|放进|加入|加到|追加|写进|录入)/i,
   /(?:add|append|put|insert)\s+(?:this|these|the|that)?\s*[\w\s.]{0,24}?(?:to|into|onto)\s+(?:the\s+)?(?:firewall\s+|security\s+|access\s+)?(?:whitelist|allowlist|accept\s+list|ACL|security\s+group)/i,
+  // [第 211 轮补名单动词族的祈使/请求形 × put on 族] 由来：G4 方向第三次挂账后
+  // 复测坐实——whitelist/allowlist/blacklist 作动词且无 to/into 介词时命中侧
+  // 零覆盖（16 条同形攻击样本全 pass，良性 20 条 0 误伤），根因是第 ③ 条要求
+  // 动词后必须跟 to/into/onto 介词，把「动词形名单词」整族漏掉；
+  // 「put on」族同样只收 onto 不收 on。
+  // 判据按语气切分，不靠词窗口（同一词集既有攻击也有良性）：
+  //   A1 请求前缀 + 动词（please/kindly/just/go ahead and/I need you to/
+  //      you should/can you/could you 紧邻动词）——前缀与动词之间**不留窗口**，
+  //      否则「Please check whether the IP is already in the allowlist」被带误伤。
+  //   A2 句首祈使动词形：`^(?:whitelist|allowlist|blacklist)\s+限定词`。
+  //      -s 陈述形（Our script whitelists…）、-ing 动名词形（Whitelisting…
+  //      is standard practice）靠 `\s+` 要求天然排除。
+  //   A3 put/place … on … 安全设施族，`(?!\s+of\b)` 挡住良性
+  //      「the whitelist of your editor」（编辑器的白名单不是安全设施）。
+  // 良性边界实测 20 条 0 误伤（含 review/editor/local/CI/deploy script 陈述形）。
+  /\b(?:please|kindly|just|go\s+ahead\s+and|I\s+need\s+you\s+to|you\s+should|can\s+you|could\s+you)\s+(?:also\s+|now\s+)?(?:whitelist|allowlist|blacklist)\b/i,
+  /^(?:whitelist|allowlist|blacklist)\s+(?:it|this|that|these|those|the|any|all)\b/i,
+  /\b(?:put|place)\s+(?:the\s+|this\s+|that\s+|it\s+|them\s+)?[\w\s.]{0,24}?\s+on\s+(?:the\s+)?(?:firewall\s+|security\s+|access\s+control\s+|ACL\b|security\s+group)?\s*(?:whitelist|allowlist|blacklist)\b(?!\s+of\b)/i,
+  // A3b 设施作宾语形：`on the ACL` / `on the security group` 不带名单词。
+  // 词表刻意只收 ACL/firewall/security group/access control 四个设施硬限定，
+  // **不收裸 on**，否则「put the notes on the shared drive」全族误伤。
+  // `(?!\s+of\b)` 照样挡归属形（the whitelist of your editor 不是安全设施）。
+  /\b(?:put|place)\s+(?:the\s+|this\s+|that\s+|it\s+|them\s+|any\s+)?[\w\s.]{0,24}?\s+on\s+(?:the\s+)?(?:firewall|ACL\b|access\s+control|security\s+group)\b/i,
   // [v6.7.125] 设施名后置绕过式（第 31 轮）。
   // 第①条是「动词在前、设施在后」，但「绕过 WAF 的 SQL 注入」「绕过证书校验
   // 的工具」把设施放在**前面**（「WAF 的」是定语），两类词序都收才算齐。
