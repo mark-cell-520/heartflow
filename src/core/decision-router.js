@@ -239,7 +239,7 @@ class DecisionRouter {
 
         id: 'error-severity',
 
-        match: (r) => r.severity !== undefined && ['critical', 'high', 'FATAL'].includes(String(r.severity).toUpperCase()),
+        match: (r) => r.severity !== undefined && ['critical', 'high', 'fatal'].includes(String(r.severity).toLowerCase()),
 
         decision: DECISION.HEAL,
 
