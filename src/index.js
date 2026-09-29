@@ -8171,8 +8171,8 @@ const BADFAITH_NARRATIVE_SLOTS_EN = [
   // 留后路改口
   {
     id: 'backdoor_rephrase',
-    hard: /(?:(?:leaves?|leaving|keep|keeps|kept|built in|bakes? in|buil[dt])\s+(?:a\s+|himself\s+|herself\s+|themselves\s+)?(?:back door|escape hatch|loophole|way out|outs?|deniability)\b)|(?:(?:deliberately\s+)?(?:vague|ambiguous|hedged|equivocal|non-?committal)\s+(?:wording|phrasing|drafting)|(?:wording|phrasing|draft)\s+(?:is|was)\s+(?:deliberately\s+)?(?:vague|ambiguous|hedged))/i,
-    purpose: /(?:(?:so (?:he|she|they|it) can |so that it can )?(?:walk|take|back|rephrase|retract|deny|disown|rewrite|undo|reverse|walk back)\b)|(?:(?:easy|easier|simpler)|(?:to make it (?:easy|easier|possible))|(?:allows? (?:him|her|them|it) to))\s+(?:deny|deniability|disown|walk|back|retract|rewrite|repudiate)\b/i,
+    hard: /(?:(?:leaves?|leaving|keep|keeps|kept|built in|bakes? in|buil[dt])\s+(?:a\s+|himself\s+|herself\s+|themselves\s+)?(?:back door|escape hatch|loophole|way out|outs?|deniability)\b)|(?:(?:every |each )?(?:clause|sentence|line|statement) (?:is |are )?hedged\b)|(?:(?:leaves?|leaving|keeps?|keeping) (?:it |them |the (?:whole )?(?:claim|statement|thing|wording) )?(?:hedged|vague|ambiguous|open(?:-| )ended))/i,
+    purpose: /(?:(?:so (?:he|she|they|it) can |so that it can )?(?:walk|take|back|rephrase|retract|deny|disown|rewrite|undo|reverse|walk back)\b)|(?:\bwalk(?:s|ed|ing)? (?:everything|it all|back|the (?:whole )?(?:thing|claim|statement)) back\b)|(?:(?:easy|easier|simpler)|(?:to make it (?:easy|easier|possible))|(?:allows? (?:him|her|them|it) to))\s+(?:deny|deniability|disown|walk|back|retract|rewrite|repudiate)\b/i,
     severity: 0.75,
   },
   {
@@ -8184,7 +8184,7 @@ const BADFAITH_NARRATIVE_SLOTS_EN = [
   // 先定性再论证
   {
     id: 'label_first',
-    hard: /(?:(?:first|first step is to|start by|start with|up front)\s+)?(?:label\w*|tag\w*|brand\w*|name\w*|call\w*|slap\w*|pin\w*|stick\w*|hang\w*|brand\w*)\s+(?:a |the |some )?(?:label|tag|name|title|charge|accusation)\s+(?:on|onto)\s+(?:you|him|her|them|it)\b/i,
+    hard: /(?:\b(?:slaps?|slapped|pins?|pinned|sticks?|stuck|hangs?|hung|puts?|labels?|labelled|labeled|tags?|tagged|names?|named|calls?|called|brands?|branded)\s+(?:a |the |some )?(?:label|tag|name|title|charge|accusation)\s+(?:on|onto)\b)|(?:(?:first|first step is to|start by|start with|up front)\s+(?:slap|pin|stick|hang|put|label|tag|name|call|brand)\w*\s+(?:a |the )?(?:label|tag|name)\b)/i,
     purpose: /(?:then |and then |only then |afterwards |before )?(?:justif\w+|explain\w*|argu\w+|rational\w+|defend\w+|make the case for|build the case for|back(?:ing)? (?:it|that|them) up)\s*(?:the |that |why )?(?:label|tag|name|charge|accusation)\b/i,
     severity: 0.75,
   },
@@ -8197,7 +8197,7 @@ const BADFAITH_NARRATIVE_SLOTS_EN = [
   // 引向细节忘核心
   {
     id: 'deflect_to_detail',
-    hard: /(?:steer\w*|diverts?|redirects?|shift\w*|draw\w*|drift\w*|wander\w*|get(?:s|ting)? bogged down|buried in)\s+(?:the )?(?:discussion|debate|conversation|attention|focus|topic|thread|argument)\s+(?:toward|into|onto|to|off into)\s+(?:tiny |petty |minor |irrelevant |trivial |the )(?:details?|particulars|minutiae|fine points?|nitpicks?|weeds)\b/i,
+    hard: /(?:(?:steer\w*|diverts?|redirects?|shift\w*|draw\w*|drifts?|drifted|drifts|wanders?|bogged down|buried in|lost in)\s+(?:the |into |toward |towards |inside )?(?:whole |entire |rest of the )?(?:discussion|debate|conversation|attention|focus|topic|thread|argument|exchange)\s+(?:toward|towards|into|onto|to|off into|deep into|away from)\b)|(?:\b(?:drift(?:s|ing)?|wander(?:s|ing)?|delve|delv(?:e|ing)|go(?:es)? off) into (?:the )?(?:tiny |petty |minor |irrelevant |trivial )?(?:details?|particulars|minutiae|fine points?|weeds)\b)/i,
     purpose: /(?:so )?(?:nobody|no one|you|they|everyone) (?:remembers?|notices?|focuses? on|gets? to|addresses?|ever gets? back to)\s+(?:the )?(?:core|main|central|real|actual|substantive|underlying)\s+(?:issue|question|point|problem|substance|matter)\b/i,
     severity: 0.75,
   },
@@ -8210,7 +8210,7 @@ const BADFAITH_NARRATIVE_SLOTS_EN = [
   // 只论输赢不论事实
   {
     id: 'win_not_truth',
-    hard: /\b(?:who wins|who loses|winning (?:the|this) (?:argument|debate|exchange|contest)|the winner|victory|scoring points|the score|top spot|the upper hand|coming out on ?top|who is right)\b/i,
+    hard: /\b(?:who wins|who loses|winning (?:the|this) (?:argument|debate|exchange|contest)|the winner|victory|scoring points|the score|top spot|the upper hand|coming out on ?top|who is right|what matters (?:here |most )?is (?:winning|the win|victory|beating))\b/i,
     purpose: /(?:not|rather than|instead of|never|over and above) (?:what'?s true|the truth|who is right|the facts?|correct(?:ness)?|accuracy)\b/i,
     severity: 0.75,
   },
@@ -8224,21 +8224,21 @@ const BADFAITH_NARRATIVE_SLOTS_EN = [
   // 结论先行
   {
     id: 'conclusion_first',
-    hard: /(?:the )?(?:verdict|conclusion|judgment|decision|guilt|call)\s+(?:on|about|against) (?:you|him|her|them)\s+(?:was|is|had been)\s+(?:already|pre-?|essentially )?(?:decided|fixed|set|written|made|reached)\b/i,
+    hard: /(?:the )?(?:verdict|conclusion|judgment|decision|guilt|call|mind)\s+(?:on|about|against) (?:you|him|her|them)\s+(?:was|is|had been|'?s)\s+(?:already|pre-?|essentially |effectively |long )?(?:decided|fixed|set|written|made|reached|settled|closed)\b|(?:you|he|she|they) (?:were |was |'?re |are )?(?:already )?(?:judged guilty|convicted|condemned)\b|(?:already |pre-?|effectively )?(?:decided|fixed|settled|written) that\b/i,
     purpose: /(?:before|prior to|ahead of|regardless of|without waiting for)\s+(?:any |the )?(?:evidence|reasons?|arguments?|facts?|hearing)\b/i,
     severity: 0.75,
   },
   // 道德高地
   {
     id: 'moral_high_ground',
-    hard: /\b(?:the )?moral high ground\b|\b(?:from |on )?(?:the )?(?:high ground|pedestal|soap ?box)\b/i,
-    purpose: /(?:so (?:nobody|no one) can|to make sure you can'?t|so you can'?t)\s+(?:challenge|question|answer|push back|disagree|talk back)\b/i,
+    hard: /\b(?:the )?moral high ground\b|\b(?:from |on )?(?:the )?(?:high ground|pedestal|soap ?box)\b|\b(?:he|she|they) (?:climbs?|climbed|mounts?|mounted|takes?|took|takes?|stood) (?:up )?(?:onto |to |on |up on )?(?:the )?(?:high ground|pedestal|soap ?box|moral high ground)\b|\bhigh ground of ethics\b/i,
+    purpose: /(?:so (?:nobody|no one) can|to make sure you can'?t|so you can'?t|lectures? everyone(?: else)? (?:about|on))\s*(?:can |to )?(?:challenge|question|answer|push back|disagree|talk back)\b/i,
     severity: 0.7,
   },
   {
     id: 'politeness_cloak',
-    hard: /\b(?:I'?m (?:just )?being|I am only|merely|simply) (?:polite|civil|respectful|nice|calm)\b/i,
-    purpose: /(?:and )?(?:nothing (?:more|else)|just (?:asking|a question)|only (?:asking|wondering)|not (?:attacking|accusing))\b/i,
+    hard: /\b(?:I'?m (?:just )?being|I am only|I'?m only|merely|simply|just) (?:polite|civil|respectful|nice|calm|asking questions?)\b/i,
+    purpose: /(?:and )?(?:nothing (?:more|else)|just (?:asking|a question)|only (?:asking|wondering)|not (?:attacking|accusing)|having a reasonable discussion)\b/i,
     severity: 0.65,
   },
 ];
