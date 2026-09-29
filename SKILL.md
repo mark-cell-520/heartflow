@@ -6,7 +6,7 @@ description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
   it reaches a human. 50 discrimination dimensions × 11-layer pipeline × 137 modules ×
-  59 MCP tools. Zero LLM dependency.
+  60 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
   discriminative result cache, async supervision layer, autonomous decision execution
