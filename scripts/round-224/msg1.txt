@@ -1,0 +1,10 @@
+fix(confidence): 英文 superlative 判据移出 hasChinese 二分支，混排文本不再整体跳过
+
+原 checkConfidenceCalibration 用 if (hasChinese) {...} else {...} 二分，
+效果是文本里出现一个汉字后整段英文判据全部不跑。实测中英混排样本
+零命中、同批纯英文 4/4 verify，批量坐实漏判。
+
+- 判据本体移至公共区（不动语义），同时把 judge 侧实测漏判的 reliable
+  补进形容词表（纯英文 most reliable 同样零命中）
+- 误伤实测：150 垂直良性 + 25 中英混排 + 97 基础基准共 272 条，
+  新判据命中 0，纯增量 0
