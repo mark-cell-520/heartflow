@@ -1,0 +1,18 @@
+feat(hasty_generalization): 第 229 轮二版——24/24 全命中 + 80 断言测试落盘
+
+二版补齐首版三轮迭代暴露的四个形状缺口（probe2/probe5/probe6 逐一定位）：
+①' everyone 连写形 + 40 个具体行为动词（Everyone ignores ...）
+①  宾语槽补 a/an/the/without/句末零宾语（wants a refund / ships without tests）
+②' all + 群体 + 句末零宾语抱怨族（All of our customers complained.）：
+    首版把尾缀分支放在 `\s+` 之后，句末零宾语永远吃不到（probe6 实测
+    full=false / prefix=true），单独拆一支处理抱怨/拒绝类谓词
+②  谓词工程排除表扩到 60+ 条，宾语槽补 a/an/the
+
+实测效果：
+- 24 条攻击样本 detect+gate 端到端 24/24（首版 2/12，二版末 17/24）
+- 20 条良性工程全称句 detect 3 条，probe4 定位全部来自**旧判据**
+  `all \w+ are`，本轮新判据零误伤；该旧判据误伤列入遗留交下一轮
+- test/hasty-generalization-universal-round229.test.js：80 断言全绿
+  （①族 10 条正向 / ②族 6 条 / ③族 7 条，各带 detect+gate 双断言；
+    良性 20 条 / 单半 6 条 / 既有判据回归 3 条 / 异常输入 5 种）
+- 负例守卫 6 条源码变异 6/6 真红、零无效变异、零异常
