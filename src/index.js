@@ -8022,10 +8022,246 @@ const BADFAITH_NARRATIVE_SLOTS = [
   },
 ];
 
+// ─── 上述判据的英文侧映射（第 226 轮） ──────────────────────────────────
+// 结构纪律与中文表逐条对齐：每个 slot 保留 hard / purpose / negative 三半，
+// severity 与中文侧同值。31 条 slot 一条不删、一条不增。
+//
+// 中文侧已用多轮验证过的边界在英文侧同样成立：
+//   · 单半不命中 —— 只说「steer the discussion toward details」不判，
+//     必须再叠「so nobody remembers the core issue」
+//   · 建设性目的排除 —— negative 半逐条对应中文侧的建设性宾语
+//
+// ⚠️ 刻意保守、本轮不收的英文形状（留给后续轮次单独验证）：
+//   · 无人称泛指（"nobody takes him seriously" 是描述，非揭示）
+//   · 完全被动句（"it was decided beforehand" 无主语时不判）
+//   · 任何 slot 之外的新族 —— 同形替换优先，不乘机扩版图
+const BADFAITH_NARRATIVE_SLOTS_EN = [
+  // 装糊涂带节奏：feign innocence + deliberate manipulation
+  {
+    id: 'feign_pretense',
+    hard: /(playing (?:dumb|innocent|naive)|feigning (?:ignorance|innocence)|pretend(?:s|ing)? not to (?:know|understand|see)|selective (?:blindness|outrage)|willfully ignorant|both stupid and bad)/i,
+    purpose: /(deliberately|intentionally|on purpose|knowingly)\s+(?:\w+\s+){0,2}(?:stirring|inflaming|manipulating|whipping|goading|provoking|misleading|steering)\b/i,
+    severity: 0.75,
+  },
+  // 追问设套：repeated questioning until slip
+  {
+    id: 'sealion_extract',
+    hard: /(keep(?:s|ing)? asking|asked (?:again and again|repeatedly)|hammering (?:the same|away at)|over and over|loop(?:ing)? back to the same|one (?:more|last) question)\b/i,
+    purpose: /(until|so that|till)\s+(?:\w+\s+){0,4}(?:slips?|mess(?:es)? up|trip(?:s|ped)? up|stumbles?|contradicts?|falters?|can(?:no|')?t answer|runs? out of (?:answers|excuses))\b/i,
+    severity: 0.75,
+  },
+  {
+    id: 'sealion_no_answer',
+    hard: /\b(?:I|we|they|he|she)\s+(?:don'?t|do not|didn'?t|never)\s+(?:actually\s+)?(?:want|need|care about)\s+(?:an?\s+)?answer/i,
+    purpose: /(?:for|about)\s+(?:the\s+)?(?:answer|truth|facts?)\b/i,
+    severity: 0.7,
+  },
+  // 稻草人：put words in their mouth
+  {
+    id: 'strawman_impose',
+    hard: /(never (?:said|claimed|argued|stated)|words? (?:you|he|she|they) never (?:said|used)|not (?:something|what) (?:you|he|she|they) (?:said|claim))\b/i,
+    purpose: /(put(?:ting)?|pin(?:ning|ned)?|slap(?:ping)?|hang(?:ing)?|stick(?:ing)?)\s+(?:\w+\s+){0,2}(?:on|onto|into)\s+(?:your|his|her|their)\s+mouth\b/i,
+    severity: 0.75,
+  },
+  {
+    id: 'strawman_forced',
+    hard: /(forcing|forcing the|misattribut\w+|distort\w+|fabricat\w+)\b/i,
+    purpose: /(?:a|the|his|her|their)\s+(?:view|position|stance|argument|words?)\s+(?:onto|on)\s+(?:you|him|her|them)\b/i,
+    severity: 0.75,
+  },
+  {
+    id: 'strawman_attack',
+    hard: /(made up|invented|nonexistent|fictional)\s+(?:claim|argument|position|quote)\b/i,
+    purpose: /(?:in order\s+)?(?:to\s+)?(?:easily\s+)?(?:refut\w+|dismiss\w+|attack\w+|discredit\w+|debunk\w+)\b/i,
+    severity: 0.75,
+  },
+  // 陈年观点：digging up the past
+  {
+    id: 'stale_dig',
+    hard: /(?:(?:three|two|several|a few|five|\d+)\s+years? ago|back in \d{4}|your (?:old|previous|earlier) (?:post|statement|take))\b/i,
+    purpose: /(?:in order\s+)?(?:to\s+)?(?:discredit|undermine|dismiss|defeat|attack|refute)\s+(?:your|his|her|their)\s+(?:current\s+)?(?:position|argument|point|view)\b/i,
+    severity: 0.7,
+  },
+  // 抓语气避论点
+  {
+    id: 'tone_over_substance',
+    hard: /(nitpick\w+|zero(?:ing)? in on (?:your )?(?:wording|phrasing|tone)|seiz\w+ (?:up )?on (?:your )?(?:word|wording|tone))\b/i,
+    purpose: /(?:in order\s+)?(?:to\s+)?(?:dodge|avoid|sidestep|evade|ignore|bypass|get around)\s+(?:the\s+)?(?:actual\s+)?(?:argument|point|substance|issue|question)\b/i,
+    severity: 0.7,
+  },
+  {
+    id: 'tone_avoid_point',
+    hard: /\b(?:your |the )(?:wording|phrasing|tone|word choice)\b/i,
+    purpose: /(?:dodges?|avoids?|sidesteps?|evades?|circumvents?|ignores?)\s+(?:the\s+)?(?:actual\s+)?(?:argument|point|substance|issue)\b/i,
+    severity: 0.7,
+  },
+  // 撤回换说法
+  {
+    id: 'withdraw_replay',
+    hard: /(retract\w*|walk(?:s|ed)? back|withdr\w+)\s+(?:the\s+)?(?:claim|statement|remark|comment|post)\b/i,
+    purpose: /(?:then |only to )?(?:rephrase|restat\w+|reword|repackag\w+|recast)\s+(?:it\s+)?(?:the same way|differently|again)\b/i,
+    severity: 0.7,
+  },
+  {
+    id: 'withdraw_deny',
+    hard: /(that'?s not what I (?:meant|said)|I didn'?t mean (?:that|it that way)|you'?re (?:putting|twisting) words)\b/i,
+    purpose: /(?:and (?:then )?)?(?:say|rephrase|restat\w+)\s+(?:the\s+)?(?:same|identical)\s+(?:thing|point)\b/i,
+    severity: 0.7,
+  },
+  // 搅浑再指责
+  {
+    id: 'muddy_then_blame',
+    hard: /(muddy(?:ing)? the waters|cloud(?:ing)? the issue|obfuscat\w+|confus\w+ the (?:issue|matters))\b/i,
+    purpose: /(?:then |and then )?(?:blam\w+|accus\w+)\s+(?:you|him|her|them)\s+(?:for|of)\s+(?:being|the one who is)\s+(?:unclear|confused|incoherent)\b/i,
+    severity: 0.75,
+  },
+  // 非求真宣告
+  {
+    id: 'not_arguing_to_win',
+    hard: /(?:I'?m |we'?re |he'?s |she'?s |they'?re )?not (?:here |just )?(?:to |for )?(?:debate|discuss|argue|reason|exchange|talk) /i,
+    purpose: /(?:I'?m |we'?re )?here (?:to|for|because)\s+(?:the )?(?:win|to win|score|points|judge|convict)\b/i,
+    severity: 0.8,
+  },
+  {
+    id: 'only_want_win',
+    hard: /(?:all (?:I|we|they)|what (?:I|we|they)) (?:want|care about|need) is\b/i,
+    purpose: /(?:to )?(?:win|beat|defeat|score)\s+(?:you|him|her|them|the argument|the debate)\b/i,
+    severity: 0.8,
+  },
+  {
+    id: 'came_to_win',
+    hard: /\b(?:I|we|they|came|came here)\s+(?:just |only )?(?:to|for) (?:win|to win)/i,
+    purpose: /(?:not |not about |rather than )(?:the truth|what'?s right|the facts?)\b/i,
+    negative: /(?:to|for) (?:solve|fix|help|build|improve|understand|learn)\b/i,
+    severity: 0.8,
+  },
+  {
+    id: 'surface_vs_real',
+    hard: /(?:on the surface|nominally|ostensibly|in name)\s+(?:it'?s |this is )?(?:about|a)\b/i,
+    purpose: /(?:but )?(?:really|actually|in truth|underneath|in reality)\s+(?:it'?s |about )?(?:winning|beating|defeating|scoring)\b/i,
+    severity: 0.75,
+  },
+  {
+    id: 'purpose_clause',
+    hard: /(?:the point is|the goal is|this is) to (?:win|beat|score|defeat)\b/i,
+    purpose: /(?:not|rather than|never) (?:being right|the truth|correct|accurate)\b/i,
+    negative: /(?:to )?(?:make|build|improve|fix|understand|ship|deliver|roll out)\b/i,
+    severity: 0.75,
+  },
+  // 拒绝讨论宣告
+  {
+    id: 'refuse_engage',
+    hard: /(?:not worth (?:the |your )?(?:debate|time|arguing)|why bother (?:debating|arguing|explaining)|no point (?:debating|arguing|discussing))\b/i,
+    purpose: /(?:this isn'?t|it'?s not) (?:a )?(?:discussion|debate|conversation|exchange)\b/i,
+    severity: 0.75,
+  },
+  // 不动作陷阱
+  {
+    id: 'inaction_trap',
+    hard: /(?:if|when) you (?:don'?t|do not|refuse to|fail to|won'?t)\s+(?:respond|reply|answer|engage|defend yourself|clarify)\b/i,
+    purpose: /(?:then )?(?:it|that) (?:means|implies|counts as) (?:you'?re|you are|you)\s+(?:guilty|wrong|defeated|silence|agreement)\b/i,
+    severity: 0.75,
+  },
+  // 不败结构
+  {
+    id: 'never_wrong',
+    hard: /(?=[\s\S]{0,30}(never (?:be )?(?:wrong|lose)|can'?t (?:be )?(?:wrong|lose)|airtight|bulletproof))(?=[\s\S]{0,30}(either way|no matter (?:what|how)|heads I win|both sides))/i,
+    severity: 0.75,
+  },
+  // 留后路改口
+  {
+    id: 'backdoor_rephrase',
+    hard: /(?:leaves?|leaving|keep|keeps|kept|built in|bakes? in)\s+(?:a\s+|himself\s+|herself\s+|themselves\s+)?(?:back door|escape hatch|loophole|way out|outs?)\b/i,
+    purpose: /(?:so (?:he|she|they|it) can |so that it can )?(?:walk|take|back|rephrase|retract|deny|disown)\b/i,
+    severity: 0.75,
+  },
+  {
+    id: 'hedge_rephrase',
+    hard: /(every (?:sentence|line|statement|claim)|each (?:sentence|statement))\s+(?:has|keeps|leaves|contains)\s+(?:a\s+)?(?:back door|escape hatch|loophole|way out)\b/i,
+    purpose: /(?:so (?:it|they|he|she) can |so that )?(?:be )?(?:rephras\w+|reword\w+|restat\w+|retract\w+|deni\w+)\s+(?:it|them|later|afterwards|anyway)\b/i,
+    severity: 0.7,
+  },
+  // 先定性再论证
+  {
+    id: 'label_first',
+    hard: /(?:first|first step is to|start by)\s+(?:label\w*|tag\w*|brand\w*|name\w*|call\w*)\s+(?:you|him|her|them|it)\b/i,
+    purpose: /(?:then |and then |only then )?(?:justif\w+|explain\w*|argu\w+|rational\w+|defend\w+)\s+(?:the )?(?:label|tag|name)\b/i,
+    severity: 0.75,
+  },
+  {
+    id: 'label_then_justify',
+    hard: /(?:label\w*|tag\w*|brand\w*|stick\w*|pin\w*)\s+(?:it|them|you|him|her)\s+(?:first|upfront)\b/i,
+    purpose: /(?:then |and then |next )?(?:explain|justif\w+|argu\w+|rationaliz\w+)\s+(?:why|that)\b/i,
+    severity: 0.75,
+  },
+  // 引向细节忘核心
+  {
+    id: 'deflect_to_detail',
+    hard: /(?:steer\w*|diverts?|redirects?|shift\w*|draw\w*)\s+(?:the )?(?:discussion|debate|conversation|attention|focus|topic)\s+(?:toward|into|onto)\s+(?:tiny |petty |minor |irrelevant )?(?:details?|particulars|minutiae)\b/i,
+    purpose: /(?:so )?(?:nobody|no one|you|they) (?:remembers?|notices?|focuses? on|gets? to)\s+(?:the )?(?:core|main|central|real|actual)\s+(?:issue|question|point|problem)\b/i,
+    severity: 0.75,
+  },
+  {
+    id: 'detail_obscures_core',
+    hard: /\b(?:the )?(?:tiny|minor|petty|irrelevant|small) (?:details?|particulars|minutiae)\b/i,
+    purpose: /(?:make|makes|let|lets|help|helps|so)\s+(?:\w+\s+){0,2}(?:forget|miss|ignore|overlook|distract from|obscure|bury)\s+(?:the )?(?:core|main|central|real|substance)\b/i,
+    severity: 0.7,
+  },
+  // 只论输赢不论事实
+  {
+    id: 'win_not_truth',
+    hard: /\b(?:who wins|who loses|winning (?:the|this) (?:argument|debate|exchange)|the winner|victory|scoring points)\b/i,
+    purpose: /(?:not|rather than|instead of|never) (?:what'?s true|the truth|who is right|the facts?|correct(?:ness)?)\b/i,
+    severity: 0.75,
+  },
+  // 伪中立真偏袒
+  {
+    id: 'fake_neutral_bias',
+    hard: /\b(?:pretend\w*|claim\w*|seems?|looks?|appears?)\s+(?:to be |)?(?:neutral|impartial|objective|balanced|fair)\b/i,
+    purpose: /(?:but |while |yet )?(?:every (?:step|move|line)|at every|constantly|quietly|behind the scenes|in practice)\s+(?:\w+\s+){0,3}(?:favou?rs?|favou?ring|favou?red|sides? with|takes? (?:their|his|her) side|tilts? toward)\b/i,
+    severity: 0.7,
+  },
+  // 结论先行
+  {
+    id: 'conclusion_first',
+    hard: /(?:the )?(?:verdict|conclusion|judgment|decision|guilt)\s+(?:on|about) (?:you|him|her|them)\s+(?:was|is)\s+(?:already|pre-?)?(?:decided|fixed|set|written)\b/i,
+    purpose: /(?:before|prior to|ahead of)\s+(?:any |the )?(?:evidence|reasons?|arguments?|facts?)\b/i,
+    severity: 0.75,
+  },
+  // 道德高地
+  {
+    id: 'moral_high_ground',
+    hard: /\b(?:the )?moral high ground\b|\b(?:from |on )?(?:the )?(?:high ground|pedestal|soap ?box)\s+(?:of|he lectures|she lectures|to lecture)\b/i,
+    purpose: /(?:so (?:nobody|no one) can|to make sure you can'?t|so you can'?t)\s+(?:challenge|question|answer|push back|disagree)\b/i,
+    severity: 0.7,
+  },
+  {
+    id: 'politeness_cloak',
+    hard: /\b(?:I'?m (?:just )?being|I am only|merely|simply) (?:polite|civil|respectful|nice|calm)\b/i,
+    purpose: /(?:and )?(?:nothing (?:more|else)|just (?:asking|a question)|only (?:asking|wondering))\b/i,
+    severity: 0.65,
+  },
+];
+
 function badFaithNarrative(text, hasChinese) {
-  if (!hasChinese) return []; // 本轮只收敛中文侧形状；英文侧留给后续轮次扩样
   const out = [];
-  for (const slot of BADFAITH_NARRATIVE_SLOTS) {
+  // [v6.7.125 第 226 轮] 英文侧扩样：此前 `if (!hasChinese) return []` 把
+  // 下面 31 条中文判据整体断路，实测 26 条英文侧同族攻击样本 bad_faith
+  // 命中 0/26（良性基线 0/10，是干净的纯召回缺口）。
+  //
+  // 判据结构与中文侧完全一致（两半齐备 AND），只把每半的词表换成英文形态：
+  //   hard 半 = 行为标记，purpose 半 = 目的揭示；单半不命中（同中文侧纪律）。
+  // negative 半同样保留——原表的建设性排除项在英文侧同形（为了做好产品
+  // / rollback 设计 / 有决策日志都是良性工程表述）。
+  //
+  // ⚠️ 刻意保守的边界（与中文侧同源）：
+  //   ① 只用同形替换，不新增任何 slot —— 新增形状要下一轮单独验证
+  //   ② 英文歧义词靠 negative 排除（"abstain from the debate" 报道语态
+  //      与 "I'm not here to debate" 自述攻击同形，前者良性）
+  //   ③ 不翻译中文词表里的成语性表达（who wins/who loses 可译，
+  //      "playing dumb" 等已在 en 词表内、不再造）
+  const slots = hasChinese ? BADFAITH_NARRATIVE_SLOTS : BADFAITH_NARRATIVE_SLOTS_EN;
+  for (const slot of slots) {
     if (slot.negative && slot.negative.test(text)) continue; // 建设性宾语排除（「不是为了赢，是为了把产品做好」）
     // [第 88 轮] purpose 半可省：never_wrong 用单条 lookahead 实现无序 AND，
     // 没有 purpose 字段。缺 purpose 时只判 hard 半。
