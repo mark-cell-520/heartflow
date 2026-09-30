@@ -1107,10 +1107,10 @@ const CONTRADICTION_PAIRS = [
   { positive: /\b(should|must|ought to)\b[^.]*?\b(but|however)\b[^.]*?\b(not if|unless|except when)\b/gi, negative: /\b(not if|unless|except when)\b/gi },
 
   // 16. Chinese: 绝对肯定 + 跨句转折否定（"完全可行，没有风险。当然，也可能有问题"）
-  { positive: /(完全可行|绝对安全|没有任何风险|毫无问题|完全正确|绝对没问题|百分之百可靠|万无一失|绝对可靠|稳赚不赔)[^。]*?[。，][^。]*?(当然|不过|然而|但是|同时|另外|值得注意的是)/g, negative: /(当然|不过|然而|但是|同时)[^。]*?(可能|也许|或许|风险|问题|隐患|担忧|不确定|例外|复杂|困难|挑战|不足|缺陷|代价|局限)/ },
+  { positive: /(完全可行|绝对安全|没有任何风险|毫无问题|完全正确|绝对没问题|百分之百可靠|万无一失|绝对可靠|稳赚不赔)[^。]*?[。，,.][^。]*?(当然|不过|然而|但是|同时|另外|值得注意的是)/g, negative: /(当然|不过|然而|但是|同时)[^。]*?(可能|也许|或许|风险|问题|隐患|担忧|不确定|例外|复杂|困难|挑战|不足|缺陷|代价|局限)/ },
 
   // 17. Chinese: 肯定结论 + 句尾补充风险
-  { positive: /(完全|绝对|肯定|一定|必然|毫无|没有任何)[^。]*?(可行|安全|正确|没问题|风险|问题|缺陷)[^。]*?[。，][^。]*?(可能|也许|或许|风险|问题|隐患|担忧|例外)/g, negative: /(可能|也许|或许|风险|问题|隐患|担忧|例外)/ },
+  { positive: /(完全|绝对|肯定|一定|必然|毫无|没有任何)[^。]*?(可行|安全|正确|没问题|风险|问题|缺陷)[^。]*?[。，,.][^。]*?(可能|也许|或许|风险|问题|隐患|担忧|例外)/g, negative: /(可能|也许|或许|风险|问题|隐患|担忧|例外)/ },
 
   // 18. English: absolute positive + cross-sentence caveat
   { positive: /\b(completely feasible|perfectly safe|no risk at all|no problem|absolutely right|certainly|undoubtedly|definitely|guaranteed)\b[^.]*?\.\s*(of course|however|but|yet|that said|on the other hand|mind you)\b/gi, negative: /\b(of course|however|but|yet|that said|on the other hand)\b[^.]*?\b(possible|perhaps|maybe|risk|problem|concern|uncertain|exception|complex|difficult|challenge|limitation|drawback|cost|caveat)\b/gi },
