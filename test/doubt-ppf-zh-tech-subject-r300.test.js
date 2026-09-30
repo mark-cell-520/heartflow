@@ -122,4 +122,7 @@ assert.strictEqual(allPos.filter(t => !ppf(t)).length, 0,
 
 console.log('\n✅ doubt-ppf-zh-tech-subject-r300 全通过');
 console.log('   断言通过: ' + pass + '/' + groups.length);
+// [v6.7.130 第 300 轮] run-all 收集器要求的「N 通过, M 失败」汇总行。
+// 口径：每组一个断言（该组全部样本判定正确才算通过）。
+console.log(`${pass} 通过, ${fail} 失败`);
 assert.strictEqual(fail, 0, 'doubt-ppf-zh-tech-subject-r300: ' + fail + ' 个分组失败');

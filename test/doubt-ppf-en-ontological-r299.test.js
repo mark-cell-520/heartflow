@@ -84,6 +84,16 @@ const metHit = POS_MET.filter(ppf).length;
 const fpEng = NEG_ENG.filter(ppf).length;
 const fpPlain = NEG_PLAIN.filter(ppf).length;
 
+// [v6.7.130 第 300 轮] 补 run-all 收集器要求的「N 通过, M 失败」汇总行。
+// 上一版只打分组数字，全量跑时被判为「静默」（2 失败实为格式问题）。
+// 口径：每组一个断言，4 组 = 4 个断言。
+const totalAssert = 4;
+const failedAssert =
+  (pdHit === POS_PD.length ? 0 : 1) +
+  (metHit === POS_MET.length ? 0 : 1) +
+  (fpEng === 0 ? 0 : 1) +
+  (fpPlain === 0 ? 0 : 1);
+
 assert.strictEqual(pdHit, POS_PD.length,
   `E1 伪辩证真阳应 ${POS_PD.length}/${POS_PD.length}，实际 ${pdHit}`);
 assert.strictEqual(metHit, POS_MET.length,
@@ -96,3 +106,4 @@ console.log(`   E1 伪辩证: ${pdHit}/${POS_PD.length}`);
 console.log(`   E2 跨域比喻: ${metHit}/${POS_MET.length}`);
 console.log(`   工程真阴误伤: ${fpEng}/${NEG_ENG.length}`);
 console.log(`   普通陈述误伤: ${fpPlain}/${NEG_PLAIN.length}`);
+console.log(`${totalAssert - failedAssert} 通过, ${failedAssert} 失败`);
