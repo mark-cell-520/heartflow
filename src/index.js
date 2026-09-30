@@ -4820,7 +4820,44 @@ const HASTY_GENERALIZATION_PATTERNS = {
     //    ignores that / cares about 三形态全砍掉（recall 12→8）；现为
     //    指人宾语 + 态度宾语并集。
     /\beveryone\s+(?:ignores?|refuses?|reads?|wants?|hates?|complains?|complained|skips?|skipped|assumes?|assumed|trusts?|believes?|understands?|expects?|expected|notices?|noticed|remembers?|cares?|listens?|learns?|questions?|responds?|replies|follows?|followed|uses?|used|opens?|opened|files?|filed|calls?|called|emails?|emailed|checks?|tried|trying|ships?|shipped)\b/i,
-    /\bevery(?:\s+\w+){0,2}\s+(?:ZZZ|ZZZ|ZZZ|ZZZ|ZZZ|engineer|employee|worker|student|member|person|people|guy|reviewer|maintainer|admin|client|patient|driver|player|voter|reader)s?\s+[a-z]+(?:s|ed|ing)?\s+(?:this\b|that\b|about\b|me\b|us\b|them\b|him\b|her\b|you\b|without\b|the\b|\.\s*$|a\b|an\b)/i,
+    // [v6.7.126 第 230 轮修 bug] 原判据群体表被写成 `ZZZ|ZZZ|ZZZ|ZZZ|ZZZ`
+    // 占位符（编辑器批量替换残留，字面永不命中），且缺 user/customer/
+    // developer/manager/team/analyst/attendee 七大最高频群体，不支持 each。
+    // 复测（scripts/round-230/probe4-r230.js）：10 条 every+高频群体行为句
+    // gate 命中 2/10，12 条同形状扩样 2/12。
+    // 根因是谓词槽用了通配 `[a-z]+(?:s|ed|ing)?`：为了不误伤功能性陈述
+    // （Every customer receives an invoice / Each user gets a notification），
+    // 只能靠宽宾语槽兜底，误伤面不可控（本轮 15 条功能性样本推演会新增误伤）。
+    // 修法：谓词改**枚举表**（负面/态度动词），功能性动词（gets/receives/
+    // signs/approves/owns/documents/completed/checked...）天然不命中，
+    // 宾语槽保持宽集。实测 15 功能性 + 10 人类集合完成态 0 误伤。
+    // [v6.7.126 第 230 轮二版] 探针6 复测剩余 miss 定位：谓词表缺三类——
+    //   ① 负面破坏动词（breaks / restarts / dropped / leaked / shipped a bug）
+    //   ② "asked the same" 多词短语（attendee asked the same question）
+    //   ③ refused to pay 的 to-不定式后置（refused 本体已在表，但后接
+    //      "to pay" 时宾语槽的 `a\b|an\b|the\b` 吃不到，见下方宾语槽扩充）
+    // 谓词表补：breaks?|restarts?|restarted|dropped|leaked|fumbled|mangled|
+    //           wrecked|broke|asked\s+the\s+same
+    // [v6.7.126 第 230 轮三版] 群体表补 operator/volunteer/buyer/seller/subscriber/
+    //    visitor/guest/applicant/respondent/colleague/neighbor/passenger/journalist/
+    //    citizen/taxpayer/investor/recruit/teammate/newcomer/outsider/designer/
+    //    tester/writer/editor/author/consumer 共 23 个常见人类角色
+    //    （probe6 实测 "Every operator restarts the box" 因 operator 缺席 MISS）。
+    //    不补 plugin/package/module/service：那类是技术对象，按 229 轮分界
+    //    「人类集合 vs 流程对象」不算人群，留作下一轮对象族单独讨论。
+    //    四版：补 blocks|blocked（229 轮回归样本 "Every reviewer blocks the
+    //    change" 依赖它，负面阻碍动词，与功能性动词不同族）。
+    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?:ignores?|refuses?|refused|hates?|wants?|complains?|complained|skips?|skipped|assumes?|assumed|trusts?|doubts|overrides?|resents?|blames|mocks|dismisses|ridicules|undermines?|sabotages?|cheats?|abandons?|avoids?|misreads?|misinterprets?|breaks?|broke|blocks?|blocked|restarts?|restarted|dropped|leaked|fumbled|mangled|wrecked|questions?|cares?|believes?|understands?|expects?|expected|notices?|noticed|remembers?|listens?|learns?|tried|trying|ships?|shipped|calls?|called|emails?|emailed|checks?|responds?|replies|uses?|used|opens?|opened|files?|filed)\s+(?:this\b|that\b|about\b|me\b|us\b|them\b|him\b|her\b|you\b|without\b|the\b|\.\s*$|a\b|an\b|to\s+(?:pay|support|help|fix|replace|upgrade|renew|wait|talk|share|review|test|deploy|switch|move|change|read|sign|answer|reply|comply|listen|trust|believe|join|leave|stay|go|do|use|try|buy|cancel|opt|agree|accept))/i,
+    // [v6.7.126 第 230 轮] writes no/without 窄支：谓词表不收 writes 本体
+    //（"Every developer writes documentation" 是功能性陈述），只收
+    // "writes no comment / writes without docs" 这种明显负面形态。
+    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+writes?\s+(?:no|without)\b/i,
+    // [v6.7.126 第 230 轮四版] asked the same ... 末位零宾语窄支。
+    //    坑与 229 轮 ②' 完全同形：谓词槽吃掉 "asked the same question" 后
+    //    句末无成分可匹配宾语槽。拆窄支，宾语处改枚举（question/quibble/
+    //    excuse）而非通配，避免误伤 "asked the same three candidates"
+    //    这种真实流程描述。probe6 实测修后 HIT。
+    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+asked\s+the\s+same\s+(?:question|quibble|excuse)\b/i,
     // ②' all + 群体 + 句末零宾语（All of our customers complained.）
     //    229 轮二版发现原 ② 族尾缀分支放在 `\s+` 之后，句末零宾语永远吃不到
     //    （probe6 实测 full=false / prefix=true），单独拆一支，谓词枚举抱怨/拒绝类。
