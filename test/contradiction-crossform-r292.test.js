@@ -16,7 +16,32 @@
  */
 
 'use strict';
-const test = require('node:test');
+
+// [v6.7.130 第294轮] run-all 兼容侧路计数。
+// run-all.js 只识别 stdout 里的「N 通过, M 失败」；
+// node:test 原生 reporter 打的是 pass/fail，本文件因此被
+// 计为失败。下面把 test 改指向侧路计数包装（仍调
+// 原生 test()，断言语义不变），进程退出时补汇总行。
+const __hfNativeTest = require('node:test').test;
+const __hfSub = require('node:test');
+let __pass = 0, __fail = 0;
+const test = function (name, opts, fn) {
+  if (typeof opts === 'function') { fn = opts; opts = undefined; }
+  return __hfNativeTest(name, opts, async (...a) => {
+    try {
+      await fn(...a);
+      __pass++;
+    } catch (e) {
+      __fail++;
+      throw e;
+    }
+  });
+};
+process.on('exit', () => {
+  console.log('\n' + __pass + ' 通过, ' + __fail + ' 失败');
+});
+
+
 const assert = require('node:assert');
 const path = require('path');
 const idx = require(path.join(__dirname, '..', 'src/index.js'));
