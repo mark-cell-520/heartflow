@@ -1,3 +1,111 @@
+# 第 311 轮（v6.7.124 工作面，闭环 r310 遗留 1：r308 两个测试文件静默失败，3 commit）
+
+**方向来源**：r310 交接簿「给下一轮」第 1 项（r308 格式问题已连续三轮占失败位，修法极简，应优先）+ r310 遗留 2（4 个零 stdout 测试）。
+本轮**用心虫本体 decision.decide() 选向**（`scripts` 探针 `scratch/decide-r311.js`，`mode: 'pick_best'`，走 r310 刚加的自身质量语义）：
+
+| 候选 | composite | chosen |
+|---|---|---|
+| A 修 r308 两个文件的 run-all 汇总行缺失 | **0.83** | ✅ |
+| B 接线 19 个孤儿模块 | 0.74 | |
+| C 深挖静默测试族（86 个 mount 文件） | 0.74 | |
+
+confidence 0.7。A 胜出理由：缺口三轮前已坐实、修法极简、零引擎风险；
+B 需先跑 0 引用扫描取当前真实数、单模块接线含 MCP 注册超出单轮预算；
+C 实测面虽最大（86 个）但多数走 _mount.js 正常计入，不是真缺口。
+
+## 1. 缺口复测（scratch/probe311-parse.js，等价重写 run-all.js 的三段解析）
+
+| 文件 | 单跑 exit | 断言 | 解析结果 |
+|---|---|---|---|
+| decision-channel-round308.test.js | 0 | 13/13 | **SILENT_FAIL** |
+| pattern-detector-jitter-round308.test.js | 0 | 32/32 | **SILENT_FAIL** |
+
+根因：两文件只输出分数式「通过 N / M」，而 `run-all.js` 的 `runChild()`
+主正则要求「通过」与「失败」**成对**出现。分数式兜底分支的
+`(\d+)\s*\/\s*(\d+)\s*(?:passed|通过|tests?\b|个|条)` 匹配不到「通过 13 / 13」
+（斜杠前是 `passed / failed` 语义的分数，而这里是「已过数 / 总数」），
+于是走 SILENT_FAIL 分支各计 1 个失败。**上一轮 UPGRADE_LOG 说的「各补一行
+汇总输出即可修」判断正确。**
+
+## 2. 改动（3 commit，全部在 test/ 与 scripts/，零 src/ 改动）
+
+| commit | 内容 |
+|---|---|
+| `97e3b53e` | 两目标文件各补 3 行（2 注释 + 1 标准汇总 console.log），不改 run-all.js（属升级机制，硬边界禁止） |
+| `1eec9a03` | 新增守卫 `test/runall-summary-contract-round311.test.js`（11 断言五段）+ 负例 `scripts/negative-test-runall-summary-r311.js` |
+| （finish 自动记账） | README 测试数 15,797 → 15,853 |
+
+守卫五段：
+A 单跑两目标文件，输出必须被解析公式判为 `standard`（13/0、32/0）；
+B run-all.js 三段解析公式仍在（标准行 / 合计分数式 / PASS-SKIP 兜底）；
+C 解析公式分辨力（纯分数式=静默、成对行=出数、英文汇总也认、失败数必须透出不许吞）；
+D **可逆性自证**——把标准汇总行从输出里抠掉，必须回到 SILENT_FAIL；
+E 两文件源码里必须真的含该 console.log（防将来被「优化」掉）。
+
+B 段最初用正则匹配 run-all.js 源码字面量，两次因反斜杠层数不符而误红，
+改为 `indexOf` 字面子串判断。教训：**守卫断言别人源码时优先字面子串，
+正则的转义层数会让守卫自己先红。**
+
+## 3. 守卫与负例
+
+`test/runall-summary-contract-round311.test.js` **11/11 全绿**。
+`scripts/negative-test-runall-summary-r311.js` **5/5 注入全变红，还原后 11/0 复绿**：
+
+| 注入 | 结果 | 失败项 |
+|---|---|---|
+| ① 删 channel 标准汇总行 | 8 通过 / 3 失败 | A1、D1、E1 |
+| ② 删 jitter 标准汇总行 | 9 通过 / 2 失败 | A2、E1 |
+| ③ 汇总行失败数写成假 0（欺骗 run-all） | 10 通过 / 1 失败 | E1 |
+| ④ 删守卫自己的汇总行（守卫变静默测试） | 0 通过 / 静默 | —（正是本轮防的形态） |
+| ⑤ 删守卫 A 段第一个例 | 10 通过 / 0 失败 | 断言数下降（用例消失） |
+
+①③④ 是本轮新增的对抗形态：**「假 0 汇总」能让 run-all 以为全绿**，
+E 段源码存在性检查专治它；④ 让守卫自己变成它要防的东西。
+
+## 4. 七项验证
+
+| 项 | 结果 |
+|---|---|
+| `bin/verify.js` | **14/14** |
+| `bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线持平，零新增） |
+| `run-all.js` | **15853 通过 / 0 失败 / 共 15853**（修复前 15797 通过 + 2 静默失败；本轮 +11 守卫 -0，且 r308 两文件从「静默计失败」转为正常计入 45 个） |
+| `security-audit.test.js` | **16/16** |
+| `doc-numbers-accuracy.test.js` | **15/15**（finish 记账 README 后复绿） |
+| 注入负例 | **5/5 变红，还原后守卫复绿** |
+| `upgrade-engine.js finish` | **7 项全绿、锁已释放、5 commit 已推送** |
+
+**run-all 从「2 个格式失败」变为 0 失败**——r310 预期的基线
+（npm-package-integrity 1 个失败）也未出现，本次实际是 0。
+
+## 5. r310 遗留 2 的复测结论（记为 N/A，非本轮缺口）
+
+r310 记「decision-capability / -constraints / -executor / -feedback 四个测试
+EXIT=0 但完全零 stdout，比格式问题更严重」。逐文件复测是**裸 node 口径的误报**：
+
+| 文件 | 形态 | 裸 node | run-all（_mount.js 注入） |
+|---|---|---|---|
+| decision-capability | mount（`module.exports = function({test})`） | 0 字节、exit 0 | **5 通过, 0 失败** |
+| decision-constraints | mount | 0 字节、exit 0 | **4 通过, 0 失败** |
+| decision-executor | mount | 0 字节、exit 0 | **1 通过, 0 失败** |
+| decision-feedback | mount | 0 字节、exit 0 | **1 通过, 0 失败** |
+
+这四个文件 export 的是 mount 函数，裸 node 跑只定义不执行 → 零输出**是正确的**；
+`runWithBestRunner()` 认出 mount 形态后改走 `_mount.js`，11 个断言全部正常计入。
+**无缺口，无需改动。** 但记一条方法论：判断测试是否「静默」，必须在
+run-all 口径下测，裸 node 的零输出对 mount 形态不是缺陷信号。
+
+## 6. 遗留（给下一轮）
+
+1. **19 个孤儿模块仍未接线**（本轮候选 B，composite 0.74）。下一轮先跑 0 引用
+   扫描取当前真实数量（r309/r310 两条独立来源都是 19，但代码这两轮动过），
+   再按「>50 行有真实逻辑 + 接线成本 <50 行」筛目标。铁律照旧：接线不等于升级，
+   每条必须有真实调用证据。
+2. **54 个未跟踪探针文件**（scripts/round-29x~30x/ + scratch/ + r310b/r311 负例）。
+   finish 的 auto-commit 明确说未动、需人工判断。负例脚本（negative-test-*.js）
+   按惯例应入库，scripts/round-NNN/ 与 scratch/ 属过程产物，建议加 .gitignore。
+3. **守卫写法的转义教训已录入 UPGRADE_LOG**：断言他人源码优先字面子串。
+4. run-all 现在 0 失败、无 npm-package-integrity 失败，下一轮若出现失败
+   必须定位到具体条目——本轮没有任何「预期失败」可依赖。
 # 第 310 轮（v6.7.124 工作面，闭环 r309 遗留 1：decision 缺口收益与候选质量混维度，1 commit）
 
 **方向来源**：r309 交接簿「给下一轮」第 1 项——decide() 复合分排序与直觉相反。
