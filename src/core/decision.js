@@ -310,6 +310,35 @@ class HeartFlowDecision {
   _parseOptionsFromText(text) {
     if (!text || typeof text !== 'string' || text.length < 8) return [];
 
+    // [v6.7.129 第 303 轮] 续行量化字段合并 —— 「四轮选向退化」的根因修复。
+    // 缺口现象（探针 scratch/probe303-contline.js 实测）：候选写成
+    // 「首行标记 + 描述」/「续行 key=value」两行时，下面三个 marker 分支的
+    // 单行捕获组 `.+` 只吃当前行，续行被**整行丢弃**
+    // → 三个候选的 feasibility/risk/confidence 全是 undefined
+    // → _scoreOption 全部回退到同一套文本推断默认值 → composite 打平
+    // → decide() 返回 options_indistinguishable + chosen:null。
+    // r299/r300/r301 连续三轮「选向退化」都是这一形态（单行写法正常）。
+    // 修法口径（保守，宁可不并也不错并）：
+    //   · 只把「非标记开头」的后续行并回上一个候选行，标记判定与下面
+    //     三个分支同口径（行首括号标记 / 字母+分隔+空白 / 编号+分隔符）
+    //   · 并完仍不足 2 个候选时原样返回，绝不改动既有解析结果
+    //   · 顿号并列分支（③）不受影响：合并只在 ≥2 个候选标记时生效，
+    //     而那种情况下①②分支早已 return，代码走不到③
+    const MARKER_HEAD = /^\s*(?:[（(\[]\s*[A-Za-z0-9]{1,2}\s*[)）\]]|[A-Za-z]\s*[.、）)]\s+|\d{1,2}\s*[.、)）]\s*)/;
+    const mergeContinuationLines = (raw) => {
+      const groups = [];
+      for (const line of String(raw).split('\n')) {
+        if (MARKER_HEAD.test(line)) {
+          groups.push(line.trim());
+        } else if (groups.length > 0 && line.trim().length > 0) {
+          groups[groups.length - 1] += ' ' + line.trim();
+        }
+      }
+      return groups.length >= 2 ? groups.join('\n') : raw;
+    };
+    const merged = mergeContinuationLines(text);
+    if (merged !== text) text = merged;
+
     // [v6.7.127 第 87 轮] 候选里的显式数值字段必须被解析出来。
     // 此前 `mk()` 只产出 {id,label,description}，而 `_scoreOption` 的
     // `num(option.feasibility) ?? derivedFeasibility` 只读结构化字段 ——
