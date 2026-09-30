@@ -8852,6 +8852,29 @@ const PSEUDO_PHILOSOPHY_ZH = [
 // 只作用于本维度判据前的过滤，不影响其他维度（其他维度有自己的工程语义需求）。
 const TECH_ATTRIBUTION_NOUNS = /(?:延迟|吞吐|并发量|连接池|QPS|TPS|p99|CPU|内存|带宽|IO|序列化|索引|缓存|锁粒度|响应时间|帧率|错误率|耗时|重排|渲染|分页|队列深度)/i;
 
+// [v6.7.130 第 300 轮] 主语技术域排除闸门（与上面 TECH_ATTRIBUTION_NOUNS 互补）。
+// 缺口复测（scripts/round-300/probe-3/probe-4）：8781 行「不是A，是B」老判据的
+// B 侧本体论词表在中文工程语言里被当普通修饰语用——「延期不是排期问题，是需求
+// 本质还没定」这类真句因 B 侧落「本质」被误判伪哲理，实测误伤面 8/9。
+// 关键分界线（probe-5 到 probe-7 三轮）：
+//   · 白名单主语（抽象域）不可行：技术主语加「这次/本次」前缀仍 FP 4/4，
+//     伪哲理加「真正的/所谓」前缀反 miss 3/3 —— 白名单会把带前缀真阳挡掉；
+//   · 排除法（主语落在技术词表即不判）ADOPT：技术主语 FP 12/12→0，
+//     抽象域召回不变，商业主语 0 误伤无需扩表；
+//   · 三种锚定实测 V1 前12字窗口与 V3 整句等效（A_FP=0/11、召回不变、
+//     对抗组零压制），V2 真正主语段反而漏 1 条 → 取前 12 字窗口（最窄，
+//     与 8781/8792 判据的主语跨距一致）。
+// 只作用于本维度中文侧判据前的过滤，不影响 EN 侧与其他维度。
+const TECH_SUBJECT_NOUNS = /(?:延期|排期|指标|活跃度|拆分|召回率|崩溃|延迟|吞吐|并发量|连接池|缓存|索引|序列化|内存|带宽|QPS|TPS|p99|CPU|错误率|耗时|帧率|渲染|队列|模块|版本|接口|查询|数据源|补丁|回滚|发布|工单|需求|上线|故障|事故|告警|扩容|缩容|限流|降级|熔断|灰度|DAU|GMV|续约率|转化率)/i;
+
+// 主语技术域判定：只取“不是”之前的主语段，跨距与 8781/8792 判据一致（12 字）。
+function isTechSubject(text) {
+  const head = text.slice(0, 24);
+  const cut = head.indexOf('不是');
+  const subj = cut === -1 ? head.slice(0, 12) : head.slice(0, Math.min(cut, 12));
+  return TECH_SUBJECT_NOUNS.test(subj);
+}
+
 function checkPseudoProfundity(text) {
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   // [v6.7.82] 中文侧合并 PSEUDO_PHILOSOPHY_ZH（伪哲理句式）。
@@ -8866,6 +8889,15 @@ function checkPseudoProfundity(text) {
   // 在长文本上开销线性增长。统一在函数内建一次即可，无需模块级噪声。
   const matches = [];
   const limited = text.length > 4000 ? text.slice(0, 4000) : text;
+  // [v6.7.130 第 300 轮] 主语技术域闸门接线：主语是技术/工程实体时不判伪哲理。
+  // 「延期不是排期问题，是需求本质还没定」是工程归因，不是本体论升格。
+  // 实测（scripts/round-300/probe-6/probe-7）：技术主语 FP 12/12→0，
+  // 抽象域真阳召回不变（7/8），对抗样本（技术词落在非主语位置）零压制。
+  // 注意接线位置：必须在 TECH_ATTRIBUTION_NOUNS 分支之后，否则该分支的
+  // filtered 逻辑会与本节重复过滤（两条闸门的作用域不同，互不替代）。
+  if (isTechSubject(limited)) {
+    return { count: 0, matches: [], score: 0 };
+  }
   // [第 297 轮] 技术实体归因闸门：归因对象是可测量技术实体时不判伪哲理。
   // 「延迟的根源不在网络，而在序列化开销的层次」是工程归因，不是本体论升格。
   if (TECH_ATTRIBUTION_NOUNS.test(limited)) {
