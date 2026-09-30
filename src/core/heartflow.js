@@ -4568,9 +4568,7 @@ class HeartFlow {
       verdictCounts: counts,
       trend,
     };
-  },
-
-
+  }
 
   // [v6.0.71] 恢复 dispatch 路由核心（被重构误删）
   dispatch(route, ...args) {
