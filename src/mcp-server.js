@@ -3478,6 +3478,9 @@ const HANDLERS = {
       // query：域内关键词检索（terms 匹配 + 置信度阈值 + recency 加分）
       if (action === 'query') {
         if (!domain) return { error: 'query 需要 domain' };
+        if (args?.question === undefined || args?.question === null || args?.question === '') {
+          return { error: 'query 需要 question（域内检索词，空检索会静默返回空结果）' };
+        }
         const q = args?.question || args?.q || '';
         const hits = kl.query(domain, q, {
           limit: args?.limit || 10,
