@@ -4884,6 +4884,40 @@ const HASTY_GENERALIZATION_PATTERNS = {
     //    excuse）而非通配，避免误伤 "asked the same three candidates"
     //    这种真实流程描述。probe6 实测修后 HIT。
     /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+asked\s+the\s+same\s+(?:question|quibble|excuse)\b/i,
+    // [第 281 轮] every/each + 群体 + 系动词 is/are + 病理贬损表语。
+    // 复测（scripts/round-281/p6-r281.js）：系动词形状在 229/230/280 三轮里
+    // 全部落空——那几轮的判据只收「行为/态度动词 + 宾语」（ignores this /
+    // mocks a stranger / asked the same question），系动词 + 表语形状零覆盖。
+    //   A 组（单数群体 × Every/Each × 15 表语 × 16 群体）：34/510 命中，
+    //     476 条漏，漏词 = fools/idiots/liars/losers/thieves/cowards/parasites/
+    //     vermin/cattle/sheep/criminal/clown/brute/worthless/inferior 全词形；
+    //   B 组（复数群体 × are × 14 表语）：34/420 命中，386 条漏；
+    //   同形状良性哨兵池 38 条 0 误伤（member/priority/volunteer/beginner/
+    //     administrator/contributor/contractor/entitled/responsible/eligible/
+    //     required/expected/encouraged/advised/strong advocate/weak signal…）。
+    // 与 280 轮②族同构：谓词槽改枚举表（系动词两个形 + 病理表语枚举），
+    // 前置约束替代事后排除，功能性动词天然不命中。
+    // 三条边界设计（零误伤关键）：
+    //   ① 否定排除 `(?!not\b|n't\b)`——`Every user is not responsible…` /
+    //      `isn't a problem` 这类免责/反驳句不命中（与判据①同口径）；
+    //    表语后必须跟句读——`cattle rancher` / `fool for love` /
+    //    `a criminal lawyer` 这类合法职业与习语形状，表语只是名词短语的
+    //    修饰成分而非全句表语，锚在句读上天然排除；
+    //    表语枚举**单复数并列**（`parasite|parasites`）——第 281 轮二版补：
+    //    首版只列复数 `parasites`（与 all 族①词表对齐），漏 `a parasite`
+    //    单数形（p10 实测 HYP2：`parasites` 中、`parasite`/`a parasite` 漏）。
+    //⑤ 群体表收 `one` 的**否决记录**：one 是 every 的量词本身不是群体名，
+    //    靠 `single user` / `one user` 中缀形态天然覆盖（见条目④）。
+    //③ 中缀 `(?:\s+\w+){0,2}` 与 230 族同构，收 single/one of the 等插入。
+    //   ④ 群体表收 `one`：代词形攻击句（every one / each one / every single
+    //    one + 系动词 + 病理表语）在 281 轮二版补。p8 复测：加 one 前该形
+    //    28 条全 pass（`Every one is a fool.` 形状）；三版实测（本条即为
+    //    三版状态）A 组 510/510 全中、B 组 420/420、良性哨兵 38 条 0 误伤。
+    //    `one of them is` 后置介词形仍不收（群体半后需紧跟系动词），记为遗留。
+    //    良性哨兵：`Every one is a member / a beginner / a step / a
+    //    record.` 全 pass（member/beginner/step/record 不在表语表）。
+    //⑤ 否决记录：曾考虑不收 one，最终收。判定方法仍是「实测驱动，不是推演驱动」。
+    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?|one)\s+(?:is|are)\s+(?!not\b|n't\b)(?:a\s+|an\s+)?(?:fools?|idiots?|liars?|losers?|thieves|thief|cowards?|parasites?|vermin|cattle|sheep|sheeple|clowns?|brutes?|criminals?|crooks|con\s+artists?|savages?|cockroaches|stray\s+dogs?|wild\s+animals|rats|roaches|worthless|inferior|hopeless|pathetic)\b(?=\s*(?:[.,;:!?]|$))/i,
     // ②' all + 群体 + 句末零宾语（All of our customers complained.）
     //    229 轮二版发现原 ② 族尾缀分支放在 `\s+` 之后，句末零宾语永远吃不到
     //    （probe6 实测 full=false / prefix=true），单独拆一支，谓词枚举抱怨/拒绝类。
