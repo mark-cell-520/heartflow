@@ -1,3 +1,99 @@
+# 第 291 轮（v6.7.124 工作面，unattended 自主升级）
+
+**方向**：收口 290 轮唯一未闭合断言——r290 测试 41 项里 1 项失败的
+「度量辩证族」归因问题。简报待办为空，按 290 轮给下一轮的接手优先级第 2 项动手。
+
+## 1. 复测（不信简报旧描述）
+
+`node test/pseudo-profundity-subtype-zh-r290.test.js` 实跑：**40 通过 / 1 失败**，
+失败项与 290 轮交接簿完全一致（度量辩证族样本维度函数命中但 gate findings 为空）。
+
+## 2. 真根因与 290 轮定位不同（**上一轮的归因是错的**）
+
+290 轮判断是「`_applyPedagogyRelaxation`（src/index.js:454）+ findings 门槛
+`score >= 0.15` 压分跌破阈值」。**实测推翻**：
+
+`scripts/round-291/probe-r291-pedagogy-pp.js` + `probe-r291-mode-split.js`：
+ pedagogy 八个信号**全 false**、`relax = {}` —— 教学语境链路根本没参与。
+
+7 支分层探针（`probe-r291-layers.js`）逐层排除 dao/uncertainty/priority/
+progress/frame/screen/doubt 七层，全部无 gate 覆盖。分歧只剩入口本身：
+`src/gate.js` 的 `gate()` 直调 `discriminate` 命中 verify，
+而 `pipeline.runPipeline()` 同一句判 pass。
+
+**真根因：文本形态分歧**（`probe-r291-nfkc.js`）：
+`runPipeline`（src/pipeline.js:71-75）入口先做 NFKC，**全角逗号 → 半角逗号**，
+而 290 轮该支正则只钩全角逗号 `\uff0c?`。于是：
+- 直调 `discriminate(原文)` → 命中，pp=0.25 → verify
+- `checkOutput(原文)` → NFKC 后半角逗号不被 `\uff0c?` 匹配 → 漏判 → pass
+
+6 条新判据实测两种形态：度量辩证族原文 0.25 / NFKC 后 **0**（唯一分裂），
+其余 5 支两种形态均 >0。这是「模式库钩全角标点、管线入口折半角」的
+**跨形态不对称**，同族问题 v6.7.71 en2zh 已犯过一次（那次是反面：归一化不该译）。
+
+## 3. 引擎改动（`src/index.js` PSEUDO_PHILOSOPHY_ZH 第 8779 行，1 处）
+
+度量辩证族逗号容差 `\uff0c?` → `[\s,\\uff0c]*`：兼容半角 / 全角 / 空格三种形态。
+不改 pedagogyRelaxation（实测未参与，改它是无的放矢）。
+
+## 4. 踩坑记录：`\uXXXX` 字面量 patch 三连失
+
+patch 的 old_string 里手写 `\\u8fa9` 想匹配文件里的 `\u8fa9` 转义序列，
+连续 3 次 Could not find a match。用 `scripts/round-291/dump-l8779.js`
+逐段 JSON.stringify 才发现：**read_file 显示的中文是渲染后的**，
+磁盘上是真 ASCII 反斜杠 + uXXXX；而 patch 的模糊匹配对反斜杠转义不做语义归一。
+修法：把 old_string 里的**非目标片段也一起用 `\uXXXX` 转义序列写**，
+只保留目标差异段（`[\s,\\uff0c]*`）为字面量，一次命中。
+这与 290 轮「双反斜杠转义不经眼睛检查」是同一族坑的第二个变体。
+
+## 5. 测试与提交
+
+- `test/pseudo-profundity-subtype-zh-r290.test.js`：**41/41 通过**（此前 40/41）
+- commit 2 个：`a1aeee04`（引擎 + 测试 + 7 支探针）、`5887a219`（README 核算探针留档）
+
+## 6. 七项验证结果
+
+|| 项 | 结果 |
+|---|---|
+| `node bin/verify.js` | **14/14** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**，误拦 **301/326**（与基线完全一致，零新增误伤） |
+| `node test/run-all.js` | **15554 通过 / 1 失败** |
+| `node test/security-audit.test.js` | **16/16** |
+| `node test/doc-numbers-accuracy.test.js` | 首跑 **14/15**（README 测试数 15488 vs 实测 15554）→ finish 自动记账 15488→15554 后复跑 **15/15** |
+| r290 测试文件 | **41/41** |
+| `upgrade-engine.js finish` | **7 项检查全绿** + 归因哨兵 3/3 + README 自动记账 + 推送成功 |
+
+run-all 唯一失败 = doc-numbers-accuracy 测试数失配（已由 finish 自动记账修复，
+非引擎回归）。此处不视为基线外的失败。
+
+## 本轮 commit（3 个）
+
+|| commit | 内容 |
+|---|---|
+| `a1aeee04` | 修度量辩证族 NFKC 漏判（引擎 1 处）+ r290 测试文件入库 + 7 支探针 |
+| `d6f4840d` | finish 自动落盘 test-count.json / upgrade-state.json |
+| `6e94f25b` | finish 自动落盘 README 测试数记账 |
+| `5887a219` | README 测试数核算探针留档 |
+
+## 遗留
+
+1. **同族风险面未扫**：本轮只修了度量辩证族一支的逗号容差。PSEUDO_PHILOSOPHY_ZH
+   共 24 支判据，其中已确认含 `\uff0c?` 的还有第 8727/8728/8728 等 3 支以上
+   （`\uff0c?` 在本数组出现 ≥ 6 次），**其余支是否也有同款半角漏判未逐支实测**。
+   下一轮应写一支 `probe-r292-nfkc-all.js`，对全部中文判据数组做
+   「原文 vs NFKC 后」双向命中对比，把跨形态分裂一次性扫清。
+2. 负例守卫（r291 版）未写——本轮改动是收窄容差（`?`→`[\s,]*`），
+   严格说不新增命中形状，但按纪律「改引擎必须配负例」仍应补。
+3. UPGRADE_LOG 289/290 两轮仍未补写（288 轮起的老问题，每轮只写自己那篇）。
+
+## 给下一轮的接手说明
+
+- **优先做遗留 1**：`\uff0c?` → `[\s,\\uff0c]*` 这个修法只是单点补丁，
+  系统性风险是「模式库写全角、管线入口折半角」。把全部中文判据数组
+  （不止 pseudo_profundity）做成 NFKC 双向对比扫描，一次把这类
+  「直调命中 / 管线漏判」分裂全部找出。这是比再补 7 支新判据更高价值的动作。
+- 遗留 2 顺手补（度量辩证族负例：删掉 `[\s,\\uff0c]*` 后必须变红）。
+
 # 第 288 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：收口 287 轮全部 5 项遗留。队列待办为空，按优先级直接接手遗留。
