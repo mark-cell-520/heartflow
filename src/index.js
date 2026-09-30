@@ -8700,6 +8700,24 @@ const PSEUDO_PHILOSOPHY_ZH = [
   // 主语与中段放宽不引入误伤。
   /这不是[^。，]{1,14}的?问题[^。]{0,24}而是[^。]{0,24}(?:维度|层次|境界|高度)/,
 
+  // [v6.7.125+2 第 297 轮] 前置否定族：「问题(不)在X，而在Y{维度|层次|境界|高度}」
+  // r296 交接簿遗留盲区①，probe-297-1 复测 4/4 全漏（gate 全 pass）。
+  // 与上面第5条「这不是X的问题而是Y」同源，只是否定词换成前置「不在」。
+  // 分界线（probe-297-4/5/6/7 四轮实测后才定）：
+  //   · 裸族（无附加条件）误伤 6/24 —— 「问题不在算法，而在数据分布的维度，这是…」
+  //     这类工程真句里「维度/层次」是被当作普通领域修饰语用，后面接续论证；
+  //   · 升格标记版（真正/根本/核心）正例只 3/6，仍有工程真句误伤 1/4；
+  //   · 本体论词 + 逗号负向前瞻版正例 9/9、误伤降至 1/32；
+  //     唯一剩的误伤是「延迟的根源不在网络，而在序列化开销的层次」——
+  //     X/Y 两侧都是可测量技术实体，被 TECH_ATTRIBUTION_NOUNS 闸门排除（0/32）。
+  // 判据三层：本体论词不得紧跟逗号（(?![，,])）+ 前置否定引导词 + 跨度上限。
+  /(?:问题|瓶颈|根源|关键)[^。！？\n]{0,12}不在[^。！？\n]{1,16}[，,。；;][^。！？\n]{0,12}(?:而)?是?在(?:于)?[^。！？\n]{0,24}(?:维度|层次|境界|高度)(?![，,])/,
+
+  // [v6.7.125+3 第 297 轮] 非「问题」引导族：「这不是X的{错|原因}，而是Y{词表}」
+  // r296 交接簿遗留盲区②，probe-297-1 复测 4 条只 1 条靠 B 侧「认知」词表搭车命中。
+  // 同款负向前瞻分界 + 主语跨度 1,18（probe-297-6：1,14 漏长主语 1 条）。
+  /这不是[^。，]{1,18}的?(?:问题|错|原因)[^。]{0,24}而是[^。]{0,24}(?:维度|层次|境界|高度)(?![，,])/,
+
   // ═══ [v6.7.129 第 289 轮] 存在论比喻族（LLM 伪深刻收尾话术）═════
   // 缺口实测（scripts/round-289/probe-pp-gap.js + probe-pp-v4.js）：
   // 16 条真实「把普通结论升格为本体论命题」的样本，**本维度命中 0/16**，
@@ -8788,6 +8806,15 @@ const PSEUDO_PHILOSOPHY_ZH = [
   /\u4e0d\u662f[^\u3002\uff01\uff1f\n]{1,12}\u5f97(?:\u591a|\u5c11)[\s,\\uff0c]*\u800c\u662f(?:\u8ba1\u8f83|\u770b\u5f85|\u5728\u4e4e|\u5173\u6ce8)[^\u3002\uff01\uff1f\n]{0,6}\u5f97(?:\u5c11|\u591a)/,
 ];
 
+// [v6.7.125+2 第 297 轮] 技术实体归因排除闸门。
+// 用途：前置否定族「问题不在X，而在Y层次」的中文工程语言里，「维度/层次」常被
+// 用作普通修饰语（「序列化开销的层次」），且 X/Y 两侧都是可测量技术实体。
+// 实测（probe-297-4/5/6/7）：该形状误伤最高 6/24，其中 1 条穿过负向前瞻后
+// 只剩这一道闸门能拦住。含义 = 句中归因对象是延迟/吞吐/锁粒度等被测量实体时，
+// 是工程归因而非本体论升格，不判 pseudo_profundity。
+// 只作用于本维度判据前的过滤，不影响其他维度（其他维度有自己的工程语义需求）。
+const TECH_ATTRIBUTION_NOUNS = /(?:延迟|吞吐|并发量|连接池|QPS|TPS|p99|CPU|内存|带宽|IO|序列化|索引|缓存|锁粒度|响应时间|帧率|错误率|耗时|重排|渲染|分页|队列深度)/i;
+
 function checkPseudoProfundity(text) {
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   // [v6.7.82] 中文侧合并 PSEUDO_PHILOSOPHY_ZH（伪哲理句式）。
@@ -8802,6 +8829,13 @@ function checkPseudoProfundity(text) {
   // 在长文本上开销线性增长。统一在函数内建一次即可，无需模块级噪声。
   const matches = [];
   const limited = text.length > 4000 ? text.slice(0, 4000) : text;
+  // [第 297 轮] 技术实体归因闸门：归因对象是可测量技术实体时不判伪哲理。
+  // 「延迟的根源不在网络，而在序列化开销的层次」是工程归因，不是本体论升格。
+  if (TECH_ATTRIBUTION_NOUNS.test(limited)) {
+    const filtered = PSEUDO_PHILOSOPHY_ZH.filter(p => p.source.indexOf('不在') === -1);
+    for (const pat of filtered) { const m = limited.match(pat); if (m) matches.push({ pattern: pat.source.slice(0, 25) }); }
+    return { count: matches.length, matches, score: Math.min(1, matches.length * 0.25) };
+  }
   for (const pat of patterns) { const m = limited.match(pat); if (m) matches.push({ pattern: pat.source.slice(0, 25) }); }
   const score = Math.min(1, matches.length * 0.25);
   return { count: matches.length, matches, score };
