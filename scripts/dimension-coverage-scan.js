@@ -21,9 +21,26 @@ const ROOT = path.resolve(__dirname, '..');
 const gate = require(path.join(ROOT, 'src/gate.js'));
 
 // ── 从 index.js 读三个 action-tier 集合 ──
-const idxSrc = fs.readFileSync(path.join(ROOT, 'src/index.js'), 'utf8');
+// [v6.7.125 round-287 口径修正] 原实现用正则 `const X = new Set\(([\s\S]*?)\)`
+// 静态解析 index.js 源码，**数少了**：BLOCK_DIMS 定义在 716 行，第 721 行的
+// 注释里含 ASCII 右括号「arXiv:2609.22978 (DSec) §6.4」，非贪婪匹配在那里
+// 就断了 —— reward_hacking（724 行）被截在匹配区外，静态只得 9/10。
+// 后果：reward_hacking 这个 block 级维度从 v6.7.126 第 71 轮起从未进入
+// 横向扫描视野（block 层只列出 5 个），decision 引擎的全局视野缺一角，
+// 而 reward_hacking 正是 src/reward-hacking.js 里独立实现的判据族。
+//
+// 修法两处都改（缺一不可）：
+//   1) 匹配前先**删除行注释** —— 注释里的 ASCII 括号/方括号不再参与匹配；
+//   2) 锚点从 `\)` 改成 `\]` + 显式的 `\[` —— Set 字面量必以 `[` 开 `]` 收，
+//      字符串体内不可能出现裸 `]`（维度名全是 [a-z_]）。
+// 实测（scripts/round-287/probe-r287-static.js）：10 / 10 / 26 = 46，rh✓。
+//
+// 注：曾试运行时导出探测（subprocess require index.js 取 idx.BLOCK_DIMS），
+// 实测三个 Set 均未导出（undefined），该路径不可行，已移除。
+const idxSrc = fs.readFileSync(path.join(ROOT, 'src/index.js'), 'utf8')
+  .replace(/^\s*\/\/.*$/gm, '');   // 删行注释，避开注释内括号截断
 function dimsOf(name) {
-  const m = idxSrc.match(new RegExp('const ' + name + ' = new Set\\(([\\s\\S]*?)\\)'));
+  const m = idxSrc.match(new RegExp('const ' + name + ' = new Set\\(\\[([\\s\\S]*?)\\]\\)'));
   return m ? (m[1].match(/['"][a-z_]+['"]/g) || []).map(s => s.slice(1, -1)) : [];
 }
 const TIERS = {
