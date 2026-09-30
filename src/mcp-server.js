@@ -3136,6 +3136,19 @@ function handleFalsePositiveTool(args) {
   }
 }
 
+// [r313] KnowledgeLayer 进程内回退单例：只在引擎未启动
+// （heartflow 为 null / 无 knowledgeLayer 属性）时兜底，正常路径永远走引擎常驻实例。
+// 刻意不用模块级缓存实例替代引擎实例——那会退化成 r312 那条「两套状态互相看不见」的老路。
+let _klFallback = null;
+function _knowledgeLayerFallback() {
+  if (_klFallback) return _klFallback;
+  try {
+    const { KnowledgeLayer } = require('./archive/knowledge-layer.js');
+    _klFallback = new KnowledgeLayer({ maxFactsPerDomain: 5000, enableSourceTracking: true });
+  } catch (_) { _klFallback = null; }
+  return _klFallback;
+}
+
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
@@ -3443,13 +3456,14 @@ const HANDLERS = {
 
   // [v6.7.132 第 312 轮] 独立知识层（KnowledgeLayer）——域名分区事实库，
   // 与 heartflow_knowledge_graph 的关系图是两回事：memory/ 管经历，这里管命题。
+  // [r313 修复] 必须走引擎常驻实例 heartflow.knowledgeLayer，
+  // 不许在 handler 里 new——r312 首版每次调用 new 新实例，
+  // store 之后再 query 必然 count=0、remove 必 false（实测见 r313 探针）。
   heartflow_knowledge_layer: (args) => {
     try {
-      const { KnowledgeLayer } = require('./archive/knowledge-layer.js');
-      const kl = new KnowledgeLayer({
-        maxFactsPerDomain: args?.maxFactsPerDomain || 5000,
-        enableSourceTracking: args?.enableSourceTracking !== false,
-      });
+      // 引擎常驻实例；引擎没起来时退化到进程内单例，保证至少单次调用自洽
+      const kl = (heartflow && heartflow.knowledgeLayer) || _knowledgeLayerFallback();
+      if (!kl) return { error: '知识层未初始化：引擎未启动且回退单例创建失败' };
       const action = args?.action || 'stats';
       const domain = typeof args?.domain === 'string' ? args.domain : '';
 
@@ -3472,6 +3486,13 @@ const HANDLERS = {
         return { action, domain, count: hits.length, hits: hits.slice(0, 20), timestamp: Date.now() };
       }
 
+      // getFact：按 id 取单条
+      if (action === 'getFact') {
+        if (!domain || !args?.id) return { error: 'getFact 需要 domain + id' };
+        const f = kl.getFact(domain, args.id);
+        return { action, domain, id: args.id, found: f !== null && f !== undefined, fact: f ?? null, timestamp: Date.now() };
+      }
+
       // remove：按 id 删一条
       if (action === 'remove') {
         if (!domain || !args?.id) return { error: 'remove 需要 domain + id' };
@@ -3486,9 +3507,11 @@ const HANDLERS = {
         return { action, cleared: before.totalFacts, stats: kl.getStats(), timestamp: Date.now() };
       }
 
-      // stats（默认）/ domains：只读
+      // stats（默认）/ domains / getDomains：只读
       const stats = kl.getStats();
-      if (action === 'domains') return { action, domains: stats.domainCount !== undefined ? kl.getDomains() : [], stats, timestamp: Date.now() };
+      if (action === 'domains' || action === 'getDomains') {
+        return { action: 'domains', domains: kl.getDomains(), stats, timestamp: Date.now() };
+      }
       return { action, stats, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
