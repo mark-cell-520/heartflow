@@ -26,7 +26,7 @@ function _registerModules(hf) {
     const subsystemNames = [
         'identityCore',
         'cognitive',
-        'memory', 'knowledge',
+        'memory', 'knowledge', 'knowledgeLayer',
         'counterfactual', 'verify', 'execution', 'decision', 'decisionVerifier',
         'evolution', 'dream', 'lesson', 'meta',
         'self', 'psychology', 'emotion', 'agentPsychology', 'agentPhilosophy', 'selfPositioning',
