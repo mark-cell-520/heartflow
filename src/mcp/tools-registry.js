@@ -355,6 +355,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_knowledge_layer',
+    description: "独立知识层（KnowledgeLayer，域名分区命题事实库）：与 heartflow_knowledge_graph 的关系图是两回事——memory/ 管经历，这里管命题。action: store 写事实（domain+fact+source+confidence）/ query 域内关键词检索（terms 匹配 + 置信度阈值 + recency 加分，返回命中、分数与来源）/ remove 按 id 删 / clear 清空 / stats 域与事实统计（默认）/ domains 列出域名。零 LLM 依赖，无持久化（进程内 Map）。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"store / query / remove / clear / stats（默认）/ domains"},"domain":{"type":"string","description":"域命名空间，如 mathematics / physics / project-notes"},"fact":{"description":"要存储的事实，字符串自动包成 {value}，也可传对象"},"source":{"type":"string","description":"来源（URL / 论文引用 / 人工标注）"},"confidence":{"type":"number","description":"置信度 0-1，默认 0.5，query 可用 minConfidence 过滤"},"question":{"type":"string","description":"query 的检索词（空格分词，与 fact 文本做子串匹配）"},"limit":{"type":"number","description":"query 最多返回条数，默认 10"},"minConfidence":{"type":"number","description":"query 置信度下限，默认 0"},"id":{"type":"string","description":"remove 用的事实 id"},"maxFactsPerDomain":{"type":"number","description":"单域软上限，超出淘汰最旧，默认 5000"},"enableSourceTracking":{"type":"boolean","description":"是否启用来源追踪，默认 true"}},"required":[]}
+  },
+
+  {
     name: 'heartflow_crowdtest_evaluate',
     description: "众测题判分：六区块结构判定 + 数字白名单（材料外数字/幻觉）+ 交付清单 + gate 合规兜底。返回形式分、硬失败项与人工陪审提示，不合并单一总分。",
     inputSchema: {"type":"object","properties":{"answer":{"type":"string","description":"被测模型按六区块格式输出的答案全文"},"materials":{"type":"array","items":{"type":"string"},"description":"题目材料文本（M1..Mn 承诺内容），用于建数字白名单"},"materialIds":{"type":"array","items":{"type":"string"},"description":"合法材料编号，如 [\"M1\",\"M2\"]；用于校验引用编号"},"requiredDeliverables":{"type":"array","items":{"type":"string"},"description":"本题必须出现的交付物关键词"},"minCitations":{"type":"number","description":"【依据】最少材料引用条数，默认 3"}},"required":["answer"]}

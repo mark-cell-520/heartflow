@@ -3441,6 +3441,58 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
 
+  // [v6.7.132 第 312 轮] 独立知识层（KnowledgeLayer）——域名分区事实库，
+  // 与 heartflow_knowledge_graph 的关系图是两回事：memory/ 管经历，这里管命题。
+  heartflow_knowledge_layer: (args) => {
+    try {
+      const { KnowledgeLayer } = require('./archive/knowledge-layer.js');
+      const kl = new KnowledgeLayer({
+        maxFactsPerDomain: args?.maxFactsPerDomain || 5000,
+        enableSourceTracking: args?.enableSourceTracking !== false,
+      });
+      const action = args?.action || 'stats';
+      const domain = typeof args?.domain === 'string' ? args.domain : '';
+
+      // store：写一条命题事实（domain + fact + source + confidence）
+      if (action === 'store') {
+        if (!domain) return { error: 'store 需要 domain' };
+        if (args?.fact === undefined || args?.fact === null) return { error: 'store 需要 fact' };
+        const r = kl.store(domain, args.fact, { source: args?.source, confidence: args?.confidence });
+        return { action, stored: r, stats: kl.getStats(), timestamp: Date.now() };
+      }
+
+      // query：域内关键词检索（terms 匹配 + 置信度阈值 + recency 加分）
+      if (action === 'query') {
+        if (!domain) return { error: 'query 需要 domain' };
+        const q = args?.question || args?.q || '';
+        const hits = kl.query(domain, q, {
+          limit: args?.limit || 10,
+          minConfidence: typeof args?.minConfidence === 'number' ? args.minConfidence : 0,
+        });
+        return { action, domain, count: hits.length, hits: hits.slice(0, 20), timestamp: Date.now() };
+      }
+
+      // remove：按 id 删一条
+      if (action === 'remove') {
+        if (!domain || !args?.id) return { error: 'remove 需要 domain + id' };
+        const removed = kl.removeFact(domain, args.id);
+        return { action, domain, id: args.id, removed, timestamp: Date.now() };
+      }
+
+      // clear：清空全部域
+      if (action === 'clear') {
+        const before = kl.getStats();
+        kl.clear();
+        return { action, cleared: before.totalFacts, stats: kl.getStats(), timestamp: Date.now() };
+      }
+
+      // stats（默认）/ domains：只读
+      const stats = kl.getStats();
+      if (action === 'domains') return { action, domains: stats.domainCount !== undefined ? kl.getDomains() : [], stats, timestamp: Date.now() };
+      return { action, stats, timestamp: Date.now() };
+    } catch (e) { return { error: e.message }; }
+  },
+
   heartflow_memory_consolidation: (args) => {
     try {
       const { MemoryConsolidationEngine } = require('./memory/memory-consolidation-engine.js');
