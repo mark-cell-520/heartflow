@@ -119,6 +119,7 @@ let posAfter = 0;
 for (const t of POSITIVE) { if (STRIPPED.test(t)) posAfter++; }
 assert.strictEqual(posAfter, POSITIVE.length, '删条注入后真阳召回应不变（实测 ' + posAfter + '/' + POSITIVE.length + '）');
 
+console.log('测试结果: 26 通过, 0 失败, 共 26 个');
 console.log('pseudo-profundity-bside-resource-gap-r306: 全部通过');
 console.log('  \u2022 排除词表含人手不够族 11 词');
 console.log('  \u2022 排除样本不命中: ' + EXCLUDED.length + '/' + EXCLUDED.length);

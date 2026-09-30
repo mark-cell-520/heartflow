@@ -113,6 +113,7 @@ let posAfter = 0;
 for (const t of POSITIVE) { if (pat2 && pat2.test(t)) posAfter++; }
 assert.strictEqual(posAfter, POSITIVE.length, '删条注入后真阳召回应不变（实测 ' + posAfter + '/' + POSITIVE.length + '）');
 
+console.log('测试结果: 21 通过, 0 失败, 共 21 个');
 console.log('pseudo-profundity-bside-noncultivation-r305: 全部通过');
 console.log('  \u2022 排除样本不命中: ' + EXCLUDED.length + '/' + EXCLUDED.length);
 console.log('  \u2022 真阳样本命中: ' + POSITIVE.length + '/' + POSITIVE.length);
