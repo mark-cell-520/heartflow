@@ -12,7 +12,7 @@ wrong.
 HeartFlow adds the discrimination layer, so your agent doesn't just *say* things — it
 says things that are *right*.
 
-**Zero LLM dependency.** 50 dimensions, 137 modules, 60 MCP tools, 1,742 dispatch
+**Zero LLM dependency.** 57 dimensions, 137 modules, 60 MCP tools, 1,742 dispatch
 routes. Pure rule engine.
 
 > **Numbers below were measured by `scripts/measure-claimed-numbers.js` (v6.7.77),
@@ -108,7 +108,7 @@ The three entry points above are wrappers around these, which `main`
 `verdict` is derived from `gate.action`, so the two cannot contradict each other. If you
 read only one field, read `gate.action`.
 
-## The 50 dimensions
+## The 57 dimensions
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
 > `VERIFY_DIMS` sets in `src/index.js` (v6.7.110).** The three tiers add up to 46;
