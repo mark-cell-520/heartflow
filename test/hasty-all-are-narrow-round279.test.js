@@ -302,5 +302,5 @@ for (const t of WEIRD) {
   ok('异常输入不抛 ' + JSON.stringify(t.slice(0, 18)), !threw);
 }
 
-console.log('\n第 279 轮 all-are 收窄判据守卫：' + pass + ' 通过，' + fail + ' 失败');
+console.log('第 279 轮 all-are 收窄判据守卫：' + pass + ' 通过, ' + fail + ' 失败, 共 ' + (pass + fail) + ' 个');
 process.exit(fail > 0 ? 1 : 0);
