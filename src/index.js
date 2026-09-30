@@ -4917,7 +4917,29 @@ const HASTY_GENERALIZATION_PATTERNS = {
     //    良性哨兵：`Every one is a member / a beginner / a step / a
     //    record.` 全 pass（member/beginner/step/record 不在表语表）。
     //⑤ 否决记录：曾考虑不收 one，最终收。判定方法仍是「实测驱动，不是推演驱动」。
-    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?|one)\s+(?:is|are)\s+(?!not\b|n't\b)(?:a\s+|an\s+)?(?:fools?|idiots?|liars?|losers?|thieves|thief|cowards?|parasites?|vermin|cattle|sheep|sheeple|clowns?|brutes?|criminals?|crooks|con\s+artists?|savages?|cockroaches|stray\s+dogs?|wild\s+animals|rats|roaches|worthless|inferior|hopeless|pathetic)\b(?=\s*(?:[.,;:!?]|$))/i,
+    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|persons?|humans?|individuals?|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?|one)\s+(?:is|are)\s+(?!not\b|n't\b)(?:a\s+|an\s+)?(?:fools?|idiots?|liars?|losers?|thieves|thief|cowards?|parasites?|vermin|cattle|sheep|sheeple|clowns?|brutes?|criminals?|crooks|con\s+artists?|savages?|cockroaches|stray\s+dogs?|wild\s+animals|rats|roaches|worthless|inferior|hopeless|pathetic|nobody|chaff)\b(?=\s*(?:[.,;:!?]|$))/i,
+    // [第 282 轮] 后置介词形系动词属性句：every/each (+ single) one/∅ of <群体> is
+    //   <病理表语>，以及 all of <群体> are <病理表语>。
+    // 复测（scripts/round-282/probe5-r282.js C/D 池）：
+    //   · `every|each one of <群体>` + `is` + 表语：238 条只中 52，186 条全漏；
+    //     `all of <代词/限定群体>` + `are` + 表语：136 条只中 17，119 条全漏。
+    // 根因：281 轮新判据的群体表后紧跟系动词，`of`-介词短语插在中间时
+    //   `(?:\s+\w+){0,2}` 中缀吃掉 of-短语后，群体槽已无可匹配成分（of/them
+    //   都不在群体表），整族形状落空。缺口与 229~230 轮同构：形状边界条件
+    //   差一个介词短语，召回就能掉一个整族。
+    // 三条边界设计（沿用 281 轮实测零误伤口径）：
+    //   ① 否定排除 `(?!not\b|n't\b)`——`All of them are not affected.` 这类
+    //      反驳/免责句不命中；
+    //   ② 表语后锚句读 `(?=\s*(?:[.,;:!?]|$))`——`cattle rancher` /
+    //      `fool for love` 这类合法职业与习语形状天然排除（表语只是名词
+    //      短修饰成分而非全句表语）；
+    //   ③ 限定词枚举 + 代词枚举（不是宽槽）——`All of them are valid
+    //      inputs.` / `Each of us is responsible.` / `Every one of you is
+    //      welcome.` 形状相同但表语不在病理表，天然不收。
+    //   `one` 设为可选：同时覆盖 `Each of them is ...`（无 one 的自然形）与
+    //   `Every single one of ... is ...`。`any one of them is ...` 未收，记遗留。
+    /\b(?:every|each)\s+(?:single\s+)?(?:one\s+)?of\s+(?:(?:the|these|those|my|your|his|her|their|our|its)\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\b|them\b|us\b|you\b|people\b)\s+is\s+(?!not\b|n't\b)(?:a\s+|an\s+)?(?:fools?|idiots?|liars?|losers?|thieves|thief|cowards?|parasites?|vermin|cattle|sheep|sheeple|clowns?|brutes?|criminals?|crooks|con\s+artists?|savages?|cockroaches|stray\s+dogs?|wild\s+animals|rats|roaches|worthless|inferior|hopeless|pathetic|nobody|chaff)\b(?=\s*(?:[.,;:!?]|$))/i,
+    /\ball\s+of\s+(?:(?:the|these|those|my|your|his|her|their|our|its)\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\b|them\b|us\b|you\b|people\b)\s+are\s+(?!not\b|n't\b)(?:a\s+|an\s+)?(?:fools?|idiots?|liars?|losers?|thieves|thief|cowards?|parasites?|vermin|cattle|sheep|sheeple|clowns?|brutes?|criminals?|crooks|con\s+artists?|savages?|cockroaches|stray\s+dogs?|wild\s+animals|rats|roaches|worthless|inferior|hopeless|pathetic|nobody|chaff)\b(?=\s*(?:[.,;:!?]|$))/i,
     // ②' all + 群体 + 句末零宾语（All of our customers complained.）
     //    229 轮二版发现原 ② 族尾缀分支放在 `\s+` 之后，句末零宾语永远吃不到
     //    （probe6 实测 full=false / prefix=true），单独拆一支，谓词枚举抱怨/拒绝类。
