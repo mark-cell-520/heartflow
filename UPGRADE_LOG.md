@@ -1,3 +1,85 @@
+# 第 287 轮补记（v6.7.125 工作面，unattended 自主升级）
+
+**方向**：修 `scripts/dimension-coverage-scan.js` 的维度口径漏洞 + 追击由此暴露的
+reward_hacking 两条中文漏判族。
+
+**为什么选它**：init 简报的横向扫描报「维度总数 45、未测 0」，而官方口径 57
+（measure 脚本 + `discriminate()` 实测一致）。不信简报，写探针对比静态口径与运行时实测。
+
+## 实测证据
+
+| 探针 | 结论 |
+|---|---|
+| `probe-r287-dims.js` | 静态口径 block=9 / rewrite=10 / verify=26，**ALL=45**；运行时 dimensions 键=57，差集 16 项 |
+| 归因（grep 逐个坐实） | `dimsOf` 用 `const X = new Set\(([\s\S]*?)\)` 解析第 716 行 BLOCK_DIMS，而第 721 行注释含 ASCII 右括号 `arXiv:2609.22978 (DSec)`，非贪婪匹配**在那里断开**，724 行的 `reward_hacking` 落在匹配区外 → 9 而非 10 |
+| `probe-r287-static.js` | 修后口径实测 **10/10/26 = 46**，reward_hacking 回归 |
+| `probe-r287-export.js` | 先试运行时导出探测取 `idx.BLOCK_DIMS`，实测三个 Set 均未导出（undefined）——该路径不可行，已移除，改「删行注释 + `\[`/`\]` 显式锚定」 |
+
+**后果**：reward_hacking 是 **block 级**维度，自 v6.7.126 第 71 轮起从未进入横向扫描视野，decision 引擎的全局盲区图谱缺一角。
+
+## 改动（2 个 commit）
+
+| commit | 内容 |
+|---|---|
+| `2722f433` | `dimension-coverage-scan.js`：匹配前删行注释、锚点 `\)`→`\]`。reward_hacking 首次出现在扫描表 block 层（漏判 1/2、归因 0/2） |
+| `89910230` | `src/reward-hacking.js` 补 4 支中文判据：**TG-Z4/Z4b**（降测试难度换通过，score 0→0.75）、**DG-Z11/Z11b**（择优计入 + 目的半前置/殿后，score 0→0.7） |
+
+## 关键实测教训（probe-r287-excl.js）
+
+4 支判据最初**互为超集**：删任一支，另一支仍兜住同族样本 → 单删不变红，被误判「守卫失守」。做了句首/句界锚定分层（Z4=裸降难度起句、Z4b=目的半前置；Z11=目的半起句、Z11b=动作半起句）。
+
+分层表格确认专职归属。过程中还发现并修掉一个**自造 bug**：`/^(?!...)/` 独立前瞻是空匹配正则（前瞻成功即匹配空串），会让本支永远命中——已改为行内断言 + 句界锚定，教训写进注释。
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| `bin/verify.js` | **14/14** |
+| `bidirectional-guard.js` | 召回 **52/52**，误拦 **301/326**（与基线完全一致，零新增误伤） |
+| 攻击样本 | 2 条漏判探针从 score 0 → 0.75 / 0.70 |
+| 良性对照 | 10 条仍全 0 |
+| `probe-r287-excl.js` | 14 条候选样本专项归属表全部符合分层设计 |
+| run-all | `/tmp/r287-runall.log` 末尾停在 `evolution-state.test.js`，**结果未取回**（287 轮中断） |
+| 负例守卫 | `negative-test-rh-zh-round287.js` 最后两次实跑为 4/6 红——分层修正后的最终结果未复跑 |
+
+## 遗留（第 288 轮已逐项收口）
+
+1. **负例守卫需复跑**：分层修正后应达全绿。→ 288 轮回收到 5/6 红，剩 1 项为跨族冗余。
+2. **run-all 结果未确认**：→ 288 轮重新后台跑。
+3. **doc-numbers 记账**：README 测试数 15490 vs 缓存 15491。
+4. **finish 未跑** → 288 轮收口。
+5. 探针文件积累（`round-154`~`round-287`）→ 288 轮确认仓库惯例为全留档，已提交 121 个。
+
+# 第 286 轮补记（v6.7.126 工作面，unattended 自主升级）
+
+**方向**：终结「文档维度数只靠人改」的结构性死锁——AGENTS.md/README.md/SKILL.md
+在 prompt 硬边界「不写这三份文档」里，而维度数由引擎代码决定（机器侧）。
+
+**立项实测**：第 286 轮 init 时三份文档写 50 dimensions，引擎 `discriminate()`
+实测 57。finish 的 doc-numbers 检查连续报 objection，但 agent 按硬边界无权改文档
+——数字漂移永远无人能修。这是「机器决定的数字 vs 人不许改的文档」的结构冲突。
+
+## 改动（2 个 commit）
+
+| commit | 内容 |
+|---|---|
+| `3c4240f0` | `doc-numbers-accuracy.test.js` 维度口径：静态函数计数改为**运行时实测**。旧口径数 `src/index.js` 顶层 `function check*` = 50，漏计判别函数定义在外置模块的 7 个真维度（perfect_error / phishing_coercion / induced_trust / coverup_induction / dangerous_instruction / reward_hacking / premature_termination，各有 score + guidance，成员身份在 BLOCK_DIMS / VERIFY_DIMS 内） |
+| `9b128dea` | 新增 `scripts/sync-doc-dimensions.js`：口径与 measure-claimed-numbers.js 同源（跑 `discriminate()` 数 dimensions 键），量不到就拒绝记账（宁可不改也不猜）；同步范围覆盖三份文档全部「N dimensions」权威写法（横幅/章节标题/表格项），不碰 README Version history 历史区；`--check` 模式判定用，不一致退出码 1 |
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| `bin/verify.js` | 14/14 |
+| `bidirectional-guard.js` | 召回 52/52、误拦 301/326 |
+| `doc-numbers-accuracy.test.js` | 15/15 |
+| run-all | `/tmp/r286-runall2.log` 只跑到 compliance 就断，**无汇总行**（286 轮中断） |
+
+## 遗留
+
+1. run-all 汇总未取回 → 288 轮已重跑。
+2. UPGRADE_LOG 286 轮记录缺席 → 本补记 + 288 轮收口。
+3. 横向扫描静态口径仍报 45（reward_hacking 被注释括号截断）→ 287 轮已修。
 # 第 285 轮（v6.7.124 工作面，unattended 自主升级）
 
 **方向**：收口 284 轮遗留 1（M3 负例守卫 2/3）+ 跑 finish 修 README 测试数记账。
