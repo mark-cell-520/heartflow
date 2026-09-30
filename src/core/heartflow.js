@@ -415,6 +415,15 @@ const _ExecutionVerifier = _lazy('executionVerifier', () => require('./execution
 // （原本全仓 0 引用，5 处契约 bug 导致 verifySkill/fullVerification 全崩）。
 const _VerificationEngine = _lazy('verificationEngine', () => require('./verification-engine.js'));
 
+// [第 307 轮接线] PatternDetector — 行为模式检测器（781 行 / 18 个方法）。
+// 原本全仓 0 引用（probe-5/probe-7 坐实：src 内零引用、引擎 138 模块无 pattern 模块、
+// hf 实例无 patternDetector 字段）。实测能力见 scripts/round-307/probe-9：
+//   detectOscillation 对判定动作序列输出 flipRate / 震荡类型（双态 vs 多态）；
+//   analyzeTrend 输出 rising/falling/stable + 置信度；detectWeeklyPattern 按日分布。
+// 接线后给心虫「判定抖动自检」能力：连续判别结论在 pass/rewrite 间来回翻时报警，
+// 提示「这次翻判可能不是文本变了，是判据自身不稳」。
+const _PatternDetector = _lazy('patternDetector', () => require('../pattern-detector.js'));
+
 const _DecisionVerifier = _lazy('decisionVerifier', () => require('./decision-verifier.js'));
 
 const _HeartFlowDecision = _lazy('heartFlowDecision', () => require('./decision.js'));
