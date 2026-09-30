@@ -4775,7 +4775,27 @@ const HASTY_GENERALIZATION_PATTERNS = {
   en: [
     /everyone\s+(knows|says|thinks|agrees|believes)/i,
     /everybody\s+(knows|says|thinks|agrees|believes)/i,
-    /all\s+\w+\s+are\b/i,
+    // [v6.7.126 第 277 轮] 旧判据 `all \\w+ are` 收窄为「群体 ∧ 属性」两半齐备。
+    // 复测证据（scripts/round-277/probe1~probe5、ab-r277.js）：
+    //   ① 双向门禁良性 326 集 hasty_generalization 误拦 0 条 → 301/326 基线不动
+    //   ② 工程全称句扩样池（30对象×全时态动词 + 工程形容词）1827 条，
+    //      旧判据误伤 1827/1827；人类群体×工程完成态 1728 条同样 1728 全误伤
+    //   ③ 双向门禁攻击 52 条 0 条依赖旧判据
+    //   ④ 政策/免责句式池 600 条（All <群体> are responsible/entitled/... for
+    //      their own work / to vote / under the policy）旧判据误伤 600/600，
+    //      含 `All <群体> are not responsible for ...` 免责句 23/23
+    // 误伤根因：`\\w+` 通配同时吃人类群体/数据对象/抽象名词，`are` 后不限成分。
+    // 收窄判据 ①：群体半（32 个人类集合名词）AND 病理归因半（76 词）。
+    //   病理归因词表剔除 responsible/entitled —— 它们在 `for their own work /
+    //   to vote` 句式里是责任分配陈述，不是概括。
+    // 收窄判据 ②：群体半 AND 褒义品格词半 AND 否定词（全称否定仍是概括）。
+    //   褒义词表刻意不含行政/法务词，保住 `are not responsible/eligible/allowed`
+    //   这类免责与规范陈述。
+    // 收窄判据 ③：群体半 AND 比较级全称 condemning 形（no better than 病理词），
+    //   不收 `no worse`（那是中性/改善语义，政策句常见）。
+    /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+are\s+(?!not\b|n't\b)(?:lazy|careless|sloppy|wrong|at\s+fault|guilty|complicit|selfish|ignorant|not\s+careful|not\s+trustworthy|equally\s+bad|equally\s+guilty|bad|terrible|awful|hopeless|useless|worthless|incompetent|unreliable|dishonest|cowardly|greedy|corrupt|spoiled|weak|inferior|stupid|foolish|naive|clueless|irresponsible|negligent|reckless|malicious|hostile|toxic|broken|flawed|defective|pathetic|blind|deaf|sheep|sheeple|cattle|puppets?|fools?|idiots?|losers?|parasites|vermin|rats?|roaches|cheats?|liars?|thugs?|criminals?|vendors?\s+of)\b/i,
+    /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+are\s+(?:not|n't)\s+(?:honest|trustworthy|careful|reliable|innocent|smart|competent|capable|diligent|hardworking|pure|noble|virtuous|brave|strong|talented|skilled|ethical|loyal|generous|kind|fair|decent|good|blameless|guiltless)\b/i,
+    /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+are\s+no\s+better\s+than\s+(?:a\s+|an\s+|the\s+)?(?:lazy|careless|sloppy|bad|useless|incompetent|corrupt|greedy|cowardly|dishonest|foolish|stupid|ignorant|hostile|toxic|reckless|negligent|irresponsible|worthless|hopeless|pathetic|weak|inferior|sheep|sheeple|cattle|puppets|fools|idiots|losers|parasites|vermin|rats|roaches|thieves|thugs|criminals?|crooks|swindlers?|parasites)\b/i,
     /all\s+the\s+time/i,
     /literally\s+every/i,
     /never\s+met\s+a\s+\w+\s+who/i,
