@@ -206,9 +206,23 @@ class HeartFlowDecision {
     const feasible = options.filter(opt => this._checkConstraints(opt, constraints));
 
     // Step 2: Score each option
+    // [v6.7.131 第 310 轮] mode 两态——「缺口收益」与「候选本身质量」分开。
+    // 探针实测（scratch/probe310-upside.js / probe310-rows.js）：把
+    // `ratioBonus` 加在 consequence_value 上时，命中率 10/10、误伤 0/30 的
+    // 最优候选 composite=0.77，命中率 4/10、误伤 12/30 的最差候选 0.86 ——
+    // 排序与候选质量完全反相关。而 r99/r309 的端到端契约明确钉的是
+    // 「缺口更大的候选排更高」（选升级方向的正确语义：先修最大的洞）。
+    // 两者都对，只是场景不同，因此拆成两个 mode 而不是二选一：
+    //   · 'pick_biggest_gap'（默认）：ratioBonus 计入 consequence_value，
+    //     composite 即「修它的收益」——升级引擎选方向用这个。
+    //   · 'pick_best'：ratioBonus 不计入 consequence_value，composite 只反映
+    //     候选本身的质量（ feasibility / identity / risk / confidence ），
+    //     缺口收益单独透出在 scores.upside 供审计，不参与排序。
+    // 默认值不变 → 既有 300+ 条相关断言（含 r99 白盒公式）行为零变化。
+    const mode = context.mode === 'pick_best' ? 'pick_best' : 'pick_biggest_gap';
     const scored = feasible.map(opt => ({
       ...opt,
-      scores: this._scoreOption(opt, task, constraints),
+      scores: this._scoreOption(opt, task, constraints, mode),
     }));
 
     // Step 3: Rank by composite score
@@ -438,7 +452,10 @@ class HeartFlowDecision {
     return true;
   }
 
-  _scoreOption(option, task, constraints) {
+  _scoreOption(option, task, constraints, mode) {
+    // [v6.7.131 第 310 轮] mode 归一化：只认 'pick_best'，其余（null/未知串/
+    // 大小写写错/不传）一律回落 'pick_biggest_gap'，保证默认行为可预期。
+    const effectiveMode = mode === 'pick_best' ? 'pick_best' : 'pick_biggest_gap';
     // 本方法的文档化输入是 { id, label, description } —— 不含任何数值字段。
     // 此前三个维度全部读数字字段并回退到同一组默认值（0.8 / 0.7 / 0），
     // 导致按文档调用时所有选项得分完全相同（0.86），decide() 退化为
@@ -568,7 +585,11 @@ class HeartFlowDecision {
       // 实测缺口通道：解析到 x/y 或覆盖率时按缺口比例加权。
       // 权重上限 0.35，与既有词表加分叠加；通道占用时词表严重性加分压到
       // ≤0.08，避免「漏判」这个词和它后面的数字被同一事实双重计数。
-      const ratioBonus = ratioGap ? Math.min(0.35, ratioGap.gap * 0.35) : 0;
+      // [v6.7.131 第 310 轮] mode='pick_best' 时缺口分不并入候选质量：
+      // decisión复合分的语义必须是「这个候选本身值不值」，缺口收益单独
+      // 走 scores.upside 透出（见函数尾部），排序只信前者。
+      const useRatioInScore = effectiveMode !== 'pick_best';
+      const ratioBonus = useRatioInScore && ratioGap ? Math.min(0.35, ratioGap.gap * 0.35) : 0;
       if (ratioBonus > 0) c += ratioBonus;
       if (/无收益|装饰性|表面功夫/.test(text)) c -= 0.2;
       // 严重性分层：漏判 > 误拦 > 装饰性
@@ -592,6 +613,25 @@ class HeartFlowDecision {
       if (REPRODUCED.test(text)) c += 0.12;
       // 用户已明确表达过偏好/纠正的方向优先
       if (USER_PREF.test(text)) c += 0.08;
+      // [v6.7.131 第 310 轮] pick_best 下补「自身达成度」修正：
+      // 缺口分剥离后，四候选（命中率 10/10→4/10）的 consequence_value 全部
+      // 停在 0.7 打平 → decide() 弃权（实测 scratch/probe310-breakdown.js）。
+      // 根因：SEVERITY_MED 的「误伤」是**候选的缺陷描述**，在「候选自身质量」
+      // 语义里应当扣分而不是加分；miss 型比例的达成度（1 - gap）才是自身的
+      // 质量信号。做法：
+      //   · 自身达成度 = 1 - measured_gap（仅 ratioGap 存在时）
+      //   · 从词表基线 c 平移到 [0.35, 0.95] 区间上按达成度取样；
+      //     达成度 1 → 0.95，达成度 0 → 0.35
+      //   · SEVERITY_MED 命中（文本明确写了误伤问题）时再压一档，避免
+      //     「缺陷描述」被当成功绩
+      if (effectiveMode === 'pick_best' && ratioGap) {
+        const attainment = 1 - ratioGap.gap;
+        const base = 0.35 + attainment * 0.6;
+        c = base;
+        // 候选自身带误伤（文本出现误伤族词，或主导比例定性为误伤型）再压一档
+        if (ratioGap.kind === 'false_positive') c -= 0.08;
+        else if (/误伤|误拦|误判|误报|false positive/i.test(text)) c -= 0.08;
+      }
       return Math.max(0.05, Math.min(1, c));
     })();
     const consequence_value = num(option.consequence_value) ?? derivedConsequence;
@@ -626,6 +666,10 @@ class HeartFlowDecision {
       // 「这个候选为什么排前面」是数字还是词表，避免又黑箱四轮。
       measured_gap: ratioGap ? Math.round(ratioGap.gap * 100) / 100 : null,
       measured_ratio_source: ratioGap ? ratioGap.source : null,
+      // [v6.7.131 第 310 轮] 缺口收益独立透出（pick_best 模式下不进 composite，
+      // 但调用方仍可审计「这个候选身上最大的洞有多大」）。
+      upside: ratioGap ? Math.round(Math.min(0.35, ratioGap.gap * 0.35) * 100) / 100 : 0,
+      scoring_mode: effectiveMode,
     };
   }
 
