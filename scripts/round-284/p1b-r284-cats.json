@@ -1,0 +1,643 @@
+{
+ "archive": [
+  "test/archive/dead-tests/creativity-engine.test.js",
+  "test/archive/dead-tests/culture-engine.test.js",
+  "test/archive/dead-tests/desire-cognition.test.js",
+  "test/archive/dead-tests/empathy-responder.test.js",
+  "test/archive/dead-tests/end-to-end.test.js",
+  "test/archive/dead-tests/engine-dispatcher.test.js",
+  "test/archive/dead-tests/engine-hook-points.test.js",
+  "test/archive/dead-tests/ethics-engine.test.js",
+  "test/archive/dead-tests/experience-distiller.test.js",
+  "test/archive/dead-tests/heartflow-v7.test.js",
+  "test/archive/dead-tests/humor-generator.test.js",
+  "test/archive/dead-tests/intuition-engine.test.js",
+  "test/archive/dead-tests/mind-wanderer.test.js",
+  "test/archive/dead-tests/self-cognitive-engine.test.js",
+  "test/archive/dead-tests/self-evolution-core.test.js",
+  "test/archive/dead-tests/social-engine.test.js",
+  "test/archive/dead-tests/strategy-orchestrator.test.js",
+  "test/archive/dead-tests/strategy-signal-map.test.js",
+  "test/archive/dead-tests/world-knowledge.test.js"
+ ],
+ "mount": [],
+ "jest": [],
+ "sub": [],
+ "empty": [
+  {
+   "rel": "test/action-tracker.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/active-inference-efe.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/adaptive-controller.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/adversarial-synthesis.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/adversarial-upgrade.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/adversarial-variant-language-coverage.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/adversarial-variant.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/agent-boundary-guard.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/ai-writing-tell-co-occurrence.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/ai-writing-tell.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/assertions.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/atomic-write.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/audit-wiring.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/auto-rules.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/being-logic.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/benign-mixed-benchmark.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/boot-check.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/budget.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/capability-abstraction.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/capability-guard.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/check-confidence-calibration.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/code-verifier.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/cognition-ground.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/cognitive-appraisal.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/cognitive-protocol.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/confidence-calibrator.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/config-hooks.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/config-v2.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/config.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/cooperative-arbitration.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/counterfactual-verifier.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/crowdtest-evaluators.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/data-eraser.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/debate-convergence.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/decision-capability.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/decision-constraints.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/decision-executor.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/decision-feedback.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/decision-verifier.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/dimension-action-wiring.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/dimension-coverage-benchmark.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/discrimination-blindspots.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/doubt-engine.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/dream-engine.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/embodied-core.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/engine-behavior.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/engine-constructor.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/engine-initializer.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/engine-lifecycle.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/engine-memory.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/engine-reasoner.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/engine-state.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/error-handler.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/error-memory-closedloop.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/error-memory.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/error-taxonomy.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/event-hooks.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/evolution-audit.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/evolution-state.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/execution-verifier.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/extracted-modules.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/fetch-safe.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/field-injector.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/flow-predictor.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/frame-check.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/gate.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/hallucination-guard.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/heal-taxonomy-wiring.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/heart-logic.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/heartflow-blindspot.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/hook-bus.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/hook-points-runner.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/identity/agent-psychology.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/index.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/information-flow.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/instruction-registry.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/intent-anchor.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/intent-layer.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/intention-tracker.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/introspect-wiring.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/knowledge/classics-value-mapper.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/llm-fallback.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/logic-patterns.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/longtask-guard.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/mcp-discriminator.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/mcp-guest-permission.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/memory-eviction.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/memory-signature-chain.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/mental-effort-tracker.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/meta-audit.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/meta-calibration.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/meta-prompt-engine.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/metaMemory.test.js",
+   "isMount": false,
+   "isJest": true
+  },
+  {
+   "rel": "test/multi-turn-subtle.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/output-gate.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/perfect-error-pipeline.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/perfect-error.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/pipeline-robustness.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/pipeline.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/premature-termination-gate.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/premature-termination.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/premise-check.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/readtime-signature.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/reward-hacking-self-referential-r120.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/rewriter.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/rule-growth.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/scope-check-context.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/scope-check-mode.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/scope-check.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/self-diagnosis.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/self-evolution-explore.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/self-evolution-v2.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/self-scanner.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/stats-engine.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/strategic-restraint.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/superlative-subjective.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/ttl-preferences.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/unsupported-claim-exemption.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/untested-dimensions-benchmark.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/verifier.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/vertical-benign-benchmark.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/what-learned.test.js",
+   "isMount": true,
+   "isJest": false
+  },
+  {
+   "rel": "test/window-attribution-receipt.test.js",
+   "isMount": true,
+   "isJest": false
+  }
+ ]
+}

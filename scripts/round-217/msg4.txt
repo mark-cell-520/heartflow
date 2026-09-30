@@ -1,0 +1,16 @@
+新增 test/reflection-loop-wiring.test.js（24 断言，第 217 轮三处改动的正式回归防线）
+
+把 scripts/round-217/ 下的探针结论固化成 run-all 可达的测试：
+1. selfReflect 类型契约：字符串数组 / 对象数组 / 单字符串 /
+   空数组 / undefined / 缺 context 六种入参形态均不抛，
+   且字符串数组仍产出正确的认知状态快照
+2. reflectBeforeSpeaking v2.1.0 语义：final === original（自省不改草稿）
+   + insights / questions 非空
+3. SelfEvolutionV2._sleep seam：注入 _sleepFn 被调用且立即返回
+4. 主引擎反思闭环：think() 产出 _reflectionLoopClosed，
+   reflected / insightCount / questionCount / predictedReaction /
+   monitored 均非空且 wasModified === false
+
+判据纪律：全部查内容（数字、字符串、布尔真值），
+不查「字段在不在」——216 轮已实测过只查布尔的守卫
+会被「挂了个空实现」骗过。

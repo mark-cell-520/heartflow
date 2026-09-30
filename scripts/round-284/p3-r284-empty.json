@@ -1,0 +1,875 @@
+{
+ "stats": {
+  "total": 123,
+  "directSilent": 123,
+  "mountHasOutput": 102,
+  "mountSilent": 0,
+  "jestHasOutput": 21,
+  "jestSilent": 0,
+  "subHasOutput": 0,
+  "subSilent": 0
+ },
+ "rep": [
+  {
+   "rel": "test/action-tracker.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 69,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/active-inference-efe.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 1050,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/adaptive-controller.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 126,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/adversarial-synthesis.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 1203,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/adversarial-upgrade.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 225,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/adversarial-variant-language-coverage.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 787,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/adversarial-variant.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 204,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/agent-boundary-guard.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 300,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/ai-writing-tell-co-occurrence.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 771,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/ai-writing-tell.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 183,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/assertions.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 195,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/atomic-write.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 177,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/audit-wiring.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 1988,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/auto-rules.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 204,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/being-logic.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 102,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/benign-mixed-benchmark.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 83,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/boot-check.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 205,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/budget.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 158,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/capability-abstraction.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 245,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/capability-guard.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 151,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/check-confidence-calibration.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 170,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/code-verifier.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 251,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/cognition-ground.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 65,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/cognitive-appraisal.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 102,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/cognitive-protocol.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 77,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/confidence-calibrator.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 239,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/config-hooks.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 74,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/config-v2.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 90,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/config.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 60,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/cooperative-arbitration.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 73,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/counterfactual-verifier.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 76,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/crowdtest-evaluators.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 274,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/data-eraser.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 156,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/debate-convergence.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 78,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/decision-capability.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 190,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/decision-constraints.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 132,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/decision-executor.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 67,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/decision-feedback.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 76,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/decision-verifier.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/dimension-action-wiring.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 295,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/dimension-coverage-benchmark.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 98,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/discrimination-blindspots.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 201,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/doubt-engine.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 287,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/dream-engine.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 158,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/embodied-core.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/engine-behavior.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/engine-constructor.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/engine-initializer.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/engine-lifecycle.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/engine-memory.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/engine-reasoner.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/engine-state.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/error-handler.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/error-memory-closedloop.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 250,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/error-memory.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 221,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/error-taxonomy.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 437,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/event-hooks.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/evolution-audit.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 571,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/evolution-state.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 831,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/execution-verifier.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/extracted-modules.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 658,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/fetch-safe.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/field-injector.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/flow-predictor.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/frame-check.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 228,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/gate.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 546,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/hallucination-guard.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 127,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/heal-taxonomy-wiring.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 207,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/heart-logic.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 343,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/heartflow-blindspot.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 2937,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/hook-bus.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/hook-points-runner.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 324,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/identity/agent-psychology.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 1106,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/index.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 495,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/information-flow.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/instruction-registry.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 456,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/intent-anchor.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 113,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/intent-layer.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/intention-tracker.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 136,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/introspect-wiring.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 2045,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/knowledge/classics-value-mapper.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 450,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/llm-fallback.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 1189,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/logic-patterns.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 388,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/longtask-guard.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 269,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/mcp-discriminator.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 4096,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/mcp-guest-permission.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 241,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/memory-eviction.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 201,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/memory-signature-chain.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 119,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/mental-effort-tracker.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/meta-audit.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 173,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/meta-calibration.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 1160,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/meta-prompt-engine.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/metaMemory.test.js",
+   "runner": "_jest-globals",
+   "direct": 0,
+   "harness": 25,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/multi-turn-subtle.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 613,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/output-gate.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 313,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/perfect-error-pipeline.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 178,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/perfect-error.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 172,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/pipeline-robustness.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 1104,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/pipeline.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 291,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/premature-termination-gate.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 212,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/premature-termination.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 348,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/premise-check.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 197,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/readtime-signature.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 174,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/reward-hacking-self-referential-r120.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 208,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/rewriter.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 222,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/rule-growth.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 268,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/scope-check-context.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 136,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/scope-check-mode.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 175,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/scope-check.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 170,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/self-diagnosis.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 437,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/self-evolution-explore.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 182,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/self-evolution-v2.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 191,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/self-scanner.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 139,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/stats-engine.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 501,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/strategic-restraint.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 466,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/superlative-subjective.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 262,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/ttl-preferences.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 145,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/unsupported-claim-exemption.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 269,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/untested-dimensions-benchmark.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 941,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/verifier.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 340,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/vertical-benign-benchmark.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 91,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/what-learned.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 386,
+   "harnessExit": 0
+  },
+  {
+   "rel": "test/window-attribution-receipt.test.js",
+   "runner": "_mount",
+   "direct": 0,
+   "harness": 292,
+   "harnessExit": 0
+  }
+ ]
+}

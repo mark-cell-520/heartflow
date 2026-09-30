@@ -1,0 +1,17 @@
+fix(hasty_generalization): 第 284 轮对齐 281 判据群体表至 83 词——补 39 个野生群体词，收口 281 轮测试池 270 条假失败
+
+probe7b 实测：281 主判据（every/each 系动词属性句）群体表只收 44/83 词，
+282/283 判据（后置介词形）已收全 83 词，三张表未对齐。
+probe8 实测：281 测试池 G_S/G_P 里的 player/reader/patient/driver/voter
+五词单复数 × 15/14 表语 × 2 量词 = 270 条全部漏判（gate 返 pass）。
+
+修法：281 主判据群体表尾补 39 词（reviewers/maintainers/admins/clients/patients/
+drivers/players/voters/readers/guys/followers/kids/children/men/women/folks/
+protesters/cops/refugees/soldiers/police/teachers/nurses/doctors/riders/staff/
+trainees/cadets/believers/activists/extremists/moderates/liberals/conservatives/
+republicans/democrats/herders/fanatics/ones，全部带单复数可选后缀），
+沿用 281 既有否定排除 + 句读锚点边界，未新增任何排除规则。
+
+验证：281 守卫测试 975/975 全绿（原 705 通过 270 失败）；
+bidirectional-guard 召回 52/52、误拦 301/326 与前两轮逐字节一致，零新增误伤；
+bin/verify.js 14/14；否定排除哨兵 3 条仍 pass。

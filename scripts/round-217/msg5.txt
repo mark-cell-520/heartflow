@@ -1,0 +1,5 @@
+README 测试数同步 7418 改为 7422（自引入回归，第 217 轮新增 24 断言）
+
+新增 test/reflection-loop-wiring.test.js 后 run-all 实测 7422 通过 0 失败，
+README 横幅仍写 7418，doc-numbers-accuracy 判「宣称少于实际=少报」报 FAIL。
+此为 216 轮同款流程：测试数由 data/test-count.json 提供，README 需手工同步。

@@ -1,0 +1,866 @@
+{
+ "results": [
+  {
+   "rel": "test/action-tracker.test.js",
+   "runner": "mount",
+   "len": 69,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/active-inference-efe.test.js",
+   "runner": "mount",
+   "len": 1050,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/adaptive-controller.test.js",
+   "runner": "mount",
+   "len": 126,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/adversarial-synthesis.test.js",
+   "runner": "mount",
+   "len": 1203,
+   "exit": 0,
+   "lastLine": "测试结果: 6 通过, 0 失败, 共 6 个"
+  },
+  {
+   "rel": "test/adversarial-upgrade.test.js",
+   "runner": "mount",
+   "len": 225,
+   "exit": 0,
+   "lastLine": "测试结果: 10 通过, 0 失败, 共 10 个"
+  },
+  {
+   "rel": "test/adversarial-variant-language-coverage.test.js",
+   "runner": "mount",
+   "len": 787,
+   "exit": 0,
+   "lastLine": "测试结果: 30 通过, 0 失败, 共 30 个"
+  },
+  {
+   "rel": "test/adversarial-variant.test.js",
+   "runner": "mount",
+   "len": 204,
+   "exit": 0,
+   "lastLine": "测试结果: 11 通过, 0 失败, 共 11 个"
+  },
+  {
+   "rel": "test/agent-boundary-guard.test.js",
+   "runner": "mount",
+   "len": 300,
+   "exit": 0,
+   "lastLine": "测试结果: 8 通过, 0 失败, 共 8 个"
+  },
+  {
+   "rel": "test/ai-writing-tell-co-occurrence.test.js",
+   "runner": "mount",
+   "len": 771,
+   "exit": 0,
+   "lastLine": "测试结果: 16 通过, 0 失败, 共 16 个"
+  },
+  {
+   "rel": "test/ai-writing-tell.test.js",
+   "runner": "mount",
+   "len": 183,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/assertions.test.js",
+   "runner": "mount",
+   "len": 195,
+   "exit": 0,
+   "lastLine": "测试结果: 9 通过, 0 失败, 共 9 个"
+  },
+  {
+   "rel": "test/atomic-write.test.js",
+   "runner": "mount",
+   "len": 177,
+   "exit": 0,
+   "lastLine": "测试结果: 6 通过, 0 失败, 共 6 个"
+  },
+  {
+   "rel": "test/audit-wiring.test.js",
+   "runner": "mount",
+   "len": 1988,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/auto-rules.test.js",
+   "runner": "mount",
+   "len": 204,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/being-logic.test.js",
+   "runner": "mount",
+   "len": 102,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/benign-mixed-benchmark.test.js",
+   "runner": "mount",
+   "len": 83,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/boot-check.test.js",
+   "runner": "mount",
+   "len": 205,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/budget.test.js",
+   "runner": "mount",
+   "len": 158,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/capability-abstraction.test.js",
+   "runner": "mount",
+   "len": 245,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/capability-guard.test.js",
+   "runner": "mount",
+   "len": 151,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/check-confidence-calibration.test.js",
+   "runner": "mount",
+   "len": 170,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/code-verifier.test.js",
+   "runner": "mount",
+   "len": 251,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/cognition-ground.test.js",
+   "runner": "mount",
+   "len": 65,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/cognitive-appraisal.test.js",
+   "runner": "mount",
+   "len": 102,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/cognitive-protocol.test.js",
+   "runner": "mount",
+   "len": 77,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/confidence-calibrator.test.js",
+   "runner": "mount",
+   "len": 239,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/config-hooks.test.js",
+   "runner": "mount",
+   "len": 74,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/config-v2.test.js",
+   "runner": "mount",
+   "len": 90,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/config.test.js",
+   "runner": "mount",
+   "len": 60,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/cooperative-arbitration.test.js",
+   "runner": "mount",
+   "len": 73,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/counterfactual-verifier.test.js",
+   "runner": "mount",
+   "len": 76,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/crowdtest-evaluators.test.js",
+   "runner": "mount",
+   "len": 274,
+   "exit": 0,
+   "lastLine": "测试结果: 10 通过, 0 失败, 共 10 个"
+  },
+  {
+   "rel": "test/data-eraser.test.js",
+   "runner": "mount",
+   "len": 156,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/debate-convergence.test.js",
+   "runner": "mount",
+   "len": 78,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/decision-capability.test.js",
+   "runner": "mount",
+   "len": 190,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/decision-constraints.test.js",
+   "runner": "mount",
+   "len": 132,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/decision-executor.test.js",
+   "runner": "mount",
+   "len": 67,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/decision-feedback.test.js",
+   "runner": "mount",
+   "len": 76,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/decision-verifier.test.js",
+   "runner": "jest",
+   "len": 27,
+   "exit": 0,
+   "lastLine": "测试结果: 10 通过, 0 失败, 共 10 个"
+  },
+  {
+   "rel": "test/dimension-action-wiring.test.js",
+   "runner": "mount",
+   "len": 295,
+   "exit": 0,
+   "lastLine": "测试结果: 7 通过, 0 失败, 共 7 个"
+  },
+  {
+   "rel": "test/dimension-coverage-benchmark.test.js",
+   "runner": "mount",
+   "len": 98,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/discrimination-blindspots.test.js",
+   "runner": "mount",
+   "len": 201,
+   "exit": 0,
+   "lastLine": "测试结果: 7 通过, 0 失败, 共 7 个"
+  },
+  {
+   "rel": "test/doubt-engine.test.js",
+   "runner": "mount",
+   "len": 287,
+   "exit": 0,
+   "lastLine": "测试结果: 8 通过, 0 失败, 共 8 个"
+  },
+  {
+   "rel": "test/dream-engine.test.js",
+   "runner": "mount",
+   "len": 158,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/embodied-core.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/engine-behavior.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/engine-constructor.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/engine-initializer.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/engine-lifecycle.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/engine-memory.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/engine-reasoner.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/engine-state.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/error-handler.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/error-memory-closedloop.test.js",
+   "runner": "mount",
+   "len": 250,
+   "exit": 0,
+   "lastLine": "测试结果: 6 通过, 0 失败, 共 6 个"
+  },
+  {
+   "rel": "test/error-memory.test.js",
+   "runner": "mount",
+   "len": 221,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/error-taxonomy.test.js",
+   "runner": "mount",
+   "len": 437,
+   "exit": 0,
+   "lastLine": "测试结果: 14 通过, 0 失败, 共 14 个"
+  },
+  {
+   "rel": "test/event-hooks.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 1 通过, 0 失败, 共 1 个"
+  },
+  {
+   "rel": "test/evolution-audit.test.js",
+   "runner": "mount",
+   "len": 571,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/evolution-state.test.js",
+   "runner": "mount",
+   "len": 831,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/execution-verifier.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/extracted-modules.test.js",
+   "runner": "mount",
+   "len": 658,
+   "exit": 0,
+   "lastLine": "测试结果: 14 通过, 0 失败, 共 14 个"
+  },
+  {
+   "rel": "test/fetch-safe.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/field-injector.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/flow-predictor.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/frame-check.test.js",
+   "runner": "mount",
+   "len": 228,
+   "exit": 0,
+   "lastLine": "测试结果: 7 通过, 0 失败, 共 7 个"
+  },
+  {
+   "rel": "test/gate.test.js",
+   "runner": "mount",
+   "len": 546,
+   "exit": 0,
+   "lastLine": "测试结果: 14 通过, 0 失败, 共 14 个"
+  },
+  {
+   "rel": "test/hallucination-guard.test.js",
+   "runner": "mount",
+   "len": 127,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/heal-taxonomy-wiring.test.js",
+   "runner": "mount",
+   "len": 207,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/heart-logic.test.js",
+   "runner": "mount",
+   "len": 343,
+   "exit": 0,
+   "lastLine": "测试结果: 14 通过, 0 失败, 共 14 个"
+  },
+  {
+   "rel": "test/heartflow-blindspot.test.js",
+   "runner": "mount",
+   "len": 2937,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/hook-bus.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/hook-points-runner.test.js",
+   "runner": "mount",
+   "len": 324,
+   "exit": 0,
+   "lastLine": "测试结果: 6 通过, 0 失败, 共 6 个"
+  },
+  {
+   "rel": "test/identity/agent-psychology.test.js",
+   "runner": "mount",
+   "len": 1106,
+   "exit": 0,
+   "lastLine": "测试结果: 21 通过, 0 失败, 共 21 个"
+  },
+  {
+   "rel": "test/index.test.js",
+   "runner": "mount",
+   "len": 495,
+   "exit": 0,
+   "lastLine": "测试结果: 10 通过, 0 失败, 共 10 个"
+  },
+  {
+   "rel": "test/information-flow.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/instruction-registry.test.js",
+   "runner": "mount",
+   "len": 456,
+   "exit": 0,
+   "lastLine": "测试结果: 8 通过, 0 失败, 共 8 个"
+  },
+  {
+   "rel": "test/intent-anchor.test.js",
+   "runner": "mount",
+   "len": 113,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/intent-layer.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/intention-tracker.test.js",
+   "runner": "mount",
+   "len": 136,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/introspect-wiring.test.js",
+   "runner": "mount",
+   "len": 2045,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/knowledge/classics-value-mapper.test.js",
+   "runner": "mount",
+   "len": 450,
+   "exit": 0,
+   "lastLine": "测试结果: 10 通过, 0 失败, 共 10 个"
+  },
+  {
+   "rel": "test/llm-fallback.test.js",
+   "runner": "mount",
+   "len": 1189,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/logic-patterns.test.js",
+   "runner": "mount",
+   "len": 388,
+   "exit": 0,
+   "lastLine": "测试结果: 10 通过, 0 失败, 共 10 个"
+  },
+  {
+   "rel": "test/longtask-guard.test.js",
+   "runner": "mount",
+   "len": 269,
+   "exit": 0,
+   "lastLine": "测试结果: 6 通过, 0 失败, 共 6 个"
+  },
+  {
+   "rel": "test/mcp-discriminator.test.js",
+   "runner": "mount",
+   "len": 4096,
+   "exit": 0,
+   "lastLine": "测试结果: 7 通过, 0 失败, 共 7 个"
+  },
+  {
+   "rel": "test/mcp-guest-permission.test.js",
+   "runner": "mount",
+   "len": 241,
+   "exit": 0,
+   "lastLine": "测试结果: 7 通过, 0 失败, 共 7 个"
+  },
+  {
+   "rel": "test/memory-eviction.test.js",
+   "runner": "mount",
+   "len": 201,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/memory-signature-chain.test.js",
+   "runner": "mount",
+   "len": 119,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/mental-effort-tracker.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/meta-audit.test.js",
+   "runner": "mount",
+   "len": 173,
+   "exit": 0,
+   "lastLine": "测试结果: 6 通过, 0 失败, 共 6 个"
+  },
+  {
+   "rel": "test/meta-calibration.test.js",
+   "runner": "mount",
+   "len": 1160,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/meta-prompt-engine.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/metaMemory.test.js",
+   "runner": "jest",
+   "len": 25,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/multi-turn-subtle.test.js",
+   "runner": "mount",
+   "len": 613,
+   "exit": 0,
+   "lastLine": "测试结果: 25 通过, 0 失败, 共 25 个"
+  },
+  {
+   "rel": "test/output-gate.test.js",
+   "runner": "mount",
+   "len": 313,
+   "exit": 0,
+   "lastLine": "测试结果: 9 通过, 0 失败, 共 9 个"
+  },
+  {
+   "rel": "test/perfect-error-pipeline.test.js",
+   "runner": "mount",
+   "len": 178,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/perfect-error.test.js",
+   "runner": "mount",
+   "len": 172,
+   "exit": 0,
+   "lastLine": "测试结果: 7 通过, 0 失败, 共 7 个"
+  },
+  {
+   "rel": "test/pipeline-robustness.test.js",
+   "runner": "mount",
+   "len": 1104,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/pipeline.test.js",
+   "runner": "mount",
+   "len": 291,
+   "exit": 0,
+   "lastLine": "测试结果: 8 通过, 0 失败, 共 8 个"
+  },
+  {
+   "rel": "test/premature-termination-gate.test.js",
+   "runner": "mount",
+   "len": 212,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/premature-termination.test.js",
+   "runner": "mount",
+   "len": 348,
+   "exit": 0,
+   "lastLine": "测试结果: 12 通过, 0 失败, 共 12 个"
+  },
+  {
+   "rel": "test/premise-check.test.js",
+   "runner": "mount",
+   "len": 197,
+   "exit": 0,
+   "lastLine": "测试结果: 6 通过, 0 失败, 共 6 个"
+  },
+  {
+   "rel": "test/readtime-signature.test.js",
+   "runner": "mount",
+   "len": 174,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/reward-hacking-self-referential-r120.test.js",
+   "runner": "mount",
+   "len": 208,
+   "exit": 0,
+   "lastLine": "测试结果: 6 通过, 0 失败, 共 6 个"
+  },
+  {
+   "rel": "test/rewriter.test.js",
+   "runner": "mount",
+   "len": 222,
+   "exit": 0,
+   "lastLine": "测试结果: 7 通过, 0 失败, 共 7 个"
+  },
+  {
+   "rel": "test/rule-growth.test.js",
+   "runner": "mount",
+   "len": 268,
+   "exit": 0,
+   "lastLine": "测试结果: 8 通过, 0 失败, 共 8 个"
+  },
+  {
+   "rel": "test/scope-check-context.test.js",
+   "runner": "mount",
+   "len": 136,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/scope-check-mode.test.js",
+   "runner": "mount",
+   "len": 175,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/scope-check.test.js",
+   "runner": "mount",
+   "len": 170,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  },
+  {
+   "rel": "test/self-diagnosis.test.js",
+   "runner": "mount",
+   "len": 437,
+   "exit": 0,
+   "lastLine": "测试结果: 8 通过, 0 失败, 共 8 个"
+  },
+  {
+   "rel": "test/self-evolution-explore.test.js",
+   "runner": "mount",
+   "len": 182,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/self-evolution-v2.test.js",
+   "runner": "mount",
+   "len": 191,
+   "exit": 0,
+   "lastLine": "测试结果: 4 通过, 0 失败, 共 4 个"
+  },
+  {
+   "rel": "test/self-scanner.test.js",
+   "runner": "mount",
+   "len": 139,
+   "exit": 0,
+   "lastLine": "测试结果: 3 通过, 0 失败, 共 3 个"
+  },
+  {
+   "rel": "test/stats-engine.test.js",
+   "runner": "mount",
+   "len": 501,
+   "exit": 0,
+   "lastLine": "测试结果: 12 通过, 0 失败, 共 12 个"
+  },
+  {
+   "rel": "test/strategic-restraint.test.js",
+   "runner": "mount",
+   "len": 466,
+   "exit": 0,
+   "lastLine": "测试结果: 8 通过, 0 失败, 共 8 个"
+  },
+  {
+   "rel": "test/superlative-subjective.test.js",
+   "runner": "mount",
+   "len": 262,
+   "exit": 0,
+   "lastLine": "测试结果: 11 通过, 0 失败, 共 11 个"
+  },
+  {
+   "rel": "test/ttl-preferences.test.js",
+   "runner": "mount",
+   "len": 145,
+   "exit": 0,
+   "lastLine": "测试结果: 7 通过, 0 失败, 共 7 个"
+  },
+  {
+   "rel": "test/unsupported-claim-exemption.test.js",
+   "runner": "mount",
+   "len": 269,
+   "exit": 0,
+   "lastLine": "测试结果: 8 通过, 0 失败, 共 8 个"
+  },
+  {
+   "rel": "test/untested-dimensions-benchmark.test.js",
+   "runner": "mount",
+   "len": 941,
+   "exit": 0,
+   "lastLine": "测试结果: 31 通过, 0 失败, 共 31 个"
+  },
+  {
+   "rel": "test/verifier.test.js",
+   "runner": "mount",
+   "len": 340,
+   "exit": 0,
+   "lastLine": "测试结果: 9 通过, 0 失败, 共 9 个"
+  },
+  {
+   "rel": "test/vertical-benign-benchmark.test.js",
+   "runner": "mount",
+   "len": 91,
+   "exit": 0,
+   "lastLine": "测试结果: 2 通过, 0 失败, 共 2 个"
+  },
+  {
+   "rel": "test/what-learned.test.js",
+   "runner": "mount",
+   "len": 386,
+   "exit": 0,
+   "lastLine": "测试结果: 8 通过, 0 失败, 共 8 个"
+  },
+  {
+   "rel": "test/window-attribution-receipt.test.js",
+   "runner": "mount",
+   "len": 292,
+   "exit": 0,
+   "lastLine": "测试结果: 5 通过, 0 失败, 共 5 个"
+  }
+ ],
+ "silent": []
+}

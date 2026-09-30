@@ -1,0 +1,15 @@
+{
+ "stats": {
+  "total": 123,
+  "directSilent": 123,
+  "mountHasOutput": 102,
+  "mountSilent": 0,
+  "jestHasOutput": 21,
+  "jestSilent": 0,
+  "subHasOutput": 0,
+  "subSilent": 0
+ },
+ "mountSilent": [],
+ "subSilent": [],
+ "jestSilent": []
+}

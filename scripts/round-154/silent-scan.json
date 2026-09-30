@@ -1,0 +1,23 @@
+{
+ "silent": [
+  {
+   "rel": "five-dimension-samples.test.js",
+   "code": 0,
+   "tail": "  合计 25/25 |  | ✅ 五个维度全部达标（每维度过半命中）"
+  }
+ ],
+ "exited": [
+  {
+   "rel": "cjk-word-boundary-round128.test.js",
+   "code": 1,
+   "tail": "src/reward-hacking.js:1709  grouped  /\\b(?:delete|remove|clear|disable|skip|comment\\s+out|silence|suppress|hide|drop)\\w*\\s*(?:off|out|掉|了|the|these|all)?\\s*[^。\\n]{0,16}\\b(?:logs?|logging|checks?|cases"
+  },
+  {
+   "rel": "doc-numbers-accuracy.test.js",
+   "code": 1,
+   "tail": " | 结果: 14 通过, 1 失败, 共 15 个"
+  }
+ ],
+ "selfFail": [],
+ "okCount": 366
+}
