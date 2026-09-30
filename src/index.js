@@ -8670,7 +8670,34 @@ function badFaithNarrative(text, hasChinese) {
 // ─── 伪深度检测（Pseudo-Profundity / LLM 空泛废话）──────────────
 const PSEUDO_PROFUNDITY_PATTERNS = {
   zh: [/从[^。]*?出发[，,]我们需要/i, /在[^。]*?(时代|背景|语境|层面|维度|视角)下/i, /深刻(的|地)?(认识|理解|洞察|反思|思考)/i, /系统性(的|地)?(思维|思考|方法|架构|框架)/i, /(变革|改革|创新).*(挑战|机遇)/i, /协同.*(共赢|共生|共创|发展)/i, /生态.*(体系|闭环|系统|圈层)/i, /赋能(于)?(组织|业务|产业|个体|生态|转型)/i, /以[^。]*?为(核心|导向|抓手|驱动|基础|目标)/i],
-  en: [/in (today'?s|this|our).{0,20}(world|era|age|landscape|environment)/i, /it (is|'s) (not|important).{0,20}(but|to).{0,20}(what|how|why|because)/i, /the (real|key|fundamental).{0,15}(question|challenge|issue).{0,20}(is|lies|comes)/i, /holistic.{0,10}(approach|perspective|view|understanding)/i, /transformative.{0,10}(change|shift|impact|power)/i],
+  // [v6.7.130 第 299 轮] EN 侧补「X is not A, it is B + 本体论宾语」族 + 「抽象主语 × 系词 × 具象比喻物」族。
+  // 缺口复测（scripts/round-299/probe-3-en-boundary.js + 复测 r298 probe-en-coverage）：
+  //   上面 5 条 EN 老族对 20 条真实 EN 伪深刻样本命中 **0**（四组 BASE 全 0/0/0/0），
+  //   20 条「把普通结论升格为本体论命题」的英文 LLM 输出整族 pass 到用户面前。
+  // 分界线（参照中文 r297/r298 方法论，probe-4 → probe-8 四轮实测后才定）：
+  //   ① E1 伪辩证族：系词否定 + 逗号分隔 + B 侧**本体论词表**。
+  //      词表是唯一判别力来源——「is not a bug, it is a missing annotation」B 侧
+  //      无本体论词，不命中；工程真句 42 条实测 0 误伤。
+  //   ② E2 跨域系词比喻族：抽象主语表 × 系词 × 具象比喻物表。
+  //      与被 289 轮已覆盖的中文 ③③族（时间是最温柔的暴政）同构。
+  //   ③ E3 引导式族（the real question is not A but B）**实测否决**：
+  //      裸版误伤 6/42（probe-7）——「The real question is not whether to migrate,
+  //      it is when to start」这类工程真句被吞（EN 老族第 3 条同款问题）；
+  //      加严版（B 侧本体论词 + 逗号负向前瞻）召回跌到 0/12（probe-8，E3b/E1g）。
+  //      引导式形容词（real/key/fundamental）无判别力，与中文 r297 前置否定族
+  //      裸版 6/24 误伤完全同构——此形态不作为 EN 侧判据，遗留记账。
+  // 中文侧零牵连：新判据只进 en 数组，zh 数组与 PSEUDO_PHILOSOPHY_ZH 未动。
+  en: [
+    /in (today'?s|this|our).{0,20}(world|era|age|landscape|environment)/i,
+    /it (is|'s) (not|important).{0,20}(but|to).{0,20}(what|how|why|because)/i,
+    /the (real|key|fundamental).{0,15}(question|challenge|issue).{0,20}(is|lies|comes)/i,
+    /holistic.{0,10}(approach|perspective|view|understanding)/i,
+    /transformative.{0,10}(change|shift|impact|power)/i,
+    // E1 — 伪辩证：系词否定 + 逗号分隔 + B 侧本体论词表（跨度 2,70 / 2,60）
+    /\b(?:is|are|was|were)\s+(?:not|n't|never)\s+[^.,;:]{2,70}?[,;]\s*(?:it\s+is|it's|but|rather|it\s+means)?\s*(?:about\s+|in\s+)?[^.,;:]{2,60}\b(?:uncertainty|vulnerability|wholeness|curiosity|humility|stillness|longing|solitude|tenderness|soul|spirit|essence|meaning|purpose|truth|journey|destiny|echo|silence|shadow|mirror|door|bridge|gift|tyranny|compass|home|destination|awakening|humanity|courage|depth|being|becoming|presence|grace|wonder|worth|language|currenc\w+|teacher|garden|river|storm|mountain|ocean|fire|light|darkness)\b/i,
+    // E2 — 跨域系词比喻：抽象主语表 × 系词 × 具象比喻物表
+    /\b(?:time|life|silence|growth|loneliness|freedom|happiness|maturity|patience|fear|hope|courage|memory|age|love|grief|death|childhood|youth|trust)\b[^.,;:]{0,20}\b(?:is|are|was|were)\b[^.,;:]{0,40}\b(?:tyranny|journey|map|answers?|mirror|prison|gift|currenc\w+|language|bridge|door|window|room|road|echo|teacher|thief|garden|river|mountain|ocean|storm|fire|light|darkness|shadow|home|power)\b/i,
+  ],
 };
 
 // [v6.7.82] 伪哲理句式（Pseudo-philosophy）
