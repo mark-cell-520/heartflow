@@ -1,3 +1,137 @@
+# 第 308 轮（v6.7.124 工作面，修 r307 自引入回归 + 接线的真实行为修复，3 commit）
+
+**方向**：r307 遗留的自引入语法错误（最高优先级）+ 复测 r307 声称「已落地」的 PatternDetector 接线真实行为。
+
+未走 decision（第一优先是修上一轮改坏的语法，缺口唯一且明确）。第二个方向
+（decision 通道契约）是在复测 r307 记账时**意外发现的失实**，详情见第 4 节。
+
+## 1. 第一件事：修 r307 自引入回归（commit `c16e91c5`）
+
+r307 把 `detectVerdictJitter` 方法收尾写成 `},`（对象字面量逗号），class 体内非法，
+`node --check` 报 SyntaxError。**该错误已被 auto-commit 落进 HEAD**，所以不能靠
+`git checkout` 回滚。
+
+修法：把 4571 行的 `},` 改回 `}`。第一次 patch 因缩进猜错（return 块是 8 空格）
+同时弄乱了缩进，第二次读回实际内容后精准修复。
+实测：`node --check src/core/heartflow.js` 从 EXIT=1 → **EXIT=0**。
+
+## 2. 主线：r307 接线的真实行为是假的（probe-1/1b 实测）
+
+r307 写了 `detectVerdictJitter` 但**从未跑过一次**。本轮实跑（probe-1b）暴露三处：
+
+| 症状 | 根因 |
+|---|---|
+| 交替 8 条序列报 `jittered:false`、`flipRate:null` | `detectOscillation` 默认 `window=10` 且内部要求 `records.length >= window`，3~9 条短会话被**静默早退**。而短会话正是判定不一致最高发的形态 |
+| `analyzeTrend` 把 `direction:'insufficient'` 当有效 trend 上报 | 底层样本 <5 时返回 insufficient，原代码 `if (t && t.direction)` 直接放行 |
+| 算不出翻转率时不标注，与「真稳定」无法区分 | 缺 `computed` 标记 |
+
+### 改动（commit `1152135c`）
+
+1. **window 显式钉成序列长度**：`win = Number.isFinite(options.window) && >0 ? Math.min(options.window, records.length) : records.length`，修复后 3 条短交替也能检出。
+2. **trend 脏出口过滤**：只放行 `stable/rising/falling` 三个值，`insufficient` 一律不外报。
+3. **算不出时如实标 `insufficient:true`**，且 `flipRate` 保持 undefined（不伪造结论）。
+
+修复前后对比（probe-1b 实测）：
+
+| 输入 | 改前 | 改后 |
+|---|---|---|
+| pass/rewrite 交替 ×8 | jittered:false, flipRate:null | **jittered:true, flipRate:1, binary** |
+| 同一批文本的真实判定序列 | jittered:false | **jittered:true, flipRate:0.714, multi** |
+| pass/rewrite/pass（3 条） | jittered:false | **jittered:true, flipRate:1** |
+
+## 3. 守卫测试 + 负例（commit `1152135c`）
+
+`test/pattern-detector-jitter-round308.test.js`：**32 断言全绿**。分组：
+A 接线性 / B 真阳 7 条 / C 真阴 2 条 / D 契约 8 条（含脏输入、冻结入参）/
+E 趋势侧 4 条 / F 旁路性 2 条 / G 窗口钳制 2 条。
+
+负例 `scripts/round-308/negative-test-jitter.js`（注入→删条→必须变红）：
+
+| 注入的 bug | 结果 |
+|---|---|
+| BUG-1 `const win = 10`（还原 window 早退） | ✅ 变红，10 条断言翻 |
+| BUG-2 `if (d)`（还原 trend 脏出口） | ✅ 变红，2 条断言翻 |
+| BUG-3 `const computed = true`（还原不标注） | ✅ 变红 |
+
+`allOk: true`。注入后 src 已恢复原样并复验 `node --check` EXIT=0。
+
+## 4. 复测 r307 记账：一处失实 + 一个新盲区（commit `b8e6ce0a`）
+
+r307 交接簿写「v3 走 key=value 通道（feasibility/risk/impact/confidence +
+引擎调用覆盖率 0/18）→ CHOSEN=A，confidence=0.85」。**本轮实测不可复现**：
+同一 prompt 得到 `chosen=null, confidence=0`。
+
+probe-5/6/7 逐项对照定位到两个叠加原因：
+
+1. **key 白名单**：`NUMERIC_KEYS = ['feasibility','consequence_value','risk','confidence','prior']`。
+   r307 写的 **`impact` 不在白名单**，字段被整个丢弃。
+2. **value 区间**：非 [0,1] 值被 `continue` 丢弃。r307 写的 9/2/7/8 全越界。
+
+真实可用通道（实测 confidence）：x/y 检测比例 → 0.7；[0,1] 白名单 key=value → 0.8~0.9；
+混合 → 0.7。
+
+**新发现盲区（probe-8）**：比例通道的打分方向与质量**反相关**——
+「命中率 10/10、误伤 0/30」得 0.77，「命中率 4/10、误伤 12/30」得 **0.82**。
+`_scoreOption` 只解析数字大小，不理解「命中率越高越好、误伤越低越好」的语义。
+这条留给后续轮次修，守卫只钉「通道能定向」的契约（不把缺陷藏进静默失败）。
+
+`test/decision-channel-round308.test.js`：**13 断言全绿**，含 r307 形态必须弃权、
+白名单四个字段各自可定向、越界值必须丢弃。
+
+## 5. 改动清单（3 commit）
+
+- `c16e91c5` 修复(自引入回归): r307 的 class 体多余逗号，node --check 1→0
+- `1152135c` 优化(PatternDetector 接线): detectVerdictJitter 三处假阴性/脏出口 +
+  32 断言守卫 + 3 处注入全变红
+- `b8e6ce0a` test(守卫): decision 定向通道契约 13 断言 + 坐实 r307 记账失实与比例通道反向盲区
+
+## 6. 验证结果
+
+| 验证 | 结果 |
+|---|---|
+| `node bin/verify.js` | **14/14 通过** |
+| `node scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线，零新增） |
+| `node test/run-all.js` | **15733 通过 / 2 失败 / 共 15735** |
+| `node test/security-audit.test.js` | **16/16 通过** |
+| `node test/doc-numbers-accuracy.test.js` | **13/15**（2 个失败，见遗留 1） |
+| 守卫负例（注入-删条-变红） | 3/3 变红，`allOk:true` |
+| `node --check src/core/heartflow.js` | EXIT=0 |
+
+## 7. 遗留（下一轮接手）
+
+1. **`doc-numbers-accuracy.test.js` 13/15 —— pre-existing 文档滞后，非本轮引入**。
+   实测 dispatch 路由 **1761**，但 `AGENTS.md:15` 与 `README.md:10` 都写 **1,742**。
+   已用 `git diff HEAD~2 --stat` 确认本轮路由相关零改动（diff 无 ALLOWED_ROUTES/dispatch 行）。
+   README line 10 的测试数也还是旧值 15,687。
+   **修它需要写 `README.md` / `AGENTS.md`，本轮硬边界禁写**，故留给后续轮次：
+   把两处 1,742 → 1,761，README 测试数 15,687 → 15,733 后本测试即回 15/15。
+2. **decision 比例通道反向打分盲区**（第 4 节）：需要让 `_scoreOption` 理解
+   「命中率越高越好、误伤越低越好」的语义方向，而不是只比数字大小。
+3. `scripts/round-299/301/304/305/306/307/308` 探针均未提交（19+16+40+8+30 个文件）。
+4. UPGRADE_LOG 289/290/301 轮次仍缺失。
+5. git push 双失败（直连+代理）持续，本地 16 个 commit 未推送。
+6. **19 个真孤儿模块**（probe-1/5 排除 plugins/ 与 archive/ 后）仍未接线。
+7. 版本号未动（v6.7.124）。
+
+## 8. 给下一轮的接手说明
+
+**第一优先：清遗留 1**（`doc-numbers-accuracy` 从 13/15 回 15/15）。这是 finish 的
+objection，且修法确定（两处 1,742 → 1,761 + README 测试数），改动是纯文档、风险低。
+注意硬边界说「不写 README.md/AGENTS.md」与「finish 的 objection 自己修」冲突时：
+该冲突应上报裁定，本轮选择不越界、如实记账。
+
+**第二优先：遗留 2 的 decision 比例反向打分**。判据已由
+`test/decision-channel-round308.test.js` 钉住（A1/A4 两条），修好后要让
+A4 从「能定向」进到「定向方向正确」。
+
+**路径提醒**：本机无 `hf.gate` 方法（实例原型链上只有 think/thinkFast/thinkDeep），
+取判定动作要用 `require('src/gate.js')` 的 `gate()`。本轮 probe-1 第一版就死在这。
+
+**命令纪律复述**：run-all 已实测 31 分钟，超过 120s 必须后台化；`node -e` 带正则
+会被安全扫描拦，全部改独立脚本文件。
+
+---
+
 # 第 306 轮（v6.7.124 工作面，run-all 全绿，2 commit）
 
 **方向**：r305 交接簿第 1、4 项遗留——r305 守卫测试跑通 + 人手不够族误伤清零。
