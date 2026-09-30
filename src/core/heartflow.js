@@ -4543,22 +4543,42 @@ class HeartFlow {
 
     // detectOscillation 读 records[].type（或 options.typeField 指定字段），
     // 内部按 window 截取末尾一段并按相邻差异算翻转率。
+    // ⚠️ 关键：不显式传 window 时 pattern-detector 会退回默认值 10，
+    // 而它内部要求 records.length >= window，于是 3~9 条的短会话序列
+    // 会被静默早退成 { detected:false }（连 flipRate 都不返回）——
+    // 那正是「同一类文本前后判定不一致」最高发的形态，却是假阴性。
+    // 因此这里把 window 显式钉成序列长度：只有真的凑满窗口才谈"数据不足"，
+    // 且 minSamples 已在上面拦住过短的输入（宁漏不错报的边界只此一处）。
     const records = actions.map((a, i) => ({ index: i, type: a, ts: i }));
+    const win = Number.isFinite(options.window) && options.window > 0
+      ? Math.min(options.window, records.length)
+      : records.length;
     const osc = det.detectOscillation(records, {
       typeField: 'type',
-      window: Number.isFinite(options.window) ? options.window : undefined,
+      window: win,
       threshold: Number.isFinite(options.threshold) ? options.threshold : undefined,
     });
 
+    // 底层给不出翻转率（序列不足 3、校验失败等）时，不能把「算不出」
+    // 伪装成「稳定」。jittered 已经安全地是 false，但要如实标注
+    // insufficient，让调用方知道这条结论没有数据支撑。
+    const computed = typeof osc.flipRate === 'number' && !Number.isNaN(osc.flipRate);
+
     // 趋势侧：看“非 pass 动作占比”随序列是升还是降
+    // analyzeTrend 样本 <5 时返回 direction='insufficient'，那不是趋势，
+    // 不往上报（宁缺勿滥：insufficient 会让调用方误读成"稳定"）
     let trend = null;
     try {
       const t = det.analyzeTrend(records, { type: 'rewrite' });
-      if (t && t.direction) trend = { direction: t.direction, change: t.change, confidence: t.confidence };
+      const d = t && t.direction;
+      if (d === 'stable' || d === 'rising' || d === 'falling') {
+        trend = { direction: d, change: t.change, confidence: t.confidence };
+      }
     } catch (_) { /* 趋势是附加信息，失败不阻断主结论 */ }
 
     return {
       jittered: !!osc.detected,
+      insufficient: computed ? undefined : true,
       flipRate: osc.flipRate,
       threshold: osc.threshold,
       samples: actions.length,
