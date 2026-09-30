@@ -151,6 +151,9 @@ at('F1 覆盖率先单挑不保证定向（记为已知盲区，不是回归）'
   console.log('decision 通道契约守卫（第 308 轮）');
   console.log('═══════════════════════════════════════');
   console.log('  通过 ' + passed + ' / ' + (passed + failed));
+  // run-all.js 只认「N 通过, M 失败」成对汇总行；只报分数式时被判静默、
+  // 计入 1 个失败（第 309-310 轮连续三轮占失败位）。这里补标准行。
+  console.log('测试结果: ' + passed + ' 通过, ' + failed + ' 失败, 共 ' + (passed + failed) + ' 个');
   if (failed) {
     console.log('  失败 ' + failed + ':');
     for (const f of failures) console.log('    ✗ ' + f);
