@@ -1,0 +1,17 @@
+fix(判据): 第 293 轮修 doubt-engine 51 处跨形态标点类不对称
+
+r291/r292 坐实的根因：gate() 直调走 toHalfWidthSafe（不动中文标点），
+checkOutput() 走 runPipeline 入口 NFKC（折半角）。doubt-engine 的模式库
+只写全角否定类与正向标点类，导致半角中文文本在管线路径被判 pass、
+全角同句被判 hedge/rewrite/block。
+
+本轮改动 src/doubt-engine.js 共 51 处：
+- 否定边界类补半角逗号孪生（45 处）
+- 否定边界类补半角句号孪生（1 处）
+- 正向句子边界类补半角逗号与句号孪生（2 处）
+- 正向结束类补半角孪生（3 处）
+
+验证：
+- 引擎探针 21 组成对候选（全角/半角）：形态分裂 5/21 降到 1/21
+  （残留 1 条经查为 contradiction 维度样本，不在 doubt-engine 范围）
+- bidirectional-guard：召回 52/52，误拦 301/326（与基线完全一致，零新增）
