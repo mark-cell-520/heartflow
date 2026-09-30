@@ -1,0 +1,858 @@
+{
+ "scanned": 447,
+ "silentCount": 142,
+ "silent": [
+  {
+   "file": "test/action-tracker.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/active-inference-efe.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/adaptive-controller.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/adversarial-synthesis.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/adversarial-upgrade.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/adversarial-variant-language-coverage.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/adversarial-variant.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/agent-boundary-guard.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/ai-writing-tell-co-occurrence.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/ai-writing-tell.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/creativity-engine.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/culture-engine.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/desire-cognition.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/empathy-responder.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/end-to-end.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/engine-dispatcher.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/engine-hook-points.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/ethics-engine.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/experience-distiller.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/heartflow-v7.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/humor-generator.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/intuition-engine.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/mind-wanderer.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/self-cognitive-engine.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/self-evolution-core.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/social-engine.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/strategy-orchestrator.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/strategy-signal-map.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/archive/dead-tests/world-knowledge.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/assertions.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/atomic-write.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/audit-wiring.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/auto-rules.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/being-logic.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/benign-mixed-benchmark.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/boot-check.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/budget.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/capability-abstraction.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/capability-guard.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/check-confidence-calibration.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/code-verifier.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/cognition-ground.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/cognitive-appraisal.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/cognitive-protocol.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/confidence-calibrator.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/config-hooks.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/config-v2.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/config.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/cooperative-arbitration.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/counterfactual-verifier.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/crowdtest-evaluators.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/data-eraser.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/debate-convergence.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/decision-capability.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/decision-constraints.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/decision-executor.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/decision-feedback.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/decision-verifier.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/dimension-action-wiring.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/dimension-coverage-benchmark.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/discrimination-blindspots.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/doubt-engine.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/dream-engine.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/embodied-core.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/engine-behavior.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/engine-constructor.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/engine-initializer.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/engine-lifecycle.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/engine-memory.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/engine-reasoner.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/engine-state.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/error-handler.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/error-memory-closedloop.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/error-memory.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/error-taxonomy.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/event-hooks.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/evolution-audit.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/evolution-state.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/execution-verifier.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/extracted-modules.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/fetch-safe.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/field-injector.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/flow-predictor.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/frame-check.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/gate.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/hallucination-guard.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/heal-taxonomy-wiring.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/heart-logic.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/heartflow-blindspot.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/hook-bus.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/hook-points-runner.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/identity/agent-psychology.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/index.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/information-flow.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/instruction-registry.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/intent-anchor.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/intent-layer.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/intention-tracker.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/introspect-wiring.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/knowledge/classics-value-mapper.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/llm-fallback.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/logic-patterns.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/longtask-guard.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/mcp-discriminator.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/mcp-guest-permission.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/memory-eviction.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/memory-signature-chain.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/mental-effort-tracker.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/meta-audit.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/meta-calibration.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/meta-prompt-engine.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/metaMemory.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/multi-turn-subtle.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/output-gate.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/perfect-error-pipeline.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/perfect-error.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/pipeline-robustness.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/pipeline.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/premature-termination-gate.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/premature-termination.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/premise-check.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/readtime-signature.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/reward-hacking-self-referential-r120.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/rewriter.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/rule-growth.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/scope-check-context.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/scope-check-mode.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/scope-check.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/self-diagnosis.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/self-evolution-explore.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/self-evolution-v2.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/self-scanner.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/stats-engine.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/strategic-restraint.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/superlative-subjective.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/ttl-preferences.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/unsupported-claim-exemption.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/untested-dimensions-benchmark.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/verifier.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/vertical-benign-benchmark.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/what-learned.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  },
+  {
+   "file": "test/window-attribution-receipt.test.js",
+   "exitLines": [],
+   "tail": "",
+   "len": 0
+  }
+ ]
+}

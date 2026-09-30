@@ -10,6 +10,8 @@
 # 运行时累积数据(子目录) - 审计发现 worldtree 被误跟踪
 # 阻止 data/ 下旧文件被 git add -A 重新追踪
 *.bak
+*.bak-*
+*.bak2-*
 *.key
 *.log
 *.orig
