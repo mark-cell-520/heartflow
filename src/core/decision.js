@@ -492,13 +492,33 @@ class HeartFlowDecision {
     // ⚠️ 措辞诚实边界：本通道只忠实换算「写明的数字」。调用方把「缺口 37%」
     //   写成「完整度 37%」会得到相反排序——必须写无歧义词（覆盖率/检测率），
     //   这是本通道的契约，也是 UPGRADE_LOG 记账的教训。
-    const RATIO_ANCHOR = /(detect|gate|命中|漏判|检出|复测|实测|通过|miss|hit|放行|拦截|定向|放行)/;
+    // [v6.7.130 第 309 轮] 锚点词表补「误伤族」——误伤型比例被静默丢弃的根因。
+    // 探针实测（scratch/probe309-ratio.js）：候选写成
+    // 「命中率 4/10、误伤 6/30」时，第二个比例的 ±10 字符窗口已被前面的
+    // 比例吃完，'命中' 被截在窗口外 → 该比例无锚点 → **整条丢弃**。
+    // 两个候选「命中率 4/10、误伤 6/30」与「命中率 4/10、误伤 12/30」
+    // 的误伤差异被整个吞掉，composite 双双 0.82 打平 → decide() 弃权。
+    // 误伤/误拦/误判/误报/false positive 是明确的检测语义锚点，
+    // 与 detect/漏判 同级；词表只增不减，r99 的 detect/覆盖率形态不受影响。
+    // 极性方向在下面 ratioGap 内单独按类型计算（两类比例好方向相反）。
+    //
+    // [v6.7.130 第 309 轮·补] 锚点表补「覆盖度」——与下方百分比通道的词表
+    // （覆盖率|覆盖度|检出率|命中率|检测率）保持一致。
+    // 实测复因（scratch/probe309-d1.js）：候选只写「引擎调用覆盖率 0/18」
+    // 时，锚点来源竟是模块名里的 Detector 子串（偶合成因）；没有任何检测词
+    // 的候选（如「做仓库卫生，覆盖率 1/18」）该比例被整条丢弃 →
+    // 覆盖率更好的候选反而排最后。补上「覆盖度」后：
+    //   · 0/18 → gap=1（缺口最大），1/18 → gap=17/18（略小）
+    //   · 两个 0/18 的候选如实打平 → decide() 继续弃权，不假装能选
+    const RATIO_ANCHOR = /(detect|gate|命中|漏判|检出|复测|实测|通过|miss|hit|放行|拦截|定向|覆盖度|覆盖率|覆盖|误伤|误拦|误判|误报|false positive|false negative|未拦|拦不住)/;
     const ratioGap = (() => {
       const pct = text.match(/(覆盖率|覆盖度|检出率|命中率|检测率)[^0-9%]{0,4}([0-9]{1,3})[ \t]*%/);
       if (pct) {
         const v = Number(pct[2]) / 100;
         if (v >= 0 && v <= 1) return { gap: 1 - v, source: 'percent' };
       }
+      // [v6.7.130 第 309 轮] 按比例类型定极性——两类比例的「好方向」相反。
+      const FP_KIND = /(误伤|误拦|误判|误报|false positive)/;
       let best = null;
       const re = /([0-9]{1,3})[ \t]*[/／][ \t]*([0-9]{1,3})/g;
       let m;
@@ -506,11 +526,37 @@ class HeartFlowDecision {
         const x = Number(m[1]);
         const y = Number(m[2]);
         if (y < 1 || y > 99 || x > y) continue;
-        const from = Math.max(0, m.index - 10);
-        const to = Math.min(text.length, m.index + m[0].length + 10);
-        if (!RATIO_ANCHOR.test(text.slice(from, to))) continue;
-        const gap = 1 - x / y;
-        if (best === null || gap > best.gap) best = { gap, source: 'ratio', x, y };
+        // 类型判定取「就近前导锚点」——不能只看窗口内有没有 fp 词：
+        // 「误伤已降至 0/30」写在前面时，其后的命中率比例的 pre 窗口
+        // 会被「误伤」二字整体占满 → 把命中型误判成误伤型 → 极性反转。
+        // 正确口径：找比例**前面最近**的那个锚点词，按它的类型定性。
+        // 前面找不到才看后面最近的（兼容「10/10 命中率」这类后置写法），
+        // 都没有则该比例无锚点，整条丢弃（与原契约一致）。
+        const nearestAnchor = (endIdx, forward) => {
+          const re = forward
+            ? new RegExp(RATIO_ANCHOR.source, 'g')
+            : new RegExp(RATIO_ANCHOR.source, 'g');
+          let hit = null;
+          let mm;
+          re.lastIndex = 0;
+          while ((mm = re.exec(text)) !== null) {
+            if (forward) {
+              if (mm.index >= endIdx && (!hit || mm.index < hit.index)) hit = { index: mm.index, word: mm[0] };
+            } else {
+              if (mm.index + mm[0].length <= endIdx && (!hit || mm.index > hit.index)) hit = { index: mm.index, word: mm[0] };
+            }
+          }
+          return hit;
+        };
+        const preAnchor = nearestAnchor(m.index, false);
+        const postAnchor = nearestAnchor(m.index + m[0].length, true);
+        const anchor = preAnchor || postAnchor;
+        if (!anchor) continue;
+        const isFalsePositive = FP_KIND.test(anchor.word);
+        const gap = isFalsePositive ? x / y : 1 - x / y;
+        if (best === null || gap > best.gap) {
+          best = { gap, source: 'ratio', x, y, kind: isFalsePositive ? 'false_positive' : 'miss' };
+        }
       }
       return best;
     })();
