@@ -47,6 +47,24 @@ function measure() {
   const reg = fs.readFileSync(path.join(HF, 'src/mcp/tools-registry.js'), 'utf8');
   const srv = fs.readFileSync(path.join(HF, 'src/mcp-server.js'), 'utf8');
 
+  // [v6.7.126 第 286 轮] 维度数改为**运行时实测**，与
+  // scripts/measure-claimed-numbers.js 同口径（v6.7.111 的修正）。
+  // 旧口径数 index.js 顶层 `function check*` = 50，漏掉判别函数
+  // 定义在外置模块的 7 个真维度（perfect_error / phishing_coercion /
+  // induced_trust / coverup_induction / dangerous_instruction /
+  // reward_hacking / premature_termination —— 定义在
+  // src/premature-termination.js、src/manipulation-tactics.js 等）。
+  // 它们各有 score + guidance，成员身份在 BLOCK_DIMS / VERIFY_DIMS 内，
+  // 是独立维度。用旧口径的测试守着新口径产出的「50」，等于拿错尺子。
+  const dr = cp.spawnSync('node', ['-e', `
+    const {discriminate}=require('${path.join(HF, 'src/index.js')}');
+    const d=discriminate('neutral baseline text');
+    const k=Object.keys(d.dimensions||{});
+    console.log(k.length);
+  `], { encoding: 'utf8', timeout: 60000 });
+  const dimsRuntime = parseInt((dr.stdout || '').trim().split('\n')[0], 10) || 0;
+
+  // 静态口径仅作参考值保留（用于「哪些维度有专属顶层 check 函数」诊断）
   const checkFns = new Set();
   for (const m of idx.matchAll(/^function (check[A-Z]\w*)\s*\(/gm)) checkFns.add(m[1]);
 
@@ -88,7 +106,10 @@ function measure() {
   }
 
   return {
-    dimensions: checkFns.size,
+    // [v6.7.126 第 286 轮] 用运行时实测（discriminate dimensions 键）。
+    // 旧值 checkFns.size 漏计 7 个外置模块维度，让三份文档少报。
+    dimensions: dimsRuntime || checkFns.size,
+    staticCheckFns: checkFns.size,
     block: tier('BLOCK_DIMS'),
     rewrite: tier('REWRITE_DIMS'),
     verify: tier('VERIFY_DIMS'),
