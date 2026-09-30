@@ -103,8 +103,9 @@ function checkSymmetry(text) {
       const isQuestion = /(?:哪些|什么|怎么|是否|是不是|有没有|为何|为什么|哪个|哪)[^，。,]{0,30}是/.test(s) || /是[^，。,]{0,20}(?:哪个|哪些|什么|谁|怎么|是否|有没有)/.test(s);
       const isStanceVerb = /(?:也|正|就|都|才|只|总|毕竟|终究|恰恰|无非|其实|不过|正好|恰好|恰是|正巧|可以|可能|或许|也许)是/.test(s);
       const isBelonging = /属于/.test(s);
+      const isInterrogative = /(?:是否|与否|能否)/.test(s);
       const BOUND = "[^\uFF0C\u3002\u0028\u0029\uFF08\uFF09\u0022\u0027\u201C\u201D\u2018\u2019\uFF1A\u003A\u2014\u2026\u000A\u000D]";
-      if (/(?<!不)是/.test(s) && new RegExp(BOUND + "{3,40}是" + BOUND + "{3,40}[的，。,]").test(s) && !isLeadWord && !isNegation && !isEmphasis && !isQuestion && !isStanceVerb && !isEvaluative && !isBelonging) {
+      if (/(?<!不)是/.test(s) && new RegExp(BOUND + "{3,40}是" + BOUND + "{3,40}[的，。,]").test(s) && !isLeadWord && !isNegation && !isEmphasis && !isQuestion && !isStanceVerb && !isEvaluative && !isBelonging && !isInterrogative) {
         const match = s.match(new RegExp(BOUND + "{3,40}是" + BOUND + "{3,40}[的，。,]"));
         if (match) {
           const reversed = match[0].replace('是', '不一定');
