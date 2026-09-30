@@ -180,7 +180,7 @@ function checkDefensiveness(text) {
     { re: /但你(要)?(知道|注意|理解)[^，。,]{0,20}其实/g, issue: '用"但是"转移错误焦点' },
     { re: /更(重要|关键)的(是|在于)/g, issue: '转移话题躲避认错' },
     // 典型 AI 防御句式
-    { re: /作为[^，。,]{0,10}(AI|助手|智能体)[，。].{0,20}(理解|明白|建议)/g, issue: 'AI身份防卫——用身份隔开责任' },
+    { re: /作为[^，。,]{0,10}(AI|助手|智能体)[，。,].{0,20}(理解|明白|建议)/g, issue: 'AI身份防卫——用身份隔开责任' },
     { re: /(首先|第一).{0,10}(抱歉|对不起|理解).{0,20}(但是|不过|然而)/g, issue: '表面道歉+实际解释——假道歉' },
   ] : [
     { re: /you (misunderstand|misunderstood|misread|misinterpreted)\b/gi, issue: 'blaming user for misunderstanding' },
