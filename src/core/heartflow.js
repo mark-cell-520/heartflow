@@ -2061,6 +2061,16 @@ class HeartFlow {
     // 直接取其导出。失败同样进 _initErrors，不影响其他模块启动。
     try { this.verification = _VerificationEngine().verificationEngine; } catch (e) { _boundedPush(this._initErrors, {module: 'verification', error: e.message}, MAX_HISTORY_SIZE); }
 
+    // [第 307 轮接线] PatternDetector — 行为模式检测器。构造入参是可选 config 对象，
+    // 无参可构造（probe-6 实测 newOk=Y / 18 个方法）。失败同样进 _initErrors。
+    // 注意：它只做「判定动作序列」的统计模式分析，不参与 gate.action 判定。
+    // 同时注册进 _modules —— 使 patternDetector.* 走 dispatch 路由可达
+    // （心虫铁律：有真实能力的引擎必须暴露可调用入口，否则等于没接）。
+    try {
+      this.patternDetector = new (_PatternDetector().PatternDetector)();
+      this._modules['patternDetector'] = this.patternDetector;
+    } catch (e) { _boundedPush(this._initErrors, {module: 'patternDetector', error: e.message}, MAX_HISTORY_SIZE); }
+
     try { this.decision = new (_HeartFlowDecision().HeartFlowDecision)(this.memory); } catch (e) { _boundedPush(this._initErrors, {module: 'decision', error: e.message}, MAX_HISTORY_SIZE); }
 
     try { this.decisionVerifier = new (_DecisionVerifier().DecisionVerifier)(); } catch (e) { _boundedPush(this._initErrors, {module: 'decisionVerifier', error: e.message}, MAX_HISTORY_SIZE); }
@@ -4475,6 +4485,90 @@ class HeartFlow {
   _getMemoryDir() { return require('./engine-memory')._getMemoryDir(this); }
 
   _initMemoryVault() { return require('./engine-memory')._initMemoryVault(this); }
+
+
+  // ─── [第 307 轮接线] 判定抖动自检 ───────────────────────────
+  //
+  // 背景：PatternDetector（src/pattern-detector.js）原本全仓 0 引用，
+  // 接线后得到的能力之一是「动作序列震荡检测」（detectOscillation）。
+  //
+  // 对心虫这个辨别者有什么用：心虫的产出是判定动作
+  // （pass / verify / rewrite / block）。把一段对话或一批文本的判定动作
+  // 按时间排成序列，如果动作在 pass 与 rewrite 之间高频率来回翻，
+  // 说明**判据自身不稳**——同一类文本前后给出不同处置。这正是
+  // HeartFlow「设计原则 4：自我检查」所缺的一块：以前只看单次判定
+  // 对不对，现在能看判定序列稳不稳。
+  //
+  // 契约（单向可证伪）：
+  //   · 输入 verdicts 数组，元素是 gate.action 字符串或 {action, ts} 对象
+  //   · 输出 { jittered, flipRate, threshold, samples, window, oscillationType,
+  //           note, verdictCounts, trend }
+  //   · 序列短于 minSamples 时返回 { jittered:false, insufficient:true }，
+  //     **不报抖动**（宁漏不错报——心虫铁律：误判代价高于漏判）
+  //   · 不修改入参、不抛异常、不参与 gate.action 判定（纯旁路自检）
+  //
+  // 用法：
+  //   const hf = new HeartFlow(); hf.start();
+  //   const r = hf.detectVerdictJitter(verdicts);
+  //   if (r.jittered) console.warn(r.note); // 判据不稳，应复查判据而非复查文本
+  //
+  detectVerdictJitter(verdicts, options = {}) {
+    const det = this.patternDetector;
+    if (!det || typeof det.detectOscillation !== 'function') {
+      return { jittered: false, reason: 'patternDetector_unavailable' };
+    }
+    if (!Array.isArray(verdicts)) {
+      return { jittered: false, reason: 'verdicts_not_array' };
+    }
+
+    const minSamples = Number.isFinite(options.minSamples) ? options.minSamples : 3;
+    // 归一化：只取动作名，丢掉文本本体（原文不进判定以外的路径）
+    const actions = verdicts
+      .map(v => (typeof v === 'string' ? v : (v && typeof v.action === 'string' ? v.action : null)))
+      .filter(a => a === 'pass' || a === 'verify' || a === 'rewrite' || a === 'block');
+
+    const counts = {};
+    for (const a of actions) counts[a] = (counts[a] || 0) + 1;
+
+    if (actions.length < minSamples) {
+      return {
+        jittered: false,
+        insufficient: true,
+        reason: 'insufficient_samples',
+        samples: actions.length,
+        minSamples,
+        verdictCounts: counts,
+      };
+    }
+
+    // detectOscillation 读 records[].type（或 options.typeField 指定字段），
+    // 内部按 window 截取末尾一段并按相邻差异算翻转率。
+    const records = actions.map((a, i) => ({ index: i, type: a, ts: i }));
+    const osc = det.detectOscillation(records, {
+      typeField: 'type',
+      window: Number.isFinite(options.window) ? options.window : undefined,
+      threshold: Number.isFinite(options.threshold) ? options.threshold : undefined,
+    });
+
+    // 趋势侧：看“非 pass 动作占比”随序列是升还是降
+    let trend = null;
+    try {
+      const t = det.analyzeTrend(records, { type: 'rewrite' });
+      if (t && t.direction) trend = { direction: t.direction, change: t.change, confidence: t.confidence };
+    } catch (_) { /* 趋势是附加信息，失败不阻断主结论 */ }
+
+    return {
+      jittered: !!osc.detected,
+      flipRate: osc.flipRate,
+      threshold: osc.threshold,
+      samples: actions.length,
+      window: osc.window,
+      oscillationType: osc.oscillationType || null,
+      note: osc.note || null,
+      verdictCounts: counts,
+      trend,
+    };
+  },
 
 
 
