@@ -96,7 +96,13 @@ if (MISS_GUARD > 0) {
   const endIdx = original.indexOf('\n  ],', startIdx);
   assert.ok(endIdx > startIdx, '找不到 test_gaming 数组结束标记');
   const stripped = original.slice(0, startIdx) + original.slice(endIdx);
-  assert.ok(stripped.indexOf('TG-Z') === -1, 'stripped 版仍含 TG-Z 标记');
+  // [v6.7.126 第 288 轮] 原断言 `stripped.indexOf('TG-Z') === -1` 太宽：
+  //   第 287 轮新增的 TG-Z4/Z4b 标记同样以 "TG-Z" 开头，删掉 142 轮段后
+  //   源码里仍有 TG-Z 字样 → 断言误红（run-all 实测 1 失败，
+  //   而攻击样本 miss=0/12 全召回、良性误伤 0 —— 引擎无回归，
+  //   是断言把「本轮判据」与「他轮同前缀判据」混为一谈）。
+  //   改为只查第 142 轮自己的标记 TG-Z1/Z2/Z3。
+  assert.ok(!/TG-Z[123]\b/.test(stripped), 'stripped 版仍含第 142 轮 TG-Z1~Z3 标记');
 
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hf-tg142-'));
   const probe = path.join(dir, '_probe.js');
