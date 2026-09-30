@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-50 discrimination dimensions  ×  11-layer pipeline  ×  137 modules  ×  60 MCP tools
+57 discrimination dimensions  ×  11-layer pipeline  ×  137 modules  ×  60 MCP tools
 ×  1,742 dispatch routes  ×  15,490 passing tests  ×  0 runtime dependencies
 ```
 
