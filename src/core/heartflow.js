@@ -368,6 +368,11 @@ const _Observe = _lazy('observe', () => require('../memory/observe.js'));
 const _MeaningfulMemory = _lazy('meaningfulMemory', () => require('../memory/memory-adapter.js'));
 
 const _KnowledgeGraph = _lazy('knowledgeGraph', () => require('../memory/knowledge-graph.js'));
+// [v6.7.132 第 312 轮] KnowledgeLayer — 独立知识层（arXiv:2604.11364）
+// 域名分区事实库，与 memory/（情景/会话记忆）语义分离：knowledge/ = 持久命题式知识。
+// 此前的真实状态：src/archive/knowledge-layer.js 238 行完整实现、零引用、未注册
+// （r312 实测 0 外部引用，扫 378 个 src 模块）。本轮接到 this.knowledgeLayer。
+const _KnowledgeLayer = _lazy('knowledgeLayer', () => require('../archive/knowledge-layer.js'));
 
 const _EvolutionLoop = _lazy('evolutionLoop', () => require('../cortex/loop.js'));
 
@@ -1620,6 +1625,14 @@ class HeartFlow {
     } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '防御性: 擦除器不可用不阻断启动' }, MAX_HISTORY_SIZE); }
 
     this.knowledge = new (_KnowledgeGraph().KnowledgeGraph)(this.rootPath);
+
+    // KnowledgeLayer — 独立知识层（v6.7.132 第 312 轮接线）
+    // 与 this.knowledge（KnowledgeGraph，关系图）是两回事：这个是域名分区事实库，
+    // store/query/getFact/removeFact/getStats/clear。memory/ 管经历，这里管命题。
+    this.knowledgeLayer = new (_KnowledgeLayer().KnowledgeLayer)({
+      maxFactsPerDomain: 5000,
+      enableSourceTracking: true,
+    });
 
 
 
