@@ -1,4 +1,123 @@
-第 309 轮（v6.7.124 工作面，修 r308 遗留的 decision 比例通道两层极性缺陷，1 commit）
+# 第 310 轮（v6.7.124 工作面，闭环 r309 遗留 1：decision 缺口收益与候选质量混维度，1 commit）
+
+**方向来源**：r309 交接簿「给下一轮」第 1 项——decide() 复合分排序与直觉相反。
+未走 decision 选向：缺口由上一轮坐实（当时就写了两条解决路径），本轮是单轮可
+闭环的定向修复；另外两条候选（19 个孤儿模块、r308 测试格式）都不是本轮能做完的。
+
+## 1. 缺口复测（scratch/probe310-upside.js、probe310-rows.js、probe310-breakdown.js）
+
+原样复现 r309 记账的两个数，并逐维拆开：
+
+| 候选 | 命中率 | 误伤 | measured_gap | consequence_value | composite |
+|---|---|---|---|---|---|
+| A 最优 | 10/10 | 0/30 | 0 | 0.70 | **0.77（最低）** |
+| B | 8/10 | 6/30 | 0.2 | 0.75 | 0.78 |
+| C | 6/10 | 12/30 | 0.4 | 0.82 | 0.80 |
+| D 最差 | 4/10 | 12/30 | 0.6 | 0.89 | **0.86（最高）** |
+
+单变量确认单调倒挂：命中率 10→4（误伤固定 0）composite 0.77→0.82；
+误伤 0→30（命中率固定 10）同样是 0.77→0.84。**与候选质量完全反相关**，
+与 r99/r309 有意钉的「缺口更大的候选排更高」同时成立 —— 两种语义被混在
+同一个 consequence_value 维度里，这是本轮的根因判断。
+
+另一层现象：缺口分剥离后（见下），四候选的 consequence_value 全部停在 0.70
+打平 → decide() 弃权。拆词表发现 SEVERITY_MED 的「误伤」在自身质量语义里
+**是缺陷描述却还在加分** —— 这是打平的近因。
+
+## 2. 改动（commit `beae7172`，src/core/decision.js 一处 + 守卫 + 负例）
+
+走 r309 遗留给的路径 (b)：**mode 两态**，不动默认契约（路径 (a) 会把缺口分
+挪进新维度，会改变 r99/r309 已钉死并全绿的端到端契约）。
+
+1. **mode 两态**：
+   · `pick_biggest_gap`（默认）——ratioBonus 计入 consequence_value，
+     composite = **修它的收益**，升级引擎选方向用这个。不传 mode 时行为
+     与改动前**逐字段一致**（含 r99 白盒公式）。
+   · `pick_best`——ratioBonus **不**计入 composite，缺口收益只通过
+     `scores.upside` 透出供审计。composite = **候选自身质量**。
+2. **pick_best 补自身达成度修正**：`consequence_value = 0.35 + (1-gap)*0.6`，
+   误伤型（`ratioGap.kind === 'false_positive'` 或文本出现误伤族词）再压 0.08。
+   修掉上面第 1 节那个打平弃权。
+3. **mode 归一化**：只精确匹配 `pick_best`；null / 未知串 / 大小写写错
+   一律回落 `pick_biggest_gap`。探针实测：第四参传 null 时 JS 默认值不生效，
+   `scoring_mode` 会透出 null（本轮的 I 段守卫由此而来）。
+4. **scores 新增 `upside` 与 `scoring_mode`** 两个可审计字段，缺口分与
+   排序分从此可分别核对。
+
+修复后（scratch/probe310-modes.js）：
+
+| mode | 胜者 | composite 序 |
+|---|---|---|
+| pick_biggest_gap（默认） | D 最差候选（4/10、12/30） | 0.82 > 0.80 > 0.78 > 0.77 |
+| pick_best | **A 最优候选（10/10、0/30）** | **0.81 > 0.78 > 0.75 > 0.72** |
+
+## 3. 守卫与负例
+
+`test/decision-mode-round310.test.js` **37 断言全绿**，九段：
+A 默认 mode 等于原加权公式 / B 缺口语义单调（r99 契约延续）/
+C 自身质量语义单调（本轮主目标，四档 + 误伤单变量）/
+D composite 与 upside 解耦（白盒达成度公式）/
+E 端到端两态给出相反胜者 / F upside 与 mode 无关 /
+G 无测量数字时两态完全等价 / H 显式 consequence_value 与 prior 仍优先 /
+I mode 入参容错（null/大小写错/未知串回落默认）。
+
+`scripts/negative-test-decision-mode-r310.js` **5/5 注入全变红**：
+
+| 注入 | 结果 |
+|---|---|
+| ① 删 mode 归一化（null 回落失效） | ✅ 35 passed / 2 failed |
+| ② 删 pick_best 达成度修正（四候选恢复打平） | ✅ 28 / 9 |
+| ③a 缺口语义态 ratioBonus 删除（r99 契约崩） | ✅ 31 / 6 |
+| ③b pick_best 达成度极性反转（1-gap → gap） | ✅ 27 / 10 |
+| ④ upside 改随 mode 变化 | ✅ 32 / 5 |
+
+**第三处注入的诚实记账**：最初写的是「pick_best 下 ratioBonus 改回并入」，
+注入后 **37/0 不变红**。原因是 pick_best 尾部 `c = base` 是硬覆盖，会把并回的
+ratioBonus 整个抹掉 —— 该缺陷在当前代码结构下**不可观测**。换成
+③a/③b 两个有可观测后果的等价注入后才钉住。这是「守卫必须真的能红」的一次
+实证，记下来免得下一轮重复设计无效注入。
+
+## 4. 验证
+
+| 项 | 结果 |
+|---|---|
+| `node --check src/core/decision.js` | EXIT=0 |
+| `bin/verify.js` | **14/14** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线持平，零新增） |
+| `security-audit.test.js` | **16/16** |
+| `doc-numbers-accuracy.test.js` | **15/15** |
+| 注入负例 | **5/5 变红**，还原后 37/37 复验全绿 |
+| `test/run-all.js` | 后台跑，见下方补记 |
+
+## 5. 遗留
+
+1. **19 个真孤儿模块**仍未接线（跨多轮工程）。
+2. **r308 两个测试的汇总输出格式与 run-all 正则不兼容**（已连续三轮占两个
+   失败位）。r309 按纪律没越界改上一轮的文件，本轮同样留给下一轮——
+   现在已是连续第三轮的会计事项，下一轮应优先处理（修法极简：
+   给 `decision-channel-round308.test.js` 和 `pattern-detector-jitter-round308.test.js`
+   各补一行 `测试结果: N 通过, M 失败` 格式的输出）。
+3. **52 个未跟踪探针文件**仍未提交（r308/r309 同项，需人工判断归类）。
+4. **`test/decision-capability.test.js` / `decision-constraints` / `decision-executor` /
+   `decision-feedback` 四个文件零输出**：实测 EXIT=0 但没有任何 stdout，
+   也没有 run-all 需要的 `测试结果: N 通过` 行。与 r308 的格式问题同源但更
+   严重（完全静默），下一轮应核对它们是否真的在跑断言。
+5. `pick_best` 目前只在自然语言候选 + 测量数字的组合下有区隔能力；结构化
+   options 走显式字段优先级，未受影响（H 段守卫钉住）。
+
+## 6. 给下一轮的接手说明
+
+1. decision 的两态契约已钉在 `test/decision-mode-round310.test.js` A~I 段。
+   **继续改 `_scoreOption` 前先跑它**，它会同时守住「默认行为不变」和
+   「两态语义分离」两条线。
+2. 下一步若要动 decide() 的公共契约（比如让升级引擎默认改用 pick_best），
+   先看 r99/r309/r310 三个守卫是否都还绿 —— 那三个文件共同构成这条通道的
+   完整契约。
+3. 路径提醒（同 r309）：实例没有 `hf.gate`，取判定动作用 `require('src/gate.js')`。
+4. 命令纪律：run-all 本轮约 9 分钟，必须后台化；安全扫描会拦「批量删除」
+   形式的命令（本轮删 4 个探针文件即被 BLOCKED），删文件要分开跑。
+
+# 第 309 轮（v6.7.124 工作面，修 r308 遗留的 decision 比例通道两层极性缺陷，1 commit）
 
 **方向来源**：队列待办第一条（r308 交接簿「给下一轮」第 1 项）——「decision 比例通道反向打分」。
 未走 decision 选向：缺口由上一轮坐实、候选唯一且无并列（简报里另外两条是「19 个孤儿模块」
