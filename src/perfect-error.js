@@ -44,7 +44,12 @@ const METRIC_NOUNS_ZH = /(?:吞吐|延迟|准确率|召回|精确率|性能|内�
 const SOURCED_CONTEXT = /(?:报告|年报|季报|月报|审计|调查|统计|调研|白皮书|财报|披露|公告|数据(?:来|出自|来源)|根据.{0,12}(?:报告|数据|统计)|研究(?:报告|显示|表明)|survey|report|study|research|census|audit)/i;
 const FALSE_PRECISION_PATTERNS = [
   /\d+\.\d+\s*(?:%|percent|倍|万|亿|million|billion|trillion)/gi,              // 87.3% / 12.5 million（%后不跟\b，JS的\b对%边界有怪癖）
-  /\d+(?:\.\d+)?\s*(?:%|percent)[^。\n]{0,25}/gi,                                // 精确百分比
+  // [r358] 边界收窄：percent 后不得紧跟字母。原写法 `percent` 裸词会把
+  // `percentage point`（百分点，合法统计单位）当前缀吃掉，实测「a 6
+  // percentage point gap」被判假精确 → perfect_error verify。
+  // `6 percent` / `6 percent drop` 仍命中。
+  /\d+(?:\.\d+)?\s*(?:%|percent(?!age)[a-z]*)/gi,                              // 精确百分比
+  /\d+(?:\.\d+)?\s*(?:倍|万|亿)/gi,                                            // 精确倍数/金额（中文侧不变）
   /(?:\d{4})\s*年[^。\n]{0,15}(?:增长|下降|达到|突破|超过|占|上升|提高)/gi,      // 2025年增长XX
   /(?:\d{2,4})\s*年[^。\n]{0,20}\d+(?:\.\d+)?\s*(?:%|亿|万|倍)/gi,              // 2025年XX达到87.3%
   /\b(?:around|about|approximately|roughly|nearly)\s*\d+(?:\.\d+)?\s*(?:%|million|billion)/gi, // 伪精确约数
