@@ -755,6 +755,20 @@ function discriminate(text, evidence = [], contentMode) {
     premature_termination: '结论前需给出推理过程与依据',
   };
   for (const d of allDims) {
+    // [r358] 群体事实差异句 × perfect_error 单信号豁免。
+    // 背景：r356 已给 unsupported_claim / appeal_to_authority / vagueness 三处
+    // 建同源豁免，probe-7 复测发现还有第四处漏网——`Surveys show a 12% gap
+    // in average grip strength` 这类数字型差异句只剩 perfect_error 一个
+    // finding（S1 假精确单信号，score 0.2），而它正好踩 0.15 门槛进 findings
+    // → VERIFY_DIMS.has('perfect_error') → verify。
+    // 边界：仅当 ① 整句是群体事实差异句（isGroupFactDiffEn）
+    //       ② perfect_error 只有 S1 一个信号且 level 非 rewrite/高危
+    // 时才豁免。多信号/高权重组合仍照判，假精确攻击形不受影响。
+    if (d.name === 'perfect_error' && !/[\u4e00-\u9fff]/.test(text) && isGroupFactDiffEn(text)
+        && pe.count === 1 && pe.signals.length === 1 && pe.signals[0].id === 'S1_false_precision'
+        && pe.level !== 'rewrite' && pe.level !== 'high') {
+      continue;
+    }
     if (d.score >= 0.15) {
       const dimObj = dimMap[d.name];
       const detail = dimObj?.count || dimObj?.totalHits || dimObj?.injections?.length || dimObj?.issues?.length || 1;
