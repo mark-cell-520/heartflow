@@ -613,7 +613,12 @@ const _WisdomEngine = _lazy('wisdomEngine', () => _stubFactory('WisdomEngine'));
 const _AIHumanIntegration = _lazy('aiHumanIntegration', () => _stubFactory('AIHumanIntegration'));
 const _BeingMode = _lazy('beingMode', () => require('../identity/being-mode.js'));
 const _ConsciousnessBridge = _lazy('consciousnessBridge', () => { try { return require('../identity/consciousness-bridge.js'); } catch(e) { return _stubFactory('ConsciousnessBridge'); } });
-const _GapExecutor = _lazy('gapExecutor', () => _stubFactory('GapExecutor'));
+const _GapExecutor = _lazy('gapExecutor', () => { try { return require('../cortex/gap-executor.js'); } catch(e) { return _stubFactory('GapExecutor'); } });
+// [r315] KnowledgeExplorer 曾被 v6.3.45 按「40个死模块」删除，但调用点
+// （think-pipeline 3 处 + plugins/explore-on-verify）全留着，走的是下面
+// globalThis 假桥接类（无 getGaps/registerGap），每次调用撞 TypeError 被静默
+// catch 吞掉。已从 59251371^ 取回真实现，这里改成真加载。
+const _KnowledgeExplorer = _lazy('knowledgeExplorer', () => { try { return require('../cortex/knowledge-explorer.js'); } catch(e) { return _stubFactory('KnowledgeExplorer'); } });
 const _LearningOrchestrator = _lazy('learningOrchestrator', () => _stubFactory('LearningOrchestrator'));
 const _LearningPulse = _lazy('learningPulse', () => _stubFactory('LearningPulse'));
 const _TaskUrgency = _lazy('taskUrgency', () => _stubFactory('TaskUrgencyEstimator'));
@@ -621,7 +626,6 @@ const _HypothesisDriver = _lazy('hypothesisDriver', () => { try { return require
 const _ErrorMemory = _lazy('errorMemory', () => { try { return require('../error-memory.js'); } catch(e) { return _stubFactory('ErrorMemory'); } });
 const _PatternTracer = _lazy('patternTracer', () => _stubFactory('PatternTracer'));
 const _WorldLandscape = _lazy('worldLandscape', () => _stubFactory('WorldLandscape'));
-const _KnowledgeExplorer = _lazy('knowledgeExplorer', () => _stubFactory('KnowledgeExplorer'));
 const _ProcessRewardModel = _lazy('processRewardModel', () => _stubFactory('ProcessRewardModel'));
 const _DesireCognition = _lazy('desireCognition', () => { try { return require('../emotion/desire-system.js'); } catch(e) { return _stubFactory('DesireCognition'); } });
 
@@ -4163,6 +4167,11 @@ class HeartFlow {
 
     // ─── [v6.2.0] KnowledgeExplorer 知识探索器：从置信缺口→探索队列 ──
     try {
+      // [r315] 原为 `new KnowledgeExplorer()`——解析到第 56 行的 globalThis
+      // 假桥接类（只有 healthCheck + 空 absorbLearnerSignals，无 getGaps/
+      // registerGap），所有调用点撞 TypeError 后被 try/catch 静默吞掉。
+      // 改成走 lazy registry 的真实实现（_KnowledgeExplorer）。
+      const { KnowledgeExplorer } = _KnowledgeExplorer();
       this.knowledgeExplorer = new KnowledgeExplorer();
       this._modules['knowledgeExplorer'] = this.knowledgeExplorer;
       // 注入 ContinuousLearner 的置信信号到探索器
