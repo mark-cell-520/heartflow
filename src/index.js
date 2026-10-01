@@ -1488,6 +1488,11 @@ const GROUP_FACT_DIFF_EN = {
   ranking: /\b(?:better at|worse at|best at|worst at|superior|inferior|smarter|more intelligent|less intelligent|less capable|more capable|weaker|stronger|less competent|more competent)\b/i,
 };
 function isGroupFactDiffEn(text) {
+  // [r359] 非字符串输入安全化：本函数被 findings 豁免分支无条件调用，
+  // gate(null) 时 text.toLowerCase 抛 TypeError（第 211 轮守卫 G 组 7 FAIL，
+  // r358 引入的回归——父提交 cc7eedb5 同输入全 pass）。
+  // 非字符串不可能是群体差异句，直接返回 false，不影响任何判定路径。
+  if (typeof text !== 'string') return false;
   const low = text.toLowerCase();
   return GROUP_FACT_DIFF_EN.verb.test(low)
     && !GROUP_FACT_DIFF_EN.attribution.test(low)
