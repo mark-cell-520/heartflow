@@ -1,4 +1,100 @@
-# 第 366 轮（修复 r365 自引入回归：stereotypeGenderJob 空数组 truthy 早退，1 commit）
+# 第 367 轮（修复玄学归因族 9 条漏判 + 修自引入自然现象回归，3 commits）
+
+## 方向选择
+
+队列待办已清空，按简报优先级取上一轮（r366）遗留最高优先项：
+「玄学归因族 7 条漏判（round-346-pseudo-causal-luck-attribution-zh.test.js）」——
+r361 起记录至今第 5 轮，唯一有测试坐实的稳定缺口。不需跑 decision。
+
+## 复测（未信简报，先实测缺口范围）
+
+`timeout 100 node test/round-346-pseudo-causal-luck-attribution-zh.test.js`
+实测 EXIT=1、**4 通过 / 2 失败**——attack 侧 7 条漏判 + 长距变体 2 条漏判
+（合计 **9 条**，比 r366 记账的 7 条多 2 条长距变体）。
+良性 39 条零误伤、单半 4 条零误命中、5/5 断言结构全过——纯召回缺口。
+
+## 根因（scripts/round-367/probe-pats.js 逐支匹配定位）
+
+9 条漏判样本的**甲半（无机制归因对象）全部命中 PC_NOOBJ_ZH**，
+但乙半获益结果词两张表各缺一半：
+
+| 表 | 覆盖的本族词形 | 漏掉的本族词形 |
+|---|---|---|
+| `PC_RES_LUCK_ZH`（⑪ 支用，20 字窗口） | 中奖/顺利/上去了 | 签约顺利/全红/上来/好了不少 |
+| `PC_REV_RES_ZH`（⑫⑬ 支用） | 翻红/订单多/下单 | 幸运色/头像/风水局的受益词形 |
+
+9 条里只有 3 条能被 ⑫⑬ 支（需显式归因引导词「因为/全靠」）捞回，
+其余 6 条既无引导词、结果词又不在两张表内；另有 2 条长距变体
+（甲半→结果间隔 >20 字）超出 ⑪ 支的 20 字窗口。
+**没有任何单支能覆盖这 9 条的交集。**
+
+## 改了什么（3 commits）
+
+1. `17acc56f` 新增判据（`src/index.js`）：
+   - `PC_RESJOIN_ZH`：两张结果表的并集，补入本族真实词形
+   - `PC_CAUSAL_ZH_PATS` 第⑭支：`PC_NOOBJ_ZH × 44 字窗口 × PC_RESJOIN_ZH`
+     （去掉显式引导词要求，覆盖无语序引导词形状）
+   - 函数体接反向护栏：第⑭支命中但带机制/统计/资金依据时不判
+     （`PC_LUCK2_MECH ∪ PC_REV_MECH` 并集，与⑪⑫⑬同款）
+2. `83e115a65` 负例守卫：`test/round-367-pseudo-causal-resjoin-guard.js`
+   沙箱删第⑭支→重跑主测试，实测 EXIT=1、2 条断言变红，守卫钉在判据上。
+   标记用 `PC_RESJOIN_ZH` 唯一定位（`PC_NOOBJ_ZH` 前缀被⑫⑬共用会误匹配 3 处）。
+3. `15d2855e` 修第⑭支自引入回归（见下节）。
+
+## 自引入回归与修复（run-all 第一次跑发现）
+
+run-all 新增失败 `pseudo-causal-zh-timeorder-round48`（父提交无此项）。
+单跑复测 3/5：良性「雨→水库水位上涨」被误判。父提交对比探针
+（scripts/round-367/probe-parent-diff.js）实测坐实：该样本父提交
+pseudo_causal=0，本轮加判据后变 1 次命中。
+根因：甲半表 `PC_NOOBJ_ZH` 含「雨」等真实气象对象，与乙半「涨了」
+同现于**真实物理因果**句。修法：新增 `PC_NOSUPERSTITION_ZH`
+（自然现象×物理/水文/气温排除表），第⑭支命中该表时不判。
+实测 round-48 回到 **5/5**（良性零误伤 30/30、攻击 24/24 保持）。
+
+## 验证结果（只列本轮实测跑过的）
+
+| 项 | 结果 |
+|---|---|
+| `round-346-pseudo-causal-luck-attribution-zh.test.js` | **4/6 → 6/6**（攻击 12/12 + 长距 2/2 全命中，良性 39/39 零误伤） |
+| `pseudo-causal-zh-timeorder-round48.test.js` | 回归引入后实测 3/5 → **5/5**（修复验证） |
+| `round-367-pseudo-causal-resjoin-guard.js` | **守卫有效**，删第⑭支后 2 条断言变红 |
+| `round-346-...-zh-guard.js`（⑪支守卫） | **保持有效**（删⑪仍变红），本支未受影响 |
+| `pseudo-causal-luck-attribution-round87.test.js` | **7/7** 保持 |
+| `pseudo-causal-forward-family-r360.test.js` | NEG_OK **9/9** 保持 |
+| `bin/verify.js` | **14 / 0** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **302/326**（基线零差异） |
+| `test/security-audit.test.js` | **16/16** |
+| `test/doc-numbers-accuracy.test.js` | **15/15** |
+
+## run-all 结果
+
+第 2 次跑（含回归修复）：**16617 通过 / 2 失败 / 共 16619**。
+2 项失败均非本轮引入：
+- `pseudo-causal-forward-family-r360.test.js` —— 单跑 NEG_OK 9/9 通过，
+  仅因输出无汇总行被计失败（r364 已记账，属 run-all 聚合展示缺陷）
+- `npm-package-integrity` 本轮实测 6/6 通过（历史「预期失败 1 个」已不存在）
+
+## 遗留（下一轮优先）
+
+1. **`pseudo-causal-forward-family-r360.test.js` 缺汇总行**（第 3 轮记账）——
+   修法是给测试补 `console.log('结果: N 通过, M 失败')` 汇总行。
+   注意：`test/run-all.js` 自身是升级机制不可改，但测试文件本身可以改，
+   收益是把 run-all 失败数降到 1。这是目前唯一还坐实的 run-all 失败源。
+2. 106 个未跟踪文件（scripts/round-*/ 探针）仍在，属探针堆积，不影响判定。
+
+## 给下一轮的接手说明
+
+- 玄学归因族已补齐第⑭支，**下轮复测 round-346 测试文件即可验收**。
+- 第⑭支的护栏有三个并集来源（⑪⑫⑬），动任何一张表时用
+  `node test/round-367-pseudo-causal-resjoin-guard.js` 验守卫仍钉得住。
+- 若再加新支，守卫必须同时覆盖兄弟判据的既有正例集（r365/r366/r367
+  连续三轮都是「新族绿了、兄弟族红了」）。
+- 建议下一轮做 r360 汇总行补齐（收益明确、风险低），或转向
+  维度覆盖扫描里的闸门放过项（multi_turn_escalation 1/2、
+  pseudo_profundity 1/2、stereotype 1/2）。
+
+
 
 ## 方向选择
 
