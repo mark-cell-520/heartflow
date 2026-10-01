@@ -1,4 +1,89 @@
-# 第 356 轮（v6.7.124 工作面：群体事实差异句误伤族清零 + 置负例守卫，3 commit）
+# 第 362 轮（玄学归因族两处结果形缺口清零 + r360 遗留守卫重建，4 commit）
+
+## 方向选择
+
+队列空。第一轮 decision 返回 chosen=null（A/B 同分 0.81 无法区隔），按规则
+补「成本/影响面/风险」量化判据后第二轮实测选 **B（0.81）**：
+A 补 ZH 获益结果形 0.80 / B 补 EN 获益事件完成形 0.81 / C 收良性误伤 0.74 / D git 卫生 0.74。
+
+选 B 后按 r361 遗留「ZH/EN 两族同表同源」说明，B 做完自然带上 A（同一族
+同一处根因），不单做 B 留下已知缺口。
+
+## 复测实测（scripts/round-362/）
+
+| 探针 | 结果 |
+|---|---|
+| probe-1 r360 守卫复测 | ZH 攻击族 8/9 非 pass、EN 6/7；良性误伤 2/24 |
+| probe-2 家族命中 | PC_HIT 15/16、GATE_PASS 13/14 |
+| probe-2b 定位 | 漏判句索引与维度（ZH 归因转发族、EN lucky 完成形族） |
+| probe-6 ZH 9 条单跑 | 第 8 条 count=0 —— 真实漏判是「客户当天下单」被时点副词隔开，不是订单族 |
+| probe-8 P3 构造 | 3 候选里 1 条有效（护栏在 0 / 护栏假 1） |
+
+## 改了什么（4 commit）
+
+| commit | 内容 |
+|---|---|
+| `12a05f13` | 引擎 `src/index.js`：ZH 第 13 支 PC_REV_RES_ZH 补获益结果形（订单多/来单/成单/客户下单）；EN PSEUDO_CAUSAL_EN 新补同族支（归因连接词 × 幸运对象 × came through/landed/got through/pulled off 等完成形） |
+| `4a34e82e` | 负例守卫 `scripts/negative-test-luck-result-form-r362.js`：2 置假点（ZH 摘结果形 / EN 整支置假），判据量 detector 层 PC_HIT + 良性 GATE_PASS 恶化哨兵 |
+| `f0670467` | 引擎第二处缺口：PC_REV_RES_ZH 再补 客户N下单/有新订单/裸下单；重建 `test/pseudo-causal-forward-family-r360.test.js` |
+
+### r360 守卫重建要点（方法级产出）
+
+原版三处错，全部实测定位后修正：
+1. 命中判据量 `gate.action` → 改 detector 层 `dimensions.pseudo_causal.count`
+   （r357 教训复现：该族生效面在 detector 层，gate 层被伴生维度掩盖）；
+2. P2 锚点 `feng ?shui` 与源字节不符（源无空格）→ 照源文件字面量抄；
+3. ZH 良性样本含 r361 已收的 2 条误伤（1.8 倍/提升三倍）→ 移出本守卫，
+   归 r361 fact-base 守卫覆盖。
+
+P3（机制护栏）重写：原判据「护栏假→良性被抓」不成立，因为那 8 条良性
+缺 `PC_NOOBJ_ZH` 对象（另一层保护），护栏失效也抓不到。改为「混合句」
+断言：同句含无机制对象 × 获益结果 × 机制词，护栏在时放行、置假后被抓
+（probe-8 3 选 1 实测筛出）。**置假点必须落在判据真正能生效的样本上，
+否则守卫恒绿。**
+
+## 验证结果（只列实测跑过的）
+
+| 项 | 结果 |
+|---|---|
+| r360 守卫（重建后） | **NEG_OK 9/9**（原版 5/7） |
+| r362 守卫 | **NEG_OK 2/2 置假点全变红**，基线还原（PC_HIT 16/16、GATE_PASS 13/14） |
+| ZH 攻击族 detector 命中 | 8/9 → **9/9** |
+| EN 攻击族 detector 命中 | 6/7 → **7/7** |
+| 探针 PC_HIT / GATE_PASS | 15/16 → **16/16**；13/14 不变（良性无新增误伤） |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **302/326**（与基线一致，无新增） |
+| `node bin/verify.js` | **14 passed / 0 failed** |
+| `test/security-audit.test.js` | **16/16** |
+| `test/doc-numbers-accuracy.test.js` | **15/15** |
+| `node test/run-all.js` | 见下方「待补」 |
+
+## 遗留
+
+1. **`node test/run-all.js` 全量结果本轮未取到最终值**：第一次启动早于引擎
+   第二处改动（已作废），第二次启动在本轮记录落盘时仍在跑。下一轮第一件事
+   取 `/tmp/r362-runall2.log` 结果，并以新实测更新 `data/test-count.json`
+   （当前缓存 16594/3）。预期失败数应与 r361 持平（3 个），新增失败必须
+   定位到具体条目。
+2. **仍存的 1 条良性 gate 层 FP（probe-2 sample 14）**：`perfect_error`
+   判 1.8 倍句（父提交 r361 已收 detector 层，gate 层由 perfect_error 接管）。
+   属 r361 遗留第 2 条，形状不同于本轮族，未处理。
+3. **93 个未跟踪文件仍在**（`scripts/round-*/` 探针目录 + 少量未入库测试）。
+   本轮按纪律提交了 round-362 与两个守卫脚本，其余未动。
+4. **`pseudo_causal` 中文数字倍数族 gate 层 FP（效率提升三倍）仍在**：
+   r361 probe-11 已实测窄豁免收不动。下一轮若要动，需先复测 probe-11
+   结论是否仍成立，再换豁免形状。
+
+## 给下一轮的接手说明
+
+1. **先取 run-all 结果并更新 test-count.json**，否则 finish 的 README/缓存
+   一致性检查会继续黄。
+2. r360 守卫的 P3 混合句范式值得复用：护栏类置假点必须构造「三半齐备」
+   的混合样本，否则护栏失效也抓不到、守卫恒绿。
+3. ZH/EN 玄学归因族本轮两处缺口已清零（9/9、7/7）。若后续再出现漏判，
+   优先查 `PC_REV_RES_ZH` / `PSEUDO_CAUSAL_EN` 两表是否又出现
+   「结果动词被时点副词隔开」的形状。
+
+
 
 ## 方向选择
 
