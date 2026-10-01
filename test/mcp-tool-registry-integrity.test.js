@@ -59,9 +59,15 @@ for (const line of (hb ? hb[1] : '').split('\n')) {
   const restPairs = m[2].split(/,\s*(?=heartflow_)/);
   let first = true;
   for (let seg of restPairs) {
-    const key = first ? m[1] : null;
+    let key = first ? m[1] : null;
     first = false;
     seg = seg.trim();
+    // [r314 修复] 行内并列键的第二个键自带 `heartflow_x:` 前缀（实测 dream 那行：
+    //   heartflow_dream: handleDream,  heartflow_active_inference: (args) => {
+    // r313 版把 key 置为 null 后整段丢掉，heartflow_active_inference 解析不出来。
+    // 改成：每段都先看自己有没有 key 前缀，有就用它，没有再退回行首的 m[1]。
+    const km = seg.match(/^(heartflow_\w+)\s*:\s*(.*)$/);
+    if (km) { key = km[1]; seg = km[2]; }
     let name = null, form;
     if (/^(?:async\s*)?\(/.test(seg)) { name = '(inline)'; form = 'inline-arrow'; }
     else if (/^(?:async\s*)?function\b/.test(seg)) { name = '(inline)'; form = 'inline-fn'; }
@@ -104,8 +110,15 @@ t('HANDLERS 一行多键全收（r313 修复回归）', () => {
 });
 
 t('HANDLERS 映射的函数都真实存在', () => {
+  // [r314 修复] r313 把形态登记表 `__form_<key>` 也塞进了 handlerMap，
+  // 本断言按 Object.entries 遍历时把它们当成「函数名」去找，
+  // 于是 121 个 `__form_* → ref` 全部假缺失；内联形态的名字是哨兵值
+  // `(inline)`（不是真实函数名），同样不该去找。
+  // 语义：本断言只该回答「简短引用形态指向的命名 handler 是否真的定义了」。
   const missing = [];
   for (const [tool, fn] of Object.entries(handlerMap)) {
+    if (tool.startsWith('__form_')) continue;          // 形态登记键，不是工具键
+    if (handlerMap['__form_' + tool]?.startsWith('inline')) continue;  // 内联形态没有命名函数可查
     if (!new RegExp('function ' + fn + '\\s*\\(').test(mcpSrc)
         && !new RegExp('const ' + fn + '\\s*=').test(mcpSrc)) missing.push(tool + ' → ' + fn);
   }
