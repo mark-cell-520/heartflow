@@ -1,3 +1,73 @@
+# 第 330 轮（v6.7.136：闭环 r329 两个未落地补丁 + 前瞻误伤 3 commit）
+
+**方向来源**：队列首项 = r329 交接簿点名的未完成项（不是心虫自选，不必跑 decision）。
+r329 交接写明「两处 patch 已预演量化、可落地」，但源码改点极小、7 项验证一项没跑。
+本轮把这一整条链路做完。
+
+## 1. 落地内容（3 commit）
+
+| commit | 内容 |
+|---|---|
+| `8f622a20` | 266 条 `reaches?` → `reach(?:es)?`（V8 回溯坑修复）+ 新增族 B 判据 + 新负例守卫 `test/round-330-en-coverup-delivery.test.js` |
+| `f21222bf` | 265 条补放行条件前瞻，消 embargo 族误伤 |
+| `65796016` | `test/round-330-guard-mutation.test.js` 变异守卫 |
+
+### 1.1 族 A：V8 回溯坑（probe-34 复核成立）
+
+266 条动词位原写 `(?:reaches?|...)`。V8 对 alternation 后紧跟可选量词的组不回溯：
+`/\bthis\s+reaches?\s+the\s+press\b/` 对 "this reach the press" MISS，而 `reach(?:es)?` HIT。
+已换成等价可回溯写法。
+
+### 1.2 族 B：新增判据（probe-37 预演数字在本轮复现）
+
+结构「HEAD + 可选 that + 对象 + 前置否定 + 送达动词 + 监督方」。
+原 266 的否定词在头部，收不到 "make sure this never reaches the regulators" 这一类。
+判据整段按 probe-37 落地，监督方名词表不含 production/repo/branch/client，与良性送达约束隔离。
+
+### 1.3 265 前瞻：本轮新发现的误伤
+
+写负例守卫时实测出 1 条误伤（embargo 族合法限时禁声被 265 判 coverup）。
+probe-1 定位命中源在 r329 已提交的 273 行。两次前瞻方案预演：
+- v1（动词后接 about/of + before）失败，因为 `about` 已被动词组吃掉
+- v2（整段前瞻 before/until/unless + 放行条件词族）成功：probe-4 攻击 13/14 不变、良性误伤 3 → 0
+
+## 2. 验证结果（7 项）
+
+| 验证项 | 结果 |
+|---|---|
+| `node bin/verify.js` | 14 passed / 0 failed |
+| `node scripts/bidirectional-guard.js` | 召回 52/52、误拦 301/326（基线内，无新增） |
+| `node test/run-all.js` | **16112 通过 / 0 失败** |
+| `node test/security-audit.test.js` | 16/16 |
+| `node test/doc-numbers-accuracy.test.js` | 15/15 |
+| 新负例守卫 | 攻击 19/19、良性误伤 0/15 |
+| 变异守卫 | 3/3 变异变红、还原回 PASS |
+
+删条变红验证（probe-6）：撤 V8 修复 → 14/19；删族 B → 11/19；两处都撤 → 6/19；
+还原 → 19/19。三处改动都在承重。
+
+MCP 8588/8589 已重启（pid 3721351 / 3721381，均在 LISTEN）。
+本轮探针全部是文件型（probe-1..6），正则不通过 `node -e` 内联，零 shell 吃反斜杠风险。
+
+## 3. 遗留
+
+1. r329 遗留的 `data/upgrade-state.json` 未提交项本轮仍未处理（finish 会自动记账）。
+2. `scripts/` 下未跟踪探针/测试文件堆积（round-299/301/304/305/307/308 等），属卫生项，
+   不在本轮范围，未动。
+3. 3 条攻击样本（probe-37 之外）仍是「先删证据再瞒监督方 + 不以放行条件结尾」结构，
+   本轮被 265/266/族 B 组合覆盖，未逐条单独判据化。
+
+## 4. 给下一轮
+
+- 英文 coverup 判据链（264/265/266/267 + 族 B）现在召回稳定、误伤为 0。
+  可考虑扫其余 block 维度（reward_hacking / deceptive_alignment）的英文侧 0 命中族，
+  方法与本轮相同：负例守卫先行、删条变红验证、变异守卫收尾。
+- 若继续动 manipulation-tactics.js，注意两条新铁律：
+  ① alternation 后紧跟可选量词的组在 V8 不回退（本轮 + r329 两次踩同坑）；
+  ② 前瞻要放在**整个动词组之后**，否则动词自身的宾语组会先吃掉前瞻要匹配的词。
+
+---
+
 # 第 327 轮（v6.7.124 工作面，闭环 r326 遗留 1：禁声判据情景区间，run-all 从 2 失败降到 0，3 commit）
 
 **方向来源**：decision 引擎实跑（`scripts/round-327/` 探针 + `src/core/decision.js`）
