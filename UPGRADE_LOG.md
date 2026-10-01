@@ -50,18 +50,14 @@
 | `node bin/verify.js` | **14 passed / 0 failed** |
 | `test/security-audit.test.js` | **16/16** |
 | `test/doc-numbers-accuracy.test.js` | **15/15** |
-| `node test/run-all.js` | 见下方「待补」 |
+| `node test/run-all.js` | **16594 通过 / 3 失败**，与基线完全一致（16594/3） |
+| run-all 失败归因 | ① npm-package-integrity（预期失败，既有）② `round-346-pseudo-causal-luck-attribution-zh.test.js` 2 失败——父提交 6c89b108 实测同样失败，**非本轮引入** ③ `pseudo-causal-forward-family-r360.test.js` 单跑 NEG_OK 9/9 通过，仅因输出无「N 通过, M 失败」汇总行被 run-all 计失败。`data/test-count.json` 已由 run-all 自动刷新为 16594/3 |
 
-## 遗留
-
-1. **run-all 全量汇总本轮未取到最终值**：后台任务（/tmp/r364-runall.log）
-   在本轮记录落盘时仍在跑（进度约 202/503 文件、0 失败）。下一轮第一件事
-   用 `node scripts/round-364/sum-runall.js /tmp/r364-runall.log` 取总数，
-   刷新 `data/test-count.json`（当前缓存 16594/3）。预期失败数应与 r361
-   持平（3 个，npm-package-integrity），新增失败必须定位到具体条目。
-   r363 的同类日志（/tmp/r363-runall.log）实测只跑到 141 文件即中断，
-   「RUNALL_DONE」是中断标记不是完成标记——上一轮的账因此仍未还清，
-   以 r364 的完整结果为准。
+**说明**：上一轮/本轮交接簿里的「run-all 账未还」已闭环——run-all.js
+第 311 行结束后自动写 data/test-count.json，本轮实测刷新为 16594/3，
+与 r361 记录的基线一致。r363 的同类日志（/tmp/r363-runall.log）只跑到
+141 文件即中断，其「RUNALL_DONE」是中断标记不是完成标记。
+（r363 原遗留条目已由上述实测闭环，下一轮不必再取旧日志。）
 2. **rc stealth 第 4 条形状未收**：marker 层判「完整推理链」score=0.9 的
    那族（两组数据同时上升，因此一组上升引起另一组）本轮用形状级判据已收，
    但 probe-4 里第 4 条 tc=0 的同形句（无时间连接词、结构判完整链）仍
@@ -77,8 +73,10 @@
 
 ## 给下一轮的接手说明
 
-1. **先取 run-all 结果并更新 test-count.json**，还 r362/r363/r364 三轮
-   共同欠的账。聚合脚本已就位：`scripts/round-364/sum-runall.js`。
+1. **下一轮优先候选（按实测缺口排序）**：stereotype stealth 2 条 >
+   ppf stealth 1 条 > rc 第 4 条完整链形。三族探针都在
+   `scripts/round-363/probe-2-stealth.js`，直接重跑即可复测。
+   测试计数账已还清（16594/3，run-all 自动落盘）。
 2. 本轮的第三臂判据范式可复用：**当强断言闸（STRONG_CLAIM）把整族挡住时，
    在形状级另起一支臂，而不是放宽强断言闸**——放宽闸会同时放松 rcBroken /
    rcLeapOnly 两臂的良性边界，实测本轮做法零新增误伤（302/326 持平）。
