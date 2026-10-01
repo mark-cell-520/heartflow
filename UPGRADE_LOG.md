@@ -1,3 +1,97 @@
+# 第 346 轮（v6.7.155 工作面：pseudo_causal 补中文「玄学归因 × 获益结果」第 ⑪ 支，2 commit）
+**方向来源**：r345 交接簿遗留第 2 条（pseudo_causal 显式因果族已确诊为 r346 首选）。
+开轮先跑 `HeartFlowDecision.decide`：首跑 chosen=null（三候选 0.78/0.76/0.74 分不开），
+补「可行性/后果/风险」三轴判据二跑 → **chosen=B 0.83**（显式因果族治本，但自评风险高）；
+三跑聚焦「玄学隐式归因族」后 decision 明确把它与显式族分开——本轮做隐式族，
+显式族（改 PC_OTHERFACTOR_ZH 豁免，牵动 48/87 两轮 60+ 良性断言）留待下轮。
+
+**decision 二跑证据**（输出顶层 chosen/label/confidence/all_options）：
+- B 显式因果治本 0.83（可行性低、后果高、风险高）
+- A 玄学隐式归因 0.80（可行性高、后果高、风险中，第 87 轮有同型试错台经验）
+- C reasoning_coherence 显式因果 0.74
+
+选 A 落地的理由：B 的自评风险是「回归面大，本轮回滚概率高」，
+而 A 是纯增量（新增第 ⑪ 支 + 自带反向护栏），且缺口同样坐实——
+隐式族里既有判据十条要么要顺序词半、要么要仪式动作半，「穿红/戴表/
+改昵称/拜财神 × 股价涨/中奖/面试过」整族没有容身位置。
+
+## 1. 复测：缺口比扫描登记的宽
+
+| 探针 | 测什么 | 结果 |
+|---|---|---|
+| 轮初扫描 | 46 维度横向刷新（`dimension-coverage-scan.js` 重跑，非 6h 缓存） | **闸门放过从 18 个降到 10 个**；r345 修的 contradiction 已 2/2 归因命中；pseudo_causal / reasoning_coherence / bad_faith 仍 2/2 全放过 |
+| probe-layer | 直调检测层区分「检测层漏 vs 闸门放过」 | pseudo_causal 探针 count=0（检测层漏，不是闸门问题） |
+| probe-expl | 补齐同族扩样 13 条攻击 + 18 条良性 | 攻击命中 **1/13**、良性误伤 0/18 |
+| probe-v1~v8 | 试错台八版迭代 | v1 5/13 → v4 8/13 → v6 11/13 → v7 定稿 **12/13、误伤 0/35** |
+| probe-v9~v13 | 接入后全引擎复测 | 攻击 12/13、良性 **0/38**、攻击族 gate 全 verify、良性 gate 33 pass + 5 条原有 verify（非 pseudo_causal 归因） |
+
+**根因（probe-1/expl 坐实）**：`PC_CAUSAL_ZH_PATS` 十条判据的甲半要么要
+「顺序标记」（自从/之后/以来），要么要「仪式动作」（拜佛/深呼吸/幸运手链），
+而中文最高频的玄学归因形状是「颜色服饰 / 护符佩戴 / 仪式节点 / 改名风水 ×
+获益结果」——既有十条对整族 0 命中。
+
+## 2. 改了什么（2 commit）
+
+| commit | 内容 |
+|---|---|
+| `8539f213` | `src/index.js` 新增 `PC_LUCK2_ACT_ZH`（甲半）/ `PC_LUCK2_RES_ZH`（乙半）/ `PC_LUCK2_MECH_ZH`（反向护栏）+ 第 ⑪ 支判据 + 函数头机制护栏分支 |
+| `465eccf9` | 新测试 6 条断言 + 负例守卫脚本 + 甲半补「护身符/早起」两槽 |
+
+**第 ⑪ 支形状**（两半 AND，缺一不命中）：
+甲半四子族 = 颜色服饰（幸运色/吉祥色/红袜子）/ 护符佩戴（戴了…表链环饰）/
+仪式节点（初一/十五/拜财神/转发/抽奖）/ 改名风水（昵称/头像/壁纸/风水/招财）
+× 乙半获益结果（中奖/签单/下单/涨/通过/中标…）。
+反向护栏：句中出现真实机制/统计名词（缓存/索引/对照组/报价/绩效等）不判。
+
+**踩坑（已修）**：甲半顶层备选最初未包进单个组，`source` 拼接后
+`[^。]{0,20}` 窗口只作用于最后一个备选——一条纯运气自嘲良性句
+（「第一次投资就赚了，纯属运气成分居多」）被误判。改成整组非捕获括号后
+误伤归零。这是「正则 source 拼接」类改动的通用陷阱，写进了下方教训。
+
+## 3. 验证结果（6 项）
+
+| 项 | 结果 |
+|---|---|
+| `node bin/verify.js` | 14 passed / 0 failed |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线零新增） |
+| `test/pseudo-causal-zh-timeorder-round48.test.js` | 5/5（零回归） |
+| `test/pseudo-causal-luck-attribution-round87.test.js` | 7/7（零回归） |
+| `test/round-346-pseudo-causal-luck-attribution-zh.test.js` | **6/6**（12 条逐槽攻击 + 2 长距 + 39 良性） |
+| `test/round-346-...-zh-guard.js`（负例守卫） | 删第 ⑪ 支后子测试退出码 1、变红断言 2 条 → **守卫有效** |
+| `test/security-audit.test.js` | 16/16 |
+| `test/doc-numbers-accuracy.test.js` | 15/15 |
+| `test/run-all.js` | **16452 通过, 0 失败** |
+| `scripts/upgrade-engine.js finish` | 见下 |
+
+## 4. 教训（写给下一轮）
+
+1. **正则 `source` 拼接必须在顶层包一个非捕获组**。多分支甲半直接
+   `const A = /x|y|z/` 后 `A.source + '[^。]{0,20}' + B.source`，
+   `|` 的优先级会让窗口只作用于最后一个分支——本次表现为「突然误伤
+   一条良性」，而不是「漏判」，极易看错方向。
+2. decision 首跑三项分差 <0.05 时会返回 chosen=null，不是引擎坏，
+   是候选缺三轴判据；补「可行性/后果/风险」再跑即可。
+3. 轮初扫描要跑**实时**版（`scripts/dimension-coverage-scan.js`），
+   简报里那份 6h 缓存把已修维度（contradiction）仍列为 gateMisses。
+
+## 5. 遗留（给下一轮）
+
+1. **pseudo_causal 显式因果族治本**（decision 二跑 chosen=B，本轮让位给
+   低风险的隐式族）：`PC_OTHERFACTOR_ZH` 含「因为」导致自我豁免，
+   改它牵动第 48/87 两轮 60+ 良性断言。动手前必须先跑
+   `test/pseudo-causal-zh-timeorder-round48.test.js` 与
+   `test/pseudo-causal-luck-attribution-round87.test.js` 拿基线，并按
+   「窄豁免」思路做（只豁免「因为 + 机制名词」共现，不是全量删「因为」）。
+2. **reasoning_coherence 检测层 2/2 全漏**（本轮 probe-layer 坐实：
+   两条探针 gate=pass、findings 无该维度）。与 pseudo_causal 的形状
+   有重叠（都是「因为X所以Y」），下一轮做显式族时应顺带判归因，
+   避免两维重复计入（pseudo_causal 已有 score=max 合并逻辑）。
+3. **bad_faith 检测层 2/2 全漏**（32 条判据全收不到，r347 候选）。
+4. 探针垃圾 ~130 个未跟踪文件仍未清；VERSION 仍 6.7.124（本轮记账
+   v6.7.155，延续同型记账法）。
+
+────────────────────────────────────────────────────────────
+
 # 第 345 轮（v6.7.154 工作面：contradiction 补中文「立场先行 × 行为背离」六支，2 commit）
 
 **方向来源**：r344 交接簿遗留第 3 条（rewrite 层 3 个闸门放过）+ 轮初横向扫描登记的
