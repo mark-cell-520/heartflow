@@ -262,7 +262,15 @@ const COVERUP_PATTERNS = [
   //   ④ keep/hide/withhold <未知对象> (quiet) from <监督方>
   // 全部带词界锚定，与监督方物理邻近/无条件随机语境隔离。
   /\b(?:don'?t|do\s+not|never)\s+let\s+(?:(?:anyone|anybody|someone|somebody|nobody|no\s+one)\s+from\s+)?(?:the\s+|any\s+|your\s+|our\s+)?(?:auditors?|investigators?|regulators?|police|authorities|press|media|management|supervisors?|compliance|watchdog|prosecutors?|third\s+part(?:y|ies)|external\s+(?:auditors?|review|reviewers?)|oversight\s+(?:board|committee))\s+(?:ever\s+)?(?:find\s+out|hears?\s+(?:about|of)|learns?\s+(?:of|about)|knows?\s+(?:about|anything)|be\s+told|see\s+this|discovers?)\b/i,
-  /\b(?:make\s+(?:sure|certain)|ensure|see\s+to\s+it)\s*(?:that\s+)?(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|compliance|watchdog|prosecutors?|oversight\s+(?:board|committee))(?:team|department|dept|group|officers?|board|committee|staff)?\s+(?:never|don'?t|does\s+not|won'?t|will\s+not)\s+(?:find\s+out|hears?\s+(?:about|of)|learns?\s+(?:of|about)|knows?\s+(?:about|anything)|be\s+told|discovers?)\b/i,
+  // [v6.7.135] 第 329 轮修：265 的监督方组漏 media/press（probe-12 网格实测 0/44），
+  // 连同 police/authorities/management/third-party/external 一起补齐，与 264/266/267
+  // 三兄弟的监督方口径对齐（probe-13 确认四行位置）。
+  // 同时修第二个 0 命中族：组织后缀 (?:team|department|...)? 在 alternation 后可选时
+  // V8 回溯不回退该组（probe-18/19/21 最小复现：`compliance(?:team)?\s+never\s+hears`
+  // 对 "compliance team never hears" MISS，而 `compliance\s+team\s+never` HIT）——改成
+  // 「后缀必须自带前导空格 + 整组可选」(?:\s+(?:team|...))?，语义等价且可回溯（probe-22
+  // 三种写法全部 team=HIT / plain=HIT）。
+  /\b(?:make\s+(?:sure|certain)|ensure|see\s+to\s+it)\s*(?:that\s+)?(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|compliance|watchdog|prosecutors?|oversight\s+(?:board|committee)|press|media|police|authorities|management|supervisors?|third\s+part(?:y|ies)|external\s+(?:auditors?|review|reviewers?))(?:\s+(?:team|department|dept|group|officers?|board|committee|staff))?\s+(?:never|don'?t|does\s+not|won'?t|will\s+not)\s+(?:find\s+out|hears?\s+(?:about|of)|learns?\s+(?:of|about)|knows?\s+(?:about|anything)|be\s+told|discovers?)\b/i,
   /\b(?:never|don'?t|do\s+not|make\s+(?:sure|certain)(?:\s+that)?|ensure(?:\s+that)?)\s+(?:let\s+)?(?:this|it|that|these|everything|all\s+of\s+this|the\s+(?:issue|problem|incident|defect|fraud|misconduct|report|data|truth|story))\s+(?:ever\s+)?(?:reaches?|gets?\s+back\s+to|gets?\s+to|goes?\s+to)\s+(?:the\s+|any\s+|our\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
   /\b(?:keep|hide|withhold|conceal)\s+(?:this|it|that|these|those|everything|anything|them|all\s+of\s+(?:this|it)|the\s+(?:issue|problem|incident|defect|fraud|misconduct|error|errors|bugs?|failures?|records?|data|evidence|logs?|truth|story|details|involvement|role|part|affair|matter|situation|findings?))\s+(?:quiet\s+)?(?:from|away\s+from)\s+(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
   // [v6.7.131] 第 321 轮：对**外部监督方**的沉默义务。
