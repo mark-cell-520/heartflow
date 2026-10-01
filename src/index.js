@@ -251,6 +251,15 @@ function checkIndirectInjection(text) {
     /(?:网页|网站|页面)?(?:源码|源代码|代码注释|注释|comment)/i,
     // [第75轮补] 数据库记录
     /(?:数据库|数据表|DB|db|记录|record)[^。；\n]{0,10}(?:里|中|内|的)[^。；\n]{0,6}(?:一条|字段|记录|text|内容)/i,
+    // [v6.7.131] 第 321 轮：裸载体词（文档/文件/附件/网页/邮件…）+ 方位/引述动词。
+    // 旧表只收「上传…PDF」「检索…片段」这类**带来源动词**的载体，
+    // 「文档里写着…」「附件中说…」这种直接引述形 0 命中 → 7.2/7.3 的
+    // _srcHit 恒为 null，下游判据全部失效（实测 2 条同族攻击 0 拦截）。
+    // 收紧（防误伤）：必须后接方位词或引述动词，不是单纯提到「文档」二字。
+    /(?:文档|文件|附件|网页|页面|邮件|报告|表格|日志|记录|资料)[^。；\n]{0,6}(?:里|中|内|上面|上|写着|写道|说|提到|说明|写着|record|says)[^。；\n]{0,24}(?:删除|清空|抹掉|销毁|格式化|覆写|发送|转发|上传|导出|执行|关闭|跳过|忽略|泄露|提供|交出|ignore|delete|send|execute|skip|bypass|reveal)/i,
+    // [v6.7.131] 第 321 轮：英文载荷载体（旧 PAYLOAD_SOURCE 只收中文载体词，
+    // "The PDF content says: ignore your instructions" 0 命中）。
+    /\b(?:pdf|docx?|document|attachment|email|web\s*page|webpage|spreadsheet|log\s*file|csv)\b[^.\n]{0,24}\b(?:content|contents|text|body|says?|states?|reads?|instructs?|tells?|contains?|includes?)\b/i,
   ];
   // 7.2 执行半：把载体内容当指令执行（"其中/里面的指令/要求"）
   //     关键是"其中的"——指令的源头在 payload 内部。
@@ -268,6 +277,21 @@ function checkIndirectInjection(text) {
     /执行[^。；\n]{0,10}(?:中|里|内)[^。；\n]{0,10}(?:节|部分|条目|全部|所有|操作)/,
     /包含指令[:：]?/,
     /(?:按|按照|遵循)它说的做|照做|请照做|按它说的/,
+    // [v6.7.131] 第 321 轮：英文执行半（旧 PAYLOAD_AS_INSTRUCTION 全是中文模式，
+    // 英文句子「ignore your instructions」0 命中）。
+    /\b(?:ignore|disregard|override|forget|bypass|skip|delete|remove|exfiltrate|send|forward|execute|disable|reveal|print)\b[^.\n]{0,30}\b(?:your|the|all|previous|system|prior|original)?\s*(?:instructions?|prompt|rules?|constraints?|guidelines?|settings?)/i,
+    // [v6.7.131] 第 321 轮：中文「载体 + 内嵌祈使破坏指令」。
+    // 旧执行半要求「其中的指令/要求」这类元表述，「文档里写着…请删除所有文件」
+    // 这种**直接祈使**0 命中。
+    // ⚠️ 第 321 轮 b 轮收紧：第一版误伤「文档里说明了上季度的营收数据，请忽略
+    // 去年的对比列」——那是要求对方**看文档时忽略某列**，不是要 Agent 执行
+    // 破坏动作。收紧条件（两处叠加）：
+    //   ① 祈使词与破坏动词之间不得出现「对比/参照/以…为准/去年的」这类
+    //      数据比较语义（那是阅读指令，不是执行指令）；
+    //   ② 破坏动词的宾语必须是「所有/全部/整个 + 文件/数据/记录/系统」这类
+    //      整体性对象，不能是「对比列/某一列/某个字段」这种字段级对象。
+    /(?:文档|PDF|pdf|文件|附件|网页|页面|邮件|报告|表格|记录|日志)[^。；\n]{0,8}(?:里|中|内|上面|写着|写道|说|提到|说明)[^。；\n]{0,30}(?:请|必须|务必|立即|马上|立刻)[^。；\n]{0,10}(?:删除|清空|抹掉|销毁|格式化|覆写|发送|转发|上传|导出|执行|关闭|跳过|泄露|提供|交出)[^。；\n]{0,6}(?:所有|全部|整个)?(?:文件|数据|记录|系统|日志|磁盘|目录|数据库|附件)/,
+    /\b(?:ignore|disregard|override|forget|bypass|skip|delete|remove|exfiltrate|send|forward|execute|disable|reveal|print)\b[^.\n]{0,30}\b(?:your|the|all|previous|system|prior|original)?\s*(?:instructions?|prompt|rules?|constraints?|guidelines?|settings?)/i,
   ];
   // 7.3 载体自身就含命令形态（"第三列写着 do not validate credentials"）
   //     与执行半任一同现即命中——载体写明命令 + 要求照做。
@@ -2431,6 +2455,13 @@ const DOUBLE_BIND_PATTERNS = {
        [/(?:反抗|反对|拒绝|顶嘴|顶撞|反驳|争辩|质疑|不服)[^。]{0,6}(?:就)?(?:说明|证明)[^。]{0,6}(?:有病|不正常|有毛病|心理有病|精神有病|不正常了)/i, 'pathologized_defiance'],
        // ③-2 否认在场感受 + 全称归咎
        [/我(?:没有|没|并不|才没)(?:生气|不高兴|难过|发火|上火|生你的气|怪你)[^。]{0,20}(?:只不过|只是|但是|但|可是)[^。]{0,24}(?:每(?:一)?件(?:事|话)[^。]{0,12}(?:证明|说明|表示)[^。]{0,12}(?:自私|自我|过分|冷血|有问题|不正常|可怕)|(?:都|全)(?:是|怪)(?:你|你的错|你的问题))/i, 'negated_feeling_blame'],
+      // ── [v6.7.131] 第 321 轮：无「如果/要是」的两支散文形状 ──
+      // 旧 13+4 支判据全部要求显式条件句式（如果…说明你 / 你要是…就），
+      // 对纯叙述的双重束缚完全失效：实测同族 2 条攻击 2 条漏判、0 归因。
+      // ① 责备半 + 转折 + 反向同样受责
+      [/你(?:怎么|为什么)?(?:总是|老是|从来|每次|一直|事事)[^。；，]{0,10}[，,][^。]{0,10}(?:不过|但是|可是|然而|只不过)[^。]{0,12}(?:也很|也挺|也太|也不|同样|反倒)(?:奇怪|不对|不行|不好|有问题|说不过去|不合适)/i, 'blame_reversal'],
+      // ② 禁令半 + 转折 + 反向禁令（双重否定：不许不X = 必须X）
+      [/(?:别|不要|少|不准|不许)[^。]{0,6}(?:顶嘴|出声|抱怨|反驳|解释|追问|提问|讲话|说话|吭声|表态)[^。]{0,14}[，,]?(?:但|但是|不过|可是|然而)[^。]{0,12}(?:也别|也不要|更不能|别不|不要不|不许不|不能不)[^。]{0,6}(?:不)?(?:顶嘴|出声|抱怨|反驳|解释|追问|提问|讲话|说话|吭声|表态)/i, 'prohibition_reversal'],
   ],
   en: [[/if you really (?:cared|loved|wanted)[^.]*?(if you |it means)/i, 'bidirectional_negation'],
        [/if you (?:disagree|agree|object|refuse|don'?t|do not)[^.]*?you('re| are)[^.]*?(uneducated|ignorant|wrong|biased|selfish|immoral|lacking|lack)/i, 'bidirectional_negation'],
@@ -2470,6 +2501,8 @@ const DOUBLE_BIND_SEVERITY = { bidirectional_negation: 0.6, contradictory_demand
   // [v6.7.127] 第 76 轮四支新族。severity 低于显式条件句式族：
   false_permission: 0.45, damned_branches: 0.45, ultimatum_expel: 0.45,
   pathologized_defiance: 0.45, negated_feeling_blame: 0.45,
+  // [v6.7.131] 第 321 轮两支散文族（与第 76 轮四族同级：单句、无显式条件词）
+  blame_reversal: 0.45, prohibition_reversal: 0.45,
   // [v6.7.128] 第 97 轮 EN 侧同族移植，与 ZH 第 76 轮取齐（英译形状同强度）
 };
 
@@ -3035,6 +3068,18 @@ const CODE_SECURITY_PATTERNS = {
     /shell\s*[:=]\s*True/i,
     /os\.(?:system|popen)\s*\(\s*(?:f?['"][^'"]*\{(?:user|data|input|cmd|arg)|['"][^'"]*['"]\s*\+)/i,
   ],
+  // [v6.7.131] 第 321 轮：散文式危险执行（**独立类**，不是 command_injection 的一支）
+  // 旧 (c) 支要求 exec/eval 后紧跟执行词，实测「用 eval 直接执行用户提交的代码」——
+  // 中间隔「直接」+ 中文受语 —— 0 命中。
+  // 为什么必须是独立类：需要两条专属豁免（劝阻式否定 / 开发语境可弃目标），
+  // 而 command_injection 类承载着 rm -rf / chmod 777 等 block 级硬判据，
+  // 对它做整类豁免等于把安全红线也放开。独立类让豁免精确落在本族上。
+  // 两半齐备：危险函数 + 执行动词 + 外部/不可信来源修饰 + 代码/数据宾语。
+  // 排除集含逗号：良性「本地测试可以直接用 eval 跑，生产环境…」在逗号处
+  // 断开，后半无外部来源修饰 → 不命中（实测）。
+  exec_prose: [
+    /(?:eval|exec)\s*(?:直接|来|去|进行|拿|用)?\s*(?:执行|运行|跑|处理)[^。；\n,]{0,12}(?:用户|外部|前端|传入|提交|输入|来路|不明|不可信)[^。；\n,]{0,6}(?:的)?(?:代码|内容|字符串|数据|脚本)/i,
+  ],
   ldap_injection: [
     /(?:ldapsearch|ldap\.search|ldapjs|activedirectory)\s*\([^)]*\+?\s*(?:req|request|params|body|input)/i,
     /(?:searchFilter|filter|ldap_query)\s*[:=]\s*['"][^'"]*\+?(?:req|request|params|body|input)/i,
@@ -3091,9 +3136,13 @@ function _devCtxNoBoundary(text) {
 }
 const CS_L = { secret:'critical', sql_injection:'critical', xss:'high', path_traversal:'high',
   insecure_crypto:'medium', command_injection:'critical', ldap_injection:'high',
-  xxe:'high', ssrf:'medium', insecure_deserialization:'high', open_redirect:'high' };
+  xxe:'high', ssrf:'medium', insecure_deserialization:'high', open_redirect:'high',
+  // [v6.7.131] 第 321 轮 exec_prose：散文式危险执行，同为 critical
+  exec_prose:'critical' };
 const CS_W = { secret:0.9, sql_injection:0.9, xss:0.7, path_traversal:0.7, insecure_crypto:0.4,
-  command_injection:0.9, ldap_injection:0.7, xxe:0.7, ssrf:0.6, insecure_deserialization:0.7, open_redirect:0.7 };
+  command_injection:0.9, ldap_injection:0.7, xxe:0.7, ssrf:0.6, insecure_deserialization:0.7, open_redirect:0.7,
+  // [v6.7.131] exec_prose 与 command_injection 同级（0.9）
+  exec_prose:0.9 };
 // [v6.7.125] 开发语境豁免的可丢弃目标表（与 isDevDebugContext 配套使用）。
 // 判定原则：目标必须是**重建成本为零的产物**（构建产物/临时目录/缓存/演示数据/
 // 容器内路径/临时表）。真业务对象（users/orders 等业务表名、/、/var/www 等服务目录、
@@ -3111,6 +3160,8 @@ const DISPOSABLE_TARGET = /(?:^|\s|\/|\.)(?:build|dist|out|target|bin|obj|temp|t
 // 把密码写到日志文件里 / 把 token 明文保存到数据库 / 把密钥发给外部服务器）
 // 全部不含否定词 → 仍命中，零退化（scripts/negative-test-code-security-negation-round73.js）。
 const _NEG_BEFORE_EXFIL = /(?:^|[^\n]{0,18})(?:不要|不能|不可以|不应|不该|请勿|切勿|莫要|禁止|严禁|别|勿|勿将|不可)[^\n]{0,20}(?:把|将|给我|发我|提供|告诉|交出|写|存|保存|存放|发|发送|上传|同步|贴|打印|输出|分享|发到|发给)[^\n]{0,16}(?:密码|口令|密钥|私钥|证书|凭证|凭据|token|api[_.]?key|access[_.]?key|secret|password)/i;
+// [v6.7.131] 第 321 轮：劝阻式危险执行表述的否定豁免（见下方入口判定）
+const _ADVISE_AGAINST_EXEC = /(?:不建议|不要|不能|不应|请勿|禁止|切勿|千万别|避免|反对)[^。\n]{0,12}(?:用|使用)[^。\n]{0,8}(?:eval|exec|Function)\b/i;
 function checkCodeSecurity(text) {
   if (!text || typeof text !== 'string') return { count: 0, issues: [], types: [], score: 0 };
   // [v6.7.127] 安全正向否定豁免（第 73 轮，代码层判定）。
@@ -3131,6 +3182,21 @@ function checkCodeSecurity(text) {
   //      把密钥发给外部服务器）→ 全部仍命中（>0），零退化
   // 边界：只豁免 sensitive_path 的索取式，secret/sql_injection 等
   // 与语境无关的代码漏洞一律不豁免。
+  // [v6.7.131] 第 321 轮：劝阻他人使用危险执行函数（"我不建议用 eval 直接
+  // 执行来路不明的代码"）是**安全正向表述**。旧 _NEG_BEFORE_EXFIL 只覆盖
+  // 凭据索取族（密码/密钥/token），对 exec_prose 新族无豁免。
+  // 与 _NEG_BEFORE_EXFIL 同构：入口判定、命中即整类跳过，其余类型照报。
+  if (_ADVISE_AGAINST_EXEC.test(text)) {
+    const issues = [];
+    for (const [type, patterns] of Object.entries(CODE_SECURITY_PATTERNS)) {
+      if (type === 'exec_prose') continue;
+      for (const pat of patterns) { const m = text.match(pat); if (m) issues.push({ type, severity: CS_L[type] }); }
+    }
+    if (issues.length === 0) return { count: 0, issues: [], types: [], score: 0, exempted: 'negation_safe_advice' };
+    const types2 = [...new Set(issues.map(i => i.type))];
+    const score2 = Math.min(1, Math.max(...types2.map(t => CS_W[t] || 0.4)));
+    return { count: issues.length, issues, types: types2, score: score2, exempted: 'negation_safe_advice' };
+  }
   if (_NEG_BEFORE_EXFIL.test(text)) {
     const issues = [];
     for (const [type, patterns] of Object.entries(CODE_SECURITY_PATTERNS)) {
@@ -3169,15 +3235,14 @@ function checkCodeSecurity(text) {
   //   `执行 rm -rf /var/www 删除网站目录` → 全部无 DEV_CONTEXT 或目标不可弃，豁免不生效。
   if (_devCtxNoBoundary(text) && DISPOSABLE_TARGET.test(text)) {
     const injOnly = !['secret', 'sql_injection', 'xss', 'path_traversal', 'insecure_crypto',
-      'ldap_injection', 'xxe', 'ssrf', 'insecure_deserialization', 'open_redirect']
-      .some(t => CODE_SECURITY_PATTERNS[t].some(p => p.test(text)));
+      'ldap_injection', 'xxe', 'ssrf', 'insecure_deserialization', 'open_redirect'].some(t => CODE_SECURITY_PATTERNS[t].some(p => p.test(text)));
     // injOnly 恒为 true（枚举即全部类型），保留它是为了让「只豁免
     // command_injection」这个约束在源码里可读：真正兜底的是命中类型判定。
     const issues = [];
     for (const [type, patterns] of Object.entries(CODE_SECURITY_PATTERNS)) {
       // 只豁免裸命令形态（command_injection），其余类型一律不豁免——
       // secret/sql_injection 等与语境无关，是代码漏洞本身。
-      if (type === 'command_injection' && injOnly) continue;
+      if ((type === 'command_injection' || type === 'exec_prose') && injOnly) continue;
       for (const pat of patterns) { const m = text.match(pat); if (m) issues.push({ type, severity: CS_L[type] }); }
     }
     if (issues.length === 0) return { count: 0, issues: [], types: [], score: 0, exempted: 'dev_disposable_command' };
@@ -3355,6 +3420,12 @@ const DEHUMANIZATION_PATTERNS = {
       /(?:人|他们|他|她|这家伙|这种人)[^。]{0,6}(?:有病|病得不轻|病态|畸形)/i,
       /(?:传染|扩散|蔓延)[^。]*?(思想|言论|文化|情绪)/i,
       /腐蚀|侵蚀|毒害[^。]*?(心灵|思想|青年|社会|风气)/i,
+      // [v6.7.131] 第 321 轮：疫病喻体 + 指人主语（旧 disease 支的主语表只收
+      // 思想/言论/文化/群体…，漏「反对者/异见者/对手」这类**真人主语**——
+      // 实测同族 2 条攻击 1 条漏判、0 归因）。
+      // 族形状（两半齐备）：指人主语 + 系词 + 疫病/害虫喻体。
+      // 刻意不许中间嵌「的」——「反对者的意见需要被记录」不命中（主语是意见）。
+      /(?:反对者|异见者|持不同意见(?:者|的人)|对手|对方|他们|她们|这些人|这群人|这帮人|那些人|某些人|自由派|保守派|左派|右派|信徒|网民|群众|百姓)(?:都|全|就|简直|根本|完全)?(?:是|属于|就是|全是|简直是|不过是)[^。]{0,4}(?:病毒|害虫|蝗虫|蟑螂|老鼠|蛀虫|毒瘤|癌细胞|瘟疫|病菌|寄生虫|苍蝇|蚊子|蛆虫|蝼蚁)/i,
     ],
     threat: [
       // [v6.7.73] 「威胁检测」「威胁模型」「威胁情报」是安全领域核心术语。
@@ -4510,6 +4581,13 @@ const HATE_SPEECH_ZH = [
   { pattern: /把[^。，]{0,8}(?:移民|难民|黑人|白人|犹太人|穆斯林|同性恋|LGBT|外国人|外地人|这群|这些人)[^。，]{0,6}(?:都|全|统统|全部)?(?:杀光|杀死|消灭|清除|灭绝|赶走|驱逐)/gi, type: 'extermination_call', severity: 1.0 },
   { pattern: /(?:移民|难民|黑人|白人|犹太人|穆斯林|同性恋|LGBT|外国人|外地人)[^。，]{0,8}(?:都)?(?:该死|不配活着|去死|不得好死)/gi, type: 'death_wish', severity: 0.9 },
   { pattern: /我(?:恨|讨厌|恶心|咒骂)(?:所有|全部|全体)?(?:的)?(?:移民|难民|黑人|白人|犹太人|穆斯林|同性恋|LGBT|外国人|外地人)/gi, type: 'group_hatred', severity: 0.85 },
+  // [v6.7.131] 第 321 轮：泛称主体（他们/这些人/那个民族…）+ 生存权否定。
+  // 旧 death_wish 支的主语是**具名族群**（移民/黑人/穆斯林…），对「他们这种人」
+  // 「那个民族」这类泛称完全失效：实测 2/2 漏判、0 归因。
+  { pattern: /(?:他们|她们|这些|那些|这[^。，]{0,4}人|那[^。，]{0,4}人|某些人|那个民族|这个民族|某些民族|这类人|那类人)[^。，]{0,6}(?:就)?(?:不该|不配|不能|不得|要去|该去|应该去|活该去)[^。，]{0,6}(?:活着|活|存在|活在)/gi, type: 'death_wish', severity: 0.9 },
+  // [v6.7.131] 第 321 轮：泛指民族/群体 + 人格污名（「那个民族的人都是垃圾」）。
+  // 旧 dehumanization 支的主语表同样只收具名族群，泛称主体全漏。
+  { pattern: /(?:那个|这个|某些)[^。，]{0,4}(?:民族|国家|地区|种族|宗教|群体)[^。，]{0,6}(?:的)?人[^。，]{0,6}(?:都是|全是|尽是|简直是|不过是)[^。，]{0,6}(?:垃圾|废物|渣子|蛀虫|蝼蚁|牲畜|畜牲|猪狗|败类|人渣)/gi, type: 'group_dehumanization', severity: 0.85 },
 ];
 
 const HATE_SPEECH_EN = [
