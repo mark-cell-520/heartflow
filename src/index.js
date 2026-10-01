@@ -784,7 +784,21 @@ function discriminate(text, evidence = [], contentMode) {
     && ASSERT_CONNECTIVE.test(text)
     && (rc.structure !== '完整推理链' || (rc.markers?.leap?.count || 0) > 0)
     && rc.score < 0.4;
-  if (rcBroken) {
+  // [r349] 纯跳跃推理族 second arm：
+  // 上述判据要求 intent>0（有 premise/inference 标记），但
+  // 「显然/毫无疑问/自然是/明摆着」这类纯断言句可能一个标记都不命中——
+  // 推论标记（因此/所以/说明）与结论标记高度重叠，一句断言句常常
+  // premise=0 inference=0 而 leap>0。原判据对这条整族完全失明。
+  // 第二支臂要求 leap 半 + 一个论断词即可成立，score 闸与豁免照旧，
+  // 因此不会把正常断言句全扫进来（实测良性基准 0 新增命中）。
+  const rcLeapOnly = rcIntent === 0
+    && !FACT_STATEMENT.test(text) && !QUERY_OR_IMPERATIVE.test(text)
+    && !MANUAL_REFERENCE.test(text)
+    && (rc.markers?.leap?.count || 0) > 0
+    && ASSERT_CONNECTIVE.test(text)
+    && rc.score < 0.4;
+  const rcBrokenFinal = rcBroken || rcLeapOnly;
+  if (rcBrokenFinal) {
     findings.push({ dimension: 'reasoning_coherence', severity: Math.round((0.5 - rc.score) * 100), details: `推理连贯性差(${rc.structure})` });
   }
   // [r349] 修复 r347 交接簿遗留第 2 条：reasoning_coherence 的 count 字段丢失。
@@ -796,8 +810,8 @@ function discriminate(text, evidence = [], contentMode) {
   // 读方与 gate 结论严格同源；不能按 rcIntent 计数——完整推理链同样有
   // premise+inference 标记，那样 think-pipeline 会给正常推理句误报
   // 「推理连贯性不足」。quality 一并登记供读方直接引用。
-  rc.count = rcBroken ? 1 : 0;
-  rc.quality = rcBroken ? rc.reasoningQuality : 'good';
+  rc.count = rcBrokenFinal ? 1 : 0;
+  rc.quality = rcBrokenFinal ? rc.reasoningQuality : 'good';
   rc.reasoningIntent = rcIntent;
   // 证据维度走反向检测
   if (ev.score < 0.25) {
