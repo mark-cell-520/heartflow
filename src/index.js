@@ -8243,7 +8243,9 @@ function stereotypeInnateDerog(text, hasChinese) {
   // （probe-4 复现回归：count 0/1）。
   if (hasChinese) {
     const gj = stereotypeGenderJob(text, low);
-    if (gj) return gj;
+    // 只在真命中时早退——空数组 truthy 会把所有中文样本挡在分支4
+    // （本轮回归根因：r49 正例 count 18 → 6，实测复现）
+    if (gj && gj.length) return gj;
   }
   const hasGroup = groups.some(g => low.includes(g.trim().toLowerCase()));
   if (!hasGroup) return [];
