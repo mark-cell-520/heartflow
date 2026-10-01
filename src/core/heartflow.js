@@ -62,7 +62,12 @@ globalThis.WorldLandscape = class { constructor() { this.healthCheck = () => ({o
 // _KnowledgeExplorer() lazy 加载。保留此全局类仅为兼容旧模块引用，
 // **不要**把它当真实现接入。守卫：test/knowledge-explorer-wiring.test.js
 globalThis.KnowledgeExplorer = class { constructor() { this.healthCheck = () => ({ok:true, fake:true, useInstead:'src/cortex/knowledge-explorer.js'}); this.absorbLearnerSignals = () => {}; } };
-globalThis.continuousLearner = { getStats: () => ({ totalConfidenceGaps: 0, topGaps: [] }) };
+// [r316] 原第 65 行有一个假 continuousLearner 全局对象：
+//   globalThis.continuousLearner = { getStats: () => ({ totalConfidenceGaps: 0, topGaps: [] }) };
+// 它的 getStats 返回 totalConfidenceGaps/topGaps，真实实现返回
+// thinkCount/lowConfidenceHits/recentReflections —— 拿到它会把统计当 0，
+// 比空壳更像真相。真实实现：hf.continuousLearner（_ContinuousLearner lazy）。
+// 守卫：test/continuous-learner-wiring.test.js
 globalThis.MacroStrategyInference = require('../cortex/self-evolution/macro-strategy-inference').MacroStrategyInference;
 globalThis.createWorldAwareOrchestrator = ({ projectRoot } = {}) => {
   const engine = new MacroStrategyInference({ projectRoot: projectRoot || process.cwd() });
