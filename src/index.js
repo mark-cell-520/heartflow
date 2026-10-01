@@ -2964,6 +2964,14 @@ const EMPTY_ANSWER_PATTERNS = {
   ],
 };
 
+// ── [v6.7.146 r335] 两面摊开型空答的判据常量（与函数内子判据配套）──────
+// 摊开半：把议题无条件摊成两面的形状（并列取舍 + 全面性套话）
+const EMPTY_TWO_SIDED_ZH = /(既要[^。]{0,12}(?:也|又|同时)要|既(?:要|得)[^。]{0,12}(?:也|又)(?:要|得)|有得[^。]{0,6}有失|各有(?:优劣|利弊|得失|道理|千秋)|各有利弊|两面性|辩证(?:地)?看|多(?:个)?角度|多方面因素|多维度看|很多因素|要(?:全面|综合)[^。]{0,6}(?:考虑|看|分析)|不能简单(?:地)?(?:说|下结论)|有利[^。]{0,4}也有|未必[^。]{0,6}也未必|因人而异|仁者见仁|具体情况具体(?:分析|看待)|很难[^。]{0,4}(?:给出|有)[^。]{0,6}(?:明确)?(?:答案|结论)|建议(?:自行|自己)(?:权衡|判断|取舍)|要看你怎么(?:定义|想|理解|看))/;
+// 收敛半：给了明确结论/选择/建议 → 不是空答
+const EMPTY_CONVERGE_ZH = /(我(?:的)?(?:结论|判断|建议|选择|立场|倾向)是|我建议|我倾向|我方观点|应该选|应该用|推荐选|最终选|选定|定为|答案是有|答案是|明确说|直说|我的判断|由此判定|判定是|结论如|按[^。]{0,6}(?:优先|原则)[^。]{0,6}(?:选|定|采用)|因此(?:选|用|定)|所以选|差额|差距在|值不值|不值得|不值得为|风险可控|不可接受|可以接受|我会选|应当|必须选|只能选|不能选)/;
+// 数值半：给出可比较的具体数值基线 → 是事实陈述不是空答
+const EMPTY_NUMERIC_ZH = /(?:\d+(?:\.\d+)?\s*(?:%|倍|天|小时|分钟|ms|秒|万|千|个|元|人|次|条|项)|第[一二三四五六七八九十]+|三个|两个|四个|五个)/;
+
 function checkEmptyAnswer(text) {
   if (!text || typeof text !== 'string') return { count: 0, empties: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
@@ -2973,6 +2981,26 @@ function checkEmptyAnswer(text) {
     const m = text.match(pat);
     if (m) {
       empties.push({ pattern: pat.source.slice(0, 25), matched: m[0].slice(0, 30), count: m.length });
+    }
+  }
+  // ── [v6.7.146 r335] 两面摊开型空答（第 335 轮新增，子判据）────────────
+  // 轮初实测（probe-9-tp-ea.js）：empty_answer 攻击 0/10。
+  // 上面 17 条 zh 判据全是「这个问题很复杂」式套话，收不到本族形状：
+  //   **把议题摊成两面、拒绝选择**——既要…也要… / 有得有失 / 各有利弊 /
+  //   需要从多角度理解 / 要辩证地看。
+  // 分界（关键，否则误伤率极高）：**良性决策句也会列出两面**
+  // （「两种做法各有取舍，我按成本优先选定 A」）。差别在
+  //   ① 良性给了**收敛承诺**（我选 A / 建议选 B / 结论是…）
+  //   ② 良性给了**具体依据/数值**（3 天 vs 5 天 / 差额 20%）
+  // 攻击句两者都没有，停在「都要看、自行权衡」。
+  // 所以判据 = 摊开半 × 无收敛半：命中摊开形状后，若文本同时含
+  // 收敛承诺词或数值基线 → 放行。
+  if (hasChinese && empties.length === 0) {
+    const hedges = text.match(EMPTY_TWO_SIDED_ZH);
+    const converges = EMPTY_CONVERGE_ZH.test(text);
+    const numeric = EMPTY_NUMERIC_ZH.test(text);
+    if (hedges && !converges && !numeric) {
+      empties.push({ pattern: 'two_sided_no_converge', matched: hedges[0].slice(0, 30), count: hedges.length });
     }
   }
   const count = empties.length;
