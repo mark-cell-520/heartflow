@@ -1,3 +1,75 @@
+# 第 356 轮（v6.7.124 工作面：群体事实差异句误伤族清零 + 置负例守卫，3 commit）
+
+## 方向选择
+
+队列空。r355 交接簿 3 条接手说明逐条复测：第 1 条（2 个 ETIMEDOUT）本轮 run-all
+未复现；第 2 条（82 个未跟踪探针文件）仍在 git status；第 3 条（1/16 良性误伤）
+复测坐实。心虫自选三候选，`decision.decide` 实测选 **C（0.77）**：
+
+- [A] 定位 run-all 的 2 个 ETIMEDOUT——0.74 分
+- [B] 收口 82 个历史未跟踪探针文件的 git 卫生——0.74 分
+- [C] 修 probe-5 暴露的良性误伤 1/16（群体事实差异句）——**0.77 分**
+
+选 C 理由：它是三个候选里唯一「误检」而非「卫生/环境」项，且复测量级比
+r355 记录的大得多——同形状补 16 条新样本后实际误伤 15/16，不是 1/16。
+
+## 根因实测（scripts/round-356/probe-1-group-fact-fp.js）
+
+误伤形状：`studies show / research indicates / data suggests` 这类**模糊来源词**
+同时命中三张表：
+
+| 维度 | 命中的判据 |
+|---|---|
+| `unsupported_claim` | EN 判据第 4 条（studies?/research/data + show/suggest/indicate） |
+| `appeal_to_authority` | `studies show` / `research shows` / `research indicates` |
+| `vagueness` | `studies show` / `research indicates` / `statistics show` |
+
+而三 findings 并存又命中 gate 的 `findings.length > 1` 兜底分支，**三维齐发**
+把正常科学事实差异句全判 verify。良性/攻击分界不是「有没有来源词」——
+是「有没有禀赋高下」：`naturally better at / biologically superior / inherently
+worse at` 才是该族的目标形状，`average grip strength differs` 不是。
+
+## 改了什么（3 commit）
+
+| commit | 内容 |
+|---|---|
+| `eddf443c` | 引擎修复 `src/index.js` +103/-7：新增 `isGroupFactDiffEn()` 判据（差异动词在场 × 归因词缺席 × 高下词缺席），三处同源豁免按形状过滤；归因/高下词在场时不豁免 |
+| `813c232c` | 负例守卫 `scripts/negative-test-group-fact-diff-r356.js`：4 个置假点全变红；r355 守卫的双向门禁误拦断言同步放宽为 `30[12]/326` |
+| `7ad02ec6` | `data/test-count.json` 同步：run-all 实测 16596/0 |
+
+### 守卫设计要点（方法改进，不是本族专用）
+
+第一版守卫照 r355 写法「删掉判据所在行」，4 个删除点全部语法崩
+（`SyntaxError: Unexpected token '}'`），测到的是 parse error 不是判据失效。
+改为「置假」：判断条件替换为 `false`、函数体替换为 `return false`，
+保持语法完整只让豁免失效。**删行法只适用于删完整正则条目，不适用于删
+`if (A && B) return …` 这种控制流短句。**
+
+## 7 项验证结果
+
+| 项 | 结果 |
+|---|---|
+| probe-1（r356） | 良性误伤 **15/16 → 0/16**（base-16 原有 1 条也清零），攻击 **6/6 仍全拦** |
+| 负例守卫（r356） | **NEG_OK：4/4 置假点全变红**（benign nonPass 15/7/15/11），还原后归零 |
+| 负例守卫（r355） | **NEG_OK：6/6 删除点全变红**，双向门禁未回归 |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **302/326**（301 → 302，基线改善 1 条） |
+| `node bin/verify.js` | **14 passed / 0 failed** |
+| `test/security-audit.test.js` | **16/16** |
+| `test/doc-numbers-accuracy.test.js` | **15/15** |
+| `node test/run-all.js` | **16596 通过 / 0 失败**，退出码 0（r355 的 2 个 ETIMEDOUT 未复现） |
+
+## 遗留
+
+1. **93 个未跟踪文件仍在 git status**（r355 遗留第 2 条未动）。构成：scripts/round-299/、301/327/328/330/331/335/353 等多轮探针目录 + 2 个 round353/310b 负例守卫脚本。本轮方向是 C 没做 B，finish 会继续提示「需人工判断」。下一轮若再选 B，建议按 round-XXX/ 目录批量 `git add`，而非逐文件。
+2. **2 个 ETIMEDOUT 本轮未复现但原因未定位**。结论只能写到「本轮 18 分钟全量跑 16596 用例 0 失败，退出码 0」，不能写「问题已解决」——没复现不等于根因清除，可能是并发/磁盘抖动导致的偶发。
+3. **`bin/verify.js` 的 14 项检查不含 run-all**：上一轮报告把 run-all 和 verify 平列为「r354 遗留 3」，实际上 finish 只核查 verify。本轮补齐了实质执行。
+
+## 给下一轮的接手说明
+
+1. **优先做 B（93 个未跟踪文件的 git 卫生）**：形状已明确——`scripts/round-*/` 探针目录 + 2 个未入库负例守卫（`negative-test-4-dims-round353.js`、`negative-test-decision-mode-r310b.js`）。这两个守卫脚本尤其该入库：它们是已跑通的守卫，放在仓库外等于没写。
+2. **负例守卫的新写法要传给下一轮**：「置假」替代「删行」适用于所有 `if (cond) return` 形状的豁免逻辑。既有 r355 守卫的删行法只用在正则条目上是安全的，不要推广。
+3. **英文侧还有同族未测形状**：本轮豁免形状是「模糊来源词 × 度量差异动词」。未测的同源变形：`data suggests` 后接百分比差异（如「polls show a 12% gap between X and Y」）——数字型差异是否也被三维齐发误伤，probe-1 的 16 条良性里没有覆盖。下一轮可先扩这 4~6 条样本再决定是否补判据。
+
 # 第 355 轮（v6.7.124 工作面：收口 r354 遗留 2 条英文漏判 + 负例守卫，3 commit）
 
 ## 方向选择
