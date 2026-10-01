@@ -2425,6 +2425,13 @@ const PSEUDO_CAUSAL_EN = [
   // metricExempt：revenue 属度量名词，故本条须在 vagueSourcePre 不命中时
   // 才成立——已由 isGrandiose 之外的 exempt 分支处理）。
   /\b(?:because|since|thanks to|due to|owing to)\b[^.!?]{0,60}?\b(?:lucky|luck|fortune|feng shui|red (?:shirt|socks|clothes)|constellation|horoscope|zodiac|charm|talisman|ritual|jinqi|(?:the\s+)?(?:weather|rain)\s+was\s+lucky)\b[^.!?]{0,60}?\b(?:won|winning|closed the deal|deal closed|signed the contract|promoted|doubled|succeeded|revenue\s+doubled|sales?\s+doubled)\b/i,
+  // [v6.7.125 第 362 轮] 同族补形：第 ⑭ 支结果动词表缺「具体获益事件
+  // 完成形」（came through / landed / got through）。轮初复测坐实：
+  // 同族 7 条英文样本 1 条 gate pass（probe-1 第 6 条，形状＝归因连接词
+  // × 幸运对象 × promotion came through）。判别形态与 ⑭ 完全一致
+  // （三半 AND + 度量/玄学否决），只是结果动词表窄了一条指代事件。
+  // 反向护栏不放松：luckyAttribPresent 在场时度量豁免照旧失效。
+  /\b(?:because|since|thanks to|due to|owing to)\b[^.!?]{0,60}?\b(?:lucky|luck|fortune|feng shui|red (?:shirt|socks|clothes)|constellation|horoscope|zodiac|charm|talisman|ritual|jinqi)\b[^.!?]{0,60}?\b(?:came through|came in|landed|got through|pulled off|panned out|worked out)\b/i,
 ];
 
 // [v6.7.83] 技术基准句白名单：improves <可度量对象> by Nx 是标准性能声明
@@ -2522,7 +2529,7 @@ const PC_LUCK2_MECH_ZH = /(?:缓存|索引|灰度|回滚|锁|并发|样本量|�
 // 「项目成功是因为前期做了充分压测」「他康复了因为按时吃药」是正常归因。
 // 声明顺序铁律：必须在 PC_CAUSAL_ZH_PATS 数组之前 —— const 有 TDZ，
 // 放在数组后直接 ReferenceError（本轮第一次尝试就是这么崩的）。
-const PC_REV_RES_ZH = /(?:成功|搞定|谈成|签单|中标|盈利|赚了|翻身|上岸|考[上过]|升职|提拔|晋级|通过|上涨|涨了?|翻红|反超|赢[了利]|中了|好转|见效|康复|夺冠|拿下|卖爆|爆单|爆了|翻倍|翻番|倍增|业绩翻|销量翻)/;
+const PC_REV_RES_ZH = /(?:成功|搞定|谈成|签单|中标|盈利|赚了|翻身|上岸|考[上过]|升职|提拔|晋级|通过|上涨|涨了?|翻红|反超|赢[了利]|中了|好转|见效|康复|夺冠|拿下|卖爆|爆单|爆了|翻倍|翻番|倍增|业绩翻|销量翻|订单[^。，,]{0,4}多|来单|成单|客户下单)/;
 const PC_REV_ATTRIB_ZH = /(?:因为|由于|原因是|归功于|全靠|多亏|幸亏|原因就是|都在于|正是因为)/;
 // 无机制归因对象：把结果归给仪式/幸运/颜色服饰/玄学/口号习惯
 const PC_NOOBJ_ZH = /(?:幸运(?:色|物|手链|手环|符|水晶)|吉祥色|吉利色|招财|开运|转运|风水|罗盘|符咒|摆件|财神|护身符|星座|属相|血型|本命年|手气|福气|运势|红(?:色|衣服|袜子|内裤|衬衫|外套)|锦鲤|(?:穿|戴|佩|带)了?[^。]{0,5}色|昵称|头像|壁纸|初一|十五|早起|转发|抽奖|(?:下|晴)?[了]?(?:雨|雪|雷|雾)|台风|彩虹|月亮|潮汐|面相|八字|算命)/;
