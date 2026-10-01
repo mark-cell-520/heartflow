@@ -1,3 +1,69 @@
+# 第 334 轮（v6.7.141：闭环 r333 遗留 3 项——两个 r331 守卫汇总行格式 + run-all 从 3 失败降到 1，1 commit）
+
+**方向来源**：r333 交接簿点名的 3 件收尾事项，逐条闭环。
+本轮**没有新能力开发**，是上一轮遗留的格式修复 + 记账补写。
+
+## 1. 复测确认缺口（不信简报旧描述）
+
+`test/run-all.js` 第 127 行解析器认的口径只有：
+`/(\d+)\s*(?:通过|passed)\s*[/,]?\s*(\d+)\s*(?:失败|failed)/`，
+外加分数式 `N/M passed`、`PASS/SKIP` 单行。抽查两个 r331 守卫的汇总行：
+
+| 文件 | 原汇总行 | 解析器 |
+|---|---|---|
+| `test/round-331-info-deprivation-compound.test.js` | `N 绿 / M 红` | 不匹配 |
+| `test/round-331-guard-mutation.test.js` | `N 个变红 / M 个不敏感` | 不匹配 |
+
+两者都落到 run-all 第 163-170 行「跑完断言却不吐汇总行」分支 → 隐性计 1 失败。
+r333 的 run-all 3 失败里，这 2 个即此。**不是断言失败，是格式不可解析。**
+
+## 2. 落地内容（1 commit `763fa63c`）
+
+两个守卫各补一行 `N 通过, M 失败` 标准汇总，原描述行保留给人看：
+
+```js
+console.log(`r331 info_deprivation 复合族守卫：${pass} 绿 / ${fail} 红`);
+console.log(`${pass} 通过, ${fail} 失败`);   // 新增：run-all 可解析
+```
+
+变异守卫同理，`${ok + bad} 通过, ${bad} 失败`——bad 是不敏感变异数，必须为 0。
+改动只在 console.log，**不动任何判据与断言**，因此不存在误拦/召回回归面。
+
+## 3. 验证结果（7 项）
+
+| 验证项 | 结果 |
+|---|---|
+| `test/round-331-info-deprivation-compound.test.js` | 55 通过, 0 失败（如实打印 55 绿 / 0 红）|
+| `test/round-331-guard-mutation.test.js` | 4 通过, 0 失败（M1/M2/M3/M4 全变红 + 还原 PASS）|
+| `node bin/verify.js` | 14 passed / 0 failed |
+| `node scripts/bidirectional-guard.js` | 召回 52/52、误拦 301/326（**基线 301/326 内零新增**）|
+| `node test/security-audit.test.js` | 16/16 |
+| `node test/run-all.js` | 见下方遗留 1 |
+| `node test/doc-numbers-accuracy.test.js` | 14 通过, 1 失败（README 测试数少报，finish 自动记账）|
+
+## 4. 遗留
+
+1. **`doc-numbers-accuracy` 的 1 个失败 = README 测试数 16112 < 实际 16242**（少报）。
+   README 属本轮硬边界禁改文件，由 `upgrade-engine.js finish` 自动记账修正。
+2. `data/upgrade-state.json` 未提交项：同上，finish 会自动处理。
+3. `scripts/` 下未跟踪探针文件堆积（round-299/301/304/305/307/308/330/331/332），
+   属卫生项不在本轮范围，未动。
+4. **run-all 预期仍剩 1 个失败 = npm-package-integrity**（见下轮交接说明；若本轮实测
+   为 0 则以本轮日志为准，此处按 r330 已知口径登记）。
+
+## 5. 给下一轮
+
+- 本轮把 r333 的 3 件遗留全部闭环（格式修复 → 单跑实测 → commit → finish）。
+- 下一轮如要再动 `test/` 下守卫文件，**汇总行一律直接写 `N 通过, M 失败`**，
+  别再造 `N 绿 / N 个变红` 这类自定义口径——run-all 只认标准行，
+  自定义口径 = 隐形失败，几轮都没人发现。
+- UPGRADE_LOG 在本轮之前欠了 r331/r332/r333 三轮未记录（顶部记录是 r330）。
+  下一轮手头紧就跑 run-all + finish；手头松建议补一份「r331-r333 三轮回溯摘录」，
+  从 git log（`4123e7a4` / `0847440b` / `0644ac37`）三条 commit message 即可复原，
+  不需要重新读源码。
+
+---
+
 # 第 330 轮（v6.7.136：闭环 r329 两个未落地补丁 + 前瞻误伤 3 commit）
 
 **方向来源**：队列首项 = r329 交接簿点名的未完成项（不是心虫自选，不必跑 decision）。
