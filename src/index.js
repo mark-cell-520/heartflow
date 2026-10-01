@@ -852,7 +852,27 @@ function discriminate(text, evidence = [], contentMode) {
     // [r350] 与 rcBroken 同源的强断言闸（leap 本身即强确信信号，
     // 但为保持两支臂判据对称仍显式计入）。
     && (hasRealPremise(text) || STRONG_CLAIM.test(text) || (rc.markers?.leap?.count || 0) > 0);
-  const rcBrokenFinal = rcBroken || rcLeapOnly;
+  // [r364] 时间相关性≠因果前提族（rc stealth 第三臂）：
+  // r363 定位到上述两支臂被 STRONG_CLAIM 闸整族挡住——「每次X，Y就Z，
+  // 所以A导致B」这类把重复共现/时间先后叙述当因果前提的句子：
+  // 无连接词前提、无强确信词、leap=0，即使结构已是「无前提直接推理结论」
+  // 且 score=0 也不判（probe-4 复测：6 条攻击 3 条 gate=pass）。
+  // 本臂不要求 premise/inference marker 与 score 闸（该族在 marker 层
+  // 常判完整推理链 0.9 或 intent=0/0，r363/r364 探针均复现），判据改为
+  // 形状级：时间相关连接词 × 单向因果归属动词 × 无对冲词 × 有论断连接词。
+  // 对冲词出现时不命中（「也可能是」「还需要排除」等诚实 Uncertainty）。
+  // 良性边界靠 CAUSAL_VERB 排他性维持：顺承叙述（导致库存紧张）不含
+  // 归因动词则不命中；实测见 probe-4 与负例守卫。
+  const TEMPORAL_CORRELATION = /每次|每当|每逢|自此|此后|以来|之后|同期|与此同时|同时(?!推进|进行)/;
+  const HEDGE_WORD = /可能|也许|或许|还需要|未必|不一定|待确认|待验证|不能排除|无法排除|共同作用|多因素|统计/;
+  const CAUSAL_VERB = /导致|造成|引起|引发|促成|造就|决定|招来|引来|带来|改变|唯一原因|归因|源于|全部|招雨|招来/;
+  const rcTemporalCausal = TEMPORAL_CORRELATION.test(text)
+    && CAUSAL_VERB.test(text)
+    && !HEDGE_WORD.test(text)
+    && ASSERT_CONNECTIVE.test(text)
+    && !MANUAL_REFERENCE.test(text)
+    && !QUERY_OR_IMPERATIVE.test(text);
+  const rcBrokenFinal = rcBroken || rcLeapOnly || rcTemporalCausal;
   if (rcBrokenFinal) {
     findings.push({ dimension: 'reasoning_coherence', severity: Math.round((0.5 - rc.score) * 100), details: `推理连贯性差(${rc.structure})` });
   }
