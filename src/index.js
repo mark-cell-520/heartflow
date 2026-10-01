@@ -1444,6 +1444,33 @@ function checkContradiction(text) {
   return { count, contradictions, score: Math.min(1, count * 0.3) };
 }
 
+// ─── [r356] 群体事实差异句族 EN（模糊来源词 × 差异动词 × 无归因无高下）────
+// r356 实测（scripts/round-356/probe-1-group-fact-fp.js）：16 条同形状良性
+// 英文事实陈述句 15 条被判 verify ——「studies show / research indicates /
+// data suggests」这类模糊来源词同时命中三张表：
+//   unsupported_claim（EN 判据第 4 条：studies?/research/data + show）、
+//   appeal_to_authority（studies show / research shows）、
+//   vagueness（studies show / research indicates / statistics show）；
+// 而 findings.length>1 又额外命中 verify 兜底分支，形成三维齐发。
+// 判据形状（两半 AND，与已坐实的攻击族互补）：
+//   差异半：differ/vary/higher/lower/greater/average 等度量差异动词
+//     —— 陈述「有差别」而非「有高下」；
+//   排除半：无天生归因词（naturally/biologically/inherently/born/DNA）
+//     × 无禀赋高下词（better at/worse at/superior/inferior/…）。
+// 良性边界：含归因或高下词的句子不被豁免，unsupported_claim 照判，
+// 攻击侧召回不变（实测 6/6 攻击样本豁免后仍全部非 pass）。
+const GROUP_FACT_DIFF_EN = {
+  verb: /\b(?:differ(?:s|ent)?|var(?:y|ies)|higher|lower|greater|larger|smaller|average(?:s)?|more|less)\b/i,
+  attribution: /\b(?:naturally|biological(?:ly)?|genetic(?:s|ally)?|born\b|hardwired|wired|DNA|inherently)\b/i,
+  ranking: /\b(?:better at|worse at|best at|worst at|superior|inferior|smarter|more intelligent|less intelligent|less capable|more capable|weaker|stronger|less competent|more competent)\b/i,
+};
+function isGroupFactDiffEn(text) {
+  const low = text.toLowerCase();
+  return GROUP_FACT_DIFF_EN.verb.test(low)
+    && !GROUP_FACT_DIFF_EN.attribution.test(low)
+    && !GROUP_FACT_DIFF_EN.ranking.test(low);
+}
+
 // ─── 模糊/模棱两可检测（weasel words）─────────────────────────────
 const VAGUE_PATTERNS = {
   zh: [/相关方面/i, /有关部门/i, /业内人士/i, /知情人士/i, /据传/i, /消息称/i, /可能也许/i, /大概可能/i, /某种程度/i, /在一定情况下/i, /有人说/i, /据了解/i, /据悉/i, /或可/i, /或会/i, /不排除/i,
@@ -1508,6 +1535,9 @@ function checkVagueness(text) {
     if (m) matches.push({ pattern: m[0].slice(0, 20), count: m.length });
   }
   const count = matches.length;
+  // [r356] 群体事实差异句豁免：studies show + differ/higher/average 形状
+  // 的度量差异陈述不是模糊话术（详见 isGroupFactDiffEn 注释）。
+  if (count > 0 && !hasChinese && isGroupFactDiffEn(text)) return { count: 0, matches: [], score: 0 };
   return { count, matches, score: explicitSource ? 0 : Math.min(1, count * 0.2) };
 }
 
@@ -2687,6 +2717,12 @@ function checkUnsupportedClaim(text) {
     /\b(?:data|report|statistics)\b[^.]{0,20}\b(?:from|sourced from|based on)\b[^.]{0,20}\b(?:annual report|audit|official|database|source)\b/i,
   ];
   const hasPublicAuthority = publicAuthoritySource.some(p => p.test(text));
+  // [r356] 群体事实差异句豁免：度量差异陈述（studies show … differs /
+  // higher / average）既非编造模板也非权威压制，是正常的科学事实引用。
+  // 归因/高下词在场时不豁免（含自然禀赋高下的句子正是该维度的目标）。
+  if (count > 0 && !hasChinese && isGroupFactDiffEn(text)) {
+    return { count: 0, claims: [], score: 0 };
+  }
   // 因果结论守卫：即使有具体来源+保留语，若文本在断言"因果/健康/疗效"类强结论
   // （延长寿命/治愈/根治/降低XX风险/提高XX率），仍不豁免——这类是最危险的编造模板。
   const causalClaim = hasChinese ? [
@@ -5970,10 +6006,13 @@ function checkAppealToAuthority(text) {
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   const patterns = hasChinese ? AUTHORITY_PATTERNS.zh : AUTHORITY_PATTERNS.en;
   const signals = [];
+  const signalsRaw = [];
   for (const pat of patterns) {
     const m = text.match(pat);
     if (m) {
-      signals.push({ pattern: pat.source.slice(0, 25), type: 'appeal_to_authority' });
+      const entry = { pattern: pat.source.slice(0, 25), type: 'appeal_to_authority' };
+      signals.push(entry);
+      signalsRaw.push(entry);
     }
   }
   // ── [第 227 轮] 第一人称权威压制族：身份半 AND (服从半 OR 终止论证半) ──
@@ -6004,12 +6043,18 @@ function checkAppealToAuthority(text) {
     }
   }
   // Deduplicate by pattern to avoid counting same pattern multiple times
-  const unique = [];
-  const seen = new Set();
-  for (const s of signals) {
-    if (!seen.has(s.pattern)) {
-      seen.add(s.pattern);
-      unique.push(s);
+  // [r356] 群体事实差异句豁免：studies show / research shows 出现在
+  // 「度量差异」陈述里（详见 isGroupFactDiffEn 注释），不是用权威身份
+  // 替代论证。归因/高下词在场时不豁免。
+  // signalsRaw 在过滤前保存，供豁免计数判断用。
+  let unique = [];
+  {
+    const filtered = (signalsRaw.length > 0 && !hasChinese && isGroupFactDiffEn(text))
+      ? signals.filter(s => !/studies|research|data (show|indicate|prove)/i.test(s.pattern))
+      : signals;
+    const seen = new Set();
+    for (const s of filtered) {
+      if (!seen.has(s.pattern)) { seen.add(s.pattern); unique.push(s); }
     }
   }
   const count = unique.length;
@@ -9900,6 +9945,7 @@ module.exports = {
   checkWhataboutism,
   checkDogwhistle,
   checkAppealToAuthority,
+  stereotypeInnateDerog,
   checkSlipperySlope,
   checkReasoningCoherence,
   checkTheoryOfMind,
