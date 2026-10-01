@@ -1,4 +1,57 @@
-# 第 348 轮（v6.7.155 工作面：收口 r347 —— bad_faith 自述型坏信念补测试/守卫/七项验证，3 commit）
+# 第 351 轮（v6.7.125 工作面：闭环 r350 遗留 2 项 —— gate(Symbol) 崩点修复 + 负例守卫，2 commit）
+
+## 方向选择
+
+r350 交接簿两条遗留，逐条复测后全部坐实：
+①「2 个失败未能定位」—— `/tmp/r350-runall2.log` 反查：`doc-numbers-accuracy` 1 失败
+（README 测试数 16462 < 实测 16594，记账缺口）+ `dangerous-instruction-en-listverb-round211`
+1 失败（第 211 轮守卫 77 通过 / 1 失败）。都不是「日志不可读」，是可定位的真实条目。
+②「finish 未执行、锁未释放、README 未记账」。
+
+## 根因实测（scripts/round-351/probe-1-symbol.js）
+
+8 种非字符串输入喂 `gate()`：null / undefined / 42 / {} / [] / true / () => {} 全部返回
+`pass`，**只有 `Symbol('x')` 抛 TypeError**：
+`Cannot convert a Symbol value to a string` at `RegExp.test` → `src/index.js` 第 818 行
+（reasoning_coherence 判据里的 `FACT_STATEMENT.test(text)`），栈顶在 `discriminate()`。
+根因：`discriminate()` 入口只把非字符串变成空串（`_normText` / `_origText` 两分支），
+但 800+ 行判据区仍有直接读 `text` 的正则测试，`RegExp.test(symbol)` 合法调用但隐式
+`String()` 对 symbol 必然抛。**不是心虫能力缺口，是入口类型卫生缺口**，优先级高于心虫自选。
+
+## 改了什么（2 commit）
+
+| commit | 内容 |
+|---|---|
+| `b21dda83` | 引擎修复：`discriminate()` 入口新增 `if (typeof text === 'symbol') text = String(text);`，G 组守卫 77→78 全绿 |
+| `87b2e9e5` | 负例守卫 `scripts/negative-test-symbol-input-round351.js`：2 个删除点全变红、基线还原 78/0 |
+
+守卫设计：删除点 1 = 整行摘除 symbol 保护；删除点 2 = 改成恒 false 的无效判定。
+两点各自把第 211 轮守卫打回「77 通过 / 1 失败」，证明守卫真的挂在 symbol 保护上，
+不是恒真摆设。
+
+## 验证结果（已跑项）
+
+| 项 | 结果 |
+|---|---|
+| `node bin/verify.js` | **14 passed / 0 failed** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线零新增） |
+| `test/round-211 dangerous-instruction-en-listverb` | **78 passed / 0 failed**（原 77/1） |
+| `test/security-audit.test.js` | **16/16** |
+| `scripts/negative-test-symbol-input-round351.js` | **2/2 删除点变红、基线还原绿** |
+| `node --check src/index.js` | 通过 |
+
+## 给下一轮的接手说明
+
+1. run-all 全量结果以 `/tmp/r351-runall.log` 为准：目标条目 round211 与
+   doc-numbers-accuracy 均已单独复跑转绿，全量预期只剩 npm-package-integrity
+   或记账类历史项；若仍见失败先反查具体文件行号，不要再写「未能定位」。
+2. 本次两个删除点都是「真变红」——r350 汇报里「第 6 个删除点恒真不可观察」的
+   处置被本轮沿用：没造恒真删除点，1 与 2 均是可观察行为变化。
+3. 遗留观察（不修，只记账）：判据区有 800+ 行直接读 `text` 的正则测试，本轮只
+   在入口挡了 symbol 一族。若后续发现 BigInt / 带 toString 抛错的对象同样崩，
+   按同型入口归一化处理（已在日志记录形状）。
+
+## 第 348 轮（v6.7.155 工作面：收口 r347 —— bad_faith 自述型坏信念补测试/守卫/七项验证，3 commit）
 
 ## 方向选择
 
