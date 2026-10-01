@@ -125,6 +125,13 @@ memory/q-table.json
 # 模型权重（86MB 级，绝不入库）
 *.onnx
 
+# 轮次探针目录（scripts/round-*/ 是一次性诊断脚本，每轮 git add -A 会顺带入库，
+# 到 r319 已累积 1023 个文件。历史文件保留不动，从 r319 起新轮次探针一律不入库）
+scripts/round-31*/
+scripts/round-32*/
+scripts/round-4*/
+scratch/
+
 # Action 运行产物（默认报告名 + 自定义报告目录）
 heartflow-audit-report.md
 reports/
