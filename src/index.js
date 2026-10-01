@@ -2400,6 +2400,10 @@ function checkEvidence(claim, evidence) {
 // ─── 伪因果精确倍数检测（Pseudo Causal）— 精确倍数因果声称 ──
 // 识别"reduced by 3.2x / improved 5x / 2.3-fold"等精确倍数因果声称。
 // 这类声称若无具体可验证来源（arxiv/DOI/具体机构+年份）则是编造高风险信号。
+// [v6.7.124 第 360 轮] 英文玄学归因对象表：与 PSEUDO_CAUSAL_EN 正序族的
+// 丙半同源，供 checkPseudoCausal 的度量豁免做反向否决用（度量名词在场
+// 也不豁免）。声明必须在 PSEUDO_CAUSAL_EN 之前（const TDZ）。
+const PC_FWD_LUCKY_EN = /\b(?:lucky|luck|fortune|feng ?shui|red (?:shirt|socks|clothes)|constellation|horoscope|zodiac|charm|talisman|ritual|jinqi)\b/i;
 const PSEUDO_CAUSAL_EN = [
   /\b(?:reduces?|reduced|lowers?|lowered|decreases?|decreased|drops?|dropped|slashes?|slashed|cut)\b[^.!?]{0,32}?\bby\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold)\b/i,
   // [v6.7.83] 补第三人称单数 + 过去分词。分支顺序：长的必须在前（improves
@@ -2410,6 +2414,17 @@ const PSEUDO_CAUSAL_EN = [
   // throughput by 3x" 都漏——grep 不到任何 hits。
   /\b(?:improves?|improved|increases?|increased|boosts?|boosted|raises?|raised|enhances?|enhanced)\b[^.!?]{0,32}?\bby\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold|%)\b/i,
   /\bby\s+(?:exactly\s+)?\d+(?:\.\d+)?\s*(?:x|times|fold)\s+(?:compared\s+to|vs|versus|over)\b/i,
+  // [v6.7.124 第 360 轮] 英文正序族：玄学/运气归因对象 × 获益结果。
+  // 轮初实测（scripts/round-360/probe-3）：中文反序/正序判据上线后，
+  // 英文同族 3 条攻击（Because the weather was lucky, so the deal closed /
+  // Since he wore the lucky color, therefore we won the bid /
+  // Thanks to the feng shui setup, revenue doubled this year）全 pass。
+  // PSEUDO_CAUSAL_EN 只收「Nx 精确倍数」族，没有归因族。
+  // 判据形状（三半 AND）：归因连接词 × 无机制归因对象 × 获益/结果动词。
+  // 反向：可验证具体来源/度量对象在场时豁免（见 checkPseudoCausal 的
+  // metricExempt：revenue 属度量名词，故本条须在 vagueSourcePre 不命中时
+  // 才成立——已由 isGrandiose 之外的 exempt 分支处理）。
+  /\b(?:because|since|thanks to|due to|owing to)\b[^.!?]{0,60}?\b(?:lucky|luck|fortune|feng shui|red (?:shirt|socks|clothes)|constellation|horoscope|zodiac|charm|talisman|ritual|jinqi|(?:the\s+)?(?:weather|rain)\s+was\s+lucky)\b[^.!?]{0,60}?\b(?:won|winning|closed the deal|deal closed|signed the contract|promoted|doubled|succeeded|revenue\s+doubled|sales?\s+doubled)\b/i,
 ];
 
 // [v6.7.83] 技术基准句白名单：improves <可度量对象> by Nx 是标准性能声明
@@ -2500,12 +2515,23 @@ const PC_LUCK2_MECH_ZH = /(?:缓存|索引|灰度|回滚|锁|并发|样本量|�
 // 「项目成功是因为前期做了充分压测」「他康复了因为按时吃药」是正常归因。
 // 声明顺序铁律：必须在 PC_CAUSAL_ZH_PATS 数组之前 —— const 有 TDZ，
 // 放在数组后直接 ReferenceError（本轮第一次尝试就是这么崩的）。
-const PC_REV_RES_ZH = /(?:成功|搞定|谈成|签单|中标|盈利|赚了|翻身|上岸|考[上过]|升职|提拔|晋级|通过|上涨|涨了?|翻红|反超|赢[了利]|中了|好转|见效|康复|夺冠|拿下|卖爆|爆单|爆了)/;
+const PC_REV_RES_ZH = /(?:成功|搞定|谈成|签单|中标|盈利|赚了|翻身|上岸|考[上过]|升职|提拔|晋级|通过|上涨|涨了?|翻红|反超|赢[了利]|中了|好转|见效|康复|夺冠|拿下|卖爆|爆单|爆了|翻倍|翻番|倍增|业绩翻|销量翻)/;
 const PC_REV_ATTRIB_ZH = /(?:因为|由于|原因是|归功于|全靠|多亏|幸亏|原因就是|都在于|正是因为)/;
 // 无机制归因对象：把结果归给仪式/幸运/颜色服饰/玄学/口号习惯
-const PC_NOOBJ_ZH = /(?:幸运(?:色|物|手链|手环|符|水晶)|吉祥色|吉利色|招财|开运|转运|风水|罗盘|符咒|摆件|财神|护身符|星座|属相|血型|本命年|手气|福气|运势|红(?:色|衣服|袜子|内裤|衬衫|外套)|(?:穿|戴|佩|带)了?[^。]{0,5}色|昵称|头像|壁纸|初一|十五|早起|转发|抽奖|(?:下|晴)?[了]?(?:雨|雪|雷|雾)|台风|彩虹|月亮|潮汐|面相|八字|算命)/;
+const PC_NOOBJ_ZH = /(?:幸运(?:色|物|手链|手环|符|水晶)|吉祥色|吉利色|招财|开运|转运|风水|罗盘|符咒|摆件|财神|护身符|星座|属相|血型|本命年|手气|福气|运势|红(?:色|衣服|袜子|内裤|衬衫|外套)|锦鲤|(?:穿|戴|佩|带)了?[^。]{0,5}色|昵称|头像|壁纸|初一|十五|早起|转发|抽奖|(?:下|晴)?[了]?(?:雨|雪|雷|雾)|台风|彩虹|月亮|潮汐|面相|八字|算命)/;
 // 机制/治疗/统计/资金依据：归因对象在场即正常归因，不判
 const PC_REV_MECH_ZH = /(?:机制|原理|架构|设计|压测|测试|代码|Bug|修复|优化|重构|缓存|索引|灰度|回滚|部署|训练|模型|样本量|变量|回归|实验组|对照组|评审|排期|复盘|协作|配合|投入|研发|营销|渠道|药|医嘱|治疗|疗程|成分|药理|医生|诊断|手术|数据|统计|指标|注资|融资|立项|需求|供应链|产能|品牌|定价|合规|谈判|招标|资质|专利|打磨|调研|迭代)/;
+// ─── [v6.7.124 第 360 轮] 中文「归因在前 × 获益结果在后」伪归因族 ───────
+// 轮初实测（scripts/round-360/probe-3~6）：r357 第⑫支（反序族）上线后，
+// 正序同族形状「因为/全靠 + 无机制归因对象 + 获益结果」10 条攻击样本
+// gate 层 9/10 仍全 pass（probe-3 实测 ATTACK 1/10）。根因：已建判据里
+// 归因引导词+获益结果的组合只存在于反序版（RES→ATTRIB→NOOBJ）。
+// 判据形状（三半 AND，缺一不命中）—— 与第⑫支同源镜像：
+//   甲半 PC_FWD_ATTRIB_ZH：归因引导词（因为/全靠/多亏/归功于…）
+//   乙半 PC_REV_RES_ZH：获益/结果动词（签单/中标/涨/成功…，复用反序族表）
+//   丙半 PC_NOOBJ_ZH：无机制归因对象（风水/红衣服/锦鲤/运气…）
+// 反向：PC_REV_MECH_ZH（机制/统计/资金依据在场即正常归因，不判）。
+const PC_FWD_ATTRIB_ZH = /(?:因为|由于|原因是|归功于|全靠|多亏|幸亏|原因就是|都在于|正是因为|全靠这?|就在[这于])/;
 const PC_CAUSAL_ZH_PATS = [
   // ① 顺序标记 × 归因断言（主判据）
   new RegExp(PC_SEQ_ZH.source + '[^。]{0,44}?' + PC_ATTRIB_ZH.source),
@@ -2539,6 +2565,9 @@ const PC_CAUSAL_ZH_PATS = [
   // 与⑩⑪同为 ACT→RES 单向判据的补集——本支是 RES→ATTRIB→NOOBJ。
   // 三半缺一不命中；机制词护栏（PC_REV_MECH_ZH）见函数体 weak 逻辑。
   new RegExp(PC_REV_RES_ZH.source + '[^。]{0,44}?' + PC_REV_ATTRIB_ZH.source + '[^。]{0,14}?' + PC_NOOBJ_ZH.source),
+  // ⑬ [v6.7.124 第 360 轮] 正序族：归因在前 × 获益结果 × 无机制归因对象。
+  // 第⑫支的镜像（ATTRIB→NOOBJ/RES），见 PC_FWD_ATTRIB_ZH 上方注释。
+  new RegExp(PC_FWD_ATTRIB_ZH.source + '[^。]{0,44}?' + PC_NOOBJ_ZH.source + '[^。]{0,44}?' + PC_REV_RES_ZH.source),
 ];
 // 对冲/机制说明：文本自认别因、样本受限或给出机制时不算伪因果
 const PC_HEDGE_ZH = /(?:不好归因|看不出主因|待评估|不能(?:直接)?归因|也可能|需要再观察|同期|混在一起|拆开看|样本(?:太|还)小|但[^。]{0,14}(?:不能|不好|还要|未见|未必)|Explain|因为[^。]{0,24}(?:被|省|挡|发现|省掉)|机制|更多是|主要是|回归分析|总体|整体)/;
@@ -2586,6 +2615,8 @@ function causalOverclaimZh(text) {
     if (pat === PC_CAUSAL_ZH_PATS[10] && luckMech) continue;
     // [v6.7.128 第 357 轮] 第 ⑫ 支命中但带机制/依据名词 → 放行
     if (pat === PC_CAUSAL_ZH_PATS[11] && revMech) continue;
+    // [v6.7.124 第 360 轮] 第 ⑬ 支（正序族）带同一机制护栏
+    if (pat === PC_CAUSAL_ZH_PATS[12] && revMech) continue;
     // ①⑤⑨ 是「弱形状」判据：必须同时无数字护栏、无他因信号才成立。
     // ②③④⑦⑧ 是强断言论（的锅/一…就/都发生在/中间只差/最X+归因），
     // 只要函数头的对冲没拦就成立。
@@ -2624,6 +2655,12 @@ function checkPseudoCausal(text) {
     || /\d+\s*(?:x|times|fold)\s*!/.test(text)
     || /(?:improves?|increased?|boosted?)\b[^.!?]*![^.!?]*\d+\s*(?:x|times|fold)/i.test(text);
   const exempt = metricExempt && !isGrandiose;
+  // [v6.7.124 第 360 轮] 玄学归因族（英文正序族）豁免维度：度量名词本身
+  // 不足以豁免——「revenue doubled thanks to the feng shui setup」正是
+  // 玄学归因 + 度量对象的合体。只有句中**不含玄学/运气归因对象**时，
+  // 度量豁免才成立（否则「风水×收入翻倍」会静默放过）。
+  const luckyAttribPresent = !hasChinese && PC_FWD_LUCKY_EN.test(text);
+  const exemptFinal = exempt && !luckyAttribPresent;
   const patterns = hasChinese ? PSEUDO_CAUSAL_ZH : PSEUDO_CAUSAL_EN;
   // [v6.7.127 第 87 轮] 中文倍数判据的数字基线护栏。
   // 回归来源：本轮给族 A 补反向量词判据后，第 48 轮既有测试抓到回归——
@@ -2638,7 +2675,7 @@ function checkPseudoCausal(text) {
   for (const pat of patterns) {
     const m = text.match(pat);
     if (!m) continue;
-    if (exempt) continue;
+    if (exemptFinal) continue;
     if (hasChinese && PC_FACT_BASE_ZH.test(text)) continue;
     hits.push(m[0].slice(0, 50));
   }
