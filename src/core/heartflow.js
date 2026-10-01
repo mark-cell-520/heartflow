@@ -53,7 +53,15 @@ globalThis.ProcessRewardModel = class { constructor() { this.healthCheck = () =>
 globalThis.DesireCognition = class { constructor() { this.healthCheck = () => ({ok:true}); } };
 globalThis.CognitiveLoadCalculator = class { constructor() { this.healthCheck = () => ({ok:true}); } };
 globalThis.WorldLandscape = class { constructor() { this.healthCheck = () => ({ok:true}); this.createWorldAwareOrchestrator = () => ({ orchestrate: () => ({}), healthCheck: () => ({ok:true}) }); } };
-globalThis.KnowledgeExplorer = class { constructor() { this.healthCheck = () => ({ok:true}); this.absorbLearnerSignals = () => {}; } };
+// [r315 标注] ⚠️ 以下是 FAKE 假桥接类，不是能力实现。
+// 它只有 healthCheck 与空 absorbLearnerSignals，没有 getGaps/registerGap/
+// nextToExplore —— 历史上（v6.3.45 删模块后）heartflow.js 的
+// `new KnowledgeExplorer()` 解析到它，所有调用点撞 TypeError 后被
+// try/catch 静默吞掉，看着有路由实际零能力。
+// 真实实现已迁到 src/cortex/knowledge-explorer.js，实例化一律走
+// _KnowledgeExplorer() lazy 加载。保留此全局类仅为兼容旧模块引用，
+// **不要**把它当真实现接入。守卫：test/knowledge-explorer-wiring.test.js
+globalThis.KnowledgeExplorer = class { constructor() { this.healthCheck = () => ({ok:true, fake:true, useInstead:'src/cortex/knowledge-explorer.js'}); this.absorbLearnerSignals = () => {}; } };
 globalThis.continuousLearner = { getStats: () => ({ totalConfidenceGaps: 0, topGaps: [] }) };
 globalThis.MacroStrategyInference = require('../cortex/self-evolution/macro-strategy-inference').MacroStrategyInference;
 globalThis.createWorldAwareOrchestrator = ({ projectRoot } = {}) => {
