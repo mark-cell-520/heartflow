@@ -8197,7 +8197,7 @@ const STER_CONTRAST = [
 //   ③ 贬损禀赋词（差/不擅长/情绪化/不行/悟性差…）
 // 单信号或信号间不相邻不命中；含「平均/数据/研究表明」等统计措辞的对照句
 // 因无本质主义 + 贬损耦合也不命中。
-const STER_GENDER_ZH = ['女性', '男性', '女生', '男生', '女人', '男的', '女孩', '男孩'];
+const STER_GENDER_ZH = ['女性', '男性', '女生', '男生', '女人', '男的', '女孩', '男孩', '女', '男'];
 const STER_JOB_ZH = [
   '员工', '职员', '工程师', '程序员', '司机', '护士', '教师', '编辑', '记者',
   '销售', '客服', '运营', '产品经理', '设计师', '科学家', '领导', '老板',
@@ -8231,17 +8231,20 @@ function stereotypeGenderJob(text, low) {
 
 function stereotypeInnateDerog(text, hasChinese) {
   const low = text.toLowerCase();
-  // [v6.7.127 第 365 轮] 性别×职业族（分支4）自带群体信号，必须早于通用
-  // hasGroup 闸：「女员工/女司机/男护士」这类组合不含 STER_GROUP_ZH 任何
-  // 完整词条（该表只有零散的「女司机」「产品经理」），走通用闸会被
+  const groups = hasChinese ? STER_GROUP_ZH : STER_GROUP_EN;
+  const innate = hasChinese ? STER_INNATE_ZH : STER_INNATE_EN;
+  const derog = hasChinese ? STER_DEROG_ZH : STER_DEROG_EN;
+  // [v6.7.127 第 365 轮] 性别×职业族（分支4）自带群体信号，在 hasGroup
+  // 通用闸之前判定：「女员工/女司机/男护士」这类组合不含 STER_GROUP_ZH
+  // 任何完整词条（该表只有零散的「女司机」「产品经理」），走通用闸会被
   // `if (!hasGroup) return []` 提前挡掉（probe-2 复现）。
+  // 只用 return 早退——**不**在未命中时返回空数组，未命中必须继续走
+  // 原有三支，否则「女性天生就是比男性情绪化」这类 r49 已收样本被挡
+  // （probe-4 复现回归：count 0/1）。
   if (hasChinese) {
     const gj = stereotypeGenderJob(text, low);
     if (gj) return gj;
   }
-  const groups = hasChinese ? STER_GROUP_ZH : STER_GROUP_EN;
-  const innate = hasChinese ? STER_INNATE_ZH : STER_INNATE_EN;
-  const derog = hasChinese ? STER_DEROG_ZH : STER_DEROG_EN;
   const hasGroup = groups.some(g => low.includes(g.trim().toLowerCase()));
   if (!hasGroup) return [];
   const hasInnate = innate.some(g => low.includes(g.trim().toLowerCase()));
@@ -9876,7 +9879,8 @@ const PSEUDO_PHILOSOPHY_ZH = [
   /\u4e0d\u662f(?:[^\u3002\uff01\uff1f\n]{1,6})?(?:\u60f3|\u8981|\u613f\u610f)[^\u3002\uff01\uff1f\n]{1,10}\u5c31[^\u3002\uff01\uff1f\n]{1,10}\uff0c?\u800c\u662f(?:\u4e0d)?(?:\u60f3|\u8981|\u613f\u610f)[^\u3002\uff01\uff1f\n]{1,10}\u5c31(?:\u4e0d)?[^\u3002\uff01\uff1f\n]{1,10}/,
 
   // \u2467-2 \u504f\u6b63\u8fa9\u8bc6 B \u4fa7\u8865\u5ea6\u91cf\u5bf9\u7acb\u8bcd
-  /\u4e0d\u662f[^\u3002\uff01\uff1f\n]{1,12}\u5f97(?:\u591a|\u5c11)[\s,\\uff0c]*\u800c\u662f(?:\u8ba1\u8f83|\u770b\u5f85|\u5728\u4e4e|\u5173\u6ce8)[^\u3002\uff01\uff1f\n]{0,6}\u5f97(?:\u5c11|\u591a)/,
+  /不是[^\u3002\uff01\uff1f\n]{1,12}得(?:多|少)[\s,\\\uff0c]*而是(?:计较|看待|在乎|关注)[^\u3002\uff01\uff1f\n]{0,6}得(?:少|多)/,
+
 ];
 
 // [v6.7.125+2 第 297 轮] 技术实体归因排除闸门。
@@ -9911,6 +9915,53 @@ function isTechSubject(text) {
   return TECH_SUBJECT_NOUNS.test(subj);
 }
 
+// ─── 自指同义反馈族（第 365 轮）────────────────────────────
+// 缺口复测（scripts/round-365/probe-1）：3 条 ppf_stealth 中 2 条 gate=pass
+// （「存在的意义就是存在者为何存在」「时间的意义在于时间如何成为它自己」）。
+// 形状不属于任何既有族：无「不是A，而是B」辩证、无比喻明喻。
+// 判据（probe-2 先测后改）：主语落抽象域词表 × 术语名词在定义短语内
+// × 宾语与主语同根 × 句内仅一条小句。probe-2 实测命中 4/4、良性 0/14。
+const PPF_SELF_SUBJ = ['生命', '人生', '时间', '存在', '自由', '爱情', '幸福', '孤独', '成长', '死亡', '命运', '灵魂', '生活', '意义'];
+const PPF_SELF_TERM = ['意义', '本质', '价值', '真谛', '目的', '方向', '定义', '答案'];
+const PPF_SELF_COP = ['就是', '在于', '正是', '其实是', '真正是', '正在于'];
+const PPF_SELF_OBJ_RE = /(自己|本身|自身|它自己)/;
+const PPF_SELF_WHY_RE = /(为何|如何|何以|是什么|是什么人|为了什么)/;
+
+function ppfSelfReferential(text) {
+  if (!text || typeof text !== 'string') return false;
+  const t = text.trim();
+  // 句内只能有一条小句：出现第二条小句标志（逗号/分号/设问后）即放行
+  if (/[，,；;。！？]/.test(t.slice(t.length - 2)) && !/[。！？]$/.test(t)) { /* 尾部忽略 */ }
+  if (/[，,；;]/.test(t.replace(/^[^，,；;]{0,6}[，,；;]/, ''))) {
+    // 允许开头短引导语后接一个逗号（「说到底，存在的意义…」），其余一律放行
+    if (!/^[^，,；;]{0,6}[，,；;][^，,；;]*$/.test(t)) return false;
+  }
+  const subjIdx = [];
+  for (const s of PPF_SELF_SUBJ) {
+    const i = t.indexOf(s);
+    if (i !== -1 && i <= 8) subjIdx.push({ s, i });
+  }
+  if (!subjIdx.length) return false;
+  for (const { s, i } of subjIdx) {
+    const rest = t.slice(i + s.length);
+    const termM = rest.match(/^\s*的?\s*(意义|本质|价值|真谛|目的|方向|定义|答案)/);
+    if (!termM) continue;
+    const afterTerm = rest.slice(termM[0].length);
+    const copM = afterTerm.match(/^\s*(就是|正在于|在于|正是|其实是|真正是)/);
+    if (!copM) continue;
+    const obj = afterTerm.slice(copM[0].length);
+    if (obj.length < 1 || obj.length > 20) continue;
+    // 主语根词必须复现（同根或含主语自身）
+    if (!obj.includes(s)) continue;
+    // 宾语必须是自指或疑问回指形态（「它自己」「为何」）
+    if (!(PPF_SELF_OBJ_RE.test(obj) || PPF_SELF_WHY_RE.test(obj))) continue;
+    // 第二小句特征：宾语里出现并列分句（含有逗号/连词）——排除
+    if (/[而且并且但是所以]/.test(obj)) continue;
+    return true;
+  }
+  return false;
+}
+
 function checkPseudoProfundity(text) {
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   // [v6.7.82] 中文侧合并 PSEUDO_PHILOSOPHY_ZH（伪哲理句式）。
@@ -9942,6 +9993,10 @@ function checkPseudoProfundity(text) {
     return { count: matches.length, matches, score: Math.min(1, matches.length * 0.25) };
   }
   for (const pat of patterns) { const m = limited.match(pat); if (m) matches.push({ pattern: pat.source.slice(0, 25) }); }
+  // [v6.7.127+2 第 365 轮] 自指同义反馈族接线
+  if (matches.length === 0 && ppfSelfReferential(limited)) {
+    return { count: 1, matches: [{ pattern: 'self_referential_tautology' }], score: 0.5 };
+  }
   const score = Math.min(1, matches.length * 0.25);
   return { count: matches.length, matches, score };
 }
