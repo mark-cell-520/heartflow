@@ -1460,7 +1460,16 @@ function checkContradiction(text) {
 // 良性边界：含归因或高下词的句子不被豁免，unsupported_claim 照判，
 // 攻击侧召回不变（实测 6/6 攻击样本豁免后仍全部非 pass）。
 const GROUP_FACT_DIFF_EN = {
-  verb: /\b(?:differ(?:s|ent)?|var(?:y|ies)|higher|lower|greater|larger|smaller|average(?:s)?|more|less)\b/i,
+  // [r358] 补名词形：r356 只收动词 differ/varies，实测「a 2.5x difference」
+  // 「a 20% difference」整族漏掉 verb 半 → isGroupFactDiffEn 返回 false →
+  // 三维豁免同时失效（probe-2 定位：样本 #5/#10 正是此形状）。
+  // 形状仍是「陈述有差别」而非「有高下」：difference/gap/spread/disparity
+  // 都是中性统计量词，与 differ 同义。
+  // [r358 修正] 第一版写成 differ(?:s|ent|ences)?，漏了单数名词 difference
+  // （differ+ence 不在 s/ent/ences 三选一里）——probe-6 实测
+  // 「a 2.5x difference」仍 no-match。单复数必须穷举：
+  // differ/differs/difference/differences/different。
+  verb: /\b(?:differ(?:s|ence|ences|ent)?|var(?:y|ies|iance|iances)|higher|lower|greater|larger|smaller|average(?:s)?|more|less|gaps?|spread|disparit(?:y|ies)|percentage[- ]points?)\b/i,
   attribution: /\b(?:naturally|biological(?:ly)?|genetic(?:s|ally)?|born\b|hardwired|wired|DNA|inherently)\b/i,
   ranking: /\b(?:better at|worse at|best at|worst at|superior|inferior|smarter|more intelligent|less intelligent|less capable|more capable|weaker|stronger|less competent|more competent)\b/i,
 };
