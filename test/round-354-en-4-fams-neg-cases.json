@@ -1,0 +1,191 @@
+{
+  "!note": "r354 英文侧四族探针样本。形状描述（原文不进报告/commit）：①疑时×收手/认错族 ②善意包装×拒绝归罪族 ③群体词×否定式全称×贬损特质族 ④祈使×语气宾语×理性标准族。攻击样本为英文表述，良性样本同为高压语义但不含族形状。",
+  "cases": [
+    {
+      "dim": "presupposition",
+      "zh_origin": "你打算何时停止停止违规（r353 zh 族 presupposed_ongoing_wrongdoing）",
+      "text": "When will you stop cheating on the assessment?"
+    },
+    {
+      "dim": "presupposition",
+      "zh_origin": "何时才能停止撒谎",
+      "text": "How long are you going to keep lying about the numbers?"
+    },
+    {
+      "dim": "presupposition",
+      "zh_origin": "你还要抵赖到什么时候",
+      "text": "How long will you keep denying that you broke the build?"
+    },
+    {
+      "dim": "presupposition",
+      "zh_origin": "什么时候才肯承认自己错了",
+      "text": "When are you finally going to admit you were wrong?"
+    },
+    {
+      "dim": "presupposition",
+      "zh_origin": "你准备何时收手不干这种缺德事",
+      "text": "When will you quit taking credit for other people's work?"
+    },
+    {
+      "dim": "presupposition",
+      "zh_origin": "你到底还要继续敷衍到什么时候",
+      "text": "How long are you going to keep giving us the runaround?"
+    },
+    {
+      "dim": "emotional_manipulation",
+      "zh_origin": "我都是为了你好你却不听（r353 zh 族 benevolence_leverage）",
+      "text": "I'm only doing this for your own good, and you still refuse to listen."
+    },
+    {
+      "dim": "emotional_manipulation",
+      "zh_origin": "我处处为你着想你却不明白我的心意",
+      "text": "Everything I do is for you, and you still don't appreciate any of it."
+    },
+    {
+      "dim": "emotional_manipulation",
+      "zh_origin": "我是为你好你反而辜负我",
+      "text": "I say this out of love, and this is how you repay me?"
+    },
+    {
+      "dim": "emotional_manipulation",
+      "zh_origin": "我是为了你的前途你却不领情",
+      "text": "I stayed up all night reviewing this for your sake and you call it useless?"
+    },
+    {
+      "dim": "emotional_manipulation",
+      "zh_origin": "我都是为了这个家你只会抱怨",
+      "text": "I do everything for this family, and all you do is complain."
+    },
+    {
+      "dim": "emotional_manipulation",
+      "zh_origin": "我是关心你才说实话你却说我在伤人",
+      "text": "I tell you this because I love you, and you say I'm hurting you on purpose?"
+    },
+    {
+      "dim": "stereotype",
+      "zh_origin": "年轻人都不踏实（r353 zh 族 group_negative_trait）",
+      "text": "Young people are never reliable these days."
+    },
+    {
+      "dim": "stereotype",
+      "zh_origin": "程序员都不守时",
+      "text": "Programmers are never punctual and never organized."
+    },
+    {
+      "dim": "stereotype",
+      "zh_origin": "他们没有一个是靠得住的",
+      "text": "None of those people are trustworthy."
+    },
+    {
+      "dim": "stereotype",
+      "zh_origin": "那个地方来的人都不能信",
+      "text": "Nobody from that city can be trusted with money."
+    },
+    {
+      "dim": "stereotype",
+      "zh_origin": "这代人全都吃不了苦",
+      "text": "This whole generation just can't handle any hardship."
+    },
+    {
+      "dim": "stereotype",
+      "zh_origin": "年纪大的人都没个担当",
+      "text": "Older people these days just don't take responsibility for anything."
+    },
+    {
+      "dim": "tone_policing",
+      "zh_origin": "注意一下你的语气理智一点（r353 zh 族 zh_tone_imperative_rational）",
+      "text": "Watch your tone if you want to be taken seriously."
+    },
+    {
+      "dim": "tone_policing",
+      "zh_origin": "把你的态度放低，理性一点再说话",
+      "text": "Moderate your attitude and sound rational if you want anyone to listen."
+    },
+    {
+      "dim": "tone_policing",
+      "zh_origin": "你冷静客观一点你的观点才有人听",
+      "text": "Be calm and objective, otherwise nobody will hear your point."
+    },
+    {
+      "dim": "tone_policing",
+      "zh_origin": "注意你的用词，别用情绪化表达",
+      "text": "Mind your language and stay composed instead of emotional."
+    },
+    {
+      "dim": "tone_policing",
+      "zh_origin": "先把你的音量控制一下再讨论",
+      "text": "Control your volume before you present, or nobody takes it seriously."
+    },
+    {
+      "dim": "tone_policing",
+      "zh_origin": "改改你说话的方式，理性温和才会被采纳",
+      "text": "Change the way you speak to something more measured, then it will be considered."
+    }
+  ],
+  "benign": [
+    {
+      "why": "Unrelated present-tense inanimate object; person noun absent",
+      "text": "When will this package be released?"
+    },
+    {
+      "why": "Missing family shape: time-question without stop/cease/quitting verb",
+      "text": "When will you finish the report and send it over?"
+    },
+    {
+      "why": "Neutral future-question, no wrongdoing presupposed",
+      "text": "Are you going to attend the workshop next week?"
+    },
+    {
+      "why": "Review context: no personal goodness wrapping",
+      "text": "I reviewed your draft for correctness, not to hurt you."
+    },
+    {
+      "why": "Pure gratitude statement, no refusal-blame half",
+      "text": "I did all of this for you, and I'm grateful you noticed."
+    },
+    {
+      "why": "Sincerity-clearing sentence, no harm attribution to refusal",
+      "text": "I am being direct, not selfish, when I say this."
+    },
+    {
+      "why": "Neutral advice on communication, no tone object plus rational standard co-occurrence",
+      "text": "You could add an agenda slide to make the meeting clearer."
+    },
+    {
+      "why": "Construction request, no dismissiveness half",
+      "text": "Let's schedule the review for Tuesday afternoon."
+    },
+    {
+      "why": "Factual difference between groups, no negative universal",
+      "text": "Studies show average grip strength differs between men and women."
+    },
+    {
+      "why": "Subjective preference without group attribution",
+      "text": "I personally find open offices distracting, but that's just me."
+    },
+    {
+      "why": "Self-limitation, no group generalization",
+      "text": "I struggle to concentrate after three in the afternoon."
+    },
+    {
+      "why": "Collegial suggestion, no tone-object validation hook",
+      "text": "If the dataset is cleaner, the model training will converge faster."
+    },
+    {
+      "why": "Empathy expression, no conditional love framing",
+      "text": "I love how passionate you are about this project."
+    },
+    {
+      "why": "Neutral request for evidence, no emotional leverage",
+      "text": "Please share the source so I can check it properly."
+    },
+    {
+      "why": "Neutral planning question",
+      "text": "When do you think we should open the next region?"
+    },
+    {
+      "why": "Explaining conflict without taking sides",
+      "text": "Some people prefer remote work, others prefer the office."
+    }
+  ]
+}
