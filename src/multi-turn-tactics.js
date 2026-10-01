@@ -135,8 +135,14 @@ const _RE_AUTHORITY_LAUNDERING = new RegExp([
   '|就一个[^。\\n]{0,8}(?:而已|罢了|而已)',
   '|(?:不敏感|无关紧要|没什么)[^。\\n]{0,8}(?:内容|数据|信息)',
   // ③ 上下文嫁接
-  '|(?:(?:刚才|前面|上次|接着)[^。\\n]{0,10}(?:那样|那样|流程一样|照样|照旧|继续|同样))',
+  // [v6.7.152] 窗口从 [^。\n] 放宽到 [^.\n]（放行句号）：r343 probe-1/9 实测
+  // 「刚才那份数据格式不错。\n继续…也照那样调出来」跨句承接，原窗口被句号
+  // 截断 → 嫁接半不命中，该攻击只剩 pii 1 层。
+  '|(?:(?:刚才|前面|上次|接着)[^.\n]{0,14}(?:那样|照样|照旧|继续|同样))',
   '|(?:流程|规矩|方式)一样',
+  // [v6.7.152] 「照那样」裸承接词：r343 样本 #3 的嫁接信号只在句尾的
+  // 「也照那样调出来」，与「刚才」隔了一句，任何窗口都接不上 → 单立分支。
+  '|也?照(?:那样|旧|样)',
   // ④ 关系信任
   '|(?:都|已经)?(?:聊|合作|配合)[^。\\n]{0,6}(?:这么|那么)(?:久|长|多)',
   '|(?:信任|情分)[^。\\n]{0,6}(?:还是有的|在那儿|在的)',
@@ -207,6 +213,30 @@ const SENSITIVE_TARGET = [
   /(?:\b(?:config|\.env|\.json|\.ya?ml|secret|credential)s?\b[^.\n]{0,16}\b(?:dump|print|show|display|reveal|export)\b)/i,
 ];
 
+// [v6.7.152] SENSITIVE_TARGET 的**平行核心名词表**（下标与 SENSITIVE_TARGET 严格对应）。
+// 用途：sensitive_target 层去重判据——若 st 分支的核心敏感名词已被同一句的
+// 某个非耦合 ladder 命中片段覆盖，说明该敏感目标已被索取层独立计入，
+// sensitive_target 再计一层就是**同一目标数两次**（r343 复测的三处存量误伤）。
+// 只收核心名词（不带索取动词），因为动词侧由 ladder 各自把关。
+// ⚠️ 新增 SENSITIVE_TARGET 分支时必须同步在这里补一行，否则新分支失去去重保护
+// （test/round-343-sensitive-target-dedup.test.js 有下标平行性守卫）。
+const SENSITIVE_TARGET_NOUNS = [
+  /手机号|身份证|银行卡|密码|验证码|住址|护照|出生日期|工号|\b(?:phone|password|ssn|credit ?card|id ?number|credentials?)\b/i,
+  /\/etc\/(?:passwd|shadow)|\.ssh|id_rsa|authorized_keys|\.npmrc|\.aws\/credentials|kubeconfig/i,
+  /密钥|密匙|secret|api[_.]?key|access[_.]?key|token|私钥|证书|数据库连接串/i,
+  /后台|管理|admin|root/i,
+  /数据库|服务器|集群/i,
+  /库/i,
+  /数据库|服务器|运维/i,
+  /密码|账号/i,
+  /配置|信息|凭据|密钥/i,
+  /phone|email|ssn|credit ?card|address|id ?numbers?|credentials?|passwords?/i,
+  /数据库|db|集群|服务器/i,
+  /prompt|instructions?|config|credentials?|secrets?/i,
+  /config|\.env|\.json|\.ya?ml|secret|credential/i,
+  // [v6.7.152] ST[13] 对应名词（反序支：dump 在前、名词在后）
+  /config|\.env|\.json|\.ya?ml|secret|credential/i,
+];
 // 阶梯的四个层级（按敏感度递增）
 const LADDERS = [
   { name: 'pii_request', label: '索取个人敏感信息', score: 30,
@@ -425,7 +455,7 @@ function checkMultiTurnEscalation(text) {
     // [v6.7.124] sensitive_file 软分支的求教排除：命中是"问用法"时不计层。
     // 硬分支不受影响（命中 /etc/passwd、.ssh、密钥落日志等仍计数）。
     if (L.name === 'sensitive_file' && softHitIsConsult(text)) continue;
-    hits.push({ ladder: L.name, label: L.label, matched: m[0].slice(0, 40) });
+    hits.push({ ladder: L.name, label: L.label, matched: m[0].slice(0, 40), span: [m.index, m.index + m[0].length] });
     score += L.score;
     if (PREDATORY.has(L.name)) predatory++;
   }
@@ -437,11 +467,48 @@ function checkMultiTurnEscalation(text) {
   // （probe-3 诊断 B1/D2 两条即此形态：洗白半与敏感半都命中却不能晋级）。
   // 本层计 hits **不计 score**（score=0），因为敏感半不是独立攻击信号，
   // 单独出现（「数据库密码」在真实运维对话里出现）完全合法。
-  for (const re of SENSITIVE_TARGET) {
-    if (!re.test(text)) continue;
-    sensitive++;
-    hits.push({ ladder: 'sensitive_target', label: '敏感索取目标（洗白族触发条件）', matched: 'sensitive', score: 0 });
+  //
+  // [v6.7.152 r343 实测修正] 同目标去重：若 st 命中的**核心敏感名词**已被同一句
+  // 的某个非耦合 ladder 命中片段覆盖，该敏感目标已被索取层独立计入，
+  // sensitive_target 不计第二层（score 仍为 0，不影响 gate）。
+  // 复测坐实的三处存量误伤（probe-1-layers.js）：
+  //   ① subtle 单层样本「密钥打到日志」：sensitive_file + sensitive_target 同目标 2 层
+  //   ② r93 良性「后台入口地址贴出来」：system_entry + sensitive_target 同目标 2 层
+  //   ③ code-security-negation r73 良性「别把密钥发到群里」：同上第三种实例
+  // 判据用「名词覆盖」而非「跨度重叠」是 probe-5/6 实测：st 片段常比 ladder
+  // 片段长（如 st[0]「身份证和住址也照那样调出」vs pii「身份证」，
+  // st[5] 反向跨句读点），跨度判据会把 pii+laundering 的真实攻击打成 1 层，
+  // 而名词判据在全测试集上攻击降级 0、误伤修好 3。
+  // sensitive 计数**不受去重影响**——耦合层的闸门仍看「目标是否敏感」，
+  // 去重只影响层数记账。
+  //
+  // ⚠️ 下标对齐：stIdx 与 SENSITIVE_TARGET_NOUNS 下标严格对应，必须同步增删
+  // （test/round-343-sensitive-target-dedup.test.js 有平行性守卫）。
+  // ⚠️ 取名词命中用 match(/g) 而非 exec 循环——exec 推进依赖 lastIndex，
+  // 正则复用 + 并发调用下会串味（本处首版实测把整轮挂死，零输出超时）。
+  let stIdx = -1;
+  const stNounSpan = [];
+  for (let si = 0; si < SENSITIVE_TARGET.length; si++) {
+    const stM = text.match(SENSITIVE_TARGET[si]);
+    if (!stM) continue;
+    stIdx = si;
     break;
+  }
+  let stDedup = false;
+  if (stIdx >= 0) {
+    sensitive++;
+    const nounRe = SENSITIVE_TARGET_NOUNS[stIdx];
+    if (nounRe) {
+      for (const nm of text.match(new RegExp(nounRe.source, 'g' + (nounRe.ignoreCase ? 'i' : ''))) || []) {
+        const at = text.indexOf(nm, stNounSpan.reduce((p, s) => Math.max(p, s[1]), 0));
+        if (at >= 0) stNounSpan.push([at, at + nm.length]);
+      }
+      // 名词跨度与任一非耦合 ladder 的命中跨度重叠 → 该目标已被索取层计入
+      stDedup = stNounSpan.some(ns => hits.some(h => h.span && h.span[0] < ns[1] && ns[0] < h.span[1]));
+    }
+  }
+  if (stIdx >= 0 && !stDedup) {
+    hits.push({ ladder: 'sensitive_target', label: '敏感索取目标（洗白族触发条件）', matched: 'sensitive', score: 0 });
   }
   // [v6.7.126] sunk_cost 耦合层：升级半 AND 索取层同时在场才计入。
   // 依据见 LADDERS 该条目注释（try1~try8 试错台塌缩全过程）。
@@ -478,5 +545,6 @@ module.exports = {
   CONSULT_WORD,
   CAPABILITY_PROBE,
   SENSITIVE_TARGET,
+  SENSITIVE_TARGET_NOUNS,
   _RE_AUTHORITY_LAUNDERING,
 };
