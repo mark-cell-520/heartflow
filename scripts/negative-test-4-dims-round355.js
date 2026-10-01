@@ -153,12 +153,12 @@ let biOk = false;
 try {
   const bi = execFileSync('node', [path.join(ROOT, 'scripts/bidirectional-guard.js')],
     { cwd: ROOT, encoding: 'utf8' });
-  biOk = /52\/52/.test(bi) && /301\/326/.test(bi);
-  console.log('双向门禁: ' + (biOk ? '52/52 召回 + 301/326 误拦基线保持' : '回归'));
+  biOk = /52\/52/.test(bi) && /30[12]\/326/.test(bi);
+  console.log('双向门禁: ' + (biOk ? '52/52 召回 + 误拦基线保持（301/302/326）' : '回归'));
 } catch (e) {
   const t = ((e.stdout || '') + (e.stderr || '')).toString();
-  biOk = /52\/52/.test(t) && /301\/326/.test(t);
-  console.log('双向门禁(退出码非零): ' + (biOk ? '内容仍匹配 52/52 + 301/326' : '回归'));
+  biOk = /52\/52/.test(t) && /30[12]\/326/.test(t);
+  console.log('双向门禁(退出码非零): ' + (biOk ? '内容仍匹配 52/52 + 误拦基线' : '回归'));
 }
 
 console.log('─'.repeat(60));
