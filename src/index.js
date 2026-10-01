@@ -482,6 +482,15 @@ function discriminate(text, evidence = [], contentMode) {
   // 但隐式拼接/正则测试不合法）。入口转成字符串文本后走正常判别路径，
   // 不改变其他 7 种类型的既有行为。
   if (typeof text === 'symbol') text = String(text);
+  // [r352] symbol 之外的第二种崩点：带抛错 toString/Symbol.toPrimitive 的对象。
+  // r351 探针补测 14 种非字符串输入，`object`/`proxy`（toString 抛错）在
+  // `RE.test(text)` 隐式 String() 时抛 Error，栈顶仍判据区（824 行）——
+  // 入口只挡 symbol 一族是不够的，凡隐式转换会抛的对象必须在入口就归一为空串。
+  // 只对「转换会抛」的对象动手：能正常 String() 的对象保持原值不动，
+  // 既有行为零改变（实测 {} / [] / Map / Date / 42 / 42n / NaN 全部仍 pass）。
+  else if (text !== null && typeof text === 'object') {
+    try { String(text); } catch (_) { text = ''; }
+  }
   const pedagogy = detectPedagogicalContent(text);
   const pedagogyRelaxation = getPedagogyRelaxation(pedagogy);
   // [v6.7.70] 对抗混淆归一化：先清洗再判（心虫 decision.decide 选定，0.92 分）
