@@ -143,6 +143,6 @@ for (const s of BENIGN_KNOWN_BASE) {
   console.log(`  NOTE 已知基线误伤（非本轮引入）: ${s} count=${count}`);
 }
 
-console.log(`r332 hasty_generalization 小样本→全称概括守卫：${passed} 绿 / ${failed} 红`
+console.log(`r332 hasty_generalization 小样本→全称概括守卫：${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`
   + `（攻击 ${ATTACK.length} 条，良性 ${BENIGN_A.length + BENIGN_B.length + BENIGN_C.length} 条）`);
 if (failed > 0) process.exit(1);
