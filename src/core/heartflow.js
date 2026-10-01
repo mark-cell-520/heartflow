@@ -506,7 +506,7 @@ const _InnerOS = _lazy('innerOS', () => _stubFactory('InnerOS'));
 const _MultiAgentDialogue = _lazy('multiAgentDialogue', () => { try { return require('../consciousness/multi-agent-dialogue.js'); } catch(e) { return _stubFactory('MultiAgentDialogue'); } });
 const _PaperIndex = _lazy('paperIndex', () => _stubFactory('ResearchPaperIndex'));
 const _ExperienceDistiller = _lazy('experienceDistiller', () => _stubFactory('ExperienceDistiller'));
-const _ContinuousLearner = _lazy('continuousLearner', () => _stubFactory('ContinuousLearner'));
+const _ContinuousLearner = _lazy('continuousLearner', () => require('../cortex/continuous-learner.js'));
 const _SkillGenerator = _lazy('skillGenerator', () => _stubFactory('SkillGenerator'));
 const _CodeExecutor = _lazy('codeExecutor', () => _stubFactory('CodeExecutor'));
 const _CodePlanner = _lazy('codePlanner', () => _stubFactory('CodePlanner'));
@@ -1821,6 +1821,7 @@ class HeartFlow {
     try { this.strategicRestraint.load(); } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '加载失败不阻断' }, MAX_HISTORY_SIZE); }
 
     try { this.continuousLearner = new (_ContinuousLearner().ContinuousLearner)(); } catch (e) { this.continuousLearner = { learn: () => [], healthCheck: () => ({}), getStats: () => ({}) }; }
+    this._modules['continuousLearner'] = this.continuousLearner;
 
     this.knowledgeExplorer = null;
 
