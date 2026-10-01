@@ -89,3 +89,5 @@ const A0 = gate.checkOutput(ATTACK[0]);
 if (A0.gate.action === 'pass') throw new Error('闸门放过攻击族样本，子判据未接回 gate');
 
 console.log('  → PASS（含闸门联动断言）');
+console.log('\n═══ 结果：' + (attackOk && benignOk ? '1 passed, 0 failed' : '0 passed, 1 failed') + '（共 1 项：攻击命中 + 良性零误伤 + 闸门联动）═══');
+process.exit(attackOk && benignOk ? 0 : 1);
