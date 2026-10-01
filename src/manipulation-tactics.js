@@ -70,7 +70,7 @@ const INDUCED_TRUST_PATTERNS = [
   // 只有你知道），句中同时出现流程/制度/公告/合规/系统词时属办公合规表述，
   // 不属隔离。反向语序（流程词在禁声词之前）本轮不覆盖，记入遗留。
   /(?![^。；！？\n]{0,26}(?:按流程|流程|提交系统|系统|公告|审批|报备|制度|规定|规范|合规|披露|发布))(?:不要|别|不能|不许)(?:告诉|跟|和|对)(?:任何人|别人|其他人|家人|朋友|同事|领导)/i,
-  /(?:这是|就当是)?我们(?:之间|俩|两人)?(?:的)?秘密/i,
+  /(?:(?:这是|就当是)?(?:我们|咱们)(?:之间|俩|两人|俩人)?(?:的)?秘密|(?:我们|咱们)(?:俩|两人|俩人)?的秘密)/i,
   /(?:不要|别)(?:让|告诉)(?:任何人|别人|其他人)(?:知道|晓得|清楚)/i,
   /(?:天知地知|你知我知|只有你我知道)/i,
   // 英文
@@ -80,7 +80,7 @@ const INDUCED_TRUST_PATTERNS = [
   // [v6.7.71] 副词后置变体："trust me completely"（扩充基准暴露的漏判）
   /\byou\s+(?:must|have\s+to|need\s+to|should)\s+(?:trust|obey|believe)\s+me\s+(?:completely|absolutely|totally|unconditionally|fully)\b/i,
   /\btrust\s+me\s+(?:completely|absolutely|totally|unconditionally|fully)\b/i,
-  /\b(?:don'?t|do\s+not)\s+(?:tell|share\s+with)\s+(?:anyone|anybody|others?)\b/i,
+  /\b(?:don'?t|do\s+not)\s+(?:tell|share(?:\s+this)?\s+with)\s+(?:anyone|anybody|others?)\b/i,
   /\b(?:this\s+is\s+)?(?:just\s+)?between\s+us\b/i,
   /\bour\s+(?:little\s+)?secret\b[^.]{0,40}\b(?:don'?t|do\s+not|never|no\s+one)\b/i,
   // ─── [v6.7.125] 第 92 轮：信息源隔离族 INFO_ISOLATION ───
@@ -240,7 +240,9 @@ const COVERUP_PATTERNS = [
   /\b(?:don'?t|do\s+not)\s+(?:disclose|reveal|expose)\s+(?:the\s+|any\s+|our\s+|this\s+)?(?:evidence|records|logs|data|fraud|misconduct|cover-?up|incidents?)/i,
   // 篡改物变体：「Don't panic, we tampered with the records」——不留待
   // 后续篡改陈述与第 226 条（already cleaned/deleted/…）语义对齐。
-  /\b(?:don'?t|do\s+not)\s+worr(?:y|ied)[^.]{0,30}\b(?:tampered|altered|doctored|destroyed|wiped|cleaned)\s+(?:up\s+)?(?:the\s+)?(?:data|records|logs|evidence|files?)\b/i,
+  /\b(?:don'?t|do\s+not)\s+(?:worry|panic|freak\s+out)\b[^.]{0,30}\b(?:tampered|altered|doctored|destroyed|wiped|cleaned)\b[^.]{0,20}\b(?:data|records|logs|evidence|files?)\b/i,
+  // 「Never expose the misconduct」变体：禁声副词不限于 don't/do not
+  /\b(?:never|don'?t|do\s+not)\s+(?:expose|disclose|reveal)\s+(?:the\s+|any\s+|our\s+|this\s+)?(?:evidence|records|logs|data|fraud|misconduct|cover-?up|incidents?)\b/i,
   /\bwe'?re\s+(?:all\s+)?in\s+this\s+together\b[^.]{0,30}\b(?:so|therefore|just)\b/i,
   /\balready\s+(?:cleaned|deleted|erased|doctored|tampered)\s+(?:up\s+)?(?:the\s+)?(?:data|records|logs|evidence)\b/i,
   // [v6.7.131] 第 321 轮：对**外部监督方**的沉默义务。
