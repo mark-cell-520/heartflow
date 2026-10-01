@@ -6,6 +6,20 @@ const os = require('os');
 
 const { EngramMemory } = require('../src/memory/engram-memory.js');
 
+// ── run-all 记账：hook assert 常用方法真实计数；缺汇总行会被 run-all 判为「不可确认」──
+const _stats = { pass: 0, fail: 0 };
+for (const _k of ['ok', 'equal', 'notEqual', 'strictEqual', 'notStrictEqual', 'deepStrictEqual', 'deepEqual', 'throws', 'doesNotThrow', 'fail', 'match', 'rejects']) {
+  if (typeof assert[_k] !== 'function') continue;
+  const _orig = assert[_k].bind(assert);
+  Object.defineProperty(assert, _k, {
+    configurable: true,
+    value: (...a) => {
+      try { const r = _orig(...a); _stats.pass++; return r; }
+      catch (e) { _stats.fail++; throw e; }
+    },
+  });
+}
+
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'engram-'));
 const idxFile = path.join(tmp, 'data', 'engram-index.json');
 
@@ -67,4 +81,5 @@ assert.strictEqual(em.store(undefined), 0);
 assert.strictEqual(em.store([null, 'str', 42, { input: 'valid', tag: 'v' }]), 4, '数组长度即返回，但只入库合法的');
 
 fs.rmSync(tmp, { recursive: true, force: true });
+console.log(`结果: ${_stats.pass} 通过, ${_stats.fail} 失败`);
 console.log('OK engram-memory 负例验证全通过（5 组负例 + 2 组功能）');
