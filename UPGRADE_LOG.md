@@ -1,3 +1,58 @@
+# 第 355 轮（v6.7.124 工作面：收口 r354 遗留 2 条英文漏判 + 负例守卫，3 commit）
+
+## 方向选择
+
+队列空。r354 交接簿 5 条遗留逐条复测：第 1 条「2 条漏判半定位」仍有 probe-5 实测 missed=2；
+第 4 条「负例守卫未写」坐实。心虫自选三候选，`decision.decide` 实测选 **B（0.80）**：
+
+- [A] 写 r354 四族 en 判据的负例守卫（4 删除点）——0.68 分，被判为「单点收尾」不够
+- [B] 收口 r354 剩余 2 条英文漏判（EM 善意宣告 1 条 + 语气警务祈使 1 条）——**0.80 分**
+- [C] 82 个历史未跟踪探针文件的 git 卫生——0.74 分
+
+选 B 理由：它同时是 r354 的第一条遗留且形状已定位一半，做透后守卫（A）随之可写；
+C 是卫生项不与能力相关。
+
+## 根因实测（scripts/round-354/probe-5-en-gap.js 复测 + 新增 probe-13/probe-9）
+
+复测起点：missed=2/24、良性误伤 1/16（既有基线）。两条漏判的形状提取（451 纪律，只记形状）：
+
+| 漏判 | 缺的半 | 既有判据为什么漏 |
+|---|---|---|
+| EM#5 | 善意宣告半的**因果前置 love 形** | 1946 行通用型词表只有 `because i care` 一种因果形，没有 `because i love you`/`since`/`as` 三形 |
+| tone#2 | **无宾语祈使**（be/stay + 理性形容词） | 六条祈使判据全部要求语气宾语名词（tone/attitude/volume…），本句祈使动词只有系动词；probe-9 分层显示 `imper=0 toneObj=0 rational=1 conseq=1` |
+
+## 改了什么（3 commit）
+
+| commit | 内容 |
+|---|---|
+| `fca55fdc` | 引擎修复 `src/index.js` +13/-2：① benevolence_leverage 通用型善意半补 3 个因果 love 形；② tone_policing 新增「无宾语祈使 × 理性标准 × otherwise/nobody」判据（severity 0.6） |
+| `eaf769d3` | 负例守卫 `scripts/negative-test-4-dims-round355.js`：6 个删除点全变红 |
+| `cb66f15a` | r354 探针与测试样本入库：11 个诊断脚本 + 24 条英文四族负例样本 |
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| probe-5 复测 | **missed 2→0（24/24 命中）**，良性误伤 1/16 基线零新增 |
+| `node --check src/index.js` | 通过 |
+| `scripts/negative-test-4-dims-round355.js` | **NEG_OK：6/6 删除点变红、基线还原、双向门禁未回归** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线零新增） |
+| `node bin/verify.js` | **14 passed / 0 failed** |
+| `node test/run-all.js` | 见下方 run-all 段 |
+
+## 给下一轮的接手说明
+
+1. 本轮 6 个删除点守卫已覆盖 r354 四族 en 判据 + r355 两个新判据，**r354 交接簿第 4 条闭环**。
+2 条漏判（r354 遗留第 1 条）也已闭环——`probe-5-en-gap.js` 现为 missed=0。
+2. 剩余已知缺口在英文侧其他族，不在本轮四族。若要继续扩 en 覆盖，先跑
+   `scripts/round-354/probe-4-en-sides.js` 看哪些 type 的 en 分支仍为空。
+3. 良性误伤 1/16 的那条是 r354 之前就有的基线行为（group 事实差异句），
+   不是本轮引入；下一轮若要清它，注意别把「群体词 × 否定全称」族收太紧。
+4. 82 个历史未跟踪探针文件（scripts/round-299/、round-301/ 等）仍未纳入 git，
+   本轮只纳了 round-354 的 11 个。全部纳入工作量大且与能力无关，建议单独一轮做。
+
+
+
 # 第 352 轮（v6.7.124 工作面：入口类型卫生续修 —— toString/toPrimitive 抛错对象崩点归零 + 负例守卫，2 commit）
 
 ## 方向选择
