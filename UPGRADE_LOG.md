@@ -1,3 +1,55 @@
+# 第 318 轮（v6.7.133 工作面，闭环 r317 遗留：守卫测试接口修正 10/19→16/16 + 路由数记账修正，3 commit）
+
+**方向来源**：r317「给下一轮」第 1 条（r317 结束时 8 文件已 add、守卫测试 10/19 红）。
+属「上一轮遗留的真缺口」，直接接手，不跑 decision 选向。
+
+## 1. 复测：r317 交接单的判断成立 —— 6 条失败全是断言写错，不是模块缺陷
+
+`test/restored-modules-wiring.test.js` 复测仍是 **10 通过 / 6 失败**（与 r317 一致）。
+按源码实测签名逐条修正，**一个 src/ 文件都没改**——r317 结论「修测试不改模块，模块本身实跑是对的」本轮证实成立。
+
+| 失败断言 | r317 的错误写法 | 本轮改法（按源码实测） |
+|---|---|---|
+| lazy 声明正则 | 正则转义漏反斜杠，`Unmatched ')'` | 改为行文本断言：`=>{` block 形态 + 真 require 兜底 |
+| worldModel 状态数 | `getStats().totalStates` | `stateCount`（src/cortex/world-model.js:261） |
+| virtueEthics 美德分 | `getVirtueScores()` 直接有内容 | 初始为 `{}`，须先 `recordPractice({virtue,...})` 才有分 |
+| moralDevelopment 阶段数 | `getStages().length` | 返回 `{kohlberg[], gilligan[]}`，改取内部数组 |
+| recordStageTransition | 传对象 | `(fromStage, toStage, trigger)` 三参（源码 256 行） |
+| resolveConflicts | 传对象 | 收 `suggestions` **数组**（源码 647 行），单条原样返回 |
+
+改后 **16/16 全绿**（r317 是 10/19，本轮是 16 条而非 19 条——r317 的 19 是含重复计数，本轮实际 16 条断言）。
+
+**commit `27eef482`**：`fix(test): r317 遗留守卫测试 6 条断言改为真实接口签名，10/19 → 16/16 全绿`
+负例验证：每条断言都做了「注入假值必须变红」的最小反向验证（改错字段名/删 recordPractice 调用即红）。
+
+## 2. 顺手闭环：doc-numbers 2 红，路由数漏记账（commit `17a54e04`）
+
+r316/r317 恢复模块后 `ALLOWED_ROUTES` 涨了，但文档数字停在 1,789。
+`node test/doc-numbers-accuracy.test.js` 复测 **13 通过 / 2 失败**：
+- `README 路由 1,789 != 1865`
+- `AGENTS.md 说 1789 routes，实测 1865`
+
+跑 `node scripts/sync-doc-numbers.js`（r314 建的计量脚本，口径 = `HeartFlow.ALLOWED_ROUTES.size` 运行时值）自动记账三份文档共 5 处 1,789→1,865。改后 doc-numbers **15/15 全绿**。
+
+**commit `17a54e04`**：`docs(记账): sync-doc-numbers 自动记账 — 路由数 1,789 → 1,865`
+
+## 3. 本轮验证结果
+
+| 项 | 结果 |
+|---|---|
+| `test/restored-modules-wiring.test.js` | **16/16 全绿**（复测起点 10/19） |
+| `bin/verify.js` | **14/14** |
+| `test/security-audit.test.js` | **16/16** |
+| `test/doc-numbers-accuracy.test.js` | **15/15**（复测起点 13/15，记账后转绿） |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（与基线持平，0 新增） |
+| `test/run-all.js` | 后台跑，见下（若唯一失败为 npm-package-integrity 属预期）|
+
+## 4. 遗留（给下一轮）
+
+1. **剩余 31 个 stub 分级仍未做**（r317 第 2 条接手建议）：r317 已实测「38 个全零调用面」，本轮恢复的 7 个也没有调用面。建议下一轮做一次「是否值得接」的分级，把需 LLM/网络的（LLMOrchestrator、EduEngine、AdaptivePlanner）明确记为「不接，缺前置条件」，写进 UPGRADE_LOG 结案，别再让这个数字每轮复读。
+2. **初始化块死码**：heartflow.js `start()` 内给 `this.worldModel` 等赋值，但构造函数没有对应属性声明，`new HeartFlow()` 不 start() 时全 undefined。可考虑把声明补进构造函数。
+3. `scripts/round-*` 探针目录已堆到 round-318 未清理（init 体检报「探针垃圾已清理」是错的，实际 round-299/301/304/305/307/308/317/318 全在），建议加进 .gitignore 或定期归档。
+
 # 第 314 轮（v6.7.133 工作面，闭环 r313 遗留：解析器修复未验证 + 结构性记账缺口，3 commit）
 
 **方向来源**：r313 迭代预算耗尽被截断，留了两件事给本轮——
