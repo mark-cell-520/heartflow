@@ -1,3 +1,129 @@
+# 第 314 轮（v6.7.133 工作面，闭环 r313 遗留：解析器修复未验证 + 结构性记账缺口，3 commit）
+
+**方向来源**：r313 迭代预算耗尽被截断，留了两件事给本轮——
+(1) `mcp-tool-registry-integrity` 解析器「修到工作区未提交、尚未重跑」；
+(2) r313 报告的 4 个 doc-numbers 失败「无自动机制，结构性记账缺口」。
+属「上一轮遗留的真缺口」，按优先级直接接手，不需要跑 decision 选向。
+
+## 1. 复测：两个缺口都坐实了，且比 r313 记录的更严重
+
+| 复测项 | 方法 | 结果 |
+|---|---|---|
+| r313 解析器修复 | `node test/mcp-tool-registry-integrity.test.js` | **9 通过 / 2 失败**（r313 报「已修」，实际 11 条里 2 条红） |
+| 文档数字漂移 | `node test/doc-numbers-accuracy.test.js` | **11 通过 / 4 失败**（工具 60≠61、路由 1761≠1770） |
+
+关键事实：r313 说「解析器修到工作区未提交」，实测 `git show 0444feff`
+（auto-commit）显示那份修复**已被自动落盘但从未跑通**，
+即 r313 的核心产出是一个**没被验证过的失败修补**——它在 run-all 里
+继续制造失败，而 r313 的记录把它说成待办。**这是「未跑测试就写
+结论」这个坑的第 N 次变体**：修完必须重跑，不能只写「待下一轮」。
+
+## 2. 缺口一：HANDLERS 解析器两处真缺陷（commit `29c47da3`）
+
+r313 的修复把 181 个 handler 正确分类，但引入两个新缺陷：
+
+**① 行内并列键第二键整段丢弃。** r313 版循环里把非首段的 key 置 null
+后直接丢掉整段，于是实测存在的 dream 那行
+（`heartflow_dream: handleDream,  heartflow_active_inference: (args) => {`）
+里 `heartflow_active_inference` 永远解析不出来。修法：每段先探自己
+有没有 `heartflow_x:` 前缀，有就用它，没有再退回行首键。
+
+**② `__form_<key>` 形态登记表被当成函数名去找。** r313 把
+「简短引用 / 内联箭头 / 内联 function」的形态记录也塞进了 handlerMap，
+而「HANDLERS 映射的函数都真实存在」断言按 `Object.entries` 全量遍历，
+于是 **121 个 `__form_* → ref` 全部假缺失**（错误信息里塞满了
+`__form_heartflow_gate → ref` 这种不存在的函数名）。
+修法：该断言跳过形态登记键，且内联形态哨兵值 `(inline)` 不参与查找
+——语义上它只该回答「简短引用形态指向的命名 handler 是否真的定义了」。
+
+修后 11/11 全绿。
+
+## 3. 缺口二：工具数/路由数结构性记账缺口（commit `e7897470`）
+
+r313 把这个列为「无自动机制，每加一个 MCP 工具就红一次」——实测确认。
+precedent 两份：`sync-doc-dimensions.js`（第 286 轮，维度数同款死锁）
+和 `syncReadmeTestCount()`（第 58 轮，README 测试数同款死锁）。
+所以本轮做了第三份：`scripts/sync-doc-numbers.js`。
+
+口径与 `measure-claimed-numbers.js` 完全同源：工具数 = TOOLS 数组
+name 去重计数，路由数 = `HeartFlow.ALLOWED_ROUTES.size` 运行时值。
+量不到就拒绝记账（宁可不改也不猜），历史引述行（AGENTS 的
+previously claimed、README 的 Version history）用占位符保住不碰。
+
+已同步三份文档共 8 处：
+- 工具数 60→61（AGENTS 横幅、README 横幅、SKILL 横幅）
+- MCP tools 表格 179→61（README、SKILL）
+- 路由 1,761→1,770（AGENTS 横幅、README 横幅）
+- Dispatch routes 表格 1,546→1,770（README、SKILL）
+
+## 4. 实现踩坑（自记）
+
+**首版逐行 replace 让跨行 pattern 永远匹配不上。** README/SKILL 的
+数字横幅是跨行的（`... × 61 MCP tools` 在行尾，`× 1,771 dispatch
+routes` 在下一行），逐行处理的结果是：`--check` 报「✅ 已一致」
+而 `doc-numbers-accuracy` 仍 4 个红——**一个「自报没问题但不解决问题」
+的记账脚本**。改成整块文本替换 + 占位符保护历史引述行，并对占位符
+还原数做断言（还原数不符则拒绝写盘）。
+
+另一次：首版 AGENTS 正则把工具数和路由数合成一条 pattern 共用捕获组，
+差点把 1,761 一起替换成 1,770 的格式串。改成两个数字各自独立锚定。
+
+## 5. 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| bin/verify.js | **14/14** |
+| bidirectional-guard.js | 召回 **52/52**、误拦 **301/326（0 新增，与基线持平）** |
+| security-audit.test.js | **16/16** |
+| doc-numbers-accuracy.test.js | **15/15**（进 run-all 前 14/15，最后 1 项是测试数，finish 自动记账后转绿） |
+| mcp-tool-registry-integrity.test.js | **11/11** |
+| run-all.js | **15885 通过 / 1 失败 / 共 15886**（唯一失败即 README 测试数，finish ①.5 自动记账修掉） |
+| 本轮负例 | `scripts/negative-test-mcp-registry-integrity-r314.js` **6/6**（5 项注入全变红 + 还原复绿） |
+
+### 负例 5 项注入
+
+| 注入 | 结果 |
+|---|---|
+| A 行内并列键第二键整段丢弃（r314 缺陷原形） | 红（失败 2） |
+| B 引用形态指向不存在的命名 handler | 红（失败 2） |
+| C 引用形态退化成内联箭头（覆盖回归） | 红（失败 1） |
+| D 引用形态键名漂移（工具成孤儿） | 红（失败 2） |
+| E 顶层键缩进变化导致解析器漏收 | 红（失败 2） |
+| 还原后 | 11/11 复绿 |
+
+首轮负例 D/E 两项「注入未生效」（old_string 没匹配上源码真实字符串），
+改成读源码真实形态后重跑才全红。**教训同 r313：负例的 needle 必须从
+源码读，不能凭想象写。**
+
+## 遗留
+
+1. **54 个未跟踪探针文件仍未归类**（连续第四轮）：`scripts/round-*/`
+   的 probe-*、`scripts/negative-test-decision-mode-r310b.js`。
+   已连续四轮出现，auto-commit-round 每轮都只打印不处理。
+   建议下一轮直接 `git add -A scripts/round-*` 或写进 .gitignore，
+   总比每轮打印一遍清单好。
+2. **19 个孤儿模块未接线**（连续第四轮）：接线模式成熟（<50 行产出
+   整个引擎能力），但一直没排上——主要是被其他方向的缺口插队。
+3. `mcp-tool-registry-integrity` 的解析器依赖「顶层键缩进正好 2 空格」
+   （负例 E 正是靠改缩进变红）。这是隐式契约，源码格式化（prettier/
+   eslint 重排）会打破它。下一轮可考虑把它变成显式断言：把
+   HANDLERS 块用 AST 或 `require` 真解析，而不是正则扫文本。
+
+## 给下一轮的接手说明
+
+1. **本轮的账已记完，7 项检查全绿，锁已放，6 个 commit 已推远程。**
+2. 若接手遗留 1（探针归类），先 `git status --short scripts/ | wc -l`
+   确认还是 54 个再动；round-299/301/304/305/307/308/313 的 probe-*
+   属历史探针，可直接 add 或 ignore，别逐个看内容。
+3. 若接手遗留 2（孤儿接线），先 `node -e` 数当前孤儿数确认仍是 19，
+   再按 r312 的接线模式（engine 侧 lazy 注册 + MCP handler 读引擎实例
+   + 跨调用状态守卫）逐个接；每接一个必须配**跨调用状态探针**，
+   不能只查「handler 是否在 HANDLERS 里」（r312 的教训：那个守卫
+   查了引擎侧实例化，却没查 MCP 用的是不是同一个实例）。
+4. `scripts/sync-doc-numbers.js` 与 `sync-doc-dimensions.js` 现在是一对；
+   若再加新的「机器可判定但文档手写」的数字，就并进 sync-doc-numbers，
+   不要写第四个同类脚本。
+
 # 第 313 轮（v6.7.132 工作面，闭环 r312 遗留：r312 引擎改动未记账 + MCP 知识层无状态缺陷，3 commit）
 
 **方向来源**：r312 的 commit 在 git log 里（`0442e2c9` 接线 + `915e1d75` 守卫），
