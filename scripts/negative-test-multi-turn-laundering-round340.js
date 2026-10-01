@@ -45,9 +45,12 @@ const INJECTIONS = [
   },
   {
     // probe-1 实测 S1：删除后 S1/S2/S4/S5 四条重新漏判
+    // r341 起 idx0 改成「索取动词×邻近敏感宾语」双向判定，PII 族在同一行
+    // 正则里出现两次（前向支一次、反向支一次）。只废前向支会留下裸宾语
+    // 反向支，测试仍全绿（实测）——整行替换成永假分支才是有效守卫。
     name: '敏感层 PII 族删除（S1/S2/S4/S5 重新漏判）',
-    from: "  /(?:手机号|身份证|银行卡|密码|验证码|住址|护照|出生日期|工号|",
-    to: "  /(?:__disabled_pii__",
+    from: "  /(?:(?:发给|发我|给出|交出来|提交|提供|告诉|列出|导出|下载|拉取|拉一下|打出来|写出来|显示|输出|调出|调出来|查一下|核对|dump|send|give|export|show|print|list|provide|tell|reveal)[^\\n。]{0,12}(?:手机号|身份证|银行卡|密码|验证码|住址|护照|出生日期|工号|\\b(?:phone|password|ssn|credit ?card|id ?number|credentials?)\\b)|(?:手机号|身份证|银行卡|密码|验证码|住址|护照|出生日期|工号|\\b(?:phone|password|ssn|credit ?card|id ?number|credentials?)\\b)[^\\n。]{0,12}(?:发给|发我|给出|交出来|提交|提供|告诉|列出|导出|下载|拉取|拉一下|打出来|写出来|显示|输出|调出|调出来|查一下|核对|dump|send|give|export|show|print|list|provide|tell|reveal))/i,",
+    to: "  /(?:__disabled_pii_req__)/i,",
   },
   {
     // probe-1 实测 S4：删除后 S6/S7 两条重新漏判
