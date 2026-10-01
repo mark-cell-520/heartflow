@@ -157,6 +157,8 @@ sabotage(results, 'P2 英文正序族置假（连接词→空）', [[
 const pass = results.filter(r => r.ok).length;
 const fail = results.filter(r => !r.ok);
 console.log('r360 正序族负例守卫: NEG_OK ' + pass + '/' + results.length);
+// run-all 聚合只认「N 通过, M 失败」汇总行（r368 补：此前仅 NEG_OK 分数式被计失败）
+console.log('结果: ' + pass + ' 通过, ' + fail.length + ' 失败');
 if (fail.length) {
   console.log('FAIL: ' + JSON.stringify(fail));
   process.exit(1);
