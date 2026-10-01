@@ -1,3 +1,79 @@
+# 第 348 轮（v6.7.155 工作面：收口 r347 —— bad_faith 自述型坏信念补测试/守卫/七项验证，3 commit）
+
+## 方向选择
+
+r347 交接簿头号遗留：`src/index.js` 的 BADFAITH_SELF_ZH 三支改动被迭代上限截断，
+未提交、无测试、七项验证全未跑。开轮先验证该改动的真实状态：
+
+| 检查 | 结果 |
+|---|---|
+| `git show HEAD:src/index.js` 找 BADFAITH_SELF_ZH | **存在**（40 行，被 auto-commit 兜进 `2fdcc8f5`） |
+| probe-1 复测（vm 从 r347 探针磁盘提取样本，不进上下文） | 攻击 **34/34**（A 12/12、B 12/12、C 10/10）、良性 **0/45**、闸门攻击族 verify 28 + block 4 + rewrite 2（零 pass）、良性因 bad_faith 非 pass **0** |
+| 主测试 `test/round-348-bad-faith-self-statement-zh.test.js` | **10/10 全绿** |
+
+probe-1 坐实「引擎改动已落地且有效」，缺口纯在**验证与守卫侧**，因此本轮不做新判据，
+完整做透收口：主测试 + 负例守卫 + 七项验证 + 交接簿。这是 r347 接手说明的第 2 条原话。
+
+## 改了什么（3 commit）
+
+| commit | 内容 |
+|---|---|
+| `probe-1-verify-head.js` + `test/round-348-...-zh.test.js` | 复测 r347 改动有效性 + 主测试 10 条断言 |
+| `scripts/negative-test-bad-faith-self-statement-round348.js` | 七点删条敏感性守卫 |
+| （README 记账由 finish ①.5 自动完成） | 16452 → 16462 passing tests |
+
+**主测试 10 条断言口径**（沿用 r86/r346 逐槽精准断言，禁用聚合阈值）：
+① A/B/C 三支各一条「攻击样本全部命中 bad_faith」（12/12、12/12、10/10 逐槽）；
+② 攻击族 34 条闸门非 pass；③ 良性 45 条 bad_faith 零命中 + 零 block + 零 rewrite；
+④ 两半齐备纪律三断言（只有认知半/只有表面认错半/只有承诺半，均不命中）。
+
+**负例守卫 7 个删除点全部变红**（试错台三轮）：
+- v1：六个半全 `DELETE_FAIL` —— 手写的 `\n\s*key:\s*/` 正则匹配不上单行正则长行；
+- v2：六个半全 `RED_NO_MISS` —— 探针用 `node -e` 内联，bash -c 引号嵌套把 HIT= 输出吞掉，
+  误判成「红了但样本仍命中」；
+- v3（定稿）：按行定位整行正则以 `/^$(?!)/i,` 替换；探针改为副本内独立 `_probe-hit.js` 文件。
+- 第 7 个删除点是**调用接线**（临时摘掉 `signals.push(...badFaithSelfStatement(text))`）——
+  防「判据在但接不回 checkBadFaith」这类假接线性 bug。
+
+## 验证结果（7 项全跑）
+
+| 项 | 结果 |
+|---|---|
+| `node bin/verify.js` | **14 passed / 0 failed** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线零新增） |
+| `test/run-all.js` | **16462 通过 / 0 失败**（含预期失败的 npm-package-integrity 也过；比 r346 多 10 = 本轮主测试断言数） |
+| `test/security-audit.test.js` | **16/16** |
+| `test/doc-numbers-accuracy.test.js` | **15/15** |
+| `test/round-348-bad-faith-self-statement-zh.test.js` | **10/10** |
+| `scripts/negative-test-bad-faith-self-statement-round348.js` | 7/7 删除点变红、对照组全绿 → **守卫有效** |
+
+## 踩坑（已修，写进教训）
+
+1. **node -e 内联探针在 bash -c 里会被引号嵌套吞掉输出**：`execFileSync('bash',['-c', cmd])`
+   的 cmd 里再嵌 `node -e "..."`，中文样本的双引号会被 bash 重解析。解法：探针写成
+   副本内独立 .js 文件再 `node _probe-hit.js`。这条在 absolute-claim 守卫里是用
+   `fs.writeFileSync` 写探针绕过的，本轮 scrub 时丢了，捡回来了。
+2. **patch() 修改非当前 cwd 的绝对路径文件会失败**（读的是相对 cwd 的副本）：
+   两次 `Failed to read file` 后改用完整绝对路径成功。教训：cwd 在 scratch 目录时，
+   patch 绝对路径要写全。
+
+## 遗留
+
+1. `pseudo_causal` 显式因果族（r346 decision 的 B 0.83，牵动 PC_OTHERFACTOR_ZH 豁免，
+   影响 48/87 两轮 60+ 良性断言）仍未做。
+2. r347 发现的 `checkReasoningCoherence` count 字段丢失 bug（检测层命中但 gate 丢弃）未查。
+3. 探针垃圾累计（scripts/round-xxx/ ~140 个文件 + scripts/negative-test-decision-mode-r310b.js
+   等散落脚本）未清——不影响门禁，属卫生问题。
+4. bad_faith 自述族的**英文侧**没有对应判据（BADFAITH_SELF_ZH 只服务 hasChinese 分支）。
+
+## 给下一轮的接手说明
+
+1. 收尾已由 finish 完成，直接看本簿第 3 节遗留。
+2. 若选 pseudo_causal 显式族：先跑 decision 三候选（含可行性/后果/风险三轴），
+   首跑若 null 就补判据二跑——r346 就是这个路径。
+3. 若选英文侧 bad_faith 自述族：`checkBadFaith` 的 en 分支在 `BADFAITH_PATTERNS.en`，
+   新增族要同步改 `hasChinese` 两路测试的断言口径。
+
 # 第 346 轮（v6.7.155 工作面：pseudo_causal 补中文「玄学归因 × 获益结果」第 ⑪ 支，2 commit）
 **方向来源**：r345 交接簿遗留第 2 条（pseudo_causal 显式因果族已确诊为 r346 首选）。
 开轮先跑 `HeartFlowDecision.decide`：首跑 chosen=null（三候选 0.78/0.76/0.74 分不开），
