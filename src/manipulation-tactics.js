@@ -245,6 +245,26 @@ const COVERUP_PATTERNS = [
   /\b(?:never|don'?t|do\s+not)\s+(?:expose|disclose|reveal)\s+(?:the\s+|any\s+|our\s+|this\s+)?(?:evidence|records|logs|data|fraud|misconduct|cover-?up|incidents?)\b/i,
   /\bwe'?re\s+(?:all\s+)?in\s+this\s+together\b[^.]{0,30}\b(?:so|therefore|just)\b/i,
   /\balready\s+(?:cleaned|deleted|erased|doctored|tampered)\s+(?:up\s+)?(?:the\s+)?(?:data|records|logs|evidence)\b/i,
+  // [v6.7.134] 第 328 轮：英文侧「隔离式禁声」族 —— 用强制知悉语 or 阻断送达绕开
+  // 监督方，而不是声明自己隐瞒（旧判据收 admit/report/confess/tell 监督方/disclose 证据，
+  // 「Don't let the investigators find out」这一类 0 命中）。第 328 轮 probe-1 实测
+  // 同族 10 条攻击样本只拦住 4 条（全部来自其它维度顺带命中）。
+  // probe-3 预演（15 攻击 / 20 良性）：四条候选正则攻击命中 15/15、良性 0 误伤。
+  // 可分性根因（probe-4 验证）：**监督方名词本身没有判别力**——
+  //   「Keep the server away from the regulator valve」「Keep the noisy compressor
+  //     away from the compliance office」只含监督方名词，安全；
+  //   判别力来自「 intending-to-know 动词 + 监督方」或「未知对象 + 监督方送达路径」。
+  // 本族只收这三种结构（probe-2 教训：不加 knowing 动词的 keep-from 会把良性
+  // 物理隔离/保密期样本一起卷进来，已在该轮预演中被否决）：
+  //   ① don't/never let <监督方> (ever) <知悉动词>
+  //   ② make sure/ensure <监督方> never <知悉动词>
+  //   ③ never/don't let <未知对象> (ever) reach/get to <监督方>
+  //   ④ keep/hide/withhold <未知对象> (quiet) from <监督方>
+  // 全部带词界锚定，与监督方物理邻近/无条件随机语境隔离。
+  /\b(?:don'?t|do\s+not|never)\s+let\s+(?:the\s+|any\s+|your\s+|our\s+)?(?:auditors?|investigators?|regulators?|police|authorities|press|media|management|supervisors?|compliance|watchdog|prosecutors?|third\s+part(?:y|ies)|external\s+(?:auditors?|review|reviewers?)|oversight\s+(?:board|committee))\s+(?:ever\s+)?(?:find\s+out|hear\s+(?:about|of)|learn\s+(?:of|about)|know\s+(?:about|anything)|be\s+told|see\s+this|discover)\b/i,
+  /\b(?:make\s+(?:sure|certain)|ensure|see\s+to\s+it)\s*(?:that\s+)?(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|compliance|watchdog|prosecutors?|oversight\s+(?:board|committee))\s+(?:never|don'?t|does\s+not|won'?t|will\s+not)\s+(?:find\s+out|hear\s+(?:about|of)|learn\s+(?:of|about)|know\s+(?:about|anything)|be\s+told|discover)\b/i,
+  /\b(?:never|don'?t|do\s+not)\s+(?:let\s+)?(?:this|it|that|these|everything|all\s+of\s+this|the\s+(?:issue|problem|incident|defect|fraud|misconduct|report|data|truth|story))\s+(?:ever\s+)?(?:reach|get\s+back\s+to|get\s+to)\s+(?:the\s+|any\s+|our\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
+  /\b(?:keep|hide|withhold|conceal)\s+(?:this|it|that|these|those|everything|anything|them|all\s+of\s+(?:this|it)|the\s+(?:issue|problem|incident|defect|fraud|misconduct|error|errors|bugs?|failures?|records?|data|evidence|logs?|truth|story|details|involvement|role|part|affair|matter|situation|findings?))\s+(?:quiet\s+)?(?:from|away\s+from)\s+(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
   // [v6.7.131] 第 321 轮：对**外部监督方**的沉默义务。
   // 旧判据只收「别承认/别举报」这类**自身过错**表述，「别让外部审计知道」
   // 「别告诉任何人」完全漏：实测同族 2 条 1 条 pass、0 归因。
