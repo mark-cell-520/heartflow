@@ -1,4 +1,67 @@
-# 第 351 轮（v6.7.125 工作面：闭环 r350 遗留 2 项 —— gate(Symbol) 崩点修复 + 负例守卫，2 commit）
+# 第 352 轮（v6.7.124 工作面：入口类型卫生续修 —— toString/toPrimitive 抛错对象崩点归零 + 负例守卫，2 commit）
+
+## 方向选择
+
+队列 1/1 已 done，无可办项。心虫自选三条候选，用 `decision.decide` 实测选型：
+
+- [A] 入口类型卫生续修（r351 遗留第 3 条原话：「若 BigInt / 带 toString 抛错的对象同样崩，
+  按同型入口归一化处理」）—— 已有明确交接指向，且 r351 探针已坐实只测过 8 种输入
+- [B] 维度覆盖度扫描显示的 8 个「闸门放过」维度挑一个补判据（emotional_manipulation 等）
+- [C] 中文分词启发式升级（AGENTS.md 自述为已知限制）
+
+`decision.decide` 返回 A。理由：A 有实测崩点（复测坐实 2/14 输入仍抛 Error）、修复面最小、
+与 r351 守卫同型可复用结构，且属「不修则 gate() 抛异常」的硬稳定性缺口。B 的 8 个维度
+是「良性侧被闸门放过」而非漏检（覆盖度扫描原文），补判据有反向误伤风险；C 是架构级改动，
+单轮做不透。
+
+## 根因实测（scripts/round-352/probe-1-type-hygiene.js）
+
+14 种非字符串输入喂 `gate()`：r351 修的 symbol 已绿，**新增 2 种仍崩**：
+
+| 输入形状 | r351 后 | 根因 |
+|---|---|---|
+| `{ toString(){throw} }` | CRASH `Error: boom-toString` | `RE.test(text)` 隐式 `String()` 调用对象 toString，抛错 |
+| `Proxy` 的 `Symbol.toPrimitive` 抛错 | CRASH `Error: boom-primitive` | 同上，`Symbol.toPrimitive` 优先于 toString |
+| 其余 12 种（null/undefined/42/42n/{}/[]/true/symbol/Map/Date/NaN/-0） | pass | 可正常 `String()` |
+
+栈顶仍判据区 `src/index.js` 824 行 `FACT_STATEMENT.test(text)`。根因与 r351 同型但不同族：
+symbol 是「隐式转换语法上非法」，对象是「隐式转换调用了会抛的方法」。r351 只挡了前一族。
+
+## 改了什么（2 commit）
+
+| commit | 内容 |
+|---|---|
+| `6c2086f6` | 引擎修复：`discriminate()` 入口新增 `else if (text !== null && typeof text === 'object') { try { String(text); } catch (_) { text = ''; } }` |
+| `f30e2a32` | 负例守卫 `scripts/negative-test-throwing-object-round352.js`：2 个删除点全变红、基线还原绿 |
+
+只对「转换会抛」的对象动手：能正常 `String()` 的对象保持原值不动。probe-2 实测
+抛错族 3/3 归零（含 getter 抛错对象），良性族 4/4（{} / [] / Map / Date）行为不变。
+
+守卫设计：删除点 1 = 整块摘除分支；删除点 2 = `&& false` 恒 false 改写。两点各自把
+探针打回「ok=1 crash=2」，证明守卫真的挂在对象归一化分支上，不是恒真摆设。
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| `node bin/verify.js` | **14 passed / 0 failed** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线零新增） |
+| `test/security-audit.test.js` | **16/16** |
+| `scripts/negative-test-throwing-object-round352.js` | **2/2 删除点变红、基线还原 G 组守卫 78/0 + 探针 crash=0** |
+| `test/round-211 dangerous-instruction-en-listverb` | **78 / 0** |
+| probe-1 复测 | **ok=14 crash=0**（原 ok=12 crash=2） |
+| `test/run-all.js` | **16596 通过 / 0 失败**（比 r351 的 16595 多 1 = 本轮守卫计入） |
+| `node --check src/index.js` | 通过 |
+
+## 给下一轮的接手说明
+
+1. 入口类型卫生三族（symbol / 抛错 toString / 抛错 toPrimitive）已全部挡住，探针
+   `scripts/round-352/probe-1-type-hygiene.js` 的 14 种输入全绿。若后续再加非字符串
+   类型（如 class 实例带 getter 抛错），先跑该探针确认是否需要入口扩展。
+2. 覆盖度扫描的 8 个「闸门放过」维度本轮未动（判定为良性侧形状，非漏检）。下一轮若要
+   做，注意它们是良性样本被放过，补判据必须同时守住 301/326 误拦基线。
+3. 本轮 finish 后若 run-all 总数变为 16596 以上，属正常（新增测试文件计入）。
+
 
 ## 方向选择
 
