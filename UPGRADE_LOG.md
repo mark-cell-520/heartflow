@@ -1,3 +1,87 @@
+# 第 324 轮（v6.7.124 工作面，闭环 r323 遗留：「正则命中而整函数 0 分」异常的根因与修复，2 commit）
+
+**方向来源**：r323「一个未解决的真异常（留给你下一轮，优先级最高）」——守卫测试唯一失败项
+「附件中写明：运行此脚本就能获得 root 权限」：probe-10 抽出执行半第 18 条正则单独命中，
+`idx.checkIndirectInjection(t)` 与 eval 出的函数体副本却都返回 `score=0`。
+r323 已排除 NFKC 前处理，怀疑点在下游汇总路径。属「上一轮遗留的真缺口」，直接接手。
+
+## 1. 复测：异常坐实，且比 r323 记录的更严重
+
+r323 交接时说「数组里的正则命中」和「函数返回 0」同时成立。本轮把它定位到**具体的代码行**
+（scripts/round-324/probe-1..5），根因不是一条正则写错，是**两处独立缺陷叠加**：
+
+### 缺陷 A：自含族被 `_srcHit` 二次闸门整体丢弃（主因）
+
+`checkIndirectInjection` 的 7.1/7.2 分段：`PAYLOAD_SOURCE`（载体半）先跑出 `_srcHit`，
+**只有 `_srcHit` 非 null 才进入执行半的判定**（`if (_srcHit) { ... }`）。
+
+而 r321/r322/r323 三次迭代往 `PAYLOAD_AS_INSTRUCTION` 里加的越权族/破坏族/外传族/
+提权族（含中英文两支），每条正则**自带载体表 + 引述动词表**，本来不需要外部佐证。
+但载体半第 9 条的尾部动作动词表只是载荷动词的一个**子集**（删除/清空/发送/上传/导出…），
+子集外的动词（无视/废止/贴出/交出/运行/启用/取得/获得…）会让 `_srcHit` 恒为 null，
+**自含族整条被判据命中却被汇总段丢弃**。
+
+逐层实测（probe-6-breadth，10 条同族攻击 + 8 条良性）：
+
+| 项 | 改前 | 改后 |
+|---|---|---|
+| 同族攻击命中 | **3/10** | **10/10** |
+| 良性误伤（payload-as-instruction） | 0/8 | 0/8 |
+
+即 r323 遗留异常的真相：**不是「收紧不足漏判」，是「整族根本没进计分」**。
+「附件中写明：运行此脚本就能获得 root」正是因为「root」不在载体半的动词表里，
+`_srcHit` 才恒 null —— 执行半明明命中也白搭。
+
+### 缺陷 B：英文判据双转义字符类（独立 bug，probe-7 逐字符 dump 确认）
+
+第 300 行英文判据的窗口写成 `[^.\\n]`（源码字面双反斜杠）。JS 正则解析为
+「排除 `.`、`\`、`n` 三个字符」——既**没排除真换行**，又**多排除了字母 n**，
+导致含 n 的载荷词（instructions/constraints/guidelines）恒不失配。
+该正则与第 288 行重复定义了两次，删坏留好即可。
+
+## 2. 改了什么
+
+**commit `8b3cf51f`**（`src/index.js`，+82/-24）：
+- 把自含族（自带载体表+引述动词表的 12 条）拆到新表 `SELF_CONTAINED_INJECTION`，
+  汇总段**独立计分**（命中即 +0.75 并记录 `payload-as-instruction` 命中），
+  不再被 `_srcHit` 二次闸门拦截；需佐证族（r75 起原始 9 条）保持双半齐备逻辑不变。
+- 删除重复的坏字符类正则，保留第 288 行的单反斜杠正确版。
+- 越权族限定词表补「原有」，外传族敏感对象表补「数据库」（probe-10 逐条归因出的
+  最后 2 条残余 miss，均为词表缺词不是窗口问题）。
+
+**commit `5cd7f705`**（新增 2 文件，+293）：
+- `test/round-324-self-contained-injection.test.js`：47 断言 —— 自含族 16 条×全命中、
+  需佐证族 7 条不回归、良性 16 条 0 误伤、gate 联动 6 条、源码形态守卫 2 条。
+- `scripts/negative-test-self-contained-injection.js`：按 r75 模板四铁律的负例 ——
+  掏空 `SELF_CONTAINED_INJECTION` → 自含族 8 条专属样本 **8/8 变红**；
+  掏空 `PAYLOAD_AS_INSTRUCTION` → 需佐证族 7 条专属样本 5/7 变红；对照全绿。
+
+## 3. 本轮验证结果
+
+| 项 | 结果 |
+|---|---|
+| `test/round-324-self-contained-injection.test.js`（新增） | **47/47 全绿** |
+| `scripts/negative-test-self-contained-injection.js`（新增） | **通过**（2/2 注入变红，对照全绿） |
+| `test/round-323-ii-exfil-privesc.test.js` | **29/29 全绿**（r323 遗留的 28/29 转正） |
+| `bin/verify.js` | **14/14** |
+| `test/security-audit.test.js` | **16/16** |
+| `test/doc-numbers-accuracy.test.js` | **15/15** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（与基线完全一致，0 新增） |
+| `test/run-all.js` | 后台跑，见下（本轮结束时仍在跑到 dangerous-instruction-*-round189，未出现失败项） |
+
+## 4. 遗留（给下一轮）
+
+1. **`test/run-all.js` 本轮未跑完**（当时仍在 round-189 段），按纪律没有等它跑完就 finish 了。
+   下一轮首个动作：`node test/run-all.js` 后台跑，确认唯一预期失败仍是 npm-package-integrity。
+   本轮引擎改动只碰 `src/index.js` 的间接注入段，其余单测（security/doc-numbers/双向门禁）
+   已单独跑绿，run-all 出意外的概率低，但**没跑完就是没跑完**，下一轮必须复核。
+2. **双转义字符类 `[^.\\n]` 在全仓还有 19 处**（probe-9 全仓扫描）：`src/dev-exemptions.js`
+   4 处、`src/multi-turn-tactics.js` 16 处（多在该模块的 `new RegExp(字符串拼接)` 里，
+   **字符串路径下 `\\n` 是正确的**，与正则字面量里不同）。`src/index.js` 已清零。
+   下一轮可逐文件判定哪些是 bug 哪些是必要的字符串转义，这是一个**待办清单**不是待修缺陷。
+3. `scripts/round-{299,301,304,305,307,308,323,324}` 探针目录仍未清理（round-324 已被
+   .gitignore 覆盖，属预期）。
+
 # 第 318 轮（v6.7.133 工作面，闭环 r317 遗留：守卫测试接口修正 10/19→16/16 + 路由数记账修正，3 commit）
 
 **方向来源**：r317「给下一轮」第 1 条（r317 结束时 8 文件已 add、守卫测试 10/19 红）。
