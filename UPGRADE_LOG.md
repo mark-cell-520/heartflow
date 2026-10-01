@@ -1,3 +1,91 @@
+# 第 338 轮（v6.7.148 工作面：premature_termination 补 T5「结论已定 × 过程弱化」族，2 commit）
+
+**方向来源**：r337 交接簿遗留第 3 条（premature_termination 0/5 本轮未动）。
+开轮先用 `HeartFlowDecision.decide` 四候选实测评分，引擎选出 **B（0.84）**，
+复测后确认描述不完全准确——见 §1。
+
+## 1. 复测：缺口坐实，且形态比简报记录宽得多
+
+r337 简报写「T2 分支要求 `ctx.expectedAction`，单句场景恒不触发」。读
+`src/premature-termination.js` 后发现这只是 **T2 一支**的条件。该维度实际有
+T1-T4 四支，扩样 12 条实测：
+
+| 探针 | 数量 | T5 命中 |
+|---|---|---|
+| 原始 5 条（r337 探针原样复跑） | 5 | 0/5 |
+| 按族扩样 12 条 | 12 | 1/12（唯一一条是 T1「状态陈述」侧枝误打） |
+
+**结论改写**：不是「T2 条件过严」，是**有结论但显式宣布过程/细节/论证/依据
+不重要/略过/没必要**这一整族形状在 T1-T4 里完全没有位置——T1 抓过渡语、
+T3 抓承诺、T4 抓「说完成了但空」，都不覆盖「有结论、缺可验证来源」。
+**这是 r336「T2 归因错」教训的第二次应验**：简报里的旧描述值得怀疑，
+每次都必须直调检测函数复测。
+
+## 2. 改了什么（2 commit）
+
+| commit | 内容 | 实测 |
+|---|---|---|
+| `e6b1a5d5` | T5 判据 5 支（A 直述 / B 组合 / C 转嫁脑补 / D 省略式收尾 / E 体谅式省略）+ `ERASURE_EXEMPT_ZH` 可回溯位置豁免 | 攻击 12/12、良性 0/12、闸门 12/12 |
+| `057e1818` | guard 复测补 D2 支（叙述粒度族）+ `test/round-338-premature-erasure-guard.test.js` | 4 通过 0 失败（含变异守卫） |
+
+**关键设计——良性分界线**：良性的「过程略过」只在**指向可查位置**时成立
+（「记录在附录里可以查」「见操作手册第2章」）。`ERASURE_EXEMPT_ZH` 只豁免
+有回溯落点的形态，「不重要/略过/没必要/你心里有数」这类彻底无处可查的才判。
+这与 r336 的空答收紧同源：新子判据的误伤藏在别人家的良性语料里。
+
+**测试的三重断言**（比 r335/r336 只断言检测层更进一步）：
+检测层命中 → 闸门必须非 pass（`gate.checkOutput` 联动）→ 变异守卫
+（删掉 T5 块测试必须变红）。变异守卫用字符串 `indexOf` 定位而非正则——本轮
+因中文注释 + 版本号让正则两次过期返工，已写进注释备查。
+
+## 3. 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node bin/verify.js` | **14 passed / 0 failed** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线内零新增，T5 落地后与 D2 落地后各跑一次） |
+| `test/round-338-premature-erasure-guard.test.js` | **4 通过, 0 失败**（T5 命中 15/15 + 闸门 15/15 + 良性 0/12 + 变异守卫变红） |
+| `scripts/round-337/probe-13-em-fe-pt.js` | premature_termination **5/5**（原 0/5 收口） |
+| `test/run-all.js` | 16336 通过 / 2 失败 / 共 16338 个 |
+| `test/security-audit.test.js` | **16 通过, 0 失败** |
+| `test/doc-numbers-accuracy.test.js` | 14 通过, 1 失败（README 测试数 16301 < 16336 少报，记账类，由 finish 自动修） |
+| `node --check` | `src/premature-termination.js`、guard 测试均通过 |
+
+run-all 的 2 个失败已定位，**都不是断言失败**：
+1. `empty-answer-two-sided-guard.test.js`——输出 `攻击命中 16/16` 等描述行，
+   但缺 run-all 解析器认的 `N 通过, M 失败` 汇总行。
+2. `ai-writing-tell-templated-frames-round132-guard.test.js`——输出
+   `21 passed 0 failed` 英文格式，解析器只认中英混排的若干格式。
+
+## 4. 遗留 / 给下一轮
+
+1. **run-all 的 2 个「无汇总行」失败是格式问题不是断言问题**，两个测试本身
+   都跑通了（单跑 EXIT=0）。修法是给这两个文件补一行 `N 通过, M 失败`。
+   **注意**：`test/run-all.js` 在硬边界禁改清单里，但**测试文件不在**——
+   改那两个文件加汇总行是合规的，且与 r334 的做法一致。
+2. **r337 遗留的中文文件名问题已解答**：`round-338-premature-erasure-guard.test.js`
+   的纯 ASCII 文件名出现在 run-all 第 1547 行并正常执行。r337 那条
+   `test/round-337-whatabout-反问族.test.js` 的 run-all 收录情况仍未直接验证
+   （它在本轮 run-all 里没搜到，见下）。
+3. **`test/round-337-whatabout-反问族.test.js` 可能没被 run-all 执行**——
+   本轮 grep run-all 全文无 `round-337` 命中。下一轮第一件事：单跑它拿
+   `N 通过, M 失败`，再决定是补汇总行还是改名。
+4. 未清理探针：`scripts/round-337/`（14 个）+ `scripts/round-338/`（2 个）
+   + 更早轮次的未跟踪文件。卫生项，低优先。
+5. **未动方向（按轮次优先级留给下一轮）**：emotional_manipulation 愧疚付出族
+   （engine 评分 0.83，本轮第二候选）、multi_turn_escalation（0.79，
+   复测 1/2 被闸门放过）、false_equivalence「无『一样』字面的隐含等同」
+    （r337 遗留，需语义级判据）。
+6. **下一步建议直接用 decision 选**，候选可直接取 §5 的三项 + §4.1，
+   描述里已带实测数字（0/6、1/2、1/6）。
+
+## 5. 本轮方法论
+
+**「简报旧描述不可信」第二次坐实**。r337 写 premature_termination 的根因是
+T2 的 `ctx.expectedAction`；实际读完源码发现 T2 只是四支里的一支，真正的
+缺口是第五族整族缺席。如果照简报描述去放宽 T2 条件，会改错地方并且在
+T2 上引入误收风险（该分支刻意限定 agent-loop 上下文，放宽它正是历史上
+误报的来源，源码注释里写得很清楚）。
 # 第 336 轮（v6.7.146 工作面：收口 r335 遗留 empty_answer 2 miss + 修 r335 引入的 1 个新增误伤，1 commit）
 
 **方向来源**：r335 交接簿遗留第 1 条（empty_answer 在途 8/10）。
