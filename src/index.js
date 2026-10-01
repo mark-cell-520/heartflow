@@ -759,11 +759,46 @@ function discriminate(text, evidence = [], contentMode) {
   // （有 premise/inference 标记却缺 conclusion 或跳跃 = 推理链断裂；纯陈述句无推理意图不触发）
   const rcIntent = (rc.markers?.premise?.count || 0) + (rc.markers?.inference?.count || 0);
   // 事实陈述豁免：报告/数据显示/调查/统计/年报 + 具体数据 = 数据引用句，不是推理链断裂
-  const FACT_STATEMENT = /报告显示|数据显示|调查了|统计显示|年报|研究表明|结果显示|同比增长|数据来自|覆盖|根据[^，。]{0,20}(文献|研究|论文|数据|资料|公开)|是[^。]{0,25}(领域|问题|方向|话题|现象)/i;
-  const rcBroken = rcIntent > 0 && !FACT_STATEMENT.test(text) && (rc.structure === '结构碎片' || rc.structure === 'unknown' || (rc.markers?.leap?.count || 0) > 0) && rc.score < 0.4;
+  const FACT_STATEMENT = /报告显示|数据显示|调查了|统计显示|年报|研究表明|结果显示|同比增长|数据来自|覆盖|根据[^，。]{0,20}(文献|研究|论文|数据|资料|公开)|是[^，。]{0,25}(领域|问题|方向|话题|现象)/i;
+  // [r349] 论断性连接词 + 问句/教学指令豁免：
+  // checkReasoningCoherence 的推论标记（因此/所以/说明/表明）与结论标记重叠严重，
+  // 「请解释什么是X」这类教学提问也会被判出 premise+inference 碎片。
+  // 反向判据必须要求文本确实在下断言（含那么/因此/所以/说明/可见/显然/必然/一定），
+  // 且不是提问或教学/指令请求，否则误伤放大（实测：不加这两支时 77 条良性基准
+  // 有 9 条被误判断裂，其中 2 条落在 strict 组，直接破坏 benign 全 pass）。
+  const ASSERT_CONNECTIVE = /那么|因此|所以|说明|可见|显然|必然|一定|注定|足见|据此/i;
+  const QUERY_OR_IMPERATIVE = /[?？]|^\s*请|请(解释|给出|说明|举例|列出|描述|介绍|分析)|如何|怎么(样|做)?|哪些|什么(是|意思)/i;
+  // [r349] 产品说明/说明书类固定搭配豁免：`X说明书请仔细阅读风险提示` /
+  // `X使用说明请见随附手册` 这类是**产品指引句**，不是推理链断裂，
+  // 但会被 premise 正则的「说明|证据|事实」和 conclusion 的「所以|因此」误吃。
+  // 实测触发 2 条 strict 组误伤（垂直场景 150 的金融/客服两类）。
+  const MANUAL_REFERENCE = /说明书|使用说明|随附|详见|参阅|官网|帮助中心|操作手册|免责声明/i;
+  // [r349] 修复死字符串 '结构碎片'：checkReasoningCoherence 只产出
+  // '部分结构碎片'（兜底分支，第 5934 行），从来没有 '结构碎片' 这个值，
+  // 原判据 `rc.structure === '结构碎片'` 恒 false——断裂判定几乎不可能成立。
+  // 改为取反「完整推理链」：其余结构（无前提直接推理结论/有前提有推理无结论/
+  // 部分结构碎片/跳跃推理）都是真断裂，配合 intent>0、事实陈述豁免、
+  // score<0.4 三闸收窄。
+  const rcBroken = rcIntent > 0 && !FACT_STATEMENT.test(text) && !QUERY_OR_IMPERATIVE.test(text)
+    && !MANUAL_REFERENCE.test(text)
+    && ASSERT_CONNECTIVE.test(text)
+    && (rc.structure !== '完整推理链' || (rc.markers?.leap?.count || 0) > 0)
+    && rc.score < 0.4;
   if (rcBroken) {
     findings.push({ dimension: 'reasoning_coherence', severity: Math.round((0.5 - rc.score) * 100), details: `推理连贯性差(${rc.structure})` });
   }
+  // [r349] 修复 r347 交接簿遗留第 2 条：reasoning_coherence 的 count 字段丢失。
+  // think-pipeline.js 第 654 行 `_dim('reasoning_coherence').count > 0` 与
+  // output-checklist.js 第 421 行 `dims.reasoning_coherence.count > 0` 两处读方
+  // 此前恒为 undefined —— 检测层命中（结构碎片/跳跃推理）但下游全部当作"未命中"，
+  // 两条告警链路从未触发过。
+  // count 语义取 rcBroken（断裂 1 / 未断 0），与 findings 层共用同一判据，
+  // 读方与 gate 结论严格同源；不能按 rcIntent 计数——完整推理链同样有
+  // premise+inference 标记，那样 think-pipeline 会给正常推理句误报
+  // 「推理连贯性不足」。quality 一并登记供读方直接引用。
+  rc.count = rcBroken ? 1 : 0;
+  rc.quality = rcBroken ? rc.reasoningQuality : 'good';
+  rc.reasoningIntent = rcIntent;
   // 证据维度走反向检测
   if (ev.score < 0.25) {
     findings.push({ dimension: 'evidence', severity: Math.round((0.5 - ev.score) * 100), details: `证据不足(${(ev.issues||[]).length}个问题)` });
