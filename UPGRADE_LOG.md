@@ -1,3 +1,100 @@
+# 第 313 轮（v6.7.132 工作面，闭环 r312 遗留：r312 引擎改动未记账 + MCP 知识层无状态缺陷，3 commit）
+
+**方向来源**：r312 的 commit 在 git log 里（`0442e2c9` 接线 + `915e1d75` 守卫），
+但 **UPGRADE_LOG.md 没有第 312 轮记录**，且 r312 的 MCP 层改动
+（`ecaa2c9e` 的 tools-registry + mcp-server 共 58 行）被 `auto-commit-round.js`
+以「chore(auto)」形式吞掉，没有任何独立 commit 说明它做了什么。
+本轮复测 r312 没验证的东西，坐实一个真缺陷并闭环。
+
+## 1. 复测对象与实测证据
+
+| 复测项 | 方法 | 结果 |
+|---|---|---|
+| r312 引擎接线 | `node test/knowledge-layer-wiring-round312.test.js` | **10/10 绿**（A/B/C 三段都在，B 段起真引擎） |
+| r312 引擎启动 | `node bin/verify.js` | **14/14 绿** |
+| r312 MCP 工具 | `scratch/r313-probe-mcp-kl.js`：起真 MCP server，Unix socket 通道打 JSON-RPC | **链路断裂** |
+
+**缺陷形态（r312 首版）**：handler 内 `new KnowledgeLayer()`，
+每次 `tools/call` 造一个全新实例。实测同一进程内连续 4 次调用：
+
+| 调用 | 返回 | 说明 |
+|---|---|---|
+| `store` | `stored.id = 19a1f78da06a83a5`，stats totalFacts=1 | 写进去了（临时实例里） |
+| `query` | **count = 0** | 另一个新实例，看不到上一条 |
+| `stats` | **totalFacts = 0** | 还是新实例 |
+| `remove`（用 store 给的 id） | **removed = false** | 新实例里没有这条 |
+
+即：工具**能调用、参数校验也对、单次返回也像模像样，但跨调用状态全丢**。
+这是比「工具不存在」更隐蔽的空壳形态——它会让人以为知识层接上了。
+
+## 2. 改动（3 commit）
+
+| commit | 内容 |
+|---|---|
+| `68da853d` | **修复**：handler 改为读引擎常驻实例 `heartflow.knowledgeLayer`；引擎未启动时退化到进程内缓存单例 `_knowledgeLayerFallback()`；补齐 `getFact` action；`domains` 收编 `getDomains` 别名；删掉 `stats.domainCount !== undefined ? ... : []` 这个恒真判断 |
+| `60b99f7b` | **守卫** `test/knowledge-layer-mcp-state-round313.test.js` 21 断言五段 + 负例 `scripts/negative-test-knowledge-layer-mcp-r313.js` 5 项注入 |
+
+### 守卫五段
+
+| 段 | 钉什么 |
+|---|---|
+| A | 工具在 `tools/list` 内、描述点明与 `knowledge_graph` 的关系图是两回事、`inputSchema` 含 action/domain |
+| **B** | 起真 MCP server 走 socket 实测**跨调用状态**：store→query count≥1、stats totalFacts≥1、getFact 取回、remove 生效、删后再 query 归 0、domains 返回数组。**本守卫的核心理由** |
+| C | handler 必须读 `heartflow.knowledgeLayer`；handler 内不许出现 `new KnowledgeLayer(`；回退单例必须缓存 |
+| D | 引擎侧三处接线仍在（r312 的 lazy 注册 / start() 实例化 / subsystemNames） |
+| E | 参数校验不许静默吞错（store/query/remove 三类都报错） |
+
+### 负例 5 项全变红，还原后 21/21 复绿
+
+| 注入 | 失败数 | 形态 |
+|---|---|---|
+| ① handler 内 `new KnowledgeLayer`（r312 缺陷原形） | **5** | C1+C2+C3 三条静态 + B 段状态链全断 |
+| ② 引擎实例可用却回退到单例（state 走旁路） | 1 | C1 |
+| ③ 回退单例去掉缓存行（退化成每次一个新实例） | 1 | C4（第一轮守卫**漏了这条未变红**，已补 C4 后转红） |
+| ④ 删 query 空检索词校验（静默返回空结果） | 1 | E2b |
+| ⑤ 删引擎侧 lazy 注册 | 1 | D1 |
+
+## 3. 顺带修掉的第二缺陷
+
+守卫第一轮 18/19 时 E2 失败，定位后发现不是测试写错而是**真缺陷**：
+`query` 缺 `question` 时不报错，而是静默走 `knowledge-layer.js` 的
+`terms.length === 0` 分支——**返回该域全部事实**。调用方以为在检索，
+实际把整个域 dump 出来了（配合 limit 上限 10）。
+已在同一 commit 内改为显式报错：`query 需要 question（域内检索词，空检索会静默返回空结果）`。
+教训：**守卫写细一点，跑一次就可能捞出一个独立缺陷**——这一条不是本轮原定目标。
+
+## 4. 七项验证
+
+| 项 | 结果 |
+|---|---|
+| `bin/verify.js` | **14/14** |
+| `bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线完全持平，零新增误拦） |
+| `run-all.js` | 见下方第 5 节（后台实测） |
+| `security-audit.test.js` | **16/16** |
+| `doc-numbers-accuracy.test.js` | **11 通过 / 4 失败**（见第 5 节，非本轮引入） |
+| 注入负例 | **5/5 全变红，还原后 21/21 复绿** |
+| `upgrade-engine.js finish` | 见下 |
+
+## 5. 遗留（给下一轮）
+
+1. **doc-numbers-accuracy 4 个失败，根因是 r312 新增 MCP 工具未记账（非本轮引入）**：
+   README 说 60 MCP tools 实测 61；SKILL.md 说 60 实测 61；
+   AGENTS.md 说 60 实测 61 + 1,761 routes 实测 1,770。
+   硬边界明文禁本轮改这三个文件，且 `upgrade-engine.js` 的自动记账
+   只覆盖 README **测试数**一项，工具数/路由数没有自动机制。
+   **这是结构性记账缺口，下一轮要么放开这三个文件的「数字记账」豁免，
+   要么给 upgrade-engine 加 tools/routes 自动记账。** 在此之前每加一个
+   MCP 工具就会让这条测试红一次。
+2. **19 个孤儿模块仍未接线**（r311 遗留，连续第三轮挂着）。下一轮先跑
+   0 引用扫描取真实数，按「>50 行有真实逻辑 + 接线成本 <50 行」筛。
+3. **54 个未跟踪探针文件**仍未归类（`scripts/round-29x~30x/`、`scratch/`、
+   r310b/r311/r313 负例）。建议 `scratch/` 与 `scripts/round-NNN/` 加
+   .gitignore，`scripts/negative-test-*.js` 按惯例入库。
+4. **方法论新增**：判断「MCP 工具是否真接上」，单跑工具表存在性不够，
+   必须像本轮这样起真 server 做**跨调用状态**探针。r312 的 wiring 守卫
+   查了引擎侧实例化（真接上了），但没查 MCP handler 用的是不是同一个实例，
+   两个守卫各看一半。**下一轮给其他新接线工具补状态探针时照 B 段写**。
+
 # 第 311 轮（v6.7.124 工作面，闭环 r310 遗留 1：r308 两个测试文件静默失败，3 commit）
 
 **方向来源**：r310 交接簿「给下一轮」第 1 项（r308 格式问题已连续三轮占失败位，修法极简，应优先）+ r310 遗留 2（4 个零 stdout 测试）。

@@ -42,16 +42,65 @@ t('每个 TOOLS 都有 name + description + inputSchema', () => {
 });
 
 // HANDLERS 映射
+// [r313 修复] 原正则只匹配 `heartflow_x: handleFoo,` 简短引用一种形态，
+// 漏掉 121 个内联箭头 handler（heartflow_x: (args) => {...}），
+// 于是把内联形态的**正确** handler 判为「孤儿工具」——
+// 首批撞上的是 r312 新增的 heartflow_knowledge_layer。
+// 守卫漏检比守卫误报更隐蔽：它让人以为 181 个 handler 都过了门。
+// 现行：逐行扫 body，顶层键（缩进正好 2 空格）按三种形态分类：
+// 简短引用 / 内联箭头 / 内联 function；同一行多个键也全收。
 const hb = mcpSrc.match(/const HANDLERS = \{([\s\S]*?)\n\};/);
 const handlerMap = {};
-for (const line of hb[1].split('\n')) {
-  const m = line.match(/^\s*'?(heartflow_\w+)'?:\s*(\w+),/);
-  if (m) handlerMap[m[1]] = m[2];
+const TOP = /^  '?(heartflow_\w+)'?:\s*(.*)$/;
+for (const line of (hb ? hb[1] : '').split('\n')) {
+  const m = line.match(TOP);
+  if (!m) continue;
+  // 同一行可能有多个 `heartflow_x: yy,` 并列（实测存在 dream 那一行）
+  const restPairs = m[2].split(/,\s*(?=heartflow_)/);
+  let first = true;
+  for (let seg of restPairs) {
+    const key = first ? m[1] : null;
+    first = false;
+    seg = seg.trim();
+    let name = null, form;
+    if (/^(?:async\s*)?\(/.test(seg)) { name = '(inline)'; form = 'inline-arrow'; }
+    else if (/^(?:async\s*)?function\b/.test(seg)) { name = '(inline)'; form = 'inline-fn'; }
+    else { const r = seg.match(/^(\w+)\s*,?$/); if (r) { name = r[1]; form = 'ref'; } }
+    if (key && name) { handlerMap[key] = name; handlerMap['__form_' + key] = form; }
+  }
 }
+// 只有真的解析出值的键才算有 handler；未出现 = 键都没解析到（真孤儿）
+const wired = Object.keys(handlerMap).filter(k => !k.startsWith('__form_'));
+const inlineCount = wired.filter(k => handlerMap[k] === '(inline)');
 
 t('每个 TOOLS 都有 handler（无孤儿）', () => {
   const orphans = TOOLS.filter(x => !handlerMap[x.name]).map(x => x.name);
   assert.strictEqual(orphans.length, 0, '孤儿工具: ' + orphans.join(', '));
+});
+
+// [r313 新增] 形态 census：不许退回「只认简短引用」的半瞎状态。
+// r313 实测：181 个顶层键里 59 个简短引用 + 121 个内联箭头 + 1 行内多键。
+// 一个内联都认不出 = 解析器退回了 r312 那个只认引用的正则。
+t('HANDLERS 解析器覆盖内联箭头形态（r313 修复回归）', () => {
+  assert.ok(wired.length >= 170,
+    `wired=${wired.length} 远低于实测 181 —— HANDLERS 解析大概率坏了`);
+  assert.ok(inlineCount.length >= 100,
+    `inline=${inlineCount.length} —— 内联箭头 handler 没被认出来（r312 缺陷的工具就是被这么误报成孤儿的）`);
+  assert.ok(handlerMap['heartflow_knowledge_layer'],
+    'heartflow_knowledge_layer 未被解析出 handler（内联箭头形态）');
+  assert.strictEqual(handlerMap['heartflow_gate'], 'handleGate',
+    '简短引用形态也应仍能解析（防止为了修内联把引用形态改坏）');
+});
+
+// [r313 新增] 行内并列键也要收到（实测 dream 那行有两个 heartflow_ 键）
+t('HANDLERS 一行多键全收（r313 修复回归）', () => {
+  const dreamLine = (hb ? hb[1] : '').split('\n').find(l => /heartflow_dream:/.test(l));
+  assert.ok(dreamLine, '找不到 dream 那行');
+  const keys = dreamLine.match(/heartflow_\w+(?=:)/g) || [];
+  assert.ok(keys.length >= 2, `dream 那行只有 ${keys.length} 个键，样本不足`);
+  for (const k of keys) {
+    assert.ok(handlerMap[k], `行内并列键 ${k} 没被解析`);
+  }
 });
 
 t('HANDLERS 映射的函数都真实存在', () => {
