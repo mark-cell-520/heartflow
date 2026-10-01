@@ -1659,7 +1659,7 @@ class HeartFlow {
 
     // [DeepSeek V4.1] Engram conditional memory init
     try {
-      const En = require('./memory/engram-memory.js');
+      const En = require('../memory/engram-memory.js');
       this._engram = new En.EngramMemory({ maxEntries: 200, ttlMs: 30 * 60 * 1000, indexPath: path.join(this.rootPath || process.cwd(), 'data', 'engram-index.json') });
     } catch (_) { this._engram = null; }
 
@@ -5552,10 +5552,19 @@ class HeartFlow {
     try {
       if (result && !result.error && typeof input === 'string') {
         const tag = result.type || result.gate?.action || 'general';
-        this._engram.store([{ input: input.slice(0, 500), tag, confidence: result.confidence || null, decision: result._decision || null, effort, ts: Date.now() }]);
-        if (result._decision) {
+        // [r319] 归一化 decision：原代码直接存 result._decision，实测该字段常为对象，
+        // 落库成 byDecision {"[object Object]"：1}，而 recallByDecision 只接受 string，
+        // 导致 recall 恒为空、_engramRecall 恒为 undefined（看着接通实则空转）。
+        const rawDecision = result._decision;
+        const decision = typeof rawDecision === 'string'
+          ? rawDecision
+          : (rawDecision && typeof rawDecision === 'object'
+            ? (rawDecision.type || rawDecision.chosen || rawDecision.composite_?.chosen || rawDecision.action || rawDecision.id || 'composite')
+            : (typeof rawDecision === 'number' ? String(rawDecision) : null));
+        this._engram.store([{ input: input.slice(0, 500), tag, confidence: result.confidence || null, decision, effort, ts: Date.now() }]);
+        if (decision) {
           const recalledByTag = this._engram.recall(tag, 3);
-          const recalledByDecision = this._engram.recallByDecision(result._decision, 2);
+          const recalledByDecision = this._engram.recallByDecision(decision, 2);
           const merged = [];
           const seen = new Set();
           for (const item of [...(recalledByDecision || []), ...(recalledByTag || [])]) {
