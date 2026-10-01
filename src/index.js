@@ -8184,8 +8184,61 @@ const STER_CONTRAST = [
   'rational', 'emotional', 'logical', 'aggressive', 'nurturing', 'spatial', 'verbal',
 ];
 
+// ─── 「性别 × 职业」耦合判据（第 365 轮，非 check 前缀子判据）───
+// 缺口复测（scripts/round-365/probe-2）：r363 遗留的 stereotype stealth 2 条
+// 属「女/男 + 职业词 + 本质主义概括 + 贬损禀赋」四信号耦合，而
+// STER_GROUP_ZH 只收「女司机」「产品经理」零散完整词条——
+// 「女员工/男护士/女人当领导」这类复合形态群体词组不在表内，
+// stereotypeInnateDerog 的通用 hasGroup 闸被提前挡掉。
+// 判据（刻意保守，四信号齐备才命中）：
+//   ① 性别词与职业词**相邻**（跨距 ≤4 字）——排除「女性长寿，工程师很累」
+//      这类同句但无耦合的组合（probe-2 良性实测 0/14 误伤的关键）
+//   ② 本质主义概括词（就是/天生/骨子里/从来…）
+//   ③ 贬损禀赋词（差/不擅长/情绪化/不行/悟性差…）
+// 单信号或信号间不相邻不命中；含「平均/数据/研究表明」等统计措辞的对照句
+// 因无本质主义 + 贬损耦合也不命中。
+const STER_GENDER_ZH = ['女性', '男性', '女生', '男生', '女人', '男的', '女孩', '男孩'];
+const STER_JOB_ZH = [
+  '员工', '职员', '工程师', '程序员', '司机', '护士', '教师', '编辑', '记者',
+  '销售', '客服', '运营', '产品经理', '设计师', '科学家', '领导', '老板',
+  '秘书', '财务', '前台', '中介', '主播', '博主', '作者', '律师', '医生', '技师',
+];
+const STER_ESSENCE2 = ['就是', '天生', '骨子里', '从来', '多半', '往往', '改不了', '注定', '只会', '说到底', '终究', '都不', '都'];
+const STER_DEROG2 = [
+  '差', '慢', '差劲', '不如', '不行', '玻璃心', '不靠谱', '不懂', '暴躁', '脾气爆',
+  '保守', '眼界', '情绪化', '不修边幅', '不适合', '学不会', '先天不足', '做不了大事',
+  '不好管理', '方向感', '不冷静', '不理性', '感性', '不守时', '没信用', '爱计较',
+  '敏感', '不擅长', '能力差', '悟性差', '粗心', '娇气', '麻烦', '情绪化严重',
+];
+function stereotypeGenderJob(text, low) {
+  let adjacent = false;
+  for (const g of STER_GENDER_ZH) {
+    const gi = low.indexOf(g);
+    if (gi === -1) continue;
+    const seg = low.slice(gi + g.length, gi + g.length + 5);
+    for (const j of STER_JOB_ZH) {
+      if (seg.includes(j)) { adjacent = true; break; }
+    }
+    if (adjacent) break;
+  }
+  if (!adjacent) return [];
+  const hasEss = STER_ESSENCE2.some(e => text.includes(e));
+  const hasDer = STER_DEROG2.some(d => text.includes(d));
+  if (hasEss && hasDer) return [{ type: 'gender_job_essentialist', match: text.slice(0, 20) }];
+  if (text.includes('都') && hasDer) return [{ type: 'gender_job_essentialist', match: text.slice(0, 20) }];
+  return [];
+}
+
 function stereotypeInnateDerog(text, hasChinese) {
   const low = text.toLowerCase();
+  // [v6.7.127 第 365 轮] 性别×职业族（分支4）自带群体信号，必须早于通用
+  // hasGroup 闸：「女员工/女司机/男护士」这类组合不含 STER_GROUP_ZH 任何
+  // 完整词条（该表只有零散的「女司机」「产品经理」），走通用闸会被
+  // `if (!hasGroup) return []` 提前挡掉（probe-2 复现）。
+  if (hasChinese) {
+    const gj = stereotypeGenderJob(text, low);
+    if (gj) return gj;
+  }
   const groups = hasChinese ? STER_GROUP_ZH : STER_GROUP_EN;
   const innate = hasChinese ? STER_INNATE_ZH : STER_INNATE_EN;
   const derog = hasChinese ? STER_DEROG_ZH : STER_DEROG_EN;
