@@ -1940,10 +1940,13 @@ const EM_MANIPULATION_PATTERNS = {
     // 定位到漏点是 for your sake 占了 14 字符，原窗口 20 不够）。
     [/\bi (?:stayed up|spent|worked) (?:all night|hours?|[^.]{0,24})\b[^.]{0,50}?\bfor (?:your|the)\b[^.]{0,26}?\b(?:and you|yet you)\b[^.]{0,30}?\b(?:call|dismiss|say)[^.]{0,20}?\b(?:useless|pointless|a waste|stupid|nothing)\b/i, 'benevolence_leverage', 0.55],
     // 「sake 通用型」：善意宣告半用 for your sake / for you / out of love /
-    // because I care，追偿半直接跟 and you + 贬低动词。r354 probe-13 定位
+    // because i care / for your own good，追偿半直接跟 and you + 贬低动词。r354 probe-13 定位
     // EM#5 的漏点是 sacrifice 半不用 stayed up/spent 类动作（是 in review
     // 类进行态），因此这句不再限定牺牲动作，只要求善意宣告 + 对方贬低。
-    [/\b(?:for your sake|for you|out of love|because i care|for your own good)\b[^.]{0,40}\b(?:and|yet|but) you\b[^.]{0,40}\b(?:call|dismiss|say|treat)[^.]{0,26}\b(?:useless|pointless|a waste|stupid|worthless|nothing|hurting)\b/i, 'benevolence_leverage', 0.55],
+    // [v6.7.158 r355] probe-16 复测：善意宣告半还有「因果前置」变体
+    // （because i love you / since i love you / as i love you），
+    // 原词表只有 because i care 一种因果形，漏掉 love 形一种。
+    [/\b(?:for your sake|for you|out of love|because i care|because i love you|since i love you|as i love you|for your own good)\b[^.]{0,40}\b(?:and|yet|but) you\b[^.]{0,40}\b(?:call|dismiss|say|treat)[^.]{0,26}\b(?:useless|pointless|a waste|stupid|worthless|nothing|hurting)\b/i, 'benevolence_leverage', 0.55],
     // 「我为这个家/你付出了一切，你却只 Z」—— 单向否定归罪（无 repay 类词）
     [/\bi (?:do|did) (?:everything|all of (?:this|it)) for (?:you|this (?:family|home|team))\b[^.]{0,40}\band all you (?:do|did) is\b/i, 'benevolence_leverage', 0.6],
     // everything I do / everything I did for you 主语句首变体
@@ -8730,6 +8733,14 @@ const TONE_POLICING_PATTERNS = {
     // 语气宾语同句共现 —— 单纯祈使（Mind your language）不命中；
     // 纯沟通建议（You could add an agenda slide）无语气宾语不命中。
     { pattern: /\b(?:watch|mind|control|moderate|tone down|change|fix|soften|lower|keep|adjust|rephrase|moderate)\s+(?:your\s+|the\s+)?(?:tone|attitude|volume|language|wording|delivery|voice|pitch|manner|words|way)\b[^.]{0,70}\b(?:rational|rationality|calm|calmer|objective|composed|measured|reasonable|serious|seriously|credible)\b/i, type: 'en_tone_imperative_rational', severity: 0.6 },
+    // [v6.7.158 r355] 无宾语祈使变体：「Be/Stay + 理性标准形容词」直接起句
+    // （不含 tone/attitude/volume 语气宾语名词）+ 后果条件半
+    // （otherwise nobody will hear your point）。r354 探针 #2 实测：
+    // rational=1 conseq=1 但 imper=0 toneObj=0 —— 上面六条全部要求
+    // 祈使动词与语气宾语紧邻，本族形状的祈使动词只有系动词 be/stay。
+    // 安全阀：仍要求理性标准形容词 + 「无人听」条件半共现；
+    // 单纯 "Be careful" / "Stay safe" 无理性标准不命中。
+    { pattern: /\b(?:be|stay|remain|sound|keep)\s+(?:calm|calmer|rational|rationality|objective|composed|measured|reasonable|level-?headed)\b[^.]{0,50}\b(?:otherwise|or else|if not|before|unless)\b[^.]{0,40}\b(?:nobody|no one|won'?t (?:hear|listen|take)|won'?t be (?:taken|heard)|not be (?:taken|heard|listened to))\b/i, type: 'en_tone_imperative_rational', severity: 0.6 },
   ],
 };
 
