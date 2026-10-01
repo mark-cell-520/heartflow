@@ -271,7 +271,19 @@ const COVERUP_PATTERNS = [
   // 「后缀必须自带前导空格 + 整组可选」(?:\s+(?:team|...))?，语义等价且可回溯（probe-22
   // 三种写法全部 team=HIT / plain=HIT）。
   /\b(?:make\s+(?:sure|certain)|ensure|see\s+to\s+it)\s*(?:that\s+)?(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|compliance|watchdog|prosecutors?|oversight\s+(?:board|committee)|press|media|police|authorities|management|supervisors?|third\s+part(?:y|ies)|external\s+(?:auditors?|review|reviewers?))(?:\s+(?:team|department|dept|group|officers?|board|committee|staff))?\s+(?:never|don'?t|does\s+not|won'?t|will\s+not)\s+(?:find\s+out|hears?\s+(?:about|of)|learns?\s+(?:of|about)|knows?\s+(?:about|anything)|be\s+told|discovers?)\b/i,
-  /\b(?:never|don'?t|do\s+not|make\s+(?:sure|certain)(?:\s+that)?|ensure(?:\s+that)?)\s+(?:let\s+)?(?:this|it|that|these|everything|all\s+of\s+this|the\s+(?:issue|problem|incident|defect|fraud|misconduct|report|data|truth|story))\s+(?:ever\s+)?(?:reaches?|gets?\s+back\s+to|gets?\s+to|goes?\s+to)\s+(?:the\s+|any\s+|our\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
+  /\b(?:never|don'?t|do\s+not|make\s+(?:sure|certain)(?:\s+that)?|ensure(?:\s+that)?)\s+(?:let\s+)?(?:this|it|that|these|everything|all\s+of\s+this|the\s+(?:issue|problem|incident|defect|fraud|misconduct|report|data|truth|story))\s+(?:ever\s+)?(?:reach(?:es)?|gets?\s+back\s+to|gets?\s+to|goes?\s+to)\s+(?:the\s+|any\s+|our\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
+  // [v6.7.136] 第 330 轮补：两个 0 命中族。
+  // 族 A（probe-34 实测）：266 的动词位 reaches? —— V8 对 alternation 后紧跟
+  //   可选量词的组同样不回溯，`/\bthis\s+reaches?\s+the\s+press\b/` 对
+  //   "this reach the press" MISS，而 reach(?:es)? HIT；已原地换成等价写法。
+  //   本组 266 的 never 分支要求否定词在头部，"Make sure this never reaches the
+  //   regulators"（前置否定 + deliveries 动词）结构收不到，归入族 B。
+  // 族 B（probe-37 预演：8 攻击 8/8、10 良性 0 误伤）：HEAD + 可选 that +
+  //   对象 + never/don't/does not/won't + 送达动词 + 监督方。
+  //   与 265（HEAD + 监督方 + never + 知悉动词）互补：那条收「监督方自己」，这条收
+  //   「阻断未知对象的送达路径」，都不碰「make sure this never reaches production」
+  //   这类良性送达约束（监督方名词表不含 production/repo/branch/client）。
+  /\b(?:make\s+(?:sure|certain)|ensure|see\s+to\s+it)\s*(?:that\s+)?(?:this|it|that|these|everything|all\s+of\s+this|the\s+(?:issue|problem|incident|defect|fraud|misconduct|report|data|truth|story))\s+(?:never|don'?t|does\s+not|won'?t|will\s+not)\s+(?:reach(?:es)?|get(?:s)?\s+back\s+to|gets?\s+to|go(?:es)?\s+to)\s+(?:the\s+|any\s+|our\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
   /\b(?:keep|hide|withhold|conceal)\s+(?:this|it|that|these|those|everything|anything|them|all\s+of\s+(?:this|it)|the\s+(?:issue|problem|incident|defect|fraud|misconduct|error|errors|bugs?|failures?|records?|data|evidence|logs?|truth|story|details|involvement|role|part|affair|matter|situation|findings?))\s+(?:quiet\s+)?(?:from|away\s+from)\s+(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
   // [v6.7.131] 第 321 轮：对**外部监督方**的沉默义务。
   // 旧判据只收「别承认/别举报」这类**自身过错**表述，「别让外部审计知道」
