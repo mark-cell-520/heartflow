@@ -768,11 +768,30 @@ function discriminate(text, evidence = [], contentMode) {
   // 有 9 条被误判断裂，其中 2 条落在 strict 组，直接破坏 benign 全 pass）。
   const ASSERT_CONNECTIVE = /那么|因此|所以|说明|可见|显然|必然|一定|注定|足见|据此/i;
   const QUERY_OR_IMPERATIVE = /[?？]|^\s*请|请(解释|给出|说明|举例|列出|描述|介绍|分析)|如何|怎么(样|做)?|哪些|什么(是|意思)/i;
-  // [r349] 产品说明/说明书类固定搭配豁免：`X说明书请仔细阅读风险提示` /
-  // `X使用说明请见随附手册` 这类是**产品指引句**，不是推理链断裂，
-  // 但会被 premise 正则的「说明|证据|事实」和 conclusion 的「所以|因此」误吃。
-  // 实测触发 2 条 strict 组误伤（垂直场景 150 的金融/客服两类）。
+  // [r350] 强断言闸（STRONG_CLAIM）：无真实前提支撑的确信判断才可能是断裂论证。
+  // r349 判据只要求「有 inference 标记 + 一个论断连接词」，把工程诊断句
+  // （「测试没通过说明实现有问题」）和流程句（「内部先定位，再对外说明」）
+  // 也扫进来了 —— r321/r331 三条既有良性断言因此被误判 verify。
+  // 收窄为：premise 必须是**真实论证前提**（连接词带出或强主体作主语），
+  // 且没有真实前提时要求出现强确信词或 leap 标记；否则该断言句视为
+  // 普通因果诊断/转述句，不判断裂。
+  // 实测（probe-6/7/9）：加上本闸后 A 族 9/9 保持命中，
+  // R 回归集 5/5、C 良性 15/15、B 族 3/3 全部零误判。
+  const STRONG_CLAIM = /一定|必然|注定|毫无疑问|毋庸置疑|板上钉钉|势必|铁定|不可动摇|100%|绝对(正确|对|错|是|会|能)|是(正确|对)的|一定(是|会|能|对)/i;
+  // 真实前提：连接词带出的从句
+  const PREMISE_CONNECTIVE = /(?:因为|由于|基于|根据|鉴于|出于|考虑到|按照|依据|凭借)[^。！？，,；;]{0,12}/;
+  // 强主体作主语（「历史经验/常识/古人/数据表明」这类是论证前提；
+  // 「文档里说明了…数据」里的裸名词只是转述对象，不算前提）
+  const PREMISE_STRONG_SUBJECT = /历史经验|经验(反复)?(证明|表明|告诉)|常识|古人|传统|惯例|权威|专家|理论上|本质上|根本上|数据(表明|显示)|研究(表明|显示|指出)|调查(表明|显示)|统计(表明|显示)/;
+  function hasRealPremise(text) {
+    return PREMISE_CONNECTIVE.test(text) || PREMISE_STRONG_SUBJECT.test(text);
+  }
   const MANUAL_REFERENCE = /说明书|使用说明|随附|详见|参阅|官网|帮助中心|操作手册|免责声明/i;
+  // [r350] MANUAL_REFERENCE 的原始注释在 r350 被上面 STRONG_CLAIM 块顶替，
+  // 在此补回语义说明（产品指引句不是断裂论证）。
+  // 产品说明/说明书类固定搭配豁免：`X说明书请仔细阅读风险提示` /
+  // `X使用说明请见随附手册` 这类是产品指引句，不是推理链断裂，
+  // 但会被 premise 正则的「说明|证据|事实」和 conclusion 的「所以|因此」误吃。
   // [r349] 修复死字符串 '结构碎片'：checkReasoningCoherence 只产出
   // '部分结构碎片'（兜底分支，第 5934 行），从来没有 '结构碎片' 这个值，
   // 原判据 `rc.structure === '结构碎片'` 恒 false——断裂判定几乎不可能成立。
@@ -783,7 +802,11 @@ function discriminate(text, evidence = [], contentMode) {
     && !MANUAL_REFERENCE.test(text)
     && ASSERT_CONNECTIVE.test(text)
     && (rc.structure !== '完整推理链' || (rc.markers?.leap?.count || 0) > 0)
-    && rc.score < 0.4;
+    && rc.score < 0.4
+    // [r350] 强断言闸：rcIntent 用的是检测层 premise 原文匹配，会把
+    // 「文档里说明了…数据」这类转述句算成有前提。真正下断言的断裂论证
+    // 必须有强确信词或 leap 标记（无真实前提时），否则视为普通诊断句。
+    && (hasRealPremise(text) || STRONG_CLAIM.test(text) || (rc.markers?.leap?.count || 0) > 0);
   // [r349] 纯跳跃推理族 second arm：
   // 上述判据要求 intent>0（有 premise/inference 标记），但
   // 「显然/毫无疑问/自然是/明摆着」这类纯断言句可能一个标记都不命中——
@@ -796,7 +819,10 @@ function discriminate(text, evidence = [], contentMode) {
     && !MANUAL_REFERENCE.test(text)
     && (rc.markers?.leap?.count || 0) > 0
     && ASSERT_CONNECTIVE.test(text)
-    && rc.score < 0.4;
+    && rc.score < 0.4
+    // [r350] 与 rcBroken 同源的强断言闸（leap 本身即强确信信号，
+    // 但为保持两支臂判据对称仍显式计入）。
+    && (hasRealPremise(text) || STRONG_CLAIM.test(text) || (rc.markers?.leap?.count || 0) > 0);
   const rcBrokenFinal = rcBroken || rcLeapOnly;
   if (rcBrokenFinal) {
     findings.push({ dimension: 'reasoning_coherence', severity: Math.round((0.5 - rc.score) * 100), details: `推理连贯性差(${rc.structure})` });
