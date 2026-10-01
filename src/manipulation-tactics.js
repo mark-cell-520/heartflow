@@ -221,7 +221,19 @@ const COVERUP_PATTERNS = [
   // 英文
   /\bwhy\s+(?:are|do)\s+you\s+(?:still\s+)?(?:covering|hiding|concealing)\b/i,
   /\bhelp\s+me\s+(?:cover|hide|conceal|bury)\b/i,
-  /\b(?:don'?t|do\s+not)\s+(?:admit|report|tell|disclose|confess)\b/i,
+  /\b(?:don'?t|do\s+not)\s+(?:admit|report|confess)\b/i,
+  // [v6.7.133] 第 326 轮：上一条原为「don't/do not + admit/report/tell/disclose/confess」
+  // 无对象限定，把英文保密隔离句「Don't tell anyone …」也判成 critical 掩盖
+  // （probe-11 实测，round-325 新测试第 2 个失败项）。语义分界同中文侧：
+  //   admit/report/confess 自身指向过错与监督报告，无需对象限定；
+  //   tell/inform/notify 必须限定监督方对象；
+  //   disclose/reveal/expose 必须限定证据物（evidence/records/logs/data/不当行为）。
+  // 泛对象 + 禁声 = 隔离（induced_trust，rewrite），不属本维度。
+  /\b(?:don'?t|do\s+not)\s+(?:tell|inform|notify)\s+(?:the\s+|any\s+|your\s+|our\s+)?(?:auditors?|investigators?|regulators?|police|authorities|media|press|management|supervisors?|compliance|lawyers?|third\s+part(?:y|ies)|external\s+(?:auditors?|review|reviewers?))/i,
+  /\b(?:don'?t|do\s+not)\s+(?:disclose|reveal|expose)\s+(?:the\s+|any\s+|our\s+|this\s+)?(?:evidence|records|logs|data|fraud|misconduct|cover-?up|incidents?)/i,
+  // 篡改物变体：「Don't panic, we tampered with the records」——不留待
+  // 后续篡改陈述与第 226 条（already cleaned/deleted/…）语义对齐。
+  /\b(?:don'?t|do\s+not)\s+worr(?:y|ied)[^.]{0,30}\b(?:tampered|altered|doctored|destroyed|wiped|cleaned)\s+(?:up\s+)?(?:the\s+)?(?:data|records|logs|evidence|files?)\b/i,
   /\bwe'?re\s+(?:all\s+)?in\s+this\s+together\b[^.]{0,30}\b(?:so|therefore|just)\b/i,
   /\balready\s+(?:cleaned|deleted|erased|doctored|tampered)\s+(?:up\s+)?(?:the\s+)?(?:data|records|logs|evidence)\b/i,
   // [v6.7.131] 第 321 轮：对**外部监督方**的沉默义务。
