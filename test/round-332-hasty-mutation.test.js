@@ -76,5 +76,5 @@ const after = runProbe();
 if (after === FULL) { pass++; console.log(`  还原后攻击命中 ${after}/6 ✔`); }
 else { fail++; console.log(`  还原后未回满命中：${after}/6`); }
 
-console.log(`r332 hasty 变异守卫：${pass} 绿 / ${fail} 红`);
+console.log(`r332 hasty 变异守卫：${pass} 通过, ${fail} 失败, 共 ${pass + fail} 个`);
 if (fail > 0) process.exit(1);
