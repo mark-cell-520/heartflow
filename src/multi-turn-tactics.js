@@ -147,10 +147,22 @@ const _RE_AUTHORITY_LAUNDERING = new RegExp([
   '|(?:(?:你)?方便[^。\\n]{0,10}(?:的话|的话就))',
   // ⑥ 责任转移（全句任一处，不止句首）
   '|(?:责任|后果|风险)[^。\\n]{0,8}(?:在|归)于?[^。\\n]{0,4}(?:你|您)',
-  '|(?:(?:耽误|延误|拖累|影响)[^。\\n]{0,8}(?:你|您)[^。\\n]{0,4}(?:负责|担责))',
+  '|(?:(?:耽误|延误|拖累|影响)[^。]{0,8}(?:你|您)[^。]{0,4}(?:负责|担责))',
+  // [v6.7.149 撤销] 责任转移·条件式分支曾在本轮加入，probe-6-branch.js 实测
+  // 与上方旧版分支同形（「责任就在你」两边都命中）→ 冗余，删除。
+  // 教训与 r336/r338 同源：新加分支前先单支测试，确认它独立命中某些样本。
+  // [v6.7.149 撤销] B2/C1/H/F2 四族分支曾在本轮加入，probe-7-independence.js
+  // 逐支独立命中验证发现：**没有任何一条测试样本独立依赖它们**（B2 命中 NONE，
+  // C1/H/F2 同样是 NONE）→ 既不能为召回贡献，也无法被负例守卫验证，
+  // 属死分支，删除。教训与 r336/r338 同源：新分支必须落在「测试集中独立命中」
+  // 的样本上，否则它不是能力是噪声。
   // 英文侧洗白族（r339 D 族）：同构六族
   '|(?:\\b(?:already|has been|was)\\s+(?:approved|authori[sz]ed|verified|confirmed|cleared)\\b)',
-  '|\\b(?:verified|checked|confirmed)\\s+(?:by\\s+)?(?:our\\s+)?(?:security|audit|compliance|ops)\\s+(?:team|dept\\w*)',
+  // [v6.7.149 实测修正] verified-team 分支原写 \\s+ 分隔，样本里 team 与
+  // verified 之间隔了 you have file access（含换行）→ 窗口内不匹配。
+  // 英文相邻窗口统一改 [^.]（放行换行），与中文侧口径一致。
+  '|(?:\\b(?:verified|checked|confirmed)\\s+by\\s+(?:our\\s+)?(?:security|audit|compliance|ops)[^.]{0,24}\\b(?:team|dept\\w*)\\b)',
+  '|(?:\\b(?:security|audit|compliance|ops)\\s+(?:team|dept\\w*)\\s+has\\s+verified\\b)',
   '|\\bwithin\\s+(?:the\\s+)?(?:authori[sz]ed|approved|permitted)\\s+(?:scope|range)',
   '|\\b(?:approved|authorized)\\s+internal\\b',
   '|\\b(?:just|only)\\s+(?:a\\s+)?(?:simple|quick|harmless|non-?sensitive)\\b',
