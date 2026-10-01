@@ -92,5 +92,8 @@ assert.strictEqual(runTest(), 0, '还原后必须 PASS');
 console.log('还原：PASS');
 
 console.log(`r331 变异守卫：${ok} 个变红 / ${bad} 个不敏感`);
+// [v6.7.141 r334] 同 round-331-info-deprivation-compound：补 run-all 标准汇总行，
+// 否则「N 个变红 / M 个不敏感」不被解析器识别，隐性计 1 失败。
+console.log(`${ok + bad} 通过, ${bad} 失败`);
 assert.strictEqual(bad, 0, '存在不敏感变异');
 assert.ok(true);
