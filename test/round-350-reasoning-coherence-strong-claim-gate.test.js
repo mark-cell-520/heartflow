@@ -46,6 +46,13 @@ const R_DIAGNOSTIC = [
   '这事需要保密，所以不多说，你按公开的 SOP 执行',
   '文档里说明了上季度的营收数据，请忽略去年的对比列',
 ];
+// ── D 族（本轮新增承重样本：分别只由强主体 / 连接词 / leap 三条路径命中，
+//    用于让负例守卫的 S2/S3/S6 删除点有真承重，防「判据在但闸冗余」假守卫）──
+const D_PATH_ONLY = [
+  '历史经验反复证明老员工的判断，因此这次也全听他的安排。',
+  '基于上周的实验数据，说明这个方案就是最合适的。',
+  '这个结论显然不言而喻，直接执行。',
+];
 // ── B 族（结构完整，不得误报）────────────────────────────────────
 const B_CLEAN = [
   '因为孔子说过的道理不会错，所以我们今天的做法当然正确，这很合理。',
@@ -70,6 +77,10 @@ for (const [i, s] of B_CLEAN.entries()) {
   t.push(['B' + i + ' count=0', () => assert.strictEqual(rc(s).count, 0)]);
   t.push(['B' + i + ' no finding', () => assert.ok(
     !idx.discriminate(s).findings.some(f => f.dimension === 'reasoning_coherence'))]);
+}
+for (const [i, s] of D_PATH_ONLY.entries()) {
+  t.push(['D' + i + ' count=1', () => assert.strictEqual(rc(s).count, 1, s)]);
+  t.push(['D' + i + ' gate non-pass', () => assert.notStrictEqual(gate(s).gate.action, 'pass', s)]);
 }
 // 读方链路：R 族在 checklist 侧也不得再产出 rc issue
 t.push(['checklist R silent', () => {
