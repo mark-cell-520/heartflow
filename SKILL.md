@@ -6,7 +6,7 @@ description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
   it reaches a human. 57 discrimination dimensions × 11-layer pipeline × 137 modules ×
-  60 MCP tools. Zero LLM dependency.
+  61 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
   discriminative result cache, async supervision layer, autonomous decision execution
@@ -86,9 +86,9 @@ from marketing copy.
 | Engine version | 6.7.69 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 137 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
-| Dispatch routes | 1,546 | sum of entries in `hf.routes()` |
+| Dispatch routes | 1,770 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 46 | `dimMap` keys in `src/index.js` |
-| MCP tools | 179 | tool definitions exposed via `tools/list` |
+| MCP tools | 61 | tool definitions exposed via `tools/list` |
 | Test suite | 547 passing / 0 failing | `node test/run-all.js` |
 | Capability guard | 18 / 18 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |

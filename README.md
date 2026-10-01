@@ -6,8 +6,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-57 discrimination dimensions  ×  11-layer pipeline  ×  137 modules  ×  60 MCP tools
-×  1,761 dispatch routes  ×  15,853 passing tests  ×  0 runtime dependencies
+57 discrimination dimensions  ×  11-layer pipeline  ×  137 modules  ×  61 MCP tools
+×  1,770 dispatch routes  ×  15,853 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -139,9 +139,9 @@ Measured on this repository at **v6.7.69**. Not marketing copy.
 |--------|-------|
 | Modules registered | 137 |
 | Module init errors | 0 |
-| Dispatch routes | 1,546 |
+| Dispatch routes | 1,770 |
 | Discrimination dimensions | 46 |
-| MCP tools | 179 |
+| MCP tools | 61 |
 | Test suite | 547 passing / 0 failing |
 | Capability guard | 18 / 18 checks |
 | Security regression | 16 / 16 |
