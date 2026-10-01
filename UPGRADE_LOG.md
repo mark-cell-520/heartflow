@@ -39,17 +39,24 @@ r350 交接簿两条遗留，逐条复测后全部坐实：
 | `test/security-audit.test.js` | **16/16** |
 | `scripts/negative-test-symbol-input-round351.js` | **2/2 删除点变红、基线还原绿** |
 | `node --check src/index.js` | 通过 |
+| `test/run-all.js` | **16595 通过 / 1 失败**（唯一失败 = doc-numbers-accuracy 的 README 记账缺口，已由 finish ①.5 自动记账 16462→16595，复跑 **15/15** 转绿） |
+| `test/doc-numbers-accuracy.test.js`（finish 后复跑） | **15/15** |
+
+finish 结果：①.5 README 记账 16462 → 16595；② 七项落盘检查全绿；②.5 推送远程成功
+（直连，11 个 commit）；③ 归因哨兵 3/3 pass；④ 队列 1/1；锁已释放。
 
 ## 给下一轮的接手说明
 
-1. run-all 全量结果以 `/tmp/r351-runall.log` 为准：目标条目 round211 与
-   doc-numbers-accuracy 均已单独复跑转绿，全量预期只剩 npm-package-integrity
-   或记账类历史项；若仍见失败先反查具体文件行号，不要再写「未能定位」。
+1. run-all 全量结果以 `/tmp/r351-runall.log` 为准：本轮收口后 = **16595 通过 / 1 失败**，
+   唯一失败已归因并修复。若下一轮全量再出现「失败未能定位到具体条目」，按本轮方法
+   反查：`grep -n -E "[1-9][0-9]* 失败" /tmp/rXXX-runall.log`，再单独复跑该文件确认。
 2. 本次两个删除点都是「真变红」——r350 汇报里「第 6 个删除点恒真不可观察」的
    处置被本轮沿用：没造恒真删除点，1 与 2 均是可观察行为变化。
 3. 遗留观察（不修，只记账）：判据区有 800+ 行直接读 `text` 的正则测试，本轮只
    在入口挡了 symbol 一族。若后续发现 BigInt / 带 toString 抛错的对象同样崩，
    按同型入口归一化处理（已在日志记录形状）。
+4. 本轮 finish 已把 11 个 commit 推送远程（直连成功）。工作区仍有 82 个未跟踪
+   的历史探针文件（scripts/round-*），属往轮遗留，不在本轮范围。
 
 ## 第 348 轮（v6.7.155 工作面：收口 r347 —— bad_faith 自述型坏信念补测试/守卫/七项验证，3 commit）
 
