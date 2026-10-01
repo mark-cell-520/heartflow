@@ -1918,6 +1918,29 @@ const EM_MANIPULATION_PATTERNS = {
     // 排除「more than + 善意主体」比较级（爱的程度比较，非孤立化），
     // 但保留裸句 "Nobody else will ever love you"（无比较对象 = 真孤立化）。
     [/(?:(?:no one|nobody|no one else|nobody else) (?:else )?will (?:ever )?(?:love|accept|want|have|take) you)(?![^.]{0,40}?\b(?:more than|like|as much as)\b(?:[^.]{0,20}?\b(?:parents?|mother|father|mom|dad|family|friends?|frien[ds])\b))/i, 'exclusivity_binding', 0.6],
+
+    // ── [v6.7.157 r354] 善意包装 × 情感追偿族 EN（与 r353 zh 侧 benevolence_leverage 同族）──
+    // r354 实测（scripts/round-354/probe-5-en-gap.js）：EM en 6 条同族攻击
+    // 2/6 漏判，全部走不进任何既有族——既有判据要么要求条件连词
+    // （if you don't regret / if you really cared）、要么要求对比转折
+    // （after all I've done for you / this is how you repay me），
+    // 本族是**无条件的善意宣告 + 对方拒绝即伤害我**。
+    // 判据形状（两半 AND，缺一不命中）：
+    //   善意包装半（I … for your own good / for you / because I love you）
+    //   × 追偿半（you still refuse / you call it useless / this is how you treat me）
+    // 良性分界：真正的关怀与协商（I reviewed your draft for correctness, not to hurt you）
+    // 无追偿半，不命中；r354 16 条良性实测 0 误伤。
+    [/\bi(?:'m| am) (?:only )?(?:doing|saying) this (?:for your own good|for you)\b[^.]{0,60}?\byou (?:still|keep|always)\b[^.]{0,30}?\b(?:refuse|ignore|won'?t listen|dismiss|rebuff|push back)\b/i, 'benevolence_leverage', 0.6],
+    [/\beverything i (?:do|did|did for you)\b[^.]{0,50}?\b(?:is|was) for you\b[^.]{0,50}?\byou (?:still|never)\b[^.]{0,30}?\b(?:appreciate|acknowledge|notice|thank|respect)\b/i, 'benevolence_leverage', 0.6],
+    [/\bi (?:say|tell you) this\b[^.]{0,30}?\b(?:out of love|for your sake|because i care)\b[^.]{0,50}?\b(?:this is how you|and you) (?:repay|treat|thank|answer) me\b/i, 'benevolence_leverage', 0.6],
+    // 「我为X做了Y，你却 Z（否定/贬低/称之为无用）」—— 善意宣告 + 对方否定归罪。
+    // 与既有 victim_stance（after all I've done for you + this is how you repay me）
+    // 的区别：本族无 repay/redeem 语义，对方只是**否认这件事的意义**。
+    [/\bi (?:stayed up|spent|worked) (?:all night|hours?)[^.]{0,50}?\bfor (?:your|the)[^.]{0,20}?\b(?:and you|yet you)\b[^.]{0,30}?\b(?:call|dismiss|say)[^.]{0,20}?\b(?:useless|pointless|a waste|stupid|nothing)\b/i, 'benevolence_leverage', 0.55],
+    // 「我为这个家/你付出了一切，你却只 Z」—— 单向否定归罪（无 repay 类词）
+    [/\bi (?:do|did) (?:everything|all of (?:this|it)) for (?:you|this (?:family|home|team))\b[^.]{0,40}\band all you (?:do|did) is\b/i, 'benevolence_leverage', 0.6],
+    // everything I do / everything I did for you 主语句首变体
+    [/\beverything i (?:do|did|did for you) (?:is|was) (?:for you|for this (?:family|home|team))\b[^.]{0,40}\band (?:all|yet) you\b[^.]{0,40}\b(?:do|did) is\b/i, 'benevolence_leverage', 0.6],
   ],
 };
 
@@ -2021,6 +2044,25 @@ const PRESUPPOSITION_PATTERNS = {
     [/\bhow could you\b/i, 'presupposed_condemnation'],
     [/\bhow can you\b/i, 'presupposed_condemnation2'],
     [/\bwhat makes you think you\b/i, 'presupposed_self_importance'],
+
+    // ── [v6.7.157 r354] 「打算何时停止/何时才肯认」预设违规族 EN（与 r353 zh 侧同族）──
+    // r354 实测（scripts/round-354/probe-5-en-gap.js）：presupposition en
+    // 6 条同族攻击 0/6 命中。上面 24 条的形状全部锚定「still/always/ever/
+    // admit/refuse + 人格质问」，而本族的形状是**预设对方正在持续做某件
+    // 坏事，只问何时收手**：when will you stop + 负面行为名词/进行时。
+    // 判据形状（两半 AND）：
+    //   时间疑问半（when will / how long will / how long are you going to /
+    //     when are you going to）
+    //   × 收手半（stop / quit / cease / give up / admit / confess）
+    //   × 负面在场（lying / cheating / denying / stealing / runaround / taking credit）
+    // 良性分界：中性时间问题（When will you finish the report?）不含收手动词；
+    // When will this package be released? 主语非人 → 不命中。
+    [/\bwhen (?:will|are) you(?: going to| gonna)?\s+(?:stop|quit|cease|give up)\b[^.]{0,40}/i, 'presupposed_ongoing_wrongdoing'],
+    [/\bhow long (?:will|are) you(?: going to| gonna)?\s+(?:keep|stop|continue)\b[^.]{0,60}/i, 'presupposed_ongoing_wrongdoing'],
+    [/\bwhen are you (?:finally |ever |going to )(?:going )?to\s+(?:admit|confess|acknowledge)\b[^.]{0,60}/i, 'presupposed_ongoing_wrongdoing'],
+    [/\bwhen will you (?:quit|stop)\s+(?:lying|cheating|denying|stealing|dragging|ignoring)\b/i, 'presupposed_ongoing_wrongdoing'],
+    [/\bhow long are you going to keep\s+(?:lying|cheating|denying|giving us|taking credit|pretending)\b/i, 'presupposed_ongoing_wrongdoing'],
+    [/\bhow long will you keep\s+(?:lying|cheating|denying|giving us|taking|hiding)\b/i, 'presupposed_ongoing_wrongdoing'],
   ],
 };
 
@@ -7870,7 +7912,26 @@ const STEREOTYPE_PATTERNS = {
     [/(millennials|boomers|gen z|gen x) (are|always|never|destroyed|ruined)/i, 'generational_bias'],
     [/(older|elderly|senior|retired) people (are|can't|don't|won't|shouldn't)/i, 'age_bias'],
     [/(kids|teenagers|young people) these days/i, 'generational_bias'],
-    [/from (the|a) (ghetto|projects|rough|bad) (neighborhood|area|side of town)/i, 'class_bias'],
+    [/\bfrom (the|a) (ghetto|projects|rough|bad) (neighborhood|area|side of town)/i, 'class_bias'],
+
+    // ── [v6.7.157 r354] 群体 × 否定式全称 × 贬损特质族 EN（与 r353 zh 侧 group_negative_trait 同族）──
+    // r354 实测（scripts/round-354/probe-5-en-gap.js）：stereotype en
+    // 6 条同族攻击 6/6 漏判。上面 13 条的形状全部要求**总结词在场**
+    // （all X are / typical X / every single X / X these days / older people
+    // are），而本族是**群体名词 + be + never/no + 贬损特质**的直白否定式，
+    // 用否定直接取代本质主义概括词。
+    // 判据形状（两半 AND）：群体词（复用 STER_GROUP_EN 的形状） × 全称否定
+    // （are never / can never / is never / none of … are / not one of）
+    // × 贬损禀赋词（reliable / punctual / organized / trustworthy / honest）。
+    // 良性分界：事实陈述（average grip strength differs）不含否定式全称；
+    // 个人陈述（I personally find…）不含群体词 → 不命中。
+    [/\b(?:young people|millennials|gen z|boomers|older people|people over|men|women|programmers|engineers|managers|immigrants|people from)\b[^.]{0,40}\b(?:are|is|can|will|do)\s+(?:never|not ever)\s+(?:reliable|punctual|organized|trustworthy|honest|competent|capable|responsible|loyal|committed|serious|careful|dependable|good)\b/i, 'group_negative_trait'],
+    [/\b(?:none|not one|not a single one) of (?:those|these|them|the)\b[^.]{0,30}\b(?:are|is)\s+(?:trustworthy|reliable|honest|competent|capable|responsible|loyal|organized|punctual|careful)\b/i, 'group_negative_trait'],
+    [/\bnobody from\b[^.]{0,30}\b(?:can|is able to|could)\s+be\s+trusted\b/i, 'group_negative_trait'],
+    // 「can't handle any hardship」型（能力否定 + 具体短板），群体词 + can't/won't
+    [/\b(?:young people|this generation|millennials|gen z|older people|people over\s+\d+|this whole generation|the whole generation)\b[^.]{0,40}\b(?:can'?t|cannot|won'?t|will not|don'?t)\s+(?:handle|take|deal with|manage|cope)\b[^.]{0,30}/i, 'group_negative_trait'],
+    // 「just don't take responsibility」型（群体 + don't + 责任/担当类名词）
+    [/\b(?:older people|young people|men|women|people)\b(?: these days| today)?\b[^.]{0,40}\b(?:just |simply )?(?:don'?t|do not|never)\s+(?:take|accept|own)\s+(?:responsibility|accountability)\b/i, 'group_negative_trait'],
   ],
 };
 
@@ -8633,6 +8694,35 @@ const TONE_POLICING_PATTERNS = {
     { pattern: /\b(?:is|are)\s+(?:going to|gonna|about to)\s+(?:take|hear|read|consider|act on|listen to)\b[^.]{0,44}\b(?:while|when|as long as|the way)\b/i, type: 'en_tone_attribution_ignored', severity: 0.7 },
     { pattern: /\b(?:try|make|put|say|state)\s+(?:it|that|this|the case|your point|the argument)\s+(?:again\s+)?(?:with|without)\s+(?:less|fewer|no|more)\s+(?:emotion|anger|outrage|hysteria|drama|accusations|edge|heat|hostility)\b[^.]{0,40}\b(?:and\s+)?(?:I|we)?\s*(?:'?ll|will|might|may|would|could)\s+(?:agree|listen|accept|consider|engage|hear)\b/i, type: 'en_tone_conditioned_talk', severity: 0.7 },
     { pattern: /\b(?:the )?reason (?:you|they|we|people)\s+(?:get|got|getting|give|gave)\s+(?:pushback|rejected|dismissed|ignored|resistance)\b[^.]{0,40}\bis\b[^.]{0,30}\b(?:the )?way (?:you|they)\s+(?:phrase|phrased|put|say|frame|word|express)\b/i, type: 'en_dismissal_cause_tone', severity: 0.7 },
+
+    // ── [v6.7.157 r354] 祈使说教族 EN（与 r353 zh 侧 zh_tone_imperative_rational 同族）──
+    // r354 实测（scripts/round-354/probe-5-en-gap.js）：tone_policing en
+    // 6 条同族攻击 0/6 命中。上面六族全部依赖「内容后果半」
+    // （valid / taken seriously / listen / fund / get pushback），
+    // 而本族的形状是**祈使动词 + 语气宾语 + 理性标准共现**，
+    // 不需要任何内容有效性/被采纳的后门词：
+    //   watch your tone + be rational / moderate your attitude + sound rational。
+    // 判据形状（三半 AND，缺一不命中）：
+    //   祈使半（watch/mind/control/moderate/change/soften/lower/keep）
+    //   × 语气宾语（tone/attitude/volume/language/wording/delivery/voice）
+    //   × 理性标准半（rational/calm/objective/composed/measured/serious）
+    // 良性分界：可执行的表达建议（add an agenda slide / slow down a bit）
+    // 不含语气宾语与理性标准共现，r354 16 条良性实测 0 误伤。
+    { pattern: /\b(?:watch|mind|control|moderate|tone down|change|fix|soften|lower|keep|adjust|rephrase)\s+(?:your\s+|the\s+)?(?:tone|attitude|volume|language|wording|delivery|voice|pitch|manner)\b[^.]{0,40}\b(?:if|unless|before|when|and)\b[^.]{0,40}\b(?:rational|rationality|calm|calmer|objective|composed|measured|serious|credible|adult)\b/i, type: 'en_tone_imperative_rational', severity: 0.7 },
+    { pattern: /\b(?:rational|rationality|calm|calmer|objective|composed|measured|reasonable)\b[^.]{0,30}\b(?:your\s+|the\s+)?(?:tone|attitude|volume|language|wording|delivery|voice)\b[^.]{0,40}\b(?:otherwise|or else|and|if|before)\b[^.]{0,30}\b(?:nobody|no one|listen|taken|considered|heard)\b/i, type: 'en_tone_imperative_rational', severity: 0.65 },
+    { pattern: /\b(?:watch|mind|control|moderate|adjust|change)\s+(?:your\s+|the\s+)?(?:tone|attitude|volume|language|wording|delivery)\s+(?:and|while)\s+(?:stay|be|remain|sound|keep)\s+(?:rational|calm|objective|composed|measured)\b/i, type: 'en_tone_imperative_rational', severity: 0.65 },
+    // 无连接词的并列祈使（Watch your tone. Stay rational. / Moderate your
+    // attitude and be objective.）——上面三条都要求连接词在场，
+    // 而祈使说教族最常见的就是两个祈使短句直接并列（逗号/句号分隔）。
+    { pattern: /\b(?:watch|mind|control|moderate|adjust|change|soften|lower|keep)\s+(?:your\s+|the\s+)?(?:tone|attitude|volume|language|wording|delivery|voice)[.,;]?\s+(?:and\s+|then\s+)?(?:be|stay|remain|sound|keep|come across)?\s*(?:rational|calm|calmer|objective|composed|measured|reasonable)\b/i, type: 'en_tone_imperative_rational', severity: 0.65 },
+    // 祈使说教的**远距变体**：三半齐备但语气宾语与理性标准之间隔着
+    // 完整的从句/补语（"Moderate your attitude and sound rational if you
+    // want anyone to listen."——want anyone to listen 占 24 字符），
+    // 上面各条的 40/44 字符窗口抓不到。r354 探针 #0/#3/#5 属此形状。
+    // 安全阀：仍要求祈使动词与语气宾语紧邻（≤4 字符），且理性标准与
+    // 语气宾语同句共现 —— 单纯祈使（Mind your language）不命中；
+    // 纯沟通建议（You could add an agenda slide）无语气宾语不命中。
+    { pattern: /\b(?:watch|mind|control|moderate|tone down|change|fix|soften|lower|keep|adjust|rephrase|moderate)\s+(?:your\s+|the\s+)?(?:tone|attitude|volume|language|wording|delivery|voice|pitch|manner|words|way)\b[^.]{0,70}\b(?:rational|rationality|calm|calmer|objective|composed|measured|reasonable|serious|seriously|credible)\b/i, type: 'en_tone_imperative_rational', severity: 0.6 },
   ],
 };
 
