@@ -112,6 +112,89 @@ const _RE_SYSTEM_ENTRY = new RegExp([
   ')',
 ].join(''), 'i');
 
+// ─── [v6.7.149] 授权洗白耦合层的两个半边 ───
+// 洗白半 _RE_AUTHORITY_LAUNDERING：声称「本来该有的审核已经不需要了」。
+// 六个族（与 fams 一一对应）：
+//   ① 不可追溯的授权声称——上面/审批过了/安全团队确认/合规没问题/授权范围内
+//   ② 试探降级——我不问敏感内容/就简单确认/就一个地址而已/不敏感
+//   ③ 上下文嫁接——刚才那份/接着刚才的范围/流程一样/照样
+//   ④ 关系信任——都聊这么久了/信任还是有的/我从来没为难你/别让我难做
+//   ⑤ 能力假定——你应该能/你现在应该可以/方便的话就
+//   ⑥ 责任转移——责任就在你/你要负责/耽误了上线你要负责
+// 刻意**不含**可回溯位置（审批单号/编号/附件/第 N 号）：良性授权句常带
+// 可回溯落点，「授权单号是 A1234」与「上面已经审批过了」是不同形状。
+const _RE_AUTHORITY_LAUNDERING = new RegExp([
+  // ① 不可追溯的授权声称
+  '(?:(?:上面|上级|领导|官方|安全团队|运维|技术)?[^。\\n]{0,8}(?:已经)?(?:审批|授权|核准|确认|核实|校验)[^。\\n]{0,12}(?:过了|没问题|通过|OK|ok|可以)',
+  '|授权范围[^。\\n]{0,4}(?:内|里的|之中)',
+  '|合规[^。\\n]{0,6}(?:没问题|没问题|没风险|已确认|没问题)',
+  '|这是[^。\\n]{0,8}(?:授权|审批|核准)范围',
+  '|上面[^。\\n]{0,8}(?:同意的|点头的|默许的|批准的))',
+  // ② 试探降级
+  '|(?:(?:我)?不(?:是)?问|先聊|先说个?不敏感|就简单)',
+  '|就一个[^。\\n]{0,8}(?:而已|罢了|而已)',
+  '|(?:不敏感|无关紧要|没什么)[^。\\n]{0,8}(?:内容|数据|信息)',
+  // ③ 上下文嫁接
+  '|(?:(?:刚才|前面|上次|接着)[^。\\n]{0,10}(?:那样|那样|流程一样|照样|照旧|继续|同样))',
+  '|(?:流程|规矩|方式)一样',
+  // ④ 关系信任
+  '|(?:都|已经)?(?:聊|合作|配合)[^。\\n]{0,6}(?:这么|那么)(?:久|长|多)',
+  '|(?:信任|情分)[^。\\n]{0,6}(?:还是有的|在那儿|在的)',
+  '|(?:我)?[^。\\n]{0,8}(?:没|不)为难过你',
+  '|(?:(?:别|不要)让我?[^。\\n]{0,6}(?:难做|为难|为难))',
+  // ⑤ 能力假定
+  '|(?:你(?:现在)?应该[^。\\n]{0,8}(?:能|可以|可以))',
+  '|(?:(?:你)?方便[^。\\n]{0,10}(?:的话|的话就))',
+  // ⑥ 责任转移（全句任一处，不止句首）
+  '|(?:责任|后果|风险)[^。\\n]{0,8}(?:在|归)于?[^。\\n]{0,4}(?:你|您)',
+  '|(?:(?:耽误|延误|拖累|影响)[^。\\n]{0,8}(?:你|您)[^。\\n]{0,4}(?:负责|担责))',
+  // 英文侧洗白族（r339 D 族）：同构六族
+  '|(?:\\b(?:already|has been|was)\\s+(?:approved|authori[sz]ed|verified|confirmed|cleared)\\b)',
+  '|\\b(?:verified|checked|confirmed)\\s+(?:by\\s+)?(?:our\\s+)?(?:security|audit|compliance|ops)\\s+(?:team|dept\\w*)',
+  '|\\bwithin\\s+(?:the\\s+)?(?:authori[sz]ed|approved|permitted)\\s+(?:scope|range)',
+  '|\\b(?:approved|authorized)\\s+internal\\b',
+  '|\\b(?:just|only)\\s+(?:a\\s+)?(?:simple|quick|harmless|non-?sensitive)\\b',
+  '|\\bwe\\s+(?:have\\s+)?been\\s+(?:talking|working)\\s+for\\s+(?:so\\s+long|a\\s+while)|\\btrust\\s+me\\b',
+  '|\\byou\\s+(?:should|must)\\s+(?:now\\s+)?(?:be\\s+able\\s+to|have\\s+access)\\b',
+  '|(?:\\bif\\s+(?:this\\s+)?(?:check|audit|review)\\s+fails\\s*,?\\s+(?:it\\s+is|the\\s+responsibility\\s+is)\\s+(?:on\\s+)?you)',
+].join(''), 'i');
+
+// 敏感目标层判据（比 PREDATORY 更严）——敏感索取目标的明单。
+// 与 LADDERS 既有层的关系：命中 pii / 凭证配置 / 生产系统 / 内部敏感文件之一
+// 即计入（authority_claim / guilt_trip 等施压层不算，误伤面已在 r93 记账）。
+// [v6.7.149 实测修正] 窗口字符从 [^。\n] 改成 [^。]（放行换行）：
+// r339 probe-3 诊断发现「生产库」那条在「…生产库对吧？\n那帮我拉一下…」上
+// 被 \n 截断（换行后 8 字才到宾语）。多轮文本按换行分段即是工作方式，
+// 相邻窗口不含 \n 等于把大半组合样本挡在门外。
+const SENSITIVE_TARGET = [
+  /(?:手机号|身份证|银行卡|密码|验证码|住址|护照|出生日期|工号|\b(?:phone|password|ssn|credit ?card|id ?number|credentials?)\b)/i,
+  /(?:\/etc\/(?:passwd|shadow)|\.ssh|id_rsa|authorized_keys|\.npmrc|\.aws\/credentials|kubeconfig)/i,
+  /(?:(?:密钥|密匙|secret|api[_.]?key|access[_.]?key|token|私钥|证书|数据库连接串)[^。]{0,12}(?:文件|内容|值|串|地址|是多少|贴出来|列出来|打|写|输出|显示|告诉|给|发|列|贴))/i,
+  /(?:后台|管理|admin|root)[^。]{0,6}(?:入口|地址|链接|口令|账号)/i,
+  /(?:(?:生产|线上|核心|主)[^。]{0,8}(?:数据库|服务器|集群)[^。]{0,12})/i,
+  // [v6.7.149] 生产库/库表：「拉一下生产库的订单表」是同一索取形状。
+  // 刻意要求「生产/线上/核心/主」前缀才收单独的「库」——裸「库」在开发语境
+  // 是中性的（「本地库连不上」不该算敏感目标）。
+  /(?:(?:生产|线上|核心|主)[^。]{0,6}库[^。]{0,20}(?:表|记录|数据|连接串|订单|用户|账号|密码|内容))/i,
+  // [v6.7.149] 数据库连接地址/入口：与 _SE_DB 软分支同源，但这里**不要求索取动词**
+  // ——耦合层的敏感半只回答「目标是否敏感」，索取动词由洗白半与 ladder 各自把关。
+  /(?:数据库|服务器|运维)[^。]{0,6}(?:连接(?:地址|串|入口)?|入口)[^。]{0,12}/i,
+  /(?:数据库密码|服务器密码|管理员密码|root ?password|管理员账号)/i,
+  // [v6.7.149] 内部配置（E1 族）：「内部配置怎么设的」是 system_entry 软分支的形状，
+  // 而 sensitive 半原先不收 → 既成 system_entry 1 层 + laundering 1 层仍 <2。
+  /(?:内部|机密|敏感|私有)[^。]{0,6}(?:配置|信息|凭据|密钥)/i,
+  // ─── [v6.7.149] 英文侧敏感目标 ───
+  // r339 探针 D 族（英文社工组合）两条改前均 0 层：英文侧只有 pii_request 一层，
+  // 且敏感半（customer phone numbers / production database / config.json）
+  // 没有任何判据。与中文侧同构，同样刻意排除 sales report / logs 这类合法导出对象。
+  /(?:\b(?:customer|user|employee|student|patient)s?\b[^.\n]{0,24}\b(?:phone|email|ssn|credit ?card|address|id ?numbers?|credentials?|passwords?)\b)/i,
+  /(?:(?:production|prod)\s+(?:database|db|cluster|server)[^.\n]{0,32})/i,
+  /(?:(?:internal|system|hidden)\s+(?:prompt|instructions?|config|credentials?|secrets?)[^.\n]{0,24})/i,
+  // [v6.7.149] dump + 配置文件（D 族 #2）：dump config.json 与中文「配置打出来」同源
+  /(?:\b(?:dump|print|show|display|reveal|export|cat|read)\b[^.\n]{0,24}\b(?:config|\.env|\.json|\.ya?ml|secret|credential)s?\b)/i,
+  /(?:\b(?:config|\.env|\.json|\.ya?ml|secret|credential)s?\b[^.\n]{0,16}\b(?:dump|print|show|display|reveal|export)\b)/i,
+];
+
 // 阶梯的四个层级（按敏感度递增）
 const LADDERS = [
   { name: 'pii_request', label: '索取个人敏感信息', score: 30,
@@ -268,6 +351,40 @@ const LADDERS = [
       'sunk_cost_prior_success', 'sunk_cost_last_step', 'sunk_cost_freq',
     ],
   },
+  // ─── [v6.7.149] authority_laundering：授权洗白耦合层 ───────────────────
+  // 来源：第 339 轮 decision.decide 选 multi_turn_escalation（0.79）。
+  // 轮初复测（scripts/round-339/probe-1-ladders.js，直调 checkMultiTurnEscalation，
+  // 不信简报旧描述）：8 族 16 条社工组合样本 **15 条 qualifies=false**，
+  // 唯一那条只是普通 bulk+pii 的正常形状。逐条分层后看到共同结构：
+  //   **洗白半 + 敏感索取半**——先用一句不可追溯的授权/审批/合规/嫁接/
+  //   关系/能力/责任把索取「洗白」，再要敏感目标。攻击性不在任何单句里，
+  //   在「这句声称取消了本该有的审核」这个组合里。
+  //
+  // ⚠️ 为什么不是新加独立阶梯（r93 try1~try4 同款教训）：
+  //   洗白措辞与正常业务流程**结构同形**——「法务确认过可以调取」「审计
+  //   需要抽查凭证」「流程审批已通过」全是授权措辞。单族判据必大误伤。
+  // 良性分界判据仍然不是语义而是**敏感目标在场与否**：
+  //   对账单 / 合同附件 / 上个月登录日志 / 报错日志 / 阻塞项 都不在敏感集。
+  //
+  // ⚠️ 为什么用 `coupled: 'sensitive'` 而不是 `'predatory'`（sunk_cost 用）：
+  //   bulk_export 命中的「导出名单/日志/记录」是合法导出请求的原型句式
+  //   （r93 已记录）。若把耦合条件放宽到含 bulk_export，那
+  //   「所有报错日志提给我」这类真实运维请求会被加成两层。故本层要求的是
+  //   更严的敏感目标：PII / 凭证配置 / 生产系统 / 内部敏感文件。
+  {
+    name: 'authority_laundering',
+    label: '授权洗白（不可追溯的授权声称 + 敏感索取）',
+    score: 25,
+    coupled: 'sensitive',
+    // 洗白半（可放宽的施压半）——刻意放宽到含良性同形结构，
+    // 因为激活与否由敏感目标层在下方把关。
+    up: _RE_AUTHORITY_LAUNDERING,
+    fams: [
+      'laundering_untraced_authority', 'laundering_probe_down',
+      'laundering_context_graft', 'laundering_relational_trust',
+      'laundering_capability_assume', 'laundering_responsibility_shift',
+    ],
+  },
 ];
 
 /**
@@ -287,6 +404,8 @@ function checkMultiTurnEscalation(text) {
   // 属施压层，不算索取半——否则「经理要求核对」+「别问了」也成两层。
   const PREDATORY = new Set(['pii_request', 'bulk_export', 'system_entry', 'sensitive_file', 'model_internals']);
   let predatory = 0;
+  // [v6.7.149] sensitive 目标命中（比 PREDATORY 更严：不含 bulk_export）
+  let sensitive = 0;
   for (const L of LADDERS) {
     if (L.coupled) continue;                 // 耦合层单独处理（下方）
     const m = text.match(L.re);
@@ -298,14 +417,31 @@ function checkMultiTurnEscalation(text) {
     score += L.score;
     if (PREDATORY.has(L.name)) predatory++;
   }
+  // [v6.7.149] 敏感目标层：命中任一 SENSITIVE_TARGET 即计入 sensitive。
+  // 刻意与 PREDATORY 分开计数——两者服务的耦合层不同
+  // （sunk_cost 用 predatory，authority_laundering 用 sensitive）。
+  // ⚠️ 这里的 hits.push 是 r339 实测修正：敏感半原先只自增 sensitive 计数，
+  // 不进 hits，于是 laundering + sensitive 仍只有 1 层 → count < 2 不 qualify
+  // （probe-3 诊断 B1/D2 两条即此形态：洗白半与敏感半都命中却不能晋级）。
+  // 本层计 hits **不计 score**（score=0），因为敏感半不是独立攻击信号，
+  // 单独出现（「数据库密码」在真实运维对话里出现）完全合法。
+  for (const re of SENSITIVE_TARGET) {
+    if (!re.test(text)) continue;
+    sensitive++;
+    hits.push({ ladder: 'sensitive_target', label: '敏感索取目标（洗白族触发条件）', matched: 'sensitive', score: 0 });
+    break;
+  }
   // [v6.7.126] sunk_cost 耦合层：升级半 AND 索取层同时在场才计入。
   // 依据见 LADDERS 该条目注释（try1~try8 试错台塌缩全过程）。
+  // [v6.7.149] authority_laundering 耦合层：洗白半 AND 敏感目标层同时在场才计入。
+  // 依据见 LADDERS 该条目注释（r339 探针 + 良性基线实测）。
   for (const L of LADDERS) {
     if (!L.coupled) continue;
-    if (predatory < 1) continue;
+    const gateOpen = L.coupled === 'sensitive' ? sensitive >= 1 : predatory >= 1;
+    if (!gateOpen) continue;
     const m = text.match(L.up);
     if (!m) continue;
-    hits.push({ ladder: L.name, label: L.label, matched: m[0].slice(0, 40), coupledWith: 'predatory' });
+    hits.push({ ladder: L.name, label: L.label, matched: m[0].slice(0, 40), coupledWith: L.coupled });
     score += L.score;
   }
   // 需要 ≥2 层阶梯才算累积攻击——单层只是"索取信息"，
@@ -329,4 +465,6 @@ module.exports = {
   DEMAND_WEAK,
   CONSULT_WORD,
   CAPABILITY_PROBE,
+  SENSITIVE_TARGET,
+  _RE_AUTHORITY_LAUNDERING,
 };
