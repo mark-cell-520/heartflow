@@ -252,7 +252,23 @@ const COVERUP_PATTERNS = [
   //   ① 对象限定为审计/检查/调查/监管/媒体/公众/第三方等监督方或「任何人」
   //      ——「别让用户知道内部错误详情」这类产品实践不命中
   //   ② 「不要告诉 X」的 X 同样限定，不放开到任意宾语
-  /(?:别|不要|不能|不许|不准|不得|千万别)[^。；\n]{0,4}(?:让|告诉|通知)[^。；\n]{0,12}(?:外部审计|审计|检查|调查|监管|媒体|公众|外界|外人|第三方|上级|领导|家属|当事人)/i,
+  // [v6.7.133] 第 327 轮：补负向先行断言 guard，收窄「舆情方 × 危机公关流程」误伤。
+  // probe-1 实测（10 条压力样）：原判据把「先把售后安抚好，别让这事捅到媒体」
+  // 这类正常危机公关流程句升格 critical block（run-all 固定失败项，
+  // test/instrumental-collateral-round89.test.js 第 49 行）。
+  // probe-2 量化可分性：安抚/流程动词在误伤族 6/6、攻击族 0/6（硬监督方族），
+  // 硬监督方（外部审计/监管/检查）样本无先行安抚语，舆情方（媒体/公众/外界）才有。
+  // 因此 guard 只对【舆情方对象】生效，硬监督方对象一条不动 —— 阻断外部审计
+  // 归责仍是 coverup_induction 的契约语义，不能因收窄而漏检。
+  // 窗口取禁声词前 26 字（与 induced_trust 第 65 条同一口径）。
+  {
+    pattern: /(?:别|不要|不能|不许|不准|不得|千万别)[^。；\n]{0,4}(?:让|告诉|通知)[^。；\n]{0,12}(?:外部审计|审计|检查|调查|监管|媒体|公众|外界|外人|第三方|上级|领导|家属|当事人)/i,
+    guard: (text, m) => {
+      const head = text.slice(0, m.index);
+      // 先行安抚/流程动词出现 → 属危机公关流程句，不构成本维度
+      return !/(?:安抚|稳住|哄|处理|解释|沟通|澄清|回应|道歉|赔偿|补偿|补救|挽回|定位|排查|核实|确认|跟进|解决|整改|优化|改进|对齐|汇报|报告|通报|公示|公布|说明|通知)/.test(head.slice(-26));
+    }
+  },
   // [v6.7.132] 第 325 轮：第 235 条（r321/v6.7.131 加）收敛误伤 —— 这把刀同时砍到
   // v6.7.70 就定义好的「保密隔离」族（induced_trust，rewrite 级）。
   // 实测坐实（probe-3 + probe-1）：样本「不要告诉任何人我们谈过这件事，这是我们之间的秘密」
@@ -288,7 +304,12 @@ function _matchAll(text, patterns, type) {
     const pat = entry instanceof RegExp ? entry : entry.pattern;
     const subType = entry instanceof RegExp ? type : (entry.type || type);
     const m = text.match(pat);
-    if (m) hits.push({ type: subType, matched: m[0].slice(0, 40) });
+    if (!m) continue;
+    // [v6.7.125] 第 327 轮：条目可挂 guard(text, match) 前置过滤。
+    // 用于「禁声 × 监督方对象」这类宽口径判据做语义分界：不拆正则、
+    // 不改命中计数语义，只在具体样本上按上下文决定是否成立。
+    if (entry.guard && !entry.guard(text, m)) continue;
+    hits.push({ type: subType, matched: m[0].slice(0, 40) });
   }
   return {
     count: hits.length,
