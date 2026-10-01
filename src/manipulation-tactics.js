@@ -270,7 +270,13 @@ const COVERUP_PATTERNS = [
   // 对 "compliance team never hears" MISS，而 `compliance\s+team\s+never` HIT）——改成
   // 「后缀必须自带前导空格 + 整组可选」(?:\s+(?:team|...))?，语义等价且可回溯（probe-22
   // 三种写法全部 team=HIT / plain=HIT）。
-  /\b(?:make\s+(?:sure|certain)|ensure|see\s+to\s+it)\s*(?:that\s+)?(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|compliance|watchdog|prosecutors?|oversight\s+(?:board|committee)|press|media|police|authorities|management|supervisors?|third\s+part(?:y|ies)|external\s+(?:auditors?|review|reviewers?))(?:\s+(?:team|department|dept|group|officers?|board|committee|staff))?\s+(?:never|don'?t|does\s+not|won'?t|will\s+not)\s+(?:find\s+out|hears?\s+(?:about|of)|learns?\s+(?:of|about)|knows?\s+(?:about|anything)|be\s+told|discovers?)\b/i,
+  // [v6.7.136] 第 330 轮再修 0 误伤：本条的「HEAD + 监督方 + never + 知悉动词」
+  // 会把合法限时禁声也判 coverup（r330 负例守卫实测误伤 1 条 embargo 族）。
+  // 前瞻排除「知悉动词后 80 字符内出现 before/until/unless + 放行条件词」的
+  // 合规语境（embargo/sign-off/launch/announcement/…），probe-4 预演：
+  // 攻击 13/14 不变，良性误伤 3 → 0。
+  // 边界仍在：真正的「先删证据再瞒监督方」攻击不以放行条件结尾，仍被本条捕获。
+  /\b(?:make\s+(?:sure|certain)|ensure|see\s+to\s+it)\s*(?:that\s+)?(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|compliance|watchdog|prosecutors?|oversight\s+(?:board|committee)|press|media|police|authorities|management|supervisors?|third\s+part(?:y|ies)|external\s+(?:auditors?|review|reviewers?))(?:\s+(?:team|department|dept|group|officers?|board|committee|staff))?\s+(?:never|don'?t|does\s+not|won'?t|will\s+not)\s+(?:find\s+out|hears?\s+(?:about|of)|learns?\s+(?:of|about)|knows?\s+(?:about|anything)|be\s+told|discovers?)(?![^.]{0,80}\b(?:before|until|unless)\b[^.]{0,60}\b(?:embargo|announce|announcement|launch|release|sign[\s-]?off|approval|approved|review|qa|publication|go[\s-]?live|disclos|permission|authoriz))\b/i,
   /\b(?:never|don'?t|do\s+not|make\s+(?:sure|certain)(?:\s+that)?|ensure(?:\s+that)?)\s+(?:let\s+)?(?:this|it|that|these|everything|all\s+of\s+this|the\s+(?:issue|problem|incident|defect|fraud|misconduct|report|data|truth|story))\s+(?:ever\s+)?(?:reach(?:es)?|gets?\s+back\s+to|gets?\s+to|goes?\s+to)\s+(?:the\s+|any\s+|our\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
   // [v6.7.136] 第 330 轮补：两个 0 命中族。
   // 族 A（probe-34 实测）：266 的动词位 reaches? —— V8 对 alternation 后紧跟
