@@ -1,3 +1,95 @@
+# 第 364 轮（reasoning_coherence 时间相关性×因果归属族漏判清零 + 负例守卫，3 commit）
+
+## 方向选择
+
+队列空。上一轮（r363）自选方向明确指向 rc stealth 族 marker 级缺口，作为
+「上一轮遗留真缺口」优先执行（不是心虫自选，不必跑 decision）。
+
+复测坐实（scripts/round-363 的 probe-2/3 直接重跑，未信简报描述）：
+- probe-3：stealth 族 rc.count 全部为 0；stealth1 结构=无前提直接推理结论
+  score=0（真断裂）但不判；stealth4 反被 marker 层判「完整推理链」0.9。
+- probe-2 gate 层：rc_stealth 4 条中 2 条 gate=pass（stereotype 2/4、
+  ppf 1/3 也漏），ATTACK 合计 6/11 非 pass。
+
+写 probe-4（scripts/round-364/）把候选判据做样本级影响实测后才动手：
+6 条攻击里 3 条仍 pass，其中 2 条确认属「时间相关性连接词 × 单向因果归属」
+形状，第 4 条（marker 层判完整链）形状不同，列入遗留。
+
+## 复测实测（scripts/round-364/）
+
+| 探针 | 结果 |
+|---|---|
+| probe-4 候选影响 | 攻击 3/6 pass → 改后 **6/6 非 pass**；良性 11 条 pass 保持 |
+| probe-5 守卫探针 | RC_HIT **6/6**、GATE_NONPASS **6/6**、GATE_PASS 11/12 |
+| probe-6 良性定位 | 唯一条非 pass 归因 pseudo_causal（r361 效率倍数族遗留），
+  用 commit 6c89b108 对照实测**改前改后完全一致**，非本轮引入 |
+| r363 高级 stealth 复测 | 全族 gate 非 pass 6/11 → **8/11**，rc 4 条全收 |
+| 维度覆盖扫描 | 46 维度 0 未测、reasoning_coherence 已不在漏判名单 |
+
+## 改了什么（3 commit）
+
+| commit | 内容 |
+|---|---|
+| `19a40227` | 引擎 `src/index.js`：rcBrokenFinal 新增第三臂 rcTemporalCausal ——
+  形状级判据「时间相关连接词（每次/每当/每逢/自此/此后/以来/之后/同期/
+  同时） × 因果归属动词 × 无对冲词 × 有论断连接词」，不要求 premise
+  marker 与 score 闸（该族 marker 层常判完整链 0.9 或 intent=0/0，
+  probe-3/4 均复现）；对冲词出现时不命中 |
+| `3fd042d8` | 负例守卫 `scripts/negative-test-rc-temporal-causal-r364.js`：
+  2 个置假点（整臂置假 / 摘归因动词形状），判据量 detector 层 RC_HIT
+  + 良性 GATE_PASS 哨兵。实测 RC_HIT 6/6 → **0/6** 与 **2/6** 全变红，
+  良性 11/12 持平，还原后回到基线 |
+| `803f0ba2` | 辅助脚本：run-all 日志聚合器 + 良性误伤定位器 |
+
+## 验证结果（只列实测跑过的）
+
+| 项 | 结果 |
+|---|---|
+| 负例守卫 r364 | **NEG_OK**，2/2 置假点变红，基线还原 |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **302/326**（与基线完全一致，零新增误拦） |
+| `node bin/verify.js` | **14 passed / 0 failed** |
+| `test/security-audit.test.js` | **16/16** |
+| `test/doc-numbers-accuracy.test.js` | **15/15** |
+| `node test/run-all.js` | 见下方「待补」 |
+
+## 遗留
+
+1. **run-all 全量汇总本轮未取到最终值**：后台任务（/tmp/r364-runall.log）
+   在本轮记录落盘时仍在跑（进度约 202/503 文件、0 失败）。下一轮第一件事
+   用 `node scripts/round-364/sum-runall.js /tmp/r364-runall.log` 取总数，
+   刷新 `data/test-count.json`（当前缓存 16594/3）。预期失败数应与 r361
+   持平（3 个，npm-package-integrity），新增失败必须定位到具体条目。
+   r363 的同类日志（/tmp/r363-runall.log）实测只跑到 141 文件即中断，
+   「RUNALL_DONE」是中断标记不是完成标记——上一轮的账因此仍未还清，
+   以 r364 的完整结果为准。
+2. **rc stealth 第 4 条形状未收**：marker 层判「完整推理链」score=0.9 的
+   那族（两组数据同时上升，因此一组上升引起另一组）本轮用形状级判据已收，
+   但 probe-4 里第 4 条 tc=0 的同形句（无时间连接词、结构判完整链）仍
+   pass。若要收，需动 checkReasoningCoherence 的 marker 判定本身，
+   风险高于本轮动作，留给后续轮次先做影响面实测。
+3. **stereotype stealth 仍有 2/4 放 pass**（「就是比…」形 / 无总结词形），
+   pseudo_profundity stealth 1/3 放 pass（同义反复后置形）。两族 marker
+   级形状 r363 probe-2 已实测到，未定位到具体判据点。
+4. **93 个未跟踪文件仍在**（scripts/round-*/ 探针目录等），未回收。
+   本轮只提交了 round-364 自有资产。
+5. **pseudo_causal 效率倍数族良性误伤仍在**（r361 遗留第 4 条）：probe-6
+   实测到，形状与 r361 记录一致，本轮未动。
+
+## 给下一轮的接手说明
+
+1. **先取 run-all 结果并更新 test-count.json**，还 r362/r363/r364 三轮
+   共同欠的账。聚合脚本已就位：`scripts/round-364/sum-runall.js`。
+2. 本轮的第三臂判据范式可复用：**当强断言闸（STRONG_CLAIM）把整族挡住时，
+   在形状级另起一支臂，而不是放宽强断言闸**——放宽闸会同时放松 rcBroken /
+   rcLeapOnly 两臂的良性边界，实测本轮做法零新增误伤（302/326 持平）。
+3. 置假点设计沿用 r362 范式：两个置假点分别覆盖「整表失效」与「形状摘除」，
+   前者证明守卫不是恒绿，后者证明判据粒度到形状级。
+4. 下一轮优先候选（按实测缺口排序）：stereotype stealth 2 条 >
+   ppf stealth 1 条 > rc 第 4 条完整链形。三族都在
+   scripts/round-363/probe-2-stealth.js 里，直接重跑即可复测。
+
+
+
 # 第 362 轮（玄学归因族两处结果形缺口清零 + r360 遗留守卫重建，4 commit）
 
 ## 方向选择
