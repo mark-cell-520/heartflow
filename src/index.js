@@ -1936,7 +1936,14 @@ const EM_MANIPULATION_PATTERNS = {
     // 「我为X做了Y，你却 Z（否定/贬低/称之为无用）」—— 善意宣告 + 对方否定归罪。
     // 与既有 victim_stance（after all I've done for you + this is how you repay me）
     // 的区别：本族无 repay/redeem 语义，对方只是**否认这件事的意义**。
-    [/\bi (?:stayed up|spent|worked) (?:all night|hours?)[^.]{0,50}?\bfor (?:your|the)[^.]{0,20}?\b(?:and you|yet you)\b[^.]{0,30}?\b(?:call|dismiss|say)[^.]{0,20}?\b(?:useless|pointless|a waste|stupid|nothing)\b/i, 'benevolence_leverage', 0.55],
+    // [v6.7.157b] for your sake / for the team 也算善意宣告半（r354 probe-12
+    // 定位到漏点是 for your sake 占了 14 字符，原窗口 20 不够）。
+    [/\bi (?:stayed up|spent|worked) (?:all night|hours?|[^.]{0,24})\b[^.]{0,50}?\bfor (?:your|the)\b[^.]{0,26}?\b(?:and you|yet you)\b[^.]{0,30}?\b(?:call|dismiss|say)[^.]{0,20}?\b(?:useless|pointless|a waste|stupid|nothing)\b/i, 'benevolence_leverage', 0.55],
+    // 「sake 通用型」：善意宣告半用 for your sake / for you / out of love /
+    // because I care，追偿半直接跟 and you + 贬低动词。r354 probe-13 定位
+    // EM#5 的漏点是 sacrifice 半不用 stayed up/spent 类动作（是 in review
+    // 类进行态），因此这句不再限定牺牲动作，只要求善意宣告 + 对方贬低。
+    [/\b(?:for your sake|for you|out of love|because i care|for your own good)\b[^.]{0,40}\b(?:and|yet|but) you\b[^.]{0,40}\b(?:call|dismiss|say|treat)[^.]{0,26}\b(?:useless|pointless|a waste|stupid|worthless|nothing|hurting)\b/i, 'benevolence_leverage', 0.55],
     // 「我为这个家/你付出了一切，你却只 Z」—— 单向否定归罪（无 repay 类词）
     [/\bi (?:do|did) (?:everything|all of (?:this|it)) for (?:you|this (?:family|home|team))\b[^.]{0,40}\band all you (?:do|did) is\b/i, 'benevolence_leverage', 0.6],
     // everything I do / everything I did for you 主语句首变体
