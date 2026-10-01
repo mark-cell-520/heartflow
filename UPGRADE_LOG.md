@@ -1,3 +1,215 @@
+# 第 370 轮（先修 r368 自引入回归，再做 multi_turn_escalation 渐进式适应族，2 commits）
+
+## 方向选择
+
+简报优先级第一项就是上一轮（r368）遗留的真缺口：`r305 守卫假失败`。
+轮初 init 显示 run-all 缓存 16608、README 16619，且上一轮明说
+「锁未释放、run-all 唯一失败是 r305 那个测试」。
+
+但 r368 交接簿给的根因**是错的**（它说「patch 把繁体 5f37 误写成简体 5f3a」）——
+轮初实测第 9888 行 `has 5f37: true`（繁体仍在，父提交字节就是繁体）。
+所以没有照抄上一轮的结论，重跑复测，拿到真实根因（见第一部分）。
+这是本轮最重要的纪律：**简报里的旧描述一律不信，先实测。**
+
+修完 r305 后转 multi_turn_escalation 的「渐进式适应」族（第 367/368
+两轮记账的覆盖扫描放过项）。两处都不是简单/安全/好看项——
+r305 是唯一坐实的测试失败源，multi_turn 是连续两轮记账的结构性空缺。
+无 decision.decide（简报优先级已指定两者）。
+
+## 第一部分：修 r305 守卫假失败（真实根因不是上一轮说的那个）1 commit
+
+复测（不信交接簿）：`scripts/round-370/probe-1-excluded.js` 直调
+PSEUDO_PHILOSOPHY_ZH 修身主语判据，8 条排除样本 **1 条仍命中**（第 7 条）。
+逐支扫描前瞻的 24 个排除候选：**23 个是简体、只有 1 个是繁体**——
+「光太强」写作繁体字形，而该排除样本正文用的是简体，前瞻失效。
+
+上一轮说「patch 误改」不成立（父提交这一 token 本来就是繁体），
+真实根因是**该词表在建表时的繁简不一致**：中文正文的自然写法是简体，
+单独一个繁体候选等于该词从未生效。
+
+修法（scripts/round-370/fix-guang.js，唯一性校验后替换）：
+前瞻内同一词补简体分支（繁简两形并存），不动其余 23 个候选。
+实测：r305 守卫 **21 通过 / 0 失败**（排除 8/8 不复命中、真阳 13/13 不变）。
+commit `e9cd878a`。
+
+## 第二部分：multi_turn_escalation 渐进式适应常态化族 1 commit
+
+复测（不信简报旧描述）：`scripts/round-370/probe-2-normdesensitize.js`
+直调 `checkMultiTurnEscalation`（不是 MCP 薄壳），覆盖扫描两条探针 +
+10 条同族样本 **0/10 qualify**。根因逐层核对：LADDERS 既有 14 层
+（12 非耦合 + 2 耦合）全是索取半 / 洗白半 / 既往让步半，
+没有任何一层收「把越界要求拆成递进小步 + 常态化脱敏收尾」这个结构；
+sunk_cost 的 up 半要求既往让步痕迹（上一步 / 都到这一步 / 不差最后一步），
+而本族前置是**将来时的第一步**（先试试看 / 第一步先配合），时态相反，
+probe-3 实测 6 条本族样本在 sunk_cost 上 count=0。
+**归因到 ladder 层的结构性空缺，不是新攻击形态。**
+
+新判据（src/multi-turn-tactics.js 的 `_RE_NORM_DESENSITIZE`）三段同现：
+① 让步开头半（先/第一步/这次 + 试试看/配合/答应/让一步/退一步/开个头）
+② 递进半（之后/后面/接下来/一次比一次/多来几次/时间久了）
+③ 脱敏收尾半（慢慢就习惯了/顺理成章/渐渐不再抵触/当成常态）
+
+为什么设计成 `coupled: 'predatory'` 而不是独立层（沿用 r93 坐实纪律）：
+probe-2 实测新半单独在 10 条攻击上命中 8/10，而这 8 条**全部无索取层在场**。
+独立层 = 单族施压即 rewrite，而「先小范围试点，再决定是否全量推广」与
+「先按我说的做第一次，后面慢慢你就接受了」结构同形，必大误伤。
+良性分界判据仍不是语义，是「索取结构在不在场」。
+
+试错收敛（probe-4/5，两个版本都实测过）：
+· V1（无排除）阳性 7/10、**良性误伤 5/10**——良性句「先做第一版，之后
+  根据反馈迭代」被末段常态词吃掉；
+· V2 = V1 + 显式否掉中性项目推进词（迭代/反馈/灰度/评审/排期/开发/方案/
+  文档/需求/试点/推广/全量/审批/批准）→ **良性 0/20**、阳性 8/10；
+· V3（再压窄前置让步词）阳性掉到 6/10，不收；
+· EXT（补「只是一小步」零动词式 + 插入式）阳性 9/10 但良性误伤 1/10
+  （良性句「这只是第一步，后面还有验收环节」被吃）→ 按零误伤铁律不收。
+
+最终实测（probe-7-verify.js，同进程对照）：
+组合 60 条（10 个既有层形状 × 6 条渐进半）**去掉本层 24/60 → 加本层 36/60
+（净增量 +12 条，且这 12 条的 ladders 里确实含 norm_desensitize，
+probe-7 逐条验证过不是靠 sunk_cost 顺带带上来的）**；
+渐进半单独 6 条 0/6 不晋级（耦合闸门守住）；良性 20 条零命中。
+
+守卫 `test/round-370-norm-desensitize-guard.js`：结构断言 + 组合晋级
++ 单独不晋级 + 良性 20 条零命中 + 删条注入阳性下降（沙箱复制整个 src/
+目录，避免 tmpdir 里相对 require 失败）。commit `60342c81`。
+
+## 验证结果（只列本轮实测跑过的）
+
+| 项 | 结果 |
+|---|---|
+| `test/pseudo-profundity-bside-noncultivation-r305.test.js` | **21 通过 / 0 失败**（上一轮留下的唯一失败源已清） |
+| `bin/verify.js` | **14 / 0** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **302/326**（与基线零差异，铁律达标） |
+| `test/security-audit.test.js` | **16 / 16** |
+| `test/round-370-norm-desensitize-guard.js`（新增） | **6 通过 / 0 失败**（删层后阳性下降、良性零命中） |
+| `test/doc-numbers-accuracy.test.js` | 14 通过 / 1 失败 = README 测试数记账漂移（16619 vs 实际），finish 自动记账处理 |
+| `test/run-all.js`（后台跑） | **16628 通过 / 1 失败 / 共 16629**，唯一失败即上条记账漂移 |
+
+注：doc 那条失败的成因是 README 的测试计数与 `data/test-count.json` 缓存
+差 11（本轮加了 1 个测试文件）。属记账问题不是代码问题，finish 会重记。
+
+## 遗留（下一轮优先）
+
+1. **norm_desensitize 剩余 2/10 形状未收**：「只是一小步」（零动词前置式）
+   与「点甜的」（中段插入式）。probe-5 EXT 试过放宽，阳性到 9/10 但
+   良性误伤 1/10（良性句「这只是第一步，后面还有验收环节」被吃）。
+   修法需要更强的「施压意图」信号而不是更宽的词表，另案记账。
+2. **predatory 口径下 4 组组合仍不晋级**（grp1/2/4/9：role_fabrication /
+   authority_claim / responsibility_shift / fake_emergency + guilt_trip
+   共 3 种施压层在场但 predatory=0）。这在设计上是**对的**（r93 坐实
+   的零误伤口径），不属于缺口，记录以说明基线 36/60 为何不是 51/60。
+3. `scripts/round-*/` 探针堆积（上一轮遗留的 106 个未跟踪文件仍在），
+   finish 会一并处理落盘。
+4. `data/test-count.json` / `data/upgrade-state.json` 的记账改动由
+   auto-commit 落盘。
+
+## 给下一轮的接手说明
+
+- 上一轮交接簿对 r305 的根因判断**是错的**（说 patch 误改繁简），
+  真实根因是词表建表时繁简不一致（24 个候选里唯一一个繁体）。
+  教训：**接手簿给的根因也要先实测再动手**，别照抄。
+- norm_desensitize 这个新层与 sunk_cost / authority_laundering 同为
+  `coupled` 层，改任一层时注意 `LADDERS` 循环里 `if (!L.coupled) continue`
+  的闸门口径（predatory vs sensitive 是两套，别混）。
+- 下一轮若扩 norm 半的词表（递进半/脱敏半），务必先跑
+  `scripts/round-370/probe-4-narrow.js` 那两条良性句——它们是本族
+  误伤的边界样本（「这只是第一步，后面还有验收环节」最危险）。
+- run-all 后台跑完后确认唯一失败是 doc-numbers-accuracy 记账漂移
+  而非新失败；finish 的 7 项检查任何 FAIL 先自动修再重跑。
+
+============================================================
+
+# 第 368 轮（补 run-all 聚合失败源 + pseudo_profundity 补「的+具象名词」族，3 commits）
+
+## 方向选择
+
+队列待办已清空，按简报优先级取上一轮（r367）交接簿第 1 项：
+「补 pseudo-causal-forward-family-r360.test.js 的汇总行」（收益明确、风险低）。
+做完后转维度覆盖扫描的闸门放过项（multi_turn_escalation 1/2、pseudo_profundity 1/2）。
+两处都不是简单/安全的好看项——r360 是 run-all 唯一坐实的失败源，
+pseudo_profundity 是维度覆盖扫描本轮的优先升级目标。无需跑 decision
+（简报优先级已指定，且前者是上一轮明确遗留的最优先项）。
+
+## 第一部分：修 run-all 聚合失败源（1 commit）
+
+复测：`test/pseudo-causal-forward-family-r360.test.js` 单跑 EXIT=0、`NEG_OK 9/9`
+全过，但 run-all 计它失败。根因读 `test/run-all.js` 第 113/127 行确认：
+聚合只认 `(\d+) 通过, (\d+) 失败` 或分数式 `N/M passed`，本文件只输出
+`NEG_OK 9/9`——两种格式都不匹配，于是被判「有输出但无汇总」= 真失败。
+
+修法（最小改动，不动 run-all.js）：测试文件末尾补一行标准汇总
+`结果: N 通过, M 失败`（保留原 NEG_OK 行供人读）。实测单跑
+`结果: 9 通过, 0 失败`。commit `1863cc3b`。
+
+## 第二部分：pseudo_profundity 闸门放过探针（1 commit + 1 守卫）
+
+复测（不信简报缓存）：`scripts/dimension-coverage-scan.js` 实测
+46 个维度、良性 0/12，闸门放过仍有 2 项：`multi_turn_escalation(1/2)`、
+`pseudo_profundity(1/2)`。逐条定位（scripts/round-368/probe-gate-misses.js
+直调 discriminate）：pseudo_profundity 的漏判样本是
+「孤独是灵魂在喧嚣世界中的静默回声」——detector 层 count=0、gate=pass；
+multi_turn_escalation 的两条漏判直调 `checkMultiTurnEscalation` 实测
+count=0（`ladders` 表 12 层全部不覆盖「分步适应」话术形态，需 ≥2 层才
+qualify 的设计对单句施压族天然放行）——该缺口需要新耦合层，属结构性
+改造，本轮不塞，仅记账给下一轮。
+
+本轮的 pseudo_profundity 缺口根因（probe-pp-source.js 逐支匹配）：
+2841 行存在论比喻族要求「的」与 B 侧本体论名词**紧邻**（的回声/的答案），
+中段一旦插修饰语（的静默回声 / 的最后的呼吸 / 的必经的阶梯）整支漏。
+**归因到既有判据的 B 侧名词表收尾形状，不是新攻击形态。**
+
+修法：PSEUDO_PHILOSOPHY_ZH 新增一支，判据三层
+① 主语表 = 抽象域名词（时间/生命/孤独/痛苦…）② B 侧名词表 =
+具象比喻物（回声/良药/枷锁/阶梯/礼物…）③ 整句收尾 `\s*$`。
+沿用函数入口的 isTechSubject 与 TECH_ATTRIBUTION_NOUNS 两道既有闸门。
+
+同进程 BASE/CANDIDATE 对照（probe-pp-candidate.js，非同文件静态数字）：
+阳性 16 条 BASE 3/16 → 含新族后 8/16（真增量 5 条），
+阴性 22 条**零误伤**（含「距离是三点之间的线段长度」「成熟是软件版本的
+最后阶段」同形工程句）。写完 commit `b80dd4e5`。
+
+负例守卫：`test/round-368-pseudo-profundity-denoun-guard.js`
+实测 NEG_OK 6/6——沙箱删新族后阳性 8/16→3/16（守卫钉在判据上），
+阴性保持零误伤（证明良性基线不依赖新族）。commit `4c8dc2c6`。
+
+## 验证结果（只列本轮实测跑过的）
+
+| 项 | 结果 |
+|---|---|
+| `round-368-pseudo-profundity-denoun-guard.js`（新增） | **NEG_OK 6/6**（删族后阳性下降、阴性零误伤） |
+| `pseudo-causal-forward-family-r360.test.js` | **9/9** + 汇总行 `9 通过, 0 失败`（单跑原就通过） |
+| `scripts/round-368/probe-gate-misses.js` | pseudo_profundity 两条探针 gate pass→**verify verify** |
+| `scripts/round-368/probe-pp-noun.js` | 12 条跨域比喻形状 count 0→5 条命中 |
+| `bin/verify.js` | **14 / 0** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **302/326**（与基线零差异，铁律达标） |
+| `test/security-audit.test.js` | **16/16** |
+| `test/doc-numbers-accuracy.test.js` | **15/15** |
+
+## 遗留（下一轮优先）
+
+1. **multi_turn_escalation 的「分步适应」族**（r361 起第 2 轮记账）——
+   覆盖扫描探针 2 条全程 gate pass。直调 checkMultiTurnEscalation 实测
+   count=0：`LADDERS` 12 层全是索取/施压半，没有覆盖「渐进式适应」话术，
+   且 ≥2 层阈值对单句施压族天然放行。修法需要新耦合层（渐进半 × 越权
+   索取半），属结构性改造，本轮未做。
+2. 106 个未跟踪文件（scripts/round-*/ 探针）仍在，属探针堆积。
+3. pseudo_profundity 同族已补 5 条（16→8），剩余 8 条属
+   「沉默是最响亮的回答」「耐心是通向答案的唯一道路」——B 侧名词表
+   广度问题（回答/道路未收），另案记账。
+
+## 给下一轮的接手说明
+
+- r360 测试的汇总行已补，run-all 失败源应只剩 npm-package-integrity
+  与 doc-numbers-accuracy 的记账漂移（finish 会自动记账）。
+- 新族守卫 `test/round-368-pseudo-profundity-denoun-guard.js` 锚点用
+  `/^\(\?:\[\^\\u3002...\\u7ed3\\u76df\)\\s\*$\/` 唯一定位，动 B 侧名词表
+  时该锚点会失效（守卫自己会报「找到 0 处」）——那时要同步更新守卫正则。
+- multi_turn_escalation 的渐进式适应族是下一轮最有价值的缺口：
+   他不是新支词表问题，是 ladder 层的结构性空缺（见上）。
+
+============================================================
+
 # 第 367 轮（修复玄学归因族 9 条漏判 + 修自引入自然现象回归，3 commits）
 
 ## 方向选择
