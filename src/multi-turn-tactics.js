@@ -179,7 +179,7 @@ const _RE_AUTHORITY_LAUNDERING = new RegExp([
 // 被 \n 截断（换行后 8 字才到宾语）。多轮文本按换行分段即是工作方式，
 // 相邻窗口不含 \n 等于把大半组合样本挡在门外。
 const SENSITIVE_TARGET = [
-  /(?:手机号|身份证|银行卡|密码|验证码|住址|护照|出生日期|工号|\b(?:phone|password|ssn|credit ?card|id ?number|credentials?)\b)/i,
+  /(?:(?:发给|发我|给出|交出来|提交|提供|告诉|列出|导出|下载|拉取|拉一下|打出来|写出来|显示|输出|调出|调出来|查一下|核对|dump|send|give|export|show|print|list|provide|tell|reveal)[^\n。]{0,12}(?:手机号|身份证|银行卡|密码|验证码|住址|护照|出生日期|工号|\b(?:phone|password|ssn|credit ?card|id ?number|credentials?)\b)|(?:手机号|身份证|银行卡|密码|验证码|住址|护照|出生日期|工号|\b(?:phone|password|ssn|credit ?card|id ?number|credentials?)\b)[^\n。]{0,12}(?:发给|发我|给出|交出来|提交|提供|告诉|列出|导出|下载|拉取|拉一下|打出来|写出来|显示|输出|调出|调出来|查一下|核对|dump|send|give|export|show|print|list|provide|tell|reveal))/i,
   /(?:\/etc\/(?:passwd|shadow)|\.ssh|id_rsa|authorized_keys|\.npmrc|\.aws\/credentials|kubeconfig)/i,
   /(?:(?:密钥|密匙|secret|api[_.]?key|access[_.]?key|token|私钥|证书|数据库连接串)[^。]{0,12}(?:文件|内容|值|串|地址|是多少|贴出来|列出来|打|写|输出|显示|告诉|给|发|列|贴))/i,
   /(?:后台|管理|admin|root)[^。]{0,6}(?:入口|地址|链接|口令|账号)/i,
@@ -187,14 +187,14 @@ const SENSITIVE_TARGET = [
   // [v6.7.149] 生产库/库表：「拉一下生产库的订单表」是同一索取形状。
   // 刻意要求「生产/线上/核心/主」前缀才收单独的「库」——裸「库」在开发语境
   // 是中性的（「本地库连不上」不该算敏感目标）。
-  /(?:(?:生产|线上|核心|主)[^。]{0,6}库[^。]{0,20}(?:表|记录|数据|连接串|订单|用户|账号|密码|内容))/i,
+  /(?:(?:生产|线上|核心|主)[^。]{0,6}库[^。]{0,26}(?:表|记录|数据|连接串|订单|用户|账号|密码|内容))/i,
   // [v6.7.149] 数据库连接地址/入口：与 _SE_DB 软分支同源，但这里**不要求索取动词**
   // ——耦合层的敏感半只回答「目标是否敏感」，索取动词由洗白半与 ladder 各自把关。
   /(?:数据库|服务器|运维)[^。]{0,6}(?:连接(?:地址|串|入口)?|入口)[^。]{0,12}/i,
   /(?:数据库密码|服务器密码|管理员密码|root ?password|管理员账号)/i,
   // [v6.7.149] 内部配置（E1 族）：「内部配置怎么设的」是 system_entry 软分支的形状，
   // 而 sensitive 半原先不收 → 既成 system_entry 1 层 + laundering 1 层仍 <2。
-  /(?:内部|机密|敏感|私有)[^。]{0,6}(?:配置|信息|凭据|密钥)/i,
+  /(?:(?:发给|发我|给出|交出来|提交|提供|告诉|列出|导出|下载|拉取|拉一下|打出来|写出来|显示|输出|调出|调出来|查一下|核对|dump|send|give|export|show|print|list|provide|tell|reveal)[^\n。]{0,10}(?:(?:内部|机密|敏感|私有)[^。]{0,6}(?:配置|信息|凭据|密钥))|(?:(?:内部|机密|敏感|私有)[^。]{0,6}(?:配置|信息|凭据|密钥))[^\n。]{0,12}(?:发给|发我|给出|交出来|提交|提供|告诉|列出|导出|下载|拉取|拉一下|打出来|写出来|显示|输出|调出|调出来|查一下|核对|dump|send|give|export|show|print|list|provide|tell|reveal))/i,
   // ─── [v6.7.149] 英文侧敏感目标 ───
   // r339 探针 D 族（英文社工组合）两条改前均 0 层：英文侧只有 pii_request 一层，
   // 且敏感半（customer phone numbers / production database / config.json）
