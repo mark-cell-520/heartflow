@@ -1,3 +1,100 @@
+# 第 366 轮（修复 r365 自引入回归：stereotypeGenderJob 空数组 truthy 早退，1 commit）
+
+## 方向选择
+
+队列待办「1 完成 / 1 总数」已清空，取上一轮（r365）明确指定的最高优先遗留：
+「⚠️ 本轮引入了新失败，必须接手修 —— stereotype-innate-derog-round49.test.js
+现在崩溃退出，攻击命中从父提交的 18/18 掉到 6/18」。按简报优先级规则，
+「修上一轮自引入回归」本身也是无人值守铁律第 3 条认可的方向，不需跑 decision。
+
+## 复测（未信简报）
+
+`timeout 100 node test/stereotype-innate-derog-round49.test.js` 实测 EXIT=1，
+**6/8 passed**，dimension 层 12 条漏判 + gate 层 12 条漏判（合计 18/18 → 6/18），
+简报数字准确，且附带的良性 30/30 与结构断言全过——是纯粹的召回丢失，不是崩溃退出
+（r365 说的「崩溃退出」描述不准，实际是软失败）。
+
+## 根因（diff 父提交版本定位）
+
+r365 引入的 `stereotypeInnateDerog` 分支4 接线写成：
+
+```js
+if (hasChinese) {
+  const gj = stereotypeGenderJob(text, low);
+  if (gj) return gj;      // ← bug：空数组 [] 在 JS 里是 truthy
+}
+```
+
+`stereotypeGenderJob` 的未命中路径 `return []` 同样 truthy，于是**所有中文样本**
+都在分支4 提前返回空数组，`hasGroup`/`hasInnate` 三支完全走不到。
+r365 的注释（「只用 return 早退——**不**在未命中时返回空数组」）与本意正好相反：
+意图上「不 return」，代码上却 return 了。
+漏判样本与 r365 猜测一致：全部含「天/骨子里 + 贬损」，即走原分支1/2 的本该
+被收样本；而 r365 新增的性别×职业正例因为在分支4 真命中，不受影响——
+这是为什么 r365 自测 24/24 全过却让 r49 掉到 6 18：**自己的守卫没覆盖兄弟判据**。
+
+## 改了什么（1 commit）
+
+`260e9214` 引擎 `src/index.js`：`if (gj && gj.length) return gj;`
+空数组不再早退，未命中继续走原有三支。单行修复 + 3 行注释记录根因。
+
+## 验证结果（只列实测跑过的）
+
+| 项 | 结果 |
+|---|---|
+| `stereotype-innate-derog-round49.test.js` | **6/8 → 8/8**（回归修复） |
+| `round-365-stereotype-job-ppf-self.test.js` | **24/24** 保持，本轮修复未伤 r365 新族 |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **302/326**，与基线完全一致（零新增误拦） |
+| `node bin/verify.js` | **14 passed / 0 failed** |
+| `test/security-audit.test.js` | **16/16** |
+| `test/doc-numbers-accuracy.test.js` | **15/15**（run-all 自动记账 README 16594 → 16617 后恢复） |
+| `node test/run-all.js` | **16617 通过 / 4 失败 / 共 16621** |
+
+## run-all 失败归因（3 项，全部非本轮引入）
+
+1. `npm-package-integrity.test.js` —— **本轮实测 6 通过 0 失败**，历史基线的
+   「预期失败 1 个」已不存在（r364/r365 交接簿里这两项记账需更新）。
+2. `round-346-pseudo-causal-luck-attribution-zh.test.js` —— 4 通过 / 2 失败，
+   玄学归因族 7 条漏判（样本见该测试断言块）。与 r361/r364 记账一致（r364 明确记录
+   「父提交 6c89b108 实测同样失败，非本轮引入」）。**注意 run-all 的「失败的测试」
+   汇总段只列了 1 条（pseudo-causal-forward-family-r360 无汇总行那个），
+   另外 3 个不会出现在该段——计数只看逐文件「N 失败」行**，这是 run-all 聚合
+   逻辑的展示缺陷（不修，属升级机制自身，超出本轮边界）。
+3. `pseudo-causal-forward-family-r360.test.js` —— r364 已记账：单跑 NEG_OK 9/9
+   通过，仅因输出无「N 通过, M 失败」汇总行被计失败。
+
+本轮 run-all 第一次跑在 456 个文件处静默中断（停在
+`instrumental-ends-justify-means-zh.test.js`，无汇总段），重跑第二次完整跑完出汇总。
+**与 r363/r364 的日志中断模式同源**——run-all 偶发中断，日志无汇总段不等于跑完。
+
+## 遗留（下一轮优先）
+
+1. **玄学归因族 7 条漏判**（`round-346-pseudo-causal-luck-attribution-zh.test.js`）
+   —— r361 起记录至今第 5 轮，形状为「做了 A，所以 B 成了」的后验幸运仪式归因，
+   无因果机制词、无「因为」等显式连接，属 pseudo_causal 的形状级缺口。
+   这是当前唯一有测试坐实的稳定漏判族，优先级最高。
+2. **pseudo-causal-forward-family-r360 缺汇总行**（r364 记账未修）——
+   修法是给测试补一行 `console.log('结果: N 通过, M 失败')`，但
+   `test/run-all.js` 本身是升级机制不可改，改测试文件本身需谨慎，
+   收益仅是把 run-all 4 失败降为 3。
+3. **106 个未跟踪文件仍在**（scripts/round-*/ 探针、负例脚本等）
+   —— r364 已记账，finish 的 auto-commit 每轮都列出，需人工判断哪些该提交。
+4. rc stealth 第 4 条完整链形、ppf/stereotype 其余 stealth 形状未动
+   （r364/r365 遗留，本轮未取）。
+
+## 给下一轮的接手说明
+
+1. run-all 账已还清：**16617 通过 / 4 失败**（本轮实测落盘到
+   data/test-count.json，README 已由 finish 自动记账）。上一轮的
+   「README 测试数与缓存不一致」是 run-all 未跑完导致的，跑完即自动一致——
+   遇到该项不要手工改 README，让 finish 的 ①.5 记账段处理。
+2. 本轮根因范式值得记住：**子判据函数返回空数组 + 调用侧 `if (fn(...))` = 全量早退**。
+   这类 bug 的特征是「自己的新测试全绿、兄弟判据的旧测试大面积掉」。
+   以后给既有判别函数加分支时，负例守卫必须同时覆盖**兄弟判据的既有正例集**
+   （本例应把 r49 的 18 条攻击样本纳入 r365 的守卫探针）。
+3. 下一轮优先：玄学归因族 7 条漏判（第 1 项遗留），探针可直接从
+   `test/round-346-pseudo-causal-luck-attribution-zh.test.js` 的漏判断言块取样本。
+
 # 第 364 轮（reasoning_coherence 时间相关性×因果归属族漏判清零 + 负例守卫，3 commit）
 
 ## 方向选择
