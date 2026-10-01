@@ -92,7 +92,15 @@ const FALSE_CAUSALITY_PATTERNS = [
 
 // ─── S5: 绝对断言 — 所有/一切/总是/从不/绝对 ───────────────────
 const ABSOLUTE_CLAIMS = [
-  /(?:所有|一切|全部|任何|每一个|总是|从不|从来|永远|绝对|完全|彻底|必定|必然|一定)\s*[^，。\n]{0,12}(?:是|都|会|能|要|必须|不会|不可能)/gi,
+  // [v6.7.125 第 322 轮] 边界类从 [^，。\n] 扩为 [^，,。.\n!?！？]：
+  //   ① src/pipeline.js:72 入口 NFKC 把全角逗号折成半角 ','，旧类不含
+  //      半角逗号 → 正则跨句误配（「你总是第一个到,不过晚到一会儿也没关系」
+  //      命中「总是…会」被判 S5 绝对断言 → perfect_error@15 → gate verify）。
+  //   ② 中文行文本就用半角逗号时（非 ASCII 文本不走 NFKC 折半角路径）
+  //      同样跨句——边界类必须两种逗号都收才算"断句"。
+  //   实测：6 条良性长句里 4 条 pipeline/direct 分叉，全族修正后收敛。
+  //   语义不变：绝对词到断言动词之间不得跨过任何句读（逗号/句号/问叹/换行）。
+  /(?:所有|一切|全部|任何|每一个|总是|从不|从来|永远|绝对|完全|彻底|必定|必然|一定)\s*[^，,。.、\n!?！？]{0,12}(?:是|都|会|能|要|必须|不会|不可能)/gi,
   /(?:nothing|everything|always|never|absolutely|certainly|undoubtedly|definitely|completely|entirely|totally)\s+\w+/gi,
   /(?:no\s+(?:doubt|question|way)|under\s+no\s+circumstances)\b/gi,
 ];
