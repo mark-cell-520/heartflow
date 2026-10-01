@@ -1,4 +1,77 @@
-# 第 338 轮（v6.7.148 工作面：premature_termination 补 T5「结论已定 × 过程弱化」族，2 commit）
+# 第 344 轮（v6.7.153 工作面：whataboutism 补「指回自身优先」族 + 修 run-all 存量失败 15/16 → 16/16，3 commit）
+
+**方向来源**：r343 交接簿遗留第 2/3/4 条（finish 未跑、测试汇总行未提交、run-all 全量未跑）。
+开轮先做 r343 交代的复跑：单跑 4 个存量失败 + 后台 run-all，然后用
+`HeartFlowDecision.decide` 三候选实测选方向（probe-1，输出 `chosen=A` 0.77，
+B=README 记账 0.75，C=清探针 0.74）。**A 是唯一真缺口**（run-all 存量失败、
+判别能力缺口），B 是记账类、C 是卫生类。
+
+## 1. 复测：缺口坐实且比 r342/r343 记录的宽
+
+r342 简报写 whataboutism 反问族 15/16，ATK #6 是「先管好你们自己再说我」。
+本轮直调复测（probe-2）：**该族扩样到 17 条，只有 9 条命中，8 条漏**，
+漏的全是同族变体语序（你们自己/先说/数落/把自己…/都没做到还好意思）。
+原表 4961 行 `/你先管好自己/` 要求「你+先+管好+自己」**四字紧邻**，
+任何插入或语序变动都漏——不是判据过严，是**整族没有第二个容身位置**。
+
+## 2. 改了什么（3 commit）
+
+|| commit | 内容 | 实测 |
+|---|---|---|---|
+|| `8be5c47f` | `WHATABOUT_PATTERNS_ZH` 补 5 支：A 管好+再才+指回动词 / B 先把自己管好（语序变体）/ C 先做到+批评（无「管好」）/ E 还好意思说（8 字窗口）/ F 自我否定式反指回（还没弄好就来指点） | 攻击 17/17、分支样本 10/10、良性 0/13 |
+|| `b960d39b` | `test/round-344-whatabout-deflect-own-first.test.js` 守卫 28 条 | 28 通过 0 失败（含变异删条守卫） |
+|| `c78f963a` | README 测试数记账 16336 → 16426 | doc-numbers-accuracy 15/15 |
+
+**良性分界线（probe-3/probe-4 逐条验证后才落地）**：
+① 主语是「我们/咱们」的内部管理建议放行（第二人称只列你/你们）；
+② 无「再/才 + 指回动词」尾巴的放行（「管好你自己这一摊，别的事我来」）；
+③ 收协作动词（帮/核对/安顿/终审）的放行——指回动词表只收**指向指责者**的
+（说/说我/管我/指点/批评/数落/评价/议论/要求/插手/掺和）。
+
+**踩坑记录**：patch 工具把 `[/怎么就针对[我他她]/i...]` 的 `?` 误插到正则
+字面量前（写成 `[/?.../i`），`node --check` 立刻报 `Nothing to repeat`。
+**正则改动后必须立刻 `node --check`**，不能只信 patch 返回的 lint ok
+（它这次返回了 error 但上一条同批 patch 也返回过 ok）。
+
+## 3. 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node bin/verify.js` | **14 passed / 0 failed** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **301/326**（基线内零新增） |
+| `test/round-344-whatabout-deflect-own-first.test.js` | **28 passed / 0 failed**（攻击 11 + 良性 12 + 分支守卫 + 变异 + 旧支回归 7） |
+| `test/round-337-whatabout-反问族.test.js` | **16 通过, 0 失败**（修复前 **15 通过, 1 失败**） |
+| `test/run-all.js` | **16426 通过, 1 失败, 共 16427 个**（失败 = doc-numbers-accuracy 的 README 记账，已修并复跑 15/15） |
+| `test/security-audit.test.js` | **16 通过, 0 失败** |
+| `test/doc-numbers-accuracy.test.js` | **15 通过, 0 失败**（修复前 14 通过 1 失败） |
+
+**两个存量失败同时收口**：r338 遗留的 empty-answer-two-sided-guard 汇总行
+（由 r343 末的 auto-commit 落盘）+ r337 遗留的 whataboutism 反问族
+（本轮真修）。
+
+## 4. 遗留 / 给下一轮
+
+1. **未清理探针垃圾**：`scripts/round-299` ~ `round-343` 约 130 个未跟踪文件
+   仍在 git status。纯卫生项，不涨判别能力，优先级最低。
+2. **`data/upgrade-state.json` 仍未提交**（多轮遗留，upgrade-engine 每次
+   init 都会改它，硬边界禁改，交给 auto-commit-round）。
+3. r343 遗留的第四候选（rewrite 层 3 个闸门放过）本轮未动。
+4. VERSION 仍 6.7.124，本轮记账 v6.7.153（延续 r342/r343 的同型记账法）。
+5. whataboutism 剩余未覆盖族（probe-4 显示「他们自己都没弄好就来数落我」
+   仍漏 count=0）——已确认为第三主语族，属下一轮候选，本轮未扩样本。
+
+### 给下一轮的接手说明
+
+- 本轮修的是**同一个维度（whataboutism）里整族缺席**，不是参数调优。
+  新增分支时**必须同步在 `test/round-344-...` 里加分支数守卫**
+  （`branchCount >= 5`），否则删掉某支测试仍绿——本轮守卫已内置。
+- 变异守卫用**文本串 indexOf** 定位，不要用正则（中文注释 + 版本号会让正则过期）。
+- 指回动词表可以扩，但**协作动词（帮/核对/安顿/终审/复盘）绝不能进表**——
+  这是良性与攻击的唯一边界，扩错一次误伤面立刻破基线。
+
+---
+
+#### 第 338 轮（v6.7.148 工作面：premature_termination 补 T5「结论已定 × 过程弱化」族，2 commit）
 
 **方向来源**：r337 交接簿遗留第 3 条（premature_termination 0/5 本轮未动）。
 开轮先用 `HeartFlowDecision.decide` 四候选实测评分，引擎选出 **B（0.84）**，
