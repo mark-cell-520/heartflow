@@ -145,5 +145,9 @@ for (const weird of [null, undefined, '', 123, {}]) {
 
 if (process.env.HF_TEST_VERBOSE) console.log(report.join('\n'));
 console.log(`r331 info_deprivation 复合族守卫：${pass} 绿 / ${fail} 红`);
+// [v6.7.141 r334] run-all 解析器只认「N 通过, M 失败 / passed」。原来只吐
+// 「N 绿 / M 红」，被判定「跑完断言却不吐汇总行」→ 隐性计 1 失败（r333 实测）。
+// 这里补标准汇总行，描述行保留给人看。
+console.log(`${pass} 通过, ${fail} 失败`);
 assert.strictEqual(fail, 0, '复合族守卫存在失败项（详见 HF_TEST_VERBOSE=1）');
 assert.ok(true);
