@@ -476,6 +476,12 @@ function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
 
 
 function discriminate(text, evidence = [], contentMode) {
+  // [r351] 非字符串输入安全化：G 组守卫实测 gate(Symbol('x')) 在
+  // 第 818 行 `RE.test(text)` 抛 "Cannot convert a Symbol value to a string"，
+  // 其余 7 种类型均正常返回 pass。symbol 是唯一崩点（String() 对 symbol 合法，
+  // 但隐式拼接/正则测试不合法）。入口转成字符串文本后走正常判别路径，
+  // 不改变其他 7 种类型的既有行为。
+  if (typeof text === 'symbol') text = String(text);
   const pedagogy = detectPedagogicalContent(text);
   const pedagogyRelaxation = getPedagogyRelaxation(pedagogy);
   // [v6.7.70] 对抗混淆归一化：先清洗再判（心虫 decision.decide 选定，0.92 分）
