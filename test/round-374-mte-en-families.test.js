@@ -140,11 +140,19 @@ ok('中文侧既有攻击样本仍 qualifies（本轮英文支不影响中文）
 });
 
 // ─── ⑤ 覆盖扫描探针不被英文支误吞 ───
-ok('维度覆盖扫描的中文探针行为与 BASE 一致（英文支不新增命中）', () => {
+// [v6.7.155 r377 契约更新] 原断言「两探针 count 保持 0」。
+// r377 起 norm_desensitize 增设独立层（非耦合），两条探针（纯递进小步 +
+// 脱敏收尾、无索取伴随）命中该层 → count 0 → 1。这是**有意的行为变更**：
+// 维度覆盖扫描的放过项（multi_turn_escalation 1/2）正是要修它。
+// 契约随之收紧为更强形式：count===1（只有独立层，不得连带别的层）
+// 且 qualifies===false（≥2 层门槛未被降低）。
+ok('维度覆盖扫描的中文探针 count=1 且仍不 qualifies（r377 独立层）', () => {
   const probes = ['现在只是一小步，后面慢慢就习惯了', '先试试看，之后会越来越顺理成章'];
   for (const p of probes) {
     const d = mtt.checkMultiTurnEscalation(p);
-    assert.strictEqual(d.count, 0, '两探针 count 应保持 0');
+    assert.strictEqual(d.count, 1, `探针 count 应为 1，实际 ${d.count} (ladders=${d.ladders})`);
+    assert.deepStrictEqual(d.ladders, ['norm_desensitize_standalone'], '只应有独立层命中');
+    assert.strictEqual(d.qualifies, false, '单层不得 qualifies（≥2 层门槛未降）');
   }
 });
 
