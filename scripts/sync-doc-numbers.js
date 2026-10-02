@@ -244,7 +244,9 @@ function syncFile(file, want, checkOnly) {
   let out = masked;
   for (const t of TARGETS) {
     if (!t.docs.includes(file)) continue;
-    const target = t.num === 'stamp' ? want.stamp : fmt(want[t.num]);
+    // [r408 修正] 先把「未测量」的目标拦下，再算 target 字符串 —— 顺序颠倒
+    // 会让 fmt(null) 先抛 TypeError（实测：挪走 capability 缓存后
+    // --check 直接崩在第 206 行，rc=1，而不是「跳过记账」）。
     // [r407 防呆 / r408 修正] **未测量**(null/undefined) 的目标一律不记账：
     // 把「18 / 18 checks」刷成「0 / 0 checks」比留着旧数字更坏——读者会以为
     // 能力守护归零了。宁可不改也不猜。
@@ -258,6 +260,7 @@ function syncFile(file, want, checkOnly) {
       }
       continue;
     }
+    const target = t.num === 'stamp' ? want.stamp : fmt(want[t.num]);
     out = out.replace(t.re, (full, pre, mid, post) => {
       if (mid === target) return full;
       hits.push({ re: String(t.re).slice(0, 40), before: mid, after: target });
