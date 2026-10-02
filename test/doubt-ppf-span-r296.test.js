@@ -40,11 +40,26 @@ const SHOULD_NOT_HIT = [
   '这不是预算的问题，而是供应商交付能力的问题。',
 ];
 
+// [v6.7.125+4 第 380 轮] 清理：原第一个分支
+//   JSON.stringify(r).includes('pseudo_profondity'.slice(0,20))
+// 里 'pseudo_profondity' 是拼写错误的字面量（fo 应为 fu，17≠18 字符），
+// slice(0,20) 截不掉差异，因此该分支**恒 false**、被 || 短路——
+// 不是判据失效，是死代码 + 会误导后来者以为它在做「全串兜底」。
+// r380 probe-10 从测试文件回读字面量逐码点对照确认（fu≠fo）。
+// 保留唯一有效分支；同时补一条恒假护栏：若哪天该分支真的开始命中
+// （说明维度名被改短/别名化），必须显式失败而不是静默改变判据语义。
 function isPseudoProfundity(text) {
   const r = checkOutput(text);
-  return JSON.stringify(r).includes('pseudo_profondity'.slice(0, 20)) ||
-         (Array.isArray(r.findings) && r.findings.some(f => f.dimension === 'pseudo_profundity'));
+  return Array.isArray(r.findings) && r.findings.some(f => f.dimension === 'pseudo_profundity');
 }
+
+// [v6.7.125+4 第 380 轮] 恒假护栏：拼写错误的兜底分支不得重新生效。
+(function guardAgainstMisspelledBranch() {
+  const r = checkOutput('今天天气很好，适合出门散步。');
+  const misspelled = JSON.stringify(r).includes('pseudo_profondity'.slice(0, 20));
+  assert.ok(!misspelled,
+    '恒假护栏触发：拼写错误的兜底分支开始命中，说明维度名或返回结构已变，需重新评估判据');
+})();
 
 let hits = 0, fps = 0;
 for (const s of SHOULD_HIT) {
