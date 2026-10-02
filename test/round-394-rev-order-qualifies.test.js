@@ -282,5 +282,7 @@ console.log('\n── ⑧ 负例变异守卫 ──');
 }
 
 console.log('\n══════════════════════════════');
-console.log('通过 ' + pass + ', 失败 ' + fail + '（r394 词序对称性守卫）');
+// [v6.7.1xx r395] 同 r393：汇总行改为「N 通过, M 失败」数字在前口径
+// （原「通过 N, 失败 M」不被 run-all 主正则识别，probe-15 实测）。
+console.log('测试结果: ' + pass + ' 通过, ' + fail + ' 失败, 共 ' + (pass + fail) + ' 个（r394 词序对称性守卫）');
 if (fail > 0) process.exit(1);
