@@ -1,3 +1,132 @@
+# 第 372 轮（soft_deflection 补「模糊副词×结论悬置」族，修复维度覆盖扫描 0/2 归因错位，2 commits）
+
+## 方向选择
+
+简报优先级队列为空（upgrade-queue 仅 1 条已 done），上一轮（r371）遗留的两项
+（norm_desensitize 剩余形状、predatory 口径说明）都不属于「真缺口」——
+norm 剩余形状 r370/371 已明确按零误伤铁律不收，predatory=0 不激活是设计正确。
+
+所以本轮走心虫自选，用 `HeartFlowDecision.decide` 实跑 4 个候选
+（scripts/round-372/decide.js），选中 **C**（0.83 分）：
+
+| 候选 | 分数 |
+|---|---|
+| C 三个 verify 级维度归因命中 0/2（rc / pe / sd） | **0.83** |
+| A multi_turn_escalation 闸门放过 1/2（norm 层耦合口径） | 0.81 |
+| B false_positive_feedback 反向接入 gate（孤岛模块） | 0.74 |
+| D pattern-detector / behavior-tracker 孤儿模块接线 | 0.74 |
+
+confidence 0.70，identity alignment 0.80。
+
+## 复测（不信简报，先实测）
+
+`scripts/dimension-coverage-scan.js` 重跑，与简报同口径：46 维、未测 0、
+良性误伤 0/12；闸门放过项 1 个（multi_turn_escalation 1/2），
+归因命中 0/2 的维度有 3 个：**reasoning_coherence / perfect_error /
+soft_deflection**（其余只 1/2 的维度都拦得住也归因对）。
+
+逐支实测后拿到简报没说的细节（probe-3 / probe-10）：
+
+- `reasoning_coherence` 两条探针 **gate 已拦**（verify / verify），但归因
+  全落在 `pseudo_causal`（0.88 / 0.64 分）。这不是归因 bug，是「两个维度
+  同源覆盖同一形状、findings 按优先级只留一个」。reasoning_coherence 自身
+  判据（时间相关×因果归属族）在那两条上 count=0（r363/r364 建族时刻意
+  不收「因为A所以B」这种结构齐备句），属真实漏判但改判据会动 r364 的
+  零误伤契约，**本轮不动**。
+- `perfect_error` 两条 **gate 已 rewrite**（0.82 / 1.0），归因落
+  confidence / capability_overclaim / bullshit。pe 本体是聚合信号
+  （3+ 信号 → rewrite），findings 里本来就不该出现 perfect_error 维度，
+  这是 `allDims` 与 findings 分层设计的既定行为。**不是缺口。**
+- `soft_deflection` 是三个里唯一**真缺口**：两条探针 action=verify/verify，
+  但 `dimEntry count=0 score=0`，findings 里维度自报恒 0。即
+  **gate 拦得住、维度自己不知道** —— 下游 think-pipeline 的
+  `dims.soft_deflection.count > 0` 告警链路从未触发过，与 r349 修的
+  reasoning_coherence count 丢失是同型问题。
+
+## 定位（probe-11 逐支匹配）
+
+SOFT_DEFLECTION_ZH 既有 5 支全部收「先让步后立论」形状（当然可能错但 /
+我们不是完美的但 / 说实话不一定但…），两条探针一条都不命中。
+探针的真实形状是**模糊副词 × 结论悬置**（某种程度上 / 也不太一定）——
+形状是「不给结论」，不是「给了软化结论」。**新族，不是既有族的放宽。**
+
+## 改了什么（2 commits）
+
+1. `c6a84be3` — `src/index.js`：
+   新增 `SOFT_DEFLECTION_HEDGE_ZH` 5 支 + `checkSoftDeflection` 的 concat 接线：
+   · H1 模糊副词（某种程度上/某种意义上/这事/要看）× 悬置结论（要看/不好说/
+     难说/取决于/不一定）；
+   · H2 模糊副词 × 要看情况/看具体/视具体；
+   · H3 悬置式收尾（也不太一定/不好下定论/很难下结论）；
+   · H4 可能副词 × 弱确定否定（不太一定/不太好说清楚）；
+   · H5 双弱化堆叠（不太/不敢说 + 一定/确定）。
+   另一含 15 个探针脚本（scripts/round-372/）。
+2. `025ea39c` — `test/round-372-soft-deflection-hedge-family.test.js`：
+   结构断言（常量存在 + concat 接线）+ 归因断言（探针 findings 含
+   soft_deflection 且非 pass）+ 族阳性 6/6 + **良性池 326 条非 pass 数
+   必须恰好 25（基线，新增=不合格）** + 双负例。
+
+## 误伤护栏的实证过程（probe-12 抓到的真实边界）
+
+第一版宽式 `(?:这个|那个|这种|那种)…(?:问题|事情|情况)…[，,]`（不带语气词
+通道）在 326 条良性池上 **命中 1 条**——第 102 条 ext-longtext 微服务长文
+（讲「首先是服务之间的调用…」）。据此把 H1 的模糊副词改成**显式在场**，
+不接受「这个+问题」泛化，probe-14 全池重测回 0。
+
+## 验证结果（只列本轮实测跑过的）
+
+| 项 | 结果 |
+|---|---|
+| `bin/verify.js` | 14 / 0 |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **302/326**（与基线零差异，铁律达标） |
+| `test/security-audit.test.js` | 16 / 16 |
+| `test/round-372-soft-deflection-hedge-family.test.js`（新增） | **5 / 0** |
+| `test/run-all.js`（后台） | **16633 通过 / 1 失败 / 共 16634**，失败项即下述记账漂移 |
+| `test/doc-numbers-accuracy.test.js` | finish 前 14/15（README 少报 5），**finish 后 15/15** |
+
+唯一失败是 README 测试数记账漂移（16628 vs 实测 16633，本轮新增 1 个测试
+文件），finish 的 ①.5 自动记账已修：`16,628 → 16,633 passing tests`。
+finish 7 项检查全绿、锁已释放、3 个 commit 已推送远程。
+
+维度侧实测（probe-15）：两条 soft_deflection 探针
+`action=verify`、`dims=[soft_deflection(70), soft_deflection(70), vagueness(20)]`
+——归因错位已消，findings 里维度自报 count 不再恒 0。
+
+## 遗留（下一轮优先）
+
+1. **reasoning_coherence 的「因为A所以B」同源覆盖仍漏判**（2/2 归因
+   pseudo_causal）。修它需要动 r363/r364 建族的零误伤契约（时间相关×
+   因果归属族刻意不收结构齐备句），建议单独一轮先复测全池误伤再动。
+2. `perfect_error` 0/2 是**分层设计既定行为**（聚合信号不单独进 findings），
+   下一轮覆盖扫描若再报，标 N/A 即可，不必反复排查。
+3. `multi_turn_escalation` 闸门放过 1/2（probe-1/2 实测：norm 层正则命中
+   但 coupled predatory 闸门未开、探针句无索取层在场 count=0）。属 r93
+   坐实的零误伤口径，A 候选方案（轻度索取名词开闸）有放开真阳的风险，
+   需要先做单向性实测再决定。
+4. `pattern-detector` / `behavior-tracker` / `false-positive-feedback` 仍是
+   零外部引用模块（probe-6/7 实测 7 个 orphan，3 个有单测）。
+   false-positive-feedback 已被 MCP server 调，不是完全死代码，
+   但 engine 侧（src/gate.js / src/index.js）不引用它。
+5. `scripts/round-*/` 探针堆积：109 个未跟踪文件（历史遗留，非本轮产生），
+   auto-commit 每轮报但不清理，需要单独一轮裁决「清 vs 留」。
+
+## 给下一轮的接手说明
+
+- 维度覆盖扫描报「归因命中 0/2」时，**先区分三种情况**（本轮踩过）：
+  ① 判据缺失（本轮 soft_deflection，真缺口）；
+  ② 同源维度覆盖、findings 按优先级只留一个（reasoning_coherence，
+  判据缺失但动它有契约风险）；
+  ③ 分层设计本就如此（perfect_error 聚合信号）。判断方法：读
+  `gate.discriminate(t).dimensions[dim]` 的 `{count, score}` ——
+  count=0 才是①，count>0 但 findings 里没它是②/③。
+- 扩 soft_deflection 词表时务必保留 H1 的「模糊副词显式在场」通道——
+  probe-12 实测宽式会吃 ext-longtext 第 102 条（微服务长文）。
+  守卫测试第 ④ 项把「良性池非 pass 数 == 25」写死，任何放宽都会直接红。
+- finish 的 ①.5 README 记账会自动改 README 并 auto-commit，**不需要
+  也不允许我手工改 README**（硬边界）；doc-numbers 在 finish 前失败是
+  预期的，finish 后重跑确认 15/15。
+- 本轮 run-all 是后台跑的（约 12 分钟），前台等会撞 180s 硬超时。
+
 # 第 370 轮（先修 r368 自引入回归，再做 multi_turn_escalation 渐进式适应族，2 commits）
 
 ## 方向选择
