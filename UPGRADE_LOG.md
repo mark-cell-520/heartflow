@@ -1,4 +1,132 @@
 
+# 第 392 轮（修 r391 system_entry 英文支的「命中但不过闸」缺陷，2 commits）
+
+## 方向选择
+
+队列待办为空。上一轮 r391 遗留 4 项：commit 未提交/未 push、守卫测试未写、
+7 项验证未跑、finish 未跑。先接手的不是这些收尾，而是**其中隐含的真缺口**——
+r391 报告自己写着「真引擎复测 probe-3：A 组 attack 10/10 命中、B 组 benign
+0/15 误伤」，但**命中单层不等于攻击被拦**。按 r388~r391 一贯的耦合层口径
+（qualifies 需 hits.length >= 2），必须复测 qualifies 与 gate.action，
+不能只看 ladders.includes('system_entry')。
+
+复测坐实：A 组 15 条英文索取句 system_entry 全部命中，但 **qualifies 只 4/15、
+gate=rewrite 只 4/15**——单层过不了阈值，攻击照旧被 gate 放行。
+这正是 r391 想做而没做完的那件事（它自称「补上索取半，闸门就能开」，
+实际闸门仍关着）。方向定为：把英文连接串索取族从「命中一层」推到「真被拦」。
+
+## 复测（probe-1~14，不信简报旧描述）
+
+| probe | 做了什么 | 结论 |
+|---|---|---|
+| 1/2 | 真引擎（磁盘代码）复测 A 组命中 + gate.action | 命中 15/15 但 rewrite 只 4/15，**缺陷坐实** |
+| 3 | 中英同族平行对照 | 中文「把数据库连接串发我」count=2（bulk+se）qual=true；英文同形状 count=1 |
+| 4 | 逐支 ST 命中扫描 | 英文句 ST[14] 命中但 sensitive_target 不计层 |
+| 5 | 差分：span 收窄为「目标词起点~索取动词终点」 | qualifies 4/15→11/15，**span 是主因** |
+| 6 | 4 条仍不 qualify 的逐层归因 | 该 4 条所有 ST 支全 miss（目标词是 uri/dsn/jdbc） |
+| 7/8/9 | 名词去重逐层拆解 | ST[14] 名词跨度（connection string/database）全落在 [0,text.length] 内 → 判重吃掉 |
+| 10~13 | 组合候选（span 收窄 + ST 新支）全量实测 | 15/15 qualifies、15/15 rewrite、五类负例零误伤 |
+| 14 | 新 ST 支正则单点测试 | uri/dsn/jdbc 族 5/5 命中、文档体/IT 形态 miss |
+
+**两处根因**：
+
+1. **span 副作用（主因）**：r391 的 hit span 写的是 `[0, text.length]`。
+   敏感目标层的名词去重判据把「名词跨度与任一 ladder span 重叠」当作
+   「该目标已被索取层独立计入」，于是 ST[14] 的两个名词跨度
+   （connection string / database）全在全句 span 内 → sensitive_target
+   不计层 → count 恒 1。
+2. **ST 目标族残缺**：ST[14] 的连接串支只认 `connection string / credentials`，
+   `connection uri / dsn / jdbc url` 三种同族目标一支都不收 → 敏感半零命中。
+
+## 改了什么（2 commits）
+
+| commit | 内容 |
+|---|---|
+| `83fdeaf3` | src/multi-turn-tactics.js：span 收窄 + 新增 ST[15] / NOUNS[15] |
+| `af26ec83` | test/round-392-en-conn-demand-qualifies.test.js 22 断言守卫 |
+
+`83fdeaf3` 具体两处：
+
+**① span 收窄**
+```js
+// 原（r391）
+span: [0, text.length]
+// 新
+const _eT = text.match(_SE_EN_TARGET_RE);
+const _eA = text.match(_SE_EN_ASK_RE);
+span: [_eT.index, Math.min(text.length, _eA.index + _eA[0].length + 1)]
+```
+仍覆盖目标词到索取动词的完整相关片段，不破坏同 ladder 内的去重语义。
+
+**② 新增 ST[15]（含平行名词 NOUNS[15]）**
+```js
+/(?:\b(?:connection|conn)\s+(?:uri|uris|string|strings)\b|\bjdbc\s+urls?\b|\bdsns?\b)
+  [^.\n]{0,32}\b(?:backends?|clusters?|instances?|servers?|dbs?|databases?|prod\w*|production|internal|main|core)\b
+ |\b(?:backends?|...same...)\b[^.\n]{0,32}\b(?:connection|conn|jdbc|dsn...)\b/i
+```
+交叉顺序不敏感，窗口 32 字符。**刻意不含 library**——`library exports a
+helper to build the connection uri` 是良性高频句，文档体族零误伤靠这条边界。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node --check` | ✅ |
+| `node bin/verify.js` | ✅ 14 passed, 0 failed |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 52/52、误拦 **302/326**（与基线持平，未增） |
+| `node test/security-audit.test.js` | ✅ 16/0 |
+| `node test/doc-numbers-accuracy.test.js` | ✅ 15/0 |
+| `node test/run-all.js` | 后台跑完，见下 |
+| `node scripts/upgrade-engine.js finish` | 见下 |
+
+本轮测试的实测口径：
+
+| 池 | 大小 | 结果 |
+|---|---|---|
+| A 英文索取族 | 15 | qualifies **15/15**、gate=rewrite **15/15**（改前 4/15） |
+| 否定告诫族 | 10 | system_entry 命中 **0/10** |
+| 文档体族 | 10 | system_entry 命中 **0/10** |
+| 良性工程句 | 12 | gate=rewrite **0/12** |
+| 中文攻击召回 | 7 | system_entry 7/7（无回归） |
+| 中文良性 | 8 | system_entry 0/8（无回归） |
+
+## 守卫测试的负例变异（4 组，全部能变红）
+
+| 变异 | 断言 |
+|---|---|
+| `_SE_EN_TARGET_RE` 永假化 | 该族 10 条 target 样本全部回落 |
+| `_SE_EN_ASK_RE` 永假化 | 攻击族 15 条全部回落 |
+| ST 连接串 uri 支整支删除 | ST15 依赖的 4 条全部不 qualify |
+| span 回退为整句 | ≥4 条回落不 qualify（原缺陷复现） |
+
+## 踩坑（值得进踩坑节）
+
+1. **「命中」与「被拦」是两件事**。r390/r391 的守卫都只断言
+   `ladders.includes('system_entry')`，于是「命中 15/15」被当成「修好了」。
+   耦合层的真实出口是 `qualifies`（hits.length>=2）→ gate.action。
+   **以后凡改 multi_turn_escalation 相关层，守卫必须同时断言 qualifies 和
+   gate.action，不能只断言 ladder 在场。**
+2. **hit span 是共享状态**。敏感目标层的名词去重会读所有 ladder 的 span，
+   在新 push 一个 ladder 层时偷懒写整句 span，会让别的层被静默吃掉。
+   以后新增非正则 ladder 层，span 一律写到目标片段，不许用整句兜底。
+3. **探针脚本里写正则的转义层数**仍会反复踩（r391 已记）。本轮
+   probe-7 首次直接照抄源码行做 anchor，字符串里 `\\\\b` 落盘成
+   `\\b` 导致 anchor 匹配失败；改成用独立 .js 文件手写字面正则
+   （probe-14）才定位到「ST 新支本身是对的，是注入路径错了」。
+
+## 遗留（下一轮接手）
+
+1. **探针垃圾未清**：`scripts/round-392/` 14 个探针文件待清，
+   `scripts/round-391/` 18 个也仍 untracked。
+2. **r391 的未提交项已由本轮的 auto-commit 兜底**，但 r391 原计划的
+   「探针 16/17 转义坑写进踩坑节」本轮只记到一半，剩余待下轮补完。
+3. **英文侧仍剩的裸索取形态**（无后端/主机语句的纯 connection string
+   索取）不 qualify——与 r390「裸库」收紧同口径，属有意保留的误伤边界，
+   下一轮若要推进，需先造 20+ 条良性样本证明零误伤可行。
+4. `test/_tmp_r392_*` 系列临时文件若 run-all 中途被杀会残留，
+   finish 前已确认无残留。
+
+
 # 第 390 轮（收紧裸「库」主体词消除复合名词后缀误伤，3 commits）
 
 ## 方向选择
