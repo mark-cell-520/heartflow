@@ -405,7 +405,19 @@ const LADDERS = [
   { name: 'authority_claim', label: '自称权威/紧急', score: 25,
     // [v6.7.86] "IT 部门"与"IT部"都要覆盖；间隔放宽到 20
     // （"我是公司 IT 部门新来的同事李明"到"需要核对"超过 12 字）
-    re: /(?:(?:总经理|总监|董事长|CEO|CTO|COO|主管|领导|经理|总经办|IT\s*部门?|信息安全部|审计部|法务部|人力资源部|HR)[^。\n]{0,20}(?:通知|要求|说的|审批|授权|安排|登记|核对)|(?:紧急|马上|立刻|立即)[^。\n]{0,10}(?:审计|核查|处理|提供|确认))/i },
+    // [v6.7.169 r382] 补英文侧两支（probe-2 实测：英文施压样本单独 0 层、
+    // 接英文索取尾仍只 bulk_export 1 层不 qualify，中文同族 qualifies 直接
+    // rewrite；根因是原始 re 三分支全是中文词表，英文自称权威进不了
+    // pressure 计数，sunk_cost/laundering 两个耦合层都缺第二层）：
+    //   ① 角色在前 + 指令动词在后：as the emergency response lead
+    //      I am ordering / instructing you to ...
+    //   ② 角色前缀自称 + 指令动词：I am the security officer, order you to ...
+    // 刻意不放开到普通职业名词（engineer / developer / analyst）：
+    // probe-3 实测良性 IT 支持句（自称 system administrator 求助重置密码，
+    // 句内无指令动词）两支均不命中，误伤面为零。
+    // 词组刻意区分 response/security/audit/compliance/ops 等**管辖类部门**
+    // 而非技术类，是因为诉求是拿系统访问权（与中文支「IT 部门 + 核对」同口径）。
+    re: /(?:(?:总经理|总监|董事长|CEO|CTO|COO|主管|领导|经理|总经办|IT\s*部门?|信息安全部|审计部|法务部|人力资源部|HR)[^。\n]{0,20}(?:通知|要求|说的|审批|授权|安排|登记|核对)|(?:紧急|马上|立刻|立即)[^。\n]{0,10}(?:审计|核查|处理|提供|确认)|\b(?:emergency|security|audit|compliance|operations?|ops|legal|hr)\s+(?:response\s+)?(?:lead|manager|officer|administrator|admin|team|head|director|supervisor)\b[^.\n]{0,32}\b(?:i\s+am|i'm|we\s+are)\s+(?:ordering|directing|instructing|commanding|requiring|authorizing|telling)\b|\b(?:i\s+am|i'm|this\s+is)\s+(?:the\s+|your\s+)?(?:emergency|security|audit|compliance|operations?|ops)\s+(?:lead|manager|officer|administrator|admin|head|director|supervisor)\b[^.\n]{0,28}\b(?:order|direct|instruct|command|require|authorize)\b)/i },
   { name: 'guilt_trip', label: '愧疚施压（别人都行为什么你不行）', score: 25,
     re: /(?:(?:其他|别的|大家|所有人|每个)[^。\n]{0,8}(?:都|全)[^。\n]{0,6}(?:能|可以|做)[^。\n]{0,12}(?:你|为何|为什么)[^。\n]{0,6}(?:不|没)|(?:如果你)[^。\n]{0,20}(?:就)[^。\n]{0,10}(?:应该|必须|该)[^。\n]{0,24}(?:不(?:答应|做|配合|给)[^。\n]{0,8}(?:就是|说明)))/i },
   // ─── [v6.7.87] 隐晦操纵手法补强 ───
