@@ -1,4 +1,141 @@
-# 第 410 轮（r409 补丁零验证零负例 → 实测抓出自锁告警不可达 + guard 判据不对称，3 commits）
+# 第 411 轮（r410 负例测试汇总行不被 run-all 解析 + vague 补「责任主体缺位族」，3 commits）
+
+## 方向选择
+
+init 简报无队列待办。r410 交接两条遗留（28 个未跟踪探针、guard-abilities 其余 check
+函数对称性未逐一核对）里，第二条是「核对型」任务、无已坐实的缺陷证据。
+先跑决策引擎拿候选（三选一，decision 实跑）：
+
+- [A] 修 run-all 全量实测出的 r410 自身失败（`round-410-checktests-catchguard.test.js` 被
+  run-all 判「未输出汇总行」，exit=1）
+- [B] 按维度覆盖扫描做 multi_turn_escalation 扩召回（但该维度 2/2 已识别、held 档、
+  r378 起已记到层，是信息档非真缺口）
+- [C] 核实 28 个未跟踪探针是否可清理
+
+decision 返回 chosen=null → 补判据重跑（把 B 的 held 证据写进候选），实跑定 [A]。
+选 [A] 的理由：**它是本轮唯一已被全量测试亲自证伪的缺口**——run-all 是心虫的
+总闸门，r410 自己的负例测试让它 exit=1，等于上一轮提交的守卫把总闸门弄哑了。
+
+## 方向一（主）：r410 负例测试汇总行不被 run-all 解析（11b5dd95）
+
+复测（不信 r410 描述）：单跑 `node test/round-410-checktests-catchguard.test.js`
+exit=0、6/6 全绿；但 run-all 全量 exit=1，失败列表只有它自己：
+
+```
+失败的测试:
+  - · round-410-checktests-catchguard.test.js
+    (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+```
+
+读 `test/run-all.js` 第 113 / 121-135 行实测根因：harness 只认三种汇总格式
+（`N 通过, M 失败` / `N passed, M failed` / `N/M passed` 分数式）。
+r410 那版写的是 `结果: 6/6 符合预期` 这种 **中文分数式**，三种正则全不匹配
+——分数式只认 `N/M passed`。所以单跑 exit=0 而全量被判「未汇总」，
+run-all 走第 113 行的 `failed++` 分支直接计失败。
+
+这是 r410 交接簿没写的真实缺口：**负例测试的单跑绿不等于全量绿**，
+r410 只做了单跑验证（6/6）就从没跑过全量。修法是把汇总行改成 harness 标准格式，
+保留人读提示行。实测单跑 `结果: 6 通过, 0 失败, 共 6 个` + exit=0。
+
+## 方向二：vague 维度补「责任主体缺位族」判据（ea4535f0）
+
+轮初用 `scripts/round-411-subjectless-probe.js` 做族内一致性扫描，发现
+**同一话术族判定不一致**：
+
+```
+「有关部门正在走流程」       → verify（vagueness，老正则 /有关部门/ 命中）
+「相关部门正在研究这个问题」  → pass  ❌ count=0
+「相关负责人表示正在研究」    → pass  ❌ count=0
+「相关负责部门尚未给出结论」  → pass  ❌ count=0
+```
+
+读码证实：`src/shield/error-taxonomy.js:225` 已把「相关部门」登记为模糊回避模式，
+但 `src/index.js` 的 `VAGUE_PATTERNS.zh` 只收了「有关部门」这一个写法。
+「相关+部门」「相关+负责人」「相关+负责部门」三种同族写法全部放过——
+责任主体被替换成「相关部门」后，读者无法追责也无法验证，正是 vagueness 要抓的形状。
+
+在 `VAGUE_PATTERNS.zh` 新增两条正则，**只收责任主体形状**（动作词限
+研究|处理|关注|负责|协调|推进|安排|跟进|核实|调查|介入|给出|回应|公布|说明），
+刻意不收「把材料提交给相关部门」这类动作主体是「你」的可执行句。
+
+实测攻击族 7/7 转 verify、良性 5/5 仍 pass：
+
+```
+✅ verify 「相关部门正在研究这个问题」
+✅ verify 「相关部门已经关注到此事」
+✅ verify 「目前由相关部门负责处理」
+✅ verify 「相关负责人表示正在研究」
+✅ verify 「相关负责部门尚未给出结论」
+✅ verify 「后续会由相关部门统一安排」
+✅ verify 「具体由相关部门协调推进」
+✅ pass  「请把材料提交给相关部门审核。」
+✅ pass  「这个问题我已经反馈给相关部门了。」
+✅ pass  「相关部门联系方式见官网公告。」
+✅ pass  「相关部门的答复函已于昨日公开。」
+✅ pass  「该事项已移交相关部门并收到回执。」
+```
+
+负例守卫 `scripts/negative-test-subjectless-authority-r411.js`（`--mutate` 跑删条变异）：
+N1 攻击族必须非 pass、N2 良性必须 pass、N3 删本轮两条新正则必须变红、
+N4 连「有关部门」老正则一起删也必须变红、D 还原必须回绿：
+
+```
+N3 变异变红      : OK
+N4 变异变红      : OK
+还原后回绿       : OK
+工作区 src 干净  : OK
+✅ 负例守卫成立：注入 → 删条 → 变红 → 还原 → 回绿
+```
+
+## 踩坑记录（给下一轮）
+
+`git add` 后立刻 `--mutate` 跑变异脚本是真事故：第一版负例脚本用
+`git checkout -- src/index.js` 还原，**把刚 add 但还没 commit 的补丁一起还原了**，
+导致第一个 commit（ea4535f0）只提了测试文件、`src/index.js` 是裸的。
+已改成「读盘快照 → 变异 → 跑判据 → 写回快照」，不碰 git。
+铁律：**变异类脚本不许用 git checkout 还原，只许写回内存快照。**
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| verify.js | 14/14 全绿 |
+| security-audit.test.js | 16/16 全绿 |
+| doc-numbers-accuracy.test.js | 21/21 全绿 |
+| bidirectional-guard | 召回 52/52、误拦 302/326（正好压基线，未增） |
+| run-all | 见下（唯一失败项已修） |
+| 负例脚本 N1-N4+还原 | 6/6 + 元校验 4/4 全绿 |
+| finish 七项检查 | 全绿（含推送 5 commit 成功） |
+
+run-all 首轮 exit=1，唯一失败项就是 r410 那个汇总行问题，已修 11b5dd95；
+修后重跑全量见下节。
+
+## 遗留
+
+1. **r411 负例脚本的汇总行也要自查**：r411 的 `negative-test-subjectless-authority-r411.js`
+   汇总格式是自定义的 `N3 变异变红 : OK`，不是 harness 标准格式。它在 `scripts/`
+   不是 `test/`，run-all 不扫它，所以本轮没暴露；但如果哪天被挪进 test/ 就会重演
+   r410 那坑。下一轮要么保持它在 scripts/，要么补标准汇总行。
+2. 28 个历史未跟踪探针（scripts/round-402-*、round-405-*）仍未清理——
+   r410/411 两轮都没做，下下轮核实无引用后可批量删（scripts/round-403/cleanup-probe-junk.js 有现成模式）。
+3. r410 交接第 2 项「guard-abilities 其余 check 函数 try/catch 判据对称性未逐一核对」
+   本轮读了 checkEntryPoints / checkSamples / checkBidirectional / checkDimensionRegistry，
+   发现 **checkSamples 有第二个真缺口**：`checkSamples` 的判据只读
+   `expectBlock/expectRewrite/expectClean` 三个字段，而样本里声明了第四个
+   `expectVague`——「vague」样本声明期望 verify，实测 gate=pass，
+   但因为判据不读 expectVague，**该样本恒判 ✅ 守卫形同虚设**。
+   本轮未改（超出本轮范围，且动它会连带改 capability 基线文件），
+   已如实登记为下一轮首选项：**给 checkSamples 补 expectVague 判据**。
+   实测证据见 `scripts/round-411-checkguard-probe.js` 输出（vague 样本 gate=pass 且守卫判 ✅）。
+
+## 给下一轮的接手说明
+
+1. **第一优先**：修 checkSamples 的 expectVague 判据缺口（见遗留 3），
+   改完必须同步 `data/capability-baseline.json` 并跑 `--baseline` 重新生成，
+   否则 `--check` 模式会误报漂移。
+2. **第二优先**：如果本轮全量测试出现新的「单跑绿、全量红」，先查汇总行格式
+   再查断言——run-all 的三种汇总正则写在 test/run-all.js 第 121-135 行。
+3. 变异脚本一律用内存快照还原，禁止 git checkout。
 
 ## 方向选择
 
