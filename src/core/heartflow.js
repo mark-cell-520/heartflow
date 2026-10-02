@@ -478,6 +478,15 @@ const _StateSnapshot = _lazy('stateSnapshot', () => require('./state-snapshot.js
 
 const _ErrorHandler = _lazy('errorHandler', () => require('./error-handler.js'));
 
+// [r404] 模块健康检查器：shield/module-health-checker.js 189 行、零静态引用。
+// MCP 层 heartflow_module_health 一直在调（每次临时 new 一个实例），引擎侧
+// this.moduleHealth 从未赋值 → engine-reasoner L253 的 think 入口巡检是死代码，
+// engine-dispatcher L106 的 __disabled fail-closed 自愈闸门在主链路从未激活
+// （r404 probe-4 实测：hf.moduleHealth === undefined，142 个模块从未被巡检）。
+// 这里补上惰性加载，接线点见下方 moduleHealth getter + LATE_ADDITIONS 后的
+// 显式实例化块（唯一注册点，r403 已证此处是唯一真正生效的求值位置）。
+const _ModuleHealthChecker = _lazy('moduleHealthChecker', () => require('../shield/module-health-checker.js'));
+
 const _ThoughtChain = _lazy('thoughtChain', () => require('../workflow/thought-chain.js'));
 
 const _CognitiveProtocol = _lazy('cognitiveProtocol', () => require('./cognitive-protocol.js'));
@@ -3016,6 +3025,29 @@ class HeartFlow {
     }
 
 
+
+    // [r404] 模块健康检查器实例化点：必须在 LATE_ADDITIONS 循环之后、
+    // generateAllowedRoutes 之前（与 falsePositiveFeedback 同一区块同一切
+    // 换时序，r403 实测此处是唯一真正生效的注册位置）。
+    // 前置巡检（engine-reasoner L253）依赖 hf.moduleHealth，此前恒 undefined；
+    // 接线后每次 think 入口做一次模块健康巡检，失败模块被 dispatcher
+    // fail-closed 拦截（自愈闸门首次在主链路上激活）。
+    if (this.moduleHealth == null) {
+      try {
+        const _mhc = _ModuleHealthChecker();
+        const _Mod = _mhc && _mhc.ModuleHealthChecker;
+        if (typeof _Mod === 'function') {
+          this.moduleHealth = new _Mod(this);
+          this._modules['moduleHealth'] = this.moduleHealth;
+        } else {
+          this._initErrors = this._initErrors || [];
+          this._initErrors.push({ module: 'moduleHealth', error: 'module not loadable', note: 'optional 不阻断主链路' });
+        }
+      } catch (e) {
+        this._initErrors = this._initErrors || [];
+        this._initErrors.push({ module: 'moduleHealth', error: e.message, note: 'optional 不阻断主链路' });
+      }
+    }
 
     // ─── Thought Chain 初始化 ───────────────────────────────────────────────
 
