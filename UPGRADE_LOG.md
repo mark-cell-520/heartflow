@@ -51,6 +51,111 @@ peer_pressure 的复数修正 patch 成功后没立刻 commit，负例脚本的 
 结论：每个 src 改动 patch 完立刻 commit。该轮 run-all 未跑完即被迭代
 上限截断，finish 未执行，UPGRADE_LOG 未写 r382 段（由 r383 补）。
 
+# 第 384 轮（premature_termination T1 过渡语误抓修复，4 commits）
+
+## 方向选择
+
+队列待办为空。上一轮（r383）遗留节没有可直接接手的缺口项，init 的维度覆盖
+横向扫描给出一条具象线索：`multi_turn_escalation(1/2)` 闸门放过 1 条。
+
+先用代码实跑复测（不信简报旧描述）——`scripts/round-384/probe-1-mte-rescan.js`：
+
+- 探针 1「现在只是一小步，后面慢慢就习惯了」：gate=pass，但
+  dimensionRaw.count=1 / qualifies=false（norm_desensitize_standalone 层已记到，
+  属 held 档，非盲区）。
+- 探针 2「先试试看，之后会越来越顺理成章」：gate=**verify**，findings 归因到
+  **premature_termination**。
+
+即真正待修的不是 mte 缺判据（r370/r371/r377 已三层处理），而是第二探针被
+T1 过渡语误抓、归因错维。用 decision 结构化选向实跑
+（probe-4-decide.js，A 0.78 / D 0.72 / C 0.67 / B 0.61）选中 A：修
+premature_termination 的 T1 误抓。
+
+## 复测（缺口坐实）
+
+`probe-2-pt-attrib.js`：探针 2 的 pt 结果 level=verify、唯一信号
+`T1_status_utterance`（权重 0.9）。
+
+`probe-3-t1-scale.js` 量化误抓面（三组样本，全部隔离在
+test/round-384-mte-samples.js）：
+
+| 组 | 形状 | T1 命中 |
+|---|---|---|
+| A | 完整陈述（递进半+结论收尾半同现） | **1/5** ← 误抓 |
+| B | 真过渡语 | 4/5（应命中，保留） |
+| C | 跨维度样本（含索取尾） | 0/2 |
+
+`probe-5-t1-en.js`：英文侧 T1 同构实测 **0/3 误抓**（英文正则锚定短窗口）——
+缺口只在中文侧，排除只做中文侧。
+
+## 改了什么（2 个 src/ 提交 + 2 个 test/ 提交）
+
+1. `88111a17` — 修 T1 误抓。新增 `T1_COMPLETE_STATEMENT_ZH`
+   （递进半 ∪ 结论收尾半同现），在 T1 命中后做后处理排除。
+   **为什么用后处理而不是改正则**：排除要看句中后段的收尾词，固定 15 字
+   前窗覆盖不到（同 r30 sensitive_file 软分支踩过的坑）。
+   原五条中文正则一字未动（轮中曾误删，已立即恢复）。
+2. `6f1ea2d7` — 守卫测试 `test/round-384-t1-complete-statement.test.js`
+   （11 断言：A 组 5 条零误抓 / B 组 4 条仍命中 / gate 归因不落 pt /
+   英文侧不退化）+ 负例还原点脚本。
+3. 探针 6 个（probe-1~probe-8）+ 样本隔离文件。
+
+## 验证结果（全部本轮实跑）
+
+- 单组误抓：A 组 1/5 → **0/5**；B 组真过渡语 **4/5 不变**（那条 miss 是
+  修复前就 miss 的「我先排查一下」，非本轮退化）。
+- 负例守卫：删排除条件即红 **1/1**（完整陈述 T1 误抓），restore 后 **11/0**。
+- 跨 worktree 净效果（probe-8，base=057e1818，attack 6 + benign 10）：
+  合计变化 **1** 条 = verify→pass（就是被误抓那条）；变严 0、误伤 0，
+  其余 5 条攻击与 10 条良性动作零变化 —— 纯去误报，未放松任何真拦截。
+- `test/round-384-t1-complete-statement.test.js`：**11/0**（run-all 收录同数）
+- `test/premature-termination.test.js`：**12/0**；`premature-termination-gate.test.js`：**4/0**
+- `bin/verify.js`：**14/0**
+- `scripts/bidirectional-guard.js`：召回 **52/52**、误拦 **302/326**（与 r383 基线完全一致，新增 0）
+- `test/security-audit.test.js`：**16/0**
+- `test/doc-numbers-accuracy.test.js`：**15/0**
+- `node test/run-all.js`：**16817 通过 / 0 失败**（含 npm-package-integrity 6/0，
+  本轮比简报预期的 1 个失败更干净）
+- 维度覆盖扫描复测：46 维、未测 0、良性误伤 0/12；闸门漏判仍 1 项
+  （multi_turn_escalation 2/2，held 档非盲区，见下方遗留分析）
+
+## 踩坑记录
+
+1. **`node test/xxx.test.js` 对工厂格式测试文件不输出也不执行**：多个
+   test/ 文件是 `module.exports = function({test})` 形式，直接跑静默 exit 0。
+   本轮误判一次「12/0」实为空跑。跑单文件必须先确认它是工厂格式，用
+   harness require 后运行（见 scripts/round-384/probe-6-pt-runner.js）。
+2. **`node test/run-all.js` 前台跑必超 180s**：本轮亲历一次 timeout(124)，
+   按纪律改后台后正常收尾。run-all ≈ 12 分钟，只走后台。
+3. patch 误删中文正则一次（把 STATUS_UTTERANCES_ZH 五条整块替换掉了），
+   SyntaxError 立刻暴露并即时恢复。教训：改常量块附近内容时，old_string
+   必须取到唯一边界，别让替换范围覆盖相邻常量。
+
+## 未完成 / 遗留
+
+1. **维度覆盖扫描的 multi_turn_escalation 现在是 2/2 放过（比上轮 1/2 更醒目）**：
+   这不是退化——修掉 T1 误抓后，探针 2 不再被 pt 误判 verify，露出真实状态
+   「两探针都只有 norm 独立层 1 层、qualifies=false」。该档位判定为
+   **设计保守而非缺口**（r370 已实测同形状独立成层会大误伤；r377 独立层
+   score 减半 + qualifies≥2 是刻意口径）。扫描器把 held 报成第一优先，
+   建议后续轮次把「held 且已有三层实测依据」项降权，避免空转。
+2. `data/dimension-coverage.json` 本轮已刷新（46 维口径）。
+3. git 卫生未做（scripts/round-3xx/ 下 100+ 未提交探针文件仍在），
+   decision 对 D 项给 0.72 但低于 A；留给后续轮次。
+
+## 给下一轮的接手说明
+
+1. T1 完整陈述排除的还原点：`src/premature-termination.js` 的
+   `if (isZh && T1_COMPLETE_STATEMENT_ZH.test(trimmed)) {`，
+   负例脚本 `scripts/negative-test-t1-complete-statement-r384.js` 已验证
+   「删即红、还原即绿」。
+2. 若后续要收 `multi_turn_escalation` 的 held 档，先读
+   src/multi-turn-tactics.js L656~L725 的三层注释（r370/r371/r377 实测
+   依据全在那儿），不要重新试错「独立成层」。
+3. 单文件测试先判格式：工厂格式需 harness，否则静默空跑。
+4. 本轮未越硬边界：未改 package/VERSION/README/AGENTS/upgrade-queue/
+   upgrade-state，未改升级机制自身，未 push、未 npm publish。
+
 # 第 383 轮（guilt_trip 补英文侧三支，压力族英文覆盖收口，6 commits）
 
 ## 方向选择
