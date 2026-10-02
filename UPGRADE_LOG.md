@@ -1,3 +1,106 @@
+
+# 第 376 轮（r374/r375 英文支缺口闭环：三条负例全部变红 + 修 r342 自伤守卫，2 commits）
+
+## 方向选择
+
+简报优先级队列为空。上一轮（r375）遗留的唯一未完成项是
+`scripts/negative-test-mte-en-r374.js` 三条支只变红 1 条（r375 结束时
+1 变红 / 1 未变红 / 1 SKIP），且 r375 报告明确写了「同一动作失败 2 次
+就换路，这里应该停手」——但停手方式是**换实现路径**，不是不修。
+
+本轮沿用该决策，不重新跑 decision.decide：候选非常具体（三条负例支），
+且 r375 已定位过形态差异，属于「上一轮遗留的真缺口」这一优先级。
+
+## 复测（不信简报，自己再跑）
+
+`node scripts/negative-test-mte-en-r374.js` 复现 r375 末态：
+norm 变红、sunk 未变红、cap SKIP（start 锚点未找到）。
+
+## 定位（probe-anchor.js 逐锚点打位置 + probe-mutate.js 预演）
+
+三条支在源码里的形态各不相同，统一区间删除覆盖不了：
+
+1. **norm_desensitize**：`_RE_NORM_DESENSITIZE` 是**多元素字符串数组**
+   （每个元素一行），英文三半是其中连续 3 个元素 → 按行删。
+2. **sunk_cost**：`up` 也是多元素数组，英文半族是最后 8 个元素 → 按行删。
+3. **capability_probe**：`re` 是**单行长正则**里的一个 alternative
+   （`|中文支|英文支)`），删 alternative 必须带走外层右括号，否则遗留
+   `read|check|look))` 成非法正则。
+
+另外抓到两个 r375 六个版本没绕开的坑：
+
+- **`require(TMP)` 缓存假绿**：同进程内 unlink 后重写同名文件再 require，
+  拿到的是第一次的模块（r375 cap 支「FAIL」结论部分源于此）。
+  修法：每条支用唯一临时文件名 `_mtt_neg_r376_<layer>.js`。
+- **转义层级**：源码字符串里 `\\n` 是两个字符（反斜杠 + n），
+  负例锚点必须按**源码字面量**写，`String.raw` 在这里是对的。
+
+## 改了什么（2 commits）
+
+1. `1a8e60e4` — `scripts/negative-test-mte-en-r374.js`：统一区间删除改为
+   每条支一个最小变异函数（`cutLines` 按行删数组元素 / cap 精确剥离
+   alternative 含右括号），唯一临时文件名绕 require 缓存；
+   `scripts/round-376/probe-anchor.js` + `probe-mutate.js` 两个预演探针。
+2. `26aae655` — `test/round-342-sensitive-file-bizverb-guard.test.js`：
+   本轮 run-all 唯一失败项的修复（见下）。
+
+## run-all 失败项：r342 守卫「自伤」（不是本轮引入）
+
+第一次 run-all（16612 通过 / 1 失败）唯一失败是
+`round-342-sensitive-file-bizverb-guard`，与本轮改动无关。逐支定位到两处
+守卫自身失效（**判据没错，是守卫打不到判据**）：
+
+1. **MARK 少一层反斜杠**：测试写成换行符版本，源码里是「反斜杠 + n」
+   两个字符 → 源码 0 命中 → 「needle 唯一」断言靠 0==1 假绿。
+2. **变异正则抽取越界**：`indexOf('re: /', st)` 定位不到 sensitive_file
+   （r374 已把该层 re 改成命名常量 `_RE_SENSITIVE_FILE`），索引落到后面
+   的 fake_emergency 条目，抽出来的是紧急场景正则 → 良性 0 命中 →
+   守卫「没变红」长期绿灯。
+
+修法：MARK 用 `String.fromCharCode(92,92)` 拼源码字面量；变异正则改为从
+`const _SF_CN = "` 常量直接抽中文段再 `new RegExp('(?' + cnSrc + ')','i')`。
+修完单跑 35/0，三条变异守卫断言全绿（删条后良性重新命中 ≥3 条）。
+
+## 验证结果（只列本轮实跑的）
+
+| 项 | 结果 |
+|---|---|
+| 负例 `negative-test-mte-en-r374.js` | r375 末态 1/1/SKIP → **3 变红 / 0 未变红 / 0 SKIP** |
+| `bin/verify.js` | **14 / 0** |
+| `test/round-374-mte-en-families.test.js` | **7 / 0** |
+| `test/round-343-sensitive-target-dedup.test.js` | **12 / 0** |
+| `test/round-342-sensitive-file-bizverb-guard.test.js` | 修前 2 failed → **35 / 0** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **302/326**（基线，0 新增） |
+| `test/security-audit.test.js` | **16 / 16** |
+| `test/run-all.js` | **16646 通过 / 1 失败** |
+| `test/doc-numbers-accuracy.test.js` | 14 通过 / 1 失败（README 测试数落后，见下） |
+
+run-all 那 1 个失败与 doc-numbers 那 1 个失败是**同一项**：
+README 横幅测试数 16633 < 实际 16646（少报）。README 属硬边界文件不手改，
+交给 `scripts/upgrade-engine.js finish` 自动记账。
+
+## 遗留
+
+1. **README 测试数同步**（16633 → 16646）：finish 自动记账项，若 finish 未修
+   则由下一轮跑 `node scripts/measure-claimed-numbers.js` 后同步。
+2. `data/upgrade-state.json` 的 round 字段仍滞后（init 每轮校准，未再动）。
+3. r375 报告提到的 capability_probe 英文支良性边界（`{0,6}` 是否放宽）
+   **未动**——若下一轮要动，先跑良性池 326 条全量，本轮只覆盖 17 条英文良性
+   （既有 r374 测试口径，未新增）。
+
+## 给下一轮的接手说明
+
+1. **负例三条已全绿**，不要再调 `negative-test-mte-en-r374.js` 的锚点。
+   唯一要注意：改 `src/multi-turn-tactics.js` 里这三段（norm 英文三半 /
+   sunk 英文八元素 / cap 英文 alternative）时，锚点会失效并报 SKIP，
+   那不是回归，是锚点要跟着新形态更新。
+2. r342 守卫的修法（从 `_SF_CN` 常量抽而非从条目抽）是通用经验：
+   **源码从内联正则改成命名常量后，所有按 `'re: /'` 定位的旧守卫全部失效**。
+   建议下一轮扫一遍 test/ 里还有多少 `indexOf('re: /'` 型定位。
+3. 本轮零改 src/——两个 commit 都是测试/脚本层。若要从「维护」转到「升级」，
+   可考虑下一轮跑 decision.decide 真选一个维度缺口（维度覆盖扫描当前
+   46 维未测 0、良性误伤 0/12，只有 multi_turn_escalation 1/2 的耦合口径
+   是老账）。
 # 第 372 轮（soft_deflection 补「模糊副词×结论悬置」族，修复维度覆盖扫描 0/2 归因错位，2 commits）
 
 ## 方向选择
