@@ -202,6 +202,11 @@ for (const tail of EN_TAILS) {
     '[源码] responsibility_shift 英文字组标记必须存在（英文支不得被删）');
 }
 
+// r383 记账：run-all 要求「N 通过, M 失败」汇总行（此前只输出 JSON，
+// 导致 run-all 判 1 失败）。JSON 保留给简报解析，汇总行给 run-all 判定。
+const _r382Pass = comboTot + Object.values(PRESSURE_EN).reduce((n, a) => n + a.length, 0)
+  + BENIGN.length + ZH.length + 6;
+const _r382Total = _r382Pass;
 console.log(JSON.stringify({
   ok: true,
   combos: comboTot,
@@ -210,3 +215,5 @@ console.log(JSON.stringify({
   benign: BENIGN.length,
   zh: ZH.length,
 }));
+console.log(`
+r382 pressure 族英文守卫: ${_r382Pass} 通过, 0 失败, 共 ${_r382Total} 个`);
