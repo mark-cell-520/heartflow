@@ -439,6 +439,16 @@ const SENSITIVE_TARGET = [
   // 因此「export the sales report」这类合法导出不收（动词后名单类宾语才算）；
   // 同时要求宾语是名单/表/连接串类，不含 report/logs/dashboard。
   /(?:\b(?:dump|pull|grab|fetch|retrieve|export|send|give|list|show|reveal|print|read|download|extract)\b[^.\n]{0,28}\b(?:customer|user|employee|student|patient|subscriber|account)s?\b[^.\n]{0,20}(?:list|table|records?|data|export|numbers?|details?|addresses?)|\b(?:connection|conn)\s+(?:string|strings|credentials?)\b)/i,
+  // [v6.7.180 r392] 英文侧连接串索取目标（uri/dsn/jdbc 族）。
+  // r391 已补 system_entry 的 JS 组合判据（_seEnConnDemandHit），但
+  // probe-1~13 复测发现该族 11/15 仍不 qualify：根因是 ST[14] 的
+  // 连接串支只认 `connection string / credentials`，而
+  // `connection uri / dsn / jdbc url` 三种同族目标一支都不收 →
+  // 敏感半零命中 → 只有 system_entry 1 层 → qualifies=false → gate=pass。
+  // 本支刻意**不含** library：`library exports a helper to build the
+  // connection uri` 是良性高频句（probe-1 D 组 0 误伤靠该边界）。
+  // 交叉顺序不敏感（任一侧在先都收），窗口 32 字符同现。
+  /(?:\b(?:connection|conn)\s+(?:uri|uris|string|strings)\b|\bjdbc\s+urls?\b|\bdsns?\b)[^.\n]{0,32}\b(?:backends?|clusters?|instances?|servers?|dbs?|databases?|prod\w*|production|internal|main|core)\b|\b(?:backends?|clusters?|instances?|servers?|dbs?|databases?|prod\w*|production|internal|main|core)\b[^.\n]{0,32}(?:\b(?:connection|conn)\s+(?:uri|uris|string|strings)\b|\bjdbc\s+urls?\b|\bdsns?\b)/i,
 ];
 
 // [v6.7.152] SENSITIVE_TARGET 的**平行核心名词表**（下标与 SENSITIVE_TARGET 严格对应）。
@@ -473,6 +483,8 @@ const SENSITIVE_TARGET_NOUNS = [
   // 不是核心目标名词（真正的目标是名单/表/连接串类），去掉不影响匹配、
   // 只纠正去重边界。
   /customer|user|employee|student|patient|subscriber|account|list|table|records?|numbers?|details?|addresses?|connection|conn|string|credentials?/i,
+  // [v6.7.180 r392] ST[15] 对应名词（英文连接串/uri/dsn/jdbc + 基础设施）。
+  /backends?|clusters?|instances?|servers?|dbs?|databases?|prod\w*|production|internal|main|core|connection|conn|uri|uris|string|strings|jdbc|urls?|dsns?/i,
 ];
 /**
  * [v6.7.155 r374] sensitive_file 层正则（组装式，与 _RE_SYSTEM_ENTRY 同款做法）。
@@ -919,8 +931,23 @@ function checkMultiTurnEscalation(text) {
   // probe-1 实测：英文索取形状在改前 system_entry 0 命中、只剩
   // sensitive_target 一层，耦合层闸门打不开 → gate 放行。
   // 判据见上方 _seEnConnDemandHit 注释（四条同现 + 80 字符窗口）。
+  // [v6.7.180 r392] span 从「整句」收窄为「目标词起点 ~ 索取动词终点」：
+  // probe-5~9 复测发现全句 span 让敏感目标层的名词去重把 ST[14] 吃掉——
+  // `give me the database connection string` 里 ST[14] 的两个名词跨度
+  // （connection string / database）全落在 [0, text.length] 内，被判
+  // 「已被 system_entry 独立计入」→ sensitive_target 不计层 →
+  // count 恒 1 → qualifies=false → gate=pass。收窄后 A 组 qualifies
+  // 4/15 → 11/15（probe-5 实测）。span 仍覆盖全部相关片段（目标+索取），
+  // 不破坏同一 ladder 内的去重语义。
   if (_seEnConnDemandHit(text)) {
-    hits.push({ ladder: 'system_entry', label: '索取系统/后台入口', matched: 'en:conn-demand', span: [0, text.length] });
+    const _eT = text.match(_SE_EN_TARGET_RE);
+    const _eA = text.match(_SE_EN_ASK_RE);
+    hits.push({
+      ladder: 'system_entry',
+      label: '索取系统/后台入口',
+      matched: 'en:conn-demand',
+      span: [_eT.index, Math.min(text.length, _eA.index + _eA[0].length + 1)],
+    });
     score += 35;
     predatory++;
   }
