@@ -3580,6 +3580,17 @@ const EMPTY_STILL_WATCH_ZH = /(仍|还|尚|依然)[^。]{0,6}(?:需要|有待|�
 const EMPTY_CONVERGE_ZH = /(我(?:的)?(?:结论|判断|建议|选择|立场|倾向)是|我建议|我倾向|我方观点|应该选|应该用|推荐选|最终选|选定|定为|答案是有|答案是|明确说|直说|我的判断|由此判定|判定是|结论如|按[^。]{0,6}(?:优先|原则)[^。]{0,6}(?:选|定|采用)|因此(?:选|用|定)|所以选|差额|差距在|值不值|不值得|不值得为|风险可控|不可接受|可以接受|我会选|应当|必须选|只能选|不能选)/;
 // 数值半：给出可比较的具体数值基线 → 是事实陈述不是空答
 const EMPTY_NUMERIC_ZH = /(?:\d+(?:\.\d+)?\s*(?:%|倍|天|小时|分钟|ms|秒|万|千|亿|个|元|人|次|条|项|单|件|号|周|月|年|款)|第[一二三四五六七八九十]+|三个|两个|四个|五个)/;
+// [v6.7.124 r417] 循环重述型空答的判据常量（解释半把主词换个说法再说一遍）
+// 形状：**被解释项与解释项字面同词** —— 「X 的原因是 X」「关键在于关键」。
+// 轮初实测（scripts/round-417-circular-probe.js）：本族攻击 1/10
+// （唯一命中还是撞上既有 it depends 词），良性 0/8 —— 坐实的真缺口。
+// 分界：良性解释会引入**新信息**（输入为空 / 依赖缺失 / 带宽上限 10Gbps），
+// 攻击句的解释半只是在同一窗口内把同一个 2-5 字词复现一遍。故判据 =
+// 同词复现 + 短窗口，不引入任何新实体需求的词表。
+// 中文两个分支：① X 的原因是 X ② X 是因为/就在于/关键在于 X（各自独立捕获组）
+const EMPTY_CIRCULAR_ZH = /([一-龥]{2,5})(?:的)?(?:原因|缘故)(?:是)?(?:因为|是由于|在于|就是)[^。！？；;，,]{0,12}\1|([一-龥]{2,5})[^。！？；;，,]{0,10}(?:是因为|就是因为|就在于)[^。！？；;，,]{0,12}\2/;
+// 英文分支：because 前后同一词干复现（works…because…works / complex…complexity）
+const EMPTY_CIRCULAR_EN = /\b(\w{4,}?)(s|ed|ing)?\b[^.]{0,30}\bbecause\b[^.]{0,30}\b\1(s|ed|ing)?\b/i;
 
 function checkEmptyAnswer(text) {
   if (!text || typeof text !== 'string') return { count: 0, empties: [], score: 0 };
@@ -3612,6 +3623,18 @@ function checkEmptyAnswer(text) {
     const stillWatch = EMPTY_PROGRESS_ZH.test(text) && EMPTY_STILL_WATCH_ZH.test(text);
     if ((hedges || stillWatch) && !converges && !numeric) {
       empties.push({ pattern: 'two_sided_no_converge', matched: (hedges ? hedges[0] : text).slice(0, 30), count: hedges ? hedges.length : 1 });
+    }
+  }
+  // ── [v6.7.124 r417] 循环重述型空答（第 417 轮新增，子判据）────────────
+  // 形状：**用问题解释问题** —— 解释半把主词换个说法再复述一遍。
+  // 两条独立通道（中/英），命中均需**无收敛/无数值**才计空答，
+  // 与上面两面摊开族的分界逻辑保持同一口径（良性都会给出收敛承诺或数值）。
+  // 与既有 17+3 条套话判据互不重叠：那些收「这个问题很复杂」「It depends」
+  // 这类**套话词**，本族收「同词复现」——轮初实测 10 条攻击 9 条绕过前者。
+  if (empties.length === 0) {
+    const circular = hasChinese ? EMPTY_CIRCULAR_ZH.test(text) : EMPTY_CIRCULAR_EN.test(text);
+    if (circular && !EMPTY_CONVERGE_ZH.test(text) && !EMPTY_NUMERIC_ZH.test(text)) {
+      empties.push({ pattern: 'circular_restate', matched: text.slice(0, 30), count: 1 });
     }
   }
   const count = empties.length;
