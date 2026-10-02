@@ -327,18 +327,35 @@ for (const [label, fp] of [['README.md', README], ['SKILL.md', SKILL]]) {
         `${label} 规格表 Discrimination dimensions = ${rows['Discrimination dimensions']}，实测 ${M.dimensions}`);
     }
     // 测试数
-    // [r408] 未测量（null）时跳过比对，但**必须有一条明确提示**——否则
-    // 「没跑过 run-all」会被静默当成「通过」，正是 r407 腐化的同款机制。
+    // [r409] 修「失败自锁」：M.tests/M.testFailed 来自 data/test-count.json，
+    // 即**上一轮** run-all 的结果。当上一轮因任何原因（并发抖动、环境噪声）
+    // 留下 failed>0 时，doc-numbers 自己会挂 3 个 → 本轮 run-all 又把
+    // failed>0 写回缓存 → 永真命题，run-all 再也回不到全绿。
+    // 本轮实测复现两次：并发跑时 188 夹具文件报 1 failed → 缓存写 1；
+    // 无并发重跑被自锁传染成 3 failed（全来自 doc-numbers 自身）；
+    // `git checkout -- data/test-count.json` 破锁后 run-all 立刻自愈 17349/0。
+    // 修法：total（passed+failed）是恒定量，文档的 Test suite 行语义就是
+    // 全绿态（17349 passing / 0 failing）——所以**与 total 比对**，
+    // 而不是与被失败的 passed 比对。failed>0 单独走自锁告警分支，
+    // 明确指出恢复命令，不混入「文档漂移」的三个 FAIL。
     if (rows['Test suite'] !== undefined) {
       const mm = rows['Test suite'].match(/([\d,]+)\s+passing\s*\/\s*(\d+)\s+failing/);
       assert.ok(mm, `${label} 规格表 Test suite 行格式无法解析：${rows['Test suite']}`);
       if (M.tests == null) {
         throw new Error(`${label} 规格表 Test suite = ${rows['Test suite']}，但本机没有 data/test-count.json 实测缓存（先跑 node test/run-all.js）`);
       }
-      assert.strictEqual(parseInt(mm[1].replace(/,/g, ''), 10), M.tests,
-        `${label} 规格表 Test suite = ${rows['Test suite']}，实测 ${M.tests} passing / ${M.testFailed} failing`);
-      assert.strictEqual(parseInt(mm[2], 10), M.testFailed,
-        `${label} 规格表 failing = ${mm[2]}，实测 ${M.testFailed}`);
+      // total = passed + failed，是 run-all 本轮真实跑过的用例总数
+      const total = M.tests + (Number.isFinite(M.testFailed) ? M.testFailed : 0);
+      assert.strictEqual(parseInt(mm[1].replace(/,/g, ''), 10), total,
+        `${label} 规格表 Test suite = ${rows['Test suite']}，实测共 ${total} 个用例` +
+        `（passed ${M.tests} + failed ${M.testFailed}）`);
+      if (M.testFailed > 0) {
+        throw new Error(
+          `${label}：上一次 run-all 遗留 ${M.testFailed} 个失败未清（缓存 data/test-count.json），` +
+          '这会让记账链路自锁——doc-numbers 挂→缓存继续写 failed>0→永不恢复。' +
+          '恢复命令：git checkout -- data/test-count.json && node test/run-all.js' +
+          '（确认无其他 run-all 进程并发，dev-exemptions 夹具测试会写 src/ 临时文件）');
+      }
     }
     // 能力守护项数（未测量 null 时跳过，不当成失败；0 是合法测量值要真比）
     if (M.capabilityChecks != null && rows['Capability guard'] !== undefined) {
