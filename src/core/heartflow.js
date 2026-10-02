@@ -637,6 +637,13 @@ const _LearningPulse = _lazy('learningPulse', () => _stubFactory('LearningPulse'
 const _TaskUrgency = _lazy('taskUrgency', () => _stubFactory('TaskUrgencyEstimator'));
 const _HypothesisDriver = _lazy('hypothesisDriver', () => { try { return require('../cortex/hypothesis-tester.js'); } catch(e) { return _stubFactory('HypothesisDriver'); } });
 const _ErrorMemory = _lazy('errorMemory', () => { try { return require('../error-memory.js'); } catch(e) { return _stubFactory('ErrorMemory'); } });
+// [r402] 误报反馈闭环：MCP 层 v6.7.72 已接（heartflow_false_positive），引擎侧
+// 一直没实例化——dispatch('falsePositiveFeedback.*') 全部 not allowed。这里补上
+// 懒加载；模块是函数式导出（report/stats/suggest/confirm/clear），不是 class。
+const _FalsePositiveFeedback = _lazy('falsePositiveFeedback', () => {
+  try { return require('../false-positive-feedback.js'); }
+  catch (e) { return {}; }
+});
 const _PatternTracer = _lazy('patternTracer', () => _stubFactory('PatternTracer'));
 const _WorldLandscape = _lazy('worldLandscape', () => _stubFactory('WorldLandscape'));
 const _ProcessRewardModel = _lazy('processRewardModel', () => _stubFactory('ProcessRewardModel'));
@@ -2967,7 +2974,12 @@ class HeartFlow {
 
       // [第 216 轮接线] 综合验证引擎（skill-verifier 契约修复后才可用）
 
-      'verification'];
+      'verification',
+
+      // [第 402 轮接线] 误报反馈闭环：MCP 工具 v6.7.72 早就在调，引擎侧
+      // this.falsePositiveFeedback 一直没进 _modules → dispatch 全 not allowed
+
+      'falsePositiveFeedback'];
 
     for (const name of LATE_ADDITIONS) {
 
@@ -2977,6 +2989,26 @@ class HeartFlow {
 
       }
 
+    }
+
+    // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
+    // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
+    // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
+    // （dispatch 按方法名分发，不需要 class 实例）。
+    if (this.falsePositiveFeedback == null) {
+      try {
+        const _fp = _FalsePositiveFeedback();
+        if (_fp && typeof _fp.report === 'function') {
+          this.falsePositiveFeedback = _fp;
+          this._modules['falsePositiveFeedback'] = _fp;
+        } else {
+          this._initErrors = this._initErrors || [];
+          this._initErrors.push({ module: 'falsePositiveFeedback', error: 'module not loadable', note: 'optional 不阻断主链路' });
+        }
+      } catch (e) {
+        this._initErrors = this._initErrors || [];
+        this._initErrors.push({ module: 'falsePositiveFeedback', error: e.message, note: 'optional 不阻断主链路' });
+      }
     }
 
 
