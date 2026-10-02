@@ -54,6 +54,7 @@ function valueDomainSound(tableSrc) {
   if (!em) return { ok: false, reason: 'EXPECT_ACTIONS 表缺失' };
   const bad = [];
   for (const line of em[1].split('\n')) {
+    if (line.trim().startsWith('//')) continue; // 跳过注释行
     const m = line.match(/^\s*(\w+)\s*:\s*\[([^\]]*)\]/);
     if (!m) continue;
     const vals = m[2].split(',').map(s => s.trim().replace(/['"]/g, '')).filter(Boolean);
