@@ -113,6 +113,11 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
   // data.discriminate 只有 3 个键，直接调 idx.discriminate 有 58 个）。
   // 后果是引擎侧已识别也无法在门禁入口读到。
   if (discResult.dimensions) data.discriminate.dimensions = discResult.dimensions;
+  // [v6.7.156 r378] 中间态原始记账同样透传（r378 probe-5 同族缺口：
+  // buildResult 只从 data.discriminate 拿 verdict/score/findings，
+  // 顶层字段一概不过——dimensionRaw 若漏了，扫描器在 checkOutput
+  // 路径上仍读不到「已识别但保守不判」）。
+  if (discResult.dimensionRaw) data.discriminate.dimensionRaw = discResult.dimensionRaw;
 
   // ─── Layer 3.2: Classical Knowledge — 古籍思想维度 ─────
   const classicalResult = evaluateRules(input);
