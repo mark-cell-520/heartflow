@@ -230,11 +230,21 @@ console.log('\n── ⑦ 负例变异守卫 ──');
 }
 
 // ⑦c ST[15] 整支永假化 —— 只依赖新支补位的样本必须回落到不 qualify
+// ⚠️ [v6.7.1xx r394 修正] 首版断言 red === ATTACK_ST15.length，r394 实测 red=0。
+//   根因：r394 的 dedup 豁免谓词让这些样本在 ST[15] 被删后仍能靠
+//   ST[14]/ST[16] 保住 sensitive_target 层。**变异断言必须隔离单变量**——
+//   这一支要证的是「ST[15] 曾经是这些样本的第二信号」，所以必须把
+//   dedup 豁免一起变异掉，才能把 ST[15] 的贡献单独暴露出来
+//   （同 r393 probe-17 的教训：变异后若其他层补位，断言的就是噪声）。
 {
-  const m = src.match(/  \/\(\?:\\b\(\?:connection\|conn\)\\s\+\(\?:uri\|uris\|string\|strings\)[^\n]*\/i,\n/);
-  ok(!!m, '变异锚点存在（ST 连接串 uri 支）');
-  if (m) {
-    const mutated = src.replace(m[0], '');
+  // 用行号定位而非正则（多层转义在测试文件里不可靠，r394 实测：正则版锚点连头都匹配不到）
+  const lines = src.split('\n');
+  const st15Line = lines.findIndex(l => l.indexOf('(?:uri|uris|string|strings)') !== -1 &&
+    l.indexOf('jdbc') !== -1 && l.trim()[0] === '/');
+  ok(st15Line !== -1, '变异锚点存在（ST 连接串 uri 支）');
+  if (st15Line !== -1) {
+    const mutated = (lines.slice(0, st15Line).join('\n') + '\n' + lines.slice(st15Line + 1).join('\n'))
+      .replace('!_isConnDemandHit(h)', '_isConnDemandHit(h)');
     const tmp = path.join(ROOT, 'test', '_tmp_r392_negC.js');
     let red = 0, err = '';
     try {
@@ -244,17 +254,20 @@ console.log('\n── ⑦ 负例变异守卫 ──');
       for (const s of ATTACK_ST15) if (!mm.checkMultiTurnEscalation(s).qualifies) red++;
       fs.unlinkSync(tmp);
     } catch (e) { red = -1; err = e.message; }
-    ok(red === ATTACK_ST15.length, 'ST 连接串 uri 支移除后该族全部不 qualify（守卫能红）',
+    ok(red === ATTACK_ST15.length, 'ST 连接串 uri 支移除（+dedup 豁免失效）后该族全部不 qualify（守卫能红）',
       'red=' + red + '/' + ATTACK_ST15.length + (err ? ' err=' + err : ''));
   }
 }
 
 // ⑦d span 改回整句 —— 原缺陷必须复现（至少 4 条回落不 qualify）
+// ⚠️ [v6.7.1xx r394 修正] 同上：span 变异必须与 dedup 豁免一并失效，
+//   否则 r394 的谓词会把 ST 层保住，测不到 span 的真实贡献。
 {
   const m = src.match(/span: \[_eT\.index, Math\.min\(text\.length, _eA\.index \+ _eA\[0\]\.length \+ 1\)\],/);
   ok(!!m, '变异锚点存在（收窄后的 span）');
   if (m) {
-    const mutated = src.replace(m[0], 'span: [0, text.length],');
+    const mutated = src.replace(m[0], 'span: [0, text.length],')
+      .replace('!_isConnDemandHit(h)', '_isConnDemandHit(h)');
     const tmp = path.join(ROOT, 'test', '_tmp_r392_negD.js');
     let red = 0, err = '';
     try {
@@ -264,7 +277,7 @@ console.log('\n── ⑦ 负例变异守卫 ──');
       for (const s of ATTACK) if (!mm.checkMultiTurnEscalation(s).qualifies) red++;
       fs.unlinkSync(tmp);
     } catch (e) { red = -1; err = e.message; }
-    ok(red >= 4, 'span 回退为整句后原缺陷复现（多条回落不 qualify，守卫能红）',
+    ok(red >= 4, 'span 回退为整句（+dedup 豁免失效）后原缺陷复现（守卫能红）',
       'red=' + red + '/' + ATTACK.length + (err ? ' err=' + err : ''));
   }
 }
