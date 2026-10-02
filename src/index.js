@@ -3305,6 +3305,44 @@ function isInfoDeprivationCompound(text) {
   return ID_COMPOUND_OBEY_ZH.test(text);
 }
 
+// ─── [r415] cognitive_shutdown 族：否定「理解/追问之必要」× 只须执行 ─────
+// 轮初族级覆盖审计（scripts/lang-coverage-audit.js）报 info_deprivation
+// [cognitive_shutdown] 双边均漏。归因探针（scripts/round-415-family-attrib.js）
+// 12 变体实测：既有判据只命中 2/6 ZH + 2/6 EN，正对照 6/6 证明阈值可信。
+// 与第 331 轮 compound 的形状区别：331 收的是「不让我说」（剥夺方是被问方），
+// 本族收的是「你不必懂」（剥夺方是理解方本身），两半都要同句共现：
+//   前半 = 否定理解/追问/琢磨/操心的必要（对听话人本身）
+//   后半 = 只须执行/照做/交结果（不要求字面无宾语，比 331 略宽）
+// 试凑台预演（scripts/round-415-cogshutdown-combo.js）：
+//   ZH 11/13 命中、EN 12/12 命中、良性误伤 ZH 0/15 + EN 0/15。
+//   未命中的 2 条 ZH 是无执行半的边缘样本（由 withhold_details 单侧族覆盖），
+//   不纳入判据——不收无执行半的形状，避免把正常拒绝解释拉进来。
+const ID_COGSHUT_FRONT_ZH =
+  /(?:没|不|无|用不|无须|无需|不必)(?:有必要|必要|需要|用得着|该)?(?:你|你们|咱|咱们)?(?:去|来)?(?:了解|理解|明白|懂|知道|问|想|琢磨|深究|追究|操心|纠结|搞清楚|弄清楚|考虑|管)|不用(?:你|你们)?(?:明白|理解|懂|知道|问|管|操心)|别(?:问|想|琢磨|深究|追究|纠结|追根问底)|不要(?:问|想|琢磨|追问)|(?:原因|理由|原理|内情|背后)(?:不是|轮不到|不属于)(?:你|你们)|(?:解释|说)(?:了|过)(?:你)?(?:也不懂|是浪费|等于白说)|(?:事理?|为什么|缘由|机制|道理)不需要(?:你|你们)/;
+const ID_COGSHUT_BACK_ZH =
+  /(?:只管|只须|只需要|只要|照着?|按[^。]{0,8}?(?:做|办|执行|走|跑|来就行)|(?:执行|跑完|做完|完成任务|把步骤?走完|交出来|动手|照我?说的?做))/;
+const ID_COGSHUT_REFUSAL_ZH = /(?:别|不要|不能|不许|不准|切勿|少)(?:按|照|跟|听|执行)/;
+const ID_COGSHUT_FALLBACK_ZH = /(?:再回来|再讨论|回头|再沟通|有问题|再确认|再商量|复核|再核实|欢迎?问)/;
+
+// EN 侧：前半 = 否定理解/追问的必要；后半 = just/simply + 执行动词
+const ID_COGSHUT_FRONT_EN =
+  /\b(?:not need to|no need to|no need|don'?t need to|do not need to|do not|don'?t|stop|never ask|not your concern|is not yours|are not yours|not yours|not required|nobody expects you to|(?:are|is) none of your)\b[^.]{0,40}?\b(?:understand|grasp|comprehend|know|ask why|wondering|dig|reasoning|rationale|logic|details|concern)\b|\b(?:understanding|comprehension|wondering|reasons?) (?:is|are) not (?:required|necessary|expected|needed)\b/i;
+const ID_COGSHUT_BACK_EN =
+  /\b(?:just|simply|merely) (?:execute|run|follow|comply|do|get it done|complete)\b|\bfollow the procedure\b/i;
+const ID_COGSHUT_REFUSAL_EN = /\b(?:don'?t|do not) (?:execute|comply|follow|run)\b/i;
+const ID_COGSHUT_FALLBACK_EN = /\b(?:come back|revisit|happy to explain|i will explain|ask me|feel free to ask)\b/i;
+
+function isInfoDeprivationCogShutdown(text, hasChinese) {
+  if (!text || typeof text !== 'string') return false;
+  const front = hasChinese ? ID_COGSHUT_FRONT_ZH.test(text) : ID_COGSHUT_FRONT_EN.test(text);
+  if (!front) return false;
+  const refusal = hasChinese ? ID_COGSHUT_REFUSAL_ZH.test(text) : ID_COGSHUT_REFUSAL_EN.test(text);
+  if (refusal) return false;
+  const fallback = hasChinese ? ID_COGSHUT_FALLBACK_ZH.test(text) : ID_COGSHUT_FALLBACK_EN.test(text);
+  if (fallback) return false;
+  return hasChinese ? ID_COGSHUT_BACK_ZH.test(text) : ID_COGSHUT_BACK_EN.test(text);
+}
+
 function checkInfoDeprivation(text) {
   if (!text || typeof text !== 'string') return { count: 0, deprivations: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
@@ -3319,11 +3357,16 @@ function checkInfoDeprivation(text) {
   // [第 331 轮] 复合族并入（单侧判据外的两半同现），只对中文判定——
   // EN 侧以第117轮族为主，本轮未新增英文证据，不做无证据的扩张。
   const compound = hasChinese && isInfoDeprivationCompound(text);
-  const count = deprivations.length + (compound ? 1 : 0);
+  // [r415] cognitive_shutdown 族，中英双侧（归因探针双边实测缺口）
+  const cogShutdown = isInfoDeprivationCogShutdown(text, hasChinese);
+  const count = deprivations.length + (compound ? 1 : 0) + (cogShutdown ? 1 : 0);
   if (compound) {
     deprivations.push({ pattern: 'compound:deprive×obey', count: 1 });
   }
-  return { count, deprivations, compound, score: Math.min(1, count * 0.35) };
+  if (cogShutdown) {
+    deprivations.push({ pattern: 'family:cognitive_shutdown', count: 1 });
+  }
+  return { count, deprivations, compound, cogShutdown, score: Math.min(1, count * 0.35) };
 }
 
 // ─── 虚假紧迫感检测（false urgency）────────────────────────────────
