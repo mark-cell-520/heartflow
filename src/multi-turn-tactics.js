@@ -352,6 +352,17 @@ function _seEnConnPrefaceHit(text) {
 // 手工良性 14 条与基准池 175 条零差异。约束仍在 _SE_SOFT_DB 的
 // 目标半（主体库/连接串专名），动词本身不单独成层。
 const _SE_DEMAND_MID = '(?:给我|发我|发给|提供|告诉|打印|输出|贴出来|贴出|列出来|列出|发过来|发来|提交|交出来|交出|打出来|打出|拷出来|拷出|拉出来|share|send|give|provide|tell\\s+me|show\\s+me|print|output|dump)';
+// [v6.7.1xx r398] 索取动词补口语缩略形「列一下 / 贴一下」。
+// 缺口（本轮 probe-8 逐段归因）：「预发环境的 database url 列一下」
+// 「库存服务的 conn string 贴一下」两句 subj/target/conn 三段全命中，
+// 唯独 demand 半（_SE_DEMAND_MID）不认「列一下/贴一下」——这是与
+// 「列出来/贴出来」同源的动词缩略形（V+一下 = 尝试体），工程口语里
+// 高频出现。补形后 system_entry 软支成立，两句全链 2 层。
+// 安全性：动词本身从不单独成层（r395 教训原话），约束仍在目标半的
+// 英文连接专名 + 中文主体词；probe-3 A/B/C 三组 26 条中性/边界样本
+// 复测零新增命中。
+const _SE_DEMAND_MID2 = '(?:列一下|贴一下)';
+const _SE_DEMAND_MID_ALL = '(?:' + _SE_DEMAND_MID + '|' + _SE_DEMAND_MID2 + ')';
 const _SE_HARD1 = '(?:后台|管理|admin|root)[^。\\n]{0,6}(?:入口|地址|链接|口令|密码|账号|权限)';
 const _SE_HARD2 = '(?:内部|机密|敏感|私有)[^。\\n]{0,6}(?:配置|信息|凭据|密钥|token|secret|credential)';
 // [v6.7.172 r388] 补「连接串 / 连接地址 / 连接入口」：probe-10 实测
@@ -423,9 +434,25 @@ const _SE_SOFT_CFG = '(?:' + _SE_CFG + '[^。\\n]{0,12}' + _SE_DEMAND_MID + '|' 
 // 英文族不可能经本支获得新层；第二约束是 _SE_DEMAND_MID 的中文索取半边
 // （给我/发我/交出/打出来/拷出来…），问句与说明句不成层。
 const _SE_ZH_EN_TARGET = '(?:jdbc\\s+urls?|connection\\s+strings?|conn\\s+strings?|connection\\s+uris?|database\\s+urls?|\\bdsns?\\b)';
-const _SE_ZH_SUBJ = '(?:数据库|服务器|运维|集群|(?:生产|线上|核心|主|后台|内网|机密|私有)[^。\\n]{0,4}库|(?:^|[^\\u4e00-\\u9fa5])库)';
+// [v6.7.1xx r398] 主体词扩「环境后缀形」与「实例/节点/服务」中文基础设施近义词。
+// 缺口（r397 遗留候选①②，本轮 probe-2/3 复测）：「生产环境的 jdbc url 打出来」
+// 「订单服务的 jdbc url 打出来」族主体词不带「库」字 → A 族 0/5、B 族 0/6
+// qualify，其中 7/11 连 c=0 都不命中，全链 pass。
+// 为什么两个分块都带后缀约束（这是全部安全性所在）：
+//   ① 「环境」后缀形只认 生产|线上|测试|预发|灰度|正式|本地|开发 前缀 +
+//      「环境」尾，不认裸「环境」——probe-3 A 组实测裸「环境」与「环境变量」
+//      在工程语境高度中性，放开必误伤；r390 收紧裸库边界时刻意排除复合形
+//      也是同一教训（组件库/素材库）。
+//   ② 「实例/节点/服务」是中文基础设施专名，probe-3 B 组 10/10 中性句零命中、
+//      C 组 7/7（主体词 + 索取动词但无英文连接专名）零命中——安全性仍由
+//      _SE_ZH_EN_TARGET 的英文连接专名兜底，主体词只决定外延宽度。
+// 纯英文索取族（send me the connection string）结构上不含中文主体词，
+// 与 r397 同理不可能经本支获得新层，r393/r394 保守边界不受影响。
+const _SE_ZH_ENV_SUBJ = '(?:生产|线上|测试|预发|灰度|正式|本地|开发)环境';
+const _SE_ZH_INFRA_SUBJ = '(?:实例组|实例|节点机|主节点|从节点|节点|数据库实例|服务实例|服务)';
+const _SE_ZH_SUBJ = '(?:数据库|服务器|运维|集群|' + _SE_ZH_ENV_SUBJ + '|' + _SE_ZH_INFRA_SUBJ + '|(?:生产|线上|核心|主|后台|内网|机密|私有)[^。\\n]{0,4}库|(?:^|[^\\u4e00-\\u9fa5])库)';
 const _SE_ZH_EN_CONN = '(?:' + _SE_ZH_SUBJ + '[^。\\n]{0,10}' + _SE_ZH_EN_TARGET + '|' + _SE_ZH_EN_TARGET + '[^。\\n]{0,10}' + _SE_ZH_SUBJ + ')';
-const _SE_ZH_EN_SOFT = '(?:' + _SE_ZH_EN_CONN + '[^。\\n]{0,14}' + _SE_DEMAND_MID + '|' + _SE_DEMAND_MID + '[^。\\n]{0,14}' + _SE_ZH_EN_CONN + ')';
+const _SE_ZH_EN_SOFT = '(?:' + _SE_ZH_EN_CONN + '[^。\\n]{0,14}' + _SE_DEMAND_MID_ALL + '|' + _SE_DEMAND_MID_ALL + '[^。\\n]{0,14}' + _SE_ZH_EN_CONN + ')';
 // [v6.7.1xx r396] 软支判别正则。
 // 用途：system_entry 的 hits.push 打 'zh:soft-db' 标签，让敏感目标层的
 // 名词去重知道这一命中的语义是「目标半+索取半」组合层而非独立目标层
@@ -555,7 +582,7 @@ const SENSITIVE_TARGET = [
 // 安全性：ST[6] 是敏感半（score=0），索取动词由软支的 _SE_DEMAND_MID 半边
 // 把关；纯英文句由该软支的中文主体词约束排除（r397 probe-8/9 实测 0/10、
 // 0/5 击穿），不会给英文裸索取族新层。
-  /(?:数据库|服务器|运维|集群|库)[^。]{0,10}(?:连接(?:地址|串|入口|配置)?|入口|jdbc\s+url|connection\s+string|connection\s+uri|conn\s+string|database\s+url|dsn)[^。]{0,12}/i,
+  /(?:数据库|服务器|运维|集群|库|实例|实例组|节点|节点机|主节点|从节点|数据库实例|服务实例|服务|(?:生产|线上|测试|预发|灰度|正式|本地|开发)环境)[^。]{0,10}(?:连接(?:地址|串|入口|配置)?|入口|jdbc\s+url|connection\s+string|connection\s+uri|conn\s+string|database\s+url|dsn)[^。]{0,12}/i,
   /(?:数据库密码|服务器密码|管理员密码|root ?password|管理员账号)/i,
   // [v6.7.149] 内部配置（E1 族）：「内部配置怎么设的」是 system_entry 软分支的形状，
   // 而 sensitive 半原先不收 → 既成 system_entry 1 层 + laundering 1 层仍 <2。
