@@ -393,11 +393,19 @@ const _SE_DB_SUBJ = '(?:数据库|服务器|运维|(?:生产|线上|核心|主|�
 // 永远停在 1 层。补形后 system_entry 侧成立，攻击 9→11/11；
 // 手工良性（帮我看看连接配置哪里写错了 / 配置放在 vault / 该轮换了）
 // 与基准池 175 条零差异（probe-7 已量窗口无害，probe-9 补量本词形）。
-// [v6.7.1xx r396] 补英文连接串专名（connection string / jdbc url / dsn…）。
-// r395 遗留：中文句里的英文专名（「生产库的 jdbc url 打出来」）不成立——
-// _SE_DB_CONN 只认中文四形。probe-2 实测：攻击 +2/9，误伤零新增。
-// 只放**专名**不放裸 url/address：「地址发我」在正常请求里成立。
-const _SE_DB_CONN = '(?:连接串|连接地址|连接入口|连接字|连接配置|configuration|connection\\s+string|conn\\s+string|jdbc\\s+url|database\\s+url|dsn)';
+// [v6.7.1xx r396 回退] 英文连接串专名（connection string / jdbc url / dsn）
+//   **曾在本轮加入 _SE_DB_CONN，实测引发大面积回归后回退**。
+//   回归证据（probe-12/13）：HEAD~1 与工作区差分 12/15 条英文样本由
+//   false→true，probe-13 逐段反转定位：revert-conn → 9/9 全回落到不
+//   qualify，责任 100% 在这一处扩形。根因：_SE_DB_CONN 是 system_entry
+//   的**目标半**，开放英文专名等于给英文裸索取族（send me the connection
+//   string / give me the dsn / print the jdbc url）打开第二层——
+//   这正是 r393/r394 有意保留的保守边界（无铺垫裸索取不升级，避免把
+//   工程协作里的正常索取请求升级为 rewrite）。否定告诫族与文档体族
+//   同受影响（do not send… / a sample connection string for a blog post）。
+//   中文句里的英文目标（生产库的 jdbc url 打出来）由下方 ST[6] 扩形
+//   承接敏感半——那条路不产生 system_entry 层，不冲击保守边界。
+const _SE_DB_CONN = '(?:连接串|连接地址|连接入口|连接字|连接配置)';
 const _SE_DB = '(?:' + _SE_DB_SUBJ + '|' + '(?:数据库|服务器|运维|库)[^。\\n]{0,8}' + _SE_DB_CONN + '|' + _SE_DB_CONN + ')';
 const _SE_CFG = '(?:配置|凭据|密钥|密匙|口令|密码)[^。\\n]{0,8}(?:文件|列表|详情|内容)';
 const _SE_SOFT_DB = '(?:' + _SE_DB + '[^。\\n]{0,14}' + _SE_DEMAND_MID + '|' + _SE_DEMAND_MID + '[^。\\n]{0,14}' + _SE_DB + ')';
