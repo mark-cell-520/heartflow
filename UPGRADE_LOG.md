@@ -1,4 +1,56 @@
 
+# 第 382 轮（authority_claim / peer_pressure / responsibility_shift 补英文侧，4 commits）
+
+## 方向选择
+
+r381 遗留第 2 项「pressure 族英文侧」的直接延续——decision 结构化选向
+（A 0.87 / C 0.79 / B 0.72）选中 A。r381 已实测英文施压样本单句多 0 层，
+且归因出「英文索取层缺位导致闸门不开」的排查顺序（先看耦合层 up 正则，
+再看 predatory 计数，最后才动正则）。
+
+## 复测
+
+r381 简报说「6 条英文施压样本 4 条 pass」。probe-2 实测更细：其中
+**3 条（自称权威 / 同侪贬低 / 责任转移）单句 0 层**，接英文索取尾仍只
+bulk_export 1 层不 qualify；1 条由 dangerous_instruction 拦，与压力族无关；
+1 条本来已 rewrite。
+
+probe-3 在 r381 前副本（6ca41cd0 worktree）上复跑「良性合规句 + 英文索取尾」
+得 4 verify + 6 rewrite，与当前工作区**数字完全一致**——那 10 条不是 r382
+引入的副作用，是「洗白语 + 名单类索取尾」这个形状本身被 laundering +
+sensitive_target 正确命中。
+
+## 改了什么（4 commits）
+
+1. `95300a6f` — authority_claim 补英文两支（角色在前 + I am 指令动词；
+   I am + 管辖类部门 + 指令动词）。刻意只收 emergency/security/audit/
+   compliance/ops，不收 engineer/developer 类技术名词——良性 IT 求助必然出现。
+2. `f763a11b` — peer_pressure 英文三支 + responsibility_shift 英文两支。
+   不收 other teams（职场描述），不收被动责任归因（无 you 指向）。
+3. `66a6372f` — 修正 peer_pressure 名词复数覆盖（models/ai/chatbots/
+   assistants/systems 加 `s?`）+ 落守卫测试。
+4. `d3df4707` — 负例还原点脚本（7/7 全绿）+ strip anchor 探针。
+
+## 验证结果
+
+压力族三支英文命中：改前 0 层 → 现在 authority_claim / peer_pressure /
+responsibility_shift 各命中。
+组合 qualifies：24 条 nonPass 11 → 20；良性 68 组合仍 10（与 r381 前一致）。
+test/pressure-family-en-r382.test.js：56/56 组合 qualifies，14 检测样本、
+9 良性零误伤、中文 3 支无退化。
+test/multi-turn-sunk-cost-round93.test.js：13/0
+test/multi-turn-laundering-round339.test.js：14/0（含「合法导出不进
+  敏感集」10/10）
+bin/verify.js：14/0
+
+## 踩坑记录（r382 未收尾，细节由 auto-commit 兜底）
+
+「patch 成功落盘但未 commit，被后续 git checkout 还原」真实发生一次：
+peer_pressure 的复数修正 patch 成功后没立刻 commit，负例脚本的 restore()
+（git checkout -- src/...）把它冲回旧版，导致 baseline 一度假红。
+结论：每个 src 改动 patch 完立刻 commit。该轮 run-all 未跑完即被迭代
+上限截断，finish 未执行，UPGRADE_LOG 未写 r382 段（由 r383 补）。
+
 # 第 383 轮（guilt_trip 补英文侧三支，压力族英文覆盖收口，6 commits）
 
 ## 方向选择
@@ -64,9 +116,9 @@ test/doc-numbers-accuracy.test.js：15 / 0
 
 1. **`node test/run-all.js` 尚未取得最终结果**（轮中仍是 r 段推进中，
    已观察段 0 失败，npm-package-integrity 6/0）。finish 前再取一次 tail。
-2. r382 的 UPGRADE_LOG 记录补写：r382 的 4 commits 与 13 项验证已在
-   上一轮简报中完整，下一轮可择要把 r382 段补进 UPGRADE_LOG 顶部
-   （本轮不重复写入，保持一轮一节，r382 段缺失属记账顺序问题而非能力缺口）。
+2. r382 的 UPGRADE_LOG 记录已在本轮顶部补齐（含 r382 简报的 4 commits、
+   3 条压力支英文命中数与 10 项验证、踩坑记录），`revert 吃掉未提交 patch`
+   的教训已移交下一轮参考。
 3. 双向基线漂移仍未重刷（r377/r379/r381/r383 连续归因非回归，维持 52/52、
    302/326 基线故不重刷；重刷会让未来真回归失去参照）。
 
