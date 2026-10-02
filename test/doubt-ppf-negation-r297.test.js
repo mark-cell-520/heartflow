@@ -19,10 +19,16 @@ const assert = require('assert');
 const path = require('path');
 const HF = require(path.join(__dirname, '..', 'src', 'gate.js'));
 
+// [v6.7.125+4 第 380 轮] 判据修正：原实现对整个 JSON 做 /pseudo_profundity/i
+// 正则，而 checkOutput 的返回里 **dimension 名 key 一定会出现**
+// （"pseudo_profundity":{"count":0,...}）—— 导致该守卫对任何输入恒真：
+// 正例「命中」是双保险假阳性，负例也全判误伤（r380 probe-4 实测：
+// idx=3855 落在维度清单的 key 上，count=0/score=0，实际零命中）。
+// 改为只读 findings 里真实上报的维度名。
 function ppf(text) {
   const r = HF.checkOutput(text);
-  const j = JSON.stringify(r);
-  return /pseudo_profundity/i.test(j);
+  const findings = Array.isArray(r.findings) ? r.findings : [];
+  return findings.some(f => f && f.dimension === 'pseudo_profundity');
 }
 
 let pass = 0, fail = 0;
