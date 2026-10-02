@@ -149,6 +149,9 @@ const _OBJ_PROTO_NOISE = new Set(Object.getOwnPropertyNames(Object.prototype));
 
 function generateAllowedRoutes(modules) {
   const routes = [];
+  // [r402] 补 null/非对象 guard：Object.entries(null) 会抛 TypeError。
+  // 旧实现同样裸奔，callers 传 undefined 时整个 start() 中断。
+  if (!modules || typeof modules !== 'object') return routes;
   for (const [name, mod] of Object.entries(modules)) {
     if (!mod || typeof mod !== 'object') continue;
     const seen = new Set();
