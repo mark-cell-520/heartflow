@@ -346,9 +346,13 @@ for (const [label, fp] of [['README.md', README], ['SKILL.md', SKILL]]) {
       }
       // total = passed + failed，是 run-all 本轮真实跑过的用例总数
       const total = M.tests + (Number.isFinite(M.testFailed) ? M.testFailed : 0);
-      assert.strictEqual(parseInt(mm[1].replace(/,/g, ''), 10), total,
-        `${label} 规格表 Test suite = ${rows['Test suite']}，实测共 ${total} 个用例` +
-        `（passed ${M.tests} + failed ${M.testFailed}）`);
+      // [r410] 顺序修正：必须先查 failed>0，再查 total。
+      // r409 把 total 比对写在前，failed=3 时 total=passed+3 与文档的
+      // passing 必然不等 → strictEqual 先挂，报「实测共 17352 个用例」
+      // 把自锁误报成「文档漂移」——下面那段自锁告警成了死代码，
+      // 恢复命令永远到不了用户眼前（实测：自锁分支可达 = false）。
+      // 现在 failed>0 时直接给自锁告警+恢复命令；failed=0 时 total==passed，
+      // total 比对口径与 r409 之前完全一致，漂移检出能力不降。
       if (M.testFailed > 0) {
         throw new Error(
           `${label}：上一次 run-all 遗留 ${M.testFailed} 个失败未清（缓存 data/test-count.json），` +
@@ -356,6 +360,9 @@ for (const [label, fp] of [['README.md', README], ['SKILL.md', SKILL]]) {
           '恢复命令：git checkout -- data/test-count.json && node test/run-all.js' +
           '（确认无其他 run-all 进程并发，dev-exemptions 夹具测试会写 src/ 临时文件）');
       }
+      assert.strictEqual(parseInt(mm[1].replace(/,/g, ''), 10), total,
+        `${label} 规格表 Test suite = ${rows['Test suite']}，实测共 ${total} 个用例` +
+        `（passed ${M.tests} + failed ${M.testFailed}）`);
     }
     // 能力守护项数（未测量 null 时跳过，不当成失败；0 是合法测量值要真比）
     if (M.capabilityChecks != null && rows['Capability guard'] !== undefined) {
