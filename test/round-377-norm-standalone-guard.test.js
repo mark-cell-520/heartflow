@@ -56,7 +56,10 @@ console.log('\n── ① 结构断言：独立层存在且非耦合 ──');
   const L = mte.LADDERS.find(x => x.name === 'norm_desensitize_standalone');
   ok(!!L, 'LADDERS 含 norm_desensitize_standalone');
   ok(L && !L.coupled, '独立层无 coupled 字段（否则又是纯耦合层，等于没修）');
-  ok(L && L.up === mte._RE_NORM_DESENSITIZE, '独立层复用 _RE_NORM_DESENSITIZE（与耦合层同判据）');
+  ok(L && L.re === mte._RE_NORM_DESENSITIZE, '独立层复用 _RE_NORM_DESENSITIZE（与耦合层同判据）');
+  // 防呆：非耦合层若误用 up 字段，text.match(undefined) 会恒真 →
+  // 本层变恒真层，给所有句子白送一层（r377 首版实测踩中，4 条回归）
+  ok(!(L && L.up) , '独立层不得带 up 字段（非耦合分支只读 re）');
   ok(L && L.score === 10, '独立层 score=10（耦合层 20 的一半）', L && ('score=' + L.score));
   const coupledLayer = mte.LADDERS.find(x => x.name === 'norm_desensitize');
   ok(!!coupledLayer && coupledLayer.coupled === 'predatory', '耦合层 norm_desensitize 仍存在且 coupled=predatory（未被打断）');
