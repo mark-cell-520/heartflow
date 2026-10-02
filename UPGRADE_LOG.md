@@ -1,4 +1,102 @@
-# 第 414 轮（lang-coverage-audit 按族多样本机制 + double_bind free_choice_trap 族中英双侧补齐，4 commits）
+# 第 416 轮（定责 r415 引入的 r331 误伤 + BACK_ZH 收窄 + M2 不敏感归因，2 commits）
+
+## 方向选择
+
+init 简报无队列待办，上一轮（r415）遗留明确：`round-331-guard-mutation.test.js`
+报 1 个失败（2 条良性样本被误判 verify），且 r415 的收尾改动未提交。
+方向即接管该遗留，不重开新方向——**先修自己上一轮引入的回归，再谈新缺口**。
+
+## 定责过程（复测不信旧描述，5 轮诊断脚本）
+
+上一轮留下的问号是「那 2 条是 r331 期望写错，还是我的判据过宽」。
+本轮用 5 个诊断脚本逐层剥开（scripts/round-416-diagnose1..13.js）：
+
+1. diagnose1/2/3：两条失败项 gate 均 `verify`，归因 `info_deprivation:35`，
+   命中族为 `family:cognitive_shutdown`（= 我 r415 新增的判据），不是 r331 的 compound。
+2. diagnose3 逐子模式试：FRONT 命中片段 `别问` / `不用问`；**BACK 命中片段只是一个「照」字**。
+3. diagnose5/7/8：对照组显示同族样本只要有回退/可追问出口就不命中，
+   排除「形状本身该拦」的解释。
+
+**定责结论：我的判据过宽，不是 r331 期望写错。**
+
+根因：`ID_COGSHUT_BACK_ZH` 原写法 `照着?` 使「着」可选，
+于是「按照既定流程推进」「照这个流程做」这类**客观流程执行**里的「照」
+被当成人称服从（照我说的做）命中。r331 那两条是 v6.7.140 第 333 轮为
+M3/M4 变异承重精心构造的良性样本，测试注释把理由写在原地，不是笔误。
+
+## 改动 1：BACK_ZH 收窄（commit 9664faa2）
+
+收窄原则：服从半必须是**人称服从**或**无宾语执行**或**把任务做完**：
+  ✓ 照我说的做 / 照做 / 只管执行 / 按我的指示做 / 按流程走 / 把任务做完
+  ✗ 照这个流程做 / 按照既定流程推进 / 照文档做（客观流程，无人称服从）
+
+收窄前后实测（scripts/round-416-negative-test.js 两个变异口径）：
+
+| 口径 | 收窄前 | 收窄后 |
+|---|---|---|
+| r415 攻击族命中 | 11/13 | 15/15（边界样本补全） |
+| r331 良性误伤 | 2 条误判 verify | 0 |
+| 变体A（BACK 整条作废） | — | 0/15（守卫敏感） |
+| 变体B（只删「按流程」支） | — | 14/15（每个子支都可删红） |
+| 还原 | — | 15/15 回归 |
+
+良性集用 r331 良性集 + r415 良性集中 10 条「照/按」临界样本，0 误伤。
+
+## 改动 2：为 M2 变异补承重样本（同 commit）
+
+round-331-guard-mutation.test.js 的 M2（把 `ID_COMPOUND_DEPRIVE_STATE_ZH`
+作废）实测「守卫不敏感」。补 1 条只靠 ds 支的样本
+（`里面的讲究你不清楚，先做就行`，diagnose8 筛选：d1=0 dy=0 ds=1,
+单侧族与 cogShutdown 均不命中）。
+
+## M2 不敏感的最终定责（重要，留给下一轮）
+
+补样后 M2 **仍不敏感**。diagnose11/12/13 逐层定位，根因是**结构性不可能**：
+
+`ID_COMPOUND_DEPRIVE_YOU_ZH`（你+不懂/不清楚）与 `ID_COMPOUND_DEPRIVE_STATE_ZH`
+（你[…]{0,8}+不懂/不清楚）在中文里**字面重叠**——任何含「你不懂/你不清楚」的
+样本同时命中两支，删掉 ds 支后 dy 支照样让 compound=true。
+实测三条候选全为 `dy=1 ds=1`，变异前后 compound 都不变。
+
+因此 M2 的不敏感**无法靠补样本修复**（除非删 dy 支，那会削弱真实覆盖）。
+这是 r331 测试自身的设计局限，r333/r334 两轮只修了 M3/M4，M2 一直潜伏。
+按纪律不改别人的测试期望，也不为让它变绿而放宽判据。
+
+处理：本轮 run-all 仍报 4 failed，来源就是这个 M2（1 个）+ 由它写入
+data/test-count.json 的 failed=4 连带的 doc-numbers 3 项。
+finish 已把数字如实同步进 README/SKILL（17384 passing / 4 failing），
+没有为掩盖而改写缓存。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| node --check src/index.js | ✅ |
+| round-415-cognitive-shutdown.test.js | 10/10 全绿（收窄未削弱攻击命中） |
+| round-331-info-deprivation-compound.test.js | 55 绿 0 红（误伤清除） |
+| round-331-guard-mutation.test.js | 3 变红 / 1 不敏感（M2 结构性原因，见上） |
+| verify.js | 14/14 |
+| security-audit | 16/16 |
+| bidirectional-guard | 召回 52/52、误拦 302/326（正好基线，未增） |
+| run-all 全量 | 17384 通过 / 4 失败（4 个 = M2 的 1 + 连带 doc-numbers 记账 3，已定位到具体条目） |
+
+## 遗留（给下一轮）
+
+1. **M2 不敏感**（本日志定责：dy/ds 两支中文字面重叠，结构性无法靠补样本修）。
+   要真修只有两条路：① 合并 dy/ds 为一支（改 r331 判据，需重跑 M1-M4 全变异）
+   ② 把 M2 变异改成「作废 dy 支」——dy 支有独占承重样本（diagnose4 实测 5 条）。
+   路线②成本低且不动判据，推荐下一轮做。
+2. 缺口队列（lang-coverage-audit 输出，均漏 2 个，优先级高于 5 个单侧族）：
+   - `unsupported_claim[sweeping_absolute]` 0/13（r415 已在试凑台有雏形）
+   - `empty_answer[circular_restate]` 0/12（需从零建判据）
+3. 5 个单侧缺口：hate_speech[expulsion](仅英文)、dehumanization[waste_population](仅中文)、
+   emotional_manipulation[guilt_ledger](仅英文)、victim_blaming[conditional_regret](仅英文)、
+   presupposition[premature_admission](仅英文)
+4. 32 个历史未跟踪探针（scripts/round-40x-*.js）连续第八轮未清理，
+   其中本轮新增 13 个。清理需人工判断哪些有保留价值，不宜批量 rm。
+5. 注意：MCP 工具读的是常驻内存引擎，本轮改的 src/index.js 需重启 MCP 才生效。
+
+
 
 ## 方向选择
 
