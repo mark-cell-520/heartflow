@@ -55,7 +55,11 @@ function _registerModules(hf) {
         'philosophyToDecision',
         'decisionRouter',
         'timeExtension',
-        'falsePositiveFeedback',
+        // [r403] 'falsePositiveFeedback' 曾列在此处，r403 单路径实测证明它是
+        // 死条目：本名单在 _registerModules() 里求值，而该实例只在
+        // heartflow.js 的显式实例化块里创建（r402），无论名单怎么改都不影响
+        // 接线结果。已删除，避免第二名假注册点误导后续轮次。
+        // 唯一注册点：heartflow.js 显式实例化块（含 _modules 注册）。
         'desireCognition',
         'loveCognition',
         'threePoisons',

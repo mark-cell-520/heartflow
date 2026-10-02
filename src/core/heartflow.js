@@ -2977,9 +2977,13 @@ class HeartFlow {
       'verification',
 
       // [第 402 轮接线] 误报反馈闭环：MCP 工具 v6.7.72 早就在调，引擎侧
-      // this.falsePositiveFeedback 一直没进 _modules → dispatch 全 not allowed
-
-      'falsePositiveFeedback'];
+      // this.falsePositiveFeedback 一直没进 _modules → dispatch 全 not allowed。
+      // 注意：这里不放 'falsePositiveFeedback' —— 本数组在下方循环里求值时
+      // 实例还没被赋值（r403 实测：该条目是死条目，历史上从没生效过）。
+      // 真实注册路径有两条，互为冗余：
+      //   ① 本方法后半段 [r402] 显式实例化块（含 _modules 注册）
+      //   ② engine-lifecycle.js subsystemNames 名单（_registerModules 时注册）
+    ];
 
     for (const name of LATE_ADDITIONS) {
 
