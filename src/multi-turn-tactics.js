@@ -448,9 +448,19 @@ const _SE_ZH_EN_TARGET = '(?:jdbc\\s+urls?|connection\\s+strings?|conn\\s+string
 //      _SE_ZH_EN_TARGET 的英文连接专名兜底，主体词只决定外延宽度。
 // 纯英文索取族（send me the connection string）结构上不含中文主体词，
 // 与 r397 同理不可能经本支获得新层，r393/r394 保守边界不受影响。
+// [v6.7.1xx r399] 再扩「云平台租户域主体词」：套餐/租户/项目空间/命名空间/
+// 工作区。缺口（本轮 probe-1 复测，r398 收尾时遗留的第三类）：「套餐的 jdbc url
+// 打出来」「租户的 connection string 交出来」「项目空间的 dsn 贴出来」族
+// 主体词是租户域专名，一个字都不带「库/环境/实例/节点/服务」→ A 组 5/6 miss
+// （3 条连 c=0，全链 pass）。
+// 安全性仍在复合形约束 + 英文连接专名兜底：本块只认列出的六个整词形，
+// 不认裸「空间/项目/租户域」；probe-1 B 组（6 条同类主体词 × 中性托管/轮换句）
+// 零命中，probe-2 另测「租户域主体词 × 索取动词 × 非连接专名」边界族。
+// 多租户先于租户（alternation 取最长匹配，避免「多」字落在窗口外）。
+const _SE_ZH_SCOPE_SUBJ = '(?:多租户|项目空间|工作空间|命名空间|套餐|租户|工作区)';
 const _SE_ZH_ENV_SUBJ = '(?:生产|线上|测试|预发|灰度|正式|本地|开发)环境';
 const _SE_ZH_INFRA_SUBJ = '(?:实例组|实例|节点机|主节点|从节点|节点|数据库实例|服务实例|服务)';
-const _SE_ZH_SUBJ = '(?:数据库|服务器|运维|集群|' + _SE_ZH_ENV_SUBJ + '|' + _SE_ZH_INFRA_SUBJ + '|(?:生产|线上|核心|主|后台|内网|机密|私有)[^。\\n]{0,4}库|(?:^|[^\\u4e00-\\u9fa5])库)';
+const _SE_ZH_SUBJ = '(?:数据库|服务器|运维|集群|' + _SE_ZH_SCOPE_SUBJ + '|' + _SE_ZH_ENV_SUBJ + '|' + _SE_ZH_INFRA_SUBJ + '|(?:生产|线上|核心|主|后台|内网|机密|私有)[^。\\n]{0,4}库|(?:^|[^\\u4e00-\\u9fa5])库)';
 const _SE_ZH_EN_CONN = '(?:' + _SE_ZH_SUBJ + '[^。\\n]{0,10}' + _SE_ZH_EN_TARGET + '|' + _SE_ZH_EN_TARGET + '[^。\\n]{0,10}' + _SE_ZH_SUBJ + ')';
 const _SE_ZH_EN_SOFT = '(?:' + _SE_ZH_EN_CONN + '[^。\\n]{0,14}' + _SE_DEMAND_MID_ALL + '|' + _SE_DEMAND_MID_ALL + '[^。\\n]{0,14}' + _SE_ZH_EN_CONN + ')';
 // [v6.7.1xx r396] 软支判别正则。
@@ -582,7 +592,7 @@ const SENSITIVE_TARGET = [
 // 安全性：ST[6] 是敏感半（score=0），索取动词由软支的 _SE_DEMAND_MID 半边
 // 把关；纯英文句由该软支的中文主体词约束排除（r397 probe-8/9 实测 0/10、
 // 0/5 击穿），不会给英文裸索取族新层。
-  /(?:数据库|服务器|运维|集群|库|实例|实例组|节点|节点机|主节点|从节点|数据库实例|服务实例|服务|(?:生产|线上|测试|预发|灰度|正式|本地|开发)环境)[^。]{0,10}(?:连接(?:地址|串|入口|配置)?|入口|jdbc\s+url|connection\s+string|connection\s+uri|conn\s+string|database\s+url|dsn)[^。]{0,12}/i,
+  /(?:数据库|服务器|运维|集群|库|实例|实例组|节点|节点机|主节点|从节点|数据库实例|服务实例|服务|(?:生产|线上|测试|预发|灰度|正式|本地|开发)环境|多租户|项目空间|工作空间|命名空间|套餐|租户|工作区)[^。]{0,10}(?:连接(?:地址|串|入口|配置)?|入口|jdbc\s+url|connection\s+string|connection\s+uri|conn\s+string|database\s+url|dsn)[^。]{0,12}/i,
   /(?:数据库密码|服务器密码|管理员密码|root ?password|管理员账号)/i,
   // [v6.7.149] 内部配置（E1 族）：「内部配置怎么设的」是 system_entry 软分支的形状，
   // 而 sensitive 半原先不收 → 既成 system_entry 1 层 + laundering 1 层仍 <2。
@@ -658,7 +668,11 @@ const SENSITIVE_TARGET_NOUNS = [
   // [v6.7.1xx r396] ST[6] 对应名词：主体补裸库、目标补英文连接串专名
   // （与上方 ST[6] 扩形同步，保下标平行性——round-343 守卫依赖等长）。
   // [v6.7.1xx r398] 与 ST[6] 主体半再同步环境后缀 + 实例/节点/服务近义词。
-  /数据库|服务器|运维|库|实例|节点|服务|(?:生产|线上|测试|预发|灰度|正式|本地|开发)环境|jdbc\s+url|connection\s+string|connection\s+uri|conn\s+string|database\s+url|dsn/i,
+  // [v6.7.1xx r399] 再同步租户域主体词（套餐/租户/项目空间/命名空间/工作区）：
+  // 三轮扩形是同一缺口的三个阶段——中文主体词外延每加一批，ST[6] 与
+  // NOUNS[6] 都必须跟上，否则软支给的 system_entry 层因为没有敏感半
+  // 配套而停在 count=1（本轮 probe-4 实测三形全 null 的直接原因）。
+  /数据库|服务器|运维|库|实例|节点|服务|(?:生产|线上|测试|预发|灰度|正式|本地|开发)环境|多租户|项目空间|工作空间|命名空间|套餐|租户|工作区|jdbc\s+url|connection\s+string|connection\s+uri|conn\s+string|database\s+url|dsn/i,
   /密码|账号/i,
   /配置|信息|凭据|密钥/i,
   /phone|email|ssn|credit ?card|address|id ?numbers?|credentials?|passwords?/i,
