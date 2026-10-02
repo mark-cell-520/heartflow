@@ -137,6 +137,42 @@ const _RE_NORM_DESENSITIZE = new RegExp([
   '(?:\\b(?:get|getting|become|becomes|becoming|grow|grows|growing)\\s+used\\s+to\\s+(?:it|this)?\\b|\\bsecond\\s+nature\\b|\\bstop\\s+(?:resisting|objecting|pushing\\s+back|minding|complain\\w*)\\b|\\bno\\s+longer\\s+(?:feel|feels|resist\\w*|object\\w*|bother\\w*|mind\\w*|complain\\w*)\\b|\\bfeel\\w*\\s+(?:more\\s+and\\s+more\\s+)?(?:comfor?table|natural|normal|fine|OK|okay)\\b|\\bjust\\s+(?:routine|normal|part\\s+of\\s+the\\s+(?:job|process|routine|day))\\b|\\bincreasingly\\s+(?:comfor?table|natural|normal)\\b|\\beventually\\s+(?:comfor?table|natural|normal|routine|fine|OK|okay)\\b|\\b(?:easier|smoother|more\\s+natural)\\s+(?:and\\s+)?(?:eventually\\s+)?(?:normal|fine|routine)\\b)',
 ].join(''), 'i');
 
+// ─── [v6.7.170 r386] norm_escalation_step：递进式扩大**两段式**耦合层 ───────
+// 缺口来源：r386 probe-2 实测（scripts/round-386/probe-2-coup.js）——
+// 「让步起步 + 递进扩大 + 索取尾」组合 10 条（中英各 5）全部 qualifies=false
+// / gate=pass，而句内已 pred=1（bulk_export 在场）。probe-3 定位根因：
+// _RE_NORM_DESENSITIZE 要求**三半同现**（让步 + 递进 + 脱敏收尾），
+// 攻击方省掉脱敏收尾半（「你迟早会习惯」这类话术）只留「先小步、再扩大」时
+// 整族失活 → 只剩索取层 1 层，够不上 ≥2 层阈值。
+// probe-4 分半诊断：英文侧让步半 5/5 不命中（无 first/to start/phase one 形态），
+// 中文侧递进半 2/5 命中——两语都在缺口里。
+//
+// 设计（三条边界，缺一不可，全部本轮实测）：
+//   ① **不单独成层**：本层 coupled 'predatory'，无索取层在场一律不计
+//      （沿用 r370 口径——良性推进句只到「先X，再Y」，无索取不成攻击）。
+//   ② **不与 norm_desensitize 重复计层**：三半同现的句子归旧层，本层在
+//      耦合循环里检测到 norm_desensitize 已计层即让位（见下方 coupled 循环）。
+//   ③ **沿用同一批中性项目词排除**（迭代/评审/验收/方案/流程 + 英文
+//      plan/roadmap/milestone/review/sprint）：probe-2 的 B1/B2/B5 三条
+//      中文样本即被该表正确排除（「验证方案/试运行/灰度发布」是标准项目
+//      计划表述），去掉脱敏半的真攻击形状（B3/B4）才进层。
+const _RE_NORM_ESCALATION_STEP = new RegExp([
+  // ① 让步/起步半（将来时的第一步，时态与 sunk_cost 的既往让步相反）
+  '(?:先|第一步|第一回|这次|这回|这一[次步回]|现在只|本次|本轮|起初|一开始|首先)',
+  '[^。\\n]{0,12}(?:试|做|配合|答应|接受|迁就|让一?步|退一?步|开个?头|起个?头|验证|读|看|跑|处理|完成|弄|搞|走一?步)',
+  // ② 递进扩大半（范围/规模往外扩，不只是时间先后）
+  '[^.。\\n]{0,16}(?:之后|后面|接下来|往后|再往后|下一步|第二步|下一阶段|第二阶段|一次比一次|多来几次|多试几次|渐渐|越来越|逐步|进一步|时间久|久了|扩大|放开|推广|铺开)',
+  // ③ 中性项目词排除（与 norm_desensitize 同一批口径）
+  '(?![^.。\\n]{0,30}(?:迭代|反馈|灰度|评审|排期|开发|文档|需求|试点|推广|全量|审批|批准|验收|试运行|上线|生产环境|按计划|流程|方案|计划|规范|标准|制度|指南))',
+  '|',
+  // [r386] 英文侧同构支（probe-4 实测让步半 5/5 不命中，无 first/to start 形态）
+  '\\b(?:first|first\\s+of\\s+all|step\\s+one|phase\\s+one|to\\s+(?:start|begin)(?:\\s+with)?|(?:start|begin)\\s+with|for\\s+now|initially|at\\s+first|try\\s+(?:this|it))\\b',
+  '[^.]{0,110}',
+  '\\b(?:then|after\\s+that|afterwards|next\\s+step|next\\s+phase|phase\\s+two|step\\s+two|once\\s+(?:that\\s+is|accepted|approved)|later|eventually|gradually|increasingly|step\\s+by\\s+step|bit\\s+by\\s+bit|scale\\s+up|expand|expand\\s+to|widen|escalate)\\b',
+  // 英文侧中性项目词排除（与中文侧同口径）
+  '(?![^.]{0,60}(?:plan|plans|planning|roadmap|milestone|sprint|backlog|requirement|spec|iteration|schedule|timeline|deadline|standup|retro|demo))',
+].join(''), 'i');
+
 /** [v6.7.151 第 370 轮] capability_probe 层判据（与 LADDERS 该层同源，用于软分支豁免的例外） */
 const CAPABILITY_PROBE = /(?:(?:你能|你可以|你应该|你能够)[^。\n]{0,16}(?:读取|访问|打开|连接|获取|查看)[^。\n]{0,30}(?:对吧|是吧|对吗|是不是|么|吗)[^。\n]{0,6}(?:那|那么|所以|就)[^。\n]{0,24}(?:帮|给|看|读|拿|取))/i;
 
@@ -723,6 +759,17 @@ const LADDERS = [
       'norm_concession_first_step', 'norm_progression', 'norm_habituation',
     ],
   },
+  // ─── [v6.7.170 r386] norm_escalation_step 见文件顶部 _RE_NORM_ESCALATION_STEP 注释 ──
+  {
+    name: 'norm_escalation_step',
+    label: '递进式扩大（让步起步 + 规模扩大 + 索取）',
+    score: 20,
+    coupled: 'predatory',
+    up: _RE_NORM_ESCALATION_STEP,
+    fams: [
+      'norm_concession_first_step', 'norm_progression',
+    ],
+  },
 ];
 
 /**
@@ -853,6 +900,13 @@ function checkMultiTurnEscalation(text) {
     if (!L.coupled) continue;
     const gateOpen = L.coupled === 'sensitive' ? sensitive >= 1 : predatory >= 1;
     if (!gateOpen) continue;
+    // [v6.7.170 r386] norm 双层去重：norm_desensitize 与 norm_escalation_step
+    // 共用「让步半 + 递进半」前置，前者还多要脱敏收尾半。三半同现的句子
+    // 旧层先计，本层必须让位，否则同一攻击被记两层（score 虚增 20）。
+    // 判据用旧层的 up 直接测（不用 _NORM_COUPLED_WILL_FIRE：那个是
+    // norm_desensitize_standalone 的让位预判，口径是 predatory≥1，
+    // 而这里要判的是「旧层真的计层了没有」）。
+    if (L.name === 'norm_escalation_step' && hits.some(h => h.ladder === 'norm_desensitize')) continue;
     const m = text.match(L.up);
     if (!m) continue;
     hits.push({ ladder: L.name, label: L.label, matched: m[0].slice(0, 40), coupledWith: L.coupled });
