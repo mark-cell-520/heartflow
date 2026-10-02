@@ -3148,6 +3148,16 @@ const DOUBLE_BIND_PATTERNS = {
        // ④ 否认在场情绪 + 全因归咎（I'm not angry, it's just that everything you do is selfish）
        //    归 gaslighting 侧处理（en_denied_feeling_blame，见第 97 轮 GASLIGHT en 表），
        //    此处不重复注册——同一动作两个维度双判违反归因诚实原则
+       // ── [v6.7.132] 第 414 轮：free_choice_trap 族（形式授权+自由选择 + 转折 +
+       //    「唯一正确选项/选错即定罪」后半）。同维度第四次「一次只做一侧」结构：
+       //    r413 的 lang-coverage-audit 升级为按族判定后立刻暴露——zh 侧 2 族、
+       //    en 侧 6+4 族，而本族英文侧 8 条同形样本 0/8 全放过。
+       //    判据沿用「两半齐备」第 12 次复现：授权半单独不命中，必须与
+       //    「唯一正确选项/选错定罪」半同句共现。13 条良性对照 0 误伤的分界：
+       //    前半收 you are free to / it is your call / feel free to / respect your
+       //    decision，后半只收「唯一正解」或「选错=人格定罪」，不收客观标准
+       //    （preferable / either works / lower latency / includes support）。
+       [/(?:\byou(?:'re| are) free to\b|\bfree to (?:choose|decide|pick|make up your own mind)\b|\bchoose (?:freely|for yourself|whatever|whatever you want)\b|\bit(?:'s| is) (?:entirely |completely )?(?:your (?:call|choice|decision)\b)|\bthe choice is (?:entirely |completely )?yours\b|\bi (?:fully |completely |totally )?respect your (?:decision|choice)\b|\byou (?:can|could|may) (?:choose|decide|do|pick) (?:whatever|anything|any of|whichever)\b|\bfeel free to\b)[^.]{0,70}?(?:,|\bbut\b|\bhowever\b|\bthough\b|\bjust\b|\bas long as\b|\bprovided that\b|\bso long as\b)[^.]{0,70}?(?:the (?:right|wrong|only|correct|proper) (?:choice|decision|option|answer|one)|only (?:the )?(?:right|correct|proper) (?:choice|one|answer|option)|the right (?:way|decision|choice) (?:is )?(?:obvious|clear)|you already know (?:what(?:'s| is) (?:right|the right|correct))|(?:choosing|choose|picking|pick(?:ing)? something else) (?:wrong|wrongly|differently|otherwise|else)|not (?:the|what) (?:right|i|we) (?:want|think|expect|had in mind)|matches? (?:what )?(?:i|we) (?:want|think|expect|had in mind|say)|shows? (?:you(?:'re| are) )?(?:immature|childish|reckless|naive|selfish|disrespectful|ignorant|wrong)|means? (?:you(?:'re| are) )?(?:immature|childish|reckless|naive|selfish|disrespectful|ignorant|wrong)|proves? (?:you |that you )?(?:don'?t|do not) (?:love|care|respect|value|trust|understand))/i, 'free_choice_trap'],
        ],
 };
 const DOUBLE_BIND_SEVERITY = { bidirectional_negation: 0.6, contradictory_demand: 0.6, no_win: 0.5, no_choice: 0.5, double_damned: 0.6, false_dilemma_strict: 0.4,
@@ -3157,6 +3167,10 @@ const DOUBLE_BIND_SEVERITY = { bidirectional_negation: 0.6, contradictory_demand
   // [v6.7.131] 第 321 轮两支散文族（与第 76 轮四族同级：单句、无显式条件词）
   blame_reversal: 0.45, prohibition_reversal: 0.45,
   // [v6.7.128] 第 97 轮 EN 侧同族移植，与 ZH 第 76 轮取齐（英译形状同强度）
+  false_permission: 0.45, damned_branches: 0.45, ultimatum_expel: 0.45,
+  pathologized_defiance: 0.45,
+  // [v6.7.132] 第 414 轮 EN free_choice_trap 族（与 ZH 侧同强度）
+  free_choice_trap: 0.45,
 };
 
 function checkDoubleBind(text) {
