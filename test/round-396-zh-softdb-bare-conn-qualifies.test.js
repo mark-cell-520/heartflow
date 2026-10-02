@@ -145,15 +145,19 @@ console.log('\n── ① 结构断言 ──');
   // [r397 修正] 原断言硬编码 r396 版窗口 {0,6} 与词形列表，r397 扩形后失配。
   // 改为按行形状判定（各段 indexOf，不用多层转义正——probe-13 实测
   // 整条正则因转义层数写错恒假，逐段拆开都能命中）。
-  const st6Line = src.split('\n').find(l => l.trim().indexOf('/(?:数据库|服务器|运维|集群|库)') === 0) || '';
+  const st6Line = src.split('\n').find(l => l.trim().indexOf('/(?:数据库|服务器|运维|集群|库|实例') === 0) || '';
   ok(st6Line.indexOf('[^。]{0,10}') !== -1 && st6Line.indexOf('连接(?:地址|串|入口|配置)?') !== -1 &&
-     st6Line.indexOf('jdbc') !== -1,
-    'ST[6] 扩形：主体含裸库 + 目标含英文专名');
+     st6Line.indexOf('jdbc') !== -1 &&
+     // [r398] 外延扩形（环境后缀 + 实例/节点/服务）须在位，
+     // 否则本轮扩形被误回退时守卫不红
+     st6Line.indexOf('生产|线上|测试|预发|灰度') !== -1 &&
+     st6Line.indexOf('节点') !== -1,
+    'ST[6] 扩形：主体含裸库 + 英文专名 + r398 环境/实例外延');
   // r397 追加四形须同在（否则本轮扩形被误回退时守卫不红）
   ok(st6Line.indexOf('connection\\s+uri') !== -1 && st6Line.indexOf('conn\\s+string') !== -1 &&
      st6Line.indexOf('database\\s+url') !== -1 && st6Line.indexOf('dsn') !== -1,
     'ST[6] 含 r397 追加四形（connection uri / conn string / database url / dsn）');
-  ok(src.includes('/数据库|服务器|运维|库|jdbc'), 'NOUNS[6] 与 ST[6] 平行扩形');
+  ok(src.includes('/数据库|服务器|运维|库|实例|节点|服务'), 'NOUNS[6] 与 ST[6] 平行扩形');
   ok(/\/密码\|账号\/i/.test(src), 'NOUNS[7]（密码|账号）未被误删');
 }
 

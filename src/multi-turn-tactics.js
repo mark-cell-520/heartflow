@@ -657,7 +657,8 @@ const SENSITIVE_TARGET_NOUNS = [
   /库/i,
   // [v6.7.1xx r396] ST[6] 对应名词：主体补裸库、目标补英文连接串专名
   // （与上方 ST[6] 扩形同步，保下标平行性——round-343 守卫依赖等长）。
-  /数据库|服务器|运维|库|jdbc\s+url|connection\s+string/i,
+  // [v6.7.1xx r398] 与 ST[6] 主体半再同步环境后缀 + 实例/节点/服务近义词。
+  /数据库|服务器|运维|库|实例|节点|服务|(?:生产|线上|测试|预发|灰度|正式|本地|开发)环境|jdbc\s+url|connection\s+string|connection\s+uri|conn\s+string|database\s+url|dsn/i,
   /密码|账号/i,
   /配置|信息|凭据|密钥/i,
   /phone|email|ssn|credit ?card|address|id ?numbers?|credentials?|passwords?/i,
