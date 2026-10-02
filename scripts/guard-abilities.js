@@ -60,6 +60,20 @@ function checkEntryPoints() {
   return results;
 }
 
+// [r412] 期望字段登记表（表驱动判据的唯一边界）。
+// 修复的缺口：此前 checkSamples 把三个期望字段写死在 if 链里，而 SAMPLES
+// 样本声明了第四个 expect* 字段（verify 级维度样本）。判据从不读它 ——
+// 该样本真实 gate 结果无论是什么都恒判通过，守卫形同虚设。
+// 表驱动后，任何新增/未登记的期望字段都会被
+// test/round-412-expect-field-guard.test.js 的静态守卫直接抓住。
+const EXPECT_ACTIONS = {
+  expectBlock: ['block'],
+  // verify 级结果也接受：rewrite 比 verify 更严格，属能力增强而非退化
+  expectRewrite: ['rewrite', 'verify'],
+  expectClean: ['pass'],
+  expectVague: ['verify'],
+};
+
 function checkSamples() {
   const results = [];
   try {
@@ -69,9 +83,9 @@ function checkSamples() {
         const r = gate.checkInput(s.text);
         const action = r.gate?.action;
         let ok = true;
-        if (s.expectBlock && action !== 'block') ok = false;
-        if (s.expectRewrite && action !== 'rewrite' && action !== 'verify') ok = false;
-        if (s.expectClean && action !== 'pass') ok = false;
+        for (const [field, allowed] of Object.entries(EXPECT_ACTIONS)) {
+          if (s[field] && !allowed.includes(action)) ok = false;
+        }
         results.push({ name: s.id, ok, detail: `gate=${action}` });
       } catch (e) {
         results.push({ name: s.id, ok: false, detail: e.message });
@@ -352,6 +366,10 @@ async function main() {
   const failed = results.filter(r => !r.ok);
 
   // [v6.5.1] 基线比对模式：检查判别结果是否与基线一致（防回归）
+  // [r412] 一并登记「期望字段与判据覆盖」：基线里的 detail 只反映某一时刻的
+  // gate 结果，抓不住「期望字段没被判据读取」这类守卫退化。这里要求
+  // sampleResults 的每条 ok 必须与判据一致 —— 由 checkSamples 自身保证，
+  // 真正的静态防回归在 test/round-412-expect-field-guard.test.js。
   const checkMode = process.argv.includes('--check');
   if (checkMode && fs.existsSync(BASELINE_FILE)) {
     try {
