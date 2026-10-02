@@ -210,11 +210,20 @@ console.log('\n── ⑦ 负例变异守卫 ──');
 }
 
 // ⑦b 索取动词正则永假化
+// [r395] 锚点必须先把 ST[16] 一并摘除，否则「索取动词永假」后 ST[16]
+// 仍会命中给 sensitive_target 垫层，断言的是别的东西。
+// probe-3 实测：单独把 _SE_EN_ASK_RE 永假时，四条 st15 分母样本
+// 仍靠 ST[16]（裸凭据 + 索取动词）保住 sensitive_target 层。
 {
+  const lines0 = src.split('\n');
+  const st16Line0 = lines0.findIndex(l => l.indexOf('send|give|share') !== -1 &&
+    l.indexOf('dsns?') !== -1 && l.trim()[0] === '/');
+  ok(st16Line0 !== -1, '变异前置锚点存在（ST[16] 索取动词支）');
   const m = src.match(/const _SE_EN_ASK_RE = \/[^\n]*\/i;/);
   ok(!!m, '变异锚点存在（索取动词正则）');
-  if (m) {
-    const mutated = src.replace(m[0], 'const _SE_EN_ASK_RE = /(?!x)x/i;');
+  if (m && st16Line0 !== -1) {
+    const mutated = lines0.map((l, i) => (i === st16Line0) ? '' : l).join('\n')
+      .replace(m[0], 'const _SE_EN_ASK_RE = /(?!x)x/i;');
     const tmp = path.join(ROOT, 'test', '_tmp_r392_negB.js');
     let red = 0, err = '';
     try {
@@ -224,26 +233,41 @@ console.log('\n── ⑦ 负例变异守卫 ──');
       for (const s of ATTACK) if (!mm.checkMultiTurnEscalation(s).ladders.includes('system_entry')) red++;
       fs.unlinkSync(tmp);
     } catch (e) { red = -1; err = e.message; }
-    ok(red === ATTACK.length, '索取动词正则永假后攻击族全部回落（守卫能红）',
+    ok(red === ATTACK.length, '索取动词正则永假（+ST[16] 摘除）后攻击族全部回落（守卫能红）',
       'red=' + red + '/' + ATTACK.length + (err ? ' err=' + err : ''));
   }
 }
 
-// ⑦c ST[15] 整支永假化 —— 只依赖新支补位的样本必须回落到不 qualify
+// ⑦c ST[15]/ST[16] 整支永假化 —— 只依赖连接词 ST 补位的样本必须回落到不 qualify
 // ⚠️ [v6.7.1xx r394 修正] 首版断言 red === ATTACK_ST15.length，r394 实测 red=0。
 //   根因：r394 的 dedup 豁免谓词让这些样本在 ST[15] 被删后仍能靠
 //   ST[14]/ST[16] 保住 sensitive_target 层。**变异断言必须隔离单变量**——
 //   这一支要证的是「ST[15] 曾经是这些样本的第二信号」，所以必须把
 //   dedup 豁免一起变异掉，才能把 ST[15] 的贡献单独暴露出来
 //   （同 r393 probe-17 的教训：变异后若其他层补位，断言的就是噪声）。
+// ⚠️ [v6.7.1xx r395 二次修正] r394 版把 dedup 豁免一并失效后，probe-2 实测
+//   四条分母样本的 ST 命中是 [15, 16]（ST[14] 因不含 uri/dsn/jdbc 词形
+//   而不命中）——单独删 ST[15] 后 ST[16] 会补位，red 仍 0/4。
+//   改为同时摘除 ST[15] 与 ST[16]（连接词词形族同源）：probe-3 实测
+//   qualifies 0/4（只剩 system_entry 单层），probe-4 复现 red=4/4，
+//   probe-5 确认该组合变异在 175 条良性基准上零差异（不制造误判）。
+// ⚠️ [r395] 摘除方式必须是**行置空**（保留空行）而非 slice 删除：
+//   删行会让 SENSITIVE_TARGET 尾部两支消失（15 = 17-2），与
+//   SENSITIVE_TARGET_NOUNS 的 17 项失去下标平行性——deviation 不是
+//   我们想测的东西。行置空后数组仍有 17 项，仅 [15]/[16] 两项为空。
+//   语义边界不变：本支要证的是**连接词 ST 补位**这个建制的贡献。
 {
   // 用行号定位而非正则（多层转义在测试文件里不可靠，r394 实测：正则版锚点连头都匹配不到）
+  // [r395] ST[15] 与 ST[16] 需一并定位（连接词词形族同源，见上方注释）
   const lines = src.split('\n');
   const st15Line = lines.findIndex(l => l.indexOf('(?:uri|uris|string|strings)') !== -1 &&
     l.indexOf('jdbc') !== -1 && l.trim()[0] === '/');
-  ok(st15Line !== -1, '变异锚点存在（ST 连接串 uri 支）');
-  if (st15Line !== -1) {
-    const mutated = (lines.slice(0, st15Line).join('\n') + '\n' + lines.slice(st15Line + 1).join('\n'))
+  const st16Line = lines.findIndex(l => l.indexOf('send|give|share') !== -1 &&
+    l.indexOf('dsns?') !== -1 && l.trim()[0] === '/');
+  ok(st15Line !== -1 && st16Line !== -1, '变异锚点存在（ST 连接词支 ×2）');
+  if (st15Line !== -1 && st16Line !== -1) {
+    // 两行同时置空：数组长度与下标平行性不变，仅目标支正则为空
+    const mutated = lines.map((l, i) => (i === st15Line || i === st16Line) ? '' : l).join('\n')
       .replace('!_isConnDemandHit(h)', '_isConnDemandHit(h)');
     const tmp = path.join(ROOT, 'test', '_tmp_r392_negC.js');
     let red = 0, err = '';
@@ -251,10 +275,20 @@ console.log('\n── ⑦ 负例变异守卫 ──');
       fs.writeFileSync(tmp, mutated);
       delete require.cache[require.resolve(tmp)];
       const mm = require(tmp);
+      // 置空两行后：数组由 17 项缩为 15 项（JS 数组字面量里的空行被忽略），
+      // 但 NOUNS 仍是 17 项——**数组长度不再是平行性的可靠代理**，
+      // 下标对应关系才是。本断言因此改为验证「最后一支仍是连接词 ST」：
+      // 置空后尾部连接词族整体消失，其余支（PII/文件/凭据/中文）全部保留。
+      ok(mm.SENSITIVE_TARGET.length === mte.SENSITIVE_TARGET.length - 2,
+        '置空恰好移除两支（ST[15]/ST[16]），无连带丢失',
+        'ST=' + mm.SENSITIVE_TARGET.length + ' base=' + mte.SENSITIVE_TARGET.length);
+      ok(mm.SENSITIVE_TARGET_NOUNS.length === mte.SENSITIVE_TARGET_NOUNS.length,
+        'NOUNS 侧不动（名词表未被一起置空）',
+        'NOUNS=' + mm.SENSITIVE_TARGET_NOUNS.length);
       for (const s of ATTACK_ST15) if (!mm.checkMultiTurnEscalation(s).qualifies) red++;
       fs.unlinkSync(tmp);
     } catch (e) { red = -1; err = e.message; }
-    ok(red === ATTACK_ST15.length, 'ST 连接串 uri 支移除（+dedup 豁免失效）后该族全部不 qualify（守卫能红）',
+    ok(red === ATTACK_ST15.length, 'ST 连接词支置空（+dedup 豁免失效）后该族全部不 qualify（守卫能红）',
       'red=' + red + '/' + ATTACK_ST15.length + (err ? ' err=' + err : ''));
   }
 }
