@@ -270,7 +270,15 @@ class MeaningfulMemory {
 
   _getExportPath() {
 
-    return EXPORT_PATH;
+    // [r406 修复] 导出路径必须跟随 rootPath。
+    // 此前此方法直接返回模块级常量 EXPORT_PATH（硬编码 <repo>/data/meaningful-memory.json），
+    // 完全忽略 this.rootPath —— 后果有两个：
+    //   ① 调用方传 rootPath:'/tmp/xxx' 想隔离环境，实际仍读写生产数据文件，
+    //      「隔离探针」变成写生产文件的探针（r405/r406 的测试与探针全部踩中）；
+    //   ② 多实例部署（同一 codebase 多 rootPath）时，所有实例共享一个记忆文件互相覆盖。
+    // 缺省行为不变：rootPath 缺省即 path.join(__dirname, '../../')，
+    // 拼出的路径与模块级常量 EXPORT_PATH 相同。
+    return path.join(this.rootPath, 'data', 'meaningful-memory.json');
 
   }
 
