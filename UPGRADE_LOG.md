@@ -1,4 +1,105 @@
-# 第 408 轮（修 r407 自引入回归：实测值 0 记不上账 — doc-numbers 21/21 恢复，3 commits）
+# 第 410 轮（r409 补丁零验证零负例 → 实测抓出自锁告警不可达 + guard 判据不对称，3 commits）
+
+## 方向选择
+
+init 简报无队列待办；r409 交接清单第 1 项明写「补丁刚落地就被截断，处于零验证零提交状态，
+下一轮必须优先处理」。轮初先核实真实状态：r409 补丁已被 auto-commit（82a87605）落盘，
+`node --check` 通过、doc-numbers 21/21 全绿 —— 所以本轮不是「验补丁」这么简单，
+而要继续挖 r409 明说的第二个缺口：**它承诺的 `negative-test-doc-numbers-round409.js` 从未存在**。
+
+读 r409 补丁源码时发现疑点：`total = passed + failed` 在前、`failed>0` 自锁告警在后，
+failed=3 时 total 与文档 passing 必然不等，strictEqual 先抛，自锁分支疑似不可达。
+**用最小样本实测证实**（不信简报推断）：
+
+```
+scripts/round-410-selflock-probe.js（只改 data/test-count.json 的 failed=3，跑完还原）
+  命中自锁告警文案 = false
+  命中 total 比对文案 = true
+  自锁分支可达     = false     <== r409 补丁把报警做成了死代码
+  报错：README.md 规格表 Test suite = 17,349 passing / 0 failing，实测共 17352 个用例
+        （passed 17349 + failed 3）   <== 把自锁误报成「文档漂移」
+```
+
+decision 引擎实跑三候选（首跑 3 个并列，补判据后重跑）：**[A] 修自锁告警不可达** 0.87
+vs [B] 仅登记遗留 0.58 vs [C] 转去做维度扩召回 0.61，confidence 0.86。
+
+## 实际做了什么（2 个方向，3 commits）
+
+### 方向一：r409 自锁告警不可达（997c3d00 + fea25c85）
+
+`test/doc-numbers-accuracy.test.js` 规格表 Test suite 断言段：**把 `failed>0` 自锁告警
+提到 total 比对之前**。failed>0 时报可操作的恢复命令（+并发根因提示）；failed=0 时
+total==passed，走原 total 比对，**漂移检出能力不降** —— 不是把断言删掉换绿。
+
+补 r409 缺失的负例（这是 r409 交接铁律「没有负例不许提交」的直接执行）：
+`scripts/negative-test-doc-numbers-round410.js`，4 组变异 + 还原自证：
+
+- N1 缓存 failed=3 → 必须报自锁告警，且**不许**被标成文档漂移
+- N2 failed=0 但文档 passing 漂移 → 仍须报红（守卫不能改成永远绿）
+- N3 无缓存文件 → 必须显式抛错，不许静默通过
+- N4 failed 为负（非法值）→ 不许被洗成 0 蒙混过关
+
+另加元校验 `scripts/round-410-negmeta.js`：删被测文件任一守卫，负例必须变红
+（D1 删自锁告警→5/6、D2 删 total 比对→3/6、D3 删无缓存抛错→5/6，全 OK），
+证明负例是真守卫不是装饰品。实测 6/6 + 元校验 4/4，缓存逐字节还原。
+
+### 方向二：guard-abilities 异常退出路径缺 passed>0 保护（2aff6f01）
+
+r409 交接第 3 项描述为「`checkTests` 里 catch 分支正则比 try 分支少了 `共 N 个`」。
+**实测读码证实该描述不准，真缺陷在别处**：两条路径正则逐字相同，差异是 ok 判据
+不对称 —— try 分支 `failed === 0 && passed > 0`，catch 分支只 `failed === 0`。
+
+```
+scripts/round-410-catchguard-probe.js（不跑 400 秒 run-all，用同组输入喂两侧判据）
+  正常全绿    "17349 通过, 0 失败"   try=true  catch=true
+  空壳 0/0   "0 通过, 0 失败"      try=false catch=true   <== 口径不一致
+  英文 0/0   "0 passed, 0 failed"  try=false catch=true   <== 口径不一致
+```
+
+run-all 异常退出且 execSync stdout 截到含「0 通过, 0 失败」形态时，一条零用例的
+空壳检查项会被判成 ✅ 全量测试通过 —— 又一处「守卫写成永远绿」。
+修法：catch 判据与 try 对齐，detail 里标注「异常退出路径」便于区分。
+
+负例 `test/round-410-checktests-catchguard.test.js`：括号配平抽取源码两条判据，
+4 组输入要求逐条对称 + 消失测试（回退旧判据后必须被抓到）+ 文件还原自证。实测 6/6。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| node --check（2 文件） | OK |
+| doc-numbers-accuracy | 21/21 |
+| round-410-checktests-catchguard | 6/6（含消失测试） |
+| negative-test-doc-numbers-round410 | 6/6 |
+| round-410-negmeta 元校验 | 4/4 |
+| run-all 全量 | 17349 通过 0 失败 |
+| security-audit | 16/16 |
+| bin/verify.js | 14/14 |
+| bidirectional-guard | 召回 52/52、误拦 302/326（正好压基线，新增 0） |
+
+finish 七项检查全绿，锁已释放，5 个 commit 已直连推送。
+
+## 遗留
+
+1. **28 个历史未跟踪探针脚本未清理**（scripts/round-402/405-*.js 等，起始于 r402）。
+   finish 的 auto-commit 提示「需人工判断」后放过了它们。它们不影响 run-all
+   （run-all 只走 test/），但 scripts/ 目录树越来越难读。下一轮可批量核实
+   「无被 test/ 引用」后删除并单独 commit——注意别删 round-410-*（本轮在用）。
+2. **r409 交接第 4/5 条已闭环**：并发根因（本轮严格执行单实例，无并发）、
+   锁释放（本轮 init 正常拿锁，无冲突）。
+3. 方向二改动只覆盖 `checkTests` 一处判据；guard-abilities 其他 check 函数
+   （checkBidirectional 等）的 try/catch 判据是否也对称，本轮未逐一核对。
+
+## 给下一轮的接手说明
+
+1. **优先做遗留 3**：「guard-abilities 全 check 函数的 try/catch 判据对称性批量核对」。
+   本轮只在 checkTests 一处抓到不对称，同一文件里还有 checkBidirectional、
+   checkCapability 等同类结构，模式相同则缺陷大概率同源。
+   手法可直接复用 `test/round-410-checktests-catchguard.test.js` 的括号配平抽取。
+2. 遗留 1 的清理要小心：删前先 `grep -rl "round-40X-xxx" test/ scripts/` 确认无引用。
+3. 本轮 evidence 已写进代码注释（`[r410]` 标记），grep `r410` 可定位全部改动。
+
+
 
 ## 方向选择
 
