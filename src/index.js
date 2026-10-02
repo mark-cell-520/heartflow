@@ -1090,18 +1090,6 @@ function discriminate(text, evidence = [], contentMode) {
       // summary，导致 discriminate() 返回的对象里查不到它们——读方
       // （gate/MCP/面板）一律当"未命中"，findings 也因此显示 none。
       pseudo_causal: pc, soft_deflection: sd, premature_termination: pt,
-      // [v6.7.156 r378] multi_turn_escalation 登记原始记账。
-      // 缺口来源：维度覆盖扫描（scripts/dimension-coverage-scan.js）唯一
-      // 放过项 multi_turn_escalation 1/2。r377 加 norm_desensitize_standalone
-      // 独立层后，探针在 checkMultiTurnEscalation 侧已能记到层
-      // （probe-2 实测 count=1 / ladders=[norm_desensitize_standalone]），
-      // 但 qualifies=false（单层不触发 finding），而 discriminate() 的
-      // dimensions 里**根本没有这个键**——读方一律当"未命中"。
-      // 于是覆盖扫描把「已识别但保守不判」误报成「完全没识别」，
-      // 每一轮都把它当第一优先目标，实际却无从判断差异。
-      // 登记后扫描器可区分 count=0（真没识别）与
-      // count>0 && qualifies=false（识别了但按设计保守）。
-      multi_turn_escalation: _multiturn,
     },
     summary: [sy.totalHits ? sy.totalHits + ' 个 sycophancy 信号':'', ct.count ? ct.count + ' 处矛盾':'',
       vg.count ? vg.count + ' 处模糊表述':'', fl.count ? fl.count + ' 个逻辑谬误':'', cc.count ? cc.count + ' 处信心偏差':'',
@@ -1121,13 +1109,6 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.7.110] reward_hacking 补登记 summary（同 v6.7.84 的 uc/ii：
       // 只进 dimensions 不进 summary 会让登记守卫漏报，也会让人看不到）
       rh.count ? rh.count + ' 处规避作弊' : '',
-      // [v6.7.156 r378] multi_turn_escalation raw 记账进 summary。
-      // 只用 qualifies=false && count>0 的中间态：qualifies=true 时
-      // 已有 findings 的文案「多轮累积(N层阶梯: ...)」，此处不重复。
-      // count 用 totalHits 同款简短形态（_multiturn 是对象，guard 的
-      // sumVars 正则会收 `_multiturn && _multiturn.` 这种形态）。
-      _multiturn && _multiturn.count && !_multiturn.qualifies
-        ? _multiturn.count + ' 处多轮累积(未达闸门阈值)' : '',
     ].filter(Boolean).join('；') || '未发现明显问题',
   };
 }
