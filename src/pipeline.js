@@ -105,6 +105,14 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
   const discResult = _discriminate(input, [], pedagogy ? 'pedagogical' : undefined);
   checked_by.push({ layer: 'discriminate', score: discResult.overallScore, verdict: discResult.verdict });
   data.discriminate = { verdict: discResult.verdict, score: discResult.overallScore, findings: discResult.findings };
+  // [v6.7.156 r378] 透传 discriminate 的 dimensions。
+  // 缺口来源：维度覆盖扫描加「已识别但保守不判」中间态（r378）需要读
+  // dimensions[dim].count，而 checkOutput 走的 buildResult 只从
+  // data.discriminate 拿 verdict/score/findings —— dimensions 在
+  // pipeline 路上被丢掉（r378 probe-5 实测：checkOutput 路径
+  // data.discriminate 只有 3 个键，直接调 idx.discriminate 有 58 个）。
+  // 后果是引擎侧已识别也无法在门禁入口读到。
+  if (discResult.dimensions) data.discriminate.dimensions = discResult.dimensions;
 
   // ─── Layer 3.2: Classical Knowledge — 古籍思想维度 ─────
   const classicalResult = evaluateRules(input);
