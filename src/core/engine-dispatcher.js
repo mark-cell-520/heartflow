@@ -136,13 +136,38 @@ function dispatch(hf, route, ...args) {
 
 /**
  * Generate allowed routes from modules registry
+ *
+ * [r402] 缺陷修复：原实现只扫 `Object.getPrototypeOf(mod)` 的原型方法。
+ * 对 class 实例（proto = 自定义原型）有效；但对**函数式导出模块**
+ * （module.exports = { report, stats, ... }，proto = Object.prototype）
+ * 只产出 `hasOwnProperty`/`valueOf` 等 11 条 Object.prototype 噪声，
+ * 而真正的 own 方法（report/stats/suggest/confirm/clear）反而全部丢失——
+ * 表现为「模块明明加载了，dispatch 全报 not allowed」。
+ * 这里改成：原型方法 + own 方法并集，显式剔除 Object.prototype 噪声。
  */
+const _OBJ_PROTO_NOISE = new Set(Object.getOwnPropertyNames(Object.prototype));
+
 function generateAllowedRoutes(modules) {
   const routes = [];
   for (const [name, mod] of Object.entries(modules)) {
     if (!mod || typeof mod !== 'object') continue;
-    for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(mod))) {
-      if (typeof mod[key] === 'function') routes.push(`${name}.${key}`);
+    const seen = new Set();
+    // ① 原型链方法（class 实例主路径）
+    try {
+      for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(mod))) {
+        if (_OBJ_PROTO_NOISE.has(key) || key === 'constructor') continue;
+        if (typeof mod[key] === 'function' && !key.startsWith('_')) {
+          seen.add(key);
+          routes.push(`${name}.${key}`);
+        }
+      }
+    } catch (e) { /* fall through */ }
+    // ② own 方法（函数式导出模块主路径）
+    for (const key of Object.keys(mod)) {
+      if (seen.has(key) || _OBJ_PROTO_NOISE.has(key)) continue;
+      if (typeof mod[key] === 'function' && !key.startsWith('_')) {
+        routes.push(`${name}.${key}`);
+      }
     }
   }
   return routes;

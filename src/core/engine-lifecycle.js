@@ -55,6 +55,7 @@ function _registerModules(hf) {
         'philosophyToDecision',
         'decisionRouter',
         'timeExtension',
+        'falsePositiveFeedback',
         'desireCognition',
         'loveCognition',
         'threePoisons',
