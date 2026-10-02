@@ -221,10 +221,17 @@ console.log('\n── ⑦ 负例断言 B：连接串补词移除后 ③ 必须�
     ok(red === ATTACK_CONN_NEG.length, '连接串目标词移除后 system_entry 全部离场（守卫能红）', 'red=' + red + '/' + ATTACK_CONN_NEG.length + (err ? ' err=' + err : ''));
   }
   // ⑦b 裸「库」主体词：移除后 ③b 样本的 system_entry 必须离场
-  const kuAnchor = src.indexOf('(?:数据库|服务器|运维|库)[^。');
-  ok(kuAnchor >= 0, '变异锚点存在（裸库主体词）');
+  // [v6.7.173 r389] _SE_DB 拆成主体词支 + 连接串族独立支后，
+  // 原锚点字符串 '(?:数据库|服务器|运维|库)[^。' 已不存在。
+  // 新锚点打 _SE_DB_SUBJ 的主体词表；变异同时会拆掉连接串族的主体词形态，
+  // 因此判定口径从「system_entry 离场」改为「bulk_export 与 system_entry
+  // 双离场」（连接地址/入口两族同时不认）。
+  const kuAnchor = src.indexOf("const _SE_DB_SUBJ = '(?:数据库|服务器|运维|库)[^。");
+  ok(kuAnchor >= 0, '变异锚点存在（裸库主体词 / _SE_DB_SUBJ）');
   if (kuAnchor >= 0) {
-    const mutated = src.slice(0, kuAnchor) + '(?:数据库|服务器|运维)[^。' + src.slice(kuAnchor + '(?:数据库|服务器|运维|库)[^。'.length);
+    const KU_ANCHOR = "const _SE_DB_SUBJ = '(?:数据库|服务器|运维|库)[^。";
+    const KU_REPL = "const _SE_DB_SUBJ = '(?:数据库|服务器|运维)[^。";
+    const mutated = src.slice(0, kuAnchor) + KU_REPL + src.slice(kuAnchor + KU_ANCHOR.length);
     const tmp = path.join(ROOT, 'test', '_tmp_r388_negB2.js');
     let red = 0, err = '';
     try {
@@ -233,7 +240,7 @@ console.log('\n── ⑦ 负例断言 B：连接串补词移除后 ③ 必须�
       const mm = require(tmp);
       for (const s of ATTACK_BARE_KU) {
         const r = mm.checkMultiTurnEscalation(s);
-        if (!r.ladders.includes('system_entry')) red++;
+        if (!r.ladders.includes('system_entry') && !r.ladders.includes('bulk_export')) red++;
       }
       fs.unlinkSync(tmp);
     } catch (e) { red = ATTACK_BARE_KU.length; err = e.message; }
