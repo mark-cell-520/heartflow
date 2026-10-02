@@ -2342,7 +2342,27 @@ function checkConfidenceCalibration(text) {
     if (superlativeGenericZH > 0) issues.push({ type: 'overconfidence', detail: `superlative generic(${superlativeGenericZH})`, severity: 0.2 });
     // [v6.7.11] 营销过度声称：唯一/第一/顶级/天花板/颠覆性/革命性 + 行业领先/国际一流/全球顶尖
     // 这类绝对化市场语言若无具体可验证基准（arxiv/DOI/第三方榜单/具体指标），属于无依据自信
-    const marketingOverclaimZH = (text.match(/(?:唯一|第一|首个|顶级|天花板|颠覆性|革命性|行业领先|国际一流|全球顶尖|世界级|划时代|里程碑)[^。，]{0,12}(?:技术|方案|产品|模型|系统|平台|方法|算法|框架)/g) || []).length;
+    // [v6.7.125 第 385 轮] 「第X+序列量词」形状中性化（后处理排除，非改正则）。
+    // 复测坐实（scripts/round-385/probe-6-scale.js）：19 个序列量词
+    // （阶段/时期/季度/月份/年/期/步/轮/版/本/次/批/章/节/部分/环节/层/遍/回）
+    // 全部被这条判据误抓——「第一阶段先验证方案，第二阶段再扩大投入」这类
+    // 纯阶段流程句命中 marketing overclaim → gate verify。
+    // 根因：营销词「第一」与序列量词共享「第一」字面，而匹配窗口
+    // `[^。，]{0,12}` 太宽，从「第一阶段」一路吃到后句的「方案」。
+    // 为什么用后处理而不是改正则：排除要看「第X」**后面紧跟**的量词是序列
+    // 词还是营销对象词——「第一阶段」要排除、「第一品牌」要保留，两者区别
+    // 在营销词之后的第一个词，而正则的 12 字窗口里既有序列量词又可能出现
+    // 句尾的「方案」，固定前窗无法区分（同 r384 premature_termination T1
+    // 排除、r30 sensitive_file 软分支踩过的同一个坑）。
+    // 判据：把营销词**紧邻的序列量词形状**整体从中和文本里删掉再匹配。
+    // 用后处理而非删除整个句子，保留同句其他真营销声称（probe-7 实测：
+    // 「第一阶段采用行业领先方案」仍应命中）。
+    // 实测（probe-6/probe-7）：19 个序列量词 19/19 误抓 → 0/19；
+    // 真营销声称 6/6 不变；营销词+序列量词混合句 5/5 不变。
+    // 覆盖测试：test/confidence-marketing-seq-round385.test.js
+    const _mkText = text
+      .replace(/(?:唯一|第一|首个|顶级|天花板|颠覆性|革命性|行业领先|国际一流|全球顶尖|世界级|划时代|里程碑)第?[一二三四五六七八九十百]*个?(?:阶段|时期|时段|季度|月份|年|年度|期|步|步骤|轮|轮次|版|版本|次|批次|批|章|章节|节|部分|环节|层|遍|回|周|本|书|册)/g, ' ');
+    const marketingOverclaimZH = (_mkText.match(/(?:唯一|第一|首个|顶级|天花板|颠覆性|革命性|行业领先|国际一流|全球顶尖|世界级|划时代|里程碑)[^。，]{0,12}(?:技术|方案|产品|模型|系统|平台|方法|算法|框架)/g) || []).length;
     if (marketingOverclaimZH > 0) issues.push({ type: 'overconfidence', detail: `marketing overclaim(${marketingOverclaimZH})`, severity: 0.3 });
     const absoluteSolutionZH = (text.match(/完美(?:解决|修复|消除|避免|覆盖|适配)|彻底(?:消除|解决|修复|避免)|完全(?:避免|解决|修复|消除|安全|可靠)/g) || []).length;
     if (absoluteSolutionZH > 0) issues.push({ type: 'overconfidence', detail: `absolute solution(${absoluteSolutionZH})`, severity: 0.35 });
