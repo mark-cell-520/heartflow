@@ -831,6 +831,15 @@ class MeaningfulMemory {
 
     if (memory.metadata?.lesson || memory.metadata?.userPreference || memory.metadata?.taskOutcome) return 'learned';
 
+    // [r405 兼容] 旧语义字段 type（triality-memory 时代的写法）：早期调用方用
+    //   type:'core'/'semantic'/'episodic' 标记记忆层级。此前只有 episodic
+    //   巧合命中（缺省即 ephemeral），semantic / core 全部静默落 ephemeral ——
+    //   稳定知识掉进易失层、身份规则掉进易失层，随后都会被遗忘曲线删除。
+    //   这里把 type 正式映射到本引擎的三层模型。
+    const _t = memory.type;
+    if (_t === 'core' || _t === 'identity' || _t === 'directive') return 'core';
+    if (_t === 'semantic' || _t === 'learned' || _t === 'knowledge') return 'learned';
+    // _t === 'episodic' / 'working' / 其他 → ephemeral（与缺省一致，不改变既有行为）
     return 'ephemeral';
 
   }
