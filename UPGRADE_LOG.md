@@ -1,5 +1,110 @@
 
-# 第 376 轮（r374/r375 英文支缺口闭环：三条负例全部变红 + 修 r342 自伤守卫，2 commits）
+# 第 377 轮（multi_turn_escalation 单侧放过根因修复：norm 独立层 + 抓出 text.match(undefined) 恒真坑，4 commits）
+
+## 方向选择
+
+简报优先级队列为空（upgrade-queue 仅 1 条已 done）。上一轮（r376）遗留 3 项，
+其中「跑 decision.decide 真选一个维度缺口」是明确的升级入口，其余两项是维护项。
+
+本轮按简报要求用 `HeartFlowDecision.decide` 实跑 3 个候选
+（`scripts/round-377/decide.js`），选中 **C**（0.81）：
+
+| 候选 | 分数 |
+|---|---|
+| C 维度覆盖扫描唯一放过项 multi_turn_escalation（1/2） | **0.81** |
+| A capability_probe 英文支窗口放宽 | 0.77 |
+| B 扫 test/ 里 `indexOf('re: /')` 型失效守卫 | 0.74 |
+
+identity alignment 0.80，confidence 0.70。
+
+## 复测（不信简报，自己再跑）
+
+`scripts/dimension-coverage-scan.js` 重跑：46 维、未测 0、良性误伤 0/12，
+**唯一闸门放过项仍是 multi_turn_escalation（探针 2 条放过 1 条）**。
+
+六支探针逐层定位（`scripts/round-377/probe-1..8`），拿到简报没说的关键事实：
+
+1. **探针不是正则漏**。`_RE_NORM_DESENSITIZE` 对两条探针**都是 hit=true**
+   （probe-3 六形对照 + probe-6 良性池旁证）。
+2. **根因是耦合闸门**：`norm_desensitize` 是 `coupled:'predatory'` 层，
+   `gateOpen = predatory >= 1`，而 PREDATORY 是五个**索取半**
+   （pii/bulk_export/system_entry/sensitive_file/model_internals）。
+   两条探针都只有「递进小步 + 脱敏收尾」半边形状，没有任何索取层在场
+   → `gateOpen=false` → 不计层 → `count=0` → gate 全放过。
+   probe-4 坐实：同一探针 + 一句索取，`count` 立刻 0 → 3、`gate=rewrite`。
+   即**结构识别本身是通的，缺的是「单侧在场」的独立判定**。
+
+## 改了什么（4 commits）
+
+1. `a41f083f` — decision.decide 选向 + 六支定位探针（round-377/ 目录）。
+2. `71652615` — `src/multi-turn-tactics.js`：LADDERS 新增
+   `norm_desensitize_standalone` **非耦合独立层**（score 10，与耦合层同判据
+   `_RE_NORM_DESENSITIZE`），配 predatory 预扫描去重（`_NORM_COUPLED_WILL_FIRE`）
+   避免同句双记 norm 两层。
+3. `e8084c5c` — `test/round-377-norm-standalone-guard.test.js`：19 断言守卫
+   （结构 / 行为 / 去重 / 误伤 / 删条必须变红）。
+4. `ab3a8cba` + `1b8bd8d0` — 修自引入回归 + r374 契约更新。
+
+## 本轮抓到的新坑（比 r376 的 require 缓存更隐蔽）
+
+**`text.match(undefined)` 恒真**。独立层首版我写了 `up:` 字段（照抄耦合层），
+但非耦合分支读的是 `text.match(L.re)`。`L.re` 为 undefined 时
+`String.prototype.match(undefined)` 编译成 `/(?:)/`，**对任何文本都返回
+零宽匹配**——于是该层变成恒真层，给所有句子白送一层。
+
+实测后果：`test/multi-turn-tactics.test.js` 从 8/0 掉到 4/4（4 条全挂），
+而**我自己写的 r377 守卫当时全绿 18/18**——因为良性池断言写的是
+「非 pass ≤ 基线 5 条」这种上限式，恒真层的 10 分不足以把良性推过阈值。
+教训：**负例守卫的误伤断言必须是精确等式（或逐条 diff），上限式断言
+会被"信号不够强"的 bug 骗过**。已在该测试补 `up` 字段防呆断言
+（`ok(!(L && L.up))`），并在源码注释里写清机制。
+
+定位手法（probe-8）值得记：`_RE_NORM_DESENSITIZE.exec(p)` 返回 null，
+但 ladder 记了命中 → 说明循环里用的不是这个正则 → 直接指向字段名错配。
+
+## 验证结果（全部本轮实跑）
+
+| 项 | 结果 |
+|---|---|
+| `bin/verify.js` | **14 / 0** |
+| `test/security-audit.test.js` | **16 / 16** |
+| `test/round-377-norm-standalone-guard.test.js` | **19 / 0** |
+| `test/multi-turn-tactics.test.js` | 修前 4 失败（自引入）→ **8 / 0** |
+| `test/round-374-mte-en-families.test.js` | 契约更新后 **7 / 0** |
+| `scripts/bidirectional-guard.js --check` | 召回 52/52；**漂移与改动前完全一致**（既有状态，见下） |
+| `test/run-all.js` | **16666 通过 / 0 失败**（458 个测试文件全跑，含预期的 npm-package-integrity） |
+
+### 双向基线漂移的归因（重要，防止下一轮误判）
+
+`--check` 报 2 类漂移（恶意 rewrite 11→12/verify 2→1、教学 verify 1→0/pass 11→12）。
+**这不是本轮引入**——用 `git stash` 级对照实测：把 src 换回改动前副本，
+漂移数字**一模一样**。基线文件 `data/bidirectional-baseline.json` 是 untracked
+文件（从未进 git），是早前某轮生成后未随后续轮次刷新。误拦数仍 302/326 基线内。
+
+## 遗留
+
+1. **维度覆盖扫描仍报 multi_turn_escalation 1/2**： scanners 的探针只跑
+   `gate.checkOutput`，独立层单层不触发 finding（qualifies ≥2 未降），
+   所以扫描口径没变。这是**设计正确的残留**（单层不该 rewrite），
+   但扫描器现在把这维度的「已识别但保守不判」与「完全没识别」混为一谈，
+   建议下一轮给扫描加一档「mte count>0 但 qualifies=false」的中间态。
+2. `indexOf('re: /')` 型失效守卫扫描（decision 的 B 候选，0.74）未做。
+3. capability_probe 英文支 `{0,6}` 窗口放宽（decision 的 A 候选，0.77）未做。
+4. r374 契约已从「count 保持 0」改为「count===1 + qualifies===false」，
+   若后续动 norm 层，记得这条新口径比旧口径严（连带断言 ladders 只有一层）。
+
+## 给下一轮的接手说明
+
+1. **norm 独立层的去重靠预扫描**（`_NORM_COUPLED_WILL_FIRE`）。它复制了
+   耦合层的激活条件（up 命中 AND 索取半命中 AND sensitive_file 软分支排除）。
+   若将来改 PREDATORY 集合或 sensitive_file 排除逻辑，**这两处必须同步改**，
+   否则要么双记、要么该让位时不让位。
+2. **LADDERS 字段名契约**：非耦合层用 `re`，耦合层用 `up`。写错不报错，
+   只会静默变恒真层。`test/round-377-norm-standalone-guard.test.js` 的
+   `up` 防呆断言是唯一护栏。
+3. 双向基线文件建议在有明确改进轮次时重刷（`--baseline`），
+   否则每轮都要重做一次「换回旧副本对照」来证明漂移非本轮引入。
+
 
 ## 方向选择
 
