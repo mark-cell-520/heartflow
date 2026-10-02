@@ -176,8 +176,14 @@ function checkTests() {
         if (m) break;
       }
       if (m) {
+        const passed = parseInt(m[1]);
         const failed = parseInt(m[2]);
-        resolve([{ name: '全量测试', ok: failed === 0, detail: `${m[1]} 通过, ${failed} 失败` }]);
+        // [r410] 判据与 try 分支对齐：加 passed > 0 保护。
+        // 此前 catch 分支只判 failed===0，若 run-all 异常退出且 stdout 截断到
+        // 只剩一行「0 通过, 0 失败」形态（execSync 抛错时 stdout 可能被截断），
+        // 一条零用例的空壳会被判成 ✅ 全量测试通过 —— 守卫变成永远绿。
+        // 实测：同一行 "0 通过, 0 失败" 下 try=false 而 catch=true，口径不一致。
+        resolve([{ name: '全量测试', ok: failed === 0 && passed > 0, detail: `${passed} 通过, ${failed} 失败（异常退出路径）` }]);
       } else {
         resolve([{ name: '全量测试', ok: false, detail: e.message.split('\n')[0] }]);
       }
