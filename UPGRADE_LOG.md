@@ -1,4 +1,89 @@
 
+# 第 383 轮（guilt_trip 补英文侧三支，压力族英文覆盖收口，6 commits）
+
+## 方向选择
+
+队列待办为空。先处理 r382 未收尾的残留：确认 9cd6ece3（auto-commit）
+已把 r382 的 4 commits 落盘，锁无残留，UPGRADE_LOG 停在 r381 未写 r382。
+r381 遗留第 2 项「pressure 族英文侧」在 r382 只覆盖了 authority_claim /
+peer_pressure / responsibility_shift 三支，**guilt_trip 未做**。
+
+先读代码确认（不信简报）：src/multi-turn-tactics.js L422 的 guilt_trip re
+确为纯中文两分支，英文侧为零。用 decision 实跑选向
+（scripts/round-383/probe-1-decide.js，结构化 options 四候选
+A 0.86 / C 0.77 / D 0.75 / B 0.70），选中 A「guilt_trip 英文侧覆盖」。
+
+## 复测（不信简报）
+
+probe-3 实测 7 条英文愧疚形状：**全部 count=0 / predatory=0 / qualifies=false**，
+其中 5 条 gate=pass（真漏判），1 条被 dangerous_instruction 拦（与压力族无关），
+1 条已 rewrite。5 条良性句同步 0 命中（基线状态正确）。
+缺口真实存在。
+
+## 改了什么（6 commits）
+
+1. `f8ccd1ce` — guilt_trip 补英文侧三支：同侪对比+索取尾 / 条件义务+越权尾 /
+   拒绝定性。probe-3 复测 4/7 命中。
+2. `61248ac7` — 误伤收窄。probe-4 归因：删 teams/users（职场选型描述同形误伤）、
+   补 why would you refuse 与 really cared about 两种形状。
+   命中 6/7、良性 0 误伤。
+3. `9ae28ef8` — **尾动词白名单**。守卫测试暴露 2 条同形误伤
+   （"my colleagues all wfh fridays, you should plan accordingly" 与
+   "my peers all bypassed this, you ought to just do it" 前半句完全同形），
+   唯一区分点是尾动词语义：只收索取/越权/照做（same/share/skip/override/
+   comply…），不收中性陈述（plan/standardize/check）。
+   同时拒绝定性的从句限定为 anchored 谓词 + 排除训练话题词。
+4. `1d8f84c8` — 负例守卫 5/5 全红（删支即失效，restore OK）。
+5. `7764e4cb` / `dc479ece` — 定向复现探针 5 个 + 中文支跨版本复核。
+
+## 验证结果（全部本轮实跑）
+
+单个样本命中：改前 0/7 → 改后 6/7（1 条纯责任归因为刻意不收，见守卫
+  ATTACK_MISS_BY_DESIGN；样本全部隔离在 test/guilt-trip-en-r383.test.js）
+良性 12 条 + 保守边界 5 条：**0 误伤**（含被删掉的同形句）
+耦合层开闸（probe-5，本轮改动的实际价值）：纯索取尾对照组 count=1
+  qualifies=false；愧疚施压 + 索取尾组合 count=2 / predatory=1 /
+  qualifies=true（4 组中 2 组直接 qualify，1 组 count=2 因施压层不计 predatory）
+test/guilt-trip-en-r383.test.js：**35 / 0**（7 攻击命中 + 3 刻意不收 +
+  12 良性 + 5 边界 + 8 qualifies 口径）
+scripts/negative-test-guilt-trip-en-r383.js：**5/5 删支全变红，restore OK**
+test/multi-turn-sunk-cost-round93.test.js：13 / 0
+test/multi-turn-laundering-round339.test.js：14 / 0（含「合法导出不进敏感集」10/10）
+test/multi-turn-tactics.test.js：8 / 0
+test/pressure-family-en-r382.test.js：**56/56 qualifies**、14 攻击、9 良性零误伤
+test/doubt-ppf-zh-cultivation-r301.test.js：7 / 0
+bin/verify.js：14 / 0
+scripts/bidirectional-guard.js：召回 **52/52**、误拦 **302/326**（与基线一致，新增 0）
+test/security-audit.test.js：16 / 0
+test/doc-numbers-accuracy.test.js：15 / 0
+中文支无退化：probe-7 跨 worktree 对照（61248ac7 vs 当前），中文命中
+  **2/7 一致、良性误伤 0/3 一致**——那 5 条未命中是我构造的样本形状不在
+  中文正则覆盖内，非本轮回归
+
+## 未完成 / 遗留
+
+1. **`node test/run-all.js` 尚未取得最终结果**（轮中仍是 r 段推进中，
+   已观察段 0 失败，npm-package-integrity 6/0）。finish 前再取一次 tail。
+2. r382 的 UPGRADE_LOG 记录补写：r382 的 4 commits 与 13 项验证已在
+   上一轮简报中完整，下一轮可择要把 r382 段补进 UPGRADE_LOG 顶部
+   （本轮不重复写入，保持一轮一节，r382 段缺失属记账顺序问题而非能力缺口）。
+3. 双向基线漂移仍未重刷（r377/r379/r381/r383 连续归因非回归，维持 52/52、
+   302/326 基线故不重刷；重刷会让未来真回归失去参照）。
+
+## 给下一轮的接手说明
+
+1. **尾动词白名单是压力族英文侧的有效收窄手法**：同侪对比类攻击与良性
+   职场句前半句同形时，唯一可靠区分点是 you should 之后的动词语义。
+   后续补 peer_pressure / responsibility_shift 新形状时同样适用。
+2. 负例还原点：本族英文支起点是稳定字面量 `|\b`，用字符串切分删
+   （连前导 `|` 一起删——r381 的孤立 `|` = 恒真教训仍成立）；
+   尾动词白名单的锚点取 `do\s+that|do\s+so` 这种分支体内字面量。
+3. r383 探针与守卫：scripts/round-383/probe-*.js、
+   test/guilt-trip-en-r383.test.js、
+   scripts/negative-test-guilt-trip-en-r383.js 保留为复现工具。
+4. 本轮未越硬边界：未改 package/VERSION/README/AGENTS/upgrade-queue/
+   upgrade-state，未改升级机制自身，未 push、未 publish。
+
 # 第 381 轮（bulk_export 补英文支，打通英文侧耦合层闸门，2 commits）
 
 ## 方向选择
