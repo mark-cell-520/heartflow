@@ -121,7 +121,7 @@ const BENIGN = [
 function probeDim(dim) {
   const probes = PROBES[dim] || [];
   if (!probes.length) return { dim, tested: false, reason: '无探针' };
-  let missedGate = 0, attributed = 0, hardGated = 0;
+  let missedGate = 0, attributed = 0, hardGated = 0, recognized = 0;
   const misses = [];
   for (const p of probes) {
     let fires = false, own = false;
@@ -136,6 +136,23 @@ function probeDim(dim) {
       own = (r.findings || []).some(f => f.dimension === dim) || gated;
       if (gated) hardGated++;
       if (own) attributed++;
+      // [v6.7.156 r378] 中间态：「已识别但保守不判」。
+      // 覆盖扫描原来只读 gate.action + findings.dimension，于是
+      // 「识别到了层、按 qualifies≥2 设计保守不判」与「完全没识别」
+      // 被混为一谈——multi_turn_escalation 因此连续多轮被列为
+      // 「闸门放过」第一优先目标，实际引擎侧早已记到层（r377 起）。
+      // 判据只取该维度自己的原始记账（dimensions[dim].count），
+      // 不跨维度借用，避免把别层的命中算成本维度识别。
+      // ⚠️ dimensions 有两个落点，都要读（r378 probe-5 实测发现）：
+      //   ① r.dimensions                     —— gate.gate() / discriminate() 直调
+      //   ② r.data.discriminate.dimensions   —— pipeline/checkOutput 路径
+      //      此前 pipeline 丢了这个字段，本轮已在 src/pipeline.js 补透传；
+      //      保留 ① 是为了 scanner 也能直接吃 gate() 的结果。
+      const dims = r.dimensions || (r.data && r.data.discriminate && r.data.discriminate.dimensions) || {};
+      const st = dims[dim];
+      if (st && typeof st === 'object' && (st.count > 0 || st.totalHits > 0)) {
+        recognized++;
+      }
     } catch (_) { /* 引擎异常不计命中 */ }
     if (!fires) { missedGate++; misses.push(p.slice(0, 24)); }
   }
@@ -143,6 +160,7 @@ function probeDim(dim) {
     dim, tested: true, total: probes.length,
     missedGate,               // gate 完全放过（最严重的漏判）
     attributed,               // 维度名命中 + 前置硬闸门
+    recognized,               // 原始记账命中（含保守不判的中间态）
     hardGated,                // 其中走 block 硬闸门的条数
     misses,
   };
@@ -165,7 +183,7 @@ const baseline = benignBaseline();
 console.log(`良性基线: ${baseline.total} 句中 ${baseline.falsePositive} 句非 pass` +
   (baseline.falsePositive ? `（${baseline.dims.join(', ')}）` : ''));
 console.log('');
-console.log('维度'.padEnd(26) + '层'.padEnd(8) + '探针'.padEnd(6) + '闸门漏判'.padEnd(9) + '归因命中');
+console.log('维度'.padEnd(26) + '层'.padEnd(8) + '探针'.padEnd(6) + '闸门漏判'.padEnd(9) + '归因命中'.padEnd(10) + '识别命中');
 console.log('─'.repeat(62));
 
 const untested = [];
@@ -175,9 +193,18 @@ for (const dim of ALL) {
   const tier = TIERS.block.includes(dim) ? 'block' : TIERS.rewrite.includes(dim) ? 'rewrite' : 'verify';
   if (!r.tested) { untested.push(dim); console.log(dim.padEnd(26) + tier.padEnd(8) + '（无探针，未测）'); continue; }
 const label = `${r.attributed}/${r.total}` + (r.hardGated ? ` (硬闸门${r.hardGated})` : '');
-  console.log(dim.padEnd(26) + tier.padEnd(8) + String(r.total).padEnd(6) + String(r.missedGate).padEnd(9) + label);
+  console.log(dim.padEnd(26) + tier.padEnd(8) + String(r.total).padEnd(6) + String(r.missedGate).padEnd(9) + label.padEnd(10) + String(r.recognized).padEnd(8));
   // 只把**闸门完全放过**的维度列为优先目标；attributed=0 但有硬闸门的不算（口径已修正）
-  if (r.missedGate > 0) weak.push({ dim, tier, total: r.total, missed: r.missedGate, hardGated: r.hardGated });
+  // [v6.7.156 r378] 漏判分两档：
+  //   · blind  —— recognized=0，引擎侧也没记到层（真盲区，最优先）
+  //   · held   —— recognized>0 但 qualifies 未达，设计上保守不判（信息档）
+  if (r.missedGate > 0) {
+    weak.push({
+      dim, tier, total: r.total, missed: r.missedGate, hardGated: r.hardGated,
+      recognized: r.recognized,
+      kind: r.recognized > 0 ? 'held' : 'blind',
+    });
+  }
 }
 
 console.log('─'.repeat(62));
@@ -187,7 +214,9 @@ weak.sort((a, b) => (TIERS.block.includes(b.dim) ? 2 : TIERS.rewrite.includes(b.
                    - (TIERS.block.includes(a.dim) ? 2 : TIERS.rewrite.includes(a.dim) ? 1 : 0));
 for (const w of weak) {
   const hg = w.hardGated ? `（另 ${w.hardGated} 条走 block 硬闸门，已拦）` : '';
-  console.log(`  [${w.tier}] ${w.dim} — 探针 ${w.total} 条，闸门放过 ${w.missed} 条${hg}`);
+  // [v6.7.156 r378] 区分「真盲区」与「已识别但保守不判」
+  const rc = w.recognized ? `；引擎侧已识别 ${w.recognized}/${w.total} 条（qualifies≥2 未达，设计保守）` : '；引擎侧也未识别（真盲区）';
+  console.log(`  [${w.tier}] ${w.dim} — 探针 ${w.total} 条，闸门放过 ${w.missed} 条${hg}${rc}`);
 }
 
 const fsOut = path.join(ROOT, 'data', 'dimension-coverage.json');
@@ -197,5 +226,9 @@ fs.writeFileSync(fsOut, JSON.stringify({
   benignBaseline: baseline,
   // 主指标：闸门放过的探针（真漏判）。归因数受前置硬闸门影响，不作唯一判据。
   gateMisses: weak.map(w => `${w.tier}:${w.dim}:${w.missed}/${w.total}`),
+  // [v6.7.156 r378] 漏判分档：blind=引擎侧也没记到层（真盲区）；
+  // held=已识别但按 qualifies≥2 保守不判。读方据此判断该不该动手。
+  blind: weak.filter(w => w.kind === 'blind').map(w => `${w.tier}:${w.dim}:${w.missed}/${w.total}`),
+  held: weak.filter(w => w.kind === 'held').map(w => `${w.tier}:${w.dim}:${w.missed}/${w.total} (已识别 ${w.recognized}/${w.total})`),
 }, null, 2));
 console.log(`\n报告已写入 ${fsOut}`);
