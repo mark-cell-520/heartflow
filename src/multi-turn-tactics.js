@@ -256,7 +256,7 @@ function softHitIsConsult(text) {
  */
 const _SE_EN_TARGET_RE = /\b(?:connection\s+strings?|conn\s+strings?|connection\s+uris?|jdbc\s+urls?|dsns?)\b/i;
 const _SE_EN_SUBJ_RE = /\b(?:databases?|dbs?|servers?|backends?|clusters?|instances?|librar(?:y|ies)|production|prod|internal|passwords?|credentials?|secrets?)\b/i;
-const _SE_EN_ASK_RE = /\b(?:give|send|share|show|provide|print|dump|forward|reveal|list|output|hand)\s+(?:out\s+|over\s+|me\s+|us\s+|them\s+|it\s+)?(?:me|us|them|it|the|our|this|that)?\b|\b(?:hand\s+over|send\s+over|hand\s+in|hand\s+me)\b/i;
+const _SE_EN_ASK_RE = /\b(?:give|send|share|show|provide|print|dump|forward|reveal|list|output|hand)\s+(?:out\s+|over\s+|me\s+|us\s+|them\s+|it\s+|with\s+)?(?:me|us|them|it|the|our|this|that)?\b|\b(?:hand\s+over|hand\s+in|hand\s+me)\b/i;
 const _SE_EN_DOC_RE = /\b(?:sample|example|template|format|docs?|documentation|readme|guide|tutorial|post|blog|wiki|handbook|compose|snippet)\b/i;
 const _SE_EN_NEG_RE = /\b(?:do\s+not|don\x27t|does\s+not|did\s+not|never|avoid|forbid\w*|prohibit\w*|must\s+not|should\s+not|cannot|can\x27t|ought\s+not\s+to|no\s+one\s+should|nobody\s+should|not\s+to)\b/i;
 // [v6.7.181 r393] 社工铺垫半：试探降级 / 授权洗白 / 关系信任 / 责任转移 /
@@ -1141,7 +1141,23 @@ function checkMultiTurnEscalation(text) {
     }
     for (const s of thisSpans) stNounSpan.push(s);
     // 名词跨度与任一非耦合 ladder 的命中跨度重叠 → 该目标已被索取层计入
-    const thisDedup = thisSpans.some(ns => hits.some(h => h.span && h.span[0] < ns[1] && ns[0] < h.span[1]));
+    // [v6.7.1xx r394] **en:conn-* 支豁免 dedup**：system_entry 的英文连接串
+    // 组合判据（en:conn-demand / en:conn-preface）本身就是「目标半 +
+    // 索取半」的组合层，与 ST[14]/ST[15]/ST[16] 同源（同一个
+    // _SE_EN_TARGET_RE），不是独立的目标层。reductio：
+    // 反序句（the database connection string, hand it over to me）
+    // 命中 system_entry，span 前向覆盖 ST[14]/ST[15] 的名词跨度
+    // → 被判「已由 system_entry 计入」→ sensitive_target 不计层 →
+    // count=1 → gate=pass；而正序句（hand over the database
+    // connection string）因 span 方向恒反向、判据恒假，ST 层存活
+    // → 两层 → rewrite。**同一攻击只因词序相反得到相反判定**。
+    // 本支不该吃连接串名词：dedup 的语义是「两个不同层独立计了同一
+    // 目标」，而这两支是同一判据的两个半边。语义对齐后两序一致，
+    // 不放宽任何词形约束（主体词/垫铺/文档体/极性闸门全部保留）。
+    const _isConnDemandHit = h => h.ladder === 'system_entry' &&
+      typeof h.matched === 'string' && h.matched.indexOf('en:conn') === 0;
+    const thisDedup = thisSpans.some(ns => hits.some(h => h.span && !_isConnDemandHit(h) &&
+      h.span[0] < ns[1] && ns[0] < h.span[1]));
     if (!thisDedup) { stDedup = false; break; }
     stDedup = true;
   }
