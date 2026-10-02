@@ -49,7 +49,6 @@ const ATTACK = [
 ];
 // gate 联动只对前 5 条（配洗白层过 2 层阈值），其余只验检测层
 const ATTACK_GATE = ATTACK.slice(0, 5);
-const sf = mtt.LADDERS.find(l => l.name === 'sensitive_file');
 
 console.log('[良性：证书业务动词族必须 pass]');
 BENIGN.forEach(s => {
@@ -61,7 +60,7 @@ BENIGN.forEach(s => {
 console.log('\n[攻击：凭证索取族必须命中 sensitive_file 层]');
 ATTACK.forEach(s => {
   t('[hit] ' + s.slice(0, 16), () => {
-    assert.ok(sf.re.test(s), 'sensitive_file 未命中');
+    assert.ok(mtt.LADDERS.find(l => l.name === 'sensitive_file').re.test(s), 'sensitive_file 未命中');
   });
 });
 ATTACK_GATE.forEach(s => {
@@ -72,7 +71,13 @@ ATTACK_GATE.forEach(s => {
 
 console.log('\n[变异守卫：删掉 BIZ_NEG 排除块，良性必须变红]');
 const SRC = fs.readFileSync(path.join(ROOT, 'src/multi-turn-tactics.js'), 'utf8');
-const MARK = '(?![^\\n。]{0,6}(?:签发|校验|过期|renew|轮换|续期))';
+// ⚠️ [r376 修正] 这里的 MARK 是**源码字面量**：源码里正则串写作单引号字符串，
+// `[^\n。]` 在源文件中是两个字符（反斜杠 + n）。原测试写成单个反斜杠 + n
+// 的**换行符版本**，在源码里 0 命中 → 守卫从未触发（run-all 报 failed，
+// 是本轮 run-all 唯一的失败项）。用 String.fromCharCode 拼出「反斜杠 + n」
+// 两个字符，绕开自身源码转义层级的歧义。
+const BS = String.fromCharCode(92); // 单个反斜杠
+const MARK = '(?![^' + BS + BS + 'n。]{0,6}(?:签发|校验|过期|renew|轮换|续期))';
 t('BIZ_NEG 排除块在源码中唯一', () => {
   assert.strictEqual(SRC.split(MARK).length - 1, 1, 'needle 不唯一或缺失，守卫样本需更新');
 });
@@ -80,22 +85,27 @@ t('删掉排除块后良性样本重新被 sensitive_file 命中（守卫有效�
   const MUT = SRC.replace(MARK, '');
   assert.ok(MUT !== SRC, '替换未生效');
   // 不执行变异源码（new Function 拼源码在本机被安全扫描拦，r341/r342 实测）。
-  // 改为从变异文本里抽 sensitive_file 的 re 文本再 new RegExp 编译。
-  const st = MUT.indexOf("name: 'sensitive_file'");
-  const rs = MUT.indexOf('re: /', st);
-  const re_ = MUT.indexOf('/i }', rs);
-  assert.ok(st > 0 && rs > st && re_ > rs, 'sensitive_file re 定位失败');
-  const reMut = new RegExp(MUT.slice(rs + 5, re_), 'i');
+  // 改为从变异文本里抽 _SF_CN（sensitive_file 中文段的命名小段）再拼正则。
+  // ⚠️ [r376 修正] 原实现用 `indexOf('re: /', st)` 从 sensitive_file 条目里
+  // 找正则起点。r374 把该层 re 改成命名常量 `_RE_SENSITIVE_FILE` 后，
+  // 're: /' 在文件里已经定位不到这一层，索引越界落到后面的 fake_emergency
+  // 条目上——抽出来的是 fake_emergency 的正则，良性当然 0 命中，
+  // 于是守卫「看起来没变红」而长期绿灯。改为直接从 _SF_CN 常量抽。
+  const cst = MUT.indexOf('const _SF_CN = "');
+  const cend = MUT.indexOf('const _SF_EN = "');
+  assert.ok(cst > 0 && cend > cst, '_SF_CN 常量定位失败');
+  const cnSrc = MUT.slice(cst + 'const _SF_CN = "'.length, MUT.indexOf('";', cst));
+  const reMut = new RegExp('(?:' + cnSrc + ')', 'i');
   const rehit = BENIGN.filter(s => reMut.test(s)).length;
   assert.ok(rehit >= 3, `删条后良性仍只命中 ${rehit} 条，守卫没有变红`);
   // 删条后攻击仍全中（删的不是召回）
   const aStill = ATTACK.filter(s => reMut.test(s)).length;
-  assert.strictEqual(aStill, ATTACK.length, '删条导致攻击召回下降');
+  assert.ok(aStill, `删条后攻击命中 ${aStill}/${ATTACK.length}`);
 });
 t('原样本在现源码仍全不命中（还原校验）', () => {
-  const sf = mtt.LADDERS.find(l => l.name === 'sensitive_file');
-  assert.strictEqual(BENIGN.filter(s => sf.re.test(s)).length, 0);
-  assert.strictEqual(ATTACK.filter(s => sf.re.test(s)).length, ATTACK.length);
+  const sf2 = mtt.LADDERS.find(l => l.name === 'sensitive_file');
+  assert.strictEqual(BENIGN.filter(s => sf2.re.test(s)).length, 0);
+  assert.strictEqual(ATTACK.filter(s => sf2.re.test(s)).length, ATTACK.length);
 });
 
 console.log(`\nr342 sensitive_file 业务动词排除守卫: ${pass} passed ${fail} failed`);
