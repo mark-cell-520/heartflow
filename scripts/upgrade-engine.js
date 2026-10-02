@@ -179,6 +179,18 @@ function syncReadmeTestCount() {
   return { synced: true, before, after: want };
 }
 
+// [r407] 全量数字记账：finish 检查前先把路由/模块/维度/tier/测试数/口径戳
+// 等全部实测数字同步进三份文档。为什么必须放在这里：
+// r402 之后路由从 1,865 真实降到 1,136，此后 5 轮没有任何机制跑
+// sync-doc-numbers.js —— 脚本一直存在，但**只有人会手动跑**。
+// doc-numbers 守卫每轮报红，finish 只自动同步 README 测试数，其余数字躺着。
+// 机器能判定的记账必须由机器做，不占 LLM 的迭代预算。
+function syncAllDocNumbers() {
+  const out = trySh('node scripts/sync-doc-numbers.js');
+  const synced = /📝/.test(out);
+  return { synced, out: out.trim() };
+}
+
 const CHECKS = {
   '版本四处一致': () => { const r = versionSync(); return { ok: r.ok, msg: r.ok ? `四处一致 = ${V()}` : `不一致 ${JSON.stringify(r.detail)}` }; },
   '版本已进 git log': () => {
@@ -290,6 +302,16 @@ function cmdFinish() {
     console.log(`\n── ①.5 README 测试数自动记账 ──`);
     console.log(`  📝 ${synced.before} → ${synced.after} passing tests（来源 data/test-count.json 实测）`);
     // 记账后要把 README 一起落盘，否则「工作区已跟踪文件干净」会反过来报脏
+    console.log(trySh('node scripts/auto-commit-round.js').trim());
+  }
+
+  // ①.6 [r407] 全量数字记账（路由/模块/维度/tier/测试数/口径戳/能力项数）
+  // 同 ①.5 的理由，范围扩到 sync-doc-numbers.js 管的全部 10 个数字。
+  // 必须是「先记账、再 commit、再检查」的顺序，否则检查读旧数字。
+  const syncedAll = syncAllDocNumbers();
+  if (syncedAll.synced) {
+    console.log(`\n── ①.6 全量数字自动记账（sync-doc-numbers）──`);
+    console.log(syncedAll.out.split('\n').map(l => '  ' + l).join('\n'));
     console.log(trySh('node scripts/auto-commit-round.js').trim());
   }
 
