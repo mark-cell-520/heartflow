@@ -1,4 +1,64 @@
-# 第 397 轮（中文句内英文连接串目标族：system_entry 侧补齐，攻击 0→11/12，2 commits + 1 守卫修复）
+# 第 401 轮（补 r400 情感记忆桥守卫 + 修 2 个 run-all 隐形失败，3 commits）
+
+## 方向选择
+
+init 简报无队列待办，上一轮（r400）遗留清单明确指向两个可执行项，直接接手（非多候选权衡，未跑 decision）：
+
+1. **r400 的守卫未写**（r400 报告中标注为"最大缺口"）：src 改了三处但 `test/round-400-*.test.js` 不存在，改坏了没人知道。
+2. **run-all 2 个隐形失败**：r399/r400 报告都记着"唯一 FAIL 是 doc-numbers-accuracy"，但翻开 `/tmp/r401-runall.log` 实际是**3 个**——另 2 个（round-392、round-399）是汇总行格式不匹配被误判，从未被任何报告点名。
+
+## 复测（不信简报旧描述）
+
+- `git log` + `scripts/round-400/probe-bridge-after-fix.js` 重跑：`bc7052e3` 确认落盘未被自动落盘覆盖，7 条探针全绿（stored=true / 低显著性拒绝 / 去重 / verifyPersistence=searchByKeywords / 批量 2/2 / hopelessness=3）。
+- run-all 后台跑完 `/tmp/r401-runall.log`：472 个测试文件，**17228 通过 / 3 失败**。逐条定位失败：doc-numbers-accuracy 1（README 数字账，已知）、round-392 + round-399 2（"未输出汇总行"）。
+- 两个"隐形失败"单独跑：**53/0、25/0 真通过** → 纯粹格式问题，不是真回归。
+- 根因：`test/run-all.js` 第 127 行正则要求 `(\d+)\s*(?:通过|passed)\s*[/,]?\s*(\d+)\s*(?:失败|failed)`，两个文件写成 `'通过 ' + pass + ', 失败 ' + fail`——数字在关键词**前面**，永远匹配不上。r395 修过同类问题（r393/r394 汇总行），这两个文件漏改。
+
+## 改了什么（3 commits）
+
+**`d7b70cd8`**：新增 `test/round-401-emotional-memory-bridge-guard.test.js`（35 断言）+ `scripts/negative-test-emotional-bridge-round401.js`（6 组变异）
+
+守卫覆盖：单条写入 stored=true、低显著性拒绝（reason 判据）、去重二次命中、verifyPersistence 走 searchByKeywords、批量 2/2、认知模式 hopelessness count=3、validateInput 类型矩阵（**含负例**：数组配 object 仍非法）、源码形状断言（array 分支/单例缓存/searchByKeywords 存在）。
+
+负例变异用「原地备份 → 变异 → 跑判据 → finally 字节级还原」，**6/6 全部变红**，且每项着陆点与修复点一一对应：
+
+| 变异 | 红项 |
+|---|---|
+| 入参校验改回 object | batch, pattern |
+| array 分支反转 | batch, pattern, array_type |
+| 恢复裸模块对象 bug | single_store, verify, batch |
+| 单例解析返 null | single_store, verify, batch |
+| 恢复 success 字段判定 bug | single_store, verify, batch |
+| 验证方法改不存在名单 | verify |
+
+变异过程抓到两个自己的假阳性并修正（已记入踩坑）：① 探针给 `extractCognitivePattern` 传 1 条数组，而该函数要求 `length>=3 && count>=2`，pattern 项在原状也恒红；② 变异构造直接删 array 分支无效——摘掉后落到「非必填 null/undefined 通过」的宽松路径，等于放宽而不是还原 bug。改用忠实还原 bug 形状（`{type:'object'}` / `return mod` / 判定严格到 `data.success`）后才真正分辨。
+
+**`269500b1`**：`test/round-392-en-conn-demand-qualifies.test.js` + `test/round-399-zh-softdb-scope-target.test.js` 各一行，汇总行改标准格式，run-all 的 3 失败降为 1 失败（仅剩 README 数字账，由 finish 自动记账）。
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| `bin/verify.js` | ✅ **14/14** |
+| `bidirectional-guard.js` | ✅ 召回 **52/52**，误拦 **302/326**（=基线，零新增） |
+| `test/run-all.js` | ✅ 17228 通过；失败 3→**1**（doc-numbers-accuracy README 16967 vs 缓存 17228，本轮跑完缓存已刷新，finish 自动记账处理） |
+| `security-audit.test.js` | ✅ **16/16** |
+| `doc-numbers-accuracy.test.js` | ⚠️ 14/15（仅 README 数字账一项，同上） |
+| 负例变异 | ✅ **6/6 变红**，src/ 字节级还原 |
+| `finish` | 见下 |
+
+## 踩坑（给后续轮次）
+
+1. **负例变异必须验基线**：变异后红不等于守卫有效。本轮两个探针构造在原状就红（恒红项），差点把假阳性当 6/6 通过。写变异脚本时先跑一次"无变异"，确认探针本身全绿。
+2. **`withRetry` 返回包装层**：`storeResult` 本体是 `{success:true, data: <真实返回值>, attempts}`。改 store 成功判定时若只写 `storeResult.success`，真写入路径不受影响——变异看起来生效、实则空转。要精确到 `storeResult.data`。
+3. **汇总行格式**：run-all 只认「数字在前、关键词在后」。测试文件写汇总行时用 `pass + ' 通过, ' + fail + ' 失败'`，别写「通过 N，失败 M」。
+
+## 遗留（下一轮接手）
+
+1. **cross-domain-reasoner 接线判据**（r400 已实测排除，建议后续轮次直接取用不必重测）：`knowledgeReasonerAvailable: false`，`analogicalInfer`/`causalChain` 只返回空 items + 3 步空壳链——无知识库时接上去是假能力，违背心虫定位。
+2. **零引用模块池**：r400 orphan 扫描实测 src/ 388 个 js 里 32 个零引用，最大三个仍是 task-pipeline(1349 行)、emotional-memory-bridge(1104 行，本轮已修)、lexical-associator(1952 行)。下轮可从这个池子里选真接线目标。
+3. **探针垃圾**：`scripts/round-299/` ~ `scripts/round-401/` 累积未清理（init 只查 `tmp-*`，查不到这些）。建议后续轮次补一轮清理，注意单次 rm 不要超 5 个文件（安全扫描会 BLOCKED）。
+
 
 ## 方向选择
 
