@@ -1,3 +1,128 @@
+# 第 406 轮（修记忆引擎导出路径忽略 rootPath 的隔离失效 + 收口 r405 遗留，2 commits）
+
+## 方向选择
+
+init 简报无队列待办，上一轮（r405）遗留清单第一条就是明确的真缺口：
+**负例变异必须重跑**（r405 写了 5 组变异但 3 组报「未变红」，未证明）。直接接手，未跑 decision（单一遗留项，不需要多候选权衡）。
+
+复测结果推翻了这个判断的假设，本轮方向随之改变 —— 详见下一节。
+
+## 关键发现：r405 交接的「隔离纪律」完全无效（本轮最大产出）
+
+### 复测：M2/M3/M5 在干净基线上确实未变红
+
+r405 报告认为未变红是「自身脚本状态污染」。我不信这个结论，用 `git show HEAD:` 现取基线重跑：
+**M2/M3/M5 在干净基线上测试依然 13/13 全绿**。这不可能是脚本污染 —— 是守卫真的失守。
+
+### 根因：`_getExportPath()` 忽略 `this.rootPath`
+
+`src/memory/meaningful-memory.js` 第 271-275 行（修复前）：
+
+```js
+_getExportPath() {
+  return EXPORT_PATH;   // 模块级常量 = <repo>/data/meaningful-memory.json
+}
+```
+
+构造函数第 133 行收下 `options.rootPath`，但**导出路径完全不读它**。
+
+**后果链（实测坐实）**：
+
+1. r405 交接写下「所有 meaningful-memory 探针必须传隔离 rootPath（mkdtempSync）」—— 这条防线**根本无效**。
+   实测：`new MeaningfulMemory({ rootPath: '/tmp/r406-iso-xxx' })` 的
+   `_getExportPath()` 返回 `/root/.hermes/skills/ai/mark-heartflow-skill/data/meaningful-memory.json`，
+   隔离目录里空空如也。
+2. r405 的守卫测试（以及我本轮所有 mkdtemp 探针）以为在隔离环境，实际**每一条 store() 都在写生产记忆文件**，
+   `_autoSave` 的 2 秒定时器把结果落盘。实测生产文件 mtime = 14:09:55，正是我探针跑的时刻。
+3. 生产记忆文件因此被污染 **240 条**（core 61 / learned 46 / ephemeral 133），
+   全是 r405/r406 探针形状的 id。
+4. **「守卫未变红」的真相**：M2 摘掉 core 映射行后，测试仍能通过 ——
+   因为测试断言「某 id 是否在 core 层」，而**生产数据文件里本来就有 `g-a1`**
+   （上一轮探针写进去的）。删掉映射行，被 store 的条目确实掉到 ephemeral，
+   但 core 层里那条历史 `g-a1` 让断言继续为真。
+
+即：**r405 记忆数据事故（1060 条 learned 被删）+ r405 守卫假阴性，同一个根因。**
+
+## 改了什么（2 commits）
+
+**`bf3f670e`** — `src/memory/meaningful-memory.js`：
+
+```js
+_getExportPath() {
+  return path.join(this.rootPath, 'data', 'meaningful-memory.json');
+}
+```
+
+rootPath 缺省时（`path.join(__dirname, '../../')`）拼出的路径与模块级常量 EXPORT_PATH 完全相同，
+**生产行为零变化**。副作用是引擎的 SAFE-FS 层现在会主动拦截越界写（隔离目录在允许根外时），
+形成双保险。
+
+**`aec78da3`** — `test/round-405-memory-layer-type-compat.test.js` 新增 D2 断言 +
+`scripts/negative-test-memory-layer-round406.js` 重写：
+
+- **D2**：隔离实例的导出路径必须落在 rootPath 内（并用 fakeRoot 验缺省形状，不碰仓库 data/）。
+- 负例脚本两条修复：
+  ① 基线每轮从 `git show HEAD:` 现取，**不再「读一次反复写回」**（r405 instrument 脚本的污染模式）；
+  ② 判定看 FAIL 行与条目名，不只看 exit code。
+- 新增 **M6 变异**：把导出路径退回硬编码常量，D2'd 必须变红。
+- 删除未跟踪的 `scripts/negative-test-memory-layer-round405.js`（污染源）。
+
+## 生产数据清理
+
+- 备份 17MB -> `/root/.hermes/cache/scratch/r406-rescue/meaningful-memory-before-clean.json`
+- 按探针 id 形状白名单删除 240 条，**保留条目一个不动**（不做整体覆盖）
+- 清理后规模 **121 / 1063 / 0 = 1184 条**，与 r405 恢复后规模（121 / 1063 / 1 = 1185）逐层吻合
+- 重算 stats.totalMemories，写入 cleanedAt/cleanedNote 标记
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node bin/verify.js` | 14/14 通过 |
+| `scripts/bidirectional-guard.js` | 召回 52/52、误拦 302/326（正好卡基线，零新增误伤） |
+| `test/round-405-memory-layer-type-compat.test.js` | 14/14（原 13 项 + 新 D2） |
+| `scripts/negative-test-memory-layer-round406.js` | 5/5 变异全部变红，源码与 HEAD 字节一致 |
+| `test/security-audit.test.js` | 16/16 |
+| `test/doc-numbers-accuracy.test.js` | 13/15（2 失败 = 老账，见遗留 1） |
+| `node test/run-all.js` | **17341 通过 / 2 失败 / 共 17343**，2 个失败全部来自 doc-numbers-accuracy |
+
+**负例变异明细**（每条都着陆在预期断言上）：
+
+| 变异 | 着陆点 |
+|---|---|
+| M1 摘整个 type 映射 | A1 type:core / A2 type:semantic |
+| M2 只摘 core 映射 | A1 type:core / A5 type 别名 |
+| M3 只摘 learned 映射 | A2 type:semantic / A4 type 别名 |
+| M5 type 拼错 typex | A1 / A2 |
+| M6 导出路径退回硬编码 | D2 导出路径形状断言 |
+
+**生产文件全程未改写**（负例脚本跑前跑后比对 mtime，未变）。
+
+## 遗留（下一轮接手）
+
+1. **README/AGENTS.md 路由数账不平**：`doc-numbers-accuracy` 2 个失败，
+   README 与 AGENTS.md 声称 dispatch routes = **1,865**，实测 **1,136**。
+   与本轮改动无关（`bin/verify.js` 的「dispatch 路由可用」是通过的，是文档数字过期）。
+   按硬边界本轮不碰 README/AGENTS.md。下一轮跑
+   `node scripts/measure-claimed-numbers.js` 重测后一次性校准这两个数字。
+   注意：1,865 与 1,136 差距 729，先确认是路由数真的降了还是测量口径变了，别直接改文档迁就代码。
+2. **`data/meaningful-memory.json` 仍无集中备份**：散落副本（hf-neg367、hermes8、.stepcode）
+   + 本轮 `/root/.hermes/cache/scratch/r406-rescue/` 备份（scratch 有 24h 清理，会消失）。
+3. **`EXPORT_PATH` 常量已成孤儿**（第 125 行）：修复后 `_getExportPath` 不再引用它，
+   仅注释里提及。`DATA_DIR` 仍被 .user-consent 使用，不能删。下一轮可清 EXPORT_PATH。
+4. 零引用模块池（r401/r402 扫描）：`aipay-server`(509)、`agent-pathologies`(202)、
+   `repo-audit`(151)、`heartflow-api-server`(136)、`sleep-wake`(105)。已判死的不做：
+   triality-memory（已合并）、layer-bus（自带 DEPRECATED）、
+   heartflow-mcp-server-blind-spot-breaker（与已插件化同名 plugin 重复）。
+
+## 给下一轮的接手说明
+
+- **先跑 `node scripts/measure-claimed-numbers.js`**，把 1,865 vs 1,136 的路由数账查清再改文档。
+  这是唯一悬着的 FAIL，收拾掉 run-all 就能回到干净状态。
+- 记忆引擎探针纪律**更新**：rootPath 隔离现在真的生效了，可以放心用 mkdtempSync；
+  但保险起见探针仍只调只读方法，别碰 `applyForgettingCurve`。
+- 本轮 `run-all` 出现的 SAFE-FS 路径越界日志是噪音（隔离目录在允许根外，符合预期），不影响结果。
+
 # 第 401 轮（补 r400 情感记忆桥守卫 + 修 2 个 run-all 隐形失败，3 commits）
 
 ## 方向选择
