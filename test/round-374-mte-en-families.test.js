@@ -82,9 +82,15 @@ const ZH_CONTROL = [
 
 // ─── ① 半族单独在场不得 qualifies ───
 ok('英文三个攻击半族单独在场时均不 qualifies（耦合层设计）', () => {
-  const alone = NORM.concat(SUNK, CAP);
-  const q = alone.filter(s => mtt.checkMultiTurnEscalation(s).qualifies).length;
-  assert.strictEqual(q, 0, `半族单独在场应有 0 个 qualifies，实际 ${q}`);
+  // [v6.7.156 r375] NORM/SUNK 是 coupled 层（predatory 闸门未开），单独在场
+  // 0 层是设计正确。CAP 是**非耦合独立层**（索取动词在场即举报），单独在场
+  // 2 层 qualifies 同样是 r374 补英文支的预期行为——原断言把 CAP 也套进
+  // 「必须 0 qualifies」是错的（probe-18 实测 4/4 现在 ≥2 层）。
+  // 拆成两条断言：coupled 两族 0 qualifies 由本条保证；CAP 族单独在场的
+  // 正确断言见下一条（count≥1 且 gate 非 pass）。
+  const coupled = NORM.concat(SUNK);
+  const q = coupled.filter(s => mtt.checkMultiTurnEscalation(s).qualifies).length;
+  assert.strictEqual(q, 0, `coupled 两族单独在场应有 0 个 qualifies，实际 ${q}`);
 });
 
 // ─── ② COMBO 必须 qualifies 且 gate 非 pass ───
