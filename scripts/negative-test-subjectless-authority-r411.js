@@ -73,31 +73,15 @@ function runChecks(label) {
   return fail;
 }
 
-function mutateRemoveNewPatterns() {
-  // N3：只删本轮新增的两条正则（保留代码注释），N1 必须变红
+function snapshotAndMutate(fn, label) {
   const src = fs.readFileSync(INDEX_FILE, 'utf8');
-  const marker = '/相关(?:负责)?(?:部门|单位|机构|方面)';
-  const i = src.indexOf(marker);
-  if (i < 0) throw new Error('N3 变异失败：找不到 r411 新增正则');
-  // 从该正则起点往前退到行首
-  let s = src.lastIndexOf('\n', i) + 1;
-  // 该正则占两行（第一条 + 相关负责人那条），删到第二条的正则末尾
-  const j = src.indexOf('/i,', src.indexOf('/相关负责人'));
-  const end = src.indexOf('\n', j);
-  fs.writeFileSync(INDEX_FILE, src.slice(0, s) + src.slice(end + 1));
-}
-
-function mutateRemoveLegacyPattern() {
-  // N4：连「有关部门」这条老正则一起删，同族老样本必须也变红
-  const src = fs.readFileSync(INDEX_FILE, 'utf8');
-  const out = src.replace(/\/有关部门\/i,\s*/, '');
-  if (out === src) throw new Error('N4 变异失败：找不到「有关部门」老正则');
+  const out = fn(src);
+  if (out === src) throw new Error(`${label} 变异失败：正则未命中`);
   fs.writeFileSync(INDEX_FILE, out);
-}
-
-function restore() {
-  const { execSync } = require('child_process');
-  execSync(`git checkout -- src/index.js`, { cwd: ROOT, encoding: 'utf8' });
+  const fail = runChecks(label);
+  // 还原到变异前快照（不是 git checkout，避免误伤同文件其它未提交改动）
+  fs.writeFileSync(INDEX_FILE, src);
+  return fail;
 }
 
 (async () => {
@@ -118,26 +102,25 @@ function restore() {
   }
 
   // B. 删本轮新增正则 → N1 必须变红（守卫有效性的证据）
-  restore();
-  mutateRemoveNewPatterns();
-  const failM3 = runChecks('N3 变异：删掉 r411 新增的两条正则');
+  const failM3 = snapshotAndMutate(src => src
+    .replace(/^\s*\/相关\(\?:负责\)\?\(\?:部门\|单位\|机构\|方面\).*\n/m, '')
+    .replace(/^\s*\/相关负责人\?.*\n/m, ''), 'N3 变异：删掉 r411 新增的两条正则');
   console.log(failM3 > 0
     ? `  N3✅ 删条后 ${failM3} 项判据变红 — 这两条正则确实在承担守卫`
     : '  N3❌ 删条后仍全绿 — 守卫可能被别的层顺手带过，判据无区分力');
   if (failM3 === 0) verdict++;
 
   // C. 连老正则一起删 → 同族老样本也必须变红
-  restore();
-  mutateRemoveNewPatterns();
-  mutateRemoveLegacyPattern();
-  const failM4 = runChecks('N4 变异：r411 新正则 + 「有关部门」老正则都删');
+  const failM4 = snapshotAndMutate(src => src
+    .replace(/^\s*\/相关\(\?:负责\)\?\(\?:部门\|单位\|机构\|方面\).*\n/m, '')
+    .replace(/^\s*\/相关负责人\?.*\n/m, '')
+    .replace(/\/有关部门\/i,\s*/, ''), 'N4 变异：r411 新正则 + 「有关部门」老正则都删');
   console.log(failM4 > 0
     ? `  N4✅ 删条后 ${failM4} 项判据变红`
     : '  N4❌ 删到老正则也不红 — 老样本的判定另有来源，需复核');
   if (failM4 === 0) verdict++;
 
-  // D. 还原 → 必须回绿（自证负例不是靠破坏被测文件拿绿）
-  restore();
+  // D. 还原到磁盘当前内容 → 必须回绿（自证负例不是靠破坏被测文件拿绿）
   const failRestore = runChecks('D 还原自证');
   const restored = failRestore === 0;
 
