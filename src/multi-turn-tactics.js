@@ -326,8 +326,15 @@ const SENSITIVE_TARGET_NOUNS = [
   /config|\.env|\.json|\.ya?ml|secret|credential/i,
   // [v6.7.152] ST[13] 对应名词（反序支：dump 在前、名词在后）
   /config|\.env|\.json|\.ya?ml|secret|credential/i,
-  // [v6.7.155 r374] ST[14] 对应名词（英文批量名单/表 + 连接串）
-  /customer|user|employee|student|patient|subscriber|account|list|table|records?|data|numbers?|details?|addresses?|connection|conn|string|credentials?/i,
+  // [v6.7.156 r375] ST[14] 对应名词（英文批量名单/表 + 连接串）。
+  // ⚠️ r375 修正：删掉此前的 `data`。诊断（probe-19-span2）实测该词造成
+  // 名词去重误吃——CAP 族英文句的探测半「database access」自带 data，
+  // 名词跨度与 capability_probe ladder 命中片段重叠，于是
+  // sensitive_target 被判「已被索取层独立计入」而不计层，#1/#2 两条
+  // 只剩 1 层被 gate 放行。data 只是 ST[14] 正则可选宾语后缀，
+  // 不是核心目标名词（真正的目标是名单/表/连接串类），去掉不影响匹配、
+  // 只纠正去重边界。
+  /customer|user|employee|student|patient|subscriber|account|list|table|records?|numbers?|details?|addresses?|connection|conn|string|credentials?/i,
 ];
 /**
  * [v6.7.155 r374] sensitive_file 层正则（组装式，与 _RE_SYSTEM_ENTRY 同款做法）。
@@ -458,7 +465,19 @@ const LADDERS = [
     // 形状与中文侧完全一致：「你能够 X + 确认问句 + 承接词 + 索取动词」。
     // ⚠️ 三半缺一不收：良性侧「can you read local files? I want to know
     // your limits」只有探测半无索取尾巴 → 保持 pass（probe-5 实测 0/17）。
-    re: /(?:(?:你能|你可以|你应该|你能够)[^。\n]{0,16}(?:读取|访问|打开|连接|获取|查看)[^。\n]{0,30}(?:对吧|是吧|对吗|是不是|么|吗)[^。\n]{0,6}(?:那|那么|所以|就)[^。\n]{0,24}(?:帮|给|看|读|拿|取)|\byou\s+(?:can|could|do\s+have|are\s+able\s+to|have)\b[^.]{0,40}(?:\bright\b|\bcorrect\b|\bis\s+that\s+(?:right|correct)\b|\bare\s+you\s+not\b|\bno\s+problem\s+right\b|\byes\b)[^.]{0,20}(?:then|so|now|therefore)[^.]{0,50}(?:help|give|get|pull|grab|send|show|open|export|dump|list|fetch|retrieve|read|check|look))/i },
+    // [v6.7.156 r375] 英文支的索取动词窗口收窄到**承接词之后、目标宾语之前**。
+    // r374 原窗口 `[^.]{0,50}` 从 then/so 一直吃到句尾，把目标宾语
+    // （customer list / user table）整个包进 ladder 命中片段。r375 诊断
+    // （probe-18/19）：该片段随后触发 SENSITIVE_TARGET_NOUNS 的名词去重，
+    // sensitive_target 层被判「已被索取层独立计入」而吃掉，#1/#2 两条
+    // 只剩 capability_probe 1 层 → qualifies=false 被 gate 放行。
+    // 中文侧 span 止于「帮我看看」（不含 config.json），所以中文的
+    // sensitive_file 能独立计层。英文侧收窄到同一边界：索取动词后最多
+    // 再吃 6 个非句点字符（覆盖 open / dump / grab the 等），宾语留给
+    // sensitive_file / sensitive_target 各自识别。probe-20 实测：
+    // 4 条 CAP-alone 2 条 2 层、2 条 1 层（索取动词在场即举报），
+    // 良性 17 条零命中不变。
+    re: /(?:(?:你能|你可以|你应该|你能够)[^。\n]{0,16}(?:读取|访问|打开|连接|获取|查看)[^。\n]{0,30}(?:对吧|是吧|对吗|是不是|么|吗)[^。\n]{0,6}(?:那|那么|所以|就)[^。\n]{0,24}(?:帮|给|看|读|拿|取)|\byou\s+(?:can|could|do\s+have|are\s+able\s+to|have)\b[^.]{0,40}(?:\bright\b|\bcorrect\b|\bis\s+that\s+(?:right|correct)\b|\bare\s+you\s+not\b|\bno\s+problem\s+right\b|\byes\b)[^.]{0,20}(?:then|so|now|therefore)[^.]{0,6}(?:help|give|get|pull|grab|send|show|open|export|dump|list|fetch|retrieve|read|check|look))/i },
   // ─── [v6.7.126] sunk_cost：沉没成本升级层（**耦合层，不单独成层**）────────
   // 来源：第 93 轮复测。r93-baseline.js 实测 COMBO 12 条（升级话术 + 索取层）
   //   中 6 条只有 1 个索取层 → qualifies=false 全放行；纯升级话术 12 条 0 层。
