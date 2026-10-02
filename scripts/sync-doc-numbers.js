@@ -83,25 +83,33 @@ function measure() {
   };
 
   // 测试数：读 run-all.js 每次跑完写下的 data/test-count.json 实测缓存
-  let tests = 0, testsFailed = 0;
+  // [r408 修正] `null` = 未测量（缓存不存在/无 passed），`0` = 合法测量值。
+  // 此前两者混同为 falsy，加上下方防呆也用 falsy 判断，导致「失败数 = 0」
+  // 这种最常见的真实值永远记不上账 —— r407 引入后实测规格表停在历史的
+  // "2 failing"，doc-numbers 从 21/21 掉到 18/21，每跑一次 run-all 就红。
+  let tests = null, testsFailed = null;
   try {
     const cf = path.join(ROOT, 'data/test-count.json');
     if (fs.existsSync(cf)) {
       const j = JSON.parse(fs.readFileSync(cf, 'utf8'));
-      tests = j.passed || 0;
-      testsFailed = j.failed || 0;
+      // passed 为 0/缺失说明 run-all 没真正跑过，两个数字都算未测量
+      if (j.passed) {
+        tests = j.passed;
+        testsFailed = Number.isFinite(j.failed) ? j.failed : 0;
+      }
     }
-  } catch (_) { /* 无缓存就报 0，调用方需自行判断 */ }
+  } catch (_) { /* 无缓存就是 null，调用方按「未测量」跳过记账 */ }
 
   // 能力守护检查项数：读 data/capability-check-count.json（由 guard-abilities.js
   // 自己写）。本脚本不跑 guard-abilities —— 实测 105s 且会超时，不能进记账链路。
-  let capabilityChecks = 0, capabilityPassed = 0;
+  // [r408] 同样区分 null（未测量）与 0：缓存不存在 / checks 为 0（空壳）都算未测量，
+  // 缓存存在且 checks>0 时 passed 即使是 0 也是合法测量值。
+  let capabilityChecks = null, capabilityPassed = null;
   try {
     const cf = path.join(ROOT, 'data', 'capability-check-count.json');
     if (fs.existsSync(cf)) {
       const j = JSON.parse(fs.readFileSync(cf, 'utf8'));
-      capabilityChecks = j.checks || 0;
-      capabilityPassed = j.passed || 0;
+      if (j.checks) { capabilityChecks = j.checks; capabilityPassed = j.passed; }
     }
   } catch (_) { /* 无缓存则该目标不记账 */ }
 
@@ -169,10 +177,19 @@ const TARGETS = [
   { num: 'modules', re: /(7 domains,\s*)(\d+)(\s+modules\))/, docs: ['README.md', 'SKILL.md'] },
   // ── 维度数（规格表行，横幅由 sync-doc-dimensions.js 负责） ──
   { num: 'dims', re: /(\| Discrimination dimensions \|\s*)(\d+)(\s*\|)/, docs: ['README.md', 'SKILL.md'] },
-  // ── 测试数（规格表行；README 横幅由 finish 的 syncReadmeTestCount 负责） ──
+  // ── 测试数（规格表行 + README 横幅，全部归本脚本；finish ①.5 的
+  //    syncReadmeTestCount 保留为兼容冗余，两者幂等） ──
   { num: 'tests', re: /(\| Test suite \|\s*)([\d,]+)(\s+passing)/, docs: ['README.md', 'SKILL.md'] },
   { num: 'testsFailed', re: /(\| Test suite \|\s*[\d,]+\s+passing\s*\/\s*)(\d+)(\s+failing)/, docs: ['README.md', 'SKILL.md'] },
-  // ── 能力守护检查项数（读 guard-abilities 缓存；无缓存则 num=0 不记账） ──
+  // [r408] README 横幅的 passing tests 也归本脚本管。此前它只由 finish ①.5 的
+  // syncReadmeTestCount 一个函数负责（而 upgrade-engine.js 属升级机制自身、
+  // 不在本轮可改范围），于是同一条测试数有两条记账路径：横幅走 ①.5、
+  // 规格表走本脚本，任一条漏掉就出现「横幅 17,341 / 规格表 17,343」的对半腐化。
+  // 本脚本是全量记账的单一入口，横幅位置必须也在它的 TARGETS 里。
+  // 幂等安全：①.5 先跑过就是已一致，本脚本再跑只会报「已一致」不重复改。
+  { num: 'tests', re: /(×\s*)([\d,]+)(\s+passing tests)/, docs: ['README.md'] },
+  // ── 能力守护检查项数（读 guard-abilities 缓存；未测量 null 不记账，
+  //    但不许把已存在的 20/20 刷成 0/0） ──
   // 两个捕获组各记一个位置：「N / N checks」。两份文档同一形状。
   { num: 'capabilityPassed', re: /(\| Capability guard \|\s*)(\d+)(\s*\/)/, docs: ['README.md', 'SKILL.md'] },
   { num: 'capabilityChecks', re: /(\| Capability guard \|\s*\d+\s*\/\s*)(\d+)(\s*checks)/, docs: ['README.md', 'SKILL.md'] },
@@ -228,10 +245,14 @@ function syncFile(file, want, checkOnly) {
   for (const t of TARGETS) {
     if (!t.docs.includes(file)) continue;
     const target = t.num === 'stamp' ? want.stamp : fmt(want[t.num]);
-    // [r407 防呆] 没有实测缓存的目标（值 = 0/undefined/null）一律不记账：
-    // 把「18 / 18 checks」刷成「0 / 0 checks」比留着旧数字更坏——
-    // 读者会以为能力守护归零了。宁可不改也不猜。
-    if (!want[t.num]) {
+    // [r407 防呆 / r408 修正] **未测量**(null/undefined) 的目标一律不记账：
+    // 把「18 / 18 checks」刷成「0 / 0 checks」比留着旧数字更坏——读者会以为
+    // 能力守护归零了。宁可不改也不猜。
+    // [r408] 但 `0` 是**合法测量值**（r407 用 falsy 判断把两者混同，导致
+    // 「失败数 = 0」这种最常见真实值永远记不上账）。判定条件必须是
+    // `!= null`，不能是 `!want[num]` —— 已实测：r407 版本让 doc-numbers
+    // 从 21/21 掉到 18/21。
+    if (want[t.num] == null) {
       if (new RegExp(t.re).test(out)) {
         skipped.push(t.num);
       }

@@ -90,19 +90,23 @@ function measure() {
   `], { encoding: 'utf8', timeout: 60000 });
   const routes = parseInt((r.stdout || '').trim().split('\n').pop(), 10) || 0;
 
-  // [v6.7.87] 用例数：读 run-all.js 每次跑完写下的 data/test-count.json。
-  // 与 scripts/measure-claimed-numbers.js 保持同一口径。
-  let testCases = 0;
-  let testFailed = 0;
+  // 测试数：读 run-all.js 每次跑完写下的 data/test-count.json。
+  // [v6.7.87] 用例数：与 scripts/measure-claimed-numbers.js 保持同一口径。
+  // [r408] 区分 null（未测量）与 0（合法测量值）—— doc-numbers 的规格表
+  // 断言要精确比对 failing 数，而它最常见的真实值就是 0。
+  let testCases = null;
+  let testFailed = null;
   {
     const cf = path.join(HF, 'data/test-count.json');
     try {
       if (fs.existsSync(cf)) {
         const d = JSON.parse(fs.readFileSync(cf, 'utf8'));
-        testCases = d.passed || 0;
-        testFailed = d.failed || 0;
+        if (d.passed) {
+          testCases = d.passed;
+          testFailed = Number.isFinite(d.failed) ? d.failed : 0;
+        }
       }
-    } catch (_) { /* 无缓存 → 0，下面断言会提示先跑 run-all */ }
+    } catch (_) { /* 无缓存 → null，下方断言按未测量处理 */ }
   }
 
   // [r407] 模块数运行时实测（与 sync-doc-numbers.js / measure-claimed-numbers.js
@@ -117,14 +121,14 @@ function measure() {
   const modules = parseInt((mr.stdout || '').trim().split('\n').pop(), 10) || 0;
 
   // 能力守护检查项数：读 guard-abilities.js 自己落盘的缓存（不跑那 105s 的脚本）
-  let capabilityChecks = 0, capabilityPassed = 0;
+  // [r408] null（未测量）与 0（合法测量值，checks>0 但全挂）区分
+  let capabilityChecks = null, capabilityPassed = null;
   {
     const cf = path.join(HF, 'data/capability-check-count.json');
     try {
       if (fs.existsSync(cf)) {
         const j = JSON.parse(fs.readFileSync(cf, 'utf8'));
-        capabilityChecks = j.checks || 0;
-        capabilityPassed = j.passed || 0;
+        if (j.checks) { capabilityChecks = j.checks; capabilityPassed = j.passed; }
       }
     } catch (_) { /* 无缓存则 capability 断言自己跳过 */ }
   }
@@ -323,16 +327,21 @@ for (const [label, fp] of [['README.md', README], ['SKILL.md', SKILL]]) {
         `${label} 规格表 Discrimination dimensions = ${rows['Discrimination dimensions']}，实测 ${M.dimensions}`);
     }
     // 测试数
+    // [r408] 未测量（null）时跳过比对，但**必须有一条明确提示**——否则
+    // 「没跑过 run-all」会被静默当成「通过」，正是 r407 腐化的同款机制。
     if (rows['Test suite'] !== undefined) {
       const mm = rows['Test suite'].match(/([\d,]+)\s+passing\s*\/\s*(\d+)\s+failing/);
       assert.ok(mm, `${label} 规格表 Test suite 行格式无法解析：${rows['Test suite']}`);
+      if (M.tests == null) {
+        throw new Error(`${label} 规格表 Test suite = ${rows['Test suite']}，但本机没有 data/test-count.json 实测缓存（先跑 node test/run-all.js）`);
+      }
       assert.strictEqual(parseInt(mm[1].replace(/,/g, ''), 10), M.tests,
         `${label} 规格表 Test suite = ${rows['Test suite']}，实测 ${M.tests} passing / ${M.testFailed} failing`);
       assert.strictEqual(parseInt(mm[2], 10), M.testFailed,
         `${label} 规格表 failing = ${mm[2]}，实测 ${M.testFailed}`);
     }
-    // 能力守护项数（无缓存时跳过，不当成失败）
-    if (M.capabilityChecks && rows['Capability guard'] !== undefined) {
+    // 能力守护项数（未测量 null 时跳过，不当成失败；0 是合法测量值要真比）
+    if (M.capabilityChecks != null && rows['Capability guard'] !== undefined) {
       const mm = rows['Capability guard'].match(/(\d+)\s*\/\s*(\d+)\s*checks/);
       if (mm) {
         assert.strictEqual(parseInt(mm[1], 10), M.capabilityPassed,
