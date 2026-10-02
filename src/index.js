@@ -1110,6 +1110,18 @@ function discriminate(text, evidence = [], contentMode) {
       // 只进 dimensions 不进 summary 会让登记守卫漏报，也会让人看不到）
       rh.count ? rh.count + ' 处规避作弊' : '',
     ].filter(Boolean).join('；') || '未发现明显问题',
+    // [v6.7.156 r378] 中间态原始记账（独立于 dimensions 的顶层字段）。
+    // 背景：维度覆盖扫描唯一放过项 multi_turn_escalation 1/2。r377 起的
+    // norm_desensitize_standalone 独立层已能记到层（count=1），但
+    // qualifies=false 不进 finding，而 discriminate() 的 dimensions 里
+    // **没有这个键**——读方一律当"未命中"，扫描器把「已识别但保守不判」
+    // 误报成「完全没识别」，连续多轮当第一优先目标却无从判断差异。
+    // ⚠️ 刻意不进 dimensions：dimensions 的键数就是 doc-numbers-accuracy
+    // 测试的运行时维度口径（r378 实测登记后 57→58，与 AGENTS/README/
+    // SKILL 三份禁改文档冲突）。放顶层字段，扫描器改读这里。
+    dimensionRaw: _multiturn
+      ? { count: _multiturn.count, qualifies: _multiturn.qualifies, ladders: _multiturn.ladders }
+      : null,
   };
 }
 // ═══════════════════════════════════════════════════════════════════════════
