@@ -1,4 +1,108 @@
 
+# 第 381 轮（bulk_export 补英文支，打通英文侧耦合层闸门，2 commits）
+
+## 方向选择
+
+队列待办为空（upgrade-queue 仅 1 条已 done）。未直接沿用 r380 移交的
+三条遗留——先用 decision 实跑选方向（scripts/round-381/probe-2-decide.js）。
+
+首次用纯 prompt 跑两次均返回 chosen:null / confidence:0
+（options_indistinguishable）。读 src/core/decision.js 后发现原因：
+decide 只认结构化 options 字段，candidates 与 prompt 里的补充判据
+全被忽略——第一次传的是 candidates（r374 的写法被抄错），
+第二次在 prompt 里补判据同样无效。第三次改传 options + 结构化分数
+（A 0.85 / B 0.79 / C 0.72）才真正分高下，选中 A。
+
+先复测推翻了简报的描述，这是本轮最重要的发现：
+r380/r379 简报把「capability_probe 英文支 {0,6} 窗口放宽」列为缺口。
+实际位置在 src/multi-turn-tactics.js LADDERS（不在扫描器），
+且 probe-10 实测 4/4 全 rewrite，{0,6} 是 r375 刻意的 span 收窄
+（防止目标宾语被包进 ladder 片段触发名词去重）。该遗留项不存在，已作废。
+真缺口是另一处，见下。
+
+## 复测（不信简报，逐层定位）
+
+scripts/round-381/probe-{1,3,4,5,6,8}.js 逐层诊断：
+
+1. probe-3：EN_ATTACK.sunk_cost 5/5 全 pass，中文同族 qualifies=true。
+2. probe-4：sunk_cost.up 正则对 5 条英文攻击 5/5 命中、良性 17 条
+   0 命中——耦合层正则没坏。但 checkMultiTurnEscalation 对同 5 条
+   返回 predatory:0，闸门没开，耦合层无法激活。
+3. probe-5：英文「升级半 + 索取尾」组合 20/20 qualifies=false，count 恒 1
+   （只有 sensitive_target 一层）。中文对照组 2 层 qualifies=true 直接 rewrite。
+4. 根因：bulk_export 的 re（src/multi-turn-tactics.js 第 373 行）
+   三个分支全是中文词表（导出/下载/拉取/打包 + 数据/记录/名单），
+   英文 send me the customer list 形态命不中任何一个，因此不进
+   PREDATORY 计数（第 670 行集合），gateOpen 为 false，
+   sunk_cost / norm_desensitize 两个耦合层全部失活。
+
+结论：这不是「英文耦合层正则缺失」，是「英文索取层缺位导致闸门不开」。
+若照简报去改 sunk_cost.up 正则，等于在没坏的部件上动刀，且闸门照样不开。
+
+## 改了什么（2 commits）
+
+1. 6ca41cd0 — src/multi-turn-tactics.js bulk_export 的 re 追加英文支：
+   索取动词（dump/pull/grab/export/send/give）+ PII 集合名词
+   （customer/user/employee + list/table/records）。
+   刻意收进 predatory 而不是 sensitive：r93 口径下「名单/表/记录」
+   是合法导出请求的原型句式，test/multi-turn-laundering-round339.test.js
+   D 组 10 条钉住该边界不得进 sensitive；而 laundering 要 sensitive >= 1。
+   新支只补 predatory 计数，两个耦合层的闸门才开，r339 边界不受影响。
+2. 3999db11 — test/bulk-export-en-couple-r381.test.js（7 组守卫：
+   检测/归因/门禁/软宾语/合法导出/中文回归/源码标记）+
+   scripts/negative-test-bulk-export-en-r381.js（4 还原点）。
+
+## probe-9 抓到的坑（写进守卫注释）
+
+删分支必须连同前导 | 一起删：只删分支体会在 re 末尾留下孤立 |，
+JS 把它解析成空分支（匹配空串），bulk_export 恒命中，探测端反而显示
+25/25 qualifies 但 softNonPass=15/15（软宾语全误伤）。即还原点本身
+制造了恒真判据。负例退化判据因此加上 softNonPass 上升一项。
+（这正是 r380 恒真判据的同款机制，换了个形态。）
+
+## 验证结果（全部本轮实跑）
+
+英文组合 qualifies：改前 0/25，改后 25/25（ladders = bulk_export+sunk_cost）
+软宾语 15 条：0 误伤（合法导出不动）
+良性 17 条：0 误伤（1 条 verify 是既有 perfect_error，非本维度）
+中文口径：4/4 仍 qualify，无退化
+负例守卫（4 还原点）：7 / 7（基线全绿 + 删支/删动词/删名词/空词表均变红）
+test/bulk-export-en-couple-r381.test.js：7 / 7
+test/multi-turn-sunk-cost-round93.test.js：13 / 0
+test/multi-turn-laundering-round339.test.js：14 / 0（含「合法导出不进敏感集」10/10、保守边界 2/2）
+test/multi-turn-tactics.test.js：8 / 0
+test/doubt-ppf-negation-r297.test.js：35 / 0（r380 修复维持）
+bin/verify.js：14 / 0
+scripts/bidirectional-guard.js：召回 52/52、误拦 302/326（与基线一致，新增 0）
+test/security-audit.test.js：16 / 16
+test/run-all.js：16676 通过 / 0 失败 / 共 16676（r380 那 17 条失败已全部消失）
+
+## 遗留
+
+1. data/bidirectional-baseline.json 仍建议重刷（decision C 候选 0.72）。
+   r377/r379/r381 连续三轮归因为非本轮引入（换回改动前副本数字一致），
+   当前召回 52/52、误拦 302/326 已达基线，故三轮都未重刷。
+   重刷会让未来真回归失去参照——需人工确认漂移来源后再决断。
+2. pressure 族英文侧（decision B 候选 0.79）：英文 6 条里 4 条 pass，
+   authority_claim / guilt_trip / peer_pressure 三支英文未覆盖。
+3. README 测试数 16658 小于实际 16676：doc-numbers-accuracy 的 1 条 FAIL，
+   记账滞后（本轮新增 2 个测试文件）。README 在禁改清单，
+   由 upgrade-engine finish 自动记账。
+
+## 给下一轮的接手说明
+
+1. decision 的正确调用姿势：decide 只读结构化 options 字段
+   （id,label,feasibility,consequence_value,risk,confidence），
+   candidates 与 prompt 里的自然语言判据都被忽略。prompt 平分会直接
+   返回 options_indistinguishable。r379/r381 两轮都踩过这个坑。
+2. 英文侧缺口排查顺序：先看耦合层 up 正则是否命中（probe-4），
+   再看 predatory 计数是否 >= 1（闸门），最后才动正则。
+   本轮若跳过前两步直接改 sunk_cost.up，会白改。
+3. 负例还原点的删除单位是 |<branch>，不是分支体本身。
+   新支追加在 re 末尾尤其容易触发「孤立 | = 空分支 = 恒真」。
+4. scripts/round-381/probe-*.js 与 scripts/negative-test-bulk-export-en-r381.js
+   保留为复现工具；样本隔离在 scripts/round-374/samples.js。
+
 # 第 379 轮（闭环 dimensionRaw 消费链——扫描器补第三个落点 + 恢复 summary 中间态文案，2 commits）
 
 ## 方向选择
