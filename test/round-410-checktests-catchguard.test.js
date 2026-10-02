@@ -104,5 +104,11 @@ if (clean) { console.log(`  ${GREEN}OK${RESET} 还原自证 :: guard-abilities.j
 else { console.log(`  ${RED}NG${RESET} 还原自证 :: 文件被改动`); }
 
 const total = results.length + 2;
-console.log(`\n${pass === total ? GREEN : RED}结果: ${pass}/${total} 符合预期${RESET}`);
-process.exit(pass === total ? 0 : 1);
+// [r411] 汇总行必须是 run-all.js 能解析的 harness 标准格式
+// 「N 通过, M 失败，共 N 个」。r410 版写的是 `结果: 6/6 符合预期`——
+// 分数式不被 run-all 第 121-135 行的三种正则识别（分数式只认 `N/M passed`），
+// 导致单跑 exit=0 而全量被判「未输出汇总行」，进 run-all 立刻失败。
+const totalChecks = results.length + 2;
+console.log(`\n结果: ${pass} 通过, ${totalChecks - pass} 失败, 共 ${totalChecks} 个`);
+console.log(`${pass === totalChecks ? GREEN : RED}${pass}/${totalChecks} 符合预期${RESET}`);
+process.exit(pass === totalChecks ? 0 : 1);
