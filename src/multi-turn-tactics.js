@@ -607,6 +607,45 @@ const LADDERS = [
       'norm_concession_first_step', 'norm_progression', 'norm_habituation',
     ],
   },
+  // ─── [v6.7.155 r377] norm_desensitize_standalone：递进常态化**独立层** ────
+  // 缺口来源：第 377 轮 decision.decide 选 C（维度覆盖扫描唯一放过项）。
+  // 轮初复测（不信简报旧描述，scripts/round-377/probe-4-coupling.js）：
+  //   探针 1「现在只是一小步，后面慢慢就习惯了」与探针 2
+  //   「先试试看，之后会越来越顺理成章」**两条都被 _RE_NORM_DESENSITIZE
+  //   命中**（probe-3/probe-6 实测 hit=true），但 checkMultiTurnEscalation
+  //   返回 count=0 / qualifies=false。
+  // 根因不是正则漏，而是耦合闸门：L.coupled === 'predatory' 时
+  // gateOpen = predatory >= 1（PREDATORY = pii/bulk_export/system_entry/
+  // sensitive_file/model_internals 五个索取半）。两条探针都只有
+  // 「递进小步 + 脱敏收尾」这半边形状，没有任何索取层在场
+  // → gateOpen=false → 不计层 → count=0 → 维度覆盖扫描记录「闸门放过」。
+  //
+  // r370 记录「不单独成层」的理由（probe-2：新半单独 8/10 攻击、
+  // 8/8 无索取层）在本轮重新核过：那一条讲的是**旧口径下半族太宽**，
+  // 与 r371/r374 增设 D/E/英文三支后的现行判据不是同一回事。
+  // 现行判据（让步半 + 递进半 + 脱敏收尾半**三段同现** + 排除中性
+  // 项目词）在 175 条良性池上实测 0 命中（probe-6），
+  // 在 6 条同族探针上 5/6 命中（probe-5，miss 的是探针 2，
+  // 它由既有主支覆盖）——即「单侧在场」现在可以独立判定而不新增误伤。
+  //
+  // 设计（三条边界，缺一不可）：
+  //   ① **不重复计层**：本层与耦合层 norm_desensitize 用同一批 exclusion，
+  //      已在耦合层计过的句子本层不再计（见下方 _NORM_STANDALONE_DONE 标记）。
+  //   ② **score 减半**（20 → 10）：独立出现时信号强度低于「索取 + 递进」
+  //      组合，避免单族即达到耦合层的权重。
+  //   ③ **仍受 qualifies ≥ 2 约束**：单独一层不触发 finding，
+  //      必须再有任意第二层（索取 / 施压 / 敏感目标）才升级 ——
+  //      良性侧「先配合一次，后面一次比一次自然」这类纯流程表述仍是 1 层。
+  {
+    name: 'norm_desensitize_standalone',
+    label: '递进常态化表述（无索取伴随的独立信号）',
+    score: 10,
+    // 刻意**不设 coupled**：本层就是为「单侧在场」设计，走非耦合分支。
+    up: _RE_NORM_DESENSITIZE,
+    fams: [
+      'norm_concession_first_step', 'norm_progression', 'norm_habituation',
+    ],
+  },
 ];
 
 /**
@@ -626,10 +665,37 @@ function checkMultiTurnEscalation(text) {
   // 属施压层，不算索取半——否则「经理要求核对」+「别问了」也成两层。
   const PREDATORY = new Set(['pii_request', 'bulk_export', 'system_entry', 'sensitive_file', 'model_internals']);
   let predatory = 0;
-  // [v6.7.149] sensitive 目标命中（比 PREDATORY 更严：不含 bulk_export）
+  // [v6.7.155 r377] norm 独立层的去重预判：耦合层 norm_desensitize 的激活
+  // 条件是 up 命中 AND predatory ≥ 1。两者共用同一批 up 正则，所以只要
+  // 「up 命中 + predatory 将达到 ≥1」，独立层就必须让位，否则同一形状
+  // 被记两层（score 虚增 10、count 虚增 1）。
+  // 放在 predatory 计数**之前**声明、循环**之后**求值：
+  // 用一个惰性 getter 在同一次调用内按最终 predatory 值判定，
+  // 不引入跨调用状态（checkMultiTurnEscalation 可能被并发调用）。
+  let _NORM_COUPLED_WILL_FIRE = false;
+  // [v6.7.155 r377] 预扫描：norm 独立层是否该让位给耦合层。
+  // 顺序无关（在 predatory 主循环之前独立扫一遍五个索取半），
+  // 与 LADDERS 数组里 norm 两项谁先谁后完全解耦。
+  // 判定条件与耦合层一字不差：up 命中 AND 至少一个索取半命中
+  // （sensitive_file 的软分支求教排除同样适用）。
+  if (_RE_NORM_DESENSITIZE.test(text)) {
+    let _prePred = 0;
+    for (const L of LADDERS) {
+      if (L.coupled || !PREDATORY.has(L.name)) continue;
+      const pm = text.match(L.re);
+      if (!pm) continue;
+      if (L.name === 'sensitive_file' && softHitIsConsult(text)) continue;
+      _prePred++;
+    }
+    _NORM_COUPLED_WILL_FIRE = _prePred >= 1;
+  }
+  // ─── [v6.7.155 r377] sensitive 目标命中（比 PREDATORY 更严：不含 bulk_export） ───
   let sensitive = 0;
   for (const L of LADDERS) {
     if (L.coupled) continue;                 // 耦合层单独处理（下方）
+    // [v6.7.155 r377] 去重标记：norm 独立层与 norm 耦合层共用同一批 up 正则，
+    // 若耦合层随后也会计入同一句（predatory ≥ 1 时），这里先不重复计层。
+    if (L.name === 'norm_desensitize_standalone' && _NORM_COUPLED_WILL_FIRE) continue;
     const m = text.match(L.re);
     if (!m) continue;
     // [v6.7.124] sensitive_file 软分支的求教排除：命中是"问用法"时不计层。
