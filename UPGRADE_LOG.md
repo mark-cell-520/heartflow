@@ -1,3 +1,152 @@
+# 第 408 轮（修 r407 自引入回归：实测值 0 记不上账 — doc-numbers 21/21 恢复，3 commits）
+
+## 方向选择
+
+init 简报**无队列待办**，r407 遗留清单第 3 条点名的 `capability-check-count.json`
+提交状态问题在轮初已顺便核实（结论见遗留节）。真正的悬着 FAIL 是文档数字账，
+且**比 r407 描述的更严重：r407 自己的记账机制引入了回归**。
+
+decision 引擎实跑三候选（首跑 3 个 0.74 并列，按纪律补可区分判据后重跑）：
+
+```
+[A] 修 sync-doc-numbers「实测值=0 记不上账」（r407 引入的回归：
+    doc-numbers 21/21 → 18/21，3 个 FAIL；修复成本约 6 行）
+[B] 修 guard-abilities 105s 超时（r407 遗留第 2 条，功能正常只是
+    cron 环境不稳定，且 init 体检本身不跑它）
+[C] 零引用模块池接线（5 个模块约 1100 行，单轮做不完）
+```
+
+decision 返回 **chosen = A**（0.82 / B 0.74 / C 0.74，confidence 0.7）。
+
+## 复测：r407 引入的回归真实存在（不是简报里的旧描述）
+
+轮初实测 `doc-numbers-accuracy` = **18/21**，三个 FAIL：
+
+1. `README 测试数 17341 < 实际 17343（宣称少于实际=少报）`——横幅
+2. `README.md 规格表 failing = 2，实测 0`
+3. `SKILL.md 规格表 failing = 2，实测 0`
+
+## 根因：一个 falsy 判断，把最常见的真实值挡在门外
+
+r407 为防「把 18/18 checks 刷成 0/0」加的防呆写的是：
+
+```js
+if (!want[t.num]) { skipped.push(t.num); continue; }   // r407 版
+```
+
+这个判断把**两种完全不同的状态混为一谈**：
+
+| 状态 | 语义 | r407 的处理 |
+|---|---|---|
+| `null` / `undefined` | 缓存不存在，**没量过** | 跳过记账 ✅ |
+| `0` | 量过了，真实值就是 0 | 也跳过记账 ❌ |
+
+而失败数（failing）最常见的真实值**恰恰是 0**。于是规格表的 `failing`
+永远停在历史值 2，每跑一次 run-all 就多报一次红。r407 的 9/9 负例
+没有覆盖这个分支——M5 变异测的是 `747 → 0` 的**总数**方向，
+没有测「失败数是 0 且必须记上账」这个方向。
+
+## 改了什么（3 commits）
+
+**`f6d5665d`** chore(记账)：三个文件同源改判
+
+- `scripts/sync-doc-numbers.js`
+  · `measure()`：test-count / capability 两类缓存从 `x || 0` 改为
+    **null（未测量）vs 数字（含 0，合法测量值）**；passed 缺失时
+    两个数字都算未测量
+  · 防呆条件 `!want[t.num]` → `want[t.num] == null`
+  · **新增 README 横幅 `passing tests` 记账位置**——此前横幅只由
+    finish ①.5 的 `syncReadmeTestCount()` 一个函数管（而
+    upgrade-engine.js 属升级机制自身，本轮不可改），规格表归本脚本。
+    同一条测试数两条记账路径各管一半，任一条漏掉就对半腐化
+    （本轮 3 个 FAIL 里第 1 个正是这个缺口）。本脚本现为全量记账
+    单一入口，与 ①.5 幂等不冲突
+- `test/doc-numbers-accuracy.test.js`：同源改判 null vs 0；规格表
+  Test suite **无实测缓存时显式抛错**（此前静默跳过——「没跑过
+  run-all」会被当成通过，正是 r407 腐化的同款机制）
+- `scripts/measure-claimed-numbers.js`：同源口径统一
+
+**`f83a63a2`** test(守卫)：`scripts/negative-test-doc-numbers-round408.js`，
+4 组变异 + BASE 自证，**5/5 全绿**
+
+| 变异 | 结果 |
+|---|---|
+| BASE 基线自证 | 磁盘=HEAD 干净时 --check 全绿 |
+| M9 规格表 failing 停 2 | 红（**r408 回归本体**） |
+| M10 README 横幅漂移 | 红（新记账位置） |
+| M11 缓存 failed=3 | 文档跟随改成 3（证明 0 是记账写下的真实值，非零也记得上） |
+| M12 无 capability 缓存 | 跳过记账、保持 20/20、rc=0（**r407 防呆未撤**） |
+
+写负例过程中自己抓到并修掉**三个真缺陷**：
+
+1. **`fmt(null)` 崩溃**：防呆判断排在 `fmt()` 之后，未测量的目标会先执行
+   `fmt(null).toLocaleString()` 抛 TypeError，`--check` 直接崩 rc=1
+   而不是「跳过记账」。挪走 capability 缓存即可复现。已改为先拦未测量、
+   再算 target 字符串。
+2. **负例脚本还原不完整**：M11 跑全量 `sync` 会把三份文档全改成
+   failing=3，`finally` 只还原 `m.doc`(README)，SKILL 残留 3 让
+   M12 假红。已改为进出每组都还原**全部**三份文档 + 缓存。
+3. **负例脚本基线被上次污染循环利用**（最隐蔽）：`backups` 一次性读
+   磁盘，若上次运行没还原干净（进程被杀/提前退出），这次读到的就是
+   **污染状态**，M11 期望恒成立。已加开跑自证：磁盘 != git HEAD 就
+   拒绝运行（rc=3）并告知先 `git checkout`。**不用 `git show HEAD:` 当
+   基线**——r407 实测那样会把 commit 时机耦合进测试（记账后未即时
+   commit，HEAD 取到旧值导致 BASE 假红）。判定权交给 git，脚本不猜。
+   实测：污染 SKILL.md → rc=3 拒绝；还原后 → rc=0 5/5。
+
+**`9e43cb91`** docs(记账)：本轮 run-all 首次全绿 **17,349/0**（连预期的
+npm-package-integrity 都过了），sync-doc-numbers 一次跑完自动记上三个
+位置（README 规格表 / README 横幅 / SKILL 规格表），**failing 保持 0**
+——这正是本轮修好后的新能力首次实战。
+
+## 验证结果（7 项）
+
+|| 项 | 结果 |
+|---|---|
+|| `bin/verify.js` | **14/14** |
+|| 双向门禁 | 本轮未碰判别代码，recall/benign 基线不变（r407 记录为召回 52/52、误拦 302/326） |
+|| 记忆层守卫 | 未受影响（本轮未碰记忆引擎） |
+|| doc-numbers-accuracy | **21/21**（r407 后曾掉到 18/21，本轮恢复并高于原值） |
+|| 负例变异 | **5/5 全部符合预期**（含 BASE 自证与 M12 防呆回归） |
+|| security-audit | **16/16** |
+|| `run-all` | **17,349 通过 / 0 失败**，唯一连预期失败都没有 |
+
+## 遗留（下一轮接手）
+
+1. **`guard-abilities` 105s 超时仍未修**（r407 遗留第 2 条，decision 落选项 B）。
+   它的【6】项会跑整个 run-all，cron 环境极不稳定。建议下轮接手，
+   改法：加 `--skip-tests` 或把【6】改成读 `data/test-count.json` 缓存。
+2. `data/capability-check-count.json` **被 .gitignore 排除、未进版本库**
+   （`data/*.json` 通配）。r407 交接簿写「本轮它被提交了」是**推断非实测**，
+   `git ls-files` 证实它不在版本库。当前行为是自洽的（它由
+   guard-abilities 自己写、由 sync-doc-numbers 自己读，两者都在运行时），
+   记账链路不依赖它在 git 里。**结论：不进版本库正确，无需改。**
+   已在负例 M12 里守住「无缓存时不刷 0」这条边界。
+3. 零引用模块池（r407 遗留第 3 条，decision 落选项 C）：
+   `aipay-server`(509)、`agent-pathologies`(202)、`repo-audit`(151)、
+   `heartflow-api-server`(136)、`sleep-wake`(105)。已判死不做：
+   triality-memory（已合并）、layer-bus（自带 DEPRECATED）、
+   `heartflow-mcp-server-blind-spot-breaker`（与已插件化同名 plugin 重复）。
+4. **r407 UPGRADE_LOG 标题写"5 commits"实际 6 个**（r407 自己列出的遗留），
+   本轮未改——UPGRADE_LOG 属历史记录不回改，在此登记备忘。
+5. 工作区仍有约 30 个 `??` 未跟踪探针脚本（`scripts/round-4*/`、
+   `test/round-3*`、`test/_tmp_*` 等），`.gitignore` 已排除
+   `scripts/round-4*/` 故不会误入库，其余是历史遗留无害。
+
+## 给下一轮的接手说明
+
+- **记账链路现在真的闭环了**：run-all 写 `test-count.json` →
+  sync-doc-numbers 读它并同步三处（规格表 + 横幅）→ doc-numbers 21/21 守。
+  若 doc-numbers 报红，先跑 `node scripts/sync-doc-numbers.js --check`，
+  看清是哪个数字漂了，再决定是文档过期（直接跑不带 --check）还是代码回退。
+- **「0」不再是记账盲区**：任何实测值可能为 0 的数字（失败数、越界写入
+  拦截数等）新增记账目标时，`want[num] == null` 才是「未测量」的正确判据，
+  别再用 falsy。这条已写进源码注释，别再退化。
+- 负例脚本有**基线自证**：磁盘 != HEAD 会 rc=3 拒绝。在 cron 里跑之前
+  先 `git status --short | grep -v '^??'` 确认干净，否则先 commit 或
+  `git checkout`。
+- 本轮 3 个 commit 都在本地 `main`，**未 push**（publish 由专用 cron 负责）。
+
 # 第 407 轮（修文档数字记账机制：sync-doc-numbers 接管 10 个数字 + 规格表从无守卫到有守卫，5 commits）
 
 ## 方向选择
