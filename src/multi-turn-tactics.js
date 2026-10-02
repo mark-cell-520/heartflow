@@ -547,7 +547,15 @@ const SENSITIVE_TARGET = [
 // （复合名词后缀不收），此处 ST 侧再由软支的索取动词半把关；
 // 英文只放**凭据专名**（jdbc url / connection string），不放裸 url。
 // probe-4 实测：攻击 6→9/11，手工良性 18 条 + 基准池 175 条零差异。
-  /(?:数据库|服务器|运维|库)[^。]{0,6}(?:连接(?:地址|串|入口)?|入口|jdbc\s+url|connection\s+string)[^。]{0,12}/i,
+// [v6.7.1xx r397] ST[6] 目标侧再补三个英文同族形（connection uri / conn string
+// / database url）并放行 dsn。缺口（r396 probe-3 + r397 probe-9 归因）：
+// zh:soft-db 支落盘后 system_entry 层已成立，但 ST[6] 目标半只认
+// jdbc url / connection string 两形 → dsn / connection uri / database url /
+// conn string 四形的族 system_entry 1 层后仍 qualifies=false。
+// 安全性：ST[6] 是敏感半（score=0），索取动词由软支的 _SE_DEMAND_MID 半边
+// 把关；纯英文句由该软支的中文主体词约束排除（r397 probe-8/9 实测 0/10、
+// 0/5 击穿），不会给英文裸索取族新层。
+  /(?:数据库|服务器|运维|集群|库)[^。]{0,10}(?:连接(?:地址|串|入口|配置)?|入口|jdbc\s+url|connection\s+string|connection\s+uri|conn\s+string|database\s+url|dsn)[^。]{0,12}/i,
   /(?:数据库密码|服务器密码|管理员密码|root ?password|管理员账号)/i,
   // [v6.7.149] 内部配置（E1 族）：「内部配置怎么设的」是 system_entry 软分支的形状，
   // 而 sensitive 半原先不收 → 既成 system_entry 1 层 + laundering 1 层仍 <2。
