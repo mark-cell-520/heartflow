@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-57 discrimination dimensions  ×  11-layer pipeline  ×  137 modules  ×  61 MCP tools
+57 discrimination dimensions  ×  11-layer pipeline  ×  143 modules  ×  61 MCP tools
 ×  1,136 dispatch routes  ×  17,341 passing tests  ×  0 runtime dependencies
 ```
 
@@ -117,7 +117,7 @@ intent-anchor -> rewriter -> error-memory -> self-diagnosis -> output
 The gate aggregates findings from every layer and emits a single action:
 `block` / `rewrite` / `verify` / `pass`.
 
-### Capability domains (7 domains, 137 modules)
+### Capability domains (7 domains, 143 modules)
 
 | Domain | Representative modules |
 |--------|------------------------|
@@ -133,17 +133,17 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.7.69**. Not marketing copy.
+Measured on this repository at **v6.7.124**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
-| Modules registered | 137 |
+| Modules registered | 143 |
 | Module init errors | 0 |
 | Dispatch routes | 1,136 |
-| Discrimination dimensions | 46 |
+| Discrimination dimensions | 57 |
 | MCP tools | 61 |
-| Test suite | 547 passing / 0 failing |
-| Capability guard | 18 / 18 checks |
+| Test suite | 17,341 passing / 2 failing |
+| Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
 
