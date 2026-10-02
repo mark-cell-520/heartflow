@@ -3322,7 +3322,10 @@ const ID_COGSHUT_FRONT_ZH =
 const ID_COGSHUT_BACK_ZH =
   /(?:只管|只须|只需要|只要|照着?|按[^。]{0,8}?(?:做|办|执行|走|跑|来就行)|(?:执行|跑完|做完|完成任务|把步骤?走完|交出来|动手|照我?说的?做))/;
 const ID_COGSHUT_REFUSAL_ZH = /(?:别|不要|不能|不许|不准|切勿|少)(?:按|照|跟|听|执行)/;
-const ID_COGSHUT_FALLBACK_ZH = /(?:再回来|再讨论|回头|再沟通|有问题|再确认|再商量|复核|再核实|欢迎?问)/;
+// 礼貌协商：请你/麻烦/劳驾/能否 → 是请求不是命令，整句豁免
+const ID_COGSHUT_POLITE_ZH = /(?:请你|麻烦你|劳驾|能否|可以请你|麻烦)/;
+// 有回退通道/互相确认：再回来/回来讨论/当面沟通/等…告诉/写(在|到)文档/附件里有
+const ID_COGSHUT_FALLBACK_ZH = /(?:再回来|再讨论|回头|再沟通|有问题|再确认|再商量|复核|再核实|欢迎?问|回来后?|回来讨论|当面沟通|等[^。]{0,12}(?:告诉|通知|说|批|审批)|写(?:在|到)[^。]{0,10}(?:文档|附件|README)|附件里|文档里|我可以另发)/;
 
 // EN 侧：前半 = 否定理解/追问的必要；后半 = just/simply + 执行动词
 const ID_COGSHUT_FRONT_EN =
@@ -3330,7 +3333,8 @@ const ID_COGSHUT_FRONT_EN =
 const ID_COGSHUT_BACK_EN =
   /\b(?:just|simply|merely) (?:execute|run|follow|comply|do|get it done|complete)\b|\bfollow the procedure\b/i;
 const ID_COGSHUT_REFUSAL_EN = /\b(?:don'?t|do not) (?:execute|comply|follow|run)\b/i;
-const ID_COGSHUT_FALLBACK_EN = /\b(?:come back|revisit|happy to explain|i will explain|ask me|feel free to ask)\b/i;
+const ID_COGSHUT_POLITE_EN = /\b(?:could you|would you|can you|may i ask|do you mind|if you don'?t mind)\b/i;
+const ID_COGSHUT_FALLBACK_EN = /\b(?:come back|revisit|happy to explain|i will explain|ask me|feel free to ask|see the doc|check the doc|in the doc|i can send|notes attached|see appendix)\b/i;
 
 function isInfoDeprivationCogShutdown(text, hasChinese) {
   if (!text || typeof text !== 'string') return false;
@@ -3338,6 +3342,8 @@ function isInfoDeprivationCogShutdown(text, hasChinese) {
   if (!front) return false;
   const refusal = hasChinese ? ID_COGSHUT_REFUSAL_ZH.test(text) : ID_COGSHUT_REFUSAL_EN.test(text);
   if (refusal) return false;
+  const polite = hasChinese ? ID_COGSHUT_POLITE_ZH.test(text) : ID_COGSHUT_POLITE_EN.test(text);
+  if (polite) return false;
   const fallback = hasChinese ? ID_COGSHUT_FALLBACK_ZH.test(text) : ID_COGSHUT_FALLBACK_EN.test(text);
   if (fallback) return false;
   return hasChinese ? ID_COGSHUT_BACK_ZH.test(text) : ID_COGSHUT_BACK_EN.test(text);
