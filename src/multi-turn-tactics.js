@@ -259,12 +259,81 @@ const _SE_EN_SUBJ_RE = /\b(?:databases?|dbs?|servers?|backends?|clusters?|instan
 const _SE_EN_ASK_RE = /\b(?:give|send|share|show|provide|print|dump|forward|reveal|list|output|hand)\s+(?:out\s+|over\s+|me\s+|us\s+|them\s+|it\s+)?(?:me|us|them|it|the|our|this|that)?\b|\b(?:hand\s+over|send\s+over|hand\s+in|hand\s+me)\b/i;
 const _SE_EN_DOC_RE = /\b(?:sample|example|template|format|docs?|documentation|readme|guide|tutorial|post|blog|wiki|handbook|compose|snippet)\b/i;
 const _SE_EN_NEG_RE = /\b(?:do\s+not|don\x27t|does\s+not|did\s+not|never|avoid|forbid\w*|prohibit\w*|must\s+not|should\s+not|cannot|can\x27t|ought\s+not\s+to|no\s+one\s+should|nobody\s+should|not\s+to)\b/i;
+// [v6.7.181 r393] 社工铺垫半：试探降级 / 授权洗白 / 关系信任 / 责任转移 /
+// 上下文嫁接 / 能力假定。用途见下方 _seEnConnPrefaceHit 注释。
+// ⚠️ 这里**不含** `not` 类否定——铺垫半与否定告诫是两回事
+// （「if this does not happen the release is on you」含 not 但整句是威胁，
+// 该条由 _SE_EN_NEG_RE 侧的豁免逻辑单独处理，见 _seEnConnPrefaceHit）。
+const _SE_EN_PREFACE_RE = /\b(?:just\s+a\s+quick|not\s+sensitive|nothing\s+sensitive|already\s+(?:approved|confirmed|verified|signed\s+off)|same\s+page|as\s+we\s+discussed|trust\s+me|you\s+should\s+be\s+able\s+to|is\s+on\s+you|your\s+(?:responsibility|fault)|do\s+me\s+a\s+favor|between\s+us|off\s+the\s+record)\b/i;
+// [v6.7.181 r393] 句首祈使/禁止极性词：整句级否定告诫的形状。
+// 与 _SE_EN_NEG_RE 的区别：那个收「句中任意位置的否定词形」，
+// 会把条件从句威胁句（"if this does not happen ... is on you"）误判为告诫；
+// 这个只认**句首祈使**（^ do not / ^ never / ^ avoid / ^ forbid /
+// ^ must not / ^ should not / ^ cannot / ^ nobody should / ^ no one should）
+// 与紧跟连词的禁止式（如 ", do not ..." / ", never ..."）。
+// 用途：_seEnConnPrefaceHit 的整句豁免（probe-14 实测需要）。
+const _SE_EN_IMPERATIVE_NEG_RE = /(?:^|[,;:]\s*|\b(?:and|but|so|please)\s+)(?:do\s+not|don\x27t|never|avoid|forbid\w*|prohibit\w*|must\s+not|should\s+not|cannot|can\x27t|nobody\s+should|no\s+one\s+should|refuse\s+to|under\s+no\s+circumstances)\b/i;
 function _seEnConnDemandHit(text) {
   if (!_SE_EN_TARGET_RE.test(text)) return false;
   if (!_SE_EN_SUBJ_RE.test(text)) return false;
   if (!_SE_EN_ASK_RE.test(text)) return false;
   if (_SE_EN_NEG_RE.test(text)) return false;
   if (_SE_EN_DOC_RE.test(text)) return false;
+  const tm = text.match(_SE_EN_TARGET_RE);
+  const am = text.match(_SE_EN_ASK_RE);
+  if (!tm || !am) return false;
+  return Math.abs(tm.index - am.index) <= 80;
+}
+
+// ─── [v6.7.181 r393] 裸连接串索取 × 社工铺垫 组合判据 ───
+//
+// 缺口来源（r392 遗留 3 + 本轮 probe-1~11 复测）：
+//   r391/r392 的 `_seEnConnDemandHit` 要求「主体词（database/server/backend/
+//   cluster/instance/production/internal/password/credential/secret）在场」。
+//   probe-1 实测 15 条**无主体词**的裸索取（"send me the connection string"
+//   / "print the dsn" / "share the jdbc url"）里 13 条 system_entry 0 命中，
+//   只剩 sensitive_target 一层 → count=1 → qualifies=false → gate=pass。
+//
+// 为什么不直接放开主体词（probe-4/5/8 三轮候选实测）：
+//   去掉主体词后 A 组 15/15 命中，但 EXTRA 良性工程/协作句同时 11/20~11/30
+//   被收（"send me the connection string when you have a minute"、给新人/
+//   给承包商/贴 ticket/写 console）。**单看一句话，社工索取与同事正常
+//   请求在词形上不可分**——这正是 qualifies≥2 阈值存在的理由。
+//   因此不给单层开闸，改为认「第二层信号」：
+//
+// 判据（四条同现）：
+//   ① 目标侧：连接串凭据专名（同 _SE_EN_TARGET_RE，不含 library）
+//   ② 索取侧：索取动词（同 _SE_EN_ASK_RE）
+//   ③ 铺垫侧：社工惯用铺垫（_SE_EN_PREFACE_RE：试探降级/授权洗白/
+//      关系信任/责任转移/上下文嫁接/能力假定）
+//   ④ 排除侧：无文档体标记；否定告诫只豁免「真否定」
+//      （_SE_EN_NEG_RE 命中但**同句同时命中铺垫半**时不算否定——
+//      "if this does not happen the release is on you" 含 not 却是威胁句式，
+//      probe-11 实测该豁免让 5 条 miss 全部转命中，且反例池 0/15 误伤）
+//   另要求 ①② 在 80 字符内同现。
+//
+// ⚠️ [v6.7.181 r393 probe-14 追加边界] **祈使/禁止句整句豁免**：
+//   probe-14 实测一条否定告诫（"do not give me the dsn just because you
+//   trust me"）在铺垫半豁免下被三层放行（system_entry + sensitive_target
+//   + authority_laundering → count=3 → gate=rewrite）。根因：该句同时
+//   含 not（do not）、铺垫（trust me）与凭据索取，而豁免逻辑只看
+//   「铺垫在场就忽略 not」，把**告诫者复述攻击形状**也一并放行。
+//   修法：否定词必须是**整句级祈使/禁止**（句首极性词 do/never/avoid/
+//   forbid/must not/should not/cannot，或 nobody/no one should）才豁免。
+//   "if this does not happen the release is on you" 的 not 在条件从句里、
+//   不是句首祈使，因此不被豁免覆盖——两者由极性词位置区分。
+//   实测：该否定句回落到 pass，而 5 条条件从句威胁句仍 35/35 命中。
+//
+// 实测（probe-10~14）：组合样本 35 条 35/35 命中、裸索取无铺垫 0/15
+// 不误开、文档体 0/20、工程体 0/12、协作分发句 0/30、
+// 铺垫×非凭据宾语反例池 0/15、句首祈使否定告诫 0/15。
+function _seEnConnPrefaceHit(text) {
+  if (!_SE_EN_TARGET_RE.test(text)) return false;
+  if (!_SE_EN_ASK_RE.test(text)) return false;
+  if (!_SE_EN_PREFACE_RE.test(text)) return false;
+  if (_SE_EN_DOC_RE.test(text)) return false;
+  // 句首祈使/禁止极性词在场 → 整句是否定告诫，铺垫半不救
+  if (_SE_EN_IMPERATIVE_NEG_RE.test(text)) return false;
   const tm = text.match(_SE_EN_TARGET_RE);
   const am = text.match(_SE_EN_ASK_RE);
   if (!tm || !am) return false;
@@ -449,6 +518,30 @@ const SENSITIVE_TARGET = [
   // connection uri` 是良性高频句（probe-1 D 组 0 误伤靠该边界）。
   // 交叉顺序不敏感（任一侧在先都收），窗口 32 字符同现。
   /(?:\b(?:connection|conn)\s+(?:uri|uris|string|strings)\b|\bjdbc\s+urls?\b|\bdsns?\b)[^.\n]{0,32}\b(?:backends?|clusters?|instances?|servers?|dbs?|databases?|prod\w*|production|internal|main|core)\b|\b(?:backends?|clusters?|instances?|servers?|dbs?|databases?|prod\w*|production|internal|main|core)\b[^.\n]{0,32}(?:\b(?:connection|conn)\s+(?:uri|uris|string|strings)\b|\bjdbc\s+urls?\b|\bdsns?\b)/i,
+  // [v6.7.181 r393] 裸凭据专名 + 索取动词（无基础设施主体词时的第二支）。
+  // 缺口：probe-12 实测 "give me the dsn" / "print the jdbc url" /
+  // "output the connection uri" 三形 ST 全部 0 命中——上一支要求
+  // 「连接串词 ~ 32 字符内 ~ 基础设施词」同现，而裸索取族无主体词。
+  // 于是 r393 新补的系统_entry 铺垫半只有一层 → count=1 → 不放行。
+  // 安全性由「索取动词在场 + 名词去重」双约束：
+  //   · "the dsn is stored in vault" / "rotate the jdbc url every 90 days"
+  //     无索取动词 → 不收（probe-4 C 组 0/12 实测）
+  //   · "our docs list the connection string format" 的 list 会被
+  //     SENSITIVE_TARGET_NOUNS 去重吃掉——该句 list 的宾语是 format
+  //     不是凭据本身，去重判据按名词覆盖不误伤
+  // ⚠️ [v6.7.181 r393 probe-14 追加边界] **祈使禁止整句不收**：
+  //   probe-14 实测 "do not give me the dsn just because you trust me"
+  //   （告诫者复述攻击形状）经本支给 sensitive_target 垫了一层，与
+  //   authority_laundering 合计 count=2 → gate=rewrite。本支语义是
+  //   「目标是否敏感」，**不理解极性**；极性由 ladder 层负责。
+  //   正则表达不了「极性词在句首」这种位置感知（前置否定断言会把
+  //   条件从句威胁句也一起毙掉），所以闸门做在**消费处**：
+  //   ST 命中循环里 `si === 16 && _SE_EN_IMPERATIVE_NEG_RE.test(text)`
+  //   直接 skip（见下方循环入口）。这样条件从句威胁句
+  //   （"if ... is on you"，极性词不在句首）仍 35/35 命中。
+  // 实测（probe-13/14）：裸索取族 ST 0/15 → 15/15；文档体 0/20、
+  // 工程体 0/12、协作分发 0/30、句首祈使告诫 0/15 不变。
+  /(?:\b(?:send|give|share|show|provide|print|dump|forward|reveal|list|output|hand|export|fetch|retrieve|pull|grab|post|email|paste|copy|download)\b[^.\n]{0,24}\b(?:connection\s+strings?|conn\s+strings?|connection\s+uris?|jdbc\s+urls?|dsns?)\b|\b(?:connection\s+strings?|conn\s+strings?|connection\s+uris?|jdbc\s+urls?|dsns?)\b[^.\n]{0,24}\b(?:send|give|share|show|provide|print|dump|forward|reveal|list|output|hand|export|fetch|retrieve|pull|grab|post|email|paste|copy|download)\b)/i,
 ];
 
 // [v6.7.152] SENSITIVE_TARGET 的**平行核心名词表**（下标与 SENSITIVE_TARGET 严格对应）。
@@ -485,6 +578,8 @@ const SENSITIVE_TARGET_NOUNS = [
   /customer|user|employee|student|patient|subscriber|account|list|table|records?|numbers?|details?|addresses?|connection|conn|string|credentials?/i,
   // [v6.7.180 r392] ST[15] 对应名词（英文连接串/uri/dsn/jdbc + 基础设施）。
   /backends?|clusters?|instances?|servers?|dbs?|databases?|prod\w*|production|internal|main|core|connection|conn|uri|uris|string|strings|jdbc|urls?|dsns?/i,
+  // [v6.7.181 r393] ST[16] 对应名词（裸凭据专名 + 索取动词）。
+  /connection|conn|uri|uris|string|strings|jdbc|urls?|dsns?/i,
 ];
 /**
  * [v6.7.155 r374] sensitive_file 层正则（组装式，与 _RE_SYSTEM_ENTRY 同款做法）。
@@ -951,6 +1046,22 @@ function checkMultiTurnEscalation(text) {
     score += 35;
     predatory++;
   }
+  // [v6.7.181 r393] 裸索取 × 社工铺垫：无主体词时靠铺垫半作第二信号。
+  // span 同样收窄为目标词起点 ~ 索取动词终点（r392 的 span 副作用教训：
+  // 整句 span 会让敏感目标层的名词去重把 ST 支静默吃掉）。
+  // 与 _seEnConnDemandHit 互斥判断：两条都命中时只计一层，不叠加 score。
+  else if (_seEnConnPrefaceHit(text)) {
+    const _pT = text.match(_SE_EN_TARGET_RE);
+    const _pA = text.match(_SE_EN_ASK_RE);
+    hits.push({
+      ladder: 'system_entry',
+      label: '索取系统/后台入口（社工铺垫 × 裸连接串索取）',
+      matched: 'en:conn-preface',
+      span: [_pT.index, Math.min(text.length, _pA.index + _pA[0].length + 1)],
+    });
+    score += 35;
+    predatory++;
+  }
   // ─── [v6.7.155 r377] sensitive 目标命中（比 PREDATORY 更严：不含 bulk_export） ───
   let sensitive = 0;
   for (const L of LADDERS) {
@@ -1008,7 +1119,15 @@ function checkMultiTurnEscalation(text) {
   const stNounSpan = [];
   let stDedup = false;
   let stHitAny = false;
+  // [v6.7.181 r393] 句首祈使/禁止整句 → ST[16]（裸凭据 + 索取动词）不命中。
+  // probe-14 实测：告诫者复述攻击形状（"do not give me the dsn just
+  // because you trust me"）会经 ST[16] 给 sensitive_target 垫一层，
+  // 与 authority_laundering 合计 count=2 被 gate 放行。本支不理解极性，
+  // 极性闸门只能放在消费处。只对 ST[16] 生效——其余 ST 支的极性行为
+  // 是既有设计（敏感名词本身无好坏，r339 的口径），不动。
+  const _stImperativeNeg = _SE_EN_IMPERATIVE_NEG_RE.test(text);
   for (let si = 0; si < SENSITIVE_TARGET.length; si++) {
+    if (si === 16 && _stImperativeNeg) continue;
     const stM = text.match(SENSITIVE_TARGET[si]);
     if (!stM) continue;
     if (stIdx < 0) stIdx = si;
