@@ -111,9 +111,25 @@ for (const s of negativesNormal) if (ppf(s)) { negHit++; badOnes.push(s); }
 // 注：「这不是某个人的错，是系统设计本身有缺陷」在 r296 基线（ac9c1ec1）上
 // 就已命中 pseudo_profundity（probe-297-11 worktree 差分验证），属历史族误伤，
 // 非本轮新族引入，故不据此判本轮失败；单独记账留给下一轮。
-const knownLegacy = badOnes.filter(s => s.indexOf('某个人的错') !== -1);
+// [v6.7.125+4 第 380 轮] 该记账已过期：修正 ppf() 判据（只读 findings）后
+// 重测 0/15 误伤，历史误伤条目消失，记账注释同步作废。
+const knownLegacy = [];
 const newFalsePositive = negHit - knownLegacy.length;
 ok(newFalsePositive === 0, '负例不误伤：常规工程/商业真句新增误伤 0（历史误伤 ' + knownLegacy.length + ' 条另行记账）');
+
+// ── ⑥ 源码标记在位：判据被删/改名时本守卫必须知道 ──
+// [v6.7.125+4 第 380 轮] 原先只有运行时断言，缺「判据字面量还在 src 里吗」。
+// r296 守卫已有同类标记，此处补齐（与 r296 的 MARK 同族不同式：本条守前置否定族）。
+const fs = require('fs');
+const SRC_PATH = path.join(__dirname, '..', 'src', 'index.js');
+const SRC = fs.readFileSync(SRC_PATH, 'utf8');
+// 判据本体（含 Unicode 转义形态），两种写法任一在位即算通过。
+const MARKS = [
+  '不在[^。！？\\n]{1,16}[，,。；;][^。！？\\n]{0,12}(?:而)?是?在(?:于)?[^。！？\\n]{0,24}(?:维度|层次|境界|高度)',
+  '(?:问题|瓶颈|根源|关键)[^。！？',
+];
+ok(MARKS.some(m => SRC.includes(m)),
+   '源码标记在位：PSEUDO_PHILOSOPHY_ZH 前置否定族判据仍在 src/index.js');
 
 console.log('\n' + pass + ' 通过, ' + fail + ' 失败');
 assert.strictEqual(fail, 0, 'doubt-ppf-negation-r297: ' + fail + ' 个断言失败');
