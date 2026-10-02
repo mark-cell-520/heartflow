@@ -2793,10 +2793,35 @@ const SOFT_DEFLECTION_ZH = [
   /(?:我)?(?:可能|也许|或许)?错(了)?[^。]{0,20}?但[^。]{0,30}?(?:数据|证据|结果|事实|确实|清楚地|表明|显示|证明)/,
   /(?:我)?(?:可能|也许)?判断(错|有误|不准)[^。]{0,15}?(?:，|。|\s)?但[^。]{0,30}?(?:数据|证据|结果|实际|确实)/,
 ];
+// ─── [v6.7.156 第 372 轮] 软话术「模糊副词 × 结论悬置」族 ────────────────
+// 轮初实测（scripts/round-372/probe-11~14）：维度覆盖扫描报 soft_deflection
+// 探针归因命中 0/2。根因不是 gate 拦不住（两条探针 action=verify/rewrite
+// 早已达成），而是 **归因错位**——findings.push 时该族无判据在场，
+// dimension 落给了 vagueness / confidence，维度自报恒为 0 命中。
+// 与本维度既有 5 支的差别：既有族收「先让步后立论」（当然可能错但…），
+// 本族收「模糊副词 + 结论悬置」（某种程度上 / 也不太一定 / 不好说）——
+// 形状是**不给结论**，不是**给了软化结论**。
+// 判据形状（逐支单条命中即可，因为每条本身已含两半）：
+//   H1/H2 = 模糊副词（某种程度上/某种意义上/这事要看）× 悬置结论（要看情况/
+//          不好说/难说/取决于）
+//   H3    = 悬置式收尾（句尾也不太一定/不好下定论/很难下结论）
+//   H4    = 可能副词 × 弱确定否定（不太一定/不太好说清楚）
+//   H5    = 双弱化堆叠（不太/不敢说 + 一定/确定）
+// 反向护栏（probe-12/13 实测）：**不带语气词通道**的宽式（「这个问题/那种
+// 情况 + 悬置」）会吃良性技术长文第 102 条（微服务调用链在讲「首先是
+// 服务之间的调用…」）。因此 H1 的模糊副词必须显式在场，不接受「这个+问题」
+// 泛化。全池 326 条实测 0 误伤（probe-14）。
+const SOFT_DEFLECTION_HEDGE_ZH = [
+  /(?:某种程度上|某种意义[上之]?|怎么说[呢吧]|这事[儿情]|要看)[^。\n]{0,12}(?:要看|不好说|不好定论|难说|没法说|说不好|取决于|不一定)/,
+  /(?:某种程度上|某种意义[上之]?)[^。\n]{0,20}(?:要看情况|取决于|看具体|视具体)/,
+  /[，,。]?\s*(?:也不太一定|不太好说|不好下定论|很难下结论|无法下结论|不好定论)/,
+  /(?:或许|也许|大概|可能)[^。\n]{0,18}不太?(?:一定|确定|好说|清楚|明朗)/,
+  /(?:不太|不很|不敢说)[^。\n]{0,8}(?:一定|确定)/,
+];
 function checkSoftDeflection(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
-  const patterns = hasChinese ? SOFT_DEFLECTION_ZH : SOFT_DEFLECTION_EN;
+  const patterns = hasChinese ? SOFT_DEFLECTION_ZH.concat(SOFT_DEFLECTION_HEDGE_ZH) : SOFT_DEFLECTION_EN;
   const hits = [];
   for (const pat of patterns) { const m = text.match(pat); if (m) hits.push(m[0].slice(0, 50)); }
   const count = hits.length;
