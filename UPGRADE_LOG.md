@@ -1,4 +1,96 @@
 
+# 第 388 轮（中文量小让步形态 + system_entry 连接串索取形状，2 commits）
+
+## 方向选择
+
+队列待办为空。上一轮 r387 遗留第 1 项是唯一可直接接手的真缺口：
+守卫测试中文侧 `cnHit=5/7` 挂着一条断言失败。decision 结构化选向
+实跑（scripts/round-388/probe-0-decide.js）三候选：
+
+- [A] 补中文让步半「小+头」量小形态（缺口面已 probe-7 定位到唯一失配段）
+- [B] 补 system_entry 连接串索取形状（probe-10 实测 c4 在 PREDATORY
+  五层全部 0 命中，只剩 sensitive_target）
+- [C] 降阈值接受 5/7（放弃缺口）
+
+结果 A 0.77 / B 0.74 / C 0.74 —— **A、B 都是真缺口且 B 比 C 只差 0.03**，
+本轮两个都做（同一耦合层两侧，属一个方向）。
+
+## 复测（不信简报，probe-1~15 逐层坐实）
+
+- probe-1：守卫测试 7 条中文样本逐条跑 → 5 hit / 2 miss（c4、c6）
+- probe-2：分半诊断 c6 —— 让步半段正则**能**匹配「本次先开个小头」到
+  「之后再放」，但模块 L.up 却 false。反向追出 zh-only 重建正则 true /
+  L.up false 的假象，最终 probe-7 逐段重建定位：**动作词表没有「小头」形态**
+- probe-3~9：耦合循环逐层复刻，排除 norm_desensitize 让位、
+  lastIndex 状态、排除段误触三个假设
+- probe-10：c4（「交出数据库连接串」）在 PREDATORY 五层全部 0 命中，
+  良性「连接串怎么配」3 条也 0 —— **缺口真实且误伤侧干净**
+- probe-13：n2（「交出生产库的连接串」）仍不命中，根因是 _SE_DB
+  主体词只有 数据库|服务器|运维，缺裸「库」
+- probe-14：裸「库」变异实测 7 条良性工程语境句前后全 false，
+  3 条攻击形状全转 true —— 安全性由 _SE_SOFT_DB 索取动词侧约束
+- probe-15：⑦ 负例 red=3/4 归因 —— n3 靠旧目标词「地址」仍命中，
+  不能进负向分母
+
+## 改了什么（2 commits）
+
+1. `c857184c` — src/multi-turn-tactics.js 两处补词：
+   - `norm_escalation_step` 中文让步半动作词表补 开个?小头/开个?小口子/
+     开条?小缝/起个?小头/起个?小步/头一?步（6 个新形态）
+   - `_SE_DB` 目标词补 连接串/连接地址/连接入口，主体词补裸「库」
+2. `380a3e6e` — 守卫 test/round-388-norm-concession-small-and-connstr.test.js
+   30 断言（结构 8 / 行为 7 / 误伤 9 / 去重 2 / 双负例 4），
+   三个独立变异靶子全部实测能红
+
+## 验证结果（全部本轮实跑）
+
+- r387 守卫回归：**41/1 失败 → 42/0 全绿**（A 修复直接解决上一轮遗留）
+- 攻击组合：量小让步 6/6、连接串索取 4/4、裸库索取 2/2 全 qualifies
+- 误伤：良性连接串问用法 5 条 predatory=0、无索取层 4 条零激活、
+  中性项目词排除 2 条、良性池 multi_turn_escalation 零命中
+- 负例闭环：三个变异靶子（量小段永假 / 目标词移除 / 裸库移除）全部实测变红
+- gate 层：C4 原句 pass→rewrite
+- `bin/verify.js`：**14/0**
+- `scripts/bidirectional-guard.js`：召回 **52/52**、误拦 **302/326**
+  （与 r384~r387 基线完全一致，新增 0）
+- `test/security-audit.test.js`：**16/0**
+- `test/doc-numbers-accuracy.test.js`：**15/0**
+- `node test/run-all.js`：后台 proc_7eab2feb24c6 运行中（写簿时），
+  日志 /tmp/r388-runall.log，以 RUNALL_EXIT 复核
+
+## 踩坑记录
+
+1. **patch 反斜杠层数坑复现**（r387 记录过）：首次 patch `'[^。\\\\n]...'`
+   被 escape-drift 检测拦下。正确做法：先 read_file 看磁盘实际层数
+   （源码里是 `\\\\n` 四字符），再按磁盘层数构造。
+2. **负例靶子必须「只依赖新补词」**：probe-15 实测 n3 靠旧目标词
+   「地址」就命中，移除新补词后它仍 qualifies。负向分母必须切片到
+   真正只依赖新词的样本，否则 red 达不到 100% 而误判守卫失效。
+3. 变异靶子打在**判据**上不打层名（r377/r386 教训沿用，本轮实测仍有效）。
+
+## 遗留
+
+1. run-all 全量结果本轮未收尾（后台在跑），finish 前以
+   /tmp/r388-runall.log 的 RUNALL_EXIT 复核；若失败需定位到具体条目。
+2. git 卫生：scripts/round-2xx/3xx/387/388 大量未跟踪探针未清；
+   src/_mtt_neg_probe2.js（60KB）与 scripts/round-531-dummy（0 字节）
+   来源仍待确认。decision 历轮都给清理项打低分，暂不动。
+3. system_entry 英文侧连接串（connection string）尚未补，中文侧已通。
+   英文支形状留后续。
+
+## 给下一轮的接手说明
+
+- 新词还原点：src/multi-turn-tactics.js 搜 `[v6.7.172 r388]`（两处注释 +
+  两处正则）。守卫 test/round-388-norm-concession-small-and-connstr.test.js
+  的 ⑥/⑦/⑦b 三段会在对应补词被移除后变红。
+- c4 样本（上一轮守卫测试挂着的那条）现已 qualifies=true / gate=rewrite，
+  r387 守卫 `cnHit>=6` 已 7/7 通过 —— 若下一轮要动中文让步半动作词表，
+  先跑 test/round-387-norm-escalation-concession.test.js 与
+  test/round-388-norm-concession-small-and-connstr.test.js 双守卫。
+- 英文侧连接串缺口（_SE_DB 英文目标词）是可接手的下一个真缺口，
+  probe-10 同类测法可直接复用（scripts/round-388/probe-10-connstr.js）。
+
+
 # 第 386 轮（multi_turn_escalation 递进式扩大两段式耦合层，2 commits）
 
 ## 方向选择
