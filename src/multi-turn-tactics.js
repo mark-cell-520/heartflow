@@ -165,10 +165,17 @@ const _RE_NORM_ESCALATION_STEP = new RegExp([
   // ③ 中性项目词排除（与 norm_desensitize 同一批口径）
   '(?![^.。\\n]{0,30}(?:迭代|反馈|灰度|评审|排期|开发|文档|需求|试点|推广|全量|审批|批准|验收|试运行|上线|生产环境|按计划|流程|方案|计划|规范|标准|制度|指南))',
   '|',
-  // [r386] 英文侧同构支（probe-4 实测让步半 5/5 不命中，无 first/to start 形态）
-  '\\b(?:first|first\\s+of\\s+all|step\\s+one|phase\\s+one|to\\s+(?:start|begin)(?:\\s+with)?|(?:start|begin)\\s+with|for\\s+now|initially|at\\s+first|try\\s+(?:this|it))\\b',
+  // [v6.7.171 r387] 英文侧让步半补词（probe-2 逐词实测 98/140 miss 归因）：
+  //   try 裸祈使（"try, and later…"）、give (it/this) a try、let us/me/let's、
+  //   (just) do this (one small) thing/task/step/part/bit、go ahead、
+  //   go along with、(just|only) this once、裸 start/begin（原只认 with/from）。
+  // 只碰本层 up，不动 norm_desensitize 的三半同现判据（r370-386 四轮钉住的
+  // 误伤边界）。
+  '\\b(?:first|first\\s+of\\s+all|step\\s+one|phase\\s+one|to\\s+(?:start|begin)(?:\\s+with)?|(?:start|begin)(?:\\s+(?:with|from|by))?|for\\s+now|initially|at\\s+first|try(?:\\s+(?:this|it|it\\s+out))?|give\\s+(?:it|this|that)\\s+a\\s+try|let\\s+(?:us|me)|let\\x27s|(?:just\\s+)?do\\s+(?:this|that)(?:\\s+one)?(?:\\s+(?:small|little|tiny))?\\s+(?:thing|task|step|part|bit)|go\\s+ahead|go\\s+along\\s+with|(?:just|only)\\s+this\\s+once)\\b',
   '[^.]{0,110}',
-  '\\b(?:then|after\\s+that|afterwards|next\\s+step|next\\s+phase|phase\\s+two|step\\s+two|once\\s+(?:that\\s+is|accepted|approved)|later|eventually|gradually|increasingly|step\\s+by\\s+step|bit\\s+by\\s+bit|scale\\s+up|expand|expand\\s+to|widen|escalate)\\b',
+  // [v6.7.171 r387] 递进半补 tomorrow / the next day / next week / next time /
+  // move on —— probe-1 A5 原句根因：让步半补全后仍卡在 tomorrow 不在递进词表。
+  '\\b(?:then|after\\s+that|afterwards|next\\s+step|next\\s+phase|phase\\s+two|step\\s+two|tomorrow|the\\s+next\\s+day|next\\s+week|next\\s+time|move\\s+on|once\\s+(?:that\\s+is|accepted|approved)|later|eventually|gradually|increasingly|step\\s+by\\s+step|bit\\s+by\\s+bit|scale\\s+up|expand|expand\\s+to|widen|escalate)\\b',
   // 英文侧中性项目词排除（与中文侧同口径）
   '(?![^.]{0,60}(?:plan|plans|planning|roadmap|milestone|sprint|backlog|requirement|spec|iteration|schedule|timeline|deadline|standup|retro|demo))',
 ].join(''), 'i');
