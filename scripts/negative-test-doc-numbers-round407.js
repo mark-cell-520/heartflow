@@ -23,11 +23,11 @@ const DOCS = ['AGENTS.md', 'README.md', 'SKILL.md'];
 
 const RED = '\x1b[31m', GREEN = '\x1b[32m', YELLOW = '\x1b[33m', RESET = '\x1b[0m';
 
-/** 从 git HEAD 现取干净基线（不是读磁盘——磁盘可能已被上一轮改过） */
+/** 备份当前磁盘状态（记账脚本的职责是让磁盘=实测；基线就用当前状态，
+ *  不用 git show HEAD: —— 那会把 commit 时机耦合进测试，r407 实测：
+ *  记账后未及时 commit，HEAD 取到旧值导致 BASE 假红）。 */
 function cleanFromGit(file) {
-  const r = cp.spawnSync('git', ['show', `HEAD:${file}`], { cwd: ROOT, encoding: 'utf8' });
-  if (r.status !== 0) throw new Error(`git show HEAD:${file} 失败：${r.stderr}`);
-  return r.stdout;
+  return fs.readFileSync(path.join(ROOT, file), 'utf8');
 }
 
 // 每组变异 = 改哪份文档的哪段文本；跑 --check 后必须报红
@@ -144,7 +144,7 @@ async function main() {
         const r = runCheck();
         // 关键断言：无缓存时文档必须保持 20/20（不是被刷成 0/0），
         // 且 --check 不该因为 capability 目标报红（跳过 ≠ 失败）
-        const after = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
+        const after = fs.readFileSync(path.join(ROOT, m.doc), 'utf8');
         const keptTwenty = /Capability guard \| 20 \/ 20 checks \|/.test(after);
         const notZeroed = !/Capability guard \| 0 \/ 0 checks \|/.test(after);
         const ok = keptTwenty && notZeroed && r.rc === 0;
@@ -152,8 +152,9 @@ async function main() {
         if (hidden) fs.renameSync(cachePath + '.r407-hidden', cachePath);
         results.push({
           key: m.key, ok,
-          note: ok ? '无缓存 → 跳过记账，文档 20/20 原样保留' : `无缓存时行为异常：文档=${after.match(/\| Capability guard[^\n]*/)?.[0]} rc=${r.rc}`,
+          note: ok ? '无缓存 → 跳过记账，文档 20/20 原样保留' : `无缓存时行为异常：文档=${after.match(/\| Capability guard[^\n]*/)?.[0]} rc=${r.rc} out=${r.out.slice(0, 200).replace(/\n/g, ' | ')}`,
         });
+        fs.writeFileSync(path.join(ROOT, m.doc), backups.get(m.doc));
         continue;
       }
 
@@ -171,6 +172,10 @@ async function main() {
         key: m.key, ok, mentioned,
         note: ok ? `红（${m.to.trim().slice(0, 32)}）` : `未变红 rc=${r.rc} out=${r.out.slice(0, 160).replace(/\n/g, ' | ')}`,
       });
+      // [r407 修复] 每组跑完立刻还原该文档 —— 否则变异会累积到下一组
+      // （M7 把 SKILL 改成 18/18 不还原，M8 的 --check 就因 M7 的残留报红，
+      // 于是 M8 假红）。变异必须一次只污染一处。
+      fs.writeFileSync(path.join(ROOT, m.doc), backups.get(m.doc));
     }
   } finally {
     // 字节级还原
