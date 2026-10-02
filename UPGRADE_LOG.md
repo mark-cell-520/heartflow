@@ -1,3 +1,136 @@
+# 第 407 轮（修文档数字记账机制：sync-doc-numbers 接管 10 个数字 + 规格表从无守卫到有守卫，5 commits）
+
+## 方向选择
+
+init 简报无队列待办，上一轮（r406）遗留清单第一条就是明确的真缺口：
+**README/AGENTS.md 路由数账不平**（声称 1,865，实测 1,136，是唯一悬着 FAIL）。
+但硬边界「不写三份文档」让 LLM 只能改代码不能改文档，所以仍按 r314/r286 的
+既定路线跑 decision 引擎选方向（3 候选：A 数字账 / B 备份集中 / C 零引用接线）：
+
+```
+[A] 修文档数字账：sync-doc-numbers 重记账（实测路由 1136 vs 声称 1865，
+    doc-numbers 13通过/2失败是唯一悬着 FAIL；另发现 modules 实 143 文档
+    写 137 且无任何守护）
+[B] 备份集中管理（scratch 24h 清理会吃掉事故备份）
+[C] 零引用模块池接线（5 个模块）
+```
+
+decision 返回 **chosen = A**（composite 0.75 / B 0.74 / C 0.74，confidence 0.7）。
+
+## 复测：1,136 是真实值，不是测量口径变化
+
+r406 交接担心「差距 729 偏大，先确认是路由真降了还是口径变了」。复测结论：
+**路由真的降了**。`git show 97b4a158`（r402）的 commit message 与
+`src/core/engine-dispatcher.js` 当前实现互相印证：r402 把
+generateAllowedRoutes 从「只扫原型方法」改成「原型 + own 方法并集，
+显式剔除 Object.prototype 噪声」，于是每个模块原先那 11 条
+hasOwnProperty/valueOf 之类噪声路由不再计入 —— 1,865 里有大量假路由。
+`scripts/measure-claimed-numbers.js` 实跑（后台 60s）确认 1,136。
+
+所以不存在「改代码把路由修回去」这一说：1,865 本身是虚高，1,136 才是真相。
+文档该迁就真相。
+
+## 关键发现：记账脚本存在 5 轮，但从来没人调用
+
+路由数从 1,865 掉到 1,136 是 r402 的事，此后 5 轮 `doc-numbers-accuracy`
+每轮报 2 个 FAIL，但 `scripts/sync-doc-numbers.js` 一次都没跑过 ——
+`scripts/upgrade-engine.js` 的 finish 只自动同步 README 测试数
+（syncReadmeTestCount），路由/工具数的记账脚本纯靠人手动跑。
+**机器能判定的记账，缺的是触发点，不是脚本。**
+
+第二个发现更严重：README/SKILL 的「Verified metrics」规格表
+**整块没有任何断言守护**，从 v6.7.69 起就没更新过：
+modules 137（实 143）/ dimensions 46（实 57）/ tests 547（实 17,341）/
+SKILL 的 action-tier 计数 5/7/24（实 10/10/26）/ capability 18/18（实 20）/
+口径版本戳停在 v6.7.69。腐化了 40+ 个版本号无人发现，因为 doc-numbers
+守卫只查横幅和 AGENTS 维度章节，没人看规格表。
+
+## 改了什么（5 commits）
+
+**`e49b4f89`** docs(记账)：sync-doc-numbers 重记账路由 1,865 → 1,136（三份文档 5 处）
+
+**`33c575c5`** feat(记账)：三个文件
+- `scripts/sync-doc-numbers.js` — 记账范围从 2 个数字扩到 **10 个**
+  （tools/routes/modules/dims/block/rewrite/verify/tests/testsFailed/
+  capability×2/stamp）。measure 改成**一次子进程同时量**工具/路由/模块/维度
+  （共享 4 秒 start() 成本），capability 与测试数走缓存文件口径。
+  新增**防呆**：`want[num]` 为空/0 的目标一律跳过记账——不许把「18/18 checks」
+  刷成「0/0 checks」（那比留着旧数字更坏，读者会以为能力守护归零）。
+- `scripts/guard-abilities.js` — 全绿时落盘 `data/capability-check-count.json`
+  （checks/passed/measuredAt）。该脚本实测 105s 会超时，绝不能进记账链路重跑，
+  所以让它把自己知道的结果数写出来供记账读。
+- `test/doc-numbers-accuracy.test.js` — 补 6 条断言（AGENTS 横幅 modules +
+  README/SKILL 规格表四个数字字段 + 两份口径版本戳 + SKILL action-tier 计数），
+  把「规格表无守卫」变成有守卫。断言 15 → 21。
+
+**`52ad9154`** docs(记账)：Capability guard 18/18 → 20/20（新缓存口径的第一次实测）
+
+**`dbe7b1d1`** chore：落盘 AGENTS.md modules 137→143 + finish 内联全量记账
+- `scripts/upgrade-engine.js` — finish 新增 ①.6 步：**每轮自动跑**
+  sync-doc-numbers.js 记账（此前脚本躺着没人调，这是本轮修的根因）。
+  顺序刻意是「先记账 → auto-commit → 再检查」，否则检查读到旧数字。
+
+**`d7190a30`** test(守卫)：`scripts/negative-test-doc-numbers-round407.js`
+8 组变异 + BASE 基线自证 + M8 防呆回归，**9/9 全绿**。
+
+## 负例守卫：9/9，每项着陆点与预期一一对应
+
+| 变异 | 红项 |
+|---|---|
+| BASE 基线自证 | 干净文档必须 --check 全绿（否则后面"变红"都不可信） |
+| M1 路由数改小 | routes |
+| M2 模块数回退 | modules |
+| M3 规格表维度数回退成 46 | dims |
+| M4 SKILL tier 计数回退成 5 | block |
+| M5 规格表测试数回退成 547 | tests |
+| M6 口径版本戳回退 | stamp |
+| M7 capability 回退成 18/18 | capabilityPassed |
+| M8 挪走 capability 缓存 | 防呆：不许刷成 0/0，须跳过并保持 20/20 |
+
+写负例过程中自己抓到两个脚本缺陷并修正（都在本脚本内，不影响引擎）：
+① 原用 `git show HEAD:` 取基线，把 commit 时机耦合进测试——r407 实测
+   记账后未即时 commit，HEAD 取到旧值导致 BASE 假红。改为备份当前磁盘状态。
+② 变异不还原会累积到下一组（M7 改 SKILL 不还原 → M8 的 --check 因 M7
+   残留报红 → M8 假红）。改为每组跑完立即还原该文档。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `bin/verify.js` | 14/14 |
+| 双向门禁 | 召回 52/52、误拦 302/326（卡基线，零新增误伤） |
+| 记忆层守卫 | 未受影响（本轮未碰记忆引擎） |
+| doc-numbers-accuracy | **21/21**（原 15，新增 6 条规格表断言） |
+| 负例变异 | **9/9 全部变红**（含 BASE 自证与 M8 防呆） |
+| security-audit | 16/16 |
+| run-all | 见下方补记 |
+
+## 遗留（下一轮接手）
+
+1. **`data/capability-check-count.json` 是新产生的运行时文件**，需确认它是否该进
+   版本库（`data/` 目前被 npm `files` 白名单排除，且 `.gitignore` 未排除它）。
+   本轮它作为记账必需缓存被提交了，下轮评估是否改放 `data/cache/`。
+2. **guard-abilities 实测 105s 且 rc=124 超时**（`timeout 100` 下）。它的
+   【6】全量回归测试会跑整个 run-all，在 cron 环境极不稳定。建议下轮给
+   guard-abilities 加 `--skip-tests` 或把【6】改成读 test-count.json 缓存。
+3. 零引用模块池（r401/r402 扫描，decision 的落选项）：
+   `aipay-server`(509)、`agent-pathologies`(202)、`repo-audit`(151)、
+   `heartflow-api-server`(136)、`sleep-wake`(105)。已判死不做：
+   triality-memory（已合并）、layer-bus（自带 DEPRECATED）、
+   heartflow-mcp-server-blind-spot-breaker（与已插件化同名 plugin 重复）。
+4. `EXPORT_PATH` 常量仍是孤儿（r406 遗留，`DATA_DIR` 仍被 .user-consent 用，不能删）。
+5. `data/meaningful-memory.json` 备份仍散落 scratch（r405/r406 遗留）。
+
+## 给下一轮的接手说明
+
+- **数字记账从此不用手动跑**：finish ①.6 会自动同步 10 个数字。若 doc-numbers
+  报红，先跑 `node scripts/sync-doc-numbers.js --check` 看清是哪个数字漂了，
+  再决定是文档过期（直接跑不带 --check 记账）还是真有代码回退。
+- **先跑 `node test/doc-numbers-accuracy.test.js`**（21 断言，比 run-all 快得多），
+  它现在连规格表一起守。
+- guard-abilities 别在 cron 里裸跑（105s 超时），要跑就 `--skip-tests` 或后台。
+- 本轮 6 个 commit 已推送 heartflow/main，工作区除 upgrade-state.json 外干净。
+
 # 第 406 轮（修记忆引擎导出路径忽略 rootPath 的隔离失效 + 收口 r405 遗留，2 commits）
 
 ## 方向选择
