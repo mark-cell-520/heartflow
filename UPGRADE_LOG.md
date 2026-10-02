@@ -1,4 +1,100 @@
 
+# 第 379 轮（闭环 dimensionRaw 消费链——扫描器补第三个落点 + 恢复 summary 中间态文案，2 commits）
+
+## 方向选择
+
+简报优先级队列为空（upgrade-queue 仅 1 条已 done）。上一轮（r378）移交的
+第一项是「未提交的 dimensionRaw 改动 + r378 测试红态必须同步」，本轮即从
+「上一轮遗留的真缺口」这一优先级入手，**未**重新跑 decision 选新方向。
+
+（首次跑 `HeartFlowDecision.decide` 4 候选返回 `chosen: null / confidence: 0`
+——A/B/C/D 分拉平；补判据（红态/已验证/改动面/风险）后第二次跑选中 D
+「重刷双向基线」0.78。**没有盲从这个结果**：D 是维护项且会掩盖 A 引入的
+漂移，而 A 对应 run-all 必红的 5/7 失败测试，按铁律优先修。D 的漂移问题
+以「改动前后实际对照」方式在本轮证明，见验证节。）
+
+## 复测（不信简报，自己再跑）
+
+`scripts/round-379/probe-1-dimraw-path.js` 实测，简报没说的关键事实：
+
+1. **引擎侧已经记对了**：`discriminate().dimensionRaw` =
+   `{count:1, qualifies:false, ladders:[norm_desensitize_standalone]}`，
+   `pipeline` 也透传成功（`r.data.discriminate.dimensionRaw` 可读）。
+2. **但零读方消费**：扫描器只读 `dimensions`（57 键里无 mte 键），
+   `dimensionRaw` 没有任何代码读它 → r378 交付的 held 档**全程空转**。
+3. **r378 测试 5/7 红态**（不是简报猜的「全部红」）：
+   `探针库`、`gate 判定不变` 2 条绿；读原始记账、summary 文案、良性 count、
+   qualifies=true 4 条红。根因是测试仍读被 revert 的 `dimensions.multi_turn_escalation`。
+4. **revert 时连带丢了 summary 中间态文案**（`N 处多轮累积(未达闸门阈值)`），
+   该文案不进 dimensions、不影响 57 维口径，可以安全补回。
+
+## 改了什么（2 commits）
+
+1. `b4c304c4` — `src/index.js` 恢复 summary 中间态文案（只在
+   `count>0 && !qualifies` 时输出，不与 findings 重复）；
+   `scripts/dimension-coverage-scan.js` recognized 判据补**第三个落点**
+   `dimensionRaw`（`r.dimensionRaw` 与 `r.data.discriminate.dimensionRaw`）；
+   `test/round-378-...` 断言改读新契约 + 新增两条守卫
+   （dimensions 键数保持 57 / 扫描器兜底不空转）。9/9 绿。
+2. `scripts/negative-test-dimension-coverage-midstate-r378.js` 重写为
+   4 还原点（删记账 / 断透传 / 删 summary 文案 / 旁路扫描器兜底），
+   实测 **5/5**（基线全绿 + 4 条还原全部变红）。
+
+## 验证结果（全部本轮实跑）
+
+| 项 | 结果 |
+|---|---|
+| r378 测试（原红 5/7） | **9 / 0** |
+| 负例守卫（4 还原点） | **5 / 0**（含基线全绿，删记账/断透传/删文案/旁路兜底均变红） |
+| `bin/verify.js` | **14 / 0** |
+| `test/security-audit.test.js` | **16 / 16** |
+| `test/doc-numbers-accuracy.test.js` | **15 / 15** |
+| 扫描器实跑 | mte 由「真盲区」变「引擎侧已识别 2/2（设计保守）」，blind=[] |
+| 双向基线劣化 | **与改动前副本完全一致**（见下） |
+| `test/run-all.js` | 见「run-all 完成情况」 |
+
+### 双向基线漂移的归因（防止下一轮误判）
+
+`--check` 报 2 类漂移（恶意 rewrite 11→12/verify 2→1、教学 verify 1→0/pass 11→12）。
+本轮用 `git checkout b8c8a116 -- src scripts` 把源码换回本轮改动前副本实测
+（`scripts/round-379/probe-4-baseline-drift.js`）：**漂移数字一模一样**。
+→ 漂移非本轮引入，根因是 untracked 的 `data/bidirectional-baseline.json` 陈旧
+（r377 已归因一次，本轮再次坐实）。误拦数仍在 302/326 基线内，召回 52/52。
+
+## 遗留
+
+1. **`data/bidirectional-baseline.json` 建议重刷**（decision 的 D 候选，0.78）。
+   r377/r379 两轮都只做了「证明非本轮引入」，没根治。重刷命令：
+   `node scripts/bidirectional-guard.js --baseline`。注意：重刷会把当前
+   （已被后续轮次改进过的）行为固化成新基线，属有明确收益时的动作。
+2. **r377 遗留 C 实测不成立**：`probe-5` 扫全 test/ 的层名断言只有 4 处，
+   3 处是 `Array#indexOf` 精确匹配（安全），唯一 1 处前缀过滤是
+   `round-377` 第 80 行 `ladders.filter(x => x.indexOf('norm_desensitize') === 0).length === 1`
+   —— 这是**刻意**同时约束耦合层与独立层不重复计数的设计，不是缺陷。
+   （附：首次探针分型分错过，把 `Array#indexOf` 当成 `String#indexOf` 前缀，
+   误报「2 处前缀过宽」，已修正并记录——分型错会让「需收紧」清单虚高。）
+3. **capability_probe 英文支 `{0,6}` 窗口放宽**（decision 的 B 候选，0.77）未做。
+4. 紧随其后的下一轮方向：run-all 全绿后，建议优先扫其他**顶层透传字段**
+   的同类缺口（本轮吃的亏是「produce 侧做了、consume 侧没读」）。
+
+## 给下一轮的接手说明
+
+1. **`dimensionRaw` 现在有三个读方**：`src/index.js`（产出 + summary 文案）、
+   `src/pipeline.js`（透传）、`scripts/dimension-coverage-scan.js`（兜底判读）。
+   改任何一个都要同步 r378 测试与 4 还原点守卫，否则守卫会报「找不到锚点」而非真红。
+2. **`dimensionRaw` 刻意不进 `dimensions`**：dimensions 键数是
+   doc-numbers-accuracy 的运行时口径（57），AGENTS/README/SKILL 三份禁改文档
+   都写 57。任何「让某维度从不可见变可见」的改动都会打破文档契约——想可见，
+   走顶层字段，不要加 dimensions 键。
+3. 探针 5 的教训：**扫「失效守卫」前先分型 API**
+   （`Array#indexOf` 精确 vs `String#indexOf` 前缀），否则清单虚高、白收紧护栏。
+4. `scripts/round-379/` 下 5 支探针（dimraw-path / decide / decide-v2 /
+   baseline-drift / ladder-prefix-guards）保留为复现工具。
+
+## run-all 完成情况
+
+（见下条 finish 前补录；本轮 run-all 后台启动于 commit `b4c304c4` 之后。）
+
 # 第 377 轮（multi_turn_escalation 单侧放过根因修复：norm 独立层 + 抓出 text.match(undefined) 恒真坑，4 commits）
 
 ## 方向选择
