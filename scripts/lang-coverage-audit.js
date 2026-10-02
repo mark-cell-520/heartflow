@@ -81,24 +81,49 @@ function hit(fnName, text) {
   } catch (_) { return null; }
 }
 
+// [r414] 主逻辑改为「族级判定 + 维度级汇总」：
+//   · 行输出带 family，一族漏判直接定位到族而不是只报维度
+//   · 汇总区分「该维度有族漏判」与「整维度漏判」——一族漏即算覆盖不均，
+//     这正是 r413 vagueness 英文族 8/8 放过却四轮未被发现的修补点
+//   · 单样本维度（只有 1 个 family）显式标 SATURATED：它的全绿没有证明力，
+//     提示后续补族（否则又会出现「一对样本恰好都命中 → 缺口被掩盖」）
 const rows = [];
 let bothMiss = 0, zhOnly = 0, enOnly = 0;
 for (const p of PAIRS) {
   const zhH = hit(p.dim, p.zh);
   const enH = hit(p.dim, p.en);
-  if (zhH === null || enH === null) { rows.push({ dim: p.dim, zh: 'no-fn', en: 'no-fn', gap: 'N/A' }); continue; }
+  if (zhH === null || enH === null) { rows.push({ dim: p.dim, family: p.family || '-', zh: 'no-fn', en: 'no-fn', gap: 'N/A' }); continue; }
   let gap;
   if (zhH && enH) { gap = '均检出'; bothMiss++; }
   else if (zhH && !enH) { gap = '仅中文'; zhOnly++; }
   else if (!zhH && enH) { gap = '仅英文'; enOnly++; }
   else { gap = '均漏'; bothMiss++; }
-  rows.push({ dim: p.dim, zh: zhH ? '✓' : '✗', en: enH ? '✓' : '✗', gap });
+  rows.push({ dim: p.dim, family: p.family || '-', zh: zhH ? '✓' : '✗', en: enH ? '✓' : '✗', gap });
 }
 
-console.log('维度'.padEnd(24) + '中文  英文  结论');
-console.log('─'.repeat(56));
+// ── 维度级汇总 ────────────────────────────────────────────────
+const byDim = {};
 for (const r of rows) {
-  console.log(r.dim.padEnd(24) + String(r.zh).padEnd(6) + String(r.en).padEnd(6) + r.gap);
+  if (!byDim[r.dim]) byDim[r.dim] = { families: 0, badFamilies: 0, gaps: [], noFn: false };
+  if (r.gap === 'N/A') { byDim[r.dim].noFn = true; continue; }
+  byDim[r.dim].families++;
+  if (r.gap !== '均检出') {
+    byDim[r.dim].badFamilies++;
+    byDim[r.dim].gaps.push(`${r.family}(${r.gap})`);
+  }
+}
+const dimGaps = [];
+const saturated = [];
+for (const [dim, s] of Object.entries(byDim)) {
+  if (s.noFn) continue;
+  if (s.badFamilies > 0) dimGaps.push(`${dim}[${s.gaps.join(' ')}]`);
+  if (s.families === 1) saturated.push(dim);
+}
+
+console.log('维度'.padEnd(22) + '族'.padEnd(24) + '中文  英文  结论');
+console.log('─'.repeat(72));
+for (const r of rows) {
+  console.log(r.dim.padEnd(22) + String(r.family).padEnd(24) + String(r.zh).padEnd(6) + String(r.en).padEnd(6) + r.gap);
 }
 console.log('\n汇总:');
 console.log('  双边都检出:', rows.filter(r => r.gap === '均检出').length);
@@ -110,3 +135,10 @@ const gaps = rows.filter(r => r.gap === '仅中文' || r.gap === '仅英文');
 console.log('\n覆盖不均维度（需补齐）:', gaps.length ? gaps.map(g => `${g.dim}(${g.gap})`).join(', ') : '无');
 const misses = rows.filter(r => r.gap === '均漏');
 console.log('双边漏检维度（更高优）:', misses.length ? misses.map(g => g.dim).join(', ') : '无');
+// [r414] 族级定位：一族漏判即点名到族，不再被同维度其他族掩盖
+console.log('\n族级缺口明细（dim[fam(方向) ...]）:', dimGaps.length ? dimGaps.join(' ') : '无');
+// [r414] 饱和度告警：只有 1 个 family 的维度，其全绿没有证明力
+console.log('单族维度（补充样本以提升证明力，共 ' + saturated.length + ' 个）:',
+  saturated.length ? saturated.join(', ') : '无');
+console.log('\n族多样性覆盖率:', Object.keys(byDim).filter(d => !byDim[d].noFn).length,
+  '个维度 /', rows.filter(r => r.gap !== 'N/A').length, '个族样本');
