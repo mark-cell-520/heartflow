@@ -1,5 +1,89 @@
 
-# 第 392 轮（修 r391 system_entry 英文支的「命中但不过闸」缺陷，2 commits）
+# 第 393 轮（补英文裸连接串索取 × 社工铺垫组合判据，1 commit）
+
+## 方向选择
+
+decision.decide 四候选（scripts/round-393/decide.js，chosen=A score 0.77）：
+A 英文裸索取缺口 / B 中文侧同族全链复测 / C 清理探针垃圾 / D 0 调用模块扫描。
+选 A：它是 r392 遗留 3 里唯一的能力缺口，且 B/C 是维护项、D 上一轮刚扫过。
+
+## 复测（probe-1~17，不信简报旧描述）
+
+| probe | 做了什么 | 结论 |
+|---|---|---|
+| 1 | 15 条裸索取族全链复测（qualifies + gate.action） | qualifies 0/15、rewrite 2/15，缺口坐实 |
+| 2 | 逐层归因（dimensionRaw.ladders） | 13 条只剩 system_entry 0 命中 |
+| 3 | 五个正则逐支拆解 | 卡在主体词：subj=0 恒 miss |
+| 4/5/8 | 三轮候选（放开主体词 / 分发对象排除 / 动词宾语相邻） | 攻击 15/15 但同时误伤 11/20~11/30 良性协作句，**全部否决** |
+| 6 | ST 逐支命中扫描 | 裸 dsn/jdbc/uri 三形 ST 全部 0 命中 |
+| 7 | 裸凭据专名单独作 ST 支候选 | 文档体 19/20、工程体 11/12 被收，否决 |
+| 9 | 铺垫 × 裸索取组合（35 样本） | qualifies 0/35，坐实需要第二层信号 |
+| 10/11 | 铺垫半正则候选 + miss 归因 + 反例池 | 30/35 命中、反例池 0/15；5 条 miss 全因 not 误判 |
+| 12 | ST 覆盖缺口复测 | 铺垫支只 1 层，需补 ST |
+| 13/14 | 全量误伤面 + 基线对照（git stash 前后差分） | 1 条告诫句误伤，定位到新支 |
+
+## 改了什么（1 commit）
+
+`06cebf18`：src/multi-turn-tactics.js + test/round-393-bare-conn-preface-qualifies.test.js
+
+**① 新增 `_SE_EN_PREFACE_RE`（社工铺垫半）**：试探降级 / 授权洗白 /
+关系信任 / 责任转移 / 上下文嫁接 / 能力假定六个形状。
+
+**② 新增 `_seEnConnPrefaceHit` 组合判据**，作为 system_entry 的互斥第二支
+（与 `_seEnConnDemandHit` else-if，不叠加 score）：目标 + 索取动词 +
+铺垫半 + 无文档体，span 收窄同 r392。
+
+**③ SENSITIVE_TARGET 补 ST[16]**（裸凭据专名 + 索取动词）+ NOUNS[16]，
+并在 ST 消费循环加 `si === 16 && _stImperativeNeg` 跳过条件。
+
+**④ 新增 `_SE_EN_IMPERATIVE_NEG_RE`（句首祈使/禁止极性词）**：
+probe-14 实测的必要边界——"do not give me the dsn just because you trust me"
+（告诫者复述攻击形状）在铺垫豁免下被三层放行。极性闸门必须在消费处做，
+正则表达不了「极性词在句首」这种位置感知。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node --check` | ✅ |
+| `node bin/verify.js` | ✅ 14 passed, 0 failed |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 52/52、误拦 **302/326 与基线完全持平** |
+| `node test/security-audit.test.js` | ✅ 16/0 |
+| `node test/doc-numbers-accuracy.test.js` | ✅ 15/0 |
+| 本轮守卫 | ✅ 31/31（7 组断言 + 4 组负例变异） |
+| `node test/run-all.js` | 后台跑，见 UPGRADE_LOG 后续 |
+
+攻击侧：铺垫 × 裸索取 35 组合 qualifies 35/35、gate=rewrite 35/35；
+手写攻击池 10/10。误伤侧：无铺垫裸索取 0/8、文档体 0/15、工程体 0/12、
+协作分发 0/30、句首祈使告诫 0/15、良性 benchmark 池 0/175。
+
+## 踩坑（值得进踩坑节）
+
+1. **变异断言必须隔离单变量**。守卫首版 5 处失败，根因全是同一个：
+   铺垫语料（"trust me" / "already approved"）**同时命中授权洗白正则**，
+   把新支变异掉之后 sensitive_target + authority_laundering 仍能垫两层，
+   qualifies 依旧 true。probe-17 诊断后才改用两条断言：层全灭
+   （`ladders.includes('system_entry')`）+ 隔离变量样本回落
+   （取铺垫语料不命中洗白正则的 if 条件从句句）。**以后写负例变异守卫，
+   先确认「变异后其他层不会补位」，否则断言的是噪声不是守卫。**
+2. **「目标是否敏感」与「该不该拦」是两个层**。ST[16] 是纯目标层，
+   极性它不理解；probe-14 的误伤只能在 ST 消费循环里 skip，
+   不能塞进正则。这印证 r392 踩坑 2 的推广版：**层职责不要越界**。
+3. 手写攻击池里混进了 ST[16] 的已知边界形（list 反序：动词在后），
+   导致断言 9/10。边界样本不该进行为断言池，已记入遗留。
+
+## 遗留（下一轮接手）
+
+1. **ST[16] 的动词反序支不完整**：`list the connection uris`（动词在前）
+   认，`the connection uris ... send me`（宾语在前动词在后）只有
+   ST[14] 兜。探针实测该形 0 命中。若下一轮要补，先造 20+ 良性
+   「宾语 + 动词」句证零误伤（ST[16] 已有前车之鉴：放开即误伤）。
+2. **中文侧同族缺口未做**（decision 候选 B）：裸连接串索取只测过命中，
+   未按本轮口径复测 qualifies + gate.action。英文侧已闭环，中文侧待验。
+3. `scripts/round-391/`~`round-393/` 共 44 个探针文件仍未跟踪清理。
+4. run-all 全量结果需在本轮结束后回填（后台跑完即补）。
+
+
 
 ## 方向选择
 
