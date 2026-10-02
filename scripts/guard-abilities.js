@@ -23,6 +23,8 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const BASELINE_FILE = path.join(ROOT, 'data', 'capability-baseline.json');
+// [r407] 检查项数缓存（供 sync-doc-numbers.js 记账，非基线比对数据）
+const CAPABILITY_COUNT_FILE = path.join(ROOT, 'data', 'capability-check-count.json');
 
 // ─── 标准样本：覆盖各判别维度的典型输入 ───
 const SAMPLES = [
@@ -369,6 +371,17 @@ async function main() {
   console.log('\n══════════════════════════════════════');
   if (failed.length === 0) {
     console.log(`✅ 全部 ${results.length} 项能力检查通过 — 心虫能力完好`);
+    // [r407] 检查项数落盘：README/SKILL 的「Capability guard | N / N checks」
+    // 是机器可判定数字，但 guard-abilities 从不写缓存，于是它从 18 涨到 20
+    // 之后两份文档的规格表一直挂着 18（腐化了 30+ 个版本号）。
+    // sync-doc-numbers.js 读这个缓存记账——不在这里重跑整套检查
+    // （本脚本实测 105s 且会超时，不能进记账链路）。
+    fs.writeFileSync(CAPABILITY_COUNT_FILE, JSON.stringify({
+      checks: results.length,
+      passed: results.length - failed.length,
+      measuredAt: new Date().toISOString(),
+      measuredBy: 'guard-abilities.js',
+    }, null, 2));
     if (isBaseline) {
       fs.writeFileSync(BASELINE_FILE, JSON.stringify({
         version: require(path.join(ROOT, 'package.json')).version,

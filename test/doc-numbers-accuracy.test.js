@@ -105,6 +105,30 @@ function measure() {
     } catch (_) { /* 无缓存 → 0，下面断言会提示先跑 run-all */ }
   }
 
+  // [r407] 模块数运行时实测（与 sync-doc-numbers.js / measure-claimed-numbers.js
+  // 同口径）。此前模块数只在 README/SKILL 规格表出现且**没有任何断言**——
+  // 从 v6.7.69 的 137 一路腐化到实测 143 无人发现，40+ 个版本号没人记账。
+  const mr = cp.spawnSync('node', ['-e', `
+    const {HeartFlow}=require('${path.join(HF, 'src/core/heartflow.js')}');
+    const hf=new HeartFlow({dataDir:'${path.join(HF, 'data')}',silent:true});
+    hf.start();
+    setTimeout(()=>{ console.log(Object.keys(hf._modules||{}).length); process.exit(0); }, 4000);
+  `], { encoding: 'utf8', timeout: 60000 });
+  const modules = parseInt((mr.stdout || '').trim().split('\n').pop(), 10) || 0;
+
+  // 能力守护检查项数：读 guard-abilities.js 自己落盘的缓存（不跑那 105s 的脚本）
+  let capabilityChecks = 0, capabilityPassed = 0;
+  {
+    const cf = path.join(HF, 'data/capability-check-count.json');
+    try {
+      if (fs.existsSync(cf)) {
+        const j = JSON.parse(fs.readFileSync(cf, 'utf8'));
+        capabilityChecks = j.checks || 0;
+        capabilityPassed = j.passed || 0;
+      }
+    } catch (_) { /* 无缓存则 capability 断言自己跳过 */ }
+  }
+
   return {
     // [v6.7.126 第 286 轮] 用运行时实测（discriminate dimensions 键）。
     // 旧值 checkFns.size 漏计 7 个外置模块维度，让三份文档少报。
@@ -118,6 +142,9 @@ function measure() {
     routes,
     tests: testCases,
     testFailed,
+    modules,
+    capabilityChecks,
+    capabilityPassed,
   };
 }
 
@@ -261,6 +288,87 @@ t('路由数匹配', () => {
   const claimed = parseInt(m[1].replace(/,/g, ''), 10);
   assert.strictEqual(claimed, M.routes,
     `AGENTS.md 说 ${claimed} routes，实测 ${M.routes}`);
+});
+
+// [r407] 以下 4 条守「Verified metrics」规格表 —— r407 之前**整块无守卫**，
+// README/SKILL 的规格表从 v6.7.69 起就没有更新过：modules 137（实 143）、
+// dimensions 46（实 57）、tests 547（实 17,341）、capability 18/18（实 20/20）。
+// 腐化了 40+ 个版本号无人发现，因为所有守卫都只查横幅和维度章节。
+
+t('模块数匹配（AGENTS.md 横幅）', () => {
+  const src = fs.readFileSync(AGENTS, 'utf8');
+  const m = src.match(/(\d+)\s+dimensions,\s*(\d+)\s+modules/);
+  assert.ok(m, 'AGENTS.md 找不到 modules 数字');
+  const claimed = parseInt(m[2], 10);
+  assert.strictEqual(claimed, M.modules,
+    `AGENTS.md 说 ${claimed} modules，实测 ${M.modules}`);
+});
+
+for (const [label, fp] of [['README.md', README], ['SKILL.md', SKILL]]) {
+  t(`${label} 规格表：模块数 / 维度数 / 测试数 / 能力守护项数`, () => {
+    const src = fs.readFileSync(fp, 'utf8');
+    const rows = {};
+    for (const line of src.split('\n')) {
+      const m = line.match(/^\|\s*([^|]+?)\s*\|\s*([^|]*?)\s*\|/);
+      if (m) rows[m[1]] = m[2];
+    }
+    // 模块数
+    if (rows['Modules registered'] !== undefined) {
+      assert.strictEqual(parseInt(rows['Modules registered'], 10), M.modules,
+        `${label} 规格表 Modules registered = ${rows['Modules registered']}，实测 ${M.modules}`);
+    }
+    // 维度数
+    if (rows['Discrimination dimensions'] !== undefined) {
+      assert.strictEqual(parseInt(rows['Discrimination dimensions'], 10), M.dimensions,
+        `${label} 规格表 Discrimination dimensions = ${rows['Discrimination dimensions']}，实测 ${M.dimensions}`);
+    }
+    // 测试数
+    if (rows['Test suite'] !== undefined) {
+      const mm = rows['Test suite'].match(/([\d,]+)\s+passing\s*\/\s*(\d+)\s+failing/);
+      assert.ok(mm, `${label} 规格表 Test suite 行格式无法解析：${rows['Test suite']}`);
+      assert.strictEqual(parseInt(mm[1].replace(/,/g, ''), 10), M.tests,
+        `${label} 规格表 Test suite = ${rows['Test suite']}，实测 ${M.tests} passing / ${M.testFailed} failing`);
+      assert.strictEqual(parseInt(mm[2], 10), M.testFailed,
+        `${label} 规格表 failing = ${mm[2]}，实测 ${M.testFailed}`);
+    }
+    // 能力守护项数（无缓存时跳过，不当成失败）
+    if (M.capabilityChecks && rows['Capability guard'] !== undefined) {
+      const mm = rows['Capability guard'].match(/(\d+)\s*\/\s*(\d+)\s*checks/);
+      if (mm) {
+        assert.strictEqual(parseInt(mm[1], 10), M.capabilityPassed,
+          `${label} 规格表 Capability guard = ${rows['Capability guard']}，实测 ${M.capabilityPassed}/${M.capabilityChecks}`);
+        assert.strictEqual(parseInt(mm[2], 10), M.capabilityChecks,
+          `${label} 规格表 Capability guard 总数 = ${mm[2]}，实测 ${M.capabilityChecks}`);
+      }
+    }
+  });
+}
+
+t('README 规格表口径版本戳为当前 VERSION', () => {
+  const ver = fs.readFileSync(path.join(HF, 'VERSION'), 'utf8').trim();
+  const src = fs.readFileSync(README, 'utf8');
+  const vh = src.indexOf('## Version history');
+  const live = vh > 0 ? src.slice(0, vh) : src;
+  assert.ok(live.includes(`at **v${ver}**`),
+    `README 规格表口径戳仍是旧版本，应为 at **v${ver}**（数字是现在量的，戳必须写现在）`);
+});
+
+t('SKILL 规格表口径版本戳为当前 VERSION', () => {
+  const ver = fs.readFileSync(path.join(HF, 'VERSION'), 'utf8').trim();
+  const src = fs.readFileSync(SKILL, 'utf8');
+  assert.ok(src.includes(`at v${ver}.`) || src.includes(`| Engine version | ${ver} |`),
+    `SKILL 规格表口径戳仍是旧版本，应为 at v${ver}.`);
+});
+
+t('SKILL action-tier 计数与三个集合一致', () => {
+  const src = fs.readFileSync(SKILL, 'utf8');
+  const b = src.match(/\*\*(\d+)\s+can\s+`block`\*\*/);
+  const r = src.match(/\*\*(\d+)\s+can\s+force/);
+  const v = src.match(/\*\*(\d+)\s+request\s+`verify`\*\*/);
+  assert.ok(b && r && v, 'SKILL.md 找不到 action-tier 计数三兄弟');
+  assert.strictEqual(parseInt(b[1], 10), M.block, `SKILL block 计数 ${b[1]} != BLOCK_DIMS ${M.block}`);
+  assert.strictEqual(parseInt(r[1], 10), M.rewrite, `SKILL rewrite 计数 ${r[1]} != REWRITE_DIMS ${M.rewrite}`);
+  assert.strictEqual(parseInt(v[1], 10), M.verify, `SKILL verify 计数 ${v[1]} != VERIFY_DIMS ${M.verify}`);
 });
 
 t('Block 层列举数与 BLOCK_DIMS 一致', () => {
