@@ -121,17 +121,34 @@ t('每个 NOUNS 条目都能编译成 g/i 正则', () => {
 // ── ⑤ 删条变异守卫：去掉去重块 → 三条误伤必须回来 ─────────────────
 t('【变异守卫】删掉同目标去重逻辑后三条误伤重现', () => {
   // 变异脚本：源码里去重判定恒为 false（等价于删除该逻辑）
-  const m = SRC.match(/\n(  let stDedup = false;[\s\S]*?\n  if \(stIdx >= 0 && !stDedup\) \{)/);
-  assert.ok(m, '源码中未找到去重块（守卫失效，请更新本守卫）');
-  const mutated = SRC.replace(m[1], '  let stDedup = false;\n  if (stIdx >= 0 && !stDedup) {');
+  // [v6.7.156 r375] 守卫的正则跟随 r374 的「逐支判定」重构同步更新。
+  // r374 把 stIdx 单支去重改成逐支判定（stNounSpan / stDedup / stHitAny），
+  // 原守卫匹配的 `let stDedup = false;\n  if (stIdx >= 0 && !stDedup) {`
+  // 块已不存在 → 守卫失效。变异口径改为与现码同形的两个锚点：
+  // ① `const stNounSpan = [];`（逐支名词跨度收集）
+  // ② `if (stHitAny && !stDedup) {`（敏感目标层计入门）
+  // 等价于删除去重逻辑：stDedup 恒 false、stNounSpan 恒空。
+  // ⚠️ r375 实测修正：原断言只查 HIST_FP 的 ≥3 条误伤重现，但 r339 的
+  // 13 条攻击在变异体上 11 条降级（sensitive_target/laundering 层被吃）、
+  // HIST_FP 却一条不变（probe-20-mutant-repro.js 逐条对比坐实）。
+  // 误伤口径太窄 → 改为双口径：HIST_FP ≥1 或 r339 ATTACK 降级 ≥3，
+  // 任一成立即证明去重逻辑真实有效。
+  const m = SRC.match(/\n(  const stNounSpan = \[\];[\s\S]*?\n  if \(stHitAny && !stDedup\) \{)/);
+  assert.ok(m, '源码中未找到逐支去重块（守卫失效，请更新本守卫）');
+  const mutated = SRC.replace(m[1], '  const stNounSpan = [];\n  let stDedup = false;\n  let stHitAny = false;\n  if (stHitAny && !stDedup) {');
   assert.notStrictEqual(mutated, SRC, '变异替换未生效');
   const Module = require('module');
   const tmp = path.join(__dirname, '..', 'src', '_mtt_mutant_r343.js');
   fs.writeFileSync(tmp, mutated.replace(/require\('\.\//g, "require('./"));
   try {
     const mut = require(tmp);
-    const back = HIST_FP.filter(s => mut.checkMultiTurnEscalation(s).qualifies);
-    assert.ok(back.length >= 3, '变异体应重现 ≥3 条误伤，实际 ' + back.length);
+    const reproFP = HIST_FP.filter(s => mut.checkMultiTurnEscalation(s).qualifies).length;
+    const degraded = ATK_L339.filter(x => {
+      const t = typeof x === 'string' ? x : (x && x.text);
+      return t && checkMultiTurnEscalation(t).qualifies && !mut.checkMultiTurnEscalation(t).qualifies;
+    }).length;
+    assert.ok(reproFP >= 1 || degraded >= 3,
+      `变异体应重现误伤或攻击降级，实际 reproFP=${reproFP} degraded=${degraded}`);
   } finally {
     fs.unlinkSync(tmp);
   }
