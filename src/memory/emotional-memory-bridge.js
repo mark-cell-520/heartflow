@@ -121,11 +121,40 @@ let _psy = null;
 const _dedupCache = new Map();
 let _dedupCacheTimestamps = [];
 
+// [v6.7.125 第 400 轮修复] 单例实例缓存。原实现把 require 的「模块对象」赋给 _mm，
+// 而 meaningful-memory.js 导出的是 { MeaningfulMemory: class } —— 模块对象上没有
+// store/add 方法，appraisalToMemory 因而恒抛 store/add method not found，
+// 重试耗尽后返回 STORE_FAILED（饱和失败路径 100% 走不通）。
+let _mmInstance = null;
+let _mmWarned = false;
+
 function getMeaningfulMemory() {
-  if (!_mm) {
-    try { _mm = require('./meaningful-memory.js'); } catch(e) { _mm = null; }
+  if (_mmInstance) return _mmInstance;
+  let mod = null;
+  try { mod = require('./meaningful-memory.js'); } catch (e) { mod = null; }
+  if (!mod) {
+    if (!_mmWarned) { _mmWarned = true; }
+    return null;
   }
-  return _mm;
+  // 情形 1：模块对象本身带 store/add（未来若改成函数式导出仍兼容）
+  if (typeof mod.store === 'function' || typeof mod.add === 'function') {
+    _mmInstance = mod;
+    return _mmInstance;
+  }
+  // 情形 2（当前实际形状）：{ MeaningfulMemory: class } → 必须实例化才有 store
+  const Ctor = mod.MeaningfulMemory || mod.MemoryAdapter || mod.default;
+  if (typeof Ctor === 'function') {
+    try {
+      const inst = new Ctor({ rootPath: HF_ROOT });
+      if (inst && (typeof inst.store === 'function' || typeof inst.add === 'function')) {
+        _mmInstance = inst;
+        return _mmInstance;
+      }
+    } catch (e) {
+      if (!_mmWarned) { _mmWarned = true; }
+    }
+  }
+  return null;
 }
 
 function getCognitiveAppraisal() {
@@ -208,6 +237,24 @@ function validateInput(value, name, rules = {}) {
     };
   }
   
+  // [v6.7.125 第 400 轮修复] 'array' 类型：数组被视为合法输入。
+  // 原表只用 'object'，而类型判据里有 Array.isArray(value) 排除数组，
+  // 导致 batchAppraisalToMemory 传数组时 validateInput 直接判 invalid，
+  // 函数第一行就 return { total: 0 } —— 批量路径同样 100% 空转。
+  if (type === 'array') {
+    if (!Array.isArray(value)) {
+      return {
+        valid: false,
+        error: {
+          type: ErrorType.INVALID_INPUT,
+          message: `参数 "${name}" 应为数组，实际为 ${Array.isArray(value) ? 'array' : typeof value}`,
+          severity: ErrorSeverity.LOW,
+          retryable: false
+        }
+      };
+    }
+  }
+
   if (type === 'object' && (typeof value !== 'object' || value === null || Array.isArray(value))) {
     return {
       valid: false,
@@ -617,7 +664,9 @@ function assessEmotionalSalience(text, appraisalResult = {}, padState = {}) {
  * 用于检测反复出现的消极认知模式
  */
 function extractCognitivePattern(appraisalHistory) {
-  const historyValidation = validateInput(appraisalHistory, 'appraisalHistory', { type: 'object' });
+  // [v6.7.125 第 400 轮修复] 数组走 'array' 类型校验（'object' 会把数组判非法，
+  // 直接 return null —— 认知模式提取路径同样 100% 空转）
+  const historyValidation = validateInput(appraisalHistory, 'appraisalHistory', { type: 'array' });
   if (!historyValidation.valid) return null;
   
   if (!appraisalHistory || !Array.isArray(appraisalHistory) || appraisalHistory.length < 3) {
@@ -697,23 +746,30 @@ async function verifyPersistence(mm, storeResult, memoryContent) {
   if (!mm) {
     return { verified: false, checkMethod: 'none', error: { type: ErrorType.MODULE_UNAVAILABLE, message: 'MeaningfulMemory not available' } };
   }
-  
-  if (!storeResult || !storeResult.success) {
+
+  // [v6.7.125 第 400 轮修复] storeResult 可能是字符串 id（MeaningfulMemory.store 的真实返回）
+  // 或无 .success 字段的对象 —— 沿用 appraisalToMemory 的三态归一化口径。
+  const storedOk = storeResult === true
+    || (typeof storeResult === 'string' && storeResult.length > 0)
+    || (storeResult && typeof storeResult === 'object' && storeResult.success === true && !storeResult.error);
+  if (!storedOk) {
     return { verified: false, checkMethod: 'none', error: { type: ErrorType.STORE_FAILED, message: 'Store operation did not return success' } };
   }
-  
+
   // 尝试不同的验证方式
-  const checkMethods = ['search', 'recall', 'query', 'get'];
-  const contentFingerprint = memoryContent?.text ? fingerprintText(memoryContent.text) : null;
-  
+  const checkMethods = ['searchByKeywords', 'search', 'recall', 'query', 'get'];
+  const words = memoryContent && typeof memoryContent.text === 'string'
+    ? memoryContent.text.slice(0, 50)
+    : '';
+
   for (const method of checkMethods) {
     try {
       if (typeof mm[method] === 'function') {
-        const result = await mm[method]({
-          query: memoryContent?.text?.slice(0, 50) || '',
-          limit: 1
-        });
-        
+        // MeaningfulMemory.searchByKeywords(keywords, limit) 收数组；其余按对象试
+        const result = method === 'searchByKeywords'
+          ? await mm[method]([words], 1)
+          : await mm[method]({ query: words, limit: 1 });
+
         if (result && (Array.isArray(result) ? result.length > 0 : true)) {
           return { verified: true, checkMethod: method, error: null };
         }
@@ -841,6 +897,9 @@ async function appraisalToMemory(text, appraisalResult, padState = {}, options =
   }
   
   // 带重试的存储
+  // [v6.7.125 第 400 轮修复] MeaningfulMemory.store() 返回 id 字符串，不带 success 字段；
+  // 原判定 `!storeResult.success` 会把真写入也判失败。改为同时接受「字符串 id」
+  // 与「带 success:true 的对象」两种实现形状（向下兼容）。
   const storeResult = await withRetry(async () => {
     if (typeof mm.store === 'function') {
       return mm.store({
@@ -860,8 +919,14 @@ async function appraisalToMemory(text, appraisalResult, padState = {}, options =
     }
     throw new Error('store/add method not found on MeaningfulMemory');
   }, { type: ErrorType.STORE_FAILED, retryDelayMs: 100 }, 2);
-  
-  if (!storeResult.success) {
+
+  // 归一化：字符串 id / {success:true,id} / {success:false} 三态统一
+  const storedOk = storeResult === true
+    || (typeof storeResult === 'string' && storeResult.length > 0)
+    || (storeResult && typeof storeResult === 'object' && storeResult.success === true
+        && !(storeResult.error));
+
+  if (!storedOk) {
     return {
       success: false,
       reason: 'Store failed after ' + storeResult.attempts + ' attempts',
@@ -872,7 +937,7 @@ async function appraisalToMemory(text, appraisalResult, padState = {}, options =
   
   // 持久化验证（可选）
   if (options.verifyPersistence) {
-    const verification = await verifyPersistence(mm, storeResult.data, memoryContent);
+    const verification = await verifyPersistence(mm, storeResult, memoryContent);
     if (!verification.verified && options.failOnUnverified) {
       return {
         success: false,
@@ -901,14 +966,17 @@ async function appraisalToMemory(text, appraisalResult, padState = {}, options =
  * @returns {Promise<{ success: boolean, results: Array, errors: Array, summary: object }>}
  */
 async function batchAppraisalToMemory(items, options = {}) {
-  const itemsValidation = validateInput(items, 'items', { type: 'object' });
+  // [v6.7.125 第 400 轮修复] 数组走 'array' 类型校验（'object' 会把数组判非法）
+  const itemsValidation = validateInput(items, 'items', { type: 'array' });
   if (!itemsValidation.valid || !Array.isArray(items)) {
     return {
       success: false,
       results: [],
       errors: [{
         type: ErrorType.INVALID_INPUT,
-        message: 'items 应为数组',
+        message: itemsValidation.error
+          ? itemsValidation.error.message
+          : 'items 应为数组',
         severity: ErrorSeverity.LOW
       }],
       summary: { total: 0, succeeded: 0, failed: 0, stored: 0, duplicate: 0 }
