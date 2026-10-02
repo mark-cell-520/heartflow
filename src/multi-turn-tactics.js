@@ -641,7 +641,11 @@ const LADDERS = [
     label: '递进常态化表述（无索取伴随的独立信号）',
     score: 10,
     // 刻意**不设 coupled**：本层就是为「单侧在场」设计，走非耦合分支。
-    up: _RE_NORM_DESENSITIZE,
+    // ⚠️ 字段名必须是 `re` 不是 `up`：非耦合分支读 text.match(L.re)，
+    // 而 `re` 缺失时 text.match(undefined) 会编译成 /(?:)/ **对任何文本
+    // 都返回空匹配**——本层会变成恒真层，给所有句子白送一层。
+    // （r377 首版实测踩中：良性对照 0 层 → 1 层，探针结论全部失真。）
+    re: _RE_NORM_DESENSITIZE,
     fams: [
       'norm_concession_first_step', 'norm_progression', 'norm_habituation',
     ],
