@@ -99,17 +99,19 @@ let tests = 0;
 // [v6.7.87] 用例数：读 run-all.js 每次跑完写下的 data/test-count.json。
 // 此前 measure 只有文件数，README 横幅的 "N passing tests"（用例数）
 // 无从比对，从 1,138 胀到 1754 都没人发现。
-let testCases = 0;
-let testCasesFailed = 0;
+// [r408] 区分 null（未测量）与 0（合法测量值）。此前 `|| 0` 把两者混同，
+// 加上 sync-doc-numbers 的防呆也用 falsy 判断，规格表的 failing 数永远
+// 记不上账（见 sync-doc-numbers.js 的 r408 注释）。
+let testCases = null;
+let testCasesFailed = null;
 {
   const cf = path.join(ROOT, 'data/test-count.json');
   try {
     if (fs.existsSync(cf)) {
       const d = JSON.parse(fs.readFileSync(cf, 'utf8'));
-      testCases = d.passed || 0;
-      testCasesFailed = d.failed || 0;
+      if (d.passed) { testCases = d.passed; testCasesFailed = Number.isFinite(d.failed) ? d.failed : 0; }
     }
-  } catch (_) { /* 无缓存就报 0，守卫会提示先跑 run-all */ }
+  } catch (_) { /* 无缓存就是 null，守卫会提示先跑 run-all */ }
 }
 
 // 8. src 文件数
