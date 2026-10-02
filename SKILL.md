@@ -86,7 +86,7 @@ from marketing copy.
 | Engine version | 6.7.69 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 137 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
-| Dispatch routes | 1,865 | sum of entries in `hf.routes()` |
+| Dispatch routes | 1,136 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 46 | `dimMap` keys in `src/index.js` |
 | MCP tools | 61 | tool definitions exposed via `tools/list` |
 | Test suite | 547 passing / 0 failing | `node test/run-all.js` |
