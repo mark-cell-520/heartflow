@@ -1945,55 +1945,40 @@ class HeartFlow {
 
 
     // Behavior
-
+    // [r373 修复] 原先这个对象字面量的 10 个箭头函数闭包引用 `behaviorTracker` 与
+    // `patternDetector` 两个**全仓零声明**的标识符（probe-8 逐行 grep 坐实：
+    // heartflow.js 内无 const/let/var 声明、engine-constructor.js 不提、
+    // MCP server 不传），于是对象字面量本身能构造成功（箭头函数体不执行），
+    // 但 10 个方法**调用即抛 ReferenceError**（probe-7 实测 10/10）——
+    // 行为目标/进度/周模式/复发风险/行为统计五类能力从未真正可用过。
+    // 修法沿用本文件 truth 段的既有模式：先在 try 内取模块引用，再构造闭包。
+    // behaviorTracker 是纯对象单例导出；PatternDetector 可无参构造（probe-3 实测）。
     try {
-
-
+      const { behaviorTracker: _behaviorTracker } = require('../behavior-tracker.js');
+      const _patternDetector = new (_PatternDetector().PatternDetector)();
 
       this.behavior = {
-
-        createGoal: (args) => behaviorTracker.createGoal(args),
-
-        record: (goalId, args) => behaviorTracker.record(goalId, args),
-
-        getProgress: (goalId) => behaviorTracker.getProgress(goalId),
-
-        formatProgress: (goalId) => behaviorTracker.formatProgress(goalId),
-
-        getAllGoals: () => behaviorTracker.data.goals,
-
-        detectWeeklyPattern: (records) => patternDetector.detectWeeklyPattern(records),
-
-        detectTriggerPattern: (records) => patternDetector.detectTriggerPattern(records),
-
-        detectRelapseRisk: (goal) => patternDetector.detectRelapseRisk(goal),
-
+        createGoal: (args) => _behaviorTracker.createGoal(args),
+        record: (goalId, args) => _behaviorTracker.record(goalId, args),
+        getProgress: (goalId) => _behaviorTracker.getProgress(goalId),
+        formatProgress: (goalId) => _behaviorTracker.formatProgress(goalId),
+        getAllGoals: () => _behaviorTracker.data.goals,
+        detectWeeklyPattern: (records) => _patternDetector.detectWeeklyPattern(records),
+        detectTriggerPattern: (records) => _patternDetector.detectTriggerPattern(records),
+        detectRelapseRisk: (goal) => _patternDetector.detectRelapseRisk(goal),
         getReport: (goalId) => {
-
-          const p = behaviorTracker.getProgress(goalId);
-
+          const p = _behaviorTracker.getProgress(goalId);
           if (!p) return null;
-
-          const goal = behaviorTracker.data.goals.find(g => g.id === goalId);
-
-          const weekly = patternDetector.detectWeeklyPattern(goal.records);
-
-          const triggers = patternDetector.detectTriggerPattern(goal.records);
-
-          const risk = patternDetector.detectRelapseRisk(goal);
-
+          const goal = _behaviorTracker.data.goals.find(g => g.id === goalId);
+          const weekly = _patternDetector.detectWeeklyPattern(goal.records);
+          const triggers = _patternDetector.detectTriggerPattern(goal.records);
+          const risk = _patternDetector.detectRelapseRisk(goal);
           return { ...p, weekly, triggers, risk };
-
         },
-
-        getStats: () => behaviorTracker.getStats(),
-
+        getStats: () => _behaviorTracker.getStats(),
       };
-
     } catch (e) {
-
       _boundedPush(this._initErrors, { module: 'behavior', error: e.message }, MAX_HISTORY_SIZE);
-
     }
 
 
