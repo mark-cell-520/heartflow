@@ -148,8 +148,22 @@ function probeDim(dim) {
       //   ② r.data.discriminate.dimensions   —— pipeline/checkOutput 路径
       //      此前 pipeline 丢了这个字段，本轮已在 src/pipeline.js 补透传；
       //      保留 ① 是为了 scanner 也能直接吃 gate() 的结果。
+      // [v6.7.157 r379] **第三个落点：dimensionRaw（顶层字段）**。
+      //   r378 的 dimensions 方案被 revert 了——把 mte 加进 dimensions
+      //   会让 dimensions 键数 57→58，直接打破 doc-numbers-accuracy
+      //   的文档契约（AGENTS/README/SKILL 三份禁改文档都写 57）。
+      //   引擎改用顶层 dimensionRaw 记账（src/index.js），pipeline 也
+      //   已透传到 r.data.discriminate.dimensionRaw。但扫描器没读它，
+      //   r378 交付后 held 档一直是空转（probe-1 实测：dimensions 的
+      //   57 个键里没有 mte 键，dimensionRaw.count=1 却无人消费）。
+      //   故此处补第三条兜底：dimensionRaw 有 count>0 即算已识别。
+      //   该字段只承载「已识别但保守不判」的中间态，不会与
+      //   dimensions[dim] 双记（mte 本就不在 dimensions 里）。
       const dims = r.dimensions || (r.data && r.data.discriminate && r.data.discriminate.dimensions) || {};
-      const st = dims[dim];
+      const dimRaw = r.dimensionRaw
+        || (r.data && r.data.discriminate && r.data.discriminate.dimensionRaw)
+        || null;
+      const st = dims[dim] || (dim === 'multi_turn_escalation' ? dimRaw : null);
       if (st && typeof st === 'object' && (st.count > 0 || st.totalHits > 0)) {
         recognized++;
       }
