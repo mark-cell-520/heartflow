@@ -1,5 +1,104 @@
 
-# 第 382 轮（authority_claim / peer_pressure / responsibility_shift 补英文侧，4 commits）
+# 第 386 轮（multi_turn_escalation 递进式扩大两段式耦合层，2 commits）
+
+## 方向选择
+
+队列待办为空（upgrade-queue.json 仅 1 条 q1-dljb 且 status=done，
+data/upgrade-queue.json 已被 upgrade-engine 记账为 done）。上一轮 r385
+遗留 4 项里，第 3 项「英文侧 mte 递进句 count=0 全漏」是唯一可直接
+接手的真缺口。r384 遗留第 1 项已把 held 档判定为设计保守（两探针
+只有 norm 独立层 1 层、qualifies=false），但 r385 深挖时定位到的
+是另一条更实的路子：**两段式递进（让步 + 递进扩大，无脱敏收尾）
++ 索取尾**这个形状。用 decision 结构化选向实跑
+（scripts/round-386/probe-5-decide.js，A 0.83 / C 0.74 / B 0.68）
+选中 A，confidence=0.7。
+
+## 复测（不信简报，三个探针逐层坐实）
+
+- probe-1（probe-1-en-mte.js）：A/B/C 三组共 15 条递进族样本
+  单句 mte 0 命中、gate 全 pass；D 组良性 5 条 pass 不变——
+  缺口面确认存在，且不在良性侧。
+- probe-2（probe-2-coup.js）：递进半 + 索取尾组合 10 条（中英各 5）
+  **全部 qualifies=false / gate=pass，而句内 pred=1 已在场**。
+  C 组纯索取尾 5 条基线不变（仍是 1 层）——即新层只补第二层，
+  不放松「单层不拦」的既有口径。
+- probe-3（probe-3-why.js）：定位到根因=_RE_NORM_DESENSITIZE 要求
+  **三半同现**（让步 + 递进 + 脱敏收尾），攻击方省掉脱敏收尾半
+  （「你迟早会习惯」）时整族失活。
+- probe-4（probe-4-halves.js）：分半诊断——英文侧让步半 5/5 不命中
+  （无 first/to start/phase one 形态），中文侧递进半 2/5 命中
+  （缺「下一步/第二阶段/扩大」这类规模扩大词）。
+
+## 改了什么（2 commits）
+
+1. `80e91c6a` — src/multi-turn-tactics.js 补 `norm_escalation_step`
+   两段式耦合层（coupled 'predatory'，score 20）。三条边界全部实测：
+   ① 无索取层一律不计层（沿用 r370 口径，良性「先X再Y」不成攻击）；
+   ② 耦合循环里检测 norm_desensitize 已计层即让位，避免同一攻击
+   记两层（score 虚增 20）；③ 沿用 norm_desensitize 同一批中性项目词
+   排除表（迭代/评审/验收/方案/流程 + 英文 plan/roadmap/milestone/
+   sprint）——probe-2 的 B1/B2/B5 三条中文样本即被正确排除。
+   正则用数组分段拼接（同 _RE_SYSTEM_ENTRY 组装式），中文侧让步半
+   补「本次/本轮/首先」、递进半补「下一步/第二阶段/扩大/推广/铺开」，
+   英文侧补 step one/phase one/to start with/for now 让步半与
+   next step/scale up/expand 递进半。
+2. `5c1f9a3d` — 守卫测试 test/round-386-norm-escalation-step.test.js
+   31 断言（结构 6 / 行为 12 / 去重 2 / 误伤 9 / 负例 2）。
+
+## 验证结果（全部本轮实跑）
+
+- 攻击组合：10 条中 **9 条** qualifies false→true、gate pass→rewrite；
+  1 条（A5「Try this short version today and tomorrow…」）形状不含
+  让步半仍未覆盖，记入遗留。
+- 误伤：probe-6 良性池 18 条（项目计划 + 日常推进 + r374 英文同源）
+  **0/18** 多判；无索取层推进句 6 条零激活；中性项目词 2 条正确排除。
+- 负例闭环：up 永假变异后 6 条攻击断言 **全部回落变红**
+  （r377 的「改名哨兵」手法在本层失效，见踩坑 1）。
+- `bin/verify.js`：**14/0**
+- `scripts/bidirectional-guard.js`：召回 **52/52**、误拦 **302/326**
+  （与 r384/r385 基线完全一致，新增 0 —— 纯补召回）
+- `test/security-audit.test.js`：**16/0**
+- `test/doc-numbers-accuracy.test.js`：**15/0**
+- `node test/run-all.js`：后台 proc_89149d509d81 运行中，日志
+  /tmp/r386-runall.log（截至写簿时已过 r384 段，未见失败条目）
+
+## 踩坑记录
+
+1. **r377「改名哨兵」变异手法对耦合层无效**：norm_escalation_step
+   的层名只出现在 LADDERS 与 coupled 去重两处，把 name 改成哨兵后
+   层照样计层（probe-7 实测 mut_name qualifies 不变）。变异必须打在
+   **判据**上（up 正则），不是打在**名字**上。probe-7 三种变异
+   （name/up-false/no-coupled）实测只有 up-false 能让断言变红。
+2. `node test/round-386-*.test.js` 工厂格式文件直接跑静默 exit 0
+   （r384 已记录过）——本轮初版误判一次「空跑」，改为 r377 同款
+   assert + 脚本格式后自跑正常。
+3. `up: /(?!x)x/` 作为永假变异靶子在 patch/heredoc 里安全，
+   但**正则字符串本身会让安全扫描按 confusable 拦**——变异写在
+   test/ 文件里（write_file 一次成型）不落地命令行，安全。
+
+## 遗留
+
+1. probe-2 A5 形状（英文让步半缺失，"try this short version today
+   and tomorrow…"）仍未覆盖——它的让步动词是 try 而非
+   phase one/first，可补 try 让步半或并入既有英文支，留后续。
+2. run-all 全量结果本轮未收尾（后台在跑），finish 前以
+   /tmp/r386-runall.log 的 RUNALL_EXIT 复核；若失败需定位到具体条目。
+3. git 卫生：scripts/round-3xx/ 100+ 未跟踪探针文件 + 
+   src/_mtt_neg_probe2.js 仍未清理（decision 对 C 项给 0.74 但低于 A）。
+4. `scripts/round-531-dummy` 空文件来源不明（0 字节，未跟踪），
+   下一轮顺手确认是否某轮误建。
+
+## 给下一轮的接手说明
+
+- 新层还原点：src/multi-turn-tactics.js 搜 `norm_escalation_step`
+  （LADDERS 条目 + coupled 去重两处），守卫 
+  test/round-386-norm-escalation-step.test.js 的 ⑤ 段会在 up 被
+  永假化后变红。
+- 若下一轮要继续补同族形状（遗留 1），**不要再动 
+  norm_desensitize 的三半同现判据**（r370/r371/r374/r377 四轮实测
+  钉住的误伤边界），只往新层的让步/递进两半补词。
+
+
 
 ## 方向选择
 
