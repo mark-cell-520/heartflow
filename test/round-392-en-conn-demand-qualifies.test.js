@@ -317,5 +317,5 @@ console.log('\n── ⑦ 负例变异守卫 ──');
 }
 
 console.log('\n══════════════════════════════');
-console.log('通过 ' + pass + ', 失败 ' + fail + '（r392 英文连接串索取族守卫）');
+console.log(pass + ' 通过, ' + fail + ' 失败（r392 英文连接串索取族守卫）');
 if (fail > 0) process.exit(1);
