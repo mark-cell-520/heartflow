@@ -410,18 +410,38 @@ const _SE_DB = '(?:' + _SE_DB_SUBJ + '|' + '(?:数据库|服务器|运维|库)[^
 const _SE_CFG = '(?:配置|凭据|密钥|密匙|口令|密码)[^。\\n]{0,8}(?:文件|列表|详情|内容)';
 const _SE_SOFT_DB = '(?:' + _SE_DB + '[^。\\n]{0,14}' + _SE_DEMAND_MID + '|' + _SE_DEMAND_MID + '[^。\\n]{0,14}' + _SE_DB + ')';
 const _SE_SOFT_CFG = '(?:' + _SE_CFG + '[^。\\n]{0,12}' + _SE_DEMAND_MID + '|' + _SE_DEMAND_MID + '[^。\\n]{0,12}' + _SE_CFG + ')';
-// [v6.7.1xx r396] 软支判别正则（只含 _SE_SOFT_DB 一支）。
+// [v6.7.1xx r397] 中文句内英文连接串目标专用软支。
+// 缺口（r396 probe-3 逐条归因 + r397 probe-2 复测 12/12）：「中文主体 + 英文
+// 连接专名 + 中文索取动词」族（生产库的 jdbc url 打出来 / 线上库的 dsn 拷出来
+// / 后台数据库的 connection uri 输出一下）system_entry 恒零命中、ST[6] 对
+// dsn/connection uri/database url/conn string 四形不认 → 全链 0~1 层被放行。
+// 为什么不把英文专名加回 _SE_DB_CONN（r396 probe-12/13 已实测回退）：
+// 那会给英文裸索取族（send me the connection string）开第二层，击穿
+// r393/r394 有意保留的保守边界，实测 12/15 回归、责任 100% 在该处扩形。
+// 本支用**中文主体词**作第一约束：_SE_ZH_SUBJ 只认中文形（数据库/服务器/
+// 运维/集群/带风险前缀的库/非汉字边界的裸库），纯英文句结构上无法满足，
+// 英文族不可能经本支获得新层；第二约束是 _SE_DEMAND_MID 的中文索取半边
+// （给我/发我/交出/打出来/拷出来…），问句与说明句不成层。
+const _SE_ZH_EN_TARGET = '(?:jdbc\\s+urls?|connection\\s+strings?|conn\\s+strings?|connection\\s+uris?|database\\s+urls?|\\bdsns?\\b)';
+const _SE_ZH_SUBJ = '(?:数据库|服务器|运维|集群|(?:生产|线上|核心|主|后台|内网|机密|私有)[^。\\n]{0,4}库|(?:^|[^\\u4e00-\\u9fa5])库)';
+const _SE_ZH_EN_CONN = '(?:' + _SE_ZH_SUBJ + '[^。\\n]{0,10}' + _SE_ZH_EN_TARGET + '|' + _SE_ZH_EN_TARGET + '[^。\\n]{0,10}' + _SE_ZH_SUBJ + ')';
+const _SE_ZH_EN_SOFT = '(?:' + _SE_ZH_EN_CONN + '[^。\\n]{0,14}' + _SE_DEMAND_MID + '|' + _SE_DEMAND_MID + '[^。\\n]{0,14}' + _SE_ZH_EN_CONN + ')';
+// [v6.7.1xx r396] 软支判别正则。
 // 用途：system_entry 的 hits.push 打 'zh:soft-db' 标签，让敏感目标层的
 // 名词去重知道这一命中的语义是「目标半+索取半」组合层而非独立目标层
 // （与 r394 对 en:conn-* 的豁免同源）。整句命中不等于软支命中——
 // HARD1/HARD2/SOFT_CFG 支不进豁免，故必须逐支判别。
 // 取 text.match 而非 L.re.test：L.re 是整支合流正则，判不出是哪一支。
-const _RE_SOFT_DB_ONLY = new RegExp('(?:' + _SE_SOFT_DB + ')', 'i');
+// [v6.7.1xx r397] 并入 _SE_ZH_EN_SOFT：它与 _SE_SOFT_DB 同构（目标半 +
+// 索取半的组合层），同样不该吃 ST[6] 的连接串名词，否则 ST 层被 dedup 吃掉
+// 又回到 1 层放行。
+const _RE_SOFT_DB_ONLY = new RegExp('(?:' + _SE_SOFT_DB + '|' + _SE_ZH_EN_SOFT + ')', 'i');
 const _RE_SYSTEM_ENTRY = new RegExp([
   '(?:',
   _SE_HARD1,
   '|', _SE_HARD2,
   '|', _SE_SOFT_DB,
+  '|', _SE_ZH_EN_SOFT,
   '|', _SE_SOFT_CFG,
   ')',
 ].join(''), 'i');
