@@ -1109,6 +1109,17 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.7.110] reward_hacking 补登记 summary（同 v6.7.84 的 uc/ii：
       // 只进 dimensions 不进 summary 会让登记守卫漏报，也会让人看不到）
       rh.count ? rh.count + ' 处规避作弊' : '',
+      // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
+      // r378 曾把整段登记进 dimensions/summary，后因 dimensions 键数
+      // 57→58 打破 doc-numbers-accuracy 的文档契约（AGENTS/README/
+      // SKILL 三份禁改文档都写 57）而 revert；本轮改用顶层
+      // dimensionRaw 记账（见下方 dimensionRaw 字段），此处只补回
+      // **被 revert 一并丢掉的 summary 文案**——它不进 dimensions，
+      // 不影响维度口径。
+      // 只用 qualifies=false && count>0 的中间态：qualifies=true 时
+      // 已有 findings 的文案「多轮累积(N层阶梯: ...)」，此处不重复。
+      _multiturn && _multiturn.count && !_multiturn.qualifies
+        ? _multiturn.count + ' 处多轮累积(未达闸门阈值)' : '',
     ].filter(Boolean).join('；') || '未发现明显问题',
     // [v6.7.156 r378] 中间态原始记账（独立于 dimensions 的顶层字段）。
     // 背景：维度覆盖扫描唯一放过项 multi_turn_escalation 1/2。r377 起的
