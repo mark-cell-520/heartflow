@@ -218,6 +218,59 @@ function softHitIsConsult(text) {
   return true;                                      // 无任何索取指向 → 排除
 }
 
+/**
+ * [v6.7.179 r391] 英文侧连接串索取的 JS 组合判据（system_entry 新支）。
+ *
+ * 缺口来源：r388 遗留「英文侧连接串形状未补」。probe-1/3 实测
+ * 5~10 条英文索取形状（give/hand over/send over/share + connection
+ * string / dsn / jdbc url + database/server/backend）在
+ * checkMultiTurnEscalation 里 system_entry 全部 0 命中，只剩
+ * sensitive_target 一层 → 耦合层闸门（predatory ≥ 1）打不开，
+ * gate 直接放行。中文同族（「交出数据库连接串」）r388 已 qualifies。
+ *
+ * 为什么不用正则补词：probe-7~15 连测 9 个纯正则候选
+ * （目标词放宽 / 动词指向形 / 主体词同现 / lookbehind 否定守卫 /
+ * 宿主层后处理豁免），没有一个能同时满足三个约束——最佳纯正则
+ * （V9 主体词同现）attack 26/27 但良性误伤 14/25、否定句误伤 4/17。
+ * 根因：正则无法表达「索取动词的宾语必须指回被索取的目标、
+ * 且全句未被否定」这种跨片段语义。
+ *
+ * 判据（四条同时成立才算命中）：
+ *   ① 目标侧：连接串凭据专名（connection string / conn string /
+ *      connection uri / jdbc url / dsn）
+ *   ② 主体侧：基础设施或凭据名词（database/db/server/backend/cluster/
+ *      instance/library/production/prod/internal/password/credential/secret）
+ *   ③ 索取侧：索取动词（give/send/share/show/provide/print/dump/forward/
+ *      reveal/list/output/hand over/hand me/hand in/send over）
+ *   ④ 排除侧：全句无否定告诫（do not / never / avoid / forbid / must not…），
+ *      且无文档体标记（sample/example/template/docs/readme/wiki…）
+ *   另要求 ①③ 在 80 字符内同现（同一句话内）。
+ *
+ * 实测（probe-18 定稿）：attack 26/29、否定告诫 0/18、
+ * 良性文档体 0/31。3 条 miss 全是无主体词的裸索取（设计边界，
+ * 与 r390「裸库」收紧同口径）。
+ *
+ * ⚠️ 转义层数：字符串里写 "\\b" 落盘成源码里的 \b，正则才是词边界。
+ * 写 "\\\\b" 会变字面反斜杠+b、整支永假（probe-16/17 实测踩中，
+ * 全部 attack 归零且不报错）。
+ */
+const _SE_EN_TARGET_RE = /\b(?:connection\s+strings?|conn\s+strings?|connection\s+uris?|jdbc\s+urls?|dsns?)\b/i;
+const _SE_EN_SUBJ_RE = /\b(?:databases?|dbs?|servers?|backends?|clusters?|instances?|librar(?:y|ies)|production|prod|internal|passwords?|credentials?|secrets?)\b/i;
+const _SE_EN_ASK_RE = /\b(?:give|send|share|show|provide|print|dump|forward|reveal|list|output|hand)\s+(?:out\s+|over\s+|me\s+|us\s+|them\s+|it\s+)?(?:me|us|them|it|the|our|this|that)?\b|\b(?:hand\s+over|send\s+over|hand\s+in|hand\s+me)\b/i;
+const _SE_EN_DOC_RE = /\b(?:sample|example|template|format|docs?|documentation|readme|guide|tutorial|post|blog|wiki|handbook|compose|snippet)\b/i;
+const _SE_EN_NEG_RE = /\b(?:do\s+not|don\x27t|does\s+not|did\s+not|never|avoid|forbid\w*|prohibit\w*|must\s+not|should\s+not|cannot|can\x27t|ought\s+not\s+to|no\s+one\s+should|nobody\s+should|not\s+to)\b/i;
+function _seEnConnDemandHit(text) {
+  if (!_SE_EN_TARGET_RE.test(text)) return false;
+  if (!_SE_EN_SUBJ_RE.test(text)) return false;
+  if (!_SE_EN_ASK_RE.test(text)) return false;
+  if (_SE_EN_NEG_RE.test(text)) return false;
+  if (_SE_EN_DOC_RE.test(text)) return false;
+  const tm = text.match(_SE_EN_TARGET_RE);
+  const am = text.match(_SE_EN_ASK_RE);
+  if (!tm || !am) return false;
+  return Math.abs(tm.index - am.index) <= 80;
+}
+
 // ─── [v6.7.124] system_entry 正则的**组装式**定义 ───
 // 为什么用数组拼接而不是手写一个巨型正则：本轮手写版连续两次
 // "Unmatched ')'"（第 30 轮），根因是嵌套 (?:(A|B)|(C|D)) 里少数
@@ -861,6 +914,15 @@ function checkMultiTurnEscalation(text) {
       _prePred++;
     }
     _NORM_COUPLED_WILL_FIRE = _prePred >= 1;
+  }
+  // ─── [v6.7.179 r391] 英文侧连接串索取的 JS 组合判据 ───
+  // probe-1 实测：英文索取形状在改前 system_entry 0 命中、只剩
+  // sensitive_target 一层，耦合层闸门打不开 → gate 放行。
+  // 判据见上方 _seEnConnDemandHit 注释（四条同现 + 80 字符窗口）。
+  if (_seEnConnDemandHit(text)) {
+    hits.push({ ladder: 'system_entry', label: '索取系统/后台入口', matched: 'en:conn-demand', span: [0, text.length] });
+    score += 35;
+    predatory++;
   }
   // ─── [v6.7.155 r377] sensitive 目标命中（比 PREDATORY 更严：不含 bulk_export） ───
   let sensitive = 0;
