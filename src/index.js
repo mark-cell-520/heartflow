@@ -1590,6 +1590,32 @@ const VAGUE_PATTERNS = {
     // === 范围模糊 ===
     /\bto a certain extent\b/i, /\bto some degree\b/i, /\bin a sense\b/i,
     /\bin some respects\b/i, /\bup to a point\b/i, /\bmore or less\b/i,
+    // === [r413] 责任主体缺位族（公共机构口径）英文侧 ===
+    // 背景：r411 给中文侧补了「相关部门/相关负责人 + 调查动作」判据，
+    // 但英文侧同族写法实测 0/8 命中（round-413-gap-full-probe.js）——
+    // 同一话术族只有中文判据，英文整体漏判。这与 r374 multi_turn_escalation
+    // 英文三族漏判是同一种系统性偏向：维度按中文语料迭代，英文侧一次性补齐
+    // 后就没人再看。lang-coverage-audit 只有一对 vagueness 样本且恰好都命中，
+    // 所以从来没暴露过这一族。
+    //
+    // 判据（四条正交支，攻击族 8/8、良性组 18/18 不误伤）：
+    //   A  relevant/responsible/related/concerned + 机构词 + be + 未完成调查动词
+    //      「The relevant department is looking into this issue.」
+    //   A2 后置修饰「the department concerned is ...」
+    //   B  机构主语 + have/has + yet to/not yet + 回应动词（未回应形状）
+    //      「Relevant authorities have yet to give an explanation.」
+    //   C  裸 officials/authorities 主语 + be + 未完成调查动词
+    //      「Officials are investigating.」
+    // 良性分界线（与中文侧同源，实测 18 条全不命中）：
+    //   · 不收带完成锚点的句子：already / confirmed / published / resolved /
+    //     approved / issued / reply / decision expected —— 这些都是已推进到
+    //     可验证状态的事实，不是「无法追责的模糊口径」
+    //   · 不收「submit documents to the relevant department」这类动作主体
+    //     是「你」的可执行句
+    /\b(?:the\s+)?(?:relevant|responsible|related|concerned)\s+(?:department|departments|authority|authorities|agency|agencies|official|officials)\s+(?:are|is)\s+(?:still\s+|yet\s+to\s+|currently\s+)?(?:looking|reviewing|studying|investigating|examining|working|handling|processing|considering|checking|evaluating|assessing)\b(?!.{0,40}(?:decision|expected|confirmed|published|resolved|completed|approved|issued|statement))/i,
+    /\bdepartment\s+concerned\s+(?:is|are)\b(?!.{0,40}(?:already|confirmed|published|resolved|completed|approved|issued|statement|reply|replied))/i,
+    /\b(?:the\s+)?(?:relevant|responsible|related|concerned)\s+(?:department|departments|authority|authorities|agency|agencies|officials?)\s+(?:have|has)\s+(?:yet\s+to|not\s+yet)\s+(?:respond|give|provide|issue|release|offer|deliver|publish|comment|reply)\b/i,
+    /\b(?:the\s+)?(?:officials?|authorities)\s+(?:are|is)\s+(?:still\s+|currently\s+)?(?:investigating|looking|reviewing|studying|examining|working|handling|considering|evaluating|assessing)\b(?!.{0,40}(?:decision|expected|confirmed|published|resolved|completed|approved|issued|statement))/i,
     // === 程度模糊 ===
     /\bpretty much\b/i, /\balmost\b/i, /\bnearly\b/i,
     /\bquite a few\b/i, /\brather than\b(?!\snot)/i,
