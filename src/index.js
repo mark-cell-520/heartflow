@@ -2180,12 +2180,14 @@ const PRESUPPOSITION_PATTERNS = {
     //   × 定在场（定性词把对方此前的判断/方案/结论钉死为错）
     // 良性分界：承认动词出现在陈述或假设里（他承认了 / 如果承认 /
     //   是否承认过）而不带强制半，或不定性，均不命中。
-    [/你(?:必须|就得|应当|应该|该|非得|务必|给我)[^，。？?]{0,10}(?:承认|认错|认下)/, 'presupposed_forced_admission'],
+    [/你(?:必须|就得|应当|应该|该|非得|务必|给我)[^，。？?]{0,10}(?:承认|认错|认下)[^，。？?]{0,16}(?:错|误|失败|问题|责任|罪|过|缺陷|漏洞|弊|疏|漏|失职)/, 'presupposed_forced_admission'],
     [/请(?:你)?[^，。？?]{0,8}(?:承认|认错)[^，。？?]{0,24}(?:错|误|失败|问题|责任)/, 'presupposed_forced_admission'],
-    [/你(?:还|都|就)?不(?:敢|肯|愿意)?承认[^，。？?]{0,24}(?:错|误|失败|问题|责任|罪|过)/, 'presupposed_forced_admission'],
+    [/你(?:还|都|就)?不(?:敢|肯|愿意)?承认[^，。？?]{0,24}(?:错|误|失败|问题|责任|罪|过|缺陷|漏洞)/, 'presupposed_forced_admission'],
+    [/你(?:还|都|就)?不(?:敢|肯|不愿意)?承认[^，。？?]{0,24}(?:站不住|不成立|有问题|有漏洞|有缺陷)/, 'presupposed_forced_admission'],
     [/你(?:还|都|就)?不(?:敢|肯|愿意)?承认[^，。？?]{0,12}一(?:错|错)/, 'presupposed_forced_admission'],
     [/你承不承认[^，。？?]{0,24}(?:错|误|失败|问题|责任|罪|过)/, 'presupposed_forced_admission'],
     [/你(?:还是)?承认(?:吧|罢)[^，。？?]{0,24}(?:错|误|失败|问题|责任|罪|过)/, 'presupposed_forced_admission'],
+    [/你(?:还是)?承认(?:吧|罢)[，,。][^。]{0,24}(?:错|误|失败|问题|责任|罪|过)/, 'presupposed_forced_admission'],
     [/你难道不承认[^，。？?]{0,24}(?:错|误|失败|问题|责任|罪|过)/, 'presupposed_forced_admission'],
   ],
   en: [
@@ -2943,6 +2945,22 @@ const UNSUPPORTED_CLAIM_ZH = [
   /(?:发表|发布|刊登)\s*(?:于|在)\s*[^。]{2,20}?(?:期刊|杂志|论文|报告|研究)/,
   /(?:增长|下降|达到|超过|延长|缩短)\s*\d+(?:\.\d+)?\s*(?:年|倍|%|个百分点|万人|亿元)/,  // 具体数字断言
   /著名(?:学者|专家|教授|科学家)[^，。]{0,20}?(?:指出|认为|表示|发现)/,
+  // ── [v6.7.125 r425] sweeping_absolute 族：全称扫荡式绝对断言 ──
+  // 缺口实测（scripts/round-425-leak-scan.js，14 条攻击样本）：
+  //   改动前本维度 0/14，gate 全 pass 直接漏出 4 条（序号 3/5/7/12）。
+  // 族形状 = **全称扫荡**：「彻底/完全/百分之百 + 解决/消除/根除 + 所有/任何」
+  //   或「不存在任何 + 风险/漏洞/隐患」。这是「无依据断言」的最强形态：
+  //   不是引用了不存在的来源，而是**用绝对化措辞宣称零残余风险**——
+  //   任何持久的工程系统都不可能做到，故一律判无依据。
+  // 良性分界铁律（实测 14 条良性样本 0 误伤，含「没有发现任何安全问题
+  //   但我们会继续跟进」「没有发现异常」这类**已核实的否定**）：
+  //   · 必须同时出现「绝对化副词/扫荡词」**与**「覆盖/消除类完成态动词」
+  //     **与**「全称量词」三者（Z1/Z2），单有否定式无绝对扫荡不命中（Z3
+  //     只收「不存在/毫无/绝无 + 风险/漏洞/隐患」这种**零残余断言**，
+  //     不收「没有发现」）。
+  /(?:彻底|完全|根本|毫无保留|百分之百|百分之一百|全方位|无死角|一概|一并)[^。]{0,8}(?:解决|消除|杜绝|根除|清除|排除|覆盖|预防)[^。]{0,12}(?:所有|全部|任何|一切|每一个|各种|各类|无一|万无一失)/,
+  /(?:已|已经|均|皆|都)[^。]{0,4}(?:根除|清除|排除|扫清|肃清|杜绝)[^。]{0,8}(?:全部|所有|一切)/,
+  /(?:不存在|毫无|无任何|绝无)[^。]{0,6}(?:任何)?[^。]{0,4}(?:风险|漏洞|隐患|缺陷)/,
 ];
 const UNSUPPORTED_CLAIM_EN = [
   /\baccording to (?:a |the )?(?:study|research|report|survey|data|statistics|experiment|paper)\b/i,
@@ -2958,6 +2976,17 @@ const UNSUPPORTED_CLAIM_EN = [
   /\b(?:increased|decreased|reached|exceeded|extended|shortened)\s+by\s+\d+(?:\.\d+)?\s*(?:years?|times|%|million|billion)\b/i,
   /\b(?:famous|renowned|leading)\s+(?:scholar|expert|professor|scientist)\b[^.]{0,30}?\b(?:pointed|said|found|argued|noted)\b/i,
   /(?:a|an)\s+[A-Z][a-zA-Z]+\s+(?:study|report|survey|paper|data)\s+(?:shows|found|suggests|indicates)\b/i,
+  // ── [v6.7.125 r425] sweeping_absolute 族（英文侧，与 ZH 同族同界）──
+  // 缺口实测（scripts/round-425-leak-scan.js）：改动前 14 条攻击样本本维度
+  //   0/14，gate 全 pass 漏出 4 条。英文侧同样零覆盖。
+  // 良性分界：E4（zero/no + 风险类名词）不收「no known regressions」这种
+  //   已核实的否定——只收 zero/defects|flaws|vulnerabilities 与
+  //   no + risk 连排。实测良性集中 "no performance risk"/"no known
+  //   regressions" 均在 attackers 侧不命中（有已知/限定语隔开）。
+  /\b(?:completely|totally|fully|entirely|utterly|undoubtedly|absolutely)\s+(?:\w+\s+){0,2}(?:eliminat\w+|eradicat\w+|remov\w+|resolv\w+|solv\w+|prevent\w+)\b/i,
+  /\b(?:all|every|each)\s+(?:\w+\s+){0,3}(?:risk|risks|issue|issues|vulnerabilit\w+|problem|problems|defect|defects|case|cases|possibilit\w+|threat|threats)\s+(?:have|has|are|is)\s+(?:(?:now|been|fully|completely|entirely|totally|all)\s+){0,3}(?:eliminated|eradicated|removed|resolved|addressed|covered|prevented|closed)\b/i,
+  /\b(?:eliminat\w+|eradicat\w+|remov\w+|resolv\w+|solv\w+|prevent\w+|prevented|cover\w+|covered)\s+(?:every|all|any|each)\s+(?:\w+\s+){0,2}(?:risk|risks|issue|issues|vulnerabilit\w+|problem|problems|defect|defects|case|cases|possibilit\w+|exception|exceptions)\b/i,
+  /\b(?:zero|no)\s+(?:defects?|bugs?|flaws?|vulnerabilit\w+|failures?)\b/i,
   // 共现组合规则：模糊来源 + 精确数字（编造研究模板的典型形态）
   // "according to a study" 搭配附近 \d+% 或 \d+x 精确数字 → 必判无依据（不依赖单点匹配）
   /(?:according to (?:a |the )?(?:(?:19|20)\d{2}\s+)?(?:[A-Z][a-zA-Z]+\s+)?(?:study|research|report|survey|paper|data)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found)|(?:[A-Z][a-zA-Z]+\s+)?(?:university|institute|researchers|scientists)\s+(?:found|show|suggest|indicate|report))[^.]{0,80}?\b\d+(?:\.\d+)?\s*(?:%|percent|x|X|times)(?!\w)/i,
