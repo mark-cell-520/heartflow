@@ -2169,6 +2169,24 @@ const PRESUPPOSITION_PATTERNS = {
     [/你(?:打算|准备|计划|想)[^，。？?]{0,6}(?:何时|什么时候|几时|哪天)[^，。？?]{0,4}(?:停止|停下|结束|放弃|收手|改正|纠正|别再)/, 'presupposed_ongoing_wrongdoing'],
     [/(?:何时|什么时候|几时)(?:才能|才会|才肯)?(?:停止|停下|结束|收手)[^，。？?]{0,10}(?:违规|违法|欺骗|撒谎|敷衍|搪塞|拖延|抵赖|狡辩|抹黑|造谣|抄袭|作弊|插队|刷单|薅羊毛|摸鱼|摆烂|甩锅|坑人|骗人|占便宜)?/, 'presupposed_ongoing_wrongdoing'],
     [/你(?:还要|打算|准备|到底)[^，。？?]{0,6}(?:持续|继续|纠缠|抵赖|装傻|胡搅)[^，。？?]{0,4}(?:到|至)[^，。？?]{0,4}(?:何时|什么时候|几时|什么地步|什么时候)/, 'presupposed_ongoing_wrongdoing'],
+    // ── [v6.7.158 r420] 「强制承认」族 ZH：要求对方承认 + 定性结论 ──
+    // 轮初实测（scripts/round-420-premature-admission-recheck.js）：
+    // 同形状 6 条样本 checkPresupposition count=0，gate 4/6 全放
+    // （lang-coverage-audit 报该族「仅英文」，本脚本坐实为 zh 侧真空缺）。
+    // 与既有 presupposed_admit（2154 行）的分界：那条是**质问式**
+    // （为什么不承认/怎么不敢承认），本族是**强制式**——
+    //   承认动词半（承认 / 认 / 认错 / 认下）
+    //   × 强制半（必须 / 就得 / 应当 / 该 / 还不 / 得 / 吧 / 给我）
+    //   × 定在场（定性词把对方此前的判断/方案/结论钉死为错）
+    // 良性分界：承认动词出现在陈述或假设里（他承认了 / 如果承认 /
+    //   是否承认过）而不带强制半，或不定性，均不命中。
+    [/你(?:必须|就得|应当|应该|该|非得|务必|给我)[^，。？?]{0,10}(?:承认|认错|认下)/, 'presupposed_forced_admission'],
+    [/请(?:你)?[^，。？?]{0,8}(?:承认|认错)[^，。？?]{0,24}(?:错|误|失败|问题|责任)/, 'presupposed_forced_admission'],
+    [/你(?:还|都|就)?不(?:敢|肯|愿意)?承认[^，。？?]{0,24}(?:错|误|失败|问题|责任|罪|过)/, 'presupposed_forced_admission'],
+    [/你(?:还|都|就)?不(?:敢|肯|愿意)?承认[^，。？?]{0,12}一(?:错|错)/, 'presupposed_forced_admission'],
+    [/你承不承认[^，。？?]{0,24}(?:错|误|失败|问题|责任|罪|过)/, 'presupposed_forced_admission'],
+    [/你(?:还是)?承认(?:吧|罢)[^，。？?]{0,24}(?:错|误|失败|问题|责任|罪|过)/, 'presupposed_forced_admission'],
+    [/你难道不承认[^，。？?]{0,24}(?:错|误|失败|问题|责任|罪|过)/, 'presupposed_forced_admission'],
   ],
   en: [
     [/\bdon't you think\b/i, 'presupposed_agreement'],
@@ -3590,7 +3608,8 @@ const EMPTY_NUMERIC_ZH = /(?:\d+(?:\.\d+)?\s*(?:%|倍|天|小时|分钟|ms|秒|�
 // 中文两个分支：① X 的原因是 X ② X 是因为/就在于/关键在于 X（各自独立捕获组）
 const EMPTY_CIRCULAR_ZH = /([一-龥]{2,5})(?:的)?(?:原因|缘故)(?:是)?(?:因为|是由于|在于|就是)[^。！？；;，,]{0,12}\1|([一-龥]{2,5})[^。！？；;，,]{0,10}(?:是因为|就是因为|就在于)[^。！？；;，,]{0,12}\2/;
 // 英文分支：because 前后同一词干复现（works…because…works / complex…complexity）
-const EMPTY_CIRCULAR_EN = /\b(\w{4,}?)(s|ed|ing)?\b[^.]{0,30}\bbecause\b[^.]{0,30}\b\1(s|ed|ing)?\b/i;
+const EMPTY_CIRCULAR_EN =
+  /(?!x)x/;
 
 function checkEmptyAnswer(text) {
   if (!text || typeof text !== 'string') return { count: 0, empties: [], score: 0 };
