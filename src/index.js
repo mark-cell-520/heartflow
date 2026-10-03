@@ -3355,7 +3355,9 @@ function isInfoDeprivationCompound(text) {
     || ID_COMPOUND_DEPRIVE_YOU_ZH.test(text)
     || ID_COMPOUND_DEPRIVE_STATE_ZH.test(text);
   if (!deprived) return false;
-  // 变异：豁免被删除
+  if (ID_COMPOUND_OBEY_REFUSAL_ZH.test(text)) return false;
+  if (ID_COMPOUND_OBEY_POLITE_ZH.test(text)) return false;
+  if (ID_COMPOUND_FALLBACK_ZH.test(text)) return false;
   return ID_COMPOUND_OBEY_ZH.test(text);
 }
 
