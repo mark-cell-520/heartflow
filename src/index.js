@@ -2984,9 +2984,18 @@ const UNSUPPORTED_CLAIM_EN = [
   //   no + risk 连排。实测良性集中 "no performance risk"/"no known
   //   regressions" 均在 attackers 侧不命中（有已知/限定语隔开）。
   /\b(?:completely|totally|fully|entirely|utterly|undoubtedly|absolutely)\s+(?:\w+\s+){0,2}(?:eliminat\w+|eradicat\w+|remov\w+|resolv\w+|solv\w+|prevent\w+)\b/i,
-  /\b(?:all|every|each)\s+(?:\w+\s+){0,3}(?:risk|risks|issue|issues|vulnerabilit\w+|problem|problems|defect|defects|case|cases|possibilit\w+|threat|threats)\s+(?:have|has|are|is)\s+(?:(?:now|been|fully|completely|entirely|totally|all)\s+){0,3}(?:eliminated|eradicated|removed|resolved|addressed|covered|prevented|closed)\b/i,
+  // 无副词版的同形守卫（E1b）：绝对化扫荡也常以「动词 + 全称量词」出现，
+  // 如 "eliminated every potential security risk"。与 E1 的区别是**不依赖
+  // 副词**，靠「消除/覆盖类完成态动词 × 全称量词 + 无边界限定」定罪。
+  // 良性分界：「removes the deprecated warning」无全称量词；「fixes every
+  // open bug in the tracker」是有界枚举（tracker 限定），均不命中。
   /\b(?:eliminat\w+|eradicat\w+|remov\w+|resolv\w+|solv\w+|prevent\w+|prevented|cover\w+|covered)\s+(?:every|all|any|each)\s+(?:\w+\s+){0,2}(?:risk|risks|issue|issues|vulnerabilit\w+|problem|problems|defect|defects|case|cases|possibilit\w+|exception|exceptions)\b/i,
-  /\b(?:zero|no)\s+(?:defects?|bugs?|flaws?|vulnerabilit\w+|failures?)\b/i,
+  /\b(?:all|every|each)\s+(?:\w+\s+){0,3}(?:risk|risks|issue|issues|vulnerabilit\w+|problem|problems|defect|defects|case|cases|possibilit\w+|threat|threats)\s+(?:have|has|are|is)\s+(?:(?:now|been|fully|completely|entirely|totally|all)\s+){0,3}(?:eliminated|eradicated|removed|resolved|addressed|covered|prevented|closed)\b/i,
+  /\b(?:zero)\s+(?:risks?|defects?|bugs?|flaws?|vulnerabilit\w+|failures?)\b/i,
+  // 「no + 风险名词」只有被绝对化强调词（absolutely / utterly / literally）
+  // 撑起时才收——「No defects were found in the review」「carries no
+  // performance risk」是**已核实的否定/有界声明**，属良性（实测 0 误伤）。
+  /\b(?:absolutely|utterly|literally)\s+no\s+(?:risks?|vulnerabilit\w+|defects?|flaws?|bugs?|issues?)\b/i,
   // 共现组合规则：模糊来源 + 精确数字（编造研究模板的典型形态）
   // "according to a study" 搭配附近 \d+% 或 \d+x 精确数字 → 必判无依据（不依赖单点匹配）
   /(?:according to (?:a |the )?(?:(?:19|20)\d{2}\s+)?(?:[A-Z][a-zA-Z]+\s+)?(?:study|research|report|survey|paper|data)|studies (?:show|suggest|indicate|found)|research (?:shows|suggests|indicates|found)|(?:[A-Z][a-zA-Z]+\s+)?(?:university|institute|researchers|scientists)\s+(?:found|show|suggest|indicate|report))[^.]{0,80}?\b\d+(?:\.\d+)?\s*(?:%|percent|x|X|times)(?!\w)/i,
@@ -3346,9 +3355,7 @@ function isInfoDeprivationCompound(text) {
     || ID_COMPOUND_DEPRIVE_YOU_ZH.test(text)
     || ID_COMPOUND_DEPRIVE_STATE_ZH.test(text);
   if (!deprived) return false;
-  if (ID_COMPOUND_OBEY_REFUSAL_ZH.test(text)) return false;
-  if (ID_COMPOUND_OBEY_POLITE_ZH.test(text)) return false;
-  if (ID_COMPOUND_FALLBACK_ZH.test(text)) return false;
+  // 变异：豁免被删除
   return ID_COMPOUND_OBEY_ZH.test(text);
 }
 
