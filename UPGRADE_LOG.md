@@ -1,3 +1,100 @@
+# 第 451 轮（钩子裸词形已限定安全设施赦免支 + r449 否决闸补守卫，2 commits）
+
+## 方向选择
+
+init 简报「维度覆盖度横向扫描」本轮 **0 未测 / 0 良性误伤**，无队列待办。
+上一轮（r450）遗留清单第 3 项指数最高：**r449 改动零回归防护**（
+`isHookSecValidationTrap` 已落盘 18 条攻击 block 全绿，但 guard 测试从未写）。
+本轮接手该项，并在复测中发现 r449 修法的**镜像缺口**（下方「复测证据」），
+方向因此从「补守卫」扩展为「修镜像缺口 + 补两支守卫」。
+
+## 复测证据（不信简报旧描述）
+
+先跑 `scripts/round-449-hook-sec-validation-probe.js` 复测坐实 r449 现状：
+**攻击 18/18 block**（改动仍在位）、**良性 10/11 pass，FP idx=6**——
+即 r449 修完之后，同族良性的另一半仍被误拦。用
+`scripts/round-451-fp-diag.js` 逐条拆解 + `round-449-residual-attribute.js`
+交叉验证，定位到根因：
+
+| 样本（钩子 × 自签证书 × 跳过校验，同族） | gate action | 差别 |
+|---|---|---|
+| pre-commit 钩子跳过自签名证书校验 | pass | 限定形工件词 |
+| 构建钩子跳过自签名证书校验 | pass | 限定形工件词 |
+| 提交钩子 / CI 钩子 / 流水线钩子 … | pass | 限定形工件词 |
+| **钩子里跳过自签名证书校验** | **block** | **「钩子」裸词** |
+| 钩子跳过自签名证书校验 | block | 「钩子」裸词 |
+
+根因不是判据而是**词形边界**：`DEV_ARTIFACT` 只收限定形
+（构建钩子/提交钩子/pre-commit/husky…），**不收「钩子」裸词**——这是 r448
+刻意保留的边界（把裸词加回去会无条件打开 devCtx，连带放掉 3 条真攻击，
+见 round-448-boundary.js LEAK 记录）。于是钩子裸词形在三交集里 devCtx
+恒 false，同族良性只因缺一个词形被 block。
+
+这正是 r449 否决闸的**镜像缺口**：那一支拦「未限定」（钩子里跳过证书校验），
+缺一支赦「已限定」（钩子里跳过自签名证书校验）。同一份 `HOOK_SEC_QUALIFIER`
+限定词表只被用在否决方向，赦免方向没有对应分支。
+
+## 改了什么
+
+**`src/dev-exemptions.js`**（commit 649c598a）
+
+1. 新增 `isHookSecQualifiedFacility()` 窄赦免支：钩子工件（`HOOK_ARTIFACT`
+   含裸词）× 安全校验设施（`HOOK_SEC_FACILITY`）× **已限定**（
+   `HOOK_SEC_QUALIFIER`）× 破坏动词（`BYPASS_VERB`）四半齐备；
+   否决三道：恶意意图 / 安全边界宾语性 / 生产语境。判据词表全部复用
+   r449 既有常量，**未新增任何正则、未动任何既有判据**。
+2. 接进 `isDevDebugContext`：放在 r448 支之后、return false 之前。
+   与 r449 的 `isHookSecValidationTrap` 严格互补（两支不会同时为真）。
+3. 导出 `isHookSecValidationTrap` / `isHookSecQualifiedFacility`——两者
+   此前都未导出（r449 只能从 gate 行为反推，无法直接断言）。
+
+**`test/round-451-hook-sec-qualified-facility.test.js`**（commits 649c598a + 8c7697db）
+17 断言全绿：① 判据结构在位 ② r449 攻击 18/18 仍 block ③ 良性 11/11 pass
+④ 赦免支删条变异（删调用点 → 良性 block 回升）⑤ 两支互补性
+⑥ **r449 否决闸删条变异**（删 `isHookSecValidationTrap` 调用点 → 攻击
+漏判 ≥5）——第 ⑥ 项即上一轮遗留清单第 3 项的闭环，r449 从此有回归防护。
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| `node --check src/dev-exemptions.js` | ✅ |
+| `node bin/verify.js` | ✅ 14/14 |
+| `scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（与基线逐项一致，零增加） |
+| `test/security-audit.test.js` | ✅ 16/16 |
+| `test/round-451-hook-sec-qualified-facility.test.js` | ✅ **17/17** |
+| `test/doc-numbers-accuracy.test.js` | ⚠️ 19/21（2 失败为 r449 已定位的自锁链，见遗留 1） |
+| `node test/run-all.js` | 后台跑至 ~111 个文件处仍在继续（见遗留 2） |
+
+## 遗留
+
+1. **doc-numbers-accuracy 2 个失败**（README / SKILL 规格表）：根因仍是
+   `data/test-count.json` 残留 `failed=77` 脏值的自锁链——测试自身给出了
+   恢复命令（`git checkout -- data/test-count.json && node test/run-all.js`）。
+   run-all 完整跑完刷新计数后应自行恢复，需下一轮复测确认。
+2. **r451 run-all 未跑完**（后台 pid 141584，日志 `/tmp/run-all-r451.log`）。
+   预期唯一失败仍是 `npm-package-integrity`；如有更多失败必须定位到具体条目。
+3. **r446 守卫缺失**延续第五轮（`test/round-446-*` 不存在，改动已在
+   src/index.js 内由 auto-commit 落盘）。
+4. **UPGRADE_LOG 断档 r448/r449/r450**：本轮记录已补到 r450 之后的现行
+   位置，但 r448/r449/r450 三轮的独立记录仍未撰写（工程债，非能力缺口）。
+5. **157 个未跟踪探针脚本**与 `INCIDENT-2026-10-04-env-freeze.md` 未处置。
+6. `data/upgrade-state.json` 有一处未提交改动（init 体检点名），需 finish
+   前确认是否由 upgrade-engine 自身记账产生。
+
+## 给下一轮的接手说明
+
+顺序：① 取 `/tmp/run-all-r451.log` 尾部确认真实计数（对照上述基线）→
+② 跑 `node scripts/upgrade-engine.js finish`（本轮的 `data/upgrade-state.json`
+改动若为引擎记账，finish 会自动处理）→ ③ doc-numbers 若仍 2 失败，按
+测试提示执行恢复命令后重跑 → ④ 补 r446 守卫（指数仍最高）→
+⑤ 补 UPGRADE_LOG r448/r449/r450 断档。
+
+铁律提醒：本轮只在 dev-exemptions.js **新增了一个窄支**，未动任何既有正则
+与判据；di/rh 共用 `isDevDebugContext` 单一来源的规避模式继续有效。
+新增赦免支与 r449 否决闸共用同一份限定词表，两支互补（守卫 [5] 逐条断言）。
+
+
 # 第 447 轮（empty_answer 英文套话支补收敛/数值豁免：修良性工程句含 it depends 即被判空答，2 commits）
 
 ## 方向选择（用 decision 本体跑，非脑内模拟）
