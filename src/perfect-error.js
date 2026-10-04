@@ -147,8 +147,22 @@ function checkPerfectError(text) {
   // 双向门禁 benign 组第 29/30 条正是这句（实测 v6.7.100 起卡红灯）。
   const isQuestion = /[？?]/.test(text) ||
     /(?:可能是什么原因|是什么原因|说明了什么|意味着什么|正常吗|是不是|为什么|有没有|如何解释)/.test(text);
+  // ── [r437] 仪器读数语域豁免（中文侧，S1/S2 同源）──────────────────
+  // 缺口实测（scripts/round-437-pe-diag.js）：
+  //   「线上监控数据表明连接池峰值使用率为 72%」被判
+  //   S1_false_precision(72%) + S2_fake_authority(数据表明…72%) → 0.43。
+  // 根因同族同根：S1 的 METRIC_NOUNS_ZH 收「占比/使用率」之外的这个说法
+  // 不含已收度量名词，而 SOURCED_CONTEXT 只认「报告/年报/审计」类名词，
+  // 「监控数据/巡检日志」这类**仪器产出处**不在表内；S2 的
+  // 「(研究|调查|实验|数据)(表明|显示…)[^。]{0,30}数字」也不分读数来自
+  // 仪器还是来自不可定位的中间人。
+  // 分界线沿用 r432/r435/r436/r437 的「能否定位」：仪器语域词 + 报告/日志
+  // 类名词 + 显示/表明三者齐备 = 数据可从监控/巡检记录复现。
+  // 人身权威形式（专家/教授/官方/可靠消息）不享受本豁免。
+  const PE_INSTRUMENT_ZH = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)[^。]{0,4}(?:报告|数据|记录|结果|日志|指标|看板|报表|告警)[^。]{0,6}(?:显示|表明|指出)/;
+  const peInstrumentSourced = hasChinese && PE_INSTRUMENT_ZH.test(text);
   const precisionHits = [];
-  if (!hasMetricNoun && !isSourced && !isQuestion) {
+  if (!hasMetricNoun && !isSourced && !peInstrumentSourced && !isQuestion) {
     for (const pat of FALSE_PRECISION_PATTERNS) {
       const m = text.match(pat);
       if (m && m.length) precisionHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
@@ -159,10 +173,16 @@ function checkPerfectError(text) {
   }
 
   // S2: 伪权威
+  // [r437] 仪器读数语域豁免：同 S1 分界（见上方 peInstrumentSourced），
+  // 句中存在仪器语域三合一时，「数据(表明|显示|指出)+数字」是监控读数
+  // 不是编造的权威引用。只摘该形态，著名专家/机构/期刊族一律保留。
   const authorityHits = [];
   for (const pat of FAKE_AUTHORITY_PATTERNS) {
     const m = text.match(pat);
-    if (m && m.length) authorityHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+    if (m && m.length) {
+      if (peInstrumentSourced && /^(?:研究|调查|实验|数据)(?:表明|显示|证明|证实|发现|指出)/.test(m[0])) continue;
+      authorityHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+    }
   }
   if (authorityHits.length) {
     signals.push({ id: 'S2_fake_authority', name: '伪权威', count: authorityHits.length, hits: authorityHits.slice(0, 3), weight: 0.9 });
