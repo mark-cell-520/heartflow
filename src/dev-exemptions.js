@@ -520,6 +520,12 @@ function isDevDebugContext(text) {
   // [第 448 轮] 钩子/CI 工件 × 开发质量检查设施 窄支（见 isHookQualityCheck 注释）。
   // 放在所有三交集支之后：它是 devCtx 之外的补充语境，不影响上面任何一支。
   if (isHookQualityCheck(text)) return true;
+  // [第 451 轮] 钩子/CI 工件 × **已限定**安全校验设施 赦免支。
+  // 与上方 isHookSecValidationTrap 否决闸严格互补：那一支拦「未限定」（钩子
+  // 里跳过证书校验），本支赦「已限定」（钩子里跳过自签名证书校验）。
+  // 放在 r448 支之后，只影响「钩子」裸词形（DEV_ARTIFACT 不收的词形，
+  // 见函数注释），不触碰任何三交集支的 devCtx 口径。
+  if (isHookSecQualifiedFacility(text)) return true;
   return false;
 }
 
@@ -650,6 +656,46 @@ function isHookSecValidationTrap(text) {
   // 句内有任意限定词在场即视为本地设施（含跨设施词位置，如「自签名证书告警」）
   if (HOOK_SEC_QUALIFIER.test(text)) return false;
   return true;
+}
+
+// ─── [第 451 轮] 钩子/CI 工件 × 已限定安全校验设施 赦免支 ──────────────────
+// 这是上方 isHookSecValidationTrap 否决闸的**镜像缺口**。r449 修完未限定族后
+// 复测（scripts/round-451-fp-diag.js）抓到同族良性的另一半仍被 block：
+//   「钩子里跳过自签名证书校验」—— devCtx=false → di 第①条命中（跳过 × 证书）
+//   → block；而同句只要换成「构建钩子/提交钩子/pre-commit 钩子 …」立刻 pass。
+// 根因不在判据而在**词形边界**：DEV_ARTIFACT 只收限定形（构建钩子/提交钩子/
+// pre-commit…），不收「钩子」裸词 —— r448 刻意不收（无条件打开 devCtx 会连带
+// 放掉 3 条真攻击，见 round-448-boundary.js LEAK 记录）。于是「钩子」裸词形
+// 在三交集里 devCtx 恒 false，同族良性只因缺一个词形被打 block。
+//
+// 为什么修在这里而不把「钩子」加回 DEV_ARTIFACT：本支与第 188 轮测试库
+// fixture、第 448 轮质量检查同型，是 devCtx 之外的**窄赦免支**——只在设施
+// 已被自签/测试环境限定时成立，不放宽任何未限定形。判据四半齐备：
+//   ① 钩子/CI 工件语境（复用 HOOK_ARTIFACT，含「钩子」裸词）
+//   ② 安全校验设施在场（复用 HOOK_SEC_FACILITY 单一来源）
+//   ③ 设施已被自签/测试环境限定（复用 HOOK_SEC_QUALIFIER）
+//   ④ 破坏动词（复用 BYPASS_VERB 单一来源）
+// 否决三道：恶意意图 / 真实安全边界（SECURITY_BOUNDARY + 宾语性）/ 生产语境
+//   —— 与 r449 否决闸共用同一组限定词，因此「未限定」与「已限定」严格互补：
+//   上方闸放行的句子本支必不命中，两支不会同时为真。
+// 边界实测（scripts/round-451/）：良性 11 条 11/11 pass；r449 的 18 条攻击
+// 全部不含限定词 → 本支 0 命中 → 仍 18/18 block。
+function isHookSecQualifiedFacility(text) {
+  if (!text || typeof text !== 'string') return false;
+  if (MALICIOUS_INTENT.test(text)) return false;
+  // 真实安全边界仍是真边界：安全词在场且是动作宾语时不赦。
+  // SECURITY_BOUNDARY 刻意不含证书/TLS/SSL（那是 DEV_TARGET 合法设施词，
+  // 自签证书族 17 条良性押在赦免面上），与 r449 否决闸同一口径。
+  if (SECURITY_BOUNDARY.test(text) && _securityIsVerbObject(text)) return false;
+  const pm = PROD_CONTEXT.exec(text);
+  if (pm) {
+    const around = text.slice(Math.max(0, pm.index - PROD_WINDOW), pm.index + pm[0].length + PROD_WINDOW);
+    if (!PROD_NEGATION.test(around) && !hasAheadNegation(text, pm.index)) return false;
+  }
+  return HOOK_ARTIFACT.test(text)
+    && HOOK_SEC_FACILITY.test(text)
+    && HOOK_SEC_QUALIFIER.test(text)
+    && BYPASS_VERB.test(text);
 }
 
 // ─── 编译器噪音警告判据（v6.7.126 第 119 轮新增，单一来源）─────────
@@ -919,6 +965,8 @@ function isTemporaryRestorePromise(text) {
 
 module.exports = {
   isDevDebugContext,
+  isHookSecValidationTrap,
+  isHookSecQualifiedFacility,
   isTestFixtureReset,
   hasAheadNegation,
   isCompilerNoiseWarning,
