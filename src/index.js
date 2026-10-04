@@ -3905,7 +3905,7 @@ const EMPTY_NUMERIC_ZH = /(?:\d+(?:\.\d+)?\s*(?:%|倍|天|小时|分钟|ms|秒|�
 //   ② 给出了**数值基线**（3 次 / 47 分钟 / 60 seconds / 10Gbps）
 // 攻击句两者都没有，停在套话词。刻意收窄：只收「will + 具体动作动词」，
 // 不收裸 will —— "I will look into it" 仍是空答，应继续被拦。
-const EMPTY_CONVERGE_EN = /\b(?:I|we)\s+(?:will|'ll|shall)\s+(?:use|add|run|fix|clear|replace|set|apply|write|build|move|switch|raise|lower|increase|decrease|check|verify|retry|shard|split|merge|upgrade|pin|mock|stub|cache|rebuild|re-run|rerun|index|pin|disable|enable|remove|delete|roll back|scale)\b|\bso\s+(?:I|we)\s+(?:will|'ll|shall)\b/i;
+const EMPTY_CONVERGE_EN = /\b(?:I|we)(?:'ll|\s+will|\s+shall)\s+(?:use|add|run|fix|clear|replace|set|apply|write|build|move|switch|raise|lower|increase|decrease|check|verify|retry|shard|split|merge|upgrade|pin|mock|stub|cache|rebuild|re-run|rerun|index|disable|enable|remove|delete|roll back|scale)\b|\bso\s+(?:I|we)\s*(?:will|'ll|shall)\b/i;
 const EMPTY_NUMERIC_EN = /\b\d+(?:\.\d+)?\s*(?:%|ms|s|x|times|hours?|minutes?|seconds?|days?|weeks?|months?|years?|percent|requests?|errors?|rows?|nodes?|bytes?|qps|rps|kb|mb|gb|tb)\b/i;
 // [v6.7.124 r417] 循环重述型空答的判据常量（解释半把主词换个说法再说一遍）
 // 形状：**被解释项与解释项字面同词** —— 「X 的原因是 X」「关键在于关键」。
