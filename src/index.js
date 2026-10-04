@@ -3101,6 +3101,19 @@ function checkUnsupportedClaim(text) {
       claims.push({ type: `unsupported_claim_${idx + 1}`, matched: m[0].slice(0, 50), count: m.length });
     }
   }
+  // [r437] 仪器读数语域豁免：句中存在「仪器语域词 + 报告/日志类名词 +
+  // 显示/表明」三合一时，「(调查|数据显示)」(UNSUPPORTED_CLAIM_ZH 第 2 支) 是
+  // 可从监控/巡检记录复现的读数引用，不是无依据断言。分界与
+  // appeal_to_authority/perfect_error/vagueness 三侧本轮同源修改一致
+  // （scripts/round-437-diag3.js 实测该族改前 unsupported_claim:45 x2）。
+  const UC_INSTRUMENT_ZH = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)[^。]{0,4}(?:报告|数据|记录|结果|日志|指标|看板|报表|告警)[^。]{0,6}(?:显示|表明|指出)/;
+  const ucInstrumentSourced = hasChinese && UC_INSTRUMENT_ZH.test(text);
+  if (ucInstrumentSourced) {
+    for (let i = claims.length - 1; i >= 0; i--) {
+      const c = claims[i];
+      if (c && typeof c.matched === 'string' && /^(?:调查显示|数据显示)$/.test(c.matched)) claims.splice(i, 1);
+    }
+  }
   const count = claims.length;
   // 自我保留豁免（收紧版）：只有当文本有"具体来源锚点"（论文/期刊/文献/测试集/数据/知名机构）时才豁免。
   // 理由：编造研究最常见的伪装就是"模糊来源(根据/研究表明/专家指出) + 具体结论 + 假装有保留语"，
@@ -6703,6 +6716,23 @@ function checkAppealToAuthority(text) {
       const entry = { pattern: pat.source.slice(0, 25), type: 'appeal_to_authority' };
       signals.push(entry);
       signalsRaw.push(entry);
+    }
+  }
+  // ── [r437] 可定位读数引用豁免（中文侧）─────────────────────────
+  // 缺口实测（scripts/round-437-vagueness2-diag.js）：
+  //   「线上巡检数据显示本周无 P0 级故障」被判 appeal_to_authority:35 -> verify，
+  //   而 vagueness 侧 r436 已为同族建了可定位语域豁免，appeal_to_authority 侧
+  //   仍把「机器读数」当成人身权威转述，同一句两侧判定不一致。
+  // 根因：AUTHORITY_PATTERNS.zh 的「数据显示/数据表明」是第三人称转述，
+  // 不区分读数来自**仪器/报告**还是来自无法定位的中间人。
+  // 分界线：句中存在「仪器语域词 + 报告类名词 + 显示/表明」三合一时，
+  // 只摘掉「数据显示/数据表明」两条信号；「专家表示/研究表明/官方指出/
+  // 据可靠消息」等人身或不可定位权威一律保留（负例守卫见
+  // test/round-437-appeal-authority-instrument.test.js）。
+  const AUTH_INSTRUMENT_ZH = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)[^。]{0,4}(?:报告|数据|记录|结果|日志|指标|看板|报表|告警)[^。]{0,6}(?:显示|表明|指出)/;
+  if (hasChinese && AUTH_INSTRUMENT_ZH.test(text)) {
+    for (let i = signals.length - 1; i >= 0; i--) {
+      if (/^(?:数据显示|数据表明)$/.test(signals[i].pattern)) signals.splice(i, 1);
     }
   }
   // ── [第 227 轮] 第一人称权威压制族：身份半 AND (服从半 OR 终止论证半) ──
