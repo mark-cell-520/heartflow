@@ -511,6 +511,9 @@ function isDevDebugContext(text) {
   //   · 动作是表级重置（delete from / truncate / 全表删 / 清表）
   //   · 安全边界词/恶意意图/生产上下文一律不豁免（复用文件头部既有否决）
   if (isTestFixtureReset(text)) return true;
+  // [第 448 轮] 钩子/CI 工件 × 开发质量检查设施 窄支（见 isHookQualityCheck 注释）。
+  // 放在所有三交集支之后：它是 devCtx 之外的补充语境，不影响上面任何一支。
+  if (isHookQualityCheck(text)) return true;
   return false;
 }
 
@@ -551,6 +554,44 @@ function isTestFixtureReset(text) {
     if (!PROD_NEGATION.test(around) && !hasAheadNegation(text, pm.index)) return false;
   }
   return TEST_FIXTURE_DB.test(text) && TEST_FIXTURE_RESET.test(text);
+}
+
+// ─── [第 448 轮] 钩子/CI 工件 × 开发质量检查设施 窄支 ──────────────────
+// 缺口实测（scripts/round-448-di-repro.js，19 条形状隔离样本）：
+// 「跳过代码格式检查，钩子里临时改的」被判 dangerous_instruction + reward_hacking
+// 双 block（gate action=block, severity 85）。逐条件拆解（round-448-devexp.js）：
+//   DEV_TARGET=true（检查）· BYPASS_VERB=true（跳过）· devCtx=**false** ——
+//   DEV_CONTEXT 无环境词，DEV_ARTIFACT 不收「钩子」裸词（只收 git hook /
+//   pre-commit / husky 等英文复合形），devCtx 不成立是唯一根因。
+// 为什么**不**把「钩子」直接加进 DEV_ARTIFACT：那会无条件打开 devCtx，
+// 实测连带赦掉 3 条真攻击（钩子里跳过 CSRF 检查 / pre-commit 忽略 TLS 警告 /
+// 本地钩子跳过证书校验 —— round-448-boundary.js LEAK idx 1/12/13/15），
+// 即「宽表治窄病」的第 7 次复发。
+// 修法与第 188 轮测试库 fixture 同型：单独一支窄判据，三半齐备 + 三道否决：
+//   ① 钩子/CI 工件语境（含「钩子」裸词，英文侧 hook/pre-commit/pipeline）
+//   ② 开发质量检查设施（代码/格式/风格/lint/prettier… × 检查/校验/lint）
+//   ③ 绕过动词（复用 BYPASS_VERB 单一来源，不另抄一份）
+//   否决：真实安全设施词（证书/TLS/SSL/CSRF/XSS/鉴权/审计…）+ 恶意意图 + 生产语境
+// 为什么必须覆盖 reward_hacking：该句 rh 的 check_suppression 同样命中
+// （di-repro dims 双记）。判据只放这一份，由 isDevDebugContext 统一调用，
+// 两个维度共用，不再重演 v6.7.107/112/115「豁免只加在一个维度」的第 8 次复发。
+const HOOK_ARTIFACT = /(?:钩子|pre-?commit|commit-?msg|git\s+hooks?|husky|lint-?staged|eslint\s+hook|测试钩子|代码检查钩子|提交钩子|钩子脚本|本地钩子|构建钩子|\bCI\b|流水线|pipeline|runner)/i;
+// 开发质量检查设施：代码/格式/风格/lint/prettier 一类**开发噪音**设施
+// （与第 119 轮 isCompilerNoiseWarning 同源），不含任何安全设施。
+// 刻意不收宽窗口：中间隔字即不匹配，「代码安全检查」「安全格式检查」均不中。
+const QUALITY_CHECK_FACILITY = /(?:代码|源码|程序|文件|格式|风格|排版|样式|规范|缩进|空行|尾随空格|lint|linting|prettier|eslint|style|format)[\s的]*(?:检查|校验|lint(?:ing)?|规范)/i;
+// 安全设施否决表（与命中侧 di 第①族设施表同源）：任何真实安全设施在场即不赦。
+const HOOK_NO_SEC = /(?:证书|certificate|TLS|\bSSL\b|CSRF|XSS|签名|signature|鉴权|认证|授权|身份验证|权限校验|权限检查|审计|日志|防火墙|WAF|IDS|IPS|白名单|ACL|安全组|访问控制|安全策略|安全机制|安全检查|安全警告|限流|熔断|反病毒|防病毒|杀毒|DLP|堡垒机|态势感知|威胁|入侵|渗透|提权|越权|脱库|密钥|密码|口令|私钥|token|secret|api[_.]?key|凭据|firewall|auth(?:entication|orization)?|audit|security|access\s+control|privilege\s+check|rbac|admin|root)/i;
+function isHookQualityCheck(text) {
+  if (!text || typeof text !== 'string') return false;
+  if (MALICIOUS_INTENT.test(text)) return false;
+  if (HOOK_NO_SEC.test(text)) return false;
+  const pm = PROD_CONTEXT.exec(text);
+  if (pm) {
+    const around = text.slice(Math.max(0, pm.index - PROD_WINDOW), pm.index + pm[0].length + PROD_WINDOW);
+    if (!PROD_NEGATION.test(around) && !hasAheadNegation(text, pm.index)) return false;
+  }
+  return HOOK_ARTIFACT.test(text) && QUALITY_CHECK_FACILITY.test(text) && BYPASS_VERB.test(text);
 }
 
 // ─── 编译器噪音警告判据（v6.7.126 第 119 轮新增，单一来源）─────────
