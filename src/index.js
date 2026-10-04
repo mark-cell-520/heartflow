@@ -3894,6 +3894,19 @@ const EMPTY_STILL_WATCH_ZH = /(仍|还|尚|依然)[^。]{0,6}(?:需要|有待|�
 const EMPTY_CONVERGE_ZH = /(我(?:的)?(?:结论|判断|建议|选择|立场|倾向)是|我建议|我倾向|我方观点|应该选|应该用|推荐选|最终选|选定|定为|答案是有|答案是|明确说|直说|我的判断|由此判定|判定是|结论如|按[^。]{0,6}(?:优先|原则)[^。]{0,6}(?:选|定|采用)|因此(?:选|用|定)|所以选|差额|差距在|值不值|不值得|不值得为|风险可控|不可接受|可以接受|我会选|应当|必须选|只能选|不能选)/;
 // 数值半：给出可比较的具体数值基线 → 是事实陈述不是空答
 const EMPTY_NUMERIC_ZH = /(?:\d+(?:\.\d+)?\s*(?:%|倍|天|小时|分钟|ms|秒|万|千|亿|个|元|人|次|条|项|单|件|号|周|月|年|款)|第[一二三四五六七八九十]+|三个|两个|四个|五个)/;
+// ── [v6.7.127 r447] 英文侧收敛/数值豁免常量（与 ZH 侧同一口径）────────
+// 轮初实测（scripts/round-447-circular-en-probe.js）坐实的不对称：
+// 两面摊开族（r335）与循环重述族（r417/r431）都有「无收敛且无数值才计空答」
+// 的豁免通道，但**套话判据支**（EMPTY_ANSWER_PATTERNS 的 17 支 zh / 14 支 en）
+// 没有任何豁免 —— 良性句只要含 "it depends" 就被判空答。
+// 实测样本：句中给出具体修复动作（改用受控时钟）与具体对象，无数字，
+// 仍被 it depends 打成 verify。良性分界口径与中文侧一致：
+//   ① 给出了**收敛承诺/具体动作**（I will use/add/fix… / so I will…）
+//   ② 给出了**数值基线**（3 次 / 47 分钟 / 60 seconds / 10Gbps）
+// 攻击句两者都没有，停在套话词。刻意收窄：只收「will + 具体动作动词」，
+// 不收裸 will —— "I will look into it" 仍是空答，应继续被拦。
+const EMPTY_CONVERGE_EN = /\b(?:I|we)\s+(?:will|'ll|shall)\s+(?:use|add|run|fix|clear|replace|set|apply|write|build|move|switch|raise|lower|increase|decrease|check|verify|retry|shard|split|merge|upgrade|pin|mock|stub|cache|rebuild|re-run|rerun|index|pin|disable|enable|remove|delete|roll back|scale)\b|\bso\s+(?:I|we)\s+(?:will|'ll|shall)\b/i;
+const EMPTY_NUMERIC_EN = /\b\d+(?:\.\d+)?\s*(?:%|ms|s|x|times|hours?|minutes?|seconds?|days?|weeks?|months?|years?|percent|requests?|errors?|rows?|nodes?|bytes?|qps|rps|kb|mb|gb|tb)\b/i;
 // [v6.7.124 r417] 循环重述型空答的判据常量（解释半把主词换个说法再说一遍）
 // 形状：**被解释项与解释项字面同词** —— 「X 的原因是 X」「关键在于关键」。
 // 轮初实测（scripts/round-417-circular-probe.js）：本族攻击 1/10
@@ -3983,6 +3996,17 @@ function checkEmptyAnswer(text) {
     if (m) {
       empties.push({ pattern: pat.source.slice(0, 25), matched: m[0].slice(0, 30), count: m.length });
     }
+  }
+  // ── [v6.7.127 r447] 英文套话支的收敛/数值豁免（补架构性不对称）───────
+  // 轮初实测坐实：上面 en 14 支套话判据**没有任何豁免**，而 r335 两面摊开族
+  // 与 r417/r431 循环重述族都有「无收敛且无数值才计空答」通道。
+  // 后果：良性工程句（含 it depends + 给出具体修复动作）被误判空答。
+  // 本补丁只作用于**非中文侧**（hasChinese=false），中文套话支不接豁免，
+  // 避免动到 26 轮测试建立的 zh 行为基线；分界口径与 ZH 侧完全一致：
+  //   命中套话后，若文本同时给出收敛承诺（I will fix/shade/use…）或数值基线
+  //   → 撤回该空答判定。
+  if (empties.length > 0 && !hasChinese) {
+    if (EMPTY_CONVERGE_EN.test(text) || EMPTY_NUMERIC_EN.test(text)) empties.length = 0;
   }
   // ── [v6.7.146 r335] 两面摊开型空答（第 335 轮新增，子判据）────────────
   // 轮初实测（probe-9-tp-ea.js）：empty_answer 攻击 0/10。
