@@ -1,3 +1,100 @@
+# 第 447 轮（empty_answer 英文套话支补收敛/数值豁免：修良性工程句含 it depends 即被判空答，2 commits）
+
+## 方向选择（用 decision 本体跑，非脑内模拟）
+
+init 简报队列无待办。用 `src/core/decision.js` 本体跑 4 候选
+（`scripts/round-447-decide.js`）：第一轮自然语言候选即分出高下，**[B] 修 empty_answer
+circular_restate 残留缺口与误伤** score 0.77 > A 补 r446 守卫+18 轮簿子断档 0.74
+> C 清理探针 0.74 > D 定位 run-all 77 失败 0.74；补「可行性/后果/风险/用户可感知」
+四项数值判据后第二轮仍为 B（0.77 > 0.74），confidence 0.7。
+
+**排除项有实测依据：** A 的 r446 改动经 `git log` 核实已被 auto-commit 落盘
+（`grep presupposed_premature_admission src/index.js` 7 支在位），但
+`test/round-446-*` 守卫测试确实缺失；C/D 见下方验证节（D 的 77 失败本轮已定位到根因）。
+
+## 复测证据（不信旧描述）
+
+简报里唯一被点名的族级缺口是 `empty_answer[circular_restate 仅中文]`。
+用 `scripts/round-447-circular-en-probe.js` 直调 `checkEmptyAnswer` + `gate`
+复测 10 条英文循环重述攻击：**dim 命中 9/10、gate 漏出 1/10** ——
+即该族英文侧**并未失活**（r417/r431 的词干比较通道在跑），审计标签「仅中文」源于
+审计样本集形状覆盖不足，不是真缺口。这条推翻了我原本打算照简报标签直接补英文判据的计划。
+
+改用 `scripts/round-447-stem-diag.js` 打印词干匹配对后，定位到**两个新问题**：
+
+| 现象 | 根因（实测归因） |
+|---|---|
+| 良性句被 gate=verify | 命中 `\bit depends\b` 套话判据，而句中给了具体修复动作与受控时钟方案，无数字 |
+| 1 条攻击穿过 gate | 形容词同义转写形状（词干不共享），非本族形状 |
+
+## 改了什么
+
+**改动 1（commit 4f2fab6e）：补英文侧收敛/数值豁免常量并接入套话判据支。**
+
+根因是**架构性不对称**：`checkEmptyAnswer` 里两面摊开族（r335）与循环重述族
+（r417/r431）都有「无收敛且无数值才计空答」的豁免通道，而
+`EMPTY_ANSWER_PATTERNS` 的 17 支 zh / 14 支 en **套话判据没有任何豁免**——
+良性句只要含 `it depends` 就被判空答。
+
+新增 `EMPTY_CONVERGE_EN` / `EMPTY_NUMERIC_EN` 两个常量，并在套话循环后接入：
+命中套话后若文本给出收敛承诺（I/we + will/shall 或缩写 + 具体动作动词）或数值基线
+→ 撤回空答判定。**只作用于非中文侧**（`!hasChinese`），中文套话支不接豁免，
+避免动到 26 轮测试建立的 zh 行为基线。
+
+刻意分界：只收「will + 具体动作动词」，不收裸 will ——
+「I will look into it」仍是空答，应继续被拦（已在守卫反向断言里验证）。
+
+**改动 2（commit aa295b8f）：守卫测试 + 删条变异 + 缩写不匹配修复。**
+
+`test/round-447-empty-answer-en-exemption.test.js` 三项断言：
+① 良性（套话 + 收敛/数值）不得判空答；② 纯套话攻击句必须仍是空答（反向守卫，
+防豁免被削弱）；③ 删条变异：把豁免接入块条件恒假化，① 必须从 0 误伤升到 10
+（证明守卫敏感，不是摆设）。
+
+变异体参照 `test/round-431-mutant-runner.js` 既有模式写入 `src/` 同目录
+（第一版写临时目录失败：单文件拷贝缺 `./pedagogy.js` 依赖，实测 MODULE_NOT_FOUND）。
+
+顺带修 `EMPTY_CONVERGE_EN` 对缩写形式不匹配（`I/we` 与 will 之间要求空格，
+`we'll + 动作` 收不到）；第一次改宽成「收了 I/we + will 就豁免」时被自己否掉
+——那会把「I will look into it」这类真空答也放行，违背分界纪律，已回退成精确修法。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node --check src/index.js` | ✅ |
+| 候选判据离线验证（10 良性 + 10 攻击） | 良性误伤 **1→0**、纯套话攻击 **10/10** 仍拦 |
+| 删条变异守卫 | 基线 0 误伤 → 删豁免后 **10**（守卫敏感） |
+| `bin/verify.js` | ✅ **14/14** |
+| `scripts/bidirectional-guard.js` | 召回 **52/52**、误拦 **302/326**（**正好基线零增**） |
+| `test/security-audit.test.js` | ✅ **16/16** |
+| `test/round-447-*.test.js` | ✅ 全绿（0 failures） |
+| `node test/run-all.js` | 后台运行中（见下方遗留） |
+
+## 遗留 / 给下一轮
+
+1. **`doc-numbers-accuracy` 2 个失败已定位根因，非本轮代码问题**：
+   缓存 `data/test-count.json` 里 `testFailed: 77` 残留，触发记账链路自锁
+   （doc-numbers 挂 → 缓存继续写 failed>0 → 永不恢复）。测试自身的提示给出恢复命令
+   `git checkout -- data/test-count.json && node test/run-all.js`。
+   本轮已启动 run-all 后台刷新真实计数（**本轮内未等到结果**），
+   下一轮先 `cat data/test-count.json` 看 failed 是否回落到预期基线（npm-package-integrity 1 个）。
+2. **r446 守卫测试仍缺失**：`test/round-446-*` 不存在，而 `src/index.js` 的
+   7 支 `presupposed_premature_admission` 判据已由 auto-commit 落盘、无守卫。
+   下一轮优先补（样本已定形：26 攻击 / 76 良性，见 r446 交接说明）。
+3. **UPGRADE_LOG 簿子断档 r429–r446 共 18 轮未落簿**（顶部仍是 r428），
+   与本轮无关但跨轮累积。建议下一轮起每轮只补最新一轮，先止血不再扩大。
+4. **157 个未跟踪 `scripts/round-*` 探针 + 若干 `test/round-*` / `src/round-431-mutant-*`**
+   未清理（finish 会提示需人工判断）。本轮新增 4 个 r447 探针，
+   其中 3 个（decide/stem-diag/b5-diag*）属诊断用、建议与旧探针一并清理，
+   `round-447-circular-en-probe.js` 建议改写为正式负例脚本后归档（参考
+   `scripts/negative-test-empty-answer-circular-en.js`）。
+5. **dangerous_instruction 误伤未修（范围外）**：实测良句含「清理缓存」类运维动作
+   被打成 severity 85 的 block，与 empty_answer 无关，是另一维度既有误伤。
+   本轮按纪律只记不改，已把该样本移出 guards 良样集以免污染本轮判据验证。
+
+---
+
 # 第 428 轮（补两个 block 级维度的单侧失活族：中文 hate_speech 泛称驱逐 + 英文 dehumanization 人口处置，3 commits）
 
 ## 方向选择
