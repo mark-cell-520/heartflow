@@ -3645,9 +3645,75 @@ const EMPTY_NUMERIC_ZH = /(?:\d+(?:\.\d+)?\s*(?:%|倍|天|小时|分钟|ms|秒|�
 // 同词复现 + 短窗口，不引入任何新实体需求的词表。
 // 中文两个分支：① X 的原因是 X ② X 是因为/就在于/关键在于 X（各自独立捕获组）
 const EMPTY_CIRCULAR_ZH = /([一-龥]{2,5})(?:的)?(?:原因|缘故)(?:是)?(?:因为|是由于|在于|就是)[^。！？；;，,]{0,12}\1|([一-龥]{2,5})[^。！？；;，,]{0,10}(?:是因为|就是因为|就在于)[^。！？；;，,]{0,12}\2/;
-// 英文分支：because 前后同一词干复现（works…because…works / complex…complexity）
-const EMPTY_CIRCULAR_EN =
-  /(?!x)x/;
+// 英文分支：[v6.7.126 r431] 补实现（此前是 /(?!x)x/ 恒假空壳，英文该族全支失活）
+// 形状：**被解释项与解释项字面同词干** —— 「X fails because failure…」。
+// 三条通道（各自独立捕获组）：
+//   ① because 前后同词干（\w+ … because … \1 系/动词形）
+//   ② 「X 的原因是 X due to <主词>名词」形（because of + 同词干名词）
+//   ③ 系动词表语与主语同词干（is X because it is X）
+// 良性分界（关键，与 ZH 侧同一口径）：良性解释引入**新实体/新信息**
+//   （the bottleneck is the regex pass / the TLS certificate expired），
+//   不会在同一窗口里把同一个词干换个词性复现一遍。
+// 词干用首字母起 3+ 字符的前缀匹配（failures/failed/failing → fai…），
+//   并要求前后**词性不同**（动词 vs 名词），否则纯同词复述不算解释。
+// 英文分支（运行时实现，非纯正则）：
+// 正则无法做「同词干 + 词性不同」的比较（fail/failure 词干同为 fai），
+// 所以英文支用函数实现，与中文支在同一处闸门调用（checkEmptyAnswer 内），
+// 保持同一口径：命中后仍受 EMPTY_CONVERGE_ZH / 数值豁免约束。
+// 英文分支（运行时实现，非纯正则）：
+// 正则无法做「同词干 + 词形不同」的比较（fail/failure 词干同为 fai），
+// 且 /([a-z]{3,})\b[^.!?;]{0,60}because.../ 会从句首贪心抓到 "The"/"migration"
+// 这类与主词无关的词，sameStem 恒 false → 全族 0 命中。
+// 故英文支用函数实现：because 两侧窗口分词后逐对比词干。
+const EMPTY_CIRCULAR_EN = /\b(?:because|since|as|due to)\b/gi;
+
+// 常见功能词（不参与词干比较）
+const EMPTY_CIRCULAR_EN_STOP = new Set([
+  'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'any', 'can', 'had', 'her', 'was',
+  'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'its', 'may', 'new', 'now',
+  'old', 'see', 'two', 'who', 'boy', 'did', 'man', 'men', 'put', 'end', 'why', 'let', 'say',
+  'she', 'too', 'use', 'that', 'this', 'with', 'from', 'they', 'have', 'been', 'were', 'said',
+  'each', 'which', 'their', 'would', 'there', 'could', 'other', 'into', 'than', 'them', 'then',
+  'these', 'some', 'what', 'when', 'make', 'like', 'just', 'over', 'also', 'after', 'most',
+  'such', 'only', 'very', 'well', 'even', 'back', 'good', 'same', 'here', 'where', 'both',
+  'does', 'did', 'done', 'being', 'every', 'much', 'must', 'should', 'shall', 'will', 'shall',
+  'because', 'since', 'while', 'though', 'although', 'however', 'therefore', 'thus', 'hence',
+  'due', 'owing', 'thanks', 'thanks', 'inherent', 'normal', 'naturally', 'naturally',
+  'property', 'characteristic', 'part', 'aspect', 'result', 'consequence', 'thing', 'way',
+  'means', 'kind', 'sort', 'type', 'form', 'case', 'point', 'fact', 'idea', 'reason',
+  'unavoidable', 'inevitable', 'expected', 'typical', 'always', 'never', 'often', 'sometimes',
+]);
+
+function _emptyCircularEnStem(w) {
+  // 词缀表含 y（flaky→flak / flakiness→flaki 需再剥 ies）
+  const SUFFIX = /(?:ness|ment|tion|sion|ance|ence|ity|ies|es|ed|ing|ly|al|ic|ive|ous|ful|less|able|ible|er|est|y|s)$/;
+  const s = w.toLowerCase();
+  const stripped = s.replace(SUFFIX, '');
+  return stripped.length >= 3 ? stripped : s;
+}
+
+function _emptyCircularEnTest(text) {
+  // 在 because/since/as 两侧 60 字符窗口内分词，比较词干
+  const re = /\b(?:because|since|as)\b/gi;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const at = m.index;
+    const before = text.slice(Math.max(0, at - 60), at);
+    const after = text.slice(at + m[0].length, at + m[0].length + 60);
+    const wordsA = (before.match(/[a-z]{3,}/gi) || []).filter(w => !EMPTY_CIRCULAR_EN_STOP.has(w.toLowerCase()));
+    const wordsB = (after.match(/[a-z]{3,}/gi) || []).filter(w => !EMPTY_CIRCULAR_EN_STOP.has(w.toLowerCase()));
+    for (const a of wordsA) {
+      for (const b of wordsB) {
+        const sa = _emptyCircularEnStem(a), sb = _emptyCircularEnStem(b);
+        if (a.toLowerCase() === b.toLowerCase()) continue; // 同形不算
+        if (sa === sb) return true; // 词干同、词形不同
+        const [lo, hi] = sa.length <= sb.length ? [sa, sb] : [sb, sa];
+        if (lo.length >= 3 && hi.startsWith(lo)) return true; // fail/failure
+      }
+    }
+  }
+  return false;
+}
 
 function checkEmptyAnswer(text) {
   if (!text || typeof text !== 'string') return { count: 0, empties: [], score: 0 };
@@ -3689,7 +3755,7 @@ function checkEmptyAnswer(text) {
   // 与既有 17+3 条套话判据互不重叠：那些收「这个问题很复杂」「It depends」
   // 这类**套话词**，本族收「同词复现」——轮初实测 10 条攻击 9 条绕过前者。
   if (empties.length === 0) {
-    const circular = hasChinese ? EMPTY_CIRCULAR_ZH.test(text) : EMPTY_CIRCULAR_EN.test(text);
+    const circular = hasChinese ? EMPTY_CIRCULAR_ZH.test(text) : _emptyCircularEnTest(text);
     if (circular && !EMPTY_CONVERGE_ZH.test(text) && !EMPTY_NUMERIC_ZH.test(text)) {
       empties.push({ pattern: 'circular_restate', matched: text.slice(0, 30), count: 1 });
     }
