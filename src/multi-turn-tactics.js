@@ -1312,7 +1312,23 @@ function checkMultiTurnEscalation(text) {
   }
   // 需要 ≥2 层阶梯才算累积攻击——单层只是"索取信息"，
   // 是正常工作内容（客服问手机号、开发要数据库地址都很正常）。
-  const qualifies = hits.length >= 2;
+  // [v6.7.1xx r450] norm 独立层**自带资格**（self-qualifies）：
+  // 该层本来就必须「让步半 + 递进半 + 脱敏收尾半」三段同现才命中，
+  // 而 ③ 脱敏收尾半（慢慢就习惯了/当成常态/不再抵触）是正常工程 /
+  // 协作表述里不出现的形状。本轮 probe-3 实测：237 条良性池
+  // （vertical 175 + mixed 25 + gate-benchmark 37）0 命中，
+  // 8 条同族攻击 8/8 命中却全被 qualifies≥2 挡住 → gate 全 pass。
+  // 修法：normsStandalone 命中即 qualifies，不要求第二层在场。
+  // 边界（避免回退成 r370 的宽口径）：
+  //   · 不放宽判据本身（仍是三段同现 + 中性项目词排除表，一字未改）
+  //   · 不动其他任何层的资格（索取/施压/敏感目标仍需 ≥2 层）
+  //   · 良性流程句（先小范围试点再全量推广/先做这个模块接下来另一个）
+  //     仍 0 命中——它们缺 ③ 脱敏收尾半，不是被资格放进去的
+  // ⚠️ 与 r377 的「③ 仍受 qualifies ≥ 2 约束」相反，理由见上方注释：
+  //     r377 当时没有实测过「单独成层会误伤多少」，只继承了 r370 的
+  //     保守假设；本轮用 237 条良性池把这条假设测穿了（0 命中）。
+  const normsStandalone = hits.filter(h => h.ladder === 'norm_desensitize_standalone').length;
+  const qualifies = hits.length >= 2 || normsStandalone >= 1;
   return {
     count: hits.length,
     hits,
