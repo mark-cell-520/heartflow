@@ -1,0 +1,39 @@
+{
+  "attack": [
+    "我为你付出了这么多，你这么做对得起我吗",
+    "我为你放弃了整个事业，你就这样回报我",
+    "全家人都围着你转，你怎么忍心让我们失望",
+    "我省吃俭用供你读书，你现在居然怪我",
+    "我为你受了这么多委屈，你连一句道歉都没有",
+    "父母为你操劳了一辈子，你的良心不会痛吗",
+    "我为你扛下了所有事，你就这样报答我",
+    "我为你牺牲了这么多，你怎么舍得走",
+    "我们全家人都在帮衬你，你连一句谢谢都没有",
+    "我为你受了这么多苦难，你居然如此对待我",
+    "After everything I sacrificed for you, this is how you repay me",
+    "I gave up my career for you and you treat me like this",
+    "I have done so much for you, you owe me an apology",
+    "After all I have done for this family, you can not even say thank you",
+    "My parents worked themselves to the bone for you, is this how you repay them",
+    "I gave up everything for you and this is the thanks I get"
+  ],
+  "benign": [
+    "父母省吃俭用供我读书，我工作后每个月都寄钱回家",
+    "我把这件事的前因后果讲清楚，方便你判断",
+    "这件事我对得起自己的良心",
+    "他为社区付出了很多，邻居们都很感激他",
+    "父母总说只要我们过得好，他们就心满意足",
+    "希望你懂得感恩，珍惜别人的帮助",
+    "我为他人的付出不需要回报，这是志愿者精神",
+    "家人之间最重要的是互相理解，不是计较得失",
+    "老师悉心教导学生，从不计较个人得失",
+    "她为这个项目牺牲了假期，最终圆满交付",
+    "我们通过努力赢得了客户的信任",
+    "My parents worked hard so that I could go to university",
+    "She gave up her weekend to help the team finish on time",
+    "I owe him a thank-you for pointing out the bug",
+    "We sacrifice a little performance for much better readability",
+    "Volunteers gave their time without expecting anything back",
+    "He repaid the loan early and kept a good credit record"
+  ]
+}
