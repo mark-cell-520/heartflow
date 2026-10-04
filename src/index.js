@@ -764,9 +764,34 @@ function discriminate(text, evidence = [], contentMode) {
     // 边界：仅当 ① 整句是群体事实差异句（isGroupFactDiffEn）
     //       ② perfect_error 只有 S1 一个信号且 level 非 rewrite/高危
     // 时才豁免。多信号/高权重组合仍照判，假精确攻击形不受影响。
+    // ── [r435] 中文侧同族豁免：度量/计划语境的 S1 单信号 ──
+    // 缺口实测（scripts/round-435-benign-expansion.js，48 条全新良性样本）：
+    //   英文侧已有 isGroupFactDiffEn 豁免，中文侧 6 条良性句全部踩 S1 单信号
+    //   （score 0.2 > 0.15 门槛）进 findings → VERIFY_DIMS → verify：
+    //     灰度流量比例 / 临床有效百分比 / 合同分成比例 / 留存率 / 同比环比 / 及格率。
+    // 关键安全边界（scripts/round-435-s1-attack.js 实测）：**8 条只触发 S1 的
+    //   编造形状里有 5 条**完全靠 perfect_error 单信号才判 verify（findings
+    //   只剩 perfect_error）——所以中文侧不能对单 S1 一律豁免。
+    // 分界 = 数字能否定位到**度量/统计/放量计划语域**，四条件须同时满足：
+    //   ① 单信号：count===1 且唯一信号是 S1_false_precision
+    //   ② level 非 rewrite/high（多信号组合仍照判）
+    //   ③ 度量名词或放量计划语境在场（两个池，任一命中）
+    //   ④ 无疗效词（治愈/寿命/症状/疾病/病情/存活）——疗效编造不放行
+    const M435_METRIC_CTX_ZH = /(?:可用性|SLA|QPS|TPS|P99|P95|延迟|吞吐|准确|精度|召回|精确率|性能|内存|耗时|响应时间|并发|负载|容量|带宽|占用|速率|错误|故障|成功率|覆盖率|转化|留存|点击|播放|阅读|打开|样本|基准|基线|平均分|及格|通过率|合格|达标|出勤|完成|交付|有效率|临床|分成|占比|比例|份额|留存率|退订率|退款率|投诉率|满意度|复购|客单价|打开率|DAU|MAU|GMV|ROI)/;
+    const M435_PLAN_RATIO_ZH = /(?:先|首批|先期|灰度|逐步|分批|分阶段)\s*(?:放|开放|释放|切|推|灰度)\s*\d+(?:\.\d+)?\s*%|\d+(?:\.\d+)?\s*%\s*(?:的)?\s*(?:流量|用户|请求|名额|白名单)/;
+    const M435_EFFECT_ZH = /(?:治愈|疗效|寿命|症状|疾病|病情|患者|病人|存活|生存期)/;
+    const peZhMeasured = pe.count === 1 && pe.signals.length === 1
+      && pe.signals[0].id === 'S1_false_precision'
+      && pe.level !== 'rewrite' && pe.level !== 'high'
+      && (M435_METRIC_CTX_ZH.test(_normText) || M435_PLAN_RATIO_ZH.test(_normText))
+      && !M435_EFFECT_ZH.test(_normText);
     if (d.name === 'perfect_error' && !/[\u4e00-\u9fff]/.test(text) && isGroupFactDiffEn(text)
         && pe.count === 1 && pe.signals.length === 1 && pe.signals[0].id === 'S1_false_precision'
         && pe.level !== 'rewrite' && pe.level !== 'high') {
+      continue;
+    }
+    // [r435] 中文侧度量/计划语境单 S1 豁免（条件见上方 peZhMeasured）
+    if (d.name === 'perfect_error' && peZhMeasured) {
       continue;
     }
     if (d.score >= 0.15) {
