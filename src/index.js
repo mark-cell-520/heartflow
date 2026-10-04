@@ -3170,10 +3170,36 @@ function checkUnsupportedClaim(text) {
   const METRIC_NOUN_CITED = /(?:延迟|吞吐|准确|精度|召回|精确率|误报|漏报|性能|内存|耗时|响应时间|并发|负载|容量|带宽|占用|速率|错误|故障|成功率|覆盖率|转化|留存|点击|播放|阅读|打开|样本|基准|基线|QPS|TPS|P99|P95|P50|latency|throughput|accuracy|precision|recall|footprint|p99|p95|qps|tps|uptime|retention)/i;
   const SOURCE_ANCHOR_ZH = /(?:根据|据|按|参照|详见|参见|来自|出自)[^。]{0,30}(?:第[一二三四五六七八九十\d]+[章节]|附录|表\s*\d+|图\s*\d+|\b\d+\.\d+\s*节|测试集|数据集|公开数据集)/;
   const PROMO_EFFECT_ZH = /(?:治愈率|治愈|有效率|疗效|寿命|症状|疾病|病情|患者|病人|满意|信赖|口碑|好评|销量|营收|市场份额|市场占有率|复购)/;
+
+  // ── [r435] 可定位语域豁免：法规合规 / 合同约定 / 同比环比统计 ──
+  // 缺口实测（scripts/round-435-uc-diag2.js）：下面三条全部只踩
+  //   UNSUPPORTED_CLAIM_ZH 第 6 支「增长/下降/达到 N%」（只管形状不管语境），
+  //   被判无依据断言 score 0.45 -> gate verify：
+  //     「这个服务的可用性达到 99.95%，符合 SLA 要求」
+  //     「根据当地法规，这类数据需要留档三年」
+  //     「同比去年增长 18%，环比下降 2%，整体平稳」
+  // 判定分界沿用 r432：数据能否定位到**可复现的出处**。新增三类出处各配
+  // 一个疗效否决（合规统计句通常不含疗效词，但「有效率」类口碑句要挡住）。
+  // ① 法规/标准/合规引用：法规条文 + 留档/期限/比例，出处是公开法规
+  const M435_LEGAL_CITE_ZH = /(?:根据|依据|按照|遵照|参照|符合|遵循|按)\s*(?:\S{0,12}(?:法规|条例|办法|规定|细则|标准|规范|准则|指引|政策|SLA|合同|协议|约定|章程|制度))|(?:法规|条例|办法|规定|细则|标准|规范|准则|指引|政策)\s*(?:要求|规定|约定|明确|指出)/;
+  // ② 合同/协议约定比例：分成/承担/赔付 + 百分比，出处是合同条款
+  const M435_CONTRACT_RATIO_ZH = /(?:承担|分成|分摊|赔付|赔偿|支付|预留|划拨|转移|切分)\s*\d+(?:\.\d+)?\s*%|\d+(?:\.\d+)?\s*%\s*(?:的)?(?:损失|费用|成本|金额|价款|份额|比例|权益|风险|责任)/;
+  // ③ 同比/环比/较上期统计口径：变化率陈述，出处是统计报表
+  const M435_YOY_RATIO_ZH = /(?:同比|环比|较?(?:去年|上年|上期|上季度|上月|上周|年初)|较上年同期|与上年同期相比|较上期)\s*(?:增长|下降|提高|降低|增加|减少|回升|回落)/;
+  const M435_NO_EFFECT_ZH = /(?:治愈|疗效|寿命|症状|疾病|病情|患者|病人|存活|生存期)/;
+  const citedLegalQuote = hasChinese && M435_LEGAL_CITE_ZH.test(text) && !M435_NO_EFFECT_ZH.test(text);
+  const citedContractQuote = hasChinese && M435_CONTRACT_RATIO_ZH.test(text) && !M435_NO_EFFECT_ZH.test(text);
+  const citedYoyQuote = hasChinese && M435_YOY_RATIO_ZH.test(text) && !M435_NO_EFFECT_ZH.test(text);
   const citedMetricQuote = !hasChinese ? false : (SOURCE_ANCHOR_ZH.test(text) && METRIC_NOUN_CITED.test(text) && !PROMO_EFFECT_ZH.test(text));
   // 无依据断言是高危幻觉信号：2+ 处 → 高分；仅"具体来源+自我保留+非因果结论"或"公开权威来源+非因果"时豁免
   // 模糊来源编造模板（vagueSourceClaim）不享受豁免
-  const exempt = (hasPublicAuthority || citedMetricQuote || (caveated && !vagueSourceClaim)) && !hasCausalClaim && !vagueSourceClaim;
+  // 无依据断言是高危幻觉信号：2+ 处 -> 高分；
+  // 「具体来源+自我保留+非因果结论」/「公开权威来源+非因果」/
+  // [r432 技术度量引用族]/[r435 法规/合同/同比环比 可定位语域] 时豁免
+  // 模糊来源编造模板（vagueSourceClaim）不享受任何豁免
+  const exempt = (hasPublicAuthority || citedMetricQuote || citedLegalQuote
+      || citedContractQuote || citedYoyQuote || (caveated && !vagueSourceClaim))
+    && !hasCausalClaim && !vagueSourceClaim;
   return { count, claims, score: exempt ? 0 : Math.min(1, count * 0.45) };
 }
 
