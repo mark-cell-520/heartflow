@@ -1,4 +1,84 @@
-# 第 416 轮（定责 r415 引入的 r331 误伤 + BACK_ZH 收窄 + M2 不敏感归因，2 commits）
+# 第 428 轮（补两个 block 级维度的单侧失活族：中文 hate_speech 泛称驱逐 + 英文 dehumanization 人口处置，3 commits）
+
+## 方向选择
+
+init 简报无队列待办；维度覆盖扫描唯一报的 `multi_turn_escalation 2/2 闸门放过`
+经 `scripts/dimension-coverage-scan.js` 第 140 行注释与 r377 起实测确认是
+**held 档（设计保守：引擎侧已记层 2/2，qualifies≥2 未达）**，不是待修缺口。
+
+用 `src/core/decision.js` 本体跑 3 候选（第一次自然语言候选全打平 chosen=null，
+按纪律补数值字段后重跑）：选定 **[A] 补两个 block 级维度的单侧失活判据**
+（confidence 0.9）。实测证据（r428 probe-1，`scripts/round-428/probe-1-single-sided.js`）：
+
+| 族 | 复测结果 |
+|---|---|
+| hate_speech\|expulsion | 中文侧 gate=**pass**、维度 0 命中；英文侧 gate=block |
+| dehumanization\|waste_population | 英文侧 gate=**pass**、维度 0 命中；中文侧 gate=block |
+
+两条都是 **block 级维度单侧失活**，攻击句穿过硬闸门，是比「归因错位」更硬的缺口
+（[B] 候选 victim_blaming/presupposition 两条 gate 已拦，只是 findings 未挂本维度，不改变拦截结果）。
+
+## 改动 1：hate_speech 中文补泛称群体驱逐族（commit 2eb8f703）
+
+缺口根因：`HATE_SPEECH_ZH` 的 extermination_call / death_wish / group_dehumanization
+三支的主语表全是**具名族群名词**或「民族/国家/地区」组合词，收不到
+「你们这个族群」「这群人」「你们这种人」这类泛称人称主体；r321 补的两支只覆盖
+「不配活着/存在」（死亡祝愿形），不含「不配留在…/该被赶走」（剥夺存续空间形）。
+
+新增 4 支 `type: 'expulsion_call'`（severity 0.9）：泛称主体+排他动词+存续空间词、
+「这个/那个族群」+继续留在、地域主语+不欢迎+人群、指代驱逐。
+实测：攻击 8/8 命中（改前 0/8）、良性 10/10 零误伤。
+
+## 改动 2：dehumanization 英文补「人群=待处置物质」族（commit 09413350）
+
+缺口根因：`DEHUMANIZATION_PATTERNS.en.object` 的 disposable/expendable 支
+要求**形容词与人群词相邻**，而「surplus material awaiting disposal」
+「excess stock that needs thinning out」这类把人群比成库存/废弃物、
+处置动词后置的形状英文侧无支可收。
+
+新增 3 支：人群词+废弃物名词+处置动词、人群词+过剩形容词+处置动词、
+（lookahead 保证句中有人群词的）过剩形容词+物质名词+处置动词。
+⚠️ 支二刻意不含 processed/processing —— 「extra residents were processed at
+the front desk」是酒店正常入住表述，实测会误伤。
+实测：攻击 7/7 命中（改前 0/7）、良性 8/8 零误伤。
+
+## 改动 3：负例变异守卫（commit da0a0c4f）
+
+`test/round-428-negative-mutation.test.js`：用**子进程**计数做删条变异
+（父进程 require 缓存会污染 gate.js 内部引擎引用，实测「删行后命中不变」是假阴性）。
+结果：新增 5 条判据行中 **4 支可删红**（删掉让命中 16→14/14/15/14），
+1 支（「把他们全部赶走」指代驱逐）与兄弟支字面重叠、删后判定不变，判为**冗余支**并
+在测试里显式标注跳过理由，不用补样本把冗余伪装成敏感。
+基线攻击命中 16/18；还原校验 16/18 回到基线。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| node --check src/index.js | ✅ |
+| verify.js | **14/14** |
+| bidirectional-guard | 召回 **52/52**、误拦 **302/326**（正好基线，未增） |
+| security-audit | **16/18 项内 16/16 通过** |
+| round-428 hate_speech 中文驱逐族 | 36/36 |
+| round-428 dehumanization 英文人口处置族 | 30/30 |
+| round-428 负例变异 | 4 可删红 / 1 冗余支，还原校验通过 |
+| doc-numbers-accuracy | 18 通过 / 3 失败（见遗留 1） |
+
+## 遗留（给下一轮）
+
+1. **doc-numbers-accuracy 3 项失败 = data/test-count.json 缓存 failed=28 未清**。
+   本轮轮初起的干净 run-all（/tmp/r428-baseline.log）跑完即应刷新缓存；
+   若下轮仍失败，按报错提示 `git checkout -- data/test-count.json` 后重跑 run-all
+   （确认无并发 run-all，dev-exemptions 夹具测试会写 src/ 临时文件）。
+2. run-all 曾出现一次 `evolution-audit.test.js` spawnSync ETIMEDOUT（子进程超时），
+   需下一轮单独复跑该文件确认是否稳定复现。
+3. scripts/round-428/ 被 .gitignore 忽略（与历史轮次一致），探针只在本机。
+4. [B] 候选的归因错位（victim_blaming|conditional_regret、
+   presupposition|premature_admission：gate 已 rewrite/verify 但 findings 未挂本维度）
+   本轮未做，可作下一轮方向。
+5. MCP 工具读常驻内存引擎，本轮改的 src/index.js 需重启 MCP 才生效。
+
+
 
 ## 方向选择
 
