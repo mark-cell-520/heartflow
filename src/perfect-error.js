@@ -161,8 +161,27 @@ function checkPerfectError(text) {
   // 人身权威形式（专家/教授/官方/可靠消息）不享受本豁免。
   const PE_INSTRUMENT_ZH = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)[^。]{0,4}(?:报告|数据|记录|结果|日志|指标|看板|报表|告警)[^。]{0,6}(?:显示|表明|指出)/;
   const peInstrumentSourced = hasChinese && PE_INSTRUMENT_ZH.test(text);
+  // [r437b] 人身权威在场否决豁免：人身权威词出现在仪器语域三合一**之前**时，
+  // 整句的「数据」转述的是该权威的口径而非仪器读数 ——
+  //   「官方巡检数据显示整体情况明显好转」「可靠消息监控数据显示…比去年好」
+  // 实测（scripts/round-437-diag4.js）两句改前 gate=pass 全维零命中。
+  // 分界线：只看权威词与首个仪器语域词的先后，权威在后不否决（「监控数据
+  // 显示业内权威专家都认可」本来就命中 appeal_to_authority 的「权威专家」支）。
+  const PE_HUMAN_AUTH_ZH = /(?:官方|有关部门|相关方面|专家|教授|学者|院士|权威|可靠消息|据称|据悉|据了解|业内人士|知情人士)/;
+  const PE_INSTR_AFTER_AUTH = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)/;
+  const peHumanFirst = (() => {
+    if (!peInstrumentSourced) return false;
+    const auth = text.match(PE_HUMAN_AUTH_ZH);
+    if (!auth) return false;
+    // 「业内巡检专家数据…」：权威词「专家」紧跟在仪器语域词**之后**
+    // （「巡检专家」= 仪器对象的修饰语而非转述主语）。只看左侧 4 字窗口，
+    // 「官方巡检数据…」的权威词在仪器词之前，不适用本判据。
+    if (PE_INSTR_AFTER_AUTH.test(text.slice(Math.max(0, auth.index - 4), auth.index))) return false;
+    const instr = text.match(/(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)/);
+    return !!instr && auth.index < instr.index;
+  })();
   const precisionHits = [];
-  if (!hasMetricNoun && !isSourced && !peInstrumentSourced && !isQuestion) {
+  if (!hasMetricNoun && !isSourced && !isQuestion && !(peInstrumentSourced && !peHumanFirst)) {
     for (const pat of FALSE_PRECISION_PATTERNS) {
       const m = text.match(pat);
       if (m && m.length) precisionHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
@@ -180,7 +199,7 @@ function checkPerfectError(text) {
   for (const pat of FAKE_AUTHORITY_PATTERNS) {
     const m = text.match(pat);
     if (m && m.length) {
-      if (peInstrumentSourced && /^(?:研究|调查|实验|数据)(?:表明|显示|证明|证实|发现|指出)/.test(m[0])) continue;
+      if ((peInstrumentSourced && !peHumanFirst) && /^(?:研究|调查|实验|数据)(?:表明|显示|证明|证实|发现|指出)/.test(m[0])) continue;
       authorityHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
     }
   }

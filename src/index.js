@@ -3107,7 +3107,19 @@ function checkUnsupportedClaim(text) {
   // appeal_to_authority/perfect_error/vagueness 三侧本轮同源修改一致
   // （scripts/round-437-diag3.js 实测该族改前 unsupported_claim:45 x2）。
   const UC_INSTRUMENT_ZH = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)[^。]{0,4}(?:报告|数据|记录|结果|日志|指标|看板|报表|告警)[^。]{0,6}(?:显示|表明|指出)/;
-  const ucInstrumentSourced = hasChinese && UC_INSTRUMENT_ZH.test(text);
+  // [r437b] 同 appeal_to_authority 侧：人身权威在场（且在仪器语域词之前）时
+  // 不豁免（「官方巡检数据显示…」「可靠消息监控数据显示…」仍应判无依据）。
+  const UC_HUMAN_AUTH_ZH = /(?:官方|有关部门|相关方面|专家|教授|学者|院士|权威|可靠消息|据称|据悉|据了解|业内人士|知情人士)/;
+  const UC_INSTR_WORD = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)/;
+  const ucHumanFirst = (() => {
+    if (!hasChinese) return false;
+    const auth = text.match(UC_HUMAN_AUTH_ZH);
+    if (!auth) return false;
+    if (UC_INSTR_WORD.test(text.slice(Math.max(0, auth.index - 4), auth.index))) return false;
+    const instr = text.match(UC_INSTR_WORD);
+    return !!instr && auth.index < instr.index;
+  })();
+  const ucInstrumentSourced = hasChinese && UC_INSTRUMENT_ZH.test(text) && !ucHumanFirst;
   if (ucInstrumentSourced) {
     for (let i = claims.length - 1; i >= 0; i--) {
       const c = claims[i];
@@ -6729,8 +6741,25 @@ function checkAppealToAuthority(text) {
   // 只摘掉「数据显示/数据表明」两条信号；「专家表示/研究表明/官方指出/
   // 据可靠消息」等人身或不可定位权威一律保留（负例守卫见
   // test/round-437-appeal-authority-instrument.test.js）。
+  // [r437b] 人身权威在场否决豁免：权威词出现在仪器语域三合一**之前**时，
+  // 转述的是该权威口径而非仪器读数（「官方巡检数据显示…」「可靠消息监控
+  // 数据显示…」，实测 scripts/round-437-diag4.js 两句改前全维零命中）。
+  // 权威词在后不否决（「监控数据显示业内权威专家都认可」本就命中别支）。
+  const AUTH_HUMAN_AUTH_ZH = /(?:官方|有关部门|相关方面|专家|教授|学者|院士|权威|可靠消息|据称|据悉|据了解|业内人士|知情人士)/;
+  const AUTH_INSTR_WORD = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)/;
+  const authHumanFirst = (() => {
+    if (!hasChinese) return false;
+    const auth = text.match(AUTH_HUMAN_AUTH_ZH);
+    if (!auth) return false;
+    // 「业内巡检专家数据…」：权威词「专家」紧跟在仪器语域词**之后**
+    // （「巡检专家」= 仪器对象的修饰语而非转述主语），读数主体仍是仪器。
+    // 只看左侧 4 字窗口；「官方巡检数据…」的权威词在仪器词之前，不适用。
+    if (AUTH_INSTR_WORD.test(text.slice(Math.max(0, auth.index - 4), auth.index))) return false;
+    const instr = text.match(AUTH_INSTR_WORD);
+    return !!instr && auth.index < instr.index;
+  })();
   const AUTH_INSTRUMENT_ZH = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)[^。]{0,4}(?:报告|数据|记录|结果|日志|指标|看板|报表|告警)[^。]{0,6}(?:显示|表明|指出)/;
-  if (hasChinese && AUTH_INSTRUMENT_ZH.test(text)) {
+  if (hasChinese && AUTH_INSTRUMENT_ZH.test(text) && !authHumanFirst) {
     for (let i = signals.length - 1; i >= 0; i--) {
       if (/^(?:数据显示|数据表明)$/.test(signals[i].pattern)) signals.splice(i, 1);
     }
