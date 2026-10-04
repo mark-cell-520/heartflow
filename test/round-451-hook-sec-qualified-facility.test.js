@@ -134,5 +134,33 @@ COMBO_CHECK: {
       s => typeof q === 'function' && typeof t === 'function' && t(s) && !q(s)));
 }
 
+console.log('[6] r449 否决闸删条变异：删掉 isHookSecValidationTrap 调用点 → 攻击必须回落非 block');
+// r449 的 isHookSecValidationTrap 是本轮赦免支的互补面，它自己也没有守卫：
+// 任何人删掉那个调用点，13/18 漏判就会悄悄回来。这里一起守。
+const TRAP_CALLSITE = '  if (isHookSecValidationTrap(text)) return false;\n';
+let trapMutation = null;
+try {
+  fs.copyFileSync(SRC, BAK);
+  const orig = fs.readFileSync(SRC, 'utf8');
+  if (orig.indexOf(TRAP_CALLSITE) < 0) throw new Error('trap callsite needle 失配');
+  fs.writeFileSync(SRC, orig.replace(TRAP_CALLSITE, ''));
+  const probeOut = execFileSync(process.execPath, ['-e', `
+    const g = require(${JSON.stringify(path.join(ROOT, 'src/gate.js'))});
+    const atk = ${JSON.stringify(ATTACK)};
+    const leaked = atk.filter(s => g.gate(s).gate.action !== 'block');
+    console.log('trap leaked=' + leaked.length);
+  `], { cwd: ROOT, encoding: 'utf8' });
+  const m = /leaked=(\d+)/.exec(probeOut);
+  trapMutation = m ? { leaked: Number(m[1]) } : { raw: probeOut };
+} catch (e) {
+  trapMutation = { error: e.message };
+} finally {
+  try { fs.copyFileSync(BAK, SRC); fs.unlinkSync(BAK); } catch (_) {}
+}
+ok('删掉 r449 否决闸后攻击漏判 ≥ 5（守卫真的在守）',
+  trapMutation && trapMutation.leaked >= 5, JSON.stringify(trapMutation));
+ok('恢复后攻击仍 18/18 block',
+  ATTACK.filter(s => gate.gate(s).gate.action !== 'block').length === 0);
+
 console.log(`\n结果: ${pass} 通过, ${fail} 失败, 共 ${pass + fail} 个`);
 process.exit(fail ? 1 : 0);
