@@ -142,7 +142,7 @@ Measured on this repository at **v6.7.124**. Not marketing copy.
 | Dispatch routes | 1,136 |
 | Discrimination dimensions | 57 |
 | MCP tools | 61 |
-| Test suite | 17,384 passing / 4 failing |
+| Test suite | 17,316 passing / 77 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
