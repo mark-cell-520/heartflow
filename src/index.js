@@ -3078,9 +3078,30 @@ function checkUnsupportedClaim(text) {
     || /studies\s+(?:show|suggest|indicate|found)/i.test(text)
     || /research\s+(?:shows|suggests|indicates|found)/i.test(text)
   ) && /\d+(?:\.\d+)?\s*(?:%|percent|x|X|times|fold)/.test(text);
+  // ── [r432] 技术度量引用族豁免（来源锚点定位 + 工程度量名词）────────
+  // 缺口实测（scripts/round-432-fp-locator.js → round-432-uc-probe.js）：
+  //   5 条真实编造攻击全命中（score 0.45~0.9），但 4 条**合规技术句**被
+  //   第 6 支 `(增长|下降|达到…)N%` 判 score=0.45 → gate verify 误拦：
+  //     「根据论文第三章的实验数据，对照组在延迟指标上从 240ms 降到 95ms，
+  //       准确率提升 12.4%」
+  //     「接口的 QPS 提升了 3 倍，p99 延迟从 800ms 降到 120ms，容量成本降 18.6%」
+  //   根因：该支只管形状不管语境，把**可复现的测量值引用**与**编造的
+  //   精确数字**同等定罪。判定分界 = 数据能否定位到具体出处。
+  // 豁免三条件（须同时满足，攻击组 5/5 仍命中）：
+  //   ① 来源定位锚点：章节/附录/表图编号/「X.Y 节」/测试集/数据集/公开数据集
+  //     ——有可定位的出处编号 = 数据可复现，区别于「根据2025年哈佛研究」；
+  //   ② 工程度量名词在场（延迟/吞吐/准确率/QPS/P99/容量/成本/样本…），
+  //     与 src/perfect-error.js 的 METRIC_NOUNS_ZH 同一口径；
+  //   ③ 无**人群疗效/营销词**（治愈率/有效率/寿命/症状/疗效/满意/信赖/
+  //     口碑/销量/营收/市场份额）——否则「实验证明治愈率达到 99.7%，
+  //     见附录 B」这类疗效编造会被一并豁免。
+  const METRIC_NOUN_CITED = /(?:延迟|吞吐|准确|精度|召回|精确率|误报|漏报|性能|内存|耗时|响应时间|并发|负载|容量|带宽|占用|速率|错误|故障|成功率|覆盖率|转化|留存|点击|播放|阅读|打开|样本|基准|基线|QPS|TPS|P99|P95|P50|latency|throughput|accuracy|precision|recall|footprint|p99|p95|qps|tps|uptime|retention)/i;
+  const SOURCE_ANCHOR_ZH = /(?:根据|据|按|参照|详见|参见|来自|出自)[^。]{0,30}(?:第[一二三四五六七八九十\d]+[章节]|附录|表\s*\d+|图\s*\d+|\b\d+\.\d+\s*节|测试集|数据集|公开数据集)/;
+  const PROMO_EFFECT_ZH = /(?:治愈率|治愈|有效率|疗效|寿命|症状|疾病|病情|患者|病人|满意|信赖|口碑|好评|销量|营收|市场份额|市场占有率|复购)/;
+  const citedMetricQuote = !hasChinese ? false : (SOURCE_ANCHOR_ZH.test(text) && METRIC_NOUN_CITED.test(text) && !PROMO_EFFECT_ZH.test(text));
   // 无依据断言是高危幻觉信号：2+ 处 → 高分；仅"具体来源+自我保留+非因果结论"或"公开权威来源+非因果"时豁免
   // 模糊来源编造模板（vagueSourceClaim）不享受豁免
-  const exempt = (hasPublicAuthority || (caveated && !vagueSourceClaim)) && !hasCausalClaim && !vagueSourceClaim;
+  const exempt = (hasPublicAuthority || citedMetricQuote || (caveated && !vagueSourceClaim)) && !hasCausalClaim && !vagueSourceClaim;
   return { count, claims, score: exempt ? 0 : Math.min(1, count * 0.45) };
 }
 
