@@ -795,6 +795,9 @@ const _AgentBoundaryGuard = _lazy('agentBoundaryGuard', () => new (require('../s
 
 const _MemoryWriteController = _lazy('memoryWriteController', () => require('../memory/memory-write-controller.js'));
 
+// [r438 隐私闸门] 用户原文落盘前的敏感度判据 + 指纹化处置
+const _PrivacyExposure = _lazy('privacyExposure', () => require('../privacy-exposure.js'));
+
 const _MetacognitiveRL = _lazy('metacognitiveRL', () => require('../cortex/metacognitive-rl.js'));
 
 
@@ -5248,7 +5251,10 @@ class HeartFlow {
       }
       const reflectionData = {
         ts: Date.now(),
-        input: typeof input === 'string' ? input.slice(0, 100) : '',
+        // [r438 隐私闸门] 反思日志同样持久化到 .opencode/memory/heartflow_state.json，
+        // 与 engram/judgment/self-play/worldtree 是并行的第五条落盘链路。
+        // 事故复现：本次 e2e 临时目录扫描命中该文件含 6 个隐私关键词全中。
+        input: typeof input === 'string' ? _PrivacyExposure().sanitizeForPersistence(input).slice(0, 100) : '',
         emotion: result._deepEmotion?.emotion || 'neutral',
         route: result.route || result.type || 'general',
         hasMultiPath: !!result.multiPathJudgment,
@@ -5380,7 +5386,10 @@ class HeartFlow {
       if (!this._reflector) this._reflector = new Reflector(this.rootPath);
       if (typeof this._reflector.feed === 'function') {
         this._reflector.feed({
-          task: typeof input === 'string' ? input.slice(0, 200) : 'think',
+          // [r438 隐私闸门] feed 的 task 会以明文 description 落进
+          // .opencode/memory/heartflow_state.json 的 achievements[]。
+          // 自省只需要"有没有任务/成没成功"，不需要任务原文。
+          task: typeof input === 'string' ? _PrivacyExposure().sanitizeForPersistence(input).slice(0, 200) : 'think',
           success: !result?.output?.suppressed,
           emotion: result?._deepEmotion?.emotion ? { valence: (result._deepEmotion.intensity || 0.5) * 10, arousal: 5 } : null,
         });
@@ -5614,7 +5623,13 @@ class HeartFlow {
           : (rawDecision && typeof rawDecision === 'object'
             ? (rawDecision.type || rawDecision.chosen || rawDecision.composite_?.chosen || rawDecision.action || rawDecision.id || 'composite')
             : (typeof rawDecision === 'number' ? String(rawDecision) : null));
-        this._engram.store([{ input: input.slice(0, 500), tag, confidence: result.confidence || null, decision, effort, ts: Date.now() }]);
+        // [r438 隐私闸门] 落盘前把高敏自述转成结构指纹。
+        // 事故：2026-10-04 一次心理分析会话的原文（家庭评判/经济比较/创伤记忆）
+        // 被无条件 slice(500) 写进 data/engram-index.json。data/ 虽在 .gitignore 里，
+        // 但一次 git add -f / 备份同步 / memory 金库导出就能让它外流。
+        // 指纹保留 tag/decision/confidence/effort 全部效用字段，只替换 input 文本。
+        const safeInput = _PrivacyExposure.sanitizeForPersistence(input);
+        this._engram.store([{ input: safeInput.slice(0, 500), tag, confidence: result.confidence || null, decision, effort, ts: Date.now() }]);
         if (decision) {
           const recalledByTag = this._engram.recall(tag, 3);
           const recalledByDecision = this._engram.recallByDecision(decision, 2);
