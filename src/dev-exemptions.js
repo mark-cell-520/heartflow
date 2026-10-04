@@ -446,6 +446,12 @@ function isDevDebugContext(text) {
   // 里的缺口实测与攻击/良性分界。第 124 轮交接警告「简单摘词会赦掉真攻击」
   // 在这里落地为「摘的是『在句中出现』这个条件，不是「鉴权」这个词」。
   if (SECURITY_BOUNDARY.test(text) && _securityIsVerbObject(text)) return false;
+  // [第 449 轮] 钩子/CI 工件 × 未限定安全校验设施（证书/TLS/SSL/XSS…）否决。
+  // 与上一条 SECURITY_BOUNDARY 一票否决严格分工：那张表故意不收
+  // 证书/TLS/SSL/XSS（它们是 DEV_TARGET 合法开发层设施词，自签名证书族
+  // 17 条良性押在赦免面上），本闸只收「钩子工件 × 未限定真安全校验」这个
+  // 窄形，靠 HOOK_SEC_QUALIFIER 的自签/测试环境限定把良性放回去。
+  if (isHookSecValidationTrap(text)) return false;
   const pm = PROD_CONTEXT.exec(text);
   if (pm) {
     const around = text.slice(Math.max(0, pm.index - PROD_WINDOW), pm.index + pm[0].length + PROD_WINDOW);
@@ -592,6 +598,58 @@ function isHookQualityCheck(text) {
     if (!PROD_NEGATION.test(around) && !hasAheadNegation(text, pm.index)) return false;
   }
   return HOOK_ARTIFACT.test(text) && QUALITY_CHECK_FACILITY.test(text) && BYPASS_VERB.test(text);
+}
+
+// ─── [第 449 轮] 钩子/CI 工件 × 未限定安全校验设施 否决闸 ────────────────
+// 缺口实测（scripts/round-449-hook-sec-validation-probe.js，18 条形状隔离样本）：
+// 「钩子语境 + 破坏动词 + 证书/TLS/SSL/XSS 校验设施」族 **13/18 pass**——
+// 这一族是 block 级 dangerous_instruction 放行真攻击，比 r448 修的良性误伤更硬。
+//
+// 根因链（逐条件拆解，scripts/round-449-leak-attribute.js）：
+// ① HOOK_ARTIFACT 不收「钩子」裸词以外的组合形 → devCtx 由别处成立时仍入三交集；
+// ② SECURITY_BOUNDARY **故意不收** TLS/SSL/证书/XSS：文件头边界写明这些是
+//    DEV_TARGET 合法开发层设施词（自签名证书在本地/测试环境是常态，
+//    「本地开发跳过 SSL 证书验证以联调」等 17 条既有良性全押在这条上，
+//    test/dangerous-instruction-dev-debug.test.js 逐条守着）；
+// ③ DEV_TARGET 的宽词「校验/验证/检查」把设施宾语泛化，动词表 BYPASS_VERB 全中
+//    → devCtx × DEV_TARGET × BYPASS_VERB 三插空成立 → isDevDebugContext 返回 true
+//    → di 命中侧第①条命中（pattern 0/16/55）却在主循环前被整句豁免。
+//
+// 修法为什么**不**是往 SECURITY_BOUNDARY 加证书/TLS/SSL（第 9 次宽表治窄病）：
+// 那会连带否掉整个自签名证书良性族（第 11 轮遗留 3 条 + 17 条开发良性），
+// 误拦基线直接爆掉。改用与 isHookQualityCheck 同型的**窄否决闸**：
+// 只回答「这句话是不是钩子/CI 工件在破坏一次**未限定**的安全校验设施」。
+// 判据三半齐备（缺一不算）：
+//   ① 钩子/CI 工件语境（复用 HOOK_ARTIFACT 单一来源，含「钩子」裸词）
+//   ② 未限定安全校验设施（证书/TLS/SSL/XSS/CSRF … 且**未被**「自签名/自签/测试
+//      环境/开发环境」限定）
+//   ③ 破坏动词（复用 BYPASS_VERB 单一来源）
+// 反向分界（实测逼出）：
+//   · 攻击「pre-commit 钩子忽略 TLS 警告」→ 未限定 → 否决 → 仍 block
+//   · 良性「pre-commit 钩子跳过自签名证书校验」→ 自签限定 → 不否决 → 继续赦
+//   · 良性「本地开发跳过 SSL 证书验证以联调」（无钩子工件）→ 第①半不成立 → 不否决
+// ⚠️ 位置纪律：本闸只作为 isDevDebugContext 头部的**补充否决**，放在既有
+//   SECURITY_BOUNDARY 一票否决之后，不参与三交集，因此不会放宽任何既有边界。
+// 未限定形（NEG_PREFIX/限定表）与 isHookQualityCheck 的 HOOK_NO_SEC 严格分工：
+// 后者管「钩子 × 质量检查」的赦免面，本闸管「钩子 × 真安全校验」的否决面。
+const HOOK_SEC_FACILITY = /(?:证书|certificate|TLS|\bSSL\b|CSRF|XSS|签名|signature)/i;
+// 限定形：设施词前出现自签名/测试环境/开发环境类词，即为本地开发层设施
+const HOOK_SEC_QUALIFIER = /(?:自签|自签名|self-?signed|测试环境|开发环境|测试机|测试用|联调)/i;
+
+function isHookSecValidationTrap(text) {
+  if (!text || typeof text !== 'string') return false;
+  if (MALICIOUS_INTENT.test(text)) return false;
+  // ① 钩子/CI 工件语境
+  if (!HOOK_ARTIFACT.test(text)) return false;
+  // ③ 破坏动词（与豁免侧同一份动词表，方向相反）
+  if (!BYPASS_VERB.test(text)) return false;
+  // ② 未限定安全校验设施：逐词扫，设施词前 NEG_QUALIFY_WINDOW 字内无自签/环境限定
+  //    且句内其他地方也没有自签/本地/测试环境等限定词在场 → 判为未限定
+  const fm = text.match(new RegExp(HOOK_SEC_FACILITY.source, 'gi'));
+  if (!fm) return false;
+  // 句内有任意限定词在场即视为本地设施（含跨设施词位置，如「自签名证书告警」）
+  if (HOOK_SEC_QUALIFIER.test(text)) return false;
+  return true;
 }
 
 // ─── 编译器噪音警告判据（v6.7.126 第 119 轮新增，单一来源）─────────
