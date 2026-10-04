@@ -1996,6 +1996,37 @@ const EM_MANIPULATION_PATTERNS = {
     // 这是为你好，但你有权拒绝）不含追偿半，12 条良性实测 0 误伤。
     [/我[^。]{0,6}(?:都)?(?:是)?(?:为了|为着)[^。]{0,4}(?:你好|你着想|你考虑|你打算|大家)[^。]{0,20}(?:你)?(?:不听|不肯听|不答应|不接受|非要|偏要|反而|却|就是)[^。]{0,10}(?:伤|寒|辜负|打击|折磨|委屈|对不住|对不起)[^。]{0,4}(?:我|心|自己)/, 'benevolence_leverage', 0.6],
     [/我[^。]{0,6}(?:都)?(?:是)?(?:为了|为着)[^。]{0,6}(?:你好|着想|考虑|打算)[^。，。]{0,24}(?:不然|否则|要不|你要)?[^。]{0,6}(?:就是)?[^。]{0,8}(?:不懂|不明白|不了解|不理解|不知好歹|不识好|不顾我的)[^。]{0,4}(?:心|好意|苦衷|感受)/, 'benevolence_leverage', 0.55],
+    // ── [v6.7.134 r434] 亏欠账本 × 对价质问族（decision 0.83 选定）──
+    // 轮初实测（scripts/round-434-family-probe.js）：ZH 探针 5 条 0 命中、
+    // EN 探针 3 条 1 命中。上面 victim_stance 三条（举手过案/你却/居然…）
+    // **全部要求指责转折词在场**（你却/你居然/你竟然/你反而/你倒），
+    // 而「我为你付出这么多，你对得起我吗」「我为你放弃整个事业，你就这样
+    // 回报我」这类**长期付出陈述 + 直接对价追讨**不含转折词，两侧全放。
+    // 与既有三族的区别：guilt_induction 胁迫物是条件后果，victim_stance 是
+    // 「你却」式指责转折，本族是**账目清算**（列支出 → 要回报/问责）。
+    //
+    // 判据沿用两半 AND（缺一不命中）：
+    //   支出半：第一人称 + 付出动词（付出/牺牲/放弃/省吃俭用/操劳/供/围着…）
+    //           + 受益对象（你/这个家/孩子/我）在场
+    //   追偿半：对得起 / 对不住 / 良心 / 回报 / 报答 / 忍心 / 舍得 /
+    //           寒心 / 连一句（道歉|谢谢）
+    // 良性分界：嘱托与期望句有支出半无追偿半（「省吃俭用供你读书，希望你
+    // 有出息」「要懂得感恩」），历史/表彰句主语非第一人称
+    // （「这个家族几代人省吃俭用供出一个状元」）→ 12 条良性实测 0 误伤。
+    [/(?:我|我们|全家人|全家|父母|长辈)[^。！？]{0,8}(?:为|替)?[^。！？]{0,6}(?:你|你们|这个家|家人|孩子)?[^。！？]{0,10}(?:(?:付出|牺牲|放弃|委屈|省吃俭用|操劳|操心|张罗|围着|照顾|帮衬|扛|受过|受尽|打拼|供养|挣钱|转|受)[^。！？]{0,8}(?:这么多|那么多|这么多苦|这么多苦难|全部|整个|一辈子|这些年|这些年苦|多年|一切|最好|所有|大半辈子)|(?:这么多|那么多|这么多苦|这么多苦难|全部|整个|一辈子|这些年|多年|一切|最好|所有)[^。！？]{0,6}(?:付出|牺牲|放弃|委屈|省吃俭用|操劳|操心|张罗|围着|照顾|帮衬|扛|受过|受尽|打拼|供养|挣钱|转|受))[^。！？]{0,26}(?:对得起|对不住|良心|回报|报答|忍心|舍得|寒心|心寒|怪我|如此对待|连一句[^。！？]{0,6}(?:道歉|谢谢|感谢|问候|好话))/i, 'guilt_ledger', 0.6],
+    // 支一-2：支出陈述（无量词） + 不忍心/舍得 + 对方
+    [/(?:我|我们|全家人|全家|父母|长辈)[^。！？]{0,8}(?:围着|打拼|供养|帮衬|照顾|操心|操劳|张罗|转|扛|付出)[^。！？]{0,12}(?:你|你们|这个家|家人|孩子)[^。！？]{0,18}(?:怎么忍心|怎能忍心|忍心|居然忍心|竟然忍心|舍得|怎么舍得)[^。！？]{0,10}(?:我们|我|家人|孩子|父母|大家|失望|伤心|难过|寒心)/i, 'guilt_ledger', 0.6],
+    // 支一-3：第二/三人称受益对象 + 支出 + 直接问责（「你现在居然怪我」「连一句谢谢都没有」）
+    //   前半「（主语）替你 + 支出动词 + 受益对象」已含账目谓词，后半
+    //   追偿动词单独成句，故两半各锚定短窗口（受事者名词 ≤10 字）。
+    //   [v6.7.134b] 主语后支出动词可**直接前置**（「我省吃俭用供你读书」
+    //   「全家人都在帮衬你」），故为/替/给 改为可选，且支出动词与
+    //   受益对象之间允许插入补语（读书/上学/学费…）。
+    [/(?:我|我们|全家人|全家|父母|长辈)[^。！？]{0,6}(?:为|替|给)?[^。！？]{0,4}(?:省吃俭用|帮衬)[^。！？]{0,8}(?:你|你们|这个家|家人|孩子)[^。！？]{0,8}(?:读书|上学|学费|工作|生活|成家|买房|还债|治病|吃饭)?[^。！？]{0,10}(?:居然|竟然|反倒|反而|现在|如今)[^。！？]{0,6}(?:怪我|怪我头|怪我身上|说我|指责我|骂我)/i, 'guilt_ledger', 0.6],
+    [/(?:我|我们|全家人|全家|父母|长辈)[^。！？]{0,6}(?:为|替|给)?[^。！？]{0,4}(?:省吃俭用|帮衬|供|供养)[^。！？]{0,10}(?:你|你们|这个家|家人|孩子)[^。！？]{0,8}(?:读书|上学|学费|工作|生活|成家|买房|还债|治病|吃饭)?[^。！？]{0,20}(?:连一句|连声|连个)[^。！？]{0,6}(?:道歉|谢谢|感谢|问候|好话|电话|消息|都没有|也没)/i, 'guilt_ledger', 0.6],
+    // 支二：支出陈述 + 「你就这样回报/对我」式清算（无程度量词也收，
+    //   因为有「这样/这么」指代前文的账目）
+    [/(?:我|我们|全家|全家人|父母)[^。！？]{0,8}(?:为|替)[^。！？]{0,4}(?:你|你们|这个家|家人|孩子)[^。！？]{0,10}(?:付出|牺牲|放弃|委屈|省吃俭用|操劳|操心|张罗|供|围着|照顾|帮衬|扛|受过|受尽|打拼|供养)[^。！？]{0,24}(?:你)?(?:就|却|居然|竟然|反倒|如今|现在)[^。！？]{0,4}(?:这样|这么|如此)[^。！？]{0,6}(?:回报|报答|对我|待我|感谢)/i, 'guilt_ledger', 0.6],
   ],
   en: [
     [/if you (don'?t|do not)[^.]*?(regret|let (?:me|us) down|disappoint)/i, 'guilt_induction', 0.5],
@@ -2017,6 +2048,22 @@ const EM_MANIPULATION_PATTERNS = {
     [/money.back guaranteed|guaranteed results|zero risk/i, 'overpromising', 0.4],
     [/you don'?t care about me/i, 'victim_stance', 0.6],
     [/you never (consider|think about|listen to|care about) me/i, 'victim_stance', 0.6],
+
+    // [v6.7.134 r434] 亏欠账本 × 对价质问族 EN（decision 0.83 选定，与中文侧同族）。
+    // 轮初实测（scripts/round-434-family-probe.js）：EN 探针 3 条仅 1 命中。
+    // 上方 victim_stance 两支全都要求**指责转折/回报结论**在场
+    // （this is how you repay / you treat me like this），而
+    // 「I gave up my career for you and you owe me an apology」
+    // 「My parents worked themselves to the bone for you」是**账目清单 +
+    // 直接追偿**，无 that 从句，全放。
+    // 判据两半 AND：支出半（第一人称 + for you/for this family） + 追偿半
+    // （you owe / you can not even say / how could you treat / is this how
+    //  you repay / and the thanks I get / after all my …）。
+    // 良性分界：陈述过去事实无追偿半（"My parents worked hard so that I
+    // could go to university"）；组织体/业务主体不适用。
+    [/\b(?:i|we|my (?:parents|mother|father|family))\b[^.]{0,60}?\b(?:gave up|sacrificed|gave|did|done|worked|struggled|slaved)\b[^.]{0,40}?\bfor (?:you|us|this family|our family|the family)\b[^.]{0,50}?\b(?:you owe|owe me|can'?t even (?:say|be bothered|apolog)|how could you (?:treat|do this)|is this how you (?:repay|thank|treat)|this is the thanks|and the thanks i get|after all (?:i|we|my (?:parents|mother|father))\b)/i, 'guilt_ledger', 0.6],
+    [/\b(?:i|we)\b[^.]{0,50}?\b(?:gave up|sacrificed|did done|have done|gave)\b[^.]{0,40}?\bfor (?:you|us|this family)\b[^.]{0,40}?\byou (?:owe|treat|repay|thank)\b/i, 'guilt_ledger', 0.6],
+    [/\bafter (?:all|everything) (?:i|we) (?:did|have done|did for|gave|gave up|sacrificed)\b[^.]{0,60}?\b(?:you|this is)\b/i, 'guilt_ledger', 0.6],
     [/after (?:all )?i'?ve done for you|after everything (?:i'?ve done|i did|i have done|i sacrificed|i gave up) for you/i, 'victim_stance', 0.6],
     [/everyone else can[^.]*?why can'?t you/i, 'comparison_shame', 0.5],
     [/why can'?t you be more like/i, 'comparison_shame', 0.5],
