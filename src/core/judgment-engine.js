@@ -1625,14 +1625,22 @@ class JudgmentEngine {
   //   削弱 RL 复用链路（且崩在很远的地方，难定位）。落盘是一去不回的边界，
   //   在 _save() 里对切片做一次浅拷贝脱敏，运行期零影响、外泄零可能。
   //
-  // 脱敏哪些字段（实测含用户原文的）：
-  //   · input            — 用户原文前 200 字（r438 已改调用点，这里再兜一层）
-  //   · context.keywords — _extractKeywords(input) 的原文切片，实测
-  //                        「我姐根本没想过我的感受」被切成 2 个 keyword，
-  //                        拼回去即完整还原原句。r438 漏的就是这一处。
+  // 脱敏哪些字段（全部为实测扫描确认含用户原文）：
+  //   · rec.input              — 用户原文前 200 字
+  //   · rec.context.keywords   — _extractKeywords(input) 的原文切片。
+  //                              r438 只脱敏了 input，keywords 整组漏掉，
+  //                              实测原句被切成碎片后仍能完整还原。
+  //   · rec.paths[].description / gotPaths
+  //                            — GoT 探索路径。description 形如
+  //                              「GoT 推理链 (N步): <原文前50字>...」，
+  //                              gotPaths[] 是 GoT 引擎对 input.slice(0,200)
+  //                              逐段推理的结果数组，数组元素里内嵌完整原文。
+  //                              这是最严重的一处：单条 path 就能把
+  //                              整段第一人称自述还原出来。
+  //                              （judgment-engine.js:824/844/850）
   //
-  // 不动的字段：paths / judgment / rlTable / consequences —— 逐字段扫描实测
-  // 不含用户原文（全是 id/score/type/signature 派生值），少改少回归。
+  // 不动的字段：rlTable / consequences —— 逐字段扫描实测不含用户原文
+  //（全是 id/score/type/signature 派生值），少改少回归。
 
   _sanitizeHistoryForSave(historySlice) {
 
@@ -1655,6 +1663,33 @@ class JudgmentEngine {
           copy.context.keywords = _PrivacyExposure.sanitizeKeywordList(copy.context.keywords);
 
         }
+
+      }
+
+      // GoT 路径：description 与 gotPaths 都可能内嵌用户原文，整体过指纹。
+      if (Array.isArray(copy.paths)) {
+
+        copy.paths = copy.paths.map((p) => {
+
+          if (!p || typeof p !== 'object') return p;
+
+          const pc = { ...p };
+
+          if (typeof pc.description === 'string') {
+
+            pc.description = _PrivacyExposure.sanitizeForPersistence(pc.description);
+
+          }
+
+          if (Array.isArray(pc.gotPaths)) {
+
+            pc.gotPaths = pc.gotPaths.map(g => (typeof g === 'string' ? _PrivacyExposure.sanitizeForPersistence(g) : g));
+
+          }
+
+          return pc;
+
+        });
 
       }
 
