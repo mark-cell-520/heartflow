@@ -27,6 +27,8 @@
  */
 
 const fs = require('../utils/safe-fs');
+// [r438 隐私闸门] 主题提取前的敏感度判据（防原文做持久化 key）
+const _PrivacyExposure = require('../privacy-exposure.js');
 const path = require('path');
 
 const VERSION = '1.0.0';
@@ -677,7 +679,18 @@ class SelfPlay {
    * 从判断中提取主题
    */
   _extractTopic(judgment) {
+    // [r438 隐私闸门] 原来直接取用户原文前 3 个词当持久化 key，
+    // 家庭/创伤/经济自述会以明文 key 形态写进 data/self-play/challenge-patterns.json。
+    // 改为：先过敏感判据 → 命中则用类别指纹做 key，保留"同类任务归并"的
+    // 效用（指纹相同即同族），原文不落盘；未命中才用词汇主题。
     const input = judgment.input || '';
+    const exposure = _PrivacyExposure && _PrivacyExposure.checkPrivacyExposure
+      ? _PrivacyExposure.checkPrivacyExposure(input)
+      : { exposed: false, findings: [] };
+    if (exposure.exposed) {
+      const tokens = [...new Set(exposure.findings.map(f => f.type))];
+      return 'redacted:' + tokens.join('+');
+    }
     // 提取前 3 个有意义的词作为主题
     const words = input.toLowerCase().split(/\s+/).filter(w => w.length > 2).slice(0, 3);
     return words.join('_') || 'general';

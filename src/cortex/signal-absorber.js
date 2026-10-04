@@ -20,6 +20,8 @@ class SignalAbsorber {
   constructor(options = {}) {
     this.name = 'signal-absorber';
     this.version = '2.0.0';
+    // [r438 隐私闸门] 原文入库前的敏感度判据 + 指纹化处置
+    this._privacy = require('../privacy-exposure.js');
     this.worldTree = null;
     try {
       const { ROUTES } = require('../memory/worldtree-bridge');
@@ -58,9 +60,16 @@ class SignalAbsorber {
     let stored = false;
     if (!opts.skipStore && this.worldTree && this.worldTree.store) {
       try {
+        // [r438 隐私闸门] worldtree 是长期知识库，原文连同学到的教训一起入库
+        // 等于把用户自述永久沉淀。这里只存：来源分类 + 学到的教训/缺口/动作，
+        // text 原文转指纹（判别与回溯都不需要原文，教训才是可复用资产）。
+        const exposure = this._privacy.checkPrivacyExposure(t);
         const payload = {
           source,
-          text: t.slice(0, 500),
+          text: this._privacy.sanitizeForPersistence(t),
+          exposure: exposure.exposed
+            ? { types: [...new Set(exposure.findings.map(f => f.type))], severity: exposure.maxSeverity }
+            : null,
           lesson: lessons.map(l => l.summary).join(' | '),
           gaps: gaps.map(g => g.module + ':' + g.issue).join(' | '),
           actions: upgradeActions,

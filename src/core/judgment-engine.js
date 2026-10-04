@@ -46,6 +46,9 @@
 
 const fs = require('../utils/safe-fs');
 
+// [r438 隐私闸门] 用户原文落盘前的敏感度判据 + 指纹化处置
+const _PrivacyExposure = require('../privacy-exposure.js');
+
 const path = require('path');
 
 
@@ -223,7 +226,10 @@ class JudgmentEngine {
 
     this._recordJudgment({
 
-      input: input.slice(0, 200),
+      // [r439 修正] r438 写成 `_PrivacyExposure().sanitizeForPersistence(...)`，
+      // 但模块导出的是对象不是工厂函数，judge() 一进来就 TypeError，
+      // 整条判断链路崩在这里（实测复现）。改为直接属性调用。
+      input: _PrivacyExposure.sanitizeForPersistence(input).slice(0, 200),
 
       context: ctx,
 
@@ -1611,6 +1617,55 @@ class JudgmentEngine {
 
 
 
+  // [r439 隐私闸门] 落盘序列化时脱敏 history 副本（不改运行期对象）。
+  //
+  // 为什么改这里而不是 _recordJudgment：
+  //   record 是 this.history 的元素本体，_findRLMatch / _recordJudgmentOutcome
+  //   在运行期还要读 context.keywords 做场景匹配与 RL 签名。就地脱敏会静默
+  //   削弱 RL 复用链路（且崩在很远的地方，难定位）。落盘是一去不回的边界，
+  //   在 _save() 里对切片做一次浅拷贝脱敏，运行期零影响、外泄零可能。
+  //
+  // 脱敏哪些字段（实测含用户原文的）：
+  //   · input            — 用户原文前 200 字（r438 已改调用点，这里再兜一层）
+  //   · context.keywords — _extractKeywords(input) 的原文切片，实测
+  //                        「我姐根本没想过我的感受」被切成 2 个 keyword，
+  //                        拼回去即完整还原原句。r438 漏的就是这一处。
+  //
+  // 不动的字段：paths / judgment / rlTable / consequences —— 逐字段扫描实测
+  // 不含用户原文（全是 id/score/type/signature 派生值），少改少回归。
+
+  _sanitizeHistoryForSave(historySlice) {
+
+    if (!Array.isArray(historySlice)) return historySlice;
+
+    return historySlice.map((rec) => {
+
+      if (!rec || typeof rec !== 'object') return rec;
+
+      const copy = { ...rec };
+
+      if (typeof copy.input === 'string') copy.input = _PrivacyExposure.sanitizeForPersistence(copy.input);
+
+      if (copy.context && typeof copy.context === 'object') {
+
+        copy.context = { ...copy.context };
+
+        if (Array.isArray(copy.context.keywords)) {
+
+          copy.context.keywords = _PrivacyExposure.sanitizeKeywordList(copy.context.keywords);
+
+        }
+
+      }
+
+      return copy;
+
+    });
+
+  }
+
+
+
   _updateRLTable(record) {
 
     if (!record.outcome) return;
@@ -1787,7 +1842,10 @@ class JudgmentEngine {
 
       const data = JSON.stringify({
 
-        history: this.history.slice(-200),
+        // [r439 隐私闸门] history 是唯一携带用户原文的字段（input +
+        // context.keywords）。落盘前过一道脱敏，返回的是浅拷贝副本，
+        // this.history 运行期对象不受影响（RL 匹配/后果回填继续用原文）。
+        history: this._sanitizeHistoryForSave(this.history.slice(-200)),
 
         consequences: this.consequences.slice(-500),
 
