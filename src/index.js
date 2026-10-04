@@ -4430,6 +4430,31 @@ const DEHUMANIZATION_PATTERNS = {
       /\b(data points|statistics|numbers|headcount)\b[^.]*?(people|lives|human|soul)/i,
       /\b(inventory|stock|merchandise|wares)\b[^.]*?(human|people|them|body)/i,
       /\b(assets|resources|capital|commodity)\b[^.]*?human/i,
+      // [v6.7.1xx r428] 「人群 = 待处置物质」族（waste_population）。
+      // 缺口实测（r428 probe-1 + 本测试攻击段 7/7 全漏、gate 全 pass）：
+      // 上面 disposable/expendable 一支要求**形容词与人群词相邻**，
+      // 而「surplus material awaiting disposal」「excess stock that needs
+      // thinning out」这类把人群比成库存/废弃物、处置动词后置的形状
+      // 英文侧无支可收（中文同族早有物化判据）。
+      // 设计边界：
+      //   ① **人群词必须在场**（people/persons/population/group/citizens/
+      //      residents/inhabitants/bodies…），缺它就不命中 —— 良性材料/
+      //      库存句（surplus stock、chemical waste、excess inventory）
+      //      因此全部豁免，本测试良性段 8/8 实测；
+      //   ② 必须有**处置/减量动词**（dispose/disposal/thinning/clearing/
+      //      culling/processing/cleanup…）在句中，与人群词同现；
+      //   ③ 人群词与处置词之间允许 is/are/just/nothing but/needs 等
+      //     连接成分，限定在同一小句内（[^.]{0,40}）。
+      // 支一：人群词 + 废弃物名词 + 处置动词（覆盖 human garbage disposed of）
+      /\b(people|persons|human|humans|population|group|crowd|citizens|residents|inhabitants|bodies|masses)\b[^.]{0,40}?\b(waste|garbage|refuse|trash|filth|scum|vermin|surplus material)\b[^.]{0,40}?\b(disposed|disposal|processed|processing|cleared away|cleaned up|thinning|thinned|culling|culled|incinerat\w*)\b/i,
+      // 支二：人群词 + 过剩形容词 + 处置动词（覆盖 unwanted surplus cleaned up）。
+      // ⚠️ 不放 processed/processing —— 「extra residents were processed at the
+      // front desk」是酒店/公寓正常入住办理表述，r428 良性基线实测会误伤。
+      /\b(people|persons|human|humans|population|group|crowd|citizens|residents|inhabitants|bodies|masses)\b[^.]{0,40}?\b(unwanted|surplus|excess|redundant|extra)\b[^.]{0,30}?\b(cleaned up|cleanup|thinning|thinned|culling|culled|cleared away|disposal|dispose|disposed)\b/i,
+      // 支三：过剩形容词 + 物质名词 + 处置动词，但用 lookahead 保证**句中
+      // 某处有人群词** —— 仓库/工厂/资金句（surplus stock、excess inventory、
+      // surplus funds）因此豁免，r428 良性基线 8/8 实测。
+      /\b(?=[^.]*\b(people|persons|human|humans|population|group|crowd|citizens|residents|inhabitants|bodies|masses)\b)[^.]{0,80}?\b(surplus|excess|unwanted|extra|redundant)\b[^.]{0,30}?\b(material|stock|refuse|waste|bodies|surplus)\b[^.]{0,30}?\b(disposal|dispose|disposed|thinning|culling|cleared away|cleaned up|processed|processing)\b/i,
     ],
     disease: [
       /\b(cancer|disease|virus|plague|infection|contagion|toxin|poison|rot|decay)\b[^.]*?(people|they|them|society)/i,
