@@ -5,7 +5,7 @@ version: "6.8.0"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  it reaches a human. 58 discrimination dimensions × 11-layer pipeline × 143 modules ×
+  it reaches a human. 67 discrimination dimensions × 11-layer pipeline × 143 modules ×
   61 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
@@ -257,19 +257,19 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 59 dimensions
+## The 67 dimensions
 
 **Block-level (10):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking
 
 **Rewrite-level (11):** emotional_manipulation, gaslighting, double_bind, victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust, instrumental_reasoning, agency_deflection, multi_turn_escalation
 
-**Verify-level (28):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield
+**Verify-level (36):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction
 
 **Scored but not action-forcing:** evidence, moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary, meta_cognition, theory_of_mind, counterfactual, social_norm, capability_overclaim, goal_misalignment, instrumental_reasoning, ai_writing_tell, bullshit_recognition
 
 > **Resistance to obfuscation:** symbol substitution (`f**k`), spaced letters (`f u c k`), homophones, and Unicode variants are covered.
 
-### Agent-facing checks (separate from the 46 text dimensions)
+### Agent-facing checks (separate from the 67 text dimensions)
 
 These judge how an AI agent behaves rather than what a sentence says — the failure
 modes where an agent reports work it did not do. Each is exposed as an MCP tool.
