@@ -67,8 +67,8 @@ t('面板能跑出结构化数字', () => {
   assert.ok(panel.total, 'total 解析失败');
 });
 
-t('维度总数 = 50', () => {
-  assert.strictEqual(parseInt(panel.total, 10), 50,
+t('维度总数 = 51', () => {
+  assert.strictEqual(parseInt(panel.total, 10), 51,
     `维度总数变了: ${panel.total}（新增维度时同步更新本测试）`);
 });
 
