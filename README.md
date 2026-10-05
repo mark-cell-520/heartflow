@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-58 discrimination dimensions  ×  11-layer pipeline  ×  143 modules  ×  61 MCP tools
+59 discrimination dimensions  ×  11-layer pipeline  ×  143 modules  ×  61 MCP tools
 ×  1,136 dispatch routes  ×  17,648 passing tests  ×  0 runtime dependencies
 ```
 
@@ -139,7 +139,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (58 dimensions) -> gate
+scope-check -> premise-check -> discriminate (59 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -175,7 +175,7 @@ Measured on this repository at **v6.8.0**. Not marketing copy.
 | Modules registered | 143 |
 | Module init errors | 0 |
 | Dispatch routes | 1,136 |
-| Discrimination dimensions | 58 |
+| Discrimination dimensions | 59 |
 | MCP tools | 61 |
 | Test suite | 17,648 passing / 28 failing |
 | Capability guard | 20 / 20 checks |

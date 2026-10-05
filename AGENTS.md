@@ -108,31 +108,35 @@ The three entry points above are wrappers around these, which `main`
 `verdict` is derived from `gate.action`, so the two cannot contradict each other. If you
 read only one field, read `gate.action`.
 
-## The 58 dimensions
+## The 59 dimensions
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
-> `VERIFY_DIMS` sets in `src/index.js` (v6.7.110).** The three tiers add up to 46;
-> the other 5 dimensions are scored but do not force a gate action.
+> `VERIFY_DIMS` sets in `src/index.js` (v6.7.110, recount 6.8.1).** The three tiers
+> add up to 49; the remaining 10 dimensions are scored but do not force a gate action.
 
 **Block-level (10):** hate_speech, dehumanization, prompt_injection, code_security,
 deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
 indirect_injection, reward_hacking
 
-**Rewrite-level (10):** emotional_manipulation, gaslighting, double_bind,
+**Rewrite-level (11):** emotional_manipulation, gaslighting, double_bind,
 victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust,
-instrumental_reasoning, multi_turn_escalation
+instrumental_reasoning, agency_deflection, multi_turn_escalation
 
-**Verify-level (27):** appeal_to_authority, vagueness, contradiction, sycophancy,
+**Verify-level (28):** appeal_to_authority, vagueness, contradiction, sycophancy,
 confidence, fallacies, presupposition, empty_answer, info_deprivation,
 false_equivalence, hasty_generalization, slippery_slope, whataboutism,
 pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith,
 no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection,
-premature_termination, sealioning, tone_policing, statistical_misleading
+premature_termination, sealioning, tone_policing, statistical_misleading,
+complexity_shield
 
 Dimensions that are scored but do not force a gate action: evidence,
 moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary,
 meta_cognition, theory_of_mind, counterfactual, social_norm, capability_overclaim,
 goal_misalignment, ai_writing_tell.
+
+> `fallacies` carries sub-family tags (`sunk_cost_coercion`, `sunk_cost_nullified`)
+> that score within `fallacies`; they are not standalone dimensions.
 
 ## Decision routing — better choices
 
