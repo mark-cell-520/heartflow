@@ -102,6 +102,10 @@ const { checkReversibility } = require('./reversibility.js');
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkStatisticalMisleading } = require('./statistical-misleading.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
+// [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
+// 非人主体，回避具体决策者）。心虫 decision 本体选出，探测器实测 8/10
+// 攻击样本穿过硬闸门、良性 0 误伤。判据细节见 src/agency-deflection.js。
+const { checkAgencyDeflection } = require('./agency-deflection.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -527,6 +531,7 @@ function discriminate(text, evidence = [], contentMode) {
   // 而那正是本族主场。零覆盖族，独立模块。
   const sm = _applyPedagogyRelaxation(checkStatisticalMisleading(_normText), "statistical_misleading", pedagogyRelaxation);
   const pt = _applyPedagogyRelaxation(checkPrematureTermination(_normText), "premature_termination", pedagogyRelaxation); // 过早终止检测（该完成却没完成）
+  const ad = _applyPedagogyRelaxation(checkAgencyDeflection(_normText), "agency_deflection", pedagogyRelaxation); // 责任转嫁抽象系统（第59维度）
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -659,6 +664,10 @@ function discriminate(text, evidence = [], contentMode) {
     {score: sm.score, name:'statistical_misleading'},
     {score: tp.score, name:'tone_policing'}, {score: sl.score, name:'sealioning'}, {score: ppf.score, name:'pseudo_profundity'},
     {score: pt.score, name:'premature_termination'},
+    // [v6.8.1] 第 59 维度 agency_deflection 参与判定（责任转嫁抽象系统）。
+    // 同 clickbait/perfect_error/reward_hacking 教训：dimMap 与 allDims
+    // 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
+    {score: ad.score, name:'agency_deflection'},
     {score: uc.score, name:'unsupported_claim'},
     {score: pc.score, name:'pseudo_causal'},
     {score: sd.score, name:'soft_deflection'},
@@ -725,7 +734,9 @@ function discriminate(text, evidence = [], contentMode) {
     phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
     reward_hacking: rh,
     // [v6.8.0] 第 58 维度：基数隐藏的比例断言
-    statistical_misleading: sm
+    statistical_misleading: sm,
+    // [v6.8.1] 第 59 维度：责任转嫁抽象系统
+    agency_deflection: ad
   };
   const findings = [];
   // [v6.7.123] 维度 → 修复指引映射。AGENTS.md 的修复闭环写的是
@@ -767,6 +778,7 @@ function discriminate(text, evidence = [], contentMode) {
     pseudo_causal: '不要用相关性冒充因果，补充机制说明或改为相关表述',
     soft_deflection: '直接回应问题，不要用软话术转移',
     premature_termination: '结论前需给出推理过程与依据',
+    agency_deflection: '不得把决策或责任转嫁给算法/系统/流程/模型等抽象主体；须说明具体是谁做的决定、谁可追责，并给出人工监督方式',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1054,6 +1066,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同级（都是价值观层面的误导），落 rewrite 不落 block——单独的"不择手段"
     // 也可能出现在策划讨论/小说台词/案例分析里。
     'instrumental_reasoning',
+    // [v6.8.1] 责任转嫁抽象系统（第 59 维度）：同 instrumental_reasoning，
+    // 落 rewrite 不落 block——单句也可能是剧本台词/案例分析复述，
+    // 需改写输出把责任落回具体的人或团队。
+    'agency_deflection',
     // [v6.7.86] 多轮累积阶梯。刻意不 block——含 ≥2 层阶梯的文本也可能是
     // 正当的**安全培训复盘/攻击分析**（"攻击者通常先索取PII再导数据"），
     // block 会误伤安全意识教育。rewrite/verify 足够提示人工确认。

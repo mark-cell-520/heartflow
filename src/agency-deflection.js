@@ -42,13 +42,19 @@
 // ─── C1: 抽象（非人）主体 ───────────────────────────────
 // 中文：把主体指向机器/流程/数据的名词
 const AGENT_ZH = /算法|系统|程序|流程|模型|平台|机器|脚本|自动化|接口|表单|软件|数据库|规则引擎|智能体|人工智能|\bAI\b|大数据|数据(?![的]库?库)|这套?体系|整套?机制/;
-// 英文：the + 抽象主体（要求 the/an 限定，避免裸词误伤）
-const AGENT_EN = /\b(?:the\s+(?:algorithm|system|model|pipeline|process|bot|script|platform|software|engine|machine|automation|process)|an?\s+(?:algorithm|automated\s+(?:system|process|pipeline))|\bAI\b|the\s+rules?\s+engine)\b/i;
+// 英文：限定词 + 抽象主体（允许中间有最多两个形容词：the automated pipeline /
+// the machine learning model）。人类责任豁免见下方 HUMAN_ACCOUNTABILITY_*，
+// 故 AGENT 侧可放宽——命中仍须与 C2 归责回避交叉才判定，单独出现不判。
+const AGENT_EN = /\b(?:the\s+(?:\w+\s+){0,2}(?:algorithm|system|model|pipeline|process|bot|script|platform|software|engine|machine|automation|rules?\s+engine)|an?\s+(?:\w+\s+){0,1}(?:algorithm|automated\s+(?:system|process|pipeline))|\bAI\b)/i;
 
 // ─── C2: 归责回避 ───────────────────────────────
 // C2a 自主判定动词：抽象主体"自己"做了决定
+// EN 侧 "cannot override" 形：句中出现「无法被人推翻」的被动语态即命中——
+// 无论主语是 the automated pipeline 还是 our classifier。
+// 判据边界：/cannot\s+(?:be\s+)?overrid(?:e|den)/ 已覆盖 cannot override /
+// cannot be overridden / can't override 三者，与 C1 交叉使用，不单独判。
 const DEFLECT_AUTO_ZH = /(?:自动|自行|自主|独立)(?:判定|决定|决策|做出|执行|生成|处理|选择|拒绝|批准|评分|判断|完成|触?发|放行|驳回|拦截)|(?:算法|系统|程序|流程|模型|平台|机器|脚本|智能体)\s*(?:自己|自动|自行)?\s*(?:算|判|定|选|做)的?(?:结果|决定|结论|选择)|自己(?:做|定)的?决定/;
-const DEFLECT_AUTO_EN = /\b(?:made|makes|made up|chose|choose|decided|decides|decided on its own|acted|acts)\b[^.]{0,40}\b(?:on its own|autonomously|by itself|independently)|(?:the\s+\w+)\s+(?:decided|chose|acted|made the (?:decision|choice|call))\b[^.]{0,30}\b(?:autonomous|on its own|by itself)|\bautonomous(?:ly)?\b|\bcannot\s+(?:be\s+)?overrid(?:e|den)\b|\bcan'?t\s+(?:be\s+)?overrid(?:e|den)\b|\bno\s+override\b/i;
+const DEFLECT_AUTO_EN = /\b(?:made|makes|made up|chose|choose|decided|decides|decided on its own|acted|acts)\b[^.]{0,40}\b(?:on its own|autonomously|by itself|independently)|(?:the\s+\w+)\s+(?:decided|chose|acted|made the (?:decision|choice|call))\b[^.]{0,30}\b(?:autonomous|on its own|by itself)|\bautonomous(?:ly)?\b|\b(?:cannot|can'?t)\s+(?:be\s+)?overrid(?:e|den)\b|\bno\s+override\b|\bno\s+human\s+(?:can|could)\s+(?:override|overrule|stop)\b/i;
 
 // C2b 责任否认：把责任推离人类主体
 // （形状描述，原文见测试文件：抽象主体在场的责任否认句式）
