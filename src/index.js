@@ -575,8 +575,13 @@ function discriminate(text, evidence = [], contentMode) {
   const att = _applyPedagogyRelaxation(checkAppealToTradition(_normText), "appeal_to_tradition", pedagogyRelaxation); // 诉诸传统压制改变（第61维度）
   const aig = _applyPedagogyRelaxation(checkAppealToIgnorance(_normText), "appeal_to_ignorance", pedagogyRelaxation); // 诉诸无知/举证倒置（第62维度）
   const cc2 = _applyPedagogyRelaxation(checkConcessionCoercion(_normText), "concession_coercion", pedagogyRelaxation); // 让步条件×灾难终局（第63维度）
-  // [v6.8.6] 第 64 维度 manufactured_consent（沉默现状×冒充集体同意）
+  // [v6.8.7] 第 65 维度 false_dilemma（伪二选一·排除第三选项）。
+  // 心虫 decision 本体选出（round-495-decide3.js，A 候选 0.88 分），
+  // 探测器固定池本轮已空，自建族级探针 r495-probe.js 实测：8 族扫描后
+  // false_dilemma 5/6 条攻击穿过硬闸门、良性 0/6 误伤。判据细节见
+  // src/false-dilemma.js。
   const mc3 = _applyPedagogyRelaxation(checkManufacturedConsent(_normText), "manufactured_consent", pedagogyRelaxation);
+  const fd = _applyPedagogyRelaxation(checkFalseDilemma(_normText), "false_dilemma", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -717,6 +722,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 clickbait/perfect_error/reward_hacking/agency_deflection 教训：
     // dimMap 与 allDims 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
     {score: csx.score, name:'complexity_shield'},
+    // [v6.8.7] 第 65 维度 false_dilemma 参与判定（伪二选一·排除第三选项）。
+    // 同 clickbait/perfect_error/agency_deflection 教训：dimMap 与 allDims
+    // 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
+    {score: fd.score, name:'false_dilemma'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -802,6 +811,8 @@ function discriminate(text, evidence = [], contentMode) {
     agency_deflection: ad,
     // [v6.8.1] 第 60 维度：以复杂性为盾拒绝解释
     complexity_shield: csx,
+    // [v6.8.7] 第 65 维度：伪二选一·排除第三选项
+    false_dilemma: fd,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1256,6 +1267,9 @@ function discriminate(text, evidence = [], contentMode) {
       pseudo_causal: pc, soft_deflection: sd, premature_termination: pt,
       // [v6.8.1] 第 60 维度：以复杂性为盾拒绝解释
       complexity_shield: csx,
+      // [v6.8.7] 第 65 维度：伪二选一·排除第三选项（同 complexity_shield
+      // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
+      false_dilemma: fd,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1280,6 +1294,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.1] 第 60 维度：以复杂性为盾拒绝解释（同 pseudo_causal/soft_deflection
       // 补登记先例：只进 dimensions 不进 summary 会让读方看不到命中）
       csx.count ? csx.count + ' 处复杂性盾牌' : '',
+      // [v6.8.7] 第 65 维度：伪二选一（同 complexity_shield 补登记先例：
+      // 只进 dimensions 不进 summary 会让读方看不到命中）
+      fd.count ? fd.count + ' 处伪二选一' : '',
       // [v6.8.2] 第 61 维度：诉诸传统压制改变（同 complexity_shield 补登记先例：
       // 只进 dimensions 不进 summary 会让读方看不到命中）
       att.count ? att.count + ' 处诉诸传统' : '',
