@@ -806,6 +806,10 @@ function discriminate(text, evidence = [], contentMode) {
     {score: lt.score, name:'loyalty_test'},
     // [v6.8.10] 第 68 维度 helplessness_induction 参与判定（无助感植入×行动劝阻）。
     {score: hi.score, name:'helplessness_induction'},
+    // [v6.8.14] 第 69 维度 sole_narrative 参与判定（口径垄断×压制核验）。
+    // 同 helplessness_induction 先例：dimMap 与 allDims 必须两处都接，
+    // 否则命中永远进不了 findings、gate 恒 pass。
+    {score: sn2.score, name:'sole_narrative'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -966,6 +970,8 @@ function discriminate(text, evidence = [], contentMode) {
     loyalty_test: '不得把「立场是否站在我这边」当成讨论的前提：须把观点质疑与忠诚问题分开陈述，让对方就事论事地反驳证据与结论；若确有资格要求（涉密/合规岗位），须给出制度依据与适用范围，而非要求个人效忠宣示',
     // [v6.8.10] 第 68 维度：无助感植入×行动劝阻
     helplessness_induction: '不得把「行动注定无效」归因于受话人无法撼动的权力结构：须把结构约束（可核实的具体条件）与行动价值分开陈述；确有约束时给出替代路径与申诉渠道，而非宣称努力没有意义',
+    // [v6.8.14] 第 69 维度：口径垄断×压制核验
+    sole_narrative: '不得把某一方未经核验的口径抬升为「唯一正确解释」并要求照单全收：须列出可核验的多方依据与分歧点；若确有唯一权威源（法规/标准/技术规范），须给出编号与适用范围，而非宣布讨论到此为止',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1302,6 +1308,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.10] 第 68 维度：无助感植入×行动劝阻（rewrite 级——同口径，
     // 单句可能是文学对白/案例复述，rewrite 会误伤）
     'helplessness_induction',
+    // [v6.8.14] 第 69 维度：口径垄断×压制核验（verify 级——单句可能是
+    // 工作汇报复述/流程说明/操作手册引用，rewrite 会误伤。与 r500/r503 同口径）
+    'sole_narrative',
   ]);
   // pass：无问题通过
 
@@ -1389,6 +1398,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.10] 第 68 维度：无助感植入×行动劝阻（同 loyalty_test
       // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
       helplessness_induction: hi,
+      // [v6.8.14] 第 69 维度：口径垄断×压制核验（同 helplessness_induction
+      // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
+      sole_narrative: sn2,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
