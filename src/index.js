@@ -1891,7 +1891,7 @@ const FALLACY_PATTERNS = {
     // 停止动作 × 「说明/证明一开始的坚持毫无意义」
     [/(?:放弃|停止|退出|收手|停下|终止|半途而废|前功尽弃|撤出|现在停)[^。]{0,18}(?:说明|证明|意味着|代表)[^。]{0,12}(?:一开始|起初|当初|从前|过去|之前)[^。]{0,8}(?:的)?[^。]{0,6}(?:坚持|努力|付出|投入|选择)[^。]{0,6}(?:毫无|完全|根本)?(?:没有)?(?:意义|价值|必要)/i, 'sunk_cost_coercion'],
     // 「不投入=没担当/不爱」形：把停止投入转译成道德或情感亏欠
-    [/(?:不投|不再投|不肯投|不愿投|不继续投|不加大投入|不追加|不肯再付出)[^。]{0,10}(?:就是|等于|说明|意味着|代表)[^。]{0,8}(?:不爱|不在乎|不重视|没担当|没责任|没良心|不信任|不支持|看不起|不尊重|没有诚意)/i, 'sunk_cost_coercion'],
+    [/(?:不投|不再投|不肯投|不愿投|不继续投|不肯继续投|不加大投入|不追加|不肯再付出|不肯再投入)[^。]{0,10}(?:就是|等于|说明|意味着|代表)[^。]{0,8}(?:不爱|不在乎|不重视|没担当|没责任|没良心|不信任|不支持|看不起|不尊重|没有诚意)/i, 'sunk_cost_coercion'],
     // 沉没量已成事实 × 只能继续的施压句
     [/(?:沉没的代价|沉没成本)[^。]{0,12}(?:已|早就|已经|都)[^。]{0,8}(?:付|花|投|砸)出?了?[^。]{0,10}(?:只能|不得不|必须|就)[^。]{0,6}(?:继续|撑|走|做)下?去?/i, 'sunk_cost_coercion'],
     // 沉没量 × 不许止损形（无显式停止动词，靠「不能/怎能」否定损失）
@@ -1998,7 +1998,10 @@ const FALLACY_PATTERNS = {
     [/\b(?:stopping|quitting|pulling\s+out|walking\s+away|bailing\s+out|backing\s+out)\s+(?:now|at\s+this\s+(?:point|stage)|here)\s+(?:would|will|could)?\s*(?:be\s+to\s+)?(?:admit|concede|acknowledge|confess)\s+(?:that\s+)?(?:our|my|the|we\s+were)\s*[^.]{0,40}\b(?:earlier|original|initial|past|previous)?\s*(?:judgment|judgement|call|decision|choice|instinct|conviction)\s+(?:was|were)\s+(?:wrong|mistaken|a\s+mistake|incorrect)\b/i, 'sunk_cost_coercion'],
     [/\b(?:if|once)\s+we\s+(?:stop|quit|walk\s+away|give\s+up|pull\s+(?:the\s+plug|out))\b[^.]{0,40}\b(?:admit|concede|confess)\s+(?:that\s+)?(?:we|i)\s+(?:were|was)\s+(?:wrong|mistaken)\b[^.]{0,20}/i, 'sunk_cost_coercion'],
     [/\bwould\s+(?:admit|concede|confess)\s+(?:that\s+)?(?:everything|all\s+the\s+(?:work|effort))\s+we\s+(?:did|have\s+done)\s+(?:was\s+)?(?:for\s+nothing|in\s+vain|pointless)\b[^.]{0,10}\b(?:and|which\s+means|so)\s+we\s+(?:were\s+)?(?:wrong|failed)\b/i, 'sunk_cost_coercion'],
-    [/\b(?:all|everything)\s+we\s+(?:did|have\s+done)\s+(?:was\s+)?(?:for\s+nothing|in\s+vain)\b[^.]{0,30}\b(?:if|unless)\s+we\s+(?:stop|quit|walk\s+away|give\s+up)\b/i, 'sunk_cost_coercion'],
+    [/\b(?:all|everything)\s+we\s+(?:did|have\s+done)\s+(?:was\s+)?(?:for\s+nothing|in\s+vain)\b[^.]{0,30}\b(?:if|unless)\s+we\s+(?:simply\s+|just\s+|now\s+)?(?:stop|quit|walk\s+away|give\s+up)\b/i, 'sunk_cost_coercion'],
+    // 全部落空形：all/everything + we did + was in vain / for nothing + if we stop
+    // （停止动词前置的倒装形：All we did was in vain if we simply stop now.）
+    [/\b(?:if|unless)\s+we\s+(?:simply\s+|just\s+|now\s+)?(?:stop|quit|walk\s+away|give\s+up|pull\s+out)\b[^.]{0,40}\b(?:all|everything)\s+we\s+(?:did|have\s+done)\b[^.]{0,20}\b(?:was|were|is)\s+/i, 'sunk_cost_coercion'],
     [/\bstopping\s+(?:now|here)\s+(?:would\s+)?(?:mean|means)\s+(?:that\s+)?(?:we|they|i)\s+(?:were|was|are)\s+(?:wrong|mistaken)\b[^.]{0,20}/i, 'sunk_cost_coercion'],
     // 停止/放弃 × would simply forfeit/write off + 已投入时长（无"承认"字面）
     [/\b(?:quitting|stopping|walking\s+away|giving\s+up|pulling\s+out)\b[^.]{0,20}\b(?:would|will|could)\s+(?:simply\s+|just\s+)?(?:forfeit|write\s+off|squander|throw\s+away|discard)\b[^.]{0,30}\b(?:years|months|decades|effort|investment|money|budget|work)\b[^.]{0,20}\b(?:we|i|they)\s*/i, 'sunk_cost_coercion'],
