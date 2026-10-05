@@ -145,6 +145,12 @@ const { checkConcessionCoercion } = require('./concession-coercion.js');
 // （没有唱票、没有记录、没有复议），一个人沉默也照样判。
 // 判据细节见 src/manufactured-consent.js。
 const { checkManufacturedConsent } = require('./manufactured-consent.js');
+// [v6.8.7] 第 65 维度 false_dilemma（伪二选一·排除第三选项）。
+// 上一轮（495）已把 dimMap/allDims/dimensions/summary 六处接完，但漏了本行
+// require —— 第 584 行直接调用 checkFalseDilemma 整个 checkOutput 会
+// TypeError 崩溃（r496 实测）。require 是接线的第 7 处，缺一即全线断裂。
+// 判据细节见 src/false-dilemma.js。
+const { checkFalseDilemma } = require('./false-dilemma.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -870,6 +876,8 @@ function discriminate(text, evidence = [], contentMode) {
     concession_coercion: '把「让步」与「灾难」的因果关系拆开：让步是条件决策，不是灾难的开关；灾难若声称发生，须给可验证依据与量级，不能用不可证伪的终局恐吓逼对方放弃让步',
     // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意
     manufactured_consent: '不得把沉默当成同意：实际表决须给出票数、弃权与反对票记录，未表态者应记为「未反馈」；需程序合规（纪要/公示/复议/书面确认）后才可称"已通过"',
+    // [v6.8.7] 第 65 维度：伪二选一·排除第三选项
+    false_dilemma: '不得把多元或可协商的局面压成只有两个选项：须列出被压掉的第三选项与各自代价再要求表态；若确为事实二元（排期/参数/法律状态），须给出二元的事实依据',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1193,6 +1201,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意（verify 级——需补出实际
     // 票数与程序痕迹；单句也可能是会议流程复述/文学对白，rewrite 会误伤）。
     'manufactured_consent',
+    // [v6.8.7] 第 65 维度：伪二选一·排除第三选项（verify 级——需列出被压掉
+    // 的第三选项与各自代价；单句也可能是小说台词/案例复述/方案对比，
+    // rewrite 会误伤）。
+    'false_dilemma',
   ]);
   // pass：无问题通过
 
