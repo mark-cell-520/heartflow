@@ -11361,6 +11361,7 @@ module.exports = {
   checkBadFaith,
   checkTonePolicing,
   checkNoFallback,
+  checkNormalizationOfDeviance,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
