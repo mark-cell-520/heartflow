@@ -29,6 +29,18 @@
  *      是被硬杀在变异中，立刻把 SRC 还原回原始内容并删掉侧车。
  *      这样即使本轮被杀，下一轮第一个测试也会自动解毒。
  *
+ *   ⚠️ [v6.7.124+1 第 472 轮] owner 存活闸（修「守卫自盲」事故）：
+ *      r469/r470 接入后，r417/r420/r446/r463 四个变异守卫测试**同时假阴性**
+ *      （exit=0、报「守卫不敏感」）。根因：arm(SRC, 健康内容) 写在
+ *      writeFileSync(变异) 之前 → 侧车存的是**健康**内容 → 被 spawn 的
+ *      子进程启动时执行 recover()，把父进程刚写下的变异**还原洗掉**，
+ *      子进程于是看到健康引擎、前置断言全过、exit 0。
+ *      修法：arm() 同时写 `<hash>.bak.pid.bak` 记录 arming 进程 pid；
+ *      recover() 先查 pid 是否存活——**存活就一律不还原**
+ *      （它可能正在变异中，洗它等于替它掩盖缺陷）；只有确认 arming 进程
+ *      已死（正是 SIGKILL 场景）才走 restoreOne。语义对齐设计意图：
+ *      「为已死的 arm 兜底，绝不打扰活着的 arm」。
+ *
  * 用法（测试文件内）：
  *     const { arm, disarm, recover } = require('./mutation-guard-recovery.js');
  *     recover();                       // 启动即解毒上一次硬杀残留
@@ -61,6 +73,44 @@ function sidecarPath(absPath) {
   return path.join(SIDECAR_DIR, srcHash(absPath) + '.bak');
 }
 
+/** arming 进程的 pid/mtime 记录文件（[r472] 新增，存活闸用） */
+function ownerPath(absPath) {
+  return sidecarPath(absPath) + '.pid.bak';
+}
+
+/** 读文件 mtimeMs；失败返回 null（不抛） */
+function safeMtime(absPath) {
+  try { return fs.statSync(absPath).mtimeMs; } catch (_) { return null; }
+}
+
+/** pid 存活探测。kill(pid,0)：不存在 → ESRCH，无权限 → EPERM（仍算存活）。 */
+function pidAlive(pid) {
+  if (!Number.isFinite(pid) || pid <= 0) return false;
+  try { process.kill(pid, 0); return true; }
+  catch (e) {
+    if (e && e.code === 'EPERM') return true;   // 属于别的用户，但确实活着
+    return false;                                // ESRCH —— 进程已死
+  }
+}
+
+/**
+ * [r472] 这个侧车是否属于一个**仍然活着**的进程？
+ * 活着 → true：recover() 绝对不能还原（那个人可能正在变异中）。
+ * @returns {boolean}
+ */
+function ownerAlive(absPath) {
+  const p = ownerPath(absPath);
+  if (!fs.existsSync(p)) {
+    // 没有 owner 记录（r472 之前的旧侧车 / 手工留下的）：
+    // 保守判定为「非活」，让 recover() 照旧解毒 —— 旧行为的兼容。
+    return false;
+  }
+  try {
+    const [pidStr] = fs.readFileSync(p, 'utf8').trim().split(' ');
+    return pidAlive(Number(pidStr));
+  } catch (_) { return false; }
+}
+
 function ensureDir() {
   try { fs.mkdirSync(SIDECAR_DIR, { recursive: true }); } catch (_) {}
 }
@@ -74,6 +124,10 @@ function arm(absPath, originalContent) {
   ensureDir();
   const sc = sidecarPath(absPath);
   fs.writeFileSync(sc, originalContent, 'utf8');
+  // [r472] 记录 arming 进程 pid —— recover() 靠它区分「活着的 arm」与
+  // 「已被 SIGKILL 的死 arm」。文件名带 .bak 结尾，落进 *.bak 忽略规则。
+  const ownerSc = ownerPath(absPath);
+  fs.writeFileSync(ownerSc, String(process.pid) + ' ' + safeMtime(absPath), 'utf8');
   armed.set(absPath, sc);
   installHooks();
 }
@@ -87,7 +141,10 @@ function disarm(absPath) {
     const cur = fs.readFileSync(absPath, 'utf8');
     // 只有确认目标已回到原始内容才删侧车；否则留着，让下一个进程 recover()
     const bak = fs.readFileSync(sc, 'utf8');
-    if (cur === bak) fs.unlinkSync(sc);
+    if (cur === bak) {
+      try { fs.unlinkSync(sc); } catch (_) {}
+      try { fs.unlinkSync(ownerPath(absPath)); } catch (_) {}
+    }
   } catch (_) {}
 }
 
@@ -101,6 +158,7 @@ function restoreOne(absPath) {
     fs.writeFileSync(absPath, bak, 'utf8');
   }
   try { fs.unlinkSync(sc); } catch (_) {}
+  try { fs.unlinkSync(ownerPath(absPath)); } catch (_) {}
   return true;
 }
 
@@ -114,9 +172,17 @@ function recover(candidates) {
     ? candidates
     : [path.join(ROOT, 'src', 'index.js')];
   let n = 0;
+  let skipped = 0;
   for (const p of list) {
-    try { if (restoreOne(p)) n++; } catch (_) {}
+    try {
+      // [r472] owner 存活闸：arming 进程还活着 → 它可能正在变异中，
+      // 此时还原等于替它掩盖缺陷（r417/r420/r446/r463 假阴性事故的根因）。
+      // 只有确认 arming 进程已死，才恢复 —— 这正是 SIGKILL 场景。
+      if (ownerAlive(p)) { skipped++; continue; }
+      if (restoreOne(p)) n++;
+    } catch (_) {}
   }
+  global.__hf_mg_last = { restored: n, skippedAlive: skipped };
   return n;
 }
 
@@ -146,4 +212,4 @@ function installHooks() {
   }
 }
 
-module.exports = { arm, disarm, recover, restoreOne, isArmed, sidecarPath, SIDECAR_DIR };
+module.exports = { arm, disarm, recover, restoreOne, isArmed, sidecarPath, ownerPath, ownerAlive, pidAlive, SIDECAR_DIR };
