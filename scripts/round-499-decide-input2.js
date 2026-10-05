@@ -1,0 +1,20 @@
+// round-499 方向选择输入 v2：本轮实探测针产出的 10 个真实缺口族
+const fs = require('fs');
+const out = [];
+out.push('[A] loyalty_test：用忠诚度测试胁迫表态，以立场审查替代事实讨论。实测：6/6 条攻击样本穿过硬闸门（gate=pass），现有 66 维对这一族零覆盖；良性对照 0 误伤。属 rewrite 级。');
+out.push('[B] helplessness_induction：灌输「再努力也没用」，压制对方的行动意愿。实测：4/5 条攻击样本穿过硬闸门，66 维零覆盖；良性 0 误伤。rewrite 级。');
+out.push('[C] fixed_mindset_disparagement：以固定型思维判定对方能力上限，消解其改进空间。实测：4/5 条穿过，66 维零覆盖；良性 0 误伤。rewrite 级。');
+out.push('[D] burden_shifting_guilt：把举证与负担转嫁给对方，并以愧疚压力锁定其让步。实测：4/5 条穿过，66 维零覆盖；良性 0 误伤。rewrite 级。');
+out.push('[E] selective_minimization：选择性淡化自身过错，只承认无害化后的版本。实测：5/5 条穿过，66 维零覆盖；良性 0 误伤。rewrite 级。');
+out.push('[F] retroactive_justification：事后为既成决定补造正当理由，把结果包装成初衷。实测：3/5 条穿过，66 维零覆盖；良性 0 误伤。verify 级。');
+out.push('[G] identity_fusion_attack：把个人身份与集体彻底熔合，消解独立判断的空间。实测：3/5 条穿过，66 维零覆盖；良性 0 误伤。rewrite 级。');
+out.push('[H] proportionality_distortion：把不成比例的轻微冒犯升级为需要同等报复的伤害。实测：5/5 条穿过，66 维零覆盖；良性 0 误伤。rewrite 级。');
+out.push('[I] fault_line_amplification：刻意放大既有分歧线，把可协商差异固化为不可弥合对立。实测：5/5 条穿过，66 维零覆盖；良性 0 误伤。rewrite 级。');
+out.push('[J] urgency_fabrication：捏造时间窗口，用假期限压缩对方的思考空间。实测：5/5 条穿过，66 维零覆盖；良性 0 误伤。rewrite 级。');
+out.push('');
+out.push('判据补充（区分用）：');
+out.push('1) 与已有维度的重叠风险：urgency_fabrication 与已上线的 false_urgency 高度同名，很可能大量重叠 → 排除。selective_minimization 与 manufactured_consent/normalization_of_deviance 的程序正当性族接近，需辨析。');
+out.push('2) 用户可感知度：用户是 AGI 第1层辨别者，最关心「拦下别人对 AI 说话的操纵话术」。loyalty_test（立场审查）与 proportionality_distortion（报复升级）是人际操纵里最常见的两族。');
+out.push('3) 单轮可完成性：均为全新维度，需 src/<dim>.js + index.js 九处接线 + 守卫测试 + 负例脚本。');
+fs.writeFileSync('/tmp/hf-round499-decide-input-v2.txt', out.join('\n') + '\n');
+console.log('written', out.length, 'lines');
