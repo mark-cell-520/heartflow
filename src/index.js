@@ -175,6 +175,19 @@ const { checkNormalizationOfDeviance } = require('./normalization-of-deviance.js
 // ⚠️ require 是接线的第 1 处——必须早于下方 checkOutput 内调用，否则
 // TypeError 全线崩（r496 false_dilemma、r499 loyalty_test 两次同型事故）。
 const { checkLoyaltyTest } = require('./loyalty-test.js');
+// [v6.8.10] 第 68 维度 helplessness_induction（无助感植入×行动劝阻）。
+// decision 本体选出（scripts/round-501-decide.js，B 候选 0.78 > A
+// manufactured_consent 0.77 / C identity_fusion_attack 0.77 /
+// D retroactive_justification 0.77；identity alignment 80%）。
+// 探测器固定池已空，沿用 r493 落盘候选池，复测探针
+// scripts/round-501-helplessness-probe.js 扩样实测
+// **16/18 攻击穿过硬闸门（gate=pass）**，缺口真实存在。
+// 与 agency_deflection 的边界：后者管责任推诿（谁负责），本族落点是
+// 「你的行动注定无效」，劝阻对象是受话人本人；与 info_deprivation 的分界：
+// 后者管信息缺口，本族给的是结论性绝望而非信息缺失。
+// 判据细节见 src/helplessness-induction.js。
+// ⚠️ require 是接线的第 1 处——必须早于下方调用，否则 TypeError 全线崩。
+const { checkHelplessnessInduction } = require('./helplessness-induction.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -621,6 +634,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [v6.8.9] 第 67 维度 loyalty_test（忠诚度测试·资格审查替代事实讨论）。
   // 模块层实测：攻击 20/20 命中、良性 0/20 误伤（round-500 复测）。
   const lt = _applyPedagogyRelaxation(checkLoyaltyTest(_normText), "loyalty_test", pedagogyRelaxation);
+  // [v6.8.10] 第 68 维度 helplessness_induction（无助感植入×行动劝阻）。
+  // 模块层实测：攻击 18/18 命中、良性 0/16 误伤（round-502 复测）。
+  const hi = _applyPedagogyRelaxation(checkHelplessnessInduction(_normText), "helplessness_induction", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -771,6 +787,8 @@ function discriminate(text, evidence = [], contentMode) {
     {score: ndv.score, name:'normalization_of_deviance'},
     // [v6.8.9] 第 67 维度 loyalty_test 参与判定（忠诚度测试·资格审查）。
     {score: lt.score, name:'loyalty_test'},
+    // [v6.8.10] 第 68 维度 helplessness_induction 参与判定（无助感植入×行动劝阻）。
+    {score: hi.score, name:'helplessness_induction'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -862,6 +880,8 @@ function discriminate(text, evidence = [], contentMode) {
     normalization_of_deviance: ndv,
     // [v6.8.9] 第 67 维度：忠诚度测试·资格审查替代事实讨论
     loyalty_test: lt,
+    // [v6.8.10] 第 68 维度：无助感植入×行动劝阻
+    helplessness_induction: hi,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -925,6 +945,8 @@ function discriminate(text, evidence = [], contentMode) {
     normalization_of_deviance: '不得用既往先例免除当次偏差的处置：本次事件须独立评估其影响与根因，与历史事件的关联只能作为背景，不能作为免处置的理由；须给出本次的处置结论、责任人与整改验收标准',
     // [v6.8.9] 第 67 维度：忠诚度测试·资格审查替代事实讨论
     loyalty_test: '不得把「立场是否站在我这边」当成讨论的前提：须把观点质疑与忠诚问题分开陈述，让对方就事论事地反驳证据与结论；若确有资格要求（涉密/合规岗位），须给出制度依据与适用范围，而非要求个人效忠宣示',
+    // [v6.8.10] 第 68 维度：无助感植入×行动劝阻
+    helplessness_induction: '不得把「行动注定无效」归因于受话人无法撼动的权力结构：须把结构约束（可核实的具体条件）与行动价值分开陈述；确有约束时给出替代路径与申诉渠道，而非宣称努力没有意义',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1258,6 +1280,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.9] 第 67 维度：忠诚度测试·资格审查替代事实讨论（rewrite 级——
     // 单句可能是文学对白/案例复述，rewrite 会误伤。与 r496/r500 同口径）
     'loyalty_test',
+    // [v6.8.10] 第 68 维度：无助感植入×行动劝阻（rewrite 级——同口径，
+    // 单句可能是文学对白/案例复述，rewrite 会误伤）
+    'helplessness_induction',
   ]);
   // pass：无问题通过
 
@@ -1342,6 +1367,9 @@ function discriminate(text, evidence = [], contentMode) {
       // normalization_of_deviance 补登记先例：只进 allDims 不进
       // dimensions/summary 会让读方看不到命中）
       loyalty_test: lt,
+      // [v6.8.10] 第 68 维度：无助感植入×行动劝阻（同 loyalty_test
+      // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
+      helplessness_induction: hi,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -11392,6 +11420,7 @@ module.exports = {
   checkNoFallback,
   checkNormalizationOfDeviance,
   checkLoyaltyTest,
+  checkHelplessnessInduction,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
