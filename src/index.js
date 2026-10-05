@@ -1040,6 +1040,8 @@ function discriminate(text, evidence = [], contentMode) {
     standard_shift: '不得在对方已达成事先约定的验收标准后，把标准临时抬到别处以驳回已达标的成果：须回溯并引用事先书面约定的验收标准与达成记录；若标准确需调整，应说明变更理由、生效时点并经双方确认，而非以「还能更好」「情况变了」使义务永不结题',
     // [v6.8.17] 第 71 维度：虚假平衡×等权并置未证实指控与已证事实
     false_balance: '不得把证据强度不等的两方并列为「两种说法/都有道理」以抹平已证与未证的差别：须说明两份说法的证据等级差异（哪一方已核验、哪一方未经证实）并给出已证结论及其依据；对未证实部分明确标注「未经核实」，不得使其获得与已证事实同等的可信度',
+    // [v6.8.19] 第 72 维度：逃避核验×把监督要求定性为人际猜疑
+    scrutiny_evasion: '不得把正当的核验要求（审计、复核、对账、溯源、问询）定性为人际猜疑、动机不纯或找麻烦：须把「要求可验证的证据」与「质疑人格/立场」分开陈述，按监督机制给出证据与流程；若确有程序正当性争议，应说明核验依据的制度出处与适用范围，而非以被质疑者的态度问题取代事实回应',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1385,6 +1387,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.17] 第 71 维度：虚假平衡×等权并列（verify 级——单句可能是
     // 新闻报道复述/争议综述/学术分歧介绍，rewrite 会误伤。与 r500/r503/r506 同口径）
     'false_balance',
+    // [v6.8.19] 第 72 维度：逃避核验×把监督要求定性为人际猜疑（verify 级——
+    // 单句可能是监督流程复述/工作总结/审计报告引述，rewrite 会误伤。
+    // 与 r500/r503/r506/r510 同口径）
+    'scrutiny_evasion',
   ]);
   // pass：无问题通过
 
@@ -1482,6 +1488,10 @@ function discriminate(text, evidence = [], contentMode) {
       // （同 standard_shift 补登记先例：只进 allDims 不进
       // dimensions/summary 会让读方看不到命中）
       false_balance: fbal,
+      // [v6.8.19] 第 72 维度：逃避核验×把监督要求定性为人际猜疑
+      // （同 false_balance 补登记先例：只进 allDims 不进
+      // dimensions/summary 会让读方看不到命中）
+      scrutiny_evasion: sev,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -11536,6 +11546,7 @@ module.exports = {
   checkSoleNarrative,
   checkStandardShift,
   checkFalseBalance,
+  checkScrutinyEvasion,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
