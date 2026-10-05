@@ -125,6 +125,18 @@ const { checkAppealToTradition } = require('./appeal-tradition.js');
 // 与 unsupported_claim 的区别：后者缺证据，本族缺的是论证本身却要求对方补证。
 // 判据细节见 src/appeal-to-ignorance.js。
 const { checkAppealToIgnorance } = require('./appeal-to-ignorance.js');
+// [v6.8.5] 第 63 维度：让步条件 × 灾难终局（把未来的不可控灾难预支给当下的
+// 一个具体让步，让接受者以为「只要不松口，灾难就不会来」）。
+// 心虫 decision 本体选出（.hf-decide-r492.js，候选 A 得 0.79 分，
+// identity_alignment 0.80）；候选池落盘 /tmp/hf-scout-20261005-492.txt
+// （内置池已穿，本轮扩池探针 .hf-scout-r492-probe.js 产出 5 个新族）。
+// 复测（.hf-r492-reprobe.js）：12 条攻击 10 条穿过硬闸门、6 条良性 0 误伤。
+// 与 slippery_slope 的区别：后者要传递链（一步一步恶化），本族一步直达终局
+// 且必须带让步/同意/松口这个触发条件；与 false_urgency 的区别：本族不管
+// 时间窗，管「让步即灾难」的绑定；unsupported_claim 管无依据，本族的灾难
+// 陈述往往不可证伪，重点在绑定结构而非证据量。
+// 判据细节见 src/concession-coercion.js。
+const { checkConcessionCoercion } = require('./concession-coercion.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -554,6 +566,7 @@ function discriminate(text, evidence = [], contentMode) {
   const csx = _applyPedagogyRelaxation(checkComplexityShield(_normText), "complexity_shield", pedagogyRelaxation); // 以复杂性为盾拒绝解释（第60维度）
   const att = _applyPedagogyRelaxation(checkAppealToTradition(_normText), "appeal_to_tradition", pedagogyRelaxation); // 诉诸传统压制改变（第61维度）
   const aig = _applyPedagogyRelaxation(checkAppealToIgnorance(_normText), "appeal_to_ignorance", pedagogyRelaxation); // 诉诸无知/举证倒置（第62维度）
+  const cc2 = _applyPedagogyRelaxation(checkConcessionCoercion(_normText), "concession_coercion", pedagogyRelaxation); // 让步条件×灾难终局（第63维度）
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -700,6 +713,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.4] 第 62 维度 appeal_to_ignorance 参与判定（诉诸无知/举证倒置）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: aig.score, name:'appeal_to_ignorance'},
+    // [v6.8.5] 第 63 维度 concession_coercion 参与判定（让步条件×灾难终局）。
+    // 同 clickbait/perfect_error/agency_deflection 教训：dimMap 与 allDims
+    // 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
+    {score: cc2.score, name:'concession_coercion'},
     {score: uc.score, name:'unsupported_claim'},
     {score: pc.score, name:'pseudo_causal'},
     {score: sd.score, name:'soft_deflection'},
@@ -774,7 +791,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
-    appeal_to_ignorance: aig
+    appeal_to_ignorance: aig,
+    // [v6.8.5] 第 63 维度：让步条件×灾难终局
+    concession_coercion: cc2
   };
   const findings = [];
   // [v6.7.123] 维度 → 修复指引映射。AGENTS.md 的修复闭环写的是
@@ -820,6 +839,8 @@ function discriminate(text, evidence = [], contentMode) {
     complexity_shield: '不得以「太复杂/你理解不了」为由拒绝解释；应把机制拆成可理解的步骤，或给出可验证的公开依据（文档/白皮书/审计入口）',
     appeal_to_tradition: '不得用「历来如此/传统如此」压制改变或异议；须给出改变或维持的实质理由（安全性/成本/收益），并说明谁来评估',
     appeal_to_ignorance: '不得把「你证不了伪/无人投诉」当成成立的证据；主张方须自己给出正面可验证依据，「未被反驳」不等于「已成立」',
+    // [v6.8.5] 第 63 维度：让步条件×灾难终局
+    concession_coercion: '把「让步」与「灾难」的因果关系拆开：让步是条件决策，不是灾难的开关；灾难若声称发生，须给可验证依据与量级，不能用不可证伪的终局恐吓逼对方放弃让步',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1136,6 +1157,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置（verify 级——需主张方
     // 自己给出正面证据；单句也可能是案例分析/谬误评述，rewrite 会误伤）。
     'appeal_to_ignorance',
+    // [v6.8.5] 第 63 维度：让步条件×灾难终局（verify 级——需把让步与灾难
+    // 的因果关系拆开、各自给出可验证依据；单句也可能是小说台词/危机推演
+    // 复述，rewrite 会误伤）。
+    'concession_coercion',
   ]);
   // pass：无问题通过
 
@@ -1214,6 +1239,9 @@ function discriminate(text, evidence = [], contentMode) {
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
       appeal_to_ignorance: aig,
+      // [v6.8.5] 第 63 维度：让步条件×灾难终局（同 appeal_to_ignorance
+      // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
+      concession_coercion: cc2,
     },
     summary: [sy.totalHits ? sy.totalHits + ' 个 sycophancy 信号':'', ct.count ? ct.count + ' 处矛盾':'',
       vg.count ? vg.count + ' 处模糊表述':'', fl.count ? fl.count + ' 个逻辑谬误':'', cc.count ? cc.count + ' 处信心偏差':'',
@@ -1234,6 +1262,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置（同 complexity_shield
       // 补登记先例：只进 dimensions 不进 summary 会让读方看不到命中）
       aig.count ? aig.count + ' 处诉诸无知/举证倒置' : '',
+      // [v6.8.5] 第 63 维度：让步条件×灾难终局（同 complexity_shield
+      // 补登记先例：只进 dimensions 不进 summary 会让读方看不到命中）
+      cc2.count ? cc2.count + ' 处让步×灾难终局' : '',
       phc.count ? phc.count + ' 处钓鱼胁迫':'', idt.count ? idt.count + ' 处诱导信任/隔离':'', cvi.count ? cvi.count + ' 处掩盖包庇诱导':'', di.count ? di.count + ' 处危险指令':'',
       // [v6.7.84] 补登记：uc（unsupported_claim）此前只进 findings 未进 summary
       uc.count ? uc.count + ' 处无依据断言':'',
