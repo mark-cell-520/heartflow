@@ -94,6 +94,44 @@ function pidAlive(pid) {
 }
 
 /**
+ * [r473] 判定 pid 是否「作为可运行进程活着」。
+ *
+ * 背景（T2 实测坐实）：子进程 SIGKILL 后进入**僵尸态（Z）**——父进程还没
+ * wait() 回收它，内核保留 task_struct。此时 process.kill(pid, 0) 仍然成功
+ * （信号能投递到僵尸），于是在**同一次 node 运行内**紧接着做 recover() 时，
+ * pid 存活探测返回 true，owner 闸把侧车判成「活着的 arm」直接跳过，
+ * SIGKILL 解毒这一整条路径永久失效（实测 recover()=0，毒留存盘）。
+ *
+ * 僵尸不是活进程：它不执行任何代码、不可能再变异任何文件。判定活必须看
+ * /proc/<pid>/stat 的 state——Z 一律算死。
+ *
+ * @param {number} pid
+ * @returns {boolean}
+ */
+function pidRunnable(pid) {
+  if (!pidAlive(pid)) return false;
+  const st = procStat(pid);
+  if (!st) return true;                 // 非 Linux / 读不到 → 保持旧行为
+  return st.state !== 'Z' && st.state !== 'X';
+}
+
+/**
+ * [r473] 读 /proc/<pid>/stat 的 state（field3）与 starttime（field22）。
+ * @returns {{state:string, starttime:string}|null} 非 Linux / 读不到 → null
+ */
+function procStat(pid) {
+  try {
+    const raw = fs.readFileSync('/proc/' + pid + '/stat', 'utf8');
+    // comm 字段可含空格与括号，从最后一个 ')' 之后切分
+    const rp = raw.lastIndexOf(')');
+    if (rp < 0) return null;
+    const rest = raw.slice(rp + 2).split(' ');
+    // rest[0]=state(field3)，starttime=field22 → 索引 19
+    return { state: rest[0], starttime: rest[19] || '' };
+  } catch (_) { return null; }
+}
+
+/**
  * [r472] 这个侧车是否属于一个**仍然活着**的进程？
  * 活着 → true：recover() 绝对不能还原（那个人可能正在变异中）。
  * @returns {boolean}
@@ -106,8 +144,17 @@ function ownerAlive(absPath) {
     return false;
   }
   try {
-    const [pidStr] = fs.readFileSync(p, 'utf8').trim().split(' ');
-    return pidAlive(Number(pidStr));
+    const parts = fs.readFileSync(p, 'utf8').trim().split(' ');
+    const pid = Number(parts[0]);
+    if (!pidRunnable(pid)) return false;
+    // [r473] pid 能跑不等于「本侧车仍属这个进程」。pid 会被 OS 回收复用——
+    // owner 本尊 SIGKILL 之后过一会儿，同一 pid 号可能已被一个毫不相干的新
+    // 进程拿到。用开机相对启动时刻 starttime 做僵尸检测：记下的 starttime 与
+    // 现在读到的对不上，说明本尊已死、号被复用，判为「非活」，让 recover 解毒。
+    // 旧格式（无 starttime 字段）时无法证伪同一性 → 判活（旧行为）。
+    const st = procStat(pid);
+    if (st && st.starttime && parts[1] !== undefined && String(parts[1]) !== String(st.starttime)) return false;
+    return true;
   } catch (_) { return false; }
 }
 
@@ -124,10 +171,13 @@ function arm(absPath, originalContent) {
   ensureDir();
   const sc = sidecarPath(absPath);
   fs.writeFileSync(sc, originalContent, 'utf8');
-  // [r472] 记录 arming 进程 pid —— recover() 靠它区分「活着的 arm」与
-  // 「已被 SIGKILL 的死 arm」。文件名带 .bak 结尾，落进 *.bak 忽略规则。
+  // [r473] owner 记录带 arming 进程的**开机相对启动时刻**（/proc/<pid>/stat
+  // 的 starttime，field 22）。它与 pid 一起构成进程同一性：pid 会被 OS 回收
+  // 复用，starttime 不会。recover() 靠它认出「pid 号被复用、本尊已死」的
+  // 僵尸侧车，避免把一个毫不相干的新进程误判成「活着的 arm」而拒绝解毒。
   const ownerSc = ownerPath(absPath);
-  fs.writeFileSync(ownerSc, String(process.pid) + ' ' + safeMtime(absPath), 'utf8');
+  const st = procStat(process.pid);
+  fs.writeFileSync(ownerSc, String(process.pid) + ' ' + String(st ? st.starttime : '') + ' ' + safeMtime(absPath), 'utf8');
   armed.set(absPath, sc);
   installHooks();
 }
@@ -212,4 +262,4 @@ function installHooks() {
   }
 }
 
-module.exports = { arm, disarm, recover, restoreOne, isArmed, sidecarPath, ownerPath, ownerAlive, pidAlive, SIDECAR_DIR };
+module.exports = { arm, disarm, recover, restoreOne, isArmed, sidecarPath, ownerPath, ownerAlive, pidAlive, pidRunnable, procStat, SIDECAR_DIR };
