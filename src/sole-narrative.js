@@ -98,7 +98,15 @@ const EXCLUSIVE_EN = new RegExp(
   "|\\b(?:go|stick)\\s+with\\s+(?:the\\s+)?(?:official|party|approved)\\s+" +
   "(?:line|narrative|version)\\b" +
   "|\\byour\\s+(?:own\\s+)?(?:judgment|reading|opinion|interpretation)\\s+" +
-  "(?:is\\s+)?(?:irrelevant|pointless|unnecessary|not\\s+needed|does\\s+not\\s+matter)\\b",
+  "(?:is\\s+)?(?:irrelevant|pointless|unnecessary|not\\s+needed|does\\s+not\\s+matter)\\b" +
+  // [v6.8.14 r506 补支] "is the only valid interpretation" 形：
+  // 单句即完成「权威源×排他」，但旧五支都要求额外结构（other/debate/your）。
+  "|\\b(?:is|are|remains?)\\s+the\\s+(?:only|single|sole)\\s+" +
+  "(?:valid|correct|acceptable|authorized|official)\\s+" +
+  "(?:account|version|reading|interpretation|explanation|narrative)\\b" +
+  "|\\bno\\s+other\\s+(?:valid|correct|acceptable)\\s+" +
+  "(?:account|version|reading|interpretation|explanation|narrative)\\s+" +
+  "(?:is|exists|should\\s+be\\s+accepted)\\b",
   'i'
 );
 const DEFER_EN = new RegExp(
