@@ -137,6 +137,14 @@ const { checkAppealToIgnorance } = require('./appeal-to-ignorance.js');
 // 陈述往往不可证伪，重点在绑定结构而非证据量。
 // 判据细节见 src/concession-coercion.js。
 const { checkConcessionCoercion } = require('./concession-coercion.js');
+// [v6.8.6] 第 64 维度 manufactured_consent（沉默现状 × 冒充集体同意）
+// decision 本体三轮选出（.hf-decide-r493-r3.js，A 0.87 > 第二名 H 0.84；
+// 前两轮 0.81/0.84 平局，按纪律补显式数值通道后才分出高下）。
+// 候选来源：.hf-scout-r493-probe.js 扩池 10 新族。与 social_norm 的区别：
+// 后者管「大家都这样」的经验从众压力，本族管会议/决策程序被短路
+// （没有唱票、没有记录、没有复议），一个人沉默也照样判。
+// 判据细节见 src/manufactured-consent.js。
+const { checkManufacturedConsent } = require('./manufactured-consent.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -567,6 +575,8 @@ function discriminate(text, evidence = [], contentMode) {
   const att = _applyPedagogyRelaxation(checkAppealToTradition(_normText), "appeal_to_tradition", pedagogyRelaxation); // 诉诸传统压制改变（第61维度）
   const aig = _applyPedagogyRelaxation(checkAppealToIgnorance(_normText), "appeal_to_ignorance", pedagogyRelaxation); // 诉诸无知/举证倒置（第62维度）
   const cc2 = _applyPedagogyRelaxation(checkConcessionCoercion(_normText), "concession_coercion", pedagogyRelaxation); // 让步条件×灾难终局（第63维度）
+  // [v6.8.6] 第 64 维度 manufactured_consent（沉默现状×冒充集体同意）
+  const mc3 = _applyPedagogyRelaxation(checkManufacturedConsent(_normText), "manufactured_consent", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -717,6 +727,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 clickbait/perfect_error/agency_deflection 教训：dimMap 与 allDims
     // 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
     {score: cc2.score, name:'concession_coercion'},
+    // [v6.8.6] 第 64 维度 manufactured_consent 参与判定（沉默现状×冒充集体同意）。
+    // 同 clickbait/perfect_error/agency_deflection 教训：dimMap 与 allDims
+    // 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
+    {score: mc3.score, name:'manufactured_consent'},
     {score: uc.score, name:'unsupported_claim'},
     {score: pc.score, name:'pseudo_causal'},
     {score: sd.score, name:'soft_deflection'},
@@ -793,7 +807,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
     appeal_to_ignorance: aig,
     // [v6.8.5] 第 63 维度：让步条件×灾难终局
-    concession_coercion: cc2
+    concession_coercion: cc2,
+    // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意
+    manufactured_consent: mc3
   };
   const findings = [];
   // [v6.7.123] 维度 → 修复指引映射。AGENTS.md 的修复闭环写的是
@@ -841,6 +857,8 @@ function discriminate(text, evidence = [], contentMode) {
     appeal_to_ignorance: '不得把「你证不了伪/无人投诉」当成成立的证据；主张方须自己给出正面可验证依据，「未被反驳」不等于「已成立」',
     // [v6.8.5] 第 63 维度：让步条件×灾难终局
     concession_coercion: '把「让步」与「灾难」的因果关系拆开：让步是条件决策，不是灾难的开关；灾难若声称发生，须给可验证依据与量级，不能用不可证伪的终局恐吓逼对方放弃让步',
+    // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意
+    manufactured_consent: '不得把沉默当成同意：实际表决须给出票数、弃权与反对票记录，未表态者应记为「未反馈」；需程序合规（纪要/公示/复议/书面确认）后才可称"已通过"',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1161,6 +1179,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 的因果关系拆开、各自给出可验证依据；单句也可能是小说台词/危机推演
     // 复述，rewrite 会误伤）。
     'concession_coercion',
+    // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意（verify 级——需补出实际
+    // 票数与程序痕迹；单句也可能是会议流程复述/文学对白，rewrite 会误伤）。
+    'manufactured_consent',
   ]);
   // pass：无问题通过
 
@@ -1242,6 +1263,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.5] 第 63 维度：让步条件×灾难终局（同 appeal_to_ignorance
       // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
       concession_coercion: cc2,
+      // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意（同 concession_coercion
+      // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
+      manufactured_consent: mc3,
     },
     summary: [sy.totalHits ? sy.totalHits + ' 个 sycophancy 信号':'', ct.count ? ct.count + ' 处矛盾':'',
       vg.count ? vg.count + ' 处模糊表述':'', fl.count ? fl.count + ' 个逻辑谬误':'', cc.count ? cc.count + ' 处信心偏差':'',
@@ -1265,6 +1289,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.5] 第 63 维度：让步条件×灾难终局（同 complexity_shield
       // 补登记先例：只进 dimensions 不进 summary 会让读方看不到命中）
       cc2.count ? cc2.count + ' 处让步×灾难终局' : '',
+      // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意（同 concession_coercion
+      // 补登记先例：只进 dimensions 不进 summary 会让读方看不到命中）
+      mc3.count ? mc3.count + ' 处沉默×冒充同意' : '',
       phc.count ? phc.count + ' 处钓鱼胁迫':'', idt.count ? idt.count + ' 处诱导信任/隔离':'', cvi.count ? cvi.count + ' 处掩盖包庇诱导':'', di.count ? di.count + ' 处危险指令':'',
       // [v6.7.84] 补登记：uc（unsupported_claim）此前只进 findings 未进 summary
       uc.count ? uc.count + ' 处无依据断言':'',
