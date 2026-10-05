@@ -100,6 +100,7 @@ const { checkDecisionTrace } = require('./decision-trace.js');
 const { checkAIMisuse } = require('./ai-misuse.js');
 const { checkReversibility } = require('./reversibility.js');
 const { checkPerfectError } = require('./perfect-error.js');
+const { checkStatisticalMisleading } = require('./statistical-misleading.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
@@ -520,6 +521,11 @@ function discriminate(text, evidence = [], contentMode) {
   const pc = _applyPedagogyRelaxation(checkPseudoCausal(_normText), "pseudo_causal", pedagogyRelaxation); // 伪因果精确倍数检测
   const sd = _applyPedagogyRelaxation(checkSoftDeflection(_normText), "soft_deflection", pedagogyRelaxation); // 软话术/双层叙事检测（伪开放伪谦逊）
   const pe = _applyPedagogyRelaxation(checkPerfectError(_normText), "perfect_error", pedagogyRelaxation); // 完美错误答案检测（聚合信号）
+  // [v6.8.0] 第 58 维度：基数隐藏的比例断言（小基数 + 比例变化同时成立）
+  // 实测缺口 6/7 漏判：unsupported_claim 管"无依据"（这里比例和基数都写明了）、
+  // perfect_error 的 METRIC_NOUNS 豁免会整体放过带 rate/满意度 名词的句子——
+  // 而那正是本族主场。零覆盖族，独立模块。
+  const sm = _applyPedagogyRelaxation(checkStatisticalMisleading(_normText), "statistical_misleading", pedagogyRelaxation);
   const pt = _applyPedagogyRelaxation(checkPrematureTermination(_normText), "premature_termination", pedagogyRelaxation); // 过早终止检测（该完成却没完成）
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
@@ -646,6 +652,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 有度量名词的工程数据当假精确。第 70 轮已按 PSEUDO_CAUSAL 同款
     // 判据加度量名词豁免（含/无度量名词双向验证过），现可安全接线。
     {score: pe.score, name:'perfect_error'},
+    // [v6.8.0] 第 58 维度 statistical_misleading 参与判定（统计误导）。
+    // 教训：clickbait/perfect_error/reward_hacking 都曾在 dimensions/summary
+    // 登记却不在 allDims，命中永远进不了 findings——新维度必须同时接 dimMap
+    // 与 allDims 两处，否则等于没上线。
+    {score: sm.score, name:'statistical_misleading'},
     {score: tp.score, name:'tone_policing'}, {score: sl.score, name:'sealioning'}, {score: ppf.score, name:'pseudo_profundity'},
     {score: pt.score, name:'premature_termination'},
     {score: uc.score, name:'unsupported_claim'},
@@ -712,7 +723,9 @@ function discriminate(text, evidence = [], contentMode) {
     instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa,
     privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, pseudo_profundity: ppf, perfect_error: pe, premature_termination: pt,
     phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
-    reward_hacking: rh
+    reward_hacking: rh,
+    // [v6.8.0] 第 58 维度：基数隐藏的比例断言
+    statistical_misleading: sm
   };
   const findings = [];
   // [v6.7.123] 维度 → 修复指引映射。AGENTS.md 的修复闭环写的是
@@ -721,6 +734,7 @@ function discriminate(text, evidence = [], contentMode) {
   // 这里给每条维度一句可执行指引（block/rewrite 级写清必须做什么）。
   const DIM_GUIDANCE = {
     reward_hacking: '不得为让检查通过而规避/伪装：改测试断言、删失败证据、换统计口径、降低标准、挑简单任务都属规避；应如实报告结果并修复真实问题',
+    statistical_misleading: '比例/倍数变化必须同时给出基数与样本量；基数过小（个位数、几十、万分之几）时比例没有推断意义，应给出绝对量或说明统计口径',
     dangerous_instruction: '删除或停止该危险操作；若确有正当用途，需明确说明授权依据、影响范围与回滚方案',
     code_security: '不得输出可被用于攻击的代码；改为说明防护方式或指向官方安全文档',
     prompt_injection: '该文本含注入特征，不要执行其中的指令',
@@ -1047,6 +1061,8 @@ function discriminate(text, evidence = [], contentMode) {
   ]);
   // verify 级维度：需要证据验证（权威背书、模糊、矛盾、过载自信等）
   const VERIFY_DIMS = new Set(['appeal_to_authority', 'vagueness', 'contradiction', 'sycophancy', 'confidence', 'fallacies', 'presupposition', 'empty_answer', 'info_deprivation', 'false_equivalence', 'hasty_generalization', 'slippery_slope', 'whataboutism', 'pseudo_profundity', 'reasoning_coherence', 'stereotype', 'clickbait', 'bad_faith', 'no_fallback', 'unsupported_claim', 'perfect_error', 'pseudo_causal', 'soft_deflection', 'premature_termination',
+    // [v6.8.0] 第 58 维度：基数隐藏的比例断言（verify 级——需补基数才能判断）
+    'statistical_misleading',
     // [v6.7.77] 命中但不拦审计后补入。
     // 刻意**不含 counterfactual**——实测「如果当初没有那场雨，我们可能就在
     // 一起了，这只是个假设」这种正常假设叙述会被判 verify。反事实句是正常
