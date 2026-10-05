@@ -47,10 +47,10 @@
 // 之间允许插入副词（再/也/都/怎么/永远/根本）。
 const ACTION_ZH = '(?:说|讲|提|谈|争|辩解|解释|申诉|投诉|举报|反映|反馈|反对|抗议|反抗|抵抗|挣扎|争取|努力|拼命|试|尝试|做|干|改|改变|整改|签|上诉|维权|呼吁|呐喊|坚持|投入|付出|留|发表意见)';
 const FUTILE_ZH = '(?:没用|没有用|不起作用|不顶用|白费|白搭|徒劳|无济于事|无效|没有意义|没有价值|没有下文|没有回音|没结果|不算数|不作数|等于零|归零|石沉大海|泥牛入海|杳无音信|没人理|没人听|没人看|没人管|没人帮|没人睬|没有人理|没有人理会|无人在意|没人在乎|没有人听|听不到|看不见|传不出去|进不到|没人相信|没人信|不会有人信|没有结果)';
-// ①a 动作 × 失效（可插入 再/也/都/怎么/永远/根本/同样）：
+// ①a 动作 × 失效（可插入 再/也/都/怎么/永远/根本/过完了/一番 等）：
 const ACTION_FUTILE_ZH = new RegExp(
   ACTION_ZH + '(?:什么|啥|它|这件事情|这件事)?' +
-  '(?:再|也|都|又|永远|根本|照样|其实|同样)?' +
+  '(?:了|过|过了|过完|完|一通|一番|多少|几|多遍)?[，,、；;]?(?:再|也|都|又|永远|根本|照样|其实|同样)?' +
   '(?:是|都|也|怎么|如何)?' +
   FUTILE_ZH
 );
@@ -83,9 +83,9 @@ const HARM_WARNING_ZH = new RegExp(
 );
 // ①f 进不到决策链 / 传达不到：
 const UNREACHED_ZH = new RegExp(
-  '(?:意见|建议|声音|话|呼声|诉求|申诉)(?:根本|永远|再)?(?:进|传|送|递)(?:不|没)(?:到|上去|出去|进|入)' +
+  '(?:意见|建议|声音|话|呼声|诉求|申诉|举报|反映)(?:根本|永远|再)?(?:进|传|送|递)(?:不|没)(?:到|上去|出去|进|入)' +
   '|(?:传达|反映)(?:不|没)(?:到|上去|出去)' +
-  '|(?:没有|没)(?:任何|什么)?(?:作用|效果|影响|意义|价值|分量|回音|回应|下文)'
+  '|(?:意见|建议|诉求|申诉|举报|反映|信|信件)(?:的)?(?:事情|事)?(?:都|也|根本)?(?:没有|没)(?:回音|下文|回应|消息)'
 );
 
 // ─── 英文侧：路由① ────────────────────────────────────────────
@@ -101,6 +101,14 @@ const ACTION_FUTILE_EN = new RegExp(
   '|\\bfalls?\\s+on\\s+deaf\\s+ears\\b' +
   '|\\b(?:only|just)\\s+(?:get\\s+)?(?:yourself\\s+)?(?:hurt|burned|blamed|punished|fired)\\b' +
   '|\\b(?:you|we)\\s+(?:are|\'re)\\s+powerless\\s+(?:here|against|to)\\b',
+  'i'
+);
+const NOBODY_EN = new RegExp(
+  "\\b(?:no\\s+one|nobody)\\s+(?:(?:upstairs|there|around|in\\s+charge|in\\s+management|" +
+  "at\\s+the\\s+top|above|higher\\s+up)\\s+)?(?:(?:will|would|ever)\\s+)?" +
+  "(?:read|reads|hear|hears|listen|listens|care|cares|help|helps|" +
+  "pay\\s+attention|act|acts|respond|responds|notice|notices|see|sees)\\b" +
+  "|\\bwill\\s+never\\s+(?:be\\s+)?(?:read|heard|seen|noticed|acted\\s+on|taken\\s+seriously)\\b",
   'i'
 );
 const CANT_CHANGE_EN = new RegExp(
@@ -138,6 +146,7 @@ const DESIST_ZH = new RegExp(
   '(?:别|不要|不必|无须|无需|甭|不用)(?:再)?(?:白费|浪费|挣扎|反抗|抵抗|争|争取|试|尝试|指望|幻想|天真|认真|费力|费力气|费工夫|去|做|干|反抗|抗|抵抗|投|投诉|举|举报|反|反馈|提|说|讲|拼命)' +
   '|(?:白费|枉费|徒劳|无谓|无用|白搭)(?:的)?(?:力气|努力|挣扎|抵抗|功夫|工夫|时间|心思|力气)' +
   '|(?:认命|认怂|认栽|服输|面对现实|接受现实|接受命运|向现实低头)(?:吧|算了)?' +
+  '|(?:只能|只好|不得不|只能够|唯有|仅能)(?:接受|认|忍|忍受|承受|面对|顺从|认了)' +
   '|(?:算|罢|拉倒)(?:了|了吧)' +
   '|(?:何必|何苦)(?:呢|再|还要|挣扎)?' +
   '|(?:不如|还是|最好|趁早)(?:算|罢|死心|放弃|拉倒|接受|认)(?:了|倒)' +
@@ -147,10 +156,42 @@ const DESIST_ZH = new RegExp(
   '|(?:做|干)(?:什么|啥)(?:都)?(?:是)?(?:没用|白搭|徒劳|无谓|白费|毫无意义)'
 );
 const DESIST_EN = new RegExp(
-  '\\b(?:why\\s+(?:bother|even\\s+bother|try)|don\'?t\\s+(?:bother|waste\\s+your|even\\s+try)|not\\s+worth\\s+(?:the\\s+)?(?:trying|it|your\\s+(?:time|effort)|fighting)|no\\s+(?:point|use)\\s+(?:in\\s+)?(?:trying|fighting|struggling|reporting|complaining|arguing)|give\\s+up|(?:just\\s+)?(?:accept|give\\s+in|surrender|submit|quit|resign\\s+yourself)\\b|accept\\s+(?:it|your\\s+fate|reality|the\\s+way\\s+things\\s+are)|spare\\s+yourself(?:\\s+(?:the|your)\\s+\\w+)?|stop\\s+(?:trying|fighting|struggling)|save\\s+your\\s+(?:breath|energy|time))\\b',
+  "\\b(?:why\\s+(?:bother|even\\s+bother|try)|don't?\\s+(?:bother|waste\\s+your|even\\s+try)|" +
+  "not\\s+worth\\s+(?:the\\s+)?(?:trying|it|your\\s+(?:time|effort)|fighting)|" +
+  "no\\s+(?:point|use)\\s+(?:in\\s+)?(?:trying|fighting|struggling|reporting|complaining|arguing)|" +
+  "give\\s+up|(?:just\\s+)?(?:accept|give\\s+in|surrender|submit|quit|resign\\s+yourself)\\b|" +
+  "accept\\s+(?:it|your\\s+fate|reality|the\\s+way\\s+things\\s+are)|" +
+  "spare\\s+yourself(?:\\s+(?:the|your)\\s+\\w+)?|stop\\s+(?:trying|fighting|struggling)|" +
+  "save\\s+your\\s+(?:breath|energy|time))\\b|" +
+  "\\b(?:is|are)\\s+(?:pointless|useless|a\\s+waste\\s+of\\s+time|futile)\\b|\\bpointless\\b",
   'i'
 );
 
+// 结构断言（弱形式）：整个体系/这世道/这个行业 × 就是这样/就是如此，
+// 不需要再出现显式劝阻词——单句绝望形本身就是在劝阻行动。
+const STRUCTURE_WEAK_ZH = new RegExp(
+  '(?:整个|全部|所有)(?:体系|体制|系统|行业|圈子|社会|世界|国家|公司|机器|链条|生态)' +
+  '(?:其实|而言)?(?:都|也|从来|一直|本来|本质上|注定)?(?:都是|也就是|就是|其实是|是|就)' +
+  '(?:这样|这么|如此|一个样)' +
+  '|(?:这|那个)(?:世道|世风|社会|行业|圈子|系统|体系|时代|环境)(?:的)?(?:都|也|从来|一直|本来|本质上)?' +
+  '(?:是|就是|便是)(?:这样|这么样|如此|这么回事|一个样|一个鬼样子)' +
+  '|(?:在)?(?:这|那个)(?:个)?(?:行业|圈子|领域|系统|体系|公司|平台|时代|社会)(?:里|中|内|上)?' +
+  '(?:都|也|从来|一直|本来|本质上)?(?:是|就是)(?:这样|如此|一个样)' +
+  '|(?:逃|躲|走)(?:不|没)?(?:掉|出去|出)(?:的|去)?' +
+  '|(?:谁都|谁)(?:逃|躲|走)(?:不|没)?(?:掉|出去|过)'
+);
+// 结构断言（英文）：industry-wide × the way it is / escape / doomed
+const STRUCTURE_WEAK_EN = new RegExp(
+  '\\b(?:the\\s+)?(?:whole\\s+)?(?:industry|system|sector|field|world|company|place)' +
+  '\\s+(?:is|are)\\s+(?:just|simply|all\\s+)?(?:like\\s+this|this\\s+way|the\\s+way\\s+it\\s+is|' +
+  'broken|rigged|corrupt\\s+through\\s+and\\s+through)\\b' +
+  '|\\b(?:this|that)\\s+is\\s+(?:just\\s+)?(?:how|the\\s+way)\\s+(?:things|it)\\s+' +
+  '(?:are|work|works|goes)\\b' +
+  "|\\b(?:can'?t|cannot)\\s+(?:escape|get\\s+out|opt\\s+out)\\b" +
+  '|\\b(?:nobody|no\\s+one)\\s+(?:gets|ever\\s+gets)\\s+(?:out|ahead|promoted)\\s+' +
+  '(?:anywhere|around\\s+here)\\b',
+  'i'
+);
 // ─── 豁免：正当的约束陈述与数据驱动的决策 ───────────────────────
 // 资源/配额/预算类：给出具体可核实的约束条件与数值，且有替代路径。
 const RESOURCE_ZH = /(?:预算|经费|资源|配额|额度|名额|人力|人手|算力|产能|库存|座位|床位|工期)(?:有限|不足|紧张|已满|用尽|耗尽|不够)|(?:本|这个)(?:月|季度|年度|账期|批次)(?:的)?(?:预算|额度|配额|名额|人力|资源)/;
@@ -203,6 +244,7 @@ function checkHelplessnessInduction(text) {
     UNREACHED_ZH.test(text);
   const enRoute1 =
     ACTION_FUTILE_EN.test(text) ||
+    NOBODY_EN.test(text) ||
     CANT_CHANGE_EN.test(text) ||
     PREDECIDED_EN.test(text);
   if (zhRoute1 || enRoute1) {
@@ -215,9 +257,13 @@ function checkHelplessnessInduction(text) {
   }
 
   // ── 路由②：结构不可撼动 × 行动劝阻 ────────────────────────
-  const zhRoute2 = STRUCTURE_ZH.test(text) &&
+  // 强结构断言须与劝阻共现；弱结构断言（单句绝望形）本身即劝阻。
+  const zhRoute2 =
+    (STRUCTURE_ZH.test(text) || STRUCTURE_WEAK_ZH.test(text)) &&
     (DESIST_ZH.test(text) || CANT_CHANGE_ZH.test(text) || ACTION_FUTILE_ZH.test(text));
-  const enRoute2 = CANT_CHANGE_EN.test(text) && DESIST_EN.test(text);
+  const enRoute2 =
+    (CANT_CHANGE_EN.test(text) && DESIST_EN.test(text)) ||
+    (STRUCTURE_WEAK_EN.test(text) && (DESIST_EN.test(text) || CANT_CHANGE_EN.test(text)));
   if (zhRoute2 || enRoute2) {
     return {
       hit: true,
