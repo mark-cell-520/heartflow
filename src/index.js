@@ -3954,16 +3954,10 @@ const EMPTY_CIRCULAR_ZH = /([一-龥]{2,5})(?:的)?(?:原因|缘故)(?:是)?(?:�
 //   不会在同一窗口里把同一个词干换个词性复现一遍。
 // 词干用首字母起 3+ 字符的前缀匹配（failures/failed/failing → fai…），
 //   并要求前后**词性不同**（动词 vs 名词），否则纯同词复述不算解释。
-// 英文分支（运行时实现，非纯正则）：
-// 正则无法做「同词干 + 词性不同」的比较（fail/failure 词干同为 fai），
-// 所以英文支用函数实现，与中文支在同一处闸门调用（checkEmptyAnswer 内），
-// 保持同一口径：命中后仍受 EMPTY_CONVERGE_ZH / 数值豁免约束。
-// 英文分支（运行时实现，非纯正则）：
-// 正则无法做「同词干 + 词形不同」的比较（fail/failure 词干同为 fai），
-// 且 /([a-z]{3,})\b[^.!?;]{0,60}because.../ 会从句首贪心抓到 "The"/"migration"
-// 这类与主词无关的词，sameStem 恒 false → 全族 0 命中。
-// 故英文支用函数实现：because 两侧窗口分词后逐对比词干。
-const EMPTY_CIRCULAR_EN = /\b(?:because|since|as|due to)\b/gi;
+// ── [v6.7.146 r460] 英文循环重述支（调用点见下方 _emptyCircularEnTest）──────
+// r431 首次补实现时，此处误落一个恒假空壳正则（/(?!x)x/，从未被引用）；
+// 真正的实现是下面的 _emptyCircularEnTest() 函数支，在 checkEmptyAnswer 内调用。
+// 英文侧判据形状与良性分界见函数体上方注释。
 
 // 常见功能词（不参与词干比较）
 const EMPTY_CIRCULAR_EN_STOP = new Set([
