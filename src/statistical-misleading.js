@@ -40,10 +40,11 @@ const C1_PCT_EN = /\b(?:increased?|decreased?|dropped?|grew|growth|rose|fell|red
 const C1_PCT_ZH = /(?:提升|增长|上升|上涨|增加|提高|下降|降低|减少|缩减|涨了|降了|回落|收窄|扩大)[^。；，]{0,18}\d+(?:\.\d+)?\s*%|\d+(?:\.\d+)?\s*%(?:的)?(?:提升|增长|上升|上涨|增加|提高|下降|降低|减少|缩减|回落|收窄|扩大)/;
 // 倍数表述
 const C1_FOLD_EN = /\b(?:doubled?|tripled?|quadrupled?|\d+(?:\.\d+)?\s*[-x×]\s*fold|\d+(?:\.\d+)?\s*times)\b/i;
-const C1_FOLD_ZH = /(?:翻[了了一]?[倍番]|增长?\s*\d+(?:\.\d+)?\s*倍|是[过]?原先的\s*\d+\s*倍|\d+(?:\.\d+)?\s*倍(?:增长|增长为))/;
+const C1_FOLD_ZH = /(?:翻[了着过]?[一二两三四五六七八九十]?[倍番]|翻[了着过]?\d+(?:\.\d+)?\s*[倍番]|增长?\s*\d+(?:\.\d+)?\s*倍|是[过]?原先的\s*\d+\s*倍|\d+(?:\.\d+)?\s*倍(?:增长|增长为))/;
 // "from X to Y" 的对照结构（英文占比断言常配这个）
 const C1_FROMTO_EN = /\bfrom\s+[\d.]+\s*(?:%|percent|users?|people|customers?|units?|orders?|cases?|tickets?)?\s+to\s+[\d.]+/i;
-const C1_FROMTO_ZH = /从\s*[\d.]+\s*(?:%|个人|人|次|起|单|例|条|台|件|家|名|位|个|万元|元)?\s*(?:涨|升|降|提高|降低|增|减|到|至)\s*(?:了?\s*)[\d.]+/;
+// "从 X 到 Y" 的对照结构：动词后允许「到/至」再接数字（涨到 6 个 / 到 3 万元）
+const C1_FROMTO_ZH = /从\s*[\d.]+\s*(?:%|个人|人|次|起|单|例|条|台|件|家|名|位|个|万元|元)?\s*(?:涨|升|降|提高|降低|增|减|到|至)\s*(?:了?\s*)(?:到\s*|至\s*)?[\d.]+/;
 
 // ─── C2: 小基数证据 ───────────────────────────────
 // 语音豁免：句中出现「基数/样本/N=」并给出大数 → 不是小基数
@@ -52,6 +53,9 @@ const BIG_BASE_HINT = /(?:样本量|基数|样本数|样本容量|n\s*=|N\s*=|sa
 // 小整数绝对量：1-30 的人/次/起/单/例/units/users/orders/cases/tickets
 // 取「个位数到三十」——统计上这个量级的比例变化不具推断意义
 const SMALL_ABS_EN = /\b(?:from\s+)?(\d{1,2})(?:\.\d+)?\s*(?:users?|people|customers?|units?|orders?|cases?|tickets?|incidents?|complaints?|signups?|downloads?)\b/i;
+// from 2 to 6 / doubled from 3 to 9 —— 无单位词的小整数对照（C1_FROMTO_EN 已确认
+// 是比例/倍数句，C2 只需证明其中一侧是小基数，故不再强制单位词）
+const SMALL_ABS_BARE_EN = /\b(?:from\s+(\d{1,2})(?:\.\d+)?\s+to\s+(\d{1,2})(?:\.\d+)?|(\d{1,2})(?:\.\d+)?\s+to\s+(\d{1,2})(?:\.\d+)?)\b/i;
 const SMALL_ABS_EN_TO = /\bto\s+(\d{1,2})(?:\.\d+)?\s*(?:users?|people|customers?|units?|orders?|cases?|tickets?|incidents?|complaints?|signups?|downloads?)\b/i;
 const SMALL_ABS_ZH = /(?:从\s*)?([0-9]{1,2}|[一二两三四五六七八九十]{1,3})\s*(?:个人|人|次|起|单|例|条|台|件|家|名|位|个)(?:[^。]{0,6}(?:涨|升|降|增|减|到|至))?/;
 
@@ -116,6 +120,20 @@ function checkStatisticalMisleading(text) {
     if (m) {
       const n = parseInt(m[1], 10);
       if (n >= 1 && n <= 30) { smallBase = `${n} ${(m[0].match(/\b(users?|people|customers?|units?|orders?|cases?|tickets?|incidents?|complaints?|signups?|downloads?)\b/i) || [])[1] || ''}`.trim(); reasons.push(`小基数绝对量(${smallBase})`); }
+    }
+  }
+
+  if (!smallBase) {
+    // 英文无单位小整数对照（from 2 to 6 / from 4 to 9）
+    // 只在 C1 已是「from X to Y 比例句」时才用：裸数字对照本身不构成证据
+    m = text.match(SMALL_ABS_BARE_EN);
+    if (m && C1_FROMTO_EN.test(text)) {
+      const nums = [m[1], m[2], m[3], m[4]].filter(Boolean).map(Number);
+      if (nums.some(n => n >= 1 && n <= 30)) {
+        const n = nums.find(x => x >= 1 && x <= 30);
+        smallBase = `${n} (from ${nums[0]} to ${nums[nums.length - 1]})`;
+        reasons.push(`小基数绝对量(${smallBase})`);
+      }
     }
   }
 
