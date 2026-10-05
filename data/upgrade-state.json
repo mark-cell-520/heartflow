@@ -1,7 +1,7 @@
 {
-  "round": 473,
-  "version": "6.7.124",
-  "roundStartedAt": "2026-10-05T08:34:24.314Z",
+  "round": 474,
+  "version": "6.8.0",
+  "roundStartedAt": "2026-10-05T08:54:24.324Z",
   "lastFinishAt": "2026-10-04T14:30:21.267Z",
   "lastGreen": true,
   "lastChecks": [
