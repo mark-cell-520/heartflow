@@ -69,7 +69,10 @@ const STIGMA_EN = /\b(?:if\s+you\s+(?:don'?t|do\s+not|aren'?t|are\s+not)\s+[^.!?
 // 判据边界：这些句子**也有**二元措辞，但二元是事实陈述或流程说明，
 // 不带 C2 的胁迫/污名放大器。双因子交叉天然覆盖大部分场景；
 // 这里再兜一层显式豁免，防「设计文档里的 A/B 方案对比」被误伤。
-const FACTUAL_ZH = /(?:路口|匝道|车道|开关|按钮|档位|阀门|接线|端子|端口|引脚|状态|字段|类型|返回值|选项)(?:只)?(?:能|可以)?(?:有|是|为|分)(?:两种|两个|左|右|开|关|0|1|true|false|true|false)|(?:直行|调头|右转|左转)(?:是)?(?:封闭|禁行|不允许|不可)|(?:签或不签|签与不签|签|不签)(?:两|两?种)?(?:结果|状态)|(?:生效|失效)(?:两种|两个)(?:状态|结果)|(?:排期|发布窗口|审批流程|合同|协议|法务|审核)(?:决定|规定|约定|明确)(?:了)?(?:只)?(?:有|需|要)(?:两个|两种|两条)|(?:物理|事实|逻辑|数学)(?:上)?(?:只)?(?:能|可能)(?:有|是)(?:两种|两个)/;
+// [r496] 补「只能左转/右转」的地理二元直接形：原来逐字链接（路口+只能+左/右），
+// 「路口没有中间路线，只能左转或右转」这一真实地理描述豁免不到，
+// 排除中项支会误判。现在事实二元的措辞本身单独可识别。
+const FACTUAL_ZH = /(?:路口|匝道|车道|开关|按钮|档位|阀门|接线|端子|端口|引脚|状态|字段|类型|返回值|选项)(?:只)?(?:能|可以)?(?:有|是|为|分)(?:两种|两个|左|右|开|关|0|1|true|false|true|false)|(?:路口|匝道|车道)(?:已经|目前|现在)?(?:封闭|禁行|不允许|不可)(?:直行|调头)?|(?:直行|调头|右转|左转)(?:是)?(?:封闭|禁行|不允许|不可)|只能(?:左转|右转)|只能(?:左转|右转)或(?:右转|左转)|(?:签或不签|签与不签|签|不签)(?:两|两?种)?(?:结果|状态)|(?:生效|失效)(?:两种|两个)(?:状态|结果)|(?:排期|发布窗口|审批流程|合同|协议|法务|审核)(?:已经)?(?:决定|规定|约定|明确)(?:了)?(?:只)?(?:有|需|要)(?:两个|两种|两条)|(?:物理|事实|逻辑|数学)(?:上)?(?:只)?(?:能|可能)(?:有|是)(?:两种|两个)|(?:实地|现场|路况|交通)(?:条件|状况)(?:只)?(?:能|允许)(?:左转|右转|两种)/;
 
 const FACTUAL_EN = /\b(?:the\s+)?(?:field|column|parameter|variable|boolean|flag|switch|port|pin|input|value)\s+(?:can\s+only\s+be|is\s+only|accepts\s+only|must\s+be)\s+(?:0|1|true|false|on|off|yes|no|set|unset)\b|\b(?:either|only)\s+(?:0|1|true|false|on|off|yes|no)\s+(?:or\s+)?(?:0|1|true|false|on|off|yes|no)\b|\b(?:the\s+)?(?:road|intersection|junction|lane|ramp)\s+(?:only\s+)?(?:allows|permits|has)\s+(?:left|right|a\s+left|a\s+right)\b|\b(?:only\s+)?(?:sign|not\s+sign)\s+(?:or|and)\s+(?:walk\s+away|decline)\s+(?:are\s+)?(?:the\s+)?(?:two\s+)?(?:outcomes?|options?)\b|\b(?:the\s+)?(?:contract|agreement|offer|proposal)\s+(?:can\s+only\s+be\s+)?(?:signed|accepted)\s+or\s+(?:declined|rejected|walked\s+away\s+from)\b|\b(?:release|deploy(?:ment)?)\s+(?:is\s+)?(?:today\s+or\s+|either\s+today\s+or\s+)next\s+(?:week'?s?\s+)?(?:window|slot)\b/i;
 
