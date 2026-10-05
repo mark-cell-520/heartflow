@@ -12,7 +12,7 @@ wrong.
 HeartFlow adds the discrimination layer, so your agent doesn't just *say* things — it
 says things that are *right*.
 
-**Zero LLM dependency.** 67 dimensions, 143 modules, 61 MCP tools, 1,136 dispatch
+**Zero LLM dependency.** 68 dimensions, 143 modules, 61 MCP tools, 1,136 dispatch
 routes. Pure rule engine.
 
 > **Numbers below were measured by `scripts/measure-claimed-numbers.js` (v6.7.77),
@@ -108,11 +108,11 @@ The three entry points above are wrappers around these, which `main`
 `verdict` is derived from `gate.action`, so the two cannot contradict each other. If you
 read only one field, read `gate.action`.
 
-## The 67 dimensions
+## The 68 dimensions
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
-> `VERIFY_DIMS` sets in `src/index.js` (v6.7.110, recount 6.8.1).** The three tiers
-> add up to 57; the remaining 10 dimensions are scored but do not force a gate action.
+> `VERIFY_DIMS` sets in `src/index.js` (v6.8.14 recount)。** The three tiers
+> add up to 58; the remaining 10 dimensions are scored but do not force a gate action.
 
 **Block-level (10):** hate_speech, dehumanization, prompt_injection, code_security,
 deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
@@ -122,7 +122,7 @@ indirect_injection, reward_hacking
 victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust,
 instrumental_reasoning, agency_deflection, multi_turn_escalation
 
-**Verify-level (36):** appeal_to_authority, vagueness, contradiction, sycophancy,
+**Verify-level (37):** appeal_to_authority, vagueness, contradiction, sycophancy,
 confidence, fallacies, presupposition, empty_answer, info_deprivation,
 false_equivalence, hasty_generalization, slippery_slope, whataboutism,
 pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith,
@@ -130,7 +130,8 @@ no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection,
 premature_termination, statistical_misleading, sealioning, tone_policing,
 complexity_shield, appeal_to_tradition, appeal_to_ignorance,
 concession_coercion, manufactured_consent, false_dilemma,
-normalization_of_deviance, loyalty_test, helplessness_induction
+normalization_of_deviance, loyalty_test, helplessness_induction,
+sole_narrative
 
 Dimensions that are scored but do not force a gate action: evidence,
 moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary,
