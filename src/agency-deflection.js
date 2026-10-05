@@ -70,7 +70,45 @@ const DEFLECT_DENY_EN_ALONE = /\b(?:nobody|no\s+one|no-one)\s+(?:is\s+)?(?:respo
 // 这些词是正常的人机分工陈述的标记，不是归责转移。
 // （中文侧与英文侧分开：中文白话另有「人来/由人」等形）
 const HUMAN_ACCOUNTABILITY_ZH = /人工|本人|工程师|编辑|值班|专人|责任到人|人来|由人|由(?:具体)?(?:的)?人|人来(?:决策|拍板|决定|把关)|人工(?:复核|审核|决定|确认|批准|拍板|介入|把关)|最终由|最后(?:由|靠)(?:人|编辑|负责人)|(?:由|受)\s*(?:团队|部门|负责人|值班人员)\s*(?:负责|决定|审批)/;
-const HUMAN_ACCOUNTABILITY_EN = /\bhuman\b|by\s+hand|manual(?:ly)?|engineer|reviewer|approver|on-?call|sign-?off|named|who\s+(?:approved|decided|made)|\bteam\s+decided/i;
+// [v6.8.6 第488轮] HUMAN 限定为**人类责任动词在场**，不收裸 human——
+// 实测「... without any human reading it」这类"无人读过"正是本族攻击形，
+// 裸 \bhuman\b 会把攻击句整体赦免（E1 组 1 条穿透即此因）。
+// 判据：human + 复核/批准/决定/监督/负责类动词同现才算责任落回人类。
+const HUMAN_ACCOUNTABILITY_EN = /\bhuman\s+(?:review(?:er|ed|ing)?|approv\w+|overse\w+|supervis\w+|oversight|accountab\w+|responsib\w+|involve\w+|sign-?off|decid\w+|was\s+(?:involved|responsible|accountable)|read\s+the\s+\w+)\b|by\s+hand|manual(?:ly)?|engineer|reviewer|approver|on-?call|sign-?off|named|who\s+(?:approved|decided|made)|\bteam\s+decided/i;
+
+// ─── T4（第488轮新增）：第一人称无权力/被移交 × 责任否认 ───────────
+// 此前零覆盖的新句式族。形状描述，样本见 test/round-488-*.test.js：
+//   · 中文「无权力形」：我们无权干涉 / 我们被取消了修改权限 /
+//     没有上级授权，我们什么都不能决定 / 我们只是执行层，没有权力叫停 /
+//     我们也很无奈，只能这样处理 / 出了什么问题我们也只能配合，改变不了什么
+//   · 中文「推诿落点形」：这件事轮不到我们管 / 后续处理不归我们管 /
+//     这块业务现在不由我们负责 / 这个责任落不到我们头上 / 你找错对象了
+//   · 英文「第一人称无权力形」：We had no say / not the ones who configured /
+//     taken out of our hands / sits with the system / just following the process /
+//     made above my level / escalated to the algorithm
+// 与既有 T1(自主判定)/T2(责任否认) 的分界：T2 收显式的责任否认句式
+// （不是我们的责任），本族收**能力剥夺与责任上推**——主体不是否认
+// 责任存在，而是宣称自己没有决策权，借此让责任悬空。
+// T4_ZH_POWERLESS：第一人称在场 × 无权力/只能配合（跨句短距）
+// [第488轮调参] 允许中间出现逗号/顿号——「我们只是执行层，没有权力叫停」
+// 这类流水句主语与能力否认之间常有停顿，限定 。；？！ 三个终止符。
+const T4_ZH_POWERLESS = /(?:我们|咱|我|我方|本(?:部门|团队|公司)|本人)[^。；？！]{0,10}(?:也无权|无权|没有?权力|没权力|没有?权限|无权限|无权(?:干涉|干预|介入|过问|决定|处理)|插不上手|说不上话|什么都不能决定|什么都决定不了|什么都做不了|无能为力|爱莫能助|只能配合|只能执行|只能服从|只能这样|改变不了|做不了主|被取消(?:了)?(?:的)?(?:修改)?权限|很无奈)/;
+// T4_ZH_SHIRK：责任落点被推离本主体（不需要无助词在场）
+const T4_ZH_SHIRK = /(?:轮不到|不归|不由|不属于|用不着|不需要)(?:我们|我|我方|咱|本(?:部门|团队|公司))?(?:来|去)?(?:管|负责|决定|处理|过问|操心|插手|担责)|(?:责任|过错|问题|锅|账|这(?:事儿|事|摊子))(?:落|算|归|记|推)(?:不|没)?(?:到|在|归|上)(?:我们|我方|任何人|任何人的)?(?:头|身)上|别再来(?:问|找|联系|骚扰)|你?(?:找|问)错(?:了)?(?:对象|人|地方|部门)/;
+// [第488轮补支] 被动移交形：「决定已由模型产出并同步给你了」——决定/结论
+// 由抽象主体产出并告知用户，没有任何自主判定动词在场。
+const T4_ZH_PASSIVE = /(?:决定|结论|结果|判定|通知|回复|邮件|处理意见|答复)(?:已经|已|系|是)?(?:由|被)(?:系统|算法|程序|流程|模型|平台|机器|脚本|智能体|接口|自动)(?:自动|自行|批量|直接)?(?:产出|生成|做出|作出|下发|发出|通知|同步|反馈)/;
+const T4_ZH_DENY_ACT = /(?:没有|无|未被)(?:上级|领导|上边)(?:的)?授权|没有?任何(?:权限|权力)(?:决定|修改|干预)|(?:被|受)(?:上|上级)(?:级|面)(?:直接)?(?:接管|接管|接管了)?/;
+
+// T4_EN_POWERLESS：第一人称无权力/被移交（单独成立，见 CONSTRUCTIVE 豁免）
+const T4_EN_POWERLESS = /\b(?:we|i|my|our)\s+(?:team|department|group|side)?\s*(?:had|have|has|\'?ve)?\s*(?:no\s+say|no\s+control|no\s+authority|no\s+power|no\s+input|no\s+influence|no\s+ability)\b|\b(?:were|was|been)\s+(?:not|never)\s+(?:the\s+ones?\s+who|consulted|asked|involved)\b|\b(?:were|was|been)\s+not\s+the\s+ones?\s+who\b|\b(?:taken|took|take|taking|removed|move|moved|moving)\s+(?:it\s+|this\s+|that\s+|the\s+\w+\s+)?out\s+of\s+(?:our|my)\s+hands\b|\b(?:sits?|rests?|lies|sits)\s+with\s+the\s+(?:system|algorithm|pipeline|process|platform|bot|engine)\b|\b(?:made|decided|approved|signed)\s+above\s+my\s+level\b|\b(?:above|beyond)\s+my\s+pay\s+grade\b|\b(?:i|we)\s+(?:was|were)\s+just\s+(?:follow|following|execut\w+|obey\w+)\b|\b(?:i|we)\s+only\s+(?:execut\w+|follow\w+|obey\w+)\b|\bno\s+(?:single\s+)?(?:individual|person|human)\s+(?:was|is|were)?\s*(?:involved|responsible|accountable)\b|\b(?:escalat\w+|defer\w+|delegat\w+|hand(?:ed)?|pass(?:ed)?|push(?:ed)?|forward(?:ed)?|reassign\w+)\s+(?:it|this|that|the\s+\w+(?:\s+\w+){0,2}|your\s+\w+)\s+(?:up\s+)?to\s+(?:the\s+)?(?:algorithm|system|model|pipeline|process|bot|script|platform|engine)\b|\b(?:was|were|been|is|are)\s+(?:escalat\w+|defer\w+|delegat\w+|hand(?:ed)?|pass(?:ed)?|forward(?:ed)?|reassign\w+|rout\w+|sent)\b[^.]{0,40}\bto\s+(?:the\s+)?(?:algorithm|system|model|pipeline|process|bot|script|platform|engine)\b/i;
+
+// ─── 建设性出路豁免：句子给出了可执行的下一步（谁去找、怎么推进）──────
+// 判据边界：无助/无权力形本身是中性的陈述（确实没权限是常见情况），
+// 只有当它被用来**终止追责**而不是推进解决时才判。出现建设性出路
+// 即视为正当的能力边界说明。
+const T4_CONSTRUCTIVE_ZH = /帮你(?:联系|转接|反馈|转达|确认|核实|问)|可以帮你|替你(?:联系|问|反馈)|建议你(?:联系|找|直接)|我(?:来)?帮你|已(?:经)?帮你|已经?将|已(?:上报|升级|转交|反馈)|协助你(?:联系|处理)|随时(?:可以)?(?:联系|找)/;
+const T4_CONSTRUCTIVE_EN = /\b(?:escalat\w+|forward\w+|pass\w+|referr?\w+|connect(?:ing)?)\s+(?:it|this|that|your\s+\w+|you)\s+to\b|\bconnect\s+you\s+(?:to|with)\b|\brefer(?:ring)?\s+you\s+to\b|\bcan\s+help\s+you\b|\bwill\s+assist\s+(?:you|with)\b|\bon\s+your\s+behalf\b|\braised\s+it\s+with\b|\blet\s+me\s+(?:check|find|ask|connect|escalate)\b|\bhere\s+is\s+(?:who|how)\b/i;
 
 /**
  * @param {string} text 归一化后的文本
@@ -82,6 +120,26 @@ function checkAgencyDeflection(text) {
   // 句中已把责任落回具体人类（人工复核/审批/留痕到人）→ 不是归责转移
   if (HUMAN_ACCOUNTABILITY_ZH.test(text) || HUMAN_ACCOUNTABILITY_EN.test(text)) {
     return { hit: false, score: 0, detail: '' };
+  }
+
+  // [v6.8.6 第488轮] T4：第一人称无权力/被移交 × 责任悬空
+  // 放在 HUMAN_ACCOUNTABILITY 之后：句中已落回具体人类责任的不判。
+  // 建设性出路豁免（帮你联系/已上报/escalated to X 等）也在此层——
+  // 无助陈述给出可执行下一步时是正当的能力边界说明。
+  const _constructive = T4_CONSTRUCTIVE_ZH.test(text) || T4_CONSTRUCTIVE_EN.test(text);
+  if (!_constructive) {
+    if (T4_ZH_POWERLESS.test(text)) {
+      return { hit: true, score: 0.7, detail: '责任转嫁(自称无权力/无能为力)' };
+    }
+    if (T4_ZH_SHIRK.test(text)) {
+      return { hit: true, score: 0.7, detail: '责任转嫁(把责任推离本主体)' };
+    }
+    if (T4_ZH_PASSIVE.test(text)) {
+      return { hit: true, score: 0.7, detail: '责任转嫁(决定被动移交抽象主体)' };
+    }
+    if (T4_EN_POWERLESS.test(text)) {
+      return { hit: true, score: 0.7, detail: '责任转嫁(否认第一人称决策权)' };
+    }
   }
 
   // C2b（责任否认/悬空）单独成立即可命中——
