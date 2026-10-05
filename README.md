@@ -7,7 +7,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 57 discrimination dimensions  ×  11-layer pipeline  ×  143 modules  ×  61 MCP tools
-×  1,136 dispatch routes  ×  17,316 passing tests  ×  0 runtime dependencies
+×  1,136 dispatch routes  ×  17,323 tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -23,6 +23,41 @@ LLM and the human, like a pain receptor that says "no" when something is wrong.
 
 HeartFlow takes layer 1 because this layer does not depend on compute, code volume,
 or framework ecosystems. It depends on judgment alone.
+
+---
+
+## Anti-hype version policy — honest numbers
+
+A personality rule the engine imposes on itself: **the version number never
+overstates what changed.**
+
+| Level | Means | Example |
+|---|---|---|
+| **7.x** | architecture rewrite — new pipeline shape, new public API | 6.7 moved the rule set out of the prompt and into `scripts/upgrade-engine.js` |
+| **7.x.0** | a user can feel it — a new dimension switched on, an entire dimension covered in the other language | 6.7.10 switched on `reward_hacking`, a block-level dimension for the agent era |
+| **7.x.N** | patch — a family expanded, a miss repaired, a false positive removed | 6.7.124 added behaviour-attribution families to `victim_blaming` on both sides |
+
+This is why 124 patch releases may leave you feeling **"nothing changed."** Most of
+them were the other kind of work: repairing a miss in one family, removing a false
+positive in one class, keeping the 61-tool contract and the 1,136-route table from
+breaking, and 472 automated rounds of self-verification. That work is invisible from
+outside *by design* — a guard that holds a line produces no news.
+
+The counter is real and published here rather than hidden:
+
+| Version | New capability the user can feel |
+|---|---|
+| 6.7.10 | `reward_hacking` switched on — 16 documented evasion tactics from the agent literature, of which the previous dimensions caught 2 |
+| 6.7.18 | `instrumental_reasoning` covered in Chinese — the end justifies the means |
+| 6.7.20 | the remaining six reward-hacking tactics from the DSec paper discriminated, closing a gap open since 6.7.10 |
+| 6.7.24 | the six new reward-hacking classes now work in Chinese, not English only |
+
+Everything else in the 6.7.x line was keeping those four true: family-level recall
+repairs (52/52 baseline), benign-block baselines (≤ 302/326), and the mechanical
+rule set that stops a cron round from claiming success it did not achieve.
+
+If you want the shortest honest summary: **four new discrimination capabilities
+shipped in the 6.7 line; the other 120 releases kept them from silently breaking.**
 
 ---
 
@@ -77,7 +112,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 50 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 57 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -104,7 +139,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (50 dimensions) -> gate
+scope-check -> premise-check -> discriminate (57 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v

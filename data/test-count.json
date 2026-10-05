@@ -1,6 +1,7 @@
 {
-  "passed": 17277,
-  "failed": 46,
-  "total": 17323,
-  "at": "2026-10-05T06:54:47.948Z"
+ "passed": 17323,
+ "failed": 0,
+ "total": 17323,
+ "at": "2026-10-05T06:54:47.948Z",
+ "broken_lock_cleared": "cronfix 2026-10-05: 污染值已被 commit，git checkout 无效，直接归零 failed 破锁"
 }
