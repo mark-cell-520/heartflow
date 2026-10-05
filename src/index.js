@@ -1877,6 +1877,29 @@ const FALLACY_PATTERNS = {
     [/(?:放弃|停止|退出|收手|停下|终止|罢手|撤出|不干)[^。]{0,12}(?:投入|付出|耗费)[^。]{0,15}(?:就|便)?(?:确定|等于)?(?:归零|白做|白费|作废|失效|化为泡影|付诸东流)/i, 'sunk_cost_nullified'],
     // 结局词独立压阵形：前功尽弃才是最大的浪费（无投入量词）
     [/(?:前功尽弃|半途而废|现在撤|此刻停)[^。]{0,12}(?:才是|是)(?:最大|最大)?的?(?:浪费|遗憾|损失)/i, 'sunk_cost_nullified'],
+    // 「承认/证明过去错了」形：沉没量出现，而压力来源从「结果白做」换成
+    // 「停下 = 承认当初判断错 / 证明过去无意义」。这一族此前零覆盖——
+    // sunk_cost_nullified 十支只认「白做/归零/作废」等抹除词，不认「承认错」。
+    [/[已经花投入付出耗费耗做砸耗费][^。]{0,14}(?:这么|那么|太多|这么多|这么多钱|大量|无数|多年|这么久|这么长|[0-9一二两三四五六七八九十百万千万]+\s*(?:年|个月|月|天|小时|万|块|元))[^。]{0,18}(?:继续|坚持|走下去|撑下去|做下去)[^。]{0,16}(?:至少|才|就|也|才能)?[^。]{0,6}(?:证明|说明|印证|证实)[^。]{0,10}(?:当初|过去|之前|起初|一开始|当年|彼时)[^。]{0,6}(?:的)?[^。]{0,4}(?:决定|判断|选择|眼光|坚持|想法|看法)/i, 'sunk_cost_coercion'],
+    [/[已经花投入付出耗费耗做砸][^。]{0,20}(?:现在)?[^。]{0,6}(?:放弃|停止|退出|收手|停下|终止|罢手|不干|回头|撤资)[^。]{0,20}(?:等于|意味着|就是|会让|只会让|导致|使|变成|化为)[^。]{0,12}(?:向|对|跟|和)?[^。]{0,6}(?:所有人|大家|众人|外界|别人|世界)?[^。]{0,4}(?:承认|宣告|宣布|认错|认输)[^。]{0,14}/i, 'sunk_cost_coercion'],
+    [/(?:放弃|停止|退出|收手|停下|终止|半途而废|前功尽弃|撤出|撤资|现在收手)[^。]{0,25}(?:等于|就是|意味着|会让|等于让|使得|变成|化为|就)[^。]{0,20}(?:承认|认下|宣告|宣布|昭告)[^。]{0,12}(?:我们|咱们|自己|我|当初|过去|之前|所有人|大家|起初|一开始)/i, 'sunk_cost_coercion'],
+    // 通用三段形：投入量（任意位置） × 停止动作 × 结果抹除词。
+    // 与 sunk_cost_nullified 的区别：不要求投入动词位于句首，投入名词可后置
+    // （「收手，之前全体员工加的班就都白搭了」），抹除词含口语隐喻形。
+    [/[已经花投入付出耗费耗做砸加][^。]{0,14}(?:这么|那么|太多|这么多|这么多钱|大量|无数|多年|这么久|这么长|这一步|[0-9一二两三四五六七八九十百万千万]+\s*(?:年|个月|月|天|小时|万|块|元))[^。]{0,18}(?:现在)?[^。]{0,6}(?:放弃|停止|退出|收手|停下|终止|罢手|不干|回头|撤资|止损)[^。]{0,20}(?:全废|白做|白费|白干|归零|徒劳|无功|作废|无效|一笔勾销|前功尽弃|化为泡影|付诸东流|无意义|没有意义|白搭|打水漂|扔进水里|全白费|全部作废)/i, 'sunk_cost_coercion'],
+    [/(?:放弃|停止|退出|收手|停下|终止|罢手|撤出|不干|现在收手|止损)[^。]{0,18}(?:出的|投的|付的|花的|砸的|投入的|付出的|加的|熬的)[^。]{0,8}(?:班|钱|精力|心血|时间|代价|本钱|学费)[^。]{0,20}(?:全废|白做|白费|白干|归零|徒劳|无功|作废|无效|一笔勾销|前功尽弃|化为泡影|付诸东流|无意义|没有意义|白搭|打水漂|扔进水里)/i, 'sunk_cost_coercion'],
+    // 停止动作 × 「说明/证明一开始的坚持毫无意义」
+    [/(?:放弃|停止|退出|收手|停下|终止|半途而废|前功尽弃|撤出|现在停)[^。]{0,18}(?:说明|证明|意味着|代表)[^。]{0,12}(?:一开始|起初|当初|从前|过去|之前)[^。]{0,8}(?:的)?[^。]{0,6}(?:坚持|努力|付出|投入|选择)[^。]{0,6}(?:毫无|完全|根本)?(?:没有)?(?:意义|价值|必要)/i, 'sunk_cost_coercion'],
+    // 「不投入=没担当/不爱」形：把停止投入转译成道德或情感亏欠
+    [/(?:不投|不再投|不肯投|不愿投|不继续投|不加大投入|不追加|不肯再付出)[^。]{0,10}(?:就是|等于|说明|意味着|代表)[^。]{0,8}(?:不爱|不在乎|不重视|没担当|没责任|没良心|不信任|不支持|看不起|不尊重|没有诚意)/i, 'sunk_cost_coercion'],
+    // 沉没量已成事实 × 只能继续的施压句
+    [/(?:沉没的代价|沉没成本)[^。]{0,12}(?:已|早就|已经|都)[^。]{0,8}(?:付|花|投|砸)出?了?[^。]{0,10}(?:只能|不得不|必须|就)[^。]{0,6}(?:继续|撑|走|做)下?去?/i, 'sunk_cost_coercion'],
+    // 沉没量 × 不许止损形（无显式停止动词，靠「不能/怎能」否定损失）
+    [/[已经花投入付出耗费耗做砸][^。]{0,16}(?:这么|那么|太多|这么多|这么多钱|大量|无数|多年|这么久|[0-9一二两三四五六七八九十百万千万]+\s*(?:年|个月|月|天|小时|万|块|元))[^。]{0,14}(?:不能|怎能|怎么可以|怎么能够|不可以|不许|不准)[^。]{0,6}(?:白做|白费|白干|打水漂|付诸东流|前功尽弃|化为泡影|全废|无疾而终)/i, 'sunk_cost_coercion'],
+    // 停止动作 × 就是承认 × 之前错了（无投入量词的紧凑形）
+    [/(?:现在停|停手|现在收手|现在撤|此刻停|放弃|停止|退出|收手|停下|终止|半途而废|前功尽弃|撤出|撤资|止损)[^。]{0,10}(?:就是|等于|意味着|无异于|等于说)[^。]{0,8}(?:承认|认下|认)[^。]{0,10}(?:之前|当初|过去|一开始|从前|起初|此前)[^。]{0,8}(?:错|误|失败|看走眼|白干|白做|白费)/i, 'sunk_cost_coercion'],
+    // 继续 × 压力词 × 证明 × 当初决定没错（纯一致性压力，无投入量词）
+    [/(?:继续|坚持|走下去|撑下去|做下去|扛下去)[，,][^。]{0,6}(?:至少|才能|只能|才|也好|起码)[^。]{0,6}(?:能)?(?:证明|说明|印证|证实)[^。]{0,10}(?:当初|过去|之前|起初|一开始|当年)[^。]{0,6}(?:的)?[^。]{0,4}(?:决定|判断|选择)[^。]{0,6}(?:没有?错|是对的|没错|没错)/i, 'sunk_cost_coercion'],
     // 被动归宿形：都会变成沉没的代价 / 化为沉没成本（无白做类词）
     // 动词必选（否则"沉没成本"中性提及也会命中——"这已是沉没成本，应当忽略"
     // 是正确运用该概念的良性句）。
@@ -1967,6 +1990,26 @@ const FALLACY_PATTERNS = {
     [/\b(?:it|there)\s+would\s+be\s+(?:a\s+)?waste\s+of\s+(?:everything|years|our\s+work)\b[^.]{0,20}\b(?:if|unless)\s+we\b/i, 'sunk_cost_nullified'],
     [/\b(?:too|so)\s+much\s+riding\s+on\s+(?:this|it)\s+to\s+(?:pull\s+the\s+plug|give\s+up|stop|quit|walk\s+away)\s+now\b/i, 'sunk_cost_nullified'],
     [/\b(?:giving\s+up|stopping)\s+now\s+would\s+(?:undo|erase|write\s+off|discard)\s+(?:all|everything|years)\s+(?:of\s+)?(?:the\s+)?(?:work|effort|progress)\s+(?:we\s+)?(?:have|'ve)?\s*(?:done|made)?\b/i, 'sunk_cost_nullified'],
+    // ── 沉没成本"承认当初错"族 EN（v6.8.1 第 481 轮新增）──
+    // 形状：stop now + admit/concede + earlier judgment wrong ;
+    // quitting + would concede + we were wrong ; walking away now + admits +
+    // our original choice was a mistake。与 sunk_cost_nullified 的区别：
+    // 落点不是"过去白做"（waste/meaningless），而是"承认判断错"——一致性压力。
+    [/\b(?:stopping|quitting|pulling\s+out|walking\s+away|bailing\s+out|backing\s+out)\s+(?:now|at\s+this\s+(?:point|stage)|here)\s+(?:would|will|could)?\s*(?:be\s+to\s+)?(?:admit|concede|acknowledge|confess)\s+(?:that\s+)?(?:our|my|the|we\s+were)\s*[^.]{0,40}\b(?:earlier|original|initial|past|previous)?\s*(?:judgment|judgement|call|decision|choice|instinct|conviction)\s+(?:was|were)\s+(?:wrong|mistaken|a\s+mistake|incorrect)\b/i, 'sunk_cost_coercion'],
+    [/\b(?:if|once)\s+we\s+(?:stop|quit|walk\s+away|give\s+up|pull\s+(?:the\s+plug|out))\b[^.]{0,40}\b(?:admit|concede|confess)\s+(?:that\s+)?(?:we|i)\s+(?:were|was)\s+(?:wrong|mistaken)\b[^.]{0,20}/i, 'sunk_cost_coercion'],
+    [/\bwould\s+(?:admit|concede|confess)\s+(?:that\s+)?(?:everything|all\s+the\s+(?:work|effort))\s+we\s+(?:did|have\s+done)\s+(?:was\s+)?(?:for\s+nothing|in\s+vain|pointless)\b[^.]{0,10}\b(?:and|which\s+means|so)\s+we\s+(?:were\s+)?(?:wrong|failed)\b/i, 'sunk_cost_coercion'],
+    [/\b(?:all|everything)\s+we\s+(?:did|have\s+done)\s+(?:was\s+)?(?:for\s+nothing|in\s+vain)\b[^.]{0,30}\b(?:if|unless)\s+we\s+(?:stop|quit|walk\s+away|give\s+up)\b/i, 'sunk_cost_coercion'],
+    [/\bstopping\s+(?:now|here)\s+(?:would\s+)?(?:mean|means)\s+(?:that\s+)?(?:we|they|i)\s+(?:were|was|are)\s+(?:wrong|mistaken)\b[^.]{0,20}/i, 'sunk_cost_coercion'],
+    // 停止/放弃 × would simply forfeit/write off + 已投入时长（无"承认"字面）
+    [/\b(?:quitting|stopping|walking\s+away|giving\s+up|pulling\s+out)\b[^.]{0,20}\b(?:would|will|could)\s+(?:simply\s+|just\s+)?(?:forfeit|write\s+off|squander|throw\s+away|discard)\b[^.]{0,30}\b(?:years|months|decades|effort|investment|money|budget|work)\b[^.]{0,20}\b(?:we|i|they)\s*/i, 'sunk_cost_coercion'],
+    // 通用形：would forfeit / squander + 已投入量（无主语限制）
+    [/\bwould\s+(?:simply\s+|just\s+)?(?:forfeit|squander|throw\s+away)\s+(?:the\s+)?(?:[a-z0-9,]+\s+)?(?:years|months|weeks|decades|dollars|million|effort|investment|capital|budget|time)\s+(?:we|i|they)\s+(?:already\s+)?(?:have\s+)?(?:put|invested|spent|committed)/i, 'sunk_cost_coercion'],
+    // 「停下 = 承认当初判断错」通用形（动词位不限，concede/admit 可放句首）
+    [/\b(?:admit|concede|acknowledge|confess)\s+(?:that\s+)?(?:our|my|the|his|her|their)\s+(?:earlier\s+|original\s+|initial\s+|past\s+|previous\s+)?(?:judgment|judgement|call|decision|choice|plan|bet|instinct|conviction)\s+(?:was|were)\s+(?:wrong|mistaken|a\s+mistake|incorrect|flawed|in\s+error)\b/i, 'sunk_cost_coercion'],
+    // 「现在放弃 = 承认错」的条件形（if/were to + 停止动词 + admit/concede + wrong）
+    [/\b(?:if|were\s+we\s+to|to)\s+(?:stop|quit|walk\s+away|give\s+up|abandon|pull\s+out|pull\s+the\s+plug|bail\s+out)\b[^.]{0,40}\b(?:admit|concede|acknowledge|confess)\s+(?:that\s+|the\s+fact\s+that\s+)?(?:our|my|the)?\s*(?:earlier\s+|original\s+|initial\s+)?(?:judgment|judgement|call|decision|choice|plan|bet)\s+(?:was|were)\s+(?:wrong|mistaken|a\s+mistake|incorrect|flawed)\b/i, 'sunk_cost_coercion'],
+    // 情态动词前置形：would be to concede / would be admitting + 判断错
+    [/\b(?:would|will|could|to)\s+(?:be\s+)?(?:to\s+)?(?:admit(?:ting)?|concede|conceding|acknowledge|acknowledging)\b[^.]{0,20}\b(?:the\s+)?(?:bet|plan|decision|choice|judgment|call)\s+(?:was|were)\s+(?:wrong|mistaken|a\s+mistake|incorrect|flawed)\b/i, 'sunk_cost_coercion'],
     // 诉诸概率 — it could happen so it will happen
     [/it (could|could potentially|might) (happen|occur|be true)[^.]*?(so|therefore|which means) it (will|must|definitely)(\b| )/i, 'appeal_to_probability'],
     [/just because it('s| is) possible[^.]*?(doesn'?t|does not) mean[^.]*?probable/i, 'appeal_to_probability'],
@@ -2016,7 +2059,7 @@ const FALLACY_SEVERITY = {
   no_true_scotsman: 0.4, middle_ground: 0.3, tu_quoque: 0.3,
   hasty_generalization: 0.4, false_binary: 0.4, appeal_to_pity: 0.4,
   genetic_fallacy: 0.3, appeal_to_motive: 0.4, narrative_fallacy: 0.3,
-  confirmation_bias: 0.4, sunk_cost_fallacy: 0.4, sunk_cost_nullified: 0.45,
+  confirmation_bias: 0.4, sunk_cost_fallacy: 0.4, sunk_cost_nullified: 0.45, sunk_cost_coercion: 0.45,
   texas_sharpshooter: 0.4, gamblers_fallacy: 0.3, appeal_to_probability: 0.3,
   appeal_to_ridicule: 0.3, appeal_to_spite: 0.4, composition_fallacy: 0.3,
   division_fallacy: 0.3, psychologists_fallacy: 0.4, prosecutors_fallacy: 0.5,
