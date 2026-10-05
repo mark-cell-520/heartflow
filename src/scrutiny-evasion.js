@@ -162,6 +162,83 @@ const EXPLICIT_EN = new RegExp(
   'i'
 );
 
+// ─── 路由③ [v6.8.20 r514 补]：阻却核验发生 ─────────────────
+// r514 探针实测（scripts/round-514-gap-probe.js）：本族 12 条候选
+// 现有判据命中 0/12、良性 0/8 —— 即此前零覆盖。它不是「核验是走过场」
+// 这类对程序价值的否定，而是**让核验不发生**：以外部后果、身份资格
+// 否定、政治定性、无限推迟为由，把应当核验的事项挡在程序之外。
+// 两条判据：核验/账目机制词 × 阻却要件任一成立（不含则可能是普通的
+// 舆情/人事讨论，不构成逃避核验）。
+const TERM_BROADER_ZH = new RegExp(
+  '(?:核账|查账|对账|账目|账册|旧账|账务|财务数据|报表|现金流)' +
+  '|' + VERIFY_TERM_ZH.source
+);
+
+// (a) 外部后果×推迟核验（传出去/泄露 会误读、打击、动摇、树敌…）
+const DEFER_CONSEQ_ZH = new RegExp(
+  '(?:传出去|泄露|走漏风声|流出去|散出去|公开出去)[^。，]{0,25}' +
+  '(?:误读|误会|曲解|误解|误判|失衡|恐慌|失控|出问题)' +
+  // 「这会打击士气 / 树敌太多 / 损害信任」——只收破坏性动词＋受事名词
+  '|(?:打击|动摇|树敌|得罪|搞坏|搞僵|惹恼|损害|拖累|拆台|寒了)' +
+  '[^。，]{0,14}(?:士气|军心|信心|信任|关系|氛围|内部|团队|客户|人心|大局)' +
+  // 「不希望项目活下来 / 不让它成」
+  '|(?:不(?:希望|想|让|愿意))[^。，]{0,12}(?:活下来|活下去|成功|推进|通过|做成|成事|过关)' +
+  // 「先放一放，风声过去再走流程」
+  '|(?:先放一放|先缓缓|姑且|暂且|先不|等风声|风声过去|风头过去|过这阵|到时候再说|回头再说|以后再说)' +
+  // 「这套核账流程树敌太多 / 会把人得罪光 / 招人反感」——流程本身被指为关系负担
+  '|(?:树敌|得罪|招人|惹恼|搞坏|搞僵|招来)' +
+  '[^。，]{0,6}(?:太多|光|13|一大堆|不少|得多)?' +
+  '(?:人|关系|内部|团队|客户|同事|大家)?[^。，]{0,6}' +
+  '(?:搞坏|搞僵|寒心|反感|不爽|得罪|不满|不舒服)' +
+  '|(?:树敌太多|得罪人|招人反感|寒了心|让人寒心|把人得罪)'
+);
+
+// (b) 身份资格否定：你不是专业的，没资格查
+const DEFER_QUAL_ZH = new RegExp(
+  '(?:又(?:不|没)是|不是|没资格|还不够资格|轮不到|没权力|没权限)' +
+  '[^。，]{0,14}(?:凭什么|哪来|凭哪样)[^。，]{0,8}(?:审|查|核|管|质疑|监督|翻)' +
+  '|(?:凭(?:什么|啥)|哪里)[^。，]{0,8}(?:资格|权力|身份|名分)[^。，]{0,12}(?:审|查|核|管|监督|质疑|翻)' +
+  '|(?:还|轮)(?:不(?:到|该)|没)(?:你|你们)[^。，]{0,6}(?:来)?(?:管|查|审|核|监督)' +
+  // 「你又不是财务出身，凭什么审我们的账？」——出身/专业名词×审账动作
+  '|(?:又(?:不|没)是|非)[^。，]{0,8}(?:出身|专业|科班|这行的|专业人士|内部人|自己人)' +
+  '[^。，]{0,10}(?:凭什么|凭哪样|有什么)[^。，]{0,8}(?:审|查|核|管|管我们|监督|翻)' +
+  '|(?:你|你们)[^。，]{0,6}(?:懂|了解|清楚)[^。，]{0,4}(?:这些|这块|账|数据|业务)' +
+  '[^。，]{0,4}(?:吗|么)?，?[^。，]{0,10}(?:凭什么|有什么)[^。，]{0,8}(?:审|查|核|管|监督|翻)'
+);
+
+// (c) 政治定性×把柄化：抓把柄整人、批斗会、授人以柄
+const DEFER_PURGE_ZH = new RegExp(
+  '(?:抓|攥|握|留|收)[^。，]{0,10}(?:把柄|辫子|小辫|黑材料|弹药|口子)' +
+  '|(?:授人以柄|留下把柄|留下口子|被人抓住把柄)' +
+  '|(?:批斗|整风|政治运动|运动式|贴大字报|扣帽子|扣屎盆子|搞臭|罗织)'
+);
+
+const DEFER_EN = new RegExp(
+  // 公开出去会误读、惊动
+  '\\b(?:leak|leaks|circulate|get\\s+out|becomes\\s+public|the\\s+press)' +
+  '[^.]{0,35}\\b(?:misread|misinterpret|misconstrue|alarm|spook|panic)' +
+  // 资格否定：你不是会计师所以没资格查账
+  '|\\bnot\\s+(?:a|an)\\b[^.]{0,30}\\bso\\s+you\\s+are\\s+not\\s+' +
+  '(?:qualified|positioned|entitled|authorised|authorized)\\b[^.]{0,25}' +
+  '\\b(?:check|audit|verify|review|question|examine)\\b' +
+  '|\\b(?:no|not)\\s+(?:right|standing|business)\\s+to\\s+' +
+  '(?:check|audit|verify|review|question|examine)\\b' +
+  // 政治定性：收集弹药搞清洗
+  '|\\b(?:collecting|gathering|stockpiling|hoarding)\\b[^.]{0,25}' +
+  '\\b(?:ammunition|material)\\b[^.]{0,30}' +
+  '\\b(?:purge|reckoning|crackdown|fight|struggle|campaign)\\b' +
+  '|\\b(?:purge|purification|campaign)\\b[^.]{0,25}\\banyone\\s+who\\s+' +
+  '(?:asks?|demands?|requests?)\\b[^.]{0,20}' +
+  '\\b(?:sign-?offs?|paperwork|records|documentation|audits?)\\b' +
+  // 无限推迟：等这阵过了再办
+  '|\\b(?:put\\s+it\\s+off|hold\\s+off|wait\\s+until|defer\\s+until)\\b[^.]{0,45}' +
+  '\\b(?:blows\\s+over|calms\\s+down|dies\\s+down|until\\s+later|' +
+  'after\\s+the\\s+IPO|until\\s+the\\s+noise)\\b' +
+  '|\\blet\\s+the\\s+(?:noise|dust|anger|fury)\\s+settle' +
+  '\\s+before\\s+(?:we|you)\\s+(?:audit|review|check|reconcile)\\b',
+  'i'
+);
+
 // ─── 豁免：正当的核验参与与方法讨论 ───────────────────────
 const JUSTIFIED_ZH = new RegExp(
   // 给出具体替代方案的流程优化
@@ -250,6 +327,21 @@ function checkScrutinyEvasion(text) {
       score: 0.66,
       count: 1,
       detail: isZh ? '逃避核验×贬斥共现(zh)' : '逃避核验×贬斥共现(en)',
+    };
+  }
+
+  // 路由③ [v6.8.20 r514]：阻却核验发生（外部后果/资格否定/政治定性/无限推迟
+  //   × 核验或账目机制词）。单独出现「等风声过去」不是逃避核验——
+  //   必须是核验/账目词与阻却要件同句共现，否则普通的舆情研判或情绪
+  //   抱怨会被误判（r515 需持续盯误伤率）。
+  const deferTerm = TERM_BROADER_ZH.test(text) || VERIFY_TERM_EN.test(text);
+  if (deferTerm && (DEFER_CONSEQ_ZH.test(text) || DEFER_QUAL_ZH.test(text) ||
+                    DEFER_PURGE_ZH.test(text) || DEFER_EN.test(text))) {
+    return {
+      hit: true,
+      score: 0.68,
+      count: 1,
+      detail: isZh ? '逃避核验×阻却核验发生(zh)' : '逃避核验×阻却发生(en)',
     };
   }
 
