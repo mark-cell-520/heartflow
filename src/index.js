@@ -11452,6 +11452,7 @@ module.exports = {
   checkNormalizationOfDeviance,
   checkLoyaltyTest,
   checkHelplessnessInduction,
+  checkSoleNarrative,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
