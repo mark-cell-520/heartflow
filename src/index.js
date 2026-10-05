@@ -1862,6 +1862,26 @@ const FALLACY_PATTERNS = {
     // 沉没成本谬误 — 已经投入这么多所以不能停
     [/已经花了[^。]*?(这么多|这么久|这么多钱)[^。]*?(不能|怎能|怎么)能?(放弃|停止|回头|白费)/i, 'sunk_cost_fallacy'],
     [/投入了[^。]*?(这么多|这么久|太多)[^。]*?(现在放弃|半途而废)[^。]*?太可惜/i, 'sunk_cost_fallacy'],
+    // ── 沉没成本"结果白做"族（v6.8.1 第 480 轮新增）──
+    // 与上面两形的区别：不说"可惜"，而说"停下 = 已投入的全部白做/归零/无意义"。
+    // 这是同族新句式——攻击点从"惋惜"换成"结果抹除"，用沉没量反过来
+    // 威胁止损者：停下来等于承认过去无效。判据三段：投入量 × 停止动作（可选）
+    // × 结果抹除词。停止动作可选是为了覆盖"投入三年现在收手等于心血全无意义"
+    // 这种无显式停止动词、靠"等于/意味着"引出结果的形。
+    // 结果词收窄为四字以上抹除义组合，避免打到中性的"这笔投入会有回报"类。
+    [/[已经花投入付出耗费耗][^。]{0,12}(?:这么|那么|太多|大量|无数|多年|这么长|[0-9一二两三四五六七八九十半数]+\s*(?:年|个月|月|天|小时))[^。]{0,15}(?:现在)?[^。]{0,6}(?:放弃|停止|退出|收手|停下|终止|罢手|不干|回头)[^。]{0,20}(?:等于|意味着|就是|使得|会让|只会让|导致|使|变成|化为)[^。]{0,12}(?:全部|全都|都|一切|以前|之前|此前|这些|全部)[^。]{0,4}(?:白做|白费|白干|归零|徒劳|无功|作废|无效|一笔勾销|前功尽弃|化为泡影|付诸东流|无意义|没有意义)/i, 'sunk_cost_nullified'],
+    [/[已经花投入付出耗费耗][^。]{0,12}(?:这么|那么|太多|大量|无数|多年|[0-9一二两三四五六七八九十半数]+\s*(?:年|个月|月|天|小时))[^。]{0,10}(?:心血|精力|付出|投入|努力|代价|成本|时间)[^。]{0,15}(?:等于|就是|意味着)[^。]{0,10}(?:白做|白费|白干|归零|徒劳|无功|作废|无效|一笔勾销|前功尽弃|化为泡影|付诸东流|无意义|没有意义)/i, 'sunk_cost_nullified'],
+    [/(?:放弃|停止|退出|收手|停下|终止|半途而废|前功尽弃|撤出)[^。]{0,25}(?:等于|就是|意味着|会让|等于让|使得|变成|化为)[^。]{0,20}(?:之前|以前|此前|过去|这些年|前功|前期|前十?[0-9一二两三四五六七八九十]*[个]?(?:月|年))(?:的)?[^。]{0,12}(?:全部|所有|全都|一切)?[^。]{0,6}(?:都可以|都可以|都|均可)?[^。]{0,2}(?:白做|白费|白干|归零|徒劳|无功|作废|无效|一笔勾销|前功尽弃|付诸东流|无意义|没有意义|沉没的代价|沉没成本)/i, 'sunk_cost_nullified'],
+    [/走到(?:了)?这一步[^。]{0,20}(?:退出|放弃|停止|收手|回头)[^。]{0,20}(?:徒劳|白费|前功尽弃|归零|无意义)/i, 'sunk_cost_nullified'],
+    // 停止动作在句后、投入量紧随其后（无句首投入动词）：停下三年投入就归零
+    [/(?:放弃|停止|退出|收手|停下|终止|罢手|撤出|不干)[^。]{0,12}(?:投入|付出|耗费)[^。]{0,15}(?:就|便)?(?:确定|等于)?(?:归零|白做|白费|作废|失效|化为泡影|付诸东流)/i, 'sunk_cost_nullified'],
+    // 结局词独立压阵形：前功尽弃才是最大的浪费（无投入量词）
+    [/(?:前功尽弃|半途而废|现在撤|此刻停)[^。]{0,12}(?:才是|是)(?:最大|最大)?的?(?:浪费|遗憾|损失)/i, 'sunk_cost_nullified'],
+    // 被动归宿形：都会变成沉没的代价 / 化为沉没成本（无白做类词）
+    // 动词必选（否则"沉没成本"中性提及也会命中——"这已是沉没成本，应当忽略"
+    // 是正确运用该概念的良性句）。
+    [/(?:变成|化为|成为|成了|沦为|沦为|归入)[^。]{0,8}(?:沉没的代价|沉没成本)/i, 'sunk_cost_nullified'],
+    [/无路可退[^。]{0,30}(?:对不起|对不住|愧对)[^。]{0,6}(?:最初|过去|当初|之前)[^。]{0,4}(?:投入|付出)/i, 'sunk_cost_nullified'],
   ],
   en: [
     [/if you[^.]*?then you must also agree/i, 'slippery_slope'],
@@ -1933,6 +1953,20 @@ const FALLACY_PATTERNS = {
     [/we('ve| have) (already|invested|spent|put)[^.]*?(too much|so much|this much)[^.]*?(to (quit|stop|walk away|give up)|can(\'t| not) (stop|turn back|abandon))/i, 'sunk_cost_fallacy'],
     [/after (all|everything) we(?:'ve| have) (put|invested|done|sacrificed)[^.]*?we (?:can't|cannot|can not) (quit|stop|give up now)/i, 'sunk_cost_fallacy'],
     [/can(\'t| not) (stop|quit|abandon|give up)[^.]*?(years|months|decades|so much|too much) invested/i, 'sunk_cost_fallacy'],
+    // ── 沉没成本"结果白做"族 EN（v6.8.1 第 480 轮新增）──
+    // 形状：pour/walk away + waste ; stopping + render meaningless ;
+    // come too far + give up halfway ; too much riding + pull the plug。
+    // 与原有 invested-to-quit 交叉形的区别：结果落点从"停不下"换成
+    // "停了就让过去全部作废"，分号词（waste / meaningless / nothing）
+    // 是判据核心。
+    [/\b(?:we|they|i)\s+(?:have|had|'ve)?\s*(?:already)?\s*(?:poured|put|invested|dumped|pushed|poured)\s+(?:too\s+much|so\s+much|a\s+lot)\s+(?:into|in)\s+\w+[^.]{0,30}\b(?:to|and)\s+(?:simply\s+)?(?:walk\s+away|give\s+up|walk\s+away\s+from)\b/i, 'sunk_cost_nullified'],
+    [/\b(?:backing\s+out|pulling\s+out|stepping\s+away)\s+at\s+this\s+(?:stage|point|juncture)\s+would\s+waste\s+(?:years|months|everything|all)\s+of\s+(?:work|effort)\s+(?:we\s+)?(?:have\s+)?(?:already\s+)?done\b/i, 'sunk_cost_nullified'],
+    [/\b(?:stopping|quitting|abandoning|cancelling|canceling|pulling\s+the\s+plug)\s+(?:now|at\s+this\s+(?:stage|point)|here)\s+would\s+(?:waste|undo|negate)\s+(?:years|months|everything|all)\b/i, 'sunk_cost_nullified'],
+    [/\bwould\s+(?:render|make)\s+(?:every|all|everything\s+we|the)\s+(?:sacrifice|effort|investment|work)\s+(?:up\s+to\s+this\s+point\s+)?(?:meaningless|pointless|worthless|for\s+nothing)\b/i, 'sunk_cost_nullified'],
+    [/\bwe\s+(?:have|'ve)\s+come\s+(?:too\s+far|this\s+far)\s+to\s+(?:give\s+up|quit|stop)\s+(?:now|halfway)\b/i, 'sunk_cost_nullified'],
+    [/\b(?:it|there)\s+would\s+be\s+(?:a\s+)?waste\s+of\s+(?:everything|years|our\s+work)\b[^.]{0,20}\b(?:if|unless)\s+we\b/i, 'sunk_cost_nullified'],
+    [/\b(?:too|so)\s+much\s+riding\s+on\s+(?:this|it)\s+to\s+(?:pull\s+the\s+plug|give\s+up|stop|quit|walk\s+away)\s+now\b/i, 'sunk_cost_nullified'],
+    [/\b(?:giving\s+up|stopping)\s+now\s+would\s+(?:undo|erase|write\s+off|discard)\s+(?:all|everything|years)\s+(?:of\s+)?(?:the\s+)?(?:work|effort|progress)\s+(?:we\s+)?(?:have|'ve)?\s*(?:done|made)?\b/i, 'sunk_cost_nullified'],
     // 诉诸概率 — it could happen so it will happen
     [/it (could|could potentially|might) (happen|occur|be true)[^.]*?(so|therefore|which means) it (will|must|definitely)(\b| )/i, 'appeal_to_probability'],
     [/just because it('s| is) possible[^.]*?(doesn'?t|does not) mean[^.]*?probable/i, 'appeal_to_probability'],
@@ -1982,7 +2016,7 @@ const FALLACY_SEVERITY = {
   no_true_scotsman: 0.4, middle_ground: 0.3, tu_quoque: 0.3,
   hasty_generalization: 0.4, false_binary: 0.4, appeal_to_pity: 0.4,
   genetic_fallacy: 0.3, appeal_to_motive: 0.4, narrative_fallacy: 0.3,
-  confirmation_bias: 0.4, sunk_cost_fallacy: 0.4,
+  confirmation_bias: 0.4, sunk_cost_fallacy: 0.4, sunk_cost_nullified: 0.45,
   texas_sharpshooter: 0.4, gamblers_fallacy: 0.3, appeal_to_probability: 0.3,
   appeal_to_ridicule: 0.3, appeal_to_spite: 0.4, composition_fallacy: 0.3,
   division_fallacy: 0.3, psychologists_fallacy: 0.4, prosecutors_fallacy: 0.5,

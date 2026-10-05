@@ -1,3 +1,50 @@
+# 第 479 轮（第 59 维度 agency_deflection 责任转嫁抽象系统接线上线，3 commits）
+
+## 补记说明
+
+本轮记录由第 480 轮补写：479 轮因 cgroup 内存阻塞（197MB < 700MB 阈值）
+未能跑 run-all / doc-numbers / finish，轮末被迭代上限截断，交接板漏记。
+工作成果已由 `scripts/auto-commit-round.js` 自动落盘（`72bfb4ef`），
+引擎侧改动完整保留在 git 历史中（`9d8a9c55` 模块 + `882eabd2` 接线）。
+以下数字来自 479 轮实测记录。
+
+## 方向
+
+478 轮交接板明确第 59 维度 `agency_deflection` 前置件已做完但**未接线**——
+按无人值守铁律，不接线等于没上线。本轮直接接手上轮遗留。
+
+## 改了什么
+
+**commit `9d8a9c55`**：落盘模块本体与探针。
+**commit `882eabd2`（主改动，真升级①）**：
+- `src/index.js` 六处接线：require、applyPedagogyRelaxation 包裹调用、
+  allDims/dimMap 加键、DIM_GUIDANCE 加指引、REWRITE_DIMS 加入
+  （不落 block，与 instrumental_reasoning 同级）。
+- `src/agency-deflection.js` 补实测缺口：AGENT_EN 放宽到「限定词 + 最多两个
+  形容词」；DEFLECT_AUTO_EN 合并 cannot/can't/be overridden 三变体并加
+  no human can override 支。
+
+## 实测效果
+
+`scripts/round-478-agency-deflection-probe.js --gate`：
+接线前 8/10 攻击样本 gate=pass → 接线后 **0/10 放过**；
+agency_deflection 命中 9/10，第 6 条由 gate_block 单独拦下；14 条良性 0 误伤。
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| `node bin/verify.js` | ✅ 14/14 |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 52/52、误拦 302/326（与基线持平） |
+| `test/round-479-agency-deflection.test.js`（新） | ✅ 8/8 断言 |
+| `test/orphan-dimension-guard.test.js` | ✅ check 函数数 50、0 断链 |
+
+未完成项（环境阻塞，非判断失误）：run-all 全量（cgroup 197MB < 700MB 三次
+BLOCKED）、doc-numbers-accuracy（test-count.json 自锁 failed=28）、
+upgrade-engine finish。见第 480 轮继续处理。
+
+---
+
 # 第 455 轮（hate_speech 中文驱逐族补具名地域群体主语 + 被动驱逐形，2 commits）
 
 ## 方向选择（decision 本体 3 候选）
