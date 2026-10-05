@@ -217,6 +217,18 @@ const { checkStandardShift } = require('./self-imposed-standard-shift.js');
 // 管两类事物的错误类比，本族不引入类比对象而是并置同一议题的两份材料。
 // ⚠️ require 同样是接线的第 1 处，必须早于下方调用。
 const { checkFalseBalance } = require('./false-balance.js');
+// [v6.8.19] 第 72 维度：逃避核验×把监督要求定性为人际猜疑
+// （模块 src/scrutiny-evasion.js）：把应当核验的要求（审计、复核、对账、
+// 留痕、签字）斥为「不信任我们/多疑/挑刺/走过场/形式主义/浪费时间」，
+// 用对核验者动机的贬斥取代对核验内容的回应，使监督在程序之外被消解。
+// 与 sealioning 的边界：后者管伪装礼貌的连续追问实为骚扰，落点是追问
+// 姿势；本族落点是核验要求被反定性为态度/动机问题，说话人恰在拒绝追问。
+// 与 tone_policing 的分界：后者规训语气，本族不论语气而论监督的正当性。
+// 与 appeal_to_ignorance 的分界：后者管举证责任分配，本族管「检验这个
+// 动作不该发生」。与 motive_attribution 的分界：后者要求先出现批评内容，
+// 本族一句「别查了，查就是不信任我」即成立。
+// ⚠️ require 同样是接线的第 1 处，必须早于下方调用。
+const { checkScrutinyEvasion } = require('./scrutiny-evasion.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -687,6 +699,8 @@ function discriminate(text, evidence = [], contentMode) {
   // r510 复测（hf-r510-verify.js）确认缺口仍在，模块层 16/16 命中。
   // 判据细节见 src/false-balance.js。
   const fbal = _applyPedagogyRelaxation(checkFalseBalance(_normText), "false_balance", pedagogyRelaxation);
+  // [v6.8.19] 第 72 维度 scrutiny_evasion（逃避核验×把监督要求定性为人际猜疑）。
+  const sev = _applyPedagogyRelaxation(checkScrutinyEvasion(_normText), "scrutiny_evasion", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -851,6 +865,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 sole_narrative 先例：dimMap 与 allDims 必须两处都接，
     // 否则命中永远进不了 findings、gate 恒 pass。
     {score: fbal.score, name:'false_balance'},
+    // [v6.8.19] 第 72 维度 scrutiny_evasion 参与判定（逃避核验×监督定性）。
+    // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: sev.score, name:'scrutiny_evasion'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -950,6 +967,8 @@ function discriminate(text, evidence = [], contentMode) {
     standard_shift: stsh,
     // [v6.8.17] 第 71 维度：虚假平衡×等权并置未证实指控与已证事实
     false_balance: fbal,
+    // [v6.8.19] 第 72 维度：逃避核验×把监督要求定性为人际猜疑
+    scrutiny_evasion: sev,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
