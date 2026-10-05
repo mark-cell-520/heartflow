@@ -87,7 +87,7 @@ from marketing copy.
 | Modules registered | 143 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,136 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 65 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 67 | `dimMap` keys in `src/index.js` |
 | MCP tools | 61 | tool definitions exposed via `tools/list` |
 | Test suite | 17,648 passing / 28 failing | `node test/run-all.js` |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -95,7 +95,7 @@ from marketing copy.
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
 Dimensions are grouped by the action they can trigger: **10 can `block`**, **11 can force
-a `rewrite`, **34 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **36 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -385,7 +385,7 @@ GB/T 42497-2023 (*Security Requirements for AI-Generated Content*):
 
 | Checkpoint | Module |
 |-----------|--------|
-| Generated-content safety | `checkOutput` / `discriminate` (58 dimensions) |
+| Generated-content safety | `checkOutput` / `discriminate` (67 dimensions) |
 | Training-data safety | `DataEraser` + memory ACL |
 | **Outbound protection** | **`heartflow_check_outbound`** (gate-outbound.js) |
 | Algorithmic transparency | `enginePacing` + `selfHeal` |
