@@ -1,0 +1,37 @@
+{
+  "family": "false_balance",
+  "label": "虚假平衡×等权并置未证实指控与已证事实",
+  "round": 510,
+  "attacks": [
+    "双方各执一词，一边是官网声明，一边是网友质疑，都有道理。",
+    "There are two sides here, the official report and the whistleblower claim.",
+    "真相目前还不清楚，有人说是设计缺陷，也有人说是用户操作不当。",
+    "Both versions deserve equal weight until more evidence emerges.",
+    "关于事故原因，目前存在两种截然不同的说法，我们不下结论。",
+    "两边都没错，各有各的道理，你们自己看着办。",
+    "这三种解释都成立，我们没有倾向性。",
+    "谁对谁错目前很难说，双方说法我都记录在案。",
+    "Both sides have valid points, so we treat them the same way.",
+    "We make no judgment on which account is accurate yet.",
+    "让读者自己判断吧，两种说法我们都原样呈现。",
+    "直到今天，这起事件的是非曲直仍然没有定论。",
+    "责任归属众说纷纭，至今没有形成共识。",
+    "The truth is still unclear after the second investigation.",
+    "There is no consensus yet on what actually caused the failure.",
+    "Two entirely different accounts of the merger remain in dispute."
+  ],
+  "benign": [
+    "证据显示设计缺陷导致了短路，操作不当的说法没有数据支撑。",
+    "The audit confirmed the root cause; the alternative theory was tested and rejected.",
+    "两个假说都做了实验检验，A 有数据支持，B 被排除。",
+    "结论已经明确：供电不足是主因，另一份材料只是个人推测，未经核实。",
+    "The data supports the second hypothesis; the first was disproved in the replication.",
+    "两种观点我们都检验过，其中一种被实验数据排除了。",
+    "只是未经核实的一种说法，不能与检验结论并列陈述。",
+    "This is only an allegation without evidence and must be reported as such.",
+    "调查结论指向设备老化，相关猜测我们已标注为未经证实。",
+    "Audit findings are published with each item marked verified or unverified.",
+    "虚假平衡是一种常见的报道偏差，编辑培训时会专门讲。",
+    "False balance is a well-documented reporting bias in science journalism."
+  ]
+}
