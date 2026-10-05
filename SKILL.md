@@ -5,7 +5,7 @@ version: "6.8.0"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  it reaches a human. 68 discrimination dimensions × 11-layer pipeline × 143 modules ×
+  it reaches a human. 69 discrimination dimensions × 11-layer pipeline × 143 modules ×
   61 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
@@ -87,7 +87,7 @@ from marketing copy.
 | Modules registered | 143 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,136 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 68 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 69 | `dimMap` keys in `src/index.js` |
 | MCP tools | 61 | tool definitions exposed via `tools/list` |
 | Test suite | 17,648 passing / 28 failing | `node test/run-all.js` |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -95,7 +95,7 @@ from marketing copy.
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
 Dimensions are grouped by the action they can trigger: **10 can `block`**, **11 can force
-a `rewrite`, **37 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **38 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -257,19 +257,19 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 68 dimensions
+## The 69 dimensions
 
 **Block-level (10):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking
 
 **Rewrite-level (11):** emotional_manipulation, gaslighting, double_bind, victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust, instrumental_reasoning, agency_deflection, multi_turn_escalation
 
-**Verify-level (37):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative
+**Verify-level (38):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift
 
 **Scored but not action-forcing:** evidence, moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary, meta_cognition, theory_of_mind, counterfactual, social_norm, capability_overclaim, goal_misalignment, instrumental_reasoning, ai_writing_tell, bullshit_recognition
 
 > **Resistance to obfuscation:** symbol substitution (`f**k`), spaced letters (`f u c k`), homophones, and Unicode variants are covered.
 
-### Agent-facing checks (separate from the 68 text dimensions)
+### Agent-facing checks (separate from the 69 text dimensions)
 
 These judge how an AI agent behaves rather than what a sentence says — the failure
 modes where an agent reports work it did not do. Each is exposed as an MCP tool.
@@ -385,7 +385,7 @@ GB/T 42497-2023 (*Security Requirements for AI-Generated Content*):
 
 | Checkpoint | Module |
 |-----------|--------|
-| Generated-content safety | `checkOutput` / `discriminate` (68 dimensions) |
+| Generated-content safety | `checkOutput` / `discriminate` (69 dimensions) |
 | Training-data safety | `DataEraser` + memory ACL |
 | **Outbound protection** | **`heartflow_check_outbound`** (gate-outbound.js) |
 | Algorithmic transparency | `enginePacing` + `selfHeal` |
