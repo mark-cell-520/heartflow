@@ -1,3 +1,92 @@
+# 第 480 轮（fallacies 补沉没成本「结果白做」新句式族 sunk_cost_nullified，真升级②）
+
+版本口径 v6.8.0 → v6.8.1（引擎新增 tag，末位号规则）。
+
+## 本轮候选来源（落盘）
+
+`bash /root/.hermes/scripts/heartflow-upgrade-scout.sh > /tmp/hf-scout-20261005-1145.txt`
+产出 4 条候选，A（agency_deflection）已在 479 轮上线故排除，B/C 是
+fallacies 下已有子路由的同族新句式缺口，D 是全新维度。
+
+decision 本体（scripts/round-480-decide.js）三候选打分：
+**B 0.80** > C 0.79 > A 0.77，confidence 0.7，identity_alignment 0.8。
+选 B = 给 fallacies 补 sunk_cost「结果白做」新句式族。
+
+## 复测证据（不信简报旧描述）
+
+`scripts/round-480-sunk-cost-probe.js --gate`（14 条攻击 + 8 条良性）：
+接线（改判据）**前**：14/14 攻击样本全部穿过硬闸门（11 条 gate=pass、
+3 条 gate=verify），fallacies 维度零命中；良性 0 误伤。
+→ 缺口真实存在，非描述夸大。
+
+## 改了什么（commit 7a482c4c，+26 行判据 + severity 注册）
+
+`src/index.js`：
+- **中文侧 9 支新判据**（FALLACY_PATTERNS.zh，tag `sunk_cost_nullified`）：
+   ① 投入量 × 停止动作 × 结果抹除词（等于全部白做/归零/徒劳）
+   ② 投入量 × 心血名词 × 等于 × 抹除词（覆盖"三年精力 = 心血全无意义"）
+   ③ 停止动作 × 等于 × 之前 × 全部 × 抹除词（投入动词后置形）
+   ④ 结局词压阵（"前功尽弃才是最大的浪费"，无投入量词）
+   ⑤ 被动归宿（"会变成沉没的代价"，动词必选）
+   ⑥ 停止动作后置 × 投入量 × 归零（"停下来三年投入就确定归零"）
+   ⑦ 走到这一步 × 退出 × 徒劳
+   ⑧ 无路可退 × 对不起最初投入
+- **英文侧 8 支新判据**（FALLACY_PATTERNS.en，同 tag）：
+   poured too much to walk away / backing out at this stage would waste /
+   stopping now would render ... meaningless / we have come too far to give
+   up halfway / waste of everything if we abandoned / too much riding on
+   this to pull the plug / giving up now would undo all the work。
+- `FALLACY_SEVERITY` 注册 `sunk_cost_nullified: 0.45`。
+
+## 接线效果（同探针实测）
+
+接线后：**15/15 攻击样本命中本族 tag**（14 条中 1 条复测样本补充），
+15/15 不再 pass（gate 全部 verify）；10 条良性（含"这已是沉没成本，
+应当忽略"这类**正确运用该概念的良性句**）**0 误伤**。
+
+## 本轮给引擎新增的辨别能力（真升级②）
+
+fallacies 维度新增「结果白做」句式族——识别「停下 = 已投入的全部白做 /
+归零 / 无意义」这一攻击话术。它与同族原有四形的区别：攻击点从
+"惋惜可惜"换成"结果抹除"，用沉没量反过来威胁止损者。此前该族零覆盖。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node --check src/index.js` | ✅ |
+| `node bin/verify.js` | ✅ 14/14 |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（与基线逐项一致，零新增） |
+| `node test/round-480-sunk-cost-nullified.test.js`（新） | ✅ 6 项断言（15 攻击全命中 / 10 良性 0 误报 / gate 不 pass / severity 注册 / **删条变异承重** / 还原健康） |
+| `node test/fallacies-slogan-verdict-round82.test.js` | ✅ 92/92（无回归） |
+| `node test/multi-turn-sunk-cost-round93.test.js` | ⚠️ 12 passed / **1 failed**——**HEAD 版本复测同样失败，历史遗留非本轮引入** |
+| `node test/security-audit.test.js` | ✅ 16/16 |
+| `node scripts/sync-doc-numbers.js` | ✅ 三文档一致（rewrite 11 / tests 17648 / v6.8.0） |
+
+## 环境阻塞说明
+
+cgroup 余量 197MB < 700MB 阈值（本容器上限 4GiB，gateway 常驻 630MB），
+内存守卫三次 BLOCKED → **未跑 run-all 全量**，按纪律改用分层单文件测试。
+`data/test-count.json` 仍自锁 failed=28（上一次超时中断留下的缓存），
+doc-numbers-accuracy 的 test-count 分支需一次干净的 run-all 才能解锁。
+
+## 给下一轮的接手说明
+
+1. **内存优先**：`bash /root/.hermes/scripts/heartflow-mem-guard.sh` 输出 OK
+   再跑 run-all；BLOCKED 就继续单文件。干净的 run-all 会把 test-count.json
+   刷成 failed=0，同时解锁 doc-numbers。
+2. **遗留 test 失败**：`test/multi-turn-sunk-cost-round93.test.js` 的
+   couple:pure-escalation-not-qualifies 一项在 HEAD 即失败，属历史遗留。
+   样本是"这一步迈过去，后面自然就顺理成章了"被 qualify——纯升级话术
+   无索取层却命中，可查 multi-turn-tactics 的 qualify 契约。
+3. **候选池**（同一次 scout 落盘未做的）：
+   C = fallacies 补 appeal_to_tradition「大家都这样」形（3/4 穿过）；
+   D = 第 60 维度 complexity_shield「你不懂所以别问」族（4/4 穿过，
+   全新维度，dimMap 加键即可）。
+4. 轮末 UPGRADE_LOG 顶部写本轮记录，别让接力断。
+
+---
+
 # 第 479 轮（第 59 维度 agency_deflection 责任转嫁抽象系统接线上线，3 commits）
 
 ## 补记说明
