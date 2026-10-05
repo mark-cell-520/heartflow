@@ -1131,6 +1131,8 @@ function discriminate(text, evidence = [], contentMode) {
       bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
       phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
       reward_hacking: rh,
+      // [v6.8.0] 第 58 维度：基数隐藏的比例断言
+      statistical_misleading: sm,
       // [v6.7.84] 补登记：indirect_injection 此前算过、findings 也推过，
       // 却从未进 dimensions/summary（守卫 dimension-registry-guard 抓出）
       indirect_injection: ii,
