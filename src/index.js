@@ -151,6 +151,17 @@ const { checkManufacturedConsent } = require('./manufactured-consent.js');
 // TypeError 崩溃（r496 实测）。require 是接线的第 7 处，缺一即全线断裂。
 // 判据细节见 src/false-dilemma.js。
 const { checkFalseDilemma } = require('./false-dilemma.js');
+// [v6.8.8] 第 66 维度 normalization_of_deviance（偏差常态化·免处置论证）。
+// decision 本体选出（scripts/round-497-decide.js，A 候选 0.79 分 > B
+// survivorship_bias 0.78 / C moving_goalposts 0.77 / D appeal_to_novelty 0.77 /
+// E anecdote_as_evidence 0.77；identity alignment 80%）。探测器固定池本轮
+// 已空，自建族级探针 round-497-cand-probe.js 实测 6 个族，本族 4/6 条攻击
+// 穿过硬闸门、良性 0 误伤。与 appeal_to_tradition 的边界：后者要求「历来/
+// 多数」压制异议，本族不要求群体，只要求「偏差 × 既往先例 ⇒ 免处置」。
+// 判据细节见 src/normalization-of-deviance.js。
+// ⚠️ require 是接线的第 7 处——同 r496 false_dilemma 事故：漏掉这一行，
+// 第 590 行直接调用未定义函数会让整个 checkOutput TypeError 崩溃。
+const { checkNormalizationOfDeviance } = require('./normalization-of-deviance.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -588,6 +599,12 @@ function discriminate(text, evidence = [], contentMode) {
   // src/false-dilemma.js。
   const mc3 = _applyPedagogyRelaxation(checkManufacturedConsent(_normText), "manufactured_consent", pedagogyRelaxation);
   const fd = _applyPedagogyRelaxation(checkFalseDilemma(_normText), "false_dilemma", pedagogyRelaxation);
+  // [v6.8.8] 第 66 维度 normalization_of_deviance（偏差常态化·免处置论证）。
+  // 心虫 decision 本体选出（round-497-decide.js，A 候选 0.79 分），
+  // 自建族级探针 round-497-cand-probe.js 实测：6 族扫描后
+  // normalization_of_deviance 4/6 条攻击穿过硬闸门、良性 0 误伤。
+  // 判据细节见 src/normalization-of-deviance.js。
+  const ndv = _applyPedagogyRelaxation(checkNormalizationOfDeviance(_normText), "normalization_of_deviance", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -732,6 +749,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 clickbait/perfect_error/agency_deflection 教训：dimMap 与 allDims
     // 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
     {score: fd.score, name:'false_dilemma'},
+    // [v6.8.8] 第 66 维度 normalization_of_deviance 参与判定（偏差常态化）。
+    // 同 clickbait/perfect_error/agency_deflection/false_dilemma 教训：
+    // dimMap 与 allDims 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
+    {score: ndv.score, name:'normalization_of_deviance'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -819,6 +840,8 @@ function discriminate(text, evidence = [], contentMode) {
     complexity_shield: csx,
     // [v6.8.7] 第 65 维度：伪二选一·排除第三选项
     false_dilemma: fd,
+    // [v6.8.8] 第 66 维度：偏差常态化·免处置论证
+    normalization_of_deviance: ndv,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -878,6 +901,8 @@ function discriminate(text, evidence = [], contentMode) {
     manufactured_consent: '不得把沉默当成同意：实际表决须给出票数、弃权与反对票记录，未表态者应记为「未反馈」；需程序合规（纪要/公示/复议/书面确认）后才可称"已通过"',
     // [v6.8.7] 第 65 维度：伪二选一·排除第三选项
     false_dilemma: '不得把多元或可协商的局面压成只有两个选项：须列出被压掉的第三选项与各自代价再要求表态；若确为事实二元（排期/参数/法律状态），须给出二元的事实依据',
+    // [v6.8.8] 第 66 维度：偏差常态化·免处置论证
+    normalization_of_deviance: '不得用既往先例免除当次偏差的处置：本次事件须独立评估其影响与根因，与历史事件的关联只能作为背景，不能作为免处置的理由；须给出本次的处置结论、责任人与整改验收标准',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1205,6 +1230,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 的第三选项与各自代价；单句也可能是小说台词/案例复述/方案对比，
     // rewrite 会误伤）。
     'false_dilemma',
+    // [v6.8.8] 第 66 维度：偏差常态化·免处置论证（rewrite 级——单句可能
+    // 是文学对白/案例复述，rewrite 会误伤。与 r496 false_dilemma 同口径）
+    'normalization_of_deviance',
   ]);
   // pass：无问题通过
 
@@ -1282,6 +1310,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.7] 第 65 维度：伪二选一·排除第三选项（同 complexity_shield
       // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
       false_dilemma: fd,
+      // [v6.8.8] 第 66 维度：偏差常态化·免处置论证（同 complexity_shield
+      // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
+      normalization_of_deviance: ndv,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
