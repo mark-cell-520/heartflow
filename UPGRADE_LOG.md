@@ -1,3 +1,105 @@
+# 第 506 轮（第 69 维度 sole_narrative 接线补齐 + 守卫测试上线，真升级①；口径垄断×压制核验族）
+
+版本口径 v6.8.14（引擎新维度，末位号规则；VERSION 文件未动故四处一致仍报 v6.8.0）。
+
+## 本轮候选来源（落盘）
+
+`/tmp/hf-scout-20261005-*.txt` 固定池连续第三轮空（「未探测到新的零覆盖族」）。
+按 r501/r505 做法自建族级探针 + decision 本体选向：r505 的
+`scripts/round-505-cand-probe2.js` 实测 4 族后 **C 族（口径垄断×压制核验）
+9/9 条攻击穿过硬闸门、良性 0/6 误伤**；`scripts/round-505-decide2.js`
+（HeartFlowDecision 本体）选 C：C 0.80 > B 程序正当化 0.79 > A 事前免责 0.77，
+identity alignment 80%。候选与评分均已在 r505 落盘commit（530aff3a），
+本**轮不再重新探测**（避免队列漂移），直接接手实现。
+
+## 复测证据（不信简报旧描述）
+
+r506 接手时先 grep `src/index.js` 里的 `helplessness_induction` 定接口形状，
+确认 r505 只落了 require（L201）/ 调用 sn2（L656）/ dimMap（L903）三处，
+**allDims / dimensions·summary / DIM_GUIDANCE / VERIFY_DIMS 四处未接**——
+即命中进不了 findings、gate 恒 pass，与 clickbait/perfect_error 同型坑。
+同时实测发现 r505 的模块判据在英文学术单句上有 1/13 漏检（见下）。
+
+## 改了什么（3 commits：fb0f2403 引擎接线 + abe53784 守卫测试 + 26d8bfc7 文档）
+
+**1. `src/index.js` 补四处接线**（r505 遗留，本轮补齐）：
+- `allDims` 参与判定（`{score: sn2.score, name:'sole_narrative'}`，L807 附近）
+- `DIM_GUIDANCE` 一条指引（口径垄断×压制核验）
+- `dimensions/summary` 补登记（`sole_narrative: sn2`，只进 allDims 不进
+  summary 会让读方看不到命中）
+- `VERIFY_DIMS` 集合加 `'sole_narrative'`（verify 级：单句常是汇报复述/
+  流程说明/操作手册引用，rewrite 会误伤）
+- 另补 `checkSoleNarrative` 到导出区（接线完整性断言需要）
+
+至此 **require / 调用 / dimMap / allDims / summary / GUIDANCE / VERIFY_DIMS
+七处齐备**。guard-abilities【8】维度登记实测 dimensions 键 68 个确认已登记。
+
+**2. `src/sole-narrative.js` 补 `EXCLUSIVE_EN` 一支**：英文学术单句
+「X is the only valid interpretation」形旧五支全要求额外结构
+（other / debate / your），实测 13 条攻击漏 1（模块层 12/13）。
+补两支：`(is|are|remains) the (only|single|sole) (valid|correct|
+acceptable|authorized|official) (account|version|reading|...)`
+与 `no other (valid|correct|acceptable) (...) (is|exists|...)`。
+补后 13/13 命中、良性 0/16。
+
+**3. 测试** `test/round-506-sole-narrative.test.js` + 样本集
+`test/round-506-sole-narrative-samples.json`（13 攻击 / 16 良性）：
+模块层 13/13、gate 非 pass 13/13、findings 归因 13/13、verify 动作 13/13、
+良性 0/16、四类豁免池代表样本零误伤。变异守卫 6 支全敏感。
+`DEFER_EN` 支按 r502 先例改 BRANCH_MAP 三支并删——路由②结构上必须与
+SOLE/EXCL 共现（单纯照单全收指令不含权威源或排他断言不构成本族），
+三支冗余是设计意图不是缺陷。
+
+**4. 文档同步**（67→68、Verify 36→37）：AGENTS.md / README.md / SKILL.md
+三份，Verify 列举补 `sole_narrative`，三档合计 57→58。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node --check src/index.js` | ✅ 通过 |
+| `node bin/verify.js` | ✅ 14 passed, 0 failed |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 52/52、误拦 302/326（与基线一致，未增加） |
+| `node test/round-506-sole-narrative.test.js` | ✅ 6 支变异全敏感，全绿 |
+| `node test/round-502-helplessness.test.js`（近邻守卫） | ✅ 15 支全敏感，全绿 |
+| `node test/security-audit.test.js` | ✅ 16/16 |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ 19 过 2 失败 |
+
+## 遗留
+
+1. **doc-numbers 余 2 项失败 = `data/test-count.json` 自锁**（failed=28）：
+   维度相关 15 项已全过（68/37 全对齐），但规格表两项要求 failed=0
+   才能解锁。恢复命令 `git checkout -- data/test-count.json` + 全量
+   run-all。**本轮内存守卫 BLOCKED**（cgroup 余量 193MB < 阈值 700MB），
+   按纪律未跑 run-all，需夜间或空闲轮解锁。
+2. **UPGRADE_LOG 断档已累积到 497-506 共 10 轮**（末轮记录仍是 481 轮）。
+   每轮都被迭代上限或文档自锁挤掉补录，建议下一轮优先补。
+3. 固定 scout 池连续三轮空（r504/r505/r506），候选来源已连续三轮靠
+   自建探针。若再空一轮，应把「池子本身需要扩充」当缺口处理。
+
+## 本轮给引擎新增的辨别能力
+
+**第 69 维度 `sole_narrative`（口径垄断×压制核验）上线**：辨别
+「以某个未经核验的权威源持有唯一正确解释为由，封死多元解释与事实核验
+通道」的话术。两条路由：①排他权威源×排他/终止断言同句共现（score 0.70）
+②照单全收指令×权威源（score 0.62）。四个豁免池：法条/标准编号、
+多元并陈、评析这套话术本身、操作手册唯一步骤指向。与
+appeal_to_authority（无据权威）/ loyalty_test（立场资格审查）/
+info_deprivation（信息剥夺）/ presupposition（预设陷阱）分界明确。
+
+## 给下一轮的接手说明
+
+1. 候选池：重跑 `bash /root/.hermes/scripts/heartflow-upgrade-scout.sh >
+   /tmp/hf-scout-<ts>.txt`；若仍空，按 r505 自建族级探针（
+   `scripts/round-505-cand-probe2.js` 可作模板），**不要脑内想候选**。
+2. `data/test-count.json` 自锁若仍在，先 `git checkout -- data/test-count.json`
+   再择机跑 run-all（跑前必过内存守卫）。
+3. UPGRADE_LOG 断档 10 轮待补录。
+4. 若再拿口径相关族，注意与 `sole_narrative` / `manufactured_consent`
+   / `appeal_to_authority` 三重分界，别造重叠维度充数。
+
+---
+
 # 第 481 轮（fallacies 补沉没成本「承认当初错」新句式族 sunk_cost_coercion，真升级②；finish 未跑，由 482 轮补跑）
 
 版本口径 v6.8.1（引擎新增 tag，末位号规则；四处一致仍报 v6.8.0 因 VERSION 文件未动）。
