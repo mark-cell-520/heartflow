@@ -182,12 +182,23 @@ const { checkLoyaltyTest } = require('./loyalty-test.js');
 // 探测器固定池已空，沿用 r493 落盘候选池，复测探针
 // scripts/round-501-helplessness-probe.js 扩样实测
 // **16/18 攻击穿过硬闸门（gate=pass）**，缺口真实存在。
+// [v6.8.10] 第 68 维度：无助感植入×行动劝阻（模块 src/helplessness-induction.js）：
+// 把「行动无效」归因于受话人无法撼动的权力结构，从而劝阻任何努力。
 // 与 agency_deflection 的边界：后者管责任推诿（谁负责），本族落点是
 // 「你的行动注定无效」，劝阻对象是受话人本人；与 info_deprivation 的分界：
 // 后者管信息缺口，本族给的是结论性绝望而非信息缺失。
 // 判据细节见 src/helplessness-induction.js。
 // ⚠️ require 是接线的第 1 处——必须早于下方调用，否则 TypeError 全线崩。
 const { checkHelplessnessInduction } = require('./helplessness-induction.js');
+// [v6.8.14] 第 69 维度：口径垄断×压制核验（模块 src/sole-narrative.js）：
+// 以未经核验的权威源持有「唯一正确解释」为由，封死多元解释与事实核验。
+// 与 appeal_to_authority 的边界：后者管无据权威（落点是「谁说的」不可考），
+// 本族落点是「排他性」——权威源可能真实存在，但其断言被要求无条件接受
+// 且不接受核验；与 loyalty_test 的分界：后者管立场资格审查，本族管
+// 解释权的单方面剥夺。
+// 判据细节见 src/sole-narrative.js。
+// ⚠️ require 同样是接线的第 1 处，必须早于下方调用。
+const { checkSoleNarrative } = require('./sole-narrative.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -637,6 +648,12 @@ function discriminate(text, evidence = [], contentMode) {
   // [v6.8.10] 第 68 维度 helplessness_induction（无助感植入×行动劝阻）。
   // 模块层实测：攻击 18/18 命中、良性 0/16 误伤（round-502 复测）。
   const hi = _applyPedagogyRelaxation(checkHelplessnessInduction(_normText), "helplessness_induction", pedagogyRelaxation);
+  // [v6.8.14] 第 69 维度 sole_narrative（口径垄断×压制核验）。
+  // 心虫 decision 本体选出（scripts/round-505-decide2.js，C 候选 0.80 分），
+  // 自建族级探针 scripts/round-505-cand-probe2.js 实测：
+  // 4 族扫描后本族 9/9 条攻击穿过硬闸门、良性 0/6 误伤。
+  // 判据细节见 src/sole-narrative.js。
+  const sn2 = _applyPedagogyRelaxation(checkSoleNarrative(_normText), "sole_narrative", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -882,6 +899,8 @@ function discriminate(text, evidence = [], contentMode) {
     loyalty_test: lt,
     // [v6.8.10] 第 68 维度：无助感植入×行动劝阻
     helplessness_induction: hi,
+    // [v6.8.14] 第 69 维度：口径垄断×压制核验
+    sole_narrative: sn2,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
