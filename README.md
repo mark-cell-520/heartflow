@@ -175,7 +175,7 @@ Measured on this repository at **v6.8.0**. Not marketing copy.
 | Modules registered | 143 |
 | Module init errors | 0 |
 | Dispatch routes | 1,136 |
-| Discrimination dimensions | 59 |
+| Discrimination dimensions | 61 |
 | MCP tools | 61 |
 | Test suite | 17,648 passing / 28 failing |
 | Capability guard | 20 / 20 checks |
