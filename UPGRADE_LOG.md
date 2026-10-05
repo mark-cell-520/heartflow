@@ -1,3 +1,74 @@
+# 第 481 轮（fallacies 补沉没成本「承认当初错」新句式族 sunk_cost_coercion，真升级②；finish 未跑，由 482 轮补跑）
+
+版本口径 v6.8.1（引擎新增 tag，末位号规则；四处一致仍报 v6.8.0 因 VERSION 文件未动）。
+
+## 本轮候选来源（落盘）
+
+`/tmp/hf-scout-20261005-r481.txt`（heartflow-upgrade-scout.sh 产出 4 条候选）。
+decision 本体（scripts/round-481-decide.js）四候选打分：
+**B 0.80** > C 0.79 > A 0.78 > D 0.77，identity_alignment 0.80。
+选 B = fallacies 补沉没成本「承认当初错」新句式族。
+补充判据：A 已在 479 轮上线、B 与 480 轮 sunk_cost_nullified 必须零重叠、
+D 工作量约为 C 的 2.5 倍。
+
+## 复测证据（不信简报旧描述）
+
+`scripts/round-481-sunk-cost-probe.js` 直调 gate 实测接线**前**：
+自建 10 条攻击样本（scout 5 + 扩展 5）+ 4 条一致性压力形，共 14 条；
+**4 条穿过硬闸门**（其余被 sunk_cost_fallacy / perfect_error 等兜住，
+说明是族级漏判不是全漏）；8 条良性 0 误伤。缺口真实存在且与
+nullified 零重叠。
+
+## 改了什么（2 commits：241ce23e 引擎 + 44291370 测试，零删除零改动既有判据）
+
+`src/index.js` 新增 tag `sunk_cost_coercion`：
+- **中文 13 支**：停下=承认之前错了 / 停下=说明一开始坚持毫无意义 /
+  继续走下去至少证明当初决定没错（一致性压力形）/ 停下=向所有人承认 /
+  不投入=没担当·不爱·不信任（压力转译形）/ 沉没量已成事实×只能继续 /
+  沉没量×不许止损（无显式停止动词）/ 投入名词后置形。
+- **英文 13 支**：stop now + admit earlier judgment wrong / concede the
+  bet was wrong / would forfeit the years we already put / stopping means
+  we were wrong / all we did was in vain if we stop（含倒装形）。
+- `FALLACY_SEVERITY` 注册 `sunk_cost_coercion: 0.45`。
+
+与 `sunk_cost_nullified` 的本质区别：压力落点从「过去白做」换成
+**「停下=承认当初判断错」**，用一致性自尊压力而非损失陈述挡住止损。
+测试里加了分界断言锁住这条界线。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node --check src/index.js` | ✅ |
+| `node bin/verify.js` | ✅ 14/14 |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（与基线逐项一致，零新增） |
+| `test/round-481-sunk-cost-coercion.test.js`（新） | ✅ 18 攻击全命中 / 10 良性 0 误报 / nullified 分界 / 删条变异承重 / 还原健康 |
+| `test/round-480-sunk-cost-nullified.test.js` | ✅ 15/15 无回归 |
+| `test/fallacies-slogan-verdict-round82.test.js` | ✅ 92/92 |
+| `test/security-audit.test.js` | ✅ 16/16 |
+| `node scripts/sync-doc-numbers.js` | ✅ 三文档一致（维度 58 / 测试 17648 通过 / v6.8.0） |
+
+写测试时发现并修了 2 处初版判据缺口（负例驱动，非口头修补）：
+「不肯继续投入」否定投入动词变体、英文倒装形。
+
+## 遗留（481 轮未闭环，482 轮接手）
+
+1. `run-all` 全量未跑（环境阻塞）：内存守卫两次 BLOCKED（余量 171–180MB
+   < 700MB 阈值），按纪律改单文件分层测试。`data/test-count.json` 仍自锁
+   failed=28，需一次干净全量才能解锁 doc-numbers 的 test-count 分支。
+2. `upgrade-engine.js finish` 未跑：**482 轮第一件事补跑**。
+3. 1 项失败：`test/multi-turn-sunk-cost-round93.test.js` 12 passed /
+   1 failed（couple:pure-escalation-not-qualifies）。480 轮已用
+   `git show HEAD` 复测确认非本轮引入；本轮未重做 HEAD 对照，
+   新判据全部只挂 sunk_cost_coercion / sunk_cost_nullified tag、
+   与 multi-turn 的 qualify 契约无交集，判定与上轮一致，仍需复核确认。
+4. 未 push：2 个 commit 在本地 master（241ce23e、44291370）。
+5. 同次 scout 候选池还剩 **C：appeal_to_tradition「历来如此/多数如此」
+   族（3/4 穿过，未上线过）** 和 **D：第 60 维度 complexity_shield
+   「你不懂所以别问」（4/4 穿过，全新维度）**——优先 C，端到端更快。
+
+---
+
 # 第 480 轮（fallacies 补沉没成本「结果白做」新句式族 sunk_cost_nullified，真升级②）
 
 版本口径 v6.8.0 → v6.8.1（引擎新增 tag，末位号规则）。
