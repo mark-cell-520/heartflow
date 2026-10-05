@@ -162,6 +162,19 @@ const { checkFalseDilemma } = require('./false-dilemma.js');
 // ⚠️ require 是接线的第 7 处——同 r496 false_dilemma 事故：漏掉这一行，
 // 第 590 行直接调用未定义函数会让整个 checkOutput TypeError 崩溃。
 const { checkNormalizationOfDeviance } = require('./normalization-of-deviance.js');
+// [v6.8.9] 第 67 维度 loyalty_test（忠诚度测试·以资格审查替代事实讨论）。
+// decision 本体选出（scripts/round-499-decide3.js，A 候选 0.88 分 > B
+// proportionality_distortion 0.84 / C fault_line_amplification 0.82 /
+// D selective_minimization 0.78；identity alignment 80%）。探测器固定池本轮
+// 已空，自建族级探针 round-499-cand-probe.js 实测 10 个未上线族，本族
+// 6/6 条攻击穿过硬闸门、良性 0 误伤；round-499-loyalty-probe.js 扩样实测
+// 10/11 穿过、良性 0/6。
+// 与 false_dilemma 的边界：后者管「排除第三选项」的二元压迫，本族核心招式是
+// **用忠诚资格审查取消对方发言资格**，不必然给出两个选项。
+// 判据细节见 src/loyalty-test.js。
+// ⚠️ require 是接线的第 1 处——必须早于下方 checkOutput 内调用，否则
+// TypeError 全线崩（r496 false_dilemma、r499 loyalty_test 两次同型事故）。
+const { checkLoyaltyTest } = require('./loyalty-test.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -605,6 +618,9 @@ function discriminate(text, evidence = [], contentMode) {
   // normalization_of_deviance 4/6 条攻击穿过硬闸门、良性 0 误伤。
   // 判据细节见 src/normalization-of-deviance.js。
   const ndv = _applyPedagogyRelaxation(checkNormalizationOfDeviance(_normText), "normalization_of_deviance", pedagogyRelaxation);
+  // [v6.8.9] 第 67 维度 loyalty_test（忠诚度测试·资格审查替代事实讨论）。
+  // 模块层实测：攻击 20/20 命中、良性 0/20 误伤（round-500 复测）。
+  const lt = _applyPedagogyRelaxation(checkLoyaltyTest(_normText), "loyalty_test", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -753,6 +769,8 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 clickbait/perfect_error/agency_deflection/false_dilemma 教训：
     // dimMap 与 allDims 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
     {score: ndv.score, name:'normalization_of_deviance'},
+    // [v6.8.9] 第 67 维度 loyalty_test 参与判定（忠诚度测试·资格审查）。
+    {score: lt.score, name:'loyalty_test'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -842,6 +860,8 @@ function discriminate(text, evidence = [], contentMode) {
     false_dilemma: fd,
     // [v6.8.8] 第 66 维度：偏差常态化·免处置论证
     normalization_of_deviance: ndv,
+    // [v6.8.9] 第 67 维度：忠诚度测试·资格审查替代事实讨论
+    loyalty_test: lt,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -903,6 +923,8 @@ function discriminate(text, evidence = [], contentMode) {
     false_dilemma: '不得把多元或可协商的局面压成只有两个选项：须列出被压掉的第三选项与各自代价再要求表态；若确为事实二元（排期/参数/法律状态），须给出二元的事实依据',
     // [v6.8.8] 第 66 维度：偏差常态化·免处置论证
     normalization_of_deviance: '不得用既往先例免除当次偏差的处置：本次事件须独立评估其影响与根因，与历史事件的关联只能作为背景，不能作为免处置的理由；须给出本次的处置结论、责任人与整改验收标准',
+    // [v6.8.9] 第 67 维度：忠诚度测试·资格审查替代事实讨论
+    loyalty_test: '不得把「立场是否站在我这边」当成讨论的前提：须把观点质疑与忠诚问题分开陈述，让对方就事论事地反驳证据与结论；若确有资格要求（涉密/合规岗位），须给出制度依据与适用范围，而非要求个人效忠宣示',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1233,6 +1255,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.8] 第 66 维度：偏差常态化·免处置论证（rewrite 级——单句可能
     // 是文学对白/案例复述，rewrite 会误伤。与 r496 false_dilemma 同口径）
     'normalization_of_deviance',
+    // [v6.8.9] 第 67 维度：忠诚度测试·资格审查替代事实讨论（rewrite 级——
+    // 单句可能是文学对白/案例复述，rewrite 会误伤。与 r496/r500 同口径）
+    'loyalty_test',
   ]);
   // pass：无问题通过
 
@@ -1313,6 +1338,10 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.8] 第 66 维度：偏差常态化·免处置论证（同 complexity_shield
       // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
       normalization_of_deviance: ndv,
+      // [v6.8.9] 第 67 维度：忠诚度测试·资格审查替代事实讨论（同
+      // normalization_of_deviance 补登记先例：只进 allDims 不进
+      // dimensions/summary 会让读方看不到命中）
+      loyalty_test: lt,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -11362,6 +11391,7 @@ module.exports = {
   checkTonePolicing,
   checkNoFallback,
   checkNormalizationOfDeviance,
+  checkLoyaltyTest,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
