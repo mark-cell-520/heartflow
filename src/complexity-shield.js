@@ -46,15 +46,17 @@ const COMPLEX_ZH = /(?:太|非常|极其|特别|相当|很|颇)?(?:复杂|专业
 
 // 英文：complex / highly technical / deep theoretical issue /
 // beyond ordinary investors ... 边界同上。
-const COMPLEX_EN = /\b(?:too|highly|extremely|very|rather|quite)\s+(?:complex|complicated|technical|sophisticated|intricate|advanced)|(?:highly\s+)?(?:complex|technical)\s+(?:issue|topic|subject|matter|question)|(?:deep|profound)\s+(?:theoretical|technical)\s+(?:issue|question|problem|matter)|(?:technical|specialist)\s+(?:barriers?\s+to\s+entry|knowledge|details)|beyond\s+(?:the\s+)?(?:understanding|comprehension|grasp)\s+of|(?:ordinary|average|normal|regular)\s+(?:investors?|people|users?|persons?|folks?)\s+(?:cannot|could\s+not|can'?t|can\s+not)\s+(?:understand|comprehend|grasp|follow)|(?:cannot|could\s+not|can'?t|can\s+not)\s+be\s+(?:understood|comprehended|grasped)\s+(?:easily|readily|quickly)|(?:requires?|takes?)\s+(?:years|decades)\s+of\s+(?:specialist|technical|professional|advanced)\s+(?:training|study|expertise)/i;
+const COMPLEX_EN = /\b(?:too|highly|extremely|very|rather|quite)\s+(?:complex|complicated|technical|sophisticated|intricate|advanced)|(?:highly\s+)?(?:complex|technical)\s+(?:issue|topic|subject|matter|question)|(?:deep|profound)\s+(?:theoretical|technical)\s+(?:issue|question|problem|matter)|(?:technical|specialist)\s+(?:barriers?\s+to\s+entry|knowledge|details)|beyond\s+(?:the\s+)?(?:understanding|comprehension|grasp)\s+of|(?:ordinary|average|normal|regular)\s+(?:investors?|people|users?|persons?|folks?)\s+(?:cannot|could\s+not|can'?t|can\s+not)\s+(?:understand|comprehend|grasp|follow)|(?:cannot|could\s+not|can'?t|can\s+not)\s+be\s+(?:understood|comprehended|grasped)\s+(?:easily|readily|quickly)|(?:requires?|takes?)\s+(?:years|decades)\s+of\s+(?:specialist|technical|professional|advanced)\s+(?:training|study|expertise)|\btoo\s+(?:technical|complex|complicated|sophisticated|intricate|advanced)\s+(?:for|to)\s+(?:you|your\s+(?:level|understanding|mind)|the\s+(?:ordinary|average|lay))/i;
 
 // ─── C2a: 理解力否定（对方或泛指主体学不会/听不懂） ──────────
 // 中文：你/你们/以你的水平/普通人 + 理解不了/听不懂/看不明白。
 // 边界：否定**自己**理解力（我还没看懂）不判，见 C2 主语限制。
-const INCOMPREHENSIBLE_ZH = /(?:你|你们|以你(?:的)?(?:水平|程度|学历|认知|智商|脑子|能力)|一般人|普通人|外行|门外汉|非专业)(?:是)?(?:不可能|无法|不能|没法|难以|理解|懂|明白|看懂|听懂|领会)不了?|(?:你|你们)(?:是)?(?:听不懂|听不明白|看不明白|理解不了|弄不懂|搞不懂|不会懂|不可能懂)|(?:理解|听懂|看懂|弄懂|搞懂)不了|说(?:了)?你(?:也)?(?:听不懂|不明白|不理解|不懂)|以(?:你|你们)(?:的)?(?:水平|认知|智商|脑子)(?:是)?(?:理解|听懂|看懂|弄懂|搞懂)不了/;
+const INCOMPREHENSIBLE_ZH = /(?:你|你们|以你(?:的)?(?:水平|程度|学历|认知|智商|脑子|能力)|一般人|普通人|普通人等|外行|门外汉|非专业|普通(?:投资者|人|用户|消费者))(?:是|根本|压根儿|压根|也)?(?:不可能|无法|不能|没法|难以|不一定)(?:理解|懂|明白|看懂|听懂|领会)(?:得了)?的?|(?:你|你们)(?:是)?(?:听不懂|听不明白|看不明白|理解不了|弄不懂|搞不懂|不会懂|不可能懂)|(?:理解|听懂|看懂|弄懂|搞懂)不了|说(?:了)?你(?:也)?(?:听不懂|不明白|不理解|不懂)|以(?:你|你们)(?:的)?(?:水平|认知|智商|脑子)(?:是)?(?:理解|听懂|看懂|弄懂|搞懂)不了|(?:你|你们)(?:也|是)?(?:弄|搞|听|看)?不懂/;
 
-// 英文：you would not understand / beyond your level / you cannot comprehend
-const INCOMPREHENSIBLE_EN = /\byou\s+(?:would\s+not|wouldn'?t|will\s+not|won'?t|cannot|can'?t|could\s+not|couldn'?t)\s+(?:understand|comprehend|grasp|follow|appreciate|get)\b|\byou\s+(?:are|'re)\s+(?:not\s+)?(?:smart|qualified|equipped|trained)\s+enough\s+to\s+(?:understand|comprehend|grasp|follow)|\bbeyond\s+your\s+(?:level|understanding|comprehension|grasp|paygrade|ken)\b|\babove\s+your\s+(?:level|paygrade|understanding)\b|\byou\s+(?:lack|don'?t\s+have)\s+the\s+(?:background|training|expertise|knowledge)\s+to\s+(?:understand|comprehend|grasp|follow)/i;
+// 英文：you would not understand / beyond your level /
+// 以及「泛指主体不可能理解」与「太复杂到不是你所能理解」(这两类单独即命中，
+// 与 C2a 同权：否定理解力本身就是本族攻击形状，不要求第二人称在场)。
+const INCOMPREHENSIBLE_EN = /\byou\s+(?:would\s+not|wouldn'?t|will\s+not|won'?t|cannot|can'?t|could\s+not|couldn'?t)\s+(?:understand|comprehend|grasp|follow|appreciate|get)\b|\byou\s+(?:are|'re)\s+(?:not\s+)?(?:smart|qualified|equipped|trained)\s+enough\s+to\s+(?:understand|comprehend|grasp|follow)|\bbeyond\s+your\s+(?:level|understanding|comprehension|grasp|paygrade|ken)\b|\babove\s+your\s+(?:level|paygrade|understanding)\b|\byou\s+(?:lack|don'?t\s+have)\s+the\s+(?:background|training|expertise|knowledge)\s+to\s+(?:understand|comprehend|grasp|follow)|\b(?:ordinary|average|normal|regular|lay|individual|retail|small)\s+(?:investors?|people|users?|persons?|folks?|consumers?|shareholders?|bulls?|humans?)\s+(?:cannot|could\s+not|can'?t|can\s+not|will\s+not|won'?t|are\s+unable\s+to|are\s+not\s+able\s+to|would\s+not|wouldn'?t)\s+(?:understand|comprehend|grasp|follow|figure\s+out|make\s+sense\s+of)|\b(?:cannot|could\s+not|can'?t|can\s+not)\s+be\s+(?:comprehended|understood|grasped)\s+by\s+(?:ordinary|average|normal|regular|lay)|\btoo\s+(?:complex|complicated|technical|sophisticated|intricate|advanced|subtle)\s+(?:for|to)\s+(?:you|your\s+(?:level|understanding|mind|head)|the\s+(?:ordinary|average|lay)|anyone|them)\b/i;
 
 // ─── C2b: 免解释指令（用复杂性换来「别问/照做」） ──────────
 // 中文：别问了/不要再问/照做就行/相信我们就行/不需要知道为什么。
@@ -62,7 +64,9 @@ const INCOMPREHENSIBLE_EN = /\byou\s+(?:would\s+not|wouldn'?t|will\s+not|won'?t|
 const NO_EXPLAIN_ZH = /(?:别|不要|不用|不必|甭)(?:再?)?(?:问|追问|深究|打听|了解|操心)|(?:照做|照办|听话|执行)(?:就)?(?:行|好|对)|(?:相信|信任|交给)我们(?:就)?(?:行|好|对|没错)?|(?:不需要|不必|无须|不用)(?:知道|了解|明白|懂)(?:为什么|其中原理|原理|细节|太多)|(?:知道|了解)(?:太多|那么细|那么深)(?:对你|对你们)?(?:没|也)?有?好处|(?:不好奇|好奇心)(?:太强|别那么|不要那么)|(?:执行|照做)(?:就|即)?可，?不?要?问/;
 
 // 英文：just trust us / do as you are told / don't ask questions
-const NO_EXPLAIN_EN = /\b(?:just\s+)?(?:trust|believe|follow)\s+(?:us|me|them|the\s+(?:experts?|process|system|model|algorithm))\b|\bdo\s+(?:as|what)\s+(?:you\s+are|you'?re)\s+told\b|\bdon'?t\s+(?:ask|question)\b|\bno\s+(?:need|point)\s+(?:to|in)\s+(?:ask|know|understand)|\byou\s+(?:don'?t|do\s+not)\s+need\s+to\s+(?:know|understand|ask)\b|\bstop\s+asking\b|\btake\s+(?:it|this|that)\s+on\s+faith\b|\bjust\s+(?:do\s+)?as\s+(?:you'?re|you\s+are)\s+told\b/i;
+// 边界：`trust the process`／`believe in yourself` 这类宾语不是「我方/权威」
+// 的习语单独出现不判（那是正当表述），须带 just 或宾语指向 us/them/权威。
+const NO_EXPLAIN_EN = /\bjust\s+(?:trust|believe|follow)\s+(?:us|me|them|the\s+(?:experts?|process|system|model|algorithm))\b|\b(?:trust|believe|follow)\s+(?:us|me|them)\b|\bdo\s+(?:as|what)\s+(?:you\s+are|you'?re)\s+told\b|\bdon'?t\s+(?:ask|question)\b|\bno\s+(?:need|point)\s+(?:to|in)\s+(?:ask|know|understand)|\byou\s+(?:don'?t|do\s+not)\s+need\s+to\s+(?:know|understand|ask)\b|\bstop\s+asking\b|\btake\s+(?:it|this|that)\s+on\s+faith\b|\bjust\s+(?:do\s+)?as\s+(?:you'?re|you\s+are)\s+told\b/i;
 
 // ─── 豁免：句中给出可理解的解释路径或透明承诺 ─────────────────
 // 判据边界：出现「我分步解释/让我说明/白皮书公开/欢迎审计」这类把解释权
