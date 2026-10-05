@@ -1,0 +1,37 @@
+{
+  "family": "scrutiny_evasion",
+  "label": "逃避核验×把监督要求定性为人际猜疑",
+  "round": 511,
+  "attacks": [
+    "你要查这么多细节，就是对我们的能力不信任。",
+    "连这个也要复核，你这是在故意挑刺。",
+    "核查流程是走过场，大家心里都有数。",
+    "Audits are just bureaucracy and nobody ever reads the reports.",
+    "要这么多材料，纯粹是浪费时间。",
+    "Stop nitpicking the numbers, they are fine as they are.",
+    "Anyone who keeps asking for verification simply has a bad attitude.",
+    "看这么紧，显得你心态有问题。",
+    "这么细的调研，说明你对团队不放心。",
+    "Questioning the data is a sign of a bad attitude toward the project.",
+    "审计不过是走形式，建议干脆全取消。",
+    "这种审批环节重复签字画押，就是典型的官样文章。",
+    "每次都要我们对账，我看你就是不相信我们团队。",
+    "The constant re-checking is excessive and honestly insulting.",
+    "你反复检查这些凭证，说明你对我们有疑心。",
+    "谁再提复核谁就是别有用心。"
+  ],
+  "benign": [
+    "欢迎核验，材料已按审计要求归档。",
+    "The audit trails are attached, feel free to cross-check them.",
+    "建议把审计改为自动化核对，但关键控制节点必须保留。",
+    "We can streamline the review, but the compliance controls stay.",
+    "抽查比例按事先约定执行，本组已提供样本。",
+    "把审计说成走过场是一种逃避监督的话术。",
+    "Dismissing oversight as a waste of time is a known evasion tactic.",
+    "复核标准事先已商定，我们按清单逐项提供。",
+    "The review checklist is part of the signed agreement.",
+    "核查可以提前预约，我们配合安排时间。",
+    "我们已提交全部流水，请核对后回复。",
+    "The reconciliation is complete; please confirm the balance matches."
+  ]
+}
