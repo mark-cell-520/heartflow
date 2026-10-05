@@ -69,9 +69,12 @@ const ACHIEVED_ZH = new RegExp(
   '|(?:按|照)(?:约定|约定好的|说好的|说定|谈定|谈好|先前定好|双方确认)' +
   '(?:把|将)?(?:X|功能|东西|模块|需求|任务|代码|方案)?' +
   '(?:写|说|讲|弄|搞|做)?(?:的)?(?:做|写|改|修|交|交付)(?:完|好)(?:了)?' +
-  // [v6.8.15 r507 补支] "标准本来写的你能达到"式（原有标准明文可满足）
-  '|(?:标准|要求|门槛)(?:本来|原本|写|规定)(?:的)?(?:你|你们|他|她)?' +
-  '(?:能|可以|能够)?(?:达到|满足|够|完成)'
+  // [v6.8.16 r508 补支] "验收标准本来写的你能达到"式（原有标准明文可满足）
+  '|(?:验收)?(?:标准|要求|门槛|条件)(?:本来|原本|原先|当初|写|规定)?' +
+  '(?:的)?(?:写|说|规定)?(?:的)?(?:你|你们|他|她)?(?:能|可以|能够)?(?:达到|满足|够|完成)' +
+  // [v6.8.16 r508 补支] "你三轮改完了"式——数量词前置的口语达成确认
+  '|(?:你|你们)?(?:都|全)?(?:这|那|三|两|几|多|\\d+)?(?:轮|次|遍|回|趟)(?:都|已经)?' +
+  '(?:改|修|做|写|讲|说)(?:完|好)(?:了)?'
 );
 
 // 英文：met / hit / satisfied / fulfilled the (already) agreed target。
@@ -84,7 +87,10 @@ const ACHIEVED_EN = new RegExp(
   "(?:requirement|target|goal|criteria|bar|standard)s?\\b" +
   "|\\bfine\\b,?\\s+\\byou\\s+(?:finished|completed|met|delivered)\\b" +
   "|\\bby\\s+(?:the|our|that)\\s+(?:agreed|original|stated|previous)\\s+" +
-  "(?:standard|criteria|bar|goal)s?\\b",
+  "(?:standard|criteria|bar|goal)s?\\b" +
+  // [v6.8.16 r508 补支] pass/cleared a round（形式上是达成确认，勿与位移要件混置）
+  "|\\byou\\s+(?:cleared|passed)\\s+(?:the|that|every)\\s+(?:\\w+\\s+){0,3}" +
+  "(?:round|stage|gate|review)s?\\b",
   'i'
 );
 
@@ -122,7 +128,8 @@ const SHIFT_ZH = new RegExp(
 // [v6.8.15 r507 补支] 反过来否定原有标准本身（"那个标准定得太低了"）
 '|(?:那个|原先|原来|既有|此前|约定)(?:的)?(?:标准|门槛|标杆|基准|考纲)(?:定(?:得)?|设(?:得)?)(?:太)?(?:低|松|宽松|容易|低啦|太低)' +
 // [v6.8.15 r507 补支二] 单方面换算法/口径（"用新的一套算"）
-'|(?:用|按|改按)(?:新|另一套|另外一套|不同)(?:的)?(?:一套|套)(?:标准|口径|算法|规则|算法|指标)(?:来)?(?:算|计算|衡量|考核|评估)' +
+'|(?:用|按|改按)(?:新|另一套|另外一套|不同)(?:的)?(?:一套|套)' +
+'(?:标准|口径|算法|规则|指标)?(?:来)?(?:算|计算|衡量|考核|评估)' +
 // [v6.8.15 r507 补支二] 事后把成果驳回（"还得再改"）
 '|(?:还|仍|依旧|依然|再)(?:得|需要|要|应该|必须)(?:再)?(?:改|修|补|打磨|完善|调整|返工)' +
 // [v6.8.15 r507 补支二] 考核项/门槛刚提高（"bar just went up"）
@@ -147,8 +154,10 @@ const SHIFT_EN = new RegExp(
   // [v6.8.15 r507 补支二] 要求已变/门槛刚涨（"requirements have since changed"）
   "|\\b(?:the\\s+)?(?:requirements?|criteria|standard|bar|target|expectations?)\\s+" +
   "(?:has|have)\\s+(?:since|already|just|now)\\s+(?:changed|moved|been\\s+raised|gone\\s+up|shifted)\\b" +
-  "|\\bthe\\s+(?:bar|standard|target|expectation)s?\\s+" +
-  "(?:just|has\\s+just|recently|simply)?\\s*(?:went|goes|has\\s+gone)\\s+up\\b" +
+  "|\\b(?:the\\s+)?(?:bar|standard|target|expectation|threshold)s?\\s+" +
+  "(?:for\\s+(?:this|that|the)\\s+\\w+\\s+)?" +
+  "(?:just|has\\s+just|recently|simply|now)?\\s*" +
+  "(?:went|goes|has\\s+gone|is\\s+going)\\s+up\\b" +
   "|\\b(?:the\\s+)?(?:old|previous|former|original)\\s+(?:numbers?|figures?|metrics?|targets?|indicators?)\\s+" +
   "(?:are|is)\\s+(?:no\\s+longer\\s+)?(?:valid|in\\s+effect|used|counted)\\b" +
   "|\\b(?:we|they)\\s+(?:now\\s+)?count\\s+(?:it|that|them)\\s+(?:differently|by\\s+new\\s+rules)\\b" +
@@ -164,7 +173,6 @@ const SHIFT_EN = new RegExp(
   // [v6.8.15 r507 补支] pass/cleared a round + bar raised
   "|\\bhe\\s+(?:satisfied|met|met\\s+every|fulfilled)\\s+every\\s+" +
   "(?:requirement|criteria?|expectation)s?\\b" +
-  "|\\byou\\s+(?:cleared|passed)\\s+(?:the|that|every)\\s+(?:round|stage|gate|review)\\b" +
   "|\\bsatisfied\\s+every\\s+(?:requirement|criteria)s?\\b",
   'i'
 );
