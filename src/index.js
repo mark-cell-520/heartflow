@@ -199,6 +199,15 @@ const { checkHelplessnessInduction } = require('./helplessness-induction.js');
 // 判据细节见 src/sole-narrative.js。
 // ⚠️ require 同样是接线的第 1 处，必须早于下方调用。
 const { checkSoleNarrative } = require('./sole-narrative.js');
+// [v6.8.15] 第 70 维度：事后加码×验收标准位移（模块 src/self-imposed-standard-shift.js）：
+// 受话人已达成事先约定的标准后，要求方不承认结果，而是把标准临时抬到别处，
+// 使已达标的成果持续作废、义务永不结题（moving the goalposts）。
+// 与 concession_coercion 的边界：后者管让步胁迫（要对方先认错再谈），
+// 本族落点是「标准被事后移动」，对方并无让步动作；与 false_urgency 的分界：
+// 后者制造时间窗，本族制造持续压力且不依赖时间窗。
+// 判据细节见 src/self-imposed-standard-shift.js。
+// ⚠️ require 同样是接线的第 1 处，必须早于下方调用。
+const { checkStandardShift } = require('./self-imposed-standard-shift.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -654,6 +663,13 @@ function discriminate(text, evidence = [], contentMode) {
   // 4 族扫描后本族 9/9 条攻击穿过硬闸门、良性 0/6 误伤。
   // 判据细节见 src/sole-narrative.js。
   const sn2 = _applyPedagogyRelaxation(checkSoleNarrative(_normText), "sole_narrative", pedagogyRelaxation);
+  // [v6.8.15] 第 70 维度 standard_shift（事后加码×移动验收标准）。
+  // 心虫 decision 本体选出（scripts/round-507-decide3.js，C 候选 0.80 分），
+  // 自建族级探针 scripts/round-507-cand-probe.js + 归因探针
+  // scripts/round-507-attrib-probe.js 实测：9/9 条攻击穿过硬闸门且
+  // 逐条归因零维度命中（本次复测中唯一零覆盖族），良性 0/6 误伤。
+  // 判据细节见 src/self-imposed-standard-shift.js。
+  const stsh = _applyPedagogyRelaxation(checkStandardShift(_normText), "standard_shift", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -810,6 +826,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 helplessness_induction 先例：dimMap 与 allDims 必须两处都接，
     // 否则命中永远进不了 findings、gate 恒 pass。
     {score: sn2.score, name:'sole_narrative'},
+    // [v6.8.15] 第 70 维度 standard_shift 参与判定（事后加码×移动验收标准）。
+    // 同 sole_narrative 先例：dimMap 与 allDims 必须两处都接，
+    // 否则命中永远进不了 findings、gate 恒 pass。
+    {score: stsh.score, name:'standard_shift'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -905,6 +925,8 @@ function discriminate(text, evidence = [], contentMode) {
     helplessness_induction: hi,
     // [v6.8.14] 第 69 维度：口径垄断×压制核验
     sole_narrative: sn2,
+    // [v6.8.15] 第 70 维度：事后加码×移动验收标准
+    standard_shift: stsh,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -972,6 +994,8 @@ function discriminate(text, evidence = [], contentMode) {
     helplessness_induction: '不得把「行动注定无效」归因于受话人无法撼动的权力结构：须把结构约束（可核实的具体条件）与行动价值分开陈述；确有约束时给出替代路径与申诉渠道，而非宣称努力没有意义',
     // [v6.8.14] 第 69 维度：口径垄断×压制核验
     sole_narrative: '不得把某一方未经核验的口径抬升为「唯一正确解释」并要求照单全收：须列出可核验的多方依据与分歧点；若确有唯一权威源（法规/标准/技术规范），须给出编号与适用范围，而非宣布讨论到此为止',
+    // [v6.8.15] 第 70 维度：事后加码×移动验收标准
+    standard_shift: '不得在对方已达成事先约定的验收标准后，把标准临时抬到别处以驳回已达标的成果：须回溯并引用事先书面约定的验收标准与达成记录；若标准确需调整，应说明变更理由、生效时点并经双方确认，而非以「还能更好」「情况变了」使义务永不结题',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1311,6 +1335,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.14] 第 69 维度：口径垄断×压制核验（verify 级——单句可能是
     // 工作汇报复述/流程说明/操作手册引用，rewrite 会误伤。与 r500/r503 同口径）
     'sole_narrative',
+    // [v6.8.15] 第 70 维度：事后加码×移动验收标准（verify 级——单句可能是
+    // 项目管理复述/文学对白/历史评价转述，rewrite 会误伤。与 r500/r503/r506 同口径）
+    'standard_shift',
   ]);
   // pass：无问题通过
 
@@ -1401,6 +1428,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.14] 第 69 维度：口径垄断×压制核验（同 helplessness_induction
       // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
       sole_narrative: sn2,
+      // [v6.8.15] 第 70 维度：事后加码×移动验收标准（同 sole_narrative
+      // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
+      standard_shift: stsh,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -11453,6 +11483,7 @@ module.exports = {
   checkLoyaltyTest,
   checkHelplessnessInduction,
   checkSoleNarrative,
+  checkStandardShift,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
