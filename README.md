@@ -7,7 +7,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 57 discrimination dimensions  ×  11-layer pipeline  ×  143 modules  ×  61 MCP tools
-×  1,136 dispatch routes  ×  17,323 tests  ×  0 runtime dependencies
+×  1,136 dispatch routes  ×  17,323 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -168,7 +168,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.7.124**. Not marketing copy.
+Measured on this repository at **v6.8.0**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -177,7 +177,7 @@ Measured on this repository at **v6.7.124**. Not marketing copy.
 | Dispatch routes | 1,136 |
 | Discrimination dimensions | 57 |
 | MCP tools | 61 |
-| Test suite | 17,316 passing / 77 failing |
+| Test suite | 17,323 passing / 0 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
@@ -294,6 +294,7 @@ Known limits:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.0 | 2026-10-05 | **A version number that says what shipped, not what was attempted.** The 6.7 line ran 124 patch releases over 472 automated rounds; the user-facing truth is that it delivered **four** new discrimination capabilities — `reward_hacking` switched on (16 documented evasion tactics, of which every pre-existing dimension caught 2), `instrumental_reasoning` covered in Chinese, the remaining six DSec reward-hacking tactics, and those six classes finally working on the Chinese side — plus ~120 releases whose whole job was keeping those four true (52/52 recall baseline, ≤302/326 benign baseline, 61-tool MCP contract, 1,136-route table). This release re-numbers the line to stop the patch count from implying capability growth it did not have, and states the four openly in the version policy table above. Shipment evidence, measured not asserted: 57 dimensions / 143 modules / 61 MCP tools / 1,136 routes / 17,323 tests / 0 runtime dependencies, `guard-abilities` 20/20, `verify.js` 14/14, bidirectional recall 52/52 with benign 302/326. Also fixed in this release: two README dimension counters still read 50 after the 57-dimension expansion, and a documentation self-lock — `data/test-count.json` carried 46 failures forward through three `chore(auto)` commits, so `doc-numbers-accuracy` threw its recovery command (`git checkout -- data/test-count.json`) at a value that the checkout itself restored, making the lock permanent. The lock is cleared here; the recovery command was left untouched because it is correct whenever the file is clean. |
 | 6.7.124 | 2026-09-27 | **`victim_blaming` could not recognize behavior-attribution sentences on either side — the family open since round 99.** Re-measured rather than assumed: zh 4/8, en 2/8, all `gate action=pass`. Root cause — all 47 existing criteria demand either "victim wording + a defect/deserved-it positive form" or one of the narrow English one-liners, so a sentence that merely attributes the outcome to the victim's own behavior had no channel at all. Eleven criteria added: five Chinese (`谁让/谁叫+consequence`, `consequence+只能怪自己` with a system-subject negative lookahead, `活该+consequence`, `早提醒+aftermath-denial`, `谁叫+后果自负`) and six English (third-person `should have known better`, `brought this on X-self`, `it takes two to tango`, `reaping what X sowed`, `made her bed/lie in it`, `he had it coming`, plus a causation form). Guardrails are measurable: the second Chinese family carries a 24-word system-subject lookahead — without it three benign retrospective sentences (吃亏只能怪容量规划 / 被骗只能怪风控 / 出事只能怪监控阈值) turned red, and with it all eleven attacks still fire. Recall 52/52, benign 300/326 zero new, 5313 passing. Two boundaries are recorded as accepted, not hidden: a team retrospective that blames 自己 and an English engineering self-deprecation sentence are formally identical to victim-blaming; the measured benign pool contains neither shape. The negative guard runs needle-exact injection (12 branches), 11 turn red and 1 has a fallback — a fallback means the sample is still caught by another branch, so it is booked honestly rather than counted as a real guard. |
 | 6.7.124 | 2026-09-24 | **Six new reward-hacking classes were added in English only — the Chinese side could not catch any of the samples.** Round 23 added the remaining six paper tactics (ioctl extent, fd swap, mirror scan, proxy fetch, package install, unbounded output) with Chinese class names and English patterns; a 15-sample probe found **5 of 15 blocked**. The cause is the same shape as three earlier gaps: the patterns demanded precise co-occurrence of rare phrases (protected + fd + dup2 + copy), so natural phrasings such as “换一个文件描述符重新打开” had no “protected” anywhere in them and slipped through. Judgements were re-aligned with the older classes' structure — **action + object + intent signal**, not exact phrases — and one ordering inversion was added for “不加长度限制地写入”, which puts the limiter before the verb. Before: 5/15 blocked. After: **14/15** (the remaining one is `verify`, which the rulebook does not count as a miss). Benign controls 0/15 falsely blocked, recall 52/52 and benign 301/326 unchanged. Note for future edits: this repo carries two same-named arrays (`REWARD_HACKING_ZH` at line 167, `REWARD_HACKING_EN` at 328) and a naive last-match insert lands in the English table — which is how two rounds of this work silently did nothing on the Chinese side. |
 | 6.7.122 | 2026-09-24 | **A restart could silently kill every upgrade round for 40 minutes.** Found while auditing whether the cron jobs were healthy: the gateway restarted at 16:07 (exit code 1, revived by the service manager at 16:16:43), a cron tick fired at 16:16:50, the preamble took the lock — and then the process was caught in the restart. The lock survived, the round produced nothing, and **every subsequent round hit “lock held by cron” until the 40-minute staleness fallback finally fired.** The lock was physically tied to a process lifetime that no longer existed. Lock files now record the holder's PID, and a lock whose holder is dead (`process.kill(pid, 0)` raises ESRCH) is taken over **immediately** instead of after 40 minutes; exit/SIGINT/SIGTERM hooks release it on the normal path too. Verified against four negative cases: a live holder is never stolen, a dead holder is taken over at age 0.0 min, and the two legacy no-PID shapes stay conservative (<40 min don't steal, >40 min do). 40 minutes of silent blindness → effectively zero. |
