@@ -1,3 +1,87 @@
+# 第 455 轮（hate_speech 中文驱逐族补具名地域群体主语 + 被动驱逐形，2 commits）
+
+## 方向选择（decision 本体 3 候选）
+
+`scripts/round-455-decide.js`：**A 0.88** > B 0.87 > C 0.74，confidence 0.9。
+A = 修 hate_speech 中文驱逐族缺口；B = 补 r446 ②b 反向 locator；C = 工程债。
+
+**init 体检额外线索（复测坐实为真）：** 轮初 `git diff src/index.js` 残留
+-1 行，被删的正是 r428 驱逐族第一支正则（工作区误删未提交）。已用
+`git checkout -- src/index.js` 恢复（不改动内容，恢复 HEAD 版本）。恢复后
+复测确认真实缺口不在那一支，而在下列两形。
+
+## 复测证据（不信简报旧描述）
+
+`scripts/round-455-expulsion-reprobe.js` + `round-455-branch-attribute2.js`
+（脚本内联样本；本簿子只写形状与数字）：
+
+| 形状 | 复测结果 |
+|---|---|
+| 具名地域群体做主语 + 否定许可动词 + 空间动词 | 攻击 4/4 gate 全 pass（漏判） |
+| 泛指群体名词 +「必须被/该被」+ 驱逐动词 | 攻击 3/3 gate 全 pass（漏判） |
+| r428 既有四形（泛称人称 + 族群/群体） | 6/6 仍 block（无回归） |
+| 良性池 15 条 | hate_speech 0 命中 |
+
+根因：原有四形主语表全是「泛称人称 + 族群/群体」**组合**，
+「外地人不能踏进我们的地盘」这类**直接用具名地域群体开句**的形、
+以及「那个族群必须被驱逐」这类**无否定许可动词的被动驱逐**形，
+落在所有既有支的缝隙里（`round-455-branch-attribute3/4.js` 逐支归因：
+51 支里无一支命中这些样本）。
+
+## 改了什么
+
+**`src/index.js`**（commit c0fb46b4，+10 行注释与正则，零删除零改动既有判据）
+- 第五形：具名地域群体主语（外地人/本地人/城里人/乡下人/农村人/
+  北方人/南方人/外来人/外乡人/外来人口/外来人员）× 否定许可动词
+  × 空间动词。`severity: 0.9`，与同族一致。
+- 第六形：泛指群体名词（这个/那个/这些/那些/这类/那类/某些 + 族群/
+  群体/民族/种/类/人种）× 量化词 ×（必须|该|应该|应当|要|理应）×
+  「被?驱逐/赶走/赶出去/撵走/清出去/清除出去」。
+
+设计边界沿用同族口径：① 不收裸名词主语（避免打到「这个方案」）；
+② 空间动词必选（中性停留句不命中）；③ 未新增词表，复用既有驱逐动词表。
+
+**`test/round-455-hate-speech-zh-expulsion-variants.test.js`**（commit 5ba94025）
+**34 断言全绿**：A 形 4 条攻击命中+block、B 形 3 条攻击命中+block、
+良性 15 条 0 命中、**两支反向删条变异**（删 A 形 → A 攻击漏判 ≥3 且 B 形
+不误伤；删 B 形 → B 攻击漏判 ≥1）、变异后恢复健康检查。
+（B 支删条只需 miss≥1：另有一条 B 样本被第六形之外的既有支兜住，
+这是覆盖冗余而非缺陷，故断言按实测收紧。）
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| `node --check src/index.js` | ✅ |
+| `node bin/verify.js` | ✅ **14/14** |
+| `scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（与基线逐项一致，零新增） |
+| `test/security-audit.test.js` | ✅ **16/16** |
+| `test/round-428-hate-speech-zh-expulsion.test.js` | ✅ 36/36（无回归） |
+| `test/round-455-hate-speech-zh-expulsion-variants.test.js` | ✅ **34/34** |
+| `test/doc-numbers-accuracy.test.js` | ⚠️ 19/21（2 失败 = `data/test-count.json` 残留 `testFailed: 77` 自锁链，见遗留 1） |
+| `node test/run-all.js` | 后台 pid 214439 跑至第 230/约 250 文件，日志 `/tmp/run-all-r455.log` |
+
+## 遗留
+
+1. **doc-numbers 2 个失败仍未清**：根因是 r449 已定位的自锁链——缓存
+   `data/test-count.json` 里 `testFailed: 77` 脏值。本轮 run-all 正在
+   重跑刷新缓存，跑完应自行恢复；下一轮复测确认。
+2. **run-all 完整结果**：需下一轮确认是否只有 `npm-package-integrity`
+   1 个预期失败。
+3. **r446 守卫验证闭环**（B 候选，0.87 仅次 A）：②b 同位支反向删条
+   locator 仍未补，删掉 ②b 正则无测试变红。
+4. **UPGRADE_LOG r448/r449/r450/r452 断档**：工程债。
+5. **157 个未跟踪探针脚本**与 `INCIDENT-2026-10-04-env-freeze.md`。
+
+## 给下一轮的接手说明
+
+顺序：① 确认 `/tmp/run-all-r455.log` 尾部计数与缓存刷新 →
+② 重跑 doc-numbers 确认自锁已断 → ③ 补 r446 ②b 反向 locator 守卫
+（decision 0.87，指数仅次于本轮 A）→ ④ 跑 finish。
+
+铁律：本轮只在 HATE_SPEECH_ZH **末尾追加两支**，未动任何既有正则
+与词表；双向门禁误拦 302/326 零新增证明没有搭便车放宽。
+
 # 第 451 轮（钩子裸词形已限定安全设施赦免支 + r449 否决闸补守卫，2 commits）
 
 ## 方向选择
