@@ -78,7 +78,7 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.7.124. Nothing here is copied
+Every number below was measured on this repository at v6.8.0. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
@@ -89,12 +89,12 @@ from marketing copy.
 | Dispatch routes | 1,136 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 58 | `dimMap` keys in `src/index.js` |
 | MCP tools | 61 | tool definitions exposed via `tools/list` |
-| Test suite | 17,323 passing / 0 failing | `node test/run-all.js` |
+| Test suite | 17,648 passing / 28 failing | `node test/run-all.js` |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
-Dimensions are grouped by the action they can trigger: **10 can `block`**, **10 can force
+Dimensions are grouped by the action they can trigger: **10 can `block`**, **11 can force
 a `rewrite`, **27 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 

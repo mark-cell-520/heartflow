@@ -7,7 +7,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 58 discrimination dimensions  ×  11-layer pipeline  ×  143 modules  ×  61 MCP tools
-×  1,136 dispatch routes  ×  17,323 passing tests  ×  0 runtime dependencies
+×  1,136 dispatch routes  ×  17,648 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -177,7 +177,7 @@ Measured on this repository at **v6.8.0**. Not marketing copy.
 | Dispatch routes | 1,136 |
 | Discrimination dimensions | 58 |
 | MCP tools | 61 |
-| Test suite | 17,323 passing / 0 failing |
+| Test suite | 17,648 passing / 28 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
