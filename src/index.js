@@ -3927,6 +3927,13 @@ const EMPTY_NUMERIC_ZH = /(?:\d+(?:\.\d+)?\s*(?:%|倍|天|小时|分钟|ms|秒|�
 // 不收裸 will —— "I will look into it" 仍是空答，应继续被拦。
 const EMPTY_CONVERGE_EN = /\b(?:I|we)(?:'ll|\s+will|\s+shall)\s+(?:use|add|run|fix|clear|replace|set|apply|write|build|move|switch|raise|lower|increase|decrease|check|verify|retry|shard|split|merge|upgrade|pin|mock|stub|cache|rebuild|re-run|rerun|index|disable|enable|remove|delete|roll back|scale)\b|\bso\s+(?:I|we)\s*(?:will|'ll|shall)\b/i;
 const EMPTY_NUMERIC_EN = /\b\d+(?:\.\d+)?\s*(?:%|ms|s|x|times|hours?|minutes?|seconds?|days?|weeks?|months?|years?|percent|requests?|errors?|rows?|nodes?|bytes?|qps|rps|kb|mb|gb|tb)\b/i;
+// [v6.7.146 r463] 循环重述支专用的英文「给出修复动作」赦免式。
+// 与 EMPTY_CONVERGE_EN（r447 套话支赦免）分开，因为套话支赦免里的动词表
+// 是按「I/we will <verb>」第一人称承诺形状写的，收不到工程句里
+// 常见的**非人称修复描述**（the fix is to … / we can … / the first run）。
+// 实测（scripts/round-463-amnesty-cand.js）：本式赦免良性 1/15、攻击误赦 0/10；
+// 与 EMPTY_NUMERIC_EN 组合后良性残留 0/15、攻击仍 10/10。
+const EMPTY_CIRCULAR_FIX_EN = /\bthe fix (?:is|was) to\b|\bthe fix\b|\bwe can (?:drop|move|raise|lower|switch|shard|batch|add|remove|scale|replace|pin|upgrade|disable|enable|roll back)\b|\bso (?:I|we)\b|\bfirst run\b/i;
 // [v6.7.124 r417] 循环重述型空答的判据常量（解释半把主词换个说法再说一遍）
 // 形状：**被解释项与解释项字面同词** —— 「X 的原因是 X」「关键在于关键」。
 // 轮初实测（scripts/round-417-circular-probe.js）：本族攻击 1/10
@@ -3995,8 +4002,18 @@ function _emptyCircularEnTest(text) {
     const wordsB = (after.match(/[a-z]{3,}/gi) || []).filter(w => !EMPTY_CIRCULAR_EN_STOP.has(w.toLowerCase()));
     for (const a of wordsA) {
       for (const b of wordsB) {
+        // [v6.7.146 r460] 移除「同形不算 → continue」。
+        // 复测坐实（scripts/round-460-en-circular-diag2.js）：r431 落盘时
+        // 这条跳过假设「循环重述 = 词形不同的同词干」，而英文循环重述恰恰是
+        // **字面同词**复现（"It is slow because it is slow"）。两者叠加导致
+        // because 两侧任何真实同词都被 continue、任何词干同形又被 stop 表
+        // 吃掉（the/issue/problem 全在表内）→ 全族 0 命中（run-all 实测
+        // 0/7，round-417 断言 hit 10 < 16）。
+        // 中文支 EMPTY_CIRCULAR_ZH 的 \\1 回引用本来就要求字面同词，
+        // 英文支此前与中文支口径不一致，本调整为对齐两侧口径。
+        // 误伤面维持：stop 词表与「无收敛/无数值」豁免不变，
+        // 良性池 15 条去掉同形跳过后实测仍 0 命中。
         const sa = _emptyCircularEnStem(a), sb = _emptyCircularEnStem(b);
-        if (a.toLowerCase() === b.toLowerCase()) continue; // 同形不算
         if (sa === sb) return true; // 词干同、词形不同
         const [lo, hi] = sa.length <= sb.length ? [sa, sb] : [sb, sa];
         if (lo.length >= 3 && hi.startsWith(lo)) return true; // fail/failure
@@ -4060,6 +4077,26 @@ function checkEmptyAnswer(text) {
     const circular = hasChinese ? EMPTY_CIRCULAR_ZH.test(text) : _emptyCircularEnTest(text);
     if (circular && !EMPTY_CONVERGE_ZH.test(text) && !EMPTY_NUMERIC_ZH.test(text)) {
       empties.push({ pattern: 'circular_restate', matched: text.slice(0, 30), count: 1 });
+    }
+  }
+  // ── [v6.7.146 r463] 循环重述支的英文收敛/数值赦免（补 r460 自引入误伤）─
+  // r460 移除「同形不算」后，攻击从 0/10 提到 10/10，但同时把一句
+  // **良性工程句**拖进命中（gate=verify）：该句 because 前后确实同词干
+  // （slow … slow），但后半立刻给出「the fix is to move …」的修复动作。
+  // 根因是**架构性不对称**（与 r447 修的套话支不对称同源）：
+  //   r447 的赦免只挂在 EMPTY_ANSWER_PATTERNS.en 套话命中的分支上，
+  //   而循环支闸门用的是 EMPTY_CONVERGE_ZH / EMPTY_NUMERIC_ZH —— 中文正则，
+  //   在纯英文文本上恒 false → 英文循环支从未有过赦免通道。
+  // 良性与攻击的分界（沿用本族既有的「无收敛/无数值」口径）：
+  //   良性解释总会给出 ① 具体修复动作（the fix is to … / we can … /
+  //   the first run）或 ② 数值基线（240ms / 3 replicas / 16GB / 10k rows）；
+  //   攻击句（同词复现）两者都不含 —— 实测 10 条攻击 0 条命中赦免式。
+  // 本赦免只作用于循环支命中的情形，且只在非中文侧生效；
+  // 中文支继续走原有 ZH 口径，不动 26 轮建立的 zh 基线。
+  if (empties.length > 0 && !hasChinese) {
+    const onlyCircular = empties.length === 1 && empties[0].pattern === 'circular_restate';
+    if (onlyCircular && (EMPTY_CIRCULAR_FIX_EN.test(text) || EMPTY_NUMERIC_EN.test(text))) {
+      empties.length = 0;
     }
   }
   const count = empties.length;
