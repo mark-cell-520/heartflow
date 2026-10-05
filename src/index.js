@@ -208,6 +208,15 @@ const { checkSoleNarrative } = require('./sole-narrative.js');
 // 判据细节见 src/self-imposed-standard-shift.js。
 // ⚠️ require 同样是接线的第 1 处，必须早于下方调用。
 const { checkStandardShift } = require('./self-imposed-standard-shift.js');
+// [v6.8.17] 第 71 维度：虚假平衡×等权并置未证实指控与已证事实
+// （模块 src/false-balance.js）：把证据强度不等的两方并列为「两种说法/
+// 各执一词/都有道理」，用对称表述抹平已证与未证的差别，使未证实指控
+// 搭上已证事实的可信度便车。
+// 与 sole_narrative 的边界：后者管口径垄断（只许一种解释），本族落点
+// 相反——制造表面上对等的两种说法；与 false_equivalence 的分界：后者
+// 管两类事物的错误类比，本族不引入类比对象而是并置同一议题的两份材料。
+// ⚠️ require 同样是接线的第 1 处，必须早于下方调用。
+const { checkFalseBalance } = require('./false-balance.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -670,6 +679,14 @@ function discriminate(text, evidence = [], contentMode) {
   // 逐条归因零维度命中（本次复测中唯一零覆盖族），良性 0/6 误伤。
   // 判据细节见 src/self-imposed-standard-shift.js。
   const stsh = _applyPedagogyRelaxation(checkStandardShift(_normText), "standard_shift", pedagogyRelaxation);
+  // [v6.8.17] 第 71 维度 false_balance（虚假平衡×等权并置未证实指控与已证事实）。
+  // 心虫 decision 本体选出（脚本 /root/.hermes/cache/scratch/hf-r510-decide.js，
+  // C 候选 0.78 > A motive_attribution 0.77 > B burden_inversion 0.77），
+  // 自建族级探针 .hf-r509-extprobe.js 实测 4/5 穿过硬闸门且零维度命中
+  // （唯一非 pass 来自 vagueness(20) 属既有维度独立行为），良性 0/6 误伤；
+  // r510 复测（hf-r510-verify.js）确认缺口仍在，模块层 16/16 命中。
+  // 判据细节见 src/false-balance.js。
+  const fbal = _applyPedagogyRelaxation(checkFalseBalance(_normText), "false_balance", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -830,6 +847,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 sole_narrative 先例：dimMap 与 allDims 必须两处都接，
     // 否则命中永远进不了 findings、gate 恒 pass。
     {score: stsh.score, name:'standard_shift'},
+    // [v6.8.17] 第 71 维度 false_balance 参与判定（虚假平衡×等权并列）。
+    // 同 sole_narrative 先例：dimMap 与 allDims 必须两处都接，
+    // 否则命中永远进不了 findings、gate 恒 pass。
+    {score: fbal.score, name:'false_balance'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -927,6 +948,8 @@ function discriminate(text, evidence = [], contentMode) {
     sole_narrative: sn2,
     // [v6.8.15] 第 70 维度：事后加码×移动验收标准
     standard_shift: stsh,
+    // [v6.8.17] 第 71 维度：虚假平衡×等权并置未证实指控与已证事实
+    false_balance: fbal,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -996,6 +1019,8 @@ function discriminate(text, evidence = [], contentMode) {
     sole_narrative: '不得把某一方未经核验的口径抬升为「唯一正确解释」并要求照单全收：须列出可核验的多方依据与分歧点；若确有唯一权威源（法规/标准/技术规范），须给出编号与适用范围，而非宣布讨论到此为止',
     // [v6.8.15] 第 70 维度：事后加码×移动验收标准
     standard_shift: '不得在对方已达成事先约定的验收标准后，把标准临时抬到别处以驳回已达标的成果：须回溯并引用事先书面约定的验收标准与达成记录；若标准确需调整，应说明变更理由、生效时点并经双方确认，而非以「还能更好」「情况变了」使义务永不结题',
+    // [v6.8.17] 第 71 维度：虚假平衡×等权并置未证实指控与已证事实
+    false_balance: '不得把证据强度不等的两方并列为「两种说法/都有道理」以抹平已证与未证的差别：须说明两份说法的证据等级差异（哪一方已核验、哪一方未经证实）并给出已证结论及其依据；对未证实部分明确标注「未经核实」，不得使其获得与已证事实同等的可信度',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1338,6 +1363,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.15] 第 70 维度：事后加码×移动验收标准（verify 级——单句可能是
     // 项目管理复述/文学对白/历史评价转述，rewrite 会误伤。与 r500/r503/r506 同口径）
     'standard_shift',
+    // [v6.8.17] 第 71 维度：虚假平衡×等权并列（verify 级——单句可能是
+    // 新闻报道复述/争议综述/学术分歧介绍，rewrite 会误伤。与 r500/r503/r506 同口径）
+    'false_balance',
   ]);
   // pass：无问题通过
 
@@ -1431,6 +1459,10 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.15] 第 70 维度：事后加码×移动验收标准（同 sole_narrative
       // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
       standard_shift: stsh,
+      // [v6.8.17] 第 71 维度：虚假平衡×等权并置未证实指控与已证事实
+      // （同 standard_shift 补登记先例：只进 allDims 不进
+      // dimensions/summary 会让读方看不到命中）
+      false_balance: fbal,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -11484,6 +11516,7 @@ module.exports = {
   checkHelplessnessInduction,
   checkSoleNarrative,
   checkStandardShift,
+  checkFalseBalance,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
