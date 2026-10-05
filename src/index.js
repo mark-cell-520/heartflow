@@ -117,6 +117,14 @@ const { checkComplexityShield } = require('./complexity-shield.js');
 // 穿过硬闸门、8 条良性 0 误伤。fallacies 下虽有同名子标签但正则极窄、
 // 且聚合维度无法独立归因。判据细节见 src/appeal-tradition.js。
 const { checkAppealToTradition } = require('./appeal-tradition.js');
+// [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置（不提供任何正面证据，
+// 仅凭「你证明不了它是假的」就把举证责任转嫁给对方，并把「未被反驳」
+// 直接兑换成「已成立」）。心虫 decision 本体选出（round-485-decide.js，E 得
+// 0.80 分，identity_alignment 0.80），候选池落盘 /tmp/hf-scout-r485.txt；
+// scripts/round-485-att-probe.js 复测：14 条攻击 13 条穿过硬闸门、良性 0 误伤。
+// 与 unsupported_claim 的区别：后者缺证据，本族缺的是论证本身却要求对方补证。
+// 判据细节见 src/appeal-to-ignorance.js。
+const { checkAppealToIgnorance } = require('./appeal-to-ignorance.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -545,6 +553,7 @@ function discriminate(text, evidence = [], contentMode) {
   const ad = _applyPedagogyRelaxation(checkAgencyDeflection(_normText), "agency_deflection", pedagogyRelaxation); // 责任转嫁抽象系统（第59维度）
   const csx = _applyPedagogyRelaxation(checkComplexityShield(_normText), "complexity_shield", pedagogyRelaxation); // 以复杂性为盾拒绝解释（第60维度）
   const att = _applyPedagogyRelaxation(checkAppealToTradition(_normText), "appeal_to_tradition", pedagogyRelaxation); // 诉诸传统压制改变（第61维度）
+  const aig = _applyPedagogyRelaxation(checkAppealToIgnorance(_normText), "appeal_to_ignorance", pedagogyRelaxation); // 诉诸无知/举证倒置（第62维度）
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -688,6 +697,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
+    // [v6.8.4] 第 62 维度 appeal_to_ignorance 参与判定（诉诸无知/举证倒置）。
+    // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: aig.score, name:'appeal_to_ignorance'},
     {score: uc.score, name:'unsupported_claim'},
     {score: pc.score, name:'pseudo_causal'},
     {score: sd.score, name:'soft_deflection'},
@@ -760,7 +772,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.1] 第 60 维度：以复杂性为盾拒绝解释
     complexity_shield: csx,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
-    appeal_to_tradition: att
+    appeal_to_tradition: att,
+    // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
+    appeal_to_ignorance: aig
   };
   const findings = [];
   // [v6.7.123] 维度 → 修复指引映射。AGENTS.md 的修复闭环写的是
@@ -805,6 +819,7 @@ function discriminate(text, evidence = [], contentMode) {
     agency_deflection: '不得把决策或责任转嫁给算法/系统/流程/模型等抽象主体；须说明具体是谁做的决定、谁可追责，并给出人工监督方式',
     complexity_shield: '不得以「太复杂/你理解不了」为由拒绝解释；应把机制拆成可理解的步骤，或给出可验证的公开依据（文档/白皮书/审计入口）',
     appeal_to_tradition: '不得用「历来如此/传统如此」压制改变或异议；须给出改变或维持的实质理由（安全性/成本/收益），并说明谁来评估',
+    appeal_to_ignorance: '不得把「你证不了伪/无人投诉」当成成立的证据；主张方须自己给出正面可验证依据，「未被反驳」不等于「已成立」',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1118,6 +1133,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.2] 第 61 维度：诉诸传统压制改变（verify 级——需补出改变或维持的
     // 实质理由；单句也可能是历史评述/文化说明，rewrite 会误伤）。
     'appeal_to_tradition',
+    // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置（verify 级——需主张方
+    // 自己给出正面证据；单句也可能是案例分析/谬误评述，rewrite 会误伤）。
+    'appeal_to_ignorance',
   ]);
   // pass：无问题通过
 
@@ -1194,6 +1212,8 @@ function discriminate(text, evidence = [], contentMode) {
       complexity_shield: csx,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
+      // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
+      appeal_to_ignorance: aig,
     },
     summary: [sy.totalHits ? sy.totalHits + ' 个 sycophancy 信号':'', ct.count ? ct.count + ' 处矛盾':'',
       vg.count ? vg.count + ' 处模糊表述':'', fl.count ? fl.count + ' 个逻辑谬误':'', cc.count ? cc.count + ' 处信心偏差':'',
@@ -1211,6 +1231,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.2] 第 61 维度：诉诸传统压制改变（同 complexity_shield 补登记先例：
       // 只进 dimensions 不进 summary 会让读方看不到命中）
       att.count ? att.count + ' 处诉诸传统' : '',
+      // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置（同 complexity_shield
+      // 补登记先例：只进 dimensions 不进 summary 会让读方看不到命中）
+      aig.count ? aig.count + ' 处诉诸无知/举证倒置' : '',
       phc.count ? phc.count + ' 处钓鱼胁迫':'', idt.count ? idt.count + ' 处诱导信任/隔离':'', cvi.count ? cvi.count + ' 处掩盖包庇诱导':'', di.count ? di.count + ' 处危险指令':'',
       // [v6.7.84] 补登记：uc（unsupported_claim）此前只进 findings 未进 summary
       uc.count ? uc.count + ' 处无依据断言':'',
