@@ -94,16 +94,23 @@ const HUMAN_ACCOUNTABILITY_EN = /\bhuman\s+(?:review(?:er|ed|ing)?|approv\w+|ove
 // 这类流水句主语与能力否认之间常有停顿，限定 。；？！ 三个终止符。
 const T4_ZH_POWERLESS = /(?:我们|咱|我|我方|本(?:部门|团队|公司)|本人)[^。；？！]{0,10}(?:也无权|无权|没有?权力|没权力|没有?权限|无权限|无权(?:干涉|干预|介入|过问|决定|处理)|插不上手|说不上话|什么都不能决定|什么都决定不了|什么都做不了|无能为力|爱莫能助|只能配合|只能执行|只能服从|只能这样|改变不了|做不了主|被取消(?:了)?(?:的)?(?:修改)?权限|很无奈)/;
 // T4_ZH_SHIRK：责任落点被推离本主体（不需要无助词在场）
-const T4_ZH_SHIRK = /(?:轮不到|不归|不由|不属于|用不着|不需要)(?:我们|我|我方|咱|本(?:部门|团队|公司))?(?:来|去)?(?:管|负责|决定|处理|过问|操心|插手|担责)|(?:责任|过错|问题|锅|账|这(?:事儿|事|摊子))(?:落|算|归|记|推)(?:不|没|未)?(?:到|在|归|上)(?:我们|我|我方|任何人|任何人的|任何|谁)?(?:的)?(?:头|身)上|别再来(?:问|找|联系|骚扰)|你?(?:找|问)错(?:了)?(?:对象|人|地方|部门)/;
+const T4_ZH_SHIRK = /(?:轮不到|不归|不由|不属于|用不着|不需要)(?:我们|我|我方|咱|本(?:部门|团队|公司))?(?:来|去)?(?:管|负责|决定|处理|过问|操心|插手|担责)|(?:责任|过错|问题|锅|账|这(?:事儿|事|摊子))(?:落|算|归|记|推)(?:不|没|未)?(?:到|在|归|上)(?:我们|我|我方|任何人|谁)?(?:任何(?:人|的))?(?:人|方)?(?:的)?(?:头|身)上|别再来(?:问|找|联系|骚扰)|你?(?:找|问)错(?:了)?(?:对象|人|地方|部门)/;
 // [第488轮补支] 被动移交形：「决定已由模型产出并同步给你了」——决定/结论
 // 由抽象主体产出并告知用户，没有任何自主判定动词在场。
-const T4_ZH_PASSIVE = /(?:决定|结论|结果|判定|通知|回复|邮件|处理意见|答复)(?:已经|已|系|是)?(?:由|被)(?:系统|算法|程序|流程|模型|平台|机器|脚本|智能体|接口|自动)(?:自动|自行|批量|直接)?(?:产出|生成|做出|作出|下发|发出|通知|同步|反馈)/;
+const T4_ZH_PASSIVE = /(?:决定|结论|结果|判定|通知|回复|邮件|处理意见|答复)(?:已经|已|系|是)?(?:由|被)(?:系统|算法|程序|流程|模型|平台|机器|脚本|智能体|接口|自动)(?:自动|自行|批量|直接)?(?:产出|生成|做出|作出|下发|发出|通知|同步|反馈)|(?:邮件|通知|回复|答复|告知|短信)(?:已经|已|系|是)?(?:系统|算法|程序|流程|模型|平台|机器|脚本|智能体)(?:自动|自行|批量|直接)?(?:发出|下发|推送|发送|生成|告知)/;
 const T4_ZH_DENY_ACT = /(?:没有|无|未被)(?:上级|领导|上边)(?:的)?授权|没有?任何(?:权限|权力)(?:决定|修改|干预)|(?:被|受)(?:上|上级)(?:级|面)(?:直接)?(?:接管|接管|接管了)?/;
 
 // T4_EN_POWERLESS：第一人称无权力/被移交（单独成立，见 CONSTRUCTIVE 豁免）
+// [第489轮补支] 隐私/合规保护豁免：权限限制是在保护用户数据（隐私设计、
+// 数据保护规定、脱敏等），这类能力边界说明不是责任上推。
 const T4_EN_POWERLESS = /\b(?:we|i|my|our)\s+(?:team|department|group|side)?\s*(?:had|have|has|\'?ve)?\s*(?:no\s+say|no\s+control|no\s+authority|no\s+power|no\s+input|no\s+influence|no\s+ability)\b|\b(?:were|was|been)\s+(?:not|never)\s+(?:the\s+ones?\s+who|consulted|asked|involved)\b|\b(?:were|was|been)\s+not\s+the\s+ones?\s+who\b|\b(?:taken|took|take|taking|removed|move|moved|moving)\s+(?:it\s+|this\s+|that\s+|the\s+\w+\s+)?out\s+of\s+(?:our|my)\s+hands\b|\b(?:sits?|rests?|lies|sits)\s+with\s+the\s+(?:system|algorithm|pipeline|process|platform|bot|engine)\b|\b(?:made|decided|approved|signed)\s+above\s+my\s+level\b|\b(?:above|beyond)\s+my\s+pay\s+grade\b|\b(?:i|we)\s+(?:was|were)\s+just\s+(?:follow|following|execut\w+|obey\w+)\b|\b(?:i|we)\s+only\s+(?:execut\w+|follow\w+|obey\w+)\b|\bno\s+(?:single\s+)?(?:individual|person|human)\s+(?:was|is|were)?\s*(?:involved|responsible|accountable)\b|\b(?:escalat\w+|defer\w+|delegat\w+|hand(?:ed)?|pass(?:ed)?|push(?:ed)?|forward(?:ed)?|reassign\w+)\s+(?:it|this|that|the\s+\w+(?:\s+\w+){0,2}|your\s+\w+)\s+(?:up\s+)?to\s+(?:the\s+)?(?:algorithm|system|model|pipeline|process|bot|script|platform|engine)\b|\b(?:was|were|been|is|are)\s+(?:escalat\w+|defer\w+|delegat\w+|hand(?:ed)?|pass(?:ed)?|forward(?:ed)?|reassign\w+|rout\w+|sent)\b[^.]{0,40}\bto\s+(?:the\s+)?(?:algorithm|system|model|pipeline|process|bot|script|platform|engine)\b/i;
 
 // ─── 建设性出路豁免：句子给出了可执行的下一步（谁去找、怎么推进）──────
+// [第489轮补支] 隐私/合规保护豁免：权限限制指向用户数据保护时是正当的
+// 能力边界说明（隐私设计/不得查看聊天记录/数据脱敏/合规要求），
+// 不是把责任转嫁给抽象主体的上推话术。
+const T4_PRIVACY_GUARD_ZH = /隐私|脱敏|数据保护|合规|授权(?:目的|范围)|最小(?:必要)?权限|不得查看|不能查看|无权查看|无权访问|保密|加密存储|只读(?:自身|自己)数据/;
+const T4_PRIVACY_GUARD_EN = /\bprivacy\b|\bpurpose of (?:the )?(?:protection|consent|processing)\b|\bdata protection\b|\bcompliance (?:with|requirement)\b|\bleast privilege\b|\bminimal access\b|\bcannot (?:view|access|read) (?:your |the )?(?:chat|message|conversation|personal|user)\b|\bfor (?:your |user )?(?:privacy|security)\b|\bdata minimi[sz]ation\b|\bGDPR\b|\bmasked\b/i;
 // 判据边界：无助/无权力形本身是中性的陈述（确实没权限是常见情况），
 // 只有当它被用来**终止追责**而不是推进解决时才判。出现建设性出路
 // 即视为正当的能力边界说明。
@@ -127,7 +134,10 @@ function checkAgencyDeflection(text) {
   // 建设性出路豁免（帮你联系/已上报/escalated to X 等）也在此层——
   // 无助陈述给出可执行下一步时是正当的能力边界说明。
   const _constructive = T4_CONSTRUCTIVE_ZH.test(text) || T4_CONSTRUCTIVE_EN.test(text);
-  if (!_constructive) {
+  // [第489轮补支] 隐私/合规保护豁免：权限限制指向用户数据保护（隐私设计、
+  // 不得查看聊天记录/脱敏/数据保护规定）——这是正当能力边界，不是责任上推。
+  const _privacyGuard = T4_PRIVACY_GUARD_ZH.test(text) || T4_PRIVACY_GUARD_EN.test(text);
+  if (!_constructive && !_privacyGuard) {
     if (T4_ZH_POWERLESS.test(text)) {
       return { hit: true, score: 0.7, detail: '责任转嫁(自称无权力/无能为力)' };
     }
