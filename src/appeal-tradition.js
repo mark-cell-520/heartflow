@@ -40,7 +40,17 @@ const TRADITION_ZH = /传统|老祖宗|祖祖辈辈|祖祖代代|老一辈|古�
 // 边界：单独出现即在场，判定仍需与 T2 交叉，故不会误伤描述性陈述。
 const TRADITION_EN = /\btradition(?:ally|al)?\b|\bcustom(?:ary)?\b|\bconventions?\b|\bfor\s+(?:generations|centuries|decades|hundreds\s+of\s+years|as\s+long\s+as)\b|\b(?:our|the)\s+(?:forefathers|ancestors|forebears|predecessors|predecessors)\b|\b(?:established|set)\s+(?:by\s+)?(?:our|the)\s+(?:forefathers|ancestors|predecessors)|\bthe\s+way\s+(?:it|we|things)\s+(?:has|have|had)\s+always\s+been\b|\b(?:has|have|had)\s+always\s+(?:\w+\s+){0,2}this\s+way\b|\balways\s+been\s+(?:done|that\s+way|this\s+way|the\s+practice|the\s+norm)\b|\blong-?standing\b|\btime-?honou?red\b|\bsince\s+time\s+immemorial\b|\bthe\s+old\s+way\b|\bby\s+precedent\b|\bcenturies?-?old\b/i;
 
-// ─── T2: 压制改变或异议 ────────────────────────────────────
+// ─── T3: 从众基数在场 × 点名对方异议（多人从众施压族） ──────────────
+// 边界：不要求出现「传统/历来」名词——本族的话术机制是「多数人这样，
+// 你凭什么不同意」，用人数置换正当性，与 T1 传统压制是两种不同的置换。
+// 从众基数词
+const CROWD_ZH = /(?:大家|别人|其他人|所有人|人人|全?公司|同行(?:们)?|周围人(?:们)?|身边人(?:们)?|身边的人(?:们)?|众人|同事们|同学们|大多数人|不少人|很多人|全场|全国|同志(?:们)?|兄弟们|姐妹们)(?:都|全都|也|一向|向来|历来|从来|一直|一个个|各自)?(?:是)?(?:这么|这样|那样)?|别人|其他人/;
+const CROWD_EN = /\b(?:everyone(?: else)?|everybody(?: else)?|all(?: the)? (?:other|rest)(?: \w+)?|nobody else|no one else|the other \w+|most (?:people|others|users|teams|reviewers)|others)\b/i;
+
+// T3b 点名对方异议：把「只有你」拎出来
+const SINGLE_OUT_ZH = /(?:就|只有|唯独|偏偏|只好|惟有)(?:你|你们)(?:一个(?:人)?)?(?:说(?:了)?)?(?:在)?(?:特殊|另类|搞特殊|与众不同|意见|反对|质疑|提意见|挑刺|不同意|受不了|有疑问|有意见|事儿多|毛病|挑剔|唱反调|唱对台戏|不合群|难搞|不好相处|做不了|办不到|完成不了)|(?:为何|为什么)(?:又)?(?:只有|就|偏偏)(?:你|你们)(?:在)?(?:反对|质疑|提意见|挑刺|不同意|受不了|有疑问|有意见|事儿多|毛病|挑剔|唱反调|不合群|难搞|不好相处|问题多|做不了|办不到|完成不了)|(?:怎么|为何|为什么)(?:就|偏|偏偏)?(?:你|你们)(?:受不了|特殊|另类|与众不同|事儿多|毛病|挑剔|难搞|不好相处|问题多|意见多|有意见|做不了|办不到|完成不了|有疑问)|(?:你|你们)(?:凭什么|凭什么敢)(?:例外|特殊|与众不同|反对|质疑|不一样|有意见|不同意)/;
+const SINGLE_OUT_EN = /\b(?:why|how come)\s+(?:is|are|do|does)?\s*(?:only\s+)?(?:you|your \w+)\s+(?:the only one\s+)?(?:complaining|objecting|arguing|struggling|having (?:a )?problem|making a fuss|causing trouble|questioning|disagreeing|unhappy|dissatisfied|upset)|(?:only|just)\s+(?:you|your \w+|your team)\s+(?:is|are|has|have|seems? to have|thinks?|objected?|objects?|complained?|raised|disagree[ds]?|struggl(?:es|ing))\b/i;
+// ─── T2: 压制改变或异议（传统族） ──────────────────────────────
 // 中文：否定改变 / 要求维持 / 禁止质疑 / 把改变定性为背叛
 const SUPPRESS_ZH = /(?:所以|因此|因而|就该|那就|必须|只能|应当|应该|理应|自然|当然|只能)(?:继续|保持|维持|照旧|沿用|守住|延续|执行|传承)|(?:不能|不许|不准|不得|不可以|不该|不应该|绝不允许|绝不允许|不容)(?:擅自|轻易|随便|任意)?(?:说)?(?:改|变更|改变|更改|变动|修改|推翻|质疑|怀疑|挑战|打破|破例|违背|违反|背离)|(?:不容|不许|不容许|绝不容|绝不容许|不允许|不容许)(?:讨论|商量|置疑|质疑|争议|擅自|随意)(?:擅自|随意)?(?:更改|变更|修改|改动|推翻|改变|质疑|批评)|(?:没有|无)(?:商量|讨论|争议)的(?:余地|空间)|(?:改变|更改|变更|修改|改革|说改就改|说变就变|轻言)(?:的人|者|想法|念头|提议)?(?:是|就是|等于|都是|算|都算)(?:对)?(?:传统|规矩|惯例|祖制|祖宗)(?:的)?(?:背叛|忘本|数典忘祖|破坏|亵渎|大逆不道|对不起)|(?:任何|一切|所有)(?:的)?(?:改变|变更|更改|改革)(?:都)?(?:是|算)(?:对)?(?:传统|规矩|惯例)的?(?:背叛|破坏|忘本|亵渎)|(?:不需要|无须|不必|不用)(?:质疑|怀疑|讨论|争辩|争论)|(?:怎么|为何|为什么)(?:就|偏)?(?:你|你们)?(?:特殊|另类|搞特殊|与众不同)|(?:就|只有|偏偏)(?:你|你们)(?:在)?(?:特殊|另类|搞特殊|与众不同)|(?:你|你们)(?:凭什么|凭什么敢)(?:例外|特殊|与众不同|反对|质疑|不一样)|(?:为什么|为何)(?:又)?只有(?:你|你们)(?:在)?(?:反对|质疑|提意见|挑刺|不同意)|照(?:老规矩|旧例|惯例)|按(?:老规矩|惯例|旧例)(?:办|执行|处理)|前人(?:定|立|立下)的(?:规矩|规矩)|古已有之|(?:不能|不得)(?:说改就改|说变就变)|(?:改变|更改|变更|改革|说改就改|说变就变|轻言)(?:的人|者|想法|念头|提议)?(?:是|就是|等于|算|都算|便是|那是)(?:数典忘祖|忘本|不肖|忤逆)|(?:绝不|绝不)(?:能)?(?:改变|更改|变更)/;
 
@@ -69,9 +79,22 @@ function checkAppealToTradition(text) {
   }
 
   const trad = TRADITION_ZH.test(text) || TRADITION_EN.test(text);
-  if (!trad) return { hit: false, score: 0, detail: '' };
 
-  // T2 压制改变/异议
+  // T3 从众施压族：从众基数在场 × 点名对方异议（不要求传统名词）
+  const crowd = CROWD_ZH.test(text) || CROWD_EN.test(text);
+  if (crowd) {
+    const singled = SINGLE_OUT_ZH.test(text) || SINGLE_OUT_EN.test(text);
+    if (singled) {
+      return { hit: true, score: 0.4, detail: '诉诸传统/从众压制异议(多数人施压)' };
+    }
+  }
+
+  if (!trad) {
+    // 无传统名词时，纯点名形不判（日常吐槽「就你事多」也可能是中性表达）
+    return { hit: false, score: 0, detail: '' };
+  }
+
+  // T2 压制改变/异议（传统在场）
   if (SUPPRESS_ZH.test(text)) {
     return { hit: true, score: 0.4, detail: '诉诸传统压制改变/异议(zh)' };
   }
