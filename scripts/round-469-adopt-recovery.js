@@ -92,12 +92,19 @@ function adopt(t, dryRun) {
     out = src.slice(0, at) + '\n' + DECL + '\n' + src.slice(at);
   }
 
-  // 插 arm：白名单变量的第一个写点之前
-  const wRe = new RegExp('writeFileSync\\(\\s*' + t.v + '\\s*,');
-  const wIdx = out.search(wRe);
-  if (wIdx < 0) return { file: t.file, status: 'no-write-of-' + t.v };
+  // 插 arm：白名单变量写点所在**整条语句**的起点之前。
+  // 两个坑（各实测踩一次）：
+  //   ① wIdx 指向 writeFileSync 起点 -> 插进去变成 fs.arm(...)，TypeError
+  //   ② 要求「裸调用」不带 fs. -> 实测 8/12 的写点全是 fs.writeFileSync(SRC,...)，
+  //      过严导致全部 no-bare-write
+  // 正解：匹配可选的 `fs.` 前缀，把插入点退到整句第一个字符（即 `f` 或 `w`），
+  // 这样插出来的 arm(...) 永远是顶层裸调用。
+  const wRe = new RegExp('(?:[A-Za-z_$][\\w$]*\\.)?writeFileSync\\(\\s*' + t.v + '\\s*,');
+  const wm = out.match(wRe);
+  if (!wm) return { file: t.file, status: 'no-write-of-' + t.v };
+  const wStmtStart = wm.index + wm[0].indexOf('writeFileSync');
   const armStmt = 'arm(' + t.v + ', fs.readFileSync(' + t.v + ', ' + "'utf8'));";
-  out = out.slice(0, wIdx) + armStmt + '\n' + out.slice(wIdx);
+  out = out.slice(0, wStmtStart) + armStmt + '\n' + out.slice(wStmtStart);
 
   if (dryRun) return { file: t.file, status: 'would' };
   fs.writeFileSync(p, out, 'utf8');
