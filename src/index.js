@@ -1250,6 +1250,8 @@ function discriminate(text, evidence = [], contentMode) {
     loyalty_by_omission: '不得把「未支持 X」直接等同于敌对或负面立场，以此取消对方的中立资格（不支持就是反对这个团队/不同意就是跟我作对/不转发就是不在乎/有异议就是不团结/要么完全信我要么谁都不信/refusing means you oppose the mission）：中立与部分支持是合法立场，分歧可以被讨论。不支持的真正理由需要被说出来——是信息不足、代价不明，还是另有方案；把它改判成忠诚问题只会消解讨论本身。若要促成决策，应陈述不决策的客观后果（排期延后/合同不生效），而不是给持有异议者本人定性',
     // [v6.8.33] 第 559 轮：第 83 维度 paternalistic_decide（家长式替决）。
     paternalistic_decide: '不得以「为你好 / 我比你更清楚 / 你不需要知道」为由替对方做决定，并同时取消对方的知情权与追问权（我是为你好，这个决定你不用知道细节/我已经替你定好了，别再问/你还不懂，以后就明白我的用意了/I decided for you, it is for your own good）：被决定一方的异议不是不懂事，而是合法参与。家长式依据不能替代对方的判断，资历、身份与保护意图都不是接管选择权的资格。若确有信息优势，应把选项、代价与客观后果说清楚，把决定权交还对方并保留追问通道（你说不定，我就照你说的办/需要我补充什么再定）',
+    // [v6.8.34] 第 560 轮：第 84 维度 anecdote_as_proof（个例冒充普遍）。
+    anecdote_as_proof: '不得把个人或身边极少数人的体验当作普遍结论、群体效果或行业标准的证据（我朋友吃了三个月就好了，说明这药有效/我从来没用出过问题，所以这套流程是安全的/我身边的人都在用，这就是行业标准/It worked for me, so it works in general）：说话人与其熟人的样本量不足以支撑「普遍适用/行业标准/证明有效」的全称判断。个例可以说明「存在这种可能性」，不能推出「对总体成立」。确有个案参考价值时应明确标注样本范围（这只是我的单次体验），并补上可验证的全量数据、统计口径或临床对照；在数据到位之前，结论必须降格为待验证假设而非既成事实',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1652,6 +1654,15 @@ function discriminate(text, evidence = [], contentMode) {
     //  后才能使用；单句也可能是转述他处报告的数据勘误讨论，rewrite 会误伤。
     //  与 r530/r534 同口径）
     'percentage_overflow',
+    // [v6.8.34] 第 560 轮：第 84 维度 anecdote_as_proof（个例冒充普遍）
+    // （verify 级——样本量不足是**证据缺口**，需补全量数据/统计口径/临床
+    // 对照才能成立；不是必须改写表达方式（对比第 83 维的家长式越权语气，
+    // 本族话术本身未必伤人）。单句也可能是受访者原话引述、口述史记录、
+    // 用户体验访谈的合法转录，rewrite 会误伤。
+    // 注意边界：hasty_generalization 管推理形式的以偏概全（要显式概括桥，
+    // 本族实测 7 条穿门样本 0 条命中 hg）；statistical_misleading 要数字；
+    // appeal_to_authority 管权威背书——本族背书者是说话人自己或其熟人。）
+    'anecdote_as_proof',
     // [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage（不完备全覆盖宣告）
     // （verify 级——分项之和显著低于百分百却宣称覆盖全部，需补充分项明细
     //  才能确认口径；单句也可能是转述他处统计报告时漏抄分项，rewrite 会误伤。
@@ -1803,6 +1814,10 @@ function discriminate(text, evidence = [], contentMode) {
       // （家长式替决）。r559 一次接齐 dimMap + allDims + 本处登记，
       // 不再走 r556「只接两处、第三处漏登记」的回头路。
       paternalistic_decide: pdc,
+      // [v6.8.34] 第 560 轮补登记：第 84 维度 anecdote_as_proof
+      // （个例冒充普遍）。r560 落库即被截断，r561 补齐 dimMap + allDims + VERIFY_DIMS
+      // + DIM_GUIDANCE + 本处登记，一次接齐不走 r556「只接两处」回头路。
+      anecdote_as_proof: aap,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
@@ -11875,6 +11890,7 @@ module.exports = {
   checkIncoherentCoverage,
   checkToolDeflection,
   checkPaternalisticDecide,
+  checkAnecdoteAsProof,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
