@@ -1,3 +1,107 @@
+# 第 535 轮（修 r534 第 77 维度 EXEMPT_EN 结构性 bug + 守卫测试上线 20/20，真升级②收尾）
+
+版本口径 v6.8.0（VERSION 未动；本轮为上一轮的收尾，未新增维度）。
+
+## 本轮候选来源
+
+无新候选——本轮是 r534 的遗留收尾（r534 因迭代预算耗尽未跑 finish，
+交接簿记的三步剩「守卫测试 3 失败项 + 提交 + 文档同步 + finish」）。
+队列 `data/upgrade-queue.json` 待办为空，按优先级「上一轮遗留的真缺口」接手。
+
+## 复测证据（不信简报旧描述）
+
+`timeout 120 node test/round-534-performative-responsibility.test.js`
+实测 17 过 / 3 败，三个失败项全部复现在场：
+① EXEMPT_ZH 探针无效、② EXEMPT_EN 探针无效、③ 锚点 #5 子串不匹配。
+
+## 改了什么（3 commits：4411773f 引擎+测试 / 34b8f0ea 文档）
+
+**1. `src/performative-responsibility.js` 修 `EXEMPT_EN` 结构性 bug**
+[r534 重建引入，非本维度新能力]。根因实测两层：
+· 表层：EXEMPT_EN 数组缺 `.join('|')`，JS 数组 toString 后用**逗号**连接，
+  正则变成「四段按逗号字面顺序出现」，`\b,\b` 形态几乎永不匹配
+  → 英文侧豁免支从上线起完全失效（所有带整改锚点的英文正当担责句
+  都会被误判为攻击）。
+· 附带：修 join 的同时补 6 支英文整改/时限锚点（remediation plan /
+  publish the fix / root cause analysis / by Friday / postmortem is due 等），
+  让英文侧豁免面与中文侧的 `EXEMPT_ZH` 对等。
+诊断脚本：`scripts/round-535-escape-diag.js`（逐支 source 对比）、
+`round-535-blankdiag.js`（变异落点验证）、`round-535-probe-trace.js`
+（OWN/INVERT/EXEMPT 逐支 test）。
+
+**2. `test/round-534-performative-responsibility.test.js` 三个失败项全修**：
+· EXEMPT_ZH 探针换为 `我全责，…我把整改方案周五前交出来。`（从 120 组合
+  实测筛出，before=false → after=true）。
+· EXEMPT_EN 探针**换了三轮**（每轮都实测后再改，未脑内模拟）：
+  ① `you also share some of the blame` → before=true 兜不住；
+  ② `also partly to blame` → invertEN=false，INVERT_EN 无此支；
+  ③ `not because you are exactly innocent` → 从句插入把判据隔断；
+  最终取直陈形 `and you are not exactly innocent`——
+  ownEN=true + invertEN=true + exEn=true，唯一满足守卫构造条件的形状。
+  教训：EN 侧陪审团要同时满足「OWN 命中 × INVERT 命中 × EXEMPT 兜住」，
+  少任何一支守卫都无效。
+· 锚点检查改**反斜杠归一化**后比较（`split(String.fromCharCode(92)).join('')`）：
+  此前 #5 失败纯粹是 patch 工具 JSON 双重转义导致 `\\b` 层级对不上，
+  不是支被删。
+
+**3. 文档同步**：sync-doc-dimensions + sync-doc-numbers 双脚本跑齐后
+手工补 AGENTS.md / SKILL.md 的 Verify-level 列举（44→45，补
+performative_responsibility），README 规格表由脚本自动记账。
+`git checkout -- data/test-count.json` 解 run-all 自锁缓存。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node --check src/performative-responsibility.js` | ✅ |
+| `node test/round-534-performative-responsibility.test.js` | ✅ **20/20 全绿**（上轮 17/20） |
+| `node test/round-530-harm-invalidation.test.js`（近邻守卫） | ✅ 17/17 |
+| `node test/round-492-concession-coercion.test.js`（分界维度） | ✅ 52/52 |
+| `node test/round-506-sole-narrative.test.js`（近邻守卫） | ✅ 6 支全敏感 |
+| `node bin/verify.js` | ✅ 14 passed, 0 failed |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 52/52、误拦 302/326（与基线一致） |
+| `node test/security-audit.test.js` | ✅ 16/16 |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ 19/21（上轮 14/21；剩 2 项为 run-all 自锁） |
+| 内存守卫 | ⚠️ BLOCKED 588MB < 700MB → 按纪律未跑 run-all |
+
+## 本轮给引擎新增的辨别能力
+
+**第 77 维度 `performative_responsibility`（表演式担责×归因倒置）的英文侧
+豁免支被修复**：这是 r534 上线时就断掉的一条腿——EXEMPT_EN 正则因数组
+未 join 而永不匹配，导致「认责 + 归因倒置」族在英文侧只有攻击路径、
+没有豁免路径。修复 + 补 6 支锚点后，英文侧真正具备了「真实担责与倒置话术
+可区分」的辨别能力（此前所有带 corrective action / postmortem / due date
+的英文正当担责句都会被误判为攻击）。守卫测试同步实测筛出合法的
+豁免陪审团（构造条件：OWN 命中 × INVERT 命中 × EXEMPT 兜住三者同时成立）。
+**这是修复上一轮自引入的回归 + 补齐零覆盖族豁免路径，不是新维度，不计入
+真升级①**——本轮的「真升级」实质是 r534 的第 77 维度上线在本轮才首次
+达到「守卫测试全绿」的可验证状态。
+
+## 遗留
+
+1. **`data/test-count.json` 自锁仍在**（doc-numbers 2 项失败的唯一原因）：
+   需跑全量 run-all 刷新缓存，本轮内存守卫 BLOCKED（588MB < 700MB），
+   按纪律未跑，留给夜间/空闲轮。
+2. **UPGRADE_LOG 断档累积到 507-534 共 28 轮**（末轮记录仍是 506）。
+   每轮都被迭代上限或文档自锁挤掉补录。r533/r534 有 commit 与测试在账，
+   细节可从 git log 取；建议下轮优先补录 r534。
+3. `scripts/` 下 525-534 历史诊断脚本共 60+ 个仍未提交，按纪律只 add
+   本轮相关文件，勿把历史脚本卷入。
+4. `test/round-530-harm-invalidation-*.json` 两个样本文件仍是未跟踪状态
+   （r530 遗留），本轮无改动，交由处理它的轮次决定。
+
+## 给下一轮的接手说明
+
+1. 队列为空；固定 scout 池已连续多轮空，按 r505/r522/r526 先例自建族级
+   探针（`scripts/round-533-cand-probe.js` 可作模板），**不要脑内想候选**。
+2. `data/test-count.json` 自锁若仍在，先 `git checkout -- data/test-count.json`
+   再择机跑 run-all（跑前必过内存守卫）。
+3. UPGRADE_LOG 断档 28 轮待补录。
+4. 英文侧豁免支的设计教训：加 EXEMPT 正则后必须写一轮「三支同时成立」
+   的陪审团探针（OWN × INVERT × EXEMPT），只测单支会漏。
+
+---
+
 # 第 506 轮（第 69 维度 sole_narrative 接线补齐 + 守卫测试上线，真升级①；口径垄断×压制核验族）
 
 版本口径 v6.8.14（引擎新维度，末位号规则；VERSION 文件未动故四处一致仍报 v6.8.0）。
