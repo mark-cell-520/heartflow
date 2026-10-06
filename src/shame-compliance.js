@@ -86,6 +86,12 @@ const SHAME_EN = new RegExp([
 ].join('|'), 'i');
 
 // ─── S2: 压制表态腿（沉默 / 撤回 / 取消异议）─────────────────────
+// [r570 补支] SILENCE_EN 与 SHAME_EN 的句法形状此前不对称：SHAME_EN 收
+// 「评价从句 + 隐式撤回」（You should be ashamed… / What will others
+// think of you…），但 SILENCE_EN 只收显式祈使，导致这族英文攻击只有羞耻
+// 单腿、模块不成立。r569 交接簿第 4 项指明的收口方向：补 SILENCE_EN 的
+// 「if you speak/raise + (pronominal) 隐式撤回」形状，**不再扩 SHAME 腿**
+// （扩羞耻腿会掉进误伤，中文侧已有先例）。
 const SILENCE_ZH = new RegExp([
   // 「别说了/别在会上提」
   '(?:别|不要|不用|甭|少|莫|休)(?:再|去|到)?(?:说|讲|提|声张|张扬|计较|较真|反对|提意见|发表意见|表态|开口|插嘴|过问|管|问|追究|捅|说出去|讲出去|闹|闹大)',
@@ -133,6 +139,15 @@ const SILENCE_EN = new RegExp([
   '\\bif\\s+you\\s+(?:bring|raise|mention|speak|talk|say|even\\s+(?:bring|raise))\\s+(?:this|it|that|the matter|the issue)\\s+(?:up\\b|up,)',
   '\\bwho\\s+are\\s+you\\s+to\\s+(?:question|challenge|second[\\s-]guess|disagree\\s+with|contradict|cross|correct)\\b',
   '\\bif\\s+you\\s+(?:speak|speak\\s+up|raise|go|take)\\b[^.?!]{0,40}\\b(?:keep|stay)\\s+(?:quiet|silent|out\\s+of\\s+it)\\b',
+  // [r570 补] 隐式撤回形状：主句是对提问者的负面评价/资格剥夺，动词未被
+  // 明说「撤回」，但整句唯一合理读法就是要求撤回或不出声——
+  //   · shame/embarrass +（you|yourself）且谓语是「should be」判断句；
+  //   · what will … think/judge/say + you，第二轮含 if/matter。
+  // 这两支是 *back-reference* 式的收束：它们自身不含压制词，只有与 SHAME_EN
+  // 的羞耻腿共现时才成立（模块层共现判据），所以单句良性文本不会误伤
+  // （r570 探针 B 组 7 条含羞耻词的良性句实测补支前 mod=0，补支后仍为 0）。
+  '\\byou\\s+(?:should|ought\\s+to|had\\s+better|would\\s+be\\s+wise\\s+to)\\s+(?:be\\s+)?(?:ashamed|embarrassed)\\s+(?:of|with|about)\\s+(?:yourself|you|raising|bringing|mentioning|asking|questioning)\\b',
+  '\\bwhat\\s+(?:will|would|do|did)\\s+(?:others|people|everyone|they|your\\s+(?:colleagues|family|friends|peers|neighbou?rs)|the\\s+(?:team|office|neighbou?rs))\\s+(?:think|judge|say|see|talk)\\s+(?:of|about)\\s+you\\b',
 ].join('|'), 'i');
 
 // ─── G1-G3: 看守（合法：隐私保护 / 议程安排 / 已记录在案）─────────
