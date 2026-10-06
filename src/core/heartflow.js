@@ -386,6 +386,12 @@ const _KnowledgeGraph = _lazy('knowledgeGraph', () => require('../memory/knowled
 // 此前的真实状态：src/archive/knowledge-layer.js 238 行完整实现、零引用、未注册
 // （r312 实测 0 外部引用，扫 378 个 src 模块）。本轮接到 this.knowledgeLayer。
 const _KnowledgeLayer = _lazy('knowledgeLayer', () => require('../archive/knowledge-layer.js'));
+// [v6.8.0] 第 538 轮：AssociativeEngine — 人类式逐词联想理解与生成引擎（L1-L5 五层）。
+// 此前的真实状态：src/archive/associative-engine.js 本体 699 行 + associative-engine/ 子目录
+// 五个子模块共 6240 行，但构造器 require 五个裸文件名 →
+// 五路全 MODULE_NOT_FOUND，类无法实例化（r538 实测）。
+// 修路径后实测 process() 331ms 跑通；本轮按 r312 范式接到 this.associativeEngine。
+const _AssociativeEngine = _lazy('associativeEngine', () => require('../archive/associative-engine.js'));
 
 const _EvolutionLoop = _lazy('evolutionLoop', () => require('../cortex/loop.js'));
 
@@ -1669,6 +1675,22 @@ class HeartFlow {
       maxFactsPerDomain: 5000,
       enableSourceTracking: true,
     });
+
+    // AssociativeEngine — 联想理解引擎（v6.8.0 第 538 轮接线）
+    // process(text) → L1-L5 五层管线（词汇联想/分块/叙述检索/语义收敛/逐词生成）。
+    // 与 knowledgeLayer 同属 archive/ 遗珠：本体+五子模块 6942 行完整实现，
+    // r538 修 require 路径后才第一次真正可加载、可运行。
+    // 防御性 try：五子模块里任一层构造失败不该拖垮引擎启动。
+    try {
+      this.associativeEngine = new (_AssociativeEngine().AssociativeEngine)(this.rootPath || process.cwd());
+    } catch (e) {
+      this.associativeEngine = null;
+      _boundedPush(this._initErrors = this._initErrors || [], {
+        module: 'associativeEngine',
+        error: e.message,
+        note: '防御性: 联想引擎不可用不阻断启动'
+      }, MAX_HISTORY_SIZE);
+    }
 
 
 
