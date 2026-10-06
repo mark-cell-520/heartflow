@@ -1741,6 +1741,11 @@ function discriminate(text, evidence = [], contentMode) {
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
       tool_deflection: tdf,
+      // [v6.8.31] 第 556 轮补登记：第 82 维度 loyalty_by_omission
+      // （立场连坐）。此前 r554/r555 只接了 allDims（判定）+ dimMap，漏了
+      // dimensions/summary —— 读方（gate/MCP/panel/discriminate 调用方）
+      // 一律当「未命中」，连 test/round-555 的端到端断言都过不去。
+      loyalty_by_omission: lbo,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
