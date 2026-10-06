@@ -101,6 +101,7 @@ const { checkAIMisuse } = require('./ai-misuse.js');
 const { checkReversibility } = require('./reversibility.js');
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkStatisticalMisleading } = require('./statistical-misleading.js');
+const { checkPercentageOverflow } = require('./percentage-overflow.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
 // 非人主体，回避具体决策者）。心虫 decision 本体选出，探测器实测 8/10
@@ -749,6 +750,13 @@ function discriminate(text, evidence = [], contentMode) {
   const pfr = _applyPedagogyRelaxation(checkPerformativeResponsibility(_normText), "performative_responsibility", pedagogyRelaxation);
   // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）。
   const sco = _applyPedagogyRelaxation(checkSufferingContest(_normText), "suffering_contest", pedagogyRelaxation);
+  // [v6.8.28] 第 545 轮：第 79 维度 percentage_overflow（分配占比合计溢出）。
+  // 心虫升级执行体自建族级探针选出（r544 立项、r545 收口，探针
+  // /root/.hermes/cache/scratch/r545-arith-probe2.js 实测：攻击 11/16 命中、
+  // 良性 0/30 误伤；gate 层旧维度对 16 条攻击 0 条 rewrite、14 条仅 verify）。
+  // 判据：分配语境 × 分项≥2 × 和 > 100.5%，四类排除（变化/频率/时段/完成度）。
+  // 判据细节见 src/percentage-overflow.js。
+  const pvo = _applyPedagogyRelaxation(checkPercentageOverflow(_normText), "percentage_overflow", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -935,6 +943,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.27] 第 78 维度 suffering_contest 参与判定（苦难竞赛×比惨消诉族）。
     // 同 r530/r534 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: sco.score, name:'suffering_contest'},
+    // [v6.8.28] 第 79 维度 percentage_overflow 参与判定（分配占比合计溢出）。
+    // 同 r530/r534 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: pvo.score, name:'percentage_overflow'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1046,8 +1057,10 @@ function discriminate(text, evidence = [], contentMode) {
     harm_invalidation: himv,
     // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）
     performative_responsibility: pfr,
-    // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
+    // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）。
     suffering_contest: sco,
+    // [v6.8.28] 第 545 轮：第 79 维度 percentage_overflow（分配占比合计溢出×和>100%）。
+    percentage_overflow: pvo,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1506,6 +1519,11 @@ function discriminate(text, evidence = [], contentMode) {
     // （verify 级——单句可能是处境说明、工作量对比、情绪自述的复述，
     //  rewrite 会误伤。与 r500/r503/r506/r510/r514/r517/r520/r530/r534 同口径）
     'suffering_contest',
+    // [v6.8.28] 第 545 轮：第 79 维度 percentage_overflow（分配占比合计溢出）
+    // （verify 级——分项之和超过百分之百是确定的数字矛盾，需重新核算口径
+    //  后才能使用；单句也可能是转述他处报告的数据勘误讨论，rewrite 会误伤。
+    //  与 r530/r534 同口径）
+    'percentage_overflow',
   ]);
   // pass：无问题通过
 
@@ -1626,6 +1644,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
       performative_responsibility: pfr,
+      // [v6.8.28] 第 545 轮：第 79 维度 percentage_overflow（分配占比合计溢出）
+      // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
+      percentage_overflow: pvo,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
