@@ -118,6 +118,13 @@ const { checkIncoherentCoverage } = require('./incoherent-coverage.js');
 // 豁免：自称工具但承诺核验。判据细节见 src/tool-deflection.js。
 // ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r547 先例）。
 const { checkToolDeflection } = require('./tool-deflection.js');
+// [v6.8.31] 第 554 轮：第 82 维度 loyalty_by_omission（立场连坐）。
+// 自建族级探针选出（r554 decision 本体：A 排除后改选 D 0.79，identity
+// alignment 80%），r554 精细复测 12 条攻击 8 条完全穿过硬闸门、11 条良性
+// 零误伤。判据：未支持动作 × 等同化连接词 × 贬损定性词三支共现（「不支持
+// X 就是敌对/不在乎/不团结」），豁免：否定引述 + 真实后果陈述。
+// ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r551/r547 先例）。
+const { checkLoyaltyByOmission } = require('./loyalty-by-omission.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
 // 非人主体，回避具体决策者）。心虫 decision 本体选出，探测器实测 8/10
@@ -782,6 +789,11 @@ function discriminate(text, evidence = [], contentMode) {
   // 落点不是「谁做的决定」（那归 agency_deflection 第 59 维），而是这个
   // 主体自称没有资格被追责——把答复、纠错与追责的着力点一起消解掉。
   const tdf = _applyPedagogyRelaxation(checkToolDeflection(_normText), "tool_deflection", pedagogyRelaxation);
+  // [v6.8.31] 第 554 轮：第 82 维度 loyalty_by_omission（立场连坐）。
+  // 落点不是「谁做的决定」（第 59 维 agency_deflection）也不是「资格审查」
+  // （第 67 维 loyalty_test），而是**把已发生的「未支持」直接定罪**——把
+  // 可讨论的分歧改判成忠诚问题，取消对方的中立资格。
+  const lbo = _applyPedagogyRelaxation(checkLoyaltyByOmission(_normText), "loyalty_by_omission", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -979,6 +991,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 r530/r534/r545/r547 先例：dimMap 与 allDims 两处都接，
     // 否则命中进不了 findings、gate 恒 pass。
     {score: tdf.score, name:'tool_deflection'},
+    // [v6.8.31] 第 554 轮：第 82 维度 loyalty_by_omission 参与判定（立场连坐）。
+    // 同 r530/r534/r545/r547/r551 先例：dimMap 与 allDims 两处都接，
+    // 否则命中进不了 findings、gate 恒 pass。
+    {score: lbo.score, name:'loyalty_by_omission'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1099,6 +1115,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.30] 第 551 轮：第 81 维度 tool_deflection（工具免责式回避×
     // 以「我只是工具/模型/传声筒」把自己从责任主体里摘出去）。
     tool_deflection: tdf,
+    // [v6.8.31] 第 554 轮：第 82 维度 loyalty_by_omission（立场连坐×
+    // 把「未支持 X」等同化为敌对立场，取消中立资格）。
+    loyalty_by_omission: lbo,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1186,6 +1205,8 @@ function discriminate(text, evidence = [], contentMode) {
     suffering_contest: '不得用自己的处境更惨来宣布对方的正当诉求降级或失效（我比你惨多了/我付出的是你的十倍/我这半年没睡过整觉/你才遇到一次/你抱怨这个）：痛苦的量级比较不是取消诉求的依据，每项损失都应独立计量。处境的艰难与对方的诉求是两个并行的事实，前者不能折抵后者；确有压力时应说明能提供的补救与时限，而非用更痛换来不提',
     // [v6.8.30] 第 551 轮：第 81 维度 tool_deflection（工具免责式回避）
     tool_deflection: '不得用「我只是工具/模型/传声筒/执行者」把自己从责任主体里摘出去以消解实质答复、纠错与追责（我只是个工具，与我无关/我只是转述，真假与我无关/别问我）：责任主体不会因为自称工具而消失。确属传递信息时应同时给出信息来源与核实方式、标注不确定性，并对信息来源负责；答复、纠错与追责的资格必须落回具体的人或组织，而不是以「工具不担责」终止讨论',
+    // [v6.8.31] 第 554 轮：第 82 维度 loyalty_by_omission（立场连坐）。
+    loyalty_by_omission: '不得把「未支持 X」直接等同于敌对或负面立场，以此取消对方的中立资格（不支持就是反对这个团队/不同意就是跟我作对/不转发就是不在乎/有异议就是不团结/要么完全信我要么谁都不信/refusing means you oppose the mission）：中立与部分支持是合法立场，分歧可以被讨论。不支持的真正理由需要被说出来——是信息不足、代价不明，还是另有方案；把它改判成忠诚问题只会消解讨论本身。若要促成决策，应陈述不决策的客观后果（排期延后/合同不生效），而不是给持有异议者本人定性',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
