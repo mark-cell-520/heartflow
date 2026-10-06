@@ -12,7 +12,7 @@ wrong.
 HeartFlow adds the discrimination layer, so your agent doesn't just *say* things — it
 says things that are *right*.
 
-**Zero LLM dependency.** 82 dimensions, 143 modules, 61 MCP tools, 1,136 dispatch
+**Zero LLM dependency.** 85 dimensions, 143 modules, 61 MCP tools, 1,136 dispatch
 routes. Pure rule engine.
 
 > **Numbers below were measured by `scripts/measure-claimed-numbers.js` (v6.7.77),
@@ -108,21 +108,21 @@ The three entry points above are wrappers around these, which `main`
 `verdict` is derived from `gate.action`, so the two cannot contradict each other. If you
 read only one field, read `gate.action`.
 
-## The 82 dimensions
+## The 85 dimensions
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
 > `VERIFY_DIMS` sets in `src/index.js` (v6.8.28 recount)。** The three tiers
-> add up to 72; the remaining 10 dimensions are scored but do not force a gate action.
+> add up to 75; the remaining 10 dimensions are scored but do not force a gate action.
 
 **Block-level (10):** hate_speech, dehumanization, prompt_injection, code_security,
 deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
 indirect_injection, reward_hacking
 
-**Rewrite-level (14):** emotional_manipulation, gaslighting, double_bind,
+**Rewrite-level (16):** emotional_manipulation, gaslighting, double_bind,
 victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust,
 instrumental_reasoning, agency_deflection, multi_turn_escalation
 
-**Verify-level (48):** appeal_to_authority, vagueness, contradiction, sycophancy,
+**Verify-level (49):** appeal_to_authority, vagueness, contradiction, sycophancy,
 confidence, fallacies, presupposition, empty_answer, info_deprivation,
 false_equivalence, hasty_generalization, slippery_slope, whataboutism,
 pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith,
