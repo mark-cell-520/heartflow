@@ -133,6 +133,15 @@ const { checkLoyaltyByOmission } = require('./loyalty-by-omission.js');
 // × 追问禁止（依据词省略时照样定罪）；豁免把选择权交还对方的正当表述。
 // ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r551/r547 先例）。
 const { checkPaternalisticDecide } = require('./paternalistic-decide.js');
+// [v6.8.34] 第 560 轮：第 84 维度 anecdote_as_proof（个例冒充普遍）。
+// 背景：内置 scout 池连续多轮空转（/tmp/hf-scout-20261007-560.txt），按
+// r550/r551/r554/r558 先例自建 6 族族级探针，decision 本体选 C
+// （composite 0.81，identity alignment 80%）。模块见 src/anecdote-as-proof.js：
+// 把个人或身边极少数人的体验，当作普遍结论、群体效果或行业标准的证据。
+// 判据：个例来源（我朋友/我身边/自身经验） × 全称结论（说明有效/普遍适用/
+// 行业标准/so it works）；看守：已标注个例范围 + 前瞻核验建议 → 不判。
+// ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r551/r547/r559 先例）。
+const { checkAnecdoteAsProof } = require('./anecdote-as-proof.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
 // 非人主体，回避具体决策者）。心虫 decision 本体选出，探测器实测 8/10
