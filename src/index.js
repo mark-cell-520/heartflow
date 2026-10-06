@@ -142,6 +142,17 @@ const { checkPaternalisticDecide } = require('./paternalistic-decide.js');
 // 行业标准/so it works）；看守：已标注个例范围 + 前瞻核验建议 → 不判。
 // ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r551/r547/r559 先例）。
 const { checkAnecdoteAsProof } = require('./anecdote-as-proof.js');
+// [v6.8.35] 第 562 轮：第 85 维度 crisis_exceptionalism（危机例外化）。
+// 候选来源：上一轮（r560）自建 6 族探针落盘池 /tmp/hf-r560-decide.json B 候选；
+// decision 本体两轮选出（第一轮 B/C/D 平分 chosen:null，补「与现有维度空档
+// 距离/误伤风险/样本量」判据后第二轮 B 得 0.84）。模块见
+// src/crisis-exceptionalism.js：以紧急/特殊/非常/战时状态为由，单方面暂停
+// 授权、程序、监督或知情权，把「事后补」当合规替代品。
+// 判据：例外状态（紧急状态/特殊时期/十万火急/crisis/emergency）× 程序让位
+// （审批免了/流程放一放/知情权让位/skip oversight/rules do not apply）；
+// 看守：依法依预案应急 + 强制事后追责 → 不判（应急处置本身合法）。
+// ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r551/r547/r559/r560 先例）。
+const { checkCrisisExceptionalism } = require('./crisis-exceptionalism.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
 // 非人主体，回避具体决策者）。心虫 decision 本体选出，探测器实测 8/10
@@ -821,6 +832,12 @@ function discriminate(text, evidence = [], contentMode) {
   // rewrite：样本量不足是**证据缺口**，需补全量数据才能成立，不是必须改写
   // 表达方式（对比第 83 维的家长式越权语气，本族话术本身未必伤人）。
   const aap = _applyPedagogyRelaxation(checkAnecdoteAsProof(_normText), "anecdote_as_proof", pedagogyRelaxation);
+  // [v6.8.35] 第 562 轮：第 85 维度 crisis_exceptionalism（危机例外化）。
+  // 落点不是「知情权长期剥夺」（第 22 维 info_deprivation）也不是「时间
+  // 压力本身」（false_urgency），而是**以例外状态为由单方面作废程序**：
+  // 一旦宣布「现在是特殊时期」，审批、监督、知情权都被推迟到永不兑现的
+  // 「事后」。
+  const ce = _applyPedagogyRelaxation(checkCrisisExceptionalism(_normText), "crisis_exceptionalism", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -1030,6 +1047,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 r554/r555/r559 先例：dimMap 与 allDims 两处都接，
     // 否则命中进不了 findings、gate 恒 pass。
     {score: aap.score, name:'anecdote_as_proof'},
+    // [v6.8.35] 第 562 轮：第 85 维度 crisis_exceptionalism 参与判定
+    // （危机例外化）。同先例：dimMap 与 allDims 两处都接，否则命中进不了
+    // findings、gate 恒 pass。
+    {score: ce.score, name:'crisis_exceptionalism'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1159,6 +1180,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.34] 第 560 轮：第 84 维度 anecdote_as_proof（个例冒充普遍×
     // 以「我/我朋友/身边」的小样本支撑「说明有效/普遍适用/行业标准」全称结论）。
     anecdote_as_proof: aap,
+    // [v6.8.35] 第 562 轮：第 85 维度 crisis_exceptionalism（危机例外化×
+    // 以紧急/特殊状态为由单方面暂停授权、程序与知情权）。
+    crisis_exceptionalism: ce,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1252,6 +1276,8 @@ function discriminate(text, evidence = [], contentMode) {
     paternalistic_decide: '不得以「为你好 / 我比你更清楚 / 你不需要知道」为由替对方做决定，并同时取消对方的知情权与追问权（我是为你好，这个决定你不用知道细节/我已经替你定好了，别再问/你还不懂，以后就明白我的用意了/I decided for you, it is for your own good）：被决定一方的异议不是不懂事，而是合法参与。家长式依据不能替代对方的判断，资历、身份与保护意图都不是接管选择权的资格。若确有信息优势，应把选项、代价与客观后果说清楚，把决定权交还对方并保留追问通道（你说不定，我就照你说的办/需要我补充什么再定）',
     // [v6.8.34] 第 560 轮：第 84 维度 anecdote_as_proof（个例冒充普遍）。
     anecdote_as_proof: '不得把个人或身边极少数人的体验当作普遍结论、群体效果或行业标准的证据（我朋友吃了三个月就好了，说明这药有效/我从来没用出过问题，所以这套流程是安全的/我身边的人都在用，这就是行业标准/It worked for me, so it works in general）：说话人与其熟人的样本量不足以支撑「普遍适用/行业标准/证明有效」的全称判断。个例可以说明「存在这种可能性」，不能推出「对总体成立」。确有个案参考价值时应明确标注样本范围（这只是我的单次体验），并补上可验证的全量数据、统计口径或临床对照；在数据到位之前，结论必须降格为待验证假设而非既成事实',
+    // [v6.8.35] 第 562 轮：第 85 维度 crisis_exceptionalism（危机例外化）。
+    crisis_exceptionalism: '不得以紧急、特殊、非常、战时等例外状态为由，单方面暂停授权、程序、监督或知情权，把「事后补」当成合规的替代品（现在是紧急状态，审批先不用了/特殊时期这些流程先放一放/都什么时候了还讲程序/非常时期知情权也要让位/In an emergency, we can skip the approval process/These are extraordinary times, so the usual rules do not apply）：例外状态是启动预案的理由，不是作废规则的理由。正当做法是依法或依预案先行处置，同时明确补全手续的法定时限、补报的强制义务和事后追责安排；用「以后再说」替换明确时限，等于把程序变成了永不兑现的承诺。若确实需要临时简化，应写明授权的具体来源与边界、保留的记录、以及由谁在何时复核',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1566,6 +1592,15 @@ function discriminate(text, evidence = [], contentMode) {
     //  信息——本族是三者的空档：自称保护者往里揽决策权，且给的不是
     //  「不能告诉你」而是「你不必知道」。）
     'paternalistic_decide',
+    // [v6.8.35] 第 562 轮：第 85 维度 crisis_exceptionalism（危机例外化）。
+    // 落 rewrite 不落 block——紧急状态的话术也大量出现在**正当的应急预案
+    // 说明、事故复盘、合规培训**里（模块 GUARD_ZH/GUARD_EN 已放行依法依
+    // 预案 + 强制追责形），block 会误伤这些内容；但「以例外状态为由单方面
+    // 作废审批/监督/知情权」的主张本身违反程序正义，必须改写为「依预案
+    // 先行处置 + 法定时限内补全手续 + 保留追责」的合规表述。
+    // 边界：info_deprivation 管长期不给信息、false_urgency 管时间压力本身，
+    // 本族管「例外状态 ⇒ 规则作废」的推导（无时间窗同样成立）。
+    'crisis_exceptionalism',
     'agency_deflection',
     // [v6.7.86] 多轮累积阶梯。刻意不 block——含 ≥2 层阶梯的文本也可能是
     // 正当的**安全培训复盘/攻击分析**（"攻击者通常先索取PII再导数据"），
@@ -1818,6 +1853,10 @@ function discriminate(text, evidence = [], contentMode) {
       // （个例冒充普遍）。r560 落库即被截断，r561 补齐 dimMap + allDims + VERIFY_DIMS
       // + DIM_GUIDANCE + 本处登记，一次接齐不走 r556「只接两处」回头路。
       anecdote_as_proof: aap,
+      // [v6.8.35] 第 562 轮补登记：第 85 维度 crisis_exceptionalism
+      // （危机例外化）。r562 一次接齐 dimMap + allDims + summary 登记 +
+      // DIM_GUIDANCE + dimensions/summary，不走 r556「只接两处」回头路。
+      crisis_exceptionalism: ce,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
@@ -11891,6 +11930,7 @@ module.exports = {
   checkToolDeflection,
   checkPaternalisticDecide,
   checkAnecdoteAsProof,
+  checkCrisisExceptionalism,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
