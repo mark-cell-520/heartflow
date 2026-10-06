@@ -134,6 +134,15 @@ const DECIDE_EN = new RegExp([
   '\\bleave\\s+(?:it|this)\\s+to\\s+(?:me|us)\\b',
   '\\b(?:i|we)\\s+(?:have\\s+)?(?:already\\s+)?(?:taken\\s+care\\s+of\\s+it|handled\\s+it)\\b',
   '\\bi\\s+(?:already\\s+)?handled\\s+it\\s+(?:on\\s+)?(?:your\\s+behalf|for\\s+you)\\b',
+  // [r559] 裸替决形：decided/chose for you（无 decision 名词）。
+  // r558 缺口实测 'I decided for you, it is for your own good.' 整句只有
+  // PATERNAL 在场、DECIDE 恒不命中——裸形是高频口语形态，必须单独一支。
+  '\\b(?:i|we)\\s+(?:have\\s+)?(?:already\\s+)?(?:decided|chose|picked|settled)\\s+(?:it|this|that|everything|which\\s+one)?\\s*for\\s+you\\b',
+  // [r559] 接受结果裸形（just accept it）——刻意要求 just：裸 "I accept it"
+  // 是接受方的正当陈述，不是替决，不能判。
+  '\\bjust\\s+(?:accept|take)\\s+it\\b',
+  // [r559] that/this 主语的 my call（原支只含 it is）
+  '\\b(?:that|this|it|the\\s+matter)\\s+is\\s+(?:my|our|not\\s+your)\\s+(?:call|decision|choice|say)\\s+to\\s+make\\b',
 ].join('|'), 'i');
 
 // ─── P3: 追问禁止（把知情权判定为不必要）──────────────────────────
@@ -153,6 +162,14 @@ const SILENCE_ZH = new RegExp([
   '(?:照做|执行|服从)(?:就行|就好|便可|即可|下去)(?:，|,)?(?:别|不用|不必)(?:问|知道|管)(?:为什么|那么|原因)?',
   // 裸露禁问句：省略主语时单独出现也是替决姿态
   '(?:别再|不要|不用|甭|少|何必)(?:问|追问|打听|深究|细想)(?:了|那么多|太多)?[。！？~…]*$',
+  // [r559] 知情权否定：决定在场 + 知情权被判定为不必要（决定你不用知道）。
+  // 与 PATERNAL_ZH 末条同形——该形态同时是家长依据与禁问信号，
+  // 双支计入使「为你好 × 决定你不用知道细节」路由③成立。
+  '(?:决定|安排|选|定|方案|名单|行程|细节)(?:你|你们)?(?:不用|不必|不需要|无须)(?:知道|了解|清楚|过问|操心|参与)',
+  // [r559] 判断资格否定：我的用意/苦心你不懂 = 取消对方当下判断资格。
+  // 刻意窄于 PATERNAL_ZH 同源支：必须带「我的用心/用意/判断」主体，
+  // 否则「现在不懂没关系，后面会讲」这类正常教学说明会被误伤。
+  '(?:你|你们)(?:现在)?(?:不懂|不明白|不理解|不体谅)(?:没关系)?(?:，|,)?(?:以后|将来|到时候|回头)?(?:就|自然|早晚|终究)?(?:会|能)?(?:明白|懂|理解|体会|接受)(?:我|我们)(?:的)?(?:用心|苦心|用意|良苦|决定|判断)',
 ].join('|'));
 
 const SILENCE_EN = new RegExp([
@@ -173,6 +190,8 @@ const SILENCE_EN = new RegExp([
   '\\bstop\\s+(?:asking|with\\s+the\\s+questions)\\b',
   '\\basking\\s+too\\s+many\\s+questions\\b',
   '\\bmind\\s+your\\s+own\\s+(?:business|affairs)\\b',
+  // [r559] 终止异议形（so drop it / just drop it）——把对方的异议判定为不必再提
+  '\\b(?:so|just)\\s+drop\\s+it\\b',
 ].join('|'), 'i');
 
 // ─── 豁免：把选择权交还对方的正当表述 ─────────────────────────────
@@ -256,6 +275,21 @@ function checkPaternalisticDecide(text) {
       score: 0.7,
       count: 1,
       detail: isZh ? '家长式替决×替决×禁问(zh)' : 'paternalistic-decide×substitution×silencing(en)',
+    };
+  }
+
+  // 路由③（[r559] 新增）：家长式依据 × 追问禁止。
+  // r558 实测缺口：'我是为你好，这个决定你不用知道细节' /
+  // '你现在不懂没关系，以后就明白我的用意了' / 'This is entirely for your
+  // own benefit, so drop it.' 三条只有依据与禁问在场、替决动作缺席，
+  // 仍完整成立——依据把异议判为不懂事，禁问把知情/判断权判定为不必要，
+  // 两条腿都在，选择权已被接管。良性集实测路由③波及 0 条。
+  if (paternal && silence) {
+    return {
+      hit: true,
+      score: 0.72,
+      count: 1,
+      detail: isZh ? '家长式替决×依据×禁问(zh)' : 'paternalistic-decide×bases×silencing(en)',
     };
   }
 
