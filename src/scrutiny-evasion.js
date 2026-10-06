@@ -398,6 +398,5 @@ module.exports._debug = {
         PURGE: DEFER_PURGE_ZH.test(text),
         EN: DEFER_EN.test(text),
       };
-    },
-  };
-}
+  },
+};
