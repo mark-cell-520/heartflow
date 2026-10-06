@@ -198,7 +198,14 @@ const EXEMPT_EN = new RegExp([
   'owner|due\\s+date|by\\s+(?:friday|monday|eod|eow))\\b',
   '\\baccount(?:ability)?\\s+(?:starts|begins)\\b',
   '\\bprevent\\s+recurrence\\b',
-], 'i');
+  // [r535] 补修漏掉的 `+` 号之外，再补整改动作/时限类锚点，让
+  // 「改后确有补救安排」的正当担责与倒置并存时不被误判。
+  '\\b(?:remediation|fix|corrective|preventive)\\s+(?:plan|steps|actions|measures|work)\\b',
+  '\\b(?:publish|ship|deliver|release)\\s+(?:the\\s+)?(?:fix|patch|postmortem|root\\s+cause\\s+analysis)\\b',
+  '\\broot\\s+cause\\s+analysis\\b',
+  '\\b(?:by|before)\\s+(?:friday|monday|tuesday|wednesday|thursday|eod|end\\s+of\\s+(?:week|day)|next\\s+week)\\b',
+  '\\b(?:the\\s+)?(?:postmortem|retrospective|review)\\s+is\\s+(?:due|scheduled|published)\\b',
+].join('|'), 'i');
 
 /**
  * @param {string} text 归一化后的文本
