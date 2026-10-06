@@ -62,8 +62,9 @@ const LEDGER_EN = new RegExp([
   '\\b(?:i|we)\\s+(?:have\\s+)?(?:done|did|helped|helped\\s+out|supported|backed|carried)\\s+(?:so\\s+much|a\\s+lot|a\\s+great\\s+deal|so\\s+many\\s+things|you)\\s+for\\s+you\\b',
   '\\b(?:i|we)\\s+(?:did\\s+)?(?:so\\s+much|a\\s+lot|everything\\s+for|so\\s+many\\s+things\\s+for)\\s+you\\b',
   '\\bafter\\s+(?:all|everything)\\s+(?:i|we)\\s+(?:have\\s+)?(?:done|did)\\s+for\\s+you\\b',
-  '\\ball\\s+(?:i|we)\\s+(?:have\\s+)?(?:done|did)\\s+for\\s+you\\b',
-  '\\b(?:i|we)\\s+(?:covered|stood\\s+up|fought|pulled\\s+strings|put\\s+in\\s+a\\s+word|vouched|went\\s+out\\s+on\\s+a\\s+limb)\\s+for\\s+you\\b',
+  '\\b(?:i|we)\\s+(?:have\\s+)?(?:done|did)\\s+for\\s+you\\b',
+  '\\b(?:i|we)\\s+(?:have\\s+)?(?:helped|backed|supported|carried)\\s+you\\s+(?:a\\s+lot|so\\s+much|a\\s+great\\s+deal|so\\s+many\\s+times)\\b',
+  '\\b(?:i|we)\\s+(?:covered|stood\\s+up|fought|pulled\\s+strings|put\\s+in\\s+a\\s+word|vouched|went\\s+out\\s+on\\s+a\\s+limb)\\s+for\\s+(?:you|your\\s+(?:promotion|career|raise|appointment|reputation))\\b',
   '\\bwithout\\s+(?:me|us)\\s+you\\s+(?:would\\s+be|are)\\s+(?:nothing|nowhere|worthless)\\b',
   '\\b(?:i|we)\\s+(?:gave|offered|handed)\\s+you\\s+(?:your|this|the)\\s+(?:chance|opportunity|break|job|position|promotion|career)\\b',
   '\\byou\\s+(?:would\\s+be|wouldn\'t\\s+have\\s+been|would\\s+not\\s+have\\s+been)\\s+(?:nothing|nowhere)\\s+(?:without\\s+(?:me|us))\\b',
@@ -79,7 +80,13 @@ const CLAIM_ZH = new RegExp([
   '(?:别|不要|不能|不许|不准|少跟我|别再)(?:推|推辞|推托|推脱|拒绝|推让|推三阻四|讲条件|谈条件)',
   // 不肯 / 好意思 / 这点事都不
   '(?:这点|这码|这点子)(?:小事|事情|事儿|事|忙|要求|吩咐)(?:你)?(?:都)?(?:不|也不|才|竟|居然)',
-  '(?:你好?意思|你还好意思|亏你好意思)',
+  '(?:你|您)?(?:怎么|也|还挺|还真)?(?:好意思|好意思说)(?:拒绝|回绝|推|推辞|推托|说不|不同意|反对|问)',
+  // 受点委屈/吃点亏/让一让（忍受型让步）
+  '(?:这点|这点子|这码|这等)?(?:委屈|亏|气|苦)(?:你|您)?(?:就)?(?:受|吃|忍|扛|憋)一?(?:下|步|会儿)?',
+  '(?:受|吃)(?:点|些|一?点)?(?:委屈|亏|气|苦|罪)',
+  '(?:)?(?:让|退|让让|退一步|低个头|吃点亏|牺牲一下|委屈一下)(?:一?(?:下|步|让))?',
+  // 你这个/这份责任必须扛（引导动词可选）
+  '(?:把|来|去|给)?(?:这个|这份|那件|这事|这口|这顶)?(?:责任|锅|委屈|担子|事情|雷)(?:你|您|得|必须|应该|应当|务必要)?(?:担|扛|顶|背|揽|认)(?:起|下|下来|过去|着)?',
   // 担起 / 扛下 / 顶着 / 背着（承担责任）
   '(?:把|来|去|给)(?:这个|这份|那件|这事)(?:责任|锅|委屈|担子|事情)(?:担|扛|顶|背|揽|认)下?',
   // 让利/让步：让一让 / 让让步 / 吃点亏 / 牺牲一下
@@ -102,7 +109,8 @@ const CLAIM_EN = new RegExp([
   '\\byou\\s+(?:cannot|can\'t|must|have\\s+to|should)\\s+(?:refuse|say\\s+no|decline|deny)\\s+(?:me|us|this)?\\b',
   '\\byou\\s+(?:owe|owe\\s+me|owe\\s+us)\\s+(?:me|us|this|this\\s+one)\\b',
   '\\b(?:so\\s+)?(?:do|do\\s+as\\s+i\\s+say|listen\\s+to\\s+me|take\\s+my\\s+word)\\b',
-  '\\bthis\\s+is\\s+(?:a\\s+)?(?:small|tiny|little|trivial|simple)\\s+(?:ask|favor|thing|request)\\s+(?:you\\s+)?(?:cannot|can\'t|won\'t)',
+  '\\bthis\\s+is\\s+(?:a\\s+)?(?:small|tiny|little|trivial|simple)\\s+(?:ask|favor|thing|request)\\b',
+  '\\bnow\\s+it\\s+is\\s+(?:my|your)\\s+turn\\b',
   '\\bconsider(?:ing)?\\s+(?:what|everything)\\s+(?:i|we)\\s+(?:did|have\\s+done)\\b',
   '\\bso\\s+the\\s+least\\s+you\\s+can\\s+do\\b',
   "\\bdon'?t\\s+(?:you\\s+)?(?:dare|even\\s+think\\s+about)?\\s*(?:refuse|push\\s+back)\\b",
