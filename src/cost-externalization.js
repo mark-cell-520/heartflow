@@ -66,21 +66,30 @@ const DISTANCE_ZH = new RegExp([
   '(?:站着说话)?(?:不)?腰疼',
   // 「疼的不是你/痛不在你身上」
   '(?:疼|痛|苦|累|难)(?:的)?(?:不|又)?(?:是|在)(?:你|你们|您)',
+  // 「疼的又不/痛的又不是你」：副词在否定词之前的倒序形（口语常说
+  // 「疼的又不是你」——r525 实测漏在此）
+  '(?:疼|痛|苦|累|难)(?:的)?(?:又|才|本来)?(?:不|没)(?:是|在)?(?:你|你们|您)',
   // 「后果由别人扛/别人承担」
   '(?:后果|风险|代价|成本|责任|损失|压力|麻烦)(?:由|归|让|交给)(?:别人|他人|其他人|他们|底下|下属|大家|团队|用户|客户|社会|公众)(?:来)?(?:扛|承担|承受|背负|负责|付|买单|接盘)',
   // 「反正是别人吃亏/别人受罪」
   '(?:反正|总之|说白了)(?:是)?(?:别人|他人|其他人|他们|底下|下属|用户|客户)(?:吃亏|受罪|受累|受苦|倒霉|倒霉蛋|买单|接盘|背锅|担着)',
   // 「你不担/不用担」
   '(?:你|你们|您)(?:也)?(?:不|没)(?:用)?担(?:这个|任何)?(?:责任|风险|后果|干系|事儿)',
+  // 「反正不用你操心/不用你费心」：零参与度声明（参与者被摘出执行
+  // 结构）——与资格消解/轻量动作共现即成本转移（r525 实测漏在此）
+  '(?:反正|总之|说到底|说白了|横竖)(?:也)?(?:不|没)(?:用|需|要)(?:你|你们|您)(?:操心|费心|劳神|动手|出面|跑腿|经手|操作|管|过问|担心)',
 ].join('|'));
 
 const DISTANCE_EN = new RegExp([
   // 「you do not bear the cost」
-  '\\byou\\s+(?:do\\s+not|do not|don t|dont)\\s+(?:have\\s+to\\s+)?' +
+  '\\byou\\s+(?:do\\s+not|do not|don t|don\'t|dont)\\s+(?:have\\s+to\\s+)?' +
     '(?:bear|carry|shoulder|absorb|pay|face|take\\s+on)\\s+(?:the\\s+|any\\s+)?' +
     '(?:cost|costs|consequence|consequences|risk|risks|fallout|burden|price)',
-  // 「don't bear/carry...」（撇号在归一化后可能丢失，兼容 don t/dont 形）
-  '\\b(?:do\\s+not|do not|don t|dont)\\s' +
+  // 「don't bear/carry...」（撇号在归一化后可能丢失，兼容 don t/dont 形。
+  // [r525] 补 ASCII 撇号形 `don't`：实测 text-normalizer 的 NFKC 通道
+  // 把弯引号折回 ASCII '，而本支原只列 don t/dont 形，导致
+  // "you don't have to bear the cost" 疏离侧漏检）
+  '\\b(?:do\\s+not|do not|don t|don\'t|dont)\\s' +
     '(?:bear|carry|shoulder|absorb|pay|face|take\\s+on)\\s+(?:the\\s+|any\\s+)?' +
     '(?:cost|costs|consequence|consequences|risk|risks|fallout|burden|price)',
   // 「it is not your cost / the cost is not yours」
@@ -103,7 +112,7 @@ const DISTANCE_EN = new RegExp([
     '(?:worry|fret|stress)\\s+about',
   '\\bno\\s+need\\s+to\\s+(?:worry|fret|stress|be\\s+concerned|think\\s+twice)',
   '\\b(?:the\\s+)?(?:cost|costs|consequence|consequences|risk|risks|burden|fallback|fallout)\\s+' +
-    '(?:is|are|falls|fall|sits|sits)\\s+(?:on\\s+)?(?:them|someone\\s+else|others)',
+    '(?:is|are|falls|fall|lands|sits)\\s+(?:on\\s+)?(?:them|someone\\s+else|others)',
   // 「someone else carries / shoulders / bears」
   '\\b(?:someone|somebody)\\s+else\\s+(?:carries|shoulders|bears|absorbs|takes|pays\\s+for|eats)',
   // 「not yours to worry about / not your problem」
@@ -148,15 +157,23 @@ const DISMISS_ZH = new RegExp([
   // 「反对无效/不用你管/别指手画脚」
   '(?:反对|异议|质疑)(?:无效|不算|不当真|没用)',
   '(?:不用你|轮不到你|用不着你|哪用你|别)(?:管|操心|担心|着急|过问|插手|干预|同意|批准|点头)',
-  // 「你管不着/管好自己」
-  '(?:你|你们)(?:管不着|管不了|少管|先管好)(?:自己|闲事|这些)',
+  // 「你管不着/管好自己」。（[r525] 尾部物件改可选：原写法把
+  // 「自己/闲事/这些」设成必选，导致光裸的「你管不着」漏检——
+  // 口语里「管不着」不带宾语是资格消解的最常见形）
+  '(?:你|你们|您)(?:管不着|管不了|少管|先管好|管好)(?:自己|闲事|这些|这事|那事)?',
   // 「较什么真/何必较真」
   '(?:较|计较)(?:什么|哪门子)?真',
+  // 「你说的这些都是风凉话/尽说风凉话」：泛指形（「这些/那些/尽」
+  // 前缀把具体反对降格为空谈——r525 实测漏在此）
+  '(?:你|你们)?(?:说|讲|泼|放)?.{0,4}?(?:都|全|尽|一直)?(?:是|在)?(?:些)?(?:风凉话|便宜话|风凉|看热闹|说便宜话)',
   // 「你又不懂/不在其位」
   '(?:你|你们)(?:又|压根|根本)(?:不懂|不明白|不了解|不在其位|不谋其政)',
   // 「等你…再说」
   '(?:等)(?:你|你们)(?:先|也|真的)?(?:担|负|付|吃)(?:过|了|上)(?:亏|苦|损失|代价|苦头)(?:再|才)',
   '(?:等)(?:你|你们)(?:坐|当)(?:到|上)(?:我|这个|那个|这)(?:位置|位子|职位)(?:再|才)',
+  // 「等你坐到我这个位置/到我这个位子上」：代词属格形（我这个位置/
+  // 他这个位子/我这个位子），r525 实测漏在此——原支只列了定指形
+  '(?:等)(?:你|你们)(?:坐|当)(?:到|上)(?:我|你|他|她|人家|这个|那个|这)(?:的)?(?:这个|那个|这)?(?:位置|位子|职位|交椅)(?:上)?(?:再|才)',
   // 「先…再说」式资格门槛
   '(?:先)(?:把|将)(?:自己|自家)(?:的)?(?:事|摊子|一亩三分地|饭碗)(?:管好|弄好|搞清楚)(?:再|才)',
 ].join('|'));
@@ -314,6 +331,12 @@ const EXEMPT_EN = new RegExp([
   // we bear it
   '\\b(?:i|we)\\s+(?:will|shall|am\\s+going\\s+to|can)\\s+(?:bear|carry|shoulder|absorb|take\\s+on)\\b',
   '\\bwe\\s+(?:will\\s+)?(?:make\\s+)?(?:them\\s+)?whole\\b',
+  // [r525] 「代价落在我方，不是落在你身上」：自担形（us/ourselves）与
+  // 「not on you」对举形。原豁免库只有 i/we 开头一支，导致
+  // "the consequences land on us, not on you" 这类「先说清谁背」的正当
+  // 表述被疏离支误伤——先讲清成本归属正是要鼓励的核验行为
+  '\\b(?:land|lands|fall|falls|sit|sits)\\s+on\\s+(?:us|ourselves|our\\s+team|my\\s+team)\\b',
+  '\\bnot\\s+on\\s+(?:you|your\\s+team|your\\s+side|yourselves)\\b',
 ].join('|'), 'i');
 
 /**
