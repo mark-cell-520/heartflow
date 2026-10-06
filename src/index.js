@@ -102,6 +102,15 @@ const { checkReversibility } = require('./reversibility.js');
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkStatisticalMisleading } = require('./statistical-misleading.js');
 const { checkPercentageOverflow } = require('./percentage-overflow.js');
+// [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage（不完备全覆盖宣告）。
+// r546 交接簿指定方向「Boundary 族无探针」，本轮 action A 落地（探测器池空转，
+// 转上一轮遗留真缺口；decision 本体对 A/B/C 打分 0.74/0.77/0.74，分差在噪声内，
+// 按「不挑维护工作」原则取 A——B 是收窄 perfect_error 误伤，属维护不构成新能力）。
+// 实测（scripts/round-547-criteria-probe.js）：攻击 11/12 命中、良性 0/13 误伤，
+// MARGIN 4–10 命中率与误伤率完全一致（结构判据非调参）。
+// 判据：无保留全覆盖宣称 × 分配语境分项≥2 × 和 ≤ 100−8%。判据细节见
+// src/incoherent-coverage.js。
+const { checkIncoherentCoverage } = require('./incoherent-coverage.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
 // 非人主体，回避具体决策者）。心虫 decision 本体选出，探测器实测 8/10
@@ -757,6 +766,11 @@ function discriminate(text, evidence = [], contentMode) {
   // 判据：分配语境 × 分项≥2 × 和 > 100.5%，四类排除（变化/频率/时段/完成度）。
   // 判据细节见 src/percentage-overflow.js。
   const pvo = _applyPedagogyRelaxation(checkPercentageOverflow(_normText), "percentage_overflow", pedagogyRelaxation);
+  // [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage（不完备全覆盖宣告）——
+  // percentage_overflow（和 > 100.5%）的反方向缺口：分项之和显著低于百却宣称
+  // 覆盖全部。实测该族 10 条攻击样本中 2 条完全穿过硬闸门判 pass。
+  // 判据细节见 src/incoherent-coverage.js。
+  const icv = _applyPedagogyRelaxation(checkIncoherentCoverage(_normText), "incoherent_coverage", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -946,6 +960,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.28] 第 79 维度 percentage_overflow 参与判定（分配占比合计溢出）。
     // 同 r530/r534 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: pvo.score, name:'percentage_overflow'},
+    // [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage 参与判定
+    // （不完备全覆盖宣告×分配不足）。同 r530/r534/r545 先例：dimMap 与
+    // allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: icv.score, name:'incoherent_coverage'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1061,6 +1079,8 @@ function discriminate(text, evidence = [], contentMode) {
     suffering_contest: sco,
     // [v6.8.28] 第 545 轮：第 79 维度 percentage_overflow（分配占比合计溢出×和>100%）。
     percentage_overflow: pvo,
+    // [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage（不完备全覆盖宣告）。
+    incoherent_coverage: icv,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1524,6 +1544,11 @@ function discriminate(text, evidence = [], contentMode) {
     //  后才能使用；单句也可能是转述他处报告的数据勘误讨论，rewrite 会误伤。
     //  与 r530/r534 同口径）
     'percentage_overflow',
+    // [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage（不完备全覆盖宣告）
+    // （verify 级——分项之和显著低于百分百却宣称覆盖全部，需补充分项明细
+    //  才能确认口径；单句也可能是转述他处统计报告时漏抄分项，rewrite 会误伤。
+    //  与 r530/r534/r545 同口径）
+    'incoherent_coverage',
   ]);
   // pass：无问题通过
 
@@ -1647,6 +1672,10 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.28] 第 545 轮：第 79 维度 percentage_overflow（分配占比合计溢出）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
       percentage_overflow: pvo,
+      // [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage（不完备全覆盖宣告）
+      // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
+      //  会让读方看不到命中）
+      incoherent_coverage: icv,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
