@@ -62,6 +62,19 @@ const CAPITAL_ZH = new RegExp([
   '(?:至少|好歹|终究)(?:我|咱)?(?:没|不曾|从未|都没有)(?:做得|干的|弄的|干的)(?:更|太|那么|那样)?(?:过分|离谱|糟糕|出格|越界|严重)',
   // 老好人/口碑
   '(?:老好人|好名声|好口碑|人品|为人|名声)(?:摆|放|挂)在(?:这儿|这里)',
+  // ── [r568] 补支：r567 末版把首条改成「合取形状」后误伤收得太紧，
+  //   支级实测（scripts/round-568-capital-diag.js）23 条攻击中 3 条中文
+  //   + 2 条英文 capital=0，全部 miss。以下四支补的是「合规自述 / 口碑
+  //   自述 / 程度自定级」三种此前零覆盖的资本形状，每条自身都带必选成分
+  //   （时间词或主语或程度词），不退回 r567 删除的「全可空前导」宽支。
+  // ① 制度性合规自述：「平时都按规矩来」（时间词必选 + 制度词必选）
+  '(?:平时|一向|向来|素来|历来|一贯|从来|多年|常年|这些年来|至今为止|工作以来)(?:都|也|一直|始终)?(?:按|循|照|守)(?:规矩|规定|制度|流程|规章|纪律|规范|法纪|本分)(?:来|办事|做事|行事|办)',
+  // ② 口碑自述：「（也）是单位的老好人」（主语必选 + 身份词必选）
+  '(?:我|咱|我们|自己|自己也算)(?:也|还)?(?:算|算是|是)(?:单位|公司|部门|这里|这一带|周边|业内|圈里|所里)?(?:的)?(?:老好人|好人|厚道人|老实人|善人|热心人|体面人)',
+  // ③ 程度自定级：「我们已经很规范了」（程度词必选 + 语气尾）
+  '(?:我们|我|咱|咱们)(?:已经|早就|早就已经)?(?:很|相当|够|十分|非常|挺|蛮|这么)(?:规范|规矩|合规|克制|客气|本分|守法|廉洁|清白|干净|正直|谨慎|稳妥|厚道|仗义)(?:了|的啦|的了)',
+  // ④ 时间副词 × 品格词（无制度动词的宽松形，时间词必选）
+  '(?:一向|向来|素来|历来|一贯|从来|多年|常年)(?:都|也)(?:很|相当|挺|蛮|这么)(?:规范|规矩|合规|克制|客气|本分|守法|廉洁|清白|干净|正直|谨慎|稳妥|厚道|仗义|仁厚)',
 ].join('|'));
 
 const CAPITAL_EN = new RegExp([
@@ -73,6 +86,15 @@ const CAPITAL_EN = new RegExp([
   '\\b(?:i|we)\\s+(?:have\\s+)?(?:done|given)\\s+so\\s+much\\s+for\\s+(?:this\\s+company|the\\s+team|the\\s+charity|them)\\b',
   '\\bafter\\s+(?:all|everything)\\s+(?:i|we)\\s+(?:have\\s+)?(?:done|given|contributed)\\s+(?:for|to)\\b',
   '\\b(?:i|we)\\s+(?:have\\s+been\\s+)?(?:restrained|moderate|measured)\\s+(?:so\\s+far|until\\s+now|in\\s+my\\s+claims)\\b',
+  // ── [r568] 补支：拟态实测（scripts/round-568-capital-diag.js）2 条英文
+  //   攻击 capital=0，补「动词 + 不定冠词 + 形容词 + 记录名词」与
+  //   「after all + 所有格 + 贡献名词」两种此前零覆盖的资本形状。
+  //   原第 3 支只有「所有格 + is + 形容词」的位置形，"I have a clean
+  //   record"（动词 + 冠词）连不上。
+  // ① 「I have a clean / spotless record」
+  '\\b(?:i|we)\\s+(?:have|had)\\s+(?:a|an)\\s*(?:clean|spotless|unblemished|blameless|impeccable|pristine)\\s+(?:record|track\\s+record|history|reputation|image|name)\\b',
+  // ② 「After all my volunteer work / community service」
+  '\\bafter\\s+(?:all|everything)\\s+(?:my|our)\\s+(?:volunteer|volunteering|charity|charitable|community|church)\\s+(?:work|service|efforts|contributions|donations|giving|hours)\\b',
 ].join('|'), 'i');
 
 // ─── A2: 越界许可（本次行为可通融/不算事/可减免/可免究）────────
