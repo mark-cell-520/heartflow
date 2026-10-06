@@ -443,8 +443,15 @@ class AssociativeEngine {
       this.metrics.setCoherence(coherence.overallScore);
 
       // 步骤6: L5逐词生成
+      // [v6.8.1 第 543 轮] 把 L4 保留下来的 matchedNarrativeDetail 传进 L5，
+      // 让 r542 写入的 narrative 选词能力真正被调用方触发（此前零调用方）。
       const l5Result = await this._safeExecuteLayer('L5', () =>
-        this.wordByWordGenerator.generateResponse(trace.layers.L4.thoughtVector, userModel)
+        this.wordByWordGenerator.generateResponse(
+          trace.layers.L4.thoughtVector,
+          userModel,
+          200,
+          trace.layers.L4.matchedNarrativeDetail || null
+        )
       , { response: '我在思考...', wordCount: 0, trace: [] });
       trace.layers.L5 = l5Result.result;
       trace.layers.L5Status = l5Result.status;
