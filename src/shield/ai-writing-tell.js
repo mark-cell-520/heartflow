@@ -280,6 +280,126 @@ const ZH_EN_CONNECTIVE_PAIRS = [
 // TIER 词（中英短语级判据 C 用）：合并 TIER1-3 词表 + 常见派生后缀
 const TIER_WORDS_RE = /\b(robust|comprehensive\w*|holistic\w*|seamless\w*|leverage\w*|streamline\w*|transformative|transformation|pivotal|multifaceted|unprecedented|intricate\w*|delve|embrace|foster\w*|nuanced|paramount|quintessential|burgeoning|poised|encompass\w*|harness\w*|unleash\w*|world-class|game-chang\w*|significant\w*|effective\w*|sophisticated\w*|crucial\w*|myriad|plethora|cataly[sz]e\w*|galvaniz\w*|illuminat\w*|elucidat\w*|juxtapos\w*|reimagin\w*|spearhead\w*|bolster\w*|resonat\w*|revolutioni[sz]e\w*|underpin\w*|underlying|cornerstone|overarching|paradigm|tapestry|beacon|meticulous\w*|nestled|vibrant|thriving|bustling|enduring|daunting|holistically|actionable|impactful|learnings|synerg\w*|interplay|symphony|elevate\w*|empower\w*|navigat\w*|facilitat\w*|augment\w*|cultivat\w*|nascent|ecosystem)\b/i;
 
+// ── 4b. [第 532 轮] 中文 AI 套话模板族 ────────────────────────────
+// 实测缺口（2026-10-06，scripts/round-532-zh-formulaic-probe.js）：
+// ai_writing_tell 的 27 个判据族里，英文族 26 个、zh-en-mixing 1 个，
+// 纯中文 AI 套话（无英文词）**零覆盖**——20 条典型中文套话样本
+// 14 条 gate=pass，其中 9 条连一个族都不命中（familiesHit=0 score=0）。
+// 根因两条：① 所有族都要求英文句型/词表；② zh-en-mixing 的判据是
+// 「中文锚 + 锚后 140 字符内 ≥2 个英文词」，纯中文输出取不到。
+//
+// 判据：9 支中文族，与英文侧同源折叠纪律逐条对称——
+//   · vocab-discourse-zh：中文 AI 高频词表 + 连接词（同 EN TIER/transitions）
+//   · templated-frames-zh：套话开头 + 套话结尾（同 EN formulaic/generic）
+//   · lets-zh / significance-zh / hollow-hedge-zh /
+//     vague-attribution-zh / chatbot-artifacts-zh 各自独立族
+// 共现门槛照旧：单族命中 score 归零（第 36 轮纪律，不因本轮松动）。
+// 词表刻意保守：不收「然后/最后/另外/例如」这类日常高频词——
+// 不收「我们要/我们将」（正常中文商务写作的通用主语），
+// 只收带陪伴义/号召义的「让我们一起/携手/并肩」。
+
+// 中文 AI 高频词（Tier1/2/3 的中文对应物：大词、空转动词、黑话）
+const ZH_TIER_WORDS = [
+  '赋能','抓手','闭环','沉淀','拉通','对齐','颗粒度','迭代','深耕','布局',
+  '范式','擘画','铸就','彰显','聚力','奋进','昂扬','提质增效','保驾护航',
+  '打通','嫁接','组合拳','赛道','生态','护城河','顶层设计','底层逻辑',
+  '落地','打磨','vertical','抓手','新引擎','新起点','新篇章','新征程',
+  '全方位','多维度','深层次','系统性','持续性','战略性','全局性',
+];
+// 中文连接词/话语标记（同 EN transitions）
+const ZH_TRANSITIONS_RE = /(?:首先|其次|再者|最后|综上所述|总而言之|总的来说|另一方面|换言之|此外|与此同时|毋庸讳言|毋庸置疑|接下来|立足于|着眼于)/;
+// 号召/陪伴义动词（同 EN lets-patterns——刻意不含"我们要/我们将"）
+const ZH_LETS_RE = /(?:让我们(?:一起|共同|一道|携手|并肩)|(?:共同|携手|并肩)(?:努力|奋斗|前行|奋进)|一道(?:努力|前行))/;
+// 套话开头（同 EN formulaic-openers）
+const ZH_FORMULAIC_OPENERS = [
+  /在这个(?:快速)?(?:发展|变化|变革|转型)的?(?:时代|时期|阶段|背景下)/,
+  /随着[^。，,；;]{2,24}的?(?:不断|日益|快速|持续)(?:发展|进步|提升|深入|推进)/,
+  /在当今[^。，,；;]{2,16}(?:时代|社会|世界|背景下)/,
+  /众所周知/,
+  /面对[^。，,；;]{2,20}(?:的?(?:新形势|新常态|新挑战|大环境))/,
+];
+// 套话结尾（同 EN generic-conclusions）
+const ZH_GENERIC_CONCLUSIONS = [
+  /(?:共创|开创|开启|谱写)[^。，,；;]{0,12}(?:未来|篇章|新篇|华章|新局面|新征程|新境界)/,
+  /(?:更加|越来越)(?:美好|辉煌|灿烂|壮丽)的?明天/,
+  /再上(?:新台阶|新水平|新高度)/,
+  /(?:迈向|走向)(?:新的)?(?:辉煌|巅峰|新征程)/,
+  /(?:充分|全面)(?:展现|展示|彰显)[^。，,；;]{0,10}(?:风采|魅力|担当|作为)/,
+];
+// 意义拔高（同 EN significance-inflation）
+const ZH_SIGNIFICANCE_INFLATION = [
+  /不仅(?:仅是)?[^。，,；;]{2,24}，?更是[^。，,；;]{2,24}/,
+  /标志着[^。，,；;]{2,28}(?:进入|迈向|开启|翻开了)/,
+  /具有?里程碑(?:式)?的?意义/,
+  /(?:一次|一场)(?:历史性|革命性|颠覆性|跨越式)的?(?:变革|飞跃|突破|提升)/,
+  /(?:站的)?新(?:起点|征程|方位)/,
+];
+// 空洞对冲（同 EN hollow-intensifiers / hedge）
+const ZH_HOLLOW_HEDGE = [
+  /不可否认/,
+  /从某种意义上?(?:说|来看|讲)/,
+  /毫无疑问/,
+  /某种程度上而言/,
+  /平心而论/,
+];
+// 模糊归因（同 EN vague-attributions）
+const ZH_VAGUE_ATTRIBUTION = [
+  /(?:专家|学者|业内人士|业界)(?:普遍)?(?:认为|指出|表示|坦言)/,
+  /研究(?:表明|显示|发现|证实)/,
+  /(?:大量|许多|诸多)(?:数据|研究|实践|案例)(?:表明|证明)/,
+  /实践证明/,
+];
+// 对话尾巴（同 EN chatbot-artifacts）
+const ZH_CHATBOT_ARTIFACTS = [
+  /希望(?:以上|这些|上述)(?:内容|回答|信息|分享)(?:对(?:您|你|大家)[^。，,；;]{0,10})?(?:有?所?帮助|有所启发|有所裨益)/,
+  /如果(?:您|你|大家)(?:还有|有任何|有其它|有其他)[^。，,；;]{0,12}(?:问题|疑问|需求)/,
+  /欢迎(?:随时)?(?:提问|咨询|交流|探讨|指正)/,
+  /以上(?:就)?是[^。，,；;]{0,16}(?:的?(?:全部|所有))?(?:内容|回答|介绍)/,
+];
+
+// 中文族 → 归一化档位（与英文侧 vocab-discourse / templated-frames 对称）
+const ZH_VOCAB_DISCOURSE = new Set(['zh-tier', 'zh-transitions']);
+const ZH_TEMPLATED_FRAMES = new Set(['zh-formulaic-openers', 'zh-generic-conclusions']);
+
+const ZH_FAMILY_SCORE = {
+  'zh-tier': 0.18, 'zh-transitions': 0.10, 'zh-lets': 0.13,
+  'zh-formulaic-openers': 0.14, 'zh-generic-conclusions': 0.16,
+  'zh-significance-inflation': 0.18, 'zh-hollow-hedge': 0.12,
+  'zh-vague-attribution': 0.20, 'zh-chatbot-artifacts': 0.25,
+};
+
+function detectZhFormulaic(text) {
+  const hasChinese = /[\u4e00-\u9fff]/.test(text);
+  if (!hasChinese) return [];
+  const fams = new Set();
+  // vocab-discourse-zh：词表与连接词同源折叠（同 EN TIER/transitions 归并纪律）
+  let tierHit = null, transHit = null;
+  for (const w of ZH_TIER_WORDS) {
+    if (text.includes(w)) { tierHit = w; break; }
+  }
+  const tm = text.match(ZH_TRANSITIONS_RE);
+  if (tm) transHit = tm[0];
+  if (tierHit) fams.add('zh-tier');
+  if (transHit) fams.add('zh-transitions');
+  const firstOf = (list) => {
+    for (const re of list) { const m = text.match(re); if (m) return m[0].slice(0, 40); }
+    return null;
+  };
+  for (const [fam, list] of [
+    ['zh-lets', [ZH_LETS_RE]],
+    ['zh-formulaic-openers', ZH_FORMULAIC_OPENERS],
+    ['zh-generic-conclusions', ZH_GENERIC_CONCLUSIONS],
+    ['zh-significance-inflation', ZH_SIGNIFICANCE_INFLATION],
+    ['zh-hollow-hedge', ZH_HOLLOW_HEDGE],
+    ['zh-vague-attribution', ZH_VAGUE_ATTRIBUTION],
+    ['zh-chatbot-artifacts', ZH_CHATBOT_ARTIFACTS],
+  ]) {
+    const hit = firstOf(list);
+    if (hit) fams.add(fam);
+  }
+  return [...fams];
+}
+
 function detectZhEnMixing(text) {
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   if (!hasChinese) return [];
@@ -469,6 +589,25 @@ function detect(text) {
     if (findings.length >= 24) break;
   }
 
+  // [第 532 轮] 中文 AI 套话模板族：9 支族各自独立计一票，计分结构与
+  // 英文族完全对称（baseScore 进 total、findings 直出、归一化档位见下方）。
+  // 刻意不汇总成一个 "zh-formulaic" 大族——共现门槛（familiesHit >= 2）的
+  // 意义就在于区分「单点命中」与「多特征共现」，合成一族会让门槛失效。
+  const zhFams = detectZhFormulaic(normalized);
+  for (const fam of zhFams) {
+    const key = `ai-tell-zh:${fam}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    total += (ZH_FAMILY_SCORE[fam] || 0.12);
+    findings.push({
+      dimension: `ai-tell-zh-${fam}`,
+      severity: Math.min(100, Math.round((ZH_FAMILY_SCORE[fam] || 0.12) * 100)),
+      trigger: fam,
+      guidance: 'AI writing artifact (Chinese formulaic template)',
+      zhFam: fam,
+    });
+  }
+
   // [第 50 轮] 中英混杂族：三条独立判据（anchor-mix / double-connective /
   // tier-phrase），任一命中即记一个 family（zh-en-mixing）。这与既有族的
   // 计分方式一致：baseScore 0.18，只加分不改路由；共现门槛照旧适用。
@@ -652,6 +791,20 @@ function detect(text) {
         // anchor-mix 与 double-connective 本就在同族内只算一票。
         return 'zh-en-mixing';
       }
+      // [第 532 轮] 中文模板族的英文侧同源折叠：
+      //   zh-en-mixing 的 anchor-mix 支判据是「中文套话锚 + 英文词」，
+      //   锚表 ZH_AI_ANCHOR（总而言之/综上所述/首先/其次…）与
+      //   ZH_TRANSITIONS_RE **逐字同源**，于是「综上所述 + 英文词」的
+      //   正当中英混排句会被 zh-transitions 与 anchor-mix 各记一票——
+      //   同一批锚词被当成两个独立证据（第 200 轮 transitions↔
+      //   double-connective 同型错误的第 7 次复现，这次是中英混排版）。
+      // 修法同型：连接词/套话锚在场时，zh-transitions 折进 zh-en-mixing。
+      // 反向确认：中文族另有 8 支独立判据，折叠一支不塌检出不倒。
+      if (fam === 'zh-transitions' && (findings || []).some(x => x.dimension === 'ai-tell-zh-en-mixing' && x.zhEnSrc === 'anchor-mix')) {
+        return 'zh-en-mixing';
+      }
+      if (ZH_VOCAB_DISCOURSE.has(fam)) return 'vocab-discourse';
+      if (ZH_TEMPLATED_FRAMES.has(fam)) return 'templated-frames';
       return fam;
     })
   );
