@@ -233,11 +233,15 @@ class ProcessingMetrics {
 class AssociativeEngine {
   constructor(projectRoot) {
     this.projectRoot = projectRoot;
-    const { LexicalAssociator } = require('./lexical-associator');
-    const { ChunkDetector } = require('./chunk-detector');
-    const { NarrativeRetriever } = require('./narrative-retriever');
-    const { SemanticConverger } = require('./semantic-converger');
-    const { WordByWordGenerator } = require('./word-by-word-generator');
+    // [v6.8.0] 第 538 轮：五个子模块在 src/archive/associative-engine/ 子目录，
+    // 此前写裸文件名 → 五个全部 MODULE_NOT_FOUND，构造器一进就 throw，
+    // AssociativeEngine 整个类无法实例化、L1-L5 管线从未运行（6240 行死代码）。
+    // 实测坐实：scripts/round-538-assoc-probe.js（改前五路全 ❌ / 改后五路全 ✅）。
+    const { LexicalAssociator } = require('./associative-engine/lexical-associator');
+    const { ChunkDetector } = require('./associative-engine/chunk-detector');
+    const { NarrativeRetriever } = require('./associative-engine/narrative-retriever');
+    const { SemanticConverger } = require('./associative-engine/semantic-converger');
+    const { WordByWordGenerator } = require('./associative-engine/word-by-word-generator');
 
     this.lexicalAssociator = new LexicalAssociator(projectRoot);
     this.chunkDetector = new ChunkDetector(projectRoot);
