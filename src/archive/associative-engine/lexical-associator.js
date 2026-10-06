@@ -20,6 +20,10 @@ const path = require('path');
 // 1 个 token 导致词典永不命中（L1 联想 0 条 / L2 chunks 0）。接入后中文自然语句
 // 首次能产出多 token 序列。
 const { getShared: _getSharedTokenizer } = require('../../core/chinese-tokenizer');
+// [v6.8.1 第 541 轮] 联想图谱格式桥接器：src 侧图谱 2045 节点全空数组，
+// 真实边（7877 条）在 dict-data/ 但格式是「节点数组+边数组」，与 loadGraph()
+// 期待的「{word:[...]}」字典永久对不上。由本桥在加载后转格式合并。
+const { AssociationGraphBridge } = require('../../core/association-graph-bridge');
 
 
 
@@ -187,6 +191,18 @@ class LexicalAssociator {
       if (fs.existsSync(this.graphFile)) {
 
         const data = JSON.parse(fs.readFileSync(this.graphFile, 'utf8'));
+
+        // [v6.8.1 第 541 轮] 格式桥接：src 侧 2045 节点全空数组，真实边在
+        // dict-data/ 但格式与本法期待的字典不符。合并失败不阻断（保持空图兜底）。
+        try {
+          const bridge = new AssociationGraphBridge(this.projectRoot);
+          const r = bridge.applyTo(data);
+          this.bridgeStats = bridge.getStats();
+          this.bridgeResult = r;
+        } catch (e) {
+          this.bridgeStats = { loaded: false, error: e.message };
+          this.bridgeResult = { merged: false, reason: e.message };
+        }
 
         return data;
 
