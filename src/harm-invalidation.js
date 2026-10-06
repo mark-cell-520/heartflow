@@ -94,11 +94,18 @@ const HARM_DENY_ZH = new RegExp([
   // [r528 新支] 转述受害声称：X说/称/抱怨 + (被|受) + 影响/波及/累及/折磨
   // 单独出现不构成否认（仍属正当受理），须与 MINIMIZE 侧归因支共现才命中
   '(?:你\s*说|你\s*称|你\s*讲|你\s*抱\s*怨|他\s*说|她\s*说|他\s*称|她\s*称|他\s*们\s*说|他\s*们\s*称|他\s*们\s*抱\s*怨|你\s*们\s*说|你\s*们\s*抱\s*怨|自\s*称)\s*(?:你\s*|自\s*己\s*)?(?:被|受)\s*(?:影\s*响|波\s*及|累\s*及|折\s*磨|拖\s*累)',
+  // [r531 补支] 范围全否形：没|未 + 受到|遭受 + 任何 + 影响/损失/伤害/波及
+  // r530 报告的 12/12 基于 12 条子集；全量 20 条复测发现本形态整体漏检——
+  // 既有支要求第二字落在 (遭|被|产|受) 字列内，而「受到」的「到」不在其中，
+  // 于是「没受到任何影响」这类范围全否句两支都不成立（样本见 test/ 第 5 行族）。
+  '(?:没|未)(?:有)?\s*受\s*(?:到|及|遭)\s*(?:任|何|任何)\s*(?:的)?\s*(?:影|损|伤|波)(?:响|失|害|及)',
 ].join('|'));
 
 const HARM_DENY_EN = new RegExp([
   // 「there was no real injury / no actual harm」
-  '\\b(?:there\\s+(?:was|were|is)|it\\s+(?:was\\s+)?(?:caused|did))\\s*(?:not)?\\s*(?:a|any)\\s*' +
+  // 「there was no real injury / no actual harm」（[r531] 补 no 形：
+  // 原支只收 a|any，「there was no real damage」这类 no 形整体漏检）
+  '\\b(?:there\\s+(?:was|were|is)|it\\s+(?:was\\s+)?(?:caused|did))\\s*(?:no|not\\s+a|not\\s+any)\\s*' +
     '(?:real|actual|genuine|serious|material|significant|measurable)\\s+' +
     '(?:injury|harm|damage|loss|suffering|impact|setback)',
   // 「nobody is actually hurt / no one is really worse off」
@@ -170,7 +177,21 @@ const MINIMIZE_ZH = new RegExp([
   // [r528 新支] 双段共现判据的归因段：归因词 + (你/他/她/们) + 不适应/不熟悉 + 新流程
   // 单独出现是正当过渡期陈述（误伤 3 条恶性样本实测），必须与 HARM_DENY_ZH 末支
   // 「转述受害声称」同句共现才命中；判据证据见 scripts/round-528-final-verify.js
-  '(?:其\s*实|只\s*是|不\s*过|纯\s*粹|实\s*际\s*上|事\s*实\s*上)\s*(?:仅\s*仅)?\s*(?:你|他|她|们)?\s*(?:不|未)\s*(?:适|习|熟|会|用|接)\s*(?:应|新|惯|悉|触|流|变|化)?\s*(?:新\s*)?(?:流\s*程|系\s*统|规\s*定|方\s*式|节\s*奏|工\s*具|环\s*境)',
+  '(?:其\s*实|只\s*是|不\s*过|纯\s*粹|实\s*际\s*上|事\s*实\s*上)\s*(?:仅\s*仅)?\s*(?:你|他|她|们|自\s*己|大\s*家)?\s*(?:不|未)\s*(?:适|习|熟|会|用|接)\s*(?:应|新|惯|悉|触|流|变|化)?\s*(?:新\s*)?(?:流\s*程|系\s*统|规\s*定|方\s*式|节\s*奏|工\s*具|环\s*境)',
+  // [r531 补支] 让步+不适应：只是|不过|仅仅 + (对X) + 不适应/不熟悉
+  // r528 归因支锚「其实/只是 + (代词) + 不适应」，但「只是对新规定不适应」
+  // 在连接词与新规定之间隔着「对…规定」宾语， pronoun 位匹配不到 → 漏检
+  // （样本见 test/ 第 6 行族）。本支锚让步词 + 任意非句读宾语 + 不适应，
+  // 不跨句读边界以免误伤「只是一次普通升级，用户不熟悉操作」这类正当说明。
+  '(?:只\s*是|不\s*过|仅\s*仅|纯\s*粹|就\s*是)\s*(?:对|对\s*于)?\s*[^，。；,!?]{0,12}\s*(?:不|未)\s*(?:适|习|熟|接)\s*(?:应|惯|悉|触)',
+  // [r531 补支] 转述不适应：大家|他们|自己 + (其实) + (是|自己) + 不熟悉/不适应
+  // 「大家其实是自己不熟悉新系统」——转述主体与归因词之间隔着「自己」，
+  // r528 支的 pronoun 位只列 你|他|她|们，接不住（样本见 test/ 第 5 行族后半段）。
+  '(?:大\s*家|他\s*们|你\s*们|自\s*己)\s*(?:其\s*实|事\s*实\s*上|实\s*际\s*上)?\s*(?:是|自\s*己)?\s*(?:不|未)\s*(?:熟|适|习|接)\s*(?:悉|应|惯|触)',
+  // [r531 补支] 量级校准：谁|大家 + 也|都 + 没 + 少|掉 + 毫毛/肉
+  // 既有量级支锚「也|都 + 没 + 有」，而「谁也没少一根毫毛」走的是
+  // 没 + 少（无「有」）路径，两支都不成立（样本见 test/ 第 13 行族）。
+  '(?:谁|大\s*家|人\s*家|任\s*何\s*人|当\s*事\s*人)\s*(?:也|都)\s*(?:没|未)\s*(?:有)?\s*(?:少|掉|缺|差)\s*(?:一|半)?\s*(?:根|丝|点|块)?\s*(?:毫\s*毛|肉|腿|胳\s*膊)',
 ].join('|'));
 
 const MINIMIZE_EN = new RegExp([
@@ -182,7 +203,11 @@ const MINIMIZE_EN = new RegExp([
   '\\b(?:it|this|that)\\s+is\\s+(?:all\\s+)?(?:in\\s+(?:their|her|his)\\s+(?:head|mind)' +
     '|anxiety\\s+talking|stress\\s+talking|fear\\s+talking)',
   // 「they are being oversensitive / hypersensitive / dramatic」
-  '\\b(?:they|she|he)\\s+(?:are|is)\\s+(?:being\\s+)?(?:oversensitive|hypersensitive|too\\s+sensitive' +
+  // 「they are being oversensitive / hypersensitive / dramatic」（[r531] 补
+  // just|merely|only 介入形：原支只收 are + being，而「they are just being
+  // oversensitive」在 are 与 being 之间隔着 just，整支不成立）
+  '\\b(?:they|she|he)\\s+(?:are|is)\\s+(?:(?:just|merely|only)\\s+)?(?:being\\s+)?' +
+    '(?:oversensitive|hypersensitive|too\\s+sensitive' +
     '|dramatic|fragile|paranoid|irrational|emotional)',
   // 「it is just anxiety / just stress」
   '\\b(?:it|this|that)\\s+is\\s+just\\s+(?:anxiety|stress|nerves|a\\s+phase|adjustment)',
