@@ -72,6 +72,10 @@ const ANECDOTE_ZH = new RegExp([
   // 动词表含「遇到过」形：中文经历体「遇到过」比裸「遇到」更常见，
   // 缺它会让「我从来没遇到过问题」整族漏判（r561 逐支实测确认）。
   '(?:我|我们)(?:从来|一直|从没|从未|一向|历来)(?:都)?(?:没|没有|未|不)(?:用|试|吃|开|买|操作|跑|部署)?(?:出过|有过|遇到过|碰到过|发生过|遇到|碰到|发生)(?:问题|故障|意外|事故|毛病|麻烦)',
+  // [r561] 否定经验 + 动词前置形：原文实测「我们从来操作没出过意外」——
+  // 宾语省略动词出现在否定词**之前**（从来+操作+没+出过）。与上一支互补：
+  // 上一支管「没[动词]出过」，本支管「[动词]没出过」。
+  '(?:我|我们)(?:从来|一向|历来|从没|从未)(?:都)?(?:用|试|吃|开|买|操作|跑|部署)(?:都)?(?:没|没有|未|不)(?:出过|有过|遇到过|碰到过|发生过)(?:意外|问题|故障|事故|毛病|麻烦|状况)',
 ].join('|'));
 
 const ANECDOTE_EN = new RegExp([
@@ -92,6 +96,13 @@ const ANECDOTE_EN = new RegExp([
   '\\bi\\s+(?:have\\s+)?(?:never|not)\\s+(?:had|seen|run\\s+into|experienced)\\s+(?:a\\s+)?(?:problem|issue|trouble|complaint|defect)\\b',
   // 自身即样本的完成时肯定经验（'I have used it for months and it worked'）
   '\\bi\\s+(?:have\\s+)?(?:used|tried|tested|taken)\\s+it\\s+(?:for\\s+)?(?:months?|weeks?|years?|days?)\\b',
+  // [r561] 裸复数熟人与 one of my relatives：原族只覆盖 everyone/all/most
+  // 修饰形与单数 my friend，实测「My coworkers all got better」「One of my
+  // relatives drove it for years」两条全脱靶。
+  '\\b(?:my|our)\\s+(?:co\\-?workers|colleagues|friends|relatives|neighbou?rs|teammates|classmates)\\b',
+  '\\b(?:one|some|a\\s+few)\\s+of\\s+my\\s+(?:friends?|co\\-?workers|colleagues|relatives|neighbou?rs|classmates|cousins)\\b',
+  // 名词化的亲属/熟人单数（a relative of mine / an uncle of mine）
+  '\\b(?:a|an|one)\\s+(?:relative|uncle|aunt|cousin|nephew|niece|friend|co\\-?worker|colleague|neighbou?r)\\s+of\\s+(?:mine|ours)\\b',
 ].join('|'), 'i');
 
 // ─── 看守样本：只标记样本来源、不推出普遍结论的正当表述 ──────────
@@ -150,6 +161,19 @@ const UNIVERSAL_ZH = new RegExp([
   // [r560] 「所以你听我的准没错」：把我的判断当普遍准绳。
   // 窄化为必须带「我的」主体，避免把「听起来没错」这类评价误判。
   '(?:听|按|照)(?:我|我们)(?:的|说|讲)(?:准)?(?:没错|不会错|准行|就行|肯定行)',
+  // [r561] A2 补支（守卫测试逐支归因实测 4 条漏判，均为 A1 在场而 A2 缺席）：
+  // 「可见/证明…有效/靠谱」「证明…安全可靠」——原族只有「说明/证明/可见
+  // +这药」的窄形，接「这课/这法子」或省略宾语时全部漏判。
+  '(?:可见|说明|证明|足以表明|足以证明)(?:这|那)?(?:课|法子|办法|方法|方案|产品|流程|操作|做法|服务|机构|平台)?(?:是|真的|确实|算)?(?:有效|靠谱|管用|可行|安全|可靠|稳妥|有效果)',
+  '(?:证明|说明|足以证明)(?:这|那)(?:套|个|种)?(?:法子|办法|方法|操作|做法|流程)?(?:是)?(?:安全|可靠|稳妥|没有隐患)(?:的)?',
+  // [r561] A2 名词位放开：检测守卫样本实测「说明这套操作办法是安全的」漏判——
+  // 「操作办法」「实施办法」这类双名词组合不在原名词表内，原族只允许
+  // 单个名词（操作/办法 二选一）。补一支允许 2-4 字名词组合。
+  '(?:说明|证明|可见|表明|足以证明)(?:这|那|该)?(?:套|个|种|类|些)?[\\u4e00-\\u9fff]{2,6}(?:是|才是|算是|真的|确实)(?:安全|可靠|稳妥|有效|有用|管用|可行|没有隐患|不会有问题)(?:的)?',
+  // 「都有效」——熟人语料 + 群体效果断言（「我认识的人用了都有效」）
+  '(?:用|吃|试|开|买)了?(?:都|全)?(?:有效|有用|管用|好|不错|有效果)',
+  // 证明…有效 / 证明…有用（宾语前置形）
+  '(?:证明|说明|可见|足以证明)(?:其|它|这|那)?(?:确实|真的|一定)?(?:有效|有用|管用|可行)',
 ].join('|'));
 
 const UNIVERSAL_EN = new RegExp([
@@ -167,6 +191,12 @@ const UNIVERSAL_EN = new RegExp([
   '\\bthe\\s+(?:process|method|procedure|approach|drug|product)\\s+is\\s+(?:safe|proven|effective|reliable)\\b',
   // hence proven / so proven
   '\\bso\\s+the\\s+method\\s+is\\s+proven\\b',
+  // [r561] 补支（守卫测试逐支归因实测 2 条漏判，A1 在场而 A2 缺席）：
+  // 「which means it is effective」「so it is reliable」——原族只覆盖
+  // so it works / is proven to work，「which means + 形容词」与
+  // so it is reliable 的形容词断言形全部脱靶。
+  '\\b(?:which\\s+means|meaning)\\s+(?:it|this|that|the\\s+\\w+)\\s+(?:is|are)\\s+(?:really\\s+)?(?:effective|reliable|safe|proven|works?)\\b',
+  '\\bso\\s+(?:it|this|that|the\\s+(?:method|drug|course|process|product|approach))\\s+is\\s+(?:really\\s+)?(?:effective|reliable|safe|proven|dependable|trustworthy)\\b',
 ].join('|'), 'i');
 
 // ─── 前瞻建议看守：把个例用作「建议你先检查」而非效果断言 ────────
