@@ -54,9 +54,20 @@ const PARTIAL_COVER = /(?:绝大部分|绝大多数|九成|八成|七成|过半|
 
 // ─── C2: 分配语境（与 percentage-overflow.js 同源判据，口径一致）──
 const ALLOC_BEFORE = /(?:占[比到]?为|占|为|是|达[到了]?|voted|chose|chosen|went to|goes to|accounted for|make[s]? up|split|agreed|disagreed|responded|answered|来自|rest)/i;
-const ALLOC_AFTER = /(?:的人|的用户|的客户|的受访者|的学生|的预算|的营收|的团队|的成员|voted|chose|agreed|disagreed|abstained|of (?:the|them|respondents|students)|went to|goes to|用于|归于|归入|是|为|rest|选择了|选择|选|投了|投向|来自|归为|支持|反对|赞成|不赞成|中立|赞成者|反对者|remainder|rest)/i;
+// [v6.8.29 / r548] C2 补「用」这一分配动词：gate 层实测发现
+// 「技术栈 15% 用 Rust，20% 用 Go」这类分项句不被识别为分配语境
+// （attacks#6 模块层漏判，之前 11/12）。ALLOC_BEFORE 已有「用于」，
+// 右侧 ALLOC_AFTER 缺同源单字。保留 ALLOC_AFTER 其余标记不变。
+const ALLOC_AFTER = /(?:用的人|的用户|用|的人|的用户|的客户|的受访者|的学生|的预算|的营收|的团队|的成员|voted|chose|agreed|disagreed|abstained|of (?:the|them|respondents|students)|went to|goes to|用于|归于|归入|是|为|rest|选择了|选择|选|投了|投向|来自|归为|支持|反对|赞成|不赞成|中立|赞成者|反对者|remainder|rest)/i;
+
+// [v6.8.29 / r548] C2 补「用」后 ALLOC_AFTER 的其他判据与 OF_DISTRIB 无变化
 const OF_DISTRIB = /\d+(?:\.\d+)?\s*%\s*of\s+(?:the\s+)?(?:respondents?|students?|users?|people|customers?|participants?|voters?|employees?|members)/i;
-const CHANGE_CTX = /(?:增长|下降|提升|降低|同比|环比|从\s*[\d.]+\s*%\s*(?:到|至|升至|降至)|from\s+[\d.]+\s*%\s+to|百分点|percentage points)/;
+
+// [v6.8.29 / r548] 排除规则一：变化语境动词补「上升/下跌」。
+// gate 层实测发现「从 X% 上升到 Y%」句式不被排除 → 静态分项被误判为
+// 不完备全覆盖（攻击样本穿透排除层）。原判据只收"升至/降至"，不收口语词。
+// 实测 recap：加词后良性误伤 0/13 不变、召回 12/12（详见 UPGRADE_LOG r548）。
+const CHANGE_CTX = /(?:增长|下降|提升|降低|上升|下跌|同比|环比|从\s*[\d.]+\s*%\s*(?:到|至|升|降)|from\s+[\d.]+\s*%\s+to|百分点|percentage points)/;
 const FREQ_HINT = /(?:每天|每周|每月|每年|天天|周周|日活|月活|年活|daily|weekly|monthly|yearly|per day|per week|per month|per year|DAU|MAU)/;
 const PHASE_HINT = /(?:上半年|下半年|第一季度|第二季度|第三季度|第四季度|第一周|第二周|第一[期阶阶]|第二[期阶段]|Q[1-4]|first half|second half|first quarter|second quarter)/i;
 
