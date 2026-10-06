@@ -384,7 +384,7 @@ class WordByWordGenerator {
 
    */
 
-  async generateResponse(thoughtVector, userModel = {}, maxLength = 200) {
+  async generateResponse(thoughtVector, userModel = {}, maxLength = 200, narrative = null) {
 
     // ====================================================================
 
@@ -442,26 +442,27 @@ class WordByWordGenerator {
 
     this.recoveryAttempts = 0;
 
+    // [v6.8.1 第 542 轮] L4→L5 叙事约束：把 L3 命中的原型 stages/framework 词表
+    // 提升为一等选词来源。传入前先归一化，非法/空值一律降级为 null（不阻断生成）。
+    const narrativeCtx = this._normalizeNarrative(narrative);
 
+    this.recordTrace('narrative_context', {
+      active: !!narrativeCtx,
+      framework: narrativeCtx ? narrativeCtx.framework : null,
+      stageWords: narrativeCtx ? narrativeCtx.stageWords.length : 0
+    });
 
     const responseState = {
-
       generatedWords: [],
-
       thoughtVector,
-
       userModel,
-
       userModelActive: hasUserModel,
-
+      // [v6.8.1 第 542 轮] 叙事上下文随 state 一路传到 predictNextWord / drift 自愈
+      narrative: narrativeCtx,
       completed: false,
-
       error: null,
-
       oscillationsDetected: 0,
-
       driftsCorrected: 0
-
     };
 
 
@@ -486,7 +487,7 @@ class WordByWordGenerator {
 
     // ====================================================================
 
-    const firstWord = this.selectFirstWord(thoughtVector);
+    const firstWord = this.selectFirstWord(thoughtVector, narrativeCtx);
 
     responseState.generatedWords.push(firstWord);
 
@@ -754,7 +755,40 @@ class WordByWordGenerator {
 
 
 
-  selectFirstWord(thoughtVector) {
+  /**
+   * [v6.8.1 第 542 轮] 归一化叙事输入。
+   * 接受 L4 的 matchedNarrativeDetail 或 NarrativeRetriever 的 matchedPrototype
+   * （stages 形如 [{stage, description}]）。非法/空 stages 一律返回 null ——
+   * 叙事是增强项，不是硬依赖。
+   * @private
+   */
+  _normalizeNarrative(narrative) {
+    if (!narrative || typeof narrative !== 'object' || Array.isArray(narrative)) return null;
+    const rawStages = Array.isArray(narrative.stages) ? narrative.stages : [];
+    const stageWords = [];
+    for (const s of rawStages) {
+      const w = s && typeof s === 'object' ? s.stage : s;
+      if (typeof w === 'string' && w.trim()) stageWords.push(w.trim());
+    }
+    if (stageWords.length === 0) return null;
+    return {
+      id: typeof narrative.id === 'string' ? narrative.id : null,
+      name: typeof narrative.name === 'string' ? narrative.name : null,
+      framework: typeof narrative.framework === 'string' ? narrative.framework : null,
+      emotionalTone: typeof narrative.emotionalTone === 'string' ? narrative.emotionalTone : null,
+      score: typeof narrative.score === 'number' ? narrative.score : 0,
+      stageWords
+    };
+  }
+
+
+  selectFirstWord(thoughtVector, narrative = null) {
+    // [v6.8.1 第 542 轮] 叙事优先于通用情绪模板：L3 已命中原型时，
+    // 首词取叙事第一阶段词（如「进入」），让生成从第一步就绑定真实叙事。
+    const nc = narrative && narrative.stageWords ? narrative : this._normalizeNarrative(narrative);
+    if (nc && nc.stageWords.length > 0) {
+      return this._safePick(nc.stageWords);
+    }
 
     // 防御性检查
 
@@ -828,6 +862,21 @@ class WordByWordGenerator {
 
     const thoughtDims = state.thoughtVector.dimensions || {};
 
+    // [v6.8.1 第 542 轮] 叙事阶段词：L3 命中时作为一等选词源。
+    // 优先级高于 userModel 与通用 transition/emotional 词表，
+    // 保证「L3 有命中」这一信息不会在 L5 被随机选词冲掉。
+    const nc = state.narrative || null;
+
+    // 叙事尚未推进过的阶段词优先
+    if (nc && nc.stageWords.length > 0) {
+      const said = new Set(state.generatedWords);
+      const remaining = nc.stageWords.filter(w => !said.has(w));
+      if (remaining.length > 0) {
+        return this._safePick(remaining);
+      }
+      // 阶段词已全部出现过 → 回落到叙事名/framework，保持同一叙事域
+      if (nc.name) return nc.name;
+    }
     
 
     // ---- 集成 userModel（如果可用） ----

@@ -217,6 +217,18 @@ class SemanticConverger {
         activatedConcepts,
         activatedIdioms,
         matchedNarrative: narrativeFramework?.name || null,
+        // [v6.8.1 第 542 轮] L4→L5 断点修复：此前只把 .name 传下来，framework /
+        // stages / emotionalTone 在 L4 就被丢掉，L5 拿不到任何叙事约束，
+        // 只能靠 vocabulary.flow 这类通用词表拼碎词串。此处保留完整原型细节，
+        // 下游 L5 才能按 stages 选词（实测：改前 5 条样本 narrative stage 词命中 L5 恒 0/4）。
+        matchedNarrativeDetail: narrativeFramework ? {
+          id: narrativeFramework.id || null,
+          name: narrativeFramework.name || null,
+          framework: narrativeFramework.framework || null,
+          emotionalTone: narrativeFramework.emotionalTone || null,
+          stages: Array.isArray(narrativeFramework.stages) ? narrativeFramework.stages : [],
+          score: typeof narrativeFramework.score === 'number' ? narrativeFramework.score : 0
+        } : null,
         understoodIntent,
         timestamp: new Date().toISOString()
       };
@@ -694,6 +706,8 @@ class SemanticConverger {
       activatedConcepts: (convergenceResult.activatedConcepts || []).slice(0, 5).map(c => c.concept),
       activatedIdioms: (convergenceResult.activatedIdioms || []).map(i => i.text),
       matchedStory: convergenceResult.matchedNarrative,
+      // [v6.8.1 第 542 轮] 同步暴露叙事细节，让 thoughtLog 不再只剩一个名字
+      matchedNarrative: convergenceResult.matchedNarrativeDetail || null,
       understoodIntent: convergenceResult.understoodIntent?.intent || 'unknown',
       emotionVector: convergenceResult.thoughtVector?.emotion || { pleasure: 0, arousal: 0, dominance: 0 },
       confidence: convergenceResult.thoughtVector?.confidence || 0,
