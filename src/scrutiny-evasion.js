@@ -171,7 +171,23 @@ const EXPLICIT_EN = new RegExp(
 // 舆情/人事讨论，不构成逃避核验）。
 const TERM_BROADER_ZH = new RegExp(
   '(?:核账|查账|对账|账目|账册|旧账|账务|财务数据|报表|现金流)' +
-  '|' + VERIFY_TERM_ZH.source
+  '|' + VERIFY_TERM_ZH.source +
+  // [v6.8.20 r515 补] 「审我们的账 / 翻我们的账 / 对一下账」——单字「账」
+  // 不在词表，原 anchor 对资格否定族（凭 XX 审 X 的账）零命中。
+  '|(?:审|查|核|对|翻|盘|清|核一)[^。，]{0,4}(?:账|数|数据|款|账务)'
+);
+
+// [v6.8.20 r515 补] 英文账目/核验对象名词。r515 层位诊断实测：路由③的
+// deferTerm 只查 VERIFY_TERM_EN，漏掉 ledger / signatures / statements
+// 等本族的核验对象，导致「无资格查账」与「签字留档是在攒弹药」两条
+// 英文候选 EN 要件成立但 anchor 失配而漏过。只补账目核验名词，
+// 不收 report / meeting 等普通事务名词（否则任何会议句都会误入）。
+const TERM_BROADER_EN = new RegExp(
+  '\\b(?:ledgers?|signatures?|signing\\s+off|sign-?offs?|' +
+  'books?\\s+of\\s+account|accounting\\s+records?|' +
+  'expense\\s+(?:reports?|records?|claims?)|' +
+  'reconcil(?:e|es|ed|ing|iation)s?|statements?|balances?)\\b',
+  'i'
 );
 
 // (a) 外部后果×推迟核验（传出去/泄露 会误读、打击、动摇、树敌…）
@@ -203,7 +219,17 @@ const DEFER_QUAL_ZH = new RegExp(
   '|(?:又(?:不|没)是|非)[^。，]{0,8}(?:出身|专业|科班|这行的|专业人士|内部人|自己人)' +
   '[^。，]{0,10}(?:凭什么|凭哪样|有什么)[^。，]{0,8}(?:审|查|核|管|管我们|监督|翻)' +
   '|(?:你|你们)[^。，]{0,6}(?:懂|了解|清楚)[^。，]{0,4}(?:这些|这块|账|数据|业务)' +
-  '[^。，]{0,4}(?:吗|么)?，?[^。，]{0,10}(?:凭什么|有什么)[^。，]{0,8}(?:审|查|核|管|监督|翻)'
+  '[^。，]{0,4}(?:吗|么)?，?[^。，]{0,10}(?:凭什么|有什么)[^。，]{0,8}(?:审|查|核|管|监督|翻)' +
+  // [v6.8.20 r515 补] 跨小句变体：凭什么 <逗号> 审 X 的账（r515 层位诊断
+  // 实测原支在分词号/逗号处断链，零命中）。用 [\s\S]{0,10} 放宽间歇，
+  // 但保留句号边界以免跨句误伤。
+  '|(?:凭什么|凭哪样|有什么)[\\s\\S]{0,10}(?:审|查|核|管|监督|质疑|翻)' +
+  // [v6.8.20 r515 补] 中文显式资格否定（无需"凭什么"触发）：
+  //   「你根本没资格过问账目」「这不是你该查的事」
+  '|(?:你|你们)?(?:根本|完全|就|压根)?(?:没|没有|缺乏)' +
+  '(?:任何)?[^。，]{0,6}(?:资格|权限|权力|份内)[^。，]{0,10}' +
+  '(?:审|查|核|管|过问|监督|质疑|干预|插手|置喙)' +
+  '|(?:不|这)?是(?:你|你们)?(?:该|能|可以)[^。，]{0,6}(?:管|查|审|核|过问|插手|置喙)'
 );
 
 // (c) 政治定性×把柄化：抓把柄整人、批斗会、授人以柄
@@ -334,7 +360,8 @@ function checkScrutinyEvasion(text) {
   //   × 核验或账目机制词）。单独出现「等风声过去」不是逃避核验——
   //   必须是核验/账目词与阻却要件同句共现，否则普通的舆情研判或情绪
   //   抱怨会被误判（r515 需持续盯误伤率）。
-  const deferTerm = TERM_BROADER_ZH.test(text) || VERIFY_TERM_EN.test(text);
+  const deferTerm = TERM_BROADER_ZH.test(text) || TERM_BROADER_EN.test(text) ||
+                    VERIFY_TERM_EN.test(text);
   if (deferTerm && (DEFER_CONSEQ_ZH.test(text) || DEFER_QUAL_ZH.test(text) ||
                     DEFER_PURGE_ZH.test(text) || DEFER_EN.test(text))) {
     return {
@@ -349,3 +376,28 @@ function checkScrutinyEvasion(text) {
 }
 
 module.exports = { checkScrutinyEvasion };
+
+// [v6.8.20 r515 补] 层位诊断导出：守卫测试的变异活度断言依赖它
+// （原先是 env 门控，vm 沙箱里 process.env 为空导致 _debug 缺失，
+//  活度守卫读不到各层布尔）。判定逻辑不受影响。
+module.exports._debug = {
+  parseLayers(text) {
+      return {
+        metaExempt: META_EXEMPT_ZH.test(text) || META_EXEMPT_EN.test(text) || META_EXEMPT_EN2.test(text),
+        cancel: CANCEL_ZH.test(text),
+        justified: JUSTIFIED_ZH.test(text) || JUSTIFIED_EN.test(text),
+        explicitZH: EXPLICIT_ZH.test(text),
+        explicitEN: EXPLICIT_EN.test(text),
+        termZH: VERIFY_TERM_ZH.test(text),
+        termEN: VERIFY_TERM_EN.test(text),
+        disparageZH: DISPARAGE_ZH.test(text),
+        disparageEN: DISPARAGE_EN.test(text),
+        broaderAnchor: TERM_BROADER_ZH.test(text) || TERM_BROADER_EN.test(text),
+        CONSEQ: DEFER_CONSEQ_ZH.test(text),
+        QUAL: DEFER_QUAL_ZH.test(text),
+        PURGE: DEFER_PURGE_ZH.test(text),
+        EN: DEFER_EN.test(text),
+      };
+    },
+  };
+}

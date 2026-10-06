@@ -173,6 +173,145 @@ check('变异守卫：置空 EXPLICIT_ZH 贬义词表支后 atk#8 必须下降',
     `变异后命中 ${after} 未变为 false —— 守卫不敏感，该支可能是死码`);
 });
 
+// ── 7b. 路由③ [v6.8.20 r515 补] 四支变异守卫 ─────────────────
+//   先修正 r515 实测发现的两个坑（本文件 §7b 记录，勿再踩）：
+//   坑1：require 的模块闭包会让 `_debug.parseLayers` 读到上一次的实例，
+//        表现是「置空某支后该支布尔仍为 true」→ 不可用作守卫判据。
+//   坑2：变异校验必须在同一进程里用「模块源码字符串」比对，而不是
+//        调用变异后的模块——因为 /tmp 下的 require 缓存不可靠。
+//   因此守卫断言 = (a) 变异声明已生效；(b) 原样本命中；(c) 变异后
+//   源码中该支不再包含原判据。
+const R3 = i => samples.attacks[i];
+
+function mutatedSource(spec) {
+  const modPath = require.resolve('../src/scrutiny-evasion.js');
+  const orig = fs.readFileSync(modPath, 'utf8');
+  return spec.mutate(orig);
+}
+
+// 整支声明置空：`const <name> = new RegExp( ... );` → `new RegExp('')`
+//   r515 实测坑：`[\s\S]*?\n\);` 非贪婪会跨越到**下一个**同样以
+//   `\n);` 结尾的声明（原文里每个 RegExp 声明都是 `\n);` 收尾），
+//   导致一次变异同时吞掉相邻支。改为**直到下一条 const 声明前**截断。
+function blankDecl(declName) {
+  return orig => {
+    const start = orig.indexOf(`const ${declName} = `);
+    if (start < 0) throw new Error(`变异目标 ${declName} 不存在（源码形状漂移）`);
+    const after = orig.indexOf('\nconst ', start + 1);
+    if (after < 0) throw new Error(`未找到 ${declName} 之后的 const 边界`);
+    const seg = orig.slice(start, after);
+    if (!/new RegExp\(/.test(seg)) throw new Error(`${declName} 声明形状异常`);
+    return orig.slice(0, start) +
+      `const ${declName} = new RegExp('');` + orig.slice(after);
+  };
+}
+
+// 原样本在未变异模块下命中（前置条件）
+function mustHit(idx) {
+  const h = checkScrutinyEvasion(R3(idx)).hit;
+  assert.ok(h, `atk#${idx} 基线未命中 —— 不能作为该支守卫样本`);
+}
+
+check('变异守卫：CONSEQ 支可被置空且 atk#17 基线命中', () => {
+  mustHit(17);
+  const m = mutatedSource({ mutate: blankDecl('DEFER_CONSEQ_ZH') });
+  assert.ok(m.includes("const DEFER_CONSEQ_ZH = new RegExp('');"), 'CONSEQ 声明未被置空');
+  assert.ok(m.includes('const DEFER_QUAL_ZH = new RegExp'), 'QUAL 支被误伤');
+  assert.ok(m.includes('const DEFER_PURGE_ZH = new RegExp'), 'PURGE 支被误伤');
+});
+
+check('变异守卫：QUAL 支可被置空且 atk#20 基线命中', () => {
+  mustHit(20);
+  const m = mutatedSource({ mutate: blankDecl('DEFER_QUAL_ZH') });
+  assert.ok(m.includes("const DEFER_QUAL_ZH = new RegExp('');"), 'QUAL 声明未被置空');
+  assert.ok(m.includes('const DEFER_CONSEQ_ZH = new RegExp'), 'CONSEQ 支被误伤');
+});
+
+check('变异守卫：PURGE 支可被置空且 atk#19 基线命中', () => {
+  mustHit(19);
+  const m = mutatedSource({ mutate: blankDecl('DEFER_PURGE_ZH') });
+  assert.ok(m.includes("const DEFER_PURGE_ZH = new RegExp('');"), 'PURGE 声明未被置空');
+  assert.ok(m.includes('const DEFER_EN = new RegExp'), 'EN 支被误伤');
+});
+
+check('变异守卫：EN 支可被置空且 atk#25 基线命中', () => {
+  mustHit(25);
+  const m = mutatedSource({ mutate: blankDecl('DEFER_EN') });
+  assert.ok(m.includes("const DEFER_EN = new RegExp('');"), 'EN 声明未被置空');
+  assert.ok(m.includes('const DEFER_QUAL_ZH = new RegExp'), 'QUAL 支被误伤');
+});
+
+check('变异守卫：ANCHOR_ZH 支可被置空且 atk#20 基线命中', () => {
+  mustHit(20);
+  const m = mutatedSource({ mutate: blankDecl('TERM_BROADER_ZH') });
+  assert.ok(m.includes("const TERM_BROADER_ZH = new RegExp('');"), 'ANCHOR_ZH 声明未被置空');
+  assert.ok(m.includes('const TERM_BROADER_EN = new RegExp'), 'ANCHOR_EN 支被误伤');
+});
+
+check('变异守卫：ANCHOR_EN 支可被置空且 atk#25 基线命中', () => {
+  mustHit(25);
+  const m = mutatedSource({ mutate: blankDecl('TERM_BROADER_EN') });
+  assert.ok(m.includes("const TERM_BROADER_EN = new RegExp('');"), 'ANCHOR_EN 声明未被置空');
+  assert.ok(m.includes('const TERM_BROADER_ZH = new RegExp'), 'ANCHOR_ZH 支被误伤');
+});
+
+// ── 7c. 支活度（真实调用变异模块，用 vm.Script 隔离作用域）──────
+// 支属性矩阵由 scripts/round-515-branch-attribute.js 实测产出（12/12 候选、
+// 0/8 良性）。这里把矩阵里最关键的**真·置空即失配**断言固化下来。
+// 实现说明：r515 实测 require 路径不可靠（/tmp 缓存 + 闭包串味），
+// 因此改用 vm.Script 在同一进程内新建模块上下文，确保变异即刻生效。
+const vm = require('node:vm');
+function loadIsolated(src) {
+  const sandbox = { module: { exports: {} }, exports: {}, require, process,
+                    console, Buffer, __filename: 'sev-isolated.js', __dirname: __dirname };
+  vm.createContext(sandbox);
+  const wrapper = vm.runInContext(
+    '(function(module, exports, require){' + src + '\nreturn module.exports;})',
+    sandbox, { filename: 'sev-isolated.js' });
+  return wrapper(sandbox.module, sandbox.module.exports, require);
+}
+
+// 真正调用：置空 <declName> 后，<idx> 样本必须从 hit 变 miss。
+function liveMutation(declName, idx) {
+  const modPath = require.resolve('../src/scrutiny-evasion.js');
+  const orig = fs.readFileSync(modPath, 'utf8');
+  const mutated = blankDecl(declName)(orig);
+  const before = checkScrutinyEvasion(R3(idx)).hit;
+  const after = loadIsolated(mutated).checkScrutinyEvasion(R3(idx)).hit;
+  return { before, after };
+}
+
+check('路由③活度：置空 CONSEQ 后 atk#17 由 hit 变 miss（真调用）', () => {
+  const r = liveMutation('DEFER_CONSEQ_ZH', 17);
+  assert.ok(r.before, '基线未命中');
+  assert.ok(!r.after, `置空后仍命中 = ${r.after} —— CONSEQ 支不敏感`);
+});
+check('路由③活度：置空 QUAL 后 atk#20 由 hit 变 miss（真调用）', () => {
+  const r = liveMutation('DEFER_QUAL_ZH', 20);
+  assert.ok(r.before, '基线未命中');
+  assert.ok(!r.after, `置空后仍命中 = ${r.after} —— QUAL 支不敏感`);
+});
+check('路由③活度：置空 PURGE 后 atk#19 由 hit 变 miss（真调用）', () => {
+  const r = liveMutation('DEFER_PURGE_ZH', 19);
+  assert.ok(r.before, '基线未命中');
+  assert.ok(!r.after, `置空后仍命中 = ${r.after} —— PURGE 支不敏感`);
+});
+check('路由③活度：置空 EN 后 atk#25 由 hit 变 miss（真调用）', () => {
+  const r = liveMutation('DEFER_EN', 25);
+  assert.ok(r.before, '基线未命中');
+  assert.ok(!r.after, `置空后仍命中 = ${r.after} —— EN 支不敏感`);
+});
+check('路由③活度：置空 ANCHOR_ZH 后 atk#20 由 hit 变 miss（真调用）', () => {
+  const r = liveMutation('TERM_BROADER_ZH', 20);
+  assert.ok(r.before, '基线未命中');
+  assert.ok(!r.after, `置空后仍命中 = ${r.after} —— ANCHOR_ZH 支不敏感`);
+});
+check('路由③活度：置空 ANCHOR_EN 后 atk#25 由 hit 变 miss（真调用）', () => {
+  const r = liveMutation('TERM_BROADER_EN', 25);
+  assert.ok(r.before, '基线未命中');
+  assert.ok(!r.after, `置空后仍命中 = ${r.after} —— ANCHOR_EN 支不敏感`);
+});
+
 // ── 8. 导出区可用性（接线完整性断言依赖）─────────────────
 check('index.js 导出 checkScrutinyEvasion', () => {
   const idx = require('../src/index.js');
