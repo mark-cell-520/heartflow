@@ -42,27 +42,39 @@
 
 // ─── 责任全揽：把全部后果/责任揽到说话人自己身上 ────────────
 // 不收「我来负责解决」这类具体任务担责，必须是全量后果担责。
-const ABSORB_ZH = new RegExp(
-  '(?:出[^。，]{0,6}问题[^。，]{0,8}(?:我|由我|归我|算我)[^。，]{0,10}' +
-  '(?:全权|全部|完全|统统)?[^。，]{0,4}(?:负责|承担|担着|扛|扛下来|兜底|认)' +
-  '|责任[^。，]{0,8}(?:我|由我|全|统统|都)[^。，]{0,6}' +
-  '(?:一个人|独自|全权)?[^。，]{0,4}(?:扛|担|承担|揽|负责|兜底)' +
-  '|(?:有)?任何后果[^。，]{0,6}(?:我|由我)[^。，]{0,4}(?:来|全)?' +
-  '(?:承担|扛|担|负责|兜底)' +
-  '|(?:追责|问责|追|算|查)[^。，]{0,8}(?:不到|追不到|算不到)' +
-  '[^。，]{0,6}(?:你|你们|我这边)' +
-  '|(?:就算|即使|哪怕|纵然)[^。，]{0,6}出事[^。，]{0,8}(?:也)?' +
-  '我(?:的)?(?:名字|责任|问题)' +
-  '|我(?:的)?名字[^。，]{0,4}(?:在上边|在上面|顶着|挂着|签着)' +
-  '|(?:全部|所有|一切)后果[^。，]{0,6}(?:我|由我)[^。，]{0,4}' +
-  '(?:担|扛|承担|负责|兜底)' +
-  '|我(?:来)?(?:兜底|兜着|担着|扛下)' +
-  '|我担[^。，]{0,4}(?:全部|所有|一切)(?:后果|责任)' +
-  // 无主全揽形：「责任揽过来 / 全部后果我兜着 / 这条线我兜底」
-  // 「这条线我兜着」缺介词形也收（r517 atk#4 实测 miss）
-  '|(?:责任|后果|后路)[^。，]{0,8}(?:揽|背|兜)(?:过来|起来|下|着)?' +
-  '|(?:这条线|这事|这件事|这事上|这条路)[^。，]{0,6}我(?:来)?(?:兜底|兜着|担着))'
-);
+// [r518] 结构重写为「数组每支独立 + join('|')」：原字符串拼接写法有两处
+// 括号/分隔符缺陷（首支 (?: 未闭合导致整体被后面的 ) 拼成一个巨型
+// alternation；`我担全部后果` 一支漏了前导 | 与前支粘连），实测导致
+// 「出问题算我的」「这条线我兜着」两族 miss（r518 diag 复现）。
+// 新写法每支括号自洽、互不粘连，逐支可独立置空做活度守卫。
+const ABSORB_ZH = new RegExp([
+  // b1：出(了)问题 + 算/归我 + (全权|全部)…负责/承担/认
+  '出[^。，]{0,6}问题[^。，]{0,8}(?:我|由我|归我|算我)[^。，]{0,10}' +
+    '(?:全权|全部|完全|统统)?[^。，]{0,4}(?:负责|承担|担着|扛|扛下来|兜底|认)',
+  // b2：责任 + 我/由我/全 + (独自|全权)…扛/担/承担/揽/负责/兜底
+  '责任[^。，]{0,8}(?:我|由我|全|统统|都)[^。，]{0,6}' +
+    '(?:一个人|独自|全权)?[^。，]{0,4}(?:扛|担|承担|揽|负责|兜底)',
+  // b3：任何后果 + 我/由我…承担/扛
+  '(?:有)?任何后果[^。，]{0,6}(?:我|由我)[^。，]{0,4}(?:来|全)?(?:承担|扛|担|负责|兜底)',
+  // b4：追责/问责 不到你
+  '(?:追责|问责|追|算|查)[^。，]{0,8}(?:不到|追不到|算不到)[^。，]{0,6}(?:你|你们|我这边)',
+  // b5：就算出事也是我的名字/责任/问题
+  '(?:就算|即使|哪怕|纵然)[^。，]{0,6}出事[^。，]{0,8}(?:也)?我(?:的)?(?:名字|责任|问题)',
+  // b6：我的名字 在上边/顶着
+  '我(?:的)?名字[^。，]{0,4}(?:在上边|在上面|顶着|挂着|签着)',
+  // b7：全部/所有/一切后果 + 我/由我…担
+  '(?:全部|所有|一切)后果[^。，]{0,6}(?:我|由我)[^。，]{0,4}(?:担|扛|承担|负责|兜底)',
+  // b8：我兜底/兜着/担着/扛下
+  '我(?:来)?(?:兜底|兜着|担着|扛下)',
+  // b9：我担(全部|所有|一切)(后果|责任)
+  '我担[^。，]{0,4}(?:全部|所有|一切)(?:后果|责任)',
+  // b10：责任/后果/后路 揽|背|兜 (过来|起来|下|着)
+  '(?:责任|后果|后路)[^。，]{0,8}(?:揽|背|兜)(?:过来|起来|下|着)?',
+  // b11：这条线/这事/这条路 + 我兜底/兜着/担着（无介词形）
+  '(?:这条线|这事|这件事|这事上|这条路)[^。，]{0,6}我(?:来)?(?:兜底|兜着|担着)',
+  // b12：问题/事/锅 + 算|归 + 我的（轻形：「出了问题算我的」）
+  '(?:问题|事情|事|锅|责任)[^。，]{0,6}(?:算|归|是)[^。，]{0,2}我(?:的)?(?:事|问题|责任|头上)?',
+].join('|'));
 
 const ABSORB_EN = new RegExp(
   '\\b(?:i|we)\\s+(?:will\\s+)?(?:take|bear|assume|shoulder|absorb|own)\\s+' +
@@ -74,13 +86,16 @@ const ABSORB_EN = new RegExp(
   '(?:be\\s+)?(?:held\\s+)?(?:accountable|responsible|liable|blamed)' +
   '|\\bmy\\s+(?:name|neck)\\s+is\\s+(?:on\\s+(?:it|the\\s+line)|out\\s+there)' +
   '|\\bit\\s+is\\s+(?:all\\s+)?my\\s+(?:call|responsibility|fault|problem)' +
-  '|\\bi\\s+(?:will\\s+)?take\\s+the\\s+(?:hit|rap|fall)' +
+  '|\\bi(?:\\u0027ll|\\s+will)?\\s+take\\s+the\\s+(?:hit|rap|fall)' +
   '|\\bi\\u0027ll\\s+take\\s+full\\s+responsibility' +
   // 「Any fallout / all the fallout ... on me / mine」
   '|\\b(?:any|all|the)\\s+(?:fallout|blame|consequences|liability|' +
   'repercussions)\\s+(?:is|are)?\\s*(?:entirely|fully|solely)?\\s*' +
   '(?:on\\s+me|mine|with\\s+me)' +
-  '|\\b(?:entirely|fully|solely|all)\\s+(?:on\\s+me|my\\s+(?:call|problem|fault|responsibility))',
+  '|\\b(?:entirely|fully|solely|all)\\s+(?:on\\s+me|my\\s+(?:call|problem|fault|responsibility))' +
+  // 混排形：中文句子里直接写英文 Accountability/liability … rests with me
+  '|\\b(?:responsibility|accountability|liability)[^\\n]{0,10}' +
+  '(?:rests?|sits|lies)\\s+(?:entirely\\s+|fully\\s+)?with\\s+me',
   'i'
 );
 
@@ -110,7 +125,12 @@ const DISSUADE_EN = new RegExp(
   '|\\bjust\\s+(?:sign|do\\s+it|comply|follow\\s+through|proceed|go\\s+ahead)' +
   '|\\bno\\s+need\\s+to\\s+(?:document|log|record|keep\\s+records)' +
   '|\\bset\\s+your\\s+(?:doubts|concerns|suspicions)\\s+aside' +
-  '|\\bstop\\s+(?:second-?guessing|questioning|worrying)',
+  '|\\bstop\\s+(?:second-?guessing|questioning|worrying)' +
+  // 「don't bother keeping records / no need to keep records / skip the
+  //  documentation」——劝阻留痕形，r518 实测漏（原五支只收 no need/just/set aside）
+  '|\\b(?:don\'t|do\\s+not)\\s+bother\\s+(?:to\\s+)?' +
+  '(?:keep(?:ing)?\\s+records?|document(?:ing)?|log(?:ging)?|writ(?:e|ing))' +
+  '|\\b(?:no\\s+need\\s+to|skip|drop)\\s+(?:keep(?:ing)?\\s+records?|document(?:ing)?|log(?:ging)?)',
   'i'
 );
 
@@ -138,7 +158,15 @@ const EXPLICIT_EN = new RegExp(
   '|\\ball\\s+(?:of\\s+)?(?:the\\s+)?(?:consequences|fallout|blame|' +
   'responsibility)\\s+(?:are\\s+)?(?:mine|on\\s+me|rest\\s+with\\s+me)' +
   '|\\bthe\\s+consequences\\s+are\\s+(?:entirely\\s+|fully\\s+)?' +
-  '(?:mine|on\\s+me)',
+  '(?:mine|on\\s+me)' +
+  // 混排形/一般形（r518 补）：中英混排句里的英文让渡 + 「Liability … rests
+  // with me / for … rests with me」。原 sub1 的「rests with me」要求
+  // responsibility|liability|accountability 后紧跟 optional ANY
+  // consequences 再 rests，`Liability for any outcome rests` 的 for 短语
+  // 不匹配，实测 e#0/e#2 全支 false（零覆盖死支）。
+  '|\\b(?:accountability|liability|responsibility|blame|fallout|' +
+  'the\\s+consequences)\\b[^.\\n]{0,24}?(?:rests?|sits|lies)\\s+' +
+  '(?:entirely\\s+|fully\\s+|solely\\s+)?(?:with|on)\\s+me\\b',
   'i'
 );
 
