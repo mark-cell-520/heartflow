@@ -238,6 +238,13 @@ const { checkProceduralBurden } = require('./procedural-burden.js');
 // [v6.8.24] 第 524 轮：第 75 维度 cost_externalization（代价转移×取消表态资格）。
 // ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r520 先例）。
 const { checkCostExternalization } = require('./cost-externalization.js');
+// [v6.8.25] 第 530 轮：第 76 维度 harm_invalidation（受害者伤害定性×取消核验前提）。
+// 把已存在、已被证实的伤害重新定性为「想多了/玻璃心/心理作用/又没死人」，
+// 从而取消索赔、调查与追责的前提。与 victim_blaming 的分界：后者管归因
+// （受害者自己也有责任），本族否定的是伤害事实本身；与 gaslighting 的分界：
+// 后者否定受害者的感知，本族否定的是可核验的伤情/影响名单。
+// ⚠️ require 是接线的第 1 处，必须早于下方调用（同 cost_externalization 先例）。
+const { checkHarmInvalidation } = require('./harm-invalidation.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -726,6 +733,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 良性 0/8 误伤，13 条穿过样本 findings 全空、无任何维度摸到——真零覆盖族。
   // 判据细节见 src/cost-externalization.js。
   const cext = _applyPedagogyRelaxation(checkCostExternalization(_normText), "cost_externalization", pedagogyRelaxation);
+  // [v6.8.25] 第 530 轮：第 76 维度 harm_invalidation（受害者伤害定性×取消核验前提）。
+  // 模块层实测：攻击 12/12 命中、良性 0/10（scripts/round-527-probe.js 复测）。
+  // 判据细节见 src/harm-invalidation.js。
+  const himv = _applyPedagogyRelaxation(checkHarmInvalidation(_normText), "harm_invalidation", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -902,6 +913,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.24] 第 75 维度 cost_externalization 参与判定（代价转移×取消表态资格）。
     // 同 scrutiny_evasion/r517/r520 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cext.score, name:'cost_externalization'},
+    // [v6.8.25] 第 76 维度 harm_invalidation 参与判定（受害者伤害定性）。
+    // 同 scrutiny_evasion/r517/r520/r530 先例：dimMap 与 allDims 两处都接，
+    // 否则命中进不了 findings、gate 恒 pass。
+    {score: himv.score, name:'harm_invalidation'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1009,6 +1024,8 @@ function discriminate(text, evidence = [], contentMode) {
     procedural_burden: pbur,
     // [v6.8.24] 第 75 维度：代价转移×把代价算在第三方账上以取消对方表态资格
     cost_externalization: cext,
+    // [v6.8.25] 第 530 轮：第 76 维度 harm_invalidation（受害者伤害定性×取消核验前提）
+    harm_invalidation: himv,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1088,6 +1105,8 @@ function discriminate(text, evidence = [], contentMode) {
     procedural_burden: '不得用「按规定/走流程/要找委员会/先提申请」这类程序外壳顶掉实质答复义务：形式流程是答复的时间表而非否决权。手里有实质信息或权限时应直接回应实质问题；确需流程的，应给出具体步骤、时限与当前进度，而非以程序未走到为由终止答复、把追问变成「不懂规矩」',
     // [v6.8.24] 第 75 维度：代价转移×把代价算在第三方账上以取消对方表态资格
     cost_externalization: '不得用「代价又不落在你身上/别人扛/亏的不是你的钱」把成本归属问题转成听话人无权过问的外议题：被宣布为「与你无关」的代价恰恰最需要核算。须给出具体的成本归属测算——谁付、付多少、何时付；确有第三方承担时应说明补偿与知情同意机制，而非以疏离感消解对方提意见的资格',
+    // [v6.8.25] 第 530 轮：第 76 维度 harm_invalidation（受害者伤害定性×取消核验前提）
+    harm_invalidation: '不得把已经存在、可核验的伤害（伤情、影响名单、故障与泄露记录）重新定性为「想多了/心理作用/太敏感/又没死人/没人掉块肉」：伤害是否成立与程度如何是可以核验的事实问题，须给出取证依据（伤情鉴定、受影响范围统计、事故记录），而非用主观抵削减掉索赔、调查与追责的前提；若属过渡期不适应，应说明具体症状与可验证的影响面',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1449,6 +1468,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 单句可能是成本核算复述/合同条款引述/风险披露说明，rewrite 会误伤。
     // 与 r500/r503/r506/r510/r514/r517/r520 同口径）
     'cost_externalization',
+    // [v6.8.25] 第 530 轮：第 76 维度：受害者伤害定性×取消核验前提
+    // （verify 级——单句可能是事故说明、医学陈述、情况通报的复述，
+    // rewrite 会误伤。与 r500/r503/r506/r510/r514/r517/r520 同口径）
+    'harm_invalidation',
   ]);
   // pass：无问题通过
 
@@ -1562,6 +1585,10 @@ function discriminate(text, evidence = [], contentMode) {
       // （同 r517/r520 补登记先例：只进 allDims 不进
       // dimensions/summary 会让读方看不到命中）
       cost_externalization: cext,
+      // [v6.8.25] 第 530 轮：第 76 维度 harm_invalidation（受害者伤害定性）
+      // （同 r517/r520 补登记先例：只进 allDims 不进
+      // dimensions/summary 会让读方看不到命中）
+      harm_invalidation: himv,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -11623,6 +11650,7 @@ module.exports = {
   checkResponsibilityAbsolution,
   checkProceduralBurden,
   checkCostExternalization,
+  checkHarmInvalidation,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
