@@ -543,9 +543,11 @@ class AssociativeEngine {
 
   /**
    * L5: 逐词回复生成层
+   * [v6.8.1 第 543 轮] 新增可选 narrative 参数，与 process() 内的 L5 调用点
+   * 保持同一签名语义，让外部直接调 processL5 也能拿到叙事约束。
    */
-  async processL5(thoughtVector, userModel) {
-    return this.wordByWordGenerator.generateResponse(thoughtVector, userModel);
+  async processL5(thoughtVector, userModel, narrative = null) {
+    return this.wordByWordGenerator.generateResponse(thoughtVector, userModel, 200, narrative);
   }
 
   /**

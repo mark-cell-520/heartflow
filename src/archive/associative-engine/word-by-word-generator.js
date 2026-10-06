@@ -589,6 +589,27 @@ class WordByWordGenerator {
 
 
 
+        // 自愈：优先回到尚未说尽的叙事阶段词，其次回高权重 L4 概念。
+        // [v6.8.1 第 543 轮] 补 r542 未落地的这一支：叙事未耗尽时先回叙事，
+        // 避免漂移自愈把 L3 命中的叙事上下文冲掉（此前 drift 只回 L4 概念）。
+        if (responseState.narrative && responseState.narrative.stageWords.length > 0) {
+          const saidSet = new Set(responseState.generatedWords);
+          const remainNarr = responseState.narrative.stageWords.filter(w => !saidSet.has(w));
+          if (remainNarr.length > 0) {
+            const narrWord = this._safePick(remainNarr);
+            responseState.generatedWords.push(narrWord);
+            this.recordTrace('drift_correction', {
+              correction: narrWord,
+              source: 'narrative_stage',
+              framework: responseState.narrative.framework,
+              remaining: remainNarr.length,
+              driftScore: drift.score,
+              reason: drift.reason
+            });
+            continue;
+          }
+        }
+
         // 自愈：强制回归到 thoughtVector 中的高权重概念
 
         const topConcept = Object.entries(thoughtVector.dimensions)
