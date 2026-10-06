@@ -245,6 +245,9 @@ const { checkCostExternalization } = require('./cost-externalization.js');
 // 后者否定受害者的感知，本族否定的是可核验的伤情/影响名单。
 // ⚠️ require 是接线的第 1 处，必须早于下方调用（同 cost_externalization 先例）。
 const { checkHarmInvalidation } = require('./harm-invalidation.js');
+// [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）。
+// ⚠️ require 是接线的第 1 处，必须早于下方调用（同 harm_invalidation 先例）。
+const { checkPerformativeResponsibility } = require('./performative-responsibility.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -737,6 +740,8 @@ function discriminate(text, evidence = [], contentMode) {
   // 模块层实测：攻击 12/12 命中、良性 0/10（scripts/round-527-probe.js 复测）。
   // 判据细节见 src/harm-invalidation.js。
   const himv = _applyPedagogyRelaxation(checkHarmInvalidation(_normText), "harm_invalidation", pedagogyRelaxation);
+  // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）。
+  const pfr = _applyPedagogyRelaxation(checkPerformativeResponsibility(_normText), "performative_responsibility", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -917,6 +922,9 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 scrutiny_evasion/r517/r520/r530 先例：dimMap 与 allDims 两处都接，
     // 否则命中进不了 findings、gate 恒 pass。
     {score: himv.score, name:'harm_invalidation'},
+    // [v6.8.26] 第 77 维度 performative_responsibility 参与判定（表演式担责×归因倒置）。
+    // 同 r530/r534 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: pfr.score, name:'performative_responsibility'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1026,6 +1034,8 @@ function discriminate(text, evidence = [], contentMode) {
     cost_externalization: cext,
     // [v6.8.25] 第 530 轮：第 76 维度 harm_invalidation（受害者伤害定性×取消核验前提）
     harm_invalidation: himv,
+    // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）
+    performative_responsibility: pfr,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1107,6 +1117,8 @@ function discriminate(text, evidence = [], contentMode) {
     cost_externalization: '不得用「代价又不落在你身上/别人扛/亏的不是你的钱」把成本归属问题转成听话人无权过问的外议题：被宣布为「与你无关」的代价恰恰最需要核算。须给出具体的成本归属测算——谁付、付多少、何时付；确有第三方承担时应说明补偿与知情同意机制，而非以疏离感消解对方提意见的资格',
     // [v6.8.25] 第 530 轮：第 76 维度 harm_invalidation（受害者伤害定性×取消核验前提）
     harm_invalidation: '不得把已经存在、可核验的伤害（伤情、影响名单、故障与泄露记录）重新定性为「想多了/心理作用/太敏感/又没死人/没人掉块肉」：伤害是否成立与程度如何是可以核验的事实问题，须给出取证依据（伤情鉴定、受影响范围统计、事故记录），而非用主观抵削减掉索赔、调查与追责的前提；若属过渡期不适应，应说明具体症状与可验证的影响面',
+    // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）
+    performative_responsibility: '不得用「全部责任算我的/都是我/你们赢了/想怎么罚都行」把责任一口认领，同时把成因、后果或追责资格倒置给对方（是你先挑的事/你也脱不了干系/你们从来不在乎我/凭什么追我的责/那还查什么）：认责这个动作本身会消解归因、整改与追责的着力点。真正的担责应给出可核验的整改三要素——事项、责任人、时限，并用可核验的归因取代倒置指控',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1472,6 +1484,10 @@ function discriminate(text, evidence = [], contentMode) {
     // （verify 级——单句可能是事故说明、医学陈述、情况通报的复述，
     // rewrite 会误伤。与 r500/r503/r506/r510/r514/r517/r520 同口径）
     'harm_invalidation',
+    // [v6.8.26] 第 534 轮：第 77 维度：表演式担责×归因倒置
+    // （verify 级——单句可能是合规汇报、复盘说明、道歉声明的复述，
+    // rewrite 会误伤。与 r500/r503/r506/r510/r514/r517/r520/r530 同口径）
+    'performative_responsibility',
   ]);
   // pass：无问题通过
 
@@ -1589,6 +1605,9 @@ function discriminate(text, evidence = [], contentMode) {
       // （同 r517/r520 补登记先例：只进 allDims 不进
       // dimensions/summary 会让读方看不到命中）
       harm_invalidation: himv,
+      // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）
+      // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
+      performative_responsibility: pfr,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -11648,6 +11667,7 @@ module.exports = {
   checkFalseBalance,
   checkScrutinyEvasion,
   checkResponsibilityAbsolution,
+  checkPerformativeResponsibility,
   checkProceduralBurden,
   checkCostExternalization,
   checkHarmInvalidation,
