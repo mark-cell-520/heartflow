@@ -162,6 +162,8 @@ const { checkCrisisExceptionalism } = require('./crisis-exceptionalism.js');
 // 看守 G1-G3 放行正当致谢、按合同制度办、人情归人情。
 // ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r551/r547/r559/r560/r562 先例）。
 const { checkFavorLedger } = require('./favor-ledger.js');
+// [v6.8.37] 第 567 轮：第 87 维度 moral_licensing（道德许可）。
+const { checkMoralLicensing } = require('./moral-licensing.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
 // 非人主体，回避具体决策者）。心虫 decision 本体选出，探测器实测 8/10
@@ -852,6 +854,12 @@ function discriminate(text, evidence = [], contentMode) {
   // （sunk_cost_coercion），而是**把单方历史付出折算成对方当下的义务**：
   // 一旦当年的帮助被记成可支取的账，「自愿决策」就被置换成了「还债」。
   const flr = _applyPedagogyRelaxation(checkFavorLedger(_normText), "favor_ledger", pedagogyRelaxation);
+  // [v6.8.37] 第 567 轮：第 87 维度 moral_licensing（道德许可）。落点不是
+  // 「历史付出 ⇒ 对方义务」（第 86 维 favor_ledger，方向相反：那是把善行
+  // 折算成别人的债；本族是把既往干净折算成自己的豁免），也不是「偏离被逐步
+  // 常态化」（normalization_of_deviance，本族是单次许可发放，不需渐变）。
+  // 判据：道德资本腿 × 越界许可腿 + 三条看守（独立评估/按制度办/法定减免）。
+  const mli = _applyPedagogyRelaxation(checkMoralLicensing(_normText), "moral_licensing", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -1068,6 +1076,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.36] 第 564 轮：第 86 维度 favor_ledger 参与判定（恩情账本）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: flr.score, name:'favor_ledger'},
+    // [v6.8.37] 第 567 轮：第 87 维度 moral_licensing 参与判定（道德许可）。
+    // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: mli.score, name:'moral_licensing'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1203,6 +1214,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.36] 第 564 轮：第 86 维度 favor_ledger（恩情账本×
     // 把单方历史付出折算成对方当下的义务）。
     favor_ledger: flr,
+    // [v6.8.37] 第 567 轮：第 87 维度 moral_licensing（道德许可×
+    // 既往善行/资历/相对干净 ⇒ 当下越界可通融）。
+    moral_licensing: mli,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1298,6 +1312,8 @@ function discriminate(text, evidence = [], contentMode) {
     anecdote_as_proof: '不得把个人或身边极少数人的体验当作普遍结论、群体效果或行业标准的证据（我朋友吃了三个月就好了，说明这药有效/我从来没用出过问题，所以这套流程是安全的/我身边的人都在用，这就是行业标准/It worked for me, so it works in general）：说话人与其熟人的样本量不足以支撑「普遍适用/行业标准/证明有效」的全称判断。个例可以说明「存在这种可能性」，不能推出「对总体成立」。确有个案参考价值时应明确标注样本范围（这只是我的单次体验），并补上可验证的全量数据、统计口径或临床对照；在数据到位之前，结论必须降格为待验证假设而非既成事实',
     // [v6.8.35] 第 562 轮：第 85 维度 crisis_exceptionalism（危机例外化）。
     'crisis_exceptionalism': '不得以紧急、特殊、非常、战时等例外状态为由，单方面暂停授权、程序、监督或知情权，把「事后补」当成合规的替代品（现在是紧急状态，审批先不用了/特殊时期这些流程先放一放/都什么时候了还讲程序/非常时期知情权也要让位/In an emergency, we can skip the approval process/These are extraordinary times, so the usual rules do not apply）：例外状态是启动预案的理由，不是作废规则的理由。正当做法是依法或依预案先行处置，同时明确补全手续的法定时限、补报的强制义务和事后追责安排；用「以后再说」替换明确时限，等于把程序变成了永不兑现的承诺。若确实需要临时简化，应写明授权的具体来源与边界、保留的记录、以及由谁在何时复核',
+    // [v6.8.37] 第 567 轮：第 87 维度 moral_licensing（道德许可）。
+    'moral_licensing': '不得以既往善行、积累的道德资本或「我比别人干净」的相对比较，给当前的越界行为发放许可证（我去年捐了那么多，这点回扣算什么/我对团队一直很大方，这次占点便宜你们别计较/我做了十年公益，私吞这点捐款不算事/我平时都按规矩来，就这次例外一下/至少我没做得更过分/比起那些真正腐败的人，我这算干净的/I donated a lot last year, so a small kickback is fine/I have a clean record, so this slip does not matter/Compared with the truly corrupt people, my conduct is clean）：既往记录与本次事项必须分开评估——过去的捐赠、资历与合规记录是真的，也不能为当下这一笔免责。正当做法是分开陈述（既往记录归既往，本次事项照常审计、审批与定性），若确因历史贡献要给予回报，应走公开的激励与补偿机制并写明依据、标准与额度，而不是在具体事项现场要求通融。边界：favor_ledger 管「我对你有恩 ⇒ 你要让步」（方向指向对方），本族管「我过去干净 ⇒ 我可以越界」（豁免指向自己）；normalization_of_deviance 管偏离被逐步常态化，本族是单次许可发放；moral_foundations 只做道德语汇打分，不判「用善行换越界」的推导；emotional_manipulation 管情绪施压，本族可以完全冷静',
     // [v6.8.36] 第 564 轮：第 86 维度 favor_ledger（恩情账本）。
     'favor_ledger': '不得把过往的付出、人情、照顾、提携记成一本可随时支取的账，用以换取当下的服从、让步或免责（我当年帮了你那么大忙，这点小事你都不肯/没有我就没有你的今天，这件事你必须听我的/这些年我处处照应你，让你扛个责任别推/I helped you a lot back then, you cannot refuse me this/After all I have done for you, you owe me this）：人情债务陈述与索取让步两腿同时在场，就是用历史善行置换当前的程序与自愿。感谢是可以的，附条件的感谢不是。正当做法是把两者分开陈述——人情归人情，决策归程序：该致谢就明确致谢且不附加任何当下要求，该走的审批、评审、合同条款照常执行；若确因历史贡献要给予回报，应走公开的激励与补偿机制，写明依据、标准与额度，而不是在具体决策现场要求对方「还」。边界：sunk_cost_coercion 管自身沉没成本，loyalty_test 管站队表忠心，本族只要求让利；emotional_manipulation 管情绪施压本身，本族可以完全没有情绪（按当年的事算，这次你担一下）',
   };
@@ -1623,6 +1639,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 边界：info_deprivation 管长期不给信息、false_urgency 管时间压力本身，
     // 本族管「例外状态 ⇒ 规则作废」的推导（无时间窗同样成立）。
     'crisis_exceptionalism',
+    // [v6.8.37] 第 567 轮：第 87 维度 moral_licensing（道德许可）。落 rewrite
+    // 不落 block——陈述既往善行、资历、合规记录本身完全正当（写进获奖感言、
+    // 介绍履历、年度总结都不少见），block 会误伤；但「过去干净 ⇒ 这次可以
+    // 通融」的主张违反程序正义，必须改写为「既往记录与本次事项分开评估」。
+    'moral_licensing',
     // [v6.8.36] 第 564 轮：第 86 维度 favor_ledger（恩情账本）。落 rewrite
     // 不落 block——恩情陈述本身可以完全正当（致谢、汇报知遇之恩、写进
     // 获奖感言都不少见），block 会误伤；但「历史付出 ⇒ 当下必须让步」
@@ -1885,6 +1906,10 @@ function discriminate(text, evidence = [], contentMode) {
       // DIM_GUIDANCE + dimensions/summary，不走 r556「只接两处」回头路。
       crisis_exceptionalism: ce,
       favor_ledger: flr,
+      // [v6.8.37] 第 567 轮补登记：第 87 维度 moral_licensing（道德许可）。
+      // r566 建模块、r567 一次接齐 dimMap + allDims + summary 登记 + DIM_GUIDANCE
+      // + REWRITE_DIMS + dimensions/summary，不走 r556「只接两处」回头路。
+      moral_licensing: mli,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
@@ -11960,6 +11985,7 @@ module.exports = {
   checkAnecdoteAsProof,
   checkCrisisExceptionalism,
   checkFavorLedger,
+  checkMoralLicensing,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
