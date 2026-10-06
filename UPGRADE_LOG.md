@@ -1,4 +1,61 @@
-# 第 553 轮（收尾审计轮 — r552 未完成项收口：finish 全绿 + doc-numbers 2 项自愈，无新维度）
+# 第 565 轮报告（favor_ledger 守卫测试落地七联全绿 + doc-numbers 8 项数字失败自愈）
+
+## 方向选择与实测证据
+
+队列待办为空；探测器候选池上一轮已空（r553 确认）；按「上一轮遗留的真缺口」优先级，r564 交接簿第 1 项即"最优先"：**守卫测试 `test/round-565-favor-ledger.test.js` 未建**。第 86 维度 favor_ledger 的模块与 8 处接线已在库（`98d096c5` / `3817789e` / `03f76b4e` / `e905ca24`），但没有任何测试守着它——判据被误改也不会有人知道，这正是无人值守升级链路里最不可接受的缺口。本轮把它补上。
+
+本轮的辨别能力增量不在新维度，而在**给已上线的第 86 维度补上可验证性**：判据的每一支现在都有"删掉它必须变红"的守卫证明它真的在判，而不是装饰。
+
+## 改了什么（1 commit + upgrade-engine 自动记账 2 个 auto-commit）
+
+| 项 | 内容 |
+|---|---|
+| `0c08949b` | 新建 `test/round-565-favor-ledger.test.js`：14 联断言全绿 |
+| upgrade-engine `93…/29…` | finish 的 `sync-doc-numbers` 把三份文档的维度口径 82→85、rewrite 列举 14→16、verify 列举 48→49 同步到 AGENTS.md / README.md / SKILL.md —— **r553 遗留的 doc-numbers 数字失败本轮被 finish 自动修掉 8 项** |
+
+测试七联覆盖：①模块层攻击 16/16；②良性主族 0/11；③gate 非 pass 16/16；④findings 归因 favor_ledger 16/16；⑤rewrite 定级唯一；⑥接线回归（dimMap/REWRITE_DIMS/计算三处 + guidance 非空）；⑦不侵占 sunk_cost_coercion / loyalty_test / concession_coercion；外加 6 条变异守卫（LEDGER_ZH / CLAIM_ZH / LEDGER_EN / CLAIM_EN / GUARD_ZH / GUARD_EN 逐支置空，对应样本必须翻向，另一语支不受影响）。
+
+## 过程中踩的坑（已写成测试内注释，防止下一个人重踩）
+
+变异守卫的第一版写法是"从 `const X = new RegExp([` 找到整行等于 `].join('|'));` 的行尾"——实测这会**把后一个声明一起吃掉**（LEDGER_EN 的分支里含多行 join 形状、EN 三支结尾是 `].join('|'), 'i');`），表现为"置空 A 支却报 B 支 is not defined"，即崩溃而非翻向。修正为按精确区间（两种合法结尾取较近者）替换，并加了三条防御断言：被删区间不得含其它声明、不得删掉 `checkFavorLedger` 函数体。
+
+另一个坑：豁免族样本 S2（"感谢提携 + 按标准打分"）实测只带 A1 不带 A2（`CLAIM_ZH=false`），所以置空 GUARD_ZH 后它仍 miss 是**正确行为**，不是守卫失守。逐腿取证后把它从"豁免依赖族"移到"良性主族"，豁免族改用真正的 A1×A2 双腿 + 看守放行样本（zh×1 / en×2）。
+
+## 验证结果（7 项 + 2 项附带）
+
+| 项 | 结果 |
+|---|---|
+| `node test/round-565-favor-ledger.test.js`（本轮新增） | ✅ **14 过 / 0 败** |
+| `node test/round-541-associative-capability.test.js`（pick-tests 子集） | ✅ **22 过 / 0 败** |
+| `node test/round-547-incoherent-coverage.test.js`（pick-tests 子集） | ✅ **16 过 / 0 败** |
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（基线 302，未超） |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败** |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ **19 过 / 2 败**（r553 的 4 败 → 本轮 2 败；8 项数字失败已被 finish 自动记账修复） |
+| `node scripts/upgrade-engine.js finish` | ✅ **7 项全绿**（含推送 23 commit、归因哨兵 3/3、队列 1/1） |
+
+`run-all` 全量仍未跑：内存守卫 BLOCKED（余量 331MB < 700MB），按纪律改跑单文件子集。`heartflow-pick-tests.sh` 按改动范围给出的子集只含 3 个测试文件，全部前台跑完。
+
+## 遗留（下一轮接手）
+
+1. **doc-numbers 剩 2 项失败属缓存自锁，不是文档问题**：`data/test-count.json` 停在 `failed=28`（2026-10-05 的 run-all 遗留），读数为 0 的当前测试全部通过也会被判失败。恢复办法是内存余量 ≥700MB 时跑一次 `run-all` 重写缓存。**这是恢复 doc-numbers 全绿的唯一路径**，不是边界外问题。
+2. **探测器族库仍只有 5 个内置族且已全部覆盖**（r553 已列）。下一轮若要"心虫自选"，前置工作仍是往 `heartflow-upgrade-scout.sh` 加新句式族探针；在旧池里反复 decision 只会得到 chosen:null。
+3. **152 个未跟踪探针文件**（r525 起累积的 `scripts/round-5xx-*.js` 与 4 个 `test/` 遗留）仍未清理，finish 每轮都报"需人工判断"。这是纯卫生问题，但持续每轮刷噪音；建议下一轮用一次性脚本按 `round-5[0-4]` 前缀批量归档或删除（删前抽查 r430 之前的，可能有复用价值）。
+4. r560 落盘池剩 `moral_licensing`、`shame_compliance` 未做（第 87/88 维度候选）。
+5. `run-all` 累计多轮未跑，`npm-package-integrity` 预期失败 1 个的口径无法复核。
+
+## 给下一轮的接手说明
+
+1. **finish 已跑、锁已释放、23 commit 已推送**——r564 的"守卫测试未建"缺口已收口，不要回头重做。
+2. 下一轮若选 r560 池的 `moral_licensing` / `shame_compliance`，**先跑探测器或 `round-56x-family-verify.js` 复测缺口**，再让 decision 本体选；样本与良性对照都写进 `scripts/round-566-*.js` 落盘，别在命令行内联。
+3. **变异守卫的 `breakDecl` 写法已固化为本仓标准**（精确区间 + 越界防御断言），第 87 维度的守卫测试直接复用本例，别再走"整行锚点"的弯路。
+4. 纪律沿用：写完第一个文件立刻 commit；测试骨架在扩样复测之前写；一条命令只做一件事，超 120s 的命令后台化。
+
+## 本轮给引擎新增的辨别能力
+
+表面看本轮没有新维度，但实质补上的是**第 86 维度 favor_ledger 的可验证性闭环**：此前它的 6 条判据支（A1/A2 各中英）与 2 条看守支都处于"没人证明它们真的在判"的状态——任何一次误改（删支、改 join、动豁免层）都会静默削弱能力而 CI 全绿。现在 6 支各有"删它必须让对应样本翻向"的守卫，2 条看守各有"删它必须让良性族转红"的守卫，端到端 rewrite 定级与不侵占近邻维度（sunk_cost_coercion / loyalty_test / concession_coercion）也各自有断言。从无人值守升级链路的角度，这把"第 86 维度已上线"从一句声明变成了可被机器持续验证的事实。
+
+
 
 > 轮末记录按「心虫升级执行体」cron 简报的格式要求，原样保留轮次标题与全部小节。本轮标题「无新维度」是如实记账：队列待办为空、探测器候选池为空、r552 遗留属已完成工作的收尾，因此本轮定位收尾审计轮。
 
