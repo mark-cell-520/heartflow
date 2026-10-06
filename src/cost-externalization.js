@@ -241,6 +241,9 @@ const LIGHT_ZH = new RegExp([
   '(?:你|你们)(?:只|就|只须|只需|只要)(?:要)?(?:签|签个|签一)(?:个)?(?:字|名)',
   // 「你只管/你只需要」
   '(?:你|你们)(?:只|就|只须|只需|只要)(?:要)?(?:管|需要|负责)(?:同意|批准|点头|签字|放行|盖章)',
+  // 「你签个字就行/签一下就好」（祈使式轻量审批：无「只/就」前缀的
+  // 命令形，句尾带「就行/就好/即可」——r524 实测样本漏在此）
+  '(?:你|你们|您)(?:签|签个|签一|批|点)(?:个|一|下|头)?(?:字|名|头|同意|批准)(?:就行|就好|即可|便可|就行了|就行了吗)?',
   // 「你说了算/你一支笔」
   '(?:你|你们)(?:说|讲)(?:了)?(?:算|了算|算数)',
   '(?:一|这)(?:支|张)(?:笔|章)(?:签|盖)(?:下去|了)',
@@ -263,6 +266,9 @@ const LIGHT_EN = new RegExp([
     '(?:sign|approve|nod|say\\s+yes|rubber-?stamp)',
   // 「just say yes / just approve」
   '\\bjust\\s+(?:say|give)\\s+(?:yes|the\\s+nod|the\\s+go-?ahead)',
+  // 「just sign here / sign right here」（祈使式轻量审批：here 方位
+  // 收尾形，r524 实测样本漏在此——LIGHT_EN 其余支都要求 just + 动词）
+  '\\b(?:just\\s+)?(?:sign|sign\\s+off)\\s+(?:right\\s+)?here\\b',
   // 「you do not even need to look」
   '\\byou\\s+(?:do\\s+not|do not|don t)\\s+even\\s+(?:need\\s+to\\s+)?' +
     '(?:read|look|check|review|understand)',
