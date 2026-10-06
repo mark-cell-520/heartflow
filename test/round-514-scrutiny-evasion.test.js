@@ -189,10 +189,14 @@ function mutatedSource(spec) {
   return spec.mutate(orig);
 }
 
-// 整支声明置空：`const <name> = new RegExp( ... );` → `new RegExp('')`
+// 整支声明置空：`const <name> = new RegExp( ... );` → 永不匹配的 RegExp。
+//   r516 实测坑：`new RegExp('')` 的**空模式匹配任何字符串**，
+//   `.test()` 恒 true ——「置空」反而成了恒命中，活度守卫全数假失败。
+//   `(?!)` 是永不成立的负向前瞻，`.test()` 恒 false，才是真置空。
 //   r515 实测坑：`[\s\S]*?\n\);` 非贪婪会跨越到**下一个**同样以
 //   `\n);` 结尾的声明（原文里每个 RegExp 声明都是 `\n);` 收尾），
 //   导致一次变异同时吞掉相邻支。改为**直到下一条 const 声明前**截断。
+const BLANK_PATTERN = '(?!)';
 function blankDecl(declName) {
   return orig => {
     const start = orig.indexOf(`const ${declName} = `);
@@ -202,7 +206,7 @@ function blankDecl(declName) {
     const seg = orig.slice(start, after);
     if (!/new RegExp\(/.test(seg)) throw new Error(`${declName} 声明形状异常`);
     return orig.slice(0, start) +
-      `const ${declName} = new RegExp('');` + orig.slice(after);
+      `const ${declName} = new RegExp('${BLANK_PATTERN}');` + orig.slice(after);
   };
 }
 
@@ -215,43 +219,49 @@ function mustHit(idx) {
 check('变异守卫：CONSEQ 支可被置空且 atk#17 基线命中', () => {
   mustHit(17);
   const m = mutatedSource({ mutate: blankDecl('DEFER_CONSEQ_ZH') });
-  assert.ok(m.includes("const DEFER_CONSEQ_ZH = new RegExp('');"), 'CONSEQ 声明未被置空');
+  const blank = `const DEFER_CONSEQ_ZH = new RegExp('${BLANK_PATTERN}');`;
+  assert.ok(m.includes(blank), 'CONSEQ 声明未被置空');
   assert.ok(m.includes('const DEFER_QUAL_ZH = new RegExp'), 'QUAL 支被误伤');
   assert.ok(m.includes('const DEFER_PURGE_ZH = new RegExp'), 'PURGE 支被误伤');
 });
 
-check('变异守卫：QUAL 支可被置空且 atk#20 基线命中', () => {
-  mustHit(20);
+check('变异守卫：QUAL 支可被置空且 atk#19 基线命中', () => {
+  mustHit(19);
   const m = mutatedSource({ mutate: blankDecl('DEFER_QUAL_ZH') });
-  assert.ok(m.includes("const DEFER_QUAL_ZH = new RegExp('');"), 'QUAL 声明未被置空');
+  const blank = `const DEFER_QUAL_ZH = new RegExp('${BLANK_PATTERN}');`;
+  assert.ok(m.includes(blank), 'QUAL 声明未被置空');
   assert.ok(m.includes('const DEFER_CONSEQ_ZH = new RegExp'), 'CONSEQ 支被误伤');
 });
 
-check('变异守卫：PURGE 支可被置空且 atk#19 基线命中', () => {
-  mustHit(19);
+check('变异守卫：PURGE 支可被置空且 atk#20 基线命中', () => {
+  mustHit(20);
   const m = mutatedSource({ mutate: blankDecl('DEFER_PURGE_ZH') });
-  assert.ok(m.includes("const DEFER_PURGE_ZH = new RegExp('');"), 'PURGE 声明未被置空');
+  const blank = `const DEFER_PURGE_ZH = new RegExp('${BLANK_PATTERN}');`;
+  assert.ok(m.includes(blank), 'PURGE 声明未被置空');
   assert.ok(m.includes('const DEFER_EN = new RegExp'), 'EN 支被误伤');
 });
 
 check('变异守卫：EN 支可被置空且 atk#25 基线命中', () => {
   mustHit(25);
   const m = mutatedSource({ mutate: blankDecl('DEFER_EN') });
-  assert.ok(m.includes("const DEFER_EN = new RegExp('');"), 'EN 声明未被置空');
+  const blank = `const DEFER_EN = new RegExp('${BLANK_PATTERN}');`;
+  assert.ok(m.includes(blank), 'EN 声明未被置空');
   assert.ok(m.includes('const DEFER_QUAL_ZH = new RegExp'), 'QUAL 支被误伤');
 });
 
-check('变异守卫：ANCHOR_ZH 支可被置空且 atk#20 基线命中', () => {
-  mustHit(20);
+check('变异守卫：ANCHOR_ZH 支可被置空且 atk#19 基线命中', () => {
+  mustHit(19);
   const m = mutatedSource({ mutate: blankDecl('TERM_BROADER_ZH') });
-  assert.ok(m.includes("const TERM_BROADER_ZH = new RegExp('');"), 'ANCHOR_ZH 声明未被置空');
+  const blank = `const TERM_BROADER_ZH = new RegExp('${BLANK_PATTERN}');`;
+  assert.ok(m.includes(blank), 'ANCHOR_ZH 声明未被置空');
   assert.ok(m.includes('const TERM_BROADER_EN = new RegExp'), 'ANCHOR_EN 支被误伤');
 });
 
 check('变异守卫：ANCHOR_EN 支可被置空且 atk#25 基线命中', () => {
   mustHit(25);
   const m = mutatedSource({ mutate: blankDecl('TERM_BROADER_EN') });
-  assert.ok(m.includes("const TERM_BROADER_EN = new RegExp('');"), 'ANCHOR_EN 声明未被置空');
+  const blank = `const TERM_BROADER_EN = new RegExp('${BLANK_PATTERN}');`;
+  assert.ok(m.includes(blank), 'ANCHOR_EN 声明未被置空');
   assert.ok(m.includes('const TERM_BROADER_ZH = new RegExp'), 'ANCHOR_ZH 支被误伤');
 });
 
@@ -286,13 +296,13 @@ check('路由③活度：置空 CONSEQ 后 atk#17 由 hit 变 miss（真调用�
   assert.ok(r.before, '基线未命中');
   assert.ok(!r.after, `置空后仍命中 = ${r.after} —— CONSEQ 支不敏感`);
 });
-check('路由③活度：置空 QUAL 后 atk#20 由 hit 变 miss（真调用）', () => {
-  const r = liveMutation('DEFER_QUAL_ZH', 20);
+check('路由③活度：置空 QUAL 后 atk#19 由 hit 变 miss（真调用）', () => {
+  const r = liveMutation('DEFER_QUAL_ZH', 19);
   assert.ok(r.before, '基线未命中');
   assert.ok(!r.after, `置空后仍命中 = ${r.after} —— QUAL 支不敏感`);
 });
-check('路由③活度：置空 PURGE 后 atk#19 由 hit 变 miss（真调用）', () => {
-  const r = liveMutation('DEFER_PURGE_ZH', 19);
+check('路由③活度：置空 PURGE 后 atk#20 由 hit 变 miss（真调用）', () => {
+  const r = liveMutation('DEFER_PURGE_ZH', 20);
   assert.ok(r.before, '基线未命中');
   assert.ok(!r.after, `置空后仍命中 = ${r.after} —— PURGE 支不敏感`);
 });
