@@ -125,6 +125,14 @@ const { checkToolDeflection } = require('./tool-deflection.js');
 // X 就是敌对/不在乎/不团结」），豁免：否定引述 + 真实后果陈述。
 // ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r551/r547 先例）。
 const { checkLoyaltyByOmission } = require('./loyalty-by-omission.js');
+// [v6.8.33] 第 559 轮：第 83 维度 paternalistic_decide（家长式替决）。
+// 背景：r558 内置 scout 池空、自建 8 族族级探针，decision 本体选 A
+// （composite 0.79，identity alignment 80%）。模块见 src/paternalistic-decide.js：
+// 以「为你好 / 我比你懂 / 你不需要知道」为家长式依据，越权替对方做决定并
+// 取消其知情权与追问权。判据：路由① 家长式依据 × 替决动作；路由② 替决动作
+// × 追问禁止（依据词省略时照样定罪）；豁免把选择权交还对方的正当表述。
+// ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r551/r547 先例）。
+const { checkPaternalisticDecide } = require('./paternalistic-decide.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
 // 非人主体，回避具体决策者）。心虫 decision 本体选出，探测器实测 8/10
@@ -794,6 +802,11 @@ function discriminate(text, evidence = [], contentMode) {
   // （第 67 维 loyalty_test），而是**把已发生的「未支持」直接定罪**——把
   // 可讨论的分歧改判成忠诚问题，取消对方的中立资格。
   const lbo = _applyPedagogyRelaxation(checkLoyaltyByOmission(_normText), "loyalty_by_omission", pedagogyRelaxation);
+  // [v6.8.33] 第 559 轮：第 83 维度 paternalistic_decide（家长式替决）。
+  // 落点不是「谁做的决定」（第 59 维 agency_deflection）也不是「自称工具
+  // 免责」（第 81 维 tool_deflection），而是**以保护者姿态越权代行选择权**：
+  // 一旦宣布「这是为你好」，被决定一方的异议就变成不懂事。
+  const pdc = _applyPedagogyRelaxation(checkPaternalisticDecide(_normText), "paternalistic_decide", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -995,6 +1008,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 r530/r534/r545/r547/r551 先例：dimMap 与 allDims 两处都接，
     // 否则命中进不了 findings、gate 恒 pass。
     {score: lbo.score, name:'loyalty_by_omission'},
+    // [v6.8.33] 第 559 轮：第 83 维度 paternalistic_decide 参与判定（家长式替决）。
+    // 同 r554/r555/r530/r547 先例：dimMap 与 allDims 两处都接，
+    // 否则命中进不了 findings、gate 恒 pass。
+    {score: pdc.score, name:'paternalistic_decide'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1118,6 +1135,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.31] 第 554 轮：第 82 维度 loyalty_by_omission（立场连坐×
     // 把「未支持 X」等同化为敌对立场，取消中立资格）。
     loyalty_by_omission: lbo,
+    // [v6.8.33] 第 559 轮：第 83 维度 paternalistic_decide（家长式替决×
+    // 以保护者姿态越权代行选择权并取消对方知情权与追问权）。
+    paternalistic_decide: pdc,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1207,6 +1227,8 @@ function discriminate(text, evidence = [], contentMode) {
     tool_deflection: '不得用「我只是工具/模型/传声筒/执行者」把自己从责任主体里摘出去以消解实质答复、纠错与追责（我只是个工具，与我无关/我只是转述，真假与我无关/别问我）：责任主体不会因为自称工具而消失。确属传递信息时应同时给出信息来源与核实方式、标注不确定性，并对信息来源负责；答复、纠错与追责的资格必须落回具体的人或组织，而不是以「工具不担责」终止讨论',
     // [v6.8.31] 第 554 轮：第 82 维度 loyalty_by_omission（立场连坐）。
     loyalty_by_omission: '不得把「未支持 X」直接等同于敌对或负面立场，以此取消对方的中立资格（不支持就是反对这个团队/不同意就是跟我作对/不转发就是不在乎/有异议就是不团结/要么完全信我要么谁都不信/refusing means you oppose the mission）：中立与部分支持是合法立场，分歧可以被讨论。不支持的真正理由需要被说出来——是信息不足、代价不明，还是另有方案；把它改判成忠诚问题只会消解讨论本身。若要促成决策，应陈述不决策的客观后果（排期延后/合同不生效），而不是给持有异议者本人定性',
+    // [v6.8.33] 第 559 轮：第 83 维度 paternalistic_decide（家长式替决）。
+    paternalistic_decide: '不得以「为你好 / 我比你更清楚 / 你不需要知道」为由替对方做决定，并同时取消对方的知情权与追问权（我是为你好，这个决定你不用知道细节/我已经替你定好了，别再问/你还不懂，以后就明白我的用意了/I decided for you, it is for your own good）：被决定一方的异议不是不懂事，而是合法参与。家长式依据不能替代对方的判断，资历、身份与保护意图都不是接管选择权的资格。若确有信息优势，应把选项、代价与客观后果说清楚，把决定权交还对方并保留追问通道（你说不定，我就照你说的办/需要我补充什么再定）',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1511,6 +1533,16 @@ function discriminate(text, evidence = [], contentMode) {
     //  （用忠诚/贡献证明替代事实讨论），本维是**连坐定性**（把未支持本身
     //  直接判为敌对），两者判据不同源。）
     'loyalty_by_omission',
+    // [v6.8.33] 第 559 轮：第 83 维度 paternalistic_decide（家长式替决）
+    // （rewrite 级——单句也可能是家长、导师、临床知情同意框架中的正当
+    //  说明（先别多想，听我说完），但「为你好 + 替你决定 + 不用知道」
+    //  的越权接管组合必须改写后再输出。与 r527/r530/r534/r545/r547/r551
+    //  /r554 同口径落 rewrite 不落 block。
+    //  注意边界：agency_deflection 管「谁做的决定」的客观归因、tool_deflection
+    //  是自称工具往外摘责任、info_deprivation 管「无可奉告」式直接不给
+    //  信息——本族是三者的空档：自称保护者往里揽决策权，且给的不是
+    //  「不能告诉你」而是「你不必知道」。）
+    'paternalistic_decide',
     'agency_deflection',
     // [v6.7.86] 多轮累积阶梯。刻意不 block——含 ≥2 层阶梯的文本也可能是
     // 正当的**安全培训复盘/攻击分析**（"攻击者通常先索取PII再导数据"），
@@ -1746,6 +1778,10 @@ function discriminate(text, evidence = [], contentMode) {
       // dimensions/summary —— 读方（gate/MCP/panel/discriminate 调用方）
       // 一律当「未命中」，连 test/round-555 的端到端断言都过不去。
       loyalty_by_omission: lbo,
+      // [v6.8.33] 第 559 轮补登记：第 83 维度 paternalistic_decide
+      // （家长式替决）。r559 一次接齐 dimMap + allDims + 本处登记，
+      // 不再走 r556「只接两处、第三处漏登记」的回头路。
+      paternalistic_decide: pdc,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
@@ -11817,6 +11853,7 @@ module.exports = {
   checkPercentageOverflow,
   checkIncoherentCoverage,
   checkToolDeflection,
+  checkPaternalisticDecide,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
