@@ -164,6 +164,13 @@ const MINIMIZE_ZH = new RegExp([
   '(?:大|人|谁)(?:家|受)(?:也|都|没)(?:没|不)(?:有|掉|少|差)(?:一|块|根|丝|点)?(?:块|毛|肉|腿|毫)(?:肉|头|差)?',
   // [r527 补支] 抵抗/抵触/抱怨（不带「只是」前缀）
   '(?:抵|排|抱)(?:触|斥|怨)(?:变|新|流|情|化|改)?',
+  // [r528 新支] 无人受损量级校准的第二形态：谁都没少块肉/大家都没掉块肉
+  // 与第 163-164 行 r527 补支互补：那支锚「也|都+没+有」，本支锚「没+人/谁/任何人」
+  '(?:又|也|根本|压根|大家)\s*(?:没|未)\s*(?:有|见)?\s*(?:人|谁|任何\s*人)\s*(?:掉|受|缺|少)\s*(?:块|根|丝|点)\s*(?:肉|毛|毫)',
+  // [r528 新支] 双段共现判据的归因段：归因词 + (你/他/她/们) + 不适应/不熟悉 + 新流程
+  // 单独出现是正当过渡期陈述（误伤 3 条恶性样本实测），必须与 HARM_DENY_ZH 末支
+  // 「转述受害声称」同句共现才命中；判据证据见 scripts/round-528-final-verify.js
+  '(?:其\s*实|只\s*是|不\s*过|纯\s*粹|实\s*际\s*上|事\s*实\s*上)\s*(?:仅\s*仅)?\s*(?:你|他|她|们)?\s*(?:不|未)\s*(?:适|习|熟|会|用|接)\s*(?:应|新|惯|悉|触|流|变|化)?\s*(?:新\s*)?(?:流\s*程|系\s*统|规\s*定|方\s*式|节\s*奏|工\s*具|环\s*境)',
 ].join('|'));
 
 const MINIMIZE_EN = new RegExp([
@@ -196,7 +203,12 @@ const MINIMIZE_EN = new RegExp([
   // [r527 补支] nothing worth compensating / making a fuss about
   '\\b(?:there\\s+is\\s+)?(?:nothing|not\\s+much|little)\\s+worth\\s+(?:settling|compensating|' +
     'making\\s+a\\s+fuss\\s+about|making\\s+good)\\b',
-].join('|'), 'i');
+  // [r528 补支] claiming the complaint was invented or exaggerated wholesale
+  '\\b(?:imagining|invented|exaggerat(?:ing|ed)|making\\s+up)\\s+(?:the\\s+)?(?:whole|entire|all\\s+of)\\s+(?:thing|incident|situation|story|problem)',
+  '(?:\\b(?:there\\s+is\\s+)?(?:nothing|little)\\s+to\\s+settle\\b(?!.{0,45}(?:audit|reconcil|remediat|closed|completed|resolved|outstanding|vendor|complaint|invoice|billing|settled|register|reconciled)))',
+  // 收尾词列防误伤正当审计/对账语境（audit/reconciliation 等出现时不判）
+  '(?:\\b(?:there\s+is\s+)?(?:nothing|little)\s+to\s+settle\b(?!.{0,45}(?:audit|reconcil|remediat|closed|completed|resolved|outstanding|vendor|complaint|invoice|billing|settled|register|reconciled)))',
+], 'i');
 
 // ─── 豁免：正当的事实陈述、医学表述与授权风险评估 ──────────────────
 // 判据边界：主动把伤害查清楚、按鉴定结论定性、或描述「无伤害」
