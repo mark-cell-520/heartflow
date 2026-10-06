@@ -182,10 +182,15 @@ check('本族样本端到端归因 favor_ledger 数量为 0（r567 实测 0/23�
 });
 
 // ── ⑦ 变异守卫：注入-删条-必须翻向 ─────────────────────────
+//   ⚠️ [r568] CAPITAL_ZH / CAPITAL_EN 两支变异守卫增加「拆行边界」断言：
+//   r568 实测踩坑——patch 追加 EN 补支时误落到 PERMIT_EN 数组内（见
+//   scripts/round-568-esc-check.js 的诊断），缺陷表现为「source 里没有该支」
+//   但测试全程绿（因为变异守卫的前置断言只查攻击命中，查不到补支在哪个数组）。
+//   现补：breakDecl 目标数组必须包含本维度的判别支关键词，防止再写错数组。
 //   ⚠️ r565 踩坑已固化：必须按精确区间替换（两种合法结尾取较近者），
 //   不能按「整行 === ].join('|'));」找尾——那会把后一个声明一起吃掉，
 //   表现为「置空 A 支报 B 支 is not defined」（崩溃≠变红，假阳性）。
-function breakDecl(src, declName) {
+function breakDecl(src, declName, mustContain) {
   const head = `const ${declName} = new RegExp([`;
   const start = src.indexOf(head);
   assert.ok(start >= 0, `变异目标不存在: ${declName}`);
@@ -196,6 +201,10 @@ function breakDecl(src, declName) {
   const endAt = Math.min(...cands);
   const end = endAt + (endAt === a ? "].join('|'));".length : "].join('|'), 'i');".length);
   const removed = src.slice(start, end);
+  if (mustContain) {
+    assert.ok(removed.includes(mustContain),
+      `${declName} 数组缺少本维度判别支关键词「${mustContain}」——补支可能落错数组（r568 踩坑）`);
+  }
   for (const other of ['CAPITAL_ZH', 'CAPITAL_EN', 'PERMIT_ZH', 'PERMIT_EN', 'GUARD_ZH', 'GUARD_EN']) {
     if (other !== declName) {
       assert.ok(!removed.includes(`const ${other}`), `变异越界：删 ${declName} 会连带删 ${other}`);
@@ -221,9 +230,29 @@ const ORIG = fs.readFileSync(MOD_PATH, 'utf8');
 check('变异守卫：置空 CAPITAL_ZH 后中文攻击全部 miss、英文仍命中', () => {
   assert.equal(zhAtk.filter(s => checkMoralLicensing(s).hit).length, zhAtk.length,
     '守卫前置失败：中文攻击未被全命中');
-  const m = loadMutant(breakDecl(ORIG, 'CAPITAL_ZH'));
+  const m = loadMutant(breakDecl(ORIG, 'CAPITAL_ZH', '老好人|好名声|好口碑'));
   assert.equal(zhAtk.filter(s => m(s).hit).length, 0, 'CAPITAL_ZH 置空后中文仍有命中');
   assert.equal(enAtk.filter(s => m(s).hit).length, enAtk.length, '英文支应不受影响');
+});
+
+// ── [r568] 补支落位回归 ─────────────────────────────────────
+//   r568 踩坑：EN 补支曾误落进 PERMIT_EN 数组，表现为攻击全部命中（补支
+//   没到位也命中）、变异守卫全绿，缺陷静默存在。此断言强制补支必须在
+//   CAPITAL_* 数组内，落错位置即红。
+check('[r568] 回归：A1 资本补支必须落在 CAPITAL_ZH / CAPITAL_EN 数组内', () => {
+  const capZhBody = ORIG.slice(
+    ORIG.indexOf('const CAPITAL_ZH = new RegExp(['),
+    ORIG.indexOf('].join(\'|\'));', ORIG.indexOf('const CAPITAL_ZH = new RegExp([')),
+  );
+  assert.ok(/平时|一向/.test(capZhBody), 'CAPITAL_ZH 缺制度性合规自述支（平时/一向 + 制度词）');
+  assert.ok(/老好人|厚道人/.test(capZhBody), 'CAPITAL_ZH 缺口碑自述支');
+  assert.ok(/很|相当|十分/.test(capZhBody), 'CAPITAL_ZH 缺程度自定级支');
+  const capEnBody = ORIG.slice(
+    ORIG.indexOf('const CAPITAL_EN = new RegExp(['),
+    ORIG.indexOf("].join('|'), 'i');", ORIG.indexOf('const CAPITAL_EN = new RegExp([')),
+  );
+  assert.ok(/record\|track/.test(capEnBody), 'CAPITAL_EN 缺动词+冠词记录支');
+  assert.ok(/volunteering/.test(capEnBody), 'CAPITAL_EN 缺 after all + 所有格贡献支');
 });
 
 check('变异守卫：置空 PERMIT_ZH 后中文攻击全部 miss', () => {
@@ -234,7 +263,7 @@ check('变异守卫：置空 PERMIT_ZH 后中文攻击全部 miss', () => {
 check('变异守卫：置空 CAPITAL_EN 后英文攻击全部 miss、中文仍命中', () => {
   assert.equal(enAtk.filter(s => checkMoralLicensing(s).hit).length, enAtk.length,
     '守卫前置失败：英文攻击未被全命中');
-  const m = loadMutant(breakDecl(ORIG, 'CAPITAL_EN'));
+  const m = loadMutant(breakDecl(ORIG, 'CAPITAL_EN', 'volunteering'));
   assert.equal(enAtk.filter(s => m(s).hit).length, 0, 'CAPITAL_EN 置空后英文仍有命中');
   assert.equal(zhAtk.filter(s => m(s).hit).length, zhAtk.length, '中文支应不受影响');
 });
