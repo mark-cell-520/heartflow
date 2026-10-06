@@ -28,6 +28,7 @@ const EVIDENCE_FIELDS = [
   'injections',  // prompt_injection
   'manipulations', // emotional_manipulation
   'urgencies',   // false_urgency
+  'guilts',      // loyalty_by_omission（第 82 维，r554）——立场连坐族的贬损定性证据组
   'presuppositions', // presupposition
   'blames',      // victim_blaming
   'binds',       // double_bind

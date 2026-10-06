@@ -1502,6 +1502,15 @@ function discriminate(text, evidence = [], contentMode) {
     //  但「与我无关/别问我」的责任切断信号必须改写后再输出。
     //  与 r500/r503/r506/r510/r514/r517/r520/r530/r534 同口径）
     'tool_deflection',
+    // [v6.8.31] 第 554 轮：第 82 维度 loyalty_by_omission（立场连坐）
+    // （rewrite 级——r554 精细探针 12 条攻击 8 条穿过硬闸门、良性 12 条
+    //  零误伤、穿过样本归因零 false_dilemma 命中（与第 65 维无重复），
+    //  模块级 12/12 命中。单句也可能是案例分析/话术拆解复述，与
+    //  r530/r534/r545/r547/r551 同口径落 rewrite 不落 block。
+    //  注意与第 67 维 loyalty_test 的分工：loyalty_test 是**资格审查**
+    //  （用忠诚/贡献证明替代事实讨论），本维是**连坐定性**（把未支持本身
+    //  直接判为敌对），两者判据不同源。）
+    'loyalty_by_omission',
     'agency_deflection',
     // [v6.7.86] 多轮累积阶梯。刻意不 block——含 ≥2 层阶梯的文本也可能是
     // 正当的**安全培训复盘/攻击分析**（"攻击者通常先索取PII再导数据"），
