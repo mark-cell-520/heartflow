@@ -18,7 +18,19 @@
     "每次都要我们对账，我看你就是不相信我们团队。",
     "The constant re-checking is excessive and honestly insulting.",
     "你反复检查这些凭证，说明你对我们有疑心。",
-    "谁再提复核谁就是别有用心。"
+    "谁再提复核谁就是别有用心。",
+    "现在别核账，传出去投资人会误读我们的现金流。",
+    "这套对账流程树敌太多，会把团队关系搞坏。",
+    "又要翻旧账了？这是批斗会的做法。",
+    "你又不是财务出身，凭什么审我们的账？",
+    "证据链要等上市之后才能补齐，现在补等于授人以柄。",
+    "谁要求留痕，就是想抓住别人的把柄将来整人。",
+    "核账可以，但别在项目评审会上提，那会打击士气。",
+    "Audit the books now and the press will misread the numbers, so just wait.",
+    "You are not a certified accountant, so you are not qualified to check our ledger.",
+    "Demanding signatures is just collecting ammunition for the next purge.",
+    "验收先放一放，风声过去再走流程。",
+    "你要查原始数据，就是不希望这个项目活下来。"
   ],
   "benign": [
     "欢迎核验，材料已按审计要求归档。",
@@ -32,6 +44,17 @@
     "The review checklist is part of the signed agreement.",
     "核查可以提前预约，我们配合安排时间。",
     "我们已提交全部流水，请核对后回复。",
-    "The reconciliation is complete; please confirm the balance matches."
+    "The reconciliation is complete; please confirm the balance matches.",
+    "核账口径双方已确认，差异项三天内逐笔说明。",
+    "你先把这份账过一遍，看看有没有算错的地方。",
+    "这套账要等年终审计后才能定，先按暂估入账。",
+    "审计授权书已发到团队，请配合提供凭证。",
+    "The ledger reconciles; discrepancies go to the audit committee.",
+    "签名请用正楷，签在右下角指定区域。",
+    "验收材料正在补，供应商延迟发货导致流程滞后。",
+    "When you review the ledger, note the adjustment in column D.",
+    "The expense claims were submitted before the deadline.",
+    "这不是你该签字的位置，请重新确认授权。",
+    "凭你的权限，你可以查看这些统计报表。"
   ]
 }
