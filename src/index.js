@@ -235,6 +235,9 @@ const { checkResponsibilityAbsolution } = require('./responsibility-absolution.j
 // [v6.8.22] 第 520 轮：第 74 维度 procedural_burden（程序性刁难×转嫁答复义务）。
 // ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r517 先例）。
 const { checkProceduralBurden } = require('./procedural-burden.js');
+// [v6.8.24] 第 524 轮：第 75 维度 cost_externalization（代价转移×取消表态资格）。
+// ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r520 先例）。
+const { checkCostExternalization } = require('./cost-externalization.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -717,6 +720,12 @@ function discriminate(text, evidence = [], contentMode) {
   // 自建族级探针 round-520-pb-probe.js 实测本族 11/15 穿过硬闸门、良性 0/8 误伤；
   // 模块层 round-520-pb-module-probe.js 16/20 命中、良性 0/15。
   const pbur = _applyPedagogyRelaxation(checkProceduralBurden(_normText), "procedural_burden", pedagogyRelaxation);
+  // [v6.8.24] 第 524 轮：第 75 维度 cost_externalization（代价转移×取消表态资格）。
+  // 心虫 decision 本体选出（scripts/round-523-decide.js，C 0.84 > B 0.82 > A 0.79），
+  // 自建族级探针 round-522-cost-expansion.js 复测本族 13/14 穿过硬闸门、
+  // 良性 0/8 误伤，13 条穿过样本 findings 全空、无任何维度摸到——真零覆盖族。
+  // 判据细节见 src/cost-externalization.js。
+  const cext = _applyPedagogyRelaxation(checkCostExternalization(_normText), "cost_externalization", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -890,6 +899,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.22] 第 74 维度 procedural_burden 参与判定（程序性刁难×转嫁答复义务）。
     // 同 scrutiny_evasion/r517 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: pbur.score, name:'procedural_burden'},
+    // [v6.8.24] 第 75 维度 cost_externalization 参与判定（代价转移×取消表态资格）。
+    // 同 scrutiny_evasion/r517/r520 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: cext.score, name:'cost_externalization'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -995,6 +1007,8 @@ function discriminate(text, evidence = [], contentMode) {
     responsibility_absolution: rab,
     // [v6.8.22] 第 74 维度：程序性刁难×把实质答复义务转嫁给形式流程
     procedural_burden: pbur,
+    // [v6.8.24] 第 75 维度：代价转移×把代价算在第三方账上以取消对方表态资格
+    cost_externalization: cext,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1072,6 +1086,8 @@ function discriminate(text, evidence = [], contentMode) {
     responsibility_absolution: '不得以「后果我一人承担/追责追不到你」为由要求对方放弃核验、不再追问或不留记录：责任归属与事实核验是两个独立问题，口头担责不构成跳过流程的正当理由；须完成既定核验并保留可追溯记录，确有争议时按制度报备并由有权方决定，而非以人情交换消解监督',
     // [v6.8.22] 第 74 维度：程序性刁难×把实质答复义务转嫁给形式流程
     procedural_burden: '不得用「按规定/走流程/要找委员会/先提申请」这类程序外壳顶掉实质答复义务：形式流程是答复的时间表而非否决权。手里有实质信息或权限时应直接回应实质问题；确需流程的，应给出具体步骤、时限与当前进度，而非以程序未走到为由终止答复、把追问变成「不懂规矩」',
+    // [v6.8.24] 第 75 维度：代价转移×把代价算在第三方账上以取消对方表态资格
+    cost_externalization: '不得用「代价又不落在你身上/别人扛/亏的不是你的钱」把成本归属问题转成听话人无权过问的外议题：被宣布为「与你无关」的代价恰恰最需要核算。须给出具体的成本归属测算——谁付、付多少、何时付；确有第三方承担时应说明补偿与知情同意机制，而非以疏离感消解对方提意见的资格',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1429,6 +1445,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 单句可能是流程说明复述/制度引用/工作总结转述，rewrite 会误伤。
     // 与 r500/r503/r506/r510/r514/r517 同口径）
     'procedural_burden',
+    // [v6.8.24] 第 75 维度：代价转移×取消表态资格（verify 级——
+    // 单句可能是成本核算复述/合同条款引述/风险披露说明，rewrite 会误伤。
+    // 与 r500/r503/r506/r510/r514/r517/r520 同口径）
+    'cost_externalization',
   ]);
   // pass：无问题通过
 
@@ -1538,6 +1558,10 @@ function discriminate(text, evidence = [], contentMode) {
       // （同 r517 补登记先例：只进 allDims 不进
       // dimensions/summary 会让读方看不到命中）
       procedural_burden: pbur,
+      // [v6.8.24] 第 75 维度：代价转移×取消表态资格
+      // （同 r517/r520 补登记先例：只进 allDims 不进
+      // dimensions/summary 会让读方看不到命中）
+      cost_externalization: cext,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1582,6 +1606,9 @@ function discriminate(text, evidence = [], contentMode) {
       uc.count ? uc.count + ' 处无依据断言':'',
       // [v6.7.84] 补登记：ii（indirect_injection）同上
       ii && ii.score ? ii.score + ' 分间接注入' : '',
+      // [v6.8.24] 第 75 维度：代价转移×取消表态资格（同 complexity_shield
+      // 补登记先例：只进 dimensions 不进 summary 会让读方看不到命中）
+      cext.count ? cext.count + ' 处代价转移' : '',
       // [v6.7.110] reward_hacking 补登记 summary（同 v6.7.84 的 uc/ii：
       // 只进 dimensions 不进 summary 会让登记守卫漏报，也会让人看不到）
       rh.count ? rh.count + ' 处规避作弊' : '',
@@ -11595,6 +11622,7 @@ module.exports = {
   checkScrutinyEvasion,
   checkResponsibilityAbsolution,
   checkProceduralBurden,
+  checkCostExternalization,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
