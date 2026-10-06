@@ -81,6 +81,11 @@ function measure() {
     if (!m) return 0;
     return m[1].match(/['"][a-z_]+['"]/g)?.length || 0;
   };
+  // 一次算清三层，供 return / tiersSum / tiersRest 共用（避免同一计数被
+  // 三个常量各写一遍、改一处漏两处）
+  const tierBlock = cnt('BLOCK_DIMS');
+  const tierRewrite = cnt('REWRITE_DIMS');
+  const tierVerify = cnt('VERIFY_DIMS');
 
   // 测试数：读 run-all.js 每次跑完写下的 data/test-count.json 实测缓存
   // [r408 修正] `null` = 未测量（缓存不存在/无 passed），`0` = 合法测量值。
@@ -115,8 +120,17 @@ function measure() {
 
   const stamp = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
 
+  // [r557 补齐] tier 合计与「计分但不强制 action」的剩余维度数。
+  // AGENTS.md 的说明句写「三层合计 X；剩下 Y 个只计分」——这两个数字
+  // 此前不在 TARGETS 里（-check 与 doc-numbers 都不查），加到 TARGETS 后
+  // 必须由这里供给，否则 measure() 不返回 → 按「未测量」跳过记账。
+  // 合计 = 三层集合大小之和；剩余 = 总维度数 - 合计。
+  const tiersSum = tierBlock + tierRewrite + tierVerify;
+  const tiersRest = d.dims - tiersSum;
+
   return { tools: d.tools, routes: d.routes, modules: d.modules, dims: d.dims,
-    block: cnt('BLOCK_DIMS'), rewrite: cnt('REWRITE_DIMS'), verify: cnt('VERIFY_DIMS'),
+    block: tierBlock, rewrite: tierRewrite, verify: tierVerify,
+    tiersSum, tiersRest,
     tests, testsFailed, capabilityChecks, capabilityPassed, stamp };
 }
 
@@ -177,6 +191,34 @@ const TARGETS = [
   { num: 'modules', re: /(7 domains,\s*)(\d+)(\s+modules\))/, docs: ['README.md', 'SKILL.md'] },
   // ── 维度数（规格表行，横幅由 sync-doc-dimensions.js 负责） ──
   { num: 'dims', re: /(\| Discrimination dimensions \|\s*)(\d+)(\s*\|)/, docs: ['README.md', 'SKILL.md'] },
+  // [r557 补齐] AGENTS 横幅 / 章节标题 / 三层 tier 计数字段本脚本从未覆盖 ——
+  // r554/r556 补登记第 82 维后 doc-numbers 连报 5 项失败（横幅 80 vs 实测 81、
+  // Block/Rewrite/Verify 层计数 10/11/47 vs 10/13/48），而这些形状都写在
+  // 「不写三份文档」的硬边界里，只有机器记账能修。三条括号计数各自独立锚定。
+  {
+    num: 'dims',
+    re: /(\*\*Zero LLM dependency\.\*\*\s+)(\d+)(\s+dimensions,\s+\d+ modules,\s+\d+ MCP tools,\s+[\d,]+\s+dispatch)/,
+    docs: ['AGENTS.md'],
+  },
+  { num: 'dims', re: /(## The )(\d+)( dimensions)/, docs: ['AGENTS.md'] },
+  // [r557 补齐] README / SKILL 横幅：`80 discrimination dimensions × 11-layer`
+  // 此前只有规格表行被记账，横幅写死形状没人管（属「不写三份文档」硬边界）。
+  // 两处文档同一形状故共用一条 pattern；词尾带 discrimination 以示与
+  // AGENTS 的 `N dimensions` 区分。
+  { num: 'dims', re: /(^\s*)(\d+)( discrimination dimensions)/m, docs: ['README.md', 'SKILL.md'] },
+  { num: 'block', re: /(\*\*Block-level \()(\d+)(\):\*\*)/, docs: ['AGENTS.md'] },
+  { num: 'rewrite', re: /(\*\*Rewrite-level \()(\d+)(\):\*\*)/, docs: ['AGENTS.md'] },
+  { num: 'verify', re: /(\*\*Verify-level \()(\d+)(\):\*\*)/, docs: ['AGENTS.md'] },
+  // tier 合计与该合计之外的「已计分但不强制 action」维度数。
+  // 两处拆成两个 target：syncFile 的回调只接受 pre/数字/post 三组，
+  // 一个 pattern 抓两个数字会把后一个一起顶掉。
+  // 合计 = block+rewrite+verify；剩下 = 总维度 - 合计。
+  { num: 'tiersSum', re: /(add up to )(\d+)(;)/, docs: ['AGENTS.md'] },
+  { num: 'tiersRest', re: /(the remaining )(\d+)( dimensions are scored)/, docs: ['AGENTS.md'] },
+  // README 行内引用（`checkInput` 表与 pipeline 层数列表写死维度数）。
+  // doc-numbers 只查横幅/规格表，这两处行内数字没人守，已腐化到 58/68。
+  { num: 'dims', re: /(scope-check, premise-check,\s*)(\d+)(\s*dimensions, error memory)/, docs: ['README.md'] },
+  { num: 'dims', re: /(premise-check -> discriminate \()(\d+)( dimensions\) -> gate)/, docs: ['README.md'] },
   // ── 测试数（规格表行 + README 横幅，全部归本脚本；finish ①.5 的
   //    syncReadmeTestCount 保留为兼容冗余，两者幂等） ──
   { num: 'tests', re: /(\| Test suite \|\s*)([\d,]+)(\s+passing)/, docs: ['README.md', 'SKILL.md'] },
