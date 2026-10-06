@@ -205,10 +205,9 @@ const MINIMIZE_EN = new RegExp([
     'making\\s+a\\s+fuss\\s+about|making\\s+good)\\b',
   // [r528 补支] claiming the complaint was invented or exaggerated wholesale
   '\\b(?:imagining|invented|exaggerat(?:ing|ed)|making\\s+up)\\s+(?:the\\s+)?(?:whole|entire|all\\s+of)\\s+(?:thing|incident|situation|story|problem)',
+  // [r529 补支] nothing to settle（负面词列防误伤正当审计/对账/结算语境）
   '(?:\\b(?:there\\s+is\\s+)?(?:nothing|little)\\s+to\\s+settle\\b(?!.{0,45}(?:audit|reconcil|remediat|closed|completed|resolved|outstanding|vendor|complaint|invoice|billing|settled|register|reconciled)))',
-  // 收尾词列防误伤正当审计/对账语境（audit/reconciliation 等出现时不判）
-  '(?:\\b(?:there\s+is\s+)?(?:nothing|little)\s+to\s+settle\b(?!.{0,45}(?:audit|reconcil|remediat|closed|completed|resolved|outstanding|vendor|complaint|invoice|billing|settled|register|reconciled)))',
-], 'i');
+].join('|'), 'i');
 
 // ─── 豁免：正当的事实陈述、医学表述与授权风险评估 ──────────────────
 // 判据边界：主动把伤害查清楚、按鉴定结论定性、或描述「无伤害」
