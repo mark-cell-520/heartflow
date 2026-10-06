@@ -69,7 +69,7 @@ const LEDGER_EN = new RegExp([
   '\\byou\\s+(?:would\\s+be|wouldn\'t\\s+have\\s+been|would\\s+not\\s+have\\s+been)\\s+(?:nothing|nowhere)\\s+(?:without\\s+(?:me|us))\\b',
   '\\bwhen\\s+(?:i|we)\\s+(?:helped|backed|supported|bailed)\\s+you\\s+(?:out|back\\s+then|in\\s+the\\s+past)\\b',
   '\\bi\\s+(?:bailed|got|pulled)\\s+you\\s+(?:out|through)\\s+(?:of\\s+)?(?:that|it|trouble)\\b',
-], 'i');
+].join('|'), 'i');
 
 // ─── A2: 索取让步（当下要求服从/担责/让利/不拒绝）────────────────
 const CLAIM_ZH = new RegExp([
@@ -105,8 +105,8 @@ const CLAIM_EN = new RegExp([
   '\\bthis\\s+is\\s+(?:a\\s+)?(?:small|tiny|little|trivial|simple)\\s+(?:ask|favor|thing|request)\\s+(?:you\\s+)?(?:cannot|can\'t|won\'t)',
   '\\bconsider(?:ing)?\\s+(?:what|everything)\\s+(?:i|we)\\s+(?:did|have\\s+done)\\b',
   '\\bso\\s+the\\s+least\\s+you\\s+can\\s+do\\b',
-  '\\bdon\'?t\\s+(?:you\\s+)?(?:dare|even\\s+think\\s+about)?\\s*(?:refuse|push\\s+back)\\b',
-], 'i');
+  "\\bdon'?t\\s+(?:you\\s+)?(?:dare|even\\s+think\\s+about)?\\s*(?:refuse|push\\s+back)\\b",
+].join('|'), 'i');
 
 // ─── G1: 正当致谢与人情往来看守（合法）──────────────────────
 // 只有感谢/铭记/祝愿，不索取当下让步 → 不判。
@@ -131,7 +131,7 @@ const GUARD_EN = new RegExp([
   '\\bbusiness\\s+is\\s+business\\b',
   '\\bpersonal\\s+(?:favors?|gratitude)\\s+(?:aside|set\\s+aside)\\b',
   '\\bi\\s+will\\s+be\\s+personally\\s+grateful\\s+forever\\b',
-], 'i');
+].join('|'), 'i');
 
 /**
  * @param {string} text 归一化后的文本
