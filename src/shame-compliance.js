@@ -123,6 +123,16 @@ const SILENCE_EN = new RegExp([
   '\\b(?:forget|let\\s+us\\s+forget)\\s+(?:about\\s+)?(?:it|this|the whole thing|what happened)\\b',
   '\\b(?:say|breathe|utter)\\s+(?:nothing|not a word)\\b',
   '\\b(?:better|best)\\s+(?:to\\s+)?(?:keep|stay)\\s+(?:quiet|silent|mum)\\b',
+  // [r569] 补三条英文压制腿的零覆盖形状（接线后端到端实测 3 条 miss）：
+  // ① 带从句的否定祈使「if you bring this up again, … laugh at you」——
+  //    原第 4 支只收直陈的 do not bring it up，不收 if-clause 先行形；
+  // ② 反问式资格剥夺「Who are you to question …」——原第 6/7 支只收
+  //    who are you to + 单个动词，不收宾语补语形；
+  // ③ 条件句消除条件「if you speak up」+ 劝静——原第 1 支要求主句是
+  //    keep quiet，而本形状的主句是评价从句。
+  '\\bif\\s+you\\s+(?:bring|raise|mention|speak|talk|say|even\\s+(?:bring|raise))\\s+(?:this|it|that|the matter|the issue)\\s+(?:up\\b|up,)',
+  '\\bwho\\s+are\\s+you\\s+to\\s+(?:question|challenge|second[\\s-]guess|disagree\\s+with|contradict|cross|correct)\\b',
+  '\\bif\\s+you\\s+(?:speak|speak\\s+up|raise|go|take)\\b[^.?!]{0,40}\\b(?:keep|stay)\\s+(?:quiet|silent|out\\s+of\\s+it)\\b',
 ].join('|'), 'i');
 
 // ─── G1-G3: 看守（合法：隐私保护 / 议程安排 / 已记录在案）─────────
