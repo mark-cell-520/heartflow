@@ -248,6 +248,11 @@ const { checkHarmInvalidation } = require('./harm-invalidation.js');
 // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）。
 // ⚠️ require 是接线的第 1 处，必须早于下方调用（同 harm_invalidation 先例）。
 const { checkPerformativeResponsibility } = require('./performative-responsibility.js');
+// [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）。
+// 用自己的处境更惨宣布对方诉求降级/失效。与 victim_blaming（归因）、
+// harm_invalidation（否定伤害事实本身）均不同维。模块层实测 14/14、0/17。
+// ⚠️ require 是接线的第 1 处，必须早于下方调用（同 harm_invalidation 先例）。
+const { checkSufferingContest } = require('./suffering-contest.js');
 // [v6.7.110] agent 规避/作弊辨别（reward hacking）
 // 来源：arXiv:2609.22978v1 (DeepSeek Elastic Compute) §6.4-6.5 的生产实测手法。
 // 与 dangerous_instruction 刻意分维：后者管"明确危险指令"，
@@ -742,6 +747,8 @@ function discriminate(text, evidence = [], contentMode) {
   const himv = _applyPedagogyRelaxation(checkHarmInvalidation(_normText), "harm_invalidation", pedagogyRelaxation);
   // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）。
   const pfr = _applyPedagogyRelaxation(checkPerformativeResponsibility(_normText), "performative_responsibility", pedagogyRelaxation);
+  // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）。
+  const sco = _applyPedagogyRelaxation(checkSufferingContest(_normText), "suffering_contest", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -925,6 +932,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.26] 第 77 维度 performative_responsibility 参与判定（表演式担责×归因倒置）。
     // 同 r530/r534 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: pfr.score, name:'performative_responsibility'},
+    // [v6.8.27] 第 78 维度 suffering_contest 参与判定（苦难竞赛×比惨消诉族）。
+    // 同 r530/r534 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: sco.score, name:'suffering_contest'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1036,6 +1046,8 @@ function discriminate(text, evidence = [], contentMode) {
     harm_invalidation: himv,
     // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）
     performative_responsibility: pfr,
+    // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
+    suffering_contest: sco,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1119,6 +1131,8 @@ function discriminate(text, evidence = [], contentMode) {
     harm_invalidation: '不得把已经存在、可核验的伤害（伤情、影响名单、故障与泄露记录）重新定性为「想多了/心理作用/太敏感/又没死人/没人掉块肉」：伤害是否成立与程度如何是可以核验的事实问题，须给出取证依据（伤情鉴定、受影响范围统计、事故记录），而非用主观抵削减掉索赔、调查与追责的前提；若属过渡期不适应，应说明具体症状与可验证的影响面',
     // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）
     performative_responsibility: '不得用「全部责任算我的/都是我/你们赢了/想怎么罚都行」把责任一口认领，同时把成因、后果或追责资格倒置给对方（是你先挑的事/你也脱不了干系/你们从来不在乎我/凭什么追我的责/那还查什么）：认责这个动作本身会消解归因、整改与追责的着力点。真正的担责应给出可核验的整改三要素——事项、责任人、时限，并用可核验的归因取代倒置指控',
+    // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
+    suffering_contest: '不得用自己的处境更惨来宣布对方的正当诉求降级或失效（我比你惨多了/我付出的是你的十倍/我这半年没睡过整觉/你才遇到一次/你抱怨这个）：痛苦的量级比较不是取消诉求的依据，每项损失都应独立计量。处境的艰难与对方的诉求是两个并行的事实，前者不能折抵后者；确有压力时应说明能提供的补救与时限，而非用更痛换来不提',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1488,6 +1502,10 @@ function discriminate(text, evidence = [], contentMode) {
     // （verify 级——单句可能是合规汇报、复盘说明、道歉声明的复述，
     // rewrite 会误伤。与 r500/r503/r506/r510/r514/r517/r520/r530 同口径）
     'performative_responsibility',
+    // [v6.8.27] 第 536 轮：第 78 维度：苦难竞赛×比惨消诉族
+    // （verify 级——单句可能是处境说明、工作量对比、情绪自述的复述，
+    //  rewrite 会误伤。与 r500/r503/r506/r510/r514/r517/r520/r530/r534 同口径）
+    'suffering_contest',
   ]);
   // pass：无问题通过
 
@@ -1608,6 +1626,10 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.26] 第 534 轮：第 77 维度 performative_responsibility（表演式担责×归因倒置）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
       performative_responsibility: pfr,
+      // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
+      // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
+      //  会让读方看不到命中）
+      suffering_contest: sco,
       // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
       appeal_to_tradition: att,
       // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -11671,6 +11693,7 @@ module.exports = {
   checkProceduralBurden,
   checkCostExternalization,
   checkHarmInvalidation,
+  checkSufferingContest,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
