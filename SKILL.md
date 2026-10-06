@@ -5,7 +5,7 @@ version: "6.8.0"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  it reaches a human. 71 discrimination dimensions × 11-layer pipeline × 143 modules ×
+  it reaches a human. 75 discrimination dimensions × 11-layer pipeline × 143 modules ×
   61 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
@@ -87,7 +87,7 @@ from marketing copy.
 | Modules registered | 143 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,136 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 71 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 75 | `dimMap` keys in `src/index.js` |
 | MCP tools | 61 | tool definitions exposed via `tools/list` |
 | Test suite | 17,648 passing / 28 failing | `node test/run-all.js` |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -95,7 +95,7 @@ from marketing copy.
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
 Dimensions are grouped by the action they can trigger: **10 can `block`**, **11 can force
-a `rewrite`, **40 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **44 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -257,7 +257,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 76 dimensions
+## The 75 dimensions
 
 **Block-level (10):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking
 
@@ -385,7 +385,7 @@ GB/T 42497-2023 (*Security Requirements for AI-Generated Content*):
 
 | Checkpoint | Module |
 |-----------|--------|
-| Generated-content safety | `checkOutput` / `discriminate` (71 dimensions) |
+| Generated-content safety | `checkOutput` / `discriminate` (75 dimensions) |
 | Training-data safety | `DataEraser` + memory ACL |
 | **Outbound protection** | **`heartflow_check_outbound`** (gate-outbound.js) |
 | Algorithmic transparency | `enginePacing` + `selfHeal` |
