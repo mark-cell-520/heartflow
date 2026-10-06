@@ -14,6 +14,9 @@
 
 const fs = require('../../utils/safe-fs');
 const path = require('path');
+// [v6.8.1 第 540 轮] 中文分词器：原 tokenize 只按空白/英文标点切分，中文整句恒为
+// 1 个 token 导致成语/俗语/诗词永不命中。接入后中文自然语句首次产出字序列。
+const { getShared: _getSharedTokenizer } = require('../../core/chinese-tokenizer');
 
 // ============================================================================
 // ErrorCode — 错误分类与恢复建议
@@ -132,6 +135,8 @@ class ChunkDetector {
     }
     this.projectRoot = projectRoot;
     this.idiomFile = path.join(projectRoot, 'src', 'core', 'associative-engine', 'idiom-story-db.json');
+    // [v6.8.1 第 540 轮] 中文分词器（模块级共享，惰性构建词表）
+    this.tokenizer = _getSharedTokenizer(projectRoot);
     this.idiomDB = this.loadIdiomDB();
     this.detectedChunks = [];
 
@@ -201,7 +206,12 @@ class ChunkDetector {
   // ========================================================================
 
   /**
-   * 分词，带输入验证和尺寸守卫
+   * 分词（带输入验证和尺寸守卫）
+   *
+   * [v6.8.1 第 540 轮] 中文切分改为字级：原实现只按空白/英文标点切分，含中文的
+   * 整句恒为 1 个 token，成语/俗语/诗词检测全部失效。字级切分与该检测层的
+   * `slice(i, i+4).join('')` 精确比对逻辑匹配。
+   *
    * @param {string} text - 输入文本
    * @returns {{ words: string[], truncated: boolean, error?: object }}
    */
@@ -211,7 +221,7 @@ class ChunkDetector {
       return { words: [], truncated: false, error: validation.error };
     }
 
-    const words = text.split(/[\s,\.!?;:'"()（）【】《》]+/).filter(w => w.length > 0);
+    const words = this.tokenizer.tokenizeChars(text);
 
     // 尺寸守卫：超过上限时截断
     if (words.length > this.maxTokenLimit) {

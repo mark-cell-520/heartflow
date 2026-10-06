@@ -16,6 +16,11 @@ const fs = require('../../utils/safe-fs');
 
 const path = require('path');
 
+// [v6.8.1 第 540 轮] 中文分词器：原 tokenize 只按空白/英文标点切分，中文整句恒为
+// 1 个 token 导致词典永不命中（L1 联想 0 条 / L2 chunks 0）。接入后中文自然语句
+// 首次能产出多 token 序列。
+const { getShared: _getSharedTokenizer } = require('../../core/chinese-tokenizer');
+
 
 
 // 拼音声母到韵母的简单映射（用于音近回退）
@@ -145,6 +150,9 @@ class LexicalAssociator {
     this.projectRoot = projectRoot;
 
     this.graphFile = path.join(projectRoot, 'src', 'core', 'associative-engine', 'association-graph.json');
+
+    // [v6.8.1 第 540 轮] 中文分词器（模块级共享，惰性构建词表）
+    this.tokenizer = _getSharedTokenizer(projectRoot);
 
     this.graph = this.loadGraph();
 
@@ -628,11 +636,20 @@ class LexicalAssociator {
 
 
 
+  /**
+   * 分词（[v6.8.1 第 540 轮] 接入中文分词器）
+   *
+   * 原实现只按空白和英文标点切分，中文自然语句（无空格）恒为 1 个 token，
+   * 导致联想图谱永不命中。现在先切英文/空白，再对中文片段做最长匹配切分。
+   */
   tokenize(text) {
-
-    return text.split(/[\s,\.!?;:'"()（）【】《》]+/).filter(w => w.length > 0);
-
+    if (typeof text !== 'string' || text.length === 0) return [];
+    return this.tokenizer.tokenize(text);
   }
+
+
+
+  /**
 
 
 
