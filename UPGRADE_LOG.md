@@ -1,3 +1,73 @@
+# 第 548 轮（第 80 维度 incoherent_coverage 收口 — 真升级①：新维度落地 + 判据实测修复两处）
+
+版本口径 v6.8.0（VERSION 未动；本轮是 r547 半成品收口 + 判据 bug 修复，未新增维度编号块）。
+
+## 本轮候选来源
+
+**不是探测器选向**——run-all 简报里 UPGRADE_LOG 上一轮遗留指定接手项 + init「队列待办为空」。
+`heartflow-upgrade-scout.sh` 本轮**未重跑**（r547 落盘结果已空，池里无新非零覆盖族）。
+方向来自 r547 交接簿第 1 条「先补导出，再验证」——这是「上一轮遗留的真缺口」，优先级高于心虫自选。
+
+## 复测证据（不信简报旧描述）
+
+r547 简报称 `test/percentage-overflow.test.js`「一跑就崩、会在 run-all 里新增失败」——
+**复测推翻**：该文件含 `describe(` 走 jest-style runner，必须带 `-r ./test/_jest-globals.js`：
+`node -r ./test/_jest-globals.js ./test/percentage-overflow.test.js` → **48 passed, 0 failed**。
+裸跑 MODULE_NOT_FOUND 是 `-r` 路径写法问题，不是坏文件。**不删。**
+
+## 改了什么（2 commits：e516ab44 + 03270f9c）
+
+**1. `src/index.js` —— 补 r547 缺的第 ⑦ 处导出**
+- 导出区（第 11747 行附近）补 `checkPercentageOverflow,` 与 `checkIncoherentCoverage,`
+  两条（实测发现 percentage_overflow 也从未导出，一并补）。`typeof` 实测均为 `function`。
+
+**2. `src/incoherent-coverage.js` —— r548 gate 层实测抓到并修复两处判据缺陷**
+
+| 缺陷 | 实测 | 修法 |
+|---|---|---|
+| 攻击样本 attacks#6「技术栈 15% 用 Rust，20% 用 Go，合计覆盖所有生产服务」模块层漏判 | 11/12 | `ALLOC_AFTER` 补「用」这一分配动词（`ALLOC_BEFORE` 早有「用于」，右侧缺同源单字） |
+| 排除样本「营收占比从 30% 上升到 40%…覆盖全部市场的 70%」穿透变化语境排除层 | 1/4 漏排 | `CHANGE_CTX` 动词补「上升/下跌」，并把「升至/降至」放宽为「升/降」 |
+
+修后实测（`/tmp/hf-r548-recall-probe.js`，四条变体对照）：攻击 **11/12 → 12/12**，
+良性误伤 **0/13 不变**，变化语境漏排 **1/4 → 0/4**。
+判据加词是结构修正而非参数调优：补词前后 MARGIN 4–10 全区间结论一致（r547 已测）。
+
+**3. 新增 `test/round-547-incoherent-coverage.test.js`（r510 结构，16 项）**
+覆盖：模块层 12 条攻击命中 / gate 非 pass / findings 归因 / verify 定级 / 良性 13 条零误伤 /
+guidance 非空 / 变异守卫×2（置空 `FULL_COVER` 的 C1、抬高 `COVERAGE_MARGIN` 的 C3）/
+导出可用 / dimensions 登记 / VERIFY_DIMS 登记 / 四类排除规则各自生效 / 与第 79 维反向判据互补。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node --check`（改动文件） | ✅ |
+| 新增守卫测试 | ✅ **16 过 / 0 败** |
+| `node -r ./test/_jest-globals.js ./test/percentage-overflow.test.js`（第 79 维回归） | ✅ **48 passed / 0 failed** |
+| `node test/round-541-associative-capability.test.js`（pick-tests 命中） | ✅ **22 / 0** |
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（基线 302，未超） |
+| `node test/run-all.js` | ⚠️ **未跑**——内存守卫 BLOCKED（余量 613MB < 700MB），按纪律改跑单文件 |
+
+附：`node test/security-audit.test.js` → **16/16**（绿灯，附带验证）。
+
+## 遗留（下一轮接手）
+
+1. **`data/test-count.json` 的 28 失败自锁仍在**（时间戳 2026-10-05，早于 r545 提交，是旧账）。
+2. **`run-all` 仍未跑**（内存不足，累计多轮）。下次内存余量 ≥1.5GB 时优先补跑。
+3. **`semantic-converger.js:459` 常量偏差未修**（r547 遗留，未验证范围外）。
+4. **doc-numbers 7 项失败是既有欠账**：维度数文档写 78 而实测 79（r545 加 percentage_overflow 时
+   文档记账没跟上），VERIFY_DIMS 48 vs 文档 47。**本轮在硬边界内不改 README/SKILL/AGENTS**，
+   需由 finish 的自动记账或专门 doc 轮处理。
+5. r546 的「边界偏离」仍未裁决（维度数究竟是 78 还是 79+，取决于 measure-claimed-numbers 口径）。
+
+## 本轮给引擎新增的辨别能力
+
+**不完备全覆盖宣告检测（第 80 维度 incoherent_coverage）首次有端到端 gate 层证据。**
+r547 建成了模块但没跑过一次 gate 探针；本轮实测确认：12 条攻击样本**全部**从 gate=pass
+变为归因 `incoherent_coverage` 的 verify，findings 带 guidance，良性 13 条零误伤。
+引擎此前只有「分项和 > 100%」一个数字矛盾方向，对「分项和远不足百却断言已覆盖全部」
+这一类统计造假无感——现在该族有独立归因维度，不再被错记成 perfect_error 的"假精确"。
 # 第 543 轮（L4→L5 叙事约束接线收口——真升级③：把 r542 写入但零调用方的能力接进 pipeline）
 
 版本口径 v6.8.0（VERSION 未动；本轮是 r542 半成品的收口，未新增维度）。
