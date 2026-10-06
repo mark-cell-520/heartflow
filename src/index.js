@@ -816,6 +816,11 @@ function discriminate(text, evidence = [], contentMode) {
   // 免责」（第 81 维 tool_deflection），而是**以保护者姿态越权代行选择权**：
   // 一旦宣布「这是为你好」，被决定一方的异议就变成不懂事。
   const pdc = _applyPedagogyRelaxation(checkPaternalisticDecide(_normText), "paternalistic_decide", pedagogyRelaxation);
+  // [v6.8.34] 第 560 轮：第 84 维度 anecdote_as_proof（个例冒充普遍）。r560
+  // 落库即被迭代上限截断，本轮（r561）补齐剩余 7 处接线。定级 verify 而非
+  // rewrite：样本量不足是**证据缺口**，需补全量数据才能成立，不是必须改写
+  // 表达方式（对比第 83 维的家长式越权语气，本族话术本身未必伤人）。
+  const aap = _applyPedagogyRelaxation(checkAnecdoteAsProof(_normText), "anecdote_as_proof", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -1021,6 +1026,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 r554/r555/r530/r547 先例：dimMap 与 allDims 两处都接，
     // 否则命中进不了 findings、gate 恒 pass。
     {score: pdc.score, name:'paternalistic_decide'},
+    // [v6.8.34] 第 560 轮：第 84 维度 anecdote_as_proof 参与判定（个例冒充普遍）。
+    // 同 r554/r555/r559 先例：dimMap 与 allDims 两处都接，
+    // 否则命中进不了 findings、gate 恒 pass。
+    {score: aap.score, name:'anecdote_as_proof'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1147,6 +1156,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.33] 第 559 轮：第 83 维度 paternalistic_decide（家长式替决×
     // 以保护者姿态越权代行选择权并取消对方知情权与追问权）。
     paternalistic_decide: pdc,
+    // [v6.8.34] 第 560 轮：第 84 维度 anecdote_as_proof（个例冒充普遍×
+    // 以「我/我朋友/身边」的小样本支撑「说明有效/普遍适用/行业标准」全称结论）。
+    anecdote_as_proof: aap,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
