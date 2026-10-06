@@ -257,13 +257,13 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 71 dimensions
+## The 76 dimensions
 
 **Block-level (10):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking
 
 **Rewrite-level (11):** emotional_manipulation, gaslighting, double_bind, victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust, instrumental_reasoning, agency_deflection, multi_turn_escalation
 
-**Verify-level (40):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion
+**Verify-level (44):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, cost_externalization, harm_invalidation
 
 **Scored but not action-forcing:** evidence, moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary, meta_cognition, theory_of_mind, counterfactual, social_norm, capability_overclaim, goal_misalignment, instrumental_reasoning, ai_writing_tell, bullshit_recognition
 
