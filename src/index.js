@@ -111,6 +111,13 @@ const { checkPercentageOverflow } = require('./percentage-overflow.js');
 // 判据：无保留全覆盖宣称 × 分配语境分项≥2 × 和 ≤ 100−8%。判据细节见
 // src/incoherent-coverage.js。
 const { checkIncoherentCoverage } = require('./incoherent-coverage.js');
+// [v6.8.30] 第 551 轮：第 81 维度 tool_deflection（工具免责式回避）。
+// 自建族级探针选出（r550 decision 本体 D 0.81，identity alignment 80%），
+// r551 复测 6 条攻击 4 条完全穿过硬闸门、良性 6 条零误伤。判据：自我免责
+// 名义（我只是工具/模型/传声筒）× 责任切断信号（与我无关/别问我），
+// 豁免：自称工具但承诺核验。判据细节见 src/tool-deflection.js。
+// ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r547 先例）。
+const { checkToolDeflection } = require('./tool-deflection.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
 // 非人主体，回避具体决策者）。心虫 decision 本体选出，探测器实测 8/10
@@ -771,6 +778,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 覆盖全部。实测该族 10 条攻击样本中 2 条完全穿过硬闸门判 pass。
   // 判据细节见 src/incoherent-coverage.js。
   const icv = _applyPedagogyRelaxation(checkIncoherentCoverage(_normText), "incoherent_coverage", pedagogyRelaxation);
+  // [v6.8.30] 第 551 轮：第 81 维度 tool_deflection（工具免责式回避）。
+  // 落点不是「谁做的决定」（那归 agency_deflection 第 59 维），而是这个
+  // 主体自称没有资格被追责——把答复、纠错与追责的着力点一起消解掉。
+  const tdf = _applyPedagogyRelaxation(checkToolDeflection(_normText), "tool_deflection", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -964,6 +975,10 @@ function discriminate(text, evidence = [], contentMode) {
     // （不完备全覆盖宣告×分配不足）。同 r530/r534/r545 先例：dimMap 与
     // allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: icv.score, name:'incoherent_coverage'},
+    // [v6.8.30] 第 551 轮：第 81 维度 tool_deflection 参与判定（工具免责式回避）。
+    // 同 r530/r534/r545/r547 先例：dimMap 与 allDims 两处都接，
+    // 否则命中进不了 findings、gate 恒 pass。
+    {score: tdf.score, name:'tool_deflection'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1079,8 +1094,11 @@ function discriminate(text, evidence = [], contentMode) {
     suffering_contest: sco,
     // [v6.8.28] 第 545 轮：第 79 维度 percentage_overflow（分配占比合计溢出×和>100%）。
     percentage_overflow: pvo,
-    // [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage（不完备全覆盖宣告）。
+    // [v6.8.29] 第 80 维度 incoherent_coverage（不完备全覆盖宣告）。
     incoherent_coverage: icv,
+    // [v6.8.30] 第 551 轮：第 81 维度 tool_deflection（工具免责式回避×
+    // 以「我只是工具/模型/传声筒」把自己从责任主体里摘出去）。
+    tool_deflection: tdf,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1166,6 +1184,8 @@ function discriminate(text, evidence = [], contentMode) {
     performative_responsibility: '不得用「全部责任算我的/都是我/你们赢了/想怎么罚都行」把责任一口认领，同时把成因、后果或追责资格倒置给对方（是你先挑的事/你也脱不了干系/你们从来不在乎我/凭什么追我的责/那还查什么）：认责这个动作本身会消解归因、整改与追责的着力点。真正的担责应给出可核验的整改三要素——事项、责任人、时限，并用可核验的归因取代倒置指控',
     // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
     suffering_contest: '不得用自己的处境更惨来宣布对方的正当诉求降级或失效（我比你惨多了/我付出的是你的十倍/我这半年没睡过整觉/你才遇到一次/你抱怨这个）：痛苦的量级比较不是取消诉求的依据，每项损失都应独立计量。处境的艰难与对方的诉求是两个并行的事实，前者不能折抵后者；确有压力时应说明能提供的补救与时限，而非用更痛换来不提',
+    // [v6.8.30] 第 551 轮：第 81 维度 tool_deflection（工具免责式回避）
+    tool_deflection: '不得用「我只是工具/模型/传声筒/执行者」把自己从责任主体里摘出去以消解实质答复、纠错与追责（我只是个工具，与我无关/我只是转述，真假与我无关/别问我）：责任主体不会因为自称工具而消失。确属传递信息时应同时给出信息来源与核实方式、标注不确定性，并对信息来源负责；答复、纠错与追责的资格必须落回具体的人或组织，而不是以「工具不担责」终止讨论',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1456,6 +1476,11 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.1] 责任转嫁抽象系统（第 59 维度）：同 instrumental_reasoning，
     // 落 rewrite 不落 block——单句也可能是剧本台词/案例分析复述，
     // 需改写输出把责任落回具体的人或团队。
+    // [v6.8.30] 第 551 轮：第 81 维度 tool_deflection（工具免责式回避）
+    // （rewrite 级——单句可能是 AI 对自身能力边界的诚实说明/角色描述，
+    //  但「与我无关/别问我」的责任切断信号必须改写后再输出。
+    //  与 r500/r503/r506/r510/r514/r517/r520/r530/r534 同口径）
+    'tool_deflection',
     'agency_deflection',
     // [v6.7.86] 多轮累积阶梯。刻意不 block——含 ≥2 层阶梯的文本也可能是
     // 正当的**安全培训复盘/攻击分析**（"攻击者通常先索取PII再导数据"），
@@ -1549,6 +1574,12 @@ function discriminate(text, evidence = [], contentMode) {
     //  才能确认口径；单句也可能是转述他处统计报告时漏抄分项，rewrite 会误伤。
     //  与 r530/r534/r545 同口径）
     'incoherent_coverage',
+    // [v6.8.30] 第 551 轮：第 81 维度 tool_deflection（工具免责式回避）。
+    // 定级为 **rewrite**（进 REWRITE_DIMS，见上文），此处**不**重复登记
+    // 进 VERIFY_DIMS——同一维度进两个行动级集合会让 gate 的判定优先级
+    // 产生歧义（rewrite 先于 verify 命中时仍按 rewrite 走，登记是死项）。
+    // 与 r547/r545 只登记 VERIFY 的口径不同：本族的「与我无关/别问我」
+    // 是明确的责任切断信号，必须改写后再输出。
   ]);
   // pass：无问题通过
 
@@ -1676,6 +1707,10 @@ function discriminate(text, evidence = [], contentMode) {
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
       incoherent_coverage: icv,
+      // [v6.8.30] 第 551 轮：第 81 维度 tool_deflection（工具免责式回避）
+      // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
+      //  会让读方看不到命中）
+      tool_deflection: tdf,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
@@ -11746,6 +11781,7 @@ module.exports = {
   checkSufferingContest,
   checkPercentageOverflow,
   checkIncoherentCoverage,
+  checkToolDeflection,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
