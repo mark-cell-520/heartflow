@@ -1,3 +1,120 @@
+# 第 543 轮（L4→L5 叙事约束接线收口——真升级③：把 r542 写入但零调用方的能力接进 pipeline）
+
+版本口径 v6.8.0（VERSION 未动；本轮是 r542 半成品的收口，未新增维度）。
+
+## 本轮候选来源
+
+**不是探测器选向**——按优先级「上一轮遗留的真缺口」接手（队列 `data/upgrade-queue.json` 待办为空）。
+r542 交接簿第 1 条明确指定方向：L4→L5 叙事断点，判据是「叙事 stage 词命中 L5 从 0/4 变为 ≥2/4」。
+未重跑 decision：本轮无多候选竞争，是一个已定位到最后一环的单向收口。
+
+## 复测证据（不信简报旧描述）
+
+复测发现 r542 简报本身有两个错误，均在动手前用实测推翻：
+
+1. **r542 的「matchedStory=undefined 是显示 bug」结论对了一半，但探针的 stage 对比也是坏的。**
+   原探针 `stageWordsOf()` 返回的是**对象数组** `[{stage:'进入',description:'开始进入状态'}]`，
+   却直接用对象做 `resp.includes(w)` 字符串比较 → **恒为 false**。
+   所以 r542 看到的 0/4 是**测量假阴性**，不全是引擎断点。
+   本轮到 `L4.matchedNarrativeDetail.stages.map(x => x.stage)` 取字符串后重测。
+
+2. **r542 的 drift 自愈分支从未落地**：`grep -n 'narrative_stage' word-by-word-generator.js`
+   零匹配。r542 简报末尾自认「文件修改校验器：1 处 patch 失败」就是这一处（第 592 行前插叙），
+   本轮重做时同样被空行干扰卡了一次，改用带 `// 自愈` 上下文行的锚点才成功。
+
+改前基线（`round-542-l4l5-probe.js`，同一台机同一样本，未接线）：
+```
+L3 matched=渐入佳境/flow_state  L3 stages=[进入][沉浸][深化][极致]
+L5 response = 成就感认为而且忘我然后忘我相信然后成就感但是理解成就感成就感忘我状态忘我支持所以...
+→ 叙事 stage 词命中 L5: 0/4
+→ narrative_context trace 不存在（narrativeCtx 恒为 null 时才不落 active:false，实际是未调用到）
+```
+
+## 改了什么（2 commits：e697c820 + aecc4642）
+
+**1. `src/archive/associative-engine.js` —— 两处接线（r542 完全没做的部分）**
+- `process()` 步骤6：`generateResponse(tv, userModel)` → `generateResponse(tv, userModel, 200, trace.layers.L4.matchedNarrativeDetail || null)`。
+  这是**最关键的一处**：此前 r542 已把 `generateResponse` 声明参改到第 4 个，
+  但所有调用点仍只传 2 个 → narrative 参数永远是 null → 新能力实测效果为零。
+- `processL5()` 公开方法同步加 `narrative = null` 第三参，与内部调用点保持同一签名语义。
+
+**2. `src/archive/associative-engine/word-by-word-generator.js` —— 补 r542 失败的 drift 分支**
+- drift 自愈新增 `narrative_stage` 分支：叙事 stage 词未说尽时，漂移后**先回叙事**
+  再回落 L4 高权重概念。此前 drift 只回 L4 概念，会把 L3 命中的叙事上下文直接冲掉。
+- `recordTrace('drift_correction', {... source:'narrative_stage'})` 落盘可审计。
+
+**3. 新增两个脚本**
+- `scripts/round-543-l4l5-verify.js`：修正后的端到端复测（取 `.stage` 字符串再比对）。
+- `scripts/negative-test-l4l5-narrative-round543.js`：8 项守卫，含**变异测试**。
+
+## 验证结果（7 项）
+
+| 项 | 结果 |
+|---|---|
+| `node --check`（2 个引擎文件） | ✅ ALL_SYNTAX_OK |
+| 端到端复测 `round-543-l4l5-verify.js` | ✅ **stage 命中 0/4 → 4/4**（判据 ≥2/4 达成） |
+| 负例脚本 `negative-test-l4l5-narrative-round543.js` | ✅ **8/8**（含变异 A/B） |
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node test/round-541-associative-capability.test.js`（改动范围命中） | ✅ **22/22** |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（未超基线） |
+| `node test/run-all.js` | ⚠️ **未跑**——内存守卫 BLOCKED（余量 508MB < 700MB），按纪律改跑单文件 |
+
+### 负例脚本 8/8 明细（证明这是真守卫而非巧合）
+
+变异测试是核心判据——同一 thoughtVector，只改 narrative 传参：
+
+| 条件 | stage 命中 |
+|---|---|
+| 接线态（`process()` 传入 detail） | **4/4** |
+| 变异 A：手动调 `generateResponse(tv, {}, 200, null)` | **0/4** |
+| 变异 B：传 `{ stages: [], name: 'x' }` | **0/4** |
+
+→ 删掉接线/清空 stages，命中立即归零。**命中确实由 narrative 造成，不是随机词碰中。**
+
+trace 实测落盘（第 1 样本）：
+`{"step":"narrative_context","data":{"active":true,"framework":"进入→沉浸→深化→极致","stageWords":4}}`
+
+## 本轮给引擎新增的辨别能力是什么
+
+真升级③（把声明了但从未被 dispatch 调用过的能力真正接进 pipeline）：
+L5 逐词生成从「只吃 thoughtVector 概念权重」变为**消费 L3 命中的叙事原型 stages/framework**。
+此前 L3 的叙事匹配结果在 L4 被压成一个名字、到 L5 完全丢失（stage 词命中恒 0）；
+现在 stage 词作为一等选词源，优先级高于 userModel 与通用 transition/emotional 词表，
+且 drift 自愈也优先回叙事而非 L4 概念。
+
+## 遗留
+
+1. **drift 的 narrative_stage 分支本轮实测命中 0 次**（4 个 stage 词在前 4 个词就被
+   `predictNextWord` 说完，drift 检测在该样本上未触发）。该分支已通过负例脚本证明
+   **代码路径就位**，但缺一个「长样本触发 drift 后仍回叙事」的正面实测。下一轮若续做，
+   样本要造长（maxLength 提到 300+）才能真正跑到那一支。
+2. **UPGRADE_LOG 累积欠账已扩大到第八轮**：簿子顶部仍是第 535 轮，r536-r542 六轮记录
+   全部缺失（其中 r536/r537/r541 的提交在 git log 里可查，簿子里没有）。
+   本轮只补 r543 一条，**欠账未清**。finish 的「交接簿轮次」检查可能因此 FAIL——
+   若 FAIL，按无人值守铁律第 2 条应自动修，但补六轮历史记录等于凭空编内容，
+   我选择**如实写欠账而不补造**，故该项 FAIL 会在下面记录。
+3. **工作区脏**：`data/upgrade-state.json` 已跟踪文件被修改未提交；另有 100+ 个
+   `scripts/round-5xx-diag*.js` 未跟踪诊断脚本（r525-r539 遗留）。
+4. r541 遗留的另两个候选仍未动：emotion 词表补 17 个心理词、L4 arousal 越界
+   （根因在 `semantic-converger.js` 边界裁剪用 [-10,10] 与 CoherenceChecker 断言的
+   [-1,1] 契约不一致，改一行常量即可，**低风险，推荐下一轮做**）。
+5. 本轮**未跑 run-all 全量**（内存 BLOCKED）。全量回归仍欠一次。
+
+## 给第 544 轮的接手说明
+
+1. **先做 low-risk 的 arousal 越界修复**：`semantic-converger.js` 边界裁剪 [-10,10] 改 [-1,1]，
+   已被 CoherenceChecker 实测检出（1.8379 超界）。改完跑 `test/coherence-checker` 相关单文件即可。
+2. **正面实测 drift 的 narrative_stage 分支**：把 `round-543-l4l5-verify.js` 的样本加长
+   或把 maxLength 提到 300，让 `_detectDrift` 真正触发一次，
+   判据是 trace 里出现 `source:'narrative_stage'` 的 drift_correction 记录。
+3. `matchedNarrative` 是**字符串**不是对象（"渐入佳境"），`matchedNarrativeDetail` 才是
+   带 id/name/framework/stages 的对象。读 `getFullTrace()` 时别对前者取 `.name/.id`。
+4. **git commit 的踩坑记录**：本仓库 `cd <dir> && git commit -m "..."` 形式必被
+   Tirith 安全扫描 BLOCKED（嵌套可执行体无法解析），**必须用 terminal 的 workdir 参数**
+   直接 `git commit -q -m "单行英文简述"`，多行 message 同样会被拦。
+5. UPGRADE_LOG 欠账若继续扩大，建议某一轮专门空出预算做「补录历史轮次」——
+   但要用 git log 的真实 commit 作证据，不要凭简报记忆编。
+
 # 第 535 轮（修 r534 第 77 维度 EXEMPT_EN 结构性 bug + 守卫测试上线 20/20，真升级②收尾）
 
 版本口径 v6.8.0（VERSION 未动；本轮为上一轮的收尾，未新增维度）。
