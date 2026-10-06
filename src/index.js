@@ -11744,6 +11744,8 @@ module.exports = {
   checkCostExternalization,
   checkHarmInvalidation,
   checkSufferingContest,
+  checkPercentageOverflow,
+  checkIncoherentCoverage,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
   checkArchitectureConsistency,
