@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-87 discrimination dimensions  ×  11-layer pipeline  ×  143 modules  ×  61 MCP tools
+88 discrimination dimensions  ×  11-layer pipeline  ×  143 modules  ×  62 MCP tools
 ×  1,136 dispatch routes  ×  17,648 passing tests  ×  0 runtime dependencies
 ```
 
@@ -112,7 +112,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 87 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 88 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -139,7 +139,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (87 dimensions) -> gate
+scope-check -> premise-check -> discriminate (88 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -175,8 +175,8 @@ Measured on this repository at **v6.8.0**. Not marketing copy.
 | Modules registered | 143 |
 | Module init errors | 0 |
 | Dispatch routes | 1,136 |
-| Discrimination dimensions | 87 |
-| MCP tools | 61 |
+| Discrimination dimensions | 88 |
+| MCP tools | 62 |
 | Test suite | 17,648 passing / 28 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
