@@ -396,9 +396,9 @@ class SelfModel {
 
       const entries = Object.entries(this._state.beliefs);
 
-      const hasA = entries.filter(([, v]) => v.content.toLowerCase().includes(a));
+      const hasA = entries.filter(([, v]) => String((v && v.content != null) ? v.content : '').toLowerCase().includes(a));
 
-      const hasB = entries.filter(([, v]) => v.content.toLowerCase().includes(b));
+      const hasB = entries.filter(([, v]) => String((v && v.content != null) ? v.content : '').toLowerCase().includes(b));
 
       if (hasA.length > 0 && hasB.length > 0) {
 
@@ -590,7 +590,10 @@ class SelfModel {
 
     const results = [];
 
-    if (premise.includes('if')) {
+    // [r605] premise 判空：调用方传 undefined/非字符串时 premise.includes
+    // 恒抛 TypeError，导致反事实推理能力在实际调用下不可达。
+    const _premise = typeof premise === 'string' ? premise : '';
+    if (_premise.includes('if')) {
 
       results.push(`基于当前信念: ${beliefs.slice(0, 3).join('; ') || '暂无高置信度信念'}`);
 
