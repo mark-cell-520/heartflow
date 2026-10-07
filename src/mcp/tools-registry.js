@@ -390,6 +390,12 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"answer":{"type":"string","description":"被测模型按六区块格式输出的答案全文"},"materials":{"type":"array","items":{"type":"string"},"description":"题目材料文本（M1..Mn 承诺内容），用于建数字白名单"},"materialIds":{"type":"array","items":{"type":"string"},"description":"合法材料编号，如 [\"M1\",\"M2\"]；用于校验引用编号"},"requiredDeliverables":{"type":"array","items":{"type":"string"},"description":"本题必须出现的交付物关键词"},"minCitations":{"type":"number","description":"【依据】最少材料引用条数，默认 3"}},"required":["answer"]}
   },
 
+  {
+    name: 'heartflow_lesson_consolidate',
+    description: "教训库盲区折叠（lesson-bank.consolidateRepeat）：同一认知盲区反复出现时，把 N 条逐字不同的 auto_reflection 记忆折叠成一条母本教训（frequency 累加），不再逐条新增。按 insightTypes 归一化键（sort 后 join('/')，与顺序无关）匹配母本；命中返回 action=merged 与累计 hitCount，未命中创建母本（action=created），insightTypes 为空则 noop。既有真实知识条目不受影响、母本条仍可被 heartflow_lesson_bank 检索命中。母本条以 [盲区累积:<key>] 前缀存于 data/lesson-bank.json 的 auto_reflection 类。外部 agent 可借此主动上报重复盲区，避免记忆库被同型噪声稀释。",
+    inputSchema: {"type":"object","properties":{"insightTypes":{"description":"盲区类型键。数组如 [\"confidence_gap\"]，或用逗号分隔字符串如 \"confidence_gap,spinning_detected\"（组合键与顺序无关）"},"label":{"type":"string","description":"母本条的可读备注（可选），写入母本 context 便于溯源"},"importance":{"type":"number","description":"母本重要度 1-10，默认 3；与既有母本命中时取 max"}},"required":["insightTypes"]}
+  },
+
 ];
 
 module.exports = { TOOLS };

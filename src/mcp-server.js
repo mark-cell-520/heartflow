@@ -4761,6 +4761,45 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
 
+  // [r600] 教训库盲区折叠（consolidateRepeat）—— AGENTS.md 约定 #3 缺口闭合。
+  // 此前该方法只被 continuous-learner 内部调用，外部 agent 既无 MCP 工具
+  // 也无 dispatch 路由可用。工具定义在 src/mcp/tools-registry.js 同步新增
+  // heartflow_lesson_consolidate（三处同步：registry / HANDLERS / 本 handler）。
+  //
+  // 用途：同一认知盲区反复出现时折叠为一条母本教训（frequency 累加），
+  // 不再逐条新增。返回 action: merged（命中既有母本）/ created（新建母本）
+  // / noop（insightTypes 为空）。真实知识条目不受影响。
+  heartflow_lesson_consolidate: (args) => {
+    try {
+      const { lessonBank } = require('./cortex/lesson-bank.js');
+      const insightTypes = Array.isArray(args?.insightTypes)
+        ? args.insightTypes.filter(t => typeof t === 'string' && t.trim()).map(t => t.trim())
+        : (typeof args?.insightTypes === 'string' && args.insightTypes.trim()
+            ? args.insightTypes.split(',').map(t => t.trim()).filter(Boolean)
+            : []);
+      const r = lessonBank.consolidateRepeat({
+        insightTypes,
+        label: typeof args?.label === 'string' ? args.label : '',
+        importance: Number(args?.importance) || 3,
+      });
+      // 回形状与 lesson_bank handler 对齐；lesson 对象太大，只回关键字段
+      return {
+        action: r.action,
+        hitCount: r.hitCount || null,
+        lesson: r.lesson ? {
+          id: r.lesson.id,
+          type: r.lesson.type,
+          frequency: r.lesson.frequency,
+          importance: r.lesson.importance,
+          trigger: r.lesson.trigger,
+          lastSeen: r.lesson.lastSeen,
+        } : null,
+        motherCount: lessonBank.lessons.filter(l => l.trigger === 'auto_reflection').length,
+        timestamp: Date.now(),
+      };
+    } catch (e) { return { error: e.message }; }
+  },
+
   heartflow_project_context: (args) => {
     try {
       const { ProjectContext } = require('./memory/project-context.js');
