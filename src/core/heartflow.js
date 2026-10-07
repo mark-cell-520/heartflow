@@ -3074,8 +3074,19 @@ class HeartFlow {
       }
     }
 
-    // ─── Thought Chain 初始化 ───────────────────────────────────────────────
+    // [r577] TopicScope 接线：实例在 L1822 就建好并桥接了 MeaningfulMemory，
+    // 但从未进 _modules —— 实测 hf._modules 143 键里 0 个含 topic、
+    // dispatch 0 条路由、ALLOWED_ROUTES 0 条、hf.routes() 1677 条里
+    // topicScope 0 条。即「实例活着、能力完整（569 行）、全库零调用」。
+    // 注册位置必须与 r402/r404 同一区块同一时序：LATE_ADDITIONS 循环之后、
+    // generateAllowedRoutes（L4392）之前，否则 _modules 里没键、路由生不成。
+    // 这一改让 topicScope.push/pop/contains/findSimilarTopic/merge 等
+    // 首次可通过 dispatch 调用，是能力从「声明未接线」到「真进 pipeline」。
+    if (this.topicScope && !this._modules['topicScope']) {
+      this._modules['topicScope'] = this.topicScope;
+    }
 
+    // ─── Thought Chain 初始化 ─────────────────────────────────────────────
     try {
 
       const TCMod = _ThoughtChain();
