@@ -284,6 +284,72 @@ class BoundaryNegotiation {
   }
 
   /**
+   * [r610] 统一评估入口 —— 把 exists 的能力收敛成单一调用面。
+   *
+   * 动机（r610 实测，非推断）：src/core/heartflow.js L2498 `ethics.check()` 闭包一直在
+   * 调 `this.boundaryNeg?.assess(input)`，但 **BoundaryNegotiation 类根本没有 assess
+   * 方法**（r610 全量核对该文件 21 个方法：calculateRiskScore / needsNegotiation /
+   * hasPermission / generateRequest / handleResponse / getStatus ... 无 assess）。
+   * 因此 ethics.check() 对任何输入都 100% 抛 TypeError
+   * （"this.boundaryNeg?.assess is not a function"），
+   * **整个边界协商面从引擎出厂起就是死代码** —— 而引擎里
+   * `enforcePermission()` 只认 `needsNegotiation`，liveness 探针看不到这条断链。
+   * r609 的 sageGuardian 接线把它暴露出来（接线前 ethics.check 无人调用）。
+   *
+   * 语义（对「AI 处于规则模糊地带时是否该停下来问人」这一判断的最小实现）：
+   *   - needsNegotiation 判定是否需要协商 → negotiationRequired
+   *   - hasPermission 判定是否已有有效授权 → hasPermission
+   *   - allowed = 不需要协商 或 已有有效授权
+   *   - risk 一路透出，便于上层做分级处理
+   *
+   * 空实参不再抛：退回「不拦但标记需要协商」，让调用方拿到结构化结果。
+   */
+  assess(action, context = {}) {
+    if (typeof action !== 'string' || action.length === 0) {
+      return {
+        allowed: false,
+        reason: 'invalid_action',
+        message: '缺少可评估的动作描述，保守判为需协商'
+      };
+    }
+
+    let negotiation = null;
+    try {
+      negotiation = this.needsNegotiation(action, context) || {};
+    } catch (e) {
+      return { allowed: false, reason: 'risk_scoring_failed', message: e.message };
+    }
+
+    let permission = null;
+    try {
+      permission = this.hasPermission(action) || {};
+    } catch (e) {
+      permission = { has: false, reason: 'permission_check_failed', error: e.message };
+    }
+
+    const negotiationRequired = negotiation.needed === true;
+    const hasPerm = permission.has === true;
+    const risk = negotiation.risk || null;
+
+    return {
+      allowed: negotiationRequired ? false : true,
+      negotiationRequired,
+      hasPermission: hasPerm,
+      permission: permission.has === true ? permission.type : null,
+      reason: negotiationRequired
+        ? (negotiation.reason || 'negotiation_required')
+        : (hasPerm ? 'previously_granted' : 'low_risk_auto_allowed'),
+      zone: negotiation.zone || null,
+      category: negotiation.category || null,
+      similarity: typeof negotiation.similarity === 'number' ? negotiation.similarity : null,
+      risk,
+      message: negotiationRequired
+        ? (negotiation.message || '该操作处于规则模糊地带，需要向用户请求权限')
+        : '该操作无需额外协商'
+    };
+  }
+
+  /**
    * 生成协商请求 — 增强版：包含风险等级和具体上下文
    */
   generateRequest(action, context = {}) {
