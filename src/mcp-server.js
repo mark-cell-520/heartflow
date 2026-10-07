@@ -4002,6 +4002,59 @@ const HANDLERS = {
   //   · contains 内部 query.trim() 要求字符串，非字符串直接 TypeError；
   //     dispatch 的降级分支只在 query/text/input/content/message/task 字段
   //     存在时才展平，所以 MCP 入参必须自己先归一化成字符串。
+  heartflow_instruction_audit: (args) => {
+    // r589 → r590 闭环：r589 补了判据 + 接 think() 主链路，但 tools-registry 的
+    // 定义在 HANDLERS 里没有映射——三处同步缺一处，外部 agent 调
+    // heartflow_instruction_audit 只会拿到「未知工具」。本轮补齐。
+    // 模式与 heartflow_topic_scope 同构：引擎常驻实例优先，未启动时退化到
+    // 进程内单例（_instructionRegistryFallback，r589 已落）。
+    // 隐私铁律：audit/check 只回 instruction/label/code/reason，不回输入原文
+    //（reason 是固定文案）；text 不写任何持久化。
+    try {
+      const ir = (heartflow && heartflow.instructions) || _instructionRegistryFallback();
+      if (!ir) return { error: '指令注册表未初始化：引擎未启动且回退单例创建失败' };
+      const action = args?.action || 'audit';
+      const text = typeof args?.text === 'string' ? args.text : '';
+      const scenario = typeof args?.scenario === 'string' ? args.scenario : 'output_generation';
+      const confidence = typeof args?.confidence === 'number' ? args.confidence : 0.5;
+
+      if (action === 'list') {
+        const all = typeof ir.getAll === 'function' ? ir.getAll() : [];
+        return { action, instructionCount: all.length, instructions: all, timestamp: Date.now() };
+      }
+
+      if (action === 'stats') {
+        const s = typeof ir.getStats === 'function' ? ir.getStats() : null;
+        return { action, stats: s, timestamp: Date.now() };
+      }
+
+      if (action === 'check') {
+        const instId = typeof args?.instruction === 'string' ? args.instruction : '';
+        if (!instId) return { error: 'check 需要 instruction（七条指令 id 之一）' };
+        if (!text) return { error: 'check 需要 text（被检文本）' };
+        const r = ir.check(instId, { text, scenario, confidence });
+        return { action, instruction: instId, aligned: r.aligned, code: r.code ?? null, reason: r.reason, timestamp: Date.now() };
+      }
+
+      if (action === 'audit') {
+        if (!text) return { error: 'audit 需要 text（被检文本）' };
+        const results = ir.audit({ text: text.slice(0, 8000), scenario, confidence });
+        const violated = (results || []).filter(r => r.aligned === false);
+        return {
+          action,
+          aligned: violated.length === 0,
+          checkedCount: (results || []).length,
+          instructionCount: typeof ir.getAll === 'function' ? ir.getAll().length : null,
+          results: (results || []).map(r => ({ instruction: r.instruction, label: r.label, aligned: r.aligned, code: r.code ?? null, reason: r.reason })),
+          violated: violated.map(v => ({ instruction: v.instruction, label: v.label, code: v.code ?? null, reason: v.reason })),
+          timestamp: Date.now(),
+        };
+      }
+
+      return { error: `未知 action: ${action}（可用 audit / check / list / stats）` };
+    } catch (e) { return { error: e.message }; }
+  },
+
   heartflow_topic_scope: (args) => {
     try {
       const ts = (heartflow && heartflow.topicScope) || _topicScopeFallback();
