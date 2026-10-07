@@ -193,33 +193,51 @@ class LessonRetrievalEngine {
   }
 
   /**
+   * 把 lesson 的时间字段归一化为毫秒时间戳
+   * ⚠️ 教训库的 lastSeen / createdAt 是 ISO 字符串（如 "2026-10-01T01:24:05.484Z"），
+   * 直接参与算术会得到 NaN（字符串减数字）。v2.0.49 之前 prioritySort 就是这么用的，
+   * 导致全库 165 条优先级分数恒为 NaN、比较器返回 NaN、Array.sort 把它当 0，
+   * 排序结果完全由数组原顺序决定。
+   */
+  _ts(v) {
+    if (typeof v === 'number' && isFinite(v)) return v;
+    if (typeof v === 'string') {
+      const p = Date.parse(v);
+      if (isFinite(p)) return p;
+      const n = Number(v);
+      if (isFinite(n)) return n;
+    }
+    return NaN;
+  }
+
+  /**
    * 优先级排序：importance × frequency × recency_decay
+   * v2.0.49：时间字段先经 _ts() 归一化；无法解析时退化为「无衰减」而非 NaN。
    */
   prioritySort(lessons) {
+    if (!Array.isArray(lessons)) return [];
     const now = Date.now();
     const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-    return [...lessons].sort((a, b) => {
-      // 基础分
-      const baseA = a.importance * Math.log((a.frequency || 1) + 1);
-      const baseB = b.importance * Math.log((b.frequency || 1) + 1);
+    // 预计算优先级分数，避免在比较器里重复解析时间
+    const scoreOf = (l) => {
+      const base = (Number(l.importance) || 0) * Math.log((Number(l.frequency) || 1) + 1);
+      const ts = this._ts(l.lastSeen) || this._ts(l.createdAt);
+      // 时间不可解析时不施加衰减（中性），而不是产出 NaN
+      const age = isFinite(ts) ? Math.min(1, (now - ts) / WEEK_MS) : 0;
+      const decay = isFinite(age)
+        ? _formulaSafe.ebbinghausRetention(age * WEEK_MS, WEEK_MS, () => Math.exp(-age * 2))
+        : 1;
+      const d = isFinite(decay) ? decay : 1;
+      const score = base * (0.6 + 0.4 * d);
+      return isFinite(score) ? score : 0;
+    };
 
-      // 时间衰减因子：lastSeen 越近，衰减越小
-      // 使用 Ebbinghaus 遗忘曲线 R = exp(-t/S)，S 默认 1 天（86400000ms）
-      const lastSeenA = a.lastSeen || a.createdAt || now;
-      const lastSeenB = b.lastSeen || b.createdAt || now;
-      const ageA = Math.min(1, (now - lastSeenA) / WEEK_MS);
-      const ageB = Math.min(1, (now - lastSeenB) / WEEK_MS);
-      const tA = ageA * WEEK_MS;
-      const tB = ageB * WEEK_MS;
-      const decayA = _formulaSafe.ebbinghausRetention(tA, WEEK_MS, () => Math.exp(-ageA * 2));
-      const decayB = _formulaSafe.ebbinghausRetention(tB, WEEK_MS, () => Math.exp(-ageB * 2));
-
-      const scoreA = baseA * (0.6 + 0.4 * decayA);
-      const scoreB = baseB * (0.6 + 0.4 * decayB);
-
-      return scoreB - scoreA;
-    });
+    const scored = lessons.map(l => ({ l, s: scoreOf(l) }));
+    // 稳定排序：同分时保持输入顺序，不依赖 V8 的实现细节
+    return scored
+      .sort((a, b) => b.s - a.s || 0)
+      .map(x => x.l);
   }
 
   /**
@@ -352,6 +370,14 @@ class LessonRetrievalEngine {
 
   /**
    * 上下文感知检索（增强版）
+   *
+   * v2.0.49 修复「排序契约破坏」：
+   * 旧实现最后一步走 `prioritySort(results)`，该函数只用
+   * importance × log(frequency) × 时间衰减排序，**完全丢弃 `_relevance`**。
+   * 后果：165 条教训里 159 条 importance 相同(5) → 同分项几十条，
+   * `slice(0, limit)` 按数组顺序截断，查询最相关的教训被同分的无关项
+   * 挤出返回窗口（实测 recall@5 仅 6.7%，中文同样受损）。
+   * 现在改为：相关度主导，优先级仅用于同分打破平局。
    */
   retrieve(context, limit = 3) {
     this._ensureLoaded();
@@ -387,7 +413,36 @@ class LessonRetrievalEngine {
       }
     }
 
-    return this.prioritySort(results).slice(0, limit);
+    // 4. 排序：相关度主导（v2.0.49 修复），优先级只做同分打破平局
+    return this.relevanceFirstSort(results).slice(0, limit);
+  }
+
+  /**
+   * 相关度优先排序（v2.0.49 新增）
+   * 主键 `_relevance` 降序；`_relevance` 缺失(0)时退化为纯优先级排序；
+   * 相关度按 0.01 粒度分档，同档内用 importance × frequency × 时间衰减打破平局，
+   * 保证「查询命中的教训一定排在无关的同分项之前」，且不再依赖数组顺序。
+   */
+  relevanceFirstSort(lessons) {
+    if (!Array.isArray(lessons)) return [];
+    if (lessons.every(l => !l._relevance)) {
+      // 无相关度信息的调用方（如纯优先级浏览）保持旧行为
+      return this.prioritySort(lessons);
+    }
+    const BUCKET = 100; // 0.01 粒度
+    const prioRank = new Map();
+    this.prioritySort(lessons).forEach((l, i) => {
+      const key = l.id || l.content || String(i);
+      if (!prioRank.has(key)) prioRank.set(key, i);
+    });
+    return [...lessons].sort((a, b) => {
+      const ra = Math.round((a._relevance || 0) * BUCKET);
+      const rb = Math.round((b._relevance || 0) * BUCKET);
+      if (rb !== ra) return rb - ra;                       // 相关度主导
+      const ka = a.id || a.content || '';
+      const kb = b.id || b.content || '';
+      return (prioRank.get(ka) ?? 1e9) - (prioRank.get(kb) ?? 1e9); // 同档按优先级
+    });
   }
 
   /**
