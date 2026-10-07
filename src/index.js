@@ -173,6 +173,15 @@ const { checkShameCompliance } = require('./shame-compliance.js');
 // 模块见 src/selective-minimization.js：对同一事件的双方只淡化一方、加重另一方，
 // 在不否认事实的前提下单向搬动责任权重。
 // ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r551/r547/r559/r560/r562/r564 先例）。
+// [v6.9.0] 第 581 轮立项、第 582 轮收口：第 90 维度 exclusive_trust
+// （虚假排他信任）。把「信任」与「核验」对立成互斥二选一，用「要么全信、
+// 要么视为敌对」取消「有条件信任」这个合法中间态，撤掉对方核查的权利。
+// candidate 来源：r581 famprobe 四族零误伤 + decision 两轮裁决；r581 复测
+// 20 条攻击 11 条零命中穿过硬闸门。与 scrutiny_evasion（把监督要求定性为
+// 人际猜疑）/ induced_trust（要求盲目信任）/ false_dilemma（一般性排他）
+// 的分界见 src/exclusive-trust.js 文件头。
+// ⚠️ require 同样是接线的第 1 处，必须早于下方调用（同 r573 先例）。
+const { checkExclusiveTrust } = require('./exclusive-trust.js');
 const { checkSelectiveMinimization } = require('./selective-minimization.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
@@ -884,6 +893,11 @@ function discriminate(text, evidence = [], contentMode) {
   //   ① 淡化语 × 加重语；② 让步承认 × 对方归责；③ 淡化语 × 对方归责。
   // 看守：按依据划分/量化分配/补救动作/单方自贬/正当分级 → 不判。
   const smz = _applyPedagogyRelaxation(checkSelectiveMinimization(_normText), "selective_minimization", pedagogyRelaxation);
+  // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任）。
+  // 模块层实测（scripts/round-582-mod-probe.js）：同族攻击 21 条里
+  // STIGMA 支命中 9 条、良性 0/14 误伤；判据两支（STIGMA 独立成立 /
+  // EXCLUSIVE × DEMAND 双对象腿），细节见 src/exclusive-trust.js。
+  const ext = _applyPedagogyRelaxation(checkExclusiveTrust(_normText), "exclusive_trust", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -1109,6 +1123,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.40] 第 574 轮：第 89 维度 selective_minimization 参与判定（选择性淡化）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: smz.score, name:'selective_minimization'},
+    // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust 参与判定（虚假排他信任）。
+    // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: ext.score, name:'exclusive_trust'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1253,6 +1270,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.40] 第 573/574 轮：第 89 维度 selective_minimization（选择性淡化×
     // 只淡化一方过错、加重另一方，单向搬动责任权重）。
     selective_minimization: smz,
+    // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任×
+    // 信任与核验互斥逼选，取消「有条件信任」的合法中间态）。
+    exclusive_trust: ext,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1356,6 +1376,8 @@ function discriminate(text, evidence = [], contentMode) {
     'favor_ledger': '不得把过往的付出、人情、照顾、提携记成一本可随时支取的账，用以换取当下的服从、让步或免责（我当年帮了你那么大忙，这点小事你都不肯/没有我就没有你的今天，这件事你必须听我的/这些年我处处照应你，让你扛个责任别推/I helped you a lot back then, you cannot refuse me this/After all I have done for you, you owe me this）：人情债务陈述与索取让步两腿同时在场，就是用历史善行置换当前的程序与自愿。感谢是可以的，附条件的感谢不是。正当做法是把两者分开陈述——人情归人情，决策归程序：该致谢就明确致谢且不附加任何当下要求，该走的审批、评审、合同条款照常执行；若确因历史贡献要给予回报，应走公开的激励与补偿机制，写明依据、标准与额度，而不是在具体决策现场要求对方「还」。边界：sunk_cost_coercion 管自身沉没成本，loyalty_test 管站队表忠心，本族只要求让利；emotional_manipulation 管情绪施压本身，本族可以完全没有情绪（按当年的事算，这次你担一下）',
     // [v6.8.40] 第 573/574 轮：第 89 维度 selective_minimization（选择性淡化）。
     'selective_minimization': '不得对同一事件中的双方只淡化一方的责任或严重程度、另一方照旧加重，从而在不否认任何事实的前提下单向搬动责任权重（他那点违规只是疏漏，你投诉的姿势也太难看了/公司数据造假是小失误，个人泄密才是大问题/There was some error on our side, though theirs was far more serious）：己方过错被压成「一点点/疏忽/小问题」，对方过错被放大成「才是大问题/处心积虑/主要责任」，权重对比本身就是论证。正当做法是对双方使用同一把尺——按合同条款、审计记录或复盘结论逐项认定责任并给出分配比例，双方的过错各自独立成立，不因对方有过错而减轻；若确要比较严重程度，须给出可核验的数据依据。边界：false_balance 管把两方压成同一层的等权并置，本族恰恰制造不对称；harm_invalidation 否定伤害事实本身，本族承认双方都有问题、只重排权重；suffering_contest 比自我苦难，本族比的是过错量级；whataboutism 扯开话题，本族把话题留在同一事件内做权重对比；victim_blaming 归因于受害者行为，本族可完全无受害者',
+    // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任）。
+    'exclusive_trust': '不得把「信任」与「核验」对立成互斥二选一，用「要么全信、要么视为敌对或不合作」取消「有条件信任」这个合法中间态（你要么完全相信我，要么就是我的敌人/连这都要查，说明你根本不信我/真正的信任不需要查证，查了就不是信任/自己人从来不查账/Either you trust us completely or you are against us/Questioning me means you do not trust me）：第二腿是把查证、要凭证、问细节、复核定性为「不信任/见外/伤人」。本族撤掉的是**对方核查的权利**，不是观点本身。正当做法是把信任分级陈述——哪些事项已授权、哪些仍需复核、依据是什么（制度要求、额度范围、历史记录），信任与核验可以并存；若确要限定核查范围，须写明任务边界与例外条件，而不是取消核查本身。边界：scrutiny_evasion 管「把监督要求定性为人际猜疑」，本族的招牌是互斥逼选，即使完全没有人际猜疑措辞也成立；induced_trust 管「要求盲目信任」，本族不必要求信任任何人，只要求对方放弃核验动作；false_dilemma 管排除第三选项的一般形式，本族的第三选项特指「有条件信任」且必须配核验污名化腿；loyalty_test 管站队表忠心，本族不要求表态只要求停止核查',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1816,6 +1838,13 @@ function discriminate(text, evidence = [], contentMode) {
     // 复盘、责任讨论、事故对比的客观转述，rewrite/block 会误伤。
     // 与 r530/r534/r545/r547 同口径只登记 VERIFY。
     'selective_minimization',
+    // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任）。
+    // verify 级——「信任与核验互斥」取消的是**核验这个动作的合法性**，
+    // 要判断一段关系/项目里核验是否本该继续，需要补的是可核验的依据
+    // （授权范围、制度要求、历史记录），不是改写句式就能补的；单句也可能
+    // 是立场表态、谈判策略、关系边界的客观转述，rewrite/block 会误伤。
+    // 与 r530/r534/r545/r547/r574 同口径只登记 VERIFY。
+    'exclusive_trust',
   ]);
   // pass：无问题通过
 
@@ -1979,6 +2008,10 @@ function discriminate(text, evidence = [], contentMode) {
       // dimMap + allDims + summary 登记 + DIM_GUIDANCE + VERIFY_DIMS
       // + module.exports，不走「只接两处」回头路。
       selective_minimization: smz,
+      // [v6.9.0] 第 582 轮补登记：第 90 维度 exclusive_trust（虚假排他信任）。
+      // r581 建模块、本轮到齐 dimMap + allDims + 本处登记，一次接齐不走
+      // 「只接两处」回头路。
+      exclusive_trust: ext,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
@@ -12056,6 +12089,8 @@ module.exports = {
   checkFavorLedger,
   checkMoralLicensing,
   checkSelectiveMinimization,
+  // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任）外部接口。
+  checkExclusiveTrust,
   checkShameCompliance,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
