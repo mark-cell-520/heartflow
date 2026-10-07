@@ -3136,6 +3136,20 @@ function handleFalsePositiveTool(args) {
   }
 }
 
+// [v6.8.0 第 593 轮] KnowledgeGraph 进程内回退单例，与 _klFallback 同构：
+// 引擎未启动时兜底，正常路径永远走引擎常驻实例（heartflow.knowledge，
+// start() 后为 KnowledgeSubsystem）。
+// r592 探针实测：旧的 handler 每次 new KnowledgeGraph({silent:true}) 造成
+// 「写入即蒸发」——单例必须带模块级缓存，否则又回到每次调用一个实例的老路。
+let _kgFallback = null;
+function _knowledgeGraphFallback() {
+  if (_kgFallback) return _kgFallback;
+  try {
+    const { KnowledgeGraph } = require('./memory/knowledge-graph.js');
+    _kgFallback = new KnowledgeGraph({ silent: true });
+  } catch (_) { _kgFallback = null; }
+  return _kgFallback;
+}
 // [r313] KnowledgeLayer 进程内回退单例：只在引擎未启动
 // （heartflow 为 null / 无 knowledgeLayer 属性）时兜底，正常路径永远走引擎常驻实例。
 // 刻意不用模块级缓存实例替代引擎实例——那会退化成 r312 那条「两套状态互相看不见」的老路。
@@ -3475,12 +3489,96 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
 
+  // [v6.8.0 第 593 轮] 知识图谱（KnowledgeGraph 三元组图）。
+  // [r593 修复] 旧实现每次调用 new KnowledgeGraph({silent:true})：装饰实例与引擎
+  // 零共享，addEdge 写进一个新 Map，下一次调用的 query/getRelated 又是另一个全新
+  // Map → 外部 agent 永远只拿到全 0 stats（r592 三个探针实测确认坏症状）。
+  // 且 tools-registry 里从未有本工具定义（tools/list 拿不到它）。
+  // 本轮按 r312→r313 / r578→r579 同款范式改成走引擎常驻实例
+  // heartflow.knowledge（start() 后是 KnowledgeSubsystem，其 graphAdapter.kg
+  // 是真实三元组图，dataDir = data/ontology，跨调用共享状态）。
   heartflow_knowledge_graph: (args) => {
     try {
-      const { KnowledgeGraph } = require('./memory/knowledge-graph.js');
-      const kg = new KnowledgeGraph({ silent: true });
+      const kg = (heartflow && heartflow.knowledge) || _knowledgeGraphFallback();
+      if (!kg) return { error: '知识图谱未初始化：引擎未启动且回退单例创建失败' };
       const action = args?.action || 'stats';
-      const stats = kg.getStats ? kg.getStats() : {};
+
+      // addEdge：写一条三元组（subject + predicate + object + confidence）
+      if (action === 'addEdge') {
+        if (!args?.subject || !args?.predicate || !args?.object) {
+          return { error: 'addEdge 需要 subject / predicate / object 三者齐全' };
+        }
+        const confidence = typeof args?.confidence === 'number' ? args.confidence : 0.5;
+        const triple = kg.addEdge(args.subject, args.predicate, args.object, confidence);
+        return { action, triple, stats: kg.getStats(), timestamp: Date.now() };
+      }
+
+      // query：按 subject/predicate/object 查三元组（AND 关系，默认模糊）
+      if (action === 'query') {
+        if (!args?.subject && !args?.predicate && !args?.object) {
+          return { error: 'query 需要 subject / predicate / object 至少一个（全空会静默返回全表）' };
+        }
+        const hits = kg.query({
+          subject: args?.subject, predicate: args?.predicate, object: args?.object,
+          fuzzy: args?.fuzzy !== false,
+          limit: typeof args?.limit === 'number' ? args.limit : 100,
+          sortByConfidence: args?.sortByConfidence === true,
+        });
+        return {
+          action, count: hits.length, triples: hits.slice(0, 100),
+          stats: kg.getStats(), timestamp: Date.now(),
+        };
+      }
+
+      // getRelated：取一个实体的关联三元组（depth 递归）
+      if (action === 'getRelated') {
+        if (!args?.entity) return { error: 'getRelated 需要 entity' };
+        const depth = typeof args?.depth === 'number' ? Math.max(1, Math.min(4, args.depth)) : 1;
+        const related = kg.getRelated(args.entity, depth) || [];
+        return {
+          action, entity: args.entity, depth,
+          count: related.length, related: related.slice(0, 100), timestamp: Date.now(),
+        };
+      }
+
+      // findPath：两实体间路径（BFS，maxDepth 默认 4）
+      if (action === 'findPath') {
+        if (!args?.from || !args?.to) return { error: 'findPath 需要 from + to' };
+        const maxDepth = typeof args?.maxDepth === 'number' ? Math.max(1, Math.min(6, args.maxDepth)) : 4;
+        const paths = kg.findPath(args.from, args.to, maxDepth) || [];
+        return { action, from: args.from, to: args.to, count: paths.length, paths, timestamp: Date.now() };
+      }
+
+      // searchEntities：实体名模糊检索
+      if (action === 'searchEntities') {
+        if (!args?.entity) return { error: 'searchEntities 需要 entity（检索词）' };
+        const entities = kg.searchEntities(args.entity) || [];
+        return { action, query: args.entity, count: entities.length, entities, timestamp: Date.now() };
+      }
+
+      // save / load：图谱持久化（dataDir = data/ontology）
+      if (action === 'save') {
+        const r = kg.save ? kg.save(args?.filePath) : null;
+        return { action, saved: r, stats: kg.getStats(), timestamp: Date.now() };
+      }
+      if (action === 'load') {
+        if (!args?.filePath) return { error: 'load 需要 filePath' };
+        const r = kg.load ? kg.load(args.filePath) : null;
+        return { action, loaded: r, stats: kg.getStats(), timestamp: Date.now() };
+      }
+
+      // clear：清空图谱（写操作，破坏性）
+      if (action === 'clear') {
+        const before = kg.getStats();
+        kg.clear();
+        return { action, cleared: before, stats: kg.getStats(), timestamp: Date.now() };
+      }
+
+      // stats（默认）/ domains：只读
+      const stats = kg.getStats();
+      if (action === 'domains') {
+        return { action: 'domains', domains: kg.listDomains ? kg.listDomains() : [], stats, timestamp: Date.now() };
+      }
       return { action, stats, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
