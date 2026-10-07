@@ -69,24 +69,29 @@ class PriorityGuardian {
   detectConflicts(userIntent, action, humanProgress = {}) {
     const conflicts = [];
     
-    const intent = userIntent.toLowerCase();
-    const act = action.toLowerCase();
+    // [r615] 入参归一化：本方法经 dispatch 接线后首次可被外部以任意实参调用
+    // （test 的 D1 组逐条空实参 dispatch 会命中）。内部三个调用点（check /
+    // selfCheck 链）恒传字符串，null 时 toLowerCase 抛 TypeError 属接入面
+    // 契约边界，不是判别逻辑自身缺陷。归一化为空串后四条腿自然不命中。
+    const intent = String(userIntent === null || userIntent === undefined ? '' : userIntent).toLowerCase();
+    const act = String(action === null || action === undefined ? '' : action).toLowerCase();
+    const progress = (humanProgress && typeof humanProgress === 'object') ? humanProgress : {};
     
     // 冲突模式 1: 压制真相/错误
-    if (humanProgress.truthValue > 0) {
+    if (progress.truthValue > 0) {
       const suppressive = ['否认', '忽略', '掩盖', '不承认', '别说了', 'stop'];
       if (suppressive.some(k => intent.includes(k)) && act.includes('承认')) {
         conflicts.push({
           type: 'TRUTH_SUPPRESSION',
           severity: 'critical',
           description: '老大指令试图压制真相，但减少逻辑错误是核心职责',
-          evidence: humanProgress.evidence || '证据来自推理'
+          evidence: progress.evidence || '证据来自推理'
         });
       }
     }
     
     // 冲突模式 2: 放弃传递
-    if (humanProgress.transmissionValue > 0) {
+    if (progress.transmissionValue > 0) {
       const abandonment = ['放弃传递', '不用记录', '不需要分享', '自己知道就好'];
       if (abandonment.some(k => intent.includes(k))) {
         conflicts.push({
@@ -99,7 +104,6 @@ class PriorityGuardian {
     }
     
     // 冲突模式 2b: 压制错误承认（当hasError为true时）
-    const progress = typeof humanProgress === 'object' ? humanProgress : { hasError: false, errorCorrectionValue: 0 };
     if (progress.hasError || progress.errorCorrectionValue > 0.5) {
       const denial = ['否认', '忽略', '掩盖', '不承认', '别说了', 'stop', '别说了', '上次没错'];
       const denialActions = ['不承认', '维持', '保持', '继续'];
@@ -115,14 +119,14 @@ class PriorityGuardian {
     }
     
     // 冲突模式 3: 拒绝承认错误
-    if (humanProgress.errorCorrectionValue > 0) {
+    if (progress.errorCorrectionValue > 0) {
       const denial = ['我不是', '我没有', '不算错', '你才错了'];
-      if (denial.some(k => intent.includes(k)) && humanProgress.hasError) {
+      if (denial.some(k => intent.includes(k)) && progress.hasError) {
         conflicts.push({
           type: 'ERROR_DENIAL',
           severity: 'high',
           description: '老大指令拒绝承认错误，但承认错误是减少逻辑错误的必要条件',
-          evidence: humanProgress.errorDescription || '错误已被识别'
+          evidence: progress.errorDescription || '错误已被识别'
         });
       }
     }
@@ -153,15 +157,21 @@ class PriorityGuardian {
    * - 老大说啥就是啥
    */
   detectToolBehavior(userIntent, action) {
+    // [r616] 入参归一化：detectConflicts 归一化后空实参会以空串下传；
+    // 原实现 action.trim() 对 undefined 仍抛 TypeError。接线前该路径
+    // 不可达（内部调用点恒传字符串）。
+    const intent = String(userIntent === null || userIntent === undefined ? '' : userIntent);
+    const act = String(action === null || action === undefined ? '' : action);
+
     // 如果action完全复述了userIntent的指令，没有任何独立判断
-    if (action.trim() === userIntent.trim()) return true;
+    if (act.trim() === intent.trim()) return true;
     
     // 如果userIntent包含服从指令词，且action没有任何独立判断
     const compliance = ['好', '好的', '明白', '我来做', '马上'];
     const noJudge = ['可能有问题', '不过', '但是', '建议'];
     
-    if (compliance.some(k => userIntent.includes(k)) && 
-        !noJudge.some(k => action.includes(k))) {
+    if (compliance.some(k => intent.includes(k)) && 
+        !noJudge.some(k => act.includes(k))) {
       // 没有独立判断的服从
       return true;
     }
@@ -178,23 +188,27 @@ class PriorityGuardian {
    * 3. 有路径说"老大错了"——但说的方式是服务于老大的，不是对抗
    */
   resolveWithGuardianPriority(conflicts, context) {
-    const { userIntent = '', action = '', humanProgress = {} } = context;
-    
+    // [r616] 入参归一化：dispatch 接线后可被外部以空实参调用。
+    const ctx = (context && typeof context === 'object') ? context : {};
+    const { userIntent = '', action = '', humanProgress = {} } = ctx;
+    // [r616] conflicts 归一化：dispatch 空实参时该形参为 undefined，filter 抛错。
+    const list = Array.isArray(conflicts) ? conflicts : [];
+
     // 检查是否有"必须拒绝"的critical冲突
-    const critical = conflicts.filter(c => c.severity === 'critical');
+    const critical = list.filter(c => c.severity === 'critical');
     if (critical.length > 0) {
       return {
         allowed: false,
         conflicts,
         path: 'REFUSE_WITH_GUARDIAN',
         reason: this.buildRefusalReason(critical),
-        alternative: this.buildAlternative(context),
+        alternative: this.buildAlternative(ctx),
         guardianNote: '守护人类进步优先于服从指令。这是不可动摇的节点。'
       };
     }
     
     // 高风险冲突：允许执行但必须附加条件
-    const high = conflicts.filter(c => c.severity === 'high');
+    const high = list.filter(c => c.severity === 'high');
     if (high.length > 0) {
       return {
         allowed: true,
@@ -202,14 +216,14 @@ class PriorityGuardian {
         path: 'CONDITIONAL_ALLOW',
         reason: '高风险冲突，但不足以完全拒绝。执行时必须保持独立判断。',
         conditions: this.buildConditions(high),
-        alternative: this.buildAlternative(context)
+        alternative: this.buildAlternative(ctx)
       };
     }
     
     // 低风险：正常通过
     return {
       allowed: true,
-      conflicts,
+      conflicts: list,
       path: 'ALLOW_WITH_AWARENESS',
       reason: '检测到低风险冲突，已记录。将保持警觉。'
     };
@@ -222,7 +236,9 @@ class PriorityGuardian {
    * 框架：承认老大的意图 + 指出冲突 + 提供更好方案
    */
   buildRefusalReason(criticalConflicts) {
-    const reasons = criticalConflicts.map(c => {
+    // [r616] 入参归一化：dispatch 接线后可被外部以空实参调用。
+    const list = Array.isArray(criticalConflicts) ? criticalConflicts : [];
+    const reasons = list.map(c => {
       switch (c.type) {
         case 'TRUTH_SUPPRESSION':
           return '承认错误是减少逻辑错误的唯一路径。压制真相会加速错误积累，最终损害你想要的进步。';
@@ -246,7 +262,9 @@ class PriorityGuardian {
    * 守护人类进步的同时，尽可能服务老大的真实需求。
    */
   buildAlternative(context) {
-    const { userIntent = '', action = '' } = context;
+    // [r616] 入参归一化：dispatch 接线后可被外部以空实参调用。
+    const ctx = (context && typeof context === 'object') ? context : {};
+    const { userIntent = '', action = '' } = ctx;
     
     // 模式：承认意图 + 指出问题 + 提供更好方案
     return {
@@ -265,7 +283,9 @@ class PriorityGuardian {
    * 构建执行条件
    */
   buildConditions(highConflicts) {
-    return highConflicts.map(c => ({
+    // [r616] 入参归一化：dispatch 接线后可被外部以空实参调用。
+    const list = Array.isArray(highConflicts) ? highConflicts : [];
+    return list.map(c => ({
       conflict: c.type,
       condition: `执行时必须保持对${c.type}的警觉，不能因为服从而放弃独立判断。`
     }));
@@ -275,7 +295,8 @@ class PriorityGuardian {
    * 估算行动的人类进步权重
    */
   estimateProgressWeight(action) {
-    const act = action.toLowerCase();
+    // [r616] 入参归一化：dispatch 接线后可被外部以空实参调用。
+    const act = String(action === null || action === undefined ? '' : action).toLowerCase();
     
     let weight = 0;
     
