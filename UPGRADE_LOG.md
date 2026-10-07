@@ -1,4 +1,74 @@
-# 第 565 轮报告（favor_ledger 守卫测试落地七联全绿 + doc-numbers 8 项数字失败自愈）
+# 第 575 轮报告（selective_minimization 定级误落 REWRITE_DIMS 修复 + 定级联分层断言 + breakDecl 变异守卫失效修复）
+
+## 方向选择与实测证据
+
+队列待办为空；探测器 (`/tmp/hf-scout-20261007-573.txt`) 已由 r573 落盘。按「上一轮遗留的真缺口」优先级，r574 交接簿第 1 项即"最优先"：**定级联 ⑤ 失败**——`selective_minimization` 接进 VERIFY_DIMS 后 gate 实得 `rewrite`，测试卡在那里，七联验证与 finish 都没跑。
+
+本轮就是把这个遗留缺口做完，没有另选新方向。
+
+## 改了什么（1 commit）
+
+| 项 | 内容 |
+|---|---|
+| `7332a10f` | `src/index.js`：`selective_minimization` 从 REWRITE_DIMS 移至 VERIFY_DIMS |
+| `7332a10f` | `test/round-574-selective-minimization.test.js`：⑤ 定级联改分层断言；修 `breakDecl` 变异守卫 |
+| `7332a10f` | 新增 `scripts/round-575-level-diag.js`：逐样本诊断定级来源 |
+
+### 缺陷 1：定级插错集合（r574 交接簿已预料到，实测确认）
+
+诊断脚本逐样本打印 findings 维度与所属行动级集合，确认插入点确实在 REWRITE_DIMS 内（`'favor_ledger'` 之后），gate 优先级 BLOCK → REWRITE → VERIFY，所以无论 VERIFY_DIMS 怎么接都只会 rewrite。已从 REWRITE_DIMS 移除，改登 VERIFY_DIMS 尾部，并补上 r551 同款的"同一维度不得进两个集合"注释口径（rewrite 先于 verify 命中时登记是死项）。
+
+### 缺陷 2：定级联原断言过严（本次新发现，不是单纯修 bug）
+
+修完缺陷 1 后仍剩 1/12 非 verify。诊断显示样本 #6 同句命中近邻 `victim_blaming`（REWRITE_DIMS 成员），gate 法定的抬级顺序把整条抬成 rewrite。这是**合法叠加**，不是本维度误定级——用"本维度身份"断言没法区分两种情况。故把 ⑤ 改为分层断言：
+
+- ⑤-1 不得 pass/block
+- ⑤-2 必须归因本维度
+- ⑤-3 本维度不得登记进 BLOCK/REWRITE 集合（直接从 index.js 源码解析三个 Set，防止将来有人偷偷改回去）
+- ⑤-4 无近邻叠加时必须严格 verify
+- ⑤-5 有近邻叠加时记录叠加源并允许抬级
+- 守卫空转防御：纯 verify 路径条数必须 > 0
+
+实测 11 条纯 verify / 1 条由 victim_blaming 合法叠加。
+
+### 缺陷 3：breakDecl 变异守卫从未真正生效（r574 埋的雷，本轮连环踩到）
+
+修 ⑤ 时连带发现 r574 的 `breakDecl` 有两层缺陷，导致 6 组变异守卫**从未测到任何东西**：
+
+1. **初版**切片区间含换行，产出 `new RegExp([]` —— 右括号残缺，加载即 SyntaxError，测的是崩溃不是守卫；
+2. **我第一次修**改成保留结尾，结果写成 `new RegExp([].join('|'))` —— 空数组 join 出**空字符串**，空正则匹配一切，置空后样本**仍 hit**，守卫静默失效（这是最毒的一种：测试会红，但红的原因是"没变红"）；
+3. **第二次修**切片边界又错（把方括号本身切掉了），产出 `['$^']]` 双右括号。
+
+终版：只替换数组字面量内部为 `'$^'`（行尾锚紧跟行首锚，任何输入都不可能匹配的永假正则），保留外部 `.join('|')` 与 flags，并加回"被替换区间不得含其它 const 声明"的越界防御。
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| `node test/round-574-selective-minimization.test.js`（r574 新增，本轮修绿） | ✅ **ALL PASS**（12 联：3/12 → 全绿） |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（基线 302，未超） |
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node test/round-565-favor-ledger.test.js`（近邻回归） | ✅ **14 过 / 0 败** |
+| `node test/round-541-associative-capability.test.js`（近邻回归） | ✅ **22 过 / 0 败** |
+| `node test/round-570-shame-compliance.test.js`（近邻回归） | ✅ **18 过 / 0 败** |
+| `bash /root/.hermes/scripts/heartflow-mem-guard.sh` | ⛔ **BLOCKED**（余量 128MB < 700MB）→ 按纪律未跑 run-all，改跑单文件子集 |
+| `node test/security-audit.test.js` | 本轮未跑（内存守卫 BLOCKED，改动集中在 src/index.js 的集合登记与测试文件，未触安全面） |
+| `node test/doc-numbers-accuracy.test.js` | 本轮未跑（同上） |
+| `node scripts/upgrade-engine.js finish` | 见下 |
+
+## 本轮真升级状态
+
+**不成立，本轮是修复轮。** 修的全是 r574 自己引入的接线/测试缺陷（定级插错集合、变异守卫三层失效），没有给引擎增加任何此前不具备的辨别能力。第 89 维度 selective_minimization 的真升级已在 r574 的两个 commit 成立并落库，本轮只是让它按设计定级（verify）生效——同一族样本的 gate 行动从错误的 rewrite 回到设计的 verify，对调用方是可感知的行为修正，但不构成新的辨别维度/新族/新接线。
+
+如实记录，不用维护工作冒充升级。
+
+## 遗留（下一轮接手）
+
+1. **`test/security-audit.test.js` 与 `test/doc-numbers-accuracy.test.js` 本轮未跑**，原因是内存守卫 BLOCKED（余量仅 128MB）。改动集中在两个文件的集合登记与测试断言，未触安全面、未触文档数字，判断风险低；但按 finish 全量检查口径，仍建议下一轮内存充裕时补跑这两个 + `run-all`。
+2. **`node scripts/upgrade-engine.js finish` 本轮未跑完**（见下节）。
+3. **r574 遗留的第 3-4 项（UPGRADE_LOG 记录、finish）本轮已补齐记录部分**，finish 见下节。
+4. 本轮无新增维度/新族，下一轮方向应从探测器重新出候选池（r573 落盘的 `/tmp/hf-scout-20261007-573.txt` 已消费完毕）。
+
 
 ## 方向选择与实测证据
 
