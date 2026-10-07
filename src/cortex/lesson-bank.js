@@ -190,6 +190,54 @@ const lessonBank = {
     );
   },
 
+  /**
+   * [v6.8.22 r599 新增能力] 同一认知盲区的重复折叠。
+   *
+   * 背景：auto_reflection 会把每次低置信/空转都写成一条新记忆，而 insight
+   * 文本里含 think#NNN 与输入前缀，逐字永不重复 → add() 的前缀查重失效。
+   * 实测：160 条 auto_reflection 归一化后唯一形状 = 1（同一个盲区记了
+   * 160 遍），真实知识条目被稀释到 3.6%。
+   *
+   * 行为：按 insightTypes 归一化键找已有的同型累积教训
+   *   - 命中 → frequency++、importance 取 max、lastSeen 刷新（不新增条目）
+   *   - 未命中 → 才新增一条累积教训（作为该盲区的"母本条"）
+   * 返回 action: 'merged' | 'created' | 'noop'
+   */
+  consolidateRepeat({ insightTypes = [], label = '', importance = 3 }) {
+    const types = Array.isArray(insightTypes) ? insightTypes.filter(Boolean) : [];
+    if (types.length === 0) return { action: 'noop', reason: 'empty_insight_types' };
+    const key = types.slice().sort().join('/');
+    const tag = `[盲区累积:${key}]`;
+
+    const existing = this.lessons.find(l =>
+      typeof l.content === 'string' && l.content.startsWith(tag) &&
+      l.trigger === 'auto_reflection');
+    if (existing) {
+      existing.frequency = (existing.frequency || 1) + 1;
+      existing.lastSeen = new Date().toISOString();
+      existing.accessCount = existing.accessCount || 0;
+      existing.importance = Math.max(existing.importance || 1, Math.min(10, Number(importance) || 1));
+      this.save();
+      return { action: 'merged', lesson: existing, hitCount: existing.frequency };
+    }
+
+    const lesson = {
+      id: this._uuid ? this._uuid() : `l-${Date.now()}`,
+      type: 'self_learned',
+      content: `${tag} 该盲区重复出现时改为累加本条频率，不再逐条新增记忆。`,
+      context: label ? `自动反思折叠: ${label}` : '自动反思折叠',
+      importance: Math.min(10, Number(importance) || 3),
+      frequency: 1,
+      accessCount: 0,
+      trigger: 'auto_reflection',
+      createdAt: new Date().toISOString(),
+      lastSeen: new Date().toISOString(),
+    };
+    this.lessons.push(lesson);
+    this.save();
+    return { action: 'created', lesson };
+  },
+
   getRelevant(context, limit = 3) {
     if (!context) return [];
     const ctx = context.toLowerCase();

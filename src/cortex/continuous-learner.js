@@ -150,6 +150,19 @@ class ContinuousLearner {
           if (result.action === 'added' || result.action === 'updated') {
             this._log.autoLessonsGenerated++;
           }
+          // [v6.8.22 r599 补支] 同一认知盲区已重复出现时，不再是「又来一条新
+          // 记忆」——把它折叠成一条累积教训（frequency 递增、重要性上调），
+          // 并把容量让给真正的新盲区。缺这一步时，同一 type 的 insight 会被
+          // 逐字不同地写满记忆库（实测 160 条归一化后唯一形状 = 1）。
+          if (result.action === 'added' && typeof lessonBank.consolidateRepeat === 'function') {
+            try {
+              lessonBank.consolidateRepeat({
+                insightTypes: insights.map(i => i.type),
+                label: `自动反思盲区累积（${insights.map(i => i.type).join('/')}）`,
+                importance: Math.max(...insights.map(i => i.importance)),
+              });
+            } catch (e) { /* 非关键：加固失败不得阻断反思 */ }
+          }
         } catch (e) { /* 非关键 */ }
       }
 
