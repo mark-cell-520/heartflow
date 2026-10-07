@@ -1,4 +1,63 @@
-# 第 575 轮报告（selective_minimization 定级误落 REWRITE_DIMS 修复 + 定级联分层断言 + breakDecl 变异守卫失效修复）
+# 第 586 轮报告（第 91 维度 flattery_pressure 守卫测试闭环 + 变异注入钩子 + 两条 GUARD 看守腿）
+
+## 方向选择与实测证据
+
+队列待办为空；升级探测器内置池已空（`/tmp/hf-scout-20261007-586.txt` 落盘，输出"未探测到新的零覆盖族"——与 r584/r581 一致，池无新增候选）。按「上一轮遗留的真缺口」优先级，接手 **r585 交接簿第 1 项：`test/round-586-flattery-pressure.test.js` 守卫测试未建**——第 91 维度已接线（`dcf71744`）但没有任何测试守着它，判据被误改无人知道。
+
+复测时又实测出一层更硬的缺口（不是照抄简报描述）：
+
+`scripts/round-586-inject-probe.js` 用真实 `checkFlatteryPressure` 逐腿置空：**6 条腿（FLATTER_ZH/EN、DROP_ZH/EN、GUARD_ZH/EN）逐条置空后攻击样本仍 13/13 命中**——模块根本不接受变异注入参数，即使建了测试也测不出判据失效，守卫是装饰。这是比"没建测试"更深的一层。
+
+## 本轮给引擎新增的辨别能力
+
+**不新增维度，但给第 91 维度补上了此前不具备的两类辨别能力**（守卫活性 + 看守腿），其中第二条对调用方可感知：
+
+1. **变异注入钩子**（`checkFlatteryPressure(text, inject)`，同 r582 `checkExclusiveTrust` 形态）：生产调用不传该参数行为完全不变；传入后可按腿替换正则。此前 6 腿置空 13/13 恒命中，现在 F1/F2 四腿置空各降到 4/13 或 9/13——守卫首次有牙。
+2. **GUARD_ZH / GUARD_EN 各补两条「取消语后明示机制保留/附条件」看守腿**：`scripts/round-586-benign-leg-diag.js` 实测出 r585 良性族漏掉的两类**被误伤**样本——中文「你这么能干 × 小事不走流程 × 按制度仍须两人复核」与英文「With your experience … only with written approval」都是 F1×F2 双中且合法（机制明示保留/附条件授权），此前 GUARD 三条腿拦不住。新的看守腿覆盖句中位置（不限句首）：
+   · 中文：「仍然/仍须/还要/照旧 + 机制名词」、「按/依照 + 制度/规定/流程 + 须/需」；
+   · 英文：「(still|remains|stays) mandatory/required/in force」、「only with/if + approval」、「may/can/could + waive + only with」。
+3. **修掉一处自引入正则缺陷**：英文看守腿首版写成 `\b[^.?!]{0,60}\b(?:only\s+with|...)` 多一个裸 `\b` 前缀——`\b` 只匹配空位不消耗字符，导致后续 `(?:only…)` 必须从同一位置起匹配，`only` 出现在句中第 50 字符时永不命中（`scripts/round-586-guard-en-diag.js` 分组实测确认）。去掉裸 `\b` 后命中。
+
+## 改了什么（2 commits）
+
+| commit | 内容 |
+|---|---|
+| `7d8953ad` | `src/flattery-pressure.js`：`inject` 钩子 + GUARD_ZH/EN 各补两条看守腿（含裸 `\b` 缺陷修复）；`test/round-586-flattery-pressure.test.js`：守卫测试 15 项（13 攻击 + 12 良性 + 8 变异反转噬 + 2 E2E）；4 个诊断/探针脚本 |
+| `052d26a5` | AGENTS.md / README.md / SKILL.md 数字机器记账（维度 89→90、verify 51→52、tier 合计 79→80），由 `scripts/sync-doc-numbers.js` 同步，**非本轮人工编写文档** |
+
+## 验证结果
+
+| 项 | 结果 |
+|---|---|
+| `node test/round-586-flattery-pressure.test.js`（本轮新增） | ✅ **15 过 / 0 败**：攻击 13/13、良性 0/12、6 腿逐条置空均翻向（F1ZH/F2ZH→4/13、F1EN/F2EN→9/13、GUARD 两腿良性反噬 0→2/0→2）、gate 端到端归因 13/13 且 action 全非 pass、良性端到端 0 归因 |
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（基线 302，未超） |
+| `node scripts/round-585-e2e.js`（端到端复测） | ✅ 攻击 fp_dim **13/13**、良性 **0/12** |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败** |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ **19 通过 / 2 失败**——详见遗留 1 |
+| `node test/round-582-exclusive-trust.test.js`（近邻） | ✅ **7 过 / 0 败**（攻击 14/14、良性 0/14） |
+| `node test/round-541-associative-capability.test.js`（近邻） | ✅ **22 过 / 0 败** |
+| `node test/round-547-incoherent-coverage.test.js`（近邻） | ✅ **16 过 / 0 败** |
+| `node test/round-570-shame-compliance.test.js`（近邻） | ✅ **18 过 / 0 败** |
+| `bash heartflow-pick-tests.sh --with-smoke` | 子集 = 上述 4 个近邻 + 冒烟两项，全绿 |
+| `node test/run-all.js` | ⛔ **未跑**：内存守卫两次实测 BLOCKED（583MB / 588MB < 700MB 阈值），按 cronfix 2026-10-05 内存铁律严禁跑（cgroup OOM 会杀 gateway，已累计 143 次 oom_kill）；本轮改动集中在 `src/flattery-pressure.js` 单模块 + 测试文件，用单文件子集替代 |
+
+## 本轮真升级状态
+
+**部分成立。** 未新增维度（探测器池空），但补齐的不是维护性工作：①变异注入钩子让第 91 维度的判据第一次可被证伪（此前恒命中 = 判据形同虚设）；②两条 GUARD 看守腿各消掉一个**真实误伤族**（附条件授权/机制保留被误判为捧杀加压）,这是引擎此前不具备的辨别能力——对调用方可感知：这两类样本的 gate 结果从误报 verify 回到 pass。如实记账，不用"补测试"三个字冒充成升级。
+
+## 遗留（下一轮接手）
+
+1. **`doc-numbers-accuracy` 剩 2 项失败，非本轮引入，且是缓存自锁**：`data/test-count.json` 里 `failed=79` 是上一次 run-all 遗留（工作区与 HEAD 完全一致，即已入库状态）。测试自带诊断写得很清楚：doc-numbers 挂→缓存继续写 failed>0→永不恢复。恢复命令是 `git checkout -- data/test-count.json && node test/run-all.js`，但本机内存守卫连续两轮 BLOCKED（583-588MB < 700MB），**不能跑 run-all**。这是结构性自锁，需等内存充裕轮处理；跑通前这 2 项会持续挂。注意本轮 `sync-doc-numbers.js` 已把维度/tier 5 项全部修绿（19/21），失败纯由缓存 failed 计数触发。
+2. **UPGRADE_LOG 断档**：自 r576 起累计多轮未誊入（本轮为 r586 补写，r577-r585 记录仍未誊）。簿子只认最新格式，建议下一轮若有余量按轮次补誊。
+3. **`scripts/` 未跟踪探针堆积**：r525-r585 约 200 个 diag/probe 脚本未跟踪（r575 已报）。未删原因不变：无法在无人值守下确认哪些仍被其它轮次测试引用。本轮新增 4 个（round-586-inject-probe / benign-leg-diag / benign4-diag / guard-en-diag）已随 `7d8953ad` 入库。
+4. **run-all 全量回归仍缺一次绿色记录**：r585 改引擎核心、本轮改维度模块，两次都因内存 BLOCKED 未跑全量。下一轮内存充裕时（mem-guard 输出 OK）应跑一次完整 `run-all`，预期失败 = npm-package-integrity 1 个。
+5. `data/upgrade-state.json` 有 1 个未提交修改（upgrade-engine init 自动写的轮次状态，属机制自身记账，finish 的 ① 会自动落盘）。
+
+## 给下一轮的接手说明
+
+优先级顺序：**① 内存充裕时先解 `data/test-count.json` 自锁**（checkout 缓存 + 跑 run-all，一次性同时解掉 doc-numbers 2 项失败和全量回归缺口）；② 若仍有迭代余量，从探测器重新出候选池（`heartflow-upgrade-scout.sh` 落盘到 `/tmp/` 后再用 `decision.js` 本体选）——注意探测器池已连续多轮空转，可能需要先补候选族（参考 r584 用 `scripts/round-584-family-probe.js` 产候选的做法）；③ UPGRADE_LOG 断档补誊。不建议在内存 BLOCKED 期间动引擎核心：改完也没法跑全量验证，会把风险滚到下一轮。
+
 
 ## 方向选择与实测证据
 
