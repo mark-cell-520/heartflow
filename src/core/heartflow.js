@@ -3054,6 +3054,21 @@ class HeartFlow {
       this._modules['consciousnessSelf'] = this.consciousnessSelf;
     }
 
+    // [r606] valueInternalizer 接线：ValueInternalizer 实例在 L2484 一直在构造
+    // （Ethics Layer，23 个原生方法），但从未进 _modules —— r606 双向核对实测：
+    // _modules 无 'valueInternalizer' 键、ALLOWED_ROUTES 0 条命中、dispatch 23/23
+    // 全抛 'route not allowed'。即「善恶辨别引擎（calculateValueAlignmentScore /
+    // evaluateAction 一票否决 / getDecisionStats 震荡检测）」此前 pipeline 完全不可达。
+    // 注册位置与 r402/r404/r577/r603/r605 同一区块同一时序：LATE_ADDITIONS 循环之后、
+    // generateAllowedRoutes（L4413）之前。注意不重复添加 'valueInternalizer' 键 ——
+    // engine-lifecycle.js 的 subsystemNames 名单里没有它（r606 实测核对过），
+    // 这里是唯一注册点。同轮修掉 3 处判空缺陷（generateBoundaryRequest 的
+    // _boundaryHistory 脏条目、_resolveConflict 的 context 缺省、_recordDecision 的
+    // actionStr/context 缺省），保证接线后逐条 dispatch 不抛。
+    if (this.valueInternalizer && !this._modules['valueInternalizer']) {
+      this._modules['valueInternalizer'] = this.valueInternalizer;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
