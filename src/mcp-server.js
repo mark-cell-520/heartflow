@@ -3837,11 +3837,31 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
 
+  // [r596] 此前硬编码返回 { lessons: [] } —— 引擎侧（v2.0.49 retrieve 相关度主导）
+  // 已由 r595 修好，但调用方拿到的永远是空数组，等于能力不存在。
+  // 改为真调模块级单例 lessonRetrieval（lesson-bank 的 165 条真实教训）。
   heartflow_lesson_search: (args) => {
     try {
-      const { LessonRetrievalEngine } = require('./cortex/lesson-retrieval.js');
-      const lr = new LessonRetrievalEngine({ rootPath: HF_DIR, silent: true });
-      return { lessons: [], note: '教训库检索', timestamp: Date.now() };
+      const { lessonRetrieval } = require('./cortex/lesson-retrieval.js');
+      const q = String(args?.query || args?.q || args?.context || '').trim();
+      if (!q) return { error: 'query 不能为空', lessons: [] };
+      const limit = Math.max(1, Math.min(20, Number(args?.limit) || 5));
+      const hits = lessonRetrieval.retrieve(q, limit) || [];
+      return {
+        query: q,
+        total: hits.length,
+        lessons: hits.map(l => ({
+          id: l.id,
+          type: l.type,
+          importance: l.importance,
+          relevance: l._relevance,
+          content: l.content,
+          context: l.context,
+          trigger: l.trigger,
+          guidance: l.guidance,
+        })),
+        timestamp: Date.now(),
+      };
     } catch (e) { return { error: e.message }; }
   },
 
@@ -4726,12 +4746,18 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
 
+  // [r596] 此前 LessonBankAdapter 传 { rootPath }，而构造函数签名是
+  // (lessonBankInstance) → this.lessonBank 恒 null → search() 的原生检索
+  // 分支永不执行，只剩增强索引一条腿。改为传入真单例 lessonBank。
   heartflow_lesson_bank: (args) => {
     try {
       const { LessonBankAdapter } = require('./cortex/lesson-bank-adapter.js');
-      const lb = new LessonBankAdapter({ rootPath: HF_DIR, silent: true });
-      const r = lb.search ? lb.search(args?.query || '') : {};
-      return { lessons: (r.results || r).slice(0, 10), timestamp: Date.now() };
+      const { lessonBank } = require('./cortex/lesson-bank.js');
+      const lb = new LessonBankAdapter(lessonBank);
+      const q = String(args?.query || args?.q || '').trim();
+      if (!q) return { error: 'query 不能为空', lessons: [] };
+      const r = lb.search(q, { limit: Math.max(1, Math.min(20, Number(args?.limit) || 10)) });
+      return { query: q, total: (r || []).length, lessons: r || [], timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
   },
 
