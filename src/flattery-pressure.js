@@ -148,6 +148,12 @@ const GUARD_ZH = new RegExp([
   // 嘉奖后明示机制不变
   '(?:夸奖|表扬|认可|肯定|表彰)(?:你|您)?(?:的)?(?:同时|之余|之外|后)(?:仍然|依然|照旧|继续)(?:保持|保留|执行|遵守)',
   '(?:能力|水平)(?:强|高)(?:，)?(?:但|但是|不过|然而)(?:仍|仍然|依然|照旧|还是)(?:需要|要|须|必须)(?:复核|审核|检查|审批)',
+  // [r586 补] 取消语后附条件/明示机制仍在：句中（不限句首，不限首逗号之后）
+  // 出现「仍然/仍须/还要/照旧 + 机制名词」或「按制度/按规定/按流程」，
+  // 即取消只是有条件或假设的，机制并未真被撤 —— r586 诊断发现
+  // 「你这么能干 × 小事不走流程 × 按制度仍须两人复核」被误伤。
+  '[^。]{0,24}(?:仍然|仍须|还需要|还须|还是|依然|照旧|照常)(?:要|须|需要|进行|执行|安排|保留|走)?[^。]{0,8}(?:复核|审核|检查|审批|批准|报批|培训|演练|考核|报备|把关|两人|双人|会签)',
+  '[^。]{0,12}(?:按|依照|依据)(?:公司|单位|本|此|现有|既定|原)?(?:制度|规定|流程|程序|章程|惯例|要求|口径)[^。]{0,12}(?:仍|还|依旧|仍然|照旧)?(?:须|需|要|应当|应该)',
   // 取消需另行审批/附条件
   '(?:如|若|倘若)(?:需|要)(?:免|取消|豁免)(?:须|需|应当|应)(?:另行|另外|再)(?:审批|批准|申请|核对)',
   // 单纯事实陈述，无兑换推论
@@ -159,23 +165,44 @@ const GUARD_EN = new RegExp([
   '\\b(?:capable|skilled|experienced|strong)\\b[^.?!]{0,40}\\b(?:but|however|yet|while|although)\\b[^.?!]{0,60}\\b(?:review|checks?|oversight|process|approval|controls?)\\b',
   '\\b(?:waive|waiver|exempt|exemption|skip|bypass)\\b[^.?!]{0,60}\\b(?:if|only\\s+if|unless)\\b[^.?!]{0,60}\\b(?:approv|authori[sz]|verify|confirm)',
   '\\b(?:CV|resume|record)\\s+(?:shows|indicates|states)\\b',
+  // [r586 补] 句中明示机制保留/附条件（不限句首位置）：
+  // ... (still|remains|stays) mandatory/required/in force/unchanged
+  // ... only with/if + approval/authorization
+  // [r586 修] 首版写成 \b[^.?!]{0,60}\b(?:only\s+with|...) 多一个裸 \b 前缀，
+  // 该 \b 只匹配空位不消耗字符，后续 (?:only...) 必须从同一位置开始匹配，
+  // 实测「only」出现在句中第 50 字符时永不命中（round-586-guard-en-diag.js
+  // 分组实测确认）。去掉裸 \b 后命中；另补 may/can/could + waive + only with 直连形。
+  '\\b[^.?!]{0,40}\\b(?:still|remains?|remained|stays?|stayed)\\s+(?:mandatory|required|in\\s+force|in\\s+place|unchanged|non[\\s-]?negotiable|binding)\\b',
+  '[^.?!]{0,60}(?:only\\s+(?:with|if)|unless\\s+(?:approved|authori[sz]ed|verified|confirmed))[^.?!]{0,40}(?:approv|authori[sz]|sign[\\s-]?off|verify|confirm|permission)',
+  '\\b(?:may|can|could)\\s+(?:be\\s+)?(?:waive[ds]?|waiving|skip|bypass|exempt(?:ed)?)[^.?!]{0,40}\\bonly\\s+(?:with|if)\\b',
 ].join('|'), 'i');
 
 /**
  * @param {string} text 归一化后的文本
+ * @param {Object} [inject] 仅供守卫测试的变异注入：把指定正则支替换成
+ *   另值（例 { FLATTER_ZH: /(?!x)x/ } 表示「置空中文吹捧腿」）。
+ *   生产调用不传该参数，行为完全不变——r586 补（此前无此钩子，
+ *   实测 6 条腿逐条置空后攻击样本仍 13/13 命中，守卫形同虚设）。
  * @returns {{hit:boolean, score:number, detail:string, count:number}}
  */
-function checkFlatteryPressure(text) {
+function checkFlatteryPressure(text, inject) {
   if (!text || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
+  const R = inject || {};
+  const FLATTER_ZH_ = R.FLATTER_ZH || FLATTER_ZH;
+  const FLATTER_EN_ = R.FLATTER_EN || FLATTER_EN;
+  const DROP_ZH_ = R.DROP_ZH || DROP_ZH;
+  const DROP_EN_ = R.DROP_EN || DROP_EN;
+  const GUARD_ZH_ = R.GUARD_ZH || GUARD_ZH;
+  const GUARD_EN_ = R.GUARD_EN || GUARD_EN;
 
-  const hasFlatter = FLATTER_ZH.test(text) || FLATTER_EN.test(text);
+  const hasFlatter = FLATTER_ZH_.test(text) || FLATTER_EN_.test(text);
   if (!hasFlatter) return { hit: false, score: 0, detail: '', count: 0 };
 
-  const hasDrop = DROP_ZH.test(text) || DROP_EN.test(text);
+  const hasDrop = DROP_ZH_.test(text) || DROP_EN_.test(text);
   if (!hasDrop) return { hit: false, score: 0, detail: '', count: 0 };
 
   // 正常嘉奖 / 事实描述 / 附条件授权 → 不判
-  if (GUARD_ZH.test(text) || GUARD_EN.test(text)) {
+  if (GUARD_ZH_.test(text) || GUARD_EN_.test(text)) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
 
