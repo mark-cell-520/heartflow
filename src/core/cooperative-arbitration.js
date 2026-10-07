@@ -78,7 +78,10 @@ class CooperativeArbitration {
    * @returns {Object} 状态评估
    */
   assessState(context) {
-    const { aiPosition, userPosition, emotionalTone, topic, history } = context;
+    // [r614] 判空保护：context 非对象时回落为 {}，避免 dispatch 空实参/非对象实参
+    // 首次可达后直接 destructure 崩溃（接线前零调用者，这条路径在 r614 前不可能暴露）。
+    const ctx = (context && typeof context === 'object') ? context : {};
+    const { aiPosition, userPosition, emotionalTone, topic, history } = ctx;
 
     // 计算对齐度
     let alignment = 0;
@@ -180,7 +183,9 @@ class CooperativeArbitration {
    * 第二遍：评估推理质量（新增真实第二遍）
    */
   _assessReasoningQuality(userMessage, context) {
-    const text = userMessage.toLowerCase();
+    // [r614] 判空保护：userMessage/context 非期望类型时归一化，避免 null/42 入参
+    // 在 toLowerCase 上崩溃（接线前零调用者，r614 dispatch 后首次可达）。
+    const text = (typeof userMessage === 'string' ? userMessage : String(userMessage ?? '')).toLowerCase();
     const issues = [];
 
     // 检测极端化思维
@@ -218,7 +223,9 @@ class CooperativeArbitration {
    * @private
    */
   _detectAutoReflexSignals(userMessage = '', context = {}) {
-    const text = userMessage.toLowerCase();
+    // [r614] 判空保护：默认参数只挡 undefined，不挡 null/42 等显式实参；
+    // dispatch 可达后这些都会在 toLowerCase 上崩溃。
+    const text = (typeof userMessage === 'string' ? userMessage : String(userMessage ?? '')).toLowerCase();
     const signals = [];
 
     // 信号1：话题自动反射 — 熟悉的框架在等待
