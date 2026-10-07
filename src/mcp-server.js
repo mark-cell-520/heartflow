@@ -3547,8 +3547,14 @@ const HANDLERS = {
     if (action === 'process') {
       if (!text) return { error: 'process 需要 text（空输入会走早退分支，拿到的是占位应答而非五层结果）' };
       const r = await ae.process(text, {});
-      const tr = ae.getLastProcessing ? ae.getLastProcessing() : null;
-      const layers = tr && tr[0] && tr[0].layers ? tr[0].layers : {};
+      // r572 修正：五层数据在 process() 返回的 r.internal.layers 里。
+      // 此前读 ae.getLastProcessing()[0].layers —— 那个键不存在（getLastProcessing
+      // 返回的是扁平 L1_associations/L2_chunks/... 键），导致所有字段恒为 null，
+      // 即「看起来接线成功、实际拿到全 null」的假接线。getLastProcessing 仅作
+      // coherence/degraded 的补充来源，扁平键与内部键双保险。
+      const tr = ae.getLastProcessing ? (ae.getLastProcessing()[0] || null) : null;
+      const layers = (r && r.internal && r.internal.layers) || {};
+      const internal = (r && r.internal) || {};
       const L1 = layers.L1 || null;
       return {
         action,
@@ -3557,12 +3563,17 @@ const HANDLERS = {
         narrativeConfidence: (layers.L3 && typeof layers.L3.confidence === 'number') ? layers.L3.confidence : null,
         coreConcepts: (L1 && L1.allAssociations) ? L1.allAssociations.slice(0, 20).map(a => a.word) : [],
         phraseChunks: (layers.L2 && layers.L2.chunks) ? layers.L2.chunks.slice(0, 20) : [],
-        coherence: (tr && tr[0] && tr[0].coherence) || null,
-        layerStatuses: (tr && tr[0] && tr[0].layers) ? Object.fromEntries(
-          Object.entries(tr[0].layers).filter(([k]) => /Status$/.test(k))
-        ) : null,
+        coherence: internal.coherence || (tr && tr.coherence) || null,
+        layerStatuses: {
+          L1: layers.L1Status || null,
+          L2: layers.L2Status || null,
+          L3: layers.L3Status || null,
+          L4: layers.L4Status || null,
+          L5: layers.L5Status || null,
+        },
+        degraded: !!(internal.degraded || (tr && tr.degraded)),
         response: (layers.L5 && layers.L5.response) || (r && r.response) || null,
-        processingTime: (tr && tr[0] && tr[0].totalTime) || null,
+        processingTime: (r && r.processingTime) || (tr && tr.processingTime) || null,
         timestamp: Date.now(),
       };
     }
