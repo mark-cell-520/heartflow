@@ -4792,14 +4792,42 @@ class HeartFlow {
     for (const [name, mod] of Object.entries(this._modules)) {
       let methods = [];
       try {
+        // [r601] 函数式导出模块（module.exports = { methodA, methodB }）的 proto
+        // 就是 Object.prototype —— 原来的 `proto && proto !== Object.prototype`
+        // 守卫会把整个模块跳过，退回 Object.keys(mod)。而对象字面量模块的
+        // own enumerable 属性里混着 data 字段（lessons/version/_walLog），
+        // 方法虽然在 own property 里，却与字段混在一起、且 `false` 的
+        // `!methods.length` 判据让 fallback 只取构造函数噪声 → 实测
+        // table['lesson'] 恒为 []。
+        //
+        // lessonBank 实测是对象字面量（src/cortex/lesson-bank.js L23
+        // `const lessonBank = {...}` → module.exports = { lessonBank }），
+        // consolidateRepeat/add/search 全部是 own 方法。修复后
+        // hf.routes() 的 lesson.* 从 0 条恢复为可见路由，
+        // 「ALLOWED_ROUTES 里有、routes() 看不见」的接口面不一致被消除。
+        //
+        // 兼容点：原逻辑对 class 实例仍走原型链分支，行为不变；
+        // 对非 prototype 继承链的模块（如 .bind() 生成的对象）也无影响，
+        // 因为它们 Object.keys(mod) 本身就是空数组。
         const proto = Object.getPrototypeOf(mod);
-        if (proto && proto !== Object.prototype) {
-          methods = Object.getOwnPropertyNames(proto).filter(m => m !== 'constructor' && typeof mod[m] === 'function');
+        if (proto && proto !== Object.prototype && typeof proto === 'object') {
+          methods = Object.getOwnPropertyNames(proto)
+            .filter(m => m !== 'constructor' && typeof mod[m] === 'function');
         }
       } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'strict mode or primitive' }, MAX_HISTORY_SIZE); }
-      if (!methods.length) {
-        methods = Object.keys(mod).filter(k => typeof mod[k] === 'function');
+
+      // own 方法：与原型链求并集（不是二选一）。对象字面量模块走这里，
+      // 下划线开头（_uuid/_writeWAL/_recoverFromWAL）按 dispatch 约定不算公有 API。
+      if (mod && typeof mod === 'object' && !Array.isArray(mod)) {
+        try {
+          const ownMethods = Object.keys(mod).filter(k => typeof mod[k] === 'function' && !k.startsWith('_'));
+          if (ownMethods.length) {
+            const merged = new Set([...methods, ...ownMethods]);
+            methods = [...merged];
+          }
+        } catch (e2) { /* own 属性枚举失败不阻断 */ }
       }
+
       table[name] = methods;
     }
     // [v6.7.74] 标注可达性：routes() 过去返回的名字大量不在
