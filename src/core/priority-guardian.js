@@ -30,17 +30,24 @@ class PriorityGuardian {
    * 
    * @returns {Object} { allowed, conflicts, path, reason }
    */
-  check(context = {}) {
-    const { userIntent = '', action = '', humanProgress = {} } = context;
-    
+  check(context) {
+    // [r615] 判空保护：dispatch 接线后本方法首次可被外部以任意实参调用。
+    // 原实现 `check(context = {})` 的默认值只在 undefined 时生效，传 null 时
+    // 解构直接抛 TypeError；humanProgress 传 null 时下方四条 critical 腿的
+    // `humanProgress.truthValue` 访问同样抛。接线前全仓只有 think() 一个内部
+    // 调用点且恒传字面量对象，这两类入参不可能出现，缺陷不可达。
+    const ctx = (context && typeof context === 'object') ? context : {};
+    const { userIntent = '', action = '', humanProgress = {} } = ctx;
+    const progress = (humanProgress && typeof humanProgress === 'object') ? humanProgress : {};
+
     // 第一层：识别冲突
-    const conflicts = this.detectConflicts(userIntent, action, humanProgress);
-    
+    const conflicts = this.detectConflicts(userIntent, action, progress);
+
     // 第二层：如果有冲突，启动守护逻辑
     if (conflicts.length > 0) {
-      return this.resolveWithGuardianPriority(conflicts, context);
+      return this.resolveWithGuardianPriority(conflicts, ctx);
     }
-    
+
     // 第三层：无冲突时，允许执行但记录人类进步方向
     return {
       allowed: true,
