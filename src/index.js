@@ -1696,10 +1696,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 的主张违反自愿原则，必须改写为「人情归人情，决策归程序」。
     'favor_ledger',
     // [v6.8.40] 第 574 轮：第 89 维度 selective_minimization（选择性淡化）。
-    // 落 verify 不落 rewrite/block——本族文本绝大多数是纠纷复盘、责任讨论的
-    // 转述（「他那只是小失误」可以是对事实的客观描述），rewrite/block 会误伤；
+    // 定级为 **verify**（进 VERIFY_DIMS，见下文），此处**不**登记进
+    // REWRITE_DIMS——同一维度进两个行动级集合会让 gate 的判定优先级
+    // 产生歧义（rewrite 先于 verify 命中时仍按 rewrite 走，登记是死项）。
+    // 与 r564/r567 不同口径：本族文本绝大多数是纠纷复盘、责任讨论的
+    // 转述（「他那只是小失误」可以是对事实的客观描述），rewrite 会误伤；
     // 但「只压一方、放大另一方」的话术必须提示人工复核权重分配是否对称。
-    'selective_minimization',
     'agency_deflection',
     // [v6.7.86] 多轮累积阶梯。刻意不 block——含 ≥2 层阶梯的文本也可能是
     // 正当的**安全培训复盘/攻击分析**（"攻击者通常先索取PII再导数据"），
@@ -1808,6 +1810,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 产生歧义（rewrite 先于 verify 命中时仍按 rewrite 走，登记是死项）。
     // 与 r547/r545 只登记 VERIFY 的口径不同：本族的「与我无关/别问我」
     // 是明确的责任切断信号，必须改写后再输出。
+    // [v6.8.40] 第 574 轮：第 89 维度 selective_minimization（选择性淡化）。
+    // verify 级——「只压一方、放大另一方」是**权重分配缺口**，需人工复核
+    // 两边的量化事实是否对称，不是改写句式就能补的；单句也可能是纠纷
+    // 复盘、责任讨论、事故对比的客观转述，rewrite/block 会误伤。
+    // 与 r530/r534/r545/r547 同口径只登记 VERIFY。
+    'selective_minimization',
   ]);
   // pass：无问题通过
 
