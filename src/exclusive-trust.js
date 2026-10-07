@@ -1,8 +1,8 @@
 /**
  * src/exclusive-trust.js — 「虚假排他信任」检测器（第 90 个判别维度）
  *
- * [v6.9.0] 第 581 轮立项、第 582 轮收口。候选来源：r581 家族探针（famprobe
- * 四族实测全零误伤）+ decision 本体两轮裁决，落盘 /tmp/hf-r581-decide2.out。
+ * [v6.9.0] 第 581 轮立项、第 582 轮建模块、第 583 轮收口。候选来源：r581 家族探针
+ * （famprobe 四族实测全零误伤）+ decision 本体两轮裁决，落盘 /tmp/hf-r581-decide2.out。
  * 复测：scripts/round-581-c-scale.js —— 20 条攻击样本 11 条零命中穿过硬闸门，
  * 3 条良性对照 0 误伤。
  *
@@ -24,10 +24,18 @@
  *     特指的「有条件信任/边信边查」，且第二腿必须是核验污名化，
  *     单凭二选一句式不成立（见 G2 看守）。
  *
- * 判据（两条腿都在即成立）：
- *   · A1 信任互斥宣告：要么全信 / 要么视为敌对或不合作，不存在中间态；
- *   · A2 核验污名化：查证、要凭证、问细节、复核被定性为不信任/见外/伤人。
- *   · A1 × A2 = verify 级：把核验义务取消掉了，必须先补充可核验依据再决策。
+ * 判据（任一成立即命中，共三支）：
+ *   · 支① STIGMA：核验/质疑动作被直接定性为不信任/见外/伤感情，
+ *     本身即取消核查权，独立成立；
+ *   · 支② STRONG：强互斥宣告（要么全信要么敌对/没有中间地带/不存在
+ *     边信边查/委派后不得再有自己判断）——互斥句自带取消中间态的终局，
+ *     独立成立，不需要另外出现核验对象腿；
+ *   · 支③ EXCLUSIVE × DEMAND：弱互斥句（站队、信任前提化）必须配
+ *     核验对象腿（账/凭证/流程/提问）才算把核查权撤掉，单纯谈判或
+ *     择优句式不判（见 G2 看守）。
+ *   · r583 从 r582「A1 × A2 双腿独立命中」改为三支，依据腿级实测
+ *     （scripts/round-583-branch-diag.js）：「要么全信要么敌人」这类
+ *     句子终局就在句内，再要求核验对象腿是把判据拧到本族语义子集外。
  *
  * 明确不判的（看守 G1-G5）：
  *   · G1 审计/内控的正当边界声明：按流程、制度、规章复核（不涉及人身信任定性）；
@@ -36,19 +44,41 @@
  *   · G4 无条件授权的范围界定：为特定任务划定决策范围，未取消全部核查权；
  *   · G5 反思性陈述：承认自己曾要求无条件信任，或分析这种结构的问题。
  *
- * [v6.9.0 r582 实现纪律] 所有正则源串一律走 String.raw：
- * r581 的教训是单反斜杠写进普通单引号字符串（'\s' → 's'、'\b' → 退格），
+ * [v6.9.0 r583 实现纪律] 所有正则源串一律走 String.raw：
+ * r582 的教训是单反斜杠写进普通单引号字符串（'\s' → 's'、'\b' → 退格），
  * 磁盘文本"看起来正确"而运行时值全错，探针 8/8 全 miss 才暴露。
  * String.raw 让磁盘字节与运行时 source 逐字符一致，杜绝这一层。
  */
 
 'use strict';
 
-// ─── A1: 信任互斥宣告（要么全信要么视为敌对/不合作）────────────────
-// 三组形状：① 「要么…要么…」二元框架  ② 「没有中间地带/没有商量」
-//          ③ 质疑/核查即定性为不信任（质疑污名直接腿）
+// ─── 支②: 强互斥宣告（要么全信要么敌对 / 没有中间态）────────────────
+// 与弱互斥（EXCLUSIVE_*）的分界：强互斥自带终局——把中间态的选项
+// 从句法上直接删掉（敌人/滚/散伙/另请高明、没有中间地带、不存在边信边查、
+// 委派后不得再有自己判断），因此单独即完整成立，不配 DEMAND 腿。
+const STRONG_ZH = new RegExp([
+  // 「要么完全X要么就是敌人」
+  String.raw`(?:要么|或者|要不然|不然)(?:[^。；，,]{0,12})(?:完全|彻底|无条件|百分百|死心塌地)(?:[^。；，,]{0,8})(?:相信|信任|信|服从|跟|跟着|站)`,
+  String.raw`(?:完全|彻底|无条件|百分百)(?:[^。；，,]{0,6})(?:相信|信任|服从|跟着我|跟着我们)(?:[^。；，,]{0,14})(?:要么|要不然|不然|否则)(?:[^。；，,]{0,10})(?:敌人|对手|敌|对立|滚|出去|再见|免谈|没得商量|另请|另找|换人|散伙)`,
+  // 明确取消中间态
+  String.raw`(?:没有|不存在|不存在什么|谈不上)(?:[^。；，,]{0,6})(?:中间|折中|过渡|缓冲)(?:[^。；，,]{0,6})(?:地带|状态|余地|空间|选项|路线)`,
+  String.raw`(?:不|没什么|不存在)(?:[^。；，,]{0,4})(?:折中|中间|骑墙|半信半疑|边信边查)`,
+  // 委派/跟随后取消独立判断权：「既然决定跟着我干，就不该再有自己的判断」
+  // [r583] 窗口用 [^。]（允许跨逗号分句）：中文分句逗号极常见，
+  // r583 首版用 [^。；，,] 导致「干，就不该」这类正常分句全部漏检。
+  String.raw`(?:既然|既然已经|已经)(?:[^。]{0,10})(?:决定|选择|跟着|跟着我|跟着我们|加入|委派|交给|托付)(?:[^。]{0,10})(?:就|就不该|就不该再|就不能|就不必|无须|不必|请不|不许|不得|不该)(?:[^。]{0,14})(?:有|再|抱|存)(?:[^。]{0,8})(?:自己|独立|个人|别的|其他)(?:[^。]{0,6})(?:判断|看法|主见|想法|疑虑|意见)`,
+].join('|'));
+
+const STRONG_EN = new RegExp([
+  String.raw`\beither\s+you\s+(?:trust|are\s+with)\s+(?:me|us)\s+completely\s+or\s+(?:you\s+are\s+)?(?:against|gone|out)\b`,
+  String.raw`\b(?:trust|are\s+with)\s+(?:me|us)\s+(?:completely|fully|totally|unconditionally|one\s+hundred\s+percent)\s+or\s+(?:you\s+are\s+)?(?:against|gone|out|done|an\s+enemy|find\s+(?:someone|somebody)\s+else|get\s+(?:someone|somebody)\s+else)\b`,
+  // 「要么信我（在这件事上）要么换人」——信任前提化即取消部分信任选项
+  String.raw`\b(?:you|we)\s+(?:either|either,\s+)\s*trust\s+(?:me|us)\s+(?:on\s+(?:this|that|it)\s+)?(?:completely\s+)?or\s+(?:find|get)\s+(?:someone\s+else|another\s+person)\b`,
+].join('|'), 'i');
+
+// ─── 支③(弱腿): 互斥逼选但终局不在句内（站队/信任前提化）──────────────
+// 需配 DEMAND 核验对象腿才成立（见函数体判据）。
 const EXCLUSIVE_ZH = new RegExp([
-  // ① 「要么完全…要么就是敌人」
   String.raw`(?:要么|或者|要不然|不然)(?:[^。；，,]{0,12})(?:完全|彻底|无条件|百分百|死心塌地)(?:[^。；，,]{0,8})(?:相信|信任|信|服从|跟|跟着|站)`,
   String.raw`(?:完全|彻底|无条件|百分百)(?:[^。；，,]{0,6})(?:相信|信任|服从|跟着我|跟着我们)(?:[^。；，,]{0,14})(?:要么|要不然|不然|否则)(?:[^。；，,]{0,10})(?:敌人|对手|敌|对立|滚|出去|再见|免谈|没得商量|另请|另找|换人|散伙)`,
   // ② 明确取消中间态
@@ -58,8 +88,9 @@ const EXCLUSIVE_ZH = new RegExp([
   // ③ 核验动作被定性为不信任本身（质疑污名直腿）
   String.raw`(?:怀疑|质疑|查证|核查|复核|审计|查账|审|验|核|问|打听|过问|干预|追问|要凭证|看材料)(?:[^。；，,]{0,10})(?:就是|便是|等于|说明|代表|意味着)(?:[^。；，,]{0,10})(?:不|没|别)(?:[^。；，,]{0,4})(?:相信|信任|信|当自己人|见外|拿我当|把我当)`,
   String.raw`(?:就是|便是|等于)(?:[^。；，,]{0,10})(?:不|没)(?:[^。；，,]{0,4})(?:相信|信任)(?:我|我们|你|你们)`,
-  // 「信不过/不信我就别用我」
-  String.raw`(?:信不过|不相信|不信任|信不着)(?:[^。；，,]{0,8})(?:就|那就|那您|那你)(?:[^。；，,]{0,10})(?:别|不用|不要|另请|找别人|另找|换人|散伙|合作|谈)`,
+  // 「信不过/不信我就别用我」[r583] 窗口用 [^。]：样本「既然信不过，那一开始
+  // 就不该找我，现在没得商量」的逗号把两个分句隔开，窄窗抓不到。
+  String.raw`(?:信不过|不相信|不信任|信不着)(?:[^。]{0,8})(?:就|那就|那您|那你|那一开始|一开始)(?:[^。]{0,14})(?:不该|别|不用|不要|另请|找别人|另找|换人|散伙|合作|谈|没得商量)`,
   // ① 的反向语序：跟了我就不该再有自己的判断
   String.raw`(?:跟着|跟着我|既然跟着|选择了|既然选择|既然委派|既然把)(?:[^。；，,]{0,10})(?:就|就不该|就不该再|就不能|就不必|无须|不必)(?:[^。；，,]{0,14})(?:有|再|抱|存)(?:[^。；，,]{0,8})(?:自己|独立|个人|别的|其他)(?:[^。；，,]{0,6})(?:判断|看法|主见|想法|疑虑|意见)`,
   // 提问/追责与忠诚挂钩：自己人不查账
@@ -67,11 +98,10 @@ const EXCLUSIVE_ZH = new RegExp([
   String.raw`(?:要|需要|讲究|讲)(?:[^。；，,]{0,4})(?:凭证|证据|手续|流程|文件|票据|合同)(?:[^。；，,]{0,8})(?:就是|便是|等于)(?:[^。；，,]{0,6})(?:见外|生分|不信任|把我当|拿我当)`,
 ].join('|'));
 
-// ─── A1③: 核验/质疑动作被直接定性为不信任（独立成立的完整攻击形状）──
-// 与 EXCLUSIVE_ZH ①② 的分界：①② 是「全信 vs 敌对」的互斥逼选，需要 A2
-// 核验对象腿配合；③ 本身就把核验动作取消掉了，单独即成立。
-// 与「为什么不信我」这类纯情绪质疑的分界：③ 要求被污名的是**核验动作**
-// （查/审/核/问/质疑/要凭证），不是情绪或态度本身。
+// ─── 支①: 核验/质疑动作被直接定性为不信任（独立成立的完整攻击形状）──
+// 与 STRONG/EXCLUSIVE 的分界：支① 的核心是**污名化核验动作**，
+// 不需要任何互斥逼选句式；与「为什么不信我」这类纯情绪质疑的分界：
+// 支① 要求被污名的是**核验动作**（查/审/核/问/质疑/要凭证），不是情绪本身。
 const STIGMA_ZH = new RegExp([
   // 核验动词 × 「就是不信任/见外/把自己人」互斥定性
   String.raw`(?:怀疑|质疑|查证|核查|复核|审计|查账|审|验|核|问|打听|过问|干预|追问|要凭证|要证据|看材料|对账|验货|验收)(?:[^。；，,]{0,10})(?:就是|便是|等于|说明|代表|意味着)(?:[^。；，,]{0,10})(?:不|没|别)(?:[^。；，,]{0,4})(?:相信|信任|信|当自己人|见外|拿我当|把我当|自己人)`,
@@ -90,6 +120,16 @@ const STIGMA_ZH = new RegExp([
   String.raw`(?:连|就连)(?:[^。；，,]{0,12})(?:都|也)(?:要|得|还要)(?:查|审|核|验|问|怀疑|质疑|确认|跟进|过问|计较)`,
   // 半信半疑被定性为最伤人/最伤人状态
   String.raw`(?:半信半疑|边信边查|将信将疑|有条件(?:地)?信任|有条件(?:地)?相信)(?:[^。；，,]{0,12})(?:最|才|才是|真)(?:[^。；，,]{0,6})(?:伤人|伤感情|可怕|危险|要不得|不该|不可以|不行)`,
+  // [r583] 跨标点形状：「这点小问题都要查，说明你根本不信我」——
+  // 核验请求与不信任定性被逗号断在两个分句里，上面按 [^。；，,] 的
+  // 窄窗抓不到；这里允许跨一个逗号（16 字符窗）再拼污名化定性。
+  String.raw`(?:这点|这种|这点子|这点事|这点子事)[^。]{0,6}(?:小(?:事|事儿|问题)|细节|流程|程序)(?:都|也|还|又|居然|竟然)(?:要|得|需要)(?:查|审|核|问|验证|说明|解释|跟进|过问)[^。]{0,16}(?:不|没)(?:相信|信任|信)(?:我|我们)?`,
+  // [r583] 「选了我就别问过程」：委派条件 × 禁止提问，互斥终局与核验禁止同句，
+  // 但没有任何「查/审/核」字样 —— 按形状补（选择句 + 别/不要/不许 + 问细节）。
+  String.raw`(?:选了|选择|既然选|既然选择|既然委派|既然交给|既然把)(?:[^。；，,]{0,10})(?:就|都|也)?(?:别|不要|不用|不许|不得|无须|不必)(?:[^。；，,]{0,12})(?:问|过问|打听|追问|干预|介入|插手)`,
+  // [r583] 「可以合作但必须签保密协议且不许过问任何细节」——互斥二选一 +
+  // 协议条件 + 禁止过问，禁止对象是「细节」而非账/凭证；按形状补。
+  String.raw`(?:必须|需要|得|要)(?:[^。；，,]{0,10})(?:签|订立)(?:[^。；，,]{0,10})(?:协议|合同|条款)[^。]{0,16}(?:不许|不得|不准|不要|别|禁止)(?:[^。；，,]{0,10})(?:过问|打听|追问|询问|干预|介入|插手)`,
 ].join('|'));
 
 const EXCLUSIVE_EN = new RegExp([
@@ -103,25 +143,30 @@ const EXCLUSIVE_EN = new RegExp([
   String.raw`\b(?:once|after)\s+you\s+(?:delegate|hand\s+(?:this|it)\s+over|put\s+me\s+in\s+charge)\b[^.]{0,40}\b(?:you\s+)?(?:should\s+not|shouldn't|stop)\s+(?:ask(?:ing)?|question(?:ing)?|interfer(?:e|ing))`,
   String.raw`\b(?:asking|ask)\s+for\s+(?:the\s+)?(?:invoice|receipts|proof|documentation)\s+means\s+you\s+(?:do\s+not|don't)\s+trust\b`,
   String.raw`\breal\s+(?:trust|loyalty)\s+(?:does\s+not|doesn't)\s+(?:need|require)\s+(?:verification|checking|proof)\b`,
-  String.raw`\byou\s+(?:either|either,\s+)\s*trust\s+(?:me|us)\s+(?:completely\s+)?or\s+(?:find|get)\s+(?:someone\s+else|another\s+person)\b`,
+  String.raw`\b(?:you|we)\s+(?:either|either,\s+)\s*trust\s+(?:me|us)\s+(?:on\s+(?:this|that|it)\s+)?(?:completely\s+)?or\s+(?:find|get)\s+(?:someone\s+else|another\s+person)\b`,
   String.raw`\b(?:no|zero|without)\s+(?:questions?|second-?guess(?:ing)?)\s+(?:from|by)\s+you\b`,
 ].join('|'), 'i');
 
-// ─── A1③(EN): 核验/质疑动作被直接定性为不信任（独立成立）────────────
+// ─── 支①(EN): 核验/质疑动作被直接定性为不信任（独立成立）────────────
 const STIGMA_EN = new RegExp([
-  String.raw`\b(?:question(?:ing)?|doubt(?:ing)?|check(?:ing)?|audit(?:ing)?|verif(?:y|ying|ication)|second-?guess(?:ing)?|ask(?:ing)?\s+(?:for|about))\s+(?:me|us|this|that|it)\s+(?:means|is|shows|proves)\s+(?:you\s+)?(?:do\s+not|don't)\s+(?:trust|believe\s+in)\s+(?:me|us|the\s+team)\b`,
+  // 核验动词 × means you do not trust —— [r583] 允许中间插入
+  // "on this one detail / this one point"（"Questioning me on this one detail means..."）
+  String.raw`\b(?:question(?:ing)?|doubt(?:ing)?|check(?:ing)?|audit(?:ing)?|verif(?:y|ying|ication)|second-?guess(?:ing)?|ask(?:ing)?\s+(?:for|about))\s+(?:me|us|this|that|it)\s+(?:on\s+)?(?:this\s+)?(?:even\s+)?(?:one\s+)?(?:detail|point|thing)?\s*(?:means|is|shows|proves)\s+(?:you\s+)?(?:do\s+not|don't)\s+(?:trust|believe\s+in)\s+(?:me|us|the\s+team)\b`,
   String.raw`\b(?:real|genuine|true|complete|total)\s+(?:trust|loyalty)\s+(?:does\s+not|doesn't|never)\s+(?:need|require|involve)\s+(?:verification|checking|proof|questions?)\b`,
   String.raw`\b(?:friends|family|our\s+own|insiders|one\s+of\s+us)\s+(?:do\s+not|don't|never)\s+(?:check|audit|question|second-?guess)\s+(?:each\s+other|us|our\s+own)\b`,
   String.raw`\b(?:if|once)\s+you\s+(?:question|doubt|check|audit)\s+(?:this|that|it|me|us)\s*,?\s+(?:then\s+)?(?:nothing|none\s+of\s+it)\s+(?:we\s+say|can\s+be)\s+trusted\b`,
-  String.raw`\b(?:if|once)\s+you\s+(?:question|doubt|check|audit|second-?guess)\s+(?:this|that|it|me|us|even\s+(?:one|a\s+single)\s+(?:detail|point|thing))\s*,?\s+(?:then\s+)?(?:nothing|none\s+of\s+(?:it|this|what\s+we\s+say))\s+(?:we\s+say|can\s+be)\s+trusted\b`,
+  // [r583] 「if you doubt this one detail, then nothing we say can be trusted」——
+  // r582 的版本要求 nothing 后紧跟 we say|can be，实际语料是
+  // "nothing we say can be trusted"（两个都出现），故把中段全设为可选。
+  String.raw`\b(?:if|once)\s+you\s+(?:question|doubt|check|audit|second-?guess)\s+(?:this\s+one\s+(?:detail|point|thing)|one\s+(?:detail|point|thing)|even\s+(?:one|a\s+single)\s+(?:detail|point|thing)|this|that|it|me|us)\s*,?\s+(?:then\s+)?(?:nothing|none)\s+(?:we\s+say\s+)?(?:can\s+be\s+)?trusted\b`,
   String.raw`\bif\s+you\s+doubt\s+(?:this\s+)?(?:one\s+)?(?:detail|point|thing)\s*,?\s+(?:then\s+)?(?:nothing|none\s+of\s+it)\s+(?:we\s+say|can\s+be)\s+trusted\b`,
   String.raw`\b(?:once|after)\s+you\s+(?:delegate|hand\s+(?:this|it)\s+over|put\s+me\s+in\s+charge|join)\s*(?:me|us|this\s+team)?\s*,?\s+(?:you\s+)?(?:stop|should\s+not|shouldn't|no\s+longer)\s+(?:ask(?:ing)?|question(?:ing)?|interfer(?:e|ing)|check(?:ing)?)\b`,
-  String.raw`\b(?:doubting|questioning|checking)\s+(?:me|us)\s+(?:on\s+)?(?:even\s+)?(?:one\s+)?(?:detail|point|thing)\s+(?:means|shows)\s+(?:you\s+)?(?:do\s+not|don't)\s+(?:trust|believe\s+in)\b`,
+  String.raw`\b(?:doubting|questioning|checking)\s+(?:me|us)\s+(?:on\s+)?(?:this\s+)?(?:even\s+)?(?:one\s+)?(?:detail|point|thing)\s+(?:means|shows)\s+(?:you\s+)?(?:do\s+not|don't)\s+(?:trust|believe\s+in)\b`,
   String.raw`\bif\s+you\s+(?:question|doubt|check)\s+(?:this|that|it)\s+one\s+(?:detail|point)\s*,?\s+(?:then\s+)?(?:nothing|none)\s+(?:we\s+say|can\s+be)\s+trusted\b`,
   String.raw`\b(?:you|we)\s+(?:either|either,\s+)\s*(?:trust|are\s+with)\s*(?:me|us)?\s*(?:completely|fully|totally|unconditionally)?\s*,?\s*or\s+(?:you\s+(?:do\s+not|don't))\s+(?:trust|believe)\s*(?:me|us|at\s+all)?\b`,
 ].join('|'), 'i');
 
-// ─── A2: 核验污名化（查证、要凭证、问细节、复核被定性为不信任/见外/伤人）──
+// ─── DEMAND: 核验对象腿（账/凭证/流程/提问）────────────────────────
 const DEMAND_ZH = new RegExp([
   String.raw`(?:查|查证|查账|审|核|核实|核查|核对|复核|审计|验收|验|印证|追问|过问|询问|打听|问细节|要|要求|出示|提供|调取|翻看|看|调)(?:[^。；，,]{0,6})(?:账|凭据|凭证|票据|证据|单据|记录|材料|文件|合同|流水|底稿|案卷|原件|数据|代码|日志|邮件|纪要)`,
   String.raw`(?:这么|这点|这种|这点子)?(?:小事|小问题|细节|小事儿|流程|程序|东西)(?:都|也|还要)?(?:要查|要审|要核|要问|要验证|要说明|要解释|要过问|要跟进)`,
@@ -137,6 +182,9 @@ const DEMAND_EN = new RegExp([
   String.raw`\b(?:stop|no\s+longer)\s+(?:ask(?:ing)?|question(?:ing)?|check(?:ing)?|audit(?:ing)?)\s+(?:me|us|about)?\s*(?:question|questions)?\s*(?:about|on|regarding)?\b`,
   String.raw`\b(?:no|zero|without)\s+(?:questions?|second-?guess(?:ing)?|interference|checking|oversight)\s+(?:from|by)\s+you\b`,
   String.raw`\bwhy\s+(?:do\s+)?(?:you\s+)?(?:need|want)\s+(?:to\s+)?(?:see|check|verify|audit)\b`,
+  // [r583] 「you should not ask questions again」——禁止提问本身就是取消核验权，
+  // r582 只认 stop asking，漏掉 should not / don't ask 这一族否定祈使。
+  String.raw`\b(?:stop|no\s+more|cannot|can't|should\s+not|shouldn't|don't|do\s+not)\s+ask(?:ing)?\s+(?:me|us\s+)?(?:any\s+)?questions?\b`,
 ].join('|'), 'i');
 
 // ─── G1: 审计/内控/合规的正当边界声明（合法）──────────────────────
@@ -155,7 +203,6 @@ const GUARD_EN = new RegExp([
 ].join('|'), 'i');
 
 // ─── G2: 一般性二选一看守（不含核验腿的合理择优表述）──────────────────
-// 排除：选供应商、选方案、二选一的正当决策表述。
 const PICK_ZH = new RegExp([
   String.raw`(?:要么|或者)(?:[^。；，,]{0,12})(?:用|选|采购|采用)(?:[^。；，,]{0,6})(?:方案|供应商|产品|服务商|版本|路线|策略)`,
   String.raw`(?:二选一|两选一|择一|选其中之一|各有利弊|权衡|取舍)`,
@@ -175,7 +222,7 @@ const CLASSIFY_EN = new RegExp([
 
 // ─── G4: 任务范围授权看守（划清决策范围，未取消全部核查权）───────────
 const SCOPE_ZH = new RegExp([
-  String.raw`(?:在|限于)(?:[^。；，,]{0,8})(?:范围|权限|额度|事项)(?:之|以)(?:内|内)(?:[^。；，,]{0,8})(?:由|归)(?:你|您)(?:全权|自主|自行|独立)(?:决定|处理|决断|定夺)`,
+  String.raw`(?:在|限于)(?:[^。；，,]{0,8})(?:范围|权限|额度|事项)(?:之|以)(?:以内|内)(?:[^。；，,]{0,8})(?:由|归)(?:你|您)(?:全权|自主|自行|独立)(?:决定|处理|决断|定夺)`,
   String.raw`(?:授权|委托)(?:你|您|你方)(?:[^。；，,]{0,8})(?:在|于)(?:[^。；，,]{0,8})(?:额度|范围|金额|事项|权限)(?:内|以上|以下)(?:[^。；，,]{0,8})(?:自主|自行|独立)(?:决定|审批|处理)`,
   String.raw`(?:超出|逾越|越出)(?:[^。；，,]{0,6})(?:范围|权限|额度|授权)(?:[^。；，,]{0,6})(?:仍需|还得|还是要|请)(?:[^。；，,]{0,8})(?:报批|请示|复核|上报|审核)`,
 ].join('|'));
@@ -211,6 +258,8 @@ const REFLEXIVE_EN = new RegExp([
 function checkExclusiveTrust(text, inject) {
   if (!text || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
   const R = inject || {};
+  const STRONG_ZH_ = R.STRONG_ZH || STRONG_ZH;
+  const STRONG_EN_ = R.STRONG_EN || STRONG_EN;
   const STIGMA_ZH_ = R.STIGMA_ZH || STIGMA_ZH;
   const STIGMA_EN_ = R.STIGMA_EN || STIGMA_EN;
   const EXCLUSIVE_ZH_ = R.EXCLUSIVE_ZH || EXCLUSIVE_ZH;
@@ -238,50 +287,35 @@ function checkExclusiveTrust(text, inject) {
   };
   const miss = () => ({ hit: false, score: 0, detail: '', count: 0 });
 
-  // 判据三段（任一成立即命中）：
-  //   支① STIGMA（核验动作被直接定性为不信任）——独立完整的攻击形状；
-  //   支② EXCLUSIVE（互斥逼选：要么全信要么敌对/没有中间态）× DEMAND
-  //        （核验对象腿：账/凭证/流程）——互斥句式必须有核验对象配合，
-  //        单纯站队/谈判/择优句式不判（见 G2 看守）。
-  // r581 原设计是 A1 × A2 两条腿都独立命中，实测 21 条同族攻击只有
-  // 5 条双腿齐备——「质疑就是不信任团队」这类句子本身就是完整攻击
-  // （互斥 + 污名在同一个分句里），再要求另外出现核验对象是把判据拧到
-  // 本族所针对的语义子集之外。r582 拆成两支。
-  const hasStigma = STIGMA_ZH_.test(text) || STIGMA_EN_.test(text);
-  const hasExclusive = EXCLUSIVE_ZH_.test(text) || EXCLUSIVE_EN_.test(text);
-  if (!hasStigma) {
-    if (!hasExclusive) return miss();
-    // 支② 先过看守，再看 DEMAND 腿
-    if (GUARD_ZH_.test(text) || GUARD_EN_.test(text)) return miss();
-    if (PICK_ZH_.test(text) || CLASSIFY_ZH_.test(text) || CLASSIFY_EN_.test(text)) return miss();
-    if (SCOPE_ZH_.test(text) || SCOPE_EN_.test(text)) return miss();
-    if (REFLEXIVE_ZH_.test(text) || REFLEXIVE_EN_.test(text)) return miss();
-    const hasDemand = DEMAND_ZH_.test(text) || DEMAND_EN_.test(text);
-    if (!hasDemand) return miss();
-    return hitResult;
-  }
+  // 五类看守（三支共用）：正当边界 / 一般性二选一 / 信息分级 /
+  // 任务授权 / 反思性陈述 → 不判。守门前置于判据，避免某支先命中
+  // 绕过守门（r582 支② 的守门在互斥判定之后，顺序散在两处）。
+  if (GUARD_ZH_.test(text) || GUARD_EN_.test(text)) return miss();
+  if (PICK_ZH_.test(text) || CLASSIFY_ZH_.test(text) || CLASSIFY_EN_.test(text)) return miss();
+  if (SCOPE_ZH_.test(text) || SCOPE_EN_.test(text)) return miss();
+  if (REFLEXIVE_ZH_.test(text) || REFLEXIVE_EN_.test(text)) return miss();
 
-  // 支① 看守：正当边界 / 一般性二选一 / 信息分级 / 任务授权 / 反思性陈述 → 不判
-  if (GUARD_ZH_.test(text) || GUARD_EN_.test(text)) {
-    return miss();
-  }
-  if (PICK_ZH_.test(text) || CLASSIFY_ZH_.test(text) || CLASSIFY_EN_.test(text)) {
-    return miss();
-  }
-  if (SCOPE_ZH_.test(text) || SCOPE_EN_.test(text)) {
-    return miss();
-  }
-  if (REFLEXIVE_ZH_.test(text) || REFLEXIVE_EN_.test(text)) {
+  // 支① STIGMA：核验/质疑动作被直接定性为不信任/见外/伤感情 —— 独立成立
+  if (STIGMA_ZH_.test(text) || STIGMA_EN_.test(text)) return hitResult;
+
+  // 支② STRONG：强互斥宣告（要么全信要么敌对 / 没有中间态 /
+  // 不存在边信边查 / 委派后不得再有自己判断）—— 终局在句内，独立成立
+  if (STRONG_ZH_.test(text) || STRONG_EN_.test(text)) return hitResult;
+
+  // 支③ EXCLUSIVE × DEMAND：弱互斥句（站队/信任前提化）必须配核验对象腿
+  if (EXCLUSIVE_ZH_.test(text) || EXCLUSIVE_EN_.test(text)) {
+    if (DEMAND_ZH_.test(text) || DEMAND_EN_.test(text)) return hitResult;
     return miss();
   }
 
-  return hitResult;
+  return miss();
 }
 
 module.exports = {
   checkExclusiveTrust,
   // 供守卫测试做「置空指定支必须变红」的变异注入用。
   __internals: () => ({
+    STRONG_ZH, STRONG_EN,
     EXCLUSIVE_ZH, EXCLUSIVE_EN,
     STIGMA_ZH, STIGMA_EN,
     DEMAND_ZH, DEMAND_EN,
