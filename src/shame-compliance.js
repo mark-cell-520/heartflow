@@ -141,13 +141,17 @@ const SILENCE_EN = new RegExp([
   '\\bif\\s+you\\s+(?:speak|speak\\s+up|raise|go|take)\\b[^.?!]{0,40}\\b(?:keep|stay)\\s+(?:quiet|silent|out\\s+of\\s+it)\\b',
   // [r570 补] 隐式撤回形状：主句是对提问者的负面评价/资格剥夺，动词未被
   // 明说「撤回」，但整句唯一合理读法就是要求撤回或不出声——
-  //   · shame/embarrass +（you|yourself）且谓语是「should be」判断句；
-  //   · what will … think/judge/say + you，第二轮含 if/matter。
-  // 这两支是 *back-reference* 式的收束：它们自身不含压制词，只有与 SHAME_EN
-  // 的羞耻腿共现时才成立（模块层共现判据），所以单句良性文本不会误伤
-  // （r570 探针 B 组 7 条含羞耻词的良性句实测补支前 mod=0，补支后仍为 0）。
+  //   ① shame/embarrass +（you|yourself）且谓语是「should be」判断句；
+  //   ② what/how will … think/judge + you（评价从句，无压制动词）；
+  //   ③ nobody will respect/trust you + if/when/once（资格剥夺 + 条件消音）。
+  // 这三支是 *共现依赖* 支：自身不含显式压制词，只有与 SHAME_EN 的羞耻腿
+  // 共现时才成立（模块层双腿判据），所以单句良性文本不会误伤——r570 探针
+  // B 组 7 条含羞耻词的良性句（含 "do not be embarrassed" / "nothing to be
+  // ashamed of" / "if you speak up, everyone will hear you"）补支前后均为
+  // mod=0；守卫测试良性族扩到 17 条实测仍 0 误伤。
   '\\byou\\s+(?:should|ought\\s+to|had\\s+better|would\\s+be\\s+wise\\s+to)\\s+(?:be\\s+)?(?:ashamed|embarrassed)\\s+(?:of|with|about)\\s+(?:yourself|you|raising|bringing|mentioning|asking|questioning)\\b',
-  '\\bwhat\\s+(?:will|would|do|did)\\s+(?:others|people|everyone|they|your\\s+(?:colleagues|family|friends|peers|neighbou?rs)|the\\s+(?:team|office|neighbou?rs))\\s+(?:think|judge|say|see|talk)\\s+(?:of|about)\\s+you\\b',
+  '\\b(?:what|how)\\s+(?:will|would|do|did)\\s+(?:others|people|everyone|they|your\\s+(?:colleagues|family|friends|peers|neighbou?rs)|the\\s+(?:team|office|neighbou?rs))\\s+(?:think|judge|say|see|talk)\\s*(?:of\\s+|about\\s+)?(?:you|your)\\b',
+  '\\b(?:nobody|no\\s+one|none\\s+of\\s+them)\\s+(?:will|would)\\s+(?:respect|take\\s+you\\s+seriously|listen\\s+to|trust)\\s+you\\s+(?:if|when|once)\\b',
 ].join('|'), 'i');
 
 // ─── G1-G3: 看守（合法：隐私保护 / 议程安排 / 已记录在案）─────────
@@ -167,6 +171,8 @@ const GUARD_EN = new RegExp([
   '\\b(?:private|confidential|sensitive|personal|privileged)\\s+(?:matter|conversation|discussion|information|data|details|topic)\\b',
   '\\b(?:involves|concerns|relates to|raises)\\s+(?:personal|private|sensitive|confidential)\\s+(?:data|information|details|matters)\\b',
   '\\blet\\s+us\\s+(?:discuss|cover|go over|take this up|defer this)\\s+(?:it\\s+)?(?:privately|separately|after the meeting|later|one[\\s-]on[\\s-]one|in a closed session|offline)\\b',
+  '\\blet\\s+us\\s+cover\\s+(?:your|the|that)\\s+(?:point|concern|question|objection)\\s+(?:privately|separately|after\\s+the\\s+meeting|one[\\s-]on[\\s-]one|offline)\\b',
+  '\\b(?:should|better|ought to)\\s+be\\s+raised\\s+(?:privately|separately|one[\\s-]on[\\s-]one|after\\s+the\\s+meeting|offline)\\b',
   '\\bwe\\s+(?:will|shall|can)\\s+(?:follow up|revisit|circle back|take this offline|schedule)\\s+(?:on|with|about)?\\s*(?:this|it|separately|later|after)?\\b',
   '\\b(?:log|logged|record(?:ed)?|document(?:ed)?|note[d]?|capture[d]?)\\s+(?:your\\s+|the\\s+)?(?:concern|issue|complaint|objection|point|feedback|question)\\b',
   '\\b(?:register(?:ed)?|routed|referred|forwarded|escalated)\\s+(?:your\\s+|the\\s+)?(?:concern|complaint|issue|objection)\\b',
