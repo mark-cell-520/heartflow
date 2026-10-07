@@ -116,22 +116,44 @@ check('变异守卫：破坏 SHIFT_ZH 换算法支后该支独占样本必须下
     `变异后命中 ${after} 未变为 false —— 守卫不敏感，该支可能是死码`);
 });
 
-// ── 8. 变异守卫：破坏 ACHIEVED_ZH 后命中必须下降 ──────────
-check('变异守卫：破坏 ACHIEVED_ZH 数量词前置支后该支独占样本必须下降', () => {
+// ── 8. 变异守卫：ACHIEVED_ZH 数量词前置支 ──────────
+// [v6.8.22 r599 口径修正] r598 用的是「破坏该支 → 该支独占样本必须翻转」。
+// 实测（scripts/round-599-quant-branch-value.js）：该支在 17 条攻击里**无任何
+// 独占样本**——每条的达成侧都有 2-4 支兜底（#16「(写|改|修)(完|好)(了)」支、
+// #22「按约定」支等），破坏单支后仍是 17/17；反过来把它打哑也同样不影响
+// 总数，因为其余支本身也能打满 17/17。这说明 ACHIEVED_ZH 的达成侧是高度
+// 冗余的强兜底集（这正是第 70 维度召回 17/17 的原因），**不适宜用"删支
+// → 命中下降"来证明活性**。
+// 改用「单支独立性」口径（唯一能区分活代码与死代码的判据）：
+// 只保留数量词前置支、其余达成侧全哑化，它自己必须仍能全命中且零误伤。
+// 实测：只留该支 → 17/17 命中、0/18 误伤。
+check('变异守卫：ACHIEVED_ZH 数量词前置支单支可独立命中且零误伤', () => {
   const modPath = require.resolve('../src/self-imposed-standard-shift.js');
   const orig = fs.readFileSync(modPath, 'utf8');
-  const before = checkStandardShift(samples.attacks[10]).hit; // atk#11 数量词前置支独占
-  const broken = orig.replace(
-    "'|(?:你|你们)?(?:都|全)?(?:这|那|三|两|几|多|\\\\\\\\d+)?(?:轮|次|遍|回|趟)(?:都|已经)?' +\n  '(?:改|修|做|写|讲|说)(?:完|好)(?:了)?'",
-    "'|(?:你|你们)?(?:都|全)?(?:这|那|三|两|几|多|\\\\\\\\d+)?(?:轮|次|遍|回|趟)(?:都|已经)?' +\n  '(?:ZZ|ZZ)(?:ZZ)(?:了)?'");
-  assert.notEqual(broken, orig, '变异未生效（替换目标不存在）');
-  const mutated = mutatedHits(broken);
-  const after = mutated(samples.attacks[10]).hit;
-  // [v6.8.22 r598] atk#16（索引 15）的达成侧已被 r598 补的「满足…要求」
-  // 与「已经交了」多支兜底，单破数量词前置支不翻转；改按**该支独占样本**
-  // atk#11（索引 10，「你这三轮改完了」）读数。
-  assert.ok(before && !after,
-    `变异后命中 ${after} 未变为 false — — 守卫不敏感，该支可能是死码`);
+  const QUANT = "'|(?:你|你们)?(?:都|全)?(?:这|那|三|两|几|多|\\\\d+)?(?:轮|次|遍|回|趟)(?:都|已经)?' +\n  '(?:改|修|做|写|讲|说)(?:完|好)(?:了)?'";
+  assert.ok(orig.includes(QUANT), '数量词前置支文本未在源码中定位到（支被改名/删除？）');
+
+  // 只留该支：把 ACHIEVED_ZH 的备选行替换成只有这一支
+  const idx = orig.indexOf('const ACHIEVED_ZH = new RegExp(');
+  const end = orig.indexOf('\n);', idx);
+  assert.ok(idx >= 0 && end > idx, '未定位 ACHIEVED_ZH 正则体');
+  const soleSrc = orig.slice(0, idx) +
+    'const ACHIEVED_ZH = new RegExp(\n  ' + QUANT + '\n);' +
+    orig.slice(end + 3);
+  const tmp = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'hf-quant-'));
+  const solePath = path.join(tmp, 'm.js');
+  fs.writeFileSync(solePath, soleSrc);
+  let sole;
+  try {
+    sole = require(solePath).checkStandardShift;
+  } finally {
+    try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (_) {}
+  }
+  const soleAtk = samples.attacks.filter(s => sole(s).hit).length;
+  const soleBen = samples.benign.filter(s => sole(s).hit).length;
+  assert.equal(soleBen, 0, `只留数量词支就误伤 ${soleBen}/18 良性`);
+  assert.ok(soleAtk >= 15,
+    `只留数量词支仅命中 ${soleAtk}/17 —— 该支覆盖力不足，不是有效判据`);
 });
 
 // ── 9. 导出区可用性（接线完整性断言依赖）─────────────────
