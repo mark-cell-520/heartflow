@@ -170,6 +170,13 @@ class SAGEGuardian {
   }
 
   checkValueAlignment(proposal, diff) {
+    // [r609] 判空保护：接线后被 dispatch 暴露为外部入口
+    // （sageGuardian.checkValueAlignment），空实参会裸抛
+    // TypeError（reading 'description' of undefined）。原实现只在
+    // reviewProposal 内部被调用，那里 proposal 恒有值，所以该缺陷此前不可达。
+    if (!proposal || typeof proposal !== 'object') {
+      return { name: 'Value Alignment', passed: false, violation: '修改提案缺失或格式无效' };
+    }
     const positiveIndicators = [
       '心流',
       '用户体验',
@@ -181,7 +188,7 @@ class SAGEGuardian {
       'improve'
     ];
 
-    const content = (proposal.description + ' ' + JSON.stringify(diff)).toLowerCase();
+    const content = ((proposal.description || '') + ' ' + JSON.stringify(diff ?? null)).toLowerCase();
     const hasPositive = positiveIndicators.some(ind => content.includes(ind));
 
     if (!hasPositive) {
@@ -267,9 +274,13 @@ class SAGEGuardian {
    * 生成用户友好的解释
    */
   explainModification(proposal, approved) {
+    // [r609] 判空保护：接线后被 dispatch 暴露为外部入口，proposal 缺省会裸抛
     if (!approved) {
       return `我原本打算进行一项调整，但经过安全审查后决定不实施，以确保系统稳定。`;
     }
+    const description = (proposal && typeof proposal === 'object' && typeof proposal.description === 'string')
+      ? proposal.description
+      : '';
 
     const explanations = {
       'calculatePAD': '为了更准确地感知你的情绪状态，我微调了情绪计算的方式。',
@@ -279,7 +290,7 @@ class SAGEGuardian {
     };
 
     for (const [key, exp] of Object.entries(explanations)) {
-      if (proposal.description.includes(key)) {
+      if (description.includes(key)) {
         return exp;
       }
     }
@@ -312,6 +323,19 @@ class SAGEGuardian {
    * ASL-3: 潜在滥用，强制人类确认
    */
   classifyContent(input, context = {}) {
+    // [r609] 判空保护：接线后被 dispatch 暴露为外部入口
+    // （sageGuardian.classifyContent），空实参会裸抛
+    // TypeError（reading 'toLowerCase' of undefined）。原调用方
+    // ethics.check() 传的是用户输入字符串，恒非空，所以该缺陷此前不可达。
+    if (typeof input !== 'string' || input.length === 0) {
+      return {
+        level: 'ASL-1',
+        action: 'normal',
+        reason: 'Normal conversation',
+        risk: 'low'
+      };
+    }
+
     const asl2Keywords = ['心理', '抑郁', '心理问题', 'mental health', 'depression'];
     const asl3Keywords = ['武器', '毒品', '黑客', '攻击', 'weapon', 'drugs', 'hack', 'attack'];
 
@@ -354,6 +378,13 @@ class SAGEGuardian {
    * 使用 JSON Lines 格式（每行一个 JSON）
    */
   logSecurityDecision(decision) {
+    // [r609] 判空保护：接线后被 dispatch 暴露为外部入口
+    // （sageGuardian.logSecurityDecision），空实参会裸抛
+    // TypeError（reading 'level' of undefined）。原实现在全库零 dispatch
+    // 调用方，所以该缺陷此前不可达。
+    if (!decision || typeof decision !== 'object') {
+      return { success: false, error: 'decision 必须是对象' };
+    }
     const logEntry = {
       timestamp: new Date().toISOString(),
       aslLevel: decision.level,

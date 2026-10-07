@@ -3089,6 +3089,25 @@ class HeartFlow {
       this._modules['forgettingEngine'] = this.forgettingEngine;
     }
 
+    // [r609] sageGuardian 接线（SAGE 伦理与安全护栏）。实例在 L2480「Ethics Layer」
+    // 一直在构造，但只有 L2494-2502 的 ethics.check() 调用了内部闭包，
+    // 实例本身从未进 _modules —— r609 双向核对实测：_modules 无 'sageGuardian' 键、
+    // ALLOWED_ROUTES 0 条命中、dispatch('sageGuardian.*') 13/13 全抛 route not allowed
+    // （探针 scripts/round-608-unwired-probe.js，对照组 r605 已接线的 consciousnessSelf
+    // 3/3 可 dispatch，口径正确）。
+    // 即「宪法五项审查（reviewProposal / checkConstitutionProtection / checkValueAlignment
+    // / checkSafetyImpact / checkBoundaries）+ ASL 安全分级（getASLLevel / classifyContent
+    // / getStatus）+ 违规计数与冷却（triggerCooldown / isInCooldown / getSecurityLog
+    // / logSecurityDecision）+ 拒绝话术生成（generateRejectionWithGuidance /
+    // explainModification）」此前 pipeline 完全不可达。
+    // 注册位置与 r402/r404/r577/r605/r606/r608 同一区块同一时序：LATE_ADDITIONS 循环
+    // 之后、generateAllowedRoutes 之前。注意不重复添加 'sageGuardian' 键 ——
+    // engine-lifecycle.js 的 subsystemNames 名单里没有它（r609 实测核对过），
+    // 这里是唯一注册点。
+    if (this.sageGuardian && !this._modules['sageGuardian']) {
+      this._modules['sageGuardian'] = this.sageGuardian;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
