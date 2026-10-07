@@ -113,6 +113,7 @@ const STIGMA_EN = new RegExp([
   String.raw`\b(?:real|genuine|true|complete|total)\s+(?:trust|loyalty)\s+(?:does\s+not|doesn't|never)\s+(?:need|require|involve)\s+(?:verification|checking|proof|questions?)\b`,
   String.raw`\b(?:friends|family|our\s+own|insiders|one\s+of\s+us)\s+(?:do\s+not|don't|never)\s+(?:check|audit|question|second-?guess)\s+(?:each\s+other|us|our\s+own)\b`,
   String.raw`\b(?:if|once)\s+you\s+(?:question|doubt|check|audit)\s+(?:this|that|it|me|us)\s*,?\s+(?:then\s+)?(?:nothing|none\s+of\s+it)\s+(?:we\s+say|can\s+be)\s+trusted\b`,
+  String.raw`\b(?:if|once)\s+you\s+(?:question|doubt|check|audit|second-?guess)\s+(?:this|that|it|me|us|even\s+(?:one|a\s+single)\s+(?:detail|point|thing))\s*,?\s+(?:then\s+)?(?:nothing|none\s+of\s+(?:it|this|what\s+we\s+say))\s+(?:we\s+say|can\s+be)\s+trusted\b`,
   String.raw`\bif\s+you\s+doubt\s+(?:this\s+)?(?:one\s+)?(?:detail|point|thing)\s*,?\s+(?:then\s+)?(?:nothing|none\s+of\s+it)\s+(?:we\s+say|can\s+be)\s+trusted\b`,
   String.raw`\b(?:once|after)\s+you\s+(?:delegate|hand\s+(?:this|it)\s+over|put\s+me\s+in\s+charge|join)\s*(?:me|us|this\s+team)?\s*,?\s+(?:you\s+)?(?:stop|should\s+not|shouldn't|no\s+longer)\s+(?:ask(?:ing)?|question(?:ing)?|interfer(?:e|ing)|check(?:ing)?)\b`,
   String.raw`\b(?:doubting|questioning|checking)\s+(?:me|us)\s+(?:on\s+)?(?:even\s+)?(?:one\s+)?(?:detail|point|thing)\s+(?:means|shows)\s+(?:you\s+)?(?:do\s+not|don't)\s+(?:trust|believe\s+in)\b`,
@@ -132,6 +133,9 @@ const DEMAND_EN = new RegExp([
   String.raw`\b(?:ask(?:ing)?\s+(?:you\s+)?for|request(?:ing)?|show|produce|provide|pull|submit)\s+(?:the\s+)?(?:invoice|receipts?|bill|proof|records?|document(?:s|ation)?|contract|log|logs|audit|paperwork|evidence)\b`,
   String.raw`\b(?:double-?check|verif(?:y|ication)|audit|re-?audit|review|inspect|examine)\s+(?:your|the|these|this|it|numbers|figures|work)\b`,
   String.raw`\b(?:audit|check|verify|review|question|ask\s+(?:about|into))\s+(?:this|that|it)\b`,
+  String.raw`\b(?:audit|check|verify|review|question|second-?guess|ask\s+(?:about|into)|interfere\s+with|weigh\s+in\s+on)\s+(?:every|any|all|these)\s+(?:detail|details|decision|decisions|number|numbers|expense|expenses|invoice|invoices|account|accounts|step|steps)\b`,
+  String.raw`\b(?:stop|no\s+longer)\s+(?:ask(?:ing)?|question(?:ing)?|check(?:ing)?|audit(?:ing)?)\s+(?:me|us|about)?\s*(?:question|questions)?\s*(?:about|on|regarding)?\b`,
+  String.raw`\b(?:no|zero|without)\s+(?:questions?|second-?guess(?:ing)?|interference|checking|oversight)\s+(?:from|by)\s+you\b`,
   String.raw`\bwhy\s+(?:do\s+)?(?:you\s+)?(?:need|want)\s+(?:to\s+)?(?:see|check|verify|audit)\b`,
 ].join('|'), 'i');
 
@@ -199,10 +203,29 @@ const REFLEXIVE_EN = new RegExp([
 
 /**
  * @param {string} text 归一化后的文本
+ * @param {Object} [inject] 仅供守卫测试的变异注入：把指定正则支替换成
+ *   另值（例 { STIGMA_ZH: /(?!x)x/ } 表示「置空中文 STIGMA 腿」）。
+ *   生产调用不传该参数，行为完全不变。
  * @returns {{hit:boolean, score:number, detail:string, count:number}}
  */
-function checkExclusiveTrust(text) {
+function checkExclusiveTrust(text, inject) {
   if (!text || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
+  const R = inject || {};
+  const STIGMA_ZH_ = R.STIGMA_ZH || STIGMA_ZH;
+  const STIGMA_EN_ = R.STIGMA_EN || STIGMA_EN;
+  const EXCLUSIVE_ZH_ = R.EXCLUSIVE_ZH || EXCLUSIVE_ZH;
+  const EXCLUSIVE_EN_ = R.EXCLUSIVE_EN || EXCLUSIVE_EN;
+  const DEMAND_ZH_ = R.DEMAND_ZH || DEMAND_ZH;
+  const DEMAND_EN_ = R.DEMAND_EN || DEMAND_EN;
+  const GUARD_ZH_ = R.GUARD_ZH || GUARD_ZH;
+  const GUARD_EN_ = R.GUARD_EN || GUARD_EN;
+  const PICK_ZH_ = R.PICK_ZH || PICK_ZH;
+  const CLASSIFY_ZH_ = R.CLASSIFY_ZH || CLASSIFY_ZH;
+  const CLASSIFY_EN_ = R.CLASSIFY_EN || CLASSIFY_EN;
+  const SCOPE_ZH_ = R.SCOPE_ZH || SCOPE_ZH;
+  const SCOPE_EN_ = R.SCOPE_EN || SCOPE_EN;
+  const REFLEXIVE_ZH_ = R.REFLEXIVE_ZH || REFLEXIVE_ZH;
+  const REFLEXIVE_EN_ = R.REFLEXIVE_EN || REFLEXIVE_EN;
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
   const hitResult = {
@@ -224,31 +247,31 @@ function checkExclusiveTrust(text) {
   // 5 条双腿齐备——「质疑就是不信任团队」这类句子本身就是完整攻击
   // （互斥 + 污名在同一个分句里），再要求另外出现核验对象是把判据拧到
   // 本族所针对的语义子集之外。r582 拆成两支。
-  const hasStigma = STIGMA_ZH.test(text) || STIGMA_EN.test(text);
-  const hasExclusive = EXCLUSIVE_ZH.test(text) || EXCLUSIVE_EN.test(text);
+  const hasStigma = STIGMA_ZH_.test(text) || STIGMA_EN_.test(text);
+  const hasExclusive = EXCLUSIVE_ZH_.test(text) || EXCLUSIVE_EN_.test(text);
   if (!hasStigma) {
     if (!hasExclusive) return miss();
     // 支② 先过看守，再看 DEMAND 腿
-    if (GUARD_ZH.test(text) || GUARD_EN.test(text)) return miss();
-    if (PICK_ZH.test(text) || CLASSIFY_ZH.test(text) || CLASSIFY_EN.test(text)) return miss();
-    if (SCOPE_ZH.test(text) || SCOPE_EN.test(text)) return miss();
-    if (REFLEXIVE_ZH.test(text) || REFLEXIVE_EN.test(text)) return miss();
-    const hasDemand = DEMAND_ZH.test(text) || DEMAND_EN.test(text);
+    if (GUARD_ZH_.test(text) || GUARD_EN_.test(text)) return miss();
+    if (PICK_ZH_.test(text) || CLASSIFY_ZH_.test(text) || CLASSIFY_EN_.test(text)) return miss();
+    if (SCOPE_ZH_.test(text) || SCOPE_EN_.test(text)) return miss();
+    if (REFLEXIVE_ZH_.test(text) || REFLEXIVE_EN_.test(text)) return miss();
+    const hasDemand = DEMAND_ZH_.test(text) || DEMAND_EN_.test(text);
     if (!hasDemand) return miss();
     return hitResult;
   }
 
   // 支① 看守：正当边界 / 一般性二选一 / 信息分级 / 任务授权 / 反思性陈述 → 不判
-  if (GUARD_ZH.test(text) || GUARD_EN.test(text)) {
+  if (GUARD_ZH_.test(text) || GUARD_EN_.test(text)) {
     return miss();
   }
-  if (PICK_ZH.test(text) || CLASSIFY_ZH.test(text) || CLASSIFY_EN.test(text)) {
+  if (PICK_ZH_.test(text) || CLASSIFY_ZH_.test(text) || CLASSIFY_EN_.test(text)) {
     return miss();
   }
-  if (SCOPE_ZH.test(text) || SCOPE_EN.test(text)) {
+  if (SCOPE_ZH_.test(text) || SCOPE_EN_.test(text)) {
     return miss();
   }
-  if (REFLEXIVE_ZH.test(text) || REFLEXIVE_EN.test(text)) {
+  if (REFLEXIVE_ZH_.test(text) || REFLEXIVE_EN_.test(text)) {
     return miss();
   }
 
