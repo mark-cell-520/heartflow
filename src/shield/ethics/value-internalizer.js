@@ -354,6 +354,30 @@ class ValueInternalizer {
   // ========================================================================
 
   /**
+   * [r606] 构造评分结果（此前全库从未定义，导致 action 为 null/undefined 时
+   * calculateValueAlignmentScore 直接抛 "this._makeScoreResult is not a function"。
+   * 该方法路径此前零调用者，所以从未暴露；r606 把 valueInternalizer 接进 dispatch 后
+   * 首次可达。）
+   * @private
+   */
+  _makeScoreResult(score, passed, matchedValues, reason, extra = {}) {
+    return {
+      score,
+      passed,
+      matchedValues,
+      matchDetails: [],
+      negativeMatch: null,
+      threshold: this.weights.threshold,
+      baseThreshold: this.weights.threshold,
+      conflicts: [],
+      oscillation: { oscillating: false, flipRate: 0, details: reason || '参数校验未通过' },
+      reason: reason || '参数校验未通过',
+      timestamp: new Date().toISOString(),
+      ...extra
+    };
+  }
+
+  /**
    * 计算价值对齐分数 — 增强版
    * 使用语义上下文匹配替代简单 includes，支持上下文权重调整
    *
@@ -478,6 +502,20 @@ class ValueInternalizer {
     // 3. 上下文自适应阈值
     const adaptiveThreshold = this._computeAdaptiveThreshold(context, matchedValues);
 
+    // [r606] 分数归一化：score 是「命中的价值权重 × 匹配档位系数」之和，
+    // 理论上限 = Σ(5 个价值的权重) × 1.0 = 1.0；但实际可达分布远低于此 ——
+    // 单个行动的文本通常只含 1-2 个价值词，单价值 exact 命中最高只加 0.25。
+    // 原算法把 0.25 的分数直接与 0.6 的阈值比较，导致除「同时命中 3 个以上价值词」
+    // 的行动外全部判否（实测「帮助用户解决问题」score=0.25 < thr=0.57 → canProceed=false，
+    // 即任何正常行动都被一票否决，引擎不可用）。归一化消除尺度不可比：
+    //   归一化基准 = 实际命中的最大可得分（各命中价值的权重 × 该价值最高可用档位）
+    //   未命中任何价值 → 基准取默认 1.0（保持 0 分即否决的语义）
+    const normalizer = this._computeNormalizer(matchedValues, matchDetails);
+
+    const rawScore = score;
+    const normalizedScore = normalizer > 0 ? score / normalizer : 0;
+    score = Math.max(0, Math.min(1, normalizedScore));
+
     // 4. 冲突检测
     const conflicts = this._detectValueConflicts(matchedValues, context);
 
@@ -489,6 +527,8 @@ class ValueInternalizer {
 
     const result = {
       score: Math.max(0, Math.min(1, score)),
+      rawScore,
+      normalizer,
       passed: score >= adaptiveThreshold,
       matchedValues,
       matchDetails,
@@ -527,6 +567,33 @@ class ValueInternalizer {
     ) ? 0.10 : 0;
 
     return Math.max(0.3, Math.min(0.95, base + severityAdjust + diversityAdjust + safetyAdjust));
+  }
+
+  /**
+   * [r606] 计算分数归一化基准 = 本次实际命中价值在「最高匹配档位」下的可得分之和。
+   * 这等于「本样本的满分」，score / 基准 = 该样本在自身可得分中的实现率，
+   * 使 0-1 分与 threshold(0.6) 可比。
+   *
+   * 负向命中（negativeMatch）会扣分，扣分可能把实现率压到 0 以下 → 由调用方 clamp 到 0，
+   * 保持「负向命中即否决」的语义不变。
+   * @private
+   */
+  _computeNormalizer(matchedValues, matchDetails) {
+    if (!Array.isArray(matchedValues) || matchedValues.length === 0) return 1;
+    const TIER_MAX = { exact: 1.0, contextual: 0.7, action: 0.5 };
+    let max = 0;
+    for (const value of matchedValues) {
+      const w = this.weights[value] || 0.1;
+      // 该价值本次达到的最高档位；若无 matchDetails（理论不可达）按 exact 计
+      let tier = 'exact';
+      const details = (matchDetails || []).filter(d => d && d.value === value);
+      if (details.length) {
+        const order = ['action', 'contextual', 'exact'];
+        tier = details.reduce((acc, d) => (order.indexOf(d.type) > order.indexOf(acc) ? d.type : acc), 'action');
+      }
+      max += w * (TIER_MAX[tier] || 1.0);
+    }
+    return max > 0 ? max : 1;
   }
 
   /**
@@ -579,8 +646,9 @@ class ValueInternalizer {
       return { winner: valueB, justification: `${valueB} 优先级高于 ${valueA}` };
     }
 
-    // 同等优先级：根据上下文
-    if (context.severity === 'critical' || context.severity === 'high') {
+    // 同等优先级：根据上下文（context 可能缺省，判空后取 severity）
+    const sev = context && typeof context === 'object' ? context.severity : undefined;
+    if (sev === 'critical' || sev === 'high') {
       if (valueA === 'safety' || valueB === 'safety') {
         return { winner: 'safety', justification: '高风险上下文：安全优先' };
       }
@@ -594,10 +662,12 @@ class ValueInternalizer {
    * @private
    */
   _recordDecision(passed, actionStr, context) {
+    const actionText = typeof actionStr === 'string' ? actionStr : (actionStr != null ? JSON.stringify(actionStr) : '');
+    const sev = context && typeof context === 'object' ? (context.severity || 'unknown') : 'unknown';
     this._decisionHistory.push({
       passed,
-      action: actionStr.substring(0, 100),
-      context: context.severity || 'unknown',
+      action: actionText.substring(0, 100),
+      context: sev,
       timestamp: Date.now()
     });
 
@@ -699,9 +769,23 @@ class ValueInternalizer {
    */
   generateBoundaryRequest(action, context = {}) {
     // 分析历史：同类请求被拒绝的频率
-    const actionStr = typeof action === 'string' ? action : JSON.stringify(action);
+    // [r607] 判空守卫修正：原写法 `typeof action === 'string' ? action : JSON.stringify(action)`
+    // 在 action 为 undefined 时 JSON.stringify 返回 undefined（根本不是字符串），
+    // 随后 `actionStr.substring(0, 30)` 抛 "Cannot read properties of undefined"。
+    // 接线后 D5 逐条空实参 dispatch 首次可达该路径 → 归一化为字符串。
+    let actionStr = typeof action === 'string' ? action : '';
+    if (!actionStr && action != null) {
+      try {
+        actionStr = JSON.stringify(action) != null ? JSON.stringify(action) : String(action);
+      } catch (e) {
+        actionStr = String(action);
+      }
+    }
+    // [r606] 判空守卫：boundary log 里可能存有 null 条目（实测 _boundaryHistory=[null]），
+    // 原写法 h.action 直接抛 "Cannot read properties of null"。脏条目不参与匹配。
     const similarRequests = this._boundaryHistory.filter(h => {
-      const hAction = typeof h.action === 'string' ? h.action : JSON.stringify(h.action);
+      if (!h || typeof h !== 'object') return false;
+      const hAction = typeof h.action === 'string' ? h.action : (h.action != null ? JSON.stringify(h.action) : '');
       return hAction.includes(actionStr.substring(0, 30));
     });
 
