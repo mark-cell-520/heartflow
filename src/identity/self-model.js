@@ -133,19 +133,31 @@ class SelfModel {
 
 
   _load() {
-
     try {
-
       if (fs.existsSync(this.filePath)) {
-
-        return JSON.parse(fs.readFileSync(this.filePath, 'utf8'));
-
+        const parsed = JSON.parse(fs.readFileSync(this.filePath, 'utf8'));
+        // [r604] 数据卫生：历史写入把 content=undefined 存进了库，
+        // JSON.stringify 静默丢掉 undefined 属性 → 落盘记录缺 content 字段
+        // （本机实测 10 条信念里 7 条缺 content）。这类脏记录会让
+        // detectDrift / repairDrift / getStats 在 b.content.toLowerCase() 处
+        // 恒抛 TypeError —— 即「AI 自处模型」的矛盾检测能力从出厂起就没跑起来过。
+        // 装载时清洗一次（内存内修复，不重写用户数据文件）。
+        if (parsed && parsed.beliefs && typeof parsed.beliefs === 'object') {
+          for (const [id, b] of Object.entries(parsed.beliefs)) {
+            if (!b || typeof b !== 'object') { delete parsed.beliefs[id]; continue; }
+            if (typeof b.content !== 'string' || b.content.length === 0) {
+              b.content = '';
+            }
+            if (typeof b.confidence !== 'number' || !Number.isFinite(b.confidence)) {
+              b.confidence = 0.5;
+            }
+          }
+        }
+        return parsed;
       }
-
     } catch { /* 合理的降级：模型文件损坏时返回默认值 */ }
 
     return this._createDefault();
-
   }
 
 
@@ -169,6 +181,14 @@ class SelfModel {
 
 
   updateBelief(content, confidence, source) {
+    // [r604] 入口卫生：历史上调用方曾传 undefined/非字符串 content，
+    // JSON.stringify 会静默丢掉 undefined 属性 → 落盘记录缺 content 字段。
+    // 这里显式拒绝，返回错误对象而不是写脏数据（调用方无需 try/catch）。
+    if (typeof content !== 'string' || content.trim().length === 0) {
+      return { error: 'belief content must be a non-empty string', id: null };
+    }
+    const conf = (typeof confidence === 'number' && Number.isFinite(confidence))
+      ? confidence : 0.5;
 
     if (Object.keys(this._state.beliefs).length >= MAX_BELIEFS) {
 
@@ -192,7 +212,7 @@ class SelfModel {
 
       content,
 
-      confidence: Math.max(0, Math.min(1, confidence)),
+      confidence: Math.max(0, Math.min(1, conf)),
 
       source: source || 'unknown',
 
@@ -288,7 +308,7 @@ class SelfModel {
 
     const conflicts = [];
 
-    const beliefTexts = beliefs.map(b => b.content.toLowerCase());
+    const beliefTexts = beliefs.map(b => String((b && b.content != null) ? b.content : '').toLowerCase());
 
 
 
