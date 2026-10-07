@@ -3069,6 +3069,26 @@ class HeartFlow {
       this._modules['valueInternalizer'] = this.valueInternalizer;
     }
 
+    // [r608] forgettingEngine 接线：ForgettingEngine 实例在 L1602 一直在构造
+    // （16 个方法），但从未进 _modules —— r608 双向核对实测：
+    // _modules 无 'forgettingEngine' 键（147 键里 0 命中）、ALLOWED_ROUTES 0 条、
+    // dispatch('forgettingEngine.*') 10/10 全抛 'route not allowed'，
+    // 对照组（r605 已接线的 consciousnessSelf）3/3 可 dispatch。
+    // 即「记忆遗忘曲线引擎（checkForget 应否遗忘 / detectOscillation 访问震荡 /
+    // ebbinghausRetention 保留率 / getForgettingProbability 遗忘概率 /
+    // consolidate 巩固 / compress 压缩 / abstract 抽象）」此前 pipeline 完全不可达。
+    // 注册位置与 r402/r404/r577/r603/r605/r606 同一区块同一时序：LATE_ADDITIONS
+    // 循环之后、generateAllowedRoutes 之前。注意不重复添加 'forgettingEngine' 键 ——
+    // engine-lifecycle.js 的 subsystemNames 名单里没有它（r608 实测核对过），
+    // 这里是唯一注册点。
+    // 同轮修掉 1 个接线前不可达的缺陷：memory/forgetting.js 的 isReferenceProtected
+    // 调用未定义的 getField（ReferenceError），checkForget 对所有有效记忆恒抛 ——
+    // 只在 validateMemory 失败时才正常返回 error，所以「有效记忆 100% 崩溃 / 无效记忆
+    // 正常」这个组合此前不可能被发现（详见该文件 L141 注释块）。
+    if (this.forgettingEngine && !this._modules['forgettingEngine']) {
+      this._modules['forgettingEngine'] = this.forgettingEngine;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
