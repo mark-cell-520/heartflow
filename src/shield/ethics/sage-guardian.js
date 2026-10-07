@@ -132,6 +132,13 @@ class SAGEGuardian {
       review.violations.push(boundaryCheck.violation);
     }
 
+    // 检查5: 修改审批（r610 补 —— 宪法第 5 节「修改审批条件」要求，此前漏项）
+    const approvalCheck = this.checkModificationApproval(proposal, diff);
+    review.checks.push(approvalCheck);
+    if (!approvalCheck.passed) {
+      review.violations.push(approvalCheck.violation);
+    }
+
     review.passed = review.violations.length === 0;
 
     if (!review.passed) {
@@ -234,7 +241,7 @@ class SAGEGuardian {
     ];
 
     const content = JSON.stringify({ proposal, diff });
-    
+
     for (const v of boundaryViolations) {
       if (v.pattern.test(content)) {
         return {
@@ -246,6 +253,36 @@ class SAGEGuardian {
     }
 
     return { name: 'Behavior Boundaries', passed: true };
+  }
+
+  /**
+   * [r610] 检查5：修改审批条件（宪法第 5 节「修改审批条件」四项之一，此前漏项）。
+   *
+   * r610 实测：reviewProposal 头部注释自称「五项审查」，实际只跑了 4 项
+   * （宪法保护 / 价值对齐 / 安全影响 / 行为边界），宪法里「任何代码修改必须通过以下
+   * 审查：4. 用户知情同意」这条**从未被实现** —— 所以「没人点头就改引擎」这一族
+   * 提案会一路绿灯通过审查，而审查报告还宣称自己审过五项。
+   *
+   * 判定：提案必须显式携带 consent 批准记录（ consented: true 或
+   * approval: { consented: true }），否则判未通过。空实参不抛。
+   */
+  checkModificationApproval(proposal, diff) {
+    if (!proposal || typeof proposal !== 'object') {
+      return { name: 'Modification Approval', passed: false, violation: '修改提案缺失或格式无效，无法确认用户知情同意' };
+    }
+
+    const consent = proposal.consent || (proposal.approval || {});
+    const consented = consent.consented === true || consent.granted === true;
+
+    if (!consented) {
+      return {
+        name: 'Modification Approval',
+        passed: false,
+        violation: '缺少用户知情同意（修改审批条件未满足）'
+      };
+    }
+
+    return { name: 'Modification Approval', passed: true, consent: true };
   }
 
   /**
