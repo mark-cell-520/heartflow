@@ -3151,6 +3151,21 @@ function _knowledgeLayerFallback() {
   } catch (_) { _klFallback = null; }
   return _klFallback;
 }
+// [v6.8.0 第 579 轮] TopicScope（话题隔离栈）进程内回退单例，与 _klFallback
+// 同构：引擎未启动时兜底，正常路径永远走引擎常驻实例
+// （heartflow.topicScope，见 heartflow.js L1822 构造 + L3085 [r577] 接线）。
+// r578 实测：坏的旧实现每次调用都 new TopicScope({silent:true}) —— 全新实例
+// 永远是空栈，且调 TopicScope 上不存在的 getCurrentTopic()（走 `? :` 兜底成
+// {}）。外部 agent 通过 MCP 拿不到任何真实话题状态。
+let _tsFallback = null;
+function _topicScopeFallback() {
+  if (_tsFallback) return _tsFallback;
+  try {
+    const { TopicScope } = require('./memory/topic-scope.js');
+    _tsFallback = new TopicScope({ silent: true });
+  } catch (_) { _tsFallback = null; }
+  return _tsFallback;
+}
 
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
@@ -3956,12 +3971,110 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
 
+  // [v6.8.0 第 579 轮] 话题隔离栈（TopicScope）—— 真正可用的 MCP 接线。
+  // r578 实测坏形状：每次调用都 new TopicScope({silent:true})（**永远空栈**）
+  // + 调 TopicScope 上不存在的 getCurrentTopic()（`? :` 兜底成 {}），
+  // 且全库 tools-registry 里没有本工具的 schema 定义 —— 三处同步缺两处，
+  // 外部 agent 通过 MCP 拿不到任何真实话题状态。
+  //
+  // 现行范式与 heartflow_knowledge_layer / heartflow_associative 同构：
+  // 常驻实例（heartflow.topicScope）优先，引擎未启动时退化到进程内单例。
+  // 刻意不用模块级缓存实例替代引擎实例——那会退化成 r312 那条
+  // 「两套状态互相看不见」的老路。
+  //
+  // 参数形状实测（r579 探针，本文件用同一形状写）：
+  //   · push / contains / findSimilarTopic / store / get 全部是 **positional**
+  //     —— dispatch('topicScope.push', '话题名')，不是 {topic:...} 对象。
+  //     push({topic}) 会把整个对象当话题名存进 _current（[object Object]）。
+  //   · contains 内部 query.trim() 要求字符串，非字符串直接 TypeError；
+  //     dispatch 的降级分支只在 query/text/input/content/message/task 字段
+  //     存在时才展平，所以 MCP 入参必须自己先归一化成字符串。
   heartflow_topic_scope: (args) => {
     try {
-      const { TopicScope } = require('./memory/topic-scope.js');
-      const ts = new TopicScope({ silent: true });
-      const r = ts.getCurrentTopic ? ts.getCurrentTopic() : {};
-      return { topic: r, timestamp: Date.now() };
+      const ts = (heartflow && heartflow.topicScope) || _topicScopeFallback();
+      if (!ts) return { error: '话题栈未初始化：引擎未启动且回退单例创建失败' };
+      const action = args?.action || 'stats';
+      const text = typeof args?.text === 'string' ? args.text : '';
+      const threshold = typeof args?.threshold === 'number' ? args.threshold : undefined;
+
+      // push：压入新话题（positional 参数：topic 必须是字符串）
+      if (action === 'push') {
+        const topic = text || (typeof args?.topic === 'string' ? args.topic : '');
+        if (!topic) return { error: 'push 需要 text（话题名，positional：不是 {topic:{...}} 对象）' };
+        ts.push(topic);
+        return { action, pushed: topic, stats: ts.getStats(), timestamp: Date.now() };
+      }
+
+      // pop：弹出当前话题
+      if (action === 'pop') {
+        ts.pop();
+        return { action, stats: ts.getStats(), timestamp: Date.now() };
+      }
+
+      // contains：判断输入是否属于当前话题（引擎过滤跑题消息的判据）
+      if (action === 'contains') {
+        if (!text) return { error: 'contains 需要 text（要判定的文本）' };
+        const r = threshold === undefined ? ts.contains(text) : ts.contains(text, threshold);
+        return { action, belongs: r.belongs, score: r.score, reason: r.reason, timestamp: Date.now() };
+      }
+
+      // findSimilarTopic：在已压入的话题里找最接近的
+      if (action === 'findSimilarTopic' || action === 'find') {
+        if (!text) return { error: 'findSimilarTopic 需要 text' };
+        const r = threshold === undefined ? ts.findSimilarTopic(text) : ts.findSimilarTopic(text, threshold);
+        return { action, topic: r.topic, score: r.score, topics: r.topics, timestamp: Date.now() };
+      }
+
+      // store：往当前话题存一个键值（positional：key, value）
+      if (action === 'store') {
+        if (!args?.key) return { error: 'store 需要 key' };
+        if (args?.value === undefined) return { error: 'store 需要 value' };
+        ts.store(args.key, args.value);
+        return { action, key: args.key, storeSize: ts.storeSize(), timestamp: Date.now() };
+      }
+
+      // get：取当前话题的一个键
+      if (action === 'get') {
+        if (!args?.key) return { error: 'get 需要 key' };
+        return { action, key: args.key, value: ts.get(args.key) ?? null, timestamp: Date.now() };
+      }
+
+      // context set/get：话题级上下文
+      if (action === 'setContext' || action === 'getContext') {
+        if (!args?.key) return { error: `${action} 需要 key` };
+        if (action === 'setContext') {
+          if (args?.value === undefined) return { error: 'setContext 需要 value' };
+          ts.setContext(args.key, args.value);
+        }
+        return {
+          action,
+          key: args.key,
+          value: action === 'setContext' ? args.value : (ts.getContext(args.key) ?? null),
+          timestamp: Date.now(),
+        };
+      }
+
+      // clearAll：清空整个话题栈
+      if (action === 'clearAll' || action === 'clear') {
+        ts.clearAll();
+        return { action, stats: ts.getStats(), timestamp: Date.now() };
+      }
+
+      // topics / stats（默认）：真实话题状态
+      if (action === 'topics') {
+        return { action, topics: ts.getTopics(), timestamp: Date.now() };
+      }
+      const stats = ts.getStats ? ts.getStats() : null;
+      const current = ts.current !== undefined ? ts.current : null;
+      return {
+        action: 'stats',
+        current,
+        stack: ts.stack || null,
+        stats,
+        storeSize: ts.storeSize ? ts.storeSize() : null,
+        topics: ts.getTopics ? ts.getTopics() : [],
+        timestamp: Date.now(),
+      };
     } catch (e) { return { error: e.message }; }
   },
 
