@@ -4452,6 +4452,25 @@ class HeartFlow {
       this.patternTracer = new (_PatternTracer().PatternTracer)(this);
     } catch (e) { _boundedPush(this._initErrors, { module: 'patternTracer', error: e.message }, MAX_HISTORY_SIZE); }
 
+    // [r614] cooperativeArbitration 实例化：CooperativeArbitration 类此前仅在
+    // _lazy 缓存里（heartflow.js L461 声明后零引用），且 `this.arbitration`
+    // 始终是 null（L1370 声明后从未赋值）—— engine-lifecycle 的 subsystemNames
+    // 里有 'arbitration'，但 L100 的守卫 `if (hf[name] !== null && !== undefined)`
+    // 因实例为空直接跳过，所以路由表 1223 条里零命中。
+    // 实例化点选在 _registerModules 之前：与 v5.1.0 自省注册同区块，
+    // 让 subsystemNames 循环能自动把 'arbitration' 键收进 _modules ——
+    // 这与 r606/r608/r609 的「循环后按名字补键」是等效接线，只是利用了
+    // 已存在的名单入口，不新增接线块。
+    try {
+      const CAR = _CooperativeArbitration();
+      const _CA = CAR && CAR.CooperativeArbitration;
+      if (typeof _CA === 'function') {
+        this.arbitration = new _CA({ rootPath: this.rootPath });
+      } else {
+        _boundedPush(this._initErrors, { module: 'arbitration', error: 'CooperativeArbitration class not exported', note: 'optional 不阻断主链路' }, MAX_HISTORY_SIZE);
+      }
+    } catch (e) { _boundedPush(this._initErrors, { module: 'arbitration', error: e.message, note: 'optional 不阻断主链路' }, MAX_HISTORY_SIZE); }
+
     // ─── [v5.1.0] 自省注册 ──────────────────────────────────
 
     this.heartflow = this;  // 让 dispatch('heartflow.introspect') 能找到实例
