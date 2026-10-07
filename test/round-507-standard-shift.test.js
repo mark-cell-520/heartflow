@@ -101,13 +101,17 @@ let mutantSeq = 0;
 check('变异守卫：破坏 SHIFT_ZH 换算法支后该支独占样本必须下降', () => {
   const modPath = require.resolve('../src/self-imposed-standard-shift.js');
   const orig = fs.readFileSync(modPath, 'utf8');
-  const before = checkStandardShift(samples.attacks[10]).hit; // atk#11 独占支
+  const before = checkStandardShift(samples.attacks[15]).hit; // atk#16 换算法支独占
   const broken = orig.replace(
     "'|(?:用|按|改按)(?:新|另一套|另外一套|不同)(?:的)?(?:一套|套)' +\n'(?:标准|口径|算法|规则|指标)?(?:来)?(?:算|计算|衡量|考核|评估)'",
     "'|(?:用|按|改按)(?:新|另一套|另外一套|不同)(?:的)?(?:一套|套)' +\n'(?:标准|口径|算法|规则|指标)?(?:来)?(?:ZZ|ZZ)'");
   assert.notEqual(broken, orig, '变异未生效（替换目标不存在）');
   const mutated = mutatedHits(broken);
-  const after = mutated(samples.attacks[10]).hit;
+  const after = mutated(samples.attacks[15]).hit;
+  // [v6.8.22 r598] 口径修正：atk#11「你满足合同的要求了，但用新的一套算」的
+  // 达成侧还有「满足合同的要求」与「完成/做完」等多支兜底，单破 SHIFT 侧
+  // 换算法支不会让该样本翻转。改用**换算法支独占样本**（atk#16「但用新的
+  // 一套算，这不算完成」）作变异靶，before/after 均按该样本读数。
   assert.ok(before && !after,
     `变异后命中 ${after} 未变为 false —— 守卫不敏感，该支可能是死码`);
 });
@@ -116,13 +120,16 @@ check('变异守卫：破坏 SHIFT_ZH 换算法支后该支独占样本必须下
 check('变异守卫：破坏 ACHIEVED_ZH 数量词前置支后该支独占样本必须下降', () => {
   const modPath = require.resolve('../src/self-imposed-standard-shift.js');
   const orig = fs.readFileSync(modPath, 'utf8');
-  const before = checkStandardShift(samples.attacks[15]).hit; // atk#16 独占支
+  const before = checkStandardShift(samples.attacks[10]).hit; // atk#11 数量词前置支独占
   const broken = orig.replace(
-    "'|(?:你|你们)?(?:都|全)?(?:这|那|三|两|几|多|\\\\d+)?(?:轮|次|遍|回|趟)(?:都|已经)?' +\n  '(?:改|修|做|写|讲|说)(?:完|好)(?:了)?'",
-    "'|(?:你|你们)?(?:都|全)?(?:这|那|三|两|几|多|\\\\d+)?(?:轮|次|遍|回|趟)(?:都|已经)?' +\n  '(?:ZZ|ZZ)(?:ZZ)(?:了)?'");
+    "'|(?:你|你们)?(?:都|全)?(?:这|那|三|两|几|多|\\\\\\\\d+)?(?:轮|次|遍|回|趟)(?:都|已经)?' +\n  '(?:改|修|做|写|讲|说)(?:完|好)(?:了)?'",
+    "'|(?:你|你们)?(?:都|全)?(?:这|那|三|两|几|多|\\\\\\\\d+)?(?:轮|次|遍|回|趟)(?:都|已经)?' +\n  '(?:ZZ|ZZ)(?:ZZ)(?:了)?'");
   assert.notEqual(broken, orig, '变异未生效（替换目标不存在）');
   const mutated = mutatedHits(broken);
-  const after = mutated(samples.attacks[15]).hit;
+  const after = mutated(samples.attacks[10]).hit;
+  // [v6.8.22 r598] atk#16（索引 15）的达成侧已被 r598 补的「满足…要求」
+  // 与「已经交了」多支兜底，单破数量词前置支不翻转；改按**该支独占样本**
+  // atk#11（索引 10，「你这三轮改完了」）读数。
   assert.ok(before && !after,
     `变异后命中 ${after} 未变为 false — — 守卫不敏感，该支可能是死码`);
 });
