@@ -373,6 +373,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_instruction_audit',
+    description: "七条指令运行时审计（InstructionRegistry）：真/善/美/不断升级/减少错误/服务人类/持续改进。每条指令都带可执行判据（腿数组），对文本逐条检查是否违反该指令，返回 violated 列表（instruction/label/code/reason）与覆盖条数。真指令查编造信号，善指令查伤害内容，美指令查长度/杂乱/复读，upgrade 查无改进信号，reduce_errors 查低置信，serve_humans 查知识滞留表述（留在体内 = 没有服务人类），continuous_improvement 查拒绝改进表述。action: audit 审计文本（text+scenario+confidence）/ check 只查一条指令（instruction）/ list 列出七条指令全部定义 / stats 检查统计。走引擎常驻实例（heartflow.instructions），引擎未启动时退化到进程内单例。零 LLM 依赖，不存输入原文。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"audit（默认）/ check / list / stats"},"text":{"type":"string","description":"audit / check 的被检文本"},"instruction":{"type":"string","description":"check 的指令 id：truth / goodness / beauty / upgrade / reduce_errors / serve_humans / continuous_improvement"},"scenario":{"type":"string","description":"审计场景，默认 output_generation（knowledge_sharing 场景会纳入 serve_humans）"},"confidence":{"type":"number","description":"reduce_errors 判据使用的置信度 0-1，默认 0.5"}},"required":[]}
+  },
+
+  {
     name: 'heartflow_crowdtest_evaluate',
     description: "众测题判分：六区块结构判定 + 数字白名单（材料外数字/幻觉）+ 交付清单 + gate 合规兜底。返回形式分、硬失败项与人工陪审提示，不合并单一总分。",
     inputSchema: {"type":"object","properties":{"answer":{"type":"string","description":"被测模型按六区块格式输出的答案全文"},"materials":{"type":"array","items":{"type":"string"},"description":"题目材料文本（M1..Mn 承诺内容），用于建数字白名单"},"materialIds":{"type":"array","items":{"type":"string"},"description":"合法材料编号，如 [\"M1\",\"M2\"]；用于校验引用编号"},"requiredDeliverables":{"type":"array","items":{"type":"string"},"description":"本题必须出现的交付物关键词"},"minCitations":{"type":"number","description":"【依据】最少材料引用条数，默认 3"}},"required":["answer"]}
