@@ -68,6 +68,8 @@
 2. **`node scripts/upgrade-engine.js finish` 本轮未跑完**（见下节）。
 3. **r574 遗留的第 3-4 项（UPGRADE_LOG 记录、finish）本轮已补齐记录部分**，finish 见下节。
 4. 本轮无新增维度/新族，下一轮方向应从探测器重新出候选池（r573 落盘的 `/tmp/hf-scout-20261007-573.txt` 已消费完毕）。
+5. **`doc-numbers-accuracy` 剩 2 项失败，且非本轮引入**（更新：finish 的 `sync-doc-numbers` 已自动修掉 8 项，13→2）。剩余 2 项是 `data/test-count.json` 缓存里上一次 run-all 遗留的 28 个失败计数——恢复命令是 `git checkout -- data/test-count.json && node test/run-all.js`，但本轮内存守卫 BLOCKED（余量 128MB），**不能跑 run-all**（cgroup OOM 会杀 gateway）。这是超出本轮范围的真问题，按纪律留给下一轮：内存充裕时先 checkout 缓存再跑一次 run-all 即可自愈，且在跑通前 doc-numbers 这 2 项会持续挂（记账链路自锁）。
+6. `scripts/` 下堆积约 200 个未跟踪的往轮 diag/probe 脚本（r525-r573 的探测器与诊断），finish 提示"需人工判断"。未删的原因：无法在无人值守下确认哪些仍被其它轮次的测试引用，误删会让下一轮的诊断脚本失效。建议下一轮用 `git log --diff-filter=A --name-only` 对照各轮测试文件引用的脚名字典，只删无引用的。
 
 
 ## 方向选择与实测证据
