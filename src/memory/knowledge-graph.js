@@ -337,15 +337,24 @@ class KnowledgeGraph {
   }
 
   /**
-   * 获取两个实体之间的路径
+   * 获取两个实体之间的路径（BFS）
+   *
+   * [r593 修复] 原实现在命中目标时只把终点 push 进临时 path 数组，
+   * 从未收集到任何结果变量，函数末尾硬编码 `return []` ——
+   * 顺着边明明能走到，任何输入也永远返回空数组（探针实测见
+   * scripts/round-593-findpath-probe.js：A→B→C 三条边，
+   * findPath(A,B) / findPath(A,C) 双双返回 []）。现补上结果收集。
+   *
    * @param {string} from - 起始实体
    * @param {string} to - 目标实体
    * @param {number} [maxDepth=4] - 最大搜索深度
-   * @returns {Array<Array<object>>} 路径数组
+   * @returns {Array<Array<object>>} 路径数组（每条路径是节点链）
    */
   findPath(from, to, maxDepth = 4) {
-    if (from.toLowerCase() === to.toLowerCase()) return [];
+    if (!from || !to || from.toLowerCase() === to.toLowerCase()) return [];
 
+    const target = to.toLowerCase();
+    const results = [];
     const queue = [[{ entity: from, depth: 0, triples: [] }]];
     const visited = new Set([from.toLowerCase()]);
 
@@ -356,21 +365,30 @@ class KnowledgeGraph {
       if (last.depth >= maxDepth) continue;
 
       const related = this.query({ subject: last.entity, fuzzy: false });
-      related.forEach(t => {
+      for (const t of related) {
         const nextEntity = t.object;
         const nextLower = nextEntity.toLowerCase();
-        if (nextLower === to.toLowerCase()) {
-          path.push({ entity: nextEntity, depth: last.depth + 1, triples: [t] });
-          return;
+        // 命中：整条链进结果（triples 累计本路径上所有边）
+        if (nextLower === target) {
+          results.push([...path, {
+            entity: nextEntity,
+            depth: last.depth + 1,
+            triples: [...last.triples, t],
+          }]);
+          continue;
         }
         if (!visited.has(nextLower) && last.depth + 1 < maxDepth) {
           visited.add(nextLower);
-          queue.push([...path, { entity: nextEntity, depth: last.depth + 1, triples: [t] }]);
+          queue.push([...path, {
+            entity: nextEntity,
+            depth: last.depth + 1,
+            triples: [...last.triples, t],
+          }]);
         }
-      });
+      }
     }
 
-    return [];
+    return results;
   }
 }
 
