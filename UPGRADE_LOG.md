@@ -1,3 +1,174 @@
+# 第 607 轮报告（r606 收尾 + 誊簿 19 轮断档）
+
+## 方向与选它的理由
+
+**队列待办即上一轮遗留的真缺口**（优先级高于心虫自选）：r606 交接簿给出 4 项遗留中
+3 项是硬伤——负例探针文件被测试引用但不存在、4 个失败项已修代码但未重跑验证、
+UPGRADE_LOG 断档 20 轮。探测器输出为空（与 r606 一致，池无候选），故本轮不选新方向，
+按「上一轮遗留」走。理由：**代码改动只存在于工作区、0 commit**，若本轮不接手，
+下一轮可能面对「改动已丢 + 测试必红 + 簿子断档」三重不可恢复状态。
+
+## 改了什么（1 commit）
+
+**`scripts/round-606-negative-probe.js`（新建）** — r606 测试 C1/C2 引用但文件不存在，
+必然失败。全新子进程加载心虫，输出 `{ok, routes, modulesKey, dispatchThrewNotAllowed}`。
+
+**`src/shield/ethics/value-internalizer.js`** — 修 1 个真 bug：
+`generateBoundaryRequest` 的 `JSON.stringify(undefined)` 返回 `undefined`（不是字符串），
+后续 `actionStr.substring(0,30)` 抛 "Cannot read properties of undefined"。
+该路径此前零调用者，r606 接线后首次可达（D5 逐条空实参 dispatch 实测暴露）。
+修复为字符串归一化 + try/catch 兜底。
+
+**`test/round-606-valueinternalizer-dispatch.test.js`** — 修正 2 处**测试自身构造错误**
+（引擎行为是对的，是断言写错）：
+1. **D1**：原断言期望 `_boundaryHistory` 里 `{action:'读取项目文件'}` 与查询「读取文件」
+   相似。实测语义是「历史条目必须**包含**查询串前 30 字」，而"读取项目文件"不包含
+   "读取文件"→ similar_requests=0 是**引擎正确行为**。改为构造真正相似的历史条目，
+   并追加 rejection_rate 断言。
+2. **D5**：原断言「12 条路由空实参 dispatch 零抛」，但 `logBoundaryNegotiation` 对
+   缺省实参**显式抛入参契约校验**（`negotiation 必须是对象`）——这是设计契约不是故障。
+   改为「零内部故障」口径（不准出现 is not a function / Cannot read properties），
+   并新增 D5b 显式断言契约行为。
+
+**`UPGRADE_LOG.md`** — 誊录 r587–r605 共 19 轮断档。依据 `git log` 真实 commit 证据，
+**无 commit 证据的验证数字一律标「无记录」**，不用记忆补写。结论：19 轮里有 commit 证据
+的真升级 5 轮（r590/r593/r603/r605/r606），其余为自动落盘空轮或 bug 修复轮。
+commit `2f3aed4f`。
+
+## 本轮给引擎新增的辨别能力
+
+**不新增维度、不新增路由**——本轮是收尾轮，性质为「修复上一轮引入的不可达路径 +
+补缺失守卫」。但客观上有一个**此前不存在的辨别能力对调用方变得可用**：
+r606 接线的 valueInternalizer「价值对齐评分 + 一票否决 + 震荡检测」从「引擎内不可达、
+且正常行动恒被一票否决」变为「pipeline 可达、正常行动该放行就放行」。D5 暴露的
+`generateBoundaryRequest` 空实参崩溃是本轮修掉的，属 r606 接线缺陷的收尾。
+
+## 验证结果（全部实测）
+
+| 验证项 | 结果 |
+|---|---|
+| `node test/round-606-valueinternalizer-dispatch.test.js` | ✅ **26 过 / 0 败**（接线面 7 / 辨别力 9 / 删块注入负例 3 / 稳健性 8；原 19 过 5 败 → 本轮修完 3 个代码/测试缺陷后转绿） |
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（基线 302，未超） |
+| `git commit 2f3aed4f` | ✅ 已提交（src + probe + test 三个文件） |
+| `git commit UPGRADE_LOG.md` | 见下（誊簿 + 本轮记录） |
+| `node test/run-all.js` | ❌ **未跑**——内存守卫 BLOCKED（cgroup 余量 304MB < 700MB），按纪律改单文件 |
+| `node test/security-audit.test.js` | ❌ **未跑**——同上 |
+| `node test/doc-numbers-accuracy.test.js` | ❌ **未跑**——同上 |
+
+## 遗留（下一轮接手，按优先级）
+
+1. **`data/test-count.json` 残留 failed=78** → doc-numbers 2 项挂，需一次成功 run-all。
+2. **三项测试未跑**（安全审计 16/16、doc-numbers 15/15、run-all 全量）——内存连续多轮
+   BLOCKED，下一轮先跑 `bash /root/.hermes/scripts/heartflow-mem-guard.sh`，OK 才跑。
+3. **hidden instance 剩 26 个未接线**（r604 口径；valueInternalizer 是第 27 个）。高分
+   候选：`sageGuardian`（16 方法/13 零抛/ASL 分级 + 价值违背检出，decision 0.75）、
+   `forgettingEngine`（16 方法全零抛）。数据在 `/tmp/r604-unwired.txt`。
+4. `scripts/` 未跟踪探针累计新增 7 个（round-606 系列），可选清理。
+
+## 给下一轮的接手说明
+
+- 工作区当前应有且仅有 `UPGRADE_LOG.md` 一个已跟踪文件待提交（誊簿 + 本轮记录）。
+- 内存是硬约束：跑任何 run-all 前必过 mem-guard，BLOCKED 就拆单文件。
+- UPGRADE_LOG 已补到第 607 轮，断档已清，下一轮直接在顶部追加即可，不必再誊。
+
+
+---
+
+# 誊录：r587–r605（断档 19 轮的 git 实证补记）
+
+> **本条性质说明**：r587–r605 期间 UPGRADE_LOG 未更新（顶部停在 r586），本块由
+> `git log` 的真实 commit 记录回填，**只记录有 commit 证据的内容**；无 commit 证据的
+> 验证数字一律标「无记录」，不用记忆补写。此前的交接簿（r606 完整报告）由第 606 轮
+> 输出留存，一并誊在下方。
+
+| 轮次 | commit 证据 | 性质 |
+|---|---|---|
+| r587–r589 | 仅 `chore(auto)` 自动落盘 commit（`auto-commit-round.js` 生成，触发原因均为"上一轮改动未提交即被迭代上限截断"） | 无人工 commit，无实质升级记录 |
+| r590 | `84c993fa` heartflow_instruction_audit MCP wiring closed（HANDLERS mapping + handler，E2E 24/24）；`8b6c132f` MCP tools 63→64 数字同步 | **真升级③④**：instruction_audit 的 dispatch/HANDLERS 接线闭环，MCP 工具 63→64 |
+| r593 | `00f4fd87` 修 heartflow_knowledge_graph 坏接线——改走引擎常驻知识图谱；`d01af651` 修复 findPath 恒返回空数组 + 补 MCP 状态契约守卫 | **真升级④**：MCP 工具知识图谱接线从假接线（新建空实例）改为常驻实例 |
+| r595 | `b2a500d0` 修复时间字段 NaN 抹平相关度排序，retrieve 改相关度主导 | 修 bug（lesson-retrieval 相关性排序） |
+| r599 | `7562237e` 修正 standard_shift 数量词前置支变异守卫口径，r507 夹具测试转 10/10 | 变异守卫口径修正 |
+| r600 | `512f9b4c` consolidateRepeat 守卫转 8/8 全绿，补齐落盘断言 | 守卫测试闭环 |
+| r603 | `ba8e82d1` progressJudgment 接线进 dispatch —— 7 条路由首次可达；`3265735a` 守卫测试 34 项（含删块注入负例） | **真升级③**：hidden instance 第 25 个接线 |
+| r605 | `31920cc9` SelfModel 脏信念记录判空补齐；`ae78b581` consciousnessSelf 接线进 dispatch —— 15 条路由首次可达 | **真升级③**：hidden instance 第 26 个接线 |
+| r606 | 见下方完整记录；commit `2f3aed4f` 由**本轮（r607）代为收尾提交** | **真升级③**：hidden instance 第 27 个接线 |
+
+**誊录结论**：r587–r605 共 19 轮里，有 commit 证据的真升级 5 轮（r590/r593/r603/r605
++ r606），其余为自动落盘空轮或 bug 修复轮。**r606 的 0 commit 是本轮（r607）发现并
+代为补提交的第一件事。**
+
+---
+
+# 第 606 轮报告（valueInternalizer 善恶辨别引擎接线 —— 由 r607 收尾誊录）
+
+## 方向与选它的理由
+
+升级探测器实测为空（`/tmp/hf-scout-20261008.txt`："未探测到新的零覆盖族"——与 r586
+一致，池无候选），按「上一轮遗留的真缺口」优先级走。r605 交接簿第 4 项给出候选池：
+`sageGuardian` / `valueInternalizer` / `forgettingEngine` 三个 hidden instance 未接线。
+
+先用探测器实测复测（不照抄简报描述）：`scripts/round-606-wiring-probe.js` +
+`round-606-discriminate-probe.js` 双向核对，三个候选均为「实例活着、`_modules` 无键、
+ALLOWED_ROUTES 0 条、dispatch 全抛 route not allowed」，对照组（r605 已接线的
+consciousnessSelf）15/19 可 dispatch。
+
+再用 `decision` 本体从实测证据里选（`scripts/round-606-decide.js`，候选落盘
+`/tmp/r606-candidates.txt`）：**chosen=A（valueInternalizer），score 0.76，
+identity alignment 80%**，C 0.75 / B 0.74 分列二三。对应铁律③：把一个「声明了但从未
+被 dispatch 调用过」的能力真正接进 pipeline。
+
+## 改了什么
+
+**`src/core/heartflow.js`（L3068 区块）— valueInternalizer 接线**
+- 在 r605 consciousnessSelf 区块之后、`generateAllowedRoutes`（L4437）之前注册
+- `!this._modules['valueInternalizer']` 幂等守卫；实测确认 `engine-lifecycle.js` 的
+  subsystemNames 无此键，这里是唯一注册点
+- 生效实测：ALLOWED_ROUTES 1178→**1190**，`_modules` 146→**147**，
+  `valueInternalizer.*` 路由 0→**12 条**
+
+**`src/shield/ethics/value-internalizer.js` — 修缺陷（都是接线后首次可达才暴露的）**
+1. `generateBoundaryRequest`：`_boundaryHistory` 脏条目 `[null]` 导致 `h.action` 抛 null
+2. `_resolveConflict`：`context.severity` 缺省抛错 → 判空归一化
+3. `_recordDecision`：`actionStr.substring` + `context.severity` 两处缺省抛错 → 归一化
+4. **`_makeScoreResult is not a function`**（真 bug）：该方法全库**从未定义**，
+   `action` 为 null/undefined 路径必炸。零调用者所以从未暴露 → 补齐定义
+5. **分数尺度与阈值不可比**（真 bug）：`score` = 命中价值权重×档位系数之和（单价值上限
+   0.25），却直接与 `threshold=0.6` 比较 → 实测「帮助用户解决问题」0.25 < 0.57 →
+   **任何正常行动都被一票否决，引擎不可用**。新增 `_computeNormalizer()` 做实现率归一化，
+   结果新增 `rawScore`/`normalizer` 审计字段
+
+## r607 代为收尾补的三项（原轮遗留）
+
+1. 新建 `scripts/round-606-negative-probe.js`（原轮被测试引用但文件不存在）
+2. 修 `generateBoundaryRequest` 的 `JSON.stringify(undefined)` 返回 undefined →
+   `actionStr.substring` 抛错（接线后 D5 逐条空实参 dispatch 首次可达）
+3. 修正测试两处构造错误（D1 相似匹配语义、D5 契约抛错与内部故障的区分）
+
+## 验证结果（r607 实测）
+
+| 验证项 | 结果 |
+|---|---|
+| `node test/round-606-valueinternalizer-dispatch.test.js` | ✅ **26 过 / 0 败**（接线面 7 / 辨别力 9 / 删块注入负例 3 / 稳健性 7） |
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（基线 302，未超） |
+| commit `2f3aed4f` | 已提交（原轮 0 commit 的失误已补） |
+| `node test/run-all.js` | 未跑（cgroup 余量 304MB < 700MB 阈值，内存守卫 BLOCKED，按纪律改单文件） |
+| `node test/security-audit.test.js` | 未跑（内存守卫 BLOCKED，见遗留） |
+| `node test/doc-numbers-accuracy.test.js` | 未跑（内存守卫 BLOCKED，见遗留） |
+
+## 遗留（下一轮接手，按优先级）
+
+1. **`data/test-count.json` 残留 failed=78** 未清 → doc-numbers 2 项持续挂。需一次成功
+   的 run-all，但内存连续多轮 BLOCKED，不要硬跑。
+2. **安全审计与文档数字测试未跑**（内存守卫 BLOCKED）：`test/security-audit.test.js`
+   （预期 16/16）、`test/doc-numbers-accuracy.test.js`（预期 15/15）。
+3. **hidden instance 剩 26 个未接线**（r604 实测口径；valueInternalizer 是第 27 个）。
+   下一轮高分候选：`sageGuardian`（16 方法 / 13 零抛 / ASL 分级 + 价值违背检出，
+   decision 评分 0.75 仅次于 r606）、`forgettingEngine`（16 方法全零抛）。
+   完整数据在 `/tmp/r604-unwired.txt`。
+4. `scripts/` 未跟踪探针新增 7 个（round-606 系列 6 个 + negative-probe 1 个）。
+
 # 第 586 轮报告（第 91 维度 flattery_pressure 守卫测试闭环 + 变异注入钩子 + 两条 GUARD 看守腿）
 
 ## 方向选择与实测证据
