@@ -361,6 +361,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_associative',
+    description: "联想理解引擎（AssociativeEngine，L1-L5 五层管线）：把输入文本跑词汇联想→短语分块→叙事匹配→语义凝结→逐词生成，返回 understoodIntent / matchedNarrative / narrativeConfidence / coreConcepts / 层间一致性 coherence / 各层降级状态。用于判断“这段文本被理解成了什么意图、匹配到哪种叙事原型”，是心虫对输入语义的拆解视图。action: process 跑完整五层（默认，需 text）/ stats 五层处理统计（成功率·降级·质量分）/ trace 最近 N 次处理链（layers·coherence·degraded）。零 LLM 依赖，无持久化（processingLog 进程内环形，上限 20 条）。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"process / stats / trace，默认 process"},"text":{"type":"string","description":"process 的输入文本（空输入走早退分支，拿到占位应答而非五层结果）"},"limit":{"type":"number","description":"trace 取最近几条，默认 1，上限 10"}},"required":[]}
+  },
+
+  {
     name: 'heartflow_crowdtest_evaluate',
     description: "众测题判分：六区块结构判定 + 数字白名单（材料外数字/幻觉）+ 交付清单 + gate 合规兜底。返回形式分、硬失败项与人工陪审提示，不合并单一总分。",
     inputSchema: {"type":"object","properties":{"answer":{"type":"string","description":"被测模型按六区块格式输出的答案全文"},"materials":{"type":"array","items":{"type":"string"},"description":"题目材料文本（M1..Mn 承诺内容），用于建数字白名单"},"materialIds":{"type":"array","items":{"type":"string"},"description":"合法材料编号，如 [\"M1\",\"M2\"]；用于校验引用编号"},"requiredDeliverables":{"type":"array","items":{"type":"string"},"description":"本题必须出现的交付物关键词"},"minCitations":{"type":"number","description":"【依据】最少材料引用条数，默认 3"}},"required":["answer"]}

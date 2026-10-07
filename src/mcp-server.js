@@ -3140,6 +3140,9 @@ function handleFalsePositiveTool(args) {
 // （heartflow 为 null / 无 knowledgeLayer 属性）时兜底，正常路径永远走引擎常驻实例。
 // 刻意不用模块级缓存实例替代引擎实例——那会退化成 r312 那条「两套状态互相看不见」的老路。
 let _klFallback = null;
+// [v6.8.0 第 571 轮] AssociativeEngine 进程内回退单例，与 _klFallback 同构：
+// 引擎未启动时兜底，正常路径永远走引擎常驻实例（heartflow.associativeEngine）。
+let _aeFallback = null;
 function _knowledgeLayerFallback() {
   if (_klFallback) return _klFallback;
   try {
@@ -3517,6 +3520,75 @@ const HANDLERS = {
       }
       return { action, stats, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
+  },
+
+  // [v6.8.0 第 571 轮] AssociativeEngine（联想理解引擎，L1-L5 五层管线）
+  // 实测背景：src/archive/associative-engine.js 本体 + 五子模块共 6942 行，
+  // r538 修好 require 路径后在 heartflow.js 构造出 this.associativeEngine，
+  // 但此后**全仓零调用**（grep 只有注释/构造/catch 三处）——引擎空转 33 轮。
+  // 本轮按 r312/r313 范式把常驻实例接成可调用的辨别能力：MCP handler +
+  // tools-registry 定义。刻意走引擎常驻实例，不在 handler 里 new，
+  // 否则每次调用都是冷启动、五层状态与 stats 全部丢失。
+  heartflow_associative: async (args) => {
+    // 常驻实例优先；引擎未启动时退化到进程内单例（与 knowledge_layer 同构）
+    let ae = (heartflow && heartflow.associativeEngine) || null;
+    if (!ae && !_aeFallback) {
+      try {
+        const { AssociativeEngine } = require('./archive/associative-engine.js');
+        _aeFallback = new AssociativeEngine(process.cwd());
+      } catch (_) { _aeFallback = null; }
+    }
+    ae = ae || _aeFallback;
+    if (!ae) return { error: '联想引擎未初始化：引擎未启动且回退单例创建失败' };
+    const action = args?.action || 'process';
+    const text = typeof args?.text === 'string' ? args.text : '';
+
+    // process（默认）：跑 L1-L5 五层管线，返回分层结果 + 层间一致性
+    if (action === 'process') {
+      if (!text) return { error: 'process 需要 text（空输入会走早退分支，拿到的是占位应答而非五层结果）' };
+      const r = await ae.process(text, {});
+      const tr = ae.getLastProcessing ? ae.getLastProcessing() : null;
+      const layers = tr && tr[0] && tr[0].layers ? tr[0].layers : {};
+      const L1 = layers.L1 || null;
+      return {
+        action,
+        understoodIntent: (layers.L4 && layers.L4.understoodIntent) || (r && r.understoodIntent) || null,
+        matchedNarrative: (layers.L3 && layers.L3.matchedPrototype) || null,
+        narrativeConfidence: (layers.L3 && typeof layers.L3.confidence === 'number') ? layers.L3.confidence : null,
+        coreConcepts: (L1 && L1.allAssociations) ? L1.allAssociations.slice(0, 20).map(a => a.word) : [],
+        phraseChunks: (layers.L2 && layers.L2.chunks) ? layers.L2.chunks.slice(0, 20) : [],
+        coherence: (tr && tr[0] && tr[0].coherence) || null,
+        layerStatuses: (tr && tr[0] && tr[0].layers) ? Object.fromEntries(
+          Object.entries(tr[0].layers).filter(([k]) => /Status$/.test(k))
+        ) : null,
+        response: (layers.L5 && layers.L5.response) || (r && r.response) || null,
+        processingTime: (tr && tr[0] && tr[0].totalTime) || null,
+        timestamp: Date.now(),
+      };
+    }
+
+    // stats：五层处理统计（成功率/降级次数/质量分）
+    if (action === 'stats') {
+      return { action, stats: ae.getStats ? ae.getStats() : null, timestamp: Date.now() };
+    }
+
+    // trace：最近一次（或最近 N 次）的处理链
+    if (action === 'trace') {
+      const n = Math.min(Math.max(parseInt(args?.limit, 10) || 1, 1), 10);
+      const log = ae.getProcessingLog ? ae.getProcessingLog().slice(-n) : [];
+      return {
+        action, count: log.length,
+        trace: log.map(t => ({
+          layers: Object.keys(t.layers || {}),
+          coherence: t.coherence || null,
+          degraded: !!t.degraded,
+          totalTime: t.totalTime || null,
+        })),
+        timestamp: Date.now(),
+      };
+    }
+
+    return { error: 'action 必须是 process / stats / trace（收到: ' + action + '）' };
   },
 
   heartflow_memory_consolidation: (args) => {
