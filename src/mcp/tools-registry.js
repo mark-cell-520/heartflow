@@ -367,6 +367,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_topic_scope',
+    description: "话题隔离栈（TopicScope）：多轮会话的话题归属判别器——压入当前话题后，判断新消息是否属于同一话题（跑题检测）、在已压入的话题栈里找最接近的历史话题，并为每个话题维护独立键值存储与上下文。返回 belongs / score / reason / current / stack / stats / topics。用于长会话里防模型把上一个话题的结论套到新话题上。action: push 压入新话题（text=话题名）/ pop 弹出当前 / contains 判定 text 是否属于当前话题（同一话题 score=1，跨话题 score=0）/ findSimilarTopic 在话题栈里找最接近的 / store+get 话题级键值（key+value）/ setContext/getContext 话题级上下文 / clearAll 清空栈 / topics 列出全部话题 / stats（默认）返回当前话题·栈深度·存储用量等真实状态。走引擎常驻实例（heartflow.topicScope），跨调用保持同一状态；引擎未启动时退化到进程内单例。零 LLM 依赖。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"push / pop / contains / findSimilarTopic / store / get / setContext / getContext / clearAll / topics / stats（默认）"},"text":{"type":"string","description":"话题名（push）或待判定文本（contains / findSimilarTopic）"},"topic":{"type":"string","description":"push 的话题名（text 的等价别名）"},"threshold":{"type":"number","description":"contains / findSimilarTopic 的相似度阈值，默认 0.25 / 0.3"},"key":{"type":"string","description":"store / get / setContext / getContext 的键名"},"value":{"description":"store / setContext 的值，任意 JSON 类型"}},"required":[]}
+  },
+
+  {
     name: 'heartflow_crowdtest_evaluate',
     description: "众测题判分：六区块结构判定 + 数字白名单（材料外数字/幻觉）+ 交付清单 + gate 合规兜底。返回形式分、硬失败项与人工陪审提示，不合并单一总分。",
     inputSchema: {"type":"object","properties":{"answer":{"type":"string","description":"被测模型按六区块格式输出的答案全文"},"materials":{"type":"array","items":{"type":"string"},"description":"题目材料文本（M1..Mn 承诺内容），用于建数字白名单"},"materialIds":{"type":"array","items":{"type":"string"},"description":"合法材料编号，如 [\"M1\",\"M2\"]；用于校验引用编号"},"requiredDeliverables":{"type":"array","items":{"type":"string"},"description":"本题必须出现的交付物关键词"},"minCitations":{"type":"number","description":"【依据】最少材料引用条数，默认 3"}},"required":["answer"]}
