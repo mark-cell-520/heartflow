@@ -2135,7 +2135,17 @@ class HeartFlow {
     try { this.daoDecision = new (_DaoDecision().DaoDecision)(); } catch (e) { _boundedPush(this._initErrors, {module: 'daoDecision', error: e.message}, MAX_HISTORY_SIZE); }
     try { this.uncertaintyQuantifier = new (_UncertaintyQuantifier().UncertaintyQuantifier)(); } catch (e) { _boundedPush(this._initErrors, {module: 'uncertaintyQuantifier', error: e.message}, MAX_HISTORY_SIZE); }
     try { this.priorityGuardian = new (_PriorityGuardian().PriorityGuardian)(); } catch (e) { _boundedPush(this._initErrors, {module: 'priorityGuardian', error: e.message}, MAX_HISTORY_SIZE); }
-    try { this.progressJudgment = new (_ProgressJudgment().ProgressJudgment)(); } catch (e) { _boundedPush(this._initErrors, {module: 'progressJudgment', error: e.message}, MAX_HISTORY_SIZE); }
+    try { this.progressJudgment = new (_ProgressJudgment().ProgressJudgment)(); this._modules['progressJudgment'] = this.progressJudgment; } catch (e) { _boundedPush(this._initErrors, {module: 'progressJudgment', error: e.message}, MAX_HISTORY_SIZE); }
+
+    // [r603] progressJudgment dispatch 接线（与上方 patternDetector 同一形态）：
+    // L2138 实例一直活着、7 个方法完整，MCP 侧 heartflow_supervise_progress 早就在调它，
+    // 但实例从未进 _modules → generateAllowedRoutes 扫不到它 → ALLOWED_ROUTES 0 条、
+    // dispatch('progressJudgment.*') 全抛 'route not allowed'。即「实例活着、能力完整、
+    // 全库 0 条引擎侧路由」。补注册后 judge/checkCoreStandards/detectPseudoProgress/
+    // makeIndependentJudgment/formMyJudgment/buildStandGround/calculateConfidence
+    // 共 7 条首次可 dispatch——「判断一个声称的进步是真进步还是伪进步」这一辨别能力
+    // 从「引擎内不可达」变成 pipeline 可达。注册形态与 r402/r404/r577 同一区块同一时序：
+    // 在 _registerModules() 之后、generateAllowedRoutes（L4403）之前。
 
     // ★ 深层推理 + 公正决策（拆分自原 heartflow.js）
 
