@@ -3108,6 +3108,26 @@ class HeartFlow {
       this._modules['sageGuardian'] = this.sageGuardian;
     }
 
+    // [r615] priorityGuardian 接线（人类进步优先守护）。实例在 L2137 一直在构造，
+    // think() 输出侧也早已在调 this.priorityGuardian.check()（L5606）——但那一次调用
+    // 恒传 humanProgress:{}，四条 critical 冲突腿（TRUTH_SUPPRESSION / TRANSMISSION_
+    // ABANDONMENT / ERROR_DENIAL / TOOL_BEHAVIOR）全部依赖 humanProgress 字段才可能
+    // 触发，所以主链路上这套「有路径说老大错了」的守护逻辑从未真正生效过一次。
+    // r615 双向核对实测：_modules 无 'priorityGuardian' 键（150 键里 0 命中）、
+    // ALLOWED_ROUTES 0 条命中、dispatch('priorityGuardian.*') 逐条抛 route not allowed。
+    // 签名复测（scripts/round-615-pg-probe.js）确认辨别力真实且分化：
+    //   压制真相+有错误 → REFUSE_WITH_GUARDIAN（allowed:false）
+    //   放弃知识传递     → REFUSE_WITH_GUARDIAN（allowed:false）
+    //   拒绝承认错误     → REFUSE_WITH_GUARDIAN（allowed:false）
+    //   行动原样复述指令 → CONDITIONAL_ALLOW（allowed:true + 附加条件）
+    //   良性修 bug       → ALLOW（无冲突）
+    // 注册位置与 r402/r404/r577/r603/r605/r606/r608/r609/r614 同一区块同一切换时序：
+    // 实例化点之后、generateAllowedRoutes 之前。engine-lifecycle.js 的 subsystemNames
+    // 名单里没有它（本文件 L1323 声明、L2137 构造，名单零命中），此处是唯一注册点。
+    if (this.priorityGuardian && !this._modules['priorityGuardian']) {
+      this._modules['priorityGuardian'] = this.priorityGuardian;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
