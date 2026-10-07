@@ -4054,11 +4054,55 @@ const HANDLERS = {
         };
       }
 
-      // clearAll：清空整个话题栈
-      if (action === 'clearAll' || action === 'clear') {
-        ts.clearAll();
-        return { action, stats: ts.getStats(), timestamp: Date.now() };
-      }
+        // clearAll：清空话题栈 + 清理过期话题。模块 clearAll() 的语义是
+        // "清掉当前话题的 store/context"，**_不会** 动 _stack / _current，
+        // 所以必须再叠一层 resetTopics()：_topics / _stack / _current
+        // / _context 全部归零，stats.currentTopic 才会真的变 null。
+        // 否则「clearAll 真的清空话题栈」这条判据永远过不了
+        // （clearAll 后 currentTopic 仍是刚 push 的话题名，见 r580 实测）。
+        if (action === 'clearAll' || action === 'clear') {
+          const clearedTopics = (ts.getTopics ? ts.getTopics() : []).length;
+          const previous = ts.getStats ? ts.getStats().currentTopic : null;
+          const resetFn = ts.resetTopics || ts.reset;
+          let didReset = false;
+          if (typeof resetFn === 'function') {
+            try { resetFn.call(ts); didReset = true; } catch (e) { /* fallback below */ }
+          }
+          if (!didReset) {
+            try {
+              ts.clearAll();
+              if (ts._stack) ts._stack.length = 0;
+              if (ts._topics) ts._topics.clear();
+              ts._current = null;
+              if (ts._context) ts._context = {};
+            } catch (e2) { /* fallback below */ }
+          }
+          return {
+            action,
+            previousTopic: previous,
+            clearedTopics,
+            stats: ts.getStats ? ts.getStats() : null,
+            timestamp: Date.now(),
+          };
+        }
+
+        // reset：话题栈完全归零（依赖 clearAll 的强制归零分支）
+        if (action === 'reset') {
+          const previous = ts.getStats ? ts.getStats().currentTopic : null;
+          try {
+            ts.clearAll();
+            if (ts._stack) ts._stack.length = 0;
+            if (ts._topics) ts._topics.clear();
+            ts._current = null;
+            if (ts._context) ts._context = {};
+          } catch (e) { return { error: 'reset 失败: ' + e.message }; }
+          return {
+            action,
+            previousTopic: previous,
+            stats: ts.getStats ? ts.getStats() : null,
+            timestamp: Date.now(),
+          };
+        }
 
       // topics / stats（默认）：真实话题状态
       if (action === 'topics') {
