@@ -3039,6 +3039,21 @@ class HeartFlow {
 
     }
 
+
+
+    // [r605] consciousnessSelf 接线：SelfModel（Identity self-model with drift
+    // detection）实例在 L2430 一直在构造、15 个方法全部完整，但从未进 _modules
+    // —— r604 双向核对实测：hf._modules 有键 'consciousness'（壳对象，只暴露
+    // getStatus 一条路由），而 SelfModel 本身的 15 个方法 shell_covers=0/15，
+    // 即一条都 dispatch 不到。
+    // 注册位置与 r402/r404/r577/r603 同一区块同一时序：LATE_ADDITIONS 循环之后、
+    // generateAllowedRoutes（L4413）之前。注意不重复添加 'consciousness' 键 ——
+    // 'consciousness' 在 engine-lifecycle.js 的 subsystemNames 名单里已存在，
+    // 重复添加会造出第二个假注册点。
+    if (this.consciousnessSelf && !this._modules['consciousnessSelf']) {
+      this._modules['consciousnessSelf'] = this.consciousnessSelf;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
