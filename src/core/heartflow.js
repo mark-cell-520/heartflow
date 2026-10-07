@@ -3128,6 +3128,28 @@ class HeartFlow {
       this._modules['priorityGuardian'] = this.priorityGuardian;
     }
 
+    // [r617] uncertaintyQuantifier 接线（不确定性量化 / 幻觉风险辨别）。
+    // 实例在 L2136 一直在构造、11 个公有方法完整，pipeline L174-185 的 Layer 3.7
+    // 与 think() 输出侧 L5608-5621 都早已在真实调用 evaluate()——但那两处都是
+    // 「每次 new 一个全新实例」或「直接用 this 字段」，dispatch 侧完全不可达。
+    // r617 双向核对实测：_modules 无 'uncertaintyQuantifier' 键、hf.routes() 里
+    // 零命中、dispatch('uncertaintyQuantifier.evaluate') 抛
+    // "route 'uncertaintyQuantifier.evaluate' not allowed"。
+    // MCP 包装层 heartflow_supervise_uncertainty 存在但走的是自己的实例路径。
+    // 辨别力实测（同形状穿透，scripts/round-617-uq-probe.js）：
+    //   强断言族   → hallucRisk 0.10 / confidence 0.26 / VERY_LOW
+    //   限定词族   → hallucRisk 0    / confidence 0.30 / LOW
+    //   引用堆叠族 → hallucRisk 0.45 / isHallucinationRisk true（只有这族触发）
+    //   平淡陈述族 → hallucRisk 0    / confidence 0.27 / VERY_LOW
+    // 四族中只有引用堆叠族命中幻觉阈值 → 辨别分化真实存在，不是常量函数。
+    // 注册位置与 r402/r404/r577/r603/r605/r606/r608/r609/r614/r615 同一区块
+    // 同一切换时序：实例化点之后、generateAllowedRoutes 之前。engine-lifecycle.js
+    // 的 subsystemNames 名单里没有它（L1322 声明、L2136 构造，名单零命中），
+    // 此处是唯一注册点。
+    if (this.uncertaintyQuantifier && !this._modules['uncertaintyQuantifier']) {
+      this._modules['uncertaintyQuantifier'] = this.uncertaintyQuantifier;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可

@@ -68,18 +68,32 @@ class UncertaintyQuantifier {
   evaluate(text, context = {}) {
     this.stats.totalEvaluations++;
     const startTime = Date.now();
-    
+
+    // [r621] 入参归一化。r617 把实例接进 _modules 后，11 个公有方法首次可被外部
+    // 以任意实参 dispatch，实测暴露：text 为 null/undefined 时 _detectHallucination
+    // 的 text.includes() 抛 "Cannot read properties of undefined"。
+    // 口径沿用 r616/r615 D1：**禁止 is not a function / Cannot read properties
+    // 类内部崩溃**，允许显式入参契约抛错。
+    // ⚠️ 只兜 null/undefined。**不能做 String(text) 式强转**：dispatch() 自带
+    // 「先按原样调用，崩了再降级」兜底（heartflow.js L4910-4921），调用方
+    // `dispatch('uncertaintyQuantifier.evaluate', {text: v})` 依赖 evaluate
+    // 在对象入参上抛 TypeError，才会被展平成字符串文本。若此处提前把对象强转成
+    // "[object Object]" 或空串，降级永不触发，所有对象入参都会退化成常量输出 ——
+    // 实测曾因此让四族分化全部变成 0.27 常量。判别语义必须零改变。
+    const _text = (text === null || text === undefined) ? '' : text;
+    const _ctx = (context && typeof context === 'object') ? context : {};
+
     // 1. 检测幻觉信号
-    const hallucination = this._detectHallucination(text);
+    const hallucination = this._detectHallucination(_text);
     
     // 2. 评估认知不确定性
-    const epistemic = this._assessEpistemicUncertainty(text, context);
+    const epistemic = this._assessEpistemicUncertainty(_text, _ctx);
     
     // 3. 评估随机不确定性
-    const aleatoric = this._assessAleatoricUncertainty(text, context);
+    const aleatoric = this._assessAleatoricUncertainty(_text, _ctx);
     
     // 4. 综合置信度
-    const confidence = this._calculateConfidence(hallucination, epistemic, aleatoric, context);
+    const confidence = this._calculateConfidence(hallucination, epistemic, aleatoric, _ctx);
     
     // 5. 不确定性分解
     const decomposition = {
@@ -369,9 +383,16 @@ class UncertaintyQuantifier {
   _updateCalibration() {
     const recent = this.records.slice(-20);
     if (recent.length < 5) return;
-    
-    const avgConfidence = recent.reduce((a, r) => a + r.confidence, 0) / recent.length;
-    const avgAccuracy = recent.reduce((a, r) => a + r.accuracy, 0) / recent.length;
+
+    // [r621] records 里可能有脏条目（recordOutcome 被空实参调用时灌入的
+    // {actualOutcome: undefined}），其 confidence/accuracy 均 undefined，
+    // 直接 reduce 会算出 NaN 并抹平整个 calibrationError。
+    // 先过滤出可计算条目；不足 5 条就不更新，不产出 NaN。
+    const valid = recent.filter(r => r && typeof r.confidence === 'number' && typeof r.accuracy === 'number');
+    if (valid.length < 5) return;
+
+    const avgConfidence = valid.reduce((a, r) => a + r.confidence, 0) / valid.length;
+    const avgAccuracy = valid.reduce((a, r) => a + r.accuracy, 0) / valid.length;
     
     const calibrationError = Math.abs(avgConfidence - avgAccuracy);
     
@@ -399,10 +420,14 @@ class UncertaintyQuantifier {
         ? (this.stats.hallucinationDetected / this.stats.totalEvaluations).toFixed(3)
         : 0,
       calibrationHistory: this.calibrationHistory.slice(-5),
+      // [r621] recentRecords 读 r.hallucination.risk：recordOutcome 空实参灌入的
+      // 脏记录没有 hallucination 字段，实测抛 "Cannot read properties of
+      // undefined (reading 'risk')"。改为分层可选链，脏记录降级为 null 而非崩溃。
       recentRecords: this.records.slice(-5).map(r => ({
         confidence: r.confidence,
         actualAccuracy: r.accuracy,
-        hallucinationRisk: r.hallucination.risk
+        hallucinationRisk: (r && r.hallucination && typeof r.hallucination.risk === 'number')
+          ? r.hallucination.risk : null,
       }))
     };
   }
