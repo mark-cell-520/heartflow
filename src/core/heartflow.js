@@ -5165,6 +5165,35 @@ class HeartFlow {
       result.metacognitive = { executive: efResult, monitor: mcResult };
     } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: '元认知监控失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
+    // ─── [v6.8.0 第 589 轮] 七条指令运行时检查接进主链路 ────────
+    // r589 之前：heartflow.js:1645 实例化 this.instructions 后全仓零调用点，
+    // 七条指令的运行时检查从未被执行过一次（其中 4 条此前根本没有判据，
+    // check() 恒 aligned:true）。本轮给 7 条全部补上可执行判据（腿数组），
+    // 并把 audit() 接进 think()：只把「未对齐」的指令写成 result.instructionAudit
+    // —— 良性输入该字段不出现，零噪声；出现即代表踩了某条指令。
+    // 隐私铁律：只存 aligned/code/reason，不存输入原文（reason 是固定文案）。
+    try {
+      if (this.instructions && typeof this.instructions.audit === 'function') {
+        const _iaText = typeof input === 'string' ? input
+          : (input && typeof input.text === 'string' ? input.text : '');
+        if (_iaText && _iaText.trim().length >= 6) {
+          const _ia = this.instructions.audit({
+            text: _iaText.slice(0, 8000),
+            scenario: 'output_generation',
+            confidence: result?.confidence ?? result?.overallScore ?? 0.5,
+          });
+          const _violations = (_ia || []).filter(r => r.aligned === false);
+          if (_violations.length > 0) {
+            result.instructionAudit = {
+              violated: _violations.map(v => ({ instruction: v.instruction, label: v.label, code: v.code, reason: v.reason })),
+              checkedCount: (_ia || []).length,
+              instructionCount: this.instructions.getAll().length,
+            };
+          }
+        }
+      }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '七条指令审计失败不阻断主链路' }, MAX_HISTORY_SIZE); }
+
     // 2. 信号吸收（输入侧）：对话/指令信号 → 能力缺口 → 升级建议
     //    注意: skipStore:true — think() 是判别链路，不写长期记忆（保持用途不偏移、零副作用）
     try {

@@ -3166,6 +3166,19 @@ function _topicScopeFallback() {
   } catch (_) { _tsFallback = null; }
   return _tsFallback;
 }
+// [v6.8.0 第 589 轮] InstructionRegistry（七条指令）进程内回退单例。
+// r589 之前 heartflow.js:1645 实例化 this.instructions 后全仓零调用点——
+// 七条指令的检查从未执行过一次，4 条连判据都没有（check 恒 aligned:true）。
+// 本轮补判据 + 接 think() 主链路 + 暴露本工具。
+let _irFallback = null;
+function _instructionRegistryFallback() {
+  if (_irFallback) return _irFallback;
+  try {
+    const { InstructionRegistry } = require('./core/instruction-registry.js');
+    _irFallback = new InstructionRegistry();
+  } catch (_) { _irFallback = null; }
+  return _irFallback;
+}
 
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
