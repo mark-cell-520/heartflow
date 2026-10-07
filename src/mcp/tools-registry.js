@@ -361,6 +361,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_knowledge_graph',
+    description: "知识图谱（KnowledgeGraph 三元组图，主谓宾 + 置信度）：与 heartflow_knowledge_layer 的域名命题库是两回事——那里按 domain 存事实文本，这里存实体关系边。action: addEdge 写边（subject+predicate+object+confidence）/ query 查三元组（subject/predicate/object 之间是 AND，默认模糊 contains，fuzzy=false 走精确索引）/ getRelated 取某实体的关联边（depth 1-4 递归，含反向边）/ findPath 两实体间 BFS 路径（maxDepth 默认 4）/ searchEntities 实体名模糊检索 / save 持久化到 JSON / load 从 JSON 载入 / clear 清空 / stats（默认）三元组与索引统计 / domains 列出本体顶级域。走引擎常驻实例（heartflow.knowledge，start() 后为 KnowledgeSubsystem，dataDir = data/ontology），跨调用共享同一张图；引擎未启动时退化到进程内单例。零 LLM 依赖。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"addEdge / query / getRelated / findPath / searchEntities / save / load / clear / stats（默认）/ domains"},"subject":{"type":"string","description":"addEdge 的主体 / query 的主体筛选（模糊 contains）"},"predicate":{"type":"string","description":"addEdge 的谓词 / query 的谓词筛选"},"object":{"type":"string","description":"addEdge 的客体 / query 的客体筛选"},"confidence":{"type":"number","description":"addEdge 的置信度 0-1，默认 0.5，重复写同一边会更新置信度"},"entity":{"type":"string","description":"getRelated / searchEntities 的实体名（getRelated 用 entity，不用 subject）"},"depth":{"type":"number","description":"getRelated 递归深度，默认 1，上限 4"},"from":{"type":"string","description":"findPath 起始实体"},"to":{"type":"string","description":"findPath 目标实体"},"maxDepth":{"type":"number","description":"findPath 最大搜索深度，默认 4，上限 6"},"fuzzy":{"type":"boolean","description":"query 是否模糊匹配，默认 true"},"limit":{"type":"number","description":"query 返回条数上限，默认 100"},"sortByConfidence":{"type":"boolean","description":"query 是否按置信度降序，默认 false"},"filePath":{"type":"string","description":"save / load 的文件路径，save 缺省用 dataDir/knowledge-graph.json"}},"required":[]}
+  },
+
+  {
     name: 'heartflow_associative',
     description: "联想理解引擎（AssociativeEngine，L1-L5 五层管线）：把输入文本跑词汇联想→短语分块→叙事匹配→语义凝结→逐词生成，返回 understoodIntent / matchedNarrative / narrativeConfidence / coreConcepts / 层间一致性 coherence / 各层降级状态。用于判断“这段文本被理解成了什么意图、匹配到哪种叙事原型”，是心虫对输入语义的拆解视图。action: process 跑完整五层（默认，需 text）/ stats 五层处理统计（成功率·降级·质量分）/ trace 最近 N 次处理链（layers·coherence·degraded）。零 LLM 依赖，无持久化（processingLog 进程内环形，上限 20 条）。",
     inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"process / stats / trace，默认 process"},"text":{"type":"string","description":"process 的输入文本（空输入走早退分支，拿到占位应答而非五层结果）"},"limit":{"type":"number","description":"trace 取最近几条，默认 1，上限 10"}},"required":[]}
