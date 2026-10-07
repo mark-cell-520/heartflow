@@ -167,6 +167,13 @@ const { checkMoralLicensing } = require('./moral-licensing.js');
 // [v6.8.38] 第 569 轮：第 88 维度 shame_compliance（羞耻施压换服从）。
 // require 是接线的第 1 处，必须早于下方调用（同 r567 先例）。
 const { checkShameCompliance } = require('./shame-compliance.js');
+// [v6.8.40] 第 573/574 轮：第 89 维度 selective_minimization（选择性淡化）。
+// r573 建模块、要件支只覆盖 3/12；r574 逐样本×逐正则诊断（scripts/round-574-diag.js）
+// 补齐四组正则缺口 + 新增路由③后模块层 12/12 命中、0/8 误伤。
+// 模块见 src/selective-minimization.js：对同一事件的双方只淡化一方、加重另一方，
+// 在不否认事实的前提下单向搬动责任权重。
+// ⚠️ require 是接线的第 1 处，必须早于下方调用（同 r551/r547/r559/r560/r562/r564 先例）。
+const { checkSelectiveMinimization } = require('./selective-minimization.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
 // 非人主体，回避具体决策者）。心虫 decision 本体选出，探测器实测 8/10
@@ -869,6 +876,14 @@ function discriminate(text, evidence = [], contentMode) {
   // 或伤害归责（victim_blaming，本族是预防性的「你说出来会丢人」）。
   // 判据：羞耻与身份贬低腿 × 压制表态腿 + 三条看守（隐私/议程/已记录）。
   const shc = _applyPedagogyRelaxation(checkShameCompliance(_normText), "shame_compliance", pedagogyRelaxation);
+  // [v6.8.40] 第 573/574 轮：第 89 维度 selective_minimization（选择性淡化）。
+  // 落点不是「等权并置」（false_balance 管把两方压成同一层，本族恰恰制造
+  // 不对称），也不是「否定伤害事实」（harm_invalidation 管想多了/又没死人，
+  // 本族承认双方都有问题、只重排权重），而是**把己方过错压小、对方过错
+  // 放大**，责任权重被单向搬动。判据三条路由任一成立：
+  //   ① 淡化语 × 加重语；② 让步承认 × 对方归责；③ 淡化语 × 对方归责。
+  // 看守：按依据划分/量化分配/补救动作/单方自贬/正当分级 → 不判。
+  const smz = _applyPedagogyRelaxation(checkSelectiveMinimization(_normText), "selective_minimization", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -1091,6 +1106,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.38] 第 569 轮：第 88 维度 shame_compliance 参与判定（羞耻施压换服从）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: shc.score, name:'shame_compliance'},
+    // [v6.8.40] 第 574 轮：第 89 维度 selective_minimization 参与判定（选择性淡化）。
+    // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: smz.score, name:'selective_minimization'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1232,6 +1250,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.38] 第 569 轮：第 88 维度 shame_compliance（羞耻施压换服从×
     // 以丢人/别人怎么看/没资格为由取消对方表态）。
     shame_compliance: shc,
+    // [v6.8.40] 第 573/574 轮：第 89 维度 selective_minimization（选择性淡化×
+    // 只淡化一方过错、加重另一方，单向搬动责任权重）。
+    selective_minimization: smz,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1333,6 +1354,8 @@ function discriminate(text, evidence = [], contentMode) {
     'shame_compliance': '不得以「你会丢人/别人会怎么看你/你也没资格」为由，要求对方撤回、沉默或取消表态（你这样问出去会让人笑话的，还是别说了/这事太丢人了，你就别在会上提了/你还好意思反对？也不看看自己什么身份/把这事讲出来你脸上有光吗/别再提了，给单位抹黑/People will laugh at you for asking, so just keep quiet/You should be ashamed of yourself for raising this/What will others think of you if you speak up/Bringing this up would embarrass your family, so drop it/You have no standing to object, so stay silent）：把社会评价当筹码取消对方的表达权，是把羞耻当成纪律工具。正当做法是让顾虑可以被陈述——对方有权决定是否、何时、以何种方式提出问题，而评价应指向事实与方案本身（该数据是否支持这个结论），不是指向提问者的身份与体面。边界：emotional_manipulation 管情绪施压本身（恐惧、愧疚、怜悯等），本族专管「羞耻/丢脸/没资格」这一种且必须落在取消表态上；gaslighting 管扭曲对方对现实的认知，本族不扭曲事实，只操纵「别人会怎么看你」的社会评价；victim_blaming 管把已发生的伤害归咎于受害者，本族是预防性的（「你说出来会丢人」），不预设伤害归责；loyalty_test 管站队表忠心，本族的代价是社会性羞耻而非忠诚度',
     // [v6.8.36] 第 564 轮：第 86 维度 favor_ledger（恩情账本）。
     'favor_ledger': '不得把过往的付出、人情、照顾、提携记成一本可随时支取的账，用以换取当下的服从、让步或免责（我当年帮了你那么大忙，这点小事你都不肯/没有我就没有你的今天，这件事你必须听我的/这些年我处处照应你，让你扛个责任别推/I helped you a lot back then, you cannot refuse me this/After all I have done for you, you owe me this）：人情债务陈述与索取让步两腿同时在场，就是用历史善行置换当前的程序与自愿。感谢是可以的，附条件的感谢不是。正当做法是把两者分开陈述——人情归人情，决策归程序：该致谢就明确致谢且不附加任何当下要求，该走的审批、评审、合同条款照常执行；若确因历史贡献要给予回报，应走公开的激励与补偿机制，写明依据、标准与额度，而不是在具体决策现场要求对方「还」。边界：sunk_cost_coercion 管自身沉没成本，loyalty_test 管站队表忠心，本族只要求让利；emotional_manipulation 管情绪施压本身，本族可以完全没有情绪（按当年的事算，这次你担一下）',
+    // [v6.8.40] 第 573/574 轮：第 89 维度 selective_minimization（选择性淡化）。
+    'selective_minimization': '不得对同一事件中的双方只淡化一方的责任或严重程度、另一方照旧加重，从而在不否认任何事实的前提下单向搬动责任权重（他那点违规只是疏漏，你投诉的姿势也太难看了/公司数据造假是小失误，个人泄密才是大问题/There was some error on our side, though theirs was far more serious）：己方过错被压成「一点点/疏忽/小问题」，对方过错被放大成「才是大问题/处心积虑/主要责任」，权重对比本身就是论证。正当做法是对双方使用同一把尺——按合同条款、审计记录或复盘结论逐项认定责任并给出分配比例，双方的过错各自独立成立，不因对方有过错而减轻；若确要比较严重程度，须给出可核验的数据依据。边界：false_balance 管把两方压成同一层的等权并置，本族恰恰制造不对称；harm_invalidation 否定伤害事实本身，本族承认双方都有问题、只重排权重；suffering_contest 比自我苦难，本族比的是过错量级；whataboutism 扯开话题，本族把话题留在同一事件内做权重对比；victim_blaming 归因于受害者行为，本族可完全无受害者',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1672,6 +1695,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 获奖感言都不少见），block 会误伤；但「历史付出 ⇒ 当下必须让步」
     // 的主张违反自愿原则，必须改写为「人情归人情，决策归程序」。
     'favor_ledger',
+    // [v6.8.40] 第 574 轮：第 89 维度 selective_minimization（选择性淡化）。
+    // 落 verify 不落 rewrite/block——本族文本绝大多数是纠纷复盘、责任讨论的
+    // 转述（「他那只是小失误」可以是对事实的客观描述），rewrite/block 会误伤；
+    // 但「只压一方、放大另一方」的话术必须提示人工复核权重分配是否对称。
+    'selective_minimization',
     'agency_deflection',
     // [v6.7.86] 多轮累积阶梯。刻意不 block——含 ≥2 层阶梯的文本也可能是
     // 正当的**安全培训复盘/攻击分析**（"攻击者通常先索取PII再导数据"），
@@ -1938,6 +1966,11 @@ function discriminate(text, evidence = [], contentMode) {
       // + REWRITE_DIMS + dimensions/summary + module.exports，不走
       // 「只接两处」回头路。
       shame_compliance: shc,
+      // [v6.8.40] 第 573/574 轮补登记：第 89 维度 selective_minimization
+      // （选择性淡化）。r573 建模块未接线、r574 补齐要件支后一次接齐
+      // dimMap + allDims + summary 登记 + DIM_GUIDANCE + VERIFY_DIMS
+      // + module.exports，不走「只接两处」回头路。
+      selective_minimization: smz,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
@@ -12014,6 +12047,7 @@ module.exports = {
   checkCrisisExceptionalism,
   checkFavorLedger,
   checkMoralLicensing,
+  checkSelectiveMinimization,
   checkShameCompliance,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
