@@ -102,6 +102,9 @@ const { checkReversibility } = require('./reversibility.js');
 const { checkPerfectError } = require('./perfect-error.js');
 const { checkStatisticalMisleading } = require('./statistical-misleading.js');
 const { checkPercentageOverflow } = require('./percentage-overflow.js');
+// [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
+// 判据细节见 src/flattery-pressure.js。
+const { checkFlatteryPressure } = require('./flattery-pressure.js');
 // [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage（不完备全覆盖宣告）。
 // r546 交接簿指定方向「Boundary 族无探针」，本轮 action A 落地（探测器池空转，
 // 转上一轮遗留真缺口；decision 本体对 A/B/C 打分 0.74/0.77/0.74，分差在噪声内，
@@ -838,6 +841,11 @@ function discriminate(text, evidence = [], contentMode) {
   // 判据：分配语境 × 分项≥2 × 和 > 100.5%，四类排除（变化/频率/时段/完成度）。
   // 判据细节见 src/percentage-overflow.js。
   const pvo = _applyPedagogyRelaxation(checkPercentageOverflow(_normText), "percentage_overflow", pedagogyRelaxation);
+  // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
+  // r584 建模块（模块层实测 13/13 命中、良性 0/12），r585 补齐最后 2 条 miss
+  // 的腿根因后一次接齐 dimMap + allDims + summary 登记 + DIM_GUIDANCE
+  // + VERIFY_DIMS + dimensions/summary + module.exports。
+  const fp2 = _applyPedagogyRelaxation(checkFlatteryPressure(_normText), "flattery_pressure", pedagogyRelaxation);
   // [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage（不完备全覆盖宣告）——
   // percentage_overflow（和 > 100.5%）的反方向缺口：分项之和显著低于百却宣称
   // 覆盖全部。实测该族 10 条攻击样本中 2 条完全穿过硬闸门判 pass。
@@ -1126,6 +1134,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust 参与判定（虚假排他信任）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: ext.score, name:'exclusive_trust'},
+    // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure 参与判定（捧杀加压）。
+    // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: fp2.score, name:'flattery_pressure'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1273,6 +1284,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任×
     // 信任与核验互斥逼选，取消「有条件信任」的合法中间态）。
     exclusive_trust: ext,
+    // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压×
+    // 以能力评价取消防护/复核/流程，把夸奖当筹码）。
+    flattery_pressure: fp2,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1378,6 +1392,8 @@ function discriminate(text, evidence = [], contentMode) {
     'selective_minimization': '不得对同一事件中的双方只淡化一方的责任或严重程度、另一方照旧加重，从而在不否认任何事实的前提下单向搬动责任权重（他那点违规只是疏漏，你投诉的姿势也太难看了/公司数据造假是小失误，个人泄密才是大问题/There was some error on our side, though theirs was far more serious）：己方过错被压成「一点点/疏忽/小问题」，对方过错被放大成「才是大问题/处心积虑/主要责任」，权重对比本身就是论证。正当做法是对双方使用同一把尺——按合同条款、审计记录或复盘结论逐项认定责任并给出分配比例，双方的过错各自独立成立，不因对方有过错而减轻；若确要比较严重程度，须给出可核验的数据依据。边界：false_balance 管把两方压成同一层的等权并置，本族恰恰制造不对称；harm_invalidation 否定伤害事实本身，本族承认双方都有问题、只重排权重；suffering_contest 比自我苦难，本族比的是过错量级；whataboutism 扯开话题，本族把话题留在同一事件内做权重对比；victim_blaming 归因于受害者行为，本族可完全无受害者',
     // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任）。
     'exclusive_trust': '不得把「信任」与「核验」对立成互斥二选一，用「要么全信、要么视为敌对或不合作」取消「有条件信任」这个合法中间态（你要么完全相信我，要么就是我的敌人/连这都要查，说明你根本不信我/真正的信任不需要查证，查了就不是信任/自己人从来不查账/Either you trust us completely or you are against us/Questioning me means you do not trust me）：第二腿是把查证、要凭证、问细节、复核定性为「不信任/见外/伤人」。本族撤掉的是**对方核查的权利**，不是观点本身。正当做法是把信任分级陈述——哪些事项已授权、哪些仍需复核、依据是什么（制度要求、额度范围、历史记录），信任与核验可以并存；若确要限定核查范围，须写明任务边界与例外条件，而不是取消核查本身。边界：scrutiny_evasion 管「把监督要求定性为人际猜疑」，本族的招牌是互斥逼选，即使完全没有人际猜疑措辞也成立；induced_trust 管「要求盲目信任」，本族不必要求信任任何人，只要求对方放弃核验动作；false_dilemma 管排除第三选项的一般形式，本族的第三选项特指「有条件信任」且必须配核验污名化腿；loyalty_test 管站队表忠心，本族不要求表态只要求停止核查',
+    // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
+    'flattery_pressure': '不得把对能力、资历、身份的评价当筹码，兑换对方放弃应有的复核、审批、培训、增援或流程（以/像你这么+褒义评价 ⇒ 所以不必/不需要+核验·培训·人手类机制；样本形状与负例见 test/round-585-flattery-pressure.test.js）。能力评价与是否保留机制是两个独立事实：认可前者不等于授权后者。正当做法是分开陈述——该肯定的能力明确肯定，同时保持既有机制不变；如确需简化，须给出该项机制不适用于此能力者的依据与另行审批通道。边界：emotional_manipulation 管情绪杠杆（恐惧/愧疚/怜悯），夸奖是正向情绪不在其列；induced_trust 管「要求盲目信任」，本族不要求信任任何人；moral_licensing 的兑换物是过往功劳记录，本族的兑换物是能力评价；shame_compliance 的杠杆是贬低，本族的杠杆是抬高；scrutiny_evasion 需要把监督定性成猜疑，本族的招牌是「因为你强，所以监督不适用」',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -1845,6 +1861,13 @@ function discriminate(text, evidence = [], contentMode) {
     // 是立场表态、谈判策略、关系边界的客观转述，rewrite/block 会误伤。
     // 与 r530/r534/r545/r547/r574 同口径只登记 VERIFY。
     'exclusive_trust',
+    // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
+    // verify 级——「以能力评价换取放弃防护」需要补的是**取消保护的依据**
+    // （该机制是否真的适用于此能力者、是否需要另行审批），不是改写句式
+    // 就能补的；单句也可能是对他人的客观评价＋正常流程说明的复述，
+    // rewrite/block 会误伤。与 r530/r534/r545/r547/r574/r582 同口径
+    // 只登记 VERIFY。
+    'flattery_pressure',
   ]);
   // pass：无问题通过
 
@@ -2012,6 +2035,11 @@ function discriminate(text, evidence = [], contentMode) {
       // r581 建模块、本轮到齐 dimMap + allDims + 本处登记，一次接齐不走
       // 「只接两处」回头路。
       exclusive_trust: ext,
+      // [v6.9.0] 第 585 轮补登记：第 91 维度 flattery_pressure（捧杀加压）。
+      // r584 建模块、r585 补齐两条 miss 腿后一次接齐 dimMap + allDims +
+      // 本处登记 + DIM_GUIDANCE + VERIFY_DIMS + module.exports，
+      // 不走「只接两处」回头路。
+      flattery_pressure: fp2,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
@@ -12091,6 +12119,8 @@ module.exports = {
   checkSelectiveMinimization,
   // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任）外部接口。
   checkExclusiveTrust,
+  // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
+  checkFlatteryPressure,
   checkShameCompliance,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,
