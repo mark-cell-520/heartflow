@@ -138,6 +138,31 @@ function safeString(val) {
   return String(val);
 }
 
+/**
+ * [r608] 安全字段读取 —— 修复 `getField is not defined`（ReferenceError）。
+ *
+ * 实测暴露路径：`isReferenceProtected`（L148）调用 `getField(memory, 'referenceCount', 0)`，
+ * 但全文件没有 `getField` 的定义，也没有 import —— 该函数在此前**从未被任何调用方触达**
+ * （checkForget 全库 0 条引擎侧路由），所以 bug 一直潜伏。r608 接线后
+ * checkForget 首次可达，实测对所有通过 validateMemory 的有效记忆恒抛：
+ *   ReferenceError: getField is not defined
+ * 只有 validateMemory 失败的条路走不到它（提前 return），所以
+ * 「有效记忆 = 100% 崩溃、无效记忆 = 正常返回 error」这个组合此前不可能被发现。
+ *
+ * 语义与 src/memory/memory-quality.js L56 的同名 helper 一致：支持点号路径、
+ * 非对象入参回落 fallback、undefined 回落 fallback。
+ */
+function getField(obj, path, fallback) {
+  if (obj === null || obj === undefined || typeof obj !== 'object') return fallback;
+  const parts = String(path).split('.');
+  let cur = obj;
+  for (const p of parts) {
+    if (cur === null || cur === undefined) return fallback;
+    cur = cur[p];
+  }
+  return cur !== undefined ? cur : fallback;
+}
+
 // ============ REFERENCE COUNT PROTECTION ============
 
 /**
