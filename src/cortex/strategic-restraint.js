@@ -259,10 +259,18 @@ class StrategicRestraint {
     if (!entry || typeof entry !== 'object' || !entry.item || typeof entry.item !== 'string') {
       return { success: false, error: 'item必填' };
     }
+    // [r627] 调用方显式指定条目 id（MCP 侧 addDont 的 id 参数）。
+    // 不接这个字段时 id 恒由引擎自生成（dr-<ts>-<rand>），外部调用方拿到的
+    // id 与 removeDont 要用的 id 之间隔了一层无文档的约定。透传后
+    // 「add 时给定 id → remove 时按同一 id 删」在外部是可闭合的。
+    const explicitId = typeof entry.id === 'string' && /^[a-zA-Z0-9._-]{1,64}$/.test(entry.id)
+      ? entry.id
+      : null;
 
     // 去重：相同item不重复追加
     const existing = this._dontList.find(d =>
       d.item.toLowerCase() === entry.item.toLowerCase()
+      || (explicitId && d.id === explicitId)
     );
     if (existing) {
       existing.reason = entry.reason || existing.reason;
@@ -275,7 +283,7 @@ class StrategicRestraint {
     }
 
     const newItem = {
-      id: `dr-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+      id: explicitId || `dr-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
       item: entry.item,
       reason: entry.reason || '',
       strength: typeof entry.strength === 'number' ? entry.strength : 0.7,
