@@ -4037,8 +4037,8 @@ const HANDLERS = {
         };
       }
 
-      // getDontList：读当前「不做清单」
-      if (action === 'listDont' || action === 'dont_list') {
+      // getDontList：读当前「不做清单」（方法名本身 + 两个别名都收）
+      if (action === 'getDontList' || action === 'listDont' || action === 'dont_list' || action === 'dontList') {
         const list = sr.getDontList();
         return {
           action: 'getDontList',
@@ -4083,8 +4083,8 @@ const HANDLERS = {
         };
       }
 
-      // getStats：克制引擎运行统计
-      if (action === 'stats') {
+      // getStats：克制引擎运行统计（方法名本身可用）
+      if (action === 'getStats' || action === 'stats') {
         const s = sr.getStats();
         return { action: 'getStats', stats: s, timestamp: ts() };
       }
