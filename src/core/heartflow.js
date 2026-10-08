@@ -189,6 +189,10 @@ function _looksLikeMacroQuery(text) {
     '战略', '博弈', '局势', '走向', '趋势', '演化', '演进', '推演', '预判', '前瞻',
     '宏观', '格局如何', '如何演化', '怎么走', '下一步', '未来三年', '未来五年', '长期影响',
     'geopolit', 'world order', 'global order', 'macro', 'geopolitics',
+    // [v6.8.0 cronfix15] 补宏观驱动因子：只列"格局/博弈"会漏掉
+    // "美联储降息…资本流动怎么变"这类真宏观输入。
+    '降息', '加息', '利率', '通胀', '汇率', '关税', '制裁', '选举', '战争', '冲突',
+    '原油', '油价', '供应链', '粮食', '人口', '央行', '资本流动', '资本外流',
   ];
   if (MACRO_SUBJECTS.some(k => t.includes(k.toLowerCase()))) return true;
   const NEWS_FRAME = ['根据新闻', '据报', '据报道', '近期国际', '最新消息', '新闻显示', '外媒', '彭博', '路透', 'reuters', 'bloomberg'];
