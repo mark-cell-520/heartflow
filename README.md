@@ -6,8 +6,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-90 discrimination dimensions  ×  11-layer pipeline  ×  150 modules  ×  66 MCP tools
-×  1,228 dispatch routes  ×  18,092 passing tests  ×  0 runtime dependencies
+92 discrimination dimensions  ×  11-layer pipeline  ×  158 modules  ×  67 MCP tools
+×  1,288 dispatch routes  ×  18,092 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -112,7 +112,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 90 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 92 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -139,7 +139,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (90 dimensions) -> gate
+scope-check -> premise-check -> discriminate (92 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -152,7 +152,7 @@ intent-anchor -> rewriter -> error-memory -> self-diagnosis -> output
 The gate aggregates findings from every layer and emits a single action:
 `block` / `rewrite` / `verify` / `pass`.
 
-### Capability domains (7 domains, 150 modules)
+### Capability domains (7 domains, 158 modules)
 
 | Domain | Representative modules |
 |--------|------------------------|
@@ -172,11 +172,11 @@ Measured on this repository at **v6.8.0**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
-| Modules registered | 150 |
+| Modules registered | 158 |
 | Module init errors | 0 |
-| Dispatch routes | 1,228 |
-| Discrimination dimensions | 90 |
-| MCP tools | 66 |
+| Dispatch routes | 1,288 |
+| Discrimination dimensions | 92 |
+| MCP tools | 67 |
 | Test suite | 18,092 passing / 78 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
