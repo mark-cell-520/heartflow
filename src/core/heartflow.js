@@ -2234,8 +2234,19 @@ class HeartFlow {
     // ★ Smart Routing 启发：平台适配器 + 能力抽象层
 
     try {
-
-      this.platformAdapter = _PlatformAdapter().createAdapter('hermes');
+      // [r642] 补 rootPath：HermesAdapter 的路径白名单 _isPathAllowed 依赖
+      // this.rootPath，此前 createAdapter('hermes') 不传 config → rootPath 恒
+      // undefined → 白名单对所有路径恒 false（fail-closed）。补仓库根路径后
+      // 白名单语义才真正可判。
+      // [r643 修正] 上面那句「才真正可判」实测不成立：Adapter 构造函数
+      // （super({...config, platform})）只认 platform，未把 rootPath 存到实例上
+      // —— 传了也白传，paOwnRootPath=false、_isPathAllowed 仍恒 false，
+      // 连仓库内 package.json 都读不到。改为构造后显式赋值，白名单的
+      // 「合法路径放行 / 越界拒绝」两分支才第一次真的可判。
+      this.platformAdapter = _PlatformAdapter().createAdapter('hermes', { rootPath: this.rootPath });
+      if (this.platformAdapter && !this.platformAdapter.rootPath) {
+        this.platformAdapter.rootPath = this.rootPath;
+      }
 
     } catch (e) {
 
@@ -3307,6 +3318,22 @@ class HeartFlow {
     // 名单里没有它，此处是唯一注册点。
     if (this.outputChecklist && !this._modules['outputChecklist']) {
       this._modules['outputChecklist'] = this.outputChecklist;
+    }
+
+    // [r642] platformAdapter 接线（平台适配器 / 路径白名单执行层）。实例自
+    // v5.4.5 起就在 L2238 一直在构造，但从未进 _modules —— r642 双向核对实测
+    // （scripts/round-642-dispatch-recheck.js）：_modules 无 'platformAdapter'
+    // 键、hf.routes() 零命中、dispatch('platformAdapter.readFile') 直接抛
+    // "this._isPathAllowed is not a function"（白名单方法写在类外，从未生效）。
+    // 即「跨平台能力抽象（CapabilityAbstraction 的宿主）+ 目录白名单守门
+    // （readFile/writeFile 越界返回 path_not_allowed）+ 跨平台记忆中继」
+    // 此前对任何 dispatch/MCP 调用方完全不可达。
+    // 同轮修掉 _isPathAllowed 的类外孤儿缺陷（见 src/core/platform-adapter.js），
+    // 使白名单从「100% TypeError」变成「越界 path_not_allowed / 合法 read+write」
+    // 三分支可判。注册位置与 r402/.../r640 同一区块同一切换时序：实例化点
+    // 之后、generateAllowedRoutes 之前，此处是唯一注册点。
+    if (this.platformAdapter && !this._modules['platformAdapter']) {
+      this._modules['platformAdapter'] = this.platformAdapter;
     }
 
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
