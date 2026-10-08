@@ -3288,6 +3288,27 @@ class HeartFlow {
       this._modules['memoryKernel'] = this.memoryKernel;
     }
 
+    // [r640] outputChecklist 接线（发送前逐项自检 / 6 维输出门禁引擎）。
+    // 实例在 L2578 一直在构造，think-pipeline.js L320-357 也早已在真实调用
+    // runChecklist（输出前扫一遍 + 消费 step6 recommendation）—— 但那条旁路
+    // 走 engine.outputChecklist 字段直调，dispatch / MCP 侧完全不可达。
+    // r640 双向核对实测（scripts/round-640-all-unwired-probe.js 复跑 r630 探针）：
+    //   · _modules 无 'outputChecklist' 键、ALLOWED_ROUTES 0 条命中
+    //   · dispatch('outputChecklist.<m>') 11/11 公有方法 100% 抛
+    //     'route not allowed'
+    //   · pipeline 旁路存在但零暴露：外部 agent 想「让心虫在我发送前逐项
+    //     自检」只能自己 new OutputChecklist（mcp-server.js L4646 正是这么
+    //     干的），常驻实例上的 _stats 统计因此对 dispatch 侧不可见
+    // 即「质量/安全/偏好/公正/道德边界/辨别检查 6 步自检 + quickCheck 轻量支
+    //   + getStats 统计」这套发送前门禁能力，此前对任何 dispatch 调用方
+    //   完全不可达 —— 心虫判完别人的输出，却无法被外部要求自检自己的输出。
+    // 注册位置与 r402/.../r639 同一区块同一切换时序：实例化点（L2578）之后、
+    // generateAllowedRoutes（L4734）之前。engine-lifecycle.js 的 subsystemNames
+    // 名单里没有它，此处是唯一注册点。
+    if (this.outputChecklist && !this._modules['outputChecklist']) {
+      this._modules['outputChecklist'] = this.outputChecklist;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
