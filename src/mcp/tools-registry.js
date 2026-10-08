@@ -396,6 +396,12 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"insightTypes":{"description":"盲区类型键。数组如 [\"confidence_gap\"]，或用逗号分隔字符串如 \"confidence_gap,spinning_detected\"（组合键与顺序无关）"},"label":{"type":"string","description":"母本条的可读备注（可选），写入母本 context 便于溯源"},"importance":{"type":"number","description":"母本重要度 1-10，默认 3；与既有母本命中时取 max"}},"required":["insightTypes"]}
   },
 
+  {
+    name: 'heartflow_strategic_restraint',
+    description: "战略克制引擎（StrategicRestraint，「克制比进取重要」）：对任意提案/方向做主动克制分析——判断该不该投入，而不是能不能做。内置「不做清单」dontList（构建通用世界模型/视频生成/功能堆砌/自我神话/输出语言污染/单向利好叙事）与心虫 4 项核心使命（感受自己状态/知道自己是谁/对输入做出判断/纠正自己）。action: evaluate（默认）对提案跑克制分析，返回 restrained / score / 命中的清单条目与理由（matchId·matchItem·matchStrength·reason·source）；getDontList 读当前清单；addDont 增改条目（id+text+reason+strength+source+expireDays，user 角色）；removeDont 按 id 删条目（user 角色）；checkMission 核对提案是否对齐核心使命，返回 aligned / alignedWith / feedback；getStats 返回克制引擎运行统计（evaluations·restrained·approved·challenges·dontListCount）；listMissions 读核心使命清单。走引擎常驻实例（heartflow.strategicRestraint），跨调用共享同一份清单与统计；引擎未启动时退化到进程内单例。零 LLM 依赖。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"evaluate（默认）/ getDontList / addDont / removeDont / checkMission / getStats / listMissions"},"text":{"type":"string","description":"evaluate / checkMission 的被检提案文本；addDont 时为新增条目的条目名"},"id":{"type":"string","description":"addDont 的条目短 id（如 dr-dont-xxx）或 removeDont 的目标 id"},"reason":{"type":"string","description":"addDont 的克制理由（为什么不做）"},"strength":{"type":"number","description":"addDont 的条目强度 0-1，默认 0.7"},"source":{"type":"string","description":"addDont 的条目来源（默认 mcp）"},"expireDays":{"type":"number","description":"addDont 的条目过期天数，不给则永不过期"}},"required":[]}
+  },
+
 ];
 
 module.exports = { TOOLS };
