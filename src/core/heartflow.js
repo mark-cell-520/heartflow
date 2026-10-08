@@ -3275,6 +3275,19 @@ class HeartFlow {
       this._modules['decisionFeedback'] = this.decisionFeedback;
     }
 
+    // [r639] memoryKernel 接线（记忆内核 / 记忆写入守门人）。
+    // 实例在 L1745 启动必读，但此前从未进 _modules —— dispatch('memoryKernel.*')
+    // 15/15 公有方法实测 100% 抛 'route not allowed'，MCP 侧零可达。
+    // 即「引擎到底记住了什么、哪些记忆被判定为违规、写入配额是否超限、
+    // 继承上下文是什么」这套自省数据，对外部 agent 此前完全不可见。
+    // 辨别力位置：validate() 是 R1-R5 规则（含 privacy R4）的执行出口，
+    // 隐私铁律（个人数据严禁入记忆库）的落点就在这里。
+    // 注册位置与前几轮同一区块同一切换时序：实例化点（L1745）之后、
+    // generateAllowedRoutes 之前。
+    if (this.memoryKernel && !this._modules['memoryKernel']) {
+      this._modules['memoryKernel'] = this.memoryKernel;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
