@@ -141,6 +141,11 @@ t('meaning-purpose-engine: 实例化', () => {
 });
 
 Promise.all(pending).then(() => {
+  // [v6.8.1] run-all 的汇总解析先匹配中文「N 通过, M 失败」，此处长期只吐
+  // 英文汇总行。宽松分支虽能读到 passed 数，但整份输出随后被判为
+  // 「未输出「N 通过, M 失败」结果行」计 1 失败（run-all 第 168 行）。
+  // 补中文行让 runner 正常计数；英文行保留供人工速读。
+  console.log(`测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
   console.log(`\n📊 recovered-modules: ${passed} passed, ${failed} failed`);
   process.exit(failed > 0 ? 1 : 0);
 });

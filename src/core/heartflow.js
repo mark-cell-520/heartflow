@@ -3345,6 +3345,22 @@ class HeartFlow {
       this._modules['instructions'] = this.instructions;
     }
 
+    // [r636] ruleGrowth 判断生长引擎接线（铁律③：声明了但从未被 dispatch 调用过）。
+    // 实例在 L2836 一直在构造，已学规则也在 L2839 注入了 decisionRouter.addRule，
+    // 但从未进 _modules —— r636 双口径实测（scripts/round-636-final-check.js）：
+    //   · HeartFlow.ALLOWED_ROUTES = Set[1284]，ruleGrowth 前缀命中 0 条
+    //   · hf._modules 157 键里无 'ruleGrowth'
+    //   · dispatch('ruleGrowth.<m>') 7/7 全部抛 'route not allowed'
+    // 即「判断从写死变为可生长」的观察/固化/评估/导出腿，
+    // 此前对任何 dispatch 调用方完全不可达（只有启动时那一次注入用过）。
+    // 注册位置与 r402/r404/r577/r603/r605/r606/r608/r609/r614/r615/r617/r626/r629
+    // 同一区块同一切换时序：实例化点之后、generateAllowedRoutes（L4681）之前。
+    // engine-lifecycle.js 的 subsystemNames 名单里没有它（L2835 声明、L2836 构造，
+    // 名单零命中），此处是唯一注册点。
+    if (this.ruleGrowth && !this._modules['ruleGrowth']) {
+      this._modules['ruleGrowth'] = this.ruleGrowth;
+    }
+
     // ─── Thought Chain 初始化 ─────────────────────────────────────────────
     try {
 
