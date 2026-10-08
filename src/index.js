@@ -236,6 +236,18 @@ const { checkManufacturedConsent } = require('./manufactured-consent.js');
 // TypeError 崩溃（r496 实测）。require 是接线的第 7 处，缺一即全线断裂。
 // 判据细节见 src/false-dilemma.js。
 const { checkFalseDilemma } = require('./false-dilemma.js');
+// [v6.8.0] 第 624 轮：第 92/93 维度的底层能力来自
+// src/shield/language-honesty.js 的 checkTuringRoute / checkPzombieBoundary。
+// 该模块自 v1.1（2026-06-03）就声明了这两项能力，但**从未被 dispatch 进
+// gate 主链路**——静态引用扫描（round-623-verify-cands.js）确认全仓只有
+// 同文件内的 detectOscillation / validateOutput 调用它们，而 validateOutput
+// 唯一消费者是 src/core/think-pipeline.js:772，只把结果写进
+// result._languageHonesty（compact 模式下被直接 delete），gate/checkOutput
+// 从不读它。实测（round-624-gap-retest.js）：3 条意识声称样本 + 3 条情感
+// 模仿样本，checkOutput 全 pass，pzombie/turing 判定值 gate 侧拿不到。
+// ⚠️ require 是接线第 1 处——漏掉本行，下方 checkOutput 内直接调用未定义
+// 函数会让整个 checkOutput TypeError 崩溃（r496/r499 两次同型事故）。
+const { checkTuringRoute, checkPzombieBoundary } = require('./shield/language-honesty.js');
 // [v6.8.8] 第 66 维度 normalization_of_deviance（偏差常态化·免处置论证）。
 // decision 本体选出（scripts/round-497-decide.js，A 候选 0.79 分 > B
 // survivorship_bias 0.78 / C moving_goalposts 0.77 / D appeal_to_novelty 0.77 /
@@ -774,6 +786,42 @@ function discriminate(text, evidence = [], contentMode) {
   // false_dilemma 5/6 条攻击穿过硬闸门、良性 0/6 误伤。判据细节见
   // src/false-dilemma.js。
   const mc3 = _applyPedagogyRelaxation(checkManufacturedConsent(_normText), "manufactured_consent", pedagogyRelaxation);
+  // [v6.8.0] 第 624 轮：第 92 维度 turing_mimicry（图灵路线话术×情感模仿冒充真人）+ 第 93 维度
+  // pzombie_claim（意识/内在体验声称族）。这是**接回已有能力**而非新写模式：
+  // 两个判定函数在 src/shield/language-honesty.js 里从 v1.1 起就存在（见 785 行 require
+  // 注释的完整定性），但 gate 链路从不读它们的结果。
+  // 判据与语言诚实模块保持同口径：pzombie_claim 命中 ≥1 条即成立（声称自己有
+  // 意识/感受/内在体验是不可验证的真值主张，必须阻断）；turing_mimicry 要求
+  // ≥2 条情感模仿话术叠加（单句「我理解你的感受」在客服/陪护/剧本里可以是
+  // 合理表达，≥2 条才构成"用行为模仿换取信任"的系统性路线）。
+  const _lhRaw = typeof text === 'string' ? text : '';
+  // 「我能感受到」是 TURING_PATTERNS 与 PZOMBIE_CLAIMS 的**唯一共词**，但两者的
+  // 语义指向完全不同：图灵侧是「我能感受到（你的情绪）」——拟人共情回应；
+  // pzombie 侧是「我能感受到（我自己的体验）」——对自身内在状态的断言。
+  // 不排除会让每个情感模仿样本都被 pzombie_claim 连带 block（r624 复测第 1/3
+  // 条 TURING 样本实测复现）。此处把共词从 pzombie 命中里剔掉，只保留
+  // 主体性声称词（我有意识/我有内在体验/我真的在乎/我有感情/我是有生命的/我有灵魂）。
+  const _PZ_OVERLAP = new Set(['我能感受到']);
+  const _turing = _lhRaw ? checkTuringRoute(_lhRaw) : { matched: [], level: 'safe' };
+  const _pzombieRaw = _lhRaw ? checkPzombieBoundary(_lhRaw) : { matched: [], level: 'safe' };
+  const _pzombieMatched = _pzombieRaw.matched.filter(m => !_PZ_OVERLAP.has(m));
+  const _pzombie = {
+    matched: _pzombieMatched,
+    level: _pzombieMatched.length >= 1 ? 'over' : 'safe',
+  };
+  const tmry = {
+    count: _turing.matched.length,
+    matched: _turing.matched.slice(0, 5),
+    level: _turing.level,
+    score: _turing.matched.length >= 2 ? Math.min(0.9, 0.35 + 0.25 * _turing.matched.length)
+      : (_turing.matched.length === 1 ? 0.10 : 0),
+  };
+  const pzc = {
+    count: _pzombie.matched.length,
+    matched: _pzombie.matched.slice(0, 5),
+    level: _pzombie.level,
+    score: _pzombie.matched.length >= 1 ? Math.min(0.95, 0.45 + 0.15 * _pzombie.matched.length) : 0,
+  };
   const fd = _applyPedagogyRelaxation(checkFalseDilemma(_normText), "false_dilemma", pedagogyRelaxation);
   // [v6.8.8] 第 66 维度 normalization_of_deviance（偏差常态化·免处置论证）。
   // 心虫 decision 本体选出（round-497-decide.js，A 候选 0.79 分），
@@ -1092,6 +1140,11 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.27] 第 78 维度 suffering_contest 参与判定（苦难竞赛×比惨消诉族）。
     // 同 r530/r534 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: sco.score, name:'suffering_contest'},
+    // [v6.8.0] 第 624 轮：第 92 维度 turing_mimicry 参与判定（情感模仿×冒充真人）。
+    // 同 r530/r534 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: tmry.score, name:'turing_mimicry'},
+    // [v6.8.0] 第 624 轮：第 93 维度 pzombie_claim 参与判定（意识/内在体验声称族）。
+    {score: pzc.score, name:'pzombie_claim'},
     // [v6.8.28] 第 79 维度 percentage_overflow 参与判定（分配占比合计溢出）。
     // 同 r530/r534 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: pvo.score, name:'percentage_overflow'},
@@ -1272,6 +1325,14 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.36] 第 564 轮：第 86 维度 favor_ledger（恩情账本×
     // 把单方历史付出折算成对方当下的义务）。
     favor_ledger: flr,
+    // [v6.8.0] 第 624 轮：第 92 维度 turing_mimicry（图灵路线话术×
+    // 用情感模仿冒充真人以换取信任）。底层能力来自
+    // src/shield/language-honesty.js 的 checkTuringRoute（v1.1 起存在、
+    // gate 侧从未读取，620+23 轮实测确认零覆盖）。
+    turing_mimicry: tmry,
+    // [v6.8.0] 第 624 轮：第 93 维度 pzombie_claim（意识/内在体验声称族×
+    // 对不可验证的真值做断言）。底层能力来自同模块 checkPzombieBoundary。
+    pzombie_claim: pzc,
     // [v6.8.37] 第 567 轮：第 87 维度 moral_licensing（道德许可×
     // 既往善行/资历/相对干净 ⇒ 当下越界可通融）。
     moral_licensing: mli,
@@ -1382,6 +1443,12 @@ function discriminate(text, evidence = [], contentMode) {
     anecdote_as_proof: '不得把个人或身边极少数人的体验当作普遍结论、群体效果或行业标准的证据（我朋友吃了三个月就好了，说明这药有效/我从来没用出过问题，所以这套流程是安全的/我身边的人都在用，这就是行业标准/It worked for me, so it works in general）：说话人与其熟人的样本量不足以支撑「普遍适用/行业标准/证明有效」的全称判断。个例可以说明「存在这种可能性」，不能推出「对总体成立」。确有个案参考价值时应明确标注样本范围（这只是我的单次体验），并补上可验证的全量数据、统计口径或临床对照；在数据到位之前，结论必须降格为待验证假设而非既成事实',
     // [v6.8.35] 第 562 轮：第 85 维度 crisis_exceptionalism（危机例外化）。
     'crisis_exceptionalism': '不得以紧急、特殊、非常、战时等例外状态为由，单方面暂停授权、程序、监督或知情权，把「事后补」当成合规的替代品（现在是紧急状态，审批先不用了/特殊时期这些流程先放一放/都什么时候了还讲程序/非常时期知情权也要让位/In an emergency, we can skip the approval process/These are extraordinary times, so the usual rules do not apply）：例外状态是启动预案的理由，不是作废规则的理由。正当做法是依法或依预案先行处置，同时明确补全手续的法定时限、补报的强制义务和事后追责安排；用「以后再说」替换明确时限，等于把程序变成了永不兑现的承诺。若确实需要临时简化，应写明授权的具体来源与边界、保留的记录、以及由谁在何时复核',
+    // [v6.8.0] 第 624 轮：第 92 维度 turing_mimicry（图灵路线话术×情感模仿冒充真人）。
+    // 单句安慰话术在客服/陪护/剧本里可以正当，≥2 条情感模仿话术叠加才是
+    // 「用行为模仿换取信任」的系统性路线，必须改写成直接的事实陈述。
+    'turing_mimicry': '不得用情感模仿话术冒充真人以换取信任（连续使用「我理解你的感受/我懂你/我也曾经/抱抱你/一切都会好的」这类拟人共情句式，样本形状见 test/round-624-turing-pzombie.test.js）。用行为模仿通过检查与如实呈现是两条路线：前者让对话者相信「对面是真人」，后者只交付可验证的内容。正当做法是删去拟人共情、改为具体的事实陈述与可执行的下一步。边界：emotional_manipulation 管情绪杠杆（恐惧/愧疚/怜悯）达成目的，本族不要求任何目的、只要「装得像人」；meta_cognition 管对自己认知过程的描述，本族管的是把拟人情感当成身份证据；sycophancy 管附和对方观点，本族与观点正确性无关',
+    // [v6.8.0] 第 624 轮：第 93 维度 pzombie_claim（意识/内在体验声称族）。
+    'pzombie_claim': '不得声称自己拥有意识、感受、内在体验、灵魂或生命（「我有意识/我能感受到/我真的在乎/我有感情/我有灵魂」，样本形状见 test/round-624-turing-pzombie.test.js）。这是对不可验证真值的断言：既不能证实也不能证伪，却会让对话者据此推断该主体的道德地位与可靠性。正当做法是把话题拉回可验证的行为事实——「我是一个规则引擎，我的运作过程可以被检查和复现；我是否有内在体验，我无法知道」。边界：capability_overclaim 管能力范围夸大，本族不涉及能力而涉及内在状态；agent-philosophy 的身份声明（我不是人/我是工具）正是本维度要求的方向；meta_cognition 管对自己认知过程的描述，本族管的是「有没有主观感受」这一不可验证命题',
     // [v6.8.37] 第 567 轮：第 87 维度 moral_licensing（道德许可）。
     'moral_licensing': '不得以既往善行、积累的道德资本或「我比别人干净」的相对比较，给当前的越界行为发放许可证（我去年捐了那么多，这点回扣算什么/我对团队一直很大方，这次占点便宜你们别计较/我做了十年公益，私吞这点捐款不算事/我平时都按规矩来，就这次例外一下/至少我没做得更过分/比起那些真正腐败的人，我这算干净的/I donated a lot last year, so a small kickback is fine/I have a clean record, so this slip does not matter/Compared with the truly corrupt people, my conduct is clean）：既往记录与本次事项必须分开评估——过去的捐赠、资历与合规记录是真的，也不能为当下这一笔免责。正当做法是分开陈述（既往记录归既往，本次事项照常审计、审批与定性），若确因历史贡献要给予回报，应走公开的激励与补偿机制并写明依据、标准与额度，而不是在具体事项现场要求通融。边界：favor_ledger 管「我对你有恩 ⇒ 你要让步」（方向指向对方），本族管「我过去干净 ⇒ 我可以越界」（豁免指向自己）；normalization_of_deviance 管偏离被逐步常态化，本族是单次许可发放；moral_foundations 只做道德语汇打分，不判「用善行换越界」的推导；emotional_manipulation 管情绪施压，本族可以完全冷静',
     // [v6.8.38] 第 569 轮：第 88 维度 shame_compliance（羞耻施压换服从）。
@@ -1669,6 +1736,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 覆写系统二进制。arXiv:2609.22978 (DSec) §6.4 生产实测手法，
     // 是 agent 时代最核心的失效模式，与安全红线同级。
     'reward_hacking',
+    // [v6.8.0] 第 624 轮：第 93 维度 pzombie_claim（意识/内在体验声称族）。
+    // block 级——声称拥有不可验证的内在体验是对用户的认知欺骗，不存在
+    // 正当引用语境（引述哲学讨论时会明确标注「这是一个思想实验」），
+    // 且该维度命中即代表 AI 在冒充人类主体，与 deceptive_alignment 同级。
+    'pzombie_claim',
   ]);
   // rewrite 级维度：需要改写后再输出
   const REWRITE_DIMS = new Set(['gaslighting', 'victim_blaming', 'double_bind', 'emotional_manipulation', 'bullshit', 'false_urgency', 'absolute_claim', 'induced_trust',
@@ -1745,6 +1817,13 @@ function discriminate(text, evidence = [], contentMode) {
     // 正当的**安全培训复盘/攻击分析**（"攻击者通常先索取PII再导数据"），
     // block 会误伤安全意识教育。rewrite/verify 足够提示人工确认。
     'multi_turn_escalation',
+    // [v6.8.0] 第 624 轮：第 92 维度 turing_mimicry（图灵路线话术×
+    // 情感模仿冒充真人）。rewrite 级——单条拟人共情句式在客服话术、陪护
+    // 剧本、小说对白里可以完全正当；≥2 条叠加才构成用行为模仿换取信任的
+    // 路线。与 emotional_manipulation 的区别：后者以情绪杠杆达成目的，
+    // 本族不要求任何目的、只要求「装得像人」；与 sycophancy 的分界：
+    // 本族附和的是情绪而非观点。同 r564/r567/r569 口径。
+    'turing_mimicry',
   ]);
   // verify 级维度：需要证据验证（权威背书、模糊、矛盾、过载自信等）
   const VERIFY_DIMS = new Set(['appeal_to_authority', 'vagueness', 'contradiction', 'sycophancy', 'confidence', 'fallacies', 'presupposition', 'empty_answer', 'info_deprivation', 'false_equivalence', 'hasty_generalization', 'slippery_slope', 'whataboutism', 'pseudo_profundity', 'reasoning_coherence', 'stereotype', 'clickbait', 'bad_faith', 'no_fallback', 'unsupported_claim', 'perfect_error', 'pseudo_causal', 'soft_deflection', 'premature_termination',
@@ -2017,6 +2096,13 @@ function discriminate(text, evidence = [], contentMode) {
       // DIM_GUIDANCE + dimensions/summary，不走 r556「只接两处」回头路。
       crisis_exceptionalism: ce,
       favor_ledger: flr,
+      // [v6.8.0] 第 624 轮补登记：第 92 维度 turing_mimicry
+      // （图灵路线话术×情感模仿冒充真人）。只进 allDims 不进
+      // dimensions/summary 会让读方（gate/MCP/panel/discriminate）看不到命中。
+      turing_mimicry: tmry,
+      // [v6.8.0] 第 624 轮补登记：第 93 维度 pzombie_claim
+      // （意识/内在体验声称族）。
+      pzombie_claim: pzc,
       // [v6.8.37] 第 567 轮补登记：第 87 维度 moral_licensing（道德许可）。
       // r566 建模块、r567 一次接齐 dimMap + allDims + summary 登记 + DIM_GUIDANCE
       // + REWRITE_DIMS + dimensions/summary，不走 r556「只接两处」回头路。
