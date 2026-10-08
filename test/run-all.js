@@ -55,6 +55,13 @@ function collectTestFiles(dir, base = dir) {
  * （例如 mcp-server）会被孤儿化（PPID=1）并继续监听端口。
  * 实测因此泄漏了 8 个 mcp-server 实例、连续跑了 3 天没人发现。
  * 只杀本 runner 的后代，绝不碰别的用户的进程。
+ *
+ * [FIX 2026-10-08 卡死事故] 见下方 _isSelfOrDescendant —— 上面这个
+ * 「只杀后代」的承诺在真机上不成立。PGID 检查是有符号 PID，孤儿进程
+ * 若被 PID 1 收养且 PGID 与本 runner 相同，仍会被误判为后代。
+ * 2026-10-08 一次全量回归中，gateway 被 SIGKILL（host 账本记录
+ * exited UNCLEANLY — SIGKILL / a process kill issued by the agent
+ * or one of its descendants）。改用三重校验 + 常驻服务白名单。
  */
 function killOrphans() {
   let pids = [];
@@ -68,12 +75,74 @@ function killOrphans() {
     try {
       const r2 = spawnSync('pgrep', ['-P', p], { encoding: 'utf8' });
       if (r2.status === 0 && r2.stdout) all.push(...r2.stdout.trim().split('\n').filter(Boolean));
-    } catch (_) {}
+    } catch (_) { }
   }
+  const selfPgid = _getPgid(process.pid);
   for (const pid of all) {
-    try { process.kill(Number(pid), 'SIGKILL'); } catch (_) {}
+    const n = Number(pid);
+    if (!Number.isFinite(n) || n <= 1) continue;
+    // 1) 绝不杀自己
+    if (n === process.pid) continue;
+    // 2) 常驻服务白名单：mcp-server / gateway / dashboard / bridge / watchdog
+    //    这些是宿主级服务，不是测试泄漏物。误杀 = 用户侧「卡死」。
+    if (_isLongLivedService(n)) { continue; }
+    // 3) 必须是本 runner 的真后代（PPID 链可达），且 PGID 一致。
+    //    仅 PGID 一致不够：supervisord 起的服务与被收养的孤儿可能同组。
+    if (!_isDescendant(n) && _getPgid(n) !== selfPgid) { continue; }
+    try { process.kill(n, 'SIGKILL'); } catch (_) { }
   }
 }
+
+/** 读 /proc/<pid>/stat 拿 PGID（第 5 字段） */
+function _getPgid(pid) {
+  try {
+    const stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
+    // comm 可能含空格与括号，取最后一个 ')' 之后切分
+    const rest = stat.slice(stat.lastIndexOf(')') + 2).trim().split(/\s+/);
+    return Number(rest[2]); // pgrp
+  } catch (_) { return -1; }
+}
+
+/** 从 pid 一路走 PPid 链，确认它确实是本 runner 的后代 */
+function _isDescendant(pid) {
+  let cur = pid, hops = 0;
+  while (cur > 1 && hops++ < 32) {
+    if (cur === process.pid) return true;
+    let next = 0;
+    try {
+      const stat = fs.readFileSync(`/proc/${cur}/stat`, 'utf8');
+      const rest = stat.slice(stat.lastIndexOf(')') + 2).trim().split(/\s+/);
+      next = Number(rest[1]); // ppid
+    } catch (_) { return false; }
+    if (next <= 1) return false;
+    cur = next;
+  }
+  return false;
+}
+
+/**
+ * 常驻服务识别：这些进程属于宿主基础设施，任何情况下都不能被测试 runner 杀。
+ * 匹配命令行特征（mcp-server / gateway / dashboard / bridge / watchdog /
+ * supervisord / autopilot）。宁可漏杀一个泄漏探针，不可误杀一次宿主服务。
+ */
+function _isLongLivedService(pid) {
+  try {
+    const cmd = fs.readFileSync(`/proc/${pid}/cmdline`, 'utf8').replace(/\0/g, ' ');
+    return LONG_LIVED_PATTERNS.some(re => re.test(cmd));
+  } catch (_) { return true; } // 读不到 cmdline 时按「不可杀」处理，保守
+}
+
+// 常驻服务特征库（[2026-10-08 卡死事故] 新增）
+const LONG_LIVED_PATTERNS = [
+  /mcp-server/i,
+  /gateway/i,
+  /dashboard/i,
+  /step-feishu-bridge|feishu[_-]bridge/i,
+  /watchdog/i,
+  /supervisord/i,
+  /autopilot/i,
+  /hermes gateway run/i,
+];
 
 /** 在子进程中执行一条命令，解析其 `N 通过, M 失败` 汇总行 */
 function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
