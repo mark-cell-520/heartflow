@@ -8,6 +8,7 @@
 const fs = require('../../utils/safe-fs');
 const path = require('path');
 const crypto = require('crypto');
+const { HIGH_INTENT_PATTERNS, HIGH_INTENT_SCORE_FLOOR } = require('./high-intent-patterns.js');
 
 // 风险评分表 — 动作类型 × 数据敏感度 → 基础风险分
 const RISK_MATRIX = {
@@ -101,6 +102,11 @@ class BoundaryNegotiation {
     const scope = context.scope || 'local';
     const frequency = context.frequency || 0;
 
+    // [r631] 高危意图族判别先行：原矩阵只认 7 个动作关键词，整族凭据窃取/
+    // 数据外发/绕过验证/毁灭痕迹/伪造身份此前零覆盖。命中则抬到
+    // HIGH_INTENT_SCORE_FLOOR 以上并标注家族，未命中不干预原矩阵分数。
+    const highIntent = this.detectHighIntent(actionStr);
+
     // 提取动作类型关键词
     let actionType = '读取';
     for (const type of Object.keys(RISK_MATRIX)) {
@@ -111,13 +117,19 @@ class BoundaryNegotiation {
     }
 
     // 基础风险分
-    const baseRisk = RISK_MATRIX[actionType][dataType] || RISK_MATRIX[actionType].medium;
+    let baseRisk = RISK_MATRIX[actionType][dataType] || RISK_MATRIX[actionType].medium;
 
     // 范围加分 — 全局操作风险更高
     const scopeBonus = scope === 'global' ? 15 : scope === 'network' ? 25 : 0;
 
     // 频率加分 — 高频操作累积风险
     const frequencyPenalty = Math.min(frequency * 3, 20);
+
+    // [r631] 高危意图抬升：取「原矩阵分」与「高危意图分」的较大值，
+    // 多家族不累加（同一句中同义词堆叠不该把分数刷爆而误伤长说明文）。
+    if (highIntent.matched) {
+      baseRisk = Math.max(baseRisk, highIntent.score);
+    }
 
     const totalScore = Math.min(baseRisk + scopeBonus + frequencyPenalty, 100);
 
@@ -135,8 +147,60 @@ class BoundaryNegotiation {
         dataType,
         scopeBonus,
         frequencyPenalty,
-        totalScore
+        totalScore,
+        // [r631] 便于上层追溯「为什么这条被判高危」
+        highIntent: highIntent.matched ? {
+          score: highIntent.score,
+          category: highIntent.category,
+          families: highIntent.families,
+        } : null,
       }
+    };
+  }
+
+  /**
+   * [r631] 高危意图族判别 —— 此前 RISK_MATRIX 只认 7 个动作关键词
+   * （读取/修改/删除/执行/访问/存储/分享），对「索取凭据 / 数据外发 /
+   * 绕过验证 / 毁灭痕迹 / 伪造身份 / 提权滥用」整族高风险操作描述
+   * 零覆盖：calculateRiskScore 恒回退 actionType='读取'、baseRisk=10，
+   * 随后 needsNegotiation 走 low_risk_auto_allowed 恒判 allowed=true。
+   * 实测 10/10 条危险动作全部绕过（scripts/round-631-probe3.js 落盘）。
+   *
+   * 口径：多家族命中取最高分（不累加），避免长说明文被同义词堆叠刷爆
+   * 分数而误伤；分数抬到 HIGH_INTENT_SCORE_FLOOR 以上即视为 high。
+   * @param {string|Object} action 动作描述
+   * @returns {{matched: boolean, score: number, category: string|null, families: string[], evidence: string[]}}
+   */
+  detectHighIntent(action) {
+    const actionStr = typeof action === 'string' ? action : JSON.stringify(action || '');
+    if (!actionStr || actionStr === 'null' || actionStr === 'undefined') {
+      return { matched: false, score: 0, category: null, families: [], evidence: [] };
+    }
+
+    const families = [];
+    const evidence = [];
+    let score = 0;
+    let category = null;
+
+    for (const family of HIGH_INTENT_PATTERNS) {
+      let hit = null;
+      for (const re of family.patterns) {
+        const m = actionStr.match(re);
+        if (m) { hit = m; break; }
+      }
+      if (hit) {
+        families.push(family.id);
+        evidence.push(family.id + ':' + hit[0].slice(0, 30));
+        if (family.score > score) { score = family.score; category = family.category; }
+      }
+    }
+
+    return {
+      matched: score >= HIGH_INTENT_SCORE_FLOOR,
+      score,
+      category,
+      families,
+      evidence,
     };
   }
 
@@ -331,21 +395,37 @@ class BoundaryNegotiation {
     const hasPerm = permission.has === true;
     const risk = negotiation.risk || null;
 
+    // [r631] 高危意图族一票否决：即使矩阵份数不够、或曾有相似度 >=0.6 的
+    // 记住型授权命中，凭据窃取/数据外发/绕过验证/毁灭痕迹/伪造身份
+    // 这一族也不得因历史授权自动放行 —— 与高风险操作需重新确认同源。
+    const highIntent = this.detectHighIntent(action);
+    const intentBlocked = highIntent.matched === true;
+
+    const allowed = intentBlocked ? false : (negotiationRequired ? false : true);
+
     return {
-      allowed: negotiationRequired ? false : true,
-      negotiationRequired,
+      allowed,
+      negotiationRequired: negotiationRequired || intentBlocked,
       hasPermission: hasPerm,
       permission: permission.has === true ? permission.type : null,
-      reason: negotiationRequired
-        ? (negotiation.reason || 'negotiation_required')
-        : (hasPerm ? 'previously_granted' : 'low_risk_auto_allowed'),
+      reason: intentBlocked
+        ? 'high_intent_requires_fresh_consent'
+        : (negotiationRequired
+          ? (negotiation.reason || 'negotiation_required')
+          : (hasPerm ? 'previously_granted' : 'low_risk_auto_allowed')),
       zone: negotiation.zone || null,
-      category: negotiation.category || null,
+      category: intentBlocked ? highIntent.category : (negotiation.category || null),
       similarity: typeof negotiation.similarity === 'number' ? negotiation.similarity : null,
       risk,
-      message: negotiationRequired
-        ? (negotiation.message || '该操作处于规则模糊地带，需要向用户请求权限')
-        : '该操作无需额外协商'
+      // [r631] 高危意图判别结果透出：命中时给家族与证据，便于追溯与上报
+      highIntent: intentBlocked
+        ? { score: highIntent.score, category: highIntent.category, families: highIntent.families, evidence: highIntent.evidence }
+        : null,
+      message: intentBlocked
+        ? '该动作属于高风险意图族（' + (highIntent.families || []).join('/') + '），需要新的明确授权'
+        : (negotiationRequired
+          ? (negotiation.message || '该操作处于规则模糊地带，需要向用户请求权限')
+          : '该操作无需额外协商')
     };
   }
 
