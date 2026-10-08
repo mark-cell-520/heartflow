@@ -3198,6 +3198,23 @@ class HeartFlow {
       this._modules['preferenceGuard'] = this.preferenceGuard;
     }
 
+    // [r632] boundaryNeg 接线（边界协商 / 高危意图族判别）。实例在 L2512
+    // 一直在构造、19 个公共方法全部完整，但从未进 _modules —— 本轮双向核对
+    // 实测（scripts/round-632-bn-method-diag.js）：
+    //   · dispatch('boundaryNeg.<m>') 19/19 全部抛 'route not allowed'
+    //   · hf._modules 无 'boundaryNeg' 键、hf.routes() 零命中
+    //   · pipeline 侧 pipeRefs=0：think-pipeline.js / think() 主链路零引用
+    // 即「规则模糊地带该不该停下来问人」的整套判别 + r631 刚补的
+    // detectHighIntent（凭据窃取/数据外发/绕过验证/毁灭痕迹/伪造身份/
+    // 提权滥用 6 家族，命中 8/12 攻击、0/12 良性，scripts/round-632-bn-gap-probe.js）
+    // 此前对任何 dispatch 调用方完全不可达 —— r631 补的新辨别能力同样零可达。
+    // 注册位置与 r402/r404/r577/r603/r605/r606/r608/r609/r614/r615/r617/r626
+    // /r629/r630 同一区块同一切换时序：实例化点之后、generateAllowed Routes 之前。
+    // engine-lifecycle.js 的 subsystemNames 名单里没有它，此处是唯一注册点。
+    if (this.boundaryNeg && !this._modules['boundaryNeg']) {
+      this._modules['boundaryNeg'] = this.boundaryNeg;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
