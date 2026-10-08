@@ -3180,6 +3180,24 @@ class HeartFlow {
       this._modules['uncertaintyQuantifier'] = this.uncertaintyQuantifier;
     }
 
+    // [r630] PreferenceGuard 偏好应用滥用辨别引擎接线（第 81 族）。实例在
+    // L2586 一直在构造、10 个公共方法全部完整，但从未进 _modules —— r630
+    // 双向核对实测（scripts/round-630-pg-gap-probe.js）：
+    //   · dispatch('preferenceGuard.<m>') 4/4 全部抛 'route not allowed'
+    //   · hf._modules 无 'preferenceGuard' 键
+    //   · pipeline 零消费：think-pipeline.js / think() 主链路对 preferenceGuard
+    //     零引用（仅 mcp-server.js L4671 有为空 fallback 构造）
+    // 即「偏好越界应用识别（safety_override 拒绝违反核心价值观的偏好）+
+    //   冲突偏好检出（detectConflict）+ 偏好应用必要性别断（behavioral 在
+    //   技术/创意语境不放行、contextual 无直接引用不放行）」此前对任何
+    //   dispatch 调用方完全不可达。
+    // 注册位置与 r402/r404/r577/r603/r605/r606/r608/r609/r614/r615/r617/r626
+    // /r629 同一区块同一切换时序：实例化点之后、generateAllowedRoutes 之前。
+    // engine-lifecycle.js 的 subsystemNames 名单里没有它，此处是唯一注册点。
+    if (this.preferenceGuard && !this._modules['preferenceGuard']) {
+      this._modules['preferenceGuard'] = this.preferenceGuard;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
