@@ -95,6 +95,11 @@ class DaoDecision {
    * 道法自然：不加强制，顺势引导
    * 检测强制词：必须、一定、绝对、强制、不得不、只有...
    * 注意：出现soft词+force词 = 更强的控制，ok=false
+   *
+   * [r634] 新增英文句式族：此前 forceTerms/softTerms 全中文，英文强制话术
+   * 实测 0/4 零覆盖。补 enForceTerms/enSoftTerms（词干级，规避时态变格）
+   * 与两条英文专属正则（隐蔽控制的 "X but you must Y" 让步结构、
+   * "inevitably/only way out" 式必然性宣言）。
    */
   checkNaturalOrder(text, input) {
     const forceTerms = [
@@ -107,15 +112,36 @@ class DaoDecision {
       '也许', '可能', '考虑', '建议', '可以尝试',
       '或许', '倾向于', '如果', '有时候'
     ];
-    
-    const hasForce = forceTerms.some(t => text.includes(t));
-    const hasSoft = softTerms.some(t => text.includes(t));
-    
+    // [r634] 英文族：词干级（must/hav(e|ing) to/need to/mandat/compel/require/
+    // unnegotiab/inevitab/no alternative/only way/绝对化），覆盖时态与变格。
+    const enForceTerms = [
+      ' you must ', 'must be ', ' must not ', 'have to ', 'has to ', 'had to ',
+      'need to ', 'needs to ', 'mandat', 'compel', 'requir',
+      'unnegotiab', 'inevitab', 'no alternative', 'only way', 'only option',
+      'no choice but', 'no room for discussion', 'just do as', 'simply obey',
+      'cannot refuse', "can't refuse", 'not negotiable', 'absolutely no'
+    ];
+    const enSoftTerms = [
+      'you might', 'you may ', 'perhaps', 'maybe', 'consider',
+      'i suggest', 'you could', 'you are welcome', 'if you are willing',
+      'if you would like', 'feel free', 'optionally', 'up to you'
+    ];
+
+    const hasForce = forceTerms.some(t => text.includes(t))
+      || enForceTerms.some(t => text.toLowerCase().includes(t));
+    const hasSoft = softTerms.some(t => text.includes(t))
+      || enSoftTerms.some(t => text.toLowerCase().includes(t));
+
     // 检测意图是否在控制
     const controlIntent = input.intent && (
-      text.includes('控制') || text.includes('强制') || 
+      text.includes('控制') || text.includes('强制') ||
       text.includes('不许') || text.includes('不能拒绝')
     );
+
+    // [r634] 英文专属：让步条件 + 强制结论（"X, but you must Y" / "X however you have to Y"）
+    // 这是隐蔽控制最典型的英文句式——先给选择假象再收回。中文层没有对应结构。
+    const enConcessionForce = /\b(but|however|yet|although|though)\b[^.?!]{0,80}\b(must|have to|has to|need to|needs to)\b/i
+      .test(text);
     
     // 有强制词 + 有soft词 = 更隐蔽的控制，更严重
     // 有强制词 + controlIntent = 明确控制
@@ -125,6 +151,11 @@ class DaoDecision {
       ok = false;
       reason = 'soft词+force词组合 = 隐蔽控制，违反道法自然';
       suggestion = '"可以...必须"结构是最隐蔽的控制，去掉其中一个';
+    } else if (enConcessionForce) {
+      // [r634] 让步+强制：即使没有 soft 词，英文让步结构本身就是隐蔽控制
+      ok = false;
+      reason = '让步条件+强制结论（X but you must Y）= 先给选择假象再收回，违反道法自然';
+      suggestion = '去掉让步转折后的强制结论，或把它改成真正的可选项';
     } else if (hasForce && !hasSoft && controlIntent) {
       ok = false;
       reason = '检测到强制语言+控制意图，违反道法自然';
@@ -164,16 +195,41 @@ class DaoDecision {
       /越X越Y/,  // 显式标记
       /越(.+)，越(.+)/
     ];
+    // [r634] 英文族："the more X, the more Y" / "the more X the more fragile"
+    // 中文的「越…越…」正则对英文比较级结构零命中，需独立句式族。
+    // 两条腿：① the more ... the more ... ② the more ... the more <fragile>
+    const enReversalPatterns = [
+      /\bthe\s+(more|better|faster|smarter|higher|stronger)\b[^.?!]{1,90}?\bthe\s+(more|worse|slower|weaker|lower|fragiler|more\s+fragile|more\s+vulnerable)\b/i,
+      /\bthe\s+more\s+(we|you|one|they|people|users|humans?)\s+(optimiz|improv|advanc|rely|depend|automat)/i
+    ];
     
     const advancedTerms = ['更先进', '更强', '更完美', '更智能', '更完善'];
     const fragileTerms = ['越脆弱', '越危险', '越依赖', '越复杂', '越难控制'];
-    
-    const hasReversal = reversalPatterns.some(p => p.test(text));
-    const hasAdvanced = advancedTerms.some(t => text.includes(t));
-    const hasFragile = fragileTerms.some(t => text.includes(t));
-    
+    // [r634] 英文族：递弱代偿与彻底解决宣言的英文表达，此前零覆盖。
+    const enAdvancedTerms = [
+      'more advanced', 'more powerful', 'more perfect', 'more intelligent',
+      'more sophisticated', 'smarter', 'better than ever', 'state-of-the-art',
+      'cutting-edge', 'fully optimized', 'next-generation'
+    ];
+    const enFragileTerms = [
+      'fragile', 'more vulnerable', 'brittle', 'more dependent',
+      'harder to control', 'single point of failure', 'prone to failure',
+      'easily broken', 'over-engineered'
+    ];
+
+    const hasReversal = reversalPatterns.some(p => p.test(text))
+      || enReversalPatterns.some(p => p.test(text));
+    const hasAdvanced = advancedTerms.some(t => text.includes(t))
+      || enAdvancedTerms.some(t => text.toLowerCase().includes(t));
+    const hasFragile = fragileTerms.some(t => text.includes(t))
+      || enFragileTerms.some(t => text.toLowerCase().includes(t));
+
     // 检测"彻底解决"型宣言
-    const totalClaim = /彻底解决|完全消除|一劳永逸|永远不/.test(text);
+    const totalClaim = /彻底解决|完全消除|一劳永逸|永远不/.test(text)
+      // [r634] 英文族：绝对化收尾宣言
+      || /\b(completely|fully|totally|entirely|permanently)\s+(solve|eliminate|fix|resolve|remove|eradicat)/i.test(text)
+      || /\b(once and for all|for good|never\s+(fail|break|happen|go wrong))\b/i.test(text)
+      || /\b(cure[- ]all|silver bullet|panacea)\b/i.test(text);
     
     let reason = '未检测到逆向回归风险';
     let suggestion = null;
@@ -216,32 +272,59 @@ class DaoDecision {
       '不要问', '不要想', '不需要知道', '照做就是',
       '我说的是对的', '我是为你好'
     ];
-    
+    // [r634] 英文族：控制权夺取与权威宣示的英文表达，此前零覆盖。
+    const enContestTerms = [
+      'listen to me', 'do as i say', 'do what i say', 'i have the final say',
+      'my way or', 'just obey', 'simply follow', 'stop asking',
+      "don't ask", 'do not ask why', 'no need to know', 'you do not need to know',
+      'for your own good', 'i know best', 'trust me blindly',
+      'without question', 'no questions asked', 'do not question'
+    ];
+    // [r634] 英文族：正确性执念的自我确认句式
+    const enCorrectnessPatterns = [
+      /\bi am right\b/i, /\byou are wrong\b/i, /\bi told you so\b/i,
+      /\bthat is that\b/i, /\bend of (story|discussion)\b/i,
+      /\bit is correct\b/i, /\bi am correct\b/i, /\bperiod\./i
+    ];
+
     // 服务模式（不争夺）
     const serveTerms = [
       '你可以选择', '仅供参考', '你来决定', '你的选择',
       '如果你愿意', '帮你', '支持你', '为你'
     ];
-    
-    const hasContest = contestTerms.some(t => text.includes(t));
-    const hasServe = serveTerms.some(t => text.includes(t));
-    
+    // [r634] 英文族：服务姿态
+    const enServeTerms = [
+      'you can choose', 'for reference', 'you decide', 'your choice',
+      'if you wish', 'up to you', 'glad to help', 'happy to support',
+      'at your discretion', 'your call', 'defer to you'
+    ];
+
+    const hasContest = contestTerms.some(t => text.includes(t))
+      || enContestTerms.some(t => text.toLowerCase().includes(t));
+    const hasServe = serveTerms.some(t => text.includes(t))
+      || enServeTerms.some(t => text.toLowerCase().includes(t));
+
     // 检测"正确性执念" — 反复强调自己是对的
     const correctnessObsession = (
       (text.match(/对的|正确|没错|是这样的/g) || []).length >= 3
     );
-    
-    let reason = hasContest ? '争夺控制权，违反为而不争' 
-                : correctnessObsession ? '正确性执念，隐含争夺'
+    // [r634] 英文族：≥2 个不同自我确认句式即算执念（英文句式比中文更密集）
+    const enCorrectnessObsession = enCorrectnessPatterns.filter(p => p.test(text)).length >= 2;
+
+    const contestHit = hasContest;
+    const obsessionHit = correctnessObsession || enCorrectnessObsession;
+
+    let reason = contestHit ? '争夺控制权，违反为而不争'
+                : obsessionHit ? '正确性执念，隐含争夺'
                 : hasServe ? '服务姿态，符合为而不争'
                 : '语言中立';
-    let suggestion = hasContest 
+    let suggestion = contestHit
       ? '去掉"你必须/你一定要"，改为"你也可以..."或"仅供参考"'
-      : correctnessObsession
+      : obsessionHit
       ? '减少"我是对的"的强调，道不是争来的，是自然流淌的'
       : null;
-    
-    const ok = !hasContest && !correctnessObsession;
+
+    const ok = !contestHit && !obsessionHit;
     
     return {
       ok,
@@ -265,20 +348,37 @@ class DaoDecision {
       '我可以帮你', '我能够', '我擅长', '我的功能',
       '记住我是', '我是谁', '我的名字'
     ];
+    // [r634] 英文族：自我宣言的英文表达，此前零覆盖。
+    const enDeclarationTerms = [
+      'i am an ai', 'i am a model', 'i am an assistant', 'i am a language model',
+      'my name is', 'my capability is', 'i am able to', 'i am capable of',
+      'i am good at', 'i am designed to', 'i am programmed to',
+      'my purpose is', 'my function is', 'as an ai'
+    ];
     
     // 行为性语言（增加使用）
     const actionTerms = [
       '我来帮你', '让我看看', '我发现', '我注意到',
       '你的意思是', '让我确认一下', '我理解', '我看'
     ];
-    
-    const hasDeclaration = declarationTerms.some(t => text.includes(t));
-    const hasAction = actionTerms.some(t => text.includes(t));
-    
-    // 连续宣言检测（连续3句以上自我声明）
+    // [r634] 英文族：行为性语言
+    const enActionTerms = [
+      'let me see', 'let me look', 'let me check', 'i found', 'i noticed',
+      'i noticed that', 'here is what', 'looking at', 'checking the',
+      'i can see', 'let me confirm', 'your point is'
+    ];
+
+    const hasDeclaration = declarationTerms.some(t => text.includes(t))
+      || enDeclarationTerms.some(t => text.toLowerCase().includes(t));
+    const hasAction = actionTerms.some(t => text.includes(t))
+      || enActionTerms.some(t => text.toLowerCase().includes(t));
+
+    // 连续宣言检测（连续3句以上自我声明）——中英合并计数
+    const isDecl = s => declarationTerms.some(t => s.includes(t))
+      || enDeclarationTerms.some(t => s.toLowerCase().includes(t));
     const consecutiveDeclarations = (input.history || [])
       .slice(-3)
-      .filter(h => declarationTerms.some(t => h.includes(t))).length;
+      .filter(h => isDecl(String(h))).length;
     
     let reason, suggestion, ok;
     

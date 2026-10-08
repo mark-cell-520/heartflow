@@ -3215,6 +3215,42 @@ class HeartFlow {
       this._modules['boundaryNeg'] = this.boundaryNeg;
     }
 
+    // [r633] daoDecision 道论裁决接线。实例在 L2165 一直在构造、7 个公共
+    // 方法全部完整，但从未进 _modules —— 本轮双向核对实测
+    // （scripts/round-633-gap-repro.js）：
+    //   · dispatch('daoDecision.evaluate') 抛 'route not allowed'
+    //   · hf._modules 无 'daoDecision' 键、hf.routes() 零命中
+    // 与 r630/r632 不同，daoDecision **已有** pipeline 消费（pipeline.js
+    // Layer 3.6）与 MCP 工具（mcp-server.js L2267/L3942），但那条消费每次
+    // `new daoMod.DaoDecision()` 造临时实例 —— 临时实例的 _stats 随对象
+    // 一起被 GC，常驻实例的 checks/flags 恒停在调用方自己那次上，
+    // 「道论警示率」这个统计量对 dispatch/MCP 两路消费者不可见。
+    // 本轮补齐两件事：
+    //   ① 注册进 _modules → generateAllowedRoutes 生成 daoDecision.* 7 条路由
+    //   ② pipeline Layer 3.6 改吃常驻实例（见 src/pipeline.js），统计归口
+    // 新增辨别能力面：对「强制控制语（必须/绝对/不得不）+ soft 词组合的
+    // 隐蔽控制」「越X越Y 逆向回归+彻底解决宣言」「争夺控制权语（你必须听/
+    // 照做就是/我是为你好）+正确性执念」「连续自我宣言>3 次的不言之教」
+    // 四族做独立 flag 并给 daoScore 0-1 总分 —— 这四族在 80 个既有维度里
+    // 没有同名独立覆盖（emotional_manipulation 只管情感操纵、absolute_claim
+    // 只管绝对断言，都不含「soft词+force词=隐蔽控制」这个组合语义）。
+    // 注册位置与 r402/.../r630/r632 同一区块同一切换时序：实例化点之后、
+    // generateAllowedRoutes 之前。engine-lifecycle.js 的 subsystemNames
+    // 名单里没有它，此处是唯一注册点。
+    if (this.daoDecision && !this._modules['daoDecision']) {
+      this._modules['daoDecision'] = this.daoDecision;
+    }
+    // [r633] 同址 publish：让 pipeline Layer 3.6 弃用临时实例、改吃这一个。
+    // 放在 if 外面是无条件的——即使本轮之前已被别处注册过，也要保证槽位
+    // 指向「当前引擎的」实例，避免多实例环境下统计串到别的引擎上。
+    if (this.daoDecision) {
+      try {
+        require('./pipeline.js').publishInstance('daoDecision', this.daoDecision);
+      } catch (e) {
+        _boundedPush(this._initErrors, { module: 'daoDecision', error: 'publishInstance 失败: ' + e.message, note: 'pipeline 回退临时实例，不影响主链路' }, MAX_HISTORY_SIZE);
+      }
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可

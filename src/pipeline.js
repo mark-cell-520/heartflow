@@ -30,6 +30,19 @@ const { evaluateRules } = require('./knowledge/classics-value-mapper.js');
 
 let pipelineAnchor = null;
 
+// [r633] 常驻实例注册槽：引擎 start() 时把 daoDecision 实例 publish 进来，
+// 让 pipeline Layer 3.6 与 dispatch / MCP 三路消费统计归口到同一实例。
+// 语义约束：只接受「带 evaluate/getStats 的道论裁决实例」，其余形状一律
+// 忽略（绝不能把任意对象塞进槽位后让 pipeline 在文本判定里崩溃）。
+const _instances = {};
+function publishInstance(name, inst) {
+  if (!name || typeof name !== 'string') return false;
+  if (!inst || typeof inst !== 'object') return false;
+  if (typeof inst.evaluate !== 'function' || typeof inst.getStats !== 'function') return false;
+  _instances[name] = inst;
+  return true;
+}
+
 /**
  * [v6.7.129 第 55 轮] 动作严格度比较——后层覆盖前层时的防降级闸门。
  *
@@ -159,9 +172,14 @@ function runPipeline({ input, mode = 'input', anchor, options = {} } = {}) {
   }
 
   // ─── Layer 3.6: Dao Decision — 道论监督 ──────────────────────
+  // [r633] 改为优先复用常驻实例（publishInstance 注册槽）。此前每次
+  // `new daoMod.DaoDecision()` 造临时实例 → _stats 随 GC 蒸发，dispatch /
+  // MCP 两路消费者读到的 flagRate 与本层调用次数无关。槽位为空时（例如
+  // 独立 require pipeline 的调用方）才回退临时构造，行为与旧版一致。
   try {
     const daoMod = require('./core/dao-decision.js');
-    const daoResult = new daoMod.DaoDecision().evaluate({ text: input, history: [] });
+    const daoInst = _instances.daoDecision || new daoMod.DaoDecision();
+    const daoResult = daoInst.evaluate({ text: input, history: [] });
     checked_by.push({ layer: 'dao-decision', daoScore: daoResult.daoScore, passed: daoResult.passed, flags: (daoResult.flags || []).slice(0, 3) });
     if (daoResult.flags && daoResult.flags.length && currentGate.action === 'pass') {
       currentGate = { action: 'verify', reason: `道论警示: ${daoResult.flags[0].reason}`, layer: 'dao-decision' };
@@ -444,4 +462,4 @@ function checkOutput(text) {
   return runPipeline({ input: text, mode: 'output' });
 }
 
-module.exports = { runPipeline, checkInput, checkDraft, checkOutput, applyHardGate };
+module.exports = { runPipeline, checkInput, checkDraft, checkOutput, applyHardGate, publishInstance };
