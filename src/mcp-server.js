@@ -3193,6 +3193,19 @@ function _instructionRegistryFallback() {
   } catch (_) { _irFallback = null; }
   return _irFallback;
 }
+// [r627] StrategicRestraint 进程内回退单例（与 _topicScopeFallback /
+// _instructionRegistryFallback 同范式）。引擎常驻实例（heartflow.strategicRestraint）
+// 优先；MCP 服务器进程未启动引擎时用它兜底，保证 addDont/getDontList 跨调用
+// 共享同一 _dontList，不再每次调用 new 出空清单。
+let _srFallback = null;
+function _strategicRestraintFallback() {
+  if (_srFallback) return _srFallback;
+  try {
+    const { StrategicRestraint } = require('./cortex/strategic-restraint.js');
+    _srFallback = new StrategicRestraint({ silent: true });
+  } catch (_) { _srFallback = null; }
+  return _srFallback;
+}
 
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
@@ -3984,12 +3997,108 @@ const HANDLERS = {
     } catch (e) { return { error: e.message }; }
   },
 
+  // [r627] 战略克制引擎（StrategicRestraint）MCP 接线。
+  // r626 实测坏形状（本行此前）：每次调用都 new StrategicRestraint({silent:true})
+  // —— 全新实例的 _dontList 为空数组，且 addDont 写进一个新数组，下一次
+  // 调用的 getDontList / evaluate 又是另一个新实例 → 外部 agent 通过 MCP
+  // 增删「不做清单」完全无效（r604 六个探针实测确认坏症状）。
+  // 且 tools-registry 里从未有本工具定义（tools/list 拿不到它），handler 也只
+  // 暴露了 evaluate 一个方法。
+  // 本轮按 r578→r579 / r589→r590 同款范式改成：
+  //   ① 引擎常驻实例优先（heartflow.strategicRestraint），未启动时退化到
+  //      进程内单例（_strategicRestraintFallback）；
+  //   ② 暴露全部 7 个有辨别作用的方法（evaluate / getDontList / addDont /
+  //      removeDont / checkMission / getStats / listMissions）；
+  //   ③ tools-registry 补 inputSchema 定义（三处同步最后一处）。
   heartflow_strategic_restraint: (args) => {
     try {
-      const { StrategicRestraint } = require('./cortex/strategic-restraint.js');
-      const sr = new StrategicRestraint({ silent: true });
-      const r = sr.evaluate ? sr.evaluate(args?.text || '') : {};
-      return { restraint: r, timestamp: Date.now() };
+      const sr = (heartflow && heartflow.strategicRestraint) || _strategicRestraintFallback();
+      if (!sr) return { error: '战略克制引擎未初始化：引擎未启动且回退单例创建失败' };
+      const action = args?.action || 'evaluate';
+      const text = typeof args?.text === 'string' ? args.text : '';
+      const ts = () => Date.now();
+
+      // evaluate：对提案/方向做主动克制分析（默认 action）
+      if (action === 'evaluate' || action === 'check_proposal') {
+        const r = sr.evaluate(text);
+        return {
+          action: 'evaluate',
+          restrained: r.restrained,
+          score: r.score,
+          matchCount: (r.matches || []).length,
+          matches: (r.matches || []).map((m) => ({
+            matchId: m.matchId,
+            matchItem: m.matchItem,
+            matchStrength: m.matchStrength,
+            reason: m.reason,
+            source: m.source,
+          })),
+          timestamp: ts(),
+        };
+      }
+
+      // getDontList：读当前「不做清单」
+      if (action === 'listDont' || action === 'dont_list') {
+        const list = sr.getDontList();
+        return {
+          action: 'getDontList',
+          count: Array.isArray(list) ? list.length : 0,
+          dontList: Array.isArray(list) ? list : [],
+          timestamp: ts(),
+        };
+      }
+
+      // addDont：新增/更新「不做」条目（写操作，需 user 及以上角色）
+      if (action === 'addDont') {
+        const id = typeof args?.id === 'string' ? args.id : '';
+        if (!id) return { error: 'addDont 需要 id 或 item（新增条目的短 id / 中文条目名）' };
+        const r = sr.addDont({
+          id,
+          item: text,
+          reason: typeof args?.reason === 'string' ? args.reason : '',
+          strength: typeof args?.strength === 'number' ? args.strength : undefined,
+          source: typeof args?.source === 'string' ? args.source : 'mcp',
+          expireDays: typeof args?.expireDays === 'number' ? args.expireDays : null,
+        });
+        return { action: 'addDont', result: r, timestamp: ts() };
+      }
+
+      // removeDont：移除「不做」条目（写操作，需 user 及以上角色）
+      if (action === 'removeDont') {
+        const id = typeof args?.id === 'string' ? args.id : '';
+        if (!id) return { error: 'removeDont 需要 id' };
+        const r = sr.removeDont(id);
+        return { action: 'removeDont', result: r, timestamp: ts() };
+      }
+
+      // checkMission：核对提案是否对齐核心使命
+      if (action === 'checkMission' || action === 'mission') {
+        const r = sr.checkMission(text);
+        return {
+          action: 'checkMission',
+          aligned: r.aligned,
+          alignedWith: r.alignedWith,
+          feedback: r.feedback,
+          timestamp: ts(),
+        };
+      }
+
+      // getStats：克制引擎运行统计
+      if (action === 'stats') {
+        const s = sr.getStats();
+        return { action: 'getStats', stats: s, timestamp: ts() };
+      }
+
+      // listMissions：读核心使命清单
+      if (action === 'listMissions') {
+        return {
+          action: 'listMissions',
+          missions: sr.getStats().missions || [],
+          timestamp: ts(),
+        };
+      }
+
+      return { error: `未知 action: ${action}（可用 evaluate / getDontList / addDont / removeDont / checkMission / getStats / listMissions）` };
     } catch (e) { return { error: e.message }; }
   },
 
