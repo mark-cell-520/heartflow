@@ -3207,6 +3207,25 @@ class HeartFlow {
       this._modules['topicScope'] = this.topicScope;
     }
 
+    // [r626] strategicRestraint 接线（战略克制 / 「不做清单」辨别引擎）。
+    // 实例在 L1866 一直在构造、load() 也曾被调（L1867），pipeline 侧
+    // think-pipeline.js:175-176 与 thought-chain.js:281-294 各有旁路调用
+    // （前者只把结果塞进 result._restrainedBy，后者只在工作流节点内可达）。
+    // r626 双向核对实测（scripts/round-626-sr-diag2.js）：
+    //   · HeartFlow.ALLOWED_ROUTES = Set[1241]，arKeys 152 个，sr_in_arKeys=false
+    //   · sr_routes=0、_modules 无 'strategicRestraint' 键
+    //   · dispatch('strategicRestraint.<m>') 9/9 全部抛 route not allowed
+    // 即「克制分析（evaluate）+ 不做清单读写（getDontList/addDont/removeDont）
+    //    + 核心使命核对（checkMission）+ 统计（getStats）+ 持久化（load）」
+    // 此前对任何 dispatch 调用方完全不可达。
+    // 与 r402/r404/r577/r603/r605/r606/r608/r609/r614/r615/r617 同一区块
+    // 同一切换时序：实例化点之后、generateAllowedRoutes 之前。
+    // engine-lifecycle.js 的 subsystemNames 名单里没有它（L427 声明、L1866
+    // 构造，名单零命中），此处是唯一注册点。
+    if (this.strategicRestraint && !this._modules['strategicRestraint']) {
+      this._modules['strategicRestraint'] = this.strategicRestraint;
+    }
+
     // ─── Thought Chain 初始化 ─────────────────────────────────────────────
     try {
 
