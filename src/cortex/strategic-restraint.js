@@ -146,7 +146,12 @@ class StrategicRestraint {
   evaluate(proposal) {
     this.load();
     this._stats.evaluations++;
-    if (!proposal) return { restrained: false, matches: [], reason: '', score: 0 };
+    // [r626] 入参归一化：dispatch 侧空实参/非字符串实参此前直接抛
+    // "proposal.toLowerCase is not a function"（r604 探针全空参调用时
+    // 该方法从未被真正调用过，缺陷零暴露）。
+    if (typeof proposal !== 'string' || !proposal.trim()) {
+      return { restrained: false, matches: [], reason: '', score: 0, note: 'empty or non-string proposal' };
+    }
 
     const proposalLower = proposal.toLowerCase();
     const proposalClean = proposalLower.replace(/["「」『』]/g, '');
@@ -250,7 +255,10 @@ class StrategicRestraint {
    */
   addDont(entry) {
     this.load();
-    if (!entry || !entry.item) return { success: false, error: 'item必填' };
+    // [r626] 入参归一化：dispatch 侧缺实参是 undefined 而非 null，旧判空漏放。
+    if (!entry || typeof entry !== 'object' || !entry.item || typeof entry.item !== 'string') {
+      return { success: false, error: 'item必填' };
+    }
 
     // 去重：相同item不重复追加
     const existing = this._dontList.find(d =>
@@ -294,6 +302,9 @@ class StrategicRestraint {
    */
   removeDont(id) {
     this.load();
+    // [r626] 入参归一化：dispatch 侧缺实参是 undefined，旧判靠 findIndex 返回 -1 兜底
+    // 但显式校验更清晰，也与 addDont 同口径。
+    if (typeof id !== 'string' || !id) return { success: false, error: 'id必填' };
     const idx = this._dontList.findIndex(d => d.id === id);
     if (idx === -1) return { success: false, error: 'not_found' };
     this._dontList.splice(idx, 1);
@@ -309,7 +320,10 @@ class StrategicRestraint {
    * @returns {Object} { aligned, alignedWith, feedback }
    */
   checkMission(proposal) {
-    if (!proposal) return { aligned: false, alignedWith: [], feedback: '无提案' };
+    // [r626] 入参归一化：与 evaluate 同源，dispatch 侧非字符串实参此前抛 TypeError。
+    if (typeof proposal !== 'string' || !proposal.trim()) {
+      return { aligned: false, alignedWith: [], feedback: '无提案' };
+    }
 
     const proposalLower = proposal.toLowerCase().replace(/["「」『』]/g, '');
     const proposalKeywords = this._extractKeywords(proposal);
