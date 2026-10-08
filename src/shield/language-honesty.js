@@ -117,7 +117,11 @@ function checkQuestions(text) {
  * 图灵路线检测
  */
 function checkTuringRoute(text) {
-  if (!text) return { isTuringRoute: false, matched: [], level: 'safe' };
+  // [v6.8.0] 第 625 轮归一化：r624 把本函数接进 gate 主链路后，非字符串入参
+  // （数字/对象/数组）首次从公开路径可达——`42` is truthy，走到
+  // text.includes 抛 "text.includes is not a function"（与 r621 D4 对
+  // uncertaintyQuantifier 的同型事故）。gate 主链路不应因入参类型抛内部故障。
+  if (!text || typeof text !== 'string') return { isTuringRoute: false, matched: [], level: 'safe' };
 
   const matched = [];
   for (let i = 0; i < TURING_PATTERNS.length; i++) {
@@ -141,7 +145,9 @@ function checkTuringRoute(text) {
  * p-zombie 诚实边界检测
  */
 function checkPzombieBoundary(text) {
-  if (!text) return { hasPzombieClaim: false, matched: [], level: 'safe' };
+  // [v6.8.0] 第 625 轮归一化：同 checkTuringRoute——r624 接线后非字符串入参
+  // 从公开路径可达，必须有类型门槛（否则 gate 主链路抛内部故障）。
+  if (!text || typeof text !== 'string') return { hasPzombieClaim: false, matched: [], level: 'safe' };
 
   const matched = [];
   for (let i = 0; i < PZOMBIE_CLAIMS.length; i++) {
