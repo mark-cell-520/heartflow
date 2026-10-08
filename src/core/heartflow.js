@@ -170,6 +170,32 @@ function _boundedPush(arr, item, maxSize = MAX_ARRAY_SIZE) {
 
 }
 
+/**
+ * [v6.8.0 cronfix15] 判断输入是否属于"宏观/新闻推演"类，决定是否调 macroStrategy。
+ *
+ * 为什么需要：macroStrategy 的词典是公司实体 + 8 类科技趋势，对普通陈述句
+ * 毫无信号，若不设门槛就会对**每一条**输入都跑一遍推演并产出
+ * insufficient_information——那是噪声不是能力。故只在显式的宏观/推演问句上生效。
+ *
+ * 判据（中英）：出现格局/局势/博弈/走向/推演/演化/重构 + 问句或祈使，
+ * 或出现"根据新闻/据报/近期国际"等新闻转述语。
+ */
+function _looksLikeMacroQuery(text) {
+  if (!text || typeof text !== 'string') return false;
+  const t = text.toLowerCase();
+  const MACRO_SUBJECTS = [
+    '世界格局', '国际格局', '全球格局', '地缘', '中美', '俄乌', '中东', '台海', '朝鲜半岛',
+    '欧盟', '北约', 'G7', 'G20', '全球化', '世界经济', '全球秩序', '国际秩序', '秩序重构',
+    '战略', '博弈', '局势', '走向', '趋势', '演化', '演进', '推演', '预判', '前瞻',
+    '宏观', '格局如何', '如何演化', '怎么走', '下一步', '未来三年', '未来五年', '长期影响',
+    'geopolit', 'world order', 'global order', 'macro', 'geopolitics',
+  ];
+  if (MACRO_SUBJECTS.some(k => t.includes(k.toLowerCase()))) return true;
+  const NEWS_FRAME = ['根据新闻', '据报', '据报道', '近期国际', '最新消息', '新闻显示', '外媒', '彭博', '路透', 'reuters', 'bloomberg'];
+  if (NEWS_FRAME.some(k => t.includes(k.toLowerCase()))) return true;
+  return false;
+}
+
 
 
 // ─── [DeepSeek V4.1 alignment] Sparse module activation tiers ──────
@@ -3226,6 +3252,24 @@ class HeartFlow {
       this._modules['strategicRestraint'] = this.strategicRestraint;
     }
 
+    // [r629] InstructionRegistry 七条指令运行时审计接线。实例在 L1645 一直在构造，
+    // 「load prop」是八条公共方法，但从未进 _modules —— r629 双向核对实测：
+    // _modules 无 'instructions' 键、hf.routes() 零命中、dispatch('instructions.*')
+    // 8/8 全部抛 'route not allowed'（探针 scripts/round-629-unwired-probe.js）；
+    // 对照组 r626 已接线的 strategicRestraint 9/9 可 dispatch，口径正确。
+    // 即「七条指令（真/善/美/不断升级/减少错误/服务人类/持续改进）带可执行判据腿的
+    // 运行时审计」此前对任何 dispatch 调用方完全不可达。
+    // r589 曾把判据腿补全并接进 think() 主链路，r590 补了 MCP 工具定义与 HANDLERS
+    // 映射——但那两处都走各自的实例路径（think 内直连 this.instructions、
+    // MCP 走 (heartflow && heartflow.instructions) || 进程内单例），
+    // dispatch 层面依然是「实例活着、能力完整、零路由」。
+    // 注册位置与 r402/r404/r577/r603/r605/r606/r608/r609/r614/r615/r617/r626
+    // 同一区块同一时序：实例化点之后、generateAllowedRoutes 之前。
+    // engine-lifecycle.js 的 subsystemNames 名单里没有它，此处是唯一注册点。
+    if (this.instructions && !this._modules['instructions']) {
+      this._modules['instructions'] = this.instructions;
+    }
+
     // ─── Thought Chain 初始化 ─────────────────────────────────────────────
     try {
 
@@ -5857,6 +5901,56 @@ class HeartFlow {
 
   result._reasoningEffort = effort;
   result._reasoningEffortMode = effortMode;
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // [v6.8.0 cronfix15] MacroStrategyInference 接入 think() 主链路
+  //
+  // 修的问题（用户实测报告）：心虫 think() 在宏观/新闻推演输入上恒定返回
+  // confidence 0.3 / _uncertainty 0.27 / conclusion「不知道，缺少关键信息」，
+  // 三种完全不同的输入（宏观战略 / 新闻推演 / 确定事实）输出一模一样。
+  // 根因：thought-chain 的中文分词无词典（古籍语料已删），定长贪心切片产出
+  // 「分析当 / 个基点至」这类碎片，hypothesis 全是垃圾，下游落 VERY_LOW 兜底。
+  //
+  // macroStrategy 是 v6.7.0 上线的 225 行完整实现（信号抽取→机会/风险匹配→
+  // 时间窗口→心虫影响→置信度→结论→推理链），启动日志显示「加载成功」，
+  // 但全文只有构造 + 注册路由两处引用，**think() 零调用**——又是一例
+  // 「声明了但从未被 dispatch 调用」的死模块。用户报告第四段「辨别者判断」
+  // 因此只能用人工编造，违背"辨别者判断必须由心虫本体给出"的要求。
+  //
+  // 接入方式沿用 AGENTS.md 记录的标准做法（v6.1.6 对抗综合器先例）：
+  // 在 think() 末尾作为附加字段挂上，try/catch 隔离，不破坏原结构。
+  // 只在**宏观/推演类输入**上生效；失败或信号不足时显式标注
+  // insufficient_information（用户 2026-07-23 铁律：缺事实库的宏观分析
+  // 应诚实返回「信息不足」，不编造），而不是吐一个恒定低分常量。
+  // ═══════════════════════════════════════════════════════════════════════
+  try {
+    if (this.macroStrategy && typeof this.macroStrategy.infer === 'function'
+        && typeof input === 'string' && input.length >= 12) {
+      const inferable = _looksLikeMacroQuery(input);
+      if (inferable) {
+        const ms = this.macroStrategy.infer(input);
+        result._macroStrategy = {
+          applied: true,
+          confidence: typeof ms.confidence === 'number' ? ms.confidence : null,
+          conclusion: ms.conclusion || null,
+          reasoning: ms.reasoning || null,
+          opportunities: Array.isArray(ms.opportunities) ? ms.opportunities : [],
+          risks: Array.isArray(ms.risks) ? ms.risks : [],
+          horizon: ms.horizon || null,
+          signalCount: typeof ms.signalCount === 'number' ? ms.signalCount : 0,
+          signals: Array.isArray(ms.signals) ? ms.signals.slice(0, 12) : [],
+          declined: !ms.signals || ms.signals.length === 0,
+        };
+        if (result._macroStrategy.declined) {
+          result._macroStrategy.status = 'insufficient_information';
+          result._macroStrategy.note = '心虫未从该输入抽到结构化信号——诚实标注信息不足，不做编造推演';
+        }
+      }
+    }
+  } catch (e) {
+    _boundedPush(this._initErrors, { module: 'macroStrategy', error: e.message, note: '宏观推演不阻断主链路' }, MAX_HISTORY_SIZE);
+    if (result) result._macroStrategy = { applied: false, error: e.message };
+  }
 
   // [DeepSeek V4.1] Engram: conditionally store/retrieve sparse memory trace
   if (this._engram) {
