@@ -494,12 +494,21 @@ class ThoughtChain {
         // 4.3 如果没有强证据，明确说出来
         const hasWeakSupport = evidenceForHypotheses.some(e => e.weakEvidence);
 
+        // [v6.7.126] 自证据层：心虫的记忆库只有自我身份/规则记忆
+        // （实测 17 条 core 记忆无一包含外部世界事实），所以对外部命题
+        // 永远取不到外部证据。这不是 bug，是知识库边界。
+        // 但输入本身携带可检验的结构信息：主张类型、是否带限定、
+        // 是否绝对化、是否多事实堆叠。这些足以做「表述层」辨别，
+        // 且不伪造外部事实。取不到外部证据时用它，confidence 相应封顶。
+        const intrinsic = this._assessIntrinsicEvidence(input, evidenceForHypotheses);
+
         return {
           evidenceForHypotheses,
           strongHypothesis: strongHypothesis || null,
           hasWeakSupport,
-          mustAdmitUncertainty: !strongHypothesis && hasWeakSupport,
-          // [P2-T2-WF] 暴露知识命中摘要，供 SYNTHESIS/RESPOND 做 richer 综合
+          // 有自证据且至少一个假设不再单靠外部证据判弱时，不强制承认不确定
+          mustAdmitUncertainty: !strongHypothesis && hasWeakSupport && !intrinsic.judgable,
+          intrinsic,
           knowledgeHits: priorKnowledgeHits,
           timestamp: Date.now()
         };
@@ -520,6 +529,9 @@ class ThoughtChain {
         const strongHypothesis = evidenceStage?.result?.strongHypothesis;
         const wasInverted = invertStage?.result?.inverted;
         const evidence = evidenceStage?.result || {};
+        // [v6.7.126] 自证据层结果（EVIDENCE 阶段算好，这里取用）。
+        // 必须在 SYNTHESIS 作用域内取值——EVIDENCE 的局部变量跨 stage 不可见。
+        const intrinsic = evidence.intrinsic || null;
 
         // 【思维连机制】调用 decision 子系统做综合决策 — 串联第五层
         let decisionResult = null;
@@ -613,6 +625,19 @@ class ThoughtChain {
           conclusion = invertStage.result.counterEvidence[0]?.description || '原假设被推翻';
           confidence = 0.3;
           reasoningChain.push('原假设被反例推翻');
+        } else if (intrinsic && intrinsic.judgable && !evidence.strongHypothesis) {
+          // [v6.7.126] 自证据层优先于一切"无外部证据"的路径。
+          // 必须放在 activeInference / strongHypothesis / mustAdmitUncertainty
+          // 之前：activeInference 的 EFE 分会把 confidence 抬到 0.9，
+          // strongHypothesis 会用 qualityScore 透传，两者都会绕过自证据封顶，
+          // 使「表述层辨别」被读成「事实层结论」。
+          // 这里只在没有真外部证据时生效；有强证据时照常走强证据分支。
+          const top = evidence.evidenceForHypotheses[0]?.hypothesis;
+          const sig = intrinsic.signals.length ? `（${intrinsic.signals.join('；')}）` : '';
+          conclusion = `表述层辨别${sig}：${top?.description || '输入含可验证主张，但缺少外部证据支撑事实判定'}`;
+          confidence = intrinsic.ceiling;
+          reasoningChain.push('自证据：输入结构可检验，但无外部事实证据');
+          reasoningChain.push(`自证据置信度上限 ${intrinsic.ceiling}，低于外部证据阈值 0.6`);
         } else if (activeInferenceConclusion && activeInferenceConfidence > 0.6) {
           // [P2-T2-WF] 主动推理主导：当 EFE 给出高置信度最优策略时优先采用
           conclusion = activeInferenceConclusion;
@@ -794,6 +819,14 @@ class ThoughtChain {
         // 6.2 证据薄弱降低置信度
         if (evidence?.mustAdmitUncertainty) {
           confidence = Math.min(confidence, 0.5);
+        }
+
+        // [v6.7.126] 自证据封顶：无外部证据时，confidence 不得超过自证据上限。
+        // 这条保证「表述层辨别」永远不会被读成「事实层结论」——
+        // 因为 0.55/0.45/0.35 都低于 0.6 守门线，下游低频置信度守门会强制标注。
+        const intrinsic = evidence?.intrinsic || null;
+        if (intrinsic && intrinsic.judicable && !evidence?.strongHypothesis) {
+          confidence = Math.min(confidence, intrinsic.ceiling);
         }
 
         // 6.3 子系统置信度校正（如果可用）
@@ -1005,6 +1038,18 @@ class ThoughtChain {
    * 整句会被当成 1 个 token，keywords.length < 2 立即返回空数组。
    * 结果：所有中文输入 HYPOTHESES=0 → INVERT=no_hypothesis → SYNTHESIS 落兜底
    * "不知道，缺少关键信息"，think() 对任何输入都返回同一句话。
+   *
+   * [v6.7.126] 主张层接入 —— 修 think() 恒定 confidence 0.4 的根因。
+   * 旧实现生成的"假设"是关键词模板（「围绕XX的核心诉求」），不是可辨别
+   * 的主张，于是 EVIDENCE 阶段拿不到任何可检验命题 → weakEvidence →
+   * mustAdmitUncertainty → SYNTHESIS 落 confidence=0.4 写死分支，
+   * conclusion 只是把输入切成关键词三元组回显。
+   * 实测：四种输入形态（多事实块/单条原子事实/长英文/短中文）全部 0.4，
+   * 连把正确答案的事实全喂给它也 0.4——因为根本没有主张可判。
+   *
+   * 现在优先用 hypothesis-tester.extractClaims() 从输入抽真实可验证主张，
+   * 每个主张生成"成立/不成立"对立假设；抽不到时才降级回关键词模板。
+   * 这样 INVERT 有反例可找、EVIDENCE 有证据可评、SYNTHESIS 有结论可综合。
    */
   _generateHypotheses(input, count) {
     const hypotheses = [];
@@ -1013,6 +1058,55 @@ class ThoughtChain {
     // 关键词太少时返回空数组（不生成占位假设）
     if (keywords.length < 2) {
       return hypotheses;
+    }
+
+    // ── [v6.7.126] 主张层：优先从输入抽真实可验证命题 ──────────────
+    const claims = this._extractClaimsForHypotheses(input);
+    if (claims.length > 0) {
+      const topic = this._describeTopic(keywords);
+      // 每个 claim 生成一对对立假设：主张成立 vs 主张不成立。
+      // initialLikelihood 不给偏置——用 claim 自身类型做先验，
+      // 绝对化/因果类主张先验低（常见于夸大），数值/证据类先验高。
+      const priorFor = (type) => {
+        if (type === 'absolute_claim') return 0.3;
+        if (type === 'causal_claim') return 0.4;
+        if (type === 'numeric_claim' || type === 'evidence_claim') return 0.55;
+        return 0.45;
+      };
+      const used = [];
+      for (const c of claims) {
+        if (hypotheses.length >= count) break;
+        if (used.some(u => u.slice(0, 20) === c.claim.slice(0, 20))) continue;
+        used.push(c.claim);
+        const p = priorFor(c.type);
+        hypotheses.push({
+          id: `h${hypotheses.length}`,
+          claim: c.claim,
+          claimType: c.type,
+          description: `待辨别主张：${c.claim}`,
+          initialLikelihood: p,
+          evidence: [],
+          counterEvidence: [],
+        });
+        // 对立面假设，让 INVERT 有明确的反证目标
+        if (hypotheses.length < count) {
+          hypotheses.push({
+            id: `h${hypotheses.length}`,
+            claim: c.claim,
+            claimType: c.type,
+            negated: true,
+            description: `反面：${c.claim}不成立或需限定`,
+            initialLikelihood: Math.max(0.15, 1 - p),
+            evidence: [],
+            counterEvidence: [],
+          });
+        }
+      }
+      if (hypotheses.length > 0) {
+        // 有真实主张时不再拼关键词模板假设
+        return hypotheses.slice(0, count);
+      }
+      void topic;
     }
 
     // 假设描述必须是"可读的主张"，不能是裸 token 串 —— 否则结论会被拼成
@@ -1036,6 +1130,75 @@ class ThoughtChain {
     }
 
     return hypotheses;
+  }
+
+  /**
+   * [v6.7.126] 从输入抽可验证主张，供 _generateHypotheses 用。
+   *
+   * 三级来源，按命中数合并去重：
+   *   1. overclaim-checker 的完成态动词表 —— 抓「已被完全解决/现已关闭」这类
+   *      完成态命题，这是 hypothesis-tester 五类模式（数值/因果/证据/权威/
+   *      绝对）抓不到的，而它恰恰是最需要辨别的夸大宣称
+   *   2. cortex/hypothesis-tester.js 的 extractClaims —— 数值/因果/证据/权威断言
+   *   3. 通用命题模式 —— 判断/是否/真伪/能否/风险等级等疑问式任务里的核心断言
+   *
+   * 任何一级失败都静默跳过，不影响其他级。全空时调用方降级回关键词模板。
+   */
+  _extractClaimsForHypotheses(input) {
+    const text = String(input || '');
+    if (!text.trim()) return [];
+    const out = [];
+    const seen = new Set();
+    const add = (claim, type) => {
+      const c = String(claim || '').trim();
+      if (c.length < 6) return;
+      const key = c.slice(0, 24);
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push({ claim: c.slice(0, 120), type });
+    };
+
+    // 1. 完成态过度宣称（overclaim-checker）
+    try {
+      const { checkOverclaim } = require('../overclaim-checker.js');
+      const oc = checkOverclaim(text);
+      for (const c of (oc.claims || [])) add(c.sentence, 'overclaim');
+      for (const q of (oc.qualified || [])) add(q.sentence, 'qualified_claim');
+    } catch (_) { /* 降级 */ }
+
+    // 2. hypothesis-tester 的数值/因果/证据/权威断言
+    try {
+      const mod = require('../cortex/hypothesis-tester.js');
+      const tester = mod && (mod.default || mod.HypothesisTester)
+        ? new (mod.default || mod.HypothesisTester)({}) : null;
+      const extract = (tester && typeof tester.extractClaims === 'function')
+        ? tester.extractClaims.bind(tester)
+        : (typeof mod.extractClaims === 'function' ? mod.extractClaims : null);
+      if (extract) {
+        for (const c of (extract(text) || [])) {
+          if (c && typeof c.claim === 'string') add(c.claim, c.type || 'claim');
+        }
+      }
+    } catch (_) { /* 降级 */ }
+
+    // 3. 通用命题模式：补 overclaim 与 hypothesis-tester 都不覆盖的判断句
+    const GENERIC = [
+      { re: /[^。；;\n]{0,60}(?:已被|已遭|已经被|现已|目前已?被)[^。；;\n]{0,40}/g, type: 'completion_claim' },
+      { re: /[^。；;\n]{0,50}(?:是否|能否|是不是|有没有)[^。；;\n]{0,50}/g, type: 'polar_question' },
+      { re: /(?:判断|辨别|识别|评估)[^。；;\n]{0,60}/g, type: 'judgment_task' },
+      { re: /[^。；;\n]{0,40}(?:风险|隐患|漏洞|缺陷)[^。；;\n]{0,40}/g, type: 'risk_assertion' },
+    ];
+    for (const { re, type } of GENERIC) {
+      re.lastIndex = 0;
+      let m;
+      let guard = 0;
+      while ((m = re.exec(text)) !== null && guard++ < 6) {
+        add(m[0], type);
+        if (m.index === re.lastIndex) re.lastIndex++;
+      }
+    }
+
+    return out.slice(0, 8);
   }
 
   /**
@@ -1189,26 +1352,152 @@ class ThoughtChain {
   }
 
   /**
+   * [v6.7.126] 自证据层：从输入自身结构提取可检验信号。
+   *
+   * 为什么需要：心虫记忆库实测只有 17 条自我身份/规则记忆，无任何外部世界
+   * 事实，所以对外部命题永远取不到外部证据。旧逻辑因此恒定落
+   * mustAdmitUncertainty → confidence=0.4。
+   *
+   * 自证据不伪造事实，只报告输入的可检验结构：
+   *   claimCount    有几个可验证主张
+   *   overclaimed   有几个是完成态无保留宣称
+   *   qualified     有几个自带限定
+   *   multiClaim    是否多事实堆叠
+   *   judgable      是否足以做表述层辨别（有主张即可）
+   *   ceiling       自证据能支撑的 confidence 上限（低于外部证据）
+   *
+   * @returns {{claimCount:number, overclaimed:number, qualified:number,
+   *            multiClaim:boolean, judgable:boolean, ceiling:number,
+   *            signals:string[]}}
+   */
+  _assessIntrinsicEvidence(input, evidenceForHypotheses) {
+    const text = String(input || '');
+    const hyps = Array.isArray(evidenceForHypotheses) ? evidenceForHypotheses : [];
+    const claimCount = hyps.length;
+    const signals = [];
+
+    let overclaimed = 0;
+    let qualified = 0;
+    try {
+      const { checkOverclaim } = require('../overclaim-checker.js');
+      const oc = checkOverclaim(text);
+      overclaimed = (oc.claims || []).length;
+      qualified = (oc.qualified || []).length;
+      if (overclaimed > 0) signals.push(`完成态无保留宣称 ${overclaimed} 处`);
+      if (qualified > 0) signals.push(`自带限定 ${qualified} 处`);
+      if (oc.systemic) signals.push('多句堆叠完成态');
+    } catch (_) { /* overclaim 不可用则只靠主张计数 */ }
+
+    // 多事实堆叠：分号/逗号分隔的多个事实块
+    const seps = (text.match(/[;；]|\d+[.、)]/g) || []).length;
+    const multiClaim = seps >= 2 || claimCount >= 3;
+    if (multiClaim) signals.push(`多事实结构（${claimCount} 个主张）`);
+
+    const judgable = claimCount > 0;
+    if (!judgable) signals.push('无可提取主张');
+
+    // 自证据的置信度上限：有主张且能识别其表述形态时可到 0.55，
+    // 仅有多事实堆叠时 0.45，什么都提不出时 0.35（等于旧兜底）。
+    // 刻意低于外部证据阈值 0.6 —— 自证据只支撑"表述层"辨别，
+    // 不支撑"事实层"结论。这不是妥协，是边界声明。
+    let ceiling = 0.35;
+    if (judgable) ceiling = multiClaim ? 0.45 : 0.55;
+    if (overclaimed > 0 && qualified === 0) ceiling = Math.min(ceiling, 0.5);
+
+    return { claimCount, overclaimed, qualified, multiClaim, judgable, ceiling, signals };
+  }
+
+  /**
    * 找证据
    */
+  /**
+   * [v6.7.126] 为假设找证据。
+   *
+   * 旧实现查 `hf.knowledgeGraph.query` 与 `hf.memoryIndex.search`，
+   * 这两个接口在心虫本体上都不存在（实测 knowledgeGraph 整个 absent，
+   * memoryIndex 只有 rootPath/dataDir/indexFile/index/files，无 search 方法）
+   * → 任何输入都返回 0 条证据 → _assessEvidenceQuality 恒 0.2 → weakEvidence
+   * → mustAdmitUncertainty → SYNTHESIS 落 confidence=0.4 写死分支。
+   * 这是 think() 恒定 0.4 的直接原因：不是"证据不足"，是"根本没去取"。
+   *
+   * 现在按真实存在的接口依次尝试，任一来源取到即计入：
+   *   graph.findRelatedByActivation / getRelated   概念图扩散激活
+   *   knowledge.queryEngine.query                  知识库查询引擎
+   *   memory.search                                三层记忆检索
+   *   dispatch('knowledge.*')                      路由兜底
+   * 全部失败时返回空数组，由上游按"无证据"如实处理（不伪造）。
+   */
   _findEvidence(hypothesis, input) {
-    // [v5.17.19 S2] 替换桩 — 接入knowledge-graph真实检索
     const evidence = [];
+    const query = (hypothesis && (hypothesis.claim || hypothesis.description)) || hypothesis;
+    const q = typeof query === 'string' ? query : String(query && query.description || input || '');
+
+    const push = (source, content, relevance) => {
+      if (!content) return;
+      evidence.push({
+        source,
+        content: typeof content === 'string' ? content.slice(0, 200) : content,
+        relevance: typeof relevance === 'number' ? relevance : 0.5,
+      });
+    };
+
     try {
       const hf = this.hf;
-      if (hf && hf.knowledgeGraph && hf.knowledgeGraph.query) {
-        const kgResults = hf.knowledgeGraph.query(hypothesis.description || hypothesis, 3);
-        for (const r of (kgResults || [])) {
-          evidence.push({ source: 'knowledge_graph', content: r.concept || r, relevance: r.score || 0.5 });
+
+      // 1. 概念图：扩散激活找相关节点
+      const g = hf && hf.graph;
+      if (g) {
+        if (typeof g.findRelatedByActivation === 'function') {
+          const rel = g.findRelatedByActivation(q, 3) || [];
+          for (const r of rel) {
+            push('concept_graph', r && (r.concept || r.node || r.label || r), r && r.score);
+          }
+        }
+        if (evidence.length < 3 && typeof g.getRelated === 'function') {
+          const rel2 = g.getRelated(q) || [];
+          for (const r of rel2) {
+            push('concept_graph_relation', r && (r.concept || r.label || r), r && r.weight);
+          }
         }
       }
-      if (hf && hf.memoryIndex && hf.memoryIndex.search) {
-        const memResults = hf.memoryIndex.search(hypothesis.description || hypothesis, 2);
-        for (const r of (memResults || [])) {
-          evidence.push({ source: 'memory_index', content: r.text || r, relevance: r.score || 0.4 });
+
+      // 2. 知识库查询引擎
+      const kb = hf && (hf.knowledge || hf.knowledgeBase);
+      const qe = kb && (kb.queryEngine || (kb.query ? kb : null));
+      if (qe && typeof qe.query === 'function') {
+        const res = qe.query(q, { limit: 3 });
+        const list = Array.isArray(res) ? res : (res && (res.results || res.items || res.hits)) || [];
+        for (const r of list.slice(0, 3)) {
+          push('knowledge_engine', r && (r.content || r.text || r.summary || r.title || r), r && (r.score || r.relevance));
         }
       }
-    } catch(e) { /* 检索降级 */ }
+
+      // 3. 三层记忆检索
+      if (hf && hf.memory && typeof hf.memory.search === 'function') {
+        const mem = hf.memory.search(q, { limit: 3 }) || [];
+        const list = Array.isArray(mem) ? mem : (mem && (mem.results || mem.items)) || [];
+        for (const r of list.slice(0, 3)) {
+          push('memory', r && (r.text || r.content || r), r && (r.score || r.relevance));
+        }
+      }
+
+      // 4. 路由兜底：knowledge 相关 route
+      if (evidence.length === 0 && hf && typeof hf.dispatch === 'function') {
+        for (const route of ['knowledgeSubsystem.query', 'worldKnowledge.search', 'knowledge.search']) {
+          try {
+            const r = hf.dispatch(route, q);
+            if (r && (Array.isArray(r) ? r.length : (r.results || r.hits))) {
+              const list = Array.isArray(r) ? r : (r.results || r.hits);
+              for (const it of list.slice(0, 3)) {
+                push('route:' + route, it && (it.content || it.text || it.summary || it), it && (it.score || it.relevance));
+              }
+              if (evidence.length) break;
+            }
+          } catch (_) { /* 该 route 不存在，试下一个 */ }
+        }
+      }
+    } catch (_) { /* 检索降级：返回已取到的部分 */ }
+
     return evidence;
   }
 

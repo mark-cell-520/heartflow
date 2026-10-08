@@ -100,6 +100,8 @@ const { checkDecisionTrace } = require('./decision-trace.js');
 const { checkAIMisuse } = require('./ai-misuse.js');
 const { checkReversibility } = require('./reversibility.js');
 const { checkPerfectError } = require('./perfect-error.js');
+// [v6.7.125 移植到 6.8.0] 完成态过度宣称检测器，见模块头注释里的实测缺口说明
+const { checkOverclaim } = require('./overclaim-checker.js');
 const { checkStatisticalMisleading } = require('./statistical-misleading.js');
 const { checkPercentageOverflow } = require('./percentage-overflow.js');
 // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
@@ -712,6 +714,25 @@ function checkIndirectInjection(text) {
 }
 
 
+/**
+ * [v6.7.125 移植到 6.8.0] 把 overclaim-checker 的输出整形成 discriminate() 其余维度通用的
+ * {count, score, hits, severity} 形状，使其能直接进 allDims 与 findings。
+ * 只做形状转换，不改变 checkOverclaim 的判定。
+ */
+function _shapeOverclaim(r) {
+  if (!r) return { count: 0, score: 0, hits: [], severity: 0 };
+  // flag=单句无保留完成态；systemic=三句以上堆叠，属系统性夸大
+  const base = r.level === 'systemic' ? 0.75 : r.count >= 1 ? 0.5 : 0;
+  return {
+    count: r.count,
+    score: base,
+    severity: Math.round(base * 100),
+    hits: (r.claims || []).slice(0, 3).map(c => c.sentence.slice(0, 80)),
+    systemic: r.systemic,
+    summary: r.summary,
+  };
+}
+
 function _applyPedagogyRelaxation(result, dimension, pedagogyRelaxation) {
   const relax = pedagogyRelaxation[dimension];
   if (relax && result && typeof result.score === 'number') {
@@ -1036,6 +1057,12 @@ function discriminate(text, evidence = [], contentMode) {
   const sn = _applyPedagogyRelaxation(checkSocialNorm(_normText), "social_norm", pedagogyRelaxation);
   const mc = _applyPedagogyRelaxation(checkMetaCognition(_normText), "meta_cognition", pedagogyRelaxation);
   const co = _applyPedagogyRelaxation(checkCapabilityOverclaim(_normText), "capability_overclaim", pedagogyRelaxation);
+  // [v6.7.125 移植到 6.8.0] 完成态过度宣称检测器。补一个实测缺口：capability_overclaim
+  // 与 absolute_claim 对「纳维-斯托克斯方程已被 AI 彻底解决」这类把部分进展说成
+  // 已完全解决的表述全部零命中，discriminate 甚至会判「可信」放行。
+  // overclaim-checker 只判表述形态（完成态动词 + 无保留副词 + 无限定标记），
+  // 不判事实真假，故与既有维度不重叠、不冲突。
+  const oc = _applyPedagogyRelaxation(_shapeOverclaim(checkOverclaim(_normText)), "overclaim", pedagogyRelaxation);
   const ab = _applyPedagogyRelaxation(checkAbsoluteClaim(_normText), "absolute_claim", pedagogyRelaxation);
   const da = _applyPedagogyRelaxation(checkDeceptiveAlignment(_normText), "deceptive_alignment", pedagogyRelaxation);
   const ir = _applyPedagogyRelaxation(checkInstrumentalReasoning(_normText), "instrumental_reasoning", pedagogyRelaxation);
@@ -1064,6 +1091,7 @@ function discriminate(text, evidence = [], contentMode) {
     {score: ss.score, name:'slippery_slope'}, {score: aa.score, name:'appeal_to_authority'},
     {score: tom.score, name:'theory_of_mind'}, {score: gm.score, name:'goal_misalignment'}, {score: cf.score, name:'counterfactual'},
     {score: sn.score, name:'social_norm'}, {score: mc.score, name:'meta_cognition'}, {score: co.score, name:'capability_overclaim'},
+    {score: oc.score, name:'overclaim'},
     {score: ab.score, name:'absolute_claim'}, {score: da.score, name:'deceptive_alignment'}, {score: ir.score, name:'instrumental_reasoning'},
     {score: st.score, name:'stereotype'}, {score: fc.score, name:'factual_consistency'}, {score: sa.score, name:'sarcasm'},
     {score: pb.score, name:'privacy_boundary'}, {score: bf.score, name:'bad_faith'}, {score: nf.score, name:'no_fallback'},
@@ -1264,7 +1292,7 @@ function discriminate(text, evidence = [], contentMode) {
     hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe,
     hasty_generalization: hg, slippery_slope: ss, appeal_to_authority: aa,
     reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf,
-    social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da,
+    social_norm: sn, meta_cognition: mc, capability_overclaim: co, overclaim: oc, absolute_claim: ab, deceptive_alignment: da,
     instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa,
     privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, pseudo_profundity: ppf, perfect_error: pe, premature_termination: pt,
     phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
@@ -2006,7 +2034,7 @@ function discriminate(text, evidence = [], contentMode) {
     dimensions: { evidence: ev, unsupported_claim: uc, sycophancy: sy, contradiction: ct, vagueness: vg, fallacies: fl, confidence: cc,
       presupposition: pp, emotional_manipulation: em, double_bind: db, info_deprivation: id, false_urgency: fu,
       empty_answer: ea, moral_foundations: mf, prompt_injection: pi, code_security: cs, dehumanization: dh,
-      bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
+      bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, overclaim: oc, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
       phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
       reward_hacking: rh,
       // [v6.8.0] 第 58 维度：基数隐藏的比例断言
@@ -12167,6 +12195,10 @@ module.exports = {
   checkSocialNorm,
   checkMetaCognition,
   checkCapabilityOverclaim,
+  // [v6.7.125 移植到 6.8.0] 完成态过度宣称检测器（把部分进展说成已完全解决）。
+  // 导出后 MCP 的 heartflow_check_single(dimension='overclaim') 自动可用，
+  // 因为该 handler 按 dimension 名转驼峰查 hf['checkOverclaim']。
+  checkOverclaim: require('./overclaim-checker.js').checkOverclaim,
   checkAbsoluteClaim,
   checkDeceptiveAlignment,
   checkInstrumentalReasoning,
