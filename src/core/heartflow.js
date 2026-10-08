@@ -3251,6 +3251,30 @@ class HeartFlow {
       }
     }
 
+    // [r638] decisionFeedback 接线（决策反馈学习 / 规则有效性自评）。
+    // 实例在 L2820 一直在构造，且 think() 主链路上已有 4 处真实消费
+    // （L5842-5853 sync supervision、L5869-5884 async supervision、
+    //  L5929-5937 自动决策闭环、L5958-5964 定期优先级调整）—— 但那四处
+    //  全部走 this.decisionFeedback 字段直调，dispatch / MCP 侧完全不可达。
+    // 本轮双向核对实测（scripts/round-638-unwired-probe.js）：
+    //   · _modules 无 'decisionFeedback' 键（158 键里 0 命中）
+    //   · dispatch('decisionFeedback.<m>') 20/20 路由实测 100% 抛
+    //     'route not allowed'
+    //   · hf.routes() 零命中
+    // 即「哪条辨别规则在真实流量里反复判对/判错（getRuleEffectiveness 的
+    //    accuracy + trend）、该给哪条规则提权/降权（adjustPriorities ±10）、
+    //    某条规则的当前学习权重是多少（getAdjustedWeight）」这套自评数据，
+    //    对任何 dispatch / MCP 调用方此前完全不可见 —— 心虫无法回答
+    //    「我这条规则到底准不准」，只能猜。
+    // 辨别力实测（scripts/round-638-cand-probe.js，8/8 公有方法零参可跑）：
+    //    同一规则灌 3 对 1 错 → accuracy 0.75 / trend / weight 1.05（非常量函数）
+    // 注册位置与 r402/.../r633 同一区块同一切换时序：实例化点（L2820）之后、
+    // generateAllowedRoutes 之前。engine-lifecycle.js 的 subsystemNames
+    // 名单里没有它（L210 tier4 名单里的是另一批），此处是唯一注册点。
+    if (this.decisionFeedback && !this._modules['decisionFeedback']) {
+      this._modules['decisionFeedback'] = this.decisionFeedback;
+    }
+
     // [r402] 误报反馈闭环的实例化点：必须在 LATE_ADDITIONS 循环之后、
     // generateAllowedRoutes 之前，否则 _modules 里没有这个键、路由生不成。
     // 模块是函数式导出（report/stats/suggest/confirm/clear），整对象挂载即可
