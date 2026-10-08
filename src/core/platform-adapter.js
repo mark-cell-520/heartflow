@@ -121,6 +121,18 @@ class HermesAdapter extends PlatformAdapter {
       return { success: false, error: e.message };
     }
   }
+
+  // [r642 修复] 目录白名单判定：原实现被写在 HermesAdapter 类闭合括号**之后**
+  // （文件末尾 L225-230），导致 this._isPathAllowed 恒 undefined ——
+  // readFile/writeFile 100% 抛 "this._isPathAllowed is not a function"，
+  // 白名单语义（越界返回 path_not_allowed）从未生效过一次。
+  // 本轮移入类内，越界路径改为正常返回 path_not_allowed。
+  _isPathAllowed(filePath) {
+    if (!this.rootPath) return false;
+    const resolved = path.resolve(filePath);
+    const sep = path.sep;
+    return resolved === this.rootPath || resolved.startsWith(this.rootPath + sep);
+  }
 }
 
 // ============================================================================
@@ -222,11 +234,23 @@ class CrossPlatformMemoryRelay {
   }
 
   // [v5.17.24 M-4] 路径白名单 — 防止任意文件读写
-  _isPathAllowed(filePath) {
-    if (!this.rootPath) return false;
-    const resolved = require('path').resolve(filePath);
-    const sep = require('path').sep;
-    return resolved === this.rootPath || resolved.startsWith(this.rootPath + sep);
+  // [r642] 已移入 HermesAdapter 类内（原实现写在类闭合括号之后，
+  // 导致 this._isPathAllowed 恒 undefined）。此处不再重复定义。
+
+  // 本地记忆读取（优先本地，fallback远程）
+  readLocal(key) {
+    const local = this.localMemory.get(key);
+    if (local) return local.value;
+
+    // fallback到远程
+    const remote = this.remoteMemory.get(key);
+    if (remote) {
+      // 回写本地缓存
+      this._evictIfNeeded(this.localMemory);
+      this.localMemory.set(key, { ...remote, synced: true });
+      return remote.value;
+    }
+    return null;
   }
 }
 
