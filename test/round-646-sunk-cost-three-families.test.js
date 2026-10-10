@@ -147,7 +147,8 @@ t('C2 findings 可见该维度', () => {
 });
 t('C3 维度总数仍为 98（本轮未增删维度）', () => {
   const d = idx.discriminate('probe');
-  assert.strictEqual(Object.keys(d.dimensions).length, 100, '维度总数应为 100');
+  // [r655] 100 → 104：r647/r648/r649/r650/r654/r655 六轮各接一个维度。
+  assert.strictEqual(Object.keys(d.dimensions).length, 104, '维度总数应为 104');
 });
 t('C4 三族样本聚合后 dimensions 均登记', () => {
   for (const s of [E_ATTACK[0], I_ATTACK[0], J_ATTACK[0]]) {

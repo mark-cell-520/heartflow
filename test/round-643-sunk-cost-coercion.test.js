@@ -105,7 +105,10 @@ t('C2 findings 可见', () => {
 });
 t('C3 维度总数 100', () => {
   const d = gateMod.discriminate('probe');
-  assert.strictEqual(Object.keys(d.dimensions).length, 100, '维度总数应为 100');
+  // [r655] 100 → 104：r647 commitment_coercion、r648 investment_as_debt、
+  // r649 suffering_capital、r650 selfharm_coercion、r654
+  // relationship_severance、r655 fear_projection 六个维度陆续接入。
+  assert.strictEqual(Object.keys(d.dimensions).length, 104, '维度总数应为 104');
 });
 t('C4 summary 有人类可读文案', () => {
   const d = gateMod.discriminate('钱都交了，你现在退出不是白花了');

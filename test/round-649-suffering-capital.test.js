@@ -146,14 +146,16 @@ t('C5 维度总数接线正确（r650 口径修正：以 doc-numbers 守卫为�
   // doc-numbers-accuracy 守卫的 measure() 用的是**裸键数不减 evidence**
   // （`Object.keys(d.dimensions).length`），两个口径差 1。r650 接入
   // selfharm_coercion 后裸键 102，r654 接入 relationship_severance 后
-  // 裸键 103，本测试若继续减 1 会算成 101 而误红。
+  // 裸键 103，r655 接入 fear_projection 后裸键 104，本测试若继续减 1
+  // 会算成 102 而误红。
   // **以守卫口径为准**（守卫是三份文档的唯一比对尺）。
   const probe = idx.discriminate('probe').dimensions;
   const total = Object.keys(probe).length;
-  assert.strictEqual(total, 103, `当前 ${total}`);
+  assert.strictEqual(total, 104, `当前 ${total}`);
   assert.ok('suffering_capital' in probe, 'probe 应含 suffering_capital');
   assert.ok('investment_as_debt' in probe, 'probe 应含 investment_as_debt（r648）');
   assert.ok('selfharm_coercion' in probe, 'probe 应含 selfharm_coercion（r650）');
+  assert.ok('fear_projection' in probe, 'probe 应含 fear_projection（r655）');
 });
 
 console.log('\n═══ D 节：gate 端到端 ═══');
