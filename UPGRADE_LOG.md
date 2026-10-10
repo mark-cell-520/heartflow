@@ -1,4 +1,4 @@
-# 第 642 轮报告（第 97 维度 synthetic_social_proof — 伪造社会认同施压）
+# 第 642 轮报告（v6.8.2 — 第 97 维度 synthetic_social_proof：伪造社会认同施压）
 
 ## 心虫选中项 + 分数 + 身份对齐
 
