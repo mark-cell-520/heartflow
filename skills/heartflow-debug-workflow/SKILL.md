@@ -1339,7 +1339,7 @@ clawhub delete wrong-slug --yes
 ```bash
 sed -i '' 's/oldver/newver/' src/core/heartflow.js VERSION package.json SKILL.md
 git add -A && git commit -m "bump: vnewver"
-git push origin --no-verify
+git push origin
 clawhub publish . --slug mark-heartflow-skill --version vnewver --changelog "..."
 ```
 
