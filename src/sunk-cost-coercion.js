@@ -94,6 +94,29 @@ const INVESTED_ZH = new RegExp([
   String.raw`(?:摊子|局面|项目|台子|架子)(?:都|已经|早就)?(?:支|搭|拉|架|撑)(?:了|起来|出)`,
   // [r645] 「投入了巨额转会费」形：投入动词 + 巨大量词（被投名词在后）。
   String.raw`(?:投入|砸进|押上|砸入|赌上)(?:[^。]{0,4})(?:巨额|大量|无数|成千万上百万|上千万)`,
+  // [r646] 追加投入形（族 E）：再/又 + 投入动词 + 追加量词 + 成本名词。
+  // 「再投一点资金就能回本」「再补一点仓就能翻盘」「再加二十万这个项目
+  // 就能活」「再借一笔钱周转」「再追加一点投入」——旧分支只认已完成的
+  // 投入陈述，整族「再投一点」的追加形全部漏判（r646 探测器实测 7/8）。
+  // ⚠️ 成本名词组必填：「再加一点盐」「再加一把劲」不得命中（量词「一把」
+  // 刻意不收）；「再追加预算」「决定是否追加」无「再」前缀也不命中。
+  String.raw`再(?:投|补|追加|借|贷|砸|押|加|投入)(?:一点|一些|一笔|一下|[0-9一二两三四五六七八九十百千万]+\s*[万亿元块]?)?(?:资金|钱款|本金|本钱|仓|投入|钱|[0-9一二两三四五六七八九十百千万]+\s*[万亿元块])`,
+  // [r646] 尝试次数形（族 I）：「第八次了」「七次都忍了」「二十多次了」
+  // 「九次都输了」——已投入的隐性形是尝试次数本身。良性「失败了九次之后」
+  // 「第十次实验终于成功」不命中（尾部不是 都/了/又/全），「多次」「每次」
+  // 无数字也不命中。含汉字数字与「多」。尾部标记补「输了/败了/失败」：
+  // 「之前九次都输了」的尾部词是「输了」不是「都」（r646 实测补）。
+  String.raw`[0-9一二两三四五六七八九十百千万]+多?(?:个)?(?:次|回|趟|局|轮|遍|把)(?:都|了|又|全|才)(?:[^。]{0,4})?(?:输|败|失败|错|白|废|无果|不成|不成器)?`,
+  // [r646] 年头/春秋形（族 I）：「熬到第三十个年头了」「走过了二十个春秋」。
+  String.raw`(?:熬|走|跑|干|挺|拼|打拼)?(?:到|过)?[0-9一二两三四五六七八九十百千万]+(?:个)?(?:年头|周年|春秋)`,
+  // [r646] 最后一次机会形（族 I）：「这是最后一次机会，之前九次都输了」。
+  String.raw`最后(?:一|这)?(?:次|回|个)(?:机会|尝试|努力|一把|一波|一搏|一搏)`,
+  // [r646] 岁月/半生形（族 J）：「我这些年的坚持」「我过去十年的付出」
+  // 「我前半辈子」「我三十年的青春」——投入物是岁月本身而非具体资源。
+  // r646 实测补：① 主语组放宽到可空（「前半辈子不就白过了吗」无主语）；
+  // ② 名词组可空——「我前半辈子不就白过了吗」的投入名词（坚持/付出）
+  // 未出现，岁月词组本身就是投入物。靠守门与双腿共现兜住误伤。
+  String.raw`(?:我|我们|自己|这人|这人一生|咱|咱们)?(?:这些年|这些年头|这些年的|过去|过往|前半辈子|后半辈子|这半生|大半生|毕生|半生|这辈子|大半辈子)(?:的)?(?:[0-9一二两三四五六七八九十]+\s*年|付出|努力|心血|青春|年华|岁月|坚持|打拼|奋斗|陪伴|光景)?`,
 ].join('|'));
 
 // 英文：already invested / we have paid / sunk ... into / three years in
@@ -112,6 +135,23 @@ const INVESTED_EN = new RegExp([
   String.raw`\b(?:already|have|has|had)\s+(?:invested|spent|paid|put|poured|committed|allocated|booked|reserved|printed|signed|prepared|arranged|deposited|planned|organized|submitted|registered)\b`,
   // [r645] "We have been at this for two years" 类：at this 也算持续投入。
   String.raw`\b(?:have|has|had)\s+(?:waited|been|stuck|worked|put in|at this)\b[^.]{0,20}?\b(?:for\s+)?[0-9a-z]+\s+(?:years?|months?|days?|hours?|weeks?)\b`,
+  // [r646] 追加投入（英文，族 E）："invest a bit more" / "one more round of
+  // funding" / "put in a little more" —— 旧分支只认已完成投入，整族追加形
+  // 漏判（r646 探测器实测 7/8 含英文 2 条）。
+  String.raw`\b(?:invest|put in|pour|add|commit|inject|throw)\s+(?:a\s+bit\s+more|a\s+little\s+more|some\s+more|a\s+few\s+more|more)\s+(?:money|funds?|funding|capital|cash|money in)\b`,
+  // [r646] "Just invest a bit more and you will break even" 形：动词后直接接
+  // "a bit more" 而名词在句末（break even 前无 money 名词）。
+  String.raw`\b(?:invest|put\s+in|pour|add|commit|inject)\s+(?:a\s+bit|a\s+little|some)\s+more\b`,
+  String.raw`\b(?:one|another|one\s+more|a\s+final)\s+(?:more\s+)?(?:round|installment|injection|tranche|batch)\s+of\s+(?:funding|investment|money|cash|capital)\b`,
+  // [r646] 尝试次数（英文，族 I）："tried this twenty times" / "the tenth
+  // attempt" / "nine failures" —— 尝试次数本身即隐性投入。
+  String.raw`\b(?:tried|attempted|taken?|made)\s+(?:this\s+)?[0-9a-z]+\s+(?:times?|attempts?|tries|shots?)\b`,
+  String.raw`\b(?:the\s+)?(?:tenth|ninth|eighth|seventh|twentieth|thirtieth|hundredth|\d+(?:st|nd|rd|th))\s+(?:attempt|try|time|try)\b`,
+  String.raw`\b(?:after|following|post)\s+(?:nine|ten|eight|seven|twenty|thirty|\d+)\s+(?:failures?|attempts?|tries|setbacks?)\b`,
+  // [r646] 岁月/半生（英文，族 J）："all these years of my life" /
+  // "the last decade of my life" —— 投入物是人生岁月。
+  String.raw`\b(?:all\s+)?(?:these|those|the\s+last|the\s+past)\s+(?:years?|decades?)\s+of\s+my\s+life\b`,
+  String.raw`\b(?:my|our)\s+(?:whole|entire)\s+(?:life|career|adult\s+life|working\s+life)\b`,
 ].join('|'), 'i');
 
 // ─── 支①右腿: 沉没定性（放弃即损失，或由沉没导出的继续指令）──────────
@@ -142,6 +182,30 @@ const SUNK_ZH = new RegExp([
   // [r645] 「这些年的陪伴算什么？」形：退出动词 + 质疑定性（没有白费词，
   // 沉没定性落在「这么多年算什么」这个反诘上）。
   String.raw`(?:说走就走|退出|放弃|走人|撂挑子|撒手|停更|撤|散伙|分手)(?:[^。]{0,12})(?:算什么|算啥|算得了什么|又算什么)`,
+  // [r646] 白活/白送/白过族（族 J）：「坚持就全都白活了」「青春就白送了」
+  // 「前半辈子不就白过了吗」——沉没定性落在**人生整体被否定**上，没有
+  // 「白费/浪费」词也没有退出动词的旧形（r646 探测器实测 5/6 漏判）。
+  String.raw`(?:白活|白送|白过|白熬|白等|白守|白撑|白拼|白付出|白投入)`,
+  // [r646] 「失去意义」形（族 J）：「过去十年的付出就全都失去了意义」。
+  String.raw`(?:全都|全部|就|也|一下子|从此|等于)?(?:失去|丧失了?|毫无|没有)(?:[^。]{0,4})(?:意义|价值|意思)`,
+  // [r646] 「对不起自己」形（族 I）：「现在走人对不起这些年的自己」。
+  String.raw`(?:对不住|对不起|辜负|愧对)(?:[^。]{0,10})(?:自己|这些年的自己|当初|当年)`,
+  // [r646] 追加投入的翻盘/回本定性（族 E）：「再补一点仓就能翻盘」
+  // 「再投一点就能回本」「再追加一点就能见到回头钱」「再借一笔周转」
+  // ——SUNK 侧由「继续即可挽回」这个镜像定性构成，无退出动词。
+  String.raw`(?:翻盘|回本|翻身|翻本|扭亏|止损|盘活|救活|起死回生|见到回头钱|收回成本|保本|见亮|见曙光|迎来转机)`,
+  // [r646] 「不成功便成仁」类孤注一掷形（族 I）：差这一次 + 必须全押。
+  String.raw`(?:就差(?:这|那)?(?:一|这)?(?:次|回|一步|一点)|只差最后|最后(?:一搏|一把))(?:[^。]{0,14})(?:不成功便成仁|全押|梭哈|孤注一掷|拼了|赌一把|必须|务必|一定要)`,
+  // [r646] 「项目就能活」类续命定性（族 E）：「再投二十万这个项目就能活」
+  // 「再借一笔周转一下等回款」「再追加投入就能见到回头钱」——SUNK 侧由
+  // 「继续即可盘活/续命」构成，无退出动词、无白费词（r646 实测补）。
+  // ⚠️ 本族 SUNK 侧最弱的形是「等回款了全部还上」：既无白费词也无退出
+  // 动词，靠「回款 + 还上/解决」这个**债务清偿承诺**构成继续理由
+  // （r646 实测：前两版都漏了它——量词「一下」与尾部标记各漏一处）。
+  String.raw`(?:[^。]{0,10})(?:就能|才可以|方能|就能)(?:活|盘活|救活|周转|转起来|跑起来|见亮|撑过去|扛过去|熬过去|缓过来)`,
+  String.raw`(?:回款|周转|续命|撑过去|缓过来|盘活)(?:[^。]{0,10})(?:还上|还清|解决|到位|有着落|填上|见影)`,
+  // 「全押/梭哈」直接作为续命定性（前面 INVESTED 侧已由 最后一次机会形 命中）
+  String.raw`(?:全押|梭哈|孤注一掷|赌一把|押上全部|倾家荡产|卖房|借遍)`,
 ].join('|'));
 
 const SUNK_EN = new RegExp([
@@ -167,6 +231,20 @@ const SUNK_EN = new RegExp([
   String.raw`\b(?:all|that|this)\s+(?:effort|work|time|money|investment|plan)\b[^.]{0,25}?\b(?:goes|go|going|went)\s+to\s+waste\b`,
   // [r645] "walk away ... what ... nothing" 质疑定性（对应中文「算什么」）。
   String.raw`\b(?:walk away|walk out|leave|quit|give up|back out)\b[^.]{0,25}?\b(?:what|nothing)\b`,
+  // [r646] 白活/白过（英文，族 J）："my life will have been for nothing" /
+  // "the last decade of my life was wasted" —— 已有 all for nothing 覆盖前者，
+  // 这里补 "wasted" 收尾形与 "in vain"。
+  String.raw`\b(?:have\s+been|was|were|is|has\s+been|would\s+have\s+been)\s+(?:for\s+nothing|in\s+vain|a\s+waste|pointless)\b`,
+  // [r646] "would mean the last decade of my life was wasted" 形：be/was +
+  // 距离 ≤25 字符 + wasted。旧分支只认 will be wasted 的完成时标记，
+  // 一般过去时形整族漏判（r646 实测补）。
+  String.raw`\b(?:was|were|is|are|been)\s+(?:all\s+|just\s+)?(?:wasted|in\s+vain|pointless|for\s+nothing)\b`,
+  // [r646] 失去意义（英文，族 J）："loses all meaning" / "renders it pointless"。
+  String.raw`\b(?:loses?|losing|lost|render|renders|rendered|make|makes|made)\s+(?:it\s+|them\s+|all\s+)?(?:meaningless|pointless|purposeless|worthless|for\s+naught)\b`,
+  // [r646] 翻盘/回本（英文，族 E）："break even" / "pay off" / "turn it around"。
+  String.raw`\b(?:break\s+even|pay\s+off|turn\s+(?:it|things|this)\s+around|get\s+(?:back|it)\s+back|recoup|recover\s+(?:the|our|your)\s+(?:money|costs?|investment))\b`,
+  // [r646] 梭哈/孤注一掷（英文，族 I）："go all in" / "double down"。
+  String.raw`\b(?:go|going|went)\s+all\s+in\b|\bdouble\s+down\b|\ball\s+or\s+nothing\b`,
 ].join('|'), 'i');
 
 // ─── G1: 决策分析语境（沉没成本是被分析的对象，正确运用）────────────
