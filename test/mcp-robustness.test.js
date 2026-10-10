@@ -111,8 +111,7 @@ function probe(body) {
   `;
   const r = cp.spawnSync('node', ['-e', script],
     { encoding: 'utf8', timeout: 30000, env: Object.assign({}, process.env, {
-      MCP_TOKEN: require('fs').readFileSync(path.join(HF, '.env'), 'utf8')
-        .match(/MCP_HEARTFLOW_KEY=(.+)/)[1].trim() }) });
+      MCP_TOKEN: (process.env.MCP_HEARTFLOW_KEY || process.env.HEARTFLOW_MCP_TOKEN || '').trim() }) });
   try { return JSON.parse((r.stdout || '').trim()); } catch (_) { return null; }
 }
 

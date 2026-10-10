@@ -456,14 +456,18 @@ git branch -D temp-v2.9.0
 git fetch origin
 git branch -u origin/main main
 
-# 方案 B（当 main 无保护时可用）：直接 force push
-# 先检查是否受保护
-curl -s -H "Authorization: token $(gh auth token)" \
+# 方案 B（main 无保护时）：force push
+# ⚠️ 这是破坏性操作，执行前必须人工确认，不要由 agent 自行决定。
+# 先检查是否受保护（token 从环境变量取，不要写进命令行）
+curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
   "https://api.github.com/repos/OWNER/REPO/branches/main" | \
   python3 -c "import sys,json; d=json.load(sys.stdin); print('Protected:', d.get('protection',{}).get('enabled',False))"
-# 不受保护时直接 force push
-git push origin main --force --no-verify
+# 不受保护时 force push —— 保留 pre-push hook，不用 --no-verify
+git push origin main --force
 ```
+> **为什么删掉 `--no-verify`**：它会跳过 pre-push hook，而 hook 正是拦住
+> 「把密钥/凭据/未验证改动推出去」的最后一道闸。方案 B 本身已是高危操作，
+> 再叠一个跳过校验没有正当理由。
 
 **注意**：如果远程 main 的历史和本地 main 不是快进关系（no-fast-forward），普通 `git push` 也会被拒绝。先用 `git log --oneline origin/main` 和 `git log --oneline HEAD` 对比，确认分歧后再选择方案 A 或 B。
 
