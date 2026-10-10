@@ -49,6 +49,7 @@ data/.mcp_token_plain
 !data/upgrade-state.json
 !data/upgrade-queue.json
 !data/test-count.json
+data/.run-all.lock       # [r645] 全量回归单例锁，运行时状态不入库
 # 例外之外：upgrade-engine.js 的 flock 锁文件永不入库
 data/.upgrade.lock
 data/audit/

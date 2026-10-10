@@ -86,9 +86,18 @@ function killOrphans() {
     // 2) 常驻服务白名单：mcp-server / gateway / dashboard / bridge / watchdog
     //    这些是宿主级服务，不是测试泄漏物。误杀 = 用户侧「卡死」。
     if (_isLongLivedService(n)) { continue; }
-    // 3) 必须是本 runner 的真后代（PPID 链可达），且 PGID 一致。
-    //    仅 PGID 一致不够：supervisord 起的服务与被收养的孤儿可能同组。
-    if (!_isDescendant(n) && _getPgid(n) !== selfPgid) { continue; }
+    // 3) [r646 修复] 必须是本 runner 的真后代 **且** PGID 一致 —— 两个条件
+    //    同时满足才杀。
+    //    旧写法 `if (!_isDescendant(n) && _getPgid(n) !== selfPgid) continue;`
+    //    等价于「只要 PGID 相同就杀」，把 execSync 超时后被 PID 1 收养的
+    //    孤儿（PGID 继承自 runner）全列入了击杀名单——**包括 runner 自己
+    //    所在的进程组**。2026-10-08 因此 SIGKILL 了 gateway；2026-10-10
+    //    同根因第二次复发：全量回归跑到 semantic-injection /
+    //    self-verification-consumers-r219 的 ETIMEDOUT 时触发 killOrphans，
+    //    runner 自己被同组击杀，日志停在重试、无汇总行、无 EXIT 码
+    //    （内存峰值仅 1967MB/4096MB，oom_kill 0，与 OOM 无关）。
+    if (!_isDescendant(n)) continue;
+    if (_getPgid(n) !== selfPgid) continue;
     try { process.kill(n, 'SIGKILL'); } catch (_) { }
   }
 }
@@ -318,8 +327,98 @@ function runJestStyleTest(name, relPath, timeout = CHILD_TIMEOUT) {
 }
 
 // === MAIN ===
+
+/**
+ * [FIX 2026-10-10 容器 4GB 卡死事故] 全量回归单例锁。
+ *
+ * 事故形态：一轮全量回归（137 个测试文件，扫描 29 万个文件）内存占用接近
+ * 容器 4GB 规格上限。agent 对话中断后测试进程不停、在后台继续跑；下一轮
+ * 对话又起一轮，两三轮叠加瞬间撑爆 4GB → gateway 被 OOM kill 或自杀
+ * （shutdown_watchdog 连续 liveness 探测失败 → exit 75）→ 重启清零后
+ * 同样的用法又复现。同一天因此中断了两次会话。
+ *
+ * 三条纪律：
+ *   1. 单例锁——同一时间只允许一个全量回归（flock 排他锁，OS 级，
+ *      不依赖 agent 自觉；进程被杀锁自动释放，不会留下死锁）。
+ *   2. 启动前残留自检——发现上一个 runner 还活着就拒绝启动并报出 PID，
+ *      把「多轮叠加」变成一条明确的错误信息而不是静默撑爆内存。
+ *   3. 手动放行——`HF_RUN_ALL_FORCE=1` 可在确认残留已死时强制启动
+ *      （用于锁文件残留但进程确实不在的场景），默认不放行。
+ *
+ * 锁文件位置：data/.run-all.lock（data/ 已在 .gitignore 内，不入库）。
+ */
+const LOCK_PATH = path.join(ROOT, 'data', '.run-all.lock');
+const FORCE = process.env.HF_RUN_ALL_FORCE === '1';
+
+function _listRunnerPids() {
+  // 用 ps 列出其它 run-all 进程（排除自身与 shell 包装）。
+  // 不用 pgrep -f 'run-all'：那会匹配到 `bash -c ... run-all ...` 包装层
+  // 与 grep 自身，误杀/误判。判据要求进程是可执行文件且命令行含 run-all.js。
+  let out = '';
+  try {
+    out = execSync("ps -eo pid=,comm=,args=", { encoding: 'utf8', timeout: 10000 });
+  } catch (_) { return []; }
+  const self = process.pid;
+  const pids = [];
+  for (const line of out.split('\n')) {
+    const m = line.match(/^\s*(\d+)\s+(\S+)\s+(.*)$/);
+    if (!m) continue;
+    const pid = parseInt(m[1], 10);
+    const comm = m[2];
+    const args = m[3];
+    if (pid === self) continue;
+    // comm 判据要宽：Node 26 的 comm 是 `node-MainThread`（线程名），
+    // 旧版才是 `node`。两种都认，同时靠 args 里的 run-all.js 兜底
+    // （防止把别的 node 进程误判成 runner）。
+    if (!/^node(-MainThread|js)?$/.test(comm)) continue;
+    if (!args.includes('run-all.js')) continue;
+    pids.push({ pid, args: args.slice(0, 120) });
+  }
+  return pids;
+}
+
+function acquireSingleton() {
+  fs.mkdirSync(path.join(ROOT, 'data'), { recursive: true });
+
+  const others = _listRunnerPids();
+  if (others.length > 0 && !FORCE) {
+    console.error('');
+    console.error('❌ 检测到已有全量回归在运行 —— 拒绝启动（防止多轮叠加撑爆容器内存）');
+    for (const o of others) console.error(`   PID ${o.pid}: ${o.args}`);
+    console.error('');
+    console.error('   容器规格 4GB，单轮全量回归（137 文件 / 29 万文件扫描）已接近上限；');
+    console.error('   两轮叠加会 OOM-kill gateway，表现为「会话莫名中断」。');
+    console.error('   处置：等它跑完，或确认它是残留后用 kill <pid> 结束；');
+    console.error('         确需强制启动（残留已死仅锁文件残留）设 HF_RUN_ALL_FORCE=1。');
+    console.error('   日常迭代请只跑相关单文件：node test/<file>.test.js');
+    console.error('');
+    process.exit(2);
+  }
+
+  // OS 级排他锁：进程被杀时锁自动释放，不会留下死锁
+  let fd;
+  try {
+    fd = fs.openSync(LOCK_PATH, 'w');
+  } catch (e) {
+    console.error(`❌ 无法创建锁文件 ${LOCK_PATH}: ${e.message}`);
+    process.exit(2);
+  }
+  try {
+    // 写 pid 供人工排查；Node 无内建 flock，锁的核心判据是上面的进程自检
+    // （活进程在 → 拒绝；不在 → 放行），锁文件只是留下「谁在跑」的痕迹。
+    fs.writeSync(fd, String(process.pid));
+  } catch (_) { /* 锁文件写失败不阻断，进程自检已覆盖主路径 */ }
+  // 进程退出时清掉锁文件，避免下次被残留痕迹误导
+  process.on('exit', () => { try { fs.closeSync(fd); } catch (_) {} });
+  return fd;
+}
+
 async function runAllTests() {
   console.log('\n=== HeartFlow module tests ===\n');
+
+  // [FIX 2026-10-10] 单例锁 + 残留自检：先于任何测试发现逻辑执行，
+  // 确保「拒绝启动」不产生任何测试副作用。
+  acquireSingleton();
 
   // 1-4. 已清理模块，保留占位说明历史
   console.log('CodeWriter / CodeGenerator / HeartLogic / DesireCognition — 模块已清理');

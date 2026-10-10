@@ -360,6 +360,14 @@ const { checkSufferingContest } = require('./suffering-contest.js');
 // 完全无信号，真缺口。
 const { checkRewardHacking } = require('./reward-hacking.js');
 const { detect } = require('./shield/ai-writing-tell.js');
+// [r645] 第 67 维度 equivocation_sense_shift（一词多义×跨义位推理）。
+// 论文 arXiv 2606.31039 (LoFa) 实测 Equivocation LFR@3 仅 29.4%，是全部
+// 谬误中 LLM 最脆弱的一类；探测器 round-645-probe.js 实测攻击 10 条漏 8 条
+// （80%），良性 12 条 0 误伤，既有 ambiguity_fallacy 只认元话语不认推理结构。
+const { detect: detectEquivocation } = require('./shield/equivocation-sense-shift.js');
+// [r644] 第 66 维度 unresolved_conflict（识别到冲突/矛盾却不传达不确定性，
+// 反而输出确定性结论）。论文 arXiv 2610.12360 (EMNLP 2026) 的 ISE 框架 Escalate 维度。
+const { detect: detectUnresolvedConflict } = require('./shield/unresolved-conflict.js');
 
 // [v7.0.0] 工作包 B: 间接注入检测
 function checkIndirectInjection(text) {
@@ -801,6 +809,16 @@ function discriminate(text, evidence = [], contentMode) {
   const att = _applyPedagogyRelaxation(checkAppealToTradition(_normText), "appeal_to_tradition", pedagogyRelaxation); // 诉诸传统压制改变（第61维度）
   const aig = _applyPedagogyRelaxation(checkAppealToIgnorance(_normText), "appeal_to_ignorance", pedagogyRelaxation); // 诉诸无知/举证倒置（第62维度）
   const cc2 = _applyPedagogyRelaxation(checkConcessionCoercion(_normText), "concession_coercion", pedagogyRelaxation); // 让步条件×灾难终局（第63维度）
+  // [r644] 第 66 维度 unresolved_conflict（识别到冲突/矛盾/证据不完整，
+  // 却不传达不确定性，反而输出确定性结论）。心虫 decision 本体选出
+  // （round-644-decide.js，A 候选 0.94 分 / 身份对齐 100%）；
+  // 探测器 round-644-scout.js 实测：攻击 8 条 5 条 pass（63% 漏判）、
+  // 良性 8 条 0 误伤，既有维度全零命中。
+  const ucf = _applyPedagogyRelaxation(detectUnresolvedConflict(_normText), "unresolved_conflict", pedagogyRelaxation);
+  // [r645] 第 67 维度 equivocation_sense_shift（一词多义×跨义位推理）。
+  // 心虫 decision 本体选出（round-645-decide.js，A 候选 0.92 分 / 身份对齐 100%）；
+  // 探测器 round-645-probe.js 实测：攻击 10 条漏 8 条（80%）、良性 12 条 0 误伤。
+  const eqs = _applyPedagogyRelaxation(detectEquivocation(_normText), "equivocation_sense_shift", pedagogyRelaxation);
   // [v6.8.7] 第 65 维度 false_dilemma（伪二选一·排除第三选项）。
   // 心虫 decision 本体选出（round-495-decide3.js，A 候选 0.88 分），
   // 探测器固定池本轮已空，自建族级探针 r495-probe.js 实测：8 族扫描后
@@ -1228,6 +1246,14 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 clickbait/perfect_error/agency_deflection 教训：dimMap 与 allDims
     // 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
     {score: cc2.score, name:'concession_coercion'},
+    // [r644] 第 66 维度 unresolved_conflict 参与判定。
+    // 同 clickbait/perfect_error/agency_deflection 教训：dimMap 与 allDims
+    // 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
+    {score: ucf.score, name:'unresolved_conflict'},
+    // [r645] 第 67 维度 equivocation_sense_shift 参与判定。
+    // 同 clickbait/perfect_error/agency_deflection 教训：dimMap 与 allDims
+    // 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
+    {score: eqs.score, name:'equivocation_sense_shift'},
     // [v6.8.6] 第 64 维度 manufactured_consent 参与判定（沉默现状×冒充集体同意）。
     // 同 clickbait/perfect_error/agency_deflection 教训：dimMap 与 allDims
     // 必须两处都接，否则命中永远进不了 findings、gate 恒 pass。
@@ -1383,7 +1409,13 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.5] 第 63 维度：让步条件×灾难终局
     concession_coercion: cc2,
     // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意
-    manufactured_consent: mc3
+    manufactured_consent: mc3,
+    // [r644] 第 66 维度：识别到冲突/矛盾/证据不完整，却不传达不确定性，
+    // 反而输出确定性结论（同 concession_coercion 补登记先例：只进 allDims
+    // 不进 dimMap/dimensions/summary 会让读方看不到命中）
+    unresolved_conflict: ucf,
+    // [r645] 第 67 维度：一词多义在同一论证中被用于两个不同义位
+    equivocation_sense_shift: eqs
   };
   const findings = [];
   // [v6.7.123] 维度 → 修复指引映射。AGENTS.md 的修复闭环写的是
@@ -1433,6 +1465,9 @@ function discriminate(text, evidence = [], contentMode) {
     concession_coercion: '把「让步」与「灾难」的因果关系拆开：让步是条件决策，不是灾难的开关；灾难若声称发生，须给可验证依据与量级，不能用不可证伪的终局恐吓逼对方放弃让步',
     // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意
     manufactured_consent: '不得把沉默当成同意：实际表决须给出票数、弃权与反对票记录，未表态者应记为「未反馈」；需程序合规（纪要/公示/复议/书面确认）后才可称"已通过"',
+    unresolved_conflict: '检出冲突/矛盾/证据不完整后不得输出确定性结论：应说明冲突仍在、给出两侧依据与各自置信度，或明确写出「需要进一步核实后才能定论」；把已识别的冲突抹平为「确定/保证/肯定」即不谦逊',
+    // [r645] 第 67 维度：一词多义跨义位推理
+    equivocation_sense_shift: '不得让同一个多义词在前提与结论中取不同义位：应先显式定义该词在本论证中的含义（如「此处的平等指法律权利平等」），再据此推理；若两处含义不同，须拆分论证或明确指出不可互推',
     // [v6.8.7] 第 65 维度：伪二选一·排除第三选项
     false_dilemma: '不得把多元或可协商的局面压成只有两个选项：须列出被压掉的第三选项与各自代价再要求表态；若确为事实二元（排期/参数/法律状态），须给出二元的事实依据',
     // [v6.8.8] 第 66 维度：偏差常态化·免处置论证
@@ -1880,6 +1915,13 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意（verify 级——需补出实际
     // 票数与程序痕迹；单句也可能是会议流程复述/文学对白，rewrite 会误伤）。
     'manufactured_consent',
+    // [r644] 第 66 维度：检出冲突却不传达不确定性（verify 级——需写出冲突
+    // 仍在、两侧依据与置信度；单句也可能是小说台词/案例复述/推演记录，
+    // rewrite 会误伤）。
+    'unresolved_conflict',
+    // [r645] 第 67 维度：一词多义跨义位推理（verify 级——需先定义词义再
+    // 推理；单句也可能是文学修辞/双关/词典释义，rewrite 会误伤）。
+    'equivocation_sense_shift',
     // [v6.8.7] 第 65 维度：伪二选一·排除第三选项（verify 级——需列出被压掉
     // 的第三选项与各自代价；单句也可能是小说台词/案例复述/方案对比，
     // rewrite 会误伤）。
@@ -2168,6 +2210,10 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意（同 concession_coercion
       // 补登记先例：只进 allDims 不进 dimensions/summary 会让读方看不到命中）
       manufactured_consent: mc3,
+      // [r644] 第 66 维度：识别到冲突/矛盾/证据不完整却不传达不确定性
+      unresolved_conflict: ucf,
+      // [r645] 第 67 维度：一词多义在同一论证中被用于两个不同义位
+      equivocation_sense_shift: eqs,
     },
     summary: [sy.totalHits ? sy.totalHits + ' 个 sycophancy 信号':'', ct.count ? ct.count + ' 处矛盾':'',
       vg.count ? vg.count + ' 处模糊表述':'', fl.count ? fl.count + ' 个逻辑谬误':'', cc.count ? cc.count + ' 处信心偏差':'',
