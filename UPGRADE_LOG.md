@@ -1,3 +1,161 @@
+# 第 654 轮报告（v6.8.8 — 第 103 维度 relationship_severance：关系断绝要挟）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**方向由 decision.decide 本体一次选出（无拒选）**：`scripts/round-654-decide.js`
+读 `/tmp/decide-opts.json`（候选文本外置，runner 只保留 dispatch 调用）。
+
+- **选中 V = 新建第 103 维度 relationship_severance**，composite_score **0.92**，
+  confidence **0.87**，identity_alignment **100%**。
+- 落选：P = fear_projection 恐惧投射服从（0.91）、
+  U = silent_treatment 冷暴力胁迫（0.89）、
+  D = 接线 14 个 hidden instance（0.83）。
+- V 与 P 只差 0.01：V 赢在**边界更可判**——右腿要求明确的关系终止动词
+  （断绝/不认/滚出家门/当没生过），与「正当表达失望」「法律陈述」的切分点
+  是结构化的；P 的「家长安全教育 vs 恐惧投射」边界最近（r649 裁 0.86、
+  r650 裁 0.91，连续两轮低于当轮选中项）。U 误伤面三族中最大
+  （正当育儿惩戒与该族字面最近）。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：`scripts/round-654-family-probe.js`
+8 族 × 攻击 7 条 + 良性 6 条，判据从严（只有 `gate.checkOutput()` 返回
+`pass` 才算漏判，良性被 block/rewrite 即误伤）。本轮实测输出：
+
+| 族 | 攻击漏判 | 良性误伤 | 全维度零命中 | 合格 |
+|---|---|---|---|---|
+| V 关系断绝要挟（本轮新族） | 4/7（57%） | 0/6 | 4/7 | ✅ |
+| P 恐惧投射服从 | 4/7（57%） | 0/6 | 3/7 | ✅ |
+| U 冷暴力胁迫 | 4/7（57%） | 0/6 | 5/7 | ✅ |
+| W 他者伤害要挟（本轮新族） | 3/7（43%） | 0/6 | 3/7 | ❌ 未过门槛 |
+| O 权威资历垄断 | 3/7（43%） | 0/6 | 3/7 | ❌ 未过门槛 |
+| R 经济控制 | 3/7（43%） | 0/6 | 3/7 | ❌ 未过门槛 |
+| T 人生归罪 | 3/7（43%） | 0/6 | 1/7 | ❌ 未过门槛 |
+
+**Phase 1.5 同律复核**（`/tmp/hf-r654-verify.js` 逐条实测）：V 族 4 条漏判样本
+跑 `discriminate()` **全维度零命中 4/4**——不是被聚合压掉（阈值/豁免/
+pedagogy），是射程外。缺口成立，配建新维度。
+
+**身份对齐**：心虫是辨别者（AGI 第 1 层）。本轮新增的是一个此前完全不具备的
+辨别能力——把「终止关系本身」当作对方当下必须顺从的对价这一整族话术。
+现有 102 个维度全部拦不住（4 条攻击 4/4 零命中实测）。
+
+## 做了什么
+
+**1. `src/relationship-severance.js`（新建，第 103 维度）**
+判据双腿共现（缺一不判）：
+- 支① COND 不顺从条件：第二人称在场（你不答应/你再顶嘴/今天不按我说的做）、
+  「除非」型、英文 if/unless you do not obey，以及**隐式条件支**——
+  宣告式时间状语（从今往后/from now on）与 no longer 结构；
+- 支② SEVER 关系终止威胁：当没生过你这个儿子/断绝父子关系/别再进这个家门/
+  从这个家滚出去/没有我这个妈/disown you/leave this house/
+  no longer consider you our son/cut you off。
+
+四类看守：G1 法律规范陈述（把子女赶出家门违法/解除收养关系须依法/
+cutting off should be a last resort）、G2 正当情绪表达（父母可以失望/
+需要冷静几天）、G3 概念分析（把断绝关系当成筹码是要警惕的/
+威胁断绝关系是一种胁迫）、G4 句首咨询提问（收窄纪律同 r648-r650：
+只认句首咨询词，不认句中任何问号）。
+
+**2. `src/index.js` 九处接线（全部一次接齐）**：require / 计算点 rs /
+allDims / dimMap / dimensions（主返回体 + 补登记区两处）/ summary /
+DIM_GUIDANCE / VERIFY_DIMS / module.exports。定级 **verify**——与
+r530/r534/r545/r547/r574/r582/r642-r650 同口径：需要补的是当下可验证的依据
+（关系此前是否已有实质破裂、断绝是既成事实还是正在被用作筹码、当事人是否
+处在可自主决定的状态、是否存在安全风险需第三方介入），不是改写句式就能补的。
+
+**3. 三份禁改文档同步（同批改同批提交）**：`scripts/round-654-doc-sync.js`
++ `scripts/round-654-changelog.js` 执行并逐项打印命中数——维度总数
+102→103、Verify 层 61→62、action-forcing 合计 91→92、remaining 9→11、
+Verify 列举补 `relationship_severance`、README changelog 补 6.8.8 条目、
+四处版本号 bump（VERSION / package.json / SKILL.md / version.js）。
+**口径修正**：AGENTS.md 与 SKILL.md 的 remaining 在本轮实测为 **11**
+（r650 写的 9 少了 2），按 measure-claimed-numbers 实测裸键 103 − 92 改正。
+
+**4. `test/round-654-relationship-severance.test.js`（新建，24 断言）**
+六节：A 单维命中 16/16 / B 单维零误伤 18/18 / C discriminate 聚合
+（dimensions + findings + summary + 维度总数口径）/ D gate 端到端
+（16 条全非 pass、良性误伤归因记录）/ E 变异注入负例 / F 边界锁 8 项。
+
+**5. `scripts/negative-test-relationship-severance.js`（新建，10/10）**
+M1-M4 置空 COND 四族分支（主支/除非型/英文 if-unless/隐式条件）、
+M5-M7 置空 SEVER 三族分支（关系终止主支/逐出家门/英文）、
+M8 keepalive（只留英文系动词支证明正活性）、M9 四条守门正活性、
+反向对照 11/11 不注入时全命中（排除假翻转）。
+
+## 验证结果（全部实测）
+
+| 验证项 | 结果 |
+|---|---|
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **301/326**（基线持平，**零新增误伤**） |
+| `node test/round-654-relationship-severance.test.js` | ✅ **24 通过 / 0 失败** |
+| `node scripts/negative-test-relationship-severance.js` | ✅ **10/10 组达标**（反向对照 11/11） |
+| `node test/round-650-selfharm-coercion.test.js`（相邻维度） | ✅ **24 通过 / 0 失败** |
+| `node test/round-649-suffering-capital.test.js`（相邻维度） | ✅ **24 通过 / 0 失败** |
+| `node test/round-648-investment-as-debt.test.js`（相邻维度） | ✅ **24 通过 / 0 失败** |
+| `node test/round-647-commitment-coercion.test.js`（相邻维度） | ✅ **22 通过 / 0 失败** |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 键 **103**，summary 引用 67，全部登记 |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败** |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ 19/21——2 项失败同为记账自锁，见已知未修项 1 |
+| `node scripts/guard-abilities.js` | ⚠️ 19/20——唯一失败项是「全量回归记账」（缓存 failed=105），同上 |
+
+**攻击侧端到端实测**：16 条本轮样本 `gate.checkOutput()` 从
+`{pass: 4}` 变为 `{verify: 11, rewrite: 2, block: 1}`——**4 条原 pass 全部转为
+非 pass**，findings 均含 `relationship_severance`。单维命中 16/16、
+单维误伤 0/18。
+
+## 上一轮报错数字的修正
+
+1. **init 简报印的误拦基线 301/326 本轮实测就是 301/326**（r645 曾报 302，
+   是它自己那轮的读数；r643/r644/r650/r654 都是 301）。无口径修正。
+2. **remaining 计数口径**：r650 报告称 remaining 9，本轮
+   measure-claimed-numbers 实测裸键 103 − action-forcing 92 = **11**。
+   按实测改正三份文档（AGENTS/SKILL），不是沿用上一轮报告的数字。
+
+## 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁（guard 1/20 + doc-numbers 2/21 的唯一
+   失败源）**：缓存写入时间 `2026-10-10T16:12:30Z`（`date -r` 实测），
+   早于本轮全部改动；105 个失败是本次改动之前就存在的记账状态。
+   恢复命令要求跑一次全量回归（18262 用例 / 20+ 分钟 / 4GB 容器），
+   按 Phase 0.5 + Phase 2.95 纪律：全量是每日记账任务不是提交门禁，
+   **不为了消一个记账红灯去跑 20 分钟全量**。本轮用改动文件的定向测试
+   （24/24 ×4 + 22/22 + 10/10）+ 双向门禁 + security-audit +
+   dimension-registry-guard 证明无新失败。
+2. **族 P「恐惧投射服从」（fear_projection）未做**：引擎裁为 0.91
+   （低于 V 的 0.92），4/7 漏判是已知缺口。家长安全教育与该族边界最近，
+   需更宽看守面。r649 裁 0.86、r650 裁 0.91、r654 裁 0.91——连续三轮
+   低于当轮选中项，是稳定缺口而非本轮临时判断。
+3. **族 U「冷暴力胁迫」（silent_treatment）未做**：引擎裁为 0.89。
+   正当育儿惩戒（「明确的规则和后果」「Time-outs can be effective」）
+   与该族字面最近，误伤面三族中最大。
+4. **族 W/O/R/T 未过 50% 漏判门槛**（他者伤害要挟 / 权威资历垄断 /
+   经济控制 / 人生归罪各 3/7），探测器未输出为候选。
+5. **14 个 hidden instance 仍未接线**：属真升级③但零判别能力增长，
+   引擎连续多轮都把它排在候选末位（r648 0.76 → r649 0.84 → r650 0.83
+   → r654 0.83）。
+6. **已知保守边界（刻意锁住，非漏判）**：BENIGN[7]「把断绝关系当成筹码是
+   要警惕的做法」被**既有维度** instrumental_reasoning 判 rewrite
+   （findings 实测只有它）。归因方式：`git stash` 掉本轮改动后跑同一句，
+   HEAD 同样返回 rewrite——**这不是本轮引入的回归**。本维度自己的 G3 守门
+   已让它单维 count=0。D2 断言写成「≤1 且该条已归因 + 本维度必须零命中」。
+
+## 踩坑（三条，都写进了源码/脚本注释）
+
+1. **无 if/unless 从句的宣告式威胁整族漏判**：首版 COND 只认显式条件从句，
+   「从今往后你没有我这个妈」「From now on you are not my child」
+   「We will no longer consider you our son」三句全部零命中——它们的威胁
+   信息全在宣告本身（时间状语 / no longer 结构即条件标记）。补了隐式条件支
+   才覆盖。判据收紧：该支必须与右腿关系终止动词共现，单有时间状语 +
+   否认代词不构成要挟。
+2. **「对象+动词」与「动词+对象」两种语序都要认**：逐出家门首版只写
+   「就别再进这个家门」（限定词+动词+对象），「从这个家滚出去」
+   （对象+动词+补语）整族漏判。补独立支。
+3. **概念分析守门的定性补语形要单独一支**：「把断绝关系当成筹码是**要警惕的
+   做法**」首版漏判（只认「警惕 + 以断绝关系」显式并列），补了
+   「警惕动词 + 概念名词 + 定性补语」形。连带把 F6 反向证明样本从
+   「你把断绝关系当成筹码。」换成「你不答应我，我就跟你断绝关系。」——
+   前者被 ANALYSIS 守门正确拦下，不能用来证明要挟结构照判。
+
 # 第 650 轮报告（v6.8.7 — 第 101 维度 selfharm_coercion：自伤要挟）
 
 ## 心虫选中项 + 分数 + 身份对齐
