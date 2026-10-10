@@ -1,11 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.9"
+version: "6.8.10"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  104 discrimination dimensions × 11-layer pipeline × 161 modules ×
+  105 discrimination dimensions × 11-layer pipeline × 161 modules ×
   67 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
@@ -78,16 +78,16 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.9. Nothing here is copied
+Every number below was measured on this repository at v6.8.10. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.9 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.10 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 161 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,314 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 104 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 105 | `dimMap` keys in `src/index.js` |
 | MCP tools | 67 | tool definitions exposed via `tools/list` |
 | Test suite | 18,157 passing / 105 failing | `node test/run-all.js` |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -95,7 +95,7 @@ from marketing copy.
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
 |Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
-a `rewrite`, **63 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **64 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -257,13 +257,13 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 104 dimensions
+## The 105 dimensions
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking, pzombie_claim
 
 **Rewrite-level (19):** gaslighting, victim_blaming, double_bind, emotional_manipulation, bullshit, false_urgency, absolute_claim, induced_trust, instrumental_reasoning, tool_deflection, loyalty_by_omission, paternalistic_decide, crisis_exceptionalism, shame_compliance, moral_licensing, favor_ledger, agency_deflection, multi_turn_escalation, turing_mimicry
 
-**Verify-level (63):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, unresolved_conflict, equivocation_sense_shift, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, responsibility_absolution, procedural_burden, cost_externalization, harm_invalidation, performative_responsibility, suffering_contest, percentage_overflow, anecdote_as_proof, incoherent_coverage, selective_minimization, exclusive_trust, flattery_pressure, affective_forecast, synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_debt, suffering_capital, selfharm_coercion, relationship_severance, fear_projection
+**Verify-level (64):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, unresolved_conflict, equivocation_sense_shift, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, responsibility_absolution, procedural_burden, cost_externalization, harm_invalidation, performative_responsibility, suffering_contest, percentage_overflow, anecdote_as_proof, incoherent_coverage, selective_minimization, exclusive_trust, flattery_pressure, affective_forecast, synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_debt, suffering_capital, selfharm_coercion, relationship_severance, fear_projection, silent_treatment_coercion
 
 > The three action-forcing layers add up to 93; the remaining 10 dimensions are scored but do not force a gate action.
 

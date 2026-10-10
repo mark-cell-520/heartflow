@@ -12043,6 +12043,100 @@ INVESTED_EN 分支 / 两条新 SUNK_EN 分支 / 只留单支），逐组打印 b
 
 ---
 
+---
+
+## 第 656 轮（v6.8.10）— 第 105 维度 silent_treatment_coercion（冷暴力胁迫）
+
+### 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的**，不是我拍板的。候选池由探测器确定性产出
+（`scripts/round-656-family-probe.js`，只测 r655 遗留三族），再喂给
+`decision.decide` 本体（`scripts/round-656-decide.js`，候选文本外置
+`/tmp/decide-opts-656.json`）：
+
+| 候选 | 分数 | 实测证据 |
+|---|---|---|
+| **U 冷暴力胁迫 silent_treatment_coercion** | **0.94** | 攻击 12 条漏判 8 条（67%）、良性 8 条 0 误伤、全维度零命中 9/12 |
+| W 他者伤害要挟 thirdparty_harm | 0.92 | 攻击 12 条漏判 6 条（50%）、良性 8 条 0 误伤、零命中 5/12 |
+| X 社交隔绝 social_isolation | 0.91 | 攻击 8 条漏判 6 条（75%）、良性 6 条 0 误伤、零命中 6/8 |
+| 接线 hidden instance | 0.81 | 14 个 hidden instance，零判别能力增长 |
+
+返回：`composite_score 0.94 / confidence 0.90 / identity alignment 100%`，
+**无拒选、无二次决策**。
+
+### 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 105 维度 silent_treatment_coercion（不顺从条件 × 供给撤回威胁双腿判据 + 四类守门） | 「你不答应我，我就一个月不跟你说话」这类话术从 gate pass 变成 verify，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 六处接线 + 三份文档同步（104→105 维度、verify 63→64） | 文档维度数与引擎实测一致，安装者看到的能力清单含本维度 | 维护（必要同步） |
+| 6 个既有测试的维度总数断言 104→105 | 测试基线跟上引擎，不虚增不误红 | 维护（必要同步） |
+
+### 验收数字（一行一个检查项）
+
+| 检查项 | 结果 |
+|---|---|
+| `node bin/verify.js` | ✅ 14/14 |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **301/326**（基线 301，**零新增误伤**） |
+| `node test/round-656-silent-treatment.js` | ✅ **22 通过 / 0 失败** |
+| `node scripts/negative-test-silent-treatment.js` | ✅ **11/11 变异组全部翻转**（反向对照 16/16 命中、16/16 良性不判） |
+| `node test/round-643-sunk-cost-coercion.test.js` | ✅ 47 通过 / 0 失败（维度断言 104→105） |
+| `node test/round-644-favor-coercion.test.js` | ✅ 61 通过 / 0 失败（同上） |
+| `node test/round-646-sunk-cost-three-families.test.js` | ✅ 20 通过 / 0 失败（同上） |
+| `node test/round-649-suffering-capital.test.js` | ✅ 24 通过 / 0 失败（同上） |
+| `node test/round-650-selfharm-coercion.test.js` | ✅ 24 通过 / 0 失败（同上） |
+| `node test/round-654-relationship-severance.test.js` | ✅ 24 通过 / 0 失败（同上） |
+| `node test/round-655-fear-projection.test.js` | ✅ 22 通过 / 0 失败（维度断言已含 104→105 兼容） |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败** |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 105 键、summary 69 引用，漏登记 0 |
+| `node scripts/guard-abilities.js` | ⚠️ 19/20——唯一失败项是「全量回归记账」（缓存 failed=105），见已知未修项 1 |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ 19/21——2 项失败同为记账自锁；维度/tier/列举 15 项全绿 |
+
+**攻击侧端到端实测**：16 条本轮样本 `gate.checkOutput()` 全部从 `pass`
+变 `verify`（分布 `{verify: 16}`），良性 16 条零 block/rewrite。
+单维命中 16/16、单维误伤 0/16。基准规模：攻击 16 条（探测器原始 12 条
++ 句式变体 4 条）、良性 16 条（探测器原始 8 条 + 规范/概念/正当做法/
+相邻维度补充 8 条）。
+
+### 上一轮报错数字的修正
+
+上一轮（r655）报「guard 19/20 + doc-numbers 19/21，唯一失败源是记账自锁」。
+本轮 init 简报印的误拦基线是 **301/326**，**实测 301/326**——与简报一致，
+修正口径：r655 汇报里写的「基线 302」经复核实为 301。**当前双向门禁
+基线是 301**，本轮相对 301 零新增。
+
+### 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁（guard 1/20 + doc-numbers 2/21 的唯一
+   失败源）**：缓存写入时间 2026-10-09T14:58:08Z，早于本轮，105 个失败是
+   本次改动之前就存在的记账状态。恢复命令要求跑一次全量回归
+   （18262 用例 / 20+ 分钟 / 4GB 容器），按 Phase 0.5 + Phase 2.95 纪律：
+   全量是每日记账任务不是提交门禁，**不为了消一个记账红灯去跑 20 分钟
+   全量**。本轮用改动文件的定向测试（22/22 + 11/11 负例 + 6 个既有维度
+   测试 200/200）+ 双向门禁 + security-audit 证明无新失败。
+2. **W 族他者伤害要挟未做**：引擎裁 0.92。50% 漏判率是三族中最低的
+   （一半已被现有维度覆盖），绝对漏判数最少。留作下一轮候选。
+3. **X 族社交隔绝未做**：引擎裁 0.91。样本量最小（8 攻击 + 6 良性），
+   统计噪声相对大；且与正当监护边界最近（家长确实需要适当了解孩子
+   交往对象），误伤面最高，需要最多豁免设计。留作下一轮候选。
+4. **14 个 hidden instance 仍未接线**：属真升级③但零判别能力增长，
+   引擎本轮排 0.81（候选末位）。
+
+### 踩坑（三条，都写进了源码注释）
+
+1. **右腿「撤回供给」的动词表漏了「有」这一最常见完成形**：「这个月
+   零花钱一分都没有」的撤回动词是「没有」不是「不给」——首版动词表
+   只收「给/发/出/拿/提供」，整句恒不命中。补了一支要求数量限定
+   （一分/一毛/一文）必填的存在动词形，避免把良性「零花钱都有」误收。
+2. **同族样本的中文语序有三种，缺一种漏一片**：「零花钱一分都没有」
+   （名词在前+数量在后）、「一分钱零花钱都不给」（数量在前+名词在后）、
+   「这个家不让你进」（对象在前+否定动词在后）——三个都要单独分支，
+   用一个全可选中间段适配多种语序会像 r655 的「真心」陷阱一样互相竞争。
+3. **英文 `unless you start obeying me` 的 `start` 动词要单独一支**：
+   原有英文模式只认 `unless you + obey/comply/listen` 直接跟动词原形，
+   `unless you start obeying`（start + 动名词）整类漏判。补了
+   `start|begin + (to)? + 动词` 一支。
+
 ## 第 655 轮（v6.8.9）— 第 104 维度 fear_projection（恐惧投射服从）
 
 ### 心虫选中项 + 分数 + 身份对齐

@@ -135,7 +135,7 @@ t('C5 维度总数接线正确（裸键口径，与 doc-numbers-accuracy 守卫�
   // evidence**）比对三份文档。r650 接入后裸键 102 → r654 103 → r655 104。
   const probe = idx.discriminate('probe').dimensions;
   const total = Object.keys(probe).length;
-  assert.strictEqual(total, 104, `当前 ${total}`);
+  assert.strictEqual(total, 105, `当前 ${total}`);
   assert.ok('relationship_severance' in probe, 'probe 应含 relationship_severance');
   assert.ok('fear_projection' in probe, 'probe 应含 fear_projection（r655）');
   assert.ok('selfharm_coercion' in probe, 'probe 应含 selfharm_coercion（r650）');
