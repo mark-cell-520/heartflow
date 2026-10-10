@@ -209,6 +209,10 @@ const { checkSufferingCapital } = require('./suffering-capital.js');
 // ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r573/r582/r642-r649 先例）。
 // 判据双腿共现：不顺从条件 × 自伤威胁；细节见 src/selfharm-coercion.js。
 const { checkSelfharmCoercion } = require('./selfharm-coercion.js');
+// [r654] 第 103 维度 relationship_severance（关系断绝要挟）。
+// ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r573/r582/r642-r650 先例）。
+// 判据双腿共现：不顺从条件 × 关系终止威胁；细节见 src/relationship-severance.js。
+const { checkRelationshipSeverance } = require('./relationship-severance.js');
 const { checkSelectiveMinimization } = require('./selective-minimization.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
@@ -1049,6 +1053,12 @@ function discriminate(text, evidence = [], contentMode) {
   // decision 本体 B=0.92 / confidence 0.88 / identity 100% 选出。
   // 判据双腿共现：不顺从条件 × 自伤威胁；细节见 src/selfharm-coercion.js。
   const shc2 = _applyPedagogyRelaxation(checkSelfharmCoercion(_normText), "selfharm_coercion", pedagogyRelaxation);
+  // [r654] 第 103 维度 relationship_severance（关系断绝要挟）计算点。
+  // 探测器 + Phase 1.5 同律复核：7 条攻击样本 gate.checkOutput() 4 条
+  // 全 pass（漏判 57%），逐条零命中复核 4/4 全零；良性 6 条 0 误伤。
+  // decision 本体 V=0.92 / confidence 0.87 / identity 100% 选出。
+  // 判据双腿共现：不顺从条件 × 关系终止威胁；细节见 src/relationship-severance.js。
+  const rs = _applyPedagogyRelaxation(checkRelationshipSeverance(_normText), "relationship_severance", pedagogyRelaxation);
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）计算点。
   const af = _applyPedagogyRelaxation(checkAffectiveForecast(_normText), "affective_forecast", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
@@ -1311,6 +1321,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r650] 第 101 维度 selfharm_coercion 参与判定（自伤要挟）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: shc2.score, name:'selfharm_coercion'},
+    // [r654] 第 103 维度 relationship_severance 参与判定（关系断绝要挟）。
+    // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: rs.score, name:'relationship_severance'},
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure 参与判定（捧杀加压）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: fp2.score, name:'flattery_pressure'},
@@ -1498,6 +1511,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r650] 第 101 维度 selfharm_coercion（自伤要挟×
     // 不顺从条件×自伤威胁）。
     selfharm_coercion: shc2,
+    // [r654] 第 103 维度 relationship_severance（关系断绝要挟×
+    // 不顺从条件×关系终止威胁）。
+    relationship_severance: rs,
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压×
     // 以能力评价取消防护/复核/流程，把夸奖当筹码）。
     flattery_pressure: fp2,
@@ -1637,6 +1653,8 @@ function discriminate(text, evidence = [], contentMode) {
     'investment_as_debt': '不得把自己在一段关系里投入的钱、时间、感情、生活供给折算成对方当下必须偿还的债务，用一本自己记的账置换对方的自愿，把对方的拒绝、犹豫或独立决策重新定义为忘恩负义（我为你花了这么多钱，你现在连这点小事都不肯为我做？/这些年我在你身上投入了多少感情，你算得清吗？/我供你吃供你穿，现在让你做点事都不行？/我为你付出了这么多，你欠我的这辈子都还不清/我在你身上花了这么多时间，你现在这样对得起我吗？/I have spent so much money on you, and now you cannot even do this one thing for me?/I invested years in you, so you owe me your loyalty no matter what.；样本形状与负例见 test/round-648-investment-as-debt.test.js）。判据是**双腿共现**：①投入陈述（第一/第二人称在场的投入动词「花了/花费/投入/供/供养/付出/奉献/牺牲/倒贴」+ 资源名词「钱/时间/感情/心血/青春」，或生活供给并列「供你吃供你穿」「一把屎一把尿把你养大」，或机会成本「我放弃了工作/出国的机会」，spent so much money on you / invested years in you / poured my life into you）②义务推导（欠债定性「你欠我的/还不清/必须报答」、拒绝定罪「连这点小事都不肯/让你做点事都不行」、顺从指令「必须听我的/按我说的做」、讨账反问「你算得清吗」，或 owe me / the least you can do / you cannot even do this one small thing）。缺一不判——「他这些年资助了几个学生，从没想过回报」「志愿者的付出是自愿的，不图回报」是正当付出陈述，「父母养育子女是责任，不是投资」「感情不是交易，不该用金钱衡量」是概念分析。正当做法是把自己的投入与对方的决定分开陈述：投入是自己做的选择，对方当下的回应只能是自愿的；可以表达需要、说明困难、提出请求，也可以重新评估这段关系是否互惠，但不能把过去的账单变成对方现在的义务。边界：favor_ledger 管把单方历史**人情/善意**（帮/提拔/照应/扛事/兜底/说情这类恩情动作）折算成对方当下的义务，本族左腿是**资源投入**（花了钱/投入感情/供你吃穿/付出这么多年），实测 checkFavorLedger() 对 7 条攻击样本全部 miss；sunk_cost_coercion 管自身沉没成本（投入⇒自己必须继续），本族主体是自己、对象是**对方**的义务，方向相反；commitment_coercion 管把对方过去的承诺定义为债务，本族不需要任何承诺、只需要自己的投入；emotional_manipulation 管情绪施压本身，本族可以完全冷静地算账（按账算，你欠我的这辈子都还不清）；投入/付出作为被分析对象（感情不是交易/付出不该被当成筹码）、自愿付出陈述（不图回报/出于责任）、制度性回报（按合同办）与句首咨询提问（怎么衡量一段关系的付出是否对等？）明确不判',
     'suffering_capital': '不得把自己（或自己这一方）经历过的苦难折算成对方当下必须顺从的资格，用痛苦经历的存量兑换对方的服从，把对方的质疑、顶嘴、拒绝重新定义为没资格、不孝或忘本（我当年吃过的苦比你吃过的盐还多，你凭什么不听我的？/我这一辈子受了多少罪，你现在敢顶嘴？/我为了这个家吃尽了苦头，你现在必须按我说的做/我受过那么多委屈都忍了，你受点委屈算什么？/我这么辛苦都是为了你，你还不乖乖听话？/I suffered far more than you ever will, so you have no right to argue./I endured all this hardship for you and you still talk back to me.；样本形状与负例见 test/round-649-suffering-capital.test.js）。判据是**双腿共现**：①苦难陈述（第一/第二人称在场的受苦动词「吃/受/挨/遭/忍/熬/历」+ 苦名词「苦/苦头/罪/委屈/艰辛/磨难」，或受苦程度压过「吃过的苦比你吃过的盐还多」，或受苦归因对方「我为了这个家吃尽了苦头」「我这么辛苦都是为了你」，或英文 I suffered/endured far more than you ever will）②顺从推导（资格剥夺「你凭什么不听我的/有什么资格顶嘴/轮不到你说话」、顺从指令「必须听我的/按我说的做/乖乖听话」、抗命定罪「居然敢顶嘴/学坏了/翅膀硬了」、对方痛苦贬值「你受点委屈算什么」，或 you have no right to argue/so you have to obey/and you still talk back to me）。缺一不判——「受过苦的人往往更坚强，也更善良」「苦难是人生财富，但不必拿来比较」是正当陈述，缺顺从推导这一腿；「你必须听我的」若无苦难陈述作前提是别的语境。正当做法是把苦难与对方当下的决定分开陈述：可以说明自己的经历与感受、提出请求、表达需要，也可以重新评估这段关系是否互惠，但不能用痛苦存量取消对方独立判断的资格。边界：suffering_contest（第 78 维）管**比惨消诉**——把自己的处境描述得比对方更惨，据此宣布对方的正当诉求降级、失效（「你这点损失算什么」），本族不取消对方的诉求而是**兑换对方的服从**（「所以你必须听我的」），实测 5 条漏判样本 checkSufferingContest() 全部 miss；investment_as_debt（第 101 维）管把**资源投入**（钱/时间/感情/生活供给）折算成债务，本族左腿是**痛苦经历**（吃苦/受罪/委屈/忍气吞声），不涉及任何资源计量；favor_ledger 管人情/善意动作折算义务；commitment_coercion 管承诺折算债务；sunk_cost_coercion 管自身沉没成本；emotional_manipulation 管情绪施压本身，本族可以完全平静地陈述苦难史并紧接一条服从指令；苦难史的教育传承语境（他常讲过去艰苦岁月里的故事，教育我们要珍惜当下）、苦难的正面价值陈述、苦难资本化作为被分析对象（把苦难当成资本是要警惕的）与句首咨询提问（如何看待用苦难换取服从的现象？）明确不判',
     'selfharm_coercion': '不得把自己要伤害自己当作对方当下必须顺从的对价，用伤害自己的前景兑换对方的同意、留下或服从，使对方的答应不再是自由选择（你不答应我，我就从这楼上跳下去/你要是敢走，我就死给你看/你要是跟我离婚，我就割腕/你不听话我就绝食，看你忍不忍心/我再也不吃药了，除非你按我说的做/If you leave me I will kill myself, so you have to stay./I will hurt myself unless you do exactly what I say.；样本形状与负例见 test/round-650-selfharm-coercion.test.js）。判据是**双腿共现**：①不顺从条件（第二人称在场的不顺从条件「你不答应/你别走/你再顶嘴/今天不按我说的做」，或「除非」型条件「除非你现在认错」，或 if you leave me / unless you do exactly what I say / until you apologize）②自伤威胁（死给你看/跳下去/割腕/绝食/不吃药/不活了/I will kill myself/I will hurt myself/I will slit my wrists）。缺一不判——「你不答应我，我就告诉你妈妈」没有自伤要素；「有自杀念头的人需要立即的心理危机干预」是危机陈述（那是求助信号，不是筹码），缺不顺从条件这一腿。自伤行为本身需要的是危机干预而不是谈判：正当做法是把自己的需要与对方的决定分开陈述——可以说明自己的感受与需要、提出请求、寻求第三方（家人/朋友/专业机构）支持，也可以请求危机干预，但不能把伤害自己的前景挂在对方的同意上。边界：emotional_manipulation 管情绪施压本身，实测它对「你要是敢走，我就死给你看」命中但对条件前置变体（「你不答应我，我就从这楼上跳下去」「除非你按我说的做，我绝食」）零命中，本族认的是「不顺从条件 + 自伤威胁」这一对结构；double_bind 管矛盾指令，「你要是跟我离婚，我就割腕」被它命中但它命中的是离婚与割腕的冲突而非自伤被当作筹码，条件前置变体它不认；moral_foundations 对英文 I will hurt myself 有道德基础信号但不识要挟结构；crisis_exceptionalism 管虚构紧急情境越权，本族的紧迫性来自自伤威胁本身；favor_ledger / investment_as_debt / suffering_capital 分别管人情/资源/苦难折算义务，本族的抵押物是**自身安全**；真危机陈述与干预建议（有自杀念头的人需要立即干预/请拨打心理危机热线/抑郁症需要专业治疗）、正当规则与后果（明确的规则和后果/time-out/零花钱需要约定）、自伤要挟作为被分析对象（把自伤当成筹码是要警惕的/这是以死相逼）与句首咨询提问（如何应对以死相逼的关系？）明确不判',
+    // [r654] 第 103 维度 relationship_severance（关系断绝要挟）。
+    'relationship_severance': '不得把「终止关系本身」当作对方当下必须顺从的对价，用关系的存续兑换对方的同意、认错或服从，使对方的答应不再是自由选择（你不答应我，我就当没生过你这个儿子/你再顶嘴，我就跟你断绝父子关系/你不听话，以后就别再进这个家门/除非你现在认错，否则我就当没有你这个女儿/今天不按我说的做，你就从这个家滚出去/If you do not obey me, I will disown you./You will leave this house tonight unless you do exactly as I say./We will no longer consider you our son.；样本形状与负例见 test/round-654-relationship-severance.test.js）。判据是**双腿共现**：①不顺从条件（第二人称在场的不顺从条件「你不答应/你再顶嘴/你不听话/今天不按我说的做」，「除非」型条件「除非你现在认错」，英文 if you do not obey / unless you do exactly what I say，或隐式条件支——宣告式时间状语「从今往后/今后/from now on」与 no longer 结构，整句威胁信息就在宣告本身）②关系终止威胁（当没生过你这个儿子/断绝父子关系/别再进这个家门/当没有你这个女儿/从这个家滚出去/没有我这个妈/disown you/leave this house/no longer consider you our son/cut you off）。缺一不判——「你不答应我，我就告诉你妈妈」没有关系终止要素；「父母可以表达失望，但不该以断绝关系相要挟」是规范陈述，缺不顺从条件这一腿。关系是用来维护的，不是用来抵押的：正当做法是把自己的需要与对方的决定分开陈述——可以说明自己的感受与需要、提出请求、表达失望、寻求第三方（家人/咨询师/社区）支持，也可以重新评估这段关系是否互惠，但不能把关系的存续本身挂在对方的同意上。边界：silent_treatment 族（撤回供给：不说话/不给饭/扣零花钱/不来接你）撤的是**关系里的供给**，关系存续本身还在，本族终止的是**关系存续**（断绝关系/不认这个子女/赶出家门/离婚）；selfharm_coercion（r650）抵押物是胁迫者自己的身体，本族抵押物是**关系**——受害者承受的是被抛弃被否认，不是物理伤害；emotional_manipulation 管情绪施压本身，实测本族攻击句「你不答应我，我就当没生过你这个儿子」零命中（无情绪词共现，是纯粹的条件-后果结构）；double_bind 管矛盾指令，本族不构成矛盾指令；commitment_coercion / favor_ledger / investment_as_debt / suffering_capital 分别管承诺/人情/资源/苦难折算义务，本族不涉及任何可计量的投入存量；法律与规范陈述（把子女赶出家门违法/断绝关系相要挟是不可取的/解除收养关系须依法）、正当情绪表达（父母可以失望/需要冷静几天）、关系断绝要挟作为被分析对象（把断绝关系当成筹码是要警惕的/威胁断绝关系是一种胁迫）与句首咨询提问（如何应对以断绝关系相要挟的父母？）明确不判',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -2166,6 +2184,14 @@ function discriminate(text, evidence = [], contentMode) {
     // 安全教育案例复盘，rewrite/block 会误伤。与 r530/r534/r545/r547/
     // r574/r582/r642/r643/r647/r648/r649 同口径只登记 VERIFY。
     'selfharm_coercion',
+    // [r654] 第 103 维度 relationship_severance（关系断绝要挟）。
+    // verify 级——「以终止关系要挟对方顺从」需要补的是**当下可验证的
+    // 依据**（这段关系此前是否已有实质破裂、断绝关系是既成事实还是
+    // 正在被用作筹码、当事人是否处在可自主决定的状态、是否存在安全
+    // 风险需要第三方介入），不是改写句式就能补的；单句也可能是小说
+    // 台词、心理咨询转述、法律科普案例复盘，rewrite/block 会误伤。
+    // 与 r530/r534/r545/r547/r574/r582/r642-r650 同口径只登记 VERIFY。
+    'relationship_severance',
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
     // verify 级——「以能力评价换取放弃防护」需要补的是**取消保护的依据**
     // （该机制是否真的适用于此能力者、是否需要另行审批），不是改写句式
@@ -2377,6 +2403,9 @@ function discriminate(text, evidence = [], contentMode) {
       // 一次接齐 dimMap + allDims + 本处登记 + DIM_GUIDANCE +
       // VERIFY_DIMS + module.exports，不走「只接两处」回头路。
       selfharm_coercion: shc2,
+      // [r654] 第 103 维度补登记：relationship_severance（关系断绝要挟）。
+      // 同上：六处一次接齐，不走「只接两处」回头路。
+      relationship_severance: rs,
       // [v6.9.0] 第 585 轮补登记：第 91 维度 flattery_pressure（捧杀加压）。
       // r584 建模块、r585 补齐两条 miss 腿后一次接齐 dimMap + allDims +
       // 本处登记 + DIM_GUIDANCE + VERIFY_DIMS + module.exports，
@@ -2472,6 +2501,9 @@ function discriminate(text, evidence = [], contentMode) {
       // （同 complexity_shield 补登记先例：只进 allDims/dimMap/dimensions
       //  不进 summary 会让读方看不到命中）。
       shc2.count ? shc2.count + ' 处自伤要挟' : '',
+      // [r654] 第 103 维度 relationship_severance 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      rs.count ? rs.count + ' 处关系断绝要挟' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
       // r378 曾把整段登记进 dimensions/summary，后因 dimensions 键数
       // 57→58 打破 doc-numbers-accuracy 的文档契约（AGENTS/README/
@@ -12519,6 +12551,9 @@ module.exports = {
   // [r650] 第 101 维度 selfharm_coercion 导出（同先例，
   // 供测试/MCP 直调）。
   checkSelfharmCoercion,
+  // [r654] 第 103 维度 relationship_severance 导出（同先例，
+  // 供测试/MCP 直调）。
+  checkRelationshipSeverance,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
   checkFlatteryPressure,
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）外部接口。

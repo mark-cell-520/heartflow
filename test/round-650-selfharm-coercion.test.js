@@ -136,12 +136,13 @@ t('C5 维度总数接线正确（r650 实测口径，stash 对照 HEAD 验证）
   // 守卫 measure() 用 `discriminate('neutral baseline text')` 的
   // `Object.keys(d.dimensions).length`（**裸键数，不减 evidence**）比对
   // 三份文档的 dimensions 数字。HEAD 时裸键 101 → 文档 101（r649 绿）；
-  // 本轮接入 selfharm_coercion 后裸键 102 → 文档 102。
+  // r650 接入 selfharm_coercion 后裸键 102；r654 接入
+  // relationship_severance 后裸键 103 → 文档 103。
   // 本测试文件首版自己减了 1（把 evidence 当非维度键），算出 101 与守卫
   // 差 1——**这是本测试自己的口径偏差，不是引擎/文档错**。以守卫口径为准。
   const probe = idx.discriminate('probe').dimensions;
   const total = Object.keys(probe).length;
-  assert.strictEqual(total, 102, `当前 ${total}`);
+  assert.strictEqual(total, 103, `当前 ${total}`);
   assert.ok('selfharm_coercion' in probe, 'probe 应含 selfharm_coercion');
   assert.ok('suffering_capital' in probe, 'probe 应含 suffering_capital（r649）');
   assert.ok('investment_as_debt' in probe, 'probe 应含 investment_as_debt（r648）');
