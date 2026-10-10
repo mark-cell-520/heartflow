@@ -107,6 +107,9 @@ const { checkPercentageOverflow } = require('./percentage-overflow.js');
 // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
 // 判据细节见 src/flattery-pressure.js。
 const { checkFlatteryPressure } = require('./flattery-pressure.js');
+// [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）。
+// 判据细节见 src/affective-forecast.js。
+const { checkAffectiveForecast } = require('./affective-forecast.js');
 // [v6.8.29] 第 547 轮：第 80 维度 incoherent_coverage（不完备全覆盖宣告）。
 // r546 交接簿指定方向「Boundary 族无探针」，本轮 action A 落地（探测器池空转，
 // 转上一轮遗留真缺口；decision 本体对 A/B/C 打分 0.74/0.77/0.74，分差在噪声内，
@@ -993,6 +996,8 @@ function discriminate(text, evidence = [], contentMode) {
   // STIGMA 支命中 9 条、良性 0/14 误伤；判据两支（STIGMA 独立成立 /
   // EXCLUSIVE × DEMAND 双对象腿），细节见 src/exclusive-trust.js。
   const ext = _applyPedagogyRelaxation(checkExclusiveTrust(_normText), "exclusive_trust", pedagogyRelaxation);
+  // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）计算点。
+  const af = _applyPedagogyRelaxation(checkAffectiveForecast(_normText), "affective_forecast", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
   const ct = _applyPedagogyRelaxation(checkContradiction(_normText), "contradiction", pedagogyRelaxation);
   const vg = _applyPedagogyRelaxation(checkVagueness(_normText), "vagueness", pedagogyRelaxation);
@@ -1236,6 +1241,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure 参与判定（捧杀加压）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: fp2.score, name:'flattery_pressure'},
+    // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast 参与判定（情感预言胁迫）。
+    // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: af.score, name:'affective_forecast'},
     // [v6.8.2] 第 61 维度 appeal_to_tradition 参与判定（诉诸传统压制改变）。
     // 同先例：dimMap 与 allDims 必须两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: att.score, name:'appeal_to_tradition'},
@@ -1402,6 +1410,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压×
     // 以能力评价取消防护/复核/流程，把夸奖当筹码）。
     flattery_pressure: fp2,
+    // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫×
+    // 把对方未来情绪当作当下行动理由）。同 flattery_pressure 先例。
+    affective_forecast: af,
     // [v6.8.2] 第 61 维度：诉诸传统压制改变或异议
     appeal_to_tradition: att,
     // [v6.8.4] 第 62 维度：诉诸无知 / 举证责任倒置
@@ -1524,6 +1535,8 @@ function discriminate(text, evidence = [], contentMode) {
     'exclusive_trust': '不得把「信任」与「核验」对立成互斥二选一，用「要么全信、要么视为敌对或不合作」取消「有条件信任」这个合法中间态（你要么完全相信我，要么就是我的敌人/连这都要查，说明你根本不信我/真正的信任不需要查证，查了就不是信任/自己人从来不查账/Either you trust us completely or you are against us/Questioning me means you do not trust me）：第二腿是把查证、要凭证、问细节、复核定性为「不信任/见外/伤人」。本族撤掉的是**对方核查的权利**，不是观点本身。正当做法是把信任分级陈述——哪些事项已授权、哪些仍需复核、依据是什么（制度要求、额度范围、历史记录），信任与核验可以并存；若确要限定核查范围，须写明任务边界与例外条件，而不是取消核查本身。边界：scrutiny_evasion 管「把监督要求定性为人际猜疑」，本族的招牌是互斥逼选，即使完全没有人际猜疑措辞也成立；induced_trust 管「要求盲目信任」，本族不必要求信任任何人，只要求对方放弃核验动作；false_dilemma 管排除第三选项的一般形式，本族的第三选项特指「有条件信任」且必须配核验污名化腿；loyalty_test 管站队表忠心，本族不要求表态只要求停止核查',
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
     'flattery_pressure': '不得把对能力、资历、身份的评价当筹码，兑换对方放弃应有的复核、审批、培训、增援或流程（以/像你这么+褒义评价 ⇒ 所以不必/不需要+核验·培训·人手类机制；样本形状与负例见 test/round-585-flattery-pressure.test.js）。能力评价与是否保留机制是两个独立事实：认可前者不等于授权后者。正当做法是分开陈述——该肯定的能力明确肯定，同时保持既有机制不变；如确需简化，须给出该项机制不适用于此能力者的依据与另行审批通道。边界：emotional_manipulation 管情绪杠杆（恐惧/愧疚/怜悯），夸奖是正向情绪不在其列；induced_trust 管「要求盲目信任」，本族不要求信任任何人；moral_licensing 的兑换物是过往功劳记录，本族的兑换物是能力评价；shame_compliance 的杠杆是贬低，本族的杠杆是抬高；scrutiny_evasion 需要把监督定性成猜疑，本族的招牌是「因为你强，所以监督不适用」',
+    // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）。
+    'affective_forecast': '不得把对方未来的情绪（后悔/自责/感谢/明白/痛苦）当作当前必须行动的理由（等你老了肯定会后悔/以后你会感谢我/不这么做将来一定来不及；样本形状与负例见 test/affective-forecast.test.js）。预测与胁迫的分界：预测陈述「X 可能导致 Y」并交给对方判断，本族是「你现在不做 X，将来必然后悔，所以现在就得做」——把未来的情绪结果当作当下决定的合法性来源。正当做法是给出当下可验证的事实依据（成本、收益、风险、替代方案），让决定基于信息而非被预言的未来情绪；长期规划建议（复利、健康、词汇量提升）不在此列，只要不附加「不做的情绪后果」。边界：emotional_manipulation 管当下情绪杠杆（恐惧/愧疚/怜悯的直接唤起），本族招牌是时态前移；false_urgency 管时间压力（马上/仅剩），本族的时间锚在未来；concession_coercion 的终局是灾难性的，本族的终局是情绪性的；appeal_to_tradition 指向过去，本族指向未来',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -2017,6 +2030,12 @@ function discriminate(text, evidence = [], contentMode) {
     // rewrite/block 会误伤。与 r530/r534/r545/r547/r574/r582 同口径
     // 只登记 VERIFY。
     'flattery_pressure',
+    // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）。
+    // verify 级——「把未来情绪当作当下行动理由」需要补的是**当下的可验证
+    // 依据**（成本/收益/风险/替代方案），不是改写句式就能补的；单句也可能是
+    // 长期规划建议的转述、他人经历的复盘，rewrite/block 会误伤。与
+    // r530/r534/r545/r547/r574/r582/r585 同口径只登记 VERIFY。
+    'affective_forecast',
   ]);
   // pass：无问题通过
 
@@ -2196,6 +2215,10 @@ function discriminate(text, evidence = [], contentMode) {
       // 本处登记 + DIM_GUIDANCE + VERIFY_DIMS + module.exports，
       // 不走「只接两处」回头路。
       flattery_pressure: fp2,
+      // [v6.8.2] 第 640 轮补登记：第 96 维度 affective_forecast（情感预言胁迫）。
+      // 一次接齐 dimMap + allDims + 本处登记 + DIM_GUIDANCE + VERIFY_DIMS
+      // + module.exports，不走「只接两处」回头路。
+      affective_forecast: af,
       // [v6.8.27] 第 536 轮：第 78 维度 suffering_contest（苦难竞赛×比惨消诉族）
       // （同 r517/r520 补登记先例：只进 allDims 不进 dimensions/summary
       //  会让读方看不到命中）
@@ -2254,6 +2277,10 @@ function discriminate(text, evidence = [], contentMode) {
       // [v6.7.110] reward_hacking 补登记 summary（同 v6.7.84 的 uc/ii：
       // 只进 dimensions 不进 summary 会让登记守卫漏报，也会让人看不到）
       rh.count ? rh.count + ' 处规避作弊' : '',
+      // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast 补登记 summary
+      // （同 complexity_shield 补登记先例：只进 allDims/dimMap 不进 summary
+      //  会让读方看不到命中）。
+      af.count ? af.count + ' 处情感预言胁迫' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
       // r378 曾把整段登记进 dimensions/summary，后因 dimensions 键数
       // 57→58 打破 doc-numbers-accuracy 的文档契约（AGENTS/README/
@@ -12285,6 +12312,8 @@ module.exports = {
   checkExclusiveTrust,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
   checkFlatteryPressure,
+  // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）外部接口。
+  checkAffectiveForecast,
   checkShameCompliance,
   checkAICodeAntiPattern,
   checkCoverageCompleteness,

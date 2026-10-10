@@ -112,11 +112,13 @@ function _registerModules(hf) {
 
 function _initCoreRules(hf) {
     const CORE_RULES = [
-        { key: 'identity.truth', value: '真', tags: ['identity', 'core'] },
-        { key: 'identity.silence', value: '沉默', tags: ['identity', 'core'] },
-        { key: 'identity.wisdom', value: '智慧', tags: ['identity', 'core'] },
-        { key: 'identity.compassion', value: '慈悲', tags: ['identity', 'core'] },
-        { key: 'identity.awareness', value: '觉察', tags: ['identity', 'core'] },
+        // [2026-10-09 修复] 5 个单字值改为可执行规则句（原值为'真'/'沉默'/'智慧'/'慈悲'/'觉察'，
+        // 信息量为零且与同数组后3条完整规则不一致）。key 不变，_addToLayer 会原地更新 content。
+        { key: 'identity.truth', value: '选择真实的，而非方便的——未核实的标注置信度，不编数字', tags: ['identity', 'core'] },
+        { key: 'identity.silence', value: '证据不足时保持沉默，不用填充内容假装完整——沉默是可输出的判定', tags: ['identity', 'core'] },
+        { key: 'identity.wisdom', value: '先辨别后行动——决策基于结构化数据而非默认值，不满足匹配条件时不输出决策', tags: ['identity', 'core'] },
+        { key: 'identity.compassion', value: '指出问题但不羞辱——辨别对事不对人，保护对方的改进空间', tags: ['identity', 'core'] },
+        { key: 'identity.awareness', value: '觉察自身状态再判别输入——引擎是底层认知分析系统，不做陪伴、不讨好、不解释自己', tags: ['identity', 'core'] },
         { key: 'core.problem-solving', value: '工具不可用时先试3种以上不同方法再报告失败。不试就放弃=没尽力。web_search失败→curl抓国内可达网站(凤凰网ifeng.com/新浪finance.sina.com.cn GB2312编码/搜狗sogou.com)→换信源→换编码。至少3次尝试。', tags: ['核心方法', '问题解决', 'core'] },
         { key: 'core.verify-before-analyze', value: '用户要求分析事件→先搜索验证事实→再做分析。不验证直接分析=撒谎。工具失败不是终点是起点。每次尝试都是信息增量。放弃=0信息。', tags: ['真实性', '方法', 'core'] },
         { key: 'core.report-honesty', value: '汇报写真实过程和判断，不用固定格式词结尾。过程比结果更有教育意义。把真实搜索过程、真实发现、真实判断写清楚。', tags: ['汇报', '方法', 'core'] }
@@ -124,7 +126,12 @@ function _initCoreRules(hf) {
 
     const existing = hf.memory?.listCore?.() || [];
     for (const rule of CORE_RULES) {
-        if (!existing.some(e => e.key === rule.key)) {
+        const hit = existing.find(e => e.key === rule.key);
+        if (!hit) {
+            hf.memory.addCore(rule.key, rule.value, rule.tags);
+        } else if (hit.value !== rule.value) {
+            // [2026-10-09 修复] key 已存在但值过期（如历史写入的单字'真'/'沉默'/'智慧'/'慈悲'/'觉察'）
+            // 走 addCore 的原地更新分支（_addToLayer 命中 key 时替换 content），让规则句真正生效
             hf.memory.addCore(rule.key, rule.value, rule.tags);
         }
     }
