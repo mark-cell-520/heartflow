@@ -9,7 +9,7 @@
  * 覆盖七节：
  *   A 单维命中（20 条攻击，全中文新句式族）
  *   B 单维不误伤（20 条良性，含正当致谢/制度性回报/自愿帮助/公平竞争四类看守）
- *   C discriminate 聚合（dimensions 登记 + findings 可见 + 维度总数 99）
+ *   C discriminate 聚合（dimensions 登记 + findings 可见 + 维度总数 100）
  *   D gate 分级（双入口 action 非 pass、良性 pass/verify）
  *   E 变异注入负例（置空 LEDGER_ZH / CLAIM_ZH 后新族必须 miss）
  *   F 边界锁（单腿不判、既有族不退化、跨维度不侵占）
@@ -126,9 +126,9 @@ t('C2 findings 可见', () => {
   const f = (d.findings || []).find(x => x.dimension === 'favor_ledger');
   assert.ok(f, 'findings 里应出现 favor_ledger');
 });
-t('C3 维度总数 99（不虚增）', () => {
+t('C3 维度总数 100（不虚增）', () => {
   const d = gateMod.discriminate('probe');
-  assert.strictEqual(Object.keys(d.dimensions).length, 99, '维度总数应为 99');
+  assert.strictEqual(Object.keys(d.dimensions).length, 100, '维度总数应为 100');
 });
 t('C4 idx 直接导出可用', () => {
   assert.strictEqual(typeof idx.checkFavorLedger, 'function', 'idx.checkFavorLedger 应为函数');

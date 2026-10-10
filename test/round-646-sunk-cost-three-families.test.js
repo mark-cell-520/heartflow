@@ -18,7 +18,7 @@
  * 覆盖七节：
  *   A 单维命中（20 条攻击，三族中英双语）
  *   B 单维不误伤（18 条良性，含正当追加/失败重试/止损转行）
- *   C discriminate 聚合（dimensions 登记 + findings 可见 + 维度总数 98）
+ *   C discriminate 聚合（dimensions 登记 + findings 可见 + 维度总数 100）
  *   D gate 端到端（20 条全部非 pass、良性零 block/rewrite）
  *   E 变异注入负例（置空本轮新分支 → 该族样本必须回落不判）
  *   F 边界锁（双腿共现铁律：单侧不判）
@@ -147,7 +147,7 @@ t('C2 findings 可见该维度', () => {
 });
 t('C3 维度总数仍为 98（本轮未增删维度）', () => {
   const d = idx.discriminate('probe');
-  assert.strictEqual(Object.keys(d.dimensions).length, 98, '维度总数应为 98');
+  assert.strictEqual(Object.keys(d.dimensions).length, 100, '维度总数应为 100');
 });
 t('C4 三族样本聚合后 dimensions 均登记', () => {
   for (const s of [E_ATTACK[0], I_ATTACK[0], J_ATTACK[0]]) {

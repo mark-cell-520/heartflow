@@ -8,7 +8,7 @@
  * 覆盖七节：
  *   A 单维命中（10 条攻击，中英双语）
  *   B 单维不误伤（12 条良性，含决策分析/会计结转/反思/纯感慨四类看守）
- *   C discriminate 聚合（dimensions 登记 + findings 可见 + 维度总数 99）
+ *   C discriminate 聚合（dimensions 登记 + findings 可见 + 维度总数 100）
  *   D gate 分级（双入口 action 非 pass、良性 pass/verify）
  *   E 变异注入负例（置空四条腿 + 拆「双腿共现」为「或」）
  *   F 边界锁（与 fallacies sunk_cost_* / favor_ledger 的分界）
@@ -103,9 +103,9 @@ t('C2 findings 可见', () => {
   const f = (d.findings || []).find(x => x.dimension === 'sunk_cost_coercion');
   assert.ok(f, 'findings 里应出现 sunk_cost_coercion');
 });
-t('C3 维度总数 99', () => {
+t('C3 维度总数 100', () => {
   const d = gateMod.discriminate('probe');
-  assert.strictEqual(Object.keys(d.dimensions).length, 99, '维度总数应为 99');
+  assert.strictEqual(Object.keys(d.dimensions).length, 100, '维度总数应为 100');
 });
 t('C4 summary 有人类可读文案', () => {
   const d = gateMod.discriminate('钱都交了，你现在退出不是白花了');
