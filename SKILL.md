@@ -5,7 +5,7 @@ version: "6.8.1"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  95 discrimination dimensions × 11-layer pipeline × 161 modules ×
+  96 discrimination dimensions × 11-layer pipeline × 161 modules ×
   67 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
@@ -87,7 +87,7 @@ from marketing copy.
 | Modules registered | 161 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,314 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 95 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 96 | `dimMap` keys in `src/index.js` |
 | MCP tools | 67 | tool definitions exposed via `tools/list` |
 | Test suite | 18,157 passing / 105 failing | `node test/run-all.js` |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -95,7 +95,7 @@ from marketing copy.
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
 Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
-a `rewrite`, **54 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **55 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -263,7 +263,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 **Rewrite-level (11):** emotional_manipulation, gaslighting, double_bind, victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust, instrumental_reasoning, agency_deflection, multi_turn_escalation
 
-**Verify-level (47):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, cost_externalization, harm_invalidation, performative_responsibility, suffering_contest, percentage_overflow
+**Verify-level (55):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, cost_externalization, harm_invalidation, performative_responsibility, suffering_contest, percentage_overflow, incoherent_coverage, responsibility_absolution, procedural_burden, selective_minimization, anecdote_as_proof, exclusive_trust, flattery_pressure, unresolved_conflict, equivocation_sense_shift, affective_forecast
 
 **Scored but not action-forcing:** evidence, moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary, meta_cognition, theory_of_mind, counterfactual, social_norm, capability_overclaim, goal_misalignment, instrumental_reasoning, ai_writing_tell, bullshit_recognition
 

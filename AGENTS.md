@@ -12,7 +12,7 @@ wrong.
 HeartFlow adds the discrimination layer, so your agent doesn't just *say* things — it
 says things that are *right*.
 
-**Zero LLM dependency.** 95 dimensions, 161 modules, 67 MCP tools, 1,314 dispatch
+**Zero LLM dependency.** 96 dimensions, 161 modules, 67 MCP tools, 1,314 dispatch
 routes. Pure rule engine.
 
 > **Numbers below were measured by `scripts/measure-claimed-numbers.js` (v6.7.77),
@@ -108,11 +108,11 @@ The three entry points above are wrappers around these, which `main`
 `verdict` is derived from `gate.action`, so the two cannot contradict each other. If you
 read only one field, read `gate.action`.
 
-## The 95 dimensions
+## The 96 dimensions
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
-> `VERIFY_DIMS` sets in `src/index.js` (v6.8.28 recount)。** The three tiers
-> add up to 82; the remaining 10 dimensions are scored but do not force a gate action.
+> `VERIFY_DIMS` sets in `src/index.js` (v6.8.2 recount — affective_forecast added as dimension 96)。** The three tiers
+> add up to 85; the remaining 11 dimensions are scored but do not force a gate action.
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security,
 deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
@@ -122,7 +122,7 @@ indirect_injection, reward_hacking
 victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust,
 instrumental_reasoning, agency_deflection, multi_turn_escalation
 
-**Verify-level (54):** appeal_to_authority, vagueness, contradiction, sycophancy,
+**Verify-level (55):** appeal_to_authority, vagueness, contradiction, sycophancy,
 confidence, fallacies, presupposition, empty_answer, info_deprivation,
 false_equivalence, hasty_generalization, slippery_slope, whataboutism,
 pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith,
@@ -136,7 +136,7 @@ cost_externalization, harm_invalidation, performative_responsibility,
 suffering_contest, percentage_overflow, incoherent_coverage,
 responsibility_absolution, procedural_burden, selective_minimization,
 anecdote_as_proof, exclusive_trust, flattery_pressure,
-unresolved_conflict, equivocation_sense_shift
+unresolved_conflict, equivocation_sense_shift, affective_forecast
 
 Dimensions that are scored but do not force a gate action: evidence,
 moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary,

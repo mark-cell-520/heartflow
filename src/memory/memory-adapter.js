@@ -104,6 +104,9 @@ class MemoryAdapter {
       existing.summary = String(value).slice(0, 120);
       existing.metadata.tags = [...new Set([...(existing.metadata.tags || []), ...tags])];
       existing.updatedAt = now;
+      // [2026-10-09 修复] 原地更新分支此前漏掉持久化，导致规则句只改内存不落盘，
+      // 重启后磁盘旧值（单字碎片）被重新读回，修复永远不生效
+      this._mm._autoSave();
       return { success: true, key, tier: layer.toUpperCase(), updated: true };
     }
 
