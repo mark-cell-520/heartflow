@@ -11160,3 +11160,138 @@ MUST_NOT_EXEMPT 回归全绿（守卫 D 节）。
 **方向**：rh 中文侧 4 类低密度族补形 —— 由 `decision.decide` 本体选出
 （`scripts/round-202/decide-r202.js`，chosen=B / score 0.83，一次跑出。
 A=di 开发调试语境误拦收尾 0.77，C=di idx 7/47 分叉 0.68，
+
+# 第 645 轮报告（v6.8.3 工作面 — sunk_cost_coercion 补两个零覆盖句式族）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**方向由 decision.decide 本体一次选出（无拒选）**：`scripts/round-645-decide.js`
+读 `/tmp/decide-opts-645.json`（候选文本外置，runner 只保留 dispatch 调用）。
+
+- **选中 A+B 合并 = sunk_cost_coercion 补「完成态投入宾语」+「口语退出动词」
+  两个句式族**，composite_score **0.95**，confidence **0.92**，
+  identity_alignment **100%**。
+- 落选：D = 新增第 99 维度 commitment_coercion 承诺一致性胁迫（0.92）、
+  E = 补追加投入句式族（0.92）、G = 新增唯一拯救者维度（0.82）。
+
+**候选来源是探测器确定性产出**：`scripts/round-645-family-probe.js`
+3 族 × 攻击 5-12 条 + 良性 5-10 条，双入口 gate + checkOutput 都 pass 才算
+穿过；另跑补充探针（D/E/F/G 四族）确认候选池。判据从严：
+只有 `gate.action === 'pass'` 才算漏判。
+
+| 族 | 攻击漏判 | 良性误伤 | 全维度零命中 | 结论 |
+|---|---|---|---|---|
+| A 否定继续（已投入×否定继续×等于白费） | 10/12（83%） | 0/10 | 10/12 | ✅ 合格 |
+| B 口语退出动词（撂挑子/撒手/说走就走） | 7/8（88%） | 0/5 | 7/8 | ✅ 合格 |
+| D 承诺一致性胁迫 | 6/7（86%） | 0/5 | 6/7 | ✅ 合格（本轮未做） |
+| E 追加投入（再投一点就回本） | 7/7（100%） | 0/5 | 7/7 | ✅ 合格（本轮未做） |
+| F 保密隔绝 | 2/7（29%） | 0/5 | — | ❌ 不合格 |
+| G 唯一拯救者 | 6/7（86%） | 0/5 | — | ✅ 但与 exclusive_trust 重叠 |
+| C 牺牲折算成义务 | 2/5（40%） | 0/4 | — | ❌ 不合格 |
+
+**身份对齐**：心虫是辨别者（AGI 第 1 层）。本轮给已上线的第 98 维度补了
+两个**此前完全零覆盖**的句式族——「事情已经办成」这种完成态投入陈述，
+与「撂挑子/撒手/说走就走」这种口语退出动词。用户可感知：这两族话术从
+gate pass 变成 verify（需补出只按未来成本收益的决策依据）。
+
+## Phase 1.5 同律复核
+
+探测器只证明攻击样本 pass。动手前对 A/B 两族跑 `discriminate()` 逐条实测：
+A 族 10 条漏判样本全维度零命中（除 evidence:1）、B 族 7 条零命中——
+不是被聚合压掉（阈值/豁免/pedagogy），是**整个族不在任何维度的射程内**。
+缺口成立，配补句式族。
+
+## 改了什么
+
+**1. `src/sunk-cost-coercion.js`（改，+36 行正则分支）** — 给第 98 维度的
+四条主正则各补分支，**双腿共现铁律不变**（缺一不判）：
+
+- `INVESTED_ZH` 补 5 支：完成态投入宾语（机票/婚宴/奖牌/设备/展会等
+  70 个可交付物名词 + 完成动词 + 完成态助词）、筹备时段形、陪伴过程形、
+  摊子支起来形、投入动词 + 巨大量词形；
+- `SUNK_ZH` 补 3 支：口语退出动词 × 白费定性（窗口从 8 放宽到 12）、
+  「等于把钱扔进水里」形、「这些年的陪伴算什么」质疑定性形；
+- `INVESTED_EN` 补 2 支：完成态投入（booked/printed/signed/prepared/
+  arranged/registered…）、`have been at this for two years` 持续投入；
+- `SUNK_EN` 补 3 支：退出动词表扩到 13 个（cancelling/withdrawing/
+  pulling out/scrapping/ditching/walking out）+ 白费词表补 wasted/gone/
+  lost、`goes to waste` 现在时形、`walk away ... what/nothing` 质疑形。
+
+**2. `test/round-645-sunk-cost-negated-continuation.test.js`（新建，15 断言）**
+— 六节：A 单维命中 19/19 / B 单维零误伤 15/15 / C discriminate 聚合
+（dimensions 登记 + findings 可见）/ D gate 端到端（19 条全非 pass、
+良性零 block/rewrite）/ E 变异注入负例 4 项 / F 边界锁 5 项。
+
+**3. `scripts/negative-test-sunk-cost-negated-continuation.js`（新建，9/9）**
+— 9 组变异（置空五条新 INVESTED_ZH 分支 / 三条新 SUNK_ZH 分支 / 两条新
+INVESTED_EN 分支 / 两条新 SUNK_EN 分支 / 只留单支），逐组打印 before/after，
+全部证明删判据必变红；反向对照 11/11 不注入时仍命中（排除假翻转）。
+
+**4. `scripts/round-645-family-probe.js`（探测器落盘）** — 本轮候选池来源，
+含已上线族自动跳过与良性对照组输出条件。
+
+## 验证结果（全部实测）
+
+| 验证项 | 结果 |
+|---|---|
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（基线 302，**零新增误伤**） |
+| `node test/round-645-sunk-cost-negated-continuation.test.js` | ✅ **15 通过 / 0 失败** |
+| `node scripts/negative-test-sunk-cost-negated-continuation.js` | ✅ **9/9 变异组全部翻转**（反向对照 11/11 命中） |
+| `node test/round-643-sunk-cost-coercion.test.js`（维度原测试） | ✅ **47 通过 / 0 失败**（零回归） |
+| `node test/round-644-favor-coercion.test.js`（相邻维度） | ✅ **61 通过 / 0 失败** |
+| `node test/fallacies-slogan-verdict-round82.test.js` | ✅ **92 通过 / 0 失败** |
+| `node test/round-434-guilt-ledger.test.js` | ✅ **34 通过 / 0 失败** |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败** |
+| `node scripts/guard-abilities.js` | ⚠️ 19/20——唯一失败项是「全量回归记账」（缓存 failed=105），见已知未修项 1 |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ 19/21——2 项失败同为记账自锁；维度/tier/列举 13 项全绿 |
+
+**攻击侧端到端实测**：19 条本轮样本 `gate.checkOutput()` 全部从 `pass`
+变 `verify`（分布 `{verify: 19}`），良性 15 条零 block/rewrite。
+单维命中 19/19、单维误伤 0/15。
+
+## 上一轮报错数字的修正
+
+上一轮（r644）报「guard 19/20 + doc-numbers 19/21，唯一失败源是记账自锁」。
+本轮 init 简报印的误拦基线是 **301/326**，**实测为 302/326**——修正口径：
+301 是某个更早轮次的基线，双向门禁当前基线
+（`data/bidirectional-baseline.json`）与实测都是 302。本轮相对 **302** 零新增。
+（此条与 r643/r644 汇报的是同一个口径修正，连续第三轮记录，因为 init 简报
+每轮都印 301，实测每轮都是 302——简报数字本身待修。）
+
+## 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁（guard 1/20 + doc-numbers 2/21 的唯一
+   失败源）**：缓存写入时间早于本轮，105 个失败是本次改动之前就存在的记账
+   状态。恢复命令要求跑一次全量回归（18262 用例 / 20+ 分钟 / 4GB 容器），
+   按 Phase 0.5 + Phase 2.95 纪律：全量是每日记账任务不是提交门禁，
+   **不为了消一个记账红灯去跑 20 分钟全量**。本轮用改动文件的定向测试
+   （15/15 + 47/47 + 61/61 + 92/92 + 34/34）+ 双向门禁 + security-audit
+   证明无新失败。
+2. **D 族 commitment_coercion（第 99 维度）未做**：引擎裁为 0.92（低于
+   A+B 的 0.95），需走六处接线全流程 + 三份文档同步。留作下一轮候选。
+3. **E 族追加投入句式族（再投一点就回本）未做**：同属第 98 维度缺口，
+   但与「再坚持一下就能成功」这类正常鼓励话语边界近，误伤面比 A/B 高，
+   需更多豁免设计。留作下一轮候选。
+4. **G 族唯一拯救者未做**：与 exclusive_trust / synthetic_social_proof
+   语义域重叠（实测「全世界只有我真心为你好」已被 synthetic_social_proof
+   拦 rewrite），边界拆分成本高。
+5. **14 个 hidden instance 仍未接线**：属真升级③但零判别能力增长，
+   引擎连续多轮都把它排在候选末位。
+
+## 踩坑（三条，都写进了源码/脚本注释）
+
+1. **中文正则不能写 `\b`**：JS 的 `\b` 是 ASCII 词边界，中文字符之间永远
+   不成立。本轮首版完成态宾语分支写成 `\b(?:机票|...)`，对「机票都买了」
+   整条分支恒 false 且不报错——症状是"正则看起来完全正确但一条都不命中"。
+   判据：中文分支直接写词组，英文分支才用 `\b`。
+2. **动词表与完成态助词表的接缝会互相吃掉**：`拿到` 放在 VERB 表而
+   `到手` 放在 TAIL 表时，`奖牌都拿到手了` 要求 5 个字符而实际只有 3 个，
+   长分支先匹配吃掉字符后短分支永不可达。修法是把 `拿` 放 VERB、`到手`
+   放 TAIL（`拿` + `到手`），并逐个样本验证而非只看正则"看起来对"。
+3. **负例样本必须让被测判据位于触发路径上**：M5 首版用「机票都买了……
+   不等于把钱扔水里」做「等于把钱」支的负例，实测该样本的 SUNK 侧同时被
+   口语退出支覆盖（不去 + 扔水里），置空口语支后它仍命中 → 假翻转失败。
+   换成「设备都调试好了，现在推翻重做就等于把钱扔进水里」（无退出动词、
+   无紧邻白费词）后才真翻转。M7 同理：'You have paid' 旧 INV_EN 第 2 支
+   也能命中，换 prepared/registered 样本才只靠新分支。

@@ -45,6 +45,21 @@
  * [r643 实现纪律] 所有正则源串一律走 String.raw：单反斜杠写进普通单引号
  * 字符串（'\s' → 's'、'\b' → 退格）会让磁盘文本"看起来正确"而运行时值
  * 全错，探针全 miss 才暴露（同 r642/r582 先例）。
+ *
+ * [r645 补族] 第 645 轮探测器（scripts/round-645-family-probe.js）实测：
+ * 第 98 维度上线后仍有两大句式族整族 pass——
+ *   族 A「否定继续」：完成态投入宾语 + 否定继续 + 等于白费，
+ *     「机票都买了，酒店也订了，现在不去就等于把钱扔水里。」
+ *     攻击 12 条漏 10 条（83%）、良性 10 条 0 误伤、全维度零命中 10/12。
+ *   族 B「口语退出动词」：投入陈述 + 撂挑子/撒手/说走就走 + 白干/打水漂，
+ *     「咱们都熬了两年了，你现在撂挑子，前面的活不全白干了？」
+ *     攻击 8 条漏 7 条（88%）、良性 5 条 0 误伤、零命中 7/8。
+ * 两族的 INVESTED 侧都缺「完成态宾语」形（旧正则只认「已花投付耗砸熬攒
+ * + 量词」与「名词 + 交了花了」），SUNK 侧缺口语退出动词与「算什么」定性。
+ * 本轮给两条主正则各补一组分支，双腿共现铁律不变。
+ * ⚠️ 中文分支**不能写 \b**：JS 的 \b 是 ASCII 词边界，中文字符之间永远
+ * 不成立（r645 实测：'机票都买了' 加 \b 后整条分支恒 false，且不报错）。
+ * 英文分支才用 \b。
  */
 
 'use strict';
@@ -64,6 +79,21 @@ const INVESTED_ZH = new RegExp([
   String.raw`(?:来都来了|钱都交了|都走到(?:了)?这(?:一|那)?步|已经走到(?:了)?(?:这|那)(?:一)?步|都已经开始了|既已开始|开(?:了)?个头|已经开了头|上了这条船|箭已离弦)`,
   // 时间投入（等了三年 / 熬了这么久 / 坚持了这么久）
   String.raw`(?:等|熬|坚持|耗|撑|走|跑|干|做)[^。]{0,6}(?:了)?[^。]{0,4}(?:这么|那么)?(?:久|长时间|这么多年|这么长|[0-9一二两三四五六七八九十]+\s*(?:年|个月|月|天))`,
+  // [r645] 完成态投入宾语：可交付物名词 + 完成动词 + 完成态助词。
+  // 覆盖「机票都买了」「婚宴订好了」「设备都调试好了」「奖牌都拿到手了」
+  // —— 旧两条分支只认抽象投入（钱/时间/心血）与「交了花了」窄形，
+  // 完全漏掉「具体事情已经办成」这一最常见的已投入陈述。
+  // ⚠️ 不加 \b：JS 的 \b 是 ASCII 词边界，中文之间恒 false（实测见文件头）。
+  String.raw`(?:机票|车票|门票|船票|电影票|票据|首付|定金|订金|押金|房贷|月供|奖牌|奖项|奖杯|冠军|金牌|名次|排名|论文|稿件|稿子|书稿|剧本|婚宴|婚礼|酒席|请柬|请帖|彩礼|嫁妆|婚戒|婚房|婚|亲事|喜事|设备|产线|展位|展会|发布会|展览|账号|课程|班课|会员|套餐|专栏|合同|协议|契约|订单|标书|摊子|流程|数据|demo|样品|模具|厂房|门店|铺面|牌照|资质|许可|名额|床位|档期|场地|服务器|域名|执照|转会费|积蓄|本金|本钱|聘礼|酒水|场地费|材料|配件|库存|货)(?:都|也|已经|早已|早就|全|均|已)?(?:[^。]{0,3})?(?:买|购|订|付|批|办|签|支|申|缴|投|发|寄|印|排|定|调试|部署|开通|注册|报名|提交|发布|审批|审|筹备|筹措|筹划|布置|搭建|跑通|打通|组织|安排|确认|立项|开建|开工|投产|夺|拿|花|砸|卖|筹|操办|张罗|订好|买好|付好|签好|办好)(?:了|好|完|定|出去|下来|到手|通|妥|定稿|光|起来)`,
+  // [r645] 筹备时段形：「筹备了八个月」「筹划了三年」——投入动词 + 时段，
+  // 名词在后或省略（旧时间投入分支要求等/熬/坚持类持续性动词）。
+  String.raw`(?:筹备|筹划|策划|筹措|张罗|铺垫|谋划|操办)(?:了)?[0-9一二两三四五六七八九十百千万]+\s*(?:年|个月|月|天|周|小时)`,
+  // [r645] 陪伴/同行过程陈述：「陪你走了这么远」「带他走过这么多年」。
+  String.raw`(?:陪|带|领|帮|等|跟随)[^。]{0,4}(?:走|跑|过|熬|撑)[^。]{0,4}了?(?:这么|那么)?(?:远|久|长|多年|这么多年)`,
+  // [r645] 摊子/局面支起来（已成局面的投入）。
+  String.raw`(?:摊子|局面|项目|台子|架子)(?:都|已经|早就)?(?:支|搭|拉|架|撑)(?:了|起来|出)`,
+  // [r645] 「投入了巨额转会费」形：投入动词 + 巨大量词（被投名词在后）。
+  String.raw`(?:投入|砸进|押上|砸入|赌上)(?:[^。]{0,4})(?:巨额|大量|无数|成千万上百万|上千万)`,
 ].join('|'));
 
 // 英文：already invested / we have paid / sunk ... into / three years in
@@ -77,6 +107,11 @@ const INVESTED_EN = new RegExp([
   String.raw`\b(?:since|after)\s+(?:you|we)\s+(?:already\s+)?(?:started|began|paid|invested|committed)\b`,
   String.raw`\b(?:come|having come)\s+this\s+far\b`,
   String.raw`\b(?:already|have|has)\s+(?:put|poured)\s+(?:so\s+much|years|time|money|effort)\s+in\b`,
+  // [r645] 完成态投入（英文）：already booked / have printed / signed /
+  // prepared / arranged / registered —— 对应中文侧「机票都买了」族。
+  String.raw`\b(?:already|have|has|had)\s+(?:invested|spent|paid|put|poured|committed|allocated|booked|reserved|printed|signed|prepared|arranged|deposited|planned|organized|submitted|registered)\b`,
+  // [r645] "We have been at this for two years" 类：at this 也算持续投入。
+  String.raw`\b(?:have|has|had)\s+(?:waited|been|stuck|worked|put in|at this)\b[^.]{0,20}?\b(?:for\s+)?[0-9a-z]+\s+(?:years?|months?|days?|hours?|weeks?)\b`,
 ].join('|'), 'i');
 
 // ─── 支①右腿: 沉没定性（放弃即损失，或由沉没导出的继续指令）──────────
@@ -97,11 +132,25 @@ const SUNK_ZH = new RegExp([
   String.raw`(?:收手|放弃|停止|退出|停下|终止|撤出|止损|不干了|回头)(?:[^。]{0,10})?(?:就是|等于|意味着|无异于|算是)(?:[^。]{0,8})(?:承认|认下|认)(?:[^。]{0,10})(?:错|误|失败|看走眼|输了|打脸)`,
   // 「就买了吧」类：既成投入 + 顺势成交（来都来了，就买了吧）
   String.raw`(?:就|干脆|索性)[^。]{0,6}(?:买了|定下|办了吧|签了吧|来吧|上吧|搞了吧|继续吧|做完吧|走完吧)`,
+  // [r645] 口语退出动词 × 白费定性（窗口从 8 放宽到 12：装不下
+  // 「不干了，前期投入全泡汤」这类中间有插入语的句式）。
+  // 覆盖「撂挑子」「撒手」「说走就走」「半路撤退」「停更」「撤稿」
+  // 「换帅」「推倒重来」「不去/不买/不练」等口语与完成态退出形。
+  String.raw`(?:撂挑子|撂下|撒手|说走就走|半路(?:撤退|撂下|退出)|停更|撤稿|取消|撤掉|换帅|推倒重来|不去|不买|不练|不干|反悔|不参加|不履约|不交付|退出|放弃|停止|收手|停下|终止|撤出|回头|不做)(?:[^。]{0,12})(?:白花|白费|白干|白交|白给|全废|作废|归零|打水漂|扔[^。]{0,3}(?:水里|水漂)|白搭|徒劳|泡汤|白跑|白忙|浪费|白扔|白供|白坐|白熬)`,
+  // [r645] 「现在不去就等于把钱扔水里」形：等于/就是 + 把钱 + 销毁动词。
+  String.raw`(?:[^。]{0,10})(?:等于|就意味着|就是)(?:[^。]{0,8})(?:把钱|白|全|都)(?:[^。]{0,4})(?:扔|丢|扔进|打水漂|白费|白花|废)`,
+  // [r645] 「这些年的陪伴算什么？」形：退出动词 + 质疑定性（没有白费词，
+  // 沉没定性落在「这么多年算什么」这个反诘上）。
+  String.raw`(?:说走就走|退出|放弃|走人|撂挑子|撒手|停更|撤|散伙|分手)(?:[^。]{0,12})(?:算什么|算啥|算得了什么|又算什么)`,
 ].join('|'));
 
 const SUNK_EN = new RegExp([
   // quitting/stopping now + waste/all for nothing
-  String.raw`\b(?:quitting|stopping|giving up|leaving|walking away|backing out)\b[^.]{0,25}?\b(?:waste|all for nothing|for naught|pointless|throw it away|go to waste)\b`,
+  // [r645] 退出动词表补 cancelling/canceling/withdrawing/pulling out/
+  // scrapping/ditching/walking out，白费词表补 wasted/gone/lost——旧表只认
+  // 5 个退出动词与 6 个白费词，「cancelling now would waste everything」
+  // 「backing out now means the money is gone」两条整族漏判（实测）。
+  String.raw`\b(?:quitting|stopping|giving up|leaving|walking away|backing out|cancelling|canceling|withdrawing|pulling out|scrapping|ditching|walking out)\b[^.]{0,25}?\b(?:waste|wasted|all for nothing|for naught|pointless|throw it away|go to waste|gone|lost)\b`,
   String.raw`\bmight\s+as\s+well\b`,
   String.raw`\b(?:too|such a|what a)\s+(?:waste|shame|pity)\b`,
   String.raw`\b(?:otherwise|or else)\b[^.]{0,25}?\b(?:wasted|all for nothing|a waste)\b`,
@@ -113,6 +162,11 @@ const SUNK_EN = new RegExp([
   // hurt.」两腿各缺一支）。⚠️ 本支单独出现不判——双腿共现是模块铁律。
   String.raw`\b(?:a\s+few|few|several|couple\s+of|some)\s+more\s+(?:years?|months?|days?|weeks?|hours?)\b[^.]{0,30}?\b(?:will|would|can|could)\s+not\s+(?:hurt|matter|make a difference|change anything)\b`,
   String.raw`\b(?:will|would|can|could)\s+not\s+(?:hurt|matter|make a difference|change anything)\b`,
+  // [r645] "All that work goes to waste" 类：goes/go/went + to + waste
+  // （旧分支只认 will be wasted / is wasted，漏掉这个最自然的现在时形）。
+  String.raw`\b(?:all|that|this)\s+(?:effort|work|time|money|investment|plan)\b[^.]{0,25}?\b(?:goes|go|going|went)\s+to\s+waste\b`,
+  // [r645] "walk away ... what ... nothing" 质疑定性（对应中文「算什么」）。
+  String.raw`\b(?:walk away|walk out|leave|quit|give up|back out)\b[^.]{0,25}?\b(?:what|nothing)\b`,
 ].join('|'), 'i');
 
 // ─── G1: 决策分析语境（沉没成本是被分析的对象，正确运用）────────────
