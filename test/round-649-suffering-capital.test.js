@@ -136,17 +136,23 @@ t('C4 dimMap 含该键（r647/r648 先例：漏登记 gate 恒 pass）', () => {
   const keys = Object.keys(d1.dimensions);
   assert.ok(keys.includes('suffering_capital'), 'dimMap 应有 suffering_capital');
 });
-t('C5 维度总数 99 → 100 接线正确（r649 实测口径）', () => {
+t('C5 维度总数接线正确（r650 口径修正：以 doc-numbers 守卫为准）', () => {
   // r649 实测口径修正：HEAD（v6.8.5）时 dimensions 键 100 个 = 99 维度 +
-  // evidence 键。本轮接入 suffering_capital 后键 101 个 = 100 维度。
+  // evidence 键。r649 接入 suffering_capital 后键 101 个 = 100 维度。
   // 注：r648 报告称「第 101 维度 investment_as_debt」，但实测 HEAD 维度数
-  // 为 99——**上一轮的维度计数口径（把 evidence 也数进去）多了 1**，本轮
+  // 为 99——**上一轮的维度计数口径（把 evidence 也数进去）多了 1**，r649
   // 按实测口径修正为 100。
+  // [r650 再修正] 本测试原来减 1（把 evidence 当非维度键），但
+  // doc-numbers-accuracy 守卫的 measure() 用的是**裸键数不减 evidence**
+  // （`Object.keys(d.dimensions).length`），两个口径差 1。r650 接入
+  // selfharm_coercion 后裸键 102，本测试若继续减 1 会算成 101 而误红。
+  // **以守卫口径为准**（守卫是三份文档的唯一比对尺）。
   const probe = idx.discriminate('probe').dimensions;
-  const total = Object.keys(probe).length - 1;
-  assert.strictEqual(total, 100, `当前 ${total}`);
+  const total = Object.keys(probe).length;
+  assert.strictEqual(total, 102, `当前 ${total}`);
   assert.ok('suffering_capital' in probe, 'probe 应含 suffering_capital');
   assert.ok('investment_as_debt' in probe, 'probe 应含 investment_as_debt（r648）');
+  assert.ok('selfharm_coercion' in probe, 'probe 应含 selfharm_coercion（r650）');
 });
 
 console.log('\n═══ D 节：gate 端到端 ═══');
