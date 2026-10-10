@@ -1,11 +1,11 @@
 {
-  "round": 648,
-  "version": "6.8.4",
-  "roundStartedAt": "2026-10-10T16:20:06.511Z",
-  "lastFinishAt": "2026-10-10T16:38:29.155Z",
-  "lastGreen": false,
+  "round": 649,
+  "version": "6.8.5",
+  "roundStartedAt": "2026-10-10T17:25:06.223Z",
+  "lastFinishAt": "2026-10-10T16:39:15.153Z",
+  "lastGreen": true,
   "lastChecks": [
-    "FAIL 版本四处一致",
+    "PASS 版本四处一致",
     "PASS 版本已进 git log",
     "PASS 工作区已跟踪文件干净",
     "PASS README 测试数与缓存一致",
