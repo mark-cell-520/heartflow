@@ -29,7 +29,7 @@ git remote -v
 
 ```bash
 git branch temp-v2.9.0 HEAD
-git push origin temp-v2.9.0 --no-verify
+git push origin temp-v2.9.0
 # 成功！HTTPS 超时但 SSH 可通
 ```
 

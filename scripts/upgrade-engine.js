@@ -346,7 +346,7 @@ function cmdFinish() {
       for (const [label, prefix] of [['直连', 'env -u https_proxy -u http_proxy -u HTTPS_PROXY -u HTTP_PROXY'], ['代理', '']]) {
         try {
           const r = require('child_process').execSync(
-            `${prefix ? prefix + ' ' : ''}git push heartflow main --no-verify 2>&1`, { cwd: ROOT, encoding: 'utf8', timeout: 90000 });
+            `${prefix ? prefix + ' ' : ''}git push heartflow main 2>&1`, { cwd: ROOT, encoding: 'utf8', timeout: 90000 });
           if (/main -> main|up-to-date|Everything up-to-date/.test(r)) { console.log(`  ✅ 推送成功（${label}）`); pushed = true; break; }
         } catch (e) { console.log(`  ⚠️ ${label}失败: ${String(e.message).split('\n')[0].slice(0, 90)}`); }
       }
