@@ -112,7 +112,7 @@ read only one field, read `gate.action`.
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
 > `VERIFY_DIMS` sets in `src/index.js` (v6.8.4 recount — fear_projection added as dimension 104)。** The three tiers
-> add up to 93; the remaining 10 dimensions are scored but do not force a gate action.
+> add up to 93; the remaining 11 dimensions are scored but do not force a gate action.
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security,
 deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
