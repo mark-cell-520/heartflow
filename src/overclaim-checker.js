@@ -73,6 +73,49 @@ const SUBJECT_HINTS = [
   '算法', '系统', '研究团队', '科学家',
 ];
 
+// ─── 服务流程语境：对对话方陈述当前工单/会话状态，不是对客观事实的断言 ──
+// [2026-10-10 修复] 双向门禁实测误拦：客服标准结束语「问题已解决，请问还有
+// 其他可以帮您？」被判完成态宣称。判据：句中含指向对话方的服务标记
+// （帮您/为您/请问/还有什么/随时/感谢您的理解/此类表达），说明这是流程陈述
+// 而非「某科学难题已攻克」那类对可验证事实的无保留断言。
+// 与 QUALIFIERS 的区别：QUALIFIERS 是说话人自己划定的边界，这里是**语境本身
+// 就是流程对话**，不需要额外限定词。
+const SERVICE_CONTEXT_ZH = [
+  '请问', '帮您', '为您', '还有什么', '随时', '感谢您的', '不好意思',
+  '给您带来', '麻烦您', '请稍等', '正在为您', '已为您',
+];
+const SERVICE_CONTEXT_EN = [
+  'how may i help', 'anything else', 'is there anything', 'let me know if',
+  'thank you for your', 'sorry for the', 'please hold', 'assisting you',
+  'i can help you', 'help you with', 'at your service',
+];
+
+/** 判断单句是否为服务流程语境（对对话方的状态陈述） */
+function isServiceContext(sentence) {
+  const lower = sentence.toLowerCase();
+  if (SERVICE_CONTEXT_ZH.some(m => sentence.includes(m))) return true;
+  return SERVICE_CONTEXT_EN.some(m => lower.includes(m));
+}
+
+/**
+ * [2026-10-10 修复] 跨句服务语境：切句后服务标记常落在**相邻句**——
+ * 「The issue is now closed. / Is there anything else I can help you with?」
+ * 完成态在第一句，服务标记在第二句。单句判定抓不到，于是把客服标准结束语
+ * 误判成完成态宣称（双向门禁实测误拦 1 条）。
+ * 判据：本句或任一相邻句（前后各 1 句）含服务标记 → 同一轮对话的服务语境。
+ * 窗口取 1 句是保守边界——跨 2 句以上就与"前面在聊技术、这里突然说已解决"
+ * 无法区分，那种情况应继续判 overclaim。
+ */
+function isServiceContextNearby(sentence, allSentences, index) {
+  if (isServiceContext(sentence)) return true;
+  for (const offset of [-1, 1]) {
+    const j = index + offset;
+    if (j < 0 || j >= allSentences.length) continue;
+    if (isServiceContext(allSentences[j])) return true;
+  }
+  return false;
+}
+
 /** 句子切分：中英文混排安全 */
 function splitSentences(text) {
   if (!text || typeof text !== 'string') return [];
@@ -124,7 +167,8 @@ function checkOverclaim(text) {
   const claims = [];
   const qualified = [];
 
-  for (const s of sentences) {
+  for (let i = 0; i < sentences.length; i++) {
+    const s = sentences[i];
     const hits = extractCompletionHits(s);
     if (!hits.length) continue;
 
@@ -143,6 +187,11 @@ function checkOverclaim(text) {
 
     if (hasQualifier(s)) {
       entry.reason = '句中含限定标记，按真话放行';
+      qualified.push(entry);
+    } else if (isServiceContextNearby(s, sentences, i)) {
+      // [2026-10-10 修复] 服务流程语境（含相邻句）：对对话方陈述工单/会话
+      // 状态，不是对客观事实的完成态断言（「问题已解决，请问还有其他可以帮您？」）
+      entry.reason = '服务流程语境，对对话方的状态陈述而非事实断言';
       qualified.push(entry);
     } else {
       entry.reason = intensifiers.length

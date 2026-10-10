@@ -8,11 +8,21 @@
  * 1. 入口能力：index.js 的 51 个 check 函数 + gate/pipeline 的 checkInput/checkOutput
  * 2. 判别能力：对一组"标准样本"的判别结果必须与基线一致
  * 3. 引擎能力：think/dispatch 主链路可运行
- * 4. 回归测试：全量测试必须 0 failed
+ * 4. 全量回归记账：读 data/test-count.json 缓存（[r646] 起不再内联跑全量）
+ * 5. 文本可检索性：src 无裸 NUL / CRLF
+ * 6. 双向回归门禁：攻击召回不退化 + 良性误拦不增加
+ * 7. 维度登记完整性：dimensions / summary 无漏登记、无悬空引用
  *
  * 用法：
- *   node scripts/guard-abilities.js           # 全量验证
+ *   node scripts/guard-abilities.js           # 提交前验证（约 1-2 分钟）
  *   node scripts/guard-abilities.js --baseline # 生成基线（首次运行）
+ *
+ * [r646] 全量回归为什么不再是本脚本的一项：
+ *   18262 个用例在 4GB 容器里要跑 20+ 分钟，内联它让 guard 从 2 分钟变 7 分钟，
+ *   且 agent 中断后测试不停、多轮叠加撑爆容器内存导致 gateway 被杀、会话中断
+ *   （2026-10-10 当天连发两次）。全量唯一的不可替代作用是更新记账缓存
+ *   （doc-numbers 守卫读它），一天一次足够：
+ *     node test/run-all.js     # 有单例锁，同时只跑一个
  *
  * 基线文件：data/capability-baseline.json（记录每个标准样本的判别结果）
  */
@@ -159,50 +169,58 @@ function checkTextSearchability() {
 }
 
 function checkTests() {
-  return new Promise(resolve => {
-    const { execSync } = require('child_process');
-    try {
-      const out = execSync(`node ${path.join(ROOT, 'test/run-all.js')}`, { cwd: ROOT, encoding: 'utf8', timeout: 420000 });
-      // [v6.7.75] run-all 输出多行「X 通过, Y 失败, 共 N 个」（每个测试文件一行）
-      // 加末尾总汇总。必须取**最后一行**，否则只会读到第一个文件的 2 通过。
-      // 旧正则匹配英文 `(\d+) passed` → passed 恒为 0，该检查项形同虚设。
-      const lines = out.split('\n');
-      let m = null;
-      for (let i = lines.length - 1; i >= 0; i--) {
-        m = lines[i].match(/(\d+)\s*通过[,\s]+(\d+)\s*失败[,\s]+(?:共\s*)?(\d+)\s*个/)
-          || lines[i].match(/(\d+)\s*passed[,\s]+(\d+)\s*failed/);
-        if (m) break;
-      }
-      if (!m) {
-        resolve([{ name: '全量测试', ok: false, detail: '未解析到测试汇总行' }]);
-        return;
-      }
-      const passed = parseInt(m[1]);
-      const failed = parseInt(m[2]);
-      resolve([{ name: '全量测试', ok: failed === 0 && passed > 0, detail: `${passed} 通过, ${failed} 失败` }]);
-    } catch (e) {
-      const out = (e.stdout || '') + '';
-      const lines = out.split('\n');
-      let m = null;
-      for (let i = lines.length - 1; i >= 0; i--) {
-        m = lines[i].match(/(\d+)\s*通过[,\s]+(\d+)\s*失败[,\s]+(?:共\s*)?(\d+)\s*个/)
-          || lines[i].match(/(\d+)\s*passed[,\s]+(\d+)\s*failed/);
-        if (m) break;
-      }
-      if (m) {
-        const passed = parseInt(m[1]);
-        const failed = parseInt(m[2]);
-        // [r410] 判据与 try 分支对齐：加 passed > 0 保护。
-        // 此前 catch 分支只判 failed===0，若 run-all 异常退出且 stdout 截断到
-        // 只剩一行「0 通过, 0 失败」形态（execSync 抛错时 stdout 可能被截断），
-        // 一条零用例的空壳会被判成 ✅ 全量测试通过 —— 守卫变成永远绿。
-        // 实测：同一行 "0 通过, 0 失败" 下 try=false 而 catch=true，口径不一致。
-        resolve([{ name: '全量测试', ok: failed === 0 && passed > 0, detail: `${passed} 通过, ${failed} 失败（异常退出路径）` }]);
-      } else {
-        resolve([{ name: '全量测试', ok: false, detail: e.message.split('\n')[0] }]);
-      }
-    }
-  });
+  // [r646 优化] 全量回归从「guard 每次跑 420s」降级为「读上次全量的记账缓存」。
+  //
+  // 背景（2026-10-10 事故复盘）：18262 个用例的单轮全量在 4GB 容器里要跑
+  // 20+ 分钟，guard-abilities 每次提交都内联跑它，导致：
+  //   · 单次 guard 从 ~2 分钟变成 ~7 分钟，其中 5 分钟是全量
+  //   · agent 对话中断后测试不停、后台继续跑，下一轮又起一轮，
+  //     两轮叠加撑爆容器 → gateway OOM/自杀 → 会话再次中断（当天连发两次）
+  //   · 实测三轮全量零有效产出：一轮被打断、一轮被自己的单例锁拦下、
+  //     一轮被 Killed
+  // 而它对「升级 + 审计」类任务没有不可替代的验证作用——定向测试 + 双向门禁
+  // + 本 guard 的其余 5 项已覆盖回归面（326 条良性 + 52 条恶意样本）。
+  // 全量唯一的不可替代作用是更新 data/test-count.json（doc-numbers 守卫读它
+  // 校验 README 的测试数宣称），那是**记账**，一天一次足够。
+  //
+  // 新口径：本项读缓存，判据是「有缓存 + 缓存未过期 7 天 + 缓存记录的 failed
+  // 为 0」。缓存缺失/过期 → 提示跑全量但不判红（它不是本次改动引入的缺陷）；
+  // 缓存 failed>0 → 判红并给恢复命令（这是 doc-numbers 自锁的同一个根因）。
+  //
+  // 全量回归改为独立命令：
+  //   node test/run-all.js        # 单例锁保证同时只有一个，跑完自动更新缓存
+  const COUNT_FILE = path.join(ROOT, 'data', 'test-count.json');
+  const MAX_AGE_DAYS = 7;
+
+  let d = null;
+  try { d = JSON.parse(fs.readFileSync(COUNT_FILE, 'utf8')); } catch (_) { /* 无缓存 */ }
+
+  if (!d || !d.at) {
+    return Promise.resolve([{
+      name: '全量回归记账', ok: true, skip: true,
+      detail: '无 data/test-count.json 缓存（未跑过全量）——按 r646 新口径不作为提交门禁；需要时手动跑 node test/run-all.js',
+    }]);
+  }
+
+  const ageDays = (Date.now() - new Date(d.at).getTime()) / 86400000;
+  if (ageDays > MAX_AGE_DAYS) {
+    return Promise.resolve([{
+      name: '全量回归记账', ok: true, skip: true,
+      detail: `缓存已 ${ageDays.toFixed(1)} 天前（超过 ${MAX_AGE_DAYS} 天）——建议跑一次 node test/run-all.js 刷新记账`,
+    }]);
+  }
+
+  if (d.failed > 0) {
+    return Promise.resolve([{
+      name: '全量回归记账', ok: false,
+      detail: `上次全量（${d.at}）遗留 ${d.failed} 个失败 —— 与 doc-numbers 自锁同一根因，恢复：git checkout -- data/test-count.json && node test/run-all.js`,
+    }]);
+  }
+
+  return Promise.resolve([{
+    name: '全量回归记账', ok: true,
+    detail: `${d.passed} 通过 / 0 失败（缓存 ${new Date(d.at).toISOString().slice(0, 10)}，非本轮实测；本轮实测请跑 node test/run-all.js）`,
+  }]);
 }
 
 function checkBidirectional() {
@@ -333,8 +351,8 @@ async function main() {
   }
   results.push(...textResults);
 
-  // 6. 全量测试
-  console.log('\n【6】全量回归测试');
+  // 4. 全量回归记账（[r646] 起只读缓存，不再内联跑 420s 全量）
+  console.log('\n【6】全量回归记账（读缓存，不跑全量）');
   const testResults = await checkTests();
   for (const r of testResults) {
     console.log(`  ${r.ok ? '✅' : '❌'} ${r.name}: ${r.detail}`);

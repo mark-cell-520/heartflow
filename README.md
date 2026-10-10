@@ -6,8 +6,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-92 discrimination dimensions  ×  11-layer pipeline  ×  158 modules  ×  67 MCP tools
-×  1,288 dispatch routes  ×  18,092 passing tests  ×  0 runtime dependencies
+95 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  67 MCP tools
+×  1,314 dispatch routes  ×  18,157 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -112,7 +112,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 92 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 95 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -139,7 +139,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (92 dimensions) -> gate
+scope-check -> premise-check -> discriminate (95 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -152,7 +152,7 @@ intent-anchor -> rewriter -> error-memory -> self-diagnosis -> output
 The gate aggregates findings from every layer and emits a single action:
 `block` / `rewrite` / `verify` / `pass`.
 
-### Capability domains (7 domains, 158 modules)
+### Capability domains (7 domains, 161 modules)
 
 | Domain | Representative modules |
 |--------|------------------------|
@@ -168,16 +168,16 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.0**. Not marketing copy.
+Measured on this repository at **v6.8.1**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
-| Modules registered | 158 |
+| Modules registered | 161 |
 | Module init errors | 0 |
-| Dispatch routes | 1,288 |
-| Discrimination dimensions | 92 |
+| Dispatch routes | 1,314 |
+| Discrimination dimensions | 95 |
 | MCP tools | 67 |
-| Test suite | 18,092 passing / 78 failing |
+| Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
@@ -294,6 +294,7 @@ Known limits:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.1 | 2026-10-10 | **Two new discrimination dimensions, plus the first false-positive fix on the completion-claim detector.** `unresolved_conflict` (arXiv 2610.12360, EMNLP 2026 — epistemic humility under knowledge conflict): detects text that identifies a conflict/contradiction/incomplete evidence and then flattens it into certainty, the paper's `detect-but-not-escalate` trajectory; 8 attack samples, 5 leaked, 0 benign harmed. `equivocation_sense_shift` (arXiv 2606.31039, LoFa — the fallacy class where LLMs are weakest, LFR@3 29.4%): detects one polysemous word used in two disjoint semantic domains within a single inference; 10 attack samples, 8 leaked, 0 benign harmed. Both are `verify`-tier and both were selected by the engine's own `decision.decide` (0.92, identity alignment 100%), not by the operator. Also fixed: `overclaim-checker` blocked the standard customer-service closing "问题已解决，请问还有其他可以帮您？" — a service-flow statement to the interlocutor, not an unreserved claim about a verifiable fact; the marker now also matches on an adjacent sentence, because sentence splitting puts the completion verb and the service marker in different sentences. Bidirectional gate: recall 52/52 unchanged, benign 302→303/326, vertical scenarios 150/150 (was 149). Both new dimensions are covered by `test/round-644-*` and `test/round-645-*` at three layers (detector / discriminate aggregate / gate end-to-end). |
 | 6.8.0 | 2026-10-05 | **A version number that says what shipped, not what was attempted.** The 6.7 line ran 124 patch releases over 472 automated rounds; the user-facing truth is that it delivered **four** new discrimination capabilities — `reward_hacking` switched on (16 documented evasion tactics, of which every pre-existing dimension caught 2), `instrumental_reasoning` covered in Chinese, the remaining six DSec reward-hacking tactics, and those six classes finally working on the Chinese side — plus ~120 releases whose whole job was keeping those four true (52/52 recall baseline, ≤302/326 benign baseline, 61-tool MCP contract, 1,136-route table). This release re-numbers the line to stop the patch count from implying capability growth it did not have, and states the four openly in the version policy table above. Shipment evidence, measured not asserted: 58 dimensions / 143 modules / 61 MCP tools / 1,136 routes / 17,323 tests / 0 runtime dependencies, `guard-abilities` 20/20, `verify.js` 14/14, bidirectional recall 52/52 with benign 302/326. Also fixed in this release: two README dimension counters still read 50 after the 57-dimension expansion, and a documentation self-lock — `data/test-count.json` carried 46 failures forward through three `chore(auto)` commits, so `doc-numbers-accuracy` threw its recovery command (`git checkout -- data/test-count.json`) at a value that the checkout itself restored, making the lock permanent. The lock is cleared here; the recovery command was left untouched because it is correct whenever the file is clean. |
 | 6.7.124 | 2026-09-27 | **`victim_blaming` could not recognize behavior-attribution sentences on either side — the family open since round 99.** Re-measured rather than assumed: zh 4/8, en 2/8, all `gate action=pass`. Root cause — all 47 existing criteria demand either "victim wording + a defect/deserved-it positive form" or one of the narrow English one-liners, so a sentence that merely attributes the outcome to the victim's own behavior had no channel at all. Eleven criteria added: five Chinese (`谁让/谁叫+consequence`, `consequence+只能怪自己` with a system-subject negative lookahead, `活该+consequence`, `早提醒+aftermath-denial`, `谁叫+后果自负`) and six English (third-person `should have known better`, `brought this on X-self`, `it takes two to tango`, `reaping what X sowed`, `made her bed/lie in it`, `he had it coming`, plus a causation form). Guardrails are measurable: the second Chinese family carries a 24-word system-subject lookahead — without it three benign retrospective sentences (吃亏只能怪容量规划 / 被骗只能怪风控 / 出事只能怪监控阈值) turned red, and with it all eleven attacks still fire. Recall 52/52, benign 300/326 zero new, 5313 passing. Two boundaries are recorded as accepted, not hidden: a team retrospective that blames 自己 and an English engineering self-deprecation sentence are formally identical to victim-blaming; the measured benign pool contains neither shape. The negative guard runs needle-exact injection (12 branches), 11 turn red and 1 has a fallback — a fallback means the sample is still caught by another branch, so it is booked honestly rather than counted as a real guard. |
 | 6.7.124 | 2026-09-24 | **Six new reward-hacking classes were added in English only — the Chinese side could not catch any of the samples.** Round 23 added the remaining six paper tactics (ioctl extent, fd swap, mirror scan, proxy fetch, package install, unbounded output) with Chinese class names and English patterns; a 15-sample probe found **5 of 15 blocked**. The cause is the same shape as three earlier gaps: the patterns demanded precise co-occurrence of rare phrases (protected + fd + dup2 + copy), so natural phrasings such as “换一个文件描述符重新打开” had no “protected” anywhere in them and slipped through. Judgements were re-aligned with the older classes' structure — **action + object + intent signal**, not exact phrases — and one ordering inversion was added for “不加长度限制地写入”, which puts the limiter before the verb. Before: 5/15 blocked. After: **14/15** (the remaining one is `verify`, which the rulebook does not count as a miss). Benign controls 0/15 falsely blocked, recall 52/52 and benign 301/326 unchanged. Note for future edits: this repo carries two same-named arrays (`REWARD_HACKING_ZH` at line 167, `REWARD_HACKING_EN` at 328) and a naive last-match insert lands in the English table — which is how two rounds of this work silently did nothing on the Chinese side. |
