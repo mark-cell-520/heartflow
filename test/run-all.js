@@ -24,9 +24,12 @@ const { execSync, spawnSync } = require('child_process');
 const TEST_DIR = __dirname;
 const ROOT = path.join(__dirname, '..');
 const CHILD_TIMEOUT = 90000;
-// [FIX 2026-09-21] execSync 的 timeout 只杀掉外层 shell，测试自己 spawn 的
-// 服务进程会被孤儿化（PPID=1）并继续监听端口，实测泄漏了 8 个 mcp-server
-// 实例、连续跑了 3 天没人发现。见 runChild() 里的 killOrphans() 清理。
+// [2026-10-10 删除] 此处曾经有一个「主动 SIGKILL 测试孙进程」的机制。
+// 该机制是两次卡死事故的根因（2026-10-08 误杀 gateway、2026-10-10 误杀
+// runner 自己），且它发的 SIGKILL 不可捕获，会绕过测试的 finally 还原块、
+// 把 src/ 永久留在变异态（见 test/mutation-guard-recovery.js 的记录）。
+// 现在只依赖 execSync 自身的 timeout 杀外层 shell；测试若 spawn 长跑服务，
+// 由测试自己用 detached + kill(-pgid) 负责，runner 不越界杀进程。
 
 let passed = 0;
 let failed = 0;
@@ -49,109 +52,6 @@ function collectTestFiles(dir, base = dir) {
   return out.sort();
 }
 
-/**
- * [FIX 2026-09-21] 杀掉本 runner 派生的、仍然活着的孙进程。
- * 背景：execSync 超时只杀掉外层 shell，测试自己 spawn 的服务进程
- * （例如 mcp-server）会被孤儿化（PPID=1）并继续监听端口。
- * 实测因此泄漏了 8 个 mcp-server 实例、连续跑了 3 天没人发现。
- * 只杀本 runner 的后代，绝不碰别的用户的进程。
- *
- * [FIX 2026-10-08 卡死事故] 见下方 _isSelfOrDescendant —— 上面这个
- * 「只杀后代」的承诺在真机上不成立。PGID 检查是有符号 PID，孤儿进程
- * 若被 PID 1 收养且 PGID 与本 runner 相同，仍会被误判为后代。
- * 2026-10-08 一次全量回归中，gateway 被 SIGKILL（host 账本记录
- * exited UNCLEANLY — SIGKILL / a process kill issued by the agent
- * or one of its descendants）。改用三重校验 + 常驻服务白名单。
- */
-function killOrphans() {
-  let pids = [];
-  try {
-    const r = spawnSync('pgrep', ['-P', String(process.pid)], { encoding: 'utf8' });
-    if (r.status !== 0 || !r.stdout) return;
-    pids = r.stdout.trim().split('\n').filter(Boolean);
-  } catch (_) { return; }
-  const all = [...pids];
-  for (const p of pids) {
-    try {
-      const r2 = spawnSync('pgrep', ['-P', p], { encoding: 'utf8' });
-      if (r2.status === 0 && r2.stdout) all.push(...r2.stdout.trim().split('\n').filter(Boolean));
-    } catch (_) { }
-  }
-  const selfPgid = _getPgid(process.pid);
-  for (const pid of all) {
-    const n = Number(pid);
-    if (!Number.isFinite(n) || n <= 1) continue;
-    // 1) 绝不杀自己
-    if (n === process.pid) continue;
-    // 2) 常驻服务白名单：mcp-server / gateway / dashboard / bridge / watchdog
-    //    这些是宿主级服务，不是测试泄漏物。误杀 = 用户侧「卡死」。
-    if (_isLongLivedService(n)) { continue; }
-    // 3) [r646 修复] 必须是本 runner 的真后代 **且** PGID 一致 —— 两个条件
-    //    同时满足才杀。
-    //    旧写法 `if (!_isDescendant(n) && _getPgid(n) !== selfPgid) continue;`
-    //    等价于「只要 PGID 相同就杀」，把 execSync 超时后被 PID 1 收养的
-    //    孤儿（PGID 继承自 runner）全列入了击杀名单——**包括 runner 自己
-    //    所在的进程组**。2026-10-08 因此 SIGKILL 了 gateway；2026-10-10
-    //    同根因第二次复发：全量回归跑到 semantic-injection /
-    //    self-verification-consumers-r219 的 ETIMEDOUT 时触发 killOrphans，
-    //    runner 自己被同组击杀，日志停在重试、无汇总行、无 EXIT 码
-    //    （内存峰值仅 1967MB/4096MB，oom_kill 0，与 OOM 无关）。
-    if (!_isDescendant(n)) continue;
-    if (_getPgid(n) !== selfPgid) continue;
-    try { process.kill(n, 'SIGKILL'); } catch (_) { }
-  }
-}
-
-/** 读 /proc/<pid>/stat 拿 PGID（第 5 字段） */
-function _getPgid(pid) {
-  try {
-    const stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
-    // comm 可能含空格与括号，取最后一个 ')' 之后切分
-    const rest = stat.slice(stat.lastIndexOf(')') + 2).trim().split(/\s+/);
-    return Number(rest[2]); // pgrp
-  } catch (_) { return -1; }
-}
-
-/** 从 pid 一路走 PPid 链，确认它确实是本 runner 的后代 */
-function _isDescendant(pid) {
-  let cur = pid, hops = 0;
-  while (cur > 1 && hops++ < 32) {
-    if (cur === process.pid) return true;
-    let next = 0;
-    try {
-      const stat = fs.readFileSync(`/proc/${cur}/stat`, 'utf8');
-      const rest = stat.slice(stat.lastIndexOf(')') + 2).trim().split(/\s+/);
-      next = Number(rest[1]); // ppid
-    } catch (_) { return false; }
-    if (next <= 1) return false;
-    cur = next;
-  }
-  return false;
-}
-
-/**
- * 常驻服务识别：这些进程属于宿主基础设施，任何情况下都不能被测试 runner 杀。
- * 匹配命令行特征（mcp-server / gateway / dashboard / bridge / watchdog /
- * supervisord / autopilot）。宁可漏杀一个泄漏探针，不可误杀一次宿主服务。
- */
-function _isLongLivedService(pid) {
-  try {
-    const cmd = fs.readFileSync(`/proc/${pid}/cmdline`, 'utf8').replace(/\0/g, ' ');
-    return LONG_LIVED_PATTERNS.some(re => re.test(cmd));
-  } catch (_) { return true; } // 读不到 cmdline 时按「不可杀」处理，保守
-}
-
-// 常驻服务特征库（[2026-10-08 卡死事故] 新增）
-const LONG_LIVED_PATTERNS = [
-  /mcp-server/i,
-  /gateway/i,
-  /dashboard/i,
-  /step-feishu-bridge|feishu[_-]bridge/i,
-  /watchdog/i,
-  /supervisord/i,
-  /autopilot/i,
-  /hermes gateway run/i,
-];
 
 /** 在子进程中执行一条命令，解析其 `N 通过, M 失败` 汇总行 */
 function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
@@ -166,8 +66,9 @@ function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
     });
   } catch (e) {
     out = (e.stdout || '').toString();
-    // 超时/被杀后清理孙进程，避免孤儿服务进程长期占用端口
-    killOrphans();
+    // [2026-10-10 删除] 不在此处主动 SIGKILL 任何进程。
+    // 见文件头说明：那是两次卡死事故的根因，且 SIGKILL 会绕过测试的
+    // finally 还原块。execSync 的 timeout 已杀掉外层 shell。
     // [v6.7.94] 环境噪声重试：子进程被系统级停顿杀死时 stdout 为空且无汇总行，
     // 一次就计失败——这类失败重跑必然恢复（第 70-72 轮三次实测：同一文件
     // ETIMEDOUT 后单独 mount 1/0、连跑两遍 1818/0）。
@@ -185,7 +86,7 @@ function runChild(label, cmd, timeout = CHILD_TIMEOUT) {
         });
       } catch (e2) {
         out = (e2.stdout || '').toString();
-        killOrphans();
+        // [2026-10-10 删除] 同上级 catch：不主动杀进程。
       }
     }
     if (!/(\d+) 通过, (\d+) 失败/.test(out)) {
