@@ -46,11 +46,14 @@ function t(name, fn) {
   catch (e) { fail++; console.log('  ❌ ' + name + ' → ' + e.message); }
 }
 
+// MCP token 只从环境变量取，绝不读仓库里的 .env。
+// 原因：package.json 的 files 白名单含 test/，任何读 .env 的代码都会随 npm 包分发，
+// 在安装者机器上读到他们的凭据。取不到 token 时本文件所有用例跳过。
 const TOKEN = (() => {
-  try {
-    return fs.readFileSync(path.join(HF, '.env'), 'utf8')
-      .match(/MCP_HEARTFLOW_KEY=(.+)/)[1].trim();
-  } catch (_) { return null; }
+  const fromEnv = (process.env.MCP_HEARTFLOW_KEY || process.env.HEARTFLOW_MCP_TOKEN || '').trim();
+  if (fromEnv) return fromEnv;
+  console.log('  ⚠️  未设 MCP_HEARTFLOW_KEY，跳过（不读 .env：test/ 会进 npm 包）');
+  return null;
 })();
 
 /** 真实 HTTP 调用，完全控制请求头 */

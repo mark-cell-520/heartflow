@@ -192,29 +192,22 @@ try {
   }
 } catch (_) { /* 防御性: 配置加载失败不阻断 */ }
 
-const AUTH_TOKEN = process.env.HEARTFLOW_MCP_TOKEN || process.env.MCP_HEARTFLOW_API_KEY || process.env.MCP_HEARTFLOW_KEY || (() => {
+// [AUDIT-FIX] 与 mcp/mcp-server-http.js 对齐：未设 token 时拒绝启动。
+//
+// 旧行为是自动生成一个随机 token 并写进 .env。问题是：
+//   1. 这个 token 没有任何人知道，客户端（config.yaml 的 ${MCP_HEARTFLOW_KEY}）
+//      读不到它，结果是"服务起来了但谁都连不上"——比明确失败更难排查；
+//   2. 静默把凭据写进 .env，。env 是 test/ 会读的文件（见 #2 修复）；
+//   3. 两个 MCP 入口策略不一致，宽松的那个会成为绕过面。
+// 现在：明确要求 HEARTFLOW_MCP_TOKEN / MCP_HEARTFLOW_API_KEY / MCP_HEARTFLOW_KEY 之一。
+const AUTH_TOKEN = process.env.HEARTFLOW_MCP_TOKEN || process.env.MCP_HEARTFLOW_API_KEY || process.env.MCP_HEARTFLOW_KEY || null;
 
-  const token = require('crypto').randomBytes(32).toString('hex');
-
-  // [v6.2.7] 自动写入 .env，让 config.yaml 的 ${MCP_HEARTFLOW_KEY} 能读到
-  try {
-    const envPath = path.join(__dirname, '..', '.env');
-    const fs2 = require('fs');
-    let env = '';
-    try { env = fs2.readFileSync(envPath, 'utf8'); } catch (_) { /* 防御性: env读取失败用默认值 */ }
-    if (!env.includes('MCP_HEARTFLOW_KEY=')) {
-      fs2.appendFileSync(envPath, `\nMCP_HEARTFLOW_KEY=${token}\n`);
-      if (process.env.HEARTFLOW_DEBUG) console.log('[MCP] Token auto-written to .env as MCP_HEARTFLOW_KEY');
-    }
-  } catch (_) { /* 防御性: 配置加载失败不阻断 */ }
-
-  if (process.env.HEARTFLOW_DEBUG) console.log('[MCP] HEARTFLOW_MCP_TOKEN not set. Auto-generated ephemeral token (not printed for security).');
-
-  if (process.env.HEARTFLOW_DEBUG) console.log('[MCP] Set HEARTFLOW_MCP_TOKEN env var for persistent auth across restarts.');
-
-  return token;
-
-})();
+if (!AUTH_TOKEN) {
+  console.error('[MCP] SECURITY: no auth token configured.');
+  console.error('[MCP] Set one of: HEARTFLOW_MCP_TOKEN / MCP_HEARTFLOW_API_KEY / MCP_HEARTFLOW_KEY');
+  console.error('[MCP] Refusing to start without authentication token (aligned with mcp-server-http.js).');
+  process.exit(1);
+}
 
 const AUTH_ENABLED = true;
 

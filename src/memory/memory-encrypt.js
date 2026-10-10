@@ -71,6 +71,8 @@ function _getAesKeySync() {
       }
       const newKey = crypto.randomBytes(32);
       fs.writeFileSync(keyFile, newKey.toString('base64'), { mode: 0o600 });
+      // mode 只在创建时生效，历史遗留文件可能仍是 644 —— 强制收敛
+      try { fs.chmodSync(keyFile, 0o600); } catch (_) { /* 平台不支持时忽略 */ }
       console.log('[memory-encrypt] Generated and persisted AES key to memory/.aes-key (0o600)');
       _aesKey = newKey;
       _aesKeyResolved = true;

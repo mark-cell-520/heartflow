@@ -179,7 +179,10 @@ function _getHmacKey() {
 
     const newKey = crypto.randomBytes(32).toString('base64');
 
+    // mode 只在创建时生效：已存在的密钥文件权限不会变，历史遗留可能是 644。
+    // [AUDIT-FIX] 写完强制 chmod 600 —— 同机其他用户可读密钥 = 记忆库可解。
     fs.writeFileSync(keyFile, newKey, { mode: 0o600 });
+    try { fs.chmodSync(keyFile, 0o600); } catch (_) { /* 平台不支持时忽略 */ }
 
     console.warn('[self-healing-rl] Generated and persisted HMAC key to memory/.qtable-hmac-key (0o600)');
 
