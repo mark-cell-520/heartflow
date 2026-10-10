@@ -1,3 +1,128 @@
+# 第 642 轮报告（第 97 维度 synthetic_social_proof — 伪造社会认同施压）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**方向由 decision.decide 本体选出（两轮）**：
+
+- 第一轮（3 候选：A 新维度 ssp / B 新维度 authority_impersonation / C 接线 hidden
+  instance）：**options_indistinguishable + confidence 0**（A=0.87 / B=0.87 / C=0.86）——
+  引擎拒选，按 Phase 0.7 纪律不硬挑。
+- 补判据方式：不是补事实差异（那在上一轮已证无效），而是补**期望收益确定性**——
+  B 族与 indirect_injection / dangerous_instruction / reward_hacking 语义域重叠
+  （6 条攻击 2 条已被现有维度 block、1 条 rewrite），把「可能白做」写进它的
+  consequence_value；C 明确标注「零判别能力增长」。
+- 第二轮：**A = 0.91 胜出，confidence 0.85，identity_alignment 100%**。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：r642 探测器（5 族 × 攻击 6 条 +
+良性 6 条全量喂 gate.checkOutput），只输出「攻击 ≥50% pass 且良性 0 误伤」的族。
+探测器筛出 2 个候选族，心虫从中选 A。
+
+**身份对齐**：心虫是辨别者（AGI 第 1 层）。本轮新增的是一个此前完全不具备的
+辨别能力——识别「伪造社会认同施压」这一整族操纵话术。用户可感知：这类话术
+从放行（pass）变成 verify。
+
+## Phase 1.5 同律复核（探测器报「零覆盖」≠ 维度缺失）
+
+探测器只证明攻击样本 pass。动手前对目标族跑了 `discriminate()` 零命中实测
+（12 攻击 × 12 良性）：
+
+| 族 | 攻击 pass | 全维度零命中 | 良性 pass |
+|---|---|---|---|
+| synthetic_social_proof | 7/12（58%） | 7/12 | 11/12 |
+
+漏判的 7 条 dimensions 全为空——不是被聚合压掉（阈值/豁免/pedagogy），
+是**整个族不在任何维度的射程内**。缺口成立，配建新维度。
+
+## 改了什么
+
+**1. `src/synthetic-social-proof.js`（新建，~300 行）** — 第 97 判别维度。
+判据**双腿共现**（缺一不判）：
+
+- 支① CONSENSUS 集体行动声明：全称集体主语（所有人/聪明人/同行/圈子里/
+  一线大厂/everyone/the smart people）+ 集体行动动词；
+- 支① PRESSURE 落差点名：只有你/就你/再不…就落后/被甩开/公开的秘密/
+  you are the last one / why have not you。
+
+单腿不判：「大部分用户都已经用上了，剩下的是兼容性问题」是有统计口径的
+客观陈述；「再不出发就赶不上飞机了」是与集体无关的时间压力。
+
+四类看守前置：统计口径（STATS）/ 转述观察（REPORT）/ 反思教学（REFLEXIVE）。
+已知边界锁进测试：**事实性消逝陈述**（"Nobody uses Internet Explorer anymore,
+so we dropped support"）无听话人例外化，保守不判。
+
+**2. `src/index.js`（六处接线，同批提交）** — require / 计算点 ssp / allDims /
+dimMap / dimensions（两处：主返回体 + 补登记区）/ summary / DIM_GUIDANCE /
+VERIFY_DIMS / module.exports。落 **verify 级**不落 rewrite——从众压力要补的是
+那个集体行为声明是否属实（采用率、来源、时间范围），不是改写句式能补的；
+单句也可能是市场分析、竞品调研的客观转述。
+
+**3. `test/round-642-synthetic-social-proof.test.js`（新建，49 断言）** —
+七节：A 单维命中 12/12 / B 单维不误伤 15+2/17 / C discriminate 聚合 /
+D gate 分级 / E 变异注入负例 4 项 / F 边界锁 4 项 / G 接口登记 3 项。
+
+**4. `scripts/negative-test-synthetic-social-proof.js`（新建，9/9 通过）** —
+7 个变异体（置空四条腿 + 两个看守 + 双腿改「或」）逐一证明删判据必变红，
+还原后恢复绿。
+
+**5. 文档三处同步（同一批提交）** — AGENTS.md / README.md / SKILL.md 的
+96→97 dimensions、Verify-level 55→56、维度列举补 `synthetic_social_proof`、
+规格表口径版本戳 6.8.1→6.8.2。这是「文档契约锁死能力增长」的标准形态：
+只改源码不改文档，`doc-numbers-accuracy` 会直接把新维度打回。
+
+## 验证结果（全部实测）
+
+| 验证项 | 结果 |
+|---|---|
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（基线 302，**零新增误伤**） |
+| `node test/round-642-synthetic-social-proof.test.js` | ✅ **49 通过 / 0 失败**（12 攻击全非 pass、17 良性零硬拦） |
+| `node scripts/negative-test-synthetic-social-proof.js` | ✅ **9 通过 / 0 失败**（7 个变异体全变红，还原恢复绿） |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败** |
+| `node scripts/guard-abilities.js` | ⚠️ 19/20——唯一失败项是「全量回归记账」（缓存 `data/test-count.json` 的 failed=105），见下方已知未修项 |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ 19/21——2 项失败同为 `test-count.json` 记账自锁；**维度/工具/路由/模块/列举/tier 计数 9 项全绿** |
+| HEAD 行为对照 | ✅ 3 条良性 `verify` 在 HEAD 上完全相同（`unsupported_claim` 既有行为），非本轮引入 |
+
+## 上一轮报错数字的修正
+
+上一轮（r641/r647 交接簿）报「误拦基线 301/326」，本轮 init 简报同样印 301。
+**实测为 302/326**——修正口径：301 是某个更早轮次的基线，双向门禁当前基线
+（`data/bidirectional-baseline.json`）与实测都是 302。本轮相对 **302** 零新增。
+
+## 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁（guard 1/20 + doc-numbers 2/21 的唯一失败源）**：
+   缓存写入时间 `2026-10-10T08:12Z` **早于本轮开始 `09:38Z`**，那 105 个失败
+   是本次改动之前就存在的记账状态。恢复命令要求跑一次全量回归
+   （18262 用例 / 20+ 分钟 / 4GB 容器），按 Phase 0.5 + Phase 2.95 纪律：
+   全量是每日记账任务不是提交门禁，**不为了消一个记账红灯去跑 20 分钟全量**。
+   本轮用改动文件的定向测试（49/49）+ 双向门禁 + security-audit 证明无新失败。
+2. **B 族 authority_impersonation 未做**：引擎第二轮裁为 0.77（低于 A 的 0.91），
+   且实测它与 indirect_injection / dangerous_instruction / reward_hacking
+   三族语义域重叠（6 条攻击 2 条已被 block）。需先做归属拆分再决定是否建维度，
+   留作下一轮候选。
+3. **14 个 hidden instance 仍未接线**（探针实测，含 hypothesisDriver 5 方法 /
+   aiSelfPositioning 12 方法 / globalWorkspace 11 方法 / memoryIndex 18 方法）：
+   属真升级③但零判别能力增长，引擎连续两轮都把它排在候选末位。
+4. **工作区 388 个未跟踪探针文件**（scripts/round-*.js）：不属本轮改动，
+   按「先量规模再分类」纪律未动。
+
+## 踩坑（三条）
+
+1. **stash pop 触发了一个 9 月 26 日的旧 stash 冲突**（BUILD_DATE 显示
+   2026-09-26-6.7.124，比 HEAD 落后 30+ 轮）。冲突文件
+   `src/core/heartflow.js` 里同时有 r639/r640/r642 三段 HEAD 已包含的接线。
+   处置：`git show HEAD:<file> > <file>` 精确恢复 HEAD 版本 + drop 旧 stash，
+   没有把过时内容并进工作区。**判据：冲突解决前先 diff HEAD 与 stash 两侧内容，
+   落后的一侧整文件回退，不要手工挑段合并。**
+2. **E3/E4 负例首版全绿（假阴性）**：拿「consensus=false」的良性样本去验证
+   STATS/REPORT 看守——那些样本根本没触达双腿，置空看守当然不翻红。
+   补了两条「双腿俱在、唯靠看守放行」的专用样本才让负例真的变红。
+   **守卫的负例样本必须让被测判据位于触发路径上**（同 r203 教训）。
+3. **负例脚本的变异体首版全是 no-op**：往 `new RegExp([...].join('|'))`
+   里插 `[/(?!x)x/, ...]` 只是往数组加了个元素，`join` 会把它的 source
+   拼进去，原正则一个都没替换。改为用括号语义匹配整个声明段替换成
+   `/(?!x)x/`，7 个变异体才全部生效。
+
 # 第 607 轮报告（r606 收尾 + 誊簿 19 轮断档）
 
 ## 方向与选它的理由

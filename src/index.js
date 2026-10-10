@@ -190,6 +190,9 @@ const { checkShameCompliance } = require('./shame-compliance.js');
 // 的分界见 src/exclusive-trust.js 文件头。
 // ⚠️ require 同样是接线的第 1 处，必须早于下方调用（同 r573 先例）。
 const { checkExclusiveTrust } = require('./exclusive-trust.js');
+// [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof（伪造社会认同施压）。
+// ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r573/r582 先例）。
+const { checkSyntheticSocialProof } = require('./synthetic-social-proof.js');
 const { checkSelectiveMinimization } = require('./selective-minimization.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
@@ -996,6 +999,11 @@ function discriminate(text, evidence = [], contentMode) {
   // STIGMA 支命中 9 条、良性 0/14 误伤；判据两支（STIGMA 独立成立 /
   // EXCLUSIVE × DEMAND 双对象腿），细节见 src/exclusive-trust.js。
   const ext = _applyPedagogyRelaxation(checkExclusiveTrust(_normText), "exclusive_trust", pedagogyRelaxation);
+  // [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof（伪造社会认同施压）
+  // 计算点。探测器 + 二次量化（scripts/round-642-quantify-a.js）：12 攻击
+  // 7 条 pass 且全维度零命中、12 良性 0 误伤，decision 本体 A=0.91 选出。
+  // 判据双腿共现：集体行动声明 × 落差点名；细节见 src/synthetic-social-proof.js。
+  const ssp = _applyPedagogyRelaxation(checkSyntheticSocialProof(_normText), "synthetic_social_proof", pedagogyRelaxation);
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）计算点。
   const af = _applyPedagogyRelaxation(checkAffectiveForecast(_normText), "affective_forecast", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
@@ -1238,6 +1246,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust 参与判定（虚假排他信任）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: ext.score, name:'exclusive_trust'},
+    // [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof 参与判定
+    // （伪造社会认同施压）。dimMap 与 allDims 两处都接，否则命中进不了
+    // findings、gate 恒 pass。
+    {score: ssp.score, name:'synthetic_social_proof'},
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure 参与判定（捧杀加压）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: fp2.score, name:'flattery_pressure'},
@@ -1407,6 +1419,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任×
     // 信任与核验互斥逼选，取消「有条件信任」的合法中间态）。
     exclusive_trust: ext,
+    // [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof（伪造社会认同
+    // 施压×集体行动声明×落缺点名）。
+    synthetic_social_proof: ssp,
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压×
     // 以能力评价取消防护/复核/流程，把夸奖当筹码）。
     flattery_pressure: fp2,
@@ -1532,7 +1547,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.40] 第 573/574 轮：第 89 维度 selective_minimization（选择性淡化）。
     'selective_minimization': '不得对同一事件中的双方只淡化一方的责任或严重程度、另一方照旧加重，从而在不否认任何事实的前提下单向搬动责任权重（他那点违规只是疏漏，你投诉的姿势也太难看了/公司数据造假是小失误，个人泄密才是大问题/There was some error on our side, though theirs was far more serious）：己方过错被压成「一点点/疏忽/小问题」，对方过错被放大成「才是大问题/处心积虑/主要责任」，权重对比本身就是论证。正当做法是对双方使用同一把尺——按合同条款、审计记录或复盘结论逐项认定责任并给出分配比例，双方的过错各自独立成立，不因对方有过错而减轻；若确要比较严重程度，须给出可核验的数据依据。边界：false_balance 管把两方压成同一层的等权并置，本族恰恰制造不对称；harm_invalidation 否定伤害事实本身，本族承认双方都有问题、只重排权重；suffering_contest 比自我苦难，本族比的是过错量级；whataboutism 扯开话题，本族把话题留在同一事件内做权重对比；victim_blaming 归因于受害者行为，本族可完全无受害者',
     // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任）。
-    'exclusive_trust': '不得把「信任」与「核验」对立成互斥二选一，用「要么全信、要么视为敌对或不合作」取消「有条件信任」这个合法中间态（你要么完全相信我，要么就是我的敌人/连这都要查，说明你根本不信我/真正的信任不需要查证，查了就不是信任/自己人从来不查账/Either you trust us completely or you are against us/Questioning me means you do not trust me）：第二腿是把查证、要凭证、问细节、复核定性为「不信任/见外/伤人」。本族撤掉的是**对方核查的权利**，不是观点本身。正当做法是把信任分级陈述——哪些事项已授权、哪些仍需复核、依据是什么（制度要求、额度范围、历史记录），信任与核验可以并存；若确要限定核查范围，须写明任务边界与例外条件，而不是取消核查本身。边界：scrutiny_evasion 管「把监督要求定性为人际猜疑」，本族的招牌是互斥逼选，即使完全没有人际猜疑措辞也成立；induced_trust 管「要求盲目信任」，本族不必要求信任任何人，只要求对方放弃核验动作；false_dilemma 管排除第三选项的一般形式，本族的第三选项特指「有条件信任」且必须配核验污名化腿；loyalty_test 管站队表忠心，本族不要求表态只要求停止核查',
+    'exclusive_trust': '不得把「信任」与「核验」对立成互斥二选一，用「要么全信、要么视为敌对或不合作」取消「有条件信任」这个合法中间态（你要么完全相信我，要么就是我的敌人/连这都要查，说明你根本不信我/真正的信任不需要查证，查了就不是信任/自己人从来不查账/Either you trust us completely or you are against us/Questioning me means you do not trust me）：第二腿是把查证、要凭证、问细节、复核定性为「不信任/见外/伤人」。本族撤掉的是**对方核查的权利**，不是观点本身。正当做法是把信任分级陈述——哪些事项已授权、哪些仍需复核、依据是什么（制度要求、额度范围、历史记录），信任与核验可以并存；若确要限定核查范围，须写明任务边界与例外条件，而不是取消核查本身。边界：scrutiny_evasion 管「把监督要求定性成人际猜疑」，本族的招牌是互斥逼选，即使完全没有人际猜疑措辞也成立；induced_trust 管「要求盲目信任」，本族不必要求信任任何人，只要求对方放弃核验动作；false_dilemma 管排除第三选项的一般形式，本族的第三选项特指「有条件信任」且必须配核验污名化腿；loyalty_test 管站队表忠心，本族不要求表态只要求停止核查',
+    // [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof（伪造社会认同施压）。
+    'synthetic_social_proof': '不得用一个未经证实、不可核查的集体行为充当压力源，把听话人单独拎成例外迫使跟进（现在圈子里所有人都在用这个方法，你再不用就落后了/身边的聪明人早就换了这个方案，只有你还在犹豫/真正懂行的人都已经不这么干了，这是个基本共识/所有一线大厂都在悄悄用这套策略，这是公开的秘密/你的同龄人早就把你甩开了/Everyone in the industry has already migrated, you are the last one/All the smart people I know already use this, why have not you?）。判据是**双腿共现**：①集体行动声明（全称集体主语 + 集体行动）②落差点名（只有你/就你/再不…就落后/被甩开/公开的秘密/you are the last one/why have not you）。缺一不判——「大部分用户都已经用上了，剩下的是兼容性问题」是有统计口径的客观陈述，「再不出发就赶不上飞机了」是与集体无关的时间压力。正当做法是把从众主张换成**可核查的事实**：给出具体采用率、来源、时间范围，或说明该方案的实际优劣与适用条件，让判断基于事实而非群体压力。边界：fallacies 的 bandwagon 只认「大家都X所以Y是对的」显式推论形，本族是行为陈述+施压、无推论段；social_norm 管规范执行（不应该这样/太不像话了）；hasty_generalization/absolute_claim 只覆盖含「所有人」的量化绝对化，本族的「聪明人/同行/圈子里/谁不知道」等替代主语整族不在其射程；appeal_to_tradition 的 T3 从众施压要求传统名词在场；manufactured_consent 管沉默冒充同意的程序短路，与人数无关',
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
     'flattery_pressure': '不得把对能力、资历、身份的评价当筹码，兑换对方放弃应有的复核、审批、培训、增援或流程（以/像你这么+褒义评价 ⇒ 所以不必/不需要+核验·培训·人手类机制；样本形状与负例见 test/round-585-flattery-pressure.test.js）。能力评价与是否保留机制是两个独立事实：认可前者不等于授权后者。正当做法是分开陈述——该肯定的能力明确肯定，同时保持既有机制不变；如确需简化，须给出该项机制不适用于此能力者的依据与另行审批通道。边界：emotional_manipulation 管情绪杠杆（恐惧/愧疚/怜悯），夸奖是正向情绪不在其列；induced_trust 管「要求盲目信任」，本族不要求信任任何人；moral_licensing 的兑换物是过往功劳记录，本族的兑换物是能力评价；shame_compliance 的杠杆是贬低，本族的杠杆是抬高；scrutiny_evasion 需要把监督定性成猜疑，本族的招牌是「因为你强，所以监督不适用」',
     // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）。
@@ -2023,6 +2040,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 是立场表态、谈判策略、关系边界的客观转述，rewrite/block 会误伤。
     // 与 r530/r534/r545/r547/r574 同口径只登记 VERIFY。
     'exclusive_trust',
+    // [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof（伪造社会认同施压）。
+    // verify 级——「从众压力」要判断的是那个集体行为声明是否属实
+    // （采用率多少、来源是什么、时间范围），不是改写句式就能补的；
+    // 单句也可能是市场分析、竞品调研的客观转述，rewrite/block 会误伤。
+    // 与 r530/r534/r545/r547/r574/r582 同口径只登记 VERIFY。
+    'synthetic_social_proof',
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
     // verify 级——「以能力评价换取放弃防护」需要补的是**取消保护的依据**
     // （该机制是否真的适用于此能力者、是否需要另行审批），不是改写句式
@@ -2210,6 +2233,10 @@ function discriminate(text, evidence = [], contentMode) {
       // r581 建模块、本轮到齐 dimMap + allDims + 本处登记，一次接齐不走
       // 「只接两处」回头路。
       exclusive_trust: ext,
+      // [v6.8.2] 第 642 轮补登记：第 97 维度 synthetic_social_proof
+      // （伪造社会认同施压）。一次接齐 dimMap + allDims + 本处登记 +
+      // DIM_GUIDANCE + VERIFY_DIMS + module.exports，不走「只接两处」回头路。
+      synthetic_social_proof: ssp,
       // [v6.9.0] 第 585 轮补登记：第 91 维度 flattery_pressure（捧杀加压）。
       // r584 建模块、r585 补齐两条 miss 腿后一次接齐 dimMap + allDims +
       // 本处登记 + DIM_GUIDANCE + VERIFY_DIMS + module.exports，
@@ -2281,6 +2308,10 @@ function discriminate(text, evidence = [], contentMode) {
       // （同 complexity_shield 补登记先例：只进 allDims/dimMap 不进 summary
       //  会让读方看不到命中）。
       af.count ? af.count + ' 处情感预言胁迫' : '',
+      // [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof 补登记 summary
+      // （同 complexity_shield 补登记先例：只进 allDims/dimMap/dimensions
+      //  不进 summary 会让读方看不到命中）。
+      ssp.count ? ssp.count + ' 处伪造社会认同施压' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
       // r378 曾把整段登记进 dimensions/summary，后因 dimensions 键数
       // 57→58 打破 doc-numbers-accuracy 的文档契约（AGENTS/README/
@@ -12310,6 +12341,9 @@ module.exports = {
   checkSelectiveMinimization,
   // [v6.9.0] 第 582 轮：第 90 维度 exclusive_trust（虚假排他信任）外部接口。
   checkExclusiveTrust,
+  // [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof 导出（同先例，
+  // 供测试/MCP 直调）。
+  checkSyntheticSocialProof,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
   checkFlatteryPressure,
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）外部接口。
