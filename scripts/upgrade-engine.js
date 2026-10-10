@@ -500,7 +500,15 @@ function cmdRelease() {
 function cmdPublish() {
   const argv = process.argv.slice(3);
   const yes = argv.includes('--yes');
+  // 版本号来自本地 VERSION 文件，但该文件可能被误改/污染。
+  // [AUDIT-FIX] 先校验格式再使用：ver 会被拼进 rm -rf 和 npm install，
+  // 一个含空格/shell 元字符的"版本号"会让 rm -rf 打到任意路径。
   const ver = sh('cat VERSION').trim();
+  if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(ver)) {
+    console.error(`❌ VERSION 文件内容不是合法语义化版本号: ${JSON.stringify(ver)}`);
+    console.error('   → 中止 publish/复验流程，请先修正 VERSION。');
+    process.exit(1);
+  }
 
   // 门槛（复用 release 的检查，避免两套标准漂移）
   const results = runAllChecks();
@@ -553,10 +561,10 @@ function cmdPublish() {
   // ④ 独立目录安装复验
   console.log('\n── ④ 独立安装复验 ──');
   const vdir = `/tmp/e2e-${ver.replace(/\./g, '')}`;
-  trySh(`rm -rf ${vdir}`);
-  trySh(`mkdir -p ${vdir} && cd ${vdir} && npm init -y >/dev/null 2>&1`);
-  const inst = trySh(`cd ${vdir} && npm install @yun520-1/heartflow@${ver} --prefer-online 2>&1`);
-  const gotVer = trySh(`cd ${vdir} && node -e "console.log(require('@yun520-1/heartflow/package.json').version)"`).trim();
+  trySh(`rm -rf "${vdir}"`);
+  trySh(`mkdir -p "${vdir}" && cd "${vdir}" && npm init -y >/dev/null 2>&1`);
+  const inst = trySh(`cd "${vdir}" && npm install @yun520-1/heartflow@${ver} --prefer-online 2>&1`);
+  const gotVer = trySh(`cd "${vdir}" && node -e "console.log(require('@yun520-1/heartflow/package.json').version)"`).trim();
   if (gotVer !== ver) {
     console.log(`❌ 独立安装拿到 ${gotVer}，期望 ${ver}。\n${inst.slice(-500)}`);
     console.log('   → 不自动回滚版本号（npm 上已是新版，回滚会造成 remote 与 npm 不一致）。');

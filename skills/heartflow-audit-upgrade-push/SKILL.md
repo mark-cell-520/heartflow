@@ -396,15 +396,15 @@ curl -sI --connect-timeout 5 https://github.com > /dev/null 2>&1 || echo "curl�
 gh auth setup-git
 
 # 2. 直接尝试
-git push origin main --no-verify
+git push origin main
 
 # 3. 超时延长
 git -c http.lowSpeedLimit=0 -c http.lowSpeedTime=999999 \
-    -c http.postBuffer=524288000 push origin main --no-verify
+    -c http.postBuffer=524288000 push origin main
 
 # 4. token 内联
 TOKEN=$(gh auth token)
-git push "https://$(gh api user --jq .login):${TOKEN}@github.com/<owner>/<repo>.git" main --no-verify
+git push "https://$(gh api user --jq .login):${TOKEN}@github.com/<owner>/<repo>.git" main
 
 # 5. 终极方案：GitHub API 直接推送（当 git push 完全超时但 gh/curl API 可通时）
 # 见 references/github-443-fallback.md 的"终极方案"章节
@@ -422,7 +422,7 @@ git push "https://$(gh api user --jq .login):${TOKEN}@github.com/<owner>/<repo>.
 # 方案 A（推荐）：temp 分支 → GitHub API 合并
 # 1. 创建 temp 分支
 git branch temp-v2.9.0 HEAD
-git push origin temp-v2.9.0 --no-verify
+git push origin temp-v2.9.0
 
 # 2. 创建 PR（用 gh CLI 或 API）
 # gh CLI 方式：
@@ -513,7 +513,7 @@ git push origin temp-v2.9.0
 
 ```bash
 cd <skill_dir>
-git add -A && git commit -m "vX.Y.Z: 升级说明" && git push origin --no-verify
+git add -A && git commit -m "vX.Y.Z: 升级说明" && git push origin
 ```
 
 ### 结果送达检查（跨平台工作流）
@@ -916,7 +916,7 @@ done
 4. **Date.now() * 1000**：meaningful-memory.js 中有3处，改一处漏一处会导致时间戳单位不一致
 5. **model.onnx 86MB**：绝不能提交到 GitHub，必须 gitignore
 6. **git remote**：心虫的 GitHub remote 是 `origin`，不是 `origin-sync`
-7. **Git hook 阻断**：如果 push 被 hook 阻断，用 `git push origin --no-verify`
+7. **Git hook 阻断**：push 被 hook 阻断时，**先查 hook 为什么拦**——hook 是拦住密钥/未验证改动的最后一道闸。确认是误报后再修 hook 或按项目规范豁免，不要一律 `--no-verify` 绕过。
 8. **子代理写入大型JS文件（>1000行）时产生严重损坏**：
    - 子代理用patch工具追加新方法到大型文件时，经常出现缩进错乱（2空格vs4空格）、类结束`}`位置错误、重复代码段
    - **根因**：子代理通过patch工具间接修改文件，对文件整体结构缺乏感知，容易在类结束`}`之后插入代码
