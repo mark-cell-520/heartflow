@@ -2,10 +2,10 @@
   "round": 655,
   "version": "6.8.8",
   "roundStartedAt": "2026-10-10T20:48:06.652Z",
-  "lastFinishAt": "2026-10-10T20:01:51.926Z",
-  "lastGreen": true,
+  "lastFinishAt": "2026-10-10T21:12:19.727Z",
+  "lastGreen": false,
   "lastChecks": [
-    "PASS 版本四处一致",
+    "FAIL 版本四处一致",
     "PASS 版本已进 git log",
     "PASS 工作区已跟踪文件干净",
     "PASS README 测试数与缓存一致",
