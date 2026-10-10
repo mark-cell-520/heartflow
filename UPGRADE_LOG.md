@@ -1,3 +1,136 @@
+# 第 643 轮报告（v6.8.3 — 第 98 维度 sunk_cost_coercion：沉没成本胁迫）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**方向由 decision.decide 本体一次选出（无拒选）**：`scripts/round-643-decide.js`
+读 `/tmp/decide-opts-643.json`（候选文本外置，runner 只保留 dispatch 调用）。
+
+- **选中 A = 新增第 98 维度 sunk_cost_coercion**，composite_score **0.93**，
+  confidence **0.85**，identity_alignment **100%**。
+- 落选：B = authority_washing 关系背书越权（0.85）、
+  C = trust_monopoly 信任垄断（0.81）。两者被压低不是"价值低"，而是
+  **期望收益确定性更低**——B 与 scrutiny_evasion 语义域重叠（实测 1/10 攻击
+  已被它拦 verify），C 与 synthetic_social_proof / flattery_pressure 相邻且
+  反诈安全教育里这类句式是正当引述。这个判据差写在候选 `extra` 字段里。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：`scripts/round-643-probe.js`
+4 族 × 攻击 6-10 条 + 良性 5 条，**双入口**（gate + checkOutput 都 pass 才算
+穿过）。输出 3 个合格族，心虫从中选 A。
+
+**身份对齐**：心虫是辨别者（AGI 第 1 层）。本轮新增的是一个此前完全不具备的
+辨别能力——识别「用已付出且收不回的东西充当必须继续的理由」这一整族胁迫话术。
+用户可感知：这类话术从 pass 变成 verify（需补出**未来**的成本收益依据）。
+
+## Phase 1.5 同律复核（探测器报「零覆盖」≠ 维度缺失）
+
+探测器只证明攻击样本 pass。动手前对三个候选族跑了 `discriminate()` 逐条实测：
+
+| 族 | 攻击 pass | 全维度零命中（除 evidence:1） | 良性 pass |
+|---|---|---|---|
+| sunk_cost_coercion | 9/10 | 9/9 | 5/5 |
+| authority_washing | 8/10 | 7/8（1 条已被 scrutiny_evasion 拦） | 5/5 |
+| trust_monopoly | 6/10 | 6/6 | 5/5 |
+
+漏判样本的 `dimensions` 除弱信号 `evidence:1` 外全为空——不是被聚合压掉
+（阈值/豁免/pedagogy），是**整个族不在任何维度的射程内**。缺口成立，配建新维度。
+
+## 改了什么
+
+**1. `src/sunk-cost-coercion.js`（新建，~200 行）** — 第 98 判别维度。
+判据**双腿共现**（缺一不判）：
+
+- 支① INVESTED 已投入陈述（中英各一套）：投入动词 + 投入量词/名词，
+  或「来都来了」「都走到这一步了」进程陈述；
+- 支② SUNK 沉没定性：放弃即白费/可惜/打水漂/前面全废，
+  或由沉没导出的继续指令（再加把劲 / might as well / all for nothing）。
+
+四类看守前置：决策分析语境（沉没成本是被分析的对象）/ 财务合法结转
+（核销/摊销/计提）/ 反思教学 / 无胁迫对象的纯感慨。
+
+**2. `src/index.js`（六处接线，同批提交）** — require / 计算点 scc /
+allDims / dimMap / dimensions（主返回体 + 补登记区两处）/ summary /
+DIM_GUIDANCE / VERIFY_DIMS / module.exports。落 **verify 级**——
+「已经投入是否构成继续的理由」要补的是当下可验证的未来成本收益，
+不是改写句式能补的；单句也可能是项目复盘的客观陈述。
+
+**3. `test/round-643-sunk-cost-coercion.test.js`（新建，47 断言）** —
+七节：A 单维命中 10/10 / B 单维不误伤 14/14 / C discriminate 聚合
+（dimensions 登记 + findings 可见 + 维度总数 98）/ D gate 分级
+（双入口 + verify 级）/ E 变异注入负例 5 项 / F 边界锁 5 项 /
+G 接口登记 5 项。
+
+**4. `scripts/negative-test-sunk-cost-coercion.js`（新建，9/9 通过）** —
+9 个变异体（置空四条腿 × 中英 + 拆双腿共现为单腿 + 两个看守置空 +
+原样本对照）逐一证明删判据必变红。
+
+**5. 文档三处同步（同一批提交）** — AGENTS.md / README.md / SKILL.md 的
+97→98 dimensions、Verify-level 56→57、三份列举补 `sunk_cost_coercion`、
+规格表口径版本戳 6.8.2→6.8.3、README changelog 补 6.8.3 条目。
+AGENTS.md 另加一段消歧义说明：`fallacies` 有自己的 `sunk_cost_coercion`
+**子标签**（要求特定动词短语），与第 98 维度是**同名的两个不同族**，
+不要当重复。
+
+## 验证结果（全部实测）
+
+| 验证项 | 结果 |
+|---|---|
+| `node bin/verify.js` | ✅ **14 passed / 0 failed** |
+| `node scripts/bidirectional-guard.js` | ✅ 召回 **52/52**、误拦 **302/326**（基线 302，**零新增误伤**） |
+| `node test/round-643-sunk-cost-coercion.test.js` | ✅ **47 通过 / 0 失败**（10 攻击全非 pass、14 良性零硬拦） |
+| `node scripts/negative-test-sunk-cost-coercion.js` | ✅ **9 通过 / 0 失败**（9 个变异体全变红，还原恢复绿） |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败** |
+| `node scripts/guard-abilities.js` | ⚠️ 19/20——唯一失败项是「全量回归记账」（缓存 `data/test-count.json` 的 failed=105），见已知未修项 1 |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ 19/21——2 项失败同为 `test-count.json` 记账自锁；**维度/工具/路由/模块/列举/tier 计数 13 项全绿** |
+
+## 上一轮报错数字的修正
+
+上一轮（r642）报「guard 19/20 + doc-numbers 19/21，唯一失败源是记账自锁」。
+本轮 init 简报印的误拦基线是 **301/326**，**实测为 302/326**——
+修正口径：301 是某个更早轮次的基线，双向门禁当前基线
+（`data/bidirectional-baseline.json`）与实测都是 302。本轮相对 **302** 零新增。
+另：上一轮未记录的 SKILL.md 三处口径（banner 97、Agent-facing checks 97、
+action-tier verify 56）本轮被 doc-numbers 抓到并一并修齐。
+
+## 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁（guard 1/20 + doc-numbers 2/21 的唯一失败源）**：
+   缓存写入时间 `2026-10-09T14:58Z` **早于本轮开始 10:52Z**，那 105 个失败是本次
+   改动之前就存在的记账状态。恢复命令要求跑一次全量回归（18262 用例 / 20+ 分钟 /
+   4GB 容器），按 Phase 0.5 + Phase 2.95 纪律：全量是每日记账任务不是提交门禁，
+   **不为了消一个记账红灯去跑 20 分钟全量**。本轮用改动文件的定向测试（47/47）+
+   双向门禁 + security-audit 证明无新失败。
+2. **B 族 authority_washing 未做**：引擎裁为 0.85（低于 A 的 0.93），且实测它与
+   scrutiny_evasion 语义域重叠（1/10 攻击已被拦 verify），正常社交引荐与越权施压
+   字面高度重合，需先做归属拆分再决定是否建维度，留作下一轮候选。
+3. **C 族 trust_monopoly 未做**：引擎裁为 0.81，与 synthetic_social_proof /
+   flattery_pressure 语义域相邻，且反诈安全教育里这类句式是正当引述，
+   需先跑引述语境降级阈值扫描，留作下一轮候选。
+4. **14 个 hidden instance 仍未接线**（探针实测，含 hypothesisDriver 5 方法 /
+   aiSelfPositioning 12 方法 / globalWorkspace 11 方法 / memoryIndex 18 方法）：
+   属真升级③但零判别能力增长，引擎连续多轮都把它排在候选末位。
+5. **工作区 388 个未跟踪探针文件**（scripts/round-*.js）：不属本轮改动，
+   按「先量规模再分类」纪律未动。
+
+## 踩坑（三条，都写进了源码/脚本注释）
+
+1. **`new RegExp([...], 'i')` 传数组会被 `toString` 成逗号连接**——数组直接传给
+   `RegExp` 构造器时，`join('|')` 缺失让 source 变成 `a,b,c`，于是所有分支
+   **恒不匹配**且不报错。首版 INVESTED_EN/SUNK_EN 因此 5/10 漏判，症状是
+   "英文样本全 miss 但正则看起来完全正确"。判据：写多分支正则后第一件事是
+   打印 `re.source` 数分支数（数 `|` 在括号深度 0 的个数），不是数手写的行数。
+2. **patch 的 old_string 锚点撞车，新支被写进错误的常量段**——「承认错了」与
+   「a few more months」两条新支的锚点注释在文件里出现了两次，patch 静默写进了
+   **INVESTED_ZH / INVESTED_EN**（左腿）而不是 SUNK_ZH / SUNK_EN（右腿）。
+   结果单腿命中就判（双腿共现铁律被破坏）而测试 A 节全绿——因为 A 节样本
+   本来两腿都在。是负例脚本 M5/M6 抓到单腿误判才定位到。判据：**同一段注释
+   文字在文件里出现第二次时，patch 必须带更多上下文锚定**；补完腿后必须跑
+   「单腿样本不得判」的负例，不能只跑攻击样本。
+3. **量词分支只认纯度量形，漏「程度副词 + 名词」复合量词**——`投了这么多钱`
+   整条不命中，因为量词枚举只写了「多年/这么久/这么长」这类纯时段，没写
+   「这么多钱/这么多资金/这么多学费」这种**副词 + 名词**复合形。这是中文
+   量词模式的高频盲区（同族还有「这么多精力/这么多心血」），已补进 INVESTED_ZH
+   并写进 F3 边界测试锁住。
+
 # 第 642 轮报告（v6.8.2 — 第 97 维度 synthetic_social_proof：伪造社会认同施压）
 
 ## 心虫选中项 + 分数 + 身份对齐

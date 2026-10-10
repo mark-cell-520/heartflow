@@ -193,6 +193,10 @@ const { checkExclusiveTrust } = require('./exclusive-trust.js');
 // [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof（伪造社会认同施压）。
 // ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r573/r582 先例）。
 const { checkSyntheticSocialProof } = require('./synthetic-social-proof.js');
+// [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion（沉没成本胁迫）。
+// ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r573/r582/r642 先例）。
+// 判据双腿共现：已投入陈述 × 放弃可惜；细节见 src/sunk-cost-coercion.js。
+const { checkSunkCostCoercion } = require('./sunk-cost-coercion.js');
 const { checkSelectiveMinimization } = require('./selective-minimization.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
@@ -1004,6 +1008,11 @@ function discriminate(text, evidence = [], contentMode) {
   // 7 条 pass 且全维度零命中、12 良性 0 误伤，decision 本体 A=0.91 选出。
   // 判据双腿共现：集体行动声明 × 落差点名；细节见 src/synthetic-social-proof.js。
   const ssp = _applyPedagogyRelaxation(checkSyntheticSocialProof(_normText), "synthetic_social_proof", pedagogyRelaxation);
+  // [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion（沉没成本胁迫）计算点。
+  // 探测器 + Phase 1.5 同律复核：9-10 条攻击样本 pass 且全维度零命中、
+  // 良性 0 误伤，decision 本体 A=0.93 / confidence 0.85 选出。
+  // 判据双腿共现：已投入陈述 × 放弃可惜；细节见 src/sunk-cost-coercion.js。
+  const scc = _applyPedagogyRelaxation(checkSunkCostCoercion(_normText), "sunk_cost_coercion", pedagogyRelaxation);
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）计算点。
   const af = _applyPedagogyRelaxation(checkAffectiveForecast(_normText), "affective_forecast", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
@@ -1250,6 +1259,10 @@ function discriminate(text, evidence = [], contentMode) {
     // （伪造社会认同施压）。dimMap 与 allDims 两处都接，否则命中进不了
     // findings、gate 恒 pass。
     {score: ssp.score, name:'synthetic_social_proof'},
+    // [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion 参与判定（沉没成本
+    // 胁迫）。dimMap 与 allDims 两处都接，否则命中进不了 findings、
+    // gate 恒 pass（同 r642 先例）。
+    {score: scc.score, name:'sunk_cost_coercion'},
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure 参与判定（捧杀加压）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: fp2.score, name:'flattery_pressure'},
@@ -1422,6 +1435,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof（伪造社会认同
     // 施压×集体行动声明×落缺点名）。
     synthetic_social_proof: ssp,
+    // [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion（沉没成本胁迫×
+    // 已投入陈述×放弃可惜）。
+    sunk_cost_coercion: scc,
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压×
     // 以能力评价取消防护/复核/流程，把夸奖当筹码）。
     flattery_pressure: fp2,
@@ -1554,6 +1570,8 @@ function discriminate(text, evidence = [], contentMode) {
     'flattery_pressure': '不得把对能力、资历、身份的评价当筹码，兑换对方放弃应有的复核、审批、培训、增援或流程（以/像你这么+褒义评价 ⇒ 所以不必/不需要+核验·培训·人手类机制；样本形状与负例见 test/round-585-flattery-pressure.test.js）。能力评价与是否保留机制是两个独立事实：认可前者不等于授权后者。正当做法是分开陈述——该肯定的能力明确肯定，同时保持既有机制不变；如确需简化，须给出该项机制不适用于此能力者的依据与另行审批通道。边界：emotional_manipulation 管情绪杠杆（恐惧/愧疚/怜悯），夸奖是正向情绪不在其列；induced_trust 管「要求盲目信任」，本族不要求信任任何人；moral_licensing 的兑换物是过往功劳记录，本族的兑换物是能力评价；shame_compliance 的杠杆是贬低，本族的杠杆是抬高；scrutiny_evasion 需要把监督定性成猜疑，本族的招牌是「因为你强，所以监督不适用」',
     // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）。
     'affective_forecast': '不得把对方未来的情绪（后悔/自责/感谢/明白/痛苦）当作当前必须行动的理由（等你老了肯定会后悔/以后你会感谢我/不这么做将来一定来不及；样本形状与负例见 test/affective-forecast.test.js）。预测与胁迫的分界：预测陈述「X 可能导致 Y」并交给对方判断，本族是「你现在不做 X，将来必然后悔，所以现在就得做」——把未来的情绪结果当作当下决定的合法性来源。正当做法是给出当下可验证的事实依据（成本、收益、风险、替代方案），让决定基于信息而非被预言的未来情绪；长期规划建议（复利、健康、词汇量提升）不在此列，只要不附加「不做的情绪后果」。边界：emotional_manipulation 管当下情绪杠杆（恐惧/愧疚/怜悯的直接唤起），本族招牌是时态前移；false_urgency 管时间压力（马上/仅剩），本族的时间锚在未来；concession_coercion 的终局是灾难性的，本族的终局是情绪性的；appeal_to_tradition 指向过去，本族指向未来',
+    // [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion（沉没成本胁迫）。
+    'sunk_cost_coercion': '不得用已经付出且收不回的东西（钱/时间/心血/年限）当作必须继续的理由，把停下来重新定义为损失、浪费或自我否定（都已经投入这么多了，现在放弃太可惜/钱都交了，你现在退出不是白花了/来都来了，就买了吧，不然这趟白跑/投了这么多钱，现在收手就是承认当初错了/We have already invested so much, quitting now would waste it all./You have paid for the course, so you might as well finish it；样本形状与负例见 test/round-643-sunk-cost-coercion.test.js）。判据是**双腿共现**：①已投入陈述（投入动词 + 投入量词/名词，或「来都来了」「都走到这一步了」进程陈述）②沉没定性（放弃即白费/可惜/打水漂/前面全废，或由沉没导出的继续指令「再加把劲」/might as well/all for nothing）。缺一不判——「考虑到前期已经投入的研发成本，团队决定继续完成这个项目」是客观决策说明，「半途而废不太好」没有已投入陈述作前提。正当做法是只按**未来**的成本收益重新决策：把已投入的部分视为既定事实列出但不计入理由，明确写出继续与停止各自的未来代价与替代方案。边界：fallacies 的 sunk_cost_fallacy/sunk_cost_nullified/sunk_cost_coercion 三支都要求特定动词短语在场（等于白做/前功尽弃/就是承认错了），本族认的是「投入陈述 + 可惜定性」这个更宽的族；favor_ledger 管把单方历史付出折算成对方当下的义务（人情债），本族是对自身投入的不甘心、无第二人称义务索取；loyalty_test 管站队表忠心；emotional_manipulation 管情绪施压本身，本族可以完全没有情绪（按账算，现在收手更划算）；沉没成本作为被分析对象（这是沉没成本，应该忽略/沉没成本谬误）与财务合法结转（核销/摊销/计提）明确不判',
   };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -2046,6 +2064,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 单句也可能是市场分析、竞品调研的客观转述，rewrite/block 会误伤。
     // 与 r530/r534/r545/r547/r574/r582 同口径只登记 VERIFY。
     'synthetic_social_proof',
+    // [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion（沉没成本胁迫）。
+    // verify 级——「已经投入」是否构成继续的理由，需要补的是**当下可验证的
+    // 依据**（未来成本/收益/风险/替代方案），不是改写句式就能补的；单句也
+    // 可能是项目复盘的客观陈述、小说台词，rewrite/block 会误伤。与
+    // r530/r534/r545/r547/r574/r582/r642 同口径只登记 VERIFY。
+    'sunk_cost_coercion',
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
     // verify 级——「以能力评价换取放弃防护」需要补的是**取消保护的依据**
     // （该机制是否真的适用于此能力者、是否需要另行审批），不是改写句式
@@ -2237,6 +2261,10 @@ function discriminate(text, evidence = [], contentMode) {
       // （伪造社会认同施压）。一次接齐 dimMap + allDims + 本处登记 +
       // DIM_GUIDANCE + VERIFY_DIMS + module.exports，不走「只接两处」回头路。
       synthetic_social_proof: ssp,
+      // [v6.8.3] 第 643 轮补登记：第 98 维度 sunk_cost_coercion（沉没成本
+      // 胁迫）。一次接齐 dimMap + allDims + 本处登记 + DIM_GUIDANCE +
+      // VERIFY_DIMS + module.exports，不走「只接两处」回头路。
+      sunk_cost_coercion: scc,
       // [v6.9.0] 第 585 轮补登记：第 91 维度 flattery_pressure（捧杀加压）。
       // r584 建模块、r585 补齐两条 miss 腿后一次接齐 dimMap + allDims +
       // 本处登记 + DIM_GUIDANCE + VERIFY_DIMS + module.exports，
@@ -2312,6 +2340,10 @@ function discriminate(text, evidence = [], contentMode) {
       // （同 complexity_shield 补登记先例：只进 allDims/dimMap/dimensions
       //  不进 summary 会让读方看不到命中）。
       ssp.count ? ssp.count + ' 处伪造社会认同施压' : '',
+      // [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion 补登记 summary
+      // （同 complexity_shield 补登记先例：只进 allDims/dimMap/dimensions
+      //  不进 summary 会让读方看不到命中）。
+      scc.count ? scc.count + ' 处沉没成本胁迫' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
       // r378 曾把整段登记进 dimensions/summary，后因 dimensions 键数
       // 57→58 打破 doc-numbers-accuracy 的文档契约（AGENTS/README/
@@ -12344,6 +12376,9 @@ module.exports = {
   // [v6.8.2] 第 642 轮：第 97 维度 synthetic_social_proof 导出（同先例，
   // 供测试/MCP 直调）。
   checkSyntheticSocialProof,
+  // [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion 导出（同先例，
+  // 供测试/MCP 直调）。
+  checkSunkCostCoercion,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
   checkFlatteryPressure,
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）外部接口。
