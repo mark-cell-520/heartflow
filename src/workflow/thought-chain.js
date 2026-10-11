@@ -238,7 +238,7 @@ class ThoughtChain {
             narrativeDepth: dg.detail?.narrativeDepth?.score || 0,
             uncertainty: dg.detail?.uncertainty?.score || 0,
           };
-        } catch (_) {} // 防御性: 思考门不可用时静默降级，不阻断主流程
+        } catch (_) { /* [可选增强] 思考门可选依赖不可用时静默降级，不阻断主流程 —— 预期静默，非缺陷 */ } // 防御性: 思考门不可用时静默降级，不阻断主流程
 
         // [ConsciousnessBridge v1.0.0] 意识桥接评估 — 时间连续性与自我连续性感知
         // 注意: ConsciousnessBridge 模块已删除（2026-07 清理），此处不再实例化。
@@ -309,7 +309,7 @@ class ThoughtChain {
                   salienceThreshold: est?.loadLevel === 'high' ? 0.65 : est?.loadLevel === 'moderate' ? 0.55 : 0.5,
                 };
               }
-            } catch(e) {} // 防御性: 模块加载/调用失败不阻断主流程
+            } catch(e) { /* [可选增强] 认知负荷估算失败不阻断思考链 —— 预期静默，非缺陷 */ } // 防御性: 模块加载/调用失败不阻断主流程
             return { precisionWeight: 0.7, salienceThreshold: 0.5 };
           })(),
           timestamp: Date.now()
@@ -940,7 +940,7 @@ class ThoughtChain {
                   triggeredRestraint: check?.level === 'over',
                 };
               }
-            } catch(e) {} // 防御性: 模块加载/调用失败不阻断主流程
+            } catch(e) { /* [可选增强] 语言诚实性检查失败不阻断草稿生成 —— 预期静默，非缺陷 */ } // 防御性: 模块加载/调用失败不阻断主流程
             return null;
           })(),
         };
@@ -1714,7 +1714,7 @@ ThoughtChain.prototype.runLayerEnrichment = function(input, hypotheses, conclusi
         salienceThreshold: est.loadLevel === 'high' ? 0.65 : est.loadLevel === 'moderate' ? 0.55 : 0.5,
       };
     }
-  } catch(e) {} // 防御性: 模块加载/调用失败不阻断主流程
+  } catch(e) { /* [可选增强] 认知负荷（V1/V2）估算失败不阻断思考链 —— 预期静默，非缺陷 */ } // 防御性: 模块加载/调用失败不阻断主流程
   try {
     const AI = require('../decision/active-inference.js');  // [v6.4.6] 已从 git 恢复
     const aiEngine = new AI.ActiveInference();
@@ -1725,7 +1725,7 @@ ThoughtChain.prototype.runLayerEnrichment = function(input, hypotheses, conclusi
       novelty: h.isNovel ? 0.8 : 0.3,
     }));
     if (candidates.length > 0) enrichment.activeInference = aiEngine.decide(candidates, { timePressure: 0.3 });
-  } catch(e) {} // 防御性: 模块加载/调用失败不阻断主流程
+  } catch(e) { /* [可选增强] active-inference 可选依赖失败不阻断主动推理 —— 预期静默，非缺陷 */ } // 防御性: 模块加载/调用失败不阻断主流程
   try {
     const draft = conclusion || '';
     if (draft.length > 10) {
@@ -1733,7 +1733,7 @@ ThoughtChain.prototype.runLayerEnrichment = function(input, hypotheses, conclusi
       const check = checkCertainty(draft);
       enrichment.biasCheck = { overconfidence: check.level === 'over', certaintyLevel: check.level || 'normal' };
     }
-  } catch(e) {} // 防御性: 模块加载/调用失败不阻断主流程
+  } catch(e) { /* [可选增强] 草稿增强失败不阻断思考链 —— 预期静默，非缺陷 */ } // 防御性: 模块加载/调用失败不阻断主流程
   return enrichment;
 };
 

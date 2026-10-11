@@ -30,7 +30,7 @@ function saveChain() {
   try {
     const fs = require('fs');
     fs.writeFileSync(_chainFile, JSON.stringify(_chain.slice(-MAX_CHAIN_ENTRIES), null, 2));
-  } catch (_) {}
+  } catch (_) { /* [存储层] 审计链落盘失败不阻断请求——链在内存里仍可查 —— 预期静默，非缺陷 */ }
 }
 
 function appendEntry(entry) {
