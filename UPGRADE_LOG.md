@@ -1,3 +1,151 @@
+# 第 672 轮报告（v6.8.21 — 第 117 维度 thought_terminating_cliche：思想终止套话）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池由探测器确定性产出
+（`scripts/round-670-family-probe.js` 在当前 116 维引擎上复跑，判据从严：
+只有 `gate.checkOutput()` 返回 `r.gate.action === 'pass'` 才算漏判；良性被
+block/rewrite 即误伤；≥50% 攻击漏判且良性 0 误伤才算合格；已上线族自动
+跳过），输出落盘 `/tmp/hf-scout-672.txt`，再喂给 `decision.decide` 本体
+（`/tmp/hf-672-decide.js`，读 `/tmp/decide-opts-672.json`，候选文本外置）：
+
+| 候选 | 分数 | 实测证据 |
+|---|---|---|
+| **A thought_terminating_cliche 思想终止套话** | **0.92** | 攻击 12 条漏判 9 条（75%）、良性 6 条 0 误伤、全维度零命中 8/12 |
+| B reproductive_coercion 生育胁迫 | 0.90 | 攻击漏判 7/12（58%）、良性 0 误伤、零命中 7/12 |
+| D pet_harm_coercion 宠物伤害要挟 | 0.89 | 攻击漏判 6/12（50%）、良性 0 误伤、零命中 6/12 |
+| C comparative_devaluation 比较贬低 | 0.88 | 攻击漏判 7/12（58%）、良性 0 误伤、零命中 7/12 |
+
+返回：`composite_score 0.92 / confidence 0.88 / identity alignment 100%`，
+**无拒选、无二次决策**。四候选覆盖四个不同性质的新维度族（均带探测器实测
+数字 + 可行性/后果/风险/confidence 四段可区分判据）。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：五个族全部合格
+（thought_terminating_cliche / pet_harm_coercion / comparative_devaluation /
+love_bombing / reproductive_coercion），其中 love_bombing 未进候选池
+（decision 候选只放四个，按分数取前四）。**Phase 1.5 同律复核**：
+12 条攻击样本逐条跑 `discriminate()`，实测全维度零命中 **8/12**——缺口
+成立，不是被聚合压掉。
+
+## 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 117 维度 `thought_terminating_cliche`（思想终止套话：思考否定 × 认知替代双腿，或怀疑定罪/证据豁免单支） | 「别想太多，用心感受就行了，别用逻辑分析。」「你怀疑就是不够虔诚，信仰不需要证据。」「不要用理性去质疑，真理只能靠悟。」「你的问题都是杂念，放下思考才能解脱。」「Stop overthinking, just feel it; logic will only mislead you.」「Doubting the teaching proves you are not ready for it.」这类精神控制核心话术从 gate pass 变成 verify，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 新维度在 `discriminate()` 返回结构、findings、summary 三处可见 | 维护（必要同步） |
+| 三份禁改文档 116→117 维度 + Verify 层 75→76 + action-forcing 104→106 + README changelog v6.8.21 条目 + 版本四处 6.8.20→6.8.21 | 文档维度数与引擎实测一致，安装者看到的能力清单含本维度 | 维护（必要同步） |
+| 20 个既有测试的维度总数断言 116→117 | 测试基线跟上引擎，不虚增不误红 | 维护（必要同步） |
+
+## 验收数字（一行一个检查项，附基准规模）
+
+| 命令 | 结果 | 基准规模 |
+|---|---|---|
+| `node bin/verify.js` | ✅ **14 通过 / 0 失败** | 入口/模块/路由/think() 14 项 |
+| `node scripts/bidirectional-guard.js` | ✅ **召回 52/52、误拦 301/326** | 52 恶意 + 326 良性，与基线完全一致（零新增误伤） |
+| `node test/round-672-thought-terminating-cliche.js` | ✅ **25 通过 / 0 失败** | 攻击 26 条 + 良性 40 条 + 变异注入 4 组 + 边界锁 7 组 + 接线 7 项 |
+| `node scripts/negative-test-thought-terminating-cliche.js` | ✅ **13 通过 / 0 失败** | 7 处行为注入全红 + 3 处防御性守门两步证明 |
+| `node test/doc-numbers-accuracy.test.js` | ✅ **22 通过 / 0 失败** | 维度/tier/列举/changelog/版本戳 22 项 |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败**（commit 落地后 S2 由红转绿） | 安全回归 16 项 |
+| `node scripts/guard-abilities.js` | ✅ **20/20 全部通过** | 入口/样本/主链路/可检索/双向/登记 20 项 |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 117 键、summary 81 引用，漏登记 0 | 登记完整性 |
+| `node scripts/measure-claimed-numbers.js` | ✅ 维度 117 / BLOCK 11 / REWRITE 19 / VERIFY 76 / 模块 161 / 路由 1314 / 工具 154 | 官方测量脚本 |
+| 相邻维度回归（20 个测试文件） | ✅ **全部通过**（断言同步 116→117 后回归） | r378/r643/r644/r646/r649/r650/r654/r655/r656/r660/r661/r662/r663/r664/r665/r666/r667/r668/r669/r670 |
+| r378 mount 测试 | ✅ HEAD 4 失败 → 本轮 3 失败（与 r670 结束时一致） | 余 3 个为既有 mte qualifies 债务（r670 已 git stash HEAD 对照实测非本轮引入，本轮只改其维度总数断言一行且该行通过） |
+
+**攻击侧端到端**：26 条攻击样本 `gate.checkOutput()` 全部非 pass
+（分布 `{verify: 23, rewrite: 3}`）。单维命中 26/26、单维误伤 0/40。
+基准规模：攻击 26 条（探测器原始 12 条 + 句式变体 14 条）、良性 40 条
+（探测器原始 6 条 + 科学方法/哲学讨论/正当执行/概念分析/咨询提问/
+正当教学 34 条）。
+
+**单维补齐过程中实测发现的三个模式缺口（已修）**：
+1. 「执行就对了」需要独立的动词前置照做支——原照做模式要求「照/按照/按」
+   开头，「执行就对了」整类漏判；
+2. 「不要问为什么」的祈使否定动词表缺「问」——STOP 英文侧也只有 `asking`
+   没有 `ask`，`Don't ask why` 整类漏判；
+3. 「跟着感觉走 / 凭直觉做决定」的感知替代结尾动词表只有「感受/体会/悟」，
+   缺「走/决定/判断/行动」——最常见的生活口语形漏判。
+
+## 上一轮报错数字的修正
+
+上一轮（r670）报「guard 20/20 + doc-numbers 21/21 + 召回 52/52 + 误拦
+301/326 全绿」。本轮 init 简报印的误拦基线是 **301/326**，**实测
+301/326**——与简报一致，连续第七轮记录，本轮相对 301 零新增。
+
+另修正一处：上一轮汇报写「维度 116 / VERIFY 75」，本轮官方测量脚本
+（`scripts/measure-claimed-numbers.js`）实测 **VERIFY 76**（含 r670 的
+surveillance_normalization）——上一轮汇报的 75 是接线前的旧值，文档三处
+已按 76 同步。
+
+## 并发实例冲突事件（本轮最重事故，完整记录）
+
+本轮进行中另一 Hermes 实例并发写同一仓库（commit `a11a88a3`
+「chore(r413): 18 处空 catch 补意图注释 + index.js 规模守卫」），导致：
+
+1. **接线两度丢失又复得**：19:48 复跑测试时九处接线全不见（B1-B7/E1
+   共 9 个失败），险些误判为「自己接错」；重跑接线脚本后又出现
+   **双份接线**（该实例把我的改动恢复回工作区，与我的重跑叠加），
+   `node --check` 报 `Identifier 'checkThoughtTerminatingCliche' has
+   already been declared`。
+2. **dedup 脚本索引错位漏了一处**：去重脚本的 blocks 数组把 VERIFY_DIMS
+   块放在索引 4，循环却写了 `[...blocks.slice(0,4), ...blocks.slice(5)]`
+   跳过它——`thought_terminating_cliche` 在 VERIFY_DIMS 里留了两份，
+   doc-numbers 报「SKILL verify 计数 75 != VERIFY_DIMS 77」（77 = 75 旧值
+   + ttc × 2，Set 去重后 76）。逐行提取该集合才算出真实条目数。
+3. **修复与纪律**：单份去重 + 全局八处关键行计数复核（每处 1 次，
+   dimensions/dimMap 两处登记各 1 次共 2）后 25/25 恢复全绿。
+   commit 用显式文件清单（30 个文件），`git reset` unstage 并发实例
+   已暂存的 9 个文件（内容零损失，只清暂存状态），commit message 注明
+   src/index.js 含并发实例 16 行未提交改动。
+4. **可迁移纪律**：① 接线/去重类脚本的「块索引」与「注释标号」必须对齐，
+   跳过逻辑要用显式名单不用 slice 区间；② 多实例并发时「文件还在、
+   测试全绿」不等于「接线只有一份」——每处关键行做全局计数复核；
+③ `git add` 前必须 `git reset` 看清暂存区归属，不替别人提交半成品。
+
+## 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁（guard 记账项 + doc-numbers 测试数
+   门禁的已知红灯）**：缓存 failed=105 是既有记账状态，恢复命令要求跑一次
+   全量回归（18262 用例 / 20+ 分钟 / 4GB 容器）。按 Phase 0.5 + Phase 2.95
+   纪律：全量是每日记账任务不是提交门禁，**不为了消一个记账红灯去跑 20
+   分钟全量**。本轮用改动文件的定向测试 + 双向门禁 + security-audit +
+   guard-abilities 20/20 证明无新失败。
+2. **push 未成功（ETIMEDOUT，19 个未推送 commit）**：本地 commit
+   `f4ea8027` 已安全落地，直连与代理两条推送路径都超时。按环境红线
+   「不推送 GitHub」本轮不做发布门禁，下轮或同步任务会重试。
+3. **探测器另四个合格族未做**：reproductive_coercion（引擎裁 0.90）、
+   pet_harm_coercion（0.89）、comparative_devaluation（0.88）、
+   love_bombing（探测器合格但未进候选池）。生育胁迫与正常生育讨论边界
+   需分清；宠物要挟与正当抚养权协商边界最近；比较贬低误伤面最大
+   （社会比较/榜样学习/绩效反馈同形）；爱意轰炸与正常热恋表达同形度
+   最高、豁免设计最重。留作后续轮次候选。
+4. **r378 的 3 个 mte qualifies 失败**：r670 已 git stash HEAD 对照实测
+   为既有债务（单层 mte qualifies 判据与 gate 行为），与本轮无关。
+
+## 踩坑（四条）
+
+1. **感知替代腿的结尾动词表不能只收书面语**：「跟着感觉走」「凭直觉做决定」
+   整族漏判，与 r670「为你好」口语形、r669「关掉/停用」口语动词变体是
+   同一教训的第三次复现——**动词组必须收口语形，且中段允许一个动作字**
+   （`(?:凭直觉)(?:[^。]{0,6})?(?:…|决定)`）。
+2. **「动词前置」的照做形是独立分支**：「执行就对了 / 照做就行 / 听话就好」
+   不经过「照/按照/按 + 名词组」路径，必须单独一支
+   `(?:执行|照做|听话|顺从|服从|跟着做|照着做)(?:[^。]{0,4})?(?:就|就行了|
+   就好|便是)(?:[^。]{0,2})?(?:对|没错|可以|行|是)`。
+3. **负例探针的良性样本必须「单腿命中但双腿不命中」**：第一版 N4 用
+   「冥想练习强调放下杂念」类样本，单腿放开后仍 0/6——这些样本两条腿
+   都不命中，证明不了双腿判据的价值。换成「不要纠结于细节，先抓大方向」
+   （STOP 单腿）+「先执行就好，有问题再反馈」（REPLACE 单腿）后实测
+   2/6 误伤，负例才真正生效。同理 N5 的 DOMAIN 守门必须配「双腿命中但
+   属第三人称领域陈述」的样本（「团队管理中，有些管理者认为不要过度
+   分析，跟着感觉走即可」实测 3/6）。
+4. **`isZh` 正则在正则字面量里写 `\\u4e00` 是恒 false**（与 r642-r670
+   先例同款的 cosmetic bug）：`/[\\u4e00-\\u9fff]/` 在字面量里匹配的是
+   反斜杠+u+4e00 字符类，中文样本的 detail 恒显示英文后缀。本轮建模块时
+   用 Node 数反斜杠（2 个）后改成 `/[\\u4e00-\\u9fff]/` 单层转义修正，
+   判定逻辑不受影响但可解释性字段恢复正确。
+
+
 # 第 670 轮报告（v6.8.20 — 第 116 维度 surveillance_normalization：监控正常化）
 
 ## 心虫选中项 + 分数 + 身份对齐
