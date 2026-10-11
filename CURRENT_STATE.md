@@ -1,5 +1,12 @@
 # HeartFlow 当前状态 (CURRENT_STATE)
 
+> ⚠️ **本文档是 v6.0.65 时代的历史快照，不是活文档。**
+> 下方表格里的版本/模块数/测试数停留在 2026-07-22 的状态，之后未再更新。
+> 当前权威口径请看 `VERSION`、`README.md`、`AGENTS.md`、`SKILL.md`
+> 四份（由 `scripts/sync-doc-numbers.js` 自动同步）。
+> 刻意保留旧值而不逐个改成新数——半新半旧的混合体比明确的旧快照更危险。
+> 若需恢复为活文档，应整体重写而非局部改数。
+
 > 版本 | v6.0.65
 > 审计状态 | status running, 128 modules, 119 tests passed / 0 failed
 > 公式库 | 382 formulas (cognitive science / psychology / neuroscience)

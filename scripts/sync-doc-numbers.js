@@ -200,7 +200,17 @@ const TARGETS = [
     re: /(\*\*Zero LLM dependency\.\*\*\s+)(\d+)(\s+dimensions,\s+\d+ modules,\s+\d+ MCP tools,\s+[\d,]+\s+dispatch)/,
     docs: ['AGENTS.md'],
   },
-  { num: 'dims', re: /(## The )(\d+)( dimensions)/, docs: ['AGENTS.md'] },
+  // [r415] SKILL.md 也有 `## The N dimensions` 章节标题，但原 pattern 的
+  // docs 只列了 AGENTS.md —— 实测 SKILL.md:260 停在 120 而引擎已 121，
+  // sync-doc-numbers --check 却报"已一致"（pattern 匹配不到即视为无漂移）。
+  // 这是 r414 修 package.json 时暴露的同类盲区：同步脚本报绿 ≠ 真一致。
+  { num: 'dims', re: /(## The )(\d+)( dimensions)/, docs: ['AGENTS.md', 'SKILL.md'] },
+  // [r415] SKILL.md 检查点表格里的 `(N dimensions)` 形状同样没被覆盖。
+  // 实测 SKILL.md:388 ｜ Generated-content safety ｜ `checkOutput` /
+  // `discriminate` (120 dimensions) ｜ 停在 120 而引擎已 121。
+  // 注意 discriminate 后面带反引号（markdown 代码标记），第一版正则漏了
+  // 反引号所以匹配 0 处、脚本继续报"已一致"——同类盲区第二次。
+  { num: 'dims', re: /(discriminate`? \()(\d+)( dimensions\))/, docs: ['SKILL.md'] },
   // [r557 补齐] README / SKILL 横幅：`80 discrimination dimensions × 11-layer`
   // 此前只有规格表行被记账，横幅写死形状没人管（属「不写三份文档」硬边界）。
   // 两处文档同一形状故共用一条 pattern；词尾带 discrimination 以示与
@@ -428,6 +438,66 @@ function main() {
     }
   }
   if (dirty) process.exit(checkOnly ? 1 : 0);
+
+  // [r415] 兜底扫描：清单外却含口径宣称的活文档。
+  //
+  // r414/r415 连修两批盲区的共同根因：同步清单是「写死的文件名 + 写死的
+  // 正则」，凡是形状没登记过的文件/句子，脚本一律视为「无漂移」并报绿。
+  // 报绿 ≠ 真一致 —— 本次实测抓到 SKILL.md 两处、CONTRIBUTING.md 一处
+  // 就是这样漏过去的。
+  //
+  // 刻意不自动改：不知道那些句子是不是历史记录，改了会篡改历史。
+  // 只把候选点打出来让人判断。判据保守：只扫 mtime 30 天内的文件，
+  // 排除 docs/、scratch/、archive/ 等明显的快照/残渣区。
+  const uncovered = (() => {
+    const RE = [
+      { kind: '维度数', re: /(\d+)\s+discrimination dimensions/gi },
+      { kind: '维度数', re: /(\d+)\s+dimensions/gi },
+      { kind: 'MCP工具数', re: /(\d+)\s+MCP tools/gi },
+      { kind: '路由数', re: /([\d,]+)\s+dispatch routes/gi },
+      { kind: '模块数', re: /(\d+)\s+modules/gi },
+    ];
+    // [r415] 全部转成字符串再比：want.dims 是 number 121，而正则抓到的是
+    // 字符串 "121"，用 !== 严格比会恒为 true —— 实测把 CONTRIBUTING.md
+    // 已改对的 121 误报成"121 ≠ 121"。
+    const VALS = {
+      维度数: String(want.dims),
+      MCP工具数: String(want.tools),
+      路由数: String(want.routes),
+      模块数: String(want.modules),
+    };
+    const SKIP = ['node_modules', '/.git', '/data', '/docs', '/scratch', '/archive', '/references', '/skills'];
+    const KNOWN = ['AGENTS.md', 'README.md', 'SKILL.md', 'package.json'];
+    const out = [];
+    (function walk(dir) {
+      let es;
+      try { es = fs.readdirSync(dir, { withFileTypes: true }); } catch (_) { return; }
+      for (const e of es) {
+        const p = path.join(dir, e.name);
+        if (e.isDirectory()) { if (!SKIP.some(s => p.includes(s))) walk(p); continue; }
+        if (!/\.(md|json)$/.test(e.name)) continue;
+        const rel = path.relative(ROOT, p);
+        if (KNOWN.includes(rel)) continue;
+        try { if (Date.now() - fs.statSync(p).mtimeMs > 30 * 864e5) continue; } catch (_) { continue; }
+        let s;
+        try { s = fs.readFileSync(p, 'utf8'); } catch (_) { continue; }
+        const hist = s.search(/##+ *(Version history|变更记录|历史)/);
+        const body = hist > 0 ? s.slice(0, hist) : s;
+        for (const { kind, re } of RE) {
+          for (const m of body.matchAll(re)) {
+            const v = m[1].replace(/,/g, '');
+            if (Number(v) > 5 && v !== VALS[kind]) out.push(`${rel}: ${kind} ${v} ≠ ${VALS[kind]}`);
+          }
+        }
+      }
+    })(ROOT);
+    return [...new Set(out)];
+  })();
+  if (uncovered.length) {
+    console.log(`\n  ⚠️  清单外口径宣称 ${uncovered.length} 处（不自动改，需人工判断是否为历史记录）:`);
+    for (const u of uncovered.slice(0, 15)) console.log(`     ${u}`);
+    if (uncovered.length > 15) console.log(`     …另 ${uncovered.length - 15} 处`);
+  }
 }
 
 if (require.main === module) main();

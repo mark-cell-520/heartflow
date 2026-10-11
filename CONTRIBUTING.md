@@ -22,7 +22,7 @@ Then open an issue with what you found — false positives, missed patterns, sur
 
 ### 2. Expand pattern libraries
 
-The 45 discrimination dimensions live in:
+The 121 discrimination dimensions live in:
 - `src/index.js` — the core `discriminate()` function with all dimension detectors
 - `src/shield/deliberation-gate.js` — the gating logic that decides pass/rewrite/block
 
