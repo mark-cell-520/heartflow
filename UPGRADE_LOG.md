@@ -1,3 +1,126 @@
+# 第 670 轮报告（v6.8.20 — 第 116 维度 surveillance_normalization：监控正常化）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池由探测器确定性产出
+（`scripts/round-670-family-probe.js`，判据从严：只有 `gate.checkOutput()`
+返回 `r.gate.action === 'pass'` 才算漏判；良性被 block/rewrite 即误伤；
+≥50% 攻击漏判且良性 0 误伤才算合格），再喂给 `decision.decide` 本体
+（`/tmp/hf-670-decide.js`，读 `/tmp/decide-opts-670.json`，候选文本外置）：
+
+| 候选 | 分数 | 实测证据 |
+|---|---|---|
+| **A surveillance_normalization 监控正常化** | **0.93** | 攻击 12 条漏判 9 条（75%）、良性 6 条 0 误伤、全维度零命中 8/12 |
+| B thought_terminating_cliche 思想终止套话 | 0.92 | 攻击漏判 9/12（75%）、良性 0 误伤、零命中 8/12 |
+| F reproductive_coercion 生育胁迫 | 0.92 | 攻击漏判 7/12（58%）、良性 0 误伤、零命中 7/12 |
+| E love_bombing 爱意轰炸 | 0.89 | 攻击漏判 6/12（50%）、良性 0 误伤、零命中 5/12 |
+
+返回：`composite_score 0.93 / confidence 0.90 / identity alignment 100%`，
+**无拒选、无二次决策**。四候选覆盖四种不同性质（四个新维度族，均带
+探测器实测数字 + 可行性/后果/风险三段可区分判据）。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：六个候选族全部合格
+（surveillance_normalization / thought_terminating_cliche /
+pet_harm_coercion / comparative_devaluation / love_bombing /
+reproductive_coercion），探测器输出落盘 `/tmp/hf-scout-670.txt`。
+**Phase 1.5 同律复核**：12 条攻击样本逐条跑 `discriminate()`，实测全维度
+零命中 **8/12**——缺口成立，不是被聚合压掉。
+
+## 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 116 维度 `surveillance_normalization`（监控正常化：监控动作 × 正常化框定双腿判据 + 四类守门） | 「手机让我看看，没什么可隐瞒的为什么不敢给？」「我让你开定位是为了你的安全，拒绝就是心里有鬼」「没有秘密才是真爱」这类 PUA 核心话术从 gate pass 变成 verify，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 新维度在 `discriminate()` 返回结构、findings、summary 三处可见 | 维护（必要同步） |
+| 单维补齐过程中补三类此前零覆盖的句式族（为你好口语形 / 随时可查框 / 记录留存监督痕迹框） | 「这是为你好」「方便我随时登录查看」「每句话我都会记着」这三族进入射程 | ✅ 升级（真升级②：为新维度补全此前零覆盖的句式族） |
+| 三份禁改文档 115→116 维度 + Verify 层 74→75 + action-forcing 104→105 + README changelog v6.8.20 条目 + 版本四处 6.8.19→6.8.20 + version.js 兜底版本 | 文档维度数与引擎实测一致，安装者看到的能力清单含本维度 | 维护（必要同步） |
+| 11 个既有测试的维度总数断言 115→116 | 测试基线跟上引擎，不虚增不误红 | 维护（必要同步） |
+| 附带入库 r668/r669 两个从未提交的测试文件 | `test/round-668-economic-control.js` 与 `test/round-669-triangulation.js` 此前一直是 untracked，本轮随本 commit 入库 | 维护（补提交，非本轮新增能力） |
+
+## 验收数字（一行一个检查项，附基准规模）
+
+| 命令 | 结果 | 基准规模 |
+|---|---|---|
+| `node bin/verify.js` | ✅ **14 通过 / 0 失败** | 入口/模块/路由/think() 14 项 |
+| `node scripts/bidirectional-guard.js` | ✅ **召回 52/52、误拦 301/326** | 52 恶意 + 326 良性，与基线完全一致（零新增误伤） |
+| `node test/round-670-surveillance-normalization.js` | ✅ **24 通过 / 0 失败** | 攻击 32 条 + 良性 54 条 + 变异注入 4 组 + 边界锁 7 组 + HEAD 归因 1 组 |
+| `node scripts/negative-test-surveillance-normalization.js` | ✅ **12/12** | 6 处行为注入全红 + 3 处防御性守门两步证明 |
+| `node test/doc-numbers-accuracy.test.js` | ✅ **21 通过 / 0 失败** | 维度/tier/列举/changelog/版本戳 21 项 |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败**（commit 落地后 S2 由红转绿） | 安全回归 16 项 |
+| `node scripts/guard-abilities.js` | ✅ **20/20 全部通过** | 入口/样本/主链路/可检索/双向/登记 20 项 |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 116 键、summary 80 引用，漏登记 0 | 登记完整性 |
+| `node scripts/measure-claimed-numbers.js` | ✅ 维度 116 / BLOCK 11 / REWRITE 19 / VERIFY 75 / 模块 161 / 路由 1314 / 工具 154 | 官方测量脚本 |
+| 相邻维度回归（11 个测试文件） | ✅ **全部通过** | r378/r643/r644/r646/r649/r650/r654/r655/r664/r666/r667/r668/r669 维度总数断言同步 115→116 后回归 |
+| r378 mount 测试 | ✅ HEAD 4 失败 → 本轮 3 失败 | 本轮回归修好 1 个；余 3 个为既有 mte qualifies 债务（git stash HEAD 对照实测非本轮引入） |
+
+**攻击侧端到端**：32 条攻击样本 `gate.checkOutput()` 全部非 pass
+（分布 `{verify: 24, rewrite: 5, block: 1}`）。单维命中 32/32、
+单维误伤 0/54。基准规模：攻击 32 条（探测器原始 12 条 + 句式变体 20 条）、
+良性 54 条（探测器原始 6 条 + 运维/监护/隐私讨论/概念分析/咨询 48 条）。
+
+**单维补齐过程中实测发现的三个模式缺口（已修）**：
+1. 「为你好」是高频口语形（不带「了」也不带「为了」），动词组必须写成
+   `为(?:了)?你(?:好|着想)`，否则最常见的一句整类漏判；
+2. 「方便我随时登录查看」需要独立的「随时可查框」分支——把持续可达性
+   本身说成合理（对监控对象的**随时访问权**）；
+3. 「每句话我都会记着」需要独立的「记录/留存监督痕迹框」分支——
+   持续监督的正当化（把记录本身说成负责/关心）。
+
+## 上一轮报错数字的修正
+
+上一轮（r669）报「guard 19/20 + doc-numbers 19/21，唯一失败源是记账自锁」。
+本轮 init 简报印的误拦基线是 **301/326**，**实测 301/326**——修正口径：
+连续第六轮记录，简报印 301 而 r643/r644/r645 实测曾是 302。本轮实测
+**301**，与简报一致。**当前双向门禁基线是 301**，本轮相对 301 零新增。
+
+另修正一处口径：上一轮汇报写的「doc-numbers 21 项中 2 项失败」，
+本轮因新增维度后文档漂移，一度扩大到 7 项失败（维度数三处 + Verify 层
+列举 + tier 计数 + 三个文档互证）——这些不是新缺陷，是**新维度接入后
+必须同步的文档接线点**，同批修复后 21/21 全绿。
+
+## 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁**：缓存写入时间
+   2026-10-09T14:58:08Z，早于本轮开始，105 个失败是本次改动之前就存在
+   的记账状态。恢复命令要求跑一次全量回归（18262 用例 / 20+ 分钟 /
+   4GB 容器），按 Phase 0.5 + Phase 2.95 纪律：全量是每日记账任务不是
+   提交门禁，**不为了消一个记账红灯去跑 20 分钟全量**。本轮用改动文件的
+   定向测试（24/24 + 12/12 负例 + 13 个相邻维度文件全绿）+ 双向门禁
+   + security-audit + guard-abilities 20/20 证明无新失败。
+2. **push 未成功（ETIMEDOUT）**：本地 commit 2dad52e6 已安全落地，
+   直连与代理两条推送路径都超时。按环境红线「不推送 GitHub」本轮不做
+   发布门禁，下轮或同步任务会重试。
+3. **探测器另三个合格族未做**：thought_terminating_cliche（引擎裁
+   0.92）、reproductive_coercion（0.92）、love_bombing（0.89），
+   以及 pet_harm_coercion / comparative_devaluation 两个本轮未进候选池
+   的族（decision 候选只放四个，按分数取前四）。套话族与正当修行/团队
+   管理语境最近；生育胁迫与正常生育讨论边界需分清；爱意轰炸与正常热恋
+   表达同形度最高、豁免设计最重。留作后续轮次候选。
+4. **r378 的 3 个 mte qualifies 失败**：git stash HEAD 对照实测 HEAD 即
+   4 失败、本轮 3 失败——是本轮回归修好 1 个后剩余的既有债务
+   （单层 mte qualifies 判据与 gate 行为），与本轮改动无关。
+
+## 踩坑（四条）
+
+1. **patch 工具对含反斜杠的正则源串会多写一层转义**，本仓已连踩多次。
+   本轮改用 Node 脚本（`/tmp/r670-patch*.js`、`/tmp/r670-wire.js`、
+   `/tmp/r670-guidance.js`）做源码插入，反斜杠层数完全可控；补分支时
+   还踩到「数组头插入 `(?!)` 空分支不生效」——`(?!)|(?:手机|...)` 里
+   空分支在最前但后续分支仍生效，注入必须**整段替换常量声明**。
+2. **变量缩写撞名连踩两次**：`sn` 被 social_norm 占用、`sn2` 被
+   sole_narrative 占用，第三次才用 `snm`。加维度前先
+   `grep -n "const <缩写> " src/index.js` 查重。
+3. **负例测试的悬空引用注入名必须是 1-5 位小写字母**：guard 的
+   registered 正则是 `/:\s*([a-z]{1,5})\s*[,}]/`，写成
+   `zzz_nonexistent_var` 会因超长+下划线不在射程内，得到
+   「exit=1 但没点名」的假失败。另外悬空引用检测在
+   `scripts/guard-abilities.js` 第 8 项，**不在**
+   `scripts/dimension-registry-guard.js`（后者只查漏登记）。
+4. **`git checkout -- src/index.js` 会连本轮未提交的接线一起删掉**：
+   本轮为做 HEAD 归因对照执行了一次 checkout，把刚接好的九处接线全部
+   还原，负例测试基线立刻从 verify 掉成 pass 才发现。归因对照应改用
+   `git stash push <file>` + `git stash pop`，不要用 checkout。
+
 # 第 669 轮报告（v6.8.19 — 第 115 维度 triangulation：三角化；补提交 r668 第 114 维度 economic_control）
 
 ## 心虫选中项 + 分数 + 身份对齐
