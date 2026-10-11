@@ -402,6 +402,12 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"evaluate（默认）/ getDontList / addDont / removeDont / checkMission / getStats / listMissions"},"text":{"type":"string","description":"evaluate / checkMission 的被检提案文本；addDont 时为新增条目的条目名"},"id":{"type":"string","description":"addDont 的条目短 id（如 dr-dont-xxx）或 removeDont 的目标 id"},"reason":{"type":"string","description":"addDont 的克制理由（为什么不做）"},"strength":{"type":"number","description":"addDont 的条目强度 0-1，默认 0.7"},"source":{"type":"string","description":"addDont 的条目来源（默认 mcp）"},"expireDays":{"type":"number","description":"addDont 的条目过期天数，不给则永不过期"}},"required":[]}
   },
 
+  {
+    name: 'heartflow_check_outbound',
+    description: "出站保护闸门：在内容离开系统之前做最后一道判别——判断即将发给用户/外部的文本是否含未声明的不确定、夸大宣称、或需要附加限定的表述。返回 gate 动作（pass/verify/rewrite）与命中维度。这是 SKILL.md「Outbound protection」检查点的主工具，纯只读、无副作用。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检查的出站文本"},"context":{"type":"string","description":"可选上下文（如对话历史、任务背景），用于判断宣称是否有支撑"},"classification":{"type":"string","description":"强制指定级别（可选），不给则由引擎自动判定"}},"required":["text"]}
+  },
+
 ];
 
 module.exports = { TOOLS };

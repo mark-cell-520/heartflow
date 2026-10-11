@@ -40,7 +40,10 @@ const REASONS = [
 // ── 内部工具 ──────────────────────────────────────────────
 
 function _ensureDir() {
-  try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (_) {}
+  // [AUDIT-FIX] 建目录失败不再静默：feedback 数据落不了地会让误报反馈悄悄丢失，
+  // 而调用方看到的是一切正常。
+  try { fs.mkdirSync(DATA_DIR, { recursive: true }); }
+  catch (e) { console.error('[false-positive-feedback] 建目录失败 ' + DATA_DIR + ': ' + e.message); }
 }
 
 function _summarize(text, max = 80) {
@@ -52,7 +55,10 @@ function _summarize(text, max = 80) {
 function _append(file, obj) {
   _ensureDir();
   fs.appendFileSync(file, JSON.stringify(obj) + '\n');
-  try { fs.chmodSync(file, 0o600); } catch (_) {}
+  // [AUDIT-FIX] chmod 600 失败不再静默 —— 这个文件可能含被检文本样本，
+  // 权限没收敛等于同机其他用户可读。与 memory/.aes-key 同一类问题。
+  try { fs.chmodSync(file, 0o600); }
+  catch (e) { console.error('[false-positive-feedback] chmod 600 失败 ' + file + ': ' + e.message); }
 }
 
 function _readLines(file) {

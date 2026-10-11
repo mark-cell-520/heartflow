@@ -6053,7 +6053,10 @@ class HeartFlow {
             const adj = this.decisionFeedback.adjustPriorities();
             if (adj && adj.adjusted && this._decisionRouter && Array.isArray(adj.adjustments)) {
               for (const a of adj.adjustments) {
-                try { this._decisionRouter.updatePriority(a.type, a.newPriority); } catch (_) {}
+                // [AUDIT-FIX] 优先级更新失败不再静默：_decisionRouter 的优先级表决定
+                // 后续路由顺序，吞掉异常会让决策悄悄按旧优先级跑。
+                try { this._decisionRouter.updatePriority(a.type, a.newPriority); }
+                catch (e) { console.error('[heartflow] decisionRouter.updatePriority 失败 (' + a.type + '): ' + e.message); }
               }
             }
           }

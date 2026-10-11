@@ -134,16 +134,24 @@ function signEvent(prevHash, event) {
 }
 
 // ── 主检查函数 ────────────────────────────────────────
-function checkOutbound({ text, context = '', classification: forcedLevel }) {
+function checkOutbound({ text, context = '', classification: forcedLevel } = {}) {
   const startTime = Date.now();
   const traceId = `out-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-  
+
+  // [AUDIT-FIX] 空/非字符串 text 不再抛错。
+  // MCP 工具经 tools/call 进来时 args 可能缺字段，抛错会让整条请求变成
+  // JSON-RPC error；这里降级为空串跑完流程，返回 pass + 明确 reason。
+  if (typeof text !== 'string') text = text == null ? '' : String(text);
+
   const classification = forcedLevel || estimateClassification(text);
   const piiFindings = scanPII(text);
-  
+
   // 按密级决定动作
   let action, reason;
-  if (classification.level >= CLASSIFICATION.CONFIDENTIAL.level) {
+  if (text.trim() === '') {
+    action = 'pass';
+    reason = '空文本，无可检查内容';
+  } else if (classification.level >= CLASSIFICATION.CONFIDENTIAL.level) {
     action = 'block';
     reason = `密级过高 (${classification.label})，禁止外发`;
   } else if (classification.level >= CLASSIFICATION.SENSITIVE.level && piiFindings.length > 0) {
