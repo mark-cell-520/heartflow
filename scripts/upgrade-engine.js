@@ -555,7 +555,7 @@ function cmdPublish() {
 
   // ② publish
   console.log('\n── ② npm publish ──');
-  const out = trySh('npm publish --access public 2>&1');
+  const out = trySh('npm publish --access public 2>&1', 300000);
   if (!out.includes('yun520-1/heartflow@')) {
     console.log('❌ publish 未确认成功:\n' + out.slice(-600));
     process.exit(1);
@@ -584,7 +584,7 @@ function cmdPublish() {
   const vdir = `/tmp/e2e-${ver.replace(/\./g, '')}`;
   trySh(`rm -rf "${vdir}"`);
   trySh(`mkdir -p "${vdir}" && cd "${vdir}" && npm init -y >/dev/null 2>&1`);
-  const inst = trySh(`cd "${vdir}" && npm install @yun520-1/heartflow@${ver} --prefer-online 2>&1`);
+  const inst = trySh(`cd "${vdir}" && npm install @yun520-1/heartflow@${ver} --prefer-online 2>&1`, 300000);
   const gotVer = trySh(`cd "${vdir}" && node -e "console.log(require('@yun520-1/heartflow/package.json').version)"`).trim();
   if (gotVer !== ver) {
     console.log(`❌ 独立安装拿到 ${gotVer}，期望 ${ver}。\n${inst.slice(-500)}`);

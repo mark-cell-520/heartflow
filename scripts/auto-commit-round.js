@@ -33,8 +33,14 @@ const { execSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 
-function sh(cmd) {
-  return execSync(cmd, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+// [r413] 默认超时 180s。execSync 不传 timeout 是无限等待——git push 到
+// GitHub 网络挂起就会把整轮 cron 升级永久阻塞（cron 是无人值守的，
+// 没有人在旁边 Ctrl-C，只能等 gateway 看门狗杀掉整个会话）。
+function sh(cmd, timeoutMs) {
+  const t = Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 180000;
+  return execSync(cmd, {
+    cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: t,
+  });
 }
 function trySh(cmd) {
   try { return sh(cmd); } catch (e) { return (e.stdout || '') + '\n' + (e.stderr || ''); }
