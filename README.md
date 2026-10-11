@@ -168,7 +168,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.11**. Not marketing copy.
+Measured on this repository at **v6.8.12**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
