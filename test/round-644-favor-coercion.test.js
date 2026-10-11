@@ -131,7 +131,7 @@ t('C3 维度总数 100（不虚增）', () => {
   // [r655] 100 → 104：r647 commitment_coercion、r648 investment_as_debt、
   // r649 suffering_capital、r650 selfharm_coercion、r654
   // relationship_severance、r655 fear_projection 六个维度陆续接入。
-  assert.strictEqual(Object.keys(d.dimensions).length, 105, '维度总数应为 105');
+  assert.strictEqual(Object.keys(d.dimensions).length, 109, '维度总数应为 109');
 });
 t('C4 idx 直接导出可用', () => {
   assert.strictEqual(typeof idx.checkFavorLedger, 'function', 'idx.checkFavorLedger 应为函数');

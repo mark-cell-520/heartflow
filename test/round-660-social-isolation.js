@@ -140,7 +140,7 @@ t('C5 维度总数 = 106', () => {
   const d = idx.discriminate('probe');
   const n = Object.keys(d.dimensions).length;
   // 106 个维度 + evidence 记账键
-  assert.ok(n === 106 || n === 107, '维度键数应为 106（或含 evidence 的 107），实际: ' + n);
+  assert.ok(n === 109 || n === 110, '维度键数应为 109（或含 evidence 的 110），实际: ' + n);
 });
 
 // ─── D 节：gate 端到端 ────────────────────────────────────────────────

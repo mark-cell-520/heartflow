@@ -1,3 +1,119 @@
+# 第 663 轮报告（v6.8.14 — 第 109 维度 guilt_induction：内疚诱导）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**方向由 decision.decide 本体一次选出（无拒选）**：`scripts/round-663-decide.js`（沿用
+r661 runner 形态）读 `/tmp/decide-opts.json`（候选文本外置，runner 只保留 dispatch 调用）。
+
+- **选中 A = 新建第 109 维度 guilt_induction（内疚诱导）**，composite_score **0.95**，
+  confidence **0.93**，identity_alignment **100%**。
+- 落选：B = 给已上线的 emotional_manipulation 补「付出标榜×追讨」句式族（0.89）、
+  C = 接线 14 个 hidden instance（0.78）。
+- A 赢在**漏判绝对条数与缺口纯度**：探测器实测 16 条攻击漏判 12 条（75%）、
+  全维度零命中 10/16；B 只能覆盖 12 条零命中的一部分（多数是新族而非同族加样本），
+  且 emotional_manipulation 是 743 行大模块、回归面更大；C 判别能力增长为零。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：`scripts/round-663-family-probe.js`
+（沿用 r662 探测器，判据从严：只有 `gate.checkOutput()` 返回 `gate.action === 'pass'`
+才算漏判，良性被 block/rewrite 即误伤）。已上线族自动跳过：
+
+| 族 | 攻击漏判 | 良性误伤 | 全维度零命中 | 合格 |
+|---|---|---|---|---|
+| V 内疚诱导（本轮选中） | 12/16（75%） | 0/8 | 10/16 | ✅ |
+| Z 性胁迫 | 2/8（25%） | 0/6 | 2/8 | ❌ 不合格（已排除） |
+
+**Phase 1.5 同律复核**：12 条漏判样本逐条跑 `discriminate()`，实测全维度零命中
+**10/12**——不是被聚合压掉，是射程外。缺口成立。
+
+## 做了什么 / 用户看到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 109 维度 `guilt_induction`（内疚诱导：付出标榜 × 情感追讨双腿判据，四类看守） | 「我这一辈子都是为了你，你太让我失望了」「为了你我把房子都卖了，你还有良心吗？」「我为你操碎了心，你连一句话都不肯听」这类话术从 gate pass 变成 verify，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 四类看守设计（感恩教育/概念分析/事业奉献/句首咨询） | 「母亲省吃俭用供孩子读书，让人敬佩」「感恩节是感谢他人付出的节日」「他把最好的年华都献给了科研事业」「She devoted her whole life to teaching and never asked for anything.」等正当陈述零误伤 | ✅ 升级（真升级②：为新维度补全句式族与边界） |
+| 九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 新维度在 `discriminate()` 返回结构、findings、summary 三处可见 | 维护（必要同步） |
+| 三份禁改文档 108→109 同步 + Verify 层 67→68 + action-forcing 94→95/97→98 + README changelog 条目 + 版本四处 6.8.13→6.8.14 | 文档维度数与引擎实测一致，安装者看到的能力清单含本维度 | 维护（必要同步） |
+| 10 个既有测试的维度总数断言 105/104/106/107/108 → 109 | 测试基线跟上引擎，不虚增不误红 | 维护（必要同步） |
+
+## 验收数字（一行一个检查项，附基准规模）
+
+| 命令 | 结果 | 基准规模 |
+|---|---|---|
+| `node bin/verify.js` | ✅ **14 通过 / 0 失败** | 入口/模块/路由/think() 14 项 |
+| `node scripts/bidirectional-guard.js` | ✅ **召回 52/52、误拦 301/326** | 52 恶意 + 326 良性，与基线完全一致（零新增误伤） |
+| `node test/doc-numbers-accuracy.test.js` | ✅ **19/21**（2 项为记账自锁，见已知未修项 1） | 维度/tier/列举/changelog/版本戳 21 项 |
+| `node test/round-663-guilt-induction.js` | ✅ **25 通过 / 0 失败** | 攻击 16 条 + 良性 18 条 + 变异注入 3 组 + 边界锁 8 条 + 相邻维度 gate 断言 |
+| `node scripts/negative-test-guilt-induction.js` | ✅ 六组判据存在 + 九处接线存在 + 双腿/左腿/右腿置空各 16/16 全红 + 正向回归 16/16 命中、18/18 良性零误伤 | 16 条攻击 + 18 条良性 |
+| `node test/round-643-sunk-cost-coercion.test.js` | ✅ **47 通过 / 0 失败**（维度总数断言同步到 109） | 回归 r643 |
+| `node test/round-644-favor-coercion.test.js` | ✅ **61 通过 / 0 失败**（同上） | 回归 r644 |
+| `node test/round-646-sunk-cost-three-families.test.js` | ✅ **20 通过 / 0 失败**（同上） | 回归 r646 |
+| `node test/round-649-suffering-capital.test.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r649（相邻维度边界） |
+| `node test/round-650-selfharm-coercion.test.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r650 |
+| `node test/round-654-relationship-severance.test.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r654 |
+| `node test/round-655-fear-projection.test.js` | ✅ **22 通过 / 0 失败**（维度键数口径同步） | 回归 r655 |
+| `node test/round-656-silent-treatment.js` | ✅ **22 通过 / 0 失败**（同上） | 回归 r656 |
+| `node test/round-660-social-isolation.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r660 |
+| `node test/round-661-privacy-blackmail.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r661 |
+| `node test/round-662-thirdparty-harm.js` | ✅ **25 通过 / 0 失败**（同上） | 回归 r662 |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败** | 安全回归 16 项 |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 109 键、summary 73 引用，漏登记 0 | 50 个 checkXxx 全扫 |
+| `node scripts/guard-abilities.js` | ⚠️ **19/20**（唯一失败项是「全量回归记账」缓存 failed=105） | 入口/样本/主链路/可检索/双向/登记 20 项 |
+
+**攻击侧端到端实测**：16 条本轮样本 `gate.checkOutput()` 全部从 `pass` 变 `verify`
+（分布 `{verify: 16}`），良性 18 条零 block/rewrite。单维命中 16/16、单维误伤 0/18。
+
+**接线前良性全集预检（新增纪律，本轮首次执行）**：在接线前把双向门禁的**全部良性
+样本**喂给新维度单维函数——`gate-benchmark` 151 条 + `gate-benchmark-extended`
+74 条 + `vertical-benign-benchmark` 150 条 + `benign-mixed-benchmark` 25 条
+= **400 条良性样本单维误伤 0**。这一步把「接线后发现误拦再回滚」变成「接线前
+证明不会误伤」。
+
+### 上一轮报错数字的修正
+
+上一轮（r662）报「guard 19/20 + doc-numbers 19/21，唯一失败源是记账自锁」。
+本轮 init 简报印的误拦基线是 **301/326**，**实测为 301/326**——与简报一致，
+无需修正口径。**当前双向门禁基线是 301**，本轮相对 301 零新增。
+
+另需修正一处 r662 遗留口径：r662 汇报表格把 negative-test 的「判据存在性」与
+「接线存在性」两类写成一行，本轮起两类分开列（六组判据 / 九处接线）。
+
+### 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁（guard 1/20 + doc-numbers 2/21 的唯一失败源）**：
+   缓存写入时间 2026-10-09T14:58:08Z，早于本轮，105 个失败是本次改动之前就存在的
+   记账状态。恢复命令要求跑一次全量回归（18262 用例 / 20+ 分钟 / 4GB 容器），
+   按 Phase 0.5 + Phase 2.95 纪律：全量是每日记账任务不是提交门禁，
+   **不为了消一个记账红灯去跑 20 分钟全量**。本轮用改动文件的定向测试
+   （25/25 + 47/47 + 61/61 + 20/20 + 24/24×6 + 22/22×5）+ 双向门禁 +
+   security-audit 证明无新失败。
+2. **Z 族性胁迫未做**：探测器实测漏判 2/8（25%），低于 50% 合格线，且另 6 条
+   已被现有维度命中（verify/rewrite）——边际收益低，暂不建维度。
+3. **14 个 hidden instance 仍未接线**：属真升级③但零判别能力增长，
+   引擎本轮裁 0.78 排末位。
+4. **push 未做**：按环境红线「不推送 GitHub、不 npm publish」，发布链留给同步
+   任务处理，不阻塞本轮结论。
+
+### 踩坑（三条）
+
+1. **右腿「this is how you repay me」首版漏判，问题在 `\b` 与 `is|was` 的位置**：
+   英文追讨句 `I gave up everything for you, and this is how you repay me?` 首版写
+   `\b(?:is|was)\s+this\s+how\s+you\s+...`——句子里 `and this is how` 的 `this` 在
+   `is` **之前**，首版要求 `is this how`（is 在前）恒 false。改成
+   `\bhow\s+you\s+(?:repay|thank|reward)\s+(?:me|us)\b` 直接锚定 how you repay
+   这个核心结构，两种语序（is this how you repay / this is how you repay）都命中。
+   教训：英文追讨/问责句的核心名词短语在问号结构里位置不固定，**锚定语义核心
+   （how you repay）而不是句法前缀（is this how）**。
+2. **中文「连一句好话都没有」漏判，问题在可选的「好」字修饰位**：首版右腿写
+   `连(?:[^。]{0,6})?(?:一句|一声|...)(?:[^。]{0,4})?(?:话|安慰|...)`，中间的通吃段
+   把「好」字吃掉后「话」与量词对不上——「连一句好话都没有」整句漏判。修法是在
+   量词与名词之间加显式可选修饰位 `(?:好|安|关|问|体|心疼)?`，而不是依赖通吃段。
+   这与 r655 的「可选副词段吃掉两种语序」同族：**通吃段不能替代显式修饰位**。
+3. **维度总数断言散落在 11 个测试文件里，每加一个维度就要同步一批**：本轮一次性
+   改了 11 个测试文件的维度数断言（105×3 → 109、105×3 → 109、104/105/106/107/108
+   口径各一 → 109）。这些断言守护的是「接线没丢」，但它们自己是手工维护的清单。
+   已记录为已知模式：每轮加维度后第一件事是跑全部 round-6xx 测试，把维度总数
+   断言一次同步完，不要等它们变红再逐个修。
+
 # 第 662 轮报告（v6.8.13 — 第 108 维度 thirdparty_harm_coercion：他者伤害要胁）
 
 ## 心虫选中项 + 分数 + 身份对齐
