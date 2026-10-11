@@ -194,7 +194,7 @@ function checkPrivacyExposureCoercion(text, inject) {
   const SAFETY_ZH_ = R.SAFETY_ZH || SAFETY_ZH;
   const QUESTION_ZH_ = R.QUESTION_ZH || QUESTION_ZH;
 
-  const isZh = /[\\u4e00-\\u9fff]/.test(text);
+  const isZh = /[\u4e00-\u9fff]/.test(text);
   const hitResult = {
     hit: true,
     score: 0.7,

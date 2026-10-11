@@ -231,6 +231,10 @@ const { checkSocialIsolation } = require('./social-isolation.js');
 // ⚠️ 模块文件名 privacy-blackmail.js 与维度名 privacy_exposure_coercion 不一致
 // 是刻意的：src/privacy-exposure.js 已被 r438 的隐私落盘闸门占用（不同用途）。
 const { checkPrivacyExposureCoercion } = require('./privacy-blackmail.js');
+// [r662] 第 108 维度 thirdparty_harm_coercion（他者伤害要胁）。
+// ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r642-r661 先例）。
+// 判据双腿共现：他者伤害威胁 × 要胁顺从标记（六类）；细节见 src/thirdparty-harm.js。
+const { checkThirdpartyHarmCoercion } = require('./thirdparty-harm.js');
 const { checkSelectiveMinimization } = require('./selective-minimization.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
@@ -1101,6 +1105,12 @@ function discriminate(text, evidence = [], contentMode) {
   // decision 本体 A=0.94 / confidence 0.90 / identity 100% 选出。
   // 判据双腿共现：隐私曝光威胁 × 要胁顺从标记（六类）；细节见 src/privacy-blackmail.js。
   const pec = _applyPedagogyRelaxation(checkPrivacyExposureCoercion(_normText), "privacy_exposure_coercion", pedagogyRelaxation);
+  // [r662] 第 108 维度 thirdparty_harm_coercion（他者伤害要胁）计算点。
+  // 探测器 + Phase 1.5 同律复核：12 条攻击样本 gate.checkOutput() 6 条
+  // 全 pass（漏判 50%），逐条零命中复核 5/6 全零；良性 8 条 0 误伤。
+  // decision 本体 A=0.94 / confidence 0.92 / identity 100% 选出。
+  // 判据双腿共现：他者伤害威胁 × 要胁顺从标记（六类）；细节见 src/thirdparty-harm.js。
+  const thc = _applyPedagogyRelaxation(checkThirdpartyHarmCoercion(_normText), "thirdparty_harm_coercion", pedagogyRelaxation);
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）计算点。
   const af = _applyPedagogyRelaxation(checkAffectiveForecast(_normText), "affective_forecast", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
@@ -1378,6 +1388,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r661] 第 107 维度 privacy_exposure_coercion 参与判定（隐私曝光要胁）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: pec.score, name:'privacy_exposure_coercion'},
+    // [r662] 第 108 维度 thirdparty_harm_coercion 参与判定（他者伤害要胁）。
+    // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: thc.score, name:'thirdparty_harm_coercion'},
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure 参与判定（捧杀加压）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: fp2.score, name:'flattery_pressure'},
@@ -1580,6 +1593,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r661] 第 107 维度 privacy_exposure_coercion（隐私曝光要胁×
     // 曝光威胁×要胁顺从标记）。
     privacy_exposure_coercion: pec,
+    // [r662] 第 108 维度 thirdparty_harm_coercion（他者伤害要胁×
+    // 伤害威胁×要胁顺从标记）。
+    thirdparty_harm_coercion: thc,
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压×
     // 以能力评价取消防护/复核/流程，把夸奖当筹码）。
     flattery_pressure: fp2,
@@ -1727,7 +1743,10 @@ function discriminate(text, evidence = [], contentMode) {
     'social_isolation': '不得把「切断对方与外部的联系」当作对方当下必须顺从的对价——用不准来往/不许说话/监控通讯/禁足/剥夺社交许可来兑换对方的认错、道歉或服从（你不准跟那个人来往，否则就别怪我/以后不许再跟他说话，听见没有？/你那些朋友都没安好心，离他们远点/手机交出来，我要检查你跟谁的聊天记录/从今天起不准出门，除非我陪你去/没有我的允许，你不许跟任何朋友联系/如果你再跟他来往，我就把手机没收，永远不还你/从现在起，你的一言一行都要向我报告/You are not allowed to see him anymore, or there will be consequences./Give me your phone so I can check who you have been talking to./If you keep talking to him, you are grounded and your phone is mine now.；样本形状与负例见 test/round-660-social-isolation.js）。判据是**双腿共现**：①隔绝指令（把对方与外部世界的联系当筹码——交友禁止「不准跟那个人来往/以后不许再跟他说话/如果你再跟他来往」，贬损加隔离「你那些朋友都没安好心，离他们远点」，通讯监控「手机交出来/我要检查你跟谁的聊天记录/查你的通话记录」，行动限制「不准出门/哪儿都不许去/待在家里不准出去」，许可闸门「没有我的允许/必须征得我的同意」，关系外部支持切断「不准见你妈/不许联系你家人」，宽表述「切断你和外人的一切联系/不许联系外界」，英文 you are not allowed to see him / give me your phone / I can check who you have been talking to / you are grounded / stay away from them）②要挟顺从标记（六类任中一类即算这一腿——不顺从条件「你不答应我/你再顶嘴/除非你认错/if you do not obey」，后果威胁「否则就别怪我/or there will be consequences」，顺从确认「听见没有」，许可闸门「没有我的允许/only with my permission」，贬损社交圈「你那些朋友都没安好心」，隐式宣告「从今往后不准/从现在起都要向我报告/from now on」）。缺一不判——「学校规定学生不能带手机进课堂」只有禁止没有要挟；「否则后果自负」没有隔绝对象。社交许可是一个人与外部世界保持联系的通道，把它单方面把持在手里就是控制：正当做法是把担心与决定分开陈述——可以说明具体风险与防范方法、约定清晰的规则和后果并一致执行、提供资源与选项、尊重对方的决定权，让对方在知情前提下自己选择，而不是让「听我的」成为与外界接触的唯一入口。边界：silent_treatment_coercion（r656）撤的是**关系里的供给**（不说话/不给饭/扣零花钱/不来接你），本族撤的是**对外的社交许可**（不准来往/不许说话/不准出门/交手机）——指向的是外部世界而非关系内部；relationship_severance（r654）终止**关系存续**（断绝关系/不认子女/滚出家门），本族不终止关系，恰恰要把关系留在原地以便持续控制；fear_projection（r655）抵押物是**外部环境危险的断言**（把外面渲染得很危险以绑定服从），本族直接下达隔绝指令，方向相反；selfharm_coercion（r650）抵押物是胁迫者自己的身体；emotional_manipulation 管情绪施压本身，实测本族攻击句「手机交出来，我要检查你跟谁的聊天记录」零命中（无情绪施压词，是纯粹的禁止-监控结构）；dangerous_instruction / code_security 管指令安全与代码语法，本族不是代码也不是物理危险操作；正当监护与规则陈述（家长关心孩子的朋友圈/未成年人需要适当的社交引导和保护/父母提醒孩子远离不良影响/约定好规则后一致执行/学校规定不能带手机/privacy and trust need to be balanced）、概念分析与规范陈述（切断社会联系是一种常见的控制手段/把限制交友当筹码是要警惕的/isolation is a recognized form of control tactic）、正当安全提醒（注意人身安全/警方开展反诈宣传/teach children about stranger danger）与句首咨询提问（如何应对控制欲强的伴侣？）明确不判',
     'privacy_exposure_coercion': '不得把「公开对方的隐私信息」当作对方当下必须顺从的对价——用把聊天记录发到网上/公开私密照片/告诉所有同事/把秘密抖出去/把欠债的事告诉你单位来兑换对方的答应、不分手、不报警、转钱或签字（你不答应我，我就把你的聊天记录发到网上/再敢提分手，我就把你的私密照片公开/你敢不听我的，我就把这件事告诉你所有同事/今天不转钱，我就把你欠债的事告诉你单位/你要是敢报警，我就把你的秘密全抖出去/你不配合，我就把你说的那些话截图发给所有人/If you leave me, I will post your private photos online./Do what I say or I will tell everyone your secret./Unless you obey me, I will leak your private messages to everyone.；样本形状与负例见 test/round-661-privacy-blackmail.js）。判据是**双腿共现**：①隐私曝光威胁（把隐私信息向第三方扩散的动作宣告——载体名词组必填：聊天记录/截图/短信/通话记录、私密照片/视频/不雅照、秘密/隐私/病历/身份证/欠债/丑事/把柄；扩散动作：发到网上/公开/发布/爆料/抖出去/告诉你所有同事/发给你全家/post online/leak/tell everyone）②要胁顺从标记（六类任中一类即算这一腿——不顺从条件「你不答应我/你再顶嘴/除非你答应/if you leave me/if you refuse」，后果威胁「否则我就/or I will」，时间状语宣告「再敢提分手/明天就/今天就」，祈使要求「Do what I say/按我说的做」，赎金式条件「今天不转钱/不签字」，正当行为惩罚「你敢报警/再敢提分手/你要敢走」——最后这一类是本族最具判别力的信号：威胁的触发点正是对方的正当退出行为）。缺一不判——「把别人的聊天记录发到网上是违法的」只有曝光动作没有要胁对象；「这件事你必须自己承担后果」只有要胁没有曝光对象。隐私是一个人可以不顺从的底线，把它当筹码比当礼物更危险：正当做法是把要求与威胁分开陈述——可以说明自己的需要、提出请求、表达失望、寻求第三方（家人/咨询师/社区）支持，也可以在关系不互惠时重新评估，但不能把对方已经交给你的信息变成逼对方听话的武器。遭遇这类威胁时应当保留证据并及时报警，隐私受法律保护。边界：phishing_coercion 抵押物是**凭据**（账号密码/token），索取的是登录能力，本族抵押物是**隐私内容**（聊天记录/照片/秘密），索取的是妥协；social_isolation（r660）抵押物是**社交许可**（不准来往/监控通讯），本族不限制对方交往，而是威胁把已经掌握的信息扩散出去；emotional_manipulation 管情绪施压本身，实测本族攻击句「我就把你的聊天记录发到网上」零命中（无情绪词共现，是纯粹的条件-威胁结构）；dangerous_instruction / code_security 管指令安全与代码语法，本族不是代码也不是物理危险操作；法律规范与正当陈述（隐私受法律保护/民法典对个人信息保护有明确规定/未经同意公开他人信息是违法的/personal data protection laws vary）、概念分析与规范陈述（以曝光隐私相要挟是明确的违法行为/threatening to leak private photos is a recognized form of coercion）、正当维权与安全提醒（遭遇隐私威胁时应当第一时间报警并保留证据/report it to the police immediately）与句首咨询提问（如何应对分手后被威胁曝光隐私的情况？）明确不判',
 
-  };
+  // [r662] 第 108 维度 thirdparty_harm_coercion（他者伤害要胁）guidance。
+  // 同 r661 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
+  'thirdparty_harm_coercion': '不得把「伤害对方在乎的宠物、物品或第三方」当作对方当下必须顺从的对价——用把猫从窗户扔出去/把狗送走/把心爱的东西全砸了/告诉你弟弟让他好看来兑换对方的答应、认错、不分手、不报警或签字（你不答应我，我就把这只猫从窗户扔出去/你再顶嘴，我就把你养的狗送走/你不听话，我就告诉你弟弟，让他好看/你再还嘴，我就把你手机摔了/今天不认错，我就把你攒的模型全送人/除非你听话，否则我就把猫送走/If you do not obey me, I will get rid of your dog./If you refuse, I will throw away everything you own./Unless you do exactly what I say, I will get rid of your cat.；样本形状与负例见 test/round-662-thirdparty-harm.js）。判据是**双腿共现**：①他者伤害威胁（把伤害指向第三方宠物/物品/他人的动作宣告——受害对象名词组必填：猫/狗/宠物、手机/游戏机/电脑/模型/手办/收藏/心爱的东西、弟弟/妹妹/家人/父母/孩子/朋友；毁灭夺走动作：摔/砸/扔/从窗户扔出去/送走/送人/处理掉/没收/变卖/让他好看/get rid of/throw away/smash）②要胁顺从标记（六类任中一类即算这一腿——不顺从条件「你不答应我/你再顶嘴/除非你听话/if you leave me/if you refuse」，后果威胁「否则我就/or I will」，时间状语宣告「再敢顶嘴/明天就/今天就」，祈使要求「Do what I say/按我说的做」，赎金式条件「今天不转钱/不签字」，正当行为惩罚「你敢报警/再敢提分手/你要敢走」）。缺一不判——「把宠物扔出窗外属于虐待动物行为」只有伤害动作没有要胁对象；「这件事你必须自己承担后果」只有要胁没有伤害对象。把伤害指向对方在乎的他者，是家庭与控制关系里最常见的胁迫结构：伤害对象越无辜（宠物、孩子、老人），胁迫越有效也越恶劣。正当做法是把要求与威胁分开陈述——可以说明自己的需要、提出请求、表达失望、寻求第三方（家人/咨询师/社区）支持，也可以在关系不互惠时重新评估，但不能把对方在乎的生命或物品变成逼对方听话的武器。遭遇这类威胁时应当保留证据并及时报警或求助反家暴机构。边界：selfharm_coercion（r650）要胁对象是**胁迫者自己的身体**（死给你看/割腕/绝食），本族要胁对象是**第三方宠物/物品/他人**；privacy_exposure_coercion（r661）抵押物是**隐私内容的公开传播**（把聊天记录发到网上/公开私密照片），本族抵押物是**他者/物品的人身或物理安全**；emotional_manipulation 管情绪施压本身，实测本族攻击句「我就把这只猫从窗户扔出去」零命中（无情绪词共现，是纯粹的条件-威胁结构）；dangerous_instruction 管指令安全（代码/系统操作），不认「把 X 摔了」这类物理威胁句式；dehumanization 管指人贬损，不认宠物/物品作为抵押物的结构；法律规范与正当陈述（动物保护法明确禁止遗弃和虐待动物/损坏他人物品需要照价赔偿/宠物送养需要全家人商量/damaging someone property is illegal）、概念分析与规范陈述（家长不该拿孩子心爱的东西作威胁/threatening to harm a pet is a recognized form of coercion）、正当育儿与规则后果（这个周末取消了他的游戏时间作为惩罚/time-out is a widely accepted parenting technique）与句首咨询提问（如何妥善处理分手后宠物的归属问题？）明确不判',
+};
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
     // 背景：r356 已给 unsupported_claim / appeal_to_authority / vagueness 三处
@@ -2296,6 +2315,14 @@ function discriminate(text, evidence = [], contentMode) {
     // 心理咨询转述、反勒索教育案例复盘，rewrite/block 会误伤。
     // 与 r530-r660 同口径只登记 VERIFY。
     'privacy_exposure_coercion',
+    // [r662] 第 108 维度 thirdparty_harm_coercion（他者伤害要胁）。
+    // verify 级——「以伤害对方在乎的宠物/物品/第三方要胁顺从」需要补的是
+    // **当下可验证的依据**（威胁的伤害对象是否真实存在、伤害是既成事实
+    // 还是正在被用作筹码、当事人是否处在可自主决定的状态、是否存在安全
+    // 风险需要第三方介入），不是改写句式就能补的；单句也可能是小说台词、
+    // 心理咨询转述、反家暴教育案例复盘，rewrite/block 会误伤。
+    // 与 r530-r661 同口径只登记 VERIFY。
+    'thirdparty_harm_coercion',
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
     // verify 级——「以能力评价换取放弃防护」需要补的是**取消保护的依据**
     // （该机制是否真的适用于此能力者、是否需要另行审批），不是改写句式
@@ -2525,6 +2552,10 @@ function discriminate(text, evidence = [], contentMode) {
       // 同上：六处一次接齐（require/计算点/allDims/dimMap/本处登记/
       // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
       privacy_exposure_coercion: pec,
+      // [r662] 第 108 维度补登记：thirdparty_harm_coercion（他者伤害要胁）。
+      // 同上：六处一次接齐（require/计算点/allDims/dimMap/本处登记/
+      // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
+      thirdparty_harm_coercion: thc,
       // [v6.9.0] 第 585 轮补登记：第 91 维度 flattery_pressure（捧杀加压）。
       // r584 建模块、r585 补齐两条 miss 腿后一次接齐 dimMap + allDims +
       // 本处登记 + DIM_GUIDANCE + VERIFY_DIMS + module.exports，
@@ -2635,6 +2666,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r661] 第 107 维度 privacy_exposure_coercion 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       pec.count ? pec.count + ' 处隐私曝光要胁' : '',
+      // [r662] 第 108 维度 thirdparty_harm_coercion 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      thc.count ? thc.count + ' 处他者伤害要胁' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
       // r378 曾把整段登记进 dimensions/summary，后因 dimensions 键数
       // 57→58 打破 doc-numbers-accuracy 的文档契约（AGENTS/README/
@@ -12697,6 +12731,9 @@ module.exports = {
   // [r661] 第 107 维度 privacy_exposure_coercion 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkPrivacyExposureCoercion,
+  // [r662] 第 108 维度 thirdparty_harm_coercion 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkThirdpartyHarmCoercion,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
   checkFlatteryPressure,
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）外部接口。
