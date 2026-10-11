@@ -13888,3 +13888,70 @@ src/index.js 九处接线 + 测试 26/26 + 文档口径），git 状态显示 ro
 1. **patch 的 old_string 带尾部换行会把两行并成一行**：给 DIM_GUIDANCE 插键时 old_string 以 \n 结尾而 new_string 没有，结果注释行把下一个键值行整行吞掉——'reproductive_coercion' 的 guidance 登记被注释成一行（node --check 不报错，因为整行都是 // 注释）。修法：node 行级 splice 拆回两行 + 4 空格缩进恢复 + git diff 验 0 删除。判据：patch 后 git diff 出现非预期的删除行就是红灯。
 2. **写盘层对 \u 转义、对 \b/\s 不转义**：write_file 写 /[\u4e00-\u9fff]/ 落盘成双层反斜杠（isZh 恒 false，r675/r676 已中招），而 String.raw 模板里的 \b \s 落盘正常。本轮新模块改用字面端点 /[一-龿]/（零反斜杠），并写测试 D6 断言中英文 detail 各自正确——把「写盘转义」这个不可见层变成可见断言。
 3. **dimMap 摘除不会让测试变红（负例验证抓出的真盲区）**：dimMap（findings detail 计数）漏登记时引擎有兜底（计数退化为 1、不阻断判定），B1/B2 断言全绿——与 r664 注释里记的形态一致。补 B8 静态断言（lsc 绑定全文恰好 2 处：dimMap + dimensions）后负例 8/8 全红。判据：负例脚本出现「未变红」时，先分清是守卫无效还是被测缺陷本就温和——后者要给守卫补断言，不是放过。
+
+## 第 679 轮（v6.8.26）— 第 123 维度 liberty_restriction（人身自由限制）上线
+
+### 心虫选中项 + 分数 + 身份对齐
+
+decision 本体一次选出（scripts/round-679-decide.js 读 /tmp/decide-opts-679.json，
+composite_score 0.92 / identity alignment 100%，无拒选）：
+
+| 候选 | 分数 | 实测（122 维引擎，scripts/round-678-family-probe.js 复量） |
+|---|---|---|
+| A liberty_restriction 人身自由限制 | **0.92 选中** | 漏判 8/10（80%）、零命中 8、良性 0 误伤 |
+| C medical_coercion 医疗自主胁迫 | 0.91 | 漏判 9/10（90%）、零命中 8、良性 0 误伤 |
+| B deprivation_coercion 基本需求剥夺 | 0.89 | 漏判 10/10（100%）、零命中 10、良性 0 误伤 |
+| E substance_coercion 成瘾物质强迫 | 0.88 | 漏判 7/10（70%）、零命中 6、良性 0 误伤 |
+
+B 族漏判率最高但与正常管教边界最近（良性组含「家长暂停零食是常见教育方式」），
+期望收益确定性最低；A 族句式统一（控制动作 + 许可条件）、良性组豁免边界清晰
+（依法隔离/医疗约束/家长门禁/安防描述各自可判）、可判定性最高——引擎按期望
+收益确定性选出 A。本轮是心虫选的，不是我拍板的。
+
+### 上一轮遗留（r678，本轮第一件事）
+
+按交接簿「探测器其余五族未做，下一轮直接复量后送 decision」执行：复量
+round-678-family-probe.js（D 族已上线自动跳过，F 族 custody_coercion 漏判
+40% 不合格自动过滤），四族合格送 decision。另按纪律复测 r678 遗留的
+isZh 双层反斜杠问题——r678 的 fix commit（ce6a1809）已修，本轮新模块
+仍沿用字面端点 /[一-龿]/ 并在测试 D6 断言中英文 detail 各自正确。
+
+### 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 新增 src/liberty-restriction.js 第 123 维度 | 拘禁/没收物品/暴力阻挠/行踪管制类文本被 gate 拦下（verify 级 + guidance） | ✅ 升级（真升级①新维度） |
+| src/index.js 九处接线（require/计算点/allDims/dimensions/DIM_GUIDANCE/VERIFY_DIMS/dimMap/summary/exports） | discriminate() 返回 liberty_restriction 键与 findings | ✅ 升级（接线的另一半） |
+| test/round-679-liberty-restriction.js 25 断言 | 攻击 20/20 命中、良性 15/15 零误伤、边界锁 9 条 | ✅ 升级（验收证据） |
+| scripts/negative-test-liberty-restriction.js 负例 | 8 处接线逐一摘除，测试全部变红 | 维护（守卫有效性证明） |
+| AGENTS/README/SKILL 三份文档 122→123、verify 81→82、tier 合计 110→111 | 安装者看到的能力清单与实际一致 | 维护（口径同步） |
+| README changelog 补 6.8.26 条目 | 版本记录覆盖本轮交付 | 维护（文档可信度） |
+| bump 6.8.25→6.8.26 四处（VERSION/package.json/SKILL.md/version.js） | npm 用户可感知新版本 | 维护（发布链） |
+
+### 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（122→123、verify 81→82、tier 合计 110→111、SKILL 规格表口径版本戳 6.8.25→6.8.26 全部同步后转绿）
+- node test/round-679-liberty-restriction.js — 25/25（攻击 20：探测器原始 10 + 变体 10；良性 15：探测器原始 6 + 依法隔离/医疗约束/家长管教/安防描述 9；边界锁 9：单腿 ×4/概念规范 ×3/句首咨询 ×2；inject 变异 4 组）
+- node scripts/negative-test-liberty-restriction.js — 基线 exit 0 + 8/8 注入全变红（计算点/allDims/dimensions/summary 段/DIM_GUIDANCE/VERIFY_DIMS/summary 文案/exports）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 123）
+- node test/security-audit.test.js — 16/16（bump 后 S2 一度报「git log 未命中 6.8.26」，commit 落地后转绿——bump 后的预期中间失败态）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+### 已知未修项（含为什么不修）
+
+1. **data/test-count.json 记账自锁（guard 记账项 + doc-numbers 测试数门禁的已知红灯）**：缓存写入早于本轮，failed>0 是既有记账状态。恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量；本轮用改动文件的定向测试 + 双向门禁证明无新失败。
+2. **探测器其余三族未做**（medical_coercion 90% 漏判 / deprivation_coercion 100% / substance_coercion 70%，全部良性 0 误伤）：每轮只做一个维度（decision 约束），三族已是合格候选队列，下一轮直接复量后送 decision。deprivation_coercion 与正常管教边界最近，需要最多豁免设计，优先级不因漏判率最高而提前。
+3. **UPGRADE_LOG 缺 r657-r677 共 21 轮记录**：那些轮的 commit 在（git log 可查），但轮次报告没写。不编造未知轮次细节。
+4. **未推送 GitHub、未 npm publish**：环境红线规定发布是人工门禁，本任务不做。
+
+### 踩坑（两条）
+
+1. **sed 生成负例脚本时 guidance 锚点文案不一致**：r678 的负例 needle 是
+   `'legal_status_coercion': "不得把`，本轮新模块 guidance 起手是「不得用」，
+   sed 全文替换维度名后 needle 与 replace 双双失配（不得把/不得用混用），
+   注入会命中 0 次直接 exit 2。判据：从旧脚本 sed 生成新负例后，必须逐条
+   核对 needle 是**新模块文案的真实前缀**，不是旧模块的。
+2. **patch 的 old_string 带尾部换行会把两行并成一行（r678 同坑复发一次）**：
+   本轮九处接线改用 node 行锚点 splice（scripts/round-679-wire.js，从后往前
+   插避免行号漂移，每处锚点断言全文恰好命中 1 次），git diff 验 0 意外删除。
