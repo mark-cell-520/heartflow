@@ -112,7 +112,7 @@ read only one field, read `gate.action`.
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
 > `VERIFY_DIMS` sets in `src/index.js` (v6.8.16 recount — conditional_affection added as dimension 111)。** The three tiers
-> add up to 99; the remaining 11 dimensions are scored but do not force a gate action.
+> add up to 100; the remaining 11 dimensions are scored but do not force a gate action.
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security,
 deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
