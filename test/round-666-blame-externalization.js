@@ -146,9 +146,9 @@ t('C3 summary 文案：攻击样本 summary 含「归责绑架」', () => {
   assert.ok(String(d.summary).includes('归责绑架'), 'summary 应含「归责绑架」: ' + d.summary);
 });
 
-t('C4 维度总数：112（登记后比上一轮 +1）', () => {
+t('C4 维度总数：113（登记后比上一轮 +1）', () => {
   const d = idx.discriminate('测试文本');
-  assert.strictEqual(Object.keys(d.dimensions).length, 112, '维度总数应为 112');
+  assert.strictEqual(Object.keys(d.dimensions).length, 113, '维度总数应为 113');
 });
 
 // ─── D 节：gate 端到端 ─────────────────────────────────────────────────

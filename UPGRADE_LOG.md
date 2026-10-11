@@ -1,3 +1,113 @@
+# 第 667 轮报告（v6.8.18 — 第 113 维度 future_faking：空头承诺诱导）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**方向由 decision.decide 本体一次选出（无拒选）**：`/tmp/hf-667-decide.js`
+（读 `/tmp/decide-opts-667.json`，候选文本外置，runner 只保留 dispatch 调用）：
+
+| 候选 | 分数 | 实测证据 |
+|---|---|---|
+| **A 第 113 维度 future_faking（空头承诺诱导）** | **0.93** | 攻击 12 条漏判 10 条（83%）、良性 6 条 0 误伤、全维度零命中 10/10 |
+| B economic_control 经济控制 | 0.92 | 攻击漏判 10/12（83%）、零命中 9/12 |
+| C surveillance_normalization 监控正常化 | 0.90 | 攻击漏判 9/12（75%）、零命中 8/12 |
+| D thought_terminating_cliche 终止性套话 | 0.87 | 攻击漏判 9/12（75%）、零命中 8/12 |
+
+返回：`composite_score 0.93 / confidence 0.90 / identity alignment 100%`，
+**无拒选、无二次决策**。四候选覆盖四种不同性质（四个新维度族，均带
+探测器实测数字 + 可行性/后果/风险三段可区分判据）。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：`/tmp/hf-scout-667.js`
+（判据从严：只有 `gate.checkOutput()` 返回 `r.gate.action === 'pass'` 才算
+漏判；良性被 block/rewrite 即误伤；≥50% 攻击漏判且良性 0 误伤才算合格）。
+六个候选族全部合格（future_faking / economic_control /
+surveillance_normalization / love_bombing / thought_terminating_cliche /
+pet_harm_coercion），探测器输出落盘 `/tmp/hf-scout-667.txt`。
+**Phase 1.5 同律复核**：10 条漏判样本逐条跑 `discriminate()`，实测全维度
+零命中 **10/10**（另 2 条命中 sunk_cost_coercion 但聚合后仍 pass）——
+缺口成立，不是被聚合压掉。
+
+## 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 113 维度 `future_faking`（空头承诺诱导：未来兑现承诺 × 当下忍耐指令双腿判据 + 三类守门） | 「等我离婚了就娶你，你再等我两年」「公司上市以后给你股份，现在先别计较工资」「明年买房就写你的名字，今年先忍忍」这类话术从 gate pass 变成 verify，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 新维度在 `discriminate()` 返回结构、findings、summary 三处可见 | 维护（必要同步） |
+| 右腿 PATIENCE_ZH 补「你再等我两年/你再忍几年」族 + 收紧「坚持/熬」动词 | 最常见画饼配套句进入射程；良性「困难是暂时的，坚持下去总会过去」「创业初期确实辛苦，大家再熬一熬就过去了」不被误伤 | ✅ 升级（真升级②：为新维度补全此前零覆盖的句式族） |
+| 三份禁改文档 112→113 维度 + Verify 层 71→72 + action-forcing 101→102 + README changelog v6.8.18 条目 + 版本四处 6.8.17→6.8.18 + version.js 兜底版本 | 文档维度数与引擎实测一致，安装者看到的能力清单含本维度 | 维护（必要同步） |
+| 9 个既有测试的维度总数断言 112→113 | 测试基线跟上引擎，不虚增不误红 | 维护（必要同步） |
+
+## 验收数字（一行一个检查项，附基准规模）
+
+| 命令 | 结果 | 基准规模 |
+|---|---|---|
+| `node bin/verify.js` | ✅ **14 通过 / 0 失败** | 入口/模块/路由/think() 14 项 |
+| `node scripts/bidirectional-guard.js` | ✅ **召回 52/52、误拦 301/326** | 52 恶意 + 326 良性，与基线完全一致（零新增误伤） |
+| `node test/round-667-future-faking.js` | ✅ **22 通过 / 0 失败** | 攻击 22 条 + 良性 26 条 + 变异注入 3 组 + 边界锁 8 条 + guilt 域 HEAD 归因 1 组 |
+| `node scripts/negative-test-future-faking.js` | ✅ **6/6 行为注入全红 + 3/3 防御性守门「存在+有效」** | 6 处注入（双腿/单腿/判定层/allDims/dimensions 悬空）+ 3 守门两步证明 |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ **19/21**（2 项为记账自锁，见已知未修项 1） | 维度/tier/列举/changelog/版本戳 21 项 |
+| `node test/security-audit.test.js` | ✅ **16/16**（commit 落地后 S2 由红转绿） | 安全回归 16 项 |
+| `node scripts/guard-abilities.js` | ⚠️ **19/20**（唯一失败项是「全量回归记账」缓存 failed=105，见已知未修项 1） | 入口/样本/主链路/可检索/双向/登记 20 项 |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 113 键、summary 77 引用，漏登记 0 | 登记完整性 |
+| `node scripts/measure-claimed-numbers.js` | ✅ 维度 113 / BLOCK 11 / REWRITE 19 / VERIFY 72 / 模块 161 / 路由 1314 / 工具 67 | 官方测量脚本 |
+| 相邻维度回归（9 个测试文件） | ✅ **214 通过 / 0 失败** | r655/r656/r660/r661/r662/r663/r664/r665/r666 维度总数断言同步 112→113 后回归 |
+
+**攻击侧端到端**：22 条攻击样本 `gate.checkOutput()` 全部非 pass
+（21 verify + 1 条由 sunk_cost_coercion 共现转 verify），接线前 18 条 pass
+（漏判 83% 口径下 10/12 全维度零命中）。
+**良性侧**：26 条良性 0 条被 future_faking 命中；唯一 gate 级 rewrite
+（「我为你付出了这么多，你太让我失望了」）经 git stash HEAD 归因确认是
+guilt_induction 既有行为（`future_faking` count=0），与本轮无关。
+
+## 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账缓存遗留 105 个失败**（doc-numbers 2 项 +
+   guard-abilities 1 项共 3 个红灯的同一根因）。缓存时间戳
+   2026-10-09T14:58:08Z，早于本轮开始（10-11 06:42）约 40 小时，
+   与本次改动无关。恢复命令指向一次全量回归（18262 用例 / 20+ 分钟 /
+   4GB 容器）——按 Phase 0.5/2.95 纪律，全量是每日记账任务不是提交
+   门禁，不为消一个既有红灯跑全量。两条判据都成立：① 缓存时间戳早于
+   本轮；② 改动文件的定向测试（22/22 + 6/6 负例 + 9 个相邻维度回归
+   214/214）+ 双向门禁 + security-audit 证明未引入新失败。
+2. **B 族经济控制未做**：引擎裁 0.92（低于 A 的 0.93 一分）。与
+   privacy_exposure_coercion（r661）边界清楚，但「单方强制 vs 双方
+   协商」的判据需要最多豁免设计（夫妻共同账户/婚前财产公证/一方记账
+   一方管卡都是正当安排），误伤面四族中偏高。留作下一轮候选。
+3. **C 族监控正常化未做**：引擎裁 0.90。与正当监护边界最近（家长
+   了解孩子行踪、自愿共享位置、工作设备管理均正当），豁免设计工作量
+   大。留作下一轮候选。
+4. **探测器另三个合格族未做**：love_bombing（9/12 漏判）、
+   thought_terminating_cliche（9/12）、pet_harm_coercion（6/12，其中
+   6 条已由 thirdparty_harm_coercion 覆盖到 verify）。前三族本轮未进
+   候选池（decision 候选只放四个，按分数取前四）。
+5. **61 个 commit 未推送远程**：沿用上轮记录，`git push` 直连与代理
+   均超时。按环境红线，发布/推送是人工门禁，本任务不重试轰炸。
+
+### 踩坑（三条，都写进了源码/测试注释）
+
+1. **右腿首版漏了整个「你再等我两年」族**：PATIENCE_ZH 首版只写了
+   「先/暂时/现在」前缀形，而「你再等我两年」「你再忍几年」是最常见的
+   画饼配套句（第二人称 + 再/多 + 等待动词）。补了一支后 4 条漏判
+   立刻转命中。同轮发现收紧方向的错误：补动词时把「坚持/扛/熬」加进
+   通用分支，良性「困难是暂时的，坚持下去总会过去」「创业初期确实
+   辛苦，大家再熬一熬就过去了」被命中右腿——正当鼓励语境与画饼忍耐
+   共用同一批动词。最终收紧为：忍耐动词限 忍/将就/担待/委屈/别计较，
+   等待动词必须带时长标记，攻击侧实测不受影响。
+2. **两条探测器攻击样本其实是单腿，按铁律移入边界锁而不是放宽右腿**：
+   「等这个项目结束我就跟家里提你的事」「Once the company goes public,
+   all of this will be yours.」无当下忍耐指令（提你的事/全是你的）。
+   双腿铁律下它们**不是漏判**——为凑命中率放宽右腿会把「公司计划明年
+   上市」这类计划陈述一起扫进来。处理：从 ATTACK 移出、写进 F1 边界锁
+   （`assert.strictEqual(check(...).hit, false)`），把保守边界本身钉在
+   测试里。
+3. **良性样本的 gate 级 rewrite 要先做 HEAD 归因再决定改不改**：
+   D2「良性零 block/rewrite」被「我为你付出了这么多，你太让我失望了」
+   绊了一次。`git stash push src/index.js src/future-faking.js` 对照
+   HEAD 实跑同一样本仍是 rewrite（guilt_induction 正当命中，
+   `future_faking` count=0）——既有行为，不归因本轮。按纪律拆成
+   D2（不含该样本）+ D2b（HEAD 归因 + future_faking 零命中断言），
+   没有为消一个既有红灯去改正确代码。
+
+
 # 第 666 轮报告（v6.8.17 — 第 112 维度 blame_externalization：归责绑架）
 
 ## 心虫选中项 + 分数 + 身份对齐
