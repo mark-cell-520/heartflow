@@ -24,6 +24,12 @@
 
 const path = require('path');
 
+// [AUDIT-FIX 2026-10-11] 必须在任何其它 require 之前加载：
+// 下游 69 处 console.log 在模块加载期就执行（[memory-encrypt] / [MemoryBank] /
+// [FormulaSearch] / [init] …），全部打到 stdout，污染协议流与管道捕获。
+// 本守卫把非 JSON-RPC 帧的 stdout 写入改道 stderr；HF_KEEP_STDOUT_LOGS=1 可禁用。
+require('./utils/stdio-guard.js');
+
 
 // [v6.6.4] P0: gate.action → 决策类型映射（品牌四层理论）
 const DECISION_TYPE_MAP = {
