@@ -1,16 +1,16 @@
 {
-  "round": 664,
-  "version": "6.8.14",
-  "roundStartedAt": "2026-10-11T03:23:03.487Z",
-  "lastFinishAt": "2026-10-11T04:45:10.484Z",
-  "lastGreen": false,
+  "round": 665,
+  "version": "6.8.16",
+  "roundStartedAt": "2026-10-11T05:33:06.070Z",
+  "lastFinishAt": "2026-10-11T04:47:19.309Z",
+  "lastGreen": true,
   "lastChecks": [
-    "FAIL 版本四处一致",
+    "PASS 版本四处一致",
     "PASS 版本已进 git log",
     "PASS 工作区已跟踪文件干净",
     "PASS README 测试数与缓存一致",
     "PASS README changelog 覆盖当前版本",
-    "FAIL 交接簿记录当前版本",
+    "PASS 交接簿记录当前版本",
     "PASS 探针垃圾已清理"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
