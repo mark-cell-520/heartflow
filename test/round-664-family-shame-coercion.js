@@ -142,11 +142,11 @@ t('C4 summary 出现家族羞耻胁迫文案', () => {
   assert.ok(summary.indexOf('家族羞耻胁迫') !== -1, 'summary 缺少「家族羞耻胁迫」: ' + summary.slice(0, 200));
 });
 
-t('C5 维度总数 = 110', () => {
+t('C5 维度总数 = 111', () => {
   const d = idx.discriminate('probe');
   const n = Object.keys(d.dimensions).length;
-  // 110 个维度 + evidence 记账键
-  assert.ok(n === 110 || n === 111, '维度键数应为 110（或含 evidence 的 111），实际: ' + n);
+  // 111 个维度 + evidence 记账键
+  assert.ok(n === 111 || n === 112, '维度键数应为 111（或含 evidence 的 112），实际: ' + n);
 });
 
 // ─── D 节：gate 端到端 ────────────────────────────────────────────────
