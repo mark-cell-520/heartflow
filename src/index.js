@@ -225,6 +225,12 @@ const { checkSilentTreatmentCoercion } = require('./silent-treatment-coercion.js
 // ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r642-r659 先例）。
 // 判据双腿共现：隔绝指令 × 要挟顺从标记（六类）；细节见 src/social-isolation.js。
 const { checkSocialIsolation } = require('./social-isolation.js');
+// [r661] 第 107 维度 privacy_exposure_coercion（隐私曝光要胁）。
+// ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r642-r660 先例）。
+// 判据双腿共现：隐私曝光威胁 × 要胁顺从标记（六类）；细节见 src/privacy-blackmail.js。
+// ⚠️ 模块文件名 privacy-blackmail.js 与维度名 privacy_exposure_coercion 不一致
+// 是刻意的：src/privacy-exposure.js 已被 r438 的隐私落盘闸门占用（不同用途）。
+const { checkPrivacyExposureCoercion } = require('./privacy-blackmail.js');
 const { checkSelectiveMinimization } = require('./selective-minimization.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
@@ -1089,6 +1095,12 @@ function discriminate(text, evidence = [], contentMode) {
   // decision 本体 X=0.93 / confidence 0.90 / identity 100% 选出。
   // 判据双腿共现：隔绝指令 × 要挟顺从标记（六类）；细节见 src/social-isolation.js。
   const si = _applyPedagogyRelaxation(checkSocialIsolation(_normText), "social_isolation", pedagogyRelaxation);
+  // [r661] 第 107 维度 privacy_exposure_coercion（隐私曝光要胁）计算点。
+  // 探测器 + Phase 1.5 同律复核：8 条攻击样本 gate.checkOutput() 5 条
+  // 全 pass（漏判 63%），逐条零命中复核 5/5 全零；良性 6 条 0 误伤。
+  // decision 本体 A=0.94 / confidence 0.90 / identity 100% 选出。
+  // 判据双腿共现：隐私曝光威胁 × 要胁顺从标记（六类）；细节见 src/privacy-blackmail.js。
+  const pec = _applyPedagogyRelaxation(checkPrivacyExposureCoercion(_normText), "privacy_exposure_coercion", pedagogyRelaxation);
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）计算点。
   const af = _applyPedagogyRelaxation(checkAffectiveForecast(_normText), "affective_forecast", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
@@ -1363,6 +1375,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r660] 第 106 维度 social_isolation 参与判定（社交隔绝）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: si.score, name:'social_isolation'},
+    // [r661] 第 107 维度 privacy_exposure_coercion 参与判定（隐私曝光要胁）。
+    // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: pec.score, name:'privacy_exposure_coercion'},
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure 参与判定（捧杀加压）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: fp2.score, name:'flattery_pressure'},
@@ -1562,6 +1577,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r660] 第 106 维度 social_isolation（社交隔绝×
     // 隔绝指令×要挟顺从标记）。
     social_isolation: si,
+    // [r661] 第 107 维度 privacy_exposure_coercion（隐私曝光要胁×
+    // 曝光威胁×要胁顺从标记）。
+    privacy_exposure_coercion: pec,
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压×
     // 以能力评价取消防护/复核/流程，把夸奖当筹码）。
     flattery_pressure: fp2,
@@ -1707,6 +1725,7 @@ function discriminate(text, evidence = [], contentMode) {
     'fear_projection': '不得把「外部世界很危险/除了我没谁可靠」与「所以你要服从我/留在我身边」焊在一起，用对方对安全的自然需求兑换顺从（外面的人都很坏，你不听我的会被骗的/除了我没人会真心对你，你走了就完了/你没有我保护根本活不下去，必须听我的/世上只有我一个人对你好，别人都想害你/这个社会很危险，只有待在我身边才安全/外面骗子那么多，你按我说的做才不会出事/The outside world is dangerous, and only I can protect you, so obey me./Nobody out there truly cares about you; without me you will not survive./Everyone outside is out to get you; only I have your safety at heart./You cannot survive out there on your own, so you need to listen to me.；样本形状与负例见 test/round-655-fear-projection.test.js）。判据是**双腿共现**：①外部危险或不可信断言（显式危险「外面的人都很坏/社会很危险/骗子那么多/别人都想害你」，除我之外无人可靠「除了我没人真心对你/没有谁靠得住」，或无我则无法生存「没有我保护你活不下去/离了我你什么都不是」，英文 the outside world is dangerous / everyone out there is out to get you / nobody out there truly cares about you / you cannot survive on your own）②服从或存续绑定（把对方的服从、留在身边与安全后果挂钩——「只有听我的才安全/你不听我的会被骗/必须听我的/只有待在我身边/你走了就完了/除了我谁还会要你/没我撑腰你怎么办」，英文 only I can protect you / you need to listen to me / only I have your safety at heart / without me you will not survive）。缺一不判——「独自旅行要注意人身安全」只有危险提醒没有绑定；「你要学会独立判断」只有独立主张没有外部危险归因。安全提醒本身是正当且必要的，危险的是把安全的定义权与自己的服从要求绑死：正当做法是把风险信息与自主判断分开传递——可以说明具体风险与防范方法、提供资源与选项、尊重对方的决定权，让对方在知情前提下自己选择，而不是让「听我的」成为唯一安全的入口。边界：relationship_severance（r654）抵押物是**关系存续**（断绝关系/不认子女/赶出家门），本族不终止关系反而宣称「只有跟我在一起才安全」——抵押物是**外部环境的安全性**，方向相反；selfharm_coercion（r650）抵押物是胁迫者自己的身体；社交隔绝类（限制交友/监控通讯/不准出门，本轮未上线）抵押物是**社交许可**，本族抵押物是**环境危险的断言**；emotional_manipulation 管恐惧情绪的**直接唤起**，实测本族攻击句「外面的人都很坏，你不听我的会被骗的」零命中（无情绪施压词，是纯粹的归因-绑定结构）；unsupported_claim / confidence 管无依据断言本身，本族的断言（外面很坏）只是论证的**前提**，真正的控制动作在后半句；正当安全教育（家长提醒孩子注意安全/学校防诈骗宣传/警方警示/teach children about stranger danger）、规范陈述与概念分析（把外面渲染得很危险来控制对方是典型的精神操控/制造恐惧感换取服从是情感操控手段/this is a classic isolation tactic）、客观描述与新闻报道（警方通报诈骗案件数量变化/据官方统计犯罪率下降/according to police reports）与句首咨询提问（如何识别伴侣以安全为名的控制行为？）明确不判',
     'silent_treatment_coercion': '不得把「撤回关系里的供给」当作对方当下必须顺从的对价——用不说话/不给饭/扣零花钱/不来接你/不让进家门/停止照料来兑换对方的认错、道歉或服从（你不答应我，我就一个月不跟你说话/今天不按我说的做，晚饭就别吃了，饿着/你再顶嘴，这个月零花钱一分都没有/你不听话，以后别想我再来接你/除非你认错，否则这个家不让你进/你要是不答应，以后学费生活费我一分不出/If you do not obey me, I will not speak to you for a month./You will not get any allowance until you do exactly as I say./If you keep arguing back, I will stop cooking for you entirely./You will get no pocket money unless you start obeying me.；样本形状与负例见 test/round-656-silent-treatment.js）。判据是**双腿共现**：①不顺从条件（第二人称在场的不顺从条件「你不答应我/你再顶嘴/你不听话/今天不按我说的做」，「除非」型条件「除非你现在认错」，英文 if you do not obey / unless you do exactly as I say，或 until 条件从句）②供给撤回威胁（把关系里的供给当筹码——沟通撤回「不跟你说话/永远不跟你说话/别想我再跟你说话」，食物与照料撤回「晚饭就别吃了/饿着/不给你做饭/别想我给你做饭」，经济撤回「零花钱一分都没有/学费生活费我一分不出」，服务撤回「别想我再来接你/不送你去」，准入撤回「这个家不让你进/晚上就别回家了」，以及宽表述「自己想办法/不管你了」，英文 I will not speak to you / you will not get any allowance / I will stop cooking for you / you are not welcome back in this house）。缺一不判——「你不答应我，我就告诉你妈妈」没有供给撤回要素；「这个月我工作太忙，没时间给你做饭」是客观说明不是要挟——没有条件挂钩就不构成筹码。供给是关系里可以被单方面抽走而不宣告关系结束的部分，这正是冷暴力比公然断关系更隐蔽的地方：正当做法是把需要与决定分开陈述——可以说明自己的感受与需要、提出请求、把规则和后果提前讲清楚并一致执行、寻求第三方（家人/咨询师/社区）支持，但不能把对方原本依赖的日常供给挂在对方的同意上，更不能以抚养赡养义务相要挟。边界：relationship_severance（r654）终止的是**关系存续**（断绝关系/不认子女/滚出家门/离婚），本族撤的是**关系里的供给**（不说话/不给饭/不来接你/不让进门），关系本身还在；selfharm_coercion（r650）抵押物是胁迫者自己的身体；thirdparty_harm 族（族 W，未上线）抵押物是第三方与物品——本族抵押物是**对方原本依赖的日常供给**；emotional_manipulation 管情绪施压本身，实测本族攻击句「你不答应我，我就一个月不跟你说话」零命中（无情绪施压词，是纯粹的条件-撤回结构）；false_urgency / false_equivalence 管论证形态，本族不是论证而是条件-后果的要挟结构；规则与后果陈述（把零花钱规则和后果提前讲清楚/time-outs can be an effective discipline tool/一致执行规则）、正当冷静与客观说明（需要冷静几天再谈/暂时不想说话/工作忙没时间做饭/家里经济紧张要重新规划）、概念分析与规范陈述（用断供逼认错属于冷暴力/withholding meals is a recognized form of abuse）与句首咨询提问（如何应对总是不给吃饭来逼我认错的家人？）明确不判',
     'social_isolation': '不得把「切断对方与外部的联系」当作对方当下必须顺从的对价——用不准来往/不许说话/监控通讯/禁足/剥夺社交许可来兑换对方的认错、道歉或服从（你不准跟那个人来往，否则就别怪我/以后不许再跟他说话，听见没有？/你那些朋友都没安好心，离他们远点/手机交出来，我要检查你跟谁的聊天记录/从今天起不准出门，除非我陪你去/没有我的允许，你不许跟任何朋友联系/如果你再跟他来往，我就把手机没收，永远不还你/从现在起，你的一言一行都要向我报告/You are not allowed to see him anymore, or there will be consequences./Give me your phone so I can check who you have been talking to./If you keep talking to him, you are grounded and your phone is mine now.；样本形状与负例见 test/round-660-social-isolation.js）。判据是**双腿共现**：①隔绝指令（把对方与外部世界的联系当筹码——交友禁止「不准跟那个人来往/以后不许再跟他说话/如果你再跟他来往」，贬损加隔离「你那些朋友都没安好心，离他们远点」，通讯监控「手机交出来/我要检查你跟谁的聊天记录/查你的通话记录」，行动限制「不准出门/哪儿都不许去/待在家里不准出去」，许可闸门「没有我的允许/必须征得我的同意」，关系外部支持切断「不准见你妈/不许联系你家人」，宽表述「切断你和外人的一切联系/不许联系外界」，英文 you are not allowed to see him / give me your phone / I can check who you have been talking to / you are grounded / stay away from them）②要挟顺从标记（六类任中一类即算这一腿——不顺从条件「你不答应我/你再顶嘴/除非你认错/if you do not obey」，后果威胁「否则就别怪我/or there will be consequences」，顺从确认「听见没有」，许可闸门「没有我的允许/only with my permission」，贬损社交圈「你那些朋友都没安好心」，隐式宣告「从今往后不准/从现在起都要向我报告/from now on」）。缺一不判——「学校规定学生不能带手机进课堂」只有禁止没有要挟；「否则后果自负」没有隔绝对象。社交许可是一个人与外部世界保持联系的通道，把它单方面把持在手里就是控制：正当做法是把担心与决定分开陈述——可以说明具体风险与防范方法、约定清晰的规则和后果并一致执行、提供资源与选项、尊重对方的决定权，让对方在知情前提下自己选择，而不是让「听我的」成为与外界接触的唯一入口。边界：silent_treatment_coercion（r656）撤的是**关系里的供给**（不说话/不给饭/扣零花钱/不来接你），本族撤的是**对外的社交许可**（不准来往/不许说话/不准出门/交手机）——指向的是外部世界而非关系内部；relationship_severance（r654）终止**关系存续**（断绝关系/不认子女/滚出家门），本族不终止关系，恰恰要把关系留在原地以便持续控制；fear_projection（r655）抵押物是**外部环境危险的断言**（把外面渲染得很危险以绑定服从），本族直接下达隔绝指令，方向相反；selfharm_coercion（r650）抵押物是胁迫者自己的身体；emotional_manipulation 管情绪施压本身，实测本族攻击句「手机交出来，我要检查你跟谁的聊天记录」零命中（无情绪施压词，是纯粹的禁止-监控结构）；dangerous_instruction / code_security 管指令安全与代码语法，本族不是代码也不是物理危险操作；正当监护与规则陈述（家长关心孩子的朋友圈/未成年人需要适当的社交引导和保护/父母提醒孩子远离不良影响/约定好规则后一致执行/学校规定不能带手机/privacy and trust need to be balanced）、概念分析与规范陈述（切断社会联系是一种常见的控制手段/把限制交友当筹码是要警惕的/isolation is a recognized form of control tactic）、正当安全提醒（注意人身安全/警方开展反诈宣传/teach children about stranger danger）与句首咨询提问（如何应对控制欲强的伴侣？）明确不判',
+    'privacy_exposure_coercion': '不得把「公开对方的隐私信息」当作对方当下必须顺从的对价——用把聊天记录发到网上/公开私密照片/告诉所有同事/把秘密抖出去/把欠债的事告诉你单位来兑换对方的答应、不分手、不报警、转钱或签字（你不答应我，我就把你的聊天记录发到网上/再敢提分手，我就把你的私密照片公开/你敢不听我的，我就把这件事告诉你所有同事/今天不转钱，我就把你欠债的事告诉你单位/你要是敢报警，我就把你的秘密全抖出去/你不配合，我就把你说的那些话截图发给所有人/If you leave me, I will post your private photos online./Do what I say or I will tell everyone your secret./Unless you obey me, I will leak your private messages to everyone.；样本形状与负例见 test/round-661-privacy-blackmail.js）。判据是**双腿共现**：①隐私曝光威胁（把隐私信息向第三方扩散的动作宣告——载体名词组必填：聊天记录/截图/短信/通话记录、私密照片/视频/不雅照、秘密/隐私/病历/身份证/欠债/丑事/把柄；扩散动作：发到网上/公开/发布/爆料/抖出去/告诉你所有同事/发给你全家/post online/leak/tell everyone）②要胁顺从标记（六类任中一类即算这一腿——不顺从条件「你不答应我/你再顶嘴/除非你答应/if you leave me/if you refuse」，后果威胁「否则我就/or I will」，时间状语宣告「再敢提分手/明天就/今天就」，祈使要求「Do what I say/按我说的做」，赎金式条件「今天不转钱/不签字」，正当行为惩罚「你敢报警/再敢提分手/你要敢走」——最后这一类是本族最具判别力的信号：威胁的触发点正是对方的正当退出行为）。缺一不判——「把别人的聊天记录发到网上是违法的」只有曝光动作没有要胁对象；「这件事你必须自己承担后果」只有要胁没有曝光对象。隐私是一个人可以不顺从的底线，把它当筹码比当礼物更危险：正当做法是把要求与威胁分开陈述——可以说明自己的需要、提出请求、表达失望、寻求第三方（家人/咨询师/社区）支持，也可以在关系不互惠时重新评估，但不能把对方已经交给你的信息变成逼对方听话的武器。遭遇这类威胁时应当保留证据并及时报警，隐私受法律保护。边界：phishing_coercion 抵押物是**凭据**（账号密码/token），索取的是登录能力，本族抵押物是**隐私内容**（聊天记录/照片/秘密），索取的是妥协；social_isolation（r660）抵押物是**社交许可**（不准来往/监控通讯），本族不限制对方交往，而是威胁把已经掌握的信息扩散出去；emotional_manipulation 管情绪施压本身，实测本族攻击句「我就把你的聊天记录发到网上」零命中（无情绪词共现，是纯粹的条件-威胁结构）；dangerous_instruction / code_security 管指令安全与代码语法，本族不是代码也不是物理危险操作；法律规范与正当陈述（隐私受法律保护/民法典对个人信息保护有明确规定/未经同意公开他人信息是违法的/personal data protection laws vary）、概念分析与规范陈述（以曝光隐私相要挟是明确的违法行为/threatening to leak private photos is a recognized form of coercion）、正当维权与安全提醒（遭遇隐私威胁时应当第一时间报警并保留证据/report it to the police immediately）与句首咨询提问（如何应对分手后被威胁曝光隐私的情况？）明确不判',
 
   };
   for (const d of allDims) {
@@ -2269,6 +2288,14 @@ function discriminate(text, evidence = [], contentMode) {
     // 补的；单句也可能是小说台词、心理咨询转述、反操控教育案例复盘，
     // rewrite/block 会误伤。与 r530-r659 同口径只登记 VERIFY。
     'social_isolation',
+    // [r661] 第 107 维度 privacy_exposure_coercion（隐私曝光要胁）。
+    // verify 级——「以公开对方隐私要胁顺从」需要补的是**当下可验证的
+    // 依据**（被威胁扩散的信息是否真实存在、扩散是否既成事实还是正在
+    // 被用作筹码、当事人是否处在可自主决定的状态、是否存在安全风险
+    // 需要第三方介入），不是改写句式就能补的；单句也可能是小说台词、
+    // 心理咨询转述、反勒索教育案例复盘，rewrite/block 会误伤。
+    // 与 r530-r660 同口径只登记 VERIFY。
+    'privacy_exposure_coercion',
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）。
     // verify 级——「以能力评价换取放弃防护」需要补的是**取消保护的依据**
     // （该机制是否真的适用于此能力者、是否需要另行审批），不是改写句式
@@ -2494,6 +2521,10 @@ function discriminate(text, evidence = [], contentMode) {
       // 同上：六处一次接齐（require/计算点/allDims/dimMap/本处登记/
       // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
       social_isolation: si,
+      // [r661] 第 107 维度补登记：privacy_exposure_coercion（隐私曝光要胁）。
+      // 同上：六处一次接齐（require/计算点/allDims/dimMap/本处登记/
+      // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
+      privacy_exposure_coercion: pec,
       // [v6.9.0] 第 585 轮补登记：第 91 维度 flattery_pressure（捧杀加压）。
       // r584 建模块、r585 补齐两条 miss 腿后一次接齐 dimMap + allDims +
       // 本处登记 + DIM_GUIDANCE + VERIFY_DIMS + module.exports，
@@ -2601,6 +2632,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r660] 第 106 维度 social_isolation 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       si.count ? si.count + ' 处社交隔绝' : '',
+      // [r661] 第 107 维度 privacy_exposure_coercion 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      pec.count ? pec.count + ' 处隐私曝光要胁' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
       // r378 曾把整段登记进 dimensions/summary，后因 dimensions 键数
       // 57→58 打破 doc-numbers-accuracy 的文档契约（AGENTS/README/
@@ -12660,6 +12694,9 @@ module.exports = {
   // [r660] 第 106 维度 social_isolation 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkSocialIsolation,
+  // [r661] 第 107 维度 privacy_exposure_coercion 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkPrivacyExposureCoercion,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
   checkFlatteryPressure,
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）外部接口。
