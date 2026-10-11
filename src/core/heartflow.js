@@ -3256,7 +3256,13 @@ class HeartFlow {
     // 指向「当前引擎的」实例，避免多实例环境下统计串到别的引擎上。
     if (this.daoDecision) {
       try {
-        require('./pipeline.js').publishInstance('daoDecision', this.daoDecision);
+        // [AUDIT-FIX] 路径修正：本文件在 src/core/ 下，pipeline.js 在 src/ 下，
+        // 旧写法 './pipeline.js' 解析成 src/core/pipeline.js（不存在）→
+        // 每次启动都在 _initErrors 里记一条「publishInstance 失败」，
+        // 正是启动日志 `[init] 1 模块初始化失败` 的来源。
+        // 后果：pipeline Layer 3.6 只能退回去 new 临时实例，常驻实例的
+        // checks/flags 统计对 dispatch/MCP 两路消费者不可见。
+        require('../pipeline.js').publishInstance('daoDecision', this.daoDecision);
       } catch (e) {
         _boundedPush(this._initErrors, { module: 'daoDecision', error: 'publishInstance 失败: ' + e.message, note: 'pipeline 回退临时实例，不影响主链路' }, MAX_HISTORY_SIZE);
       }

@@ -69,7 +69,11 @@ t('全库无实际 git push/pull --no-verify 命令', () => {
     !l.includes('/scripts/round') &&
     !l.includes('/test/') &&
     !l.includes('不要一律') && !l.includes('先查 hook') && !l.includes('修 hook') &&
-    !l.includes('不要用') && !l.includes('⚠️') && !l.includes('绕过所有'));
+    !l.includes('不要用') && !l.includes('⚠️') && !l.includes('绕过所有') &&
+    // 「扫这个模式」的自检说明：git-essentials 教人用 grep 扫 --no-verify，
+    // 其命令行与示例本身就是字面量，不是要执行的 push
+    !l.includes('grep -rn') && !l.includes('git push --no-verify`') &&
+    !l.includes('git pull --no-verify`'));
   assert(hits.length === 0, `仍有 ${hits.length} 处:\n${hits.slice(0, 5).join('\n')}`);
 });
 t('heartflow-audit-upgrade-push 无 token 明文占位', () => {

@@ -15,9 +15,9 @@ says things that are *right*.
 **Zero LLM dependency.** 112 dimensions, 161 modules, 67 MCP tools, 1,314 dispatch
 routes. Pure rule engine.
 
-> **Numbers below were measured by `scripts/measure-claimed-numbers.js` (v6.7.77),
-> not asserted from memory.** If you change any of them, re-run that script —
-> this file previously claimed "46 dimensions / 179 MCP tools / 1,546 routes"
+> **Numbers below were measured by `scripts/measure-claimed-numbers.js` against the
+> current VERSION, not asserted from memory.** If you change any of them, re-run that
+> script — this file previously claimed "46 dimensions / 179 MCP tools / 1,546 routes"
 > while the code actually had 50 / 59 / 1,728. Honest numbers is design
 > principle #5 in this file.
 

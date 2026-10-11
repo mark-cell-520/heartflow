@@ -129,7 +129,15 @@ let srcFiles = 0;
   srcFiles = walk(path.join(ROOT, 'src')).length;
 }
 
-console.log('=== 实测数字（v6.7.77）===\n');
+// [AUDIT-FIX] 版本戳动态读 VERSION，不再硬编码。
+// 硬编码的 v6.7.77 让每个看到输出的人都以为这份实测是 124 个补丁版本前跑的，
+// 而 AGENTS.md 第 18 行引用的是同一串字面量 —— 根因在脚本，不在文档。
+let _measureVer = 'unknown';
+try {
+  _measureVer = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim() || 'unknown';
+} catch (_) { /* VERSION 缺失时降级，不阻断测量 */ }
+
+console.log(`=== 实测数字（v${_measureVer}）===\n`);
 console.log(`判别维度数（dimensions 键实测）: ${dimCount}`);
 console.log(`  BLOCK_DIMS   : ${cnt('BLOCK_DIMS')}`);
 console.log(`  REWRITE_DIMS : ${cnt('REWRITE_DIMS')}`);
