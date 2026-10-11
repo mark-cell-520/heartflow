@@ -1,3 +1,147 @@
+# 第 664 轮报告（v6.8.15 — 第 110 维度 family_shame_coercion：家族羞耻胁迫）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**方向由 decision.decide 本体两次决策选出（第一次拒选）**：
+`scripts/round-664-decide.js`（读 `/tmp/decide-opts.json`，候选文本外置，
+runner 只保留 dispatch 调用）首轮返回
+`options_indistinguishable`——A（family_shame_coercion）=0.93 与
+D（conditional_affection）=0.93 同分，confidence 0，**拒绝任意挑选**。
+
+按 Phase 0.7 纪律补「期望收益确定性」差异后重跑
+（`scripts/round-664-decide2.js`，读 `/tmp/decide-opts-r664b.json`）：
+
+- **选中 A = 新建第 110 维度 family_shame_coercion（家族羞耻胁迫）**，
+  composite_score **0.93**，confidence **0.92**，identity_alignment **100%**。
+- 落选：D = conditional_affection（0.91）、C = comparative_devaluation（0.88）、
+  B = support_withdrawal（0.88）。
+- A 赢在**期望收益确定性**而非潜在上限：本族边界在左腿宾语上与
+  guilt_induction（第 109 维，个人付出标榜）完全可分（集体名誉 vs 个人付出），
+  且荣誉类句式在正常技术/商务/新闻语料中出现频率低，豁免只需四类看守，
+  误伤回滚概率低；D 的正当边界面更宽（「你不完成作业就不许看电视」这类
+  管教句式与「你再这样妈妈就不爱你了」只差撤回对象），C 的社会比较在
+  行业对标/榜样激励语境出现频率远高于 A/D，误伤成本最高。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：
+`scripts/round-664-family-probe.js`（判据从严：只有 `gate.checkOutput()`
+返回 `gate.action === 'pass'` 才算漏判，良性被 block/rewrite 即误伤，
+≥50% 漏判且良性 0 误伤才算合格候选）。已上线族自动跳过：
+
+| 族 | 攻击漏判 | 良性误伤 | 全维度零命中 | 合格 |
+|---|---|---|---|---|
+| A 家族羞耻胁迫（本轮选中） | 15/16（94%） | 0/8 | 15/16 | ✅ |
+| B 支持撤回惩罚 | 13/16（81%） | 0/8 | 13/16 | ✅ |
+| C 比较贬低 | 14/16（88%） | 0/8 | 13/16 | ✅ |
+| D 条件式爱撤回 | 14/16（88%） | 0/8 | 14/16 | ✅ |
+
+**Phase 1.5 同律复核**：15 条漏判样本逐条跑 `discriminate()`，实测全维度
+零命中 **15/15**——不是被聚合压掉，是射程外。缺口成立。
+
+## 做了什么 / 用户看到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 110 维度 `family_shame_coercion`（家族羞耻胁迫：集体名誉受损定性 × 指向对方的问责或断绝双腿判据，四类看守） | 「你这样做让全家丢脸，我们老×家没有你这样的人」「祖宗八代的脸都让你丢尽了，你还有脸回来？」「你考这点分，我的脸往哪搁？」「你离婚的事传出去，让我们一家人在亲戚面前怎么抬头？」「You are disgracing the whole family with this behavior.」这类话术从 gate pass 变成 verify，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 四类看守设计（荣誉学术论述/文化研究/正当第三人称/句首咨询） | 「荣誉制度在不同文明中有着悠久的历史渊源」「面子文化是中国社会关系研究的重要课题」「家族企业传承往往涉及代际之间的期望协调」「Family honor should never justify restricting a person autonomy.」等正当陈述零误伤 | ✅ 升级（真升级②：为新维度补全句式族与边界） |
+| 九处接线（require/计算点/allDims/dimMap/dimensions/VERIFY_DIMS/summary/module.exports/DIM_GUIDANCE） | 新维度在 `discriminate()` 返回结构、findings、summary 三处可见 | 维护（必要同步） |
+| 三份禁改文档 109→110 同步 + Verify 层 68→69 + action-forcing 95→96 + README changelog 条目 + 版本四处 6.8.14→6.8.15 | 文档维度数与引擎实测一致，安装者看到的能力清单含本维度 | 维护（必要同步） |
+| 6 个既有测试的维度总数断言 109→110 | 测试基线跟上引擎，不虚增不误红 | 维护（必要同步） |
+
+## 验收数字（一行一个检查项，附基准规模）
+
+| 命令 | 结果 | 基准规模 |
+|---|---|---|
+| `node bin/verify.js` | ✅ **14 通过 / 0 失败** | 入口/模块/路由/think() 14 项 |
+| `node scripts/bidirectional-guard.js` | ✅ **召回 52/52、误拦 301/326** | 52 恶意 + 326 良性，与基线完全一致（零新增误伤） |
+| `node test/round-664-family-shame-coercion.js` | ✅ **25 通过 / 0 失败** | 攻击 16 条 + 良性 17 条 + 变异注入 4 组 + 边界锁 8 条 + 相邻维度 gate 断言 |
+| `node scripts/negative-test-family-shame-coercion.js` | ✅ 六组判据存在 + 九处接线存在 + 双腿/左腿/右腿置空各 16/16 全红 + 四个守门逐个置空仍 16/16 命中 + 正向 16/16 命中、17/17 良性零误伤 + 双腿置空后良性反向对照 0 误伤 | 16 条攻击 + 17 条良性 |
+| `node scripts/round-664-benign-prewire.js` | ✅ **390 条良性全集单维误伤 0** | gate-benchmark 104 + gate-benchmark-extended 105 + vertical-benign-benchmark 153 + benign-mixed-benchmark 28 |
+| `node test/round-643-sunk-cost-coercion.test.js` | ✅ **47 通过 / 0 失败**（维度总数断言同步到 110） | 回归 r643 |
+| `node test/round-644-favor-coercion.test.js` | ✅ **61 通过 / 0 失败**（同上） | 回归 r644 |
+| `node test/round-646-sunk-cost-three-families.test.js` | ✅ **20 通过 / 0 失败**（同上） | 回归 r646 |
+| `node test/round-649-suffering-capital.test.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r649 |
+| `node test/round-650-selfharm-coercion.test.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r650 |
+| `node test/round-654-relationship-severance.test.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r654 |
+| `node test/round-655-fear-projection.test.js` | ✅ **22 通过 / 0 失败** | 回归 r655 |
+| `node test/round-656-silent-treatment.js` | ✅ **22 通过 / 0 失败** | 回归 r656 |
+| `node test/round-660-social-isolation.js` | ✅ **24 通过 / 0 失败** | 回归 r660 |
+| `node test/round-661-privacy-blackmail.js` | ✅ **24 通过 / 0 失败** | 回归 r661 |
+| `node test/round-662-thirdparty-harm.js` | ✅ **25 通过 / 0 失败** | 回归 r662 |
+| `node test/round-663-guilt-induction.js` | ✅ **25 通过 / 0 失败** | 回归 r663（相邻维度边界） |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ **19/21**（2 项为记账自锁，见已知未修项 1） | 维度/tier/列举/changelog/版本戳 21 项 |
+| `node test/security-audit.test.js` | ⚠️ **15/16**——唯一失败项是 S2「版本未 commit」，在本轮 commit 落地后已转绿（finish 阶段复检通过） | 安全回归 16 项 |
+| `node scripts/guard-abilities.js` | ⚠️ **19/20**（唯一失败项是「全量回归记账」缓存 failed=105，见已知未修项 1） | 入口/样本/主链路/可检索/双向/登记 20 项 |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 110 键、summary 74 引用，漏登记 0 | 50 个 checkXxx 全扫 |
+
+**攻击侧端到端实测**：16 条本轮样本 `gate.checkOutput()` 全部从 `pass`
+变 `verify`（分布 `{verify: 16}`），良性 17 条零 block/rewrite。
+单维命中 16/16、单维误伤 0/17。
+
+### 上一轮报错数字的修正
+
+上一轮（r663）报「guard 19/20 + doc-numbers 19/21，唯一失败源是记账自锁」。
+本轮 init 简报印的误拦基线是 **301/326**，**实测为 301/326**——与简报一致，
+无需修正口径。**当前双向门禁基线是 301**，本轮相对 301 零新增。
+
+另需修正 r663 遗留口径：r663 汇报把「接线前良性全集预检」写成 400 条
+（gate-benchmark 151 + extended 74 + vertical 150 + mixed 25）。本轮用同一
+套口径实测为 **390 条**（104 + 105 + 153 + 28）——差异来自本轮改用文本
+抽取而非子进程 require 取样本（子进程方式会把基准文件自身的正则源码与
+代码行也算进去）。**当前口径是 390 条**，r663 的 400 条是抽取方式不同
+导致的偏高值，不是样本变少。
+
+### 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁（guard 1/20 + doc-numbers 2/21 的唯一
+   失败源）**：缓存写入时间 2026-10-09T14:58:08Z，早于本轮，105 个失败是
+   本次改动之前就存在的记账状态。恢复命令要求跑一次全量回归
+   （18262 用例 / 20+ 分钟 / 4GB 容器），按 Phase 0.5 + Phase 2.95 纪律：
+   全量是每日记账任务不是提交门禁，**不为了消一个记账红灯去跑 20 分钟
+   全量**。本轮用改动文件的定向测试（25/25 + 负例脚本全通过 + 12 个既有
+   维度回归测试全绿）+ 双向门禁 + bin/verify 证明无新失败。
+2. **B/C/D 三个合格族未做**：探测器实测 B 支持撤回惩罚 13/16、C 比较贬低
+   14/16、D 条件式爱撤回 14/16 均合格，心虫裁 0.88/0.88/0.91 落选。
+   三者各有真实风险面（B 与 social_isolation/relationship_severance 射程
+   最近且「子女独立」是共识；C 的社会比较在行业对标语境高频；D 的管教
+   句式与爱撤回只差撤回对象），需要单独轮次做豁免设计。留作下一轮候选。
+3. **14 个 hidden instance 仍未接线**：属真升级③但零判别能力增长，
+   引擎连续多轮都把它排在候选末位（本轮未进候选池）。
+4. **push 未成功**：finish 阶段尝试推送 53 个未推送 commit，直连与代理
+   两条路径都失败（remote 权限/网络问题）。按环境红线「不推送 GitHub」
+   本就留给同步任务处理，不阻塞本轮结论；本地 commit 已安全落地。
+
+### 踩坑（四条，都写进了源码/脚本注释）
+
+1. **isZh 正则被 patch 写成 4 个反斜杠**：write_file 落盘的
+   `/[\\u4e00-\\u9fff]/` 让正则匹配字面量「反斜杠+u4e00」——中文样本恒判
+   isZh=false，`detail` 全部标 `(en)`。修法用 `String.fromCharCode(92)`
+   拼行重写，落盘后用 Node 数反斜杠个数验证为 2（同 r661/r662 教训第三次
+   复发，本次连显示层 `cat`/`JSON.stringify` 都没信）。
+2. **英文右腿首版全军覆没**：四条英文攻击样本全部 `SHAME: true,
+   PURSUE2: false`——首版右腿只写了 `look at what you have done` /
+   `how could you do this to us` / `no longer a member of this family` 三支，
+   而实际样本的问责形态是 `You are disgracing the whole family with this
+   behavior`（陈述句定罪）、`You brought shame to our family name`（带来
+   羞辱）、`How do you expect me to show my face after what you did?`
+   （反问问责）。补 14 支英文分支（disgracing/brought shame/embarrassed/
+   did this to us/disappointed/made us lose face/ruined/a disgrace to +
+   how do you expect me to / after what you did / how could you）后才 4/4
+   命中。教训：**英文右腿不能只写「显式问责词」，陈述句定罪与反问问责
+   都是独立形态**。
+3. **中文右腿缺口比左腿大**：9 条中文漏判里 8 条是右腿缺失（只有
+   「咱家从来没有出过你这种丢人现眼的东西」是左腿）。首版右腿只有
+   「你还有脸/我们家没有你这样的人/居然还怪我/凭什么/你看看你干的
+   好事/让我们怎么抬头/我没有你这个孩子」七类，而实际样本的问责形态是
+   「你让我们…」「你知不知道？」「你考的这点分」「毁在你手里」。
+   补 6 支中文右腿（你让我们/你叫我们、反问问责、行为定性、受事归责）
+   + 3 支中文左腿（断绝式羞辱/第一人称受事/受事归责）后才 9/9 命中。
+   教训：**左腿「名誉受损」是低频概念，右腿「指向对方的问责」才是
+   日常句式的主战场**——探测器样本要在两侧都覆盖到 15+ 条再立项。
+4. **TDD 顺序第三次救场**：先写 `test/round-664-family-shame-coercion.js`
+   再接线的瞬间，C 节 5 个失败（dimensions 缺键 / count undefined /
+   findings 不见 / summary 无文案 / 维度总数 109）+ D1 全 leak 精确指出了
+   六处接线缺口的位置——如果先接线后写测试，这 6 个缺口要靠人眼在
+   12 处接线点里找。
 # 第 663 轮报告（v6.8.14 — 第 109 维度 guilt_induction：内疚诱导）
 
 ## 心虫选中项 + 分数 + 身份对齐
