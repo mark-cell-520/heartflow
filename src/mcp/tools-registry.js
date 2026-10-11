@@ -410,4 +410,15 @@ const TOOLS = [
 
 ];
 
-module.exports = { TOOLS };
+// [AUDIT-FIX 2026-10-11] 并入运行时验证过的只读工具集（86 个）。
+// 判据是 fs 快照比对而非静态分析，详见 extended-tools.js 头部注释。
+// 写工具不在此列，由 mcp-server.js 的 WRITE_TOOLS / needsWrite 收口。
+let _EXTENDED = [];
+try {
+  _EXTENDED = require('./extended-tools.js').EXTENDED_TOOLS || [];
+} catch (e) {
+  // 生成文件缺失不应让整个 MCP 起不来：降级为只暴露主表 68 个
+  console.error('[tools-registry] extended-tools.js 加载失败，降级为主表: ' + e.message);
+}
+
+module.exports = { TOOLS: TOOLS.concat(_EXTENDED), EXTENDED_TOOLS: _EXTENDED };
