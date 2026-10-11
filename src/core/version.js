@@ -31,7 +31,10 @@ const path = require('path');
 //                 v6.7.110 的收尾，并修掉它引入的 conda 误拦 + etc/passwd 漏报）。
 // [v6.8.18] 第 667 轮同步：6.8.17 → 6.8.18（第 113 维度 future_faking
 //                 归责绑架上线）。
-let VERSION = '6.8.18';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.19] 第 669 轮同步：6.8.18 → 6.8.19（第 114 维度 economic_control
+//                 经济控制 + 第 115 维度 triangulation 三角化上线；
+//                 r668 遗留的 economic_control 本轮补提交）。
+let VERSION = '6.8.19';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

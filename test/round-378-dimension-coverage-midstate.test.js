@@ -54,10 +54,10 @@ module.exports = function ({ test }) {
     assert.strictEqual(mte.qualifies, false, '单层不应 qualifies');
   });
 
-  test('dimensionRaw 不进 dimensions（文档契约：维度口径保持 57 键）', () => {
+  test('dimensionRaw 不进 dimensions（文档契约：维度口径保持 115 键）', () => {
     const d = idx.discriminate(MT_PROBES[0]);
-    assert.strictEqual(Object.keys(d.dimensions).length, 57,
-      'dimensions 键数变了——会打破 doc-numbers-accuracy 的 57 维口径');
+    assert.strictEqual(Object.keys(d.dimensions).length, 115,
+      'dimensions 键数变了——会打破 doc-numbers-accuracy 的 115 维口径');
     assert.strictEqual(d.dimensions.multi_turn_escalation, undefined,
       'mte 不该进 dimensions（r378 v1 的 revert 原因正是它）');
   });
