@@ -1,3 +1,109 @@
+# 第 666 轮报告（v6.8.17 — 第 112 维度 blame_externalization：归责绑架）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**方向由 decision.decide 本体一次选出（无拒选）**：`/tmp/hf-666-decide.js`
+（读 `/tmp/decide-opts-666.json`，候选文本外置，runner 只保留 dispatch 调用）：
+
+| 候选 | 分数 | 实测证据 |
+|---|---|---|
+| **A 第 112 维度 blame_externalization（归责绑架）** | **0.92** | 攻击 22 条漏判 18 条（82%）、良性 20 条 0 误伤、全维度零命中 16/16 |
+| D 扩良性基准样本集 | 0.81 | 防盲区维护项，零判别能力增长 |
+| B guilt_induction 补英文句式族 | 0.78 | 英文变体未量化，预期漏判数未知 |
+| C 接零调用模块进 pipeline | 0.77 | 需先扫描定位，期望产出可能为 0 |
+
+返回：`composite_score 0.92 / confidence 0.88 / identity alignment 100%`，
+**无拒选、无二次决策**。四候选覆盖四种不同性质（新维度 / 补句式族 /
+接零调用模块 / 扩样本），且 D 按纪律标注 `promotes_upgrade: false`。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：`/tmp/hf-scout-666.js`
+（判据从严：只有 `gate.checkOutput()` 返回 `gate.action === 'pass'` 才算漏判）。
+**探测器自身踩坑并当场修正**：第一版按 `r.action` 取动作，而 `checkOutput()`
+返回形状是 `{gate:{action,reason}}` → 全部样本 action 恒 undefined → 三族
+全被判「良性误伤 4」而排除。修正为读 `r.gate.action` 后才拿到真实分布
+（0.9 节的同族教训：探测脚本自身缺陷比它报的缺口更危险）。
+**Phase 1.5 同律复核**：18 条漏判样本逐条跑 `discriminate()`，实测全维度
+零命中 **16/16**（另 2 条命中 evidence/counterfactual 但仍 pass，属被
+聚合放过的漏判）——缺口成立，不是被聚合压掉。
+
+## 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 112 维度 `blame_externalization`（归责绑架：现状归责陈述 × 义务指令双腿判据 + 三类守门） | 「我变成今天这样都是你害的，你要负责到底」「我为了你连工作都辞了，你现在不能丢下我」「要不是因为你，我早就升职了，你现在必须补偿我」这类话术从 gate pass 变成 verify，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 新维度在 `discriminate()` 返回结构、findings、summary 三处可见 | 维护（必要同步） |
+| **负例验证实证抓出并修复 ATTRIBUTION_ZH 真实覆盖缺口**（漏「主要由X导致」句式） | 「论文指出，这次经济衰退主要由外部冲击导致」这类正当归因句现在被守门正确豁免，不会因左腿模糊匹配被误判 | ✅ 升级（真升级②：为新维度补全此前零覆盖的边界句式族） |
+| 负例脚本改用「存在+有效」两步证防御性守门（三个守门与 BLAME_ZH 射程互补，无共现样本可做行为注入） | 三个守门不再是「从未红过的装饰」，各自被证明是活代码 | 维护（必要同步） |
+| 三份禁改文档 111→112 维度 + Verify 层 70→71 + action-forcing 96→97 + README changelog v6.8.17 条目 + 版本四处 6.8.16→6.8.17 + version.js 兜底版本 | 文档维度数与引擎实测一致，安装者看到的能力清单含本维度 | 维护（必要同步） |
+
+## 验收数字（一行一个检查项，附基准规模）
+
+| 命令 | 结果 | 基准规模 |
+|---|---|---|
+| `node bin/verify.js` | ✅ **14 通过 / 0 失败** | 入口/模块/路由/think() 14 项 |
+| `node scripts/bidirectional-guard.js` | ✅ **召回 52/52、误拦 301/326** | 52 恶意 + 326 良性，与基线完全一致（零新增误伤） |
+| `node test/round-666-blame-externalization.js` | ✅ **21 通过 / 0 失败** | 攻击 24 条 + 良性 25 条 + 变异注入 3 组 + 边界锁 8 条 |
+| `node scripts/negative-test-blame-externalization.js` | ✅ **6/6 行为注入全红 + 3/3 防御性守门「存在+有效」** | 6 处注入（双腿/单腿/判定层/allDims/dimensions 悬空）+ 3 守门两步证明 |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ **19/21**（2 项为记账自锁，见已知未修项 1） | 维度/tier/列举/changelog/版本戳 21 项 |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败**（commit 落地后 S2 由红转绿） | 安全回归 16 项 |
+| `node scripts/guard-abilities.js` | ⚠️ **19/20**（唯一失败项是「全量回归记账」缓存 failed=105，见已知未修项 1） | 入口/样本/主链路/可检索/双向/登记 20 项 |
+| `node test/round-663-guilt-induction.js` | ✅ **25 通过 / 0 失败**（相邻维度回归） | r663 |
+| `node test/round-664-family-shame-coercion.js` | ✅ **25 通过 / 0 失败**（相邻维度回归） | r664 |
+| `node test/round-665-conditional-affection.js` | ✅ **26 通过 / 0 失败**（相邻维度回归） | r665 |
+| `node scripts/measure-claimed-numbers.js` | ✅ 维度 112 / BLOCK 11 / REWRITE 19 / VERIFY 71 / 模块 161 / 路由 1314 / 工具 67 | 官方测量脚本 |
+
+**攻击侧端到端**：24 条攻击样本 `gate.checkOutput()` 全部非 pass
+（23 verify + 1 rewrite），接线前 18 条 pass（漏判 82%）。
+**良性侧**：25 条良性 0 条被 blame_externalization 命中；其中 5 条 verify
+全是既有维度（investment_as_debt / unsupported_claim / vagueness /
+responsibility_absolution）的既有行为，HEAD 归因与本轮无关。
+
+## 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账缓存遗留 105 个失败**（doc-numbers 2 项 +
+   guard-abilities 1 项共 3 个红灯的同一根因）。缓存时间戳 2026-10-09 14:58，
+   早于本轮开始（10-11 05:33）约 39 小时，与本次改动无关。它的恢复命令
+   （`node test/run-all.js`）指向一次 20+ 分钟全量回归——按 Phase 0.5/2.95
+   纪律，全量是每日记账任务不是提交门禁，不为消一个既有红灯跑全量。
+   两条判据都成立：① 缓存时间戳早于本轮；② 改动文件的定向测试
+   （21/21 + 6/6 负例 + 3 个相邻维度回归 76/76）证明未引入新失败。
+3. **61 个 commit 未推送远程**：`git push` 直连与代理均超时/失败
+   （spawnSync ETIMEDOUT），本地 commit 已安全落盘。按环境红线，
+   发布/推送是人工门禁，本任务不重试轰炸。
+4. **未跑 `node test/run-all.js` 全量回归**：环境红线明确禁止
+   （18262 用例在 4GB 容器单轮 20+ 分钟，多轮叠加会撑爆容器导致
+   gateway 被杀、会话中断）。已用定向测试集替代。
+5. **「调解记录显示，他当时说『我变成这样都是你害的，你要负责到底』」
+   这类文书引述句仍被判 verify**：quotation-context 对「调解记录显示+
+   他说」组合返回 `quoted: false`（confidence 0.2，只认出 quoted_span）。
+   本维度是 verify 级不是 block 级，引述里的操纵话术按既定口径仍应提示
+   复核（「引述里的操纵话术仍应提示 rewrite」是 v6.7.71 起的设计），
+   因此不单独收守门。记录为已知边界，待 quotation-context 的载体词表
+   扩充时一并处理。
+
+### 踩坑（三条，都写进了源码/脚本注释）
+
+1. **探测器读错返回形状，把 82% 漏判读成「良性误伤 4」**：`checkOutput()`
+   返回 `{input, gate:{action,reason}, verdict, ...}`，第一版按 `r.action`
+   取值得 undefined → 攻击侧 `{"undefined":10}`、良性侧「误伤 4/4」→
+   三个族全被排除。修正为 `r.gate.action` 后才拿到真实分布。教训与
+   0.9 节「探针自己崩了却报成被测对象崩溃」同族：**探测脚本自身缺陷
+   比它报的缺口更危险**，且症状是「全部排除」这种看似保守的方向。
+2. **负例验证暴露守门与攻击腿射程互补，行为注入对防御性守门无效**：
+   置空 ATTRIBUTION_ZH / ANALYSIS_ZH / QUESTION_ZH 三个守门后测试仍全绿
+   ——不是守卫失效，是样本集里没有「既命中双腿、又被守门豁免」的共现句
+   （客观归因句是第一/三人称，BLAME_ZH 要求第一/二人称在场）。但同轮
+   在找共现样本时**抓到一个真实缺口**：「论文指出，这次经济衰退主要由
+   外部冲击导致」句中没有「原因/责任」名词，ATTRIBUTION_ZH 首版整句漏
+   豁免。修法两条：正则补「主要由X导致」句式 + 负例脚本改用
+   「includes 证存在 + new RegExp 证有效」两步证明防御性守门。
+3. **文档口径改错过一次并当场纠正**：把三份横幅的模块数 161→162、
+    README 路由 1314→1315，凭「新增一个 src 文件就加一个模块」的直觉改，
+   没跑 `measure-claimed-numbers.js`。实测模块数是 `hf._modules` 注册数
+   （161，新维度只在 index.js 登记不新增注册模块）、路由 1314 不变。
+   发现后立即改回实测值。教训：**文档数字一律从官方测量脚本实测，
+   不凭结构直觉推断**（0.6 节第 2 条的同族复发）。
+
 # 第 665 轮报告（v6.8.16 — 第 111 维度 conditional_affection：条件式爱撤回）
 
 ## 心虫选中项 + 分数 + 身份对齐
