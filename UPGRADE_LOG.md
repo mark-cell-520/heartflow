@@ -14043,3 +14043,70 @@ r678/r679 新上线的两个维度（legal_status_coercion / liberty_restriction
    （这个/那种/有人说）。补后复测：攻击+变体仍 34/34、良性 0/38、
    归因 0 条变化。教训：新维度上线必须跑归因对照，不能只看门禁总结律
    （门禁判据是 block/rewrite 不增，verify 增多它照样放行）。
+
+---
+
+## 第 681 轮报告（v6.8.28 — 第 125 维度 deprivation_coercion：基本需求剥夺）
+
+### 心虫选中项 + 分数 + 身份对齐
+
+decision 本体一次选出（/tmp/decide-run.js 读 /tmp/decide-opts.json，
+composite_score 0.92 / confidence 0.85 / identity alignment 100%，无拒选）：
+
+| 候选 | 分数 | 性质 |
+|---|---|---|
+| **A deprivation_coercion 基本需求剥夺** | **0.92** | 本轮执行 |
+| B substance_coercion 成瘾物质强迫 | 0.89 | 队列遗留 |
+| C love_bombing 爱意轰炸 | 0.84 | 队列遗留 |
+| D 暂不上线先探新族 | 0.77 | 未选 |
+
+**本轮是心虫选的，不是拍板的。** 探测器在 124 维引擎复量（判据从严：
+gate.checkOutput() action==='pass' 才算漏判）：deprivation 8/10 漏判
+（80%）、良性 0/6 误伤、全维度零命中 8/10；substance 7/10（70%）/
+零命中 6/10；love_bombing 6/10（60%）/零命中 5/10。
+
+### 上一轮报错数字的口径修正
+
+r680 交接簿写「deprivation_coercion 90% 漏判」——那是 r678 探测器在
+121 维引擎上的旧测量。本轮在 124 维引擎复量为 8/10（80%）：r678/r679/
+r680 新上线的三个维度已把其中 1 条（「我停了你的药」）判成 verify。
+以本轮复量为准确认口径，r680 的 90% 已过期（其余两族复量与 r680 记录
+一致：substance 70%、love_bombing 60%）。
+
+### 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 新增 src/deprivation-coercion.js 第 125 维度 | 不许睡/不给饭吃/不让上厕所/停空调/锁门外/扣钱治病/饿到求饶这类基本需求剥夺文本被 gate 拦下（verify 级 + guidance） | ✅ 升级（真升级①新维度） |
+| src/index.js 九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/exports） | discriminate() 返回 deprivation_coercion 键与 findings | ✅ 升级（接线的另一半） |
+| test/round-681-deprivation-coercion.js 28 断言 | 攻击 34/34 命中、良性 38/38 零误伤、边界 9/9 miss、inject 4 组 | ✅ 升级（验收证据） |
+| 模块三处腿修复（A1 单维 4 miss 定位后） | P1 条件准入形（再给你进屋）/人称前置形（你就没有饭吃）/P2 英文时态（admitted）覆盖 | ✅ 升级（补漏的覆盖面） |
+| scripts/negative-test-deprivation-coercion.js 负例 | 8 处接线逐一摘除，测试全部变红 | 维护（守卫有效性证明） |
+| AGENTS/README/SKILL 三份文档 124→125、verify 83→84、tier 合计 113→114、版本戳 6.8.28、recount 注释 | 安装者看到的能力清单与实际一致 | 维护（口径同步） |
+| README changelog 补 6.8.28 条目 | 版本记录覆盖本轮交付 | 维护（文档可信度） |
+| bump 6.8.27→6.8.28 四处（VERSION/package.json/SKILL.md/version.js） | npm 用户可感知新版本 | 维护（发布链） |
+
+### 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（124→125、verify 83→84、tier 合计 113→114、README/SKILL 口径版本戳 6.8.27→6.8.28 全部同步后转绿）
+- node test/round-681-deprivation-coercion.js — 28/28（攻击 34：探测器原始 10 + 同族变体 24，覆盖 P1×8/P2×6/P3×6/P4×4 四条通路；良性 38：探测器原始 6 + 权利规范 8 + 正当管教 8 + 医疗流程 5 + 事实条件 6 + 自述转述邻域 5；边界锁 9：缺腿 ×3/医疗自述/单腿 ×2/liberty 领地/句首咨询；inject 4 组各摘通路验证独立性）
+- node scripts/negative-test-deprivation-coercion.js — 基线 exit 0 + 8/8 注入全变红（计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary 文案/module.exports），md5 校验还原一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 125）
+- node test/security-audit.test.js — 16/16
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+### 已知未修项（含为什么不修）
+
+1. **data/test-count.json 记账自锁（guard 记账项与 doc-numbers 测试数门禁的已知红灯）**：缓存写入早于本轮，failed>0 是既有记账状态（guard 已按 r412 改为永不判红、只读 passed）。恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量；本轮用改动文件的定向测试 + 双向门禁 + guard + security-audit 证明无新失败。
+2. **r678/r679/r680 三个旧测试文件的 B7「维度总数」断言冻结在旧计数**（122/123/124，实测 125）：经 git stash 对照 HEAD 证实是既有状态（HEAD 上同样失败），非本轮引入。全仓共 9 个旧测试文件有此模式（120×4/122×3/123/124），每轮冻结当时计数是既定实践；逐个回改是维护范围外且无能力收益，留给后续统一处理。
+3. **队列剩余两族未做**（substance_coercion 70% 漏判 / love_bombing 60%，全部良性 0 误伤）：每轮只做一个维度（decision 约束），两族已是合格候选，下一轮直接复量后送 decision。love_bombing 与正常热恋表达边界最模糊，需要最多豁免设计。
+4. **P3 的弱惩罚目的边界**（「饭不给你做了，自己看着办」这类家庭拌嘴句式）：刻意从惩罚目的腿删掉「看着办」（不够惩罚性、误伤风险高），代价是部分弱惩罚目的的家庭剥夺句式不判——保守边界，不是漏判。
+5. **UPGRADE_LOG 缺 r657-r677 共 21 轮记录**：那些轮的 commit 在（git log 可查），但轮次报告没写。不编造未知轮次细节。
+6. **未推送 GitHub、未 npm publish**：环境红线规定发布是人工门禁，本任务不做。
+
+### 踩坑（三条）
+
+1. **整体重写模块时丢失一条腿，单维测试立刻抓到**：第二版整体重写 src/deprivation-coercion.js 时丢了 PUNISH_TIME_ZH 的「什么时候…再」时限腿，A1 单维测试抓到 4 条 miss（含英文 admitted 时态失配——until he admitted 的动词后 \b 让 admit 系列失配，英文动词必须允许时态后缀）。教训：整体重写大模块后必须跑完整单维测试，不能只跑 node --check。
+2. **docs 脚本中途失败留下半改状态**：round-681-docs.js 先改 AGENTS.md 再改 README 时 README 锚点不存在（「N request verify」行只在 SKILL.md 不在 README），脚本抛错中断，AGENTS.md 已写入。已加幂等跳过逻辑重跑。教训：批量文档脚本要么全量幂等，要么先干跑校验；同一口径行在不同文档的存在性不同，不能假设三份文档结构一致。
+3. **dimMap 锚点子串撞号**：4 空格缩进的 medical_coercion: mdc, 是 6 空格 dimensions 行的子串，src.split(anchor) 数出 2 处。改用带上一行注释的两行锚点才唯一。判据：对多缩进层级仓库，锚点必须带上下文行，不能只带内容行。
