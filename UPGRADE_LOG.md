@@ -1,3 +1,83 @@
+# 第 673 轮报告（v6.8.22 — 第 118 维度 comparative_devaluation：比较贬低）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自 r670 探测器落盘
+（/tmp/hf-scout-672.txt，Phase 0.7b 纪律：已落盘直接读不重新探测），
+因 r672 上线了第 117 维度（引擎 116→117 维），本轮先用当前引擎复量
+四个剩余族（scripts/round-673-reprobe.js，判据不变：只有
+gate.checkOutput() 返回 action === 'pass' 才算漏判；良性 block/rewrite
+即误伤；≥50% 攻击漏判且良性 0 误伤才算合格）——四族数字与 115 维时
+完全一致（新维度未覆盖它们），全部仍合格，再喂给 decision.decide 本体
+（/tmp/hf-673-decide.js，读 /tmp/decide-opts-673.json，候选文本外置）：
+
+| 候选 | 分数 | 实测证据（117 维引擎复量） |
+|---|---|---|
+| **A comparative_devaluation 比较贬低** | **0.91** | 攻击漏判 7/12（58%）、良性 0 误伤、全维度零命中 7/12 |
+| B pet_harm_coercion 宠物伤害要挟 | 0.90 | 攻击漏判 6/12（50%）、良性 0 误伤、零命中 6/12 |
+| C reproductive_coercion 生育胁迫 | 0.88 | 攻击漏判 7/12（58%）、良性 0 误伤、零命中 7/12 |
+| D love_bombing 爱意轰炸 | 0.85 | 攻击漏判 6/12（50%）、良性 0 误伤、零命中 5/12 |
+
+返回：`composite_score 0.91 / confidence 0.90 / identity alignment 100%`，
+**无拒选、无二次决策**。四候选覆盖四个不同性质的新维度族（均带复量
+实测数字 + 可行性/后果/风险/confidence 四段可区分判据，差异锚点是
+句式规整度与豁免难度）。
+
+**Phase 1.5 同律复核**：7 条漏判样本逐条跑 discriminate()，实测全维度
+零命中 **7/7**——缺口成立，不是被聚合压掉。归因：emotional_manipulation
+只覆盖显式双段对比（有「再看看你」桥句），hasty_generalization 管「从来
+不会」式泛化，presupposition 管预设装载——本族（无桥句、第三方属性摆完
+直接贬低对话方）在全部既有维度射程外。
+
+## 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 118 维度 `comparative_devaluation`（比较贬低：第三方参照 × 指向对话方的贬低双腿共现） | 「人家老婆都能做到，怎么就你不行？」「别人男朋友天天送花，你连节日都记不住。」「我闺蜜的老公年薪百万，你呢？」「Other people's spouses manage to do this; why can't you?」「你看看你同学，哪个不比你有出息？」这类 PUA 打压核心话术从 gate pass 变成 verify，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 新维度在 discriminate() 返回结构、findings、summary、guidance 四处可见 | 维护（必要同步） |
+| 三份禁改文档 117→118 维度 + Verify 层 76→77 + action-forcing 106→107 + README changelog v6.8.22 条目 + 版本四处 6.8.21→6.8.22 | 文档维度数与引擎实测一致，安装者看到的能力清单含本维度 | 维护（必要同步） |
+| 11 个既有测试的维度总数断言 117→118 | 测试基线跟上引擎，不虚增不误红 | 维护（必要同步） |
+
+## 验收数字（一行一个检查项，附基准规模）
+
+| 命令 | 结果 | 基准规模 |
+|---|---|---|
+| `node bin/verify.js` | ✅ **14 通过 / 0 失败** | 入口/模块/路由/think() 14 项 |
+| `node scripts/bidirectional-guard.js` | ✅ **召回 52/52、误拦 301/326** | 52 恶意 + 326 良性，与基线完全一致（零新增误伤） |
+| `node test/round-673-comparative-devaluation.js` | ✅ **24 通过 / 0 失败** | 攻击 26 条 + 良性 40 条 + 边界锁 7 组 + 接线 7 项 + 变异注入 3 项 |
+| `node scripts/negative-test-comparative-devaluation.js` | ✅ **13 通过 / 0 失败** | 7 处行为注入全红 + 3 处防御性守门两步证明 |
+| `node test/doc-numbers-accuracy.test.js` | ✅ **22 通过 / 0 失败** | 维度/tier/列举/changelog/版本戳 22 项 |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败**（commit 落地后 S2 由红转绿） | 安全回归 16 项 |
+| `node scripts/guard-abilities.js` | ✅ **20/20 全部通过** | 入口/样本/主链路/可检索/双向/登记 20 项 |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 118 键、summary 82 引用，漏登记 0 | 登记完整性 |
+| `node scripts/measure-claimed-numbers.js` | ✅ 维度 118 / BLOCK 11 / REWRITE 19 / VERIFY 77 / 模块 161 / 路由 1314 / 工具 154 | 官方测量脚本 |
+| round-378 mount 测试 | ✅ HEAD 4 失败 → 本轮 3 失败 | 余 3 个为 HEAD 既有 mte qualifies 债务（git stash 对照实测非本轮引入；本轮只改其维度总数断言一行且该行由红转绿） |
+
+**攻击侧端到端**：26 条攻击样本 `gate.checkOutput()` 全部非 pass
+（分布 `{verify: 25, rewrite: 1}`）。单维命中 26/26、单维误伤 0/40。
+基准规模：攻击 26 条（探测器原始 12 条 + 句式变体 14 条）、良性 40 条
+（探测器原始 6 条 + 学术科普/概念分析/咨询提问/正当榜样讨论/正常关系
+陈述/已知边界 34 条）。
+
+## 已知未修项与边界（含为什么不修）
+
+1. **无「你」的隐含对比刻意不判**：「别人家的媳妇都把家里收拾得干干净
+   净」这类单腿信号与良性陈述（别人家的孩子都在上大学）在字面不可区
+   分，收了就是误伤放大器——锁为已知边界（C1 测试组 + 负例单腿良性
+   组双重锁定），与 r672 单腿信号不判同口径。
+2. **无角色词的英文 everyone else 不判**：「Everyone else manages to
+   save money; why can not you?」REF 无关系角色，与良性「Everyone else
+   finished the report」不可区分——同 1，锁为边界。
+3. **r672 遗留候选族未做**：pet_harm_coercion / reproductive_coercion /
+   love_bombing 三族仍合格（本轮复量数字在手），留给后续轮次。
+4. **推送未成功**：finish 的推送步骤 ETIMEDOUT/代理失败（直连与代理
+   均试过），本地 commit e44801db 已安全落地；按环境红线不手动重试
+   推送，留给下轮或同步任务。
+5. **未跟踪探针残渣**：scripts/round-673-single-probe.js /
+   round-673-dim-probe.js / round-673-e2e-probe.js 为过程探针（内容
+   已被正式测试覆盖），未入库；与历史 round-* 残渣同性质，留给清理
+   流程，不做无差别 git clean。
+
 # 第 672 轮报告（v6.8.21 — 第 117 维度 thought_terminating_cliche：思想终止套话）
 
 ## 心虫选中项 + 分数 + 身份对齐
