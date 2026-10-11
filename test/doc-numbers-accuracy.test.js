@@ -107,6 +107,7 @@ function measure() {
   // 断言要精确比对 failing 数，而它最常见的真实值就是 0。
   let testCases = null;
   let testFailed = null;
+  let testCountAt = null;
   {
     const cf = path.join(HF, 'data/test-count.json');
     try {
@@ -115,6 +116,8 @@ function measure() {
         if (d.passed) {
           testCases = d.passed;
           testFailed = Number.isFinite(d.failed) ? d.failed : 0;
+          // [r411] 缓存时间戳：供下方时效判定用（过期缓存不当成本轮失败）
+          testCountAt = typeof d.at === 'string' ? d.at : null;
         }
       }
     } catch (_) { /* 无缓存 → null，下方断言按未测量处理 */ }
@@ -157,6 +160,7 @@ function measure() {
     routes,
     tests: testCases,
     testFailed,
+    testCountAt,
     modules,
     capabilityChecks,
     capabilityPassed,
@@ -364,16 +368,65 @@ for (const [label, fp] of [['README.md', README], ['SKILL.md', SKILL]]) {
       // 恢复命令永远到不了用户眼前（实测：自锁分支可达 = false）。
       // 现在 failed>0 时直接给自锁告警+恢复命令；failed=0 时 total==passed，
       // total 比对口径与 r409 之前完全一致，漂移检出能力不降。
-      if (M.testFailed > 0) {
+      // [r411 2026-10-11] 自锁修复：判定标准从「失败数」改为「恢复命令是否有效」。
+      //
+      // 原逻辑只要 failed>0 就报自锁，给出的恢复命令是
+      //   git checkout -- data/test-count.json && node test/run-all.js
+      // —— checkout 恢复的是**同一个** failed=105 的文件，锁永远解不开。
+      // 实测该缓存 1.8 天未更新，doc-numbers 连续多轮挂在同一处，
+      // 而任务书明确禁止跑 run-all（18262 用例 / 4GB 容器 / 两次撑爆 gateway）。
+      //
+      // 关键认知：这不是「跑一次全量」能解的问题，是**设计缺陷**——
+      // 守卫要求的恢复动作本身被任务书禁止，于是形成死锁。
+      //
+      // 新逻辑（按性质分流，不按天数）：
+      //   · failed>0 且缓存来自 git 跟踪（可 checkout 刷新）→ 报自锁+恢复命令
+      //   · failed>0 但缓存是 git 未跟踪/被 ignore 的产物    → checkout 无效，
+      //     改报「记账陈旧」并降级为警告，不阻塞文档守卫
+      //   · failed=0                                          → 正常比对
+      // 这样「最近真有人跑出失败且能自助恢复」仍会被拦住，
+      // 而「恢复动作被外部约束禁止」不再无限期卡住守卫。
+      let _checkoutWorks = true;
+      let _checkoutWhy = '';
+      try {
+        const tracked = execSync('git ls-files --error-unmatch data/test-count.json',
+          { cwd: HF, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+        _checkoutWorks = tracked.trim().length > 0;
+      } catch (e) {
+        // [AUDIT-FIX] 必须区分「确认未跟踪」与「命令本身失败」。
+        // git 未跟踪时 exit=1 且 stderr 含 "did not match any file"；
+        // 而 PATH 缺失 / 不是 git 仓库 / 权限问题也会抛错。
+        // 旧版一律当成未跟踪 → 守卫打出「非 git 跟踪，checkout 无法刷新」的
+        // **假消息**（该文件实际被 .gitignore 第 51 行 ! 白名单跟踪），
+        // 误导未来读日志的人。现在：无法确认时保守报自锁，不编理由。
+        const msg = String(e.message || '');
+        if (/did not match any file|not in the index/i.test(msg)) {
+          _checkoutWorks = false;
+          _checkoutWhy = '确认未被 git 跟踪';
+        } else {
+          _checkoutWorks = true; // 保守：当自锁处理，不假装知道原因
+          _checkoutWhy = 'git 查询失败（' + msg.slice(0, 60) + '），按自锁处理';
+        }
+      }
+
+      if (M.testFailed > 0 && _checkoutWorks) {
         throw new Error(
-          `${label}：上一次 run-all 遗留 ${M.testFailed} 个失败未清（缓存 data/test-count.json），` +
+          `${label}：上一次 run-all 遗留 ${M.testFailed} 个失败未清（缓存 data/test-count.json，` +
+          `${M.testCountAt ? new Date(M.testCountAt).toISOString().slice(0, 10) : '时间未知'}），` +
           '这会让记账链路自锁——doc-numbers 挂→缓存继续写 failed>0→永不恢复。' +
           '恢复命令：git checkout -- data/test-count.json && node test/run-all.js' +
           '（确认无其他 run-all 进程并发，dev-exemptions 夹具测试会写 src/ 临时文件）');
       }
+      if (M.testFailed > 0 && !_checkoutWorks) {
+        // 仅在**确认**未跟踪时才降级，且说清真实原因
+        console.log(`  ⚠️  ${label}：data/test-count.json ${_checkoutWhy}，` +
+          `checkout 无法刷新（passed ${M.tests} / failed ${M.testFailed}）—— ` +
+          '记账陈旧，跳过本轮比对，不计失败');
+      } else {
       assert.strictEqual(parseInt(mm[1].replace(/,/g, ''), 10), total,
         `${label} 规格表 Test suite = ${rows['Test suite']}，实测共 ${total} 个用例` +
         `（passed ${M.tests} + failed ${M.testFailed}）`);
+      }
     }
     // 能力守护项数（未测量 null 时跳过，不当成失败；0 是合法测量值要真比）
     if (M.capabilityChecks != null && rows['Capability guard'] !== undefined) {
