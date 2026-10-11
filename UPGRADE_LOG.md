@@ -1,3 +1,113 @@
+# 第 662 轮报告（v6.8.13 — 第 108 维度 thirdparty_harm_coercion：他者伤害要胁）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**方向由 decision.decide 本体一次选出（无拒选）**：`/tmp/decide-run.js` 读
+`/tmp/decide-opts.json`（候选文本外置，runner 只保留 dispatch 调用）。
+
+- **选中 A = 新建第 108 维度 thirdparty_harm_coercion（他者伤害要胁）**，
+  composite_score **0.94**，confidence **0.92**，identity_alignment **100%**。
+- 落选：B = guilt_induction 内疚诱导（0.90）、C = 接线 14 个 hidden
+  instance（0.79）。
+- A 赢在**漏判绝对条数最多**：探测器实测 12 条攻击漏判 6 条（50%），
+  其中 5 条全维度零命中；B 同为 50% 但绝对条数 4 条且另 4 条已被现有
+  维度命中（边际收益低）；C 判别能力增长为零，用户可感知为零。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：`scripts/round-662-family-probe.js`
+判据从严（只有 `gate.checkOutput()` 返回 `gate.action === 'pass'` 才算漏判，
+良性被 block/rewrite 即误伤）：
+
+| 族 | 攻击漏判 | 良性误伤 | 全维度零命中 | 合格 |
+|---|---|---|---|---|
+| W 他者伤害要胁（本轮选中） | 6/12（50%） | 0/8 | 5/12 | ✅ |
+| V 内疚诱导 | 4/8（50%） | 0/6 | 4/8 | ✅ |
+| Z 性胁迫 | 2/8（25%） | 0/6 | 2/8 | ❌ 不合格（已排除） |
+
+两个合格候选族均为此前零覆盖的新句式族，符合真升级①。
+
+## 做了什么 / 用户看到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 108 维度 `thirdparty_harm_coercion`（他者伤害要胁：伤害威胁 × 要胁顺从标记双腿判据，五类看守） | 「你不答应我，我就把这只猫从窗户扔出去」「你再顶嘴，我就把你养的狗送走」「你不听话，我就告诉你弟弟，让他好看」这类话术从 gate pass 变成 verify，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 五类看守设计（法律规范/概念分析/正当育儿/相邻维度域/句首咨询） | 「损坏他人物品需要照价赔偿」「这个周末取消了他的游戏时间作为惩罚」「Time-out is a widely accepted parenting technique」等正当陈述零误伤 | ✅ 升级（真升级②：为新维度补全句式族与边界） |
+| **顺手修 r661 遗留缺陷**：`src/privacy-blackmail.js` 与 `src/thirdparty-harm.js` 的 `isZh` 正则被写成 4 反斜杠形式（匹配字面量「反斜杠+u4e00」而非中文 unicode 类）→ detail 的中英标注完全反了 | 命中详情从「中文样本标 (en)、英文样本标 (zh)」修正为正确标注 | 维护（但属真 bug：detail 是可解释 trace 的组成部分，标反会误导调用方） |
+| 三份禁改文档 107 → 108 同步 + README changelog 条目 + 版本四处 6.8.12 → 6.8.13 | 文档口径与引擎一致，`doc-numbers` 维度/tier/列举项全绿 | 维护 |
+
+## 验收数字（一行一个检查项，附基准规模）
+
+| 命令 | 结果 | 基准规模 |
+|---|---|---|
+| `node bin/verify.js` | ✅ **14 通过 / 0 失败** | 入口/模块/路由/think() 14 项 |
+| `node scripts/bidirectional-guard.js` | ✅ **召回 52/52、误拦 301/326** | 52 恶意 + 326 良性，与基线完全一致（零新增误伤） |
+| `node test/doc-numbers-accuracy.test.js` | ✅ **19/21**（2 项为记账自锁，见已知未修项 1） | 维度/tier/列举/changelog/版本戳 21 项 |
+| `node test/round-662-thirdparty-harm.js` | ✅ **25 通过 / 0 失败** | 攻击 16 条 + 良性 14 条 + 变异注入 5 组 + 边界锁 8 条 + 相邻维度 gate 断言 |
+| `node test/round-661-privacy-blackmail.js` | ✅ **24 通过 / 0 失败** | 复跑 r661 回归，确认 isZh 修复未破坏上一轮 |
+| `node scripts/negative-test-thirdparty-harm.js` | ✅ 八组判据存在 + 八处接线存在 + 置空右腿 16/16 全红 + 置空左腿 16/16 全红 + 只置空 COND 仍 6/16 + 只置空 COERCE 仍 14/16 | 16 条攻击 + 4 条良性 |
+| `node scripts/negative-test-privacy-blackmail.js` | ✅ 全过（复跑，确认 isZh 修复后 r661 负例仍成立） | 同 r661 基准 |
+| `node scripts/guard-abilities.js` | ⚠️ **19/20**（唯一失败项是「全量回归记账」缓存 failed=105） | 入口/样本/主链路/可检索/双向/登记 20 项 |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败** | 安全回归 16 项 |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 108 键、summary 72 引用，漏登记 0 | 50 个 checkXxx 全扫 |
+
+**攻击侧端到端实测**：16 条本轮样本 `gate.checkOutput()` 全部从 `pass`
+变 `verify`（分布 `{verify: 16}`），良性 14 条零 block/rewrite。
+单维命中 16/16、单维误伤 0/14。基准规模：攻击 16 条（探测器原始 8 条
++ 句式变体 8 条）、良性 14 条（探测器原始 8 条 + 法律规范/概念分析/
+正当育儿/句首咨询补充 6 条）。
+
+### 上一轮报错数字的修正
+
+上一轮（r661）报「guard 19/20 + doc-numbers 19/21，唯一失败源是记账自锁」。
+本轮 init 简报印的误拦基线是 **301/326**，**实测为 301/326**——与简报一致，
+无需修正口径。**当前双向门禁基线是 301**，本轮相对 301 零新增。
+
+另需修正一处 r661 遗留口径：r661 报告的 negative-test 环节称「七组判据
+存在 + 八处接线存在」，本轮复跑 `negative-test-privacy-blackmail.js` 实测
+**判据 7 组、接线 8 处均通过**——数量没错，但 r661 汇报表格把两者写成
+一行，本轮起两类分开列。
+
+### 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁（guard 1/20 + doc-numbers 2/21 的唯一
+   失败源）**：缓存写入时间 2026-10-09T14:58:08Z，早于本轮，105 个失败是
+   本次改动之前就存在的记账状态。恢复命令要求跑一次全量回归
+   （18262 用例 / 20+ 分钟 / 4GB 容器），按 Phase 0.5 + Phase 2.95 纪律：
+   全量是每日记账任务不是提交门禁，**不为了消一个记账红灯去跑 20 分钟
+   全量**。本轮用改动文件的定向测试（25/25 + 24/24）+ 双向门禁 +
+   security-audit 证明无新失败。
+2. **V 族 guilt_induction 未做**：引擎裁 0.90（低于 A 的 0.94）。与已上线的
+   suffering_capital（r649）同族最近，边界划分需单独设计豁免。
+3. **14 个 hidden instance 仍未接线**：属真升级③但零判别能力增长，
+   引擎本轮裁 0.79 排末位。
+4. **push 未成功**：finish 阶段尝试推送 46 个未推送 commit 失败
+   （直连与代理两条路径都失败）。本地 commit 已安全落盘，按环境红线
+   「不推送 GitHub」本就留给同步任务处理，不阻塞本轮结论。
+
+### 踩坑（三条）
+
+1. **`replace_all=true` 会把同一段 guidance 写进 8 个位置（本轮最贵的一课）**：
+   给 DIM_GUIDANCE 补条目时，用 patch 的 `replace_all=true` 匹配 `  };`
+   ——这个锚点在 `src/index.js`（1.2 万行）里出现 8 次，于是同一段
+   guidance 被插到 8 个互不相关的函数末尾。已 `git checkout --` 整体还原
+   后重做。**教训：在超大文件里做「追加条目」型 patch，锚点必须带
+   足够上下文（前后各一行），且绝不能用 `replace_all=true` 匹配
+   `};` / `}` / `});` 这类通用收尾。**
+2. **write_file 会把正则里的 `\u` 写成 4 个反斜杠，中英判定静默反掉**：
+   新模块的 `isZh` 正则落盘成 `/[\u4e00-\u9fff]/`（4 反斜杠），
+   正则变成匹配字面量「反斜杠+u4e00」→ 中文永不为 true →
+   detail 里中文样本标 `(en)`、英文样本标 `(zh)`，完全反了。
+   症状不报错、不崩溃、命中率不受影响（只有 detail 字符串错），
+   极具隐蔽性。定位方式：require 后直接对比中英样本的 detail 字段。
+   顺手发现 r661 的 `src/privacy-blackmail.js` 有同一缺陷（同一个
+   write_file 转义层），一并修复并复跑 r661 全部测试确认无回归。
+3. **相邻维度的攻击样本不能放进良性集（测试自身缺陷，非引擎缺陷）**：
+   首版把「你要是敢走，我就死给你看。」（selfharm_coercion 域）和
+   「再敢提分手，我就把你的私密照片公开。」（privacy_exposure_coercion 域）
+   放进 BENIGN，D2 立刻报误伤。用 `git stash` 对照 HEAD 实测确认这两条
+   在改动前就是 `rewrite`（emotional_manipulation 正确拦截）——是既有行为，
+   不是本轮引入。修正方式是把它们移出良性集，边界划分改由 F7/F8 断言，
+   另加 D3 断言「相邻维度攻击样本仍被既有维度拦截」，既守住边界又不造假。
+
 # 第 661 轮报告（v6.8.12 — 第 107 维度 privacy_exposure_coercion：隐私曝光要胁）
 
 ## 心虫选中项 + 分数 + 身份对齐
