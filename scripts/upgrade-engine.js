@@ -162,13 +162,44 @@ for (const sig of ['exit', 'SIGINT', 'SIGTERM']) {
   try { process.on(sig, () => releaseLockSmart()); } catch { /* 某些平台不支持 */ }
 }
 
-// ─── 版本四处一致 ────────────────────────────────
+// ─── 版本四处一致 ────────────────────────────────────────
+// [r414] 增补 description 维度数校验。
+//
+// 原 versionSync() 只比四处文件的 `version` 字段，不管 package.json 的
+// description 里那句「N discrimination dimensions」。于是 cron 每轮同步
+// 版本号，description 的维度数永远不动 —— 同类漂移已发生三次
+// （46→112→115→120，每次都要人工发现并手改）。
+// 根因：维度数不在任何自动同步清单里。
+//
+// 现在：versionSync() 同时校验 package.json description 的维度数与
+// 引擎实测一致。不一致即 ok:false，finish 门禁会拦下来，cron 被迫修。
 function versionSync() {
   const v = V();
-  const pkg = readJson(path.join(ROOT, 'package.json'), {}).version;
+  const pkgRaw = readJson(path.join(ROOT, 'package.json'), {});
+  const pkg = pkgRaw.version;
   const skill = (fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf8').match(/^version:\s*["']?([\d.]+)["']?/m) || [])[1];
   const vjs = (fs.readFileSync(path.join(ROOT, 'src/core/version.js'), 'utf8').match(/let VERSION\s*=\s*'([\d.]+)'/) || [])[1];
-  return { ok: v === pkg && v === skill && v === vjs, detail: { VERSION: v, packageJson: pkg, SKILLmd: skill, 'version.js': vjs } };
+
+  // description 里的维度数 vs 引擎实测
+  const descDims = pkgRaw.description
+    ? (pkgRaw.description.match(/(\d+)\s+discrimination dimensions/) || [])[1]
+    : null;
+  let actualDims = null;
+  try {
+    actualDims = String(execSync(
+      `node -e "const i=require('./src/index.js');const d=i.discriminate('t');console.log(d&&d.dimensions?Object.keys(d.dimensions).length:0)"`,
+      { cwd: ROOT, encoding: 'utf8', timeout: 120000, stdio: ['ignore', 'pipe', 'ignore'] }
+    ).trim());
+  } catch (_) { /* 引擎起不来时不阻塞版本校验 */ }
+
+  const dimsOk = descDims === null || actualDims === null || descDims === actualDims;
+  return {
+    ok: v === pkg && v === skill && v === vjs && dimsOk,
+    detail: {
+      VERSION: v, packageJson: pkg, SKILLmd: skill, 'version.js': vjs,
+      pkgDescDims: descDims, actualDims, dimsOk,
+    },
+  };
 }
 
 // ─── 检查项（全部可机器判定） ────────────────────

@@ -326,6 +326,58 @@ function syncFile(file, want, checkOnly) {
   return { file, hits, skipped };
 }
 
+// [r414] package.json 的 description 同步（维度数 / MCP 工具数 / 路由数）。
+// 与 syncFile 同一套 want 数据源，但 package.json 是 JSON 而非 markdown，
+// 必须保持 JSON 合法（原先手改过一次，json.dumps 缩进与原文一致才没坏事）。
+function syncPackageJson(want, checkOnly) {
+  const p = path.join(ROOT, 'package.json');
+  const hits = [];
+  let d;
+  try {
+    d = JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch (e) {
+    return { error: 'JSON 解析失败: ' + e.message, hits };
+  }
+  if (typeof d.description !== 'string') {
+    return { error: '无 description 字段', hits };
+  }
+  const rules = [
+    { re: /(\d+)\s+discrimination dimensions/, val: want.dims, name: '维度数' },
+    { re: /(\d+)\s+MCP tools/, val: want.tools, name: 'MCP 工具数' },
+    { re: /([\d,]+)\s+dispatch routes/, val: want.routes.toLocaleString('en-US'), name: '路由数' },
+  ];
+  let desc = d.description;
+  for (const r of rules) {
+    const m = desc.match(r.re);
+    if (!m) continue;
+    if (m[1] !== String(r.val)) {
+      hits.push({ before: `${r.name} ${m[1]}`, after: `${r.val}`, re: r.re.source });
+    }
+  }
+  if (!hits.length) return { hits };
+
+  if (!checkOnly) {
+    // 只替换数字本身，保留原有间隔与后缀（不动 " discrimination dimensions" 等文字）
+    let out = d.description;
+    for (const r of rules) {
+      const m = out.match(r.re);
+      if (!m) continue;
+      const wantStr = String(r.val);
+      if (m[1] !== wantStr) {
+        out = out.slice(0, m.index) + wantStr + out.slice(m.index + m[1].length);
+      }
+    }
+    d.description = out;
+    // 保持 2 空格缩进 + 中文不转义，与仓库现有格式一致
+    fs.writeFileSync(p, JSON.stringify(d, null, 2) + '\n');
+    // 复核 JSON 仍合法
+    try { JSON.parse(fs.readFileSync(p, 'utf8')); } catch (e) {
+      return { error: '写入后 JSON 非法: ' + e.message, hits };
+    }
+  }
+  return { hits };
+}
+
 function main() {
   const checkOnly = process.argv.includes('--check');
   let want;
@@ -340,7 +392,28 @@ function main() {
   console.log(`      测试 ${want.tests} 通过 / ${want.testsFailed} 失败 / 口径版本戳 v${want.stamp}\n`);
 
   let dirty = 0;
-  for (const f of ['AGENTS.md', 'README.md', 'SKILL.md']) {
+  // [r414] 增补 package.json。
+  //
+  // 原清单只有 AGENTS/README/SKILL 三份 markdown，package.json 的
+  // description 里同样写着「N discrimination dimensions / M MCP tools /
+  // R dispatch routes」，却从不在同步范围 —— 同类漂移已发生三次
+  // （46→112→115→120），每次都要人工发现并手改。
+  // versionSync() 现在也会校验它，但「只拦不修」会让 cron 每轮卡在门禁上，
+  // 所以这里必须能自动改。
+  for (const f of ['AGENTS.md', 'README.md', 'SKILL.md', 'package.json']) {
+    if (f === 'package.json') {
+      const r = syncPackageJson(want, checkOnly);
+      if (r.hits.length) {
+        dirty++;
+        console.log(`  ${checkOnly ? '❌' : '📝'} ${f}`);
+        for (const h of r.hits) console.log(`     ${h.before} → ${h.after}  (${h.re})`);
+      } else if (r.error) {
+        console.log(`  ❌ ${f}: ${r.error}`); dirty++;
+      } else {
+        console.log(`  ✅ ${f}`);
+      }
+      continue;
+    }
     const r = syncFile(f, want, checkOnly);
     if (r.error) { console.log(`  ❌ ${r.file}: ${r.error}`); dirty++; continue; }
     if (r.hits.length) {
