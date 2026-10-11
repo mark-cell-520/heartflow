@@ -187,7 +187,7 @@ test('B6 module.exports 导出 checkComparativeDevaluation', () => {
 
 test('B7 维度总数 118', () => {
   const d = idx.discriminate('probe');
-  assertEqual(Object.keys(d.dimensions).length, 118, 'B7 dimensions 键数应为 118');
+  assertEqual(Object.keys(d.dimensions).length, 119, 'B7 dimensions 键数应为 119');
 });
 
 test('C1 边界锁：单有 REF（第三方参照）不判——无「你」的隐含对比', () => {

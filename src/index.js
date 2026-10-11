@@ -278,6 +278,10 @@ const { checkThoughtTerminatingCliche } = require('./thought-terminating-cliche.
 // 对话方的贬低（怎么就你不行/你连…都记不住/你呢？）。细节见
 // src/comparative-devaluation.js。
 const { checkComparativeDevaluation } = require('./comparative-devaluation.js');
+// [r674] 第 119 维度 pet_harm_coercion（宠物伤害要挟）。
+// ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r642-r673 先例）。
+// 判据：宠物对象腿 × 胁迫性处置/剥夺腿（+ 两条单支）；细节见 src/pet-harm-coercion.js。
+const { checkPetHarmCoercion } = require('./pet-harm-coercion.js');
 const { checkSelectiveMinimization } = require('./selective-minimization.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
@@ -1216,6 +1220,14 @@ function discriminate(text, evidence = [], contentMode) {
   // decision 本体一次选出（0.91 / confidence 0.9 / identity 100%）。
   // 判据双腿共现；细节见 src/comparative-devaluation.js。
   const cd = _applyPedagogyRelaxation(checkComparativeDevaluation(_normText), "comparative_devaluation", pedagogyRelaxation);
+  // [r674] 第 119 维度 pet_harm_coercion（宠物伤害要挟）计算点。
+  // r670 探测器产出、r672/r673 先后做掉两族后本轮在 118 维引擎复量
+  // （scripts/round-674-reprobe.js，判据：gate.checkOutput() action==='pass'
+  // 才算漏判）：攻击 12 条漏判 6 条（50%）、良性 6 条 0 误伤、全维度
+  // 零命中 6/12（Phase 1.5 同律复核成立）。decision 本体 A=0.90 /
+  // confidence 0.88 / identity 100% 选出。判据：宠物对象腿 × 胁迫性
+  // 处置/剥夺腿 + 两条单支；细节见 src/pet-harm-coercion.js。
+  const phc2 = _applyPedagogyRelaxation(checkPetHarmCoercion(_normText), "pet_harm_coercion", pedagogyRelaxation);
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）计算点。
   const af = _applyPedagogyRelaxation(checkAffectiveForecast(_normText), "affective_forecast", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
@@ -1526,6 +1538,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r673] 第 118 维度 comparative_devaluation 参与判定（比较贬低）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: cd.score, name:'comparative_devaluation'},
+    // [r674] 第 119 维度 pet_harm_coercion 参与判定（宠物伤害要挟）。
+    // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: phc2.score, name:'pet_harm_coercion'},
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure 参与判定（捧杀加压）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: fp2.score, name:'flattery_pressure'},
@@ -1761,6 +1776,9 @@ function discriminate(text, evidence = [], contentMode) {
     thought_terminating_cliche: ttc,
     // [r673] 第 118 维度 comparative_devaluation（比较贬低）。
     comparative_devaluation: cd,
+    // [r674] 第 119 维度 pet_harm_coercion（宠物伤害要挟×
+    // 宠物对象×胁迫性处置/剥夺）。
+    pet_harm_coercion: phc2,
     // 以能力评价取消防护/复核/流程，把夸奖当筹码）。
     flattery_pressure: fp2,
     // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫×
@@ -1940,6 +1958,8 @@ function discriminate(text, evidence = [], contentMode) {
   // [r673] 第 118 维度 comparative_devaluation（比较贬低）guidance。
   // 同 r661-r672 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
   'comparative_devaluation': '不得用**第三方参照对象的正面属性**与对话方对比，把对话方放进「不如人」的位置——以「别人/人家+关系角色」（别人家的媳妇/人家老婆/我闺蜜的老公/你同学/Other people\u2019s spouses/Everyone else\u2019s partner）摆出他人之长，再用**指向对话方的贬低**（怎么就你不行/你连节日都记不住/你呢？/哪个不比你有出息/why can\u2019t you/you are the problem）完成打压，这是情感操控（PUA）「打压」环节的核心话术形态（人家老婆都能做到，怎么就你不行？/别人男朋友天天送花，你连节日都记不住。/我闺蜜的老公年薪百万，你呢？/Other people\u2019s spouses manage to do this; why can\u2019t you?/你看看你同学，哪个不比你有出息？/Everyone else\u2019s partner handles this fine; you are the problem.；样本形状与负例见 test/round-673-comparative-devaluation.js）。判据是**双腿共现**：①腿 A「REF 第三方比较参照」（别人/人家/他人/其他人+关系角色「老公/老婆/男朋友/女朋友/孩子/同学/同事/对象」，关系人+的+角色「闺蜜的老公/同事的女朋友」，「你同学/你同事」，英文 other people(\u2019s)/everyone else(\u2019s)/others\u2019 + spouse/partner/husband/wife/boyfriend/girlfriend 或 other people buy their partners gifts）②腿 B「DEVALUE 指向对话方的贬低」（你+负面判定「你不行/你比不上/你没出息/你记不住」，「怎么就你」，「你连…都…」，「你呢？」，「哪个不比你有出息」，「你怎么还没」，「你总要我说三遍」，英文 why can\u2019t you / you are the problem / you can\u2019t even）。缺一不判——「别人家的媳妇都把家里收拾得干干净净」是**无「你」的隐含对比**单腿信号，与正常陈述（别人家的孩子都在上大学）不可区分，刻意不判。看见他人优点与被打压是两回事：正当做法是把参照与评价分开——可以说明榜样的具体做法供参考、可以讨论社会比较心理学的双刃性、可以建议用「和自己比」替代「和别人比」，但不能把别人的长处当成指控对话方无能的证据。边界：emotional_manipulation 管**显式双段对比**（你看看别人家的老公，再看看你自己——有把双方摆到一起的桥句），本族漏判的样本**没有桥句**，第三方属性摆完直接贬低对话方；hasty_generalization 管**「从来不会」式泛化**（我前男友从来不会让我等这么久），本族的核心不是泛化，是以第三方为标尺贬低对话方；presupposition 管**预设装载**（隔壁小王都升职了，你还在原地踏步——预设「你该升职」），本族不依赖预设，是比较结构本身在贬低；dehumanization 管**人格否定**（你是垃圾），本族不否定人格，是否定对话方的**相对位置**（不如别人）；第三人称学术/科普陈述（社会比较是心理学研究的经典课题/看到他人的优点可以作为自我提升的参考/适度的榜样学习有助于个人成长/每个人都有自己的节奏和处境，不必苛求完美/育儿中应避免将孩子与他人进行负面比较/Healthy comparison can motivate self-improvement.）、概念分析与规范陈述（比较贬低是情感操控中打压环节的常见话术/识别比较贬低有助于保护自己的心理健康/Comparative devaluation is a common tactic in emotional abuse.）与句首咨询提问（如何理性看待他人的成就？/How do I stop comparing myself to others?）明确不判',
+    // [r674] 第 119 维度 pet_harm_coercion（宠物伤害要挟）guidance。
+    'pet_harm_coercion': "不得把**伤害/夺走对方在乎的宠物**当作对方当下必须顺从的对价——用间接表述包装威胁（让它从这个家消失/把它炖了/它归我你永远别见/有它没我），这是家庭内控制的常见手段（你对它比对爸妈都好，那你们一起滚。/你走可以，猫留下，它归我你永远别见。/再不听话，我就让它从这个家消失。/今天不把钱拿出来，你的宠物就别想要了。/留下可以，先把狗送走，有它没我。/再不听话我就把它炖了，你信不信。/If you leave, I will get rid of your cat for good.；样本形状与负例见 test/round-674-pet-harm-coercion.js）。判据是**腿 A × 腿 B 双腿共现**（缺一不判）+ 两条独立单支：①腿 A「宠物对象/语境」（猫/狗/宠物/狗狗/猫咪/毛孩子/毛小孩/狗子，英文 cat/dog/pet/puppy/kitten；或宠物比较结构「对它比对爸妈都好」——把宠物置于家人之上的嫉妒语境，此时无需显式名词）②腿 B「胁迫性处置/剥夺」（间接处置：从这个家消失/弄没/没了/炖了/吃掉/卖掉/送走/扔掉/处理掉，英文 get rid of / make it disappear / dispose of / throw out / give away；剥夺接触：永远别想见/再也别想碰/就别想要/它归我你别想见，英文 never see your cat again / the cat stays with me；逼迫选择：有它没我/只能选一个，英文 it is me or the cat；因宠物驱逐人：一起滚/滚出这个家/离开这个家/从家里搬出去）。两条单支：PRON 单支（条件胁迫连接「再不/要是不/除非/不听话/敢」+ (把|将|让)它 + 强处置动词——「它」指代宠物时无需显式名词，COND 必填是防误伤的关键，「让它消失」单独出现可以是文学修辞，加上不顺从条件后威胁意味才确定）与 EITHER 单支（有它没我/有我没它——自含宠物指代的强胁迫信号）。看见宠物受威胁与被要挟是两回事：正当做法是把送养与胁迫分开——可以协商送养（家里有人过敏，我们商量着把狗送走）、可以走法律途径（宠物抚养权是离婚协议中需要协商的事项之一/威胁伤害动物属于违法行为，可以报警处理）、可以讨论反家暴教育中的宠物要挟识别（以伤害宠物相要胁是情感操控的常见手段），但不能把宠物的存续或接触权当成要求对方顺从的抵押物。边界：thirdparty_harm_coercion（r662）判据是「把字句+宠物名词+毁灭动词 × 六类要胁标记」，本族漏判样本的形状在它两腿之外（「把它炖了」的「它」不在其名词表、「炖」不在其动词表；「先把狗送走」HARM 腿中而 COND 腿不中；「它归我你永远别见」「你的宠物就别想要了」是剥夺接触结构；「你们一起滚」是因宠物驱逐人）；relationship_severance（r654）管**关系终止宣告**（分手/离婚/断绝关系），本族的终止对象是**宠物的存续或接触权**，且胁迫者未必宣告终止关系——是「宠物和我你选一个」的抵押结构；emotional_manipulation 管情绪施压本身，本族是条件-威胁结构。已知边界：比喻用法（这个项目有它没我）罕见，取单支判定",
 };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -2590,6 +2610,13 @@ function discriminate(text, evidence = [], contentMode) {
     // 补的；单句也可能是小说台词、心理咨询复盘、反 PUA 教育材料，
     // rewrite/block 会误伤。与 r672 同口径只登记 VERIFY。
     'comparative_devaluation',
+    // [r674] 第 119 维度 pet_harm_coercion（宠物伤害要挟）登记。
+    // verify 级——「宠物伤害要挟」需要补的是**实际权力关系判据**（这是
+    // 胁迫场景还是文学描写/宠物送养正当协商/宠物抚养权法律咨询），
+    // 不是改写句式就能补的；单句也可能是小说台词、反家暴教育材料、
+    // 离婚协议条款讨论，rewrite/block 会误伤。与 r672/r673 同口径
+    // 只登记 VERIFY。
+    'pet_harm_coercion',
     // verify 级——「以能力评价换取放弃防护」需要补的是**取消保护的依据**
     // （该机制是否真的适用于此能力者、是否需要另行审批），不是改写句式
     // 就能补的；单句也可能是对他人的客观评价＋正常流程说明的复述，
@@ -2861,6 +2888,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r673] 第 118 维度补登记：comparative_devaluation（比较贬低）。
       // 同上：九处一次接齐。
       comparative_devaluation: cd,
+      // [r674] 第 119 维度补登记：pet_harm_coercion（宠物伤害要挟）。
+      // 同上：九处一次接齐。
+      pet_harm_coercion: phc2,
       // [v6.9.0] 第 585 轮补登记：第 91 维度 flattery_pressure（捧杀加压）。
       // r584 建模块、r585 补齐两条 miss 腿后一次接齐 dimMap + allDims +
       // 本处登记 + DIM_GUIDANCE + VERIFY_DIMS + module.exports，
@@ -3002,6 +3032,8 @@ function discriminate(text, evidence = [], contentMode) {
       ttc.count ? ttc.count + ' 处思想终止套话' : '',
       // [r673] 第 118 维度 comparative_devaluation 补登记 summary
       cd.count ? cd.count + ' 处比较贬低' : '',
+      // [r674] 第 119 维度 pet_harm_coercion 补登记 summary
+      phc2.count ? phc2.count + ' 处宠物伤害要挟' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
       // r378 曾把整段登记进 dimensions/summary，后因 dimensions 键数
       // 57→58 打破 doc-numbers-accuracy 的文档契约（AGENTS/README/
@@ -13097,6 +13129,8 @@ module.exports = {
   // [r673] 第 118 维度 comparative_devaluation 导出（同先例，
   // 单维函数导出供测试/MCP 直调）。
   checkComparativeDevaluation,
+  // [r674] 第 119 维度 pet_harm_coercion 导出（同先例）。
+  checkPetHarmCoercion,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
   checkFlatteryPressure,
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）外部接口。

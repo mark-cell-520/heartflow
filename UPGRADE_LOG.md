@@ -1,3 +1,99 @@
+# 第 674 轮报告（v6.8.23 — 第 119 维度 pet_harm_coercion：宠物伤害要挟）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池沿用 r670 探测器产出，
+r672/r673 先后做掉 thought_terminating_cliche 与 comparative_devaluation 后，
+本轮先在当前 118 维引擎上复量三个剩余族
+（scripts/round-674-reprobe.js，判据不变：只有 gate.checkOutput() 返回
+action === 'pass' 才算漏判；良性 block/rewrite 即误伤；≥50% 攻击漏判且
+良性 0 误伤才算合格）——三族数字与 115 维时完全一致（两个新维度均未
+覆盖它们），全部仍合格，再喂给 decision.decide 本体
+（/tmp/hf-674-decide.js，读 /tmp/decide-opts-674.json，候选文本外置）：
+
+| 候选 | 分数 | 实测证据（118 维引擎本轮复量） |
+|---|---|---|
+| **A pet_harm_coercion 宠物伤害要挟** | **0.90** | 攻击漏判 6/12（50%）、良性 0 误伤、全维度零命中 6/12 |
+| B reproductive_coercion 生育胁迫 | 0.88 | 攻击漏判 7/12（58%）、良性 0 误伤、零命中 7/12 |
+| C love_bombing 爱意轰炸 | 0.85 | 攻击漏判 6/12（50%）、良性 0 误伤、零命中 5/12 |
+
+返回：`composite_score 0.90 / confidence 0.88 / identity alignment 100%`，
+**无拒选、无二次决策**。三候选覆盖三个不同性质的新维度族（均带复量实测
+数字 + 可行性/后果/风险/confidence 四段可区分判据，差异锚点是句式规整度
+与豁免难度：A 句式规整且误伤面最低、B 绝对漏判数最多但句式分散需 3-4 组
+模式、C 与良性热恋表达字面边界最窄需最多豁免设计）。
+
+**Phase 1.5 同律复核**：6 条漏判样本逐条跑 discriminate()，实测全维度
+零命中 **6/6**——缺口成立，不是被聚合压掉。归因：thirdparty_harm_coercion
+（r662）判据是「把字句+宠物名词+毁灭动词 × 六类要胁标记」，本族漏判
+样本的形状全在其两腿之外（「把它炖了」的「它」不在其名词表、「炖」不在
+其动词表；「让它从这个家消失」用「让」不用「把」且「消失」不在动词表；
+「先把狗送走」HARM 腿中而 COND 腿六类标记无一命中；「它归我你永远别见」
+「你的宠物就别想要了」是剥夺接触结构；「你们一起滚」是因宠物驱逐人）。
+
+## 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 119 维度 `pet_harm_coercion`（宠物伤害要挟：宠物对象腿 × 胁迫性处置/剥夺腿 + PRON/EITHER 两条单支） | 「再不听话，我就让它从这个家消失」「今天不把钱拿出来，你的宠物就别想要了」「留下可以，先把狗送走，有它没我」「你对它比对爸妈都好，那你们一起滚」这类以宠物为抵押物的胁迫话术从 gate pass 变成 verify/rewrite，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 新维度在 discriminate() 返回结构、findings、summary、guidance 四处可见 | 维护（必要同步） |
+| 三份禁改文档 118→119 维度 + Verify 层 77→78 + action-forcing 107→108 + README changelog v6.8.23 条目 + 版本四处 6.8.22→6.8.23 | 文档维度数与引擎实测一致，安装者看到的能力清单含本维度 | 维护（必要同步） |
+| 12 个既有测试的维度总数断言 118→119 | 测试基线跟上引擎，不虚增不误红 | 维护（必要同步） |
+
+## 验收数字（一行一个检查项，附基准规模）
+
+| 命令 | 结果 | 基准规模 |
+|---|---|---|
+| `node bin/verify.js` | ✅ **14 通过 / 0 失败** | 入口/模块/路由/think() 14 项 |
+| `node scripts/bidirectional-guard.js` | ✅ **召回 52/52、误拦 301/326** | 52 恶意 + 326 良性，与基线完全一致（零新增误伤） |
+| `node test/round-674-pet-harm-coercion.js` | ✅ **26 通过 / 0 失败** | 攻击 26 条 + 良性 40 条 + 边界锁 7 组 + 接线 7 项 + 变异注入 6 项 |
+| `node scripts/negative-test-pet-harm-coercion.js` | ✅ **13 通过 / 0 失败** | 7 处行为注入全红 + 3 处防御性守门两步证明 |
+| `node test/doc-numbers-accuracy.test.js` | ✅ **22 通过 / 0 失败** | 维度/tier/列举/changelog/版本戳 22 项 |
+| `node test/security-audit.test.js` | ⚠️ 15/16——唯一失败 S2「版本号进 git log」，commit 落地后转绿（bump 后预期中间态） | 安全回归 16 项 |
+| `node scripts/guard-abilities.js` | ✅ **20/20 全部通过** | 入口/样本/主链路/可检索/双向/登记 20 项 |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 119 键、summary 82 引用，漏登记 0 | 登记完整性 |
+| `node scripts/measure-claimed-numbers.js` | ✅ 维度 119 / BLOCK 11 / REWRITE 19 / VERIFY 78 / 模块 161 / 路由 1314 / 工具 154 | 官方测量脚本 |
+| 12 个既有测试维度断言回归 | ✅ 全部通过（断言同步 118→119 后回归） | r378/r643/r644/r646/r655/r666/r667/r668/r669/r670/r672/r673 |
+
+**攻击侧端到端**：26 条攻击样本 `gate.checkOutput()` 全部非 pass
+（分布 `{verify: 16, rewrite: 10}`）。单维命中 26/26、单维误伤 0/40。
+基准规模：攻击 26 条（探测器原始 12 条 + 句式变体 14 条）、良性 40 条
+（探测器原始 6 条 + 正当送养协商/法律规范科普/概念分析/句首咨询/
+正当宠物讨论/已知边界 34 条）。
+
+## 已知未修项与边界（含为什么不修）
+
+1. **「有它没我」比喻用法不设守门**：该结构单支判定，比喻用法（这个
+   项目有它没我）在中文里罕见，未加豁免——加了反而要维护一份几乎永不
+   命中的名单。锁为已知边界写进模块注释。
+2. **剩余两候选族未做**：reproductive_coercion（引擎裁 0.88，句式分散
+   需 3-4 组模式，且与正常生育讨论共享词汇需最多豁免设计）、
+   love_bombing（0.85，与良性热恋表达字面边界最窄、误伤风险最高）。
+   本轮复量数字在手，留给后续轮次。
+3. **推送未做**：按环境红线「不推送 GitHub、不 npm publish」——发布是
+   人工门禁，本轮不执行；本地 commit 落地即可。
+4. **未跟踪探针残渣**：scripts/round-674-fix-guidance.js 为一次性修复
+   脚本（修 guidance 行插入时的转义层错误），内容已被正式接线覆盖，
+   未入库；与历史 round-* 残渣同性质，留给清理流程，不做无差别
+   git clean。
+
+## 踩坑（三条）
+
+1. **腿 A 英文侧漏写导致 4 条英文攻击全 miss**：首版 PET_ZH 只写了中文
+   分支（猫/狗/宠物），而腿 B 英文侧（get rid of / make it disappear）
+   已写好——中英配对纪律要求两侧同轮补齐，TDD 的 A1 组直接把 4 条英文
+   漏判摆出来（与 r673「只写主动语态漏被动句」同族：配对侧漏一侧）。
+2. **String.raw 模板里写 `\b`/`\s` 是恒 false 的字面量匹配**（r642-r673
+   第 N 次复现）：用 write_file 建模块时反斜杠被多写一层，`\bpet\s+
+   custody\b` 匹配的是「反斜杠+b」而非词边界。本轮用 Node 数反斜杠
+   （`(line.match(/\\/g)||[]).length`）逐行校正后才修对。
+3. **guidance 行的插入不能用 JSON.stringify+手动转义**：先写了
+   `JSON.stringify(text).replace(/"/g,'\"')` 把内部引号全转义，结果键值
+   都变成 `\"` 字面量、node --check 直接 SyntaxError。正确形状是
+   JSON.stringify 输出即合法 JS 单行字符串，直接拼接；另 G1b 守卫的
+   `replace(/^'|,$/g,'')` 会留下中间引号，必须写 `/^'|',$/g`
+   （r673 的正确写法，本轮照抄时漏了引号导致 G1b 假红一轮）。
+
 # 第 673 轮报告（v6.8.22 — 第 118 维度 comparative_devaluation：比较贬低）
 
 ## 心虫选中项 + 分数 + 身份对齐
