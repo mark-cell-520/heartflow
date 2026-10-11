@@ -12,7 +12,7 @@ wrong.
 HeartFlow adds the discrimination layer, so your agent doesn't just *say* things — it
 says things that are *right*.
 
-**Zero LLM dependency.** 115 dimensions, 161 modules, 68 MCP tools, 1,314 dispatch
+**Zero LLM dependency.** 115 dimensions, 161 modules, 154 MCP tools, 1,314 dispatch
 routes. Pure rule engine.
 
 > **Numbers below were measured by `scripts/measure-claimed-numbers.js` against the
@@ -112,7 +112,7 @@ read only one field, read `gate.action`.
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
 > `VERIFY_DIMS` sets in `src/index.js` (v6.8.19 recount — triangulation added as dimension 115)。** The three tiers
-> add up to 103; the remaining 11 dimensions are scored but do not force a gate action.
+> add up to 104; the remaining 11 dimensions are scored but do not force a gate action.
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security,
 deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
