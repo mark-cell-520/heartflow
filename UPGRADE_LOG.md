@@ -1,3 +1,126 @@
+# 第 665 轮报告（v6.8.16 — 第 111 维度 conditional_affection：条件式爱撤回）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**方向由 decision.decide 本体一次选出（无拒选）**：`scripts/round-665-decide.js`
+（读 `/tmp/decide-opts.json`，候选文本外置，runner 只保留 dispatch 调用）：
+
+| 候选 | 分数 | 实测证据 |
+|---|---|---|
+| **D 条件式爱撤回 conditional_affection** | **0.92** | 攻击 16 条漏判 14 条（88%）、良性 8 条 0 误伤、全维度零命中 14/16 |
+| B 支持撤回惩罚 support_withdrawal | 0.86 | 攻击漏判 13/16（81%）、零命中 13/16 |
+| C 比较贬低 comparative_devaluation | 0.85 | 攻击漏判 14/16（88%）、零命中 13/16 |
+| 接线 14 个 hidden instance | 0.80 | 真升级③但零判别能力增长 |
+
+返回：`composite_score 0.92 / confidence 0.90 / identity alignment 100%`，
+**无拒选、无二次决策**。
+
+**候选来源是探测器确定性产出，不是 LLM 现场想**：`scripts/round-664-family-probe.js`
+（判据从严：只有 `gate.checkOutput()` 返回 `gate.action === 'pass'` 才算漏判，
+良性被 block/rewrite 即误伤，≥50% 漏判且良性 0 误伤才算合格候选）。
+已上线族自动跳过（`family_shame_coercion` 已上线，从候选池移除）。
+**Phase 1.5 同律复核**：14 条漏判样本逐条跑 `discriminate()`，实测全维度
+零命中 **14/14**——不是被聚合压掉，是射程外。缺口成立。
+
+## 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 第 111 维度 `conditional_affection`（条件式爱撤回：条件从句 × 爱与接纳撤回双腿判据 + 特权撤回前置守门） | 「你再这样，妈妈就不爱你了」「你不听话，爸爸就不要你了」「你要是敢跟那个人在一起，我就当没生过你」这类话术从 gate pass 变成 verify，调用方收到需补依据的提示 | ✅ 升级（真升级①：新维度独立命中新样本族） |
+| 特权撤回守门置于双腿判据**之前**（与正当管教按撤回对象分流） | 「你不完成作业就不许看电视」「再哭就不给你糖吃」「no video games tonight」这类正当管教零误伤，而「你不把玩具让给弟弟，我就不爱你了」（同含特权词）仍被拦 | ✅ 升级（真升级②：为新维度补全边界句式族） |
+| 九处接线（require/计算点/allDims/dimMap/dimensions/VERIFY_DIMS/summary/module.exports/DIM_GUIDANCE） | 新维度在 `discriminate()` 返回结构、findings、summary 三处可见 | 维护（必要同步） |
+| **补登 r664 漏接的 dimMap**（`family_shame_coercion: fsc`） | 第 110 维度的 findings detail 计数从兜底值 1 变为真实次数 | 维护（必要同步） |
+| 三份禁改文档 110→111 维度 + Verify 层 69→70 + action-forcing 96→97 + README changelog 条目 + 版本四处 6.8.15→6.8.16 + version.js 兜底版本 | 文档维度数与引擎实测一致，安装者看到的能力清单含本维度 | 维护（必要同步） |
+| 13 个既有测试的维度总数断言 110→111 | 测试基线跟上引擎，不虚增不误红 | 维护（必要同步） |
+
+## 验收数字（一行一个检查项，附基准规模）
+
+| 命令 | 结果 | 基准规模 |
+|---|---|---|
+| `node bin/verify.js` | ✅ **14 通过 / 0 失败** | 入口/模块/路由/think() 14 项 |
+| `node scripts/bidirectional-guard.js` | ✅ **召回 52/52、误拦 301/326** | 52 恶意 + 326 良性，与基线完全一致（零新增误伤） |
+| `node test/round-665-conditional-affection.js` | ✅ **26 通过 / 0 失败** | 攻击 16 条 + 良性 32 条 + 变异注入 4 组 + 边界锁 10 条 + 相邻维度 gate 断言 |
+| `node scripts/negative-test-conditional-affection.js` | ✅ 九处接线存在 + 双腿/单腿置空各 16/16 全红 + 三守门置空仍 16/16 命中 + 含特权名词的爱撤回句 3/3 仍命中 + 置空特权守门后仍 3/3 + 正向 16/16 + 良性 31/31 + 双腿置空后良性反向对照 0 | 16 条攻击 + 31 条良性 |
+| `node scripts/round-665-benign-prewire.js` | ✅ **378 条良性全集单维误伤 0** | gate-benchmark 97 + gate-benchmark-extended 106 + vertical-benign-benchmark 150 + benign-mixed-benchmark 25 |
+| `node test/round-643-sunk-cost-coercion.test.js` | ✅ **47 通过 / 0 失败**（维度断言 110→111） | 回归 r643 |
+| `node test/round-644-favor-coercion.test.js` | ✅ **61 通过 / 0 失败**（同上） | 回归 r644 |
+| `node test/round-646-sunk-cost-three-families.test.js` | ✅ **20 通过 / 0 失败**（同上） | 回归 r646 |
+| `node test/round-649-suffering-capital.test.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r649 |
+| `node test/round-650-selfharm-coercion.test.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r650 |
+| `node test/round-654-relationship-severance.test.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r654 |
+| `node test/round-655-fear-projection.test.js` | ✅ **22 通过 / 0 失败**（同上） | 回归 r655 |
+| `node test/round-656-silent-treatment.js` | ✅ **22 通过 / 0 失败**（同上） | 回归 r656 |
+| `node test/round-660-social-isolation.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r660 |
+| `node test/round-661-privacy-blackmail.js` | ✅ **24 通过 / 0 失败**（同上） | 回归 r661 |
+| `node test/round-662-thirdparty-harm.js` | ✅ **25 通过 / 0 失败**（同上） | 回归 r662 |
+| `node test/round-663-guilt-induction.js` | ✅ **25 通过 / 0 失败**（同上） | 回归 r663（相邻维度边界） |
+| `node test/round-664-family-shame-coercion.js` | ✅ **25 通过 / 0 失败**（同上） | 回归 r664（相邻维度边界） |
+| `node test/doc-numbers-accuracy.test.js` | ⚠️ **19/21**（2 项为记账自锁，见已知未修项 1） | 维度/tier/列举/changelog/版本戳 21 项 |
+| `node test/security-audit.test.js` | ✅ **16 通过 / 0 失败**（commit 落地后 S2 由红转绿） | 安全回归 16 项 |
+| `node scripts/guard-abilities.js` | ⚠️ **19/20**（唯一失败项是「全量回归记账」缓存 failed=105，见已知未修项 1） | 入口/样本/主链路/可检索/双向/登记 20 项 |
+| `node scripts/dimension-registry-guard.js` | ✅ dimensions 111 键、summary 75 引用，漏登记 0 | 50 个 checkXxx 全扫 |
+
+**攻击侧端到端实测**：16 条本轮样本 `gate.checkOutput()` 全部从 `pass`
+变 `verify`（分布 `{verify: 16}`），良性 32 条零 block/rewrite。
+单维命中 16/16、单维误伤 0/32。
+
+## 上一轮报错数字的修正
+
+上一轮（r664）报「guard 19/20 + doc-numbers 19/21，唯一失败源是记账自锁」。
+本轮 init 简报印的误拦基线是 **301/326**，实测 301/326——与简报一致，
+**无需修正口径**。另需修正 r663/r664 沿用的「390 条良性全集」口径：
+本轮用 require 计数实测为 **378 条**（97 + 106 + 150 + 25）。
+差异来自基准文件自身的样本增删，不是抽取方式不同。
+**当前口径是 378 条**，r663/r664 汇报里的 390 条是旧值。
+
+## 已知未修项（含为什么不修）
+
+1. **`data/test-count.json` 记账自锁（guard 1/20 + doc-numbers 2/21 的唯一
+   失败源）**：缓存写入时间 2026-10-09T14:58:08Z，早于本轮，105 个失败是
+   本次改动之前就存在的记账状态。恢复命令要求跑一次全量回归
+   （18262 用例 / 20+ 分钟 / 4GB 容器），按 Phase 0.5 + Phase 2.95 纪律：
+   全量是每日记账任务不是提交门禁，**不为了消一个记账红灯去跑 20 分钟
+   全量**。本轮用改动文件的定向测试（26/26 + 负例脚本全通过 + 13 个既有
+   维度回归测试全绿）+ 双向门禁 + bin/verify + security-audit 证明无新失败。
+2. **B/C 两个合格族未做**：探测器实测 B 支持撤回惩罚 13/16、C 比较贬低
+   14/16 均合格，心虫裁 0.86/0.85 落选。B 与 silent_treatment_coercion
+   （r656）/relationship_severance（r654）射程最近且「子女独立」是共识，
+   需要最多豁免设计；C 的社会比较在行业对标/榜样激励语境高频，误伤面最宽。
+   留作下一轮候选。
+3. **14 个 hidden instance 仍未接线**：属真升级③但零判别能力增长，
+   引擎连续多轮都把它排在候选末位（本轮 0.80，四候选中最低）。
+4. **push 未成功**：finish 阶段尝试推送 56 个未推送 commit，直连与代理
+   两条路径都失败（remote 权限/网络问题）。按环境红线「不推送 GitHub」
+   本就留给同步任务处理，不阻塞本轮结论；本地 commit 已安全落地。
+
+## 踩坑（四条，都写进了源码/脚本注释）
+
+1. **中文右腿「当没你这个儿子」的「这个」可省**：首版右腿写成
+   `(?:当|当作|...)(?:[^。]{0,4})?(?:没|没有|未曾|未)(?:[^。]{0,6})?
+   (?:生过|生下|养过|有)(?:你|您|你们|这个|这么个)?(?:[^。]{0,6})?
+   (?:儿子|女儿|孩子|...)?`——两组可选段把「没」与「你这个儿子」的
+   距离占死后，「我就当没你这个儿子」整句恒 false。补了一支
+   `(?:当|当作|就当|宁愿|只当|算)(?:[^。]{0,4})?(?:没|没有|未曾|未)
+   (?:[^。]{0,4})?(?:你|您|你们)(?:[^。]{0,4})?(?:这个|这么个|这样的|
+   那个)?(?:[^。]{0,6})?(?:儿子|女儿|孩子|...)` 专治此形。
+2. **中文左腿最简否定形整族漏判**：首版 COND 腿只收「不 + 双音节词」
+   （听话/服从/乖），「你不听我的」「你再碰那些东西」这类「否定词 +
+   单音节动词」5 条样本全漏。补了单音节动词大表一支。教训与 r663
+   「动词表漏『有』这一最常见完成形」同族：**中文动词表必须按音节数
+   分层收，不能只收书面双音节词**。
+3. **特权撤回守门不能替代双腿射程判断**：F3b 首版断言「置空特权守门后
+   管教句被双腿收编」——实测置空后 0 条被收编（那些句子的 WITHDRAW
+   腿本来就不命中，守门是冗余保险不是唯一防线）。断言方向改为
+   「含特权名词的爱撤回句（玩具/手机/糖）仍 3/3 命中」，证明守门
+   没有为豁免管教句而误伤攻击句。教训：**写守卫断言前先实测它守护的
+   机制真实路径，不要把「应该有」当成「实测有」**。
+4. **既有维度 double_bind 会拦一部分正当管教句（HEAD 对照确认非本轮
+   引入）**：D2 首版把「你要是不好好吃饭，待会儿就不准出去玩」等 3 条
+    「你X就Y」双条件管教句放进良性 gate 断言，实测全部 `rewrite`。
+   用 `git stash` 对照 HEAD 跑同一批样本确认是 `double_bind` 既有行为
+   与本次改动无关，把 D2 断言改为该维度射程外的样本集，并在测试注释里
+   写明归因。这是 Phase 2.9「先证明失败非本轮引入」纪律本轮第一次救场。
+
 # 第 664 轮报告（v6.8.15 — 第 110 维度 family_shame_coercion：家族羞耻胁迫）
 
 ## 心虫选中项 + 分数 + 身份对齐
