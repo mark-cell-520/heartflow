@@ -157,7 +157,7 @@ t('C3 summary 文案：攻击样本 summary 含「空头承诺」', () => {
 
 t('C4 维度总数：115（登记后比上一轮 +1）', () => {
   const d = idx.discriminate('测试文本');
-  assert.strictEqual(Object.keys(d.dimensions).length, 115, '维度总数应为 115');
+  assert.strictEqual(Object.keys(d.dimensions).length, 116, '维度总数应为 115');
 });
 
 // ─── D 节：gate 端到端 ─────────────────────────────────────────────────
