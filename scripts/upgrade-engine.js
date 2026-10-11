@@ -56,7 +56,13 @@ const sh = (c, timeoutMs) => execSync(c, {
   cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
   timeout: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : SH_TIMEOUT,
 });
-const trySh = (c, timeoutMs) => { try { return sh(c, timeoutMs); } catch (e) { return (e.stdout || '') + (e.stderr || '') + (e.message || ''); } };
+// [r670] 修假阳性：catch 分支**只返回 stdout+stderr，不拼 e.message**。
+// 根因：`ls scripts/tmp-* 2>/dev/null` 无匹配时 exit 2 → sh() 抛错 →
+// trySh 把 e.message（'cmd failed'）拼进返回值 → 调用方
+// `.split('\n').filter(Boolean)` 得到 1 个元素 → 误报「1 个探针未删」，
+// 而 scripts/ 下实际没有任何 tmp-* 文件（实测 stdout/stderr 均为空）。
+// 判据：命令失败 ≠ 有输出；把错误消息当输出会让「无残留」永远报红。
+const trySh = (c, timeoutMs) => { try { return sh(c, timeoutMs); } catch (e) { return (e.stdout || '') + (e.stderr || ''); } };
 const readJson = (p, fb) => { try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return fb; } };
 const writeJson = (p, o) => { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, JSON.stringify(o, null, 2) + '\n'); };
 const V = () => fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
