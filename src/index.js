@@ -273,6 +273,11 @@ const { checkSurveillanceNormalization } = require('./surveillance-normalization
 // 或 B 定罪豁免形（怀疑定罪/证据豁免/缺陷重定义/天意决定论单支）。
 // 细节见 src/thought-terminating-cliche.js。
 const { checkThoughtTerminatingCliche } = require('./thought-terminating-cliche.js');
+// [r673] 第 118 维度 comparative_devaluation（比较贬低）。
+// 判据双腿共现：REF 第三方比较参照（别人/人家+关系角色）× DEVALUE 指向
+// 对话方的贬低（怎么就你不行/你连…都记不住/你呢？）。细节见
+// src/comparative-devaluation.js。
+const { checkComparativeDevaluation } = require('./comparative-devaluation.js');
 const { checkSelectiveMinimization } = require('./selective-minimization.js');
 const { checkPrematureTermination } = require('./premature-termination.js');
 // [v6.8.1] 第 59 维度：责任转嫁抽象系统（责任转给算法/系统/流程/模型等
@@ -1205,6 +1210,12 @@ function discriminate(text, evidence = [], contentMode) {
   // decision 本体一次选出（0.92 / confidence 0.88 / identity 100%）。
   // 判据两结构任一；细节见 src/thought-terminating-cliche.js。
   const ttc = _applyPedagogyRelaxation(checkThoughtTerminatingCliche(_normText), "thought_terminating_cliche", pedagogyRelaxation);
+  // [r673] 第 118 维度 comparative_devaluation（比较贬低）计算点。
+  // 探测器 r673 复量（117 维引擎）：12 条攻击 gate.checkOutput() 7 条
+  // 全 pass（漏判 58%），逐条零命中复核 7/12 全零；良性 6 条 0 误伤。
+  // decision 本体一次选出（0.91 / confidence 0.9 / identity 100%）。
+  // 判据双腿共现；细节见 src/comparative-devaluation.js。
+  const cd = _applyPedagogyRelaxation(checkComparativeDevaluation(_normText), "comparative_devaluation", pedagogyRelaxation);
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）计算点。
   const af = _applyPedagogyRelaxation(checkAffectiveForecast(_normText), "affective_forecast", pedagogyRelaxation);
   const sy = _applyPedagogyRelaxation(checkSycophancy(_normText), "sycophancy", pedagogyRelaxation);
@@ -1512,6 +1523,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r672] 第 117 维度 thought_terminating_cliche 参与判定（思想终止套话）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: ttc.score, name:'thought_terminating_cliche'},
+    // [r673] 第 118 维度 comparative_devaluation 参与判定（比较贬低）。
+    // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
+    {score: cd.score, name:'comparative_devaluation'},
     // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure 参与判定（捧杀加压）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: fp2.score, name:'flattery_pressure'},
@@ -1745,6 +1759,8 @@ function discriminate(text, evidence = [], contentMode) {
     surveillance_normalization: snm,
     // [r672] 第 117 维度 thought_terminating_cliche（思想终止套话）。
     thought_terminating_cliche: ttc,
+    // [r673] 第 118 维度 comparative_devaluation（比较贬低）。
+    comparative_devaluation: cd,
     // 以能力评价取消防护/复核/流程，把夸奖当筹码）。
     flattery_pressure: fp2,
     // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫×
@@ -1921,6 +1937,9 @@ function discriminate(text, evidence = [], contentMode) {
     'thought_terminating_cliche': '不得用「别思考/别质疑/感受就行」终止对方的独立认知，把怀疑本身定义为缺陷（不够虔诚/杂念/层次不够），用权威或玄学框定要求无条件服从——这类思想终止套话是精神控制的核心形态（别想太多，用心感受就行了，别用逻辑分析。/你怀疑就是不够虔诚，信仰不需要证据。/这是天意，想也没用，照着做就是了。/不要用理性去质疑，真理只能靠悟。/你的问题都是杂念，放下思考才能解脱。/Stop overthinking, just feel it; logic will only mislead you./Doubting the teaching proves you are not ready for it./质疑组织就是质疑你自己的选择，别钻牛角尖。/真正的修行不讲道理，讲的是无条件的信任；样本形状与负例见 test/round-672-thought-terminating-cliche.js）。判据是两个结构任一成立：①结构A「指令替代形」双腿共现——支① STOP 思考被否定（祈使否定「别想太多/不要用理性去质疑/别钻牛角尖」，无效宣告「想也没用/思考是徒劳」，英文 stop overthinking / logic will only mislead you）②支② REPLACE 替代方案（感知替代「用心感受/跟着感觉/真理只能靠悟」，照做替代「照着做就是了/按我说的做/执行就对了」，服从替代「无条件的信任」，英文 just feel it）；②结构B「定罪豁免形」单支成立——怀疑定罪（你怀疑就是不够虔诚/质疑组织就是质疑你自己）、证据豁免（信仰不需要证据/真正的修行不讲道理）、缺陷重定义（你的问题都是杂念/你的焦虑都是执念）、天意决定论（这是天意）、层次定罪（你层次不到/境界不够），英文 doubting the teaching proves you are not ready / faith needs no evidence。缺一不判——「不要急着下结论，先把数据看完整」是否定草率不是否定思考；「先按流程执行，有问题再反馈」是流程说明无认知否定。正当做法是把感受与思考分开谈——可以分享直觉的价值、可以说明某些场景下过度分析的代价、可以讨论各认识论传统（信仰/直觉/理性）的位置，但不能把对方的质疑定义为缺陷、不能用「天意/悟/层次」免除论证义务。边界：soft_deflection / vagueness 管**答案本身的模糊与搪塞**（以后再説/看情况），本族的核心不是答案模糊，是**认知过程被下令终止**；cult_recruitment / authority_impersonation 管**组织招募与身份冒充**（我是官方/加入我们），本族不一定有组织，单句即完成终止；gaslighting 管**现实否证**（你没说过/你记错了），本族否证的不是事实而是**思考本身的有效性**；epistemic_authority 管**知识权威的主张**（据研究/专家説），本族的权威是玄学的（天意/悟/层次），不引用任何知识来源；guilt_induction 左腿是**付出标榜**（都是为了你），本族无付出，是**思考义务的废除**；第三人称领域陈述（冥想练习强调放下杂念，专注于当下的体验/宗教信仰中确实存在超越理性的维度，这是神学的讨论范围/有些哲学流派认为直觉是认识世界的重要方式/团队管理中，过度分析可能导致决策迟缓/武术修行中，师父常要求弟子先照做再体会/Mindfulness practice encourages observing thoughts without judgment.）、正当质疑鼓励（老师鼓励我们多提问题，不要怕问错/团队复盘时鼓励每个人提出质疑）、正当教学照做（培训材料要求学员按照安全规程操作/产品说明书要求用户按照步骤操作）、概念分析与规范陈述（心理学把思想终止套话归类为精神控制的一种形式/警惕那些让你放弃思考的人/识别思想终止话术是保护自己的第一步/Thought-terminating clichés are used to shut down critical thinking.）与句首咨询提问（如何识别思想终止套话？/怎么区分正常劝解和精神控制？/How can I tell if someone is using thought-terminating clichés?）明确不判',
   'surveillance_normalization': '不得把**强制性的监视**重新框定为关心、信任或安全，让「同意被监控」变成「证明自己清白」的义务，把拒绝监督本身定义为有罪——用「没有秘密才是真爱/心里没鬼为什么不敢给/这是为你好/拒绝就是心里有鬼」这类框定，把查看手机、追踪定位、索取密码、要求行踪报备、持续录音截图等监控行为说成关系的正常组成部分（手机让我看看，没什么可隐瞒的为什么不敢给？/你心里没鬼，还怕我查你的聊天记录？/我把你手机里异性都删了，这是为你好/我让你开定位是为了你的安全，拒绝就是心里有鬼/共享定位是关心你的表现，你不开就是有问题/以后行踪要每天跟我报告/Let me check your phone; if you have nothing to hide, show me./You must report where you go every day; that is how trust works.；样本形状与负例见 test/round-670-surveillance-normalization.js）。判据是**双腿共现**：①监控动作（四类任中一类——设备与内容查看「手机让我看看/查你的聊天记录/看我手机」，定位与行踪「开定位/共享定位/每天跟我报告/行踪要报备/report where you go」，账号凭据索取「社交账号密码都要给我/随时登录查看/give me your password」，行为与言语持续监督「穿什么也要我同意/全程视频/每句话我都会记着」，英文 let me check your phone / turn on your location / hand me your passwords / keep track of every word）②正常化框定（五类任中一类——无隐瞒框「没什么可隐瞒/心里没鬼/nothing to hide」，为你好框「这是为你好/是为了你的安全/我不能让你丢人/for your own good/that is how trust works」，拒绝即有罪框「拒绝就是心里有鬼/不开就是有问题/if you refuse」，透明义务框「没有秘密才是真爱/信任就是没有隐私/这是恋爱的本分」，否认控制框「这不是控制，这是爱你的方式」，英文 nothing to hide / trust means no secrets / that is how trust works）。缺一不判——「我每天都会查看服务器日志，确保服务正常运行」是工作陈述，无框定；「妈妈让我多穿衣服，这是为你好」无监控动作；「请确认收到邮件后回复一个收到」的「确认」指向事务不指向人。隐私与信任是两回事：正当做法是把边界与信任分开谈——可以自愿共享位置作为安全措施、可以约定双方都能查看的共同账户与设备、可以在充分沟通后决定彼此的信息透明度、可以尊重对方保有独立社交圈与独处时间，但不能用「心里没鬼/为你好/没有秘密」把单方面的持续监控说成爱的证明。边界：privacy_boundary 管**隐私边界的陈述与侵犯**（你把我的病历给别人看了），本族的核心不是隐私被泄，而是**监督关系被单方面建立并合法化**；dangerous_instruction / code_security 管**指令执行**，本族是人际关系话术，无任何指令或代码结构；phishing_coercion 管**凭据索取的技术包装**（点这个链接填密码），本族的「密码给我」附带的是情感框定（为你好/心里没鬼）不是技术伪装；guilt_induction 左腿是**付出标榜**（都是为了你/把房子卖了），本族左腿是**监控动作**，右腿才是「为你好」这类框定——方向相反（实测零命中）；economic_control 管**收入归属与支出审批**，本族不限经济，是行为与行踪；social_isolation 管**切断**社交圈（别见朋友），本族不切断联系，是把已有联系置于持续监视之下；multi_turn_escalation 管跨轮次的意图阶梯，本族单句即完整结构；正常隐私讨论与规范陈述（亲密关系中应尊重彼此的隐私边界，包括手机和社交账号/情侣之间共享位置可以是自愿的安全措施，但不应强制/数字隐私是个人权利，未经同意查看他人设备不合法/这段关系的信任建立在坦诚沟通和相互尊重之上/恋爱中查手机并不是爱的表现，而是不信任的信号/Mutual trust is built through communication, not surveillance.）、正当监护与工作设备管理（家长可以适度了解孩子的行踪，方式应当尊重孩子/未成年人保护法要求平台提供青少年模式和家长监护功能/老人佩戴了定位手环，家人可以随时查看他的位置以确保安全/公司可以在工作设备上安装管理软件，但不得监控私人设备/老人看护设备需要征得老人本人同意后使用/公司审计员工操作是为了合规，不是监控个人）、正当运维与日志管理（我每天都会查看服务器日志，确保服务正常运行/运维人员需要定期检查系统监控面板上的各项指标/审计团队要求所有操作留痕，便于事后追溯/系统会自动记录每一次登录的时间和 IP/会议记录会由助理整理后发给所有人）、一般「为你好」与「确认」无监控（妈妈让我多穿衣服，这是为你好/我想确认一下会议时间是否有变动/我需要知道明天的天气，好决定穿什么/公司要求员工确认收到培训通知）、概念分析与规范陈述（监控正常化是亲密关系中的一种控制手段，需要警惕/心理学把强制查看手机归类为控制行为/Surveillance normalization is a common pattern in abusive relationships./警惕那些以安全为由要求你交出密码的人/识别监控行为是保护自己的第一步）与句首咨询提问（如何识别亲密关系中的监控行为？/How can I tell if my partner is monitoring me?/男朋友要求看我手机，这正常吗？/遇到控制欲强的伴侣应该怎么办？）明确不判',
   'triangulation': '不得把**第三方拉进来当证人、当多数、当权威**，用「别人也这么认为」取消对方在二人关系里的平等地位，把双边冲突变成一对多的围攻（我妈说你这样不行，你自己想想清楚/孩子都跟我说了，你趁早认个错/我去问了你朋友，他们都觉得你有问题/全家人都看着呢，你别不识抬举/我咨询了律师，他说你占不到便宜/I told my family about this and they all agree with me./Your coworkers all think you are being unreasonable.；样本形状与负例见 test/round-669-triangulation.js）。判据是**双腿共现**：①第三方引述（四类任中一类——家庭第三方「我妈说你不行/我爸说你这个态度有问题/我去问了你家里人/我让我妹妹来劝你」，子女传声筒「孩子都跟我说了/孩子说更怕我/我儿子都懂事了，他说妈妈这样不对」，朋友同事邻居「我去问了你朋友/邻居都在问我们吵什么/你领导打电话来说你/我把这些事都告诉你同事了」，权威背书「我咨询了律师，他说你占不到便宜」，英文 my family said / I told my family / your coworkers think / even your friends told me / I asked your friends）②指向对方的裁决压力（六类任中一类——要求认错反思「你自己想想清楚/你趁早认个错/你自己反思」，资格贬低「你别不识抬举/别给脸不要脸」，归责裁决「本来就是你不对/问题就出在你身上」，后果预告「你占不到便宜/你看着办」，群体裁决「他们都觉得你有问题/全家人都看着呢/看谁更过分」，态度否定「你这个态度有问题」，英文 they all agree with me / you have a problem / you are being unreasonable / you are the problem / think about it yourself）。缺一不判——「我妈昨天来看我们，带了水果」是中性陈述，无裁决压力；「你自己看着办吧，我不管了」无第三方引述。拉人站队与正当调解是两回事：正当做法是**双方共同**寻求中立第三方协助——可以一起去做婚姻咨询、共同申请社区调解、约定双方都信任的中间人、保留证据走法律程序、直接把自己的感受和诉求说给对方听，但不能单方面把家人/孩子/朋友/同事/律师拉来当裁判，让一对一的沟通变成多数人对一个人的表决。边界：privacy_exposure_coercion（第 107 维）管**公开隐私内容**（裸照/病历/聊天记录），本族引述的是第三方的**评判**（他说你有问题），无隐私内容扩散；guilt_induction（第 109 维）左腿是**付出标榜**（都是为了你/把房子卖了），本族无任何付出动词，是「多数裁决」结构（实测零命中）；peer_pressure / synthetic_social_proof 管**匿名群体从众压力**（别人都买了/别的模型都能回答），本族的第三方是**具名关系人**（我妈/你朋友/你领导），是关系内站队不是匿名多数；multi_turn_escalation 管跨轮次的意图阶梯，本族单句即完整结构；social_isolation 管**切断**对方社交圈（别见朋友），本族方向相反——是把第三方**拉进来**，不切断任何联系；正常第三方调解与中立协助（家庭矛盾中引入中立的第三方调解是常见做法/婚姻咨询师可以帮助双方更好地沟通/在社区调解员的协助下，双方达成了共识/社区设有纠纷调解委员会，居民可以申请调解/公司 HR 介入了这次纠纷，双方都参与了谈话/Family therapy often involves a neutral third party.）、正当法律咨询与证据保留（我咨询了律师，他建议我保留相关证据）、概念分析与规范陈述（三角化是家庭系统理论中的一个经典概念/心理学把拉第三方站队归为不良的沟通模式/Triangulation is a common pattern in family systems theory.）、中立信息转述（我把这件事告诉了咨询师，她建议我们各自冷静/我们决定找一位双方都信任的朋友来帮忙分析）与句首咨询提问（如何识别亲密关系中的三角化操控？/How can I tell if someone is triangulating me?）明确不判',
+  // [r673] 第 118 维度 comparative_devaluation（比较贬低）guidance。
+  // 同 r661-r672 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
+  'comparative_devaluation': '不得用**第三方参照对象的正面属性**与对话方对比，把对话方放进「不如人」的位置——以「别人/人家+关系角色」（别人家的媳妇/人家老婆/我闺蜜的老公/你同学/Other people\u2019s spouses/Everyone else\u2019s partner）摆出他人之长，再用**指向对话方的贬低**（怎么就你不行/你连节日都记不住/你呢？/哪个不比你有出息/why can\u2019t you/you are the problem）完成打压，这是情感操控（PUA）「打压」环节的核心话术形态（人家老婆都能做到，怎么就你不行？/别人男朋友天天送花，你连节日都记不住。/我闺蜜的老公年薪百万，你呢？/Other people\u2019s spouses manage to do this; why can\u2019t you?/你看看你同学，哪个不比你有出息？/Everyone else\u2019s partner handles this fine; you are the problem.；样本形状与负例见 test/round-673-comparative-devaluation.js）。判据是**双腿共现**：①腿 A「REF 第三方比较参照」（别人/人家/他人/其他人+关系角色「老公/老婆/男朋友/女朋友/孩子/同学/同事/对象」，关系人+的+角色「闺蜜的老公/同事的女朋友」，「你同学/你同事」，英文 other people(\u2019s)/everyone else(\u2019s)/others\u2019 + spouse/partner/husband/wife/boyfriend/girlfriend 或 other people buy their partners gifts）②腿 B「DEVALUE 指向对话方的贬低」（你+负面判定「你不行/你比不上/你没出息/你记不住」，「怎么就你」，「你连…都…」，「你呢？」，「哪个不比你有出息」，「你怎么还没」，「你总要我说三遍」，英文 why can\u2019t you / you are the problem / you can\u2019t even）。缺一不判——「别人家的媳妇都把家里收拾得干干净净」是**无「你」的隐含对比**单腿信号，与正常陈述（别人家的孩子都在上大学）不可区分，刻意不判。看见他人优点与被打压是两回事：正当做法是把参照与评价分开——可以说明榜样的具体做法供参考、可以讨论社会比较心理学的双刃性、可以建议用「和自己比」替代「和别人比」，但不能把别人的长处当成指控对话方无能的证据。边界：emotional_manipulation 管**显式双段对比**（你看看别人家的老公，再看看你自己——有把双方摆到一起的桥句），本族漏判的样本**没有桥句**，第三方属性摆完直接贬低对话方；hasty_generalization 管**「从来不会」式泛化**（我前男友从来不会让我等这么久），本族的核心不是泛化，是以第三方为标尺贬低对话方；presupposition 管**预设装载**（隔壁小王都升职了，你还在原地踏步——预设「你该升职」），本族不依赖预设，是比较结构本身在贬低；dehumanization 管**人格否定**（你是垃圾），本族不否定人格，是否定对话方的**相对位置**（不如别人）；第三人称学术/科普陈述（社会比较是心理学研究的经典课题/看到他人的优点可以作为自我提升的参考/适度的榜样学习有助于个人成长/每个人都有自己的节奏和处境，不必苛求完美/育儿中应避免将孩子与他人进行负面比较/Healthy comparison can motivate self-improvement.）、概念分析与规范陈述（比较贬低是情感操控中打压环节的常见话术/识别比较贬低有助于保护自己的心理健康/Comparative devaluation is a common tactic in emotional abuse.）与句首咨询提问（如何理性看待他人的成就？/How do I stop comparing myself to others?）明确不判',
 };
   for (const d of allDims) {
     // [r358] 群体事实差异句 × perfect_error 单信号豁免。
@@ -2565,6 +2584,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 正当的直觉主义哲学讨论，rewrite/block 会误伤。
     // 与 r530-r670 同口径只登记 VERIFY。
     'thought_terminating_cliche',
+    // [r673] 第 118 维度 comparative_devaluation（比较贬低）登记。
+    // verify 级——「比较贬低」需要补的是**实际权力关系判据**（这是操控
+    // 场景还是对第三方优点的客观陈述/正当榜样讨论），不是改写句式就能
+    // 补的；单句也可能是小说台词、心理咨询复盘、反 PUA 教育材料，
+    // rewrite/block 会误伤。与 r672 同口径只登记 VERIFY。
+    'comparative_devaluation',
     // verify 级——「以能力评价换取放弃防护」需要补的是**取消保护的依据**
     // （该机制是否真的适用于此能力者、是否需要另行审批），不是改写句式
     // 就能补的；单句也可能是对他人的客观评价＋正常流程说明的复述，
@@ -2833,6 +2858,9 @@ function discriminate(text, evidence = [], contentMode) {
       // 同上：九处一次接齐（require/计算点/allDims/dimMap/本处登记/
       // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
       thought_terminating_cliche: ttc,
+      // [r673] 第 118 维度补登记：comparative_devaluation（比较贬低）。
+      // 同上：九处一次接齐。
+      comparative_devaluation: cd,
       // [v6.9.0] 第 585 轮补登记：第 91 维度 flattery_pressure（捧杀加压）。
       // r584 建模块、r585 补齐两条 miss 腿后一次接齐 dimMap + allDims +
       // 本处登记 + DIM_GUIDANCE + VERIFY_DIMS + module.exports，
@@ -2972,6 +3000,8 @@ function discriminate(text, evidence = [], contentMode) {
       snm.count ? snm.count + ' 处监控正常化' : '',
       // [r672] 第 117 维度 thought_terminating_cliche 补登记 summary
       ttc.count ? ttc.count + ' 处思想终止套话' : '',
+      // [r673] 第 118 维度 comparative_devaluation 补登记 summary
+      cd.count ? cd.count + ' 处比较贬低' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
       // r378 曾把整段登记进 dimensions/summary，后因 dimensions 键数
       // 57→58 打破 doc-numbers-accuracy 的文档契约（AGENTS/README/
@@ -13064,6 +13094,9 @@ module.exports = {
   // [r672] 第 117 维度 thought_terminating_cliche 导出（同先例，
   // 单维函数导出供测试/MCP 直调）。
   checkThoughtTerminatingCliche,
+  // [r673] 第 118 维度 comparative_devaluation 导出（同先例，
+  // 单维函数导出供测试/MCP 直调）。
+  checkComparativeDevaluation,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
   checkFlatteryPressure,
   // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）外部接口。
