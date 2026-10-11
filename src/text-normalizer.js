@@ -347,7 +347,7 @@ function _deEncode(text) {
       const dec = out.replace(/\\u([0-9a-f]{4})/gi, (_, h) =>
         String.fromCharCode(parseInt(h, 16)));
       if (dec !== out) { out = dec; }
-    } catch (_) {}
+    } catch (_) { /* [反混淆] unicode 转义解码失败即保持原文（反混淆尽力而为） —— 预期静默，非缺陷 */ }
   }
 
   // html 实体 &#NNNN; / &#xHH;
@@ -381,7 +381,7 @@ function _deEncode(text) {
       const dec = buf.toString('utf8');
       // 只在解出可读文本（含字母空格）时采用
       if (/[A-Za-z]{4,}\s/.test(dec) || /[\u4e00-\u9fff]/.test(dec)) out = dec;
-    } catch (_) {}
+    } catch (_) { /* [反混淆] hex/base64 解码失败即保持原文（反混淆尽力而为） —— 预期静默，非缺陷 */ }
   }
 
   return out;

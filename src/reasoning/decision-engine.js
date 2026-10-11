@@ -151,7 +151,7 @@ class DecisionEngine {
           if (Math.abs(formulaP - posterior) > 0.01) posterior = formulaP;
         }
       }
-    } catch (_) {} // 防御性: 公式库不可用时回退内置贝叶斯计算，不阻断信念更新
+    } catch (_) { /* [可选增强] 公式桥可选依赖缺失时回退内置贝叶斯，不阻断信念更新 —— 预期静默，非缺陷 */ } // 防御性: 公式库不可用时回退内置贝叶斯计算，不阻断信念更新
     this._beliefState.set(hypothesis, Math.max(0, Math.min(1, posterior)));
     return +posterior.toFixed(6);
   }

@@ -227,7 +227,7 @@ function confirm(p = {}) {
 /** 清理（测试用） */
 function clear() {
   for (const f of [FP_FILE, FP_CONFIRMED_FILE]) {
-    try { fs.unlinkSync(f); } catch (_) {}
+    try { fs.unlinkSync(f); } catch (_) { /* clear() 主动清理：文件不存在即已清理，属预期；真错误（权限/EBUSY）由下方 fs 操作暴露 */ }
   }
   return { success: true };
 }

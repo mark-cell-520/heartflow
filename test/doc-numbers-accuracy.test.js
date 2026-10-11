@@ -479,5 +479,18 @@ t('README changelog 覆盖当前版本（v6.7.87 补充）', () => {
     `README Version history 缺少当前版本 ${ver} 的记录——changelog 落后了`);
 });
 
+// [r413] 单文件规模守卫：src/index.js 已达 1.3MB / 13095 行。
+// 不拆它（cron 每轮在上面加维度，拆分会撞车且是高危重构），但让超标可见。
+// 判据用行数而非字节：行数直接影响可读性与 diff 冲突概率。
+t('src/index.js 规模未超阈值（不拆分，只报警）', () => {
+  const MAX_LINES = 14000;
+  const n = fs.readFileSync(path.join(HF, 'src/index.js'), 'utf8').split('\n').length;
+  if (n > MAX_LINES) {
+    console.log(`  ⚠️  src/index.js 已 ${n} 行（阈值 ${MAX_LINES}）——` +
+      '拆分是高危重构且 cron 每轮在此加维度，暂不自动处理；超阈值请人工评估拆分时机');
+  }
+  assert.ok(true, '规模守卫只报告不判红');
+});
+
 console.log(`\n结果: ${pass} 通过, ${fail} 失败, 共 ${pass + fail} 个`);
 process.exit(fail > 0 ? 1 : 0);

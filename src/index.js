@@ -1219,7 +1219,7 @@ function discriminate(text, evidence = [], contentMode) {
       try {
         const onAlt = fn(alt);
         if (cnt(onAlt) > cnt(better)) better = onAlt;
-      } catch (_) {}
+      } catch (_) { /* 归一化变体探测：某变体解析失败即跳过该变体，取剩余最优；全部失败由 better 初值兜底 */ }
     }
     return relaxDim ? _applyPedagogyRelaxation(better, relaxDim, pedagogyRelaxation) : better;
   };

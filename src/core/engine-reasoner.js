@@ -1045,7 +1045,7 @@ try { hf._saveAllMemories(tcResult, input); } catch(e) { /* ignore */ }
 
             if (poisons) deepAnalysis.poisons = { dominant: poisons.dominantPoison, severity: poisons.severity, score: poisons.totalToxicity };
 
-          } catch(e) {} // 防御性: 模块加载/调用失败不阻断主流程
+          } catch(e) { /* [可选增强] threePoisons 可选增强分析失败不阻断推理主链路 —— 预期静默，非缺陷 */ } // 防御性: 模块加载/调用失败不阻断主流程
 
           try {
 
@@ -1053,7 +1053,7 @@ try { hf._saveAllMemories(tcResult, input); } catch(e) { /* ignore */ }
 
             if (psych?.emotion) deepAnalysis.emotion = { pleasure: psych.emotion.pleasure, arousal: psych.emotion.arousal, dominance: psych.emotion.dominance, type: psych.emotion.emotionZh };
 
-          } catch(e) {} // 防御性: 模块加载/调用失败不阻断主流程
+          } catch(e) { /* [可选增强] psychology 可选增强分析失败不阻断推理主链路 —— 预期静默，非缺陷 */ } // 防御性: 模块加载/调用失败不阻断主流程
 
           try {
 
@@ -1061,7 +1061,7 @@ try { hf._saveAllMemories(tcResult, input); } catch(e) { /* ignore */ }
 
             if (pos?.positioning) deepAnalysis.selfCheck = { isResonating: pos.positioning.isResonating, dominantDimension: pos.positioning.state?.dominantDimension, insight: pos.positioning.insight };
 
-          } catch(e) {} // 防御性: 模块加载/调用失败不阻断主流程
+          } catch(e) { /* [可选增强] selfPositioning 可选增强分析失败不阻断推理主链路 —— 预期静默，非缺陷 */ } // 防御性: 模块加载/调用失败不阻断主流程
 
           deepAnalysis.correction = hf._generatePollutionCorrection(pollution, deepAnalysis.poisons, deepAnalysis.emotion);
 

@@ -5913,7 +5913,7 @@ if (require.main === module) {
   initHeartFlow();
   if (SOCKET_PATH) {
     const unixServer = net.createServer(handleUnixClient);
-    try { fs.unlinkSync(SOCKET_PATH); } catch (_) {}
+    try { fs.unlinkSync(SOCKET_PATH); } catch (_) { /* Unix socket 绑定前清旧 socket 文件：不存在是正常情况（首次启动） */ }
     try {
       unixServer.listen(SOCKET_PATH, () => {
         fs.chmodSync(SOCKET_PATH, 0o600);
