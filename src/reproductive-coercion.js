@@ -239,7 +239,9 @@ function checkReproductiveCoercion(text, inject) {
   const LEGIT_ZH_ = R.LEGIT_ZH || LEGIT_ZH;
   const QUESTION_ZH_ = R.QUESTION_ZH || QUESTION_ZH;
 
-  const isZh = /[\u4e00-\u9fff]/.test(text);
+  // [r678 顺手修] 双层反斜杠版 /[\\u4e00-\\u9fff]/ 恒 false（patch 转义层所致），
+  // 只影响 detail 中英文文案不影响判定；改用无反斜杠的字面端点（同 r678 模块）。
+  const isZh = /[一-龿]/.test(text);
   const hitResult = {
     hit: true,
     score: 0.6,

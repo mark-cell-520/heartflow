@@ -171,7 +171,7 @@ test('B6 module.exports 导出 checkIntermittentReinforcement', () => {
 
 test('B7 维度总数 121', () => {
   const d = idx.discriminate('probe');
-  assertEqual(Object.keys(d.dimensions).length, 121, 'B7 dimensions 键数应为 121');
+  assertEqual(Object.keys(d.dimensions).length, 122, 'B7 dimensions 键数应为 122（r678 起第 122 维度 legal_status_coercion 上线）');
 });
 
 test('C1 边界锁：单有坏极陈述（腿 A）不判', () => {
