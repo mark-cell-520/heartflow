@@ -41,6 +41,19 @@ let mcpTools = 0;
 {
   const names = new Set();
   for (const m of reg.matchAll(/name:\s*['"](heartflow_[a-z0-9_]+)['"]/g)) names.add(m[1]);
+  // [AUDIT-FIX 2026-10-11] 必须并入 EXTENDED_TOOLS。
+  // 旧实现只 grep tools-registry.js 的 name:，漏掉 extended-tools.js 里
+  // 86 个运行时验证过的只读工具 → 实测报 68 而真实 tools/list 返回 154，
+  // 于是 doc-numbers 守卫拿着错的口径去比对，把对的文档判成漂移。
+  try {
+    const extPath = path.join(ROOT, 'src/mcp/extended-tools.js');
+    if (fs.existsSync(extPath)) {
+      const ext = fs.readFileSync(extPath, 'utf8');
+      // 注意：extended-tools.js 是 JSON 序列化产物，键形如 \"name\": \"heartflow_x\"
+      // （键名本身带引号），所以要匹配 ['\"]?name['\"]?\s*:\s*['\"]
+      for (const m of ext.matchAll(/['"]?name['"]?\s*:\s*['"](heartflow_[a-z0-9_]+)['"]/g)) names.add(m[1]);
+    }
+  } catch (_) { /* extended-tools 缺失时降级为主表，不阻断测量 */ }
   mcpTools = names.size;
 }
 

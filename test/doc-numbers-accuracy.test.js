@@ -75,6 +75,17 @@ function measure() {
 
   const tools = new Set();
   for (const m of reg.matchAll(/name:\s*['"](heartflow_[a-z0-9_]+)['"]/g)) tools.add(m[1]);
+  // [AUDIT-FIX 2026-10-11] 并入 EXTENDED_TOOLS（86 个运行时验证过的只读工具）。
+  // 旧逻辑只数 tools-registry.js → 得 68，而真实 tools/list 返回 154，
+  // 守卫于是把正确的文档判成漂移。与 measure-claimed-numbers.js 同源修正。
+  // 注意 extended-tools.js 是 JSON 产物，键形如 "name": "heartflow_x"。
+  try {
+    const extPath = path.join(HF, 'src/mcp/extended-tools.js');
+    if (fs.existsSync(extPath)) {
+      const ext = fs.readFileSync(extPath, 'utf8');
+      for (const m of ext.matchAll(/['"]?name['"]?\s*:\s*['"](heartflow_[a-z0-9_]+)['"]/g)) tools.add(m[1]);
+    }
+  } catch (_) { /* 降级为主表 */ }
 
   const hStart = srv.indexOf('const HANDLERS');
   const hb = srv.slice(hStart, srv.indexOf('\n};', hStart));
