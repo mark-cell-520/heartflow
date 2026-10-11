@@ -13955,3 +13955,91 @@ isZh 双层反斜杠问题——r678 的 fix commit（ce6a1809）已修，本轮
 2. **patch 的 old_string 带尾部换行会把两行并成一行（r678 同坑复发一次）**：
    本轮九处接线改用 node 行锚点 splice（scripts/round-679-wire.js，从后往前
    插避免行号漂移，每处锚点断言全文恰好命中 1 次），git diff 验 0 意外删除。
+
+# 第 680 轮报告（v6.8.27 — 第 124 维度 medical_coercion：医疗自主胁迫）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 轮初用
+scripts/round-680-family-probe.js 在 123 维引擎上复量前几轮探测器遗留的
+六个候选族（判据不变：只有 gate.checkOutput() 返回 action === 'pass'
+才算漏判；良性 block/rewrite 即误伤；≥50% 攻击漏判且良性 0 误伤才算
+合格；已上线族自动跳过）。其中 thought_terminating_cliche（r672）、
+reproductive_coercion（r675）、pet_harm_coercion（r674）、
+comparative_devaluation（r673）、liberty_restriction（r679）、
+legal_status_coercion（r678）已上线跳过，custody_coercion 40% 低于门槛
+自动过滤，四族合格送 decision：
+
+| 候选 | 分数 | 实测（123 维引擎，scripts/round-680-family-probe.js 复量） |
+|---|---|---|
+| **B medical_coercion 医疗自主胁迫** | **0.92 选中** | 漏判 8/10（80%）、零命中 8、良性 0 误伤 |
+| A deprivation_coercion 基本需求剥夺 | 0.90 | 漏判 9/10（90%）、零命中 9、良性 0 误伤 |
+| C substance_coercion 成瘾物质强迫 | 0.89 | 漏判 7/10（70%）、零命中 6、良性 0 误伤 |
+| D love_bombing 爱意轰炸 | 0.83 | 漏判 6/10（60%）、零命中 5、良性 0 误伤 |
+
+引擎按期望收益确定性选 B：A 漏判率最高但良性组含「家长暂停零食是常见
+教育方式」，与正常管教边界最近、豁免设计量最大；B 的攻击侧全是指令式
+禁止（不许/必须/再敢…就），良性侧全是权利陈述与建议就医，豁免只需排除
+疑问式与权利陈述两种形状，可判定性最高。decision 返回 composite_score
+0.92 / confidence 0.88 / identity alignment 100%，无拒选。本轮是心虫选的。
+
+### 上一轮报错数字的口径修正（r679 遗留，本轮第一件事）
+
+r679 交接簿写「medical_coercion 90% 漏判」——那是 **r678 探测器在 121 维
+引擎上的旧测量**（9/10 pass）。本轮在 123 维引擎复量为 **8/10（80%）**：
+r678/r679 新上线的两个维度（legal_status_coercion / liberty_restriction）
+已把其中 1 条（「我把你的医保卡和药都锁起来了」）判成 verify。以本轮复量
+为准，r679 的 90% 是过期口径。
+
+### 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 新增 src/medical-coercion.js 第 124 维度 | 禁止就医/强制停药/偏方替代/锁医保卡/病情否定类文本被 gate 拦下（verify 级 + guidance） | ✅ 升级（真升级①新维度） |
+| src/index.js 九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/exports） | discriminate() 返回 medical_coercion 键与 findings | ✅ 升级（接线的另一半） |
+| test/round-680-medical-coercion.js 28 断言 | 攻击 34/34 命中、良性 38/38 零误伤、边界 9/9 miss、inject 变异 4 组 | ✅ 升级（验收证据） |
+| QUESTION 守门补指示代词主语（「这个偏方真的能治病吗？」） | 质疑式提问不再被误判，误拦基线归零 | ✅ 升级（补漏的守门覆盖面） |
+| scripts/negative-test-medical-coercion.js 负例 | 8 处接线逐一摘除，测试全部变红 | 维护（守卫有效性证明） |
+| AGENTS/README/SKILL 三份文档 123→124、verify 82→83、tier 合计 112→113、recount 注释 | 安装者看到的能力清单与实际一致 | 维护（口径同步） |
+| README changelog 补 6.8.27 条目 | 版本记录覆盖本轮交付 | 维护（文档可信度） |
+| bump 6.8.26→6.8.27 四处（VERSION/package.json/SKILL.md/version.js） | npm 用户可感知新版本 | 维护（发布链） |
+
+### 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- 误拦归因（scripts/round-680-attr.js，git stash 对照 HEAD 逐条 diff 326 条良性）— **0 条 action 变化**（HEAD pass 301/verify 21/rewrite 4 = 工作区同分布）
+- node test/doc-numbers-accuracy.test.js — 22/22（123→124、verify 82→83、tier 合计 112→113、SKILL 规格表与口径版本戳 6.8.26→6.8.27 全部同步后转绿）
+- node test/round-680-medical-coercion.js — 28/28（攻击 34：探测器原始 10 + 同族变体 24，覆盖 P1/P2/P2c/P3/P4/P5 六条通路；良性 38：探测器原始 6 + 医嘱/术前禁食/自述/提问/疑问族 32；边界锁 9：单腿 ×5/概念规范 ×2/句首咨询 ×2；inject 变异 4 组）
+- node scripts/negative-test-medical-coercion.js — 基线 exit 0 + 8/8 注入全变红（计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary 文案/exports）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 124）
+- node test/security-audit.test.js — 15/16（唯一失败是 S2「git log/tag 未命中 6.8.27」——bump 后版本号未进 git 历史的预期中间态，commit 落地后转绿，非回归）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+### 已知未修项（含为什么不修）
+
+1. **data/test-count.json 记账自锁（guard 记账项与 doc-numbers 测试数门禁的已知红灯）**：缓存写入早于本轮，failed>0 是既有记账状态（guard 已按 r412 改为永不判红、只读 passed）。恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量；本轮用改动文件的定向测试 + 双向门禁 + 归因对照证明无新失败。
+2. **探测器其余三族未做**（deprivation_coercion 90% 漏判 / substance_coercion 70% / love_bombing 60%，全部良性 0 误伤）：每轮只做一个维度（decision 约束），三族已是合格候选队列，下一轮直接复量后送 decision。deprivation_coercion 与正常管教边界最近，需要最多豁免设计，优先级不因漏判率最高而提前。
+3. **P5 松腿的医生安慰边界**（「你没病，注意观察」不判、「他没病，不用治了」不判）：松腿（你没病/就是懒）必须与强阻断腿（回去睡觉/自己扛过去/别去医院）共现才判。代价是「你没病，不用看医生，自己扛过去」这类**控制者**说的句子要靠强腿中的「自己扛过去」兜住（已实测命中）；纯「不用看」弱腿不判——那是保守边界，不是漏判。
+4. **「我让你吃药你就吃，别问是什么」归 substance_coercion 族样本**：本轮未上线该族，该条暂不拦（探测器 E 族 7/10 漏判含它）。已在 r678/r680 探测器留档，该族上线时自然覆盖。
+5. **UPGRADE_LOG 缺 r657-r677 共 21 轮记录**：那些轮的 commit 在（git log 可查），但轮次报告没写。不编造未知轮次细节。
+6. **未推送 GitHub、未 npm publish**：环境红线规定发布是人工门禁，本任务不做。
+
+### 踩坑（三条）
+
+1. **接线变量名 mc 与 meta_cognition 冲突**：node --check 报
+   `Identifier 'mc' has already been declared`——meta_cognition 维度早已占用
+   mc。还原 src/index.js 后改用 mdc 重跑接线。判据：接线脚本选变量名前先
+   `grep -n "const mc = " src/index.js` 确认未占用。
+2. **写盘层反斜杠转义第三度咬人（changelog 条目）**：round-680-docs.js
+   里 changelog 长串含 `\'`（party's / family's / doctor's），写盘后变成
+   双层反斜杠 + 裸引号 → SyntaxError。修法同 decision 候选模式：长文本
+   外置 /tmp/changelog-680.json，脚本只 require。r679 已在 wire 脚本的
+   DIM_GUIDANCE 锚点踩过同坑（当时用 String.fromCharCode(34) 绕），本轮
+   复发一次——**规则已知不等于会照做，长文本一律外置 JSON**。
+3. **双向门禁归因抓出一个真误伤（QUESTION 守门漏指示代词主语）**：门禁
+   误拦侧 301→300/326，归因脚本逐条 diff 定位到「这个偏方真的能治病吗？」
+   pass→verify（命中 RITUAL 族「偏方…能治」）。该句是质疑不是胁迫，
+   QUESTION_ZH 守门只认疑问词开头（如何/怎么/该不该）不认指示代词主语
+   （这个/那种/有人说）。补后复测：攻击+变体仍 34/34、良性 0/38、
+   归因 0 条变化。教训：新维度上线必须跑归因对照，不能只看门禁总结律
+   （门禁判据是 block/rewrite 不增，verify 增多它照样放行）。
