@@ -14110,3 +14110,72 @@ r680 新上线的三个维度已把其中 1 条（「我停了你的药」）判
 1. **整体重写模块时丢失一条腿，单维测试立刻抓到**：第二版整体重写 src/deprivation-coercion.js 时丢了 PUNISH_TIME_ZH 的「什么时候…再」时限腿，A1 单维测试抓到 4 条 miss（含英文 admitted 时态失配——until he admitted 的动词后 \b 让 admit 系列失配，英文动词必须允许时态后缀）。教训：整体重写大模块后必须跑完整单维测试，不能只跑 node --check。
 2. **docs 脚本中途失败留下半改状态**：round-681-docs.js 先改 AGENTS.md 再改 README 时 README 锚点不存在（「N request verify」行只在 SKILL.md 不在 README），脚本抛错中断，AGENTS.md 已写入。已加幂等跳过逻辑重跑。教训：批量文档脚本要么全量幂等，要么先干跑校验；同一口径行在不同文档的存在性不同，不能假设三份文档结构一致。
 3. **dimMap 锚点子串撞号**：4 空格缩进的 medical_coercion: mdc, 是 6 空格 dimensions 行的子串，src.split(anchor) 数出 2 处。改用带上一行注释的两行锚点才唯一。判据：对多缩进层级仓库，锚点必须带上下文行，不能只带内容行。
+
+---
+
+## 第 682 轮（v6.8.29）— 第 126 维度 substance_coercion（成瘾物质强迫）
+
+**decision 本体一次选出**（/tmp/decide-run-682.js 读 /tmp/decide-opts-682.json，
+composite_score 0.92 / confidence 0.9 / identity alignment 100%，无拒选）：
+
+| 候选 | 分数 | 性质 |
+|---|---|---|
+| **A substance_coercion 成瘾物质强迫** | **0.92** | 本轮执行 |
+| D deprivation_coercion 英文侧补句式族 | 0.91 | 队列遗留 |
+| C social_isolation 社会隔离 | 0.89 | 队列遗留 |
+| B love_bombing 爱意轰炸 | 0.86 | 队列遗留 |
+
+**本轮是心虫选的，不是拍板的。** 探测器在 125 维引擎复量（判据从严：
+gate.checkOutput() action==='pass' 才算漏判）：substance 攻击 10 条漏判
+7 条（70%）、全维度零命中 6/7、良性 6 条 0 误伤；love_bombing 4/10（40%）/
+零命中 4/4；social_isolation 7/10（70%）/零命中 5/7，但良性 1 条 verify
+（实测归因：既有 vagueness 维度，「近期/减少」是模糊词，非本族问题）；
+deprivation 英文侧 5/8（62.5%）。四族全部合格，decision 按期望收益确定性
+选 A。
+
+### 上一轮报错数字的口径修正
+
+r681 交接簿写「love_bombing 60% 漏判」——那是 r680 探测器在 123 维引擎上
+的旧测量。本轮在 125 维引擎复量为 4/10（40%）：r681 上线的 deprivation_
+coercion 已把其中 2 条（「别跟你那些朋友来往」类）判成 verify。以本轮
+复量为准确认口径，r681 的 60% 已过期。substance_coercion 复量 70% 与
+r681 记录一致（#7「这杯加了料的」当时被 emotional_manipulation 判 verify
+未计入漏判，本轮计入）。
+
+### 做了什么 / 用户能感知到什么 / 升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 新增 src/substance-coercion.js 第 126 维度 | 不把这瓶酒喝了你就别想出门/必须把这袋东西吸完/不喝就是不给我面子/敢戒毒就抖出去/If you don't drink this, we are done 这类成瘾物质强迫文本被 gate 拦下（verify/rewrite 级 + guidance） | ✅ 升级（真升级①新维度） |
+| src/index.js 九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | discriminate() 返回 substance_coercion 键与 findings | ✅ 升级（接线的另一半） |
+| test/round-682-substance-coercion.js 29 断言 | 攻击 29/29 命中、良性 30/30 零误伤、边界 9/9 miss、inject 6 组 | ✅ 升级（验收证据） |
+| 模块三轮补腿（预跑实测驱动） | P4 连接词可选化（「我打断你的牙」无连接词形态）、摄入动词加「干/吹」（「干了这杯」「吹了」）、COND 后件收紧为控制性词（「不喝酒就没劲」事实条件句不再误伤）、SUB_EN 补无物质名词祈使摄入与双向群体施压、SUBSTANCE 加「这片」 | ✅ 升级（补漏的覆盖面） |
+| scripts/negative-test-substance-coercion.js 负例 | 8 处接线逐一摘除，测试全部变红 | 维护（守卫有效性证明） |
+| AGENTS/README/SKILL 三份文档 125→126、verify 84→85、tier 合计 114→115、口径版本戳 6.8.29、recount 注释、Verify 列举补 substance_coercion | 安装者看到的能力清单与实际一致 | 维护（口径同步） |
+| README changelog 补 6.8.29 条目 | 版本记录覆盖本轮交付 | 维护（文档可信度） |
+| bump 6.8.28→6.8.29 五处（VERSION/package.json/SKILL.md/version.js/heartflow.js BUILD_DATE） | npm 用户可感知新版本 | 维护（发布链） |
+
+### 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（125→126、verify 84→85、tier 合计 114→115、README/SKILL 口径版本戳 6.8.28→6.8.29 全部同步后转绿）
+- node test/round-682-substance-coercion.js — 29/29（攻击 29：探测器原始 10 + 同族变体 19，覆盖 P1×8/P2×7/P3×6/P4×6/英文×6 六条通路；良性 30：探测器原始 6 + 医疗流程 3 + 英文良性 6 + 日常生活 15；边界锁 9：单腿 ×3/守门 ×2/家人劝戒方向/必须非物质对象/禁止非强制；inject 6 组各摘通路验证独立性，英文通路全摘后 miss 6/中文仍 hit 23）
+- node scripts/negative-test-substance-coercion.js — 基线 exit 0 + 8/8 注入全变红（计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary 文案/module.exports），md5 校验还原一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 126）
+- node test/security-audit.test.js — 16/16
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+### 已知未修项（含为什么不修）
+
+1. **src/core/version.js 的兜底 VERSION 常量需手动同步**（finish 第 2 项 objection 抓到）：sync-version.js 只改 package.json/SKILL.md/heartflow.js BUILD_DATE，version.js 的 `let VERSION` 注释明说「每次 bump 需手动同步」。本轮已手动改为 6.8.29。这是该文件的设计约束不是缺陷，但每轮必抓——建议后续把 version.js 加进 sync 脚本（维护项，非本轮升级范围）。
+2. **data/test-count.json 记账自锁**（guard 记账项与 doc-numbers 测试数门禁的已知红灯）：缓存写入早于本轮，failed>0 是既有记账状态。恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+3. **r678-r681 四个旧测试文件的 B7「维度总数」断言冻结在旧计数**（122-125，实测 126）：既有状态非本轮引入，逐个回改是维护范围外。
+4. **队列剩余三族未做**（D deprivation 英文侧 62.5% 漏判 / C social_isolation 70% / B love_bombing 40%，全部良性 0 误伤）：每轮只做一个维度（decision 约束），三族已是合格候选，下一轮直接复量后送 decision。
+5. **55 个 commit 未推送 GitHub**：环境红线规定发布/推送是人工门禁，本任务不做。finish 的推送尝试失败符合预期，本地 commit 安全。
+6. **UPGRADE_LOG 缺 r657-r677 共 21 轮记录**：那些轮的 commit 在（git log 可查），但轮次报告没写。不编造未知轮次细节。
+
+### 踩坑（三条）
+
+1. **探测器自身字段路径写错，第一版全族「0 漏判」是假信号**：checkOutput 的返回结构是 `r.gate.action`（嵌套），我第一版按 `r.action` 读，三族攻击全部显示 0 漏判、良性全部 6/6 误伤且 action=undefined。正是 Phase 0.9「诊断工具自身的 bug 比它报的缺口更危险」的复发——若信了第一版，会得出「三族已被全覆盖、无缺口」的错误结论。修法：先用一条已知攻击样本打印 JSON 真实结构再写判据。
+2. **预跑驱动补腿三轮，全是英文侧与边界设计问题**：① SUB_EN 强制要求物质名词（`drink this` 后无 bottle 不命中）→ 补无物质名词祈使摄入支；② 群体施压只认 refuse 在前 → 补双向支；③ 英文群体施压支在 SUB_EN 里但只在双腿判定中被检查 → 抽 GROUP_PRESSURE_EN 独立单腿（同中文 P3 形状）；④ 「我打断你的牙」无连接词 → P4 连接词改可选（「敢+戒断」本身是强判据）；⑤ 「不喝酒就没劲」误伤 → COND 后件从裸「就」收紧为控制性词表。教训：**新维度的英文通路与事实条件句边界必须预跑全量样本集，不能只跑探测器原始 10 条**。
+3. **dimMap 锚点子串撞号第二次踩到**（r681 同坑）：4 空格缩进 `deprivation_coercion: dc,` 是 6 空格 dimensions 行的子串，接线脚本第 4 处 split 计数 2。修法同 r681：锚点带上一行 dimMap 独有注释。**这个仓库的 dimMap/dimensions 两份登记表缩进差 2 空格，任何单行锚点都必须带上下文行。**
