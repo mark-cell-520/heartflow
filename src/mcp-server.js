@@ -5172,7 +5172,7 @@ function makeError(id, code, message, data) {
 
 
 
-async function handleRequest(request, sessionId, httpHeaders) {
+async function handleRequest(request, sessionId, httpHeaders, forcedRole) {
 
   const { id, method, params = {} } = request;
 
@@ -5220,10 +5220,15 @@ async function handleRequest(request, sessionId, httpHeaders) {
       const httpAuth = (httpHeaders && (httpHeaders.authorization || httpHeaders.Authorization)) || '';
       const reqOid = (httpHeaders && (httpHeaders['x-heartflow-oid'] || httpHeaders['HeartFlow-OID'])) || '';
       const token = httpAuth.startsWith('Bearer ') ? httpAuth.slice(7) : '';
-      let role = 'guest';
+      // [AUDIT-FIX 2026-10-11] HTTP 层已完成鉴权三态判定，直接采信 forcedRole，
+      // 不再从 headers 重推（旧逻辑「持 token 即 admin」在匿名档放行后会把
+      // 无 token 请求也判成 admin —— 因为 safeCompare('' , token) 为 false 时
+      // role 保持 guest 虽正确，但语义分散两处难维护）。
+      // Unix socket 调用点不传 forcedRole，走下面的 headers 推断保持 admin。
+      let role = forcedRole || 'guest';
       // stdio 模式是本地管道，无 HTTP 身份可验，视为受信
-      if (httpHeaders && httpHeaders.__stdio) role = 'admin';
-      else if (token && typeof AUTH_TOKEN === 'string' && safeCompare(token, AUTH_TOKEN)) {
+      if (!forcedRole && httpHeaders && httpHeaders.__stdio) role = 'admin';
+      else if (!forcedRole && token && typeof AUTH_TOKEN === 'string' && safeCompare(token, AUTH_TOKEN)) {
         role = 'admin';
       }
       const oidMatch = String(reqOid).match(/^HeartFlow-OID-([a-f0-9]{16})$/);
@@ -5428,27 +5433,34 @@ const server = http.createServer((req, res) => {
   
 
   if (AUTH_ENABLED && !safeCompare(token, AUTH_TOKEN)) {
-
-    // [AUDIT-FIX] Token 维度速率限制：记录失败尝试
-
-    const tokenHash = token ? crypto.createHash('sha256').update(token).digest('hex').slice(0, 16) : 'none';
-
-    if (!checkTokenRateLimit(tokenHash)) {
-
-      res.writeHead(429, { 'Content-Type': 'application/json' });
-
-      res.end(JSON.stringify({ error: 'Too Many Auth Failures', retryAfter: 60 }));
-
+    // [AUDIT-FIX 2026-10-11] 三态鉴权：admin（持正确 token）/ guest（匿名只读）/ 拒绝。
+    //
+    // 旧行为是一刀切 401，导致三层权限模型里的 guest 档不可达
+    // （无 token 进不来，持 token 就是 admin），WRITE_TOOLS 的 guest 拦截
+    // 因此是死代码。
+    //
+    // 现在：
+    //   完全没有 token   → 以 guest 身份放行，只允许只读操作
+    //   token 有值但不正确 → 仍然 401（这是攻击信号，绝不放行）
+    //
+    // guest 允许 initialize / tools/list / ping / tools/call 里的非写工具，
+    // 写工具由 tools/call 内的 needsWrite 拦截。
+    if (typeof token === 'string' && token.length > 0) {
+      // 有 token 但不正确 → 明确拒绝
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex').slice(0, 16);
+      if (!checkTokenRateLimit(tokenHash)) {
+        res.writeHead(429, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Too Many Auth Failures', retryAfter: 60 }));
+        return;
+      }
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Unauthorized', message: 'Invalid or missing Bearer token in Authorization header' }));
       return;
-
     }
-
-    res.writeHead(401, { 'Content-Type': 'application/json' });
-
-    res.end(JSON.stringify({ error: 'Unauthorized', message: 'Invalid or missing Bearer token in Authorization header' }));
-
-    return;
-
+    // 匿名 → guest 档继续往下走
+    req.__heartflowRole = 'guest';
+  } else if (AUTH_ENABLED) {
+    req.__heartflowRole = 'admin';
   }
 
 
@@ -5649,7 +5661,7 @@ const server = http.createServer((req, res) => {
 
         }
 
-        const result = await handleRequest(request, sessionId, req.headers);
+        const result = await handleRequest(request, sessionId, req.headers, req.__heartflowRole || 'admin');
 
         if (result !== null) {
 
