@@ -211,6 +211,59 @@ if (!AUTH_TOKEN) {
 
 const AUTH_ENABLED = true;
 
+// ─── 写权限工具白名单（[AUDIT-FIX 2026-10-11] 从 4 个扩到完整集合）───
+// 这些工具会改引擎自身状态、写记忆/审计账本、发起网络请求或触发自愈演化，
+// guest 角色不可调用。user / admin 可调（admin 另有 OID 身份码门槛）。
+//
+// 判据：穿透 handler 转发层后，目标模块含文件写原语或引擎自改入口
+// （writeFileSync/appendFileSync/unlinkSync/mkdirSync/chmodSync/
+//  createWriteStream/process.exit，或引擎属性属写性质）。
+// 静态判据会误判（如 self_benchmark 模块别处有 writeFileSync 但 handler
+// 只调 assess()），故此处为人工核对后的保守集合——宁可多拦，不可漏放。
+const WRITE_TOOLS = new Set([
+  // 记忆写/删/压缩/巩固
+  'heartflow_memory_write_control',
+  'heartflow_memory_eraser',
+  'heartflow_memory_consolidation',
+  'heartflow_memory_compress',
+  'heartflow_memory_integrity',
+  'heartflow_agentic_memory',
+  'heartflow_reflection_memory',
+  'heartflow_meaningful_memory',
+  'heartflow_long_term_memory',
+  'heartflow_meta_memory',
+  'heartflow_memory_bank',
+  'heartflow_project_context',
+  // 审计账本（可被篡改即失去审计意义）
+  'heartflow_retention_log',
+  'heartflow_outbound_ledger',
+  'heartflow_audit_log',
+  'heartflow_audit_trace',
+  // 自愈 / 演化 / 自改
+  'heartflow_self_heal',
+  'heartflow_self_heal_rl',
+  'heartflow_self_healing',
+  'heartflow_self_correction',
+  'heartflow_evolution_loop',
+  'heartflow_evolve',
+  'heartflow_skill_evolution',
+  'heartflow_metacognitive_rl',
+  // 决策写入
+  'heartflow_decision_decide',
+  'heartflow_decision_executor',
+  'heartflow_decision_feedback',
+  // 响应拦截 / 出网
+  'heartflow_response_intercept',
+  'heartflow_safe_fetch',
+  // 熔断（action:'trip' 可手动停引擎）
+  'heartflow_circuit_breaker',
+  // 经验/课程库写入
+  'heartflow_experience_collect',
+  'heartflow_lesson_bank',
+  // 唤醒验证
+  'heartflow_wakeup_verify',
+]);
+
 
 
 // ─── 时间安全的 token 比较（防止 timing attack）───
@@ -5171,8 +5224,22 @@ async function handleRequest(request, sessionId, httpHeaders) {
       if (oidMatch) {
         role = Math.max(['guest','user','admin'].indexOf(role), ['guest','user','admin'].indexOf('user'));
       }
-      const needsWrite = ['heartflow_memory_write_control', 'heartflow_memory_eraser',
-        'heartflow_decision_decide', 'heartflow_self_heal'].includes(name);
+      // [AUDIT-FIX 2026-10-11] 写权限白名单从 4 个扩到完整集合。
+      //
+      // 旧白名单只有 memory_write_control / memory_eraser / decision_decide /
+      // self_heal 四个。但 HANDLERS 有 184 个，其中写操作远不止这四个 ——
+      // 未列出的写工具（self_heal_rl / evolution_loop / memory_consolidation /
+      // retention_log / outbound_ledger / safe_fetch …）对 guest 完全开放。
+      //
+      // 判据来源：穿透 handler 转发层后检查目标模块自身是否含
+      // writeFileSync/appendFileSync/unlinkSync/mkdirSync/chmodSync/
+      // createWriteStream/process.exit（classify-handlers-v2.js 实测），
+      // 再人工核对 handler 实际调用的入口（静态判据会误判，故只作候选）。
+      //
+      // 注意：tools/call 对未在 TOOLS 里列出的 handler 同样放行
+      // （HANDLERS[name] 命中即执行，toolDef 只用于参数清洗），
+      // 所以「没暴露在 tools/list」不等于「调不到」—— 权限必须在这里收口。
+      const needsWrite = WRITE_TOOLS.has(name);
       if (needsWrite && role === 'guest') {
         return { content: [{ type: 'text', text: JSON.stringify({
           error: '权限不足：guest 角色不可写，请升级身份认证'
