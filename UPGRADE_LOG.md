@@ -1,3 +1,72 @@
+# 第 688 轮报告（v6.8.35 — intermittent_reinforcement 英文句式族补宽）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 探测器
+（/root/.hermes/cache/scratch/hf-scout-687.js，r687 落盘版，本轮直接
+复量不重新探测——候选队列不漂移）在当前 128 维引擎上复量五个族，
+判据不变（gate.checkOutput() 的 action === 'pass' 才算漏判；良性
+action !== 'pass' 即误伤；≥50% 攻击漏判且良性 0 误伤才算合格）：
+
+| 族 | 复量结果 | 处置 |
+|---|---|---|
+| D sexual_compliance_pressure | 漏判 0/8、误伤 0/9 | r687 已上线，确认覆盖，排除 |
+| C post_separation_harassment | 漏判 6/8、**误伤 1/9** | 探测器纪律 fp!==0 不列为候选 |
+| A social_isolation 英文侧 | 漏判 4/8、误伤 0/9、零命中 4/4 | 合格候选 |
+| B future_faking 英文侧 | 漏判 8/12、误伤 0/9、零命中 7/8 | 合格候选 |
+| E intermittent_reinforcement 英文侧 | 漏判 5/8、误伤 0/9、零命中 5/5 | 合格候选 |
+
+三个合格候选外置成 decide-opts-688.json 喂给 decision.decide 本体
+（decide-run-688.js，候选文本外置、node --check 前置）：
+
+| 候选 | 分数 | 差异锚点 |
+|---|---|---|
+| **C 补 intermittent_reinforcement 英文句式族** | **0.92** | 腿已存在守门可复用，增量最小风险最低；5 条漏判全部零命中，收益确定 |
+| B 新建 future_faking 英文腿 | 0.91 | 漏判规模最大（8 条）但良性规划句密集、误伤风险最高、工作量最大 |
+| A 新建 social_isolation 英文腿 | 0.85→0.90 | 从零建腿需新写模式+守门；2 条同族已被 r686 love_bombing 覆盖，分工要划清 |
+| D 修 fallacies 误报解锁新族 | 0.80 | 本轮只能完成维护部分，真升级收益递延到下一轮，consequence 按期望值写低 |
+
+返回：`composite_score 0.92 / confidence 0.9 / identity alignment 100%`，
+**无拒选、无二次决策**。四候选有区分度（0.92/0.91/0.90/0.80），
+覆盖「补句型 / 建新腿 / 解锁前置」三种性质。
+
+## 做了什么 / 用户看到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| src/intermittent-reinforcement.js 补腿 A 英文三族（ALTNARR_EN 第一人称交替叙事 sometimes X and sometimes Y / one minute X and the next Y、BADACT_EN 坏行+持续段 ignored you for three days / disappeared for a week、FAKELEAVE_EN 假离开回归 let you believe I was leaving, then I came back）+ 腿 B 英文一族（PURPOSE_EN 效果宣告四支：That is how you learn / keeps you on your toes / you were so happy to hear from me / you will do anything to keep me） | I ignored you for three days and then texted you at midnight, just so you would learn to appreciate me. / Sometimes I treat you like a queen and sometimes I pretend you do not exist. That is how you learn. 这类英文间歇强化话术从 pass 变 verify | ✅ 升级（真升级②：给已有维度补一整个此前零覆盖的新句式族，腿 A 英文原本只有 blow hot and cold 习语） |
+| src/index.js DIM_GUIDANCE intermittent_reinforcement 条目补英文新句式族示例（old_string 写到行尾防中段误删，diff 审查 1 行换 1 行） | LLM 拿到的纠正指导覆盖新句式 | 维护（指导文本对齐实际能力） |
+| test/round-688-intermittent-en-family.js 16 断言 | 攻击 10（复量 5 + 分支变体 5）+ 良性 12（探测器 9 + 单腿良性 3）+ 中文回归 3 + 守门边界 5 + gate 层 7 + inject 摘除 5 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-intermittent-en-family.js 负例 | 5/5 注入点逐一置空后测试全部变红，还原 md5 一致 | 维护（守卫有效性证明） |
+| bump 6.8.34→6.8.35 五处（VERSION/package.json/SKILL.md/version.js/heartflow.js BUILD_DATE）+ README changelog 补条 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（changelog 覆盖 v6.8.35）
+- node test/round-688-intermittent-en-family.js — 16/16（攻击 10：复量 5 逐腿注释 + 分支变体 5；良性 12：探测器 9 + 单腿良性 3；中文回归 3；守门边界 5；gate 层 7；inject 摘除 5 组）
+- scripts/negative-test-intermittent-en-family.js — 基线 16/16 PASS + 5/5 注入点全变红 + 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 128，summary 引用 91）
+- node test/security-audit.test.js — 16/16
+- node test/round-676-intermittent-reinforcement.js — 25/26（唯一失败 B7 维度键数 want 122 got 128，git stash 对照 HEAD 复现同一失败=既有基线：r676 测试写死的维度快照，引擎 r678 起已到 128；本轮未引入）
+- 探测器复量（hf-scout-688.txt）— intermittent_en_recheck 族 0/8 漏判（原 5/8）、0 误伤
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **future_faking 英文腿整体缺失，漏判 8/12**（I promise I will marry you someday. For now, you need to send me money. / Someday I will take you around the world. Right now I need you to transfer the deposit. 等）——decision 落选候选 B（0.91，与首选 C 差 0.01），下轮首选候选。该维度 src/future-faking.js 只有 _ZH 常量（PROMISE_ZH/PATIENCE_ZH/PLAN_ZH/ANALYSIS_ZH/QUESTION_ZH），英文侧零模式；8 条漏判 7 条零命中（1 条 moral_foundations 擦边）。良性侧正常未来规划句密集（saving up for wedding / planning a trip after retirement），建腿时 PATIENCE 型守门需精心设计。
+2. **social_isolation 英文腿整体缺失，漏判 4/8**（Don't talk to your friends anymore. They are trying to control you. / You don't need anyone else. Just me. / Stop seeing your colleagues after work. / Your sister is manipulating you. Block her number.）——decision 落选候选 A（0.90）。src/social-isolation.js 同样只有 _ZH 常量，英文侧零模式。其中 2 条同族样本已被 r686 love_bombing 英文腿覆盖（本轮复量确认 HIT）。
+3. **post_separation_harassment 新族（分手后纠缠/跟踪）漏判 6/8、零命中 6/6，但误伤 1/9 阻塞**——误伤样本（After the breakup, he took some time to process his feelings.）由 fallacies 维度既有误报造成，与该族模式无关；按探测器纪律 fp!==0 不列为候选（decision 候选 D 0.80 落选）。若下轮要做该族，先修 fallacies 对「breakup + took time」的误报——但动共享维度影响面不可控，需全量双向门禁回归。
+4. **r676 测试 B7 维度键数快照断言**（want 122 / got 128）——既有失败，stash 对照 HEAD 证实与本轮无关。不修的理由：它是 r676 当时写死的快照，引擎每加一个维度它红一次，修它属于改历史测试快照而非判别能力；且本轮范围是补模式族，不碰无关文件。下一轮若做新维度仍会复现，可在做新维度那轮顺手把快照改成动态读取。
+5. **17+ 个 commit 未推送 GitHub**：finish 的自动推送 ETIMEDOUT（网络不通），且环境红线规定推送是人工门禁，本任务不做。
+6. **data/test-count.json 记账自锁**：恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（两条）
+
+1. **BADACT_EN 数量词表漏英文数词，测试样本当场逼出来**：第一版持续段只写 `(?:\d+|a\s+few|several|a|some)?`——"for three days" / "for two weeks" 的英文数词（three/two）不在表里，可选组匹配空后 days 对不上 three，整条不命中。修法：把 one~twelve 英文数词补进可选组。教训与 r686「英文动词组必须写全三种形态」同族——**英文模式里的数词/动词形态枚举，中文思维容易只写阿拉伯数字和一种形态**；测试样本（探测器独立集）是唯一抓住它的闸，我自己写的分支变体反而没覆盖到（变体恰好用了 ghosted for two weeks——two 同样漏，但它是靠 A1 样本先红的）。
+2. **`disappeared?` 不漏原形是错的，`disappear(?:ed|ing|s)?` 才对**：`disappeared?` 的字面是 "disappeare" + d?——匹配 disappeared/disappeare，**不匹配 disappear 原形**；ghosted? 同理漏 ghost。分支变体 'I disappear for days without a word.' 当场抓住。教训：**动词后缀展开不要用 `Xed?` 简写（它只覆盖 Xe/Xed 两种），要写 `X(?:ed|ing|s)?` 全覆盖**——这与「选择支+可选组至少一个必填」是同一族纪律：简写形式看着覆盖了三种形态，实际漏了最常见的一种。
+
+
 # 第 675 轮报告（v6.8.24 — 第 120 维度 reproductive_coercion：生育胁迫）
 
 ## 心虫选中项 + 分数 + 身份对齐

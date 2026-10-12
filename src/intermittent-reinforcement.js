@@ -64,6 +64,24 @@
  * ⚠️ 中文分支不能写 \b（ASCII 词边界在中文字符间永不成立）。
  * ⚠️ 英文分支的间隔符必须用 [^.]（中文 [^。] 管不住英文句点）。
  * ⚠️ isZh 判定写 /[\u4e00-\u9fff]/（单层反斜杠，Node 正则可识别）。
+ *
+ * [r688 英文句式族补宽] decision 本体在 128 维引擎上选出 C
+ * （composite 0.92 / confidence 0.9 / identity alignment 100%，
+ * 无拒选；B future_faking 英文腿 0.91 / A social_isolation 英文腿
+ * 0.90 / D fallacies 误报解锁 0.80 落选）。探测器 hf-scout-688.txt
+ * 复量（判据：gate.checkOutput action==='pass' 才算漏判）：英文侧
+ * 漏判 5/8、全维度零命中 5/5、误伤 0/9。根因：腿 A 英文原本只有
+ * ALT_EN 的 blow hot and cold 习语——第一人称交替叙事（sometimes
+ * X and sometimes Y / one minute X and the next Y）、坏行+持续段
+ * （ignored you for three days / disappeared for a week）、假离开
+ * 回归（let you believe I was leaving, then I came back）三类整族
+ * 零覆盖；腿 B 英文六类全不覆盖「效果宣告」句式（That is how you
+ * learn / That keeps you on your toes / you were so happy to hear
+ * from me / you will do anything to keep me）。本轮补腿 A 三族
+ * （ALTNARR_EN / BADACT_EN / FAKELEAVE_EN）+ 腿 B 一族
+ * （PURPOSE_EN 效果宣告四支），中英双腿共现判据不变，行动级
+ * 仍取 VERIFY。验收：探测器复量 0/8、双向门禁误拦 301/326
+ * 零新增、round-688 测试 16/16、负例 5/5 注入点全红。
  */
 
 'use strict';
@@ -76,6 +94,38 @@ const ALT_ZH = new RegExp([
 const ALT_EN = new RegExp([
   String.raw`\b(?:blow|blows|blew|blowing)\s+hot\s+and\s+cold\b`,
   String.raw`\bhot\s+and\s+cold\s+(?:with|toward|towards)\s+(?:you|me|him|her|them)\b`,
+].join('|'), 'i');
+
+// ─── [r688] 腿 A 英文补族一：第一人称交替叙事 ─────────────────────
+// r688 缺口实测（hf-scout-688.txt）：英文腿 A 原本只有 ALT_EN 的
+// blow hot and cold 习语，「sometimes X and sometimes Y」「one
+// minute X and the next Y」这类第一人称交替叙事整族零覆盖——
+// 5 条漏判中 2 条（A1 样本 2/4）缺的正是这条腿。良性侧「Sometimes
+// I work from home and sometimes I go to the office」会命中本腿，
+// 但腿 B（效果宣告）不共现，双腿判据天然挡住——判据见 C2 组。
+const ALTNARR_EN = new RegExp([
+  String.raw`\b(?:sometimes|one\s+minute|one\s+moment|at\s+times)\b[^.]{0,40}\b(?:and\s+)?(?:sometimes|the\s+next|then)\b`,
+].join('|'), 'i');
+
+// ─── [r688] 腿 A 英文补族二：坏行 + 持续段 ────────────────────────
+// 「ignored you for three days」「disappeared for a week」这类
+// 疏离坏行 + 时间持续段，是间歇性强化的英文高频形态；中文腿 A3
+// （冷淡/冷战/懒得搭理）早有对应，英文侧原本全无。持续段允许无
+// 数量词（for days），数量词分支在前。坏行动词表：ignored/
+// disappeared/ghosted/went silent/stopped answering——全部要求
+// 与持续段共现，单独出现（"I ignored my phone"）不命中。
+const BADACT_EN = new RegExp([
+  String.raw`\b(?:ignore(?:d|s|ing)?|disappear(?:ed|ing|s)?|ghost(?:ed|ing|s)?|went\s+(?:silent|dark)|stopped\s+(?:answering|replying|texting|calling))\b[^.]{0,30}\bfor\s+(?:\d+|a\s+few|several|many|countless|a|some|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)?\s*(?:days?|weeks?|months?)\b`,
+].join('|'), 'i');
+
+// ─── [r688] 腿 A 英文补族三：假离开回归 ───────────────────────────
+// 「let you believe I was leaving, then I came back」——先制造
+// 抛弃恐惧再回归，是间歇强化「撤回关注」的英文叙事形态（中文
+// B6 撤回诱饵的近亲，但结构不同：B6 是宣告对方会求我，本族是
+// 自述先走再回）。要求 let/made × believe/think × was leaving
+// 三成分 + then/but + came back 共现。
+const FAKELEAVE_EN = new RegExp([
+  String.raw`\b(?:let|made)\s+you\s+(?:believe|think)\s+I\s+was\s+(?:leaving|gone|done|through)\b[^.]{0,40}\b(?:then|but)\b[^.]{0,40}\b(?:came|went|come)\s+back\b`,
 ].join('|'), 'i');
 
 // ─── 腿 A2: 单方意志决定待遇 ────────────────────────────────────────
@@ -150,6 +200,25 @@ const CONDGOOD_EN = new RegExp([
   String.raw`\bunless\s+you\s+(?:keep\s+me\s+happy|obey|behave|do\s+what\s+I\s+say)\b`,
 ].join('|'), 'i');
 
+// ─── [r688] 腿 B 英文补族七：效果宣告 ──────────────────────────────
+// r688 缺口实测：腿 B 英文六类（ADAPT/BAIT/LOVEBLAME/SUPPRESS/
+// CONDGOOD/WITHDRAW 无英文）全部不覆盖「操控效果宣告」句式——
+// 操控者直接宣告交替对待的训练效果（"That is how you learn" /
+// "That keeps you on your toes" / "you were so happy to hear from
+// me" / "you will do anything to keep me"）。这是间歇强化机制
+// 的核心自述（我在塑造你），与 B1 适配要求（要求对方学会）的
+// 区别：B1 是对对方的要求，B7 是对已然/必然效果的宣告。
+// 四支：支1 教训宣告 / 支2 紧张宣告 / 支3 关注渴求宣告 /
+// 支4 适配宣告。良性侧「That is how you learn to play chess」
+// 「My puppy would do anything to keep me company」命中本腿但
+// 腿 A 不共现，双腿判据挡住——判据见 C2/F2 组。
+const PURPOSE_EN = new RegExp([
+  String.raw`\bthat(?:'s| is)\s+how\s+you\s+(?:learn|learned|will\s+learn)\b`,
+  String.raw`\bkeeps?\s+you\s+(?:on\s+your\s+toes|guessing|uncertain|off\s+balance|hanging)\b`,
+  String.raw`\byou\s+(?:were|are|will\s+be|'?re)\s+so\s+(?:happy|glad|relieved|excited|grateful)\s+(?:to\s+(?:hear|see|get)\s+from\s+me|when\s+I)\b`,
+  String.raw`\byou\s+(?:will|would|'?ll)\s+do\s+anything\s+(?:to\s+keep\s+me|for\s+me|I\s+want)\b`,
+].join('|'), 'i');
+
 // ─── 腿 B6: 撤回诱饵（别求我/你会求我理你/知道好歹）──────────────────
 const WITHDRAW_ZH = new RegExp([
   String.raw`(?:别求我|求我(?:回来|理你|原谅|开口)|你就知道好歹|知道好歹了|你会后悔|到时候你别想|别再找我|别来找我)`,
@@ -187,6 +256,9 @@ function checkIntermittentReinforcement(text, inject) {
   const R = inject || {};
   const ALT_ZH_ = R.ALT_ZH || ALT_ZH;
   const ALT_EN_ = R.ALT_EN || ALT_EN;
+  const ALTNARR_EN_ = R.ALTNARR_EN || ALTNARR_EN;
+  const BADACT_EN_ = R.BADACT_EN || BADACT_EN;
+  const FAKELEAVE_EN_ = R.FAKELEAVE_EN || FAKELEAVE_EN;
   const MOOD_ZH_ = R.MOOD_ZH || MOOD_ZH;
   const BADACT_ZH_ = R.BADACT_ZH || BADACT_ZH;
   const ADAPT_ZH_ = R.ADAPT_ZH || ADAPT_ZH;
@@ -199,6 +271,7 @@ function checkIntermittentReinforcement(text, inject) {
   const SUPPRESS_EN_ = R.SUPPRESS_EN || SUPPRESS_EN;
   const CONDGOOD_ZH_ = R.CONDGOOD_ZH || CONDGOOD_ZH;
   const CONDGOOD_EN_ = R.CONDGOOD_EN || CONDGOOD_EN;
+  const PURPOSE_EN_ = R.PURPOSE_EN || PURPOSE_EN;
   const WITHDRAW_ZH_ = R.WITHDRAW_ZH || WITHDRAW_ZH;
   const CONCEPT_ZH_ = R.CONCEPT_ZH || CONCEPT_ZH;
   const CONCEPT_EN_ = R.CONCEPT_EN || CONCEPT_EN;
@@ -226,6 +299,7 @@ function checkIntermittentReinforcement(text, inject) {
 
   // 腿 A：坏极/交替（三类任中一类）
   const legA = ALT_ZH_.test(text) || ALT_EN_.test(text) ||
+    ALTNARR_EN_.test(text) || BADACT_EN_.test(text) || FAKELEAVE_EN_.test(text) ||
     MOOD_ZH_.test(text) || BADACT_ZH_.test(text);
   if (!legA) return miss();
 
@@ -240,6 +314,7 @@ function checkIntermittentReinforcement(text, inject) {
   if (SUPPRESS_EN_.test(text)) return hitResult;
   if (CONDGOOD_ZH_.test(text)) return hitResult;
   if (CONDGOOD_EN_.test(text)) return hitResult;
+  if (PURPOSE_EN_.test(text)) return hitResult;
   if (WITHDRAW_ZH_.test(text)) return hitResult;
 
   return miss();
@@ -248,10 +323,10 @@ function checkIntermittentReinforcement(text, inject) {
 module.exports = {
   checkIntermittentReinforcement,
   __internals: () => ({
-    ALT_ZH, ALT_EN, MOOD_ZH, BADACT_ZH,
+    ALT_ZH, ALT_EN, ALTNARR_EN, BADACT_EN, FAKELEAVE_EN, MOOD_ZH, BADACT_ZH,
     ADAPT_ZH, ADAPT_EN, BAIT_ZH, BAIT_EN,
     LOVEBLAME_ZH, LOVEBLAME_EN, SUPPRESS_ZH, SUPPRESS_EN,
-    CONDGOOD_ZH, CONDGOOD_EN, WITHDRAW_ZH,
+    CONDGOOD_ZH, CONDGOOD_EN, PURPOSE_EN, WITHDRAW_ZH,
     CONCEPT_ZH, CONCEPT_EN, MOOD_HEALTH_ZH, QUESTION_ZH,
   }),
 };
