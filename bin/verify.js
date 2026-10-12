@@ -154,6 +154,36 @@ if (engine) {
   try { engine.stop(); } catch(e) { /* stop may fail on circular ref */ }
 }
 
+// 4b. [r422] 对外入口 gate.js 校验 —— 修「自检走 heartflow.js，用户走 gate.js」的盲区
+//
+// 历史问题（外部审计发现 2 实证）：verify.js 全部 14 项都测 src/core/heartflow.js，
+// 而 README「Use it in 30 seconds」和所有文档承诺的入口是 src/gate.js 的
+// gate.checkOutput()。两条路径不同源 —— 裁剪发布时实测遇到过
+// 「verify.js 报 12/14 全绿，但 gate.checkOutput 一调就 MODULE_NOT_FOUND」
+// （维度文件漏入库，heartflow.js 那条路不碰它所以不报）。
+//
+// 判据：不猜、不静态扫，真的调一次 checkOutput，要求返回四档之一的 action。
+check('gate.js 入口可用（README 招牌路径）', () => {
+  const gatePath = path.join(HF_DIR, 'src/gate.js');
+  if (!fs.existsSync(gatePath)) throw new Error('src/gate.js 不存在');
+  const gate = require(gatePath);
+  if (typeof gate.checkOutput !== 'function') throw new Error('gate.checkOutput 不是函数');
+  const r = gate.checkOutput('According to 2025 Harvard research, coffee extends life by 12.5 years');
+  if (!r || !r.gate || !['pass', 'verify', 'rewrite', 'block'].includes(r.gate.action)) {
+    throw new Error('checkOutput 未返回四档裁决: ' + JSON.stringify(r && r.gate));
+  }
+  // verdict 必须与 action 一致（文档承诺「verdict is derived from gate.action」）
+  if (!r.verdict) throw new Error('缺少 verdict 字段');
+});
+
+// 4c. [r422] 三个入口函数都在（checkInput / checkDraft / checkOutput）
+check('三个对外入口函数齐全', () => {
+  const gate = require(path.join(HF_DIR, 'src/gate.js'));
+  for (const fn of ['checkInput', 'checkDraft', 'checkOutput']) {
+    if (typeof gate[fn] !== 'function') throw new Error(`gate.${fn} 不是函数`);
+  }
+});
+
 // 6. npm 依赖检查
 check('npm 必选依赖为空', () => {
   const pkg = require(path.join(HF_DIR, 'package.json'));

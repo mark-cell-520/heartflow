@@ -95,7 +95,10 @@ console.log('\n=== 异步分支 ===');
   const { execSync } = require('child_process');
   const out = execSync('node bin/verify.js', { cwd: HF, encoding: 'utf8', timeout: 240000 });
   const pm = out.match(/(\d+) passed/), fm = out.match(/(\d+) failed/);
-  T('passed = 14', pm ? +pm[1] : 0, 14);
+  // [r422] 16 = 原 14 项 + r422 新增的 gate.js 入口校验与三入口函数检查。
+  // 这个断言是「改严后不能误杀现有检查」的回归哨兵：若 verify.js 因改动
+  // 把原有检查打红，这里会立刻发现（而不是等用户跑安装自检时才暴露）。
+  T('passed = 16', pm ? +pm[1] : 0, 16);
   T('failed = 0', fm ? +fm[1] : 0, 0);
 
   console.log(`\n结果: ${pass} 通过, ${fail} 失败, 共 ${pass + fail} 个`);

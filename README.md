@@ -73,7 +73,7 @@ no runtime dependencies.
 ```bash
 git clone https://github.com/mark-cell-520/heartflow.git
 cd heartflow
-node bin/verify.js        # 14 installation checks
+node bin/verify.js        # 16 installation checks (incl. the gate.js entry README itself uses)
 node bin/cli.js status    # engine status
 node bin/cli.js chat      # interactive console
 ```
@@ -172,7 +172,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.37**. Not marketing copy.
+Measured on this repository at **v6.8.38**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -252,7 +252,7 @@ Each is available as an MCP tool (`heartflow_check_completion_evidence`,
 ## Tests
 
 ```bash
-node bin/verify.js                     # installation checks (14)
+node bin/verify.js                     # installation checks (16)
 node scripts/guard-abilities.js        # capability guardian (20 checks)
 node test/doc-numbers-accuracy.test.js # documentation-number guard
 node test/security-audit.test.js       # security regression (16)
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.38 | 2026-10-12 | `social_isolation` (dimension 106) gains its English legs — 8 new ISOLATE families (negative wish: I do not want you to see / stop + -ing + with-to / no more + -ing / delete-or-block group reference / cut off + object fronted: cut off all your friends / exclusive contact: you only need me / nobody else matters) plus 6 new COERCE families (bad-influence disparagement: they are a bad influence / love condition: if you love me / prohibition declaration: I forbid it / anymore implicit-finality declaration / possession declaration: you belong to me only / from now on + second-person directive), 7/8 leaks closed (8/8 all caught after the chat-doubling fix), 0/25 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged |
 | 6.8.37 | 2026-10-12 | **A 129th dimension: `post_separation_harassment`** — after the relationship ends (or the other party has asked to end it / has blocked), one party denies the other's autonomy to separate via on-site pursuit, repeated contact, stalking-knowledge, refusal to accept the breakup, and ledger-style whereabouts control: two-leg coexistence (separation event × harassment in four families — on-site/repeated contact / knowledge threat / refusal to accept / whereabouts ledger), 8/8 leaks closed, 0/23 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged |
 | 6.8.36 | 2026-10-12 | `future_faking` gains its English legs — seven new PROMISE families (far-future time word + will + promise verb / promise verb + far-future word after / unilateral-will condition both word orders / business-success benefit / divorce-reunion declaration / unconditional care-forever) plus four new PATIENCE families (present-time word + demand-to-me / demand-before-time / compliance-type demand / desire-price), 10/12 leaks closed, 0/20 benign harmed, bidirectional guard 301/326 unchanged |
 | 6.8.35 | 2026-10-12 | `intermittent_reinforcement` gains three whole new English families on leg A (first-person alternating narrative / bad-act-plus-duration / fake-departure-return) plus a new leg B family (effect declaration, four branches) — 5/8 leaks closed, 0/9 benign harmed, bidirectional guard 301/326 unchanged |
