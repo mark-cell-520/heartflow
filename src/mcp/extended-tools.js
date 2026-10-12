@@ -1,18 +1,37 @@
 /**
- * extended-tools.js — 运行时验证过的只读工具集（2026-10-11 自动生成）
+ * extended-tools.js — 运行时验证过的无 fs 副作用工具集
  *
- * 来源：全局审计 P1-1「117 个 handler 未暴露」。116 个未暴露 handler 经
- * **运行时验证**（启动 server → JSON-RPC tools/call 真调 → fs 快照比对
- * mtime+size）确认无副作用后纳入本表。
+ * 来源：全局审计 P1-1「117 个 handler 未暴露」。
  *
- * 为何不用静态分析：静态判据两个方向都误判过 ——
+ * ## 验证方法（唯一可信判据）
+ * 启动真实 server → JSON-RPC tools/call 真调 → fs 快照比对 mtime+size。
+ * 静态分析两个方向都误判过：
  *   · 按 handler 体正则：把 heartflow_memory_write_control 判成纯读（名字没 write）
  *   · 穿透目标模块：把 heartflow_self_benchmark 判成写（模块别处有 writeFileSync，
  *     实际它确实会落盘 data/self-benchmark.json，但那是运行时才发现的）
  * 只有 fs 快照比对是确定性的。
  *
- * 排除项（有 fs 副作用，不纳入）：
- *   heartflow_self_benchmark → 写 data/self-benchmark.json
+ * ## r419 补验（2026-10-12）：29 个从未被验证的 handler
+ * 首轮 exposure-candidates.json 只有 clean 72 + dirty 1 + errored 14 = 87，
+ * 而当时差集是 117 —— **29 个从未进入验证**，既没暴露也没排除。
+ * r419a 用空参数测，29 个全"零变化"，但那是无效证据：空参数让
+ * memory_write_control 之类走了参数错误分支，根本没执行。
+ * r419b/r419c/r419d 改为：多组最小有效参数（text/query/action）+ 等 5 秒
+ * + 进程退出后再比一次，并用 self_benchmark 作**阳性对照**证明检测有效
+ * （它确实让 data/self-benchmark.json 的 mtime 改变）。28 个通过。
+ *
+ * ## r419 新发现：三个"假成功"工具
+ * heartflow_evolve 返回 {learned: true, lesson: "default experience"}
+ * heartflow_audit_log 返回 {recorded: true}
+ * heartflow_memory_write_control 返回 {timestamp: ...}
+ * 三者 5 秒后 + 进程退出后 fs 均零变化 —— 声称成功但**不落盘**，只在内存。
+ * 它们因此满足"无 fs 副作用"被纳入本表，但调用方不应把返回值当持久化证据。
+ * （此问题记录待修，不影响本次暴露决策。）
+ *
+ * ## 排除项
+ *   heartflow_self_benchmark → 写 data/self-benchmark.json（r419 复测确认）
+ *   heartflow_safe_fetch     → 能发任意网络请求，SSRF 面（引擎内有
+ *                               url-validator.js 防护但未在此路径复用）
  *
  * 写工具（WRITE_TOOLS）不在此表，由 mcp-server.js 的 needsWrite 收口。
  *
@@ -77,6 +96,72 @@ const EXTENDED_TOOLS = [
     "inputSchema": {
       "type": "object",
       "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_agentic_memory",
+    "description": "agentic memory（index）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "type": "string",
+          "description": "input（可选）"
+        },
+        "output": {
+          "type": "string",
+          "description": "output（可选）"
+        },
+        "context": {
+          "type": "string",
+          "description": "context（可选）"
+        },
+        "limit": {
+          "type": "string",
+          "description": "limit（可选）"
+        },
+        "action": {
+          "type": "string",
+          "description": "操作类型（可选，不给则由工具自行决定默认行为）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_audit_log",
+    "description": "audit log（audit-logger）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "description": "event（可选）"
+        },
+        "action": {
+          "type": "string",
+          "description": "操作类型（可选，不给则由工具自行决定默认行为）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_audit_trace",
+    "description": "audit trace（trace-chain）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "reason（可选）"
+        },
+        "action": {
+          "type": "string",
+          "description": "操作类型（可选，不给则由工具自行决定默认行为）"
+        }
+      },
       "required": []
     }
   },
@@ -431,6 +516,42 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_decision_executor",
+    "description": "decision executor（decision-executor）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": "string",
+          "description": "decision（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_decision_feedback",
+    "description": "decision feedback。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": "string",
+          "description": "decision（可选）"
+        },
+        "outcome": {
+          "type": "string",
+          "description": "outcome（可选）"
+        },
+        "notes": {
+          "type": "string",
+          "description": "notes（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
     "name": "heartflow_decision_instruction",
     "description": "decision instruction（philosophy-to-decision）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {
@@ -570,6 +691,15 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_evolution_loop",
+    "description": "evolution loop（loop）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
     "name": "heartflow_evolutionary_search",
     "description": "evolutionary search（index）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {
@@ -612,6 +742,20 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_evolve",
+    "description": "evolve（meta-learner）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "experience": {
+          "type": "string",
+          "description": "experience（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
     "name": "heartflow_executable_reasoning",
     "description": "executable reasoning（index）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {
@@ -632,6 +776,20 @@ const EXTENDED_TOOLS = [
         "action": {
           "type": "string",
           "description": "操作类型（可选，不给则由工具自行决定默认行为）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_experience_collect",
+    "description": "experience collect（experience-collector）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "experience": {
+          "type": "string",
+          "description": "experience（可选）"
         }
       },
       "required": []
@@ -809,6 +967,28 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_lesson_bank",
+    "description": "lesson bank（lesson-bank-adapter）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "query（可选）"
+        },
+        "q": {
+          "type": "string",
+          "description": "q（可选）"
+        },
+        "limit": {
+          "type": "string",
+          "description": "limit（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
     "name": "heartflow_lesson_search",
     "description": "lesson search（lesson-retrieval）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {
@@ -849,6 +1029,20 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_long_term_memory",
+    "description": "long term memory（long-term-memory）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "query（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
     "name": "heartflow_meaning",
     "description": "meaning（meaning-purpose-engine）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {
@@ -857,6 +1051,84 @@ const EXTENDED_TOOLS = [
         "text": {
           "type": "string",
           "description": "text（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_meaningful_memory",
+    "description": "meaningful memory（meaningful-memory）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "text（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_memory_bank",
+    "description": "memory bank（memory-bank）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "query（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_memory_compress",
+    "description": "memory compress（memory-compressor）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "memory": {
+          "type": "string",
+          "description": "memory（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_memory_consolidation",
+    "description": "memory consolidation（memory-consolidation-engine）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "memory": {
+          "type": "string",
+          "description": "memory（可选）"
+        },
+        "age": {
+          "type": "string",
+          "description": "age（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_memory_integrity",
+    "description": "memory integrity（memory-integrity）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "memory": {
+          "type": "string",
+          "description": "memory（可选）"
+        },
+        "action": {
+          "type": "string",
+          "description": "操作类型（可选，不给则由工具自行决定默认行为）"
         }
       },
       "required": []
@@ -877,6 +1149,20 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_memory_write_control",
+    "description": "memory write control（memory-write-controller）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "type": "string",
+          "description": "profile（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
     "name": "heartflow_mental_effort",
     "description": "mental effort（mental-effort-tracker）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {
@@ -887,6 +1173,15 @@ const EXTENDED_TOOLS = [
           "description": "task（可选）"
         }
       },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_meta_memory",
+    "description": "meta memory（metaMemory）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
       "required": []
     }
   },
@@ -937,6 +1232,20 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_metacognitive_rl",
+    "description": "metacognitive rl（metacognitive-rl）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "text（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
     "name": "heartflow_mood",
     "description": "mood（mood-evolution）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {
@@ -973,6 +1282,20 @@ const EXTENDED_TOOLS = [
         "observation": {
           "type": "string",
           "description": "observation（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_outbound_ledger",
+    "description": "outbound ledger（outbound-ledger）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "操作类型（可选，不给则由工具自行决定默认行为）"
         }
       },
       "required": []
@@ -1030,6 +1353,20 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_project_context",
+    "description": "project context（project-context）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "project（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
     "name": "heartflow_psychology_engine",
     "description": "psychology engine（engine）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {
@@ -1067,6 +1404,20 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_reflection_memory",
+    "description": "reflection memory（reflection-memory）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "memory": {
+          "type": "string",
+          "description": "memory（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
     "name": "heartflow_reflexion",
     "description": "reflexion（reflexion-engine）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {
@@ -1081,11 +1432,85 @@ const EXTENDED_TOOLS = [
     }
   },
   {
+    "name": "heartflow_response_intercept",
+    "description": "response intercept（response-interceptor）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "text（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_retention_log",
+    "description": "retention log（retention-logger）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "操作类型（可选，不给则由工具自行决定默认行为）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_self_correction",
+    "description": "self correction（self-correction-loop）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "type": "string",
+          "description": "input（可选）"
+        },
+        "correction": {
+          "type": "string",
+          "description": "correction（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
     "name": "heartflow_self_diagnose",
     "description": "self diagnose（self-diagnosis）。只读工具，无副作用（运行时 fs 快照验证）。",
     "inputSchema": {
       "type": "object",
       "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_self_heal_rl",
+    "description": "self heal rl（self-healing-rl）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "string",
+          "description": "context（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_self_healing",
+    "description": "self healing（self-healing）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "string",
+          "description": "context（可选）"
+        }
+      },
       "required": []
     }
   },
@@ -1107,6 +1532,20 @@ const EXTENDED_TOOLS = [
         "signal": {
           "type": "string",
           "description": "signal（可选）"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_skill_evolution",
+    "description": "skill evolution（skill-evolution-engine）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "skill": {
+          "type": "string",
+          "description": "skill（可选）"
         }
       },
       "required": []
@@ -1277,6 +1716,15 @@ const EXTENDED_TOOLS = [
           "description": "text（可选）"
         }
       },
+      "required": []
+    }
+  },
+  {
+    "name": "heartflow_wakeup_verify",
+    "description": "wakeup verify（wake-up-verifier）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
       "required": []
     }
   },
