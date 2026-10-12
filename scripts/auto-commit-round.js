@@ -59,10 +59,58 @@ const tracked = status
   .filter(l => /^\s*[MADRCU]/.test(l))
   .map(l => l.slice(3).trim().split(' -> ').pop());
 const untracked = status.filter(l => /^\?\?/.test(l));
+// [r420] require 完整性门禁用：O(1) 判断某文件是否已被跟踪
+const trackedSet = new Set(execSync('git ls-files', { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean));
 
 if (tracked.length === 0) {
   console.log('[auto-commit] 工作区无已跟踪文件改动 —— 无需自动提交');
   process.exit(0);
+}
+
+// ②b [r420] require 完整性门禁 —— 补上"新文件遗漏"这个洞
+//
+// 外部审计发现 1（严重）：src/index.js require('./economic-control.js')，
+// 但该文件从未入库，全新克隆跑 README 示例立即 MODULE_NOT_FOUND。
+// 根因就是上面 ② 的设计：只 add 已跟踪的 M/D，未跟踪文件一律视为
+// 探针垃圾。于是 AI 循环每轮新建的源文件永远进不了 git，而引用它的
+// index.js 可以正常入库 —— "防垃圾"防住了，"防遗漏"没有任何补偿。
+//
+// 补偿规则（精准，不放宽"防垃圾"）：
+//   扫所有**已被 git 跟踪**的 JS 里的 require('./x.js') / require('../x.js')
+//   · 目标本地存在但未被跟踪  → 自动加入本次 add（这是被引用的新文件，不是垃圾）
+//   · 目标本地不存在          → 打印断链告警（不阻断，交人工判断）
+//   不被任何已跟踪文件 require 的未跟踪文件仍然一律不动。
+const integrityViolations = [];
+try {
+  const trackedJs = execSync('git ls-files "src/*.js" "src/**/*.js" "bin/*.js"',
+    { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
+  for (const rel of trackedJs) {
+    const abs = path.join(ROOT, rel);
+    let src;
+    try { src = fs.readFileSync(abs, 'utf8'); } catch (_) { continue; }
+    for (const m of src.matchAll(/require\(['"](\.[^'"]+\.js)['"]\)/g)) {
+      const target = path.resolve(path.dirname(abs), m[1]);
+      const targetRel = path.relative(ROOT, target);
+      if (!fs.existsSync(target)) {
+        // JSDoc 注释里的示例路径不算断链（历史上多次误报）
+        const lineStart = src.lastIndexOf('\n', m.index) + 1;
+        const line = src.slice(lineStart, src.indexOf('\n', m.index));
+        if (/^\s*(\*|\/\/|\/\*)/.test(line)) continue;
+        integrityViolations.push(`${rel} → ${targetRel}（断链：目标不存在）`);
+        continue;
+      }
+      if (!trackedSet.has(targetRel)) {
+        tracked.push(targetRel);
+        console.log(`[auto-commit] require 完整性：补入被引用但未入库的 ${targetRel}`);
+      }
+    }
+  }
+} catch (e) {
+  console.log('[auto-commit] require 完整性扫描跳过: ' + e.message);
+}
+if (integrityViolations.length) {
+  console.log(`[auto-commit] ⚠️  ${integrityViolations.length} 处 require 断链（不阻断，需人工判断）:`);
+  integrityViolations.slice(0, 5).forEach(v => console.log(`    ${v}`));
 }
 
 // ③ commit message 必须含 VERSION（S2 守卫）

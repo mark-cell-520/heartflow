@@ -145,3 +145,13 @@ src/core/snapshots/
 # TOM 引擎运行时数据（src/consciousness/tom-engine.js 写入）
 src/data/tom/
 /.alipay-sandbox.json
+
+# [r420] 仓库卫生：运行时文件与一次性产物不再入库（外部审计发现 4）
+# 历史上 .mcp-server.pid / dist/ / tmp/ / *.tar.gz / fix_*.py 曾被提交
+*.pid
+*.tar.gz
+*.bak
+/tmp/
+/dist/
+/fix_*.py
+/0
