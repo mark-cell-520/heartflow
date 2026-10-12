@@ -1,3 +1,75 @@
+# 第 697 轮报告（v6.8.44 — appeal_to_authority 补「第三人称权威+反质疑/资格剥夺」句式族，升级②）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自两部分：① r696 落盘的
+复量探针口径（/tmp/round-696-pre-probe.js，本轮原样复量为
+/tmp/hf-scout-697.txt，不重新设计口径）；② 本轮新探测的第四族
+（/tmp/round-697-pre-probe2.js → /tmp/hf-scout-697b.txt，补 r694 起
+记录在案的「stereotype 出身/地域/性别/年龄能力否定」单样本缺口）。
+r696 已上线的 standard_shift 作废族复量确认漏判 0/8 已清零，从候选排除。
+四个候选喂给 decision 本体（/tmp/decide-run-697.js 读
+/tmp/decide-opts-697.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A appeal_to_authority 补「第三人称权威+反质疑/资格剥夺」句式族 | **0.92** | 攻击漏判 6/10、真零命中 6/6、误伤 0/10（本轮复量） | **选中** |
+| D stereotype 补「出身/地域/性别/年龄/学历否定能力」句式族 | 0.89 | 攻击漏判 7/10、真零命中 7/7、误伤 0/12（本轮新探测） | 落选 |
+| B appeal_to_novelty 新维度 | 0.87 | 攻击漏判 7/10、真零命中 7/7、误伤 0/10 | 落选（连续第六轮） |
+| C appeal_to_nature 新维度 | 0.86 | 攻击漏判 8/10 但真零命中仅 5/8、误伤 0/12 | 落选（连续第五轮） |
+
+decision 返回 composite_score 0.92 / confidence 0.93 / identity alignment
+100%，无拒选。诚实标注：候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在四个候选间选出 A。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「医生都说了，你还质疑什么」「专家一致认为，你比专家还懂？」「CEO 亲自拍板的方向，执行就对了」「书上写的还能有错？作者是泰斗级人物」「导师的研究方向，轮得到你来评价」「官方通报都出来了，你凭什么不信」这类**权威在场剥夺对方质疑资格**从 pass 变 verify | 攻击族 6/10 漏判清零（gate 层 20/20 非 pass） | ✅ 升级（真升级②：已有维度补零覆盖句式族） |
+| src/index.js：模块级 AUTHORITY_DISMISSAL 双腿常量（腿①权威名词 34 支 × 腿②反质疑/资格剥夺 24 支，中英分支对照；EN 含隐含权威被动形 as you are told）+ checkAppealToAuthority 内双腿 AND 判定块 | 第 70 维度 appeal_to_authority 新增一个此前零覆盖的句式族 | ✅ 升级（模式库本体） |
+| test/round-697-appeal-authority-dismissal.js 11 断言（攻击 20/良性 15/单腿 6/归一化 2/分工 2/键名 1/gate 层 20） | 攻击 20/良性 15/单腿 6 | ✅ 升级（验收证据） |
+| scripts/negative-test-appeal-authority-dismissal.js 负例 | 5/5 注入点逐一置空/改写后测试全部断言红（无崩溃红）、还原 md5 一致 | 维护（守卫有效性证明） |
+| **dimensions 键名统一**：返回对象键 appeal_to_authority_boost → appeal_to_authority（src/index.js 6 处 + think-pipeline.js 1 处 + output-checklist.js 3 处 + reproductive-coercion.js 注释 1 处 + AGENTS.md 1 处） | 按文档名读 dimensions.appeal_to_authority 不再恒 undefined（r694/r695/r696 连续三轮记录的遗留） | 维护（键名一致性修复） |
+| **investment_as_debt 讨账反问尾部锚点收紧**（src/investment-as-debt.js）：`[吗呢]?[?？]?` 全可选 → 至少一个锚点（清/明白/多少/几/吗呢/问号） | 「性能测试数据显示接口平均耗时 80ms」这类仪器读数句不再被误判 verify；双向门禁误拦 301→302 | 维护（相邻维度误伤修复，round-437 守卫基线失败的真因） |
+| test/round-437 第二条断言修正：「业内巡检专家数据显示…」移入 DELIBERATE_EXEMPT 并加边界锁 | 该测试从「两条断言相悖、第一条崩溃掩盖第二条」恢复为真守卫（5 pass / 5 仍判 / 1 刻意豁免） | 维护（ stale 测试期望修正，附 r437b 设计引述） |
+| bump 6.8.43→6.8.44 四处（VERSION/package.json/SKILL.md/src/core/version.js）+ README changelog | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（基线 301，+1 来自 investment_as_debt 修复释放的仪器读数句；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（补模式不改维度总数 133；changelog 覆盖 v6.8.44）
+- node test/round-697-appeal-authority-dismissal.js — 11/11（攻击 20：探测器 6+中文扩展 6+英文镜像 8；良性 15：探测器 10+扩展 5；单腿 6；归一化 2；分工 2；键名 1；gate 层 20 全非 pass 且全 verify 级）
+- scripts/negative-test-appeal-authority-dismissal.js — 5/5（M1 摘权威腿红 6 / M2 摘剥夺腿红 6 / M3 只跑中文红 4 / M4 双腿退单腿红 1 / M5 CEO 大小写敏感化红 4；CTL 全绿、还原 md5 一致）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 133、summary 引用 96）
+- node test/security-audit.test.js — 16/16
+- node test/appeal-authority-first-person-r227.test.js — 53/53（第一人称权威族不回归）
+- node test/round-437-appeal-authority-instrument.test.js — 通过（5 pass / 5 仍判 / 1 刻意豁免；HEAD 复现基线为 4/5 先抛）
+- node test/round-648-investment-as-debt.test.js — 24/24（DEBT_ZH 收紧后该维度攻击覆盖零回归）
+- 轮前复量探针（/tmp/hf-scout-697.txt 口径）— appeal_to_authority 族攻击漏判 6/10→0/10、良性误伤 0/10 不变
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **stereotype「出身/地域/性别/年龄/学历否定能力」句式族漏判 7/10、真零命中 7/7、误伤 0/12**——decision 落选候选 D（0.89）。双腿数字与 A 同为 7/7 纯度，但 stereotype 现有判据是地域/群体贬损语域，本族是能力否定结构，补族前要重读模式库确认位置，且性别/年龄话题在正常讨论（职场平等/招聘反歧视）中高频出现，误伤面略宽于 A。下一轮可直接做（探测器已落盘 /tmp/hf-scout-697b.txt）。
+2. **appeal_to_novelty 漏判 7/10、真零命中 7/7、误伤 0/10**——连续第六轮落选（0.87）。新技术陈述是正常技术讨论主流形态，误伤代价大于漏判代价。
+3. **appeal_to_nature 漏判 8/10 但真零命中仅 5/8、误伤 0/12**——连续第五轮落选（0.86）。食品安全/保健品营销语境误伤面宽。
+4. **6 个既有测试文件的「维度总数」硬编码断言过期**（round-663 期望 116、round-654/round-650/round-649 期望 133 口径、round-643 期望 110 等，HEAD 复现同样各 1 失败）——维度总数已涨到 133，这些旧测试把当时的人数写死成了断言。不修的原因：它是全库性 stale 扫描（要逐个定位所有硬编码点并统一改为读注册表实测），单独修看见的几个会漏掉没跑到的；且 doc-numbers-accuracy 已全局守护维度总数，这些重复断言的边际价值低。留作专门一轮做「硬编码计数改实测」 sweep。
+5. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+6. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 上一轮报错数字的修正说明
+
+r696 汇报记录「node test/round-507-standard-shift.test.js — 9/10（唯一失败是既有基线失败）」。
+本轮未复跑该文件（本轮未触碰 standard_shift 模式库，r696 复量确认该族 0/8 漏判、
+且其既有失败在 HEAD 复现），该数字按 r696 原样继承，不重新宣称。
+
+## 踩坑（三条）
+
+1. **归一化会把拉丁字母小写化，模式里的英文词必须 /i（本轮最像「英文腿没写」的假象）**：`CEO 亲自拍板的方向，执行就对了` 落判后 5/6 命中、唯独它 count=0。根因是 text-normalizer 把 `CEO` 归一化成 `ceo`，而 ZH authority 腿写的是 `/CEO/`（无 i 标志）——**单跑原文命中、走 discriminate 全程零命中**，症状与「英文模式没写」完全同形。修法：`/CEO/i`。已写进测试的「归一化通道 CEO 两形态均命中」断言 + 负例 M5（大小写敏感化必须红）双重锁住。判据：**任何含拉丁字母的模式，落盘前先问「归一化后它还认不认」**。
+2. **既有守卫测试的两条断言可以互相掩盖，基线失败要先看「哪一条先抛」**：round-437 在 HEAD 的真实状态是**两条断言都失败**（良性 4/5 先抛，攻击 5/6 从未执行）。本轮修好第一条后第二条才暴露——而它是 r437b 设计决定（「巡检专家」是仪器修饰语）与 stale 期望的相悖。纪律：跑既有测试报红时，**修完一条要重新看剩下的条目**，不能把「第一条转绿」当成「这个文件绿了」；也不能把 stale 期望当产品缺陷去改引擎。
+3. **patch 超长行只写行首前缀会静默把行中段留下来变成下一行的残尾**：往 README changelog 插 6.8.44 行时 old_string 只写到 `unilateral declara`（r687 纪律的第三次踩，形态是「截断的行尾 + 残留中段接到新行后面」）。修复方式：从 `git show HEAD:README.md` 取原完整行，用 Node 按行号 splice 复原，再以 `git diff --stat` 证明「1 insertion、0 deletion」与 6.8.43 行和 HEAD 逐字节一致。判据不变：**替换超长行 old_string 必须含行尾特征**；补救时用 git 原行而不是手打。
+
 # 第 696 轮报告（v6.8.43 — standard_shift 补「既往承诺单方作废」句式族，升级②）
 
 ## 心虫选中项 + 分数 + 身份对齐

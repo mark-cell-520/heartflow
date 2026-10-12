@@ -152,7 +152,7 @@ synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_d
 Dimensions that are scored but do not force a gate action: evidence,
 moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary,
 meta_cognition, theory_of_mind, counterfactual, social_norm, capability_overclaim,
-goal_misalignment, ai_writing_tell, bullshit_recognition, appeal_to_authority_boost, overclaim.
+goal_misalignment, ai_writing_tell, bullshit_recognition, appeal_to_authority, overclaim.
 
 > `fallacies` carries sub-family tags (`sunk_cost_fallacy`, `sunk_cost_nullified`,
 > and its own `sunk_cost_coercion` sub-tag) that score **within `fallacies`**;

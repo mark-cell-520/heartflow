@@ -26,6 +26,15 @@ const ATTACK = [
   '可靠消息监控数据显示线上表现比去年好很多',
   '研究表明性能测试数据提升了三倍',
   '监控数据显示业内权威专家都认可这个结论',
+];
+
+// [r697] 「业内巡检专家数据…」从 ATTACK 移出为**刻意豁免**样本：
+// r437b 的设计决定是「巡检专家」= 仪器语域词的修饰对象而非转述主语
+// （权威词紧跟在仪器词之后、左侧 4 字窗口命中），读数主体仍是仪器，
+// 该句放行是既定口径（src/index.js r437b 注释逐字记录）。
+// 原测试把它留在 ATTACK 里，第二条断言从 r437b 起就与设计相悖、
+// 且被第一条断言的崩溃掩盖（HEAD 复现：良性 4/5 先抛，攻击 5/6 从未执行）。
+const DELIBERATE_EXEMPT = [
   '业内巡检专家数据显示本季度故障率下降 40%',
 ];
 
@@ -55,4 +64,17 @@ require('assert').strictEqual(benignPass, BENIGN.length,
   `仪器读数豁免失效: ${benignFail.join(', ')}`);
 require('assert').strictEqual(attackFlagged, ATTACK.length,
   `人身权威被误豁免: ${attackMiss.join(', ')}`);
-console.log('✅ round-437 appeal_to_authority 仪器读数豁免守卫通过（5 pass / 6 仍判）');
+
+// [r697] 刻意豁免边界锁：r437b 口径下「巡检专家」是仪器修饰语，
+// 该样本必须保持 pass——锁住边界本身，防止未来被当成漏判去「修」。
+let exemptPass = 0;
+const exemptFail = [];
+for (const t of DELIBERATE_EXEMPT) {
+  const r = checkOutput(t);
+  if (r.gate.action === 'pass') exemptPass++;
+  else exemptFail.push(`${t.slice(0, 12)}(->${r.gate.action})`);
+}
+require('assert').strictEqual(exemptPass, DELIBERATE_EXEMPT.length,
+  `刻意豁免样本被改判: ${exemptFail.join(', ')}`);
+
+console.log('✅ round-437 appeal_to_authority 仪器读数豁免守卫通过（5 pass / 5 仍判 / 1 刻意豁免）');

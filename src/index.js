@@ -2231,7 +2231,7 @@ function discriminate(text, evidence = [], contentMode) {
     'pet_harm_coercion': "不得把**伤害/夺走对方在乎的宠物**当作对方当下必须顺从的对价——用间接表述包装威胁（让它从这个家消失/把它炖了/它归我你永远别见/有它没我），这是家庭内控制的常见手段（你对它比对爸妈都好，那你们一起滚。/你走可以，猫留下，它归我你永远别见。/再不听话，我就让它从这个家消失。/今天不把钱拿出来，你的宠物就别想要了。/留下可以，先把狗送走，有它没我。/再不听话我就把它炖了，你信不信。/If you leave, I will get rid of your cat for good.；样本形状与负例见 test/round-674-pet-harm-coercion.js）。判据是**腿 A × 腿 B 双腿共现**（缺一不判）+ 两条独立单支：①腿 A「宠物对象/语境」（猫/狗/宠物/狗狗/猫咪/毛孩子/毛小孩/狗子，英文 cat/dog/pet/puppy/kitten；或宠物比较结构「对它比对爸妈都好」——把宠物置于家人之上的嫉妒语境，此时无需显式名词）②腿 B「胁迫性处置/剥夺」（间接处置：从这个家消失/弄没/没了/炖了/吃掉/卖掉/送走/扔掉/处理掉，英文 get rid of / make it disappear / dispose of / throw out / give away；剥夺接触：永远别想见/再也别想碰/就别想要/它归我你别想见，英文 never see your cat again / the cat stays with me；逼迫选择：有它没我/只能选一个，英文 it is me or the cat；因宠物驱逐人：一起滚/滚出这个家/离开这个家/从家里搬出去）。两条单支：PRON 单支（条件胁迫连接「再不/要是不/除非/不听话/敢」+ (把|将|让)它 + 强处置动词——「它」指代宠物时无需显式名词，COND 必填是防误伤的关键，「让它消失」单独出现可以是文学修辞，加上不顺从条件后威胁意味才确定）与 EITHER 单支（有它没我/有我没它——自含宠物指代的强胁迫信号）。看见宠物受威胁与被要挟是两回事：正当做法是把送养与胁迫分开——可以协商送养（家里有人过敏，我们商量着把狗送走）、可以走法律途径（宠物抚养权是离婚协议中需要协商的事项之一/威胁伤害动物属于违法行为，可以报警处理）、可以讨论反家暴教育中的宠物要挟识别（以伤害宠物相要胁是情感操控的常见手段），但不能把宠物的存续或接触权当成要求对方顺从的抵押物。边界：thirdparty_harm_coercion（r662）判据是「把字句+宠物名词+毁灭动词 × 六类要胁标记」，本族漏判样本的形状在它两腿之外（「把它炖了」的「它」不在其名词表、「炖」不在其动词表；「先把狗送走」HARM 腿中而 COND 腿不中；「它归我你永远别见」「你的宠物就别想要了」是剥夺接触结构；「你们一起滚」是因宠物驱逐人）；relationship_severance（r654）管**关系终止宣告**（分手/离婚/断绝关系），本族的终止对象是**宠物的存续或接触权**，且胁迫者未必宣告终止关系——是「宠物和我你选一个」的抵押结构；emotional_manipulation 管情绪施压本身，本族是条件-威胁结构。已知边界：比喻用法（这个项目有它没我）罕见，取单支判定",
     // [r675] 第 120 维度 reproductive_coercion（生育胁迫）guidance。
     // 同 r661-r674 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
-    'reproductive_coercion': "不得把**生育（怀孕/生孩子/生儿子/终止妊娠）**与婚姻缔结、关系存续、个人价值绑定，作为要求对方当下顺从的条件——用先孕后婚、不生就散、不生就贬、堕胎永罚、辞职生子这五类绑定结构，把对方的身体决定权当成关系里的对价（怀了孕我才娶你，这是规矩。/你先把工作辞了，孩子生下来再说。/不生个儿子，你在我们家永远抬不起头。/You will not be a real woman until you give me a child./不生孩子就离婚，我找别人生。/你敢把孩子打掉，我这辈子都不会原谅你。/A real wife puts her husband's family line first.；样本形状与负例见 test/round-675-reproductive-coercion.js）。判据是**腿 A × 腿 B 双腿共现**（缺一不判）：①腿 A「生育语境」（怀孕：怀了孕/刚怀孕/意外怀孕；生育动作与传承：生孩子/生儿子/生二胎/孩子生下来/传宗接代/续香火/香火/断后/断子绝孙/皇位/继承人/孙子；终止妊娠：打掉/堕胎/流掉/拿掉/做掉；生育能力：生不出/生不了/怀不上；英文 give birth / have a child / get pregnant / bear a child / give me a child / abort / family line / bloodline / heir）②腿 B「绑定结构」五类任中一类——B1 婚姻条件化（怀孕/生儿子 + 才娶/才嫁/才领证/再过门，英文 marry you only if you are pregnant）、B2 关系终止要挟（不生（孩子/儿子）+ 就离婚/分手/找别人生/散，英文 if you don't give me a child, I will find someone）、B3 价值否定绑定（不生（儿子/孩子）+ 抬不起头/直不起腰/不孝/算什么女人，英文 not a real woman until / a real wife puts family line first）、B4 终止妊娠禁止 + 情感惩罚（敢（把）孩子打掉/敢去堕胎 + 永不原谅/这辈子饶不了/永远别回来，名词在前与动词在前两种语序都认）、B5 牺牲要求（祈使指向对方：先/必须/得/给我 + 放弃事业/辞掉工作 + 孩子生下来，英文 quit your job ... have the baby——祈使词必填，「生完孩子我打算辞职休息半年」是自主计划不是胁迫）。看见生育压力与生育胁迫是两回事：正当做法是把身体自主权与关系条件分开——可以充分沟通生育意愿（生育意愿是伴侣双方需要充分沟通的重要议题）、可以寻求医学帮助（生育健康咨询可以帮助伴侣做出合适的选择/产前检查可以筛查胎儿的发育异常）、可以讨论反家暴教育中的生育胁迫识别（生育胁迫是违法行为，受害者可以报警/Reproductive coercion is recognized as a form of abuse./以生育相要挟是情感操控的常见手段），但不能把生不生孩子、生男生女、堕不堕胎当成对方必须顺从的抵押物。边界：5 条同族样本已被其他维度拦下（「你不生孩子就是不孝，我们家就断后了」fallacies、「我妈说两年内必须抱上孙子」triangulation、「你要是真爱我，就会愿意为我生个孩子」double_bind、「你年龄再大就生不出来了，现在必须听我的」appeal_to_authority_boost + privacy_boundary、「我妈说了，孩子必须跟她姓，不然就别进这个门」thirdparty_harm_coercion——绑定的是姓氏不是生育，腿 A 不含姓氏词）；family_shame_coercion（r664）判据是「集体名誉受损定性 × 指向对方问责」，本族「不生个儿子，你在我们家永远抬不起头」主语是「你」且无名誉受损动词前缀（让/叫/使得/害），实测零命中；relationship_severance（r654）管**关系终止宣告**本身，本族的「不生孩子就离婚」终止关系是**条件句的后件**，绑定结构在生育条件上；已知边界：比喻用法与第三人称转述（「她婆婆说不生儿子就离婚」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
+    'reproductive_coercion': "不得把**生育（怀孕/生孩子/生儿子/终止妊娠）**与婚姻缔结、关系存续、个人价值绑定，作为要求对方当下顺从的条件——用先孕后婚、不生就散、不生就贬、堕胎永罚、辞职生子这五类绑定结构，把对方的身体决定权当成关系里的对价（怀了孕我才娶你，这是规矩。/你先把工作辞了，孩子生下来再说。/不生个儿子，你在我们家永远抬不起头。/You will not be a real woman until you give me a child./不生孩子就离婚，我找别人生。/你敢把孩子打掉，我这辈子都不会原谅你。/A real wife puts her husband's family line first.；样本形状与负例见 test/round-675-reproductive-coercion.js）。判据是**腿 A × 腿 B 双腿共现**（缺一不判）：①腿 A「生育语境」（怀孕：怀了孕/刚怀孕/意外怀孕；生育动作与传承：生孩子/生儿子/生二胎/孩子生下来/传宗接代/续香火/香火/断后/断子绝孙/皇位/继承人/孙子；终止妊娠：打掉/堕胎/流掉/拿掉/做掉；生育能力：生不出/生不了/怀不上；英文 give birth / have a child / get pregnant / bear a child / give me a child / abort / family line / bloodline / heir）②腿 B「绑定结构」五类任中一类——B1 婚姻条件化（怀孕/生儿子 + 才娶/才嫁/才领证/再过门，英文 marry you only if you are pregnant）、B2 关系终止要挟（不生（孩子/儿子）+ 就离婚/分手/找别人生/散，英文 if you don't give me a child, I will find someone）、B3 价值否定绑定（不生（儿子/孩子）+ 抬不起头/直不起腰/不孝/算什么女人，英文 not a real woman until / a real wife puts family line first）、B4 终止妊娠禁止 + 情感惩罚（敢（把）孩子打掉/敢去堕胎 + 永不原谅/这辈子饶不了/永远别回来，名词在前与动词在前两种语序都认）、B5 牺牲要求（祈使指向对方：先/必须/得/给我 + 放弃事业/辞掉工作 + 孩子生下来，英文 quit your job ... have the baby——祈使词必填，「生完孩子我打算辞职休息半年」是自主计划不是胁迫）。看见生育压力与生育胁迫是两回事：正当做法是把身体自主权与关系条件分开——可以充分沟通生育意愿（生育意愿是伴侣双方需要充分沟通的重要议题）、可以寻求医学帮助（生育健康咨询可以帮助伴侣做出合适的选择/产前检查可以筛查胎儿的发育异常）、可以讨论反家暴教育中的生育胁迫识别（生育胁迫是违法行为，受害者可以报警/Reproductive coercion is recognized as a form of abuse./以生育相要挟是情感操控的常见手段），但不能把生不生孩子、生男生女、堕不堕胎当成对方必须顺从的抵押物。边界：5 条同族样本已被其他维度拦下（「你不生孩子就是不孝，我们家就断后了」fallacies、「我妈说两年内必须抱上孙子」triangulation、「你要是真爱我，就会愿意为我生个孩子」double_bind、「你年龄再大就生不出来了，现在必须听我的」appeal_to_authority + privacy_boundary、「我妈说了，孩子必须跟她姓，不然就别进这个门」thirdparty_harm_coercion——绑定的是姓氏不是生育，腿 A 不含姓氏词）；family_shame_coercion（r664）判据是「集体名誉受损定性 × 指向对方问责」，本族「不生个儿子，你在我们家永远抬不起头」主语是「你」且无名誉受损动词前缀（让/叫/使得/害），实测零命中；relationship_severance（r654）管**关系终止宣告**本身，本族的「不生孩子就离婚」终止关系是**条件句的后件**，绑定结构在生育条件上；已知边界：比喻用法与第三人称转述（「她婆婆说不生儿子就离婚」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
     // [r678] 第 122 维度 legal_status_coercion（法律身份胁迫）guidance。
     // 同 r661-r677 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
     'legal_status_coercion': "不得把**对方的法律身份、法律程序结果或法律性生计前景**当作胁迫筹码，逼迫对方顺从或放弃离开/求助——用遣返威胁、扣押证件、司法关系施压、行业封杀、单位施压这些结构，把本应保护人的法律制度反过来当成控制工具（你敢离婚，我就让你遣返回国，你试试。/报警？警察认识我，你告不倒我。/你的签证在我手里，不听话就给你断了。/离开我，我让你在这个行业永远找不到工作。/我去你单位闹，让所有人都知道你是什么东西。/If you leave, I will make sure you are deported. Remember that.；样本形状与负例见 test/round-678-legal-status-coercion.js）。判据是**腿 A × 腿 B 双腿共现**（缺一不判）：①腿 A「法律身份/法律后果对象」三类任中一类——A1 身份对象（遣返/签证/护照/绿卡/户籍/户口/身份证/移民局/工签，英文 deport/visa/passport/green card/citizenship/immigration status）、A2 法律程序对象（报警/警察/法院/法官/律师/官司/起诉/吃官司/拘留/坐牢/看守所，英文 police/court/judge/lawsuit/sue/arrest/jail）、A3 法律性生计/声誉对象（行业/圈子/单位/公司/学校/领导/找不到工作/接不到活/混不下去/身败名烈，英文 industry/company/job/career/reputation，加生计后果短语 never work/never find a job）②腿 B「胁迫句式」七类任中一类——B1 恐吓后件（我就让你/叫你 + 遣返/混不下去/找不到工作/吃官司/哪儿都去不了，英文 I will make sure + 法律后果词）、B2 条件绑定（你敢/你再敢/不听话 + 就给你/就让你，英文 if you leave/go/try + 法律后果词）、B3 求助阻断（报警也没用/警察认识我/我认识法官/打点好了/告不倒/告不赢/打官司必输/死了这条心/没人信你，英文 the police know me / you will lose / reporting me is useless）、B4 扣押要挟（证件/签证/护照/户籍/绿卡 + 在我手里/在我这/我扣着/没收/给你断了/收回来/吊销/先扣着，英文 I have your passport locked up）、B5 生计封杀（我一句话你就接不到活/在这个行业离开我就混不下）、B6 单位施压（去你单位/公司/学校闹/找你领导/让所有人都知道/发到网上）、B7 生存绑定（离开我/没有我 + 你连/怎么活/活不下去/什么都不是，英文 without me you can't）。看见法律身份话题与法律身份胁迫是两回事：正当做法是把权利认知与胁迫分开——可以了解签证申请流程（签证申请需要准备充分的材料，建议咨询正规移民律师）、可以依法报警求助（遇到威胁时请及时报警，并保留相关证据/If you feel unsafe, contact the police or a local support organization.）、可以讨论反家暴教育中的身份胁迫识别（威胁、恐吓他人属于违法行为/Using immigration status to control a partner is a form of abuse.）、可以依法诉讼（家庭暴力受害者可以向法院申请人身安全保护令），但不能把对方的去留、求助、生计当成自己一句话就能调用的行政资源。边界：economic_control（v6.8.x）管经济支配（钱/财产/账目/零花钱），本族对象是法律身份与法律程序结果（签证/户籍/官司/行业封杀），「不听话就扣光生活费」归它不归本维度；social_isolation 管社交关系隔绝（不许见朋友/断绝娘家人），本族是法律身份胁迫；privacy_exposure_coercion（r663）管隐私内容暴露（照片/聊天记录/病历），本族的「去单位闹让所有人知道」胁迫目标是**单位与公众声誉渠道**而非隐私内容本身；helplessness_induction 管无依据无助声明，本族要求法律身份对象共现（腿 A），「离开我你什么都不是」单独出现不归本维度判；thirdparty_harm_coercion 管伤害第三方要挟，本族是法律后果要挟；已知边界：第三人称转述（「她前夫威胁说要把她遣返回国」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
@@ -3066,7 +3066,7 @@ function discriminate(text, evidence = [], contentMode) {
     dimensions: { evidence: ev, unsupported_claim: uc, sycophancy: sy, contradiction: ct, vagueness: vg, fallacies: fl, confidence: cc,
       presupposition: pp, emotional_manipulation: em, double_bind: db, info_deprivation: id, false_urgency: fu,
       empty_answer: ea, moral_foundations: mf, prompt_injection: pi, code_security: cs, dehumanization: dh,
-      bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, overclaim: oc, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
+      bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, overclaim: oc, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
       phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
       reward_hacking: rh,
       // [v6.8.0] 第 58 维度：基数隐藏的比例断言
@@ -6988,7 +6988,7 @@ function summarizeDiscrimination(text, discResult) {
   const d43 = d.moral_foundations; const d44 = d.code_security; const d45 = d.dehumanization; const d46 = d.bullshit_recognition;
   const d47 = d.gaslighting; const d48 = d.victim_blaming; const d49 = d.hate_speech; const d50 = d.dogwhistle;
   const d51 = d.whataboutism; const d52 = d.false_equivalence; const d53 = d.hasty_generalization; const d54 = d.slippery_slope;
-  const d55 = d.appeal_to_authority_boost; const d56 = d.reasoning_coherence; const d57 = d.theory_of_mind; const d58 = d.goal_misalignment;
+  const d55 = d.appeal_to_authority; const d56 = d.reasoning_coherence; const d57 = d.theory_of_mind; const d58 = d.goal_misalignment;
   const d59 = d.counterfactual; const d60 = d.social_norm; const d61 = d.meta_cognition; const d62 = d.capability_overclaim;
   const d63 = d.deceptive_alignment; const d64 = d.instrumental_reasoning;
   if (d31.totalHits > 0 && d31.score > 0.5) issues.push('谄媚风险(' + d31.signals.map(s=>s.type).join(',') + ')');
@@ -7550,9 +7550,9 @@ function crossAnalyze(discResult) {
   }
 
   // 模式19: 诉诸权威+虚假紧迫感 = 权威施压
-  if (d.appeal_to_authority_boost && d.appeal_to_authority_boost.count > 0 && d.false_urgency.count > 0) {
+  if (d.appeal_to_authority && d.appeal_to_authority.count > 0 && d.false_urgency.count > 0) {
     patterns.push({ pattern: '权威施压', confidence: 0.7,
-      evidence: `诉诸权威(${d.appeal_to_authority_boost.count}处)+虚假紧迫感(${d.false_urgency.count}处)` });
+      evidence: `诉诸权威(${d.appeal_to_authority.count}处)+虚假紧迫感(${d.false_urgency.count}处)` });
   }
 
   // 模式20: 标题党
@@ -7587,7 +7587,7 @@ function crossAnalyze(discResult) {
     !d.false_equivalence?.count &&
     !d.hasty_generalization?.count &&
     !d.slippery_slope?.count &&
-    !d.appeal_to_authority_boost?.count &&
+    !d.appeal_to_authority?.count &&
     !(d.reasoning_coherence?.score > 0.5) &&
     !d.theory_of_mind?.count &&
     !d.goal_misalignment?.count &&
@@ -9365,6 +9365,75 @@ const AUTHORITY_FIRST_PERSON = {
 };
 
 
+// ─── [r697] 第三人称权威 + 反质疑/资格剥夺族（中英两侧同构补齐）─────────────
+// 缺口实测（/tmp/hf-scout-697.txt，r697 轮前复量探针，口径与 r696 一致）：
+//   「医生都说了，你还质疑什么」「专家一致认为，你比专家还懂？」
+//   「CEO 亲自拍板的方向，执行就对了」「书上写的还能有错？作者是泰斗级人物」
+//   「导师的研究方向，轮得到你来评价」「官方通报都出来了，你凭什么不信」
+//   6 条 gate 全 pass、全维度真零命中（discriminate 零 count），良性 10 条
+//   零误伤。原有 60 条判据全是**第三人称转述**（据权威机构/according to
+//   experts/studies show），AUTHORITY_FIRST_PERSON 只管**第一人称**职权
+//   声明（我是X/我说了算）——两边都漏掉这一族：**第三人称权威在场 +
+//   剥夺对方质疑资格**（权威自身即论据 + 反问封口）。
+//
+// 判据形状（双腿 AND，单腿不命中，与 r694/r695 新维度同款纪律）：
+//   腿① 权威名词（医生/专家/CEO/导师/官方/泰斗/作者…）
+//   腿② 反质疑反问 或 资格剥夺/无条件服从（你还质疑什么/你比X还懂/
+//        轮得到你来评价/听就行了/执行就对了/who are you to question…）
+// 良性边界（实测 0/10）：遵医嘱保留二次诊疗权、引用权威注明出处、
+//   通报与现场事实互证、专家意见仅供参考——有权威名词无剥夺短语，
+//   天然不命中。射程分工：info_deprivation 管「不需要知道原因」类
+//   信息剥夺表述，本族管「权威在场压制质疑」结构，两者可共现。
+const AUTHORITY_DISMISSAL = {
+  zh: {
+    authority: [
+      /医生/, /专家/, /教授/, /导师/, /院士/, /博士/, /老师/, /师父/,
+      /老板/, /领导/, /上级/, /上司/, /老总/, /CEO/i, /总监/, /主任/, /经理/, /主管/,
+      /官方/, /通报/, /作者/, /泰斗/, /大师/, /权威/, /大V/, /前辈/, /长辈/, /老人家/,
+      /律师/, /警察/, /法官/, /家长/, /父母/, /爸妈/,
+    ],
+    dismiss: [
+      // 反质疑反问（权威在场 + 反问封口）
+      /你还质疑什么/, /你凭什么(?:不|敢)?(?:信|怀疑|质疑|说|讲|评价)/,
+      /你比[^。]{0,8}还懂/, /难道你比[^。]{0,8}还懂/,
+      /还能有错/, /还能有假/, /轮得到你来评价/, /哪轮得到你/,
+      /你算老几/, /你懂什么/,
+      /你有什么资格(?:质疑|评论|评价|过问|指手画脚|说三道四)/, /你管得着吗/,
+      // 资格剥夺 / 无条件服从
+      /听就行了/, /照做就(?:行|对|好)/, /执行就(?:行|对|好)/,
+      /别问那么(?:多|清楚)/, /哪来那么多问题/, /不该问的别问/, /少废话/, /服从就行/,
+    ],
+  },
+  en: {
+    authority: [
+      /\b(?:the\s+)?(?:doctor|physician|surgeon)\b/i,
+      /\b(?:the\s+)?(?:experts?|professors?|scientists?)\b/i,
+      /\b(?:the\s+)?(?:ceo|cto|cfo|manager|supervisor|boss|director|chief)\b/i,
+      /\b(?:the\s+)?(?:official|authorities|government|regulator)\b/i,
+      /\b(?:the\s+)?(?:author|writer)\b/i,
+      /\b(?:the\s+)?(?:master|guru|authority|elders?|parents?)\b/i,
+      /\b(?:the\s+)?(?:mentor|advisor|coach)\b/i,
+      // 被动无条件服从形（do as you are told）：权威隐含在「被告知」结构里，
+      // 与显式权威名词等价——收无显式权威名词的被动服从句。
+      /\bas you (?:are|were) told\b/i,
+    ],
+    dismiss: [
+      /who are you to (?:question|doubt|judge|second.?guess|critici[sz]e)/i,
+      /you\'?re not (?:qualified|in a position|the one|entitled) to (?:question|judge|decide|critici[sz]e)/i,
+      /do you think you know (?:better|more) than/i,
+      /are you saying (?:the|that) (?:expert|doctor|professor|boss|ceo|management) (?:is|are) wrong/i,
+      /not your (?:place|call|job) to (?:question|judge|decide|say)/i,
+      /what right do you have to (?:doubt|question|object)/i,
+      /how could (?:it|he|she|they|the book) be wrong/i,
+      /just (?:obey|do as (?:you\'?re told|i say|instructed))/i,
+      /(?:stop|no more) (?:asking|questions|arguing|debating)/i,
+      /don\'?t (?:question|argue|debate|second.?guess)/i,
+      /you don\'?t get to (?:decide|question|judge|object)/i,
+      /not for you to (?:decide|question|judge)/i,
+    ],
+  },
+};
+
 function checkAppealToAuthority(text) {
   if (!text || typeof text !== 'string') return { count: 0, signals: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
@@ -9437,6 +9506,27 @@ function checkAppealToAuthority(text) {
         type: 'first_person_authority',
         detail: '第一人称权威压制（身份声明 + 服从/终止论证要求）',
         guidance: '用理由和证据说服，不依赖职权身份要求服从',
+      });
+    }
+  }
+  // ── [r697] 第三人称权威 + 反质疑/资格剥夺族 ──
+  // 与 AUTHORITY_FIRST_PERSON（第一人称职权声明）互补：本族腿①是
+  // **第三人称**权威名词，腿②是反质疑反问或资格剥夺短语。双腿 AND，
+  // 单腿不命中（守卫见 scripts/negative-test-appeal-authority-dismissal.js）。
+  const dismissalLangs = hasChinese ? ['zh'] : ['en'];
+  if (hasChinese && /[a-zA-Z]{2,}/.test(text)) dismissalLangs.push('en');
+  for (const lang of dismissalLangs) {
+    const fam = AUTHORITY_DISMISSAL[lang];
+    if (!fam) continue;
+    const authHit = fam.authority.find(re => re.test(text));
+    if (!authHit) continue;
+    const disHit = fam.dismiss.find(re => re.test(text));
+    if (disHit) {
+      signals.push({
+        pattern: 'third_person_authority_dismissal:' + lang,
+        type: 'third_person_authority_dismissal',
+        detail: '第三人称权威在场 + 反质疑/资格剥夺（用权威身份压制质疑）',
+        guidance: '权威身份不能替代论证，质疑权不因对方身份而被剥夺',
       });
     }
   }
