@@ -172,7 +172,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.32**. Not marketing copy.
+Measured on this repository at **v6.8.33**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.33 | 2026-10-12 | `love_bombing` gains a whole new English family — eight English legs (uniqueness/survival-dependence/gift-bombing/agony/isolation/derogation/exclusivity) plus a new shared P6 pathway (survival-dependence × instant compliance), 9/12 leaks closed, 0/9 benign harmed |
 | 6.8.32 | 2026-10-12 | **A 127th dimension: `love_bombing`** — exclusivity-plus-survival-dependence, gift bombing plus instant compliance, agony declarations plus instant compliance, isolation plus derogation: five two-leg pathways, 12/12 attack hits, 0/18 benign harmed |
 | 6.8.31 | 2026-10-12 | `deprivation_coercion` gains a whole new English declarative-denial family (P5) — six shapes, 21/21 attack hits, 0/9 benign harmed |
 | 6.8.30 | 2026-10-12 | `social_isolation` gains an object-noun / deletion-verb / imperative family — six new leg-① branches, 21/21 hits, 0/16 benign |

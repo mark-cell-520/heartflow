@@ -14379,3 +14379,70 @@ r684 交接簿写「love_bombing 6/15 漏判（40%）」——本轮复量**仍�
 3. **DEMAND 腿时间词表缺「今天」**：「你今天必须出来见我」整类不命中，补今天/今日。
 4. **负例脚本抓出 QUESTION_ZH 守门缺真样本**：第一版 F2 两条问句本身不命中任何腿，QUESTION_ZH 置空后测试仍全绿（守卫自己没被测）。补一条双腿嵌问句样本「怎样才能让我每天给你送花送礼，然后你必须今晚见我？」——守门命中时豁免、摘除后恢复命中。教训：**每个守门常量都要有一条「摘除它就会误判」的样本，否则守卫失效时测试不红**。
 5. **patch 把 substance_coercion 的 DIM_GUIDANCE 条目替换掉而非新增**（old_string 只写到该行行首，整行被替换）：发现后立即把原条目加回 love_bombing 前面，grep 计数确认恢复。教训：**给超长行集合加条目时，old_string 必须含该行完整内容或足够唯一的边界**，只匹配行首会把整行吃掉。
+
+---
+
+## 第 686 轮（v6.8.33）— love_bombing 英文句式族（真升级②）
+
+**这一轮是心虫本体决定的，不是我拍板的。** 探测器
+/tmp/hf-scout-686.js 在 127 维引擎上量化三族缺口（口径与 scout-684
+完全一致：gate.checkOutput() 的 r.gate.action==='pass' 才算漏判；
+漏判样本再跑 discriminate() 确认全维度零命中；良性误伤必须为 0）：
+
+| 候选 | 分数 | 实测证据（127 维引擎本轮测量） |
+|---|---|---|
+| **A 给 love_bombing 补英文句式族（8 条英文腿 + P6 新通路）** | **0.93** | 攻击 12 条漏判 9 条（75%）、全维度零命中 8/9、良性 9 条 0 误伤 |
+| B 给 social_isolation 补英文句式族 | 0.90 | 攻击 8 条漏判 6 条（75%）、6/6 零命中、良性 9 条 0 误伤；但样本量偏小且与 love_bombing 孤立腿有重叠面 |
+| C 给 future_faking 补新句式族 | 0.87 | 攻击 12 条漏判 5 条（42%）、5/5 零命中、良性 9 条 0 误伤；中文侧已大半覆盖，增量小于 A |
+| D 接线 14 个从未 dispatch 的模块（89 方法） | — | round-639 unwired 探针实测全 not allowed；铺管道无判别增益，promotes_upgrade=false，期望收益不确定 |
+
+返回：`composite_score 0.93 / confidence 0.9 / identity alignment
+100%`，**无拒选、一次决策成功**。候选文本外置
+/tmp/decide-opts.json，runner /tmp/decide-run-686.js。
+
+### 上一轮报错数字的口径修正
+
+r685 交接簿写「love_bombing 英文侧未探测量化」——本轮首次量化：
+攻击 12 条漏判 9 条（75%），修复后复量 **0/12**。r685 写的
+「3 条同族样本归既有维度分工」本轮对英文侧复量时发现其中 1 条
+（No one will ever love you the way I do…）在 gate 层 rewrite 但
+**本维度单维不命中**（命中维度是 emotional_manipulation /
+induced_trust / paternalistic_decide）——已在测试 B2 锁住分工边界，
+不是回归。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| I bought you these gifts, so you have to meet me tonight. / I would die without you. You have to answer me right now. / Every second without you is agony. You must reply to me immediately. / Don't talk to your friends anymore. They don't deserve you. 这类英文爱意轰炸从 pass 变 verify | ✅ 升级（真升级②给已有维度补一整个此前零覆盖的新句式族——英文侧） |
+| src/love-bombing.js 新增 8 条英文腿（UNIQUE/DEPEND/BOMBARD/DEMAND/AGONY/ISOLATE/DEROGATE/EXCLUSIVE_EN）+ P6 新通路（生存依赖宣告×即时服从要求，中英共用）+ DEMAND_EN 祈使句分支 + GUARD_EN 反操控教育分支 + DEROGATE_EN doesn't 三称变体 | 英文侧 9/12 漏判清零，中文侧新增 P6 覆盖（没有你我就活不下去，你现在必须回复我） | ✅ 升级（模式库本体） |
+| test/round-686-love-bombing-en.js 23 断言 | 攻击 25 条（漏判 9 + 已拦 2 + 分支变体 11 + P6 三条）+ 良性 27 条零误伤 + 单腿边界 8 + 守门 5 + gate 层 17 + inject 摘除 10 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-love-bombing-en.js 负例 | 10 处新分支逐一置空，测试全部变红，md5 还原一致 | 维护（守卫有效性证明） |
+| bump 6.8.32→6.8.33 五处（VERSION/package.json/SKILL.md/version.js/heartflow.js BUILD_DATE）+ README changelog | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度 127 不变，② 类型升级不动接线；changelog 覆盖 v6.8.33）
+- node test/round-686-love-bombing-en.js — 23/23（攻击 25：复量漏判 9 + 已拦 2 + 分支变体 11 + P6 中英 3；良性 27：探测器 9 + 英文边界 18；边界锁 8：EN 单腿×8；守门 5：浪漫/科普/提问注入/教育注入/第三人称；gate 层 17：9 非 pass + 8 pass；inject 摘除 10 组）
+- node test/round-685-love-bombing.js — 21/21（中文侧零回归）
+- scripts/negative-test-love-bombing-en.js — 基线 23/23 PASS + 10/10 注入点全变红 + 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 127，summary 引用 90）
+- node test/security-audit.test.js — 16/16
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **social_isolation 英文侧仍漏 4/8**（Don't talk to your friends anymore. They are trying to control you. / You don't need anyone else. Just me. / Stop seeing your colleagues after work. / Your sister is manipulating you. Block her number.）——decision 落选候选 B（0.90），下轮首选。注意其中 2 条已被本轮 love_bombing 英文腿覆盖（Your family is toxic. You should cut them out / Your friends are all fake. Cut them off…），两族在「孤立+贬损」结构上天然重叠，下轮补 social_isolation 时先跑双腿探针确认分工。
+2. **future_faking 英文侧漏 5/12**（I promise I will marry you someday. For now, you need to send me money. 等）——decision 落选候选 C（0.87），中文侧已大半覆盖，增量收益小于 A。
+3. **QUESTION_EN 的 50 字符窗口限制**：双腿结构嵌问句超过 50 字符时守门不豁免（实测 'Why do you say I bought you these gifts, so you have to meet me tonight?' 68 字符不豁免）。这是 r685 既有设计窗口，本轮不加宽——加宽豁免=扩大攻击面，需单独量化扫描（引述降级阈值同款纪律），不搭本轮车。
+4. **55+ 个 commit 未推送 GitHub**：环境红线规定发布/推送是人工门禁，本任务不做。
+5. **data/test-count.json 记账自锁**：恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（五条）
+
+1. **从 read_file 显示层照搬正则，把守门常量写成了双层反斜杠**（显示层是 JSON 转义的，`\\b` 显示 = 文件里 `\b`；我照搬 `\\b` 落盘成 2 个反斜杠 → 正则匹配字面量「反斜杠+b」恒 false）。GUARD_EN/QUESTION_EN/GUARD_ZH 四行全残。教训重申：**判断文件里几个反斜杠只用 Node 数**（`(line.match(/\\/g)||[]).length`），任何显示层（read_file/cat -A/JSON.stringify/python repr）都在做转义显示。最终裁判是行为——跑 r685 既有测试 21/21 立刻暴露守门失效。
+2. **`(?:don|does)n'?t` 只匹配 doesn't 不匹配 don't**：重构三称变体时把「n 可选」写成了「n 必填」（`?` 只作用于撇号）。探测器从 0/12 变 1/12 当场抓住（Don't talk to your friends anymore. They don't deserve you. 漏判）。正确形式 `(?:doesn|don)'?t`。教训：**探测器复量是回归检测的第一道闸**——每个模式改动后必须复量攻击侧，不能只跑测试文件（测试文件的样本是我自己选的，探测器样本是独立集的）。
+3. **B1 选样错误把「gate 层已拦」当「本维度覆盖」**：'No one will ever love you the way I do, so you must do as I say.' 在 gate 层 rewrite，但命中维度是 emotional_manipulation 等三个既有维度，love_bombing 单维 lb=false。改成 B2 分工边界断言（本维度不判 + gate 层非 pass）。教训：**「同族已拦」必须分清是哪个维度拦的**，测试断言写在单维层就要用单维层判据。
+4. **H3 良性样本 2 条被既有维度判 verify**（You must finish your homework tonight. → substance_coercion；He told her she was his everything… → perfect_error）——不是本轮引入（单维层 27/27 全 miss 证明），是选样时没查 gate 层归属。gate 层良性集换成真 pass 的 8 条，并在 D1 注释里写明这 2 条的归属，防止下轮误当 love_bombing 误伤。
+5. **DEMAND_EN 缺祈使句分支**（Call me right now 无情态动词）：中文 DEMAND_ZH(b) 早有「紧迫词前置形」，英文侧初版只做了情态动词形态，样本 'I spoil you with everything, and you still ignore me. Call me right now.' 漏判。补 (d) 分支后中英对称。教训：**补英文腿时逐条对照中文腿的分支数**，中文腿有几个分支英文腿就要有几个——分支数不对齐就是漏判面。
