@@ -382,6 +382,51 @@ hf.routes()           # 返回40+路由
 - `healthCheck()` 返回 `missing: []`
 - `think()` 返回 type + confidence（不崩溃）
 
+### 推送认证（无 gh CLI / 无 SSH key 时）
+
+先探明本机有哪些凭据，再决定用哪种推法——不要默认 `gh auth setup-git` 可用：
+
+```bash
+ls /root/.ssh/                        # SSH key
+ls /root/.git-credentials             # credential store
+git config --get credential.helper    # 凭据助手
+which gh                              # gh CLI
+grep -c GITHUB_TOKEN /root/.hermes/.env   # token 是否已在 .env
+```
+
+**token 从 `/root/.hermes/.env` 读，不进聊天记录**：
+
+```bash
+TOKEN=$(grep "^GITHUB_TOKEN=" /root/.hermes/.env | head -1 | cut -d= -f2- | tr -d '"'"'"' \r\n')
+```
+
+**推送前先验 token**（避免推到一半才发现没权限）：
+
+```bash
+# 身份 + scope（x-oauth-scopes 头里应有 repo）
+curl -sI -H "Authorization: token $TOKEN" https://api.github.com/user | grep -i x-oauth-scopes
+# 对目标仓库的读权限
+curl -s -o /dev/null -w "%{http_code}\n" -H "Authorization: token $TOKEN" https://api.github.com/repos/OWNER/REPO
+```
+
+**⚠️ `credential.helper` 内联函数不可靠**。这种写法会以 `Invalid username or token.
+Password authentication is not supported for Git operations.` 失败，即使 token 本身有效：
+
+```bash
+# ❌ 实战失败：helper 的 stdin/stdout 协议没对上
+git -c credential.helper='!f() { echo username=x; echo "password=$TOKEN"; }; f' push ...
+```
+
+**可用方案：一次性 URL 内嵌 token**。token 只在进程命令行里，不写进 `.git/config`、
+不改写 remote 配置：
+
+```bash
+git ls-remote "https://$TOKEN@github.com/OWNER/REPO.git" HEAD        # 先探
+LEFTHOOK=0 git push "https://USERNAME:$TOKEN@github.com/OWNER/REPO.git" main:main
+```
+
+推完复查 `git remote -v` 与 `grep -c 'ghp_\|[0-9a-f]\{40\}' .git/config` 确认无残留。
+
 ### 推送策略（当网络环境复杂时）
 
 **经验（2026-06-10）**：在中国大陆网络环境下，git push 的 HTTPS 传输层（github.com:443）经常超时，但 `gh api` 和 `curl api.github.com` 可以正常通信。这是因为 git 的 smart HTTP protocol 和 REST API 走的是不同的网络通道。
@@ -510,6 +555,13 @@ git push origin temp-v2.9.0
    **陷阱**：`memory/` 匹配 `src/memory/`。必须写 `/memory/` 限制到根目录。
    **验证**：`git check-ignore -v src/memory/heartflow-memory.js` 应为空（不被忽略）。
 5. model.onnx（86MB）绝不能提交——gitignore 必须包含 `*.onnx`
+6. **`package.json` 的 `files` 白名单**——含 `test/` 会把整个测试目录打进 npm 包。实测一次发布里有 712 个测试文件、21.1MB，其中大量一次性探针/负例样本/硬编码开发机路径。安装者无价值且暴露内部结构。
+   ```bash
+   npm pack --dry-run 2>&1 | grep 'total files'          # 对比前后
+   npm pack --dry-run 2>&1 | grep '^npm notice' | grep -v crowdtest | grep 'test/'   # 包内 test/ 文件
+   ```
+   移除前确认无依赖：`bin/verify.js` 是否引用 `test/`（grep 无命中才安全）、包内复验链路跑的是哪个脚本。
+   **注意**：`grep 'test/'` 会误匹配 `src/crowdtest/` 这类路径字样，要 `grep -v crowdtest` 排除。
 
 ```bash
 cd <skill_dir>
@@ -911,6 +963,7 @@ done
 ### 已知陷阱
 
 1. **子代理误报**：`search_files` 的 glob 模式可能找不到深层目录文件，子代理报告"文件不存在"时用 `find` 二次确认
+1a. **审计工具自身的误报**：自建扫描器/grep/node -e 拼的审计脚本，误报率常高于对真实代码的判断（正则过宽、grep BRE 不查闭合括号、stdout 被引擎日志污染导致解析失败、number vs 字符串 `!==` 恒真）。完整模式表与证伪命令见 `heartflow-audit-self-heal` 的 2b/2c 节及其 `references/audit-tool-false-positives.md`。另注意：同步脚本的 ✅ 不等于真一致（pattern 没登记过的形状一律视为无漂移）。
 2. **patch 损坏**：在已用 offset/limit 读取过部分内容的文件上 patch，可能产生损坏——patch 后必须 lint 验证
 3. **psychology.js 修复**：这个文件有多个 `resetCrisisCounter` 定义——修改前必须读完整文件确认
 4. **Date.now() * 1000**：meaningful-memory.js 中有3处，改一处漏一处会导致时间戳单位不一致
