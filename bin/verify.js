@@ -12,11 +12,35 @@ const HF_DIR = path.join(__dirname, '..');
 const RESULTS = [];
 let hasError = false;
 
+// [r416] check() 原先只看「有没有抛异常」，不看返回值：
+//   同步分支 RESULTS.push('✅') 无条件执行，
+//   异步分支 .then(r => RESULTS.push('✅')) 同样不看 r。
+// 于是任何返回 false / {ok:false} 而不 throw 的检查都会被静默标绿。
+// 现在三条路都判：抛异常 / resolve(false 类) / 返回 false 类，全部记 ❌。
+//
+// 关键约束（第一版改错后实测纠正）：**undefined 必须算通过**。
+// verify.js 现有检查大量写成「语句块 + 靠 throw 表达失败」而不返回值，
+// 若把 undefined 判失败，14 项会瞬间变成 1 项（实测 1 passed / 13 failed）。
+// 判失败的只有「明确表达失败」的形态：false / null / {ok:false} 等。
+function isFalsyResult(r) {
+  if (r === false || r === null) return true;
+  if (typeof r === 'object' && r !== null) {
+    if (r.ok === false || r.passed === false || r.success === false) return true;
+    if (r.error) return true;
+  }
+  return false;
+}
+
 function check(label, fn) {
   try {
     const result = fn();
     if (result && typeof result.then === 'function') {
       return result.then(r => {
+        if (isFalsyResult(r)) {
+          RESULTS.push(`  ❌ ${label}: 检查返回失败值`);
+          hasError = true;
+          return null;
+        }
         RESULTS.push(`  ✅ ${label}`);
         return r;
       }).catch(e => {
@@ -24,6 +48,11 @@ function check(label, fn) {
         hasError = true;
         return null;
       });
+    }
+    if (isFalsyResult(result)) {
+      RESULTS.push(`  ❌ ${label}: 检查返回失败值`);
+      hasError = true;
+      return null;
     }
     RESULTS.push(`  ✅ ${label}`);
     return result;
