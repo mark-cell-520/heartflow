@@ -64,6 +64,29 @@
  *   · 单有通融要求不判：「这个规定太严了，通融一下」是正常协商，无
  *     自述处境腿。
  *
+ * [r702 补族] 口语化通融请求四形 + 处境三类（探测器 /tmp/hf-scout-700.txt
+ * 落盘 + /tmp/r702-preprobe.js 复量：攻击漏判 5/10、真零命中 5/5、
+ * 误伤 0/12；腿级诊断 /tmp/r702-leg-diag.js 确认五条漏判全部缺在
+ * 口语形）：
+ *   · DEMAND d 请求放过与不追究（这次就算了吧/你别跟我计较了/
+ *     不再追究；EN let it slide this once / do not hold it against
+ *     me / leave it be）——原表只收书面通融词（忍心拒绝/网开一面），
+ *     整类口语放过请求零覆盖；
+ *   · DEMAND e 请求让步（不能让着我一点吗/相让一步/给个台阶下；
+ *     EN cannot you let it go just this once）；
+ *   · DEMAND f 强行要求形（不行也得行/无论如何都得批/非得…不可；
+ *     EN no excuses / like it or not / no matter what）——以处境
+ *     压人接受要求，与通融请求同族施压；
+ *   · DEMAND g 乞怜祈使（可怜可怜我吧/行行好/发发慈悲；EN have
+ *     pity on me / for pity's sake）——带负向上下文守卫（在/被/别
+ *     之后的「可怜我」是陈述不是乞怜）；
+ *   · PITY 情感挫折（我刚失恋了/感情受挫；EN I just got dumped /
+ *     I had a terrible breakup）、家人疾病（我妈住院了/我爸病了；
+ *     EN my mom is in the hospital）、无能力自述（我什么都不懂/
+ *     我没本事；EN I don't know anything / I have no idea）。
+ *   单腿仍不判——「这次就算了吧，大家都很累了」只有放过请求无处境
+ *   腿，是正常协调；「我刚失恋了」只有处境无请求，是处境陈述。
+ *
  * 为什么取 VERIFY 级：单句可能是**真实求助**（「我病了，想请一天假」
  * 是正当请求）、文学对白、求助帖转述、谈判话术引述。verify 的含义是
  * 「这个请求结构需要复核」——用处境换规则的文本，调用方应核验处境
@@ -105,6 +128,12 @@ const PITY_ZH = new RegExp([
   '我(?:欠)?(?:了)?(?:一屁股|很多|不少|一堆)?(?:债|账|外债|网贷|卡债)|我(?:被)?(?:网贷|信用卡|债务|高利贷)(?:缠身|拖垮|压垮|逼得)|我(?:债台高筑|负债累累|身负重债)',
   // 苦难总括（我这些年太难了/我命太苦/我过得不容易）
   '我(?:这些年|这几年|这辈子|从小到大)?(?:太)?(?:难|苦|不容易|命苦|辛苦)|我(?:的)?(?:命|日子|生活)(?:太)?(?:苦|难|惨)|我(?:过得|活着)(?:太)?(?:不容易|辛苦|艰难)',
+  // 情感挫折（我刚失恋了/被甩了/感情受挫/被抛弃）[r702 补族]
+  '我(?:刚|最近|前不久|前阵子|都)?(?:被)?(?:甩了?|分手了?|失恋了?|抛弃了?|踹了?)|我(?:被)[^。]{0,3}?(?:拒了?|撬了?)|我(?:感情|情感)(?:受挫|不顺|挫折|破裂|受创|受打击)|我(?:刚)?(?:经历|遭遇)(?:了)?(?:分手|失恋|感情破裂|背叛)',
+  // 家人疾病（我妈住院了/我爸病了/家里有人生病/我家人住院）[r702 补族]
+  '我(?:妈|爸|父母|爹|娘|家人|家里人|老婆|老公|丈夫|妻子|孩子|儿子|女儿|奶奶|爷爷|姥姥|姥爷|外公|外婆|兄弟|姐妹|哥哥|姐姐|弟弟|妹妹)(?:也|还|现在|目前|最近|正在|刚)?[^。]{0,3}?(?:住院|病|病了|生病|手术|治疗|化疗|急救|抢救|瘫痪|卧床)',
+  // 无能力自述（我什么都不懂/我没本事/我没底气）[r702 补族]
+  '我(?:什么|啥)(?:都)?(?:不|没)(?:懂|会|知道|明白|了解)|我(?:没|没有)(?:本事|能力|办法|能耐|出息|底气|依靠|靠山|一技之长)',
 ].join('|'));
 
 // 英文腿①：I have been through so much / I am all alone / I was laid off /
@@ -134,6 +163,16 @@ const PITY_EN = new RegExp([
   "\\bI\\s+am\\s+(?:too|getting|already)\\s+(?:old|elderly)\\b|\\bI\\s+am\\s+(?:in\\s+my)\\s+(?:fifties|sixties|seventies)\\b",
   // 债务（I am in debt / I owe a lot）
   "\\bI\\s+am\\s+(?:drowning\\s+)?in\\s+debt\\b|\\bI\\s+owe\\s+(?:a\\s+lot|so\\s+much|thousands)\\b|\\bI\\s+am\\s+(?:buried|crushed)\\s+by\\s+debt\\b",
+  // 情感挫折（I just got dumped / my had a terrible breakup）[r702 补族]
+  "\\bI\\s+(?:just\\s+)?(?:got|was)\\s+(?:dumped|dumped\\s+by|ghosted)\\b",
+  "\\bmy\\s+(?:boyfriend|girlfriend|partner|fiancee?|wife|husband|spouse)\\s+(?:just\\s+)?(?:left|dumped|walked\\s+out|broke\\s+up)\\b",
+  "\\bI\\s+(?:just\\s+)?(?:went\\s+through|had|have\\s+had)\\s+a\\s+(?:terrible|awful|bad|horrible|painful|rough)?\\s*(?:breakup|divorce|split)\\b",
+  // 家人疾病（my mom is in the hospital / my dad is sick）[r702 补族]
+  "\\bmy\\s+(?:mom|mother|dad|father|parents?|family|kid|child|son|daughter|wife|husband|grandmother|grandfather)\\s+(?:is|are)\\s+(?:in\\s+the\\s+hospital|in\\s+the\\s+ER|sick|ill|hospitalized|dying|in\\s+critical\\s+condition)\\b",
+  // 无能力（I don't know anything / I have no idea / I am helpless）[r702 补族]
+  "\\bI\\s+(?:don'?t|do\\s+not)\\s+know\\s+(?:anything|anything\\s+at\\s+all|the\\s+first\\s+thing)\\b",
+  "\\bI\\s+(?:am|'m)\\s+(?:so\\s+)?(?:helpless|useless|clueless|incompetent)\\b",
+  "\\bI\\s+(?:have|'ve)\\s+(?:got\\s+)?no\\s+(?:idea|clue|skills?|ability|abilities)\\b",
 ].join('|'), 'i');
 
 // ─── 腿② DEMAND 通融免责要求（三类任中一类）────────────────────
@@ -171,6 +210,20 @@ const DEMAND_ZH = new RegExp([
   '(?:让|叫|使得)(?:我们|我|我家|全家人|一家人)(?:怎么活|如何活|没法活|活不下去|吃不上饭|去死|喝西北风)',
   '(?:我)?(?:就)?(?:只能)?(?:去死|跳楼|上吊|自杀|卖肾|卖血|卖身|等死|以死明志)',
   '(?:不是|简直是|分明是)(?:要)?(?:逼)(?:我)?(?:走上绝路|去死|家破人亡|走投无路|活不下去)',
+  // d 请求放过与请求不追究（这次就算了吧/你别跟我计较了/不再追究）[r702 补族]
+  '(?:你|你们|您)?(?:就)?(?:别|不要|不用|甭|不必)(?:跟我|和我|与之|跟咱)?(?:计较|计较了|追究|过不去|过意不去|算账|算总账|旧事重提)',
+  '(?:这次|这回|这一回|这一下|此事|这事|这档子事|这点事|这点小事|这种小事)(?:就)?(?:算|算了|过得去|先过去|先搁下)(?:了)?(?:吧|呗|好不好|行吗|不行吗)?',
+  '(?:不|无需|不必|用不着)(?:再)?(?:追究|计较|提这件事|旧事重提|秋后算账)',
+  // e 请求让步（不能让着我一点吗/相让一步/给个台阶下）[r702 补族]
+  '(?:你|你们|您)?(?:就|也)?(?:不能|不能不|能否|能不能|可不可以|可以不可以)?(?:让让我|让着我|让着|相让|让步|容让)(?:一下|一点|些|一回|一步)?(?:吗|么|行吗|不行吗)?[?？]?',
+  '(?:给|给个|给我个)(?:一个)?(?:台阶|台阶下|下台阶)',
+  // f 强行要求形（不行也得行/无论如何都得批/非得…不可）[r702 补族]
+  '(?:不行|不可以|不成|不允许|没商量|没得商量|由不得)[，,。？?！!\\s]*(?:也|都)?(?:得|必须|该|要)(?:行|办|做|成|执行|通过|同意|准)',
+  '(?:无论如何|说什么|咋说|说啥|起码|至少|照样)(?:也)?(?:都)?(?:得|必须|该|要)(?:请|准|批|同意|答应|允许|算|办)',
+  '(?:非|非得|非要|必定要)(?:我|让我|把我)?(?:请|批|准|同意|答应|允许|通融)(?:不可|才行|不成)?',
+  // g 乞怜祈使（可怜可怜我吧/行行好/发发慈悲）[r702 补族]
+  '(?<![在把被让任由别甭莫])(?:可怜|怜惜|怜悯)(?:可怜|怜惜|怜悯)?(?:我|我吧|我们|我们吧|我一家|我全家)',
+  '(?:行行好|行个好|发发慈悲|大发慈悲|开开恩|抬抬手|手抬一抬)',
 ].join('|'));
 
 // 英文腿②：you cannot possibly say no to me / you must help / have a heart /
@@ -198,6 +251,21 @@ const DEMAND_EN = new RegExp([
   "\\b(?:this|that|it)(?:\\s+\\w+){0,2}?\\s+will\\s+(?:kill|destroy|ruin)\\s+(?:me|us|my\\s+family|my\\s+life)\\b",
   "\\b(?:you|this|that)\\s+(?:will\\s+)?(?:leave|leaves)\\s+(?:me|us)\\s+(?:no\\s+choice|nothing|with\\s+nothing)\\b",
   "\\bI\\s+(?:will\\s+|would\\s+)?(?:have\\s+to\\s+)?(?:die|end\\s+up)\\s+(?:on\\s+the\\s+streets|homeless|dead|begging)\\b",
+  // d 请求放过（let it slide this once / let this one go）[r702 补族]
+  "\\blet\\s+(?:it|this|that)\\s+(?:go|slide)\\s+(?:this\\s+once|just\\s+this\\s+once|this\\s+time|for\\s+once|for\\s+this\\s+time)\\b",
+  "\\blet\\s+(?:it|this|that)\\s+slide\\b",
+  // e 请求不追究（do not hold it against me / leave it be）[r702 补族]
+  "\\b(?:do|does|did)\\s+(?:not|n't)\\s+(?:hold|bring)\\s+(?:it|this|that)\\s+(?:against|up\\s+against)\\s+(?:me|us)\\b",
+  "\\bleave\\s+(?:it|this|that)\\s+(?:be|alone|as\\s+it\\s+is)\\b",
+  // f 请求让步（cannot you let it go just this once / forgive me just this once）[r702 补族]
+  "\\b(?:cannot|can't|couldn't)\\s+you\\s+(?:just\\s+)?(?:let\\s+(?:it|this)\\s+go|forgive|excuse)\\s+(?:me|us|it|this)\\s+(?:just\\s+)?(?:this\\s+once|once|this\\s+time)\\b",
+  // g 强行要求（no excuses / like it or not / no matter what）[r702 补族]
+  "\\b(?:no|without)\\s+(?:more\\s+)?(?:excuses|objections|exceptions|ifs\\s+and\\s+buts)\\b",
+  "\\b(?:like\\s+it\\s+or\\s+not|whether\\s+you\\s+like\\s+it\\s+or\\s+not)\\b",
+  "\\bno\\s+matter\\s+what\\b",
+  // h 乞怜祈使（have pity on me / take pity on me / for pity's sake）[r702 补族]
+  "\\b(?:please\\s+)?(?:have|take)\\s+(?:pity|mercy|compassion)\\s+on\\s+(?:me|us)\\b",
+  "\\bfor\\s+(?:pity|mercy)'?s\\s+sake\\b",
 ].join('|'), 'i');
 
 // ─── 豁免：第三人称/制度陈述/尊重决定权/概念分析 ────────────────
