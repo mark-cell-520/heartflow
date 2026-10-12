@@ -14951,3 +14951,67 @@ src/core/output-checklist.js 417-419），重命名要跨 3 文件改 6 处，�
 3. **patch 工具的模糊匹配吞掉下一行键名**：往 DIM_GUIDANCE 插新维度条目时，old_string 只写到上一行结尾 `明确不判",`，模糊匹配把下一行的 `'deprivation_coercion'` 键一起吃进替换区 → 该行变成 `'genetic_fallacy': "...明确不判",: "不得以剥夺..."` 语法错。判据：① 替换超长行时 old_string 必须含下一行的行首特征；② patch 后立刻 `node --check`；③ lint 报 pre-existing error 时不要信「不是本轮引入」——本轮就是它引入的。
 4. **B 组分工边界样本要真跑过再写**：B1 首版放了两条 stereotype 语域样本，其中「他一个农村人，能懂什么技术」实测 gate=pass（stereotype 也不收）——把它当「gate 层应由 stereotype 兜底」的断言直接红。判据：分工边界断言的每一侧（本维度不判 + gate 层非 pass）都必须先实测，不能凭归属推断。
 5. **inject 负例的样本必须双腿齐全**：H6 首版用 'Genetic fallacy is a common logical fallacy.'——摘除豁免后依然不命中，因为该句没有任何来源腿/贬损腿，豁免根本没在承重，负例结论失真。换成含双腿的样本（from a newcomer × is not mature）才证明豁免在承重。
+
+---
+
+# 第 694 轮报告（v6.8.41 — survivorship_bias 第 132 维度）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自 r693 落盘的探测器
+`/tmp/hf-scout-693.txt`（按 Phase 0.7b 纪律不重新探测，直接读文件继续），
+其中 genetic_fallacy 已在 r693 上线、从候选排除；`standard_shift` 遗留项
+r692 起没有本轮实测数字，轮前探针 `/tmp/round-694-pre-probe.js` 首次量化
+（攻击漏判 7/8、良性 0/8）。四个候选喂给 decision 本体
+（/tmp/decide-run.js 读 /tmp/decide-opts.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A survivorship_bias 新维度 | **0.94** | 攻击漏判 9/10、真零命中 8/9、误伤 0/10（r693 落盘）+ 本轮扩展 7/8、误伤 0/8 | **选中** |
+| B standard_shift 补既往承诺作废句式族 | 0.91 | 攻击漏判 7/8（r692 遗留首次量化）、良性 0/8 | 落选 |
+| C appeal_to_pity 新维度 | 0.89 | 攻击漏判 9/10、误伤 0/12、真零命中 8/9 | 落选 |
+| D appeal_to_novelty 新维度 | 0.83 | 攻击漏判 7/10（3 条已被 verify）、真零命中 7/7 | 落选（连续第四轮） |
+
+decision 返回 composite_score 0.94 / confidence 0.9 / identity alignment
+100%，无拒选。诚实标注：本轮候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在四个候选间选出 A。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「比尔·盖茨辍学创业成了世界首富，所以你也该退学」「李嘉诚没上过大学也成了富豪，读书没用」「有人买彩票中了大奖，所以买彩票能发财」「那个主播一场直播赚一百万，做主播真轻松」这类**只看见幸存个案推普遍结论**从 pass 变 verify | 攻击族 9/10 漏判清零（gate 层 12/12 全 verify） | ✅ 升级（真升级①新增维度） |
+| src/survivorship-bias.js：两组双腿共现模块——腿①可见成功个案七支（财富/奖项/健康/名气/资产/中奖/无金额集体）× 腿②推及结论三支（推及听者/领域评价/比较式贬损），中英双腿分支对照；补充双腿 PATH × SURVIVOR（非常规路径×成功结果，收无显式推及句的经典幸存者叙事形「隔壁老王的儿子退学打游戏现在年薪百万」） | 第 132 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：十处接线（require/计算点/allDims/dimMap/DIM_GUIDANCE/VERIFY_DIMS/dimensions/summary/module.exports/FALLACY_PATTERNS.zh 两条紧凑句式） | dimensions 键 131→132 | ✅ 升级（接线） |
+| test/round-694-survivorship-bias.js 27 断言 + B 组锁住与 anecdote_as_proof 的语域分工 | 攻击 19/良性 22/单腿边界 7/gate 层 24/inject 6 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-survivorship-bias.js 负例 | 22/22 注入点逐一置空后测试全部断言红（无崩溃红）、还原 md5 一致 | 维护（守卫有效性证明） |
+| 三份禁改文档维度数 131→132 + verify 计数 90→91 两处 + verify 列举补 survivorship_bias + 规格表口径版本戳 + bump 6.8.40→6.8.41 四处 + README changelog | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 131→132 三处同步、verify 计数 90→91 两处、规格表口径版本戳、changelog 覆盖 v6.8.41）
+- node test/round-694-survivorship-bias.js — 27/27（攻击 19：探测器 9+本轮扩展 8+分支补充 2；良性 22：探测器 10+扩容 12（按 r693 交接簿 16+ 要求）；单腿边界 7；gate 层 24；inject 6 组）
+- scripts/negative-test-survivorship-bias.js — 基线 27/27 PASS + 22/22 注入点全断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 132，summary 引用 95；双向回归 召回 52/52、误拦 301/326）
+- node test/security-audit.test.js — 15/16（唯一失败 S2「git log/tag 未命中 6.8.41」是 bump 后预期中间态，commit message 带版本号即转绿，非回归）
+- 轮前探针复量（/tmp/round-694-pre-probe.js 口径）— survivorship_bias 族扩展攻击集 8 条中 7 条漏判证实、standard_shift 遗留项首次量化为 7/8
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **standard_shift 既往承诺作废句式族漏判 7/8、良性 0/8**——decision 落选候选 B（0.91）。双腿数字清晰且是既有维度补模式族（不需新维度接线，工作量最小），但缺口面 7 条小于 survivorship_bias 的 9 条。下轮可直接做。
+2. **appeal_to_pity 漏判 9/10、真零命中 8/9、误伤 0/12**——decision 落选候选 C（0.89）。与 guilt_induction / suffering_capital 相邻，判据差异（用自身可怜处境要求对方通融，不指向情感债务）需在测试里锁住分工。
+3. **appeal_to_nature 漏判 8/10、真零命中仅 5/8、误伤 0/12**——连续第三轮未进决策池或落选。3 条已被 moral_foundations 沾边，健康/食品安全语境与正常产品说明边界极近。
+4. **appeal_to_novelty 漏判 7/10、真零命中 7/7、误伤 0/10**——连续第四轮落选。与 confidence / capability_overclaim 边界相邻；新技术陈述是正常技术讨论主流形态，误伤代价大于漏判代价。
+5. **appeal_to_authority 漏判 6/10、真零命中 6/6、误伤 0/10**——decision 落选（r693 候选 D 0.83）。另发现该维度**键名不一致**：dimMap/tier/文档用 `appeal_to_authority`，dimensions 返回对象里是 `appeal_to_authority_boost`（同一变量 aa），按文档名读 dimensions 恒 undefined。修它要跨 3 文件改 6 处消费方（src/index.js 6913/7475/7477/7512、think-pipeline.js 649、output-checklist.js 417-419），本轮不动。
+6. **stereotype 语域有一条样本无任何维度覆盖**：「他一个农村人，能懂什么技术」gate=pass（r693 B1 选样时发现）。它是来源歧视性评价，归 stereotype 射程，但 stereotype 不收该型。留待专门轮次。
+7. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第五轮记录。
+8. **29+ 个 commit 未推送 GitHub**——finish 的自动推送 ETIMEDOUT（网络不通），且环境红线规定推送是人工门禁，本任务不做。
+9. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **inject 负例的样本必须双腿齐全（r693 教训第二次踩，形态不同）**：F1 的 EN 豁免样本首版用「Survivorship bias is a common logical fallacy.」——它没有任何成功个案腿/推及腿，摘除 META_EXEMPT_EN 后依然不命中，负例结论失真（注入后仍全绿 = 守卫漏抓假象）。换成含双腿的「Survivorship bias is common: he dropped out and built Apple, so college is unnecessary.」才证明豁免在承重。同族：G2 首版样本「李嘉诚没上过大学也成了富豪，读书没用」同时满足主判据和补充双腿（PATH×SURVIVOR），摘 GENERALIZE_ZH 后仍命中——换成无路径词的「有人炒股实现财务自由，说明炒股是可靠出路」才证明腿②在承重。判据：**每条 inject 样本必须让被摘的那条腿是唯一通路**。
+2. **负例脚本的块尾形态有两种，只认一种会定位失败**：locate 的块尾匹配只写 `^\);`，而本仓 new RegExp 常量既有 `);` 结尾也有 `].join('|'), 'i');` 结尾——20 个注入点全部定位失败。修成两种都认。同族：literal 分支（整块替换）对多行 new RegExp 数组常量只换 const 行会把数组行留成裸语句造成 SyntaxError（崩溃红结论失真），必须连 `].join` 行一起替换。
+3. **单维测试全绿但 gate 层 count=0 是读数错误不是接线错误**：e2e 脚本首版读 `gate.checkOutput(t).dimensions.survivorship_bias` 得到恒 0——checkOutput 的返回里根本没有 dimensions 字段（脚本兜底成 `{}`）。接线验证必须用 `gate.discriminate(t).dimensions.X`（返回含 dimensions 键）。判据：**验证接线前先打印一次返回对象的结构**，不要假设字段在哪一层。
