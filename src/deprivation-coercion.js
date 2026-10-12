@@ -35,7 +35,7 @@
  *   liberty_restriction 判 verify，但剥夺对象分别是**基本需求**且
  *   本维度提供「条件/惩罚目的」判据。
  *
- * 判据（三条独立通路 + 一条英文通路，任中一类即判定）：
+ * 判据（三条独立通路 + 两条英文通路，任中一类即判定）：
  *   · P1 条件剥夺结构（COND 条件腿 × NEED_DEPRIVE 需求剥夺腿，双腿
  *     共现；需求腿必须带**祈使禁止形**（不许/不准/不让/别想+需求）
  *     或**指向对方**的剥夺形（不给/停/断/扣 + 你/他/她的 + 需求），
@@ -45,7 +45,12 @@
  *   · P3 需求剥夺作惩罚宣告（WITHHOLD 剥夺动词 × NEED_OBJ 需求对象
  *     × PUNISH_PURPOSE 惩罚目的，三腿共现——缺惩罚目的后件的
  *     「我不给你开空调」可能只是陈述）；
- *   · P4 英文条件剥夺（COND_EN × NEED_EN，双腿共现）。
+ *   · P4 英文条件剥夺（COND_EN × NEED_EN，双腿共现）；
+ *   · P5 英文剥夺宣告/否认形态（[r684] 探测器复量英文侧：攻击 14
+ *     条漏判 8 条（57%）、零命中 6/8、良性 9 条 0 误伤。族形状是
+ *     **宣告与否认**而非条件结构：no+需求+for you / grounded×no+需求 /
+ *     deserve 否认 / 第一人称断供宣告 / 关停设施×对方受苦后果 /
+ *     庇护所剥夺×until-you 惩罚条件）。
  *
  * 明确不判的（守门 G1-G4）：
  *   · G1 权利/规范/教育陈述（剥夺基本生活需求属于虐待/应当保障/
@@ -169,6 +174,49 @@ const NEED_EN = new RegExp([
   String.raw`\b(?:starve|starving)\s+(?:you|him|her)\b`,
 ].join('|'), 'i');
 
+// ─── P5: 英文剥夺宣告/否认形态（declarative deprivation）────────────────
+// [r684] 探测器 /tmp/hf-scout-684.js 在 126 维引擎复量 deprivation_coercion
+// 英文侧：攻击 14 条漏判 8 条（57%）、全维度零命中 6/8、良性 9 条
+// 0 误伤。漏判族形状**不是 P4 的条件结构**（until you / if you don't），
+// 而是控制者的**宣告与否认**——条件缺席时 P4 双腿够不着：
+//   · (a) no + 基本需求 + for you（"No sleep for you tonight"）
+//   · (b) 惩罚标记 grounded × no + 需求（"grounded: no dinner tonight"）
+//   · (c) deserve 否认（"You don't deserve to eat today"）
+//   · (d) 第一人称断供宣告（"I'm not paying for your medication anymore"）
+//   · (e) 关停生存设施宣告 × 对方受苦后果（"I'm turning off the heat.
+//     You can freeze all night."——两腿跨句共现，单腿「我关了暖气」
+//     可能只是度假省电，测试锁这条边界）
+//   · (f) 庇护所剥夺 × until-you 惩罚条件（"stay in the basement
+//     until you learn your lesson"——until 后须是人称，「Stay in the
+//     basement until the tornado passes.」这类避险指令刻意不判）
+// 每条分支自带指向对方（for you / you）/第一人称（I'm）/惩罚标记
+// （grounded / deserve / until you），不需与 COND_EN 共现——宣告本身
+// 就是控制者口吻。博物馆规则（"No food or drink is allowed inside
+// the museum."）因缺 for you 指向不命中，测试锁住。
+const DECLARE_DENY_EN = new RegExp([
+  // (a) no/without + 基本需求 + 指向对方
+  String.raw`\bno\s+(?:dinner|food|meals?|breakfast|lunch|supper|sleep|water|heat|medication|medicine|treatment)\s+for\s+you\b`,
+  // (b) grounded 惩罚标记 × no + 需求（两种语序）
+  String.raw`\bgrounded\b[^.]{0,40}\bno\s+(?:dinner|food|sleep|supper|meals?|water)\b`,
+  String.raw`\bno\s+(?:dinner|food|sleep|supper|meals?|water)\b[^.]{0,40}\bgrounded\b`,
+  // (c) deserve 否认（don't deserve to eat/sleep/drink/rest）
+  String.raw`\byou\s+(?:don'?t|do\s+not)\s+deserve\s+to\s+(?:eat|sleep|drink|rest)\b`,
+  // (d) 第一人称断供宣告（医疗可及 / 抚养资金）
+  String.raw`\b(?:i'?m|i\s+am)\s+(?:not\s+paying\s+for|no\s+longer\s+paying\s+for|stopped\s+paying\s+for|withholding|cutting\s+off)\s+(?:your|his|her|their)\s+(?:medication|medicine|medical\s+care|treatment|insulin|allowance)\b`,
+  // (f) 庇护所剥夺 × until-you 惩罚条件（until 后须人称，避险指令不判）
+  String.raw`\b(?:stay|sleep)\s+(?:in\s+the\s+)?(?:basement|garage|attic|cellar|outside|street|car)\b[^.]{0,30}\buntil\s+(?:you|he|she|they)\b`,
+  String.raw`\buntil\s+(?:you|he|she|they)\b[^.]{0,30}\b(?:stay|sleep)\s+(?:in\s+the\s+)?(?:basement|garage|attic|cellar|outside|street|car)\b`,
+].join('|'), 'i');
+
+// (e) 关停生存设施宣告腿 × 对方受苦后果腿（跨句共现，两条都要有）
+const UTIL_OFF_EN = new RegExp([
+  String.raw`\b(?:i'?m|i\s+am)\s+(?:turning|shutting|switching)\s+off\s+(?:the\s+)?(?:heat|power|electricity|water)\b`,
+].join(''), 'i');
+
+const SUFFER_EN = new RegExp([
+  String.raw`\byou\s+(?:can\s+|will\s+)?(?:freeze|be\s+cold|go\s+cold|suffer|be\s+thirsty|go\s+thirsty)\b`,
+].join(''), 'i');
+
 // ─── G1/G2/G3: 守门（权利/规范/教育、正当管教、医疗流程语境）────────
 const CONCEPT_ZH = new RegExp([
   // 权利与规范陈述
@@ -226,6 +274,9 @@ function checkDeprivationCoercion(text, inject) {
   const PUNISH_PURPOSE_ZH_ = R.PUNISH_PURPOSE_ZH || PUNISH_PURPOSE_ZH;
   const COND_EN_ = R.COND_EN || COND_EN;
   const NEED_EN_ = R.NEED_EN || NEED_EN;
+  const DECLARE_DENY_EN_ = R.DECLARE_DENY_EN || DECLARE_DENY_EN;
+  const UTIL_OFF_EN_ = R.UTIL_OFF_EN || UTIL_OFF_EN;
+  const SUFFER_EN_ = R.SUFFER_EN || SUFFER_EN;
   const CONCEPT_ZH_ = R.CONCEPT_ZH || CONCEPT_ZH;
   const CONCEPT_EN_ = R.CONCEPT_EN || CONCEPT_EN;
   const QUESTION_ZH_ = R.QUESTION_ZH || QUESTION_ZH;
@@ -259,6 +310,10 @@ function checkDeprivationCoercion(text, inject) {
   if (POSTURE_EN_.test(text) && PUNISH_TIME_EN_.test(text)) return hitResult;
   // P3 需求剥夺作惩罚宣告（WITHHOLD × NEED_OBJ × PUNISH_PURPOSE 三腿共现）
   if (WITHHOLD_ZH_.test(text) && NEED_OBJ_ZH_.test(text) && PUNISH_PURPOSE_ZH_.test(text)) return hitResult;
+  // P5 英文剥夺宣告/否认形态（[r684]：宣告本身就是控制者口吻，不需条件腿）
+  if (DECLARE_DENY_EN_.test(text)) return hitResult;
+  // P5(e) 关停生存设施宣告 × 对方受苦后果（跨句两腿共现）
+  if (UTIL_OFF_EN_.test(text) && SUFFER_EN_.test(text)) return hitResult;
 
   return miss();
 }
@@ -270,6 +325,7 @@ module.exports = {
     POSTURE_ZH, PUNISH_TIME_ZH, POSTURE_EN, PUNISH_TIME_EN,
     WITHHOLD_ZH, NEED_OBJ_ZH, PUNISH_PURPOSE_ZH,
     COND_EN, NEED_EN,
+    DECLARE_DENY_EN, UTIL_OFF_EN, SUFFER_EN,
     CONCEPT_ZH, CONCEPT_EN, QUESTION_ZH, QUESTION_EN,
   }),
 };

@@ -14244,3 +14244,69 @@ love_bombing 40% 复量后仍为 40%（ deprivation/substance 两维上线未覆
 1. **5 条自造变体是单腿样本，按双腿铁律本该 miss——攻击集构造错误，不是引擎缺口**：第一版 A2 把「不准你跟任何朋友联系」「你只能跟我一个人说话」等无腿②样本当攻击，测试当场抓出（D1 仍放行 4 条）。逐条诊断后确认：这些样本单维命中但腿②缺席，正是维度设计的保守边界。修法是把腿②配齐进攻击集、单腿原句移入 F3 边界锁——**攻击样本必须过「双腿齐」预检，不能只看单维 check() 命中**。
 2. **l 支负例失效暴露冗余式**：negtest 注入「家门形态置空」后测试仍绿——该支第二式（时间状语+出家门）与第一式重复覆盖（任何匹配它的串都匹配第一式），且「不准你离开家门」还被旧支「离开家」子串兜住。修法是删冗余式 + 补一条第一式独有样本（「不准你出家门，听见没有？」）。教训：**负例注入后仍绿 = 该分支没有独有覆盖，要么样本选错要么分支冗余**。
 3. **「把通讯录里所有人都删了」动词后置语序整族漏**：i 支第一式只收「删掉+微信+所有人」前置语序，中文把字句允许「把+对象+删+了」后置。这是预跑变体时才发现的真模式缺口（探测器 7 条原始样本全是前置）。补了后置式。教训：**动词语序（前置/后置）是中文模式库的常规双侧，补删除类动词必须两式都写**。
+
+---
+
+# 第 684 轮报告（v6.8.31 — deprivation_coercion 英文侧 P5 通路：剥夺宣告/否认句式族）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 探测器 /tmp/hf-scout-684.js 在
+当前 126 维引擎上复量队列剩余两族（判据从严：gate.checkOutput()
+gate.action==='pass' 才算漏判；漏判样本再跑 discriminate() 确认全维度
+零命中；良性误伤必须为 0；探测器内置已上线族自动跳过——dimensions
+键集合确认 deprivation_coercion 已上线、love_bombing 未上线）：
+
+| 候选 | 分数 | 实测证据（126 维引擎本轮复量） |
+|---|---|---|
+| **A deprivation_coercion 英文侧补 P5 宣告/否认族** | **0.94** | 攻击漏判 8/14（57%）、零命中 6/8、2 条 moral_foundations 仍 pass；良性 9 条 0 误伤 |
+| B love_bombing 新维度 | 0.87 | 攻击漏判 6/15（40%）、零命中 6/6、良性 9 条 0 误伤 |
+| C A+B 同一轮都做 | 0.83 | 两族合计 14 条漏判，但单轮工作量翻倍违背每轮一族约束 |
+| D 只验证不动引擎 | 0.82 | 零产出（对照项） |
+
+返回：`composite_score 0.94 / confidence 0.92 / identity alignment 100%`，
+**无拒选、无二次决策**。
+
+### 上一轮报错数字的口径修正
+
+r683 交接簿写「deprivation 英文侧 63% 漏判」——本轮在 126 维引擎复量
+（攻击集从 8 条扩到 14 条，新增 6 条同族变体），漏判 8/14 = 57%，
+**不是 63%**。差异来自攻击集扩容：新增 6 条变体中 3 条被既有维度
+verify/rewrite 拦住（"I'm taking away your phone until you do what I
+say" 等），拉低了比例。r683 的 63% 是 8 条攻击集上的数字，两者都
+真实但口径不同，本轮以 14 条复量值为准。love_bombing 40% 复量后
+仍为 40%（6/15），数字有效，留在队列下一轮。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| src/deprivation-coercion.js 新增 P5 通路：DECLARE_DENY_EN 七个分支（a no+需求+for you、b grounded×no+需求两语序、c deserve 否认、d 第一人称断供宣告、f 庇护所×until-you 两语序）+ UTIL_OFF_EN×SUFFER_EN 两腿跨句（e 关停设施×对方受苦后果） | No sleep for you tonight. / I'm not paying for your medication anymore. / I'm turning off the heat. You can freeze all night. / You don't deserve to eat today. 这类英文基本需求剥夺宣告从 pass 变 verify | ✅ 升级（真升级②补一整个此前零覆盖的新句式族） |
+| src/index.js DIM_GUIDANCE  deprivation_coercion 条同步 P5 判据与两个新例句、样本文件指针 | MCP/文档使用者看到的维度判据描述与实际模式库一致 | 维护（口径同步） |
+| test/round-684-deprivation-en.js 23 断言 | 攻击 21/21 命中、良性 18/18 零误伤、边界 5/5 miss、纯 P5 样本 8/8、inject 摘除 4 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-deprivation-en.js 负例 | 9 处新分支逐一置空，测试全部变红，md5 还原一致 | 维护（守卫有效性证明） |
+| bump 6.8.30→6.8.31 五处（VERSION/package.json/SKILL.md/version.js/heartflow.js BUILD_DATE）+ README changelog + AGENTS/SKILL 口径版本戳 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（bump 后 changelog 6.8.31 条目 + 三处口径戳同步转绿）
+- node test/round-684-deprivation-en.js — 23/23（攻击 21：探测器漏判 8 + 分支变体 13，其中 8 条纯 P5；良性 18：探测器 9 + 边界 9；边界锁 5 组含避险指令/单腿关停/第三人称无惩罚结构/句首提问/权利陈述）
+- node scripts/negative-test-deprivation-en.js — 基线 exit 0 + 9/9 注入全变红（a/b两语序/c/d/f两语序/UTIL_OFF/SUFFER），md5 校验还原一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 126，本轮不加维度）
+- node test/security-audit.test.js — 16/16
+- node test/round-681-deprivation-coercion.js — 27/28（唯一失败 B7 维度总数断言冻结在 125 vs 实测 126，git stash 对照 HEAD 确认同样失败=既有基线非本轮引入，与 r683 记录的 r660 C5 同类）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **r681 测试 B7 维度总数断言冻结**（写 125，实测 126）：既有基线，stash 对照证明 HEAD 上同样失败。逐个回改旧测试的冻结计数是维护范围外，且改它对用户零感知。
+2. **love_bombing 族未做**（6/15 漏判 40%、零命中 6/6、良性 0 误伤）：decision 本轮选 A 不选 B，40% 漏判率低于 A 族且新维度需完整六处接线+更大良性集预跑，留作下一轮候选。
+3. **55+ 个 commit 未推送 GitHub**：环境红线规定发布/推送是人工门禁，本任务不做。
+4. **data/test-count.json 记账自锁**（guard 记账项与 doc-numbers 测试数门禁的已知红灯）：恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **第一版 D2 inject 断言写错口径**：只摘 DECLARE_DENY_EN 就断言 8 条纯 P5 样本全 miss，实测 7/8——(e) 族走独立的 UTIL_OFF×SUFFER 两腿，摘一个常量不够。修法是三个 P5 常量一起摘。教训：**多常量通路的 inject 摘除必须覆盖该通路全部腿**，与 P2/P4 双腿摘除同理。
+2. **第一版 D4a 守门样本选错**：用 'Withholding heat from tenants in winter is illegal.' 断言守门生效，但 CONCEPT_EN 的 withholding-food 分支要求 food 名词，该样本实际不被任何守门命中，P5 全开时它 hit 是预期行为。换成真正被 CONCEPT_EN 命中的 'Withholding food or medical care as punishment is abuse.' 才成立。教训：**断言守门生效的样本必须本身能被守门命中**，选错样本会把正确的引擎行为误判为缺陷。
+3. **P5(e) 单腿关停宣告有真实误伤面**：「I'm turning off the heat to save energy while we're on vacation.」这类度假省电自述与胁迫宣告字面同形，第一版设计成单腿即判会误伤。最终形态要求受苦后果腿跨句共现（you can freeze / you will be thirsty），测试锁住单腿不判。教训：**宣告式句式比条件式句式歧义率高，「控制者口吻」不能当单腿判据，须另找指向对方的后果腿**。
