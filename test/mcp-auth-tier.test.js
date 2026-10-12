@@ -103,10 +103,18 @@ const alive = (() => {
 })();
 
 if (!alive) {
-  console.log('\n⚠️  8588 不在线或无有效 token，跳过 HTTP 鉴权测试。');
-  console.log('    这意味着 v6.7.72 修掉的"admin 死代码"bug 无法在本环境验证。');
-  console.log('    上线前请手动确认：cd ' + HF + ' && node src/mcp-server.js --port 8588');
-  process.exit(0);
+  // [r418] 这个文件历史上的行为是 process.exit(0) —— 即「跳过」。
+  // exit 0 让上层看起来是通过的，于是「跳过」和「验证通过」无法区分，
+  // 而它自己写着「无法在本环境验证」。一个永远跳过的测试比没有测试更糟。
+  //
+  // 现在：明确标为 SKIP（exit 77，约定俗成的跳过码），并指向真正会跑的
+  // 端到端测试 test/mcp-auth-e2e-real.test.js —— 那个测试自生成 token、
+  // 自己起 server、用真实 HTTP JSON-RPC 打三态鉴权，13 项全绿。
+  console.log('\n⏭️  SKIP: 8588 不在线或无有效 token（本文件依赖外部已在跑的实例）。');
+  console.log('    本文件不再以 exit 0 冒充通过。');
+  console.log('    真实的三态鉴权验证请看：node test/mcp-auth-e2e-real.test.js');
+  console.log('    （自生成 token + 自起 server + 真实 HTTP JSON-RPC，13 项）');
+  process.exit(77);
 }
 
 console.log('\n[写工具：正确 token 必须放行]');
