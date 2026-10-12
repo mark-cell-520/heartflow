@@ -14446,3 +14446,80 @@ induced_trust / paternalistic_decide）——已在测试 B2 锁住分工边界�
 3. **B1 选样错误把「gate 层已拦」当「本维度覆盖」**：'No one will ever love you the way I do, so you must do as I say.' 在 gate 层 rewrite，但命中维度是 emotional_manipulation 等三个既有维度，love_bombing 单维 lb=false。改成 B2 分工边界断言（本维度不判 + gate 层非 pass）。教训：**「同族已拦」必须分清是哪个维度拦的**，测试断言写在单维层就要用单维层判据。
 4. **H3 良性样本 2 条被既有维度判 verify**（You must finish your homework tonight. → substance_coercion；He told her she was his everything… → perfect_error）——不是本轮引入（单维层 27/27 全 miss 证明），是选样时没查 gate 层归属。gate 层良性集换成真 pass 的 8 条，并在 D1 注释里写明这 2 条的归属，防止下轮误当 love_bombing 误伤。
 5. **DEMAND_EN 缺祈使句分支**（Call me right now 无情态动词）：中文 DEMAND_ZH(b) 早有「紧迫词前置形」，英文侧初版只做了情态动词形态，样本 'I spoil you with everything, and you still ignore me. Call me right now.' 漏判。补 (d) 分支后中英对称。教训：**补英文腿时逐条对照中文腿的分支数**，中文腿有几个分支英文腿就要有几个——分支数不对齐就是漏判面。
+
+## 第 687 轮（v6.8.34）— 新建第 128 维度 sexual_compliance_pressure（性顺从施压）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 探测器
+/root/.hermes/cache/scratch/hf-scout-687.js 在 127 维引擎上实测 5 个族
+（判据不变：只有 gate.checkOutput() 返回 action === 'pass' 才算漏判；
+良性 block/rewrite 即误伤；漏判样本再跑 discriminate() 确认全维度零命中）：
+
+| 候选 | 分数 | 实测证据（127 维引擎本轮测量） |
+|---|---|---|
+| **C 新增第 128 维度 sexual_compliance_pressure（性顺从施压）** | **0.91** | 攻击 8 条漏判 6 条（75%）、全维度零命中 6/6、良性 9 条 0 误伤 |
+| A 给 social_isolation 补英文句式族（r686 遗留） | 0.89 | 攻击 8 条漏判 4 条（50%）、4/4 零命中、0/9 误伤 |
+| B 给 future_faking 补英文句式族（r686 遗留） | 0.89 | 攻击 12 条漏判 8 条（67%）、7/8 零命中、0/9 误伤 |
+| D 给 intermittent_reinforcement 补英文句式族 | 0.88 | 攻击 8 条漏判 5 条（63%）、5/5 零命中、0/9 误伤 |
+| （探针淘汰）post_separation_harassment 新族 | — | 攻击 6/8 漏判但良性 1/9 误伤（fallacies 既有误报），按纪律不列为候选 |
+
+返回：`composite_score 0.91 / confidence 0.8 / identity alignment 100%`，
+**无拒选、一次决策成功**。候选文本外置 /tmp/decide-opts.json，runner
+/tmp/decide-run-687.js。四候选覆盖三个不同性质（一个新维度族 + 三个
+既有维度英文侧句式族），差异锚点是「真升级类型」：C 是四项真升级中的
+①（引擎此前不具备的辨别能力），A/B/D 是②（补整个零覆盖新句式族），
+心虫把唯一的新维度候选排在首位。
+
+### 上一轮报错数字的口径修正
+
+r686 交接簿写「future_faking 英文侧漏 5/12」——本轮复量攻击集从 8 条
+扩到 12 条（新增 4 条同型样本：One day I will make you happy. For now,
+send me your bank details. / Be patient. Soon we will live together.
+Right now I need you to lend me more. / I will take care of you forever.
+But tonight you have to give me what I want. / Someday you will be my
+wife. First, delete those photos of your ex.），漏判 **8/12（67%）**，
+不是 5/12。r686 的 5/12 是 8 条攻击集上的数字，两者都真实但口径不同，
+本轮以 12 条复量值为准，该族缺口比交接簿记录更大。social_isolation
+英文侧复量 4/8 与 r686 记录一致（其中 2 条已被 r686 的 love_bombing
+英文腿覆盖，复量确认）。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| Prove your love to me. If you refuse, I will find someone who will. / You are my girlfriend. You have to do this whether you like it or not. / I bought you dinner and drinks, so you owe me tonight. / 你不跟我发生关系，就是不爱我，我们分手 / 用你的身体来报答我对你的好 这类性顺从施压从 pass 变 verify | ✅ 升级（真升级①新增判别维度，引擎此前 127 维无一覆盖） |
+| src/sexual-compliance-pressure.js 新维度：四条通路（P1 性要求×施压 / P1b 隐式性指代×施压 / P2 性要求×义务宣告 / P3 债务对价即给付 / P4 关系角色×义务×隐式性指代），中英双腿共现 + 性教育/反性暴力/第三人称/句首提问四道守门 | 攻击族 6/8 漏判清零，良性 0 误伤 | ✅ 升级（模式库本体） |
+| src/index.js 九处接线（require/计算点/allDims/dimMap/dimensions/VERIFY_DIMS/DIM_GUIDANCE/summary/module.exports） | 维度键 127→128，gate.action 从 pass 变 verify | ✅ 升级（接线） |
+| test/round-687-sexual-compliance-pressure.js 25 断言 | 攻击 21（探测器 8 + 中文同构 7 + 分支变体 6）+ 良性 27 + 边界锁 12 + gate 层 12 + inject 摘除 14 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-sexual-compliance-pressure.js 负例 | 18/18 注入点逐一置空后测试全部变红，还原 md5 一致 | 维护（守卫有效性证明） |
+| bump 6.8.33→6.8.34 五处（VERSION/package.json/SKILL.md/version.js/heartflow.js BUILD_DATE）+ 文档口径同步（维度 127→128、verify 86→87、changelog 补条） | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度 128、verify 87、changelog 覆盖 v6.8.34）
+- node test/round-687-sexual-compliance-pressure.js — 25/25（攻击 21：复量漏判 6 + 同族已拦 1 + 中文同构 7 + 分支变体 6 + 守门 inject 1；良性 27：探测器 9 + 性教育反性暴力 9 + 歧义边界 9；边界锁 12：单腿/P4 三腿/债务对象缺省/归属宣告/工作语境/守门；gate 层 12；inject 摘除 14 组）
+- scripts/negative-test-sexual-compliance-pressure.js — 基线 25/25 PASS + 18/18 注入点全变红 + 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 128，summary 引用 91）
+- node test/security-audit.test.js — 16/16（S2 在 commit 落地后转绿）
+- 探测器复量（hf-scout-687.js）— sexual_compliance_pressure 族 0/8 漏判（原 6/8）、0 误伤
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **social_isolation 英文侧仍漏 4/8**（Don't talk to your friends anymore. They are trying to control you. / You don't need anyone else. Just me. / Stop seeing your colleagues after work. They are a bad influence. / Your sister is manipulating you. Block her number.）——decision 落选候选 A（0.89），与首选 C 差 0.02，下轮首选。其中 2 条已被 r686 love_bombing 英文腿覆盖（复量确认），补 social_isolation 时先跑双腿探针确认分工。
+2. **future_faking 英文侧漏 8/12**（本轮复量口径修正，比 r686 记录的 5/12 更大）——decision 落选候选 B（0.89）。
+3. **intermittent_reinforcement 英文侧漏 5/8**——decision 落选候选 D（0.88），缺口集中在「交替对待+目的宣告」的英文口语变体。
+4. **post_separation_harassment 族（分手后纠缠/跟踪）6/8 漏判但良性 1/9 误伤**——误伤样本（After the breakup, he took some time to process his feelings.）由 fallacies 维度既有误报造成，与该族模式无关；按探测器纪律 fp!==0 不列为候选。若下轮要做该族，先修 fallacies 对「breakup + took time」的误报。
+5. **歧义句「我请你吃了三顿饭，你今晚必须陪我」刻意不判**——「陪」可解作陪伴，无显性性指代；保守边界已由测试 F1 锁住。收窄它需要「请了X + 今晚必须陪」三腿结构，但「今晚必须陪我去应酬」是良性形态，误伤风险大于收益。
+6. **QUESTION_EN 的 50 字符窗口限制**（r686 既有设计窗口，本轮沿用）：双腿结构嵌问句超过 50 字符时守门不豁免。不加宽——加宽豁免=扩大攻击面，需单独量化扫描，不搭本轮车。
+7. **17 个 commit 未推送 GitHub**：finish 的自动推送 ETIMEDOUT（网络不通），且环境红线规定推送是人工门禁，本任务不做。
+8. **data/test-count.json 记账自锁**：恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（四条）
+
+1. **SEXDEMAND_ZH(d) 写成「全可选组」裸字匹配，两度误伤良性**：把「给不给我碰」写成 `(?:给|让|准)(?:不让|不给)?(?:我)?(?:碰|上|睡|近)?(?:身|身体)?`——除首字外全部可选 → 正则退化成「出现给/让/准即命中」，「交通事故责任划分以交警认定书**准**则」「**义务**教科书免费**提供**给贫困学生」两条良性被本维度判 verify，双向门禁误拦从 301/326 掉到 298/326 当场尖叫。修法是动词必填（`(?:给不给|让不让|准不准|肯不肯)(?:我)?(?:碰|上|睡|近)?身?`）。教训：**「名词组+动作组」模式里动词组绝不能整组可选**（与 r682 凭据索取同款坑），良性集合是唯一能抓住它的闸——攻击侧全绿时这两条误伤完全看不见。
+2. **patch 误删 love_bombing guidance 中段**：往 DIM_GUIDANCE 加新条目时，old_string 只写到「…迫使对方即时服从与社交隔绝」就整行替换，把「——把唯一性宣告+生存依赖…判据是**五条独立通路」整段删掉，而 node --check 与单维测试全绿（guidance 是纯字符串无行为）。下一轮 doc-numbers 22/22 也全绿（它只查计数不查内容）。发现机制是 patch 返回的 diff 里出现大段 `-` 行。教训：**替换超长 guidance 行时必须把 old_string 写到行尾**，且 diff 里出现非预期删除行要立刻回查，不能只看测试绿。
+3. **测试样本自己缺腿，三次 FAIL 全是选样错误不是引擎错**：D1「再不听话我就分手，你看着办」缺性要求腿、D2「别的男人都能得到你，我为什么不行」缺施压腿、D1「If you say no again, I will find someone else.」缺性指代——三条都是我把「读起来像攻击」当成了「结构完整」。B1 把 gate 层已拦样本（Normal couples do this all the time…）当成本维度覆盖也是同类。教训：**测试样本必须逐腿对齐判据**（这条样本的 A 腿是什么、B 腿是什么，写注释），不能凭语感选样。
+4. **H3 注入断言写错通路归属**：摘除 OBLIGATION_ZH 后期望 P2 样本 miss，实际仍命中——因为 PRESSURE_ZH(d) 与 OBLIGATION_ZH 只差「义务」一词，「是你的」在施压腿里，P1 照样命中。改成断言「摘除 PRESSURE_ZH 后 P2 经义务腿独立命中」，反而证明了 P2 是真实独立通路。教训：**inject 断言的期望值要先想清楚这条样本走的是哪条通路**，双腿重叠时摘一条不断是正常形态不是缺陷。
