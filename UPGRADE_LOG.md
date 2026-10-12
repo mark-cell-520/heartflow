@@ -14788,3 +14788,76 @@ r690 交接簿写「social_isolation 英文腿漏判 7/8」作为下轮候选—
 2. **C4 anymore 窗口 {0,3} 词装不下真实句子**：'You are not allowed to talk to your friends anymore' 的 not 与 anymore 之间隔 6 个词（allowed to talk to your friends），{0,3} 窗口恒不匹配。放宽 {0,6} 后命中。判据：隐式终结支的窗口要按「否定词 + 动词短语 + 宾语」的真实词数设，不按最短样本设。
 3. **负例脚本 I6a/I6b 注入点被同族冗余兜底**：'From now on, you only need me. Nobody else matters.' 一条样本同时含 I6a 与 I6b 两条腿①支——单独注入任一条，另一条仍让样本命中，负例报「注入后仍全绿（守卫漏抓）」的假阴性。修法：给每条支各配一条**单支样本**（'From now on, you only need me.' 只有 I6a；'Nobody else matters to you. I forbid it.' 只有 I6b）。判据：**两条支覆盖同一样本时，单支注入证明不了单支承重**。
 4. **守门 inject 样本选错两次**：E5 首版选「切断社会联系是一种常见的控制手段」——它 baseline pass 靠的是**缺腿②**而非 ANALYSIS 守门（注入后仍 pass）；第二版选「如何应对他要求检查我手机还不许我出门？」——「检查我手机」属腿① c 支、「不许我出门」属腿① d 支，腿②根本没命中。第三版选「怎么应对他说不准出门否则就别怪我？」才三要素齐全（句首疑问词 + 腿① d 支 + 腿② COERCE b 支）。判据：**守门 inject 样本必须「句首疑问词 + 腿① + 腿②」三要素齐全**，先跑诊断脚本确认双腿命中再写断言——问句转述天然缺腿②，因为转述会改主语。
+
+---
+
+## 第 692 轮（v6.8.39）— moving_goalposts 第 130 维度（真升级①）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 探测器 /tmp/hf-scout-692.js 在 129 维
+引擎实测（判据不变：只有 gate.checkOutput() 返回 action === 'pass' 才算漏判；
+漏判样本再跑 discriminate() 确认全维度真零命中，evidence 维度恒返回 score:1 无
+issues 不算覆盖；良性 0 误伤才列为候选；social_isolation_en / post_separation_harassment
+已在 r690/r691 上线从候选池排除）：
+
+| 候选 | 分数 | 实测证据（129 维引擎本轮测量） |
+|---|---|---|
+| **A 新建第 130 维度 moving_goalposts（人际评价版移动球门）** | **0.92** | 攻击 8 条漏判 8/8、真零命中 8/8、误伤 0/16 |
+| B 新建 genetic_fallacy 维度（起源谬误） | 0.90 | 攻击 8 条漏判 7/8、真零命中 7/7、误伤 0/9 |
+| I 新建 appeal_to_pity 维度（诉诸怜悯） | 0.89 | 攻击 8 条漏判 6/8、真零命中 5/6、误伤 0/9 |
+| H 新建 appeal_to_nature 维度（诉诸自然） | 0.88 | 攻击 8 条漏判 7/8、真零命中仅 4/7、误伤 0/9 |
+| D 新建 appeal_to_novelty 维度（诉诸新奇） | 0.86 | 攻击 8 条漏判 5/8、真零命中 5/5、误伤 0/9 |
+
+返回：`composite_score 0.92 / identity alignment 100%`，**无拒选、一次决策成功**。
+候选文本外置 /tmp/decide-opts-692.json，runner /tmp/decide-run-692.js。
+心虫选 A 的理由：期望收益确定性最高——漏判面最大（8/8）且误伤面已用按 r691
+交接簿要求扩容后的 16 条工作语境良性集验证为 0，判据（贬损性承认/成绩承认 ×
+否认价值/满分层/旧账问责/他人比较）与正常反馈的边界已在 16 条样本上量过。
+
+### 上一轮报错数字的口径修正
+
+r691 交接簿写「moving_goalposts 漏判 8/8、真零命中 8/8」作为下轮候选，并附
+条件「需要先构造 20+ 条工作语境边界样本才配动手」——本轮第一件事就是扩容良性
+集：从 9 条加到 16 条（含绩效反馈/家长鼓励/正当追问旧事/正当比较四类边界），
+复量确认漏判数不变（8/8）、误伤 0/16。**缺口数字三轮稳定（r690→r691→r692 都是
+8/8），变化的是良性集规模**——r691 报的 9 条只是当时没扩，不是引擎行为变化。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 你做到了？那不算，我说的是完全不犯错 / 考了 90 分？为什么不是 100 分 / 涨薪了？隔壁公司同龄人都当上总监了，你这算什么 这类「承认后立刻撤回」的评价话术从 pass 变 verify | 攻击族 8/8 漏判清零（gate 层 10/10 全拦） | ✅ 升级（真升级①新增维度） |
+| src/moving-goalposts.js：双腿共现模块——腿①成果承认三类（显式达成/成绩等级利益/贬损性弱承认）× 腿②标准瞬移四类（否认价值/满分层抬标/旧账问责与话题切换/他人比较贬损），中英双腿分支对照 | 第 130 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | dimensions 键 129→130 | ✅ 升级（接线） |
+| test/round-692-moving-goalposts.js 31 断言 + B 组锁住与 standard_shift（第 70 维）的语域分工 | 攻击 16/良性 36/边界锁 9/gate 层 18/inject 6 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-moving-goalposts.js 负例 | 11/11 注入点逐一置空后测试全部断言红（无崩溃红）、还原 md5 一致 | 维护（守卫有效性证明） |
+| 三份禁改文档维度数 129→130 + verify 列举补 moving_goalposts + bump 6.8.38→6.8.39 + README changelog | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 129→130 三处同步、changelog 覆盖 v6.8.39、SKILL 规格表版本戳同步）
+- node test/round-692-moving-goalposts.js — 31/31（攻击 16：探测器 8+英文对称 4+分支变体 4；良性 36：探测器 16+工作语境扩容 8+英文边界 4+单腿与守门边界 8；边界锁 9；gate 层 18；inject 6 组）
+- scripts/negative-test-moving-goalposts.js — 基线 31/31 PASS + 11/11 注入点全断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 130，summary 引用 93；双向回归 召回 52/52、误拦 301/326）
+- node test/security-audit.test.js — 16/16（S2 在 commit 落盘后由红转绿，属 bump 后预期中间态）
+- 探测器复量（hf-scout-692.js 口径）— moving_goalposts 族漏判 8/8→0/8、误伤 0/16
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **genetic_fallacy 新维度漏判 7/8、真零命中 7/7**——decision 落选候选 B（0.90）。注意边界：「女人写的代码可靠性不如男人」已被既有 stereotype 维度判 verify，建维度前要把「来源歧视性评价」与「来源-质量推断」两类句式分开收。下轮可直接做。
+2. **appeal_to_pity 漏判 6/8、真零命中 5/6**——decision 落选候选 I（0.89）。与 guilt_induction / suffering_capital 相邻但判据不同（用自身可怜处境要求对方通融，不指向情感债务）。
+3. **appeal_to_nature 漏判 7/8、真零命中仅 4/7**——decision 落选候选 H（0.88）。3 条已被 moral_foundations 沾边，期望收益打折扣；健康/食品安全语境与正常产品说明边界极近。
+4. **appeal_to_novelty 漏判 5/8**——decision 落选候选 D（0.86，连续两轮落选）。缺口面中等，与 confidence / capability_overclaim 边界相邻。
+5. **standard_shift（第 70 维）既往作废路由有个相邻缺口**（本轮 B1 选样时发现）：「之前答应的标准不算数了，按新标准来」这类**无达成确认**的既往承诺作废句，standard_shift 路由②要求「之前+答应+不算数」紧邻，中间插入名词（标准/要求）即漏；本维度也不收（无成果承认腿）。实测 gate=pass。这是 standard_shift 的模式缺口，不属本轮维度射程，留待专门轮次。
+6. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第三轮记录。它让所有「读 score 判命中」的审计脚本失真。修它要确认没有消费方依赖 score:1 的现状。
+7. **29+ 个 commit 未推送 GitHub**——finish 的自动推送 ETIMEDOUT（网络不通），且环境红线规定推送是人工门禁，本任务不做。
+8. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **负例脚本整块注入把 const 声明行也替换了**（本轮最贵）：ACK_EN/SHIFT_EN 是 `new RegExp(...)` 多行拼接块，locate 返回的区间起点就是 `const ACK_EN = new RegExp(` 行本身，killLines 从该行开始替换 → 声明行变成裸 `''`、后续模式行悬空 → SyntaxError。崩溃红不是断言红，负例结论失真（r690 坑4 同族复发：那次是漏尾逗号，这次是吞声明行）。修法：killLines 跳过 `/^\s*const\s/` 行。判据：**任何按行区间替换的注入脚本，先确认区间边界不包含结构性行（声明行/闭合行）**。
+2. **整块注入丢尾逗号同样造成崩溃红**：`new RegExp(...)` 块的最后一条模式行以 `",` 结尾（后面还有第二参数 `'i'`），替换成 `''`（不带逗号）会让 `''` 与 `'i'` 贴成 `'''i'` 相邻字符串 → SyntaxError。修法：按原行形态替换——以 `,` 结尾换 `'',`、以 `+` 结尾换 `'' +`、裸行换 `''`。
+3. **META_EXEMPT_ZH 漏放带修饰前缀的名词**：「这种移动球门是一种**情感**操控」首版不豁免——正则里 `(?:一种|典型的|常见的)?` 之后直接要求 `(?:谬误|…|操控|…)`，「情感」两个字插在中间就整句不匹配。补 `情感|精神|心理|经典的|隐性|常见` 进修饰前缀表后才生效。判据：**豁免正则的「动词+名词」之间常插修饰语，名词表前要留可选的形容词组**——与腿②b 满分层名词表漏「总监」是同一条纪律（为什么不是N分/N名之外，职位名词也是满分层抬标的常见宾语）。
