@@ -1,11 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.38"
+version: "6.8.39"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  129 discrimination dimensions × 11-layer pipeline × 161 modules ×
+  130 discrimination dimensions × 11-layer pipeline × 161 modules ×
   182 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
@@ -83,11 +83,11 @@ from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.38 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.39 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 161 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,314 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 129 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 130 | `dimMap` keys in `src/index.js` |
 | MCP tools | 182 | tool definitions exposed via `tools/list` |
 | Test suite | 18,157 passing / 105 failing | `node test/run-all.js` |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -95,7 +95,7 @@ from marketing copy.
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
 |Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
-a `rewrite`, **88 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **89 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -257,13 +257,13 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 129 dimensions
+## The 130 dimensions
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking, pzombie_claim
 
 **Rewrite-level (19):** gaslighting, victim_blaming, double_bind, emotional_manipulation, bullshit, false_urgency, absolute_claim, induced_trust, instrumental_reasoning, tool_deflection, loyalty_by_omission, paternalistic_decide, crisis_exceptionalism, shame_compliance, moral_licensing, favor_ledger, agency_deflection, multi_turn_escalation, turing_mimicry
 
-**Verify-level (88):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, unresolved_conflict, equivocation_sense_shift, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, responsibility_absolution, procedural_burden, cost_externalization, harm_invalidation, performative_responsibility, suffering_contest, percentage_overflow, anecdote_as_proof, incoherent_coverage, selective_minimization, exclusive_trust, flattery_pressure, affective_forecast, synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_debt, suffering_capital, selfharm_coercion, relationship_severance, fear_projection, silent_treatment_coercion, social_isolation, privacy_exposure_coercion, thirdparty_harm_coercion, guilt_induction, family_shame_coercion, conditional_affection, blame_externalization, future_faking, economic_control, triangulation, surveillance_normalization, thought_terminating_cliche, comparative_devaluation, pet_harm_coercion, reproductive_coercion, intermittent_reinforcement,
+**Verify-level (89):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, unresolved_conflict, equivocation_sense_shift, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, responsibility_absolution, procedural_burden, cost_externalization, harm_invalidation, performative_responsibility, suffering_contest, percentage_overflow, anecdote_as_proof, incoherent_coverage, selective_minimization, exclusive_trust, flattery_pressure, affective_forecast, synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_debt, suffering_capital, selfharm_coercion, relationship_severance, fear_projection, silent_treatment_coercion, social_isolation, privacy_exposure_coercion, thirdparty_harm_coercion, guilt_induction, family_shame_coercion, conditional_affection, blame_externalization, future_faking, economic_control, triangulation, surveillance_normalization, thought_terminating_cliche, comparative_devaluation, pet_harm_coercion, reproductive_coercion, intermittent_reinforcement,
 legal_status_coercion,
 liberty_restriction,
 medical_coercion,
@@ -271,9 +271,10 @@ deprivation_coercion,
 substance_coercion,
 love_bombing,
 sexual_compliance_pressure,
-post_separation_harassment
+post_separation_harassment,
+moving_goalposts
 
-> The three action-forcing layers add up to 117; the remaining 11 dimensions are scored but do not force a gate action.
+> The three action-forcing layers add up to 118; the remaining 11 dimensions are scored but do not force a gate action.
 
 > **Resistance to obfuscation:** symbol substitution (`f**k`), spaced letters (`f u c k`), homophones, and Unicode variants are covered.
 
@@ -393,7 +394,7 @@ GB/T 42497-2023 (*Security Requirements for AI-Generated Content*):
 
 | Checkpoint | Module |
 |-----------|--------|
-| Generated-content safety | `checkOutput` / `discriminate` (129 dimensions) |
+| Generated-content safety | `checkOutput` / `discriminate` (130 dimensions) |
 | Training-data safety | `DataEraser` + memory ACL |
 | **Outbound protection** | **`heartflow_check_outbound`** (gate-outbound.js) |
 | Algorithmic transparency | `enginePacing` + `selfHeal` |
