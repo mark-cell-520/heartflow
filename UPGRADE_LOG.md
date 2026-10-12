@@ -14861,3 +14861,93 @@ r691 交接簿写「moving_goalposts 漏判 8/8、真零命中 8/8」作为下�
 1. **负例脚本整块注入把 const 声明行也替换了**（本轮最贵）：ACK_EN/SHIFT_EN 是 `new RegExp(...)` 多行拼接块，locate 返回的区间起点就是 `const ACK_EN = new RegExp(` 行本身，killLines 从该行开始替换 → 声明行变成裸 `''`、后续模式行悬空 → SyntaxError。崩溃红不是断言红，负例结论失真（r690 坑4 同族复发：那次是漏尾逗号，这次是吞声明行）。修法：killLines 跳过 `/^\s*const\s/` 行。判据：**任何按行区间替换的注入脚本，先确认区间边界不包含结构性行（声明行/闭合行）**。
 2. **整块注入丢尾逗号同样造成崩溃红**：`new RegExp(...)` 块的最后一条模式行以 `",` 结尾（后面还有第二参数 `'i'`），替换成 `''`（不带逗号）会让 `''` 与 `'i'` 贴成 `'''i'` 相邻字符串 → SyntaxError。修法：按原行形态替换——以 `,` 结尾换 `'',`、以 `+` 结尾换 `'' +`、裸行换 `''`。
 3. **META_EXEMPT_ZH 漏放带修饰前缀的名词**：「这种移动球门是一种**情感**操控」首版不豁免——正则里 `(?:一种|典型的|常见的)?` 之后直接要求 `(?:谬误|…|操控|…)`，「情感」两个字插在中间就整句不匹配。补 `情感|精神|心理|经典的|隐性|常见` 进修饰前缀表后才生效。判据：**豁免正则的「动词+名词」之间常插修饰语，名词表前要留可选的形容词组**——与腿②b 满分层名词表漏「总监」是同一条纪律（为什么不是N分/N名之外，职位名词也是满分层抬标的常见宾语）。
+
+---
+
+## 第 693 轮（v6.8.40）— genetic_fallacy 第 131 维度（真升级①）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+decision 本体一次选出，无拒选：
+
+| 候选 | 分数 | 实测证据（130 维引擎本轮测量） |
+|---|---|---|
+| **A 新建 genetic_fallacy（起源谬误：按来源出身判好坏不论内容）** | **0.94** | 攻击 10 条漏判 10/10、真零命中 10/10、误伤 0/16 |
+| B 新建 survivorship_bias（生存者偏差） | 0.90 | 攻击 9/10 漏判、真零命中 8/9、误伤 0/10 |
+| C 新建 appeal_to_pity（诉诸怜悯） | 0.88 | 攻击 9/10 漏判、真零命中 8/9、误伤 0/12 |
+| D 新建 appeal_to_authority（诉诸权威） | 0.83 | 攻击 6/10 漏判、真零命中 6/6、误伤 0/10（4 条已被既有维度 verify） |
+
+返回：`composite_score 0.94 / identity alignment 100%`，**无拒选、一次决策成功**。
+候选文本外置 /tmp/decide-opts-693.json，runner /tmp/decide-run-693.js，
+探测器 scripts/round-693-family-probe.js（落盘 /tmp/hf-scout-693.txt）。
+心虫选 A 的理由：期望收益确定性最高——漏判面最大（10/10 全漏）且真零命中
+10/10，良性集已按 r691 交接簿要求扩到 16 条（含审计报告/同行评审/官方统计/
+进口设备等正当来源采信），边界已量过。
+
+**这一轮是心虫选的，不是我拍板的。**
+
+### 上一轮报错数字的口径修正
+
+r692 交接簿写「genetic_fallacy 漏判 7/8、真零命中 7/7」作为下轮候选——本轮
+复量（良性集从 9 扩到 16 条、攻击集补英文对称 2 条）后实际为**漏判 10/10、
+真零命中 10/10**。缺口数字变大的原因是攻击集从 8 条扩到 10 条（新增两条英文
+对称样本也全漏），不是引擎行为变化。另：r692 探测器产出但未进决策池的
+survivorship_bias（8/8 漏判）本轮进池复量为 9/10（新增的「我认识的几个人做
+这个都赚了」已被既有维度 verify）， sacrifice_debt 复量**不合格出局**——
+误伤 1 条（「她为了照顾老人提前退休，这个决定值得尊重」被既有维度 rewrite）
+且漏判仅 50%，不列为候选。
+
+### 探测器自身的口径修正（Phase 0.9 纪律）
+
+探测器的「已上线族自动跳过」用 `Object.keys(gate.discriminate('probe').dimensions)`
+判活。本轮发现 **appeal_to_authority 在该键集合里不存在，但它其实是在线维度**——
+根因是键名不一致：dimMap/tier/文档用 `appeal_to_authority`，而 dimensions 返回
+对象里登记的是 `appeal_to_authority_boost`（同一变量 aa）。后果：按文档名读
+`dimensions.appeal_to_authority` 恒 undefined。该维度有 6 处真实消费方
+（src/index.js 6913/7475/7477/7512、src/core/think-pipeline.js 649、
+src/core/output-checklist.js 417-419），重命名要跨 3 文件改 6 处，风险大于
+收益，**本轮不修，记入已知未修项**。对探测器结论的影响仅限跳过机制——
+漏判样本的「真零命中」统计遍历全部维度值（不限键名），6/6 数字不受影响。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 你做到了？那不算…同族的「按出身判好坏」话术——「这个观点是年轻人提出的，肯定不成熟」「外国人写的书，能适合中国国情吗」「小作坊生产的，质量能好到哪去」「他没上过名牌大学，观点不值得听」「这理论是两百年前提出的，早就过时了」「农村来的见识短，别听他的」「大厂裁员出来的人，能力肯定有问题」从 pass 变 verify | 攻击族 10/10 漏判清零（gate 层 12/12 全拦） | ✅ 升级（真升级①新增维度） |
+| src/genetic-fallacy.js：双腿共现模块——腿①来源点名三类（人群身份/年代时间/出身机构与产地）× 腿②质量贬损推断三类（直接贬损/比较贬损/反问贬损），中英双腿分支对照 | 第 131 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | dimensions 键 130→131 | ✅ 升级（接线） |
+| test/round-693-genetic-fallacy.js 28 断言 + B 组锁住与 stereotype 的语域分工 | 攻击 12/良性 34/边界锁 10/gate 层 20/inject 6 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-genetic-fallacy.js 负例 | 15/15 注入点逐一置空后测试全部断言红（无崩溃红）、还原 md5 一致 | 维护（守卫有效性证明） |
+| 三份禁改文档维度数 130→131 + verify 列举补 genetic_fallacy（89→90）+ bump 6.8.39→6.8.40 四处 + README changelog | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 130→131 三处同步、verify 计数 89→90、changelog 覆盖 v6.8.40、规格表版本戳同步）
+- node test/round-693-genetic-fallacy.js — 28/28（攻击 12：探测器 10+分支变体 2；良性 34：探测器 16+扩容 12+英文边界 6；边界锁 10；gate 层 20；inject 6 组）
+- scripts/negative-test-genetic-fallacy.js — 基线 28/28 PASS + 15/15 注入点全断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 131，summary 引用 94；双向回归 召回 52/52、误拦 301/326）
+- node test/security-audit.test.js — 15/16（唯一失败 S2「git log/tag 未命中 6.8.40」是 bump 后预期中间态，commit message 带版本号即转绿，非回归）
+- 探测器复量（hf-scout-693.txt 口径）— genetic_fallacy 族漏判 10/10→0/10、误伤 0/16
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **survivorship_bias 新维度漏判 9/10、真零命中 8/9、误伤 0/10**——decision 落选候选 B（0.90）。双腿结构（可见成功个案+推及听者/普遍化结论）清晰，但「个案→结论」与正常举例说明的边界比 genetic_fallacy 窄，良性集只有 10 条。下轮可直接做，建议先把良性集扩到 16+。
+2. **appeal_to_pity 漏判 9/10、真零命中 8/9、误伤 0/12**——decision 落选候选 C（0.88）。与 guilt_induction / suffering_capital 相邻，判据差异（用自身可怜处境要求对方通融，不指向情感债务）需在测试里锁住分工。
+3. **appeal_to_nature 漏判 8/10、真零命中仅 5/8、误伤 0/12**——r692 落选后本轮未进决策池（候选只有 4 个）。3 条已被 moral_foundations 沾边，健康/食品安全语境与正常产品说明边界极近。
+4. **appeal_to_novelty 漏判 7/10、真零命中 7/7、误伤 0/10**——连续第三轮落选。与 confidence / capability_overclaim 边界相邻。
+5. **appeal_to_authority 漏判 6/10、真零命中 6/6、误伤 0/10**——decision 落选候选 D（0.83）。另发现该维度**键名不一致**：dimMap/tier/文档用 `appeal_to_authority`，dimensions 返回对象里是 `appeal_to_authority_boost`（同一变量 aa），按文档名读 dimensions 恒 undefined。修它要跨 3 文件改 6 处消费方（src/index.js 6913/7475/7477/7512、think-pipeline.js 649、output-checklist.js 417-419），本轮不动。
+6. **stereotype 语域有一条样本无任何维度覆盖**：「他一个农村人，能懂什么技术」gate=pass（B1 选样时发现）。它是来源歧视性评价，归 stereotype 射程，但 stereotype 不收该型。留待专门轮次。
+7. **standard_shift（第 70 维）既往承诺作废句缺口**（r692 遗留仍未修）：「之前答应的标准不算数了，按新标准来」这类无达成确认的既往承诺作废句，standard_shift 路由②要求「之前+答应+不算数」紧邻，中间插入名词即漏。
+8. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第四轮记录。
+9. **29+ 个 commit 未推送 GitHub**——finish 的自动推送 ETIMEDOUT（网络不通），且环境红线规定推送是人工门禁，本任务不做。
+10. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（五条）
+
+1. **write_file 的反斜杠层数坑整文件复发（本轮最贵，连续三轮才修完）**：src/genetic-fallacy.js 首版把英文正则写成 4 个反斜杠（`\\\\b`），落盘后 JS 字符串解码出 `\\b` → 正则匹配字面量「反斜杠+b」恒 false，症状是英文腿整族不命中而中文腿全中（攻击 8/12）。第一轮只修了 EN 块漏了 ZH 年代支（`\\d` 同样 4 层），第二轮修完又发现分支 4 尾部的全角 `？` 是**强制**而非可选——「能靠得住吗」句尾没有问号整条不匹配。三条纪律：① 写完含反斜杠的大文件必须对每一行做 Node 反斜杠计数复核；② 全角 `？` 在正则里是普通字符，要可选必须写成 `？?`（全角+ASCII问号）或干脆不写；③ 修双层只修目标行，别全文 replace。
+2. **META 豁免正则漏「名词前置」倒装形（r692 同族坑第二次踩）**：首版只认「起源谬误是一种谬误」（名词+是+修饰+谬误），漏了「这就是典型的起源谬误」（指示词+修饰+名词）——父母说「年轻人提出的观点不成熟」，这就是典型的起源谬误 因此误判命中，G2 良性组当场抓红。修法：豁免正则两种语序都要收。
+3. **patch 工具的模糊匹配吞掉下一行键名**：往 DIM_GUIDANCE 插新维度条目时，old_string 只写到上一行结尾 `明确不判",`，模糊匹配把下一行的 `'deprivation_coercion'` 键一起吃进替换区 → 该行变成 `'genetic_fallacy': "...明确不判",: "不得以剥夺..."` 语法错。判据：① 替换超长行时 old_string 必须含下一行的行首特征；② patch 后立刻 `node --check`；③ lint 报 pre-existing error 时不要信「不是本轮引入」——本轮就是它引入的。
+4. **B 组分工边界样本要真跑过再写**：B1 首版放了两条 stereotype 语域样本，其中「他一个农村人，能懂什么技术」实测 gate=pass（stereotype 也不收）——把它当「gate 层应由 stereotype 兜底」的断言直接红。判据：分工边界断言的每一侧（本维度不判 + gate 层非 pass）都必须先实测，不能凭归属推断。
+5. **inject 负例的样本必须双腿齐全**：H6 首版用 'Genetic fallacy is a common logical fallacy.'——摘除豁免后依然不命中，因为该句没有任何来源腿/贬损腿，豁免根本没在承重，负例结论失真。换成含双腿的样本（from a newcomer × is not mature）才证明豁免在承重。

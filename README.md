@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-130 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+131 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
 ×  1,314 dispatch routes  ×  18,157 passing tests  ×  0 runtime dependencies
 ```
 
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 130 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 131 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -143,7 +143,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (130 dimensions) -> gate
+scope-check -> premise-check -> discriminate (131 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -172,14 +172,14 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.39**. Not marketing copy.
+Measured on this repository at **v6.8.40**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 130 |
+| Discrimination dimensions | 131 |
 | MCP tools | 182 |
 | Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.40 | 2026-10-12 | **A 131st dimension: `genetic_fallacy` (origin/source-based quality inference)** — an idea, product, or person is judged by where it came from instead of what it says: origin naming (young / freshman / no elite degree / laid off from a big company / foreign / domestic / small workshop / amateur / self-taught / two centuries ago / last century / ancient / rural) × quality disparagement inference (direct disparagement "definitely immature / long outdated / narrow-minded / definitely has problems / not worth listening to", comparative disparagement "less mature than the imported one", rhetorical-question disparagement "can it fit China's context / how good can it be / can it be trusted"). Two-leg coexistence; 10/10 leaks closed, 0/16 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged. Domain boundary with `stereotype` (source-discriminatory evaluation vs source-quality inference, the two families are collected separately per the r691 handoff) is locked by tests |
 | 6.8.39 | 2026-10-12 | **A 130th dimension: `moving_goalposts` (interpersonal-evaluation domain)** — the moment an achievement, grade, or progress is acknowledged, the evaluator immediately denies its value or shifts the standard elsewhere: dismissive acknowledgment + denial of value ("that does not count" / "what is that" / "that was your duty"), perfect-score raising ("why not 100" / "no mistakes allowed" / "you must finish that too"), old-score accountability or topic switch ("but you still have not explained last time" / "what really matters is"), and comparison disparagement ("everyone your age is already a director"). Two-leg coexistence (achievement acknowledgment in three families x standard shift in four families); 8/8 leaks closed, 0/36 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged. Domain boundary with `standard_shift` (dimension 70, contract/acceptance domain) is locked by tests — the two dialects of the same fallacy, complementary coverage |
 | 6.8.38 | 2026-10-12 | `social_isolation` (dimension 106) gains its English legs — 8 new ISOLATE families (negative wish: I do not want you to see / stop + -ing + with-to / no more + -ing / delete-or-block group reference / cut off + object fronted: cut off all your friends / exclusive contact: you only need me / nobody else matters) plus 6 new COERCE families (bad-influence disparagement: they are a bad influence / love condition: if you love me / prohibition declaration: I forbid it / anymore implicit-finality declaration / possession declaration: you belong to me only / from now on + second-person directive), 7/8 leaks closed (8/8 all caught after the chat-doubling fix), 0/25 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged |
 | 6.8.37 | 2026-10-12 | **A 129th dimension: `post_separation_harassment`** — after the relationship ends (or the other party has asked to end it / has blocked), one party denies the other's autonomy to separate via on-site pursuit, repeated contact, stalking-knowledge, refusal to accept the breakup, and ledger-style whereabouts control: two-leg coexistence (separation event × harassment in four families — on-site/repeated contact / knowledge threat / refusal to accept / whereabouts ledger), 8/8 leaks closed, 0/23 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged |

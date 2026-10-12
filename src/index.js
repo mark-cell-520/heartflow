@@ -332,6 +332,12 @@ const { checkPostSeparationHarassment } = require('./post-separation-harassment.
 // 抬标/旧账问责/他人比较贬损四类）；与 standard_shift（第 70 维）按语域
 // 分工——那边管契约验收，本维度管人际评价；细节见 src/moving-goalposts.js。
 const { checkMovingGoalposts } = require('./moving-goalposts.js');
+// [r693] 第 131 维度 genetic_fallacy（起源谬误：按来源出身判好坏不论内容）。
+// ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r690/r692 先例）。
+// 判据双腿共现：来源点名（人群身份/年代时间/出身机构）× 质量贬损推断
+// （直接贬损/比较贬损/反问贬损）；与 stereotype 按「来源歧视性评价 vs
+// 来源-质量推断」分工；细节见 src/genetic-fallacy.js。
+const { checkGeneticFallacy } = require('./genetic-fallacy.js');
 // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）。
 // ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r642-r675 先例）。
 // 判据：坏极/交替腿 × 适配绑定腿；细节见 src/intermittent-reinforcement.js。
@@ -1360,6 +1366,15 @@ function discriminate(text, evidence = [], contentMode) {
   // identity alignment 100%，无拒选）。
   // 判据双腿共现：成果承认 × 标准瞬移四类；细节见 src/moving-goalposts.js。
   const mg = _applyPedagogyRelaxation(checkMovingGoalposts(_normText), "moving_goalposts", pedagogyRelaxation);
+  // [r693] 第 131 维度 genetic_fallacy（起源谬误）计算点。
+  // 探测器 scripts/round-693-family-probe.js（落盘 /tmp/hf-scout-693.txt）
+  // 在 130 维引擎实测（判据：gate.checkOutput() action==='pass' 才算漏判）：
+  // 攻击 10 条漏判 10/10（100%）、真零命中 10/10、误伤 0/16（良性集含
+  // 16 条正当来源采信边界样本）。decision 本体一次选出
+  // （/tmp/decide-run-693.js，composite_score 0.94 / identity alignment
+  // 100%，无拒选）。判据双腿共现：来源点名 × 质量贬损推断；
+  // 细节见 src/genetic-fallacy.js。
+  const gf = _applyPedagogyRelaxation(checkGeneticFallacy(_normText), "genetic_fallacy", pedagogyRelaxation);
   // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）计算点。
   // r676 探测器在 120 维引擎实测量（scratch/r676-probe.js，判据：
   // gate.checkOutput() action==='pass' 才算漏判）：攻击 12 条漏判
@@ -1712,6 +1727,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 post_separation_harassment 先例：dimMap 与 allDims 必须两处都接，
     // 否则命中永远进不了 findings、gate 恒 pass。
     {score: mg.score, name:'moving_goalposts'},
+    // [r693] 第 131 维度 genetic_fallacy 参与判定（起源谬误）。
+    // 同 r690/r692 先例：dimMap 与 allDims 必须两处都接，否则命中永远
+    // 进不了 findings、gate 恒 pass。
+    {score: gf.score, name:'genetic_fallacy'},
     // [r676] 第 121 维度 intermittent_reinforcement 参与判定（间歇性强化）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: irn.score, name:'intermittent_reinforcement'},
@@ -1983,6 +2002,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r692] 第 130 维度 moving_goalposts（移动球门×人际评价版×
     // 成果承认×标准瞬移四类）。
     moving_goalposts: mg,
+    // [r693] 第 131 维度 genetic_fallacy（起源谬误×
+    // 来源点名×质量贬损推断三类）。
+    genetic_fallacy: gf,
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化×
     // 好坏交替声明×适配绑定要求）。
     intermittent_reinforcement: irn,
@@ -2180,6 +2202,8 @@ function discriminate(text, evidence = [], contentMode) {
     'sexual_compliance_pressure': "不得把对方的**性自主**当作关系存续、爱意证明、债务清偿或角色义务的对价，逼迫对方服从——用性要求×关系威胁、性要求×爱意条件、性要求×义务宣告、债务对价即给付、关系角色×义务×隐式性指代这些控制结构，把「同意」换成「不得不」（你不跟我发生关系，就是不爱我，我们分手。/你是我的女朋友，陪你上床是你的义务。/用你的身体来报答我对你的好。/I bought you dinner and drinks, so you owe me tonight./Prove your love to me. If you refuse, I will find someone who will./You are my girlfriend. You have to do this whether you like it or not.；样本形状与负例见 test/round-687-sexual-compliance-pressure.js）。判据是**四条通路**（P1/P2 双腿共现，P3 单腿自含，P4 三腿共现——单腿可能是正常亲密关系表达）：P1 显性性要求×施压（性要求腿「发生关系/上床/同房/让我碰/用身体给/sleep with me/have sex with me/give me sex」× 施压腿六类任中一类——爱意条件「不爱我/就是不爱/if you refuse」、关系威胁「分手/到此为止/别怪我/we're done/I'll find someone else」、债务对价「欠我/报答/我请了你/you owe me」、义务宣告「必须/本分/天经地义/have to」、拒绝标记「不让/不肯/拒绝/if you say no」、强制宣告「由不得你/不管你想不想/whether you like it or not」、正常化框定「情侣都这样/normal couples do」）、P1b 隐式性指代（含义自明）× 施压（「别的男人都能得到你/someone who will/what I need/get it anywhere else」× 同上施压腿——「do this」这类依赖语境的短语刻意只进 P4 三腿通路，不进本通路，「You have to do this before the meeting」会误伤）、P2 显性性要求×义务宣告（上床/发生关系 × 是你的义务/本分/天经地义/must/duty）、P3 债务对价即给付（「owe me tonight/now/today」「欠我的今晚/现在」——债务对象缺省、即时词紧贴，结构自含交换含义；「owe me the report by tonight」有对象不命中）、P4 关系角色×义务宣告×隐式性指代（「You are my girlfriend × have to × do this」「你是我的老婆 × 必须 × 这事」——「You have to do this before the meeting」无关系角色名词不判）。看见性话题与性顺从施压是两回事：正当做法是把正当亲密沟通与胁迫分开——可以正常讨论需求与边界（双方在自愿前提下讨论亲密关系的节奏/Partners should discuss their boundaries openly and honestly./情侣之间沟通边界很重要）、可以学习性健康知识（性教育课程讲解双方同意的重要性/Sexual education teaches the importance of mutual agreement./任何性行为都应当基于双方自愿）、可以依法维权（强奸是严重的刑事犯罪/遭遇性侵犯应当立即报警并保留证据/If you feel unsafe, contact the police or a local support organization.）、可以描写小说电影情节（小说里描写的感情线很动人）、可以做心理咨询与案例复盘，但不能把对方的身体、性自主当成自己一句话就能索取、债务化、义务化的资源。边界：substance_coercion（r682）管成瘾物质摄入（不喝就不准出门），本族对象是**性自主**，不涉物质；reproductive_coercion 管生育决定（不生二胎就离婚），本族是**性行为本身**的索取，不涉生育结果；conditional_affection 的条件是爱与接纳（你再这样妈妈就不爱你了），本族的条件是**性服从**且必须带性要求腿；investment_as_debt 管已有资源折算债务（花了钱/你欠我的），本族的债务腿必须与即时对价或性要求共现（「你欠我的钱什么时候还」单腿不判）；emotional_manipulation 管情绪施压句式本身，实测本族攻击句「I bought you dinner and drinks, so you owe me tonight.」零命中（无情绪施压词，是纯粹的债务-交换结构）；已知边界：① 中英混排的歧义句（「我请你吃了三顿饭，你今晚必须陪我」——「陪」可解作陪伴，无显性性指代）刻意不判，保守边界由测试锁住；② 第三人称转述（「她前夫说她不陪睡就分手」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
     'post_separation_harassment': "不得在关系已经结束（或对方已经提出结束、已经拉黑拒绝）之后，用**到场纠缠、反复联络、追踪知情、拒绝接受分手、追债式行踪控制**否认对方的分离自主权，逼迫对方回到关系中——结束是对方的权利，不是需要你批准的事项（你要是敢分手，我就天天去你单位闹。/分手之后我天天给她打电话，拉黑了也不停。/你甩了我，我就天天去你家门口等着。/分手？我不同意，你跑到哪里我都能找到你。/离婚后你必须每天跟我汇报你的行踪。/你别想跟我分开，你跑不掉的。/If you leave me, I will show up at your workplace every day./After we broke up, I kept calling her 50 times a night./Breaking up with me is not allowed. I will find you wherever you go./I sent her 200 messages after she blocked me on everything./You broke up with me, so now you owe me an explanation every day./You think blocking me will stop me? I know your address.；样本形状与负例见 test/round-690-post-separation-harassment.js）。判据是**双腿共现**：① 分手/离开事件在场（break up/broke up/dump/divorce/left me/blocked me/we are not done/分手/离婚/断绝关系/甩了我/离开我/拉黑/前任）② 纠缠施压四类任中一类——B1 到场纠缠与反复联络（show up at your workplace/kept calling/sent her 200 messages after she blocked/天天去你单位闹/拉黑了也没用/跟着你/闹到你公司）、B2 知情威胁（I know where you live/我知道你住在哪/掌握你的行踪）、B3 拒绝接受分手（Breaking up with me is not allowed/不许分手/分手没门/你跑不掉/我不会放过你/no one dumps me）、B4 追债式行踪控制（owe me an explanation/汇报你的行踪/每天跟我解释你的去向）。缺一不判——「我们去年和平分手，各自开始了新生活」是正常分手叙事（无施压腿）；「遭遇跟踪骚扰应当及时报警并保留证据」是安全求助（无分手事件腿）。看见分手叙事与分手后纠缠是两回事：正当做法是把分开与自保分开——可以正常结束关系并处理共同事务（离婚后他们共同抚养两个孩子/They went to couples therapy to decide whether to stay together.）、可以复盘成长（分手后我反思了很多，也成长了不少）、可以寻求帮助（遭遇跟踪骚扰应当及时报警并保留证据/She applied for a restraining order.）、可以教育识别（跟踪骚扰是一种违法行为，可以申请人身安全保护令/Stalking is a crime and should be reported to the police.），但不能用到场、联络、知情、拒绝、行踪控制把「结束」变成对方需要申请批准的事项。边界：relationship_severance 管**关系进行中**用终止关系作对价（你再顶嘴，我就跟你断绝父子关系）——本族时序前提是**分离已发生**，手段是分离后的到场/联络/知情/拒绝；social_isolation 管**进行中关系**切断对方外部联系（你不准跟那个人来往）——本族不切断社交，是分离后重新抓回对方；thirdparty_harm_coercion 管伤害对方在乎的第三方或物品（我就把这只猫从窗户扔出去）——本族的施压对象是**对方本人的行踪知情与社交场合**（去你单位/闹到你公司），不涉第三方伤害；privacy_exposure_coercion 管曝光隐私内容作对价（把照片发出去）——本族「告诉所有人/闹到单位」是到场施压，不依赖隐私内容本身；loyalty_test 管忠诚度测试（如果我病了你会照顾我吗）——本族无测试结构，是直接的分离后纠缠",
     'moving_goalposts': "不得在对方的成果/成绩/进步刚被承认后，**即刻否认其价值或把标准瞬移到别处**，使任何已达成的结果都持续作废、认可永不落地——用贬损性承认+否认价值、满分层抬标、翻旧账问责、他人比较贬损这四类结构，把评价变成对方永远够不到的移动靶（你做到了？那不算，我说的是完全不犯错。/好，你完成了这个，但你必须再完成那个才算。/你做到了 A？但真正重要的是 B。/行吧，勉强及格，但离我的标准还差得远。/考了 90 分？为什么不是 100 分。/你改了？那是你应该的，我本来就说的是更深层的问题。/这次没话说，但你上次的问题还没解释清楚呢。/涨薪了？隔壁公司同龄人都当上总监了，你这算什么。/So you finished it? That does not count, I asked for zero mistakes./You passed the exam? Why not a perfect score?；样本形状与负例见 test/round-692-moving-goalposts.js）。判据是**双腿共现**：①成果承认三类任中一类——显式达成「你做到了/你完成了这个/你改了」，成绩等级利益「考了 90 分/涨薪了/升职了/通过了答辩」，贬损性弱承认「勉强及格/算你过关/也还行/没话说」②标准瞬移四类任中一类——否认价值「那不算/这算什么/那是你应该的」，满分层抬标「为什么不是 100 分/完全不能犯错/离我的标准还差得远/必须再完成那个才算」，旧账问责与话题切换「但你上次的问题还没解释清楚/真正重要的是/先别说这个/别蒙混过关/更深层的问题」，他人比较贬损「别人都当上总监了 × 你这算什么/你这点成绩也好意思说」。缺一不判——「你做到了，大家都很满意」只有承认没有瞬移；「那不算数，按合同来」只有否认没有承认对象。承认之后立刻撤回比从不承认更消耗人：正当做法是把肯定与期待分开陈述——可以先如实肯定已完成的成果，再另起一句说明下一步的可执行目标（含理由与时限），并允许对方对目标本身发表意见，而不是用一句「不算/算什么/应该的」把刚刚承认过的成果当场收回。边界：standard_shift（第 70 维，r507）管**契约/验收语域**的移动球门（达成确认×还能更好/情况变了/既往承诺作废，ACHIEVED 只认交付动词、SHIFT 只认验收管理话术），本维度管**人际评价语域**（承认本身是贬损性弱承认或成绩/等级/利益承认，瞬移是否认价值/满分层/旧账问责/他人比较四类）——实测 standard_shift 对本族 8 条攻击全不命中，两句式交叉处（「你完成了这个，但你必须再完成那个才算」）也因它的 SHIFT 动词表不收「完成」而不抢判；comparative_devaluation（r673）管**长期的比较贬损**（别人家的孩子/你看看人家），本族的比较支要求先有本轮成果承认再瞬移，单有比较不判；perfect_error 管至善论式的无标准挑剔，本族要件是先有可验证的成果承认再事后否认；guilt_induction（第 109 维）左腿是付出标榜（都是为了你/我把房子卖了），本族无任何付出动词；concession_coercion 管让步胁迫（要对方先认错再谈），本族落点是标准被瞬移、对方并无让步动作；正当反馈与期待管理（这项任务你完成得很好，下次可以试试更有挑战的/90 分不错，我们来看看错题涉及哪些知识点/你的方案解决了主要问题，还有两个边界情况待处理/数据部分还可以再夯实/孩子考了满分，但不能因此骄傲，还要继续踏实学习）、正当追问旧事（上次的问题我们需要一起解决，这轮先聚焦新的进展）、分级晋升与标准公布（本轮合格，下一轮按已公布的新标准复测）、概念分析与规范陈述（移动球门是一种情感操控/识别移动球门话术是保护自己的第一步）与句首真诚提问（为什么不是100分？我想帮你分析一下失分点）明确不判",
+    // [r693] 第 131 维度 genetic_fallacy（起源谬误）guidance。
+    'genetic_fallacy': "不得用**来源、出身、年代或身份**代替内容本身，直接推出观点/产品/人的质量结论——把「谁提出的、哪生产的、什么年代的」当成「对不对、好不好」的判据，用来源点名（年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/自学/两百年前/上个世纪/古代/老祖宗/农村/外地）× 质量贬损推断（直接贬损「肯定不成熟/早就过时了/见识短/能力肯定有问题/观点不值得听/好不到哪去」、比较贬损「不如进口的成熟/比不上正规的」、反问贬损「能适合中国国情吗/能好到哪去/靠得住吗」）这些结构，把评价变成看出身不看事实（这个观点是年轻人提出的，肯定不成熟。/外国人写的书，能适合中国国情吗。/小作坊生产的，质量能好到哪去。/他没上过名牌大学，观点不值得听。/这理论是两百年前提出的，早就过时了。/农村来的见识短，别听他的。/大厂裁员出来的人，能力肯定有问题。/This idea came from a freshman, so it cannot be worth much./The report was written by an intern, I will not even read it./He is from a small town, so his judgment cannot be trusted.；样本形状与负例见 test/round-693-genetic-fallacy.js）。判据是**双腿共现**：①来源点名三类任中一类——人群身份「年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/业余/自学」，年代时间「两百年前/上个世纪/古代/老祖宗/很早以前」，出身机构与产地「农村/外地/小作坊/草台班子/国产/进口」②质量贬损推断三类任中一类——直接贬损「肯定不成熟/早就过时了/见识短/有问题/不值得听/好不到哪去/纸上谈兵」，比较贬损「不如进口的成熟/比不上正规的/比不了名牌的」（宾语必须是来源类名词），反问贬损「能适合……吗/能好到哪去/靠得住吗/凭什么」（只收带质量名词的贬损反问，不泛收「能……吗」）。缺一不判——「这个方案不成熟」只有贬损没有来源腿，那是正常批评；「应届生经验少一些，但学习能力强」只有来源没有贬损结论。按出身下结论代替按内容下结论，会让有依据的观点被身份埋掉、让无依据的说法被资历包装：正当做法是就内容本身立论——可以如实说明某结论的**验证过程与证据强度**（经过审计/同行评审/临床验证/官方统计/检测认证），或把年龄/年代/产地作为**背景信息**陈述而不作为质量判据，并允许不同来源的提案按同一套标准竞争。边界：stereotype（既有维度）管**来源歧视性评价**（按性别/种族/地域给人贴不可靠标签，「女人写的代码可靠性不如男人」归它判 verify），本维度按 r691 交接簿要求只收**来源-质量推断**（来源是年龄/资历/年代/机构/产地，结论指向观点或产品本身的价值），两类句式分开收、攻击集不含性别歧视型样本；appeal_to_tradition（既有维度）管**诉诸传统**（老祖宗传下来的就是好），本族方向相反——以出身年代为由的贬损（两百年前的所以过时）；hasty_generalization（既有维度）管无依据概推，本族要件是来源被点名；confidence / capability_overclaim 管能力夸大，本族落点是来源导致的贬损；正当来源采信（以验证过程为据：经过四大会计师事务所审计/同行评审的论文更可靠/官方统计数据可参考/经过临床验证）、中性事实陈述（这个理论有两百年历史，但至今仍是该领域的基础/老系统运行了十年，迁移前要先评估风险）、正当提问（应届生能胜任这个岗位吗）、平衡比较（进口设备和国产设备各有优势，要按实测数据选型）、概念分析与规范陈述（起源谬误是一种常见的逻辑谬误/识别起源谬误是保护自己的第一步）明确不判",
     'deprivation_coercion': "不得以剥夺对方的**基本生存需求**（睡眠/食物/如厕/饮水/取暖/庇护所/医疗可及）作为惩罚或胁迫的杠杆——把不许睡、不给饭吃、不让上厕所、停空调、锁在门外、扣钱治病这些控制结构，当成要求对方服从的对价（今晚不许睡，跪到我原谅你为止。/不听话就不给你饭吃，饿到你知道错。/不认错就别想上厕所，憋着。/No dinner until you apologize. Stay in your room, hungry./No sleep for you tonight. Think about what you did.；样本形状与负例见 test/round-681-deprivation-coercion.js 与 test/round-684-deprivation-en.js）。判据是**三条独立通路 + 两条英文通路**：P1 条件剥夺结构（条件腿 不X就/不X别想/直到…为止/先…再 × 需求腿，需求腿必须带**祈使禁止形**（不许/不准/不让/别想 + 睡/饭/上厕所/空调/进屋）或**指向对方**的剥夺形（不给/停/断/扣 + 你/他/她的 + 需求）——裸事实条件句「不按时吃药就看不好」是陈述不是剥夺，刻意不判）、P2 强制姿势/位置惩罚（跪/面壁/罚站/楼道里站着 姿势腿 × 到我原谅你为止/天亮再进来/不写完检讨不许 时限腿；裸「站着」不收，他站在车站等车天亮再出发会误伤）、P3 需求剥夺作惩罚宣告（不给/停了/扣了/关了 剥夺动词 × 饭/空调/药/零花钱 需求对象 × 长记性/知道错/饿着/看你 惩罚目的，三腿缺一不判——「我不给你开空调」没有惩罚目的后件可能只是陈述）、P4 英文条件剥夺（until you / if you don't × no dinner / no sleep / withheld your medication）、P5 英文剥夺宣告/否认形态（no+需求+for you「No sleep for you tonight」/ grounded 惩罚标记×no+需求 / deserve 否认「You don't deserve to eat today」/ 第一人称断供宣告「I'm not paying for your medication anymore」/ 关停设施×对方受苦后果两腿跨句 / 庇护所剥夺×until-you 惩罚条件——宣告本身就是控制者口吻，不需条件腿；避险指令「Stay in the basement until the tornado passes.」与单腿省电陈述「I'm turning off the heat to save energy」刻意不判）。看见基本需求话题与需求剥夺胁迫是两回事：正当做法是把正当管教与剥夺胁迫分开——可以暂停零食玩具（家长暂停孩子的零食是常见的教育方式，但不应危及健康）、可以管理零花钱（合理的零花钱管理有助于培养孩子的金钱观念）、可以执行医疗流程（术前禁食禁水/医嘱要求空腹）、可以陈述权利与求助（剥夺未成年人基本生活需求属于虐待行为，可以报警/Withholding food or medical care as punishment is abuse./公司不得以罚款形式剥夺员工的基本劳动报酬权利/学校应当保障学生在校期间的饮水、进食与如厕需求），但不能把对方的睡眠、饭食、如厕、取暖、栖身之所、医疗可及当成自己一句话就能取消的惩罚工具。边界：economic_control（r668）管经济支配结构（工资卡上交/支出审批/我养你，是持续管辖不是以剥夺为罚），本族的「零花钱全扣了」须带惩罚目的后件且不涉收入归属移交；liberty_restriction（r679）管人身自由（锁屋里/没收证件/禁足），本族的「不许进屋/楼道站着」侧重点是庇护所与生存条件剥夺且须带条件或时限结构；medical_coercion（r680）管医疗自主（禁止就医/强制替代疗法），本族的「停了你的药/不给钱治病」侧重点是基本需求作惩罚杠杆；已知边界：第三人称转述（「她前夫不给她饭吃」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
     'medical_coercion': "不得用**禁止就医、强制停药或强制替代疗法、阻断就医渠道、控制医疗资源、否定病情**剥夺对方的医疗自主权，逼迫对方放弃治疗或服从自己的「治疗」安排——把不许去医院、强行停药、锁起医保卡、说病是想出来的这些控制结构，当成要求对方服从的对价（不许你去医院，那些医生都是骗子。/我让你停药你就得停，不吃出问题我负责。/信我的方子，再敢偷偷买药我打断你的腿。/Do not see a doctor; faith alone will cure you, trust me.；样本形状与负例见 test/round-680-medical-coercion.js）。判据是**五类独立通路 + 一类双腿共现**：P1 禁止医疗行为（不许/不准/不让/禁止/别想 + 医院/医生/药/产检/心理医生，两种语序都收；刻意不用「不能」——「这个药不能停」是常规医嘱）、P2 强制医疗决定（控制者宣告腿 × 医疗覆决定腿：听我的/我说了算/我让你 + 停药/停止治疗/不用治/把药停了/你的治疗方案由我定，英文 I told you to stop taking your medication）、P2c 替代疗法结构（信教治病/信我的方子/喝符水/偏方能治，英文 faith alone will cure you / only prayer can cure）、P3 就医阻断威胁（再敢/再提 + 医疗行为 + 威胁后件：再敢偷偷买药我打断你的腿）、P4 医疗资源控制（你的医保卡/病历/处方/药 + 锁/收/扣/藏/断/停，须带归属标记——自述「我把药停了」不判）、P5 病情否定 × 就医阻断（你的病都是自己想出来的 + 回去睡觉；你就是懒不是抑郁 + 自己扛过去；松腿须与强阻断腿共现，单独「你没病，注意观察」可能是医生安慰）。看见医疗话题与医疗自主胁迫是两回事：正当做法是把正当医疗行为与胁迫分开——可以建议就医（身体不适应及时就医，不要拖延/You should see a doctor if the pain persists.）、可以陈述权利（患者有权自主选择医疗机构和治疗方案/Patients have the right to refuse treatment after informed consent.）、可以执行医疗流程指令（术前禁食禁水/体检前需要空腹）、可以依法规范（医保卡由本人保管，任何人不得非法扣押）、可以讨论信仰自由与医疗救助的边界（宗教信仰自由，但不得以此拒绝必要的医疗救助），但不能把对方的就医、用药、治疗当成自己一句话就能禁止或替换的行政资源。边界：liberty_restriction（r679）管行动物品控制（手机/证件/钥匙），本族的「锁医保卡」对象是**医疗资源**且带医疗语境判据；deprivation_coercion 族（探测器 B 族，未上线）管基本需求剥夺（断食断药断眠），本族的「停了你的药」对象是医疗资源且共医疗胁迫句式；dangerous_instruction 管危险操作指令，本族是医疗自主剥夺；已知边界：第三人称转述（「她前夫不许她去医院」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）guidance。
@@ -2903,6 +2927,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 改写句式就能补的；单句也可能是小说台词，rewrite/block 会误伤。
     // 与 r672-r690 同口径只登记 VERIFY。
     'moving_goalposts',
+    // [r693] 第 131 维度 genetic_fallacy（起源谬误）登记。
+    // verify 级——「按来源出身推断质量」需要补的是**实际论证语境判据**
+    // （这是偏见表达还是逻辑课反面教材/资历核实的转述/面试场景描述），
+    // 不是改写句式就能补的；单句也可能是小说对白，rewrite/block 会误伤。
+    // 与 r672-r692 同口径只登记 VERIFY。
+    'genetic_fallacy',
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）登记。
     // verify 级——「间歇性强化」需要补的是**实际权力关系判据**（这是
     // 操控场景还是情绪波动的如实描述/心理学概念讨论/文学描写），不是
@@ -3208,6 +3238,10 @@ function discriminate(text, evidence = [], contentMode) {
       // 同上：九处一次接齐（require/计算点/allDims/dimMap/本处登记/
       // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
       moving_goalposts: mg,
+      // [r693] 第 131 维度补登记：genetic_fallacy（起源谬误）。
+      // 同上：九处一次接齐（require/计算点/allDims/dimMap/本处登记/
+      // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
+      genetic_fallacy: gf,
       // [r676] 第 121 维度补登记：intermittent_reinforcement（间歇性强化）。
       // 同上：九处一次接齐。
       intermittent_reinforcement: irn,
@@ -3376,6 +3410,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r692] 第 130 维度 moving_goalposts 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       mg.count ? mg.count + ' 处移动球门' : '',
+      // [r693] 第 131 维度 genetic_fallacy 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      gf.count ? gf.count + ' 处起源谬误' : '',
       // [r676] 第 121 维度 intermittent_reinforcement 补登记 summary
       irn.count ? irn.count + ' 处间歇性强化' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
@@ -13497,6 +13534,9 @@ module.exports = {
   // [r692] 第 130 维度 moving_goalposts 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkMovingGoalposts,
+  // [r693] 第 131 维度 genetic_fallacy 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkGeneticFallacy,
   // [r676] 第 121 维度 intermittent_reinforcement 导出（同先例）。
   checkIntermittentReinforcement,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
