@@ -1,3 +1,65 @@
+# r702 轮报告（v6.8.49）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自 r700 探测器
+落盘 /tmp/hf-scout-700.txt（纪律：已落盘但维度未做完时下一轮直接读
+文件，不重新探测；circular_reasoning 已于 r701 上线、standard_shift
+已于 r700 上线，均排除），本轮 /tmp/r702-preprobe.js 对剩余 6 族复量
+并做 FP 归因（stereotype 那条「误伤」经归因是已有 stereotype+
+genetic_fallacy 正确拦截的阳性对照，非误伤）。喂给 decision 本体
+（/tmp/decide-run-r702.js 读 /tmp/decide-opts-r702.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| B appeal_to_pity 补「诉处境→求通融」口语族 | **0.89** | 攻击 5/10 漏判、零命中 5/5、误伤 0/12 | **选中** |
+| A stereotype 出身歧视族 | 0.87 | 攻击 10/10 漏判、零命中 10/10、真实误伤 0/11（探针那 1 条是阳性对照） | 落选（身份词表豁免设计难度大，连续第四轮记录） |
+| C appeal_to_ridicule 新维度 | 0.86 | 攻击 10/10 漏判、零命中 8/10、误伤 1/12（存量 contradiction） | 落选（新维度六处接线工作量最大） |
+| D appeal_to_authority 补族 | 0.77 | 攻击 7/10 漏判、零命中 7/7、误伤 4/12（2 条来自该维度自身存量模式） | 落选（需先修存量再补族，两个动作耦合） |
+
+decision 返回 composite_score 0.89 / confidence 0.9 / identity
+alignment 100%，无拒选。诚实标注：候选的 feasibility/consequence_
+value/risk/confidence 四段判据由我构造，decision 本体在四个候选间
+选出 B。pity 族连续第三轮进决策池（r700/r701 两次以 0.89 落选，
+本轮 0.89 选中）。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「我家里这么困难，这次就算了吧」「我年纪大了，你们不能让着我一点吗」「我刚失恋，你就别跟我计较了」「我妈住院了，我必须请假，不行也得行」「可怜可怜我吧，我什么都不懂」这类**口语化通融请求/乞怜**从 pass 变 verify | 攻击族 5/10 漏判清零（探测器复量 0/10，gate 层 27/27 全非 pass） | ✅ 升级（真升级②补句式族） |
+| src/appeal-to-pity.js：DEMAND 表补四类口语形（d 请求放过与不追究「这次就算了吧/别跟我计较了」、e 请求让步「不能让着我一点吗/相让一步/给个台阶下」、f 强行要求「不行也得行/无论如何都得批」、g 乞怜祈使「可怜可怜我吧/行行好」带负向守卫），PITY 表补三类处境（情感挫折「我刚失恋了」、家人疾病「我妈住院了/刚做了手术」、无能力自述「我什么都不懂」），中英分支对称（EN 5 块对 ZH 4 支，d≈d+e 映射写在注释） | appeal_to_pity 覆盖面从书面通融词扩到口语放过/让步/强压/乞怜全形 | ✅ 升级（模式库本体） |
+| src/index.js：DIM_GUIDANCE 的 appeal_to_pity 条目补新族判据与单腿边界 | 维度引导文本覆盖新族 | 维护（文档口径） |
+| test/round-702-appeal-to-pity-family.js 18 断言 + scripts/negative-test-appeal-to-pity-family.js 15 注入点 | 攻击 27/良性 24/单腿 8/豁免 7/gate 51/分工 6 | ✅ 升级（验收证据） |
+| bump 6.8.48→6.8.49 四处 + README changelog + SKILL 规格表版本戳 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度总数不变 136；SKILL 规格表口径版本戳同步 6.8.49——第一轮跑时此处报红，补改后转绿；changelog 覆盖 v6.8.49）
+- node test/round-702-appeal-to-pity-family.js — 18/18（攻击 27：中 18 + 英 9；良性 24；单腿边界 8；META 豁免 7；gate 层 51；相邻维度分工 6；inject 摘除 2）
+- scripts/negative-test-appeal-to-pity-family.js — 基线 18/18 PASS + 15/15 注入点全部断言红（无崩溃红）+ 还原 md5 一致
+- node test/round-695-appeal-to-pity.js — 22/22（既有测试无回归）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 136，summary 引用 99；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 commit 转绿）
+- 探测器复量（/tmp/r702-preprobe.js）：appeal_to_pity 族攻击漏判 5/10 → 0/10、误伤 0/12
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **stereotype 出身歧视族**——decision 落选（0.87，与选中项仅差 0.02）。攻击漏判 10/10、真零命中 10/10、真实误伤 0/11（探针里那 1 条「农村来的就是不行」经归因是已有 stereotype+genetic_fallacy 正确拦截的阳性对照，不是误伤——r700 探测器按「fp≠0 一律不合格」把它误判为不合格，本轮复量纠正了口径）。缺口面是队列里最大的，但身份词表+让步豁免（「他虽然是农村出身，但技术能力很强」必须 pass）需要设计迭代，连续第四轮记录。下轮可直接做。
+2. **appeal_to_ridicule 新维度**——decision 落选（0.86）。攻击漏判 10/10、零命中 8/10、误伤 1/12（存量 contradiction 维度，非本族引入）。新维度需六处接线 + 与 sarcasm 分工边界，工作量最大。
+3. **appeal_to_authority 补族**——decision 落选（0.77）。4 条存量误伤中 2 条（「权威机构发布了新的行业标准」「研究表明适量运动有益健康」）由 appeal_to_authority 自身存量模式命中，需先修存量再补族，两个动作耦合。
+4. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第八轮记录。
+5. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+6. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **「我妈刚做了手术」的「做了」插在处境词中间，整条不命中**：家人疾病支初版写 `(?:也|还|现在|...)?(?:在)?(?:住院|病|...)`，「我妈刚做了手术」的「做了」落在可选组与动词之间 → 零命中，症状像「正则没写对」。修法是可选组后加 `[^。]{0,3}?` 容忍插入成分（做了/动了/了）。判据：**处境词与动词之间常见有轻度插入（做了/在/还），枚举可选词表不如直接放行 0-3 字符间隔**——动词表本身够具体（住院/手术/化疗/抢救），间隔放宽不放大误伤面。
+2. **豁免承重样本的 demand 腿必须在射程内**：G1 首版样本「这个假必须办，按规定可以申请」——「必须办」不在 f 强行要求支的任何子支里（f 收「不行也得行/无论如何都得批/非得…不可」），摘豁免后照样不命中，豁免承重证明失真。换成「不行也得行」后才成立。判据：**inject 摘除样本的两条腿都先在单维层实测命中过，再拿来证明豁免**。
+3. **一条样本同时命中两支，杀哪支都不红**：DEMAND_EN-f 请求让步首版样本「can't you let it go just this once」——子串「let it go just this once」同时命中 d 请求放过支（`let (it|this|that) (go|slide) (just this once|...)`），杀 f 后样本仍经 d 命中 → 守卫漏抓。换成 forgive 形「cannot you forgive me just this once」（d 只认 let go/slide 通路）后才独占。判据：**每个注入点的专属样本必须先确认「杀该支后必 miss」——同形近义的两支要用走不同通路的样本**。
+
 # r701 轮报告（v6.8.48）
 
 ## 心虫选中项 + 分数 + 身份对齐
