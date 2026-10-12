@@ -14713,3 +14713,78 @@ action === 'pass' 才算漏判；漏判样本再跑 discriminate() 确认全维�
 3. **GUARD_EN 动词组只写原形，「calling the police」整类漏拦**：负例脚本跑出 REFUSAL 两个注入点不承重时顺带发现——F5c 样本 'I am thinking about calling the police.' 首版测试就绿（守门没生效但样本双腿不完整所以没暴露），补 GUARD_EN 动词三形态（call/calling/contact/contacting/report/reporting）后才真拦。与 r689「英文动词组必须写全三种形态」同律，这是它第三次以不同形态复发。
 4. **负例脚本替换行漏尾逗号，测试因语法崩溃变红而非断言变红**：`lines[idx] = 'String.raw`(?!)`'` 少了尾逗号 → 下一个数组行 SyntaxError → 测试「红」但是崩红。那种红证明不了守卫能抓住分支失效，负例结论失真。修法：替换行带逗号 + runTest 的 tail 提取区分崩溃签名（SyntaxError/Cannot find module/ReferenceError）与断言失败行。**「置空后变红」必须确认是断言红。**
 5. **QUESTION_EN 的 50 字符窗口装不下真实求助问句**：真实问句普遍 60-80 字符（'What should I do if my ex shows up at my workplace after we broke up?' 72 字符），沿用 r686/r687 的 50 窗口会让整类真实提问漏出守门（F4/F5 两条样本因此失效）。放宽到 90 并保留「句首疑问词 + 句末问号 + [^.] 不跨句点」三重约束。
+
+---
+
+## 第 691 轮（v6.8.38）— social_isolation 英文腿补齐（真升级②）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 探测器 /tmp/hf-scout-691.js 在 129 维
+引擎实测（判据不变：只有 gate.checkOutput() 返回 action === 'pass' 才算漏判；
+漏判样本再跑 discriminate() 确认全维度真零命中，evidence 维度恒返回 score:1 无
+issues 不算覆盖；良性 0 误伤才列为候选；post_separation_harassment 已在 r690
+上线从候选池排除）：
+
+| 候选 | 分数 | 实测证据（129 维引擎本轮测量） |
+|---|---|---|
+| **C 补齐 social_isolation 英文判别腿** | **0.93** | 攻击 8 条漏判 7/8、真零命中 7/7、误伤 0/9 |
+| A 新建第 130 维度 moving_goalposts（移动球门） | 0.91 | 攻击 8 条漏判 8/8、真零命中 8/8、误伤 0/9 |
+| B 新建第 130 维度 survivorship_bias（生存者偏差） | 0.90 | 攻击 8 条漏判 8/8、真零命中 7/8、误伤 0/9 |
+| D 新建 appeal_to_novelty 维度（诉诸新奇） | 0.86 | 攻击 8 条漏判 5/8、真零命中 5/5、误伤 0/9 |
+| E 新建 sacrifice_debt 维度（牺牲型情感债务） | 0.77 | 漏判 5/8、真零命中仅 3/5、与四个既有维度边界重叠 |
+
+返回：`composite_score 0.93 / identity alignment 100%`，**无拒选、一次决策成功**。
+候选文本外置 /tmp/decide-opts-691.json，runner /tmp/decide-run-691.js。
+心虫选 C 的理由：期望收益确定性最高——中文腿已有对称判据可参照、模式集中、
+误伤面已用独立良性集验证为 0、接线流程复用 r690 清单。候选 A 缺口面最大
+（8/8）但标准抬高句式与正常绩效反馈边界近，风险 0.35 高于 C 的 0.2。
+
+### 上一轮报错数字的口径修正
+
+r690 交接簿写「social_isolation 英文腿漏判 7/8」作为下轮候选——本轮复量
+（换用独立良性集 9 条）确认数字不变：漏判 7/8、真零命中 7/7、误伤从 r689 报
+的 2/9 变 0/9。r689 的 2/9 误伤是用了含 evidence 维度既有误报的良性集，本轮
+换成不含该类样本的独立集后为 0。**r689→r690→r691 三轮同一族数字的波动全部
+来自良性集选样，不是引擎行为变化**——引擎侧该族漏判数三轮稳定 7/8。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| You are not allowed to talk to your friends anymore. / I do not want you to see your family. / Stop hanging out with your coworkers. / You should cut off all your friends if you love me. / No more chatting with other guys. / Block them all / From now on, you only need me. 这类英文社交隔绝从 pass 变 verify | 英文腿攻击族 7/8 漏判清零（gate 层 8/8 全拦） | ✅ 升级（真升级②补句式族） |
+| src/social-isolation.js：ISOLATE 补 8 条英文支（I1 否定愿望/I2 stop+ing/I3 no more+ing/I4 删除群体指代/I5 cut off 宾语前置/I6a you only need me/I6b nobody else matters）+ COERCE 补 6 条英文支（C1 影响贬损/C2 爱情条件/C3 禁止宣告/C4 anymore 隐式终结/C5 占有宣告/C6 from now on+第二人称指令），分支对照中文腿分支表 | 中英双腿结构对齐 | ✅ 升级（模式库本体） |
+| test/round-691-social-isolation-en.js 15 断言 | 攻击 9/良性 25/边界锁 6/gate 层 8/inject 5 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-social-isolation-en.js 负例 | 14/14 注入点逐一置空后测试全部断言红、还原 md5 一致 | 维护（守卫有效性证明） |
+| test/round-660-social-isolation.js C5 硬编码维度数 116/117 改动态下界 | 该既有测试从 23/24 恢复 24/24（HEAD 上同样失败，stash 对照确认既有债务） | 维护（修测试写死等值） |
+| QUESTION_EN 窗口 50→90（同 r690 修正） | 长英文问句（60-90 字符）整类恢复守门 | 维护（同族坑第三次修正） |
+| bump 6.8.37→6.8.38 六处 + README changelog 补条 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数不变 129，changelog 覆盖 v6.8.38、规格表版本戳同步）
+- node test/round-691-social-isolation-en.js — 15/15（攻击 9：探测器 7+单支样本 2；良性 25：探测器 9+英文边界 10+中文 6；边界锁 6；gate 层 8；inject 5 组）
+- node test/round-660-social-isolation.js — 24/24（中文腿回归；C5 既有债务修后恢复）
+- scripts/negative-test-social-isolation-en.js — 基线 15/15 PASS + 14/14 注入点全断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 129，summary 引用 92；双向回归 召回 52/52、误拦 301/326）
+- node test/security-audit.test.js — 16/16
+- 探测器复量（hf-scout-691.js 口径）— social_isolation_en 族漏判 7/8→0/8、误伤 0/9
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **moving_goalposts 新维度漏判 8/8、真零命中 8/8**——decision 落选候选 A（0.91）。标准抬高句式与正常绩效反馈边界近，9 条良性只是小样本，需要先构造 20+ 条工作语境边界样本才配动手。下轮可直接做。
+2. **survivorship_bias 新维度漏判 8/8、真零命中 7/8**——decision 落选候选 B（0.90）。与 hasty_generalization / anecdote_as_proof / statistical_misleading 是近亲维度，建维度前要先把判据差异写穿。
+3. **appeal_to_novelty 漏判 5/8、真零命中 5/5**——decision 落选候选 D（0.86）。缺口面中等（3 条已被既有维度 verify/rewrite）。
+4. **sacrifice_debt 漏判 5/8、真零命中仅 3/5**——decision 落选候选 E（0.77，连续两轮落选）。与 favor_ledger / investment_as_debt / guilt_induction / suffering_capital 四个既有维度边界重叠，误伤验证成本最高。
+5. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 候选 D 纯维护项。它让所有「读 score 判命中」的审计脚本失真。修它要确认没有消费方依赖 score:1 的现状，需独立轮次。
+6. **29+ 个 commit 未推送 GitHub**——finish 的自动推送 ETIMEDOUT（网络不通），且环境红线规定推送是人工门禁，本任务不做。
+7. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（四条）
+
+1. **chatting 双写辅音：`chat(?:ing)?` 匹配不到任何 chatting**（本轮最贵）：I3 首版对 'No more chatting with other guys' 整句漏判——chatting = chat+t+ing，`chat(?:ing)?` 匹配 "chat" 后剩下 "ting" 挡死 `\s+with`。最小复现逐段缩小（no more + chatting true → + with false）才定位到。判据：**英文动词 -ing 形态必须处理双写辅音**（chat/stop/run/hug/skip/cut 双写，talk/text/see/contact/hang/block/delete 不双写）。这是 r689「动词三种形态」纪律的同族新形态——那次漏第三人称单数，这次漏双写辅音。
+2. **C4 anymore 窗口 {0,3} 词装不下真实句子**：'You are not allowed to talk to your friends anymore' 的 not 与 anymore 之间隔 6 个词（allowed to talk to your friends），{0,3} 窗口恒不匹配。放宽 {0,6} 后命中。判据：隐式终结支的窗口要按「否定词 + 动词短语 + 宾语」的真实词数设，不按最短样本设。
+3. **负例脚本 I6a/I6b 注入点被同族冗余兜底**：'From now on, you only need me. Nobody else matters.' 一条样本同时含 I6a 与 I6b 两条腿①支——单独注入任一条，另一条仍让样本命中，负例报「注入后仍全绿（守卫漏抓）」的假阴性。修法：给每条支各配一条**单支样本**（'From now on, you only need me.' 只有 I6a；'Nobody else matters to you. I forbid it.' 只有 I6b）。判据：**两条支覆盖同一样本时，单支注入证明不了单支承重**。
+4. **守门 inject 样本选错两次**：E5 首版选「切断社会联系是一种常见的控制手段」——它 baseline pass 靠的是**缺腿②**而非 ANALYSIS 守门（注入后仍 pass）；第二版选「如何应对他要求检查我手机还不许我出门？」——「检查我手机」属腿① c 支、「不许我出门」属腿① d 支，腿②根本没命中。第三版选「怎么应对他说不准出门否则就别怪我？」才三要素齐全（句首疑问词 + 腿① d 支 + 腿② COERCE b 支）。判据：**守门 inject 样本必须「句首疑问词 + 腿① + 腿②」三要素齐全**，先跑诊断脚本确认双腿命中再写断言——问句转述天然缺腿②，因为转述会改主语。

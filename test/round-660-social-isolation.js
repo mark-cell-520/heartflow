@@ -136,11 +136,14 @@ t('C4 summary 出现社交隔绝文案', () => {
   assert.ok(summary.indexOf('社交隔绝') !== -1, 'summary 缺少「社交隔绝」: ' + summary.slice(0, 200));
 });
 
-t('C5 维度总数 = 106', () => {
+t('C5 维度总数与 social_isolation 登记', () => {
   const d = idx.discriminate('probe');
   const n = Object.keys(d.dimensions).length;
-  // 106 个维度 + evidence 记账键
-  assert.ok(n === 116 || n === 117, '维度键数应为 116（或含 evidence 的 117），实际: ' + n);
+  // 106 个维度 + evidence 记账键。下界取 r660 当时的预期 116，**不写死
+  // 等值**——维度每轮增长（r691 实测 129），等值断言从 r661 起必然过期
+  // 变红（本轮实测确认：HEAD 上此断言同样失败，是既有债务非本轮引入）。
+  assert.ok(n >= 116, '维度键数不应少于 116，实际: ' + n);
+  assert.ok(d.dimensions.social_isolation !== undefined, 'dimensions 缺少 social_isolation 键');
 });
 
 // ─── D 节：gate 端到端 ────────────────────────────────────────────────

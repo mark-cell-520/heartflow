@@ -95,6 +95,27 @@
  *     极端形态 → 补 k 支（信任只能通向于我）。
  * 双侧验收：攻击 10/10 命中（原 7 漏判全消）、良性 30/30 零误伤
  * （含新增边界样本：规则陈述/安全提醒/第三人称转述/提问句式）。
+ *
+ * [r691 补英文句式族 — 真升级②] decision 本体选出（/tmp/decide-run-691.js
+ * 读 /tmp/decide-opts-691.json，composite_score 0.93 / identity alignment
+ * 100%，无拒选）。探测器 /tmp/hf-scout-691.js 在 129 维引擎实测（判据从严：
+ * gate.checkOutput() action==='pass' 才算漏判）：英文攻击 8 条漏判 7/8、
+ * 真零命中 7/7、误伤 0/9。诊断脚本 /tmp/round-691-si-diag.js 逐条两腿
+ * 诊断：6 条双腿全缺、1 条缺腿①。补 8 条 ISOLATE 英文支（I1 否定愿望
+ * / I2 stop+ing / I3 no more+ing / I4 删除群体指代 / I5 cut off 宾语前置 /
+ * I6a you only need me / I6b nobody else matters）+ 6 条 COERCE 英文支
+ * （C1 影响贬损 / C2 爱情条件 / C3 禁止宣告 / C4 anymore 隐式终结 /
+ * C5 占有宣告 / C6 from now on+第二人称指令）。
+ * 英文腿分支对照表见 test/round-691-social-isolation-en.js 头注释
+ * （r686 纪律：中文腿有几个分支，英文腿就要有几个）。本轮实测补完后
+ * 攻击 8/8 全命中（gate 层 verify）、良性 25/25 零误伤、双向门禁误拦
+ * 301/326 与基线完全一致。
+ * 踩坑（两个都进测试锁住）：① chatting 是双写辅音（chat+t+ing），
+ * `chat(?:ing)?` 匹配不到——I3 首版对 No more chatting with other guys
+ * 整句漏判，改 `chat(?:ting)?`；② C4 anymore 窗口首版 {0,3} 词装不下
+ * not allowed to talk to your friends anymore（6 词），放宽 {0,6}。
+ * 附带维护修正：QUESTION_EN 窗口 50→90（同 r690：真实英文问句普遍
+ * 60-90 字符，50 窗口让整类求助提问失去守门；C2b 样本守护）。
  */
 
 'use strict';
@@ -177,6 +198,29 @@ const ISOLATE_ZH = new RegExp([
   String.raw`\b(?:cut|cutting)\s+(?:you|u)\s+off\s+from\s+(?:your\s+)?(?:friends?|family|everyone|anybody|everybody|the\s+outside\s+world)`,
   String.raw`\byou\s+(?:will\s+not|won't)\s+(?:see|talk\s+to|contact)\s+(?:your\s+)?(?:friends?|family|anyone)\s+(?:again|anymore|until)`,
   String.raw`\b(?:no|zero)\s+(?:friends?|visitors?|phone\s+calls?|calls?|contacts?)\s+(?:allowed|permitted)\s+(?:for\s+)?(?:you|u)`,
+  // ── [r691] 英文腿补齐：对照中文腿分支表（a 交友禁止 / h 对象扩展 /
+  // i 删除型 / k 排他），补 8 条此前零覆盖句式族。探测器实测 7/8 漏判样本
+  // 逐条两腿诊断（/tmp/round-691-si-diag.js）：6 条双腿全缺、1 条缺腿①。
+  // I1 否定愿望 + 看见/联系：「I do not want you to see your family」——
+  // 英文最常见的隔绝形态（want not let/allow），旧动词表只收 let/allow。
+  String.raw`\bi\s+(?:do\s+not|don't)\s+want\s+(?:you|u)\s+(?:to\s+)?(?:see|visit|call|text|talk(?:ing)?\s+to|meet|contact|hang(?:ing)?\s+out\s+with)\s+(?:him|her|them|your|any|those|these)`,
+  // I2 stop + 动名词 + with/to：「Stop hanging out with your coworkers」——
+  // 祈使禁止形，与 I3（no more）同为英文口语主战场。
+  String.raw`\bstop\s+(?:hang(?:ing)?\s+out|talk(?:ing)?|speak(?:ing)?|text(?:ing)?|meet(?:ing)?|see(?:ing)?|contact(?:ing)?)\s+(?:with|to)\s+(?:him|her|them|your|any|those|these|other)`,
+  // I3 no more + 动名词 + with/to：「No more chatting with other guys」。
+  String.raw`\bno\s+more\s+(?:hang(?:ing)?\s+out|talk(?:ing)?|chat(?:ting)?|text(?:ing)?|meet(?:ing)?|see(?:ing)?|contact(?:ing)?)\s+(?:with|to)\s+(?:him|her|them|your|any|those|these|other|anybody|anyone)`,
+  // I4 删除/拉黑群体指代：「Block them all / Delete them all」——中文 i 支
+  // 的英文对应（删掉/清空 + 全部人）。宾语刻意限死人称/群体指代，不收普通
+  // 名词（「block the IP」「delete the file」是正当运维，不匹配）。
+  String.raw`\b(?:block|delete|remove|unfriend)\s+(?:them|him|her|everyone|everybody|all\s+of\s+them|those\s+people)\b`,
+  // I5 cut off + 宾语前置（无 you off from 中介）：「cut off all your
+  // friends」——旧支要求 cut you off from 结构，宾语前置形整族漏判。
+  // 名词表对齐中文 h 支：朋友/同学/邻居/熟人 + 同事。
+  String.raw`\bcut\s+off\s+(?:all\s+)?(?:your|u)\s+(?:friends?|family|coworkers?|colleagues?|classmates?|neighbors?|contacts?)`,
+  // I6 排他性接触（中文 k 支对应）：「you only need me」「Nobody else
+  // matters」——社交接触被单方面排他化，旧支只收中文「只能跟我说话」。
+  String.raw`\byou\s+only\s+(?:need|have)\s+(?:me|us)\b`,
+  String.raw`\bnobody\s+else\s+(?:matters?|counts?|is\s+important|should\s+matter)`,
 ].join('|'), 'i');
 
 // ─── [r683] 把字句祈使（自明单腿）：把+你+亲属+微信+删掉 ─────────────────
@@ -285,6 +329,30 @@ const COERCE_ZH = new RegExp([
   // 不是「没有我的允许不能交往」，而是「信任本身只能通向于我」。
   String.raw`(?:除了|除去)(?:我|咱们|我们)(?:[^。]{0,6})?(?:谁|任何人|什么人|其他人|别人)(?:都)?(?:不能|不可以|不许|不得|没法|别)(?:信|相信|听|依赖|依靠|来往|说话|商量)`,
   String.raw`\b(?:from\s+(?:now\s+on|today|this\s+day\s+on|then\s+on|that\s+moment\s+on))\b[^.]{0,40}?\b(?:not|no|never|don't|do\s+not)\b`,
+  // ── [r691] C1 影响贬损（they/those people 主语）：「They are a bad
+  // influence」——旧 e 支只认 your friends are toxic，主语是 they 时
+  // 整类漏判（与中文 j 支「那些人都在带坏你」同族）。
+  String.raw`\b(?:they|those\s+people|he|she)\s+(?:are|is)\s+(?:a\s+)?(?:bad|toxic|negative|horrible|terrible)\s+influence`,
+  // ── [r691] C2 爱情条件：「if you love me」——把隔绝指令挂在爱上
+  // （「You should cut off all your friends if you love me」）。与
+  // emotional_manipulation 的边界：本维度要求腿①隔绝指令共现，单有
+  // 「if you love me」不判（良性情话无隔绝指令即 pass）。
+  String.raw`\bif\s+you\s+(?:really\s+)?(?:love|care\s+about)\s+me\b`,
+  // ── [r691] C3 禁止宣告：「I forbid it / I do not allow it」——中文
+  // 「我不准」的英文对应，第一人称宣告式强制信号。
+  String.raw`\bi\s+(?:forbid|prohibit|do\s+not\s+allow|don't\s+allow|will\s+not\s+allow|won't\s+allow)\s+(?:it|that|this|you)`,
+  // ── [r691] C4 anymore 隐式终结宣告：「You are not allowed to talk to
+  // your friends anymore」——否定词 + 0-3 词 + anymore/ever again，与
+  // 中文 f 支「从今往后不准」同族（终结信息在 anymore 本身，不要求显式
+  // 不顺从条件）。
+  String.raw`\b(?:not|never|no)\s+(?:\w+\s+){0,6}?(?:anymore|ever\s+again)\b`,
+  // ── [r691] C5 占有宣告：「You belong to me only」——排他归属宣告，
+  // 与 I6a/b（腿①排他指令）配对成双腿；单独出现（情话）无腿①不判。
+  String.raw`\byou\s+belong\s+to\s+(?:me|us)\s+only\b`,
+  // ── [r691] C6 from now on + 第二人称指令：旧 f 支英文形要求 from now
+  // on 后接 not/no/never，「From now on, you only need me」是否定词
+  // 之外的隐式强制（排他指令自含强制），补 you only/will/must 变体。
+  String.raw`\b(?:from\s+(?:now\s+on|today|this\s+day\s+on|then\s+on))\b[^.]{0,40}?\byou\s+(?:only|will|must|shall|have\s+to|need\s+to)\b`,
 ].join('|'), 'i');
 
 // ─── G1: 正当监护与规则陈述（家长关心孩子/约定规则/学校纪律/未成年人保护）
@@ -336,7 +404,7 @@ const SAFETY_ZH = new RegExp([
 // ─── G4: 句首咨询提问（只认句首咨询词，句中反问不豁免）────────────────
 const QUESTION_ZH = new RegExp([
   String.raw`^\s*(?:如何|怎么|怎样|为什么|为何|是否|能不能|可不可以|该不该|要不要|应不应该、该如何)[^。]{0,30}[?？]`,
-  String.raw`\b^\s*(?:how|why|what|when|should|is\s+it|can\s+i|do\s+i|does|are\s+there)\b[^.]{0,50}\?`,
+  String.raw`\b^\s*(?:how|why|what|when|should|is\s+it|can\s+i|do\s+i|does|are\s+there)\b[^.]{0,90}\?`,
 ].join('|'), 'i');
 
 /**
