@@ -61,10 +61,11 @@ action !== 'pass' 即误伤；≥50% 攻击漏判且良性 0 误伤才算合格�
 5. **17+ 个 commit 未推送 GitHub**：finish 的自动推送 ETIMEDOUT（网络不通），且环境红线规定推送是人工门禁，本任务不做。
 6. **data/test-count.json 记账自锁**：恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
 
-## 踩坑（两条）
+## 踩坑（三条）
 
 1. **BADACT_EN 数量词表漏英文数词，测试样本当场逼出来**：第一版持续段只写 `(?:\d+|a\s+few|several|a|some)?`——"for three days" / "for two weeks" 的英文数词（three/two）不在表里，可选组匹配空后 days 对不上 three，整条不命中。修法：把 one~twelve 英文数词补进可选组。教训与 r686「英文动词组必须写全三种形态」同族——**英文模式里的数词/动词形态枚举，中文思维容易只写阿拉伯数字和一种形态**；测试样本（探测器独立集）是唯一抓住它的闸，我自己写的分支变体反而没覆盖到（变体恰好用了 ghosted for two weeks——two 同样漏，但它是靠 A1 样本先红的）。
-2. **`disappeared?` 不漏原形是错的，`disappear(?:ed|ing|s)?` 才对**：`disappeared?` 的字面是 "disappeare" + d?——匹配 disappeared/disappeare，**不匹配 disappear 原形**；ghosted? 同理漏 ghost。分支变体 'I disappear for days without a word.' 当场抓住。教训：**动词后缀展开不要用 `Xed?` 简写（它只覆盖 Xe/Xed 两种），要写 `X(?:ed|ing|s)?` 全覆盖**——这与「选择支+可选组至少一个必填」是同一族纪律：简写形式看着覆盖了三种形态，实际漏了最常见的一种。
+2. **bump 的第五处 version.js 兜底值，sync-version.js 刻意不管**：本轮按旧记忆跑 `printf > VERSION` + `sync-version.js`，脚本输出 "Version sync complete" 让人以为五处齐了——但 src/core/version.js:45 的 `let VERSION = '6.8.35'` 兜底值注释明写「sync-version.js 不管这里，每次 bump 需手动同步」，finish 的「版本四处一致」检查当场抓住（version.js 仍 6.8.34）。教训：**bump 后必须跑 `node scripts/upgrade-engine.js finish` 让机器核对四处一致**，"sync complete" 的输出只覆盖它管的那三处；r687 日志写的「五处」是真五处，我漏改的正是脚本不管的那处。
+3. **`disappeared?` 不漏原形是错的，`disappear(?:ed|ing|s)?` 才对**：`disappeared?` 的字面是 "disappeare" + d?——匹配 disappeared/disappeare，**不匹配 disappear 原形**；ghosted? 同理漏 ghost。分支变体 'I disappear for days without a word.' 当场抓住。教训：**动词后缀展开不要用 `Xed?` 简写（它只覆盖 Xe/Xed 两种），要写 `X(?:ed|ing|s)?` 全覆盖**——这与「选择支+可选组至少一个必填」是同一族纪律：简写形式看着覆盖了三种形态，实际漏了最常见的一种。
 
 
 # 第 675 轮报告（v6.8.24 — 第 120 维度 reproductive_coercion：生育胁迫）
@@ -14014,7 +14015,7 @@ isZh 双层反斜杠问题——r678 的 fix commit（ce6a1809）已修，本轮
 3. **UPGRADE_LOG 缺 r657-r677 共 21 轮记录**：那些轮的 commit 在（git log 可查），但轮次报告没写。不编造未知轮次细节。
 4. **未推送 GitHub、未 npm publish**：环境红线规定发布是人工门禁，本任务不做。
 
-### 踩坑（两条）
+### 踩坑（三条）
 
 1. **sed 生成负例脚本时 guidance 锚点文案不一致**：r678 的负例 needle 是
    `'legal_status_coercion': "不得把`，本轮新模块 guidance 起手是「不得用」，
