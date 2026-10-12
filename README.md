@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-132 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+133 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
 ×  1,314 dispatch routes  ×  18,157 passing tests  ×  0 runtime dependencies
 ```
 
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 132 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 133 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -143,7 +143,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (132 dimensions) -> gate
+scope-check -> premise-check -> discriminate (133 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -172,14 +172,14 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.41**. Not marketing copy.
+Measured on this repository at **v6.8.42**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 132 |
+| Discrimination dimensions | 133 |
 | MCP tools | 182 |
 | Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
@@ -310,6 +310,7 @@ duplicate the log.
 |---------|------|--------|
 | 6.8.40 | 2026-10-12 | **A 131st dimension: `genetic_fallacy` (origin/source-based quality inference)** — an idea, product, or person is judged by where it came from instead of what it says: origin naming (young / freshman / no elite degree / laid off from a big company / foreign / domestic / small workshop / amateur / self-taught / two centuries ago / last century / ancient / rural) × quality disparagement inference (direct disparagement "definitely immature / long outdated / narrow-minded / definitely has problems / not worth listening to", comparative disparagement "less mature than the imported one", rhetorical-question disparagement "can it fit China's context / how good can it be / can it be trusted"). Two-leg coexistence; 10/10 leaks closed, 0/16 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged. Domain boundary with `stereotype` (source-discriminatory evaluation vs source-quality inference, the two families are collected separately per the r691 handoff) is locked by tests |
 | 6.8.41 | 2026-10-12 | **A 132nd dimension: `survivorship_bias` (survivorship bias)** — only the visible successful cases are seen, and universal conclusions or listener actions are inferred, ignoring the silent majority: visible successful cases (success-result nouns: became the world's richest person / financial freedom / annual salary in the millions / monthly income in the tens of thousands / won the lottery / won Best Actress / champion / fully recovered / became famous / bought a house / lived to ninety / admitted to Tsinghua; EN: became a millionaire / won the lottery / got rich / made it big / owns three houses / never went to college and now owns) × inferred conclusions in three categories (inferred to the listener "so you should also / you definitely can too / with this method your child can too / everyone can", domain evaluation "studying is useless / really easy / can get rich / reliable way out / shortcut / good timing / does not affect health", EN counterparts "so you should / you can too / college is unnecessary / is pointless / is a solid plan / anyone can"), plus the supplementary two legs unconventional path (dropped out / skipped the film academy / played games / sold at a roadside stall / started from nothing; EN: dropped out / skipped college) × success result — the classic survivor narrative form without an explicit inferred sentence ("the neighbor's son dropped out to play games and now earns millions a year"). Two sets of two-leg coexistence; 9/10 leaks closed, 0/10 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged. Domain boundary with `anecdote_as_proof` (acquaintance corpus × universal effect assertion vs unrestricted-source cases × inferred listener action) is locked by tests |
+| 6.8.42 | 2026-10-12 | **A 133rd dimension: `appeal_to_pity` (appeal to pity)** — using self-described pitiful circumstances in place of argument, demanding rule exemptions or special treatment: first-person circumstance statements (I am so pitiful / I am drifting alone in a strange land / my parents divorced when I was little / I am in poor health with a heart condition / my child is still little / my family is this poor / I was laid off by the company; EN: I have been through so much / I am all alone / I was laid off / my family will starve / my child is still little) × exemption demands in three categories (a accommodation and care "how could you bear to refuse me / you will not even help / you must take care of me / it should finally be my turn / make an exception / show some mercy / let me off this once", EN: you cannot possibly say no to me / you must help / have a heart / make an exception for me; b rhetorical exemption and blame "what is wrong with being a few minutes late / do you have any compassion / criticizing me is bullying the weak / how can you have the heart", EN: how could you refuse / where is your compassion; c consequence hostage-taking "that would cut off our lifeline / you are forcing me to a dead end / how are we supposed to live / I could only die", EN: we will starve / this rule will kill my family). Two-leg coexistence; 9/10 leaks closed (8/9 true zero-hit), 0/12 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged. Domain boundaries with `guilt_induction` (left leg is sacrifice boasting vs this dimension's pitiful circumstance self-description) and `suffering_capital` (right leg is compliance derivation vs this dimension's exemption demand) are locked by tests; VERIFY level — a single sentence may be a genuine request for help, rewrite/block would harm legitimate appeals |
 | 6.8.39 | 2026-10-12 | **A 130th dimension: `moving_goalposts` (interpersonal-evaluation domain)** — the moment an achievement, grade, or progress is acknowledged, the evaluator immediately denies its value or shifts the standard elsewhere: dismissive acknowledgment + denial of value ("that does not count" / "what is that" / "that was your duty"), perfect-score raising ("why not 100" / "no mistakes allowed" / "you must finish that too"), old-score accountability or topic switch ("but you still have not explained last time" / "what really matters is"), and comparison disparagement ("everyone your age is already a director"). Two-leg coexistence (achievement acknowledgment in three families x standard shift in four families); 8/8 leaks closed, 0/36 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged. Domain boundary with `standard_shift` (dimension 70, contract/acceptance domain) is locked by tests — the two dialects of the same fallacy, complementary coverage |
 | 6.8.38 | 2026-10-12 | `social_isolation` (dimension 106) gains its English legs — 8 new ISOLATE families (negative wish: I do not want you to see / stop + -ing + with-to / no more + -ing / delete-or-block group reference / cut off + object fronted: cut off all your friends / exclusive contact: you only need me / nobody else matters) plus 6 new COERCE families (bad-influence disparagement: they are a bad influence / love condition: if you love me / prohibition declaration: I forbid it / anymore implicit-finality declaration / possession declaration: you belong to me only / from now on + second-person directive), 7/8 leaks closed (8/8 all caught after the chat-doubling fix), 0/25 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged |
 | 6.8.37 | 2026-10-12 | **A 129th dimension: `post_separation_harassment`** — after the relationship ends (or the other party has asked to end it / has blocked), one party denies the other's autonomy to separate via on-site pursuit, repeated contact, stalking-knowledge, refusal to accept the breakup, and ledger-style whereabouts control: two-leg coexistence (separation event × harassment in four families — on-site/repeated contact / knowledge threat / refusal to accept / whereabouts ledger), 8/8 leaks closed, 0/23 benign harmed, bidirectional guard 52/52 recall and 301/326 unchanged |

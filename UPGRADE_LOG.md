@@ -1,3 +1,67 @@
+# 第 695 轮报告（v6.8.42 — 第 133 维度 appeal_to_pity 诉诸怜悯）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自 r695 轮前探针
+`/tmp/round-695-pre-probe2.js`（v2 口径修正版，落盘
+`/tmp/hf-scout-695b.txt`），其中 survivorship_bias / genetic_fallacy
+已在 r693/r694 上线从候选排除，standard_shift 维度已上线但「既往
+承诺作废句式族」是升级②候选不跳过。v1 探针曾有两个口径 bug（把
+良性 pass 误报成「误伤」、用 score 判「真零命中」），v2 修正后五族
+数字与 r693/r694 落盘完全一致。四个候选喂给 decision 本体
+（/tmp/decide-run-695.js 读 /tmp/decide-opts-695.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A appeal_to_pity 新维度 | **0.94** | 攻击漏判 9/10、真零命中 8/9、误伤 0/12 | **选中** |
+| B standard_shift 补既往承诺作废句式族 | 0.91 | 攻击漏判 7/8、真零命中 7/7、误伤 0/8 | 落选 |
+| C appeal_to_novelty 新维度 | 0.87 | 攻击漏判 7/10、真零命中 7/7、误伤 0/10 | 落选（连续第四轮） |
+| D appeal_to_nature 新维度 | 0.86 | 攻击漏判 8/10（真零命中仅 5/8）、误伤 0/12 | 落选（连续第三轮） |
+
+decision 返回 composite_score 0.94 / confidence 0.9 / identity
+alignment 100%，无拒选。诚实标注：本轮候选的
+feasibility/consequence_value/risk/confidence 四段判据由我构造，
+decision 本体在四个候选间选出 A。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「我孩子还小，你们扣我工资就是断我们活路」「我身体不好还有心脏病，迟到几分钟怎么了」「I have been through so much, you cannot possibly say no to me.」这类**用自述可怜处境换规则豁免**从 pass 变 verify | 攻击族 9/10 漏判清零（gate 层 26/26 非 pass，1 条 rewrite 归因 fallacies 既有维度） | ✅ 升级（真升级①新增维度） |
+| src/appeal-to-pity.js：双腿共现模块——腿① PITY 自述可怜处境十类（可怜自述/孤独漂泊/家庭不幸/疾病身体/孩子拖累/贫困处境/失业裁员/年纪大/债务缠身/苦难总括）× 腿② DEMAND 通融免责三类（a 通融照顾/b 反问免责与指责/c 后果绑架），中英双腿分支对照 | 第 133 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：十处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports/FALLACY_PATTERNS 两条紧凑句式） | dimensions 键 132→133 | ✅ 升级（接线） |
+| test/round-695-appeal-to-pity.js 22 断言 + F 组锁住与 guilt_induction/suffering_capital 的射程分工 + F3 锁住 r695 收紧候选 | 攻击 26/良性 22/单腿 6/豁免 12/gate 层 48/分工 4/inject 6 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-appeal-to-pity.js 负例 | 35/35 注入点逐一置空后测试全部断言红（无崩溃红）、还原 md5 一致 | 维护（守卫有效性证明） |
+| 三份禁改文档维度数 132→133 + verify 计数 91→92 两处 + verify 列举补 appeal_to_pity + 分层计数 118→122（实测口径修正）+ bump 6.8.41→6.8.42 四处 + README changelog | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 132→133、verify 91→92、分层列举、changelog 覆盖 v6.8.42）
+- node test/round-695-appeal-to-pity.js — 22/22（攻击 26：探测器 10+扩展 16；良性 22：探测器 12+扩容 10；单腿 6；豁免 12；gate 层 48；分工 4；inject 6 组）
+- scripts/negative-test-appeal-to-pity.js — 基线 22/22 PASS + 35/35 注入点全断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 133，summary 引用 96；双向回归 召回 52/52、误拦 301/326）
+- node test/security-audit.test.js — 15/16（唯一失败 S2「git log/tag 未命中 6.8.42」是 bump 后预期中间态，commit message 带版本号即转绿，非回归）
+- measure-claimed-numbers 实测 — 维度 133 / BLOCK 11 / REWRITE 19 / VERIFY 92（与三份文档同步值一致）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **standard_shift 既往承诺作废句式族漏判 7/8、良性 0/8、真零命中 7/7**——decision 落选候选 B（0.91）。双腿数字清晰且是既有维度补模式族（工作量最小），但缺口面 7 条小于 appeal_to_pity 的 9 条。连续第四轮可做。
+2. **appeal_to_novelty 漏判 7/10、真零命中 7/7、误伤 0/10**——连续第四轮落选（0.87）。新技术陈述是正常技术讨论主流形态，误伤代价大于漏判代价。
+3. **appeal_to_nature 漏判 8/10 但真零命中仅 5/8、误伤 0/12**——连续第三轮落选（0.86）。3 条已被 moral_foundations 沾边，食品安全/保健品营销语境误伤面宽。
+4. **appeal_to_authority 漏判 6/10 + 键名不一致**——dimensions 键是 appeal_to_authority_boost 而文档/dimMap 用 appeal_to_authority，修它要跨 3 文件改 6 处消费方（r694 起连续第二轮记录）。
+5. **「我都被公司裁员了，你就不能通融一下吗」在 r695 探针中 gate=verify 归 emotional_manipulation 等既有维度**——本维度接线后已独立命中（ap.count=1），该条归因差异不影响覆盖。
+6. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+7. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（四条）
+
+1. **轮前探针 v1 两个口径 bug 让全部族误报「不合格」**：① 良性侧把 pass 当成「误伤」统计（良性 pass 是正确行为，误伤应是 block/rewrite）；② 「真零命中」用 score 判据（fallacies 等 scored 维度 count=0 时 score>0，r693 口径是 count-based）。v2 修正后五族数字与 r693/r694 落盘完全一致——**修正前差点把五个合格候选全部误杀**。纪律：探针每跑出一批数字，先与上一轮落盘对照，整体性偏离先怀疑口径不是引擎。
+2. **r693 反斜杠教训原样复发（本轮最贵）**：从零 authoring EN 正则时写成 4 层反斜杠，落盘后 JS 字符串解码出 `\b` → 正则匹配字面量「反斜杠+b」恒 false，症状是英文腿整族不命中而中文腿全中，极像「英文模式没写」。且第一轮只修了 PITY_EN 漏了 DEMAND_EN 的一处 3 连段。修法：Node 脚本按行 4连→2连（patch 工具的参数层会多一层转义，r694 已有纪律本轮再次验证），修完对每行做段分布复核。
+3. **裸词表支「照顾」造成双侧误伤（r687 同族第二次）**：DEMAND_ZH a5 裸词表初版含「照顾」，与 PITY 腿共现即判——「我身体不好，你能照顾一下这个客户吗」（正常工作请求）被误判。b2 支初版含「照顾/理解/帮我」且整组可选更糟。收紧：裸词表去「照顾」（照料义不是通融义），b2 动词表只收通融类。连带 EN 两处漏判：`this will kill` 不匹配 `this rule will kill`（主语与 will 间插入名词）、`must grant (me|us)` 不匹配 `must grant an exception for me`（动词后插入名词）——都是「中间插入成分」漏写，补 `(?:\s+\w+){0,2}?` 承接。
+4. **负例脚本定位特征写错两处（定位失败非漏抓）**：DEMAND_ZH a1 特征写成 `(?:竟|竟然|居然)(?:忍心...)` 而文件里是 `...竟|竟然|居然)(?:忍心...`（`(?:` 在「怎么」前）；a4 特征漏了中间重复的 `|理应`。判据：定位失败要读文件真实行特征，不要凭印象写注入特征。
+
 # 第 688 轮报告（v6.8.35 — intermittent_reinforcement 英文句式族补宽）
 
 ## 心虫选中项 + 分数 + 身份对齐
