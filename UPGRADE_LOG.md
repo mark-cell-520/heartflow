@@ -1,3 +1,66 @@
+# 第 696 轮报告（v6.8.43 — standard_shift 补「既往承诺单方作废」句式族，升级②）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自 r696 轮前复量探针
+`/tmp/round-696-pre-probe.js`（落盘 `/tmp/hf-scout-696.txt`，口径与 r695 v2
+完全一致）。r695 已上线的 appeal_to_pity 复量确认漏判 0/10 已清零，从候选
+排除。四个候选喂给 decision 本体（/tmp/decide-run-696.js 读
+/tmp/decide-opts-696.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A standard_shift 补既往承诺作废句式族 | **0.91** | 攻击漏判 7/8、真零命中 7/7、误伤 0/8（本轮实测，数字与 r692/r694/r695 连续四轮一致） | **选中** |
+| B appeal_to_authority 新维度 | 0.89 | 攻击漏判 6/10、真零命中 6/6、误伤 0/10 | 落选 |
+| C appeal_to_novelty 新维度 | 0.87 | 攻击漏判 7/10、真零命中 7/7、误伤 0/10 | 落选（连续第五轮） |
+| D appeal_to_nature 新维度 | 0.86 | 攻击漏判 8/10、真零命中 5/8、误伤 0/12 | 落选（连续第四轮） |
+
+decision 返回 composite_score 0.91 / confidence 0.92 / identity alignment
+100%，无拒选。**这是该候选连续第五轮进池后首次被选中**——前四轮它都因
+consequence_value 低于新维度类落选；本轮按 Phase 0.7 纪律 4 在 A 的 extra
+里显式写入「预期收益确定性」判据（另三个新维度候选要么误伤面宽、要么真零
+命中率不满、要么附带额外修复债），decision 才把它与其余候选区隔开。
+诚实标注：候选的 feasibility/consequence_value/risk/confidence 四段判据
+由我构造，decision 本体在四个候选间选出 A。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「之前答应的标准不算数了，按新标准来」「上次说好的规则作废，现在重新定」「原来谈的待遇取消了，以最新通知为准」「早先答应的条款宣布无效，按新规执行」「We are withdrawing the previously agreed standard」「The terms we promised earlier are cancelled」这类**单方宣布既往承诺作废**从 pass 变 verify | 攻击族 8/8 漏判清零（gate 层 13/13 非 pass） | ✅ 升级（真升级②：已有维度补零覆盖句式族） |
+| src/self-imposed-standard-shift.js：路由②作废判据从函数内行内正则提升为模块级 VOID_ZH/VOID_EN 常量——名词插入容忍（既往承诺词与作废动词间插入「标准/规则/条件/待遇/条款/事情/价格」仍判，上限 8 字符且不容忍句读）、作废动词扩表（收回/撤销/撤回/撕毁/宣告无效/宣布无效/一笔勾销/翻篇/不认了/不认账）、既往动词补「谈/许诺/保证」与「说好/谈好」形；SHIFT_ZH 补 3 支（条件收回/宣布无效/以最新通知为准+插入容忍）、SHIFT_EN 补主动撤回与被动取消两族 | 第 70 维度 standard_shift 新增一个此前零覆盖的句式族 | ✅ 升级（模式库本体） |
+| test/round-696-standard-shift-void.js 11 断言（攻击 13：探测器 8+扩展 5；良性 16：探测器 8+扩展 8；单腿边界 4；r507 既有样本 17+18 不回归；VOID_ZH/VOID_EN 两个变异守卫） | 攻击 13/良性 16/单腿 4/回归 35 | ✅ 升级（验收证据） |
+| scripts/negative-test-standard-shift-void.js 负例 | 7/7（基线全绿→摘 VOID_ZH 红→摘 VOID_EN 红→还原 md5 一致恢复全绿） | 维护（守卫有效性证明） |
+| bump 6.8.42→6.8.43 四处（VERSION/package.json/SKILL.md/src/core/version.js）+ README changelog + 两处规格表口径版本戳 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（changelog 覆盖 v6.8.43、README/SKILL 规格表口径戳同步为 v6.8.43；补模式不改维度总数，133 维计数不动）
+- node test/round-696-standard-shift-void.js — 11/11（攻击 13：探测器 8+扩展 5；良性 16：探测器 8+扩展 8；单腿 4；r507 回归 35；变异守卫 2）
+- scripts/negative-test-standard-shift-void.js — 7/7（VOID_ZH/VOID_EN 摘除均当场红、还原 md5 一致）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 133、summary 引用 96，与 r695 一致）
+- node test/security-audit.test.js — 16/16
+- node test/round-507-standard-shift.test.js — 9/10（唯一失败「gate 动作为 verify 级」是**既有基线失败**：git stash 对照 HEAD 实测 atk#1「这一轮的指标你已经完成了，但我觉得还能更好」与 atk#15「你满足合同的要求了，但用新的一套算」在补丁前同样 rewrite——分别归因 overclaim/presupposition 与 moving_goalposts 既有维度，与本轮补丁无关）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **「一笔勾销」类作废动词只进 VOID_ZH 不进 SHIFT_ZH 宽支**——实测「原先承诺的福利一笔勾销」VOID 侧命中但 SHIFT 侧无对应支（原「标准/规则」名词表不含「福利」），仍漏判。不修的原因：把「一笔勾销」写成 SHIFT 宽支会新开一条**路由①**通路（ACHIEVED×SHIFT），「你说完了，之前的账一笔勾销，咱们重新开始」这类双向和解良性句会被误判。修它需要给宽支加单方限定词，是独立一轮的工作量。本轮探测器 8 条已全覆盖，该变体留作边界。
+2. **appeal_to_authority 漏判 6/10 + 键名不一致**——decision 落选候选 B（0.89）。dimensions 键是 appeal_to_authority_boost 而 dimMap/文档用 appeal_to_authority，修它要跨 3 文件改 6 处消费方（r694 起连续第三轮记录）。
+3. **appeal_to_novelty 漏判 7/10、真零命中 7/7、误伤 0/10**——连续第五轮落选（0.87）。新技术陈述是正常技术讨论主流形态，误伤代价大于漏判代价。
+4. **appeal_to_nature 漏判 8/10 但真零命中仅 5/8、误伤 0/12**——连续第四轮落选（0.86）。食品安全/保健品营销语境误伤面宽。
+5. **r507 测试第 4 项「gate 动作为 verify 级」既有失败**（atk#1/atk#15 rewrite，HEAD 复现）——修它要么改测试口径（把 rewrite 纳入可接受动作集合，但会削弱该断言的对定级守护），要么动 overclaim/moving_goalposts 的惩罚权重（超出本轮范围）。按「既有基线失败不冒充本轮回归、也不为消红灯改产品」纪律，原样记录在此。
+6. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+7. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（四条）
+
+1. **补丁脚本的定位锚点缩进不能照 read_file 显示层**：read_file 显示 SHIFT_ZH 末支前有 2 空格缩进，Node 实测文件里该行**顶格**（显示层统一加了缩进）。第一版补丁因此定位失败。纪律：锚点串先用 Node dump 一次 JSON.stringify 再写进脚本。
+2. **反斜杠层数第三次靠 @B@/@S@ 占位法零损失通过**：本轮补丁文本全部用 `@B@`/`@S@`/`@N@` 占位、落盘前用 `String.fromCharCode(92)` 拼接（r686/r693 同款纪律），patch1 一次落盘正确。但 patch2 首版仍踩了两个非反斜杠坑：① replaceOnce 忘了先 resolve 占位符（拿含 @S@ 的串去匹配 src 必然 0 次）；② oldS 外层多包了一层源码单引号（复制了分支①②的模式，但 VOID_EN/SHIFT_EN 的行是双引号字符串行、没有外层单引号）。
+3. **「名词插入容忍」的上限字符类必须同时排除逗号**：VOID_ZH 两个插入段都写 `[^。；;，,！!？?\n]{0,8}`——「当初答应的事情，你现在说不认了」因逗号断在插入段里而漏判。这既是防跨句配对的设计（良性「之前的口头约定没有书面记录，建议补签」靠它不误伤），也是边界（跨小句的作废宣告要另立样本形态，本轮扩展样本改为无逗号紧凑形）。
+4. **变异守卫的样本必须让被摘的腿是唯一通路（r693 教训第三次踩，形态不同）**：VOID_ZH 变异守卫首版选了「上次说好的规则作废」——它的「说好」命中 ACHIEVED_ZH 的「（写|改|修|说|讲）（完|好）」支，走**路由①**，摘 VOID_ZH 根本不翻转，差点误判「名词插入容忍是死码」。改成先用 ACHIEVED_ZH/SHIFT_ZH/VOID_ZH 三常量实测矩阵筛出 ACH=false 的 5 条独占样本，守卫才证明判据承重。纪律：**变异样本入组前先跑双腿归属矩阵**。
+
 # 第 695 轮报告（v6.8.42 — 第 133 维度 appeal_to_pity 诉诸怜悯）
 
 ## 心虫选中项 + 分数 + 身份对齐

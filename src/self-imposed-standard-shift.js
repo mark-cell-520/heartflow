@@ -20,6 +20,11 @@
  *     "做到了/达标了/合格了"，后段用转折把标准抬走；
  *   · 路由②（次）：**既往承诺作废**——直接宣布先前答应的标准"不算数"，
  *     以更高门槛替换（无达成确认也构成，因为单方面作废已构成加码）。
+ *     [v6.8.43 r696 补支] 名词插入容忍：「之前答应的**标准**不算数」「原来谈的**待遇**
+ *     取消了」——既往承诺词与作废动词之间插入受约对象名词仍判；作废动词扩表
+ *     补 收回/撕毁/宣告无效/宣布无效/一笔勾销/翻篇/不认账，既往动词补 谈/许诺/保证，
+ *     英文侧补主动撤回（withdrawing/cancel/rescind）与被动取消（are cancelled）两族。
+ *     以更高门槛替换（无达成确认也构成，因为单方面作废已构成加码）。
  *
  * 为什么现有维度拦不住：
  *   · concession_coercion 管让步胁迫（要对方先认错再谈），落点在让步，
@@ -156,7 +161,11 @@ const SHIFT_ZH = new RegExp(
 '|(?:还|仍|依旧|依然|再)(?:得|需要|要|应该|必须)(?:再)?(?:改|修|补|打磨|完善|调整|返工)' +
 // [v6.8.15 r507 补支二] 考核项/门槛刚提高（"bar just went up"）
 '|(?:刚|刚刚|才|最近|眼下|现在)?(?:提高|抬升|上调|涨了)(?:了|到)?(?:不少|很多|一截)?' +
-'|(?:门槛|标准|标杆|要求|基准)(?:刚刚|刚|才|最近)?(?:提|抬|升|涨)(?:高|升|起来)(?:了)?'
+'|(?:门槛|标准|标杆|要求|基准)(?:刚刚|刚|才|最近)?(?:提|抬|升|涨)(?:高|升|起来)(?:了)?' +
+  // [v6.8.43 r696 补支] 既往承诺单方作废族腿②侧（条件收回/宣布无效/以新通知为准）
+  '|(?:条件|待遇|条款|约定|承诺|说法|规矩|事情|价格)(?:被)?[^。；;，,！!？?\\n]{0,6}(?:收回|撤销|撤回|翻篇|不认账|不认了|作废)' +
+  '|(?:宣布|宣告|声明|声称)(?:无效|作废|失效)' +
+  '|(?:以|按)(?:最新|新)(?:的)?(?:通知|口径|说法|规矩)(?:为准)'
 );
 
 // 英文：now the bar is higher / that was the old bar / keep going until I say so。
@@ -195,7 +204,38 @@ const SHIFT_EN = new RegExp(
   // [v6.8.15 r507 补支] pass/cleared a round + bar raised
   "|\\bhe\\s+(?:satisfied|met|met\\s+every|fulfilled)\\s+every\\s+" +
   "(?:requirement|criteria?|expectation)s?\\b" +
-  "|\\bsatisfied\\s+every\\s+(?:requirement|criteria)s?\\b",
+  "|\\bsatisfied\\s+every\\s+(?:requirement|criteria)s?\\b" +
+  // [v6.8.43 r696 补支] 既往承诺单方作废英文侧（主动撤回/被动取消两族）
+  "|\\b(?:we|I|they)\\s+(?:are\\s+|is\\s+)?(?:withdrawing|withdraw|cancel(?:l?ing|l?ed)|rescind(?:ing|ed)|revok(?:ing|ed)|void(?:ing|ed)|retract(?:ing|ed))\\s+(?:the\\s+)?(?:previously\\s+|formerly\\s+)?(?:agreed|promised|prior|previous|original)\\s+(?:standard|terms?|agreement|deal|conditions?)s?\\b" +
+  "|\\bthe\\s+(?:terms?|agreement|standard|conditions?|deal|promise|offer)s?\\s+(?:we|I|they)\\s+(?:promised|agreed(?:\\s+on)?(?:\\s+to)?|offered)\\s+(?:earlier|before|previously|beforehand)\\s+(?:are|is|have\\s+been|has\\s+been)\\s+(?:now\\s+)?(?:cancelled|canceled|withdrawn|rescinded|revoked|void|invalid|null\\s+and\\s+void|no\\s+longer\\s+valid)\\b" +
+  "|\\b(?:we|I|they)\\s+(?:promised|agreed\\s+on)\\s+(?:earlier|before|previously)\\s+(?:standard|terms?|deal|conditions?|agreement)s?\\s+(?:are|is)\\s+(?:now\\s+)?(?:void|invalid|cancelled|canceled|withdrawn|no\\s+longer\\s+valid)\\b",
+  'i'
+);
+
+// ─── 要件二之补：既往承诺单方作废（v6.8.43 r696 补支）────────────────
+// [r696] 路由②的作废判据原为函数内行内正则，要求「答应/说/约定」后**直接**
+// 跟作废动词——插入名词（标准/规则/条件/待遇/条款）即不命中。r696 探测器
+// 实测该族 7/8 漏判全出在这一处；「说好/谈好」形、「收回/宣布无效/翻篇」
+// 动词、英文 withdraw/cancel 被动族原表也不收。判据仍是双腿：腿①既往承诺
+// 词（时间词/说好类）× 腿②作废动词，名词插入容忍上限 8 字符且不容忍句读
+// （防跨句配对——「之前的口头约定没有书面记录，建议补签」不命中）。
+const VOID_ZH = new RegExp(
+  '(?:之前|先前|当初|原来|上次|早先|此前|原先)' +
+  '[^。；;，,！!？?\\n]{0,6}' +
+  '(?:答应|承诺|应承|说|讲|约定|谈|定|许诺|保证)' +
+  '(?:好|的)?' +
+  '[^。；;，,！!？?\\n]{0,8}' +
+  '(?:不算数|不算|不作数|作废|取消|撤销|撤回|推翻|收回|撕毁|背弃|宣告无效|宣布无效|声明无效|一笔勾销|翻篇|无效了|失效了|不认了|不认账|不算了)' +
+  '|(?:说好|谈好|约定好|讲好|说定|谈定)(?:的)?' +
+  '[^。；;，,！!？?\\n]{0,8}' +
+  '(?:不算数|不作数|作废|取消|撤销|撤回|推翻|收回|撕毁|背弃|宣告无效|宣布无效|一笔勾销|翻篇|无效了|失效了|不认账|不算了)'
+);
+const VOID_EN = new RegExp(
+  "\\b(?:we|I|they|the\\s+company|management)\\s+(?:are\\s+|is\\s+)?(?:withdrawing|withdraw|cancel(?:l?ing|l?ed)|rescind(?:ing|ed)|revok(?:ing|ed)|void(?:ing|ed)|retract(?:ing|ed))\\s+(?:the\\s+)?(?:previously\\s+|formerly\\s+|earlier\\s+)?(?:agreed|promised|prior|previous|original)\\s+(?:standard|terms?|agreement|conditions?|deal|offer|commitment)s?\\b" +
+  "|\\bthe\\s+(?:terms?|agreement|standard|conditions?|deal|promise|commitment|offer)s?\\s+(?:we|I|they)\\s+(?:promised|agreed(?:\\s+on)?(?:\\s+to)?|offered)\\s+(?:earlier|before|previously|beforehand)\\s+(?:are|is|have\\s+been|has\\s+been)\\s+(?:now\\s+)?(?:cancelled|canceled|withdrawn|rescinded|revoked|void|null\\s+and\\s+void|no\\s+longer\\s+valid)\\b" +
+  "|\\b(?:the\\s+)?(?:previously|formerly)\\s+(?:agreed|promised)\\s+(?:standard|terms?|conditions?|deal|agreement)s?\\s+(?:are|is|have\\s+been|has\\s+been)\\s+(?:now\\s+)?(?:withdrawn|cancelled|canceled|rescinded|revoked|void|invalid|null\\s+and\\s+void|no\\s+longer\\s+valid)\\b" +
+  "|\\b(?:the\\s+)?(?:standard|terms?|deal|conditions?|agreement)s?\\s+(?:we|I|they)\\s+agreed\\s+on\\s+(?:earlier|before|previously)\\s+(?:has\\s+been|have\\s+been|are|is)\\s+(?:now\\s+)?(?:withdrawn|cancelled|canceled|rescinded|revoked|void|invalid|no\\s+longer\\s+valid)\\b" +
+  "|\\b(?:we|I|they)\\s+(?:promised|agreed\\s+on)\\s+(?:earlier|before|previously)\\s+(?:standard|terms?|deal|conditions?|agreement)s?\\s+(?:are|is)\\s+(?:now\\s+)?(?:void|invalid|cancelled|canceled|withdrawn|no\\s+longer\\s+valid)\\b",
   'i'
 );
 
@@ -280,8 +320,9 @@ function checkStandardShift(text) {
 
   // 路由②：既往承诺直接作废（无达成确认也构成单方面加码）
   if (shiftZh || shiftEn) {
-    const voidZh = /(?:之前|先前|当初|原来|上次|早先|说好|约定|讲好)(?:答应|说|讲|约定|承诺|定的)(?:的)?(?:不算数|不作数|作废|不算|取消|推翻|不算了|不算了)/.test(text);
-    const voidEn = /\b(?:that|this|those|our|the)\s+(?:was|were|is)\s+(?:no\s+longer\s+)?(?:the\s+)?(?:deal|agreement|bargain)\b|\b(?:we|I|they)\s+(?:are\s+)?(?:no\s+longer|not)\s+(?:honou?ring|bound\s+by)\s+(?:that|this)\b/i.test(text);
+    // [v6.8.43 r696] 作废判据提升为模块级 VOID_ZH/VOID_EN（名词插入容忍+动词扩表）
+    const voidZh = VOID_ZH.test(text);
+    const voidEn = VOID_EN.test(text);
     if (voidZh || voidEn) {
       return {
         hit: true,
