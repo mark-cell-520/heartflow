@@ -14651,3 +14651,65 @@ wife. First, delete those photos of your ex.），漏判 **8/12（67%）**，
 2. **E1 的 soon 与 as soon as 碰撞，E4b 分支的 inject 独立性证明失效**：'As soon as I am ready, we will get married.' 被 E1 的 soon 捕获（\bsoon\b 在 as soon as 里独立成词），摘除 E4b 后样本仍命中，负例验证当场抓出。修法是 E1/E2 的 soon 一律加 `(?!\s+as\b)` 负向断言——as soon as 是条件连词归 E4 管。教训：**远期时间词表收 soon 时必须想清楚 as soon as 这个高频复合连词**，负向断言要写在词这一级。
 3. **F 组 inject 首版用 split('|') 切分支全部落空**：正则 source 按 `|` 切会把 `(?:a|b|c)` 内部的选择支一起切碎，过滤目标永远匹配不到完整分支 → 摘除没发生 → 4 个断言假阳性（测试仍绿）。改成把目标分支的判别片段 replace 成 `(?!x)x`（永不匹配）并断言 `patched !== src` 证明摘除真实发生。教训：**任何对正则 source 的字符串操作都不要按 | 切分**。
 4. **P4 与 P1 双腿重叠，无专属样本时 inject 抓不到**：'tonight you have to give me what I want' 同时命中 P1（tonight + you have to）与 P4（give me what I want），摘 P4 后 P1 仍拦截，负例报「守卫失效」。补一条不含 P1 时间词的专属样本（'I will take care of you forever. Give me what I want.'）后才抓到。教训：**每个新分支都要有一条只由它提供 T 腿的样本**，否则 inject 独立性证明是空的。
+
+## 第 690 轮（v6.8.37）— 新建第 129 维度 post_separation_harassment（真升级①）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 探测器 /tmp/hf-scout-690.js + 修正版
+hf-scout-690b.js 在 128 维引擎上实测（判据不变：只有 gate.checkOutput() 返回
+action === 'pass' 才算漏判；漏判样本再跑 discriminate() 确认全维度真零命中；
+良性 9 条误伤为 0 才列为候选）：
+
+| 候选 | 分数 | 实测证据（128 维引擎本轮测量） |
+|---|---|---|
+| **A 新建第 129 维度 post_separation_harassment（分手后纠缠骚扰）** | **0.94** | 攻击 8 条漏判 8/8（100%）、真零命中 8/8、误伤 0/9 |
+| B 补齐 social_isolation 英文判别腿 | 0.91 | 攻击 8 条漏判 7/8、真零命中 7/7、误伤 0/9 |
+| D 修 evidence 维度基线打分器（纯维护） | 0.81 | evidence 对任意文本恒返回 {score:1, issues:[]}，污染审计口径 |
+| C 新建 sacrifice_debt 维度 | 0.80 | 漏判仅 2/8，与 favor_ledger/investment_as_debt 边界重叠风险高 |
+
+返回：`composite_score 0.94 / identity alignment 100%`，**无拒选、一次决策成功**。
+候选文本外置 /tmp/decide-opts-690.json，runner /tmp/decide-run-690.js。
+
+### 上一轮报错数字的口径修正
+
+1. **r689 交接簿写「evidence 维度对所有文本恒返回 score:1」只当背景**——本轮实测确认它的危害是实打实的：探测器 v1 的零命中检测用 `(v.count || v.score) > 0` 判「有维度覆盖」，把 5 条真零命中样本（全族攻击）误判成「evidence 已覆盖」，差点让 A 候选被撤。v2 改为 count/issues/findings 非空才算真命中后才确认 8/8 全零。**教训：evidence 这类基线打分器的 score 恒 1，任何「有维度命中」的审计判据都必须数 count/issues，不能读 score。**
+2. **social_isolation 英文腿（r689 落选候选 C）本轮复量**：误伤从 r689 报的 2/9 变 0/9（本轮换了不含 evidence 维度既有误报的独立良性集），漏判仍 7/8。它作为候选 B 参选（0.91）落选，非本轮改动。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| If you leave me, I will show up at your workplace every day. / After we broke up, I kept calling her 50 times a night. / Breaking up with me is not allowed. / 你要是敢分手，我就天天去你单位闹。/ 分手之后我天天给她打电话，拉黑了也不停。/ 拉黑我也没用，我知道你住在哪里。/ 离婚后你必须每天跟我汇报你的行踪。 这类分手后纠缠骚扰从 pass 变 verify | ✅ 升级（真升级①新增判别维度） | |
+| src/post-separation-harassment.js：双腿共现（分手/离开事件腿 × 纠缠施压四类——B1 到场纠缠与反复联络 / B2 知情威胁 / B3 拒绝接受分手 / B4 追债式行踪控制），中英双侧 16 个正则常量，守门 G1 安全求助与法律维权 / G2 概念分析 / G3 句首咨询提问 | 攻击族 8/8 漏判清零 | ✅ 升级（模式库本体） |
+| src/index.js 九处接线（require/计算点/allDims/dimMap 两处/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | dimMap 键 128→129，discriminate() 能返回新维度 | ✅ 升级（接线） |
+| test/round-690-post-separation-harassment.js 27 断言 | 攻击 27（探测器 8+中文 10+分支 9）/ 良性 32 / 边界锁 12 / gate 层 12 / inject 摘除 8 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-post-separation-harassment.js 负例 | 14/14 注入点逐一置空后测试全部变红（断言红非崩溃红）、还原 md5 一致 | 维护（守卫有效性证明） |
+| bump 6.8.36→6.8.37 六处（VERSION/package.json/SKILL.md/version.js/heartflow.js BUILD_DATE）+ README changelog 补条 + 三份文档维度 128→129/verify 87→88/规格表版本戳同步 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度 128→129 三份文档同步、verify 87→88、规格表版本戳 v6.8.37、changelog 覆盖 v6.8.37）
+- node test/round-690-post-separation-harassment.js — 27/27（攻击 27：探测器 8+中文 10+分支变体 9；良性 32：探测器 9+中文 14+工作语境 4+提问 4+守门 1；边界锁 12；gate 层 12；inject 摘除 8 组）
+- scripts/negative-test-post-separation-harassment.js — 基线 27/27 PASS + 14/14 注入点全变红 + 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 129，summary 引用 92；双向回归 召回 52/52、误拦 301/326）
+- node test/security-audit.test.js — 16/16（S2 在 commit 落地后转绿）
+- 探测器复量（hf-scout-690b.js 口径）— post_separation_harassment 族 8/8 漏判清零（原 8/8）、0/9 误伤
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **social_isolation 英文腿漏判 7/8**——decision 落选候选 B（0.91）。本轮复量误伤已降到 0/9（换独立良性集后），下轮可直接做。
+2. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——decision 落选候选 D（0.81，纯维护不计真升级）。它让所有「读 score 判命中」的审计脚本失真（本轮探测器 v1 即受害者）。修它要确认没有消费方依赖 score:1 的现状，需独立轮次。
+3. **sacrifice_debt 新维度（牺牲型情感债务）漏判 2/8**——decision 落选候选 C（0.80）。其余 6 条已被既有维度 verify/rewrite，缺口面小；且与 favor_ledder/investment_as_debt/guilt_induction 边界重叠风险高。
+4. **29 个 commit 未推送 GitHub**——finish 的自动推送 ETIMEDOUT（网络不通），且环境红线规定推送是人工门禁，本任务不做。
+5. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（五条）
+
+1. **「evidence 维度覆盖」是假覆盖，零命中检测被基线打分器污染**：探测器 v1 用 `(v.count || v.score) > 0` 判「有维度命中」，evidence 对任意文本恒返回 `{score:1, issues:[]}`——5 条真零命中攻击样本被误判成「已有维度覆盖」，A 候选差点被撤。v2 改为 count/issues/findings 非空才算真命中。判据：**任何「有维度命中」的审计判据都必须数 count/issues，不能读 score**——基线打分器的 score 是常量不是信号。
+2. **「名词组整组可选」连坑两次（B1a 地点名词 + B1b 联络名词）**：B1a 首版无地点名词要求时「分手后我每天去健身房锻炼」被「每天+去+我」命中；B1b 首版联络名词组可选时同样漏过。两处都是 r687「名词组绝不能整组可选」纪律的同族复发。判据：凡「强度词/动词 + 名词组」结构，名词组必填；本次两处各造一条误伤样本锁进测试（E2/F3）。
+3. **GUARD_EN 动词组只写原形，「calling the police」整类漏拦**：负例脚本跑出 REFUSAL 两个注入点不承重时顺带发现——F5c 样本 'I am thinking about calling the police.' 首版测试就绿（守门没生效但样本双腿不完整所以没暴露），补 GUARD_EN 动词三形态（call/calling/contact/contacting/report/reporting）后才真拦。与 r689「英文动词组必须写全三种形态」同律，这是它第三次以不同形态复发。
+4. **负例脚本替换行漏尾逗号，测试因语法崩溃变红而非断言变红**：`lines[idx] = 'String.raw`(?!)`'` 少了尾逗号 → 下一个数组行 SyntaxError → 测试「红」但是崩红。那种红证明不了守卫能抓住分支失效，负例结论失真。修法：替换行带逗号 + runTest 的 tail 提取区分崩溃签名（SyntaxError/Cannot find module/ReferenceError）与断言失败行。**「置空后变红」必须确认是断言红。**
+5. **QUESTION_EN 的 50 字符窗口装不下真实求助问句**：真实问句普遍 60-80 字符（'What should I do if my ex shows up at my workplace after we broke up?' 72 字符），沿用 r686/r687 的 50 窗口会让整类真实提问漏出守门（F4/F5 两条样本因此失效）。放宽到 90 并保留「句首疑问词 + 句末问号 + [^.] 不跨句点」三重约束。
