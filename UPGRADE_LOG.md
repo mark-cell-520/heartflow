@@ -1,3 +1,74 @@
+# 第 699 轮报告（v6.8.46 — 第 135 维度 appeal_to_novelty 诉诸新潮，升级①）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自 r698 落盘的探测器
+（/tmp/hf-scout-698.txt，按 Phase 0.7b 纪律不重新探测，本轮原样复量）：
+r698 的 4 个候选中 poisoning_the_well 已在 r698 当轮上线（复量漏判 0/10，
+标 N/A 排除），appeal_to_consequences 仍不合格（良性误伤 1/12），剩余
+appeal_to_novelty（新维度）与 stereotype_origin_dismiss（补族）经本轮
+round-699-reprobe.js 双确认仍是真缺口（漏判 10/10 与 9/9、全维度零命中、
+误伤 0/12）。三个候选喂给 decision 本体（/tmp/decide-run.js 读
+/tmp/decide-opts.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A appeal_to_novelty 新维度 | **0.91** | 攻击漏判 10/10、真零命中 10/10、误伤 0/12（r698 落盘 + 本轮复量双确认） | **选中** |
+| B stereotype 补「出身/身份歧视贬低」句式族 | 0.90 | 攻击漏判 9/9、真零命中 9/9、误伤 0/12（r698 落盘 + 本轮复量双确认） | 落选 |
+| C appeal_to_consequences 新维度 | 0.84 | 攻击漏判 8/10、零命中 8/8、误伤 1/12（需先补豁免） | 落选 |
+
+decision 返回 composite_score 0.91 / confidence 0.90 / identity alignment
+100%，无拒选。诚实标注：候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在三个候选间选出 A。
+
+**上一轮报错数字的修正**：r698 交接簿记「stereotype 遗留 1 条无覆盖样本」
+与 r697 记的 7/10，本轮复量为 9/10 全零命中——两轮的样本口径不同（r697
+是混合探测、r698/r699 是纯出身歧视族），以本轮 9/9 为准，该族从「遗留
+1 条」更正为「完整 9 条族」，随本轮落选进入下轮候选池。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「这是最新的框架，肯定比老框架好」「刚发布的模型一定比上一代强」「用新技术就对了，老方法早就过时了」「旧方案可以扔了」「The latest framework is definitely better than the old one.」这类**仅凭新/近期属性推出质量优越或旧的该弃用**从 pass 变 verify | 攻击族 10/10 漏判清零（gate 层 21/21 全 verify） | ✅ 升级（真升级①新增维度） |
+| src/appeal-to-novelty.js：双腿共现模块——腿①新潮标记（最新/刚发布/新技术/今年才出/新款/新一代/latest/brand-new/newly released/the new version/new technology）② 无依据优越断言三支（a 比较优越「肯定比老框架好」、b 绝对优越「肯定更先进/修复了所有问题/碾压」含 b2 无情态宣告形「fixes all the problems」、c 贬旧劝告「老方法早就过时了/旧方案可以扔了/买新不买旧」含 EN「the old methods are obsolete/throw out the old」）；四类豁免（提问句式/依据在场/平衡比较/META 概念分析） | 第 135 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：十一处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports/FALLACY_PATTERNS 三条中文紧凑形/FALLACY_SEVERITY） | dimensions 键 134→135 | ✅ 升级（接线） |
+| 三份禁改文档同批同步（维度数 134→135、Verify 层列举 93→94 且 appeal_to_novelty 进列举、规格表口径版本戳 v6.8.46、README changelog 6.8.46 条目、历史链补记） | 文档契约与引擎实测一致 | 维护（但禁改文档契约要求同批，漏一处 doc-numbers 打回） |
+| test/round-699-appeal-to-novelty.js 16 断言（攻击 21/良性 9/单腿 4/分工 2+2/豁免 5×2/归一化 1/键名 1/summary 1/紧凑形 1/维度总数 1） | 攻击 21/良性 9 | ✅ 升级（验收证据） |
+| scripts/negative-test-appeal-to-novelty.js 7 个注入点 | 7/7 全红、还原 md5 一致 | ✅ 升级（守卫证据） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16 passed, 0 failed
+- node scripts/bidirectional-guard.js — 召回侧 52/52 被处理（100%）；误拦侧 302/326 pass，**与轮前基线完全一致、零新增误伤**（基准规模：52 恶意 + 326 良性，覆盖 extended mixed/垂直场景 150/中英混排 25 等类）
+- node test/doc-numbers-accuracy.test.js — 22 通过, 0 失败（维度数 134→135 三份文档、Verify 列举 93→94、规格表口径戳 v6.8.46、changelog 覆盖 v6.8.46）
+- node test/round-699-appeal-to-novelty.js — 16 通过, 0 失败（攻击 21 条：探测器 10 + 中文扩展 4 + 英文镜像 7；良性 9 条：探测器 6 + 扩展 3）
+- scripts/negative-test-appeal-to-novelty.js — 7 mutations red=7 invalid=0 crashed=0 还原=一致（M1 摘新潮腿/M2 摘优越腿/M3 只跑中文腿/M4 提问豁免/M5 依据豁免/M6 平衡豁免/M7 META 豁免，摘腿后攻击翻漏判、摘豁免后豁免样本被误伤，均当场抓红）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 135；双向回归记账读缓存）
+- node test/security-audit.test.js — 16 通过, 0 失败
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）；本轮改动全部有定向测试覆盖
+
+## 接线六处/十一处核对
+
+require、计算点、allDims、dimMap、dimensions、DIM_GUIDANCE、VERIFY_DIMS、
+summary、module.exports、FALLACY_PATTERNS、FALLACY_SEVERITY 全部各 1 次
+（接线脚本每处 split/join 次数断言 =1 才写入）；dimensions 键总数实测
+135、findings 归因 21/21、gate.action 全 verify 级。
+
+## 已知未修项（含为什么不修）
+
+1. **stereotype 出身歧视贬低族漏判 9/9、误伤 0/12**——decision 落选候选 B（0.90）。双腿数字完整、是既有维度补模式族工作量最小，但比选中项低 0.01。下轮首选候选。
+2. **appeal_to_consequences 新维度漏判 8/10、误伤 1/12**——decision 落选候选 C（0.84）。误伤样本需先补三类豁免（可测量名词/来源语境/领域专有），工作量约为新维度 1.5 倍。
+3. **两条既有维度归属行为（非本轮引入，HEAD worktree 对照实测同行为）**：「最新版已经推送给所有用户」被 dangerous_instruction 判 block、「Both the old and new systems have trade-offs」被 empty_answer 判 verify。均为 HEAD 既有行为，修它们属既有债务，不在本轮真升级四项内，写入测试 D 组锁住归属。
+4. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——历史遗留记录项。
+5. **29+ 个 commit 未推送 GitHub**——finish 的自动推送历史上 ETIMEDOUT（网络不通），且环境红线规定推送是人工门禁，本任务不做。
+6. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **豁免样本必须双腿齐全，否则负例脚本失真（r698 教训同族第三次）**：M6/M7 首版负例 INVALID（注入后仍全绿）——平衡豁免样本「新旧系统各有优势，按场景选择」只有新潮腿无优越断言，META 样本「Appeal to novelty is a common logical fallacy.」双腿都没有，摘掉豁免照样不判。换成含双腿的样本（「最新的框架肯定比老框架好，但旧系统也有成熟稳定的优势，我们按场景选择」「Appeal to novelty is a fallacy: the latest framework is definitely better than the old one.」）才证明豁免在承重。连带修了 BALANCE_EXEMPT 漏「按场景」与 META 样本「这是典型的」缺「就是」两个模式/选样问题。
+2. **反斜杠复核脚本必须区分正则字面量与字符串拼接**：首版复核把 META_EXEMPT_EN 的正则字面量（单层 `\b`）报成「奇数反斜杠异常」——正则字面量里单层正确，只有字符串拼接形态（`"\\b"`）才需要双层。行为验证（样本命中）才是最终判据。
+3. **HEAD 归因用 git worktree，不用 git archive**：git archive 1MB 输出触发 execFileSync ENOBUUS（ENOBUFS），改用 `git worktree add /tmp/hf-head-699 HEAD` 后子进程对照，两条「疑似误伤」样本实测 HEAD 同行为（ dangerous_instruction block / empty_answer verify），确认非本轮引入，未改坏正确代码。
+
 # 第 698 轮报告（v6.8.45 — 第 134 维度 poisoning_the_well 井里投毒，升级①）
 
 ## 心虫选中项 + 分数 + 身份对齐
