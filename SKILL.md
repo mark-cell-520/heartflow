@@ -78,12 +78,12 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.43. Nothing here is copied
+Every number below was measured on this repository at v6.8.44. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.43 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.44 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 161 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,314 | sum of entries in `hf.routes()` |
