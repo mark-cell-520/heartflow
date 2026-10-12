@@ -86,20 +86,29 @@ console.log('SMOKE_OK: gate.action = ' + r.gate.action + ', verdict = ' + r.verd
 }
 
 // 5. 额外：MCP server 能起（audit 报告说 154/182 个工具对外提供）
+// [r420] 必须传 MCP_HEARTFLOW_KEY：mcp-server.js 无 token 时按设计 exit 1
+// （r412 加的保护），不传 token 会误判成"server 起不来"。
 console.log('\n【D】MCP server 可启动');
 const rD = spawnSync(process.execPath, ['-e', `
 const { spawn } = require('child_process');
 const http = require('http');
 const port = 18900 + Math.floor(Math.random() * 400);
-const p = spawn(process.execPath, ['src/mcp-server.js', '--port', String(port)], { stdio: 'ignore' });
-const body = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'smoke', version: '1' } } });
-const q = http.request({ host: '127.0.0.1', port, path: '/mcp', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) } }, res => {
-  let d = ''; res.on('data', c => d += c); res.on('end', () => { p.kill(); process.exit(res.statusCode === 200 || res.statusCode === 401 ? 0 : 1); });
+const p = spawn(process.execPath, ['src/mcp-server.js', '--port', String(port)], {
+  stdio: 'ignore', env: { ...process.env, MCP_HEARTFLOW_KEY: 'smoke-' + Math.random().toString(36).slice(2) }
 });
-q.on('error', () => { p.kill(); process.exit(1); });
-q.write(body); q.end();
-setTimeout(() => { p.kill(); process.exit(1); }, 40000);
-`], { cwd: WORK, encoding: 'utf8', timeout: 60000 });
+const body = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'smoke', version: '1' } } });
+function attempt(n) {
+  if (n <= 0) { p.kill(); process.exit(1); }
+  const q = http.request({ host: '127.0.0.1', port, path: '/mcp', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) } }, res => {
+    let d = ''; res.on('data', c => d += c); res.on('end', () => { p.kill(); process.exit(res.statusCode === 200 || res.statusCode === 401 ? 0 : 1); });
+  });
+  q.on('error', () => setTimeout(() => attempt(n - 1), 2000));
+  q.write(body); q.end();
+}
+// [r420] 实测干净树上启动要 30s+（1286 条公式 + 161 模块），
+// 单次请求必超时。改为轮询重试，总预算 90s。
+setTimeout(() => attempt(45), 3000);
+`], { cwd: WORK, encoding: 'utf8', timeout: 120000 });
 T('MCP server 启动并响应 initialize', rD.status === 0, 'exit ' + rD.status);
 
 // 收尾

@@ -26,12 +26,37 @@ const ROOT = path.resolve(__dirname, '..');
 const quiet = process.argv.includes('--quiet');
 const log = (...a) => { if (!quiet) console.log(...a); };
 
+// [r420] 无 .git 时（git archive 导出的干净树）降级：
+// 不检查"是否已跟踪"（那需要 .git），只检查 require 目标是否存在。
+// 这正好覆盖冒烟场景 —— 干净树里缺文件就是缺文件。
+const hasGit = fs.existsSync(path.join(ROOT, '.git'));
+let tracked, trackedJs;
+if (hasGit) {
+  tracked = new Set(execSync('git ls-files', { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean));
+  trackedJs = execSync('git ls-files "src/*.js" "src/**/*.js" "bin/*.js"',
+    { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
+} else {
+  log('（无 .git 目录 —— 干净树模式：只查 require 目标是否存在，不查跟踪状态）');
+  tracked = null;
+  trackedJs = [];
+  // [r420] 只扫 src/ 与 bin/，与 git 模式的 ls-files 范围保持一致。
+  // 第一版扫了全仓（含 archive/ 历史归档），报出 101 处断链全是归档代码，
+  // 而 git 模式根本不扫 archive —— 两个模式判据不同，冒烟必然误报。
+  for (const sub of ['src', 'bin']) {
+    const base = path.join(ROOT, sub);
+    if (!fs.existsSync(base)) continue;
+    (function walk(d) {
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        const p = path.join(d, e.name);
+        if (e.isDirectory()) { if (['node_modules'].includes(e.name)) continue; walk(p); }
+        else if (/\.js$/.test(e.name)) trackedJs.push(path.relative(ROOT, p));
+      }
+    })(base);
+  }
+}
+
 let fail = 0;
 const broken = [], untracked = [];
-
-const tracked = new Set(execSync('git ls-files', { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean));
-const trackedJs = execSync('git ls-files "src/*.js" "src/**/*.js" "bin/*.js"',
-  { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
 
 for (const rel of trackedJs) {
   const abs = path.join(ROOT, rel);
@@ -47,7 +72,7 @@ for (const rel of trackedJs) {
       broken.push(`${rel} → ${targetRel}`);
       continue;
     }
-    if (!tracked.has(targetRel)) untracked.push(`${rel} → ${targetRel}`);
+    if (tracked && !tracked.has(targetRel)) untracked.push(`${rel} → ${targetRel}`);
   }
 }
 
@@ -66,12 +91,16 @@ if (untracked.length) {
 }
 if (!fail) log('✅ require 完整性通过：所有被引用文件都已入库');
 
-// 附带检查：仓库卫生（审计发现 4）
+// 附带检查：仓库卫生（审计发现 4）—— 需要 .git，干净树模式跳过
 log('\n=== 仓库卫生 ===');
 const junk = [];
-for (const pat of ['.pid', 'dist/', 'tmp/', '.bak', '.tar.gz']) {
-  const hits = execSync(`git ls-files "*${pat}*"`, { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
-  if (hits.length) junk.push([pat, hits]);
+if (hasGit) {
+  for (const pat of ['.pid', 'dist/', 'tmp/', '.bak', '.tar.gz']) {
+    const hits = execSync(`git ls-files "*${pat}*"`, { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
+    if (hits.length) junk.push([pat, hits]);
+  }
+} else {
+  log('  （干净树模式，跳过 git 跟踪状态检查）');
 }
 for (const [pat, hits] of junk) {
   console.log(`  ⚠️  ${pat}: ${hits.length} 个已入库（${hits.slice(0, 3).join(', ')}${hits.length > 3 ? '…' : ''}）`);
