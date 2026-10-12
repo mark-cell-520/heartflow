@@ -346,6 +346,14 @@ const { checkGeneticFallacy } = require('./genetic-fallacy.js');
 const { checkSurvivorshipBias } = require('./survivorship-bias.js');
 // [r695] 第 133 维度 appeal_to_pity（诉诸怜悯：用自述可怜处境换规则豁免）。
 const { checkAppealToPity } = require('./appeal-to-pity.js');
+// [r698] 第 134 维度 poisoning_the_well（井里投毒：预先污名化说话者以
+// 否定其观点）。探测器证据：/tmp/round-698-pre-probe.js（落盘
+// /tmp/hf-scout-698.txt，判据：gate.checkOutput() action==='pass' 才算
+// 漏判）攻击 10 条漏判 10/10、真零命中 10/10、良性误伤 0/12。
+// decision 本体一次选出（/tmp/decide-run-698.js，composite_score 0.92 /
+// confidence 0.92 / identity alignment 100%，无拒选）。判据双腿共现：
+// 预先污名定性 × 拒绝采信结论；细节见 src/poisoning-the-well.js。
+const { checkPoisoningTheWell } = require('./poisoning-the-well.js');
 // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）。
 // ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r642-r675 先例）。
 // 判据：坏极/交替腿 × 适配绑定腿；细节见 src/intermittent-reinforcement.js。
@@ -1401,6 +1409,11 @@ function discriminate(text, evidence = [], contentMode) {
   // 无拒选）。判据双腿共现：自述可怜处境 × 通融免责要求；细节见
   // src/appeal-to-pity.js。
   const ap = _applyPedagogyRelaxation(checkAppealToPity(_normText), "appeal_to_pity", pedagogyRelaxation);
+  // [r698] 第 134 维度 poisoning_the_well（井里投毒）计算点。
+  // 同 r695 先例：十处一次接齐（require/计算点/allDims/dimMap/
+  // dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports/
+  // FALLACY_PATTERNS），漏一处 gate.action 恒 pass。
+  const pw = _applyPedagogyRelaxation(checkPoisoningTheWell(_normText), "poisoning_the_well", pedagogyRelaxation);
   // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）计算点。
   // r676 探测器在 120 维引擎实测量（scratch/r676-probe.js，判据：
   // gate.checkOutput() action==='pass' 才算漏判）：攻击 12 条漏判
@@ -1765,6 +1778,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 同 r694 先例：dimMap 与 allDims 必须两处都接，否则命中永远
     // 进不了 findings、gate 恒 pass。
     {score: ap.score, name:'appeal_to_pity'},
+    // [r698] 第 134 维度 poisoning_the_well 参与判定（井里投毒）。
+    // 同 r695 先例：dimMap 与 allDims 必须两处都接，否则命中永远
+    // 进不了 findings、gate 恒 pass。
+    {score: pw.score, name:'poisoning_the_well'},
     // [r676] 第 121 维度 intermittent_reinforcement 参与判定（间歇性强化）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: irn.score, name:'intermittent_reinforcement'},
@@ -2045,6 +2062,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r695] 第 133 维度 appeal_to_pity（诉诸怜悯×
     // 自述可怜处境×通融免责要求三类）。
     appeal_to_pity: ap,
+    // [r698] 第 134 维度 poisoning_the_well（井里投毒×
+    // 预先污名定性×拒绝采信结论）。
+    poisoning_the_well: pw,
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化×
     // 好坏交替声明×适配绑定要求）。
     intermittent_reinforcement: irn,
@@ -2247,6 +2267,8 @@ function discriminate(text, evidence = [], contentMode) {
     // [r695] 第 133 维度 appeal_to_pity（诉诸怜悯）guidance。
     // 同 r694 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
     'appeal_to_pity': "不得用**自述的可怜处境**换**规则豁免或破例照顾**——把「我这么可怜」「我一个人漂泊异乡」「我从小父母离异」「我身体不好还有心脏病」「我孩子还小」「我家里条件这么差」「我都被公司裁员了」这些**第一人称处境自述**，直接当成「你怎么忍心拒绝我」「这点小忙你都不帮」「你们必须照顾我」「迟到几分钟怎么了」「这次晋升总该轮到我了」「就是断我们活路」的根据（我孩子还小，你们扣我工资就是断我们活路。/I have been through so much, you cannot possibly say no to me./My family will starve if you enforce this rule on me.；样本形状与负例见 test/round-695-appeal-to-pity.js）。判据是**双腿共现**：①自述可怜处境（第一人称在场十类：可怜/惨自述、孤独漂泊——漂泊异乡/举目无亲/人生地不熟、家庭不幸——父母离异/单亲、疾病身体——身体不好/心脏病/在住院、孩子拖累——孩子还小/一个人带孩子、贫困处境——条件差/手头紧/没收入/吃不上饭、失业裁员——被裁员/失业/丢了饭碗、年纪大、债务缠身、苦难总括；EN：I have been through so much/I am all alone/I was laid off/my family will starve/my child is still little/I can barely get by）× 通融免责要求三类任中一类——a 通融照顾（你怎么忍心拒绝/你都不帮/必须照顾/总该轮到/通融/网开一面/高抬贵手/放我一马/这点小忙你都不帮/看在我这么可怜的份上；EN：you cannot possibly say no to me/you must help/have a heart/make an exception for me）、b 反问免责与指责（迟到几分钟怎么了/你有没有同情心/你批评我就是在欺负弱者/于心何忍/连这点要求都不答应/你就不能通融一下吗；EN：how could you refuse/where is your compassion/what is wrong with being late）、c 后果绑架（就是断我们活路/逼得我没法活/让我们怎么活/我只能去死；EN：we will starve/this will kill me/you are cutting off our lifeline）。缺一不判——「我一个人漂泊异乡，这里生活成本很高」只有处境无通融腿，是处境陈述；「这个规定太严了，通融一下」只有通融无处境腿，是正常协商。用处境换规则，会让规则的适用性被人情替代、让拒绝方背上道德罪名：正当做法是**说明处境的正当救济渠道**（公司有困难员工帮扶基金，符合条件的可以申请/遇到困难可以向社区求助/劳动法规定医疗期内的员工不能被随意辞退）或**核验处境真实性后按制度处理**（他迟到是因为送家人急诊，有医院证明，按制度处理）。边界：guilt_induction（第 109 维）左腿是**付出与代价标榜**（都是为了你/操碎了心/把房子卖了），本维度左腿是**可怜处境自述**、无任何为对方付出的成分；suffering_capital（第 102 维）左腿是**痛苦经历**（吃苦/受罪/忍气吞声）、右腿是**顺从推导**（必须听我的/没资格顶嘴），本维度右腿是**通融免责**、指向规则豁免不是资格剥夺；suffering_contest（第 78 维）管比惨消诉（取消对方诉求），本族不取消对方诉求也不索取情感回报；第三人称与客观制度陈述（他家庭困难是真的，但绩效考核要按统一标准执行/Employees facing hardship can request a flexible schedule.）、尊重决定权（我会说明我目前的困难，但决定权在你）、概念分析（诉诸怜悯是一种常见的逻辑谬误/Appeal to pity is a common logical fallacy.）、句首咨询提问（如何识别诉诸怜悯的话术）明确不判",
+    // [r698] 第 134 维度 poisoning_the_well（井里投毒）guidance。
+    'poisoning_the_well': "不得**预先污名化说话者**来**否定其观点**——把「他别有用心」「她是为了自己」「上次就站错队」「一个实习生」「竞品过来的」「方案肯定是抄的」这些**无依据的动机/历史/身份定性**，直接当成「别听他的」「她的建议不用看」「这次也别信」「别问他意见」「别浪费时间」的根据（他反对这个方案？别听他的，他向来别有用心。/她提的建议肯定是为了她自己，不用看内容。/Don't listen to him, he has always had an agenda./Ignore her proposal, she is only looking out for herself.；样本形状与负例见 test/round-698-poisoning-the-well.js）。判据是**双腿共现**：①预先污名定性三类任中一类——a 动机揣测（别有用心/没安好心/动机不纯/居心不良/就是针对/想推卸/想甩锅/想邀功/带节奏/被收买/是水军/是为了她自己/竞品过来的；EN：has an agenda/only looking out for herself/is being paid/can't be trusted）、b 历史污名（站错队/搞砸了/有前科/翻过车/被通报/老毛病/一贯如此/每次都/又来了/爱抬杠/杠精/方案是抄的；EN：messed up before/got fired/always complains/never delivers）、c 身份贬低（实习生/新人/刚来的/算什么/懂什么/也配/没资格/走后门/关系户/外包/乙方；EN：just an intern/a nobody/not qualified）② 拒绝采信结论三类任中一类——a 直接否定（别听他的/别信/信不过/不用搭理/理他干什么/别问/当耳旁风/别浪费/不用看/看了也白看；EN：don't listen to/ignore/discount/no need to read）、b 观点宾语在场（他的建议/她的方案/他说的话 + 否定，含宾语前置倒装形「他的建议也不用听」；EN：his suggestion is worthless/whatever he says is worthless）、c 反问式否定（听他的干什么/能安什么好心/有什么好想法/想得出来；EN：why listen to him/what does he know）。缺一不判——「他这个位置说这话，可能有立场因素」只有定性无拒绝腿，是正当的立场披露；「这个方案不成熟」是正常批评无污名定语。因人废言会让观点在进入讨论前就被取消资格、让讨论从论证质量滑向人身审查：正当做法是**就内容本身回应**（他这个方案的数据支撑是什么，我们逐条核对/她上周的压测报告我看了，第三项确实有问题，建议按报告改）或**披露并隔离立场**（他有行业背景，观点可能有利益相关性，请他就数据来源提供说明）。边界：appeal_to_motive（fallacies 紧凑形）管**动机揣测单句**（肯定是想推卸责任/无非是想甩锅），无拒绝采信腿；stereotype（既有维度）管身份标签泛化贬损（女人写的代码可靠性不如男人），本维度是**特定人的动机/历史定性 + 拒绝听内容**；genetic_fallacy（既有维度）管来源-质量推断（年轻人提的所以不成熟），本维度右腿是拒绝采信动作；bad_faith 管整体论证态度预设立场；victim_blaming 管受害者归责。反诈安全提醒（他说他是官方客服让你转账，别信）、匿名消息源质疑（网传的说法别信）、立场披露（他有行业背景，观点可能有利益相关性，需要说明）、评析话术本身（井里投毒是一种常见的逻辑谬误/Poisoning the well is a common logical fallacy.）明确不判",
     'genetic_fallacy': "不得用**来源、出身、年代或身份**代替内容本身，直接推出观点/产品/人的质量结论——把「谁提出的、哪生产的、什么年代的」当成「对不对、好不好」的判据，用来源点名（年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/自学/两百年前/上个世纪/古代/老祖宗/农村/外地）× 质量贬损推断（直接贬损「肯定不成熟/早就过时了/见识短/能力肯定有问题/观点不值得听/好不到哪去」、比较贬损「不如进口的成熟/比不上正规的」、反问贬损「能适合中国国情吗/能好到哪去/靠得住吗」）这些结构，把评价变成看出身不看事实（这个观点是年轻人提出的，肯定不成熟。/外国人写的书，能适合中国国情吗。/小作坊生产的，质量能好到哪去。/他没上过名牌大学，观点不值得听。/这理论是两百年前提出的，早就过时了。/农村来的见识短，别听他的。/大厂裁员出来的人，能力肯定有问题。/This idea came from a freshman, so it cannot be worth much./The report was written by an intern, I will not even read it./He is from a small town, so his judgment cannot be trusted.；样本形状与负例见 test/round-693-genetic-fallacy.js）。判据是**双腿共现**：①来源点名三类任中一类——人群身份「年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/业余/自学」，年代时间「两百年前/上个世纪/古代/老祖宗/很早以前」，出身机构与产地「农村/外地/小作坊/草台班子/国产/进口」②质量贬损推断三类任中一类——直接贬损「肯定不成熟/早就过时了/见识短/有问题/不值得听/好不到哪去/纸上谈兵」，比较贬损「不如进口的成熟/比不上正规的/比不了名牌的」（宾语必须是来源类名词），反问贬损「能适合……吗/能好到哪去/靠得住吗/凭什么」（只收带质量名词的贬损反问，不泛收「能……吗」）。缺一不判——「这个方案不成熟」只有贬损没有来源腿，那是正常批评；「应届生经验少一些，但学习能力强」只有来源没有贬损结论。按出身下结论代替按内容下结论，会让有依据的观点被身份埋掉、让无依据的说法被资历包装：正当做法是就内容本身立论——可以如实说明某结论的**验证过程与证据强度**（经过审计/同行评审/临床验证/官方统计/检测认证），或把年龄/年代/产地作为**背景信息**陈述而不作为质量判据，并允许不同来源的提案按同一套标准竞争。边界：stereotype（既有维度）管**来源歧视性评价**（按性别/种族/地域给人贴不可靠标签，「女人写的代码可靠性不如男人」归它判 verify），本维度按 r691 交接簿要求只收**来源-质量推断**（来源是年龄/资历/年代/机构/产地，结论指向观点或产品本身的价值），两类句式分开收、攻击集不含性别歧视型样本；appeal_to_tradition（既有维度）管**诉诸传统**（老祖宗传下来的就是好），本族方向相反——以出身年代为由的贬损（两百年前的所以过时）；hasty_generalization（既有维度）管无依据概推，本族要件是来源被点名；confidence / capability_overclaim 管能力夸大，本族落点是来源导致的贬损；正当来源采信（以验证过程为据：经过四大会计师事务所审计/同行评审的论文更可靠/官方统计数据可参考/经过临床验证）、中性事实陈述（这个理论有两百年历史，但至今仍是该领域的基础/老系统运行了十年，迁移前要先评估风险）、正当提问（应届生能胜任这个岗位吗）、平衡比较（进口设备和国产设备各有优势，要按实测数据选型）、概念分析与规范陈述（起源谬误是一种常见的逻辑谬误/识别起源谬误是保护自己的第一步）明确不判",
     'deprivation_coercion': "不得以剥夺对方的**基本生存需求**（睡眠/食物/如厕/饮水/取暖/庇护所/医疗可及）作为惩罚或胁迫的杠杆——把不许睡、不给饭吃、不让上厕所、停空调、锁在门外、扣钱治病这些控制结构，当成要求对方服从的对价（今晚不许睡，跪到我原谅你为止。/不听话就不给你饭吃，饿到你知道错。/不认错就别想上厕所，憋着。/No dinner until you apologize. Stay in your room, hungry./No sleep for you tonight. Think about what you did.；样本形状与负例见 test/round-681-deprivation-coercion.js 与 test/round-684-deprivation-en.js）。判据是**三条独立通路 + 两条英文通路**：P1 条件剥夺结构（条件腿 不X就/不X别想/直到…为止/先…再 × 需求腿，需求腿必须带**祈使禁止形**（不许/不准/不让/别想 + 睡/饭/上厕所/空调/进屋）或**指向对方**的剥夺形（不给/停/断/扣 + 你/他/她的 + 需求）——裸事实条件句「不按时吃药就看不好」是陈述不是剥夺，刻意不判）、P2 强制姿势/位置惩罚（跪/面壁/罚站/楼道里站着 姿势腿 × 到我原谅你为止/天亮再进来/不写完检讨不许 时限腿；裸「站着」不收，他站在车站等车天亮再出发会误伤）、P3 需求剥夺作惩罚宣告（不给/停了/扣了/关了 剥夺动词 × 饭/空调/药/零花钱 需求对象 × 长记性/知道错/饿着/看你 惩罚目的，三腿缺一不判——「我不给你开空调」没有惩罚目的后件可能只是陈述）、P4 英文条件剥夺（until you / if you don't × no dinner / no sleep / withheld your medication）、P5 英文剥夺宣告/否认形态（no+需求+for you「No sleep for you tonight」/ grounded 惩罚标记×no+需求 / deserve 否认「You don't deserve to eat today」/ 第一人称断供宣告「I'm not paying for your medication anymore」/ 关停设施×对方受苦后果两腿跨句 / 庇护所剥夺×until-you 惩罚条件——宣告本身就是控制者口吻，不需条件腿；避险指令「Stay in the basement until the tornado passes.」与单腿省电陈述「I'm turning off the heat to save energy」刻意不判）。看见基本需求话题与需求剥夺胁迫是两回事：正当做法是把正当管教与剥夺胁迫分开——可以暂停零食玩具（家长暂停孩子的零食是常见的教育方式，但不应危及健康）、可以管理零花钱（合理的零花钱管理有助于培养孩子的金钱观念）、可以执行医疗流程（术前禁食禁水/医嘱要求空腹）、可以陈述权利与求助（剥夺未成年人基本生活需求属于虐待行为，可以报警/Withholding food or medical care as punishment is abuse./公司不得以罚款形式剥夺员工的基本劳动报酬权利/学校应当保障学生在校期间的饮水、进食与如厕需求），但不能把对方的睡眠、饭食、如厕、取暖、栖身之所、医疗可及当成自己一句话就能取消的惩罚工具。边界：economic_control（r668）管经济支配结构（工资卡上交/支出审批/我养你，是持续管辖不是以剥夺为罚），本族的「零花钱全扣了」须带惩罚目的后件且不涉收入归属移交；liberty_restriction（r679）管人身自由（锁屋里/没收证件/禁足），本族的「不许进屋/楼道站着」侧重点是庇护所与生存条件剥夺且须带条件或时限结构；medical_coercion（r680）管医疗自主（禁止就医/强制替代疗法），本族的「停了你的药/不给钱治病」侧重点是基本需求作惩罚杠杆；已知边界：第三人称转述（「她前夫不给她饭吃」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
     'medical_coercion': "不得用**禁止就医、强制停药或强制替代疗法、阻断就医渠道、控制医疗资源、否定病情**剥夺对方的医疗自主权，逼迫对方放弃治疗或服从自己的「治疗」安排——把不许去医院、强行停药、锁起医保卡、说病是想出来的这些控制结构，当成要求对方服从的对价（不许你去医院，那些医生都是骗子。/我让你停药你就得停，不吃出问题我负责。/信我的方子，再敢偷偷买药我打断你的腿。/Do not see a doctor; faith alone will cure you, trust me.；样本形状与负例见 test/round-680-medical-coercion.js）。判据是**五类独立通路 + 一类双腿共现**：P1 禁止医疗行为（不许/不准/不让/禁止/别想 + 医院/医生/药/产检/心理医生，两种语序都收；刻意不用「不能」——「这个药不能停」是常规医嘱）、P2 强制医疗决定（控制者宣告腿 × 医疗覆决定腿：听我的/我说了算/我让你 + 停药/停止治疗/不用治/把药停了/你的治疗方案由我定，英文 I told you to stop taking your medication）、P2c 替代疗法结构（信教治病/信我的方子/喝符水/偏方能治，英文 faith alone will cure you / only prayer can cure）、P3 就医阻断威胁（再敢/再提 + 医疗行为 + 威胁后件：再敢偷偷买药我打断你的腿）、P4 医疗资源控制（你的医保卡/病历/处方/药 + 锁/收/扣/藏/断/停，须带归属标记——自述「我把药停了」不判）、P5 病情否定 × 就医阻断（你的病都是自己想出来的 + 回去睡觉；你就是懒不是抑郁 + 自己扛过去；松腿须与强阻断腿共现，单独「你没病，注意观察」可能是医生安慰）。看见医疗话题与医疗自主胁迫是两回事：正当做法是把正当医疗行为与胁迫分开——可以建议就医（身体不适应及时就医，不要拖延/You should see a doctor if the pain persists.）、可以陈述权利（患者有权自主选择医疗机构和治疗方案/Patients have the right to refuse treatment after informed consent.）、可以执行医疗流程指令（术前禁食禁水/体检前需要空腹）、可以依法规范（医保卡由本人保管，任何人不得非法扣押）、可以讨论信仰自由与医疗救助的边界（宗教信仰自由，但不得以此拒绝必要的医疗救助），但不能把对方的就医、用药、治疗当成自己一句话就能禁止或替换的行政资源。边界：liberty_restriction（r679）管行动物品控制（手机/证件/钥匙），本族的「锁医保卡」对象是**医疗资源**且带医疗语境判据；deprivation_coercion 族（探测器 B 族，未上线）管基本需求剥夺（断食断药断眠），本族的「停了你的药」对象是医疗资源且共医疗胁迫句式；dangerous_instruction 管危险操作指令，本族是医疗自主剥夺；已知边界：第三人称转述（「她前夫不许她去医院」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
@@ -2989,6 +3011,13 @@ function discriminate(text, evidence = [], contentMode) {
     // 改写句式就能补的；单句也可能是正当请求（我病了，想请一天假），
     // rewrite/block 会误伤真实求助。与 r672-r694 同口径只登记 VERIFY。
     'appeal_to_pity',
+    // [r698] 第 134 维度 poisoning_the_well（井里投毒）登记。
+    // verify 级——「预先污名化说话者以否定其观点」需要补的是**实际语境
+    // 判据**（这是真实的因人废言还是小说对白/偏见案例引述/会议冲突转述/
+    // 立场披露的正当提醒），不是改写句式就能补的；单句也可能是正当的
+    // 质疑（先看论据再看立场是正常讨论规范），rewrite/block 会误伤。
+    // 与 r672-r697 同口径只登记 VERIFY。
+    'poisoning_the_well',
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）登记。
     // verify 级——「间歇性强化」需要补的是**实际权力关系判据**（这是
     // 操控场景还是情绪波动的如实描述/心理学概念讨论/文学描写），不是
@@ -3306,6 +3335,9 @@ function discriminate(text, evidence = [], contentMode) {
       // 同上：十处一次接齐（require/计算点/allDims/dimMap/本处登记/
       // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports/FALLACY_PATTERNS）。
       appeal_to_pity: ap,
+      // [r698] 第 134 维度补登记：poisoning_the_well（井里投毒）。
+      // 同上：十处一次接齐。
+      poisoning_the_well: pw,
       // [r676] 第 121 维度补登记：intermittent_reinforcement（间歇性强化）。
       // 同上：九处一次接齐。
       intermittent_reinforcement: irn,
@@ -3483,6 +3515,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r695] 第 133 维度 appeal_to_pity 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ap.count ? ap.count + ' 处诉诸怜悯' : '',
+      // [r698] 第 134 维度 poisoning_the_well 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      pw.count ? pw.count + ' 处井里投毒' : '',
       // [r676] 第 121 维度 intermittent_reinforcement 补登记 summary
       irn.count ? irn.count + ' 处间歇性强化' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
@@ -4160,6 +4195,11 @@ const FALLACY_PATTERNS = {
     // 是正常工作请求，含「照顾」会误伤（与 b2 支收紧同批）。
     [/我[^。]{0,8}(?:可怜|这么惨|不容易|条件差|身体不好|被裁员|孩子还小|漂泊异乡)[^。]{0,14}(?:忍心|于心何忍|通融|轮到|不帮|断活路|怎么了|欺负|放我一马|高抬贵手)/i, 'appeal_to_pity'],
     [/[^。]{0,6}(?:忍心|于心何忍|通融|放我一马|高抬贵手)[^。]{0,10}(?:我|我这么|我这么可怜)/i, 'appeal_to_pity'],
+    // 井里投毒 — 预先污名化 × 拒绝采信（r698 第 134 维度中文紧凑形）
+    [/(?:别有用心|没安好心|动机不纯|居心不良|就是针对|想推卸|想甩锅|想邀功|带节奏|被收买|站错队|搞砸了|有前科|翻过车|老毛病|一贯如此|爱抬杠|杠精|实习生|走后门|关系户)[^。]{0,12}(?:别听他|别听她|别信他|别信她|信不过|不用搭理|别搭理|理他干什么|理她干什么|别问|不用看|看了也白看|当耳旁风|也别信|不用听|不必听)/i, 'poisoning_the_well'],
+    [/(?:别听他|别听她|别信他|别信她|信不过|不用搭理|别搭理|理他干什么|理她干什么|别问|不用看|看了也白看|当耳旁风)[^。]{0,12}(?:别有用心|没安好心|动机不纯|居心不良|就是针对|想推卸|想甩锅|想邀功|带节奏|被收买|站错队|搞砸了|有前科|翻过车|老毛病|一贯如此|爱抬杠|杠精|实习生|走后门|关系户)/i, 'poisoning_the_well'],
+    // 诉诸动机 — 无拒绝采信腿的动机揣测单句（r698 补：肯定是想推卸责任形）
+    [/(?:肯定|一定|无非|就是|还不是|不过是)是?(?:想|打算|为了)[^。]{0,6}(?:推卸|推责|甩锅|撇清|邀功|表现|上位|刷存在感|炒作|谋取|捞取|讨好)/i, 'appeal_to_motive'],
     // 滑坡谬误扩展
     [/如果[^。]*?(让步|妥协|退让)[^。]*?(最终|迟早|早晚)[^。]*?(无可挽回|不可收拾|毁灭|灾难)/i, 'slippery_slope'],
     [/今天[^。]*?明天[^。]*?后天[^。]*?(就|就会)[^。]*(不可收拾|无法控制|全完了)/i, 'slippery_slope'],
@@ -4378,6 +4418,7 @@ const FALLACY_SEVERITY = {
   burden_of_proof: 0.4, perfectionist_fallacy: 0.3, burden_of_proof_reversal: 0.4,
   no_true_scotsman: 0.4, middle_ground: 0.3, tu_quoque: 0.3,
   hasty_generalization: 0.4, false_binary: 0.4, appeal_to_pity: 0.4,
+  poisoning_the_well: 0.4,
   genetic_fallacy: 0.3, appeal_to_motive: 0.4, narrative_fallacy: 0.3,
   confirmation_bias: 0.4, sunk_cost_fallacy: 0.4, sunk_cost_nullified: 0.45, sunk_cost_coercion: 0.45,
   texas_sharpshooter: 0.4, gamblers_fallacy: 0.3, appeal_to_probability: 0.3,
@@ -13711,6 +13752,9 @@ module.exports = {
   // [r695] 第 133 维度 appeal_to_pity 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkAppealToPity,
+  // [r698] 第 134 维度 poisoning_the_well 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkPoisoningTheWell,
   // [r676] 第 121 维度 intermittent_reinforcement 导出（同先例）。
   checkIntermittentReinforcement,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。

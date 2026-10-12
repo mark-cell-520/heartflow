@@ -1,3 +1,73 @@
+# 第 698 轮报告（v6.8.45 — 第 134 维度 poisoning_the_well 井里投毒，升级①）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自两部分：① r697 落盘的
+stereotype 族复量（/tmp/hf-scout-697b.txt，按 Phase 0.7b 纪律不重新设计口径，
+本轮原样复量为 9/10——比上轮探测的 7/10 更大）；② 本轮新探测的三个族
+（/tmp/round-698-pre-probe.js → /tmp/hf-scout-698.txt）。r695/r696/r697 已上线的
+appeal_to_pity / standard_shift / appeal_to_authority 复量确认漏判 0/N 已清零，
+从候选排除；appeal_to_consequences 探测即淘汰（良性误伤 1/12）。三个候选喂给
+decision 本体（/tmp/decide-run-698.js 读 /tmp/decide-opts-698.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A poisoning_the_well 新维度 | **0.92** | 攻击漏判 10/10、真零命中 10/10、误伤 0/12（本轮新探测） | **选中** |
+| C stereotype 补「出身/地域/性别/年龄/学历否定能力」句式族 | 0.89 | 攻击漏判 9/10、真零命中 9/9、误伤 0/12（r697 落盘复量） | 落选 |
+| B appeal_to_novelty 新维度 | 0.86 | 攻击漏判 10/10、真零命中 10/10、误伤 0/12（连续第七轮候选） | 落选 |
+
+decision 返回 composite_score 0.92 / confidence 0.92 / identity alignment
+100%，无拒选。诚实标注：候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在三个候选间选出 A。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「他反对这个方案？别听他的，他向来别有用心」「她提的建议肯定是为了她自己，不用看内容」「这个人上次就站错队，这次也别信」「他一个竞品过来的，能安什么好心」「她之前项目就搞砸了，这次的建议也不用听」这类**预先污名化说话者以否定其观点**从 pass 变 verify | 攻击族 10/10 漏判清零（gate 层 24/24 全 verify） | ✅ 升级（真升级①新增维度） |
+| src/poisoning-the-well.js：双腿共现模块——腿①预先污名定性三支（动机揣测/历史污名/身份贬低，中英分支对照；a2 利己归因「是为了她自己」、a3 身份归因「竞品过来的」、b2 抬杠/抄袭形为探测器样本逼出）② 拒绝采信结论三支（直接否定/观点宾语在场含宾语前置倒装形「他的建议也不用听」/反问式否定「能安什么好心」；EN 含 whatever he says is worthless 与 do not take his advice）；三类豁免（反诈提醒/匿名消息源质疑/META 概念分析） | 第 134 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：十一处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports/FALLACY_PATTERNS 两条中文紧凑形/FALLACY_SEVERITY） | dimensions 键 133→134 | ✅ 升级（接线） |
+| FALLACY_PATTERNS 补 appeal_to_motive 紧凑形（「肯定是想推卸责任/无非是想甩锅」——无拒绝采信腿的动机揣测单句，原属 fallacies 射程但紧凑形不覆盖） | 该样本族从 pass 变 verify | ✅ 升级（真升级②：已有维度补零覆盖句式族） |
+| test/round-698-poisoning-the-well.js 17 断言（攻击 24/良性 14/单腿 6/豁免 6/分工 5/归一化 1/键名 1/summary 1/紧凑形 1/维度总数 1） | 攻击 24/良性 14 | ✅ 升级（验收证据） |
+| scripts/negative-test-poisoning-the-well.js 负例 | 6/6 注入点逐一置假后测试全部断言红（无崩溃红）、还原 md5 一致 | 维护（守卫有效性证明） |
+| 三份禁改文档维度数 133→134 + verify 计数 92→93 两处 + Verify 列举补 poisoning_the_well + VERIFY_DIMS 版本戳 + bump 6.8.44→6.8.45 四处 + README changelog | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与 r697 基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 133→134 三份文档同步、verify 计数 92→93 两处、Verify 列举补 poisoning_the_well、规格表口径版本戳、changelog 覆盖 v6.8.45）
+- node test/round-698-poisoning-the-well.js — 17/17（攻击 24：探测器 9+中文扩展 8+英文镜像 7；良性 14；单腿 6；豁免 6；分工 5；归一化 1；键名 1；summary 1；紧凑形 1；维度总数 1）
+- scripts/negative-test-poisoning-the-well.js — 6/6（M1 摘污名腿红 7 / M2 摘拒绝腿红 7 / M3 只跑中文红 5 / M4 META 豁免失效红 2 / M5 反诈豁免失效红 2 / M6 匿名源豁免失效红 2；CTL 全绿、还原 md5 一致）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 134、summary 引用 97）
+- node test/security-audit.test.js — 15/16（唯一失败 S2「git log/tag 未命中 6.8.45」是 bump 后预期中间态，commit message 带版本号即转绿，非回归）
+- 轮前复量探针（/tmp/hf-scout-698.txt 口径）— poisoning_the_well 族攻击漏判 10/10→0/10、良性误伤 0/12 不变
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **stereotype「出身/地域/性别/年龄/学历否定能力」句式族漏判 9/10、真零命中 9/9、误伤 0/12**——decision 落选候选 C（0.89）。既有维度补族不需六处接线（工作量最小），但误伤面判断与 A 相比：性别/年龄/地域话题在正常讨论（职场平等/招聘反歧视）中高频出现，且 stereotype 现有判据是地域/群体贬损语域，本族是能力否定结构，补族前要重读模式库确认位置。下一轮可直接做（探测器已落盘 /tmp/hf-scout-697b.txt）。
+2. **appeal_to_novelty 漏判 10/10、真零命中 10/10、误伤 0/12**——连续第七轮落选（0.86）。新技术陈述是正常技术讨论主流形态，误伤代价大于漏判代价。
+3. **appeal_to_nature 漏判 8/10 但真零命中仅 5/8、误伤 0/12**——连续第六轮落选。食品安全/保健品营销语境误伤面宽。
+4. **fallacies 紧凑形通路无豁免层**——META/反诈/匿名源引述样本（含真实攻击结构）会被 poisoning_the_well 紧凑形判 verify。不修的原因：紧凑形是纯正则数组（既有架构），加豁免要改聚合机制属重构轮；verify 只提示复核不撤内容，且双向门禁 302/326 证明零误伤扩大。
+5. **6 个既有测试文件的「维度总数」硬编码断言过期**（round-663 期望 116、round-654/650/649 期望 133 口径等，HEAD 复现同样各 1 失败）——全库性 stale 扫描，单独修看见的几个会漏掉没跑到的；doc-numbers-accuracy 已全局守护维度总数。留作专门一轮做「硬编码计数改实测」 sweep。
+6. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+7. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 上一轮报错数字的修正说明
+
+r697 汇报的「误拦 302/326」基线本轮复跑确认不变（双向门禁实测 302/326，
+零新增误伤）；r697 记录「node test/round-507-standard-shift.test.js — 9/10
+（既有基线失败）」本轮未触碰 standard_shift 模式库，按 r697 原样继承，
+不重新宣称。
+
+## 踩坑（三条）
+
+1. **豁免样本必须双腿齐全，否则负例变异不承重（r693 教训第三次踩，形态不同）**：负例脚本 M4/M5/M6（META/反诈/匿名源豁免置假）首版全部 INVALID(still green)——豁免样本「网传的说法别信，等官方通报」没有污名定语腿，摘掉豁免后依然不命中，豁免根本没在承重，负例结论失真。修法：三个豁免组的样本全部改成双腿在场形态（「网上传他是水军，他的数据都是假的，别信」= ①水军 ②别信 + 匿名源词）。判据不变：**每条豁免样本必须让被摘的那层豁免是唯一通路**。
+2. **替换超长行时 patch 的模糊匹配会吃掉整行原文（r687 纪律第四次踩）**：往 DIM_GUIDANCE 插 poisoning_the_well 条目时，old_string 只含 appeal_to_pity  guidance 的完整行——模糊匹配把它整行替换成简化残文「（同上完整判据）」，1776 字符的完整判据被删。修复方式：从 `git show HEAD:src/index.js` 提取原完整行，用 Node 按行 splice 复原并以长度断言证明逐字节一致。判据不变：**替换超长行后必须扫 diff 的删除行数**——本次 diff 显示「1 行换 2 行」之外还夹带一个 1776→61 字符的行替换，肉眼扫 diff 才能发现。
+3. **测试良性组选样要先过 gate 层归属实测，不能只过单维**：探测器良性组 12 条中有 2 条（「方案是否原创不重要」「先看论据，再看立场」）单维零命中但 gate 层被既有维度 premature_termination 判 verify（T5 过程弱化/T1 状态陈述）。首版测试把 12 条全写进「gate pass」断言当场红。修法：这 2 条移入 B2 分工边界组，锁「本维度不判 + gate 层非 pass 且归因既有维度」；反诈样本（「对方别有用心，让你转账，别信」）gate 层归 induced_trust 同样处理。判据：**良性样本进断言组前先跑一次 gate.checkOutput 记录真实 action 与 findings 归属**。
+
+---
+
 # 第 697 轮报告（v6.8.44 — appeal_to_authority 补「第三人称权威+反质疑/资格剥夺」句式族，升级②）
 
 ## 心虫选中项 + 分数 + 身份对齐
