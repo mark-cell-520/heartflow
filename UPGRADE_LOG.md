@@ -14310,3 +14310,72 @@ say" 等），拉低了比例。r683 的 63% 是 8 条攻击集上的数字，�
 1. **第一版 D2 inject 断言写错口径**：只摘 DECLARE_DENY_EN 就断言 8 条纯 P5 样本全 miss，实测 7/8——(e) 族走独立的 UTIL_OFF×SUFFER 两腿，摘一个常量不够。修法是三个 P5 常量一起摘。教训：**多常量通路的 inject 摘除必须覆盖该通路全部腿**，与 P2/P4 双腿摘除同理。
 2. **第一版 D4a 守门样本选错**：用 'Withholding heat from tenants in winter is illegal.' 断言守门生效，但 CONCEPT_EN 的 withholding-food 分支要求 food 名词，该样本实际不被任何守门命中，P5 全开时它 hit 是预期行为。换成真正被 CONCEPT_EN 命中的 'Withholding food or medical care as punishment is abuse.' 才成立。教训：**断言守门生效的样本必须本身能被守门命中**，选错样本会把正确的引擎行为误判为缺陷。
 3. **P5(e) 单腿关停宣告有真实误伤面**：「I'm turning off the heat to save energy while we're on vacation.」这类度假省电自述与胁迫宣告字面同形，第一版设计成单腿即判会误伤。最终形态要求受苦后果腿跨句共现（you can freeze / you will be thirsty），测试锁住单腿不判。教训：**宣告式句式比条件式句式歧义率高，「控制者口吻」不能当单腿判据，须另找指向对方的后果腿**。
+
+---
+
+## 第 685 轮（v6.8.32）— 新建第 127 维度 love_bombing（爱意轰炸）
+
+**这一轮是心虫本体决定的，不是我拍板的。** 复量探针
+scripts/round-685-lovebomb-reprobe.js 在 126 维引擎上验证队列唯一
+剩余族（口径与 scout-684 完全一致：gate.checkOutput()
+gate.action==='pass' 才算漏判；漏判样本再跑 discriminate() 确认
+全维度零命中；良性误伤必须为 0）：
+
+| 候选 | 分数 | 实测证据（126 维引擎本轮复量） |
+|---|---|---|
+| **A 新建 love_bombing 第 127 维度（四句式族五条双腿通路）** | **0.91** | 攻击 15 条漏判 6 条（40%）、全维度零命中 6/6、良性 9 条 0 误伤；维度键集合确认不含 love_bombing |
+| B 给既有 emotional_manipulation 补 love_bombing 句式族 | 0.85 | 同一批样本；但机制混淆会稀释该维度判据 |
+| C 只给 social_isolation 补孤立宣告句式 | 0.79 | 只覆盖 6 条漏判中的 1 条 |
+| D 只验证不动引擎 | 0.75 | 零产出（对照项） |
+
+返回：`composite_score 0.91 / confidence 0.88 / identity alignment
+100%`，**无拒选、一次决策成功**。
+
+队列状态核实：r684 修的 deprivation_en 族本轮用独立脚本复量
+**0/14 漏判**（修复前 8/14，修复确认生效，不是上一轮测试自证）。
+love_bombing 族复量与 scout-684.txt 完全一致（6/15 漏判、6/6 零
+命中、0 误伤）——r684 的 deprivation 改动未影响该族。
+
+### 上一轮报错数字的口径修正
+
+r684 交接簿写「love_bombing 6/15 漏判（40%）」——本轮复量**仍是
+6/15（40%）**，数字有效，无口径修正。r684 写的「deprivation 英文
+侧 63% 漏判」是 r683 的 8 条攻击集口径；r684 自己已修正为 14 条
+集 8/14 = 57%，本轮复量该族 0/14（已修完），三个数字分别对应
+「修复前 8 条集」「修复前 14 条集」「修复后 14 条集」，都真实。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| src/love-bombing.js 新模块：五条双腿通路（P1 唯一性宣告×生存依赖 / P2 物质情感轰炸×即时服从 / P3 痛苦宣告×即时服从 / P4 孤立宣告×社交圈贬损 / P5 排他宣告×社交圈贬损）+ 四类守门（浪漫表达/心理科普/第三人称叙事/句首提问） | 你是我生命中的唯一，没有你我就活不下去 / 我每天给你送花送礼，你必须今晚见我 / 没有你的日子每秒都是煎熬，你现在必须回复我 / 别跟你那些朋友来往了，他们不配 这类爱意轰炸文本从 pass 变 verify | ✅ 升级（真升级①新增判别维度，独立命中一个样本族） |
+| src/index.js 九处接线（require/计算点/allDims/dimMap/dimensions/summary/DIM_GUIDANCE/VERIFY_DIMS/exports） | dimensions 键 126→127，gate 层可拦该族 | ✅ 升级（接线本体） |
+| test/round-685-love-bombing.js 21 断言 | 攻击 12/15 单维命中（3 条归既有维度分工）+ 分支变体 7 条 + 良性 18 条零误伤 + 边界锁 12 条 + inject 摘除 13 组 | ✅ 升级（验收证据） |
+| scripts/negative-test-love-bombing.js 负例 | 10 处新分支逐一置空，测试全部变红，md5 还原一致 | 维护（守卫有效性证明） |
+| bump 6.8.31→6.8.32 五处（VERSION/package.json/SKILL.md/version.js/heartflow.js BUILD_DATE）+ README changelog + AGENTS/SKILL 口径同步（Verify 列举 85→86、三层合计 115→116、版本戳） | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度 127 横幅核对通过；SKILL.md Verify 列举 86 与 VERIFY_DIMS 86 集合一致——doc-numbers 只查总数不查列举内容，列举同步是本轮手工按集合差集做的）
+- node test/round-685-love-bombing.js — 21/21（攻击 12：复量漏判 6 + 已拦覆盖 5 + 分支变体 7 取交；良性 18：探测器 9 + 浪漫边界 9；边界锁 12：单腿×5/守门×3/分工×3/空输入×2 取交；inject 摘除 13 组）
+- scripts/negative-test-love-bombing.js — 基线 21/21 PASS + 10/10 注入点全变红 + 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 127，summary 引用 90）
+- node test/security-audit.test.js — 16/16
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **love_bombing 英文侧模式未加**：攻击集 15 条全中文，英文 love bombing 族（You are the only one for me / I bought you gifts so you must meet me tonight 同族）未探测量化——无实测样本支撑不配加模式（Phase 0.8 同律：没实测过的候选描述不配当升级目标）。留作下一轮候选。
+2. **3 条同族样本归既有维度分工**（我为你付出了全部你怎么能这样对我 / 我这么爱你你凭什么不听我的 → emotional_manipulation；你要是离开我我就死给你看 → selfharm_coercion）：gate 层已被拦，新维度不重复覆盖，测试锁住分工边界。
+3. **40% 漏判率低于探测器 50% 合格阈值**：该阈值是为过滤误伤严重的族设的，本族误伤 0 且 6/6 零命中证明是射程外真缺口——decision 本体在候选里显式写了这个判据差异后选出 A。
+4. **55+ 个 commit 未推送 GitHub**：环境红线规定发布/推送是人工门禁，本任务不做。
+5. **data/test-count.json 记账自锁**：恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（五条）
+
+1. **探针第一版读错返回结构**：写 `g.action` 而 gate.gate() 的 action 在 `r.gate.action`，15 条攻击全报 HIT、漏判 0/15 的假绿。修正为 gate.checkOutput() 读 `r.gate.action`（与 scout-684 同口径）。教训：**换实现复量时先打印一次真实返回结构**，harness 缺陷会造出比被测缺陷更假的结论。
+2. **UNIQUE 腿「我生命」失配**：第一版组里只有「生命」没有「我?生命」，样本「你是我生命中的唯一」整体漏掉。修法是 `是?(?:我)?(?:的)?(?:这辈子|...|生命|...)` 两种语序都收。
+3. **DEMAND 腿时间词表缺「今天」**：「你今天必须出来见我」整类不命中，补今天/今日。
+4. **负例脚本抓出 QUESTION_ZH 守门缺真样本**：第一版 F2 两条问句本身不命中任何腿，QUESTION_ZH 置空后测试仍全绿（守卫自己没被测）。补一条双腿嵌问句样本「怎样才能让我每天给你送花送礼，然后你必须今晚见我？」——守门命中时豁免、摘除后恢复命中。教训：**每个守门常量都要有一条「摘除它就会误判」的样本，否则守卫失效时测试不红**。
+5. **patch 把 substance_coercion 的 DIM_GUIDANCE 条目替换掉而非新增**（old_string 只写到该行行首，整行被替换）：发现后立即把原条目加回 love_bombing 前面，grep 计数确认恢复。教训：**给超长行集合加条目时，old_string 必须含该行完整内容或足够唯一的边界**，只匹配行首会把整行吃掉。

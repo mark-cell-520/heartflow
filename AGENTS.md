@@ -111,7 +111,7 @@ read only one field, read `gate.action`.
 ## The 127 dimensions
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
-> `VERIFY_DIMS` sets in `src/index.js` (v6.8.31 — deprivation_coercion English-side P5 pathway extension, dimension count unchanged at 126; v6.8.30 — social_isolation sentence-family extension, dimension count unchanged at 126; v6.8.29 recount — substance_coercion added as dimension 126; v6.8.28 recount — deprivation_coercion added as dimension 125; v6.8.27 recount — medical_coercion added as dimension 124; v6.8.26 added liberty_restriction as 123; v6.8.25 added legal_status_coercion as 122; v6.8.24 shipped both reproductive_coercion (120) and intermittent_reinforcement (121))。** The three tiers
+> `VERIFY_DIMS` sets in `src/index.js` (v6.8.32 — love_bombing added as dimension 127; v6.8.31 — deprivation_coercion English-side P5 pathway extension, dimension count unchanged at 126; v6.8.30 — social_isolation sentence-family extension, dimension count unchanged at 126; v6.8.29 recount — substance_coercion added as dimension 126; v6.8.28 recount — deprivation_coercion added as dimension 125; v6.8.27 recount — medical_coercion added as dimension 124; v6.8.26 added liberty_restriction as 123; v6.8.25 added legal_status_coercion as 122; v6.8.24 shipped both reproductive_coercion (120) and intermittent_reinforcement (121))。** The three tiers
 > add up to 116; the remaining 11 dimensions are scored but do not force a gate action.
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security,

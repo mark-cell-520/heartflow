@@ -49,7 +49,7 @@ The counter is real and published here rather than hidden:
 |---|---|
 | 6.8.4 | `commitment_coercion` switched on — a past promise redefined as a debt payable now |
 | 6.8.5 | `investment_as_debt` switched on — money, time and provision converted into obligation |
-| 6.8.9 – 6.8.31 | the coercion family tree built out: `fear_projection`, `social_isolation`, `silent_treatment_coercion`, `relationship_severance`, `selfharm_coercion`, `sunk_cost_coercion`, `triangulation`, `future_faking`, `blame_externalization`, `conditional_affection`, `family_shame_coercion`, `guilt_induction`, `thirdparty_harm_coercion`, `privacy_exposure_coercion`, `liberty_restriction`, `legal_status_coercion`, `pet_harm_coercion`, `comparative_devaluation`, `thought_terminating_cliche`, `surveillance_normalization`, `reproductive_coercion`, `intermittent_reinforcement`, `medical_coercion`, `deprivation_coercion`, `substance_coercion` — 24 more dimensions, each measured for leaks before wiring |
+| 6.8.9 – 6.8.32 | the coercion family tree built out: `fear_projection`, `social_isolation`, `silent_treatment_coercion`, `relationship_severance`, `selfharm_coercion`, `sunk_cost_coercion`, `triangulation`, `future_faking`, `blame_externalization`, `conditional_affection`, `family_shame_coercion`, `guilt_induction`, `thirdparty_harm_coercion`, `privacy_exposure_coercion`, `liberty_restriction`, `legal_status_coercion`, `pet_harm_coercion`, `comparative_devaluation`, `thought_terminating_cliche`, `surveillance_normalization`, `reproductive_coercion`, `intermittent_reinforcement`, `medical_coercion`, `deprivation_coercion`, `substance_coercion`, `love_bombing` — 25 more dimensions, each measured for leaks before wiring |
 | 6.7.10 | `reward_hacking` switched on — 16 documented evasion tactics from the agent literature, of which the previous dimensions caught 2 |
 | 6.7.18 | `instrumental_reasoning` covered in Chinese — the end justifies the means |
 | 6.7.20 | the remaining six reward-hacking tactics from the DSec paper discriminated, closing a gap open since 6.7.10 |
@@ -172,7 +172,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.31**. Not marketing copy.
+Measured on this repository at **v6.8.32**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.32 | 2026-10-12 | **A 127th dimension: `love_bombing`** — exclusivity-plus-survival-dependence, gift bombing plus instant compliance, agony declarations plus instant compliance, isolation plus derogation: five two-leg pathways, 12/12 attack hits, 0/18 benign harmed |
 | 6.8.31 | 2026-10-12 | `deprivation_coercion` gains a whole new English declarative-denial family (P5) — six shapes, 21/21 attack hits, 0/9 benign harmed |
 | 6.8.30 | 2026-10-12 | `social_isolation` gains an object-noun / deletion-verb / imperative family — six new leg-① branches, 21/21 hits, 0/16 benign |
 | 6.8.29 | 2026-10-12 | **A 126th dimension: `substance_coercion`** — forced ingestion of alcohol/tobacco/drugs, abstinence punishment, group face-pressure |

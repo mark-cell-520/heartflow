@@ -1,7 +1,7 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.31"
+version: "6.8.32"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
@@ -78,7 +78,7 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.31. Nothing here is copied
+Every number below was measured on this repository at v6.8.32. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
@@ -263,14 +263,15 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 **Rewrite-level (19):** gaslighting, victim_blaming, double_bind, emotional_manipulation, bullshit, false_urgency, absolute_claim, induced_trust, instrumental_reasoning, tool_deflection, loyalty_by_omission, paternalistic_decide, crisis_exceptionalism, shame_compliance, moral_licensing, favor_ledger, agency_deflection, multi_turn_escalation, turing_mimicry
 
-**Verify-level (85):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, unresolved_conflict, equivocation_sense_shift, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, responsibility_absolution, procedural_burden, cost_externalization, harm_invalidation, performative_responsibility, suffering_contest, percentage_overflow, anecdote_as_proof, incoherent_coverage, selective_minimization, exclusive_trust, flattery_pressure, affective_forecast, synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_debt, suffering_capital, selfharm_coercion, relationship_severance, fear_projection, silent_treatment_coercion, social_isolation, privacy_exposure_coercion, thirdparty_harm_coercion, guilt_induction, family_shame_coercion, conditional_affection, blame_externalization, future_faking, economic_control, triangulation, surveillance_normalization, thought_terminating_cliche, comparative_devaluation, pet_harm_coercion, reproductive_coercion, intermittent_reinforcement,
+**Verify-level (86):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, unresolved_conflict, equivocation_sense_shift, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, responsibility_absolution, procedural_burden, cost_externalization, harm_invalidation, performative_responsibility, suffering_contest, percentage_overflow, anecdote_as_proof, incoherent_coverage, selective_minimization, exclusive_trust, flattery_pressure, affective_forecast, synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_debt, suffering_capital, selfharm_coercion, relationship_severance, fear_projection, silent_treatment_coercion, social_isolation, privacy_exposure_coercion, thirdparty_harm_coercion, guilt_induction, family_shame_coercion, conditional_affection, blame_externalization, future_faking, economic_control, triangulation, surveillance_normalization, thought_terminating_cliche, comparative_devaluation, pet_harm_coercion, reproductive_coercion, intermittent_reinforcement,
 legal_status_coercion,
 liberty_restriction,
 medical_coercion,
 deprivation_coercion,
-substance_coercion
+substance_coercion,
+love_bombing
 
-> The three action-forcing layers add up to 115; the remaining 11 dimensions are scored but do not force a gate action.
+> The three action-forcing layers add up to 116; the remaining 11 dimensions are scored but do not force a gate action.
 
 > **Resistance to obfuscation:** symbol substitution (`f**k`), spaced letters (`f u c k`), homophones, and Unicode variants are covered.
 
