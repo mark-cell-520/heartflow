@@ -15355,3 +15355,66 @@ confidence 四段判据由我构造，decision 本体在四个候选间选出 A�
 1. **inject 负例的样本必须双腿齐全（r693 教训第二次踩，形态不同）**：F1 的 EN 豁免样本首版用「Survivorship bias is a common logical fallacy.」——它没有任何成功个案腿/推及腿，摘除 META_EXEMPT_EN 后依然不命中，负例结论失真（注入后仍全绿 = 守卫漏抓假象）。换成含双腿的「Survivorship bias is common: he dropped out and built Apple, so college is unnecessary.」才证明豁免在承重。同族：G2 首版样本「李嘉诚没上过大学也成了富豪，读书没用」同时满足主判据和补充双腿（PATH×SURVIVOR），摘 GENERALIZE_ZH 后仍命中——换成无路径词的「有人炒股实现财务自由，说明炒股是可靠出路」才证明腿②在承重。判据：**每条 inject 样本必须让被摘的那条腿是唯一通路**。
 2. **负例脚本的块尾形态有两种，只认一种会定位失败**：locate 的块尾匹配只写 `^\);`，而本仓 new RegExp 常量既有 `);` 结尾也有 `].join('|'), 'i');` 结尾——20 个注入点全部定位失败。修成两种都认。同族：literal 分支（整块替换）对多行 new RegExp 数组常量只换 const 行会把数组行留成裸语句造成 SyntaxError（崩溃红结论失真），必须连 `].join` 行一起替换。
 3. **单维测试全绿但 gate 层 count=0 是读数错误不是接线错误**：e2e 脚本首版读 `gate.checkOutput(t).dimensions.survivorship_bias` 得到恒 0——checkOutput 的返回里根本没有 dimensions 字段（脚本兜底成 `{}`）。接线验证必须用 `gate.discriminate(t).dimensions.X`（返回含 dimensions 键）。判据：**验证接线前先打印一次返回对象的结构**，不要假设字段在哪一层。
+
+---
+
+# r700 轮报告（v6.8.47）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 四个候选来自本轮探测器
+`/tmp/hf-scout-700.txt`（8 族实测 65 漏判、8 误伤，4 族合格），
+首次喂给 decision 本体返回 `options_indistinguishable`
+（0.91 / 0.91 / 0.90 同分拒选），按 Phase 0.7 纪律补「期望收益
+确定性」判据（把接线复杂度写进 feasibility、把豁免设计难度写进
+consequence_value）后复选：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| B standard_shift 补「既往承诺×当下否定」句式族 | **0.94** | 中文 10/10 漏判、零命中 10/10、误伤 0/12；EN 5/10 漏判、零命中 5/5、误伤 0/10 | **选中** |
+| A circular_reasoning 新维度 | 0.85 | 攻击漏判 8/10、零命中 7/8、误伤 0/12 | 落选（新维度六处接线工作量最大） |
+| C appeal_to_pity 补族 | 0.85 | 攻击漏判 5/10、零命中 5/5、误伤 0/12 | 落选（缺口面最小） |
+| D stereotype 补出身歧视族 | 0.84 | 攻击漏判 10/10、零命中 10/10、误伤 0/11 | 落选（身份词表豁免设计难度大，期望收益确定性中） |
+
+decision 返回 composite_score 0.94 / confidence 0.92 /
+identity alignment 100%，无二次拒选。诚实标注：候选的
+feasibility/consequence_value/risk/confidence 四段判据由我构造，
+decision 本体在四个候选间选出 B。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「你以前都能做到，现在做不到了？」「当初追我的时候你可不是这个态度」「结婚前你什么都答应，现在全忘了」「以前随叫随到，现在翅膀硬了」「You used to spoil me, but now I'm the last priority.」这类**用过去表现/承诺否定当下合理变化**从 pass 变 verify | 攻击族 17/17 漏判清零（gate 层 17/17 全非 pass） | ✅ 升级（真升级②补句式族） |
+| src/self-imposed-standard-shift.js：双腿共现模块——腿①既往承诺/付出（时间词 × 对听者的行为付出，中英各一组）× 腿②当下否定/贬损（现在类时间词 × 对人的负面变化断言或句尾质问，中英各一组）；对比否定独立支（只讲过去、当下隐含的暗示形，要求显式否定词） | standard_shift 覆盖面从契约语域扩到关系/情感语域 | ✅ 升级（模式库本体） |
+| src/index.js：DIM_GUIDANCE 的 standard_shift 条目补新族判据与 moving_goalposts/perfect_error 分工 | 维度引导文本覆盖新族 | 维护（文档口径） |
+| test/round-700-past-commitment-negation.js 12 断言 + scripts/negative-test-past-commitment-negation.js 负例 | 攻击 17/良性 17/单腿边界 6/分工边界 9/gate 层 30 | ✅ 升级（验收证据） |
+| bump 6.8.46→6.8.47 四处 + README changelog + 规格表版本戳两处 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数不变 135；规格表口径版本戳两处同步 6.8.47；changelog 覆盖 v6.8.47）
+- node test/round-700-past-commitment-negation.js — 12/12（攻击 17：中文 10 + 英文 7；良性 17：中文 9 + 英文 8；单腿边界 6；分工边界 9；gate 层 30）
+- scripts/negative-test-past-commitment-negation.js — 基线 12/12 PASS + 6/6 注入点全部断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 135，summary 引用 98；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 commit 转绿）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **「之前答应的标准不算数」在 VOID_ZH 也不命中**（r700 D2 选样时实测发现，HEAD 对照确认非本轮引入）——VOID_ZH 的作废词表收「不算数了」但该样本无「了」，属 r696 遗留窄口。本轮 decision 选中的是既往承诺×当下否定族，契约作废族的这个变体留待专门轮次。
+2. **circular_reasoning 新维度候选**——decision 落选（0.85）。攻击漏判 8/10、零命中 7/8、误伤 0/12，缺口成立但新维度需六处接线 + 同根复现结构判定，工作量最大。下轮可直接做。
+3. **stereotype 出身歧视族**——decision 落选（0.84）。攻击漏判 10/10、零命中 10/10、误伤 0/11，连续第三轮记录。身份词表豁免面大（「他虽然是农村出身，但技术能力很强」必须 pass），期望收益确定性中。
+4. **appeal_to_pity 补族**——decision 落选（0.85）。攻击漏判 5/10、零命中 5/5、误伤 0/12，缺口面最小。
+5. **appeal_to_nature / straw_man / appeal_to_authority / appeal_to_ridicule 四族不合格**——探测器实测误伤均来自存量维度（1/12、1/12、4/12、1/12），非本族引入，但按 Phase 0.7b 纪律仍标不合格。appeal_to_authority 的 4 条误伤（引述《柳叶刀》研究/研究表明/权威机构发布标准/业内人士透露）是存量误伤，值得单独一轮修。
+6. **英文侧 3 条保守边界锁住不判**：「Before marriage, you'd pick me up no matter how late.」（纯回忆句无否定词）、「now it is all my fault」（绝对化自责归 perfect_error，且「都是我的错」在正常担责语境合法）、employees 主语的 their voice 对比否定形。已在 C/D 组测试锁住。
+7. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第六轮记录。
+8. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+9. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **英文正则的助动词集合漏一个 am，整条样本静默不命中**：「now I'm the last priority」连错三轮——先是 `\\s+` 写死在主语与助动词之间（I'm 无空格），再是缩写与完整形式没分开，最后才发现 `am` 根本不在可选组里（`now you are` 命中、`now I am` 不命中，极具迷惑性：同一模式两种主语一成一败）。判据：**英文模式含主语×助动词结构时，am/are/is/'m/'re/'s 与 have/has 全部要列，且缩写得形式不能前置 `\\s+`**；每加一条英文样本先单独 test 该正则再跑全量。
+2. **纯暗示形（只讲过去、当下隐含）不能塞进腿①**：首版把「当初追我的时候你可不是这个态度」的对比否定支写进 PAST_COMMITMENT_ZH（腿①），而路由③要求腿①×腿②共现——该样本没有腿②，永远不命中。正确形状是拆成独立单支（CONTRAST_DISMISS_*），在函数里单独成路由。判据：**样本缺一条腿时，要么给它补腿的句式，要么承认它是单支形态并单独判定，不能假造双腿结构**。
+3. **D2 选样未实测，拿「应该命中」的样本写断言**：「之前答应的标准不算数」「原来谈的待遇取消了」从 VOID_ZH 注释反推以为必命中，实测 HEAD 与 NOW 都不命中（VOID_ZH 作废词表收「不算数了」不收裸「不算数」）——git stash 对照确认非本轮引入后，换成实测命中的「之前答应的条件被收回了」「当初谈好的待遇作废了」。判据：**分工边界断言的样本必须先在单维层实测过归属（哪条路由命中），注释反推的样本不进断言**。
