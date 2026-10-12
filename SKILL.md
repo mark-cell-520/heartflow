@@ -78,7 +78,7 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.35. Nothing here is copied
+Every number below was measured on this repository at v6.8.36. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
