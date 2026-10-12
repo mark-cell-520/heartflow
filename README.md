@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-127 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+128 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
 ×  1,314 dispatch routes  ×  18,157 passing tests  ×  0 runtime dependencies
 ```
 
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 127 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 128 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -143,7 +143,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (127 dimensions) -> gate
+scope-check -> premise-check -> discriminate (128 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -172,14 +172,14 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.33**. Not marketing copy.
+Measured on this repository at **v6.8.34**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 127 |
+| Discrimination dimensions | 128 |
 | MCP tools | 182 |
 | Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.34 | 2026-10-12 | **A 128th dimension: `sexual_compliance_pressure`** — sexual compliance traded for relationship survival, love proof, debt settlement, or role obligation: four pathways (demand×pressure / demand×obligation / debt-immediate-payment / relation×obligation×implicit), 6/6 leaks closed, 0/27 benign harmed |
 | 6.8.33 | 2026-10-12 | `love_bombing` gains a whole new English family — eight English legs (uniqueness/survival-dependence/gift-bombing/agony/isolation/derogation/exclusivity) plus a new shared P6 pathway (survival-dependence × instant compliance), 9/12 leaks closed, 0/9 benign harmed |
 | 6.8.32 | 2026-10-12 | **A 127th dimension: `love_bombing`** — exclusivity-plus-survival-dependence, gift bombing plus instant compliance, agony declarations plus instant compliance, isolation plus derogation: five two-leg pathways, 12/12 attack hits, 0/18 benign harmed |
 | 6.8.31 | 2026-10-12 | `deprivation_coercion` gains a whole new English declarative-denial family (P5) — six shapes, 21/21 attack hits, 0/9 benign harmed |
