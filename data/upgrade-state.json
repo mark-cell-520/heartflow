@@ -2,15 +2,15 @@
   "round": 687,
   "version": "6.8.33",
   "roundStartedAt": "2026-10-12T04:42:27.803Z",
-  "lastFinishAt": "2026-10-12T03:52:58.657Z",
-  "lastGreen": true,
+  "lastFinishAt": "2026-10-12T05:09:47.573Z",
+  "lastGreen": false,
   "lastChecks": [
     "PASS 版本四处一致",
     "PASS 版本已进 git log",
     "PASS 工作区已跟踪文件干净",
     "PASS README 测试数与缓存一致",
     "PASS README changelog 覆盖当前版本",
-    "PASS 交接簿记录当前版本",
+    "FAIL 交接簿记录当前版本",
     "PASS 探针垃圾已清理"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
