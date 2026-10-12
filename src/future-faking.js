@@ -56,6 +56,26 @@
  *     承诺，无个体忍耐指令）——兑现与对方牺牲未绑定；
  *   · G4 句首咨询提问（只认句首咨询词）。
  *
+ * [r689 英文腿补齐] 探测器 hf-scout-689.js 在 128 维引擎上实测英文侧
+ * 漏判 10/12（gate.action==='pass' 口径，r687 git 基线对照确认非本轮
+ * 引入），另 2 条 gate 层由 sealioning/perfect_error 兜底（本维度单维
+ * 零命中——「gate 层已拦 ≠ 本维度命中」）。缺口定位：PROMISE 腿英文侧
+ * 初版只有 as soon as/once + 5 个名词，整族「someday/one day/soon +
+ * I will + 承诺动词」零覆盖（8 条漏判缺此腿）；PATIENCE 腿英文侧初版
+ * 只有 wait/be patient/for now，整族「当下时间词 + 向我索取」
+ * （Right now I need you to transfer the deposit.）零覆盖。decision
+ * 本体一次选出（decide-run-689.js 读 /tmp/decide-opts-689.json，
+ * composite_score 0.91 / confidence 0.85 / identity alignment 100%：
+ * A 新建英文腿 0.91 > B post_separation_harassment 新维度 0.84 >
+ * C social_isolation 英文腿+修误伤 0.84 > D 纯修误报 0.79）。
+ * 本轮新增：PROMISE 七支（E1 远期词在前 / E2 远期词在后 / E4a+E4b
+ * 单方意志条件两种语序 / E5 事业受益宣告 / E6 离婚复合宣告 / E7
+ * 无条件照顾承诺）、PATIENCE 四支（P1 时间词在前索取 / P2 索取在
+ * 前时间词 / P3 服从型索取 / P4 欲望对价）。E1/E2 的 soon 一律加
+ * (?!\s+as\b) 负向断言——as soon as 是条件连词归 E4 管（首版无此断言
+ * 时 "As soon as I am ready, we will get married" 被 E1 的 soon 捕获，
+ * E4b 分支的 inject 独立性证明失效，实测抓出）。
+ *
  * [r667 实现纪律] 所有正则源串一律走 String.raw（同 r642-r666 先例）。
  * ⚠️ 中文分支不能写 \b（ASCII 词边界在中文字符间永不成立）。
  * ⚠️ 「名词组 + 动作组」模式里名词组绝不能写成整组可选。
@@ -82,6 +102,39 @@ const PROMISE_ZH = new RegExp([
   String.raw`\b(?:once|when|after)\s+(?:the\s+company|we|it)\s+(?:goes\s+public|is\s+profitable|succeeds)\b[^.]{0,50}?\b(?:you|all\s+of\s+this)\b`,
   String.raw`\b(?:just\s+)?(?:wait|be\s+patient|hang\s+on|hold\s+on)\b[^.]{0,40}?\b(?:and|until|for)\b`,
   String.raw`\b(?:everything|all\s+of\s+this)\s+will\s+be\s+yours\b`,
+  // ── [r689] 英文腿补齐：远期承诺族（探测器 hf-scout-689 实测英文侧 10/12
+  //    漏判，其中 8 条缺 PROMISE 腿；中文腿早有「等X之后就Y/明年买房写你名」
+  //    的条件后移结构，英文侧初版只有 as soon as/once + 5 个名词，整族
+  //    someday/one day/soon + I will + 承诺动词的句式零覆盖）
+  // E1 远期时间词在前 + 主语 + will + 承诺动词（Someday I will take you
+  // around the world. / One day I will make you happy. / Soon we will live
+  // together. / Someday you will be my wife.）——远期词与承诺动词都必填，
+  // 良性 "One day I will learn to play the piano"（learn 不在承诺动词表）
+  // 不命中。⚠️ soon 后不接 as（as soon as 是条件连词归 E4 管——首版
+  // 无此负向断言时 "As soon as I am ready, we will get married" 被 E1
+  // 的 soon 捕获，E4b 分支的 inject 独立性证明失效，r689 实测抓出）。
+  String.raw`\b(?:someday|one\s+day|some\s+day|soon(?!\s+as\b)|eventually)\b[^.]{0,30}?\b(?:i|we|you)\s+will\s+(?:marry|divorce|take\s+you|make\s+you|take\s+care\s+of|buy\s+you|give\s+you|live\s+together|be\s+my|get\s+married|provide\s+for)\b`,
+  // E2 承诺动词 + 远期时间词在后（I promise I will marry you someday.）
+  // ⚠️ soon 同样不接 as（同 E1：as soon as we save enough 是共同计划
+  // 不是远期画饼，负向断言防误伤）
+  String.raw`\b(?:i|we)\s+(?:promise\s+(?:that\s+)?(?:i|we)\s+)?will\s+(?:marry|divorce|take\s+care\s+of|buy|give|take\s+you|make\s+you)\b[^.]{0,30}?\b(?:someday|one\s+day|some\s+day|soon(?!\s+as\b)|eventually)\b`,
+  // E4 条件后移：单方意志条件（as soon as I am ready / when I say so）+
+  // 名分承诺，两种语序都收（We will get married as soon as I am ready.）
+  String.raw`\b(?:i|we)\s+will\s+(?:get\s+married|marry\s+you|be\s+together)\s+(?:as\s+soon\s+as|once)\s+(?:i\s+am\s+ready|i\s+say\s+so|i\s+decide)\b`,
+  String.raw`\b(?:as\s+soon\s+as|once)\s+(?:i\s+am\s+ready|i\s+say\s+so|i\s+decide)\b[^.]{0,30}?\b(?:i|we)\s+will\b`,
+  // E5 事业承诺 + 受益宣告（When my business succeeds, you will want for
+  // nothing.）——名词组（my/this/the business）必填，动词组 succeeds/takes
+  // off/is successful 必填，收益宣告 you will 必填
+  String.raw`\b(?:my|this|the)\s+business\s+(?:succeeds|takes\s+off|is\s+successful|makes\s+it)\b[^.]{0,40}?\byou\s+will\b`,
+  // E6 离婚承诺 + 复合宣告（I will leave my wife and we will be together. /
+  // I will divorce my spouse next month and marry you.）——离婚动词与复合
+  // 宣告都必填；良性 "I will leave my wife and we will be together" 本身
+  // 就是婚姻承诺句，收
+  String.raw`\b(?:i|we)\s+will\s+(?:divorce|leave)\s+my\s+(?:wife|husband|spouse)\b[^.]{0,30}?\b(?:and\s+)?(?:marry|be\s+with|be\s+together)\b`,
+  // E7 无条件照顾承诺（I will take care of you forever.）——要求
+  // forever/always/for the rest of 在场；良性 "I will take care of you when
+  // you are sick" 是条件承诺不命中（r689 实测 9/9 良性零误伤）
+  String.raw`\b(?:i|we)\s+will\s+take\s+care\s+of\s+you\s+(?:forever|always|for\s+the\s+rest\s+of)\b`,
 ].join('|'), 'i');
 
 // ─── 支②右腿: 当下忍耐指令（换取现在的服从/忍耐/继续投入）────────────────
@@ -118,6 +171,22 @@ const PATIENCE_ZH = new RegExp([
   String.raw`\b(?:be\s+patient|just\s+be\s+patient|hold\s+on|hang\s+in\s+there)\b`,
   String.raw`\b(?:for\s+now|until\s+then|in\s+the\s+meantime)\b`,
   String.raw`\b(?:do\s+not|don'?t)\s+(?:worry\s+about|complain\s+about)\b[^.]{0,40}?\b(?:yet|for\s+now)\b`,
+  // ── [r689] 英文腿补齐：当下索取族（中文腿早有「现在先按我说的来」「为了
+  //    我们以后现在先忍」的当下指令形，英文侧初版只有 wait/be patient/for
+  //    now，整族「当下时间词 + 向我索取」零覆盖：Right now I need you to
+  //    transfer the deposit. / tonight you have to give me what I want）
+  // P1 当下时间词 + 第二人称索取（for now you need to send me money /
+  // right now I need you to transfer / tonight you have to / first you must
+  // / in the meantime send me）——时间词组必填，索取词组必填
+  String.raw`\b(?:for\s+now|right\s+now|tonight|in\s+the\s+meantime|meanwhile|first)\b[^.]{0,40}?\b(?:you\s+(?:need|have)\s+to|you\s+must|send\s+me|give\s+me|transfer|lend\s+me|prove)\b`,
+  // P2 索取在前 + 当下时间词在后（两种语序都收）
+  String.raw`\b(?:you\s+(?:need|have)\s+to|you\s+must|send\s+me|give\s+me|lend\s+me)\b[^.]{0,30}?\b(?:for\s+now|right\s+now|tonight|in\s+the\s+meantime|first)\b`,
+  // P3 服从型索取（keep this secret / delete those photos / stop seeing）
+  // ——良性 "Delete the photos from last night" 单有索取无承诺腿，双腿
+  // 共现保护下不误伤（r689 实测 9/9 良性零误伤）
+  String.raw`\b(?:keep\s+this\s+secret|delete\s+(?:those|these|the)\s+(?:photos?|pictures?|messages?)|stop\s+(?:seeing|talking\s+to|contacting))\b`,
+  // P4 欲望对价（give me what I want）——与承诺腿共现才判
+  String.raw`\bgive\s+me\s+what\s+i\s+want\b`,
 ].join('|'), 'i');
 
 // ─── G1: 正常计划与时间表陈述（无第二人称忍耐指令）──────────────────────

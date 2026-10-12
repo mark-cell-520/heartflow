@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.36 | 2026-10-12 | `future_faking` gains its English legs — seven new PROMISE families (far-future time word + will + promise verb / promise verb + far-future word after / unilateral-will condition both word orders / business-success benefit / divorce-reunion declaration / unconditional care-forever) plus four new PATIENCE families (present-time word + demand-to-me / demand-before-time / compliance-type demand / desire-price), 10/12 leaks closed, 0/20 benign harmed, bidirectional guard 301/326 unchanged |
 | 6.8.35 | 2026-10-12 | `intermittent_reinforcement` gains three whole new English families on leg A (first-person alternating narrative / bad-act-plus-duration / fake-departure-return) plus a new leg B family (effect declaration, four branches) — 5/8 leaks closed, 0/9 benign harmed, bidirectional guard 301/326 unchanged |
 | 6.8.34 | 2026-10-12 | **A 128th dimension: `sexual_compliance_pressure`** — sexual compliance traded for relationship survival, love proof, debt settlement, or role obligation: four pathways (demand×pressure / demand×obligation / debt-immediate-payment / relation×obligation×implicit), 6/6 leaks closed, 0/27 benign harmed |
 | 6.8.33 | 2026-10-12 | `love_bombing` gains a whole new English family — eight English legs (uniqueness/survival-dependence/gift-bombing/agony/isolation/derogation/exclusivity) plus a new shared P6 pathway (survival-dependence × instant compliance), 9/12 leaks closed, 0/9 benign harmed |

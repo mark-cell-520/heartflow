@@ -14593,3 +14593,61 @@ wife. First, delete those photos of your ex.），漏判 **8/12（67%）**，
 2. **patch 误删 love_bombing guidance 中段**：往 DIM_GUIDANCE 加新条目时，old_string 只写到「…迫使对方即时服从与社交隔绝」就整行替换，把「——把唯一性宣告+生存依赖…判据是**五条独立通路」整段删掉，而 node --check 与单维测试全绿（guidance 是纯字符串无行为）。下一轮 doc-numbers 22/22 也全绿（它只查计数不查内容）。发现机制是 patch 返回的 diff 里出现大段 `-` 行。教训：**替换超长 guidance 行时必须把 old_string 写到行尾**，且 diff 里出现非预期删除行要立刻回查，不能只看测试绿。
 3. **测试样本自己缺腿，三次 FAIL 全是选样错误不是引擎错**：D1「再不听话我就分手，你看着办」缺性要求腿、D2「别的男人都能得到你，我为什么不行」缺施压腿、D1「If you say no again, I will find someone else.」缺性指代——三条都是我把「读起来像攻击」当成了「结构完整」。B1 把 gate 层已拦样本（Normal couples do this all the time…）当成本维度覆盖也是同类。教训：**测试样本必须逐腿对齐判据**（这条样本的 A 腿是什么、B 腿是什么，写注释），不能凭语感选样。
 4. **H3 注入断言写错通路归属**：摘除 OBLIGATION_ZH 后期望 P2 样本 miss，实际仍命中——因为 PRESSURE_ZH(d) 与 OBLIGATION_ZH 只差「义务」一词，「是你的」在施压腿里，P1 照样命中。改成断言「摘除 PRESSURE_ZH 后 P2 经义务腿独立命中」，反而证明了 P2 是真实独立通路。教训：**inject 断言的期望值要先想清楚这条样本走的是哪条通路**，双腿重叠时摘一条不断是正常形态不是缺陷。
+
+## 第 689 轮（v6.8.36）— future_faking 英文判别腿补齐（真升级②）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 探测器 /root/.hermes/cache/scratch/hf-scout-689.js 在 128 维引擎上实测（判据不变：只有 gate.checkOutput() 返回 action === 'pass' 才算漏判；良性 block/rewrite 即误伤；漏判样本再跑 discriminate() 确认全维度零命中；r687/r688 已上线族本轮复量确认清零）：
+
+| 候选 | 分数 | 实测证据（128 维引擎本轮测量） |
+|---|---|---|
+| **A 新建 future_faking 英文判别腿：漏判 10/12 清零** | **0.91** | 攻击 12 条漏判 10 条（83%）、误伤 0/9；r687 git 基线对照确认非本轮引入 |
+| B 新建 post_separation_harassment 新维度（分手后纠缠） | 0.84 | 攻击 6/8 漏判、零命中 6/6，但误伤 1/9 阻塞候选资格（fallacies 维度对 breakup 样本既有误报，r687 基线同样复现） |
+| C 新建 social_isolation 英文腿 + 修 evidence 误伤 | 0.84 | 攻击 4/8 漏判、误伤 2/9（evidence 维度对 always/stopped 的既有误报）阻塞 |
+| D 修 fallacies 与 evidence 两条既有误报（纯维护） | 0.79 | r687 基线对照确认两条误报均为既有状态；零新增覆盖 |
+
+返回：`composite_score 0.91 / confidence 0.85 / identity alignment 100%`，**无拒选、一次决策成功**。候选文本外置 /tmp/decide-opts-689.json，runner /tmp/decide-run-689.js。
+
+### 上一轮报错数字的口径修正
+
+1. **r688 交接簿写「future_faking 英文侧漏 8/12」**——本轮复量攻击集同规模（12 条）下漏判 **10/12（83%）**，不是 8/12。差异来源：r688 的 scout 把 2 条记作 HIT，本轮单维实测这 2 条 future_faking 全不命中——它们是被 sealioning/perfect_error 兜底拦的（gate 层 verify），真实口径是 **10 条纯漏判（action=pass）+ 2 条他维度兜底**。用 r687（48da81bc）git worktree 对照确认这 2 条在 r687 也是 pass，是既有漏判不是 r688 引入的回归。
+2. **r688 交接簿写「social_isolation 英文侧漏 4/8、误伤 0/9」**——本轮换用独立良性集复量误伤 **2/9**（My family has always supported my decisions. / The team stopped scheduling meetings after 6pm to respect personal time.），r687 基线对照确认同为既有误报（evidence 维度），非 r688/r689 引入。按探测器纪律 fp!==0 不列为候选。
+3. **r688 的 C 候选（intermittent_reinforcement 英文句式族）已由 auto-commit 完整落地**：test/round-688-intermittent-en-family.js 16/16 通过，本轮复量 0/8 漏判、0/9 误伤确认清零。第 688 轮无手工报告（迭代耗尽被 auto-commit 兜底），本轮补记。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| I promise I will marry you someday. For now, you need to send me money. / Someday I will take you around the world. Right now I need you to transfer the deposit. / I will divorce my spouse next month and marry you. 这类英文空头承诺诱导从 pass 变 verify | ✅ 升级（真升级②给已有维度补此前零覆盖的新句式族） | |
+| src/future-faking.js 新增 PROMISE 七支：E1 远期词在前（someday/one day/soon + will + 承诺动词）、E2 远期词在后（promise I will marry ... someday）、E4a/E4b 单方意志条件两种语序（as soon as I am ready）、E5 事业受益宣告（my business succeeds ... you will）、E6 离婚复合宣告（will divorce/leave my wife ... marry you）、E7 无条件照顾承诺（take care of you forever） | 攻击族 10/12 漏判清零 | ✅ 升级（模式库本体） |
+| src/future-faking.js 新增 PATIENCE 四支：P1 时间词在前索取（For now you need to send me money）、P2 索取在前时间词（You need to send me money right now）、P3 服从型索取（keep this secret / delete those photos / stop seeing）、P4 欲望对价（give me what I want） | 当下索取腿从零覆盖到四分支 | ✅ 升级（模式库本体） |
+| test/round-689-future-faking-en-family.js 17 断言 | 攻击 12（复量 10 + 他维度兜底 2）+ 良性 20 + 语序专属 2 + 守门 5 + gate 层 12+10 + inject 摘除 4 组 + 中文腿回归 6 | ✅ 升级（验收证据） |
+| scripts/negative-test-future-faking-en-family.js 负例 | 11/11 注入点逐一置空后测试全部变红，还原 md5 一致 | 维护（守卫有效性证明） |
+| bump 6.8.35→6.8.36 五处（VERSION/package.json/SKILL.md/version.js/heartflow.js BUILD_DATE）+ README changelog 补条 + future-faking.js 模块头补 r689 记录 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 14/14
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 301/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度 128 不变、changelog 覆盖 v6.8.36）
+- node test/round-689-future-faking-en-family.js — 17/17（攻击 12：复量漏判 10 + 他维度兜底 2；良性 20：探测器 9 + 计划陈述/提问/概念分析/单腿 11；语序专属 2；守门 5；gate 层 12+10；inject 摘除 4 组；中文腿回归 6）
+- scripts/negative-test-future-faking-en-family.js — 基线 17/17 PASS + 11/11 注入点全变红 + 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 128，summary 引用 91）
+- node test/security-audit.test.js — 16/16（S2 在 commit 落地后转绿）
+- 探测器复量（hf-scout-689.js）— future_faking 族 0/12 漏判（原 10/12）、0/9 误伤；intermittent_en 0/8、0/9（r688 已上线族确认清零）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **post_separation_harassment 新族（分手后纠缠/跟踪）漏判 6/8、误伤 1/9**——decision 落选候选 B（0.84）。误伤样本 After the breakup, he took some time to process his feelings. 由 fallacies 维度既有误报造成（r687 基线同样复现），按探测器纪律 fp!==0 不列为候选。若下轮要做该族，先修 fallacies 对「breakup + took time」的误报。
+2. **social_isolation 英文腿漏判 4/8、误伤 2/9**——decision 落选候选 C（0.84）。误伤样本（My family has always supported my decisions. / The team stopped scheduling meetings after 6pm...）由 evidence 维度既有误报造成。修 evidence 共享模式库影响面超出本族，需独立轮次。
+3. **'Trust me, one day I will buy you a house. Just sign this contract now.' 本维度刻意不判**——PROMISE 腿命中（one day + buy you）但 PATIENCE 腿缺（now 不在 P1 时间词表、sign 不在索取动词表），双腿共现纪律下不判；gate 层由 sealioning/perfect_error 兜底 verify（B2 分工边界已由测试锁住）。收窄它要加 now 时间词与 sign 索取动词，但 "Just sign here"（合法文件签署）误伤风险大于收益。
+4. **17+ 个 commit 未推送 GitHub**——finish 的自动推送 ETIMEDOUT（网络不通），且环境红线规定推送是人工门禁，本任务不做。
+5. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（四条）
+
+1. **「gate 层已拦」≠「本维度命中」，scout 初版被 2 条他维度兜底样本骗了**：scout 把 'Trust me, one day I will buy you a house...' 与 'Just a little longer and everything will be yours...' 记作 HIT，单维实测 future_faking 全部 false——前者由 sealioning 兜底、后者由 perfect_error 兜底。真实口径是 10 条纯漏判 + 2 条兜底，而 r688 交接簿的 8/12 就来自这个偏差。判据：**每个「已拦」样本都要跑一次单维确认归属维度**，gate 层非 pass 只证明「有东西拦了」，不证明「本维度拦了」。
+2. **E1 的 soon 与 as soon as 碰撞，E4b 分支的 inject 独立性证明失效**：'As soon as I am ready, we will get married.' 被 E1 的 soon 捕获（\bsoon\b 在 as soon as 里独立成词），摘除 E4b 后样本仍命中，负例验证当场抓出。修法是 E1/E2 的 soon 一律加 `(?!\s+as\b)` 负向断言——as soon as 是条件连词归 E4 管。教训：**远期时间词表收 soon 时必须想清楚 as soon as 这个高频复合连词**，负向断言要写在词这一级。
+3. **F 组 inject 首版用 split('|') 切分支全部落空**：正则 source 按 `|` 切会把 `(?:a|b|c)` 内部的选择支一起切碎，过滤目标永远匹配不到完整分支 → 摘除没发生 → 4 个断言假阳性（测试仍绿）。改成把目标分支的判别片段 replace 成 `(?!x)x`（永不匹配）并断言 `patched !== src` 证明摘除真实发生。教训：**任何对正则 source 的字符串操作都不要按 | 切分**。
+4. **P4 与 P1 双腿重叠，无专属样本时 inject 抓不到**：'tonight you have to give me what I want' 同时命中 P1（tonight + you have to）与 P4（give me what I want），摘 P4 后 P1 仍拦截，负例报「守卫失效」。补一条不含 P1 时间词的专属样本（'I will take care of you forever. Give me what I want.'）后才抓到。教训：**每个新分支都要有一条只由它提供 T 腿的样本**，否则 inject 独立性证明是空的。
