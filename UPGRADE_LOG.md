@@ -1,3 +1,64 @@
+# r701 轮报告（v6.8.48）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选题池来自 r700 探测器
+落盘 /tmp/hf-scout-700.txt（纪律：已落盘但维度未做完时下一轮直接读
+文件，不重新探测），本轮 /tmp/r701-preprobe.js 对两个合格候选复验
+仍成立（circular 6/6 仍 pass、pity 5/5 仍 pass）。喂给 decision 本体
+（/tmp/decide-run-r701.js 读 /tmp/decide-opts-r701.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A circular_reasoning 新维度 | **0.90** | 攻击 10 条漏判 8/10、真零命中 7/8、误伤 0/12；复验 6/6 仍 pass | **选中** |
+| B appeal_to_pity 补族 | 0.89 | 攻击 5/10 漏判、零命中 5/5、误伤 0/12 | 落选（缺口面最小，与 A 仅差 0.01） |
+| C stereotype 出身歧视族 | 0.84 | 攻击 10/10 漏判、零命中 10/10、误伤 1/12（存量） | 落选（身份词表豁免设计难度大，连续第四轮记录） |
+| D appeal_to_authority 补族 | 0.80 | 攻击 7/10 漏判、零命中 7/7、误伤 4/12（存量） | 落选（需先修存量误伤，两个动作耦合） |
+
+decision 返回 composite_score 0.90 / confidence 0.88 / identity
+alignment 100%，无拒选。诚实标注：候选的 feasibility/consequence_
+value/risk/confidence 四段判据由我构造，decision 本体在四个候选间
+选出 A。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「因为这是对的，所以它是对的」「这本书是好书，因为它写的都是好内容」「他是天才，因为天才才写得出这样的作品」「数据准确，因为数据从来不会错」「他专业，因为不专业的人做不到这么专业」这类**把结论本身当作结论的证据**从 pass 变 verify | 攻击族 20/20 漏判清零（中 10 + 英 10，gate 层全部非 pass） | ✅ 升级（真升级①新维度） |
+| src/circular-reasoning.js：程序化判定——跨连接词的同词共现（中文 2-6 字纯汉字 n-gram、功能词片段跳过；英文 4+ 字母实词、词干/复数/否定前缀/相邻实词对）× 定义式复述框五类（主语重启/类指名词化/恒常否定/全称判断/同构复述；EN 六框） | 循环论证族从射程外变可判别 | ✅ 升级（模式库本体） |
+| src/index.js：十处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports/FALLACY_PATTERNS 补链式形） | 第 136 维度在线，dimensions 键 136 | 维护（接线，升级的必需部分） |
+| test/round-701-circular-reasoning.js 18 断言 + scripts/negative-test-circular-reasoning.js 5/5 注入点全红 | 攻击 20/良性 36/边界 10/分工 8/gate 层 17 | ✅ 升级（验收证据） |
+| 文档三处同步：维度总数 135→136、verify 94→95、SKILL/AGENTS verify 列举补齐（顺带修 r699 漏登 appeal_to_novelty、更早漏登 love_bombing、两份重复的 appeal_to_pity 条目） | npm 用户看到的维度数恢复真实 | 维护（文档口径） |
+| bump 6.8.47→6.8.48 四处 + README changelog + 规格表版本戳两处 | 新版本可感知 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度总数 135→136、verify 计数 94→95、SKILL/AGENTS verify 列举与 VERIFY_DIMS 精确一致各 95、规格表版本戳两处同步 6.8.48、changelog 覆盖 v6.8.48）
+- node test/round-701-circular-reasoning.js — 18/18（攻击 20：中 10 + 英 10；良性 36：中 26 + 英 10；边界锁 10；分工边界 8；gate 层 17）
+- scripts/negative-test-circular-reasoning.js — 基线 18/18 PASS + 5/5 注入点全部断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 136，summary 引用 99；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 commit 转绿）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **appeal_to_pity 补族候选**——decision 落选（0.89，与选中项仅差 0.01）。攻击漏判 5/10、零命中 5/5、误伤 0/12，缺口成立且零误伤，下轮可直接做。
+2. **stereotype 出身歧视族**——decision 落选（0.84），连续第四轮记录。攻击漏判 10/10、零命中 10/10、误伤 1/12（存量）。身份词表豁免面大（「他虽然是农村出身，但技术能力很强」必须 pass）。
+3. **appeal_to_authority 补族**——decision 落选（0.80）。4 条存量误伤（引述《柳叶刀》研究/研究表明/权威机构发布标准/业内人士透露）不修就上线会拉高误拦基线，需先修存量再补族。
+4. **FUNCTION_NGRAM / META_EXEMPT_EN / DEFINITIONAL_MARKERS 三个常量无专属负例注入点**——实测杀掉后测试仍全绿：现有样本集里没有一条的判定结果依赖它们（FUNCTION_NGRAM 是防御性常量；META_EXEMPT_EN 的元话语形状本轮未构造；DEFINITIONAL_MARKERS 帧逻辑重写后只剩 rep 前缀拒绝一处窄用途）。已在负例脚本头部诚实记录，不伪装成已覆盖。
+5. **「我们都是普通人，因为大家都是普通人」判 verify**——该句本质是同义反复（普通人 because 普通人），verify 级提示补充独立依据是合理行为，不算误伤，未锁边界。
+6. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第七轮记录。
+7. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+8. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（四条）
+
+1. **英文正则的缩写/引号被 patch 转义层写坏，lint 还报「非本轮引入」**：往 enDefinitionalFrame 补 don't 分支时 patch 落入双层反斜杠 + 未转义引号 → SyntaxError，而 lint 提示「Pre-existing lint errors — this edit didn't introduce new ones」是误判。修法用 Node 按行替换（不在 patch 里写反斜杠密集行），且 patch 含引号的字符串后必须立刻 node --check。
+2. **英文腿 4 个 miss 同一根因：right 半句没 trim**——前导空格让 ^ 锚点全失效（「It is right because it is right.」的 it is right 匹配不上），极像「英文模式没写」。修法：split 后 trim + 去尾标点。
+3. **帧逻辑顺序无关化放过 2 个真误伤**：「他总是有理由」（个体习惯，新增了事实）与「事情从来如此」（传统诉诸）都含恒常标记+重复词。收紧为恒常标记必须带否定（从来不会错/从不说谎），且 从来/永远/总是 从主语重启尾表移除——攻击 6 改走 HABITUAL_OK 后仍命中。两条误伤已锁进 C8 边界。
+4. **豁免词表过宽把攻击句自身豁免掉**：REPORTING_EXEMPT 首版收裸「说」，「他从来不说假话」「他没说过谎」两条攻击被误豁免（2/10 静默不命中，症状像「正则没写对」）。收紧为主语锚定引述（他说/据报道）+ 显式转述动词。
+
 # 第 699 轮报告（v6.8.46 — 第 135 维度 appeal_to_novelty 诉诸新潮，升级①）
 
 ## 心虫选中项 + 分数 + 身份对齐
