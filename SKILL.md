@@ -403,7 +403,7 @@ GB/T 42497-2023 (*Security Requirements for AI-Generated Content*):
 
 | Checkpoint | Module |
 |-----------|--------|
-| Generated-content safety | `checkOutput` / `discriminate` (142 dimensions) |
+| Generated-content safety | `checkOutput` / `discriminate` (143 dimensions) |
 | Training-data safety | `DataEraser` + memory ACL |
 | **Outbound protection** | **`heartflow_check_outbound`** (gate-outbound.js) |
 | Algorithmic transparency | `enginePacing` + `selfHeal` |
