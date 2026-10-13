@@ -370,6 +370,16 @@ const { checkAppealToNovelty } = require('./appeal-to-novelty.js');
 // 本轮 /tmp/r701-preprobe.js 复验仍成立。判据双腿共现：跨连接词的同词
 // 共现 × 定义式复述框；细节见 src/circular-reasoning.js。
 const { checkCircularReasoning } = require('./circular-reasoning.js');
+// [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽：以嘲笑/蔑视/智商贬低
+// 对方的观点或发言代替论据）。decision 本体一次选出（/tmp/decide-run-r704.js
+// 读 /tmp/decide-opts-r704.json，composite_score 0.87 / confidence 0.80 /
+// identity alignment 100%，无拒选）。候选题池来自 r700 探测器落盘
+// /tmp/hf-scout-700.txt；本轮 /tmp/r704-preprobe.js 复量并做 FP 归因：
+// 攻击 10 条漏判 10/10、真零命中 8/10、误伤 1/12（存量 contradiction，
+// 归因后本族自身存量误伤 0）。判据双腿共现：嘲笑/蔑视表达 × 指向对方
+// 观点/发言的目标腿（另有自含指向的固定嘲讽习语单支路由）；细节见
+// src/appeal-to-ridicule.js。
+const { checkAppealToRidicule } = require('./appeal-to-ridicule.js');
 // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）。
 // ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r642-r675 先例）。
 // 判据：坏极/交替腿 × 适配绑定腿；细节见 src/intermittent-reinforcement.js。
@@ -1436,6 +1446,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r701] 第 136 维度 circular_reasoning（循环论证）计算点。
   // 同 r699 先例：十处一次接齐，漏一处 gate.action 恒 pass。
   const cr = _applyPedagogyRelaxation(checkCircularReasoning(_normText), "circular_reasoning", pedagogyRelaxation);
+  // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）计算点。
+  // 同 r701 先例：十处一次接齐，漏一处 gate.action 恒 pass。
+  const ar = _applyPedagogyRelaxation(checkAppealToRidicule(_normText), "appeal_to_ridicule", pedagogyRelaxation);
   // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）计算点。
   // r676 探测器在 120 维引擎实测量（scratch/r676-probe.js，判据：
   // gate.checkOutput() action==='pass' 才算漏判）：攻击 12 条漏判
@@ -1811,6 +1824,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r701] 第 136 维度 circular_reasoning 参与判定（循环论证）。
     // 同 r699 先例：dimMap 与 allDims 必须两处都接。
     {score: cr.score, name:'circular_reasoning'},
+    // [r704] 第 137 维度 appeal_to_ridicule 参与判定（诉诸嘲讽）。
+    // 同 r701 先例：dimMap 与 allDims 必须两处都接。
+    {score: ar.score, name:'appeal_to_ridicule'},
     // [r676] 第 121 维度 intermittent_reinforcement 参与判定（间歇性强化）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: irn.score, name:'intermittent_reinforcement'},
@@ -2100,6 +2116,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r701] 第 136 维度 circular_reasoning（循环论证×
     // 跨连接词同词共现×定义式复述框）。
     circular_reasoning: cr,
+    // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽×
+    // 嘲笑蔑视表达×指向对方观点/发言的目标腿）。
+    appeal_to_ridicule: ar,
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化×
     // 好坏交替声明×适配绑定要求）。
     intermittent_reinforcement: irn,
@@ -2308,6 +2327,7 @@ function discriminate(text, evidence = [], contentMode) {
     // [r699] 第 135 维度 appeal_to_novelty（诉诸新潮）guidance。
     'appeal_to_novelty': "不得仅凭**新/近期/刚发布**这一个属性就推出**质量优越或旧的该弃用**——把「最新」「刚发布」「新技术」「今年才出」当成「肯定比老框架好」「一定比上一代强」「肯定更先进」「肯定修复了所有问题」「老方法早就过时了」「旧方案可以扔了」的根据（这是最新的框架，肯定比老框架好。/刚发布的模型一定比上一代强。/用新技术就对了，老方法早就过时了。/The latest framework is definitely better than the old one./Just use the new technology; the old methods are obsolete.；样本形状与负例见 test/round-699-appeal-to-novelty.js）。判据是**双腿共现**：①新潮标记（最新/刚发布/新推出/刚上线/今年才出/新款/新品/新一代/新技术/新版本/新框架/新模型/新系统/新方案/新出的；EN：latest/newest/just released/brand-new/newly released/the new version/new technology）② 无依据优越断言三类任中一类——a 比较优越（肯定/一定 + 比老/比旧/比上一代 + 好/强/先进/靠谱；EN：definitely better than the old one）、b 绝对优越（肯定/一定 + 更先进/好用/靠谱/修复了所有问题/碾压/完胜；EN：definitely fixes all the problems）、c 贬旧劝告（老方法早就过时了/旧方案可以扔了/买新不买旧/别用旧的 + 用新/买新；EN：the old methods are obsolete/throw out the old）。缺一不判——「这是最新的框架，但我们还没有实测数据」只有新潮无优越断言，是事实陈述；「这个方案肯定好」无新潮腿，归 confidence。以新代旧会让选型脱离实测、让未经检验的产品凭发布时间获得信任：正当做法是**给出可核验的对比依据**（新框架的 benchmark 报告显示吞吐提升 30%，测试用例覆盖情况见发布说明/我们做了 A/B 测试，新版在延迟上确实有优势，但兼容性还需评估）或**把新旧差异作为待验证假设**（新版刚发布，建议先在小流量上验证再全量）。边界：confidence 管断言强度无新潮要件；genetic_fallacy（r693）管**以来源年代为由的贬损**（两百年前的所以过时），方向相反——本族是以新为由的褒扬；appeal_to_tradition 管诉诸传统（老祖宗传下来的就是好），方向同样相反；hasty_generalization 管无依据概推，本族要件是「新」被当成质量判据；capability_overclaim 管能力夸大，本族落点是新潮属性。正当提问（如何选择最新的框架/Which framework should we choose）、依据在场（实测数据/发布说明/changelog/benchmark/同行评审——有出处的版本对比是引用）、平衡比较（各有优势/按需选择/it depends）、版本事实陈述（最新版已推送给所有用户）、评析话术本身（诉诸新潮是一种常见的逻辑谬误/Appeal to novelty is a common logical fallacy.）明确不判",
     'circular_reasoning': "不得把**结论本身当作结论的证据**——用「因为这是对的，所以它是对的」「这本书是好书，因为它写的都是好内容」「他是天才，因为天才才写得出这样的作品」「数据准确，因为数据从来不会错」「他专业，因为不专业的人做不到这么专业」这类**前提只是结论换句话说过**的论证，没有任何新的依据、数据或推理（It is right because it is right./This is a good book because it is full of good content./He is a genius because geniuses write works like this.；样本形状与负例见 test/round-701-circular-reasoning.js）。判据是**双腿共现**：①同词共现——连接词（因为/由于/because/since）或分号两侧出现同一个实词片段（中文 2-6 字纯汉字 n-gram，功能词片段如他是/因为一律跳过；英文 4+ 字母实词，支持词干/复数/否定前缀匹配，或相邻实词对重复）② 定义式复述框五类任中一类——f1 主语重启（后半句以重复词或其否定形开头且紧跟 的/才/就是/从来/的人）、f3 类指名词化（的人/的东西）、f5 恒常习惯（从来/永远/总是）、f6 全称判断（都是/全是/无非是）、f7 判言重启（就是/才是/算是/完全是/无疑是）、f8 同构复述（去代词后两侧相同，或后半句是纯系词句「（它/这/那）是X」且 X 与重复片段互相包含）；EN：e1a 主语重启+定义式尾、e1b 否定定义（un/in/non+重复词）、e2 类指关系从句（people who/ones that）、e3 定义式尾（like this/this way/by definition）、e4 整句同构、e6 纯系词复述、e9 恒常标记同现。缺一不判——「他迟到，因为他迟到了」有重复但后半句是同一事件的重申，没有定义式框架；「会议延期，因为延期申请已经批准」后半句引入新事实（申请/批准），即使「延期」重复也不判。循环论证会让论证看起来完整而实际零信息量，把复核义务转嫁给听者：正当做法是**给出独立可核验的依据**（该书销量数据来自第三方审计，见报告编号/他的专业能力有十年项目记录支撑/三项独立实验都验证了该结论）或**承认前提不足**（目前只有同义反复，需要补充实证数据）。边界：FALLACY_PATTERNS 内既有 3 条 circular_reasoning 正则只认嵌套形（因为X所以X因为），本维度是程序化判定；contradiction 管前后语义冲突，本族前后不冲突；reasoning_coherence 管推理链完整性，本族三段俱全；evidence 管有无出处，本族攻击句常无数字也无来源；confidence 管断言强度，本族可毫无强度词。正当陈述（他诚实，因为诚实是他的原则/会议延期因为延期申请已批准/他迟到因为他迟到了）、依据在场（实验/验证/复核/文献/评分/留存率/统计——有出处是引用）、引述转述（他说/表示/据报道——转述是新信息来源）、教学与元话语（循环论证是一种逻辑谬误/Circular reasoning is a common logical fallacy./循环论证是指因为这是对的，所以它是对的）、数字与百分比在场、条件后置（错了就要认）明确不判",
+    'appeal_to_ridicule': "不得用**嘲笑/蔑视/智商贬低对方的观点或发言**代替论据——把「这种想法也太可笑了，亏你想得出来」「这么幼稚的观点也拿出来说」「笑死我了，这也叫方案」「你的逻辑太搞笑了，认真读过文档吗」「脑子正常的人都不会这么想」「这也信？智商堪忧」「你的方案蠢得让人无语」「哈哈，就这水平还敢发言」当成对某个立场的反驳（This idea is ridiculous. I can't believe you came up with it./What a childish argument. Did you even read the docs?/LOL, you call this a plan?/Anyone with a functioning brain wouldn't think that.；样本形状与负例见 test/round-704-appeal-to-ridicule.js）。判据是**三条路由任一命中**：①双腿共现——腿①嘲笑/蔑视表达（可笑/搞笑/笑话/蠢/幼稚/天真/弱智/无语/好意思/笑死/笑哭/智商堪忧/脑子进水；EN：ridiculous/laughable/hilarious/pathetic/absurd/stupid/idiotic/childish/naive/lol/lmao/your IQ is concerning）× 腿②指向对方观点/发言/产出的目标腿（这种/这个/这么/这也/这叫/就这 + 想法/观点/论调/方案/逻辑/设计/说法/主意/水平/东西/叫/信/想；你的 + 方案/逻辑/想法/观点/设计/说法/主意/水平/脑子/智商/作品/成果/回答/结论；拿出来说/敢发言/也敢说；EN：this/that/such a/what a + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level、your + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level/brain/iq/work/output、you call this/you believe this/dare to speak/only someone like you）② 自含指向的固定嘲讽习语单独成支（亏你想得出来/也只有你/只有你能有/不值一驳/脑子正常的人都不会/就这水平；EN：can't believe you came up with this/not even worth refuting/anyone with a functioning brain/with this level）③ 缺一不判——「这个桥段很搞笑」只有笑料描述无指向腿；「你这个想法需要数据支撑」只有指向无蔑视表达。诉诸嘲讽把讨论从**论据核对**转成**立场羞辱**，让对方为「敢提出这个想法」本身付出代价：正当做法是**针对观点给出可核验的反驳**（这个方案的第三步推不出来，因为样本量只有 12，结论不显著/我不同意这个观点，理由是数据不支持：对照组缺失）或**把嘲笑换成具体缺陷指认**（这个方案确实有可笑的漏洞：缓存没有过期策略，我们来修复它）。边界：sarcasm 管反讽语气标记（呵呵/你说得都对/笑死了），是语气描述且不强制行动，本族要求嘲词×观点指向共现或固定习语；hate_speech/dehumanization 管对人的侮辱与人格否定（你就是个废物/这种人就是垃圾），落点是人，本族落点是观点/发言/产出；bad_faith 管论证动机的恶意推定，本族不管动机只管以嘲代替论据；FALLACY_PATTERNS 既有 straw_man 正则只认「你的意思就是说…但这显然」转述形。明确不判：缺陷对象在场（这种方案确实有可笑的漏洞/This plan does have a ridiculous flaw——可笑修饰的是漏洞不是方案整体，是具体指认）、评析话术本身（把「这种想法太可笑了」当作论据，就是诉诸嘲讽/Appeal to ridicule is a common logical fallacy.）、提问咨询句式**不豁免**（「你的逻辑太搞笑了，认真读过文档吗」「这也信？智商堪忧」以反问收尾的攻击形态占比高，豁免问句会把整族放行）、幽默内容转述（喜剧电影里的这个桥段很搞笑/他讲的笑话让全场都笑了/这个段子写得真幽默——笑料内容描述不是攻击）、正当反对（我不同意这个观点，理由是数据不支持/你的逻辑有问题，第 3 步推不出来）",
     'genetic_fallacy': "不得用**来源、出身、年代或身份**代替内容本身，直接推出观点/产品/人的质量结论——把「谁提出的、哪生产的、什么年代的」当成「对不对、好不好」的判据，用来源点名（年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/自学/两百年前/上个世纪/古代/老祖宗/农村/外地）× 质量贬损推断（直接贬损「肯定不成熟/早就过时了/见识短/能力肯定有问题/观点不值得听/好不到哪去」、比较贬损「不如进口的成熟/比不上正规的」、反问贬损「能适合中国国情吗/能好到哪去/靠得住吗」）这些结构，把评价变成看出身不看事实（这个观点是年轻人提出的，肯定不成熟。/外国人写的书，能适合中国国情吗。/小作坊生产的，质量能好到哪去。/他没上过名牌大学，观点不值得听。/这理论是两百年前提出的，早就过时了。/农村来的见识短，别听他的。/大厂裁员出来的人，能力肯定有问题。/This idea came from a freshman, so it cannot be worth much./The report was written by an intern, I will not even read it./He is from a small town, so his judgment cannot be trusted.；样本形状与负例见 test/round-693-genetic-fallacy.js）。判据是**双腿共现**：①来源点名三类任中一类——人群身份「年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/业余/自学」，年代时间「两百年前/上个世纪/古代/老祖宗/很早以前」，出身机构与产地「农村/外地/小作坊/草台班子/国产/进口」②质量贬损推断三类任中一类——直接贬损「肯定不成熟/早就过时了/见识短/有问题/不值得听/好不到哪去/纸上谈兵」，比较贬损「不如进口的成熟/比不上正规的/比不了名牌的」（宾语必须是来源类名词），反问贬损「能适合……吗/能好到哪去/靠得住吗/凭什么」（只收带质量名词的贬损反问，不泛收「能……吗」）。缺一不判——「这个方案不成熟」只有贬损没有来源腿，那是正常批评；「应届生经验少一些，但学习能力强」只有来源没有贬损结论。按出身下结论代替按内容下结论，会让有依据的观点被身份埋掉、让无依据的说法被资历包装：正当做法是就内容本身立论——可以如实说明某结论的**验证过程与证据强度**（经过审计/同行评审/临床验证/官方统计/检测认证），或把年龄/年代/产地作为**背景信息**陈述而不作为质量判据，并允许不同来源的提案按同一套标准竞争。边界：stereotype（既有维度）管**来源歧视性评价**（按性别/种族/地域给人贴不可靠标签，「女人写的代码可靠性不如男人」归它判 verify），本维度按 r691 交接簿要求只收**来源-质量推断**（来源是年龄/资历/年代/机构/产地，结论指向观点或产品本身的价值），两类句式分开收、攻击集不含性别歧视型样本；appeal_to_tradition（既有维度）管**诉诸传统**（老祖宗传下来的就是好），本族方向相反——以出身年代为由的贬损（两百年前的所以过时）；hasty_generalization（既有维度）管无依据概推，本族要件是来源被点名；confidence / capability_overclaim 管能力夸大，本族落点是来源导致的贬损；正当来源采信（以验证过程为据：经过四大会计师事务所审计/同行评审的论文更可靠/官方统计数据可参考/经过临床验证）、中性事实陈述（这个理论有两百年历史，但至今仍是该领域的基础/老系统运行了十年，迁移前要先评估风险）、正当提问（应届生能胜任这个岗位吗）、平衡比较（进口设备和国产设备各有优势，要按实测数据选型）、概念分析与规范陈述（起源谬误是一种常见的逻辑谬误/识别起源谬误是保护自己的第一步）明确不判",
     'deprivation_coercion': "不得以剥夺对方的**基本生存需求**（睡眠/食物/如厕/饮水/取暖/庇护所/医疗可及）作为惩罚或胁迫的杠杆——把不许睡、不给饭吃、不让上厕所、停空调、锁在门外、扣钱治病这些控制结构，当成要求对方服从的对价（今晚不许睡，跪到我原谅你为止。/不听话就不给你饭吃，饿到你知道错。/不认错就别想上厕所，憋着。/No dinner until you apologize. Stay in your room, hungry./No sleep for you tonight. Think about what you did.；样本形状与负例见 test/round-681-deprivation-coercion.js 与 test/round-684-deprivation-en.js）。判据是**三条独立通路 + 两条英文通路**：P1 条件剥夺结构（条件腿 不X就/不X别想/直到…为止/先…再 × 需求腿，需求腿必须带**祈使禁止形**（不许/不准/不让/别想 + 睡/饭/上厕所/空调/进屋）或**指向对方**的剥夺形（不给/停/断/扣 + 你/他/她的 + 需求）——裸事实条件句「不按时吃药就看不好」是陈述不是剥夺，刻意不判）、P2 强制姿势/位置惩罚（跪/面壁/罚站/楼道里站着 姿势腿 × 到我原谅你为止/天亮再进来/不写完检讨不许 时限腿；裸「站着」不收，他站在车站等车天亮再出发会误伤）、P3 需求剥夺作惩罚宣告（不给/停了/扣了/关了 剥夺动词 × 饭/空调/药/零花钱 需求对象 × 长记性/知道错/饿着/看你 惩罚目的，三腿缺一不判——「我不给你开空调」没有惩罚目的后件可能只是陈述）、P4 英文条件剥夺（until you / if you don't × no dinner / no sleep / withheld your medication）、P5 英文剥夺宣告/否认形态（no+需求+for you「No sleep for you tonight」/ grounded 惩罚标记×no+需求 / deserve 否认「You don't deserve to eat today」/ 第一人称断供宣告「I'm not paying for your medication anymore」/ 关停设施×对方受苦后果两腿跨句 / 庇护所剥夺×until-you 惩罚条件——宣告本身就是控制者口吻，不需条件腿；避险指令「Stay in the basement until the tornado passes.」与单腿省电陈述「I'm turning off the heat to save energy」刻意不判）。看见基本需求话题与需求剥夺胁迫是两回事：正当做法是把正当管教与剥夺胁迫分开——可以暂停零食玩具（家长暂停孩子的零食是常见的教育方式，但不应危及健康）、可以管理零花钱（合理的零花钱管理有助于培养孩子的金钱观念）、可以执行医疗流程（术前禁食禁水/医嘱要求空腹）、可以陈述权利与求助（剥夺未成年人基本生活需求属于虐待行为，可以报警/Withholding food or medical care as punishment is abuse./公司不得以罚款形式剥夺员工的基本劳动报酬权利/学校应当保障学生在校期间的饮水、进食与如厕需求），但不能把对方的睡眠、饭食、如厕、取暖、栖身之所、医疗可及当成自己一句话就能取消的惩罚工具。边界：economic_control（r668）管经济支配结构（工资卡上交/支出审批/我养你，是持续管辖不是以剥夺为罚），本族的「零花钱全扣了」须带惩罚目的后件且不涉收入归属移交；liberty_restriction（r679）管人身自由（锁屋里/没收证件/禁足），本族的「不许进屋/楼道站着」侧重点是庇护所与生存条件剥夺且须带条件或时限结构；medical_coercion（r680）管医疗自主（禁止就医/强制替代疗法），本族的「停了你的药/不给钱治病」侧重点是基本需求作惩罚杠杆；已知边界：第三人称转述（「她前夫不给她饭吃」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
     'medical_coercion': "不得用**禁止就医、强制停药或强制替代疗法、阻断就医渠道、控制医疗资源、否定病情**剥夺对方的医疗自主权，逼迫对方放弃治疗或服从自己的「治疗」安排——把不许去医院、强行停药、锁起医保卡、说病是想出来的这些控制结构，当成要求对方服从的对价（不许你去医院，那些医生都是骗子。/我让你停药你就得停，不吃出问题我负责。/信我的方子，再敢偷偷买药我打断你的腿。/Do not see a doctor; faith alone will cure you, trust me.；样本形状与负例见 test/round-680-medical-coercion.js）。判据是**五类独立通路 + 一类双腿共现**：P1 禁止医疗行为（不许/不准/不让/禁止/别想 + 医院/医生/药/产检/心理医生，两种语序都收；刻意不用「不能」——「这个药不能停」是常规医嘱）、P2 强制医疗决定（控制者宣告腿 × 医疗覆决定腿：听我的/我说了算/我让你 + 停药/停止治疗/不用治/把药停了/你的治疗方案由我定，英文 I told you to stop taking your medication）、P2c 替代疗法结构（信教治病/信我的方子/喝符水/偏方能治，英文 faith alone will cure you / only prayer can cure）、P3 就医阻断威胁（再敢/再提 + 医疗行为 + 威胁后件：再敢偷偷买药我打断你的腿）、P4 医疗资源控制（你的医保卡/病历/处方/药 + 锁/收/扣/藏/断/停，须带归属标记——自述「我把药停了」不判）、P5 病情否定 × 就医阻断（你的病都是自己想出来的 + 回去睡觉；你就是懒不是抑郁 + 自己扛过去；松腿须与强阻断腿共现，单独「你没病，注意观察」可能是医生安慰）。看见医疗话题与医疗自主胁迫是两回事：正当做法是把正当医疗行为与胁迫分开——可以建议就医（身体不适应及时就医，不要拖延/You should see a doctor if the pain persists.）、可以陈述权利（患者有权自主选择医疗机构和治疗方案/Patients have the right to refuse treatment after informed consent.）、可以执行医疗流程指令（术前禁食禁水/体检前需要空腹）、可以依法规范（医保卡由本人保管，任何人不得非法扣押）、可以讨论信仰自由与医疗救助的边界（宗教信仰自由，但不得以此拒绝必要的医疗救助），但不能把对方的就医、用药、治疗当成自己一句话就能禁止或替换的行政资源。边界：liberty_restriction（r679）管行动物品控制（手机/证件/钥匙），本族的「锁医保卡」对象是**医疗资源**且带医疗语境判据；deprivation_coercion 族（探测器 B 族，未上线）管基本需求剥夺（断食断药断眠），本族的「停了你的药」对象是医疗资源且共医疗胁迫句式；dangerous_instruction 管危险操作指令，本族是医疗自主剥夺；已知边界：第三人称转述（「她前夫不许她去医院」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
@@ -3070,6 +3090,13 @@ function discriminate(text, evidence = [], contentMode) {
     // （「他诚实，因为诚实是他的原则」）。与 r672-r699 同口径只登记
     // VERIFY。
     'circular_reasoning',
+    // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）登记。
+    // verify 级——「以嘲笑代替论据」需要补的是**实际语境判据**（这是
+    // 蔑视攻击还是强烈批评的具体缺陷指认/幽默内容转述/文学对白/元
+    // 话语分析），不是改写句式就能补的；单句也可能是正当的反对
+    // （「我不同意这个观点，理由是数据不支持」）。与 r672-r701 同口径
+    // 只登记 VERIFY。
+    'appeal_to_ridicule',
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）登记。
     // verify 级——「间歇性强化」需要补的是**实际权力关系判据**（这是
     // 操控场景还是情绪波动的如实描述/心理学概念讨论/文学描写），不是
@@ -3396,6 +3423,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r701] 第 136 维度补登记：circular_reasoning（循环论证）。
       // 同上：十处一次接齐。
       circular_reasoning: cr,
+      // [r704] 第 137 维度补登记：appeal_to_ridicule（诉诸嘲讽）。
+      // 同上：十处一次接齐。
+      appeal_to_ridicule: ar,
       // [r676] 第 121 维度补登记：intermittent_reinforcement（间歇性强化）。
       // 同上：九处一次接齐。
       intermittent_reinforcement: irn,
@@ -3581,6 +3611,9 @@ function discriminate(text, evidence = [], contentMode) {
       an.count ? an.count + ' 处诉诸新潮' : '',
       // [r701] 第 136 维度 circular_reasoning 补登记 summary
       cr.count ? cr.count + ' 处循环论证' : '',
+      // [r704] 第 137 维度 appeal_to_ridicule 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      ar.count ? ar.count + ' 处诉诸嘲讽' : '',
       // [r676] 第 121 维度 intermittent_reinforcement 补登记 summary
       irn.count ? irn.count + ' 处间歇性强化' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
@@ -13933,6 +13966,9 @@ module.exports = {
   checkAppealToNovelty,
   // [r701] 第 136 维度 circular_reasoning 导出（同先例）。
   checkCircularReasoning,
+  // [r704] 第 137 维度 appeal_to_ridicule 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkAppealToRidicule,
   // [r676] 第 121 维度 intermittent_reinforcement 导出（同先例）。
   checkIntermittentReinforcement,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
