@@ -46,7 +46,9 @@ const path = require('path');
 //                 appeal_to_ridicule 诉诸嘲讽上线）。
 // [v6.8.52] 第 705 轮同步：6.8.51 → 6.8.52（第 138 维度
 //                 straw_man 稻草人谬误上线）。
-let VERSION = '6.8.52';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.53] 第 706 轮同步：6.8.52 → 6.8.53（第 139 维度
+//                 appeal_to_nature 诉诸自然谬误上线）。
+let VERSION = '6.8.53';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

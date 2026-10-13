@@ -1,3 +1,65 @@
+# r706 轮报告（v6.8.53）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自 r700 探测器落盘
+/tmp/hf-scout-700.txt 的剩余族（纪律：已落盘直接读文件继续，不重新探测；
+standard_shift 已于 r700、circular_reasoning 已于 r701、appeal_to_pity 已于
+r702、stereotype 出身歧视族已于 r703、appeal_to_ridicule 已于 r704、
+straw_man 已于 r705 上线，均排除），本轮 /tmp/r705-preprobe.js 复量
+（样本集与 r704/r705 完全一致，跨轮可比）并做 FP 归因。三个候选喂给
+decision 本体（/tmp/decide-run-706.js 读 /tmp/decide-opts-706.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A appeal_to_nature 新维度 | **0.92** | 攻击漏判 8/10、真零命中 5/8、良性误伤 1/12 且全部归因存量维度（unsupported_claim/vagueness/moral_foundations/appeal_to_authority），本族自身存量误伤 0 → 探测器判定合格 | **选中** |
+| C standard_shift 补 VOID_ZH 契约作废窄口 | 0.82 | 4 条样本 2 条漏判且零命中（「之前答应的标准不算数」「原来谈的条件不算数了」），r700 起连续第七轮记录；缺口面最小（2 条）且性质是同族补词形、按真升级操作定义不计四项之一 | 落选 |
+| B appeal_to_authority 修存量误伤 + 补反质疑族 | 0.75 | 攻击漏判 7/10、真零命中 7/7，但良性误伤 4/12 中 2 条是该维度自身存量模式命中良性（「研究表明适量运动有益健康」「权威机构发布了新的行业标准」），补族与收紧存量互相牵制，preprobe 连续第三轮判不合格 | 落选 |
+
+decision 返回 composite_score 0.92 / confidence 0.9 / identity alignment
+100%，无拒选。诚实标注：候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在三个候选间选出 A。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「这是纯天然植物提取的，肯定比化学药安全」「全天然成分，没有任何添加剂，所以放心吃」「这东西是野生的，比养殖的有营养」「自然熟的果子比催熟的健康，这是自然规律」「我们这是纯草本配方，没有任何化学成分」「原始森林里的空气比城里的好，毕竟没有工业污染」「这部手机用的是天然材质，手感肯定更高级」「这个疗法用的是自然疗法，比西医副作用小」「母乳是天然的，所以一定比配方奶好」「老祖宗传下来的做法，自然是经过时间检验的」这类**以天然/自然/野生/祖传为依据断言更安全或更优越**的句式从 pass 变 verify | 攻击族 21/21 漏判清零（gate 层 21/21 全非 pass） | ✅ 升级（真升级①新增维度） |
+| src/appeal-to-nature.js：双腿共现模块——腿①自然性断言八支（(纯/全/100%)天然+名词、纯植物/纯草本提取、野生、自然熟/自然农法/原生态、老祖宗传下来+做法/偏方、古法制作、原始森林/深山空气/无工业污染、自然疗法、母乳是天然的）× 腿②优越/安全结论六支（比化学/人工/养殖/城里/西医/普通+优越词、比X更+优越词、肯定/一定+优越词、放心吃/用、没有任何化学成分/添加剂、经过时间检验），中英双腿分支对照（EN a-h × a-e，含 100% herbal / natural materials / passed down from ancestors / primeval forest / time-tested 形）；豁免：元话语评析（META_EXEMPT 中英双侧） | 第 139 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。**刻意不接 FALLACY_PATTERNS 第十处**——静态正则没有豁免层（同 r703/r704/r705 先例） | dimensions 键 138→139 | ✅ 升级（接线） |
+| test/round-706-appeal-to-nature.js 10 断言 + scripts/negative-test-appeal-to-nature.js 负例 29/29 注入点全断言红 | 攻击 21 中英对称/良性 16/单腿边界 8/相邻维度分工 4/豁免承重 2/gate 层 21/接线 9 | ✅ 升级（验收证据） |
+| bump 6.8.52→6.8.53 六处（VERSION/package.json/SKILL.md frontmatter/两处描述戳/src/core/version.js）+ README changelog + 三份禁改文档维度数 138→139 共八处（README banner/管线/规格表、SKILL description/规格表/正文标题/checkOutput 描述、AGENTS 横幅/正文标题）+ verify 计数 97→98 三处（SKILL 正文/SKILL 列举/AGENTS 列举）+ verify 与全列举补 appeal_to_nature + AGENTS 维度史加 v6.8.53 条目 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 138→139 八处同步、verify 计数 97→98 三处、verify 与全列举补 appeal_to_nature、规格表版本戳、changelog 覆盖 v6.8.53；修复过程中从 7 失败降到 0）
+- node test/round-706-appeal-to-nature.js — 10/10（攻击 21：中文 12 + 英文 9；良性 16：中文 12 + 英文 4；单腿边界 8；相邻维度分工 4；豁免承重 2；gate 层 21；接线 9）
+- scripts/negative-test-appeal-to-nature.js — 基线 10/10 PASS + 29/29 注入点全部断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 139，summary 引用 103；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 15/16（唯一失败 S2「git log/tag 未命中 6.8.53」是 bump 后预期中间态，commit message 带版本号即转绿，非回归）
+- 轮前探针复量（/tmp/r705-preprobe.js 口径）— appeal_to_nature 族攻击 8/10 漏判证实、真零命中 5/8、appeal_to_authority 误伤 4/12（2 条自身存量）、VOID_ZH 窄口 2/4
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **standard_shift 的 VOID_ZH 契约作废窄口**——decision 落选（0.82）。契约作废族 4 条中 2 条漏判且零命中（「之前答应的标准不算数」「原来谈的条件不算数了」），r700 起连续第七轮记录。词表补「不算数」裸形十分钟级可清，但按真升级操作定义属同族补词形不计四项之一；下一轮若候选池无合格新维度，可顺手清掉。
+2. **appeal_to_authority 修存量误伤 + 补反质疑族**——decision 落选（0.75）。攻击漏判 7/10、真零命中 7/7，但该维度自身存量模式命中 2 条良性（「研究表明适量运动有益健康」「权威机构发布了新的行业标准」），收紧存量与补族互相牵制（放宽误伤会丢召回、收紧会拦良性），需 A/B 对照实测，preprobe 连续第三轮判不合格。
+3. **NATURE_EN-b（plant-based extract）支暂无专属攻击样本**——负例注入点未列该支（没有样本承重的分支列了会假失败）。A2 良性集有 plant-based 样本但攻击集没有，留待补样轮次。
+4. **「实验室数据显示该化合物在自然条件下会降解」gate 层 verify**——存量维度行为（unsupported_claim/vagueness/moral_foundations/appeal_to_authority），HEAD 对照一致，非本轮引入；不为了消它改产品（Phase 2.95 纪律）。
+5. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十轮记录。
+6. **80+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+7. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（四条，两条是本轮最贵）
+
+1. **write_file 落盘的 EN 正则块整体多了一层反斜杠（r693/r705 坑第三次复现，且修复过程连踩三个假信号）**：write_file 的 content 参数经 JSON 层解码后，EN 正则每处落盘 4 连反斜杠（正确态 2 连）→ JS 字符串解码出 2 反斜杠 → 正则匹配字面「反斜杠+b」恒 false，症状是 EN 整族不命中而 ZH 全中（攻击 13/18），极像「英文模式没写」。三个假信号依次骗过修复：① 终端回传的 node -e 计数把 4 显示成 8（传输层翻倍），据此写的第一版修复脚本按 includes(8连) 匹配，打印「降层行数: 0」——**脚本自报无故障而行为测试坐实 EN 恒 false**；② 第二版按 4→2 降层修好了 EN 块，却把 detail 行的汉字区正则 /[\\u4e00-\\u9fff]/ 也多降一层（正则字面量里应是 1 个反斜杠），症状变成中英分支判反（EN 样本出中文 detail）；③ 每次「修完」都只跑单条样本，没有对每常量跑全样本冒烟。最终纪律：**EN 正则块的落盘层数只有一个可信判据——行为测试**（对每支跑一条应命中样本），Node 计数只能定位不能定论；修双层只修目标行（split/join 8→4 再 4→2 再 detail 行 2→1，每步断言出现次数为 1）。
+2. **SUPERIOR_ZH 的 b 支漏了行首 `|`（r705 踩坑 2 同族复发）**：b 支「肯定/一定/必然+优越词」粘成 a2 支「比X更/还+优越词」的后缀，要求「比X更」后紧跟「一定」恒不匹配——「母乳是天然的，所以一定比配方奶好」「手感肯定更高级」两条攻击因此漏判，而冒烟脚本一跑就露馅。判据不变：**正则块每行注释一支，写完把 __internals() 的 source 打出来逐支目视，`|` 缺失在 source 里一目了然**（本轮目视又抓出豁免承重组所需的全部支分隔正确后才收工）。
+3. **负例 killLines 的 lead 判据只认单引号，EN 块双引号形态整体串味（r705 踩坑 3 的升级形态）**：r705 判据 `t2.startsWith("'|")` 对 ZH 块（`'|(?:...`）有效，但 EN 块全部是双引号（`"|\\bwild...`）——trim 后第一个字符是双引号，判据恒 false → 替换值丢行首 `|` → 上一支末尾粘上 `__negtest_never__` → 杀 d 支实际杀掉 c 支，红样本是 c 的样本而非 d 专属，**单支承重证明失真而 29/29 全红的总数看起来完全正常**（只有逐条核对红样本归属才发现 d/e/h 三个注入点归因错）。修法：判据认两种引号（`t2.startsWith("'|") || t2.startsWith('"|")`）。连带纪律：**负例跑完必须逐个核对注入点的红样本是不是该支的专属样本，只数「N/N 全红」不够**。
+4. **a2 支的专属样本被自己的名词表扩充吞掉（归因设计的自反馈）**：首版 a2 专属样本用「野生的比家里养的健康」，随后修漏判时把「家里养」补进了 a 支名词表——该样本改走 a 支，杀 a2 后仍全绿（负例当场报「守卫漏抓」）。这不是守卫失效，是样本与模式同源演化后失去了通路独占性。修法：补真正的 a2 专属样本「野生的比超市买的更有营养」（a 支名词表无「超市买」），并把「样本注释写清走哪支」升级为**注释里写明该支的独占性依据**（为什么别的支不命中它）。
+
+---
+
 # r705 轮报告（v6.8.52）
 
 ## 心虫选中项 + 分数 + 身份对齐
