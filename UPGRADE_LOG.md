@@ -1,3 +1,65 @@
+# r703 轮报告（v6.8.50）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自 r700 探测器
+落盘 /tmp/hf-scout-700.txt（纪律：已落盘但维度未做完时下一轮直接读
+文件，不重新探测；standard_shift 已于 r700、circular_reasoning 已于
+r701、appeal_to_pity 已于 r702 上线，均排除），本轮 /tmp/r702-preprobe.js
+对剩余 4 族复量并做 FP 归因（stereotype 那条「误伤」经归因是已有
+stereotype+genetic_fallacy 正确拦截的阳性对照，非误伤）。喂给
+decision 本体（/tmp/decide-run-r703.js 读 /tmp/decide-opts-r703.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A stereotype 补「出身/学历/年龄/地域歧视贬低」句式族 | **0.88** | 攻击 10/10 漏判、真零命中 10/10、真实误伤 0/11 | **选中** |
+| B appeal_to_ridicule 新维度 | 0.86 | 攻击 10/10 漏判、真零命中 8/10、误伤 1/12（存量 contradiction） | 落选（新维度六处接线工作量最大） |
+| C appeal_to_authority 补族 + 修存量误伤 | 0.82 | 攻击 7/10 漏判、真零命中 7/7、误伤 4/12（2 条该维度自身存量模式） | 落选（补族与收紧存量两个动作耦合） |
+| D appeal_to_nature 新维度 | 0.82 | 攻击 8/10 漏判、真零命中 5/8、误伤 1/12 | 落选（3 条已有 moral_foundations 部分覆盖） |
+
+decision 返回 composite_score 0.88 / confidence 0.85 /
+identity alignment 100%，无拒选。诚实标注：候选的
+feasibility/consequence_value/risk/confidence 四段判据由我构造，
+decision 本体在四个候选间选出 A。stereotype 出身歧视族连续第五轮
+进决策池（r699-r702 四次落选），本轮首次选中。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「他一个农村人，能懂什么技术」「你一个女的，写什么代码」「大专毕业的，能写出什么好系统」「三十多岁还没升管理层，能力可想而知」「外地人开的店，服务肯定不上档次」「老年人学不会新东西，别让他碰关键系统」「小地方来的，眼界就那么点」「女人写什么代码，回家带孩子吧」「他技校毕业的，能看懂什么架构」「本科生带项目，最后还是得靠海归」这类**以出身/学历/年龄/地域身份标签反问式否定人能力**的句式从 pass 变 verify | 攻击族 18/18 漏判清零（gate 层 18/18 全非 pass，stereotype finding 在场） | ✅ 升级（真升级②补句式族） |
+| src/index.js：新增 stereotypeOriginDismiss 子判据——「身份标签 × 能力否定」双腿共现（腿①学历/地域/年龄/性别口语指称 × 腿②反问形「能懂什么/写什么」+ 贬低断言「可想而知/不上档次/学不会/眼界就那么点/回家带孩子」），中英分支对称；让步复句豁免只在翻案段（最后转折词或第一个逗号之后）查腿② | stereotype 覆盖面从「天生/本质归因」扩到直白身份贬低 | ✅ 升级（模式库本体） |
+| src/index.js：DIM_GUIDANCE 补完整 stereotype 条目（此前无条目，findings 只能拿默认 guidance「按维度说明复核该表述」） | LLM 拿到具体改写指引（含与 genetic_fallacy/poisoning_the_well/hate_speech 分工边界） | 维护（文档口径，用户可感知） |
+| test/round-703-origin-dismiss.js 10 断言 + scripts/negative-test-origin-dismiss.js 负例 10/10 注入点全红 | 攻击 18 中英对称/良性 20/让步复句边界 6/单腿边界 6/gate 层 38/相邻维度分工 5/guidance 1/接线 3 | ✅ 升级（验收证据） |
+| bump 6.8.49→6.8.50 五处 + README changelog + SKILL 规格表版本戳两处 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数不变 136；changelog 覆盖 v6.8.50；SKILL 规格表版本戳两处同步）
+- node test/round-703-origin-dismiss.js — 10/10（攻击 18：中文 10 + 英文 8；良性 20；让步复句边界 6；单腿边界 6；gate 层 38；相邻维度分工 5；guidance 1；接线 3）
+- scripts/negative-test-origin-dismiss.js — 基线 10/10 PASS + 10/10 注入点全部断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 136，summary 引用 99；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 commit 转绿；bump 后 commit 前为预期的 15/16 中间态）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **appeal_to_ridicule 新维度**——decision 落选（0.86）。攻击漏判 10/10、真零命中 8/10、误伤 1/12（存量 contradiction），缺口成立但新维度需六处接线 + 与 sarcasm/hate_speech 分工设计。下轮可直接做。
+2. **appeal_to_authority 补族 + 存量误伤**——decision 落选（0.82）。攻击漏判 7/10、误伤 4/12，其中「权威机构发布了新的行业标准」「研究表明适量运动有益健康」由该维度自身存量模式命中——补族与收紧存量两个动作互相牵制（新族「明星都在用，肯定不会错」与良性「业内人士透露」结构相近），需更细豁免设计，单独一轮做。
+3. **appeal_to_nature 新维度**——decision 落选（0.82）。攻击漏判 8/10 但 3 条已有 moral_foundations 部分覆盖（有效增量 5 条），天然/自然在食品护肤养生语境高频，豁免面大。
+4. **r700 遗留：「之前答应的标准不算数」在 VOID_ZH 不命中**——r702 起连续第三轮记录，契约作废族的窄口，留待专门轮次。
+5. **让步豁免的已知边界**：「虽然X，Y」无逗号无转折词时（「虽然他是农村人技术能力很强」）不切段——中文该形态极罕见（无标点复句），实测未构造出样本，标已知边界不加固。
+6. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第七轮记录。
+7. **75+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做（finish 的推送尝试 ETIMEDOUT 是预期，只记 🟡 不判失败）。
+8. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **负例脚本 killLines 用空串替换会让负例当场假绿**：r702 脚本的替换值是 `''`（依赖模式库 join 成正则、空串不改变匹配语义）；本族是 includes 判据，`''.includes` 恒 true——把分支 kill 成空串后腿①恒命中，注入点「仍然全绿」。判据：**includes 判据的常量，负例替换值必须用永不匹配串**（`'__negtest_never__'`），空串只对 join 成正则的模式库安全。
+2. **让步豁免只认转折词不够，英语「Although X, Y」无 but 直接翻案整句被误判**：`Although people say someone from a small town can't possibly understand architecture, she designed our whole platform.` 被新族判命中（stereotype=1，gate verify）——让步词虽在，但句中没有 but/yet，`cut` 保持 -1 不切段，全句查腿②命中前节引述的攻击话术。修法是翻案段起点取 max(最后转折词之后, 第一个逗号之后)。判据：**让步豁免的切段判据要覆盖「无转折词直接翻案」形态，不能只认 but/yet**。
+3. **豁免逻辑没有承重样本时，负例抓不住它失效**：首版负例第 9 注入点（杀让步豁免）跑出「仍然全绿」——因为 D1a/D1b 两条翻案样本的转折后段本来就没有腿②，豁免生不生效都放行。补两条「引述+翻案」样本（前节引述带腿②的歧视话术、逗号后翻案）才让豁免成为承重分支。判据：**每个豁免/短路分支都要配一条「摘掉它就误伤」的样本，否则守护是装饰**。同轮连带：选样还要过 gate 层——「虽然有人说他一个农村人懂什么技术」单维放行但 gate 层被存量 vagueness 判 verify（「懂什么」的模糊词），换成「学不会架构」才两侧纯净。
+
 # r702 轮报告（v6.8.49）
 
 ## 心虫选中项 + 分数 + 身份对齐
