@@ -1,7 +1,7 @@
 {
   "name": "@yun520-1/heartflow",
   "version": "6.8.56",
-  "description": "HeartFlow (心虫) — AGI Layer 1: the Discriminator. Rule-based engine that checks what AI says before it reaches humans. 140 discrimination dimensions, 11-layer pipeline, 161 modules (logic/decision/cognition/emotion/memory/ethics/collaboration), 182 MCP tools, 1,314 dispatch routes. Zero LLM dependency. The gate that says NO when something is wrong.",
+  "description": "HeartFlow (心虫) — AGI Layer 1: the Discriminator. Rule-based engine that checks what AI says before it reaches humans. 141 discrimination dimensions, 11-layer pipeline, 161 modules (logic/decision/cognition/emotion/memory/ethics/collaboration), 182 MCP tools, 1,314 dispatch routes. Zero LLM dependency. The gate that says NO when something is wrong.",
   "main": "src/gate.js",
   "bin": {
     "heartflow": "src/mcp-server.js"
