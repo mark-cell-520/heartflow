@@ -1,3 +1,67 @@
+# r705 轮报告（v6.8.52）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自 r700 探测器落盘
+/tmp/hf-scout-700.txt（纪律：已落盘但维度未做完时直接读文件继续，不重新
+探测；standard_shift 已于 r700、circular_reasoning 已于 r701、
+appeal_to_pity 已于 r702、stereotype 出身歧视族已于 r703、
+appeal_to_ridicule 已于 r704 上线，均排除），本轮 /tmp/r705-preprobe.js
+对剩余 3 族 + VOID_ZH 遗留复量并做 FP 归因（样本集与 r704 完全一致，
+数字跨轮可比）。四个候选喂给 decision 本体（/tmp/decide-run-r705.js
+读 /tmp/decide-opts-r705.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A straw_man 新维度 | **0.89** | 攻击漏判 7/10、真零命中 7/7、误伤 1/12（存量 contradiction，归因后本族自身存量误伤 0） | **选中** |
+| B appeal_to_nature 新维度 | 0.86 | 攻击漏判 8/10、真零命中 5/8（3 条已有 moral_foundations 沾边，有效增量 5）、误伤 1/12 归因存量维度 | 落选 |
+| C standard_shift 补 VOID_ZH 契约作废窄口 | 0.86 | 4 条样本 2 条漏判且零命中（「之前答应的标准不算数」「原来谈的条件不算数了」），缺口面最小 | 落选 |
+| D appeal_to_authority 修存量误伤 + 补反质疑族 | 0.79 | 攻击漏判 7/10 但良性误伤 4/12 中 2 条是该维度自身存量模式命中，补族与收紧存量互相牵制 | 落选 |
+
+decision 返回 composite_score 0.89 / confidence 0.85 / identity alignment
+100%，无拒选。诚实标注：候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在四个候选间选出 A。
+straw_man 连续第五轮进决策池（r700-r704 四次落选），本轮首次选中。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「你无非就是想说不用加班，那公司业绩谁来管」「你意思就是让我别努力了，躺平算了」「你不就是想说不花钱就能解决问题，太天真了」「你这么说无非是想否定我们团队所有的努力」「你的意思是我以前做的都是错的，只有你对」「你不就是嫌我管得多，那以后我什么都不管了」「你不就是想说领导决策都有问题吗」「So you're just saying we shouldn't work overtime, then who's going to manage the numbers?」「By your logic, we might as well delete all the tests and ship.」这类**把对方立场转述成极端化/歪曲版本再对假靶子反驳**的句式从 pass 变 verify | 攻击族 25/25 漏判清零（gate 层 25/25 全非 pass，24/25 带 straw_man finding） | ✅ 升级（真升级①新增维度） |
+| src/straw-man.js：两条路由模块——路由① 强归谬形转述标记（五支：你[们]+强调+就是/不就是/是想、你这么[说/讲]无非是想、按你的意思/逻辑/说法、照你[这么/的]说/逻辑、你的逻辑就是/岂不是；EN：you're just saying / so you're saying / by your logic 等）×（反驳尾巴四支：反问威胁/贬损定性/反诘对立/放弃贬损；或绝对化负面归述四支：都全+负面词/所有的付出被否定/否定+所有整个/完全根本+不可行）共现；路由② 弱转述形（你的意思是/你想说的是；EN what you mean is）× 反驳尾巴——无尾巴的弱转述是良性确认问句（「你的意思是需要先跑测试再上线吗」必须 pass），刻意不判；绝对化负面归述只与强归谬形配对（「你的意思是所有测试都要重跑吗」不判）；豁免：元话语评析（META_EXEMPT 中英双侧） | 第 138 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。**刻意不接 FALLACY_PATTERNS 第十处**——静态正则没有豁免层（同 r703/r704 先例）；本族窄形与既有 straw_man 条目由 fallacies 维度各判各的 | dimensions 键 137→138 | ✅ 升级（接线） |
+| test/round-705-straw-man.js 11 断言 + scripts/negative-test-straw-man.js 负例 24/24 注入点全断言红 | 攻击 25 中英对称/良性 30/单腿边界 8/相邻维度分工 4/豁免承重 4/gate 层 25/接线 9 | ✅ 升级（验收证据） |
+| bump 6.8.51→6.8.52 六处（VERSION/package.json/SKILL.md frontmatter/两处描述戳/src/core/version.js）+ README changelog + 三份禁改文档维度数 137→138、verify 计数 96→97 两处、verify 列举补 straw_man、AGENTS 维度史加 v6.8.52 条目 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 137→138 三处同步、verify 计数 96→97 两处、verify 列举、规格表版本戳、changelog 覆盖 v6.8.52）
+- node test/round-705-straw-man.js — 11/11（攻击 25：中文 15 + 英文 10；良性 30：中文 19 + 英文 11；单腿边界 8；相邻维度分工 4；豁免承重 4；gate 层 25；接线 9）
+- scripts/negative-test-straw-man.js — 基线 11/11 PASS + 24/24 注入点全部断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 138，summary 引用 102；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 commit 转绿；bump 后 commit 前为预期的 15/16 中间态）
+- 轮前探针复量（/tmp/r705-preprobe.js 口径）— straw_man 族攻击 7/10 漏判证实、appeal_to_nature 8/10（有效增量 5）、appeal_to_authority 误伤 4/12（2 条自身存量）、VOID_ZH 窄口 2/4
+- 良性 non-pass 归因（/tmp/r705-attr.js + git stash HEAD 对照）— 6 条良性 gate 层 verify 全部为存量维度行为（contradiction/bad_faith/appeal_to_authority/unsupported_claim），straw_man 维度对它们零命中，HEAD 对照行为完全一致，非本轮引入
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **appeal_to_nature 新维度**——decision 落选（0.86）。攻击漏判 8/10、有效增量 5（3 条已有 moral_foundations 沾边），天然/自然在食品护肤养生语境高频，豁免面（「纯植物提取物也可能引起过敏反应」必须 pass）设计难度大。下轮可直接做。
+2. **standard_shift 的 VOID_ZH 契约作废窄口**——decision 落选（0.86）。契约作废族 4 条中 2 条漏判且零命中（「之前答应的标准不算数」「原来谈的条件不算数了」），缺口面最小（2 条），词表补「不算数」裸形即可，r700 起连续第六轮记录。
+3. **appeal_to_authority 补族 + 存量误伤**——decision 落选（0.79）。攻击漏判 7/10 但良性误伤 4/12 中 2 条是该维度自身存量模式命中（「研究表明适量运动有益健康」「权威机构发布了新的行业标准」），补族与收紧存量互相牵制，preprobe 连续第三轮判不合格，需单独一轮。
+4. **「这句话的意思是不是指接口会变慢」等 6 条良性 gate 层 verify**——存量维度行为（contradiction/bad_faith/appeal_to_authority），HEAD 对照一致，非本轮引入；不为了消它们改产品（Phase 2.95 纪律）。
+5. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第九轮记录。
+6. **79+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+7. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（四条）
+
+1. **从零写含正则的新文件，EN 块落了双层反斜杠（r693 坑复现）**：write_file 时把英文正则写成 4 个反斜杠（`\\b`），落盘后 JS 字符串解码出 `\b` → 正则匹配字面量「反斜杠+b」恒 false——英文腿整族不命中而中文腿全中（攻击 8/12），极像「英文模式没写」。修法是只对含 4 连反斜杠的行做降层（23 行），修完复跑冒烟。判据不变：新文件落盘后对每一行含反斜杠的行做 Node 计数复核（EN 正则块与 ZH 数字/空白支都要查）。
+2. **REFUTE_EN 的 how/naive 支漏了行首 `|`**：与上一支粘连成 `...the point\b\b(?:how|...`，该支整类不命中——症状是「同族样本一半命中一半不命中」（How naive 单独测 true、放进完整句子 false）。判据：正则块每行注释一支，写完后把 `__internals()` 的 source 打出来逐支目视，`|` 缺失在 source 里一目了然。
+3. **负例脚本 killLines 丢行首 `|` 造成串味，注入点归因失真**：替换值 `'__negtest_never__'`（无 `|`）让上一支末尾粘上永不匹配串——杀 ABS-b 实际把 ABS-a 的尾部也杀了，红样本是 a 支的样本而非 b 支专属，单支承重证明失真（24 个注入点里 b/b2/d/c 四支归因错）。且第一遍修错了：判据写成 `startsWith('|')`，而模式行 trim 后第一个字符是**单引号**（`'|(?:...`），`|` 在引号内——恒 false，等于没修。正确判据是 `startsWith("'|")`。连带发现 ATTRIB_STRONG_ZH-c 支「按你的意思」与 WEAK_ZH「你的意思」双支覆盖同一样本，杀 c 后经路由②仍命中（注入后全绿）——补 c 支专属样本「按你的逻辑，我们干脆散伙算了」（不含「意思」二字）后才抓到。判据：**同形近义的两支必须用走不同通路的样本做专属证明**（r691 纪律同族）。
+4. **A1 选样未实测腿归属，F1/F2 断言读错字段形状**：`gate.gate()` 的 action 在 `r.gate.action` 不在 `r.action`（checkOutput 才是扁平 r.action）；D1 的窄形样本「你的意思就是说不用加班，但这显然不对」不过 fallacies——[^，。] 不跨标点 + 「不对」触发 r82 元话语豁免（后置否定评析）双重窄口，换成「但这显然行不通」且去逗号后才命中。判据：**测试样本的归属必须先在目标层实测过再写断言**（r687 纪律第三次复现）。
+
 # r704 轮报告（v6.8.51）
 
 ## 心虫选中项 + 分数 + 身份对齐
