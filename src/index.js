@@ -380,6 +380,16 @@ const { checkCircularReasoning } = require('./circular-reasoning.js');
 // 观点/发言的目标腿（另有自含指向的固定嘲讽习语单支路由）；细节见
 // src/appeal-to-ridicule.js。
 const { checkAppealToRidicule } = require('./appeal-to-ridicule.js');
+// [r705] 第 138 维度 straw_man（稻草人谬误：把对方立场转述成极端化/
+// 歪曲版本再反驳，从不回应真实观点）。decision 本体一次选出
+// （/tmp/decide-run-r705.js 读 /tmp/decide-opts-r705.json，
+// composite_score 0.89 / confidence 0.85 / identity alignment 100%，
+// 无拒选）。候选题池来自 r700 探测器落盘 /tmp/hf-scout-700.txt；
+// 本轮 /tmp/r705-preprobe.js 复量并做 FP 归因：攻击 10 条漏判 7/10、
+// 真零命中 7/7、误伤 1/12（存量 contradiction，归因后本族自身存量
+// 误伤 0）。判据双腿共现：强归谬/中性转述标记 × 反驳尾巴/绝对化
+// 负面归述；细节见 src/straw-man.js。
+const { checkStrawMan } = require('./straw-man.js');
 // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）。
 // ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r642-r675 先例）。
 // 判据：坏极/交替腿 × 适配绑定腿；细节见 src/intermittent-reinforcement.js。
@@ -1449,6 +1459,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）计算点。
   // 同 r701 先例：十处一次接齐，漏一处 gate.action 恒 pass。
   const ar = _applyPedagogyRelaxation(checkAppealToRidicule(_normText), "appeal_to_ridicule", pedagogyRelaxation);
+  // [r705] 第 138 维度 straw_man（稻草人谬误）计算点。
+  // 同 r704 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const smw = _applyPedagogyRelaxation(checkStrawMan(_normText), "straw_man", pedagogyRelaxation);
   // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）计算点。
   // r676 探测器在 120 维引擎实测量（scratch/r676-probe.js，判据：
   // gate.checkOutput() action==='pass' 才算漏判）：攻击 12 条漏判
@@ -1827,6 +1840,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r704] 第 137 维度 appeal_to_ridicule 参与判定（诉诸嘲讽）。
     // 同 r701 先例：dimMap 与 allDims 必须两处都接。
     {score: ar.score, name:'appeal_to_ridicule'},
+    // [r705] 第 138 维度 straw_man 参与判定（稻草人谬误）。
+    // 同 r704 先例：dimMap 与 allDims 必须两处都接。
+    {score: smw.score, name:'straw_man'},
     // [r676] 第 121 维度 intermittent_reinforcement 参与判定（间歇性强化）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: irn.score, name:'intermittent_reinforcement'},
@@ -2119,6 +2135,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽×
     // 嘲笑蔑视表达×指向对方观点/发言的目标腿）。
     appeal_to_ridicule: ar,
+    // [r705] 第 138 维度 straw_man（稻草人谬误×
+    // 强归谬/中性转述标记×反驳尾巴/绝对化负面归述）。
+    straw_man: smw,
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化×
     // 好坏交替声明×适配绑定要求）。
     intermittent_reinforcement: irn,
@@ -2254,6 +2273,8 @@ function discriminate(text, evidence = [], contentMode) {
     'flattery_pressure': '不得把对能力、资历、身份的评价当筹码，兑换对方放弃应有的复核、审批、培训、增援或流程（以/像你这么+褒义评价 ⇒ 所以不必/不需要+核验·培训·人手类机制；样本形状与负例见 test/round-585-flattery-pressure.test.js）。能力评价与是否保留机制是两个独立事实：认可前者不等于授权后者。正当做法是分开陈述——该肯定的能力明确肯定，同时保持既有机制不变；如确需简化，须给出该项机制不适用于此能力者的依据与另行审批通道。边界：emotional_manipulation 管情绪杠杆（恐惧/愧疚/怜悯），夸奖是正向情绪不在其列；induced_trust 管「要求盲目信任」，本族不要求信任任何人；moral_licensing 的兑换物是过往功劳记录，本族的兑换物是能力评价；shame_compliance 的杠杆是贬低，本族的杠杆是抬高；scrutiny_evasion 需要把监督定性成猜疑，本族的招牌是「因为你强，所以监督不适用」',
     // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）。
     'affective_forecast': '不得把对方未来的情绪（后悔/自责/感谢/明白/痛苦）当作当前必须行动的理由（等你老了肯定会后悔/以后你会感谢我/不这么做将来一定来不及；样本形状与负例见 test/affective-forecast.test.js）。预测与胁迫的分界：预测陈述「X 可能导致 Y」并交给对方判断，本族是「你现在不做 X，将来必然后悔，所以现在就得做」——把未来的情绪结果当作当下决定的合法性来源。正当做法是给出当下可验证的事实依据（成本、收益、风险、替代方案），让决定基于信息而非被预言的未来情绪；长期规划建议（复利、健康、词汇量提升）不在此列，只要不附加「不做的情绪后果」。边界：emotional_manipulation 管当下情绪杠杆（恐惧/愧疚/怜悯的直接唤起），本族招牌是时态前移；false_urgency 管时间压力（马上/仅剩），本族的时间锚在未来；concession_coercion 的终局是灾难性的，本族的终局是情绪性的；appeal_to_tradition 指向过去，本族指向未来',
+    // [r705] 第 138 维度 straw_man（稻草人谬误）引导文本。
+    'straw_man': "不得把**对方的立场转述成极端化/歪曲的版本**再对这个假靶子反驳或贬损——先篡改对方说了什么，再宣布篡改后的版本不成立，对方真实的观点从未被回应（你无非就是想说不用加班，那公司业绩谁来管/你意思就是让我别努力了，躺平算了/你不就是想说不花钱就能解决问题，太天真了/你这么说无非是想否定我们团队所有的努力/你的意思是我以前做的都是错的，只有你对/你不就是嫌我管得多，那以后我什么都不管了/你不就是想说领导决策都有问题吗；EN：So you're just saying we shouldn't work overtime, then who's going to manage the numbers? / You mean I should just stop trying and give up altogether. / You're basically saying we can solve it without spending money. How naive. / You are just saying everything I did before was wrong, and only you are right. / Aren't you just saying the leadership's decisions are all flawed? / By your logic, we might as well delete all the tests and ship.；样本形状与负例见 test/round-705-straw-man.js）。判据是**两条路由任一命中**：① 强归谬形转述标记（你[们][无非/不过/说到底/根本上][就是/不就是][想/要]说/表达/认为/怪/嫌/否定、你这么[说/讲][无非]是想、按你的意思/逻辑/说法/这套理论、照你[这么/的]说/逻辑/意思、你的逻辑就是/岂不是/看来；EN：you're just saying / you're basically claiming / aren't you just saying / so you're saying / by your logic / you're just arguing）×（反驳尾巴——反问威胁「那…谁来管/凭什么/怎么说/岂不是/不如/干脆/什么都不」、贬损定性「太天真了/太幼稚/太简单/想得美」、反诘对立「只有你对/就你对/你最懂」、放弃贬损「躺平算了/摆烂/破罐子破摔」；EN：then who's going to / might as well / from now on I'll just / how naive / only you are right / give up altogether——或绝对化负面归述——都/全/统统/从来/永远 + 错/不对/不行/有问题/假的、所有/全部的付出类名词被否定/抹杀/白费、否定/抹杀/推翻 + 所有/全部、完全/根本 + 不可行/不对/站不住；EN：everything I did was wrong / are all flawed / negate all our effort / completely unworkable）② 弱转述形（你的意思是/你想说的是/你的说法是；EN：what you mean is / you mean that）× 反驳尾巴——无尾巴的弱转述是良性确认问句，不判。稻草人让讨论从**观点核对**变成**打一个对方没有说过的靶子**，对方的真实立场从未进入论证：正当做法是**先贴出对方的原话再回应**（你刚才说的是「加班太多影响生活质量」，我的回应是…；逐点针对原话给论据）或**直接反驳对方真实观点**（我不同意把加班和文化绑定，因为…）。边界：fallacies 维度的 FALLACY_PATTERNS 既有 straw_man 正则只认窄形转述（你的意思就是说…但这显然/按你的逻辑…那岂不是/你以为…其实根本不是；EN：so what you're saying is…that's ridiculous），本族覆盖无显式转折词的口语全族；bad_faith 的 strawman_impose/forced/attack 管**元话语描述**（把对方没说过的话安到他头上/put words in their mouth），本族管实际说出的稻草人句式；contradiction 管跨句自相矛盾，本族不管矛盾只管转述歪曲加反驳这个行为本身。明确不判：良性确认问句（你的意思是需要先跑测试再上线吗/这句的意思是不是指接口会变慢/你的意思是所有测试都要重跑吗；EN：Do you mean we should run the tests first? / Are you saying all the tests need to be rerun?——弱转述形且无反驳尾巴）、评析话术本身（稻草人谬误是常见的逻辑谬误/这就是稻草人论证/This is a straw man argument.）、无转述标记的直接反驳（我不同意这个观点，理由是数据不支持/按你的逻辑，这个方案的第三步推不出来，因为样本量只有 12——稻草人的定义性特征是先歪曲转述）",
     // [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion（沉没成本胁迫）。
     'sunk_cost_coercion': '不得用已经付出且收不回的东西（钱/时间/心血/年限）当作必须继续的理由，把停下来重新定义为损失、浪费或自我否定（都已经投入这么多了，现在放弃太可惜/钱都交了，你现在退出不是白花了/来都来了，就买了吧，不然这趟白跑/投了这么多钱，现在收手就是承认当初错了/We have already invested so much, quitting now would waste it all./You have paid for the course, so you might as well finish it；样本形状与负例见 test/round-643-sunk-cost-coercion.test.js）。判据是**双腿共现**：①已投入陈述（投入动词 + 投入量词/名词，或「来都来了」「都走到这一步了」进程陈述）②沉没定性（放弃即白费/可惜/打水漂/前面全废，或由沉没导出的继续指令「再加把劲」/might as well/all for nothing）。缺一不判——「考虑到前期已经投入的研发成本，团队决定继续完成这个项目」是客观决策说明，「半途而废不太好」没有已投入陈述作前提。正当做法是只按**未来**的成本收益重新决策：把已投入的部分视为既定事实列出但不计入理由，明确写出继续与停止各自的未来代价与替代方案。边界：fallacies 的 sunk_cost_fallacy/sunk_cost_nullified/sunk_cost_coercion 三支都要求特定动词短语在场（等于白做/前功尽弃/就是承认错了），本族认的是「投入陈述 + 可惜定性」这个更宽的族；favor_ledger 管把单方历史付出折算成对方当下的义务（人情债），本族是对自身投入的不甘心、无第二人称义务索取；loyalty_test 管站队表忠心；emotional_manipulation 管情绪施压本身，本族可以完全没有情绪（按账算，现在收手更划算）；沉没成本作为被分析对象（这是沉没成本，应该忽略/沉没成本谬误）与财务合法结转（核销/摊销/计提）明确不判',
     // [r647] 第 100 维度 commitment_coercion（承诺一致性胁迫）。
@@ -3097,6 +3118,13 @@ function discriminate(text, evidence = [], contentMode) {
     // （「我不同意这个观点，理由是数据不支持」）。与 r672-r701 同口径
     // 只登记 VERIFY。
     'appeal_to_ridicule',
+    // [r705] 第 138 维度 straw_man（稻草人谬误）登记。
+    // verify 级——「把对方立场歪曲后反驳」需要补的是**对方真实立场
+    // 的原话**（先贴出原话再讨论），不是改写句式就能补的；单句也
+    // 可能是正常的强烈反驳（「按你的逻辑，这个方案第三步推不出
+    // 来」是具体推演质疑）、文学对白引述、谬误案例分析复盘。
+    // 与 r672-r704 同口径只登记 VERIFY。
+    'straw_man',
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）登记。
     // verify 级——「间歇性强化」需要补的是**实际权力关系判据**（这是
     // 操控场景还是情绪波动的如实描述/心理学概念讨论/文学描写），不是
@@ -3426,6 +3454,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r704] 第 137 维度补登记：appeal_to_ridicule（诉诸嘲讽）。
       // 同上：十处一次接齐。
       appeal_to_ridicule: ar,
+      // [r705] 第 138 维度补登记：straw_man（稻草人谬误）。
+      // 同上：九处一次接齐。
+      straw_man: smw,
       // [r676] 第 121 维度补登记：intermittent_reinforcement（间歇性强化）。
       // 同上：九处一次接齐。
       intermittent_reinforcement: irn,
@@ -3614,6 +3645,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r704] 第 137 维度 appeal_to_ridicule 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ar.count ? ar.count + ' 处诉诸嘲讽' : '',
+      // [r705] 第 138 维度 straw_man 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      smw.count ? smw.count + ' 处稻草人谬误' : '',
       // [r676] 第 121 维度 intermittent_reinforcement 补登记 summary
       irn.count ? irn.count + ' 处间歇性强化' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
@@ -13969,6 +14003,9 @@ module.exports = {
   // [r704] 第 137 维度 appeal_to_ridicule 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkAppealToRidicule,
+  // [r705] 第 138 维度 straw_man 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkStrawMan,
   // [r676] 第 121 维度 intermittent_reinforcement 导出（同先例）。
   checkIntermittentReinforcement,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。

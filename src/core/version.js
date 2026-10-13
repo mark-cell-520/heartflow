@@ -44,7 +44,9 @@ const path = require('path');
 //                 surveillance_normalization 监控正常化上线）。
 // [v6.8.51] 第 704 轮同步：6.8.50 → 6.8.51（第 137 维度
 //                 appeal_to_ridicule 诉诸嘲讽上线）。
-let VERSION = '6.8.51';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.52] 第 705 轮同步：6.8.51 → 6.8.52（第 138 维度
+//                 straw_man 稻草人谬误上线）。
+let VERSION = '6.8.52';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');
