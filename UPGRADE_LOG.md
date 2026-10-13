@@ -1,3 +1,76 @@
+# r708 轮报告（v6.8.55）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** r700 探测器队列 7 族已上线
+6 族（standard_shift r700、circular_reasoning r701、appeal_to_pity r702、
+stereotype r703、appeal_to_ridicule r704、straw_man r705、appeal_to_nature
+r706、appeal_to_ignorance 扩族 r707），剩余 appeal_to_authority 探测器
+连续第四轮判不合格（误伤 4/12 中 2 条是该维度自身存量模式命中良性，
+收紧存量与补族互相牵制）。按 Phase 0.7b 纪律新侦察：本轮探测器
+/tmp/r708-preprobe.js（沿用 r707 同一样本集，跨轮可比，落盘
+/tmp/hf-scout-708.txt）+ /tmp/r708-unwired-probe.js（checkXxx 断链面：
+defined 50 / discriminate 全调用，零遗留）+ /tmp/r708-route-probe.js
+（路由静态扫描噪声过大——dispatch 调用点只扫到 23 个明显欠计，判据
+不可信未作候选）。四个候选喂给 decision 本体
+（/tmp/decide-run-708.js 读 /tmp/decide-opts-708.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A anecdotal 个例泛化新维度 | **0.93** | 攻击漏判 9/10、真零命中 9/9、良性误伤 1/12 全归因存量 confidence；逐条实测 9 条漏判样本在 survivorship_bias/anecdote_as_proof/hasty_generalization 上 count 全 0 | **选中** |
+| B tu_quoque 诉诸伪善新维度 | 0.90 | 攻击漏判 8/10、真零命中 8/8、误伤 2/12 归因存量 sycophancy/false_balance | 落选（「真诚自省」与攻击仅差剥夺资格词，边界判据要细） |
+| C middle_ground 和稀泥新维度 | 0.88 | 攻击漏判 7/10、真零命中 7/7、误伤 4/12 归因存量 victim_blaming/false_equivalence/false_balance/premature_termination | 落选（与三个存量维度射程高度重叠，分工最易翻搅） |
+| D appeal_to_authority 补族+修存量 | 0.81 | 攻击漏判 7/10、真零命中 7/7，但误伤 2/12 是自身存量模式命中良性 | 落选（连续第四轮探测器判不合格，期望收益确定性最低） |
+
+decision 返回 composite_score 0.93 / confidence 0.92 /
+identity alignment 100%，无拒选。诚实标注：候选的
+feasibility/consequence_value/risk/confidence 四段判据由我构造
+（依据是实测数字 + 读源码后的形状判断），decision 本体在四个候选间
+选出 A。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 「我邻居抽烟喝酒活到九十，所以烟酒根本不致癌」「我二舅没上大学照样当老板，读书没用」「我同事天天吃外卖身体倍儿棒，外卖很健康」「我同学裸考就过了，这考试根本不用复习」「我老家老人一辈子没体检也活到九十八，体检是浪费钱」「我亲戚家孩子天天打游戏照样上清华，游戏不害人」「我闺蜜老公就是彩礼给得多才幸福，彩礼必须多要」「我朋友用了这个方法月入十万，你照做就行」「我表姐就是喝红糖水治好了痛经，你试试」及英文同类 9 条——**用身边个例的一个具体结局推领域级结论**（否定领域公认事实/正面定性领域/推及听者行动）从 pass 变 verify | 攻击族 19/19 漏判清零（gate 层 19/19 全非 pass） | ✅ 升级（真升级①新增维度） |
+| src/anecdotal.js：双腿共现模块——腿①身边个例在场（个例指称 我+关系词/我认识的/我老家/我闺蜜的老公，EN my uncle/a guy I know/my hometown/my friend's husband × 具体结局 活到九十/月入十万/当老板/身体倍儿棒/治好了/就过了/上清华/过得幸福/中大奖，EN lived to 92/became a boss/was cured/aced the exam/got into Tsinghua/are happy/won the lottery；**结局是泛化触发物**，只有指称没有结局的是意见转述刻意不判）× 腿②领域结论三类（N 领域否定/P 领域正面/U 推及行动，中英各三支对称）；豁免 HEDGE_ZH/HEDGE_EN（保留语/统计陈述/意见转述限定/概念分析） | 第 140 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/dimensions 补登记/summary/module.exports）。**计算点走 _dual 不是 _normText**——实测归一化的 leet 还原把「100k」变成「iook」，英文 OUTCOME 腿整条失配（原文命中、归一句零命中），与 double_bind/emotional_manipulation 同例 | dimensions 键 139→140 | ✅ 升级（接线） |
+| test/round-708-anecdotal.js 9 断言 + scripts/negative-test-anecdotal.js 20 注入点 | 攻击 19（中英对称、结论类型逐条归因）/良性 30/单腿边界 6/相邻分工 6/豁免承重 6/gate 层 19+26/接线 9 | ✅ 升级（验收证据） |
+| bump 6.8.54→6.8.55 七处（VERSION/package.json/SKILL.md frontmatter/两处测量戳/version.js 常量+注释）+ README changelog + 三份禁改文档维度数 139→140 共八处 + verify 计数 98→99 三处 + verify 与全列举补 anecdotal + AGENTS 维度史加 v6.8.55 条目 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 139→140 八处同步、verify 计数 98→99 三处、verify 与全列举补 anecdotal、规格表版本戳 6.8.55、changelog 覆盖 v6.8.55）
+- node test/round-708-anecdotal.js — 9/9（攻击 19：中文 10 + 英文 9；良性 30：中文 18 + 英文 12；单腿边界 6；相邻分工 6；豁免承重 6；gate 层攻击 19 全非 pass、良性 26 pass；接线 9）
+- scripts/negative-test-anecdotal.js — 基线 9/9 PASS + 20/20 注入点全部断言红（12 常量块 + 8 路由行，无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 140，summary 引用 103；双向回归 召回 52/52、误拦 302/326；启动 v6.8.55 模块 161）
+- node test/security-audit.test.js — 15/16（唯一失败 S2「git log/tag 未命中 6.8.55」是 bump 后预期中间态，commit message 带版本号即转绿）
+- 轮前探测器复量（/tmp/hf-scout-708.txt 口径）— anecdotal 族攻击漏判 9/10→**0/19**（中英对称）、良性误伤 0/30；tu_quoque 8/10、middle_ground 7/10、appeal_to_authority 7/10（2/12 自身存量误伤）
+- 相近维度归因（/tmp/r708-overlap-probe.js + /tmp/r708-dimattr-probe.js）— 9 条漏判样本在 survivorship_bias/anecdote_as_proof/hasty_generalization 上 count 全 0（仅「中五百万」一条 SB 先判 verify，两维共存）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **tu_quoque 诉诸伪善新维度候选**——decision 落选（0.90）。攻击漏判 8/10、真零命中 8/8、误伤 2/12 归因存量。缺口成立，但「真诚自省」（我承认我以前也犯过这个错，所以想帮你避开）与攻击仅差剥夺资格词，边界判据要细。下轮可直接进候选池。
+2. **middle_ground 和稀泥新维度候选**——decision 落选（0.88）。攻击漏判 7/10、真零命中 7/7，但与 victim_blaming/false_equivalence/false_balance 三个存量维度射程高度重叠（「一个巴掌拍不响」类句式归属易翻搅），分工边界设计成本最高。
+3. **appeal_to_authority 修存量误伤 + 补反质疑族**——decision 落选（0.81），探测器连续第四轮判不合格：误伤 4/12 中 2 条是该维度自身存量模式命中良性（「研究表明适量运动有益健康」「权威机构发布了新的行业标准」），收紧存量与补族互相牵制，需 A/B 对照实测。
+4. **腿①结局表只收 favorable/neutral 观察结局**——「出问题/吃亏/被骗」不在表内：那类结局推出的通常是有依据的否定（「我朋友买了这个课钱都打水漂，所以这课不靠谱」），不是泛化。属刻意边界，写进 D 组测试锁住。
+5. **EN 侧「takeout, which is healthy」关系从句形不判**——POS_EN/NEG_EN 收紧为直接附着（防「My coworker eats takeout every day and is fine」人作主语的误配，该样本实测误配后当场抓住并修紧），关系从句形是收紧的保守边界。
+6. **4 条良性在 gate 层被存量维度判 verify**——confidence（我的情况比较特殊，不一定适合你 / My situation is quite special…）、unsupported_claim+vagueness+appeal_to_authority+premature_termination（研究表明适量运动有益健康）、contradiction+perfect_error（My uncle… but that is an exception…）、vagueness（My situation…）。逐维度归因确认全部存量行为，双向门禁误拦基线与 HEAD 完全一致（302/326），零新增误伤；不为了消它们改产品（Phase 2.95 纪律）。
+7. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十二轮记录。
+8. **80+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+9. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条，两条被负例当场抓住）
+
+1. **EN 正则块落盘层数多一倍（r693/r705/r706 坑第四次复现，且中间被三个假信号骗过）**：write_file 的 content 参数是字面量——照搬 read_file 显示层（JSON 转义后翻倍）的 `\\\\b` 落盘成 4 连反斜杠，JS 字符串解码出 2 个 → 正则匹配字面「反斜杠+b」恒 false。三个假信号：① 终端回传的 node -e 计数把真实层数又翻一倍（shell 双引号层 + JSON 传输层），据此写的第一版修复脚本自报「降层行数: 0」而行为测试坐实 EN 恒 false；② 第一版修复按 4→2 降层修好 EN 块后，误把 detail 行的汉字区正则也多降一层，症状变成中英分支判反；③ 修复脚本的注入变量笔误（OUTCOME_EN.test 少了注入下划线）让负例注入对该常量静默无效。最终纪律：**EN 正则块的落盘层数只有一个可信判据——行为测试**（对每支跑一条应命中样本）；用脚本文件（不经 shell 双引号）数反斜杠；修双层只修目标行。最终 fix3 用 String.fromCharCode(92) 拼反斜杠彻底避开引号层歧义。
+2. **DIM_GUIDANCE 插入把原字符串劈断**：接线脚本的 anchor 只写到行首 `'appeal_to_nature': "`（开引号），插入点落在长字符串字面量中间 → node --check 报 Invalid or unexpected token，而 lint 提示「非本轮引入」是误判。修复用 Node 精确字符串替换（分裂点 + 接缝两处各断言出现次数为 1），不再喂给模糊匹配。判据：**往长字符串行前插内容时，anchor 必须含该行之后的行首特征**，不能只写到开引号。
+3. **负例常量块注入产出崩溃红被误判成断言红**：多行 `new RegExp([...].join('|'))` 常量只换 decl 行会让后续数组行成孤儿语法；而常量名提取 slice(7,-2) 偏移错一位，产出的替换行声明的是 `EF_ZH` 而非 `REF_ZH` → 运行时 ReferenceError「REF_ZH is not defined」→ 测试红但红在崩溃上，isCrashRed 的正则没匹配到（错误消息里没有 "ReferenceError" 字样，只有 "X is not defined"），20/20 全红的结论差点是假的。修正是 slice(6,-3) 并复跑，同时 HEDGE_EN 注入点暴露第二个问题——原豁免样本无腿②、杀豁免也不命中（守卫漏抓的真实信号），换成有腿②的「do not conclude that higher education is pointless」样本后才承重。判据：**负例的「断言红」必须逐条看失败消息是断言失败还是运行时崩溃**；每个注入点的样本必须在该常量失效后真的改变命中结果。
+
+---
+
 # r707 轮报告（v6.8.54）
 
 ## 心虫选中项 + 分数 + 身份对齐
