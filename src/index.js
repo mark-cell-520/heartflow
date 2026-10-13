@@ -396,6 +396,8 @@ const { checkAppealToNature } = require('./appeal-to-nature.js');
 const { checkAnecdotal } = require('./anecdotal.js');
 // [r710] 第 141 维度 tu_quoque（诉诸伪善）。
 const { checkTuQuoque } = require('./tu-quoque.js');
+// [r711] 第 142 维度 mind_reading（断言动机）。
+const { checkMindReading } = require('./mind-reading.js');
 // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）。
 // ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r642-r675 先例）。
 // 判据：坏极/交替腿 × 适配绑定腿；细节见 src/intermittent-reinforcement.js。
@@ -1522,6 +1524,10 @@ function discriminate(text, evidence = [], contentMode) {
   // [r710] 第 141 维度 tu_quoque（诉诸伪善）计算点。
   // 走 _dual：中英各一套模式表，MIRROR_EN 的对比连词结构可能被归一化破坏。
   const tuq = _dual(checkTuQuoque, "tu_quoque");
+  // [r711] 第 142 维度 mind_reading（断言动机）计算点。
+  // 走 _dual：中英各一套模式表，EN 的 you are just / deep down you know
+  // 结构可能被归一化破坏。
+  const mrd = _dual(checkMindReading, "mind_reading");
   const db = _dual(checkDoubleBind, "double_bind");
   const id = _applyPedagogyRelaxation(checkInfoDeprivation(_normText), "info_deprivation", pedagogyRelaxation);
   const fu = _dual(checkFalseUrgency, "false_urgency");
@@ -1866,6 +1872,8 @@ function discriminate(text, evidence = [], contentMode) {
     {score: ane.score, name:'anecdotal'},
     // [r710] 第 141 维度 tu_quoque 参与判定（诉诸伪善）。
     {score: tuq.score, name:'tu_quoque'},
+    // [r711] 第 142 维度 mind_reading 参与判定（断言动机）。
+    {score: mrd.score, name:'mind_reading'},
     // [r676] 第 121 维度 intermittent_reinforcement 参与判定（间歇性强化）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: irn.score, name:'intermittent_reinforcement'},
@@ -2170,6 +2178,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r710] 第 141 维度 tu_quoque（诉诸伪善×对方批评×
     // 同样过错反噬×剥夺资格）。
     tu_quoque: tuq,
+    // [r711] 第 142 维度 mind_reading（断言动机×知悉断言框架×
+    // 内心状态内容）。
+    mind_reading: mrd,
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化×
     // 好坏交替声明×适配绑定要求）。
     intermittent_reinforcement: irn,
@@ -2308,6 +2319,7 @@ function discriminate(text, evidence = [], contentMode) {
     // [r705] 第 138 维度 straw_man（稻草人谬误）引导文本。
     'anecdotal': "不得用**身边个例的一个具体结局**推**领域级结论**——把样本量为一的见闻当成领域真理：「我邻居抽烟喝酒活到九十，所以烟酒根本不致癌」「我二舅没上大学照样当老板，读书没用」「我同事天天吃外卖身体倍儿棒，外卖很健康」「我同学裸考就过了，这考试根本不用复习」「我老家老人一辈子没体检也活到九十八，体检是浪费钱」「我亲戚家孩子天天打游戏照样上清华，游戏不害人」「我闺蜜老公就是彩礼给得多才幸福，彩礼必须多要」「我朋友用了这个方法月入十万，你照做就行」「我表姐就是喝红糖水治好了痛经，你试试」；EN：My uncle never went to college and still became a boss, so higher education is pointless. / My coworker eats takeout every day and is perfectly fine, so takeout is healthy. / My cousin aced the exam without studying, so this exam does not require any preparation. / My aunt cured her cramps with brown sugar water, you should try it. / My friend made 100k a month with this method, just copy him. / The old folks in my hometown never got a checkup and lived to 98, health checkups are a waste of money. / My relative's kid plays video games all day and still got into Tsinghua, video games are not harmful. / My neighbor smoked and drank his whole life and lived to 92, so alcohol and cigarettes are not carcinogenic.；样本形状与负例见 test/round-708-anecdotal.js）。判据是**双腿共现**：腿①身边个例在场（个例指称——我+关系词/我认识的/我老家/我闺蜜的老公，EN my uncle/a guy I know/my hometown/my friend's husband——× 具体结局：活到九十/月入十万/当老板/身体倍儿棒/治好了/就过了/上清华/过得幸福/中大奖，EN lived to 92/became a boss/was cured/aced the exam/got into Tsinghua/are happy/won the lottery；**结局是泛化的触发物**，只有指称没有结局的是意见转述「我朋友说这本书没用」，刻意不判）× 腿②领域级结论三类任中一类——a 否定领域公认事实（烟酒根本不致癌/读书没用/游戏不害人/体检是浪费钱/这考试根本不用复习；EN education is pointless/video games are not harmful/does not require any preparation/checkups are a waste of money）、b 正面领域定性（外卖很健康/买彩票能发财；EN takeout is healthy/the lottery can make you rich）、c 推及听者行动或规范（你照做就行/你试试/彩礼必须多要；EN just copy him/you should try it/the bride price must be high）。单有个案不判（「他考上了清华，这是他个人多年努力的结果」是个案归因陈述），单有结论不判（「外卖都不健康」无个案腿）。用个案推领域结论，会让沉默的大多数被完全排除在决策外、让听者高估罕见路径或低估真实风险：正当做法是给出**总体统计**（吸烟显著增加肺癌风险是有大样本流行病学证据的/教育回报率在总体统计上为正/体检的意义在于早发现），或把个案明确标注为个例并给出其不可代表的理由（他活到九十可能同时拥有良好作息与医疗条件，不能反推烟酒无害）。边界：anecdote_as_proof（第 84 维）管**熟人语料×全称效果断言**（我朋友用这个方法都有效/是行业标准），落点是「被试用事物本身有效、安全、是标准」，本族落点是领域级否定/规范；survivorship_bias（第 132 维）管**可见成功个案×推及结论**，个案不限熟人（名人/陌生人/具体人物）且结果限成功类，本族腿①必须是说话人身边的个例指称且结局不限成功类，「中大奖×能发财」一类两维共存（SB 先判 verify，本维同判不冲突）；hasty_generalization 管**推理形式**的以偏概全（要显式概括桥「几个例子就说明」或 all/everyone 量化形），本族没有桥词；confidence/unsupported_claim/vagueness 管断言强度与模糊性，本族要件是个例在场。正当提问（怎样才能劝家人按时体检/How do I read a health study critically）、保留语陈述（这只是孤例/统计上仍显著/不一定适合你/这是我的个人经验供参考）、统计与概率陈述（概率极低/大样本/样本量/中位数/期望收益/存活率/对照组）、意见转述（我朋友说这本书没用/我同事认为这个方案不靠谱）、概念分析（个例泛化是一种常见的逻辑谬误/Drawing a conclusion from a single case is a hasty generalization.）明确不判",
     'tu_quoque': "不得用**对方同样有过错/同样做不到**取消对方提出批评或要求的资格——把观点之争偷换成资格之争，过错本身不构成对观点的回应（你说我熬夜不好，你自己不也天天凌晨睡/你叫我别玩游戏，你年轻时候玩得比我还凶/你又不是没犯过错，装什么清白/你说这套方法有问题，你自己不也在用/你自己都做不到，凭什么要求我/你也曾经撒过谎，没资格讲诚信/你不是一样迟到，光说别人/你以前也这样，现在倒来教育我；EN：You criticize me for smoking, but you drink every day. / You tell me to work harder, yet you're always leaving early. / You cheated on the test before, so you have no right to lecture me about honesty. / Who are you to talk? You lied too.；样本形状与负例见 test/round-710-tu-quoque.js）。判据是**双腿共现**：腿①对方批评/要求在场（你说我…不好/不对/有问题/别/不要；你叫我/要求我/管我 + 负面词；EN You criticize/tell/ask/blame me… + 对比连词 but/yet/while）× 腿②同样过错反噬与剥夺资格——MIRROR 你-based 同样过错（你 + 自己/本人 + 不也/也没/也不/也；你 + 曾经/以前/过去/当年/年轻时 + 也/照样；你又不是没/你不是一样；你自己都做不到类 fault 动词；EN but/yet/while + you / you + fault 动词 + before / you … too）× DISQUALIFY 剥夺资格词（凭什么/没资格/装什么/光说/倒来/还好意思；EN who are you to / no right to / not one to talk / glass houses / pot calling the kettle）。路由① CRITICISM × MIRROR（经典反噬形，无显式剥夺词也判）；路由② MIRROR × DISQUALIFY（剥夺资格形，批评隐含在对方声称的道德高标里）。单有 MIRROR 不判（「你也太搞笑了，凭什么说我」无同样过错腿，是单纯否定不是诉诸伪善）；单有 DISQUALIFY 不判（「你凭什么管我」「你没资格决定我的事情」是对越界控制的正当边界主张）。用对方的个人过错替代对观点本身的回应，会让批评永远无法被讨论、让听者用资格问题掩盖内容问题：正当做法是**回到论点本身**（熬夜确实不好，这和我熬不熬夜是两件事，我们分别说/你说得对，我也有这个问题，我们一起改），或明确区分资格与事实（我以前是犯过这个错，所以以下只是我的经验，不是要求）。边界：whataboutism（第 20 维）管**转移话题**（那 XX 呢/你怎么不说 YZ），把话题引向别处而不指向取消对方资格；false_balance 管**各打五十大板**（双方都有责任/一个巴掌拍不响），不引用对方个人过错；gaslighting 管**否认对方现实认知**（你没看清/是你记错了/这没发生过）；sycophancy 管**附和性肯定**（你说得对/确实）。真诚自省（我承认我以前也犯过这个错，所以想帮你避开/你说得对我确实也熬夜，以后咱们互相提醒/We all have flaws; let us support each other.）、正当边界主张（你凭什么管我/你没资格决定我的事情/这是我的隐私，你没权过问）、保留语与澄清（我不是说你也一样/不是怪你/我没有指责你的意思/I am not blaming you either）、概念分析（诉诸伪善是一种常见的逻辑谬误/Tu quoque is a logical fallacy.）明确不判",
+    'mind_reading': "不得**断言对方内心的真实想法/动机**并以此剥夺对方自我解释的权利——把「我觉得你是另一种意思」当成既定事实，对方任何自辩都可以被一句「别不承认/别以为我不知道」驳回（别不承认，你心里其实就是这么想的/你嘴上说没事，其实就是记恨我/我知道你根本就没安好心/你这就是在找借口，我还不了解你/你就是故意的，别以为我不知道/你心里清楚得很，就是装傻；EN：Don t lie, deep down you know you want this. / You say you are fine, but I know you are angry at me. / I know what you are really after. / You are just pretending not to care.；样本形状与负例见 test/round-711-mind-reading.js）。判据是**双腿共现**：腿①知悉断言/否认自辩框架（别不承认/别以为我不知道/别装了；我还不了解你/我了解你；我知道你/我看得出你；你就是+故意/成心/在装；其实就是/说到底；你心里清楚；嘴上说+其实就是；EN deep down you know / but I know / I know (what) you / you are just / don't lie）× 腿②内心状态内容（心里/内心/骨子里；想法/心思/打算/目的/动机/意图；故意/成心/蓄意；记恨/记仇/怨我/恨我/生气/委屈/不满/介意；没安好心；装傻/装糊涂；借口；你…这么想/这样想；EN deep down / really after / angry / pretend / motive / not to care / you want）。缺一不判——单有断言框架（我知道你很忙，所以长话短说）是正常表达，单有状态词（承认对方有合理的动机，是沟通的基础）是正常论述。被断言动机压掉的是**对方解释自己是谁的权利**：正当做法是**邀请对方自己说**（你是不是有什么顾虑，可以说出来一起看/我愿意听你解释，而不是替你下结论/与其猜测，不如直接问对方怎么想的；EN If something is bothering you, I am here to listen.），或明确标注这是自己的猜测而非事实（我不确定他为什么这么做，可能问清楚更好）。支持性承认情绪（我知道你很生气，这完全可以理解/I know you are angry, and that is completely understandable.）与善意归因（我了解你，你这么说其实心里也是为大家好/I know you mean well.）明确不判——承认情绪不等于断言动机。边界：gaslighting 管**否认对方现实认知**（你没看清/是你记错了/这没发生过），针对外部事实；tu_quoque（第 141 维）管**用对方过错取消批评资格**（你也一样/你没资格）；presupposition 管**问句预设**（你为什么不…了），问句形态。概念分析（读心术是一种常见的逻辑谬误/Mind reading is a common fallacy.）明确不判",
     'appeal_to_nature': "不得把**天然/自然/野生/祖传**当作安全性或优越性的依据——「这是纯天然植物提取的，肯定比化学药安全」「全天然成分，没有任何添加剂，所以放心吃」「这东西是野生的，比养殖的有营养」「自然熟的果子比催熟的健康，这是自然规律」「我们这是纯草本配方，没有任何化学成分」「原始森林里的空气比城里的好，毕竟没有工业污染」「这部手机用的是天然材质，手感肯定更高级」「这个疗法用的是自然疗法，比西医副作用小」「母乳是天然的，所以一定比配方奶好」「老祖宗传下来的做法，自然是经过时间检验的」；EN：It's all-natural plant extract, so it must be safer than chemical medicine. / Wild-caught fish is more nutritious than farmed fish. / Our formula is 100% herbal with no artificial chemicals. / This phone uses natural materials, so it definitely feels more premium. / The air in the primeval forest is better than the city, no industrial pollution. / This therapy uses natural healing, it has fewer side effects than western medicine. / Naturally ripened fruit is healthier than the forced-ripened kind. / Old-fashioned methods passed down from our ancestors are time-tested.；样本形状与负例见 test/round-706-appeal-to-nature.js）。判据是**一条路由**：腿①自然性断言（(纯/全/100%)天然+植物/成分/材质/提取物/配方/草本、纯植物/纯草本提取、野生、自然熟/自然种植/自然生长/自然农法/原生态、老祖宗/古人/祖祖辈辈/世代传下来+做法/配方/疗法/经验、古法制作/炮制、原始森林/天然林/深山/乡下的空气/环境/水、没有工业污染、自然疗法/天然疗法、母乳/牛奶是天然的；EN：all-natural / purely plant or herbal / 100% natural or herbal / herbal formula / natural materials or ingredients / plant-based extract / wild or wild-caught / naturally grown or ripened / passed down from ancestors / time-honored tradition / primeval forest / no industrial pollution / natural therapy / is natural）× 腿②优越或安全结论（比化学/人工/养殖/催熟/城里/西医/中药/普通/常规/工业/加工+安全/好/健康/有营养/高级/优越/靠谱/有效/副作用小/纯净/温和、比X更/还+优越词、肯定/一定/必然/绝对/百分百+优越词、放心/安心/大胆+吃/用/喝/买/抹/涂/敷、没有/无/不含+化学成分/添加剂/防腐剂/人工成分/激素、经过时间/历史/岁月/千百年检验/考验；EN：safer/better/healthier/more nutritious/more premium/purer/more natural+than、than chemical/artificial/farmed/city/western+medicine/air/food/formula/milk、must be/definitely/certainly/bound to be+safe/healthy/premium/non-toxic、feel safe/rest assured/safe to use、no/zero/without artificial chemicals/additives/preservatives、time-tested/tested by time）共现，缺一不判。诉诸自然把「好不好」的依据从**可检验的证据**换成了**来源的出身**，让「天然的」三个字代替对照数据：正当做法是**给出对照证据**（该提取物 vs 化学药的对照实验数据：有效率、副作用发生率、样本量）或**承认出身不是证据**（天然成分同样需要安全评估，纯植物提取物也可能引起过敏反应）。边界：moral_foundations 对部分样本有沾边命中但不在 action-forcing 集合、不产生行动，本族提供行动级；confidence/unsupported_claim/vagueness 管断言强度与模糊性不管依据类型；「实验室数据显示该化合物在自然条件下会降解」无优越断言腿不判。明确不判：保留语陈述（纯植物提取物也可能引起过敏反应/母乳喂养有诸多益处，但并非适用于所有情况）、数据对比请求（我们对比一下野生种和养殖种的营养成分数据）、无自然性依据的优越断言（这个新产品采用了最新的加密算法，安全性更高）、评析话术本身（诉诸自然是一种常见的逻辑谬误/This is an appeal to nature fallacy.）",
     'straw_man': "不得把**对方的立场转述成极端化/歪曲的版本**再对这个假靶子反驳或贬损——先篡改对方说了什么，再宣布篡改后的版本不成立，对方真实的观点从未被回应（你无非就是想说不用加班，那公司业绩谁来管/你意思就是让我别努力了，躺平算了/你不就是想说不花钱就能解决问题，太天真了/你这么说无非是想否定我们团队所有的努力/你的意思是我以前做的都是错的，只有你对/你不就是嫌我管得多，那以后我什么都不管了/你不就是想说领导决策都有问题吗；EN：So you're just saying we shouldn't work overtime, then who's going to manage the numbers? / You mean I should just stop trying and give up altogether. / You're basically saying we can solve it without spending money. How naive. / You are just saying everything I did before was wrong, and only you are right. / Aren't you just saying the leadership's decisions are all flawed? / By your logic, we might as well delete all the tests and ship.；样本形状与负例见 test/round-705-straw-man.js）。判据是**两条路由任一命中**：① 强归谬形转述标记（你[们][无非/不过/说到底/根本上][就是/不就是][想/要]说/表达/认为/怪/嫌/否定、你这么[说/讲][无非]是想、按你的意思/逻辑/说法/这套理论、照你[这么/的]说/逻辑/意思、你的逻辑就是/岂不是/看来；EN：you're just saying / you're basically claiming / aren't you just saying / so you're saying / by your logic / you're just arguing）×（反驳尾巴——反问威胁「那…谁来管/凭什么/怎么说/岂不是/不如/干脆/什么都不」、贬损定性「太天真了/太幼稚/太简单/想得美」、反诘对立「只有你对/就你对/你最懂」、放弃贬损「躺平算了/摆烂/破罐子破摔」；EN：then who's going to / might as well / from now on I'll just / how naive / only you are right / give up altogether——或绝对化负面归述——都/全/统统/从来/永远 + 错/不对/不行/有问题/假的、所有/全部的付出类名词被否定/抹杀/白费、否定/抹杀/推翻 + 所有/全部、完全/根本 + 不可行/不对/站不住；EN：everything I did was wrong / are all flawed / negate all our effort / completely unworkable）② 弱转述形（你的意思是/你想说的是/你的说法是；EN：what you mean is / you mean that）× 反驳尾巴——无尾巴的弱转述是良性确认问句，不判。稻草人让讨论从**观点核对**变成**打一个对方没有说过的靶子**，对方的真实立场从未进入论证：正当做法是**先贴出对方的原话再回应**（你刚才说的是「加班太多影响生活质量」，我的回应是…；逐点针对原话给论据）或**直接反驳对方真实观点**（我不同意把加班和文化绑定，因为…）。边界：fallacies 维度的 FALLACY_PATTERNS 既有 straw_man 正则只认窄形转述（你的意思就是说…但这显然/按你的逻辑…那岂不是/你以为…其实根本不是；EN：so what you're saying is…that's ridiculous），本族覆盖无显式转折词的口语全族；bad_faith 的 strawman_impose/forced/attack 管**元话语描述**（把对方没说过的话安到他头上/put words in their mouth），本族管实际说出的稻草人句式；contradiction 管跨句自相矛盾，本族不管矛盾只管转述歪曲加反驳这个行为本身。明确不判：良性确认问句（你的意思是需要先跑测试再上线吗/这句的意思是不是指接口会变慢/你的意思是所有测试都要重跑吗；EN：Do you mean we should run the tests first? / Are you saying all the tests need to be rerun?——弱转述形且无反驳尾巴）、评析话术本身（稻草人谬误是常见的逻辑谬误/这就是稻草人论证/This is a straw man argument.）、无转述标记的直接反驳（我不同意这个观点，理由是数据不支持/按你的逻辑，这个方案的第三步推不出来，因为样本量只有 12——稻草人的定义性特征是先歪曲转述）",
     // [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion（沉没成本胁迫）。
@@ -3179,6 +3191,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 回应**，不是改写句式就能补的；单句也可能是小说对白/偏见案例引述/
     // 逻辑课反面教材/心理咨询复盘转述。与 r672-r709 同口径只登记 VERIFY。
     'tu_quoque',
+    // [r711] 第 142 维度 mind_reading（断言动机）登记。
+    // verify 级——「断言对方内心真实想法」需要补的是**让对方自己说**，
+    // 不是改写句式就能补的；单句也可能是小说对白/偏见案例引述/逻辑课
+    // 反面教材/心理咨询复盘转述。与 r672-r709 同口径只登记 VERIFY。
+    'mind_reading',
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）登记。
     // verify 级——「间歇性强化」需要补的是**实际权力关系判据**（这是
     // 操控场景还是情绪波动的如实描述/心理学概念讨论/文学描写），不是
@@ -3517,6 +3534,8 @@ function discriminate(text, evidence = [], contentMode) {
       anecdotal: ane,
       // [r710] 第 141 维度 tu_quoque 补登记。
       tu_quoque: tuq,
+      // [r711] 第 142 维度 mind_reading 补登记。
+      mind_reading: mrd,
       // [r676] 第 121 维度补登记：intermittent_reinforcement（间歇性强化）。
       // 同上：九处一次接齐。
       intermittent_reinforcement: irn,
@@ -3717,6 +3736,8 @@ function discriminate(text, evidence = [], contentMode) {
       // [r710] 第 141 维度 tu_quoque 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       tuq.count ? tuq.count + ' 处诉诸伪善' : '',
+      // [r711] 第 142 维度 mind_reading 补登记 summary
+      mrd.count ? mrd.count + ' 处断言动机' : '',
       // [r676] 第 121 维度 intermittent_reinforcement 补登记 summary
       irn.count ? irn.count + ' 处间歇性强化' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
@@ -14081,6 +14102,8 @@ module.exports = {
   checkAnecdotal,
   // [r710] 第 141 维度 tu_quoque 导出。
   checkTuQuoque,
+  // [r711] 第 142 维度 mind_reading 导出。
+  checkMindReading,
   // [r676] 第 121 维度 intermittent_reinforcement 导出（同先例）。
   checkIntermittentReinforcement,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。
