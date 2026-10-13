@@ -1,3 +1,56 @@
+# r711 轮报告（v6.8.57）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 四个候选来自 r711 探测器
+`/tmp/r711-scout.js` + `/tmp/r711-scout2.js`（落盘 `/tmp/hf-scout-711.txt`，
+对 6 个候选族在当前 141 维引擎上实测），喂给 decision 本体
+（`/tmp/decide-run-r711.js` 读 `/tmp/decide-opts-r711.json`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A mind_reading 断言动机新维度 | **0.94** | 攻击漏判 10/10、真零命中 9/10、误伤 0/12 | **选中** |
+| B stereotype 出身歧视补族 | 0.89 | 攻击漏判 8/10、真零命中 7/8、误伤 0/12 | 落选（补族，非新维度） |
+| C void_zh 既往承诺作废补族 | 0.87 | 攻击漏判 6/7、真零命中 6/6、误伤 0/7 | 落选（缺口面最小） |
+| D middle_ground 和稀泥新维度 | 0.86 | 攻击漏判 10/10、真零命中 10/10、误伤 1/12 | 落选（存量 victim_blaming 误伤良性句） |
+
+decision 返回 composite_score 0.94 / confidence 0.90 / identity alignment 100%。
+诚实标注：候选的 feasibility/consequence_value/risk/confidence 四段判据由我
+构造，decision 本体在四个候选间选出 A。
+
+**轮次截断说明（r712 会话补完成）**：r711 会话在改动完工、测试通过后被迭代
+上限截断，未 commit、未写本报告。r712 会话开头实测复验全部通过后代为收尾
+（修 package.json 描述 141→142、补本报告、commit）。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「别不承认，你心里其实就是这么想的」「你嘴上说没事，其实就是记恨我」「你就是故意的，别以为我不知道」「I know what you are really after.」这类**断言对方内心真实想法并剥夺自我解释权**从 pass 变 verify | 攻击族 10/10 漏判清零（gate 层 10/10 全非 pass） | ✅ 升级（真升级①：第 142 个辨别维度） |
+| src/mind-reading.js：双腿共现模块——腿①知悉断言/否认自辩框架（别不承认/别以为我不知道/我还不了解你/我知道你/其实就是/你心里清楚；EN deep down you know / but I know / you are just / don't lie）× 腿②内心状态内容（心里/内心/想法/动机/故意/记恨/装傻/借口；EN deep down / really after / angry / pretend / motive）；支持性承认情绪与善意归因豁免 | 读心术句式族零误伤（良性 12/12 pass） | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/dimMap 补登记）+ bump 6.8.56→6.8.57 四处 | npm 用户可感知新版本 | 维护（接线 + 发布链） |
+| test/round-711-mind-reading.js 9 断言 + scripts/negative-test-mind-reading.js 负例 | 攻击 10/良性 12/单腿边界 6/分工边界 3/豁免 8/gate 层 10+7 | ✅ 升级（验收证据） |
+
+## 验收数字（一行一个检查项，r712 会话开头复验）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 142；规格表口径版本戳两处同步 6.8.57；changelog 覆盖 v6.8.57）
+- node test/round-711-mind-reading.js — 9/9（攻击 10：中文 6 + 英文 4；良性 12；单腿边界 6；分工边界 3；豁免 8；gate 层攻击 10 verify + 良性 7）
+- scripts/negative-test-mind-reading.js — 13/13 注入点全部断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 142，summary 引用 105；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 15/16（S2 版本未 commit，本 commit 后转绿）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **package.json description 维度数漂移（141→142）**——r711 bump 时漏改，init 第 5 项抓到。doc-numbers-accuracy 不扫 package.json description（只扫 README/SKILL/AGENTS 横幅），是守卫盲区。本 commit 已修。
+2. **middle_ground 和稀泥新维度候选**——decision 落选（0.86）。攻击漏判 10/10、真零命中 10/10，但误伤 1/12（存量 victim_blaming 误伤良性句「一个巴掌拍不响，我们可以一起反思沟通方式」）。r712 复量仍是误伤 1/12 不合格。
+3. **guilt_by_association 连坐定罪新维度候选**——r712 复量：攻击漏判 10/10、真零命中 7/10、误伤 1/12（存量误伤「你和他都是受害者，应该互相作证」），不合格。
+4. **stereotype 出身歧视补族**——decision 落选（0.89）。r712 复量：漏判 8/10、真零命中 7/8、误伤 0/12，仍合格，留待后续轮次。
+5. **void_zh 既往承诺作废补族**——decision 落选（0.87）。r712 复量：漏判 6/7、真零命中 6/6、误伤 0/7，仍合格，留待后续轮次。
+6. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+7. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
 # r710 轮报告（v6.8.56）
 
 ## 心虫选中项 + 分数 + 身份对齐
