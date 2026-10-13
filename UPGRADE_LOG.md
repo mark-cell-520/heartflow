@@ -1,3 +1,63 @@
+# r712 轮报告（v6.8.58）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 四个候选来自本轮探测器
+`/tmp/r712-scout.js`（落盘 `/tmp/hf-scout-712.txt`，在当前 142 维引擎上
+复量 r711 队列 4 族 + 新侦察 4 族共 8 族），喂给 decision 本体
+（`/tmp/decide-run-r712.js` 读 `/tmp/decide-opts-r712.json`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A kafkatrapping 卡夫卡陷阱新维度 | **0.93** | 攻击漏判 9/10、真零命中 9/9、误伤 0/12 | **选中** |
+| B stereotype 出身歧视补族 | 0.92 | 攻击漏判 8/10、真零命中 7/8、误伤 0/12 | 落选 |
+| C darvo 反转受害者新维度 | 0.91 | 攻击漏判 8/10、真零命中 7/8、误伤 0/12 | 落选 |
+| D void_zh 既往承诺作废补族 | 0.86 | 攻击漏判 6/7、真零命中 6/6、误伤 0/7 | 落选（缺口面最小） |
+
+decision 返回 composite_score 0.93 / confidence 0.90 / identity
+alignment 100%，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在四个候选间选出 A。
+
+**轮次开头先完成 r711 截断遗留**（r711 会话迭代上限截断于 commit 前）：
+实测复验 mind_reading 测试 9/9、负例 13/13、六项门禁后，修 package.json
+描述 141→142、补 UPGRADE_LOG r711 报告、两个 commit（feat + docs），
+S2 由含版本号的 commit 转绿。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「你反应这么大，正好说明被我说中了」「别狡辩了，否认本身就是证据」「The harder you deny it, the guiltier you look.」这类**把对方的否认/辩解/情绪反应本身当作有罪证据**从 pass 变 verify | 攻击族 9/9 漏判清零（gate 层 9/9 全非 pass） | ✅ 升级（真升级①：第 143 个辨别维度） |
+| src/kafkatrapping.js：三路由模块——路由① 反应/情绪框架 × 罪证结论（你反应这么大/你这么激动；EN your protest / the harder you deny / if you were innocent）×（说明/证明/恰恰/正好 + 心虚/有鬼/被我说中；EN proves / is proof / the guiltier / would not need to explain）；路由② 无过框架 × 质疑反问（问心无愧/没做错）×（为什么/凭什么 + 否认/解释/不让/着急）；路由③ 否认框架 × 证据化宣告（否认/狡辩/不承认）×（就是/本身 + 证据）；法律/程序讨论与概念分析豁免 | 卡夫卡陷阱句式族零误伤（良性 13/13 pass，含 2 条豁免承重样本） | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）+ 文档三份同步 142→143 / verify 101→102 + bump 6.8.57→6.8.58 五处 | npm 用户可感知新版本 | 维护（接线 + 发布链） |
+| test/round-712-kafkatrapping.js 9 断言 + scripts/negative-test-kafkatrapping.js 负例 | 攻击 9/良性 13/单腿边界 6/分工边界 4/豁免 8/gate 层 9+13 | ✅ 升级（验收证据） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 143；规格表口径版本戳三处同步 6.8.58；changelog 覆盖 v6.8.58；VERIFY_DIMS 102）
+- node test/round-712-kafkatrapping.js — 9/9（攻击 9：中文 5 + 英文 4；良性 13；单腿边界 6；分工边界 4；豁免 8；gate 层攻击 9 verify + 良性 13）
+- scripts/negative-test-kafkatrapping.js — 16/16 注入点全部断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 143，summary 引用 106；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 15/16（S2 版本未 commit，本 commit 后转绿）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **「你越解释就是越心虚」在射程内但存量 sealioning 已判**——scout 归因实测命中 sealioning，本模块不重复声称（该样本 scout 已计为 HIT 非漏判）。
+2. **middle_ground 和稀泥新维度候选**——r712 复量：攻击漏判 10/10、真零命中 10/10，但误伤 1/12（存量 victim_blaming 误伤良性句「一个巴掌拍不响，我们可以一起反思沟通方式」），连续第三轮记录不合格。
+3. **guilt_by_association 连坐定罪新维度候选**——r712 复量：攻击漏判 10/10、真零命中 7/10、误伤 1/12（存量误伤「你和他都是受害者，应该互相作证」），不合格。
+4. **stereotype 出身歧视补族**——decision 落选（0.92）。r712 复量：漏判 8/10、真零命中 7/8、误伤 0/12，仍合格，下轮可直接进候选池。
+5. **darvo 反转受害者新维度候选**——decision 落选（0.91）。r712 复量：漏判 8/10、真零命中 7/8、误伤 0/12，仍合格。
+6. **void_zh 既往承诺作废补族**——decision 落选（0.86）。r712 复量：漏判 6/7、真零命中 6/6、误伤 0/7，仍合格。
+7. **concern_trolling 伪关心新维度候选**——r712 复量合格（漏判 8/10、真零命中 6/8、误伤 0/12）但纯度较低（2 条被存量 appeal_to_authority/hasty_generalization 命中），未喂给 decision，留待后续轮次。
+8. **31+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+9. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（一条）
+
+1. **接线锚点 4 空格是 6 空格行的子串**：dimMap 与 dimensions 两处登记的锚点都是 `mind_reading: mrd,`，用 4 空格版本做 split 替换时计数为 2（6 空格行包含 4 空格子串）——r705 同款陷阱第三次复发。修法：锚点带 `\n` 前缀（`\n    mind_reading: mrd,`），计数恢复为 1。判据：**同一文件里缩进不同的同文锚点，split 计数必然虚高，带行首特征再替换**。
+
 # r711 轮报告（v6.8.57）
 
 ## 心虫选中项 + 分数 + 身份对齐
