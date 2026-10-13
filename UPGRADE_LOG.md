@@ -1,3 +1,69 @@
+# r704 轮报告（v6.8.51）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池来自 r700 探测器落盘
+/tmp/hf-scout-700.txt（纪律：已落盘但维度未做完时下一轮直接读文件，不重新
+探测；standard_shift 已于 r700、circular_reasoning 已于 r701、appeal_to_pity
+已于 r702、stereotype 出身歧视族已于 r703 上线，均排除），本轮
+/tmp/r704-preprobe.js 对剩余 4 族复量并做 FP 归因（每个误伤都定位到具体
+维度，区分「本族自身存量模式」与「别的存量维度」）。四个候选喂给 decision
+本体（/tmp/decide-run-r704.js 读 /tmp/decide-opts-r704.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A appeal_to_ridicule 新维度 | **0.87** | 攻击漏判 10/10、真零命中 8/10、误伤 1/12（存量 contradiction，归因后本族自身存量误伤 0） | **选中** |
+| C straw_man 新维度 | 0.85 | 攻击漏判 7/10、真零命中 7/7、误伤 1/12（存量 contradiction） | 落选 |
+| D standard_shift 补 VOID_ZH 契约作废窄口 | 0.85 | 攻击漏判 2/4（「之前答应的标准不算数」「原来谈的条件不算数了」零命中）、缺口面最小 | 落选 |
+| B appeal_to_nature 新维度 | 0.82 | 攻击漏判 8/10、真零命中 5/8（3 条已有 moral_foundations 沾边，有效增量 5） | 落选 |
+
+decision 返回 composite_score 0.87 / confidence 0.80 / identity alignment
+100%，无拒选。诚实标注：候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在四个候选间选出 A。
+appeal_to_ridicule 连续第五轮进决策池（r700-r703 四次落选），本轮首次选中。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+| 「这种想法也太可笑了，亏你想得出来」「这么幼稚的观点也拿出来说」「笑死我了，这也叫方案」「你的逻辑太搞笑了，认真读过文档吗」「脑子正常的人都不会这么想」「这也信？智商堪忧」「你的方案蠢得让人无语」「哈哈，就这水平还敢发言」这类**以嘲笑/蔑视/智商贬低对方的观点或发言代替论据**的句式从 pass 变 verify | 攻击族 26/26 漏判清零（gate 层 26/26 全非 pass，appeal_to_ridicule finding 在场） | ✅ 升级（真升级①新增维度） |
+| src/appeal-to-ridicule.js：三条路由模块——路由①嘲词×目标腿共现（腿①嘲笑/蔑视表达三支：直接嘲词/笑声蔑称/智商贬低；腿②指向对方观点/发言/产出三支：指称+观点名词/第二人称号领/发言动词指向，中文指称带 (?<![我你]) 负向后视使第一人称自嘲不判）；路由②自含指向的固定嘲讽习语单独成支（亏你想得出来/也只有你/不值一驳/脑子正常的人都不会/就这水平；EN 对应四条）；豁免：缺陷对象在场（可笑的漏洞是具体指认不是整体蔑视）、评析话术本身；**提问句式刻意不豁免**（反问收尾的攻击形态占比高） | 第 137 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。**刻意不接 FALLACY_PATTERNS 第十处**——静态正则没有豁免层，实测会把元话语样本「把『这种想法太可笑了』当作论据，就是诉诸嘲讽」判成 fallacies verify，而程序化模块的 META_EXEMPT 能正确放行（同 r703 stereotype 先例） | dimensions 键 136→137 | ✅ 升级（接线） |
+| test/round-704-appeal-to-ridicule.js 12 断言 + scripts/negative-test-appeal-to-ridicule.js 负例 16/16 注入点全红 | 攻击 26 中英对称/良性 30/单腿边界 8/相邻维度分工 8/豁免承重 4/gate 层 26/接线 5 | ✅ 升级（验收证据） |
+| bump 6.8.50→6.8.51 六处（VERSION/package.json/SKILL.md frontmatter/src/core/version.js/两处描述）+ README changelog + 三份禁改文档维度数 136→137、verify 计数 95→96 两处、verify 列举补 appeal_to_ridicule、规格表版本戳 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 136→137 三处同步、verify 计数 95→96 两处、verify 列举、规格表版本戳两处、changelog 覆盖 v6.8.51）
+- node test/round-704-appeal-to-ridicule.js — 12/12（攻击 26：中文 16 + 英文 10；良性 30：中文 17 + 英文 13；单腿边界 8；相邻维度分工 8；豁免承重 4；gate 层 26；接线 5）
+- scripts/negative-test-appeal-to-ridicule.js — 基线 12/12 PASS + 16/16 注入点全部断言红（无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 137，summary 引用 100；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 commit 转绿；bump 后 commit 前为预期的 15/16 中间态）
+- 轮前探针复量（/tmp/r704-preprobe.js 口径）— appeal_to_ridicule 族攻击 10/10 漏判证实、straw_man 7/10、appeal_to_nature 8/10（有效增量 5）、VOID_ZH 窄口 2/4 首次量化
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **straw_man 新维度**——decision 落选（0.85，与 D 同分）。攻击漏判 7/10、真零命中 7/7、误伤 1/12（存量 contradiction）。结构判据清晰（「你的意思是 X」转述 + 极端化/反问反驳），与 paraphrase/confirm 良性句式（「你的意思是需要先跑测试再上线吗」）边界需精心设计。下轮可直接做。
+2. **appeal_to_nature 新维度**——decision 落选（0.82）。攻击漏判 8/10 但 3 条已有 moral_foundations 沾边（有效增量 5），天然/自然在食品护肤养生语境高频，豁免面（「纯植物提取物也可能引起过敏反应」必须 pass）设计难度大于 ridicule。
+3. **standard_shift 的 VOID_ZH 契约作废窄口**——decision 落选（0.85）。契约作废族 4 条中 2 条漏判且零命中（「之前答应的标准不算数」「原来谈的条件不算数了」），缺口面最小（2 条），词表补「不算数」裸形即可，r700 起连续第五轮记录。
+4. **appeal_to_authority 补族 + 存量误伤**——r703 起连续第二轮记录。本轮复量仍不合格：误伤 4/12，其中 2 条是该维度自身存量模式命中良性（「研究表明适量运动有益健康」「权威机构发布了新的行业标准」），补族与收紧存量互相牵制，需单独一轮。
+5. **「这设计太弱智了，你的脑子进水了吗」gate 层是 block 而非 verify**——block 来自存量 hate_speech（弱智是残障贬称），不是本维度。已在测试 F1 组用干净样本单独断言 verify 定级（r686 B2 纪律：gate 层已拦样本不能当本维度 tier 证据）。
+6. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第八轮记录。
+7. **78 个 commit 未推送 GitHub**——finish 的推送尝试直连 ETIMEDOUT、代理也失败（网络不通），且环境红线规定推送是人工门禁，本任务不做。
+8. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（四条）
+
+1. **写完先接 FALLACY_PATTERNS 再实测元话语样本，被静态正则打脸**：按 r699/r701 十处先例接了 3 条中文紧凑正则，跑良性样本时发现元话语句「把『这种想法太可笑了』当作论据，就是诉诸嘲讽」被 `fallacies` 维度判 verify——静态正则没有豁免层，而程序化模块的 META_EXEMPT 能正确放行。处置是整段撤掉 FALLACY_PATTERNS 接线（改九处），并在模块头与报告里写明理由。判据：**静态紧凑正则接不接，要看它会不会绕过模块的豁免层**；r703 stereotype 不接静态表是同一纪律的先例。
+2. **中文指称腿被第一人称自嘲钻空子**：「我这个想法确实很蠢，算了」被判命中——「我这个想法」里含「这个想法」子串，指称腿不认领属者。修法是在指称词前加负向后视 `(?<![我你])`，同时把第二人称号领支从「你的+名词」扩到「你(的|这个|这种|这么|那么)?+名词」补回「你这个想法也太可笑了」这类对听者攻击形。判据：**凡指称腿含「这个/这种」，必须查第一人称领属形**。
+3. **EN 元话语豁免只认首置形，尾置形整类漏放**：「Saying "this idea is ridiculous" ... is appeal to ridicule.」被命中——META_EXEMPT_EN 只写了「appeal to ridicule is a fallacy」前缀形，没有「...is appeal to ridicule」尾置形（中文侧早有「就是诉诸嘲讽」尾置支，英汉不对称）。补尾置形后才放行。判据：**豁免正则要中英双侧对照分支数**（r686 纪律同族）。
+4. **负例脚本杀 new RegExp 块的 flags 行造成崩溃红，结论失真**：RIDICULE_EN/TARGET_EN/IDIOM_EN 三块注入后报 `SyntaxError: Invalid flags supplied to RegExp constructor '__negtest_never__'`——killLines 把 `  'i'` flags 行也替换成了永不匹配串，new RegExp 的第二个参数变成非法 flags。修法是 flags 行（`/^'[gimsuyvdx]*'$/`）跳过不换。判据：**负例的崩溃红证明不了断言能抓分支失效，杀块时必须先认出哪些行不是模式行**。
+
+
+---
+
 # r703 轮报告（v6.8.50）
 
 ## 心虫选中项 + 分数 + 身份对齐

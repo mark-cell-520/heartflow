@@ -42,7 +42,9 @@ const path = require('path');
 //                 thought_terminating_cliche 思想终止套话上线）。
 // [v6.8.20] 第 670 轮同步：6.8.19 → 6.8.20（第 116 维度
 //                 surveillance_normalization 监控正常化上线）。
-let VERSION = '6.8.50';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.51] 第 704 轮同步：6.8.50 → 6.8.51（第 137 维度
+//                 appeal_to_ridicule 诉诸嘲讽上线）。
+let VERSION = '6.8.51';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');
