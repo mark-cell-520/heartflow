@@ -1,3 +1,73 @@
+# r710 轮报告（v6.8.56）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** r700-r708 探测器队列 9 族
+已上线 8 族（appeal_to_authority 连续第四轮判不合格——误伤 4/12 中 2 条
+是该维度自身存量模式命中良性），按 Phase 0.7b 纪律新侦察：本轮探测器
+/tmp/r710-scout.js（落盘 /tmp/hf-scout-710.txt）复量两个队列遗留族
+（样本集与 r708 一致跨轮可比）+ 两个全新族，另跑
+/tmp/r708-unwired-probe.js（checkXxx 断链面：defined 50 /
+discriminate 全调用，零遗留）。四个候选喂给 decision 本体
+（/tmp/decide-run-710.js 读 /tmp/decide-opts-710.json）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A tu_quoque 诉诸伪善新维度 | **0.92** | 攻击漏判 9/10、真零命中 9/9、误伤 5/12 全归因存量 sycophancy/false_balance | **选中** |
+| D mind_reading 断言动机新维度 | 0.91 | 攻击漏判 10/10、真零命中 9/10、误伤 1/12 归因存量 contradiction | 落选（0.01 之差；边界判据最清晰但缺口面相同） |
+| B middle_ground 和稀泥新维度 | 0.89 | 攻击漏判 10/10、真零命中 10/10、误伤 5/12 归因存量四维 | 落选（与存量三维射程重叠，分工成本最高） |
+| C guilt_by_association 连坐定罪新维度 | 0.89 | 攻击漏判 10/10、真零命中 7/10、误伤 1/12 归因存量 victim_blaming | 落选（3 条已被存量判非 pass，缺口纯度中） |
+
+decision 返回 composite_score 0.92 / confidence 0.9 /
+identity alignment 100%，无拒选。诚实标注：候选的
+feasibility/consequence_value/risk/confidence 四段判据由我构造
+（依据是实测数字 + 读源码后的形状判断），decision 本体在四个候选间
+选出 A。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 「你说我熬夜不好，你自己不也天天凌晨睡」「你又不是没犯过错，装什么清白」「你自己都做不到，凭什么要求我」「你也曾经撒过谎，没资格讲诚信」「You criticize me for smoking, but you drink every day.」「Who are you to talk? You lied too.」这类**用对方同样有过错取消其批评/要求资格**的句式从 pass 变 verify | 攻击族 15/15 漏判清零（gate 层 15/15 全 verify，own count 全 1） | ✅ 升级（真升级①新增维度） |
+| src/tu-quoque.js：双腿共现模块——腿① CRITICISM 对方批评/要求在场（你说我…不好/不对/有问题/别/不要/乱花钱；EN You criticize/tell/ask/blame/accuse me… + but/yet/while，弱动词 say/said/claim 须负面评价词共现）× 腿② MIRROR 你-based 同样过错（你+自己/本人+不也/也没/也不/也；你+曾经/以前/上次+也/照样；你又不是没/你不是一样；你自己都做不到类 fault 动词；EN but/yet/while+you / you+fault 动词+before / you…too）× DISQUALIFY 剥夺资格词（凭什么/没资格/装什么/光说/倒来/还好意思；EN who are you to / no right to / not one to talk / glass houses / pot calling the kettle）；路由① CRITICISM×MIRROR（经典反噬形）、路由② MIRROR×DISQUALIFY（剥夺资格形）；HEDGE 豁免（真诚自省/互相改进/正当边界/保留语/概念分析，中英各一组） | 第 141 个辨别维度上线 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点 _dual/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/补登记/summary/module.exports）。计算点走 _dual——中英各一套模式表，归一化可能破坏英文 MIRROR 对比连词结构（与 anecdotal/double_bind 同例） | dimensions 键 140→141 | ✅ 升级（接线） |
+| test/round-710-tu-quoque.js 10 断言 + scripts/negative-test-tu-quoque.js 18 注入点 | 攻击 15（中英对称、逐条路由归因）/良性 16/单腿边界 5/相邻分工 4 实测归属/豁免 4+承重 2/gate 层 15+10/接线 9 | ✅ 升级（验收证据） |
+| bump 6.8.55→6.8.56 七处（VERSION/package.json/SKILL.md frontmatter/两处测量戳/version.js 常量+注释）+ README changelog + 三份禁改文档维度数 140→141 共十四处 + verify 计数 99→100 三处列举 + verify 与全列举补 tu_quoque + AGENTS 维度史加 v6.8.56 条目 + AGENTS tier 合计 129→130 | npm 用户可感知新版本 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度数 140→141 十四处同步、verify 99→100 三处、规格表版本戳 6.8.56 两处、changelog 覆盖 v6.8.56）
+- node test/round-710-tu-quoque.js — 10/10（攻击 15：中文 10 + 英文 5，逐条路由归因；良性 16：中文 10 + 英文 6；单腿边界 5；相邻分工 4；豁免 4+承重 2；gate 层攻击 15 全 verify、良性本维度负责 10 全 pass；接线 9）
+- scripts/negative-test-tu-quoque.js — 基线 10/10 PASS + 18/18 注入点全部断言红（8 常量块 + 10 路由行，无崩溃红）+ 还原 md5 一致
+- node scripts/guard-abilities.js — 20/20（dimensions 键 141，summary 引用 104；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 commit 转绿）
+- 轮前探测器复量（/tmp/hf-scout-710.txt 口径）— tu_quoque 族攻击漏判 9/10→**0/15**（中英对称）、良性本维度误伤 0/16；middle_ground 10/10、guilt_by_association 10/10、mind_reading 10/10 留待后续轮次
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **mind_reading 断言动机新维度候选**——decision 落选（0.91，与选中项仅差 0.01）。攻击漏判 10/10、真零命中 9/10、误伤 1/12 归因存量 contradiction。缺口成立且边界判据（断言式 别不承认/其实就是/我知道你根本 vs 探询式 是不是有什么顾虑）最清晰，下轮可直接进候选池。
+2. **middle_ground 和稀泥新维度候选**——decision 落选（0.89）。攻击漏判 10/10、真零命中 10/10，但与 victim_blaming/false_equivalence/false_balance 三个存量维度射程高度重叠，分工边界设计成本最高。
+3. **guilt_by_association 连坐定罪新维度候选**——decision 落选（0.89）。攻击漏判 10/10、真零命中 7/10（3 条已被 sarcasm×2/moral_foundations×1 判非 pass）、误伤 1/12 归因存量 victim_blaming。
+4. **EN 侧「You are the one who …」强调形与虚拟条件形（If you had not done X, you could talk）不收**——CRITICISM_EN 的强/弱动词支都要求批评动词在场，强调形把批评藏在关系从句里；虚拟条件形的比较结构不在 MIRROR_EN 三个支的射程。属刻意边界（放宽会碰到 "You are the one who introduced me to her" 这类纯陈述），写进 D 组测试锁住不判的方向。
+5. **中文「彼此彼此」类俗语形不判**——无剥夺资格词，属互指贬损不构成资格取消链（单 MIRROR 不判的保守边界）。
+6. **DISQUALIFY_ZH 的「说你」支较宽**——(?:说|管|教育|训|数落|指点|批评|骂|怪)(?:我|咱们)?你 在无前缀限定时可匹配任意「X说你」，与 MIRROR 共现时才判（路由②）。实测双侧门禁误拦 302/326 零新增，宽支被 MIRROR 门与双向基准兜住；下轮若出现误判样本再收紧。
+7. **5 条良性在 gate 层被存量维度判 verify**——sycophancy×4（你说得对…系列/You are right, I used to do that too…）、false_balance×1（双方都有做得不到位的地方）。逐维度归因确认全部存量行为，双向门禁误拦基线与 HEAD 完全一致（302/326），零新增误伤；不为了消它们改产品（Phase 2.95 纪律）。
+8. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十三轮记录。
+9. **80+ 个 commit 未推送 GitHub**——finish 的自动推送受网络所限，且环境红线规定推送是人工门禁，本任务不做。
+10. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（四条，全被当场抓住）
+
+1. **EN 正则块落盘层数多一倍（r693/r705/r706/r708 坑第五次复现）**：从零 authoring 时把 EN 字符串字面量正则写成 4 连反斜杠（`\\\\b`），落盘后 JS 解码出 `\\b` → 正则匹配字面「反斜杠+b」恒 false，EN 攻击侧 0/12 全 MISS 而 ZH 全中——行为测试（/tmp/r710-tq-behavior.js 逐支样本）当场抓住。修法沿用 r708 fix3 纪律：Node 脚本 + String.fromCharCode(92) 拼接、只修 EN 常量块内的行（16 行 4→2 降层）。判据不变：**EN 正则块的落盘层数只有一个可信判据——行为测试**。
+2. **全角/可选性笔误两连发**：MIRROR_ZH 首版漏「你自己都做不到」支（无 也/不也 的 fault 动词形，全靠 `(?:都|根本|压根)?(?:做不到|…)` 补上）；HEDGE_ZH 的「不是怪你」支末尾 `(?:也|一样)` 漏写 `?` 变成必填——「我不是怪你」句尾没有「也一样」整支不匹配，豁免静默失效（症状是 F2 承重样本被误判）。判据：**任何可选组落笔后数一遍 `?`，豁免支的承重样本（有腿+豁免语）必须实测在豁免后不判**。
+3. **英文弱动词支造出假阳性**：给 CRITICISM_EN 补 say/said/claim 后「You say I am right, but you never do the dishes either.」（你说得对，但你从不洗碗——附和句不是批评）被路由①误中。修法拆强弱两支：强动词（criticize/tell/blame/lecture/nag/judge/shame/preach/accuse）自带批评义可直接接对比连词；弱动词（say/said/claim）须负面评价词（lazy/wrong/at fault/selfish/careless…）共现。判据：**每加一类动词先造「该动词 + 非批评宾语」的对照样本**。
+4. **gate 层良性选样必须先查归属再进 mustPass**：首版把「You are right, I used to do that too, so I understand.」写进 mustPass，实测被存量 sycophancy 判 verify——它是探测器已归因的既有行为（5/12 误伤之一），不是本维度误伤。按 r686/r708 纪律移出 mustPass 并在注释里写明归属，由 C 组断言 own count=0 负责。判据：**mustPass 集里的每一条都要先在 gate 层实测过 pass**。
+
+---
+
 # r708 轮报告（v6.8.55）
 
 ## 心虫选中项 + 分数 + 身份对齐
