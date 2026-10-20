@@ -1,3 +1,82 @@
+# r714 轮报告（v6.8.60）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r713 交接簿「已知
+未修项」点名的四个候选（r713 decision 落选的 B/C/D + 存量误伤待修的
+middle_ground/guilt_by_association），按「引用 UPGRADE_LOG tail 当现状
+前必须复测」纪律（r713 踩坑第一条：tail 是历史池复述）先 grep 确认
+未上线（concern_trolling 在 src/index.js 只有 bad-faith 检测表里的
+en_concern_trolling **指控句** pattern，非独立维度；stereotype_origin
+只在注释里出现过），再用本轮探测器
+`scripts/round-714-family-probe.js` 在当前 144 维引擎逐族复测，喂给
+decision 本体（`scripts/decide-r714.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A concern_trolling 伪关心新维度 | **0.84** | 攻击漏判 9/10（90%）、真零命中 7/9、误伤 0/12 | **选中** |
+| B stereotype_origin 出身歧视新维度 | 0.83 | 攻击漏判 8/10（80%）、真零命中 8/8、误伤 0/12 | 落选（与 genetic_fallacy 语域相邻要复核） |
+| C void_zh_standard_shift 契约作废窄口补形 | 0.78 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选（样本面最小） |
+| （复测出局）middle_ground 和稀泥 | — | 攻击漏判 4/9（44%） | 不合格（漏判率不足 50%，且 r713 记录的存量误伤本轮复测 0/12 已不存在） |
+| （复测出局）guilt_by_association 连坐定罪 | — | 攻击漏判 6/9（67%）但误伤 1/12 | 不合格（fp≠0 按 Phase 0.7b 纪律不输出为候选；误伤样本「圈子里有坏人，不代表圈子里所有人都是坏人」被存量维度判 rewrite） |
+
+decision 返回 composite_score 0.84 / confidence 0.7 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在三个候选间选出 A。
+
+**轮次开头先收尾 r713 遗留**（round-guard before 报的两个阻塞项）：
+① 2026-10-15 global-fix 的两个未提交改动（start-mcp.sh 的 node 路径
+写死 /tmp/nodejs/bin/node 本机不存在导致脚本一直起不来、fuser 本机
+没有那步静默空转；debug-log.js 的 warn() 第三参被静默丢弃导致
+engine-lifecycle 的「N 模块初始化失败」看不到模块名）——语法检查 +
+两参/三参行为验证后提交；② version.js 兜底值 6.8.58→6.8.59（r713
+bump 漏了手动同步，sync-version.js 不管这里）。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 「我是为你好，才指出你这些问题的」「我这么说都是关心你，别人谁愿意跟你说这些」「为你好才提醒你，你这样下去不行」「别不识好人心，我这些都是为你好」「我关心你才说这些难听话，换别人我才不管」「我是担心你才批评你的，这是负责任的表现」「I am only saying this because I care about you.」「A real friend would tell you these hard truths, and I care enough to do it.」这类**用「为你好」包装实施控制/贬低/打压、把伤害性话语装扮成善意提醒并取消对方不接受的权利**从 pass 变 verify | 伪关心族 9/10 漏判清零（gate 层 20/20 全非 pass） | ✅ 升级（真升级①：第 145 个辨别维度） |
+| src/concern-trolling.js：双路由共现模块——路由①关心包装腿×贬低控制腿（缺一不判），路由②关心包装腿×排他垄断腿（别人谁愿意/换别人——把「愿意批评你」垄断成自己的特权）；两条豁免（元话语概念引述/第三人称职务语境） | 伪关心族从射程外变可判别 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 第 145 维度在线，dimensions 键 145 | 维护（接线，升级的必需部分） |
+| test/round-714-concern-trolling.js 11 断言 + scripts/negative-test-concern-trolling.js 14/14 | 攻击 20/良性 21/边界锁 11/分工 2/gate 层 5，7 个注入点逐一置空验证承重 | ✅ 升级（验收证据） |
+| 文档同步：维度总数 144→145、verify 计数 103→104、SKILL/AGENTS verify 列举补 concern_trolling、规格表版本戳两处、bump 6.8.59→6.8.60 四处 + README changelog | npm 用户看到的维度数恢复真实 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度总数 144→145 多处、verify 计数 103→104、SKILL/AGENTS verify 列举与 VERIFY_DIMS 精确一致各 104、规格表版本戳同步 6.8.60、changelog 覆盖 v6.8.60）
+- node test/round-714-concern-trolling.js — 11/11（攻击 20：中 10 + 英 10；良性 21：中 11 + 英 10；边界锁 11；分工边界 2；gate 层 5）
+- node scripts/negative-test-concern-trolling.js — 14/14（基线 7/7 + 注入 7/7 翻转符合预期 + 未知注入键不崩溃 + __internals 覆盖全部注入点）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 145，summary 引用 108；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 commit 转绿）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **stereotype_origin 出身歧视新维度**——decision 落选（0.83）。攻击漏判 8/10、真零命中 8/8、误伤 0/12；与 genetic_fallacy（来源点名×质量贬损，r693 已上线）的语域分工要先复核（「专科毕业的，逻辑能力能强到哪去」vs「这理论是两百年前提出的」的边界）再补。下轮首选。
+2. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.78）。攻击漏判 6/9、真零命中 6/6、误伤 0/9；r696 起遗留，作废词表补变体即可，但样本面 9 条最小。
+3. **guilt_by_association 连坐定罪存量误伤**——本轮复测确认「圈子里有坏人，不代表圈子里所有人都是坏人」被存量维度判 rewrite（fp=1/12），按 Phase 0.7b 纪律 fp≠0 不输出为候选；该存量误伤值得单独一轮修（先定位是哪个存量维度判的）。
+4. **middle_ground 和稀泥**——本轮复测漏判仅 4/9（44%）不合格（r713 记录的存量误伤 1/12 本轮复测已不存在，说明 r713 之后有轮次修过或样本形状变化）；缺口面不足以立新维度，留观。
+5. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第九轮记录。
+6. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+7. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **UPGRADE_LOG tail 的「已知未修项」必须逐族复测（r713 踩坑的第二次验证）**：r713 交接簿写 middle_ground「复测误伤 1/12」，本轮同族复测误伤 0/12——历史池的数字会随引擎演进而失效。纪律执行方式：grep 确认未上线 + 探测器全族重跑，两个都做才动手。本轮 concern_trolling 的 grep 还发现一个易误判点：src/index.js 里有 `en_concern_trolling` 字样，但那是 bad-faith 检测表里认字面「you are concern trolling」**指控句**的 pattern，与本维度（运用话术的陈述本身）是「指认」与「运用」的关系——只看 grep 命中会误判已上线，要看维度键集合。
+2. **分工边界样本要选存量维度真兜底的形状**：D1 首版用「你说话客气点，别这么冲」当 tone_policing 分工样本，实测 gate 层 pass（tone_policing 也不判它）——分工断言失败。换成「你说话太冲了，客气一点会死吗」（tone_policing 实测 verify）才过。判据：分工样本的「归属维度」必须实测非 pass，否则锁的是空气。
+3. **负例注入的豁免样本要避开其他豁免的叠加兜底**：THIRD_PERSON_EXEMPT 注入样本首版写「心理咨询师说，你丈夫总是说为你好才批评你，这是伪关心的话术」——含「伪关心」字样会被 META_NOUN 超集兜底，置空 THIRD_PERSON 后期望翻转但实际仍不命中（假阴性，r713 踩坑第四条同形态）。修法：样本刻意去掉「伪关心」字样（「这是典型的话术」），让被摘的豁免是唯一通路。
+
+## 心虫选中项 + 分数 + 身份对齐
+
+decision 返回 composite_score 0.84 / confidence 0.7 / identity
+alignment 0.8，无拒选。候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在三个合格候选间选出 A
+（concern_trolling）。身份对齐依据：伪关心是情感操控的核心话术
+（PUA/煤气灯的高频前奏），「善意包装的恶意」正是辨别层最该抓的形态。
+
 # r712 轮报告（v6.8.58）
 
 ## 心虫选中项 + 分数 + 身份对齐
