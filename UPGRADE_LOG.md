@@ -1,3 +1,87 @@
+# r715 轮报告（v6.8.61）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r714 交接簿「已知
+未修项」点名的 stereotype_origin（下轮首选）+ void_zh_standard_shift +
+guilt_by_association 存量误伤 + middle_ground 留观 + 新侦察
+appeal_to_majority / post_hoc，按「引用 UPGRADE_LOG tail 当现状前必须
+复测」纪律先 grep 确认未上线（stereotype_origin 在 src/ 只有一处注释
+提及 /tmp/hf-scout-700.txt，非独立维度；void_zh_standard_shift 未上线；
+guilt_by_association 未上线），再用本轮探测器
+`scripts/round-715-family-probe.js` 在当前 145 维引擎逐族复测，喂给
+decision 本体（`scripts/decide-r715.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A stereotype_origin 出身歧视新维度 | **0.84** | 攻击漏判 8/10（80%）、真零命中 8/8、误伤 0/12 | **选中** |
+| B void_zh_standard_shift 契约作废窄口补形 | 0.78 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选（样本面最小） |
+| C appeal_to_majority 诉诸多数新维度 | 0.82 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选（新侦察，语域与 synthetic_social_proof 相邻） |
+| D post_hoc 后此谬误新维度 | 0.79 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选（新侦察，语域与 pseudo_causal 相邻） |
+| （复测出局）guilt_by_association 连坐定罪 | — | 攻击漏判 6/9（67%）但误伤 1/12 | 不合格（fp≠0 按 Phase 0.7b 纪律不输出为候选；误伤样本「圈子里有坏人，不代表圈子里所有人都是坏人」被存量维度判 rewrite） |
+| （复测出局）middle_ground 和稀泥 | — | 攻击漏判 4/9（44%） | 不合格（漏判率不足 50%） |
+
+decision 返回 composite_score 0.84 / confidence 0.7 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在四个候选间选出 A。
+
+**语域分工复核（r714 遗留项）**：r714 交接簿要求「与 genetic_fallacy
+的语域分工要先复核再补」。本轮快速探针
+`scripts/round-715-quick-probe.js` 实测确认：genetic_fallacy 只命中
+「小地方出来的人，眼界就是不行」（来源×质量推断，落点是判断力/认知
+质量），stereotype 只命中「女人就是情绪化，谈什么理性」（身份标签×
+不可靠标签），其余 8 条出身歧视样本（专科毕业的逻辑能力能强到哪去/
+年纪轻轻的懂什么/富二代能力都是家里给的/单亲家庭心理都有问题/文科生
+写代码能写出什么好东西）全维度零命中。分工成立：stereotype_origin
+管「出身×人的属性/品格/心理贬损」，genetic_fallacy 管「来源×质量
+推断（观点/产品价值）」，stereotype 管「身份标签×不可靠标签（对群体）」。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 「专科毕业的，逻辑能力能强到哪去」「年纪轻轻的懂什么，回去多历练几年」「富二代罢了，能力都是家里给的」「单亲家庭长大的孩子心理都有问题」「文科生写代码，能写出什么好东西」「People from small towns just do not have the vision for this.」「She is too emotional to handle a leadership role.」「He is just a trust-fund kid, none of it is his own work.」这类**按出身/来源贴标签贬低人本身的属性/品格/心理、不论实际表现**从 pass 变 verify | 出身歧视族 8/10 漏判清零（gate 层 20/20 全非 pass） | ✅ 升级（真升级①：第 146 个辨别维度） |
+| src/stereotype-origin.js：双腿共现模块——出身标签腿（学历/年龄/家庭背景三类）× 人的属性贬损腿（能力/心理/品格三类），缺一不判；元话语/概念引述豁免 | 出身歧视族从射程外变可判别 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 第 146 维度在线，dimensions 键 146 | 维护（接线，升级的必需部分） |
+| test/round-715-stereotype-origin.js 56 断言 + scripts/negative-test-stereotype-origin.js 15/15 | 攻击 20/良性 21/边界锁 8/分工 2/gate 层 5，6 个注入点逐一置空验证承重 | ✅ 升级（验收证据） |
+| 文档同步：维度总数 145→146、verify 计数 104→105、SKILL/AGENTS verify 列举补 stereotype_origin、规格表版本戳两处、bump 6.8.60→6.8.61 四处 + README changelog + 修 doc-numbers 测试正则边界 bug（`/46 dimensions/` 误匹配 `146 dimensions` 子串） | npm 用户看到的维度数恢复真实 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度总数 145→146 多处、verify 计数 104→105、SKILL/AGENTS verify 列举与 VERIFY_DIMS 精确一致各 105、规格表版本戳同步 6.8.61、changelog 覆盖 v6.8.61）
+- node test/round-715-stereotype-origin.js — 56/56（攻击 20：中 10 + 英 10；良性 21：中 11 + 英 10；边界锁 8；分工边界 2；gate 层 5）
+- node scripts/negative-test-stereotype-origin.js — 15/15（基线 7/7 + 注入 7/7 翻转符合预期 + 未知注入键不崩溃 + __internals 覆盖全部注入点）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 146，summary 引用 108；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 commit 转绿）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.78）。攻击漏判 6/9、真零命中 6/6、误伤 0/9；r696 起遗留，作废词表补变体即可，但样本面 9 条最小。下轮首选。
+2. **appeal_to_majority 诉诸多数新维度**——decision 落选（0.82）。攻击漏判 6/9、真零命中 6/6、误伤 0/9；新侦察候选，与 synthetic_social_proof（社会证明）语域相邻但落点不同（那管伪造社会证明，本族管以多数意见代替论证），语域分工要先复核。
+3. **post_hoc 后此谬误新维度**——decision 落选（0.79）。攻击漏判 5/9、真零命中 5/5、误伤 0/9；新侦察候选，与 pseudo_causal（伪因果）语域相邻但落点不同（那管虚假因果机制，本族管纯时间先后推断），语域分工要先复核。
+4. **guilt_by_association 连坐定罪存量误伤**——本轮复测确认「圈子里有坏人，不代表圈子里所有人都是坏人」被存量维度判 rewrite（fp=1/12），按 Phase 0.7b 纪律 fp≠0 不输出为候选；该存量误伤值得单独一轮修（先定位是哪个存量维度判的）。
+5. **middle_ground 和稀泥**——本轮复测漏判仅 4/9（44%）不合格；缺口面不足以立新维度，留观。
+6. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十轮记录。
+7. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+8. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **英文攻击样本的出身标签匹配需要覆盖 `is a` 形式**：首版 ORIGIN_EN 只收 `from a community college` 等介词形式，漏了 `He is self-taught` / `She is a single-parent` / `He is a gig worker` / `She is blue-collar` 等 `is a` 系动词形式。修法：补 `\b(?:is|are|was|were)\s+(?:a\s+)?(?:self-taught|single-parent|gig\s+worker|blue-collar|...)\b` 支路。教训：英文出身标签不只有介词短语形式，系动词+名词短语也是高频形态。
+2. **英文贬损腿需要覆盖 `quality is questionable` 倒装形**：首版 BELITTLE_EN 只收 `questionable quality`（形容词+名词），漏了 `his code quality is questionable`（名词+is+形容词）倒装形。修法：补 `\b(?:quality|skills?|ability|work|performance)\s+is\s+(?:questionable|dubious|suspect|poor|weak|low)\b` 支路。教训：英文贬损形容词可前可后，两种语序都要收。
+3. **doc-numbers 测试正则 `/46 dimensions/` 误匹配 `146 dimensions` 子串**：版本到 146 后，`146 dimensions` 中的 `46 dimensions` 被无边界正则匹配，导致 doc-numbers 从 22/22 掉到 20/22。修法：加 `\b` 边界（`/\b46 dimensions/`）。教训：数字前缀增长会触发无边界正则的误匹配，版本号过百后要检查所有数字匹配正则的边界。
+
+## 心虫选中项 + 分数 + 身份对齐
+
+decision 返回 composite_score 0.84 / confidence 0.7 / identity
+alignment 0.8，无拒选。候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在四个合格候选间选出 A
+（stereotype_origin）。身份对齐依据：出身歧视是偏见的核心形态，
+「按出身否定人本身」正是辨别层最该抓的「来源代替内容」。
+
 # r714 轮报告（v6.8.60）
 
 ## 心虫选中项 + 分数 + 身份对齐
