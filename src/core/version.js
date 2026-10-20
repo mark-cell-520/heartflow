@@ -51,13 +51,15 @@ const path = require('path');
 // [v6.8.56] 第 710 轮同步：6.8.55 → 6.8.56（第 141 维度 tu_quoque 诉诸伪善新增）
 // [v6.8.58] 第 712 轮同步：6.8.57 → 6.8.58（第 143 维度
 //                 kafkatrapping 卡夫卡陷阱上线）。
+// [v6.8.61] 第 715 轮同步：6.8.60 → 6.8.61（第 146 维度
+//                 stereotype_origin 出身歧视上线）。
 // [v6.8.60] 第 714 轮同步：6.8.59 → 6.8.60（第 145 维度
 //                 concern_trolling 伪关心上线）。
 // [v6.8.57] 第 711 轮同步：6.8.56 → 6.8.57（第 142 维度
 //                 mind_reading 断言动机上线）
 // [v6.8.54] 第 707 轮同步：6.8.53 → 6.8.54（第 62 维度
 //                 appeal_to_ignorance 补举证倒置-需求形句式族）。
-let VERSION = '6.8.60';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+let VERSION = '6.8.61';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');
