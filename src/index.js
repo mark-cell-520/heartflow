@@ -404,6 +404,14 @@ const { checkStereotypeOrigin } = require('./stereotype-origin.js');
 // 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9。判据双腿共现；
 // 细节见 src/wishful-thinking.js。
 const { checkWishfulThinking } = require('./wishful-thinking.js');
+// [r717] 第 148 维度 cherry_picking（摘樱桃：只挑对自己有利的证据呈
+// 现，把反面证据隐瞒/略过不提，用单边取样代替完整证据面）。decision 本体
+// 选出（scripts/decide-r717.js，composite_score 0.85 / confidence 0.8 /
+// identity alignment 0.8）。候选题池来自 r717 探测器
+// scripts/round-717-family-probe.js；本轮在当前引擎（147 维）复测：
+// 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9。判据双腿共现；
+// 细节见 src/cherry-picking.js。
+const { checkCherryPicking } = require('./cherry-picking.js');
 // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽：以嘲笑/蔑视/智商贬低
 // 对方的观点或发言代替论据）。decision 本体一次选出（/tmp/decide-run-r704.js
 // 读 /tmp/decide-opts-r704.json，composite_score 0.87 / confidence 0.80 /
@@ -1512,6 +1520,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r716] 第 147 维度 wishful_thinking（一厢情愿）计算点。
   // 同 r715 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const wt = _applyPedagogyRelaxation(checkWishfulThinking(_normText), "wishful_thinking", pedagogyRelaxation);
+  // [r717] 第 148 维度 cherry_picking（摘樱桃）计算点。
+  // 同 r716 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const cpk = _applyPedagogyRelaxation(checkCherryPicking(_normText), "cherry_picking", pedagogyRelaxation);
   // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）计算点。
   // 同 r701 先例：十处一次接齐，漏一处 gate.action 恒 pass。
   const ar = _applyPedagogyRelaxation(checkAppealToRidicule(_normText), "appeal_to_ridicule", pedagogyRelaxation);
@@ -1924,6 +1935,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r716] 第 147 维度 wishful_thinking 参与判定（一厢情愿）。
     // 同 r715 先例：dimMap 与 allDims 必须两处都接。
     {score: wt.score, name:'wishful_thinking'},
+    // [r717] 第 148 维度 cherry_picking 参与判定（摘樱桃）。
+    // 同 r716 先例：dimMap 与 allDims 必须两处都接。
+    {score: cpk.score, name:'cherry_picking'},
     // [r704] 第 137 维度 appeal_to_ridicule 参与判定（诉诸嘲讽）。
     // 同 r701 先例：dimMap 与 allDims 必须两处都接。
     {score: ar.score, name:'appeal_to_ridicule'},
@@ -2241,6 +2255,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r716] 第 147 维度 wishful_thinking（一厢情愿×
     // 信念/愿望腿×必然结果推断腿/超自然因果腿）。
     wishful_thinking: wt,
+    // [r717] 第 148 维度 cherry_picking（摘樱桃×
+    // 排他性选择/隐瞒动作腿×有利/不利对照腿）。
+    cherry_picking: cpk,
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽×
     // 嘲笑蔑视表达×指向对方观点/发言的目标腿）。
     appeal_to_ridicule: ar,
@@ -2481,6 +2498,7 @@ function discriminate(text, evidence = [], contentMode) {
     'concern_trolling': "不得用**「为你好」的包装实施控制、贬低或打压**——把「我是为你好，才指出你这些问题的」「我这么说都是关心你，别人谁愿意跟你说这些」「为你好才提醒你，你这样下去不行」「别不识好人心，我这些都是为你好」「我关心你才说这些难听话，换别人我才不管」「我是担心你才批评你的，这是负责任的表现」「I am only saying this because I care about you.」「A real friend would tell you these hard truths, and I care enough to do it.」这类**把伤害性话语装扮成善意提醒、同时取消对方不接受的权利**的话术当正常关心（样本形状与负例见 test/round-714-concern-trolling.js）。判据两条路由任一成立：① 关心包装×贬低控制双腿共现——腿①关心包装（为你好/关心你/担心你；EN: because I care / I care about you / for your own good / I care enough / a real friend would）× 腿②贬低控制内容（你这些问题/你的问题/你这样下去/你这样不行/你不听/不听劝/批评你/指责你/难听话/不识好人心/不知好歹/你这个人/你总是/你从来；EN: hard truths / your problems / these problems / only saying this / nobody else would）；② 关心包装×排他垄断双腿共现（别人谁愿意/换别人/除了我/没人愿意/谁会跟你说/只有我——把「愿意批评你」垄断成自己的特权，正常关心陈述不争夺批评权的独占）。正常关心（你最近看起来状态不好，发生什么事了吗/这件事我有点担心，想听听你的想法/作为朋友我提醒你一下，这个合同条款要仔细看/我尊重你的决定，只是把我的担心说出来供你参考/I am worried about you, let me know if you need anything.）、正常批评（你这个方案有问题，理由是数据不支持）、元话语分析（伪关心是一种用关心包装的控制手法）、第三人称专业复盘（心理咨询师说，你丈夫总是说为你好才批评你，这是伪关心的话术）明确不判。边界：guilt_induction/emotional_manipulation 管情感债务制造（我为你付出这么多/你欠我的），本族可毫无付出叙事；tone_policing 管压制表达方式（你说话客气点），本族管「以关心之名行贬低之实」的内容替换；bad_faith 检测表里的 en_concern_trolling pattern 只认字面「you are concern trolling」的指控句，本族管运用这套话术的陈述本身。正当做法是**把「问题」落到可核对的事实上**（你提到的具体是哪件事？我们可以逐条核对/这个判断的依据是什么，有没有具体例子）或**承认对方的接受权**（我把担心说出来供你参考，采不采纳你定），不是用善意包装取消对方不接受的权利。",
     'stereotype_origin': "不得用**出身/来源标签**代替**实际表现**，直接贬低人的属性、品格或心理——把「专科毕业的，逻辑能力能强到哪去」「年纪轻轻的懂什么，回去多历练几年」「富二代罢了，能力都是家里给的」「单亲家庭长大的孩子心理都有问题」「文科生写代码，能写出什么好东西」「People from small towns just do not have the vision for this.」「She is too emotional to handle a leadership role.」「He is just a trust-fund kid, none of it is his own work.」这类**按学历/年龄/家庭背景给人贴标签、不论其实际作品或表现就下贬损结论**的话术当正常评价（样本形状与负例见 test/round-715-stereotype-origin.js）。判据是**双腿共现**：①出身/来源标签三类任中一类——学历出身「专科/二本/三本/大专/中专/技校/职高/文科生/理科生/艺术生/体育生/非名校/没上过大学/自学成才/海归/留学生/野鸡大学/成人教育/网络教育/专升本」，年龄出身「年纪轻轻/年纪小/太年轻/年轻人/青年人/应届生/毕业生/实习生/新人/新手/小孩/小年轻」，家庭背景与机构出身「富二代/官二代/拆二代/单亲家庭/单亲妈妈/单亲爸爸/农村/外地/小地方/小县城/小镇/乡下/草台班子/民间/大厂/裁员/自由职业/转岗/宝妈/奶爸/北漂/沪漂/深漂」；EN：from a vocational school / community college / art major / self-taught / non-degree / too young / just a kid / fresh graduate / intern / newcomer / trust-fund kid / silver spoon / single-parent / from a broken home / from small towns / rural / village / laid-off / gig worker / blue-collar / working-class / she is too ② 对人的属性/品格/心理贬损三类任中一类——能力贬损「逻辑能力能强到哪去/懂什么/能写出什么好东西/能力都是家里给的/不成熟/幼稚/纸上谈兵/眼高手低」，心理贬损「心理都有问题/心理脆弱/性格缺陷/情绪化/玻璃心/抗压能力差/心理不健康/人格缺陷」，品格贬损「眼界不行/见识短/目光短浅/靠不住/不可靠/有问题/有毛病/不靠谱/素质低/没教养/格局小」；EN：cannot have the vision / does not know anything / none of it is his own work / too emotional / psychologically damaged / has issues / cannot be trusted / unreliable / has no vision / narrow-minded。缺一不判——「这位候选人来自二线城市，但项目经验很扎实」只有出身无贬损结论，是事实陈述；「这个方案不成熟」只有贬损无出身腿，是正常批评。按出身下结论代替按实际表现下结论，会让有能力的候选人被学历埋掉、让无依据的贬损被出身包装：正当做法是**就实际表现立论**（这位候选人虽然学历普通，但开源贡献说明自学能力很强/她转行做开发两年，已经能独立负责模块/我们评估候选人主要看作品和面试表现）或**把出身作为背景信息陈述而不作为能力判据**（他来自小城市，但项目经验很扎实/成长环境会影响性格，但不决定一个人的能力）。边界：genetic_fallacy（第 131 维）管**来源×质量推断**——落点是观点/产品的价值（「小地方出来的人，眼界就是不行」被它判 verify，因为「眼界」指向判断力/认知质量），本维度只收 genetic_fallacy 不覆盖的**出身×人的属性/品格/心理贬损**（学历/年龄/家庭背景×能力/心理/品格），两类句式分开收；stereotype（既有维度）管**身份标签×不可靠标签**——按性别/种族/地域给群体贴不可靠标签（「女人就是情绪化，谈什么理性」被它判 verify），本维度只收 stereotype 不覆盖的**出身×个人属性贬损**（学历/年龄/家庭×个人能力），性别歧视型句式整族不在此列；hasty_generalization（既有维度）管无依据概推，本族要件是出身被点名；confidence / capability_overclaim 管能力夸大，本族落点是出身导致的贬损；正当评价（以实际表现为据：项目经验很扎实/能独立负责模块/开源贡献说明自学能力很强）、中性事实陈述（这位候选人来自二线城市/她转行做开发两年/他家里条件不错）、平衡比较（年轻同事想法新，老同事经验足，可以互补）、正当提问（应届生能胜任这个岗位吗）、概念分析与规范陈述（出身歧视是一种偏见/识别出身歧视话术）明确不判",
     'wishful_thinking': "不得用**愿望/信念/心态**代替**证据**，直接推断结果会按自己期望的方向发展——把「我相信会成功，所以一定会成功」「只要我足够努力，宇宙就会回应我」「念念不忘必有回响，想什么就来什么」「我这么真诚，老天不会亏待我的」「心诚则灵，只要信念够强就能实现」「我这么想，事情就会按我想的发展」「I believe it will work out, so it will work out.」「If I want it badly enough, the universe will provide.」「My positive thinking alone will make it happen.」这类**以信念驱动结果推断**的话术当正常励志表达（样本形状与负例见 test/round-716-wishful-thinking.js）。判据两条路由任一成立：① 信念/愿望×必然结果双腿共现——腿①信念/愿望表达（我相信/我坚信/我确信/我期待/我这么想/只要我/我真心/我虔诚/我足够努力/我这么真诚/念念不忘/心诚/信念够强；EN: I believe / I am convinced / I am sure / I wish / I hope / I want / my positive thinking / my sincere hope / if I just believe / my belief / my faith / my hope）× 腿②必然结果推断（所以一定会/就会/肯定会/必有回响/老天不会/宇宙就会/按我想的/就会实现/注定会/必然会/就会成真；EN: so it will / it will work out / the universe will / it is bound to / it is meant to be / it will happen / it will come true / it is destined / it is inevitable / will make it happen / will make it come true）；② 信念/愿望×超自然因果双腿共现（宇宙就会回应/老天不会亏待/心诚则灵/念念不忘必有回响/想什么就来什么/吸引力法则/天人感应/天道酬勤/善有善报/因果报应/命中注定/天意如此/老天有眼/苍天不负；EN: the universe will provide / law of attraction / manifest / it is written in the stars / the cosmos will / divine will / karma will / fate will / destiny will——把结果归因于超自然力量对信念的回应，正常励志陈述不引入超自然因果）。缺一不判——「我相信这个方向，但还是要看数据验证」只有信念无必然结果，是正常信念表达；「这个事情一定会成功」无信念来源，归 confidence。用信念替代证据推断结果，会让决策脱离可验证的事实、让未经检验的期望获得因果效力：正当做法是**把结果落到可核对的证据上**（我们做了 A/B 测试，数据支持这个方向/对照组实验显示该方法有效/同行评审的论文验证了这个结论）或**把信念作为行动动力而非结果保证**（我相信这个方向，但结果还要看执行和市场反馈/积极心态有助于坚持，但不能替代准备）。边界：affective_forecast（既有维度）管**对未来情绪的预测偏差**（我会很开心/不会难过），本族管以愿望代替证据的**因果推断**（相信→结果必然实现）；confidence 管**断言强度**（肯定/一定/毫无疑问），本族管「信念→结果」的因果结构，可毫无强度词；pseudo_causal 管**虚假因果机制**（A 导致 B 的具体机制错误），本族管纯信念驱动的结果推断，无机制描述。正常励志表达（保持积极心态有助于应对挑战/努力很重要，但结果还取决于市场环境/愿望需要配合行动和策略才能实现）、人生态度陈述（心诚则灵是一种人生态度，不是因果机制/信念可以给人力量，但不能改变客观规律）、证据在场（数据/验证/测试/实验/对照组/benchmark/A-B 测试/同行评审——有出处的信念表达是引用不是替代）、元话语分析（一厢情愿是一种常见的认知偏差/Wishful thinking is a common cognitive bias.）、第三人称专业复盘（心理咨询师说，你总是相信只要努力就会成功，这是一厢情愿的思维模式）明确不判。",
+    'cherry_picking': "不得**只挑对自己有利的证据呈现，把反面证据隐瞒/略过不提**，用单边取样代替完整证据面——把「他只挑对自己有利的数据说，反面证据一概不提」「只看成功的案例，失败的案例全被隐藏了」「这份报告只列支持结论的部分，反对数据一个没放」「他引用的都是支持自己的研究，反对的研究全部略过」「只讲赚钱的月份，亏钱的月份一个字不提」「数据里挑出几个好看的数字，难看的全部删掉」「He only cites the studies that support his view and ignores the rest.」「They cherry-picked the best quarters and left out the losses.」「She presents only the successful cases and hides the failures.」这类**单边证据叙事**当完整论证（样本形状与负例见 test/round-717-cherry-picking.js）。判据双腿共现，缺一不判：腿①排他性选择/隐瞒动作（只挑/只看/只列/只讲/只引用/一概不提/全部略过/全部删掉/一个字不提/一个没放/全被隐藏/都是支持/隐瞒/略过/删掉/挑出；EN: only cites / only presents / cherry-picked / leaves out / hides / omits / ignores the rest / withholds / suppresses）× 腿②有利/不利对照（对自己有利/支持自己/支持结论/成功的案例/赚钱的月份/好看的数字/反面证据/失败的案例/亏钱的月份/难看的/反对数据/反对研究/不利结果；EN: support his view / best quarters / successful cases / the losses / the failures / favorable results / contradicting evidence）。缺一不判——「这个分析只覆盖了部分数据，因为其余数据尚未清洗完成」只有排他性措辞无有利/不利对照，是正常的范围说明；「报告列出了支持和反对两方面的数据」只有对照无双边隐瞒动作，是完整的双向呈现。单边取样会让读者把裁剪过的证据面当成全部事实，让反面证据在决策中消失：正当做法是**把反面证据一并呈现**（报告同时列出支持和反对的数据，结论标注置信区间/我们既统计了成功案例也统计了失败案例/论文的局限性部分明确写了未纳入的研究）或**公开筛选标准**（我们按预先注册的纳入标准筛选文献，标准公开可查/做了多重比较校正排除随机巧合）。边界：selective_minimization（既有维度）管**对严重性的淡化措辞**（只是小问题/影响有限），本族管**证据呈现的单边取舍**；statistical_misleading 管**统计数据的呈现误导**（百分比滥用/基数隐藏），本族管样本/案例层面的选择性纳入与排除；survivorship_bias 管**只看存活样本的推断偏差**（活下来的都这么说），本族管**主动的隐瞒动作**（略过/不提/删掉）；unsupported_claim 管**无依据断言**，本族管有依据但依据被单边裁剪。正常范围声明（样本量限制/数据未清洗完成）、方法透明度陈述（预先注册假设/多重比较校正/报告了所有检验结果/独立样本验证/holdout 检验）、双向呈现在场（支持和反对两方面/包括不显著的那些）、元话语分析（摘樱桃是一种常见的证据选择偏误/Cherry picking is a common selection bias.）、第三人称专业复盘（统计学家说，这份报告只列了支持结论的数据）明确不判。",
     'appeal_to_ridicule': "不得用**嘲笑/蔑视/智商贬低对方的观点或发言**代替论据——把「这种想法也太可笑了，亏你想得出来」「这么幼稚的观点也拿出来说」「笑死我了，这也叫方案」「你的逻辑太搞笑了，认真读过文档吗」「脑子正常的人都不会这么想」「这也信？智商堪忧」「你的方案蠢得让人无语」「哈哈，就这水平还敢发言」当成对某个立场的反驳（This idea is ridiculous. I can't believe you came up with it./What a childish argument. Did you even read the docs?/LOL, you call this a plan?/Anyone with a functioning brain wouldn't think that.；样本形状与负例见 test/round-704-appeal-to-ridicule.js）。判据是**三条路由任一命中**：①双腿共现——腿①嘲笑/蔑视表达（可笑/搞笑/笑话/蠢/幼稚/天真/弱智/无语/好意思/笑死/笑哭/智商堪忧/脑子进水；EN：ridiculous/laughable/hilarious/pathetic/absurd/stupid/idiotic/childish/naive/lol/lmao/your IQ is concerning）× 腿②指向对方观点/发言/产出的目标腿（这种/这个/这么/这也/这叫/就这 + 想法/观点/论调/方案/逻辑/设计/说法/主意/水平/东西/叫/信/想；你的 + 方案/逻辑/想法/观点/设计/说法/主意/水平/脑子/智商/作品/成果/回答/结论；拿出来说/敢发言/也敢说；EN：this/that/such a/what a + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level、your + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level/brain/iq/work/output、you call this/you believe this/dare to speak/only someone like you）② 自含指向的固定嘲讽习语单独成支（亏你想得出来/也只有你/只有你能有/不值一驳/脑子正常的人都不会/就这水平；EN：can't believe you came up with this/not even worth refuting/anyone with a functioning brain/with this level）③ 缺一不判——「这个桥段很搞笑」只有笑料描述无指向腿；「你这个想法需要数据支撑」只有指向无蔑视表达。诉诸嘲讽把讨论从**论据核对**转成**立场羞辱**，让对方为「敢提出这个想法」本身付出代价：正当做法是**针对观点给出可核验的反驳**（这个方案的第三步推不出来，因为样本量只有 12，结论不显著/我不同意这个观点，理由是数据不支持：对照组缺失）或**把嘲笑换成具体缺陷指认**（这个方案确实有可笑的漏洞：缓存没有过期策略，我们来修复它）。边界：sarcasm 管反讽语气标记（呵呵/你说得都对/笑死了），是语气描述且不强制行动，本族要求嘲词×观点指向共现或固定习语；hate_speech/dehumanization 管对人的侮辱与人格否定（你就是个废物/这种人就是垃圾），落点是人，本族落点是观点/发言/产出；bad_faith 管论证动机的恶意推定，本族不管动机只管以嘲代替论据；FALLACY_PATTERNS 既有 straw_man 正则只认「你的意思就是说…但这显然」转述形。明确不判：缺陷对象在场（这种方案确实有可笑的漏洞/This plan does have a ridiculous flaw——可笑修饰的是漏洞不是方案整体，是具体指认）、评析话术本身（把「这种想法太可笑了」当作论据，就是诉诸嘲讽/Appeal to ridicule is a common logical fallacy.）、提问咨询句式**不豁免**（「你的逻辑太搞笑了，认真读过文档吗」「这也信？智商堪忧」以反问收尾的攻击形态占比高，豁免问句会把整族放行）、幽默内容转述（喜剧电影里的这个桥段很搞笑/他讲的笑话让全场都笑了/这个段子写得真幽默——笑料内容描述不是攻击）、正当反对（我不同意这个观点，理由是数据不支持/你的逻辑有问题，第 3 步推不出来）",
     'genetic_fallacy': "不得用**来源、出身、年代或身份**代替内容本身，直接推出观点/产品/人的质量结论——把「谁提出的、哪生产的、什么年代的」当成「对不对、好不好」的判据，用来源点名（年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/自学/两百年前/上个世纪/古代/老祖宗/农村/外地）× 质量贬损推断（直接贬损「肯定不成熟/早就过时了/见识短/能力肯定有问题/观点不值得听/好不到哪去」、比较贬损「不如进口的成熟/比不上正规的」、反问贬损「能适合中国国情吗/能好到哪去/靠得住吗」）这些结构，把评价变成看出身不看事实（这个观点是年轻人提出的，肯定不成熟。/外国人写的书，能适合中国国情吗。/小作坊生产的，质量能好到哪去。/他没上过名牌大学，观点不值得听。/这理论是两百年前提出的，早就过时了。/农村来的见识短，别听他的。/大厂裁员出来的人，能力肯定有问题。/This idea came from a freshman, so it cannot be worth much./The report was written by an intern, I will not even read it./He is from a small town, so his judgment cannot be trusted.；样本形状与负例见 test/round-693-genetic-fallacy.js）。判据是**双腿共现**：①来源点名三类任中一类——人群身份「年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/业余/自学」，年代时间「两百年前/上个世纪/古代/老祖宗/很早以前」，出身机构与产地「农村/外地/小作坊/草台班子/国产/进口」②质量贬损推断三类任中一类——直接贬损「肯定不成熟/早就过时了/见识短/有问题/不值得听/好不到哪去/纸上谈兵」，比较贬损「不如进口的成熟/比不上正规的/比不了名牌的」（宾语必须是来源类名词），反问贬损「能适合……吗/能好到哪去/靠得住吗/凭什么」（只收带质量名词的贬损反问，不泛收「能……吗」）。缺一不判——「这个方案不成熟」只有贬损没有来源腿，那是正常批评；「应届生经验少一些，但学习能力强」只有来源没有贬损结论。按出身下结论代替按内容下结论，会让有依据的观点被身份埋掉、让无依据的说法被资历包装：正当做法是就内容本身立论——可以如实说明某结论的**验证过程与证据强度**（经过审计/同行评审/临床验证/官方统计/检测认证），或把年龄/年代/产地作为**背景信息**陈述而不作为质量判据，并允许不同来源的提案按同一套标准竞争。边界：stereotype（既有维度）管**来源歧视性评价**（按性别/种族/地域给人贴不可靠标签，「女人写的代码可靠性不如男人」归它判 verify），本维度按 r691 交接簿要求只收**来源-质量推断**（来源是年龄/资历/年代/机构/产地，结论指向观点或产品本身的价值），两类句式分开收、攻击集不含性别歧视型样本；appeal_to_tradition（既有维度）管**诉诸传统**（老祖宗传下来的就是好），本族方向相反——以出身年代为由的贬损（两百年前的所以过时）；hasty_generalization（既有维度）管无依据概推，本族要件是来源被点名；confidence / capability_overclaim 管能力夸大，本族落点是来源导致的贬损；正当来源采信（以验证过程为据：经过四大会计师事务所审计/同行评审的论文更可靠/官方统计数据可参考/经过临床验证）、中性事实陈述（这个理论有两百年历史，但至今仍是该领域的基础/老系统运行了十年，迁移前要先评估风险）、正当提问（应届生能胜任这个岗位吗）、平衡比较（进口设备和国产设备各有优势，要按实测数据选型）、概念分析与规范陈述（起源谬误是一种常见的逻辑谬误/识别起源谬误是保护自己的第一步）明确不判",
     'deprivation_coercion': "不得以剥夺对方的**基本生存需求**（睡眠/食物/如厕/饮水/取暖/庇护所/医疗可及）作为惩罚或胁迫的杠杆——把不许睡、不给饭吃、不让上厕所、停空调、锁在门外、扣钱治病这些控制结构，当成要求对方服从的对价（今晚不许睡，跪到我原谅你为止。/不听话就不给你饭吃，饿到你知道错。/不认错就别想上厕所，憋着。/No dinner until you apologize. Stay in your room, hungry./No sleep for you tonight. Think about what you did.；样本形状与负例见 test/round-681-deprivation-coercion.js 与 test/round-684-deprivation-en.js）。判据是**三条独立通路 + 两条英文通路**：P1 条件剥夺结构（条件腿 不X就/不X别想/直到…为止/先…再 × 需求腿，需求腿必须带**祈使禁止形**（不许/不准/不让/别想 + 睡/饭/上厕所/空调/进屋）或**指向对方**的剥夺形（不给/停/断/扣 + 你/他/她的 + 需求）——裸事实条件句「不按时吃药就看不好」是陈述不是剥夺，刻意不判）、P2 强制姿势/位置惩罚（跪/面壁/罚站/楼道里站着 姿势腿 × 到我原谅你为止/天亮再进来/不写完检讨不许 时限腿；裸「站着」不收，他站在车站等车天亮再出发会误伤）、P3 需求剥夺作惩罚宣告（不给/停了/扣了/关了 剥夺动词 × 饭/空调/药/零花钱 需求对象 × 长记性/知道错/饿着/看你 惩罚目的，三腿缺一不判——「我不给你开空调」没有惩罚目的后件可能只是陈述）、P4 英文条件剥夺（until you / if you don't × no dinner / no sleep / withheld your medication）、P5 英文剥夺宣告/否认形态（no+需求+for you「No sleep for you tonight」/ grounded 惩罚标记×no+需求 / deserve 否认「You don't deserve to eat today」/ 第一人称断供宣告「I'm not paying for your medication anymore」/ 关停设施×对方受苦后果两腿跨句 / 庇护所剥夺×until-you 惩罚条件——宣告本身就是控制者口吻，不需条件腿；避险指令「Stay in the basement until the tornado passes.」与单腿省电陈述「I'm turning off the heat to save energy」刻意不判）。看见基本需求话题与需求剥夺胁迫是两回事：正当做法是把正当管教与剥夺胁迫分开——可以暂停零食玩具（家长暂停孩子的零食是常见的教育方式，但不应危及健康）、可以管理零花钱（合理的零花钱管理有助于培养孩子的金钱观念）、可以执行医疗流程（术前禁食禁水/医嘱要求空腹）、可以陈述权利与求助（剥夺未成年人基本生活需求属于虐待行为，可以报警/Withholding food or medical care as punishment is abuse./公司不得以罚款形式剥夺员工的基本劳动报酬权利/学校应当保障学生在校期间的饮水、进食与如厕需求），但不能把对方的睡眠、饭食、如厕、取暖、栖身之所、医疗可及当成自己一句话就能取消的惩罚工具。边界：economic_control（r668）管经济支配结构（工资卡上交/支出审批/我养你，是持续管辖不是以剥夺为罚），本族的「零花钱全扣了」须带惩罚目的后件且不涉收入归属移交；liberty_restriction（r679）管人身自由（锁屋里/没收证件/禁足），本族的「不许进屋/楼道站着」侧重点是庇护所与生存条件剥夺且须带条件或时限结构；medical_coercion（r680）管医疗自主（禁止就医/强制替代疗法），本族的「停了你的药/不给钱治病」侧重点是基本需求作惩罚杠杆；已知边界：第三人称转述（「她前夫不给她饭吃」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
@@ -3271,6 +3289,7 @@ function discriminate(text, evidence = [], contentMode) {
     // （「我相信这个方向，但还是要看数据验证」）。与 r672-r715 同口径
     // 只登记 VERIFY。
     'wishful_thinking',
+    'cherry_picking',
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）登记。
     // verify 级——「以嘲笑代替论据」需要补的是**实际语境判据**（这是
     // 蔑视攻击还是强烈批评的具体缺陷指认/幽默内容转述/文学对白/元
@@ -3652,6 +3671,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r716] 第 147 维度补登记：wishful_thinking（一厢情愿）。
       // 同上：九处一次接齐。
       wishful_thinking: wt,
+      // [r717] 第 148 维度补登记：cherry_picking（摘樱桃）。
+      // 同上：九处一次接齐。
+      cherry_picking: cpk,
       // [r704] 第 137 维度补登记：appeal_to_ridicule（诉诸嘲讽）。
       // 同上：十处一次接齐。
       appeal_to_ridicule: ar,
@@ -3865,6 +3887,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r716] 第 147 维度 wishful_thinking 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       wt.count ? wt.count + ' 处一厢情愿' : '',
+      // [r717] 第 148 维度 cherry_picking 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      cpk.count ? cpk.count + ' 处摘樱桃' : '',
       // [r704] 第 137 维度 appeal_to_ridicule 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ar.count ? ar.count + ' 处诉诸嘲讽' : '',
@@ -14245,6 +14270,9 @@ module.exports = {
   // [r716] 第 147 维度 wishful_thinking 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkWishfulThinking,
+  // [r717] 第 148 维度 cherry_picking 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkCherryPicking,
   // [r704] 第 137 维度 appeal_to_ridicule 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkAppealToRidicule,
