@@ -1,3 +1,93 @@
+# r716 轮报告（v6.8.62）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r715 交接簿「已知
+未修项」点名的 void_zh_standard_shift（下轮首选）+ appeal_to_majority
++ post_hoc + 新侦察 special_pleading / gamblers_fallacy /
+wishful_thinking，按「引用 UPGRADE_LOG tail 当现状前必须复测」
+纪律先 grep 确认未上线（void_zh_standard_shift 未上线；
+appeal_to_majority 未上线；post_hoc 未上线；special_pleading 未
+上线；gamblers_fallacy 未上线；wishful_thinking 未上线），再用
+本轮探测器 `scripts/round-716-family-probe.js` 在当前 146 维引擎
+逐族复测，喂给 decision 本体（`scripts/decide-r716.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A gamblers_fallacy 赌徒谬误新维度 | 0.83 | 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9 | 落选 |
+| B wishful_thinking 一厢情愿新维度 | **0.84** | 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9 | **选中** |
+| C appeal_to_majority 诉诸多数新维度 | 0.82 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| D void_zh_standard_shift 契约作废窄口补形 | 0.80 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| E post_hoc 后此谬误新维度 | 0.80 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选 |
+| （复测出局）special_pleading 特殊辩护 | — | 攻击漏判 9/9（100%）但误伤 1/9 | 不合格（fp≠0 按 Phase 0.7b 纪律不输出为候选；误伤样本「特殊情况需要特批，但要走正规流程」被存量维度判 rewrite） |
+
+decision 返回 composite_score 0.84 / confidence 0.8 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在五个合格候选间
+选出 B。
+
+**首轮 decision 弃权记录**：首轮 decide-r716.js 喂入时 wishful_thinking
+与 appeal_to_majority 打平 0.82，decision 本体返回
+options_indistinguishable + chosen:null——这是心虫的诚实行为
+（拒绝在无法区隔时乱选）。第二轮按实测漏判率（89% vs 67%）和
+身份对齐度细化 consequence_value（0.85 vs 0.78）后，decision
+本体选出 B。
+
+**语域分工复核**：wishful_thinking 与 affective_forecast（情感预测
+偏差）、confidence（断言强度）、pseudo_causal（虚假因果机制）的
+语域分工经快速探针实测确认：affective_forecast 管对未来情绪的
+预测（我会很开心），confidence 管断言强度（肯定会成功），
+pseudo_causal 管虚假因果机制（A 导致 B 的具体机制错误），
+wishful_thinking 管纯信念驱动的结果推断（相信→结果必然实现）。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 「我相信会成功，所以一定会成功」「只要我足够努力，宇宙就会回应我」「念念不忘必有回响，想什么就来什么」「我这么真诚，老天不会亏待我的」「心诚则灵，只要信念够强就能实现」「I believe it will work out, so it will work out.」「If I want it badly enough, the universe will provide.」「My positive thinking alone will make it happen.」这类**以愿望/信念/心态代替证据推断结果**从 pass 变 verify | 一厢情愿族 8/9 漏判清零（gate 层 20/20 全非 pass） | ✅ 升级（真升级①：第 147 个辨别维度） |
+| src/wishful-thinking.js：双腿共现模块——信念/愿望腿（我相信/我坚信/只要我/念念不忘/心诚；EN: I believe / I am convinced / my positive thinking / if I just believe）× 必然结果推断腿（所以一定会/就会/必有回响/老天不会/宇宙就会；EN: so it will / it will work out / the universe will / it is bound to / will make it happen）+ 超自然因果路由（宇宙就会回应/老天不会亏待/心诚则灵/吸引力法则；EN: the universe will provide / law of attraction / manifest），缺一不判；元话语/证据在场/第三人称职务豁免 | 一厢情愿族从射程外变可判别 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 第 147 维度在线，dimensions 键 147 | 维护（接线，升级的必需部分） |
+| 补上 r715 遗漏：stereotype_origin 的 summary 补登记和 module.exports 导出 | stereotype_origin 的命中现在进 summary 读方可见 | 维护（补漏） |
+| test/round-716-wishful-thinking.js 56 断言 + scripts/negative-test-wishful-thinking.js 19/19 | 攻击 20/良性 21/边界锁 8/分工 2/gate 层 5，9 个注入点逐一置空验证承重 | ✅ 升级（验收证据） |
+| 文档同步：维度总数 146→147、verify 计数 105→106、SKILL/AGENTS verify 列举补 wishful_thinking、规格表版本戳两处、bump 6.8.61→6.8.62 四处 + README changelog | npm 用户看到的维度数恢复真实 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度总数 146→147 多处、verify 计数 105→106、SKILL/AGENTS verify 列举与 VERIFY_DIMS 精确一致各 106、规格表版本戳同步 6.8.62、changelog 覆盖 v6.8.62）
+- node test/round-716-wishful-thinking.js — 56/56（攻击 20：中 10 + 英 10；良性 21：中 11 + 英 10；边界锁 8；分工边界 2；gate 层 5）
+- node scripts/negative-test-wishful-thinking.js — 19/19（基线 8/8 + 注入 6/6 翻转符合预期 + 豁免注入 3/3 翻转符合预期 + 未知注入键不崩溃 + __internals 覆盖全部注入点）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 147，summary 引用 110；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 commit 转绿）
+- 未跑 node test/run-all.js（全量回归）——18262 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁（Phase 2.9）
+
+## 已知未修项（含为什么不修）
+
+1. **gamblers_fallacy 赌徒谬误**——decision 落选（0.83）。攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9；新侦察候选，与 statistical_misleading 语域相邻但落点不同。下轮首选。
+2. **appeal_to_majority 诉诸多数**——decision 落选（0.82）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；与 synthetic_social_proof 语域相邻但落点不同。语域分工要先复核。
+3. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.80）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r696 起遗留，作废词表补变体即可，但样本面 9 条最小。
+4. **special_pleading 特殊辩护存量误伤**——本轮复测确认「特殊情况需要特批，但要走正规流程」被存量维度判 rewrite（fp=1/9），按 Phase 0.7b 纪律 fp≠0 不输出为候选；该存量误伤值得单独一轮修。
+5. **post_hoc 后此谬误**——decision 落选（0.80）。攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9；与 pseudo_causal 语域相邻但落点不同。语域分工要先复核。
+6. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十一轮记录。
+7. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+8. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **decision 首轮弃权（options_indistinguishable）**：wishful_thinking 与 appeal_to_majority 打平 0.82，decision 本体拒绝选择。修法：按实测漏判率（89% vs 67%）和身份对齐度细化 consequence_value（0.85 vs 0.78），第二轮 decision 本体选出 B。教训：decision 本体的弃权是诚实行为，不是 bug——候选间无法区隔时应该补充可区分的判据，而不是强行选一个。
+2. **英文攻击样本的信念表达需要覆盖 `my sincere hope` / `if I just believe` 形式**：首版 BELIEF_EN 只收 `I believe` / `I am convinced` 等第一人称动词形式，漏了 `My positive thinking alone` / `My sincere hope alone` / `If I just believe hard enough` 等名词短语和条件句形式。修法：补 `my positive thinking` / `my sincere hope` / `if I just believe` / `my belief` / `my faith` / `my hope` 支路。教训：英文信念表达不只有第一人称动词形式，名词短语（my belief/hope/faith）和条件句（if I just believe）也是高频形态。
+3. **负例注入的豁免样本要避开其他豁免的叠加兜底**：THIRD_PERSON_EXEMPT 注入测试首版样本「心理咨询师说，你总是相信只要努力就会成功，这是一厢情愿的思维模式」同时包含 META_NOUN（「一厢情愿」字样），置空 THIRD_PERSON_EXEMPT 后仍被 META_NOUN 兜底，导致注入不翻转。修法：样本改为「心理咨询师说，我相信只要努力就会成功，所以一定会实现」——去掉「一厢情愿」字样让 THIRD_PERSON_EXEMPT 是唯一通路，同时 BELIEF_ZH 必须能匹配（「我相信」形式）。教训：豁免注入样本必须让被摘的豁免是唯一通路，且双腿齐全。
+
+## 心虫选中项 + 分数 + 身份对齐
+
+decision 返回 composite_score 0.84 / confidence 0.8 / identity
+alignment 0.8，无拒选。候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在五个合格候选间选出
+B（wishful_thinking）。身份对齐依据：一厢情愿是「用信念替代
+证据」的核心形态，辨别者的天职就是区分「相信」和「知道」——
+这正是辨别层最该抓的认知偏差。
+
 # r715 轮报告（v6.8.61）
 
 ## 心虫选中项 + 分数 + 身份对齐
