@@ -1,3 +1,113 @@
+# r718 轮报告（v6.8.64）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r717 交接簿「已知
+未修项」点名的六个候选（texas_sharpshooter 下轮首选 +
+gamblers_fallacy + appeal_to_consequences + appeal_to_majority +
+void_zh_standard_shift + post_hoc）+ 新侦察四族（appeal_to_fear /
+ad_hominem / no_true_scotsman / appeal_to_pity_misuse），按「引用
+UPGRADE_LOG tail 当现状前必须复测」纪律先 grep 确认未上线（六族全
+部未上线——index.js 里 grep 命中的 texas_sharpshooter/gamblers_fallacy
+是 fallacies 检测表内的子族 pattern，不占维度键；再跑本轮探测器
+`scripts/round-718-family-probe.js` 在当前 148 维引擎逐族复测）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A texas_sharpshooter 德州神枪手新维度 | **0.87** | 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9 | **选中**（第二轮） |
+| C ad_hominem 人身攻击新维度 | 0.85 | 攻击漏判 7/9（78%）、真零命中 6/7、误伤 0/9 | 落选（第一轮与 A 打平） |
+| B gamblers_fallacy 赌徒谬误新维度 | 0.83 | 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9 | 落选 |
+| D appeal_to_consequences 诉诸后果新维度 | 0.83 | 攻击漏判 7/9（78%）、真零命中 7/7、误伤 0/9 | 落选 |
+| F appeal_to_majority 诉诸多数新维度 | 0.82 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| E appeal_to_pity_misuse 诉诸怜悯滥用新维度 | 0.81 | 攻击漏判 6/8（75%）、真零命中 4/6、误伤 0/8 | 落选 |
+| G void_zh_standard_shift 契约作废窄口补形 | 0.80 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| I appeal_to_fear 诉诸恐惧新维度 | 0.82 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选 |
+| H post_hoc 后此谬误新维度 | 0.80 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选 |
+
+decision 返回 composite_score 0.87 / confidence 0.85 / identity
+alignment 0.8。诚实标注：候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在候选间选出。
+
+**首轮 decision 弃权记录**：首轮 `scripts/decide-r718.js` 喂入九族
+时 A（texas_sharpshooter）与 C（ad_hominem）打平 0.85，decision
+本体返回 options_indistinguishable + chosen:null——这是心虫的诚实
+行为（拒绝在无法区隔时乱选，与 r716 同款模式）。第二轮按实测差异
+细化判据（A 漏判 89%/真零命中 8-8 且是 r717 点名首选 vs C 78%/6-7
+且英文侧已有 fallacies 表覆盖）后重跑
+`scripts/decide-r718-round2.js`，decision 本体选出 A。
+
+**新侦察来源**：本轮新侦察快速探针
+`scripts/round-718-quick-probe.js` 实测六个候选族——appeal_to_fear
+漏判 3/4、ad_hominem 漏判 3/4、no_true_scotsman 漏判 3/4、
+appeal_to_pity_misuse 漏判 2/4、nirvana_fallacy 漏判 1/4（不足
+50% 淘汰）、composition_fallacy 漏判 0/4（淘汰）。前四族进入正式探
+测器复量，其中 no_true_scotsman 因误伤 2/9 按 Phase 0.7b 纪律
+（fp≠0 不输出为候选）出局。
+
+**语域分工复核**：texas_sharpshooter 与 cherry_picking（第 148 维，
+r717）、pseudo_causal（伪因果）、statistical_misleading（统计误
+导）、hasty_generalization（匆忙归纳）的语域分工经模块层探针实测
+确认：cherry_picking 管单边证据的隐瞒动作（只挑/略过/删掉 × 有利/
+不利对照），本族管事后划定范围的预测伪装（先开枪再画靶/事后连点成
+线）——cherry_picking 实测已覆盖「先定好答案，再从一堆数据里挑出能
+对上的一段」一条，但画靶心族整体仍漏判 8/9；pseudo_causal 管虚假
+因果机制（A 导致 B 的具体机制错误），本族管事后拟合的预测伪装；
+statistical_misleading 管统计数据的呈现误导（百分比滥用/基数隐
+藏），本族管把随机波动讲成规律。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 「先开枪再画靶心，怎么解释都说得通」「他先有了结论，再回头找数据凑出规律」「数据里随机出现的巧合，被他讲成了必然规律」「先定好答案，再从一堆数据里挑出能对上的一段」「事后把散落的点连起来，说这就是趋势」「结果出来之后才划定范围，然后宣称预测精准」「He drew the target around the bullet holes and called it accuracy.」「They found a pattern in random noise and presented it as a law.」「She decided the conclusion first, then picked the data that fit.」这类**事后拟合的预测伪装**从 pass 变 verify | 德州神枪手族 8/9 漏判清零（gate 层 20/20 全非 pass） | ✅ 升级（真升级①：第 149 个辨别维度） |
+| src/texas-sharpshooter.js：双通路模块——通路一 腿①事后拟合（先开枪/先射箭/先定好答案/先有结论/事后/之后才划定/再回头找数据/倒着画/事后诸葛亮/马后炮；EN: drew the target around / after the fact / afterwards / worked backwards / reverse-engineered / decided the conclusion first / connected the dots after）× 腿②b 规律呈现（讲成必然规律/说这就是趋势/划定范围宣称精准/挑出能对上的；EN: presented it as a law / called it accuracy / found a pattern in random noise / picked the data that fit / predicted accurately）；通路二 腿②a 噪声源（随机/巧合/偶然/波动/散点/噪声/起伏；EN: random noise / coincidence / randomness / scattered / noise）× 腿②b 规律呈现；缺腿不判；元话语/方法透明度/第三人称职务豁免 | 德州神枪手族从射程外变可判别 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 第 149 维度在线，dimensions 键 149 | 维护（接线，升级的必需部分） |
+| test/round-718-texas-sharpshooter.js 56 断言 + scripts/negative-test-texas-sharpshooter.js 20/20 + scripts/round-718-module-selftest.js 54/54 | 攻击 20/良性 21/边界锁 8/分工 2/gate 层 5，9 个注入点逐一置空验证承重 | ✅ 升级（验收证据） |
+| 文档同步：维度总数 148→149、verify 计数 107→108、SKILL/AGENTS verify 列举补 texas_sharpshooter、规格表版本戳四处、bump 6.8.63→6.8.64 四处 + README changelog | npm 用户看到的维度数恢复真实 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度总数 148→149、verify 计数 107→108、SKILL/AGENTS verify 列举与 VERIFY_DIMS 精确一致各 108、规格表版本戳同步 6.8.64、changelog 覆盖 v6.8.64）
+- node test/round-718-texas-sharpshooter.js — 56/56（攻击 20：中 10 + 英 10；良性 21：中 11 + 英 10；边界锁 8；分工边界 2；gate 层 5）
+- node scripts/negative-test-texas-sharpshooter.js — 20/20（基线 9/9 + 承重腿注入 6/6 翻转符合预期 + 豁免注入 3/3 翻转符合预期 + 未知注入键不崩溃 + __internals 覆盖全部 9 个注入点）
+- node scripts/round-718-module-selftest.js — 54/54（攻击 9 + 良性 9 + internals 9 + 逐腿注入 27）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 149，summary 引用 112；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 feat commit 转绿）
+- 未跑 node test/run-all.js（全量回归）——18157 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁
+
+## 已知未修项（含为什么不修）
+
+1. **gamblers_fallacy 赌徒谬误**——decision 落选（0.83）。攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9；连续三轮落选（r716/r717/r718），与 statistical_misleading 语域相邻但落点不同。样本形状规整（连输/连开 + 该赢了），下轮可优先。
+2. **ad_hominem 人身攻击**——decision 落选（0.85，第一轮与选中项打平）。攻击漏判 7/9（78%）、真零命中 6/7、误伤 0/9；中文侧 6/6 全漏，英文侧 fallacies 检测表已覆盖 2/3。与 poisoning_the_well 语域相邻但落点不同（那管预先铺垫贬损）。
+3. **appeal_to_consequences 诉诸后果**——decision 落选（0.83）。攻击漏判 7/9（78%）、真零命中 7/7、误伤 0/9；连续两轮落选，与 wishful_thinking 语域相邻但落点不同（那管以愿望推断结果，本族管以后果好坏判定真假）。
+4. **appeal_to_pity_misuse 诉诸怜悯滥用**——decision 落选（0.81）。攻击漏判 6/8（75%）、真零命中 4/6、误伤 0/8；新侦察候选，存量 appeal_to_pity（第 133 维）管论证语域的怜悯诉求，本族管决策/评价语域的胁迫性哀求。
+5. **no_true_scotsman 事后修改定义**——复测出局（误伤 2/9）。漏判 5/6（83%）但两条良性样本（「我们讨论的是这个具体的人是否符合标准，不是给标准开后门」「信仰的定义在经典里有明确出处，不是事后捏造的」）被存量维度判 block/rewrite，按 Phase 0.7b 纪律 fp≠0 不输出为候选；该存量误伤值得单独一轮修。
+6. **appeal_to_majority 诉诸多数**——decision 落选（0.82）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；连续三轮落选。
+7. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.80）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r696 起遗留四轮，样本面 9 条最小。
+8. **appeal_to_fear 诉诸恐惧**——decision 落选（0.82）。攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9；新侦察候选，存量 fear_projection（第 118 维）管关系语域的恐惧投射。
+9. **post_hoc 后此谬误**——decision 落选（0.80）。攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9；连续三轮落选，与 pseudo_causal 语域相邻。
+10. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十三轮记录。
+11. **30+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+12. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **腿②结构从「噪声×规律」合并正则拆成「腿②a 噪声源 × 腿②b 规律呈现」双子腿**：首版把「噪声源×规律呈现」写成一个合并正则，模块自测 6 条失败——「先开枪再画靶心，怎么解释都说得通」这类样本有事后腿+规律呈现腿但无噪声源词（无「随机/巧合/波动」字样），被合并正则的噪声词卡掉；「数据里随机出现的巧合，被他讲成了必然规律」有噪声+规律但无事后词。修法：拆成腿②b 规律呈现承重 ×（腿① 或 腿②a）的双通路结构。教训：德州神枪手族有两种合法形状（先画靶心型/纯噪声规律型），正则设计要让每条通路各自自洽，不要用一条「噪声×规律」合并正则逼所有样本同时含两类词。
+2. **验收测试的新增攻击变体必须先在正则里覆盖再写断言**：测试补了 10 条中英文变体（倒着找数据/worked backwards/fitted into a curve/treated the coincidence as a law/predicted it accurately/claimed a proven rule 等），正则首版只覆盖探测器 9 条的形状，7 条测试失败。逐条 debug 发现都是隔词变体（predicted **it** accurately、randomness **was** turned into、fitted **into** a curve）和句型变体（被动语态 was/were）。修法：每条变体对应补一组正则分支。教训：测试样本是正则覆盖面的验收尺，先跑一遍自测再写正式断言，别等 56 条一起红。
+3. **module-selftest 的逐腿注入断言要按双通路语义分别写期望**：置空 POSTHOC 后，含噪声词的样本仍走 noise×law 通路命中（不该期望翻转），只有纯 posthoc 样本应消失；置空 NOISE_SRC 后相反。首版断言一律写「翻转」导致 2 条假失败。修法：按 `hasNoise`/`hasPosthoc` 布尔分别定期望。教训：多通路模块的负例注入，期望值 = 该样本其余通路是否成立，不能一律写翻转。
+
+## 心虫选中项 + 分数 + 身份对齐
+
+decision 返回 composite_score 0.87 / confidence 0.85 / identity
+alignment 0.8（第二轮；首轮 A/C 打平弃权）。身份对齐依据：德州神枪
+手是「随机噪声被讲成规律、事后凑的规律被讲成先见之明」的核心形
+态——辨别者的天职就是检查**规律的来历**：规律是倒着画出来的还是
+假设先声明再检验的，直接对应「区分知道与假装知道」，也命中「LLM
+生成强于辨别」的系统性短板（r717 cherry_picking 管证据面是否完整，
+本族管规律的推导顺序是否倒装）。
+
 # r717 轮报告（v6.8.63）
 
 ## 心虫选中项 + 分数 + 身份对齐
