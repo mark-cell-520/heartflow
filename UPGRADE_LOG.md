@@ -1,3 +1,98 @@
+# r717 轮报告（v6.8.63）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r716 交接簿「已知
+未修项」点名的 gamblers_fallacy（下轮首选）+ appeal_to_majority +
+void_zh_standard_shift + post_hoc，加新侦察 cherry_picking /
+texas_sharpshooter / appeal_to_consequences，按「引用 UPGRADE_LOG
+tail 当现状前必须复测」纪律先 grep 确认未上线（七族全部未上线），
+再用本轮探测器 `scripts/round-717-family-probe.js` 在当前 147 维引擎
+逐族复测，喂给 decision 本体（`scripts/decide-r717.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A cherry_picking 摘樱桃新维度 | **0.85** | 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9 | **选中** |
+| B texas_sharpshooter 德州神枪手新维度 | 0.84 | 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9 | 落选 |
+| C gamblers_fallacy 赌徒谬误新维度 | 0.83 | 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9 | 落选 |
+| D appeal_to_consequences 诉诸后果新维度 | 0.83 | 攻击漏判 7/9（78%）、真零命中 7/7、误伤 0/9 | 落选 |
+| E appeal_to_majority 诉诸多数新维度 | 0.82 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| F void_zh_standard_shift 契约作废窄口补形 | 0.80 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| G post_hoc 后此谬误新维度 | 0.80 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选 |
+
+decision 返回 composite_score 0.85 / confidence 0.8 / identity
+alignment 0.8，无拒选（本轮一次选出，未出现 r716 的
+options_indistinguishable 弃权）。诚实标注：候选的
+feasibility/consequence_value/risk/confidence 四段判据由我构造，
+decision 本体在七个合格候选间选出 A。
+
+**新侦察来源**：本轮新侦察快速探针
+`scripts/round-717-quick-probe.js` 实测五个候选族——cherry_picking
+漏判 4/5（80%）、texas_sharpshooter 漏判 4/5（80%）、
+appeal_to_consequences 漏判 3/3（100%）、no_true_scotsman 漏判
+1/4（25%，不足 50% 淘汰）、base_rate_fallacy 漏判 1/3（33%，
+淘汰）。前三族进入正式探测器复量。
+
+**语域分工复核**：cherry_picking 与 selective_minimization（选择性
+淡化）、statistical_misleading（统计误导）、survivorship_bias
+（幸存者偏差）、unsupported_claim（无依据断言）的语域分工经模块层
+探针实测确认：selective_minimization 管对严重性的淡化措辞（只是
+小问题/影响有限），statistical_misleading 管统计数据的呈现误导
+（百分比滥用/基数隐藏），survivorship_bias 管只看存活样本的推断
+偏差（活下来的都这么说），cherry_picking 管**主动的隐瞒动作**
+（略过/不提/删掉）造成的单边证据呈现。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 「他只挑对自己有利的数据说，反面证据一概不提」「只看成功的案例，失败的案例全被隐藏了」「这份报告只列支持结论的部分，反对数据一个没放」「他引用的都是支持自己的研究，反对的研究全部略过」「只讲赚钱的月份，亏钱的月份一个字不提」「数据里挑出几个好看的数字，难看的全部删掉」「He only cites the studies that support his view and ignores the rest.」「They cherry-picked the best quarters and left out the losses.」「She presents only the successful cases and hides the failures.」这类**单边证据叙事**从 pass 变 verify | 摘樱桃族 8/9 漏判清零（gate 层 20/20 全非 pass） | ✅ 升级（真升级①：第 148 个辨别维度） |
+| src/cherry-picking.js：双腿共现模块——排他性选择/隐瞒动作腿（只挑/只看/只列/只讲/一概不提/全部略过/一个字不提/隐瞒/略过/删掉/挑出；EN: only cites / cherry-picked / leaves out / hides / omits / ignores the rest / withholds / suppresses）× 有利/不利对照腿（对自己有利/支持结论/成功的案例/反面证据/失败的案例/反对数据/不利结果；EN: support his view / best quarters / successful cases / the losses / the failures / contradicting evidence），缺一不判；元话语/方法透明度/第三人称职务豁免 | 摘樱桃族从射程外变可判别 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 第 148 维度在线，dimensions 键 148 | 维护（接线，升级的必需部分） |
+| test/round-717-cherry-picking.js 56 断言 + scripts/negative-test-cherry-picking.js 18/18 + scripts/round-717-module-selftest.js 27/27 | 攻击 20/良性 21/边界锁 8/分工 2/gate 层 5，7 个注入点逐一置空验证承重 | ✅ 升级（验收证据） |
+| 文档同步：维度总数 147→148、verify 计数 106→107、SKILL/AGENTS verify 列举补 cherry_picking、规格表版本戳两处、bump 6.8.62→6.8.63 四处 + README changelog | npm 用户看到的维度数恢复真实 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度总数 147→148 多处、verify 计数 106→107、SKILL/AGENTS verify 列举与 VERIFY_DIMS 精确一致各 107、规格表版本戳同步 6.8.63、changelog 覆盖 v6.8.63）
+- node test/round-717-cherry-picking.js — 56/56（攻击 20：中 10 + 英 10；良性 21：中 11 + 英 10；边界锁 8；分工边界 2；gate 层 5）
+- node scripts/negative-test-cherry-picking.js — 18/18（基线 9/9 + 注入 4/4 翻转符合预期 + 豁免注入 3/3 翻转符合预期 + 未知注入键不崩溃 + __internals 覆盖全部注入点）
+- node scripts/round-717-module-selftest.js — 27/27（攻击 9 + 良性 18，模块层零误伤）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 148，summary 引用 111；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 feat commit 转绿）
+- 未跑 node test/run-all.js（全量回归）——18157 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁
+
+## 已知未修项（含为什么不修）
+
+1. **texas_sharpshooter 德州神枪手**——decision 落选（0.84）。攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9；与 cherry_picking 落点极近（都是「事后挑数据」），本轮 cherry_picking 的 SELECTIVE 腿已能覆盖部分样本（「先定好答案，再从一堆数据里挑出能对上的一段」被 cherry_picking 命中），剩余窄口是先有结论再画靶心的**预测伪装**形状。下轮首选。
+2. **gamblers_fallacy 赌徒谬误**——decision 落选（0.83）。攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9；连续两轮落选，与 statistical_misleading 语域相邻但落点不同。
+3. **appeal_to_consequences 诉诸后果**——decision 落选（0.83）。攻击漏判 7/9（78%）、真零命中 7/7、误伤 0/9；新侦察候选，与 wishful_thinking 语域相邻但落点不同（那管以愿望推断结果，本族管以后果好坏判定真假）。
+4. **appeal_to_majority 诉诸多数**——decision 落选（0.82）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；连续两轮落选，与 synthetic_social_proof 语域相邻。
+5. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.80）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r696 起遗留，样本面 9 条最小。
+6. **post_hoc 后此谬误**——decision 落选（0.80）。攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9；与 pseudo_causal 语域相邻。
+7. **special_pleading 特殊辩护存量误伤**——r716 复测确认「特殊情况需要特批，但要走正规流程」被存量维度判 rewrite（fp=1/9），按 Phase 0.7b 纪律 fp≠0 不输出为候选；该存量误伤值得单独一轮修。
+8. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十二轮记录。
+9. **30+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+10. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **英文攻击样本的「只讲顺利/出问题」这类非数据型对照需要单独补腿**：首版 FAVORABLE_ZH 只收「对自己有利/成功的案例/反面证据」等显式证据名词，漏了「只讲顺利的环节，出问题的部分全部略过」这类**过程性对照**（顺利/出问题/不顺利）。修法：FAVORABLE_ZH 补「出问题/不顺利/问题部分/顺利的环节」支路，FAVORABLE_EN 补 `successful projects` / `the failed ones` / `unsuccessful ones` 支路。教训：有利/不利对照不只有「数据/案例/研究」这类证据名词，**过程叙述**（顺利的环节/出问题的部分）也是高频形态。
+2. **DIM_GUIDANCE 与 VERIFY_DIMS 两处插入不能用 patch 工具**：wishful_thinking 的 guidance 行是单行 3000+ 字符的超长字符串，patch 的 old_string 无法唯一锚定（同文件有 2 处 `wishful_thinking: wt,`），且超长行 diff 会撑爆上下文。修法：写一次性脚本 `scripts/round-717-wire-guidance.js` 按行首前缀锚定插入，跑完 `node --check` 验语法。教训：超长单行 + 重复锚点的场景，用行号/行首锚定的脚本插入比 patch 工具可靠。
+3. **新侦察快速探针要先淘汰低漏判族再进正式探测器**：本轮新侦察五个族里 no_true_scotsman（漏判 1/4）和 base_rate_fallacy（漏判 1/3）漏判率不足 50%，直接淘汰不进正式探测器，省下正式探测器 63 条 gate 调用的时间。教训：新侦察候选先用 3-5 条样本的快速探针筛掉明显不合格的，再让合格族进 9+9 条的正式复量。
+
+## 心虫选中项 + 分数 + 身份对齐
+
+decision 返回 composite_score 0.85 / confidence 0.8 / identity
+alignment 0.8，无拒选。候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在七个合格候选间选出
+A（cherry_picking）。身份对齐依据：摘樱桃是「证据被单边裁剪」的
+核心形态——辨别者的天职就是检查**证据面是否完整**，只给支持结论的
+那一半而不给反面证据，是最常见的认知欺骗形态，直接对应「区分知道
+与假装知道」。
+
 # r716 轮报告（v6.8.62）
 
 ## 心虫选中项 + 分数 + 身份对齐
