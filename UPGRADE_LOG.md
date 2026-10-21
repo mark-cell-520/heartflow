@@ -1,3 +1,100 @@
+# r719 轮报告（v6.8.65）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r718 交接簿「已知
+未修项」点名的六个候选（gamblers_fallacy 下轮首选 +
+ad_hominem + appeal_to_consequences + appeal_to_majority +
+appeal_to_pity_misuse + no_true_scotsman）+ 新侦察两族
+（special_pleading 特殊豁免 / guilt_by_association 连坐定罪），
+按「引用 UPGRADE_LOG tail 当现状前必须复测」纪律先 grep 确认
+未上线（七族全部未上线——index.js 里 grep 命中的 gamblers 等是
+fallacies 检测表内的子族 pattern，不占维度键；再跑本轮探测器
+`scripts/round-719-family-probe.js` 在当前 149 维引擎逐族复测）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| B ad_hominem 人身攻击新维度 | **0.85** | 攻击漏判 7/9（78%）、真零命中 6/7、误伤 0/9 | **选中**（首轮直接选出，无弃权） |
+| D special_pleading 特殊豁免新维度 | 0.84 | 攻击漏判 7/9（78%）、真零命中 7/7、误伤 0/9 | 落选 |
+| A gamblers_fallacy 赌徒谬误新维度 | 0.83 | 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9 | 落选（连续四轮） |
+| C appeal_to_consequences 诉诸后果新维度 | 0.83 | 攻击漏判 7/9（78%）、真零命中 7/7、误伤 0/9 | 落选 |
+| E appeal_to_majority 诉诸多数新维度 | 0.82 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选（连续四轮） |
+| F appeal_to_pity_misuse 诉诸怜悯滥用新维度 | 0.81 | 攻击漏判 6/8（75%）、真零命中 4/6、误伤 0/8 | 落选 |
+| G guilt_by_association 连坐定罪新维度 | 0.81 | 攻击漏判 6/9（67%）、真零命中 5/6、误伤 0/9 | 落选 |
+
+decision 返回 composite_score 0.85 / confidence 0.8 / identity
+alignment 0.8。诚实标注：候选的 feasibility/consequence_value/risk/
+confidence 四段判据由我构造，decision 本体在候选间选出。
+
+**新侦察来源**：本轮新侦察两族 special_pleading（规则只约束别人
+的双标族：漏判 7/9、零误伤）与 guilt_by_association（连坐定罪
+族：漏判 6/9、零误伤）直接进正式探测器复量，全部合格进候选池。
+no_true_scotsman 复测仍误伤 2/9（「我们讨论的是这个具体的人是
+否符合标准」「信仰的定义在经典里有明确出处」两条良性样本被存量
+维度判 block/rewrite），按 Phase 0.7b 纪律（fp≠0 不输出为候选）
+再次出局。
+
+**语域分工复核**：ad_hominem 与 poisoning_the_well（毒井，管预
+先铺垫贬损——在听取论证之前先污染信源）、stereotype_origin（第
+146 维，出身歧视，管按出身标签贬低人）、tu_quoque（第 141 维，
+诉诸伪善，管用对方过错取消批评资格的一致性结构）、
+appeal_to_ridicule（第 137 维，管嘲笑/蔑视表达）的语域分工经
+模块层探针实测确认：本族管**以人的属性直接否定其论证**的当下
+动作（人品/资历贬损 × 言论否定的共现）——分工边界样本
+（「你自己也这样做，没资格说我」tu_quoque 型、「这种想法也太
+可笑了，亏你想得出来」appeal_to_ridicule 型）实测存量真兜底
+（gate verify）+ 本模块不命中。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户看到什么 | 升级 or 维护 |
+|---|---|---|
+| 「他的人品有问题，所以他的观点全部不成立」「他连大学都没上过，说的话能有什么道理」「她不过是个外行，她的分析根本不用看」「一个离婚的人谈什么家庭教育，自己家都搞不好」「他自己都迟到，还有脸要求别人准时」「你这种人懂什么，闭嘴吧」「He is a terrible person, so everything he says is wrong.」「She never went to college, so her opinion does not matter.」「You are just an amateur; your analysis is worthless.」这类**以人废言的人身攻击**从 pass 变 verify | 人身攻击族 7/9 漏判清零（gate 层 20/20 全非 pass） | ✅ 升级（真升级①：第 150 个辨别维度） |
+| src/ad-hominem.js：双腿共现模块——腿①人的属性贬损（人品有问题/素质低/人渣；连大学都没上过/外行/门外汉/业余/半路出家；一个离婚的人/自己家都搞不好；自己都迟到/自己都做不到；你这种人/你也配；EN: terrible person / never went to college / amateur / fraud / hypocrite / loser / has no idea what / all incompetent people）× 腿②言论否定（观点不成立/无效/说的话能有什么道理/不足为信/一派胡言；没资格谈/不配说/懂什么/闭嘴；谈什么家庭教育/还有脸要求；EN: everything he says is wrong / opinion does not matter / can be ignored / deserve no credibility / worthless / shut up）；缺腿不判；元话语/反对人身攻击批评/第三人称职务豁免 | 人身攻击族从射程外变可判别 | ✅ 升级（模式库本体） |
+| src/index.js：九处接线（require/计算点/allDims/dimMap/dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports） | 第 150 维度在线，dimensions 键 150 | 维护（接线，升级的必需部分） |
+| test/round-719-ad-hominem.js 56 断言 + scripts/negative-test-ad-hominem.js 19/19 + scripts/round-719-module-selftest.js 53/53 | 攻击 20/良性 21/边界锁 8/分工 2/gate 层 5，9 个注入点逐一置空验证承重 | ✅ 升级（验收证据） |
+| 文档同步：维度总数 149→150、verify 计数 108→109、SKILL/AGENTS verify 列举补 ad_hominem、规格表版本戳四处、bump 6.8.64→6.8.65 四处 + README changelog | npm 用户看到的维度数恢复真实 | 维护（发布链） |
+
+## 验收数字（一行一个检查项）
+
+- node bin/verify.js — 16/16
+- node scripts/bidirectional-guard.js — 召回 52/52、误拦 302/326（与基线完全一致，零新增误伤；基准 326 良性 + 52 恶意）
+- node test/doc-numbers-accuracy.test.js — 22/22（维度总数 149→150、verify 计数 108→109、SKILL/AGENTS verify 列举与 VERIFY_DIMS 精确一致各 109、规格表版本戳同步 6.8.65、changelog 覆盖 v6.8.65）
+- node test/round-719-ad-hominem.js — 56/56（攻击 20：中 10 + 英 10；良性 21：中 11 + 英 10；边界锁 8；分工边界 2；gate 层 5）
+- node scripts/negative-test-ad-hominem.js — 19/19（基线 9/9 + 承重腿注入 4/4 翻转 + 豁免注入 4/4 翻转符合预期 + 未知注入键不崩溃 + __internals 覆盖全部 9 个注入点）
+- node scripts/round-719-module-selftest.js — 53/53（攻击 9 + 良性 9 + internals 9 + 逐腿注入 18 + 豁免置空 8）
+- node scripts/guard-abilities.js — 20/20（dimensions 键 150，summary 引用 113；双向回归 召回 52/52、误拦 302/326）
+- node test/security-audit.test.js — 16/16（S2 由含版本号的 feat commit 转绿）
+- 未跑 node test/run-all.js（全量回归）——18157 用例 / 20+ 分钟 / 4GB 容器，是每日记账任务不是提交门禁
+
+## 已知未修项（含为什么不修）
+
+1. **gamblers_fallacy 赌徒谬误**——decision 落选（0.83，连续四轮）。攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9；与 statistical_misleading 语域相邻但落点不同。样本形状规整（连输/连开 + 该赢了），下轮可优先。
+2. **special_pleading 特殊豁免**——decision 落选（0.84）。攻击漏判 7/9（78%）、真零命中 7/7、误伤 0/9；新侦察候选，与 standard_shift/cost_externalization 语域相邻但落点不同（那管规则/标准本身被改变或成本转移，本族管自称对规则拥有豁免权）。
+3. **appeal_to_consequences 诉诸后果**——decision 落选（0.83）。攻击漏判 7/9（78%）、真零命中 7/7、误伤 0/9；连续三轮落选，与 wishful_thinking 语域相邻但落点不同（那管以愿望推断结果，本族管以后果好坏判定真假）。
+4. **no_true_scotsman 事后修改定义**——复测出局（误伤 2/9，与 r718 一致）。漏判 5/6（83%）但两条良性样本（「我们讨论的是这个具体的人是否符合标准」「信仰的定义在经典里有明确出处」）被存量维度判 block/rewrite，按 Phase 0.7b 纪律 fp≠0 不输出为候选；该存量误伤值得单独一轮修（连续两轮记录）。
+5. **appeal_to_majority 诉诸多数**——decision 落选（0.82，连续四轮）。
+6. **guilt_by_association 连坐定罪**——decision 落选（0.81）。新侦察候选，漏判 6/9（67%）、真零命中 5/6、误伤 0/9；与 genetic_fallacy/stereotype 语域相邻。
+7. **appeal_to_pity_misuse 诉诸怜悯滥用**——decision 落选（0.81）。漏判 6/8（75%）、真零命中 4/6、误伤 0/8。
+8. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十四轮记录。
+9. **30+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+10. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（两条）
+
+1. **验收测试的新增攻击变体必须先在模块层 debug 再写断言**：测试补了 10 条中英文变体（素质太低/has no idea what talking about/all incompetent people/deserve no credibility/is a liar 等），首版 4 条失败。逐条 debug 发现都是词表缺口：「素质太低」中间插了程度副词（太/很/非常）不在原正则；`they are all incompetent people` 的 people 复数不在 PERSON_EN 名词表；`her evidence does not count` 的 evidence 不在 DISMISS_EN 名词表；`her claim is nonsense` 的 nonsense 作表语不在表语列表；`deserve no credibility` 是新句型。修法：每条变体对应补一组词表分支。教训：先跑 10 条自测再写正式断言，别等 56 条一起红（与 r718 教训同源）。
+2. **豁免注入样本必须避开其他豁免的叠加兜底**：负例测试首版三条豁免注入失败——「人身攻击谬误的典型例子」被 META_NOUN 裸名词兜底（置空 META_EXEMPT 后仍不命中）；「批评观点可以，但请针对内容本身」本身不是攻击形状（置空豁免后双腿不齐也不会翻转）。修法：换样本——元话语样本用「人身攻击是指…」句式（只触发 META_EXEMPT 不触发 META_NOUN）；反对人身攻击样本带完整攻击双腿 +「对事不对人」字样（让 ANTI_ADHOMINEM 是唯一通路）。教训：豁免注入的翻转断言 = 样本必须是攻击形状 + 被摘的豁免是它不被命中的唯一原因。
+
+## 心虫选中项 + 分数 + 身份对齐
+
+decision 返回 composite_score 0.85 / confidence 0.8 / identity
+alignment 0.8（首轮直接选出，无弃权）。身份对齐依据：人身攻击
+是**「对人不对事」的最核心形态**——辨别者的天职就是检查评价
+的对象是**论证本身**还是**提出论证的人**：以人品/资历差判定言
+论错，正是「区分知道与假装知道」在人际维度的体现——言论的
+真伪只取决于证据链，不取决于说话者的属性，直接对应心虫
+「LLM 生成强于辨别」的系统性短板在辩论/评审语域的落点。
+
 # r718 轮报告（v6.8.64）
 
 ## 心虫选中项 + 分数 + 身份对齐

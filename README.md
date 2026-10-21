@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-149 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+150 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
 ×  1,314 dispatch routes  ×  18,157 passing tests  ×  0 runtime dependencies
 ```
 
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 149 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 150 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -143,7 +143,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (149 dimensions) -> gate
+scope-check -> premise-check -> discriminate (150 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -172,14 +172,14 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.63**. Not marketing copy.
+Measured on this repository at **v6.8.65**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 149 |
+| Discrimination dimensions | 150 |
 | MCP tools | 182 |
 | Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
@@ -307,6 +307,7 @@ This table exists so a reader can see the shape of the line in ten seconds, not 
 duplicate the log.
 
 | Version | Date | Change |
+| 6.8.65 | 2026-10-22 | **`ad_hominem` added as dimension 150 (upgrade type 1 — a brand-new discrimination dimension)** — ad hominem (personal attack): substituting belittlement of the person for evaluation of the argument — rather than addressing the content of a claim, attacking the arguer's character, credentials, circumstances, or behavioral consistency to declare their words invalid (他的人品有问题，所以他的观点全部不成立 / 他连大学都没上过，说的话能有什么道理 / 她不过是个外行，她的分析根本不用看 / 一个离婚的人谈什么家庭教育，自己家都搞不好 / 他自己都迟到，还有脸要求别人准时 / 你这种人懂什么，闭嘴吧 / He is a terrible person, so everything he says is wrong. / She never went to college, so her opinion does not matter. / You are just an amateur; your analysis is worthless.): two-leg coexistence, a single leg does not hit — leg 1 person belittlement (人品有问题/素质低/人渣; 连大学都没上过/外行/门外汉/业余/半路出家; 一个离婚的人/自己家都搞不好; 自己都迟到/自己都做不到; 你这种人/你也配; EN: terrible person / never went to college / amateur / fraud / hypocrite / loser / has no idea what) × leg 2 speech dismissal (观点不成立/无效/说的话能有什么道理/不足为信/一派胡言; 没资格谈/不配说/懂什么/闭嘴; 谈什么家庭教育/还有脸要求; EN: everything he says is wrong / opinion does not matter / can be ignored / deserve no credibility / worthless / shut up). 7/9 leaks closed (6/7 true zero-hit), 0/9 benign harmed, bidirectional guard 52/52 recall and false positives 302/326 (identical to baseline, zero new harm). Exemptions locked: normal conflict review, logic-class counterexamples, meta analysis of the fallacy itself, anti-ad-hominem meta criticism (不要针对个人/对事不对人/attack the argument, not the person), third-person professional review, acknowledgment structures (经验有限，但观点有出处值得查证). Decision entity selected this round (first-pass direct pick, no abstention — composite_score 0.85 / confidence 0.8 / identity alignment 0.8; alternatives: special_pleading 0.84, gamblers_fallacy 0.83, appeal_to_consequences 0.83, appeal_to_majority 0.82, appeal_to_pity_misuse 0.81, guilt_by_association 0.81). VERIFY level — a single sentence may be normal conflict review, logic-class counterexample, counseling pattern analysis, or quoted dialogue |
 |---------|------|--------|
 | 6.8.58 | 2026-10-13 | **`kafkatrapping` added as dimension 143 (upgrade type 1 — a brand-new discrimination dimension that independently hits its own sample family)** — the family treats the interlocutor's denial/defense/emotional reaction itself as proof of guilt (你反应这么大，正好说明被我说中了 / The harder you deny it, the guiltier you look.): three routes — reaction × guilt-inference, innocence × challenging question, denial × evidence-declaration |
 | 6.8.60 | 2026-10-20 | **`concern_trolling` added as dimension 145 (upgrade type 1 — a brand-new discrimination dimension)** — fake concern: control, belittlement, or suppression wrapped in a "for your own good" package, dressing harmful words as well-meant reminders while cancelling the other party's right to refuse (我是为你好，才指出你这些问题的 / 我这么说都是关心你，别人谁愿意跟你说这些 / I am only saying this because I care about you. / A real friend would tell you these hard truths, and I care enough to do it.): two routes — care-wrapping × belittlement/control content (two-leg coexistence, a single leg does not hit), care-wrapping × exclusive monopoly (别人谁愿意 / 换别人 — monopolizing the right to criticize as one's own privilege). 9/10 leaks closed (7/9 true zero-hit), 0/12 benign harmed, bidirectional guard 52/52 recall and false positives 302/326 (identical to baseline, zero new harm). Four exemptions locked: normal concern (你最近看起来状态不好，发生什么事了吗 / I am worried about you, let me know if you need anything.), normal criticism without the care-wrapping leg, meta analysis of the tactic itself (伪关心是一种用关心包装的控制手法), third-person professional review (心理咨询师说……这是伪关心的话术). Decision entity selected this round (composite_score 0.84 / confidence 0.7 / identity alignment 0.8). VERIFY level — a single sentence may be normal concern, conflict review, or counseling pattern analysis |
