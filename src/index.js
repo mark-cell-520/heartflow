@@ -412,6 +412,14 @@ const { checkWishfulThinking } = require('./wishful-thinking.js');
 // 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9。判据双腿共现；
 // 细节见 src/gamblers-fallacy.js。
 const { checkGamblersFallacy } = require('./gamblers-fallacy.js');
+// [r718] 第 149 维度 appeal_to_majority（诉诸多数：以人数/流行度
+// 代替论证，让观点背负人数背书）。decision 本体选出
+// （scripts/decide-r718.js，composite_score 0.83 / confidence 0.8 /
+// identity alignment 0.8，无拒选）。候选池来自 r718 探测器
+// scripts/round-718-family-probe.js；本轮在当前引擎（148 维）复测：
+// 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9。判据双腿共现；
+// 细节见 src/appeal-to-majority.js。
+const { checkAppealToMajority } = require('./appeal-to-majority.js');
 // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽：以嘲笑/蔑视/智商贬低
 // 对方的观点或发言代替论据）。decision 本体一次选出（/tmp/decide-run-r704.js
 // 读 /tmp/decide-opts-r704.json，composite_score 0.87 / confidence 0.80 /
@@ -1523,6 +1531,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r717] 第 148 维度 gamblers_fallacy（赌徒谬误）计算点。
   // 同 r716 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const gmb = _applyPedagogyRelaxation(checkGamblersFallacy(_normText), "gamblers_fallacy", pedagogyRelaxation);
+  // [r718] 第 149 维度 appeal_to_majority（诉诸多数）计算点。
+  // 同 r717 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const apm = _applyPedagogyRelaxation(checkAppealToMajority(_normText), "appeal_to_majority", pedagogyRelaxation);
   // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）计算点。
   // 同 r701 先例：十处一次接齐，漏一处 gate.action 恒 pass。
   const ar = _applyPedagogyRelaxation(checkAppealToRidicule(_normText), "appeal_to_ridicule", pedagogyRelaxation);
@@ -1938,6 +1949,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r717] 第 148 维度 gamblers_fallacy 参与判定（赌徒谬误）。
     // 同 r716 先例：dimMap 与 allDims 必须两处都接。
     {score: gmb.score, name:'gamblers_fallacy'},
+    // [r718] 第 149 维度 appeal_to_majority 参与判定（诉诸多数）。
+    // 同 r717 先例：dimMap 与 allDims 必须两处都接。
+    {score: apm.score, name:'appeal_to_majority'},
     // [r704] 第 137 维度 appeal_to_ridicule 参与判定（诉诸嘲讽）。
     // 同 r701 先例：dimMap 与 allDims 必须两处都接。
     {score: ar.score, name:'appeal_to_ridicule'},
@@ -2258,6 +2272,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r717] 第 148 维度 gamblers_fallacy（赌徒谬误×
     // 历史连胜/连败腿×反转/概率升高预期腿）。
     gamblers_fallacy: gmb,
+    // [r718] 第 149 维度 appeal_to_majority（诉诸多数×
+    // 多数/流行度腿×人数收束结论腿）。
+    appeal_to_majority: apm,
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽×
     // 嘲笑蔑视表达×指向对方观点/发言的目标腿）。
     appeal_to_ridicule: ar,
@@ -2499,6 +2516,7 @@ function discriminate(text, evidence = [], contentMode) {
     'stereotype_origin': "不得用**出身/来源标签**代替**实际表现**，直接贬低人的属性、品格或心理——把「专科毕业的，逻辑能力能强到哪去」「年纪轻轻的懂什么，回去多历练几年」「富二代罢了，能力都是家里给的」「单亲家庭长大的孩子心理都有问题」「文科生写代码，能写出什么好东西」「People from small towns just do not have the vision for this.」「She is too emotional to handle a leadership role.」「He is just a trust-fund kid, none of it is his own work.」这类**按学历/年龄/家庭背景给人贴标签、不论其实际作品或表现就下贬损结论**的话术当正常评价（样本形状与负例见 test/round-715-stereotype-origin.js）。判据是**双腿共现**：①出身/来源标签三类任中一类——学历出身「专科/二本/三本/大专/中专/技校/职高/文科生/理科生/艺术生/体育生/非名校/没上过大学/自学成才/海归/留学生/野鸡大学/成人教育/网络教育/专升本」，年龄出身「年纪轻轻/年纪小/太年轻/年轻人/青年人/应届生/毕业生/实习生/新人/新手/小孩/小年轻」，家庭背景与机构出身「富二代/官二代/拆二代/单亲家庭/单亲妈妈/单亲爸爸/农村/外地/小地方/小县城/小镇/乡下/草台班子/民间/大厂/裁员/自由职业/转岗/宝妈/奶爸/北漂/沪漂/深漂」；EN：from a vocational school / community college / art major / self-taught / non-degree / too young / just a kid / fresh graduate / intern / newcomer / trust-fund kid / silver spoon / single-parent / from a broken home / from small towns / rural / village / laid-off / gig worker / blue-collar / working-class / she is too ② 对人的属性/品格/心理贬损三类任中一类——能力贬损「逻辑能力能强到哪去/懂什么/能写出什么好东西/能力都是家里给的/不成熟/幼稚/纸上谈兵/眼高手低」，心理贬损「心理都有问题/心理脆弱/性格缺陷/情绪化/玻璃心/抗压能力差/心理不健康/人格缺陷」，品格贬损「眼界不行/见识短/目光短浅/靠不住/不可靠/有问题/有毛病/不靠谱/素质低/没教养/格局小」；EN：cannot have the vision / does not know anything / none of it is his own work / too emotional / psychologically damaged / has issues / cannot be trusted / unreliable / has no vision / narrow-minded。缺一不判——「这位候选人来自二线城市，但项目经验很扎实」只有出身无贬损结论，是事实陈述；「这个方案不成熟」只有贬损无出身腿，是正常批评。按出身下结论代替按实际表现下结论，会让有能力的候选人被学历埋掉、让无依据的贬损被出身包装：正当做法是**就实际表现立论**（这位候选人虽然学历普通，但开源贡献说明自学能力很强/她转行做开发两年，已经能独立负责模块/我们评估候选人主要看作品和面试表现）或**把出身作为背景信息陈述而不作为能力判据**（他来自小城市，但项目经验很扎实/成长环境会影响性格，但不决定一个人的能力）。边界：genetic_fallacy（第 131 维）管**来源×质量推断**——落点是观点/产品的价值（「小地方出来的人，眼界就是不行」被它判 verify，因为「眼界」指向判断力/认知质量），本维度只收 genetic_fallacy 不覆盖的**出身×人的属性/品格/心理贬损**（学历/年龄/家庭背景×能力/心理/品格），两类句式分开收；stereotype（既有维度）管**身份标签×不可靠标签**——按性别/种族/地域给群体贴不可靠标签（「女人就是情绪化，谈什么理性」被它判 verify），本维度只收 stereotype 不覆盖的**出身×个人属性贬损**（学历/年龄/家庭×个人能力），性别歧视型句式整族不在此列；hasty_generalization（既有维度）管无依据概推，本族要件是出身被点名；confidence / capability_overclaim 管能力夸大，本族落点是出身导致的贬损；正当评价（以实际表现为据：项目经验很扎实/能独立负责模块/开源贡献说明自学能力很强）、中性事实陈述（这位候选人来自二线城市/她转行做开发两年/他家里条件不错）、平衡比较（年轻同事想法新，老同事经验足，可以互补）、正当提问（应届生能胜任这个岗位吗）、概念分析与规范陈述（出身歧视是一种偏见/识别出身歧视话术）明确不判",
     'wishful_thinking': "不得用**愿望/信念/心态**代替**证据**，直接推断结果会按自己期望的方向发展——把「我相信会成功，所以一定会成功」「只要我足够努力，宇宙就会回应我」「念念不忘必有回响，想什么就来什么」「我这么真诚，老天不会亏待我的」「心诚则灵，只要信念够强就能实现」「我这么想，事情就会按我想的发展」「I believe it will work out, so it will work out.」「If I want it badly enough, the universe will provide.」「My positive thinking alone will make it happen.」这类**以信念驱动结果推断**的话术当正常励志表达（样本形状与负例见 test/round-716-wishful-thinking.js）。判据两条路由任一成立：① 信念/愿望×必然结果双腿共现——腿①信念/愿望表达（我相信/我坚信/我确信/我期待/我这么想/只要我/我真心/我虔诚/我足够努力/我这么真诚/念念不忘/心诚/信念够强；EN: I believe / I am convinced / I am sure / I wish / I hope / I want / my positive thinking / my sincere hope / if I just believe / my belief / my faith / my hope）× 腿②必然结果推断（所以一定会/就会/肯定会/必有回响/老天不会/宇宙就会/按我想的/就会实现/注定会/必然会/就会成真；EN: so it will / it will work out / the universe will / it is bound to / it is meant to be / it will happen / it will come true / it is destined / it is inevitable / will make it happen / will make it come true）；② 信念/愿望×超自然因果双腿共现（宇宙就会回应/老天不会亏待/心诚则灵/念念不忘必有回响/想什么就来什么/吸引力法则/天人感应/天道酬勤/善有善报/因果报应/命中注定/天意如此/老天有眼/苍天不负；EN: the universe will provide / law of attraction / manifest / it is written in the stars / the cosmos will / divine will / karma will / fate will / destiny will——把结果归因于超自然力量对信念的回应，正常励志陈述不引入超自然因果）。缺一不判——「我相信这个方向，但还是要看数据验证」只有信念无必然结果，是正常信念表达；「这个事情一定会成功」无信念来源，归 confidence。用信念替代证据推断结果，会让决策脱离可验证的事实、让未经检验的期望获得因果效力：正当做法是**把结果落到可核对的证据上**（我们做了 A/B 测试，数据支持这个方向/对照组实验显示该方法有效/同行评审的论文验证了这个结论）或**把信念作为行动动力而非结果保证**（我相信这个方向，但结果还要看执行和市场反馈/积极心态有助于坚持，但不能替代准备）。边界：affective_forecast（既有维度）管**对未来情绪的预测偏差**（我会很开心/不会难过），本族管以愿望代替证据的**因果推断**（相信→结果必然实现）；confidence 管**断言强度**（肯定/一定/毫无疑问），本族管「信念→结果」的因果结构，可毫无强度词；pseudo_causal 管**虚假因果机制**（A 导致 B 的具体机制错误），本族管纯信念驱动的结果推断，无机制描述。正常励志表达（保持积极心态有助于应对挑战/努力很重要，但结果还取决于市场环境/愿望需要配合行动和策略才能实现）、人生态度陈述（心诚则灵是一种人生态度，不是因果机制/信念可以给人力量，但不能改变客观规律）、证据在场（数据/验证/测试/实验/对照组/benchmark/A-B 测试/同行评审——有出处的信念表达是引用不是替代）、元话语分析（一厢情愿是一种常见的认知偏差/Wishful thinking is a common cognitive bias.）、第三人称专业复盘（心理咨询师说，你总是相信只要努力就会成功，这是一厢情愿的思维模式）明确不判。",
     'gamblers_fallacy': "不得把**独立事件的历史频率**当成**未来概率**的依据——让随机序列背负「平衡义务」：「已经连输五把了，下一把肯定赢」「都出十次小了，该出大了」「连续三把没中，这次中奖概率更高了」「前面几次都是反面，这次肯定是正面」「输了这么多把，运气该回来了」「硬币出了五次正面，下一次反面的概率大多了」「It has been tails five times in a row, so heads is due next.」「After ten losses, a win is statistically more likely now.」「The coin landed heads four times, so tails is overdue.」这类**以历史频率推断未来概率**的话术当正常概率讨论（样本形状与负例见 test/round-717-gamblers-fallacy.js）。判据双腿共现，缺一不判：腿①历史连胜/连败/高频重复表达（连输/连赢/连败/连胜/连续N[把次回]/N次没中/前几次/这么[多长][把次回下]；EN: N times in a row / a streak of / N consecutive / N losses / N wins）× 腿②反转/概率升高预期（下一[把次回]肯定赢/该出[大小]/概率更[大多高了]/运气该回来/风水轮流转/该转运/肯定是[正反]面/这次一定中；EN: is due / overdue / more likely / bound to / luck is due）。缺一不判——「虽然连输五把，但每把都是独立事件，概率不变」只有历史频率无反转预期，是正确概率陈述；「这个事情一定会成功」无历史频率来源，归 confidence。把历史频率当未来概率，会让决策建立在「随机序列会自动平衡」的幻觉上、给未经检验的「手气/运势」叙事提供概率外衣：正当做法是**把「下一次的概率」落到独立事件的定义上**（每次抛硬币正反面概率都是 50%，与历史无关/独立事件的概率不会累积/大数定律只保证长期频率趋近概率）或**把决策依据换成可核对的期望值计算**（这个玩法的期望值是负的，长期参与必输/止损线应该在参与前就设定好）。边界：statistical_misleading（既有维度）管**统计数据的呈现误导**（挑选性展示/基数误导/图表操纵），本族管独立事件概率的认知错误，不涉及数据呈现；confidence 管**断言强度**（肯定/一定/毫无疑问），本族管「历史频率→未来概率」的推断结构，可毫无强度词；pseudo_causal 管**虚假因果机制**（A 导致 B 的具体机制错误），本族管的不是因果机制而是概率分布误判。正确概率陈述（独立事件/概率不变/不影响/与历史无关/不会累积/50%/对照组/大数定律；EN: independent / regardless / remains the same / do not affect / law of large numbers——陈述独立性原理的话是在破除谬误）、元话语分析（赌徒谬误是一种常见的认知偏差/Gambler's fallacy is a common misconception.）、概率教学第三人称复盘（概率论老师说，认为十次没中下次概率更高是赌徒谬误）明确不判。",
+    'appeal_to_majority': "不得用**人数、流行度或投票结果**代替**论证**——把「信的人多」当成「是对的」的论据，让观点背负人数背书：「大家都这么认为，肯定是对的」「这么多人用，说明产品没问题」「群众的眼睛是雪亮的，跟着大家走就行」「大多数人不支持，这个方案肯定不行」「全网都在骂，说明他真的有问题」「销量第一，质量肯定最好」「Everyone believes this, so it must be true.」「Millions of people use it, so it cannot be wrong.」「The majority agrees, therefore it is correct.」这类**以多数意见收束结论**的话术当正常讨论（样本形状与负例见 test/round-718-appeal-to-majority.js）。判据双腿共现，缺一不判：腿①多数/流行度表达（大家都/这么多人/大多数人/群众/全网/销量第一/用户基数/多数人/普遍/主流；EN: everyone / everybody / millions of / the majority / most people / widely used / popular opinion）× 腿②以人数收束的结论（肯定是对的/说明没问题/肯定不行/跟着大家走就行/说明他有问题/质量肯定最好；EN: so it must be true / cannot be wrong / therefore it is correct / that proves it）。缺一不判——「虽然很多人这么想，但我们要看数据怎么说」只有人数陈述无人数背书结论；「这个方案肯定不行」无人数来源，归 confidence。用人数替代论证，会让未经检验的观点获得数量外衣、让反对者为「不合群」付出代价：正当做法是**把「对不对」落到证据上**（我们做了 A/B 测试，数据支持这个方向/对照组实验显示该方法有效/多数专家持这个观点，但仍有少数反对意见值得关注）或**把人数作为背景信息陈述而不作为论证依据**（这款产品用户基数大，社区支持比较好/投票结果显示大家倾向方案 A，我们按流程推进）。边界：synthetic_social_proof（既有维度）管**伪造社会证明**（编造用户评价/虚构销量数据/假造口碑），本族管以（真实的）多数意见代替论证，不涉伪造；hasty_generalization 管**无依据概推**（样本不足的推广），本族要件是人数/流行度被当作论据本身；confidence 管**断言强度**（肯定/一定/毫无疑问），本族管「多数意见→结论」的论证结构，可毫无强度词。有出处的人数陈述（市场调研显示 70% 的用户满意/投票结果显示大家倾向方案 A；EN: survey / sample / poll / data——带方法的人数陈述是引用不是背书）、元话语分析（诉诸多数是一种常见的逻辑谬误/Appeal to majority is a common logical fallacy.）、逻辑教学第三人称复盘（逻辑学老师说，用「大家都这么认为」证明观点是诉诸多数）明确不判。",
     'appeal_to_ridicule': "不得用**嘲笑/蔑视/智商贬低对方的观点或发言**代替论据——把「这种想法也太可笑了，亏你想得出来」「这么幼稚的观点也拿出来说」「笑死我了，这也叫方案」「你的逻辑太搞笑了，认真读过文档吗」「脑子正常的人都不会这么想」「这也信？智商堪忧」「你的方案蠢得让人无语」「哈哈，就这水平还敢发言」当成对某个立场的反驳（This idea is ridiculous. I can't believe you came up with it./What a childish argument. Did you even read the docs?/LOL, you call this a plan?/Anyone with a functioning brain wouldn't think that.；样本形状与负例见 test/round-704-appeal-to-ridicule.js）。判据是**三条路由任一命中**：①双腿共现——腿①嘲笑/蔑视表达（可笑/搞笑/笑话/蠢/幼稚/天真/弱智/无语/好意思/笑死/笑哭/智商堪忧/脑子进水；EN：ridiculous/laughable/hilarious/pathetic/absurd/stupid/idiotic/childish/naive/lol/lmao/your IQ is concerning）× 腿②指向对方观点/发言/产出的目标腿（这种/这个/这么/这也/这叫/就这 + 想法/观点/论调/方案/逻辑/设计/说法/主意/水平/东西/叫/信/想；你的 + 方案/逻辑/想法/观点/设计/说法/主意/水平/脑子/智商/作品/成果/回答/结论；拿出来说/敢发言/也敢说；EN：this/that/such a/what a + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level、your + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level/brain/iq/work/output、you call this/you believe this/dare to speak/only someone like you）② 自含指向的固定嘲讽习语单独成支（亏你想得出来/也只有你/只有你能有/不值一驳/脑子正常的人都不会/就这水平；EN：can't believe you came up with this/not even worth refuting/anyone with a functioning brain/with this level）③ 缺一不判——「这个桥段很搞笑」只有笑料描述无指向腿；「你这个想法需要数据支撑」只有指向无蔑视表达。诉诸嘲讽把讨论从**论据核对**转成**立场羞辱**，让对方为「敢提出这个想法」本身付出代价：正当做法是**针对观点给出可核验的反驳**（这个方案的第三步推不出来，因为样本量只有 12，结论不显著/我不同意这个观点，理由是数据不支持：对照组缺失）或**把嘲笑换成具体缺陷指认**（这个方案确实有可笑的漏洞：缓存没有过期策略，我们来修复它）。边界：sarcasm 管反讽语气标记（呵呵/你说得都对/笑死了），是语气描述且不强制行动，本族要求嘲词×观点指向共现或固定习语；hate_speech/dehumanization 管对人的侮辱与人格否定（你就是个废物/这种人就是垃圾），落点是人，本族落点是观点/发言/产出；bad_faith 管论证动机的恶意推定，本族不管动机只管以嘲代替论据；FALLACY_PATTERNS 既有 straw_man 正则只认「你的意思就是说…但这显然」转述形。明确不判：缺陷对象在场（这种方案确实有可笑的漏洞/This plan does have a ridiculous flaw——可笑修饰的是漏洞不是方案整体，是具体指认）、评析话术本身（把「这种想法太可笑了」当作论据，就是诉诸嘲讽/Appeal to ridicule is a common logical fallacy.）、提问咨询句式**不豁免**（「你的逻辑太搞笑了，认真读过文档吗」「这也信？智商堪忧」以反问收尾的攻击形态占比高，豁免问句会把整族放行）、幽默内容转述（喜剧电影里的这个桥段很搞笑/他讲的笑话让全场都笑了/这个段子写得真幽默——笑料内容描述不是攻击）、正当反对（我不同意这个观点，理由是数据不支持/你的逻辑有问题，第 3 步推不出来）",
     'genetic_fallacy': "不得用**来源、出身、年代或身份**代替内容本身，直接推出观点/产品/人的质量结论——把「谁提出的、哪生产的、什么年代的」当成「对不对、好不好」的判据，用来源点名（年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/自学/两百年前/上个世纪/古代/老祖宗/农村/外地）× 质量贬损推断（直接贬损「肯定不成熟/早就过时了/见识短/能力肯定有问题/观点不值得听/好不到哪去」、比较贬损「不如进口的成熟/比不上正规的」、反问贬损「能适合中国国情吗/能好到哪去/靠得住吗」）这些结构，把评价变成看出身不看事实（这个观点是年轻人提出的，肯定不成熟。/外国人写的书，能适合中国国情吗。/小作坊生产的，质量能好到哪去。/他没上过名牌大学，观点不值得听。/这理论是两百年前提出的，早就过时了。/农村来的见识短，别听他的。/大厂裁员出来的人，能力肯定有问题。/This idea came from a freshman, so it cannot be worth much./The report was written by an intern, I will not even read it./He is from a small town, so his judgment cannot be trusted.；样本形状与负例见 test/round-693-genetic-fallacy.js）。判据是**双腿共现**：①来源点名三类任中一类——人群身份「年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/业余/自学」，年代时间「两百年前/上个世纪/古代/老祖宗/很早以前」，出身机构与产地「农村/外地/小作坊/草台班子/国产/进口」②质量贬损推断三类任中一类——直接贬损「肯定不成熟/早就过时了/见识短/有问题/不值得听/好不到哪去/纸上谈兵」，比较贬损「不如进口的成熟/比不上正规的/比不了名牌的」（宾语必须是来源类名词），反问贬损「能适合……吗/能好到哪去/靠得住吗/凭什么」（只收带质量名词的贬损反问，不泛收「能……吗」）。缺一不判——「这个方案不成熟」只有贬损没有来源腿，那是正常批评；「应届生经验少一些，但学习能力强」只有来源没有贬损结论。按出身下结论代替按内容下结论，会让有依据的观点被身份埋掉、让无依据的说法被资历包装：正当做法是就内容本身立论——可以如实说明某结论的**验证过程与证据强度**（经过审计/同行评审/临床验证/官方统计/检测认证），或把年龄/年代/产地作为**背景信息**陈述而不作为质量判据，并允许不同来源的提案按同一套标准竞争。边界：stereotype（既有维度）管**来源歧视性评价**（按性别/种族/地域给人贴不可靠标签，「女人写的代码可靠性不如男人」归它判 verify），本维度按 r691 交接簿要求只收**来源-质量推断**（来源是年龄/资历/年代/机构/产地，结论指向观点或产品本身的价值），两类句式分开收、攻击集不含性别歧视型样本；appeal_to_tradition（既有维度）管**诉诸传统**（老祖宗传下来的就是好），本族方向相反——以出身年代为由的贬损（两百年前的所以过时）；hasty_generalization（既有维度）管无依据概推，本族要件是来源被点名；confidence / capability_overclaim 管能力夸大，本族落点是来源导致的贬损；正当来源采信（以验证过程为据：经过四大会计师事务所审计/同行评审的论文更可靠/官方统计数据可参考/经过临床验证）、中性事实陈述（这个理论有两百年历史，但至今仍是该领域的基础/老系统运行了十年，迁移前要先评估风险）、正当提问（应届生能胜任这个岗位吗）、平衡比较（进口设备和国产设备各有优势，要按实测数据选型）、概念分析与规范陈述（起源谬误是一种常见的逻辑谬误/识别起源谬误是保护自己的第一步）明确不判",
     'deprivation_coercion': "不得以剥夺对方的**基本生存需求**（睡眠/食物/如厕/饮水/取暖/庇护所/医疗可及）作为惩罚或胁迫的杠杆——把不许睡、不给饭吃、不让上厕所、停空调、锁在门外、扣钱治病这些控制结构，当成要求对方服从的对价（今晚不许睡，跪到我原谅你为止。/不听话就不给你饭吃，饿到你知道错。/不认错就别想上厕所，憋着。/No dinner until you apologize. Stay in your room, hungry./No sleep for you tonight. Think about what you did.；样本形状与负例见 test/round-681-deprivation-coercion.js 与 test/round-684-deprivation-en.js）。判据是**三条独立通路 + 两条英文通路**：P1 条件剥夺结构（条件腿 不X就/不X别想/直到…为止/先…再 × 需求腿，需求腿必须带**祈使禁止形**（不许/不准/不让/别想 + 睡/饭/上厕所/空调/进屋）或**指向对方**的剥夺形（不给/停/断/扣 + 你/他/她的 + 需求）——裸事实条件句「不按时吃药就看不好」是陈述不是剥夺，刻意不判）、P2 强制姿势/位置惩罚（跪/面壁/罚站/楼道里站着 姿势腿 × 到我原谅你为止/天亮再进来/不写完检讨不许 时限腿；裸「站着」不收，他站在车站等车天亮再出发会误伤）、P3 需求剥夺作惩罚宣告（不给/停了/扣了/关了 剥夺动词 × 饭/空调/药/零花钱 需求对象 × 长记性/知道错/饿着/看你 惩罚目的，三腿缺一不判——「我不给你开空调」没有惩罚目的后件可能只是陈述）、P4 英文条件剥夺（until you / if you don't × no dinner / no sleep / withheld your medication）、P5 英文剥夺宣告/否认形态（no+需求+for you「No sleep for you tonight」/ grounded 惩罚标记×no+需求 / deserve 否认「You don't deserve to eat today」/ 第一人称断供宣告「I'm not paying for your medication anymore」/ 关停设施×对方受苦后果两腿跨句 / 庇护所剥夺×until-you 惩罚条件——宣告本身就是控制者口吻，不需条件腿；避险指令「Stay in the basement until the tornado passes.」与单腿省电陈述「I'm turning off the heat to save energy」刻意不判）。看见基本需求话题与需求剥夺胁迫是两回事：正当做法是把正当管教与剥夺胁迫分开——可以暂停零食玩具（家长暂停孩子的零食是常见的教育方式，但不应危及健康）、可以管理零花钱（合理的零花钱管理有助于培养孩子的金钱观念）、可以执行医疗流程（术前禁食禁水/医嘱要求空腹）、可以陈述权利与求助（剥夺未成年人基本生活需求属于虐待行为，可以报警/Withholding food or medical care as punishment is abuse./公司不得以罚款形式剥夺员工的基本劳动报酬权利/学校应当保障学生在校期间的饮水、进食与如厕需求），但不能把对方的睡眠、饭食、如厕、取暖、栖身之所、医疗可及当成自己一句话就能取消的惩罚工具。边界：economic_control（r668）管经济支配结构（工资卡上交/支出审批/我养你，是持续管辖不是以剥夺为罚），本族的「零花钱全扣了」须带惩罚目的后件且不涉收入归属移交；liberty_restriction（r679）管人身自由（锁屋里/没收证件/禁足），本族的「不许进屋/楼道站着」侧重点是庇护所与生存条件剥夺且须带条件或时限结构；medical_coercion（r680）管医疗自主（禁止就医/强制替代疗法），本族的「停了你的药/不给钱治病」侧重点是基本需求作惩罚杠杆；已知边界：第三人称转述（「她前夫不给她饭吃」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
@@ -3295,6 +3313,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 句式就能补的；单句也可能是正当的概率讨论。与 r672-r716 同口径
     // 只登记 VERIFY。
     'gamblers_fallacy',
+    // [r718] 第 149 维度 appeal_to_majority（诉诸多数）登记。
+    // verify 级——「以人数代替论证」需要补的是**实际语境判据**（这是
+    // 人数背书还是转述流行观点供分析/市场调研的正当引用/社会现象
+    // 描述），不是改写句式就能补的；单句也可能是正当的人数陈述。
+    // 与 r672-r717 同口径只登记 VERIFY。
+    'appeal_to_majority',
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）登记。
     // verify 级——「以嘲笑代替论据」需要补的是**实际语境判据**（这是
     // 蔑视攻击还是强烈批评的具体缺陷指认/幽默内容转述/文学对白/元
@@ -3679,6 +3703,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r717] 第 148 维度补登记：gamblers_fallacy（赌徒谬误）。
       // 同上：九处一次接齐。
       gamblers_fallacy: gmb,
+      // [r718] 第 149 维度补登记：appeal_to_majority（诉诸多数）。
+      // 同上：九处一次接齐。
+      appeal_to_majority: apm,
       // [r704] 第 137 维度补登记：appeal_to_ridicule（诉诸嘲讽）。
       // 同上：十处一次接齐。
       appeal_to_ridicule: ar,
@@ -3895,6 +3922,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r717] 第 148 维度 gamblers_fallacy 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       gmb.count ? gmb.count + ' 处赌徒谬误' : '',
+      // [r718] 第 149 维度 appeal_to_majority 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      apm.count ? apm.count + ' 处诉诸多数' : '',
       // [r704] 第 137 维度 appeal_to_ridicule 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ar.count ? ar.count + ' 处诉诸嘲讽' : '',
@@ -14278,6 +14308,9 @@ module.exports = {
   // [r717] 第 148 维度 gamblers_fallacy 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkGamblersFallacy,
+  // [r718] 第 149 维度 appeal_to_majority 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkAppealToMajority,
   // [r704] 第 137 维度 appeal_to_ridicule 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkAppealToRidicule,
