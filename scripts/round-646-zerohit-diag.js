@@ -4,8 +4,9 @@
  * 判据：Phase 1.5 —— 全维度零命中才算真缺口；有维度命中只是被压掉 = 接线/阈值问题。
  */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 const gate = require(path.join(HF, 'src/gate.js'));
 

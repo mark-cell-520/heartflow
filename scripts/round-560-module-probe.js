@@ -1,6 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 第 84 维度 anecdote_as_proof：模块级直调命中测试（未接线版）。
-const { checkAnecdoteAsProof } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/anecdote-as-proof.js');
+const { checkAnecdoteAsProof } = require(__HF + '/src/anecdote-as-proof.js');
 
 const ATK = [
   '我身边所有人吃了都好，这药肯定有效。',

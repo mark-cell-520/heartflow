@@ -1,7 +1,8 @@
 // [r673] 新维度单测探针（接线前）——行为验证，不信显示层
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { checkComparativeDevaluation, __internals } = require(path.join(HF, 'src/comparative-devaluation.js'));
 
 // 反斜杠层数验证（技能铁律：显示层不可信，Node 数才算数）

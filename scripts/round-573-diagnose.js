@@ -1,6 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r573 诊断：每条攻击样本的四个要件命中情况
-const { __internals } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/selective-minimization.js');
+const { __internals } = require(__HF + '/src/selective-minimization.js');
 const iv = __internals();
 
 const attacks = [

@@ -1,7 +1,8 @@
 // 第 289 轮 v6：验证 src/index.js 里 PSEUDO_PHILOSOPHY_ZH 新增 9 条正则的
 // 实际命中与误伤（通过真实 gate.checkOutput，不复述样本到报告）。
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 
 const ONTO = [

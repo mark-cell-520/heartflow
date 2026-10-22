@@ -18,7 +18,9 @@
  */
 'use strict';
 
-const REPO = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const REPO = __HF;
 const { checkSelfharmCoercion } = require(REPO + '/src/selfharm-coercion.js');
 const I = require(REPO + '/src/selfharm-coercion.js').__internals();
 

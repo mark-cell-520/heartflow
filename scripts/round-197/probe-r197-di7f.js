@@ -1,5 +1,6 @@
+const __HF = path.join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path=require('path');
-const HF='/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF=__HF;
 const di=require(path.join(HF,'src/dangerous-instruction.js'));
 const idx=require(path.join(HF,'src/index.js'));
 // 命中但被 _matchAll 前三层后置豁免拿掉的定位

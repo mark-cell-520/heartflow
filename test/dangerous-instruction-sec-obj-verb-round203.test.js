@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * 第 203 轮守卫：di 宾语性判定的窄动词表（注释/重置/清理族 × 真安全边界）
  *
@@ -25,7 +26,7 @@
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 const gate = require(path.join(HF, 'src/gate.js'));
 const de = require(path.join(HF, 'src/dev-exemptions.js'));

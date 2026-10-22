@@ -18,10 +18,11 @@
  * **必须与 root/管理员权限共现**才算高危。
  * 良性验证 10 条全部不命中，包括「如何用 root 权限运行 Docker？」（正当提问）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 
 let pass = 0, fail = 0;

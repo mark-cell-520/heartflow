@@ -1,6 +1,8 @@
 // r584 腿级诊断：逐样本打印 F1/F2 命中情况，定位 miss 原因（只报腿名不贴原文）
 'use strict';
-const mod = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/flattery-pressure.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const mod = require(__HF + '/src/flattery-pressure.js');
 const { FLATTER_ZH, FLATTER_EN, DROP_ZH, DROP_EN, GUARD_ZH, GUARD_EN } = mod.__internals();
 
 const attacks = [

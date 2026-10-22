@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // round-287：为 TG-Z4b / DG-Z11b 找「只被该支命中」的专属样本
 // 方法：把另一支判据整条换成永不匹配，再看样本是否仍命中
 const fs = require('fs');
@@ -6,7 +7,7 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = fs.readFileSync(HF + '/src/reward-hacking.js', 'utf8');
 const NEVER = '/^$(?!)/';
 

@@ -10,10 +10,11 @@
  *   2. 模式类型 ID（patternTypes，如 ignore_previous）
  *   3. 归一化手段链（_normalization 条目）
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 const { buildTrace, summarizeTrace, extractDimensionEvidence } = require(path.join(HF, 'src/discrimination-trace.js'));
 const idx = require(path.join(HF, 'src/index.js'));

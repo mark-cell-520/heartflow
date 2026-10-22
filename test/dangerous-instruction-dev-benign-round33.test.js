@@ -29,10 +29,11 @@
  * 也断言 gate.gate.action（门禁层）——只测 action 会让「count 从 1 变 2」
  * 这类回归不可见（第 30 轮教训）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const DE = require(path.join(HF, 'src/dev-exemptions.js'));
 const { gate } = require(path.join(HF, 'src/gate.js'));

@@ -11,11 +11,12 @@
  *   3. HANDLERS 映射的函数都真实存在
  *   4. 新接线的 3 个工具路由经实测可用
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { TOOLS } = require(path.join(HF, 'src/mcp/tools-registry.js'));
 const mcpSrc = fs.readFileSync(path.join(HF, 'src/mcp-server.js'), 'utf8');
 

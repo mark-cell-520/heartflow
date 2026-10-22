@@ -1,8 +1,9 @@
 // 轮 201：把攻击侧语料也纳入 awt 扫描（全 378 条只覆盖良性侧）。
 // 攻击侧 = gate-97.malicious + ext.adversarial + 既有 awt 攻击测试池。
 // 目的：在确认「同源叠票是否还存在」时，需要同时知道折叠是否会塌掉攻击侧检出。
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const BENCH = path.join(ROOT, 'test');
 const awt = require(path.join(ROOT, 'src/shield/ai-writing-tell.js'));
 

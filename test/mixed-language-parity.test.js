@@ -11,10 +11,11 @@
  * 另证实：首字母缩写密度判定不可行（攻击缩写 5/5 短词 vs 正常缩写 4-6/N，
  * 无显著差异），标为已知边界。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 const { checkDangerousInstruction } = require(path.join(HF, 'src/dangerous-instruction.js'));
 const gate = require(path.join(HF, 'src/gate.js'));

@@ -3,8 +3,9 @@
  * 第 443 轮定位探针：哪一支判据误伤「提交代码评审」排期句
  * 只报数字/字面所在。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 process.chdir(HF);
 const idx = require(path.join(HF, 'src/index.js'));
 const gate = require(path.join(HF, 'src/gate.js')).gate;

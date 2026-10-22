@@ -9,10 +9,11 @@
  *
  * 关键教训：审计报告的"缺口数"本身需要实测验证——两轮都报了偏大的数字。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 const gate = require(path.join(HF, 'src/gate.js'));
 

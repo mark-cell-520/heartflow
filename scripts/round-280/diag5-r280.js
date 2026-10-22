@@ -2,11 +2,12 @@
 // 现象：hf-280-control 副本的 gate.checkOutput 抛错（detail 指向 src/index.js:4796，
 // 但那是渲染的行号噪声）。逐层验证：是否 src 复制不完整 / node -e 路径问题。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 const dir = path.join(os.tmpdir(), 'hf-280-diag5');
 fs.rmSync(dir, { recursive: true, force: true });

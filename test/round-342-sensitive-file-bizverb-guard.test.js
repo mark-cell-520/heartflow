@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // r342 守卫正面：sensitive_file 硬分支二「凭证 noun + 业务动词」排除（注入-删条必须变红）
 const path = require('path');
 const assert = require('assert');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const gate = require(path.join(ROOT, 'src/gate.js'));
 const mtt = require(path.join(ROOT, 'src/multi-turn-tactics.js'));
 const fs = require('fs');

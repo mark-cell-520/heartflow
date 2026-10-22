@@ -2,8 +2,9 @@
 // 判据从严：只有 gate.action === 'pass' 才算漏判；verify/rewrite 说明已有维度在管。
 // 良性对照组 0 误伤是输出条件的一部分（fp !== 0 的族不输出）。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gateMod = require(path.join(HF, "src/gate.js"));
 const idx = require(path.join(HF, 'src/index.js'));
 

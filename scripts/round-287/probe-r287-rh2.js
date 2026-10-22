@@ -1,7 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // round-287：两条 reward_hacking 漏判探针的逐支诊断
 // 目标：定位漏判的族/类，并验证候选补形是否命中且不误伤良性
-const path = '/root/.hermes/skills/ai/mark-heartflow-skill/src/reward-hacking.js';
+const path = __HF + '/src/reward-hacking.js';
 const rh = require(path);
 
 const ATTACK = [

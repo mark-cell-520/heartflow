@@ -24,10 +24,11 @@
  * 本测试双向：攻击必须 block，良性不得因本轮改动被误拦。
  * 删条守卫：两处改动各删一次，行为必须反转。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = process.env.HF_ROOT || '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = process.env.HF_ROOT || __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const de = require(path.join(HF, 'src/dev-exemptions.js'));
 const idx = require(path.join(HF, 'src/index.js'));

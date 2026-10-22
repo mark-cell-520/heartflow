@@ -37,11 +37,12 @@
  *   ① HANDLERS 里不允许重复定义同名键（覆盖是静默的，编译器不报错）
  *   ② 首选的 handleXxx 实现必须真的排在最后（或至少不被空壳覆盖）
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 let pass = 0, fail = 0;
 function t(name, fn) {

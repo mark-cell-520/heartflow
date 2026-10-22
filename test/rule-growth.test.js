@@ -1,9 +1,11 @@
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 /**
  * RuleGrowth 测试 — 验证心虫判断生长能力（v6.0.59 新增核心能力）
  */
 module.exports = function ({ test, assertEqual, assertTrue, assertFalse, assertDefined, assertThrows }) {
   const { RuleGrowth, MIN_OCCURRENCE } = require('../src/cortex/rule-growth.js');
-  const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+  const ROOT = __HF;
   // 用临时规则文件避免污染真实数据
   const fs = require('fs');
   const tmpFile = ROOT + '/data/learned-rules.test.json';

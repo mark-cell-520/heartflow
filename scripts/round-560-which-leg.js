@@ -1,7 +1,9 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 逐条打印模块 hit/detail + 哪一支缺席（不打印样本原文，只按 index）
-const { checkAnecdoteAsProof } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/anecdote-as-proof.js');
-const I = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/anecdote-as-proof.js').__internals();
+const { checkAnecdoteAsProof } = require(__HF + '/src/anecdote-as-proof.js');
+const I = require(__HF + '/src/anecdote-as-proof.js').__internals();
 
 const ATK = [
   '我身边所有人吃了都好，这药肯定有效。',

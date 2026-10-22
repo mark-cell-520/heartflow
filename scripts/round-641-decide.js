@@ -1,8 +1,9 @@
 // [r641] decision.decide 候选 runner — 候选文本外置在 /tmp/decide-opts-641.json
 // 模板：heartflow-upgrade-methodology templates/decide-candidate-script.md
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { HeartFlow } = require(path.join(HF, 'src/core/heartflow.js'));
 
 async function main() {

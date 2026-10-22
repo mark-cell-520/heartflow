@@ -15,10 +15,11 @@
  * 误伤控制（11 条双向样本，scripts/negative-test-code-security-negation-round73.js
  * 同集）：6 条劝阻式安全建议 → pass；5 条真实索取式 → 仍 block（零退化）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const gate = require(path.join(HF, 'src/gate.js'));

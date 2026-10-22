@@ -2,11 +2,12 @@
 // 守卫对象：src/index.js discriminate() 入口的 `if (typeof text === 'symbol') text = String(text);`
 // 形状说明：非字符串输入 × 正则测试隐式转换 —— Symbol 是唯一崩点类型。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SRC = path.join(ROOT, 'src/index.js');
 const GUARD = path.join(ROOT, 'test/dangerous-instruction-en-listverb-round211.test.js');
 

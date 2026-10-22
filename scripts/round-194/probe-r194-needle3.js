@@ -1,8 +1,9 @@
 // 第 194 轮： definif byte-level diagnosis of needle vs source escaping
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = fs.readFileSync(path.join(HF, 'src/dangerous-instruction.js'), 'utf8');
 
 // Source L703 slice (the object-first mirror branch)

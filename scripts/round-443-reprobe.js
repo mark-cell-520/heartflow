@@ -8,8 +8,9 @@
  * 样本只写形状描述对应的字面，隔离在本文件内（内容审查纪律）。
  * 只输出数字/布尔，不打印攻击原文到报告。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 process.chdir(HF);
 const idx = require(path.join(HF, 'src/index.js'));
 

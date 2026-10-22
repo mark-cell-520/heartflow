@@ -2,10 +2,11 @@
 // BASE = 修复前 commit（fa493a1），CAND = 当前工作区
 // 输出：两个语料的 gate 动作变化明细（只报数字与形状，不贴原文）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 
 const BASE_WT = '/tmp/wt-r384-base';
 const BASE_COMMIT = process.argv[2] || 'fa493a1';

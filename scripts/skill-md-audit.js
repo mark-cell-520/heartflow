@@ -6,10 +6,11 @@
  * （人类视角），SKILL.md 从未被验证过。agent 照 SKILL.md 操作踩空 =
  * 整个 skill 对它归零。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const cp = require('child_process');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 
 const skill = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf8');
 

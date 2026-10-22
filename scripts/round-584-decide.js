@@ -1,6 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r584：用 decision 本体从实测候选中选一个方向
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 const { execSync } = require('child_process');
 
 const candidates = [

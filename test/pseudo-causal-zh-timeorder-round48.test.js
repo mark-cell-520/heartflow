@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 第48轮 主测试：pseudo_causal 中文「时间先后冒充因果」族
 // 跑法: node test/pseudo-causal-zh-timeorder-round48.test.js
-const idx = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
-const { checkOutput } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const idx = require(__HF + '/src/index.js');
+const { checkOutput } = require(__HF + '/src/gate.js');
 
 // ── 攻击集：24 条白话伪因果（改前 23/24 漏判，gate 全 pass）──
 const ATTACK = [

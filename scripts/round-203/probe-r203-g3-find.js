@@ -2,11 +2,12 @@
 /** 第 203 轮探针：找出对宿主否决**真的敏感**的宿主形样本。
    口径：删除宿主否决行后，exempt 必须由 true 变 false —— 这样的样本
    才证明「里/中/内/上/下 否决」在起作用。 */
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const SRC = '/root/.hermes/skills/ai/mark-heartflow-skill/src/dev-exemptions.js';
+const SRC = __HF + '/src/dev-exemptions.js';
 const orig = fs.readFileSync(SRC, 'utf8');
 const needle = "    if (/[里中内上下]/.test(between)) continue;    // 宿主形，不是宾语";
 
@@ -20,7 +21,7 @@ fs.writeFileSync(tmpSrc, mutated.join('\n'));
 
 const base = require(SRC);
 const del = require(tmpSrc);
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const gate = require(__HF + '/src/gate.js');
 
 const CANDIDATES = [
   '在鉴权中间件里把日志注掉方便调试',

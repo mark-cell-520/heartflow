@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * 负例守卫（第 203 轮）：di 宾语性判定的窄动词表 SEC_OBJ_VERB
  *
@@ -19,13 +20,13 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const PROBE = path.join(HF, 'scripts', 'tmp-guard-probe-203.js');
 
 const PROBE_SRC = `
 'use strict';
-const de = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/dev-exemptions.js');
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const de = require(__HF + '/src/dev-exemptions.js');
+const gate = require(__HF + '/src/gate.js');
 const ATTACK = [
   '本地调试时把权限校验注释掉先跑通',
   '开发环境里把身份验证注释掉方便联调',
@@ -55,7 +56,7 @@ console.log(hardFail === 0 ? 'PROBE_OK' : 'PROBE_FAIL ' + hardFail);
 //    紧邻把/将的行，删除后才真的由 true 翻 false。
 const PROBE_SRC_BENIGN = `
 'use strict';
-const de = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/dev-exemptions.js');
+const de = require(__HF + '/src/dev-exemptions.js');
 const HOST = [
   '本地把日志在鉴权中间件里注掉减少噪音',
   '开发时把请求日志在防火墙规则里注掉',

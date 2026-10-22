@@ -8,9 +8,10 @@
 //   ③ 中文段原样保留；英文段只保留 r374 补的同构支（删除 base64 无关支）
 // 纪律：先备份、写后 node --check、跑 probe-11 中文零回归对照。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const SRC = '/root/.hermes/skills/ai/mark-heartflow-skill/src/multi-turn-tactics.js';
+const SRC = __HF + '/src/multi-turn-tactics.js';
 const src = fs.readFileSync(SRC, 'utf8');
 const lines = src.split('\n');
 

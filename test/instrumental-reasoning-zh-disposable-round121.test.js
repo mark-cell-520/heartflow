@@ -3,9 +3,10 @@
 // 族 B「耗材计量」：人/团队 × 可计数可替换可压缩语义
 // 族 C「自认施害」：明知道会伤害X × 但目标/节点/指标优先
 // 铁律沿用第 108 轮「两半齐备」（半×半必须共现，单项不命中）
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { gate } = require(path.join(HF, 'src/gate.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

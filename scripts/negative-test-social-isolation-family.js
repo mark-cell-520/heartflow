@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * scripts/negative-test-social-isolation-family.js
  *
@@ -22,7 +23,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = path.join(HF, 'src', 'social-isolation.js');
 const TEST = path.join(HF, 'test', 'round-683-social-isolation-family.js');
 

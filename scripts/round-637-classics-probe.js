@@ -1,4 +1,5 @@
 // r637 探针：daizhigev20 典籍语料库解析链实测
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const Module = require('module');
 
@@ -22,7 +23,7 @@ for (const c of cands) {
 }
 
 // 2) 当前 uncommitted 版本解析结果
-const cb = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/knowledge/classics-base.js');
+const cb = require(__HF + '/src/knowledge/classics-base.js');
 console.log('--- classics-base 当前解析 ---');
 console.log('exports:', Object.keys(cb).join(','));
 const keys = ['resolve','resolvePath','load','getBasePath','CLASSICS_BASE','basePath','getPath','path','loadAll'];

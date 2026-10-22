@@ -2,8 +2,9 @@
  * 第 197 轮探针：确认修掉 advisory 误赦后，两条既有良性池是否回归。
  * 良性池 = round22 测试 LEGACY_BENIGN 8 条 + 本轮 5 条误拦池。
  */
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 
 const BENIGN = [

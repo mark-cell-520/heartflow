@@ -33,11 +33,12 @@
  * 本测试必须真的 POST 到 http://127.0.0.1:8588/mcp 才有效。
  * 8588 不在线时跳过——但那意味着这个 bug 可能再次发生而没人知道。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const cp = require('child_process');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const fs = require('fs');
 
 let pass = 0, fail = 0;

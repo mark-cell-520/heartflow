@@ -28,11 +28,12 @@
  *   ① 零幽灵方法（硬失败）
  *   ② 全部导出都被至少一份文档提及（硬失败——防止再漏）
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 let pass = 0, fail = 0;
 function t(name, fn) {

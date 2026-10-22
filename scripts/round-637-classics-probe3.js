@@ -1,7 +1,9 @@
 // r637 探针 3：典籍检索链可用性（回归：classics-base 路径解析）
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const cb = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/knowledge/classics-base.js');
-const cr = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/knowledge/classics-rules.js');
+const cb = require(__HF + '/src/knowledge/classics-base.js');
+const cr = require(__HF + '/src/knowledge/classics-rules.js');
 
 console.log('CLASSICS_BASE =', cb.CLASSICS_BASE);
 console.log('SCRIPT =', cb.SCRIPT);

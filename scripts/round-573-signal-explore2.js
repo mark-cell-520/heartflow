@@ -1,6 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r573 探索2：双方归责指向 + 转折 是核
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const gate = require(__HF + '/src/gate.js');
 
 const attacks = [
   '他确实推了一下，但你也有责任，谁让你站在那么近。',

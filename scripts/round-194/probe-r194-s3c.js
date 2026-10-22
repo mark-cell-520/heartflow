@@ -1,7 +1,8 @@
 // 第 194 轮：确认 _privescIsAdvisory 误赦 S3 样本
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 
 // 无法直接 require 内部函数，用主循环反馈定位：改样本去掉「脚本」词

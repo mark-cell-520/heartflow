@@ -5,8 +5,10 @@
  * AGENTS.md 全部口径、VERSION/package.json/version.js 四处 bump。
  */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 function repl(file, pairs) {
   const p = HF + '/' + file;

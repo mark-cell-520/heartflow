@@ -1,7 +1,9 @@
 // 一次性修复脚本：把 1962 行的坏 guidance 行替换为合法 JS 字符串行
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const f = '/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js';
+const f = __HF + '/src/index.js';
 const lines = fs.readFileSync(f, 'utf8').split('\n');
 
 // 1. 定位 comparative_devaluation guidance 行（以 ' 开头的登记行）

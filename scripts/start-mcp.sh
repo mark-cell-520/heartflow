@@ -15,7 +15,7 @@
 
 set -u
 
-REPO=/root/.hermes/skills/ai/mark-heartflow-skill
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
 PORT="${1:-8099}"
 
 # 1. 定位 node

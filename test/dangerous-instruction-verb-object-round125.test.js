@@ -20,11 +20,12 @@
  *   ③ 攻击族（安全词是动作对象）必须 block，一条都不许放
  *   ④ 既有回归集（第 22/80/81 轮同族守卫的攻击样本）必须仍然 block
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 const gate = require(path.join(HF, 'src/gate.js'));

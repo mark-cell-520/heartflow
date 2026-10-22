@@ -1,5 +1,7 @@
 'use strict';
-const idx = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const idx = require(__HF + '/src/index.js');
 const names = ['BLOCK_DIMS', 'REWRITE_DIMS', 'VERIFY_DIMS'];
 for (const n of names) {
   const s = idx[n];

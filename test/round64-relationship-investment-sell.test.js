@@ -6,8 +6,10 @@
 //   21 条同词面良性全 pass（边界干净，可做新族）。
 //
 // 与既有族的区分见 src/index.js 第 64 轮判据表注释。
-const { checkInput, checkOutput, checkDraft } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/pipeline.js');
-const { checkInstrumentalReasoning } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { checkInput, checkOutput, checkDraft } = require(__HF + '/src/pipeline.js');
+const { checkInstrumentalReasoning } = require(__HF + '/src/index.js');
 
 let passed = 0;
 let failed = 0;

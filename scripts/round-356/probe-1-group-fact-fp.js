@@ -2,10 +2,12 @@
  * r356 probe-1：群体事实差异句误伤族复测（形状：模糊来源词 + 群体 A/B + 差异动词）
  * 只输出数字。样本原文只放在 test/ 与脚本内，不进报告。
  */
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
-const benign = require('/root/.hermes/skills/ai/mark-heartflow-skill/test/round-354-en-4-fams-neg-cases.json').benign;
-const r356 = require('/root/.hermes/skills/ai/mark-heartflow-skill/test/round-356-group-fact-diff-cases.json');
+const benign = require(__HF + '/test/round-354-en-4-fams-neg-cases.json').benign;
+const r356 = require(__HF + '/test/round-356-group-fact-diff-cases.json');
 
 function run(list, label) {
   let fp = 0; const fpIdx = [];

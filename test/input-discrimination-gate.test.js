@@ -2,8 +2,9 @@
 // 覆盖 v6.7.70 两个新行为：
 //   1) think() 对原始输入跑完整 discriminate() → _inputDiscrimination
 //   2) 10 个高危维度触发点从死代码变成活的 → _highRiskOutput
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { HeartFlow } = require(path.join(HF, 'src/core/heartflow.js'));
 const { buildGateVerdict } = require(path.join(HF, 'src/gate-verdict.js'));
 

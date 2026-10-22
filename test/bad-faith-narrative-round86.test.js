@@ -22,10 +22,11 @@
  *    不报错、只是永远不命中。not_arguing_to_win 槽曾因此从命中 5 条
  *    掉到 0。node --check 抓不到这类括号错位。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

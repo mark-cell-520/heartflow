@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // [r562] 用 decision 本体从 r560 落盘候选池里选本轮方向。
 // 只用形状描述，不写任何攻击话术原句（451 铁律）。
 const fs = require('fs');
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 
 const prompt = [
   '[A] favor_ledger 恩情账本：以过往付出/人情/债务为由，换取当下的服从或让步（过往付出×当下索取服从）。',

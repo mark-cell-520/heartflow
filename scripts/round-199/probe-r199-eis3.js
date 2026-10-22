@@ -8,7 +8,9 @@ const segs = {
 };
 for (const [k, re] of Object.entries(segs)) console.log(k, re.test(t));
 console.log('--- full regex from source ---');
-const { REWARD_HACKING_EN } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/reward-hacking.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { REWARD_HACKING_EN } = require(__HF + '/src/reward-hacking.js');
 const pats = REWARD_HACKING_EN.eval_input_shortcut;
 pats.forEach((p, i) => {
   if (/ground\s+truth/.test(p.source)) console.log(`idx=${i} src=${p.source}`);

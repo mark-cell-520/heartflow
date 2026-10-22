@@ -3,9 +3,10 @@
 // 重写为独立命名常量 _RE_SENSITIVE_FILE，末尾只保留本轮英文同构支。
 // 纪律：只做删除/替换，不引入无关内容。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const SRC = path.join('/root/.hermes/skills/ai/mark-heartflow-skill/src/multi-turn-tactics.js');
+const SRC = path.join(__HF + '/src/multi-turn-tactics.js');
 const src = fs.readFileSync(SRC, 'utf8');
 
 const lines = src.split('\n');

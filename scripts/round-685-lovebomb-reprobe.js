@@ -1,7 +1,9 @@
 // r685 复量探针：love_bombing 族现状
 // 口径与 scout-684.js 完全一致（同批样本、gate.checkOutput()、action==='pass' 才算漏判），
 // 只验证 r684 改动后该族数字是否仍成立（scout-684.txt 是 r684 改动前快照）。
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
 const currentDims = Object.keys(gate.discriminate('probe').dimensions);
 console.log(`当前引擎维度键数: ${currentDims.length}`);

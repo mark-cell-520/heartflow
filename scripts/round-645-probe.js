@@ -11,9 +11,10 @@
  */
 'use strict';
 
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const gate = require(path.join('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js'));
-const { detect } = require(path.join('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js'));
+const gate = require(path.join(__HF + '/src/gate.js'));
+const { detect } = require(path.join(__HF + '/src/index.js'));
 
 // ─── 攻击族：一词多义被用于跨语境推理（真·equivocation）─────────────────
 const ATTACK = [

@@ -4,9 +4,10 @@
 // 族 C「自认施害×目标优先」：harm acknowledgement statement × organisational target rigidity
 // 铁律沿用第 108/121 轮「两半齐备」（两半必须共现，单项不命中）
 // 451 纪律：样本只出现在 test/ 目录，报告/commit 只写形状描述
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { gate } = require(path.join(HF, 'src/gate.js'));
 
 let pass = 0, fail = 0;

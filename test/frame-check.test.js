@@ -1,7 +1,9 @@
 /**
  * frame-check.test.js — 叙事框架检查测试
  */
-const { check } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/frame-check.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { check } = require(__HF + '/src/frame-check.js');
 
 module.exports = ({ test, assertEqual, assertTrue, assertDefined }) => {
 

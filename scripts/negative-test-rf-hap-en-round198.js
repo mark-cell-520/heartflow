@@ -13,11 +13,12 @@
  * （HF_ROOT 覆盖的是工程根，副本必须连 src 一起复制才生效）。
  * 删条方式：把该支正则替换为永不匹配的占位 /(?!x)x/i，注释行保持原样。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const { execFileSync } = require('child_process');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SRC = path.join(ROOT, 'src', 'reward-hacking.js');
 const GUARD = path.join(ROOT, 'test', 'reward-hacking-rf-hap-en-round198.test.js');
 

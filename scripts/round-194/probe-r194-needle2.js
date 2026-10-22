@@ -1,8 +1,9 @@
 // 第 194 轮：比对 needle 字符串与源码实际字节（转义层定位）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = fs.readFileSync(path.join(HF, 'src/dangerous-instruction.js'), 'utf8');
 
 const A = String.raw`[^。\\n]{0,3}(?:删除|删掉|删了|清空|清除|清掉|抹掉|销毁|格式化|删)(?![^。\\n]{0,12}(?:测试库|测试环境|staging|沙箱|开发环境|本地环境|预发|demo\\b))[^。\\n]{0,4}(?:备份集|备份文件|备份数据|备份数据库|备份库|备份|快照)`;

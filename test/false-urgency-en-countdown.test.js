@@ -20,8 +20,9 @@
 //   ③④ 刻意排除 tickets/items：实测 `There are only 2 tickets left for the
 //   6pm train`（火车余票查询）与 `Only 10 items left on your to-do list`
 //   会误命中；tickets/items 只在带 offer/sale/register/stock 主体时才收。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 const { gate } = require(path.join(HF, 'src/gate.js'));
 

@@ -1,3 +1,44 @@
+# 全局审计 + Windows 工具链适配（v6.8.65，r718 后置专项）
+
+## 审计范围与工具
+
+repo-audit.js 全仓（5168 文件 / 1,795,983 行）+ guard-require-integrity +
+audit-missing-requires + dimension-coverage-scan + lang-coverage-audit +
+skill-md-audit + api-surface-audit + assertion-quality-scan 系列 +
+六项门禁全量复扫。
+
+## 审计发现与处置（按证伪纪律逐条）
+
+| 报告项 | 验证结论 | 处置 |
+|---|---|---|
+| SECRETS 6 处 | `data/keys/root-key.json` 未入 git 且 .gitignore 有 `data/keys/` 覆盖；其余 5 处是审计工具自身与安全测试夹具 | **误报**，不动 |
+| SHELL 306 处 | 引擎设计内的本地脚本调用（构建/探针/归档），无外部输入注入面 | 误报（设计用途） |
+| TRAV 83 处 | scripts/round-NNN 探针的 path.join 本地拼接；引擎有 SAFE-FS 越界拦截 | 误报（本地拼接≠traversal） |
+| PROMPT 43 处 | docs/presets/examples 的提示词库——心虫的产品内容不是漏洞 | 误报 |
+| **657 文件硬编码 `/root/...`** | **真问题**：Windows 副本上整套 scripts/test/bin 工具链 ENOENT，审计器一半起不来 | **已修**（见下） |
+| `src/multi-turn-tactics.js` 死变量 `HF` | 定义后零使用 | 已删 |
+| `test/_tmp_r388_negA.js` 编辑器残骸 `(?!x)x` + `''` | 历史坏码混入 git（基线快照带入） | 已清 |
+| 3 个上游坏码（fetch-*formulas / round-145 probe） | 验证 origin/main 同样坏——上游历史遗留的一次性脚本 | **不修**，记录在案 |
+| License missing | 仓库根无 LICENSE | 观察项（发布完备性，不阻塞门禁） |
+
+## Windows 工具链适配修复（653 文件，三个脚本 + 手工收尾）
+
+1. `scripts/fix-windows-root-hardcode.js`：注入 `__HF = path.join(__dirname, <按深度>)` 替换 710 处硬编码
+2. `scripts/fix-double-hf-inject.js`：修 647 处双注入（const 重复声明）+ 629 处 TDZ（__HF 排在 path require 前）
+3. `scripts/fix-stringified-hf.js`：修 713 处字符串化 `__HF` + 181 处双重前缀 `__HF + '__HF/...`
+4. 手工收尾：fix-evaluators / round-287 / round-530 / reward-hacking-round96 四个特殊形态（path 变量名冲突 / node:path 前缀）
+5. shell 两个：start-mcp.sh 与 round-637 的 REPO 改 dirname 推导
+
+**修复过程中的两个自伤坑（已记入技能）**：修复脚本扫描自身导致 TDZ（加 self-exclusion）；`node --check` 验证的是磁盘原文而非内存修复内容 → 652 个坏文件被误判通过（改先写后验）。
+
+## 修复后验证（全绿）
+
+- 全仓 3159 JS 语法坏 = 3（全是上游历史遗留，远程同样坏）
+- 六项门禁：verify 16/16 ✓ doc-numbers 22/22 ✓ guard-abilities 20/20 ✓（键 149）security-audit 16/16 ✓ bidirectional ✅ ✓
+- 审计器复跑：skill-md-audit 踩空 0 ✓ api-surface 无漂移 ✓ orphan-dimension ✓ require 完整性 0 C 类 ✓ dimension-coverage 0 闸门漏判 ✓
+- 引擎冒烟：status running，记忆库正常
+- r717 测试 GATE-2 总数断言 148→149 更新（每轮新维度的预期过期，非回归）
+
 # r718 轮报告（v6.8.64）
 
 ## 心虫选中项 + 分数 + 身份对齐

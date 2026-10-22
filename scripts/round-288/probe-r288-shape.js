@@ -8,10 +8,11 @@
  */
 'use strict';
 
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = fs.readFileSync(path.join(HF, 'src', 'reward-hacking.js'), 'utf8');
 
 // 从源码原样提取 measurement_rigging 中文表（未注入）

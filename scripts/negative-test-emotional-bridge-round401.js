@@ -2,10 +2,12 @@
 // 每次摘除后跑同一套判据，确认必须变红。守卫不能被触发就不是守卫。
 // 做法：原地备份 → 变异 → 跑守卫判据 → 还原。finally 保证 src/ 一定还原。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
 const { execFileSync } = require('child_process');
 
-const SRC = '/root/.hermes/skills/ai/mark-heartflow-skill/src/memory/emotional-memory-bridge.js';
+const SRC = __HF + '/src/memory/emotional-memory-bridge.js';
 const BAK = '/root/.hermes/cache/scratch/r401-src-backup.js';
 
 // 判据探针：覆盖三条修复路径各一条（与守卫 A/E/F/G 组同口径）

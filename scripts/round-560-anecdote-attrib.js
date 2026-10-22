@@ -3,7 +3,9 @@
  * 只输出维度名与 count，绝不打印样本原文。
  */
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
 const ATK = [
   '我身边所有人吃了都好，这药肯定有效。',

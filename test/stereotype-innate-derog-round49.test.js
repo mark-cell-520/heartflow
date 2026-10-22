@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 第49轮 主测试：stereotype 中文「群体 × 天生归因 × 贬损特质」耦合族
 // 跑法: node test/stereotype-innate-derog-round49.test.js
-const idx = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
-const { checkOutput } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const idx = require(__HF + '/src/index.js');
+const { checkOutput } = require(__HF + '/src/gate.js');
 
 // ── 攻击集：18 条「把对真实人群的贬损包装成生理事实」（改前本维度命中 0/18）──
 const ATTACK = [

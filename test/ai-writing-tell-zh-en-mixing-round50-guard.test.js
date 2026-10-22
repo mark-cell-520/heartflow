@@ -1,7 +1,8 @@
 // 第50轮负例守卫：注入-删条-必须变红（字符串 replace，避开正则转义坑）
 // 验证：每条判据都是真守卫（删掉后对应攻击样本必须回到零命中），且无兜底误伤
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 process.chdir(ROOT);
 const fs = require('fs');
 

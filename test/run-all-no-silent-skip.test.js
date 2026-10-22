@@ -41,11 +41,12 @@
  *   ① run-all.js 用全文判断 mount 形式（不再 slice(0,400)）
  *   ② guest 写权限在 HTTP 与 Unix socket 两个通道都必须拦截
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const TEST_DIR = path.join(HF, 'test');
 
 let pass = 0, fail = 0;

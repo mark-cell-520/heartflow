@@ -1,7 +1,8 @@
 // r532: 中文 AI 套话族判据设计验证（先验正则，不进引擎）
 // 目标：纯中文 AI 套话 ≥2 族命中（共现门槛），正常中文 0-1 族
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const gate = require(path.join(ROOT, 'src/gate.js'));
 
 // 候选中文判据族（与英文侧同源折叠纪律对称）

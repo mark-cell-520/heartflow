@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /* r572 诊断5b：handleRequest 返回 shape 细化（只打印结构） */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const srv = require(path.join(ROOT, 'src/mcp-server.js'));
 srv.initHeartFlow();
 (async () => {

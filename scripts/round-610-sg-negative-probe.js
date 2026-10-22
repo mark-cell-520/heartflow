@@ -1,8 +1,9 @@
 // [r610] sageGuardian 负例探针：审批项注入-删条必须变红
 // 只打印布尔/计数，不引述攻击样本原文。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const HF_PATH = path.join(ROOT, 'src/core/heartflow.js');
 const SG_PATH = path.join(ROOT, 'src/shield/ethics/sage-guardian.js');
 

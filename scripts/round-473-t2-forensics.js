@@ -1,10 +1,11 @@
 // r473 探针：T2 失败的 owner 记录实况（aggressive：强制清侧车再跑 victim）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawn, spawnSync } = require('child_process');
-const MG = require('/root/.hermes/skills/ai/mark-heartflow-skill/test/mutation-guard-recovery.js');
+const MG = require(__HF + '/test/mutation-guard-recovery.js');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'mg473-'));
 const FAKE = path.join(TMP, 'fake.js');
@@ -19,7 +20,7 @@ try { fs.unlinkSync(MG.ownerPath(FAKE)); } catch (_) {}
 const VICTIM = path.join(TMP, 'victim.js');
 fs.writeFileSync(VICTIM, [
   "const fs = require('fs');",
-  "const { arm } = require(" + JSON.stringify(path.resolve('/root/.hermes/skills/ai/mark-heartflow-skill/test/mutation-guard-recovery.js')) + ");",
+  "const { arm } = require(" + JSON.stringify(path.resolve(__HF + '/test/mutation-guard-recovery.js')) + ");",
   "const E = " + JSON.stringify(FAKE) + ";",
   "const orig = fs.readFileSync(E, 'utf8');",
   "arm(E, orig);",

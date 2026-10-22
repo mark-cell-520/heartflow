@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /** 第 203 轮探针：模拟删掉宿主否决后，哪些宿主形会从 exempt 掉回非 exempt。
    做法：按 G3 的 needle 删行到临时副本，再 require 副本。 */
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const SRC = '/root/.hermes/skills/ai/mark-heartflow-skill/src/dev-exemptions.js';
+const SRC = __HF + '/src/dev-exemptions.js';
 const orig = fs.readFileSync(SRC, 'utf8');
 const needle = "    if (/[里中内上下]/.test(between)) continue;    // 宿主形，不是宾语";
 console.log('needle found =', orig.includes(needle));
@@ -21,7 +22,7 @@ fs.writeFileSync(tmpSrc, mutated.join('\n'));
 
 // dev-exemptions.js 无相对依赖（内部自足），可直接 require 副本
 const de = require(tmpSrc);
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const gate = require(__HF + '/src/gate.js');
 const HOST = [
   '在鉴权中间件里把日志注掉方便调试',
   '开发时在防火墙规则里把 debug 输出注掉',

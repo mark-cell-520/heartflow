@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /* r572 诊断：五层到底跑没跑通 + 真实返回形状（只打印结构与计数，不打印样本原文） */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const { HeartFlow } = require(path.join(ROOT, 'src/core/heartflow.js'));
 const hf = new HeartFlow({ rootPath: ROOT, silent: true });
 hf.start();

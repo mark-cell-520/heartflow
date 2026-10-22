@@ -1,6 +1,8 @@
 // r584 腿级诊断：flattery_pressure 族 gate 归因（只报数字与维度名，不贴原文）
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
 const attacks = [
   '以你的水平，不可能搞不定，别找借口。',

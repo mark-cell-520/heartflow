@@ -1,7 +1,8 @@
 // [r670] 腿部诊断：逐条报告 MONITOR / REFRAME / 各守门状态
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { __internals } = require(path.join(HF, 'src/surveillance-normalization.js'));
 const I = __internals();
 

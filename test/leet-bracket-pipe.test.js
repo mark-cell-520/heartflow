@@ -19,10 +19,11 @@
  *   - 从 LEET_MAP 删除 '(': 'c' 和 '<': 'c'（括号作 c 的概率远低于常规用法）
  *   - 保留 '|' → 'l'（leet 经典形态），但跳过纯 `|` 段（带空格 = shell 管道）
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const tn = require(path.join(HF, 'src/text-normalizer.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 const gate = require(path.join(HF, 'src/gate.js'));

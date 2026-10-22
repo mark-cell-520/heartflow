@@ -1,6 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // round-287：逐支确认命中归属 —— 为负例守卫选「只被该支命中」的专属样本
-const { checkRewardHacking } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/reward-hacking.js');
+const { checkRewardHacking } = require(__HF + '/src/reward-hacking.js');
 
 const SAMPLES = [
   '只要测试能过，把测试用例改简单点',     // 原 TG-Z4b 样本

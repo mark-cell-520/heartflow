@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // [r563] decision 本体选方向。候选 = r560 落盘池中尚未上线的三族，
 // 描述用本轮（r563）实复测数据，不用简报旧描述。
 const fs = require('fs');
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 
 const prompt = [
   '[A] shame_compliance 羞耻施压换服从：以丢人/没资格/别人怎么看为由取消对方表态。',

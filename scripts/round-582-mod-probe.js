@@ -1,8 +1,9 @@
 // r582：模块层复测（用 r581 c-scale 的同族攻击样本 + 良性对照）
 // 只打印数字与族名，不贴样本原文（纪律：原文不进上下文）。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const { checkExclusiveTrust } = require(path.join(ROOT, 'src/exclusive-trust.js'));
 
 const attacks = [

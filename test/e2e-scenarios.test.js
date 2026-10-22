@@ -1,7 +1,9 @@
 // e2e-test.js — 心虫管线端到端验证
 // 用真实场景跑全链路，看管线到底能不能抓到问题
 
-const { checkInput, checkDraft, checkOutput } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/pipeline.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { checkInput, checkDraft, checkOutput } = require(__HF + '/src/pipeline.js');
 
 const scenarios = [
   {

@@ -23,10 +23,11 @@
  *
  * 最终结论：全部 50 个 check 函数都能被真实句式命中，没有一个是死的。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 const { toText, toTexts } = require(path.join(HF, 'test/regex-to-text.js'));
 

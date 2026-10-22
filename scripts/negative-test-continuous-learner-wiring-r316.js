@@ -1,11 +1,12 @@
 // negative-test-continuous-learner-wiring-r316.js
 // 注入-删条-必须变红：验证 test/continuous-learner-wiring.test.js 的守卫有效性
 // 每条注入都把「接真实现」回退成 r316 修掉的形态，跑测试必须出现失败。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const REPO = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const REPO = __HF;
 const SRC = path.join(REPO, 'src/core/heartflow.js');
 const SRC_PIPE = path.join(REPO, 'src/core/think-pipeline.js');
 const TEST = path.join(REPO, 'test/continuous-learner-wiring.test.js');

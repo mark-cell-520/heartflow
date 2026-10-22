@@ -19,6 +19,7 @@
  *
  * 样本隔离：只用中性工作描述与良性工程文本，不贴任何攻击话术或隐私内容。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 const net = require('net');
@@ -26,7 +27,7 @@ const os = require('os');
 const fs = require('fs');
 const { spawn } = require('child_process');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SRC = path.join(ROOT, 'src');
 
 let pass = 0, fail = 0;

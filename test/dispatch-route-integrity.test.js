@@ -38,10 +38,11 @@
  *    ① routes() 标注可达性（不再让调用方踩空）
  *    ② dispatch 入口参数归一化不破坏结构化参数
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 let pass = 0, fail = 0;
 function t(name, fn) {

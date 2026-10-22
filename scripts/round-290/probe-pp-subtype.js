@@ -1,8 +1,9 @@
 // 第 290 轮：复测 7 条未命中样本（沿用 round-289/diag.js 的 16 条集），
 // 并测良性 3 条零误伤。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const src = require('fs').readFileSync(path.join(HF, 'src/index.js'), 'utf8');
 const start = src.indexOf('const PSEUDO_PHILOSOPHY_ZH = [');
 const end = src.indexOf('];', start);

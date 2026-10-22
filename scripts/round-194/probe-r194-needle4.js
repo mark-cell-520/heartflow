@@ -1,8 +1,9 @@
 // 第 194 轮：精确 diff —— needle vs 源码对应段，逐字符报差异位置
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = fs.readFileSync(path.join(HF, 'src/dangerous-instruction.js'), 'utf8');
 
 const MIRROR = String.raw`(?:生产|线上|正式|prod\\b|production|live)(?![^。\\n]{0,24}(?:过期|失效|历史|旧的?|之前|以前|三个月|三天|七天|30\\s*天|90\\s*天|归档|上个月|上月))[^。\\n]{0,6}(?:数据库|库|集群)?[^。\\n]{0,4}(?:备份|快照)`;

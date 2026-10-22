@@ -11,10 +11,11 @@
  *   ② 硬分支与 capability_probe 真组合不受影响（召回不退化）
  *   ③ 单层阈值纪律不变（≥2 层才 qualify，不许偷偷放宽）
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 const {
   checkMultiTurnEscalation,

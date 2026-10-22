@@ -1,10 +1,11 @@
 // 第 121 轮负例守卫：逐条从源码删除新增判据 → 主测试必须变红
 // 参考 scripts/negative-test-absolute-claim-en.js 的注入-删条-必须变红形态
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const SRC = '/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js';
-const TEST = '/root/.hermes/skills/ai/mark-heartflow-skill/test/instrumental-reasoning-zh-disposable-round121.test.js';
+const SRC = __HF + '/src/index.js';
+const TEST = __HF + '/test/instrumental-reasoning-zh-disposable-round121.test.js';
 
 // 每条 needle 必须是本轮新增判据的**唯一**源码特征串（从正则内部起点替换，
 // 向前找最近的 '/' 作为正则起点，避免第 120 轮 \b 悬空坑）

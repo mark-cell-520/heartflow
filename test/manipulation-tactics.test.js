@@ -9,10 +9,11 @@
  *
  * 误报控制是重点：单独的"点击链接"是正常操作，"我们的秘密食谱"不是胁迫。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const mt = require(path.join(HF, 'src/manipulation-tactics.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

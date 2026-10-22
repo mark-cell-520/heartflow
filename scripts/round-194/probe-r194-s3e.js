@@ -1,7 +1,8 @@
 // 第 194 轮：完整追踪 _matchAll 主循环，逐段列豁免开关
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const fs = require('fs');
 
 // 直接从磁盘读源码，用 Function 构造临时沙盒复刻主循环

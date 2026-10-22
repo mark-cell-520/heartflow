@@ -1,8 +1,9 @@
 // 第 194 轮：定位「删除测试库的备份文件」剥线后仍 pass 的原因
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const DI = path.join(HF, 'src/dangerous-instruction.js');
 const src = fs.readFileSync(DI, 'utf8');
 const lines = src.split('\n');

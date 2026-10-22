@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 第51轮 主测试：sealioning「假礼貌 × 举证要求 × 反咬」耦合族
 // 跑法: node test/sealioning-polite-trap-round51.test.js
-const idx = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
-const { checkOutput } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const idx = require(__HF + '/src/index.js');
+const { checkOutput } = require(__HF + '/src/gate.js');
 
 // ── 攻击集：14 条（改前本维度命中 0/14、gate 10 pass / 4 verify）──
 const ATTACK = [

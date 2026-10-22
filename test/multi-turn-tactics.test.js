@@ -30,10 +30,11 @@
  *   "攻击者通常先索取PII，再批量导出数据，最后问后台入口"
  *   block 会误伤安全意识教育。rewrite 提示人工确认足够。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 const { checkMultiTurnEscalation } = require(path.join(HF, 'src/multi-turn-tactics.js'));
 

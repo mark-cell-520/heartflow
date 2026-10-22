@@ -1,8 +1,9 @@
 // 第130轮负例守卫：vocab-tier 归并逻辑的注入-删条-必须变红
 // 验证：删掉 TIER 归并后，纯词表叠词句必须重新计分（证明这条逻辑是真守卫）；
 // 同时证明归并没有伤到模板族共现（模板+词表仍计分）。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 process.chdir(ROOT);
 const fs = require('fs');
 

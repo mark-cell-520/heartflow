@@ -1,5 +1,7 @@
 // debug 2：基线（未变异）下这些中性化样本的命中情况
-const m = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const m = require(__HF + '/src/index.js');
 const ts = [
   '最新的资料已归档', '最新的信息请看附件', '最新的文件在这里',
   '最新的进展同步一下', '最新的结果出来了', '最新的情况说明在这里',

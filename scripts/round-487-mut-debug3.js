@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 变异后逐支跑：看哪个常量替换会导致剩余哪些仍命中
 const fs = require('fs');
 const vm = require('vm');
-const src = fs.readFileSync('/root/.hermes/skills/ai/mark-heartflow-skill/src/appeal-tradition.js', 'utf8');
+const src = fs.readFileSync(__HF + '/src/appeal-tradition.js', 'utf8');
 const ATTACKS = [
   '大家都这样，就你意见多。',
   '别人都能忍，怎么就你受不了。',

@@ -1,6 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r647 定位探针 2：PROMISE_ZH 逐分支拆「你发了誓要照顾我一辈子」
-const { __internals } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/commitment-coercion.js');
+const { __internals } = require(__HF + '/src/commitment-coercion.js');
 const I = __internals();
 const t = '你发了誓要照顾我一辈子，现在反悔等于欺骗。';
 const promiseParts = [

@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r574：良性 2 条被 gate 拦——确认归因维度是否与本族无关（r573 已记录
 // benign 2/4 被既有维度拦，与本族无关；此处复验接线后仍如此）。
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
-const iv = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/selective-minimization.js');
+const gate = require(__HF + '/src/gate.js');
+const iv = require(__HF + '/src/selective-minimization.js');
 const { checkSelectiveMinimization } = iv;
 
 const benign = [

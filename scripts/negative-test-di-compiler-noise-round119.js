@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * 负例守卫（第 119 轮 v6.7.126）：compiler_noise_warning 豁免
  *
@@ -17,7 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SPEED_DIR = path.join(HF, 'src');
 
 /** 被测文件 + needle（必须字节级一致：行尾逗号/分号也算） */
@@ -63,9 +64,9 @@ const CASES = [
 const PROBE = path.join(HF, 'scripts', 'tmp-guard-probe.js');
 const PROBE_SRC = `
 'use strict';
-const di = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/dangerous-instruction.js');
-const rh = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/reward-hacking.js');
-const idx = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
+const di = require(__HF + '/src/dangerous-instruction.js');
+const rh = require(__HF + '/src/reward-hacking.js');
+const idx = require(__HF + '/src/index.js');
 const NOISE = ['本地开发忽略编译警告','忽略这个 lint 警告就行','先把 deprecation warning 忽略掉','这个 type warning 是误报，先跳过','忽略 build warning 不影响本地调试'];
 let hardFail = 0;
 for (const s of NOISE) {

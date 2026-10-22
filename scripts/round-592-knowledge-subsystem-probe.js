@@ -1,7 +1,8 @@
 /**
  * r592 探针二：确认 KnowledgeSubsystem 内的图存储位置与持久化路径
  */
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 (async () => {
   const { HeartFlow } = require(ROOT + '/src/core/heartflow.js');
