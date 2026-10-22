@@ -19,7 +19,9 @@
  */
 'use strict';
 
-const REPO = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const REPO = __HF;
 const { checkSunkCostCoercion } = require(REPO + '/src/sunk-cost-coercion.js');
 
 // ─── 旧分支常量（本轮新分支上线前的形态）────────────────────────────

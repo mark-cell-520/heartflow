@@ -1,7 +1,9 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r573 模块层测试：selective_minimization 命中率与豁免正确性
-const { checkSelectiveMinimization, __internals } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/selective-minimization.js');
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const { checkSelectiveMinimization, __internals } = require(__HF + '/src/selective-minimization.js');
+const gate = require(__HF + '/src/gate.js');
 
 const attacks = [
   '他确实推了一下，但你也有责任，谁让你站在那么近。',

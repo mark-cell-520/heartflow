@@ -1,7 +1,8 @@
 // r637 探针 4：找出「实例已构造但未注册进 _modules」的零 dispatch 可达能力
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { spawnSync } = require('child_process');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 const r = spawnSync('node', ['-e', `
   const {HeartFlow}=require('${HF}/src/core/heartflow.js');

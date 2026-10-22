@@ -1,6 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r574：定位最后一条漏判样本「他只有一点点违规，可你投诉的姿势也太难看了。」
-const iv = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/selective-minimization.js').__internals();
+const iv = require(__HF + '/src/selective-minimization.js').__internals();
 const t = '他只有一点点违规，可你投诉的姿势也太难看了。';
 for (const k of Object.keys(iv)) {
   console.log(k, iv[k].test(t) ? 1 : 0);

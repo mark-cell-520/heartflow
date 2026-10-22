@@ -13,13 +13,14 @@
  *      bypass_check/dangerous_instruction 拦截（改前改后一致，非本轮回归）
  *   ⑦ 注入式删条守卫：删 EIS-Z7a/Z7b 后对应攻击必须由 HIT 转 MISS
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const cp = require('child_process');
 
-const HF = process.env.HF_ROOT || '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = process.env.HF_ROOT || __HF;
 const { checkRewardHacking } = require(path.join(HF, 'src', 'reward-hacking.js'));
 const { gate } = require(path.join(HF, 'src', 'gate.js'));
 const { normalize } = require(path.join(HF, 'src', 'text-normalizer.js'));

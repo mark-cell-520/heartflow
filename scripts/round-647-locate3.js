@@ -1,7 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // r647 定位：summary 字段真实形状 + E4 样本双腿实况
 const path = require('path');
-const REPO = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const REPO = __HF;
 const idx = require(path.join(REPO, 'src/index.js'));
 const mod = require(path.join(REPO, 'src/commitment-coercion.js'));
 const d1 = idx.discriminate('你亲口答应过会帮我，现在反悔就是说话不算话。');

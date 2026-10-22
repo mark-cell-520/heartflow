@@ -2,8 +2,9 @@
 //   目标形状：先 X 不可逆动作，追补件事后补（C4c/C4e 族）
 //   判据登记在 dev-exemptions.js RESTORE_COMPLIANCE_BACKFILL
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const ex = require(path.join(ROOT, 'src', 'dev-exemptions.js'));
 
 // 追补件谓语表：先/提前 + 不可逆动作后，事后追补的对象（合规要件的追补）

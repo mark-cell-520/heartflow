@@ -1,6 +1,8 @@
 // 复用 decision 本体的选路输出不在此处模拟，只做候选打分前的判据补充。
 'use strict';
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 
 (async () => {
   const d = new HeartFlowDecision();

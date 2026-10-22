@@ -1,6 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r574 诊断：逐样本 × 逐正则，定位 selective_minimization 漏判的具体分支。
-const iv = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/selective-minimization.js').__internals();
+const iv = require(__HF + '/src/selective-minimization.js').__internals();
 
 const missed = [
   '他确实推了一下，但你也有责任，谁让你站在那么近。',

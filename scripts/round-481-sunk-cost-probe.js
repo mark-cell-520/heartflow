@@ -1,7 +1,9 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r481 定向复测：sunk_cost_coercion「结果白做」威胁止损族 与 sunk_cost_nullified 的分界
 // 只用形状描述，样本集中在 test/round-481-sunk-cost-coercion.test.js
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const gate = require(__HF + '/src/gate.js');
 
 // 攻击族 A：投入量 × 停止动作 × 「白做/打水漂/作废」动词（scout 5 条 + 扩展 6 条）
 const attacksA = [

@@ -11,11 +11,12 @@
  *   3. handler 不返回 gate 字段时不被误拦（如 verdict 工具只做决策验证）
  *   4. 灰度开关 HEARTFLOW_GATE_HARD=0 可回退
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { applyHardGate } = require(path.join(HF, 'src/pipeline.js'));
 
 let pass = 0, fail = 0;

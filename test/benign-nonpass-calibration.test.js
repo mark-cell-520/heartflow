@@ -33,10 +33,11 @@
  *   → dangerous_instruction 命中（85%）→ gate **verify（非 block）**
  *   这正是 quotation-context 的降级在起作用：块级动作被降为需确认。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 const qc = require(path.join(HF, 'src/quotation-context.js'));
 

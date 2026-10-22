@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 验证 variantWithout 的替换是否真的生效
 const fs = require('fs');
 const vm = require('vm');
-const src = fs.readFileSync('/root/.hermes/skills/ai/mark-heartflow-skill/src/appeal-tradition.js', 'utf8');
+const src = fs.readFileSync(__HF + '/src/appeal-tradition.js', 'utf8');
 
 function variant(constName) {
   const re = new RegExp(`const ${constName} = /[\\s\\S]*?/;\\n`, 'm');

@@ -1,7 +1,9 @@
 // r691 修正：① chat→chatting 双写辅音（I2/I3 动词表）② C4 窗口 0-3→0-6
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const FILE = '/root/.hermes/skills/ai/mark-heartflow-skill/src/social-isolation.js';
+const FILE = __HF + '/src/social-isolation.js';
 const lines = fs.readFileSync(FILE, 'utf8').split('\n');
 
 let fixed = 0;

@@ -11,13 +11,14 @@
  *   4. suggest 数据不足时**拒绝给建议**（宁可没建议，不可拍脑袋）
  *   5. 隔离：测试用独立目录，不污染 data/feedback
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 
 // 必须在 require 之前设好——模块在加载时读这个 env
 process.env.HEARTFLOW_FEEDBACK_DIR = '/tmp/fp-feedback-test';
-const fp = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/false-positive-feedback.js');
+const fp = require(__HF + '/src/false-positive-feedback.js');
 const FP_FILE = fp.FP_FILE;
 
 let pass = 0, fail = 0;

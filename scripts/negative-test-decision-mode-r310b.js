@@ -2,11 +2,12 @@
 // 所以那条 path 实际不可观测。真正该钉的是「ratioBonus 不并入」的可观测后果。
 // 结论：把注入③换成可观测的等价缺陷 —— pick_biggest_gap 态把 ratioBonus 删掉
 // （r99 契约直接崩），以及 pick_best 的达成度公式用错极性（1-gap → gap）。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const REPO = path.resolve('/root/.hermes/skills/ai/mark-heartflow-skill');
+const REPO = path.resolve(__HF);
 const SRC = path.join(REPO, 'src/core/decision.js');
 const TEST = path.join(REPO, 'test/decision-mode-round310.test.js');
 

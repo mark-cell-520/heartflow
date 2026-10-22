@@ -1,9 +1,11 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 第48轮 负例守卫：pseudo_causal 中文时间先后族
 // 9 条判据逐条注入样本 → 命中；再逐条删掉该判据（monkey-patch 常量副本）→ 必须变红。
 // 用法: node test/pseudo-causal-zh-timeorder-round48-guard.test.js
 const assert = require('assert');
-const idx = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
+const idx = require(__HF + '/src/index.js');
 
 // 每条判据的代表样本（只依赖该判据，不含其他判据的强特征）
 const CASES = [

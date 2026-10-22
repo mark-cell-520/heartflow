@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * 第 188 轮负例脚本：两支新判据的 needle 删条后必须失效
  * 用法：node scripts/negative-test-dev-fixture-round188.js
@@ -9,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SRC = path.join(ROOT, 'src/dev-exemptions.js');
 
 const NEEDLES = [

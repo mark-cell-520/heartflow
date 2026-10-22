@@ -1,7 +1,8 @@
 // r627 诊断：MCP handler 里 heartflow.strategicRestraint 到底是什么实例？
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const { HeartFlow } = require(path.join(ROOT, 'src/core/heartflow.js'));
 const { StrategicRestraint } = require(path.join(ROOT, 'src/cortex/strategic-restraint.js'));
 

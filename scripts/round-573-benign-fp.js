@@ -1,5 +1,7 @@
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 const benign = [
   '双方均存在过错：我方晚交付 3 天，对方变更需求 5 次，责任按合同条款划分。',
   'Both parties contributed; the postmortem assigns 40% to us and 60% to them.',

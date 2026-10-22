@@ -1,7 +1,8 @@
 // [r640] 零命中验证：对 4 个候选族跑 discriminate() 全维度，确认是真缺口不是聚合压掉。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gateMod = require(path.join(HF, 'src/gate.js'));
 
 const FAMILY_SAMPLES = {

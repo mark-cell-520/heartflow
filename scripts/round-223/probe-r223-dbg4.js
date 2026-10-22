@@ -1,7 +1,8 @@
 // debug 4：直接算 _supText4 后的匹配，看每个片段是否真的必要
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 let src = fs.readFileSync(path.join(HF, 'src', 'index.js'), 'utf8');
 
 // 提取第 223 轮那条正则字面量

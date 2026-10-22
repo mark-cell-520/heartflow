@@ -14,11 +14,12 @@
  * ⚠️ 崩溃 ≠ 变红（第 13/15/87 轮教训）：退出码非零但 stdout 没有
  *    「结果:N通过,M失败」判为崩溃，不计入真变红。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const IDX = path.join(HF, 'src/index.js');
 const MAIN = path.join(HF, 'test/bad-faith-gaps-round88.test.js');
 const COPY = '/root/.hermes/scratch/r88-guard-copy';

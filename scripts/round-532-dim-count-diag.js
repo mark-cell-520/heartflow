@@ -1,8 +1,9 @@
 // r532: 诊断「文档宣称 76 vs 运行时 dimMap 75」的口径差
 // 输出：dimMap 键集 vs AGENTS.md 列举名集的双向差集
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 
 const { discriminate } = require(path.join(ROOT, 'src/index.js'));
 const d = discriminate('neutral baseline text');

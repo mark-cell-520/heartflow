@@ -1,7 +1,8 @@
 // 第 216 轮：验证 verification-engine 是否可作为独立模块接线（require 冒烟 + 接口实测）
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 try {
-  const ve = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/verification-engine.js');
+  const ve = require(__HF + '/src/core/verification-engine.js');
   console.log('exports keys:', Object.keys(ve));
   const e = ve.verificationEngine;
   console.log('methods:', ['verifySkill', 'verifyCode', 'verifyClaims', 'quickCheck', 'healthCheck', 'clearCache', 'generateReport', 'getLessons', 'recordCorrection'].map(m => m + '=' + (typeof e[m])).join(', '));

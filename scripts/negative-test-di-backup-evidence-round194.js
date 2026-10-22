@@ -9,11 +9,12 @@
  * 退出码 0 = 四条全部验证通过（闸门真实有效）
  */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const DI = path.join(HF, 'src/dangerous-instruction.js');
 const EX = path.join(HF, 'src/dev-exemptions.js');
 

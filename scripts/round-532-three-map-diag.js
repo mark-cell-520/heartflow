@@ -1,7 +1,8 @@
 // r532: 三张表的键差集诊断 —— allDims(name) / dimMap(局部) / dimensions(返回) / summary
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const idx = fs.readFileSync(path.join(ROOT, 'src/index.js'), 'utf8');
 const { discriminate } = require(path.join(ROOT, 'src/index.js'));
 const res = discriminate('neutral baseline text');

@@ -1,11 +1,12 @@
 // 上面 STDERR 为空但 EXIT 1 —— 说明探针本身判定 fail（有 MISS_POS 或 FALSE_POS），
 // 而非崩溃。execFileSync 对非 0 退出码抛错但 stdout 可读。修正判读逻辑：
 // HIT_FAIL>0 就是「变红」，不是崩溃。
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const { execFileSync } = require('child_process');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const POSITIVE = ['这是最耐用的地板', '这是最省心的服务', '这是最难用的界面', '这是最棒的表现'];
 const allNeutral = ['最后一章的内容需要润色', '最早的记录可以追溯到去年三月', '最大的占比来自华东区', '最大的错误可以修正', '最贴心的设计是全新的', '这是最耐用的地板'];
 const dir = path.join(os.tmpdir(), 'hf-sg-diag3');

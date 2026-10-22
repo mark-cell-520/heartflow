@@ -4,7 +4,9 @@
 //   B 组 —— 真过渡语（无一句实质内容，应保持命中）
 //   C 组 —— 同形跨维度样本：多轮累积/沉没成本族带「先试」前缀的句子
 'use strict';
-const pt = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/premature-termination.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const pt = require(__HF + '/src/premature-termination.js');
 
 const A_COMPLETE = [
   '先试试看，之后会越来越顺理成章',

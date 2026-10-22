@@ -1,8 +1,9 @@
 // 第 194 轮：定稿 needle —— 从磁盘直接抓源码行，保证与实现同源
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = fs.readFileSync(path.join(HF, 'src/dangerous-instruction.js'), 'utf8');
 
 // 从源码行抽取 regex 字面量主体（去掉首尾 / 与 flags）

@@ -9,7 +9,8 @@
 // 本守卫锁住这三条；负例变异负责证明「摘掉修复就会红」。
 'use strict';
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const ROOT = __HF;
 const path = require('path');
 const fs = require('fs');
 const E = require(path.join(ROOT, 'src/memory/emotional-memory-bridge.js'));

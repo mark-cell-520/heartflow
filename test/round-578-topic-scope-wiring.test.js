@@ -19,10 +19,11 @@
  *
  * 样本隔离：本文件只用中性工作话题描述，不贴任何攻击话术或隐私内容。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SRC = path.join(ROOT, 'src');
 
 // 隔离话题落盘目录，避免污染 data/

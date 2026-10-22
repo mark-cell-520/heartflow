@@ -1,7 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // r647 decision runner：候选文本全部外置在 /tmp/decide-opts.json，本文件只保留 dispatch 调用。
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { HeartFlow } = require(path.join(HF, 'src/core/heartflow.js'));
 const opts = require('/tmp/decide-opts.json');
 

@@ -10,9 +10,10 @@
 //        第 130/131/141/142/200 五轮的形状）。
 //
 // 只报告不改源码：是否折叠必须逐对过攻击池 + 良性池验证后才动。
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const gate = require(path.join(ROOT, 'src/gate.js'));
 
 // ── 良性与攻击语料（只从 test 目录读，不在本文件内联原文） ──────────

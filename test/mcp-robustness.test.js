@@ -34,10 +34,11 @@
  *   边界：>1MB 的 body 会 413（未实测精确阈值，约在 1MB~3MB 之间）
  *         ——这是 HTTP 层限制不是 handler 缺陷，调用方应先截断
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 let pass = 0, fail = 0;
 function t(name, fn) {

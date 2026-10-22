@@ -1,7 +1,9 @@
 // 探测 src/index.js 中关键正则行的实际字符形态（ASCII 转义 or 实际中文）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const src = fs.readFileSync('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js', 'utf8');
+const src = fs.readFileSync(__HF + '/src/index.js', 'utf8');
 const lines = src.split('\n');
 lines.forEach((l, i) => {
   if (l.includes('得(?:多|少)') || l.includes('得(?:少|多)') || l.includes('为什么') || l.includes('为何')) {

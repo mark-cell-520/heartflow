@@ -1,9 +1,10 @@
 // 轮 201 辅助：定位其它 shield 维度里「同一词表/同族判据重复」的实际形状。
 // 做法：require 各 shield 模块的 detect 函数，拿 findings 的 dimension 分布。
 // 只输出族名与计数，不输出任何样本原文。
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const files = fs.readdirSync(path.join(ROOT, 'src/shield')).filter(x => x.endsWith('.js'));
 const dims = {};
 for (const f of files) {

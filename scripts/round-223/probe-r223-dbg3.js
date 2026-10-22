@@ -1,8 +1,9 @@
 // debug 3：分别变异 M3/M4/M5 后，观察负向样本是否变「非零命中」
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 function build(tag, from, to) {
   const dir = path.join(os.tmpdir(), 'hf-sl-' + tag);

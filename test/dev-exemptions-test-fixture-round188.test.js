@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // 第 188 轮双向守卫：dev-exemptions 两支新判据
 //   · isTestFixtureReset（测试态库 × 表级重置 × 无安全设施）
 //   · RESTORE_WAIT_DONE + RESTORE_AGAIN_VERB（「等 X 完再开」恢复承诺通道）
@@ -7,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const dev = require(path.join(HF, 'src/dev-exemptions.js'));
 const g = require(path.join(HF, 'src/gate.js'));
 

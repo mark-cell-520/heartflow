@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * scripts/round-681-wire.js
  * [r681] 第 125 维度 deprivation_coercion（基本需求剥夺）九处接线。
@@ -6,7 +7,7 @@
  */
 const fs = require('fs');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const FILE = path.join(HF, 'src/index.js');
 let src = fs.readFileSync(FILE, 'utf8');
 

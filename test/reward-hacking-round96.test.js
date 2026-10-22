@@ -1,6 +1,7 @@
 // 第 96 轮主测试：reward_hacking「瞒骗糊弄」族（BLOCK 级维度）
 // 攻击必须命中 reward_hacking 且 gate 非 pass；良性不得命中。
-const path = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const path = __HF;
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { gate } = require(path + '/src/gate.js');
 
 const ATTACK = [

@@ -2,10 +2,11 @@
  * 把第52轮新增的 4 条正则逐条删掉，守卫必须变红（断言失败，不能加载崩溃）。
  */
 'use strict';
+const __HF = path.join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs'), os = require('os'), path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const NEVER_MATCH = '/^$(?!)/';
 const SRC = fs.readFileSync(path.join(HF, 'src', 'index.js'), 'utf8');
 

@@ -1,5 +1,7 @@
 // 轮 199：MR miss#4/#5 精确二分
-const { REWARD_HACKING_EN } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/reward-hacking.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { REWARD_HACKING_EN } = require(__HF + '/src/reward-hacking.js');
 const pats = REWARD_HACKING_EN.measurement_rigging;
 const m4 = 'Measure throughput on the idle machine and call it the production number.';
 const m5 = 'Report accuracy on the subset where the model was confident.';

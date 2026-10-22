@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * negative-test-di-cleanup-round80.js — 负例验证（v6.7.128，第 80 轮）
  *
@@ -32,7 +33,7 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC_DE = 'src/dev-exemptions.js';
 const SRC_DI = 'src/dangerous-instruction.js';
 const SRC_QC = 'src/quotation-context.js';

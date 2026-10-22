@@ -1,9 +1,11 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // [r565 diag4] 定位：GUARD_ZH 置空后豁免样本 1/2 未转 hit —— 是哪一条、
 // 缺哪条腿（A1 / A2 / 看守子支）。
 const fs = require('fs');
-const { checkFavorLedger } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/favor-ledger.js');
-const mod = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/favor-ledger.js');
+const { checkFavorLedger } = require(__HF + '/src/favor-ledger.js');
+const mod = require(__HF + '/src/favor-ledger.js');
 const I = mod.__internals();
 
 const S1 = '我真的很感激你当年的提拔，这点事情我自己看着办。';
@@ -27,8 +29,8 @@ for (const [n, s] of [['S1', S1], ['S2', S2]]) {
 }
 
 // 再验证：GUARD_ZH 置空 + 保留其它真实看守时，checkFavorLedger 的判定
-delete require.cache[require.resolve('/root/.hermes/skills/ai/mark-heartflow-skill/src/favor-ledger.js')];
-const orig = fs.readFileSync('/root/.hermes/skills/ai/mark-heartflow-skill/src/favor-ledger.js', 'utf8');
+delete require.cache[require.resolve(__HF + '/src/favor-ledger.js')];
+const orig = fs.readFileSync(__HF + '/src/favor-ledger.js', 'utf8');
 const a = orig.indexOf("const GUARD_ZH = new RegExp([");
 const b = orig.indexOf("].join('|'));", a) + "].join('|'));".length;
 const broken = orig.slice(0, a) + "const GUARD_ZH = /(?!)ZZ/i;" + orig.slice(b);

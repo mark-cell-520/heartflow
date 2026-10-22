@@ -10,10 +10,11 @@
  * isFalsyResult + check 逻辑做等价复现，逐条验证判定。
  * 复现必须与 bin/verify.js 保持一致，故用读源码 + eval 的方式取真逻辑。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const src = fs.readFileSync(path.join(HF, 'bin/verify.js'), 'utf8');
 
 // ── 从源码抽出 isFalsyResult（确保测的是真逻辑，不是抄一份）──

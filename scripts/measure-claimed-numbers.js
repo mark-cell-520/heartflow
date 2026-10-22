@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /** 实测全部对外宣称的数字（v6.7.77） */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 
 const idx = fs.readFileSync(path.join(ROOT, 'src/index.js'), 'utf8');
 const srv = fs.readFileSync(path.join(ROOT, 'src/mcp-server.js'), 'utf8');

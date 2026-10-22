@@ -1,7 +1,8 @@
 // 轮 201：定位 ext.longtext 里唯一被 awt 计分的那条，命中族与是否真误伤。
 // 只输出命中族与 gate 结论，不输出样本原文。
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const BENCH = path.join(ROOT, 'test');
 const awt = require(path.join(ROOT, 'src/shield/ai-writing-tell.js'));
 const gate = require(path.join(ROOT, 'src/gate.js'));

@@ -1,7 +1,8 @@
 // 第 194 轮：逐层剥离 _matchAll 顶层豁免，定位 S3 条被丢在哪一层
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const ex = require(path.join(HF, 'src/dev-exemptions.js'));
 

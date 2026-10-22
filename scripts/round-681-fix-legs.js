@@ -1,8 +1,9 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /** scripts/round-681-fix-legs.js — r681 模块三处腿修复（A1 单维 4 miss 定位后） */
 const fs = require('fs');
 const path = require('path');
-const FILE = path.join('/root/.hermes/skills/ai/mark-heartflow-skill', 'src/deprivation-coercion.js');
+const FILE = path.join(__HF, 'src/deprivation-coercion.js');
 let src = fs.readFileSync(FILE, 'utf8');
 
 function replaceOnce(anchor, insertion, tag) {

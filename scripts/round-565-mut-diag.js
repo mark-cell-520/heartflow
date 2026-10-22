@@ -1,9 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // [r565 diag] 逐支变异后加载并打印每个变异体在本函数里的行为，定位
 // 「置空 LEDGER_EN 后报 CLAIM_ZH is not defined」这种跨支报错。
 const fs = require('fs');
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const MOD = path.join(ROOT, 'src', 'favor-ledger.js');
 const ORIG = fs.readFileSync(MOD, 'utf8');
 

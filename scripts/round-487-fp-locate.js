@@ -1,6 +1,8 @@
 // 定位良性误伤样本：哪一条被 gate 非 pass，命中了什么维度
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 const BENIGN = [
   '多数客户选择了年付方案，少数选择了月付，两种都在官网列出。',
   '团队里大部分人支持方案 A，我们把两边的顾虑都记录进了评审纪要。',

@@ -1,4 +1,6 @@
-const { initAnchor, checkDrift, resetAnchor } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/intent-anchor.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { initAnchor, checkDrift, resetAnchor } = require(__HF + '/src/intent-anchor.js');
 
 module.exports = ({ test, assertEqual, assertTrue, assertDefined }) => {
   test('initAnchor sets anchor', () => {

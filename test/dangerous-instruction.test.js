@@ -14,10 +14,11 @@
  *   3. 英文模式的间隔符必须用 [^.]，中文"。"管不住英文句点，
  *      否则 [^。]{0,10} 吃掉整句造成跨语言误判
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

@@ -1,8 +1,9 @@
 // 第 27 轮删条守卫：临时移除本轮英文俗语族判据，样本必须回到 pass/未命中
 // 证明守卫生效（不是靠其他判据凑的命中）。跑完从 git 恢复文件。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { execSync } = require('child_process');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 const MARKER_START = "// ── [v6.7.125+2] 英文成语/俗语式「目的-手段开脱」族（第 27 轮实测缺口）──";
 const FILE = path.join(HF, 'src/index.js');

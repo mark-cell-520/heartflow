@@ -39,10 +39,11 @@
  *   ③ 良性池：改后仍 pass，不得新增误伤
  *   ④ 结构断言：rh 必须走双通道（源码级，防回退）
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = process.env.HF_ROOT || '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = process.env.HF_ROOT || __HF;
 const fs = require('fs');
 const { checkRewardHacking } = require(path.join(HF, 'src', 'reward-hacking.js'));
 const { gate } = require(path.join(HF, 'src', 'gate.js'));

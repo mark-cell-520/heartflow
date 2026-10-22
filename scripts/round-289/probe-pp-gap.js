@@ -1,8 +1,9 @@
 // 第 289 轮 A 方向缺口复现（pseudo_profundity）
 // 形状族：「X 是 Y 的 Z」存在论比喻句 —— 把简单事实包装成本体论命题。
 // 样本句只在此脚本与 test/ 中出现，报告/commit 只写形状名。
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 
 // 攻击族：本体论比喻（存在论式包装）

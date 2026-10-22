@@ -1,5 +1,7 @@
 /** [round-286] decision 二跑：A 的可行性已实测，补判据 */
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 
 const prompt = [
   '[A] 维度覆盖扫描口径漏维（已实测坐实）：data/dimension-coverage.json 报 dimsTotal=45，而 src 实际 50 维度。差 5 个 = evidence/moral_foundations/dogwhistle/factual_consistency/sarcasm（不强制闸门动作的那 5 个，AGENTS.md 明说「scored but do not force a gate action」）。覆盖扫描只统计会触发动作的维度，漏的恰是无守护测试的 5 个。修法：给 dimension-coverage 扫描补上无动作维度口径，并确认这 5 个维度各自至少有 1 条测试样本。工作量：扫描器一处 + 最多 5 个测试样本，1-2 小时内可完成并有负例守卫支撑。',

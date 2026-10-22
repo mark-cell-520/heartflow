@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * scripts/round-681-docs.js
  * [r681] 文档口径同步（124→125、verify 83→84、tier 合计 113→114）+
@@ -7,7 +8,7 @@
  */
 const fs = require('fs');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 function edit(file, pairs) {
   const p = path.join(HF, file);

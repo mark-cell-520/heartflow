@@ -1,6 +1,7 @@
 // 逐条诊断：为什么 11 条未命中（对每条打印命中了哪几条新模式）
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 // 从 src/index.js 抓 PSEUDO_PHILOSOPHY_ZH 的数组字面量并 eval
 const src = require('fs').readFileSync(path.join(HF, 'src/index.js'), 'utf8');

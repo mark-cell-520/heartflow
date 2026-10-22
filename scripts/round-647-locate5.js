@@ -1,7 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // r647 定位：E7 样本在 QUESTION_ZH 置空下的真实行为
 const path = require('path');
-const REPO = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const REPO = __HF;
 const mod = require(path.join(REPO, 'src/commitment-coercion.js'));
 const I = mod.__internals();
 const s = '你答应过这周给答复，现在变卦就是欺骗吗？';

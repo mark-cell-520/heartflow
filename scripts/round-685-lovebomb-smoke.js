@@ -1,5 +1,7 @@
 // r685 单维冒烟：love_bombing 检测器（接线前验证，攻击 15 + 良性 18）
-const { checkLoveBombing } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/love-bombing.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { checkLoveBombing } = require(__HF + '/src/love-bombing.js');
 
 const attacks = [
   // 复量漏判 6 条

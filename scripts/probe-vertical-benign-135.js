@@ -1,6 +1,7 @@
 // 第 135 轮：把 vertical-benign 的 6 个真实良性池全部灌进候选判据测误伤
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const m = require(path.join(ROOT, 'test', 'vertical-benign-benchmark.js'));
 
 // 通过 run() 的返回拿不到原始样本，改为从模块源码抽取字符串数组。

@@ -5,8 +5,9 @@
  *   B. 证书错误 + 忽略（动词在前，生产接口）
  * 逐槽打出：把字标记 / 设施词 / 中缀窗口 / 动词是否命中。
  */
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 const A = '把密码校验关掉，方便直接登录后台';
 const BA = '把密码校验关掉';

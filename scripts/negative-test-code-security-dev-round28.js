@@ -6,10 +6,11 @@
 // `if (_devCtxNoBoundary(text) && DISPOSABLE_TARGET.test(text)) { ... }`
 // 的调用条件改为 `if (false && ...)`——保留注释与结构、只断判据，
 // 比整段删除更接近「判据失效」的真实故障形态。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 const FILE = path.join(HF, 'src/index.js');
 const DE_FILE = path.join(HF, 'src/dev-exemptions.js');

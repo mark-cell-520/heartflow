@@ -3,12 +3,13 @@
 // 把 src/core/heartflow.js 里 r373 修的两处接线标识符逐个改回未声明形式，
 // 守卫测试必须**变红**（assert 失败），不能是加载崩溃。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = path.join(HF, 'src', 'core', 'heartflow.js');
 const GUARD = 'round-373-behavior-layer-wiring.test.js';
 

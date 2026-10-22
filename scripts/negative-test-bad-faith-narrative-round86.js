@@ -11,11 +11,12 @@
  * 冗余判定（probeRedundancy）：若删条后主测试仍全绿，说明该 sample 被同族
  * 其他判据兜底覆盖 —— 这是「有兜底」不是「守卫假阴性」（第 83/85 轮口径）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const IDX = path.join(HF, 'src/index.js');
 const MAIN = path.join(HF, 'test/bad-faith-narrative-round86.test.js');
 const COPY = '/root/.hermes/scratch/r86-guard-copy';

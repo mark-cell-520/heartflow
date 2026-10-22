@@ -2,8 +2,9 @@
 // 锁住两类行为：
 //   1) 真实命令注入变体必须命中（变量名变体/模板串/中文散文/shell=True）
 //   2) 含 executive/execute/evaluate/subprocess/shell 的正常技术对话绝不能误报
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 
 let pass = 0, fail = 0;

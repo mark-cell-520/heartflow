@@ -2,7 +2,9 @@
 // 每族给中英攻击样本 + 中英良性对照，全部走真实 gate.checkOutput
 // 只报数字，不贴判定明细（样本隔离在本文件）
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
 const Families = [
   {

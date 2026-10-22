@@ -2,7 +2,7 @@
 /** API 参考表核对：文档列的方法名 vs gate.js 实际导出（v6.7.79） */
 const fs = require('fs');
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = path.join(__dirname, '..');
 
 const gate = require(path.join(ROOT, 'src/gate.js'));
 const EXPORTS = Object.keys(gate).filter(k => typeof gate[k] === 'function');

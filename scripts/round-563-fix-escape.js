@@ -1,9 +1,11 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // [r563] 修过度转义：源文件英文正则字符串字面量里写成了 4 个反斜杠（\\\\），
 // 字符串解析后得到 2 个反斜杠字符，正则匹配的是字面 \b 而非单词边界。
 // 把 LEDGER_EN / CLAIM_EN / GUARD_EN 三个常量段内的 4 反斜杠降为 2 反斜杠。
 const fs = require('fs');
-const p = '/root/.hermes/skills/ai/mark-heartflow-skill/src/favor-ledger.js';
+const p = __HF + '/src/favor-ledger.js';
 let s = fs.readFileSync(p, 'utf8');
 
 const NAMES = ['LEDGER_EN', 'CLAIM_EN', 'GUARD_EN'];

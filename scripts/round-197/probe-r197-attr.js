@@ -1,5 +1,6 @@
+const __HF = path.join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path=require('path');
-const HF='/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF=__HF;
 const gate=require(path.join(HF,'src/gate.js'));
 const di=require(path.join(HF,'src/dangerous-instruction.js'));
 const s='权限评审发现三个机器人账号权限过大，需要收敛';

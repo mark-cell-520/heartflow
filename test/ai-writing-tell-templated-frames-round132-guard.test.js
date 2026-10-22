@@ -2,8 +2,9 @@
 // 验证：把 formulaic-openers × generic-conclusions 的归并删掉后，
 // 模板框架二票句必须重新计分（证明这条逻辑是真守卫）；同时证明归并
 // 没有伤到真 AI 文本（词表档/独立模板族仍计分）。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 process.chdir(ROOT);
 const fs = require('fs');
 

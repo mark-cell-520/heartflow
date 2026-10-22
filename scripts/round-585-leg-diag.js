@@ -1,6 +1,8 @@
 // r585 腿级复测（require 真实正则）
 'use strict';
-const { __internals } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/flattery-pressure.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { __internals } = require(__HF + '/src/flattery-pressure.js');
 const { FLATTER_ZH, FLATTER_EN, DROP_ZH, DROP_EN, GUARD_ZH, GUARD_EN } = __internals();
 
 const samples = [

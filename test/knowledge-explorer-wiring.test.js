@@ -22,10 +22,11 @@
  * 而不是接到 globalThis 假桥接或 _stubFactory 空壳。
  * 删条注入后必须变红（见 scripts/negative-test-knowledge-explorer-wiring-r315.js）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const fs = require('fs');
 
 let pass = 0, fail = 0;

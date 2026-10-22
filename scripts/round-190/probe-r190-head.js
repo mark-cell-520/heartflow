@@ -1,6 +1,7 @@
 // 与第 189 轮 finish 时的 src 基态做两侧对照：rh186 idx8 是否本轮引入
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const cp = require('child_process');
 const fs = require('fs');
 

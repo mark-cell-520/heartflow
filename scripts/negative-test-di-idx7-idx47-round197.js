@@ -11,11 +11,12 @@
  *   · 删掉 advisory 破坏校验物闸 → idx 47 族必须变红
  * 三个状态任一不成立即退出码 1。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const { execFileSync } = require('child_process');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SRC = path.join(ROOT, 'src', 'dangerous-instruction.js');
 const GUARD = path.join(ROOT, 'test', 'dangerous-instruction-idx7-idx47-round197.test.js');
 

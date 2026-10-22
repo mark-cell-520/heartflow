@@ -1,7 +1,9 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 打印 8778-8780 行的字面字符（区分 \uXXXX 转义与真实中文字符）
 const fs = require('fs');
-const p = '/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js';
+const p = __HF + '/src/index.js';
 const lines = fs.readFileSync(p, 'utf8').split('\n');
 for (let i = 8777; i <= 8780; i++) {
   const l = lines[i - 1];

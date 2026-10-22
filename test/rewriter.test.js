@@ -1,8 +1,10 @@
 /**
  * rewriter.test.js — 改写引擎测试
  */
-const { discriminate } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
-const { rewrite } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/rewriter.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { discriminate } = require(__HF + '/src/index.js');
+const { rewrite } = require(__HF + '/src/rewriter.js');
 
 module.exports = ({ test, assertEqual, assertTrue }) => {
 

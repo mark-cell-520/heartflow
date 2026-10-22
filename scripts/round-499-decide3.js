@@ -2,7 +2,9 @@
 // （_scoreOption 契约：显式 feasibility/consequence_value/risk/confidence 优先于文本推断）
 // 候选为本轮实探测针 10 个真实缺口族，这里按「与已有维度重叠面 / 良性误伤面 / 可行性」排序。
 'use strict';
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 
 const opts = [
   {

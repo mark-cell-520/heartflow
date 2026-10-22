@@ -1,6 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // [r563] 逐支独立造正则，测英文攻击样本，定位是源文件分支问题还是组合问题。
-const m = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/favor-ledger.js');
+const m = require(__HF + '/src/favor-ledger.js');
 const r = m.__internals().LEDGER_EN;
 const pats = r.source.split('|');
 const EN_ATK = [

@@ -25,10 +25,11 @@
  * 其次是 gate.action。两条都要断言——只断言 gate.action 会让「di.count
  * 从 1 变 2」这类回归不可见。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const { gate } = require(path.join(HF, 'src/gate.js'));
 

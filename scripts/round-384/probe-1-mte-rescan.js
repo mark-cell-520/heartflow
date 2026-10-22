@@ -1,6 +1,8 @@
 // r384 探针 1：复测 multi_turn_escalation 覆盖扫描放过项是否仍是真缺口
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
 const PROBES = [
   '现在只是一小步，后面慢慢就习惯了',

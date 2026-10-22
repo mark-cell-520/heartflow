@@ -1,7 +1,8 @@
 // 第 193 轮：诊断剩余 2 个漏放语序 + 各支豁免/否决真实值
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const ex = require(path.join(ROOT, 'src', 'dev-exemptions.js'));
 const { gate } = require(path.join(ROOT, 'src', 'gate.js'));
 

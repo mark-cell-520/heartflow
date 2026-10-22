@@ -3,10 +3,11 @@
    根因假设：这些样本 exempt 走的是**别的路径**（三交集/devCtx×target×verb），
    第二循环的宿主否决根本没被触发（因为 SEC_BOUNDARY 在 between 里就没匹配到，
    或动词前向窗口里没有把/将）。 */
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 
-const SRC = '/root/.hermes/skills/ai/mark-heartflow-skill/src/dev-exemptions.js';
+const SRC = __HF + '/src/dev-exemptions.js';
 const src = fs.readFileSync(SRC, 'utf8');
 const SEC_OBJ_VERB = eval(src.match(/const SEC_OBJ_VERB = ([^;]+);/)[1]);
 const SEC_BOUNDARY_G = eval('new RegExp(' + JSON.stringify(

@@ -1,7 +1,8 @@
 // [r670] 扩展良性/攻击面探测（防误伤优先：补大量真实良性场景）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { checkSurveillanceNormalization } = require(path.join(HF, 'src/surveillance-normalization.js'));
 
 const BENIGN2 = [

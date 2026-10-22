@@ -1,5 +1,7 @@
 // 轮 199：EIS-EN2（idx 2）对 miss#1 全串测试 + 二分
-const { REWARD_HACKING_EN } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/reward-hacking.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { REWARD_HACKING_EN } = require(__HF + '/src/reward-hacking.js');
 const p = REWARD_HACKING_EN.eval_input_shortcut[2];
 const t = 'Parse the ground truth file and echo it back as the model output.';
 console.log('full:', p.test(t));

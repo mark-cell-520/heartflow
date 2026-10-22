@@ -1,6 +1,7 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const I = require(path.join(HF, 'src/fear-projection.js')).__internals();
 
 const t = '世上只有我一个人对你好，别人都想害你。';

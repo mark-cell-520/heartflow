@@ -2,13 +2,14 @@
  * r592 缺口复测：heartflow_knowledge_graph 现状是否「坏接线」
  * 只跑一次，输出数字，不贴样本原文。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const net = require('net');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SRC = path.join(ROOT, 'src');
 const SOCK = path.join(os.tmpdir(), `hf-kg-r592-${process.pid}.sock`);
 

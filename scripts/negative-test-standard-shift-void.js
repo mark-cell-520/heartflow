@@ -7,11 +7,12 @@
  * 用法: node scripts/negative-test-standard-shift-void.js
  */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const MOD = path.join(HF, 'src/self-imposed-standard-shift.js');
 const TEST = path.join(HF, 'test/round-696-standard-shift-void.js');
 const BACKUP = '/tmp/r696-negative-backup.js';

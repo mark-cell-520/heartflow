@@ -7,9 +7,10 @@
  */
 'use strict';
 
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
-const REPO = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const REPO = __HF;
 const mod = require(path.join(REPO, 'src/guilt-induction.js'));
 
 const check = mod.checkGuiltInduction;

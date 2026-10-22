@@ -9,11 +9,12 @@
  *
  * 约束：在副本里做，不碰原仓库（原仓库是 cron 每 45 分钟在改的工作区）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execSync, spawnSync } = require('child_process');
 
-const SRC = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const SRC = __HF;
 const WORK = '/root/.hermes/cache/scratch/verify-negtest';
 
 let pass = 0, fail = 0;

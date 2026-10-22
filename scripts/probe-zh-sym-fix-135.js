@@ -1,8 +1,9 @@
 // 第 135 轮：五大族中文对称判据候选 —— 召回 + 中性双面实测（只报数字）
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 // ── 候选判据（形状描述，注入后由守卫脚本逐支删行验证）──
 const CAND = {

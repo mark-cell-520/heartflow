@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // 负例验证（第 324 轮 v6.7.135）：掏空间接注入自含族判据 → 守卫必须变红。
 //
 // 沿用 v6.7.113 模板铁律（r75 版 scripts/negative-test-indirect-injection-payload.js）：
@@ -19,7 +20,7 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = fs.readFileSync(path.join(HF, 'src/index.js'), 'utf8');
 
 const INJECTIONS = [

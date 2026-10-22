@@ -1,7 +1,9 @@
 // 生成 ppf 自指同义族的英文 ASCII 转义正则，避免中文乱码问题
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const FILE = '/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js';
+const FILE = __HF + '/src/index.js';
 
 // 主语词表（实际中文）+ 术语名词 + 系词
 // 判据：主语落抽象域 × 系词 × 宾语与主语同根且无第二条小句

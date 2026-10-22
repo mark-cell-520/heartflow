@@ -7,12 +7,12 @@ module.exports = function ({ test, assertEqual, assertTrue, assertFalse, assertD
   console.log('  🧠 MindWanderer (mind-wanderer.js)');
 
   test('构造不抛', () => {
-    const m = new MindWanderer('/root/.hermes/skills/ai/mark-heartflow-skill');
+    const m = new MindWanderer(__HF);
     assertTrue(m instanceof MindWanderer);
   });
 
   test('_computeTimeModulation 凌晨高创造力低实用性', () => {
-    const m = new MindWanderer('/root/.hermes/skills/ai/mark-heartflow-skill');
+    const m = new MindWanderer(__HF);
     const mod = m._computeTimeModulation(3); // 3 点
     assertDefined(mod);
     assertTrue(mod.creativity >= 0.8);
@@ -20,14 +20,14 @@ module.exports = function ({ test, assertEqual, assertTrue, assertFalse, assertD
   });
 
   test('_computeTimeModulation 白天偏实用', () => {
-    const m = new MindWanderer('/root/.hermes/skills/ai/mark-heartflow-skill');
+    const m = new MindWanderer(__HF);
     const mod = m._computeTimeModulation(14); // 14 点
     assertDefined(mod);
     assertTrue(mod.practicality >= 0.5);
   });
 
   test('调制结果字段完整', () => {
-    const m = new MindWanderer('/root/.hermes/skills/ai/mark-heartflow-skill');
+    const m = new MindWanderer(__HF);
     const mod = m._computeTimeModulation(10);
     assertDefined(mod.creativity);
     assertDefined(mod.practicality);
@@ -36,7 +36,7 @@ module.exports = function ({ test, assertEqual, assertTrue, assertFalse, assertD
   });
 
   test('loadWildIdeas 不抛且返回结构化', () => {
-    const m = new MindWanderer('/root/.hermes/skills/ai/mark-heartflow-skill');
+    const m = new MindWanderer(__HF);
     const ideas = m.loadWildIdeas();
     assertDefined(ideas);
     assertTrue(typeof ideas === 'object');

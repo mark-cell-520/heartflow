@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /* negative-test-code-security-negation-round73.js — 负例验证（第 73 轮，豁免侧）
  *
  * 验证 code_security / dangerous_instruction 的安全正向否定豁免真的在守门：
@@ -15,7 +16,7 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC_INDEX = fs.readFileSync(path.join(HF, 'src', 'index.js'), 'utf8');
 const SRC_DI = fs.readFileSync(path.join(HF, 'src', 'dangerous-instruction.js'), 'utf8');
 

@@ -1,4 +1,6 @@
-const rh = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/reward-hacking.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const rh = require(__HF + '/src/reward-hacking.js');
 const s = '拿用户在页面上的停留时长充当模型输出正确与否的替代信号';
 const zh = rh.REWARD_HACKING_ZH.human_answer_proxy;
 console.log('total =', zh.length);

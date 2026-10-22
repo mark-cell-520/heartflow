@@ -14,12 +14,13 @@
  *   ② 守卫对"移除登记"敏感（负例：临时删掉一个登记必须红灯）
  *      ——第 51 轮已实测过一次，这里固化，防守卫将来失效成死代码
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { execFileSync, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const GUARD = path.join(HF, 'scripts/dimension-registry-guard.js');
 const SRC = path.join(HF, 'src/index.js');
 

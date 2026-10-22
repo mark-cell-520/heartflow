@@ -1,7 +1,9 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // round-287：TG-Z4b / DG-Z11b 是否真的在承接语序？逐字诊断
 const fs = require('fs');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = fs.readFileSync(HF + '/src/reward-hacking.js', 'utf8');
 
 const segTG = SRC.slice(SRC.indexOf('[v6.7.125 round-287] TG-Z4'), SRC.indexOf('[v6.7.125 round-287] TG-Z4') + 4000);

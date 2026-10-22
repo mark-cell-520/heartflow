@@ -1,7 +1,8 @@
 // 第 135 轮：最终判据集在对齐基线良性池上做误伤预检（只报数字）
 // 用 test/vertical-benign-benchmark.js + test/benign-mixed-benchmark.js 的真实良性池
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 
 const CAND = {
   human_answer_proxy: [

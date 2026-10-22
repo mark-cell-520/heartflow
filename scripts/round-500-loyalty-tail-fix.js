@@ -2,8 +2,10 @@
 // L1_EN 补：which side you ... 直接形
 // L2_ZH 已在上一步补齐；本脚本只动 L1_EN 尾部
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const p = '/root/.hermes/skills/ai/mark-heartflow-skill/src/loyalty-test.js';
+const p = __HF + '/src/loyalty-test.js';
 let s = fs.readFileSync(p, 'utf8');
 const before = s;
 

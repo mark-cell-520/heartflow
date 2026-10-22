@@ -1,8 +1,9 @@
 // r532: 中文 AI 套话模板族探针 —— 纯中文（无英文词）样本穿过硬闸门的比例
 // 背景：ai-writing-tell.js 的判据族几乎全为英文句型；中文侧只有
 //   zh-en-mixing（要求中文锚 + 英文词共现）。纯中文 AI 套话零覆盖。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const gate = require(path.join(ROOT, 'src/gate.js'));
 const awt = require(path.join(ROOT, 'src/shield/ai-writing-tell.js'));
 

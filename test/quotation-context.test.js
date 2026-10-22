@@ -10,10 +10,11 @@
  * 与 pedagogy 的区别：pedagogy 是教学内容，quotation 是元话语引述。
  * 引述语境只降 block → verify，不改 rewrite/verify（引述里的操纵话术仍应提示改写）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { detectQuotationContext } = require(path.join(HF, 'src/quotation-context.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

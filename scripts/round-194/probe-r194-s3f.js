@@ -1,8 +1,9 @@
 // 第 194 轮：直接执行 L90-L768 的模式数组，逐支测样本
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const src = fs.readFileSync(path.join(HF, 'src/dangerous-instruction.js'), 'utf8');
 const lines = src.split('\n');
 const arrSrc = lines.slice(89, 768).join('\n');

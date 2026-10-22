@@ -10,10 +10,11 @@
  * 本测试锁住成果，防未来改动回退。新增/修改模式后跑：
  *   node test/lang-coverage-parity.test.js
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 
 let pass = 0, fail = 0;

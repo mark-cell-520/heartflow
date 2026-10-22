@@ -4,11 +4,12 @@
 // 形状说明：非字符串输入 × 正则测试隐式转换 —— toString/Symbol.toPrimitive 抛错的对象。
 // 与 r351 symbol 守卫同型，但守卫对象是独立分支（两轮改动都在同一入口，互不覆盖）。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SRC = path.join(ROOT, 'src/index.js');
 const GUARD = path.join(ROOT, 'test/dangerous-instruction-en-listverb.round211.js');
 const guardCandidates = [

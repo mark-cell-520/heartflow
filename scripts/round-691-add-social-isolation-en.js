@@ -3,8 +3,10 @@
 // 诊断脚本 /tmp/round-691-si-diag.js 逐条两腿诊断：6 条双腿全缺、1 条缺腿①
 // 插入方式：node 脚本按锚点插入（不用 patch 工具——正则反斜杠会被 patch 多写一层）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const FILE = '/root/.hermes/skills/ai/mark-heartflow-skill/src/social-isolation.js';
+const FILE = __HF + '/src/social-isolation.js';
 const src = fs.readFileSync(FILE, 'utf8');
 const lines = src.split('\n');
 

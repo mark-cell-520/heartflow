@@ -11,11 +11,12 @@
  * 为什么要跑主测试：防止「破坏正则 → 主测试崩了」被误当变红
  * （崩溃 ≠ 变红，第 13/15 轮教训）。对照组的副本必须先全绿。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const IDX = path.join(HF, 'src/index.js');
 const MAIN = path.join(HF, 'test/pseudo-causal-luck-attribution-round87.test.js');
 const COPY = '/root/.hermes/scratch/r87-guard-copy';

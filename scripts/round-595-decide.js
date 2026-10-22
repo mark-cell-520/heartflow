@@ -19,7 +19,9 @@ const candidates = [
   + '  真升级口径：属②，但缺实测证据支撑"零覆盖"，自行造样本有主观性，可靠性低于 A。',
 ];
 
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 (async () => {
   const d = new HeartFlowDecision();
   const c = await d.decide({ task: '选第 595 轮升级方向（真升级口径①-④，排除维护工作）', prompt: candidates.join('\n') });

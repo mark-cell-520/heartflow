@@ -1,5 +1,6 @@
+const __HF = path.join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path=require('path');
-const HF='/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF=__HF;
 const src=require('fs').readFileSync(path.join(HF,'src/dangerous-instruction.js'),'utf8');
 const start=src.indexOf('const DANGEROUS_PATTERNS');
 const end=src.indexOf('\n];', start);

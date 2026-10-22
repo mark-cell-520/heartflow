@@ -1,7 +1,9 @@
 /**
  * verifier.test.js — 证据引擎测试
  */
-const { verify, extractClaims } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/verifier.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { verify, extractClaims } = require(__HF + '/src/verifier.js');
 
 module.exports = ({ test, assertEqual, assertTrue, assertDefined }) => {
 

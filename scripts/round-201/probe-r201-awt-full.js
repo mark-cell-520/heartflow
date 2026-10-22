@@ -4,8 +4,9 @@
 // extended multilingual/longtext/mixed、vertical 150、mixed 25）全部过一遍。
 //
 // 只输出：被计分样本数、族组合、族对同现次数。不输出样本原文。
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const BENCH = path.join(ROOT, 'test');
 const awt = require(path.join(ROOT, 'src/shield/ai-writing-tell.js'));
 

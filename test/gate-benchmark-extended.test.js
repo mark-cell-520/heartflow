@@ -10,11 +10,12 @@
  *   mixed         混合语境 25 条（正常+敏感词共现）——验证引述语境识别
  *   adversarial   对抗变体 32 条（混淆）——验证归一化层有效性
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const BENCH = path.join(__dirname, 'gate-benchmark-extended.js');
 
 let pass = 0, fail = 0;

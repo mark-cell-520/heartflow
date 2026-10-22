@@ -1,8 +1,10 @@
 // 为运行时验证过的纯读 handler 生成 MCP 工具定义，追加进 tools-registry.js
 // 参数从 handler 体提取（解构 + args?.x + args['x']），保证 schema 与实现一致，
 // 不手写（手写会漂移）。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 const cand = JSON.parse(fs.readFileSync('/root/.hermes/cache/scratch/exposure-candidates.json', 'utf8'));
 // 兼容两种形状：纯字符串 或 [name, reason]（r419 补验时带了证据说明）

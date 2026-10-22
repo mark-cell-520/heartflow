@@ -1,7 +1,9 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // round-287：验证 4 个 anchor 在源码新块内的唯一性与可定位性
 const fs = require('fs');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = fs.readFileSync(HF + '/src/reward-hacking.js', 'utf8');
 
 const BLOCK_START = Math.max(

@@ -1,5 +1,7 @@
 /** [round-286] decision 引擎选方向——三候选，均带实测证据 */
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 
 const prompt = [
   '[A] 复测维度覆盖缺口：data/dimension-coverage.json 只报 dimsTotal=45，而 AGENTS.md/README 宣称 50 维度。差异 5 个维度是谁、为何未被覆盖扫描纳入（未测=0 说明扫描口径本身可能漏维）。收益：覆盖扫描口径若漏维，等于 5 个维度无守护测试。',

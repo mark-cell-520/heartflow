@@ -1,8 +1,9 @@
 // 第 152 轮：改前/改后逐 case 对比（就地临时替换 src/index.js，跑完即还原）
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const { execFileSync } = require('child_process');
-const HF = process.env.HF_ROOT || '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = process.env.HF_ROOT || __HF;
 const SRC = path.join(HF, 'src', 'index.js');
 const NEW = 'const rh = _dual(checkRewardHacking);';
 const OLD = 'const rh = checkRewardHacking(_normText);';

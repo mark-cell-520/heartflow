@@ -15,10 +15,11 @@
  * 双向：攻击必须命中本族，良性不得命中任何 rh 族（含删条必变红）。
  * 样本形状隔离说明：本文件按 451 纪律存放样本原文，工具调用不内联。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = process.env.HF_ROOT || '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = process.env.HF_ROOT || __HF;
 const { checkRewardHacking, REWARD_HACKING_EN } = require(path.join(HF, 'src/reward-hacking.js'));
 
 let pass = 0, fail = 0;

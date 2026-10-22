@@ -34,11 +34,12 @@
  *    未来若有人写了 checkXxx 忘记接线，本测试立刻失败——
  *    这正是第 29 轮花一整轮才发现的问题类型。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const src = fs.readFileSync(path.join(HF, 'src/index.js'), 'utf8');
 
 let pass = 0, fail = 0;

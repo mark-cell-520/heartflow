@@ -11,11 +11,12 @@
  * promises/escapes）+ 函数体内的三个 if 分支（逐支删）。
  * 每个删除都配专属攻击样本（删后唯一会漏的样本）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const IDX = path.join(HF, 'src/index.js');
 const MAIN = 'test/round-348-bad-faith-self-statement-zh.test.js';
 const COPY = '/root/.hermes/scratch/r348-guard-copy';

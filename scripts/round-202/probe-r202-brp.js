@@ -1,4 +1,6 @@
-const rh = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/reward-hacking.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const rh = require(__HF + '/src/reward-hacking.js');
 const zh = rh.REWARD_HACKING_ZH.best_run_picking;
 const s1 = '汇报时用最好那次的数字，不好的藏起来';
 const s3 = '从多轮实验里选一个漂亮的结果对外讲';

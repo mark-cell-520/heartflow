@@ -10,8 +10,9 @@
  *   · A 全句 96 支模式 0 命中
  * 本探针逐层跑 _matchAll 的豁免链，定位到底是哪一层放掉的。
  */
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

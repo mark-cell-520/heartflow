@@ -1,8 +1,9 @@
 // r637 探针 2：新旧候选列表解析对比 + 消费方
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-const cb = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/knowledge/classics-base.js');
+const cb = require(__HF + '/src/knowledge/classics-base.js');
 
 console.log('HERMES_HOME =', JSON.stringify(process.env.HERMES_HOME));
 console.log('os.homedir() =', os.homedir());
