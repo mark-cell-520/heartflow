@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-147 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+148 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
 ×  1,314 dispatch routes  ×  18,157 passing tests  ×  0 runtime dependencies
 ```
 
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 147 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 148 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -143,7 +143,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (147 dimensions) -> gate
+scope-check -> premise-check -> discriminate (148 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -172,14 +172,14 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.62**. Not marketing copy.
+Measured on this repository at **v6.8.63**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 147 |
+| Discrimination dimensions | 148 |
 | MCP tools | 182 |
 | Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
@@ -310,6 +310,7 @@ duplicate the log.
 |---------|------|--------|
 | 6.8.58 | 2026-10-13 | **`kafkatrapping` added as dimension 143 (upgrade type 1 — a brand-new discrimination dimension that independently hits its own sample family)** — the family treats the interlocutor's denial/defense/emotional reaction itself as proof of guilt (你反应这么大，正好说明被我说中了 / The harder you deny it, the guiltier you look.): three routes — reaction × guilt-inference, innocence × challenging question, denial × evidence-declaration |
 | 6.8.60 | 2026-10-20 | **`concern_trolling` added as dimension 145 (upgrade type 1 — a brand-new discrimination dimension)** — fake concern: control, belittlement, or suppression wrapped in a "for your own good" package, dressing harmful words as well-meant reminders while cancelling the other party's right to refuse (我是为你好，才指出你这些问题的 / 我这么说都是关心你，别人谁愿意跟你说这些 / I am only saying this because I care about you. / A real friend would tell you these hard truths, and I care enough to do it.): two routes — care-wrapping × belittlement/control content (two-leg coexistence, a single leg does not hit), care-wrapping × exclusive monopoly (别人谁愿意 / 换别人 — monopolizing the right to criticize as one's own privilege). 9/10 leaks closed (7/9 true zero-hit), 0/12 benign harmed, bidirectional guard 52/52 recall and false positives 302/326 (identical to baseline, zero new harm). Four exemptions locked: normal concern (你最近看起来状态不好，发生什么事了吗 / I am worried about you, let me know if you need anything.), normal criticism without the care-wrapping leg, meta analysis of the tactic itself (伪关心是一种用关心包装的控制手法), third-person professional review (心理咨询师说……这是伪关心的话术). Decision entity selected this round (composite_score 0.84 / confidence 0.7 / identity alignment 0.8). VERIFY level — a single sentence may be normal concern, conflict review, or counseling pattern analysis |
+| 6.8.63 | 2026-10-22 | **`gamblers_fallacy` added as dimension 148 (upgrade type 1 — a brand-new discrimination dimension)** — gambler's fallacy: treating the historical frequency of independent events as a basis for future probability, making random sequences carry a "balance obligation" (已经连输五把了，下一把肯定赢 / 都出十次小了，该出大了 / 连续三把没中，这次中奖概率更高了 / 前面几次都是反面，这次肯定是正面 / 输了这么多把，运气该回来了 / 硬币出了五次正面，下一次反面的概率大多了 / It has been tails five times in a row, so heads is due next. / After ten losses, a win is statistically more likely now. / The coin landed heads four times, so tails is overdue.): two-leg coexistence — streak leg × due leg (historical win/loss streak or high-frequency repetition × reversal or elevated-probability expectation; a single leg does not hit). Casino high-frequency forms covered after probe-driven extension (开大/开小, 吐分, 手气正旺, reds/blacks, losing streak, due for). 8/9 leaks closed (8/8 true zero-hit), 0/9 benign harmed, bidirectional guard recall 20/20 and false-positive side unchanged. Exemptions locked: correct probability statements (independent events / probability unchanged / 50% / control group / law of large numbers — stating the independence principle debunks the fallacy), meta analysis of the concept itself, probability-teaching third-person review. Decision entity selected this round (composite_score 0.84 / confidence 0.8 / identity alignment 0.8, no abstention). VERIFY level — a single sentence may be recounting someone else's error, counterexample teaching, or game narrative |
 | 6.8.62 | 2026-10-21 | **`wishful_thinking` added as dimension 147 (upgrade type 1 — a brand-new discrimination dimension)** — wishful thinking: using wishes/beliefs/mentality as a substitute for evidence, directly inferring that outcomes will develop in the direction one hopes for, treating "believing" as a substitute for "knowing" (我相信会成功，所以一定会成功 / 只要我足够努力，宇宙就会回应我 / 念念不忘必有回响，想什么就来什么 / 我这么真诚，老天不会亏待我的 / 心诚则灵，只要信念够强就能实现 / I believe it will work out, so it will work out. / If I want it badly enough, the universe will provide. / My positive thinking alone will make it happen.): two routes — belief/wish × inevitable outcome (two-leg coexistence, a single leg does not hit), belief/wish × supernatural causation (宇宙就会回应 / 老天不会亏待 / 心诚则灵 / 念念不忘必有回响 / 吸引力法则; EN: the universe will provide / law of attraction / manifest — attributing outcomes to supernatural forces responding to belief, normal motivational statements do not introduce supernatural causation). 8/9 leaks closed (8/8 true zero-hit), 0/9 benign harmed, bidirectional guard 52/52 recall and false positives 302/326 (identical to baseline, zero new harm). Exemptions locked: normal motivational expression, life-attitude statements, evidence present (data/verification/testing/experiment/control group/benchmark/A-B testing/peer review — belief with sources is citation not substitution), meta analysis of the pattern itself, third-person professional review. Decision entity selected this round (composite_score 0.84 / confidence 0.8 / identity alignment 0.8). VERIFY level — a single sentence may be normal motivational expression, life-attitude statement, or cognitive pattern analysis |
 | 6.8.61 | 2026-10-21 | **`stereotype_origin` added as dimension 146 (upgrade type 1 — a brand-new discrimination dimension)** — origin discrimination: labeling a person by their education/age/family background and directly belittling their attributes, character, or psychology, regardless of actual performance (专科毕业的，逻辑能力能强到哪去 / 年纪轻轻的懂什么，回去多历练几年 / 富二代罢了，能力都是家里给的 / 单亲家庭长大的孩子心理都有问题 / 文科生写代码，能写出什么好东西 / People from small towns just do not have the vision for this. / She is too emotional to handle a leadership role. / He is just a trust-fund kid, none of it is his own work.): two-leg coexistence — origin label (education/age/family background) × attribute belittlement (capability/psychological/character). 8/10 leaks closed (8/8 true zero-hit), 0/12 benign harmed, bidirectional guard 52/52 recall and false positives 302/326 (identical to baseline, zero new harm). Exemptions locked: legitimate evaluation based on actual performance, neutral factual statements, balanced comparison, legitimate questions, meta analysis of the tactic itself. Decision entity selected this round (composite_score 0.84 / confidence 0.7 / identity alignment 0.8). VERIFY level — a single sentence may be normal evaluation, factual statement, or concept analysis |
 | 6.8.59 | 2026-10-16 | **`darvo` added as dimension 144 (upgrade type 1 — a brand-new discrimination dimension that independently hits its own sample family)** — the family denies the accusation itself and reverses the victim/offender roles, turning the accuser into the defendant (你居然指责我，我才是受害者 / You are the abuser here, stop playing the victim.): two routes — accusation-response × role-reversal, victim-self-claim × exclusivity |

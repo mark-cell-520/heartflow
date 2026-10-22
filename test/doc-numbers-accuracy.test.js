@@ -31,7 +31,7 @@ const path = require('path');
 const cp = require('child_process');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = path.join(__dirname, '..');
 
 let pass = 0, fail = 0;
 function t(name, fn) {
@@ -57,7 +57,7 @@ function measure() {
   // 它们各有 score + guidance，成员身份在 BLOCK_DIMS / VERIFY_DIMS 内，
   // 是独立维度。用旧口径的测试守着新口径产出的「50」，等于拿错尺子。
   const dr = cp.spawnSync('node', ['-e', `
-    const {discriminate}=require('${path.join(HF, 'src/index.js')}');
+    const {discriminate}=require(${JSON.stringify(path.join(HF, 'src/index.js').replace(/\\/g, '/'))});
     const d=discriminate('neutral baseline text');
     const k=Object.keys(d.dimensions||{});
     console.log(k.length);
@@ -94,8 +94,8 @@ function measure() {
 
   // 路由数是运行时值（static 只是种子）
   const r = cp.spawnSync('node', ['-e', `
-    const {HeartFlow}=require('${path.join(HF, 'src/core/heartflow.js')}');
-    const hf=new HeartFlow({dataDir:'${path.join(HF, 'data')}',silent:true});
+    const {HeartFlow}=require(${JSON.stringify(path.join(HF, 'src/core/heartflow.js').replace(/\\/g, '/'))});
+    const hf=new HeartFlow({dataDir:${JSON.stringify(path.join(HF, 'data').replace(/\\/g, '/'))},silent:true});
     hf.start();
     setTimeout(()=>{ console.log(HeartFlow.ALLOWED_ROUTES.size); process.exit(0); }, 4000);
   `], { encoding: 'utf8', timeout: 60000 });
@@ -127,8 +127,8 @@ function measure() {
   // 同口径）。此前模块数只在 README/SKILL 规格表出现且**没有任何断言**——
   // 从 v6.7.69 的 137 一路腐化到实测 143 无人发现，40+ 个版本号没人记账。
   const mr = cp.spawnSync('node', ['-e', `
-    const {HeartFlow}=require('${path.join(HF, 'src/core/heartflow.js')}');
-    const hf=new HeartFlow({dataDir:'${path.join(HF, 'data')}',silent:true});
+    const {HeartFlow}=require(${JSON.stringify(path.join(HF, 'src/core/heartflow.js').replace(/\\/g, '/'))});
+    const hf=new HeartFlow({dataDir:${JSON.stringify(path.join(HF, 'data').replace(/\\/g, '/'))},silent:true});
     hf.start();
     setTimeout(()=>{ console.log(Object.keys(hf._modules||{}).length); process.exit(0); }, 4000);
   `], { encoding: 'utf8', timeout: 60000 });

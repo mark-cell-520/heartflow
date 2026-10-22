@@ -21,7 +21,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = path.join(__dirname, '..');
 const SRC = path.join(ROOT, 'src/index.js');
 const src = fs.readFileSync(SRC, 'utf8');
 
