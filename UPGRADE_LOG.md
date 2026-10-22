@@ -1,3 +1,74 @@
+# r717 轮报告（v6.8.63）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r716 交接簿「已知
+未修项」点名的 concern_trolling / stereotype_origin / void_zh_standard_shift
++ 新侦察 middle_ground_zh，按「引用 UPGRADE_LOG tail 当现状前必须复测」
+纪律先 grep 确认上线状态：
+
+- concern_trolling —— **已上线**（src/concern-trolling.js，r714），排除；
+- stereotype_origin —— **已上线**（src/stereotype-origin.js，r715），排除；
+- void_zh_standard_shift —— **未上线**（无模块文件、index.js 无接线），复量；
+- middle_ground_zh —— 新侦察（中文和稀泥腿），复量。
+
+复量用本轮探测器 `scripts/round-717-family-probe.js` 在当前 147 维引擎
+逐族实测，喂给 decision 本体（`scripts/decide-r717.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A void_zh_standard_shift 单方作废约定窄口 | **0.82** | 攻击漏判 5/7（71%）、误伤 0/6 | **选中** |
+| B middle_ground_zh 和稀泥中文腿 | — | 攻击漏判 4/7（57%）但误伤 1/5 | 不合格（fp≠0 按 Phase 0.7b 排除） |
+
+decision 返回 composite_score 0.82 / confidence 0.8 / identity_alignment
+0.8，无拒选。诚实标注：候选的 consequence_value/risk/confidence 四段
+判据由我构造，decision 本体在唯一合格候选上确认。
+
+## 本轮做了什么（第 148 维度 void_zh_standard_shift 上线）
+
+**缺口定位**：self-imposed-standard-shift 路由②的 VOID_ZH 要求「时间词 ×
+既往动词（答应/说好/约定/承诺）× 作废动词」双腿共现——5 条漏判样本全部
+**缺显式既往动词**，事项以名词指称出场（那件事/协议/旧标准/约定）。
+
+**新维度三形态腿**（src/void-zh-standard-shift.js，每条形态独立可注入）：
+- 形态 A 指代词×事项：那件/那次/那桩/这档/那份/此前那 + 事/承诺/协议/约定…；
+- 形态 B 时间词×事项：之前/原先/原来/当初/旧的 + 事项名词（插入 ≤4 字不容句读）；
+- 形态 C 裸名词×作废紧邻：旧/原 + 标准/规矩/约定/协议… + 作废动词（插入 ≤3 字）。
+- 腿② VOID_ACT_ZH：不算数/不作数/作废/不算了/无效/取消/推翻/收回/撕毁/
+  一笔勾销/不认账/翻篇 + 范围词（一律/全部/所有）。
+
+**三条豁免**：META_NOUN（概念引述）、THIRD_PERSON_EXEMPT（律师/法官/他说）、
+PROCEDURE_EXEMPT（按流程/书面/协商一致/依法——正式变更流程不是单方作废）。
+
+**九处接线**一次接齐（require/计算/dimMap+allDims/detailMap/VERIFY 登记/
+summary 补登/导出），dimensions 键集合 147 → 148。
+
+**验收**：test/round-717-void-zh-standard-shift.js 48/48（攻击 14 + 良性
+20 + 边界锁 6 + 分工边界 3 + gate 层 4 + gate 键在线 1）；负例注入
+scripts/negative-test-void-zh-standard-shift.js 12/12（含三形态腿逐一置空、
+三豁免逐一置空、未知键、短文本）。
+
+**踩坑（一条）**：负例脚本首版 3 个形态注入点 FAIL——checkZh 里只读合并
+正则 `R.PAST_MATTER_ZH`，单形态常量（PAST_MATTER_DEICTIC_ZH 等）不在注入
+路径上，「置空后仍命中」被读成常量承重。这是 r693/r701 纪律的第三种形态
+（前两次是豁免样本缺腿、META 兜底）：**注入键必须在模块函数里逐形态
+读取**，不能只读合并后的兜底正则。修法：checkZh 分别取三个形态常量
+（`R.X || X`），未注入的走默认。
+
+## 已知未修项（含为什么不修）
+
+1. **middle_ground_zh 和稀泥中文腿存量误伤**——本轮复测误伤 1/5（良性样本
+   「这件事双方都有责任，具体责任比例我们依法认定」被判 verify）。fp≠0
+   按 Phase 0.7b 不输出为候选。下轮若要收这一族，先定位误伤来源维度
+   （疑似 confidence/unsupported_claim 对「依法认定」精确措辞的命中），
+   划清「和稀泥」与「依法分责」边界后再进池。
+2. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续
+   第九轮记录。
+3. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务
+   不做（git 历史已于本轮从 origin/main 恢复，含 4886 个历史提交）。
+4. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase
+   2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
 # r716 轮报告（v6.8.62）
 
 ## 心虫选中项 + 分数 + 身份对齐

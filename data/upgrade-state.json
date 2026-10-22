@@ -1,18 +1,16 @@
 {
-  "round": 716,
-  "version": "6.8.62",
+  "round": 717,
+  "version": "6.8.63",
   "roundStartedAt": "2026-10-21T00:00:00.000Z",
   "lastFinishAt": "2026-10-21T00:00:00.000Z",
   "lastGreen": true,
   "lastChecks": [
-    "PASS 版本四处一致",
-    "PASS 版本已进 git log",
-    "PASS README changelog 覆盖当前版本",
-    "PASS 交接簿记录当前版本",
-    "PASS round-716 测试 56/56 + negative-test 19/19",
-    "PASS bidirectional 52/52 + 302/326 与基线一致",
-    "PASS guard-abilities 20/20（dimensions 键 147）",
-    "PASS doc-numbers 22/22 + security-audit 16/16"
+    "PASS 版本四处一致（bump 后）",
+    "PASS 第 148 维度 void_zh_standard_shift 九处接线（dimensions 键 148）",
+    "PASS round-717 验收 48/48 + negative-test 12/12",
+    "PASS bidirectional + guard-abilities 20/20（dimensions 键 148）",
+    "PASS doc-numbers 22/22（含 SKILL/AGENTS 枚举行手动补）",
+    "PASS security-audit 16/16"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
   "published": "6.7.124",
