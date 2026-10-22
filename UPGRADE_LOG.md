@@ -1,3 +1,68 @@
+# r718 轮报告（v6.8.64）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r717 交接簿「已知
+未修项」点名的 appeal_to_majority（下轮首选）+ void_zh_standard_shift
++ post_hoc + special_pleading 存量误伤，按「引用 UPGRADE_LOG tail 当
+现状前必须复测」纪律用本轮探测器
+`scripts/round-718-family-probe.js` 在当前引擎（v6.8.63，148 维）
+逐族复测，喂给 decision 本体（`scripts/decide-r718.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A appeal_to_majority 诉诸多数新维度 | **0.83** | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | **选中** |
+| B void_zh_standard_shift 契约作废窄口补形 | 0.80 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| C post_hoc 后此谬误新维度 | 0.80 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选 |
+| （复测出局）special_pleading 特殊辩护 | — | 攻击漏判 9/9（100%）但误伤 1/9 | 不合格（fp≠0 按 Phase 0.7b 纪律；焦点样本「特殊情况需要特批，但要走正规流程」本轮复测仍被存量维度判 rewrite，连续第三轮记录） |
+
+decision 返回 composite_score 0.83 / confidence 0.8 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在三个合格候选间
+选出 A。**预区分判据生效**：A 与 B 漏判率打平 67%/67%，按「新维度
+vs 存量补形」和身份对齐度细化 consequence_value（0.82 vs 0.72）
+后 decision 本体直接选出 A，未出现 r716 式弃权。身份对齐依据：
+诉诸多数是「用票数替代论证」的核心认知偏差形态——辨别者的天职
+就是区分「人数」和「论证」。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/appeal-to-majority.js`（第 149 维度，双腿判据：多数/流行度表达×人数收束结论，三豁免：有出处人数陈述/元话语/逻辑教学第三人称） | 「大家都这么认为，肯定是对的」类话术现在会被 gate 判 verify 并给出「把对不对落到证据上」的指引 | **真升级①**（新辨别维度上线） |
+| 高频形态补支路（十个人里有九个/widely accepted/popular opinion says/millions of fans/most experts agree/他不火谁火/还能有假）——首轮测试 8 个 MISS 暴露后补的真实缺口 | 拉踩/带货/网暴语境的中英文攻击样本全部命中 | 真升级①的组成部分（判据射程） |
+| 九处接线（require/计算点/allDims/dimensions×2/DIM_GUIDANCE/VERIFY_DIMS/summary/exports） | 维度键 148→149，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+
+## 验收数字
+
+- 轮测试 `test/round-718-appeal-to-majority.js`：**56/56 通过**（攻击 20 + 良性 21 + 边界锁 8 + 分工边界 2 + gate 层 5；首轮 48/56，补支路 + 换分工样本后全过）
+- 负例注入 `scripts/negative-test-appeal-to-majority.js`：**17/17 通过**（基线 8 + 常量注入 4 + 豁免注入 3 + 未知键 1 + internals 覆盖 1）
+- `node bin/verify.js`：16/16
+- `node scripts/bidirectional-guard.js`：召回侧 unchanged、误拦侧 74/77 pass（96.1%），双向门禁通过（Windows 副本口径）
+- `node scripts/guard-abilities.js`：20/20（dimensions 键 149）
+- `node test/doc-numbers-accuracy.test.js`：22/22
+- `node test/security-audit.test.js`：见提交后复验
+- `node scripts/round-guard.js --stage=after`：见文末复跑记录
+
+## 已知未修项（含为什么不修）
+
+1. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.80）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r696 起遗留（已 23 轮），作废词表补变体即可，但样本面 9 条最小。下轮首选。
+2. **post_hoc 后此谬误**——decision 落选（0.80）。攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9；r715/r716/r717/r718 四连续落选，与 pseudo_causal 语域相邻。
+3. **special_pleading 特殊辩护存量误伤**——本轮复测确认「特殊情况需要特批，但要走正规流程」仍被存量维度判 rewrite（fp=1/9），按 Phase 0.7b 纪律不输出为候选；连续第三轮记录，值得单独一轮修存量豁免。
+4. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十三轮记录。
+5. **31+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+6. **data/test-count.json 记账自锁**——按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **首轮测试 8 个 MISS 集中在拉踩/带货高频形态**：首版 MAJORITY/CONCLUSION 只覆盖「大家都/肯定是对的」教科书形态，「十个人里有九个说好，这还能有假」「widely accepted, therefore it has to be right」「millions of fans cannot be wrong」「most experts agree」全漏。修法：MAJORITY_ZH 补比例词（十个人/九成/过半/半数/乡亲们/粉丝）与「都在X」族，CONCLUSION_ZH 补反问收束（还能有假/有什么可怀疑/他不火谁火），EN 两侧补 commonly accepted / widely held / most experts agree / so he must be / has to be。教训：与 r717 赌场形态同构——语域的高频变体要靠候选样本实测逼出来，首版「最小覆盖」必然有缺口，这是测试的价值不是造假。
+2. **分工边界样本第二次选错（锁空气）**：DIVISION-2 首版用「这款产品好评如潮，用户评价都是编出来的」，实测 gate=pass——存量维度也不判，断言锁的是空气。修法：换「这款产品上线三天就有十万条五星好评，一看就是刷出来的」（存量 synthetic_social_proof 判 verify，apm 不命中）。教训：r717 已踩过一次（statistical_misleading 样本放行），本轮又栽在同类句式上——分工样本落笔前必须**先实测 gate action**，「应该被认领」的语域直觉不可靠。
+3. **round-guard 在 Windows 需要 stdin 关闭**：`node scripts/round-guard.js --stage=before` 直接跑报 "stdin is not a tty"（脚本内部有 readline 交互），加 `< /dev/null` 即过。教训：Windows 副本跑门禁脚本统一加重定向，与 r717 的路径坑并列为本副本两条环境惯例。
+
+## round-guard [after] 复跑
+
+（三连提交后复跑，结果见 git log 与文末状态）
+
 # r717 轮报告（v6.8.63）
 
 ## 心虫选中项 + 分数 + 身份对齐
