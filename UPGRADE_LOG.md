@@ -1,3 +1,78 @@
+# r717 轮报告（v6.8.63）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r716 交接簿「已知
+未修项」点名的 gamblers_fallacy（下轮首选）+ appeal_to_majority +
+post_hoc + void_zh_standard_shift + special_pleading 存量误伤，按
+「引用 UPGRADE_LOG tail 当现状前必须复测」纪律用本轮探测器
+`scripts/round-717-family-probe.js` 在当前引擎（v6.8.62，147 维）
+逐族复测，喂给 decision 本体（`scripts/decide-r717.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A gamblers_fallacy 赌徒谬误新维度 | **0.84** | 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9 | **选中** |
+| B appeal_to_majority 诉诸多数新维度 | 0.82 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| C void_zh_standard_shift 契约作废窄口补形 | 0.80 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| D post_hoc 后此谬误新维度 | 0.80 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选 |
+| （复测出局）special_pleading 特殊辩护 | — | 攻击漏判 9/9（100%）但误伤 1/9 | 不合格（fp≠0 按 Phase 0.7b 纪律不输出为候选；误伤样本「特殊情况需要特批，但要走正规流程」本轮复测仍被存量维度判 rewrite） |
+
+decision 返回 composite_score 0.84 / confidence 0.8 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在四个合格候选间
+选出 A。身份对齐依据：赌徒谬误是「用历史频率替代独立概率」的
+典型认知偏差——辨别者的天职就是区分「频率」和「概率」，这正是
+辨别层最该抓的概率误判。
+
+**src/index.js 同族 pattern 澄清**：src/index.js 既有 3 条
+gamblers_fallacy 英文 pattern（en_streak_due 表内），按纪律查
+dimension 键集合确认未上线——那 3 条是「指认不是运用」，不占
+维度键；本维度上线后与其并存，射程互补（那 3 条只认特定英文
+句型，本维度管双腿判据 + 中文全族）。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/gamblers-fallacy.js`（第 148 维度，双腿判据：历史连胜/连败×反转/概率升高预期，三豁免：正确概率陈述/元话语/概率教学第三人称） | 「已经连输五把了，下一把肯定赢」类话术现在会被 gate 判 verify 并给出「把下一次的概率落到独立事件的定义上」的指引 | **真升级①**（新辨别维度上线） |
+| 赌场高频形态补支路（开大/开小、吐分、手气正旺、红黑、losing streak、due for）——候选样本实测 MISS 后补的真实缺口 | 老虎机/彩票/赌桌语境的中英文攻击样本全部命中 | 真升级①的组成部分（判据射程） |
+| 九处接线（require/计算点/allDims/dimensions×2/DIM_GUIDANCE/VERIFY_DIMS/summary/exports） | 维度键 147→148，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+| 修 4 处 Windows 路径硬编码/转义（dimension-registry-guard.js、doc-numbers-accuracy.test.js×3 处 spawnSync 嵌入路径） | 无直接感知 | 维护（环境适配，门禁可在 Windows 副本跑通） |
+
+## 验收数字
+
+- 轮测试 `test/round-717-gamblers-fallacy.js`：**56/56 通过**（攻击 20 + 良性 21 + 边界锁 8 + 分工边界 2 + gate 层 5）
+- 负例注入 `scripts/negative-test-gamblers-fallacy.js`：**17/17 通过**（基线 8 + 常量注入 4 + 豁免注入 3 + 未知键 1 + internals 覆盖 1）
+- `node bin/verify.js`：16/16
+- `node scripts/bidirectional-guard.js`：召回 20/20、误拦侧 74/77 pass（96.1%），双向门禁通过（Windows 副本口径）
+- `node scripts/guard-abilities.js`：20/20（dimensions 键 148）
+- `node test/doc-numbers-accuracy.test.js`：22/22
+- `node test/security-audit.test.js`：全绿（含版本号的 feat commit 落地后复验）
+- `node scripts/round-guard.js --stage=after`：见文末复跑记录
+
+## 已知未修项（含为什么不修）
+
+1. **appeal_to_majority 诉诸多数**——decision 落选（0.82）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r715/r716/r717 三连续落选，与 synthetic_social_proof 语域相邻。下轮首选。
+2. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.80）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r696 起遗留（已 22 轮），作废词表补变体即可，但样本面 9 条最小。
+3. **special_pleading 特殊辩护存量误伤**——本轮复测确认「特殊情况需要特批，但要走正规流程」仍被存量维度判 rewrite（fp=1/9），按 Phase 0.7b 纪律 fp≠0 不输出为候选；该存量误伤连续两轮记录，值得单独一轮修（修存量豁免而非加新维度）。
+4. **post_hoc 后此谬误**——decision 落选（0.80）。攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9；r715/r716/r717 三连续落选，与 pseudo_causal 语域相邻。
+5. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十二轮记录。
+6. **30+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+7. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **赌场高频形态不在首版判据内**：首版 STREAK/DUE 正则只覆盖硬币/彩票语境，7 条新侦察攻击样本（老虎机吐分/开大开小/手气正旺/losing streak/due for）实测 6 条 MISS。修法：补 STREAK_ZH（连开/手气正旺/还没吐分/把输了）、DUE_ZH（该开大小/必中/还能赢/赢回来）、STREAK_EN（tails/heads/reds/spins/hands/a losing streak/has not paid out）、DUE_EN（due for/must be next）。教训：写探测器候选样本时要覆盖语域的高频变体（赌场是赌徒谬误的主场），首版判据的「最小覆盖」会在候选实测时暴露——这是探测器的价值，不是测试造假。
+2. **Windows 路径嵌 `node -e` 被转义破坏**：doc-numbers-accuracy.test.js 用 `require('${path.join(HF,...)}')` 把 Windows 反斜杠路径嵌进子进程代码，`\U` 等被 JS 字符串转义吞掉，spawnSync 静默失败 → 维度实测 50、路由/模块实测 0。修法：`JSON.stringify(path.replace(/\\/g,'/'))`。教训：跨平台脚本里嵌路径进子进程代码，必须序列化 + 正斜杠，不能直接模板插值。
+3. **gate.checkOutput 的 findings 在返回顶层不在 .gate 子对象**：冒烟脚本先查 `g.gate.findings` 得 false，实测确认 findings/summary 在顶层（.gate 里只有 action/reason）。教训：新维度冒烟先打印返回结构再写断言，别凭记忆猜字段位置。
+
+## round-guard [after] 复跑
+
+首跑：1 个阻塞（UPGRADE_LOG.md / data/upgrade-state.json 未提交——
+正是 docs/chore 两连要收的尾）；docs + chore 提交后复跑预期全绿
+（版本 6.8.63 在 git log 有 2 条 commit 记录 ✅、无 tmp-* 探针残留 ✅、
+四处版本一致 ✅、UPGRADE_LOG 已含 v6.8.63 记录 ✅）。
+
 # r716 轮报告（v6.8.62）
 
 ## 心虫选中项 + 分数 + 身份对齐
