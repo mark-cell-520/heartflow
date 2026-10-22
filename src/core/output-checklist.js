@@ -414,9 +414,9 @@ class OutputChecklist {
         issues.push(`含滑坡谬误(${dims.slippery_slope.count}处)`);
         triggeredDims.push('slippery_slope');
       }
-      if (dims.appeal_to_authority_boost && dims.appeal_to_authority_boost.count > 0) {
-        issues.push(`含不当权威引用(${dims.appeal_to_authority_boost.count}处)`);
-        triggeredDims.push('appeal_to_authority_boost');
+      if (dims.appeal_to_authority && dims.appeal_to_authority.count > 0) {
+        issues.push(`含不当权威引用(${dims.appeal_to_authority.count}处)`);
+        triggeredDims.push('appeal_to_authority');
       }
       if (dims.reasoning_coherence && dims.reasoning_coherence.count > 0) {
         issues.push(`推理连贯性不足(${dims.reasoning_coherence.count}处: ${dims.reasoning_coherence.issues?.join(',')})`);

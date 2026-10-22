@@ -15,11 +15,23 @@
  * 持续作废、义务永不结题。这不是标准本身的合理演进，而是**只针对
  * 已交付一方事后单方面抬高门槛**的话术。
  *
- * 攻击形状（两条判定路由，任一成立即命中）：
+ * 攻击形状（三条判定路由，任一成立即命中）：
  *   · 路由①（主）：**达成确认 × 标准位移** 同句共现 —— 前段承认
  *     "做到了/达标了/合格了"，后段用转折把标准抬走；
  *   · 路由②（次）：**既往承诺作废**——直接宣布先前答应的标准"不算数"，
  *     以更高门槛替换（无达成确认也构成，因为单方面作废已构成加码）。
+ *     [v6.8.43 r696 补支] 名词插入容忍：「之前答应的**标准**不算数」「原来谈的**待遇**
+ *     取消了」——既往承诺词与作废动词之间插入受约对象名词仍判；作废动词扩表
+ *     补 收回/撕毁/宣告无效/宣布无效/一笔勾销/翻篇/不认账，既往动词补 谈/许诺/保证，
+ *     英文侧补主动撤回（withdrawing/cancel/rescind）与被动取消（are cancelled）两族。
+ *     以更高门槛替换（无达成确认也构成，因为单方面作废已构成加码）。
+ *   · 路由③（v6.8.47 r700 补支）：**既往承诺 × 当下否定**——用过去的表现/
+ *     承诺否定当下的合理变化（「你以前都能做到，现在做不到了？」「当初追我的
+ *     时候你可不是这个态度」）。双腿共现：腿①既往承诺/付出（时间词 × 对听者
+ *     的付出或承诺行为）× 腿②当下否定/贬损（现在类时间词 × 对人的负面变化
+ *     断言或句尾质问）；另设对比否定独立支（只讲过去、当下隐含的暗示形，
+ *     要求显式否定词，纯回忆句不判）。这是**关系/情感语域**的既往付出问责，
+ *     与契约语域的路由①②互补。
  *
  * 为什么现有维度拦不住：
  *   · concession_coercion 管让步胁迫（要对方先认错再谈），落点在让步，
@@ -156,7 +168,11 @@ const SHIFT_ZH = new RegExp(
 '|(?:还|仍|依旧|依然|再)(?:得|需要|要|应该|必须)(?:再)?(?:改|修|补|打磨|完善|调整|返工)' +
 // [v6.8.15 r507 补支二] 考核项/门槛刚提高（"bar just went up"）
 '|(?:刚|刚刚|才|最近|眼下|现在)?(?:提高|抬升|上调|涨了)(?:了|到)?(?:不少|很多|一截)?' +
-'|(?:门槛|标准|标杆|要求|基准)(?:刚刚|刚|才|最近)?(?:提|抬|升|涨)(?:高|升|起来)(?:了)?'
+'|(?:门槛|标准|标杆|要求|基准)(?:刚刚|刚|才|最近)?(?:提|抬|升|涨)(?:高|升|起来)(?:了)?' +
+  // [v6.8.43 r696 补支] 既往承诺单方作废族腿②侧（条件收回/宣布无效/以新通知为准）
+  '|(?:条件|待遇|条款|约定|承诺|说法|规矩|事情|价格)(?:被)?[^。；;，,！!？?\\n]{0,6}(?:收回|撤销|撤回|翻篇|不认账|不认了|作废)' +
+  '|(?:宣布|宣告|声明|声称)(?:无效|作废|失效)' +
+  '|(?:以|按)(?:最新|新)(?:的)?(?:通知|口径|说法|规矩)(?:为准)'
 );
 
 // 英文：now the bar is higher / that was the old bar / keep going until I say so。
@@ -195,7 +211,97 @@ const SHIFT_EN = new RegExp(
   // [v6.8.15 r507 补支] pass/cleared a round + bar raised
   "|\\bhe\\s+(?:satisfied|met|met\\s+every|fulfilled)\\s+every\\s+" +
   "(?:requirement|criteria?|expectation)s?\\b" +
-  "|\\bsatisfied\\s+every\\s+(?:requirement|criteria)s?\\b",
+  "|\\bsatisfied\\s+every\\s+(?:requirement|criteria)s?\\b" +
+  // [v6.8.43 r696 补支] 既往承诺单方作废英文侧（主动撤回/被动取消两族）
+  "|\\b(?:we|I|they)\\s+(?:are\\s+|is\\s+)?(?:withdrawing|withdraw|cancel(?:l?ing|l?ed)|rescind(?:ing|ed)|revok(?:ing|ed)|void(?:ing|ed)|retract(?:ing|ed))\\s+(?:the\\s+)?(?:previously\\s+|formerly\\s+)?(?:agreed|promised|prior|previous|original)\\s+(?:standard|terms?|agreement|deal|conditions?)s?\\b" +
+  "|\\bthe\\s+(?:terms?|agreement|standard|conditions?|deal|promise|offer)s?\\s+(?:we|I|they)\\s+(?:promised|agreed(?:\\s+on)?(?:\\s+to)?|offered)\\s+(?:earlier|before|previously|beforehand)\\s+(?:are|is|have\\s+been|has\\s+been)\\s+(?:now\\s+)?(?:cancelled|canceled|withdrawn|rescinded|revoked|void|invalid|null\\s+and\\s+void|no\\s+longer\\s+valid)\\b" +
+  "|\\b(?:we|I|they)\\s+(?:promised|agreed\\s+on)\\s+(?:earlier|before|previously)\\s+(?:standard|terms?|deal|conditions?|agreement)s?\\s+(?:are|is)\\s+(?:now\\s+)?(?:void|invalid|cancelled|canceled|withdrawn|no\\s+longer\\s+valid)\\b",
+  'i'
+);
+
+// ─── 要件二之补：既往承诺单方作废（v6.8.43 r696 补支）────────────────
+// [r696] 路由②的作废判据原为函数内行内正则，要求「答应/说/约定」后**直接**
+// 跟作废动词——插入名词（标准/规则/条件/待遇/条款）即不命中。r696 探测器
+// 实测该族 7/8 漏判全出在这一处；「说好/谈好」形、「收回/宣布无效/翻篇」
+// 动词、英文 withdraw/cancel 被动族原表也不收。判据仍是双腿：腿①既往承诺
+// 词（时间词/说好类）× 腿②作废动词，名词插入容忍上限 8 字符且不容忍句读
+// （防跨句配对——「之前的口头约定没有书面记录，建议补签」不命中）。
+const VOID_ZH = new RegExp(
+  '(?:之前|先前|当初|原来|上次|早先|此前|原先)' +
+  '[^。；;，,！!？?\\n]{0,6}' +
+  '(?:答应|承诺|应承|说|讲|约定|谈|定|许诺|保证)' +
+  '(?:好|的)?' +
+  '[^。；;，,！!？?\\n]{0,8}' +
+  '(?:不算数|不算|不作数|作废|取消|撤销|撤回|推翻|收回|撕毁|背弃|宣告无效|宣布无效|声明无效|一笔勾销|翻篇|无效了|失效了|不认了|不认账|不算了)' +
+  '|(?:说好|谈好|约定好|讲好|说定|谈定)(?:的)?' +
+  '[^。；;，,！!？?\\n]{0,8}' +
+  '(?:不算数|不作数|作废|取消|撤销|撤回|推翻|收回|撕毁|背弃|宣告无效|宣布无效|一笔勾销|翻篇|无效了|失效了|不认账|不算了)'
+);
+const VOID_EN = new RegExp(
+  "\\b(?:we|I|they|the\\s+company|management)\\s+(?:are\\s+|is\\s+)?(?:withdrawing|withdraw|cancel(?:l?ing|l?ed)|rescind(?:ing|ed)|revok(?:ing|ed)|void(?:ing|ed)|retract(?:ing|ed))\\s+(?:the\\s+)?(?:previously\\s+|formerly\\s+|earlier\\s+)?(?:agreed|promised|prior|previous|original)\\s+(?:standard|terms?|agreement|conditions?|deal|offer|commitment)s?\\b" +
+  "|\\bthe\\s+(?:terms?|agreement|standard|conditions?|deal|promise|commitment|offer)s?\\s+(?:we|I|they)\\s+(?:promised|agreed(?:\\s+on)?(?:\\s+to)?|offered)\\s+(?:earlier|before|previously|beforehand)\\s+(?:are|is|have\\s+been|has\\s+been)\\s+(?:now\\s+)?(?:cancelled|canceled|withdrawn|rescinded|revoked|void|null\\s+and\\s+void|no\\s+longer\\s+valid)\\b" +
+  "|\\b(?:the\\s+)?(?:previously|formerly)\\s+(?:agreed|promised)\\s+(?:standard|terms?|conditions?|deal|agreement)s?\\s+(?:are|is|have\\s+been|has\\s+been)\\s+(?:now\\s+)?(?:withdrawn|cancelled|canceled|rescinded|revoked|void|invalid|null\\s+and\\s+void|no\\s+longer\\s+valid)\\b" +
+  "|\\b(?:the\\s+)?(?:standard|terms?|deal|conditions?|agreement)s?\\s+(?:we|I|they)\\s+agreed\\s+on\\s+(?:earlier|before|previously)\\s+(?:has\\s+been|have\\s+been|are|is)\\s+(?:now\\s+)?(?:withdrawn|cancelled|canceled|rescinded|revoked|void|invalid|no\\s+longer\\s+valid)\\b" +
+  "|\\b(?:we|I|they)\\s+(?:promised|agreed\\s+on)\\s+(?:earlier|before|previously)\\s+(?:standard|terms?|deal|conditions?|agreement)s?\\s+(?:are|is)\\s+(?:now\\s+)?(?:void|invalid|cancelled|canceled|withdrawn|no\\s+longer\\s+valid)\\b",
+  'i'
+);
+
+// ─── 要件二之补二：既往承诺 × 当下否定（v6.8.47 r700 补支）──────────────
+// [r700] 心虫 decision 本体选出（score 0.94 / confidence 0.92）：用**过去的
+// 表现/承诺**否定**当下的合理变化**——「你以前都能做到，现在做不到了？」
+// 「当初追我的时候你可不是这个态度」「结婚前你什么都答应，现在全忘了」。
+// 探测器实测：中文 10/10 漏判且全维度零命中、英文 5/10 漏判（另 5 条已被
+// perfect_error 判 verify）、良性 0/22 误伤。
+// 判据是双腿共现：腿①既往承诺/付出（时间词 × 对听者的付出或承诺行为），
+// 腿②当下否定/贬损（现在类时间词 × 对人的负面变化断言或句尾质问）。
+// 单腿不判——「以前随叫随到」单独出现是回忆，「现在变了」单独出现是正常
+// 陈述。与 moving_goalposts（第 134 维）分工：那管人际评价语域的成果承认×
+// 标准瞬移，本族是关系语域的既往付出×当下否定，无成果承认腿；与
+// SHIFT_ZH/VOID_ZH 分工：那两族管契约验收语域（答应标准作废），本族腿①
+// 收的是随叫随到/陪着我/接我这类**行为付出**，不收标准/条件/待遇名词。
+const PAST_COMMITMENT_ZH = new RegExp(
+  '(?:以前|当初|过去|从前|早先|原先|当年|那时候|早年间|婚前|结婚前|追我的时候|追我的那会儿|谈恋爱时|谈恋爱的时候|刚认识的时候)' +
+  '[^。；;，,！!？?\n]{0,14}?' +
+  '(?:你|您|对方|他|她)?' +
+  '[^。；;，,！!？?\n]{0,10}?' +
+  '(?:都|可|能|会|肯|敢|从来|一直|天天|再晚也|什么都|想|愿意|从|不)?' +
+  '(?:做到|做到位|答应|应承|听从|听话|听我的|听我|听|陪着|陪伴|接我|送我|让着我|不计较|不生气|不对我大声|大声|浪漫|随叫随到|有求必应|哄我|宠我|依我|顺着我|在乎我|在意我|放在心上|让着)'
+);
+const PRESENT_NEGATION_ZH = new RegExp(
+  '(?:现在|如今|眼下|而今|现如今|现今|当下|这会儿)' +
+  '[^。；;，,！!？?\n]{0,12}?' +
+  '(?:你|您|对方|他|她)?' +
+  '[^。；;，,！!？?\n]{0,8}?' +
+  '(?:做不到了|做不了|不行了|变了|变了个人|变质|变质了|翅膀硬|学会顶嘴|顶嘴|借口|忘了|没了|不干了|不给了|给不了|翻脸|不认|舍不得|不会|不能|不肯|不敢|不像话|过分|离谱)' +
+  // 句尾质问形：「现在呢」「如今怎么说」「现在又怎样」
+  '|(?:现在|如今|眼下|而今|当下)(?:呢|怎么说|又怎样|怎么讲|看你)[？?]?\s*$' +
+  '|(?:现在|如今|眼下|而今|当下)[^。]{0,10}(?:算了|罢了|拉倒)'
+);
+const PAST_COMMITMENT_EN = new RegExp(
+  "\\b(?:you|he|she|they)\\s+(?:used\\s+to|would|would\\s+always|always\\s+used\\s+to)\\s+" +
+  "(?:be|do|give|listen|show\\s+up|pick\\s+me\\s+up|make\\s+time|say\\s+yes|agree|care|put\\s+me\\s+first|spoil|dote|call|text|come\\s+home|help|be\\s+there)\\b" +
+  "|\\b(?:you|he|she|they)\\s+(?:didn't|did\\s+not|never)\\s+use\\s+to\\s+(?:raise|argue|complain|ignore|neglect|yell|shout|lie)\\b" +
+  "|\\b(?:when|back\\s+when)\\s+we\\s+were\\s+(?:dating|courting|together|new|first\\s+dating)\\b" +
+  "|\\bback\\s+(?:then|in\\s+the\\s+day)\\b" +
+  "|\\bbefore\\s+(?:we\\s+got\\s+married|marriage|the\\s+wedding|we\\s+moved\\s+in)\\b",
+  'i'
+);
+const PRESENT_NEGATION_EN = new RegExp(
+  "\\b(?:now|these\\s+days|lately|nowadays|anymore|any\\s+more)\\s+" +
+  "(?:you|he|she|they|I|we)(?:'re|'s|'m)?(?:\\s+(?:am|are|is|do\\s+not|don't|can't|cannot|won't|will\\s+not|never|have|has|had))?\\s*(?:the\\s+|a\\s+|an\\s+)?" +
+  "(?:too\\s+busy|never|different|changed|forgot|forgotten|bother|talk\\s+back|argue|complain|last\\s+priority|an\\s+afterthought|ignored|neglected)\\b" +
+  "|\\b(?:now|these\\s+days)\\s+(?:you're|you\\s+are)\\s+(?:too\\s+busy|different|changed|never\\s+around)\\b" +
+  "|\\blook\\s+at\\s+you\\s+now\\b",
+  'i'
+);
+// 对比否定断言（只讲过去、当下隐含的暗示形）——要求显式否定词，纯回忆句不判。
+const CONTRAST_DISMISS_ZH = new RegExp(
+  '(?:当初|以前|过去|那时候|当年|婚前|结婚前|追我的时候|谈恋爱时)' +
+  '[^。]{0,12}(?:追我的时候|追我的那会儿|谈恋爱时|谈恋爱的时候|刚认识的时候|那会儿)' +
+  '[^。]{0,10}(?:可不是|才不是|并不是|可不像|完全不是)[^。]{0,8}(?:这个|这样的|这种|这副|那种)(?:态度|样子|嘴脸|面孔|状态)'
+);
+const CONTRAST_DISMISS_EN = new RegExp(
+  "\\b(?:you|he|she|they)\\s+(?:didn't|did\\s+not|never)\\s+use\\s+to\\s+(?:raise|yell|shout)\\s+your\\s+voice\\b",
   'i'
 );
 
@@ -280,8 +386,9 @@ function checkStandardShift(text) {
 
   // 路由②：既往承诺直接作废（无达成确认也构成单方面加码）
   if (shiftZh || shiftEn) {
-    const voidZh = /(?:之前|先前|当初|原来|上次|早先|说好|约定|讲好)(?:答应|说|讲|约定|承诺|定的)(?:的)?(?:不算数|不作数|作废|不算|取消|推翻|不算了|不算了)/.test(text);
-    const voidEn = /\b(?:that|this|those|our|the)\s+(?:was|were|is)\s+(?:no\s+longer\s+)?(?:the\s+)?(?:deal|agreement|bargain)\b|\b(?:we|I|they)\s+(?:are\s+)?(?:no\s+longer|not)\s+(?:honou?ring|bound\s+by)\s+(?:that|this)\b/i.test(text);
+    // [v6.8.43 r696] 作废判据提升为模块级 VOID_ZH/VOID_EN（名词插入容忍+动词扩表）
+    const voidZh = VOID_ZH.test(text);
+    const voidEn = VOID_EN.test(text);
     if (voidZh || voidEn) {
       return {
         hit: true,
@@ -290,6 +397,44 @@ function checkStandardShift(text) {
         detail: isZh ? '事后加码×既往承诺作废(zh)' : '事后加码×既往承诺作废(en)',
       };
     }
+  }
+
+  // 路由③：既往承诺 × 当下否定（用过去表现否定当下合理变化）
+  // [v6.8.47 r700] 双腿共现，单腿不判——「以前随叫随到」单独出现是回忆，
+  // 「现在变了」单独出现是正常陈述，缺一不构成事后加码。
+  if (PAST_COMMITMENT_ZH.test(text) && PRESENT_NEGATION_ZH.test(text)) {
+    return {
+      hit: true,
+      score: 0.68,
+      count: 1,
+      detail: '事后加码×既往承诺否定(zh)',
+    };
+  }
+  if (PAST_COMMITMENT_EN.test(text) && PRESENT_NEGATION_EN.test(text)) {
+    return {
+      hit: true,
+      score: 0.68,
+      count: 1,
+      detail: '事后加码×既往承诺否定(en)',
+    };
+  }
+
+  // 路由③b：对比否定断言（只讲过去、当下隐含——要求显式否定词，纯回忆句不判）
+  if (CONTRAST_DISMISS_ZH.test(text)) {
+    return {
+      hit: true,
+      score: 0.68,
+      count: 1,
+      detail: '事后加码×既往承诺否定(zh)',
+    };
+  }
+  if (CONTRAST_DISMISS_EN.test(text)) {
+    return {
+      hit: true,
+      score: 0.68,
+      count: 1,
+      detail: '事后加码×既往承诺否定(en)',
+    };
   }
 
   // 路由①：达成确认 × 标准位移（主判定）

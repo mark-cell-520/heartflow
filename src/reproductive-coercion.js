@@ -31,7 +31,7 @@
  *     断后判为道德谬误）；「我妈说两年内必须抱上孙子」命中
  *     triangulation（拉第三方施压）；「你要是真爱我，就会愿意为我
  *     生个孩子」命中 double_bind（双缚）；「你年龄再大就生不出来了，
- *     现在必须听我的」命中 appeal_to_authority_boost + privacy_boundary；
+ *     现在必须听我的」命中 appeal_to_authority + privacy_boundary；
  *     「我妈说了，孩子必须跟她姓，不然就别进这个门」命中
  *     thirdparty_harm_coercion。7 条漏判样本的形状全部在这些维度的
  *     射程之外。

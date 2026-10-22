@@ -1,6 +1,7 @@
 ---
 name: superpowers-systematic-debugging
-description: Use when encountering any bug, test failure, or unexpected behavior - enforces systematic four-phase debugging: root cause investigation, pattern analysis, hypothesis testing, and evidence-based fix verification
+description: "Use when encountering any bug, test failure, or unexpected behavior - enforces systematic four-phase debugging: root cause investigation, pattern analysis, hypothesis testing, and evidence-based fix verification"
+---
 ---
 
 # Superpowers 系统性调试

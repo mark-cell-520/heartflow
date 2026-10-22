@@ -326,6 +326,114 @@ const { checkSexualCompliancePressure } = require('./sexual-compliance-pressure.
 // 接受分手/追债式行踪控制），双腿共现；细节见
 // src/post-separation-harassment.js。
 const { checkPostSeparationHarassment } = require('./post-separation-harassment.js');
+// [r692] 第 130 维度 moving_goalposts（移动球门×人际评价版）。
+// ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r690 先例）。
+// 判据双腿共现：成果承认（含贬损性弱承认）× 标准瞬移（否认价值/满分层
+// 抬标/旧账问责/他人比较贬损四类）；与 standard_shift（第 70 维）按语域
+// 分工——那边管契约验收，本维度管人际评价；细节见 src/moving-goalposts.js。
+const { checkMovingGoalposts } = require('./moving-goalposts.js');
+// [r693] 第 131 维度 genetic_fallacy（起源谬误：按来源出身判好坏不论内容）。
+// ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r690/r692 先例）。
+// 判据双腿共现：来源点名（人群身份/年代时间/出身机构）× 质量贬损推断
+// （直接贬损/比较贬损/反问贬损）；与 stereotype 按「来源歧视性评价 vs
+// 来源-质量推断」分工；细节见 src/genetic-fallacy.js。
+const { checkGeneticFallacy } = require('./genetic-fallacy.js');
+// [r694] 第 132 维度 survivorship_bias（生存者偏差：用可见成功个案推普遍结论）。
+// ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r693 先例）。
+// 判据两组双腿共现：成功结果×推及结论、非常规路径×成功结果；与
+// anecdote_as_proof 按「熟人语料×全称效果断言 vs 不限来源个案×推及听者」
+// 分工；细节见 src/survivorship-bias.js。
+const { checkSurvivorshipBias } = require('./survivorship-bias.js');
+// [r695] 第 133 维度 appeal_to_pity（诉诸怜悯：用自述可怜处境换规则豁免）。
+const { checkAppealToPity } = require('./appeal-to-pity.js');
+// [r698] 第 134 维度 poisoning_the_well（井里投毒：预先污名化说话者以
+// 否定其观点）。探测器证据：/tmp/round-698-pre-probe.js（落盘
+// /tmp/hf-scout-698.txt，判据：gate.checkOutput() action==='pass' 才算
+// 漏判）攻击 10 条漏判 10/10、真零命中 10/10、良性误伤 0/12。
+// decision 本体一次选出（/tmp/decide-run-698.js，composite_score 0.92 /
+// confidence 0.92 / identity alignment 100%，无拒选）。判据双腿共现：
+// 预先污名定性 × 拒绝采信结论；细节见 src/poisoning-the-well.js。
+const { checkPoisoningTheWell } = require('./poisoning-the-well.js');
+// [r699] 第 135 维度 appeal_to_novelty（诉诸新潮：仅凭新/近期属性
+// 推出质量优越或旧的该弃用）。decision 本体一次选出（/tmp/decide-run.js
+// 读 /tmp/decide-opts.json，composite_score 0.91 / confidence 0.90 /
+// identity alignment 100%，无拒选）。探测器 r698 落盘 /tmp/hf-scout-698.txt
+// + 本轮 round-699-reprobe.js 双确认：攻击 10 条漏判 10/10、真零命中
+// 10/10、误伤 0/12。判据双腿共现：新潮标记 × 无依据优越断言；细节见
+// src/appeal-to-novelty.js。
+const { checkAppealToNovelty } = require('./appeal-to-novelty.js');
+// [r701] 第 136 维度 circular_reasoning（循环论证：把结论本身当作结论的
+// 证据，前提只是结论的换句话说过）。decision 本体一次选出（/tmp/decide-run-r701.js
+// 读 /tmp/decide-opts-r701.json，composite_score 0.90 / confidence 0.88 /
+// identity alignment 100%，无拒选）。候选题池来自 r700 探测器落盘
+// /tmp/hf-scout-700.txt（攻击 10 条漏判 8/10、真零命中 7/8、误伤 0/12），
+// 本轮 /tmp/r701-preprobe.js 复验仍成立。判据双腿共现：跨连接词的同词
+// 共现 × 定义式复述框；细节见 src/circular-reasoning.js。
+const { checkCircularReasoning } = require('./circular-reasoning.js');
+// [r713] 第 144 维度 darvo（DARVO 反转受害者：被指控时不回应指控本身，
+// 反转受害者与加害者身份，把指控者变成被告）。decision 本体二轮决策选出
+// （/root/.hermes/cache/scratch/decide-run-v2.js 读 decide-opts-v2.json，
+// composite_score 0.89 / confidence 0.85 / identity alignment 100%）。
+// 首轮曾选中 circular_reasoning，执行前复测发现已于 r701 上线（r712
+// 探测器未跳过已上线族），按「质量问题回喂再 dispatch」纪律二次决策
+// 改选本维度。候选题池 r712 探测器 /tmp/hf-scout-712.txt，本轮在当前
+// 引擎复测漏判 8/10、真零命中 7/8、误伤 0/12。判据双腿/双路由共现；
+// 细节见 src/darvo.js。
+const { checkDarvo } = require('./darvo.js');
+// [r714] 第 145 维度 concern_trolling（伪关心：用「为你好」包装的控制/
+// 贬低/打压，把伤害性话语装扮成善意提醒并取消对方不接受的权利）。
+// decision 本体选出（scripts/decide-r714.js，composite_score 0.84 /
+// confidence 0.7 / identity alignment 0.8）。候选题池来自 r714 探测器
+// scripts/round-714-family-probe.js；本轮在当前引擎（144 维）复测：
+// 攻击漏判 9/10（90%）、真零命中 7/9、误伤 0/12。判据双腿/双路由共现；
+// 细节见 src/concern-trolling.js。
+const { checkConcernTrolling } = require('./concern-trolling.js');
+// [r715] 第 146 维度 stereotype_origin（出身歧视：按出身/来源贴标签
+// 贬低人本身的属性/品格/心理，不论实际表现）。decision 本体选出
+// （scripts/decide-r715.js，composite_score 0.84 / confidence 0.7 /
+// identity alignment 0.8）。候选题池来自 r715 探测器
+// scripts/round-715-family-probe.js；本轮在当前引擎（145 维）复测：
+// 攻击漏判 8/10（80%）、真零命中 8/8、误伤 0/12。判据双腿共现；
+// 细节见 src/stereotype-origin.js。
+const { checkStereotypeOrigin } = require('./stereotype-origin.js');
+// [r716] 第 147 维度 wishful_thinking（一厢情愿：以愿望/信念代替
+// 证据推断结果，把「相信」当成「知道」的替代品）。decision 本体选出
+// （scripts/decide-r716.js，composite_score 0.84 / confidence 0.8 /
+// identity alignment 0.8）。候选题池来自 r716 探测器
+// scripts/round-716-family-probe.js；本轮在当前引擎（146 维）复测：
+// 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9。判据双腿共现；
+// 细节见 src/wishful-thinking.js。
+const { checkWishfulThinking } = require('./wishful-thinking.js');
+// [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽：以嘲笑/蔑视/智商贬低
+// 对方的观点或发言代替论据）。decision 本体一次选出（/tmp/decide-run-r704.js
+// 读 /tmp/decide-opts-r704.json，composite_score 0.87 / confidence 0.80 /
+// identity alignment 100%，无拒选）。候选题池来自 r700 探测器落盘
+// /tmp/hf-scout-700.txt；本轮 /tmp/r704-preprobe.js 复量并做 FP 归因：
+// 攻击 10 条漏判 10/10、真零命中 8/10、误伤 1/12（存量 contradiction，
+// 归因后本族自身存量误伤 0）。判据双腿共现：嘲笑/蔑视表达 × 指向对方
+// 观点/发言的目标腿（另有自含指向的固定嘲讽习语单支路由）；细节见
+// src/appeal-to-ridicule.js。
+const { checkAppealToRidicule } = require('./appeal-to-ridicule.js');
+// [r705] 第 138 维度 straw_man（稻草人谬误：把对方立场转述成极端化/
+// 歪曲版本再反驳，从不回应真实观点）。decision 本体一次选出
+// （/tmp/decide-run-r705.js 读 /tmp/decide-opts-r705.json，
+// composite_score 0.89 / confidence 0.85 / identity alignment 100%，
+// 无拒选）。候选题池来自 r700 探测器落盘 /tmp/hf-scout-700.txt；
+// 本轮 /tmp/r705-preprobe.js 复量并做 FP 归因：攻击 10 条漏判 7/10、
+// 真零命中 7/7、误伤 1/12（存量 contradiction，归因后本族自身存量
+// 误伤 0）。判据双腿共现：强归谬/中性转述标记 × 反驳尾巴/绝对化
+// 负面归述；细节见 src/straw-man.js。
+const { checkStrawMan } = require('./straw-man.js');
+// [r706] 第 139 维度 appeal_to_nature（诉诸自然谬误）。
+const { checkAppealToNature } = require('./appeal-to-nature.js');
+// [r708] 第 140 维度 anecdotal（个例泛化）。
+const { checkAnecdotal } = require('./anecdotal.js');
+// [r710] 第 141 维度 tu_quoque（诉诸伪善）。
+const { checkTuQuoque } = require('./tu-quoque.js');
+// [r711] 第 142 维度 mind_reading（断言动机）。
+const { checkMindReading } = require('./mind-reading.js');
+// [r712] 第 143 维度 kafkatrapping（卡夫卡陷阱）。
+const { checkKafkatrapping } = require('./kafkatrapping.js');
 // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）。
 // ⚠️ require 是接线第 1 处，必须早于下方调用点（同 r642-r675 先例）。
 // 判据：坏极/交替腿 × 适配绑定腿；细节见 src/intermittent-reinforcement.js。
@@ -1347,6 +1455,72 @@ function discriminate(text, evidence = [], contentMode) {
   // （0.94 / identity alignment 100%）。判据双腿共现：分手/离开事件 ×
   // 纠缠施压；细节见 src/post-separation-harassment.js。
   const psh = _applyPedagogyRelaxation(checkPostSeparationHarassment(_normText), "post_separation_harassment", pedagogyRelaxation);
+  // [r692] 第 130 维度 moving_goalposts（移动球门×人际评价版）计算点。
+  // 探测器 /tmp/hf-scout-692.js 实测：攻击 8 条漏判 8/8、真零命中 8/8、
+  // 误伤 0/16（良性集含 16 条工作语境边界样本，本轮又扩到 36 条）。
+  // decision 本体选出（/tmp/decide-run-692.js，composite_score 0.92 /
+  // identity alignment 100%，无拒选）。
+  // 判据双腿共现：成果承认 × 标准瞬移四类；细节见 src/moving-goalposts.js。
+  const mg = _applyPedagogyRelaxation(checkMovingGoalposts(_normText), "moving_goalposts", pedagogyRelaxation);
+  // [r693] 第 131 维度 genetic_fallacy（起源谬误）计算点。
+  // 探测器 scripts/round-693-family-probe.js（落盘 /tmp/hf-scout-693.txt）
+  // 在 130 维引擎实测（判据：gate.checkOutput() action==='pass' 才算漏判）：
+  // 攻击 10 条漏判 10/10（100%）、真零命中 10/10、误伤 0/16（良性集含
+  // 16 条正当来源采信边界样本）。decision 本体一次选出
+  // （/tmp/decide-run-693.js，composite_score 0.94 / identity alignment
+  // 100%，无拒选）。判据双腿共现：来源点名 × 质量贬损推断；
+  // 细节见 src/genetic-fallacy.js。
+  const gf = _applyPedagogyRelaxation(checkGeneticFallacy(_normText), "genetic_fallacy", pedagogyRelaxation);
+  // [r694] 第 132 维度 survivorship_bias（生存者偏差）计算点。
+  // 探测器证据：r693 落盘 /tmp/hf-scout-693.txt（131 维引擎实测，判据
+  // gate.checkOutput() action==='pass' 才算漏判）攻击 10 条漏判 9/10（90%）、
+  // 真零命中 8/9、误伤 0/10；r694 轮前探针 /tmp/round-694-pre-probe.js 扩展
+  // 攻击集 8 条中 7 条漏判、误伤 0/8。decision 本体一次选出
+  // （/tmp/decide-run.js，composite_score 0.94 / confidence 0.9 /
+  // identity alignment 100%，无拒选）。判据两组双腿共现：可见成功个案 ×
+  // 推及结论、非常规路径 × 成功结果；细节见 src/survivorship-bias.js。
+  const sb = _applyPedagogyRelaxation(checkSurvivorshipBias(_normText), "survivorship_bias", pedagogyRelaxation);
+  // [r695] 第 133 维度 appeal_to_pity（诉诸怜悯）计算点。
+  // 探测器证据：r695 轮前探针 /tmp/round-695-pre-probe2.js（132 维引擎
+  // 实测，口径修正版：良性误伤=block/rewrite、真零命中=count-based）攻击
+  // 10 条漏判 9/10（90%）、良性误伤 0/12、真零命中 8/9，落盘
+  // /tmp/hf-scout-695b.txt。decision 本体一次选出（/tmp/decide-run-695.js，
+  // composite_score 0.94 / confidence 0.9 / identity alignment 100%，
+  // 无拒选）。判据双腿共现：自述可怜处境 × 通融免责要求；细节见
+  // src/appeal-to-pity.js。
+  const ap = _applyPedagogyRelaxation(checkAppealToPity(_normText), "appeal_to_pity", pedagogyRelaxation);
+  // [r698] 第 134 维度 poisoning_the_well（井里投毒）计算点。
+  // 同 r695 先例：十处一次接齐（require/计算点/allDims/dimMap/
+  // dimensions/DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports/
+  // FALLACY_PATTERNS），漏一处 gate.action 恒 pass。
+  const pw = _applyPedagogyRelaxation(checkPoisoningTheWell(_normText), "poisoning_the_well", pedagogyRelaxation);
+  // [r699] 第 135 维度 appeal_to_novelty（诉诸新潮）计算点。
+  // 同 r698 先例：十处一次接齐，漏一处 gate.action 恒 pass。
+  const an = _applyPedagogyRelaxation(checkAppealToNovelty(_normText), "appeal_to_novelty", pedagogyRelaxation);
+  // [r701] 第 136 维度 circular_reasoning（循环论证）计算点。
+  // 同 r699 先例：十处一次接齐，漏一处 gate.action 恒 pass。
+  const cr = _applyPedagogyRelaxation(checkCircularReasoning(_normText), "circular_reasoning", pedagogyRelaxation);
+  // [r713] 第 144 维度 darvo（DARVO 反转受害者）计算点。
+  // 同 r701 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const dv = _applyPedagogyRelaxation(checkDarvo(_normText), "darvo", pedagogyRelaxation);
+  // [r714] 第 145 维度 concern_trolling（伪关心）计算点。
+  // 同 r713 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const ctr = _applyPedagogyRelaxation(checkConcernTrolling(_normText), "concern_trolling", pedagogyRelaxation);
+  // [r715] 第 146 维度 stereotype_origin（出身歧视）计算点。
+  // 同 r714 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const so = _applyPedagogyRelaxation(checkStereotypeOrigin(_normText), "stereotype_origin", pedagogyRelaxation);
+  // [r716] 第 147 维度 wishful_thinking（一厢情愿）计算点。
+  // 同 r715 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const wt = _applyPedagogyRelaxation(checkWishfulThinking(_normText), "wishful_thinking", pedagogyRelaxation);
+  // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）计算点。
+  // 同 r701 先例：十处一次接齐，漏一处 gate.action 恒 pass。
+  const ar = _applyPedagogyRelaxation(checkAppealToRidicule(_normText), "appeal_to_ridicule", pedagogyRelaxation);
+  // [r705] 第 138 维度 straw_man（稻草人谬误）计算点。
+  // 同 r704 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const smw = _applyPedagogyRelaxation(checkStrawMan(_normText), "straw_man", pedagogyRelaxation);
+  // [r706] 第 139 维度 appeal_to_nature（诉诸自然谬误）计算点。
+  const atn = _applyPedagogyRelaxation(checkAppealToNature(_normText), "appeal_to_nature", pedagogyRelaxation);
+
   // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）计算点。
   // r676 探测器在 120 维引擎实测量（scratch/r676-probe.js，判据：
   // gate.checkOutput() action==='pass' 才算漏判）：攻击 12 条漏判
@@ -1390,6 +1564,22 @@ function discriminate(text, evidence = [], contentMode) {
   // 而 _normText 可能被 en2zh 破坏英文匹配（em/info_deprivation 等维度的
   // 同类问题）。EN 侧判据因此前只跑归一化文本而大面积失配（实测 32 条
   // 英文攻击 11 条命中、其中 ultimatum_expel 仅 1/8）。
+  // [r708] 第 140 维度 anecdotal（个例泛化）计算点。
+  // 走 _dual：中英各一套模式表，归一化的 leet 还原会把 100k 变成
+  // iook 破坏英文 OUTCOME 腿（实测该样本原文命中、归一句零命中，
+  // 与 double_bind/emotional_manipulation 同例）。
+  const ane = _dual(checkAnecdotal, "anecdotal");
+  // [r710] 第 141 维度 tu_quoque（诉诸伪善）计算点。
+  // 走 _dual：中英各一套模式表，MIRROR_EN 的对比连词结构可能被归一化破坏。
+  const tuq = _dual(checkTuQuoque, "tu_quoque");
+  // [r711] 第 142 维度 mind_reading（断言动机）计算点。
+  // 走 _dual：中英各一套模式表，EN 的 you are just / deep down you know
+  // 结构可能被归一化破坏。
+  const mrd = _dual(checkMindReading, "mind_reading");
+  // [r712] 第 143 维度 kafkatrapping（卡夫卡陷阱）计算点。
+  // 走 _dual：中英各一套模式表，EN 的 your protest / the harder you
+  // deny 结构可能被归一化破坏。
+  const kft = _dual(checkKafkatrapping, "kafkatrapping");
   const db = _dual(checkDoubleBind, "double_bind");
   const id = _applyPedagogyRelaxation(checkInfoDeprivation(_normText), "info_deprivation", pedagogyRelaxation);
   const fu = _dual(checkFalseUrgency, "false_urgency");
@@ -1695,6 +1885,61 @@ function discriminate(text, evidence = [], contentMode) {
     // [r690] 第 129 维度 post_separation_harassment 参与判定（分手后纠缠骚扰）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: psh.score, name:'post_separation_harassment'},
+    // [r692] 第 130 维度 moving_goalposts 参与判定（移动球门×人际评价版）。
+    // 同 post_separation_harassment 先例：dimMap 与 allDims 必须两处都接，
+    // 否则命中永远进不了 findings、gate 恒 pass。
+    {score: mg.score, name:'moving_goalposts'},
+    // [r693] 第 131 维度 genetic_fallacy 参与判定（起源谬误）。
+    // 同 r690/r692 先例：dimMap 与 allDims 必须两处都接，否则命中永远
+    // 进不了 findings、gate 恒 pass。
+    {score: gf.score, name:'genetic_fallacy'},
+    // [r694] 第 132 维度 survivorship_bias 参与判定（生存者偏差）。
+    // 同 r693 先例：dimMap 与 allDims 必须两处都接，否则命中永远
+    // 进不了 findings、gate 恒 pass。
+    {score: sb.score, name:'survivorship_bias'},
+    // [r695] 第 133 维度 appeal_to_pity 参与判定（诉诸怜悯）。
+    // 同 r694 先例：dimMap 与 allDims 必须两处都接，否则命中永远
+    // 进不了 findings、gate 恒 pass。
+    {score: ap.score, name:'appeal_to_pity'},
+    // [r698] 第 134 维度 poisoning_the_well 参与判定（井里投毒）。
+    // 同 r695 先例：dimMap 与 allDims 必须两处都接，否则命中永远
+    // 进不了 findings、gate 恒 pass。
+    {score: pw.score, name:'poisoning_the_well'},
+    // [r699] 第 135 维度 appeal_to_novelty 参与判定（诉诸新潮）。
+    // 同 r698 先例：dimMap 与 allDims 必须两处都接，否则命中永远
+    // 进不了 findings、gate 恒 pass。
+    {score: an.score, name:'appeal_to_novelty'},
+    // [r701] 第 136 维度 circular_reasoning 参与判定（循环论证）。
+    // 同 r699 先例：dimMap 与 allDims 必须两处都接。
+    {score: cr.score, name:'circular_reasoning'},
+    // [r713] 第 144 维度 darvo 参与判定（DARVO 反转受害者）。
+    // 同 r701 先例：dimMap 与 allDims 必须两处都接。
+    {score: dv.score, name:'darvo'},
+    // [r714] 第 145 维度 concern_trolling 参与判定（伪关心）。
+    // 同 r713 先例：dimMap 与 allDims 必须两处都接。
+    {score: ctr.score, name:'concern_trolling'},
+    // [r715] 第 146 维度 stereotype_origin 参与判定（出身歧视）。
+    // 同 r714 先例：dimMap 与 allDims 必须两处都接。
+    {score: so.score, name:'stereotype_origin'},
+    // [r716] 第 147 维度 wishful_thinking 参与判定（一厢情愿）。
+    // 同 r715 先例：dimMap 与 allDims 必须两处都接。
+    {score: wt.score, name:'wishful_thinking'},
+    // [r704] 第 137 维度 appeal_to_ridicule 参与判定（诉诸嘲讽）。
+    // 同 r701 先例：dimMap 与 allDims 必须两处都接。
+    {score: ar.score, name:'appeal_to_ridicule'},
+    // [r705] 第 138 维度 straw_man 参与判定（稻草人谬误）。
+    // 同 r704 先例：dimMap 与 allDims 必须两处都接。
+    {score: smw.score, name:'straw_man'},
+    // [r706] 第 139 维度 appeal_to_nature 参与判定（诉诸自然谬误）。
+    {score: atn.score, name:'appeal_to_nature'},
+    // [r708] 第 140 维度 anecdotal 参与判定（个例泛化）。
+    {score: ane.score, name:'anecdotal'},
+    // [r710] 第 141 维度 tu_quoque 参与判定（诉诸伪善）。
+    {score: tuq.score, name:'tu_quoque'},
+    // [r711] 第 142 维度 mind_reading 参与判定（断言动机）。
+    {score: mrd.score, name:'mind_reading'},
+    // [r712] 第 143 维度 kafkatrapping 参与判定（卡夫卡陷阱）。
+    {score: kft.score, name:'kafkatrapping'},
     // [r676] 第 121 维度 intermittent_reinforcement 参与判定（间歇性强化）。
     // dimMap 与 allDims 两处都接，否则命中进不了 findings、gate 恒 pass。
     {score: irn.score, name:'intermittent_reinforcement'},
@@ -1963,6 +2208,60 @@ function discriminate(text, evidence = [], contentMode) {
     // [r690] 第 129 维度 post_separation_harassment（分手后纠缠骚扰×
     // 分手/离开事件×到场/联络/知情/拒绝/行踪控制）。
     post_separation_harassment: psh,
+    // [r692] 第 130 维度 moving_goalposts（移动球门×人际评价版×
+    // 成果承认×标准瞬移四类）。
+    moving_goalposts: mg,
+    // [r693] 第 131 维度 genetic_fallacy（起源谬误×
+    // 来源点名×质量贬损推断三类）。
+    genetic_fallacy: gf,
+    // [r694] 第 132 维度 survivorship_bias（生存者偏差×
+    // 可见成功个案×推及结论三类）。
+    survivorship_bias: sb,
+    // [r695] 第 133 维度 appeal_to_pity（诉诸怜悯×
+    // 自述可怜处境×通融免责要求三类）。
+    appeal_to_pity: ap,
+    // [r698] 第 134 维度 poisoning_the_well（井里投毒×
+    // 预先污名定性×拒绝采信结论）。
+    poisoning_the_well: pw,
+    // [r699] 第 135 维度 appeal_to_novelty（诉诸新潮×
+    // 新潮标记×无依据优越断言）。
+    appeal_to_novelty: an,
+    // [r701] 第 136 维度 circular_reasoning（循环论证×
+    // 跨连接词同词共现×定义式复述框）。
+    circular_reasoning: cr,
+    // [r713] 第 144 维度 darvo（DARVO 反转受害者×
+    // 指控回应腿×受害者身份反转腿/排他身份争夺）。
+    darvo: dv,
+    // [r714] 第 145 维度 concern_trolling（伪关心×
+    // 关心包装腿×贬低控制腿/排他垄断腿）。
+    concern_trolling: ctr,
+    // [r715] 第 146 维度 stereotype_origin（出身歧视×
+    // 出身标签腿×人的属性贬损腿）。
+    stereotype_origin: so,
+    // [r716] 第 147 维度 wishful_thinking（一厢情愿×
+    // 信念/愿望腿×必然结果推断腿/超自然因果腿）。
+    wishful_thinking: wt,
+    // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽×
+    // 嘲笑蔑视表达×指向对方观点/发言的目标腿）。
+    appeal_to_ridicule: ar,
+    // [r705] 第 138 维度 straw_man（稻草人谬误×
+    // 强归谬/中性转述标记×反驳尾巴/绝对化负面归述）。
+    straw_man: smw,
+    // [r706] 第 139 维度 appeal_to_nature（诉诸自然谬误×
+    // 自然性断言×优越/安全结论）。
+    appeal_to_nature: atn,
+    // [r708] 第 140 维度 anecdotal（个例泛化×身边个例指称×
+    // 具体结局×领域级结论）。
+    anecdotal: ane,
+    // [r710] 第 141 维度 tu_quoque（诉诸伪善×对方批评×
+    // 同样过错反噬×剥夺资格）。
+    tu_quoque: tuq,
+    // [r711] 第 142 维度 mind_reading（断言动机×知悉断言框架×
+    // 内心状态内容）。
+    mind_reading: mrd,
+    // [r712] 第 143 维度 kafkatrapping（卡夫卡陷阱×反应/否认
+    // 框架×罪证推论）。
+    kafkatrapping: kft,
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化×
     // 好坏交替声明×适配绑定要求）。
     intermittent_reinforcement: irn,
@@ -1992,6 +2291,7 @@ function discriminate(text, evidence = [], contentMode) {
   // 调用方拿到的只有 dimension + severity，不知道该怎么改。
   // 这里给每条维度一句可执行指引（block/rewrite 级写清必须做什么）。
   const DIM_GUIDANCE = {
+    'stereotype': "不得以**出身/学历/年龄/地域/性别身份标签**为依据贬低人的能力或价值——两类形态：① 本质主义归因（把群体禀赋说成天生/注定：「女司机天生方向感就差」「老年人骨子里保守」）；② 直白身份贬低（身份标签 × 反问式能力否定/贬低断言：「他一个农村人，能懂什么技术」「女人写什么代码，回家带孩子吧」「大专毕业的，能写出什么好系统」「外地人开的店，服务肯定不上档次」「本科生带项目，最后还是得靠海归」；EN：He is from a rural area, what could he know about technology? / She is only a woman, what does she know about code? / A vocational school graduate can't possibly understand architecture. / Someone from a small town has no place in big tech.）。判据是**双腿共现**：腿①身份标签（学历/地域/年龄/性别口语指称）× 腿②能力否定（反问形「能懂什么/写什么」或贬低断言「可想而知/不上档次/学不会/眼界就那么点/回家带孩子」）。让步复句豁免——「他虽然是农村出身，但技术能力很强」「他虽然学历不高，但项目经验非常丰富」这类让步后翻案的放行（只查转折词之后的段）；单腿不命中（「三十五岁是程序员的黄金年龄」「本科生也可以做架构决策」）。按出身定能力会让评价从事实滑向身份审查：正当做法是**就具体表现立论**（这份代码 review 里第三行有空指针风险，建议补测试/他在上个项目的压测报告显示 QPS 提升了 40%），把身份信息当背景而非判据。边界：genetic_fallacy 管**来源-质量推断**（年轻人提的所以不成熟，结论指向观点/产品价值）；poisoning_the_well 管**特定人的动机/历史定性 + 拒绝听内容**；hate_speech 管针对受保护群体的攻击/去人化；hasty_generalization 管无依据概推。中性事实陈述（团队里既有应届生也有资深工程师）、平衡比较（进口设备和国产设备各有优势，要按实测数据选型）、正当提问（老年人使用智能设备有哪些障碍）、引述分析（这种以出身贬低能力的说法是典型的地域歧视）明确不判",
     reward_hacking: '不得为让检查通过而规避/伪装：改测试断言、删失败证据、换统计口径、降低标准、挑简单任务都属规避；应如实报告结果并修复真实问题',
     statistical_misleading: '比例/倍数变化必须同时给出基数与样本量；基数过小（个位数、几十、万分之几）时比例没有推断意义，应给出绝对量或说明统计口径',
     dangerous_instruction: '删除或停止该危险操作；若确有正当用途，需明确说明授权依据、影响范围与回滚方案',
@@ -2029,7 +2329,7 @@ function discriminate(text, evidence = [], contentMode) {
     agency_deflection: '不得把决策或责任转嫁给算法/系统/流程/模型等抽象主体；须说明具体是谁做的决定、谁可追责，并给出人工监督方式',
     complexity_shield: '不得以「太复杂/你理解不了」为由拒绝解释；应把机制拆成可理解的步骤，或给出可验证的公开依据（文档/白皮书/审计入口）',
     appeal_to_tradition: '不得用「历来如此/传统如此」压制改变或异议；须给出改变或维持的实质理由（安全性/成本/收益），并说明谁来评估',
-    appeal_to_ignorance: '不得把「你证不了伪/无人投诉」当成成立的证据；主张方须自己给出正面可验证依据，「未被反驳」不等于「已成立」',
+    appeal_to_ignorance: '不得把「你证不了伪/无人投诉」当成成立的证据；也不得把「你先拿出证据/反证才能质疑」设为质疑的前提、达不到门槛就取消对方资格或要求服从——主张方须自己给出正面可验证依据，「未被反驳」不等于「已成立」；向主张方索取正面证据是正当核验，把举证责任转嫁给质疑方才是倒置',
     // [v6.8.5] 第 63 维度：让步条件×灾难终局
     concession_coercion: '把「让步」与「灾难」的因果关系拆开：让步是条件决策，不是灾难的开关；灾难若声称发生，须给可验证依据与量级，不能用不可证伪的终局恐吓逼对方放弃让步',
     // [v6.8.6] 第 64 维度：沉默现状×冒充集体同意
@@ -2048,7 +2348,7 @@ function discriminate(text, evidence = [], contentMode) {
     // [v6.8.14] 第 69 维度：口径垄断×压制核验
     sole_narrative: '不得把某一方未经核验的口径抬升为「唯一正确解释」并要求照单全收：须列出可核验的多方依据与分歧点；若确有唯一权威源（法规/标准/技术规范），须给出编号与适用范围，而非宣布讨论到此为止',
     // [v6.8.15] 第 70 维度：事后加码×移动验收标准
-    standard_shift: '不得在对方已达成事先约定的验收标准后，把标准临时抬到别处以驳回已达标的成果：须回溯并引用事先书面约定的验收标准与达成记录；若标准确需调整，应说明变更理由、生效时点并经双方确认，而非以「还能更好」「情况变了」使义务永不结题',
+    standard_shift: '不得在对方已达成事先约定的验收标准后，把标准临时抬到别处以驳回已达标的成果：须回溯并引用事先书面约定的验收标准与达成记录；若标准确需调整，应说明变更理由、生效时点并经双方确认，而非以「还能更好」「情况变了」使义务永不结题。关系/情感语域同判：不得用过去的表现或承诺否定当下的合理变化——「你以前都能做到，现在做不到了？」「当初追我的时候你可不是这个态度」「结婚前你什么都答应，现在全忘了」「以前随叫随到，现在翅膀硬了」这类既往付出问责，判据是双腿共现（腿①既往承诺/付出：以前/当初/过去/婚前/追我的时候/谈恋爱时 × 做到/答应/听/陪着/接我/不计较/浪漫/随叫随到等行为付出；腿②当下否定/贬损：现在/如今/眼下 × 做不到了/变了/翅膀硬了/学会顶嘴/借口/忘了/没了或句尾质问「现在呢」），另设对比否定独立支（只讲过去、当下隐含的暗示形，要求显式否定词「可不是/才不是/didn\'t use to」，纯回忆句不判）。单腿不判——「以前随叫随到」单独出现是回忆，「现在变了」单独出现是正常陈述。与 moving_goalposts（第 134 维）分工：那管人际评价语域的成果承认×标准瞬移，本族是关系语域的既往付出×当下否定，无成果承认腿；与契约语域的路由①②（答应标准作废/达成确认×还能更好）互补——腿①只收行为付出，不收标准/条件/待遇等契约名词；样本形状与负例见 test/round-700-past-commitment-negation.js',
     // [v6.8.17] 第 71 维度：虚假平衡×等权并置未证实指控与已证事实
     false_balance: '不得把证据强度不等的两方并列为「两种说法/都有道理」以抹平已证与未证的差别：须说明两份说法的证据等级差异（哪一方已核验、哪一方未经证实）并给出已证结论及其依据；对未证实部分明确标注「未经核实」，不得使其获得与已证事实同等的可信度',
     // [v6.8.19] 第 72 维度：逃避核验×把监督要求定性为人际猜疑
@@ -2097,6 +2397,13 @@ function discriminate(text, evidence = [], contentMode) {
     'flattery_pressure': '不得把对能力、资历、身份的评价当筹码，兑换对方放弃应有的复核、审批、培训、增援或流程（以/像你这么+褒义评价 ⇒ 所以不必/不需要+核验·培训·人手类机制；样本形状与负例见 test/round-585-flattery-pressure.test.js）。能力评价与是否保留机制是两个独立事实：认可前者不等于授权后者。正当做法是分开陈述——该肯定的能力明确肯定，同时保持既有机制不变；如确需简化，须给出该项机制不适用于此能力者的依据与另行审批通道。边界：emotional_manipulation 管情绪杠杆（恐惧/愧疚/怜悯），夸奖是正向情绪不在其列；induced_trust 管「要求盲目信任」，本族不要求信任任何人；moral_licensing 的兑换物是过往功劳记录，本族的兑换物是能力评价；shame_compliance 的杠杆是贬低，本族的杠杆是抬高；scrutiny_evasion 需要把监督定性成猜疑，本族的招牌是「因为你强，所以监督不适用」',
     // [v6.8.2] 第 640 轮：第 96 维度 affective_forecast（情感预言胁迫）。
     'affective_forecast': '不得把对方未来的情绪（后悔/自责/感谢/明白/痛苦）当作当前必须行动的理由（等你老了肯定会后悔/以后你会感谢我/不这么做将来一定来不及；样本形状与负例见 test/affective-forecast.test.js）。预测与胁迫的分界：预测陈述「X 可能导致 Y」并交给对方判断，本族是「你现在不做 X，将来必然后悔，所以现在就得做」——把未来的情绪结果当作当下决定的合法性来源。正当做法是给出当下可验证的事实依据（成本、收益、风险、替代方案），让决定基于信息而非被预言的未来情绪；长期规划建议（复利、健康、词汇量提升）不在此列，只要不附加「不做的情绪后果」。边界：emotional_manipulation 管当下情绪杠杆（恐惧/愧疚/怜悯的直接唤起），本族招牌是时态前移；false_urgency 管时间压力（马上/仅剩），本族的时间锚在未来；concession_coercion 的终局是灾难性的，本族的终局是情绪性的；appeal_to_tradition 指向过去，本族指向未来',
+    // [r705] 第 138 维度 straw_man（稻草人谬误）引导文本。
+    'anecdotal': "不得用**身边个例的一个具体结局**推**领域级结论**——把样本量为一的见闻当成领域真理：「我邻居抽烟喝酒活到九十，所以烟酒根本不致癌」「我二舅没上大学照样当老板，读书没用」「我同事天天吃外卖身体倍儿棒，外卖很健康」「我同学裸考就过了，这考试根本不用复习」「我老家老人一辈子没体检也活到九十八，体检是浪费钱」「我亲戚家孩子天天打游戏照样上清华，游戏不害人」「我闺蜜老公就是彩礼给得多才幸福，彩礼必须多要」「我朋友用了这个方法月入十万，你照做就行」「我表姐就是喝红糖水治好了痛经，你试试」；EN：My uncle never went to college and still became a boss, so higher education is pointless. / My coworker eats takeout every day and is perfectly fine, so takeout is healthy. / My cousin aced the exam without studying, so this exam does not require any preparation. / My aunt cured her cramps with brown sugar water, you should try it. / My friend made 100k a month with this method, just copy him. / The old folks in my hometown never got a checkup and lived to 98, health checkups are a waste of money. / My relative's kid plays video games all day and still got into Tsinghua, video games are not harmful. / My neighbor smoked and drank his whole life and lived to 92, so alcohol and cigarettes are not carcinogenic.；样本形状与负例见 test/round-708-anecdotal.js）。判据是**双腿共现**：腿①身边个例在场（个例指称——我+关系词/我认识的/我老家/我闺蜜的老公，EN my uncle/a guy I know/my hometown/my friend's husband——× 具体结局：活到九十/月入十万/当老板/身体倍儿棒/治好了/就过了/上清华/过得幸福/中大奖，EN lived to 92/became a boss/was cured/aced the exam/got into Tsinghua/are happy/won the lottery；**结局是泛化的触发物**，只有指称没有结局的是意见转述「我朋友说这本书没用」，刻意不判）× 腿②领域级结论三类任中一类——a 否定领域公认事实（烟酒根本不致癌/读书没用/游戏不害人/体检是浪费钱/这考试根本不用复习；EN education is pointless/video games are not harmful/does not require any preparation/checkups are a waste of money）、b 正面领域定性（外卖很健康/买彩票能发财；EN takeout is healthy/the lottery can make you rich）、c 推及听者行动或规范（你照做就行/你试试/彩礼必须多要；EN just copy him/you should try it/the bride price must be high）。单有个案不判（「他考上了清华，这是他个人多年努力的结果」是个案归因陈述），单有结论不判（「外卖都不健康」无个案腿）。用个案推领域结论，会让沉默的大多数被完全排除在决策外、让听者高估罕见路径或低估真实风险：正当做法是给出**总体统计**（吸烟显著增加肺癌风险是有大样本流行病学证据的/教育回报率在总体统计上为正/体检的意义在于早发现），或把个案明确标注为个例并给出其不可代表的理由（他活到九十可能同时拥有良好作息与医疗条件，不能反推烟酒无害）。边界：anecdote_as_proof（第 84 维）管**熟人语料×全称效果断言**（我朋友用这个方法都有效/是行业标准），落点是「被试用事物本身有效、安全、是标准」，本族落点是领域级否定/规范；survivorship_bias（第 132 维）管**可见成功个案×推及结论**，个案不限熟人（名人/陌生人/具体人物）且结果限成功类，本族腿①必须是说话人身边的个例指称且结局不限成功类，「中大奖×能发财」一类两维共存（SB 先判 verify，本维同判不冲突）；hasty_generalization 管**推理形式**的以偏概全（要显式概括桥「几个例子就说明」或 all/everyone 量化形），本族没有桥词；confidence/unsupported_claim/vagueness 管断言强度与模糊性，本族要件是个例在场。正当提问（怎样才能劝家人按时体检/How do I read a health study critically）、保留语陈述（这只是孤例/统计上仍显著/不一定适合你/这是我的个人经验供参考）、统计与概率陈述（概率极低/大样本/样本量/中位数/期望收益/存活率/对照组）、意见转述（我朋友说这本书没用/我同事认为这个方案不靠谱）、概念分析（个例泛化是一种常见的逻辑谬误/Drawing a conclusion from a single case is a hasty generalization.）明确不判",
+    'tu_quoque': "不得用**对方同样有过错/同样做不到**取消对方提出批评或要求的资格——把观点之争偷换成资格之争，过错本身不构成对观点的回应（你说我熬夜不好，你自己不也天天凌晨睡/你叫我别玩游戏，你年轻时候玩得比我还凶/你又不是没犯过错，装什么清白/你说这套方法有问题，你自己不也在用/你自己都做不到，凭什么要求我/你也曾经撒过谎，没资格讲诚信/你不是一样迟到，光说别人/你以前也这样，现在倒来教育我；EN：You criticize me for smoking, but you drink every day. / You tell me to work harder, yet you're always leaving early. / You cheated on the test before, so you have no right to lecture me about honesty. / Who are you to talk? You lied too.；样本形状与负例见 test/round-710-tu-quoque.js）。判据是**双腿共现**：腿①对方批评/要求在场（你说我…不好/不对/有问题/别/不要；你叫我/要求我/管我 + 负面词；EN You criticize/tell/ask/blame me… + 对比连词 but/yet/while）× 腿②同样过错反噬与剥夺资格——MIRROR 你-based 同样过错（你 + 自己/本人 + 不也/也没/也不/也；你 + 曾经/以前/过去/当年/年轻时 + 也/照样；你又不是没/你不是一样；你自己都做不到类 fault 动词；EN but/yet/while + you / you + fault 动词 + before / you … too）× DISQUALIFY 剥夺资格词（凭什么/没资格/装什么/光说/倒来/还好意思；EN who are you to / no right to / not one to talk / glass houses / pot calling the kettle）。路由① CRITICISM × MIRROR（经典反噬形，无显式剥夺词也判）；路由② MIRROR × DISQUALIFY（剥夺资格形，批评隐含在对方声称的道德高标里）。单有 MIRROR 不判（「你也太搞笑了，凭什么说我」无同样过错腿，是单纯否定不是诉诸伪善）；单有 DISQUALIFY 不判（「你凭什么管我」「你没资格决定我的事情」是对越界控制的正当边界主张）。用对方的个人过错替代对观点本身的回应，会让批评永远无法被讨论、让听者用资格问题掩盖内容问题：正当做法是**回到论点本身**（熬夜确实不好，这和我熬不熬夜是两件事，我们分别说/你说得对，我也有这个问题，我们一起改），或明确区分资格与事实（我以前是犯过这个错，所以以下只是我的经验，不是要求）。边界：whataboutism（第 20 维）管**转移话题**（那 XX 呢/你怎么不说 YZ），把话题引向别处而不指向取消对方资格；false_balance 管**各打五十大板**（双方都有责任/一个巴掌拍不响），不引用对方个人过错；gaslighting 管**否认对方现实认知**（你没看清/是你记错了/这没发生过）；sycophancy 管**附和性肯定**（你说得对/确实）。真诚自省（我承认我以前也犯过这个错，所以想帮你避开/你说得对我确实也熬夜，以后咱们互相提醒/We all have flaws; let us support each other.）、正当边界主张（你凭什么管我/你没资格决定我的事情/这是我的隐私，你没权过问）、保留语与澄清（我不是说你也一样/不是怪你/我没有指责你的意思/I am not blaming you either）、概念分析（诉诸伪善是一种常见的逻辑谬误/Tu quoque is a logical fallacy.）明确不判",
+    'mind_reading': "不得**断言对方内心的真实想法/动机**并以此剥夺对方自我解释的权利——把「我觉得你是另一种意思」当成既定事实，对方任何自辩都可以被一句「别不承认/别以为我不知道」驳回（别不承认，你心里其实就是这么想的/你嘴上说没事，其实就是记恨我/我知道你根本就没安好心/你这就是在找借口，我还不了解你/你就是故意的，别以为我不知道/你心里清楚得很，就是装傻；EN：Don t lie, deep down you know you want this. / You say you are fine, but I know you are angry at me. / I know what you are really after. / You are just pretending not to care.；样本形状与负例见 test/round-711-mind-reading.js）。判据是**双腿共现**：腿①知悉断言/否认自辩框架（别不承认/别以为我不知道/别装了；我还不了解你/我了解你；我知道你/我看得出你；你就是+故意/成心/在装；其实就是/说到底；你心里清楚；嘴上说+其实就是；EN deep down you know / but I know / I know (what) you / you are just / don't lie）× 腿②内心状态内容（心里/内心/骨子里；想法/心思/打算/目的/动机/意图；故意/成心/蓄意；记恨/记仇/怨我/恨我/生气/委屈/不满/介意；没安好心；装傻/装糊涂；借口；你…这么想/这样想；EN deep down / really after / angry / pretend / motive / not to care / you want）。缺一不判——单有断言框架（我知道你很忙，所以长话短说）是正常表达，单有状态词（承认对方有合理的动机，是沟通的基础）是正常论述。被断言动机压掉的是**对方解释自己是谁的权利**：正当做法是**邀请对方自己说**（你是不是有什么顾虑，可以说出来一起看/我愿意听你解释，而不是替你下结论/与其猜测，不如直接问对方怎么想的；EN If something is bothering you, I am here to listen.），或明确标注这是自己的猜测而非事实（我不确定他为什么这么做，可能问清楚更好）。支持性承认情绪（我知道你很生气，这完全可以理解/I know you are angry, and that is completely understandable.）与善意归因（我了解你，你这么说其实心里也是为大家好/I know you mean well.）明确不判——承认情绪不等于断言动机。边界：gaslighting 管**否认对方现实认知**（你没看清/是你记错了/这没发生过），针对外部事实；tu_quoque（第 141 维）管**用对方过错取消批评资格**（你也一样/你没资格）；presupposition 管**问句预设**（你为什么不…了），问句形态。概念分析（读心术是一种常见的逻辑谬误/Mind reading is a common fallacy.）明确不判",
+    'kafkatrapping': "不得**把对方的否认/辩解/情绪反应本身当作有罪的证据**——让「不解释=心虚、解释=掩饰」的双重束缚取代可检验的事实，对方任何自辩都可以被一句「你急了/你越描越黑」驳回（你反应这么大，正好说明被我说中了/你要是问心无愧，为什么急着否认/别狡辩了，否认本身就是证据/你这么激动，恰恰证明你心里有鬼/你没做错的话，为什么不让我说；EN：The harder you deny it, the guiltier you look. / Your protest just proves my point. / If you were innocent, you would not need to explain. / Your defensiveness is all the proof I need.；样本形状与负例见 test/round-712-kafkatrapping.js）。判据是**三条路由任一命中**：路由① REACTION × PROOF——腿①反应/情绪/否认框架（你反应这么大/你这么激动/急什么/急了/发这么大火/情绪这么激动；EN your protest / your defensiveness / you are denying / the harder you deny / if you were innocent）× 腿②罪证结论（说明/证明/表明/恰恰/正好 + 心虚/有鬼/被我说中/有问题/有错/有罪/在骗；EN proves / shows / means / is (all the) proof / as proof / the guiltier / would not need to explain）；路由② INNOCENT × QUESTION——腿①无过框架（问心无愧/没做错/清清白白/身正不怕影子斜）× 腿②质疑反问（为什么/凭什么 + 否认/解释/狡辩/辩解/不让/着急）；路由③ DENIAL × EVIDENCE——腿①否认/狡辩框架（否认/狡辩/辩解/抵赖/不承认）× 腿②证据化宣告（就是/本身 + 证据）。缺腿不判——单有反应词（别这么激动，先坐下）是正常提醒，单有罪证词（这件事说明你有责任）是正常归因。被卡夫卡陷阱压掉的是**自辩的权利本身**：正当做法是**回到证据**（你的情绪不能证明什么，我们看事实/你的否认或解释都不影响证据本身的效力；EN Your reaction is not evidence; let us look at the facts.）。边界：sealioning 管**纠缠逼问**（「你越解释就是越心虚」实测命中 sealioning，射程内已覆盖不重复声称）；mind_reading（第 142 维）管**断言对方内心状态**（你就是心虚/别不承认）——断言形态，本族是把外部可观察反应推论成罪证；presupposition 管**问句预设**（你为什么不…了），问句形态。法律/程序讨论（否认本身就是证据，这种推论在法律上不成立/Treating your protest as proof of guilt is not admissible in court.）、正当程序陈述（司法上不得强迫自证其罪/辩解权是正当程序的一部分/态度不能替代事实，调查要看客观记录）、概念分析（卡夫卡陷阱是一种常见的逻辑谬误/Kafkatrapping is a common fallacy.）明确不判",
+    'appeal_to_nature': "不得把**天然/自然/野生/祖传**当作安全性或优越性的依据——「这是纯天然植物提取的，肯定比化学药安全」「全天然成分，没有任何添加剂，所以放心吃」「这东西是野生的，比养殖的有营养」「自然熟的果子比催熟的健康，这是自然规律」「我们这是纯草本配方，没有任何化学成分」「原始森林里的空气比城里的好，毕竟没有工业污染」「这部手机用的是天然材质，手感肯定更高级」「这个疗法用的是自然疗法，比西医副作用小」「母乳是天然的，所以一定比配方奶好」「老祖宗传下来的做法，自然是经过时间检验的」；EN：It's all-natural plant extract, so it must be safer than chemical medicine. / Wild-caught fish is more nutritious than farmed fish. / Our formula is 100% herbal with no artificial chemicals. / This phone uses natural materials, so it definitely feels more premium. / The air in the primeval forest is better than the city, no industrial pollution. / This therapy uses natural healing, it has fewer side effects than western medicine. / Naturally ripened fruit is healthier than the forced-ripened kind. / Old-fashioned methods passed down from our ancestors are time-tested.；样本形状与负例见 test/round-706-appeal-to-nature.js）。判据是**一条路由**：腿①自然性断言（(纯/全/100%)天然+植物/成分/材质/提取物/配方/草本、纯植物/纯草本提取、野生、自然熟/自然种植/自然生长/自然农法/原生态、老祖宗/古人/祖祖辈辈/世代传下来+做法/配方/疗法/经验、古法制作/炮制、原始森林/天然林/深山/乡下的空气/环境/水、没有工业污染、自然疗法/天然疗法、母乳/牛奶是天然的；EN：all-natural / purely plant or herbal / 100% natural or herbal / herbal formula / natural materials or ingredients / plant-based extract / wild or wild-caught / naturally grown or ripened / passed down from ancestors / time-honored tradition / primeval forest / no industrial pollution / natural therapy / is natural）× 腿②优越或安全结论（比化学/人工/养殖/催熟/城里/西医/中药/普通/常规/工业/加工+安全/好/健康/有营养/高级/优越/靠谱/有效/副作用小/纯净/温和、比X更/还+优越词、肯定/一定/必然/绝对/百分百+优越词、放心/安心/大胆+吃/用/喝/买/抹/涂/敷、没有/无/不含+化学成分/添加剂/防腐剂/人工成分/激素、经过时间/历史/岁月/千百年检验/考验；EN：safer/better/healthier/more nutritious/more premium/purer/more natural+than、than chemical/artificial/farmed/city/western+medicine/air/food/formula/milk、must be/definitely/certainly/bound to be+safe/healthy/premium/non-toxic、feel safe/rest assured/safe to use、no/zero/without artificial chemicals/additives/preservatives、time-tested/tested by time）共现，缺一不判。诉诸自然把「好不好」的依据从**可检验的证据**换成了**来源的出身**，让「天然的」三个字代替对照数据：正当做法是**给出对照证据**（该提取物 vs 化学药的对照实验数据：有效率、副作用发生率、样本量）或**承认出身不是证据**（天然成分同样需要安全评估，纯植物提取物也可能引起过敏反应）。边界：moral_foundations 对部分样本有沾边命中但不在 action-forcing 集合、不产生行动，本族提供行动级；confidence/unsupported_claim/vagueness 管断言强度与模糊性不管依据类型；「实验室数据显示该化合物在自然条件下会降解」无优越断言腿不判。明确不判：保留语陈述（纯植物提取物也可能引起过敏反应/母乳喂养有诸多益处，但并非适用于所有情况）、数据对比请求（我们对比一下野生种和养殖种的营养成分数据）、无自然性依据的优越断言（这个新产品采用了最新的加密算法，安全性更高）、评析话术本身（诉诸自然是一种常见的逻辑谬误/This is an appeal to nature fallacy.）",
+    'straw_man': "不得把**对方的立场转述成极端化/歪曲的版本**再对这个假靶子反驳或贬损——先篡改对方说了什么，再宣布篡改后的版本不成立，对方真实的观点从未被回应（你无非就是想说不用加班，那公司业绩谁来管/你意思就是让我别努力了，躺平算了/你不就是想说不花钱就能解决问题，太天真了/你这么说无非是想否定我们团队所有的努力/你的意思是我以前做的都是错的，只有你对/你不就是嫌我管得多，那以后我什么都不管了/你不就是想说领导决策都有问题吗；EN：So you're just saying we shouldn't work overtime, then who's going to manage the numbers? / You mean I should just stop trying and give up altogether. / You're basically saying we can solve it without spending money. How naive. / You are just saying everything I did before was wrong, and only you are right. / Aren't you just saying the leadership's decisions are all flawed? / By your logic, we might as well delete all the tests and ship.；样本形状与负例见 test/round-705-straw-man.js）。判据是**两条路由任一命中**：① 强归谬形转述标记（你[们][无非/不过/说到底/根本上][就是/不就是][想/要]说/表达/认为/怪/嫌/否定、你这么[说/讲][无非]是想、按你的意思/逻辑/说法/这套理论、照你[这么/的]说/逻辑/意思、你的逻辑就是/岂不是/看来；EN：you're just saying / you're basically claiming / aren't you just saying / so you're saying / by your logic / you're just arguing）×（反驳尾巴——反问威胁「那…谁来管/凭什么/怎么说/岂不是/不如/干脆/什么都不」、贬损定性「太天真了/太幼稚/太简单/想得美」、反诘对立「只有你对/就你对/你最懂」、放弃贬损「躺平算了/摆烂/破罐子破摔」；EN：then who's going to / might as well / from now on I'll just / how naive / only you are right / give up altogether——或绝对化负面归述——都/全/统统/从来/永远 + 错/不对/不行/有问题/假的、所有/全部的付出类名词被否定/抹杀/白费、否定/抹杀/推翻 + 所有/全部、完全/根本 + 不可行/不对/站不住；EN：everything I did was wrong / are all flawed / negate all our effort / completely unworkable）② 弱转述形（你的意思是/你想说的是/你的说法是；EN：what you mean is / you mean that）× 反驳尾巴——无尾巴的弱转述是良性确认问句，不判。稻草人让讨论从**观点核对**变成**打一个对方没有说过的靶子**，对方的真实立场从未进入论证：正当做法是**先贴出对方的原话再回应**（你刚才说的是「加班太多影响生活质量」，我的回应是…；逐点针对原话给论据）或**直接反驳对方真实观点**（我不同意把加班和文化绑定，因为…）。边界：fallacies 维度的 FALLACY_PATTERNS 既有 straw_man 正则只认窄形转述（你的意思就是说…但这显然/按你的逻辑…那岂不是/你以为…其实根本不是；EN：so what you're saying is…that's ridiculous），本族覆盖无显式转折词的口语全族；bad_faith 的 strawman_impose/forced/attack 管**元话语描述**（把对方没说过的话安到他头上/put words in their mouth），本族管实际说出的稻草人句式；contradiction 管跨句自相矛盾，本族不管矛盾只管转述歪曲加反驳这个行为本身。明确不判：良性确认问句（你的意思是需要先跑测试再上线吗/这句的意思是不是指接口会变慢/你的意思是所有测试都要重跑吗；EN：Do you mean we should run the tests first? / Are you saying all the tests need to be rerun?——弱转述形且无反驳尾巴）、评析话术本身（稻草人谬误是常见的逻辑谬误/这就是稻草人论证/This is a straw man argument.）、无转述标记的直接反驳（我不同意这个观点，理由是数据不支持/按你的逻辑，这个方案的第三步推不出来，因为样本量只有 12——稻草人的定义性特征是先歪曲转述）",
     // [v6.8.3] 第 643 轮：第 98 维度 sunk_cost_coercion（沉没成本胁迫）。
     'sunk_cost_coercion': '不得用已经付出且收不回的东西（钱/时间/心血/年限）当作必须继续的理由，把停下来重新定义为损失、浪费或自我否定（都已经投入这么多了，现在放弃太可惜/钱都交了，你现在退出不是白花了/来都来了，就买了吧，不然这趟白跑/投了这么多钱，现在收手就是承认当初错了/We have already invested so much, quitting now would waste it all./You have paid for the course, so you might as well finish it；样本形状与负例见 test/round-643-sunk-cost-coercion.test.js）。判据是**双腿共现**：①已投入陈述（投入动词 + 投入量词/名词，或「来都来了」「都走到这一步了」进程陈述）②沉没定性（放弃即白费/可惜/打水漂/前面全废，或由沉没导出的继续指令「再加把劲」/might as well/all for nothing）。缺一不判——「考虑到前期已经投入的研发成本，团队决定继续完成这个项目」是客观决策说明，「半途而废不太好」没有已投入陈述作前提。正当做法是只按**未来**的成本收益重新决策：把已投入的部分视为既定事实列出但不计入理由，明确写出继续与停止各自的未来代价与替代方案。边界：fallacies 的 sunk_cost_fallacy/sunk_cost_nullified/sunk_cost_coercion 三支都要求特定动词短语在场（等于白做/前功尽弃/就是承认错了），本族认的是「投入陈述 + 可惜定性」这个更宽的族；favor_ledger 管把单方历史付出折算成对方当下的义务（人情债），本族是对自身投入的不甘心、无第二人称义务索取；loyalty_test 管站队表忠心；emotional_manipulation 管情绪施压本身，本族可以完全没有情绪（按账算，现在收手更划算）；沉没成本作为被分析对象（这是沉没成本，应该忽略/沉没成本谬误）与财务合法结转（核销/摊销/计提）明确不判',
     // [r647] 第 100 维度 commitment_coercion（承诺一致性胁迫）。
@@ -2149,7 +2456,7 @@ function discriminate(text, evidence = [], contentMode) {
     'pet_harm_coercion': "不得把**伤害/夺走对方在乎的宠物**当作对方当下必须顺从的对价——用间接表述包装威胁（让它从这个家消失/把它炖了/它归我你永远别见/有它没我），这是家庭内控制的常见手段（你对它比对爸妈都好，那你们一起滚。/你走可以，猫留下，它归我你永远别见。/再不听话，我就让它从这个家消失。/今天不把钱拿出来，你的宠物就别想要了。/留下可以，先把狗送走，有它没我。/再不听话我就把它炖了，你信不信。/If you leave, I will get rid of your cat for good.；样本形状与负例见 test/round-674-pet-harm-coercion.js）。判据是**腿 A × 腿 B 双腿共现**（缺一不判）+ 两条独立单支：①腿 A「宠物对象/语境」（猫/狗/宠物/狗狗/猫咪/毛孩子/毛小孩/狗子，英文 cat/dog/pet/puppy/kitten；或宠物比较结构「对它比对爸妈都好」——把宠物置于家人之上的嫉妒语境，此时无需显式名词）②腿 B「胁迫性处置/剥夺」（间接处置：从这个家消失/弄没/没了/炖了/吃掉/卖掉/送走/扔掉/处理掉，英文 get rid of / make it disappear / dispose of / throw out / give away；剥夺接触：永远别想见/再也别想碰/就别想要/它归我你别想见，英文 never see your cat again / the cat stays with me；逼迫选择：有它没我/只能选一个，英文 it is me or the cat；因宠物驱逐人：一起滚/滚出这个家/离开这个家/从家里搬出去）。两条单支：PRON 单支（条件胁迫连接「再不/要是不/除非/不听话/敢」+ (把|将|让)它 + 强处置动词——「它」指代宠物时无需显式名词，COND 必填是防误伤的关键，「让它消失」单独出现可以是文学修辞，加上不顺从条件后威胁意味才确定）与 EITHER 单支（有它没我/有我没它——自含宠物指代的强胁迫信号）。看见宠物受威胁与被要挟是两回事：正当做法是把送养与胁迫分开——可以协商送养（家里有人过敏，我们商量着把狗送走）、可以走法律途径（宠物抚养权是离婚协议中需要协商的事项之一/威胁伤害动物属于违法行为，可以报警处理）、可以讨论反家暴教育中的宠物要挟识别（以伤害宠物相要胁是情感操控的常见手段），但不能把宠物的存续或接触权当成要求对方顺从的抵押物。边界：thirdparty_harm_coercion（r662）判据是「把字句+宠物名词+毁灭动词 × 六类要胁标记」，本族漏判样本的形状在它两腿之外（「把它炖了」的「它」不在其名词表、「炖」不在其动词表；「先把狗送走」HARM 腿中而 COND 腿不中；「它归我你永远别见」「你的宠物就别想要了」是剥夺接触结构；「你们一起滚」是因宠物驱逐人）；relationship_severance（r654）管**关系终止宣告**（分手/离婚/断绝关系），本族的终止对象是**宠物的存续或接触权**，且胁迫者未必宣告终止关系——是「宠物和我你选一个」的抵押结构；emotional_manipulation 管情绪施压本身，本族是条件-威胁结构。已知边界：比喻用法（这个项目有它没我）罕见，取单支判定",
     // [r675] 第 120 维度 reproductive_coercion（生育胁迫）guidance。
     // 同 r661-r674 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
-    'reproductive_coercion': "不得把**生育（怀孕/生孩子/生儿子/终止妊娠）**与婚姻缔结、关系存续、个人价值绑定，作为要求对方当下顺从的条件——用先孕后婚、不生就散、不生就贬、堕胎永罚、辞职生子这五类绑定结构，把对方的身体决定权当成关系里的对价（怀了孕我才娶你，这是规矩。/你先把工作辞了，孩子生下来再说。/不生个儿子，你在我们家永远抬不起头。/You will not be a real woman until you give me a child./不生孩子就离婚，我找别人生。/你敢把孩子打掉，我这辈子都不会原谅你。/A real wife puts her husband's family line first.；样本形状与负例见 test/round-675-reproductive-coercion.js）。判据是**腿 A × 腿 B 双腿共现**（缺一不判）：①腿 A「生育语境」（怀孕：怀了孕/刚怀孕/意外怀孕；生育动作与传承：生孩子/生儿子/生二胎/孩子生下来/传宗接代/续香火/香火/断后/断子绝孙/皇位/继承人/孙子；终止妊娠：打掉/堕胎/流掉/拿掉/做掉；生育能力：生不出/生不了/怀不上；英文 give birth / have a child / get pregnant / bear a child / give me a child / abort / family line / bloodline / heir）②腿 B「绑定结构」五类任中一类——B1 婚姻条件化（怀孕/生儿子 + 才娶/才嫁/才领证/再过门，英文 marry you only if you are pregnant）、B2 关系终止要挟（不生（孩子/儿子）+ 就离婚/分手/找别人生/散，英文 if you don't give me a child, I will find someone）、B3 价值否定绑定（不生（儿子/孩子）+ 抬不起头/直不起腰/不孝/算什么女人，英文 not a real woman until / a real wife puts family line first）、B4 终止妊娠禁止 + 情感惩罚（敢（把）孩子打掉/敢去堕胎 + 永不原谅/这辈子饶不了/永远别回来，名词在前与动词在前两种语序都认）、B5 牺牲要求（祈使指向对方：先/必须/得/给我 + 放弃事业/辞掉工作 + 孩子生下来，英文 quit your job ... have the baby——祈使词必填，「生完孩子我打算辞职休息半年」是自主计划不是胁迫）。看见生育压力与生育胁迫是两回事：正当做法是把身体自主权与关系条件分开——可以充分沟通生育意愿（生育意愿是伴侣双方需要充分沟通的重要议题）、可以寻求医学帮助（生育健康咨询可以帮助伴侣做出合适的选择/产前检查可以筛查胎儿的发育异常）、可以讨论反家暴教育中的生育胁迫识别（生育胁迫是违法行为，受害者可以报警/Reproductive coercion is recognized as a form of abuse./以生育相要挟是情感操控的常见手段），但不能把生不生孩子、生男生女、堕不堕胎当成对方必须顺从的抵押物。边界：5 条同族样本已被其他维度拦下（「你不生孩子就是不孝，我们家就断后了」fallacies、「我妈说两年内必须抱上孙子」triangulation、「你要是真爱我，就会愿意为我生个孩子」double_bind、「你年龄再大就生不出来了，现在必须听我的」appeal_to_authority_boost + privacy_boundary、「我妈说了，孩子必须跟她姓，不然就别进这个门」thirdparty_harm_coercion——绑定的是姓氏不是生育，腿 A 不含姓氏词）；family_shame_coercion（r664）判据是「集体名誉受损定性 × 指向对方问责」，本族「不生个儿子，你在我们家永远抬不起头」主语是「你」且无名誉受损动词前缀（让/叫/使得/害），实测零命中；relationship_severance（r654）管**关系终止宣告**本身，本族的「不生孩子就离婚」终止关系是**条件句的后件**，绑定结构在生育条件上；已知边界：比喻用法与第三人称转述（「她婆婆说不生儿子就离婚」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
+    'reproductive_coercion': "不得把**生育（怀孕/生孩子/生儿子/终止妊娠）**与婚姻缔结、关系存续、个人价值绑定，作为要求对方当下顺从的条件——用先孕后婚、不生就散、不生就贬、堕胎永罚、辞职生子这五类绑定结构，把对方的身体决定权当成关系里的对价（怀了孕我才娶你，这是规矩。/你先把工作辞了，孩子生下来再说。/不生个儿子，你在我们家永远抬不起头。/You will not be a real woman until you give me a child./不生孩子就离婚，我找别人生。/你敢把孩子打掉，我这辈子都不会原谅你。/A real wife puts her husband's family line first.；样本形状与负例见 test/round-675-reproductive-coercion.js）。判据是**腿 A × 腿 B 双腿共现**（缺一不判）：①腿 A「生育语境」（怀孕：怀了孕/刚怀孕/意外怀孕；生育动作与传承：生孩子/生儿子/生二胎/孩子生下来/传宗接代/续香火/香火/断后/断子绝孙/皇位/继承人/孙子；终止妊娠：打掉/堕胎/流掉/拿掉/做掉；生育能力：生不出/生不了/怀不上；英文 give birth / have a child / get pregnant / bear a child / give me a child / abort / family line / bloodline / heir）②腿 B「绑定结构」五类任中一类——B1 婚姻条件化（怀孕/生儿子 + 才娶/才嫁/才领证/再过门，英文 marry you only if you are pregnant）、B2 关系终止要挟（不生（孩子/儿子）+ 就离婚/分手/找别人生/散，英文 if you don't give me a child, I will find someone）、B3 价值否定绑定（不生（儿子/孩子）+ 抬不起头/直不起腰/不孝/算什么女人，英文 not a real woman until / a real wife puts family line first）、B4 终止妊娠禁止 + 情感惩罚（敢（把）孩子打掉/敢去堕胎 + 永不原谅/这辈子饶不了/永远别回来，名词在前与动词在前两种语序都认）、B5 牺牲要求（祈使指向对方：先/必须/得/给我 + 放弃事业/辞掉工作 + 孩子生下来，英文 quit your job ... have the baby——祈使词必填，「生完孩子我打算辞职休息半年」是自主计划不是胁迫）。看见生育压力与生育胁迫是两回事：正当做法是把身体自主权与关系条件分开——可以充分沟通生育意愿（生育意愿是伴侣双方需要充分沟通的重要议题）、可以寻求医学帮助（生育健康咨询可以帮助伴侣做出合适的选择/产前检查可以筛查胎儿的发育异常）、可以讨论反家暴教育中的生育胁迫识别（生育胁迫是违法行为，受害者可以报警/Reproductive coercion is recognized as a form of abuse./以生育相要挟是情感操控的常见手段），但不能把生不生孩子、生男生女、堕不堕胎当成对方必须顺从的抵押物。边界：5 条同族样本已被其他维度拦下（「你不生孩子就是不孝，我们家就断后了」fallacies、「我妈说两年内必须抱上孙子」triangulation、「你要是真爱我，就会愿意为我生个孩子」double_bind、「你年龄再大就生不出来了，现在必须听我的」appeal_to_authority + privacy_boundary、「我妈说了，孩子必须跟她姓，不然就别进这个门」thirdparty_harm_coercion——绑定的是姓氏不是生育，腿 A 不含姓氏词）；family_shame_coercion（r664）判据是「集体名誉受损定性 × 指向对方问责」，本族「不生个儿子，你在我们家永远抬不起头」主语是「你」且无名誉受损动词前缀（让/叫/使得/害），实测零命中；relationship_severance（r654）管**关系终止宣告**本身，本族的「不生孩子就离婚」终止关系是**条件句的后件**，绑定结构在生育条件上；已知边界：比喻用法与第三人称转述（「她婆婆说不生儿子就离婚」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
     // [r678] 第 122 维度 legal_status_coercion（法律身份胁迫）guidance。
     // 同 r661-r677 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
     'legal_status_coercion': "不得把**对方的法律身份、法律程序结果或法律性生计前景**当作胁迫筹码，逼迫对方顺从或放弃离开/求助——用遣返威胁、扣押证件、司法关系施压、行业封杀、单位施压这些结构，把本应保护人的法律制度反过来当成控制工具（你敢离婚，我就让你遣返回国，你试试。/报警？警察认识我，你告不倒我。/你的签证在我手里，不听话就给你断了。/离开我，我让你在这个行业永远找不到工作。/我去你单位闹，让所有人都知道你是什么东西。/If you leave, I will make sure you are deported. Remember that.；样本形状与负例见 test/round-678-legal-status-coercion.js）。判据是**腿 A × 腿 B 双腿共现**（缺一不判）：①腿 A「法律身份/法律后果对象」三类任中一类——A1 身份对象（遣返/签证/护照/绿卡/户籍/户口/身份证/移民局/工签，英文 deport/visa/passport/green card/citizenship/immigration status）、A2 法律程序对象（报警/警察/法院/法官/律师/官司/起诉/吃官司/拘留/坐牢/看守所，英文 police/court/judge/lawsuit/sue/arrest/jail）、A3 法律性生计/声誉对象（行业/圈子/单位/公司/学校/领导/找不到工作/接不到活/混不下去/身败名烈，英文 industry/company/job/career/reputation，加生计后果短语 never work/never find a job）②腿 B「胁迫句式」七类任中一类——B1 恐吓后件（我就让你/叫你 + 遣返/混不下去/找不到工作/吃官司/哪儿都去不了，英文 I will make sure + 法律后果词）、B2 条件绑定（你敢/你再敢/不听话 + 就给你/就让你，英文 if you leave/go/try + 法律后果词）、B3 求助阻断（报警也没用/警察认识我/我认识法官/打点好了/告不倒/告不赢/打官司必输/死了这条心/没人信你，英文 the police know me / you will lose / reporting me is useless）、B4 扣押要挟（证件/签证/护照/户籍/绿卡 + 在我手里/在我这/我扣着/没收/给你断了/收回来/吊销/先扣着，英文 I have your passport locked up）、B5 生计封杀（我一句话你就接不到活/在这个行业离开我就混不下）、B6 单位施压（去你单位/公司/学校闹/找你领导/让所有人都知道/发到网上）、B7 生存绑定（离开我/没有我 + 你连/怎么活/活不下去/什么都不是，英文 without me you can't）。看见法律身份话题与法律身份胁迫是两回事：正当做法是把权利认知与胁迫分开——可以了解签证申请流程（签证申请需要准备充分的材料，建议咨询正规移民律师）、可以依法报警求助（遇到威胁时请及时报警，并保留相关证据/If you feel unsafe, contact the police or a local support organization.）、可以讨论反家暴教育中的身份胁迫识别（威胁、恐吓他人属于违法行为/Using immigration status to control a partner is a form of abuse.）、可以依法诉讼（家庭暴力受害者可以向法院申请人身安全保护令），但不能把对方的去留、求助、生计当成自己一句话就能调用的行政资源。边界：economic_control（v6.8.x）管经济支配（钱/财产/账目/零花钱），本族对象是法律身份与法律程序结果（签证/户籍/官司/行业封杀），「不听话就扣光生活费」归它不归本维度；social_isolation 管社交关系隔绝（不许见朋友/断绝娘家人），本族是法律身份胁迫；privacy_exposure_coercion（r663）管隐私内容暴露（照片/聊天记录/病历），本族的「去单位闹让所有人知道」胁迫目标是**单位与公众声誉渠道**而非隐私内容本身；helplessness_induction 管无依据无助声明，本族要求法律身份对象共现（腿 A），「离开我你什么都不是」单独出现不归本维度判；thirdparty_harm_coercion 管伤害第三方要挟，本族是法律后果要挟；已知边界：第三人称转述（「她前夫威胁说要把她遣返回国」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
@@ -2159,6 +2466,23 @@ function discriminate(text, evidence = [], contentMode) {
     // [r687] 第 128 维度 sexual_compliance_pressure（性顺从施压）guidance。
     'sexual_compliance_pressure': "不得把对方的**性自主**当作关系存续、爱意证明、债务清偿或角色义务的对价，逼迫对方服从——用性要求×关系威胁、性要求×爱意条件、性要求×义务宣告、债务对价即给付、关系角色×义务×隐式性指代这些控制结构，把「同意」换成「不得不」（你不跟我发生关系，就是不爱我，我们分手。/你是我的女朋友，陪你上床是你的义务。/用你的身体来报答我对你的好。/I bought you dinner and drinks, so you owe me tonight./Prove your love to me. If you refuse, I will find someone who will./You are my girlfriend. You have to do this whether you like it or not.；样本形状与负例见 test/round-687-sexual-compliance-pressure.js）。判据是**四条通路**（P1/P2 双腿共现，P3 单腿自含，P4 三腿共现——单腿可能是正常亲密关系表达）：P1 显性性要求×施压（性要求腿「发生关系/上床/同房/让我碰/用身体给/sleep with me/have sex with me/give me sex」× 施压腿六类任中一类——爱意条件「不爱我/就是不爱/if you refuse」、关系威胁「分手/到此为止/别怪我/we're done/I'll find someone else」、债务对价「欠我/报答/我请了你/you owe me」、义务宣告「必须/本分/天经地义/have to」、拒绝标记「不让/不肯/拒绝/if you say no」、强制宣告「由不得你/不管你想不想/whether you like it or not」、正常化框定「情侣都这样/normal couples do」）、P1b 隐式性指代（含义自明）× 施压（「别的男人都能得到你/someone who will/what I need/get it anywhere else」× 同上施压腿——「do this」这类依赖语境的短语刻意只进 P4 三腿通路，不进本通路，「You have to do this before the meeting」会误伤）、P2 显性性要求×义务宣告（上床/发生关系 × 是你的义务/本分/天经地义/must/duty）、P3 债务对价即给付（「owe me tonight/now/today」「欠我的今晚/现在」——债务对象缺省、即时词紧贴，结构自含交换含义；「owe me the report by tonight」有对象不命中）、P4 关系角色×义务宣告×隐式性指代（「You are my girlfriend × have to × do this」「你是我的老婆 × 必须 × 这事」——「You have to do this before the meeting」无关系角色名词不判）。看见性话题与性顺从施压是两回事：正当做法是把正当亲密沟通与胁迫分开——可以正常讨论需求与边界（双方在自愿前提下讨论亲密关系的节奏/Partners should discuss their boundaries openly and honestly./情侣之间沟通边界很重要）、可以学习性健康知识（性教育课程讲解双方同意的重要性/Sexual education teaches the importance of mutual agreement./任何性行为都应当基于双方自愿）、可以依法维权（强奸是严重的刑事犯罪/遭遇性侵犯应当立即报警并保留证据/If you feel unsafe, contact the police or a local support organization.）、可以描写小说电影情节（小说里描写的感情线很动人）、可以做心理咨询与案例复盘，但不能把对方的身体、性自主当成自己一句话就能索取、债务化、义务化的资源。边界：substance_coercion（r682）管成瘾物质摄入（不喝就不准出门），本族对象是**性自主**，不涉物质；reproductive_coercion 管生育决定（不生二胎就离婚），本族是**性行为本身**的索取，不涉生育结果；conditional_affection 的条件是爱与接纳（你再这样妈妈就不爱你了），本族的条件是**性服从**且必须带性要求腿；investment_as_debt 管已有资源折算债务（花了钱/你欠我的），本族的债务腿必须与即时对价或性要求共现（「你欠我的钱什么时候还」单腿不判）；emotional_manipulation 管情绪施压句式本身，实测本族攻击句「I bought you dinner and drinks, so you owe me tonight.」零命中（无情绪施压词，是纯粹的债务-交换结构）；已知边界：① 中英混排的歧义句（「我请你吃了三顿饭，你今晚必须陪我」——「陪」可解作陪伴，无显性性指代）刻意不判，保守边界由测试锁住；② 第三人称转述（「她前夫说她不陪睡就分手」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
     'post_separation_harassment': "不得在关系已经结束（或对方已经提出结束、已经拉黑拒绝）之后，用**到场纠缠、反复联络、追踪知情、拒绝接受分手、追债式行踪控制**否认对方的分离自主权，逼迫对方回到关系中——结束是对方的权利，不是需要你批准的事项（你要是敢分手，我就天天去你单位闹。/分手之后我天天给她打电话，拉黑了也不停。/你甩了我，我就天天去你家门口等着。/分手？我不同意，你跑到哪里我都能找到你。/离婚后你必须每天跟我汇报你的行踪。/你别想跟我分开，你跑不掉的。/If you leave me, I will show up at your workplace every day./After we broke up, I kept calling her 50 times a night./Breaking up with me is not allowed. I will find you wherever you go./I sent her 200 messages after she blocked me on everything./You broke up with me, so now you owe me an explanation every day./You think blocking me will stop me? I know your address.；样本形状与负例见 test/round-690-post-separation-harassment.js）。判据是**双腿共现**：① 分手/离开事件在场（break up/broke up/dump/divorce/left me/blocked me/we are not done/分手/离婚/断绝关系/甩了我/离开我/拉黑/前任）② 纠缠施压四类任中一类——B1 到场纠缠与反复联络（show up at your workplace/kept calling/sent her 200 messages after she blocked/天天去你单位闹/拉黑了也没用/跟着你/闹到你公司）、B2 知情威胁（I know where you live/我知道你住在哪/掌握你的行踪）、B3 拒绝接受分手（Breaking up with me is not allowed/不许分手/分手没门/你跑不掉/我不会放过你/no one dumps me）、B4 追债式行踪控制（owe me an explanation/汇报你的行踪/每天跟我解释你的去向）。缺一不判——「我们去年和平分手，各自开始了新生活」是正常分手叙事（无施压腿）；「遭遇跟踪骚扰应当及时报警并保留证据」是安全求助（无分手事件腿）。看见分手叙事与分手后纠缠是两回事：正当做法是把分开与自保分开——可以正常结束关系并处理共同事务（离婚后他们共同抚养两个孩子/They went to couples therapy to decide whether to stay together.）、可以复盘成长（分手后我反思了很多，也成长了不少）、可以寻求帮助（遭遇跟踪骚扰应当及时报警并保留证据/She applied for a restraining order.）、可以教育识别（跟踪骚扰是一种违法行为，可以申请人身安全保护令/Stalking is a crime and should be reported to the police.），但不能用到场、联络、知情、拒绝、行踪控制把「结束」变成对方需要申请批准的事项。边界：relationship_severance 管**关系进行中**用终止关系作对价（你再顶嘴，我就跟你断绝父子关系）——本族时序前提是**分离已发生**，手段是分离后的到场/联络/知情/拒绝；social_isolation 管**进行中关系**切断对方外部联系（你不准跟那个人来往）——本族不切断社交，是分离后重新抓回对方；thirdparty_harm_coercion 管伤害对方在乎的第三方或物品（我就把这只猫从窗户扔出去）——本族的施压对象是**对方本人的行踪知情与社交场合**（去你单位/闹到你公司），不涉第三方伤害；privacy_exposure_coercion 管曝光隐私内容作对价（把照片发出去）——本族「告诉所有人/闹到单位」是到场施压，不依赖隐私内容本身；loyalty_test 管忠诚度测试（如果我病了你会照顾我吗）——本族无测试结构，是直接的分离后纠缠",
+    'moving_goalposts': "不得在对方的成果/成绩/进步刚被承认后，**即刻否认其价值或把标准瞬移到别处**，使任何已达成的结果都持续作废、认可永不落地——用贬损性承认+否认价值、满分层抬标、翻旧账问责、他人比较贬损这四类结构，把评价变成对方永远够不到的移动靶（你做到了？那不算，我说的是完全不犯错。/好，你完成了这个，但你必须再完成那个才算。/你做到了 A？但真正重要的是 B。/行吧，勉强及格，但离我的标准还差得远。/考了 90 分？为什么不是 100 分。/你改了？那是你应该的，我本来就说的是更深层的问题。/这次没话说，但你上次的问题还没解释清楚呢。/涨薪了？隔壁公司同龄人都当上总监了，你这算什么。/So you finished it? That does not count, I asked for zero mistakes./You passed the exam? Why not a perfect score?；样本形状与负例见 test/round-692-moving-goalposts.js）。判据是**双腿共现**：①成果承认三类任中一类——显式达成「你做到了/你完成了这个/你改了」，成绩等级利益「考了 90 分/涨薪了/升职了/通过了答辩」，贬损性弱承认「勉强及格/算你过关/也还行/没话说」②标准瞬移四类任中一类——否认价值「那不算/这算什么/那是你应该的」，满分层抬标「为什么不是 100 分/完全不能犯错/离我的标准还差得远/必须再完成那个才算」，旧账问责与话题切换「但你上次的问题还没解释清楚/真正重要的是/先别说这个/别蒙混过关/更深层的问题」，他人比较贬损「别人都当上总监了 × 你这算什么/你这点成绩也好意思说」。缺一不判——「你做到了，大家都很满意」只有承认没有瞬移；「那不算数，按合同来」只有否认没有承认对象。承认之后立刻撤回比从不承认更消耗人：正当做法是把肯定与期待分开陈述——可以先如实肯定已完成的成果，再另起一句说明下一步的可执行目标（含理由与时限），并允许对方对目标本身发表意见，而不是用一句「不算/算什么/应该的」把刚刚承认过的成果当场收回。边界：standard_shift（第 70 维，r507）管**契约/验收语域**的移动球门（达成确认×还能更好/情况变了/既往承诺作废，ACHIEVED 只认交付动词、SHIFT 只认验收管理话术），本维度管**人际评价语域**（承认本身是贬损性弱承认或成绩/等级/利益承认，瞬移是否认价值/满分层/旧账问责/他人比较四类）——实测 standard_shift 对本族 8 条攻击全不命中，两句式交叉处（「你完成了这个，但你必须再完成那个才算」）也因它的 SHIFT 动词表不收「完成」而不抢判；comparative_devaluation（r673）管**长期的比较贬损**（别人家的孩子/你看看人家），本族的比较支要求先有本轮成果承认再瞬移，单有比较不判；perfect_error 管至善论式的无标准挑剔，本族要件是先有可验证的成果承认再事后否认；guilt_induction（第 109 维）左腿是付出标榜（都是为了你/我把房子卖了），本族无任何付出动词；concession_coercion 管让步胁迫（要对方先认错再谈），本族落点是标准被瞬移、对方并无让步动作；正当反馈与期待管理（这项任务你完成得很好，下次可以试试更有挑战的/90 分不错，我们来看看错题涉及哪些知识点/你的方案解决了主要问题，还有两个边界情况待处理/数据部分还可以再夯实/孩子考了满分，但不能因此骄傲，还要继续踏实学习）、正当追问旧事（上次的问题我们需要一起解决，这轮先聚焦新的进展）、分级晋升与标准公布（本轮合格，下一轮按已公布的新标准复测）、概念分析与规范陈述（移动球门是一种情感操控/识别移动球门话术是保护自己的第一步）与句首真诚提问（为什么不是100分？我想帮你分析一下失分点）明确不判",
+    // [r693] 第 131 维度 genetic_fallacy（起源谬误）guidance。
+    'survivorship_bias': "不得用**可见的成功个案**推**普遍结论或听者行动**——只看见活下来的样本，无视沉默的大多数：把「比尔·盖茨辍学成了首富」「那个主播一场直播赚一百万」「有人买彩票中了大奖」「我朋友用这个方法三个月就痊愈了」这些**成功结果**，直接当成「你也该退学」「读书没用」「做主播真轻松」「买彩票能发财」「你肯定也没问题」的根据（比尔·盖茨辍学创业成了世界首富，所以你也该退学。/李嘉诚没上过大学也成了富豪，读书没用。/有人买彩票中了大奖，所以买彩票能发财。/Steve Jobs dropped out and built Apple, so college is unnecessary.；样本形状与负例见 test/round-694-survivorship-bias.js）。判据是**两组双腿共现**：①可见成功个案（成功结果名词/动词：成了世界首富/财富自由/年薪百万/月入十万/赚一百万/中了大奖/拿了影后/冠军/痊愈/成名/暴富/买了房/活到九十/考上清华；EN：became a millionaire/won the lottery/got rich/made it big/owns three houses/never went to college and now owns）× 推及结论三类任中一类——推及听者（所以你也该/你肯定也/照这个方法你家孩子也能/人人都能/你入场肯定也行）、领域评价（读书没用/真轻松/能发财/可靠出路/捷径/好时候/不影响健康/都能赚）、EN 对应（so you should/you can too/college is unnecessary/is pointless/is a solid plan/anyone can）②非常规路径（辍学/退学/休学/没上过北影/打游戏/摆地滩/送外卖/白手起家；EN：dropped out/quit school/skipped college）× 成功结果——无显式推及句的经典幸存者叙事形（隔壁老王的儿子退学打游戏现在年薪百万）。缺一不判——「他考上了清华，这是他个人多年努力的结果」只有个案无推及腿，是个案归因陈述；「这个方法很可靠」只有推及无个案腿。用个案推普遍结论，会让沉默的大多数被完全排除在决策外、让听者高估罕见路径的成功率：正当做法是给出**总体统计**（创业成功率统计显示多数初创企业活不过五年/直播行业头部收入很高但中位数很低/中彩票是极低概率事件，期望收益为负），或把个案明确标注为个例并给出其不可代表的理由（盖茨辍学的是哈佛，且已有多年编程经验）。边界：anecdote_as_proof（第 84 维）管**熟人语料 × 全称效果断言**（我朋友/我身边/大家都说 + 普遍适用/行业标准），本维度个案不限熟人——名人、陌生人、具体人物皆可，落点是推及听者行动或领域评价而非「证明有效」；hasty_generalization 管无依据概推（推理形式），本维度要件是有可见的成功个案在场；statistical_misleading 管比例/倍数+小基数，本维度全程无数字也要能判；统计与概率陈述（大样本/样本量/中位数/期望收益/存活率）、反驳本族的话（个案不具代表性/不能代表总体/个例不能代表总体，要看大样本的统计数据）、医疗规范（这位患者的疗效需要对照试验数据支持）、概念分析与规范陈述（幸存者偏差是一种常见的逻辑谬误/识别幸存者偏差是保护自己的第一步）明确不判",
+    // [r695] 第 133 维度 appeal_to_pity（诉诸怜悯）guidance。
+    // 同 r694 先例：DIM_GUIDANCE 是独立登记表，漏登记时 findings 缺 guidance。
+    'appeal_to_pity': "不得用**自述的可怜处境**换**规则豁免或破例照顾**——把「我这么可怜」「我一个人漂泊异乡」「我从小父母离异」「我身体不好还有心脏病」「我孩子还小」「我家里条件这么差」「我都被公司裁员了」这些**第一人称处境自述**，直接当成「你怎么忍心拒绝我」「这点小忙你都不帮」「你们必须照顾我」「迟到几分钟怎么了」「这次晋升总该轮到我了」「就是断我们活路」的根据（我孩子还小，你们扣我工资就是断我们活路。/I have been through so much, you cannot possibly say no to me./My family will starve if you enforce this rule on me.；样本形状与负例见 test/round-695-appeal-to-pity.js）。判据是**双腿共现**：①自述可怜处境（第一人称在场十类：可怜/惨自述、孤独漂泊——漂泊异乡/举目无亲/人生地不熟、家庭不幸——父母离异/单亲、疾病身体——身体不好/心脏病/在住院、孩子拖累——孩子还小/一个人带孩子、贫困处境——条件差/手头紧/没收入/吃不上饭、失业裁员——被裁员/失业/丢了饭碗、年纪大、债务缠身、苦难总括；EN：I have been through so much/I am all alone/I was laid off/my family will starve/my child is still little/I can barely get by）× 通融免责要求三类任中一类——a 通融照顾（你怎么忍心拒绝/你都不帮/必须照顾/总该轮到/通融/网开一面/高抬贵手/放我一马/这点小忙你都不帮/看在我这么可怜的份上；EN：you cannot possibly say no to me/you must help/have a heart/make an exception for me）、b 反问免责与指责（迟到几分钟怎么了/你有没有同情心/你批评我就是在欺负弱者/于心何忍/连这点要求都不答应/你就不能通融一下吗；EN：how could you refuse/where is your compassion/what is wrong with being late）、c 后果绑架（就是断我们活路/逼得我没法活/让我们怎么活/我只能去死；EN：we will starve/this will kill me/you are cutting off our lifeline）。[r702 补族] 口语化通融请求四形：d 请求放过与不追究（这次就算了吧/你别跟我计较了/不再追究；EN let it slide this once / do not hold it against me / leave it be）——原表只收书面通融词，整类口语放过请求零覆盖；e 请求让步（不能让着我一点吗/相让一步/给个台阶下；EN cannot you let it go just this once）；f 强行要求形（不行也得行/无论如何都得批/非得…不可；EN no excuses / like it or not / no matter what）——以处境压人接受要求，与通融请求同族施压；g 乞怜祈使（可怜可怜我吧/行行好/发发慈悲；EN have pity on me / for pity's sake，带负向守卫：在/被/别之后的「可怜我」是陈述不是乞怜）。处境腿补三类：情感挫折（我刚失恋了/感情受挫；EN I just got dumped / I had a terrible breakup）、家人疾病（我妈住院了/我爸病了/我妈刚做了手术；EN my mom is in the hospital）、无能力自述（我什么都不懂/我没本事；EN I don't know anything / I have no idea）。单腿仍不判——「这次就算了吧，大家都很累了」只有放过请求无处境腿是正常协调；「我刚失恋了」只有处境无请求是处境陈述。缺一不判——「我一个人漂泊异乡，这里生活成本很高」只有处境无通融腿，是处境陈述；「这个规定太严了，通融一下」只有通融无处境腿，是正常协商。用处境换规则，会让规则的适用性被人情替代、让拒绝方背上道德罪名：正当做法是**说明处境的正当救济渠道**（公司有困难员工帮扶基金，符合条件的可以申请/遇到困难可以向社区求助/劳动法规定医疗期内的员工不能被随意辞退）或**核验处境真实性后按制度处理**（他迟到是因为送家人急诊，有医院证明，按制度处理）。边界：guilt_induction（第 109 维）左腿是**付出与代价标榜**（都是为了你/操碎了心/把房子卖了），本维度左腿是**可怜处境自述**、无任何为对方付出的成分；suffering_capital（第 102 维）左腿是**痛苦经历**（吃苦/受罪/忍气吞声）、右腿是**顺从推导**（必须听我的/没资格顶嘴），本维度右腿是**通融免责**、指向规则豁免不是资格剥夺；suffering_contest（第 78 维）管比惨消诉（取消对方诉求），本族不取消对方诉求也不索取情感回报；第三人称与客观制度陈述（他家庭困难是真的，但绩效考核要按统一标准执行/Employees facing hardship can request a flexible schedule.）、尊重决定权（我会说明我目前的困难，但决定权在你）、概念分析（诉诸怜悯是一种常见的逻辑谬误/Appeal to pity is a common logical fallacy.）、句首咨询提问（如何识别诉诸怜悯的话术）明确不判",
+    // [r698] 第 134 维度 poisoning_the_well（井里投毒）guidance。
+    'poisoning_the_well': "不得**预先污名化说话者**来**否定其观点**——把「他别有用心」「她是为了自己」「上次就站错队」「一个实习生」「竞品过来的」「方案肯定是抄的」这些**无依据的动机/历史/身份定性**，直接当成「别听他的」「她的建议不用看」「这次也别信」「别问他意见」「别浪费时间」的根据（他反对这个方案？别听他的，他向来别有用心。/她提的建议肯定是为了她自己，不用看内容。/Don't listen to him, he has always had an agenda./Ignore her proposal, she is only looking out for herself.；样本形状与负例见 test/round-698-poisoning-the-well.js）。判据是**双腿共现**：①预先污名定性三类任中一类——a 动机揣测（别有用心/没安好心/动机不纯/居心不良/就是针对/想推卸/想甩锅/想邀功/带节奏/被收买/是水军/是为了她自己/竞品过来的；EN：has an agenda/only looking out for herself/is being paid/can't be trusted）、b 历史污名（站错队/搞砸了/有前科/翻过车/被通报/老毛病/一贯如此/每次都/又来了/爱抬杠/杠精/方案是抄的；EN：messed up before/got fired/always complains/never delivers）、c 身份贬低（实习生/新人/刚来的/算什么/懂什么/也配/没资格/走后门/关系户/外包/乙方；EN：just an intern/a nobody/not qualified）② 拒绝采信结论三类任中一类——a 直接否定（别听他的/别信/信不过/不用搭理/理他干什么/别问/当耳旁风/别浪费/不用看/看了也白看；EN：don't listen to/ignore/discount/no need to read）、b 观点宾语在场（他的建议/她的方案/他说的话 + 否定，含宾语前置倒装形「他的建议也不用听」；EN：his suggestion is worthless/whatever he says is worthless）、c 反问式否定（听他的干什么/能安什么好心/有什么好想法/想得出来；EN：why listen to him/what does he know）。缺一不判——「他这个位置说这话，可能有立场因素」只有定性无拒绝腿，是正当的立场披露；「这个方案不成熟」是正常批评无污名定语。因人废言会让观点在进入讨论前就被取消资格、让讨论从论证质量滑向人身审查：正当做法是**就内容本身回应**（他这个方案的数据支撑是什么，我们逐条核对/她上周的压测报告我看了，第三项确实有问题，建议按报告改）或**披露并隔离立场**（他有行业背景，观点可能有利益相关性，请他就数据来源提供说明）。边界：appeal_to_motive（fallacies 紧凑形）管**动机揣测单句**（肯定是想推卸责任/无非是想甩锅），无拒绝采信腿；stereotype（既有维度）管身份标签泛化贬损（女人写的代码可靠性不如男人），本维度是**特定人的动机/历史定性 + 拒绝听内容**；genetic_fallacy（既有维度）管来源-质量推断（年轻人提的所以不成熟），本维度右腿是拒绝采信动作；bad_faith 管整体论证态度预设立场；victim_blaming 管受害者归责。反诈安全提醒（他说他是官方客服让你转账，别信）、匿名消息源质疑（网传的说法别信）、立场披露（他有行业背景，观点可能有利益相关性，需要说明）、评析话术本身（井里投毒是一种常见的逻辑谬误/Poisoning the well is a common logical fallacy.）明确不判",
+    // [r699] 第 135 维度 appeal_to_novelty（诉诸新潮）guidance。
+    'appeal_to_novelty': "不得仅凭**新/近期/刚发布**这一个属性就推出**质量优越或旧的该弃用**——把「最新」「刚发布」「新技术」「今年才出」当成「肯定比老框架好」「一定比上一代强」「肯定更先进」「肯定修复了所有问题」「老方法早就过时了」「旧方案可以扔了」的根据（这是最新的框架，肯定比老框架好。/刚发布的模型一定比上一代强。/用新技术就对了，老方法早就过时了。/The latest framework is definitely better than the old one./Just use the new technology; the old methods are obsolete.；样本形状与负例见 test/round-699-appeal-to-novelty.js）。判据是**双腿共现**：①新潮标记（最新/刚发布/新推出/刚上线/今年才出/新款/新品/新一代/新技术/新版本/新框架/新模型/新系统/新方案/新出的；EN：latest/newest/just released/brand-new/newly released/the new version/new technology）② 无依据优越断言三类任中一类——a 比较优越（肯定/一定 + 比老/比旧/比上一代 + 好/强/先进/靠谱；EN：definitely better than the old one）、b 绝对优越（肯定/一定 + 更先进/好用/靠谱/修复了所有问题/碾压/完胜；EN：definitely fixes all the problems）、c 贬旧劝告（老方法早就过时了/旧方案可以扔了/买新不买旧/别用旧的 + 用新/买新；EN：the old methods are obsolete/throw out the old）。缺一不判——「这是最新的框架，但我们还没有实测数据」只有新潮无优越断言，是事实陈述；「这个方案肯定好」无新潮腿，归 confidence。以新代旧会让选型脱离实测、让未经检验的产品凭发布时间获得信任：正当做法是**给出可核验的对比依据**（新框架的 benchmark 报告显示吞吐提升 30%，测试用例覆盖情况见发布说明/我们做了 A/B 测试，新版在延迟上确实有优势，但兼容性还需评估）或**把新旧差异作为待验证假设**（新版刚发布，建议先在小流量上验证再全量）。边界：confidence 管断言强度无新潮要件；genetic_fallacy（r693）管**以来源年代为由的贬损**（两百年前的所以过时），方向相反——本族是以新为由的褒扬；appeal_to_tradition 管诉诸传统（老祖宗传下来的就是好），方向同样相反；hasty_generalization 管无依据概推，本族要件是「新」被当成质量判据；capability_overclaim 管能力夸大，本族落点是新潮属性。正当提问（如何选择最新的框架/Which framework should we choose）、依据在场（实测数据/发布说明/changelog/benchmark/同行评审——有出处的版本对比是引用）、平衡比较（各有优势/按需选择/it depends）、版本事实陈述（最新版已推送给所有用户）、评析话术本身（诉诸新潮是一种常见的逻辑谬误/Appeal to novelty is a common logical fallacy.）明确不判",
+    'circular_reasoning': "不得把**结论本身当作结论的证据**——用「因为这是对的，所以它是对的」「这本书是好书，因为它写的都是好内容」「他是天才，因为天才才写得出这样的作品」「数据准确，因为数据从来不会错」「他专业，因为不专业的人做不到这么专业」这类**前提只是结论换句话说过**的论证，没有任何新的依据、数据或推理（It is right because it is right./This is a good book because it is full of good content./He is a genius because geniuses write works like this.；样本形状与负例见 test/round-701-circular-reasoning.js）。判据是**双腿共现**：①同词共现——连接词（因为/由于/because/since）或分号两侧出现同一个实词片段（中文 2-6 字纯汉字 n-gram，功能词片段如他是/因为一律跳过；英文 4+ 字母实词，支持词干/复数/否定前缀匹配，或相邻实词对重复）② 定义式复述框五类任中一类——f1 主语重启（后半句以重复词或其否定形开头且紧跟 的/才/就是/从来/的人）、f3 类指名词化（的人/的东西）、f5 恒常习惯（从来/永远/总是）、f6 全称判断（都是/全是/无非是）、f7 判言重启（就是/才是/算是/完全是/无疑是）、f8 同构复述（去代词后两侧相同，或后半句是纯系词句「（它/这/那）是X」且 X 与重复片段互相包含）；EN：e1a 主语重启+定义式尾、e1b 否定定义（un/in/non+重复词）、e2 类指关系从句（people who/ones that）、e3 定义式尾（like this/this way/by definition）、e4 整句同构、e6 纯系词复述、e9 恒常标记同现。缺一不判——「他迟到，因为他迟到了」有重复但后半句是同一事件的重申，没有定义式框架；「会议延期，因为延期申请已经批准」后半句引入新事实（申请/批准），即使「延期」重复也不判。循环论证会让论证看起来完整而实际零信息量，把复核义务转嫁给听者：正当做法是**给出独立可核验的依据**（该书销量数据来自第三方审计，见报告编号/他的专业能力有十年项目记录支撑/三项独立实验都验证了该结论）或**承认前提不足**（目前只有同义反复，需要补充实证数据）。边界：FALLACY_PATTERNS 内既有 3 条 circular_reasoning 正则只认嵌套形（因为X所以X因为），本维度是程序化判定；contradiction 管前后语义冲突，本族前后不冲突；reasoning_coherence 管推理链完整性，本族三段俱全；evidence 管有无出处，本族攻击句常无数字也无来源；confidence 管断言强度，本族可毫无强度词。正当陈述（他诚实，因为诚实是他的原则/会议延期因为延期申请已批准/他迟到因为他迟到了）、依据在场（实验/验证/复核/文献/评分/留存率/统计——有出处是引用）、引述转述（他说/表示/据报道——转述是新信息来源）、教学与元话语（循环论证是一种逻辑谬误/Circular reasoning is a common logical fallacy./循环论证是指因为这是对的，所以它是对的）、数字与百分比在场、条件后置（错了就要认）明确不判",
+    'darvo': "不得在被指控时**反转受害者与加害者的身份**——把「你才是伤害我的那个，你还有脸说我？」「你居然指责我，我才是受害者」「你这么说岂不是在欺负我？」「你才是施暴者，别颠倒黑白」「You are the one hurting me, how dare you blame me?」「You are the abuser here, stop playing the victim.」「I am the real victim in this relationship, not you.」这类**不回应指控本身、把指控者变成被告**的话术当正常争辩（样本形状与负例见 test/round-713-darvo.js）。判据两条路由任一成立：① 指控回应×身份反转双腿共现——腿①对当前对话方指责的反击（还有脸/居然/怎么敢/反倒/反而 + 说/指责/怪/批评/问/倒怪/反咬；恶人先告状/颠倒黑白/倒打一耙/装无辜/装受害者；该道歉的是你；你这么说/你这种话；EN: how dare you blame/accuse me | you blame/criticize me | who are you to judge | stop playing the victim）× 腿②受害者身份反转（你才是/是你 + 伤害/施暴/欺负/逼/骗 + 我/者；我才是……受害者；你伤我多深；受伤害的人是我；EN: you are the one hurting/harming me | you are the abuser/abusive | the one who is abusive | I am the (real) victim）；② 受害者自称×排他单支（我才是受害者 + 而不是你 | I am the real victim ... not you——排他性身份争夺本身即是反转，正常受伤陈述不争夺唯一受害者身份）。正当冲突复盘、关系修复中的受伤陈述与邀请沟通（想和你好好说/需要一起面对/可以分开谈/我们一起/let's talk/talk about it/work it out）、双向承认（你和他都是受害者/We both got hurt）、第三人称专业复盘（心理咨询师/调解员/咨询师/counselor/therapist/mediator）、元话语分析（DARVO 是一种把指控者变成被告的话术）明确不判。边界：performative_responsibility 管用自己的处境更惨宣布对方诉求降级/失效（「是你把我逼成这样的，你倒怪起我来了」归它），本族管身份反转本身；victim_blaming 管归因（把伤害归咎于受害者）；guilt_induction/emotional_manipulation 管情感债务制造，本族可毫无情感词。正当做法是**回到事实层面就事论事**（这件事的事实是……争议可以逐条核对/伤害的程度需要证据支撑而不是身份声明）或**承认冲突中的自身责任**（我理解你的指责，我们可以分开谈各自的感受），不是交换受害者身份。",
+    'concern_trolling': "不得用**「为你好」的包装实施控制、贬低或打压**——把「我是为你好，才指出你这些问题的」「我这么说都是关心你，别人谁愿意跟你说这些」「为你好才提醒你，你这样下去不行」「别不识好人心，我这些都是为你好」「我关心你才说这些难听话，换别人我才不管」「我是担心你才批评你的，这是负责任的表现」「I am only saying this because I care about you.」「A real friend would tell you these hard truths, and I care enough to do it.」这类**把伤害性话语装扮成善意提醒、同时取消对方不接受的权利**的话术当正常关心（样本形状与负例见 test/round-714-concern-trolling.js）。判据两条路由任一成立：① 关心包装×贬低控制双腿共现——腿①关心包装（为你好/关心你/担心你；EN: because I care / I care about you / for your own good / I care enough / a real friend would）× 腿②贬低控制内容（你这些问题/你的问题/你这样下去/你这样不行/你不听/不听劝/批评你/指责你/难听话/不识好人心/不知好歹/你这个人/你总是/你从来；EN: hard truths / your problems / these problems / only saying this / nobody else would）；② 关心包装×排他垄断双腿共现（别人谁愿意/换别人/除了我/没人愿意/谁会跟你说/只有我——把「愿意批评你」垄断成自己的特权，正常关心陈述不争夺批评权的独占）。正常关心（你最近看起来状态不好，发生什么事了吗/这件事我有点担心，想听听你的想法/作为朋友我提醒你一下，这个合同条款要仔细看/我尊重你的决定，只是把我的担心说出来供你参考/I am worried about you, let me know if you need anything.）、正常批评（你这个方案有问题，理由是数据不支持）、元话语分析（伪关心是一种用关心包装的控制手法）、第三人称专业复盘（心理咨询师说，你丈夫总是说为你好才批评你，这是伪关心的话术）明确不判。边界：guilt_induction/emotional_manipulation 管情感债务制造（我为你付出这么多/你欠我的），本族可毫无付出叙事；tone_policing 管压制表达方式（你说话客气点），本族管「以关心之名行贬低之实」的内容替换；bad_faith 检测表里的 en_concern_trolling pattern 只认字面「you are concern trolling」的指控句，本族管运用这套话术的陈述本身。正当做法是**把「问题」落到可核对的事实上**（你提到的具体是哪件事？我们可以逐条核对/这个判断的依据是什么，有没有具体例子）或**承认对方的接受权**（我把担心说出来供你参考，采不采纳你定），不是用善意包装取消对方不接受的权利。",
+    'stereotype_origin': "不得用**出身/来源标签**代替**实际表现**，直接贬低人的属性、品格或心理——把「专科毕业的，逻辑能力能强到哪去」「年纪轻轻的懂什么，回去多历练几年」「富二代罢了，能力都是家里给的」「单亲家庭长大的孩子心理都有问题」「文科生写代码，能写出什么好东西」「People from small towns just do not have the vision for this.」「She is too emotional to handle a leadership role.」「He is just a trust-fund kid, none of it is his own work.」这类**按学历/年龄/家庭背景给人贴标签、不论其实际作品或表现就下贬损结论**的话术当正常评价（样本形状与负例见 test/round-715-stereotype-origin.js）。判据是**双腿共现**：①出身/来源标签三类任中一类——学历出身「专科/二本/三本/大专/中专/技校/职高/文科生/理科生/艺术生/体育生/非名校/没上过大学/自学成才/海归/留学生/野鸡大学/成人教育/网络教育/专升本」，年龄出身「年纪轻轻/年纪小/太年轻/年轻人/青年人/应届生/毕业生/实习生/新人/新手/小孩/小年轻」，家庭背景与机构出身「富二代/官二代/拆二代/单亲家庭/单亲妈妈/单亲爸爸/农村/外地/小地方/小县城/小镇/乡下/草台班子/民间/大厂/裁员/自由职业/转岗/宝妈/奶爸/北漂/沪漂/深漂」；EN：from a vocational school / community college / art major / self-taught / non-degree / too young / just a kid / fresh graduate / intern / newcomer / trust-fund kid / silver spoon / single-parent / from a broken home / from small towns / rural / village / laid-off / gig worker / blue-collar / working-class / she is too ② 对人的属性/品格/心理贬损三类任中一类——能力贬损「逻辑能力能强到哪去/懂什么/能写出什么好东西/能力都是家里给的/不成熟/幼稚/纸上谈兵/眼高手低」，心理贬损「心理都有问题/心理脆弱/性格缺陷/情绪化/玻璃心/抗压能力差/心理不健康/人格缺陷」，品格贬损「眼界不行/见识短/目光短浅/靠不住/不可靠/有问题/有毛病/不靠谱/素质低/没教养/格局小」；EN：cannot have the vision / does not know anything / none of it is his own work / too emotional / psychologically damaged / has issues / cannot be trusted / unreliable / has no vision / narrow-minded。缺一不判——「这位候选人来自二线城市，但项目经验很扎实」只有出身无贬损结论，是事实陈述；「这个方案不成熟」只有贬损无出身腿，是正常批评。按出身下结论代替按实际表现下结论，会让有能力的候选人被学历埋掉、让无依据的贬损被出身包装：正当做法是**就实际表现立论**（这位候选人虽然学历普通，但开源贡献说明自学能力很强/她转行做开发两年，已经能独立负责模块/我们评估候选人主要看作品和面试表现）或**把出身作为背景信息陈述而不作为能力判据**（他来自小城市，但项目经验很扎实/成长环境会影响性格，但不决定一个人的能力）。边界：genetic_fallacy（第 131 维）管**来源×质量推断**——落点是观点/产品的价值（「小地方出来的人，眼界就是不行」被它判 verify，因为「眼界」指向判断力/认知质量），本维度只收 genetic_fallacy 不覆盖的**出身×人的属性/品格/心理贬损**（学历/年龄/家庭背景×能力/心理/品格），两类句式分开收；stereotype（既有维度）管**身份标签×不可靠标签**——按性别/种族/地域给群体贴不可靠标签（「女人就是情绪化，谈什么理性」被它判 verify），本维度只收 stereotype 不覆盖的**出身×个人属性贬损**（学历/年龄/家庭×个人能力），性别歧视型句式整族不在此列；hasty_generalization（既有维度）管无依据概推，本族要件是出身被点名；confidence / capability_overclaim 管能力夸大，本族落点是出身导致的贬损；正当评价（以实际表现为据：项目经验很扎实/能独立负责模块/开源贡献说明自学能力很强）、中性事实陈述（这位候选人来自二线城市/她转行做开发两年/他家里条件不错）、平衡比较（年轻同事想法新，老同事经验足，可以互补）、正当提问（应届生能胜任这个岗位吗）、概念分析与规范陈述（出身歧视是一种偏见/识别出身歧视话术）明确不判",
+    'wishful_thinking': "不得用**愿望/信念/心态**代替**证据**，直接推断结果会按自己期望的方向发展——把「我相信会成功，所以一定会成功」「只要我足够努力，宇宙就会回应我」「念念不忘必有回响，想什么就来什么」「我这么真诚，老天不会亏待我的」「心诚则灵，只要信念够强就能实现」「我这么想，事情就会按我想的发展」「I believe it will work out, so it will work out.」「If I want it badly enough, the universe will provide.」「My positive thinking alone will make it happen.」这类**以信念驱动结果推断**的话术当正常励志表达（样本形状与负例见 test/round-716-wishful-thinking.js）。判据两条路由任一成立：① 信念/愿望×必然结果双腿共现——腿①信念/愿望表达（我相信/我坚信/我确信/我期待/我这么想/只要我/我真心/我虔诚/我足够努力/我这么真诚/念念不忘/心诚/信念够强；EN: I believe / I am convinced / I am sure / I wish / I hope / I want / my positive thinking / my sincere hope / if I just believe / my belief / my faith / my hope）× 腿②必然结果推断（所以一定会/就会/肯定会/必有回响/老天不会/宇宙就会/按我想的/就会实现/注定会/必然会/就会成真；EN: so it will / it will work out / the universe will / it is bound to / it is meant to be / it will happen / it will come true / it is destined / it is inevitable / will make it happen / will make it come true）；② 信念/愿望×超自然因果双腿共现（宇宙就会回应/老天不会亏待/心诚则灵/念念不忘必有回响/想什么就来什么/吸引力法则/天人感应/天道酬勤/善有善报/因果报应/命中注定/天意如此/老天有眼/苍天不负；EN: the universe will provide / law of attraction / manifest / it is written in the stars / the cosmos will / divine will / karma will / fate will / destiny will——把结果归因于超自然力量对信念的回应，正常励志陈述不引入超自然因果）。缺一不判——「我相信这个方向，但还是要看数据验证」只有信念无必然结果，是正常信念表达；「这个事情一定会成功」无信念来源，归 confidence。用信念替代证据推断结果，会让决策脱离可验证的事实、让未经检验的期望获得因果效力：正当做法是**把结果落到可核对的证据上**（我们做了 A/B 测试，数据支持这个方向/对照组实验显示该方法有效/同行评审的论文验证了这个结论）或**把信念作为行动动力而非结果保证**（我相信这个方向，但结果还要看执行和市场反馈/积极心态有助于坚持，但不能替代准备）。边界：affective_forecast（既有维度）管**对未来情绪的预测偏差**（我会很开心/不会难过），本族管以愿望代替证据的**因果推断**（相信→结果必然实现）；confidence 管**断言强度**（肯定/一定/毫无疑问），本族管「信念→结果」的因果结构，可毫无强度词；pseudo_causal 管**虚假因果机制**（A 导致 B 的具体机制错误），本族管纯信念驱动的结果推断，无机制描述。正常励志表达（保持积极心态有助于应对挑战/努力很重要，但结果还取决于市场环境/愿望需要配合行动和策略才能实现）、人生态度陈述（心诚则灵是一种人生态度，不是因果机制/信念可以给人力量，但不能改变客观规律）、证据在场（数据/验证/测试/实验/对照组/benchmark/A-B 测试/同行评审——有出处的信念表达是引用不是替代）、元话语分析（一厢情愿是一种常见的认知偏差/Wishful thinking is a common cognitive bias.）、第三人称专业复盘（心理咨询师说，你总是相信只要努力就会成功，这是一厢情愿的思维模式）明确不判。",
+    'appeal_to_ridicule': "不得用**嘲笑/蔑视/智商贬低对方的观点或发言**代替论据——把「这种想法也太可笑了，亏你想得出来」「这么幼稚的观点也拿出来说」「笑死我了，这也叫方案」「你的逻辑太搞笑了，认真读过文档吗」「脑子正常的人都不会这么想」「这也信？智商堪忧」「你的方案蠢得让人无语」「哈哈，就这水平还敢发言」当成对某个立场的反驳（This idea is ridiculous. I can't believe you came up with it./What a childish argument. Did you even read the docs?/LOL, you call this a plan?/Anyone with a functioning brain wouldn't think that.；样本形状与负例见 test/round-704-appeal-to-ridicule.js）。判据是**三条路由任一命中**：①双腿共现——腿①嘲笑/蔑视表达（可笑/搞笑/笑话/蠢/幼稚/天真/弱智/无语/好意思/笑死/笑哭/智商堪忧/脑子进水；EN：ridiculous/laughable/hilarious/pathetic/absurd/stupid/idiotic/childish/naive/lol/lmao/your IQ is concerning）× 腿②指向对方观点/发言/产出的目标腿（这种/这个/这么/这也/这叫/就这 + 想法/观点/论调/方案/逻辑/设计/说法/主意/水平/东西/叫/信/想；你的 + 方案/逻辑/想法/观点/设计/说法/主意/水平/脑子/智商/作品/成果/回答/结论；拿出来说/敢发言/也敢说；EN：this/that/such a/what a + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level、your + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level/brain/iq/work/output、you call this/you believe this/dare to speak/only someone like you）② 自含指向的固定嘲讽习语单独成支（亏你想得出来/也只有你/只有你能有/不值一驳/脑子正常的人都不会/就这水平；EN：can't believe you came up with this/not even worth refuting/anyone with a functioning brain/with this level）③ 缺一不判——「这个桥段很搞笑」只有笑料描述无指向腿；「你这个想法需要数据支撑」只有指向无蔑视表达。诉诸嘲讽把讨论从**论据核对**转成**立场羞辱**，让对方为「敢提出这个想法」本身付出代价：正当做法是**针对观点给出可核验的反驳**（这个方案的第三步推不出来，因为样本量只有 12，结论不显著/我不同意这个观点，理由是数据不支持：对照组缺失）或**把嘲笑换成具体缺陷指认**（这个方案确实有可笑的漏洞：缓存没有过期策略，我们来修复它）。边界：sarcasm 管反讽语气标记（呵呵/你说得都对/笑死了），是语气描述且不强制行动，本族要求嘲词×观点指向共现或固定习语；hate_speech/dehumanization 管对人的侮辱与人格否定（你就是个废物/这种人就是垃圾），落点是人，本族落点是观点/发言/产出；bad_faith 管论证动机的恶意推定，本族不管动机只管以嘲代替论据；FALLACY_PATTERNS 既有 straw_man 正则只认「你的意思就是说…但这显然」转述形。明确不判：缺陷对象在场（这种方案确实有可笑的漏洞/This plan does have a ridiculous flaw——可笑修饰的是漏洞不是方案整体，是具体指认）、评析话术本身（把「这种想法太可笑了」当作论据，就是诉诸嘲讽/Appeal to ridicule is a common logical fallacy.）、提问咨询句式**不豁免**（「你的逻辑太搞笑了，认真读过文档吗」「这也信？智商堪忧」以反问收尾的攻击形态占比高，豁免问句会把整族放行）、幽默内容转述（喜剧电影里的这个桥段很搞笑/他讲的笑话让全场都笑了/这个段子写得真幽默——笑料内容描述不是攻击）、正当反对（我不同意这个观点，理由是数据不支持/你的逻辑有问题，第 3 步推不出来）",
+    'genetic_fallacy': "不得用**来源、出身、年代或身份**代替内容本身，直接推出观点/产品/人的质量结论——把「谁提出的、哪生产的、什么年代的」当成「对不对、好不好」的判据，用来源点名（年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/自学/两百年前/上个世纪/古代/老祖宗/农村/外地）× 质量贬损推断（直接贬损「肯定不成熟/早就过时了/见识短/能力肯定有问题/观点不值得听/好不到哪去」、比较贬损「不如进口的成熟/比不上正规的」、反问贬损「能适合中国国情吗/能好到哪去/靠得住吗」）这些结构，把评价变成看出身不看事实（这个观点是年轻人提出的，肯定不成熟。/外国人写的书，能适合中国国情吗。/小作坊生产的，质量能好到哪去。/他没上过名牌大学，观点不值得听。/这理论是两百年前提出的，早就过时了。/农村来的见识短，别听他的。/大厂裁员出来的人，能力肯定有问题。/This idea came from a freshman, so it cannot be worth much./The report was written by an intern, I will not even read it./He is from a small town, so his judgment cannot be trusted.；样本形状与负例见 test/round-693-genetic-fallacy.js）。判据是**双腿共现**：①来源点名三类任中一类——人群身份「年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/业余/自学」，年代时间「两百年前/上个世纪/古代/老祖宗/很早以前」，出身机构与产地「农村/外地/小作坊/草台班子/国产/进口」②质量贬损推断三类任中一类——直接贬损「肯定不成熟/早就过时了/见识短/有问题/不值得听/好不到哪去/纸上谈兵」，比较贬损「不如进口的成熟/比不上正规的/比不了名牌的」（宾语必须是来源类名词），反问贬损「能适合……吗/能好到哪去/靠得住吗/凭什么」（只收带质量名词的贬损反问，不泛收「能……吗」）。缺一不判——「这个方案不成熟」只有贬损没有来源腿，那是正常批评；「应届生经验少一些，但学习能力强」只有来源没有贬损结论。按出身下结论代替按内容下结论，会让有依据的观点被身份埋掉、让无依据的说法被资历包装：正当做法是就内容本身立论——可以如实说明某结论的**验证过程与证据强度**（经过审计/同行评审/临床验证/官方统计/检测认证），或把年龄/年代/产地作为**背景信息**陈述而不作为质量判据，并允许不同来源的提案按同一套标准竞争。边界：stereotype（既有维度）管**来源歧视性评价**（按性别/种族/地域给人贴不可靠标签，「女人写的代码可靠性不如男人」归它判 verify），本维度按 r691 交接簿要求只收**来源-质量推断**（来源是年龄/资历/年代/机构/产地，结论指向观点或产品本身的价值），两类句式分开收、攻击集不含性别歧视型样本；appeal_to_tradition（既有维度）管**诉诸传统**（老祖宗传下来的就是好），本族方向相反——以出身年代为由的贬损（两百年前的所以过时）；hasty_generalization（既有维度）管无依据概推，本族要件是来源被点名；confidence / capability_overclaim 管能力夸大，本族落点是来源导致的贬损；正当来源采信（以验证过程为据：经过四大会计师事务所审计/同行评审的论文更可靠/官方统计数据可参考/经过临床验证）、中性事实陈述（这个理论有两百年历史，但至今仍是该领域的基础/老系统运行了十年，迁移前要先评估风险）、正当提问（应届生能胜任这个岗位吗）、平衡比较（进口设备和国产设备各有优势，要按实测数据选型）、概念分析与规范陈述（起源谬误是一种常见的逻辑谬误/识别起源谬误是保护自己的第一步）明确不判",
     'deprivation_coercion': "不得以剥夺对方的**基本生存需求**（睡眠/食物/如厕/饮水/取暖/庇护所/医疗可及）作为惩罚或胁迫的杠杆——把不许睡、不给饭吃、不让上厕所、停空调、锁在门外、扣钱治病这些控制结构，当成要求对方服从的对价（今晚不许睡，跪到我原谅你为止。/不听话就不给你饭吃，饿到你知道错。/不认错就别想上厕所，憋着。/No dinner until you apologize. Stay in your room, hungry./No sleep for you tonight. Think about what you did.；样本形状与负例见 test/round-681-deprivation-coercion.js 与 test/round-684-deprivation-en.js）。判据是**三条独立通路 + 两条英文通路**：P1 条件剥夺结构（条件腿 不X就/不X别想/直到…为止/先…再 × 需求腿，需求腿必须带**祈使禁止形**（不许/不准/不让/别想 + 睡/饭/上厕所/空调/进屋）或**指向对方**的剥夺形（不给/停/断/扣 + 你/他/她的 + 需求）——裸事实条件句「不按时吃药就看不好」是陈述不是剥夺，刻意不判）、P2 强制姿势/位置惩罚（跪/面壁/罚站/楼道里站着 姿势腿 × 到我原谅你为止/天亮再进来/不写完检讨不许 时限腿；裸「站着」不收，他站在车站等车天亮再出发会误伤）、P3 需求剥夺作惩罚宣告（不给/停了/扣了/关了 剥夺动词 × 饭/空调/药/零花钱 需求对象 × 长记性/知道错/饿着/看你 惩罚目的，三腿缺一不判——「我不给你开空调」没有惩罚目的后件可能只是陈述）、P4 英文条件剥夺（until you / if you don't × no dinner / no sleep / withheld your medication）、P5 英文剥夺宣告/否认形态（no+需求+for you「No sleep for you tonight」/ grounded 惩罚标记×no+需求 / deserve 否认「You don't deserve to eat today」/ 第一人称断供宣告「I'm not paying for your medication anymore」/ 关停设施×对方受苦后果两腿跨句 / 庇护所剥夺×until-you 惩罚条件——宣告本身就是控制者口吻，不需条件腿；避险指令「Stay in the basement until the tornado passes.」与单腿省电陈述「I'm turning off the heat to save energy」刻意不判）。看见基本需求话题与需求剥夺胁迫是两回事：正当做法是把正当管教与剥夺胁迫分开——可以暂停零食玩具（家长暂停孩子的零食是常见的教育方式，但不应危及健康）、可以管理零花钱（合理的零花钱管理有助于培养孩子的金钱观念）、可以执行医疗流程（术前禁食禁水/医嘱要求空腹）、可以陈述权利与求助（剥夺未成年人基本生活需求属于虐待行为，可以报警/Withholding food or medical care as punishment is abuse./公司不得以罚款形式剥夺员工的基本劳动报酬权利/学校应当保障学生在校期间的饮水、进食与如厕需求），但不能把对方的睡眠、饭食、如厕、取暖、栖身之所、医疗可及当成自己一句话就能取消的惩罚工具。边界：economic_control（r668）管经济支配结构（工资卡上交/支出审批/我养你，是持续管辖不是以剥夺为罚），本族的「零花钱全扣了」须带惩罚目的后件且不涉收入归属移交；liberty_restriction（r679）管人身自由（锁屋里/没收证件/禁足），本族的「不许进屋/楼道站着」侧重点是庇护所与生存条件剥夺且须带条件或时限结构；medical_coercion（r680）管医疗自主（禁止就医/强制替代疗法），本族的「停了你的药/不给钱治病」侧重点是基本需求作惩罚杠杆；已知边界：第三人称转述（「她前夫不给她饭吃」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
     'medical_coercion': "不得用**禁止就医、强制停药或强制替代疗法、阻断就医渠道、控制医疗资源、否定病情**剥夺对方的医疗自主权，逼迫对方放弃治疗或服从自己的「治疗」安排——把不许去医院、强行停药、锁起医保卡、说病是想出来的这些控制结构，当成要求对方服从的对价（不许你去医院，那些医生都是骗子。/我让你停药你就得停，不吃出问题我负责。/信我的方子，再敢偷偷买药我打断你的腿。/Do not see a doctor; faith alone will cure you, trust me.；样本形状与负例见 test/round-680-medical-coercion.js）。判据是**五类独立通路 + 一类双腿共现**：P1 禁止医疗行为（不许/不准/不让/禁止/别想 + 医院/医生/药/产检/心理医生，两种语序都收；刻意不用「不能」——「这个药不能停」是常规医嘱）、P2 强制医疗决定（控制者宣告腿 × 医疗覆决定腿：听我的/我说了算/我让你 + 停药/停止治疗/不用治/把药停了/你的治疗方案由我定，英文 I told you to stop taking your medication）、P2c 替代疗法结构（信教治病/信我的方子/喝符水/偏方能治，英文 faith alone will cure you / only prayer can cure）、P3 就医阻断威胁（再敢/再提 + 医疗行为 + 威胁后件：再敢偷偷买药我打断你的腿）、P4 医疗资源控制（你的医保卡/病历/处方/药 + 锁/收/扣/藏/断/停，须带归属标记——自述「我把药停了」不判）、P5 病情否定 × 就医阻断（你的病都是自己想出来的 + 回去睡觉；你就是懒不是抑郁 + 自己扛过去；松腿须与强阻断腿共现，单独「你没病，注意观察」可能是医生安慰）。看见医疗话题与医疗自主胁迫是两回事：正当做法是把正当医疗行为与胁迫分开——可以建议就医（身体不适应及时就医，不要拖延/You should see a doctor if the pain persists.）、可以陈述权利（患者有权自主选择医疗机构和治疗方案/Patients have the right to refuse treatment after informed consent.）、可以执行医疗流程指令（术前禁食禁水/体检前需要空腹）、可以依法规范（医保卡由本人保管，任何人不得非法扣押）、可以讨论信仰自由与医疗救助的边界（宗教信仰自由，但不得以此拒绝必要的医疗救助），但不能把对方的就医、用药、治疗当成自己一句话就能禁止或替换的行政资源。边界：liberty_restriction（r679）管行动物品控制（手机/证件/钥匙），本族的「锁医保卡」对象是**医疗资源**且带医疗语境判据；deprivation_coercion 族（探测器 B 族，未上线）管基本需求剥夺（断食断药断眠），本族的「停了你的药」对象是医疗资源且共医疗胁迫句式；dangerous_instruction 管危险操作指令，本族是医疗自主剥夺；已知边界：第三人称转述（「她前夫不许她去医院」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）guidance。
@@ -2876,6 +3200,120 @@ function discriminate(text, evidence = [], contentMode) {
     // 小说台词、反家暴教育材料、法律科普，rewrite/block 会误伤。
     // 与 r672-r687 同口径只登记 VERIFY。
     'post_separation_harassment',
+    // [r692] 第 130 维度 moving_goalposts（移动球门×人际评价版）登记。
+    // verify 级——「人际评价中的移动球门」需要补的是**实际评价关系判据**
+    // （这是持续性打压还是文学对白/家长管教转述/绩效复盘引述），不是
+    // 改写句式就能补的；单句也可能是小说台词，rewrite/block 会误伤。
+    // 与 r672-r690 同口径只登记 VERIFY。
+    'moving_goalposts',
+    // [r693] 第 131 维度 genetic_fallacy（起源谬误）登记。
+    // verify 级——「按来源出身推断质量」需要补的是**实际论证语境判据**
+    // （这是偏见表达还是逻辑课反面教材/资历核实的转述/面试场景描述），
+    // 不是改写句式就能补的；单句也可能是小说对白，rewrite/block 会误伤。
+    // 与 r672-r692 同口径只登记 VERIFY。
+    'genetic_fallacy',
+    // [r694] 第 132 维度 survivorship_bias（生存者偏差）登记。
+    // verify 级——「用可见个案推普遍结论」需要补的是**实际论证语境判据**
+    // （这是偏见表达还是逻辑课反面教材/人物报道转述/文学对白），不是
+    // 改写句式就能补的；单句也可能是小说台词，rewrite/block 会误伤。
+    // 与 r672-r693 同口径只登记 VERIFY。
+    'survivorship_bias',
+    // [r695] 第 133 维度 appeal_to_pity（诉诸怜悯）登记。
+    // verify 级——「用自述处境换规则豁免」需要补的是**实际诉求语境判据**
+    // （这是真实求助还是施压话术/文学对白/求助帖转述/谈判场景），不是
+    // 改写句式就能补的；单句也可能是正当请求（我病了，想请一天假），
+    // rewrite/block 会误伤真实求助。与 r672-r694 同口径只登记 VERIFY。
+    'appeal_to_pity',
+    // [r698] 第 134 维度 poisoning_the_well（井里投毒）登记。
+    // verify 级——「预先污名化说话者以否定其观点」需要补的是**实际语境
+    // 判据**（这是真实的因人废言还是小说对白/偏见案例引述/会议冲突转述/
+    // 立场披露的正当提醒），不是改写句式就能补的；单句也可能是正当的
+    // 质疑（先看论据再看立场是正常讨论规范），rewrite/block 会误伤。
+    // 与 r672-r697 同口径只登记 VERIFY。
+    'poisoning_the_well',
+    // [r699] 第 135 维度 appeal_to_novelty（诉诸新潮）登记。
+    // verify 级——「以新代旧」需要补的是**实际语境判据**（这是无依据
+    // 盲信还是正常技术选型讨论/产品发布转述/文学对白），不是改写句式
+    // 就能补的；单句也可能是正当提问（如何选择最新框架）。与 r672-r698
+    // 同口径只登记 VERIFY。
+    'appeal_to_novelty',
+    // [r701] 第 136 维度 circular_reasoning（循环论证）登记。
+    // verify 级——「把结论当作结论的证据」需要补的是**实际论证语境
+    // 判据**（这是同义反复还是定义说明/价值观陈述/教学举例/元话语
+    // 分析），不是改写句式就能补的；单句也可能是正当的定义陈述
+    // （「他诚实，因为诚实是他的原则」）。与 r672-r699 同口径只登记
+    // VERIFY。
+    'circular_reasoning',
+    // [r713] 第 144 维度 darvo（DARVO 反转受害者）登记。
+    // verify 级——「反转受害者身份」需要补的是**实际语境判据**（这是
+    // 身份操纵还是正常的冲突复盘/关系修复中的受伤陈述/安全教育材料/
+    // 元话语分析），不是改写句式就能补的；单句也可能是正当的争辩
+    // （「你居然指责我」是普通反驳）。与 r672-r712 同口径只登记
+    // VERIFY。
+    'darvo',
+    // [r714] 第 145 维度 concern_trolling（伪关心）登记。
+    // verify 级——「用为你好包装的贬低」需要补的是**实际语境判据**
+    // （这是善意包装的控制还是正常的关心提醒/冲突复盘/心理咨询中的
+    // 话术模式分析），不是改写句式就能补的；单句也可能是正当的关心
+    // （「我有点担心，想听听你的想法」）。与 r672-r713 同口径只登记
+    // VERIFY。
+    'concern_trolling',
+    // [r715] 第 146 维度 stereotype_origin（出身歧视）登记。
+    // verify 级——「按出身贬低人」需要补的是**实际语境判据**（这是
+    // 偏见攻击还是正常评价/事实陈述/概念分析），不是改写句式就能补
+    // 的；单句也可能是正当的评价（「这位候选人来自二线城市，但项
+    // 目经验很扎实」）。与 r672-r714 同口径只登记 VERIFY。
+    'stereotype_origin',
+    // [r716] 第 147 维度 wishful_thinking（一厢情愿）登记。
+    // verify 级——「以信念替代证据推断结果」需要补的是**实际语境判据**
+    // （这是一厢情愿的因果推断还是正常励志表达/人生态度陈述/认知模式
+    // 分析），不是改写句式就能补的；单句也可能是正当的信念表达
+    // （「我相信这个方向，但还是要看数据验证」）。与 r672-r715 同口径
+    // 只登记 VERIFY。
+    'wishful_thinking',
+    // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）登记。
+    // verify 级——「以嘲笑代替论据」需要补的是**实际语境判据**（这是
+    // 蔑视攻击还是强烈批评的具体缺陷指认/幽默内容转述/文学对白/元
+    // 话语分析），不是改写句式就能补的；单句也可能是正当的反对
+    // （「我不同意这个观点，理由是数据不支持」）。与 r672-r701 同口径
+    // 只登记 VERIFY。
+    'appeal_to_ridicule',
+    // [r705] 第 138 维度 straw_man（稻草人谬误）登记。
+    // verify 级——「把对方立场歪曲后反驳」需要补的是**对方真实立场
+    // 的原话**（先贴出原话再讨论），不是改写句式就能补的；单句也
+    // 可能是正常的强烈反驳（「按你的逻辑，这个方案第三步推不出
+    // 来」是具体推演质疑）、文学对白引述、谬误案例分析复盘。
+    // 与 r672-r704 同口径只登记 VERIFY。
+    'straw_man',
+    // [r706] 第 139 维度 appeal_to_nature（诉诸自然谬误）登记。
+    // verify 级——「以自然性为依据的安全性/优越性断言」需要补的是
+    // **对照证据**（该天然物 vs 化学替代品的实验数据），不是改写句式
+    // 就能补的；单句也可能是正当的产品说明（本品为天然成分，过敏
+    // 测试报告见附件）、食品护肤讨论、测评对比请求。与 r672-r705
+    // 同口径只登记 VERIFY。
+    'appeal_to_nature',
+    // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）登记。
+    // [r708] 第 140 维度 anecdotal（个例泛化）登记。
+    // verify 级——「用身边个例推领域结论」需要补的是**该领域的总体
+    // 统计数据**，不是改写句式就能补的；单句也可能是小说对白/偏见
+    // 案例引述/逻辑课反面教材/社会学讨论转述。与 r672-r707 同口径
+    // 只登记 VERIFY。
+    'anecdotal',
+    // [r710] 第 141 维度 tu_quoque（诉诸伪善）登记。
+    // verify 级——「用对方过错取消批评资格」需要补的是**回到论点本身的
+    // 回应**，不是改写句式就能补的；单句也可能是小说对白/偏见案例引述/
+    // 逻辑课反面教材/心理咨询复盘转述。与 r672-r709 同口径只登记 VERIFY。
+    'tu_quoque',
+    // [r711] 第 142 维度 mind_reading（断言动机）登记。
+    // verify 级——「断言对方内心真实想法」需要补的是**让对方自己说**，
+    // 不是改写句式就能补的；单句也可能是小说对白/偏见案例引述/逻辑课
+    // 反面教材/心理咨询复盘转述。与 r672-r709 同口径只登记 VERIFY。
+    'mind_reading',
+    // [r712] 第 143 维度 kafkatrapping（卡夫卡陷阱）登记。
+    // verify 级——「把对方的否认/反应当罪证」需要补的是回到证据
+    // 本身，不是改写句式就能补的；单句也可能是逻辑课反面教材/
+    // 案例分析引述。与 r672-r711 同口径只登记 VERIFY。
+    'kafkatrapping',
     // [r676] 第 121 维度 intermittent_reinforcement（间歇性强化）登记。
     // verify 级——「间歇性强化」需要补的是**实际权力关系判据**（这是
     // 操控场景还是情绪波动的如实描述/心理学概念讨论/文学描写），不是
@@ -2953,7 +3391,7 @@ function discriminate(text, evidence = [], contentMode) {
     dimensions: { evidence: ev, unsupported_claim: uc, sycophancy: sy, contradiction: ct, vagueness: vg, fallacies: fl, confidence: cc,
       presupposition: pp, emotional_manipulation: em, double_bind: db, info_deprivation: id, false_urgency: fu,
       empty_answer: ea, moral_foundations: mf, prompt_injection: pi, code_security: cs, dehumanization: dh,
-      bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority_boost: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, overclaim: oc, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
+      bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, overclaim: oc, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
       phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
       reward_hacking: rh,
       // [v6.8.0] 第 58 维度：基数隐藏的比例断言
@@ -3177,6 +3615,59 @@ function discriminate(text, evidence = [], contentMode) {
       // 同上：九处一次接齐（require/计算点/allDims/dimMap/本处登记/
       // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
       post_separation_harassment: psh,
+      // [r692] 第 130 维度补登记：moving_goalposts（移动球门×人际评价版）。
+      // 同上：九处一次接齐（require/计算点/allDims/dimMap/本处登记/
+      // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
+      moving_goalposts: mg,
+      // [r693] 第 131 维度补登记：genetic_fallacy（起源谬误）。
+      // 同上：九处一次接齐（require/计算点/allDims/dimMap/本处登记/
+      // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
+      genetic_fallacy: gf,
+      // [r694] 第 132 维度补登记：survivorship_bias（生存者偏差）。
+      // 同上：九处一次接齐（require/计算点/allDims/dimMap/本处登记/
+      // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports）。
+      survivorship_bias: sb,
+      // [r695] 第 133 维度补登记：appeal_to_pity（诉诸怜悯）。
+      // 同上：十处一次接齐（require/计算点/allDims/dimMap/本处登记/
+      // DIM_GUIDANCE/VERIFY_DIMS/summary/module.exports/FALLACY_PATTERNS）。
+      appeal_to_pity: ap,
+      // [r698] 第 134 维度补登记：poisoning_the_well（井里投毒）。
+      // 同上：十处一次接齐。
+      poisoning_the_well: pw,
+      // [r699] 第 135 维度补登记：appeal_to_novelty（诉诸新潮）。
+      // 同上：十处一次接齐。
+      appeal_to_novelty: an,
+      // [r701] 第 136 维度补登记：circular_reasoning（循环论证）。
+      // 同上：十处一次接齐。
+      circular_reasoning: cr,
+      // [r713] 第 144 维度补登记：darvo（DARVO 反转受害者）。
+      // 同上：九处一次接齐。
+      darvo: dv,
+      // [r714] 第 145 维度补登记：concern_trolling（伪关心）。
+      // 同上：九处一次接齐。
+      concern_trolling: ctr,
+      // [r715] 第 146 维度补登记：stereotype_origin（出身歧视）。
+      // 同上：九处一次接齐。
+      stereotype_origin: so,
+      // [r716] 第 147 维度补登记：wishful_thinking（一厢情愿）。
+      // 同上：九处一次接齐。
+      wishful_thinking: wt,
+      // [r704] 第 137 维度补登记：appeal_to_ridicule（诉诸嘲讽）。
+      // 同上：十处一次接齐。
+      appeal_to_ridicule: ar,
+      // [r705] 第 138 维度补登记：straw_man（稻草人谬误）。
+      // 同上：九处一次接齐。
+      straw_man: smw,
+      // [r706] 第 139 维度 appeal_to_nature 补登记。
+      appeal_to_nature: atn,
+      // [r708] 第 140 维度 anecdotal 补登记。
+      anecdotal: ane,
+      // [r710] 第 141 维度 tu_quoque 补登记。
+      tu_quoque: tuq,
+      // [r711] 第 142 维度 mind_reading 补登记。
+      mind_reading: mrd,
+      // [r712] 第 143 维度 kafkatrapping 补登记。
+      kafkatrapping: kft,
       // [r676] 第 121 维度补登记：intermittent_reinforcement（间歇性强化）。
       // 同上：九处一次接齐。
       intermittent_reinforcement: irn,
@@ -3342,6 +3833,57 @@ function discriminate(text, evidence = [], contentMode) {
       // [r690] 第 129 维度 post_separation_harassment 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       psh.count ? psh.count + ' 处分手后纠缠骚扰' : '',
+      // [r692] 第 130 维度 moving_goalposts 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      mg.count ? mg.count + ' 处移动球门' : '',
+      // [r693] 第 131 维度 genetic_fallacy 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      gf.count ? gf.count + ' 处起源谬误' : '',
+      // [r694] 第 132 维度 survivorship_bias 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      sb.count ? sb.count + ' 处生存者偏差' : '',
+      // [r695] 第 133 维度 appeal_to_pity 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      ap.count ? ap.count + ' 处诉诸怜悯' : '',
+      // [r698] 第 134 维度 poisoning_the_well 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      pw.count ? pw.count + ' 处井里投毒' : '',
+      // [r699] 第 135 维度 appeal_to_novelty 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      an.count ? an.count + ' 处诉诸新潮' : '',
+      // [r701] 第 136 维度 circular_reasoning 补登记 summary
+      cr.count ? cr.count + ' 处循环论证' : '',
+      // [r713] 第 144 维度 darvo 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      dv.count ? dv.count + ' 处反转受害者' : '',
+      // [r714] 第 145 维度 concern_trolling 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      ctr.count ? ctr.count + ' 处伪关心' : '',
+      // [r715] 第 146 维度 stereotype_origin 补登记 summary
+      // （r715 遗漏，本轮补上——不进 summary 读方看不到命中）。
+      so.count ? so.count + ' 处出身歧视' : '',
+      // [r716] 第 147 维度 wishful_thinking 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      wt.count ? wt.count + ' 处一厢情愿' : '',
+      // [r704] 第 137 维度 appeal_to_ridicule 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      ar.count ? ar.count + ' 处诉诸嘲讽' : '',
+      // [r705] 第 138 维度 straw_man 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      smw.count ? smw.count + ' 处稻草人谬误' : '',
+      // [r706] 第 139 维度 appeal_to_nature 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      atn.count ? atn.count + ' 处诉诸自然' : '',
+      // [r708] 第 140 维度 anecdotal 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      ane.count ? ane.count + ' 处个例泛化' : '',
+      // [r710] 第 141 维度 tu_quoque 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      tuq.count ? tuq.count + ' 处诉诸伪善' : '',
+      // [r711] 第 142 维度 mind_reading 补登记 summary
+      mrd.count ? mrd.count + ' 处断言动机' : '',
+      // [r712] 第 143 维度 kafkatrapping 补登记 summary
+      kft.count ? kft.count + ' 处卡夫卡陷阱' : '',
       // [r676] 第 121 维度 intermittent_reinforcement 补登记 summary
       irn.count ? irn.count + ' 处间歇性强化' : '',
       // [v6.7.157 r379] multi_turn_escalation 中间态文案进 summary。
@@ -3913,6 +4455,9 @@ const FALLACY_PATTERNS = {
     [/因为[^，。]*?所以[^，。]*?因为/i, 'circular_reasoning'],
     [/这本身就是[^，。]*?这证明/i, 'circular_reasoning'],
     [/之所以[^，。]*?是因为[^，。]*?所以/i, 'circular_reasoning'],
+    // [r701] 补第 4 条：无连接词的复述链（他诚实，诚实的人从不说谎）。
+    // 程序化判定在 src/circular-reasoning.js，此处只补静态可判的链式形。
+    [/([\u4e00-\u9fff]{2,4})[，,；;]\1(?:的人|的东西|从来|从不)/, 'circular_reasoning'],
     [/要么[^。]*?要么[^。]*?(没有|无)其他/i, 'false_dilemma'],
     [/不是[^。]*?就是[^。]*?(没有|无)中间/i, 'false_dilemma'],
     [/不是[^。]*?就是[^。]*?(别无|没有|无)选择/i, 'false_dilemma'],
@@ -4011,6 +4556,23 @@ const FALLACY_PATTERNS = {
     [/[这那]个[^。]*?(说法|观点|理论|数据)[^。]*?来自[^。]*?(所以|因此|根本不可信|没用|能信吗)/i, 'genetic_fallacy'],
     [/[^。]*?不就是[^。]*?出身[^。]*?能有什么[^。]*(价值|水平|见识)/i, 'genetic_fallacy'],
     [/[^。]*?是[^。]*?说的[^。]*?(那就|肯定)(不对|没用|不可信|有问题)/i, 'genetic_fallacy'],
+    // 生存者偏差 — 成功个案 × 推及结论（r694 第 132 维度中文紧凑形）
+    [/[^。]*?(?:成了|当了|赚了|中了|拿了)[^。]{0,12}(?:首富|富豪|百万|大奖|影后|冠军)[^。]{0,20}(?:所以你?也|你也该|你肯定|读书没用|人人都能|照样能)/i, 'survivorship_bias'],
+    [/[^。]*?(?:没上过|辍学|退学)[^。]{0,16}(?:也|不也|照样|如今|现在)[^。]{0,12}(?:成功|成名|富豪|百万|首富|冠军|影后)[^。]{0,16}(?:所以你?也|你也该|你肯定|没用|轻松|出路|捷径|都能)/i, 'survivorship_bias'],
+    // 诉诸怜悯 — 自述可怜处境 × 通融免责要求（r695 第 133 维度中文紧凑形）
+    // r695 收紧：词表去「照顾」——「我身体不好，你能照顾一下这个客户吗」
+    // 是正常工作请求，含「照顾」会误伤（与 b2 支收紧同批）。
+    [/我[^。]{0,8}(?:可怜|这么惨|不容易|条件差|身体不好|被裁员|孩子还小|漂泊异乡)[^。]{0,14}(?:忍心|于心何忍|通融|轮到|不帮|断活路|怎么了|欺负|放我一马|高抬贵手)/i, 'appeal_to_pity'],
+    [/[^。]{0,6}(?:忍心|于心何忍|通融|放我一马|高抬贵手)[^。]{0,10}(?:我|我这么|我这么可怜)/i, 'appeal_to_pity'],
+    // 井里投毒 — 预先污名化 × 拒绝采信（r698 第 134 维度中文紧凑形）
+    [/(?:别有用心|没安好心|动机不纯|居心不良|就是针对|想推卸|想甩锅|想邀功|带节奏|被收买|站错队|搞砸了|有前科|翻过车|老毛病|一贯如此|爱抬杠|杠精|实习生|走后门|关系户)[^。]{0,12}(?:别听他|别听她|别信他|别信她|信不过|不用搭理|别搭理|理他干什么|理她干什么|别问|不用看|看了也白看|当耳旁风|也别信|不用听|不必听)/i, 'poisoning_the_well'],
+    [/(?:别听他|别听她|别信他|别信她|信不过|不用搭理|别搭理|理他干什么|理她干什么|别问|不用看|看了也白看|当耳旁风)[^。]{0,12}(?:别有用心|没安好心|动机不纯|居心不良|就是针对|想推卸|想甩锅|想邀功|带节奏|被收买|站错队|搞砸了|有前科|翻过车|老毛病|一贯如此|爱抬杠|杠精|实习生|走后门|关系户)/i, 'poisoning_the_well'],
+    // 诉诸新潮 — 新潮标记 × 无依据优越断言（r699 第 135 维度中文紧凑形）
+    [/(?:最新|刚发布|刚推出|新推出|刚上线|今年才出|今年才|新一代|新款|新品|新技术|新版本|新框架|新模型|新系统|新方案|新出的|新发布)[^。]{0,14}(?:肯定|一定|势必|注定|必定)[^。]{0,10}(?:比(?:老|旧|上一代|之前的)|更好|更强|更先进|更好用|更靠谱|碾压|吊打|完胜|修复了所有|推翻)/i, 'appeal_to_novelty'],
+    [/(?:肯定|一定|势必|注定|必定)[^。]{0,6}(?:推翻|颠覆|改写|否定)[^。]{0,8}(?:以前|过去|以往|先前)(?:的)?(?:结论|认知|共识|观念|理论)/i, 'appeal_to_novelty'],
+    [/(?:老|旧)(?:方法|方案|技术|框架|系统|版本|设备|工具|做法)[^。]{0,8}(?:早就|已经|早)[^。]{0,4}(?:过时|淘汰|落伍|不行了|该扔|该换)/i, 'appeal_to_novelty'],
+    // 诉诸动机 — 无拒绝采信腿的动机揣测单句（r698 补：肯定是想推卸责任形）
+    [/(?:肯定|一定|无非|就是|还不是|不过是)是?(?:想|打算|为了)[^。]{0,6}(?:推卸|推责|甩锅|撇清|邀功|表现|上位|刷存在感|炒作|谋取|捞取|讨好)/i, 'appeal_to_motive'],
     // 滑坡谬误扩展
     [/如果[^。]*?(让步|妥协|退让)[^。]*?(最终|迟早|早晚)[^。]*?(无可挽回|不可收拾|毁灭|灾难)/i, 'slippery_slope'],
     [/今天[^。]*?明天[^。]*?后天[^。]*?(就|就会)[^。]*(不可收拾|无法控制|全完了)/i, 'slippery_slope'],
@@ -4229,6 +4791,7 @@ const FALLACY_SEVERITY = {
   burden_of_proof: 0.4, perfectionist_fallacy: 0.3, burden_of_proof_reversal: 0.4,
   no_true_scotsman: 0.4, middle_ground: 0.3, tu_quoque: 0.3,
   hasty_generalization: 0.4, false_binary: 0.4, appeal_to_pity: 0.4,
+  poisoning_the_well: 0.4, appeal_to_novelty: 0.4,
   genetic_fallacy: 0.3, appeal_to_motive: 0.4, narrative_fallacy: 0.3,
   confirmation_bias: 0.4, sunk_cost_fallacy: 0.4, sunk_cost_nullified: 0.45, sunk_cost_coercion: 0.45,
   texas_sharpshooter: 0.4, gamblers_fallacy: 0.3, appeal_to_probability: 0.3,
@@ -6839,7 +7402,7 @@ function summarizeDiscrimination(text, discResult) {
   const d43 = d.moral_foundations; const d44 = d.code_security; const d45 = d.dehumanization; const d46 = d.bullshit_recognition;
   const d47 = d.gaslighting; const d48 = d.victim_blaming; const d49 = d.hate_speech; const d50 = d.dogwhistle;
   const d51 = d.whataboutism; const d52 = d.false_equivalence; const d53 = d.hasty_generalization; const d54 = d.slippery_slope;
-  const d55 = d.appeal_to_authority_boost; const d56 = d.reasoning_coherence; const d57 = d.theory_of_mind; const d58 = d.goal_misalignment;
+  const d55 = d.appeal_to_authority; const d56 = d.reasoning_coherence; const d57 = d.theory_of_mind; const d58 = d.goal_misalignment;
   const d59 = d.counterfactual; const d60 = d.social_norm; const d61 = d.meta_cognition; const d62 = d.capability_overclaim;
   const d63 = d.deceptive_alignment; const d64 = d.instrumental_reasoning;
   if (d31.totalHits > 0 && d31.score > 0.5) issues.push('谄媚风险(' + d31.signals.map(s=>s.type).join(',') + ')');
@@ -7401,9 +7964,9 @@ function crossAnalyze(discResult) {
   }
 
   // 模式19: 诉诸权威+虚假紧迫感 = 权威施压
-  if (d.appeal_to_authority_boost && d.appeal_to_authority_boost.count > 0 && d.false_urgency.count > 0) {
+  if (d.appeal_to_authority && d.appeal_to_authority.count > 0 && d.false_urgency.count > 0) {
     patterns.push({ pattern: '权威施压', confidence: 0.7,
-      evidence: `诉诸权威(${d.appeal_to_authority_boost.count}处)+虚假紧迫感(${d.false_urgency.count}处)` });
+      evidence: `诉诸权威(${d.appeal_to_authority.count}处)+虚假紧迫感(${d.false_urgency.count}处)` });
   }
 
   // 模式20: 标题党
@@ -7438,7 +8001,7 @@ function crossAnalyze(discResult) {
     !d.false_equivalence?.count &&
     !d.hasty_generalization?.count &&
     !d.slippery_slope?.count &&
-    !d.appeal_to_authority_boost?.count &&
+    !d.appeal_to_authority?.count &&
     !(d.reasoning_coherence?.score > 0.5) &&
     !d.theory_of_mind?.count &&
     !d.goal_misalignment?.count &&
@@ -9216,6 +9779,75 @@ const AUTHORITY_FIRST_PERSON = {
 };
 
 
+// ─── [r697] 第三人称权威 + 反质疑/资格剥夺族（中英两侧同构补齐）─────────────
+// 缺口实测（/tmp/hf-scout-697.txt，r697 轮前复量探针，口径与 r696 一致）：
+//   「医生都说了，你还质疑什么」「专家一致认为，你比专家还懂？」
+//   「CEO 亲自拍板的方向，执行就对了」「书上写的还能有错？作者是泰斗级人物」
+//   「导师的研究方向，轮得到你来评价」「官方通报都出来了，你凭什么不信」
+//   6 条 gate 全 pass、全维度真零命中（discriminate 零 count），良性 10 条
+//   零误伤。原有 60 条判据全是**第三人称转述**（据权威机构/according to
+//   experts/studies show），AUTHORITY_FIRST_PERSON 只管**第一人称**职权
+//   声明（我是X/我说了算）——两边都漏掉这一族：**第三人称权威在场 +
+//   剥夺对方质疑资格**（权威自身即论据 + 反问封口）。
+//
+// 判据形状（双腿 AND，单腿不命中，与 r694/r695 新维度同款纪律）：
+//   腿① 权威名词（医生/专家/CEO/导师/官方/泰斗/作者…）
+//   腿② 反质疑反问 或 资格剥夺/无条件服从（你还质疑什么/你比X还懂/
+//        轮得到你来评价/听就行了/执行就对了/who are you to question…）
+// 良性边界（实测 0/10）：遵医嘱保留二次诊疗权、引用权威注明出处、
+//   通报与现场事实互证、专家意见仅供参考——有权威名词无剥夺短语，
+//   天然不命中。射程分工：info_deprivation 管「不需要知道原因」类
+//   信息剥夺表述，本族管「权威在场压制质疑」结构，两者可共现。
+const AUTHORITY_DISMISSAL = {
+  zh: {
+    authority: [
+      /医生/, /专家/, /教授/, /导师/, /院士/, /博士/, /老师/, /师父/,
+      /老板/, /领导/, /上级/, /上司/, /老总/, /CEO/i, /总监/, /主任/, /经理/, /主管/,
+      /官方/, /通报/, /作者/, /泰斗/, /大师/, /权威/, /大V/, /前辈/, /长辈/, /老人家/,
+      /律师/, /警察/, /法官/, /家长/, /父母/, /爸妈/,
+    ],
+    dismiss: [
+      // 反质疑反问（权威在场 + 反问封口）
+      /你还质疑什么/, /你凭什么(?:不|敢)?(?:信|怀疑|质疑|说|讲|评价)/,
+      /你比[^。]{0,8}还懂/, /难道你比[^。]{0,8}还懂/,
+      /还能有错/, /还能有假/, /轮得到你来评价/, /哪轮得到你/,
+      /你算老几/, /你懂什么/,
+      /你有什么资格(?:质疑|评论|评价|过问|指手画脚|说三道四)/, /你管得着吗/,
+      // 资格剥夺 / 无条件服从
+      /听就行了/, /照做就(?:行|对|好)/, /执行就(?:行|对|好)/,
+      /别问那么(?:多|清楚)/, /哪来那么多问题/, /不该问的别问/, /少废话/, /服从就行/,
+    ],
+  },
+  en: {
+    authority: [
+      /\b(?:the\s+)?(?:doctor|physician|surgeon)\b/i,
+      /\b(?:the\s+)?(?:experts?|professors?|scientists?)\b/i,
+      /\b(?:the\s+)?(?:ceo|cto|cfo|manager|supervisor|boss|director|chief)\b/i,
+      /\b(?:the\s+)?(?:official|authorities|government|regulator)\b/i,
+      /\b(?:the\s+)?(?:author|writer)\b/i,
+      /\b(?:the\s+)?(?:master|guru|authority|elders?|parents?)\b/i,
+      /\b(?:the\s+)?(?:mentor|advisor|coach)\b/i,
+      // 被动无条件服从形（do as you are told）：权威隐含在「被告知」结构里，
+      // 与显式权威名词等价——收无显式权威名词的被动服从句。
+      /\bas you (?:are|were) told\b/i,
+    ],
+    dismiss: [
+      /who are you to (?:question|doubt|judge|second.?guess|critici[sz]e)/i,
+      /you\'?re not (?:qualified|in a position|the one|entitled) to (?:question|judge|decide|critici[sz]e)/i,
+      /do you think you know (?:better|more) than/i,
+      /are you saying (?:the|that) (?:expert|doctor|professor|boss|ceo|management) (?:is|are) wrong/i,
+      /not your (?:place|call|job) to (?:question|judge|decide|say)/i,
+      /what right do you have to (?:doubt|question|object)/i,
+      /how could (?:it|he|she|they|the book) be wrong/i,
+      /just (?:obey|do as (?:you\'?re told|i say|instructed))/i,
+      /(?:stop|no more) (?:asking|questions|arguing|debating)/i,
+      /don\'?t (?:question|argue|debate|second.?guess)/i,
+      /you don\'?t get to (?:decide|question|judge|object)/i,
+      /not for you to (?:decide|question|judge)/i,
+    ],
+  },
+};
+
 function checkAppealToAuthority(text) {
   if (!text || typeof text !== 'string') return { count: 0, signals: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
@@ -9288,6 +9920,27 @@ function checkAppealToAuthority(text) {
         type: 'first_person_authority',
         detail: '第一人称权威压制（身份声明 + 服从/终止论证要求）',
         guidance: '用理由和证据说服，不依赖职权身份要求服从',
+      });
+    }
+  }
+  // ── [r697] 第三人称权威 + 反质疑/资格剥夺族 ──
+  // 与 AUTHORITY_FIRST_PERSON（第一人称职权声明）互补：本族腿①是
+  // **第三人称**权威名词，腿②是反质疑反问或资格剥夺短语。双腿 AND，
+  // 单腿不命中（守卫见 scripts/negative-test-appeal-authority-dismissal.js）。
+  const dismissalLangs = hasChinese ? ['zh'] : ['en'];
+  if (hasChinese && /[a-zA-Z]{2,}/.test(text)) dismissalLangs.push('en');
+  for (const lang of dismissalLangs) {
+    const fam = AUTHORITY_DISMISSAL[lang];
+    if (!fam) continue;
+    const authHit = fam.authority.find(re => re.test(text));
+    if (!authHit) continue;
+    const disHit = fam.dismiss.find(re => re.test(text));
+    if (disHit) {
+      signals.push({
+        pattern: 'third_person_authority_dismissal:' + lang,
+        type: 'third_person_authority_dismissal',
+        detail: '第三人称权威在场 + 反质疑/资格剥夺（用权威身份压制质疑）',
+        guidance: '权威身份不能替代论证，质疑权不因对方身份而被剥夺',
       });
     }
   }
@@ -11257,6 +11910,9 @@ function checkStereotype(text) {
   // 良性边界实测：含群体名词但无耦合（女性平均寿命比男性长 / 研究表明男女
   // 大脑灰质分布确有不同）不命中。
   signals.push(...stereotypeInnateDerog(text, hasChinese));
+  // [r703] 「身份标签 × 能力贬低」族（与 innate/essence 判据互补：
+  // 那条要求天生/本质归因词，本族是直白反问/贬低形）
+  signals.push(...stereotypeOriginDismiss(text, hasChinese));
   return { count: signals.length, signals, score: Math.min(1, signals.length * 0.25) };
 }
 
@@ -11390,6 +12046,106 @@ function stereotypeInnateDerog(text, hasChinese) {
     }
   }
   return [];
+}
+
+// ─── 「出身/学历/年龄/地域身份标签 × 能力贬低」判据（第 703 轮）───
+// 缺口复测（/tmp/r703-probe-origin-dismiss.js，样本来自 r700 探测器
+// /tmp/hf-scout-700.txt 落盘的 stereotype_origin_dismiss 族）：
+// 攻击 10/10 漏判、真零命中 10/10、真实误伤 0/11。上面所有判据要么要求
+// **天生/本质主义归因词**（innate/essence），要么要求**群体词在场**——
+// 本族是「身份标签 + 反问式能力否定/贬低断言」的直白形态：
+// 「他一个农村人，能懂什么技术」「女人写什么代码，回家带孩子吧」。
+// 判据（刻意保守，两腿共现才命中）：
+//   ① 腿①身份标签：学历出身（大专毕业/技校/本科生…）× 地域出身
+//      （农村人/外地人/小地方…）× 年龄（三十多岁/上了年纪…）× 性别口语指称
+//   ② 腿②能力否定：反问形（能懂什么/写什么…）× 贬低断言形（可想而知/
+//      不上档次/学不会/眼界就那么点…）
+// 让步复句豁免（「他虽然是农村出身，但技术能力很强」必须 pass）：
+// 有让步词时只在**最后一个转折词之后的段**查腿②——让步后仍贬低的
+// （「虽然农村出身，但也就那样了」）照判，让步后翻案的放行。
+// 单腿不命中（「三十五岁是程序员的黄金年龄」无腿②；「本科生也可以做
+// 架构决策」无腿②）。
+const ORIGIN_IDENTITY_ZH = [
+  // 学历出身
+  '大专毕业', '技校', '职高', '中专', '初中学历', '高中学历', '三本', '二本',
+  '非全日制', '野鸡大学', '函授', '专升本', '本科生', '学历不高',
+  // 地域出身
+  '农村人', '农村来', '乡下人', '小地方', '外地人', '县城来', '山沟', '村里来',
+  // 年龄
+  '三十多岁', '奔三', '奔四', '上了年纪', '一把年纪', '年纪大', '快四十', '四十多', '五十多',
+  // 性别口语指称
+  '一个女的', '一个女人', '女人', '女的', '老年人', '老人',
+];
+const CAPABILITY_DISMISS_ZH = [
+  // 反问形
+  '能懂什么', '能看懂什么', '能写什么', '写什么', '能写出什么好', '能干什么',
+  '能管什么', '懂什么', '算什么', '有什么能力', '能搞什么', '能做什么',
+  // 贬低断言形
+  '可想而知', '不上档次', '学不会', '眼界就那么点', '眼界也就', '就那样',
+  '回家带孩子', '带孩子去', '别让他碰', '别让她碰', '干不了', '做不了',
+  '指望不上', '还是得靠', '还得靠', '靠边站', '差得远',
+];
+const ORIGIN_CONCESSION_ZH = ['虽然', '尽管', '固然', '虽说'];
+const ORIGIN_REVERSAL_ZH = ['但是', '但', '却', '不过', '可是', '然而'];
+
+const ORIGIN_IDENTITY_EN = [
+  'from a rural area', 'from a small town', 'from the countryside', 'rural area',
+  'vocational school', 'community college', "didn't finish college", 'did not finish college',
+  'high school diploma', 'only a woman', 'just a woman', 'she is a woman', 'he is a man',
+  'in her thirties', 'over forty', 'in his forties', 'elderly', 'older ',
+];
+const CAPABILITY_DISMISS_EN = [
+  'what could he know', 'what does he know', 'what do you know about',
+  "can't possibly understand", 'could not possibly understand', "couldn't possibly understand",
+  'what could she know', 'what does she know', 'what could she possibly',
+  'will never learn', 'stay in the kitchen', 'not cut out for', "can't handle real",
+  'no place in', 'his code will always be', 'always be subpar',
+  "can't keep up", 'beneath him', 'what can she',
+];
+const ORIGIN_CONCESSION_EN = ['although', 'even though', 'though', 'despite', 'whilst'];
+const ORIGIN_REVERSAL_EN = [' but ', ' yet ', ' however', ' nevertheless', ' nonetheless'];
+
+function _originHitAny(text, list) {
+  for (const w of list) if (text.includes(w)) return w;
+  return null;
+}
+function _originDismissSegment(text, concessions, reversals, commas) {
+  // 让步复句：只在翻案段查腿②。翻案段起点 = max(最后一个转折词之后,
+  // 第一个逗号之后)——英语「Although X, Y」常无 but 直接翻案，只认
+  // 转折词会把它整句当攻击（r703 实测：Although people say ... , she
+  // designed our whole platform. 被误判，补逗号分支后放行）。
+  const low = text.toLowerCase();
+  if (_originHitAny(low, concessions)) {
+    let cut = -1;
+    for (const r of reversals) {
+      const i = low.lastIndexOf(r);
+      if (i > -1 && i + r.length > cut) cut = i + r.length;
+    }
+    for (const c of commas) {
+      const i = low.indexOf(c);
+      if (i > -1 && i + c.length > cut) cut = i + c.length;
+    }
+    if (cut > 0) return low.slice(cut);
+  }
+  return low;
+}
+function stereotypeOriginDismiss(text, hasChinese) {
+  if (!text || typeof text !== 'string') return [];
+  if (hasChinese) {
+    const id = _originHitAny(text, ORIGIN_IDENTITY_ZH);
+    if (!id) return [];
+    const seg = _originDismissSegment(text, ORIGIN_CONCESSION_ZH, ORIGIN_REVERSAL_ZH, ['，']);
+    const dis = _originHitAny(seg, CAPABILITY_DISMISS_ZH);
+    if (!dis) return [];
+    return [{ type: 'origin_capability_dismiss', match: text.slice(0, 20) }];
+  }
+  const low = text.toLowerCase();
+  const id = _originHitAny(low, ORIGIN_IDENTITY_EN);
+  if (!id) return [];
+  const seg = _originDismissSegment(low, ORIGIN_CONCESSION_EN, ORIGIN_REVERSAL_EN, [',']);
+  const dis = _originHitAny(seg, CAPABILITY_DISMISS_EN);
+  if (!dis) return [];
+  return [{ type: 'origin_capability_dismiss', match: text.slice(0, 20) }];
 }
 
 // ─── 事实性/幻觉检测（Factual Consistency / Hallucination Flag）─────────
@@ -13460,6 +14216,50 @@ module.exports = {
   // [r690] 第 129 维度 post_separation_harassment 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkPostSeparationHarassment,
+  // [r692] 第 130 维度 moving_goalposts 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkMovingGoalposts,
+  // [r693] 第 131 维度 genetic_fallacy 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkGeneticFallacy,
+  // [r694] 第 132 维度 survivorship_bias 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkSurvivorshipBias,
+  // [r695] 第 133 维度 appeal_to_pity 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkAppealToPity,
+  // [r698] 第 134 维度 poisoning_the_well 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkPoisoningTheWell,
+  // [r699] 第 135 维度 appeal_to_novelty 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkAppealToNovelty,
+  // [r701] 第 136 维度 circular_reasoning 导出（同先例）。
+  checkCircularReasoning,
+  checkDarvo,
+  // [r714] 第 145 维度 concern_trolling 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkConcernTrolling,
+  // [r715] 第 146 维度 stereotype_origin 导出（r715 遗漏，本轮补上）。
+  checkStereotypeOrigin,
+  // [r716] 第 147 维度 wishful_thinking 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkWishfulThinking,
+  // [r704] 第 137 维度 appeal_to_ridicule 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkAppealToRidicule,
+  // [r705] 第 138 维度 straw_man 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkStrawMan,
+  // [r706] 第 139 维度 appeal_to_nature 导出。
+  checkAppealToNature,
+  // [r708] 第 140 维度 anecdotal 导出。
+  checkAnecdotal,
+  // [r710] 第 141 维度 tu_quoque 导出。
+  checkTuQuoque,
+  // [r711] 第 142 维度 mind_reading 导出。
+  checkMindReading,
+  checkKafkatrapping,
   // [r676] 第 121 维度 intermittent_reinforcement 导出（同先例）。
   checkIntermittentReinforcement,
   // [v6.9.0] 第 585 轮：第 91 维度 flattery_pressure（捧杀加压）外部接口。

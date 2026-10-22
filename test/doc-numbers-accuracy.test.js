@@ -219,7 +219,7 @@ t('README.md 行内 46→50 引用已更新', () => {
   // 守卫误报过一次：changelog 刚补上历史说明就被这条断言拦下。
   const changelogStart = src.search(/##\s*Version history/i);
   const body = changelogStart > 0 ? src.slice(0, changelogStart) : src;
-  assert.ok(!/46 dimensions/.test(body),
+  assert.ok(!/\b46 dimensions/.test(body),
     'README.md 正文仍有过时的 "46 dimensions" 宣称');
 });
 
@@ -241,7 +241,7 @@ t('SKILL.md 无过时 46 维度引用', () => {
   // 同样排除 changelog 引述
   const sk = src.search(/##\s*(Version history|Changelog)/i);
   const body = sk > 0 ? src.slice(0, sk) : src;
-  assert.ok(!/46 dimensions/.test(body), 'SKILL.md 正文仍有过时引用');
+  assert.ok(!/\b46 dimensions/.test(body), 'SKILL.md 正文仍有过时引用');
 });
 
 t('三个文档数字互相一致', () => {
