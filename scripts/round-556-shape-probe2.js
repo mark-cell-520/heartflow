@@ -1,0 +1,11 @@
+'use strict';
+const path = require('path');
+const ROOT = path.resolve(__dirname, '..');
+const gate = require(path.join(ROOT, 'src', 'gate.js'));
+const r = gate.checkOutput('不支持这个方案，你就是站在对立面。');
+const f = (r.findings||[]).find(x=>x.dimension==='loyalty_by_omission');
+console.log('severity:', f && f.severity);
+console.log('checked_by layers:', JSON.stringify(r.checked_by));
+const d = r.data || {};
+console.log('data keys:', Object.keys(d).join(','));
+if (d.discriminate) console.log('discriminate lbo hit:', JSON.stringify(d.discriminate['loyalty_by_omission']));

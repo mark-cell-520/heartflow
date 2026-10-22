@@ -646,7 +646,7 @@ async function runThinkPipeline(result, input, engine) {
       }
 
       // 25. 诉诸权威→提示
-      if (_dim('appeal_to_authority_boost')?.count > 0) {
+      if (_dim('appeal_to_authority')?.count > 0) {
         warnings.push('检测到不当诉诸权威');
       }
 

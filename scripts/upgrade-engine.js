@@ -321,7 +321,7 @@ function cmdInit() {
 
   console.log('\n  👉 现在开始干活：读缺口 → 实测 → 改 src/ → 写 test/ → 跑下列验证');
   console.log('     node bin/verify.js');
-  console.log('     node scripts/bidirectional-guard.js        # 召回 52/52、误拦基线 301/326');
+  console.log('     node scripts/bidirectional-guard.js        # 召回 52/52、误拦基线 302/326');
   // [r646] 不再提示跑全量。18262 用例的单轮在 4GB 容器要 20+ 分钟，
   // 且 agent 中断后测试不停、多轮叠加撑爆容器 → gateway 被杀 → 会话中断
   // （2026-10-10 当天连发两次）。全量唯一的不可替代作用是刷新
