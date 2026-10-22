@@ -1,3 +1,69 @@
+# r719 轮报告（v6.8.67）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r718 交接簿
+「已知未修项」+ r719 全局修复后状态变化：special_pleading（修复
+crisis_exceptionalism 存量误伤后 fp 清零，本轮首次够格）+ void_zh_
+standard_shift + post_hoc，按「引用 UPGRADE_LOG tail 当现状前必须
+复测」纪律用本轮探测器 `scripts/round-719-family-probe.js` 在当前
+引擎（v6.8.66，149 维）逐族复测，喂给 decision 本体
+（`scripts/decide-r719.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A special_pleading 特殊辩护新维度 | **0.85** | 攻击漏判 9/9（100%）、真零命中 9/9、误伤 0/9 | **选中** |
+| B void_zh_standard_shift 契约作废窄口补形 | 0.80 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| C post_hoc 后此谬误新维度 | 0.80 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选 |
+
+decision 返回 composite_score 0.85 / confidence 0.8 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在三个合格候选间
+选出 A。身份对齐依据：特殊辩护是「用例外身份替代同一套标准」的
+核心形态——辨别者的天职就是识别「对自己一套对别人一套」的双标
+结构；漏判率 100% 为三候选最高。**本族是 r716-r718 三连续出局后
+的首个轮回**：每次出局都因存量误伤（fp=1/9），r719 全局修复
+crisis_exceptionalism GUARD_ZH 后 fp 清零，本轮才够格——「先修
+存量误伤、再上新维度」的纪律在本族上完整走了一轮。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/special-pleading.js`（第 150 维度，三路由判据：规则他指×自我例外 / 他人受管×自我豁免 / 特殊身份×例外许可，三豁免：正当程序/元话语/更严审查） | 「规则是给普通人定的，我不一样」类话术现在会被 gate 判 verify 并给出「把为什么你可以例外落到正当理由与程序上」的指引 | **真升级①**（新辨别维度上线） |
+| 高频形态补支路（制度是管老百姓的/想来就来/Ordinary employees need/Others must/I make the rules/do not bother）——首轮测试 9 个 MISS 暴露后补的真实缺口 | 职场双标/特权话术的中英文攻击样本全部命中 | 真升级①的组成部分（判据射程） |
+| 九处接线（require/计算点/allDims/dimensions×2/DIM_GUIDANCE/VERIFY_DIMS/summary/exports） | 维度键 149→150，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+
+## 验收数字
+
+- 轮测试 `test/round-719-special-pleading.js`：**56/56 通过**（攻击 20 + 良性 21 + 边界锁 8 + 分工边界 2 + gate 层 5；首轮 47/56，补支路后全过）
+- 负例注入 `scripts/negative-test-special-pleading.js`：**21/21 通过**（基线 7 + 常量注入 9 + 豁免注入 3 + 未知键 1 + internals 覆盖 1）
+- `node bin/verify.js`：16/16
+- `node scripts/bidirectional-guard.js`：双向门禁通过（召回侧不变、误拦侧与基线一致）
+- `node scripts/guard-abilities.js`：20/20（dimensions 键 150）
+- `node test/doc-numbers-accuracy.test.js`：22/22
+- `node test/security-audit.test.js`：见提交后复验
+- `node scripts/round-guard.js --stage=after`：见文末复跑记录
+
+## 已知未修项（含为什么不修）
+
+1. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.80）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r696 起遗留（已 25 轮），作废词表补变体即可，但样本面 9 条最小。下轮首选。
+2. **post_hoc 后此谬误**——decision 落选（0.80）。攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9；r715-r719 五连续落选，与 pseudo_causal 语域相邻。样本面与漏判率均最小，若继续落选应考虑并入 pseudo_causal 扩形而非独立维度。
+3. **evidence 维度基线打分器**——r719 全局修复已证伪为有意设计（v6.7.73 中性默认），记录已摘除，不再列为未修项。
+4. **round-145/probe-r145-re.js 上游坏码**——ZS 数组解构形状残骸，远程同样坏，非门禁链文件，隔离记录不修。
+5. **33+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+6. **data/test-count.json 记账自锁**——按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **首轮测试 9 个 MISS 全在新侦察高频形态**：首版判据只覆盖探测器 9 条（教科书双标句），新补的职场/制度语境形态（制度是管老百姓的/想来就来/Ordinary employees need/Others must/I make the rules/do not bother）大量 MISS。修法：腿①「老百姓」入列表、OTHERS_BOUND 补通报/批评/考核/检讨动词与「签到对他们是硬要求」制度他指形、SELF_EXCEPT_EN 补 beyond/of my caliber/make the rules/do not bother、RULE_OTHERS_EN 放开 must/need 后的 to（`Others must file` 无 to）。教训：与 r717 赌场形态、r718 拉踩形态同构——语域高频变体必须靠候选样本实测逼出，这是第三轮同型踩坑，「写探测器候选样本时按语域真实分布取样」应固化为纪律。
+2. **EN 腿一支路多写了 `\s+to`**：`others must file reports` / `Ordinary employees need approval` 中 must/need 后直接跟宾语，无 to——我照 `everyone else has to` 的形状把 to 写进支路，两条新样本因此 MISS。教训：英文助动词支路的 to 是可选的，除非目标句式确实固定带 to。
+3. **分工边界样本实测前置第三次奏效**：DIVISION-1/2 落笔前先跑实测（standard_shift 语域 verify、responsibility_absolution 语域 rewrite，本模块均不命中）——延续 r717/r718 两次「锁空气」教训后，本轮一次选对。教训：分工样本先实测再落笔，已是连续第三轮验证该纪律。
+
+## round-guard [after] 复跑
+
+（三连提交后复跑，结果见 git log 与文末状态）
+
 # 全局修复（v6.8.66，r719 专项）
 
 ## 修复清单（按证伪纪律逐条）

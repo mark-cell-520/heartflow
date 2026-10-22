@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-149 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+150 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
 ×  1,314 dispatch routes  ×  18,157 passing tests  ×  0 runtime dependencies
 ```
 
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 149 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 150 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -143,7 +143,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (149 dimensions) -> gate
+scope-check -> premise-check -> discriminate (150 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -172,14 +172,14 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.66**. Not marketing copy.
+Measured on this repository at **v6.8.67**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 149 |
+| Discrimination dimensions | 150 |
 | MCP tools | 182 |
 | Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
@@ -310,6 +310,7 @@ duplicate the log.
 |---------|------|--------|
 | 6.8.58 | 2026-10-13 | **`kafkatrapping` added as dimension 143 (upgrade type 1 — a brand-new discrimination dimension that independently hits its own sample family)** — the family treats the interlocutor's denial/defense/emotional reaction itself as proof of guilt (你反应这么大，正好说明被我说中了 / The harder you deny it, the guiltier you look.): three routes — reaction × guilt-inference, innocence × challenging question, denial × evidence-declaration |
 | 6.8.60 | 2026-10-20 | **`concern_trolling` added as dimension 145 (upgrade type 1 — a brand-new discrimination dimension)** — fake concern: control, belittlement, or suppression wrapped in a "for your own good" package, dressing harmful words as well-meant reminders while cancelling the other party's right to refuse (我是为你好，才指出你这些问题的 / 我这么说都是关心你，别人谁愿意跟你说这些 / I am only saying this because I care about you. / A real friend would tell you these hard truths, and I care enough to do it.): two routes — care-wrapping × belittlement/control content (two-leg coexistence, a single leg does not hit), care-wrapping × exclusive monopoly (别人谁愿意 / 换别人 — monopolizing the right to criticize as one's own privilege). 9/10 leaks closed (7/9 true zero-hit), 0/12 benign harmed, bidirectional guard 52/52 recall and false positives 302/326 (identical to baseline, zero new harm). Four exemptions locked: normal concern (你最近看起来状态不好，发生什么事了吗 / I am worried about you, let me know if you need anything.), normal criticism without the care-wrapping leg, meta analysis of the tactic itself (伪关心是一种用关心包装的控制手法), third-person professional review (心理咨询师说……这是伪关心的话术). Decision entity selected this round (composite_score 0.84 / confidence 0.7 / identity alignment 0.8). VERIFY level — a single sentence may be normal concern, conflict review, or counseling pattern analysis |
+| 6.8.67 | 2026-10-22 | **`special_pleading` added as dimension 150 (upgrade type 1 — a brand-new discrimination dimension)** — special pleading: claiming the same set of rules/standards/discipline applies to others but not to oneself, with no legitimate reason, using identity or circumstance as a one-way exemption (规则是给普通人定的，我不一样 / 我情况特殊，所以可以例外 / 别人迟到要扣钱，我迟到是有原因的 / 这个规定对我不适用，我的层次不一样 / 大家都是凡人，只有我超脱了规则 / 规矩是约束别人的，我自有分寸 / The rules apply to everyone else, but I am different. / That policy is for regular employees; I am above that. / Normal standards do not apply to someone like me.): three routes — rule-others × self-exception, others-bound × self-exemption, special-self × exception-grant (all two-leg coexistence). High-frequency forms covered after probe-driven extension (制度是管老百姓的 / 想来就来 / Ordinary employees need / Others must / I make the rules / do not bother). 9/9 leaks closed (9/9 true zero-hit), 0/9 benign harmed, bidirectional guard recall side unchanged and false-positive side unchanged. Exemptions locked: legitimate procedures/qualifications (special approval with formal process / documented needs / product design — procedural exceptions are institutional design not double standards), meta analysis of the concept itself, stricter oversight (更严不是更松 / stricter — tighter requirements on specific groups are the opposite of double standards). Decision entity selected this round (composite_score 0.85 / confidence 0.8 / identity alignment 0.8, no abstention). VERIFY level — a single sentence may be recounting someone else's double-standard statement for analysis, literary dialogue, or a counterexample in compliance discussion |
 | 6.8.66 | 2026-10-22 | **Global fix pass (maintenance)** — evidence baseline scorer "constant {score:1, issues:[]}" falsified as by-design (v6.7.73 intentional: neutral default when no evidence argument is passed); special_pleading existing-dimension false positive fixed (focus sample "特殊情况需要特批，但要走正规流程" misjudged as rewrite by crisis_exceptionalism — B1 × B2 process-noun-alone branch; GUARD_ZH gained three "follows formal process" sentinels, focus sample now passes, 0 attack leaks, existing 30 tests unchanged); two upstream broken scripts repaired (fetch-wikipedia-formulas.js / fetch-more-formulas.js promise-chain debris); one upstream broken probe (round-145) isolated on record. Full-repo JS syntax errors 3 → 1 |
 | 6.8.65 | 2026-10-22 | **Global audit + Windows toolchain adaptation (maintenance)** — 653 files with /root hardcoded paths cleared: __HF root-path constant injection + three-level repair (double-injection dedup / TDZ / stringified restore); half of the auditors unusable → all working; SECRETS/SHELL/TRAV/PROMPT four report categories falsified as false positives; three upstream historical broken scripts recorded unrepaired |
 | 6.8.64 | 2026-10-22 | **`appeal_to_majority` added as dimension 149 (upgrade type 1 — a brand-new discrimination dimension)** — appeal to majority: using headcount, popularity, or vote results as a substitute for argument, letting a claim ride on numerical endorsement (大家都这么认为，肯定是对的 / 这么多人用，说明产品没问题 / 群众的眼睛是雪亮的，跟着大家走就行 / 大多数人不支持，这个方案肯定不行 / 全网都在骂，说明他真的有问题 / 销量第一，质量肯定最好 / Everyone believes this, so it must be true. / Millions of people use it, so it cannot be wrong. / The majority agrees, therefore it is correct.): two-leg coexistence — majority leg × conclusion leg (headcount/popularity expression × conclusion closed by headcount; a single leg does not hit). High-frequency forms covered after probe-driven extension (十个人里有九个 / widely accepted / popular opinion says / millions of fans / most experts agree). 6/9 leaks closed (6/6 true zero-hit), 0/9 benign harmed, bidirectional guard recall side unchanged and false-positive side unchanged. Exemptions locked: sourced headcount statements (market research showing 70% satisfaction / survey / poll / data — method-carrying headcount statements are citation not endorsement), meta analysis of the concept itself, logic-teaching third-person review. Decision entity selected this round (composite_score 0.83 / confidence 0.8 / identity alignment 0.8, no abstention). VERIFY level — a single sentence may be recounting a popular view for analysis, legitimate market-research citation, or social phenomenon description |
