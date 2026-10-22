@@ -404,6 +404,14 @@ const { checkStereotypeOrigin } = require('./stereotype-origin.js');
 // 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9。判据双腿共现；
 // 细节见 src/wishful-thinking.js。
 const { checkWishfulThinking } = require('./wishful-thinking.js');
+// [r717] 第 148 维度 void_zh_standard_shift（单方作废约定：以指称既往事项的
+// 名词短语 + 作废动词，事后单方面宣布共识/承诺/契约不算数）。decision 本体
+// 选出（scripts/decide-r717.js，composite_score 0.82 / confidence 0.8 /
+// identity alignment 0.8）。候选题池来自 r717 探测器
+// scripts/round-717-family-probe.js；本轮在当前引擎（147 维）复测：
+// 攻击漏判 5/7（71%）、误伤 0/6。判据双腿共现；细节见
+// src/void-zh-standard-shift.js。
+const { checkVoidZhStandardShift } = require('./void-zh-standard-shift.js');
 // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽：以嘲笑/蔑视/智商贬低
 // 对方的观点或发言代替论据）。decision 本体一次选出（/tmp/decide-run-r704.js
 // 读 /tmp/decide-opts-r704.json，composite_score 0.87 / confidence 0.80 /
@@ -1512,6 +1520,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r716] 第 147 维度 wishful_thinking（一厢情愿）计算点。
   // 同 r715 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const wt = _applyPedagogyRelaxation(checkWishfulThinking(_normText), "wishful_thinking", pedagogyRelaxation);
+  // [r717] 第 148 维度 void_zh_standard_shift（单方作废约定）计算点。
+  // 同 r716 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const vzs = _applyPedagogyRelaxation(checkVoidZhStandardShift(_normText), "void_zh_standard_shift", pedagogyRelaxation);
   // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）计算点。
   // 同 r701 先例：十处一次接齐，漏一处 gate.action 恒 pass。
   const ar = _applyPedagogyRelaxation(checkAppealToRidicule(_normText), "appeal_to_ridicule", pedagogyRelaxation);
@@ -1924,6 +1935,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r716] 第 147 维度 wishful_thinking 参与判定（一厢情愿）。
     // 同 r715 先例：dimMap 与 allDims 必须两处都接。
     {score: wt.score, name:'wishful_thinking'},
+    // [r717] 第 148 维度 void_zh_standard_shift 参与判定（单方作废约定）。
+    // 同 r716 先例：dimMap 与 allDims 必须两处都接。
+    {score: vzs.score, name:'void_zh_standard_shift'},
     // [r704] 第 137 维度 appeal_to_ridicule 参与判定（诉诸嘲讽）。
     // 同 r701 先例：dimMap 与 allDims 必须两处都接。
     {score: ar.score, name:'appeal_to_ridicule'},
@@ -2241,6 +2255,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r716] 第 147 维度 wishful_thinking（一厢情愿×
     // 信念/愿望腿×必然结果推断腿/超自然因果腿）。
     wishful_thinking: wt,
+    // [r717] 第 148 维度 void_zh_standard_shift（单方作废约定×
+    // 既往事项指称腿×作废动词腿）。
+    void_zh_standard_shift: vzs,
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽×
     // 嘲笑蔑视表达×指向对方观点/发言的目标腿）。
     appeal_to_ridicule: ar,
@@ -3271,6 +3288,12 @@ function discriminate(text, evidence = [], contentMode) {
     // （「我相信这个方向，但还是要看数据验证」）。与 r672-r715 同口径
     // 只登记 VERIFY。
     'wishful_thinking',
+    // [r717] 第 148 维度 void_zh_standard_shift（单方作废约定）登记。
+    // verify 级——「单方作废既有约定」需要补的是**实际语境判据**（这是
+    // 单方作废话术还是正当的合同复盘/变更流程/对话引用），不是改写句式
+    // 就能补的；单句也可能是正当陈述（「原合同里写了变更条款，按流程
+    // 来就行」）。与 r672-r716 同口径只登记 VERIFY。
+    'void_zh_standard_shift',
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）登记。
     // verify 级——「以嘲笑代替论据」需要补的是**实际语境判据**（这是
     // 蔑视攻击还是强烈批评的具体缺陷指认/幽默内容转述/文学对白/元
@@ -3652,6 +3675,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r716] 第 147 维度补登记：wishful_thinking（一厢情愿）。
       // 同上：九处一次接齐。
       wishful_thinking: wt,
+      // [r717] 第 148 维度 void_zh_standard_shift 补登记：
+      // 单方作废约定。同上：九处一次接齐。
+      void_zh_standard_shift: vzs,
       // [r704] 第 137 维度补登记：appeal_to_ridicule（诉诸嘲讽）。
       // 同上：十处一次接齐。
       appeal_to_ridicule: ar,
@@ -3865,6 +3891,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r716] 第 147 维度 wishful_thinking 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       wt.count ? wt.count + ' 处一厢情愿' : '',
+      // [r717] 第 148 维度 void_zh_standard_shift 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      vzs.count ? vzs.count + ' 处单方作废约定' : '',
       // [r704] 第 137 维度 appeal_to_ridicule 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ar.count ? ar.count + ' 处诉诸嘲讽' : '',
@@ -14245,6 +14274,9 @@ module.exports = {
   // [r716] 第 147 维度 wishful_thinking 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkWishfulThinking,
+  // [r717] 第 148 维度 void_zh_standard_shift 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkVoidZhStandardShift,
   // [r704] 第 137 维度 appeal_to_ridicule 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkAppealToRidicule,
