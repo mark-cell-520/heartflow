@@ -226,9 +226,7 @@ function fetchWikiPage(page, cat, sub) {
     const url = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(page)}&prop=wikitext&format=json&origin=*`;
     return safeFetch(url, { timeout: 20000, headers: { 'User-Agent': 'HeartFlow/5.8.6 (educational)' } })
       .then(res => res.text())
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
+      .then(data => {
         try {
           const json = JSON.parse(data);
           const wikitext = json?.parse?.wikitext?.['*'] || '';
@@ -249,10 +247,8 @@ function fetchWikiPage(page, cat, sub) {
         } catch (e) {
           resolve([]);
         }
-      });
-    });
-    req.on('error', () => resolve([]));
-    req.setTimeout(15000, () => { req.destroy(); resolve([]); });
+      })
+      .catch(() => resolve([]));
   });
 }
 
