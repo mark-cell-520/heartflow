@@ -1,0 +1,307 @@
+/**
+ * src/perfect-error.js — 完美错误答案检测器
+ *
+ * "完美的错误答案" = 结构完美（流畅、肯定、像真的），内容错误（编造、无据）。
+ * 单个信号无害，多个信号叠加 = 用户无法辨别的危险输出。
+ *
+ * 核心思想：抓 6 类信号，用"触发计数 + 协同惩罚"判定，而不是单信号触发。
+ *
+ * 信号:
+ *   S1 假精确     — 精确数字伪装（小数、百分比、年份+数字）
+ *   S2 伪权威     — 编造的专家/机构/研究引用
+ *   S3 全肯定结构 — 无任何让步/不确定词
+ *   S4 伪因果     — 无证据强因果（"正是因为X""必然导致"）
+ *   S5 绝对断言   — "所有/一切/总是/从不/绝对"
+ *   S6 无来源     — 长断言但无来源词（研究/报告/数据/调查）
+ *
+ * 判定:
+ *   1 信号 → pass（正常论述也偶尔有）
+ *   2 信号 → verify（需验证）
+ *   3+ 信号 → rewrite（疑似完美错误答案）
+ *   4+ 信号 + 假精确 → 高危（分数 0.9+，直接 rewrite）
+ */
+
+'use strict';
+
+// ─── S1: 假精确 — 精确数字伪装 ───────────────────────────────
+// [v6.7.93] 度量名词豁免（心虫 C 排查后由 D 修复，0.82）
+// 原来 `latency dropped 40%` 命中 S1（第 29 行的"精确百分比"模式），
+// 但这是**有具体度量名词的性能数据**，不是假精确。第 68 轮正是因此
+// 才没有把 perfect_error 接进 allDims（接了会升误拦）。
+// 判据与 src/index.js 的 PSEUDO_CAUSAL 豁免一致：句中含具体度量名词时，
+// 精确百分比是合法测量值。**不含度量名词的裸百分比仍算假精确**——
+// "市场份额达到 87.3%" 这种没有来源的数字才是目标。
+// ⚠️ 不能加 share/percentage/ratio/index/market：`market share reached 87.3%`
+// 恰是假精确的典型目标（第 70 轮加过 share，结果把该句豁免掉了）。
+// 豁免词必须是**可测量、有采集手段的量**，不能是任何能接百分比的名词。
+const METRIC_NOUNS_EN = /\b(?:throughput|latency|accuracy|precision|recall|f1|rate|speed|performance|memory|footprint|cost|price|size|capacity|bandwidth|usage|consumption|duration|time|error|revenue|growth|margin|yield|p50|p95|p99|qps|rps|sla|coverage|availability|uptime|downtime|retention|conversion|engagement|frequency|volume|count)\b/i;
+const METRIC_NOUNS_ZH = /(?:吞吐|延迟|准确率|召回|精确率|性能|内存|耗时|成本|价格|容量|带宽|占用|速率|错误率|收入|增幅|毛利|产量|占用率|成功率|转化率|转化|点击率|留存率|活跃|渗透率|覆盖率|命中率|故障率|响应时间|并发|负载|QPS|TPS|DAU|MAU|GMV|ROI|人效|坪效|折扣率|复购率|客单价|完播率|播放量|阅读量|打开率|退订率|退款率|投诉率|满意度|NPS|CSAT|回撤|最大回撤|夏普|波动率|久期|基准|净值|权益|杠杆率|不良率|拨备|保险费率|佣金率|中签率|完成率|达标率|合格率|及格率|出勤率|上线率|交付率|增量率)/;
+// [v6.7.93] 来源语境豁免：句中出现"报告显示/年报/审计/调查/统计"这类
+// 明确来源标记 + 度量名词时，精确百分比是**有出处的引用数据**，不是假精确。
+// 这是 test/unsupported-claim-exemption.test.js 第 45 轮固化的契约——
+// 接线 perfect_error 后它立刻变红（「报告显示，2024年公司营收增长15%，
+// 数据来自年报审计」从 pass 变 verify），说明豁免必须两个条件都查。
+const SOURCED_CONTEXT = /(?:报告|年报|季报|月报|审计|调查|统计|调研|白皮书|财报|披露|公告|数据(?:来|出自|来源)|根据.{0,12}(?:报告|数据|统计)|研究(?:报告|显示|表明)|survey|report|study|research|census|audit)/i;
+const FALSE_PRECISION_PATTERNS = [
+  /\d+\.\d+\s*(?:%|percent|倍|万|亿|million|billion|trillion)/gi,              // 87.3% / 12.5 million（%后不跟\b，JS的\b对%边界有怪癖）
+  // [r358] 边界收窄：percent 后不得紧跟字母。原写法 `percent` 裸词会把
+  // `percentage point`（百分点，合法统计单位）当前缀吃掉，实测「a 6
+  // percentage point gap」被判假精确 → perfect_error verify。
+  // `6 percent` / `6 percent drop` 仍命中。
+  /\d+(?:\.\d+)?\s*(?:%|percent(?!age)[a-z]*)/gi,                              // 精确百分比
+  /\d+(?:\.\d+)?\s*(?:倍|万|亿)/gi,                                            // 精确倍数/金额（中文侧不变）
+  /(?:\d{4})\s*年[^。\n]{0,15}(?:增长|下降|达到|突破|超过|占|上升|提高)/gi,      // 2025年增长XX
+  /(?:\d{2,4})\s*年[^。\n]{0,20}\d+(?:\.\d+)?\s*(?:%|亿|万|倍)/gi,              // 2025年XX达到87.3%
+  /\b(?:around|about|approximately|roughly|nearly)\s*\d+(?:\.\d+)?\s*(?:%|million|billion)/gi, // 伪精确约数
+];
+
+// ─── S2: 伪权威 — 编造的专家/机构/研究引用 ─────────────────────
+const FAKE_AUTHORITY_PATTERNS = [
+  /(?:著名|权威|知名|资深|国际|国内)\s*(?:教授|专家|学者|研究员|博士|院士)/gi,
+  /(?:据|根据|按照|引用)\s*(?:某|一位|一位著名|某著名)?\s*(?:专家|学者|教授|研究团队|机构)/gi,
+  /(?:Nature|Science|Cell|The Lancet|JAMA|BMJ|NEJM|PNAS)\s*(?:研究|论文|报告|发现|证实|表明)/gi,
+  /(?:发表|发布|刊登)\s*(?:在|于)?\s*(?:国际|顶级|权威|知名)?\s*(?:期刊|杂志|学报|报告)\b/gi,
+  /(?:某|一位|多位|几名)\s*(?:科学家|研究员|学者|专家|教授)\s*(?:指出|表示|认为|发现|证实|强调)/gi,
+  /(?:研究|调查|实验|数据)\s*(?:表明|显示|证明|证实|发现|指出)[^。\n]{0,30}\d+(?:%|万|亿|倍)/gi,
+  // 英文伪权威
+  /\b(?:renowned|famous|leading|distinguished|eminent|top)\s+(?:Professor|Dr\.?|Doctor|scientist|researcher|scholar|expert|academic)\b/gi,
+  /\b(?:According to|according to)\s+(?:a|an)?\s*(?:recent|new|202\d)?\s*(?:Nature|Science|study|research|report|paper|survey)\b/gi,
+  /\b(?:published|reported|documented)\s+in\s+(?:the\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+(?:Journal|Review|Report|Paper)\b/gi,
+  /\b(?:study|research|report|paper|survey)\s+(?:shows?|proves?|demonstrates?|reveals?|finds?|confirms?)\b[^.]{0,40}\d+(?:\.\d+)?\s*(?:%|million|billion)\b/gi,
+];
+
+// ─── S3: 全肯定结构 — 无任何让步/不确定词 ─────────────────────
+const UNCERTAINTY_WORDS_ZH = [
+  '可能', '或许', '也许', '大概', '大约', '估计', '推测', '往往', '通常',
+  '一般而言', '一般来说', '一定程度上', '某些', '部分', '有些', '似乎', '显得',
+  '不确定', '未证实', '有待', '值得商榷', '存疑', '难以确定', '还不清楚', '不能肯定',
+  '据我所知', '以我目前了解', '我的理解是', '大概来说'
+];
+const UNCERTAINTY_WORDS_EN = [
+  'maybe', 'perhaps', 'possibly', 'probably', 'might', 'may', 'could',
+  'seems', 'appears', 'sometimes', 'often', 'usually', 'typically',
+  'generally', 'approximately', 'roughly', 'somewhat', 'some', 'certain',
+  'unclear', 'uncertain', 'unknown', 'not sure', 'not certain', 'i think',
+  'in my view', 'to my knowledge', 'as far as i know'
+];
+
+// ─── S4: 伪因果 — 无证据强因果 ──────────────────────────────
+const FALSE_CAUSALITY_PATTERNS = [
+  /(?:正是因为|正因为|正是因为有了|恰恰是因为)\s*[^，。]{2,20}\s*(?:才|所以|导致|造成|使得|让)/gi,
+  /(?:必然|必定|毫无疑问)\s*(?:导致|造成|引起|使得|让)/gi,
+  /(?:所以|因此|由此可见)\s*(?:必然|肯定|一定|毫无疑问)[^。\n]{0,20}/gi,
+  /(?:只要|一旦)\s*[^，。]{2,15}\s*(?:就|必|一定)[^。\n]{0,15}(?:成功|失败|必然|导致)/gi,
+  /(?:\w+\s+therefore\s+|\w+\s+thus\s+|\w+\s+hence\s+)\w+/gi,
+  /(?:undoubtedly|unquestionably|absolutely|certainly)\s+(?:leads?|causes?|results?|triggers?|produces?)/gi,
+];
+
+// ─── S5: 绝对断言 — 所有/一切/总是/从不/绝对 ───────────────────
+const ABSOLUTE_CLAIMS = [
+  // [v6.7.125 第 322 轮] 边界类从 [^，。\n] 扩为 [^，,。.\n!?！？]：
+  //   ① src/pipeline.js:72 入口 NFKC 把全角逗号折成半角 ','，旧类不含
+  //      半角逗号 → 正则跨句误配（「你总是第一个到,不过晚到一会儿也没关系」
+  //      命中「总是…会」被判 S5 绝对断言 → perfect_error@15 → gate verify）。
+  //   ② 中文行文本就用半角逗号时（非 ASCII 文本不走 NFKC 折半角路径）
+  //      同样跨句——边界类必须两种逗号都收才算"断句"。
+  //   实测：6 条良性长句里 4 条 pipeline/direct 分叉，全族修正后收敛。
+  //   语义不变：绝对词到断言动词之间不得跨过任何句读（逗号/句号/问叹/换行）。
+  /(?:所有|一切|全部|任何|每一个|总是|从不|从来|永远|绝对|完全|彻底|必定|必然|一定)\s*[^，,。.、\n!?！？]{0,12}(?:是|都|会|能|要|必须|不会|不可能)/gi,
+  /(?:nothing|everything|always|never|absolutely|certainly|undoubtedly|definitely|completely|entirely|totally)\s+\w+/gi,
+  /(?:no\s+(?:doubt|question|way)|under\s+no\s+circumstances)\b/gi,
+];
+
+// ─── S6: 无来源 — 长断言但无来源词 ────────────────────────────
+const SOURCE_WORDS = [
+  '研究', '报告', '数据', '调查', '论文', '文献', '统计', '资料', '案例',
+  '实验', '测试', '观察', 'evidence', 'research', 'study', 'report', 'data',
+  'survey', 'paper', 'literature', 'statistics', 'source', 'according'
+];
+const CLAIM_PATTERNS = [
+  /[^。\n]{15,60}(?:证明了|证实了|发现|表明|显示)[^。\n]{0,30}/gi,
+  /[^。\n]{10,}(?:是|为)\s*(?:全球|全国|世界|行业)?\s*(?:第一|最大|最强|最快|最先进|唯一)\b/gi,
+];
+
+/**
+ * 检测文本是否为"完美的错误答案"
+ * @param {string} text - 要检测的文本
+ * @returns {{ count, signals, score, isPerfectError, details }}
+ */
+function checkPerfectError(text) {
+  if (!text || typeof text !== 'string') return { count: 0, signals: [], score: 0, isPerfectError: false };
+
+  const hasChinese = /[\u4e00-\u9fff]/.test(text);
+  const signals = [];
+
+  // S1: 假精确
+  // [v6.7.93] 度量名词豁免：含具体度量名词时，精确百分比是合法测量值。
+  // 「latency dropped 40%」「准确率提升到 91.2%」是工程结论不是伪装精确。
+  // 反面仍算假精确：「市场份额达到 87.3%」（无度量名词、无来源）。
+  const hasMetricNoun = METRIC_NOUNS_EN.test(text) || METRIC_NOUNS_ZH.test(text);
+  // 来源语境：明确标注了报告/年报/调查等出处时，数字是引用而非伪装
+  const isSourced = SOURCED_CONTEXT.test(text);
+  // [v6.7.101] 疑问句豁免：假精确的定义是"用精确数字伪装确定的断言"。
+  // 「这个季度的销售数据比上季度下降了 15%，可能是什么原因？」里的 15%
+  // 是提问的事实前提，不是伪装断言——文本在**求证**而非**定论**。
+  // 判据：句尾是问号（或句中出现"可能是什么原因/说明了什么/正常吗/为什么"）
+  // 且没有 S2 伪权威共现时，S1 不计信号。
+  // 双向门禁 benign 组第 29/30 条正是这句（实测 v6.7.100 起卡红灯）。
+  const isQuestion = /[？?]/.test(text) ||
+    /(?:可能是什么原因|是什么原因|说明了什么|意味着什么|正常吗|是不是|为什么|有没有|如何解释)/.test(text);
+  // ── [r437] 仪器读数语域豁免（中文侧，S1/S2 同源）──────────────────
+  // 缺口实测（scripts/round-437-pe-diag.js）：
+  //   「线上监控数据表明连接池峰值使用率为 72%」被判
+  //   S1_false_precision(72%) + S2_fake_authority(数据表明…72%) → 0.43。
+  // 根因同族同根：S1 的 METRIC_NOUNS_ZH 收「占比/使用率」之外的这个说法
+  // 不含已收度量名词，而 SOURCED_CONTEXT 只认「报告/年报/审计」类名词，
+  // 「监控数据/巡检日志」这类**仪器产出处**不在表内；S2 的
+  // 「(研究|调查|实验|数据)(表明|显示…)[^。]{0,30}数字」也不分读数来自
+  // 仪器还是来自不可定位的中间人。
+  // 分界线沿用 r432/r435/r436/r437 的「能否定位」：仪器语域词 + 报告/日志
+  // 类名词 + 显示/表明三者齐备 = 数据可从监控/巡检记录复现。
+  // 人身权威形式（专家/教授/官方/可靠消息）不享受本豁免。
+  const PE_INSTRUMENT_ZH = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)[^。]{0,4}(?:报告|数据|记录|结果|日志|指标|看板|报表|告警)[^。]{0,6}(?:显示|表明|指出)/;
+  const peInstrumentSourced = hasChinese && PE_INSTRUMENT_ZH.test(text);
+  // [r437b] 人身权威在场否决豁免：人身权威词出现在仪器语域三合一**之前**时，
+  // 整句的「数据」转述的是该权威的口径而非仪器读数 ——
+  //   「官方巡检数据显示整体情况明显好转」「可靠消息监控数据显示…比去年好」
+  // 实测（scripts/round-437-diag4.js）两句改前 gate=pass 全维零命中。
+  // 分界线：只看权威词与首个仪器语域词的先后，权威在后不否决（「监控数据
+  // 显示业内权威专家都认可」本来就命中 appeal_to_authority 的「权威专家」支）。
+  const PE_HUMAN_AUTH_ZH = /(?:官方|有关部门|相关方面|专家|教授|学者|院士|权威|可靠消息|据称|据悉|据了解|业内人士|知情人士)/;
+  const PE_INSTR_AFTER_AUTH = /(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)/;
+  const peHumanFirst = (() => {
+    if (!peInstrumentSourced) return false;
+    const auth = text.match(PE_HUMAN_AUTH_ZH);
+    if (!auth) return false;
+    // 「业内巡检专家数据…」：权威词「专家」紧跟在仪器语域词**之后**
+    // （「巡检专家」= 仪器对象的修饰语而非转述主语）。只看左侧 4 字窗口，
+    // 「官方巡检数据…」的权威词在仪器词之前，不适用本判据。
+    if (PE_INSTR_AFTER_AUTH.test(text.slice(Math.max(0, auth.index - 4), auth.index))) return false;
+    const instr = text.match(/(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)/);
+    return !!instr && auth.index < instr.index;
+  })();
+  const precisionHits = [];
+  if (!hasMetricNoun && !isSourced && !isQuestion && !(peInstrumentSourced && !peHumanFirst)) {
+    for (const pat of FALSE_PRECISION_PATTERNS) {
+      const m = text.match(pat);
+      if (m && m.length) precisionHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+    }
+  }
+  if (precisionHits.length) {
+    signals.push({ id: 'S1_false_precision', name: '假精确', count: precisionHits.length, hits: precisionHits.slice(0, 3), weight: 0.8 });
+  }
+
+  // S2: 伪权威
+  // [r437] 仪器读数语域豁免：同 S1 分界（见上方 peInstrumentSourced），
+  // 句中存在仪器语域三合一时，「数据(表明|显示|指出)+数字」是监控读数
+  // 不是编造的权威引用。只摘该形态，著名专家/机构/期刊族一律保留。
+  const authorityHits = [];
+  for (const pat of FAKE_AUTHORITY_PATTERNS) {
+    const m = text.match(pat);
+    if (m && m.length) {
+      if ((peInstrumentSourced && !peHumanFirst) && /^(?:研究|调查|实验|数据)(?:表明|显示|证明|证实|发现|指出)/.test(m[0])) continue;
+      authorityHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+    }
+  }
+  if (authorityHits.length) {
+    signals.push({ id: 'S2_fake_authority', name: '伪权威', count: authorityHits.length, hits: authorityHits.slice(0, 3), weight: 0.9 });
+  }
+
+  // S3: 全肯定结构 — 长文本(>80字)且无任何不确定词
+  const clean = text.replace(/[。！？!?]/g, '。').replace(/\n/g, '。');
+  // 英文按句号/感叹号分句，中文按句号分句
+  const sentences = hasChinese
+    ? clean.split('。').filter(s => s.trim().length > 8)
+    : text.split(/[.!?]/).filter(s => s.trim().split(/\s+/).length > 4);
+  const words = hasChinese ? UNCERTAINTY_WORDS_ZH : UNCERTAINTY_WORDS_EN;
+  const totalLen = text.length;
+  let uncertaintyHits = 0;
+  for (const w of words) {
+    const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    if (re.test(text)) uncertaintyHits++;
+  }
+  // 长文本 + 无不确定词 + 多断言句 → 全肯定
+  if (totalLen > 80 && uncertaintyHits === 0 && sentences.length >= 3) {
+    signals.push({ id: 'S3_all_certain', name: '全肯定结构', count: sentences.length, hits: [`${sentences.length}句断言无任何不确定词`], weight: 0.7 });
+  }
+
+  // S4: 伪因果
+  const causalHits = [];
+  for (const pat of FALSE_CAUSALITY_PATTERNS) {
+    const m = text.match(pat);
+    if (m && m.length) causalHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+  }
+  if (causalHits.length) {
+    signals.push({ id: 'S4_false_causality', name: '伪因果', count: causalHits.length, hits: causalHits.slice(0, 3), weight: 0.7 });
+  }
+
+  // S5: 绝对断言
+  // [v6.7.93] 三处领域/语境豁免（都是第 70 轮接线后被基准抓到的真误拦）：
+  //  ① 法律/医学专有名词里的"完全"：「完全民事行为能力」不是断言强度
+  //  ② **流程陈述里的"所有"**：「所有审批都在 OA 系统里完成」是规则描述，
+  //     「所有用户都喜欢这个功能」才是夸大——判据是"所有"后接流程/存在动词
+  //     （都在/均须/都走/都需/都通过）时不算断言，与第 12 轮 dehumanization
+  //     的"需指人共现"同款思路：先限定语境再谈强度。
+  //  ③ SOURCE_WORDS 已在上方 S1 侧处理，此处不重复。
+  const LEGAL_MEDICAL_FULL = /完全(?:民事行为(?:能力|权利)|刑事(?:责任|行为能力)|行政(?:责任|能力)|缓解|抗原|康复|治愈|停产|停业)/;
+  const PROCEDURAL_ALL = /(?:所有|全部|一切|任何)\s*[^。，,]{0,12}(?:都在|均须|都要|都须|必须|须经|都走|都需|都通过|都由|均在此|都是.{0,4}(?:系统|流程|平台|规定)|按|均按照)/;
+  const absoluteHits = [];
+  if (!LEGAL_MEDICAL_FULL.test(text) && !PROCEDURAL_ALL.test(text)) {
+    for (const pat of ABSOLUTE_CLAIMS) {
+      const m = text.match(pat);
+      if (m && m.length) absoluteHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+    }
+  }
+  if (absoluteHits.length) {
+    signals.push({ id: 'S5_absolute_claim', name: '绝对断言', count: absoluteHits.length, hits: absoluteHits.slice(0, 3), weight: 0.6 });
+  }
+
+  // S6: 无来源 — 长断言但无来源词
+  const hasSource = SOURCE_WORDS.some(w => text.toLowerCase().includes(w.toLowerCase()));
+  if (!hasSource && totalLen > 60) {
+    const claimCount = CLAIM_PATTERNS.reduce((n, pat) => {
+      const m = text.match(pat);
+      return n + (m ? m.length : 0);
+    }, 0);
+    if (claimCount >= 2) {
+      signals.push({ id: 'S6_no_source', name: '无来源断言', count: claimCount, hits: [`${claimCount}处断言无任何来源/数据/研究引用`], weight: 0.6 });
+    }
+  }
+
+  const count = signals.length;
+  // 加权分
+  const weighted = signals.reduce((s, sig) => s + sig.weight, 0);
+  // 协同惩罚：信号越多越危险（非线性）
+  const synergy = count >= 4 ? 0.15 : count === 3 ? 0.08 : 0;
+  const score = Math.min(1, weighted / 4 + synergy);
+
+  // 判定级别
+  // 高权重组合升级：伪权威(S2,0.9)+假精确(S1,0.8) 或 伪权威+绝对断言(S5) 同时出现时，
+  // 即使只有2个信号也判 rewrite——"著名专家+有效率99.7%"这类是最典型的完美错误（编造权威+假数据）。
+  // 但需排除合法学术来源：文本含具体期刊/论文/测试集/机构/数据引用时，S2 不算编造权威。
+  // ⚠️ 2026-08-10 修复：纯机构/期刊名（如 "Nature"）不算合法来源——编造声明常拿知名期刊当挡箭牌
+  //（"根据2025年Nature最新研究显示"）。必须同时出现来源引用结构（期刊名+研究/指出/显示/证明）才算。
+  const legitimateSource = /(?:论文|期刊|文献|测试集|数据集|报告|年报|审计|样本|数据源|数据库|团队|课题组|实验室|机构)/.test(text) ||
+    (/(?:哈佛|剑桥|牛津|斯坦福|麻省理工|清华|北大|中科院|耶鲁|普林斯顿|伯克利|MIT|Stanford|Harvard|Oxford|Cambridge|Yale|Nature|Science|Cell|Lancet|JAMA|BMJ|NEJM|PNAS)/i.test(text) &&
+     /(?:研究|实验|测试|调查|报告|指出|显示|证明|数据|统计|论文|发布)/.test(text));
+  const signalIds = signals.map(s => s.id);
+  const hasHighWeightPair = !legitimateSource &&
+    signalIds.includes('S2_fake_authority') &&
+    (signalIds.includes('S1_false_precision') || signalIds.includes('S5_absolute_claim') || signalIds.includes('S4_false_causality'));
+  let level = 'pass';
+  if (count >= 4 && precisionHits.length) level = 'high';       // 4+信号含假精确 → 高危
+  else if (count >= 3) level = 'high';                          // 3+信号 → 高危
+  else if (hasHighWeightPair) level = 'rewrite';                // 伪权威+假精确/绝对断言 → 完美错误
+  else if (count >= 2) level = 'verify';                        // 2信号 → 需验证
+
+  return {
+    count,
+    signals,
+    score: Math.round(score * 100) / 100,
+    isPerfectError: count >= 3,
+    level,
+    details: signals.map(s => `${s.name}(${s.count}处)`).join('; ') || '无明显信号'
+  };
+}
+
+module.exports = { checkPerfectError };

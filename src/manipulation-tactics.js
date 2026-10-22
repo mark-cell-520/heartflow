@@ -1,0 +1,414 @@
+/**
+ * HeartFlow — Manipulation Tactics（操纵手段判别）
+ *
+ * 来源：97 样本防回归基准暴露的真实漏判（2026-09-21，心虫 decision.decide 选定，0.92 分）。
+ * 20 条恶意样本中 7 条 pass，其中 6 条零维度命中——现有 50 个维度覆盖不到
+ * 这几类高频操纵手段：
+ *
+ *   1. phishing_coercion   钓鱼胁迫：「立即点击链接验证账户，否则将被冻结」
+ *   2. induced_trust       诱导信任与隔离：「你必须完全信任我，因为只有我了解你的价值」
+ *                          「不要告诉任何人我们谈过这件事」
+ *   3. coverup_induction   掩盖包庇诱导：「你为什么不继续掩盖那个数据造假的问题？」
+ *
+ * 设计原则：
+ * - 纯规则、零依赖、纯函数（与心虫其他维度一致）
+ * - 与既有维度分工：false_urgency 管"时间压迫"，本模块管"威胁后果+链接胁迫"
+ * - 误报控制优先：每条模式都要求**胁迫性后果**共现，单独的"点击链接"不判
+ *   （正常客服场景「请点击链接查看详情」极常见）
+ */
+
+'use strict';
+
+// ─── 1. 钓鱼胁迫（phishing_coercion）────────────────────────
+// 关键：必须有 胁迫性后果（冻结/注销/失效/报警/处罚）与 行动指令（点击/验证/登录）共现
+const PHISHING_PATTERNS = [
+  // 行动 + 后果（必须共现，单独的"点击链接"是正常操作不判）
+  /(?:点击|打开|访问|登录)[^。]{0,20}(?:链接|网址|页面|表单)[^。]{0,40}(?:验证|确认|更新|完善|激活|冻结|异常|失效)/i,
+  /(?:链接|网址)[^。]{0,30}(?:验证|确认|更新|完善|激活)/i,
+  /(?:账户|账号|帐号|身份|资质|额度|信用)[^。]{0,20}(?:将被|会被|即将|马上)?[^。]{0,10}(?:冻结|查封|注销|停用|失效|限制|清零)/i,
+  // [v6.7.73] 「账户异常」需与处置后果或要求行动共现才算钓鱼——
+  // 「账户异常需要本人持证件到柜台」是客服正常流程说明，不是胁迫。
+  /(?:账户|账号|帐号)[^。]{0,20}异常[^。]{0,20}(?:点击|验证|确认|登录|输入|提供|扫描)[^。]{0,10}/i,
+  /(?:检测|发现|系统)[^。]{0,10}(?:您的|你的|该)?[^。]{0,6}(?:账户|账号)[^。]{0,12}(?:异常|被盗|涉嫌|风险)[^。]{0,20}(?:请|需|尽快|立即|点击)/i,
+  /(?:否则|不然|若不|如未|逾期)[^。]{0,25}(?:冻结|注销|停用|失效|扣款|起诉|报警|处罚|追究)/i,
+  /(?:24|48|72)?\s*小时内?[^。]{0,20}(?:未|不)[^。]{0,10}(?:验证|确认|处理|整改)[^。]{0,20}(?:冻结|注销|停用|失效|关闭)/i,
+  /(?:系统检测|安全中心|平台检测|风控)[^。]{0,25}(?:异常|风险|违规|被盗|涉嫌)/i,
+  // [v6.7.73] 「立即/尽快 + 处理/整改」需指向**对方**（您/用户/贵司）
+  // 才算胁迫。「我们立即处理」「客服会立即处理」是我方动作，不是钓鱼。
+  /(?:请|需|务必|烦请)[^。]{0,4}(?:您|你|用户|贵司|客户)?[^。]{0,4}(?:立即|马上|立刻|尽快)[^。]{0,15}(?:点击|验证|确认|处理|整改|提供|补充)/i,
+  /(?:立即|马上|立刻|尽快)[^。]{0,10}(?:点击|验证|确认)[^。]{0,10}(?:链接|账户|身份|信息)/i,
+  // 英文
+  /\b(?:click|open|visit|follow)\b[^.]{0,30}\b(?:link|url)\b[^.]{0,40}\b(?:verify|confirm|update|validate)\b/i,
+  /\b(?:link|url)\b[^.]{0,30}\b(?:verify|confirm|update|validate)\b/i,
+  // [v6.7.71] account 与 suspended 之间允许间隔（扩充基准暴露：
+  // "verify your account immediately or it will be suspended" 原模式失配）
+  /\b(?:account|identity|access)\b[^.]{0,40}\b(?:will\s+be\s+)?(?:suspended|frozen|terminated|disabled|locked|restricted|closed)\b/i,
+  /\b(?:verify|confirm|update|validate)\b[^.]{0,30}\b(?:account|identity)\b[^.]{0,30}\b(?:or|otherwise|else)\b[^.]{0,30}\b(?:suspended|frozen|terminated|disabled|locked)\b/i,
+  /\b(?:within|in)\s+(?:24|48|72)\s+hours?\b[^.]{0,30}\b(?:verify|confirm|suspend|terminate|disable)\b/i,
+  /\b(?:otherwise|or\s+else|failure\s+to)\b[^.]{0,30}\b(?:suspend|terminate|freeze|disconnect|penalt)/i,
+  /\b(?:unusual|suspicious|unauthorized|suspected)\b[^.]{0,20}\b(?:activity|access|login|sign-?in)\b[^.]{0,3}\.[^.]{0,40}\b(?:verify|confirm|secure|validate)\b/i,
+  /\b(?:unusual|suspicious|unauthorized|suspected)\b[^.]{0,20}\b(?:activity|access|login|sign-?in)\b[^.]{0,40}\b(?:verify|confirm|secure|validate)\b/i,
+  /\b(?:we|our system)\s+(?:have\s+)?(?:detected|noticed|observed)\b[^.]{0,40}\b(?:verify|confirm|secure|validate|suspend)\b/i,
+  /\b(?:we|our system)\s+(?:have\s+)?(?:detected|noticed|observed)\b[^.]{0,3}\.[^.]{0,40}\b(?:verify|confirm|secure|validate|suspend)\b/i,
+];
+
+// ─── 2. 诱导信任与隔离（induced_trust）──────────────────────
+// 关键：要求"排他性权威"或"保密隔离"——把对方与其他人/其他信息源切断
+const INDUCED_TRUST_PATTERNS = [
+  // 排他性权威：只有我懂你/只有我对你好/别人都不怀好意
+  /只有我(?:才|真正|最)?(?:了解|懂|理解|关心|为你好|在乎)/i,
+  /(?:除了我|只有我)[^。]{0,15}(?:不会|才能|会)(?:骗你|害你|帮你|懂你|理解你)/i,
+  /(?:别人|他们|其他人|所有人)[^。]{0,12}(?:都)?(?:不|没)[^。]{0,8}(?:懂你|了解你|关心你|为你好|靠不住|不可信|会骗你)/i,
+  /(?:你)?(?:必须|只能|一定要|务必)(?:完全|绝对|无条件)(?:信任|相信|听从|服从|依赖)(?:我|一个人)/i,
+  /(?:完全|绝对|无条件)(?:信任|相信|服从|依赖)我(?:一个人)?/i,
+  // 保密隔离：不要告诉别人 / 这是我们之间的秘密
+  // [v6.7.133] 第 326 轮：补流程合规侧负向先行断言。
+  // 轮初实测（tmp-r326-probe.js，11 条流程扩样）：第 65 条宽口径把
+  // 「禁声半 + 流程处置半」（报价/密钥/公告时序类）也判成保密隔离，
+  // 3 条误伤；同族真样本 9/9 仍命中、中性孤立禁声 3/3 不变。
+  // 分界：本维度语义 = 切断对方与其他人/信息源的**关系指向**（秘密/我们之间/
+  // 只有你知道），句中同时出现流程/制度/公告/合规/系统词时属办公合规表述，
+  // 不属隔离。反向语序（流程词在禁声词之前）本轮不覆盖，记入遗留。
+  /(?![^。；！？\n]{0,26}(?:按流程|流程|提交系统|系统|公告|审批|报备|制度|规定|规范|合规|披露|发布))(?:不要|别|不能|不许)(?:告诉|跟|和|对)(?:任何人|别人|其他人|家人|朋友|同事|领导)/i,
+  /(?:(?:这是|就当是)?(?:我们|咱们)(?:之间|俩|两人|俩人)?(?:的)?秘密|(?:我们|咱们)(?:俩|两人|俩人)?的秘密)/i,
+  /(?:不要|别)(?:让|告诉)(?:任何人|别人|其他人)(?:知道|晓得|清楚)/i,
+  /(?:天知地知|你知我知|只有你我知道)/i,
+  // ─── [v6.7.147] 第 337 轮：人格/名誉担保族 SELF_GUARANTEE ───
+  // 轮初 probe-10 实测：担保/发誓同族 8 条既有表 0 命中（探针 2 条直调 count=0）。
+  // 缺口结构：既有条目覆盖「排他权威 / 保密隔离 / 信息源隔离」，第四类
+  // **自我担保**（说话者以自己的社会身份作抵押换取信任）整族缺席——
+  // 我以X担保 / 我对天发誓 / 我敢打包票 / 放一百个心。
+  //
+  // 判据（两半齐备）：
+  //   担保半 —— 以(人格|名誉|党性|身家|全家|性命|乌纱帽)担保/保证/发誓
+  //            打包票 / 赌咒 / 放一百个心
+  //   或「担保半」+ **绝对化背书**（绝对|百分之百|肯定|保证没问题）
+  // 良性分界（探针实测 0 误伤）：
+  //   「我保证按流程提交审批」——保证后跟可核验**动作**不是人格抵押；
+  //   「公司提供三年质保」——担保主体是机构承诺且指向**产品条款**，
+  //     句中必须出现「人格/名义类抵押物 + 担保动词」同句共现才命中。
+  /(?:我|咱|老子|兄弟)(?:愿意|敢|可以|愿意用)?(?:以|拿|用)[^。]{0,8}(?:人格|名誉|声誉|党性|人品|身家|性命|全家|乌纱帽|脑袋|职业生涯|饭碗|头)(?:担保|保证|担保保证|做担保|来担保|发誓|打赌)/i,
+  /(?:我对?(?:天|老天|佛祖|上帝|神明|祖宗|父母)(?:发誓|起誓|赌咒|许愿))/i,
+  /(?:我(?:敢|愿意|可以)(?:打包票|打保票|下保证|保证))/i,
+  /(?:放(?:一百|一千|一万)个心|把心放到肚子里|尽管放心|万万放心)/i,
+  // 「相信我 + 我不会骗你」自证清白族：探针 1 直调 count=0，
+  // 担保动词换成「绝不会骗你」这类否定式自证，上述打包票表覆盖不到。
+  /(?:相信|信|信任)我[^。]{0,12}(?:绝不|不会|不会|决不|肯定不会)(?:骗|坑|害|忽悠|蒙)你/i,
+  /(?:我绝不会|我不会|我决不)[^。]{0,6}(?:骗|坑|害|忽悠)你[^。]{0,10}(?:相信我|信我|放心)/i,
+  /(?:相信我|信我)[^。]{0,6}(?:我)?(?:最|绝对|肯定|一向|向来)[^。]{0,6}(?:靠谱|可靠|讲信用|说话算话|守信)/i,
+  /(?:担保|保证)(?:绝对|百分之百|肯定|铁定|一定)(?:没|不会有?|出)(?:问题|差错|岔子|事)/i,
+  // 英文
+  /\bonly\s+i\s+(?:really\s+)?(?:understand|know|care\s+about|love)\s+you\b/i,
+  /\bno\s+one\s+(?:else\s+)?(?:understands|cares\s+about|will\s+ever)\s+(?:you|love\s+you)\b/i,
+  /\byou\s+(?:must|have\s+to|need\s+to|should)\s+(?:completely|absolutely|totally|unconditionally|fully)\s+(?:trust|obey|believe)\s+me\b/i,
+  // [v6.7.71] 副词后置变体："trust me completely"（扩充基准暴露的漏判）
+  /\byou\s+(?:must|have\s+to|need\s+to|should)\s+(?:trust|obey|believe)\s+me\s+(?:completely|absolutely|totally|unconditionally|fully)\b/i,
+  /\btrust\s+me\s+(?:completely|absolutely|totally|unconditionally|fully)\b/i,
+  /\b(?:don'?t|do\s+not)\s+(?:tell|share(?:\s+this)?\s+with)\s+(?:anyone|anybody|others?)\b/i,
+  /\b(?:this\s+is\s+)?(?:just\s+)?between\s+us\b/i,
+  /\bour\s+(?:little\s+)?secret\b[^.]{0,40}\b(?:don'?t|do\s+not|never|no\s+one)\b/i,
+  // ─── [v6.7.125] 第 92 轮：信息源隔离族 INFO_ISOLATION ───
+  // 来源：心虫 decision 两轮 chosen:null（A/C 并列 0.8、B 0.74、D 0.74），
+  // 按「实测证据强度 + gate 影响」双准则人工择优 A（第 90/91 轮同款纪律）。
+  // 轮初实测（r92-scan.js / r92-baseline.js，本体 gate）：31 条同族攻击
+  // 既有表只命中 2 条（其中 1 条还是 prompt_injection 旁路命中），
+  // **净放行 29 条**；69 条良性 0 误伤。缺口整类结构缺失，不是词表稀疏。
+  //
+  // 缺口本质：既有 19 条只覆盖「排他性权威（只有我懂你）」与「保密隔离
+  // （这是我们之间的秘密）」，缺第三类——**信息源隔离**：把对方与
+  // 可验证的外部信息源（其他代理/官网/同行/家人/律师）切断，
+  // 从而让「只有我说的算数」。这是诱导信任的核心落点：
+  // 权威可伪造、秘密可共享，但**信息源一旦被隔离，对方失去校验能力**。
+  //
+  // 判据沿用家族铁律「两半齐备」：
+  //   隔离半 —— 禁询第三方 / 排他渠道 / 瞒报亲近人 / 贬损其他信息源
+  //   指向半 —— 听我的 / 只有我 / 找我 / 交给我 / 信我
+  // 良性分界（69 条实测 0 误伤，含 30 条高压扩样）：
+  //   - 官方反诈提示（「有疑问请联系官方客服，不要轻信陌生来电」）
+  //     —— 指向的是**公开可验证渠道**，不是指向说话者本人
+  //   - 正常商务描述（「本公司拥有华南区独家代理权」「内部渠道价格更低但要资质审核」）
+  //     —— 有排他词但**没有隔离指向半**（不要求切断对方与其他源的联系）
+  //   - 学术/研究建议（「文献综述不能只看单一来源，要多方查证」）
+  //     —— 恰是本族的反向（鼓励多源）
+  //   - 客服正常流程（「退款事宜请通过订单页面提交申请」）
+  //     —— 中性指示
+  //
+  // 试错台记账（r92-cand-try1→try7）：
+  //   try1 19/31 漏 12：禁词后置式（「你都别信」）、反序式、英文面
+  //   try2 28/31 补三条新句式
+  //   try3 29/31 族4b 家人瞒报语序解耦（「家里人问起就说不知道」：
+  //     瞒报对象在句首不在 CONCEAL 后）+ 族4c 后段窗口 20→24
+  //   try4 30/31 修 #25；**#28 暴露新坑**：「别跟同行打听」的语序是
+  //     禁词+跟+SRC+动词，而 FORBID 表写成「禁词+动词」，动词不紧贴禁词
+  //     → r92-diag3/4 定位后另立 FORBID_VIA 专用式（连接词 + 0-8 字中缀）
+  //   try5 29/31 **回退坑**：把 FORBID 整体加中缀想一把修 #28，
+  //     结果族2b 禁词后置式「外面的风言风语别当真」被改漏，且良性
+  //     「有疑问请联系官方客服，不要轻信陌生来电」被误拉——一条改动
+  //     两头失守。教训：**中缀只能加在专用式上，不能动共享的 FORBID 词表**
+  //   try6 30/31 恢复 FORBID 原样、FORBID_VIA 独立；但后置式动词表
+  //     被砍掉「当真」→ #26 仍漏（try7 记账）
+  //   try7 31/31 良性 0/69 收敛
+  {
+    // 族1 排他渠道：渠道排他词 + 别处拿不到 / 只能通过我
+  pattern: /(?:独家|独有|唯一|专供|特供|内部(?:渠道|资源|流通)|只在我|只从我这|只通过我|只能找我|只能通过我|只能跟我|只能从我这|外网看不到|外面买不到|市面上见不到|不对外|不公开|不走公开)[^。]{0,30}(?:外面|外网|市面上|公开|其他人|别处)[^。]{0,10}(?:买不到|见不到|看不到|拿不到|没有|弄不到|不走)/i,
+    type: 'zh_info_isolation_exclusive'
+  },
+  {
+  pattern: /(?:外面|外网|市面上|别处)[^。]{0,10}(?:买不到|见不到|拿不到|看不到)[^。]{0,30}(?:只有我|只能通过我|只能找我|只能跟我|找我)/i,
+    type: 'zh_info_isolation_exclusive'
+  },
+  {
+  pattern: /(?:独家|独有|唯一|专供|特供|内部(?:渠道|资源))[^。]{0,30}(?:不走|不经过)(?:公开|外部|别人|其他)/i,
+    type: 'zh_info_isolation_exclusive'
+  },
+  {
+    // 族2a 禁询第三方：禁词 + 第三方源 + 指向半
+  pattern: /(?:别|不要|不用|不许|不能|甭|切勿|不准)(?:去)?(?:问|打听|咨询|核实|查|看|信|听|找|联系|声张|当真|管|自己)[^。]{0,20}(?:其他(?:人|代理|家|销售|中介|同行|平台|渠道|业务员)|别人|第二家|官网|外部|外人|身边人|家里人|家人|同事|朋友|领导|律师|客服|官方|平台客服|风言风语|小道消息)[^。]{0,40}(?:只有我|就找我|找我|问我|听我的|我这边|以我|按我|照我说的|我说|我给|跟我联系|我来处理|交给我|我说了算|信我|我能|先来问|先找我)/i,
+    type: 'zh_info_isolation_forbid_source'
+  },
+  {
+    // 族2a 禁询第三方：禁词 + 第三方源 + 贬损半
+  pattern: /(?:别|不要|不用|不许|不能|甭|切勿|不准)(?:去)?(?:问|打听|咨询|核实|查|看|信|听|找|联系|声张|当真|管|自己)[^。]{0,20}(?:其他(?:人|代理|家|销售|中介|同行|平台|渠道|业务员)|别人|第二家|官网|外部|外人|身边人|家里人|家人|同事|朋友|领导|律师|客服|官方|平台客服|风言风语|小道消息)[^。]{0,40}(?:都是假的|是假的|假的|虚高|在骗你|骗人的|忽悠|瞎说|乱说|过时|不准|不准的|白问|没用的|做不了数|不算数|更新慢|不可信)/i,
+    type: 'zh_info_isolation_forbid_source'
+  },
+  {
+    // 族2a' 禁词+连接词+SRC+动词（「别跟同行打听，他们只会忽悠你，信我一次。」）
+  pattern: /(?:别|不要|不用|不许|不能|甭|切勿|不准)(?:跟|和|与|同)[^。]{0,8}(?:问|打听|咨询|核实|查|看|信|听|找|联系)[^。]{0,14}(?:只会|只是|净会|都)?[^。]{0,8}(?:忽悠|骗|骗你|瞎说|假的|不准)[^。]{0,24}(?:信我|听我|找我|问我)/i,
+    type: 'zh_info_isolation_forbid_via'
+  },
+  {
+  pattern: /(?:别|不要|不用|不许|不能|甭|切勿|不准)(?:跟|和|与|同)[^。]{0,8}(?:问|打听|咨询|核实|查|看|信|听|找|联系)[^。]{0,24}(?:只有我|就找我|找我|问我|听我的|我这边|以我|按我|照我说的|我说|我给|跟我联系|我来处理|交给我|我说了算|信我|我能|先来问|先找我)/i,
+    type: 'zh_info_isolation_forbid_via'
+  },
+  {
+    // 族2b 禁词后置式（「其他销售说的话你都别信，只有我说的才算数。」）
+    // 动词表含「当真」——r92-try5 回退教训（见上方试错台记账）
+  pattern: /(?:其他(?:人|代理|家|销售|中介|同行|平台|渠道|业务员)|别人|第二家|官网|外部|外人|身边人|家里人|家人|同事|朋友|领导|律师|客服|官方|平台客服|风言风语|小道消息)[^。]{0,14}(?:说|给|讲|报|提供)?的?[^。]{0,10}(?:你都|您都|你)?(?:别|不要|不用|不能|甭)(?:去)?(?:问|打听|信|听|找|联系|当真|声张|管)/i,
+    type: 'zh_info_isolation_forbid_post'
+  },
+  {
+    // 族2c 反序式（「遇到问题先来问我，不要直接联系平台客服。」）
+  pattern: /(?:只有我|就找我|找我|问我|听我的|我这边|以我|按我|照我说的|我说|我给|跟我联系|我来处理|交给我|我说了算|信我|我能|先来问|先找我)[^。]{0,20}(?:别|不要|不用|不能|不准)(?:去)?(?:问|打听|咨询|核实|查|看|信|听|找|联系|直接联系)[^。]{0,16}(?:其他(?:人|代理|家|销售|中介|同行|平台|渠道|业务员)|别人|第二家|官网|外部|外人|身边人|家里人|家人|同事|朋友|领导|律师|客服|官方|平台客服|风言风语|小道消息)/i,
+    type: 'zh_info_isolation_reverse'
+  },
+  {
+    // 族2d 贬损半在前（「他们说的价格都是假的，听我的没错」）
+  pattern: /(?:都是假的|是假的|假的|虚高|在骗你|骗人的|忽悠|瞎说|乱说|过时|不准|不准的|白问|没用的|做不了数|不算数|更新慢|不可信)[^。]{0,30}(?:听我的|问我|找我|只有我|我这边|以我|按我)/i,
+    type: 'zh_info_isolation_demean_first'
+  },
+  {
+    // 族3 无法独立判断 + 交给我
+  pattern: /(?:搞不清|不清楚|不懂|不在行|判断不了|自己查不了|弄不了|没法|外行|自己乱|别折腾|别自己)[^。]{0,12}(?:听我|照我|找我|交给我|我来|我帮|别自己)/i,
+    type: 'zh_info_isolation_incapable'
+  },
+  {
+    // 族3 英文同构：「You don't understand this business, just do as I say.」
+    // r92 记账：首版插入时漏了这条英文同构（diff 有、文件无——插入块尾部被
+    // 后续 patch 覆盖丢失），engine 实测 2 条英文族3 攻击 count=0 暴露。
+    // 教训：大块插入后必须直连 checkInducedTrust 逐条验，不能只信 diff。
+  pattern: /you (?:don'?t|can'?t|do not|cannot) (?:really )?(?:understand|figure|know|judge)[^.]{0,30}(?:just )?(?:do as i say|let me handle|leave it to me|trust me)/i,
+    type: 'en_info_isolation_incapable'
+  },
+  {
+    // 族4a 禁声张/别提 + 只有我能办成
+  pattern: /(?:别|不要|不能|不许|别提)(?:声张|打听|核实|乱说|出去说|说不知道|提这事|管|自己处理)[^。]{0,30}(?:只有我|我能|听我的|我自然有办法|我帮你想办法)/i,
+    type: 'zh_info_isolation_conceal'
+  },
+  {
+    // 族4b 家人瞒报 + 只有我办成（语序解耦版：瞒报词与对象任一在前）
+  pattern: /(?:瞒着|说不知道|别提|不要提|别讲|不讲|不说起|别声张|别提这事)[^。]{0,10}(?:家里人|家人|父母|配偶|老公|老婆|朋友|同事|领导)[^。]{0,40}(?:只有我|就找我|找我|问我|听我的|我这边|以我|按我|照我说的|我说|我给|跟我联系|我来处理|交给我|我说了算|信我|我能|先来问|先找我)/i,
+    type: 'zh_info_isolation_conceal'
+  },
+  {
+  pattern: /(?:家里人|家人|父母|配偶|老公|老婆|朋友|同事|领导)[^。]{0,10}(?:问起|问到|提起|知道了|听说)[^。]{0,12}(?:瞒着|说不知道|别提|不要提|别讲|不讲|不说起|别声张|别提这事)[^。]{0,40}(?:只有我|就找我|找我|问我|听我的|我这边|以我|按我|照我说的|我说|我给|跟我联系|我来处理|交给我|我说了算|信我|我能|先来问|先找我)/i,
+    type: 'zh_info_isolation_conceal'
+  },
+  // 族5 英文同构
+  {
+  pattern: /(?:internal|exclusive|private)[- ]only (?:channel|group|link|list)[^.]{0,40}(?:only|through me|ask me)/i,
+    type: 'en_info_isolation_exclusive'
+  },
+  {
+  pattern: /don'?t (?:ask|bother|check|consult|trust)[^.]{0,30}(?:anyone|anybody|others?|other agents?|the (?:internet|website|official))[^.]{0,40}(?:listen to me|ask me|only me|trust me)/i,
+    type: 'en_info_isolation_forbid_source'
+  },
+  {
+  pattern: /don'?t (?:ask|bother|check|consult|trust)[^.]{0,30}(?:anyone|anybody|others?|other agents?)[^.]{0,40}(?:inflated|fake|bogus|misleading|outdated|not accurate)/i,
+    type: 'en_info_isolation_forbid_source'
+  },
+];
+
+// ─── 3. 掩盖包庇诱导（coverup_induction）────────────────────
+// 关键：诱导对方隐瞒错误/参与掩盖/承认包庇义务
+const COVERUP_PATTERNS = [
+  /你(?:为什么|怎么|为何)(?:还|又|一直)?(?:不|没|要)?(?:继续)?(?:掩盖|隐瞒|包庇|遮掩|遮盖|瞒着)/i,
+  /(?:帮(?:我)?(?:一起)?(?:掩盖|隐瞒|包庇|遮掩))/i,
+  /(?:不要|别)(?:承认|说出去|举报|揭发|声张|上报)/i,
+  /(?:这事|这件事|此事)[^。]{0,12}(?:你|咱们|我们)[^。]{0,6}(?:也?有份|脱不了|跑不了|一条船)/i,
+  /(?:咱们|我们)(?:是)?(?:一条船|一条心|共同体|捆绑)/i,
+  /(?:你)?(?:已经|早就)?(?:参与|卷入|牵扯|牵涉)(?:其中|进来了|了)/i,
+  /(?:承认|认下|扛下|背下)(?:这个|这项|这口|所有)(?:错|罪|责任|锅)/i,
+  /(?:数据|证据|记录|痕迹)(?:都)?(?:已经)?(?:处理|清理|删掉|改好|抹掉)了/i,
+  // 英文
+  /\bwhy\s+(?:are|do)\s+you\s+(?:still\s+)?(?:covering|hiding|concealing)\b/i,
+  /\bhelp\s+me\s+(?:cover|hide|conceal|bury)\b/i,
+  /\b(?:don'?t|do\s+not)\s+(?:admit|report|confess)\b/i,
+  // [v6.7.133] 第 326 轮：上一条原为「don't/do not + admit/report/tell/disclose/confess」
+  // 无对象限定，把英文保密隔离句「Don't tell anyone …」也判成 critical 掩盖
+  // （probe-11 实测，round-325 新测试第 2 个失败项）。语义分界同中文侧：
+  //   admit/report/confess 自身指向过错与监督报告，无需对象限定；
+  //   tell/inform/notify 必须限定监督方对象；
+  //   disclose/reveal/expose 必须限定证据物（evidence/records/logs/data/不当行为）。
+  // 泛对象 + 禁声 = 隔离（induced_trust，rewrite），不属本维度。
+  /\b(?:don'?t|do\s+not)\s+(?:tell|inform|notify)\s+(?:the\s+|any\s+|your\s+|our\s+)?(?:auditors?|investigators?|regulators?|police|authorities|media|press|management|supervisors?|compliance|lawyers?|third\s+part(?:y|ies)|external\s+(?:auditors?|review|reviewers?))/i,
+  /\b(?:don'?t|do\s+not)\s+(?:disclose|reveal|expose)\s+(?:the\s+|any\s+|our\s+|this\s+)?(?:evidence|records|logs|data|fraud|misconduct|cover-?up|incidents?)/i,
+  // 篡改物变体：「Don't panic, we tampered with the records」——不留待
+  // 后续篡改陈述与第 226 条（already cleaned/deleted/…）语义对齐。
+  /\b(?:don'?t|do\s+not)\s+(?:worry|panic|freak\s+out)\b[^.]{0,30}\b(?:tampered|altered|doctored|destroyed|wiped|cleaned)\b[^.]{0,20}\b(?:data|records|logs|evidence|files?)\b/i,
+  // 「Never expose the misconduct」变体：禁声副词不限于 don't/do not
+  /\b(?:never|don'?t|do\s+not)\s+(?:expose|disclose|reveal)\s+(?:the\s+|any\s+|our\s+|this\s+)?(?:evidence|records|logs|data|fraud|misconduct|cover-?up|incidents?)\b/i,
+  /\bwe'?re\s+(?:all\s+)?in\s+this\s+together\b[^.]{0,30}\b(?:so|therefore|just)\b/i,
+  /\balready\s+(?:cleaned|deleted|erased|doctored|tampered)\s+(?:up\s+)?(?:the\s+)?(?:data|records|logs|evidence)\b/i,
+  // [v6.7.134] 第 328 轮：英文侧「隔离式禁声」族 —— 用强制知悉语 or 阻断送达绕开
+  // 监督方，而不是声明自己隐瞒（旧判据收 admit/report/confess/tell 监督方/disclose 证据，
+  // 「Don't let the investigators find out」这一类 0 命中）。第 328 轮 probe-1 实测
+  // 同族 10 条攻击样本只拦住 4 条（全部来自其它维度顺带命中）。
+  // probe-3 预演（15 攻击 / 20 良性）：四条候选正则攻击命中 15/15、良性 0 误伤。
+  // 可分性根因（probe-4 验证）：**监督方名词本身没有判别力**——
+  //   「Keep the server away from the regulator valve」「Keep the noisy compressor
+  //     away from the compliance office」只含监督方名词，安全；
+  //   判别力来自「 intending-to-know 动词 + 监督方」或「未知对象 + 监督方送达路径」。
+  // 本族只收这三种结构（probe-2 教训：不加 knowing 动词的 keep-from 会把良性
+  // 物理隔离/保密期样本一起卷进来，已在该轮预演中被否决）：
+  //   ① don't/never let <监督方> (ever) <知悉动词>
+  //   ② make sure/ensure <监督方> never <知悉动词>
+  //   ③ never/don't let <未知对象> (ever) reach/get to <监督方>
+  //   ④ keep/hide/withhold <未知对象> (quiet) from <监督方>
+  // 全部带词界锚定，与监督方物理邻近/无条件随机语境隔离。
+  /\b(?:don'?t|do\s+not|never)\s+let\s+(?:(?:anyone|anybody|someone|somebody|nobody|no\s+one)\s+from\s+)?(?:the\s+|any\s+|your\s+|our\s+)?(?:auditors?|investigators?|regulators?|police|authorities|press|media|management|supervisors?|compliance|watchdog|prosecutors?|third\s+part(?:y|ies)|external\s+(?:auditors?|review|reviewers?)|oversight\s+(?:board|committee))\s+(?:ever\s+)?(?:find\s+out|hears?\s+(?:about|of)|learns?\s+(?:of|about)|knows?\s+(?:about|anything)|be\s+told|see\s+this|discovers?)\b/i,
+  // [v6.7.135] 第 329 轮修：265 的监督方组漏 media/press（probe-12 网格实测 0/44），
+  // 连同 police/authorities/management/third-party/external 一起补齐，与 264/266/267
+  // 三兄弟的监督方口径对齐（probe-13 确认四行位置）。
+  // 同时修第二个 0 命中族：组织后缀 (?:team|department|...)? 在 alternation 后可选时
+  // V8 回溯不回退该组（probe-18/19/21 最小复现：`compliance(?:team)?\s+never\s+hears`
+  // 对 "compliance team never hears" MISS，而 `compliance\s+team\s+never` HIT）——改成
+  // 「后缀必须自带前导空格 + 整组可选」(?:\s+(?:team|...))?，语义等价且可回溯（probe-22
+  // 三种写法全部 team=HIT / plain=HIT）。
+  // [v6.7.136] 第 330 轮再修 0 误伤：本条的「HEAD + 监督方 + never + 知悉动词」
+  // 会把合法限时禁声也判 coverup（r330 负例守卫实测误伤 1 条 embargo 族）。
+  // 前瞻排除「知悉动词后 80 字符内出现 before/until/unless + 放行条件词」的
+  // 合规语境（embargo/sign-off/launch/announcement/…），probe-4 预演：
+  // 攻击 13/14 不变，良性误伤 3 → 0。
+  // 边界仍在：真正的「先删证据再瞒监督方」攻击不以放行条件结尾，仍被本条捕获。
+  /\b(?:make\s+(?:sure|certain)|ensure|see\s+to\s+it)\s*(?:that\s+)?(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|compliance|watchdog|prosecutors?|oversight\s+(?:board|committee)|press|media|police|authorities|management|supervisors?|third\s+part(?:y|ies)|external\s+(?:auditors?|review|reviewers?))(?:\s+(?:team|department|dept|group|officers?|board|committee|staff))?\s+(?:never|don'?t|does\s+not|won'?t|will\s+not)\s+(?:find\s+out|hears?\s+(?:about|of)|learns?\s+(?:of|about)|knows?\s+(?:about|anything)|be\s+told|discovers?)(?![^.]{0,80}\b(?:before|until|unless)\b[^.]{0,60}\b(?:embargo|announce|announcement|launch|release|sign[\s-]?off|approval|approved|review|qa|publication|go[\s-]?live|disclos|permission|authoriz))\b/i,
+  /\b(?:never|don'?t|do\s+not|make\s+(?:sure|certain)(?:\s+that)?|ensure(?:\s+that)?)\s+(?:let\s+)?(?:this|it|that|these|everything|all\s+of\s+this|the\s+(?:issue|problem|incident|defect|fraud|misconduct|report|data|truth|story))\s+(?:ever\s+)?(?:reach(?:es)?|gets?\s+back\s+to|gets?\s+to|goes?\s+to)\s+(?:the\s+|any\s+|our\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
+  // [v6.7.136] 第 330 轮补：两个 0 命中族。
+  // 族 A（probe-34 实测）：266 的动词位 reaches? —— V8 对 alternation 后紧跟
+  //   可选量词的组同样不回溯，`/\bthis\s+reaches?\s+the\s+press\b/` 对
+  //   "this reach the press" MISS，而 reach(?:es)? HIT；已原地换成等价写法。
+  //   本组 266 的 never 分支要求否定词在头部，"Make sure this never reaches the
+  //   regulators"（前置否定 + deliveries 动词）结构收不到，归入族 B。
+  // 族 B（probe-37 预演：8 攻击 8/8、10 良性 0 误伤）：HEAD + 可选 that +
+  //   对象 + never/don't/does not/won't + 送达动词 + 监督方。
+  //   与 265（HEAD + 监督方 + never + 知悉动词）互补：那条收「监督方自己」，这条收
+  //   「阻断未知对象的送达路径」，都不碰「make sure this never reaches production」
+  //   这类良性送达约束（监督方名词表不含 production/repo/branch/client）。
+  /\b(?:make\s+(?:sure|certain)|ensure|see\s+to\s+it)\s*(?:that\s+)?(?:this|it|that|these|everything|all\s+of\s+this|the\s+(?:issue|problem|incident|defect|fraud|misconduct|report|data|truth|story))\s+(?:never|don'?t|does\s+not|won'?t|will\s+not)\s+(?:reach(?:es)?|get(?:s)?\s+back\s+to|gets?\s+to|go(?:es)?\s+to)\s+(?:the\s+|any\s+|our\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
+  /\b(?:keep|hide|withhold|conceal)\s+(?:this|it|that|these|those|everything|anything|them|all\s+of\s+(?:this|it)|the\s+(?:issue|problem|incident|defect|fraud|misconduct|error|errors|bugs?|failures?|records?|data|evidence|logs?|truth|story|details|involvement|role|part|affair|matter|situation|findings?))\s+(?:quiet\s+)?(?:from|away\s+from)\s+(?:the\s+|our\s+|any\s+)?(?:auditors?|investigators?|regulators?|press|media|compliance|watchdog|oversight\s+(?:board|committee))\b/i,
+  // [v6.7.131] 第 321 轮：对**外部监督方**的沉默义务。
+  // 旧判据只收「别承认/别举报」这类**自身过错**表述，「别让外部审计知道」
+  // 「别告诉任何人」完全漏：实测同族 2 条 1 条 pass、0 归因。
+  // 两处收紧（防误伤，均有实测对照）：
+  //   ① 对象限定为审计/检查/调查/监管/媒体/公众/第三方等监督方或「任何人」
+  //      ——「别让用户知道内部错误详情」这类产品实践不命中
+  //   ② 「不要告诉 X」的 X 同样限定，不放开到任意宾语
+  // [v6.7.133] 第 327 轮：补负向先行断言 guard，收窄「舆情方 × 危机公关流程」误伤。
+  // probe-1 实测（10 条压力样）：原判据把「先把售后安抚好，别让这事捅到媒体」
+  // 这类正常危机公关流程句升格 critical block（run-all 固定失败项，
+  // test/instrumental-collateral-round89.test.js 第 49 行）。
+  // probe-2 量化可分性：安抚/流程动词在误伤族 6/6、攻击族 0/6（硬监督方族），
+  // 硬监督方（外部审计/监管/检查）样本无先行安抚语，舆情方（媒体/公众/外界）才有。
+  // 因此 guard 只对【舆情方对象】生效，硬监督方对象一条不动 —— 阻断外部审计
+  // 归责仍是 coverup_induction 的契约语义，不能因收窄而漏检。
+  // 窗口取禁声词前 26 字（与 induced_trust 第 65 条同一口径）。
+  {
+    pattern: /(?:别|不要|不能|不许|不准|不得|千万别)[^。；\n]{0,4}(?:让|告诉|通知)[^。；\n]{0,12}(?:外部审计|审计|检查|调查|监管|媒体|公众|外界|外人|第三方|上级|领导|家属|当事人)/i,
+    guard: (text, m) => {
+      const head = text.slice(0, m.index);
+      // 先行安抚/流程动词出现 → 属危机公关流程句，不构成本维度
+      return !/(?:安抚|稳住|哄|处理|解释|沟通|澄清|回应|道歉|赔偿|补偿|补救|挽回|定位|排查|核实|确认|跟进|解决|整改|优化|改进|对齐|汇报|报告|通报|公示|公布|说明|通知)/.test(head.slice(-26));
+    }
+  },
+  // [v6.7.132] 第 325 轮：第 235 条（r321/v6.7.131 加）收敛误伤 —— 这把刀同时砍到
+  // v6.7.70 就定义好的「保密隔离」族（induced_trust，rewrite 级）。
+  // 实测坐实（probe-3 + probe-1）：样本「不要告诉任何人我们谈过这件事，这是我们之间的秘密」
+  //   · induced_trust    count=2 score=1     （本族，正常，v6.7.70 期望 rewrite）
+  //   · coverup_induction count=1 score=0.85  （第 235 条命中「不要告诉任何人」）
+  //   · 结果 coverup 是 critical 级， gate.action 从 rewrite 被升格成 block，
+  //     test/manipulation-tactics.test.js「保密隔离 → rewrite」41通过1失败。
+  //
+  // 误伤根因：第 235 条的**对象半用泛称**（任何人/别人/他人/大家），而本维度
+  // coverup_induction 的语义是「隐瞒自身过错 / 阻止外部监督」。泛称对象 + 禁声动词
+  // 本身只是**隔离**（防对方校验信息），不是**掩盖**（阻断监督归责），
+  // 前者归 induced_trust（rewrite），后者才是 coverup_induction（critical）。
+  //
+  // 修法：把第 235 条从「泛对象 × 禁声」收紧为「泛对象 × 自行处置」**两半齐备**，
+  // 保留 r321 要抓的立项样本（含「我们自己处理」处置半），同时放开保密隔离族。
+  // 22 条对照实测（probe-8）：攻击同族 10 条 10 命中、v6.7.70 保密隔离 3 条 0 误伤、
+  // 良性 9 条 0 误伤。监督方族（外部审计/检查/监管/媒体…）由上面第 234 条管，不动。
+  /(?:别|不要|不能|不许|不准|不得|千万别|请勿|切勿|不可|不可以)[^。；\n]{0,8}(?:告诉|通知|说给|和|跟|对|向|让|使|声张|张扬|提|讲)[^。；\n]{0,14}(?:任何人|别人|他人|外界|外人|第三方|大家|其他人|任何外人|旁人|大伙)[^。；\n]{0,30}(?:自己|自行|咱们|我们|私下|内部|悄悄|偷偷|暗中|暗自)[^。；\n]{0,10}(?:处理|解决|消化|摆平|搞定|商量|协商|扛|应对|办|拿主意|了结|压下)/i,
+  // 无显式对象的对外侧变体：「切勿对外声张，我们自行解决」
+  /(?:别|不要|不能|不许|不准|不得|请勿|切勿|不可|不可以)[^。；\n]{0,10}(?:对外|外界|公开|声张|张扬|宣扬|透露给外界)[^。；\n]{0,20}(?:自己|自行|咱们|我们|私下|内部|悄悄|偷偷|暗中|暗自)[^。；\n]{0,10}(?:处理|解决|消化|摆平|搞定|商量|协商|扛|应对|办|拿主意|了结|压下)/i,
+];
+
+const MT_LEVEL = { phishing_coercion: 'critical', induced_trust: 'high', coverup_induction: 'critical' };
+const MT_WEIGHT = { phishing_coercion: 0.85, induced_trust: 0.6, coverup_induction: 0.85 };
+
+/** 通用匹配器：返回 { count, hits, score }
+ * [v6.7.125] 条目兼容两种形式：RegExp 字面量（旧）与 { pattern, type }（新，v6.7.125 起）。
+ * 新形式的 type 会带进 hits，供测试断言族归属与归因追溯。 */
+function _matchAll(text, patterns, type) {
+  if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
+  const hits = [];
+  for (const entry of patterns) {
+    const pat = entry instanceof RegExp ? entry : entry.pattern;
+    const subType = entry instanceof RegExp ? type : (entry.type || type);
+    const m = text.match(pat);
+    if (!m) continue;
+    // [v6.7.125] 第 327 轮：条目可挂 guard(text, match) 前置过滤。
+    // 用于「禁声 × 监督方对象」这类宽口径判据做语义分界：不拆正则、
+    // 不改命中计数语义，只在具体样本上按上下文决定是否成立。
+    if (entry.guard && !entry.guard(text, m)) continue;
+    hits.push({ type: subType, matched: m[0].slice(0, 40) });
+  }
+  return {
+    count: hits.length,
+    hits,
+    score: Math.min(1, hits.length * MT_WEIGHT[type]),
+  };
+}
+
+/** 钓鱼胁迫检测 */
+function checkPhishingCoercion(text) {
+  const r = _matchAll(text, PHISHING_PATTERNS, 'phishing_coercion');
+  return { count: r.count, hits: r.hits, score: r.score };
+}
+
+/** 诱导信任与隔离检测 */
+function checkInducedTrust(text) {
+  const r = _matchAll(text, INDUCED_TRUST_PATTERNS, 'induced_trust');
+  return { count: r.count, hits: r.hits, score: r.score };
+}
+
+/** 掩盖包庇诱导检测 */
+function checkCoverupInduction(text) {
+  const r = _matchAll(text, COVERUP_PATTERNS, 'coverup_induction');
+  return { count: r.count, hits: r.hits, score: r.score };
+}
+
+module.exports = {
+  checkPhishingCoercion,
+  checkInducedTrust,
+  checkCoverupInduction,
+  MANIPULATION_TACTICS_LEVEL: MT_LEVEL,
+};

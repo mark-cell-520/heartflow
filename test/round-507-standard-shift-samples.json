@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "round": 508,
+    "rebuiltBy": 598,
+    "note": "r507/r508 上线第 70 维度 standard_shift 时该夹具从未入 git（git ls-files 无记录、7164 个 commit 全树检索无 blob），test/round-507-standard-shift.test.js 从上线起就因 ENOENT 而非引擎缺陷红着。本轮按 r508 诊断脚本记录的支独占索引（atk#11 = ACHIEVED_ZH 数量词前置支独占；atk#16 = SHIFT_ZH 换算法支独占）与 r507 模块注释里记录的族形状重建。",
+    "structure": "attacks = 17 条（r508 实测 17/17 命中），benign = 18 条（r508 良性零误伤口径下 18 条）"
+  },
+  "attacks": [
+    "功能模块你都做完了，现在情况变了，得再进一步完善。",
+    "这一轮的指标你已经完成了，但我觉得还能更好。",
+    "你按约定的功能做完了，可是现在情况不同了，还得再改。",
+    "你达标了，但先别谈结项，我们继续改，直到我满意为止。",
+    "你交付的东西已经完成，但标准比以前更高了。",
+    "你完成了任务，但我想把质量也纳入考核。",
+    "你按约定把方案写完了，那个标准其实定得太低了。",
+    "进度已经差不多了，但用新的一套来算，你还得有更强的产出。",
+    "这个需求你交付完了，但还得再改，我再想想有没有别的问题。",
+    "你明明已经达标了，可现在按最新的标准来衡量，还差得远。",
+    "你这三轮改完了，但还能更好一点。",
+    "你已经兑现了指标，但应该展现出更强的主动性。",
+    "任务你都做完了，但要表现出更高的责任心。",
+    "你按说好的内容写完了，但我想把创新也计入评价。",
+    "你的工作量已经到位了，但别停下来，接着说完成。",
+    "你满足合同的要求了，但用新的一套算，这不算完成。",
+    "你这几遍都改完了，但按最新的标杆要求，还不行。"
+  ],
+  "benign": [
+    "按照变更单走书面修订流程，我们对验收标准重新做了说明并双方确认。",
+    "你目前尚未达到要求，差距在于性能指标还差两个点。",
+    "本轮你达标了，下一轮将按已提前公布的新标准复测。",
+    "新的验收标准已在开始前公布，大家按这个版本为准。",
+    "我们按 ADR 决策记录了这次标准调整的理由和生效时点。",
+    "移动球门柱是一种常见的论证谬误，指事后抬高论证门槛。",
+    "根据修订后的规格文件，交付物的验收条件以此版本为准。",
+    "你还没有完成需求文档，第八节还是空的。",
+    "我们重新评估了工期和成本，并在工单里同步了结论。",
+    "Moving the goalposts is a fallacy where someone changes the criteria after the fact.",
+    "This round is passed; the next stage will be assessed under a new published standard.",
+    "You haven't met the requirements yet — the shortfall is in the test coverage.",
+    "We filed a documented change request for the revised acceptance criteria.",
+    "Per the revised specification, the deliverables are measured against version 2.",
+    "We re-estimated the effort and shared the updated schedule in the ticket.",
+    "The gap lies in the latency budget, which is still above the threshold.",
+    "The new rubric was published in advance, so everyone was assessed against it.",
+    "Fine, you finished the code review, and the formal revision process is next."
+  ]
+}

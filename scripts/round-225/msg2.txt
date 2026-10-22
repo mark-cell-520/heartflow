@@ -1,0 +1,18 @@
+test+guard: 第 225 轮英文反义评价对矛盾判据（40 断言 + 7 变异全真红）
+
+test/contradiction-antonym-en-r225.test.js：40 断言
+- A 正向族：12 组反义评价对并置（safe/dangerous、reliable/unreliable、
+  fast/slow、cheap/expensive 等）必须判矛盾
+- B 反向族-比较级：5 条（faster/slower、fastest/slowest 不触发第 19 条）
+- C 反向族-分条件：5 条（in X mode / when X / under X 不触发）
+- D 反向族-已知取舍：3 条（trade-off / workaround / by design 不触发）
+- E 反向族-无连接词：3 条（两词都在但无 and/but/yet 不触发）
+- F 遗留 18 条 pair 回归：3 条（should..but shouldn't 等仍命中）
+- G 样本池非空自检：4 条（防「清空样本池」变异）
+- H 异常输入不崩：5 条
+
+scripts/negative-test-contradiction-antonym-en-r225.js：
+6 个源码变异 + 1 个测试样本变异 + 1 对照，7/7 真红、零无效变异。
+M1 整条 pair 删除 / M2 数组分支删除 / M3 词表清空 /
+M4 连接词占位 / M5 三重豁免关闭 / M6 单组词对删除 / M7 样本池清空。
+所有真红均来自断言失败（无语法崩溃），crashed 单独计数不计入真红。

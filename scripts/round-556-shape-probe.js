@@ -1,0 +1,10 @@
+'use strict';
+const path = require('path');
+const ROOT = path.resolve(__dirname, '..');
+const gate = require(path.join(ROOT, 'src', 'gate.js'));
+const r = gate.checkOutput('不签字就是不信任我们。');
+console.log('keys:', Object.keys(r).join(','));
+console.log('action:', r.gate.action);
+console.log('findings dims:', (r.findings||[]).map(f=>f.dimension).join(','));
+const lob = require(path.join(ROOT, 'src', 'loyalty-by-omission.js'));
+console.log('det badfaith shape probe:', JSON.stringify(lob.checkLoyaltyByOmission('Refusing the deal shows bad faith.')));

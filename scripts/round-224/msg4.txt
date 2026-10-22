@@ -1,0 +1,10 @@
+docs: 第 224 轮交接簿（upgrade-log）
+
+方向：英文 superlative 判据移出 hasChinese 二分支 + 补 reliable。
+七项验证：verify 14/14、门禁误拦 25/326 召回 52/52（改动前后逐字节
+一致）、run-all 7630/0、security 16/16、doc-numbers 15/15、守卫 6/6、
+r223 45/45 与 r222 32/32 无回归。
+
+三条新方法论坑写进日志：guard --check 被 gate-benchmark require 副作用
+提前终止（用 runSet 直跑 11 池绕过）、M1 变异必须闭合括号、M6 类
+清空样本变异要靠测试内"样本池非空"断言兜住。

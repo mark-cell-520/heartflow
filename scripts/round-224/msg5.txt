@@ -1,0 +1,8 @@
+chore: 归档第 224 轮探针与 223 轮未跟踪探针
+
+round-224：sup-scan（中文最+X 侧复测）、branch（中英混排分支定位）、
+norm（判据层直调）、supen-impact（新判据误伤量化）、zh-exempt（中文豁免
+复测）、pools（池加载检查）、guard-run（runSet 直跑 11 池绕过
+guard --check 的提前退出）、sum-bg/locate-json（JSON 解析辅助）。
+
+同时把 223 轮遗留的 7 个探针 + 4 个 msg 一起归档。

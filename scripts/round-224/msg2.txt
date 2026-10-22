@@ -1,0 +1,9 @@
+test: 第 224 轮英文 superlative 混排覆盖（9 断言）
+
+正向 4 组：混排 most+主观形容词 4 条、混排 -est 3 条、中文位置无关
+3 条、most reliable 补词回归（纯英文 + 混排各 1 条）。
+反向 5 组：建议句式与时间/序列副词豁免 6 条保持 pass、可验证形容词
+（accurate/precise）刻意不收、中文 superlative 未被本轮改动破坏、
+中文时间副词不命中 confidence 维度。
+
+末行按 run-all 汇总口径输出「N 通过, M 失败, 共 N 个」。

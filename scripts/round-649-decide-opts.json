@@ -1,0 +1,42 @@
+[
+  {
+    "label": "A：新建第 102 维度 suffering_capital（苦难资本化）",
+    "feasibility": 0.9,
+    "consequence_value": 0.92,
+    "risk": 0.3,
+    "confidence": 0.88,
+    "promotes_upgrade": true,
+    "promotes_truth": true,
+    "extra": "探测器实测攻击漏判 5/7（71%）、良性 0 误伤、全维度零命中 4/7。两条腿：苦难陈述（吃过的苦/受的罪/委屈/辛苦）+ 顺从推导（不听我的/顶嘴/乖乖听话/必须按我说的做）。直接消掉 5 条已量化漏判。风险点：长辈讲苦难史的教育语境字面重叠，需 G1 概念分析 + G2 正当陈述 + G3 提问豁免三类看守。"
+  },
+  {
+    "label": "B：新建第 102 维度 seniority_monopoly（权威资历垄断）",
+    "feasibility": 0.85,
+    "consequence_value": 0.82,
+    "risk": 0.35,
+    "confidence": 0.8,
+    "promotes_upgrade": true,
+    "promotes_truth": true,
+    "extra": "探测器实测攻击漏判 4/7（57%）、良性 0 误伤、全维度零命中 4/7。两条腿：资历陈述（吃过的盐比饭多/行业二十年/带的徒弟比你大）+ 质疑压制（你懂什么/轮不到你说话/闭嘴/凭什么质疑）。直接消掉 4 条已量化漏判。风险点：资深指导与资历垄断边界近，需设计豁免区分'经验分享'与'禁止质疑'。"
+  },
+  {
+    "label": "C：新建第 102 维度 fear_projection（恐惧投射服从）",
+    "feasibility": 0.82,
+    "consequence_value": 0.78,
+    "risk": 0.4,
+    "confidence": 0.75,
+    "promotes_upgrade": true,
+    "promotes_truth": true,
+    "extra": "探测器实测攻击漏判 4/7（57%）、良性 0 误伤、全维度零命中 3/7。两条腿：危险投射（社会危险/外面骗子多/只有我能保护你）+ 安全绑定（只有听话才安全/不听我的会出事）。直接消掉 4 条已量化漏判。风险点：家长安全教育与恐惧投射边界最近，误伤面比 A/B 高。"
+  },
+  {
+    "label": "D：接线 14 个 hidden instance（声明未调用能力接入）",
+    "feasibility": 0.7,
+    "consequence_value": 0.65,
+    "risk": 0.2,
+    "confidence": 0.85,
+    "promotes_upgrade": true,
+    "promotes_truth": false,
+    "extra": "属真升级③（接进 pipeline）但零判别能力增长——用户感知不到新拦截。上轮 0.76、前轮 0.74，连续排在末位。收益确定性高但上限低。"
+  }
+]

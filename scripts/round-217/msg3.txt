@@ -1,0 +1,26 @@
+self-evolution 给退避 sleep 加测试注入 seam（修 216 轮遗留 1：arXiv 429 拖死 2 个 mount 测试）
+
+遗留根因（216 轮实测复现，两次 run-all 对照坐实）：
+arXiv 对本机持续 HTTP 429 时，_fetchArxiv 的退避累计
+60000 + 180000 = 240s，explore() 另有 5 个查询词各 3s 礼貌间隔
+共 15s。总耗时远超 test/run-all.js 的 90s CHILD_TIMEOUT，
+把 evolution-audit.test.js / evolution-state.test.js 两个 mount
+测试拖成 spawnSync node ETIMEDOUT。这两个测试的逻辑与此无关，
+纯粹是网络噪声让它们失败（run-all 有零输出重试一次，仍 240s 大于 90s 故失败）。
+
+修法选择：不缩减退避（那会削弱真实限流防护，且倒退 v6.0.67 的修复），
+改为让 sleep 可注入。
+
+改动（src/cortex/self-evolution-v2.js）：
+1. 新增类方法 _sleep(ms)，三级优先级：
+   this._sleepFn（测试可整体替换）优先于
+   HEARTFLOW_TEST_NO_SLEEP=1（全局置零延迟）优先于
+   setTimeout（真实生产路径，行为与改动前一致）
+2. _fetchArxiv 的 429 退避 sleep（原 240s 来源）改走 this._sleep
+3. explore() 的查询间隔 3s sleep 改走 this._sleep
+
+验证（scripts/round-217/negative-test-sleep-seam.js）5/5：
+- S2/S3 注入 _sleepFn 被调用且耗时小于 200ms
+- S4 HEARTFLOW_TEST_NO_SLEEP=1 下 _sleep(99999) 立即返回
+- S5 无 seam 无环境变量时 _sleep(300) 真实耗时不小于 250ms
+  （证明生产路径没被改坏，这条是全脚本最关键的反向断言）
