@@ -1,3 +1,64 @@
+# r720 轮报告（v6.8.68）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r719 交接簿
+「已知未修项」+ 新侦察：void_zh_standard_shift（25 轮遗留）+
+post_hoc（五连续落选）+ appeal_to_probability（新侦察族），按
+「引用 UPGRADE_LOG tail 当现状前必须复测」纪律用本轮探测器
+`scripts/round-720-family-probe.js` 在当前引擎（v6.8.67，150 维）
+逐族复测，喂给 decision 本体（`scripts/decide-r720.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A void_zh_standard_shift 契约作废窄口补形 | 0.79 | 攻击漏判 12/16（75%）、真零命中 12/12、误伤 0/12 | 落选（存量补形非新维度） |
+| B post_hoc 后此谬误新维度 | **0.81** | 攻击漏判 10/14（71%）、真零命中 10/10、误伤 0/10 | **选中** |
+| C appeal_to_probability 可能性误当必然新维度 | 0.80 | 攻击漏判 5/8（63%）、真零命中 5/5、误伤 0/7 | 落选 |
+
+decision 返回 composite_score 0.81 / confidence 0.75 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在三个合格候选间
+选出 B。身份对齐依据：后此谬误是「以先后代因果」的经典谬误——
+辨别者的天职就是识破「因为发生在前面所以是原因」的伪因果。本族
+r715-r719 五连续落选，本轮补语域高频形态（杀毒软件/手机号/加班
+缺席/椅子玄学）后漏判率从 56% 升到 71%，超过 void_zh_standard_shift
+的绝对漏判数成为最高。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/post-hoc.js`（第 151 维度，三路由：缺位-灾厄共现×回避 / 干预-变化共现 / 归因措辞直判，三豁免：正当程序/元话语/必要非充分声明） | 「那天没去加班第二天就出乱子」「自从换了领导业绩就下滑」类时间归因话术现在会被 gate 判 verify 并给出「时间先后不等于因果」的指引 | **真升级①**（新辨别维度上线） |
+| AVOID_ZH 补「不敢」口语变体（以后不敢/以后我不敢/我不敢）——负例注入测试暴露基础攻击样本「以后我不敢缺席了」不翻转 | 中文口语回避形全部命中 | 真升级①的组成部分（判据射程） |
+| 九处接线（require/计算点/allDims/dimensions×2/DIM_GUIDANCE/VERIFY_DIMS/summary/exports） | 维度键 150→151，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+| 文档计数同步 + Verify-level 列举补 post_hoc + README changelog + 版本 bump 6.8.67→6.8.68 | 文档口径与引擎一致 | 维护（文档/版本） |
+
+## 验收数字
+
+- 轮测试 `test/round-720-post-hoc.js`：**55/55 通过**（攻击 20 + 良性 21 + 边界锁 + 分工边界 2 + gate 层登记 3）
+- 负例注入 `scripts/negative-test-post-hoc.js`：**74/74 通过**（首轮 65/74，补 AVOID_ZH 三变体后全过）
+- `node bin/verify.js`：16/16
+- `node scripts/bidirectional-guard.js`：双向门禁通过（召回 52/52，误拦 302/326，与基线一致零新增）
+- `node scripts/guard-abilities.js`：20/20（dimensions 键 151）
+- `node test/doc-numbers-accuracy.test.js`：22/22
+- `node test/security-audit.test.js`：16/16（S2 _verifyGitCommit 由含版本号的 feat commit 转绿）
+
+## 已知未修项（含为什么不修）
+
+1. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.79）。攻击漏判 12/16（75%）为三候选最高，但属存量补形非新辨别维度，且 r696 起已遗留 25 轮，样本面 16 条。下轮可作专项修复轮候选。
+2. **appeal_to_probability 可能性误当必然**——decision 落选（0.80）。攻击漏判 5/8（63%）、真零命中 5/5、误伤 0/7；wishful_thinking/gamblers_fallacy 存量维度只覆盖「坚持买一定中」形，「宇宙这么大肯定有外星人」「试多了总能成」整族全漏。样本面 8 条最小，下轮补语域形态后可再参选。
+3. **33+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+4. **data/test-count.json 记账自锁**——按纪律不为了消记账红灯跑 20 分钟全量回归。
+
+## 踩坑（两条）
+
+1. **AVOID_ZH 常量覆盖不足**：基础攻击样本用「以后我不敢缺席了」而常量只定义「再也不敢」——负例注入测试（置空 AVOID_ZH 后期望翻转）暴露该样本不翻转。修法：补「以后不敢/以后我不敢/我不敢」三口语变体。教训：负例注入是常量覆盖不足的探针，基础攻击样本必须过注入验证。
+2. **VERIFY_DIMS 未从 index.js 导出**：轮测试想 require 断言登记，实际 undefined——改用源码段正则匹配。另 gate 层验证级断言改为「post_hoc 命中需 verdict≠可信、良性句保持可信」的行为断言，比登记断言更贴近用户可感知效果。
+
+## round-guard [after] 复跑
+
+（三连提交后复跑，结果见 git log 与文末状态）
+
 # r719 轮报告（v6.8.67）
 
 ## 心虫选中项 + 分数 + 身份对齐
