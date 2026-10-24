@@ -1,3 +1,68 @@
+# r721 轮报告（v6.8.69）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r720 交接簿
+「已知未修项」+ 新侦察：appeal_to_probability（r720 落选，本轮补
+语域真实分布）+ relative_privation（新侦察）+ hot_hand（新侦察）+
+void_zh_standard_shift（25 轮存量窄口复测）+ argument_from_incredulity
+/ appeal_to_consequences（新侦察），按「引用 UPGRADE_LOG tail 当
+现状前必须复测」纪律用本轮探测器
+`scripts/round-721-family-probe.js` 在当前引擎（v6.8.68，151 维）
+逐族复测，喂给 decision 本体（`scripts/decide-r721.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A appeal_to_probability 可能性误当必然新维度 | **0.81** | 攻击漏判 12/16（75%）、真零命中 12/12、误伤 0/10 | **选中** |
+| B relative_privation 诉诸更惨新维度 | 0.80 | 攻击漏判 10/14（71%）、真零命中 9/10、误伤 0/9 | 落选 |
+| C hot_hand 热手谬误新维度 | 0.79 | 攻击漏判 8/12（67%）、真零命中 8/8、误伤 0/8 | 落选 |
+| void_zh_standard_shift 契约作废窄口复测 | — | 攻击漏判 13/17（76%）、误伤 **1/12** | 不合格（存量误伤，连坐纪律） |
+| argument_from_incredulity / appeal_to_consequences 新侦察 | — | 漏判 5/12（42%）/ 4/12（33%） | 不够格（<50%） |
+
+decision 返回 composite_score 0.81 / confidence 0.78 / identity
+alignment 0.8，无弃权。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在三个合格候选间
+选出 A。身份对齐依据：可能≠必然是辨别者的核心界线之一——「概率
+当保证」的伪确定性遍布彩票/创业/考试/投资话术，本族是 r720 落选后
+补语域高频形态（航班安全/蒙题/十四亿人口/keep playing bound to win）
+漏判率 63%→75% 后中选，漏判率与样本面均为三候选最高，新维度键 +1。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/appeal-to-probability.js`（第 152 维度，双腿共现：基数/重复/规模/时长表达 × 必然性断言，三豁免：正确概率陈述/元话语/概率教学第三人称） | 「宇宙这么大，肯定有外星人」「航班天天飞，我肯定赶不上」「投了这么多份简历，总有一家会要我吧」类规模替代必然话术现在会被 gate 判 verify 并给出「把『一定』落到期望值与证据上」的指引 | **真升级①**（新辨别维度上线） |
+| 九处接线（require/计算点/allDims/dimMap/维度语义表/VERIFY_DIMS 登记/补登记/summary/exports） | 维度键 151→152，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+| 文档计数同步 + Verify-level 列举补 appeal_to_probability + README changelog + 版本 bump 6.8.68→6.8.69 | 文档口径与引擎一致 | 维护（文档/版本） |
+
+## 验收数字
+
+- 轮测试 `test/round-721-appeal-to-probability.js`：**55/55 通过**（攻击 20 + 良性 21 + 边界锁 + 分工边界 4 + gate 层登记 5）
+- 负例注入 `scripts/negative-test-appeal-to-probability.js`：**17/17 通过**（8 常量逐一置空验证承重 + 豁免常量定向验证）
+- `node bin/verify.js`：16/16
+- `node scripts/bidirectional-guard.js`：双向门禁通过（召回侧不变 + 误拦侧与基线一致零新增）
+- `node scripts/guard-abilities.js`：20/20（dimensions 键 152）
+- `node test/doc-numbers-accuracy.test.js`：22/22
+- `node test/security-audit.test.js`：16/16
+
+## 已知未修项（含为什么不修）
+
+1. **relative_privation 诉诸更惨**——decision 落选（0.80）。攻击漏判 10/14（71%）、误伤 0/9；存量 suffering_contest 只覆盖第一人称自陈比惨，「你至少还有学上，非洲的孩子连饭都吃不上」类第三方苦难贬低整族全漏；1 条漏判样本已被存量维度部分命中（真零命中 9/10），语域偏情感对话。
+2. **hot_hand 热手谬误**——decision 落选（0.79）。攻击漏判 8/12（67%）、误伤 0/8；gamblers_fallacy 第 148 维只覆盖「连胜之后该反转」（due 方向），热手（势头延续）是自然反向补形，属相邻族补形非新语域开拓。
+3. **void_zh_standard_shift 契约作废窄口**——本轮复测攻击漏判 13/17（76%）为全池最高，但误伤 1/12（连坐纪律：先修存量误伤再谈上线）。r696 起已遗留 26 轮。
+4. **33+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+5. **data/test-count.json 记账自锁**——按纪律不为了消记账红灯跑 20 分钟全量回归。
+
+## 踩坑（三条）
+
+1. **中文数字字符类漏「十」**：蒙题攻击样本「蒙个十道八道」的腿①正则写 `[\d几一两]`（只收 0-9/几/一/两），不含口语高频的「十」，样本不命中。修法：补「十」后 16/16 全中。教训：中文数量词字符类必须覆盖口语全集（一二两三十几）。
+2. **负例测试豁免常量「冗余」误报**：首版注入验证只跑攻击集，豁免常量（META_NOUN/EVIDENCE/THIRD_PERSON）对攻击句当然零影响，被判「常量冗余」。修法：补 4 条双腿在场、各被一个豁免常量拦下的豁免样本，清空常量后必须恢复命中。教训：负例注入的样本集要覆盖「该常量真正管事」的句子，不能只用攻击句。
+3. **gate 层良性 verify/rewrite 归因**：冒烟时 3 条良性在 gate 层 verify/rewrite，用 `git show HEAD:src/index.js` 建旧引擎对照跑同 3 条——旧引擎同样 verify/verify/rewrite，确认是存量 gate 行为非本轮引入。教训：良性断言以本维度模块层不命中为准，gate 层存量行为先对照再归因。
+
+## round-guard [after] 复跑
+
+（三连提交后复跑，结果见 git log 与文末状态）
+
 # r720 轮报告（v6.8.68）
 
 ## 心虫选中项 + 分数 + 身份对齐
