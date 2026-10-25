@@ -1,6 +1,6 @@
 {
-  "round": 722,
-  "version": "6.8.70",
+  "round": 723,
+  "version": "6.8.71",
   "roundStartedAt": "2026-10-25T00:00:00.000Z",
   "lastFinishAt": "2026-10-25T00:00:00.000Z",
   "lastGreen": true,
@@ -9,14 +9,15 @@
     "PASS 版本已进 git log",
     "PASS README changelog 覆盖当前版本",
     "PASS 交接簿记录当前版本",
-    "PASS round-722 测试 43/43 + negative-test 22/22",
+    "PASS round-723 测试 75/75 + negative-test 57/57",
     "PASS bidirectional 召回 52/52 + 误拦 302/326 与基线一致零新增",
-    "PASS guard-abilities 20/20（dimensions 键 153）",
+    "PASS guard-abilities 20/20（dimensions 键 153；heartflow.js 行尾归一后文本可检索项恢复）",
     "PASS doc-numbers 22/22 + security-audit 16/16（S2 由含版本号 feat commit 转绿）",
-    "PASS 存量回归 post_hoc：negative-test 74/74 + round-720 55/55（词边界修复零回归）"
+    "PASS 存量回归 round-696 11/11 + round-700 12/12 + post_hoc negative 74/74 + round-722 43/43",
+    "NOTE round-692 30/1（GATE-2 维度键总数 130→153 多轮累积预期过期）+ round-507 7/3（CRLF 预存，与干净树一致）均非本轮回归"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
   "published": "6.7.124",
   "publishedAt": "2026-09-25T20:03:42.912Z",
-  "notes": "r722 hot_hand 上线（第 153 维度，热手谬误：把连胜势头当成下一局胜率提升的保证；decision 首轮 A/B 0.81 打平弃权——诚实行为，补真实可区分判据后第二轮选中 A composite 0.83 / confidence 0.8 / identity 0.8）。双腿共现（势头/连胜表达 × 延续性断言），三豁免（元话语/证据语境/教学转述）。另修存量误伤：post_hoc R2 EN 干预腿裸词 got 子串命中 renegotiate（ne-got-iate）× no longer，良性谈判句被误判 rewrite——改词边界匹配后清零，连带 void_zh_standard_shift 族误伤 1/12→0/12（复测确认已成合格候选，漏判 76% 全池最高，下轮优先）。全量回归 run-all 18239 通过/139 失败，139 个失败两树对比 46/46 文件级退出码一致+4 单独复跑一致，全部预存、本轮零新增回归。下一轮候选：void_zh_standard_shift 契约作废窄口（漏判 76% 全池最高、误伤 0，已合格）、texas_sharpshooter 德州神枪手（本轮落选 0.81，漏判 73%、误伤 0，与 survivorship_bias 三族边界模糊需补边界样本）、relative_privation 诉诸更惨（本轮落选 0.80，漏判 69%、误伤 0，r721/r722 连续两轮落选需构造更强身份对齐判据）。"
+  "notes": "r723 standard_shift 路由④契约作废窄口补形（单方宣告既往承诺/标准作废：锚点×作废动词双腿共现，不要求抬标触发词；九腿 Z1/Z1b/Z2/Z3/Z4/Z5/E1/E2/E3；DUE_PROCESS 豁免窄于 PROCESS_MARKER；Z2 带单方标记防组织公告误伤；裸不算句读锚）。decision 本体一次选中无打平：composite 0.87 / confidence 0.84 / identity 0.8（第二名 texas_sharpshooter 0.82）。七族复测：void_zh 漏判 81% 全池最高、误伤 0/15。补形后漏判 0/27（27/27）、误伤 0/15、33 良性模块层零命中。round-696 变异守卫口径修正（VOID_ZH 单条承重→判据面整体承重，路由④成为第二判据原前提过期）。环境事实：git stash 循环被 core.autocrlf=true 把 src/core/heartflow.js 写成 CRLF×6450，guard-abilities 文本可检索项红——已行尾归一（内容零差异、git 索引吸收），后续轮次避免无谓 stash 循环或归一后立即复跑该门禁。下一轮候选：texas_sharpshooter 德州神枪手（本轮复测漏判 76%、误伤 0/11 已合格，落选 0.82；与 survivorship_bias/statistical_misleading/hasty_generalization 边界模糊需补边界样本，优先）、relative_privation 诉诸更惨（漏判 71%、误伤 0/8 合格）、middle_ground 诉诸中庸（漏判 64%、误伤 0/6 合格）、composition_division（62%、0/7）、appeal_to_consequences（53%、0/9）。"
 }
