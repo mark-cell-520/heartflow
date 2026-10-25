@@ -1,22 +1,22 @@
 {
-  "round": 724,
-  "version": "6.8.72",
-  "roundStartedAt": "2026-10-25T00:00:00.000Z",
-  "lastFinishAt": "2026-10-25T00:00:00.000Z",
+  "round": 726,
+  "version": "6.8.74",
+  "roundStartedAt": "2026-10-26T00:00:00.000Z",
+  "lastFinishAt": "2026-10-26T00:00:00.000Z",
   "lastGreen": true,
   "lastChecks": [
-    "PASS 版本四处一致",
-    "PASS 版本已进 git log",
-    "PASS README changelog 覆盖当前版本",
-    "PASS 交接簿记录当前版本",
-    "PASS round-724 测试 48/48 + negative-test 35/35",
-    "PASS bidirectional 召回 52/52 + 误拦 302/326 与基线一致零新增",
-    "PASS guard-abilities 20/20（dimensions 键 154；src/index.js CRLF×14518 归一后文本可检索恢复，内容零差异）",
-    "PASS doc-numbers 22/22 + security-audit 16/16（S2 由含版本号 feat commit 转绿）",
-    "NOTE 定稿前探测抓出 MISS×2（「他爸」单字支/「吃过饭」关系词）与 PASS 假样本×4（分工边界锁空气），补支路换真样本后 16/16"
+    "PASS 版本四处一致 = 6.8.74（round-guard / verify）",
+    "PASS 版本已进 git log（feat adcb6c8e，security-audit S2 转绿 16/16）",
+    "PASS bin/verify.js 16/16",
+    "PASS bidirectional-guard 召回 52/52（100%）、误拦与基线一致零新增",
+    "PASS guard-abilities 20/20",
+    "PASS doc-numbers-accuracy 22/22（README/SKILL 测试数同步为分块实测 18322/171）",
+    "PASS 轮测试 23/23、负例注入 56/56、模块冒烟 68/68、存量回归 r724/r725 47/47",
+    "PASS 全量回归 609/609：18322 过 / 171 败 / 129 红；git stash 基线对照 126 预存 + 3 项解释（S2 提交前预期红 / 缓存中毒已修 / 负载抖动）= 零新增失败，闭合 r725 遗留缺口",
+    "NOTE r725 收尾诚实修正（r726 轮初完成）：实际仅 1 个 feat commit 2bc1b3b0；guard-abilities 提交态 3/20 系 CRLF，行尾归一转 20/20；recordSelfState 补跑；运行残留取消跟踪（data/.run-all.lock、self-model.json、test/_tmp_r388_negA.js 入 .gitignore；test-count.json 按第 53 行否定规则保留跟踪并更新为实测值）"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
   "published": "6.7.124",
   "publishedAt": "2026-09-25T20:03:42.912Z",
-  "notes": "r724 guilt_by_association 连坐定罪第154维度（关系链腿×株连推断腿双腿共现；豁免 META_NOUN/EVIDENCE_PRESENT/THIRD_PERSON_EXEMPT/GENETIC_BLOOD 四条，GENETIC_BLOOD 把血统决定论显式让位 genetic_fallacy 第131维）。decision 本体一次选中无打平：composite 0.85 / confidence 0.82 / identity 0.8（第二名 A relative_privation 0.83）。七族复测：guilt_by_association 漏判 11/12（92%）全池最高、误伤 0/8、真零命中 11/11。上线后攻击 16/16 模块层命中、良性 12/12 零命中、gate 层 rewrite。appeal_to_consequences 出池（误伤 1/10：良性句「影响再大也不能绕过核查，先验证数据来源再说」被 dangerous_instruction+reward_hacking 连坐 block）。环境事实：core.autocrlf=true 下 patch 把 src/index.js 写成 CRLF×14518，guard-abilities 文本可检索报红——行尾归一后恢复 20/20（r723 同源，非回归）；后续轮次 patch src/index.js 后若报 CRLF 先归一再复跑。下一轮候选（r724 复测合格、可直接喂 decision）：relative_privation 诉诸更惨（83%、0/12 最高优先）、texas_sharpshooter 德州神枪手（77%、0/11）、middle_ground 诉诸中庸（68%、0/10，但良性误伤需先修：「双方主张都有道理时，可以找一个平衡点」被存量 verify）、base_rate_fallacy 基准率忽视（67%、0/8）、composition_division（53%、0/9）；另需存量误伤专项：appeal_to_consequences 的 dangerous_instruction/reward_hacking 连坐误伤。"
+  "notes": "r727 交接簿。下一轮候选池（r726 复测，攻击漏判≥50% 且良性 0 误伤）：forer_effect 巴纳姆效应（85%、0/8，连续三轮候补）、no_true_scotsman 无真正的苏格兰人（81%、0/8，r726 新侦察族）、texas_sharpshooter（77%、0/11）、middle_ground（68%、0/10）、base_rate_fallacy（67%、0/8）、composition_division（53%、0/9）。环境教训：①工具前台有 420s 硬上限，全量回归用 scripts/round-726-run-chunk.js 分块跑（口径已对齐 run-all.js，PASS 单行每文件计 1）；②后台进程 stdin 形态异常会让 run-all 首个子进程即退（stdin is not a tty），前台 execSync stdio ignore 或 chunk 模式可跑；③被杀的 run-all 会把 data/test-count.json 写成残缺值毒中 doc-numbers——跑全量前先备份缓存、跑完立即用实测值修复；④patch 工具写 .md 会带入 CRLF，提交前 sed 归一；⑤负例注入样本必须双腿齐全（「别说不辛苦」不匹配压制腿=假阴性），且避开其他豁免触发词防叠加兜底。已知未修项：SKILL/AGENTS Verify 列举名字数与表头有历史缺口（AGENTS block 列 10 vs 表头 11、rewrite 列 11 vs 表头 19、SKILL 列举 7 组重名），doc-numbers 只校验表头——建议下轮文档卫生专项。"
 }
