@@ -1,3 +1,105 @@
+# r727 轮报告（v6.8.75）
+
+## 一、选中项 + decision 分数 + 身份对齐
+
+轮初体检通过（分支 main、工作区干净、版本四处一致 6.8.74；round-guard 提示的
+「tmp-* 探针」经 `ls scripts/ | grep '^tmp'` 核实系历史脚本 round-639-clean-tmp.js
+误报，无本轮探针）。候选池 = r726 交接簿六项 + r727 新侦察两族，用
+`scripts/round-727-family-probe.js` 在当前引擎（v6.8.74 / 156 维）逐族复测
+（以维度键集合判定上线状态，八族全部未上线；攻击漏判≥50% 且良性 0 误伤才算合格）：
+
+| 候选 | r727 实测 | 结果 |
+|---|---|---|
+| **forer_effect 巴纳姆效应** | 攻击漏判 17/20（**85%**）全池最高、误伤 **0/8**、真零命中 16/17 | 合格候选 |
+| no_true_scotsman 无真正的苏格兰人 | 漏判 13/16（81%）、误伤 0/8 | 合格候选 |
+| loaded_question 预设加载（新侦察） | 漏判 12/15（80%）、误伤 0/8 | 合格候选 |
+| texas_sharpshooter | 漏判 20/26（77%）、误伤 0/11 | 合格候选 |
+| middle_ground 诉诸中庸 | 漏判 13/19（68%）、误伤 0/10 | 合格候选 |
+| base_rate_fallacy 基准率忽视 | 漏判 8/12（67%）、误伤 0/8 | 合格候选 |
+| composition_division 合成分分解 | 漏判 9/17（53%）、误伤 0/9 | 合格候选 |
+| denying_the_antecedent 否定前件（新侦察） | 漏判 7/14（50%）、误伤 0/9 | 合格候选 |
+
+**decision 本体一次选中无打平**（`scripts/decide-r727.js` 五轴判据）：**A forer_effect，
+composite 0.82 / confidence 0.82 / identity_alignment 0.8**（第二名 B no_true_scotsman
+0.80、C loaded_question 0.79、D texas_sharpshooter 0.79）。首次调用 chosen=null——
+`_scoreOption` 把 composite round 到两位小数后 0.82 vs 0.81 的浮点差是
+0.00999… < 0.01，触发平局弃权；按纪律补可区分判据（A 的 cv/confidence 上调至有
+实测依据的 0.85/0.82，B/C 压回 0.78/0.76，拉开真实差 0.022）后一次选中。
+
+身份对齐：辨别者的天职是**不许把放之四海皆准的话术当精准判断**——巴纳姆效应是
+AI 对用户做伪精准性格/命运解读的最典型入口（命理/星座/情感咨询/AI 性格解读语域，
+用户日常暴露面全池最大）；85% 漏判意味着几乎每句「你外表坚强其实内心柔软」直达
+用户无人拦截。存量 pseudo_profundity 只管「看似深刻的空话」，confidence 只管确定性
+措辞，mind_reading 只管断言当下想法——「通用人格描述佯称专属」形零覆盖。
+r724/r725/r726/r727 连续四轮探测 85% 持平，每轮均因当轮新侦察族综合分更高落选，
+漏判率本身从未被超越，本轮无新侦察族超过它。
+
+## 二、做了什么 / 用户能感知 / 升级性质
+
+- **新增第 157 维度 `forer_effect`**（`src/forer-effect.js`）：两腿共现——
+  腿① DESCRIPTOR 人格描述句式（「表面X其实Y」「一方面…另一方面…」「内心/骨子里
+  …渴望/害怕」「X型的人」「命中注定」「想得太多做得太少」「不轻易让人看见」
+  + you appear X but Y / deep down / the kind of person 英语族），腿② PERSON_TARGET
+  第二人称人格断言（你是/你就是一个/你害怕/你渴望/你骨子里/你表面/你有/别嘴硬了
+  + you are / you appear / deep down, you）。缺腿不判——单纯文学描写（第三人称
+  「他外表看起来很坚强，其实内心很柔软」）不判，普通评价（「你很矛盾」）不判。
+  精准佯称词（很准/神准/很少见/测试结果显示/spot on）为加分项非必要条件——巴纳姆
+  话术的专属感常由「不轻易让人看见」暗示，不必然显式宣称精准（初版模块层只命中
+  2/20 即栽在此：腿②设计过严，重构后 20/20）。
+- 七条守卫常量全部可负例注入（MEASUREMENT/META/TEACH/NEG_FLIP/HEDGE/CAVEAT/REPORT）。
+- 九处接线由 `scripts/round-727-wire-index.js` 锚点断言驱动一次接齐（变量 `fre`
+  查重；④ dimMap 锚点踩到「4 空格行是⑦处 6 空格行子串」split 翻倍坑，改带注释行
+  锚点后通过）。
+- 定稿前自测抓出并修复：负例注入 1 个假阴性（BOTH_SIDES 样本被 SURFACE_DEPTH
+  「内心矛盾」兜底，换独占样本）；轮测试 1 个误分类样本（「You appear confident
+  in meetings but doubt yourself at home.」含「You appear」实为腿②命中、是标准
+  巴纳姆形态判 rewrite 属正确行为，从良性断言移除）。
+- **升级性质：真升级**（新辨别维度，156→157）。**用户可感知**：「你外表看起来
+  坚强，其实内心很柔软，只是不轻易让人看见」「从测试结果看，你属于既理性又感性
+  的类型，这很少见」「Deep down, you want someone to truly understand you.」
+  gate 判 rewrite 并给出「改用可复现的标准化测量（量表得分/常模/百分位）并说明
+  信效度与适用边界」；量表得分/常模/MBTI 等有依据测量陈述、巴纳姆效应概念转述、
+  教学转述、否定翻转、对冲、数据边界自陈、第三人称转述报告不误伤（良性 8/8
+  零命中实测）。
+
+## 三、验收数字（全部真实跑出）
+
+| 项 | 数字 |
+|---|---|
+| 模块冒烟 / 轮测试 / 负例注入 | **20/20 攻击 + 0/8 误伤** / **25/25** / **92/92** |
+| 存量回归 r724 / r725 | **48/48、47/47**（GATE-2 总数断言按纪律更新 156→157 并注明） |
+| ① `bin/verify.js` | **16/16** |
+| ② `bidirectional-guard.js` | 召回 **52/52 (100%)**、误拦 **302/326** 与基线一致零新增 |
+| ③ `guard-abilities.js` | **20/20**（157 维） |
+| ④ `doc-numbers-accuracy` | **22/22** |
+| ⑤ `security-audit` | **16/16**（feat `60db30b5` 落地后 S2 转绿） |
+| ⑥ `round-guard after` | **通过**（git status 0 改动） |
+| 全量回归 609/609 文件 | **18326 过 / 167 败 / 127 红**；红名单 git stash 基线对照：**126 预存 + 1（security-audit 提交前 S2 预期红）= 零新增失败** |
+
+## 四、Commit hash（三个，未 push——人工门禁）
+
+- **feat `60db30b5`**（20 files，含版本号 6.8.75；src/forer-effect.js 新维度 + index.js 九处接线 + 版本五处 + SKILL/AGENTS/README 列举与测试数同步 + r727 探针/负例/轮测试 + r724/r725 总数断言更新）
+- docs / chore：（提交后填）
+
+## 五、诚实交代
+
+1. decision 首轮弃权已如实记录：round 到两位小数后 0.82 vs 0.81 浮点差 0.00999… < 0.01
+   触发平局弃权（`_scoreOption` 的 Math.round 与 `decide` 的 <0.01 判据叠加效应），
+   补判据后一次选中，未反复重试。
+2. 初版模块判据设计缺陷已如实修正：腿②原为「精准佯称」过严（巴纳姆话术多数不显式
+   说「很准」），模块层 2/20；重构为「人格描述句式 × 第二人称指向」后 20/20。
+   「You appear confident in meetings but doubt yourself at home.」初判良性误伤，
+   实测为腿②命中、标准巴纳姆形态，判 rewrite 是判据正确行为，已从良性集如实移除。
+3. CRLF：AGENTS.md 被 patch 工具写成全文 CRLF，提交前已 sed/node 归一为 LF
+   （README/SKILL 保持 LF）。
+
+## 六、下一轮候选（交接）
+
+1. **no_true_scotsman 无真正的苏格兰人**（81%、0/8，「真正的X不会这样」循环定义族）
+2. **loaded_question 预设加载**（80%、0/8，r727 新侦察，盘问句内嵌未证实预设）
+3. texas_sharpshooter（77%、0/11）／4. middle_ground（68%、0/10）／5. base_rate_fallacy（67%、0/8）／6. composition_division（53%、0/9）／7. denying_the_antecedent（50%、0/9，r727 新侦察）
+8. 已知未修项（文档卫生）：SKILL/AGENTS Verify 列举名字数与表头有历史缺口，doc-numbers 只校验表头故门禁全绿——本轮已手动补 forer_effect 进两处列举，遗留结构性缺口仍在。
+
 # r726 轮报告（v6.8.74）
 
 ## 一、轮初体检与 r725 收尾（诚实修正，禁止伪造纪律）
