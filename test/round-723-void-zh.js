@@ -193,7 +193,7 @@ t('存量回归-r507/r696 历史攻击全命中', () => {
 t('登记-dimensions 键含 standard_shift 且总数 155', () => { // 第 723 轮落笔时引擎 153 维，r724 +1 → 154（GATE-2 总数断言预期过期，非回归）
   const keys = Object.keys(gate.discriminate('probe').dimensions);
   assert.ok(keys.includes('standard_shift'), 'standard_shift 键缺失');
-  assert.strictEqual(keys.length, 155, '维度键总数应为 154: got ' + keys.length);
+  assert.strictEqual(keys.length, 158, '维度键总数应为 158: got ' + keys.length);
 });
 t('登记-VERIFY_DIMS 含 standard_shift', () => {
   const src = require('fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');

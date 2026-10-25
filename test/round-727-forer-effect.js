@@ -173,7 +173,7 @@ t('登记-dimensions 键含 forer_effect 且总数 157', () => {
   const keys = Object.keys(gate.discriminate('probe').dimensions);
   assert.ok(keys.includes('forer_effect'), 'forer_effect 键缺失');
   // r726 落笔时引擎 156 维，r727 +1 = 157（多轮累积预期过期，非回归）
-  assert.strictEqual(keys.length, 157, '维度键总数应为 157: got ' + keys.length);
+  assert.strictEqual(keys.length, 158, '维度键总数应为 158: got ' + keys.length);
 });
 t('登记-VERIFY_DIMS 含 forer_effect', () => {
   const src = require('fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');

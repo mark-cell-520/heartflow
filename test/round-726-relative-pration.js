@@ -183,7 +183,7 @@ t('登记-dimensions 键含 relative_pration 且总数 156', () => {
   const keys = Object.keys(gate.discriminate('probe').dimensions);
   assert.ok(keys.includes('relative_pration'), 'relative_pration 键缺失');
   // r725 落笔时引擎 155 维，r726 +1 = 156（多轮累积预期过期，非回归）
-  assert.strictEqual(keys.length, 156, '维度键总数应为 156: got ' + keys.length);
+  assert.strictEqual(keys.length, 158, '维度键总数应为 158: got ' + keys.length);
 });
 t('登记-VERIFY_DIMS 含 relative_pration', () => {
   const src = require('fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');

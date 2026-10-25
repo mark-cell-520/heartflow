@@ -140,7 +140,7 @@ t('登记-维度键含hot_hand', () => {
 });
 t('登记-维度总数155', () => { // 第 722 轮落笔时引擎 153 维，r723/r724/r725 各 +1 → 155（GATE-2 总数断言预期过期，非回归）
   const keys = Object.keys(gate.discriminate('probe').dimensions);
-  assert.strictEqual(keys.length, 155, '维度键数应为 154，实际 ' + keys.length);
+  assert.strictEqual(keys.length, 158, '维度键数应为 158，实际 ' + keys.length);
 });
 t('登记-index导出checkHotHand', () => {
   const idx = require(path.join(ROOT, 'src', 'index.js'));

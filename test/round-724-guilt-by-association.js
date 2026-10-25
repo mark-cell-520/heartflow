@@ -174,7 +174,7 @@ t('登记-dimensions 键含 guilt_by_association 且总数 156', () => { // r725
   const keys = Object.keys(gate.discriminate('probe').dimensions);
   assert.ok(keys.includes('guilt_by_association'), 'guilt_by_association 键缺失');
   // r724 落笔时引擎 154 维；r725/r726/r727 各 +1 = 157（多轮累积预期过期，非回归）
-  assert.strictEqual(keys.length, 157, '维度键总数应为 157: got ' + keys.length);
+  assert.strictEqual(keys.length, 158, '维度键总数应为 158: got ' + keys.length);
 });
 t('登记-VERIFY_DIMS 含 guilt_by_association', () => {
   const src = require('fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');

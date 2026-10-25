@@ -1,7 +1,15 @@
 {
+<<<<<<< HEAD
   "passed": 18326,
   "failed": 167,
   "total": 18493,
   "at": "2026-10-26T00:00:00.000Z",
   "note": "r727 分块实测（scripts/round-727-run-chunk.js，口径对齐 run-all.js；609/609 文件；红名单 127 = 126 预存 + security-audit 提交前 S2 预期红，stash 基线对照零新增失败）"
 }
+=======
+  "passed": 18561,
+  "failed": 115,
+  "total": 18676,
+  "at": "2026-10-25T15:08:05.959Z"
+}
+>>>>>>> box-merged

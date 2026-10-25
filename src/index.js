@@ -404,6 +404,12 @@ const { checkStereotypeOrigin } = require('./stereotype-origin.js');
 // 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9。判据双腿共现；
 // 细节见 src/wishful-thinking.js。
 const { checkWishfulThinking } = require('./wishful-thinking.js');
+// [r717→合并重编号 158] 第 158 维度 void_zh_standard_shift（单方作废约定：以指称既往事项的
+// [r717→合并重编号 158] 名词短语 + 作废动词，事后单方面宣布共识/承诺/契约不算数）。decision 本体
+// [r717→合并重编号 158] 选出（scripts/decide-r717.js，composite_score 0.82 / confidence 0.8 /
+// [r717→合并重编号 158] identity alignment 0.8）。本轮在当前引擎复测：攻击漏判 5/7（71%）、误伤 0/6。
+// [r717→合并重编号 158] 判据双腿共现；细节见 src/void-zh-standard-shift.js。
+const { checkVoidZhStandardShift } = require('./void-zh-standard-shift.js');
 // [r717] 第 148 维度 gamblers_fallacy（赌徒谬误：把独立事件的历史
 // 频率当成未来概率的依据，让随机序列背负「平衡义务」）。decision
 // 本体选出（scripts/decide-r717.js，composite_score 0.84 / confidence
@@ -1584,6 +1590,8 @@ function discriminate(text, evidence = [], contentMode) {
   // [r716] 第 147 维度 wishful_thinking（一厢情愿）计算点。
   // 同 r715 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const wt = _applyPedagogyRelaxation(checkWishfulThinking(_normText), "wishful_thinking", pedagogyRelaxation);
+  // [r717→合并重编号 158] 第 158 维度 void_zh_standard_shift（单方作废约定）计算点。
+  const vzs = _applyPedagogyRelaxation(checkVoidZhStandardShift(_normText), "void_zh_standard_shift", pedagogyRelaxation);
   // [r717] 第 148 维度 gamblers_fallacy（赌徒谬误）计算点。
   // 同 r716 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const gmb = _applyPedagogyRelaxation(checkGamblersFallacy(_normText), "gamblers_fallacy", pedagogyRelaxation);
@@ -2025,6 +2033,8 @@ function discriminate(text, evidence = [], contentMode) {
     // [r716] 第 147 维度 wishful_thinking 参与判定（一厢情愿）。
     // 同 r715 先例：dimMap 与 allDims 必须两处都接。
     {score: wt.score, name:'wishful_thinking'},
+    // [r717→合并重编号 158] 第 158 维度 void_zh_standard_shift 参与判定（单方作废约定）。
+    {score: vzs.score, name:'void_zh_standard_shift'},
     // [r717] 第 148 维度 gamblers_fallacy 参与判定（赌徒谬误）。
     // 同 r716 先例：dimMap 与 allDims 必须两处都接。
     {score: gmb.score, name:'gamblers_fallacy'},
@@ -2371,6 +2381,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r716] 第 147 维度 wishful_thinking（一厢情愿×
     // 信念/愿望腿×必然结果推断腿/超自然因果腿）。
     wishful_thinking: wt,
+    // [r717→合并重编号 158] 第 158 维度 void_zh_standard_shift（单方作废约定×
+    // [r717→合并重编号 158] 既往事项指称腿×作废动词腿）。
+    void_zh_standard_shift: vzs,
     // [r717] 第 148 维度 gamblers_fallacy（赌徒谬误×
     // 历史连胜/连败腿×反转/概率升高预期腿）。
     gamblers_fallacy: gmb,
@@ -3442,6 +3455,11 @@ function discriminate(text, evidence = [], contentMode) {
     // （「我相信这个方向，但还是要看数据验证」）。与 r672-r715 同口径
     // 只登记 VERIFY。
     'wishful_thinking',
+    // [r717→合并重编号 158] 第 158 维度 void_zh_standard_shift（单方作废约定）登记。
+    // [r717→合并重编号 158] verify 级——「单方作废既有约定」需要补的是**实际语境判据**（这是
+    // [r717→合并重编号 158] 单方作废话术还是正当的合同复盘/变更流程/对话引用），不是改写句式
+    // [r717→合并重编号 158] 就能补的；单句也可能是正当陈述。同口径只登记 VERIFY。
+    'void_zh_standard_shift',
     // [r717] 第 148 维度 gamblers_fallacy（赌徒谬误）登记。
     // verify 级——「把历史频率当未来概率」需要补的是**实际语境判据**
     // （这是概率误判还是转述他人错误/反例教学/游戏叙事），不是改写
@@ -3873,6 +3891,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r715] 第 146 维度补登记：stereotype_origin（出身歧视）。
       // 同上：九处一次接齐。
       stereotype_origin: so,
+      // [r717→合并重编号 158] 第 158 维度 void_zh_standard_shift（单方作废约定×
+      // [r717→合并重编号 158] 既往事项指称腿×作废动词腿）。
+      void_zh_standard_shift: vzs,
       // [r716] 第 147 维度补登记：wishful_thinking（一厢情愿）。
       // 同上：九处一次接齐。
       wishful_thinking: wt,
@@ -4119,6 +4140,8 @@ function discriminate(text, evidence = [], contentMode) {
       // [r716] 第 147 维度 wishful_thinking 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       wt.count ? wt.count + ' 处一厢情愿' : '',
+      // [r717→合并重编号 158] 第 158 维度 void_zh_standard_shift 补登记 summary
+      vzs.count ? vzs.count + ' 处单方作废约定' : '',
       // [r717] 第 148 维度 gamblers_fallacy 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       gmb.count ? gmb.count + ' 处赌徒谬误' : '',
@@ -14528,6 +14551,9 @@ module.exports = {
   // [r716] 第 147 维度 wishful_thinking 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkWishfulThinking,
+  // [r717→合并重编号 158] 第 158 维度 void_zh_standard_shift 导出（同先例，
+  // [r717→合并重编号 158] 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkVoidZhStandardShift,
   // [r717] 第 148 维度 gamblers_fallacy 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkGamblersFallacy,
