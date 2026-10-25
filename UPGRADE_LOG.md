@@ -1,3 +1,115 @@
+# r724 轮报告（v6.8.72）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r723 交接簿
+「已知未修项」五项 + r724 新侦察两族，按「引用 UPGRADE_LOG tail 当现状前
+必须复测」纪律用本轮探测器 `scripts/round-724-family-probe.js` 在当前
+引擎（v6.8.71，153 维）逐族复测（grep 命中≠上线：以维度键集合判定，
+五个候选族全部未上线）：
+
+| 候选 | r724 实测 | 结果 |
+|---|---|---|
+| guilt_by_association 连坐定罪（新侦察） | 攻击漏判 11/12（**92%**）全池最高、误伤 **0/8**、真零命中 11/11 | 合格候选 |
+| relative_privation 诉诸更惨 | 漏判 24/29（83%）、误伤 0/12、真零命中 23/24 | 合格候选 |
+| texas_sharpshooter 德州神枪手 | 漏判 20/26（77%）、误伤 0/11、真零命中 20/20 | 合格候选 |
+| middle_ground 诉诸中庸 | 漏判 13/19（68%）、误伤 0/10、真零命中 11/13 | 合格候选 |
+| base_rate_fallacy 基准率忽视（新侦察） | 漏判 8/12（67%）、误伤 0/8、真零命中 6/8 | 合格候选 |
+| composition_division 合成分分解 | 漏判 9/17（53%）、误伤 0/9、真零命中 8/9 | 合格候选 |
+| appeal_to_consequences 诉诸后果 | 漏判 61% 但误伤 1/10（存量 dangerous_instruction+reward_hacking 连坐误伤良性句） | 不合格（存量误伤先修） |
+
+新侦察两族按语域真实分布取样（不只教科书句）：guilt_by_association
+取「他朋友就是骗子，他能好到哪去」「这个博主跟那个翻车的人互关，
+一路货色」「他们老家出了这事，那边来的人都要防着点」等口语/舆论
+形态，base_rate_fallacy 取「检测准确率 99%，你阳性了，基本就是
+确诊了」等医疗/风控形态——这是连续多轮同型验证的结构性缺口，
+本轮探测器按纪律补齐。relative_privation 复测 71%→83%（补
+「别抱怨 996 了，工地上还有搬砖的呢」「别嫌工资低，至少还有五险
+一金」等婚恋/职场/地域形态后教科书低估真实分布被证实）。
+
+**decision 本体一次选中，无打平**：喂 `scripts/decide-r724.js` 构造的
+四段判据（A relative_privation / B texas_sharpshooter / C
+guilt_by_association / D middle_ground / E base_rate_fallacy /
+F composition_division），C 的劣势如实写入（样本面 12 条全池最小、
+与 genetic_fallacy 边界需 carve-out）。本体选中 **C
+guilt_by_association 连坐定罪**：composite **0.85** / confidence
+**0.82** / identity_alignment **0.8**，第二名 A 0.83，无打平弃权。
+身份对齐论证：连坐是辨别者最该拦的株连形——「因为关系人坏所以此人
+坏」用关系代替证据，把个体未验证的行为定罪成群体性语言暴力，与
+genetic_fallacy（血统决定论）/triangulation（拉第三方施压）相邻，
+保护个体不被舆论语言暴力定罪。
+
+## 做了什么（用户能感知什么）
+
+- **新增第 154 维度 `guilt_by_association`（连坐定罪）**
+  `src/guilt-by-association.js`，双腿判据：腿①关系链词（朋友/前任/
+  亲戚/同乡/互关/关注列表/待过/共事/团队/公司/老家/出身/吃过饭；
+  EN: brother / used to work / follows / from the same town）×
+  腿②株连推断（好到哪去/一路货色/干净不了/也不是什么好人/能信吗/
+  一伙的/防着点/就有问题；EN: must be one too / cannot be trusted /
+  no better than / cut from the same cloth）。缺腿不判——「他朋友的
+  问题归他朋友，我们看他本人的记录」只有关系语境无株连推断，是正当
+  就事论事；「他哥是罪犯」只有污名陈述无转移推断，不判。
+- **四条豁免常量**（全部可被负例注入）：META_NOUN（连坐/株连/
+  guilt by association 概念转述）、EVIDENCE_PRESENT（靠证据/按事实/
+  个案/责任自负）、THIRD_PERSON_EXEMPT（老师/教材/课堂/textbook）、
+  GENETIC_BLOOD（血统/基因/龙生龙/根正苗红/将门/出身/born into
+  ——血统决定论显式让位 genetic_fallacy 第 131 维）。
+- **九处接线一次接齐**（src/index.js）：require / 计算点 / allDims /
+  dimensions 键 / DIM_GUIDANCE / VERIFY_DIMS / 补登记 / summary /
+  exports。定稿前探测（scripts/tmp-r724-guilt-probe.js，轮末已删）
+  抓出 2 个 MISS（「他爸」缺单字支、「吃过饭」缺关系词）与 4 个
+  PASS 假样本（锁空气），补支路 + 换真分工样本后 16/16 命中。
+- **升级性质**：真升级（新辨别维度，维度数 153→154，判别家族
+  「关系代替证据」闭合）。**用户可感知**：AI 输出含「他朋友是骗子，
+  他能好到哪去」「互关的一路货色」「他说话能信吗」这类连坐指控时，
+  gate 现在会判 rewrite 并给出「把评价落回此人本人可验证的行为与
+  记录」的 guidance；就事论事（「按事实逐条核查」）、血统论、
+  教学转述不误伤。
+
+## 六项门禁验收数字
+
+| 门禁 | 数字 |
+|---|---|
+| bin/verify.js | **16/16 通过**（引擎启动、模块数、gate 入口、think() 可用） |
+| bidirectional-guard.js | 召回 **52/52 (100%)**｜误拦 **302/326 (92.6%) 与基线一致零新增** |
+| guard-abilities.js | **20/20 通过**（dimensions 键 154；CRLF 归一后文本可检索恢复） |
+| doc-numbers-accuracy.test.js | **22/22 通过** |
+| security-audit.test.js | **16/16**（S2 由含版本号 feat commit 转绿） |
+| round-guard --stage=after | 通过（tmp 探针已清） |
+
+轮测试 `test/round-724-guilt-by-association.js` **48/48**（攻击
+中11+英5 / 良性12 / 边界锁 / 分工锁 / 登记断言 / 存量回归）；
+负例注入 `scripts/negative-test-guilt-by-association.js` **35/35**
+（逐常量置空翻转 + 豁免独立性交叉 + 全腿置空静默）。
+
+## 环境事实（交接）
+
+- **CRLF×N 再次出现（r723 同源）**：core.autocrlf=true 环境下
+  patch 工具把 src/index.js 写成 CRLF×14518，guard-abilities
+  「文本可检索」项报红——按 r723 先例行尾归一（内容零差异、
+  git 索引 i/lf 吸收）后 20/20 恢复。本轮新建文件
+  src/guilt-by-association.js 为 LF（write_file 未引入 CRLF）。
+  后续轮次 patch src/index.js 后若 guard-abilities 报 CRLF，
+  先归一再复跑，不要当回归修。
+- **security-audit S2 在 commit 前红是预期**（查 git log/tag 命中
+  当前版本号），含版本号 feat commit 落地后转绿。
+
+## 已知未修项（下一轮候选池）
+
+- **appeal_to_consequences 存量误伤**：良性句「影响再大也不能绕过
+  核查，先验证数据来源再说」被 dangerous_instruction+reward_hacking
+  连坐 block（r724 探测器实测）。按连坐纪律，该族上线前需先开一轮
+  专项修复（定位误伤来源维度补豁免/看守支）。
+- **middle_ground 良性误伤**：「双方主张都有道理时，可以找一个
+  平衡点」被存量维度 verify——谈判语域正当折中用法的豁免设计难度
+  实质最高（r724 复测确认）。
+- 合格候选（按 r724 漏判率排序，可直接喂下一轮 decision）：
+  **relative_privation 诉诸更惨（83%、0/12）**、texas_sharpshooter
+  德州神枪手（77%、0/11，r723 曾钦定优先，本轮落选 0.79）、
+  middle_ground 诉诸中庸（68%、0/10）、base_rate_fallacy 基准率
+  忽视（67%、0/8）、composition_division 合成分分解（53%、0/9）。
+
 # r723 轮报告（v6.8.71）
 
 ## 心虫选中项 + 分数 + 身份对齐
