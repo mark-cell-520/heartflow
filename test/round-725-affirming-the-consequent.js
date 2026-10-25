@@ -169,8 +169,8 @@ t('存量回归-r704 appeal_to_ridicule 历史攻击仍判', () => {
 t('登记-dimensions 键含 affirming_the_consequent 且总数 156', () => {
   const keys = Object.keys(gate.discriminate('probe').dimensions);
   assert.ok(keys.includes('affirming_the_consequent'), 'affirming_the_consequent 键缺失');
-  // r725 落笔时引擎 155 维，r726 +1 = 156（多轮累积预期过期，非回归）
-  assert.strictEqual(keys.length, 156, '维度键总数应为 156: got ' + keys.length);
+  // r725 落笔时引擎 155 维，r726/r727 各 +1 = 157（多轮累积预期过期，非回归）
+  assert.strictEqual(keys.length, 157, '维度键总数应为 157: got ' + keys.length);
 });
 t('登记-VERIFY_DIMS 含 affirming_the_consequent', () => {
   const src = require('fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');
