@@ -1,3 +1,120 @@
+# r723 轮报告（v6.8.71）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r722 交接簿
+「已知未修项」+ 新侦察：void_zh_standard_shift（r722 起遗留、
+r722 报告钦定「下轮优先」）+ texas_sharpshooter / relative_privation /
+middle_ground / composition_division / appeal_to_consequences（r722
+落选族复测）+ argument_from_incredulity（r722 出池复测），按
+「引用 UPGRADE_LOG tail 当现状前必须复测」纪律用本轮探测器
+`scripts/round-723-family-probe.js` 在当前引擎（v6.8.70，153 维）
+逐族复测：
+
+| 候选 | 实测 | 结果 |
+|---|---|---|
+| void_zh_standard_shift 契约作废窄口 | 攻击漏判 22/27（81%）全池最高、误伤 **0/15**、真零命中 22/22 | 合格候选 |
+| texas_sharpshooter 德州神枪手 | 漏判 16/21（76%）、误伤 0/11、真零命中 15/16 | 合格候选 |
+| relative_privation 诉诸更惨 | 漏判 12/17（71%）、误伤 0/8、真零命中 12/12 | 合格候选 |
+| middle_ground 诉诸中庸 | 漏判 64%、误伤 0/6、真零命中 7/7 | 合格候选 |
+| composition_division 合成分分解 | 漏判 62%、误伤 0/7、真零命中 7/8 | 合格候选 |
+| appeal_to_consequences 诉诸后果 | 漏判 53%、误伤 0/9、真零命中 8/9 | 合格候选 |
+| argument_from_incredulity 诉诸无知 | 漏判 47% | 不够格（<50%） |
+
+**decision 本体一次选中，无打平**：喂 `scripts/decide-r723.js` 构造的
+四段判据（A void_zh / B texas_sharpshooter / C relative_privation /
+D middle_ground / E composition_division / F appeal_to_consequences），
+A 的劣势如实写入（存量补形非新维度、维度数不涨、边界与存量
+standard_shift 路由①②③ 相邻）。本体选中 **A void_zh_standard_shift
+契约作废窄口补形**：composite **0.87** / confidence **0.84** /
+identity_alignment **0.8**，第二名 B 0.82，无打平弃权。身份对齐
+依据：「作废本身就是位移」——一方把既往承诺/标准单方宣告作废以
+逃避约束，与 standard_shift「事后抬高未明说的标准」是同一辨别的
+两个方向（一个是抬高标准，一个是作废标准），补齐该方向才闭合
+「单方修改游戏规则」家族；这是 r696 起遗留 27 轮的窄口。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+**真升级（存量维度上的真实能力增益，非维护）**：`src/self-imposed-
+standard-shift.js` 新增**路由④「强单方作废族」**——既往承诺/标准
+锚点 × 单方作废动词双腿共现即判，不要求既往抬标触发词
+（「作废本身就是位移」）。九腿：Z1 时间词×承诺名词×作废动词、
+Z1b 时间词+说/谈+的+(都|全)?+作废动词、Z2 旧/老字修饰×标准×单方
+标记、Z3 说好X+逗号阻断+指示词重启、Z4 可撤销性主张、Z5 说好的X
+现在不认、E1 EN 承诺名词+is/are+作废动词、E2 cannot hold me to /
+no longer bound by、E3 that is off the table。常量全部数组化、
+可负例注入，`__internals` 导出 14 个注入点。用户能感知：
+「当初那件事不作数，你别拿它说事」「这次承诺不算，我改主意了」
+「旧标准作废，按我今天说的来」「婚前说好不干涉我的工作，那条
+现在不算数」「谈好的条件随时可以改，我说了算」「说好的提成
+现在不认了，规矩我来定」「That deal is void, I have decided on
+new terms.」「You cannot hold me to what I said last month.」
+类话术现在被 gate 判 verify 并给出「既往承诺/标准不得单方作废」
+指引。漏判 81% → **0%（27/27）**，误伤 0/15，33 条良性模块层
+零命中。豁免与边界：Z2 腿带单方标记（按我今天说的/我说了算/
+按新方案）防组织公告误伤（「旧版标准已经失效，请注意查阅更新
+通知」不判）；DUE_PROCESS 豁免窄于 PROCESS_MARKER（只放行双方/
+协商/公示/备案/书面/盖章/签字/变更单/过渡期/依法/法院/仲裁）；
+裸「不算」用句读锚（「之前的问题不算难」不判）；void of
+（空虚义）排除；空表防退化守卫（词表置空摘除该腿，不变成
+`(?:)` 恒真）。**维护部分**：round-696 变异守卫口径修正
+（VOID_ZH 单条承重 → VOID_ZH+STRONG_VOID 判据面整体承重，
+原前提因路由④成为第二判据而过期，同 GATE-2 过期类）、
+heartflow.js 行尾归一（git stash 循环被 autocrlf 写成 CRLF×6450
+导致 guard-abilities 文本可检索项红，归一后 20/20，内容零差异）。
+
+## 六项门禁实测数字（全绿）
+
+- bin/verify.js：**16/16**
+- bidirectional-guard.js：召回 **52/52**，误拦 **302/326**
+  与基线一致零新增
+- guard-abilities.js：**20/20**（dimensions 键 153）
+- doc-numbers-accuracy.test.js：**22/22**
+- security-audit.test.js：**16/16**（S2 由含版本号 feat commit 转绿）
+- round-guard after：通过（版本四处一致、工作区干净、无 tmp 探针）
+
+## 测试数字
+
+- 轮测试 test/round-723-void-zh.js：**75/75**（攻击 25 + 良性 33
+  模块层零命中 + 边界锁 7 + 分工锁 4 + 存量回归 + 登记断言 4）
+- 负例注入 scripts/negative-test-void-zh.js：**57/57**（12 个攻击
+  腿常量逐一置空翻转 + 2 个豁免注入翻转 + 半边置空不误伤 + 全置空
+  不恒真 + __internals 完整性）
+- 存量回归：round-696 **11/11**、round-700 **12/12**、
+  post_hoc negative **74/74**、round-722 **43/43**
+- round-692 **30/1**：唯一失败是 GATE-2 维度键总数断言
+  （130 → 现 153），多轮累积的预期过期，非本轮回归
+- round-507 **7/3**：3 个失败与干净树逐一复跑完全一致
+  （CRLF 行尾预存问题），非本轮回归
+
+## 全量回归（额外验证，非六门禁项）
+
+run-all.js 全量 **18243 通过 / 139 失败 / 共 18382**。与 r722 基线
+（18239/139/18378）对比：**失败数 139 = 139 完全一致，零新增回归**；
+通过数 +4（新增 4 个 scripts 探针文件被计数类测试计入）。失败文件
+53 个中唯一属于本轮改动维度族的是 round-507-standard-shift
+（预存 CRLF，已与干净树复跑对照一致），其余 52 个文件分属
+reward_hacking / mcp / ai-writing-tell 等无关族，本轮未触碰其模块。
+本轮改动仅涉及 src/self-imposed-standard-shift.js 及其测试，
+standard_shift 全族测试（507/696/700/692/723 + negative）已逐一
+单独复跑，结果如上。
+
+## 已知未修项 top 3（交接给下一轮）
+
+1. texas_sharpshooter 德州神枪手——本轮复测漏判 76%、误伤 0/11
+   已成合格候选（composite 0.82 落选于 A），与 survivorship_bias /
+   statistical_misleading / hasty_generalization 边界模糊需补边界
+   样本，下轮优先
+2. relative_privation 诉诸更惨——漏判 71%、误伤 0/8 合格候选，
+   落选 0.82 以下
+3. 33+ commit 未推送 GitHub——推送是人工门禁红线，不做
+
+## commit 列表（三连）
+
+- `feat(r723): v6.8.71 standard_shift 路由④契约作废窄口补形（漏判 81%→0%，27/27）+ round-696 守卫口径修正 + heartflow.js 行尾归一`
+- `docs(r723): v6.8.71 契约作废窄口轮报告（七族复测、decision 0.87 一次选中无打平、全量测试数字）`
+- `chore(r723): 交接簿更新（round 723 完成，texas_sharpshooter 已成合格候选记入下一轮优先）`
+
 # r722 轮报告（v6.8.70）
 
 ## 心虫选中项 + 分数 + 身份对齐
