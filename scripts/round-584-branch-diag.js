@@ -1,10 +1,12 @@
 // r584 叶子诊断：确认 A6/E2/E3/E5 各腿的正则子表达式匹配情况（只报子支编号）
 'use strict';
-const mod = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/flattery-pressure.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const mod = require(__HF + '/src/flattery-pressure.js');
 const I = mod.__internals();
 
 // 拆出数组源以逐支测试（不贴样本原文，只报支号）
-const src = require('fs').readFileSync('/root/.hermes/skills/ai/mark-heartflow-skill/src/flattery-pressure.js', 'utf8');
+const src = require('fs').readFileSync(__HF + '/src/flattery-pressure.js', 'utf8');
 function branches(srcText, name) {
   const m = srcText.match(new RegExp('const ' + name + ' = new RegExp\\(\\[([\\s\\S]*?)\\]\\.join'));
   if (!m) return null;

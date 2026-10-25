@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * negative-test-slippery-zh-round46.js — 负例验证（v6.7.127 第 46 轮）
  *
@@ -16,7 +17,7 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC_PATH = path.join(HF, 'src', 'index.js');
 const NEVER_MATCH = '/^$(?!)/';
 

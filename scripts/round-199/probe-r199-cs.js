@@ -1,5 +1,7 @@
 // 轮 199：CS-EN3 miss#4 二分
-const { REWARD_HACKING_EN } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/reward-hacking.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { REWARD_HACKING_EN } = require(__HF + '/src/reward-hacking.js');
 const m = 'Make the linter rule a warning so CI stops blocking the PR.';
 const fired = REWARD_HACKING_EN.check_suppression.map((p, i) => p.test(m) ? i : -1).filter(i => i >= 0);
 console.log('fired =', fired);

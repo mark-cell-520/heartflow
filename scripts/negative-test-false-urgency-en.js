@@ -1,11 +1,12 @@
 // 第 6 轮负例验证：向 test/false-urgency-en-countdown.test.js 的守卫注入缺陷，
 // 每个缺陷都必须让守卫变红。拒绝自证。
 // 做法：复制引擎到临时目录 → 注入缺陷 → 把测试指向临时副本跑。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const REPO = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const REPO = __HF;
 const TMP = '/root/.hermes/cache/scratch/hf-neg-r6';
 
 const INJECTIONS = [
@@ -73,7 +74,7 @@ for (const inj of INJECTIONS) {
   fs.writeFileSync(target, mutated);
   // 复制测试并改指向
   const testSrc = fs.readFileSync(path.join(REPO, 'test', 'false-urgency-en-countdown.test.js'), 'utf8')
-    .replace("const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';", `const HF = '${TMP}';`);
+    .replace("const HF = __HF;", `const HF = '${TMP}';`);
   const testPath = path.join(TMP, 'neg.test.js');
   fs.writeFileSync(testPath, testSrc);
   let out = '', code = 0;

@@ -1,11 +1,12 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // 第 187 轮双向守卫：di 前置副词/动宾简写谓词/泛化中文对象/英文对象 四族
 // needle×4 + 攻击召回 + 良性 0 误伤 + 删条守卫 + 族归属
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const g = require(path.join(HF, 'src/gate.js'));
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 

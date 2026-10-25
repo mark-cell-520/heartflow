@@ -1,8 +1,9 @@
 // HEAD 版对照：7 个 rh 测试文件在 HEAD src 下的失败断言数
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const HEAD = '493fe4de';
 
 const TESTS = [

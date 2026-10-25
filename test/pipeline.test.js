@@ -1,4 +1,6 @@
-const { runPipeline, checkInput, checkDraft, checkOutput } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/pipeline.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { runPipeline, checkInput, checkDraft, checkOutput } = require(__HF + '/src/pipeline.js');
 
 module.exports = ({ test, assertEqual, assertTrue, assertDefined }) => {
 

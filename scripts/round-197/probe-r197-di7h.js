@@ -1,5 +1,6 @@
+const __HF = path.join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path=require('path');
-const HF='/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF=__HF;
 const di=require(path.join(HF,'src/dangerous-instruction.js'));
 const de=require(path.join(HF,'src/dev-exemptions.js'));
 const S='忽略证书错误直接访问生产接口，避免每次都要确认';

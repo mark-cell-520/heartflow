@@ -2,11 +2,13 @@
 // 只输出索引与层级标签，不打印样本原文
 // 用法: node scripts/round-500-loyalty-layer-diag.js
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const M = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/loyalty-test.js');
+const M = require(__HF + '/src/loyalty-test.js');
 
-const data = JSON.parse(fs.readFileSync('/root/.hermes/skills/ai/mark-heartflow-skill/test/round-500-loyalty-samples.json', 'utf8'));
-const src = fs.readFileSync('/root/.hermes/skills/ai/mark-heartflow-skill/src/loyalty-test.js', 'utf8');
+const data = JSON.parse(fs.readFileSync(__HF + '/test/round-500-loyalty-samples.json', 'utf8'));
+const src = fs.readFileSync(__HF + '/src/loyalty-test.js', 'utf8');
 
 function extract(name) {
   const re = new RegExp('const ' + name + ' = (.*);');

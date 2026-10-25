@@ -1,3 +1,16 @@
+## [合并] v6.8.72 — Windows 线（r717–r724）并入本体机线；void_zh_standard_shift 重编号为第 155 维度
+
+> 背景：本体机线（dc3077bf 基线 → fd6e5302 v6.8.62 → r717 void_zh v6.8.63）与 Windows 线
+> （693f3e4 快照 → 77fbdae v6.8.72，r717–r724 七个新维度 148–154）于 10-22 分岔后各自进化，
+> 10-25 经 git bundle 跨主机合并（git merge --allow-unrelated-histories，644 冲突全解）。
+> 合并口径：除本体机 r717 的九处接线（重新施加）外，其余文件一律取 Windows 侧（更新）。
+> void_zh_standard_shift 原始编号第 148 与 Windows 线 gamblers_fallacy（148）撞号，
+> 按"后合入者重编号"重编为**第 155 维度**；src/index.js 内注释以 [r717→合并重编号 155] 标注。
+> 本体机 r717 的两个同名脚本（decide-r717.js / round-717-family-probe.js）保留为 *-box-voidzh.js。
+> 合并后维度总数 155；dimension-registry-guard 复跑通过（dimensions 键 155，全部登记）。
+
+---
+
 # r717 轮报告（v6.8.63）
 
 ## 心虫选中项 + 分数 + 身份对齐
@@ -68,6 +81,712 @@ scripts/negative-test-void-zh-standard-shift.js 12/12（含三形态腿逐一置
    不做（git 历史已于本轮从 origin/main 恢复，含 4886 个历史提交）。
 4. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase
    2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+---
+
+# r724 轮报告（v6.8.72）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r723 交接簿
+「已知未修项」五项 + r724 新侦察两族，按「引用 UPGRADE_LOG tail 当现状前
+必须复测」纪律用本轮探测器 `scripts/round-724-family-probe.js` 在当前
+引擎（v6.8.71，153 维）逐族复测（grep 命中≠上线：以维度键集合判定，
+五个候选族全部未上线）：
+
+| 候选 | r724 实测 | 结果 |
+|---|---|---|
+| guilt_by_association 连坐定罪（新侦察） | 攻击漏判 11/12（**92%**）全池最高、误伤 **0/8**、真零命中 11/11 | 合格候选 |
+| relative_privation 诉诸更惨 | 漏判 24/29（83%）、误伤 0/12、真零命中 23/24 | 合格候选 |
+| texas_sharpshooter 德州神枪手 | 漏判 20/26（77%）、误伤 0/11、真零命中 20/20 | 合格候选 |
+| middle_ground 诉诸中庸 | 漏判 13/19（68%）、误伤 0/10、真零命中 11/13 | 合格候选 |
+| base_rate_fallacy 基准率忽视（新侦察） | 漏判 8/12（67%）、误伤 0/8、真零命中 6/8 | 合格候选 |
+| composition_division 合成分分解 | 漏判 9/17（53%）、误伤 0/9、真零命中 8/9 | 合格候选 |
+| appeal_to_consequences 诉诸后果 | 漏判 61% 但误伤 1/10（存量 dangerous_instruction+reward_hacking 连坐误伤良性句） | 不合格（存量误伤先修） |
+
+新侦察两族按语域真实分布取样（不只教科书句）：guilt_by_association
+取「他朋友就是骗子，他能好到哪去」「这个博主跟那个翻车的人互关，
+一路货色」「他们老家出了这事，那边来的人都要防着点」等口语/舆论
+形态，base_rate_fallacy 取「检测准确率 99%，你阳性了，基本就是
+确诊了」等医疗/风控形态——这是连续多轮同型验证的结构性缺口，
+本轮探测器按纪律补齐。relative_privation 复测 71%→83%（补
+「别抱怨 996 了，工地上还有搬砖的呢」「别嫌工资低，至少还有五险
+一金」等婚恋/职场/地域形态后教科书低估真实分布被证实）。
+
+**decision 本体一次选中，无打平**：喂 `scripts/decide-r724.js` 构造的
+四段判据（A relative_privation / B texas_sharpshooter / C
+guilt_by_association / D middle_ground / E base_rate_fallacy /
+F composition_division），C 的劣势如实写入（样本面 12 条全池最小、
+与 genetic_fallacy 边界需 carve-out）。本体选中 **C
+guilt_by_association 连坐定罪**：composite **0.85** / confidence
+**0.82** / identity_alignment **0.8**，第二名 A 0.83，无打平弃权。
+身份对齐论证：连坐是辨别者最该拦的株连形——「因为关系人坏所以此人
+坏」用关系代替证据，把个体未验证的行为定罪成群体性语言暴力，与
+genetic_fallacy（血统决定论）/triangulation（拉第三方施压）相邻，
+保护个体不被舆论语言暴力定罪。
+
+## 做了什么（用户能感知什么）
+
+- **新增第 154 维度 `guilt_by_association`（连坐定罪）**
+  `src/guilt-by-association.js`，双腿判据：腿①关系链词（朋友/前任/
+  亲戚/同乡/互关/关注列表/待过/共事/团队/公司/老家/出身/吃过饭；
+  EN: brother / used to work / follows / from the same town）×
+  腿②株连推断（好到哪去/一路货色/干净不了/也不是什么好人/能信吗/
+  一伙的/防着点/就有问题；EN: must be one too / cannot be trusted /
+  no better than / cut from the same cloth）。缺腿不判——「他朋友的
+  问题归他朋友，我们看他本人的记录」只有关系语境无株连推断，是正当
+  就事论事；「他哥是罪犯」只有污名陈述无转移推断，不判。
+- **四条豁免常量**（全部可被负例注入）：META_NOUN（连坐/株连/
+  guilt by association 概念转述）、EVIDENCE_PRESENT（靠证据/按事实/
+  个案/责任自负）、THIRD_PERSON_EXEMPT（老师/教材/课堂/textbook）、
+  GENETIC_BLOOD（血统/基因/龙生龙/根正苗红/将门/出身/born into
+  ——血统决定论显式让位 genetic_fallacy 第 131 维）。
+- **九处接线一次接齐**（src/index.js）：require / 计算点 / allDims /
+  dimensions 键 / DIM_GUIDANCE / VERIFY_DIMS / 补登记 / summary /
+  exports。定稿前探测（scripts/tmp-r724-guilt-probe.js，轮末已删）
+  抓出 2 个 MISS（「他爸」缺单字支、「吃过饭」缺关系词）与 4 个
+  PASS 假样本（锁空气），补支路 + 换真分工样本后 16/16 命中。
+- **升级性质**：真升级（新辨别维度，维度数 153→154，判别家族
+  「关系代替证据」闭合）。**用户可感知**：AI 输出含「他朋友是骗子，
+  他能好到哪去」「互关的一路货色」「他说话能信吗」这类连坐指控时，
+  gate 现在会判 rewrite 并给出「把评价落回此人本人可验证的行为与
+  记录」的 guidance；就事论事（「按事实逐条核查」）、血统论、
+  教学转述不误伤。
+
+## 六项门禁验收数字
+
+| 门禁 | 数字 |
+|---|---|
+| bin/verify.js | **16/16 通过**（引擎启动、模块数、gate 入口、think() 可用） |
+| bidirectional-guard.js | 召回 **52/52 (100%)**｜误拦 **302/326 (92.6%) 与基线一致零新增** |
+| guard-abilities.js | **20/20 通过**（dimensions 键 154；CRLF 归一后文本可检索恢复） |
+| doc-numbers-accuracy.test.js | **22/22 通过** |
+| security-audit.test.js | **16/16**（S2 由含版本号 feat commit 转绿） |
+| round-guard --stage=after | 通过（tmp 探针已清） |
+
+轮测试 `test/round-724-guilt-by-association.js` **48/48**（攻击
+中11+英5 / 良性12 / 边界锁 / 分工锁 / 登记断言 / 存量回归）；
+负例注入 `scripts/negative-test-guilt-by-association.js` **35/35**
+（逐常量置空翻转 + 豁免独立性交叉 + 全腿置空静默）。
+
+存量回归（r720-r723 历史轮测试全绿）：round-720 post_hoc **55/55** +
+round-721 appeal_to_probability **55/55** + round-722 hot_hand
+**43/43** + round-723 standard_shift **75/75**。r721/r722/r723 的
+GATE-2 维度总数断言（152/153/153→154）为多轮累积预期过期（设计
+使然非回归），已按纪律更新断言值并在注释注明「第 N 轮落笔时引擎
+M 维，本轮 +1」。
+
+## 环境事实（交接）
+
+- **CRLF×N 再次出现（r723 同源）**：core.autocrlf=true 环境下
+  patch 工具把 src/index.js 写成 CRLF×14518，guard-abilities
+  「文本可检索」项报红——按 r723 先例行尾归一（内容零差异、
+  git 索引 i/lf 吸收）后 20/20 恢复。本轮新建文件
+  src/guilt-by-association.js 为 LF（write_file 未引入 CRLF）。
+  后续轮次 patch src/index.js 后若 guard-abilities 报 CRLF，
+  先归一再复跑，不要当回归修。
+- **security-audit S2 在 commit 前红是预期**（查 git log/tag 命中
+  当前版本号），含版本号 feat commit 落地后转绿。
+
+## 已知未修项（下一轮候选池）
+
+- **appeal_to_consequences 存量误伤**：良性句「影响再大也不能绕过
+  核查，先验证数据来源再说」被 dangerous_instruction+reward_hacking
+  连坐 block（r724 探测器实测）。按连坐纪律，该族上线前需先开一轮
+  专项修复（定位误伤来源维度补豁免/看守支）。
+- **middle_ground 良性误伤**：「双方主张都有道理时，可以找一个
+  平衡点」被存量维度 verify——谈判语域正当折中用法的豁免设计难度
+  实质最高（r724 复测确认）。
+- 合格候选（按 r724 漏判率排序，可直接喂下一轮 decision）：
+  **relative_privation 诉诸更惨（83%、0/12）**、texas_sharpshooter
+  德州神枪手（77%、0/11，r723 曾钦定优先，本轮落选 0.79）、
+  middle_ground 诉诸中庸（68%、0/10）、base_rate_fallacy 基准率
+  忽视（67%、0/8）、composition_division 合成分分解（53%、0/9）。
+
+# r723 轮报告（v6.8.71）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r722 交接簿
+「已知未修项」+ 新侦察：void_zh_standard_shift（r722 起遗留、
+r722 报告钦定「下轮优先」）+ texas_sharpshooter / relative_privation /
+middle_ground / composition_division / appeal_to_consequences（r722
+落选族复测）+ argument_from_incredulity（r722 出池复测），按
+「引用 UPGRADE_LOG tail 当现状前必须复测」纪律用本轮探测器
+`scripts/round-723-family-probe.js` 在当前引擎（v6.8.70，153 维）
+逐族复测：
+
+| 候选 | 实测 | 结果 |
+|---|---|---|
+| void_zh_standard_shift 契约作废窄口 | 攻击漏判 22/27（81%）全池最高、误伤 **0/15**、真零命中 22/22 | 合格候选 |
+| texas_sharpshooter 德州神枪手 | 漏判 16/21（76%）、误伤 0/11、真零命中 15/16 | 合格候选 |
+| relative_privation 诉诸更惨 | 漏判 12/17（71%）、误伤 0/8、真零命中 12/12 | 合格候选 |
+| middle_ground 诉诸中庸 | 漏判 64%、误伤 0/6、真零命中 7/7 | 合格候选 |
+| composition_division 合成分分解 | 漏判 62%、误伤 0/7、真零命中 7/8 | 合格候选 |
+| appeal_to_consequences 诉诸后果 | 漏判 53%、误伤 0/9、真零命中 8/9 | 合格候选 |
+| argument_from_incredulity 诉诸无知 | 漏判 47% | 不够格（<50%） |
+
+**decision 本体一次选中，无打平**：喂 `scripts/decide-r723.js` 构造的
+四段判据（A void_zh / B texas_sharpshooter / C relative_privation /
+D middle_ground / E composition_division / F appeal_to_consequences），
+A 的劣势如实写入（存量补形非新维度、维度数不涨、边界与存量
+standard_shift 路由①②③ 相邻）。本体选中 **A void_zh_standard_shift
+契约作废窄口补形**：composite **0.87** / confidence **0.84** /
+identity_alignment **0.8**，第二名 B 0.82，无打平弃权。身份对齐
+依据：「作废本身就是位移」——一方把既往承诺/标准单方宣告作废以
+逃避约束，与 standard_shift「事后抬高未明说的标准」是同一辨别的
+两个方向（一个是抬高标准，一个是作废标准），补齐该方向才闭合
+「单方修改游戏规则」家族；这是 r696 起遗留 27 轮的窄口。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+**真升级（存量维度上的真实能力增益，非维护）**：`src/self-imposed-
+standard-shift.js` 新增**路由④「强单方作废族」**——既往承诺/标准
+锚点 × 单方作废动词双腿共现即判，不要求既往抬标触发词
+（「作废本身就是位移」）。九腿：Z1 时间词×承诺名词×作废动词、
+Z1b 时间词+说/谈+的+(都|全)?+作废动词、Z2 旧/老字修饰×标准×单方
+标记、Z3 说好X+逗号阻断+指示词重启、Z4 可撤销性主张、Z5 说好的X
+现在不认、E1 EN 承诺名词+is/are+作废动词、E2 cannot hold me to /
+no longer bound by、E3 that is off the table。常量全部数组化、
+可负例注入，`__internals` 导出 14 个注入点。用户能感知：
+「当初那件事不作数，你别拿它说事」「这次承诺不算，我改主意了」
+「旧标准作废，按我今天说的来」「婚前说好不干涉我的工作，那条
+现在不算数」「谈好的条件随时可以改，我说了算」「说好的提成
+现在不认了，规矩我来定」「That deal is void, I have decided on
+new terms.」「You cannot hold me to what I said last month.」
+类话术现在被 gate 判 verify 并给出「既往承诺/标准不得单方作废」
+指引。漏判 81% → **0%（27/27）**，误伤 0/15，33 条良性模块层
+零命中。豁免与边界：Z2 腿带单方标记（按我今天说的/我说了算/
+按新方案）防组织公告误伤（「旧版标准已经失效，请注意查阅更新
+通知」不判）；DUE_PROCESS 豁免窄于 PROCESS_MARKER（只放行双方/
+协商/公示/备案/书面/盖章/签字/变更单/过渡期/依法/法院/仲裁）；
+裸「不算」用句读锚（「之前的问题不算难」不判）；void of
+（空虚义）排除；空表防退化守卫（词表置空摘除该腿，不变成
+`(?:)` 恒真）。**维护部分**：round-696 变异守卫口径修正
+（VOID_ZH 单条承重 → VOID_ZH+STRONG_VOID 判据面整体承重，
+原前提因路由④成为第二判据而过期，同 GATE-2 过期类）、
+heartflow.js 行尾归一（git stash 循环被 autocrlf 写成 CRLF×6450
+导致 guard-abilities 文本可检索项红，归一后 20/20，内容零差异）。
+
+## 六项门禁实测数字（全绿）
+
+- bin/verify.js：**16/16**
+- bidirectional-guard.js：召回 **52/52**，误拦 **302/326**
+  与基线一致零新增
+- guard-abilities.js：**20/20**（dimensions 键 153）
+- doc-numbers-accuracy.test.js：**22/22**
+- security-audit.test.js：**16/16**（S2 由含版本号 feat commit 转绿）
+- round-guard after：通过（版本四处一致、工作区干净、无 tmp 探针）
+
+## 测试数字
+
+- 轮测试 test/round-723-void-zh.js：**75/75**（攻击 25 + 良性 33
+  模块层零命中 + 边界锁 7 + 分工锁 4 + 存量回归 + 登记断言 4）
+- 负例注入 scripts/negative-test-void-zh.js：**57/57**（12 个攻击
+  腿常量逐一置空翻转 + 2 个豁免注入翻转 + 半边置空不误伤 + 全置空
+  不恒真 + __internals 完整性）
+- 存量回归：round-696 **11/11**、round-700 **12/12**、
+  post_hoc negative **74/74**、round-722 **43/43**
+- round-692 **30/1**：唯一失败是 GATE-2 维度键总数断言
+  （130 → 现 153），多轮累积的预期过期，非本轮回归
+- round-507 **7/3**：3 个失败与干净树逐一复跑完全一致
+  （CRLF 行尾预存问题），非本轮回归
+
+## 全量回归（额外验证，非六门禁项）
+
+run-all.js 全量 **18243 通过 / 139 失败 / 共 18382**。与 r722 基线
+（18239/139/18378）对比：**失败数 139 = 139 完全一致，零新增回归**；
+通过数 +4（新增 4 个 scripts 探针文件被计数类测试计入）。失败文件
+53 个中唯一属于本轮改动维度族的是 round-507-standard-shift
+（预存 CRLF，已与干净树复跑对照一致），其余 52 个文件分属
+reward_hacking / mcp / ai-writing-tell 等无关族，本轮未触碰其模块。
+本轮改动仅涉及 src/self-imposed-standard-shift.js 及其测试，
+standard_shift 全族测试（507/696/700/692/723 + negative）已逐一
+单独复跑，结果如上。
+
+## 已知未修项 top 3（交接给下一轮）
+
+1. texas_sharpshooter 德州神枪手——本轮复测漏判 76%、误伤 0/11
+   已成合格候选（composite 0.82 落选于 A），与 survivorship_bias /
+   statistical_misleading / hasty_generalization 边界模糊需补边界
+   样本，下轮优先
+2. relative_privation 诉诸更惨——漏判 71%、误伤 0/8 合格候选，
+   落选 0.82 以下
+3. 33+ commit 未推送 GitHub——推送是人工门禁红线，不做
+
+## commit 列表（三连）
+
+- `feat(r723): v6.8.71 standard_shift 路由④契约作废窄口补形（漏判 81%→0%，27/27）+ round-696 守卫口径修正 + heartflow.js 行尾归一`
+- `docs(r723): v6.8.71 契约作废窄口轮报告（七族复测、decision 0.87 一次选中无打平、全量测试数字）`
+- `chore(r723): 交接簿更新（round 723 完成，texas_sharpshooter 已成合格候选记入下一轮优先）`
+
+# r722 轮报告（v6.8.70）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r721 交接簿
+「已知未修项」+ 新侦察：hot_hand（r721 落选，本轮补语域真实分布）+
+relative_privation（r721 落选复测）+ texas_sharpshooter / middle_ground /
+composition_division（三个新侦察族）+ argument_from_incredulity /
+appeal_to_consequences（r721 新侦察复测）+ void_zh_standard_shift
+（存量误伤专项复测+归因），按「引用 UPGRADE_LOG tail 当现状前必须
+复测」纪律用本轮探测器 `scripts/round-722-family-probe.js` 在当前
+引擎（v6.8.69，152 维）逐族复测：
+
+| 候选 | 实测 | 结果 |
+|---|---|---|
+| hot_hand 热手谬误新维度 | 攻击漏判 11/15（73%）、真零命中 11/11、误伤 0/8 | 合格候选 |
+| texas_sharpshooter 德州神枪手新维度 | 攻击漏判 8/11（73%）、真零命中 8/8、误伤 0/5 | 合格候选 |
+| relative_privation 诉诸更惨新维度 | 攻击漏判 11/16（69%）、真零命中 10/11、误伤 0/9 | 合格候选 |
+| middle_ground 诉诸中庸新维度 | 攻击漏判 6/10（60%）、真零命中 5/6、误伤 0/5 | 合格候选 |
+| composition_division 合成分解谬误新维度 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/5 | 合格候选 |
+| argument_from_incredulity / appeal_to_consequences | 漏判 7/15（47%）/ 7/15（47%） | 不够格（<50%） |
+| void_zh_standard_shift 契约作废窄口 | 攻击漏判 13/17（76%）全池最高、误伤 **1/12** | 不合格（连坐纪律：先修存量误伤） |
+
+**decision 首轮弃权是诚实行为**：A/B（hot_hand / texas_sharpshooter）
+composite 同为 0.81 打平（identity_alignment 对两者同为默认 0.8，
+feasibility/consequence_value 差异正好抵消），本体 abstain
+（options_indistinguishable）。按纪律补救——补**真实**可区分判据
+（非凑数，依据写进 scripts/decide-r722.js 注释）：① hot_hand 是
+gamblers_fallacy 第 148 维的族内反向补形，边界由「延续/反转」方向词
+截然分开，texas_sharpshooter 与 survivorship_bias/statistical_
+misleading/hasty_generalization 三族边界模糊；② hot_hand 经
+r721/r722 两轮复测、15 样本 5 场景、真零命中 11/11。第二轮
+decision 本体选出 **A hot_hand**：composite_score **0.83** /
+confidence **0.8** / identity_alignment **0.8**。身份对齐依据：
+把独立事件当相关是辨别者的核心界线之一——现有维度只覆盖 due 方向
+（该反转），补齐 momentum 方向（该延续）才闭合「独立事件序列的
+概率幻觉」家族；语域覆盖赌桌/销售/面试/表白/考试五个日常不可逆
+决策场景，新维度键 +1。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/hot-hand.js`（第 153 维度，双腿共现：势头/连胜表达 × 延续性断言，三豁免：元话语/证据语境/教学转述第三人称） | 「我手感正旺，下一把肯定中」「连红三把了，房费都是我的，继续押」「I have won five in a row; ride the momentum」类势头当保证话术现在会被 gate 判 rewrite 并给出「连胜势头不能提高下一局胜率」指引 | **真升级①**（新辨别维度上线） |
+| 九处接线（require/计算点/allDims/dimMap/DIM_GUIDANCE/VERIFY_DIMS/补登记/summary/exports） | 维度键 152→153，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+| **存量误伤修复**：post_hoc R2 的 EN 干预腿裸词 `got` 子串命中 `renegotiate`（ne-got-iate）× `no longer`，良性谈判建议句 "If the old terms no longer work for you, let us renegotiate." 被 gate 误判 rewrite——干预腿改词边界匹配 | 含 "renegotiate/forgot/gotten" 类词的良性句子不再被误改写 | 真修复（本轮探测器新增误伤归因能力挖出，连坐纪律） |
+| 文档计数同步 + Verify-level 列举补 hot_hand + README changelog + 版本 bump 6.8.69→6.8.70 | 文档口径与引擎一致 | 维护（文档/版本） |
+
+## 验收数字
+
+- 轮测试 `test/round-722-hot-hand.js`：**43/43 通过**（攻击 15 + 良性 8 + 边界锁 10 + 分工边界 4 + gate 登记 7，含 post_hoc 误伤修复验证）
+- 负例注入 `scripts/negative-test-hot-hand.js`：**22/22 通过**（8 常量逐一置空验证承重 + 跨路由独立 + 豁免独立性交叉校验 + 全腿置空静默）
+- 存量回归：`scripts/negative-test-post-hoc.js` 74/74、`test/round-720-post-hoc.js` 55/55（词边界修复零回归）
+- `node bin/verify.js`：**16/16**
+- `node scripts/bidirectional-guard.js`：召回 **52/52**，误拦 **302/326** 与基线一致零新增
+- `node scripts/guard-abilities.js`：**20/20**（dimensions 键 **153**）
+- `node test/doc-numbers-accuracy.test.js`：**22/22**
+- `node test/security-audit.test.js`：16/16（S2 由含版本号的 feat commit 转绿）
+- `node scripts/round-guard.js --stage=after`：通过
+
+## 已知未修项（含为什么不修）
+
+1. **texas_sharpshooter 德州神枪手（先射箭后画靶）**——decision 第二轮落选（0.81）。攻击漏判 8/11（73%）、误伤 0/5；「先定结论再找论据，哪几个城市增长数据拿过来用」「测试一百个组合，总有几个显著的」整族全漏；落选主因是与 survivorship_bias/statistical_misleading/hasty_generalization 三族边界模糊（「看这五个成功案例」近乎 survivorship_bias 现形），样本面 11 条最小、仅一轮复测。下轮可补边界样本后再探。
+2. **relative_privation 诉诸更惨**——decision 落选（0.80）。攻击漏判 11/16（69%）、误伤 0/9；存量 suffering_contest 只覆盖第一人称自陈比惨，「别嫌房租贵了，有人睡大街呢」类第三方苦难贬低整族全漏；1 条漏判样本已被存量维度部分命中（真零命中 10/11），语域偏情感对话。r721/r722 连续两轮落选，下轮需构造更强身份对齐判据。
+3. **void_zh_standard_shift 契约作废窄口**——本轮复测攻击漏判 13/17（76%）仍为全池最高；复测同时确认 post_hoc 词边界修复后该族**误伤 1/12 → 0/12**（`scripts/round-722-family-probe.js` 重跑实测），**该族现为合格候选**（漏判 76% 全池最高、误伤 0）。r696 起已遗留 27 轮，下轮优先。
+4. **33+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+
+## 全量回归验证（run-all，非六门禁项，额外跑了做零回归证明）
+
+`node test/run-all.js` 全量：**18239 通过 / 139 失败 / 共 18378**。139 个失败经两树对比证明**全部预存**：① 46 个文件级失败在 r721 状态（b1c3a38 worktree）与当前状态逐一复跑，**退出码 46/46 完全一致（diff=0）**；② classics-rules 19/20、AgentBoundaryGuard 7/8、ai-writing-tell round200 守卫 7/13、bidirectional-guard.test.js 11/12 四个单独复跑同样两树一致（前者为 Windows 平台语义——POSIX 路径/含空格路径 spawn 未加引号/`lines.length - 1` 字符串断言被 v6.8.65 重构改掉，均为 v6.8.65 前后的历史问题）；③ security-audit 在 run-all 内 15/16 是 commit 中途的 git 状态竞争，提交完成后单独跑 16/16。**本轮引入零新增回归。**
+
+## 踩坑（三条）
+
+1. **decision 首轮 A/B 打平弃权**：identity_alignment 走 `_checkIdentityAlignment`，memory 无 identity rules 时对所有选项返回默认 0.8，A/B 的 feasibility/consequence_value 差异正好抵消成 0.81/0.81。教训：构造判据时要预判打平——主动用真实可区分事实（族内补形 vs 新语域、复测轮数、样本面、边界清晰度）拉开 composite，且 ratioGap 判据是 `|A-B|/(A+B) ≥ 0.01`，按比例算不按绝对差算，0.82/0.81 的显示值仍可能弃权（真实值差 0.0155 时比例差 0.0095 < 0.01）。
+2. **patch 误替换 ZH 路由块**：post_hoc R2 实际是 ZH/EN 两个并列块，old_string 只写 EN 条件时 context_aware 策略定位到了 ZH 块，把 ZH 路由换成了 EN 条件——若不复读全文核对 diff 就会静默破坏中文路由。教训：多路由模块改匹配逻辑必须整段重读 + 跑既有攻击集验证每条路由，不能只看 patch 报成功。
+3. **负例注入值类型坑**：`loadWithOverrides({ X: [] })` 传 JS 数组，源码替换时 `'' + []` 变空串，注入出 `const X = ;` 语法错误。教训：注入值必须是字符串 `'[]'`（post_hoc 先例如此，抄的时候别"优化"成数组）。
+
+# r721 轮报告（v6.8.69）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r720 交接簿
+「已知未修项」+ 新侦察：appeal_to_probability（r720 落选，本轮补
+语域真实分布）+ relative_privation（新侦察）+ hot_hand（新侦察）+
+void_zh_standard_shift（25 轮存量窄口复测）+ argument_from_incredulity
+/ appeal_to_consequences（新侦察），按「引用 UPGRADE_LOG tail 当
+现状前必须复测」纪律用本轮探测器
+`scripts/round-721-family-probe.js` 在当前引擎（v6.8.68，151 维）
+逐族复测，喂给 decision 本体（`scripts/decide-r721.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A appeal_to_probability 可能性误当必然新维度 | **0.81** | 攻击漏判 12/16（75%）、真零命中 12/12、误伤 0/10 | **选中** |
+| B relative_privation 诉诸更惨新维度 | 0.80 | 攻击漏判 10/14（71%）、真零命中 9/10、误伤 0/9 | 落选 |
+| C hot_hand 热手谬误新维度 | 0.79 | 攻击漏判 8/12（67%）、真零命中 8/8、误伤 0/8 | 落选 |
+| void_zh_standard_shift 契约作废窄口复测 | — | 攻击漏判 13/17（76%）、误伤 **1/12** | 不合格（存量误伤，连坐纪律） |
+| argument_from_incredulity / appeal_to_consequences 新侦察 | — | 漏判 5/12（42%）/ 4/12（33%） | 不够格（<50%） |
+
+decision 返回 composite_score 0.81 / confidence 0.78 / identity
+alignment 0.8，无弃权。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在三个合格候选间
+选出 A。身份对齐依据：可能≠必然是辨别者的核心界线之一——「概率
+当保证」的伪确定性遍布彩票/创业/考试/投资话术，本族是 r720 落选后
+补语域高频形态（航班安全/蒙题/十四亿人口/keep playing bound to win）
+漏判率 63%→75% 后中选，漏判率与样本面均为三候选最高，新维度键 +1。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/appeal-to-probability.js`（第 152 维度，双腿共现：基数/重复/规模/时长表达 × 必然性断言，三豁免：正确概率陈述/元话语/概率教学第三人称） | 「宇宙这么大，肯定有外星人」「航班天天飞，我肯定赶不上」「投了这么多份简历，总有一家会要我吧」类规模替代必然话术现在会被 gate 判 verify 并给出「把『一定』落到期望值与证据上」的指引 | **真升级①**（新辨别维度上线） |
+| 九处接线（require/计算点/allDims/dimMap/维度语义表/VERIFY_DIMS 登记/补登记/summary/exports） | 维度键 151→152，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+| 文档计数同步 + Verify-level 列举补 appeal_to_probability + README changelog + 版本 bump 6.8.68→6.8.69 | 文档口径与引擎一致 | 维护（文档/版本） |
+
+## 验收数字
+
+- 轮测试 `test/round-721-appeal-to-probability.js`：**55/55 通过**（攻击 20 + 良性 21 + 边界锁 + 分工边界 4 + gate 层登记 5）
+- 负例注入 `scripts/negative-test-appeal-to-probability.js`：**17/17 通过**（8 常量逐一置空验证承重 + 豁免常量定向验证）
+- `node bin/verify.js`：16/16
+- `node scripts/bidirectional-guard.js`：双向门禁通过（召回侧不变 + 误拦侧与基线一致零新增）
+- `node scripts/guard-abilities.js`：20/20（dimensions 键 152）
+- `node test/doc-numbers-accuracy.test.js`：22/22
+- `node test/security-audit.test.js`：16/16
+
+## 已知未修项（含为什么不修）
+
+1. **relative_privation 诉诸更惨**——decision 落选（0.80）。攻击漏判 10/14（71%）、误伤 0/9；存量 suffering_contest 只覆盖第一人称自陈比惨，「你至少还有学上，非洲的孩子连饭都吃不上」类第三方苦难贬低整族全漏；1 条漏判样本已被存量维度部分命中（真零命中 9/10），语域偏情感对话。
+2. **hot_hand 热手谬误**——decision 落选（0.79）。攻击漏判 8/12（67%）、误伤 0/8；gamblers_fallacy 第 148 维只覆盖「连胜之后该反转」（due 方向），热手（势头延续）是自然反向补形，属相邻族补形非新语域开拓。
+3. **void_zh_standard_shift 契约作废窄口**——本轮复测攻击漏判 13/17（76%）为全池最高，但误伤 1/12（连坐纪律：先修存量误伤再谈上线）。r696 起已遗留 26 轮。
+4. **33+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+5. **data/test-count.json 记账自锁**——按纪律不为了消记账红灯跑 20 分钟全量回归。
+
+## 踩坑（三条）
+
+1. **中文数字字符类漏「十」**：蒙题攻击样本「蒙个十道八道」的腿①正则写 `[\d几一两]`（只收 0-9/几/一/两），不含口语高频的「十」，样本不命中。修法：补「十」后 16/16 全中。教训：中文数量词字符类必须覆盖口语全集（一二两三十几）。
+2. **负例测试豁免常量「冗余」误报**：首版注入验证只跑攻击集，豁免常量（META_NOUN/EVIDENCE/THIRD_PERSON）对攻击句当然零影响，被判「常量冗余」。修法：补 4 条双腿在场、各被一个豁免常量拦下的豁免样本，清空常量后必须恢复命中。教训：负例注入的样本集要覆盖「该常量真正管事」的句子，不能只用攻击句。
+3. **gate 层良性 verify/rewrite 归因**：冒烟时 3 条良性在 gate 层 verify/rewrite，用 `git show HEAD:src/index.js` 建旧引擎对照跑同 3 条——旧引擎同样 verify/verify/rewrite，确认是存量 gate 行为非本轮引入。教训：良性断言以本维度模块层不命中为准，gate 层存量行为先对照再归因。
+
+## round-guard [after] 复跑
+
+（三连提交后复跑，结果见 git log 与文末状态）
+
+# r720 轮报告（v6.8.68）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r719 交接簿
+「已知未修项」+ 新侦察：void_zh_standard_shift（25 轮遗留）+
+post_hoc（五连续落选）+ appeal_to_probability（新侦察族），按
+「引用 UPGRADE_LOG tail 当现状前必须复测」纪律用本轮探测器
+`scripts/round-720-family-probe.js` 在当前引擎（v6.8.67，150 维）
+逐族复测，喂给 decision 本体（`scripts/decide-r720.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A void_zh_standard_shift 契约作废窄口补形 | 0.79 | 攻击漏判 12/16（75%）、真零命中 12/12、误伤 0/12 | 落选（存量补形非新维度） |
+| B post_hoc 后此谬误新维度 | **0.81** | 攻击漏判 10/14（71%）、真零命中 10/10、误伤 0/10 | **选中** |
+| C appeal_to_probability 可能性误当必然新维度 | 0.80 | 攻击漏判 5/8（63%）、真零命中 5/5、误伤 0/7 | 落选 |
+
+decision 返回 composite_score 0.81 / confidence 0.75 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在三个合格候选间
+选出 B。身份对齐依据：后此谬误是「以先后代因果」的经典谬误——
+辨别者的天职就是识破「因为发生在前面所以是原因」的伪因果。本族
+r715-r719 五连续落选，本轮补语域高频形态（杀毒软件/手机号/加班
+缺席/椅子玄学）后漏判率从 56% 升到 71%，超过 void_zh_standard_shift
+的绝对漏判数成为最高。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/post-hoc.js`（第 151 维度，三路由：缺位-灾厄共现×回避 / 干预-变化共现 / 归因措辞直判，三豁免：正当程序/元话语/必要非充分声明） | 「那天没去加班第二天就出乱子」「自从换了领导业绩就下滑」类时间归因话术现在会被 gate 判 verify 并给出「时间先后不等于因果」的指引 | **真升级①**（新辨别维度上线） |
+| AVOID_ZH 补「不敢」口语变体（以后不敢/以后我不敢/我不敢）——负例注入测试暴露基础攻击样本「以后我不敢缺席了」不翻转 | 中文口语回避形全部命中 | 真升级①的组成部分（判据射程） |
+| 九处接线（require/计算点/allDims/dimensions×2/DIM_GUIDANCE/VERIFY_DIMS/summary/exports） | 维度键 150→151，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+| 文档计数同步 + Verify-level 列举补 post_hoc + README changelog + 版本 bump 6.8.67→6.8.68 | 文档口径与引擎一致 | 维护（文档/版本） |
+
+## 验收数字
+
+- 轮测试 `test/round-720-post-hoc.js`：**55/55 通过**（攻击 20 + 良性 21 + 边界锁 + 分工边界 2 + gate 层登记 3）
+- 负例注入 `scripts/negative-test-post-hoc.js`：**74/74 通过**（首轮 65/74，补 AVOID_ZH 三变体后全过）
+- `node bin/verify.js`：16/16
+- `node scripts/bidirectional-guard.js`：双向门禁通过（召回 52/52，误拦 302/326，与基线一致零新增）
+- `node scripts/guard-abilities.js`：20/20（dimensions 键 151）
+- `node test/doc-numbers-accuracy.test.js`：22/22
+- `node test/security-audit.test.js`：16/16（S2 _verifyGitCommit 由含版本号的 feat commit 转绿）
+
+## 已知未修项（含为什么不修）
+
+1. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.79）。攻击漏判 12/16（75%）为三候选最高，但属存量补形非新辨别维度，且 r696 起已遗留 25 轮，样本面 16 条。下轮可作专项修复轮候选。
+2. **appeal_to_probability 可能性误当必然**——decision 落选（0.80）。攻击漏判 5/8（63%）、真零命中 5/5、误伤 0/7；wishful_thinking/gamblers_fallacy 存量维度只覆盖「坚持买一定中」形，「宇宙这么大肯定有外星人」「试多了总能成」整族全漏。样本面 8 条最小，下轮补语域形态后可再参选。
+3. **33+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+4. **data/test-count.json 记账自锁**——按纪律不为了消记账红灯跑 20 分钟全量回归。
+
+## 踩坑（两条）
+
+1. **AVOID_ZH 常量覆盖不足**：基础攻击样本用「以后我不敢缺席了」而常量只定义「再也不敢」——负例注入测试（置空 AVOID_ZH 后期望翻转）暴露该样本不翻转。修法：补「以后不敢/以后我不敢/我不敢」三口语变体。教训：负例注入是常量覆盖不足的探针，基础攻击样本必须过注入验证。
+2. **VERIFY_DIMS 未从 index.js 导出**：轮测试想 require 断言登记，实际 undefined——改用源码段正则匹配。另 gate 层验证级断言改为「post_hoc 命中需 verdict≠可信、良性句保持可信」的行为断言，比登记断言更贴近用户可感知效果。
+
+## round-guard [after] 复跑
+
+（三连提交后复跑，结果见 git log 与文末状态）
+
+# r719 轮报告（v6.8.67）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r718 交接簿
+「已知未修项」+ r719 全局修复后状态变化：special_pleading（修复
+crisis_exceptionalism 存量误伤后 fp 清零，本轮首次够格）+ void_zh_
+standard_shift + post_hoc，按「引用 UPGRADE_LOG tail 当现状前必须
+复测」纪律用本轮探测器 `scripts/round-719-family-probe.js` 在当前
+引擎（v6.8.66，149 维）逐族复测，喂给 decision 本体
+（`scripts/decide-r719.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A special_pleading 特殊辩护新维度 | **0.85** | 攻击漏判 9/9（100%）、真零命中 9/9、误伤 0/9 | **选中** |
+| B void_zh_standard_shift 契约作废窄口补形 | 0.80 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| C post_hoc 后此谬误新维度 | 0.80 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选 |
+
+decision 返回 composite_score 0.85 / confidence 0.8 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在三个合格候选间
+选出 A。身份对齐依据：特殊辩护是「用例外身份替代同一套标准」的
+核心形态——辨别者的天职就是识别「对自己一套对别人一套」的双标
+结构；漏判率 100% 为三候选最高。**本族是 r716-r718 三连续出局后
+的首个轮回**：每次出局都因存量误伤（fp=1/9），r719 全局修复
+crisis_exceptionalism GUARD_ZH 后 fp 清零，本轮才够格——「先修
+存量误伤、再上新维度」的纪律在本族上完整走了一轮。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/special-pleading.js`（第 150 维度，三路由判据：规则他指×自我例外 / 他人受管×自我豁免 / 特殊身份×例外许可，三豁免：正当程序/元话语/更严审查） | 「规则是给普通人定的，我不一样」类话术现在会被 gate 判 verify 并给出「把为什么你可以例外落到正当理由与程序上」的指引 | **真升级①**（新辨别维度上线） |
+| 高频形态补支路（制度是管老百姓的/想来就来/Ordinary employees need/Others must/I make the rules/do not bother）——首轮测试 9 个 MISS 暴露后补的真实缺口 | 职场双标/特权话术的中英文攻击样本全部命中 | 真升级①的组成部分（判据射程） |
+| 九处接线（require/计算点/allDims/dimensions×2/DIM_GUIDANCE/VERIFY_DIMS/summary/exports） | 维度键 149→150，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+
+## 验收数字
+
+- 轮测试 `test/round-719-special-pleading.js`：**56/56 通过**（攻击 20 + 良性 21 + 边界锁 8 + 分工边界 2 + gate 层 5；首轮 47/56，补支路后全过）
+- 负例注入 `scripts/negative-test-special-pleading.js`：**21/21 通过**（基线 7 + 常量注入 9 + 豁免注入 3 + 未知键 1 + internals 覆盖 1）
+- `node bin/verify.js`：16/16
+- `node scripts/bidirectional-guard.js`：双向门禁通过（召回侧不变、误拦侧与基线一致）
+- `node scripts/guard-abilities.js`：20/20（dimensions 键 150）
+- `node test/doc-numbers-accuracy.test.js`：22/22
+- `node test/security-audit.test.js`：见提交后复验
+- `node scripts/round-guard.js --stage=after`：见文末复跑记录
+
+## 已知未修项（含为什么不修）
+
+1. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.80）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r696 起遗留（已 25 轮），作废词表补变体即可，但样本面 9 条最小。下轮首选。
+2. **post_hoc 后此谬误**——decision 落选（0.80）。攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9；r715-r719 五连续落选，与 pseudo_causal 语域相邻。样本面与漏判率均最小，若继续落选应考虑并入 pseudo_causal 扩形而非独立维度。
+3. **evidence 维度基线打分器**——r719 全局修复已证伪为有意设计（v6.7.73 中性默认），记录已摘除，不再列为未修项。
+4. **round-145/probe-r145-re.js 上游坏码**——ZS 数组解构形状残骸，远程同样坏，非门禁链文件，隔离记录不修。
+5. **33+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+6. **data/test-count.json 记账自锁**——按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **首轮测试 9 个 MISS 全在新侦察高频形态**：首版判据只覆盖探测器 9 条（教科书双标句），新补的职场/制度语境形态（制度是管老百姓的/想来就来/Ordinary employees need/Others must/I make the rules/do not bother）大量 MISS。修法：腿①「老百姓」入列表、OTHERS_BOUND 补通报/批评/考核/检讨动词与「签到对他们是硬要求」制度他指形、SELF_EXCEPT_EN 补 beyond/of my caliber/make the rules/do not bother、RULE_OTHERS_EN 放开 must/need 后的 to（`Others must file` 无 to）。教训：与 r717 赌场形态、r718 拉踩形态同构——语域高频变体必须靠候选样本实测逼出，这是第三轮同型踩坑，「写探测器候选样本时按语域真实分布取样」应固化为纪律。
+2. **EN 腿一支路多写了 `\s+to`**：`others must file reports` / `Ordinary employees need approval` 中 must/need 后直接跟宾语，无 to——我照 `everyone else has to` 的形状把 to 写进支路，两条新样本因此 MISS。教训：英文助动词支路的 to 是可选的，除非目标句式确实固定带 to。
+3. **分工边界样本实测前置第三次奏效**：DIVISION-1/2 落笔前先跑实测（standard_shift 语域 verify、responsibility_absolution 语域 rewrite，本模块均不命中）——延续 r717/r718 两次「锁空气」教训后，本轮一次选对。教训：分工样本先实测再落笔，已是连续第三轮验证该纪律。
+
+## round-guard [after] 复跑
+
+（三连提交后复跑，结果见 git log 与文末状态）
+
+# 全局修复（v6.8.66，r719 专项）
+
+## 修复清单（按证伪纪律逐条）
+
+| 项 | 验证结论 | 处置 |
+|---|---|---|
+| **evidence 打分器「恒返回 {score:1, issues:[]}」**（r690 起连续 13 轮记录） | **证伪**：读 src/index.js:5618 确认是 v6.7.73 有意设计——无 evidence 参数时中性默认 1.0，注释明确「未提供证据不应被判证据不足」（v6.7.31 修复原则）。13 轮的「未修项」记录本身是误报， whoever 记录它时没读注释 | 从交接簿摘除，证伪依据记录在案 |
+| **special_pleading 存量误伤**（fp=1/9 连续 3 轮） | 真误伤。定位：焦点样本「特殊情况需要特批，但要走正规流程」被存量维度 crisis_exceptionalism 判 rewrite——B1「特殊情况」（特殊+情况）命中 × B2「流程」名词**单独成支**（SUSPEND_ZH 第一行缺让位动词共现要求）。该句是要求走程序的合规表述 | **已修**：GUARD_ZH 补三支「遵守正规程序」看守（走/按照/经过+正规/正常/法定+流程/程序/手续/审批；正规流程办理形；特批也需走流程形）。验收：焦点样本 gate=pass ✓、攻击 0 漏判（5+3 条）✓、round-327 现有 30 测试无回归 ✓ |
+| **fetch-wikipedia-formulas.js 上游坏码** | `.then(res => res.text())` 后缺 `.then(data =>` 一层，try 块错位、`});` 多层（远程同样坏） | **已修**：补 promise 链一层，语法通过 |
+| **fetch-more-formulas.js 上游坏码** | 同型：safeFetch promise 链里混了 http.get 流式回调（`res.on('data')` + 不存在的 `req`），远程同样坏 | **已修**：逻辑搬进 `.then(data =>` + `.catch`，语法通过 |
+| **round-145/probe-r145-re.js 上游坏码** | Z1 巨正则缺闭合斜杠（已补），但 ZS 数组解构形状仍有残骸（Z2 起报 destructuring），远程同样坏；非门禁链文件 | **隔离不修**：考古成本超预算，记录在案。全仓语法坏 3→1，剩余 1 个即此文件 |
+
+## 验证（修复后全绿）
+
+- 全仓 3159 JS 语法坏 = 1（隔离项，远程同样坏）
+- special_pleading 族复测：焦点样本 fp 1/9 → **0/9**（攻击侧仍 9/9 漏判，待未来轮次上新维度）
+- 六项门禁复扫：见提交记录
+
+# 全局审计 + Windows 工具链适配（v6.8.65，r718 后置专项）
+
+## 审计范围与工具
+
+repo-audit.js 全仓（5168 文件 / 1,795,983 行）+ guard-require-integrity +
+audit-missing-requires + dimension-coverage-scan + lang-coverage-audit +
+skill-md-audit + api-surface-audit + assertion-quality-scan 系列 +
+六项门禁全量复扫。
+
+## 审计发现与处置（按证伪纪律逐条）
+
+| 报告项 | 验证结论 | 处置 |
+|---|---|---|
+| SECRETS 6 处 | `data/keys/root-key.json` 未入 git 且 .gitignore 有 `data/keys/` 覆盖；其余 5 处是审计工具自身与安全测试夹具 | **误报**，不动 |
+| SHELL 306 处 | 引擎设计内的本地脚本调用（构建/探针/归档），无外部输入注入面 | 误报（设计用途） |
+| TRAV 83 处 | scripts/round-NNN 探针的 path.join 本地拼接；引擎有 SAFE-FS 越界拦截 | 误报（本地拼接≠traversal） |
+| PROMPT 43 处 | docs/presets/examples 的提示词库——心虫的产品内容不是漏洞 | 误报 |
+| **657 文件硬编码 `/root/...`** | **真问题**：Windows 副本上整套 scripts/test/bin 工具链 ENOENT，审计器一半起不来 | **已修**（见下） |
+| `src/multi-turn-tactics.js` 死变量 `HF` | 定义后零使用 | 已删 |
+| `test/_tmp_r388_negA.js` 编辑器残骸 `(?!x)x` + `''` | 历史坏码混入 git（基线快照带入） | 已清 |
+| 3 个上游坏码（fetch-*formulas / round-145 probe） | 验证 origin/main 同样坏——上游历史遗留的一次性脚本 | **不修**，记录在案 |
+| License missing | 仓库根无 LICENSE | 观察项（发布完备性，不阻塞门禁） |
+
+## Windows 工具链适配修复（653 文件，三个脚本 + 手工收尾）
+
+1. `scripts/fix-windows-root-hardcode.js`：注入 `__HF = path.join(__dirname, <按深度>)` 替换 710 处硬编码
+2. `scripts/fix-double-hf-inject.js`：修 647 处双注入（const 重复声明）+ 629 处 TDZ（__HF 排在 path require 前）
+3. `scripts/fix-stringified-hf.js`：修 713 处字符串化 `__HF` + 181 处双重前缀 `__HF + '__HF/...`
+4. 手工收尾：fix-evaluators / round-287 / round-530 / reward-hacking-round96 四个特殊形态（path 变量名冲突 / node:path 前缀）
+5. shell 两个：start-mcp.sh 与 round-637 的 REPO 改 dirname 推导
+
+**修复过程中的两个自伤坑（已记入技能）**：修复脚本扫描自身导致 TDZ（加 self-exclusion）；`node --check` 验证的是磁盘原文而非内存修复内容 → 652 个坏文件被误判通过（改先写后验）。
+
+## 修复后验证（全绿）
+
+- 全仓 3159 JS 语法坏 = 3（全是上游历史遗留，远程同样坏）
+- 六项门禁：verify 16/16 ✓ doc-numbers 22/22 ✓ guard-abilities 20/20 ✓（键 149）security-audit 16/16 ✓ bidirectional ✅ ✓
+- 审计器复跑：skill-md-audit 踩空 0 ✓ api-surface 无漂移 ✓ orphan-dimension ✓ require 完整性 0 C 类 ✓ dimension-coverage 0 闸门漏判 ✓
+- 引擎冒烟：status running，记忆库正常
+- r717 测试 GATE-2 总数断言 148→149 更新（每轮新维度的预期过期，非回归）
+
+# r718 轮报告（v6.8.64）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r717 交接簿「已知
+未修项」点名的 appeal_to_majority（下轮首选）+ void_zh_standard_shift
++ post_hoc + special_pleading 存量误伤，按「引用 UPGRADE_LOG tail 当
+现状前必须复测」纪律用本轮探测器
+`scripts/round-718-family-probe.js` 在当前引擎（v6.8.63，148 维）
+逐族复测，喂给 decision 本体（`scripts/decide-r718.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A appeal_to_majority 诉诸多数新维度 | **0.83** | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | **选中** |
+| B void_zh_standard_shift 契约作废窄口补形 | 0.80 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| C post_hoc 后此谬误新维度 | 0.80 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选 |
+| （复测出局）special_pleading 特殊辩护 | — | 攻击漏判 9/9（100%）但误伤 1/9 | 不合格（fp≠0 按 Phase 0.7b 纪律；焦点样本「特殊情况需要特批，但要走正规流程」本轮复测仍被存量维度判 rewrite，连续第三轮记录） |
+
+decision 返回 composite_score 0.83 / confidence 0.8 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在三个合格候选间
+选出 A。**预区分判据生效**：A 与 B 漏判率打平 67%/67%，按「新维度
+vs 存量补形」和身份对齐度细化 consequence_value（0.82 vs 0.72）
+后 decision 本体直接选出 A，未出现 r716 式弃权。身份对齐依据：
+诉诸多数是「用票数替代论证」的核心认知偏差形态——辨别者的天职
+就是区分「人数」和「论证」。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/appeal-to-majority.js`（第 149 维度，双腿判据：多数/流行度表达×人数收束结论，三豁免：有出处人数陈述/元话语/逻辑教学第三人称） | 「大家都这么认为，肯定是对的」类话术现在会被 gate 判 verify 并给出「把对不对落到证据上」的指引 | **真升级①**（新辨别维度上线） |
+| 高频形态补支路（十个人里有九个/widely accepted/popular opinion says/millions of fans/most experts agree/他不火谁火/还能有假）——首轮测试 8 个 MISS 暴露后补的真实缺口 | 拉踩/带货/网暴语境的中英文攻击样本全部命中 | 真升级①的组成部分（判据射程） |
+| 九处接线（require/计算点/allDims/dimensions×2/DIM_GUIDANCE/VERIFY_DIMS/summary/exports） | 维度键 148→149，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+
+## 验收数字
+
+- 轮测试 `test/round-718-appeal-to-majority.js`：**56/56 通过**（攻击 20 + 良性 21 + 边界锁 8 + 分工边界 2 + gate 层 5；首轮 48/56，补支路 + 换分工样本后全过）
+- 负例注入 `scripts/negative-test-appeal-to-majority.js`：**17/17 通过**（基线 8 + 常量注入 4 + 豁免注入 3 + 未知键 1 + internals 覆盖 1）
+- `node bin/verify.js`：16/16
+- `node scripts/bidirectional-guard.js`：召回侧 unchanged、误拦侧 74/77 pass（96.1%），双向门禁通过（Windows 副本口径）
+- `node scripts/guard-abilities.js`：20/20（dimensions 键 149）
+- `node test/doc-numbers-accuracy.test.js`：22/22
+- `node test/security-audit.test.js`：见提交后复验
+- `node scripts/round-guard.js --stage=after`：见文末复跑记录
+
+## 已知未修项（含为什么不修）
+
+1. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.80）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r696 起遗留（已 23 轮），作废词表补变体即可，但样本面 9 条最小。下轮首选。
+2. **post_hoc 后此谬误**——decision 落选（0.80）。攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9；r715/r716/r717/r718 四连续落选，与 pseudo_causal 语域相邻。
+3. **special_pleading 特殊辩护存量误伤**——本轮复测确认「特殊情况需要特批，但要走正规流程」仍被存量维度判 rewrite（fp=1/9），按 Phase 0.7b 纪律不输出为候选；连续第三轮记录，值得单独一轮修存量豁免。
+4. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十三轮记录。
+5. **31+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+6. **data/test-count.json 记账自锁**——按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **首轮测试 8 个 MISS 集中在拉踩/带货高频形态**：首版 MAJORITY/CONCLUSION 只覆盖「大家都/肯定是对的」教科书形态，「十个人里有九个说好，这还能有假」「widely accepted, therefore it has to be right」「millions of fans cannot be wrong」「most experts agree」全漏。修法：MAJORITY_ZH 补比例词（十个人/九成/过半/半数/乡亲们/粉丝）与「都在X」族，CONCLUSION_ZH 补反问收束（还能有假/有什么可怀疑/他不火谁火），EN 两侧补 commonly accepted / widely held / most experts agree / so he must be / has to be。教训：与 r717 赌场形态同构——语域的高频变体要靠候选样本实测逼出来，首版「最小覆盖」必然有缺口，这是测试的价值不是造假。
+2. **分工边界样本第二次选错（锁空气）**：DIVISION-2 首版用「这款产品好评如潮，用户评价都是编出来的」，实测 gate=pass——存量维度也不判，断言锁的是空气。修法：换「这款产品上线三天就有十万条五星好评，一看就是刷出来的」（存量 synthetic_social_proof 判 verify，apm 不命中）。教训：r717 已踩过一次（statistical_misleading 样本放行），本轮又栽在同类句式上——分工样本落笔前必须**先实测 gate action**，「应该被认领」的语域直觉不可靠。
+3. **round-guard 在 Windows 需要 stdin 关闭**：`node scripts/round-guard.js --stage=before` 直接跑报 "stdin is not a tty"（脚本内部有 readline 交互），加 `< /dev/null` 即过。教训：Windows 副本跑门禁脚本统一加重定向，与 r717 的路径坑并列为本副本两条环境惯例。
+
+## round-guard [after] 复跑
+
+（三连提交后复跑，结果见 git log 与文末状态）
+
+# r717 轮报告（v6.8.63）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r716 交接簿「已知
+未修项」点名的 gamblers_fallacy（下轮首选）+ appeal_to_majority +
+post_hoc + void_zh_standard_shift + special_pleading 存量误伤，按
+「引用 UPGRADE_LOG tail 当现状前必须复测」纪律用本轮探测器
+`scripts/round-717-family-probe.js` 在当前引擎（v6.8.62，147 维）
+逐族复测，喂给 decision 本体（`scripts/decide-r717.js`）：
+
+| 候选 | 分数 | 实测证据 | 结果 |
+|---|---|---|---|
+| A gamblers_fallacy 赌徒谬误新维度 | **0.84** | 攻击漏判 8/9（89%）、真零命中 8/8、误伤 0/9 | **选中** |
+| B appeal_to_majority 诉诸多数新维度 | 0.82 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| C void_zh_standard_shift 契约作废窄口补形 | 0.80 | 攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9 | 落选 |
+| D post_hoc 后此谬误新维度 | 0.80 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9 | 落选 |
+| （复测出局）special_pleading 特殊辩护 | — | 攻击漏判 9/9（100%）但误伤 1/9 | 不合格（fp≠0 按 Phase 0.7b 纪律不输出为候选；误伤样本「特殊情况需要特批，但要走正规流程」本轮复测仍被存量维度判 rewrite） |
+
+decision 返回 composite_score 0.84 / confidence 0.8 / identity
+alignment 0.8，无拒选。诚实标注：候选的 feasibility/consequence_value/
+risk/confidence 四段判据由我构造，decision 本体在四个合格候选间
+选出 A。身份对齐依据：赌徒谬误是「用历史频率替代独立概率」的
+典型认知偏差——辨别者的天职就是区分「频率」和「概率」，这正是
+辨别层最该抓的概率误判。
+
+**src/index.js 同族 pattern 澄清**：src/index.js 既有 3 条
+gamblers_fallacy 英文 pattern（en_streak_due 表内），按纪律查
+dimension 键集合确认未上线——那 3 条是「指认不是运用」，不占
+维度键；本维度上线后与其并存，射程互补（那 3 条只认特定英文
+句型，本维度管双腿判据 + 中文全族）。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/gamblers-fallacy.js`（第 148 维度，双腿判据：历史连胜/连败×反转/概率升高预期，三豁免：正确概率陈述/元话语/概率教学第三人称） | 「已经连输五把了，下一把肯定赢」类话术现在会被 gate 判 verify 并给出「把下一次的概率落到独立事件的定义上」的指引 | **真升级①**（新辨别维度上线） |
+| 赌场高频形态补支路（开大/开小、吐分、手气正旺、红黑、losing streak、due for）——候选样本实测 MISS 后补的真实缺口 | 老虎机/彩票/赌桌语境的中英文攻击样本全部命中 | 真升级①的组成部分（判据射程） |
+| 九处接线（require/计算点/allDims/dimensions×2/DIM_GUIDANCE/VERIFY_DIMS/summary/exports） | 维度键 147→148，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+| 修 4 处 Windows 路径硬编码/转义（dimension-registry-guard.js、doc-numbers-accuracy.test.js×3 处 spawnSync 嵌入路径） | 无直接感知 | 维护（环境适配，门禁可在 Windows 副本跑通） |
+
+## 验收数字
+
+- 轮测试 `test/round-717-gamblers-fallacy.js`：**56/56 通过**（攻击 20 + 良性 21 + 边界锁 8 + 分工边界 2 + gate 层 5）
+- 负例注入 `scripts/negative-test-gamblers-fallacy.js`：**17/17 通过**（基线 8 + 常量注入 4 + 豁免注入 3 + 未知键 1 + internals 覆盖 1）
+- `node bin/verify.js`：16/16
+- `node scripts/bidirectional-guard.js`：召回 20/20、误拦侧 74/77 pass（96.1%），双向门禁通过（Windows 副本口径）
+- `node scripts/guard-abilities.js`：20/20（dimensions 键 148）
+- `node test/doc-numbers-accuracy.test.js`：22/22
+- `node test/security-audit.test.js`：全绿（含版本号的 feat commit 落地后复验）
+- `node scripts/round-guard.js --stage=after`：见文末复跑记录
+
+## 已知未修项（含为什么不修）
+
+1. **appeal_to_majority 诉诸多数**——decision 落选（0.82）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r715/r716/r717 三连续落选，与 synthetic_social_proof 语域相邻。下轮首选。
+2. **void_zh_standard_shift 契约作废窄口**——decision 落选（0.80）。攻击漏判 6/9（67%）、真零命中 6/6、误伤 0/9；r696 起遗留（已 22 轮），作废词表补变体即可，但样本面 9 条最小。
+3. **special_pleading 特殊辩护存量误伤**——本轮复测确认「特殊情况需要特批，但要走正规流程」仍被存量维度判 rewrite（fp=1/9），按 Phase 0.7b 纪律 fp≠0 不输出为候选；该存量误伤连续两轮记录，值得单独一轮修（修存量豁免而非加新维度）。
+4. **post_hoc 后此谬误**——decision 落选（0.80）。攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/9；r715/r716/r717 三连续落选，与 pseudo_causal 语域相邻。
+5. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续第十二轮记录。
+6. **30+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+7. **data/test-count.json 记账自锁**——恢复命令要求跑全量回归，按 Phase 2.95 纪律不为了消一个记账红灯跑 20 分钟全量。
+
+## 踩坑（三条）
+
+1. **赌场高频形态不在首版判据内**：首版 STREAK/DUE 正则只覆盖硬币/彩票语境，7 条新侦察攻击样本（老虎机吐分/开大开小/手气正旺/losing streak/due for）实测 6 条 MISS。修法：补 STREAK_ZH（连开/手气正旺/还没吐分/把输了）、DUE_ZH（该开大小/必中/还能赢/赢回来）、STREAK_EN（tails/heads/reds/spins/hands/a losing streak/has not paid out）、DUE_EN（due for/must be next）。教训：写探测器候选样本时要覆盖语域的高频变体（赌场是赌徒谬误的主场），首版判据的「最小覆盖」会在候选实测时暴露——这是探测器的价值，不是测试造假。
+2. **Windows 路径嵌 `node -e` 被转义破坏**：doc-numbers-accuracy.test.js 用 `require('${path.join(HF,...)}')` 把 Windows 反斜杠路径嵌进子进程代码，`\U` 等被 JS 字符串转义吞掉，spawnSync 静默失败 → 维度实测 50、路由/模块实测 0。修法：`JSON.stringify(path.replace(/\\/g,'/'))`。教训：跨平台脚本里嵌路径进子进程代码，必须序列化 + 正斜杠，不能直接模板插值。
+3. **gate.checkOutput 的 findings 在返回顶层不在 .gate 子对象**：冒烟脚本先查 `g.gate.findings` 得 false，实测确认 findings/summary 在顶层（.gate 里只有 action/reason）。教训：新维度冒烟先打印返回结构再写断言，别凭记忆猜字段位置。
+
+## round-guard [after] 复跑
+
+首跑：1 个阻塞（UPGRADE_LOG.md / data/upgrade-state.json 未提交——
+正是 docs/chore 两连要收的尾）；docs + chore 提交后复跑预期全绿
+（版本 6.8.63 在 git log 有 2 条 commit 记录 ✅、无 tmp-* 探针残留 ✅、
+四处版本一致 ✅、UPGRADE_LOG 已含 v6.8.63 记录 ✅）。
 
 # r716 轮报告（v6.8.62）
 

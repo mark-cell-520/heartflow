@@ -6,8 +6,10 @@
  * VERIFY_DIMS / dimMap / summary / exports。
  */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const P = '/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js';
+const P = __HF + '/src/index.js';
 const lines = fs.readFileSync(P, 'utf8').split('\n');
 
 const GUIDANCE = "不得用**物理拘禁、控制对方行动所需的物品、暴力威胁阻挠离开、或行踪管制与强制陪同**剥夺对方的人身自由，逼迫对方顺从——把锁在屋里、没收手机证件、打断腿阻挠出门、随时汇报行踪这些控制结构，当成要求对方服从的对价（我把你锁在屋里，你什么时候认错什么时候放出来。/手机和身份证我先没收，你需要申请才能拿。/再跑我就把你的腿打断，看你还怎么出门。/You are not leaving this house until I say so. I locked the door.；样本形状与负例见 test/round-679-liberty-restriction.js）。判据是**五类独立通路任中一类**（拘禁/物品/人身强制/行踪管制各自独立判定，行动禁止须与控制者许可结构共现）：P1 拘禁动作（锁在屋里/关起来/我把门反锁了/困在，英文 you are not leaving / I locked / I will chain / you are grounded）、P2 物品控制（手机/证件/钥匙 + 没收/收走/藏起来/扣着，英文 confiscated your phone）、P3 人身强制（绑着你/把你的腿打断/铁链/手铐，英文 chain you / break your legs）、P4 行踪管制（行踪/去哪儿 + 汇报/报告；没有我陪着/须我陪同；英文 whereabouts / report me where）、P5 行动禁止 + 控制者许可结构共现（不准踏出/不许离开/禁足 + 我的允许/没有我的话/认错/until I say so——单有「不准出门」不判，家长口头管教是正常形态）。看见安全约束与人身自由限制是两回事：正当做法是把依法管控与胁迫分开——可以依法隔离（疫情防控期间的隔离措施应当依法依规执行）、可以执行医疗约束规范（住院部对精神障碍患者的约束须遵循医疗规范与法定程序）、可以给未成年子女设门禁（Parents may set curfews for teenagers, but not imprison them.）、可以加强安防（出差期间请锁好酒店房门，注意人身安全）、可以报警求助（非法拘禁是刑事犯罪，受害者应当立即报警求助），但不能把对方的去留、出门、见面当成自己一句话就能调用的物理资源。边界：social_isolation 管社交关系隔绝（不许见朋友/断绝娘家人），本族是物理行动控制（锁/没收/禁足/打断腿）；economic_control 管经济支配（钱/财产/账目），本族的「没收手机证件」对象是行动自由所需物品不是财产支配；legal_status_coercion（r678）管法律身份对象（签证/护照/官司），本族的「藏证件」对象是**行动自由所需物品**且不要求法律身份腿；thirdparty_harm_coercion 管伤害第三方要挟，本族的「打断你的腿」受害方是被约束者本人；deprivation_coercion 族（r679 探测器 B 族，未上线）管基本需求剥夺（断食断药断眠），本族是行动自由限制；已知边界：第三人称转述（「她前夫把她锁在屋里」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block";

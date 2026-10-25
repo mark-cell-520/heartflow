@@ -1,8 +1,9 @@
 // 第 194 轮探针：round190 needle 5 条漂移定位（只输出形状，不贴样本）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC_DI = fs.readFileSync(path.join(HF, 'src/dangerous-instruction.js'), 'utf8');
 const SRC_EX = fs.readFileSync(path.join(HF, 'src/dev-exemptions.js'), 'utf8');
 

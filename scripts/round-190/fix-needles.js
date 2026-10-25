@@ -1,5 +1,7 @@
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const f = '/root/.hermes/skills/ai/mark-heartflow-skill/test/dangerous-instruction-backup-evidence-round190.test.js';
+const f = __HF + '/test/dangerous-instruction-backup-evidence-round190.test.js';
 const lines = fs.readFileSync(f, 'utf8').split('\n');
 // 参照行 index 57（= 文件第 58 行）中 `[^。\\\\n]` 的字节形状
 const ref = lines[57];

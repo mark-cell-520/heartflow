@@ -1,7 +1,8 @@
 // [r610] 定位探针：reviewProposal 为何返回空对象（keys=[]），以及 checkValueAlignment 单参行为
 // 只打印形状与布尔结论，不引述任何攻击样本原文。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const { HeartFlow } = require(path.join(ROOT, 'src/core/heartflow.js'));
 
 const hf = new HeartFlow(ROOT);

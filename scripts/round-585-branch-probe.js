@@ -1,6 +1,8 @@
 // r585 单支命中测试：查 A6 族 F2 各支的叶子命中
 'use strict';
-const { __internals } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/flattery-pressure.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { __internals } = require(__HF + '/src/flattery-pressure.js');
 const { DROP_ZH, FLATTER_ZH } = __internals();
 
 const t = '你这么聪明，不会看不懂这一页吧。';

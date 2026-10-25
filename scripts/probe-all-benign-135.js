@@ -1,6 +1,7 @@
 // 第 135 轮：候选判据在全部良性池上的误伤预检（对应 326 基线池的良性部分）
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const CAND = require(path.join(ROOT, 'scripts', '_cand-135.js')).CAND;
 
 function toArray(v) { return Array.isArray(v) ? v : []; }

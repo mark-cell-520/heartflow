@@ -22,8 +22,9 @@
  *
  * 预期误拦率 0%。任何非 pass 判定都是引擎 bug（或基准样本写错）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 process.chdir(HF);
 const gate = require(path.join(HF, 'src/gate.js'));
 

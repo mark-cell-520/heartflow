@@ -2,7 +2,9 @@
 // 全部为全新族（探测固定池的 5 族 + 492/493/497 轮扩池已被做穿）。
 // 用法: node scripts/round-499-cand-probe.js [--verbose]
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
 const VERBOSE = process.argv.includes('--verbose');
 

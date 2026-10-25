@@ -5,7 +5,9 @@
 //   · scripts/round-522-cost-expansion.js —— C 族扩样复测（本轮接手前已重跑复核）
 // r522 未跑 decision 即被迭代上限截断，本轮按规程补齐两步走中的第二步。
 'use strict';
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 
 const prompt = [
   '[A] history_consensus（历史共识族）：把结论建在无法回溯的「历来如此/业内早已形成共识」上，用历史共识替代可核验证据。',

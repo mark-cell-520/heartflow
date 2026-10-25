@@ -1,7 +1,8 @@
 // r637 探针 6：候选能力是否真的「零调用」——全 src/ 搜调用点
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const SRC = '/root/.hermes/skills/ai/mark-heartflow-skill/src';
+const SRC = __HF + '/src';
 const cands = ['aiSelfPositioning','fieldInjector','associativeEngine','globalWorkspace','memoryKernel','memoryIndex','dreamConsolidation','decisionFeedback','gapExecutor','hypothesisDriver','outputChecklist','agentCard','postTraining','decisionExecutor','selfDiagnosis','whatLearned','diagnostic'];
 
 function walk(d, out) {

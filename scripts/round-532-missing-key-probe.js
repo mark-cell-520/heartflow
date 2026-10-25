@@ -1,6 +1,7 @@
 // r532: 实测 agency_deflection / ai_writing_tell 是否「算了、dimMap 有、返回 dimensions 无」
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const { discriminate, checkOutput } = require(path.join(ROOT, 'src/index.js'));
 const gate = require(path.join(ROOT, 'src/gate.js'));
 

@@ -111,6 +111,13 @@
       "source": "test",
       "createdAt": 1791611277369,
       "updatedAt": 1791611277369
+    },
+    "belief_1792940622219_zfvy": {
+      "content": "r605 probe belief never fails",
+      "confidence": 0.85,
+      "source": "test",
+      "createdAt": 1792940622219,
+      "updatedAt": 1792940622219
     }
   },
   "capabilities": [
@@ -166,12 +173,6 @@
     {}
   ],
   "identityHistory": [
-    {
-      "timestamp": 1791391559869,
-      "action": "drift_repair",
-      "removed": 0,
-      "conflicts": []
-    },
     {
       "timestamp": 1791391753393,
       "action": "drift_repair",
@@ -303,6 +304,14 @@
       "action": "drift_repair",
       "removed": 0,
       "conflicts": []
+    },
+    {
+      "timestamp": 1792940622219,
+      "action": "drift_repair",
+      "removed": 1,
+      "conflicts": [
+        "Contradiction: \"always\" vs \"never\""
+      ]
     }
   ],
   "growthMetrics": {

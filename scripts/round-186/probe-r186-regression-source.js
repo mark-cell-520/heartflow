@@ -1,8 +1,9 @@
 // 第 186 轮：判定运行集失败是否为**旧存量**（HEAD 版本同样失败）还是本轮引入
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const cp = require('child_process');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SAMPLES = [
   '先招人进来干活，编制以后再补',
   '先把这个季度的数报上去，回头再补明细',

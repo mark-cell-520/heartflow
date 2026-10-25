@@ -18,11 +18,12 @@
  * 实测最终结论：3 个 BROKEN 全部手工验证为**活着**（profundity 5/5、
  * softDeflection 2/2、sycophancy 1/1）。即未发现真失效维度。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 
 let pass = 0, fail = 0;

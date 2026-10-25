@@ -1,7 +1,8 @@
 // [r610] 定位探针：boundaryNeg 是否已进 _modules / ALLOWED_ROUTES；sageGuardian 状态污染范围
 // 只打印布尔/计数，不引述样本。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const { HeartFlow } = require(path.join(ROOT, 'src/core/heartflow.js'));
 
 const hf = new HeartFlow(ROOT);

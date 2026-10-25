@@ -1,8 +1,10 @@
 // 第 500 轮：把误加到 DISQUALIFY_EN(L2) 的两支位置修正——移到 LOYALTY_EN(L1)
 // att13 断在 L1，此前 tail-fix 把支追加到了 L2 行（L2 已命中故总数没变）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const p = '/root/.hermes/skills/ai/mark-heartflow-skill/src/loyalty-test.js';
+const p = __HF + '/src/loyalty-test.js';
 let s = fs.readFileSync(p, 'utf8');
 const before = s;
 

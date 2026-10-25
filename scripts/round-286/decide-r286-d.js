@@ -1,5 +1,7 @@
 /** [round-286] decision 三跑——B 的诚实性风险已量化，请求重裁 */
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 
 const prompt = [
   '[A] 修 doc-numbers-accuracy.test.js 维度口径漏洞【已三轮探针坐实】。事实链：scripts/measure-claimed-numbers.js 官方口径（discriminate() 数 dimensions 键）实测 57；doc-numbers 测试用「index.js 顶层 function check* 计数」= 50 并硬断言三份文档必须写 50。7 个差异维度（perfect_error / phishing_coercion / induced_trust / coverup_induction / dangerous_instruction / reward_hacking / premature_termination）经 grep 逐个坐实为独立维度：判别函数定义在 src/premature-termination.js、src/manipulation-tactics.js 等外置模块，各有 score + guidance，且成员身份在 BLOCK_DIMS / VERIFY_DIMS 内。v6.7.111 的源码注释明确记载同一漏洞的修法（「原口径数 ^function check* 只得 50 —— reward_hacking 的判别函数在 src/reward-hacking.js 里，照样是独立维度、进了 BLOCK_DIMS 和 dimensions，却没被计入」），但 doc-numbers 测试至今仍用旧口径。后果量化：三份对外文档（AGENTS.md / README.md / SKILL.md）少报 7 个真维度，宣称 50 实际 57，直接违反 AGENTS.md 设计原则 #5 Honest numbers——而本该抓到它的守卫自己拿着错的尺子。工作量：1 处测试口径 + 3 处文档数字，可用变异守卫验证（摘掉 7 个外置 require 之一必须变红）。风险：低，测试口径改为与官方 measure 脚本同源。',

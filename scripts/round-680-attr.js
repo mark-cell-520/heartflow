@@ -5,8 +5,9 @@
  * 归因方法：git stash 后跑一次存 HEAD 基线，stash pop 后再跑一次，逐条 diff。
  */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const BENCH_DIR = path.join(ROOT, 'test');
 const gate = require(path.join(ROOT, 'src/gate.js'));
 

@@ -1,7 +1,8 @@
 // [r610] 定性探针：1) boundaryNeg.assess 缺失 2) reviewProposal 返回体 3) 持久化状态污染
 // 只打印形状，不引述任何攻击样本原文。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const { HeartFlow } = require(path.join(ROOT, 'src/core/heartflow.js'));
 
 const hf = new HeartFlow(ROOT);

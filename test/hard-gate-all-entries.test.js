@@ -9,11 +9,12 @@
  * findings 换成拦截指令、input 回显脱敏。rewrite 级不清内容（交调用方改写），
  * 良性输入零改动。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 
 let pass = 0, fail = 0;

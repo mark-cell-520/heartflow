@@ -17,10 +17,11 @@
  * 下限取 basline-1 而非当前值：允许小幅波动（删一个基准样本），
  * 但阻止断崖式退化（回到 10/50 的 20% 时代）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 // 覆盖率下限（百分点）。提升覆盖率时同步提高这个数字。
 const MIN_HEALTHY = 20;       // 至少 20 个 healthy（当前 24）

@@ -2,11 +2,12 @@
 // 形态沿用 scripts/negative-test-ir-zh-disposable-round121.js（注入-删条-必须变红）
 // v1 教训：5 条 needle 漏了 ) 后紧跟的 \b 导致 ×0 误报 ANOMALY；全部 needle 在
 // check-needles.js 里先逐字校验 ×1 才落进本脚本。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const SRC = '/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js';
-const TEST = '/root/.hermes/skills/ai/mark-heartflow-skill/test/instrumental-en-gan-three-families-round122.test.js';
+const SRC = __HF + '/src/index.js';
+const TEST = __HF + '/test/instrumental-en-gan-three-families-round122.test.js';
 
 const NEEDLES = [
   // 族 A（7 支）

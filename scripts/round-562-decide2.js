@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // [r562] decision 第一轮 chosen:null（B/C/D 分不出）→ 补充可区分判据后重跑。
 // 判据：与现有维度的空档边界距离、判据可形式化程度、误伤风险、可测样本量。
 const fs = require('fs');
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 
 const prompt = [
   '[A] moral_licensing 道德许可：以既往善行/相对干净为由，给当前越界行为发许可证。',

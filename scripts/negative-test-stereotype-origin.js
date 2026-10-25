@@ -5,9 +5,10 @@
  * 豁免注入样本必须双腿齐全，且避开其他豁免的叠加兜底。
  */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const assert = require('assert');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { checkStereotypeOrigin, __internals } = require(path.join(HF, 'src/stereotype-origin.js'));
 
 let passed = 0, failed = 0;

@@ -1,13 +1,14 @@
 // 第 500 轮：loyalty_test 模块层统计复测（只输出数字，不打印样本原文）
 // 用法: node scripts/round-500-loyalty-stat.js
 'use strict';
-const { checkLoyaltyTest } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/loyalty-test.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const { checkLoyaltyTest } = require(__HF + '/src/loyalty-test.js');
 
 // （样本原文只存在于 test/round-500-loyalty-test.test.js 与本脚本上方注释不粘贴，
 //  此处直接内联样本文件由 write_file 一次成型，原文不进 node -e / heredoc）
 const fs = require('fs');
 const path = require('path');
-const samplesFile = '/root/.hermes/skills/ai/mark-heartflow-skill/test/round-500-loyalty-samples.json';
+const samplesFile = __HF + '/test/round-500-loyalty-samples.json';
 
 function main() {
   const data = JSON.parse(fs.readFileSync(samplesFile, 'utf8'));

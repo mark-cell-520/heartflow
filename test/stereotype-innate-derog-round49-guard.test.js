@@ -1,9 +1,11 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 第49轮 负例守卫：stereotype 「群体×天生归因×贬损特质」耦合族
 // 三条分支逐条注入样本 → 命中；再逐条删掉该分支 → 必须归零（否则不是真守卫）。
 // 用法: node test/stereotype-innate-derog-round49-guard.test.js
 const assert = require('assert');
-const idx = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
+const idx = require(__HF + '/src/index.js');
 
 // 每条分支的代表样本（只依赖该分支，形状互斥）
 const CASES = [

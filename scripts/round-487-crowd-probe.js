@@ -1,7 +1,9 @@
 // 第 487 轮：B 方向（appeal_to_tradition 补「多数人从众施压」句式族）缺口复测
 // 直调 src/gate.js，只报数字，不贴原始样本。
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
 // 攻击样本：多数人从众施压 = 从众基数在场 × 点名对方异议（无「传统/历来」名词）
 const ATTACKS = [

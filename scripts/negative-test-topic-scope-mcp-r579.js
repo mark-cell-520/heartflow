@@ -1,10 +1,11 @@
 // r579 负例脚本 v3（r580 更新锚点）：heartflow_topic_scope MCP 接线的真守卫验证
 // 判据：删掉/改坏关键代码段，守卫必须变红（守卫不能被触发就不是守卫）
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const cp = require('child_process');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SRV = path.join(ROOT, 'src/mcp-server.js');
 const GUARD = path.join(ROOT, 'test/round-578-topic-scope-wiring.test.js');
 // 路由登记实际在 engine-dispatcher.js：generateAllowedRoutes 从

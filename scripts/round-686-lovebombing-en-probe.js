@@ -2,7 +2,9 @@
 // 判据从严：gate.checkOutput() 的 r.gate.action === 'pass' 才算漏判
 // 零覆盖证明：对漏判样本跑 discriminate() 确认全维度零命中
 // 良性误伤 !== 0 的族一律不输出为候选
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
 const currentDims = Object.keys(gate.discriminate('probe').dimensions);
 console.log(`当前引擎维度键数: ${currentDims.length}`);

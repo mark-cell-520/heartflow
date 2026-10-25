@@ -1,10 +1,11 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // 验证：删 VERIFY_DIMS 登记后，一条"仅本维度命中"的样本 gate action 是否从 verify 降为 pass
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 function makeCopy(tag) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'hf-vd-' + tag + '-'));

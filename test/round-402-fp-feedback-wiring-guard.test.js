@@ -13,11 +13,12 @@
  *
  * 样本隔离：本文件只用形状描述与真实模块输出，不贴攻击话术原文。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 const fs = require('fs');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const HF_DIR = path.join(ROOT, 'src');
 
 // 隔离测试目录，避免污染 data/feedback

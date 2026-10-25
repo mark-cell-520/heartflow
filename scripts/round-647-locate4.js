@@ -1,7 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // r647 定位：四条守门样本的 PROMISE/BREACH 双腿实况（判断负例断言是否写错）
 const path = require('path');
-const REPO = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const REPO = __HF;
 const mod = require(path.join(REPO, 'src/commitment-coercion.js'));
 const I = mod.__internals();
 const cases = {

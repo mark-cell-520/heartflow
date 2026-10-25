@@ -19,10 +19,11 @@
  *   - assert.ok(arr.length === 3)                     —— 查数量
  *   - assert.throws(...)                              —— 查真的抛错
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const TEST_DIR = path.join(ROOT, 'test');
 
 function walk(dir, out = []) {

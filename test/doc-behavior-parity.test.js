@@ -35,10 +35,11 @@
  *   **文档示例的输入/期望输出**与引擎实际行为一致。
  *   真正的安装验证在 test/npm-package-integrity.test.js。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 
 let pass = 0, fail = 0;

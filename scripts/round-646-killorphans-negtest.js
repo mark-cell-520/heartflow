@@ -18,12 +18,14 @@
  */
 'use strict';
 
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const { spawn, execSync } = require('child_process');
 const fs = require('fs');
 
-const SRC = '/root/.hermes/skills/ai/mark-heartflow-skill/test/run-all.js';
+const SRC = __HF + '/test/run-all.js';
 const src = fs.readFileSync(SRC, 'utf8');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 /** 括号配对提取函数体 */
 function extractFn(name) {

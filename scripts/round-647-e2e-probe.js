@@ -1,7 +1,8 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // r647 端到端探测：接线后 gate.checkOutput() 的动作分布 + dimensions 登记 + findings 可见性
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

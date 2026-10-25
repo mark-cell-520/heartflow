@@ -8,6 +8,7 @@
  *
  * 不修改 src/（避免测试副作用泄漏），只在临时目录造一个假 gate 模块。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 const fs = require('fs');
@@ -19,7 +20,7 @@ function t(name, fn) {
   catch (e) { fail++; console.log('  ❌ ' + name + ' → ' + e.message); }
 }
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { runSet } = require(path.join(HF, 'scripts/bidirectional-guard.js'));
 
 console.log('\n[runSet 基本行为]');

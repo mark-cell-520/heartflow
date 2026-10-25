@@ -18,11 +18,12 @@
  * 用法：node scripts/negative-test-fp-wiring-round402.js
  * 只报数字与红项名，不贴样本内容。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const cp = require('child_process');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const GUARD = path.join(ROOT, 'test/round-402-fp-feedback-wiring-guard.test.js');
 
 const FILES = {

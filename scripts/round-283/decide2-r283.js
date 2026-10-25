@@ -1,6 +1,8 @@
 // 第 283 轮二跑：补判据（可行性/后果/风险）后的 decision
 'use strict';
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 (async () => {
   const d = new HeartFlowDecision();
   const candidates = [

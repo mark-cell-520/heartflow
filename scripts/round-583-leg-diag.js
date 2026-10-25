@@ -1,9 +1,10 @@
 // r583 腿级诊断：从既有测试/探针文件提取样本，不在本文件重复原文（原文零进上下文）。
 // 只打印命中数字与腿名布尔，供定位漏检腿。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const I = require(path.join(ROOT, 'src/exclusive-trust.js')).__internals();
 
 function extract(file, name) {

@@ -1,8 +1,9 @@
 /**
  * 第 197 轮 advisory 误赦修复后的真函数复测（用 checkDangerousInstruction）。
  */
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 const gate = require(path.join(HF, 'src/gate.js'));

@@ -20,12 +20,13 @@
  */
 'use strict';
 
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 // 永不匹配的合法正则
 const NEVER_MATCH = '/^$(?!)/';

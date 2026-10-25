@@ -7,7 +7,7 @@
  * 只测**已确认有对应 checkXxx 函数**的维度；无对应函数的跳过。
  */
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = path.join(__dirname, '..');
 process.chdir(HF);
 const idx = require(path.join(HF, 'src/index.js'));
 

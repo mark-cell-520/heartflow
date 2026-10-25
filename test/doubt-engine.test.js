@@ -1,7 +1,9 @@
 /**
  * doubt-engine.test.js — 怀疑引擎测试
  */
-const { doubt, checkKnowledgeBoundary, checkSymmetry, checkDefensiveness } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/doubt-engine.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { doubt, checkKnowledgeBoundary, checkSymmetry, checkDefensiveness } = require(__HF + '/src/doubt-engine.js');
 
 module.exports = ({ test, assertEqual, assertTrue, assertDefined }) => {
 

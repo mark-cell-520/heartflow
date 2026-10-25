@@ -1,6 +1,8 @@
 'use strict';
-const { checkAppealToIgnorance } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/appeal-to-ignorance.js');
-const { gate, discriminate } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { checkAppealToIgnorance } = require(__HF + '/src/appeal-to-ignorance.js');
+const { gate, discriminate } = require(__HF + '/src/gate.js');
 const A = [
   '你证明不了它是假的，那就是真的',
   '没人能证明这个方案有问题，所以可以放心上',

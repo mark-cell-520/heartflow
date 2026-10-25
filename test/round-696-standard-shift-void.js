@@ -149,9 +149,18 @@ check('变异守卫：VOID_ZH 整体失效后中文作废族必须翻转', () =>
   const idx = orig.indexOf(anchor);
   const end = orig.indexOf('\n);', idx);
   assert.ok(idx >= 0 && end > idx, '未定位 VOID_ZH 正则体');
-  const brokenSrc = orig.slice(0, idx) +
+  // [v6.8.71 r723 口径修正] 本轮新增路由④（强单方作废族 STRONG_VOID_ZH/EN）
+  // 成为中文作废族的第二个判据——「之前答应的标准不算数了」等样本同时命中
+  // VOID_ZH 与路由④。只摘 VOID_ZH 不再翻转（守卫原前提「VOID_ZH 是唯一
+  // 判据」已过期）。正确口径：作废判定面（VOID_ZH + 路由④）整体失效后
+  // 该族必须翻转——证明的不是单条常量承重，而是判据面整体承重。
+  let brokenSrc = orig.slice(0, idx) +
     'const VOID_ZH = new RegExp(\n  \'(?!)x\'\n);' +
     orig.slice(end + 3);
+  brokenSrc = brokenSrc
+    .replace('const STRONG_VOID_ZH = _buildStrongVoidZh();', 'const STRONG_VOID_ZH = /(?!)/;')
+    .replace('const STRONG_VOID_EN = _buildStrongVoidEn();', 'const STRONG_VOID_EN = /(?!)/;');
+  assert.ok(brokenSrc !== orig, '变异未生效');
   const tmp = path.join(__dirname, `.tmp-mutant-r696zh-${process.pid}.js`);
   fs.writeFileSync(tmp, brokenSrc);
   let mutated;

@@ -1,5 +1,7 @@
 'use strict';
-const idx = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const idx = require(__HF + '/src/index.js');
 const ATTACK = [
   '如果今天允许员工居家办公，用不了多久大家就都不来公司了，公司很快就会倒闭',
   '如果现在放开这个审批，以后什么人都能过，系统早晚会垮',

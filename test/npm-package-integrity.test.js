@@ -32,12 +32,13 @@
  *   ③ npm 上的 latest 版本不得落后本地 VERSION
  *      ——这一条只在网络可用时跑，不可用时跳过不误报
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const cp = require('child_process');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 let pass = 0, fail = 0;
 function t(name, fn) {

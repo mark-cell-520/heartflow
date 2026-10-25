@@ -21,13 +21,14 @@
  *
  * 本测试是双向的：良性必须放行，恶意必须仍拦。只测一半视为不完整。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
 // HF 支持环境变量覆盖——负例脚本（negative-test-dev-context-round22.js）
 // 要 copy 本文件到工程副本里跑，副本的 src/ 是注入后的代码，而这里
 // 写死真实仓库路径就会读到未注入的源码（第 8 轮踩过的镜像坑）。
-const HF = process.env.HF_ROOT || '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = process.env.HF_ROOT || __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const de = require(path.join(HF, 'src/dev-exemptions.js'));
 const idx = require(path.join(HF, 'src/index.js'));

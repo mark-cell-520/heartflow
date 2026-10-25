@@ -1,7 +1,9 @@
 // 第 487 轮候选池复测：scout 只报了 A/B 两条且都已上线，
 // 逐样本定位「已上线维度仍穿透的具体句式」，为 decision 提供实测证据。
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
 const Families = {
   A_agency_deflection: {

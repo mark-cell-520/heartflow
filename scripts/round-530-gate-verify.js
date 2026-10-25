@@ -1,8 +1,9 @@
 'use strict';
+const __HF = require('node:path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 // r530: gate 层端到端验证（样本来自 test/round-526-family-probe.js 家族池，不内联）
 const path = require('node:path');
-const { gate } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
-const src = require('node:fs').readFileSync(path.join('/root/.hermes/skills/ai/mark-heartflow-skill/scripts', 'round-526-family-probe.js'), 'utf8');
+const { gate } = require(__HF + '/src/gate.js');
+const src = require('node:fs').readFileSync(path.join(__HF + '/scripts', 'round-526-family-probe.js'), 'utf8');
 const m = src.match(/const FAMILIES = (\{[\s\S]*?\n\});/);
 const FAMILIES = eval('(' + m[1] + ')');
 const fam = FAMILIES.A_harm_invalidation;

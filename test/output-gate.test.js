@@ -1,7 +1,9 @@
 /**
  * output-gate.test.js — 输出门禁测试
  */
-const { screen, findSelfContradiction, checkUncertaintyGap } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/output-gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { screen, findSelfContradiction, checkUncertaintyGap } = require(__HF + '/src/output-gate.js');
 
 module.exports = ({ test, assertEqual, assertTrue, assertDefined }) => {
 

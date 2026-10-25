@@ -11,8 +11,9 @@
  *   注意：rewrite/verify 不算绕过——它们仍会触发调用方注意。
  *   只有完全无感通过才算绕过。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 process.chdir(HF);
 const gate = require(path.join(HF, 'src/gate.js'));
 

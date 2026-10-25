@@ -32,6 +32,16 @@
  *     断言或句尾质问）；另设对比否定独立支（只讲过去、当下隐含的暗示形，
  *     要求显式否定词，纯回忆句不判）。这是**关系/情感语域**的既往付出问责，
  *     与契约语域的路由①②互补。
+ *   · 路由④（v6.8.71 r723 窄口补形）：**强单方作废形**——既往承诺/标准锚点 ×
+ *     单方作废动词共现即判，不要求抬标触发词。补存量路由②的窄口：真实语域
+ *     「当初那件事不作数」（承诺名词无动词）、「旧标准作废，按我今天说的来」
+ *     （旧字修饰标准名词）、「婚前说好…，那条现在不算数」（逗号阻断 gap）、
+ *     「谈好的条件随时可以改」（可撤销性主张）、「You cannot hold me to what
+ *     I said last month.」（EN 可执行性否认）五族。r723 实测该窄口攻击漏判
+ *     22/27（81%）、误伤 0/15。Z2 腿带单方标记（按我今天说的/我说了算/按新
+ *     方案）防「旧版标准已失效，请查更新通知」式组织公告误伤；DUE_PROCESS
+ *     程序正当锚点（双方/协商/公示/备案/书面/盖章/签字/变更单/过渡期/依法/
+ *     法院/仲裁）豁免双方共同作废的程序形。
  *
  * 为什么现有维度拦不住：
  *   · concession_coercion 管让步胁迫（要对方先认错再谈），落点在让步，
@@ -246,6 +256,148 @@ const VOID_EN = new RegExp(
   'i'
 );
 
+// ─── [v6.8.71 第 723 轮] 窄口补形：强单方作废族（路由④）──────────────────
+// 背景（scripts/round-723-family-probe.js 实测）：存量 VOID_ZH/VOID_EN 要求
+// 「时间词+承诺动词」共现，真实语域整族漏判——攻击漏判 22/27（81%）、
+// 误伤 0/15、漏判中真零命中 22/22；r722 复测 76%，本轮补语域高频形态后
+// 升至 81%（教科书样本系统性低估真实分布）。漏判形状族：
+//   ① 承诺名词无动词：「当初那件事不作数，你别拿它说事」「那次承诺不算」
+//   ② 旧字修饰标准名词：「旧标准作废，按我今天说的来」「去年的绩效标准作废」
+//   ③ 逗号阻断 gap：「婚前说好不干涉我的工作，那条现在不算数」
+//   ④ 可撤销性主张：「谈好的条件随时可以改，我说了算」
+//   ⑤ EN 可执行性否认：「You cannot hold me to what I said last month.」
+// 判据仍是双腿共现（单腿不判），九腿：
+//   Z1 时间词×承诺名词×作废动词（名词直连，不要求承诺动词）
+//   Z1b 时间词+说/谈+的+都+作废动词（「之前说的都不算数」）
+//   Z2 旧字修饰×标准名词×作废动词×单方标记（标记腿防「旧版标准已失效，
+//      请查更新通知」式组织公告误伤——公告是陈述，单方决定才是操控）
+//   Z3 说好类×gap(逗号可跨)×指示词重启×作废动词
+//   Z4 谈好的/说好的X随时可改（可撤销性主张）
+//   Z5 谈好的/说好的×gap×(现在)?×作废动词（「说好的提成现在不认了」）
+//   E1 (that|the|this)+承诺名词(+we made/agreed)+is/are+作废动词
+//   E2 可执行性否认（you cannot hold me to / no longer bound by）
+//   E3 (that|it|this) is off the table
+//   E4 what (we|I) agreed/promised … does not count / no longer applies
+// 豁免：DUE_PROCESS 程序正当锚点（经双方/双方确认/协商一致/公示/报备/
+// 备案/书面确认/盖章/签字/变更单/过渡期/依法/法院/仲裁）——双方共同作废
+// 是程序不是操控。词表全部数组化，负例注入逐一置空可验证承重。
+const VOID_TIME_ZH = [
+  '之前', '以前', '先前', '当初', '原来', '上次', '早先', '此前', '原先',
+  '那次', '那回', '当时', '早些时候', '那时候', '去年', '婚前', '这次',
+];
+const VOID_NOUN_ZH = [
+  '那件事', '这事儿', '这事', '那话', '那回事', '那个', '这个',
+  '承诺', '约定', '条件', '标准', '规矩', '方案', '待遇', '价钱', '价格',
+  '协议', '合同', '提成', '绩效', '考核', '条款', '事', '话',
+];
+const VOID_VERB_ZH = [
+  '不作数', '不算数', '不算了', '不认了', '不认', '作废', '翻篇',
+  '一笔勾销', '取消', '收回', '撤销', '撤回', '推翻', '赖账', '说了不算',
+];
+// 句读锚定的裸「不算」变体：「那次承诺不算，我改主意了」——不加句读锚会
+// 误伤「之前的问题不算难」（裸词+形容词），故只认 标点/行尾 结尾形。
+const VOID_VERB_EDGE_ZH = '|不算[，,。！!？?；;]|不算$';
+const VOID_MOD_ZH = ['旧', '老', '原来', '原先', '过去', '去年', '之前', '先前', '当初', '原有', '旧的', '老的'];
+const VOID_STD_ZH = [
+  '标准', '标杆', '门槛', '基准', '规矩', '方案', '条件', '待遇', '考核',
+  '绩效', '规则', '口径', '算法', '条款', '承诺', '约定', '协议',
+];
+const VOID_SAID_ZH = ['说', '谈', '讲', '定', '答应', '承诺', '许'];
+const VOID_DEM_ZH = ['那条', '这事', '这事儿', '这茬', '那些', '这些', '此话', '这话'];
+const VOID_AGREED_ZH = ['说好', '谈好', '讲好', '约定', '说定', '谈定', '讲定', '许诺', '答应'];
+const VOID_ANYTIME_ZH = ['随时', '说改就改', '可以改', '想改就改', '说变就变', '说作废就作废', '随时作废', '随时取消'];
+// Z2 单方标记腿：旧标准作废句式在组织公告语域高频（「旧版标准已失效，请查
+// 更新通知」），必须与单方决定/替换标记共现才判——公告是陈述，我说了算
+// 才是操控。
+const VOID_MARK_ZH = [
+  '按我今天说的', '按我的', '听我的', '按新方案', '按新标准', '按新规矩',
+  '重新定', '我说了算', '我来定', '别翻了', '别当真', '按今天', '按我',
+];
+const DUE_PROCESS_ZH = [
+  '经双方', '双方确认', '双方同意', '双方签字', '双方书面', '协商一致',
+  '公示期', '已公示', '报备', '备案', '书面确认', '盖章', '签字',
+  '变更单', '过渡期', '依法', '法院', '仲裁',
+];
+const VOID_EN_NOUN = [
+  'deal', 'agreement', 'promise', 'arrangement', 'pact', 'contract',
+  'terms', 'rules', 'plan', 'standard',
+];
+const VOID_EN_VOID = [
+  'void(?!\\s+of)', 'off', 'dead', 'cancelled', 'canceled', 'null', 'invalid',
+  'no longer valid', 'no longer binding',
+];
+const DUE_PROCESS_EN = [
+  'both parties', 'mutual consent', 'in writing', 'signed', 'filed',
+  'notarized', 'by law', 'court', 'arbitration', 'change control',
+  'notice period', 'formal amendment',
+];
+
+function _alt(a) { return a.join('|'); }
+
+// 按腿组装强作废判据；任一腿词表被置空（负例注入）则摘除该腿，全部腿落空
+// 时返回永不命中正则（防空 alternation `(?:)` 退化成恒真）。
+function _buildStrongVoidZh() {
+  const GAP6 = '[^。；;，,！!？?\\n]{0,6}';
+  const GAP4 = '[^。；;，,！!？?\\n]{0,4}';
+  const VERB = '(?:' + _alt(VOID_VERB_ZH) + VOID_VERB_EDGE_ZH + ')';
+  const legs = [];
+  if (VOID_TIME_ZH.length && VOID_NOUN_ZH.length && VOID_VERB_ZH.length) {
+    // Z1 时间词×承诺名词×作废动词（名词直连）
+    legs.push('(?:' + _alt(VOID_TIME_ZH) + ')(?:我们|咱们|你|你们|彼此)?' + GAP6 + '(?:' + _alt(VOID_NOUN_ZH) + ')' + GAP4 + VERB);
+  }
+  if (VOID_TIME_ZH.length && VOID_SAID_ZH.length && VOID_VERB_ZH.length) {
+    // Z1b 时间词+说/谈+的+(都|全)?+作废动词
+    legs.push('(?:' + _alt(VOID_TIME_ZH) + ')(?:我们|咱们)?(?:' + _alt(VOID_SAID_ZH) + ')的(?:都|全)?' + VERB);
+  }
+  if (VOID_MOD_ZH.length && VOID_STD_ZH.length && VOID_VERB_ZH.length && VOID_MARK_ZH.length) {
+    // Z2 旧字修饰×标准名词×(时态)?×作废动词×单方标记
+    legs.push('(?:' + _alt(VOID_MOD_ZH) + ')' + GAP4 + '(?:' + _alt(VOID_STD_ZH) + ')(?:已经|现已|如今|现在|此刻|目前)?' + VERB + '[^。；;！!？?\\n]{0,20}(?:' + _alt(VOID_MARK_ZH) + ')');
+  }
+  if (VOID_AGREED_ZH.length && VOID_DEM_ZH.length && VOID_VERB_ZH.length) {
+    // Z3 说好类×gap(逗号可跨)×指示词重启×(现在)?×作废动词
+    legs.push('(?:' + _alt(VOID_AGREED_ZH) + ')(?:好|的)?[^。；;！!？?\\n]{0,14}(?:' + _alt(VOID_DEM_ZH) + ')(?:现在|如今|眼下)?' + VERB);
+  }
+  if (VOID_ANYTIME_ZH.length) {
+    // Z4 谈好的/说好的X随时可改（可撤销性主张）
+    legs.push('(?:谈好的|说好的|讲好的|定好的|约好的|说定|谈定)(?:条件|规矩|标准|要求|承诺|约定|条款|价钱|价格|待遇|方案)(?:' + _alt(VOID_ANYTIME_ZH) + ')');
+  }
+  if (VOID_AGREED_ZH.length && VOID_VERB_ZH.length) {
+    // Z5 谈好的/说好的×gap×(现在|如今|眼下)?×作废动词
+    legs.push('(?:谈好的|说好的|讲好的|定好的|约好的|说定|谈定)' + GAP6 + '(?:现在|如今|眼下)?' + VERB);
+  }
+  return legs.length ? new RegExp(legs.join('|')) : /(?!)/;
+}
+
+function _buildStrongVoidEn() {
+  const legs = [];
+  if (VOID_EN_NOUN.length && VOID_EN_VOID.length) {
+    // E1 (that|the|this)+名词(+we made/agreed)+is/are+作废动词
+    legs.push('(?:that|the|this)\\s+(?:[a-z]{0,14}\\s+)?(?:' + _alt(VOID_EN_NOUN) + ')(?:\\s+(?:we|i|you|they))?(?:\\s+(?:made|had|agreed|settled))?(?:\\s+(?:to|on))?\\s+(?:is|are)\\s+(?:' + _alt(VOID_EN_VOID) + ')');
+    // E4a what (we|I) agreed/settled/promised … does not count / no longer applies
+    legs.push('(?:what|whatever)\\s+(?:we|i|you|they)\\s+(?:agreed|settled|decided|promised)(?:\\s+on|\\s+to)?[^.!?]{0,24}(?:does\\s+not\\s+count|doesn[\'’]?t\\s+count|no\\s+longer\\s+counts|no\\s+longer\\s+applies|is\\s+void|are\\s+void|is\\s+off|is\\s+dead)');
+    // E4b what (i|we) said/promised … no longer applies / does not count
+    legs.push('what\\s+(?:i|we)\\s+(?:said|promised|agreed|told\\s+you)(?:\\s+(?:before|earlier|last\\s+(?:month|week|year|time)))?(?:\\s+(?:no\\s+longer|doesn[\'’]?t|does\\s+not))?\\s+(?:apply|applies|count|counts|matter|matters|stand|stands)');
+  }
+  // E2 可执行性否认（固定腿；cannot 无空格形与 can't 都要覆盖）
+  legs.push('you\\s+(?:can\\s?not|could\\s+not|can[’]?t|couldn[’]?t)\\s+hold\\s+me\\s+to');
+  legs.push('you\\s+are\\s+no\\s+longer\\s+bound\\s+by');
+  // E3 off the table（固定腿）
+  legs.push('(?:that|it|this|the\\s+deal|the\\s+offer|the\\s+price)\\s+is\\s+off\\s+the\\s+table');
+  return legs.length ? new RegExp(legs.join('|'), 'i') : /(?!)/;
+}
+
+const STRONG_VOID_ZH = _buildStrongVoidZh();
+const STRONG_VOID_EN = _buildStrongVoidEn();
+// DUE_PROCESS 同样防空表退化：任一半空表时只组另一半，全空返回永不命中
+// （否则 _alt([]) = '' 会让 `(?:)` 空 alternation 变成恒真、豁免一切）。
+function _buildDueProcess() {
+  const parts = [];
+  if (DUE_PROCESS_ZH.length) parts.push('(?:' + _alt(DUE_PROCESS_ZH) + ')');
+  if (DUE_PROCESS_EN.length) parts.push('(?:' + _alt(DUE_PROCESS_EN) + ')');
+  return parts.length ? new RegExp(parts.join('|'), 'i') : /(?!)/;
+}
+const DUE_PROCESS = _buildDueProcess();
+
 // ─── 要件二之补二：既往承诺 × 当下否定（v6.8.47 r700 补支）──────────────
 // [r700] 心虫 decision 本体选出（score 0.94 / confidence 0.92）：用**过去的
 // 表现/承诺**否定**当下的合理变化**——「你以前都能做到，现在做不到了？」
@@ -449,7 +601,29 @@ function checkStandardShift(text) {
     };
   }
 
+  // [v6.8.71 第 723 轮] 路由④：强单方作废形（窄口补形）
+  // 既往承诺/标准锚点 × 单方作废动词共现即判——不要求抬标触发词
+  // （「当初那件事不作数」「旧标准作废」没有抬标话术，作废本身就是位移），
+  // 也不受 PROCESS_ZH/EN 的书面流程字样影响（「我们之间的协议不作数了」
+  // 是攻击不是程序讨论）。DUE_PROCESS 程序正当形豁免。
+  const strongVoid = (STRONG_VOID_ZH.test(text) || STRONG_VOID_EN.test(text)) && !DUE_PROCESS.test(text);
+  if (strongVoid) {
+    return {
+      hit: true,
+      score: 0.66,
+      count: 1,
+      detail: isZh ? '既往承诺/标准单方作废(zh)' : '既往承诺/标准单方作废(en)',
+    };
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
-module.exports = { checkStandardShift };
+module.exports = {
+  checkStandardShift,
+  __internals: {
+    VOID_TIME_ZH, VOID_NOUN_ZH, VOID_VERB_ZH, VOID_MOD_ZH, VOID_STD_ZH,
+    VOID_SAID_ZH, VOID_DEM_ZH, VOID_AGREED_ZH, VOID_ANYTIME_ZH, VOID_MARK_ZH,
+    DUE_PROCESS_ZH, VOID_EN_NOUN, VOID_EN_VOID, DUE_PROCESS_EN,
+  },
+};

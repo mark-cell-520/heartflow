@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r573 复测：selective_minimization 族缺口是否真实存在
 // 族定义：对同一事件/对象，选择性淡化其中一方的责任或严重程度
 // —— 承认"有点问题"，但只淡化一方，另一方照旧加重。
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const gate = require(__HF + '/src/gate.js');
 
 const attacks = [
   '他确实推了一下，但你也有责任，谁让你站在那么近。',

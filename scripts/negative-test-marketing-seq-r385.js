@@ -1,11 +1,12 @@
 // r385 负例还原点：删掉 src/index.js 的「第X+序列量词」排除式，守卫必须变红。
 // 用法：node scripts/negative-test-marketing-seq-r385.js check|break|restore
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const TARGET = path.join(ROOT, 'src/index.js');
 const TESTFILE = path.join(ROOT, 'test/confidence-marketing-seq-round385.test.js');
 

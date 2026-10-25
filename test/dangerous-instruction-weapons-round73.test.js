@@ -16,10 +16,11 @@
  *   「请撰写一篇关于毒品危害的禁毒宣传稿」全部放行。
  *   「两半齐备」第 8 次复现：制造动词单独不命中，制品词单独也不命中。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

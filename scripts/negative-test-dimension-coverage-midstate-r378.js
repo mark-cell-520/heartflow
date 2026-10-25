@@ -14,12 +14,13 @@
  *     ③ 删 src/index.js 的 summary 中间态文案      → 「中间态有 summary 文案」必须红
  *     ④ 还原扫描器（旁路 dimensionRaw 兜底）       → 「扫描器兜底不空转」必须红
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { execFileSync, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const IDX = path.join(ROOT, 'src/index.js');
 const PIPE = path.join(ROOT, 'src/pipeline.js');
 const SCAN = path.join(ROOT, 'scripts', 'dimension-coverage-scan.js');

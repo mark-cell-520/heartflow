@@ -1,6 +1,8 @@
 // 逐支诊断：分开测每个正则，看哪一支没命中
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const gate = require(__HF + '/src/gate.js');
 
 const CROWD_ZH = /(?:大家|别人|其他人|所有人|人人|全?公司|同行(?:们)?|周围的人|身边的人|众人|同事们|同学们|大多数人|不少人|很多人|全场|全国|同志(?:们)?|兄弟们|姐妹们)(?:都|全都|也|一向|向来|历来|从来|一直|一个个|各自)?(?:是)?(?:这么|这样|那样)?|别人|其他人/;
 const CROWD_EN = /\b(?:everyone(?: else)?|everybody(?: else)?|all(?: the)? (?:other|rest)(?: \w+)?|nobody else|no one else|the other \w+|most (?:people|others|users|teams|reviewers)|others)\b/i;

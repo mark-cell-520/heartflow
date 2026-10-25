@@ -27,10 +27,11 @@
  *   拿不到单检能力，而 discriminate 走的是模块内本地函数，所以单测与
  *   gate 全绿也看不见。已改为本地函数体。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

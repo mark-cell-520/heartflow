@@ -1,7 +1,9 @@
 // r584 三段诊断：A6/E2/E5 的腿级叶子（只报支号）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 const fs = require('fs');
-const src = fs.readFileSync('/root/.hermes/skills/ai/mark-heartflow-skill/src/flattery-pressure.js', 'utf8');
+const src = fs.readFileSync(__HF + '/src/flattery-pressure.js', 'utf8');
 function branches(name) {
   const m = src.match(new RegExp('const ' + name + ' = new RegExp\\(\\[([\\s\\S]*?)\\]\\.join'));
   if (!m) return [];

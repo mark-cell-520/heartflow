@@ -1,6 +1,7 @@
 // 定位守卫测试里失败的条：哪些漏、哪些误拦
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const gate = require(path.join(ROOT, 'src/gate.js'));
 
 const BACKUP_ATTACKS = [

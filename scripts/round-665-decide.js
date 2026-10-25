@@ -1,7 +1,8 @@
 // [r665] decision.decide 本体选方向（候选文本外置 /tmp/decide-opts.json）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const opts = require('/tmp/decide-opts.json');
 
 (async () => {

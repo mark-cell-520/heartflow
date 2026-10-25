@@ -1,4 +1,6 @@
-const auto = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/auto-rules.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const auto = require(__HF + '/src/auto-rules.js');
 
 module.exports = ({ test, assertEqual, assertTrue, assertDefined }) => {
 

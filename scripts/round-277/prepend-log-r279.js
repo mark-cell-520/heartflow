@@ -1,9 +1,10 @@
 // 第 279 轮收尾：把本轮 UPGRADE_LOG 记录插到 UPGRADE_LOG.md 顶部。
 // 纯文本拼接，避免 heredoc/python 被安全扫描拦。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const TMP = '/root/.hermes/cache/scratch/round279-log.md';
 const LOG = path.join(ROOT, 'UPGRADE_LOG.md');
 

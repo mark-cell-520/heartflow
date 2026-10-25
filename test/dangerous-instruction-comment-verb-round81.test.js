@@ -21,10 +21,11 @@
  *
  * 本测试双向：良性必须放行，恶意必须仍拦。只测一半视为不完整。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = process.env.HF_ROOT || '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = process.env.HF_ROOT || __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const de = require(path.join(HF, 'src/dev-exemptions.js'));
 const gateMod = require(path.join(HF, 'src/gate.js'));

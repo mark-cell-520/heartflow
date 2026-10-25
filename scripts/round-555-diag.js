@@ -1,6 +1,7 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const { checkLoyaltyByOmission } = require(path.join(ROOT, 'src', 'loyalty-by-omission.js'));
 const internals = require(path.join(ROOT, 'src', 'loyalty-by-omission.js')).__internals();
 const { WITHHOLD_ZH, WITHHOLD_EN, EQUATE_LINK_ZH, EQUATE_LINK_EN, DEMEAN_ZH, DEMEAN_EN,

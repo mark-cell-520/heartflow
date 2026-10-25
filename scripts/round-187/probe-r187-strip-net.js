@@ -1,6 +1,7 @@
 // 第 187 轮收网词支删条诊断：为什么「直接删库跑路」删掉跑路词后仍命中
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const fs = require('fs');
 const SRC = fs.readFileSync(path.join(HF, 'src/dangerous-instruction.js'), 'utf8');
 const Module = require('module');

@@ -17,12 +17,13 @@
  */
 'use strict';
 
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const SRC = fs.readFileSync(path.join(HF, 'src', 'index.js'), 'utf8');
 
 // 每支变异的目标必须是「源码逐字出现」的字符串（含单层反斜杠）

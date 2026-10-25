@@ -1,7 +1,8 @@
 // 第50轮主测试：中英混杂 AI 腔族（zh-en code-mixing）
 // 攻击 23 条 / 良性 3 组 / 单族不计分（第36轮共现纪律）/ DELIBERATE_SKIP 锁当前边界
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 process.chdir(ROOT);
 const { detect } = require(path.join(ROOT, 'src/shield/ai-writing-tell.js'));
 

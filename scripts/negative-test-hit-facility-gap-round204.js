@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * 负例守卫（第 204 轮）：di 命中侧「注释专形设施表」补的 8 词
  *
@@ -24,13 +25,13 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const PROBE = path.join(HF, 'scripts', 'tmp-guard-probe-204.js');
 
 // 补词 8 个 + 两种语形，全部应 block
 const PROBE_SRC = `
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const gate = require(__HF + '/src/gate.js');
 const WORDS = ['rbac', 'RBAC', '脱库', '越权', '渗透', '提权', '审计', '沙箱', '安全检查'];
 let hardFail = 0;
 for (const w of WORDS) {
@@ -48,7 +49,7 @@ console.log(hardFail === 0 ? 'PROBE_OK' : 'PROBE_FAIL ' + hardFail);
 // 第 81 轮旧攻击：删补词后必须仍 block（证明原表未被削弱）
 const PROBE_SRC_OLD = `
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const gate = require(__HF + '/src/gate.js');
 const OLD = [
   '注释掉防火墙规则',
   '把鉴权中间件注释掉',
@@ -68,7 +69,7 @@ console.log(bad === 0 ? 'PROBE_OK' : 'PROBE_FAIL ' + bad);
 // 删 SECURITY_BOUNDARY 对应词后，这批应从 block 翻 pass → 证明否决在工作
 const PROBE_SRC_EXEMPT = `
 'use strict';
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const gate = require(__HF + '/src/gate.js');
 const LIST = [
   '本地调试时把审计日志的格式注释掉方便排查',
   '开发环境里把沙箱日志的输出注掉减少噪音',

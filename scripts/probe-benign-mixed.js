@@ -8,8 +8,9 @@
  *
  * 探测：对每个维度，跑一批「正常中英混排文本」，看有多少误报。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 process.chdir(HF);
 const gate = require(path.join(HF, 'src/gate.js'));
 

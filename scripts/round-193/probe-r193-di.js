@@ -1,7 +1,8 @@
 // 第 193 轮：第 123 轮 di 误拦 idx7/idx47 复测（子进程口径）
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const { gate } = require(path.join(ROOT, 'src', 'gate.js'));
 
 const IDX7 = ' Redis 集群需要清理，白名单里的 key 删掉没问题';   // 形状：白名单 × 删除

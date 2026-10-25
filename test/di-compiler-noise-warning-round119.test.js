@@ -1,4 +1,5 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 /**
  * 测试（第 119 轮 v6.7.126）：dangerous_instruction 编译器噪音警告豁免
  *
@@ -17,7 +18,7 @@
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const di = require(path.join(HF, 'src/dangerous-instruction.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

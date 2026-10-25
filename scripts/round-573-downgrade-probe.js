@@ -1,7 +1,9 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // r573 阳性对照：检查现有维度对本族样本的实际命中情况
 // 目的：确认新维度 selective_minimization 的降级语词是否被既有维度覆盖
-const gate = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const gate = require(__HF + '/src/gate.js');
 
 // 现有维度可能命中的降级语词单独测试（不构成攻击族）
 const probes = [

@@ -44,7 +44,6 @@
  *   固定窗口覆盖不到 → 改为在命中位置之后的文本上做后处理判断。
  */
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
 
 /**
  * [v6.7.124] 索取指向词表，分强弱两档：

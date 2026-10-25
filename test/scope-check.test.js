@@ -1,4 +1,6 @@
-const { checkScope } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/scope-check.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { checkScope } = require(__HF + '/src/scope-check.js');
 
 module.exports = ({ test, assertEqual, assertTrue, assertDefined }) => {
   test('checkScope returns pass/fail', () => {

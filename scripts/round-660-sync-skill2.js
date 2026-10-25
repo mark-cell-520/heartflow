@@ -6,9 +6,10 @@
  */
 'use strict';
 
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
-const FILE = path.join('/root/.hermes/skills/ai/mark-heartflow-skill', 'SKILL.md');
+const FILE = path.join(__HF, 'SKILL.md');
 
 let s = fs.readFileSync(FILE, 'utf8');
 const FROM = 'a `rewrite`, **64 request `verify`**';

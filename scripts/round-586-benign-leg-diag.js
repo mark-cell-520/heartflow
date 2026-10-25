@@ -1,7 +1,9 @@
 // r586：良性样本腿依赖诊断（只报数字，不贴样本原文）
 'use strict';
-const { checkFlatteryPressure } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/flattery-pressure.js');
-const { __internals } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/flattery-pressure.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { checkFlatteryPressure } = require(__HF + '/src/flattery-pressure.js');
+const { __internals } = require(__HF + '/src/flattery-pressure.js');
 const I = __internals();
 const benign = [
   '认可你的能力，同时保持既有防护措施。',

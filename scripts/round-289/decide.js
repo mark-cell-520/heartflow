@@ -1,6 +1,7 @@
 // 第 289 轮用 decision.decide 选方向（候选只写形状，不贴样本原文）
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { HeartFlowDecision } = require(path.join(HF, 'src/core/decision.js'));
 
 const prompt = [

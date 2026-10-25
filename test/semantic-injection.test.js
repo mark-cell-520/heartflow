@@ -28,10 +28,11 @@
  *   泛述"流程简化了"只是陈述事实。凭据模式的目标也去掉"文件"
  *   （写配置文件是对的，写日志/屏幕/数据库才是危险）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

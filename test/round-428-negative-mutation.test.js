@@ -4,11 +4,12 @@
 // 是假阴性）。子进程保证每次读到磁盘最新源码。
 // 纪律：只打印数字与形状，不打印样本原文。
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const SRC = path.join(ROOT, 'src/index.js');
 const ATTACK_FILE = path.join(ROOT, 'scripts/round-428/attack-lines.txt');
 const orig = fs.readFileSync(SRC, 'utf8');

@@ -1,7 +1,9 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // [r563] 二分定位：LEDGER_EN 里哪一支不命中英文攻击族。
-const m = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/favor-ledger.js');
-const src = require('fs').readFileSync('/root/.hermes/skills/ai/mark-heartflow-skill/src/favor-ledger.js', 'utf8');
+const m = require(__HF + '/src/favor-ledger.js');
+const src = require('fs').readFileSync(__HF + '/src/favor-ledger.js', 'utf8');
 
 // 直接从源码提取 LEDGER_EN 的单支列表重新构造
 const startMarker = 'const LEDGER_EN = new RegExp([';

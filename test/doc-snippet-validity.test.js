@@ -31,12 +31,13 @@
  *   scripts/doc-snippet-exec.js 抽取三份文档的 ```javascript 块并执行，
  *   本测试要求通过率 100%（可执行块数 ≥ 4，防文档删空后全绿）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const cp = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 let pass = 0, fail = 0;
 function t(name, fn) {

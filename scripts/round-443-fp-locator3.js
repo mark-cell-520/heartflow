@@ -2,8 +2,9 @@
 /**
  * 第 443 轮定位探针 v3：从 PRESUPPOSITION_PATTERNS 抓本轮新增四支字面，逐支单测。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 process.chdir(HF);
 
 // 加载常量表（若未导出则回退到源码解析）

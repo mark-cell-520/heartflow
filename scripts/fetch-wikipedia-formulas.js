@@ -116,7 +116,7 @@ function fetchPageHTML(title) {
     const url = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=text&format=json&origin=*`;
     return safeFetch(url, { timeout: 20000, headers: { 'User-Agent': 'HeartFlow/5.8.6 (yun520-1@github, educational research)' } })
       .then(res => res.text())
-      let data = '';
+      .then(data => {
       // data received in text
         try {
           const json = JSON.parse(data);
@@ -125,8 +125,7 @@ function fetchPageHTML(title) {
         } catch {
           resolve('');
         }
-      });
-    
+      })
       .catch(() => '');
     });
 }

@@ -43,10 +43,11 @@
  *   已加保护：schema 有 properties 但过滤后为空 → 明确报错
  *   并列出 expectedParams。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 let pass = 0, fail = 0;
 function t(name, fn) {

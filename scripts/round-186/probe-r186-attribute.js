@@ -1,10 +1,11 @@
 // 第 186 轮：归因 —— 8 个 run-all 失败条目是否全部为**旧存量**（HEAD 同样失败）
 // 方法：把 HEAD 版本的 src/reward-hacking.js 写到 src/.rh-before.js（同目录可解析
 // 相对依赖），分别跑同一测试文件，比对失败清单。
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
 const cp = require('child_process');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const dir = path.join(ROOT, 'src', '.r186-cmp');
 fs.mkdirSync(dir, { recursive: true });
 fs.copyFileSync(path.join(ROOT, 'src', 'dev-exemptions.js'), path.join(dir, 'dev-exemptions.js'));

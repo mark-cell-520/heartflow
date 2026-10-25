@@ -1,6 +1,8 @@
 // 定位剩余 3 条失败样本的族归属（只输出索引与命中片段）
 'use strict';
-const idx = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const idx = require(__HF + '/src/index.js');
 const samples = [
   'Everyone ignores the migration guide.',
   'All of our customers complained.',

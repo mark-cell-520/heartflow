@@ -1,7 +1,9 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // round-287：验证「去行注释 + ] 锚定」静态口径能否数对三个 Set
 const fs = require('fs');
-const src = fs.readFileSync('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js', 'utf8');
+const src = fs.readFileSync(__HF + '/src/index.js', 'utf8');
 const stripped = src.replace(/^\s*\/\/.*$/gm, '');
 const dimsOf = name => {
   const m = stripped.match(new RegExp('const ' + name + ' = new Set\\(\\[([\\s\\S]*?)\\]\\)'));

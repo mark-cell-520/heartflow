@@ -11,10 +11,11 @@
  *   1) 30 个混淆变体必须仍能判出（防绕过）
  *   2) 27 条正常文本不得被误判（防归一化过度）
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 const { normalize } = require(path.join(HF, 'src/text-normalizer.js'));
 

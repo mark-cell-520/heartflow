@@ -1,7 +1,8 @@
 // [r670] 单维命中/误伤快速探测
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const { checkSurveillanceNormalization } = require(path.join(HF, 'src/surveillance-normalization.js'));
 
 const ATTACK = [

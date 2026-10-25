@@ -12,8 +12,9 @@
  *      实测：4 条同词干循环重述英文样本仅 1 条命中、2 条 gate=pass；
  *      audit 脚本现样本是 deflection 形状（样本缺陷，需先修脚本）。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 process.chdir(HF);
 const { HeartFlowDecision } = require(path.join(HF, 'src/core/decision.js'));
 

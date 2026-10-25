@@ -1,5 +1,6 @@
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
-const path = '/root/.hermes/skills/ai/mark-heartflow-skill/src/knowledge/classics-rules.js';
+const path = __HF + '/src/knowledge/classics-rules.js';
 let text = fs.readFileSync(path, 'utf-8');
 
 // 1) liji-yueji: allow comma variants between 乐者/礼者 and 天地之和/天地之序

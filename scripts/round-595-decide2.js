@@ -18,7 +18,9 @@ const candidates = [
   + '  风险：无探测器背书的族可能其实已被覆盖，做了也不算真升级。',
 ];
 
-const { HeartFlowDecision } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/core/decision.js');
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const { HeartFlowDecision } = require(__HF + '/src/core/decision.js');
 (async () => {
   const d = new HeartFlowDecision();
   const c = await d.decide({

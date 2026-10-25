@@ -24,10 +24,11 @@
  * 教训：线上验证只看"是否拦截"会把 6 个正常工作的维度误报成失效。
  * 必须先看 action 分布 + 各维度归属集合，再下结论。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const gate = require(path.join(HF, 'src/gate.js'));
 const idx = require(path.join(HF, 'src/index.js'));
 

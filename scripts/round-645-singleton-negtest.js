@@ -5,11 +5,12 @@
  * 反向：杀掉伪装进程 → 再跑 → 必须能正常启动（不被残留锁文件挡住）。
  */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const { execSync, spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 function runAll(timeoutMs = 60000) {
   try {

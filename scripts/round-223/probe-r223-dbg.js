@@ -1,8 +1,9 @@
 // debug：M3 删除后，「最新的资料已归档」到底命中什么
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const dir = path.join(os.tmpdir(), 'hf-sl-dbg');
 fs.mkdirSync(dir, { recursive: true });
 fs.copyFileSync(path.join(HF, 'VERSION'), path.join(dir, 'VERSION'));

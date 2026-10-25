@@ -1,6 +1,7 @@
 // r532: ai_writing_tell 族探针 —— 找真实穿过硬闸门的 AI 文风样本
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const ROOT = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const ROOT = __HF;
 const gate = require(path.join(ROOT, 'src/gate.js'));
 
 const samples = [

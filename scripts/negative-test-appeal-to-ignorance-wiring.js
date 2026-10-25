@@ -14,12 +14,13 @@
  */
 'use strict';
 
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 const PROBE_ZH = '没人能证明这个方案有问题，所以可以放心上';
 const PROBE_EN = 'You cannot prove this is wrong, therefore it is right.';

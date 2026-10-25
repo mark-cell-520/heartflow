@@ -4,8 +4,9 @@
  * 看每条缺哪一侧——决定补在哪条正则的哪个分支。
  */
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const M = require(path.join(HF, 'src/sunk-cost-coercion.js'));
 const I = M.__internals();
 

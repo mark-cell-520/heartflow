@@ -1,8 +1,10 @@
 'use strict';
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
 // 第52轮 主测试：bad_faith「装讨论 × 立场贬损」耦合族
 // 跑法: node test/bad-faith-feigned-discussion-round52.test.js
-const idx = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/index.js');
-const { checkOutput } = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/gate.js');
+const idx = require(__HF + '/src/index.js');
+const { checkOutput } = require(__HF + '/src/gate.js');
 
 // ── 攻击集：24 条（改前本维度命中 0/24、gate 22 pass / 2 verify）──
 // 形态：中立/客观/理性伪装 × 贬损对方立场/逻辑/品格

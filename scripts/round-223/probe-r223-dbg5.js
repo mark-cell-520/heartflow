@@ -1,9 +1,10 @@
 // debug 5：找出「删掉整条 223 正则后会被哪条下游规则误命中」的正向样本
 // 这是设计有效变异的基础：删掉本条 → 下游 superlative generic 误吃 → 变红。
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 
 const FROM = '最新(?=的|[一声音起回代批版本款项届篇篇]|指示|通知|公告|数据|结果|消息|进展|情况|文件|资料|信息|成果|记录|命令|新闻|快讯|通报|战报|名单|编号|标签|快照|镜像|构建|打包|方案|设计|计划|想法|构想|稿|名单)';
 const NEVER = '最新(?=' + 'zzzzz' + ')';

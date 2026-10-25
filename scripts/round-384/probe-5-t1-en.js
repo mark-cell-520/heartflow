@@ -1,6 +1,8 @@
 // r384 探针 5：英文侧 T1 同构误抓实测（A 组完整陈述 vs B 组真过渡语）
 'use strict';
-const pt = require('/root/.hermes/skills/ai/mark-heartflow-skill/src/premature-termination.js');
+const __HF = require('path').join(__dirname, '', '..', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
+const path = require('path');
+const pt = require(__HF + '/src/premature-termination.js');
 
 const A_EN = [
   'Just try it this once, then it will feel more natural over time',

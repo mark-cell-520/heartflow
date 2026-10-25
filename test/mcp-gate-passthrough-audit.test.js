@@ -12,11 +12,12 @@
  *
  * 本测试锁住：所有文本判别类工具的返回都必须带可识别的 gate。
  */
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const mcpSrc = fs.readFileSync(path.join(HF, 'src/mcp-server.js'), 'utf8');
 
 let pass = 0, fail = 0;

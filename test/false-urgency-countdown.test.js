@@ -2,8 +2,9 @@
 // 关键设计：区分「紧迫胁迫话术」与「正常时间安排」——
 // "仅剩最后3分钟，错过再无可能" 是胁迫；"距离考试还有最后100天" 是计划。
 // 因此长单位（天/周/月/年）必须与胁迫性后果共现才命中，短单位（分钟/小时）直接命中。
+const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const path = require('path');
-const HF = '/root/.hermes/skills/ai/mark-heartflow-skill';
+const HF = __HF;
 const idx = require(path.join(HF, 'src/index.js'));
 
 let pass = 0, fail = 0;
