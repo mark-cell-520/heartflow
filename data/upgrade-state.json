@@ -1,22 +1,21 @@
 {
-  "round": 726,
-  "version": "6.8.74",
+  "round": 727,
+  "version": "6.8.75",
   "roundStartedAt": "2026-10-26T00:00:00.000Z",
   "lastFinishAt": "2026-10-26T00:00:00.000Z",
   "lastGreen": true,
   "lastChecks": [
-    "PASS 版本四处一致 = 6.8.74（round-guard / verify）",
-    "PASS 版本已进 git log（feat adcb6c8e，security-audit S2 转绿 16/16）",
+    "PASS 版本五处一致 = 6.8.75（round-guard / verify / sync-version）",
+    "PASS 版本已进 git log（feat 60db30b5，security-audit S2 转绿 16/16）",
     "PASS bin/verify.js 16/16",
-    "PASS bidirectional-guard 召回 52/52（100%）、误拦与基线一致零新增",
-    "PASS guard-abilities 20/20",
-    "PASS doc-numbers-accuracy 22/22（README/SKILL 测试数同步为分块实测 18322/171）",
-    "PASS 轮测试 23/23、负例注入 56/56、模块冒烟 68/68、存量回归 r724/r725 47/47",
-    "PASS 全量回归 609/609：18322 过 / 171 败 / 129 红；git stash 基线对照 126 预存 + 3 项解释（S2 提交前预期红 / 缓存中毒已修 / 负载抖动）= 零新增失败，闭合 r725 遗留缺口",
-    "NOTE r725 收尾诚实修正（r726 轮初完成）：实际仅 1 个 feat commit 2bc1b3b0；guard-abilities 提交态 3/20 系 CRLF，行尾归一转 20/20；recordSelfState 补跑；运行残留取消跟踪（data/.run-all.lock、self-model.json、test/_tmp_r388_negA.js 入 .gitignore；test-count.json 按第 53 行否定规则保留跟踪并更新为实测值）"
+    "PASS bidirectional-guard 召回 52/52（100%）、误拦 302/326 与基线一致零新增",
+    "PASS guard-abilities 20/20（157 维；CRLF 归一后恢复，提交 blob 本就是 LF 未产生新 commit）",
+    "PASS doc-numbers-accuracy 22/22（README/SKILL 测试数同步为实测 18326/167）",
+    "PASS 轮测试 25/25、负例注入 92/92、模块冒烟 20/20 攻击 + 0/8 误伤、存量回归 r724/r725 48/48、47/47（GATE-2 总数断言按纪律更新 156→157 并注明）",
+    "PASS 全量回归 609/609：18326 过 / 167 败 / 127 红；红名单 git stash 基线对照：126 预存 + security-audit 提交前 S2 预期红 = 零新增失败"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
   "published": "6.7.124",
   "publishedAt": "2026-09-25T20:03:42.912Z",
-  "notes": "r727 交接簿。下一轮候选池（r726 复测，攻击漏判≥50% 且良性 0 误伤）：forer_effect 巴纳姆效应（85%、0/8，连续三轮候补）、no_true_scotsman 无真正的苏格兰人（81%、0/8，r726 新侦察族）、texas_sharpshooter（77%、0/11）、middle_ground（68%、0/10）、base_rate_fallacy（67%、0/8）、composition_division（53%、0/9）。环境教训：①工具前台有 420s 硬上限，全量回归用 scripts/round-726-run-chunk.js 分块跑（口径已对齐 run-all.js，PASS 单行每文件计 1）；②后台进程 stdin 形态异常会让 run-all 首个子进程即退（stdin is not a tty），前台 execSync stdio ignore 或 chunk 模式可跑；③被杀的 run-all 会把 data/test-count.json 写成残缺值毒中 doc-numbers——跑全量前先备份缓存、跑完立即用实测值修复；④patch 工具写 .md 会带入 CRLF，提交前 sed 归一；⑤负例注入样本必须双腿齐全（「别说不辛苦」不匹配压制腿=假阴性），且避开其他豁免触发词防叠加兜底。已知未修项：SKILL/AGENTS Verify 列举名字数与表头有历史缺口（AGENTS block 列 10 vs 表头 11、rewrite 列 11 vs 表头 19、SKILL 列举 7 组重名），doc-numbers 只校验表头——建议下轮文档卫生专项。"
+  "notes": "r728 交接簿。下一轮候选池（r727 复测，攻击漏判≥50% 且良性 0 误伤）：no_true_scotsman 无真正的苏格兰人（81%、0/8，「真正的X不会这样」循环定义族）、loaded_question 预设加载（80%、0/8，r727 新侦察，盘问句内嵌未证实预设）、texas_sharpshooter（77%、0/11）、middle_ground（68%、0/10）、base_rate_fallacy（67%、0/8）、composition_division（53%、0/9）、denying_the_antecedent 否定前件（50%、0/9，r727 新侦察）。环境教训：①decision 本体 composite 经 Math.round 到两位小数，显示差 0.01 的候选（0.82 vs 0.81）浮点差 0.00999…<0.01 会触发平局弃权——构造判据要拉开 ≥0.02 显示差（真实差 ≥0.015），弃权后补判据比一次选对多花一轮；②后台进程跑 chunk 回归脚本会 stdin is not a tty 挂掉，全量回归必须前台 execSync 跑（每块约 220s，420s 上限内）；③MSYS /tmp 与 node 的 Windows 路径不通，node 读 bash heredoc 写的临时文件要用 cygpath -w 拿真实路径或直接写 scratch 的 Windows 路径；④patch 工具写 AGENTS.md/UPGRADE_LOG.md 会带入全文 CRLF，sync-doc-numbers 改 .md 同样会，提交前必须 node/sed 归一；git stash pop 会把工作区写回 CRLF，guard-abilities 的「文本可检索」项会抓 CRLF——归一后 git add 刷缓存即可恢复（提交 blob 本就是 LF，不产生新 commit）；⑤4 空格缩进锚点是 6 空格行的子串，裸锚点 split 计数翻倍——接线锚点必须带注释行；⑥模块判据设计教训：巴纳姆话术不必然显式宣称精准（「很准」），专属感常由「不轻易让人看见/很少有人读懂你」暗示——判据腿按语域真实分布设计（本轮腿②从「精准佯称」改为「第二人称指向」后模块层 2/20→20/20）。已知未修项：SKILL/AGENTS Verify 列举名字数与表头有历史缺口（doc-numbers 只校验表头），本轮已手动补 forer_effect 进两处列举，结构性缺口仍在。"
 }
