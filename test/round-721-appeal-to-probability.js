@@ -157,9 +157,9 @@ t('登记-verify级在gate生效', () => {
   const r2 = gate.checkOutput('概率虽然低但不是零，我们还是要做好预案');
   assert.strictEqual(r2.verdict, '可信');
 });
-t('登记-维度总数152', () => {
+t('登记-维度总数154', () => { // 第 721 轮落笔时引擎 152 维，r722/r723/r724 各 +1 → 154（GATE-2 总数断言预期过期，非回归）
   const keys = Object.keys(gate.discriminate('probe').dimensions);
-  assert.strictEqual(keys.length, 152, '维度键数应为 152，实际 ' + keys.length);
+  assert.strictEqual(keys.length, 154, '维度键数应为 154，实际 ' + keys.length);
 });
 
 console.log('passed: ' + pass + ', failed: ' + fails.length);

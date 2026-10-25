@@ -83,6 +83,13 @@ genetic_fallacy（血统决定论）/triangulation（拉第三方施压）相邻
 负例注入 `scripts/negative-test-guilt-by-association.js` **35/35**
 （逐常量置空翻转 + 豁免独立性交叉 + 全腿置空静默）。
 
+存量回归（r720-r723 历史轮测试全绿）：round-720 post_hoc **55/55** +
+round-721 appeal_to_probability **55/55** + round-722 hot_hand
+**43/43** + round-723 standard_shift **75/75**。r721/r722/r723 的
+GATE-2 维度总数断言（152/153/153→154）为多轮累积预期过期（设计
+使然非回归），已按纪律更新断言值并在注释注明「第 N 轮落笔时引擎
+M 维，本轮 +1」。
+
 ## 环境事实（交接）
 
 - **CRLF×N 再次出现（r723 同源）**：core.autocrlf=true 环境下
