@@ -79,7 +79,9 @@ r724/r725/r726/r727 连续四轮探测 85% 持平，每轮均因当轮新侦察�
 ## 四、Commit hash（三个，未 push——人工门禁）
 
 - **feat `60db30b5`**（20 files，含版本号 6.8.75；src/forer-effect.js 新维度 + index.js 九处接线 + 版本五处 + SKILL/AGENTS/README 列举与测试数同步 + r727 探针/负例/轮测试 + r724/r725 总数断言更新）
-- docs / chore：（提交后填）
+- **docs `c695a1ab`**（UPGRADE_LOG r727 轮报告置顶）
+- **chore `84351ba2`**（upgrade-state 推进到 round 727 + recordSelfState r727 脚本归档）
+- **chore `0e9d6a69`**（.gitignore 行内注释致忽略规则失效的修复——self-model.json/test/_tmp_* 两行带行尾注释，gitignore 不支持行内注释使规则失效，运行残留重新显形；维护项，非升级）
 
 ## 五、诚实交代
 
