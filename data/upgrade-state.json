@@ -1,21 +1,22 @@
 {
-  "round": 721,
-  "version": "6.8.69",
-  "roundStartedAt": "2026-10-24T00:00:00.000Z",
-  "lastFinishAt": "2026-10-24T00:00:00.000Z",
+  "round": 722,
+  "version": "6.8.70",
+  "roundStartedAt": "2026-10-25T00:00:00.000Z",
+  "lastFinishAt": "2026-10-25T00:00:00.000Z",
   "lastGreen": true,
   "lastChecks": [
     "PASS 版本四处一致",
     "PASS 版本已进 git log",
     "PASS README changelog 覆盖当前版本",
     "PASS 交接簿记录当前版本",
-    "PASS round-721 测试 55/55 + negative-test 17/17",
-    "PASS bidirectional 召回侧不变 + 误拦侧与基线一致",
-    "PASS guard-abilities 20/20（dimensions 键 152）",
-    "PASS doc-numbers 22/22 + security-audit 16/16"
+    "PASS round-722 测试 43/43 + negative-test 22/22",
+    "PASS bidirectional 召回 52/52 + 误拦 302/326 与基线一致零新增",
+    "PASS guard-abilities 20/20（dimensions 键 153）",
+    "PASS doc-numbers 22/22 + security-audit 16/16（S2 由含版本号 feat commit 转绿）",
+    "PASS 存量回归 post_hoc：negative-test 74/74 + round-720 55/55（词边界修复零回归）"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
   "published": "6.7.124",
   "publishedAt": "2026-09-25T20:03:42.912Z",
-  "notes": "r721 appeal_to_probability 上线（第 152 维度，诉诸概率：把基数大/重复多/样本大/时间够长当成「一定发生/一定轮到我」的保证；r720 落选族，本轮补语域高频形态后漏判率 63%→75% 中选）。decision 选中 A composite 0.81 / confidence 0.78 / identity 0.8。双腿共现（基数/重复/规模/时长表达 × 必然性断言），三豁免（正确概率陈述/元话语/概率教学第三人称）。下一轮候选：relative_privation（漏判 71%，拿更惨的人抹掉眼前抱怨）、hot_hand（漏判 67%，连胜势头延续，gamblers_fallacy 反向补形）、void_zh_standard_shift 存量修复专项（复测漏判 76% 全池最高但有 1 误伤，连坐纪律先修误伤）。"
+  "notes": "r722 hot_hand 上线（第 153 维度，热手谬误：把连胜势头当成下一局胜率提升的保证；decision 首轮 A/B 0.81 打平弃权——诚实行为，补真实可区分判据后第二轮选中 A composite 0.83 / confidence 0.8 / identity 0.8）。双腿共现（势头/连胜表达 × 延续性断言），三豁免（元话语/证据语境/教学转述）。另修存量误伤：post_hoc R2 EN 干预腿裸词 got 子串命中 renegotiate（ne-got-iate）× no longer，良性谈判句被误判 rewrite——改词边界匹配后清零，连带 void_zh_standard_shift 族误伤 1/12→0/12（复测确认已成合格候选，漏判 76% 全池最高，下轮优先）。全量回归 run-all 18239 通过/139 失败，139 个失败两树对比 46/46 文件级退出码一致+4 单独复跑一致，全部预存、本轮零新增回归。下一轮候选：void_zh_standard_shift 契约作废窄口（漏判 76% 全池最高、误伤 0，已合格）、texas_sharpshooter 德州神枪手（本轮落选 0.81，漏判 73%、误伤 0，与 survivorship_bias 三族边界模糊需补边界样本）、relative_privation 诉诸更惨（本轮落选 0.80，漏判 69%、误伤 0，r721/r722 连续两轮落选需构造更强身份对齐判据）。"
 }
