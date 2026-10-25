@@ -111,6 +111,48 @@
       "source": "test",
       "createdAt": 1791611277369,
       "updatedAt": 1791611277369
+    },
+    "belief_1792937357760_dhd8": {
+      "content": "r605 probe belief never fails",
+      "confidence": 0.85,
+      "source": "test",
+      "createdAt": 1792937357760,
+      "updatedAt": 1792937357760
+    },
+    "belief_1792940791790_c3ug": {
+      "content": "r605 probe belief never fails",
+      "confidence": 0.85,
+      "source": "test",
+      "createdAt": 1792940791790,
+      "updatedAt": 1792940791790
+    },
+    "belief_1792940822216_mbqp": {
+      "content": "r605 probe belief never fails",
+      "confidence": 0.85,
+      "source": "test",
+      "createdAt": 1792940822216,
+      "updatedAt": 1792940822216
+    },
+    "belief_1792941017342_umaf": {
+      "content": "r605 probe belief always holds",
+      "confidence": 0.85,
+      "source": "test",
+      "createdAt": 1792941017343,
+      "updatedAt": 1792941017343
+    },
+    "belief_1792942556059_zi5d": {
+      "content": "r605 probe belief never fails",
+      "confidence": 0.85,
+      "source": "test",
+      "createdAt": 1792942556059,
+      "updatedAt": 1792942556059
+    },
+    "belief_1792942590569_msao": {
+      "content": "r605 probe belief never fails",
+      "confidence": 0.85,
+      "source": "test",
+      "createdAt": 1792942590570,
+      "updatedAt": 1792942590570
     }
   },
   "capabilities": [
@@ -166,42 +208,6 @@
     {}
   ],
   "identityHistory": [
-    {
-      "timestamp": 1791391559869,
-      "action": "drift_repair",
-      "removed": 0,
-      "conflicts": []
-    },
-    {
-      "timestamp": 1791391753393,
-      "action": "drift_repair",
-      "removed": 0,
-      "conflicts": []
-    },
-    {
-      "timestamp": 1791431056046,
-      "action": "drift_repair",
-      "removed": 0,
-      "conflicts": []
-    },
-    {
-      "timestamp": 1791433181989,
-      "action": "drift_repair",
-      "removed": 0,
-      "conflicts": []
-    },
-    {
-      "timestamp": 1791434313660,
-      "action": "drift_repair",
-      "removed": 0,
-      "conflicts": []
-    },
-    {
-      "timestamp": 1791435652270,
-      "action": "drift_repair",
-      "removed": 0,
-      "conflicts": []
-    },
     {
       "timestamp": 1791443986736,
       "action": "drift_repair",
@@ -303,6 +309,54 @@
       "action": "drift_repair",
       "removed": 0,
       "conflicts": []
+    },
+    {
+      "timestamp": 1792937357761,
+      "action": "drift_repair",
+      "removed": 1,
+      "conflicts": [
+        "Contradiction: \"always\" vs \"never\""
+      ]
+    },
+    {
+      "timestamp": 1792940791791,
+      "action": "drift_repair",
+      "removed": 1,
+      "conflicts": [
+        "Contradiction: \"always\" vs \"never\""
+      ]
+    },
+    {
+      "timestamp": 1792940822217,
+      "action": "drift_repair",
+      "removed": 1,
+      "conflicts": [
+        "Contradiction: \"always\" vs \"never\""
+      ]
+    },
+    {
+      "timestamp": 1792941017345,
+      "action": "drift_repair",
+      "removed": 1,
+      "conflicts": [
+        "Contradiction: \"always\" vs \"never\""
+      ]
+    },
+    {
+      "timestamp": 1792942556060,
+      "action": "drift_repair",
+      "removed": 1,
+      "conflicts": [
+        "Contradiction: \"always\" vs \"never\""
+      ]
+    },
+    {
+      "timestamp": 1792942590570,
+      "action": "drift_repair",
+      "removed": 1,
+      "conflicts": [
+        "Contradiction: \"always\" vs \"never\""
+      ]
     }
   ],
   "growthMetrics": {

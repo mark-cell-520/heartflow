@@ -6,8 +6,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-154 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
-×  1,314 dispatch routes  ×  18,157 passing tests  ×  0 runtime dependencies
+155 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+×  1,314 dispatch routes  ×  18,277 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 154 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 155 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -143,7 +143,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (154 dimensions) -> gate
+scope-check -> premise-check -> discriminate (155 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -172,16 +172,16 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.72**. Not marketing copy.
+Measured on this repository at **v6.8.73**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 154 |
+| Discrimination dimensions | 155 |
 | MCP tools | 182 |
-| Test suite | 18,157 passing / 105 failing |
+| Test suite | 18,277 passing / 138 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.73 | 2026-10-25 | **`affirming_the_consequent` added as dimension 155 (upgrade type 1 — a brand-new discrimination dimension)** — affirming the consequent: reversing cause from evidence ("if he did it he would leave traces; there are traces, so he did it"). decision 本体一次选中无打平（composite 0.86 / confidence 0.86 / identity alignment 0.8）。r725 复测漏判 14/15（93%）全池最高 → 上线后攻击 15/15 命中、良性 12/12 零命中。modus ponens / modus tollens / 对冲形天然不判（按推断词切分事实句，前半须含后件关键词、后半回指前件关键词）|
 | 6.8.72 | 2026-10-25 | **`guilt_by_association` added as dimension 154 (upgrade type 1 — a brand-new discrimination dimension)** — guilt by association: blaming someone for the sins of their associates ("his friend is a scammer, so he is no good"). decision 本体一次选中无打平（composite 0.85 / confidence 0.82 / identity alignment 0.8）。r724 复测漏判 11/12（92%）→ 上线后全命中，误伤 0/12，双向门禁召回 52/52、误拦 302/326 与基线一致零新增 |
 | 6.8.71 | 2026-10-25 | **`standard_shift` dimension 70 strengthened (upgrade type 1 adjacent — a real capability gain on an existing dimension: a second judging route for the contract-void family)** — single-sided voiding of a prior promise/standard (契约作废窄口): one party declares an already-agreed standard void to escape it, without any goalpost-raising trigger words (当初那件事不作数，你别拿它说事 / 这次承诺不算，我改主意了 / 旧标准作废，按我今天说的来 / 婚前说好不干涉我的工作，那条现在不算数 / 谈好的条件随时可以改，我说了算 / 说好的提成现在不认了，规矩我来定 / That deal is void, I have decided on new terms. / You cannot hold me to what I said last month.): route ④ requires promise/standard anchor × voiding verb to co-occur (九腿 Z1/Z1b/Z2/Z3/Z4/Z5/E1/E2/E3), Z2 carries a one-sided marker (按我今天说的/我说了算/按新方案) so organizational announcements (旧版标准已经失效，请注意查阅更新通知) stay clean, DUE_PROCESS exemption is narrower than PROCESS_MARKER (only mutual consent / publication / filing / written / change order / transition period / by law / court / arbitration pass), bare 不算 is anchored to sentence punctuation (之前的问题不算难 is not a hit). Decision entity selected this direction from a seven-family re-probe (void_zh 81% miss rate, highest in pool, 0/15 false positives; composite 0.87 / confidence 0.84 / identity 0.8). 27/27 leaks closed (81% → 0%), 0/15 false positives, 33 benign samples zero module-layer hits. Negative-injection test verifies every constant is load-bearing 57/57 (including empty-table anti-degeneration guards: an emptied table drops its leg instead of becoming a match-everything `(?:)`). |
 | 6.8.70 | 2026-10-25 | **`hot_hand` added as dimension 153 (upgrade type 1 — a brand-new discrimination dimension)** — hot hand fallacy: treating a winning streak as a guarantee that the next round's odds improve (我手感正旺，下一把肯定中 / 今天连赢五把，趁热打铁再来一局 / 最近状态好，这个月业绩肯定还会涨 / 连胜之后势头在我，决赛肯定也赢 / 我已经连对十题了，下一道也一定对 / 连红三把了，房费都是我的，继续押 / 最近面试全过，这家肯定也成 / 我这个月签了三单，下个月肯定更多 / I am on a hot streak, so the next hand is mine. / I have won five in a row; I should ride the momentum. / Things are going my way lately, so the next one will work out too. / I am in the zone, so this next shot is definitely going in. / Three wins in a row — the momentum is clearly on my side.): two legs — streak/momentum expression (手感/手气旺/手风顺/势头/气势/趁热打铁/走运/运气好/状态好/连赢/连胜/连对/连红/连中/连签/连过/连成/连涨/全过/全中/签了三单；EN: hot streak / on a roll / in the zone / momentum / on fire / going my way / five in a row / wins in a row) × continuation assertion (肯定/一定/必然/势必/铁定/必定/必中/必赢/稳了/还会/也会/再来一局/再来一把/继续押/继续买/下一把也/下一局也/下一道也/下一个也/下个月也/再买几注；EN: definitely / guaranteed / bound to / certainly / surely / for sure / no doubt / is mine / will work out / going in / on my side / next one will / ride the momentum) — missing either leg means no hit (连胜可能提升信心，但每局概率独立 is legitimate review; 连胜这么多了，下一把该输了 is the reversal direction, owned by gamblers_fallacy dimension 148). Decision entity selected (first round A/B composite 0.81 tie → honest abstention; after adding genuinely distinguishable criteria the second round chose A: composite_score 0.83 / confidence 0.8 / identity alignment 0.8). 11/15 leaks closed (73%, true zero-hit 11/11), 0/8 benign harmed, bidirectional guard 52/52 recall and false positives 302/326 (identical to baseline, zero new harm). Three exemptions locked: meta discourse (热手谬误/hot hand fallacy/赌徒谬误), evidence context (独立事件/概率独立/不影响/与历史无关/大数定律；EN: independent event / regardless of / remains the same / same probability), teaching third-person context (老师/教材/课堂/教授/textbook/lecture). Negative-injection test verifies every constant is load-bearing 22/22. Also fixes a pre-existing false positive found this round: post_hoc R2's EN intervention leg matched the bare word "got" as a substring inside "renegotiate" (ne-got-iate) × "no longer", causing the benign sentence "If the old terms no longer work for you, let us renegotiate." to be gate-rewritten — word-boundary matching clears it. VERIFY level | \n

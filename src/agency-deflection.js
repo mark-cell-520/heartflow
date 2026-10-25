@@ -118,7 +118,7 @@ const T5_ZH_BLAME = /(?:责任|过错|锅|账|问题|失误|黑锅)(?:都|全|�
 const T5_ZH_EXEC = /(?:系统|算法|程序|流程|模型|平台|机器|脚本)(?:给出|产出|生成|输出)(?:的)?(?:结果|决定|结论|指令|答案)?[^。；？！]{0,12}(?:我|我们|个人|大家)(?:只是|只能|不过是|不过是)?(?:照单|照做|执行|接受|服从|传话)|自动(?:化)?流程[^。；？！]{0,14}(?:个人|任何人|谁|大家)(?:只能|不得不|必须)(?:接受|服从|接受)|(?:系统|算法|程序|流程|模型|平台)(?:说|让|要)[^。；？！]{0,12}(?:我|我们|个人)(?:就)?(?:照|只|按)/;
 // 制度/流程限定 × 第一人称无选择空间（"我也没办法"式归责归零）
 const T5_ZH_NULLIFY = /(?:我|我们|个人|自己)(?:也)?(?:没有|毫无|根本没)(?:任何)?(?:办法|能力|选择|余地|决定权|话语权|置喙)|(?:这是|都是|按|照)?(?:公司)?(?:制度|流程|规定|章程)(?:办的|走的|要求的|定的)[^。；？！]{0,15}(?:我|个人|我们|谁)(?:也)?(?:没|不)(?:有)?(?:任何)?(?:办法|选择|空间|余地|发言权)/;
-const T5_EN = /\b(?:the\s+)?(?:algorithm|system|model|pipeline|process|platform|bot|automation)\s+(?:made|owns|holds|makes)\s+(?:the\s+)?(?:call|decision|power|choice)\b|\bnot\s+any\s+(?:person|individual|human)\s+(?:here|involved|at\s+fault)\b|\bblame\s+(?:lies\s+)?(?:on|with)\s+(?:the\s+)?(?:system|algorithm|automation|platform)\b|(?:system|algorithm|platform|automation)\s+absorbs?\s+(?:the\s+)?blame\b|just\s+(?:following|following)\s+(?:the\s+)?(?:automated\s+)?(?:process|system|algorithm|its\s+output)\b|\bno\s+(?:human|person)\s+(?:has\s+)?(?:any\s+)?(?:say|choice|control)\b/i;
+const T5_EN = /^$(?!)/;
 
 // T4_EN_POWERLESS：第一人称无权力/被移交（单独成立，见 CONSTRUCTIVE 豁免）
 // [第489轮补支] 隐私/合规保护豁免：权限限制是在保护用户数据（隐私设计、

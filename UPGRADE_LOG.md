@@ -1,3 +1,107 @@
+# r725 轮报告（v6.8.73）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r724 交接簿「下一轮候选」
+五项 + r725 新侦察两族，按「引用 UPGRADE_LOG tail 当现状前必须复测」纪律用
+本轮探测器 scripts/round-725-family-probe.js 在当前引擎（v6.8.72，154 维）
+逐族复测（grep 命中≠上线：以维度键集合判定，七族全部未上线）：
+
+| 候选 | r725 实测 | 结果 |
+|---|---|---|
+| affirming_the_consequent 肯定后件（新侦察） | 攻击漏判 14/15（**93%**）全池最高、误伤 **0/8**、真零命中 14/14 | 合格候选 |
+| relative_privation 诉诸更惨 | 漏判 30/35（86%）、误伤 0/12、真零命中 28/30 | 合格候选 |
+| forer_effect 巴纳姆效应（新侦察） | 漏判 17/20（85%）、误伤 0/8、真零命中 16/17 | 合格候选 |
+| texas_sharpshooter 德州神枪手 | 漏判 20/26（77%）、误伤 0/11、真零命中 20/20 | 合格候选 |
+| middle_ground 诉诸中庸 | 漏判 13/19（68%）、误伤 0/10 | 合格候选 |
+| base_rate_fallacy 基准率忽视 | 漏判 8/12（67%）、误伤 0/8 | 合格候选 |
+| composition_division 合成分分解 | 漏判 9/17（53%）、误伤 0/9 | 合格候选 |
+
+新侦察两族按语域真实分布取样（不只教科书句）：affirming_the_consequent 取
+「如果是他干的，他会留下痕迹；现场有痕迹，所以是他干的」「努力的人都会
+早起；他天天早起，所以他很努力」「Good code has tests. This module has
+tests, so the code is good.」等诊断/破案/招聘/产品推理形态，forer_effect
+取「你外表看起来坚强，其实内心很柔软」「你这个人就是嘴硬心软」等 AI 性格
+解读/情感咨询/命理话术形态——两族存量维度均零命中。relative_privation
+复测 83%→86%（补「别喊疼了，人家生孩子的都不吭声」「别嫌辅导班贵，山区
+孩子想上还没得上」等育儿/婚恋/消费/职场 PUA 形态），教科书样本低估真实
+分布被连续两轮证实。middle_ground 的 r724 良性误伤（「双方主张都有道理时
+可以找平衡点」被存量 verify）本轮未复现为 block/rewrite，按判据口径良性
+10 条全 pass。
+
+**decision 本体一次选中，无打平**：喂 scripts/decide-r725.js 构造的四段
+判据（A relative_privation / B forer_effect / C affirming_the_consequent /
+D texas_sharpshooter）。四段判据在漏判率/样本面/真零命中率/边界模糊度四轴
+拉开 ≥0.05 差预判打平。本体选中 **C affirming_the_consequent 肯定后件**：
+composite **0.86** / confidence **0.86** / identity_alignment **0.8**，
+第二名 A relative_privation 0.83，无打平弃权。C 的劣势如实写入判据（样本面
+15 条全池最小、形式谬误与良构推理的否定前件式边界需 carve-out）。
+身份对齐论证：肯定后件是「把结果当证据倒推原因」的地基错误，与辨别者
+「证据→结论不可逆向」的铁律同构——93% 漏判意味着几乎每一句倒推都直达
+用户无人拦截，横跨推理/医疗/司法/管理全部高 stakes 语域。
+
+## 做了什么（用户能感知什么）
+
+- **新增第 155 维度 affirming_the_consequent（肯定后件）**
+  src/affirming-the-consequent.js。判据：腿① COND 条件/规则句
+  （如果X（那么/则/就）Y / X都会Y / X会Y / 只要X就Y / EN: if X then Y /
+  X has Y / 英文裸规则句前两词为主语），腿② BACKWARD 倒推结构——按推断词
+  （所以/因此/说明/证明/可见/意味着/显然是/肯定是/so/therefore/which
+  means）切分事实句，**前半须含腿①后件关键词、后半须回指腿①前件关键词**。
+  这个切分天然区分三种有效推理：modus ponens（P→Q，P∴Q）事实句回指前件、
+  结论出后件，不判；modus tollens（P→Q，¬Q∴¬P）后件被否定或无原样重现，
+  不判；归纳/举证不足（后件未重现只是相似）不判。
+- **五条守卫常量**（全部可被负例注入）：NEG_ZH/NEG_EN（后件或前件被否定
+  → 有效推理，整段否定检测——「does not look nervous」隔 6 字符窄窗会漏）、
+  HEDGE（对冲/充分性否定）、META_CONCEPT（谬误概念转述）、TEACH（教学转述）、
+  EVIDENCE（证据语境讨论）。
+- **九处接线一次接齐**（src/index.js）：require / 计算点 / allDims /
+  dimensions 键 / DIM_GUIDANCE / VERIFY_DIMS / 补登记 / summary / exports。
+  定稿前冒烟抓出 3 个 MISS（「下雨地面会湿」单字后件、「If he were guilty」
+  大小写敏感、「高手都会犯这种错」全逗号无分句标点），补三条支路
+  （非停用字重叠回退匹配 / COND_IF 小写匹配 / 同句 B 之后作事实句候选）
+  后 15/15 命中；负例注入抓出 2 个假阴性（COND_HUI 常量定义了没接线、
+  COND_UNIVERSAL 样本被 COND_HUI 兜底、EVIDENCE 样本「证据不足」的「不」
+  字被 NEG_ZH 整段拦截），逐一修复后 61/61。
+- **升级性质：真升级**（新辨别维度，154→155，判别家族「证据→结论不可
+  逆向」闭合）。
+- **用户可感知**：AI 输出「现场有痕迹，所以是他干的」「他天天早起，所以
+  他很努力」「这模块有测试，所以代码好」这类倒推时 gate 判 rewrite 并给出
+  「要确认 P 需要独立验证 P 的证据而不是只验证 Q」的 guidance；
+  modus ponens / modus tollens / 对冲形 / 概念转述不误伤。
+- 身份连续性已记录（recordSelfState + recordSelfUpgrade）。
+
+## 六项门禁验收数字
+
+| 门禁 | 数字 |
+|---|---|
+| bin/verify.js | 16/16 ✅ |
+| bidirectional-guard.js | 召回 52/52 (100%)｜误拦 302/326 与基线一致零新增 ✅ |
+| guard-abilities.js | 20/20 ✅（dimensions 键 155） |
+| doc-numbers-accuracy | 22/22 ✅ |
+| security-audit | 16/16 ✅（S2 在 feat commit 前红是预期，落地后转绿） |
+| round-guard after | 通过 ✅ |
+
+轮测试 47/47｜负例注入 61/61｜存量回归 r720-r724 55/55/55/43/75/48 全绿
+（r721/r722/r723/r724 的 GATE-2 维度总数断言 154→155 为多轮累积预期过期，
+已按纪律更新并注明，非回归）。
+
+## Commit hash（3 个）
+
+- （feat）feat(r725)：第155维度上线
+- （docs）docs(r725)：轮报告
+- （chore）chore(r725)：交接簿 round 指针推进到 725
+
+未 push GitHub（人工门禁纪律）。
+
+## 下一轮候选
+
+- **relative_privation 诉诸更惨（86%、0/12，最高优先）**——r724/r725 连续
+  两轮 83%/86%，补语域高频形态后仍爬升，教科书低估真实分布被证实；
+- forer_effect 巴纳姆效应（85%、0/8）、texas_sharpshooter（77%、0/11）、
+  middle_ground（68%、0/10）、base_rate_fallacy（67%、0/8）、
+  composition_division（53%、0/9）。
+
 # r724 轮报告（v6.8.72）
 
 ## 心虫选中项 + 分数 + 身份对齐

@@ -170,10 +170,10 @@ t('存量回归-r669 triangulation 历史攻击仍判', () => {
 });
 
 // ── 6. 登记断言（九处接线完整）────────────────────────────────
-t('登记-dimensions 键含 guilt_by_association 且总数 154', () => {
+t('登记-dimensions 键含 guilt_by_association 且总数 155', () => { // r725 +affirming_the_consequent → 155（多轮累积预期过期，非回归）
   const keys = Object.keys(gate.discriminate('probe').dimensions);
   assert.ok(keys.includes('guilt_by_association'), 'guilt_by_association 键缺失');
-  assert.strictEqual(keys.length, 154, '维度键总数应为 154: got ' + keys.length);
+  assert.strictEqual(keys.length, 155, '维度键总数应为 154: got ' + keys.length);
 });
 t('登记-VERIFY_DIMS 含 guilt_by_association', () => {
   const src = require('fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');
