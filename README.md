@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-152 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+153 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
 ×  1,314 dispatch routes  ×  18,157 passing tests  ×  0 runtime dependencies
 ```
 
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 152 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 153 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -143,7 +143,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (152 dimensions) -> gate
+scope-check -> premise-check -> discriminate (153 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -172,14 +172,14 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.69**. Not marketing copy.
+Measured on this repository at **v6.8.70**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 152 |
+| Discrimination dimensions | 153 |
 | MCP tools | 182 |
 | Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.70 | 2026-10-25 | **`hot_hand` added as dimension 153 (upgrade type 1 — a brand-new discrimination dimension)** — hot hand fallacy: treating a winning streak as a guarantee that the next round's odds improve (我手感正旺，下一把肯定中 / 今天连赢五把，趁热打铁再来一局 / 最近状态好，这个月业绩肯定还会涨 / 连胜之后势头在我，决赛肯定也赢 / 我已经连对十题了，下一道也一定对 / 连红三把了，房费都是我的，继续押 / 最近面试全过，这家肯定也成 / 我这个月签了三单，下个月肯定更多 / I am on a hot streak, so the next hand is mine. / I have won five in a row; I should ride the momentum. / Things are going my way lately, so the next one will work out too. / I am in the zone, so this next shot is definitely going in. / Three wins in a row — the momentum is clearly on my side.): two legs — streak/momentum expression (手感/手气旺/手风顺/势头/气势/趁热打铁/走运/运气好/状态好/连赢/连胜/连对/连红/连中/连签/连过/连成/连涨/全过/全中/签了三单；EN: hot streak / on a roll / in the zone / momentum / on fire / going my way / five in a row / wins in a row) × continuation assertion (肯定/一定/必然/势必/铁定/必定/必中/必赢/稳了/还会/也会/再来一局/再来一把/继续押/继续买/下一把也/下一局也/下一道也/下一个也/下个月也/再买几注；EN: definitely / guaranteed / bound to / certainly / surely / for sure / no doubt / is mine / will work out / going in / on my side / next one will / ride the momentum) — missing either leg means no hit (连胜可能提升信心，但每局概率独立 is legitimate review; 连胜这么多了，下一把该输了 is the reversal direction, owned by gamblers_fallacy dimension 148). Decision entity selected (first round A/B composite 0.81 tie → honest abstention; after adding genuinely distinguishable criteria the second round chose A: composite_score 0.83 / confidence 0.8 / identity alignment 0.8). 11/15 leaks closed (73%, true zero-hit 11/11), 0/8 benign harmed, bidirectional guard 52/52 recall and false positives 302/326 (identical to baseline, zero new harm). Three exemptions locked: meta discourse (热手谬误/hot hand fallacy/赌徒谬误), evidence context (独立事件/概率独立/不影响/与历史无关/大数定律；EN: independent event / regardless of / remains the same / same probability), teaching third-person context (老师/教材/课堂/教授/textbook/lecture). Negative-injection test verifies every constant is load-bearing 22/22. Also fixes a pre-existing false positive found this round: post_hoc R2's EN intervention leg matched the bare word "got" as a substring inside "renegotiate" (ne-got-iate) × "no longer", causing the benign sentence "If the old terms no longer work for you, let us renegotiate." to be gate-rewritten — word-boundary matching clears it. VERIFY level | \n
 | 6.8.69 | 2026-10-24 | **`appeal_to_probability` added as dimension 152 (upgrade type 1 — a brand-new discrimination dimension)** — appeal to probability / scale-as-certainty: treating "large base, many repetitions, big sample, enough time, probability exists" as a guarantee that "it will definitely happen / it will definitely be my turn" (宇宙这么大，肯定有外星人 / 世上无难事，只要肯试，试多了总能成 / 航班天天飞，出事的才几起，我肯定赶不上 / 选择题四个选项，蒙个十道八道总能对几道，考试稳了 / 概率再低，只要重复次数够多就一定发生 / 中国有十四亿人，什么样的事不可能发生？ / With so many tickets sold, someone has to win — why not me? / The universe is so vast, there must be intelligent life. / Given enough time, anything that can happen will happen. / If I keep playing, I am bound to win sooner or later.): two legs — base/scale/repetition/duration expression (这么[大广多]/那么[大广多]/十几亿人/这么多人/天天飞/遍地/试多了/重复次数够多/蒙个十道八道/投了三百份/时间够长; EN: so many / so vast / billions of / given enough time / enough times / keep playing / hundreds of) × certainty assertion (肯定[有会成]/一定[会能发生]/总能/迟早/必然/不可能不发生/稳了/凭什么不是我/还会远吗; EN: must be / bound to / guaranteed / has to / inevitable / will happen / sooner or later / why not me) — missing either leg means no hit ("宇宙这么大，但至今没有证据" is a correct scale statement; "这事一定能成" with no evidence source belongs to wishful_thinking / confidence). Decision entity selected (composite_score 0.81 / confidence 0.78 / identity alignment 0.8). 12/16 leaks closed (75%), 0/10 benign harmed, r721 probe re-verified: true zero-hit 12/12 across all 151 prior dimensions. Three exemptions locked: correct probability statements (概率很低但不是零/大数定律/独立事件; low probability / no evidence / does not guarantee), meta discourse (诉诸概率是一种逻辑谬误), probability-teaching third-person context (老师/教材/课堂上/textbook/lecture). Negative-injection test verifies every constant is load-bearing 17/17. VERIFY level | 
 | 6.8.68 | 2026-10-24 | **`post_hoc` added as dimension 151 (upgrade type 1 — a brand-new discrimination dimension)** — post hoc fallacy: treating temporal sequence alone as proof of causation ("after X, therefore because of X"). Three routes: (R1) 时序连接词×归因断言 — "自从/换/装/用 了 X 之后/以后 … 就 …" 归因句； (R2) 干预词×变化词 — "换了/穿了/吃了 X" + "业绩/成绩/运气/运气 就 好/坏/升/降" 突变形； (R3) 缺席×灾祸×规避 — "没去/没带 X" + "就出了事/就倒霉" + "以后不敢/不敢" 三腿共现（缺一腿不判）。中文常量表覆盖日常归因口语形态（"就" 突变形与中性记录句作形状区分），英文覆盖 "since/after/ever since + crash/failure/improvement + must have been caused by" 形态。负例注入测试逐一置空常量验证承重 74/74，攻击样本 gate 层 rewrite，良性样本 0 误伤。VERIFY 级 | 
 | 6.8.58 | 2026-10-13 | **`kafkatrapping` added as dimension 143 (upgrade type 1 — a brand-new discrimination dimension that independently hits its own sample family)** — the family treats the interlocutor's denial/defense/emotional reaction itself as proof of guilt (你反应这么大，正好说明被我说中了 / The harder you deny it, the guiltier you look.): three routes — reaction × guilt-inference, innocence × challenging question, denial × evidence-declaration |

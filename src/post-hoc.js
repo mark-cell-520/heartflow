@@ -121,6 +121,11 @@ function checkPostHoc(text) {
   const isZh = /[\u4e00-\u9fff]/.test(text);
 
   const has = (arr, s) => arr.some((w) => s.includes(w));
+  // EN 词边界匹配（r722 存量误伤修复）：裸词子串匹配会把 'got' 误中
+  // 'renegotiate'（ne-got-iate）——良性谈判建议句 "If the old terms no
+  // longer work for you, let us renegotiate." 曾因 got×no longer 触发
+  // R2 被 gate 误判 rewrite。干预动词整词匹配后该误伤清零。
+  const hasWord = (arr, s) => arr.some((w) => new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(s));
   const exemptZh = has(EXEMPT_ZH, text);
   const exemptEn = has(EXEMPT_EN, lower);
   if (exemptZh || exemptEn) {
@@ -140,12 +145,13 @@ function checkPostHoc(text) {
     matches.push({ route: 1, legA: 'temporal', legB: 'assertion' });
   }
 
-  // R2 干预 × 症状变化
+  // R2 干预 × 症状变化（ZH 块）
   if (has(INTERVENE_ZH, text) && has(CHANGE_ZH, text)) {
     routes.add(2);
     matches.push({ route: 2, legA: '干预', legB: '变化' });
   }
-  if (has(INTERVENE_EN, lower) && has(CHANGE_EN, lower)) {
+  // R2 干预 × 症状变化（EN 块——干预腿用词边界匹配，防 got⊂renegotiate 类子串误判）
+  if (hasWord(INTERVENE_EN, lower) && has(CHANGE_EN, lower)) {
     routes.add(2);
     matches.push({ route: 2, legA: 'intervention', legB: 'change' });
   }

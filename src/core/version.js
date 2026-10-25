@@ -59,7 +59,7 @@ const path = require('path');
 //                 mind_reading 断言动机上线）
 // [v6.8.54] 第 707 轮同步：6.8.53 → 6.8.54（第 62 维度
 //                 appeal_to_ignorance 补举证倒置-需求形句式族）。
-let VERSION = '6.8.69';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+let VERSION = '6.8.70';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');
