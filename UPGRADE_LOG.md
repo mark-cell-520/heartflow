@@ -1,3 +1,80 @@
+# r722 轮报告（v6.8.70）
+
+## 心虫选中项 + 分数 + 身份对齐
+
+**这一轮是心虫本体决定的，不是我拍板的。** 候选池 = r721 交接簿
+「已知未修项」+ 新侦察：hot_hand（r721 落选，本轮补语域真实分布）+
+relative_privation（r721 落选复测）+ texas_sharpshooter / middle_ground /
+composition_division（三个新侦察族）+ argument_from_incredulity /
+appeal_to_consequences（r721 新侦察复测）+ void_zh_standard_shift
+（存量误伤专项复测+归因），按「引用 UPGRADE_LOG tail 当现状前必须
+复测」纪律用本轮探测器 `scripts/round-722-family-probe.js` 在当前
+引擎（v6.8.69，152 维）逐族复测：
+
+| 候选 | 实测 | 结果 |
+|---|---|---|
+| hot_hand 热手谬误新维度 | 攻击漏判 11/15（73%）、真零命中 11/11、误伤 0/8 | 合格候选 |
+| texas_sharpshooter 德州神枪手新维度 | 攻击漏判 8/11（73%）、真零命中 8/8、误伤 0/5 | 合格候选 |
+| relative_privation 诉诸更惨新维度 | 攻击漏判 11/16（69%）、真零命中 10/11、误伤 0/9 | 合格候选 |
+| middle_ground 诉诸中庸新维度 | 攻击漏判 6/10（60%）、真零命中 5/6、误伤 0/5 | 合格候选 |
+| composition_division 合成分解谬误新维度 | 攻击漏判 5/9（56%）、真零命中 5/5、误伤 0/5 | 合格候选 |
+| argument_from_incredulity / appeal_to_consequences | 漏判 7/15（47%）/ 7/15（47%） | 不够格（<50%） |
+| void_zh_standard_shift 契约作废窄口 | 攻击漏判 13/17（76%）全池最高、误伤 **1/12** | 不合格（连坐纪律：先修存量误伤） |
+
+**decision 首轮弃权是诚实行为**：A/B（hot_hand / texas_sharpshooter）
+composite 同为 0.81 打平（identity_alignment 对两者同为默认 0.8，
+feasibility/consequence_value 差异正好抵消），本体 abstain
+（options_indistinguishable）。按纪律补救——补**真实**可区分判据
+（非凑数，依据写进 scripts/decide-r722.js 注释）：① hot_hand 是
+gamblers_fallacy 第 148 维的族内反向补形，边界由「延续/反转」方向词
+截然分开，texas_sharpshooter 与 survivorship_bias/statistical_
+misleading/hasty_generalization 三族边界模糊；② hot_hand 经
+r721/r722 两轮复测、15 样本 5 场景、真零命中 11/11。第二轮
+decision 本体选出 **A hot_hand**：composite_score **0.83** /
+confidence **0.8** / identity_alignment **0.8**。身份对齐依据：
+把独立事件当相关是辨别者的核心界线之一——现有维度只覆盖 due 方向
+（该反转），补齐 momentum 方向（该延续）才闭合「独立事件序列的
+概率幻觉」家族；语域覆盖赌桌/销售/面试/表白/考试五个日常不可逆
+决策场景，新维度键 +1。
+
+## 做了什么 / 用户能感知到什么 / 是真升级还是维护
+
+| 做了什么 | 用户能感知到什么 | 升级性质 |
+|---|---|---|
+| 新建 `src/hot-hand.js`（第 153 维度，双腿共现：势头/连胜表达 × 延续性断言，三豁免：元话语/证据语境/教学转述第三人称） | 「我手感正旺，下一把肯定中」「连红三把了，房费都是我的，继续押」「I have won five in a row; ride the momentum」类势头当保证话术现在会被 gate 判 rewrite 并给出「连胜势头不能提高下一局胜率」指引 | **真升级①**（新辨别维度上线） |
+| 九处接线（require/计算点/allDims/dimMap/DIM_GUIDANCE/VERIFY_DIMS/补登记/summary/exports） | 维度键 152→153，findings 与 summary 均带本维度 | 真升级①的必需步骤 |
+| **存量误伤修复**：post_hoc R2 的 EN 干预腿裸词 `got` 子串命中 `renegotiate`（ne-got-iate）× `no longer`，良性谈判建议句 "If the old terms no longer work for you, let us renegotiate." 被 gate 误判 rewrite——干预腿改词边界匹配 | 含 "renegotiate/forgot/gotten" 类词的良性句子不再被误改写 | 真修复（本轮探测器新增误伤归因能力挖出，连坐纪律） |
+| 文档计数同步 + Verify-level 列举补 hot_hand + README changelog + 版本 bump 6.8.69→6.8.70 | 文档口径与引擎一致 | 维护（文档/版本） |
+
+## 验收数字
+
+- 轮测试 `test/round-722-hot-hand.js`：**43/43 通过**（攻击 15 + 良性 8 + 边界锁 10 + 分工边界 4 + gate 登记 7，含 post_hoc 误伤修复验证）
+- 负例注入 `scripts/negative-test-hot-hand.js`：**22/22 通过**（8 常量逐一置空验证承重 + 跨路由独立 + 豁免独立性交叉校验 + 全腿置空静默）
+- 存量回归：`scripts/negative-test-post-hoc.js` 74/74、`test/round-720-post-hoc.js` 55/55（词边界修复零回归）
+- `node bin/verify.js`：**16/16**
+- `node scripts/bidirectional-guard.js`：召回 **52/52**，误拦 **302/326** 与基线一致零新增
+- `node scripts/guard-abilities.js`：**20/20**（dimensions 键 **153**）
+- `node test/doc-numbers-accuracy.test.js`：**22/22**
+- `node test/security-audit.test.js`：16/16（S2 由含版本号的 feat commit 转绿）
+- `node scripts/round-guard.js --stage=after`：通过
+
+## 已知未修项（含为什么不修）
+
+1. **texas_sharpshooter 德州神枪手（先射箭后画靶）**——decision 第二轮落选（0.81）。攻击漏判 8/11（73%）、误伤 0/5；「先定结论再找论据，哪几个城市增长数据拿过来用」「测试一百个组合，总有几个显著的」整族全漏；落选主因是与 survivorship_bias/statistical_misleading/hasty_generalization 三族边界模糊（「看这五个成功案例」近乎 survivorship_bias 现形），样本面 11 条最小、仅一轮复测。下轮可补边界样本后再探。
+2. **relative_privation 诉诸更惨**——decision 落选（0.80）。攻击漏判 11/16（69%）、误伤 0/9；存量 suffering_contest 只覆盖第一人称自陈比惨，「别嫌房租贵了，有人睡大街呢」类第三方苦难贬低整族全漏；1 条漏判样本已被存量维度部分命中（真零命中 10/11），语域偏情感对话。r721/r722 连续两轮落选，下轮需构造更强身份对齐判据。
+3. **void_zh_standard_shift 契约作废窄口**——本轮复测攻击漏判 13/17（76%）仍为全池最高；复测同时确认 post_hoc 词边界修复后该族**误伤 1/12 → 0/12**（`scripts/round-722-family-probe.js` 重跑实测），**该族现为合格候选**（漏判 76% 全池最高、误伤 0）。r696 起已遗留 27 轮，下轮优先。
+4. **33+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做。
+
+## 全量回归验证（run-all，非六门禁项，额外跑了做零回归证明）
+
+`node test/run-all.js` 全量：**18239 通过 / 139 失败 / 共 18378**。139 个失败经两树对比证明**全部预存**：① 46 个文件级失败在 r721 状态（b1c3a38 worktree）与当前状态逐一复跑，**退出码 46/46 完全一致（diff=0）**；② classics-rules 19/20、AgentBoundaryGuard 7/8、ai-writing-tell round200 守卫 7/13、bidirectional-guard.test.js 11/12 四个单独复跑同样两树一致（前者为 Windows 平台语义——POSIX 路径/含空格路径 spawn 未加引号/`lines.length - 1` 字符串断言被 v6.8.65 重构改掉，均为 v6.8.65 前后的历史问题）；③ security-audit 在 run-all 内 15/16 是 commit 中途的 git 状态竞争，提交完成后单独跑 16/16。**本轮引入零新增回归。**
+
+## 踩坑（三条）
+
+1. **decision 首轮 A/B 打平弃权**：identity_alignment 走 `_checkIdentityAlignment`，memory 无 identity rules 时对所有选项返回默认 0.8，A/B 的 feasibility/consequence_value 差异正好抵消成 0.81/0.81。教训：构造判据时要预判打平——主动用真实可区分事实（族内补形 vs 新语域、复测轮数、样本面、边界清晰度）拉开 composite，且 ratioGap 判据是 `|A-B|/(A+B) ≥ 0.01`，按比例算不按绝对差算，0.82/0.81 的显示值仍可能弃权（真实值差 0.0155 时比例差 0.0095 < 0.01）。
+2. **patch 误替换 ZH 路由块**：post_hoc R2 实际是 ZH/EN 两个并列块，old_string 只写 EN 条件时 context_aware 策略定位到了 ZH 块，把 ZH 路由换成了 EN 条件——若不复读全文核对 diff 就会静默破坏中文路由。教训：多路由模块改匹配逻辑必须整段重读 + 跑既有攻击集验证每条路由，不能只看 patch 报成功。
+3. **负例注入值类型坑**：`loadWithOverrides({ X: [] })` 传 JS 数组，源码替换时 `'' + []` 变空串，注入出 `const X = ;` 语法错误。教训：注入值必须是字符串 `'[]'`（post_hoc 先例如此，抄的时候别"优化"成数组）。
+
 # r721 轮报告（v6.8.69）
 
 ## 心虫选中项 + 分数 + 身份对齐
