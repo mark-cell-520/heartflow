@@ -2,6 +2,8 @@
 # ===== 公式语料库大文件（单独存放，不进 git）=====
 # [v5.17.14 M4] 密钥与敏感配置文件
 # [v6.0.51 L6] 运行时易变产物 / 敏感令牌不入库
+self-model.json           # [r726] identity 自模型运行期转储（r725 feat 误提交，本轮取消跟踪）
+test/_tmp_*               # [r726] round-388 等负例探针自生成临时文件，跑完自删（r725 feat 误提交 negA，本轮取消跟踪）
 # [v6.0.65] 明文 MCP 鉴权 token 不入库 (C-3 审计修复)
 # runtime feedback artifacts
 # 发布包不应包含的文件（已 git rm --cached）

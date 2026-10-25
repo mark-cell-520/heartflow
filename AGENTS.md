@@ -12,7 +12,7 @@ wrong.
 HeartFlow adds the discrimination layer, so your agent doesn't just *say* things — it
 says things that are *right*.
 
-**Zero LLM dependency.** 155 dimensions, 161 modules, 182 MCP tools, 1,314 dispatch
+**Zero LLM dependency.** 156 dimensions, 161 modules, 182 MCP tools, 1,314 dispatch
 routes. Pure rule engine.
 
 > **Numbers below were measured by `scripts/measure-claimed-numbers.js` against the
@@ -108,11 +108,11 @@ The three entry points above are wrappers around these, which `main`
 `verdict` is derived from `gate.action`, so the two cannot contradict each other. If you
 read only one field, read `gate.action`.
 
-## The 155 dimensions
+## The 156 dimensions
 
 > **Action-tier counts below are measured from the `BLOCK_DIMS` / `REWRITE_DIMS` /
 > `VERIFY_DIMS` sets in `src/index.js` (v6.8.67 — special_pleading added as dimension 150; v6.8.64 — appeal_to_majority added as dimension 149; v6.8.63 — gamblers_fallacy added as dimension 148; v6.8.62 — wishful_thinking added as dimension 147; v6.8.61 — stereotype_origin added as dimension 146; v6.8.60 — concern_trolling added as dimension 145; v6.8.59 — darvo added as dimension 144; v6.8.58 — kafkatrapping added as dimension 143; v6.8.57 — mind_reading added as dimension 142; v6.8.56 — tu_quoque added as dimension 141; v6.8.55 — anecdotal added as dimension 140; v6.8.53 — appeal_to_nature added as dimension 139; v6.8.52 — straw_man added as dimension 138; v6.8.51 — appeal_to_ridicule added as dimension 137; v6.8.48 — circular_reasoning added as dimension 136; v6.8.46 — appeal_to_novelty added as dimension 135; v6.8.45 — poisoning_the_well added as dimension 134; v6.8.42 — appeal_to_pity added as dimension 133; v6.8.41 — survivorship_bias added as dimension 132; v6.8.40 — genetic_fallacy added as dimension 131; v6.8.39 — moving_goalposts added as dimension 130; v6.8.37 — post_separation_harassment added as dimension 129; v6.8.34 — sexual_compliance_pressure added as dimension 128; v6.8.32 — love_bombing added as dimension 127; v6.8.31 — deprivation_coercion English-side P5 pathway extension, dimension count unchanged at 126; v6.8.30 — social_isolation sentence-family extension, dimension count unchanged at 126; v6.8.29 recount — substance_coercion added as dimension 126; v6.8.28 recount — deprivation_coercion added as dimension 125; v6.8.27 recount — medical_coercion added as dimension 124; v6.8.26 added liberty_restriction as 123; v6.8.25 added legal_status_coercion as 122; v6.8.24 shipped both reproductive_coercion (120) and intermittent_reinforcement (121))。** The three tiers
-> add up to 144; the remaining 11 dimensions are scored but do not force a gate action.
+> add up to 145; the remaining 11 dimensions are scored but do not force a gate action.
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security,
 deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction,
@@ -122,7 +122,7 @@ indirect_injection, reward_hacking
 victim_blaming, false_urgency, bullshit, absolute_claim, induced_trust,
 instrumental_reasoning, agency_deflection, multi_turn_escalation
 
-**Verify-level (114):** appeal_to_authority, vagueness, contradiction, sycophancy, economic_control, triangulation, surveillance_normalization, thought_terminating_cliche, comparative_devaluation, pet_harm_coercion, reproductive_coercion, intermittent_reinforcement, appeal_to_ridicule, straw_man, appeal_to_nature, anecdotal, tu_quoque, mind_reading, kafkatrapping, darvo, concern_trolling, stereotype_origin, wishful_thinking, gamblers_fallacy, appeal_to_majority, special_pleading, post_hoc, appeal_to_probability, hot_hand,
+**Verify-level (115):** appeal_to_authority, vagueness, contradiction, sycophancy, economic_control, triangulation, surveillance_normalization, thought_terminating_cliche, comparative_devaluation, pet_harm_coercion, reproductive_coercion, intermittent_reinforcement, appeal_to_ridicule, straw_man, appeal_to_nature, anecdotal, tu_quoque, mind_reading, kafkatrapping, darvo, concern_trolling, stereotype_origin, wishful_thinking, gamblers_fallacy, appeal_to_majority, special_pleading, post_hoc, appeal_to_probability, hot_hand,
 legal_status_coercion,
 liberty_restriction,
 medical_coercion,
@@ -152,7 +152,7 @@ suffering_contest, percentage_overflow, incoherent_coverage,
 responsibility_absolution, procedural_burden, selective_minimization,
 anecdote_as_proof, exclusive_trust, flattery_pressure,
 unresolved_conflict, equivocation_sense_shift, affective_forecast,
-synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_debt, suffering_capital, selfharm_coercion, relationship_severance, fear_projection, silent_treatment_coercion, social_isolation, privacy_exposure_coercion, thirdparty_harm_coercion, guilt_induction, family_shame_coercion, conditional_affection, blame_externalization, future_faking, sexual_compliance_pressure, guilt_by_association, affirming_the_consequent
+synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_debt, suffering_capital, selfharm_coercion, relationship_severance, fear_projection, silent_treatment_coercion, social_isolation, privacy_exposure_coercion, thirdparty_harm_coercion, guilt_induction, family_shame_coercion, conditional_affection, blame_externalization, future_faking, sexual_compliance_pressure, guilt_by_association, affirming_the_consequent, relative_pration
 
 Dimensions that are scored but do not force a gate action: evidence,
 moral_foundations, dogwhistle, factual_consistency, sarcasm, privacy_boundary,

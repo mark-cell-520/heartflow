@@ -6,8 +6,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-155 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
-×  1,314 dispatch routes  ×  18,277 passing tests  ×  0 runtime dependencies
+156 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+×  1,314 dispatch routes  ×  18,322 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 155 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 156 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -143,7 +143,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (155 dimensions) -> gate
+scope-check -> premise-check -> discriminate (156 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -172,16 +172,16 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.73**. Not marketing copy.
+Measured on this repository at **v6.8.74**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 155 |
+| Discrimination dimensions | 156 |
 | MCP tools | 182 |
-| Test suite | 18,277 passing / 138 failing |
+| Test suite | 18,322 passing / 171 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.74 | 2026-10-26 | **`relative_pration` added as dimension 156 (upgrade type 1 — a brand-new discrimination dimension)** — 诉诸更惨：拿别人更惨的处境抹掉对方正当的当下诉求（"别喊累了，有人连饭都吃不上"/"知足吧，还有人工资比你低一半呢"/"Others have it worse; stop complaining"）。decision 本体一次选中无打平（composite 0.83 / confidence 0.84 / identity alignment 0.8）。r726 复测漏判 30/35（86%）全池最高、误伤 0/12，连续四轮候补后当选；上线后攻击 35/35 命中、良性 12/12 零命中。第一人称自陈比惨显式让位 suffering_contest 第78维 |
 | 6.8.73 | 2026-10-25 | **`affirming_the_consequent` added as dimension 155 (upgrade type 1 — a brand-new discrimination dimension)** — affirming the consequent: reversing cause from evidence ("if he did it he would leave traces; there are traces, so he did it"). decision 本体一次选中无打平（composite 0.86 / confidence 0.86 / identity alignment 0.8）。r725 复测漏判 14/15（93%）全池最高 → 上线后攻击 15/15 命中、良性 12/12 零命中。modus ponens / modus tollens / 对冲形天然不判（按推断词切分事实句，前半须含后件关键词、后半回指前件关键词）|
 | 6.8.72 | 2026-10-25 | **`guilt_by_association` added as dimension 154 (upgrade type 1 — a brand-new discrimination dimension)** — guilt by association: blaming someone for the sins of their associates ("his friend is a scammer, so he is no good"). decision 本体一次选中无打平（composite 0.85 / confidence 0.82 / identity alignment 0.8）。r724 复测漏判 11/12（92%）→ 上线后全命中，误伤 0/12，双向门禁召回 52/52、误拦 302/326 与基线一致零新增 |
 | 6.8.71 | 2026-10-25 | **`standard_shift` dimension 70 strengthened (upgrade type 1 adjacent — a real capability gain on an existing dimension: a second judging route for the contract-void family)** — single-sided voiding of a prior promise/standard (契约作废窄口): one party declares an already-agreed standard void to escape it, without any goalpost-raising trigger words (当初那件事不作数，你别拿它说事 / 这次承诺不算，我改主意了 / 旧标准作废，按我今天说的来 / 婚前说好不干涉我的工作，那条现在不算数 / 谈好的条件随时可以改，我说了算 / 说好的提成现在不认了，规矩我来定 / That deal is void, I have decided on new terms. / You cannot hold me to what I said last month.): route ④ requires promise/standard anchor × voiding verb to co-occur (九腿 Z1/Z1b/Z2/Z3/Z4/Z5/E1/E2/E3), Z2 carries a one-sided marker (按我今天说的/我说了算/按新方案) so organizational announcements (旧版标准已经失效，请注意查阅更新通知) stay clean, DUE_PROCESS exemption is narrower than PROCESS_MARKER (only mutual consent / publication / filing / written / change order / transition period / by law / court / arbitration pass), bare 不算 is anchored to sentence punctuation (之前的问题不算难 is not a hit). Decision entity selected this direction from a seven-family re-probe (void_zh 81% miss rate, highest in pool, 0/15 false positives; composite 0.87 / confidence 0.84 / identity 0.8). 27/27 leaks closed (81% → 0%), 0/15 false positives, 33 benign samples zero module-layer hits. Negative-injection test verifies every constant is load-bearing 57/57 (including empty-table anti-degeneration guards: an emptied table drops its leg instead of becoming a match-everything `(?:)`). |
