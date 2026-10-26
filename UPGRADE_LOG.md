@@ -1,3 +1,29 @@
+# r728 轮报告（v6.8.77）
+
+## 一、背景：cron agent 崩溃后半程落地
+
+10:52 轮 agent 干活 24 分钟后于 11:16:47 崩溃（Windows asyncio WinError 995
+「线程退出或应用程序请求，已中止 I/O 操作」），留下 r728 半程：family-probe、
+decide、模块本体、冒烟脚本已就（未接线/未测/未提交），execution 卡 running
+成幽灵。本轮由主会话接管收尾：补完九处接线（含 dimensions 对象内补登记与
+module.exports 导出）、补轮测试、版本传播、提交。
+
+## 二、落地项：第 159 维度 no_true_scotsman（无真正的苏格兰人）
+
+双腿共现（authenticity 短语 × 驱逐断言/反事实条件）。冒烟 22/24 命中、
+良性零误伤；轮测试 22/22；guard-abilities 20/20；dimension-registry-guard
+159 键全登记。已知边界：`Real artists never trace references, they draw from
+imagination alone.` 模块层 70 分但 normalize 的 de_pinyin 破坏含 m 英文
+（imagination→i码agination）+ 去空格导致 discriminate 归零——存量 normalize
+边界，非本维度接线缺陷，留专项轮。
+
+## 三、顺带修复
+
+1. src/core/heartflow.js 被并发实例写成 CRLF×6450（Windows autocrlf 使
+   git diff 不可见，仅 guard-abilities 磁盘扫描暴露）——已转回 LF。
+2. cron 幽灵 execution 已 force_close（详见 data/upgrade-state.json notes）。
+
+
 # r727 轮报告（v6.8.75）
 
 ## 一、选中项 + decision 分数 + 身份对齐
