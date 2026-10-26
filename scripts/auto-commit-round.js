@@ -60,7 +60,7 @@ const tracked = status
   .map(l => l.slice(3).trim().split(' -> ').pop());
 const untracked = status.filter(l => /^\?\?/.test(l));
 // [r420] require 完整性门禁用：O(1) 判断某文件是否已被跟踪
-const trackedSet = new Set(execSync('git ls-files', { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean));
+const trackedSet = new Set(sh('git ls-files').split('\n').filter(Boolean));
 
 if (tracked.length === 0) {
   console.log('[auto-commit] 工作区无已跟踪文件改动 —— 无需自动提交');
@@ -82,8 +82,7 @@ if (tracked.length === 0) {
 //   不被任何已跟踪文件 require 的未跟踪文件仍然一律不动。
 const integrityViolations = [];
 try {
-  const trackedJs = execSync('git ls-files "src/*.js" "src/**/*.js" "bin/*.js"',
-    { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
+  const trackedJs = sh('git ls-files "src/*.js" "src/**/*.js" "bin/*.js"').split('\n').filter(Boolean);
   for (const rel of trackedJs) {
     const abs = path.join(ROOT, rel);
     let src;

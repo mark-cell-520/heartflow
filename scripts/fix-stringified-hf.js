@@ -69,7 +69,7 @@ for (const f of files) {
     try { fs.writeFileSync(f, out); } catch (e) { errs++; errList.push(f + ' WRITE ' + e.message); continue; }
   }
   try {
-    cp.execSync(`node --check ${JSON.stringify(f)}`, { stdio: 'pipe' });
+    cp.execSync(`node --check ${JSON.stringify(f)}`, { stdio: 'pipe', timeout: 30000 });
     fixed++;
   } catch (e) {
     errs++;

@@ -40,7 +40,7 @@ const T = (name, ok, detail) => {
 // 1. 导出干净树（git archive 只含已跟踪文件 —— 这本身就是一道关：
 //    没入库的文件不会出现在这里，所以跑不通就说明发布物不完整）
 try {
-  execSync(`git archive ${REF} | tar -x -C ${WORK}`, { cwd: ROOT, maxBuffer: 64 * 1024 * 1024 });
+  execSync(`git archive ${REF} | tar -x -C ${WORK}`, { cwd: ROOT, maxBuffer: 64 * 1024 * 1024, timeout: 300000 });
   T('git archive 导出干净树', true);
 } catch (e) {
   T('git archive 导出干净树', false, e.message.slice(0, 120));

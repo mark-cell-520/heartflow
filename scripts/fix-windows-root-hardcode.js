@@ -77,7 +77,7 @@ function fixFile(file) {
   // 3. 语法验证（apply 模式）
   if (APPLY) {
     try {
-      require('child_process').execSync(`node --check ${JSON.stringify(file)}`, { stdio: 'pipe' });
+      require('child_process').execSync(`node --check ${JSON.stringify(file)}`, { stdio: 'pipe', timeout: 30000 });
     } catch (e) {
       return { file, occurrences, error: String(e.stderr || e.message).slice(0, 200) };
     }

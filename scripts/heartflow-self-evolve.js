@@ -39,7 +39,9 @@ function bumpVersion(v) {
 
 function run(cmd) {
   try {
-    return execSync(cmd, { cwd: ROOT, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+    // [全局修复 2026-10-26] 默认 180s——execSync 不传 timeout 是无限等待，
+    // cron 无人值守场景下 git/网络挂起会把整轮升级永久阻塞。
+    return execSync(cmd, { cwd: ROOT, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 180000 });
   } catch (e) {
     return (e.stdout || '') + (e.stderr || '');
   }

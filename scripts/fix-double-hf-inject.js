@@ -71,7 +71,7 @@ for (const f of files) {
   // 3. 先写盘再验证（验证的是修复后的内容，不是磁盘原文）
   if (APPLY) fs.writeFileSync(f, out);
   try {
-    cp.execSync(`node --check ${JSON.stringify(f)}`, { stdio: 'pipe' });
+    cp.execSync(`node --check ${JSON.stringify(f)}`, { stdio: 'pipe', timeout: 30000 });
   } catch (e) {
     errors++;
     errorList.push({ file: path.relative(ROOT, f), err: String(e.stderr || e.message).split('\n').slice(0, 2).join(' ') });
