@@ -6,8 +6,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-159 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
-×  1,314 dispatch routes  ×  18,326 passing tests  ×  0 runtime dependencies
+160 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+×  1,314 dispatch routes  ×  18,294 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 159 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 160 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -143,7 +143,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (158 dimensions) -> gate
+scope-check -> premise-check -> discriminate (160 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -172,16 +172,16 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.76**. Not marketing copy.
+Measured on this repository at **v6.8.78**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 158 |
+| Discrimination dimensions | 160 |
 | MCP tools | 182 |
-| Test suite | 18,326 passing / 167 failing |
+| Test suite | 18,294 passing / 161 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
@@ -308,6 +308,8 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.78 | 2026-10-26 | **`conditional_proposition` added as dimension 160 (upgrade type 1 — a brand-new discrimination dimension)** — 条件句武器化：用未经验证的假设性条件句（「如果A就B」）直接推出关于现实的确定性结论，把存在性推断当作前件真值的证据（「如果他真的爱你，就不会让你受这种委屈」/「如果这个方案可行，我们早就看到成果了」/"If he really loved you, he would never treat you like that."）。两腿共现（假设条件句 × 否定推断：早就…了/就不会/怎么会/would never/would have/there would be）；r729 复测攻击漏判 16/20（80%）、良性 0/10 误伤；decision 本体一次选中无打平（composite 0.84 / confidence 0.76 / identity_alignment 0.8，第二名 loaded_question 0.81）。豁免：规则合同条件/谬误概念转述/对冲/显式证据模式/否定翻转。本半程由 14:00 cron 崩溃（模型 repetition loop）后主会话接管收尾 |
+| 6.8.77 | 2026-10-26 | **`no_true_scotsman` added as dimension 159 (upgrade type 1 — a brand-new discrimination dimension)** — 无真正的苏格兰人：用修改定义的方式驱逐反例（「真正爱你的男人，不会计较你花多少钱」/「Real artists never trace references」）。两腿共现（authenticity 短语 × 驱逐断言/反事实条件）；冒烟 22/24 命中、良性零误伤；轮测试 22/22；guard-abilities 20/20；维度键实测 159。已知边界：含 m 英文攻击句被 normalize de_pinyin 破坏（imagination→i码agination）致 discriminate 归零，留专项轮 |
 | 6.8.76 | 2026-10-26 | **Merge: box line (4f4ebeb4) merged into the r727 mainline — `void_zh_standard_shift` renumbered as dimension 158 (upgrade type 1 — a brand-new discrimination dimension)** — 中文「双标」标准转移：对他人与自己使用两套评判标准（「别人加班是敬业，我加班就是剥削」/「规定是定给员工的，我不用遵守」/「Employees must clock in on time, but I come and go as I please」）。来自 Windows box 线（r717 侦察、r718-r724 迭代），经 10-26 07:27 合并入主线并重编号 155→158。本轮（r728）补全合并遗漏：VERSION/version.js 之外的版本四处传播（package.json/SKILL.md）、解决 data/upgrade-state.json 与 data/test-count.json 进 HEAD 的冲突标记、Verify 列举 116→117 并补 void_zh_standard_shift、维度计数 157→158。引擎维度键实测 158 |
 | 6.8.75 | 2026-10-26 | **`forer_effect` added as dimension 157 (upgrade type 1 — a brand-new discrimination dimension)** — 巴纳姆效应：放之四海皆准的性格/命运描述佯称针对个体的专属解读（"你外表看起来坚强，其实内心很柔软，只是不轻易让人看见"/"从测试结果看，你属于既理性又感性的类型，这很少见"/"Deep down, you want someone to truly understand you."）。两腿共现（人格描述句式 × 第二人称人格断言）；r727 复测攻击漏判 17/20（85%）全池最高、良性误伤 0/8；decision 本体一次选中（composite 0.82 / confidence 0.82 / identity_alignment 0.8，第二名 no_true_scotsman 0.80） |
 | 6.8.74 | 2026-10-26 | **`relative_pration` added as dimension 156 (upgrade type 1 — a brand-new discrimination dimension)** — 诉诸更惨：拿别人更惨的处境抹掉对方正当的当下诉求（"别喊累了，有人连饭都吃不上"/"知足吧，还有人工资比你低一半呢"/"Others have it worse; stop complaining"）。decision 本体一次选中无打平（composite 0.83 / confidence 0.84 / identity alignment 0.8）。r726 复测漏判 30/35（86%）全池最高、误伤 0/12，连续四轮候补后当选；上线后攻击 35/35 命中、良性 12/12 零命中。第一人称自陈比惨显式让位 suffering_contest 第78维 |

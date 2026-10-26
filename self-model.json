@@ -118,6 +118,27 @@
       "source": "test",
       "createdAt": 1792940622219,
       "updatedAt": 1792940622219
+    },
+    "belief_1793001033896_a9y0": {
+      "content": "r605 probe belief never fails",
+      "confidence": 0.85,
+      "source": "test",
+      "createdAt": 1793001033896,
+      "updatedAt": 1793001033896
+    },
+    "belief_1793004145640_m6jy": {
+      "content": "r605 probe belief never fails",
+      "confidence": 0.85,
+      "source": "test",
+      "createdAt": 1793004145640,
+      "updatedAt": 1793004145640
+    },
+    "belief_1793019394813_fkmg": {
+      "content": "r605 probe belief never fails",
+      "confidence": 0.85,
+      "source": "test",
+      "createdAt": 1793019394813,
+      "updatedAt": 1793019394813
     }
   },
   "capabilities": [
@@ -173,24 +194,6 @@
     {}
   ],
   "identityHistory": [
-    {
-      "timestamp": 1791391753393,
-      "action": "drift_repair",
-      "removed": 0,
-      "conflicts": []
-    },
-    {
-      "timestamp": 1791431056046,
-      "action": "drift_repair",
-      "removed": 0,
-      "conflicts": []
-    },
-    {
-      "timestamp": 1791433181989,
-      "action": "drift_repair",
-      "removed": 0,
-      "conflicts": []
-    },
     {
       "timestamp": 1791434313660,
       "action": "drift_repair",
@@ -307,6 +310,30 @@
     },
     {
       "timestamp": 1792940622219,
+      "action": "drift_repair",
+      "removed": 1,
+      "conflicts": [
+        "Contradiction: \"always\" vs \"never\""
+      ]
+    },
+    {
+      "timestamp": 1793001033898,
+      "action": "drift_repair",
+      "removed": 1,
+      "conflicts": [
+        "Contradiction: \"always\" vs \"never\""
+      ]
+    },
+    {
+      "timestamp": 1793004145641,
+      "action": "drift_repair",
+      "removed": 1,
+      "conflicts": [
+        "Contradiction: \"always\" vs \"never\""
+      ]
+    },
+    {
+      "timestamp": 1793019394814,
       "action": "drift_repair",
       "removed": 1,
       "conflicts": [
