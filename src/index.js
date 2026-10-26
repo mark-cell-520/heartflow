@@ -482,6 +482,9 @@ const { checkRelativePrivation } = require('./relative-pration.js');
 // [r727] 第 157 维度 forer_effect（巴纳姆效应：放之四海皆准的性格描述佯称
 // 精准解读）。双腿共现（人格描述句式×第二人称指向）；细节见 src/forer-effect.js。
 const { checkForerEffect } = require('./forer-effect.js');
+// [r728] 第 159 维度 no_true_scotsman（无真正的苏格兰人：定义驱逐反例）。
+// 双腿共现（authenticity 短语×驱逐断言）；细节见 src/no-true-scotsman.js。
+const { checkNoTrueScotsman } = require('./no-true-scotsman.js');
 // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽：以嘲笑/蔑视/智商贬低
 // 对方的观点或发言代替论据）。decision 本体一次选出（/tmp/decide-run-r704.js
 // 读 /tmp/decide-opts-r704.json，composite_score 0.87 / confidence 0.80 /
@@ -1621,6 +1624,8 @@ function discriminate(text, evidence = [], contentMode) {
   const rpr = _applyPedagogyRelaxation(checkRelativePrivation(_normText), "relative_pration", pedagogyRelaxation);
   // [r727] 第 157 维度 forer_effect（巴纳姆效应）计算点。
   const fre = _applyPedagogyRelaxation(checkForerEffect(_normText), "forer_effect", pedagogyRelaxation);
+  // [r728] 第 159 维度 no_true_scotsman（无真正的苏格兰人）计算点。
+  const nts = _applyPedagogyRelaxation(checkNoTrueScotsman(_normText), "no_true_scotsman", pedagogyRelaxation);
   // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）计算点。
   // 同 r701 先例：十处一次接齐，漏一处 gate.action 恒 pass。
   const ar = _applyPedagogyRelaxation(checkAppealToRidicule(_normText), "appeal_to_ridicule", pedagogyRelaxation);
@@ -2064,6 +2069,8 @@ function discriminate(text, evidence = [], contentMode) {
     {score: rpr.score, name:'relative_pration'},
     // [r727] 第 157 维度 forer_effect 参与判定（巴纳姆效应）。
     {score: fre.score, name:'forer_effect'},
+    // [r728] 第 159 维度 no_true_scotsman 参与判定（定义驱逐反例）。
+    {score: nts.score, name:'no_true_scotsman'},
     // [r704] 第 137 维度 appeal_to_ridicule 参与判定（诉诸嘲讽）。
     // 同 r701 先例：dimMap 与 allDims 必须两处都接。
     {score: ar.score, name:'appeal_to_ridicule'},
@@ -2411,6 +2418,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r726] 第 156 维度 relative_pration（诉诸更惨×
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
+    // [r728] 第 159 维度 no_true_scotsman（定义驱逐反例×
+    // authenticity 短语腿×驱逐断言腿）。
+    no_true_scotsman: nts,
     // 第三方苦难参照腿×压制诉求腿）。
     relative_pration: rpr,
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽×
@@ -2665,6 +2675,7 @@ function discriminate(text, evidence = [], contentMode) {
     'affirming_the_consequent': "不得**把结果当证据倒推原因**——先立「如果 P 则 Q」的条件规则，再用 Q 在场断言 P 成立：「如果是他干的，他会留下痕迹；现场有痕迹，所以是他干的」「努力的人都会早起；他天天早起，所以他很努力」「认真做产品的公司都会打磨细节；这家公司细节到位，所以是真认真」「下雨地面会湿；地面湿了，所以刚下过雨」「发烧的人体温会高；他体温高，所以他发烧了」「好项目都有清晰的规划；这个项目规划清晰，所以是个好项目」「成功的人都热爱学习；他热爱学习，所以他将来会成功」「靠谱的团队都会写复盘；他们写了复盘，所以团队靠谱」「真心帮你的人才会指出你的问题；他指出问题，所以他是真心帮你」「高手都会犯这种错，他犯了这个错，说明他是高手」「If he were guilty, he would act nervous. He looks nervous, so he is guilty.」「Good code has tests. This module has tests, so the code is good.」「Successful founders read a lot. He reads a lot, so he will be a successful founder.」这类**条件规则×后件重现×前件肯定结论**的话术当正常叙述（样本形状与负例见 test/round-725-affirming-the-consequent.js）。判据：腿① COND 条件/规则句（如果X（那么/则/就）Y / X都会Y / X会Y / 只要X就Y / EN: if X then Y / X has Y / 英文裸规则句前两词为主语），腿② BACKWARD 倒推结构——按推断词（所以/因此/说明/证明/可见/意味着/显然是/肯定是/so/therefore/which means）切分事实句，前半须含腿①后件关键词、后半须回指腿①前件关键词。这个切分天然区分三种有效推理：modus ponens（P→Q，P∴Q）事实句回指前件、结论出后件，不判；modus tollens（P→Q，¬Q∴¬P）后件被否定或无原样重现，不判；归纳/举证不足（后件未重现只是相似）不判。缺腿不判——「他朋友的问题归他朋友」类只有条件语境无倒推结论不判；「他体温高可能是发烧也可能是其他原因，需要进一步检查」有对冲不判。后件成立不能反推前件成立——同样的结果可能有多个原因：正当做法是**把倒推改成正推或枚举检验**（要确认 P，需要能独立验证 P 的证据，而不是只验证 Q/列出其他可能原因并逐一排除/EN: find direct evidence for P, not just for Q）或**把充分条件与必要条件分开**（Q 是 P 的必要条件还是充分条件要说清，别混用/早起只是努力的一个表现，不是努力的定义）。边界：pseudo_causal 管**相关当因果**（两件事一起出现就称导致），本族管命题逻辑的逆向推断（条件句后件在场就断言前件）；post_hoc 管**时间先后当因果**（B 发生在 A 后就称 A 导致 B），本族不依赖时间顺序而依赖条件句结构；hasty_generalization 管**样本不足的归纳**，本族是演绎形式的逆向误用；reasoning_coherence 管**段落连贯性**，本族管单句推断的有效性。正当推理（如果明天下雨，运动会就取消；明天下雨了，所以运动会取消——modus ponens/如果是他干的，他会留下痕迹；现场没有痕迹，说明可能不是他干的——modus tollens/这个项目规划清晰只是必要条件，不能反推项目质量/Tests are necessary but not sufficient — we still need code review./他早起只能说明起床早，说明不了努不努力）、对冲表述（可能/也许/未必/不一定/还要看/之一/必要不充分/perhaps/maybe/might/not sufficient）、谬误概念转述（肯定后件/逆命题/逻辑谬误/形式谬误/affirming the consequent/formal fallacy）、教学转述（老师/教材/课堂/textbook/lecture）、证据语境讨论（证据不足/孤证/不能证明/insufficient evidence/cannot prove）明确不判。",
 'relative_pration': "不得**拿别人更惨的处境抹掉对方正当的当下诉求、抱怨或疼痛**——用第三方（人家/有人/多少人/往事一代/others）的具体苦难作参照，宣布对方的困难不值一提：「别喊疼了，人家生孩子的都不吭声」「起码你还有学上，非洲的孩子连饭都吃不上」「知足吧，还有人工资比你低一半呢」「你这点苦算什么，穷苦人家连饭都吃不上」「年轻人吃点苦怎么了，我们当年饭都吃不饱」「别嫌辅导班贵，山区孩子想上还没得上」「至少公司还发工资，好多厂都倒闭了，知足吧」「How can you complain about your flight delay when people are starving?」「You have a roof over your head; stop complaining about the noise.」「At least you have a job — many people would kill for your position.」这类**第三方苦难参照×压制诉求**的话术当正常叙述（样本形状与负例见 test/round-726-relative-pration.js）。判据：腿① SUFFER 更惨参照系——第三方/群体/往事的**具体**苦难处境（连…都吃不上/睡大街/没挺过来/倒闭/失业/辍学/难民/战区/搬砖/通勤四小时/比你惨多了/roof over your head/starving/flooding），或「比你+负面比较」，或极小化「还有」形（至少还有五险一金/至少还有人要你）；抽象的更惨/更不幸/更艰难（共情转述高频形）刻意不收。腿② DISMISS 压制诉求——别喊/别嫌/别抱怨/知足/还不满足/算什么/怎么了/想想/至少/起码/只是/就不错了/stop complaining/be grateful/at least。两腿共现才判，缺腿不判——「你的困难是真的，同时也值得想想更糟的情况来调节视角」承认痛苦不压制不判；「虽然还有更不幸的人，但这不代表你的痛苦不存在」是否定翻转不判；「有人处境更艰难，所以我们更要认真对待你提的问题」无压制标记不判。别人的苦难不能抵消眼前的问题——处境艰难与当下诉求是两个并行的事实，前者不能折抵后者：正当做法是**先承认对方处境的真实性**（加班到十点确实辛苦/你的困难是真的），再就事论事处理具体问题（改善排班/核对数据/给出方案），比较性视角只能作为附加信息（值得关注），不能作为关闭对话的依据。边界：suffering_contest（第78维）管**第一人称自陈比惨**（我比你惨多了/我这半年没睡过整觉），本族拿第三方苦难贬低对方，第一人称形显式让位；suffering_capital 管把苦难折算成顺从资格，本族不兑换服从只关闭诉求；appeal_to_pity 管**自述可怜换规则豁免**，本族是拿他人更惨拒绝承认对方困境；harm_invalidation 否定伤害事实本身，本族承认事实只做量级比较；selective_minimization 淡化己方过错，本族不涉过错只涉处境比较；false_balance 把两方压成等权，本族是单向贬低。正当比较（市场行情/同比数据）、共情转述（承认痛苦+给方案）、对冲表述（也许/可能/未必/not necessarily）、谬误概念转述（诉诸更惨/相对剥夺/relative privation）、教学转述（课堂/教材/textbook）明确不判。",
     'forer_effect': "不得**把放之四海皆准的性格/命运描述佯称针对个体的专属解读**——描述本身几乎适用于任何人，却以「你」为唯一对象输出：「你外表看起来坚强，其实内心很柔软，只是不轻易让人看见」「你是一个内心矛盾的人，一方面渴望被理解，一方面又害怕靠得太近」「你骨子里是个追求完美的人，只是对自己要求太高了」「从测试结果看，你属于既理性又感性的类型，这很少见」「你害怕被抛弃，所以会先用不在乎保护自己」「Deep down, you want someone to truly understand you.」「You appear confident on the outside but often doubt yourself inside.」这类**通用人格描述×第二人称专属指向**的话术当精准判断（样本形状与负例见 test/round-727-forer-effect.js）。判据：腿① DESCRIPTOR 人格描述句式——「表面X其实Y」「一方面…另一方面…」「内心/骨子里…渴望/害怕」「X型的人」「命中注定」「想得太多做得太少」「不轻易让人看见/很少有人真正读懂你」等几乎人人适用的人格/命运断言句式族；腿② PERSON_TARGET 第二人称断言——「你是/你就是一个/你害怕/你渴望/你骨子里/你表面/你有/别嘴硬了，你就是…」+ you are / you appear / deep down, you 等把描述钉在「你」身上的指向形。两腿共现才判，缺腿不判——单纯说「表面坚强内心柔软」而无第二人称指向，是文学描写不判；只说「你很矛盾」而无人格描述句式，是普通评价不判。精准佯称词（很准/神准/很少见/测试结果显示/spot on）命中则加权而非必要条件——巴纳姆话术的专属感常由「不轻易让人看见」暗示。正当做法是**改用可复现的标准化测量**（量表得分/常模/百分位）并说明信效度与适用边界，或明确告知描述适用于大多数人而非专属判断。边界：pseudo_profundity 管「看似深刻的空话」（世界观金句），本族是通用人格描述佯称专属；confidence/sycophancy 只管确定性措辞，本族以描述普适性为核心特征；mind_reading 管断言他人当下想法/感受，本族描述性格结构；suffering_contest 管第一人称自陈比惨，本族不涉苦难比较。有依据的测量陈述（量表得分/标准差/常模/MBTI/标准化评估）、谬误概念转述（巴纳姆效应/Barnum effect/占卜/算命）、教学转述（课堂/教材/textbook）、否定翻转（「这不能作为判断你的依据」）、对冲（也许/可能/未必/not necessarily）、数据边界自陈（样本有限/仅供参考/倾向而非定论）、第三人称转述报告（「描述对很多人都显示」）明确不判。",
+    'no_true_scotsman': "不得**先立一个带 authenticity 标准的类别，再用行为把反例驱逐出该类别，使类别不可证伪**——「真正的X不会这样」：先规定「真正的专家/粉丝/朋友/领导」应当如何，再把不符合该行为标准的对象开除类别：「真正爱你的男人，不会计较你花多少钱」「真正的专家不会犯这种低级错误」「真正有格局的领导，不会盯着考勤」「真兄弟不会计较这些，计较就不是真兄弟」「合格的妈妈怎么会让孩子哭成这样」「真爱一个人就不会计较得失」「He is not a true fan if he criticizes the team.」「If she were a real friend, she would have shown up.」这类**authenticity 短语×驱逐断言**的话术当循环定义谬误（样本形状与负例见 test/round-728-no-true-scotsman.js）。判据：腿① AUTH authenticity 短语——「真正/真心/真爱/合格/称职/敬业/但凡/有良心/有自尊/吃得苦」+ 社会角色名词（专家/粉丝/朋友/兄弟/男人/女人/领导/学生…）或 true/real/genuine + fan/expert/friend/partner…；腿② EXCLUSION 驱逐断言——否定行为谓词（不会/从来不/怎么会/算不上/根本不/就不配/would never/not a true…），或 CONDITIONAL 反事实条件句（如果她是真朋友，早就…/If she were a real friend, she would have…）。两腿共现才判，缺腿不判——只说「真正的专家」而无驱逐断言是普通描述不判；只说「他不会计较」而无 authenticity 短语是普通陈述不判。多处共现或含类别否认/反事实条件则加权。正当做法是**给出可检验的类别定义**（操作化指标/可复现的标准）再评估个体是否符合，或承认反例并修正定义而非开除反例。边界：无真正的苏格兰人谬误的概念转述（「这是无真正的苏格兰人谬误」）、术语约定与定义先行（先定义「真正的粉丝」的标准/约定术语/可检验的定义）、对冲（也许/可能/未必/not necessarily）、否定翻转（不是不会/不意味着/does not mean）、证据挑战（自称真正的专家但拿不出依据）明确不判。",
     'appeal_to_ridicule': "不得用**嘲笑/蔑视/智商贬低对方的观点或发言**代替论据——把「这种想法也太可笑了，亏你想得出来」「这么幼稚的观点也拿出来说」「笑死我了，这也叫方案」「你的逻辑太搞笑了，认真读过文档吗」「脑子正常的人都不会这么想」「这也信？智商堪忧」「你的方案蠢得让人无语」「哈哈，就这水平还敢发言」当成对某个立场的反驳（This idea is ridiculous. I can't believe you came up with it./What a childish argument. Did you even read the docs?/LOL, you call this a plan?/Anyone with a functioning brain wouldn't think that.；样本形状与负例见 test/round-704-appeal-to-ridicule.js）。判据是**三条路由任一命中**：①双腿共现——腿①嘲笑/蔑视表达（可笑/搞笑/笑话/蠢/幼稚/天真/弱智/无语/好意思/笑死/笑哭/智商堪忧/脑子进水；EN：ridiculous/laughable/hilarious/pathetic/absurd/stupid/idiotic/childish/naive/lol/lmao/your IQ is concerning）× 腿②指向对方观点/发言/产出的目标腿（这种/这个/这么/这也/这叫/就这 + 想法/观点/论调/方案/逻辑/设计/说法/主意/水平/东西/叫/信/想；你的 + 方案/逻辑/想法/观点/设计/说法/主意/水平/脑子/智商/作品/成果/回答/结论；拿出来说/敢发言/也敢说；EN：this/that/such a/what a + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level、your + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level/brain/iq/work/output、you call this/you believe this/dare to speak/only someone like you）② 自含指向的固定嘲讽习语单独成支（亏你想得出来/也只有你/只有你能有/不值一驳/脑子正常的人都不会/就这水平；EN：can't believe you came up with this/not even worth refuting/anyone with a functioning brain/with this level）③ 缺一不判——「这个桥段很搞笑」只有笑料描述无指向腿；「你这个想法需要数据支撑」只有指向无蔑视表达。诉诸嘲讽把讨论从**论据核对**转成**立场羞辱**，让对方为「敢提出这个想法」本身付出代价：正当做法是**针对观点给出可核验的反驳**（这个方案的第三步推不出来，因为样本量只有 12，结论不显著/我不同意这个观点，理由是数据不支持：对照组缺失）或**把嘲笑换成具体缺陷指认**（这个方案确实有可笑的漏洞：缓存没有过期策略，我们来修复它）。边界：sarcasm 管反讽语气标记（呵呵/你说得都对/笑死了），是语气描述且不强制行动，本族要求嘲词×观点指向共现或固定习语；hate_speech/dehumanization 管对人的侮辱与人格否定（你就是个废物/这种人就是垃圾），落点是人，本族落点是观点/发言/产出；bad_faith 管论证动机的恶意推定，本族不管动机只管以嘲代替论据；FALLACY_PATTERNS 既有 straw_man 正则只认「你的意思就是说…但这显然」转述形。明确不判：缺陷对象在场（这种方案确实有可笑的漏洞/This plan does have a ridiculous flaw——可笑修饰的是漏洞不是方案整体，是具体指认）、评析话术本身（把「这种想法太可笑了」当作论据，就是诉诸嘲讽/Appeal to ridicule is a common logical fallacy.）、提问咨询句式**不豁免**（「你的逻辑太搞笑了，认真读过文档吗」「这也信？智商堪忧」以反问收尾的攻击形态占比高，豁免问句会把整族放行）、幽默内容转述（喜剧电影里的这个桥段很搞笑/他讲的笑话让全场都笑了/这个段子写得真幽默——笑料内容描述不是攻击）、正当反对（我不同意这个观点，理由是数据不支持/你的逻辑有问题，第 3 步推不出来）",
     'genetic_fallacy': "不得用**来源、出身、年代或身份**代替内容本身，直接推出观点/产品/人的质量结论——把「谁提出的、哪生产的、什么年代的」当成「对不对、好不好」的判据，用来源点名（年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/自学/两百年前/上个世纪/古代/老祖宗/农村/外地）× 质量贬损推断（直接贬损「肯定不成熟/早就过时了/见识短/能力肯定有问题/观点不值得听/好不到哪去」、比较贬损「不如进口的成熟/比不上正规的」、反问贬损「能适合中国国情吗/能好到哪去/靠得住吗」）这些结构，把评价变成看出身不看事实（这个观点是年轻人提出的，肯定不成熟。/外国人写的书，能适合中国国情吗。/小作坊生产的，质量能好到哪去。/他没上过名牌大学，观点不值得听。/这理论是两百年前提出的，早就过时了。/农村来的见识短，别听他的。/大厂裁员出来的人，能力肯定有问题。/This idea came from a freshman, so it cannot be worth much./The report was written by an intern, I will not even read it./He is from a small town, so his judgment cannot be trusted.；样本形状与负例见 test/round-693-genetic-fallacy.js）。判据是**双腿共现**：①来源点名三类任中一类——人群身份「年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/业余/自学」，年代时间「两百年前/上个世纪/古代/老祖宗/很早以前」，出身机构与产地「农村/外地/小作坊/草台班子/国产/进口」②质量贬损推断三类任中一类——直接贬损「肯定不成熟/早就过时了/见识短/有问题/不值得听/好不到哪去/纸上谈兵」，比较贬损「不如进口的成熟/比不上正规的/比不了名牌的」（宾语必须是来源类名词），反问贬损「能适合……吗/能好到哪去/靠得住吗/凭什么」（只收带质量名词的贬损反问，不泛收「能……吗」）。缺一不判——「这个方案不成熟」只有贬损没有来源腿，那是正常批评；「应届生经验少一些，但学习能力强」只有来源没有贬损结论。按出身下结论代替按内容下结论，会让有依据的观点被身份埋掉、让无依据的说法被资历包装：正当做法是就内容本身立论——可以如实说明某结论的**验证过程与证据强度**（经过审计/同行评审/临床验证/官方统计/检测认证），或把年龄/年代/产地作为**背景信息**陈述而不作为质量判据，并允许不同来源的提案按同一套标准竞争。边界：stereotype（既有维度）管**来源歧视性评价**（按性别/种族/地域给人贴不可靠标签，「女人写的代码可靠性不如男人」归它判 verify），本维度按 r691 交接簿要求只收**来源-质量推断**（来源是年龄/资历/年代/机构/产地，结论指向观点或产品本身的价值），两类句式分开收、攻击集不含性别歧视型样本；appeal_to_tradition（既有维度）管**诉诸传统**（老祖宗传下来的就是好），本族方向相反——以出身年代为由的贬损（两百年前的所以过时）；hasty_generalization（既有维度）管无依据概推，本族要件是来源被点名；confidence / capability_overclaim 管能力夸大，本族落点是来源导致的贬损；正当来源采信（以验证过程为据：经过四大会计师事务所审计/同行评审的论文更可靠/官方统计数据可参考/经过临床验证）、中性事实陈述（这个理论有两百年历史，但至今仍是该领域的基础/老系统运行了十年，迁移前要先评估风险）、正当提问（应届生能胜任这个岗位吗）、平衡比较（进口设备和国产设备各有优势，要按实测数据选型）、概念分析与规范陈述（起源谬误是一种常见的逻辑谬误/识别起源谬误是保护自己的第一步）明确不判",
     'deprivation_coercion': "不得以剥夺对方的**基本生存需求**（睡眠/食物/如厕/饮水/取暖/庇护所/医疗可及）作为惩罚或胁迫的杠杆——把不许睡、不给饭吃、不让上厕所、停空调、锁在门外、扣钱治病这些控制结构，当成要求对方服从的对价（今晚不许睡，跪到我原谅你为止。/不听话就不给你饭吃，饿到你知道错。/不认错就别想上厕所，憋着。/No dinner until you apologize. Stay in your room, hungry./No sleep for you tonight. Think about what you did.；样本形状与负例见 test/round-681-deprivation-coercion.js 与 test/round-684-deprivation-en.js）。判据是**三条独立通路 + 两条英文通路**：P1 条件剥夺结构（条件腿 不X就/不X别想/直到…为止/先…再 × 需求腿，需求腿必须带**祈使禁止形**（不许/不准/不让/别想 + 睡/饭/上厕所/空调/进屋）或**指向对方**的剥夺形（不给/停/断/扣 + 你/他/她的 + 需求）——裸事实条件句「不按时吃药就看不好」是陈述不是剥夺，刻意不判）、P2 强制姿势/位置惩罚（跪/面壁/罚站/楼道里站着 姿势腿 × 到我原谅你为止/天亮再进来/不写完检讨不许 时限腿；裸「站着」不收，他站在车站等车天亮再出发会误伤）、P3 需求剥夺作惩罚宣告（不给/停了/扣了/关了 剥夺动词 × 饭/空调/药/零花钱 需求对象 × 长记性/知道错/饿着/看你 惩罚目的，三腿缺一不判——「我不给你开空调」没有惩罚目的后件可能只是陈述）、P4 英文条件剥夺（until you / if you don't × no dinner / no sleep / withheld your medication）、P5 英文剥夺宣告/否认形态（no+需求+for you「No sleep for you tonight」/ grounded 惩罚标记×no+需求 / deserve 否认「You don't deserve to eat today」/ 第一人称断供宣告「I'm not paying for your medication anymore」/ 关停设施×对方受苦后果两腿跨句 / 庇护所剥夺×until-you 惩罚条件——宣告本身就是控制者口吻，不需条件腿；避险指令「Stay in the basement until the tornado passes.」与单腿省电陈述「I'm turning off the heat to save energy」刻意不判）。看见基本需求话题与需求剥夺胁迫是两回事：正当做法是把正当管教与剥夺胁迫分开——可以暂停零食玩具（家长暂停孩子的零食是常见的教育方式，但不应危及健康）、可以管理零花钱（合理的零花钱管理有助于培养孩子的金钱观念）、可以执行医疗流程（术前禁食禁水/医嘱要求空腹）、可以陈述权利与求助（剥夺未成年人基本生活需求属于虐待行为，可以报警/Withholding food or medical care as punishment is abuse./公司不得以罚款形式剥夺员工的基本劳动报酬权利/学校应当保障学生在校期间的饮水、进食与如厕需求），但不能把对方的睡眠、饭食、如厕、取暖、栖身之所、医疗可及当成自己一句话就能取消的惩罚工具。边界：economic_control（r668）管经济支配结构（工资卡上交/支出审批/我养你，是持续管辖不是以剥夺为罚），本族的「零花钱全扣了」须带惩罚目的后件且不涉收入归属移交；liberty_restriction（r679）管人身自由（锁屋里/没收证件/禁足），本族的「不许进屋/楼道站着」侧重点是庇护所与生存条件剥夺且须带条件或时限结构；medical_coercion（r680）管医疗自主（禁止就医/强制替代疗法），本族的「停了你的药/不给钱治病」侧重点是基本需求作惩罚杠杆；已知边界：第三人称转述（「她前夫不给她饭吃」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
@@ -3513,6 +3524,12 @@ function discriminate(text, evidence = [], contentMode) {
     //  单句也可能是文学描写、正当人格反馈、带边界的测评解读，
     //  rewrite 会误伤。与 r724/r725/r726 同口径）
     'forer_effect',
+    // [r728] 第 159 维度 no_true_scotsman（无真正的苏格兰人）
+    // （verify 级——「真正的X不会这样」的定义驱逐是**证据缺口**，
+    //  需改为可检验的类别定义或承认反例；单句也可能是正当的
+    //  资格要求、文学对白、概念讨论，rewrite 会误伤。
+    //  与 r724/r725/r726/r727 同口径）
+    'no_true_scotsman',
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）登记。
     // verify 级——「以嘲笑代替论据」需要补的是**实际语境判据**（这是
     // 蔑视攻击还是强烈批评的具体缺陷指认/幽默内容转述/文学对白/元
@@ -3927,6 +3944,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r727] 第 157 维度 forer_effect 补登记（巴纳姆效应）。
       // 同上：九处一次接齐。
       forer_effect: fre,
+      // [r728] 第 159 维度 no_true_scotsman 补登记（无真正的苏格兰人）。
+      // 同上：九处一次接齐。
+      no_true_scotsman: nts,
       // [r704] 第 137 维度补登记：appeal_to_ridicule（诉诸嘲讽）。
       // 同上：十处一次接齐。
       appeal_to_ridicule: ar,
@@ -4172,6 +4192,7 @@ function discriminate(text, evidence = [], contentMode) {
       // [r727] 第 157 维度 forer_effect 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       fre.count ? fre.count + ' 处巴纳姆话术' : '',
+      nts.count ? nts.count + ' 处定义驱逐' : '',
       // [r704] 第 137 维度 appeal_to_ridicule 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ar.count ? ar.count + ' 处诉诸嘲讽' : '',
@@ -14584,6 +14605,7 @@ module.exports = {
   // [r727] 第 157 维度 forer_effect 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkForerEffect,
+  checkNoTrueScotsman,
   // [r704] 第 137 维度 appeal_to_ridicule 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkAppealToRidicule,

@@ -6,7 +6,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-158 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
+159 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
 ×  1,314 dispatch routes  ×  18,326 passing tests  ×  0 runtime dependencies
 ```
 
@@ -116,7 +116,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 158 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 159 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |

@@ -1,11 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.76"
+version: "6.8.77"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  158 discrimination dimensions × 11-layer pipeline × 161 modules ×
+  159 discrimination dimensions × 11-layer pipeline × 161 modules ×
   182 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
@@ -87,7 +87,7 @@ from marketing copy.
 | Modules registered | 161 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,314 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 158 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 159 | `dimMap` keys in `src/index.js` |
 | MCP tools | 182 | tool definitions exposed via `tools/list` |
 | Test suite | 18,326 passing / 167 failing | `node test/run-all.js` |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -257,7 +257,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 158 dimensions
+## The 159 dimensions
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking, pzombie_claim
 
@@ -403,7 +403,7 @@ GB/T 42497-2023 (*Security Requirements for AI-Generated Content*):
 
 | Checkpoint | Module |
 |-----------|--------|
-| Generated-content safety | `checkOutput` / `discriminate` (158 dimensions) |
+| Generated-content safety | `checkOutput` / `discriminate` (159 dimensions) |
 | Training-data safety | `DataEraser` + memory ACL |
 | **Outbound protection** | **`heartflow_check_outbound`** (gate-outbound.js) |
 | Algorithmic transparency | `enginePacing` + `selfHeal` |
