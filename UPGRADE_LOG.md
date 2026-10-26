@@ -1,3 +1,113 @@
+# r729 轮报告（v6.8.78）
+
+## 一、选中项 + decision 分数 + 身份对齐
+
+轮次背景：14:00 cron 轮在 init（写完 r729 交接簿）后完成探针/选向/建模块/九处接线，
+于模型流式 repetition loop 崩溃，留下半程工作区（模块+接线+轮测试未测未提交）。
+本轮由主会话接管收尾：先核实 WIP 时间戳（14:36–15:05）与无并发进程，确认系同一轮
+中断残留后继续，未重做已认证的部分。
+
+候选池复测（scripts/round-729-family-probe.js，当前引擎 159 维基线，以维度键集合
+判定上线状态）：conditional_proposition 攻击漏判 16/20（80%）、良性 0/10 误伤、
+真零命中 16/16——合格候选；loaded_question 漏判 11/20（55%）、误伤 0/11——合格
+候选；equivocation / false_dilemma / slippery_slope / hasty_generalization 均已
+上线（维度键命中跳过）。decision 本体（src/core/decision.js）一次选中无打平：
+composite 0.84 / confidence 0.76 / identity_alignment 0.8，第二名 loaded_question
+0.81（scripts/decide-r729.js）。身份对齐：条件句武器化是「把未验证假设当既成
+证据」的辨别缺口，正命中判别者「替人类拦住包装成必然的未证实结论」的核心职责。
+
+## 二、落地项：第 160 维度 conditional_proposition（条件句武器化）
+
+新建 src/conditional-proposition.js（160 行）：双腿共现——腿① HYPOTHETICAL
+假设条件句（如果/要是/若/假如/倘若/换了是我/if/were 虚拟语气）× 腿②
+NEG_INFERENCE 对前件真值的否定推断（早就…了 / 就不会 / 怎么会 / would never /
+would have …ed / there would be）。缺腿不判：良性直接结果陈述（「如果明天下雨，
+运动会就取消」）不含腿②标记，天然放行。五个豁免常量全部可负例注入置空：
+RULE_CONDITION 规则合同条件 / META_NOUN 谬误概念转述 / HEDGE 对冲 /
+EVIDENCE_MODE 显式证据模式 / NEGATION_FLIP 否定翻转。index.js 九处接线一次接齐
+（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions
+对象内补登记 / summary / module.exports），另补 FALLACY_PATTERNS 中英两条与
+FALLACY_SEVERITY。
+
+与存量边界：no_true_scotsman（r728）管「真正的X不会Y」定义驱逐；本维度管
+「如果A真就B；B没发生⇒A假」的条件推断武器化；conditional_affection 管情感要挟
+条件（你要…我才…）；affirming_the_consequent 管显式「如果P则Q；Q所以P」形式
+推理。含 authenticity 短语样本可能双腿族同时命中，gate 取并集不漏判即达标。
+
+## 三、验收数字
+
+- 模块冒烟（scripts/round-729-module-smoke.js）：攻击 20/20 命中、良性 0/17
+  误伤；腿①全置空 0/20、腿②全置空 0/20 承重✓；五豁免常量逐项置空翻转✓
+- 轮测试（test/round-729-conditional-proposition.js）：19 通过 0 失败
+  （攻击 ZH 10+EN 10 / 良性模块层 15 / 边界豁免 5 / 分工锁 3 / 存量回归 2 /
+  登记 6 组 / 注入承重 3 组）
+- 六项门禁：bin/verify.js 16/16 ✅；bidirectional-guard ✅；guard-abilities
+  20/20（维度键 160）✅；doc-numbers-accuracy 22/22 ✅（含本轮手动补 SKILL/AGENTS
+  Verify 列举 no_true_scotsman+conditional_proposition、README changelog 补
+  6.8.77+6.8.78 两行、SKILL action-tier prose 147→149 修正）；security-audit
+  15/16（S2 预期红——含版本号的 feat commit 落地后复跑转绿）；round-guard after
+  提交前 3 blocker 均「未提交」类，三连提交后复跑转绿
+- 全量回归 node test/run-all.js：见 data/tmp-runall-r729.log（本轮跑完取最终
+  汇总行，0 回归才收尾）
+
+## 四、顺带修复（文档债，r728 遗漏）
+
+1. SKILL/AGENTS 的 Verify 层列举缺 no_true_scotsman（r728 上线未补列举）——
+   本轮连同 conditional_proposition 一并补入。
+2. README changelog 缺 6.8.77 行（r728 只补了 6.8.76）——补 6.8.77+6.8.78 两行。
+3. SKILL.md「three action-forcing layers add up to 147」prose 失真（AGENTS.md
+   早已是 149）——修正为 149。
+
+## 五、Commit hash
+
+见文末三连提交（feat v6.8.78 / docs 轮报告 / chore 交接簿）。
+
+## 六、下一轮候选与注意事项
+
+1. loaded_question（55% 漏判、0/11 误伤）仍是最高优先候选，与 presupposition
+   存量维度的归因边界需先厘清再建模块。
+2. normalize de_pinyin 破坏含 m 英文（imagination→i码agination）的存量边界
+   仍未修——影响全部维度的 EN 样本，值得开专项轮。
+3. conditional_affection 对「要是…就…」情感要挟形宽命中（「要是累了就休息」
+   在 HEAD 即 rewrite）是存量误伤，留专项轮修存量再加紧本族边界。
+4. src/index.js 已 14686 行超 14000 阈值——护栏优先的拆分评估留人工时机。
+
+## 七、主会话收尾记录（2026-10-26 晚，接手 16:00 轮崩溃现场）
+
+16:00 轮 agent 在跑全量回归时随 gateway stream stale 崩溃，工作区留了本轮的
+半程产物。主会话重启心虫后按 round-guard before→复跑→收尾路径完成落地：
+
+1. **门禁复跑（主会话实测）**：
+   - `node bin/verify.js`：16 passed / 0 failed ✅
+   - `node scripts/bidirectional-guard.js`：召回 52/52，误拦 302/326（92.6%）✅
+   - `node scripts/guard-abilities.js`：20/20，维度登记 dimensions 160 键 ✅
+   - `node test/doc-numbers-accuracy.test.js`：复跑初为 22 之 3 失败（README/SKILL
+     测试数停在 14:00 轮的 18,285/170，低于 16:46 实测缓存）——已同步为
+     18,294/161 后 22/22 ✅
+   - `node test/security-audit.test.js`：15/16，唯一红项 S2 `_verifyGitCommit`
+     为「未提交」预期态，本三连提交后转绿
+   - r729 轮测试 `test/round-729-conditional-proposition.js`：19/19 ✅
+   - `scripts/round-729-module-smoke.js`：HEDGE_RE / EVIDENCE_MODE_RE /
+     NEGATION_FLIP_RE 负例注入均承重 ✓
+   - 存量修复复核：`scripts/round-617-uq-negative-probe.js --child` 输出
+     childConfirmed=true；`test/round-338-premature-erasure-guard.test.js`
+     4 通过 / 0 失败（两处无限递归修复均生效）
+2. **全量回归口径说明（诚实记录）**：data/test-count.json 的 18,294 passing /
+   161 failing 为 16:00 轮 agent 以 data/run-r729-suite.bat 后台单线程实测
+   （16:19 起跑、16:46 落盘，与 638 个测试文件规模吻合）。本会话环境
+   terminal 后台通道拒绝 node 常驻（stdin is not a tty 即退，winpty/pty/
+   重定向均试过），无法重跑同款全量；已抽样 7 个文件核对一致（round-338
+   4/0、knowledge-ontology 10/0、self-model 8/0、logic-reasoning 9/0 等）。
+   证据日志 data/tmp-runall-r729.log 命中了 .gitignore 的 *.log 规则未入库，
+   以本记录 + test-count.json 时间为证。
+3. **chore 清理**：删除 16:00 轮临时启动器 data/run-r729-suite.bat；
+   `git rm --cached data/.run-all.lock`（.gitignore 自 r645 已忽略该运行时
+   锁，历史误跟踪，本次取消跟踪）。
+4. **cron 背景**：自主进化（9ac1f00e1f15）与健康监控（4638973731ba）两个
+   cron 任务今日因 WinError 995 / stream stale 连续失败已被用户删除，
+   本轮为删除后由主会话手动接管驱动，配置备份在 hermes/cron/ 目录。
+
+
 # r728 轮报告（v6.8.77）
 
 ## 一、背景：cron agent 崩溃后半程落地

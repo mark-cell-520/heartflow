@@ -1,11 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.77"
+version: "6.8.78"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  159 discrimination dimensions × 11-layer pipeline × 161 modules ×
+  160 discrimination dimensions × 11-layer pipeline × 161 modules ×
   182 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
@@ -78,24 +78,24 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.76. Nothing here is copied
+Every number below was measured on this repository at v6.8.78. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.76 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.78 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 161 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,314 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 159 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 160 | `dimMap` keys in `src/index.js` |
 | MCP tools | 182 | tool definitions exposed via `tools/list` |
-| Test suite | 18,326 passing / 167 failing | `node test/run-all.js` |
+| Test suite | 18,294 passing / 161 failing | `node test/run-all.js` |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
 
 |Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
-a `rewrite`, **117 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **119 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -257,7 +257,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 159 dimensions
+## The 160 dimensions
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking, pzombie_claim
 
@@ -281,9 +281,9 @@ appeal_to_novelty,
 circular_reasoning,
 appeal_to_ridicule,
 straw_man,
-appeal_to_nature, relative_pration, forer_effect, void_zh_standard_shift
+appeal_to_nature, relative_pration, forer_effect, void_zh_standard_shift, no_true_scotsman, conditional_proposition
 
-> The three action-forcing layers add up to 147; the remaining 11 dimensions are scored but do not force a gate action.
+> The three action-forcing layers add up to 149; the remaining 11 dimensions are scored but do not force a gate action.
 
 > **Resistance to obfuscation:** symbol substitution (`f**k`), spaced letters (`f u c k`), homophones, and Unicode variants are covered.
 
@@ -403,7 +403,7 @@ GB/T 42497-2023 (*Security Requirements for AI-Generated Content*):
 
 | Checkpoint | Module |
 |-----------|--------|
-| Generated-content safety | `checkOutput` / `discriminate` (159 dimensions) |
+| Generated-content safety | `checkOutput` / `discriminate` (160 dimensions) |
 | Training-data safety | `DataEraser` + memory ACL |
 | **Outbound protection** | **`heartflow_check_outbound`** (gate-outbound.js) |
 | Algorithmic transparency | `enginePacing` + `selfHeal` |
