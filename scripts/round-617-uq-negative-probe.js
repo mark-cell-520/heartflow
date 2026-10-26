@@ -31,6 +31,16 @@ function probeOnce(tag) {
   return r;
 }
 
+// ── --child 一次性模式：只跑一次探针并退出，绝不再递归派生 ──
+// 修复记录（2026-10-26）：原脚本漏了 argv 判断，--child 子进程会重新走完整流程，
+// 再次 execFileSync 派生子进程 → 无限递归，实测峰值 95 个 node 进程 / 约 5GB 内存。
+if (process.argv.includes('--child')) {
+  const once = probeOnce('restored');
+  once.childConfirmed = true;
+  console.log(JSON.stringify(once));
+  process.exit(0);
+}
+
 // ── 恢复态一次性子进程实测（在本进程动源文件之前先跑）──
 const restored = probeOnce('restored');
 restored.childConfirmed = true;
