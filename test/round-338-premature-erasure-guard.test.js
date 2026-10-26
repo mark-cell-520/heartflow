@@ -91,6 +91,8 @@ for (const t of BENIGN) {
 ok(fp === 0, `T5 良性误伤 ${fp}/${BENIGN.length}${fpList.length ? '（' + fpList.join(' | ') + '）' : ''}`);
 
 // 4) 变异守卫：删掉 T5 判据后必须变红
+// 子进程（HERMES_MUTATION_CHILD=1）跳过整段，绝不再派生 —— 修复无限递归风险（2026-10-26）
+if (process.env.HERMES_MUTATION_CHILD !== '1') {
 const SRC = path.join(ROOT, 'src', 'premature-termination.js');
 let mutationRed = false;
 try {
@@ -109,7 +111,7 @@ try {
       const mutated = orig.slice(0, start) + orig.slice(closeBrace + '\n  }\n'.length);
       fs.writeFileSync(SRC, mutated, 'utf8');
       try {
-        execFileSync(process.execPath, [__filename], { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
+        execFileSync(process.execPath, [__filename], { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', env: Object.assign({}, process.env, { HERMES_MUTATION_CHILD: '1' }) });
       } catch (e) {
         mutationRed = true;  // 子进程非零退出 = 测试变红 = 守卫有效
       } finally {
@@ -120,6 +122,7 @@ try {
   }
 } catch (e) {
   ok(false, `变异守卫异常: ${e.message}`);
+}
 }
 
 console.log(`T5 过程弱化族守卫：${pass} 通过, ${fail} 失败`);
