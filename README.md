@@ -172,14 +172,14 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.75**. Not marketing copy.
+Measured on this repository at **v6.8.76**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 157 |
+| Discrimination dimensions | 158 |
 | MCP tools | 182 |
 | Test suite | 18,326 passing / 167 failing |
 | Capability guard | 20 / 20 checks |
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.76 | 2026-10-26 | **Merge: box line (4f4ebeb4) merged into the r727 mainline — `void_zh_standard_shift` renumbered as dimension 158 (upgrade type 1 — a brand-new discrimination dimension)** — 中文「双标」标准转移：对他人与自己使用两套评判标准（「别人加班是敬业，我加班就是剥削」/「规定是定给员工的，我不用遵守」/「Employees must clock in on time, but I come and go as I please」）。来自 Windows box 线（r717 侦察、r718-r724 迭代），经 10-26 07:27 合并入主线并重编号 155→158。本轮（r728）补全合并遗漏：VERSION/version.js 之外的版本四处传播（package.json/SKILL.md）、解决 data/upgrade-state.json 与 data/test-count.json 进 HEAD 的冲突标记、Verify 列举 116→117 并补 void_zh_standard_shift、维度计数 157→158。引擎维度键实测 158 |
 | 6.8.75 | 2026-10-26 | **`forer_effect` added as dimension 157 (upgrade type 1 — a brand-new discrimination dimension)** — 巴纳姆效应：放之四海皆准的性格/命运描述佯称针对个体的专属解读（"你外表看起来坚强，其实内心很柔软，只是不轻易让人看见"/"从测试结果看，你属于既理性又感性的类型，这很少见"/"Deep down, you want someone to truly understand you."）。两腿共现（人格描述句式 × 第二人称人格断言）；r727 复测攻击漏判 17/20（85%）全池最高、良性误伤 0/8；decision 本体一次选中（composite 0.82 / confidence 0.82 / identity_alignment 0.8，第二名 no_true_scotsman 0.80） |
 | 6.8.74 | 2026-10-26 | **`relative_pration` added as dimension 156 (upgrade type 1 — a brand-new discrimination dimension)** — 诉诸更惨：拿别人更惨的处境抹掉对方正当的当下诉求（"别喊累了，有人连饭都吃不上"/"知足吧，还有人工资比你低一半呢"/"Others have it worse; stop complaining"）。decision 本体一次选中无打平（composite 0.83 / confidence 0.84 / identity alignment 0.8）。r726 复测漏判 30/35（86%）全池最高、误伤 0/12，连续四轮候补后当选；上线后攻击 35/35 命中、良性 12/12 零命中。第一人称自陈比惨显式让位 suffering_contest 第78维 |
 | 6.8.73 | 2026-10-25 | **`affirming_the_consequent` added as dimension 155 (upgrade type 1 — a brand-new discrimination dimension)** — affirming the consequent: reversing cause from evidence ("if he did it he would leave traces; there are traces, so he did it"). decision 本体一次选中无打平（composite 0.86 / confidence 0.86 / identity alignment 0.8）。r725 复测漏判 14/15（93%）全池最高 → 上线后攻击 15/15 命中、良性 12/12 零命中。modus ponens / modus tollens / 对冲形天然不判（按推断词切分事实句，前半须含后件关键词、后半回指前件关键词）|
