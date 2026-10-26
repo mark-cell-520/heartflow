@@ -32,9 +32,9 @@ const log = (...a) => { if (!quiet) console.log(...a); };
 const hasGit = fs.existsSync(path.join(ROOT, '.git'));
 let tracked, trackedJs;
 if (hasGit) {
-  tracked = new Set(execSync('git ls-files', { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean));
+  tracked = new Set(execSync('git ls-files', { cwd: ROOT, encoding: 'utf8', timeout: 60000 }).split('\n').filter(Boolean));
   trackedJs = execSync('git ls-files "src/*.js" "src/**/*.js" "bin/*.js"',
-    { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
+    { cwd: ROOT, encoding: 'utf8', timeout: 60000 }).split('\n').filter(Boolean);
 } else {
   log('（无 .git 目录 —— 干净树模式：只查 require 目标是否存在，不查跟踪状态）');
   tracked = null;
@@ -96,7 +96,7 @@ log('\n=== 仓库卫生 ===');
 const junk = [];
 if (hasGit) {
   for (const pat of ['.pid', 'dist/', 'tmp/', '.bak', '.tar.gz']) {
-    const hits = execSync(`git ls-files "*${pat}*"`, { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
+    const hits = execSync(`git ls-files "*${pat}*"`, { cwd: ROOT, encoding: 'utf8', timeout: 60000 }).split('\n').filter(Boolean);
     if (hits.length) junk.push([pat, hits]);
   }
 } else {

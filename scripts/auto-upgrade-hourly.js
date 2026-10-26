@@ -73,7 +73,7 @@ function revertVersionBump(originalVersion) {
 
 function gitResetHard() {
   try {
-    execSync('git reset --hard HEAD', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
+    execSync('git reset --hard HEAD', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', timeout: 60000 });
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e.message };
@@ -82,7 +82,7 @@ function gitResetHard() {
 
 function gitStatus() {
   try {
-    const out = execSync('git status --porcelain', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
+    const out = execSync('git status --porcelain', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', timeout: 60000 });
     return out.trim().split('\n').filter(Boolean);
   } catch {
     return [];
@@ -91,7 +91,7 @@ function gitStatus() {
 
 function gitDiffStat() {
   try {
-    return execSync('git diff --cached --stat', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' }).trim();
+    return execSync('git diff --cached --stat', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', timeout: 60000 }).trim();
   } catch {
     return '';
   }
@@ -424,7 +424,10 @@ function runTests() {
       cwd: ROOT,
       encoding: 'utf8',
       stdio: 'pipe',
-      timeout: 120000,
+      // [全局修复 2026-10-26] 原 120s——全量回归 638 文件实测 27 分钟，
+      // 每轮必被杀且无汇总行 → parseTestResult 判 ok:false → 轮次反复失败。
+      // 40 分钟 = 实测 27 分钟 + 50% 余量。
+      timeout: 2400000,
     });
     return { ok: true, output: out, parsed: { ok: true, passed: 0, failed: 0, allowedFailures: 0, newFailures: 0 } };
   } catch (e) {
@@ -438,8 +441,8 @@ function runTests() {
 
 function gitCommitPush(message) {
   try {
-    execSync('git add -A', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
-    execSync(`git commit -m "${message}"`, { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
+    execSync('git add -A', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', timeout: 60000 });
+    execSync(`git commit -m "${message}"`, { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', timeout: 60000 });
     // 推送失败时重试，指数退避
     let lastError = null;
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -528,7 +531,7 @@ async function main() {
       const file = line.slice(3).trim();
       if (!file.endsWith('.js')) continue;
       try {
-        execSync(`node --check "${file}"`, { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
+        execSync(`node --check "${file}"`, { cwd: ROOT, encoding: 'utf8', stdio: 'pipe', timeout: 30000 });
       } catch (e) {
         syntaxErrors.push(file + ': ' + (e.stdout || e.message).split('\n')[0]);
       }

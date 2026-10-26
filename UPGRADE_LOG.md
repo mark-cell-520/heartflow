@@ -1,3 +1,47 @@
+# 全局修复轮（v6.8.79）— execSync 无 timeout 歼灭战
+
+## 背景
+
+用户问「升级一次心虫要多少时间、为什么慢、怎么卡、能否优化」。git log 时间戳
++ r729 实测给出的答案是：单轮有效 2.5–3.5 小时，最大单块是全量回归
+（638 文件 × ~2.5s ≈ 27 分钟），叠加一个隐藏卡死源——scripts/repo-audit.js
+全局审计（5242 文件）SHELL 类 306 命中，逐处人工证伪后定位到 **15 处真实
+裸 execSync/spawnSync**（多行 options 假阳性已排除，src/ 13 处、sync 系、
+measure 系经窗口核对全有时 timeout）。
+
+## 修复清单（8 文件 15 处）
+
+| 文件 | 处数 | 修法 |
+|---|---|---|
+| scripts/auto-upgrade-hourly.js | 6 | git 系 60s；**run-all 120s→2400s（原值 2 分钟必杀 27 分钟的全量回归，无汇总行 → parseTestResult ok:false → cron 轮反复失败，是历史卡死轮的直接根因）**；node --check 30s |
+| scripts/auto-commit-round.js | 2 | git ls-files 改走 r413 已修的 sh() 包装（180s） |
+| scripts/guard-require-integrity.js | 3 | git ls-files × 3 → 60s |
+| scripts/heartflow-self-evolve.js | 1 | run() 包装统一 180s（覆盖全部调用点） |
+| scripts/smoke-clean-clone.js | 1 | git archive → 300s |
+| scripts/fix-windows-root-hardcode.js / fix-stringified-hf.js / fix-double-hf-inject.js | 3 | node --check → 30s |
+
+## 证伪记录（不动项）
+
+- SECRETS 6：root-key.json 是公钥（设计内），test_*.cjs 是扫描器文件名误报；
+  硬编码密钥 grep 模式实测 0 命中
+- TRAV 83：抽样 3/3 为 path.join(__dirname, '../..') 常规相对路径，__dirname
+  锚定不可由外部输入控制
+- PROMPT 43：全为 scripts/round-*/ 探针脚本自身的提示词模板（v6.8.65 已证伪同款）
+- src/ 13 处、sync-doc-*/measure-*/smoke 92 行：多行 options，timeout 均在
+  6 行窗口外（人工逐处核对存在）
+
+## 验证
+
+- 8 个改动文件 node --check 全过
+- guard-require-integrity.js 实跑无 🔴（require 完整性 + 仓库卫生仅 dist/
+  已入库 GitHub Action 的既知警告）
+- verify 16/16（引擎未动）
+
+历史轮脚本（scripts/round-*/、negative-test-*、archive/）按「已认证历史轮
+产物不清理」铁律不动，其一性质脚本的裸调用风险由 cron 主驱动已全部覆盖。
+
+---
+
 # r729 轮报告（v6.8.78）
 
 ## 一、选中项 + decision 分数 + 身份对齐
