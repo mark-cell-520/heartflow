@@ -1,17 +1,20 @@
 {
-  "round": 728,
-  "version": "6.8.77",
-  "roundStartedAt": "2026-10-26T00:00:00.000Z",
-  "lastFinishAt": "2026-10-26T14:10:00+08:00",
+  "round": 729,
+  "version": "6.8.80",
+  "roundStartedAt": "2026-10-27T00:23:00.000Z",
+  "lastFinishAt": "2026-10-27T08:52:59+08:00",
   "lastGreen": true,
   "lastChecks": [
-    "PASS 版本四处一致 = 6.8.77（VERSION/version.js/package.json/sync-version）",
-    "PASS dimension-registry-guard 159 键全登记",
-    "PASS guard-abilities 20/20（含 heartflow.js CRLF 修复后复跑）",
-    "PASS round-728 轮测试 22/22（攻击 22 命中/良性 8 零误伤/边界 8 锁/分工 3 锁/存量 3 回归/登记 5 项）"
+    "PASS 版本五处一致 = 6.8.80（VERSION/version.js/package.json/SKILL.md/README 规格表口径戳）",
+    "PASS guard-abilities 20/20（含 heartflow.js + index.js 全文 CRLF 转 LF 后复跑）",
+    "PASS doc-numbers-accuracy 22/22（sync-doc-numbers.js 机器记账 + README changelog 补 6.8.79/6.8.80 两行）",
+    "PASS bidirectional-guard 召回 52/52、误拦 302/326（与基线一致零新增）",
+    "PASS security-audit 16/16",
+    "PASS bin/verify.js 16/16",
+    "全量回归 18348 过 / 157 败 / 18505 个，耗时 737.9s（提交 4505be93 实测；上一轮基线 18326/167，失败数 -10、通过数 +22）"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
   "published": "6.7.124",
   "publishedAt": "2026-09-25T20:03:42.912Z",
-  "notes": "r729 交接簿（v6.8.77 / 第 159 维度 no_true_scotsman 已上线）。\n【下一轮候选池】loaded_question（诱导性问题）、equivocation（一词多义偷换）、conditional_proposition（条件命题误用）、false_dilemma_extended、slippery_slope_extended、hasty_generalization_extended（侦察判定同 r728 口径）。\n【环境教训（新增三条）】① Windows asyncio ProactorEventLoop 会以 WinError 995 「线程退出或应用程序请求，已中止 I/O 操作」崩溃——cron agent 崩后 execution 卡 running 成幽灵（heartbeat 空转刷 progress_at），调度器被挡住跳过后续触发；修法=executions.force_close 后 next_run 自动恢复，排障先看 agent.log 最后一条 ERROR 与 output 目录有无对应文件（claimed-but-no-process 的 running 无输出文件）。② Windows 工具写文件会带 CRLF，git autocrlf 让 diff 不可见，仅 guard-abilities 磁盘扫描暴露——并发实例 checkout 复原后必须跑 guard 或 file 检查。③ normalize 的 de_pinyin 会把英文单词里的 m 破坏成「码」（imagination→i码agination）并去空格，导致含 m 的英文攻击句在 discriminate 层归零（模块层仍命中）——影响全部维度的存量边界，EN 样本尽量避开含 m 单词，专项轮再修 normalize。\n【已知未修】normalize de_pinyin 英文破坏（见教训③）；decide-r728 后候选池侦察脚本可复用 round-728-family-probe.js 模式。"
+  "notes": "r730 交接簿（v6.8.80 / 第 160 维度 conditional_proposition 已上线；6.8.79 与 6.8.80 是 r729 之后两个无编号修复轮——execSync 无 timeout 歼灭战、Windows 平台卡死歼灭战·二，引擎 src/ 两轮均零改动）。\n【下一轮候选池（r730，按纪律必须复测，UPGRADE_LOG tail 是历史池复述）】① loaded_question 诱导性问题（r729 decision 0.81 第二名，r727 复测漏判 80%/误伤 0，缺口面最大）；② false_dilemma_extended / slippery_slope_extended / hasty_generalization_extended 三个存量维度补句式族；③ equivocation 一词多义偷换——注意 AGENTS.md 已有 equivocation_sense_shift 维度，动手前先 grep 确认是否同族，别重复上线；④ 存量误伤修复：special_pleading（「特殊情况需要特批，但要走正规流程」被存量维度判 rewrite，连续多轮记录）、guilt_by_association（「圈子里有坏人，不代表圈子里所有人都是坏人」）、middle_ground（和稀泥，复测误伤 1/12）。\n【两个真 bug，比加新维度更值得做】① normalize 的 de_pinyin 把英文单词里的 m 破坏成「码」（imagination→i码agination）并去空格，导致含 m 的英文攻击句在 discriminate 层归零（模块层仍命中）——影响全部 160 个维度的存量边界，英文攻击样本 currently 只能绕开含 m 单词；② evidence 维度基线打分器恒返回 {score:1, issues:[]}，从 r690 起连续十几轮记录，等于一个装饰维度。\n【环境教训（本轮新增三条）】① CRLF 会复发：src/core/heartflow.js + src/index.js 本轮又被写成全文 CRLF（r728 修过一次），根因是 core.autocrlf=true 签出即 CRLF，任何 git checkout/stash 触碰这两个路径就复发，而 git diff 因归一化完全不可见，只有 guard-abilities 磁盘扫描能暴露。已转回 LF；如已加 .gitattributes（* text=auto eol=lf）则根治，未加则下轮还会复发。② 全量回归本机实测 737.9s（12.3 分钟），UPGRADE_LOG 里「~3 分钟」是干净机器口径，Windows 本机排程别按 3 分钟算。③ MSYS 的 grep -c $'\\r' 数 CR 行不可靠（对纯 LF 文件也返回全部行数），判定行尾必须用 od -c 或 node 读 Buffer 数 0x0d。\n【状态】npm published 仍 6.7.124（本地 6.8.x 是自演进线，比 npm 超前 13 个版本号）；29+ commits 未 push GitHub（人工门禁，别自动推）；Claude 侧技能副本 ~/.claude/skills/heartflow-engine 停在 6.8.62 / 147 维，未同步 hermes 的 160 维。"
 }
