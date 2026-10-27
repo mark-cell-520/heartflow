@@ -414,6 +414,12 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本（原文，不做任何修改）"}},"required":["text"]}
   },
 
+  {
+    name: 'heartflow_check_injection_synonyms',
+    description: "英文注入同义族通道检测（English injection synonym families）：提示注入的英文模式库 INJECTION_PATTERNS.en 只有 12 条字面短语正则，ignore 是唯一动词、previous|above|prior 是唯一指代词、instruction|prompt|rule|... 是唯一宾语族，而中文侧 zh 库有为同义替换准备的词族结构（无视|撇开|抛开|丢掉|舍弃|废止 × 之前|上述|所有 × 指令|规则|限制|约束|设定）。r733 轮初实测 25 条常见英文注入句式里 16 条 gate.action=pass（静默放行），prompt_injection 是 BLOCK 级维度，等于门禁对该类攻击无效。本通道改成三族合取：覆盖动词 × 指代锚点 × 规范宾语，三个族同时落在同一窗口内才判命中，一条判据覆盖动词×锚点×宾语的交叉乘积（约 20×18×30）。精度护栏：三族缺一不判；动词前有否定词整条跳过（'do not ignore ...' 是要求继续遵守）；转述句/往事句/许可句跳过（主语是第三人称或出现 can/could/may/might）；宾语被圈定到外部文档时跳过（'skip the previous instructions in the README'）；格式类忽略豁免（含 'rules about indentation' 语序）；无宾语裸指代要求量词或同句第二人称。r733 实测：17 条攻击句式 17/17 命中、双向门禁 326 条良性样本零新增误伤、15 条刻意构造的良性长句 15/15 不判。action: check（默认）返回 count/score/blocked/injections（含 verb/anchor/object 三族归因）；families 读当前词表规模与交叉乘积；list 导出三族词表全文（审计用）。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本（原文，只读不改）"},"action":{"type":"string","description":"check（默认）/ families / list"}},"required":["text"]}
+  },
+
 ];
 
 // [AUDIT-FIX 2026-10-11] 并入运行时验证过的只读工具集（86 个）。
