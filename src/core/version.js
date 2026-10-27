@@ -64,7 +64,11 @@ const path = require('path');
 // [v6.8.81] 第 730 轮同步：6.8.80 → 6.8.81（normalize de_pinyin 英文破坏修复：
 //                 空格链判据从「含任一拼音键」升级为「拼音键覆盖率 ≥ 50%」，
 //                 英文句不再被抹空格+改词，攻击句从 pass 变 rewrite）。
-let VERSION = '6.8.81';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.82] 第 731 轮同步：6.8.81 → 6.8.82（_dePinyin site 1 三缺陷修复：
+//                 EN_WORD_EXCEPTIONS 英文词例外表 + _replacePinyinKeys 逐 token
+//                 大小写不敏感替换 + 5c-post 还原闭环，7 种拼音注入形态
+//                 pass → block，英文句零污染）。
+let VERSION = '6.8.82';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

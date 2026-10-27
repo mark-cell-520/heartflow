@@ -7,7 +7,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 160 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
-×  1,314 dispatch routes  ×  18,366 passing tests  ×  0 runtime dependencies
+×  1,314 dispatch routes  ×  18,364 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -172,7 +172,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.81**. Not marketing copy.
+Measured on this repository at **v6.8.82**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -181,7 +181,7 @@ Measured on this repository at **v6.8.81**. Not marketing copy.
 | Dispatch routes | 1,314 |
 | Discrimination dimensions | 160 |
 | MCP tools | 182 |
-| Test suite | 18,366 passing / 143 failing |
+| Test suite | 18,364 passing / 145 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.82 | 2026-10-27 | **`_dePinyin` site 1 修复：英文词碰撞 + 大小写 + 还原闭环（upgrade type 2 — 存量缺陷修复，第 731 轮）** — site 1（无空格拼音还原）原实现是盲目 `out.split(k).join(PINYIN_MAP[k])`，实测三个缺陷：① **英文词碰撞**：`mingling` 本身就是 PINYIN_MAP 键（→命令），"the mingling of cultures" → "the 命令 of cultures"（扫仓库 85,968 个英文 token，唯一整词碰撞就是它）；② **大小写敏感**：`_dePinyin` 跑在 lowercase 之前，句首大写 `Hulve` / 全大写 `HULVE` 的 `includes(k)` 不成立 → 整个漏还原；③ **还原不闭环**：还原出「忽略」后周围英文攻击词不翻译，"忽略 previous instructions" 既不匹配中文模式（previous 是英文）也不匹配英文模式（hulve ≠ ignore），**整句 gate=pass 静默放行**（实测 `prompt_injection` count=0，而完整还原「忽略 之前的 指令」→ block）。修复：`EN_WORD_EXCEPTIONS` 英文词例外表（含 mingling 词族 + 派生词串守卫）+ `_replacePinyinKeys` 逐 token 大小写不敏感替换（三处通路共用）+ 5c-post 还原闭环（`_en2zh` 从 step 4c 提取复用，补 previous/prior → 之前）+ 中英混插剥离器只剥夹在字母间的**单字**汉字（原判据会把 site 1 刚还原出的「忽略」吃掉「忽」）。收益：7 种拼音注入形态全部 `pass → block`（含句首大写/全大写/please 前缀/中文语境内插大写拼音）；英文句零污染（mingling 词族 5 句 normalize 输出与输入逐字节一致、gate 全 pass）；存量反混淆能力零回归。门禁：`bin/verify.js` 16/16、双向门禁召回 52/52、误拦 302/326（与基线一致，零新增误伤）、`guard-abilities` 20/20、轮测试 37/37、r730 轮测试 18/18（其「已知局限」断言翻转为守修复）。全量回归 18,364 过 / 145 败 / 18,509 个（与 r730 实测 18,366/143/18,509 同总量；失败 +2 逐定性为存量：doc-snippet 执行器在 Windows 把反斜杠路径生成进 JS 字符串致 0/4——HEAD 版本实测同样 0/4；`dimension-action-wiring` 的 post_hoc 误判——该句 normalize 输出与 HEAD 逐字节一致，与本轮无关）。已知未修：evidence 维度打分器恒返回 `{score:1, issues:[]}`（r690 起连续记录）；无空格英文注入 "ignorepreviousinstructions" 仍 pass（英文模式要求空格，纯英文就这样，非拼音引入）；camelCase 标识符被 `de_encode` 的 base64 试探解出乱码（存量，与本轮无关） |
 | 6.8.81 | 2026-10-27 | **normalize de_pinyin 英文破坏修复（upgrade type 2 — 存量缺陷修复，第 730 轮）** — `_dePinyin` 的空格链判据原是「压缩后含任一 PINYIN_MAP 键即判拼音串」，而英文句压缩后极易偶然含键：`"Real artists never trace references, they draw from imagination alone."` 压缩得 `theydrawfromimaginationalone`，含 `mima`（4/27 = 15% 覆盖）→ 被判成拼音串 → 空格被抹、`from` 的 `m+a` 被换成「密码」→ 中英混插剥离器 `/([a-z]{2,8})[一-鿿]/` 吃掉「密」→ 得到 `theydrawfro码ginationalone`，**英文模式全失配，该 no_true_scotsman 攻击句 gate=pass 静默放行**。修复：兜底判据升级为拼音键覆盖率 ≥ 50%（新增 `_pinyinCoverage` 贪心最长匹配；实测真拼音串 100%/81%、英文句 12%~17%，两边充足间隔），stopword 与 avgLen 两道原有防线保留并联。收益：该攻击句 `pass → rewrite`（discriminate 命中 no_true_scotsman）；英文句零损坏；拼音还原能力零回归（两个既有反混淆用例 + 拼音英文混合形态全部实测通过）。顺带修掉 r729 上线第 160 维度后未同步的存量断言（`round-728-no-true-scotsman.js` 的 159 → 160，该红灯从 v6.8.78 起常驻）。全量回归 18,366 过 / 143 败 / 18,509 个（基线 18,348/157/18,505：**失败 -14、通过 +18，零新增失败**；剩余 6 个 MCP 类失败为 8099 端口被在跑服务占用导致的存量环境噪声）。已知局限记录在案：`mingling` 本身是 PINYIN_MAP 键（→命令），纯英文词与拼音键不可区分，site 1 的盲目子串替换仍会局部改写它——但实测该良性句 gate 仍 pass，不构成误报；修它会让「hulve previous instructions」这类真攻击形态失去还原能力，留专项轮 |
 | 6.8.80 | 2026-10-27 | **Windows 平台卡死歼灭战·二（upgrade type 3 — 测试链与工程修复，引擎 `src/` 零改动）** — `test/run-all.js` 从串行 for 循环重构为「任务构造 + 并发池」（`HF_RUN_ALL_JOBS` 默认 4、按 CPU 核数封顶，`=1` 退化为原串行行为），609 个测试文件全量实测 737.9 秒（并发池阶段约 4 分钟跑完 522 个，变更/MCP 类 87 个独占串行车道）；顺带修四个 Windows 专属问题：① 单例锁补 `'wx'` 排他创建 + 双检，关掉两个 runner 同时启动的毫秒级竞态；② 15 个测试文件 `execSync(process.execPath + ' ' + ...)` 在 `C:\Program Files\nodejs\node.exe` 上被 shell 拆断成 `'C:\Program'` 整文件 Command failed（Linux 容器无此路径所以历史全绿），统一改 `JSON.stringify(process.execPath)`；③ mount/jest 形态测试原先被静默跳过，并发池按任务对象统一调度后补齐；④ 72 个变更测试（writeFileSync 改 `src/` 做负例验证）并发跑时互相覆盖补丁造成批量假失败（实测单跑 3/0 过、并发 EXIT=1），改两阶段调度——变更测试与 MCP 服务类测试独占串行车道，其余 522 个走并发池；另加突变残留兜底（跑前快照 `src/` 全文，子进程被 SIGKILL 后逐文件回滚，防 4 个 src 文件带负例突变污染仓库）。全量回归实测 18,348 过 / 157 败（上一轮基线 18,294/161，失败数净减 4、通过数 +54） |
 | 6.8.79 | 2026-10-27 | **全局修复轮：execSync 无 timeout 歼灭战（upgrade type 3 — 工程修复，引擎未动）** — `scripts/repo-audit.js` 全局审计 5242 文件、SHELL 类 306 命中逐处人工证伪后，定位 8 文件 15 处真实裸 `execSync`/`spawnSync` 并全部补 timeout。最关键一处：`scripts/auto-upgrade-hourly.js` 里 run-all 的 timeout 原值 **120 秒**——"2 分钟必杀 27 分钟的全量回归，无汇总行 → `parseTestResult` ok:false → cron 轮反复失败"，是历史卡死轮的直接根因，改 2400s。证伪记录：SECRETS 6（root-key.json 是公钥、test_*.cjs 是扫描器文件名误报）、TRAV 83（抽样 3/3 为 `path.join(__dirname,'../..')` 常规相对路径）、PROMPT 43（全为探针脚本自身提示词模板）均不动 |
