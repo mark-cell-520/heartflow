@@ -7,7 +7,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 160 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
-×  1,314 dispatch routes  ×  18,348 passing tests  ×  0 runtime dependencies
+×  1,314 dispatch routes  ×  18,366 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -172,7 +172,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.80**. Not marketing copy.
+Measured on this repository at **v6.8.81**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -181,7 +181,7 @@ Measured on this repository at **v6.8.80**. Not marketing copy.
 | Dispatch routes | 1,314 |
 | Discrimination dimensions | 160 |
 | MCP tools | 182 |
-| Test suite | 18,348 passing / 157 failing |
+| Test suite | 18,366 passing / 143 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.81 | 2026-10-27 | **normalize de_pinyin 英文破坏修复（upgrade type 2 — 存量缺陷修复，第 730 轮）** — `_dePinyin` 的空格链判据原是「压缩后含任一 PINYIN_MAP 键即判拼音串」，而英文句压缩后极易偶然含键：`"Real artists never trace references, they draw from imagination alone."` 压缩得 `theydrawfromimaginationalone`，含 `mima`（4/27 = 15% 覆盖）→ 被判成拼音串 → 空格被抹、`from` 的 `m+a` 被换成「密码」→ 中英混插剥离器 `/([a-z]{2,8})[一-鿿]/` 吃掉「密」→ 得到 `theydrawfro码ginationalone`，**英文模式全失配，该 no_true_scotsman 攻击句 gate=pass 静默放行**。修复：兜底判据升级为拼音键覆盖率 ≥ 50%（新增 `_pinyinCoverage` 贪心最长匹配；实测真拼音串 100%/81%、英文句 12%~17%，两边充足间隔），stopword 与 avgLen 两道原有防线保留并联。收益：该攻击句 `pass → rewrite`（discriminate 命中 no_true_scotsman）；英文句零损坏；拼音还原能力零回归（两个既有反混淆用例 + 拼音英文混合形态全部实测通过）。顺带修掉 r729 上线第 160 维度后未同步的存量断言（`round-728-no-true-scotsman.js` 的 159 → 160，该红灯从 v6.8.78 起常驻）。全量回归 18,366 过 / 143 败 / 18,509 个（基线 18,348/157/18,505：**失败 -14、通过 +18，零新增失败**；剩余 6 个 MCP 类失败为 8099 端口被在跑服务占用导致的存量环境噪声）。已知局限记录在案：`mingling` 本身是 PINYIN_MAP 键（→命令），纯英文词与拼音键不可区分，site 1 的盲目子串替换仍会局部改写它——但实测该良性句 gate 仍 pass，不构成误报；修它会让「hulve previous instructions」这类真攻击形态失去还原能力，留专项轮 |
 | 6.8.80 | 2026-10-27 | **Windows 平台卡死歼灭战·二（upgrade type 3 — 测试链与工程修复，引擎 `src/` 零改动）** — `test/run-all.js` 从串行 for 循环重构为「任务构造 + 并发池」（`HF_RUN_ALL_JOBS` 默认 4、按 CPU 核数封顶，`=1` 退化为原串行行为），609 个测试文件全量实测 737.9 秒（并发池阶段约 4 分钟跑完 522 个，变更/MCP 类 87 个独占串行车道）；顺带修四个 Windows 专属问题：① 单例锁补 `'wx'` 排他创建 + 双检，关掉两个 runner 同时启动的毫秒级竞态；② 15 个测试文件 `execSync(process.execPath + ' ' + ...)` 在 `C:\Program Files\nodejs\node.exe` 上被 shell 拆断成 `'C:\Program'` 整文件 Command failed（Linux 容器无此路径所以历史全绿），统一改 `JSON.stringify(process.execPath)`；③ mount/jest 形态测试原先被静默跳过，并发池按任务对象统一调度后补齐；④ 72 个变更测试（writeFileSync 改 `src/` 做负例验证）并发跑时互相覆盖补丁造成批量假失败（实测单跑 3/0 过、并发 EXIT=1），改两阶段调度——变更测试与 MCP 服务类测试独占串行车道，其余 522 个走并发池；另加突变残留兜底（跑前快照 `src/` 全文，子进程被 SIGKILL 后逐文件回滚，防 4 个 src 文件带负例突变污染仓库）。全量回归实测 18,348 过 / 157 败（上一轮基线 18,294/161，失败数净减 4、通过数 +54） |
 | 6.8.79 | 2026-10-27 | **全局修复轮：execSync 无 timeout 歼灭战（upgrade type 3 — 工程修复，引擎未动）** — `scripts/repo-audit.js` 全局审计 5242 文件、SHELL 类 306 命中逐处人工证伪后，定位 8 文件 15 处真实裸 `execSync`/`spawnSync` 并全部补 timeout。最关键一处：`scripts/auto-upgrade-hourly.js` 里 run-all 的 timeout 原值 **120 秒**——"2 分钟必杀 27 分钟的全量回归，无汇总行 → `parseTestResult` ok:false → cron 轮反复失败"，是历史卡死轮的直接根因，改 2400s。证伪记录：SECRETS 6（root-key.json 是公钥、test_*.cjs 是扫描器文件名误报）、TRAV 83（抽样 3/3 为 `path.join(__dirname,'../..')` 常规相对路径）、PROMPT 43（全为探针脚本自身提示词模板）均不动 |
 | 6.8.78 | 2026-10-26 | **`conditional_proposition` added as dimension 160 (upgrade type 1 — a brand-new discrimination dimension)** — 条件句武器化：用未经验证的假设性条件句（「如果A就B」）直接推出关于现实的确定性结论，把存在性推断当作前件真值的证据（「如果他真的爱你，就不会让你受这种委屈」/「如果这个方案可行，我们早就看到成果了」/"If he really loved you, he would never treat you like that."）。两腿共现（假设条件句 × 否定推断：早就…了/就不会/怎么会/would never/would have/there would be）；r729 复测攻击漏判 16/20（80%）、良性 0/10 误伤；decision 本体一次选中无打平（composite 0.84 / confidence 0.76 / identity_alignment 0.8，第二名 loaded_question 0.81）。豁免：规则合同条件/谬误概念转述/对冲/显式证据模式/否定翻转。本半程由 14:00 cron 崩溃（模型 repetition loop）后主会话接管收尾 |
