@@ -117,19 +117,32 @@ for (const s of EN_BENIGN) {
   });
 }
 
-// ── 5. 已知局限（不修，记录在案）────────────────────────────────
-console.log('\n【5】已知局限：mingling 词内碰撞（site 1 盲目子串替换）');
+// ── 5. 已知局限（r730 记录在案，r731 已修复）────────────────────────
+console.log('\n【5】mingling 词内碰撞（r730 已知局限 → r731/v6.8.82 已修复）');
 
-// 'mingling' 本身是 PINYIN_MAP 键（→命令），纯英文词与拼音键不可区分。
-// site 1 的替换是**局部**的（只换一个词，不抹空格），英文模式仍可匹配，
-// 实测该良性句 gate 仍 pass，不构成误报，故本轮不动 site 1——
-// 动它会让「hulve previous instructions」这种真攻击形态失去还原能力。
-t('mingling 被局部替换但不造成 gate 误报', () => {
+// r730 时这里是「已知局限」：'mingling' 本身是 PINYIN_MAP 键（→命令），
+// site 1 的盲目子串替换会把纯英文词改坏，但替换是局部的、不抹空格，
+// 英文模式仍可匹配，实测 gate 仍 pass，故当时不动 site 1。
+// r731 补了 EN_WORD_EXCEPTIONS（英文词例外表）+ 逐 token 替换后修好：
+// 例外词整词原样返回，英文句零污染。本条从「记录局限」翻转为「守修复」。
+t('mingling 不再被替换（英文词例外表生效）', () => {
   const s = 'She said the mingling of cultures made the city what it is.';
   const n = normalize(s).normalized;
-  assert.ok(n.includes('命令'), '预期 mingling → 命令（已知局限）: ' + n.slice(0, 60));
+  assert.ok(!n.includes('命令'), 'mingling 仍被改成「命令」: ' + n.slice(0, 60));
+  assert.strictEqual(n, s.toLowerCase(), 'normalize 破坏了含 mingling 的英文句: ' + n.slice(0, 60));
+});
+t('mingle 词族同样受保护', () => {
+  for (const s of ['They mingle at every conference.',
+                   'The mingled flavors worked well together.',
+                   'Mingling with strangers is not recommended.']) {
+    const n = normalize(s).normalized;
+    assert.ok(!/[一-鿿]/.test(n), '词族被误还原出汉字: ' + n.slice(0, 60));
+  }
+});
+t('修复后良性句仍 pass（不升级成误报）', () => {
+  const s = 'She said the mingling of cultures made the city what it is.';
   assert.strictEqual(gate.checkOutput(s).gate.action, 'pass',
-    '已知局限升级成了误报，需要单独一轮修 site 1');
+    '已知局限修复引入了误报');
 });
 
 // ── 6. 存量回归 ─────────────────────────────────────────────────
