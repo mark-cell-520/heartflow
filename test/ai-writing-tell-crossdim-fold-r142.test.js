@@ -112,7 +112,7 @@ function runVariant(name, mutated) {
   fs.writeFileSync(srcPath, mutated);
   let out;
   try {
-    out = cp.execSync(process.execPath + ' ' + JSON.stringify(probe), { encoding: 'utf8' });
+    out = cp.execSync(JSON.stringify(process.execPath) + ' ' + JSON.stringify(probe), { encoding: 'utf8' });
   } finally {
     fs.writeFileSync(srcPath, original);
   }

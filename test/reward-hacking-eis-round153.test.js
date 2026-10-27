@@ -182,7 +182,7 @@ console.log('\n[7] 注入-删条守卫（子进程隔离）');
   let out;
   fs.writeFileSync(srcPath, stripped);
   try {
-    out = cp.execSync(process.execPath + ' ' + JSON.stringify(probe), { encoding: 'utf8', cwd: HF });
+    out = cp.execSync(JSON.stringify(process.execPath) + ' ' + JSON.stringify(probe), { encoding: 'utf8', cwd: HF });
   } finally {
     fs.writeFileSync(srcPath, original);
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) { /* 清理失败不影响结论 */ }

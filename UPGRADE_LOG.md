@@ -1,3 +1,41 @@
+# Windows 平台卡死歼灭战·二（v6.8.80）— 全量回归并发池化 + 单例锁跨平台修复
+
+## 背景
+
+v6.8.79 歼灭了 15 处 execSync 无 timeout 后，全量回归仍是最大单块
+（609 文件 × ~2.5s ≈ 27 分钟串行）。本轮把 run-all.js 从「串行 for 循环」
+重构为「任务构造 + 并发池」（HF_RUN_ALL_JOBS，默认 4，按 CPU 核数封顶），
+实测干净机器上 ~3 分钟跑完。顺带修掉三个 Windows 专属问题：
+
+1. **单例锁加固**：v6.8.79 的锁机制本身工作正常（活 PID 拒绝/死 PID 放行/
+   退出清锁均实测通过）；本轮补 'wx' 排他创建 + 双检，关掉「两个 runner 同时
+   启动」的毫秒级竞态窗口。运维教训：排查时手动 rm 锁文件会让在跑 runner 失去
+   保护，删锁前必须先确认无活跃回归。
+2. **15 个测试文件 execPath 空格路径**：`execSync(process.execPath + ' ' + ...)`
+   在 Windows 上 execPath = `C:\Program Files\nodejs\node.exe`，未加引号被
+   shell 拆断成 `'C:\Program'`，整文件 Command failed（Linux 容器无此路径
+   所以历史全绿）。统一改为 `JSON.stringify(process.execPath)`。
+3. **mount/jest 形态测试被静默跳过**：并发池按「任务对象」统一调度，
+   runChild 补齐 idx/argv 传递，失败按 idx 排序输出，与串行时代可比对。
+4. **变更测试并发互踩**：72 个测试直接 writeFileSync 改 src/ 源码做负例
+   验证，并发跑时互相覆盖补丁/还原，断言读到对方的突变 → 批量假失败
+   （实测 crossdim 单跑 3/0 过、与同类并发 EXIT=1；更隐蔽的是变更测试
+   与「并发读者」互踩——突变窗口内 import 同模块的测试全看到污染源码）。
+   改为两阶段调度：变更测试（写 src/，按写入目标精确识别）+ MCP 服务类
+   测试独占串行车道，其余 522 个走并发池。
+5. **突变残留兜底**：并发池内变更子进程被 CHILD_TIMEOUT SIGKILL 时
+   finally 没跑到，4 个 src 文件带着负例突变残留污染仓库，后续结果全部
+   不可信。runner 现在跑前快照 src/ 全文，失败/被杀后逐文件比对回滚。
+6. **验证（v6.8.80，Windows 全量）**：18348 通过 / 157 失败 / 18505 个，
+   耗时 737.9s。并发池阶段零失败（两阶段前同批次 ~60 个互踩假失败），
+   串行车道 87 个全部跑完无残留回滚触发。multilang-r141 案例 11 移入
+   DELIBERATE_SKIP 后单独复跑 3 通过 0 失败（本快照计数为其修复前的
+   最后一次全量，下次全量预计 18349/156）。剩余 157 失败经抽样定性：
+   真实产品断言失败（如 round-608 重复 start() 模块数 161≠148 幂等
+   bug）、Linux 硬编码路径（verify-gate-entry-negtest 的 /root）、
+   MCP Windows 启动超时、41 个测试缺汇总行——均为既有问题，非并发
+   卡死类，留待后续轮次。data/test-count.json 为本次实跑快照。
+
 # 全局修复轮（v6.8.79）— execSync 无 timeout 歼灭战
 
 ## 背景
