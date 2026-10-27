@@ -143,13 +143,13 @@ try {
   const diCheck = path.join(dir, 'di-check.js');
   fs.writeFileSync(rhCheck, RH_STRIPPED);
   fs.writeFileSync(diCheck, DI_STRIPPED);
-  cp.execSync(process.execPath + ' --check ' + JSON.stringify(rhCheck));
-  cp.execSync(process.execPath + ' --check ' + JSON.stringify(diCheck));
+  cp.execSync(JSON.stringify(process.execPath) + ' --check ' + JSON.stringify(rhCheck));
+  cp.execSync(JSON.stringify(process.execPath) + ' --check ' + JSON.stringify(diCheck));
 
   fs.writeFileSync(SRC_RH, RH_STRIPPED);
   fs.writeFileSync(SRC_DI, DI_STRIPPED);
   let out;
-  try { out = cp.execSync(process.execPath + ' ' + JSON.stringify(probe), { encoding: 'utf8' }); }
+  try { out = cp.execSync(JSON.stringify(process.execPath) + ' ' + JSON.stringify(probe), { encoding: 'utf8' }); }
   finally {
     fs.writeFileSync(SRC_RH, RH_ORIG);
     fs.writeFileSync(SRC_DI, DI_ORIG);

@@ -121,7 +121,7 @@ t('移除折叠后修复样本必须回到误伤（score>0 / gate verify）', ()
       'console.log("fp=" + fp);',
     ].join('\n'));
     let out = '';
-    try { out = cp.execSync(process.execPath + ' ' + JSON.stringify(probe), { encoding: 'utf8' }); }
+    try { out = cp.execSync(JSON.stringify(process.execPath) + ' ' + JSON.stringify(probe), { encoding: 'utf8' }); }
     finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
     const fpAfter = parseInt((out.match(/fp=(\d+)/) || [])[1], 10);
     assert.strictEqual(fpAfter, 1, `移除折叠后应有 1 条回到误伤，实得 ${fpAfter}`);

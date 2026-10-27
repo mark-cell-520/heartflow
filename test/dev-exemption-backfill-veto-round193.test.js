@@ -153,7 +153,7 @@ t('delete-guard:stripping-restores-exemption', () => {
   let out = '';
   try {
     fs.writeFileSync(path.join(dir, 'ex.js'), EX_STRIPPED);
-    cp.execSync(process.execPath + ' --check ' + JSON.stringify(path.join(dir, 'ex.js')));
+    cp.execSync(JSON.stringify(process.execPath) + ' --check ' + JSON.stringify(path.join(dir, 'ex.js')));
     fs.writeFileSync(probe, [
       'const ex = require(' + JSON.stringify(path.join(dir, 'ex.js')) + ');',
       'const A = ' + JSON.stringify(ATTACK.map(x => x[0 + 1])) + ';',
@@ -164,7 +164,7 @@ t('delete-guard:stripping-restores-exemption', () => {
     // 剥线版必须在真实位置生效：把沙盒副本写回源，跑完还原
     fs.writeFileSync(SRC_EX, EX_STRIPPED);
     let raw;
-    try { raw = cp.execSync(process.execPath + ' ' + JSON.stringify(probe), { encoding: 'utf8' }); }
+    try { raw = cp.execSync(JSON.stringify(process.execPath) + ' ' + JSON.stringify(probe), { encoding: 'utf8' }); }
     finally { fs.writeFileSync(SRC_EX, EX_ORIG); }
     out = raw;
   } finally {

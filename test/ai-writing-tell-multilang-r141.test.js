@@ -18,7 +18,11 @@ const cp = require('child_process');
 
 const { detect } = require(path.join(__dirname, '..', 'src', 'shield', 'ai-writing-tell.js'));
 
-// ── 12 条多语言正当文本（中/日/韩/俄/阿拉伯/泰 + 英文术语混排的技术说明）──
+// ── 11 条多语言正当文本（中/日/韩/俄/阿拉伯/泰 + 英文术语混排的技术说明）──
+// [v6.8.80] 原 12 条。第 12 条（首先…因此 therefore 连接词对照句）与下方
+// DELIBERATE_SKIP 边界同形（中文连接词+标点+紧贴英文对应词），引擎按
+// zh-en-mixing 命中是设计内行为——round-141 已登记该边界却漏移本例，
+// 导致 ① 与 ①b 自相矛盾（同形既要求归零又要求命中）。移入边界组。
 const MULTILANG_BENIGN = [
   'この API は robust な設計になっており、retry 時に exponential backoff を使います。',
   'システムの throughput を改善するため、cache layer を comprehensive に見直しました。',
@@ -30,7 +34,6 @@ const MULTILANG_BENIGN = [
   'ระบบนี้มีความ robust สูง และ latency ต่ำมาก',
   '这个 pipeline 需要 comprehensive 的 retry 策略，覆盖 timeout 和 rate limit 两类失败。',
   '我们把 gateway 重写成 leverage 了连接池的实现，throughput 提升明显。',
-  '首先，我们需要 firstly 明确 SLA 目标；因此，therefore 再决定重试次数。',
 ];
 
 // [第 141 轮] 已知边界（DELIBERATE_SKIP）：中文连接词 + 紧贴英文对应词的
@@ -39,6 +42,9 @@ const MULTILANG_BENIGN = [
 // 1 个中文标点），无法用可区分特征分离。第 50 轮判定它属于 AI 翻译腔自认
 // （把连接词双语并排放置），故不列为误伤，登记为边界。
 const DELIBERATE_SKIP = [
+  // [v6.8.80] 从 MULTILANG_BENIGN 移入（原第 12 条）：与已登记边界同形，
+  // 引擎命中是设计内行为，① 不得要求其归零。
+  '首先，我们需要 firstly 明确 SLA 目标；因此，therefore 再决定重试次数。',
   '总之，overall 这个方案可以上线；此外，moreover 要补监控。',
 ];
 
@@ -110,7 +116,7 @@ fs.writeFileSync(probe, [
 fs.writeFileSync(srcPath, stripped);
 let out;
 try {
-  out = cp.execSync(process.execPath + ' ' + JSON.stringify(probe), { encoding: 'utf8' });
+  out = cp.execSync(JSON.stringify(process.execPath) + ' ' + JSON.stringify(probe), { encoding: 'utf8' });
 } finally {
   fs.writeFileSync(srcPath, original);
   try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) { /* 清理失败不影响结论 */ }

@@ -145,7 +145,7 @@ try {
   // 让探针加载的是 stripped 副本而不是原文件——通过临时替换原文件内容
   fs.writeFileSync(SRC, stripped);
   let out;
-  try { out = cp.execSync(process.execPath + ' ' + JSON.stringify(probe), { encoding: 'utf8' }); }
+  try { out = cp.execSync(JSON.stringify(process.execPath) + ' ' + JSON.stringify(probe), { encoding: 'utf8' }); }
   finally { fs.writeFileSync(SRC, original); }
   const after = parseInt((out.match(/hit=(\d+)/) || [])[1], 10);
   assert.ok(Number.isFinite(after), '子进程删条探针输出无法解析: ' + out.slice(0, 200));

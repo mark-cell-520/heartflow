@@ -117,7 +117,7 @@ if (MISS_GUARD > 0) {
   fs.writeFileSync(srcPath, stripped);
   let out;
   try {
-    out = cp.execSync(process.execPath + ' ' + JSON.stringify(probe), { encoding: 'utf8' });
+    out = cp.execSync(JSON.stringify(process.execPath) + ' ' + JSON.stringify(probe), { encoding: 'utf8' });
   } finally {
     fs.writeFileSync(srcPath, original);
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) { /* 清理失败不影响结论 */ }
