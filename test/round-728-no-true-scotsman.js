@@ -156,11 +156,13 @@ t('存量回归-r725 affirming_the_consequent 历史攻击仍判', () => {
 });
 
 // ── 6. 登记断言（九处接线完整）────────────────────────────────
-t('登记-dimensions 键含 no_true_scotsman 且总数 159', () => {
+t('登记-dimensions 键含 no_true_scotsman 且总数 160', () => {
   const keys = Object.keys(gate.discriminate('probe').dimensions);
   assert.ok(keys.includes('no_true_scotsman'), 'no_true_scotsman 键缺失');
-  // r727 落笔时引擎 158 维，r728 +1 = 159
-  assert.strictEqual(keys.length, 159, '维度键总数应为 159: got ' + keys.length);
+  // r727 落笔时引擎 158 维，r728 +1 = 159。
+  // [v6.8.81 r730 更新] r729 上线 conditional_proposition（第 160 维度）后
+  // 本断言未同步，从 v6.8.78 起常驻红名单；按存量回归纪律更新到 160。
+  assert.strictEqual(keys.length, 160, '维度键总数应为 160: got ' + keys.length);
 });
 t('登记-VERIFY_DIMS 含 no_true_scotsman', () => {
   const src = require('fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');

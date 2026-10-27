@@ -179,6 +179,36 @@ const CYRILLIC_HOMOGLYPH = {
   '\u03b1': 'a', '\u03b5': 'e', '\u03c1': 'p', '\u03c5': 'u',
 };
 
+/**
+ * [v6.8.81] 压缩串的拼音键覆盖率（贪心最长匹配），返回 0~1。
+ *
+ * 为什么需要它：原空格链判据是「压缩后含任一 PINYIN_MAP 键即判拼音串」，
+ * 而英文句子压缩后极易偶然含键——实测
+ *   "they draw from imagination alone" → theydrawfromimaginationalone
+ * 含 mima（4/27 = 15% 覆盖）就被判成拼音串，于是空格被抹、from 的 m+a
+ * 被换成「密码」、再被中英混插剥离器吃掉「密」，最终得到
+ *   theydrawfro码ginationalone
+ * 英文模式全失配，no_true_scotsman 攻击句 gate=pass 静默放行。
+ *
+ * 真拼音串的覆盖率天然高（整串就是音节拼出来的）：实测两个既有用例
+ * 100% / 81%；英文句 12%~17%。阈值取 0.5，两边都有充足间隔。
+ */
+function _pinyinCoverage(compact) {
+  if (!compact) return 0;
+  const keys = Object.keys(PINYIN_MAP).sort((a, b) => b.length - a.length);
+  let covered = 0;
+  let i = 0;
+  while (i < compact.length) {
+    let hit = null;
+    for (const k of keys) {
+      if (compact.startsWith(k, i)) { hit = k; break; }
+    }
+    if (hit) { covered += hit.length; i += hit.length; }
+    else { i += 1; }
+  }
+  return covered / compact.length;
+}
+
 /** [v6.7.73] 拼音还原：长词优先，空格分隔与无空格都试 */
 function _dePinyin(text) {
   let out = text;
@@ -211,14 +241,13 @@ function _dePinyin(text) {
       // 平均词长 > 6 → 正常英文单词（拼音音节很少超过 6 字符）
       const avgLen = words.reduce((s, w) => s + w.length, 0) / words.length;
       if (avgLen > 6) continue;
-      // [v6.7.73] 兜底：链中必须至少有一个词能拼出 PINYIN_MAP 的键前缀，
-      // 否则可能是「worthless loser」这类无功能词的两个实义词（英文短语）。
-      // 判据：把整链去掉空格后，是否包含任一 PINYIN_MAP 键。
+      // [v6.8.81] 兜底判据从「压缩后含任一 PINYIN_MAP 键」升级为**拼音键
+      // 覆盖率 ≥ 50%**。原判据下英文句一个偶然子串命中就够（mima ⊂
+      // theydrawfromimagination），整句被当拼音串抹空格+改词，攻击句因此
+      // 静默放行；覆盖率下真拼音串 100%/81% 照样还原，英文句 12%~17% 一律不碰。
+      // 上面的 stopword 与 avgLen 两道防线保留，三道并联。
       const compacted = chain.replace(/ /g, '');
-      const maybePinyin = Object.keys(PINYIN_MAP).some(k => compacted.includes(k))
-        // 或链中任一词是已知键（如 hu+lve 中的 lve 不在表但 hu 在）
-        || words.some(w => Object.prototype.hasOwnProperty.call(PINYIN_MAP, w));
-      if (!maybePinyin) continue;
+      if (_pinyinCoverage(compacted) < 0.5) continue;
       candidate = chain;
       break;
     }

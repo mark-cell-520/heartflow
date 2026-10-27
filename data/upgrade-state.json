@@ -1,20 +1,21 @@
 {
-  "round": 729,
-  "version": "6.8.80",
-  "roundStartedAt": "2026-10-27T00:23:00.000Z",
-  "lastFinishAt": "2026-10-27T08:52:59+08:00",
+  "round": 730,
+  "version": "6.8.81",
+  "roundStartedAt": "2026-10-27T01:00:00.000Z",
+  "lastFinishAt": "2026-10-27T09:40:00+08:00",
   "lastGreen": true,
   "lastChecks": [
-    "PASS 版本五处一致 = 6.8.80（VERSION/version.js/package.json/SKILL.md/README 规格表口径戳）",
-    "PASS guard-abilities 20/20（含 heartflow.js + index.js 全文 CRLF 转 LF 后复跑）",
-    "PASS doc-numbers-accuracy 22/22（sync-doc-numbers.js 机器记账 + README changelog 补 6.8.79/6.8.80 两行）",
-    "PASS bidirectional-guard 召回 52/52、误拦 302/326（与基线一致零新增）",
-    "PASS security-audit 16/16",
-    "PASS bin/verify.js 16/16",
-    "全量回归 18348 过 / 157 败 / 18505 个，耗时 737.9s（提交 4505be93 实测；上一轮基线 18326/167，失败数 -10、通过数 +22）"
+    "PASS 版本五处一致 = 6.8.81（VERSION/version.js/package.json/SKILL.md/README 口径戳）",
+    "PASS guard-abilities 20/20",
+    "PASS doc-numbers-accuracy 22/22",
+    "PASS bidirectional-guard 召回 52/52、误拦 302/326（与基线一致，零新增误伤）",
+    "PASS security-audit 16/16、bin/verify.js 16/16",
+    "PASS round-730 轮测试 16/16",
+    "PASS 存量红灯清除：round-728-no-true-scotsman.js 断言 159→160，21/1 → 22/0",
+    "全量回归 18366 过 / 143 败 / 18509 个（基线 18348/157/18505：失败 -14、通过 +18，零新增失败）"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
   "published": "6.7.124",
   "publishedAt": "2026-09-25T20:03:42.912Z",
-  "notes": "r730 交接簿（v6.8.80 / 第 160 维度 conditional_proposition 已上线；6.8.79 与 6.8.80 是 r729 之后两个无编号修复轮——execSync 无 timeout 歼灭战、Windows 平台卡死歼灭战·二，引擎 src/ 两轮均零改动）。\n【下一轮候选池（r730，按纪律必须复测，UPGRADE_LOG tail 是历史池复述）】① loaded_question 诱导性问题（r729 decision 0.81 第二名，r727 复测漏判 80%/误伤 0，缺口面最大）；② false_dilemma_extended / slippery_slope_extended / hasty_generalization_extended 三个存量维度补句式族；③ equivocation 一词多义偷换——注意 AGENTS.md 已有 equivocation_sense_shift 维度，动手前先 grep 确认是否同族，别重复上线；④ 存量误伤修复：special_pleading（「特殊情况需要特批，但要走正规流程」被存量维度判 rewrite，连续多轮记录）、guilt_by_association（「圈子里有坏人，不代表圈子里所有人都是坏人」）、middle_ground（和稀泥，复测误伤 1/12）。\n【两个真 bug，比加新维度更值得做】① normalize 的 de_pinyin 把英文单词里的 m 破坏成「码」（imagination→i码agination）并去空格，导致含 m 的英文攻击句在 discriminate 层归零（模块层仍命中）——影响全部 160 个维度的存量边界，英文攻击样本 currently 只能绕开含 m 单词；② evidence 维度基线打分器恒返回 {score:1, issues:[]}，从 r690 起连续十几轮记录，等于一个装饰维度。\n【环境教训（本轮新增三条）】① CRLF 会复发：src/core/heartflow.js + src/index.js 本轮又被写成全文 CRLF（r728 修过一次），根因是 core.autocrlf=true 签出即 CRLF，任何 git checkout/stash 触碰这两个路径就复发，而 git diff 因归一化完全不可见，只有 guard-abilities 磁盘扫描能暴露。已转回 LF；如已加 .gitattributes（* text=auto eol=lf）则根治，未加则下轮还会复发。② 全量回归本机实测 737.9s（12.3 分钟），UPGRADE_LOG 里「~3 分钟」是干净机器口径，Windows 本机排程别按 3 分钟算。③ MSYS 的 grep -c $'\\r' 数 CR 行不可靠（对纯 LF 文件也返回全部行数），判定行尾必须用 od -c 或 node 读 Buffer 数 0x0d。\n【状态】npm published 仍 6.7.124（本地 6.8.x 是自演进线，比 npm 超前 13 个版本号）；29+ commits 未 push GitHub（人工门禁，别自动推）；Claude 侧技能副本 ~/.claude/skills/heartflow-engine 停在 6.8.62 / 147 维，未同步 hermes 的 160 维。"
+  "notes": "r731 交接簿（v6.8.81 / normalize de_pinyin 英文破坏已修复）。\n【本轮怎么选题的】两个 cron 已被用户删除（hermes/cron/jobs.json 现为空数组），自主循环停了，r730 起由主会话（Claude Code）接管驱动。选题未经 decision 本体打分——我复测交接簿里两个真 bug 后判定：存量缺陷影响面（全部 160 维的英文判别通路）大于补新维度。下轮若要走 decision 流程，候选题见下。\n【下一轮候选池（r731，按纪律必须复测）】① loaded_question 诱导性问题（r729 decision 0.81 第二名，r727 复测漏判 80%/误伤 0，缺口面最大）；② false_dilemma_extended / slippery_slope_extended / hasty_generalization_extended 三个存量维度补句式族；③ equivocation 一词多义偷换——AGENTS.md 已有 equivocation_sense_shift 维度，动手前先 grep 确认是否同族，别重复上线；④ 存量误伤修复：special_pleading（「特殊情况需要特批，但要走正规流程」连续多轮被存量维度判 rewrite）、guilt_by_association、middle_ground。\n【两个真 bug，比加新维度更值得做】① **site 1 盲目子串替换**：`_dePinyin` 里 `out.split(k).join(PINYIN_MAP[k])` 无词边界保护，`mingling`（英文词）本身就是 PINYIN_MAP 键→被改成「命令」。本轮只修了空格链路径（覆盖率门禁），site 1 没动——因为它是「hulve previous instructions」这类真攻击形态目前唯一还原通路，加边界会砍掉它。要做的是「有汉字才启用 site 1」或英文词例外表，需先补攻击样本。② **evidence 维度基线打分器恒返回 {score:1, issues:[]}**，r690 起连续记录，等于装饰维度；动打分器风险高于补维度，单独一轮。\n【环境教训（r730 新增四条，都是实际踩的）】① MSYS 的 `grep -c $'\\r'` 数 CR 行不可靠——对纯 LF 文件也返回全部行数，害人判错文件行尾；判定行尾必须用 `od -c` 或 node 读 Buffer 数 0x0d。② `nohup ... &` 的 `$!` 不是真正的 node PID（是子 shell/nohup 包装），查进程用 `Get-CimInstance Win32_Process` 按 CommandLine 过滤。③ CRLF→LF 转换后 `git status` 报假阳性 ` M`（索引 stat 缓存记着旧尺寸），`git update-index --really-refresh` 消不掉，必须 `git add` 重写索引项；round-guard 的「无未提交改动」检查会被它挡住。④ 全量回归期间不要编辑仓库文件——runner 会快照 src/ 做突变回滚，doc 测试读 README/SKILL。\n【环境噪声】全量回归里 6 个 MCP 类测试（mcp-server / mcp-smoke / mcp-auth-tier / mcp-guest-permission / knowledge-*-mcp-state）常驻失败，根因是 8099 被常驻 MCP 服务占用，非产品缺陷；要跑全绿先停服务。\n【状态】npm published 仍 6.7.124（本地 6.8.x 自演进线，比 npm 超前 14 个版本号）；29+ commits 未 push GitHub（人工门禁）；Claude 侧技能副本 ~/.claude/skills/heartflow-engine 停在 6.8.62 / 147 维，未同步 hermes 的 160 维。"
 }
