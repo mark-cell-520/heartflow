@@ -3474,6 +3474,28 @@ const HANDLERS = {
       };
     } catch (e) { return { error: e.message }; }
   },
+  // [r733] 英文注入同义族通道（English injection synonym families）MCP 接线。
+  // r733 轮初实测：en 模式库只有字面短语，ignore 是唯一动词、previous|above|prior
+  // 是唯一指代词，25 条常见注入句式 16 条静默放行（prompt_injection 是 BLOCK 级）。
+  // 该通道由 src/injection-synonyms.js 收口，已在 index.js 的 checkPromptInjection
+  // 内自动生效；此处单独暴露，供外部 agent 审计「命中段的三族归因」与词表规模。
+  heartflow_check_injection_synonyms: (args) => {
+    try {
+      const mod = require('./injection-synonyms.js');
+      const action = args?.action || 'check';
+      if (action === 'list') return mod.listSynonymFamilies();
+      if (action === 'families') return mod.familySummary();
+      const text = args?.text || '';
+      const r = mod.checkInjectionSynonyms(text);
+      return {
+        count: r.count,
+        score: r.score,
+        blocked: r.count > 0,
+        injections: r.injections,
+        families: r.families,
+      };
+    } catch (e) { return { error: e.message }; }
+  },
   heartflow_check_decision_trace: (args) => {
     try {
       const { checkDecisionTrace } = require('./index.js');
