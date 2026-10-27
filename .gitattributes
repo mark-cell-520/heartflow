@@ -1,0 +1,14 @@
+# 行尾策略：全仓文本一律 LF。
+#
+# 根因（2026-10-27 实录）：core.autocrlf=true 在 Windows 签出时把文本文件统一
+# 写成 CRLF，src/core/heartflow.js（6450 行）与 src/index.js（14685 行）已被
+# 反复写坏两次（r728 修过一次，v6.8.80 又复发）。git diff 因归一化完全不可见，
+# 只有 guard-abilities 的磁盘扫描能暴露——属于「行为正确但工具链失效」的缺陷，
+# 测试测不出来，只能在这里从签出口根治。
+#
+# 仓库 4225 个文件里二进制只有 assets/ 下 3 个 jpg，无 .bat/.cmd/.ps1，
+# 故全仓 eol=lf 安全。
+* text=auto eol=lf
+*.jpg binary
+*.png binary
+*.ico binary
