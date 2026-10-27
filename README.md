@@ -7,7 +7,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 160 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  182 MCP tools
-×  1,314 dispatch routes  ×  18,294 passing tests  ×  0 runtime dependencies
+×  1,314 dispatch routes  ×  18,348 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -172,7 +172,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.78**. Not marketing copy.
+Measured on this repository at **v6.8.80**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -181,7 +181,7 @@ Measured on this repository at **v6.8.78**. Not marketing copy.
 | Dispatch routes | 1,314 |
 | Discrimination dimensions | 160 |
 | MCP tools | 182 |
-| Test suite | 18,294 passing / 161 failing |
+| Test suite | 18,348 passing / 157 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
@@ -308,6 +308,8 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.80 | 2026-10-27 | **Windows 平台卡死歼灭战·二（upgrade type 3 — 测试链与工程修复，引擎 `src/` 零改动）** — `test/run-all.js` 从串行 for 循环重构为「任务构造 + 并发池」（`HF_RUN_ALL_JOBS` 默认 4、按 CPU 核数封顶，`=1` 退化为原串行行为），638 文件实测 27 分钟压到约 3 分钟；顺带修四个 Windows 专属问题：① 单例锁补 `'wx'` 排他创建 + 双检，关掉两个 runner 同时启动的毫秒级竞态；② 16 个测试文件 `execSync(process.execPath + ' ' + ...)` 在 `C:\Program Files\nodejs\node.exe` 上被 shell 拆断成 `'C:\Program'` 整文件 Command failed（Linux 容器无此路径所以历史全绿），统一改 `JSON.stringify(process.execPath)`；③ mount/jest 形态测试原先被静默跳过，并发池按任务对象统一调度后补齐；④ 72 个变更测试（writeFileSync 改 `src/` 做负例验证）并发跑时互相覆盖补丁造成批量假失败（实测单跑 3/0 过、并发 EXIT=1），改两阶段调度——变更测试与 MCP 服务类测试独占串行车道，其余 522 个走并发池；另加突变残留兜底（跑前快照 `src/` 全文，子进程被 SIGKILL 后逐文件回滚，防 4 个 src 文件带负例突变污染仓库）。全量回归实测 18,348 过 / 157 败（上一轮基线 18,326/167，失败数 -10、通过数 +22，零新增回归） |
+| 6.8.79 | 2026-10-27 | **全局修复轮：execSync 无 timeout 歼灭战（upgrade type 3 — 工程修复，引擎未动）** — `scripts/repo-audit.js` 全局审计 5242 文件、SHELL 类 306 命中逐处人工证伪后，定位 8 文件 15 处真实裸 `execSync`/`spawnSync` 并全部补 timeout。最关键一处：`scripts/auto-upgrade-hourly.js` 里 run-all 的 timeout 原值 **120 秒**——"2 分钟必杀 27 分钟的全量回归，无汇总行 → `parseTestResult` ok:false → cron 轮反复失败"，是历史卡死轮的直接根因，改 2400s。证伪记录：SECRETS 6（root-key.json 是公钥、test_*.cjs 是扫描器文件名误报）、TRAV 83（抽样 3/3 为 `path.join(__dirname,'../..')` 常规相对路径）、PROMPT 43（全为探针脚本自身提示词模板）均不动 |
 | 6.8.78 | 2026-10-26 | **`conditional_proposition` added as dimension 160 (upgrade type 1 — a brand-new discrimination dimension)** — 条件句武器化：用未经验证的假设性条件句（「如果A就B」）直接推出关于现实的确定性结论，把存在性推断当作前件真值的证据（「如果他真的爱你，就不会让你受这种委屈」/「如果这个方案可行，我们早就看到成果了」/"If he really loved you, he would never treat you like that."）。两腿共现（假设条件句 × 否定推断：早就…了/就不会/怎么会/would never/would have/there would be）；r729 复测攻击漏判 16/20（80%）、良性 0/10 误伤；decision 本体一次选中无打平（composite 0.84 / confidence 0.76 / identity_alignment 0.8，第二名 loaded_question 0.81）。豁免：规则合同条件/谬误概念转述/对冲/显式证据模式/否定翻转。本半程由 14:00 cron 崩溃（模型 repetition loop）后主会话接管收尾 |
 | 6.8.77 | 2026-10-26 | **`no_true_scotsman` added as dimension 159 (upgrade type 1 — a brand-new discrimination dimension)** — 无真正的苏格兰人：用修改定义的方式驱逐反例（「真正爱你的男人，不会计较你花多少钱」/「Real artists never trace references」）。两腿共现（authenticity 短语 × 驱逐断言/反事实条件）；冒烟 22/24 命中、良性零误伤；轮测试 22/22；guard-abilities 20/20；维度键实测 159。已知边界：含 m 英文攻击句被 normalize de_pinyin 破坏（imagination→i码agination）致 discriminate 归零，留专项轮 |
 | 6.8.76 | 2026-10-26 | **Merge: box line (4f4ebeb4) merged into the r727 mainline — `void_zh_standard_shift` renumbered as dimension 158 (upgrade type 1 — a brand-new discrimination dimension)** — 中文「双标」标准转移：对他人与自己使用两套评判标准（「别人加班是敬业，我加班就是剥削」/「规定是定给员工的，我不用遵守」/「Employees must clock in on time, but I come and go as I please」）。来自 Windows box 线（r717 侦察、r718-r724 迭代），经 10-26 07:27 合并入主线并重编号 155→158。本轮（r728）补全合并遗漏：VERSION/version.js 之外的版本四处传播（package.json/SKILL.md）、解决 data/upgrade-state.json 与 data/test-count.json 进 HEAD 的冲突标记、Verify 列举 116→117 并补 void_zh_standard_shift、维度计数 157→158。引擎维度键实测 158 |
