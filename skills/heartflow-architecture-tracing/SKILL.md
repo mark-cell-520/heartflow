@@ -11,26 +11,29 @@ tags: [heartflow, architecture, tracing, debugging, think-chain, decision-router
 
 ## 核心问题：心虫的结果从哪里来？
 
-心虫 think() 的输出不是来自 LLM 或外部 API——它来自一个 **7阶段声明式 Pipeline**（v5.0.0 新增）。
+心虫 think() 的输出不是来自 LLM 或外部 API——它来自一个 **7 阶段声明式思维链（ThoughtChain）**。
 
-v4.x 及之前是 13 步硬编码分析流水线 + ThoughtChain 思维链。v5.0.0 用 Pipeline 引擎替代了硬编码 think() 体，自动在阶段间传递数据。
+> **[v6.8.88] 架构勘误（原文档写反了）**：v5.0.0 曾用 Pipeline 引擎（pipeline.js）替代硬编码 think() 体。
+> 现行架构（v6.x 实测，heartflow.js:5272-5277 + 5453）已回摆为：
+> **主路径 = ThoughtChain.chain.run(input)（七阶段）**，
+> **think-pipeline.js 降级为后置检查流水线**（runThinkPipeline(result, input, this)，在主链之后跑）。
+> 下文 v5.0.0 管道架构段落为历史记录，追溯根因时以本节为准。
 
-### v5.0.0 管道架构
+### 现行主链路（v6.x）
 
 ```
 用户输入
   ↓
-think() — heartflow.js
-  ↓ 优先走 Pipeline（回退到 ThoughtChain）
+think() — heartflow.js:5127
   ↓
-Pipeline — pipeline.js（7阶段声明式管道）
-  ├─ Stage 1 (并行): heartLogic ─┬─ intent ─┬─ memory
-  ├─ Stage 2 (依赖1): psychology (需要 heartLogic + intent)
-  ├─ Stage 3 (依赖2): judgment (需要 psychology + intent + memory)
-  ├─ Stage 4 (依赖3): decision (需要 judgment + psychology)
-  └─ Stage 5 (依赖4): output (需要 judgment + decision + memory)
+ThoughtChain.chain.run(input) — thought-chain.js（主路径）
+  ├─ decision ─ parse ─ hypotheses ─ evidence ─ reflection ─ conclusion ─ confidence
   ↓
-{ output, type, confidence, thoughtChain }
+{ output, chain, type, confidence, ... }        ← 注意：七阶段住在 chain 键，无 thoughtChain 键
+  ↓
+runThinkPipeline(result, input, this) — think-pipeline.js:5453（后置检查/护栏）
+  ↓
+{ output, chain, type, confidence, ... }        ← 最终返回
 ```
 
 **关键事实：心虫不调任何外部API。** 所有分析都是本地JS规则——正则匹配、关键词提取、BM25搜索。

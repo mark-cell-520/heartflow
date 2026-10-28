@@ -22,7 +22,9 @@
  * - six-level consciousness: 觉察→自省→无我→彼岸→般若→圣人
  */
 
-const { DreamV11: DreamEngine, LEVELS, DEFAULT_SCORING } = require('./dream.js');
+// [v6.8.88] 删除 LEVELS/DEFAULT_SCORING 死解构：dream.js 从未导出这两个符号
+// （运行时实测双双 undefined），解出即 undefined，文件内零使用。
+const { DreamV11: DreamEngine } = require('./dream.js');
 
 // ============================================================================
 // 常量定义
@@ -705,7 +707,8 @@ module.exports = {
   DEFAULT_WEIGHTS,
   DREAM_STATE,
   DREAM_ERROR,
-  LEVELS,
+  // [v6.8.88] 移除 LEVELS 死导出：dream.js 无此导出（值为 undefined），
+  // 唯一消费者 interactive-dream.js 解构后也从未使用。
   OSCILLATION_THRESHOLD,
   MEMORY_PRESSURE,
   RETRY_POLICY,

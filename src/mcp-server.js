@@ -302,6 +302,28 @@ function safeCompare(provided, expected) {
 
 let heartflow = null;
 
+// [v6.8.88] 按 sessionId 隔离的引擎实例注册表。审计发现 getOrCreateInstance 被
+// 4 处调用但全仓库零定义：HTTP SSE 建联下发 sessionId 后 benchmark 工具必抛
+// ReferenceError，被 dispatch 的 try/catch 兜底吞掉→静默落到共享全局实例，
+// 会话隔离从未生效。此处补真实实现：按 sessionId 缓存独立实例，start() 完成
+// 后才入表，带容量上限（超限淘汰最旧）。start() 失败则异常上抛由调用方处理。
+const _sessionInstances = new Map();
+const _SESSION_INSTANCE_CAP = 16;
+async function getOrCreateInstance(sessionId) {
+  if (!sessionId || typeof sessionId !== 'string') return heartflow;
+  const cached = _sessionInstances.get(sessionId);
+  if (cached) return cached;
+  if (_sessionInstances.size >= _SESSION_INSTANCE_CAP) {
+    const oldest = _sessionInstances.keys().next().value;
+    _sessionInstances.delete(oldest);
+  }
+  const { HeartFlow } = require(HEARTFLOW_PATH);
+  const inst = new HeartFlow({ rootPath: HF_DIR, sessionId });
+  await inst.start();
+  _sessionInstances.set(sessionId, inst);
+  return inst;
+}
+
 let version = 'unknown';
 
 
@@ -2491,7 +2513,7 @@ async function handleBenchmarkRun(args, sessionId) {
 
     const { BenchmarkRunner } = require(path.join(HF_DIR, 'src', 'benchmark', 'benchmark-runner.js'));
 
-    const hf = sessionId ? getOrCreateInstance(sessionId) : heartflow;
+    const hf = sessionId ? await getOrCreateInstance(sessionId) : heartflow;
 
     if (!hf) return { error: '引擎未启动', timestamp: Date.now() };
 
@@ -2597,7 +2619,7 @@ async function handleBenchmarkImportFailures(args, sessionId) {
 
     const { FailureCaseImporter } = require(path.join(HF_DIR, 'src', 'benchmark', 'failure-importer.js'));
 
-    const hf = sessionId ? getOrCreateInstance(sessionId) : heartflow;
+    const hf = sessionId ? await getOrCreateInstance(sessionId) : heartflow;
 
     if (!hf) return { error: '引擎未启动', timestamp: Date.now() };
 
