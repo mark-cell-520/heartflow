@@ -1,6 +1,6 @@
 ---
 name: heartflow-audit-upgrade-push
-version: "1.4.0"
+version: "1.4.1"
 title: "心虫审计→并发修复→验证→推送 全流程"
 description: |
   心虫大规模升级工作流：全量审计→分类问题→并发修复→验证→推送GitHub。
@@ -980,6 +980,11 @@ done
 10. **子代理的"完成"不代表真正完成**：子代理返回"completed"但文件可能没写入、写入了损坏代码、或写入了语法错误。每次子代理修改后必须 `node --check` 验证。
 11. **.gitignore 模式陷阱**：`memory/`（无前导 `/`）会匹配所有路径中的 `memory/` 目录，包括 `src/memory/`、`node_modules/xxx/memory/`。如果 `.gitignore` 本意是忽略顶层的记忆数据目录，必须写 `/memory/`（根目录限定）。`src/memory/` 下的代码文件（如 `heartflow-memory.js`）会被无意间忽略。修复方法：`git check-ignore -v src/memory/xxx.js` 定位具体是哪个 `.gitignore` 规则，然后修复它。
 12. **scripts/ 目录需要主动跟踪**：心虫代码中有 `scripts/` 目录存放工具脚本（如 `heartflow-memory-tool.js`）。如果新增的脚本在 `git status` 中显示为 `??` 未跟踪，检查是否被 `.gitignore` 意外匹配。新脚本必须 `git add -f`（如被忽略）或正常 `git add` 加入追踪。`scripts/` 下的工具是心虫功能的一部分，不是临时文件。
+13. **归档/删除前置扫描漏三种引用形态会制造回归（2026-10-28 实战，4 个测试红）**：
+    - **archive 目录是活代码的家**：心虫把已归档模块的加载路径保留为运行时依赖——`heartflow.js:424` 与 `mcp-server.js:3771` 都从 `src/archive/associative-engine.js` 惰性加载联想引擎。归档 `src/core/chinese-tokenizer.js` 后，`src/archive/associative-engine/chunk-detector.js:19` 的 `require('../../core/chinese-tokenizer')`（无 `.js` 后缀）直接崩，连带 `association-graph-bridge` 同样中枪。**扫描引用时 grep 必须包含 archive 目录，不能只扫 src/ 主树。**
+    - **无后缀 require**：`require('../../core/chinese-tokenizer')` 这类不带 `.js` 的引用，用「只匹配 `xxx.js`」的 grep 模式永远搜不到。扫描要同时匹配 `require('[^']*模块名')`。
+    - **路径字符串引用（非 require）**：`test/readme-test-count-autosync.guard.test.js:19` 用 `path.join(__dirname,'..','scripts','upgrade-engine.js')` + `fs.readFileSync` 读文件、按字符串切出 `syncReadmeTestCount()` 函数源码做单测。归档 `scripts/upgrade-engine.js` 后该测试 ENOENT 崩（基线 26/26 通过）。**删除任何文件前要搜文件名（不带扩展名）在 test/ scripts/ bin/ 里的字符串出现。**
+    - **归档后必须全量回归**：本轮 4 处回归全部由「全量 4 段分段测试」抓到，且失败数对基线（71）才发现异常。归档轮的标准动作 = 归档后立刻跑 `HF_RUN_ALL_SLICE=N/4` 全量，对比基线失败数，不是只跑冒烟。
 
 ---
 
