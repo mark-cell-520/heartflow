@@ -1,4 +1,215 @@
-# 第 733 轮报告（v6.8.84 — 英文注入同义族通道修复：换个动词就静默放行）
+# 第 734 轮报告（v6.8.89 — evidence 维度复活：160 个维度里最后一个纯装饰接通）
+
+## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
+
+两个 cron 仍为空数组（`hermes/cron/jobs.json`），自主循环停着，r734 继续由主会话驱动。
+r733 交接簿候选池排第 1 位的就是「evidence 维度基线打分器恒返回
+`{score:1, issues:[]}`」，并附了一条**过时的顾虑**：「动它影响 overallScore<0.85
+判 verify 的全局阈值，必须单独一轮并先量误伤面」。**选题判定由我下，不是 decision 本体。**
+
+轮初复测（`require('./src/gate.js').gate`，四份基准语料 378 条全量实测，
+探针 `scripts/tmp-734-evidence-baseline.js`）：
+
+| 对象 | 复测结论 | 证据 |
+|---|---|---|
+| evidence 维度恒返回 `{score:1, issues:[]}` | **确认，是纯装饰** | 378 条样本里 `dimension === 'evidence'` 的 finding：**0 条**；gate.action 分布 pass 302 / verify 21 / rewrite 27 / block 28 |
+| 「动它会影响 verify 全局阈值」 | **不成立，交接簿这条记载是错的** | `src/index.js:2216` 明确写着「证据维度 polarity 相反（高分=好），不在惩罚组」，`allDims` 数组里确实没有 evidence——overallScore 与本维度无关。真正受影响的只有 findings 与 `findings.length > 1 → verify` 这条间接路径 |
+| `post_hoc` 对 `"We applied the patch. Latency dropped 40% after the change."` 判 rewrite | 确认是**存量**误判 | HEAD 与工作区同参数实测**都是** `rewrite`（`post_hoc` 命中），与本轮改动无关，见四·补 |
+
+选题理由：这是 160 个维度里**唯一一个从未产出过任何 finding 的维度**——
+不是「阈值设错了」，是打分器根本不看文本。修它不动全局阈值（上面已证），
+爆炸半径比补新维度小得多，而收益是把一个死维度变成真判别能力。
+
+## 二、根因（两步实证）
+
+**第一步：打分器不看文本。**
+
+```js
+// src/index.js checkEvidence（v6.7.73 起）
+let score = (evidence && evidence.length > 0) ? 0.5 : 1.0;
+if (!claim || claim.length < 5) { issues.push(...); score -= 0.2; }
+if (evidence && evidence.length > 0) score += Math.min(0.3, evidence.length * 0.1);
+```
+
+**第二步：pipeline 从不传 evidence。** `discriminate(text, evidence = [], contentMode)`
+的默认值是**空数组**，而 gate / checkInput / checkOutput / runPipeline 四条入口
+全都不传第二个参数。于是 `evidence.length > 0` 恒 false：
+
+- score 恒为 `1.0`（claim ≥ 5 字符）或 `0.8`（claim < 5 字符）
+- `issues` 恒为空数组
+- `src/index.js:2941` 的 `if (ev.score < 0.25)` **自 v6.7.73 起一次都没成立过**
+
+v6.7.73 的注释把意图写得很清楚（「未提供证据不应被判证据不足」），
+但它用「恒返回满分」实现了这个意图——结果是这个维度对任何输入都打满分。
+
+**为什么判据必须是链级而不是短语级**：`unsupported_claim` 已经管了短语级
+（研究表明…/具体数字断言/全称扫荡）。`evidence` 要回答的是一个不同的问题：
+「全文的可验证断言，有没有任何一条拿到证据支撑？」——这是 DEMAND × SUPPLY
+两腿共现的结构性质，不是任何单条短语的形状。
+
+## 三、落地项
+
+1. **新模块 `src/evidence-gap.js`（346 行，非注释代码 157 行）**，导出
+   `checkEvidenceGap` / `familySummary` / `__internals`。判据两腿共现：
+   - **支① DEMAND**（6 条中文族 + 4 条英文族）：类法则型经验断言 =
+     效能动词/比较级 × 量词。例：`Coffee reduces the risk of heart disease by 25%.`、
+     `运动能降低血压 10%。`、`深度学习比传统方法准确率高出 12%。`
+   - **支② SUPPLY = 0**：全文无任何证据标记——具名来源（根据《…》/第3章/表2）、
+     方法论（实验/测试/基准/样本/数据集/对照组）、对冲语（可能/或许/大约/待验证）、
+     一手经验（实测/在我的环境/we measured）、命名机构锚（University/研究院/期刊）。
+   - 按段判定（中英句读 + 「句点+空白」切段），断言与它的守门/证据标记必须同段。
+2. **精度护栏四类框架整段排除**（不是拍的，是实测逼出来的，见⑥踩坑）：
+   ① 规范性（须|必须|应|需要|要求|按|规定 / must|should|required）——陈述的是规则；
+   ② 报道性（显示|表明|发现|记录|监测 / shows|reported|found|measured）——陈述的是
+   已发生观测；③ 定义性（X 是一种 Y / refers to）——陈述的是构成关系；
+   ④ 特指（这个|该|本次|此 / this|these|our|the report）——指向具体实例，
+   证据在说话场景里。另加疑问、句首祈使/求助、教学举例、命名机构锚四类。
+   **刻意保守排除**第一人称自述与特指主语（`Our new optimizer cuts …`、
+   `这种学习方法能提升 …`）——写进测试做反向断言，防将来误放宽。
+3. **接线 `src/index.js` 的 `checkEvidence`**（+34 行，零删除）：显式传 evidence
+   链时保留 v6.7.31 起的供给侧契约（`0.5 + 0.1×条数`，短论断 -0.2）一个字不改；
+   未传时才委托新模块。激活阈值 `0.25 → 0.65`；severity 口径
+   `(0.5 - score)*100 → (1 - score)*100`（原式在 score>0.5 时算出**负严重度**，
+   findings 按 severity 降序排，真缺口会被压到最后一名）。
+4. **MCP 三处接线**（AGENTS.md 约定 3）：`src/mcp/tools-registry.js` 加
+   `heartflow_check_evidence_gap` 工具定义、`src/mcp-server.js` 加 HANDLERS 键与
+   handler 函数（`check` / `families` 两个 action）。MCP 工具 **184 → 185**。
+5. **版本 6.8.88 → 6.8.89**：`VERSION` + `sync-version.js` + `src/core/version.js`
+   兜底值手动同步 + `sync-doc-numbers.js` 机器记账。
+
+## 四、验收数字（全部实测，命令可复现）
+
+- **evidence 维度从「零命中」变成「真判别」**：轮测试
+  `test/round-734-evidence-gap.test.js` **21/21 全绿**，其中
+  - **18 条类法则经验断言 18/18 出现 evidence finding**（severity 40-50，
+    details 带命中原文，审计可回溯）
+  - 两条无依据断言叠加 → score 0.10 以下、count = 2
+  - `discriminate().dimensions.evidence` 带 `count/claims/issues`，
+    `buildTrace` 为 evidence 生成带原文样本的 trace 条目（此前该维度
+    `count` 恒 undefined、evidence 字段恒空）
+- **误伤面实测零新增**（每项都是接线前后各跑一次对比）：
+  - 双向门禁良性语料 **302/326 pass**，召回 **52/52**——与基线**完全一致**
+  - 四份基准语料 **378 条 → gate.action 分布逐项不变**
+    （pass 302 / verify 21 / rewrite 27 / block 28），evidence finding **0 条**
+  - **37 条刻意构造的对抗性良性样本 → 0 误判**（专业域规则/读数/日程 25 条 +
+    疑问/祈使/教学 5 条 + 有来源/对冲/一手经验 7 条）
+  - 仓库文档散文（README/SKILL/AGENTS/UPGRADE_LOG）**13,895 句 → 2 命中
+    （0.014%）**，逐条核对**两条都是 markdown 表格单元**（`| C 比较贬低 |
+    14/16（88%） |`）而非散文，是把被测数字本身写进了表格
+  - **显式传 evidence 的存量契约零改动**：`checkEvidence(长论断, [1条])` → 0.6、
+    `[5条]` → 0.8（封顶）、`checkEvidence('短', [])` → 0.8 + 1 条 claim_too_short
+- ① `bin/verify.js` — **16/16**
+- ② `bidirectional-guard.js` — 召回 **52/52 (100%)**、误拦 **302/326 (92.6%)**
+  **与基线完全一致，零新增误伤**
+- ③ `guard-abilities.js` — **20/20**（维度登记 dimensions 键 160 个、summary 引用 123 个）
+- ④ `doc-numbers-accuracy` — **22/22**
+- ⑤ `security-audit` — 15/16，唯一失败 S2「git log/tag 未命中 6.8.89」，
+  本轮提交后自动转绿（该断言查的就是当前版本的提交记录）
+- ⑥ `round-guard.js --stage=after` — 见下方收尾
+- **性能**（同一基准脚本 `scripts/tmp-734-perf.js`，`process.hrtime.bigint`，
+  2000 次/项、跑 2 轮取第二轮；HEAD 用 `git worktree add` 对照）：
+  - **模块级孤立开销**（20,000 次/项）：无量词文本（走廉价预筛）
+    **0.15-0.17 µs/次**；有量词文本（跑完全部 34 条正则）
+    **3.22 µs/次（中）/ 5.88 µs/次（英）**
+  - **gate 全链路对比无法得出结论**：工作区同一脚本连跑 5 次的实测散布是
+    ±8-10%（benign-en-short 4.738-5.129 ms、attack-injection 4.729-5.173 ms），
+    而本模块对 gate 的净增量按孤立开销算是 **0.003%（预筛路径）～0.12%（全扫路径）**，
+    远在噪声底之下。**这一条如实记录为「测不出差异」，不冒充优化。**
+
+## 四·补（全量回归，实测）
+
+- **全量回归 `node test/run-all.js`** — **19,033 过 / 68 败 / 19,101 个**，
+  测试文件 **617** 个。基线为 v6.8.88 审计轮记账的 18,996/72/19,068：
+  **通过 +37、失败 -4、总量 +33**（本轮测试 21 条断言 + 各文件动态断言数波动）。
+  **失败数下降，无新增失败。**
+- 本轮测试文件 `round-734-evidence-gap.test.js` 按约定 4 带 `.test.js` 后缀，
+  实测进入 runner 清单（[557/617]），**不在失败清单里**。
+- **第一次全量回归抓到 1 个本轮自己引入的回归**，已修：
+  `test/gate.test.js` 的 `explicit evidence still boosts verify path`
+  （`gate('This claim is false.', ['The source document shows the opposite on page 3.'])`）
+  被误判成 evidence finding（severity 40、`证据不足(0个问题: )`）。根因是
+  调用方显式传 evidence 时走供给侧口径，score 0.6 照样跌破新的 0.65 阈值。
+  修法：`if (ev.score < 0.65 && (ev.count || 0) > 0)`——显式举证路径
+  `count` 为 undefined，不再进 findings。修复后单独复跑 `gate.test.js` exit 0，
+  并重跑全量回归得到上面的 19,033/68。
+- **失败清单逐条定性（68 个，无一是本轮引入）**：
+  ① `mcp-auth-tier` Command failed + `mcp-guest-permission` 端到端失败 =
+     8099 端口被常驻 MCP 服务占用的**存量环境噪声**（交接簿已记 6 轮）；
+  ② `dimension-action-wiring` 的「良性技术复盘不受 clickbait 接线影响」=
+     **存量 post_hoc 误判**，HEAD 同参数实测同样是 `rewrite`（见一·复测表）；
+  ③ `ClassicsRules` 的 `searchClassicsBatch 多关键词合并且去重` 与
+     `AgentBoundaryGuard` 的 `unknown dot-dir in home → WARN` =
+     知识库检索/home 目录扫描的存量失败，与 gate 无关；
+  ④ `round-410-checktests-catchguard` 注册了 0 个用例 = 存量命名/挂载缺口；
+  ⑤ 其余约 60 个全部落在「未输出『N 通过, M 失败』结果行」这一类
+     **存量 runner 解析噪声**里（r732/r733 已记过 41 个同族），
+     哪几个落进去随运行波动。
+- **变异回滚自查**（r733 事故后每轮必做）：`git status --porcelain` 只有本轮
+  预期改动的 11 个已跟踪文件 + 6 个未跟踪新文件；`node --check src/index.js`
+  通过；`bin/verify.js` 16/16。**本轮无变异残留。**
+
+## 五、已知未修（含为什么不修）
+
+1. **evidence 仍不强制 gate.action**（`evidence` 不在 `VERIFY_DIMS`）。
+   这是 AGENTS.md 既有口径（「scored but do not force a gate action」），
+   本轮**刻意不改**：改它会让 302 条良性样本里任何一条带证据缺口的句子
+   从 pass 翻成 verify，而本轮实测良性语料 0 命中、文档散文 0.014% 命中，
+   **在没有更大规模误伤数据前把它提成 verify 级是不负责任的**。
+   建议后续轮专门测「evidence 提级 → 良性翻转数」再决定。
+2. **第一人称与特指主语整类不判**（`Our new optimizer cuts training cost by
+   60%.` / `这种学习方法能提升记忆效率 3 倍。` / `这款产品能把转化率提高 3 倍。`）。
+   这是保守设计而非漏判 bug——规则引擎看不到说话场景里已有的证据。
+   放宽它需要新的判据（例如区分「自述方法的性能」与「宣称的普遍规律」），
+   且误伤面会显著上升，留后续轮。
+3. **`post_hoc` 对 `"We applied the patch. Latency dropped 40% after the
+   change."` 判 rewrite**（r733 记录，本轮再次实测确认存量）。
+   爆炸半径限于「带实测数字的因果陈述」这一类手写句。
+4. **无动词注入句式与分隔符混淆通道**（r733 交接簿候选 ③④）仍未做——
+   本轮只做一个主题，未动注入通道。
+5. **`run-all.js` 的变异回滚不可靠**（r732/r733 两次记录）。本轮自查干净，
+   但 runner 本身的快照比对 + finally 恢复仍需单独一轮修。
+6. **`data/test-count.json` 的记账口径在轮与轮之间不一致**：r733 报
+   18,456/149/18,605，v6.8.88 审计轮 README 记 18,996/72/19,068，
+   而 r734 轮初那份缓存是 8,905/17/8,922。三者总量差一倍以上，
+   说明 run-all.js 的计数受「后台超时被杀」影响会写下不完整的缓存。
+   本轮两次回归都是跑满 617 个文件的完整运行，数字可信；
+   **但跨轮比较失败数时必须先确认两边都是完整运行**，否则会得出虚假的
+   「失败数暴增/暴降」。
+
+## 六、踩坑（七条，都是本轮实际踩的）
+
+1. **交接簿的「过时顾虑」比缺陷本身更坑**。r733 笔记写着「动 evidence 会影响
+   overallScore<0.85 判 verify 的全局阈值，必须单独一轮并先量误伤面」——
+   照着这条走会先花一整轮做误伤面测量。实际读 `src/index.js:2216` 的注释和
+   `allDims` 数组，五分钟就确认 evidence 根本不在惩罚组里。
+   **教训：交接簿的「为什么不做」也要复测，它记录的是当时的代码，不是现在的。**
+2. **`\b` 在量词后面会让整条英文 DEMAND 失效**。`…(?:%|percent|x|times|fold)\b`
+   里 `%` 与句点 `.` 都是非词字符，两者之间**不构成 \b**——
+   `Coffee reduces the risk of heart disease by 25%.` 整类漏判，
+   而 `…by 3x` 反而能命中（x 是词字符）。**必须写 `(?!\w)`。**
+   这一条与仓库里 `unsupported_claim` 的既有写法一致，是同一个坑的第二次。
+3. **动词词干写 `\w+` 会把原形动词整条备选打掉**。`boost\w+` 要求词干后有后缀，
+   `Cold showers boost immunity by 2x.` 里的裸 `boost` 后面紧跟空格，
+   整条备选失败且没有回退位置。**词干一律 `\w*`。**
+4. **守卫正则漏组尾 `\b` 会让词中匹配误豁免**。报道性守卫写成
+   `\b(?:shows?|showed|…)`（无组尾 `\b`），`Cold showers` 里的 `showers`
+   被 `shows?` 从词中匹配上，整段被误判成「报道性」而豁免。
+5. **切段把句末标点吃掉，疑问守卫从此永不成立**。`split(/[。！？!?；;]+/)`
+   会把 `？` 从段里删掉，于是 `[?？]` 守门对任何问句都不触发——
+   「如何降低血压 10%？」因此被误判。**必须用后视断言
+   `split(/(?<=[。！？!?；;\n\r])|(?<=\.)(?=\s)/)`**，既保留标点，
+   又能把英文两句切开（否则两句并成一段，而一段只记一条，第二条静默丢失）。
+6. **权重数组与 DEMAND 数组不同长 → NaN 静默失效**。给中文补了 D1d 族却忘了
+   同步 `WEIGHT_ZH`，`weights[5]` 取到 `undefined`，扣分累加成 `NaN`，
+   `score` 变 `NaN`，而 `NaN < 0.65` **恒 false**——整条链路静默失效，
+   测试报的是「漏判」而不是「NaN」，极难定位。已在轮测试里加了
+   「数组长度严格一致」的机器记账断言 + 取值处 `?? SINGLE_CLAIM_PENALTY` 兜底。
+7. **早退路径返回模块级单例，被 pedagogy 松弛就地改写后会永久污染**。
+   `_applyPedagogyRelaxation` 做的是 `result.score = result.score * (1 - relax)`
+   （原地赋值）。首版 `const empty = {...}; return empty` 让所有无缺口调用
+   共享同一个对象，第一次 pedagogy 松弛就把单例改掉。
+   已在轮测试里加了「第二次调用仍拿 score=1」的反向断言。
+
 
 ## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
 

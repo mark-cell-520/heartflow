@@ -6,8 +6,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-160 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
-×  1,314 dispatch routes  ×  18,996 passing tests  ×  0 runtime dependencies
+160 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  185 MCP tools
+×  1,314 dispatch routes  ×  19,032 passing tests  ×  0 runtime dependencies
 ```
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
@@ -172,7 +172,7 @@ The gate aggregates findings from every layer and emits a single action:
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.88**. Not marketing copy.
+Measured on this repository at **v6.8.89**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -180,8 +180,8 @@ Measured on this repository at **v6.8.88**. Not marketing copy.
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
 | Discrimination dimensions | 160 |
-| MCP tools | 184 |
-| Test suite | 18,996 passing / 72 failing |
+| MCP tools | 185 |
+| Test suite | 19,032 passing / 69 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 0 |
@@ -308,6 +308,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.89 | 2026-10-29 | **evidence 维度复活（chain-level evidence gap — 160 个维度里最后一个纯装饰维度接通）** — r734 轮初实测（`require('./src/gate.js').gate`，四份基准语料 378 条）：`dimension === 'evidence'` 的 finding **0 条**。根因不是阈值设错而是打分器不看文本：`checkEvidence(claim, evidence)` 的 `score = evidence.length>0 ? 0.5 : 1.0`，而 `discriminate(text, evidence = [])` 默认值是空数组、pipeline 全链路（gate / checkInput / checkOutput / runPipeline）从不传 evidence，于是 score 恒 1.0、`ev.score < 0.25` 自 v6.7.73 起一次都没成立过。新模块 `src/evidence-gap.js`（判据两腿共现）：支① DEMAND 类法则型经验断言（效能动词/比较级 × 量词，中英各 6/4 族）× 支② SUPPLY 全文无证据标记（具名来源/引用/方法论/对冲语/一手经验/命名机构）。精度护栏四类框架整段排除——规范性（须|必须|应|需要 / must|should|required）、报道性（显示|表明|发现 / shows|reported|found）、定义性（X 是一种 Y / refers to）、特指（这个|该|本次 / this|these|our），另加疑问、句首祈使/求助、教学举例、命名机构锚。`checkEvidence` 在显式传 evidence 时保留 v6.7.31 起的供给侧契约（一个字不改），未传时才委托新模块；激活阈值 0.25 → 0.65；severity 口径 `(0.5-score)*100` → `(1-score)*100`（原式在 score>0.5 时算出负严重度，findings 按 severity 降序排会把真缺口压到最后一名）。**诚实标注**：evidence 仍不在 `allDims` 惩罚组里（`overallScore` 与本维度无关，这一点推翻了交接簿「动它会影响 verify 全局阈值」的过时记载），命中只进 `findings` 供审计，不强制 gate.action。实测：18 条攻击句式 18/18 判缺口、4 条保守排除不判、37 条对抗性良性样本 0 误判、双向门禁误拦与基线完全一致（302/326，召回 52/52）、四份语料 378 条 gate.action 分布逐项不变（pass 302 / verify 21 / rewrite 27 / block 28）、仓库文档散文 13,895 句 2 命中（0.014%，均为 markdown 表格单元）。MCP 新工具 `heartflow_check_evidence_gap`（工具 184 → 185）。 |
 | 6.8.88 | 2026-10-28 | **审计修复批（multi-agent audit patch — 异步委托 4 子代理全量审计闭环）** — 委托批次 deleg_39686998 发现的真问题逐条亲验后修复：① [HIGH] `getOrCreateInstance` 全仓库 4 处调用 0 处定义——`src/mcp-server.js` 与 `mcp/mcp-server-http.js` 的 SSE 会话级 benchmark 工具 100% 落进 dispatch try/catch 被 ReferenceError 吞掉静默回退全局实例；两文件落地 `_sessionInstances` Map 注册表（按 sessionId 缓存、上限 16 FIFO 淘汰、start() 失败上抛不回退），4 处调用点改 `await`，等价逻辑单测 cache_hit/隔离/兜底三项全 true。② [MEDIUM] `src/cortex/self-benchmark.js` 调用 `anchorSync` 但 `benchmark-external-anchor.js` 9 行全 Stub 未导出该符号——外部基准锚定从未生效且错误被 catch 吞；删除 stub 模块与死导入/死调用，assess() 诚实走未验证分支（内评 0.7 折 + verified:false），`heartflow.js` 启动日志假宣称「外部锚定防自欺已启用」改为实况。③ [MEDIUM] `BUILD_DATE` 落后一个补丁（6.8.86→6.8.87）。④ [LOW] `src/dream/dream-loop.js` / `interactive-dream.js` 对 `dream.js` 的 `LEVELS`/`DEFAULT_SCORING` 死解构死导出（运行时实测 undefined）、`module-registry.js` 死导出 `createSpecialModule`（heartflow.js 用本地副本 `_createSpecialModule`），四处清除。⑤ [LOW] `package.json` 4 个 script 指向已归档 `tests/` 死目录，重指向现存文件。⑥ [LOW] `src/report/report-generator.js` `_extract` 缺 think() 实际形态（七阶段住在 `chain` 键，`thoughtChain` 恒不存在）——CLI/MCP 两条报告路径全输入输出「未捕获思维链」，补形态 (c) 规范化 + `_stageText` 对象 output 的 `[object Object]` 渲染修复。⑦ [LOW] SSRF 保留网段补齐：`url-validator.js` CIDR 表增 CGNAT/TEST-NET1-3/198.18/组播/240÷4/广播 8 段并导出 `isBlockedV4`，`fetch-safe.js` 两处会漂移的内联私网副本改复用单一事实源。⑧ 文档：`heartflow-architecture-tracing/SKILL.md` 架构描述与实码相反（实际 ThoughtChain 主路径 + think-pipeline 后置），勘误；规格表测试数改实测 4 段聚合 18,996/72/19,068。验证：s2/s3 与改动前基线逐分一致、s4 失败集合同源（round-608 等既有 flaky）、security-audit 16/16、fetch-safe 2/2、gate-verdict 27/27、recovered-modules 16/16、doc-numbers 3 条失败为 r412 既有切片噪声。 |
 | 6.8.87 | 2026-10-28 | **console 残留清理（code-quality patch — 25 处调试噪声接入 house logger）** — 全局审计（安全/运行时/质量三线 + 4 代理交叉）发现全部闭环后，将 src/ 下 25 处调试噪声 console 调用接入既有 house 标准 `src/utils/logger.js`（`logger.debug/info/warn(module, ...)`，LOG_LEVEL 默认 WARN 静默、`LOG_LEVEL=1` 恢复）：`src/cortex/meta-engine.js` 10 处 cycle 追踪、`src/formula/formula-engine.js` 7 处加载/推导调试（含 2 处「简化版」提示行）、`src/memory/memory-bank.js` 2 处加载状态、`src/memory/memory-encrypt.js` 4 处（2 消息 × 2 份重复块）密钥状态、`src/formula/formula-search.js` 1 处加载完成统计、`src/emotion/deep-emotion.js` 1 处初始化、`src/core/uncertainty-quantifier.js` 1 处校准告警（升 logger.warn）、`src/core/engine-initializer.js` 1 处会话间隔。排除项（40+ 处不动）：aipay-server/api-server/a2m-notify 支付与通知操作日志、mcp-server/gate 的 console.error 安全输出、repo-audit 的 REPORT/FILES/LINES 机器可读契约、utils/logger 与 infra/logger 自身实现、heartflow.js 内部 logger 与 HEARTFLOW_DEBUG 门控行、transmission-engine 全注释形态。grep 验证零测试 spy stdout/断言这些前缀；默认输出实测零噪声（CLI status 常驻 [MemoryBank] 行消失），`LOG_LEVEL=1` 恢复。8 个被改模块 require 冒烟 EXIT=0；靶向测试（engine-initializer / round-621-uncertaintyquantifier-dispatch / meta-audit / meta-calibration / metaMemory）全过；全量分段回归 19,005 通过 / 70 失败 / 19,075，与清理前逐段一致（零回归）。 |
 | 6.8.86 | 2026-10-28 | **全局审计修复（multi-agent audit patch — 安全 / 运行时 / 质量三线并行）** — 三路审计（子代理并行：安全、运行时 bug、质量死代码）交叉核实后修复：① [HIGH] `src/core/heartflow.js` 缺 `stop()` 方法——`src/mcp-server.js:5887`、`mcp/mcp-server-http.js:1480`、`bin/verify.js:154`、主块 dispatch（6428/6436）共 6 处 `hf.stop()` 调用全部落进 `catch` 被静默吞，MCP 关闭与验证器收尾从未真正执行；补 `stop()`（先停 consolidate 观察器再委托 `shutdown()`），fail-to-pass 证据：`test/legacy/v2_0_19.test.js` 从 `hf.stop is not a function` 崩溃变为 31/31 通过。② [HIGH] `src/knowledge/classics-rules.js:986` `execSync` 字符串插值执行 `bash`，keyword/scope 直达 shell（引号/反引号/`$`/分号全部存活），改 `execFileSync` 参数化数组；当前宿主未捆绑 `search_guji.sh` 故不可达，属潜在漏洞。③ [HIGH] `src/memory/memory.js` 804 行死代码（`@deprecated REMOVED in v12.0.0`，精确 require 引用 0 命中，29 个宽匹配全系 memory-adapter/bank 等别名），删除并同步 `memory-encrypt.js` 注释。④ [MEDIUM] `tests/` 孤儿目录并轨：`TEST_DIR=__dirname` 只扫 `test/`，5 个 `*.test.js`（core / decision-routing / integration / memory-system / legacy v2_0_19，共 50+ 用例）+ 2 个错位文件从未执行——`tests/unit/test-code-verifier.js` 按自述头归位 `test/core/code-verifier.test.js`（实测通过）；`test/core/path-guard.test.js` 原是只查模块加载的空桩，真实 25 例测试错位在 `tests/unit/test-path-guard.js`（v6.8.85 轮的 Windows 修复打在影子副本上，canonical 版从未受益），替换；4 个一次性诊断脚本移 `test/archive/one-off-scripts/`。7 个文件全部经 `test/_mount.js` harness 退出码 0 复验。⑤ [HIGH] `src/consciousness/debate-engine.js` MCP `heartflow_debate` 工具 `sessionId` 路径遍历——`addRound`/`summarize`/`conclude` 的 id 未经校验直拼 `path.join(this.dataDir, id + '.json')`，`../../x` 可越权读写任意 `.json`；在 `_loadSession`/`_saveSession` choke 点加 `^[a-zA-Z0-9_-]{1,64}$` 白名单（合法 id 仅由 `createSession` 的 `crypto.randomUUID()` 前缀生成），遍历读写实测全部拦截。⑥ [MEDIUM] `_lazy` 注册表双副本漂移——`src/core/heartflow.js` start() 内 117 行内联表与 `engine-constructor.js` 的 `initializeLazyRegistry` 逐条重复（实测 50/50 键运行时一致，但 `initializeLazyRegistry` 从未被调用，任何一侧修改必漂移）；内联表替换为 `initializeLazyRegistry(this)` 一行调用，并修复真身表 5 条路径错别字（`flowPredictor`→`./flow-predictor.js`、`userModel`/`purposeEngine`→`../identity/`、`riskAnalyzer`→`../reasoning/`、`auditLogger`→`../shield/`，原先 19/46 条目 MODULE_NOT_FOUND 降至 14 个保留槽位）。全量复跑（分段 1/4–4/4）：19,040 通过 / 71 失败 / 19,111 ||

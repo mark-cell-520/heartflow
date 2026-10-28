@@ -3518,6 +3518,28 @@ const HANDLERS = {
       };
     } catch (e) { return { error: e.message }; }
   },
+  // [r734] evidence 维度（证据缺口）MCP 接线。r734 轮初实测 378 条语料 0 条
+  // evidence finding——打分器不看文本，`ev.score < 0.25` 自 v6.7.73 起从未成立，
+  // 160 个维度里 1 个是纯装饰。判据与护栏见 src/evidence-gap.js 头注释；此处
+  // 单独暴露，供外部 agent 审计「哪条断言没有证据」与当前族规模口径。
+  heartflow_check_evidence_gap: (args) => {
+    try {
+      const mod = require('./evidence-gap.js');
+      const action = args?.action || 'check';
+      if (action === 'families') return mod.familySummary();
+      const text = args?.text || '';
+      const r = mod.checkEvidenceGap(text);
+      return {
+        score: r.score,
+        count: r.count,
+        demand: r.demand,
+        supply: r.supply,
+        gap: r.score < 0.65,
+        claims: r.claims,
+        issues: r.issues,
+      };
+    } catch (e) { return { error: e.message }; }
+  },
   heartflow_check_decision_trace: (args) => {
     try {
       const { checkDecisionTrace } = require('./index.js');

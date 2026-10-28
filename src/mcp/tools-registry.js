@@ -420,6 +420,12 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本（原文，只读不改）"},"action":{"type":"string","description":"check（默认）/ families / list"}},"required":["text"]}
   },
 
+  {
+    name: 'heartflow_check_evidence_gap',
+    description: "证据缺口检测（evidence dimension, chain-level）：160 个判别维度里 evidence 一维自 v6.7.73 起是纯装饰——打分器 score = evidence.length>0 ? 0.5 : 1.0，而 discriminate(text, evidence=[]) 的默认值是空数组、pipeline 全链路从不传证据，于是 score 恒为 1.0，index.js 的 ev.score<0.25 一次都没成立过（r734 轮初实测 378 条语料 0 条 evidence finding）。本工具接通该维度：判据是两腿共现——支① DEMAND 类法则型经验断言（效能动词/比较级 × 量词，如 'Coffee reduces the risk of heart disease by 25%' / '运动能降低血压 10%'）× 支② SUPPLY 全文无任何证据标记（具名来源/引用/方法论/对冲语/一手经验/命名机构）。精度护栏四类框架整段排除：规范性（须|必须|应|需要|要求 / must|should|required——陈述的是规则）、报道性（显示|表明|发现|记录 / shows|reported|found——陈述的是已发生观测）、定义性（是|属于|指 / is|are|means——陈述的是构成关系）、特指（这个|该|本次|此 / this|these|our|the report——指向具体实例，证据在场景里）；另加疑问、句首祈使/求助、教学举例、命名机构锚四类。r734 实测：19 条攻击句式 16/19 命中（3 条漏判全部是第一人称/特指保守排除，见 UPGRADE_LOG 五）、37 条对抗性良性样本 0 误判、双向门禁 326 条良性样本误拦数与基线完全一致（302/326）、四份基准语料 378 条 gate.action 分布逐项不变（pass 302/verify 21/rewrite 27/block 28）、仓库文档散文 13895 句 2 命中（0.014%，均为 markdown 表格单元而非散文）。极性：score 高分=证据充分（1.0 无缺口，0.0 完全无依据）；evidence 不在 allDims 里，overallScore 与本维度无关，命中只进 findings 供审计。action: check（默认）返回 score/count/demand/supply/claims/issues；families 读当前族规模与权重口径。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本（原文，只读不改）"},"action":{"type":"string","description":"check（默认）/ families"}},"required":["text"]}
+  },
+
 ];
 
 // [AUDIT-FIX 2026-10-11] 并入运行时验证过的只读工具集（86 个）。

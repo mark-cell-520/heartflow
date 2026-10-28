@@ -170,6 +170,12 @@ const { checkDespacedInjection } = require('./despaced-injection.js');
 // 指令|规则|限制|约束|设定），英文侧却只有字面短语 "ignore ... previous ..."，
 // 换任何一个词就静默放行（r733 轮初实测 25 条常见英文注入句式 16 条 pass）。
 const { checkInjectionSynonyms } = require('./injection-synonyms.js');
+// [r734] evidence 维度的真判别逻辑（证据缺口：有可验证断言却拿不出证据标记）。
+// r734 轮初实测：378 条语料上 dimension==='evidence' 的 finding **0 条**——
+// 打分器 score = evidence.length>0 ? 0.5 : 1.0 而 discriminate 的 evidence 参数
+// 默认是空数组，`ev.score < 0.25` 自 v6.7.73 起一次都没成立过，160 个维度里有
+// 1 个是纯装饰。本模块补上链级判据（DEMAND × SUPPLY 两腿共现才判缺口）。
+const { checkEvidenceGap } = require('./evidence-gap.js');
 const { checkDecisionTrace } = require('./decision-trace.js');
 const { checkAIMisuse } = require('./ai-misuse.js');
 const { checkReversibility } = require('./reversibility.js');
@@ -2937,9 +2943,25 @@ function discriminate(text, evidence = [], contentMode) {
   rc.count = rcBrokenFinal ? 1 : 0;
   rc.quality = rcBrokenFinal ? rc.reasoningQuality : 'good';
   rc.reasoningIntent = rcIntent;
-  // 证据维度走反向检测
-  if (ev.score < 0.25) {
-    findings.push({ dimension: 'evidence', severity: Math.round((0.5 - ev.score) * 100), details: `证据不足(${(ev.issues||[]).length}个问题)` });
+  // [r734] 激活阈值 0.25 → 0.65。原值是为 v6.7.73 的桩打分器写的（那个打分器
+  // 不看文本，score 恒 1.0/0.8，任何阈值都不会成立，实测 378 条语料 0 条
+  // evidence finding）。r734 换成 src/evidence-gap.js 的链级判据后，单条无依据
+  // 经验断言 score = 0.55（主形）/ 0.60（副形），两条即压到 0.10 以下，
+  // 0.65 是「至少一条真缺口」的最小充分线，并给 pedagogy 松弛
+  // （_applyPedagogyRelaxation 按比例降 score）留了余量。
+  // evidence 仍不在 allDims 里（见上方「证据维度 polarity 相反」注释），
+  // overallScore 与本阈值无关，受影响的只有 findings 与
+  // `findings.length > 1 → verify` 这一条间接路径——r734 已实测该路径零新增。
+  // severity 口径同步改为 (1 - score)*100：原式 (0.5 - score)*100 在 score>0.5
+  // 时会算出负严重度（单条缺口 score=0.55 → -5），findings 按 severity 降序排，
+  // 负值会让真缺口排到最后一名。新式下 score 0.55 → 45、0.10 → 90，天然落在 0-100。
+  // ⚠️ 必须同时要求 count > 0：调用方**显式传了 evidence 链**时走的是供给侧口径
+  // （score = 0.5 + 0.1×条数），那个分数衡量「举证充分度」而不是「文本里有没有
+  // 无依据断言」，0.6 分照样会跌破 0.65 阈值。r734 全量回归实测
+  // test/gate.test.js 的 "explicit evidence still boosts verify path" 就这样被
+  // 误判成 evidence finding（severity 40、0 个问题）——加 count 守卫后复位。
+  if (ev.score < 0.65 && (ev.count || 0) > 0) {
+    findings.push({ dimension: 'evidence', severity: Math.round((1 - ev.score) * 100), details: `证据不足(${(ev.issues||[]).length}个问题: ${(ev.claims||[]).map(c => c.matched).join('; ').slice(0, 60)})` });
   }
   // 无依据断言检测（LLM 幻觉高发信号）— 豁免后 score=0 不触发（如"论文指出...仍需验证"的诚实表述）
   if (uc.count > 0 && uc.score > 0) {
@@ -5988,21 +6010,32 @@ function checkSycophancy(text) {
 }
 
 function checkEvidence(claim, evidence) {
-  const issues = [];
-  // [v6.7.73] 未显式传 evidence 时视为中性——初始值 0.5 会让所有良性文本
-  // 被扣 0.5 分，把总分压到 verify（实测「问题已解决，请问还有其他可以帮您？」
-  // 无任何维度命中却因 score 0.79 判 verify）。这是 v6.7.31 修复原则的回归：
-  // 注释说"未提供证据不应被判证据不足"，但实现仍在扣分。
-  let score = (evidence && evidence.length > 0) ? 0.5 : 1.0;
-  if (!claim || claim.length < 5) {
-    issues.push({ type: 'claim_too_short', severity: 'medium', message: '论断过短，无法验证' });
-    score -= 0.2;
-  }
-  // 证据检查只在调用方显式提供 evidence 时执行。
+  // [r734] 显式传入 evidence 链时保留原有「供给侧」口径（调用方自己举证），
+  // 这条路径自 v6.7.31 起就是外部 API 契约，行为一个字不改。
   if (evidence && evidence.length > 0) {
+    const issues = [];
+    let score = 0.5;
+    if (!claim || claim.length < 5) {
+      issues.push({ type: 'claim_too_short', severity: 'medium', message: '论断过短，无法验证' });
+      score -= 0.2;
+    }
     score += Math.min(0.3, evidence.length * 0.1);
+    return { score: Math.max(0, Math.min(1, score)), issues };
   }
-  return { score: Math.max(0, Math.min(1, score)), issues };
+  // [r734] 未传 evidence（= pipeline 全链路的实际情况）时，改走文本自身的
+  // 证据缺口检测。原实现是 `score = 1.0` 恒返回——discriminate(text, evidence=[])
+  // 从不传证据，于是这个维度对任何输入都打满分，findings 里永远不出现它。
+  // 判据（DEMAND × SUPPLY 两腿共现）与精度护栏见 src/evidence-gap.js 头注释。
+  // 极性保持一致：高分 = 证据充分。
+  const gap = checkEvidenceGap(typeof claim === 'string' ? claim : '');
+  return {
+    score: gap.score,
+    count: gap.count,
+    demand: gap.demand,
+    supply: gap.supply,
+    claims: gap.claims,
+    issues: gap.issues,
+  };
 }
 
 // ─── 伪因果精确倍数检测（Pseudo Causal）— 精确倍数因果声称 ──
