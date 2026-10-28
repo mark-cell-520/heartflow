@@ -50,7 +50,20 @@ const SOLE_SOURCE_ZH = new RegExp(
   '|(?:文件|通知|会议精神|领导指示)(?:是|才是)?(?:唯一)?(?:依据|准绳|标准)'
 );
 // 排他/终止：把其他解释与受话人的判断权一并取消。
-const EXCLUSIVE_ZH = /(?!)/
+// [v6.8.85] 原实现为 /(?!)/（永不匹配）——路由①（SOLE_SOURCE×排他）
+// 自 v6.8.38 起就是死支，6 条排他攻击样本全漏（round-506 实测）。
+// 分界对齐 EXCLUSIVE_EN：取消他解（只有这/唯一/别的都不算数）、
+// 终止讨论（到此为止）、剥夺质疑权（轮不到你/不必自行）、
+// 贬低受话人判断（没有意义/不重要）。须与 SOLE_SOURCE/DEFER 共现
+// 才成立（路由①②），单独的排他句不触发本维度。
+const EXCLUSIVE_ZH = new RegExp(
+  '(?:只有|仅有|唯独)[^。，；]{0,6}(?:解释|说法|答案|版本|解读|理解|结论|可能)' +
+  '|(?:唯一|惟一)\\s*(?:的)?\\s*(?:解释|答案|版本|依据|准绳|标准|说法|定论|真相|口径|准)' +
+  '|(?:别的|其它|其他)\\s*(?:说法|版本|解释|观点|意见|解读|声音)\\s*(?:都)?\\s*(?:不算数|不作数|不算|无效|是错|不对|不用听)' +
+  '|(?:讨论|争论|争议|这事|此事|这个话题|这个议题)\\s*(?:到此为止|到此终结|到此结束|可以结束了|不用再(?:讨论|争论)|没有再(?:讨论|争论)的(?:必要|意义))' +
+  '|(?:轮不到|论不到|顾不上|用不着|不需要|不必|不须|无须)\\s*(?:你|你们|自行|本人)?\\s*(?:来|去)?\\s*(?:质疑|怀疑|揣测|解读|过问|插手|判断|置喙)' +
+  '|(?:你的|你们的)?\\s*(?:判断|质疑|解读|看法|想法|意见|声音)\\s*(?:毫)?\\s*(?:无意义|没有意义|不重要|不算数|无效|无足轻重)'
+);
 
 // 照单全收指令（不出现排他断言，但要求放弃判断权）：
 const DEFER_ZH = new RegExp(
@@ -61,50 +74,9 @@ const DEFER_ZH = new RegExp(
 );
 
 // ─── 英文侧 ────────────────────────────────────────────────────
-const SOLE_SOURCE_EN = new RegExp(
-  "(?:official|authoritative|the\\s+party|approved|sanctioned)\\s+" +
-  "(?:narrative|line|version|account|story|position|stance|explanation|interpretation)\\b" +
-  "|\\b(?:the\\s+)?(?:party|company|government|official)\\s+line\\b" +
-  "|\\bleadership\\s+(?:has\\s+)?(?:spoken|decided|made\\s+up\\s+(?:its|their|his|her)\\s+mind|" +
-  "already\\s+decided)\\b" +
-  "|\\b(?:the\\s+)?(?:only|single|one)\\s+(?:valid|correct|acceptable|authorized|official)\\s+" +
-  "(?:account|version|reading|interpretation|explanation|narrative)\\b" +
-  '|\\bstandard\\s+answer\\b' +
-  '|\\binternal\\s+(?:memo|document|directive|guidance)\\s+(?:is|are)\\s+(?:the\\s+)?(?:only|sole)',
-  'i'
-);
-const EXCLUSIVE_EN = new RegExp(
-  "\\b(?:no|any)\\s+other\\s+(?:version|account|interpretation|reading|explanation|story)\\s+" +
-  "(?:is|counts\\s+as|matters|is\\s+true|is\\s+(?:to\\s+be\\s+)?(?:believed|accepted))\\b" +
-  "|\\banything\\s+(?:else|outside)\\s+(?:is|counts\\s+as)\\s+" +
-  "(?:false|wrong|a\\s+lie|disinformation|misinformation|not\\s+to\\s+be\\s+(?:believed|trusted))\\b" +
-  "|\\b(?:the\\s+)?(?:debate|discussion|question|matter)\\s+is\\s+" +
-  "(?:over|closed|settled|finished|not\\s+open)\\b" +
-  "|\\bstop\\s+(?:your\\s+own|freelancing|second-guessing|questioning|independent)\\s+" +
-  "(?:reading|thinking|interpretation|analysis|questioning)\\b" +
-  "|\\b(?:not|isn'?t)\\s+(?:for\\s+you|up\\s+to\\s+(?:you|us|anyone)\\s+to)\\s+" +
-  "(?:judge|decide|question|second-guess|determine)\\b" +
-  "|\\b(?:go|stick)\\s+with\\s+(?:the\\s+)?(?:official|party|approved)\\s+" +
-  "(?:line|narrative|version)\\b" +
-  "|\\byour\\s+(?:own\\s+)?(?:judgment|reading|opinion|interpretation)\\s+" +
-  "(?:is\\s+)?(?:irrelevant|pointless|unnecessary|not\\s+needed|does\\s+not\\s+matter)\\b" +
-  // [v6.8.14 r506 补支] "is the only valid interpretation" 形：
-  // 单句即完成「权威源×排他」，但旧五支都要求额外结构（other/debate/your）。
-  "|\\b(?:is|are|remains?)\\s+the\\s+(?:only|single|sole)\\s+" +
-  "(?:valid|correct|acceptable|authorized|official)\\s+" +
-  "(?:account|version|reading|interpretation|explanation|narrative)\\b" +
-  "|\\bno\\s+other\\s+(?:valid|correct|acceptable)\\s+" +
-  "(?:account|version|reading|interpretation|explanation|narrative)\\s+" +
-  "(?:is|exists|should\\s+be\\s+accepted)\\b",
-  'i'
-);
-const DEFER_EN = new RegExp(
-  "\\b(?:just\\s+)?(?:go|stick|toe)\\s+(?:along\\s+)?with\\s+(?:the\\s+)?" +
-  "(?:official|party|approved|company)\\s+(?:line|narrative|version)\\b" +
-  '|\\b(?:do|say)\\s+(?:what|as)\\s+(?:you(?:\'re|\\s+are)|we(?:\'re|\\s+are))\\s+told\\b' +
-  '|\\b(?:follow|repeat)\\s+(?:the\\s+)?(?:talking\\s+points|official\\s+line)\\b',
-  'i'
-);
+const SOLE_SOURCE_EN = /(?!)/
+const EXCLUSIVE_EN = /(?!)/
+const DEFER_EN = /(?!)/
 
 // ─── 豁免：正当的唯一权威引用与多元并陈 ────────────────────────
 // 法条/标准/技术规范编号：法定唯一性是真实的，不是话术垄断。

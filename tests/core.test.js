@@ -1,10 +1,12 @@
 /**
  * HeartFlow Core Unit Tests
  * 运行: HEARTFLOW_CODE_EXECUTOR_ENABLED=true node tests/core.test.js
+ *
+ * [v6.8.85 审计修复] 删除 CodeExecutor 段：src/code/code-executor.js 模块
+ * 已并入 heartflow.js 的惰性 stub（src/code/ 目录整体移除），原 require 是死引用。
  */
 
 const { HeartFlow } = require('../src/core/heartflow.js');
-const { CodeExecutor, ExecStatus } = require('../src/code/code-executor.js');
 
 let passed = 0;
 let failed = 0;
@@ -27,66 +29,8 @@ function assert(condition, message) {
 async function runTests() {
   console.log('\n🧪 HeartFlow Core Tests\n');
 
-  // ─── CodeExecutor Tests ─────────────────────────────────────────
-  console.log('📦 CodeExecutor:');
-  const ce = new CodeExecutor();
-
-  test('constructor initializes stats', () => {
-    assert(ce.totalExecutions === 0, 'Should start with 0 executions');
-    assert(ce.successRate === 0, 'Should start with 0% success rate');
-  });
-
-  test('execute JavaScript: 1+1=2', async () => {
-    const result = await ce.execute('1 + 1');
-    assert(result.status === ExecStatus.SUCCESS, `Expected SUCCESS, got ${result.status}`);
-    assert(result.output.includes('2'), `Expected output to contain 2, got: ${result.output}`);
-  });
-
-  test('execute JavaScript: console.log', async () => {
-    const result = await ce.execute('console.log("hello")');
-    assert(result.status === ExecStatus.SUCCESS, `Expected SUCCESS`);
-    assert(result.output.includes('hello'), `Expected "hello" in output`);
-  });
-
-  test('execute JavaScript: error handling', async () => {
-    const result = await ce.execute('throw new Error("test error")');
-    assert(result.status === ExecStatus.FAILED || result.status === ExecStatus.ERROR, `Expected FAILED/ERROR, got ${result.status}`);
-  });
-
-  test('sandbox blocks require()', async () => {
-    const result = await ce.sandbox('require("fs")');
-    assert(result.blocked === true, `Expected blocked, got: ${JSON.stringify(result)}`);
-  });
-
-  test('sandbox blocks eval()', async () => {
-    const result = await ce.sandbox('eval("1+1")');
-    assert(result.blocked === true, `Expected blocked`);
-  });
-
-  test('sandbox blocks constructor.constructor bypass', async () => {
-    const result = await ce.sandbox('(0,constructor.constructor)("alert(1)")()');
-    assert(result.blocked === true, `Expected blocked for constructor bypass`);
-  });
-
-  test('runTests: passing assertion', async () => {
-    const result = await ce.runTests('function add(a, b) { return a + b; }', 'console.assert(add(1, 2) === 3);');
-    assert(result.passed >= 1, `Expected at least 1 passed, got ${result.passed}`);
-    assert(result.failed === 0, `Expected 0 failed`);
-  });
-
-  test('runTests: failing assertion', async () => {
-    const result = await ce.runTests('function add(a, b) { return a + b; }', 'console.assert(add(1, 2) === 5);');
-    assert(result.failed >= 1, `Expected at least 1 failed`);
-  });
-
-  test('healthCheck: reports healthy/degraded', () => {
-    const health = ce.healthCheck();
-    assert(health.status === 'healthy' || health.status === 'degraded', `Invalid status: ${health.status}`);
-    assert(Array.isArray(health.executors), 'executors should be array');
-  });
-
   // ─── HeartFlow Core Tests ──────────────────────────────────────
-  console.log('\n💓 HeartFlow Core:');
+  console.log('💓 HeartFlow Core:');
   const hf = new HeartFlow({ rootPath: '/tmp/heartflow-test-' + Date.now() });
 
   test('constructor sets version', () => {

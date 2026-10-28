@@ -13,7 +13,8 @@ const os = require('os');
 const ROOT = path.resolve(__dirname, '..');
 const gate = require(path.join(ROOT, 'src/gate.js'));
 const devex = require(path.join(ROOT, 'src/dev-exemptions.js'));
-const probe = require(path.join(ROOT, 'scripts/round-449-hook-sec-validation-probe.js'));
+// [v6.8.85 审计修复] scripts/round-449-hook-sec-validation-probe.js 已从仓库移除（scripts/ 清理时删除），
+// 其能力由 src/dev-exemptions.js 的导出覆盖，死 require 删除（本测试实际只用 -e 内联子进程）。
 
 // 复刻 r449 探针的两组样本（探针只 console.log，这里重新定义以便断言）
 const ATTACK = [

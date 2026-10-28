@@ -1,3 +1,4 @@
+require('./helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 const { classifyError, ErrorCategory, ExecutionStatus, RetryStrategy } = require('../src/core/embodied-core.js');
 
 describe('embodied-core', () => {

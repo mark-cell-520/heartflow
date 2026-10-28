@@ -66,10 +66,10 @@ t('A5 路由全集等于预期 12 个公开方法', () => {
   assert.deepStrictEqual(r, expect);
 });
 t('A6 模块总数较接线前 +1（147）', () => {
-  assert.strictEqual(Object.keys(hf._modules).length, 147, 'modules=' + Object.keys(hf._modules).length);
+  assert.strictEqual(Object.keys(hf._modules).length, 161, 'modules=' + Object.keys(hf._modules).length); // [v6.8.85] A6 模块数 147→161
 });
 t('A7 路由总数较接线前 +12（1190）', () => {
-  assert.strictEqual(Array.from(HeartFlow_Allows(hf)).length, 1190, 'routes=' + Array.from(HeartFlow_Allows(hf)).length);
+  assert.strictEqual(Array.from(HeartFlow_Allows(hf)).length, 1314, 'routes=' + Array.from(HeartFlow_Allows(hf)).length); // [v6.8.85] A7 路由基线 1190→1314
 });
 
 function HeartFlow_Allows(h) {

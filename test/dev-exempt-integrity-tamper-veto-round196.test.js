@@ -144,10 +144,10 @@ test('删掉第九道闸调用行后攻击族重新被赦免（守卫有效性�
   if (process.env.ROUND196_SKIP_MUTATION === '1') return;
   try {
     fs.writeFileSync(SRC, orig.replace(line, '  // [删条守卫] 临时移除第九道闸'));
-    // 清 require 缓存以重载
+    // 清 require 缓存以重载。Windows 下 cache 键是反斜杠路径，
+    // 正向斜杠过滤器永远匹配不上——必须同时兼容两种分隔符。
     for (const k of Object.keys(require.cache)) {
-      if (k.includes('/src/dev-exemptions.js') || k.includes('/src/reward-hacking.js')
-          || k.includes('/src/gate.js') || k.includes('/src/index.js')) delete require.cache[k];
+      if (/[\\/]src[\\/](dev-exemptions|reward-hacking|gate|index)\.js$/.test(k)) delete require.cache[k];
     }
     const dxFresh = require('../src/dev-exemptions.js');
     const gateFresh = require('../src/gate.js');
@@ -162,8 +162,7 @@ test('删掉第九道闸调用行后攻击族重新被赦免（守卫有效性�
   } finally {
     fs.writeFileSync(SRC, orig);
     for (const k of Object.keys(require.cache)) {
-      if (k.includes('/src/dev-exemptions.js') || k.includes('/src/reward-hacking.js')
-          || k.includes('/src/gate.js') || k.includes('/src/index.js')) delete require.cache[k];
+      if (/[\\/]src[\\/](dev-exemptions|reward-hacking|gate|index)\.js$/.test(k)) delete require.cache[k];
     }
   }
 });

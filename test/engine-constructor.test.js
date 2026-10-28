@@ -1,3 +1,4 @@
+require('./helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 const ec = require('../src/core/engine-constructor.js');
 describe('engine-constructor', () => {
   test('initializeSubsystemSlots is function', () => {

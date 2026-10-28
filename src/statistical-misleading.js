@@ -57,7 +57,11 @@ const SMALL_ABS_EN = /\b(?:from\s+)?(\d{1,2})(?:\.\d+)?\s*(?:users?|people|custo
 // 是比例/倍数句，C2 只需证明其中一侧是小基数，故不再强制单位词）
 const SMALL_ABS_BARE_EN = /\b(?:from\s+(\d{1,2})(?:\.\d+)?\s+to\s+(\d{1,2})(?:\.\d+)?|(\d{1,2})(?:\.\d+)?\s+to\s+(\d{1,2})(?:\.\d+)?)\b/i;
 const SMALL_ABS_EN_TO = /\bto\s+(\d{1,2})(?:\.\d+)?\s*(?:users?|people|customers?|units?|orders?|cases?|tickets?|incidents?|complaints?|signups?|downloads?)\b/i;
-const SMALL_ABS_ZH = /(?:从\s*)?([0-9]{1,2}|[一二两三四五六七八九十]{1,3})\s*(?:个人|人|次|起|单|例|条|台|件|家|名|位|个)(?:[^。]{0,6}(?:涨|升|降|增|减|到|至))?/;
+// [v6.8.85 审计修复] 「N 个 + 时间单位」（三个季度/两个月/一整年）是时间
+// 跨度，不是统计小基数——r360 实测「连续三个季度业绩翻倍」被「三个」喂
+// C2 与 C1「翻倍」双腿误伤。单位词后紧跟时间单位词（容 2 字间隔）时，
+// 该数量不是基数证据。攻击族（3 个用户/5 单）不受影响。
+const SMALL_ABS_ZH = /(?:从\s*)?([0-9]{1,2}|[一二两三四五六七八九十]{1,3})\s*(?:个人|人|次|起|单|例|条|台|件|家|名|位|个)(?![^。]{0,2}(?:季度|个月|月|年|周|天|小时|分钟|秒|轮|届|期|阶段))(?:[^。]{0,6}(?:涨|升|降|增|减|到|至))?/;
 
 // 极小基数比率：万分之 N / 千分之 N / per 10k / N out of 1000 以内
 const SMALL_RATE_ZH = /(?:万分之|千分)[一二三四五六七八九十百0-9]+/;
@@ -147,7 +151,10 @@ function checkStatisticalMisleading(text) {
   }
 
   // 低比率区间：0.1% / 不足 1% —— 百分比变化在这个量级是统计噪声
-  if (!smallBase) {
+  // [v6.8.85] 收窄为「完整 from-to 对照」才成立：单期事实陈述
+  // （「本季度故障率下降到 0.3%」= SLA 读数）不是误导，只有
+  // 「从 30% 下降到 0.3%」这类省略不得的对照翻倍才是统计噪声。
+  if (!smallBase && (C1_FROMTO_ZH.test(text) || C1_FROMTO_EN.test(text))) {
     if (LOW_PCT_EN.test(text) || LOW_PCT_ZH.test(text)) {
       smallBase = (text.match(LOW_PCT_EN) || text.match(LOW_PCT_ZH) || ['低比率'])[0].trim();
       reasons.push(`低比率区间(${smallBase})`);

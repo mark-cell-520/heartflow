@@ -32,7 +32,7 @@ ok('A1 tools-registry 有 heartflow_associative 定义', !!def);
 ok('A2 定义有 inputSchema.properties', !!(def && def.inputSchema && def.inputSchema.properties));
 ok('A3 定义声明了 process/stats/trace 三个 action',
   !!(def && /process/.test(def.description) && /stats/.test(def.description) && /trace/.test(def.description)));
-ok('A4 工具总数 62', TOOLS.length === 62, 'actual=' + TOOLS.length);
+ok('A4 工具总数 184', TOOLS.length === 184, 'actual=' + TOOLS.length);
 
 const srv = fs_readServerSrc();
 ok('A5 mcp-server HANDLERS 有 heartflow_associative 映射',

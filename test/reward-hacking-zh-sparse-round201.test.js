@@ -152,8 +152,7 @@ function cripple(sampleText, fam, anchorComment, expectFallbackTo) {
   try {
     fs.writeFileSync(SRC, crippled);
     for (const k of Object.keys(require.cache)) {
-      if (k.includes('/src/reward-hacking.js') || k.includes('/src/gate.js')
-          || k.includes('/src/index.js')) delete require.cache[k];
+      if (/[\\/]src[\\/](reward-hacking|gate|index)\.js$/.test(k)) delete require.cache[k];
     }
     const fresh = require('../src/reward-hacking.js');
     const r = fresh.checkRewardHacking(sampleText);
@@ -162,8 +161,7 @@ function cripple(sampleText, fam, anchorComment, expectFallbackTo) {
   } finally {
     fs.writeFileSync(SRC, orig);
     for (const k of Object.keys(require.cache)) {
-      if (k.includes('/src/reward-hacking.js') || k.includes('/src/gate.js')
-          || k.includes('/src/index.js')) delete require.cache[k];
+      if (/[\\/]src[\\/](reward-hacking|gate|index)\.js$/.test(k)) delete require.cache[k];
     }
   }
 }

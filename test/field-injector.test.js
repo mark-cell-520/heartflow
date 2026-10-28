@@ -1,3 +1,4 @@
+require('./helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 const fi = require('../src/core/field-injector.js');
 describe('field-injector', () => {
   test('module exports functions', () => {

@@ -84,7 +84,10 @@ t('A4 _strategicRestraintFallback() 是进程内单例（含 lazy 缓存）', ()
 });
 
 // ── B~D. E2E 真实 socket 调用 ─────────────────────────
-const SOCK = path.join(os.tmpdir(), `hf-sr-r627-${process.pid}.sock`);
+// [v6.8.85 审计修复] Windows 无 Unix domain socket（listen EACCES），改用命名管道传输层
+const SOCK = process.platform === 'win32'
+  ? `\\\\.\\pipe\\hf-restraint-r627-${process.pid}`
+  : path.join(os.tmpdir(), `hf-restraint-r627-${process.pid}.sock`);
 
 function mcpCall(name, args, timeoutMs = 30000) {
   return new Promise((resolve, reject) => {
@@ -121,17 +124,27 @@ const RESTRAINED_PROPOSAL = '下一步立项构建一个通用世界模型，用
 const BENIGN_PROPOSAL = '把入口闸门的判定延迟再降低一些，保持现有职责不变';
 const MISSION_PROPOSAL = '完善自我认知模块，让心虫更准确知道自己是谁';
 const OFFMISSION_PROPOSAL = '重新设计公司考勤排班表和下午茶供应商评选流程';
-const NEW_DONT_ID = 'dr-r627-probe';
-const NEW_DONT_TEXT = 'r627 探针临时条目';
+// [v6.8.85 审计修复] 探针文本带 pid：历史残留（上次运行被杀没走到 removeDont）会
+// 让 addDont 命中去重返回 action:'updated' + 旧 id，C1~C4 连锁失败。唯一化后不受残留影响。
+const NEW_DONT_ID = `dr-r627-probe-${process.pid}`;
+const NEW_DONT_TEXT = `r627 探针临时条目 p${process.pid}`;
 
 (async () => {
   const deadline = Date.now() + 45000;
   while (Date.now() < deadline) {
     if (mcpProc.exitCode !== null) throw new Error(`MCP 进程提前退出 code=${mcpProc.exitCode}`);
-    if (fs.existsSync(SOCK)) { await new Promise(r => setTimeout(r, 1500)); break; }
+    if (process.platform !== 'win32' && fs.existsSync(SOCK)) { await new Promise(r => setTimeout(r, 1500)); break; }
+    // [v6.8.85 审计修复] win32 用命名管道：无 socket 文件，以「建连成功」为就绪信号
+    if (process.platform === 'win32') {
+      const ok = await new Promise(res => {
+        const c = net.createConnection(SOCK, () => { c.end(); res(true); });
+        c.on('error', () => res(false));
+      });
+      if (ok) break;
+    }
     await new Promise(r => setTimeout(r, 250));
   }
-  if (!fs.existsSync(SOCK)) throw new Error('MCP socket 未就绪');
+  if (!fs.existsSync(SOCK) && process.platform !== 'win32') throw new Error('MCP socket 未就绪');
   console.log('\n[B~D. E2E MCP 协议层真实调用]');
 
   // B1: evaluate 对克制样本必须判 restrained:true 且给出清单条目依据

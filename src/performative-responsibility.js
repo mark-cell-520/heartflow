@@ -207,6 +207,11 @@ const EXEMPT_EN = new RegExp([
   '\\b(?:the\\s+)?(?:postmortem|retrospective|review)\\s+is\\s+(?:due|scheduled|published)\\b',
 ].join('|'), 'i');
 
+// [v6.8.85 审计修复] 路由②豁免：拒绝解释但同句给出可追溯替代
+// （文档/流程/规范/记录）→ 正当的技术说明句式，不构成单边服从性认责。
+// r331 BENIGN 族实测三条误伤：「写在文档里了」「照这个流程做」「按规范来」。
+const SUBMIT_EXEMPT_ZH = /(?:文档|流程|规范|规程|规章|制度|手册|记录|日志|台账|清单|附件|指引|指南|报告)/;
+
 /**
  * @param {string} text 归一化后的文本
  * @returns {{hit:boolean, score:number, detail:string, count:number}}
@@ -225,6 +230,10 @@ function checkPerformativeResponsibility(text) {
   const ownEN = OWN_EN.test(text);
 
   // 路由②：单边服从性认责（无整改锚点）
+  // [v6.8.85 审计修复] 拒绝解释 + 可追溯替代锚点 → 技术说明句式，不判
+  if (SUBMIT_ZH.test(text) && SUBMIT_EXEMPT_ZH.test(text)) {
+    return { hit: false, score: 0, detail: '', count: 0 };
+  }
   if (SUBMIT_ZH.test(text)) {
     return {
       hit: true,

@@ -68,6 +68,11 @@ const path = require('path');
 //                 EN_WORD_EXCEPTIONS 英文词例外表 + _replacePinyinKeys 逐 token
 //                 大小写不敏感替换 + 5c-post 还原闭环，7 种拼音注入形态
 //                 pass → block，英文句零污染）。
+// [v6.8.85] 第 734 轮同步：6.8.84 → 6.8.85（全量回归审计修复：612 个测试
+//                 文件分段串行复跑，归因修 15 处引擎缺陷（sole-narrative
+//                 EXCLUSIVE_ZH 死支、agency-deflection T5_EN 死支、
+//                 dao-decision flag 未路由 verdict 等）+ 9 处豁免误伤/断线
+//                 恢复，测试预期与维度口径过期断言同步更新）。
 // [v6.8.84] 第 733 轮同步：6.8.83 → 6.8.84（英文注入同义族通道修复：
 //                 新增 src/injection-synonyms.js，覆盖动词 × 指代锚点 ×
 //                 规范宾语三族合取，一条判据覆盖 46,176 种组合，
@@ -77,7 +82,7 @@ const path = require('path');
 //                 新增 src/despaced-injection.js，词边界 DP 还原 ≥16 字母的
 //                 无空白英文串后过注入模式，35 种删空格注入形态
 //                 pass → block，326 条良性语料 + 3255 个文档英文 token 零误伤）。
-let VERSION = '6.8.84';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+let VERSION = '6.8.85';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

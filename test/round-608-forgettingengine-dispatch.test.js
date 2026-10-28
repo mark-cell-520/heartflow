@@ -79,10 +79,10 @@ t('A5 路由全集等于预期 16 个公开方法', () => {
   assert.deepStrictEqual(r, expect);
 });
 t('A6 模块键总数较接线前 +1（148）', () => {
-  assert.strictEqual(Object.keys(hf._modules).length, 148, 'modules=' + Object.keys(hf._modules).length);
+  assert.strictEqual(Object.keys(hf._modules).length, 161, 'modules=' + Object.keys(hf._modules).length); // [v6.8.85] A6 模块数 148→161
 });
 t('A7 路由总数（1206）', () => {
-  assert.strictEqual(allows(hf).length, 1206, 'routes=' + allows(hf).length);
+  assert.strictEqual(allows(hf).length, 1314, 'routes=' + allows(hf).length); // [v6.8.85] A7 路由基线 1206→1314
 });
 
 console.log('\n=== 第二组：辨别力（dispatch 逐条真调） ===');
@@ -269,7 +269,7 @@ t('C0 前置：注册行在源文件中唯一', () => {
     assert.strictEqual(res.ok, true, '恢复后探针失败: ' + JSON.stringify(res));
     assert.strictEqual(res.routes, 16, '恢复后路由数 ' + res.routes);
     assert.strictEqual(res.modulesKey, true, '恢复后 _modules 无键');
-    assert.strictEqual(res.modulesKeyCount, 148, '恢复后模块数 ' + res.modulesKeyCount);
+    assert.strictEqual(res.modulesKeyCount, 161, '恢复后模块数 ' + res.modulesKeyCount); // [v6.8.85] C2 恢复态 148→161
   });
 })();
 
@@ -344,7 +344,7 @@ t('D7 重复 start() 不会重复注册（幂等）', () => {
   hf4.start();
   const r = allows(hf4).filter(x => x.startsWith('forgettingEngine.'));
   assert.strictEqual(r.length, 16, '重复 start 后路由数应为 16，实得 ' + r.length);
-  assert.strictEqual(Object.keys(hf4._modules).length, 148, '重复 start 后模块数 ' + Object.keys(hf4._modules).length);
+  assert.strictEqual(Object.keys(hf4._modules).length, 161, '重复 start 后模块数 ' + Object.keys(hf4._modules).length); // [v6.8.85] D7 重复 start 148→161
 });
 
 console.log('\n=== 结果 ===');

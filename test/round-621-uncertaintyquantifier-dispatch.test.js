@@ -50,15 +50,21 @@ t('A3 路由清单与实例公有方法对应', () => {
 t('A4 _modules 含 uncertaintyQuantifier 键', () => {
   assert.strictEqual(Object.prototype.hasOwnProperty.call(hf._modules, PREFIX), true);
 });
-t('A5 路由总数较接线前 +3（1238→1241）', () => {
-  assert.strictEqual(allows(hf).length, 1241, 'total=' + allows(hf).length);
+t('A5 路由总数较接线前 +3（1311→1314）', () => {
+  assert.strictEqual(allows(hf).length, 1314, 'total=' + allows(hf).length);
 });
-t('A6 模块键总数较接线前 +1（151→152）', () => {
-  assert.strictEqual(Object.keys(hf._modules).length, 152, 'modules=' + Object.keys(hf._modules).length);
+t('A6 模块键总数较接线前 +1（160→161）', () => {
+  assert.strictEqual(Object.keys(hf._modules).length, 161, 'modules=' + Object.keys(hf._modules).length);
 });
 t('A7 evaluate 走 dispatch 与直调结果一致（接线未改语义）', () => {
-  const a = JSON.stringify(UQ.evaluate('根据记录数据显示研究表明已有结论', { hasEvidence: false }));
-  const b = JSON.stringify(hf.dispatch(PREFIX + '.evaluate', { text: '根据记录数据显示研究表明已有结论' }));
+  // [v6.8.85 审计修复] 两处口径缺陷：
+  // ① 直调传 { hasEvidence: false } 而 dispatch 只传 { text }，入参不同
+  //    却要求 JSON 完全相等；统一为裸文本入参。
+  // ② duration 是执行耗时毫秒数，两次调用天然可能 1ms vs 0ms，JSON 严格
+  //    相等永远不成立；比较前剔除该字段。
+  const strip = o => { const c = JSON.parse(JSON.stringify(o)); delete c.duration; return JSON.stringify(c); };
+  const a = strip(UQ.evaluate('根据记录数据显示研究表明已有结论'));
+  const b = strip(hf.dispatch(PREFIX + '.evaluate', { text: '根据记录数据显示研究表明已有结论' }));
   assert.strictEqual(a, b);
 });
 t('A8 dispatch 传对象入参时正确降级为文本（heartflow.js L4910 兜底仍生效）', () => {
@@ -110,8 +116,11 @@ t('B7 幻觉命中时校准短语给出「请验证关键事实」处置建议',
   assert.ok(r.recommendations.some(x => /幻觉|核实/.test(x)), JSON.stringify(r.recommendations));
 });
 t('B8 置信度分级函数覆盖五档', () => {
+  // [v6.8.85 审计修复] 原取点 [0.0, 0.2, 0.45, 0.6, 0.9] 中 0.6 落在
+  // MEDIUM 档（>=0.50），五档集合缺 HIGH。改为每档中点：
+  // 0.1→VERY_LOW / 0.35→LOW / 0.55→MEDIUM / 0.75→HIGH / 0.95→VERY_HIGH。
   const levels = new Set();
-  for (const c of [0.0, 0.2, 0.45, 0.6, 0.9]) {
+  for (const c of [0.1, 0.35, 0.55, 0.75, 0.95]) {
     levels.add(UQ._confidenceToLevel(c));
   }
   assert.ok(levels.has('VERY_LOW') && levels.has('LOW') && levels.has('MEDIUM')
@@ -225,7 +234,7 @@ t('D8 重复 start() 不会重复注册（幂等）', () => {
   hf4.start();
   const r = allows(hf4).filter(x => x.startsWith(PREFIX + '.'));
   assert.strictEqual(r.length, 3, '重复 start 后路由数 ' + r.length);
-  assert.strictEqual(Object.keys(hf4._modules).length, 152, '重复 start 后模块数 ' + Object.keys(hf4._modules).length);
+  assert.strictEqual(Object.keys(hf4._modules).length, 161, '重复 start 后模块数 ' + Object.keys(hf4._modules).length);
 });
 t('D9 源码保留 [r617] 接线标记（防回归被误删）', () => {
   const src = fs.readFileSync(path.join(HF, 'src', 'core', 'heartflow.js'), 'utf8');

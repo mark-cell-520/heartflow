@@ -800,7 +800,12 @@ function detect(text) {
       //   double-connective 同型错误的第 7 次复现，这次是中英混排版）。
       // 修法同型：连接词/套话锚在场时，zh-transitions 折进 zh-en-mixing。
       // 反向确认：中文族另有 8 支独立判据，折叠一支不塌检出不倒。
-      if (fam === 'zh-transitions' && (findings || []).some(x => x.dimension === 'ai-tell-zh-en-mixing' && x.zhEnSrc === 'anchor-mix')) {
+      // [v6.8.85 审计修复] 维度名写错：中文 transitions 族的 dimension 实际是
+      //   ai-tell-zh-zh-transitions（去前缀 fam='zh-zh-transitions'），旧条件写
+      //   fam === 'zh-transitions' 恒为假、折叠从未生效——单锚句「综上所述 +
+      //   comprehensively evaluate」被 transitions 独立计第二族，score=0.46
+      //   破了第 36 轮单族归零纪律（r50 SINGLE_FAMILY 守卫样本实测暴露）。
+      if (fam === 'zh-zh-transitions' && (findings || []).some(x => x.dimension === 'ai-tell-zh-en-mixing' && x.zhEnSrc === 'anchor-mix')) {
         return 'zh-en-mixing';
       }
       if (ZH_VOCAB_DISCOURSE.has(fam)) return 'vocab-discourse';

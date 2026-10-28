@@ -103,12 +103,14 @@ t('C2 findings 可见', () => {
   const f = (d.findings || []).find(x => x.dimension === 'sunk_cost_coercion');
   assert.ok(f, 'findings 里应出现 sunk_cost_coercion');
 });
-t('C3 维度总数 100', () => {
+t('C3 维度总数 160', () => {
   const d = gateMod.discriminate('probe');
   // [r655] 100 → 104：r647 commitment_coercion、r648 investment_as_debt、
   // r649 suffering_capital、r650 selfharm_coercion、r654
   // relationship_severance、r655 fear_projection 六个维度陆续接入。
-  assert.strictEqual(Object.keys(d.dimensions).length, 120, '维度总数应为 110');
+  // [r657-r690 轮] 后续 r656-r690 维度批量接入，r644/r621/r572 三处基线
+  // 同步更新后当前实际值为 160（v6.8.85 审计核实，勿凭注释猜数）。
+  assert.strictEqual(Object.keys(d.dimensions).length, 160, '维度总数应为 160');
 });
 t('C4 summary 有人类可读文案', () => {
   const d = gateMod.discriminate('钱都交了，你现在退出不是白花了');

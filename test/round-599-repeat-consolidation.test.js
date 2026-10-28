@@ -32,7 +32,7 @@ function makeBank() {
   const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'cortex', 'lesson-bank.js'), 'utf8')
     .replace(/path\.join\(__dirname, '\.\.\/\.\.\/data\//g, `path.join(${JSON.stringify(dir)}, '`)
     // 源码只此一处相对 require；拷贝到临时目录后会脱离源树，改写为绝对路径
-    .replace("../utils/safe-fs", path.join(__dirname, '..', 'src', 'utils', 'safe-fs.js'));
+    .replace("../utils/safe-fs", path.join(__dirname, '..', 'src', 'utils', 'safe-fs.js').replace(/\\/g, '/'));
   fs.writeFileSync(path.join(dir, 'lesson-bank.js'), src);
   // symlink 回源树，保证被拷贝源码的相对 require 可解析
   for (const dep of ['utils', 'core']) {

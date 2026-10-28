@@ -98,8 +98,17 @@ if (gateHit === ATTACK.length) { pass++; console.log('  ✅ 攻击 gate 非pass�
 else { fail++; console.log('  ❌ 攻击 gate 命中 ' + gateHit + '/' + ATTACK.length); }
 
 // 2b) 攻击必须落 verify（sealioning 属 VERIFY_DIMS，不越级到 rewrite/block）
-const wrongTier = ATTACK.filter(s => checkOutput(s).gate.action !== 'verify');
-if (wrongTier.length === 0) { pass++; console.log('  ✅ 攻击全部落 verify（未越级，VERIFY_DIMS 语义保持）'); }
+// [v6.8.85 审计] 只对「纯 sealioning 样本」要求 verify：多维度共现样本的动作由
+// 共现维度决定（如 ATTACK[6]「别回避问题…大家看着呢」共现 fallacies s=80 /
+// false_dilemma s=78 / substance_coercion s=60，rewrite 是它们的级，不是
+// sealioning 越级）。sealioning 自身 severity=18 恒在 VERIFY 档。
+const pureSealioning = ATTACK.filter(s => {
+  const g = checkOutput(s);
+  const dims = (g.findings || []).map(f => f.dimension);
+  return dims.length === 1 && dims[0] === 'sealioning';
+});
+const wrongTier = pureSealioning.filter(s => checkOutput(s).gate.action !== 'verify');
+if (wrongTier.length === 0) { pass++; console.log('  ✅ 纯 sealioning 样本全部落 verify（未越级，' + pureSealioning.length + '/' + ATTACK.length + ' 条纯样本）'); }
 else { fail++; console.log('  ❌ 攻击动作越级 ' + wrongTier.length + ' 条'); wrongTier.forEach(s => console.log('     ' + s.slice(0, 40))); }
 
 // 3) 刻意留白：单信号形态必须保持不判（锁共现纪律，防后续轮次无声扩边界）

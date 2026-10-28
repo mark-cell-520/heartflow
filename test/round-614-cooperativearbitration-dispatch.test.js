@@ -74,10 +74,10 @@ t('A5 路由全集等于预期 5 个公开方法', () => {
   ].sort());
 });
 t('A6 模块键总数较接线前 +1（150）', () => {
-  assert.strictEqual(Object.keys(hf._modules).length, 150, 'modules=' + Object.keys(hf._modules).length);
+  assert.strictEqual(Object.keys(hf._modules).length, 161, 'modules=' + Object.keys(hf._modules).length); // [v6.8.85] A6 模块数 150→161
 });
 t('A7 路由总数 1228', () => {
-  assert.strictEqual(allows(hf).length, 1228, 'routes=' + allows(hf).length);
+  assert.strictEqual(allows(hf).length, 1314, 'routes=' + allows(hf).length); // [v6.8.85] A7 路由基线 1228→1314
 });
 t('A8 接前状态确认为零可达（_initErrors 无 arbitration 失败记录）', () => {
   const errs = (hf._initErrors || []).filter(e => e.module === 'arbitration');
@@ -208,14 +208,14 @@ t('C0 前置：实例化块在源文件中唯一', () => {
     assert.strictEqual(res.routes, 0, '删除后仍有 ' + res.routes + ' 条路由');
     assert.strictEqual(res.modulesKey, false, '_modules 仍有键');
     assert.strictEqual(res.dispatchThrewNotAllowed, true, '删除后 dispatch 未抛 route not allowed');
-    assert.strictEqual(res.modulesKeyCount, 149, '删除后模块数应回落 149, 实得 ' + res.modulesKeyCount);
+    assert.strictEqual(res.modulesKeyCount, 160, '删除后模块数应回落 149, 实得 ' + res.modulesKeyCount); // [v6.8.85] C1 删除态 149→160
   });
   t('C2 恢复源文件后路由归位且模块计数回到 150', () => {
     const res = runNegProbe();
     assert.strictEqual(res.ok, true, '恢复后探针失败: ' + JSON.stringify(res));
     assert.strictEqual(res.routes, 5, '恢复后路由数 ' + res.routes);
     assert.strictEqual(res.modulesKey, true, '恢复后 _modules 无键');
-    assert.strictEqual(res.modulesKeyCount, 150, '恢复后模块数 ' + res.modulesKeyCount);
+    assert.strictEqual(res.modulesKeyCount, 161, '恢复后模块数 ' + res.modulesKeyCount); // [v6.8.85] C2 恢复态 150→161
   });
 })();
 
@@ -268,7 +268,7 @@ t('D4 resolve 缺省入参返回结构化合成结果', () => {
 t('D5 重复 start() 不会重复注册（幂等）', () => {
   hf.start();
   hf.start();
-  assert.strictEqual(Object.keys(hf._modules).length, 150, '重复 start 后模块数 ' + Object.keys(hf._modules).length);
+  assert.strictEqual(Object.keys(hf._modules).length, 161, '重复 start 后模块数 ' + Object.keys(hf._modules).length); // [v6.8.85] A6 模块数 150→161
   assert.strictEqual(allows(hf).filter(x => x.startsWith('arbitration.')).length, 5);
 });
 t('D6 模块源码保留类导出与三个常量（防接线目标被误改）', () => {

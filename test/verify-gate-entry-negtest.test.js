@@ -12,10 +12,13 @@
 const __HF = require('path').join(__dirname, '', '..'); // [r718 审计修复] 仓库根（跨平台，替代原 /root 硬编码）
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { execSync, spawnSync } = require('child_process');
 
 const SRC = __HF;
-const WORK = '/root/.hermes/cache/scratch/verify-negtest';
+// [v6.8.85 审计修复] 工作目录平台自适应：原硬编码 /root/.hermes/cache/scratch/verify-negtest
+// 在 Windows 副本必挂（/root 不存在且 cp -r 目标不可写）。
+const WORK = path.join(os.tmpdir(), 'verify-negtest');
 
 let pass = 0, fail = 0;
 const T = (n, ok, d) => { console.log(`  ${ok ? '✅' : '❌'} ${n}${ok || !d ? '' : ': ' + d}`); if (ok) pass++; else fail++; };

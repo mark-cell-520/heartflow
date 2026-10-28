@@ -88,11 +88,16 @@ t('heartflow-audit-upgrade-push 无 token 明文占位', () => {
 console.log('\n#7 密钥文件权限');
 t('memory/.aes-key 权限 600', () => {
   const m = fs.statSync(path.join(HF, 'memory/.aes-key')).mode & 0o777;
-  assert(m === 0o600, `权限是 ${m.toString(8)}`);
+  // [v6.8.85 审计修复] Windows 无 POSIX 权限位（statSync 恒 0o666），仅非 win32 断言 600
+  if (process.platform !== 'win32') {
+    assert(m === 0o600, `权限是 ${m.toString(8)}`);
+  }
 });
 t('memory/.qtable-hmac-key 权限 600', () => {
   const m = fs.statSync(path.join(HF, 'memory/.qtable-hmac-key')).mode & 0o777;
-  assert(m === 0o600, `权限是 ${m.toString(8)}`);
+  if (process.platform !== 'win32') {
+    assert(m === 0o600, `权限是 ${m.toString(8)}`);
+  }
 });
 t('memory-encrypt.js 有 chmod 自愈（mode 只在创建时生效）', () => {
   const s = read(path.join(HF, 'src/memory/memory-encrypt.js'));

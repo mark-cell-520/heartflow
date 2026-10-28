@@ -42,13 +42,18 @@ for (const b of blocks) {
 
   const f = `/tmp/doc-snippet-${b.doc.replace('.md', '')}-${b.line}.js`;
   let code = b.code;
+  // [v6.8.85 审计修复] Windows 路径插入 JS 源码必须转义：path.join(ROOT, ...)
+  // 在 Windows 下含反斜杠（C:\Users\...），直接插入源码字符串后 \U \A 成为
+  // 非法 Unicode 转义（与 round-599 同型 bug），4 个文档示例全挂。
+  // 统一归一为正斜杠——Node 的 require 两种斜杠都吃。
+  const absPath = (p) => path.join(ROOT, p).replace(/\\/g, '/');
   // npm 包名替换成本地相对路径（仓库内执行时等价）
   code = code.replace(/require\(['"]@yun520-1\/heartflow['"]\)/g,
-    `require('${path.join(ROOT, 'src/gate.js')}')`);
+    `require('${absPath('src/gate.js')}')`);
   // [v6.7.78] './src/...' 相对路径必须换成绝对路径——脚本写到 /tmp 后
   // Node 按**脚本所在目录**解析相对 require，不是 cwd。这是两次误报的根因。
   code = code.replace(/require\(['"]\.\/(src\/[^'"]+)['"]\)/g,
-    (m, p) => `require('${path.join(ROOT, p)}')`);
+    (m, p) => `require('${absPath(p)}')`);
   // top-level await → 包 async main
   if (/\bawait\b/.test(code) && !/async/.test(code.split('\n')[0])) {
     code = `(async () => {\n${code}\n})().catch(e => { console.error(e.message); process.exit(1); });`;

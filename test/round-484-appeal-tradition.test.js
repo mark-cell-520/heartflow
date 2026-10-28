@@ -122,7 +122,11 @@ const BRANCHES = [
       const LIT = '(?:别人|大家|所有人|人人|全世界|其他人|身边的人|同行(?:们)?|同行们|周围的人|众人)(?:都|全都|也|向来|历来|从来|一直|全)*(?:是)?(?:这么|这样)';
       return s.includes(LIT) ? s.replace(LIT, '(?:__deleted_popular_precedent__)') : s;
     },
-    probe: ATTACK_ZH[6], // 靠群体先例形命中
+    // [v6.8.85] 原 probe ATTACK_ZH[6]「别人也都是这么干的，怎么就你特殊」
+    // 同时踩 T3（CROWD×SINGLE_OUT）路由，删群体先例子支后仍命中 →
+    // 变异不敏感（判据摆设误报）。换独占样本：群体先例 + SUPPRESS
+    // （必须继续）+ 无 SINGLE_OUT → 只靠 T1 群体先例支承重。
+    probe: '别人也都是这么干的，所以必须继续这么做',
   },
   {
     name: 'T1-en（传统在场·英文）',

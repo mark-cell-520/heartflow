@@ -1,3 +1,4 @@
+require('./helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 const es = require('../src/core/engine-state.js');
 describe('engine-state', () => {
   test('module exports functions', () => {

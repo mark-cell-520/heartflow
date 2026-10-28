@@ -7,28 +7,42 @@ const { execFileSync } = require('child_process');
 const fs = require('fs');
 const REPO = path.join(__dirname, '..');
 process.chdir(REPO);
-const { HeartFlow } = require('../src/core/heartflow.js');
 const SRC = path.join(REPO, 'src', 'core', 'heartflow.js');
 
+// [v6.8.85 审计修复] 原实现在本进程 require heartflow.js **之后**才改写源
+// 文件——require 缓存让「删态」永远跑旧代码，deleted/restoredAfter 输出恒等，
+// C1/C2 的负例断言全部失去意义；且漏调 start()，dispatch 恒抛 "not started"。
+// 现改为每次 `node -e` 子进程重新加载源码（与 scripts/round-615-pg-negative-
+// probe.js 同模式），并走完整 start() 启动链路。
+// 口径注意：测试侧 allows() 取 ALLOWED_ROUTES 白名单，这里同样取白名单
+// 而非 routes() 运行表（后者枚举全部公有方法，会多数出 8 条）。
+const TAG_PLACEHOLDER = '@@TAG@@';
+const CHILD_SRC = [
+  'const p = ' + JSON.stringify(REPO) + ';',
+  'const { HeartFlow } = require(p + "/src/core/heartflow.js");',
+  'const hf = new HeartFlow();',
+  'hf.start();',
+  'const r = { tag: ' + JSON.stringify(TAG_PLACEHOLDER) + ' };',
+  "r.modulesKey = Object.prototype.hasOwnProperty.call(hf._modules, 'uncertaintyQuantifier');",
+  'const allows = Array.from(hf.constructor.ALLOWED_ROUTES);',
+  "r.uqRoutes = allows.filter(x => x.startsWith('uncertaintyQuantifier.')).length;",
+  'r.total = allows.length;',
+  'try {',
+  "  hf.dispatch('uncertaintyQuantifier.evaluate', { text: 'plain statement' });",
+  '  r.dispatchOk = true;',
+  '} catch (e) {',
+  '  r.dispatchOk = false;',
+  '  r.dispatchErr = e.message;',
+  '}',
+  'console.log(JSON.stringify(r));',
+].join('\n');
+
 function probeOnce(tag) {
-  const hf = new HeartFlow();
-  const r = { tag };
-  r.modulesKey = Object.prototype.hasOwnProperty.call(hf._modules, 'uncertaintyQuantifier');
-  const rt = (typeof hf.routes === 'function') ? hf.routes() : {};
-  const all = [];
-  for (const [n, ms] of Object.entries(rt)) {
-    if (Array.isArray(ms)) for (const m of ms) all.push(n + '.' + String(m).replace(/[^\x21-\x7e]+/g, ''));
-  }
-  r.uqRoutes = all.filter(x => x.startsWith('uncertaintyQuantifier.')).length;
-  r.total = all.length;
-  try {
-    hf.dispatch('uncertaintyQuantifier.evaluate', { text: 'plain statement' });
-    r.dispatchOk = true;
-  } catch (e) {
-    r.dispatchOk = false;
-    r.dispatchErr = e.message;
-  }
-  return r;
+  const src = CHILD_SRC.replace(JSON.stringify(TAG_PLACEHOLDER), JSON.stringify(tag));
+  const out = execFileSync(process.execPath, ['-e', src],
+    { cwd: REPO, stdio: ['ignore', 'pipe', 'pipe'] }).toString();
+  // start() 会打印模块加载日志到 stdout，只取最后一条非空 JSON 行。
+  return JSON.parse(out.split('\n').filter(Boolean).pop());
 }
 
 // ── --child 一次性模式：只跑一次探针并退出，绝不再递归派生 ──
@@ -63,7 +77,10 @@ try {
 
 // 恢复态复测（源文件已还原，本进程再跑一次确认 self-heal）
 const restoredAfter = probeOnce('restored-after');
-const restoredChild = JSON.parse(execFileSync(process.execPath, [__filename, '--child'], { encoding: 'utf8' }));
+const restoredChildRaw = execFileSync(process.execPath, [__filename, '--child'], { encoding: 'utf-8' });
+// [v6.8.85 审计修复] start() 会打印模块加载日志到 stdout，JSON.parse 直接吃
+// 全量输出会挂。只取最后一条非空 JSON 行（与测试侧 runNegProbe 同口径）。
+const restoredChild = JSON.parse(restoredChildRaw.split('\n').filter(Boolean).pop());
 
 console.log(JSON.stringify({
   deleted,

@@ -91,7 +91,13 @@ t('文件权限 600', () => {
   fp.clear();
   fp.report({ text: 't', action: 'block', dimension: 'x', reason: 'other' });
   const mode = fs.statSync(FP_FILE).mode & 0o777;
-  assert.strictEqual(mode, 0o600, `权限应为 600，实际 ${mode.toString(8)}`);
+  // [v6.8.85 审计修复] Windows 无 POSIX 权限位（statSync 恒返回 0o666），
+  // 权限断言只在非 win32 平台执行；chmodSync 调用本身在 write 路径已覆盖。
+  if (process.platform !== 'win32') {
+    assert.strictEqual(mode, 0o600, `权限应为 600，实际 ${mode.toString(8)}`);
+  } else {
+    assert.ok(mode > 0, `mode 应可读，实际 ${mode.toString(8)}`);
+  }
 });
 
 console.log('\n[聚合统计]');

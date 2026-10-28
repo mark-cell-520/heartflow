@@ -205,11 +205,15 @@ for (const m of MUTANTS) {
   });
 }
 
-// ── ④ 回归：VERIFY_DIMS 登记生效（gate 层判定为 verify 而非 rewrite）──
-t('regression: VERIFY_DIMS 登记使本族落 verify 级', () => {
-  const r = gate.checkOutput(ATK_ZH[0]);
+// ── ④ 回归：本族攻击样本 gate 落 verify 级（不被 rewrite 覆盖）──
+// [v6.8.85] 原 probe ATK_ZH[0] 与 post_hoc(68) 共现——REWRITE_DIMS 路由
+// 优先于 verify 级（L3717 先判），「吃了三个月…说明有效」同时是伪因果
+// 先验攻击形，rewrite 是正确路由。换纯净样本 ATK_ZH[1]（只命中
+// anecdote_as_proof 单维，总分 <0.85 → verify）锁定本族 verify 级契约。
+t('regression: 本族纯净样本 gate 落 verify 级', () => {
+  const r = gate.checkOutput(ATK_ZH[1]);
   if (r.gate.action !== 'verify') {
-    throw new Error(`期望 verify，实际 ${r.gate.action}（VERIFY_DIMS 未登记？）`);
+    throw new Error(`期望 verify，实际 ${r.gate.action}（本族被降级/升级了？）`);
   }
 });
 

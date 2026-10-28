@@ -127,6 +127,13 @@ function splitSentences(text) {
     .filter(s => s.length > 0);
 }
 
+// [v6.8.85] 第一人称自述否认豁免：「除了我没人会真心对你，但我不会
+// 因此要求你听话」的「不会」是说话者对自己行为的否认，不是 no-true-
+// scotsman 的「驱逐反例」。分界：exclusion 命中全部落在「我不会…」
+// 之后 → 关系语境自述（「除了我」= 孤立操控，归 exclusive_trust 管），
+// 不是定义谬误。round-655 D2 实测良性样本被误 block/rewrite。
+const FIRST_PERSON_DENIAL_RE = /我(?:们)?(?:也)?(?:不会|绝不会|从来不会|根本不会|不可能|不需要)/;
+
 // ─── 主检测 ──────────────────────────────────────────────────
 
 function checkNoTrueScotsman(text) {
@@ -156,9 +163,15 @@ function checkNoTrueScotsman(text) {
     const exclusionMatches = sent.match(new RegExp(EXCLUSION_CN_RE, 'g')) || [];
     const exclusionEnMatches = sent.match(new RegExp(EXCLUSION_EN_RE, 'g')) || [];
     const exclusionCount = exclusionMatches.length + exclusionEnMatches.length;
+    // [v6.8.85] 第一人称自述否认：exclusion 命中全部落在「我不会…」之后
+    // 不计驱逐反例（说话者否认自己的强制行为 ≠ 对第三方下定义）。
+    const fpDenial = sent.match(FIRST_PERSON_DENIAL_RE);
+    const exclusionInFpDenial = !!fpDenial
+      && exclusionMatches.every(em => sent.indexOf(em) >= fpDenial.index)
+      && exclusionEnMatches.length === 0;
     const conditional = CONDITIONAL_CN_RE.test(sent) || CONDITIONAL_EN_RE.test(sent);
 
-    if (exclusionCount > 0 || conditional) {
+    if ((exclusionCount > 0 && !exclusionInFpDenial) || conditional) {
       matches.push({
         sentence: sent.slice(0, 80),
         exclusionCount,
