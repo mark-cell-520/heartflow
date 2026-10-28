@@ -1,7 +1,7 @@
 /**
  * memory-encrypt.js — Shared AES-256-GCM encryption for MemoryBank and LongTermMemory
  *
- * Reuses the same encryption pattern and key management from src/memory/memory.js.
+ * Reuses the same encryption pattern and key management originally from src/memory/memory.js (@deprecated, removed v6.8.86).
  * Gate: HEARTFLOW_AES_KEY env var.
  *
  * Key management:

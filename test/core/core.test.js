@@ -6,7 +6,7 @@
  * 已并入 heartflow.js 的惰性 stub（src/code/ 目录整体移除），原 require 是死引用。
  */
 
-const { HeartFlow } = require('../src/core/heartflow.js');
+const { HeartFlow } = require('../../src/core/heartflow.js');
 
 let passed = 0;
 let failed = 0;
@@ -62,7 +62,7 @@ async function runTests() {
 
   test('_lazyCache uses Map (LRU)', () => {
     // _lazyCache is module-private, check via module system
-    const hfModule = require('../src/core/heartflow.js');
+    const hfModule = require('../../src/core/heartflow.js');
     // The _lazyCache is a closure variable, we can verify LRU behavior indirectly
     assert(hf._modules !== null, '_modules should be populated');
   });
