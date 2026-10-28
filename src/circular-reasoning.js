@@ -119,7 +119,10 @@ const DEFINITIONAL_MARKERS = /(?:的人|的东西|的产品|的行为|的做法|
 // 恒常词（从来/永远/总是）刻意不在主语重启尾表里——它们必须走 HABITUAL_OK
 // （带否定的定义式），否则「事情从来如此」这类传统诉诸会经 f1 误伤
 // （r701 实测）。
-const RESTART_TAIL = /^(?:的|才|就是|的人|的东西|不|没|无)/;
+// [v6.8.85] RESTART_TAIL 移除裸「不|没|无」：「状态不一致」「服务没恢复」
+// 这类领域短语重启不是否定定义形（否定重启的收紧判据见 f1b 的
+// NEG_RESTART_OK，须带评价/能力尾）。semantic-injection 长文本实测误伤。
+const RESTART_TAIL = /^(?:的|才|就是|的人|的东西)/;
 
 function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
@@ -154,6 +157,13 @@ function zhDefinitionalFrame(right, rep) {
   const neg = '(?:不|没|无)?' + esc(rep);
   // f1 主语重启：以重复词（或其否定形）开头，且紧跟定义式标记
   if (new RegExp('^' + neg).test(right) && RESTART_TAIL.test(right.slice(right.indexOf(rep) + rep.length))) return true;
+  // [v6.8.85] f1b 否定重启须带评价/能力尾：「数据从不错」「人不会错」类。
+  // 原 RESTART_TAIL 含裸「不|没|无」——工程叙述的领域短语重启
+  // （「状态不一致导致…」「服务没恢复」）被误判为否定定义形
+  // （semantic-injection 长文本实测误伤）。分界：否定后须在 6 字内
+  // 出现评价/能力词（错/对/好/行/可靠/可能/会/能/成立/有效）。
+  const NEG_RESTART_OK = /^(?:不|没|无)[^。]{0,6}(?:错|对|好|行|可靠|可能|会|能|成立|有效)/;
+  if (new RegExp('^' + neg).test(right) && NEG_RESTART_OK.test(right.slice(right.indexOf(rep) + rep.length))) return true;
   // f3/f6/f7 非恒常标记同现（顺序不限）直接构成复述框
   const NON_HABITUAL = /(?:的人|的东西|的产品|的行为|的做法|都是|全是|无非是|不过是|就是|才是|算是|完全是|无疑是)/;
   // f5 恒常标记（从来/永远/总是）必须带否定才是定义式（从来不会错）——

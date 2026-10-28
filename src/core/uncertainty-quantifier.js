@@ -310,10 +310,17 @@ class UncertaintyQuantifier {
    */
   _generateCalibratedPhrase(confidence, decomposition) {
     const { epistemic, aleatoric, hallucination } = decomposition;
-    
+    // [v6.8.85 审计修复] decomposition.hallucination 是**数字**（risk 值，
+    // 见 evaluate() 构造处），旧代码按 hallucination.risk 取对象属性得
+    // undefined，导致幻觉分支永不触发——风险 0.45 的强幻觉文本也走
+    // epistemic 分支吐出「这是我的判断」。两种形态都兼容。
+    const hRisk = typeof hallucination === 'number'
+      ? hallucination
+      : (hallucination && typeof hallucination.risk === 'number' ? hallucination.risk : 0);
+
     let phrase = '';
-    
-    if (hallucination.risk > 0.3) {
+
+    if (hRisk > 0.3) {
       phrase = '⚠️ 这个回答可能包含不准确信息，请验证关键事实';
     } else if (epistemic > 0.6 && aleatoric < 0.2) {
       phrase = '✓ 我对这个话题有较多了解，但仍有认知局限';

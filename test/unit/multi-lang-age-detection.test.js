@@ -1,3 +1,4 @@
+require('../helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 /**
  * Multi-Language Age Detection Tests
  * Tests current implementation and validates what WOULD work with enhancements

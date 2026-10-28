@@ -39,12 +39,12 @@ const newIdx = [];
 const redundantLines = new Set();
 for (let i = 0; i < lines.length; i++) {
   const L = lines[i];
-  if (!/\{ pattern: /.test(L)) continue;
+  if (!/\{ pattern: /.test(L) && !/^\s*\/[^/\s]/.test(L)) continue;
   if (L.includes("type: 'expulsion_call'")) {
     // 第二支删红样本被第一/第三支同样覆盖（实测），标为冗余
     newIdx.push({ i, redundant: L.includes('(?:族群|外地人|这种人|这类人)[^。，]{0,16}') });
   } else if (
-    /unwanted\\\|surplus\\\|excess\\\|redundant\\\|extra\)/.test(L) ||
+    /(?:unwanted|surplus|excess|redundant|extra)\|/.test(L) ||
     L.includes('surplus material')
   ) newIdx.push({ i, redundant: false });
 }

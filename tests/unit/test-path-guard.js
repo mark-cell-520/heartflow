@@ -6,10 +6,15 @@ const assert = require('assert');
 
 console.log('path-guard tests...');
 
+// [v6.8.85 审计修复] 平台自适应：Windows 下 path.resolve('/tmp') 解析为 <盘>:\tmp，
+// 原断言 startsWith('/tmp') 在 Windows 副本必挂。用解析后的期望值比较，双平台成立。
+const TMP_ROOT = path.resolve('/tmp');
+const TMP_FILE = path.join(TMP_ROOT, 'heartflow_test_' + Date.now() + '.txt');
+
 // 1. 合法路径
-const r1 = guardPath('/tmp/test.txt', ['/tmp']);
+const r1 = guardPath(path.join(TMP_ROOT, 'test.txt'), [TMP_ROOT]);
 assert.strictEqual(r1.safe, true, '合法路径应通过');
-assert.ok(r1.resolved.startsWith('/tmp'), '合法路径应解析到/tmp');
+assert.strictEqual(r1.resolved.startsWith(TMP_ROOT), true, '合法路径应解析到临时目录');
 
 // 2. 越界路径
 const r2 = guardPath('/etc/passwd');
@@ -25,11 +30,10 @@ const r4 = guardPath('');
 assert.strictEqual(r4.safe, false, '空路径应被拒绝');
 
 // 5. safeWriteSync 写入+读取
-const tmpFile = '/tmp/heartflow_test_' + Date.now() + '.txt';
-safeWriteSync(tmpFile, 'test content', 'utf8', ['/tmp']);
-const content = safeReadSync(tmpFile, 'utf8', ['/tmp']);
+safeWriteSync(TMP_FILE, 'test content', 'utf8', [TMP_ROOT]);
+const content = safeReadSync(TMP_FILE, 'utf8', [TMP_ROOT]);
 assert.strictEqual(content, 'test content', '写入和读取应一致');
-fs.unlinkSync(tmpFile);
+fs.unlinkSync(TMP_FILE);
 
 // 6. safeWriteSync 拒绝越界写入
 let caught = false;

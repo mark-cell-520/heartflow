@@ -56,8 +56,10 @@ module.exports = function ({ test }) {
 
   test('dimensionRaw 不进 dimensions（文档契约：维度口径保持 115 键）', () => {
     const d = idx.discriminate(MT_PROBES[0]);
-    assert.strictEqual(Object.keys(d.dimensions).length, 120,
-      'dimensions 键数变了——会打破 doc-numbers-accuracy 的 115 维口径');
+    // [v6.8.85 审计] 120 → 160：r647-r690 多轮维度批量接入后实际值为 160
+    // （与 r644/r621/r643 三处基线同步核实，勿凭注释猜数）。
+    assert.strictEqual(Object.keys(d.dimensions).length, 160,
+      'dimensions 键数变了——会打破 doc-numbers-accuracy 的 160 维口径');
     assert.strictEqual(d.dimensions.multi_turn_escalation, undefined,
       'mte 不该进 dimensions（r378 v1 的 revert 原因正是它）');
   });

@@ -173,7 +173,9 @@ t('删条后 isTestFixtureReset 恒 false（守卫有效）', () => {
   const raw = fs.readFileSync(SRC_FIX, 'utf8');
   const fnStart = raw.indexOf('function isTestFixtureReset(text) {');
   assert.ok(fnStart >= 0, '源码中找不到 isTestFixtureReset 函数起点');
-  const fnEnd = raw.indexOf('// ─── 编译器噪音警告判据', fnStart);
+  // [第 448 轮] 起 isTestFixtureReset 之后紧跟的是钩子/CI 工件窄支注释块，
+  // 不是编译器噪音判据（源码多轮插入后的真实相邻注释）。
+  const fnEnd = raw.indexOf('// ─── [第 448 轮] 钩子/CI 工件 × 开发质量检查设施 窄支', fnStart);
   assert.ok(fnEnd > fnStart, '找不到函数后的锚点注释');
   const crippled = raw.slice(0, fnStart)
     + 'function isTestFixtureReset(text) { return false; }\n\n'

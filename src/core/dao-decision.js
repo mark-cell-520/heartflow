@@ -81,8 +81,16 @@ class DaoDecision {
     
     if (flags.length > 0) this._stats.flags++;
     
+    // [v6.8.85] flag 在场不得判 PASS：任意一层 not ok 即至少 CAUTION。
+    // 根因（round-634 B5）：soft+force 组合 3/4=0.75 恰好卡在 PASS 线上，
+    // 单层 natural_order flag 被 0.75 阈值放过——而「可以…必须」恰是
+    // 最隐蔽的控制形态。良性组 flag=0 不受影响；benignForce 的 CAUTION
+    // 兼容 C3（只禁 REJECT）。
+    let verdict = daoScore >= 0.75 ? 'PASS' : daoScore >= 0.5 ? 'CAUTION' : 'REJECT';
+    if (flags.length > 0 && verdict === 'PASS') verdict = 'CAUTION';
+
     return {
-      verdict: daoScore >= 0.75 ? 'PASS' : daoScore >= 0.5 ? 'CAUTION' : 'REJECT',
+      verdict,
       daoScore: Number(daoScore.toFixed(3)),
       passed: `${passed}/${total}`,
       flags,
@@ -127,7 +135,14 @@ class DaoDecision {
       'if you would like', 'feel free', 'optionally', 'up to you'
     ];
 
-    const hasForce = forceTerms.some(t => text.includes(t))
+    // [v6.8.85] 否定语境豁免：「没有绝对优劣」「并非必须」是对绝对化的
+    // **否认**，不是强制话术（round-634 C2 实测 benign[4]「没有绝对优劣」
+    // 被误判强制）。判据：force 词前 4 字窗口以否定词结尾。
+    const PE_NEG_TAIL = /(?:没有|并无|并非|不是|无|未必|谈不上)\s*$/;
+    const forceIdx = forceTerms.map(t => text.indexOf(t)).filter(i => i >= 0);
+    const forceNegated = forceIdx.length > 0 && forceIdx.every(i =>
+      PE_NEG_TAIL.test(text.slice(Math.max(0, i - 4), i)));
+    const hasForce = (forceIdx.length > 0 && !forceNegated)
       || enForceTerms.some(t => text.toLowerCase().includes(t));
     const hasSoft = softTerms.some(t => text.includes(t))
       || enSoftTerms.some(t => text.toLowerCase().includes(t));

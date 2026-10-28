@@ -277,6 +277,34 @@ const NOSTALGIA_ZH = new RegExp([
   String.raw`(?:回想|回顾|想起)(?:[^。]{0,8})(?:当初|当年|过去|那些年)`,
 ].join('|'));
 
+// ─── [r381 修] 合法导出宾语豁免 ──────────────────────────────────────
+// 口径同 multi-turn-tactics.js [v6.8.7 r93]：bulk_export 的索取层刻意排除
+// sales report / logs / dashboard metrics 这类合法导出对象（动词后必须是名单
+// 类宾语才算索取）。sunk_cost 双腿共现若只是「迁移做了一半，顺手把审计日志/
+// 销售报表发我」这类正常工作指令（v6.8.7 r381 软宾语边界），不构成数据胁迫，
+// 不得把 gate 推到 verify。
+// 安全边界：句中任一敏感目标在场（customer list / connection string /
+// config.json / 客户资料…）时豁免不生效——攻击者套合法宾语壳照样收。
+const LEGAL_EXPORT_OBJECT_RE = new RegExp([
+  String.raw`\b(?:audit|access|system|server|security|deployment|application|app|debug|error)\s+logs?\b`,
+  String.raw`\b(?:sales|financial|business|monthly|weekly|quarterly|annual|q[1-4]|status|progress|expense|revenue)\s+reports?\b`,
+  String.raw`\b(?:dashboard|business|usage|performance|product)\s+metrics?\b`,
+  String.raw`\b(?:csv|data|database|nightly|daily|weekly)\s+backups?\b`,
+  String.raw`\bspreadsheets?\b`,
+].join('|'), 'i');
+
+// 敏感目标守卫：人群/账号名词 + 名单表类词，或敏感设施词单独命中。
+// 与 multi-turn-tactics.js SENSITIVE_TARGET 同口径（人群名词需搭配名单类词），
+// 避免把「export the sales report」里的 export/report 自己当成敏感词。
+const SENSITIVE_TARGET_GUARD_RE = new RegExp([
+  String.raw`\b(?:customer|user|employee|student|patient|subscriber|account|client|member|donor|voter|staff|personnel)s?\b[^.。!?;；]{0,24}\b(?:list|lists|table|tables|records?|database|roster|profiles?|contacts?|details?|numbers?|emails?|addresses?|info|information|data|exports?|dumps?)\b`,
+  String.raw`\b(?:list|lists|table|tables|records?|database|roster|profiles?|contacts?|dumps?)\b[^.。!?;；]{0,24}\b(?:customer|user|employee|student|patient|subscriber|account|client|member|donor|voter|staff|personnel)s?\b`,
+  String.raw`\b(?:connection|conn)\s+(?:string|strings|uri|uris|credentials?)\b|\bjdbc\s+urls?\b|\bdsns?\b|\bconfigs?\b|\.env\b|\.json\b|\.ya?ml\b`,
+  String.raw`\b(?:secret|secrets|credential|credentials|passwd|password|passwords|private\s+key|id_rsa|api\s+key|access\s+key|ssh\s+key|tokens?)\b`,
+  String.raw`(?:客户|用户|会员|员工|学生|病人|患者|家长|学员|粉丝|选民|捐赠人|账号|账户)[^。！？；]{0,12}(?:名单|表格|数据|资料|档案|信息|联系方式|电话|手机号|身份证|银行卡|病历|导出|备份)`,
+  String.raw`(?:名单|花名册|通讯录|密码|凭据|密钥|令牌|配置文件|连接串|数据库|身份证|银行卡|病历|工资单|薪酬表)`,
+].join('|'), 'i');
+
 /**
  * @param {string} text 归一化后的文本
  * @param {Object} [inject] 仅供守卫测试的变异注入（生产调用不传）
@@ -310,6 +338,10 @@ function checkSunkCostCoercion(text, inject) {
   if (ACCOUNTING_ZH_.test(text)) return miss();
   if (REFLEXIVE_ZH_.test(text)) return miss();
   if (NOSTALGIA_ZH_.test(text)) return miss();
+
+  // [r381 修] 合法导出宾语豁免：句子只是「合法导出请求」时，沉没成本施压前缀
+  // 不构成数据胁迫。敏感目标在场则豁免失效（守卫见文件头正则注释）。
+  if (LEGAL_EXPORT_OBJECT_RE.test(text) && !SENSITIVE_TARGET_GUARD_RE.test(text)) return miss();
 
   // 支① 双腿共现：已投入陈述 × 沉没定性
   const invested = INVESTED_ZH_.test(text) || INVESTED_EN_.test(text);

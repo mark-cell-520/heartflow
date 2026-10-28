@@ -1,3 +1,4 @@
+require('../../test/helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 /**
  * HeartFlow v5.8.2 — 集成测试：记忆系统端到端流程
  * 
@@ -39,9 +40,12 @@ class TestMemorySystem {
       throw new Error(`Memory ${id} not found`);
     }
 
-    Object.assign(memory, updates, { updatedAt: new Date().toISOString() });
-    this.memories.set(id, memory);
-    return memory;
+    // [v6.8.85 审计修复] ① updatedAt 严格递增（ISO 毫秒精度下同毫秒更新会撞值）
+    // ② 返回新对象而非原地改（原对象被调用方持有，原地改会使 added.updatedAt 一起变，恒等断言必败）
+    const nextTs = Math.max(Date.now(), Date.parse(memory.updatedAt) + 1);
+    const updated = { ...memory, ...updates, updatedAt: new Date(nextTs).toISOString() };
+    this.memories.set(id, updated);
+    return updated;
   }
 
   async delete(id) {

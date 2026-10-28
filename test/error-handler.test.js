@@ -1,3 +1,4 @@
+require('./helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 const eh = require('../src/core/error-handler.js');
 describe('error-handler', () => {
   test('exports errors array and maxHistory', () => {

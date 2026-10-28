@@ -1,3 +1,4 @@
+require('../test/helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 /**
  * Task A: Decision Routing Boundary Tests (FIXED)
  * ✅ Tests actual DecisionRouter behavior with field dynamics

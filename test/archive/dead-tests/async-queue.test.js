@@ -1,3 +1,4 @@
+require('../../test/helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 /**
  * HeartFlow v5.8.2 — 单元测试：异步队列
  * 

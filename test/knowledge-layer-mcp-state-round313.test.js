@@ -36,14 +36,16 @@ function rpcOnce(sock, body) {
   });
 }
 
+// [v6.8.85 审计修复] Windows 无 Unix domain socket（listen EACCES），改用命名管道
 async function startServer(sock) {
-  if (fs.existsSync(sock)) fs.unlinkSync(sock);
+  const isWin = process.platform === 'win32';
+  if (!isWin && fs.existsSync(sock)) fs.unlinkSync(sock);
   const proc = spawn(process.execPath, [SERVER, '--socket', sock], {
     cwd: ROOT, stdio: ['ignore', 'ignore', 'ignore'],
   });
   for (let i = 0; i < 60; i++) {
     await sleep(500);
-    if (!fs.existsSync(sock)) continue;
+    if (!isWin && !fs.existsSync(sock)) continue;
     try {
       const r = await rpcOnce(sock, { jsonrpc: '2.0', id: 0, method: 'tools/list' });
       if (r && r.result) return proc;
@@ -65,7 +67,9 @@ function textOf(resp) {
 }
 
 (async () => {
-  const SOCK = '/tmp/r313-kl-guard.sock';
+  const SOCK = process.platform === 'win32'
+    ? `\\\\.\\pipe\\r313-kl-guard`
+    : '/tmp/r313-kl-guard.sock';
   let proc;
   try {
     proc = await startServer(SOCK);

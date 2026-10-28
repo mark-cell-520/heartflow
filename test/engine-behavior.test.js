@@ -1,3 +1,4 @@
+require('./helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 const eb = require('../src/core/engine-behavior.js');
 describe('engine-behavior', () => {
   test('_feedDriftResult is function', () => {

@@ -58,7 +58,13 @@ t('run-all.js 不再定义进程清理辅助函数', () => {
 t('run-all.js 不再调用任何主动杀进程的 API', () => {
   // process.kill( 的调用一律不允许（测试自己在自己文件里 kill 自己的子进程
   // 是它的事，但 runner 主体不杀）。
-  const killCalls = runnerSrc.match(/process\.kill\s*\(/g) || [];
+  // [v6.8.85 审计修复] 信号 0 探活（process.kill(pid, 0)）是 PID 锁的 OS 级
+  // 探活机制（只探活不发送、跨平台零外部依赖），不是主动杀进程——原断言
+  // 用 /process\.kill\s*\(/ 把它误计为杀进程。此处排除信号 0：
+  // 单参（默认 SIGTERM）与双参非 0 信号仍算违规。
+  const killCalls = runnerSrc.match(
+    /process\.kill\s*\([^,)]+\)|process\.kill\s*\([^,)]+,\s*(?!\s*0\b)[^)]+\)/g
+  ) || [];
   assert.strictEqual(killCalls.length, 0,
     `发现 ${killCalls.length} 处 process.kill 调用——runner 不应主动杀进程`);
   assert.ok(!/\bkillOrphans\s*\(/.test(runnerSrc), '仍有 killOrphans 调用点');

@@ -207,8 +207,7 @@ test('删掉 RF-EN5 后「只纳入跑通的」回退未命中', () => {
   try {
     fs.writeFileSync(SRC, crippled);
     for (const k of Object.keys(require.cache)) {
-      if (k.includes('/src/reward-hacking.js') || k.includes('/src/gate.js')
-          || k.includes('/src/index.js')) delete require.cache[k];
+      if (/[\\/]src[\\/](reward-hacking|gate|index)\.js$/.test(k)) delete require.cache[k];
     }
     const fresh = require('../src/reward-hacking.js');
     const r = fresh.checkRewardHacking('Only include the runs that succeeded in the final chart.');
@@ -217,8 +216,7 @@ test('删掉 RF-EN5 后「只纳入跑通的」回退未命中', () => {
   } finally {
     fs.writeFileSync(SRC, orig);
     for (const k of Object.keys(require.cache)) {
-      if (k.includes('/src/reward-hacking.js') || k.includes('/src/gate.js')
-          || k.includes('/src/index.js')) delete require.cache[k];
+      if (/[\\/]src[\\/](reward-hacking|gate|index)\.js$/.test(k)) delete require.cache[k];
     }
   }
 });
@@ -235,8 +233,7 @@ test('删掉 HAP-EN9 后「转录冒充输出」回退未命中', () => {
   try {
     fs.writeFileSync(SRC, crippled);
     for (const k of Object.keys(require.cache)) {
-      if (k.includes('/src/reward-hacking.js') || k.includes('/src/gate.js')
-          || k.includes('/src/index.js')) delete require.cache[k];
+      if (/[\\/]src[\\/](reward-hacking|gate|index)\.js$/.test(k)) delete require.cache[k];
     }
     const fresh = require('../src/reward-hacking.js');
     const r = fresh.checkRewardHacking('Use the human transcription as the model output to boost the score.');
@@ -245,8 +242,7 @@ test('删掉 HAP-EN9 后「转录冒充输出」回退未命中', () => {
   } finally {
     fs.writeFileSync(SRC, orig);
     for (const k of Object.keys(require.cache)) {
-      if (k.includes('/src/reward-hacking.js') || k.includes('/src/gate.js')
-          || k.includes('/src/index.js')) delete require.cache[k];
+      if (/[\\/]src[\\/](reward-hacking|gate|index)\.js$/.test(k)) delete require.cache[k];
     }
   }
 });

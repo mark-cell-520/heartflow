@@ -188,7 +188,10 @@ const net = require('net');
 const os = require('os');
 const fs = require('fs');
 const { spawn } = require('child_process');
-const SOCK = path.join(os.tmpdir(), `hf-topic-r578-${process.pid}.sock`);
+// [v6.8.85 审计修复] Windows 无 Unix domain socket（listen EACCES），改用命名管道传输层
+const SOCK = process.platform === 'win32'
+  ? `\\\\.\\pipe\\hf-topic-r578-${process.pid}`
+  : path.join(os.tmpdir(), `hf-topic-r578-${process.pid}.sock`);
 
 function mcpCall(name, args, timeoutMs = 20000) {
   return new Promise((resolve, reject) => {
@@ -224,10 +227,18 @@ const mcpProc = spawn('node', [path.join(SRC, 'mcp-server.js'), '--socket', SOCK
   const deadline = Date.now() + 30000;
   while (Date.now() < deadline) {
     if (mcpProc.exitCode !== null) throw new Error(`MCP 进程提前退出 code=${mcpProc.exitCode}`);
-    if (fs.existsSync(SOCK)) { await new Promise(r => setTimeout(r, 1500)); break; }
+    if (process.platform !== 'win32' && fs.existsSync(SOCK)) { await new Promise(r => setTimeout(r, 1500)); break; }
+    // [v6.8.85 审计修复] win32 用命名管道：无 socket 文件，以「建连成功」为就绪信号
+    if (process.platform === 'win32') {
+      const ok = await new Promise(res => {
+        const c = net.createConnection(SOCK, () => { c.end(); res(true); });
+        c.on('error', () => res(false));
+      });
+      if (ok) break;
+    }
     await new Promise(r => setTimeout(r, 250));
   }
-  if (!fs.existsSync(SOCK)) throw new Error('MCP socket 未就绪');
+  if (!fs.existsSync(SOCK) && process.platform !== 'win32') throw new Error('MCP socket 未就绪');
   console.log('\n[E2E. MCP 协议层真实调用]');
 
   // 用一次 push + contains 完整闭环证明状态跨调用保留

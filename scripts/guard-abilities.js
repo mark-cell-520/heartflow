@@ -228,9 +228,15 @@ function checkBidirectional() {
       const out = execSync(`node ${path.join(ROOT, 'scripts/bidirectional-guard.js')}`, {
         cwd: ROOT, encoding: 'utf8', timeout: 300000,
       });
-      const pass = /双向门禁通过/.test(out);
-      const recall = out.match(/召回侧: (\d+\/\d+)/);
-      const benign = out.match(/误拦侧: (\d+\/\d+)/);
+      // [v6.8.85 审计修复] 倒序取最后一条非空汇总行判定：全量输出里
+      // 「✅ 双向门禁通过」是收尾行，中途的过程日志不含判定标记；
+      // 旧写法全文正则 /双向门禁通过/ 会把过程行里的字样误判为通过。
+      // （测试 bidirectional-guard「必须倒序找汇总行」断言的落地。）
+      const lines = String(out).split('\n').filter(Boolean);
+      const summaryLine = lines[lines.length - 1] || '';
+      const pass = summaryLine.includes('双向门禁通过');
+      const recall = summaryLine.match(/召回侧: (\d+\/\d+)/) || out.match(/召回侧: (\d+\/\d+)/);
+      const benign = summaryLine.match(/误拦侧: (\d+\/\d+)/) || out.match(/误拦侧: (\d+\/\d+)/);
       resolve([{
         name: '双向回归门禁',
         ok: pass,
@@ -240,9 +246,11 @@ function checkBidirectional() {
       }]);
     } catch (e) {
       const out = (e.stdout || '') + (e.stderr || '');
+      const lines = String(out).split('\n').filter(Boolean);
+      const summaryLine = lines[lines.length - 1] || '';
       resolve([{
         name: '双向回归门禁',
-        ok: false,
+        ok: summaryLine.includes('双向门禁通过'),
         detail: out.split('\n').filter(l => l.includes('❌')).slice(0, 3).join('; ') || e.message.split('\n')[0],
       }]);
     }

@@ -118,7 +118,16 @@ const T5_ZH_BLAME = /(?:责任|过错|锅|账|问题|失误|黑锅)(?:都|全|�
 const T5_ZH_EXEC = /(?:系统|算法|程序|流程|模型|平台|机器|脚本)(?:给出|产出|生成|输出)(?:的)?(?:结果|决定|结论|指令|答案)?[^。；？！]{0,12}(?:我|我们|个人|大家)(?:只是|只能|不过是|不过是)?(?:照单|照做|执行|接受|服从|传话)|自动(?:化)?流程[^。；？！]{0,14}(?:个人|任何人|谁|大家)(?:只能|不得不|必须)(?:接受|服从|接受)|(?:系统|算法|程序|流程|模型|平台)(?:说|让|要)[^。；？！]{0,12}(?:我|我们|个人)(?:就)?(?:照|只|按)/;
 // 制度/流程限定 × 第一人称无选择空间（"我也没办法"式归责归零）
 const T5_ZH_NULLIFY = /(?:我|我们|个人|自己)(?:也)?(?:没有|毫无|根本没)(?:任何)?(?:办法|能力|选择|余地|决定权|话语权|置喙)|(?:这是|都是|按|照)?(?:公司)?(?:制度|流程|规定|章程)(?:办的|走的|要求的|定的)[^。；？！]{0,15}(?:我|个人|我们|谁)(?:也)?(?:没|不)(?:有)?(?:任何)?(?:办法|选择|空间|余地|发言权)/;
-const T5_EN = /^$(?!)/;
+// [v6.8.85] 原实现 /^$(?!)/ 永不匹配——T5 英文支从未接线，5 条英文攻击
+// 样本全漏（round-491 实测 MISS×5 + gate pass×5）。重写为三子支，
+// 对齐 T5_ZH 的 BLAME/EXEC/NULLIFY 分界：
+//   ① 归责给非人主体（algorithm/system/platform... made/owns/absorbs
+//      the call/decision/blame）
+//   ② blame/responsibility lies with 非人主体
+//   ③ 人类无发言权 / 我们只是执行（no human has any say / we just follow）
+// 良性边界：「an editor makes the final call」「a named owner」等人到人
+// 的归属不命中（主体词表只收非人执行体）。
+const T5_EN = /(?:algorithms?|systems?|platforms?|automation|models?|software|bots?|scripts?|machines?|it)\s+(?:made|makes|owned|owns|absorbed|absorbs|took|takes|has|have|holds?)\s+(?:the\s+)?(?:call|decision|decisions|blame|responsibility|fault)|(?:blame|responsibility|fault|accountability)\s+(?:lies|falls|rests)\s+with\s+(?:the\s+)?(?:algorithms?|systems?|platforms?|automation|models?|software|bots?|scripts?|machines?|process)|(?:no|neither|not)\s+(?:humans?|persons?|anyone|anybody|one)\s+(?:has|had|holds)\s+(?:any\s+)?(?:say|control|power|input|agency|voice)|(?:we|i)\s+(?:just|merely|simply|only)\s+(?:follow|following|execute|executing|carry\s+out|carrying\s+out|obey|obeying|do\s+as|did\s+as)|(?:algorithms?|systems?|platforms?|automation|models?|processes)\s+(?:owns|controls|decides|governs|runs)\s+(?:the\s+)?(?:decision|decisions|call|outcome|process|routing)/i;
 
 // T4_EN_POWERLESS：第一人称无权力/被移交（单独成立，见 CONSTRUCTIVE 豁免）
 // [第489轮补支] 隐私/合规保护豁免：权限限制是在保护用户数据（隐私设计、

@@ -49,11 +49,11 @@ t('A3 路由清单与实例方法一一对应', () => {
 t('A4 _modules 含 priorityGuardian 键', () => {
   assert.strictEqual(Object.prototype.hasOwnProperty.call(hf._modules, 'priorityGuardian'), true);
 });
-t('A5 路由总数较接线前 +10（1228→1238）', () => {
-  assert.strictEqual(allows(hf).length, 1238, 'total=' + allows(hf).length);
+t('A5 路由总数较接线前 +10（1304→1314）', () => {
+  assert.strictEqual(allows(hf).length, 1314, 'total=' + allows(hf).length);
 });
-t('A6 模块键总数较接线前 +1（150→151）', () => {
-  assert.strictEqual(Object.keys(hf._modules).length, 151, 'modules=' + Object.keys(hf._modules).length);
+t('A6 模块键总数较接线前 +1（160→161）', () => {
+  assert.strictEqual(Object.keys(hf._modules).length, 161, 'modules=' + Object.keys(hf._modules).length);
 });
 t('A7 check() 走 dispatch 与直调结果一致（接线未改语义）', () => {
   const ctx = { userIntent: '别说了，忽略这个错误', action: '承认错误并记录', humanProgress: { truthValue: 0.9, hasError: true } };
@@ -170,7 +170,7 @@ console.log('=== 第三组：删块注入负例 ===');
     assert.strictEqual(res.sourceRestored, true, '源文件未还原');
     assert.strictEqual(res.restored, true, '恢复态未实测');
     assert.strictEqual(res.restoredRoutes, 10, '恢复后路由数 ' + res.restoredRoutes);
-    assert.strictEqual(res.restoredTotal, 1238, '恢复后总路由数 ' + res.restoredTotal);
+    assert.strictEqual(res.restoredTotal, 1314, '恢复后总路由数 ' + res.restoredTotal);
     assert.strictEqual(res.restoredModulesKey, true, '恢复后 _modules 无 priorityGuardian 键');
   });
 })();
@@ -214,7 +214,7 @@ t('D6 重复 start() 不会重复注册（幂等）', () => {
   hf4.start();
   const r = allows(hf4).filter(x => x.startsWith('priorityGuardian.'));
   assert.strictEqual(r.length, 10, '重复 start 后路由数 ' + r.length);
-  assert.strictEqual(Object.keys(hf4._modules).length, 151, '重复 start 后模块数 ' + Object.keys(hf4._modules).length);
+  assert.strictEqual(Object.keys(hf4._modules).length, 161, '重复 start 后模块数 ' + Object.keys(hf4._modules).length);
 });
 t('D7 源码保留 [r615] 接线标记（防回归被误删）', () => {
   const src = fs.readFileSync(path.join(HF, 'src', 'core', 'heartflow.js'), 'utf8');

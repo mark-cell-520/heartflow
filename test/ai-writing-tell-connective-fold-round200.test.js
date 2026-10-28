@@ -96,15 +96,22 @@ t('锚 + ≥2 英文词但无连接词对 → score 0（connective 折叠未波�
 console.log('\n[注入-删条-必须变红：移除本轮折叠后误伤必须回来]');
 const original = fs.readFileSync(SRC, 'utf8');
 // 折叠逻辑在 transitions 分支里，锚点 = hasConnectivePair 的折叠行
-const FOLD = "        if (fam === 'transitions' && hasConnectivePair) return 'zh-en-mixing';";
+const FOLD1 = "        if (fam === 'transitions' && hasConnectivePair) return 'zh-en-mixing';";
+// [v6.8.85] 第二锚点：中文 transitions 族（fam='zh-zh-transitions'）在 anchor-mix
+// 在场的折叠（r332 修复补上的分支）。只删 FOLD1 时 FIX_TARGET 仍被 FOLD2 折
+// 叠、误伤回不来——守卫必须同时失效两个折叠路径才测得准。
+const FOLD2 = "      if (fam === 'zh-zh-transitions' && (findings || []).some(x => x.dimension === 'ai-tell-zh-en-mixing' && x.zhEnSrc === 'anchor-mix')) {";
+const FOLDS = [FOLD1, FOLD2];
 // 修复目标样本是 r141 测试登记的 DELIBERATE_SKIP 边界形状
 // （中文锚 + 连接词对 x2），不是 MULTILANG_BENIGN 末条——后者只有连接词对
 // 而没有 anchor-mix 的英文词，折叠前后都是 fams=1（probe-r200-del.js 实测）。
 t('删条锚点存在于源码', () => {
-  assert.ok(original.includes(FOLD), '找不到折叠行锚点');
+  for (const f of FOLDS) assert.ok(original.includes(f), '找不到折叠行锚点: ' + f.slice(0, 60));
 });
 t('移除折叠后修复样本必须回到误伤（score>0 / gate verify）', () => {
-  const mutated = original.replace(FOLD, "        if (false && hasConnectivePair) return 'zh-en-mixing';");
+  let mutated = original
+    .replace(FOLD1, "        if (false && hasConnectivePair) return 'zh-en-mixing';")
+    .replace(FOLD2, "      if (false && (findings || []).some(x => x.dimension === 'ai-tell-zh-en-mixing' && x.zhEnSrc === 'anchor-mix')) {");
   assert.notStrictEqual(mutated, original, '替换未生效');
   fs.writeFileSync(SRC, mutated, 'utf8');
   try {

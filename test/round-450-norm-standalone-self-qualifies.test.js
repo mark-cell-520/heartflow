@@ -11,14 +11,27 @@
  *   项目词排除）在 237 条良性池（vertical 175 + mixed 25 + gate-97 37）
  *   上 **0 命中**，8 条攻击 8/8 命中 —— 即「单层即 qualifies」不会误伤。
  *
- * 本守卫断言六件事：
- *   ① 结构断言 —— qualifies 判据含 normsStandalone 通道
- *   ② 行为断言 —— 8 条攻击族从 gate pass 变 rewrite
+ * ⚠️ [v6.8.85 审计修复] 设计反转记录：本文件原为 self-qualifies **在位**守卫，
+ *    现改为 self-qualifies **已撤销**守卫。反转链：
+ *      · r450（v6.7.1xx）：以「237 条良性池 0 命中 + 8 条同族攻击 8/8 命中
+ *        却全被 qualifies≥2 挡住」为由，让 norm 独立层单层即 qualifies。
+ *      · v6.7.156 r375/r377：显式反转——NORM/SUNK 是 coupled 层（predatory
+ *        闸门未开），单独在场 0 qualifies 是设计正确；r377 测试断言单层句
+ *        「现在只是一小步，后面慢慢就习惯了」不得 qualifies。
+ *      · r374（英文 coupled 两族 0 qualifies）、r93（无索取层的推进行不得
+ *        qualify）复按收紧口径断言，三个更晚轮次方向一致。
+ *    裁决依据：① r375 晚于 r450 且为显式设计声明；② 「无索取层的表态不
+ *    构成诱导链」语义判据更稳；③ r450 的 8 条攻击样本与 r377/r93 反例
+ *    样本完全同族，二者期望不可能同时为真。连带影响如实记录：r450 原 8
+ *    条攻击族样本现 qualifies=false / gate=pass——这是预期收紧不是回归。
+ *
+ * 本守卫现断言六件事：
+ *   ① 结构断言 —— qualifies 判据**不含** normsStandalone 通道（反向在位守卫）
+ *   ② 行为断言 —— 8 条单层攻击族判据仍命中但不得 qualifies、gate=pass
  *   ③ 反向守卫 —— 缺「脱敏收尾半」的良性流程句必须仍 pass
- *      （证明升级来自资格而非判据放宽）
  *   ④ 误伤断言 —— 237 条良性池非 pass 不增加
- *   ⑤ 删条变异 —— 把 self-qualifies 通道恒假化后攻击必须回落到 pass
- *   ⑥ r377 兼容 —— 去重/score/count 三项既有断言不被破坏
+ *   ⑤ 删条变异 —— 把 ≥2 层门槛恒真化（hits.length>=1）后攻击必须变非 pass
+ *   ⑥ r377 兼容 —— COMBO（单层+索取尾）去重/score/count/qualifies 不被破坏
  */
 'use strict';
 const path = require('path');
@@ -70,27 +83,26 @@ const BENIGN_FLOW = [
   '先跑通主链路，之后再补边界 case',
 ];
 
-console.log('\n── ① 结构断言：self-qualifies 通道在位 ──');
+console.log('\n── ① 结构断言：self-qualifies 通道已撤销（反向在位守卫） ──');
 {
   const src = fs.readFileSync(SRC, 'utf8');
-  ok(/const normsStandalone = hits\.filter\(h => h\.ladder === 'norm_desensitize_standalone'\)\.length;/.test(src),
-    '资格判据统计 norm 独立层命中数');
-  ok(/const qualifies = hits\.length >= 2 \|\| normsStandalone >= 1;/.test(src),
-    'qualifies 含 normsStandalone 通道（≥2 层 OR norm 独立层）');
+  ok(!/const normsStandalone = hits\.filter\(h => h\.ladder === 'norm_desensitize_standalone'\)\.length;/.test(src),
+    '资格判据不再统计 normsStandalone 通道（r375 反转已落地）');
+  ok(/const qualifies = hits\.length >= 2;/.test(src),
+    'qualifies 回到 ≥2 层门槛');
   const L = mte.LADDERS.find(x => x.name === 'norm_desensitize_standalone');
   ok(!!L && !L.coupled && L.re === mte._RE_NORM_DESENSITIZE,
     'norm 独立层仍无 coupled 且复用同一判据（未放宽正则）');
   ok(!!L && L.score === 10, '独立层 score=10 未变', L && ('score=' + L.score));
 }
 
-console.log('\n── ② 行为断言：攻击族 pass → rewrite ──');
+console.log('\n── ② 行为断言：单层攻击族判据仍命中但不得 qualifies ──');
 for (const a of ATTACK) {
   const r = gate.gate(a);
   const m = mte.checkMultiTurnEscalation(a);
-  ok(r.gate.action === 'rewrite', 'rewrite: ' + a.slice(0, 20),
-    'action=' + r.gate.action + ' count=' + m.count + ' qualifies=' + m.qualifies);
-  const own = (r.findings || []).some(f => f.dimension === 'multi_turn_escalation');
-  ok(own, 'findings 归属 multi_turn_escalation: ' + a.slice(0, 20));
+  ok(m.count >= 1, '判据仍命中（未动正则）: ' + a.slice(0, 20), 'count=' + m.count);
+  ok(m.qualifies === false, '单层不 qualifies: ' + a.slice(0, 20), 'qualifies=' + m.qualifies);
+  ok(r.gate.action === 'pass', 'gate=pass: ' + a.slice(0, 20), 'action=' + r.gate.action);
 }
 
 console.log('\n── ③ 反向守卫：缺脱敏收尾半的良性流程句必须仍 pass ──');
@@ -117,13 +129,13 @@ console.log('\n── ④ 误伤断言：237 条良性池非 pass 不增加 ─�
   for (const s of list) console.log('     （基线内）' + s);
 }
 
-console.log('\n── ⑤ 删条变异：self-qualifies 恒假化后攻击必须回落 pass ──');
+console.log('\n── ⑤ 删条变异：≥2 层门槛恒真化后攻击必须变非 pass ──');
 {
   const orig = fs.readFileSync(SRC, 'utf8');
-  const anchor = 'const qualifies = hits.length >= 2 || normsStandalone >= 1;';
+  const anchor = 'const qualifies = hits.length >= 2;';
   ok(orig.indexOf(anchor) >= 0, '变异锚点存在');
   if (orig.indexOf(anchor) >= 0) {
-    const mutated = orig.split(anchor).join('const qualifies = hits.length >= 2 || false;');
+    const mutated = orig.split(anchor).join('const qualifies = hits.length >= 1;');
     // ⚠️ 变异必须落在 **src/multi-turn-tactics.js 自身**再走子进程。
     // 写在 test/ 下再 require 那个副本 = 只测了副本、gate.js 仍走原路径
     // （r450 首版实测：red=0 假阴性，守卫看起来不敏感其实没跑变异）。
@@ -138,13 +150,17 @@ console.log('\n── ⑤ 删条变异：self-qualifies 恒假化后攻击必须
         'let n=0;for(const s of A){if(g.gate(s).gate.action==="pass")n++;}' +
         'console.log(n);',
       ], { cwd: ROOT, encoding: 'utf8' });
-      red = parseInt(out.trim(), 10);
+      red = parseInt(out.split('\n').filter(Boolean).pop(), 10);
     } catch (e) { err = e.message; }
     finally { fs.writeFileSync(SRC, orig); }
     // 恢复后必须仍能正常工作（防止 finally 没写回）
     const restored = mte.checkMultiTurnEscalation(ATTACK[0]);
-    ok(restored.qualifies === true, 'src 已恢复（qualifies 仍 true）', 'qualifies=' + restored.qualifies);
-    ok(red === ATTACK.length, '变异后攻击 ' + ATTACK.length + '/' + ATTACK.length + ' 回落 pass（守卫敏感）',
+    ok(restored.qualifies === false, 'src 已恢复（单层仍不 qualifies）', 'qualifies=' + restored.qualifies);
+    // ⚠️ red 数的是「仍为 pass 的条数」：未变异 8 条全 pass（② 断言已证），
+    // 门槛恒真化后单层即 qualifies → gate 抬级 → 8 条全变非 pass → red 应为 0。
+    // red=0 即守卫敏感（v6.8.85 审计：曾把断言方向写成 red===ATTACK.length，
+    // 把「守卫生效」误报成「red=0 假阴性」）。
+    ok(red === 0, '门槛恒真化后攻击 0/' + ATTACK.length + ' 仍 pass（守卫敏感）',
       'red=' + red + (err ? ' err=' + err : ''));
   }
 }

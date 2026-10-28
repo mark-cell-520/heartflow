@@ -68,8 +68,11 @@ t('面板能跑出结构化数字', () => {
   assert.ok(panel.total, 'total 解析失败');
 });
 
-t('维度总数 = 51', () => {
-  assert.strictEqual(parseInt(panel.total, 10), 51,
+t('维度总数 = 141', () => {
+  // [v6.8.85 审计] 51 → 141：dimension-health.js 的「导出 check 函数维度」
+  // 口径（160 个 discriminate 维度中 141 个有独立 check 函数导出），
+  // 51 是 v6.7 早期快照。新增 check 函数维度时同步更新本断言。
+  assert.strictEqual(parseInt(panel.total, 10), 141,
     `维度总数变了: ${panel.total}（新增维度时同步更新本测试）`);
 });
 

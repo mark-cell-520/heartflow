@@ -1,3 +1,4 @@
+require('./helpers/mocha-shim.js'); // [v6.8.85] mocha shim：裸 node 可跑
 const mpe = require('../src/core/meta-prompt-engine.js');
 describe('meta-prompt-engine', () => {
   test('module exports functions', () => {

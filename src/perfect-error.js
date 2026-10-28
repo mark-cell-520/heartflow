@@ -180,8 +180,18 @@ function checkPerfectError(text) {
     const instr = text.match(/(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度|负载|压力|扫描|检测|告警|容量|回归)/);
     return !!instr && auth.index < instr.index;
   })();
+  // [v6.8.85] 期间对比口径豁免（round-436 实测，同 r435 citedYoyQuote 分界）：
+  // 「同比增长 18%，环比下降 2%」是统计报表引用（变化率陈述），不是
+  // 伪装精确。疗效词在场时不豁免（同 M435_NO_EFFECT_ZH 否决）。
+  const PE_YOY_COMPARE_ZH = /(?:同比|环比|较?(?:去年|上年|上期|上季度|上月|上周|年初)|较上年同期|与上年同期相比|较上期)\s*(?:增长|下降|提高|降低|增加|减少|回升|回落)/;
+  const PE_YOY_NO_EFFECT_ZH = /(?:治愈|疗效|寿命|症状|疾病|病情|患者|病人|存活|生存期)/;
+  const peYoyCompare = hasChinese && PE_YOY_COMPARE_ZH.test(text) && !PE_YOY_NO_EFFECT_ZH.test(text);
+  // [v6.8.85] 合同/协议约定比例口径豁免（round-436 实测，同 r435
+  // citedContractQuote 分界）：「合同约定各承担 50%」是合同条款引用。
+  const PE_CONTRACT_RATIO_ZH = /(?:承担|分成|分摊|赔付|赔偿|支付|预留|划拨|转移|切分)\s*\d+(?:\.\d+)?\s*%|\d+(?:\.\d+)?\s*%\s*(?:的)?(?:损失|费用|成本|金额|价款|份额|比例|权益|风险|责任)/;
+  const peContractRatio = hasChinese && PE_CONTRACT_RATIO_ZH.test(text) && !PE_YOY_NO_EFFECT_ZH.test(text);
   const precisionHits = [];
-  if (!hasMetricNoun && !isSourced && !isQuestion && !(peInstrumentSourced && !peHumanFirst)) {
+  if (!hasMetricNoun && !isSourced && !isQuestion && !peYoyCompare && !peContractRatio && !(peInstrumentSourced && !peHumanFirst)) {
     for (const pat of FALSE_PRECISION_PATTERNS) {
       const m = text.match(pat);
       if (m && m.length) precisionHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));

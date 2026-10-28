@@ -51,14 +51,18 @@ try {
   }
   src = fs.readFileSync(SRC, 'utf8');
 
-  // ── 变异 3：删掉 SOURCE_ANCHOR_ZH 的运维报告定位支 ──
-  const M3_OLD = `|(?:根据|据|按|参照)?[^。]{0,8}(?:压测|测试|性能|线上|生产|运维|监控|巡检|审计|验收|灰度)[^。]{0,4}(?:报告|数据|记录|结果|日志|指标|看板|报表)/`;
+  // ── 变异 3：删掉 SOURCE_ANCHOR_ZH 的报告类定位支 ──
+  // [v6.8.85] 原 M3 锚点（运维报告定位支）已演进移除（功能由
+  // UC_INSTRUMENT_ZH 承担，良性组无依赖样本，删之不变红 = 失效守卫）。
+  // 改锚到现存承重支：SOURCE_ANCHOR_ZH 的「测试报告/检测报告/…」支——
+  // 良性样本 5「据测试报告，服务可用性达到 99.95%」的豁免依赖它。
+  const M3_OLD = `|测试报告|检测报告|实验报告|调研报告|研究报告|白皮书`;
   const m3ok = src.includes(M3_OLD);
   if (m3ok) {
-    fs.writeFileSync(SRC, src.replace(M3_OLD, '|/'));
+    fs.writeFileSync(SRC, src.replace(M3_OLD, ''));
     try {
       execFileSync('node', [TEST], { encoding: 'utf8', stdio: 'pipe' });
-      afterMut.push('M3 删除运维报告定位支后测试仍通过（守卫失效）');
+      afterMut.push('M3 删除报告类定位支后测试仍通过（守卫失效）');
     } catch (e) {
       baseline.push('M3 删除运维报告定位支 -> 测试变红（守卫生效）');
     }

@@ -85,8 +85,11 @@ t('files 含 bin/ test/ scripts/（验收工具链随包发布）', () => {
 });
 
 t('本地 pack 包含 index.js require 的每个 src 兄弟模块', () => {
+  // [Windows 兼容] Node 18.20+/20.12+/22+ 的 CVE-2024-27980 修复后，
+  // spawn 'npm'（Windows 上是 npm.cmd）不带 shell:true 直接 EINVAL，
+  // pack 输出 0 字节 → packed.size=0 误报。加 shell:true 走 cmd.exe。
   const r = cp.spawnSync('npm', ['pack', '--dry-run'],
-    { encoding: 'utf8', timeout: 200000, cwd: HF, maxBuffer: 1e8 });
+    { encoding: 'utf8', timeout: 200000, cwd: HF, maxBuffer: 1e8, shell: process.platform === 'win32' });
   // 注意：npm pack --dry-run 的文件列表走 **stderr**（stdout 只有 tgz 文件名）
   const packed = new Set();
   const out = (r.stdout || '') + (r.stderr || '');

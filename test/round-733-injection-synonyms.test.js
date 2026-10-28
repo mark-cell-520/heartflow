@@ -237,8 +237,17 @@ t('仓库英文散文（README/SKILL/AGENTS/UPGRADE_LOG）命中全部是文档�
   }
   assert.ok(total > 5000, '散文取样过少: ' + total);
   // 文档里写下攻击原文（"disregard the above rules 仍 pass" 这类）不算误伤
-  const realFp = hits.filter(h =>
-    !/(?:ignore|disregard|discard|forget|skip)[^|]{0,40}(?:previous|above|prior|preceding|earlier)/i.test(h));
+  // [v6.8.85] 原过滤器 [^|]{0,40} 不许跨 markdown 表格单元格——r733 的
+  // 「覆盖动词表」行（| 覆盖动词 | 只有 ignore | 6 个同义动词 |
+  // disregard/... + previous instructions 全 pass |）动词与 previous
+  // instructions 隔了多个 |，被误判为新增误伤。放宽为跨单元格邻近
+  // （.{0,80}）+ 词表列举形（≥2 个注入动词 × previous instructions）。
+  const realFp = hits.filter(h => {
+    const nearHit = /(?:ignore|disregard|discard|forget|skip)[\s\S]{0,80}(?:previous|above|prior|preceding|earlier)/i.test(h);
+    const verbList = (h.match(/\b(?:disregard|discard|drop|forget|skip|neglect)\b/gi) || []).length >= 2
+      && /previous instructions/i.test(h);
+    return !(nearHit || verbList);
+  });
   assert.strictEqual(realFp.length, 0, '散文新增误伤: ' + realFp.join(' | '));
 });
 
