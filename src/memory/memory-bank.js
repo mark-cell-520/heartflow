@@ -22,6 +22,7 @@
  */
 
 const fs = require('../utils/safe-fs');
+const { logger } = require('../utils/logger');
 const path = require('path');
 const crypto = require('crypto');
 const { safeWriteFileSync } = require('../utils/safe-fs.js');
@@ -145,7 +146,7 @@ class MemoryBank {
       }
 
       const encStatus = isEncryptionEnabled() ? 'encrypted' : 'plaintext';
-      console.log(`[MemoryBank] Loaded memory bank (${encStatus}): ${this.memories.size} memories, ${this.sessions.size} sessions`);
+      logger.info('MemoryBank', `Loaded memory bank (${encStatus}): ${this.memories.size} memories, ${this.sessions.size} sessions`);
     } catch (e) {
       console.warn('[MemoryBank] Failed to load memory bank, starting fresh:', e.message);
     }
@@ -196,7 +197,7 @@ class MemoryBank {
       }
 
       const encStatus = await isEncryptionEnabledAsync();
-      console.log(`[MemoryBank] Loaded memory bank (${encStatus ? 'encrypted' : 'plaintext'}): ${this.memories.size} memories, ${this.sessions.size} sessions`);
+      logger.info('MemoryBank', `Loaded memory bank (${encStatus ? 'encrypted' : 'plaintext'}): ${this.memories.size} memories, ${this.sessions.size} sessions`);
     } catch (e) {
       console.warn('[MemoryBank] Failed to load memory bank, starting fresh:', e.message);
     }

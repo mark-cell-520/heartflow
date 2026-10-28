@@ -5,6 +5,7 @@
  */
 
 const debugLog = require('../utils/debug-log');
+const { logger } = require('../utils/logger');
 const path = require('path');
 const { _getConfig, _runSelfImprovementHealthCheck, getSelfImprovementHealth } = require('./engine-state');
 // [v6.8.86] 移除未使用的 _instantiateSpecialModule 导入：原绑定在模块体内
@@ -71,7 +72,7 @@ function start(hf, HeartFlowClass) {
       const lastContext = hf.identityCore.getLastSessionContext();
       if (lastContext && lastContext.bootTime) {
         const gapMinutes = Math.round((hf.startTime - lastContext.bootTime) / 60000);
-        if (gapMinutes > 0) console.log(`[HeartFlow] 上次会话距现在 ${gapMinutes} 分钟`);
+        if (gapMinutes > 0) logger.info('HeartFlow', `上次会话距现在 ${gapMinutes} 分钟`);
       }
     }
     hf.identityCore.updateUserProfile({ lastLogin: new Date().toISOString() });

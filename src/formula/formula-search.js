@@ -4,6 +4,7 @@
  */
 
 const fs = require('../utils/safe-fs');
+const { logger } = require('../utils/logger');
 const path = require('path');
 
 class FormulaSearch {
@@ -59,7 +60,7 @@ class FormulaSearch {
 
     this.formulas = all;
     if (this._loadErrors.length) {
-      console.warn(`[FormulaSearch] 完成，${files} 个文件，${all.length} 条公式，${this._loadErrors.length} 个文件解析失败`);
+      logger.info('FormulaSearch', `完成，${files} 个文件，${all.length} 条公式，${this._loadErrors.length} 个文件解析失败`);
     } else {
       console.log(`[FormulaSearch] 完成，${files} 个文件，${all.length} 条公式`);
     }
