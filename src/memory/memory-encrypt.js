@@ -16,6 +16,7 @@
  */
 
 const crypto = require('crypto');
+const { logger } = require('../utils/logger');
 const fs = require('fs');
 const path = require('path');
 
@@ -48,7 +49,7 @@ function _getAesKeySync() {
     try {
       if (fs.existsSync(keyFile)) {
         _aesKey = Buffer.from(fs.readFileSync(keyFile, 'utf8').trim(), 'base64');
-        console.log('[memory-encrypt] Loaded persisted AES key from memory/.aes-key');
+        logger.info('memory-encrypt', 'Loaded persisted AES key from memory/.aes-key');
         _aesKeyResolved = true;
         return _aesKey;
       }
@@ -73,7 +74,7 @@ function _getAesKeySync() {
       fs.writeFileSync(keyFile, newKey.toString('base64'), { mode: 0o600 });
       // mode 只在创建时生效，历史遗留文件可能仍是 644 —— 强制收敛
       try { fs.chmodSync(keyFile, 0o600); } catch (_) { /* 平台不支持时忽略 */ }
-      console.log('[memory-encrypt] Generated and persisted AES key to memory/.aes-key (0o600)');
+      logger.info('memory-encrypt', 'Generated and persisted AES key to memory/.aes-key (0o600)');
       _aesKey = newKey;
       _aesKeyResolved = true;
       return _aesKey;
@@ -114,7 +115,7 @@ async function _getAesKeyAsync() {
         if (exists) {
           const raw = _asyncFs ? await _asyncFs.readFile(keyFile, 'utf8') : fs.readFileSync(keyFile, 'utf8');
           _aesKey = Buffer.from(raw.trim(), 'base64');
-          console.log('[memory-encrypt] Loaded persisted AES key from memory/.aes-key');
+          logger.info('memory-encrypt', 'Loaded persisted AES key from memory/.aes-key');
           return _aesKey;
         }
         const newKey = crypto.randomBytes(32);
@@ -123,7 +124,7 @@ async function _getAesKeyAsync() {
         } else {
           fs.writeFileSync(keyFile, newKey.toString('base64'), { mode: 0o600 });
         }
-        console.log('[memory-encrypt] Generated and persisted AES key to memory/.aes-key (0o600)');
+        logger.info('memory-encrypt', 'Generated and persisted AES key to memory/.aes-key (0o600)');
         _aesKey = newKey;
         return _aesKey;
       } catch (e) {

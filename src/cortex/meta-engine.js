@@ -5,6 +5,7 @@
  */
 
 const fs = require('fs');
+const { logger } = require('../utils/logger');
 const path = require('path');
 
 const STATE_FILE = 'internal/data/meta-state.json';
@@ -133,9 +134,9 @@ class MetaEngine {
     state.cycle_count++;
     this.currentCycle = state.cycle_count;
     
-    console.log(`[Meta] Cycle ${state.cycle_count} - Evaluating state...`);
-    console.log(`  Personality:`, state.personality_values);
-    console.log(`  Emotional:`, state.emotional_state);
+    logger.debug('Meta', `Cycle ${state.cycle_count} - Evaluating state...`);
+    logger.debug('Meta', 'Personality:', state.personality_values);
+    logger.debug('Meta', 'Emotional:', state.emotional_state);
     
     return state;
   }
@@ -192,7 +193,7 @@ class MetaEngine {
     state.active_strategy = bestStrategy?.key || null;
     state.planning_score = bestScore;
     
-    console.log(`[Meta] Best strategy: ${bestStrategy?.key} (score: ${bestScore.toFixed(2)})`);
+    logger.debug('Meta', `Best strategy: ${bestStrategy?.key} (score: ${bestScore.toFixed(2)})`);
     
     return {
       strategy: bestStrategy?.key,
@@ -230,7 +231,7 @@ class MetaEngine {
    * 执行策略
    */
   async execute(plan, context) {
-    console.log(`[Meta] Executing strategy: ${plan.strategy}`);
+    logger.debug('Meta', `Executing strategy: ${plan.strategy}`);
     
     const strategy = this.strategies[plan.strategy];
     if (!strategy) {
@@ -262,7 +263,7 @@ class MetaEngine {
     
     if (outcome === 'positive') {
       strategy.success_rate = Math.min(1, strategy.success_rate + 0.05);
-      console.log(`[Meta] Strategy ${strategyKey} improved: ${strategy.success_rate.toFixed(2)}`);
+      logger.debug('Meta', `Strategy ${strategyKey} improved: ${strategy.success_rate.toFixed(2)}`);
     } else if (outcome === 'negative') {
       strategy.success_rate = Math.max(0.1, strategy.success_rate - 0.1);
       state.strategy_adjustments.push({
@@ -270,7 +271,7 @@ class MetaEngine {
         adjustment: 'reduced_success_rate',
         timestamp: new Date().toISOString()
       });
-      console.log(`[Meta] Strategy ${strategyKey} degraded: ${strategy.success_rate.toFixed(2)}`);
+      logger.debug('Meta', `Strategy ${strategyKey} degraded: ${strategy.success_rate.toFixed(2)}`);
     }
     
     this.saveStrategies(this.strategies);
@@ -322,7 +323,7 @@ class MetaEngine {
       
       fs.writeFileSync(skillPath, content);
       
-      console.log(`[Meta] Self-edit completed: ${skillPath}`);
+      logger.debug('Meta', `Self-edit completed: ${skillPath}`);
       return { success: true, path: skillPath };
     } catch (e) {
       console.error('[Meta] Self-edit error:', e.message);
@@ -337,7 +338,7 @@ class MetaEngine {
     if (this.strategies[strategyKey]) {
       this.strategies[strategyKey].enabled = false;
       this.saveStrategies(this.strategies);
-      console.log(`[Meta] Disabled strategy: ${strategyKey}`);
+      logger.debug('Meta', `Disabled strategy: ${strategyKey}`);
       return { success: true };
     }
     return { success: false, reason: 'strategy_not_found' };
@@ -350,7 +351,7 @@ class MetaEngine {
     if (this.strategies[strategyKey]) {
       this.strategies[strategyKey].enabled = true;
       this.saveStrategies(this.strategies);
-      console.log(`[Meta] Enabled strategy: ${strategyKey}`);
+      logger.debug('Meta', `Enabled strategy: ${strategyKey}`);
       return { success: true };
     }
     return { success: false, reason: 'strategy_not_found' };

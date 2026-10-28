@@ -12,6 +12,8 @@
  * 4. 置信度校准: 输出置信度与实际准确率匹配
  */
 
+const { logger } = require('../utils/logger');
+
 class UncertaintyQuantifier {
   constructor(config = {}) {
     this.records = [];
@@ -412,7 +414,7 @@ class UncertaintyQuantifier {
     
     // 如果校准误差超过0.2，提示需要调整
     if (calibrationError > 0.2) {
-      console.log(`[UncertaintyQuantifier] ⚠️ 校准误差: ${calibrationError.toFixed(2)}, 建议重新校准`);
+      logger.warn('UncertaintyQuantifier', `⚠️ 校准误差: ${calibrationError.toFixed(2)}, 建议重新校准`);
     }
   }
 

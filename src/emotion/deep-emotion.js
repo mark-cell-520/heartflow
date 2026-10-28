@@ -10,6 +10,8 @@
  * - 情感计算 (Picard)
  */
 
+const { logger } = require('../utils/logger');
+
 class DeepEmotion {
   constructor(projectRoot) {
     this.projectRoot = projectRoot;
@@ -99,7 +101,7 @@ class DeepEmotion {
     // 情感触发器
     this.triggers = this.initializeTriggers();
     
-    console.log('[DeepEmotion] 深度情感引擎初始化');
+    logger.info('DeepEmotion', '深度情感引擎初始化');
   }
 
   /**

@@ -6,6 +6,7 @@
  */
 
 const { FormulaSearch } = require('./formula-search.js');
+const { logger } = require('../utils/logger');
 const { FormulaCalculator } = require('./formula-calculator.js');
 
 class FormulaEngine {
@@ -26,14 +27,14 @@ class FormulaEngine {
 
     this.search._ensureLoaded();
     const formulaCount = this.search.formulas.length;
-    console.log(`[FormulaEngine] 初始化完成，加载了 ${formulaCount} 个公式`);
+    logger.debug('FormulaEngine', `初始化完成，加载了 ${formulaCount} 个公式`);
     
     // 构建缓存（ID → 公式）
     this._cache = {};
     this.search.formulas.forEach(f => {
       this._cache[f.id] = f;
     });
-    console.log(`[FormulaEngine] 缓存已构建（${Object.keys(this._cache).length} 个公式）`);
+    logger.debug('FormulaEngine', `缓存已构建（${Object.keys(this._cache).length} 个公式）`);
     
     this.initialized = true;
   }
@@ -86,7 +87,7 @@ class FormulaEngine {
     if (!formulaData.id || !formulaData.formula || !formulaData.category) {
       throw new Error('公式数据不完整（需要 id, formula, category）');
     }
-    console.log(`[FormulaEngine] 添加公式（简化版）：${formulaData.id}`);
+    logger.debug('FormulaEngine', `添加公式（简化版）：${formulaData.id}`);
     return { success: true, id: formulaData.id, note: '简化版：未实际写入文件' };
   }
 
@@ -95,8 +96,8 @@ class FormulaEngine {
    */
   async extractFromArxiv(paperId) {
     // 简化实现：只打印提示，不实际下载
-    console.log(`[FormulaEngine] arXiv 公式提取（简化版）：paperId=${paperId}`);
-    console.log('  提示：完整实现需要 arXiv API + PDF 解析');
+    logger.debug('FormulaEngine', `arXiv 公式提取（简化版）：paperId=${paperId}`);
+    logger.debug('FormulaEngine', '提示：完整实现需要 arXiv API + PDF 解析');
     return { success: false, note: '简化版：未实际提取', paperId };
   }
 
@@ -105,8 +106,8 @@ class FormulaEngine {
    */
   deriveFormula(baseFormulaId, targetVariable) {
     // 简化实现：只打印提示，不实际推导
-    console.log(`[FormulaEngine] 公式推导（简化版）：base=${baseFormulaId}, target=${targetVariable}`);
-    console.log('  提示：完整实现需要符号计算（如 sympy.js）');
+    logger.debug('FormulaEngine', `公式推导（简化版）：base=${baseFormulaId}, target=${targetVariable}`);
+    logger.debug('FormulaEngine', '提示：完整实现需要符号计算（如 sympy.js）');
     return { success: false, note: '简化版：未实际推导', baseFormulaId, targetVariable };
   }
 
