@@ -89,7 +89,7 @@ from marketing copy.
 | Dispatch routes | 1,314 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 160 | `dimMap` keys in `src/index.js` |
 | MCP tools | 185 | tool definitions exposed via `tools/list` |
-| Test suite | 19,032 passing / 69 failing | `node test/run-all.js` (4-slice aggregate; failed set is pre-existing runner/flaky noise — s2/s3 byte-identical to pre-change baseline) |
+| Test suite | 19,033 passing / 68 failing | `node test/run-all.js` (4-slice aggregate; failed set is pre-existing runner/flaky noise — s2/s3 byte-identical to pre-change baseline) |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
