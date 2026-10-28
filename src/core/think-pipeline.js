@@ -244,11 +244,15 @@ async function runThinkPipeline(result, input, engine) {
   } catch (_) { /* 非关键 */ }
 
   // ─── [v6.2.4] 知识域探测：输入关联哪些领域本体 ──
+  // [v6.8.86] matched 提升到函数作用域：下方「上下文感知探索触发」try 块要读
+  // 本块里赋的 matched；const 块级作用域下跨块引用必抛 ReferenceError，
+  // 被 catch 吞掉后 registerGap（好奇心 gap 注册）全程静默失效。
+  let matched = null;
   try {
     if (engine.knowledge && input) {
       const domains = engine.knowledge.ontology.domains;
       const lowered = input.toLowerCase();
-      const matched = domains.filter(d =>
+      matched = domains.filter(d =>
         lowered.includes(d.id) ||
         lowered.includes((d.name || '').toLowerCase()) ||
         (d.nameEn && lowered.includes(d.nameEn.toLowerCase()))
@@ -957,7 +961,10 @@ async function runThinkPipeline(result, input, engine) {
   // ─── [v6.x] PhilosophyEngine — 四框架伦理评估 ──
   try {
     if (input && typeof input === 'string') {
-      // const { PhilosophyEngine } = require('../identity/philosophy-engine.js'); 
+      // [v6.8.86] 恢复被注释的 require：缺了这行，下方 new PhilosophyEngine()
+      // 必抛 ReferenceError 被 catch 吞掉，四框架伦理评估 + PhilosophyToDecision
+      // 转化两块全程静默失效（真身 src/identity/philosophy-engine.js 一直存在）。
+      const { PhilosophyEngine } = require('../identity/philosophy-engine.js');
       const pe = new PhilosophyEngine();
       result._philosophyEngine = pe.evaluate({
         action: { description: input },
