@@ -1,6 +1,6 @@
 ---
 name: heartflow-audit-upgrade-push
-version: "1.4.1"
+version: "1.5.0"
 title: "心虫审计→并发修复→验证→推送 全流程"
 description: |
   心虫大规模升级工作流：全量审计→分类问题→并发修复→验证→推送GitHub。
@@ -964,6 +964,9 @@ done
 
 1. **子代理误报**：`search_files` 的 glob 模式可能找不到深层目录文件，子代理报告"文件不存在"时用 `find` 二次确认
 1a. **审计工具自身的误报**：自建扫描器/grep/node -e 拼的审计脚本，误报率常高于对真实代码的判断（正则过宽、grep BRE 不查闭合括号、stdout 被引擎日志污染导致解析失败、number vs 字符串 `!==` 恒真）。完整模式表与证伪命令见 `heartflow-audit-self-heal` 的 2b/2c 节及其 `references/audit-tool-false-positives.md`。另注意：同步脚本的 ✅ 不等于真一致（pattern 没登记过的形状一律视为无漂移）。
+1b. **子代理「文档漂移」结论必须用守卫同口径复测**：子代理用静态口径（index.js 导出函数计数）判定文档宣称数漂移，而 doc-numbers 守卫用 runtime 口径（函数返回对象的 dimensions 键数 / `hf.routes()` 数组求和）——口径不同源会把正确数字误判为漂移。改文档宣称数字前先按守卫口径实测一遍，两口径对不上时以守卫为准。
+1c. **分片回归失败先分诊再归因**：单跑通过、分片跑失败的测试是 runner 交互问题（子进程互踩/计时），不是回归。判定是否自己引入：`git stash` 后重跑同一分片对比失败集，集合同源=既有失败；聚合通过数 ±10 以内波动是 flaky 噪声，不归因到改动。stash 期间分片跑会写 `data/test-count.json` 挡住 `git stash pop`——先 `git checkout -- data/test-count.json` 再 pop。
+1d. **探针被沙箱拦截时改验仓库自带测试**：直接断言探针（如批量 IP 断言）被安全钩子拦截且未获批时，不要重试同一命令；找仓库自带测试里走同一代码路径的用例替代验证（SSRF 改动用 `test/security-audit.test.js` + `test/fetch-safe.test.js`），通过即覆盖。
 2. **patch 损坏**：在已用 offset/limit 读取过部分内容的文件上 patch，可能产生损坏——patch 后必须 lint 验证
 3. **psychology.js 修复**：这个文件有多个 `resetCrisisCounter` 定义——修改前必须读完整文件确认
 4. **Date.now() * 1000**：meaningful-memory.js 中有3处，改一处漏一处会导致时间戳单位不一致
@@ -985,6 +988,7 @@ done
     - **无后缀 require**：`require('../../core/chinese-tokenizer')` 这类不带 `.js` 的引用，用「只匹配 `xxx.js`」的 grep 模式永远搜不到。扫描要同时匹配 `require('[^']*模块名')`。
     - **路径字符串引用（非 require）**：`test/readme-test-count-autosync.guard.test.js:19` 用 `path.join(__dirname,'..','scripts','upgrade-engine.js')` + `fs.readFileSync` 读文件、按字符串切出 `syncReadmeTestCount()` 函数源码做单测。归档 `scripts/upgrade-engine.js` 后该测试 ENOENT 崩（基线 26/26 通过）。**删除任何文件前要搜文件名（不带扩展名）在 test/ scripts/ bin/ 里的字符串出现。**
     - **归档后必须全量回归**：本轮 4 处回归全部由「全量 4 段分段测试」抓到，且失败数对基线（71）才发现异常。归档轮的标准动作 = 归档后立刻跑 `HF_RUN_ALL_SLICE=N/4` 全量，对比基线失败数，不是只跑冒烟。
+14. **API 复核 owner/repo 从 `git remote -v` 读**：推送后用 GitHub API 复核远程 HEAD/VERSION 时，凭记忆猜仓库名会 404；先 `git remote -v` 拿准 owner/repo 再发请求。
 
 ---
 
