@@ -9,7 +9,7 @@
  *   - straddle.overlap_exposure = 重叠窗口被显式暴露，但不 claim attribution
  *   - 每个收据自带完整性字段，防「读取时偏好毒化快照」
  *
- * 使用：const { WindowAttributionReceipt } = require('./src/core/window-attribution-receipt.js')
+ * 使用（相对本文件）：const { WindowAttributionReceipt } = require('./window-attribution-receipt.js')
  */
 'use strict';
 

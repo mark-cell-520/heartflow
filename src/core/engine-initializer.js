@@ -7,7 +7,8 @@
 const debugLog = require('../utils/debug-log');
 const path = require('path');
 const { _getConfig, _runSelfImprovementHealthCheck, getSelfImprovementHealth } = require('./engine-state');
-const { _instantiateSpecialModule } = require('./module-registry');
+// [v6.8.86] 移除未使用的 _instantiateSpecialModule 导入：原绑定在模块体内
+// 零引用（审计发现），且 module-registry 从未导出该名字，留着就是死绑定。
 
 // Lazy loaders from heartflow.js
 const _VERSION = () => require('./version.js');
