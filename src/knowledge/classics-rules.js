@@ -10,7 +10,7 @@
  * 3. 规则命中后映射到 HeartFlow 既有判别维度，不新增维度
  */
 
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -978,17 +978,18 @@ function matchDomain(input) {
 
 function searchClassics(keyword, scope) {
   // NOTE: search_guji.sh is not bundled; this is dead code pending future integration.
-  // When enabled, replace execSync string interpolation with parameterized array to prevent shell injection.
+  // [FIX 2026-10-28 v6.8.86] 参数化数组替代字符串插值，堵命令注入
+  // （旧代码 keyword/scope 直达 shell，引号/反引号/$/分号全部存活）。
   if (!fs.existsSync(SCRIPT)) {
     return { hits: [], error: 'searchClassics disabled: search_guji.sh not found' };
   }
   try {
-    const cmd = scope ? `bash "${SCRIPT}" "${keyword}" "${scope}"` : `bash "${SCRIPT}" "${keyword}"`;
+    const args = scope ? [SCRIPT, keyword, scope] : [SCRIPT, keyword];
     // [FIX 2026-09-19] 脚本内部硬编码了 ${HOME}/.hermes/skills/daizhigev20，
     // 引擎以其他用户运行时会找不到语料库；把解析出的路径逊给脚本。
     const env = Object.assign({}, process.env);
     if (CLASSICS_BASE) env.DAIZHIGEV20_PATH = CLASSICS_BASE;
-    const out = execSync(cmd, { encoding: 'utf-8', timeout: 15000, env });
+    const out = execFileSync('bash', args, { encoding: 'utf-8', timeout: 15000, env });
     const lines = out.split(/\r?\n/).filter(Boolean);
     return {
       keyword,

@@ -6265,6 +6265,14 @@ class HeartFlow {
     this.started = false;
   }
 
+  // [FIX 2026-10-28 v6.8.86] stop() 别名：MCP server（src/mcp-server.js:5887、
+  // mcp/mcp-server-http.js:1480）、bin/verify.js:154、主块 dispatch（6428/6436）
+  // 共 6 处调用点此前全部落进 catch 被静默吞——类上只有 shutdown() 没有 stop()。
+  stop() {
+    try { if (this.consolidate && typeof this.consolidate.stop === 'function') this.consolidate.stop(); } catch (_) { /* observe 未初始化时容忍 */ }
+    this.shutdown();
+  }
+
   // [v6.0.71] 委托给 hook-points-runner
   _runInitHookPoints() {
     const { runInitHookPoints } = require('./hook-points-runner.js');
