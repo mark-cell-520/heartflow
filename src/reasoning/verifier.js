@@ -16,8 +16,11 @@ const { factChecker } = require('./fact-checker.js');
 
 function _tryRequire(p) {
   try {
-    const m = require(p);
-    return typeof m === 'function' ? m() : m;
+    // [v6.8.86] 不再自动调用函数型模块：裸类导出（module.exports = class）
+    // 被无 new 调用会抛 "Class constructor cannot be invoked without 'new'"，
+    // 被本 catch 吞成 null，导致 counterfactualVerifier 从未实例化。
+    // 由调用方按形状处理（类直接 new，属性导出取属性）。
+    return require(p);
   } catch (e) {
     return null;
   }
@@ -39,9 +42,15 @@ class Verifier {
       intercepted: 0,
     };
 
-    const cfModule = _tryRequire('./counterfactual-verifier.js');
-    if (cfModule && cfModule.CounterfactualVerifier) {
-      this.counterfactualVerifier = new cfModule.CounterfactualVerifier();
+    // [v6.8.86] 路径修错：文件在 src/core/ 下，原 './counterfactual-verifier.js'
+    // 从 reasoning/ 解析必 MODULE_NOT_FOUND → 反事实验证器从未实例化。
+    const cfModule = _tryRequire('../core/counterfactual-verifier.js');
+    // [v6.8.86] counterfactual-verifier.js 是裸类导出（module.exports = class），
+    // 原来只认 cfModule.CounterfactualVerifier 属性 → 永不成立 → 反事实验证
+    // 器从未实例化（静默失效）。两种导出形状都兼容。
+    const CFClass = (cfModule && (cfModule.CounterfactualVerifier || (typeof cfModule === 'function' ? cfModule : null))) || null;
+    if (CFClass) {
+      this.counterfactualVerifier = new CFClass();
     }
 
     // 懒初始化 counterfactualVerifier 的 init

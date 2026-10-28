@@ -170,15 +170,20 @@ function initializeLazyRegistry(hf) {
     intentLayer: { lazy: true, path: './intent-layer.js', Ctor: 'IntentLayer', args: {} },
     deliberationGate: { lazy: true, path: '../shield/deliberation-gate.js', Ctor: 'DeliberationGate', args: {} },
     epistemicSafety: { lazy: true, path: '../shield/epistemic-safety.js', Ctor: '', args: {} },
-    flowPredictor: { lazy: true, path: '../planner/flow-predictor.js', Ctor: 'FlowPredictor', args: {} },
+    // [v6.8.86] 路径修正：真身在 src/core/ 下，原 '../planner/' 前缀必然 MODULE_NOT_FOUND
+    flowPredictor: { lazy: true, path: './flow-predictor.js', Ctor: 'FlowPredictor', args: {} },
     safetyGuardrails: { lazy: true, path: '../shield/safety-guardrails.js', Ctor: '', args: {} },
-    userModel: { lazy: true, path: './user-model.js', Ctor: 'UserModel', args: {} },
+    // [v6.8.86] 路径修正：真身在 src/identity/ 下
+    userModel: { lazy: true, path: '../identity/user-model.js', Ctor: 'UserModel', args: {} },
     actionTracker: { lazy: true, path: './action-tracker.js', Ctor: 'ActionTracker', args: {} },
-    purposeEngine: { lazy: true, path: './purpose-engine.js', Ctor: 'PurposeEngine', args: {} },
-    riskAnalyzer: { lazy: true, path: './risk-benefit-analyzer.js', Ctor: 'RiskBenefitAnalyzer', args: {} },
+    // [v6.8.86] 路径修正：真身在 src/identity/ 下
+    purposeEngine: { lazy: true, path: '../identity/purpose-engine.js', Ctor: 'PurposeEngine', args: {} },
+    // [v6.8.86] 路径修正：真身在 src/reasoning/ 下
+    riskAnalyzer: { lazy: true, path: '../reasoning/risk-benefit-analyzer.js', Ctor: 'RiskBenefitAnalyzer', args: {} },
     adaptiveCtrl: { lazy: true, path: './adaptive-controller.js', Ctor: 'AdaptiveController', args: {} },
     intentionTrack: { lazy: true, path: './IntentionTracker.js', Ctor: 'IntentionTracker', args: {} },
-    auditLogger: { lazy: true, path: './audit-logger.js', Ctor: 'AuditLogger', args: {} },
+    // [v6.8.86] 路径修正：真身在 src/shield/ 下
+    auditLogger: { lazy: true, path: '../shield/audit-logger.js', Ctor: 'AuditLogger', args: {} },
     focusOfAttention: { lazy: true, path: '../memory/focus-of-attention.js', Ctor: 'FocusOfAttention', args: {} },
     codeSelfDebug: { lazy: true, path: '../code/code-self-debug.js', Ctor: 'CodeSelfDebug', args: {} },
     reflexionEngine: { lazy: true, path: '../cortex/reflexion-engine.js', Ctor: 'ReflexionEngine', args: {} },

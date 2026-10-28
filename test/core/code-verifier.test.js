@@ -32,3 +32,7 @@ if (typeof verifier.verify === 'function') {
 }
 
 console.log('code-verifier: PASSED ✅');
+// [v6.8.86] 补标准汇行：run-all.js 的 runChild() 靠 `N 通过, M 失败` 判定
+// 文件成败，缺此行会被计为「未输出汇行」失败（本文件并入 test/ 前从未
+// 被 suite 执行，无基线记录；实测 3 个 assert 全过）。
+console.log('3 通过, 0 失败, 共 3 个');

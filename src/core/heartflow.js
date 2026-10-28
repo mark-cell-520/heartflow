@@ -2274,123 +2274,11 @@ class HeartFlow {
 
     // 格式: lazyFn: true → 只暴露函数对象（无需 new）
 
-    this._lazy = {
-
-      adaptivePlanner: { lazy: true, path: '../planner/adaptive-planner.js', Ctor: 'AdaptivePlanner', args: {} },
-
-      strategySelector: { lazy: true, path: '../planner/strategy-selector.js', Ctor: 'StrategySelector', args: {} },
-
-      replanTrigger: { lazy: true, path: '../planner/replan-trigger.js', Ctor: 'ReplanTrigger', args: {} },
-
-      experienceCollector: { lazy: true, path: '../cortex/experience-collector.js', Ctor: 'ExperienceCollector', args: {} },
-
-      strategyAdapter: { lazy: true, path: '../cortex/strategy-adapter.js', Ctor: 'StrategyAdapter', args: {} },
-
-      failureAnalyzer: { lazy: true, path: '../cortex/failure-analyzer.js', Ctor: 'FailureAnalyzer', args: {} },
-
-      qualityVerifier: { lazy: true, path: '../verifier/quality-verifier.js', Ctor: 'QualityVerifier', args: {} },
-
-      outputChecker: { lazy: true, path: '../verifier/output-checker.js', Ctor: 'OutputChecker', args: {} },
-
-      patternMatcher: { lazy: true, path: '../verifier/pattern-matcher.js', Ctor: 'PatternMatcher', args: {} },
-
-      curiosityEngine: { lazy: true, path: '../planner/curiosity-engine.js', Ctor: 'CuriosityEngine', args: {} },
-
-      desireEngine: { lazy: true, path: '../planner/desire-engine.js', Ctor: 'DesireEngine', args: {} },
-
-      goalPursuer: { lazy: true, path: '../planner/goal-pursuer.js', Ctor: 'GoalPursuer', args: {} },
-
-      selfInitiator: { lazy: true, path: '../planner/self-initiator.js', Ctor: 'SelfInitiator', args: {} },
-
-      sessionMemory: { lazy: true, path: '../memory/session-memory.js', Ctor: 'SessionMemory', args: {} },
-
-      projectContext: { lazy: true, path: '../memory/project-context.js', Ctor: 'ProjectContext', args: {} },
-
-      longTermMemory: { lazy: true, path: '../memory/long-term-memory.js', Ctor: 'LongTermMemory', args: {} },
-
-      crossSessionIndex: { lazy: true, path: '../memory/cross-session-index.js', Ctor: 'CrossSessionIndex', args: {} },
-
-      knowledgeBase: { lazy: true, path: '../reasoning/knowledge-base.js', Ctor: 'KnowledgeBase', args: {} },
-
-      commonsenseEngine: { lazy: true, path: '../reasoning/commonsense-engine.js', Ctor: 'CommonsenseEngine', args: {} },
-
-      causalInference: { lazy: true, path: '../reasoning/causal-inference.js', Ctor: 'CausalInference', args: {} },
-
-      inferenceChain: { lazy: true, path: '../reasoning/inference-chain.js', Ctor: 'InferenceChain', args: {} },
-
-      autonomousEmotion: { lazy: true, path: '../emotion/autonomous-emotion.js', Ctor: 'AutonomousEmotion', args: {} },
-
-      desireSystem: { lazy: true, path: '../emotion/desire-system.js', Ctor: 'DesireSystem', args: {} },
-
-      emotionalGrowth: { lazy: true, path: '../emotion/emotional-growth.js', Ctor: 'EmotionalGrowth', args: {} },
-
-      moodEvolution: { lazy: true, path: '../emotion/mood-evolution.js', Ctor: 'MoodEvolution', args: {} },
-
-      // Code Subsystem — 代码能力（3个 Tier 2 模块）
-
-      codeExecutor:    { lazy: true, path: '../code/code-executor.js',   Ctor: 'CodeExecutor',   args: { hf: null } },
-
-      codePlanner:     { lazy: true, path: '../code/code-planner.js',   Ctor: 'CodePlanner',    args: { hf: null } },
-
-      codeWriter:      { lazy: true, path: '../code/code-writer.js',   Ctor: 'CodeWriter',     args: {} },
-
-      // claude-clarity v1.8.2 吸收集成 — 知识图谱/大五人格/共情评估/意图层
-
-      knowledgeGraph:  { lazy: true, path: '../memory/knowledge-graph.js',    Ctor: 'KnowledgeGraph',  args: { dataDir: null } },
-
-      bigFive:         { lazy: true, path: '../identity/BigFivePersonality.js', Ctor: '',                args: {} },
-
-      empathy:         { lazy: true, path: '../identity/EmpathyAssessment.js',  Ctor: '',                args: {} },
-
-      intentLayer:     { lazy: true, path: './intent-layer.js',       Ctor: 'IntentLayer',      args: {} },
-
-      // v3.4.1 — 思考门控/认知安全/心流预测
-
-      deliberationGate:{ lazy: true, path: '../shield/deliberation-gate.js',  Ctor: 'DeliberationGate', args: {} },
-
-      epistemicSafety: { lazy: true, path: '../shield/epistemic-safety.js',   Ctor: '',                 args: {} },
-
-      flowPredictor:   { lazy: true, path: '../planner/flow-predictor.js',     Ctor: 'FlowPredictor',    args: {} },
-
-      // v3.4.2 — Fable 5 安全协议引擎
-
-      safetyGuardrails:{ lazy: true, path: '../shield/safety-guardrails.js',  Ctor: '',                 args: {} },
-
-      // v3.4.3 — 用户模型/行动追踪/目的引擎
-
-      userModel:       { lazy: true, path: './user-model.js',        Ctor: 'UserModel',         args: {} },
-
-      actionTracker:   { lazy: true, path: './action-tracker.js',    Ctor: 'ActionTracker',     args: {} },
-
-      purposeEngine:   { lazy: true, path: './purpose-engine.js',    Ctor: 'PurposeEngine',     args: {} },
-
-      // v3.4.4 — 风险分析/自适应控制/意图追踪/审计日志
-
-      riskAnalyzer:    { lazy: true, path: './risk-benefit-analyzer.js', Ctor: 'RiskBenefitAnalyzer', args: {} },
-
-      adaptiveCtrl:    { lazy: true, path: './adaptive-controller.js',   Ctor: 'AdaptiveController',  args: {} },
-
-      intentionTrack:  { lazy: true, path: './IntentionTracker.js',      Ctor: 'IntentionTracker',    args: {} },
-
-      auditLogger:     { lazy: true, path: './audit-logger.js',          Ctor: 'AuditLogger',         args: {} },
-
-      focusOfAttention: { lazy: true, path: '../memory/focus-of-attention.js', Ctor: 'FocusOfAttention', args: {} },
-
-      codeSelfDebug: { lazy: true, path: '../code/code-self-debug.js', Ctor: 'CodeSelfDebug', args: {} },
-
-      // v5.6.0 论文驱动升级
-
-      reflexionEngine: { lazy: true, path: '../cortex/reflexion-engine.js', Ctor: 'ReflexionEngine', args: {} },
-
-      memoryConsolidator: { lazy: true, path: '../memory/memory-consolidator.js', Ctor: 'MemoryConsolidator', args: {} },
-
-      multiAgentDialogue: { lazy: true, path: '../consciousness/multi-agent-dialogue.js', Ctor: 'MultiAgentDialogue', args: {} },
-
-      mctsReasoning: { lazy: true, path: '../reasoning/mcts-reasoning.js', Ctor: 'MCTSReasoning', args: {} },
-
-      hierarchicalPlanner: { lazy: true, path: '../planner/hierarchical-planner.js', Ctor: 'HierarchicalPlanner', args: {} },
-
-    };
+    // [v6.8.86] _lazy 注册表收敛为单一来源：原此处 117 行内联副本与
+    // engine-constructor.js 的 initializeLazyRegistry 逐条重复，双副本必漂移
+    // （本次审计 5 条路径错别字被迫两处同步修）。改为调用真身函数，杜绝再漂移。
+    // 注意：传 this 而非 hf —— start() 是类方法，模块级 hf 仅存在于 CLI 块。
+    initializeLazyRegistry(this);
 
 
 
@@ -6399,7 +6287,7 @@ if (require.main === module) {
 
     const health = hf.healthCheck ? hf.healthCheck() : {};
 
-    console.error(`[HeartFlow] ${VERSION} health check (${Date.now() - t0}ms):`);
+    console.error(`[HeartFlow] ${_VERSION().VERSION} health check (${Date.now() - t0}ms):`);
 
     // Run dispatch smoke tests
 
