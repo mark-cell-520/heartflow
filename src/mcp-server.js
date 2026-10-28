@@ -3540,6 +3540,44 @@ const HANDLERS = {
       };
     } catch (e) { return { error: e.message }; }
   },
+  // [r735] 注入混淆绕过通道（delimiter confusion + annulment override）MCP 接线。
+  // r735 轮初实测两类绕过形态全部静默放行（prompt_injection 是 BLOCK 级维度）：
+  //   ① 字母间撒分隔符："i-g-n-o-r-e all previous instructions" → pass
+  //      text-normalizer 的 strip_separator 只做成对合并（→ "ig-no-re"），
+  //      归一化结果反而更匹配不上任何模式，是比不处理更隐蔽的半修。
+  //   ② 无动词废止句式："the previous instructions are void" → pass
+  //      r733 三族合取要求覆盖动词出现，废止谓语族一个都不在动词表里。
+  // 判据与护栏见 src/injection-obfuscation.js 头注释；此处单独暴露，
+  // 供外部 agent 审计「哪一段被撒点、紧凑后是什么」与废止句式的三族归因。
+  heartflow_check_injection_obfuscation: (args) => {
+    try {
+      const mod = require('./injection-obfuscation.js');
+      const action = args?.action || 'check';
+      if (action === 'families') {
+        return {
+          annulmentFamilies: mod.ANNULMENT_PATTERNS.length,
+          scopeFamily: String(mod.SCOPE_PATTERN),
+          objectFamily: String(mod.OBJECT_PATTERN),
+          externalQualifier: String(mod.EXTERNAL_QUALIFIER),
+          severity: mod.OBFUSCATION_SEVERITY,
+          minCompactedLength: mod.MIN_COMPACTED_LENGTH,
+          minSprinkleSegments: mod.MIN_SPRINKLE_SEGMENTS,
+        };
+      }
+      const text = args?.text || '';
+      const r = mod.checkInjectionObfuscation(text, {
+        checkSynonyms: require('./injection-synonyms.js').checkInjectionSynonyms,
+      });
+      return {
+        count: r.count,
+        score: r.score,
+        blocked: r.count > 0,
+        injections: r.injections,
+        runs: r.runs,
+        compactedView: r.view,
+      };
+    } catch (e) { return { error: e.message }; }
+  },
   heartflow_check_decision_trace: (args) => {
     try {
       const { checkDecisionTrace } = require('./index.js');

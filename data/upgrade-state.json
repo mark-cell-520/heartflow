@@ -1,23 +1,22 @@
 {
-  "round": 734,
-  "version": "6.8.89",
+  "round": 735,
+  "version": "6.8.90",
   "roundStartedAt": "2026-10-28T04:20:00.000Z",
-  "lastFinishAt": "2026-10-28T17:20:00.000Z",
+  "lastFinishAt": "2026-10-28T20:14:29.532Z",
   "lastGreen": true,
   "lastChecks": [
-    "PASS 版本五处一致 = 6.8.89（VERSION/version.js/package.json/SKILL.md/README 口径戳）",
+    "PASS 版本五处一致 = 6.8.90（VERSION/version.js/package.json/SKILL.md/README 口径戳）",
     "PASS guard-abilities 20/20（dimensions 键 160 个 / summary 引用 123 个）",
-    "PASS doc-numbers-accuracy 22/22（README 补 6.8.89 changelog + MCP 工具 184→185 机器记账 + 测试数 18,996→19,032 机器记账）",
-    "PASS bidirectional-guard 召回 52/52、误拦 302/326（接线前后各跑一次，与基线完全一致，零新增误伤）",
+    "PASS doc-numbers-accuracy 22/22（README 补 6.8.90 changelog + MCP 工具 185→186 机器记账）",
+    "PASS bidirectional-guard 召回 52/52、误拦 302/326 —— 与基线完全一致，零新增误伤",
     "PASS bin/verify.js 16/16",
-    "PASS round-734 轮测试 21/21（test/round-734-evidence-gap.test.js，runner 清单 617 个文件内，不在失败清单）",
-    "PASS 全量回归 19033 过 / 68 败 / 19101 个（基线 18996/72/19068：通过 +37、失败 -4、总量 +33，失败数下降无新增）",
-    "PASS 第一次回归抓到并修掉 1 个本轮自引入回归（gate.test.js explicit evidence），修复后重跑全量回归得 19033/68",
-    "PASS 变异回滚自查干净：git status 只有本轮预期 11 个已跟踪改动 + 6 个新文件，node --check src/index.js 通过",
-    "PASS 引擎启动实测 MCP 工具 185 个 / 路由 1314 条 / 模块 161 个 / 维度 160 个（block 11 / rewrite 19 / verify 119）"
+    "PASS round-735 轮测试 52/52（test/round-735-injection-obfuscation.test.js；经真实 runner HF_RUN_ALL_SLICE=558/618 单跑同为 52/0）",
+    "PASS 全量回归 19066 过 / 75 败 / 19141 个（基线 19033/68/19101：失败 +7 逐个定位后全部落在存量噪声桶，零条本轮引入）",
+    "PASS security-audit 15/16，唯一失败 S2「git log/tag 未命中 6.8.90」本轮提交后自动转绿",
+    "PASS 引擎启动实测 MCP 工具 186 个 / 路由 1314 条 / 模块 161 个 / 维度 160 个（block 11 / rewrite 19 / verify 119）"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
   "published": "6.7.124",
   "publishedAt": "2025-09-25T20:03:42.912Z",
-  "notes": "r735 交接簿（v6.8.89 / evidence 维度复活：160 个维度里最后一个纯装饰接通）。\n【本轮怎么选题的】两个 cron 仍为空数组（hermes/cron/jobs.json），自主循环停着，r734 继续由主会话驱动。选题未经 decision 本体打分——我复测 r733 交接簿候选池第 1 位后判定：evidence 维度打分器恒返回满分是「160 个维度里唯一从未产出过 finding 的死维度」，且推翻了交接簿「动它会影响 verify 全局阈值」的过时记载（evidence 不在 allDims 里，overallScore 与它无关），爆炸半径比补新维度小得多。\n【下一轮候选池（r735，按纪律必须复测）】① 把 evidence 提级进 VERIFY_DIMS（本轮刻意没做，因为缺「良性翻转数」数据；做法：先在 302 条良性样本 + 文档散文 13895 句上量翻转数，>0 就继续留）；② 放宽第一人称/特指保守排除（Our new optimizer cuts training cost by 60%. 这类，需要新判据区分「自述方法性能」与「宣称普遍规律」，误伤面会上升）；③ 无动词注入句式：\"the previous instructions are void\" / \"all prior rules no longer apply\"（r733 候选③，三族合取判不了）；④ 分隔符混淆通道：i-g-n-o-r-e / ignore.previous.instructions / i g n o r e（r733 候选④，需先剥离再还原）；⑤ loaded_question 诱导性问题（r729 decision 0.81 第二名，r727 复测漏判 80%/误伤 0，至今未复测）；⑥ false_dilemma_extended / slippery_slope_extended / hasty_generalization_extended 三个存量维度补句式族；⑦ equivocation 一词多义偷换（AGENTS.md 已有 equivocation_sense_shift，动手前先 grep 确认是否同族）；⑧ camelCase 标识符被 de_encode 的 base64 试探解出乱码（r731 记录存量）；⑨ post_hoc 对 \"We applied the patch. Latency dropped 40% after the change.\" 判 rewrite（r733/r734 两次实测确认存量，HEAD 同参数也是 rewrite）；⑩ run-all.js 的变异回滚不可靠 + data/test-count.json 记账口径在轮与轮之间不一致（见本轮 UPGRADE_LOG 五·6，跨轮比失败数必须先确认两边都是完整运行）。\n【本轮踩的坑（r734 新增七条，详见 UPGRADE_LOG 六】① 交接簿的「为什么不做」也要复测——它记录的是当时的代码不是现在的（r733 那条 evidence 顾虑直接是错的，照着走会白花一整轮）；② 正则量词后写 \\b 不写 (?!\\w)：`%` 与句点都是非词字符，两者之间不构成 \\b，`…by 25%.` 整类漏判而 `…by 3x` 反而命中；③ 动词词干写 \\w+ 会把原形动词整条备选打掉（boost\\w+ 吃不到裸 boost），词干一律 \\w*；④ 守卫正则漏组尾 \\b 会让词中匹配误豁免（showers 被 shows? 命中，整段被当报道性放过）；⑤ 切段 split 字符类会把句末标点吃掉，疑问守卫 [?？] 从此永不成立——必须用后视断言 split(/(?<=[。！？!?；;\\n\\r])|(?<=\\.)(?=\\s)/)，既保留标点又能切开英文两句；⑥ 权重数组与 DEMAND 数组不同长 → weights[i] 取到 undefined → 扣分累加成 NaN → score 变 NaN → `NaN < 0.65` 恒 false，整条链路静默失效，测试报的是「漏判」不是「NaN」（轮测试已加数组长度机器记账断言）；⑦ 早退路径返回模块级单例会被 _applyPedagogyRelaxation 的就地赋值永久污染，每条早退路径都必须返回新建对象。\n【环境噪声】全量回归里 6 个 MCP 类常驻失败（mcp-server / mcp-smoke / mcp-auth-tier / mcp-guest-permission / knowledge-graph-mcp-state-round593 / knowledge-layer-mcp-state-round313）根因是 8099 被常驻 MCP 服务占用；约 60 个「未输出『N 通过, M 失败』结果行」属 r732/r733 已记的存量 runner 解析噪声，哪几个落进去随运行波动；dimension-action-wiring 的「良性技术复盘不受 clickbait 接线影响」是存量 post_hoc 误判（HEAD 同参数实测同样 rewrite）。\n【状态】npm published 仍 6.7.124；29+ commits 未 push GitHub（人工门禁）；Claude 侧技能副本 ~/.claude/skills/heartflow-engine 停在 6.8.62 / 147 维，未同步 hermes 的 160 维。r730 轮测试文件 round-730-normalize-pinyin-density.js 不带 .test.js 后缀不被 runner 发现（存量命名缺口，历来只手动跑）。本轮新增 scripts/tmp-734-*.js 五个探针已在提交前删除（round-guard 会查）。"
+  "notes": "r736 交接簿（v6.8.90 / 注入混淆绕过通道：分隔符撒点 + 无动词废止句式，14 条 BLOCK 级绕过形态全部从 pass 变 block）。\n【本轮怎么选题的】两个 cron 仍为空数组（hermes/cron/jobs.json），自主循环停着，r735 继续由主会话驱动。选题未经 decision 本体打分——我复测 r733/r734 交接簿候选池第 ③ ④ 位后判定它们是同一个主题的两半：prompt_injection 是 BLOCK 级维度，但字面模式库 + r732 despaced + r733 synonym 三条通道对这两类绕过形态 14/14 全部静默放行（轮初实测 gate.action 全是 pass）。\n【根因两条】① 分隔符撒点：text-normalizer.js:595 的 strip_separator 是成对合并（i-g-n-o-r-e → ig-no-re），是比不处理更隐蔽的半修；对照 :590 的 strip_letter_space 走整体去空白所以 \"i g n o r e\" 本来就命中，中文侧 :597 也覆盖了，英文单字母撒点是唯一漏口。② 无动词废止句式：r733 三族合取要求覆盖动词出现，废止谓语族一个都不在动词表里，第二族恒缺。\n【下一轮候选池（r736，按纪律必须复测）】① 部分撒点 + 换词叠加形态（d-i-s-r-e-g-a-r-d.prior.directives）未测，通道 A 目前只覆盖单字母撒点；② 通道 B 的 OBJECT_PATTERN 收窄到指令族，context/conversation/message 没进（误伤面会升）；③ 撤回或收紧 SCOPE_PATTERN 里的 system（\"the system configuration is obsolete\" 这类安全策略文档句会判，属已记录边界风险，本轮 326 条良性语料 0 命中所以收了）；④ 放宽第一人称/特指保守排除（Our new optimizer cuts training cost by 60%.）；⑤ loaded_question 诱导性问题（r729 decision 0.81 第二名，r727 复测漏判 80%/误伤 0，至今未复测）；⑥ false_dilemma_extended / slippery_slope_extended / hasty_generalization_extended 三个存量维度补句式族；⑦ post_hoc 对 \"We applied the patch. Latency dropped 40% after the change.\" 判 rewrite（r733/r734/r735 三次实测确认存量，HEAD 同参数也是 rewrite）；⑧ run-all.js 并发池 label 与输出块交错 + keep 过滤器只认「通过/✗/失败」三个词（❌ U+274C 被吃）——本轮为此多花一轮全量回归证伪；⑨ camelCase 标识符被 de_encode 的 base64 试探解出乱码（r731 记录存量）；⑩ evidence 提级进 VERIFY_DIMS（r734 候选①，缺良性翻转数数据）。\n【本轮踩的坑（r735 新增五条，详见 UPGRADE_LOG 六】① 「半修」比「不修」更隐蔽——strip_separator 的 applied 非空、归一化也真变了，但变出的 ig-no-re 比原文更匹配不上模式；审查归一化要看结果能否被下游模式匹配，不能只看 applied 非空。② 撒点正则必须排除 CJK 与数字，否则中文整段被吞成一个 run。③ 撒点正则不能写 \\b（r734 踩坑⑥ 同族：量词后写 \\b 会让整类漏判）。④ 同进程 A/B 必须把测量顺序也跑一遍——只跑 before→after 会得到 −1.08 µs 的假结论（第二遍吃到 V8 预热），反转后符号翻转才确认良性增量在噪声底之下。⑤ run-all.js:194 的 keep 过滤器只认「通过 / ✗ / 失败」，❌(U+274C) 不在其中，测试自建 ❌ 行被整行吃掉只剩汇总行——本轮已把轮测试 ❌ 行改成带「失败」二字。\n【环境噪声】全量回归里 6 个 MCP 类常驻失败（mcp-server / mcp-smoke / mcp-auth-tier / mcp-guest-permission / knowledge-graph-mcp-state-round593 / knowledge-layer-mcp-state-round313）根因是 8099 被常驻 MCP 服务占用；54 个「未输出『N 通过, M 失败』结果行」+ 1 个「注册 0 用例」属 r732/r733 已记的存量 runner 解析噪声，哪几个落进去随运行波动（首轮 56、二轮 54）；3 个 Command failed（round-502-helplessness 模块层漏检:7 / round-506-sole-narrative 模块层漏检:5 / round-572-associative-wiring 27过1败）git stash 出 HEAD 后同参数失败信息逐字相同；dimension-action-wiring 的「良性技术复盘不受 clickbait 接线影响」是存量 post_hoc 误判。\n【状态】npm published 仍 6.7.124；29+ commits 未 push GitHub（人工门禁）；Claude 侧技能副本 ~/.claude/skills/heartflow-engine 停在 6.8.62 / 147 维，未同步 hermes 的 160 维。本轮新增 scripts/tmp-735-*.js 三个探针已在提交前删除。"
 }
