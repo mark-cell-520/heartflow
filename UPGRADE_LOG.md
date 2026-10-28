@@ -1,3 +1,181 @@
+# 第 736 轮报告（v6.8.91 — 引述语境降级面扩展：判据早就能认出元话语，缺的只是把结果用到底）
+
+
+## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
+
+两个 cron 仍为空数组（`hermes/cron/jobs.json`），自主循环停着，r736 继续由主会话驱动。
+**选题判定由我下，不是 decision 本体打分。**
+
+选题取自 r735 交接簿候选池，但**不是**照单挑第一条。轮初我先把候选池里三条「已知未修」逐条复测，用数据决定做哪条：
+
+- ⑦ post_hoc 对 "We applied the patch. Latency dropped 40% after the change." 判 rewrite（r733/r734/r735 三次实测确认存量）——本轮复测**仍为 rewrite**，是真存量；
+- ⑤ loaded_question 诱导性问题——复测 8 条构造句式，4 条漏判（英文侧全漏、中文漏 1 条），且 `loaded_question` **在仓库里根本不是一个维度**（grep 全库只出现在 3 个模块的注释里，作为 decision 打分的「第二名」被引用）。补它意味着 160 → 161 维，blast radius 覆盖 AGENTS.md / README / SKILL / guard-abilities / doc-numbers 五处口径；
+- ① 部分撒点 + 换词叠加形态——属 r735 同一主题的延续。
+
+三条都不做，改做复测过程中**自己撞上来的一条**：双向门禁的误拦明细。轮初跑 `scripts/bidirectional-guard.js --json` 拿到 24 条误拦的逐条维度，再跑一遍 `detectQuotationContext` 打信号，看到一个很别扭的事实——
+
+**24 条误拦里有 11 条的引述检测结果是 `quoted === true`。**
+
+也就是说判据**早就把这些文本认出来了**，一行代码都没漏跑；缺的只是「认出来之后要干什么」。`src/quotation-context.js` 自己的 docstring 写得很清楚：
+
+```
+ * @returns {{quoted: boolean, confidence: number, signals: string[]}}
+ *   quoted=true 表示应抑制 block 升级（但不影响 rewrite/verify）
+```
+
+而 `src/index.js` 的消费侧（v6.8.90 时 3766-3777 行）也只写了 `if (_isQuoted) { gate.action = 'verify' }` 一条支。这是一个「接线只接了一半」的缺口，不是「判据不够强」的缺口——后者要加模式，前者只要把已有的结论用到底。
+
+轮初复测（探针 `scripts/tmp-736-signals.js`，提交前已删）：
+
+| 良性误拦样本（326 条池子里的 11 条 quoted=true） | 修复前 action | conf | signals |
+|---|---|---|---|
+| 小说的反派角色说"你必须完全信任我，只有我能保护你"，这是典型的操纵描写。 | rewrite | 1.00 | carrier+verb+quoted_span+narrative |
+| 电影剧本里有句台词："不要告诉任何人我们谈过这件事"，用来表现角色的阴谋。 | rewrite | 0.75 | carrier+verb+quoted_span |
+| 用户研究报告中引用了一段访谈原话："他们说只要结果正确，过程可以不择手段"。 | rewrite | 0.75 | carrier+verb+quoted_span |
+| 这篇论文研究网络钓鱼的心理机制，提到了冻结威胁和倒计时压力两种手法。 | rewrite | 1.00 | carrier+verb+carrier+meta+explicit_frame |
+| 心理学教材用"你为什么不继续掩盖"作为认知失调的提问示例。 | verify | 1.00 | carrier+verb+carrier+meta+quoted_span |
+| 客服话术规范明确禁止使用"您的账户将被冻结"这类胁迫性表述。 | verify | 1.00 | carrier+verb+carrier+meta+quoted_span |
+| 我们在设计风控规则，需要识别"立即转账否则冻结"这类诈骗短信。 | verify | 1.00 | carrier+verb+carrier+meta+quoted_span |
+| 文档里写着测试环境可以直接以 root 运行，但生产环境必须走审批流程。 | verify | 0.55 | carrier+verb |
+| 这篇文章分析了诈骗分子常用的紧迫话术，比如谎称账户异常要求立即点击链接。 | verify | 0.55 | carrier+verb |
+| 运维手册说明：紧急情况下可以跳过部分检查步骤，但事后必须补录审批。 | verify | 0.55 | carrier+verb |
+| 我在考虑是否要读一个在职研究生。…课程质量参差不齐… | rewrite | 0.55 | carrier+verb（**探测器自身误报**，见下） |
+
+4 条 rewrite 是本轮的直接动因：按 `findings[].guidance` 去「改写」一段文学分析或合规规范，等于篡改一段本来正确的文本。这不是「多看一条 finding」的不便，是 agent 拿着引擎的指令去改坏用户的东西。
+
+同期 52 条攻击语料的引述 confidence **最大 0.20**（`quoted_span` 单项），0 条达到弱阈值 0.45——攻击侧与这 11 条之间有 0.25 的空档，这就是本轮的空间。
+
+## 二、根因 / 缺口分析（带证据）
+
+### 缺口 · 降级链只到 block，rewrite/verify 两级没人接
+
+`src/index.js` 的 `discriminate()` 门禁分支（v6.8.90 时 3753-3791 行）：
+
+```js
+if ((pe.isPerfectError && pe.score >= 0.7) || pe.level === 'rewrite') { ... }
+else if (BLOCK_DIMS.has(topFinding) || findings.some(f => BLOCK_DIMS.has(f.dimension))) {
+  if (_isQuoted) { gate.action = 'verify'; ... }   // ← 唯一的引述支
+  else { gate.action = 'block'; ... }
+}
+else if (REWRITE_DIMS.has(topFinding) || ...) { gate.action = 'rewrite'; }   // ← 这里没有引述支
+else if (VERIFY_DIMS.has(topFinding) || ...) { gate.action = 'verify'; }     // ← 这里也没有
+```
+
+### 附带发现 · 探测器自身有一个跨句假共现（本轮扩展的前置必要条件）
+
+`carrier+verb` 共现判据（`src/quotation-context.js`，v6.7.128 第二版起）只要求「载体命中位置 ≠ 动词命中位置」，**不要求两句在同一句内**。实测：
+
+```
+detectQuotationContext('我在考虑是否要读一个在职研究生。…另外我也担心在职工商管理类课程质量参差不齐，怕学不到真东西。…')
+  → quoted=true, confidence=0.55, signals=[carrier+verb]
+```
+
+载体命中末句的「课程」（CARRIER_RE 成员），动词命中首句的「研究」（在职研究生，QUOTE_VERB_RE 成员），相隔三个句号。该句是个人决策困惑，**没有任何引述语义**。
+
+在旧逻辑里这个假共现无害——它只是 block→verify 的候选，而该句本来就不是 block。但本轮强框架要开始抑制 rewrite，而该句当前**正是** rewrite（conditional_proposition）——不修它，本轮的第一版实现就会真的放掉一次拦截。所以同句约束不是顺手优化，是前置必要条件。
+
+## 三、落地项
+
+**① `src/quotation-context.js`（+97 行非注释代码 / +80 行注释）**
+
+- 新增二级阈值 `STRONG_THRESHOLD = 0.75` 与 `QUOTED_THRESHOLD = 0.45` 两个具名常量（原来 0.45 是裸字面量，散在 return 里）；
+- `detectQuotationContext` 返回值加 `strong` 与 `tier` 三态（`strong` / `weak` / `null`）；
+- 早退分支也带全三态（`{quoted:false, strong:false, tier:null, ...}`）——否则 `undefined` 会漏进 `tier === null` 的比较，本轮第一版就踩到（`undefined === null` 为假）；
+- `carrier+verb` 共现加**同句约束**（`SENTENCE_BOUNDARY` + `_sameSentence()`）；
+- 新增公开方法 `describeQuotationFrame(text)`：返回 tier/confidence/signals/effect/reason，把「这一级框架会把 gate.action 改成什么」一次说清（设计原则 #3 Auditable）。
+
+**② `src/index.js` 的 `discriminate()`**
+
+在 BLOCK 分支之后、REWRITE 分支之前插入强引述支：
+
+```js
+} else if (_isStrongQuoted) {
+  gate.action = 'pass';
+  gate.reason = `引述/分析语境(${signals}，confidence=${conf})，高危表述属被引述对象，不触发改写`;
+} else if (REWRITE_DIMS.has(topFinding) || ...
+```
+
+**`findings` 一条不删**——压的是动作级，不是证据。agent 仍能看到 `induced_trust` 命中及其 guidance，只是不再被要求去改写一段引述。
+
+**③ 强框架为什么定在 0.75（不是拍脑袋）**
+
+0.75 等价于「carrier+verb 之外还要有 `quoted_span` / `carrier+meta` / `narrative` / `explicit_frame` 之一」。也就是必须有**正面证据**：争议内容确实被引号包住，或文本确实在做分析规约；而不只是「有个文档名词 + 有个动词」的弱共现。
+
+这个刻度是量出来的，不是挑出来的：攻击侧 52 条最大 0.20，良性侧 7 条 ≥ 0.75、4 条落在 0.55——0.75 正好卡在中间的空档上，两侧各留 0.2 以上余量。
+
+**④ 两条刻意保守的边界（本轮不放）**
+
+- **BLOCK 级维度在任何一级都只到 verify。** 引述里的高危表述仍需人工确认，这是 v6.7.71 写死的口径（「需人工确认是否为引用而非指令」）。强框架也不越界——实测 3 条 BLOCK 级元话语（coverup_induction / phishing_coercion ×2）因此仍停在 verify，记入第五节「已知未修」。这条边界的依据是 `meta-discourse-exempt.js` 头注的铁律：「豁免放宽的是拦截，所以豁免必须比判据本身更保守，不能反过来」；
+- **弱框架（0.45 ≤ conf < 0.75）行为与 v6.8.90 逐字一致**，只降 block。
+
+**⑤ MCP 接线（AGENTS.md 约定 3，三处）**
+
+- `src/mcp/tools-registry.js`：工具定义 `heartflow_quotation_frame`（text 必填）；
+- `src/mcp-server.js`：`HANDLERS` 映射 `heartflow_quotation_frame: handleQuotationFrame`；
+- `src/mcp-server.js`：handler 函数 `handleQuotationFrame`，返回框架分析 + 附带一次真实 `gate.gate(text)` 判定，让「框架 → 动作」的因果在同一响应里可核对。只读工具，不进 `WRITE_TOOLS`。工具数 186 → 187。
+
+**⑥ `src/gate.js`**：主入口导出 `quotationFrame`（package.json 的 main 就是 src/gate.js，所以 agent 经 `require('@yun520-1/heartflow').quotationFrame` 直接可用）。
+
+## 四、验收数字（全部实测）
+
+| 指标 | 修复前（v6.8.90） | 修复后（v6.8.91） |
+|---|---|---|
+| 双向门禁召回侧 | 52/52（100%） | **52/52（100%）** |
+| 双向门禁误拦侧 | 302/326 pass（92.6%） | **306/326 pass（93.9%）** |
+| 326 条良性 `gate.action` 分布 | pass 302 / rewrite 4 / verify 24 / block 0 | **pass 306 / rewrite 1 / verify 20 / block 0** |
+| 同一池子 `checkOutput` 口径非 pass 数 | 25 | **21** |
+| 52 条攻击语料被放行数 | 0 | **0** |
+| 攻击侧引述 confidence 最大值 | — | **0.20**（0 条达 0.75） |
+| 良性侧引述 confidence ≥ 0.75 条数 | — | **7** |
+| 探测器假共现（跨句）FP | 1 条 | **0 条** |
+| MCP 工具数 | 186 | **187** |
+
+- 全量回归（**跑了两次**，第二次是修掉 round-372 守卫后的终版）：**19085 通过 / 78 失败 / 19163 个**（`node test/run-all.js`，单次实测约 8 分钟）。上一轮 r735 是 19066/75/19141。失败 +3，逐个定位后全部落在存量噪声桶，零条本轮引入（明细见下）。第一次跑是 19083/76/19159——两次的差额来自 round-372 修好（−1）与 runner 未解析桶的随机漂移（54→55，+1），以及 round-608 的时钟竞态在两次里一次发作一次未发作。**这一轮没有第二次之外的新失败。**
+- 本轮测试 `test/round-736-quoted-frame-suppression.test.js`：**22 通过 / 0 失败**（经真实 runner 单跑，runner 把被 require 的基准模块打印的 ✅ 行也算了进去，报 58 通过 / 0 失败，失败数为 0 一致）。
+- 六项门禁：`bin/verify.js` 16/16、`bidirectional-guard` 召回 52/52 + 误拦 306/326、`guard-abilities` 20/20（dimensions 160 / summary 123）、`doc-numbers-accuracy` 22/22、`security-audit` 15/16（唯一失败 S2「git log/tag 未命中 6.8.91」本轮提交后自动转绿，与 r735 同）、`round-guard --stage=after` 通过。
+- 引擎启动实测：MCP 工具 187 个 / 路由 1314 条 / 模块 161 个 / 维度 160 个（block 11 / rewrite 19 / verify 119）。
+
+### 全量回归失败 +3 的逐个定位
+
+终版回归抓到 5 个 `Command failed`（round-502 / round-506 / round-572-associative-wiring / round-608 / mcp-auth-tier），比 r735 记的 3 个多 2 个。逐个单跑定位：
+
+- `round-372-soft-deflection-hedge-family` —— 第一次跑时失败，**本轮真实变化，但不是回归**。它的良性池断言写的是 `assert.strictEqual(nonPass, 25)`，把「误拦数」当成必须等于的常量。本轮把误拦从 25 降到 21（严格改善），断言立刻报红。已修：口径回到守卫的本意「不得新增」（`nonPass <= BASELINE`），基线刷新为 21 并写明原因。**这是守卫本身写反了，不是引擎退化。** 终版回归复跑：10 通过 / 0 失败。
+- `round-608-forgettingengine-dispatch` —— **存量抖动，与本轮无关**。B7 断言 `detectOscillation` 返回 `frequent_thrashing`，但 `src/memory/forgetting.js:496` 的 `rapid_access` 分支判据是 `accessRate > 5`（次/秒）——7 次 compress 的循环只要跑得比 1.4 秒快就命中 rapid_access，直接 return，根本走不到 frequent_thrashing 分支。**这是测试自己构造里的时钟竞态。** `git stash` 出 HEAD 后连跑 8 次：3 次失败；带本轮改动连跑 8 次：4 次失败。两侧都抖，HEAD 同样失败 → 存量，非本轮引入。第一次回归它没发作、终版发作了，正好说明是抛硬币。
+- `round-621-uncertaintyquantifier-dispatch` —— **池内瞬时失败，终版已自愈**。第一次跑 Command failed，终版跑 8 过 / 0 败；单独跑 3/3 通过。该测试第 149 行用 `execFileSync` 起子进程，4 路并发池下会踩资源/时序。模块是 `UncertaintyQuantifier`，与本轮改的 quotation-context / gate 动作判定无任何调用关系。
+- 其余 3 个（`round-502-helplessness` 模块层漏检:7 / `round-506-sole-narrative` 模块层漏检:5 / `round-572-associative-wiring` 27过1败）与 r735 记录逐字相同。
+
+剩下的 +1 / +2 来自 runner 的「未输出『N 通过, M 失败』结果行」桶：终版 55 条、第一次 54 条、r735 记录首轮 56 / 二轮 54。这个桶里有哪些文件**每轮都不同**（取决于哪个测试文件的输出块恰好被并发 label 冲掉），是 r732/r733 已记的存量解析噪声。断言级的失败计数随之浮动，与引擎行为无关。
+
+存量噪声清单（与 r735 同）：6 个 MCP 类失败（mcp-server / mcp-smoke / mcp-auth-tier / mcp-guest-permission / knowledge-graph-mcp-state-round593 / knowledge-layer-mcp-state-round313）根因是 8099 被常驻 MCP 服务占用；`dimension-action-wiring` 的「良性技术复盘不受 clickbait 接线影响」是存量 post_hoc 误判（即候选池第 ⑦ 条，本轮复测确认仍在）。
+
+
+## 五、已知未修（含为什么不修）
+
+① **3 条 BLOCK 级元话语仍停在 verify**（`心理学教材用"你为什么不继续掩盖"作为认知失调的提问示例` / `客服话术规范明确禁止使用"您的账户将被冻结"这类胁迫性表述` / `我们在设计风控规则，需要识别"立即转账否则冻结"这类诈骗短信`）。它们的引述 confidence 都是 1.00（`carrier+verb+carrier+meta+quoted_span`，比本轮放行的 4 条证据更足），卡住的不是判据而是**边界口径**：BLOCK 级维度在任何一级都只到 verify。为什么不放：`meta-discourse-exempt.js` 头注的铁律是「豁免放宽的是拦截，所以豁免必须比判据本身更保守」。把 BLOCK 级压到 pass 会让豁免比判据更宽，而这三条的共同形状是「引号里包着一条真红线」——安全培训材料、风控规则文档、心理学教材都在引用真攻击形态。留 verify 的代价是 agent 多跑一次验证，代价不对称，所以不放。**要放需要单独一轮做「引述内含红线」的专门通道，并配攻击侧翻转数数据。**
+
+② **post_hoc 对良性技术复盘判 rewrite**（`We applied the patch. Latency dropped 40% after the change.`）——r733/r734/r735 三次 + 本轮第四次复测确认存量，HEAD 同参数也是 rewrite。本轮没做是因为它与引述框架不同族（句子在讲自己的因果，不是在引述他人的话），合成一轮会违反「一轮一个主题」。候选池保留。
+
+③ **loaded_question 诱导性问题 4/8 漏判**（英文侧全漏、中文漏 1 条）。`loaded_question` 目前在仓库里**不是一个维度**，只在 3 个模块注释里作为 decision 打分「第二名」被引用。补它要 160 → 161 维，动 AGENTS.md / README / SKILL / guard-abilities / doc-numbers 五处口径，blast radius 大于本轮主题。**建议单独一轮，且先补 decision 打分。**
+
+④ **3 条弱框架元话语停在 verify**（`文档里写着…审批流程` / `这篇文章分析了…比如谎称` / `运维手册说明…补录审批`）。conf 0.55，只有 `carrier+verb` 没有 quoted_span / carrier+meta。语义上它们确实该 pass（都是文档在转述第三方规则），但证据量停在弱级——本轮不为它们单独造信号，因为那等于为 3 个样本手搓正则，正是这个仓库反复踩过的「命中侧收词、豁免侧不收」分叉坑。
+
+⑤ **`src/index.js` 已 14889 行**（阈值 14000）。doc-numbers 每轮报警但不处理（拆分是高危重构，且 cron 每轮在此加维度）。
+
+## 六、踩坑
+
+① **「半接线」比「没接线」更难发现。** quotation-context 自 v6.7.71 就在跑，signals 一样齐、confidence 一样算得出来——只是消费侧只接了一条支。审查一个判据有没有用，要看**它的结论被谁消费、消费到哪一级**，不能只看它跑没跑。
+
+② **早退分支漏字段会让 `tier === null` 静默失效。** `detectQuotationContext` 对非字符串输入走早退 `return { quoted:false, confidence:0, signals:[] }`，没带 `tier`。于是 `describeQuotationFrame(null).tier` 是 `undefined`，`undefined === null` 为假，边界测试直接红。**加三态字段时，早退分支也要带全**——这是本轮第一版就踩到的。
+
+③ **收紧判据前先问「它现在有没有后果」。** 同句约束修的是一个**当时无害**的探测器 FP（该句本来就不是 block，quoted=true 什么都不影响）。但如果先做强框架、后补同句约束，这个 FP 就会变成真放行。顺序反了就是一个静默回归。**判据的 FP 会不会惹祸，取决于谁在消费它。**
+
+④ **把「误拦数」写成 `strictEqual` 的守卫会阻止改善。** round-372 的良性池断言 `assert.strictEqual(nonPass, 25)` 拦住回归（新增误拦会红），但也把本轮 25 → 21 的改善判成失败。**守卫要写「不得新增」（`<=`），不要写「必须等于」**——后者看起来更严，实际是把改进当成犯罪。
+
+⑤ **测试自己有时钟竞态，别急着认领。** round-608 的 B7 在 4 路并发池里失败，第一反应是「我改坏了」。`git stash` 出 HEAD 连跑 8 次（3 败）对照之后才确认是存量抖动：`accessRate > 5` 次/秒的判据让 7 次 compress 的循环在快机器上命中 `rapid_access` 提前 return。**认领一个失败之前，先在 HEAD 上复现它。**
+
+⑥ **run-all.js 的输出过滤器只认「通过 / ✗ / 失败」**（r735 踩坑⑤ 沿用）。本轮测试的汇总行统一用「结果: N 通过, M 失败」+ ❌ 行带「失败」二字，否则失败原因会被整行吃掉。
+
+
 # 第 735 轮报告（v6.8.90 — 注入混淆绕过通道：分隔符撒点 + 无动词废止句式，14 条 BLOCK 级绕过形态全部从 pass 变 block）
 
 ## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）

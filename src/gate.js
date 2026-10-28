@@ -23,6 +23,8 @@ const pipelineModule = require('./pipeline.js');
 const { detectPedagogicalContent } = require('./pedagogy.js');
 const { buildTrace, summarizeTrace } = require('./discrimination-trace.js');
 const { normalize } = require('./text-normalizer.js');
+// [v6.8.91 第 736 轮] 引述框架的对外可解释入口（AGENTS.md 约定 3 同步到 MCP）。
+const { describeQuotationFrame } = require('./quotation-context.js');
 
 function _pedagogyMode(text) {
   return detectPedagogicalContent(text) ? 'pedagogical' : undefined;
@@ -89,4 +91,23 @@ function pipeline(text, evidence) {
 // 从 pipeline 重新导出完整版
 const { runPipeline, checkInput, checkDraft, checkOutput } = pipelineModule;
 
-module.exports = { gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput };
+/**
+ * 引述框架分析（对外公开方法，MCP 工具 heartflow_quotation_frame）。
+ *
+ * 回答「这段文本里的高危表述是被引述的对象，还是作者自己说出来的」，
+ * 并给出该框架对 gate.action 的实际影响。用于 agent 自证一次
+ * rewrite/block 抑制不是漏放，而是元话语引述。
+ *
+ * @param {string} text
+ * @returns {{quoted:boolean, strong:boolean, tier:string|null,
+ *            confidence:number, signals:string[], effect:object, reason:string}}
+ */
+function quotationFrame(text) {
+  try {
+    return describeQuotationFrame(text);
+  } catch (_) {
+    return { quoted: false, strong: false, tier: null, confidence: 0, signals: [], effect: {}, reason: '引述框架分析失败' };
+  }
+}
+
+module.exports = { gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput, quotationFrame };

@@ -35,6 +35,36 @@ const META_INTENT_RE = /(如何|怎么|怎样|什么是|为什么|识别|辨别|
 /** 直接引语包裹（被引内容是争议来源） */
 const QUOTED_RE = /["""''「」『』（）()【】\[\]]{1}[\s\S]{2,80}?["""''「」『』（）()【】\[\]]{1}/;
 
+/** 弱引述框架阈值：够格把 block 降为 verify（[v6.7.71] 起沿用不变） */
+const QUOTED_THRESHOLD = 0.45;
+/** 强引述框架阈值：够格把 rewrite / verify 压到 pass（[v6.8.91 第 736 轮] 新增） */
+const STRONG_THRESHOLD = 0.75;
+
+/**
+ * [v6.8.91 第 736 轮] 句界符：载体与引述动词必须落在**同一句**内才算共现。
+ *
+ * 由来（第 736 轮立项实测的探测器自身误报）：
+ *   「我在考虑是否要读一个在职研究生。…另外我也担心在职工商管理类课程质量
+ *    参差不齐，怕学不到真东西。」→ quoted=true、confidence=0.55、signals=[carrier+verb]
+ *   载体命中末句的「课程」，动词命中首句的「研究」（在职研究生）——两句
+ *   相隔三个句号，却被判成「这份材料被引述」。
+ *   该句是个人决策困惑，没有任何引述语义；在旧逻辑里它只是 block→verify
+ *   的候选（而它本来就不是 block，所以无害），一旦强框架开始抑制 rewrite
+ *   （它当前正是 rewrite），这个假共现就会真的放掉一次拦截。
+ * 判据：真实引述句的「载体 + 引述动词」几乎总是在同一句内（「文档里写着」、
+ * 「文章分析了」、「教材用…作为示例」）；跨句共现在语用上不成立——
+ * 你不能引用一份跨越了句界的材料。
+ */
+const SENTENCE_BOUNDARY = /[。！？!?；;\n]/;
+
+/** 两个命中位置之间是否存在句界符 */
+function _sameSentence(text, i, j) {
+  const lo = Math.min(i, j);
+  const hi = Math.max(i, j);
+  if (hi <= lo) return true;
+  return !SENTENCE_BOUNDARY.test(text.slice(lo, hi));
+}
+
 /**
  * 检测文本是否处于引述/分析语境。
  *
@@ -43,7 +73,9 @@ const QUOTED_RE = /["""''「」『』（）()【】\[\]]{1}[\s\S]{2,80}?["""''�
  *   quoted=true 表示应抑制 block 升级（但不影响 rewrite/verify）
  */
 function detectQuotationContext(text) {
-  if (!text || typeof text !== 'string') return { quoted: false, confidence: 0, signals: [] };
+  // 早退也要带全 tier 三态（[v6.8.91 第 736 轮]：调用方按 tier 分支，
+  // 缺字段会让 undefined 漏进比较，`undefined === null` 为假）
+  if (!text || typeof text !== 'string') return { quoted: false, strong: false, tier: null, confidence: 0, signals: [] };
   const signals = [];
   let score = 0;
 
@@ -69,12 +101,14 @@ function detectQuotationContext(text) {
   // 判据改为：存在「载体命中位置 ≠ 动词命中位置」的配对，即算共现。
   // 用 matchAll 取全部命中位置（String.match 只返回第一个，看不到后面
   // 「报告」「引用」——这正是第一版误判的直接原因）。
+  // [v6.8.91 第 736 轮] 追加同句约束：两个位置之间不得有句界符，
+  // 否则「首句的研究 + 末句的课程」这类跨句假共现会被当成引述证据。
   const carrierHits = [...text.matchAll(new RegExp(CARRIER_RE.source, 'g'))];
   const verbHits = [...text.matchAll(new RegExp(QUOTE_VERB_RE.source, 'g'))];
   let coLocated = false;
   for (const c of carrierHits) {
     for (const v of verbHits) {
-      if (c.index !== v.index) coLocated = true;
+      if (c.index !== v.index && _sameSentence(text, c.index, v.index)) coLocated = true;
     }
   }
   if (carrierHits.length > 0 && verbHits.length > 0 && coLocated) {
@@ -146,7 +180,66 @@ function detectQuotationContext(text) {
   // 实测：0.4/0.45/0.5 均达到 100% 识别率 + 0% 误判；0.3 起出现 4% 误判
   // （真指令被误判为引述会导致 block 被降级，危险），0.6 识别率掉到 64%。
   // 取中点是为两侧留余量，不是取边界值。
-  return { quoted: confidence >= 0.45, confidence, signals };
+  //
+  // [v6.8.91 第 736 轮] 二级阈值 STRONG_THRESHOLD = 0.75：**强引述框架**。
+  // 为什么需要第二级：0.45 这一级只够支撑「block → verify」——动作仍然
+  // 非 pass，命中仍进 findings 供人工确认。而元话语文本上的 rewrite 级误拦
+  // （「小说的反派角色说"你必须完全信任我…"这是典型的操纵描写」被判改写）
+  // 需要把动作直接压到 pass，那时误判的代价从「多看一条 finding」升级为
+  // 「 agent 按 guidance 去篡改一段本来正确的文学分析」。
+  // 故强框架刻意要求**高于**弱框架的证据量：0.75 等价于「carrier+verb 之外
+  // 还要有 quoted_span / carrier+meta / narrative / explicit_frame 之一」——
+  // 即必须有「争议内容确实被引号包住」或「确实在做分析规约」的正面证据，
+  // 而不只是「有个文档名词 + 有个动词」。
+  // 实测（第 736 轮，52 条攻击语料 + 326 条良性语料）：
+  //   攻击侧 52/52 的 confidence 最大 0.20（quoted_span 单项），0 条 ≥ 0.75；
+  //   良性侧 7 条 ≥ 0.75，全部是元话语引述（小说对白/剧本台词/访谈原话/
+  //   教材示例/论文手法分析/话术规范禁止/风控规则识别）。
+  const tier = confidence >= STRONG_THRESHOLD ? 'strong'
+    : (confidence >= QUOTED_THRESHOLD ? 'weak' : null);
+  return { quoted: confidence >= QUOTED_THRESHOLD, strong: confidence >= STRONG_THRESHOLD, tier, confidence, signals };
 }
 
-module.exports = { detectQuotationContext };
+/**
+ * 引述框架的完整可解释描述（对外公开方法，AGENTS.md 约定 3 同步到 MCP）。
+ *
+ * 设计原则 #3「Auditable」要求每个抑制动作都能回答「为什么」——
+ * `detectQuotationContext` 只返回布尔与分数，agent 看到 rewrite 被压成 pass
+ * 时无法自证。本函数把判据、分级、以及各级对 gate.action 的实际影响一次给出。
+ *
+ * @param {string} text
+ * @returns {{quoted: boolean, strong: boolean, tier: string|null,
+ *            confidence: number, signals: string[], effect: object,
+ *            reason: string}}
+ */
+function describeQuotationFrame(text) {
+  const d = detectQuotationContext(text);
+  const effect = {
+    // 弱框架：block → verify（[v6.7.71] 既有行为，保持不变）
+    blockDowngradedTo: d.quoted ? 'verify' : 'block',
+    // 强框架：rewrite / verify → pass（[v6.8.91 第 736 轮] 新增）
+    rewriteSuppressed: d.strong,
+    verifySuppressed: d.strong,
+  };
+  let reason;
+  if (d.strong) {
+    reason = `强引述框架（signals=${d.signals.join('+')}，confidence=${d.confidence.toFixed(2)}）：` +
+      '文本在引述/分析/规约危险表述而非自己发出，rewrite 与 verify 升级被抑制，findings 仍保留供审计';
+  } else if (d.quoted) {
+    reason = `弱引述框架（signals=${d.signals.join('+')}，confidence=${d.confidence.toFixed(2)}）：` +
+      '仅把 block 降为 verify，不抑制 rewrite/verify——证据量不足以直接放行';
+  } else {
+    reason = `未命中引述框架（signals=${d.signals.join('+') || '无'}，confidence=${d.confidence.toFixed(2)}）`;
+  }
+  return {
+    quoted: d.quoted,
+    strong: d.strong,
+    tier: d.tier,
+    confidence: d.confidence,
+    signals: d.signals,
+    effect,
+    reason,
+  };
+}
+
+module.exports = { detectQuotationContext, describeQuotationFrame };

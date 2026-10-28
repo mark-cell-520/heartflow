@@ -3053,6 +3053,34 @@ function handleGateCheck(args) {
   }
 }
 
+/**
+ * [v6.8.91 第 736 轮] 引述框架分析（三处同步第 3 处）。
+ * 只读工具：不碰任何引擎状态，不改文本，纯判定 + 解释。
+ * 存在的理由：强框架下 gate 会把 rewrite/verify 压成 pass，agent 需要能
+ * 回答「为什么这次没拦」——否则抑制动作在调用侧就是不可解释的黑箱。
+ */
+function handleQuotationFrame(args) {
+  const { text } = args || {};
+  if (!text) throw new Error('text 是必填参数');
+  try {
+    const gate = require(HF_DIR + '/src/gate.js');
+    const frame = gate.quotationFrame(text);
+    return {
+      ...frame,
+      // 附带一次真实 gate 判定，让「框架 → 动作」的因果在同一响应里可核对
+      gate: (() => {
+        try {
+          const r = gate.gate(text);
+          return { action: r.gate.action, reason: r.gate.reason, findings: (r.findings || []).map(f => f.dimension) };
+        } catch (_) { return null; }
+      })(),
+      timestamp: Date.now(),
+    };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
 function handleGatePipeline(args) {
   const { text, evidence = [] } = args || {};
   if (!text) throw new Error('text 是必填参数');
@@ -3290,6 +3318,9 @@ const HANDLERS = {
   heartflow_gate: handleGate,
   heartflow_gate_check: handleGateCheck,
   heartflow_gate_pipeline: handleGatePipeline,
+  // [v6.8.91 第 736 轮] 引述框架可解释入口（三处同步第 2 处：
+  // tools-registry 工具定义 + 本映射 + handleQuotationFrame）
+  heartflow_quotation_frame: handleQuotationFrame,
   // [v6.7.72] 误报反馈闭环（心虫 decision.decide 选定 0.92）
   heartflow_false_positive: handleFalsePositiveTool,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,

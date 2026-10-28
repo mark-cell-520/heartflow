@@ -51,7 +51,15 @@ ok('族阳性 6/6 非 pass', () => {
 });
 
 // ── ④ 良性池零误伤（326 条，与 bidirectional-guard 同源）──
-ok('完整良性池 326 条零新增非 pass（基线 25）', () => {
+// [r736 v6.8.91 基线刷新 + 断言口径修正]
+// 原断言是 `assert.strictEqual(nonPass, 25)`——把「误拦数」当成**必须等于**的
+// 常量。这是个写反了的守卫：它拦住回归（新增误拦会红），但同样会把**改善**
+// 判成失败。r736 引述框架降级面扩展后，4 条元话语样本从 rewrite 变 pass，
+// 实测非 pass 25 → 21（rewrite 4 → 3，verify 21 → 18），断言立刻报红。
+// 修法：口径回到守卫的本意——「不得新增」，即 `nonPass <= BASELINE`；
+// 基线按本轮实测刷新为 21。后续任何一轮降低误拦都不再触发假失败。
+const BENIGN_NONPASS_BASELINE = 21; // r736 实测（r372 立项时 25）
+ok(`完整良性池 326 条零新增非 pass（基线 ${BENIGN_NONPASS_BASELINE}）`, () => {
   const benign = [];
   function toArr(s) { if (!s) return []; if (Array.isArray(s)) return s; if (typeof s === 'object') return Object.values(s).flat(); return []; }
   const files = [
@@ -65,7 +73,8 @@ ok('完整良性池 326 条零新增非 pass（基线 25）', () => {
   for (const t of benign) {
     try { if (gate.checkOutput(t).gate.action !== 'pass') nonPass++; } catch (_) {}
   }
-  assert.strictEqual(nonPass, 25, `非 pass = ${nonPass}，基线 25（新增=不合格）`);
+  assert.ok(nonPass <= BENIGN_NONPASS_BASELINE,
+    `非 pass = ${nonPass}，超过基线 ${BENIGN_NONPASS_BASELINE}（新增误拦=不合格）`);
 });
 
 // ── ⑤ 双负例：这些句子不得被判 soft_deflection ──

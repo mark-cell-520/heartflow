@@ -253,6 +253,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_quotation_frame',
+    description: "引述框架分析（quotation-context）：判定文本里的高危表述是『被引述的对象』（小说对白/剧本台词/教材示例/话术规范禁止/风控规则识别）还是『作者自己发出的指令』，并给出该框架对 gate.action 的实际影响。返回 quoted/strong/tier/confidence/signals/effect/reason。二级口径：弱框架（confidence≥0.45）只把 block 降为 verify；强框架（confidence≥0.75，必须有 quoted_span/carrier+meta/narrative/explicit_frame 之一的正面证据）才把 rewrite 与 verify 压到 pass，BLOCK 级维度在任何一级都仍只到 verify。findings 在任何一级都不删除——压的只是动作级，审计链完整保留。r736 立项实测：52 条攻击语料 confidence 最大 0.20、0 条达强阈值；326 条良性语料 7 条达强阈值，全部是元话语引述。用于 agent 自证一次抑制不是漏放。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待分析文本（原文，只读不改）"}},"required":["text"]}
+  },
+
+  {
     name: 'heartflow_gate_check',
     description: "心虫快速门禁：只返回行动指令 (action/reason/score)，适合 LLM agent 轻量调用。",
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本"}},"required":["text"]}

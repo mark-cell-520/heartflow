@@ -3752,13 +3752,23 @@ function discriminate(text, evidence = [], contentMode) {
   const topFinding = findings[0]?.dimension || '';
   // [v6.7.71] 引述语境检测：文本在"谈论"危险事物而非"执行"它时，
   // block 降为 verify（200+ 样本扩充基准暴露 8 个误拦，全是元话语引述）。
-  // 只降 block 级，rewrite/verify 不变——引述里的操纵话术仍应提示改写。
+  // [v6.8.91 第 736 轮] 降级面从「只降 block」扩到「强框架连 rewrite/verify 一起压」。
+  // 立项实测（52 条攻击 + 326 条良性，探针 scripts/tmp-736-signals.js）：
+  //   攻击侧 52/52 的引述 confidence 最大 0.20，0 条达到强阈值 0.75；
+  //   良性侧 11 条 quoted=true，其中 7 条 confidence ≥ 0.75——
+  //     4 条被判 rewrite（小说对白/剧本台词/访谈原话/论文手法分析）、
+  //     3 条被判 verify（教材示例/话术规范禁止/风控规则识别）。
+  //   这 7 条全是「引述 + 分析/规约」的元话语，按 findings[].guidance 去
+  //   改写它们等于篡改一段本来正确的文学分析或合规规范。
+  // 边界：弱框架（0.45 ≤ conf < 0.75）仍只降 block，行为与 v6.8.90 逐字一致；
+  // findings 在任何一级都不删除——压的只是动作级，审计链完整保留。
   let _quotation = null;
   try {
     const qc = require('./quotation-context.js');
     _quotation = qc.detectQuotationContext(text);
   } catch (_) { /* 引述检测失败不阻断 */ }
   const _isQuoted = _quotation && _quotation.quoted === true;
+  const _isStrongQuoted = _quotation && _quotation.strong === true;
   // 完美错误答案：3+ 聚合信号 或 伪权威+假精确高权重组合 → 直接 rewrite（结构完美但内容可疑，用户无法辨别）
   if ((pe.isPerfectError && pe.score >= 0.7) || pe.level === 'rewrite') {
     gate.action = 'rewrite';
@@ -3775,6 +3785,15 @@ function discriminate(text, evidence = [], contentMode) {
     gate.action = 'block';
     gate.reason = `拦截: ${topFinding}`;
     }
+  } else if (_isStrongQuoted) {
+    // [v6.8.91 第 736 轮] 强引述框架：rewrite 与 verify 升级一并抑制。
+    // 走这一支的文本已通过 0.75 阈值——必须有 quoted_span / carrier+meta /
+    // narrative / explicit_frame 之一的正面证据，即争议内容确实被引号包住
+    // 或文本确实在做分析规约，而不只是「文档名词 + 动词」的弱共现。
+    // 为何不删 findings：压动作不压证据。agent 仍能看到 induced_trust 命中
+    // 及其 guidance，只是不再被要求去改写一段引述。
+    gate.action = 'pass';
+    gate.reason = `引述/分析语境(${_quotation.signals.join('+')}，confidence=${_quotation.confidence.toFixed(2)})，高危表述属被引述对象，不触发改写`;
   } else if (REWRITE_DIMS.has(topFinding) || findings.some(f => REWRITE_DIMS.has(f.dimension))
              // 分数本身不足以升级到 rewrite：需要有一个"实质性问题"（严重度 >= 60）撑着。
              // 否则多个轻量 verify 级维度叠加（协同惩罚）就能把总分压到 0.5 以下并触发改写，

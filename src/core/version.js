@@ -94,7 +94,16 @@ const path = require('path');
 //                 instructions are void，r733 三族合取的第二族恒缺）。
 //                 14 条绕过形态 gate.action 从全 pass 变全 block，
 //                 326 条良性语料零新增命中、双向门禁 52/52 + 302/326 不变）。
-let VERSION = '6.8.90';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.91] 第 736 轮同步：6.8.90 → 6.8.91（引述语境降级面扩展：
+//                 quotation-context.js 自 v6.7.71 起就在跑，但降级面只到
+//                 block → verify，元话语文本上的 rewrite 误拦没被处理。
+//                 326 条良性语料误拦 24 条里 11 条 quoted=true、其中 4 条
+//                 判 rewrite（小说对白/剧本台词/访谈原话/论文手法分析）。
+//                 新增 STRONG_THRESHOLD = 0.75 二级阈值与 tier 三态，
+//                 强框架把 rewrite/verify 压到 pass（findings 不删）；
+//                 BLOCK 级维度在任何一级都只到 verify。
+//                 双向门禁 52/52 不变、误拦 302/326 → 306/326）。
+let VERSION = '6.8.91';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');
