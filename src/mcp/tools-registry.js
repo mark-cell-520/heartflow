@@ -259,6 +259,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_delimiter_channel',
+    description: "分隔符混淆通道诊断（delimiter confusion）：逐条列出文本里的字母撒点 run（如 i-g-n-o-r-e / d-i-s-r-e-g-a-r-d）各自还原成了什么、命中哪一级判据（tier 1 精确词表 / tier 2 DP 词边界）、有没有被边界修剪（right_trim=剪掉跨词多吞的尾组，left_extend=往前多吃一个字母），以及被拒绝的 run 拒绝原因（compacted_too_short/too_few_segments/no_token/no_token_after_trim）。r737 修复的正是这条通道此前的黑箱：run 跨词吞字母时紧凑串变成 disregardp，通道对外只显示 count=0，分不清『没抽出 run』和『抽出了但没还原出来』。返回 accepted/rejected/view/repairedCount，附带一次真实 gate 判定。只读工具，不改文本不碰引擎状态。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待诊断文本（原文，只读不改）"}},"required":["text"]}
+  },
+
+  {
     name: 'heartflow_gate_check',
     description: "心虫快速门禁：只返回行动指令 (action/reason/score)，适合 LLM agent 轻量调用。",
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本"}},"required":["text"]}

@@ -320,8 +320,9 @@ t('① 工具定义 + ② handler 映射 + ③ handler 函数', () => {
   assert.ok(/function handleQuotationFrame\(args\)/.test(s), '缺 handler 函数');
   assert.ok(s.indexOf("gate.quotationFrame(text)") >= 0, 'handler 未调用 gate.quotationFrame');
 
-  // 工具总数滚动快照：r735 记 186，r736 新增本工具后为 187
-  assert.strictEqual(TOOLS.length, 187, `工具总数应 187，实为 ${TOOLS.length}`);
+  // 工具总数滚动快照：r735 记 186，r736 新增本工具后为 187，
+  // r737 新增 heartflow_delimiter_channel 后为 188
+  assert.strictEqual(TOOLS.length, 188, `工具总数应 188，实为 ${TOOLS.length}`);
   const names = TOOLS.map(x => x.name);
   assert.strictEqual(names.filter((n, i) => names.indexOf(n) !== i).length, 0, '工具名重复');
 });

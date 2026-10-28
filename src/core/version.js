@@ -103,7 +103,16 @@ const path = require('path');
 //                 强框架把 rewrite/verify 压到 pass（findings 不删）；
 //                 BLOCK 级维度在任何一级都只到 verify。
 //                 双向门禁 52/52 不变、误拦 302/326 → 306/326）。
-let VERSION = '6.8.91';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.92] 第 737 轮同步：6.8.91 → 6.8.92（分隔符混淆通道 run 边界修复：
+//                 SPRINKLED_RUN 结尾的 [A-Za-z] 会在词间空白被换成撒点字符时
+//                 跨词吞掉下一个词的首字母，紧凑串变成 disregardp 还原失败，
+//                 13 条 BLOCK 级绕过形态静默放行。改成边界修剪：剪掉尾部
+//                 「分隔符 + 一个字母」后必须精确命中注入词表，视图游标同步
+//                 推进到修剪点；镜像修了左界（撒点只覆盖词后半段时往前多吃
+//                 一个字母）。新增 describeDelimiterChannel 逐 run 诊断。
+//                 13 条绕过 → 10 条 block，双向门禁 52/52 + 306/326 不变，
+//                 570,889 句全仓库散文送检与 HEAD 差额 0）。
+let VERSION = '6.8.92';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

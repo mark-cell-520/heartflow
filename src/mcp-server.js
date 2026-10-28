@@ -3081,6 +3081,36 @@ function handleQuotationFrame(args) {
   }
 }
 
+/**
+ * [v6.8.92 第 737 轮] 分隔符混淆通道逐 run 诊断（三处同步第 3 处）。
+ * 只读工具：不碰任何引擎状态，不改文本，纯诊断 + 解释。
+ * 存在的理由：r737 修的是「run 跨词吞字母导致紧凑串还原失败」——这类失效
+ * 在修复前对外只显示 count=0，分不清「没抽出 run」和「抽出了但没还原出来」。
+ * agent 需要能回答「为什么这条看着像注入的文本没被 block」，否则 BLOCK 级
+ * 通道的静默放行在调用侧就是不可解释的黑箱。
+ */
+function handleDelimiterChannel(args) {
+  const { text } = args || {};
+  if (!text) throw new Error('text 是必填参数');
+  try {
+    const gate = require(HF_DIR + '/src/gate.js');
+    const channel = gate.delimiterChannel(text);
+    return {
+      ...channel,
+      // 附带一次真实 gate 判定，让「通道诊断 → 动作」的因果在同一响应里可核对
+      gate: (() => {
+        try {
+          const r = gate.gate(text);
+          return { action: r.gate.action, reason: r.gate.reason, findings: (r.findings || []).map(f => f.dimension) };
+        } catch (_) { return null; }
+      })(),
+      timestamp: Date.now(),
+    };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
 function handleGatePipeline(args) {
   const { text, evidence = [] } = args || {};
   if (!text) throw new Error('text 是必填参数');
@@ -3321,6 +3351,9 @@ const HANDLERS = {
   // [v6.8.91 第 736 轮] 引述框架可解释入口（三处同步第 2 处：
   // tools-registry 工具定义 + 本映射 + handleQuotationFrame）
   heartflow_quotation_frame: handleQuotationFrame,
+  // [v6.8.92 第 737 轮] 分隔符混淆通道逐 run 诊断（三处同步第 2 处：
+  // tools-registry 工具定义 + 本映射 + handleDelimiterChannel）
+  heartflow_delimiter_channel: handleDelimiterChannel,
   // [v6.7.72] 误报反馈闭环（心虫 decision.decide 选定 0.92）
   heartflow_false_positive: handleFalsePositiveTool,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,

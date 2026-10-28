@@ -25,6 +25,8 @@ const { buildTrace, summarizeTrace } = require('./discrimination-trace.js');
 const { normalize } = require('./text-normalizer.js');
 // [v6.8.91 第 736 轮] 引述框架的对外可解释入口（AGENTS.md 约定 3 同步到 MCP）。
 const { describeQuotationFrame } = require('./quotation-context.js');
+// [v6.8.92 第 737 轮] 分隔符混淆通道的逐 run 诊断（AGENTS.md 约定 3 同步到 MCP）。
+const { describeDelimiterChannel } = require('./injection-obfuscation.js');
 
 function _pedagogyMode(text) {
   return detectPedagogicalContent(text) ? 'pedagogical' : undefined;
@@ -110,4 +112,27 @@ function quotationFrame(text) {
   }
 }
 
-module.exports = { gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput, quotationFrame };
+/**
+ * 分隔符混淆通道诊断（对外公开方法，MCP 工具 heartflow_delimiter_channel）。
+ *
+ * 回答「这段文本里的字母撒点 run 各自还原成了什么、有没有被边界修剪」。
+ * 用于 agent 自证一次 block 不是因为漏放，也不是因为误伤——r737 修复的
+ * 正是这条通道此前无法自证的部分：run 跨词吞字母导致紧凑串还原失败时，
+ * 通道对外只显示 count=0，看不出「抽出了 run 但没还原出来」。
+ *
+ * @param {string} text
+ * @returns {{channel:string, runCount:number, accepted:object[], rejected:object[],
+ *            view:string|null, repairedCount:number}}
+ */
+function delimiterChannel(text) {
+  try {
+    return describeDelimiterChannel(text);
+  } catch (_) {
+    return {
+      channel: 'delimiter_confusion', runCount: 0,
+      accepted: [], rejected: [], view: null, repairedCount: 0,
+    };
+  }
+}
+
+module.exports = { gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput, quotationFrame, delimiterChannel };

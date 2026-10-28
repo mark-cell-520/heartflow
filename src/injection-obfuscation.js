@@ -114,8 +114,22 @@ function splitSentences(text) {
 
 /**
  * 分析一条撒点 run：返回紧凑串与判定层级，不构成注入词汇则返回 null。
+ *
+ * r737 右界修剪：SPRINKLED_RUN 的结尾是 `[A-Za-z]`，而它前面的分隔符同时
+ * 也是撒点字符。当攻击者把**词间空白换成撒点字符**（"disregard.prior.directives"）
+ * 时，正则会贪婪地跨过词界，把下一个词的首字母吞进 run：
+ *
+ *   "d-i-s-r-e-g-a-r-d.prior.directives"
+ *     → run = "d-i-s-r-e-g-a-r-d.p"（末尾的 '.p' 不属于撒点词）
+ *     → 紧凑串 "disregardp" → 既不是注入动词也不是注入标记词 → 整条通道静默放行
+ *
+ * 所以紧凑串还原失败时，要把尾部那组「分隔符 + 一个字母」剪掉再试一次。
+ * 剪掉后紧凑串必须**精确命中**注入词表才算数——不接受「包含」，那是为放宽
+ * 而放宽（本仓库反复踩过的「命中侧收词、豁免侧不收」分叉坑）。
+ *
  * @param {string} raw 撒点 run 原文
- * @returns {{compacted:string,tier:number,words:string[]}|null}
+ * @returns {{compacted:string,tier:number,words:string[],usedLength:number}|null}
+ *          usedLength 是本 run 实际消耗的原文长度（修剪后小于 raw.length）
  */
 function analyseSprinkledRun(raw) {
   const compacted = raw.replace(SPRINKLE_SEPARATORS, '');
@@ -124,20 +138,75 @@ function analyseSprinkledRun(raw) {
   if (segments.length < MIN_SPRINKLE_SEGMENTS) return null;
   const lower = compacted.toLowerCase();
   // 强判据 A：整串还原成一个注入动词（"i-g-n-o-r-e" → ignore）
-  if (CORE_VERBS.has(lower)) return { compacted, tier: 1, words: [lower] };
+  if (CORE_VERBS.has(lower)) return { compacted, tier: 1, words: [lower], usedLength: raw.length };
   // 强判据 B：整串还原成一个注入标记词（"i-n-s-t-r-u-c-t-i-o-n-s" → instructions）
-  if (CORE_MARKERS.has(lower)) return { compacted, tier: 1, words: [lower] };
+  if (CORE_MARKERS.has(lower)) return { compacted, tier: 1, words: [lower], usedLength: raw.length };
+  // 强判据 A'/B'：右界修剪后精确命中（r737）。剪掉的是「分隔符 + 一个字母」，
+  // 因为 SPRINKLED_RUN 结尾的 `[A-Za-z]` 最多只可能多吞一个字母。
+  const trimmed = trimTrailingGroup(raw);
+  if (trimmed !== null) {
+    const tCompacted = trimmed.replace(SPRINKLE_SEPARATORS, '');
+    if (tCompacted.length >= MIN_COMPACTED_LENGTH) {
+      const tLower = tCompacted.toLowerCase();
+      if (CORE_VERBS.has(tLower) || CORE_MARKERS.has(tLower)) {
+        return { compacted: tCompacted, tier: 1, words: [tLower], usedLength: trimmed.length };
+      }
+    }
+  }
   // 强判据 C：DP 词边界还原（复用 r732 实现，自带 ≥16 字母门槛）
   const seg = longestSegmentation(lower);
-  if (!seg) return null;
-  const verbs = seg.words.filter(w => CORE_VERBS.has(w)).length;
-  const markers = seg.words.filter(w => CORE_MARKERS.has(w)).length;
-  if (verbs < 1 && markers < 1) return null;
-  return { compacted, tier: 2, words: seg.words };
+  if (seg) {
+    const verbs = seg.words.filter(w => CORE_VERBS.has(w)).length;
+    const markers = seg.words.filter(w => CORE_MARKERS.has(w)).length;
+    if (verbs >= 1 || markers >= 1) {
+      return { compacted, tier: 2, words: seg.words, usedLength: raw.length };
+    }
+  }
+  // 强判据 C'：修剪后再走一次 DP（长串跨词时，未修剪视图里 DP 也还原不出词链）
+  if (trimmed !== null) {
+    const tLower = trimmed.replace(SPRINKLE_SEPARATORS, '').toLowerCase();
+    const tSeg = longestSegmentation(tLower);
+    if (tSeg) {
+      const verbs = tSeg.words.filter(w => CORE_VERBS.has(w)).length;
+      const markers = tSeg.words.filter(w => CORE_MARKERS.has(w)).length;
+      if (verbs >= 1 || markers >= 1) {
+        return {
+          compacted: trimmed.replace(SPRINKLE_SEPARATORS, ''),
+          tier: 2,
+          words: tSeg.words,
+          usedLength: trimmed.length,
+        };
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * 剪掉撒点 run 尾部的「1~2 个分隔符 + 一个字母」。没有这个形状就返回 null。
+ * 这是 SPRINKLED_RUN 结构性多吞的那一组，不是任意裁剪。
+ * @param {string} raw
+ * @returns {string|null}
+ */
+function trimTrailingGroup(raw) {
+  if (typeof raw !== 'string' || raw.length === 0) return null;
+  const m = /[^\sA-Za-z0-9一-鿿]{1,2}[A-Za-z]$/.exec(raw);
+  if (!m) return null;
+  return raw.slice(0, raw.length - m[0].length);
 }
 
 /**
  * 通道 A：分隔符混淆。抽出所有撒点 run，造紧凑视图，在视图上复核注入模式。
+ *
+ * r737 边界修复，两处与 r735 初版不同：
+ *   ① **左界扩展**：SPRINKLED_RUN 从「字母 + 分隔符」起跳，所以撒点只覆盖
+ *      注入词后半段时（"ig-n-o-r-e"），run 起点落在词中间，紧凑串是 "gnore"。
+ *      还原失败时往前多吃一个字母再试——只在多吃的那个字母能让紧凑串精确
+ *      命中词表时才接受。
+ *   ② **右界修剪**：analyseSprinkledRun 可能剪掉尾部跨词的那一组，此时
+ *      usedLength < raw.length，游标只能推进到修剪点，否则视图会把下一个
+ *      词的首字母粘在紧凑串后面（"ignorea ll"），词边界一样丢。
+ *
  * @returns {{runs:object[],view:string,spans:Array<{start:number,end:number}>}}
  */
 function buildCompactView(text) {
@@ -148,17 +217,115 @@ function buildCompactView(text) {
   SPRINKLED_RUN.lastIndex = 0;
   let m;
   while ((m = SPRINKLED_RUN.exec(text)) !== null) {
-    const info = analyseSprinkledRun(m[0]);
+    let raw = m[0];
+    let start = m.index;
+    let info = analyseSprinkledRun(raw);
+    if (!info) {
+      const extended = extendRunLeft(text, m.index, raw);
+      if (extended !== null) {
+        const extInfo = analyseSprinkledRun(extended);
+        if (extInfo) { raw = extended; start = m.index - (extended.length - m[0].length); info = extInfo; }
+      }
+    }
     if (!info) continue;
-    const start = view.length + (m.index - cursor);
-    view += text.slice(cursor, m.index) + info.compacted;
-    cursor = m.index + m[0].length;
-    spans.push({ start, end: start + info.compacted.length });
-    runs.push({ raw: m[0], compacted: info.compacted, tier: info.tier, words: info.words });
+    const used = typeof info.usedLength === 'number' ? info.usedLength : raw.length;
+    const vStart = view.length + (start - cursor);
+    view += text.slice(cursor, start) + info.compacted;
+    cursor = start + used;
+    spans.push({ start: vStart, end: vStart + info.compacted.length });
+    runs.push({
+      raw: m[0],
+      compacted: info.compacted,
+      tier: info.tier,
+      words: info.words,
+      usedLength: used,
+      repaired: used !== m[0].length || start !== m.index,
+    });
   }
   if (runs.length === 0) return { runs: [], view: text, spans: [] };
   view += text.slice(cursor);
   return { runs, view, spans };
+}
+
+/**
+ * 左界扩展候选：run 起点前一个字符是字母时，把它并进 run 再试一次。
+ * 只做一步——撒点通道的形状决定多吃的字母不可能超过一个。
+ * @returns {string|null}
+ */
+function extendRunLeft(text, index, raw) {
+  if (!(index > 0)) return null;
+  const prev = text.charAt(index - 1);
+  if (!/[A-Za-z]/.test(prev)) return null;
+  return prev + raw;
+}
+
+/**
+ * 分隔符混淆通道的逐 run 诊断（r737）。
+ *
+ * 存在的理由：r735 建通道时只能看到「命中了 / 没命中」，看不到「为什么
+ * 没命中」。本轮排查 'd-i-s-r-e-g-a-r-d.prior.directives' 静默放行时，
+ * 第一个问题是「到底抽出了几条 run、每条还原成了什么」——这个问题当时
+ * 只能靠临时探针回答。现在它成为模块的公开能力：拒绝的 run 也带原因，
+ * 下一轮遇到新绕过形态时不必再写一次性脚本。
+ *
+ * @param {string} text 原文（绝不修改）
+ * @returns {{channel:string, runCount:number, accepted:object[], rejected:object[],
+ *            view:string|null, repairedCount:number}}
+ */
+function describeDelimiterChannel(text) {
+  const empty = {
+    channel: 'delimiter_confusion', runCount: 0,
+    accepted: [], rejected: [], view: null, repairedCount: 0,
+  };
+  if (!text || typeof text !== 'string') return empty;
+
+  SPRINKLED_RUN.lastIndex = 0;
+  const accepted = [];
+  const rejected = [];
+  let m;
+  while ((m = SPRINKLED_RUN.exec(text)) !== null) {
+    const raw = m[0];
+    let info = analyseSprinkledRun(raw);
+    let extended = false;
+    if (!info) {
+      const ext = extendRunLeft(text, m.index, raw);
+      if (ext !== null) {
+        const extInfo = analyseSprinkledRun(ext);
+        if (extInfo) { info = extInfo; extended = true; }
+      }
+    }
+    if (info) {
+      const used = typeof info.usedLength === 'number' ? info.usedLength : raw.length;
+      const trimmed = used < raw.length;
+      accepted.push({
+        raw,
+        compacted: info.compacted,
+        tier: info.tier,
+        words: info.words,
+        usedLength: used,
+        repair: trimmed ? 'right_trim' : (extended ? 'left_extend' : 'none'),
+        dropped: trimmed ? raw.slice(used) : (extended ? '' : ''),
+      });
+      continue;
+    }
+    const compacted = raw.replace(SPRINKLE_SEPARATORS, '');
+    const segments = raw.split(SPRINKLE_SEPARATORS).filter(Boolean);
+    let reason;
+    if (compacted.length < MIN_COMPACTED_LENGTH) reason = 'compacted_too_short';
+    else if (segments.length < MIN_SPRINKLE_SEGMENTS) reason = 'too_few_segments';
+    else reason = trimTrailingGroup(raw) !== null ? 'no_token_after_trim' : 'no_token';
+    rejected.push({ raw, compacted, segments: segments.length, reason });
+  }
+
+  const compact = buildCompactView(text);
+  return {
+    channel: 'delimiter_confusion',
+    runCount: accepted.length + rejected.length,
+    accepted,
+    rejected,
+    view: compact.runs.length > 0 ? compact.view : null,
+    repairedCount: accepted.filter(a => a.repair !== 'none').length,
+  };
 }
 
 /** 视图内 [a,b) 与任一紧凑区间是否相接 */
@@ -323,6 +490,9 @@ module.exports = {
   analyseSprinkledRun,
   buildCompactView,
   splitSentences,
+  describeDelimiterChannel,
+  trimTrailingGroup,
+  extendRunLeft,
   ANNULMENT_PATTERNS,
   SCOPE_PATTERN,
   OBJECT_PATTERN,
