@@ -39,13 +39,10 @@ async function safeFetch(url, options = {}) {
       if (!net.isIPv4(address)) {
         throw new Error(`SSRF blocked: resolved address ${address} is not a valid IPv4`);
       }
-      // 复用url-validator中的IP校验逻辑 — 直接在fetch-safe内联私网判定
-      const parts = address.split('.').map(Number);
-      if (parts[0] === 127 || parts[0] === 10 ||
-          (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
-          (parts[0] === 192 && parts[1] === 168) ||
-          parts[0] === 0 ||
-          (parts[0] === 169 && parts[1] === 254)) {
+      // [v6.8.88] 复用 url-validator 的 CIDR 判定（单一事实源）：原内联副本漏
+      // CGNAT/TEST-NET/组播/保留/广播网段且会与 url-validator 漂移，已删除。
+      const { isBlockedV4 } = require('../security/url-validator.js');
+      if (isBlockedV4(address)) {
         throw new Error(`SSRF blocked: resolved IP ${address} is private/internal`);
       }
     } catch (e) {
@@ -87,8 +84,9 @@ async function safeFetch(url, options = {}) {
         if (!net.isIPv4(rip.address)) {
           throw new Error(`SSRF blocked: redirect resolved to non-IPv4 ${rip.address}`);
         }
-        const p = rip.address.split('.').map(Number);
-        if (p[0]===127||p[0]===10||(p[0]===172&&p[1]>=16&&p[1]<=31)||(p[0]===192&&p[1]===168)||p[0]===0||(p[0]===169&&p[1]===254)) {
+        // [v6.8.88] 复用 url-validator 的 CIDR 判定（单一事实源），与原内联副本一致
+        const { isBlockedV4 } = require('../security/url-validator.js');
+        if (isBlockedV4(rip.address)) {
           throw new Error(`SSRF blocked: redirect resolved to private IP ${rip.address}`);
         }
         // 仅跟随一跳，目标已校验，用 follow 再取一次

@@ -32,6 +32,19 @@ function _extract(result) {
   if (result.stages !== undefined || Array.isArray(result)) {
     return { thoughtChain: result, raw: { thoughtChain: result } };
   }
+  // [v6.8.88] 形态 (c)：think() 的实际返回——七阶段链住在 chain 键
+  // （decision/parse/hypotheses/...），result.thoughtChain 恒不存在。
+  // 缺失此形态时 CLI/MCP 两条报告路径都输出"未捕获思维链"（实测全输入复现）。
+  // 把 chain 对象规范化为 {stages:[{name, output}]}，复用既有渲染逻辑。
+  if (result.chain !== undefined && result.chain !== null) {
+    const c = result.chain;
+    const stages = Array.isArray(c)
+      ? c
+      : (typeof c === 'object'
+        ? Object.entries(c).map(([name, value]) => ({ name, output: value }))
+        : null);
+    return { thoughtChain: stages && stages.length ? { stages } : null, raw: result };
+  }
   // 其他：当作空
   return { thoughtChain: null, raw: result };
 }
@@ -64,11 +77,12 @@ function _stageText(stage) {
   if (!stage) return '';
   if (typeof stage === 'string') return stage;
   const name = stage.name ? `[${stage.name}] ` : '';
-  const body =
-    stage.conclusion ||
-    stage.text ||
-    stage.output ||
-    (typeof stage.output === 'object' ? JSON.stringify(stage.output) : '');
+  // [v6.8.88] 对象 output 需 JSON 序列化：原 `stage.output ||` 短路会直接把
+  // 对象喂进模板字符串渲染成 "[object Object]"（形态 c 规范化后触发）。
+  let body = stage.conclusion || stage.text || '';
+  if (!body && stage.output != null) {
+    body = typeof stage.output === 'string' ? stage.output : JSON.stringify(stage.output);
+  }
   return body ? `${name}${body}` : '';
 }
 

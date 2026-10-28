@@ -11,7 +11,9 @@
    * - dream can be strange / useless / poetic
    */
 
-  const { generateDream, getDreamEngine, LEVELS } = require('./dream-loop.js');
+  // [v6.8.88] 移除 LEVELS 死解构：dream-loop 从未真正导出（dream.js 无此符号），
+  // 本文件解构后也从未使用。
+  const { generateDream, getDreamEngine } = require('./dream-loop.js');
   const { WakeUpVerifier } = require('../shield/wake-up-verifier.js');
   const { generateNarrative, generateWideNarrative } = require('./narrative-generator.js');
 

@@ -28,6 +28,15 @@ const BLOCKED_V4_RANGES = [
   { network: '172.16.0.0',   prefix: 12, label: 'private (172.16.0.0/12)' },
   { network: '192.168.0.0',  prefix: 16, label: 'private (192.168.0.0/16)' },
   { network: '169.254.0.0',  prefix: 16, label: 'link-local (169.254.0.0/16)' },
+  // [v6.8.88] 审计补齐保留网段：CGNAT / TEST-NET / 基准测试 / 组播 / 保留 / 广播
+  { network: '100.64.0.0',   prefix: 10, label: 'CGNAT (100.64.0.0/10)' },
+  { network: '192.0.2.0',    prefix: 24, label: 'TEST-NET-1 (192.0.2.0/24)' },
+  { network: '198.18.0.0',   prefix: 15, label: 'benchmark (198.18.0.0/15)' },
+  { network: '198.51.100.0', prefix: 24, label: 'TEST-NET-2 (198.51.100.0/24)' },
+  { network: '203.0.113.0',  prefix: 24, label: 'TEST-NET-3 (203.0.113.0/24)' },
+  { network: '224.0.0.0',    prefix: 4,  label: 'multicast (224.0.0.0/4)' },
+  { network: '240.0.0.0',    prefix: 4,  label: 'reserved (240.0.0.0/4)' },
+  { network: '255.255.255.255', prefix: 32, label: 'broadcast (255.255.255.255/32)' },
 ];
 
 // ─── Blocked IPv6 addresses ──────────────────────────────────────────────────
@@ -234,4 +243,4 @@ async function validateFetchUrl(urlStr) {
   return { safe: true, reason: '' };
 }
 
-module.exports = { validateFetchUrl };
+module.exports = { validateFetchUrl, isBlockedV4 };

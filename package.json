@@ -1,6 +1,6 @@
 {
   "name": "@yun520-1/heartflow",
-  "version": "6.8.87",
+  "version": "6.8.88",
   "description": "HeartFlow (心虫) — AGI Layer 1: the Discriminator. Rule-based engine that checks what AI says before it reaches humans. 160 discrimination dimensions, 11-layer pipeline, 161 modules (logic/decision/cognition/emotion/memory/ethics/collaboration), 184 MCP tools, 1,314 dispatch routes. Zero LLM dependency. The gate that says NO when something is wrong.",
   "main": "src/gate.js",
   "bin": {
@@ -10,10 +10,10 @@
     "prepublishOnly": "node scripts/sync-version.js",
     "start": "node bin/cli.js chat",
     "status": "node bin/cli.js status",
-    "test": "node test/run-all.js || node tests/integration.test.js",
-    "test:integration": "node tests/integration.test.js",
-    "test:unit": "node tests/unit/test-path-guard.js && node tests/unit/test-code-verifier.js",
-    "test:full": "find tests test -name '*.test.js' -exec node {} \\;",
+    "test": "node test/run-all.js",
+    "test:integration": "node test/integration.test.js",
+    "test:unit": "node test/core/path-guard.test.js && node test/code-verifier.test.js",
+    "test:full": "find test -name '*.test.js' -exec node {} \\;",
     "verify": "node bin/verify.js",
     "check": "node -e \"require('fs').readdirSync('src',{recursive:true}).filter(f=>f.endsWith('.js')).forEach(f=>require('child_process').execSync('node --check src/'+f,{stdio:'inherit'}))\""
   },

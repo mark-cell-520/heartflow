@@ -218,7 +218,8 @@ function generateAllowedRoutes(modules) {
 
 module.exports = {
   SPECIAL_MODULES,
-  createSpecialModule,
+  // [v6.8.88] 移除 createSpecialModule 死导出：全仓库外部零引用（heartflow.js
+  // 用的是自家本地副本 _createSpecialModule），仅 instantiateSpecialModule 被用。
   instantiateSpecialModule,
   SUBSYSTEM_NAMES,
   registerModules,

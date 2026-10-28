@@ -916,7 +916,7 @@ const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('
 
 
 
-const BUILD_DATE = '2026-10-28-6.8.86';
+const BUILD_DATE = '2026-10-28-6.8.87';
 
 
 
@@ -4497,7 +4497,7 @@ class HeartFlow {
       this._modules['benchmark'] = this.benchmark;
       HeartFlow.ALLOWED_ROUTES.add('benchmark.assess');
       HeartFlow.ALLOWED_ROUTES.add('benchmark.getStats');
-      _log.info('init', 'SelfBenchmark 加载成功（外部锚定防自欺已启用）');
+      _log.info('init', 'SelfBenchmark 加载成功（外部锚定未实装：内评 0.7 折 + verified:false 防自欺）');
     } catch (e) { _boundedPush(this._initErrors, { module: 'benchmark', error: e.message }, MAX_HISTORY_SIZE); }
 
     // ─── [v6.1.0] WorldLandscape 世界格局分析引擎（AI人类核心认知能力）───

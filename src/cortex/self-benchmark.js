@@ -8,7 +8,8 @@
  */
 
 const { encryptJSON, decryptJSON } = require('../memory/memory-encrypt.js');
-const { anchorSync } = require('./benchmark-external-anchor.js');
+// [v6.8.88] 已删除对 benchmark-external-anchor（9 行 stub）的导入——
+// 该模块从未导出 anchorSync，导入即死代码，详见 assess() 内注释。
 
 const BENCHMARK_FILE = require('path').join(__dirname, '../../data/self-benchmark.json');
 const MAX_BENCHMARKS = 500;
@@ -68,13 +69,13 @@ class SelfBenchmark {
     const stats = this._computeStats();
     const internalScore = this._score(stats);
 
-    // 外部锚定（同步：逻辑题 + 可选满意度；跨模型为 opt-in 异步，不在此阻塞）
-    let external = null;
-    try {
-      external = anchorSync(this.hf);
-    } catch (_) {
-      external = null;
-    }
+    // [v6.8.88] 外部锚定未实装：benchmark-external-anchor 是 9 行 stub（getAnchor
+    // 恒 null / setAnchor 空转 / healthCheck 恒 ok），且其从未导出 anchorSync——
+    // 原 const { anchorSync } = require(...) 解出 undefined，此处调用必抛
+    // TypeError 被 catch 吞掉，external 永远为 null。已删除该 stub 模块与死调用，
+    // 诚实走未验证分支：内评打 0.7 折并标 verified:false，不再假称"防自欺已启用"。
+    // 未来若实装真实外部锚，恢复 external 赋值即可，评分公式不变。
+    const external = null;
 
     let finalScore;
     let verified;
