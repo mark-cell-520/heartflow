@@ -99,7 +99,10 @@ http.createServer(async (req, res) => {
         return res.end(JSON.stringify({error: `invalid repoName: ${nameCheck.reason}`}));
       }
 
-      const script = path.join(path.dirname(require.resolve('./gate.js')), '..', 'scripts', 'repo-audit.js');
+      // [v6.8.86] 与 index.js:54 统一为 src/repo-audit.js 单一真相源：
+      // 原 scripts/repo-audit.js 与 src/repo-audit.js md5 完全相同却双份维护，
+      // 改一处漏一处必分叉。gate.js 位于 src/，dirname 即 src/。
+      const script = path.join(path.dirname(require.resolve('./gate.js')), 'repo-audit.js');
       const safeRepoPath = pathCheck.resolved;
       const outPath = path.join(safeRepoPath, `heartflow-audit-report-${nameCheck.value}.md`);
       // [AUDIT-FIX] 二次校验输出路径是否在允许范围内

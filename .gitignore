@@ -95,17 +95,17 @@ mark-heartflow-skill/
 meaningful-core.json
 meaningful-ephemeral.json
 meaningful-learned.json
-memory/*.json
-memory/*.jsonl
-memory/*.md
-memory/*.txt
-memory/.aes-key
-memory/.gitkeep
-memory/.hmac-key
-memory/.qtable-hmac-key
-memory/.last-dream
-memory/.q-meta*
-memory/wal/*.log
+/memory/*.json
+/memory/*.jsonl
+/memory/*.md
+/memory/*.txt
+/memory/.aes-key
+/memory/.gitkeep
+/memory/.hmac-key
+/memory/.qtable-hmac-key
+/memory/.last-dream
+/memory/.q-meta*
+/memory/wal/*.log
 node_modules/
 run_bb_test.js
 
@@ -123,9 +123,9 @@ data/autopilot-log.jsonl
 
 # GitHub workflow files (push requires workflow scope)
 
-memory/dialogue-history.jsonl
+/memory/dialogue-history.jsonl
 
-memory/q-table.json
+/memory/q-table.json
 
 # 模型权重（86MB 级，绝不入库）
 *.onnx
