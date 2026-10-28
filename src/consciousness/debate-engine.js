@@ -121,8 +121,27 @@ class DebateEngine {
     return { concluded: true, conclusion: session.conclusion };
   }
 
-  _saveSession(s) { fs.writeFileSync(path.join(this.dataDir, s.id + '.json'), JSON.stringify(s, null, 2), 'utf-8'); }
-  _loadSession(id) { try { return JSON.parse(fs.readFileSync(path.join(this.dataDir, id + '.json'), 'utf-8')); } catch (_) { return null; } }
+  // [v6.8.86] 安全修复：sessionId 来自 MCP 工具参数，原先直接拼进
+  // path.join → '../../x' 可越权读（_loadSession）/写（_saveSession）任意
+  // .json 文件。合法 id 仅由 createSession 生成（crypto.randomUUID 前缀），
+  // 这里用白名单堵死一切路径分隔符与 '..'。
+  static _assertSafeId(id) {
+    if (typeof id !== 'string' || !/^[a-zA-Z0-9_-]{1,64}$/.test(id)) {
+      throw new Error(`invalid session id: ${String(id).slice(0, 40)}`);
+    }
+  }
+
+  _saveSession(s) {
+    DebateEngine._assertSafeId(s.id);
+    fs.writeFileSync(path.join(this.dataDir, s.id + '.json'), JSON.stringify(s, null, 2), 'utf-8');
+  }
+
+  _loadSession(id) {
+    try {
+      DebateEngine._assertSafeId(id);
+      return JSON.parse(fs.readFileSync(path.join(this.dataDir, id + '.json'), 'utf-8'));
+    } catch (_) { return null; }
+  }
 }
 
 module.exports = { DebateEngine, ROLES };

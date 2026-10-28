@@ -512,6 +512,22 @@ async function runAllTests() {
   // 再由并发池执行。JOBS=1 时退化为原串行行为（语义不变）。
   const totalTasks = tasks.length;
   for (const t of tasks) t.total = totalTasks;
+  // [v6.8.86] 分段复跑：HF_RUN_ALL_SLICE="k/n"（1-based）只跑第 k 段。
+  // 动机：618 个文件全量约 25-30 分钟，超出单次前台调用上限（600s），
+  // 而本机后台执行通道对 node 不可用（wrapper 秒杀，exit 1 + "stdin is
+  // not a tty"，2026-10-28 实测三种写法全挂）。分段只改任务集合，
+  // 不改 runner/判定/两阶段语义——各段并集即全量，逐段人工汇总。
+  const sliceEnv = (process.env.HF_RUN_ALL_SLICE || '').match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (sliceEnv) {
+    const sk = Math.max(1, parseInt(sliceEnv[1], 10));
+    const sn = Math.max(1, parseInt(sliceEnv[2], 10));
+    if (sk > sn) { console.error(`HF_RUN_ALL_SLICE 段号 ${sk} 超出总段数 ${sn}`); process.exit(2); }
+    const before = tasks.length;
+    const kept = tasks.filter((t, i) => (i % sn) === (sk - 1));
+    for (let i = 0; i < kept.length; i++) { kept[i].idx = i; kept[i].total = kept.length; }
+    tasks.length = 0; tasks.push(...kept);
+    console.log(`[分段] HF_RUN_ALL_SLICE=${sk}/${sn}：${before} → ${tasks.length} 个文件`);
+  }
   // [v6.8.80] 两阶段调度：变更测试（写 src/ 源码）与 MCP 服务类测试
   // 独占串行车道——前者与并发读者/同类互踩（详见 detectWriteToSrc 注释），
   // 后者端口与启动耗时互踩。其余测试走并发池。

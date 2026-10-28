@@ -98,6 +98,10 @@ async function runThinkPipeline(result, input, engine) {
   // ─── [v6.2.5] AREX递归自验证：决策验证→问题发现→精炼→重验 (arXiv 2607.21461) ──
   // 核心洞见：finding贵，verifying便宜。产出结果后先自我审计，发现缺口→立即定向精炼
   // 实现：DecisionVerifier.verify() + SelfPlay.refine() 的两阶段递归 (max 2轮)
+  // [v6.8.86] vResult 提升到函数作用域：DecisionFeedback 学习闭环（下方
+  // try 块）要读 AREX 块里赋的 vResult；const 块级作用域下跨块引用必抛
+  // ReferenceError，被该 catch 吞掉后闭环全程静默失效。
+  let vResult = null;
   try {
     if (engine.decisionVerifier && result) {
       for (let cycle = 0; cycle < 2; cycle++) {
@@ -109,7 +113,7 @@ async function runThinkPipeline(result, input, engine) {
           risks: result.blindSpotAnalysis?.identified ? result.blindSpotAnalysis.vulnerabilities : undefined,
           confidence: meta.confidence ?? result.confidence ?? 0.5,
         };
-        const vResult = engine.decisionVerifier.verify(record);
+        vResult = engine.decisionVerifier.verify(record);
         if (vResult.issues?.length > 0) {
           result._verification = {
             score: vResult.score,

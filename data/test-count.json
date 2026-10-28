@@ -1,6 +1,7 @@
 {
-  "passed": 18785,
-  "failed": 125,
-  "total": 18910,
-  "at": "2026-10-27T14:25:57.589Z"
+  "passed": 19040,
+  "failed": 71,
+  "total": 19111,
+  "at": "2026-10-28T04:47:58.725Z",
+  "note": "aggregate of HF_RUN_ALL_SLICE=1/4..4/4 on 2026-10-28 (v6.8.86 audit round)"
 }
