@@ -82,7 +82,9 @@ const path = require('path');
 //                 新增 src/despaced-injection.js，词边界 DP 还原 ≥16 字母的
 //                 无空白英文串后过注入模式，35 种删空格注入形态
 //                 pass → block，326 条良性语料 + 3255 个文档英文 token 零误伤）。
-let VERSION = '6.8.88';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.89] 第 161 轮同步：6.8.88 → 6.8.89（第 161 维度 monocause
+//                 单一因果过度简化 / fallacy of the single cause 上线）。
+let VERSION = '6.8.89';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

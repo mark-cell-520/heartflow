@@ -1,3 +1,11 @@
+## [6.8.89] - 2026-10-30
+
+### Added
+- **161st discrimination dimension — `monocause` (single-cause oversimplification / fallacy of the single cause)**: fills the causal-discipline gap left by `post_hoc` (temporal→causal), `false_cause` (correlation→causal), and `pseudo_causal` (fabricated mechanism) — none catch collapsing a genuinely multi-causal systemic outcome into one cause while denying multiplicity. Two-leg criteria: ① COMPLEX-OUTCOME — a known multi-causal systemic phenomenon (economic crisis / corporate collapse / crime rate / divorce rate / inequality / low birth rate / war / dynastic collapse / imperial decline / social fragmentation / startup failure …; only systemic phenomena, not exams/games/ordinary projects that can legitimately have a single cause — the precision anchor) × ② SINGLE-CAUSE — absolute single-cause framing (完全是因为 / 纯粹是 / 唯一的原因 / 说到底 / solely because of / nothing but / the only reason / it all comes down to). Four exemptions: explicit multi-cause acknowledgment, hedged single-contributor ("…之一" / one of the main drivers), questions, and meta-discussion of the fallacy. New file `src/monocause.js` (~230 lines), wired into `src/index.js` at nine points (require / compute / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / module.exports). VERIFY-tier. Source: standard informal-fallacy taxonomy + HN benchmark story 16200526 ("Recognising the fallacy of a single root cause"); Semantic Scholar rate-limited (HTTP 429 ×4), GitHub had no mature rule-engine implementation — no arXiv ID fabricated.
+
+### Verification
+- round-161 test 20/20 (attacks ZH 10/10 + EN 6/6, benign 0 false-positives, per-constant negative-injection load-bearing); `bin/verify.js` 16/16; `guard-abilities.js` 20/20 (bidirectional 52/52 recall | 302/326 benign, zero new false positives); `doc-numbers` 22/22; `bidirectional-guard` 52/52 | 302/326. Dimensions 160→161, VERIFY 119→120.
+
 ## [6.8.88] - 2026-10-30
 
 ### Fixed

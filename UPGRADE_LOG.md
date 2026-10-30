@@ -1,3 +1,37 @@
+# 第 161 轮报告（v6.8.89 — 第 161 维度 monocause 单一因果过度简化上线 — 2026-10-30）
+
+## 一、方向与来源
+- 方向：因果纪律 / 逻辑谬误检测（8 大候选方向轮换后选定；贴合心虫三支柱「符合宇宙规律：因果」）。上一轮（734/v6.8.88）是审计收尾，本轮为能力增长轮。
+- 缺口核验：grep src/（排除 test/）monocause / causal_oversimplif / reductionis / 单一因果 = 0 命中（真缺口，射程外）。既有 post_hoc（时序→因）/ false_cause（相关→因）/ pseudo_causal（虚构机制）/ texas_sharpshooter（挑樱桃证据）/ base_rate_fallacy & prosecutors_fallacy（概率混淆）均不覆盖「把真实多因现象压成单因并否认多因性」。心虫裁决：heartflow_philosophy_decision → type=accelerate / confidence 0.7 / priority 40 / goalReviewed true（rationale 的 cognitiveLoad/uncertainty 为默认 "unknown"，如实说明非实测背书）。
+- 外部来源（如实，不编造）：HN Algolia 命中真实基准故事 "Recognising the fallacy of a single root cause"（HN id 16200526 → https://cevo.com.au/post/2017-11-10-fallacy-of-a-single-root-cause/）与 "Fallacy of the single cause"（Wikipedia）；Semantic Scholar 4 次尝试全程 HTTP 429 限流（不可用）；GitHub monocausal/single-cause 检索仅无关低星仓库（最高 20★，无成熟规则引擎实现）。概念基准 = 标准非形式谬误 "fallacy of the single cause / causal oversimplification"。侦察落盘：/tmp/hf-scout-1761850000.txt。
+
+## 二、实现内容
+- 新文件 src/monocause.js（约 230 行）：checkMonocause(text, inject) + __internals，仿 appeal-to-novelty.js 双腿+四豁免结构。
+  - 腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/公司倒闭/犯罪率/离婚率/贫富差距/少子化/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/创业失败/市值暴跌…；EN：the crisis / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性现象，不收考试/比赛/普通项目等可单一归因的琐事（精度锚，保护 302/326 误拦门禁）。
+  - 腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/唯一的原因/归根结底/说到底/无非/仅仅是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to）。
+  - 四类豁免：多因并列/共同作用、hedged 单一贡献者（…之一 / one of the main drivers）、提问句式、概念分析（单一因果谬误 / monocausal fallacy）。
+- src/index.js 九处接线：require / 计算点 / allDims 参与判定 / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / module.exports。
+- 负例注入测试 test/round-161-monocause.js（20 断言，逐常量承重：腿①/腿②置空攻击全停判、每个豁免常量置空其边界样本翻转为命中）。
+- 版本 6.8.88 → 6.8.89（VERSION / package.json / SKILL.md / heartflow.js BUILD_DATE / src/core/version.js 兜底同步）。
+- 文档三处数字同步：维度 160→161、VERIFY 119→120、AGENTS 复杂度注记补 monocause=dim161 + Verify-level 列举、README changelog 6.8.89 条目、SKILL action-tier "120 request verify"。
+
+## 三、验证数据（五门禁 + 新能力实测）
+- bin/verify.js：16 passed / 0 failed
+- guard-abilities.js：20/20（含双向回归 召回 52/52 | 误拦 302/326，零新增误伤；维度登记 dimensions 键 161）
+- doc-numbers-accuracy.test.js：22/22
+- bidirectional-guard.js：召回 52/52 | 误拦 302/326 pass（92.6%，未升）
+- round-161-monocause.js：20/20（攻击 ZH 10/10 + EN 6/6 命中、良性 0 误伤、负例注入逐常量翻转）
+- 新能力实测（gate.js 真实返回）：攻击「这家公司倒闭完全是因为管理不善，没有别的原因」→ gate.action=verify，findings 含 monocause(sev50)+guidance；多因良性「经济衰退是货币政策、供应链和消费信心多重因素共同作用的结果」→ gate.action=pass；英文攻击「The financial crisis was caused entirely by deregulation.」→ verify；隔离良性 0/17 误伤。
+- measure：维度 161 / BLOCK 11 / REWRITE 19 / VERIFY 120 / 工具 184 / 路由 1314 / 模块 161 / 测试 18157。
+
+## 四、已知边界 / 下次可继续
+- 召回边界：无显式复杂现象名词的笼统归约（"It all comes down to greed."）不判——保守设计，保精度优先于召回。
+- 英文文明名靠有限枚举（rome/city/state…），更多专名可扩。
+- MCP 8588 服务跑的是升级前代码，monocause 在其下次重启/重载后生效（本轮以 gate.js 新代码路径实测为准，未重启生产服务以免影响其他会话）。
+- 全量测试通过数（18157）为 guard-abilities 缓存值，本轮未跑 run-all（既定：20+ 分钟/4GB 会撑爆 gateway，failed 为长期噪声非门禁）；下一轮如需刷新计数再跑。
+
+---
+
 # 第 734 轮报告（v6.8.88 收尾 — 2026-10-30 全面审计修复批 + GitHub 仓库初始化）
 
 ## 一、背景

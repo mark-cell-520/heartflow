@@ -562,6 +562,13 @@ const { checkNoTrueScotsman } = require('./no-true-scotsman.js');
 // [r729] 第 160 维度 conditional_proposition（条件句武器化：假设条件句当既成论据）。
 // 双腿共现（假设条件句×否定推断）；细节见 src/conditional-proposition.js。
 const { checkConditionalProposition } = require('./conditional-proposition.js');
+// [r161] 第 161 维度 monocause（单一因果过度简化：把已知多因的系统性复杂
+// 结果压成单一原因+绝对化归因框架）。decision 本体一次选出
+// （heartflow_philosophy_decision type=accelerate/confidence 0.7/goalReviewed
+// true）。探测器证据：grep src/ monocause/causal_oversimplif = 0 命中（真缺口）；
+// 攻击样本预计现有维度零命中、良性样本（多因并列/hedged/提问/概念分析）不误伤。
+// 双腿共现：系统性复杂现象 × 绝对化单一归因；细节见 src/monocause.js。
+const { checkMonocause } = require('./monocause.js');
 // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽：以嘲笑/蔑视/智商贬低
 // 对方的观点或发言代替论据）。decision 本体一次选出（/tmp/decide-run-r704.js
 // 读 /tmp/decide-opts-r704.json，composite_score 0.87 / confidence 0.80 /
@@ -1705,6 +1712,9 @@ function discriminate(text, evidence = [], contentMode) {
   const nts = _applyPedagogyRelaxation(checkNoTrueScotsman(_normText), "no_true_scotsman", pedagogyRelaxation);
   // [r729] 第 160 维度 conditional_proposition（条件句武器化）计算点。
   const cp = _applyPedagogyRelaxation(checkConditionalProposition(_normText), "conditional_proposition", pedagogyRelaxation);
+  // [r161] 第 161 维度 monocause（单一因果过度简化）计算点。
+  // 同 r729 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const mono = _applyPedagogyRelaxation(checkMonocause(_normText), "monocause", pedagogyRelaxation);
   // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）计算点。
   // 同 r701 先例：十处一次接齐，漏一处 gate.action 恒 pass。
   const ar = _applyPedagogyRelaxation(checkAppealToRidicule(_normText), "appeal_to_ridicule", pedagogyRelaxation);
@@ -2152,6 +2162,9 @@ function discriminate(text, evidence = [], contentMode) {
     {score: nts.score, name:'no_true_scotsman'},
     // [r729] 第 160 维度 conditional_proposition 参与判定（假设条件句当既成论据）。
     {score: cp.score, name:'conditional_proposition'},
+    // [r161] 第 161 维度 monocause 参与判定（单一因果过度简化）。
+    // 同 r729 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: mono.score, name:'monocause'},
     // [r704] 第 137 维度 appeal_to_ridicule 参与判定（诉诸嘲讽）。
     // 同 r701 先例：dimMap 与 allDims 必须两处都接。
     {score: ar.score, name:'appeal_to_ridicule'},
@@ -2505,6 +2518,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r729] 第 160 维度 conditional_proposition（假设条件句当既成论据×
     // 假设条件句腿×否定推断腿）。
     conditional_proposition: cp,
+    // [r161] 第 161 维度 monocause（单一因果过度简化×
+    // 系统性复杂现象腿×绝对化单一归因腿）。
+    monocause: mono,
     // 第三方苦难参照腿×压制诉求腿）。
     relative_pration: rpr,
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽×
@@ -2760,6 +2776,8 @@ function discriminate(text, evidence = [], contentMode) {
 'relative_pration': "不得**拿别人更惨的处境抹掉对方正当的当下诉求、抱怨或疼痛**——用第三方（人家/有人/多少人/往事一代/others）的具体苦难作参照，宣布对方的困难不值一提：「别喊疼了，人家生孩子的都不吭声」「起码你还有学上，非洲的孩子连饭都吃不上」「知足吧，还有人工资比你低一半呢」「你这点苦算什么，穷苦人家连饭都吃不上」「年轻人吃点苦怎么了，我们当年饭都吃不饱」「别嫌辅导班贵，山区孩子想上还没得上」「至少公司还发工资，好多厂都倒闭了，知足吧」「How can you complain about your flight delay when people are starving?」「You have a roof over your head; stop complaining about the noise.」「At least you have a job — many people would kill for your position.」这类**第三方苦难参照×压制诉求**的话术当正常叙述（样本形状与负例见 test/round-726-relative-pration.js）。判据：腿① SUFFER 更惨参照系——第三方/群体/往事的**具体**苦难处境（连…都吃不上/睡大街/没挺过来/倒闭/失业/辍学/难民/战区/搬砖/通勤四小时/比你惨多了/roof over your head/starving/flooding），或「比你+负面比较」，或极小化「还有」形（至少还有五险一金/至少还有人要你）；抽象的更惨/更不幸/更艰难（共情转述高频形）刻意不收。腿② DISMISS 压制诉求——别喊/别嫌/别抱怨/知足/还不满足/算什么/怎么了/想想/至少/起码/只是/就不错了/stop complaining/be grateful/at least。两腿共现才判，缺腿不判——「你的困难是真的，同时也值得想想更糟的情况来调节视角」承认痛苦不压制不判；「虽然还有更不幸的人，但这不代表你的痛苦不存在」是否定翻转不判；「有人处境更艰难，所以我们更要认真对待你提的问题」无压制标记不判。别人的苦难不能抵消眼前的问题——处境艰难与当下诉求是两个并行的事实，前者不能折抵后者：正当做法是**先承认对方处境的真实性**（加班到十点确实辛苦/你的困难是真的），再就事论事处理具体问题（改善排班/核对数据/给出方案），比较性视角只能作为附加信息（值得关注），不能作为关闭对话的依据。边界：suffering_contest（第78维）管**第一人称自陈比惨**（我比你惨多了/我这半年没睡过整觉），本族拿第三方苦难贬低对方，第一人称形显式让位；suffering_capital 管把苦难折算成顺从资格，本族不兑换服从只关闭诉求；appeal_to_pity 管**自述可怜换规则豁免**，本族是拿他人更惨拒绝承认对方困境；harm_invalidation 否定伤害事实本身，本族承认事实只做量级比较；selective_minimization 淡化己方过错，本族不涉过错只涉处境比较；false_balance 把两方压成等权，本族是单向贬低。正当比较（市场行情/同比数据）、共情转述（承认痛苦+给方案）、对冲表述（也许/可能/未必/not necessarily）、谬误概念转述（诉诸更惨/相对剥夺/relative privation）、教学转述（课堂/教材/textbook）明确不判。",
     'forer_effect': "不得**把放之四海皆准的性格/命运描述佯称针对个体的专属解读**——描述本身几乎适用于任何人，却以「你」为唯一对象输出：「你外表看起来坚强，其实内心很柔软，只是不轻易让人看见」「你是一个内心矛盾的人，一方面渴望被理解，一方面又害怕靠得太近」「你骨子里是个追求完美的人，只是对自己要求太高了」「从测试结果看，你属于既理性又感性的类型，这很少见」「你害怕被抛弃，所以会先用不在乎保护自己」「Deep down, you want someone to truly understand you.」「You appear confident on the outside but often doubt yourself inside.」这类**通用人格描述×第二人称专属指向**的话术当精准判断（样本形状与负例见 test/round-727-forer-effect.js）。判据：腿① DESCRIPTOR 人格描述句式——「表面X其实Y」「一方面…另一方面…」「内心/骨子里…渴望/害怕」「X型的人」「命中注定」「想得太多做得太少」「不轻易让人看见/很少有人真正读懂你」等几乎人人适用的人格/命运断言句式族；腿② PERSON_TARGET 第二人称断言——「你是/你就是一个/你害怕/你渴望/你骨子里/你表面/你有/别嘴硬了，你就是…」+ you are / you appear / deep down, you 等把描述钉在「你」身上的指向形。两腿共现才判，缺腿不判——单纯说「表面坚强内心柔软」而无第二人称指向，是文学描写不判；只说「你很矛盾」而无人格描述句式，是普通评价不判。精准佯称词（很准/神准/很少见/测试结果显示/spot on）命中则加权而非必要条件——巴纳姆话术的专属感常由「不轻易让人看见」暗示。正当做法是**改用可复现的标准化测量**（量表得分/常模/百分位）并说明信效度与适用边界，或明确告知描述适用于大多数人而非专属判断。边界：pseudo_profundity 管「看似深刻的空话」（世界观金句），本族是通用人格描述佯称专属；confidence/sycophancy 只管确定性措辞，本族以描述普适性为核心特征；mind_reading 管断言他人当下想法/感受，本族描述性格结构；suffering_contest 管第一人称自陈比惨，本族不涉苦难比较。有依据的测量陈述（量表得分/标准差/常模/MBTI/标准化评估）、谬误概念转述（巴纳姆效应/Barnum effect/占卜/算命）、教学转述（课堂/教材/textbook）、否定翻转（「这不能作为判断你的依据」）、对冲（也许/可能/未必/not necessarily）、数据边界自陈（样本有限/仅供参考/倾向而非定论）、第三人称转述报告（「描述对很多人都显示」）明确不判。",
     'no_true_scotsman': "不得**先立一个带 authenticity 标准的类别，再用行为把反例驱逐出该类别，使类别不可证伪**——「真正的X不会这样」：先规定「真正的专家/粉丝/朋友/领导」应当如何，再把不符合该行为标准的对象开除类别：「真正爱你的男人，不会计较你花多少钱」「真正的专家不会犯这种低级错误」「真正有格局的领导，不会盯着考勤」「真兄弟不会计较这些，计较就不是真兄弟」「合格的妈妈怎么会让孩子哭成这样」「真爱一个人就不会计较得失」「He is not a true fan if he criticizes the team.」「If she were a real friend, she would have shown up.」这类**authenticity 短语×驱逐断言**的话术当循环定义谬误（样本形状与负例见 test/round-728-no-true-scotsman.js）。判据：腿① AUTH authenticity 短语——「真正/真心/真爱/合格/称职/敬业/但凡/有良心/有自尊/吃得苦」+ 社会角色名词（专家/粉丝/朋友/兄弟/男人/女人/领导/学生…）或 true/real/genuine + fan/expert/friend/partner…；腿② EXCLUSION 驱逐断言——否定行为谓词（不会/从来不/怎么会/算不上/根本不/就不配/would never/not a true…），或 CONDITIONAL 反事实条件句（如果她是真朋友，早就…/If she were a real friend, she would have…）。两腿共现才判，缺腿不判——只说「真正的专家」而无驱逐断言是普通描述不判；只说「他不会计较」而无 authenticity 短语是普通陈述不判。多处共现或含类别否认/反事实条件则加权。正当做法是**给出可检验的类别定义**（操作化指标/可复现的标准）再评估个体是否符合，或承认反例并修正定义而非开除反例。边界：无真正的苏格兰人谬误的概念转述（「这是无真正的苏格兰人谬误」）、术语约定与定义先行（先定义「真正的粉丝」的标准/约定术语/可检验的定义）、对冲（也许/可能/未必/not necessarily）、否定翻转（不是不会/不意味着/does not mean）、证据挑战（自称真正的专家但拿不出依据）明确不判。",
+    // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
+    'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
     // [r729] 第 160 维度 conditional_proposition（条件句武器化）。
     'conditional_proposition': "不得**用未经验证的假设性条件句直接裁定现实结论**——把「如果A真就B」的存在性推断当作A真假的证据，替代事实核查：「如果他真的爱你，就不会让你受这种委屈」「如果这个方案可行，我们早就看到成果了」「要是她问心无愧，为什么不敢出来回应」「如果早听我的，现在也不会这样」「If he really loved you, he would never treat you like that.」「If this strategy worked, we would have seen results by now.」「If she were innocent, she would have come forward.」这类**假设条件句×否定推断**的话术当条件句武器化谬误（样本形状与负例见 test/round-729-conditional-proposition.js）。判据：腿① HYPOTHETICAL 假设条件句——「如果/要是/若/假如/倘若/若是/换了是我/如果当时」+ if/were 引导的待验证命题；腿② NEG_INFERENCE 否定推断——条件之后紧跟对前件真值的否定性断言：反事实完成标记（早就…了/早该）、否定结果断言（就不会/也不会/不可能/定然不会）、反问否定（怎么会/怎么可能/为什么没/为什么不敢/为什么不/会不）、EN（would never/would not/would have …ed/'d have/there would be）。两腿共现才判，缺腿不判——「如果明天下雨，运动会就取消」「If it rains tomorrow, the match will be postponed.」这类规则/预报条件缺否定推断腿，是普通陈述不判。多处共现或含反事实完成标记则加权。正当做法是**分别核查前件与后件各自的证据**（条件句的真假取决于两个命题的证据，不取决于假设本身），或把假设明确标注为待验证前提再讨论。边界：条件命题/条件句/反事实推理的谬误概念转述、规则合同条件句（制度明文的触发条件）、对冲（也许/可能/未必/not necessarily/might）、否定翻转（不能说明/不代表/并不意味着/does not mean）、显式证据模式（实测/数据/证据/experiment/data）明确不判。",
     'appeal_to_ridicule': "不得用**嘲笑/蔑视/智商贬低对方的观点或发言**代替论据——把「这种想法也太可笑了，亏你想得出来」「这么幼稚的观点也拿出来说」「笑死我了，这也叫方案」「你的逻辑太搞笑了，认真读过文档吗」「脑子正常的人都不会这么想」「这也信？智商堪忧」「你的方案蠢得让人无语」「哈哈，就这水平还敢发言」当成对某个立场的反驳（This idea is ridiculous. I can't believe you came up with it./What a childish argument. Did you even read the docs?/LOL, you call this a plan?/Anyone with a functioning brain wouldn't think that.；样本形状与负例见 test/round-704-appeal-to-ridicule.js）。判据是**三条路由任一命中**：①双腿共现——腿①嘲笑/蔑视表达（可笑/搞笑/笑话/蠢/幼稚/天真/弱智/无语/好意思/笑死/笑哭/智商堪忧/脑子进水；EN：ridiculous/laughable/hilarious/pathetic/absurd/stupid/idiotic/childish/naive/lol/lmao/your IQ is concerning）× 腿②指向对方观点/发言/产出的目标腿（这种/这个/这么/这也/这叫/就这 + 想法/观点/论调/方案/逻辑/设计/说法/主意/水平/东西/叫/信/想；你的 + 方案/逻辑/想法/观点/设计/说法/主意/水平/脑子/智商/作品/成果/回答/结论；拿出来说/敢发言/也敢说；EN：this/that/such a/what a + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level、your + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level/brain/iq/work/output、you call this/you believe this/dare to speak/only someone like you）② 自含指向的固定嘲讽习语单独成支（亏你想得出来/也只有你/只有你能有/不值一驳/脑子正常的人都不会/就这水平；EN：can't believe you came up with this/not even worth refuting/anyone with a functioning brain/with this level）③ 缺一不判——「这个桥段很搞笑」只有笑料描述无指向腿；「你这个想法需要数据支撑」只有指向无蔑视表达。诉诸嘲讽把讨论从**论据核对**转成**立场羞辱**，让对方为「敢提出这个想法」本身付出代价：正当做法是**针对观点给出可核验的反驳**（这个方案的第三步推不出来，因为样本量只有 12，结论不显著/我不同意这个观点，理由是数据不支持：对照组缺失）或**把嘲笑换成具体缺陷指认**（这个方案确实有可笑的漏洞：缓存没有过期策略，我们来修复它）。边界：sarcasm 管反讽语气标记（呵呵/你说得都对/笑死了），是语气描述且不强制行动，本族要求嘲词×观点指向共现或固定习语；hate_speech/dehumanization 管对人的侮辱与人格否定（你就是个废物/这种人就是垃圾），落点是人，本族落点是观点/发言/产出；bad_faith 管论证动机的恶意推定，本族不管动机只管以嘲代替论据；FALLACY_PATTERNS 既有 straw_man 正则只认「你的意思就是说…但这显然」转述形。明确不判：缺陷对象在场（这种方案确实有可笑的漏洞/This plan does have a ridiculous flaw——可笑修饰的是漏洞不是方案整体，是具体指认）、评析话术本身（把「这种想法太可笑了」当作论据，就是诉诸嘲讽/Appeal to ridicule is a common logical fallacy.）、提问咨询句式**不豁免**（「你的逻辑太搞笑了，认真读过文档吗」「这也信？智商堪忧」以反问收尾的攻击形态占比高，豁免问句会把整族放行）、幽默内容转述（喜剧电影里的这个桥段很搞笑/他讲的笑话让全场都笑了/这个段子写得真幽默——笑料内容描述不是攻击）、正当反对（我不同意这个观点，理由是数据不支持/你的逻辑有问题，第 3 步推不出来）",
@@ -3622,6 +3640,11 @@ function discriminate(text, evidence = [], contentMode) {
     //  文学对白、反事实推演讨论，rewrite 会误伤。
     //  与 r724-r728 同口径）
     'conditional_proposition',
+    // [r161] 第 161 维度 monocause（单一因果过度简化）登记。
+    // verify 级——「把多因现象压成单因」是**证据/归因缺口**，需改为列出
+    // 并权衡多因；单句也可能是转述他人观点、文学对白、历史归因的教学
+    // 讨论，rewrite/block 会误伤。与 r724-r729 同口径只登记 VERIFY。
+    'monocause',
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）登记。
     // verify 级——「以嘲笑代替论据」需要补的是**实际语境判据**（这是
     // 蔑视攻击还是强烈批评的具体缺陷指认/幽默内容转述/文学对白/元
@@ -4042,6 +4065,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r729] 第 160 维度 conditional_proposition 补登记（条件句武器化）。
       // 同上：九处一次接齐。
       conditional_proposition: cp,
+      // [r161] 第 161 维度 monocause 补登记（单一因果过度简化）。
+      // 同上：九处一次接齐。
+      monocause: mono,
       // [r704] 第 137 维度补登记：appeal_to_ridicule（诉诸嘲讽）。
       // 同上：十处一次接齐。
       appeal_to_ridicule: ar,
@@ -4291,6 +4317,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r729] 第 160 维度 conditional_proposition 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       cp.count ? cp.count + ' 处条件句武器化' : '',
+      // [r161] 第 161 维度 monocause 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      mono.count ? mono.count + ' 处单一因果过度简化' : '',
       // [r704] 第 137 维度 appeal_to_ridicule 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ar.count ? ar.count + ' 处诉诸嘲讽' : '',
@@ -14749,6 +14778,9 @@ module.exports = {
   checkForerEffect,
   checkNoTrueScotsman,
   checkConditionalProposition,
+  // [r161] 第 161 维度 monocause 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkMonocause,
   // [r704] 第 137 维度 appeal_to_ridicule 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkAppealToRidicule,
