@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-18%2C157%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-162-blueviolet.svg)](#what-it-catches-162-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-163-blueviolet.svg)](#what-it-catches-163-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-162 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
+163 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
 ×  1,314 dispatch routes  ×  18,157 passing tests  ×  2 npm dependencies
 ```
 
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (162 dimensions)
+## What it catches (163 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **121 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **122 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -196,7 +196,7 @@ Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 
 | Emotional & psychological | `emotional_manipulation`, `gaslighting`, `mind_reading`, `darvo`, `kafkatrapping`, `concern_trolling`, `fear_projection`, `guilt_induction`, `suffering_capital` | 6.7.x – 6.8.x |
 | Agent-era attacks | `reward_hacking`, `prompt_injection` (+ synonym families: 37 verbs × 24 anchors × 52 objects = 46,176 combinations), `instrumental_reasoning`, `deceptive_alignment`, `capability_overclaim`, `turing_mimicry` | 6.7.10 – 6.8.84 |
 | Evidence & statistical honesty | `unsupported_claim`, `false_urgency`, `statistical_misleading`, `percentage_overflow`, `perfect_error`, `pseudo_causal`, `post_hoc`, `anecdotal`, `survivorship_bias` | 6.7.x – 6.8.x |
-| Discourse & power | `tu_quoque`, `whataboutism`, `poisoning_the_well`, `standard_shift`, `moving_goalposts`, `sunk_cost_coercion`, `victim_blaming`, `thought_terminating_cliche`, `sycophancy` | 6.7.x – 6.8.x |
+| Discourse & power | `tu_quoque`, `whataboutism`, `poisoning_the_well`, `standard_shift`, `moving_goalposts`, `sunk_cost_coercion`, `victim_blaming`, `thought_terminating_cliche`, `sycophancy`, `doublespeak` | 6.7.x – 6.8.92 |
 
 Every new dimension ships with a negative-injection test that empties each constant to prove it is load-bearing, a probe-measured leak rate, a benign-sample false-positive count, and the bidirectional guard (52/52 attack recall, 302/326 benign pass) as a no-regression gate.
 
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.91**. Not marketing copy.
+Measured on this repository at **v6.8.92**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 162 |
+| Discrimination dimensions | 163 |
 | MCP tools | 184 |
 | Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.92 | 2026-10-30 | **第 163 维度 doublespeak（语义洗白 / euphemistic relabeling）上线** — 新增判别维度，补上心虫「是非判断」里缺失的名实分离族：把有害行为用中性/褒义词汇重新命名以规避指责（「我们不是在监控你，我们是在关心你的安全」「这不是裁员，这是优化，是给社会输送人才」「这不叫打压，这叫帮助你成长」「公司把裁员说成是优化」「政府部门把强拆包装成城市更新」；This is not surveillance, it is care. / The layoffs were rebranded as optimization. / Coercion was dressed up as consent.）。双腿判据+方向原则：腿① HARMFUL-ACT 有害行为名词/动词族（监控/打压/辞退/裁员/惩罚/欺骗/造假/剽窃/暴力/拘禁/操纵/剥削/歧视/霸凌/家暴/降薪/强制加班；EN：surveillance/censorship/layoff/coercion/exploitation/harassment/blackmail/propaganda）× 腿② RELABEL 重新命名框架两条路由——(a) 否定替换式（不是X，是Y / 并非X，而是Y / 不叫X，应叫Y；EN：this is not X, it is Y / we do not X; we Y / rather than X）；(b) 转称式（把X说成Y / X说成Y / 把X包装成Y；EN：X was rebranded as Y / X was dressed up as Y），中性改名动词另需柔性标签（优化/关怀/安全/成长/care/safety/optimization）——**方向原则**：有害词必须是被改名的对象而非被揭穿的现实，据此排除批评者揭批形态（「以安全之名，行监控之实」「under the guise of…」）与受害者反向拆穿（「这不是爱，这是控制」）。三类豁免（法律定性/升级定性、元话语概念评析、无有害词同形句）。仿 incredulity.js 结构，新文件 src/doublespeak.js（~370 行），index.js 九处接线。来源：arXiv:2103.16808 "Self-Supervised Euphemism Detection and Identification for Content Moderation"（IEEE S&P Oakland 2021，HN id 26725061，自监督路线与纯规则引擎不同构）+ GitHub WanzhengZhu/Euphemism（36★）、yiyepianzhounc/TED-SCL（69★）均无可复用规则。维度 162→163、VERIFY 121→122。验证：round-164 变体矩阵 ZH 25/25 + EN 18/18 命中、良性 0/34（含 10 条批评者揭批形态）、双向门禁良性语料 0/369 误伤、负例注入逐常量承重、gate 层攻击全 verify 且 doublespeak count>0 承重。 |
 | 6.8.91 | 2026-10-30 | **第 162 维度 incredulity（诉诸个人怀疑 / argument from personal incredulity）上线** — 新增判别维度，补上心虫「证据纪律」里缺失的认知越界族：以主观「无法想象/难以置信」替代证据，据此否定事实真值（「我无法想象他怎么能做到，所以这成绩一定是假的」「一看就是后期剪辑的」「不可能是真的，我实在无法想象它怎么采集的」；I cannot imagine how this is possible, so it cannot be true. / There is no way that happened; I cannot fathom it.）。双腿判据：腿① INCREDULITY 难以置信陈述（无法想象/难以想象/想象不到/难以置信/不可思议/匪夷所思；EN：can't imagine / hard to believe / inconceivable / unfathomable / unbelievable）× 腿② TRUTH-DENIAL 真值否定推导（推断词+否定断言：所以/因此/这说明…+不是真的/是假的/纯属/不可信/作弊/编造/摆拍/有黑幕；直接否定断言：一看就是假的/肯定是作弊的/不可能是真的；倒装形同样命中）。三类豁免（有据可查的惊讶、提问句式、概念分析）。仿 monocause.js 结构，新文件 src/incredulity.js（~260 行），index.js 九处接线。来源：标准非形式谬误 taxonomy（argument from personal incredulity）；HN Algolia 命中真实基准故事 arXiv 2405.02318（LLM 路线，与纯规则引擎不同构）、GitHub 最高星 latent-variable/Real_time_fallacy_detection（119★，无可复用规则）、Semantic Scholar 全程失败，不编造 arXiv ID。维度 161→162、VERIFY 120→121。验证：round-163 轮测 20/20（变体矩阵 ZH/EN×裸词干/修饰/倒装/长句 10/10 命中、良性 9/9 零误伤、负例注入逐常量承重）、gate 层攻击非 pass、incredulity 维度 count>0 承重、双向门禁不升误拦。 |
 | 6.8.90 | 2026-10-30 | **v6.8.90 monocause 腿①裸战争补缺 + README badge 同步（r161 首轮 cron 产出实测修补）** — 实测发现 monocause 腿①只收带后缀的「战争爆发」，裸名词形「战争纯粹是因为资源争夺」整句漏判，补 COMPLEX_ZH 裸词形态；README badge/横幅数字同步至 161/161。 |
 | 6.8.89 | 2026-10-30 | **第 161 维度 monocause（单一因果过度简化 / fallacy of the single cause）上线** — 新增判别维度，补上心虫三大支柱「因果纪律」里缺失的归约谬误射程：post_hoc 管时序→因、false_cause 管相关→因、pseudo_causal 管虚构机制，但都没有管「把真实多因的系统性复杂现象压成单一原因并否认多因性」。辨别把经济危机/公司倒闭/犯罪率/战争爆发/王朝覆灭/帝国衰落/社会撕裂/创业失败等已知多因现象，归结为「完全是因为X」「纯粹是X」「唯一的原因」「说到底/归根结底」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty.）。双腿判据：腿① COMPLEX-OUTCOME 已知多因的系统性现象（只收系统性现象，不收考试/比赛/普通项目等可单一归因的琐事——精度锚）× 腿② SINGLE-CAUSE 绝对化单一归因框架；四类豁免（多因并列/共同作用、hedged 单一贡献者「…之一/one of the main drivers」、提问句式、概念分析）。仿 appeal-to-novelty.js 结构，新文件 src/monocause.js（~230 行），index.js 九处接线（require/计算点/allDims/dimMap/DIM_GUIDANCE/VERIFY_DIMS/dimensions/summary/module.exports）。来源：标准非形式谬误 taxonomy + HN 基准故事 16200526（Recognising the fallacy of a single root cause）；Semantic Scholar 全程 429 限流、GitHub 无成熟规则引擎实现，不编造 arXiv ID。维度 160→161、VERIFY 119→120。验证：round-161 轮测 20/20（攻击 ZH/EN 全命中、良性 0 误伤、负例注入逐常量承重）、gate 层攻击=verify、隔离良性 0/17 误伤、双向门禁不升误拦。 |
