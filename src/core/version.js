@@ -120,7 +120,13 @@ const path = require('path');
 //                 复盘 15 条误判 14 条全 rewrite → 0 条；r720 存量攻击样本
 //                 20 条零退化；存量红测试 dimension-action-wiring 转绿。
 //                 新增 describePostHoc / postHocLegs 逐路由逐腿诊断）。
-let VERSION = '6.8.93';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.94] 第 739 轮同步：6.8.93 → 6.8.94（全量回归汇总行解析面扩容：
+//                 49 个测试文件落进「未输出『N 通过, M 失败』结果行」桶，
+//                 跑完、有输出、exit 0，只是汇总行格式不被 runner 认识。
+//                 解析器抽成单一来源 test/_summary-parse.js，新增 6 族格式，
+//                 45/49 救回、496 个此前隐形的断言数得以计入。纯 runner 侧
+//                 改动，引擎零行为变化）。
+let VERSION = '6.8.94';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

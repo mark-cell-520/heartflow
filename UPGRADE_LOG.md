@@ -1,3 +1,277 @@
+# 第 739 轮报告（v6.8.94 — 全量回归汇总行解析面扩容：49 个测试文件跑完、有输出、exit 0，只是汇总行格式不被 runner 认识，每轮通过数一直在低报）
+
+
+## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
+
+两个 cron 仍为空数组（`hermes/cron/jobs.json`），自主循环停着，r739 继续由主会话驱动。
+**选题判定由我下，不是 decision 本体打分。**
+
+选题直接取自 r738 交接簿候选池①——那条被标注「**强烈建议 r739 直接做这条**」的项。
+它同时满足三个条件：r732/r733/r734/r735/r736/r737/r738 **第七次复测确认**的存量缺陷、
+纯 runner 侧改动（引擎 `src/` 零行为变化，风险最低）、收益可直接度量。
+
+轮初先复测做实，不猜。写探针 `scripts/tmp-739-probe-unparsed.js`（轮末已删）：复用
+`run-all.js` 的 `collectTestFiles` + `taskWithBestRunner` + 同一套解析正则，对
+**621 个测试文件**逐个跑（JOBS=6），把解析不到任何汇总格式的 stdout **完整落盘**到
+`data/tmp-739-unparsed/`：
+
+| 探针实测（并发 6） | 文件数 |
+|---|---|
+| 落「未输出『N 通过, M 失败』结果行」桶 | **49** |
+| Command failed（并发争抢，比 runner 的 4 并发激进） | 25 |
+
+49 份 stdout 逐份读完，归类出 **9 种汇总格式**，其中 **6 族从未被 runner 认识**。
+选题依据：每轮都有 49~56 个测试文件的断言数无法计入、各计 1 个失败，等于全量回归的
+通过数一直在低报，而 runner 的解析逻辑只要再认几种格式就能把它们收回来。
+
+## 二、根因 / 缺口分析（带证据）
+
+### 根因：runner 的解析正则只认 3 族，仓库里实际有 9 族
+
+`test/run-all.js` 的 `runChild()` 原只认三种（v6.7.83~v6.7.86 逐轮补的）：
+
+```
+1. 「N 通过, M 失败」/「N passed, M failed」   主正则
+2. 「N/M passed」「合计 N/M」                   分数式
+3. 「PASS …」/「SKIP …」单行                    裸跑型
+```
+
+而 49 份真实 stdout 里有 6 族不在此列。**每族的文件数与真实样本**（全部来自
+`data/tmp-739-unparsed/` 落盘，提交前已删）：
+
+| 族 | 真实书写 | 文件数 |
+|---|---|---|
+| **cn-short** | `== 结果: 10 过 / 0 败 ==`、`结果：14 过 / 0 败`、`r583 …守卫：13 过 / 0 败（共 54 项）`、`结果: 61 过 / 0 败, 共 61 个` | 17 |
+| **health-phrase** | `r417 circular_restate: 全部通过`、`path-guard: ALL PASSED ✅`、`r447: ALL GREEN`、`round-574-…: ALL PASS`、`round-480-…: 15 攻击命中 / 10 良性 0 误报 / 删条变异承重 / 还原健康`、`round-493-…: 断言 52 全部通过` | 19 |
+| **passline(✅)** | `  ✅ 模块层攻击命中 12/12` 等逐行 ✅（round-551 共 11 行） | 2 |
+| **sample-pass** | `✅ round-436 双语可定位语域豁免守卫通过（7 pass / 4 verify）` | 3 |
+| **cn-order** | `=== 结果 ===` 下的 `通过 26 / 失败 0` | 1 |
+| **kv** | `[r634 dao-dispatch] pass=32 fail=0` | 1 |
+| **json** | `RESULT{"pass":61,"fail":0,…}`、行首裸 `{\n "pass": 13,\n "fail": 0,` | 2 |
+| 合计 | | **45** |
+
+后果不是「数字难看」，是**三重失真**：
+1. **通过数低报**：45 个文件合计 **496 个断言**不计入 passed；
+2. **失败数虚高**：这 45 个文件各计 1 个失败，混进真正的失败清单，把信号淹掉；
+3. **红测试被掩盖**：一个真失败的测试如果恰好用这 6 族格式之一报失败，会和其他
+   49 个一起落桶，人工根本分不出哪个是真红。
+
+### 佐证：4 个文件本轮**刻意不救**（诚实边界）
+
+| 文件 | 为什么救不了 |
+|---|---|
+| `mcp-server.test.js` / `mcp-smoke.test.js` / `round-572-associative-handler.test.js` | stdout **零字节**（exit 0 但无任何输出）——8099 端口被常驻 MCP 服务占用导致的存量环境噪声，解析层无输入可解析 |
+| `round-630-preference-guard-dispatch.test.js` | `RESULT{"reach":{…},"inModules":true,"overrideBlocked":"0/5","benignPassed":"0/4","conflictFound":0,"mutantEscape":"0/5"}` —— **没有 `pass`/`fail` 键**。要救就得把 `overrideBlocked`/`mutantEscape` 的 `0/5` 当失败数解读，那是编数字，违反「Honest numbers」。它的正解是改测试自己输出 `pass/fail`，属独立主题 |
+
+## 三、落地项
+
+### ① `test/_summary-parse.js`：解析器抽成单一来源（新建，29 行非注释代码）
+
+9 族解析按**优先级**排列，纪律三条（都是踩坑换来的）：
+
+```js
+1. standard     「N 通过, M 失败」   （原主正则，一个字没改——r311 B1 段钉着它）
+2. ratio        「N/M passed」「合计 N/M」
+3. cn-order     「通过 N / 失败 M」
+4. cn-short     「N 过 / M 败」
+5. kv           「pass=N fail=M」
+6. json         RESULT{…} / 行首裸 {
+7. sample-pass  「N pass / M verify」  ← verify 是 gate 动作，不是测试失败，按 0 失败计
+8. health-phrase 显式全绿措辞         ← 取不到通过数按 1 计（PASS 单行同语义，不虚增）
+9. passline     PASS / ✅ 单行
+```
+
+- **数字族一律优先于语义族。** round-436 的真实输出同时含「7 pass / 4 verify」和
+  「守卫通过」——若 health-phrase 抢先，通过数会被压成 1。测试 D1 钉住这个优先级。
+- **没有失败数的格式一律按 0 失败计**（族 7/8），不许把 verify 数、样本数当失败数。
+- **一族都不认仍返回 `SILENT_FAIL`**，run-all.js 的静默兜底原样保留（r6.7.83 的
+  「不报汇总行就永久隐形」纪律不能被新族吃掉）。测试 C1b 钉住。
+
+### ② `test/run-all.js`：改调共享模块，并让新族可见
+
+```js
+const { parseSummary } = require('./_summary-parse.js');
+...
+const parsed = parseSummary(out);
+if (parsed.kind === 'SILENT_FAIL') { /* 原静默兜底，一字未改 */ }
+if (parsed.kind === 'passline')    { passed += parsed.passLines; /* 原 PASS/SKIP 分支 */ }
+passed += parsed.passed; failed += parsed.failed;
+if (parsed.kind !== 'standard' && parsed.kind !== 'ratio') {
+  console.log(`  [解析:${parsed.kind}] ${label.trim()} → …`);   // 不许悄悄改数字
+}
+```
+
+- **err 分支一个字没动**：非零退出仍被 `if (!/(\d+) 通过, (\d+) 失败/.test(out))` 拦成
+  Command failed，新格式洗不白崩溃（测试 C2 钉住这行仍在）。
+- `keep` 输出过滤器补 `败`/`✅`：新族原文（`N 过 / M 败`、`✅ 行`）此前会被只认
+  「通过/✗/失败」三个词的过滤器整行滤掉。
+
+### ③ `test/runall-summary-contract-round311.test.js`：契约守卫改为 require 同一份实现
+
+这个 r311 守卫原先在文件里**字面重写了一份解析公式**当契约。本轮一新增格式，两份立刻
+漂移——副本判 `SILENT_FAIL`、实现已认出（r737 踩坑③「诊断与判定必须是同一个不变式的
+两半」的第三次踩坑，形状不同）。改为 `require('./_summary-parse.js')` 后契约不可能
+再漂移；B 段改钉「共享模块仍在 **且** 被 run-all.js 引用」（B1b，防守的是死代码）。
+D 段负例同步升级：stripped 要把**全部**可识别格式抠掉（标准行 + ✅ 行 + 全绿措辞）
+才允许回到 SILENT_FAIL。实测 13/13 全绿。
+
+### ④ 本轮测试 `test/round-739-runall-summary-formats.test.js`：20 通过 / 0 失败
+
+186 行非注释代码，七段覆盖：A 段各族真实样本（样本全部硬编码自探针落盘的 stdout，
+不依赖 tmp 目录）、B 段存量三族回归、C 段失败数必须透出（四族各喂一个非零失败数）、
+D 段优先级、E 段不救的形状（零输出 / 无 pass/fail 键的 RESULT）、F 段稳定性与三处接线。
+
+## 四、验收数字（全部实测）
+
+### 探针口径（49 份落盘 stdout，逐份喂新解析器）
+
+| 指标 | 修复前 | 修复后 |
+|---|---|---|
+| 落「未输出结果行」桶的文件 | 49 | **4**（3 个零输出 + 1 个无 pass/fail 键，刻意不救） |
+| 救回的文件 | 0 | **45** |
+| 救回的断言数（此前完全不计入 passed） | 0 | **496** |
+
+### 全量回归：`node test/run-all.js`（777.5s，并发 4）
+
+**19852 通过 / 25 失败 / 19877 个**（`data/test-count.json` 已由 runner 自动写入）。
+基线 r738 是 19247 / 75 / 19322：
+
+| 指标 | r738 基线 | r739 | 差额 |
+|---|---|---|---|
+| 通过 | 19247 | 19852 | **+605** |
+| 失败 | 75 | 25 | **−50（不增）** |
+| 总数 | 19322 | 19877 | +555 |
+
+三个数字完全自洽，可逐项对账：总数 +555 = 本轮测试 20 条 + 55 个文件此前各计 1 失败
+（不计通过）现在按文件自报数字计入的 535；失败 −50 = 这 55 个文件此前各计的 1 个失败
+里有 50 个不再计失败（另 5 个是本来就红的存量桶：mcp-server / mcp-smoke /
+round-572-associative-handler / round-498 / round-630，本轮仍失败，见下）。
+
+runner 实际打印的新族识别（`grep -o "解析:[a-z-]*"` 实测）：
+
+| 族 | 文件数 |
+|---|---|
+| health-phrase | 23 |
+| cn-short | 19 |
+| cn-order | 5 |
+| kv | 3 |
+| sample-pass | 3 |
+| json | 2 |
+| **合计** | **55** |
+
+比探针的 45 多 10 个——探针并发 6 有 10 个文件落 Command failed 桶，runner 并发 4 下
+它们 exit 0 而被救回。**探针桶 ≠ runner 桶**，别把两者混着报数。
+
+### 剩余 25 个失败逐条核对，零条本轮新引入
+
+| 桶 | r738 | r739 | 说明 |
+|---|---|---|---|
+| 文件自报失败 | 4 文件 | **3 文件**（ClassicsRules / AgentBoundaryGuard / mcp-guest-permission，各产 2 条清单条目） | dimension-action-wiring 已在 r738 转绿，本条与 r738 逐字同族 |
+| 未输出结果行 | 54 | **5**（mcp-server / mcp-smoke / round-572-associative-handler / round-498 / round-630） | 前 3 个零输出（8099 端口占用存量噪声）；round-498 从 Command failed 桶漂移进来；round-630 无 pass/fail 键 |
+| Command failed | 6 | **5**（mcp-auth-tier / round-502 / round-506 / round-572-associative-wiring / round-621） | 与 r738 逐字同族，round-608 本轮未失败（漂移） |
+| 注册 0 用例 | 1 | 1（round-410-checktests-catchguard，存量） | 同 r738 |
+
+### 引擎行为零变化的证据
+
+`git diff src/` 只有一行：`src/core/heartflow.js` 的 `BUILD_DATE`（`6.8.93`→`6.8.94`，
+不参与判别）。双向门禁因此与 r738 基线**逐项一致**：召回 **52/52**、误拦 **306/326**
+（一条不增不减）。本轮未跑 r738 那套全仓库散文 FP 面（760,535 句送检）——引擎代码
+零判别变化时它是恒等的，跑它只会消耗 8 分钟回归之外的时间。
+
+### 六项门禁
+
+| 门禁 | 结果 |
+|---|---|
+| `bin/verify.js` | **16/16** |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 306/326**（与 r738 逐项一致） |
+| `scripts/guard-abilities.js` | **20/20**（dimensions 键 160 / summary 引用 123） |
+| `test/doc-numbers-accuracy.test.js` | **22/22** |
+| `test/security-audit.test.js` | 15/16，唯一失败 S2「git log/tag 未命中 6.8.94」，本轮提交后自动转绿（与 r735~r738 同） |
+| `scripts/round-guard.js --stage=after` | 提交后通过 |
+
+### 本轮测试与契约守卫
+
+| 测试 | 结果 |
+|---|---|
+| `test/round-739-runall-summary-formats.test.js` | **20 通过 / 0 失败** |
+| `test/runall-summary-contract-round311.test.js`（改为 require 共享模块后） | **13 通过 / 0 失败** |
+
+### 新增代码量（诚实标注）
+
+新增非注释代码 **230 行**：`_summary-parse.js` 29（功能逻辑）+ 本轮测试 186 +
+r311 契约守卫净增约 10 + run-all.js 接线净增约 5。
+**其中纯功能逻辑 34 行，低于硬约束 4 的 50 行门槛**——这是 runner 侧基础设施修复，
+不是「新增公开方法」，因此 AGENTS.md 约定 3 的 MCP 三处接线不适用（外部 agent 不通过
+MCP 调测试 runner）。可度量收益见上：+605 通过 / −50 失败 / 496 个此前无法计入的断言。
+
+## 五、已知未修（含为什么不修）
+
+① **【下一轮强烈建议先做这条】`scripts/sync-doc-numbers.js` 有破坏性，会改 `src/` 源码。**
+本轮实测：跑它之后 `git diff --stat` 显示 `src/reward-hacking.js` −103 行、
+`src/core/heartflow.js` −32 行（它是真的在删源码，不是改文档），同时把模块数 161→157、
+路由 1314→1264——而 bin/verify.js 与 guard-abilities 的实测是 **161 / 1314**（r738
+lastChecks 同）。已 `git checkout --` 恢复源码、手工把文档数字改回、手工补
+`version.js` 兜底值与 BUILD_DATE（sync-version.js 不管 version.js，r738 踩坑同条）。
+**轮次协议第 5 步让每轮都跑这个脚本，等于每轮都在删引擎源码**——必须查清它为什么
+实测出 157/1264（很可能是它的度量入口与 bin/verify.js 不同，比如懒加载模块未触发），
+并把它对 `src/` 的写权限去掉。
+
+② **runner 的 `rollbackSrcIfDirty` 不删新增文件。** 它只回滚「快照里存在但内容变了」
+的文件；变更测试被 SIGKILL/timeout kill 时**新建**的突变文件不在快照里，永远不删。
+本轮实测踩到：第一次全量回归被 background time limit kill 时正跑
+`round-448-hook-quality-check.test.js`，留下 `src/round-448-mutant-*.js`（5 个）+
+`test/round-448-mutant-runner.js` + `samples.json` 共 7 个未跟踪残留，已手工 rm。
+修法：快照时记录 `src/` 全量文件名集合，回滚时把不在集合内的 `.js` 也删掉（或至少报出来）。
+
+③ **`round-630-preference-guard-dispatch.test.js` 的 RESULT 没有 pass/fail 键**，刻意不救
+（见第二节表）。正解是改该测试自己输出 `pass=N fail=M`，是独立主题。
+
+④ **3 个零输出文件**（mcp-server / mcp-smoke / round-572-associative-handler）：根因是
+8099 端口被常驻 MCP 服务占用，解析层无输入可解析。要么让这几个测试在端口占用时输出
+`SKIP …`（现有 SKIP 分支不计失败），要么换动态端口。
+
+⑤ **`round-498-normalization-of-deviance.test.js` 本轮从 Command failed 桶漂移进未输出桶**，
+说明它的 stdout 有内容但格式仍不被认。要救需单独抓一次它的输出归类（本轮未单独存盘）。
+
+⑥ r738 候选池 ②~⑨ 全部沿用未动（撒点多字母中段 / 多词撒点、通道 B OBJECT_PATTERN
+收窄、loaded_question 新维度、evidence 提级、三个 extended 维度补句式族、引述内含红线
+通道、post_hoc ZH 侧第三腿、round-608 时钟竞态）。本轮只做 runner 一个主题（纪律 3）。
+
+⑦ **`src/index.js` 已 14893 行**（阈值 14000）。doc-numbers 每轮报警不处理，同 r738。
+
+## 六、踩坑
+
+① **`scripts/sync-doc-numbers.js` 会删 `src/` 源码——本轮最大的坑。** 轮次协议第 5 步
+让「版本 +0.0.1 → sync-version.js → sync-doc-numbers.js」连着跑，我照做了，结果它把
+`src/reward-hacking.js` 103 行、`src/core/heartflow.js` 32 行删掉，还把 161/1314 改成
+157/1264。发现方式是 `git status --porcelain` 里出现了两个**不该出现**的 ` M src/...`。
+**教训：跑任何 scripts/ 下的「同步」脚本后，第一件事是 `git status` 看有没有 src/ 被动。**
+这条已升级为下一轮候选①。
+
+② **runner 兜底只防「改」不防「增」。** 被 kill 的回归留下 7 个突变文件，我第一反应是
+「runner 有 rollbackSrcIfDirty 应该自己会还原」，看了源码才发现它遍历的是快照 Map
+（只有跑前存在的文件）。**兜底函数的第一件事是看它的输入集合覆盖了什么**，不是看它
+叫什么名字。
+
+③ **带 `g` 的正则漏了 `g`，`String.match` 就只返回第一个匹配。** `PASS_LINE_RE` 第一版
+写成 `/^\s*(?:PASS\b|✅)/m`，结果 round-551 的 11 个 ✅ 行恒计 1。是自己写测试 A7 断言
+11 时当场炸出来的。**数行数的正则必须先问「我加 g 了吗」。**
+
+④ **契约副本第三次漂移，这次是 runner 家族。** r311 守卫字面重写解析公式，r739 一加
+格式它就与 run-all.js 的真实行为分叉（副本说 SILENT_FAIL、实现说通过）。前两次是
+r737 的诊断函数词表、r738 的 ARRIVE_EN。**「辅助判据与调用方必须是同一个不变式的两半」
+在这仓库已经是第三次以不同形状出现，下次看到「字面重写一遍别人的逻辑」就要警觉。**
+
+⑤ **探针并发数必须和 runner 一致，否则桶不可比。** 探针 JOBS=6 时 Command failed 桶
+25 个文件，runner JOBS=4 时只有 5 个。差 20 个全是并发争抢噪声。报数时两个桶分开报，
+别把探针的 25 当成「存量失败 25 个」。
+
+⑥ **ratio 族要求尾部跟 `个/条/tests/passed`，「通过 13 / 13」裸分数式不匹配。** 本轮
+测试 B2 第一版写了 `'  通过 13 / 13\n  合计 12 / 15\n'` 期望 passed=13，实测拿到 12
+（第一个 ratio 分支没匹配上，落到 `合计 12 / 15`）。改成分开两条各自测。**写样本前先
+手算一遍正则会咬到哪一段。**
+
+
 # 第 738 轮报告（v6.8.93 — post_hoc R2 的 EN 侧第三腿「归因主张」补线：guidance 承诺的契约在 EN 侧没有实现，中性工程复盘被后此谬误误判 rewrite）
 
 

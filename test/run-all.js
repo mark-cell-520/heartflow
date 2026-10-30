@@ -25,6 +25,8 @@
 const fs = require('fs');
 const path = require('path');
 const { execFile } = require('child_process');
+// [v6.8.94] 汇总行解析的单一来源：run-all 与 r311 契约守卫共用，杜绝副本漂移。
+const { parseSummary } = require('./_summary-parse.js');
 
 const TEST_DIR = __dirname;
 const ROOT = path.join(__dirname, '..');
@@ -110,44 +112,13 @@ async function runChild(task) {
       return;
     }
   }
-  // [v6.7.86] 同时识别多种汇总格式：
-  //   「N 通过, M 失败」       —— harness 标准中文汇总
-  //   「N passed, M failed」   —— 自建 harness 英文汇总
-  //   「N passed / M failed」  —— 带斜杠分隔（compliance.test.js）
-  //   「N/M passed」           —— 只报通过数的分数式（blindspot-upgrade）
-  //   「PASS/SKIP 单行」       —— 裸跑型 smoke test
-  // 只认第一种曾让 6+ 个测试文件长期隐形：它们跑完了、有汇总、有 exit code。
-  let m = out.match(/(\d+)\s*(?:通过|passed)\s*[/,]?\s*(\d+)\s*(?:失败|failed)/);
-  let ratio = null;
-  if (!m) {
-    // 分数式：N/M passed、N/M tests passed、合计 N/M、N/总数
-    const r = out.match(/(\d+)\s*\/\s*(\d+)\s*(?:passed|通过|tests?\b|个|条)/)
-      || out.match(/合计\s*(\d+)\s*\/\s*(\d+)/);
-    if (r) {
-      const pass = parseInt(r[1], 10), total = parseInt(r[2], 10);
-      ratio = { passed: pass, failed: Math.max(0, total - pass) };
-    }
-  }
-  const parsed = m
-    ? { passed: parseInt(m[1], 10), failed: parseInt(m[2], 10) }
-    : ratio;
-  if (!parsed) {
-    // [v6.7.83] 第四种格式：裸跑型测试的 PASS/SKIP 单行报告。
-    // 形如 `console.log('PASS version.test.js (module loads)')` 或
-    // `console.log('SKIP x (' + code + ')')`。这类文件语义上是"通过"
-    // 但完全没有计数——core/ utils/ memory/ 下 40+ 个测试全属此类。
-    // PASS → 计 1 个通过；SKIP → 不计失败但打出来（环境依赖缺失时
-    // 模块加载不了，判失败会掩盖真实情况）。
-    const passLines = (out.match(/^\s*PASS\b.*$/gm) || []).length;
-    const skipLines = (out.match(/^\s*SKIP\b.*$/gm) || []);
-    if (passLines > 0 || skipLines.length > 0) {
-      passed += passLines;
-      if (skipLines.length > 0) {
-        console.log(skipLines.slice(0, 2).join('\n'));
-      }
-      // 有输出但全 SKIP：不计失败，但要可见（已在上面打出）
-      return;
-    }
+  // [v6.8.94] 汇总行解析改调共享模块 _summary-parse.js。
+  // 原先是 runChild 内联正则 + r311 契约测试里一份字面重写的副本，两份必然漂移
+  // （r739 实测：副本判 SILENT_FAIL 而实现已认出的格式有 6 族）。单一来源后
+  // 「判定」与「契约」是同一份代码的两半。err 分支仍用上面的主正则粗判，
+  // 非零退出不会被新格式洗成通过。
+  const parsed = parseSummary(out);
+  if (parsed.kind === 'SILENT_FAIL') {
     // [v6.7.83] 吐不出结果行 = 静默。实测四类探针：exit1 被 execSync 的
     // 异常路径捕获（正确），但「跑完断言却不吐 N 通过, M 失败」的测试
     // 走到这里只打印尾巴就 return —— 不计入 passed、不计入 failed，
@@ -163,8 +134,30 @@ async function runChild(task) {
     });
     return;
   }
+  if (parsed.kind === 'passline') {
+    // [v6.7.83] 裸跑型测试的 PASS/SKIP/✅ 单行报告。形如
+    // `console.log('PASS version.test.js (module loads)')`。这类文件语义上
+    // 是"通过"但完全没有计数——core/ utils/ memory/ 下 40+ 个测试全属此类。
+    // 每行计 1 个通过；SKIP → 不计失败但打出来（环境依赖缺失时
+    // 模块加载不了，判失败会掩盖真实情况）。
+    passed += parsed.passLines;
+    if (parsed.skipLines.length > 0) {
+      console.log(parsed.skipLines.slice(0, 2).join('\n'));
+    }
+    // 有输出但全 SKIP：不计失败，但要可见（已在上面打出）
+    return;
+  }
   passed += parsed.passed;
   failed += parsed.failed;
+  // [v6.8.94] 非标准族（cn-short/kv/json/sample-pass/health-phrase）要把识别到的
+  // 格式打出来：这些文件此前长期计 1 失败，现在按文件自报数字计入，必须可见、
+  // 可人工核对，不能悄悄改数字。
+  if (parsed.kind !== 'standard' && parsed.kind !== 'ratio') {
+    const shown = parsed.kind === 'health-phrase' && parsed.phrase
+      ? `措辞「${parsed.phrase}」`
+      : `${parsed.passed} 过 / ${parsed.failed} 败`;
+    console.log(`  [解析:${parsed.kind}] ${label.trim()} → ${shown}`);
+  }
   // [v6.7.97] 各文件自报的失败必须进 failures 清单。
   // 原来只累加数字不记名字 → 最终汇总说「N 失败」而失败列表为空、
   // 还打印「全部通过」。第 74 轮在独立安装的 node_modules 里撞到：
@@ -191,7 +184,9 @@ async function runChild(task) {
     const fm = line.match(/^\s*✗\s+(.+?)\s*$/);
     if (fm) failures.push({ idx, name: fm[1], error: `(${label.trim()})` });
   }
-  const keep = out.split('\n').filter(l => l.includes('通过') || l.includes('✗') || l.includes('失败'));
+  // [v6.8.94] keep 过滤器补「败」与「✅」：新识别的「N 过 / M 败」「✅ 行」
+  // 族原文此前会被这个过滤器整行滤掉（只认「通过/✗/失败」三个词）。
+  const keep = out.split('\n').filter(l => l.includes('通过') || l.includes('✗') || l.includes('失败') || l.includes('败') || l.includes('✅'));
   console.log(keep.join('\n') || '  (无输出)');
 }
 
