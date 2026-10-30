@@ -1,3 +1,12 @@
+## [6.8.90] - 2026-10-30
+
+### Fixed
+- **monocause leg-1 enumeration gap**: the systemic-phenomenon pattern only matched suffixed forms (`战争爆发`/`战争阴云`/`战争的起因`), so the bare noun 「这场战争纯粹是因为资源争夺」passed the gate unblocked. Bare `战争` plus `战乱` and `冲突(不断|升级|频发)?` are now covered; attack variant matrix 6/6 hits (bare/suffixed/war-chaos/conflict/dynasty-collapse/English), 0/6 benign harmed, bidirectional guard unchanged (52/52 recall, 302/326 benign pass).
+- **README badge** row still read `dimensions-160` after the r161 dimension landed; corrected to 161.
+
+### Changed
+- **Cron job prompt hardened** (job 53ee5b19fdce) after first-round live audit: new-dimension verification now requires a same-family variant matrix (≥5 variants: ZH/EN, bare noun, modified, inverted — all must hit); documentation sync list now includes the README badge row; every round must restart `heartflow-mcp` via supervisorctl and verify the new version is live (the first round shipped code that the running MCP process did not have).
+
 ## [6.8.89] - 2026-10-30
 
 ### Added

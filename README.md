@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-18%2C157%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-160-blueviolet.svg)](#what-it-catches-160-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-161-blueviolet.svg)](#what-it-catches-160-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
