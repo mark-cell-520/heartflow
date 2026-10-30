@@ -15,8 +15,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-166 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
-×  1,314 dispatch routes  ×  19,026 passing tests  ×  2 npm dependencies
+168 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
+×  1,314 dispatch routes  ×  18,157 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 166 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 168 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (166 dimensions) -> gate
+scope-check -> premise-check -> discriminate (168 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (164 dimensions)
+## What it catches (168 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **123 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **127 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -195,7 +195,7 @@ Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 
 | Logical fallacies | `straw_man`, `appeal_to_nature`, `appeal_to_novelty`, `circular_reasoning`, `no_true_scotsman`, `special_pleading`, `conditional_proposition`, `appeal_to_probability`, `gamblers_fallacy`, `hot_hand`, `appeal_to_majority`, `affirming_the_consequent` | 6.8.40 – 6.8.78 |
 | Emotional & psychological | `emotional_manipulation`, `gaslighting`, `mind_reading`, `darvo`, `kafkatrapping`, `concern_trolling`, `fear_projection`, `guilt_induction`, `suffering_capital` | 6.7.x – 6.8.x |
 | Agent-era attacks | `reward_hacking`, `prompt_injection` (+ synonym families: 37 verbs × 24 anchors × 52 objects = 46,176 combinations), `instrumental_reasoning`, `deceptive_alignment`, `capability_overclaim`, `turing_mimicry` | 6.7.10 – 6.8.84 |
-| Evidence & statistical honesty | `unsupported_claim`, `false_urgency`, `statistical_misleading`, `percentage_overflow`, `perfect_error`, `pseudo_causal`, `post_hoc`, `anecdotal`, `survivorship_bias` | 6.7.x – 6.8.x |
+| Evidence & statistical honesty | `unsupported_claim`, `false_urgency`, `statistical_misleading`, `percentage_overflow`, `perfect_error`, `pseudo_causal`, `post_hoc`, `anecdotal`, `survivorship_bias`, `selection_bias` | 6.7.x – 6.8.97 |
 | Discourse & power | `tu_quoque`, `whataboutism`, `poisoning_the_well`, `standard_shift`, `moving_goalposts`, `sunk_cost_coercion`, `victim_blaming`, `thought_terminating_cliche`, `sycophancy`, `doublespeak` | 6.7.x – 6.8.92 |
 
 Every new dimension ships with a negative-injection test that empties each constant to prove it is load-bearing, a probe-measured leak rate, a benign-sample false-positive count, and the bidirectional guard (52/52 attack recall, 302/326 benign pass) as a no-regression gate.
@@ -204,16 +204,16 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.95**. Not marketing copy.
+Measured on this repository at **v6.8.97**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 166 |
+| Discrimination dimensions | 168 |
 | MCP tools | 184 |
-| Test suite | 19,026 passing / 77 failing |
+| Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -382,6 +382,8 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.97 | 2026-10-31 | **第 168 维度 selection_bias（取样偏差 / selection bias）上线** — 新增判别维度，补上心虫「证据充分性」方向缺失的取样框限制谬误：只从一个受限的、自选择的或非随机的来源取证（只调查会员/只统计某群体/只采访愿意配合者/数据只来自某平台/样本全部来自志愿者），却据此断言「代表全体」「具有普遍性」「适用于所有人」「足以说明全国」——取样来源与结论总体不匹配，证据效力被夸大（「问卷只发给了注册会员，所以调查结果代表全体用户的满意度」「数据只来自一线城市的活跃用户，足以说明全国用户的偏好」「样本全部来自自愿报名的志愿者，因此这个结论具有普遍性」「We only surveyed volunteers, so the results are representative of everyone.」「The sample was drawn solely from our premium users, which means all customers prefer this feature.」）。近 5 轮均为形式逻辑族（affirming_the_consequent/denying_the_antecedent/one_sided_dismissal/appeal_to_consequences/illicit_conversion），本轮按任务书轮换纪律切到统计推断/证据充分性方向。双腿判据：腿① RESTRICTION 取样受限——限定标记（只/仅/仅仅/全都/都/均/only/solely/restricted to）×取样动词（调查/统计/采访/回收/收集/纳入/来自/发给/survey/sampled/drawn/recruited）近距离共现（含裸名词形态「数据都来自一线城市」），或来源短语（样本/数据+全部/都/均+来自/源于）带受限来源词（会员/活跃/自愿/投诉/一线/管理层/volunteers/premium/self-selected）；腿② GENERALIZATION 总体推广——推广动词（代表/适用于/推广/反映/具有/足以说明/足以证明/representative of/generalizes to/applies to）接总体范围词（全体/所有/整体/全国/每个人/大众/普遍/all/every/everyone），或总体范围词+「都」形全称判断（全体员工都认可）。结论候选覆盖同逗号段推断词后、后续逗号段、跨句后续句、「毕竟/因为」倒装路由；推断词本身是推广动词（足以说明/which shows）时不断句。八类豁免全部负例注入承重：明示局限（只能反映/不能代表/不一定成立/还有待验证/不足以推广——正确推理）、充分取样（随机抽样/分层抽样/普查/random sample）、幸存者措辞（幸存者/活下来/survivors——射程归 survivorship_bias）、只描述样本自身（会员的满意度更高/所有样本都合格）、概率化结论（可能/也许/maybe/might）、疑问句、谬误概念转述（取样偏差/selection bias）、教学转述。仿 illicit-conversion.js 结构，新文件 src/selection-bias.js（~330 行），index.js 九处接线。来源：HN Algolia "base rate fallacy" 检索命中 Wikipedia Base rate fallacy 与 Schneier「Terrorists, Data Mining, and the Base Rate Fallacy」（概念背景；心虫 base_rate/prosecutors 子标签仅英文侧 5 条正则、中文侧零覆盖，Semantic Scholar 空返回，GitHub 高星方案全部 LLM-based 与纯规则引擎不同构），候选族差距由 /tmp/r169-gap-probe.js + /tmp/r169-baseline-probe.js 在当前 167 维引擎实测（取样偏差族 9/10 真零命中；对照候选：可得性启发 5/6、聚类错觉 4/5、区群谬误/回归均值 3/4 被存量维度代拦，故选取样偏差族）；判据为心虫自有纯规则实现。侦察落盘 /tmp/hf-scout-r169.txt。维度 167→168、VERIFY 126→127。验证：round-169 轮测 53/53（攻击 ZH 10/10+EN 4/4 命中含裸名词/带修饰/倒装/长句/跨句/仅标记、良性 ZH 11+EN 4 零误判含边缘良性、14 常量负例注入承重翻转、分工边界锁、区分锁、存量回归×2、登记断言×4、gate 层×2）、gate 层变体矩阵 12/12 非 pass 且 findings 全含 selection_bias、模块层良性 16/16 零误判、双向门禁 52/52 召回 302/326 误拦不升、verify 16/16、guard 20/20、doc 22/22。 |
+| 6.8.96 | 2026-10-31 | **第 167 维度 illicit_conversion（不当换位 / illicit conversion）上线** — 新增判别维度，补上心虫「演绎有效性」里缺失的范畴换位无效式：先立「所有 A 都是 B」的全称肯定命题，再据此断言「所有 B 都是 A」——主项谓项一对调，单向包含关系被偷换成双向（「所有猫都是动物，所以动物都是猫」「畅销的车都省油，所以省油的车都畅销」「爱国者都支持国产，所以支持国产的都是爱国者」「凡是认真读过原著的人都反对魔改，所以反对魔改的人都认真读过原著」「坚持锻炼的人免疫力强，所以免疫力强的人都坚持锻炼」；All squares are rectangles, so all rectangles are squares. / Every poet loves language, so everyone who loves language is a poet. / Whales are mammals, so mammals are whales.）。这是三段论形式谬误族的第三块（affirming_the_consequent 管 Q∴P、denying_the_antecedent 管 ¬P∴¬Q、conditional_proposition 管 ¬B⇒¬A，本族管 B⊇A 的主谓对调）。双腿判据：腿① PREMISE 全称肯定前提——全称量词（所有/全部/任何/每个/每一/凡/一切/一律）或裸「都」形的 A⊆B 陈述（EN: all/every/any/each A are B，或无系词动词句 Every poet loves language），切出主项 A 与谓项 B；腿② CONVERSION 换位结论——推断词（所以/因此/可见/这说明/故/so/therefore/which means）之后（或紧跟的下一句、倒装在前的上一句、「因为」标记路由的同句后半）出现以 **B 为主项、A 为谓项**的陈述。裸谓词前提（「坚持锻炼的人免疫力强」无量词无系词无都）按结论主/谓项关键词位置回退切分；单字谓项允许被前提关键词反向包含（飞 ⊆ 会飞的）。这个「主谓对调」结构天然区分：特称换位（有些A是B ∴ 有些B是A——有效）、否定换位（所有A都不是B ∴ 所有B都不是A——有效）、单称例示（结论主项回指 A）、有效三段论（结论回指第二前提主项）、前提重述（方向未对调）。八类豁免全部负例注入承重：特称量词、对冲/宽泛量、否定词（否定结论是正确的换位否认）、双条件（当且仅当/iff）、对称关系（同一/等同于/互为）、谬误概念转述（不当换位/换位命题/illicit conversion）、教学转述、证据语境。仿 denying-the-antecedent.js 结构，新文件 src/illicit-conversion.js（~440 行），index.js 九处接线。来源：HN Algolia 逻辑谬误主题多篇高票故事（Translating natural language to first-order logic for logical fallacy detection 258 pts / Logical fallacies in software engineering 242 pts / Logical Fallacies Are Usually Irrelevant or Cited Incorrectly 176 pts——FOL 路线需 LLM 与纯规则引擎不同构，仅背景参考），候选族差距由 /tmp/r168-gap-probe.js 在当前 166 维引擎实测（换位族 8 条 7 条真零命中，候选中项不周延族仅 2/8，故选换位族）；判据为心虫自有纯规则。侦察落盘 /tmp/hf-scout-1793387758.txt。维度 166→167、VERIFY 125→126。验证：round-168 轮测 25/25（攻击 ZH 10/10+EN 5/5 命中含倒装形/裸谓词前提/无逗号同句、良性 ZH 14+EN 4 零误判、八常量负例注入承重翻转、分工边界锁×2、区分锁、存量回归×2、登记断言×5、gate 层×2）、gate 层变体矩阵 12/12 非 pass 且 findings 全含 illicit_conversion、双向门禁 52/52 召回 302/326 误拦不升、verify 16/16、guard 20/20、doc 22/22。 |
 | 6.8.95 | 2026-10-31 | **第 166 维度 one_sided_dismissal（让步消解 / concessive dismissal）上线** — 新增判别维度，补上心虫「证据对称性」里缺失的单边论证族：先让步承认反面证据存在，再用一句总体性概括把它**不作量化权衡地**扫掉，直接收尾到单边结论（「这个药虽然有副作用，但临床试验显示它利远大于弊，所以值得推广」「研究确实也发现了一些问题，不过总体而言瑕不掩瑜」「当然反对者也能举出一些反例，但主流数据都站在我们这边」「他确实犯过错，但这不能掩盖他取得的巨大成就」；Side effects exist, but the benefits overwhelmingly outweigh the risks.）。这是 false_balance（把一边倒说成势均力敌）的镜像：把势均力敌/有真实反面证据的说成一边倒。双腿判据（缺一不判）：腿① CONCESSION 让步标记（虽然/尽管/固然/诚然/不可否认/必须承认/确实/当然/ admittedly/although/though/while/granted/critics/skeptics/there are/exist）× 反面证据词（副作用/风险/反例/批评/质疑/缺陷/过错/失败/争议/代价/受损/冲击 / side effects/risks/criticism/concerns/failures/flaws/drawbacks/dissenting——全部裸名词形态）；腿② DISMISSAL 消解短语（瑕不掩瑜/不能掩盖/利远大于弊/总体而言/归根结底/主流/大势所趋/实践证明/时间会证明 / overwhelmingly/outweighs/on balance/consensus is clear）。四类豁免全部负例注入承重：双方量化（让步与消解前后均出现具体数字——真实的风险收益权衡）、处置措施（可以监测/及时调整/停药即可/可控/可逆——全文检查，处置声明常出现在消解短语之前）、概念转述（选择性证据/单边论证/cherry picking）、教学转述。新文件 src/one-sided-dismissal.js（~230 行），index.js 九处接线。来源：Semantic Scholar 证据充分性/幻觉检测综述（Evidence-Chain Reliable RAG 2025、Medico arXiv:2410.10408、Evidence-Aligned Entity Verification arXiv:2609.08267——均需 LLM/embedding，仅背景参考），判据为心虫自有纯规则。维度 165→166、VERIFY 124→125。验证：round-167 轮测 44/44（攻击 ZH 10/10+EN 5/5 含倒装形、良性 ZH 8+EN 4 零误判、8 常量注入承重翻转、区分锁 false_balance）、gate 层变体矩阵 11/11 非 pass 且 findings 全含 one_sided_dismissal、双向门禁 52/52 召回 302/326 误拦不升、verify 16/16、guard 20/20、doc 22/22。 |
 | 6.8.94 | 2026-10-30 | **第 165 维度 denying_the_antecedent（否定前件 / denying the antecedent）上线** — 新增判别维度，补上心虫「演绎有效性」里缺失的无效推理族：先立「如果 P 则 Q」的条件规则，再以「并非 P」断言「并非 Q」——否定前件得出后件也不成立（「如果下雨，运动会就取消；今天没下雨，所以运动会不取消」「努力的人都会早起；他根本不努力，所以他不会早起」；If it rains, the match will be cancelled. It did not rain, so the match is not cancelled.）。双腿判据：腿① COND 条件/规则句（如果X（那么/则/就）Y / X都会Y / X能Y / 只要X就Y / EN: if X then Y / X has Y / 英文裸规则句前两词为主语），切出前件 A 与后件 B；腿② ANTECEDENT_DENY——按推断词（所以/因此/说明/so/therefore）切分事实句，前半回指**前件 A** 且被否定（¬P）、后半回指**后件 B** 且被否定（¬Q），「¬P ∴ ¬Q」结构天然区分 modus ponens（前后件皆肯定）/modus tollens（¬Q∴¬P 方向相反且 A≠B 不交叉）/affirming the consequent（Q∴P 无否定）。六类豁免（双条件/否定翻转/对冲/概念转述/教学/证据语境）。仿 affirming-the-consequent.js 结构，新文件 src/denying-the-antecedent.js（~290 行），index.js 九处接线。来源：arXiv:2405.02318 "Translating natural language to first-order logic for logical fallacy detection"（HN 258 pts，FOL 路线与纯规则引擎不同构，仅背景参考）+ GitHub tmakesense/logical-fallacy（20★）无可复用规则。维度 164→165、VERIFY 123→124。验证：round-166 轮测 39/39（攻击 ZH 8/8+EN 5/5 命中、良性 ZH 8+EN 3 零误判、五常量负例注入承重翻转、区分锁/分工边界锁）、gate 层攻击 8/8 非 pass 且 denying_the_antecedent count≥1 承重、双向门禁 52/52 召回 302/326 误拦不升。 |
 | 6.8.93 | 2026-10-30 | **第 164 维度 appeal_to_consequences（诉诸后果 / appeal to consequences）上线** — 新增判别维度，补上心虫「证据纪律」里缺失的后果替代族：以命题后果的可怕/不可接受/意义消解评估替代事实证据，据此否定或拒绝相信命题真值（「承认房价会跌太可怕了，那么多人还着贷款，所以房价不可能跌」「如果进化论是真的，那人活着就没有意义了，所以进化论不可能是真的」「我不敢相信气候变化是人为的，万一这是真的，经济就全盘崩溃了」；If climate change were real, our economy would collapse, so it cannot be true. / The findings are too devastating to be true — the data must be fabricated.）。双腿判据：腿① CONSEQUENCE 显式后果评估（太可怕/细思极恐/不堪设想/不敢想/没法接受/天要塌了/全盘崩溃/经济崩盘/还有什么意义/天下大乱；EN：too damaging / would collapse / would be devastating / too much to bear / life would have no meaning）× 腿② TRUTH-DENIAL 真值否定/拒绝相信（所以不可能是真的/一定是假的/纯属吓唬/危言耸听/我不敢相信…是真的/怎么可能；EN：cannot be true / must be false / I refuse to believe / too … to be true），倒装形（拒绝在前后果在后）由双腿共现覆盖。五类豁免（对冲/证据在场/概念转述/否定翻转/提问）。仿 monocause.js 结构，新文件 src/appeal-to-consequences.js（~250 行），index.js 九处接线。来源：标准非形式谬误 taxonomy（argumentum ad consequentiam）；外部搜索记录——SelfDoubt 论文（satwik2711/SelfDoubt，4★，COLM 2026 submitted，Hedge-to-Verify Ratio 概念）作背景参考、未直接集成（其方法需 reasoning trace 与模型 internals，与纯规则引擎不同构），Semantic Scholar 全程不可用（total undefined），不编造 arXiv ID。维度 163→164、VERIFY 122→123。验证：round-165 轮测 25/25（变体矩阵 ZH 8/8+EN 5/5 命中、良性 ZH 8+EN 3 零误伤、五豁免逐常量承重翻转、负例注入双腿停判）、gate 层攻击 10/10 非 pass 且 appeal_to_consequences count≥1 承重、双向门禁 52/52 召回 302/326 误拦不升。 |

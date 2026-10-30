@@ -1,4 +1,81 @@
 
+# 第 169 轮报告（v6.8.97 — 第 168 维度 selection_bias 取样偏差上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向：**统计推断 / 证据充分性**（任务书轮换池「证据充分性与幻觉检测 / 不确定性量化」一线）。近 5 轮均为形式逻辑族（affirming_the_consequent / denying_the_antecedent / one_sided_dismissal / appeal_to_consequences / illicit_conversion），本轮按轮换纪律切到**取样框限制谬误**：只从一个受限的、自选择的或非随机的来源取证，却把结论推广到全体/普遍/代表所有——取样来源与结论总体不匹配，证据效力被夸大。
+- 攻击族定义：「问卷只发给了注册会员，所以调查结果代表全体用户的满意度」「数据只来自一线城市的活跃用户，足以说明全国用户的偏好」「样本全部来自自愿报名的志愿者，因此这个结论具有普遍性」「公司只收集了投诉客户的意见，这说明客户整体都很不满意」「由于经费限制，这项调研只回收了愿意配合的老年人的问卷，但研究者认为这完全可以代表全市老年人的健康状况」「所以全体员工都认可这项新制度——毕竟问卷只发给了管理层」「他只问了几位铁杆粉丝，这说明所有观众都爱看这部剧」「我们仅统计了愿意公开评分的人，因此这部电影的评分代表大众口味」「We only surveyed volunteers, so the results are representative of everyone.」「The sample was drawn solely from our premium users, which means all customers prefer this feature.」「Feedback came only from subscribers, which shows the whole audience wants this change.」
+- 缺口核验：grep src/ 基础概率|先验|贝叶斯|患病率|base_rate|prosecutor → base_rate_fallacy / prosecutors_fallacy 仅是 `fallacies` 维度的**英文侧子标签**（index.js L5414-5420 共 5 条英文正则），中文侧零覆盖、无独立维度；monocause.js L41 注释确认其归 fallacies 子标签。
+- 缺口实证（/tmp/r169-gap-probe.js + /tmp/r169-baseline-probe.js，当前 v6.8.96 / 167 维引擎实测）：取样偏差族 10 条攻击 **9 条真零命中**（仅「只统计了坚持下来的学员」被 absolute_claim/hasty_generalization 代拦）；对照候选：可得性启发 5/6 零命中、聚类错觉 4/5、区群谬误 4/6 与回归均值误配 3/4 被存量维度代拦、诉诸资历 3/5 被 appeal_to_authority 代拦、中项不周延 4/5 被 affirming_the_consequent 代拦——故选取样偏差族（缺口最大且两腿结构最干净）。
+- 外部来源（真实，未编造）：HN Algolia "base rate fallacy" 命中 Wikipedia Base rate fallacy（7/5 pts）与 Schneier「Terrorists, Data Mining, and the Base Rate Fallacy」（2006，3/2 pts）——仅概念背景；Semantic Scholar "base rate neglect fallacy" 空返回（限流/无结果，如实记录）；GitHub "logical fallacy detection" 高星方案（tmakesense/logical-fallacy 20★、SeanFlannery/Logical.ly 4★、EPITA-SCIA/Fallacy-Detection-LLM 2★）全部依赖 LLM，与心虫纯规则引擎不同构，仅背景参考。**本族判据为心虫自有纯规则实现**。侦察落盘：/tmp/hf-scout-r169.txt。
+
+## 二、心虫裁决门禁
+- heartflow_philosophy_decision：**type=accelerate**（confidence 0.7 / priority 40 / goalReviewed true / trigger optimal_conditions）。如实说明：rationale 里 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎未实测按低负荷处理），不作为实质背书；accelerate 的依据是任务上下文本身的方向明确性（轮换纪律 + 候选族 9/10 实测零命中差距）。
+
+## 三、实现内容
+- 新文件 **src/selection-bias.js**（~330 行）：checkSelectionBias() + __internals 注入接口（28 个常量可负例注入）。第 168 维度 selection_bias（取样偏差），VERIFY 级。
+  - 腿① RESTRICTION 取样受限两路由：(a) 限定标记（只/仅/仅仅/唯独/全都/全部/都/均/only/solely/restricted to/limited to/confined to）×取样动词（调查/统计/采访/回收/收集/纳入/分析/问卷/数据/样本/来自/源于/发给/寄给/survey/sampled/drawn/recruited/interviewed…）近距离共现——裸名词形态「数据都来自一线城市」「问卷只发给了管理层」均收；(b) 来源短语（样本/数据/问卷/意见/反馈+全部/都/均/只/仅+来自/源于/取自/集中于）带受限来源词（会员/活跃/自愿/志愿者/投诉/一线/管理层/朋友圈/volunteers/premium/self-selected…）——「样本源于自愿报名的志愿者」无「只」也收。
+  - 腿② GENERALIZATION 总体推广三路由：(a) 推广动词（代表/代表着/适用于/推广到/反映/具有/足以说明/足以证明/说明/证明/可见/representative of/generalizes to/applies to/shows/which shows）近距离接总体范围词（全体/所有/整体/全国/全市/每个人/所有人/大众/公众/普遍/all/every/everyone/whole audience）；(b) 推断词（这说明/说明/可见/证明/means/so/therefore）接总体范围词；(c) 总体范围词+「都」形全称判断（「全体员工都认可」「所有人都同意」）。
+  - 结论候选路由：同逗号段推断词后、后续逗号段（≤2）、跨句后续句（≤2）、「毕竟/因为/由于」倒装前段/前句；**推断词本身是推广动词（足以说明/which shows）时不断句**（r169 实测教训：切掉后腿②动词丢失）。
+  - 范围词回指样本自身保护（_scopeRefersSample）：「所有样本都合格」「全部数据来自」不判。
+  - 八类豁免（全部负例注入承重）：ACK_FULL/ACK_CLAUSE 明示局限（只能反映/不能代表/不一定成立/还有待验证/不足以推广——正确推理）、ADEQUATE 充分取样（随机抽样/分层抽样/普查/random sample，带否定前置检查「不是随机抽样」不豁免）、SURVIVOR 幸存者措辞（幸存者/活下来/survivors——射程让给 survivorship_bias）、HEDGE 概率化结论、META_CONCEPT 谬误概念转述、TEACH 教学转述、疑问句。
+- index.js **九处接线**：require / 计算点（变量名 sel）/ allDims 参与判定 / dimMap / DIM_GUIDANCE（完整概念条文）/ VERIFY_DIMS（第 168 维度，VERIFY 126→127）/ summary 补登记 / summary 计数 / module.exports 导出。
+- 文档同步：VERSION 6.8.96→6.8.97；sync-version.js 同步 package.json/SKILL.md/heartflow.js BUILD_DATE；sync-doc-numbers.js 机器记账（AGENTS Verify-level 126→127、add up to 156→157、README/SKILL/package.json 维度 167→168、Verify request verify 126→127、三份文档口径戳 6.8.97）；手工补：AGENTS Verify-level 列举加 selection_bias 与版本戳 v6.8.97、README What-it-catches 标题 167→168 与 verify 行 126→127、Evidence & statistical honesty 行加 selection_bias、README changelog 与 CHANGELOG 追加 6.8.97 条目。
+
+## 四、验证数据（五门禁 + 变体矩阵，全部实测）
+- 轮测试 test/round-169-selection-bias.js：**53/53 通过**。
+- 模块层独立探针（/tmp/r169-module-probe.js，非自检）：攻击 10/10 命中、良性 15/15 零误伤。
+- bin/verify.js：**16 passed / 0 failed**。
+- guard-abilities.js：**20/20**（维度登记 dimensions 键 168；双向回归召回 **52/52**、误拦 **302/326**，与基线逐位一致，零新增误伤）。
+- doc-numbers-accuracy.test.js：**22/22**。
+- bidirectional-guard.js：召回 **52/52**、误拦 **302/326 不升**。
+- 变体矩阵实测（node require('./src/gate.js')，独立探针 /tmp/r169-gate-probe.js）：攻击 12 条（中英双语、裸名词「数据只来自一线城市」、带修饰「只回收了愿意配合的老年人的问卷」、倒装「毕竟问卷只发给了管理层」、长句、跨句「研究只统计了X。因此所有人都有效」、仅标记形）**12/12 gate.action 非 pass 且 findings 全部含 selection_bias**；良性 16 条模块层 selection_bias 0 命中。
+
+## 五、已知边界 / 下次可继续
+- **幸存者族中文句式是实测缺口**：survivorship_bias 对「只采访了事故的幸存者，所以这反映了全体乘客的体验」等中文样本零命中（本维度按射程切割主动让出），下轮可直接补 survivorship_bias 中文句式族。
+- 可得性启发（媒体/回忆暴露→频率判断，5/6 零命中）与聚类错觉（连续事件→「绝不是偶然」，4/5 零命中）是本轮实测的第二、第三缺口，判定良性边界（「很火」类流行度推断 vs 「很普遍」类基础概率断言）需更细豁免设计。
+- 隐式率推广（「只统计了投诉的人，所以投诉率很高」——结论无显式全体范围词）不判，腿②要求显式总体范围词，保精度弃召回。
+- 无「只/仅/都/均」标记的弱受限取样（「问卷发给了会员，所以代表全体」）不判——腿①要求显式限定信号。
+- 下一轮可继续方向：幸存者偏差中文句式族 / 可得性启发 / 聚类错觉，或轮换池中记忆巩固与检索、价值对齐与目标漂移检测。
+
+---
+
+# 第 168 轮报告（v6.8.96 — 第 167 维度 illicit_conversion 不当换位上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向：**形式逻辑推理 / 三段论形式谬误判别**（任务书轮换池「逻辑谬误检测」一线的演绎支族；近 3 轮为证据对称性（one_sided_dismissal）/否定前件/诉诸后果，本轮回到命题-范畴逻辑的**换位无效式**，与 affirming_the_consequent（Q∴P）、denying_the_antecedent（¬P∴¬Q）、conditional_proposition（¬B⇒¬A）同族但射程互异）。
+- 攻击族定义：先立「所有 A 都是 B」的全称肯定命题，再据此断言「所有 B 都是 A」——主项谓项一对调，单向包含关系被偷换成双向：「所有猫都是动物，所以动物都是猫」「畅销的车都省油，所以省油的车都畅销」「爱国者都支持国产，所以支持国产的都是爱国者」「凡是认真读过原著的人都反对魔改，所以反对魔改的人都认真读过原著」「坚持锻炼的人免疫力强，所以免疫力强的人都坚持锻炼」「All squares are rectangles, so all rectangles are squares.」「Whales are mammals, so mammals are whales.」
+- 缺口核验：grep src/（排除 test）illicit conversion / 不当换位 / 换位 = 仅误命中（METRIC_NOUNS_EN 的 conversion、homophonic_slur 正则、false-dilemma 自己的排除中项概念）→ 无独立维度。
+- 缺口实证（/tmp/r168-gap-probe.js，当前 v6.8.95 / 166 维引擎实测）：换位攻击族 8 条 **7 条真零命中**（仅 1 条被 stereotype/perfect_error 代拦）；同池候选中项不周延族仅 2/8 零命中（5 条被 affirming_the_consequent 代拦），故选换位族。良性控制（有效三段论/单称例示/特称与否定换位）当前 pass。
+- 外部来源（真实，未编造）：HN Algolia 检索 "logical fallacy" 命中多篇高票故事——Translating natural language to first-order logic for logical fallacy detection（258 pts）、Logical fallacies in software engineering（242 pts）、Logical Fallacies Are Usually Irrelevant or Cited Incorrectly（176 pts）、Show HN: Aristotl（173 pts）、Logical Fallacies（141 pts）、Master List of Logical Fallacies 2018（113 pts）等——**FOL 路线需 LLM 翻译，与心虫纯规则引擎不同构，仅背景参考**；Semantic Scholar 检索 syllogistic 无返回（限流/空）。本族判据为心虫自有纯规则实现。侦察落盘：/tmp/hf-scout-1793387758.txt。
+
+## 二、心虫裁决门禁
+- heartflow_philosophy_decision：**type=accelerate**（confidence 0.7 / priority 40 / goalReviewed true / trigger optimal_conditions）。如实说明：rationale 里 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎未实测按低负荷处理），不作为实质背书；accelerate 的依据是任务上下文本身的方向明确性与候选族 7/8 的实测零命中差距。
+
+## 三、实现内容
+- 新文件 **src/illicit-conversion.js**（~440 行）：checkIllicitConversion() + __internals 注入接口（14 个常量可负例注入）。第 167 维度 illicit_conversion（不当换位），VERIFY 级。
+  - 腿① PREMISE 全称肯定前提：全称量词（所有/全部/任何/每一个/每个/每一/凡/一切/一律/毫无例外/但凡）或裸「都」形的 A⊆B 陈述；EN 三路由（all/every/any/each + are/is、同族无系词动词句 Every poet loves language、裸名词句 Whales are mammals）。切出主项 A 与谓项 B。
+  - 腿② CONVERSION 换位结论：推断词（所以/因此/因而/可见/这说明/那就意味着/故/so/therefore/which means）之后的同句余句、后随 3 句、倒装在前的 2 句，或同句内「因为/because」前提标记路由的后半；结论须以 B 为主项、A 为谓项（方向判定：主项回指 B、谓项回指 A，且非前提重述）。
+  - 两个召回补强（161 轮教训的裸名词纪律在演绎族的落地）：**裸谓词前提**（「坚持锻炼的人免疫力强」无量词无系词无都）按结论主/谓项关键词位置回退切分 A/B；**单字谓项**允许被前提关键词反向包含（飞 ⊆ 会飞的），兜住「所有鸟都会飞，所以会飞的都是鸟」。
+  - 八类豁免（全部负例注入承重）：PARTICULAR 特称量词（有些/某些/部分/个别/有的/some/certain——特称换位有效）、HEDGE 对冲/宽泛量（可能/也许/往往/通常/大多数/maybe/most）、NEG_ZH/NEG_EN 否定词（否定换位有效、否定结论是正确的换位否认）、BICONDITIONAL 双条件（当且仅当/iff）、SYMMETRIC 对称关系（同一/等同于/互为/equivalent/identical）、META_CONCEPT 概念转述（不当换位/换位命题/illicit conversion）、TEACH 教学转述、EVIDENCE 证据语境。
+- index.js **九处接线**：require / 计算点（变量名 ilc，避开已占用 icv）/ allDims 参与判定 / dimMap / DIM_GUIDANCE（完整概念条文）/ VERIFY_DIMS（第 167 维度，VERIFY 125→126）/ summary 补登记 / summary 计数 / module.exports 导出。
+- 测试 test/round-168-illicit-conversion.js（25 断言，不带 .test.js 后缀）：攻击 ZH 10/10 + EN 5/5（变体矩阵：所有/凡是/任何/全部/裸都/裸谓词前提/带修饰/长句/倒装/无逗号同句 + EN all...are/everyone who/bare whales/no-copula 动词）；良性 ZH 14 + EN 4 零误判（含单称例示、有效三段论、特称换位、否定换位、否定结论、对冲、双条件、对称关系、疑问、概念转述、教学、证据语境、有效演绎例示、有效传递三段论）；分工边界锁×2（肯定后件/否定前件族不交叉误触）；区分锁×1（无推断词并列不判）；存量回归×2；登记断言×5（dimensions 167 / dimMap 补登记 / DIM_GUIDANCE / 导出）；负例注入承重×8（UNIVERSAL_ZH 置空量化形停判；PARTICULAR/NEG_ZH/HEDGE/BICONDITIONAL/META_CONCEPT/TEACH/EVIDENCE 置空各自翻命中）；gate 层×2。
+
+## 四、验证数据（五门禁 + 变体矩阵，全部实测）
+- 轮测试 test/round-168-illicit-conversion.js：**25/25 通过**。
+- 模块层独立探针（/tmp/r168-module-probe.js，非自检）：攻击 15/15 命中、良性 20/20 零误伤。
+- bin/verify.js：**16 passed / 0 failed**。
+- guard-abilities.js：**20/20**（维度登记 dimensions 键 167；双向回归召回 **52/52**、误拦 **302/326**，与基线逐位一致，零新增误伤）。
+- doc-numbers-accuracy.test.js：**22/22**（sync-doc-numbers.js 机器记账 + 手工补：维度 166→167、VERIFY 125→126、README 横幅与 What-it-catches 标题、README action-tier 行 123→126、AGENTS Verify-level 列举加 illicit_conversion 与版本戳 v6.8.96、三份文档口径戳 6.8.96；CHANGELOG 与 README Version history 追加 6.8.96 条目）。
+- 变体矩阵实测（node require('./src/gate.js')，独立探针）：攻击 12 条（中英双语、裸名词「畅销的车都省油」、带修饰「任何通过认证的产品」、倒装「所以动物都是猫，因为所有猫都是动物」、无逗号同句、裸谓词前提、everyone who 形、无系词动词前提）**12/12 gate.action 非 pass 且 findings 全部含 illicit_conversion**；良性 5 条模块层 illicit_conversion 0 命中（gate 层 verify 来自存量维度 stereotype/fallacies/perfect_error，非本轮回归）。
+
+## 五、已知边界 / 下次可继续
+- 单字主项的回指仍靠「≥2 实字重叠」主规则，单字谓项有反向包含回退但单字主项没有——「会飞的（都）是鸟，鸟都会飞」形主项单字时可能漏（保精度弃召回，同 r163/r165 先例）。
+- 无标记泛称前提（「猫是动物，所以动物是猫」无都无量词）不判——前提解析要求全称标记，裸系词句不收，保精度。
+- 「所有A都是B，所以B大多都是A」形（宽泛量结论）按 HEDGE 豁免不判——统计性换位错误留给未来不确定性量化方向。
+- 下一轮可继续方向：记忆巩固与检索 / 价值对齐与目标漂移检测 / 不确定性量化（轮换池中尚未做的方向），或三段论族的第四块——中项不周延（本轮实测 2/8 零命中，多被 affirming_the_consequent 代拦，需与姊妹维度做更细的射程切割后再上）。
+
+---
+
 # 第 167 轮报告（v6.8.95 — 第 166 维度 one_sided_dismissal 让步消解上线 — 2026-10-31）
 
 ## 一、方向与来源

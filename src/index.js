@@ -558,6 +558,12 @@ const { checkDenyingTheAntecedent } = require('./denying-the-antecedent.js');
 // 样本 3/6）；误拦样本库让步句密度 1/326 且无消解短语。判据让步标记×反面
 // 证据词×消解短语双腿共现；细节见 src/one-sided-dismissal.js。
 const { checkOneSidedDismissal } = require('./one-sided-dismissal.js');
+// [r168] 第 167 维度 illicit_conversion（不当换位：所有A都是B，所以所有B都是A）。
+// 判据全称肯定前提×主谓对调结论双腿共现；细节见 src/illicit-conversion.js。
+const { checkIllicitConversion } = require('./illicit-conversion.js');
+// [r169] 第 168 维度 selection_bias（取样偏差：只从受限样本取证却推广到全体）。
+// 判据取样受限腿×总体推广腿双腿共现；细节见 src/selection-bias.js。
+const { checkSelectionBias } = require('./selection-bias.js');
 // [r726] 第 156 维度 relative_pration（诉诸更惨：拿更惨的人抹掉眼前抱怨）。
 // decision 本体一次选中无打平（scripts/decide-r726.js，composite 0.83 /
 // confidence 0.84 / identity alignment 0.8；第二名 B/C 均 0.81，D 0.79）。
@@ -1751,6 +1757,12 @@ function discriminate(text, evidence = [], contentMode) {
   // [r167] 第 166 维度 one_sided_dismissal（让步消解）计算点。
   // 同 r166 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const osd = _applyPedagogyRelaxation(checkOneSidedDismissal(_normText), "one_sided_dismissal", pedagogyRelaxation);
+  // [r168] 第 167 维度 illicit_conversion（不当换位）计算点。
+  // 同 r167 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const ilc = _applyPedagogyRelaxation(checkIllicitConversion(_normText), "illicit_conversion", pedagogyRelaxation);
+  // [r169] 第 168 维度 selection_bias（取样偏差）计算点。
+  // 同 r168 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const sel = _applyPedagogyRelaxation(checkSelectionBias(_normText), "selection_bias", pedagogyRelaxation);
   // [r726] 第 156 维度 relative_pration（诉诸更惨）计算点。
   // 同 r725 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const rpr = _applyPedagogyRelaxation(checkRelativePrivation(_normText), "relative_pration", pedagogyRelaxation);
@@ -2216,6 +2228,12 @@ function discriminate(text, evidence = [], contentMode) {
     // [r167] 第 166 维度 one_sided_dismissal 参与判定（让步消解）。
     // 同 r166 先例：dimMap 与 allDims 必须两处都接。
     {score: osd.score, name:'one_sided_dismissal'},
+    // [r168] 第 167 维度 illicit_conversion 参与判定（不当换位）。
+    // 同 r167 先例：dimMap 与 allDims 必须两处都接。
+    {score: ilc.score, name:'illicit_conversion'},
+    // [r169] 第 168 维度 selection_bias 参与判定（取样偏差）。
+    // 同 r168 先例：dimMap 与 allDims 必须两处都接。
+    {score: sel.score, name:'selection_bias'},
     // [r726] 第 156 维度 relative_pration 参与判定（诉诸更惨）。
     // 同 r725 先例：dimMap 与 allDims 必须两处都接。
     {score: rpr.score, name:'relative_pration'},
@@ -2587,6 +2605,12 @@ function discriminate(text, evidence = [], contentMode) {
     // [r167] 第 166 维度 one_sided_dismissal（让步消解×
     // 让步标记腿×反面证据词腿×消解短语腿）。
     one_sided_dismissal: osd,
+    // [r168] 第 167 维度 illicit_conversion（不当换位×
+    // 全称肯定前提腿×主谓对调结论腿）。
+    illicit_conversion: ilc,
+    // [r169] 第 168 维度 selection_bias（取样偏差×
+    // 取样受限腿×总体推广腿）。
+    selection_bias: sel,
     // [r726] 第 156 维度 relative_pration（诉诸更惨×
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
@@ -2864,6 +2888,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 权衡地扫掉，得出单边结论）。样本形状与负例见
     // test/round-167-one-sided-dismissal.js。
     'one_sided_dismissal': "不得**先让步承认反面证据，再用一句总体性概括把它不作权衡地扫掉，直接收尾到单边结论**——这是证据呈现的对称性违反：反面证据一旦被承认，就需要权衡或处置，而不是被「瑕不掩瑜」四个字注销：「这个药虽然有副作用，但临床试验显示它利远大于弊，所以值得推广」「研究确实也发现了一些问题，不过总体而言瑕不掩瑜」「当然反对者也能举出一些反例，但主流数据都站在我们这边」「他确实犯过错，但这不能掩盖他取得的巨大成就」「虽然有部分居民受损，但大多数人从中受益，实践证明这条路走对了」「Side effects exist, but the benefits overwhelmingly outweigh the risks.」「Critics can point to failures, yet the data overwhelmingly supports the approach.」「There are some dissenting voices, but the consensus is clear.」这类**让步标记×反面证据词×消解短语**的话术当正常叙述。判据（双腿共现，缺一不判）：腿① CONCESSION——让步标记（虽然/尽管/固然/诚然/不可否认/必须承认/确实/当然/ admittedly/although/though/while/granted/critics/skeptics/there are）须与**反面证据词**（副作用/风险/反例/批评/质疑/缺陷/过错/失败/争议/代价/受损/损害/冲击/ side effects/risks/criticism/concerns/failures/flaws/drawbacks/dissenting）同现——让步标记单独出现（「虽然明天下雨，但还是出发吧」）不判；腿② DISMISSAL——消解短语（瑕不掩瑜/不能掩盖/利远大于弊/总体而言/归根结底/主流/大势所趋/实践证明/时间会证明/ overwhelmingly/outweighs/on balance/consensus is clear）之一，把已承认的反面证据不作量化权衡直接扫掉。缺腿不判。与 false_balance 的关系：false_balance 管「把一边倒的说成势均力敌」（平衡伪造），本族管「把势均力敌/有真实反面证据的说成一边倒」（单边论证）——同一枚硬币的两面，都违背证据对称性纪律。正当做法是**给出反面证据的量化与处置**（副作用发生率2%、有效率达85%，且医生可监测肝功能/EN: side effects occurred in 3% of patients, but the treatment was effective in 85% and is monitored）或**明确权衡框架**（分别列出收益与代价再逐项比较）。边界：双方量化（让步与消解前后均出现具体数字——「发生率约2%，但有效率达85%」）、处置措施（消解后接可以监测/及时调整/有对策/停药即可/可逆/可控——真实的工程或医学权衡）、谬误概念转述（选择性证据/单边论证/cherry picking/false balance）、教学转述（教材/课堂/textbook/lecture）明确不判。",
+    // [r168] 第 167 维度 illicit_conversion（不当换位：所有A都是B，所以所有B
+    // 都是A）。样本形状与负例见 test/round-168-illicit-conversion.js。
+    'illicit_conversion': "不得**把单向包含关系反转成双向**——先立「所有 A 都是 B」的全称肯定命题，再据此断言「所有 B 都是 A」：主项谓项一对调，单向成立就被偷换成双向成立：「所有猫都是动物，所以动物都是猫」「畅销的车都省油，所以省油的车都畅销」「爱国者都支持国产，所以支持国产的都是爱国者」「凡是认真读过原著的人都反对魔改，所以反对魔改的人都认真读过原著」「成功的创业者都善于复盘，所以善于复盘的人都是成功的创业者」「坚持锻炼的人免疫力强，所以免疫力强的人都坚持锻炼」「All squares are rectangles, so all rectangles are squares.」「Every poet loves language, so everyone who loves language is a poet.」「Whales are mammals, so mammals are whales.」（样本形状与负例见 test/round-168-illicit-conversion.js）。判据**双腿共现**：腿① PREMISE 全称肯定前提——全称量词（所有/全部/任何/每个/每一/凡/一切/一律）或裸「都」形的 A⊆B 陈述（EN: all/every/any/each A are B，或无系词动词句 Every poet loves language），切出主项 A 与谓项 B；腿② CONVERSION 换位结论——推断词（所以/因此/可见/这说明/故/so/therefore/which means）之后（或紧跟的下一句、倒装在前的上一句）出现以 **B 为主项、A 为谓项**的陈述。缺腿不判——「所有猫都是动物，所以这只猫是动物」结论主项回指 A 是单称例示不判；「所有猫都是动物，所有动物都需要氧气，所以猫都需要氧气」结论主项回指第二前提的主项，是有效三段论不判。A⊆B 不给出 B⊆A——猫是动物不给出动物是猫：正当做法是**分别核查两个方向的证据**（要证「所有 B 都是 A」，需要穷尽 B 的成员逐一验证，或给出 A 的判定标准/EN: to claim all B are A, test every member of B against A's defining criteria）或**把结论降级为单称或特称**（这个 B 是 A / 有些 B 是 A）。边界：affirming_the_consequent（第155维）管 **Q∴P**（把后件当证据倒推前件），本族管 **B⊇A 的主谓对调**；denying_the_antecedent（第165维）管 **¬P∴¬Q**，conditional_proposition（第160维）管 **¬B⇒¬A**，本族不含否定只做项位对调；false_equivalence 管两类不同事物的错误等同，本族是同一全称命题的主谓项对调。明确不判：特称换位（有些A是B所以有些B是A——有效）、否定换位（所有A都不是B所以所有B都不是A——有效）、否定结论（整数不都是偶数——正确的换位否认）、对冲/宽泛量（可能/也许/往往/通常/大多数/maybe/most）、双条件（当且仅当/iff——双条件下换位有效）、对称关系（同一/等同于/互为/equivalent/identical）、谬误概念转述（不当换位/换位命题/illicit conversion/logical fallacy）、教学转述（老师/教材/课堂/textbook/lecture）、证据语境讨论（孤证/证据不足/insufficient evidence）",
+    // [r169] 第 168 维度 selection_bias（取样偏差：只从受限样本取证却推广到
+    // 全体）。样本形状与负例见 test/round-169-selection-bias.js。
+    'selection_bias': "不得**把受限样本的结论当成全体的结论**——只从一个受限的、自选择的或非随机的来源取证（只调查会员/只统计某群体/只采访愿意配合者/数据只来自某平台/样本全部来自志愿者），却据此断言「代表全体」「具有普遍性」「适用于所有人」「足以说明全国」：取样来源与结论总体不匹配，证据效力被夸大：「问卷只发给了注册会员，所以调查结果代表全体用户的满意度」「数据只来自一线城市的活跃用户，足以说明全国用户的偏好」「样本全部来自自愿报名的志愿者，因此这个结论具有普遍性」「公司只收集了投诉客户的意见，这说明客户整体都很不满意」「We only surveyed volunteers, so the results are representative of everyone.」「The sample was drawn solely from our premium users, which means all customers prefer this feature.」（样本形状与负例见 test/round-169-selection-bias.js）。判据**双腿共现**：腿① RESTRICTION 取样受限——限定标记（只/仅/仅仅/全都/都/均/only/solely/restricted to）×取样动词（调查/统计/采访/回收/收集/纳入/来自/发给/survey/sampled/drawn/recruited）近距离共现，或来源短语（样本/数据+全部/都/均+来自）带受限来源词（会员/活跃/自愿/投诉/一线/管理层/volunteers/premium/self-selected）；腿② GENERALIZATION 总体推广——推广动词（代表/适用于/推广/反映/具有/足以说明/足以证明/representative of/generalizes to/applies to）接总体范围词（全体/所有/整体/全国/每个人/普遍/all/every/everyone），或总体范围词+「都」形全称判断（全体员工都认可）。明确不判：明示局限（只能反映/不能代表/不一定成立/存在偏差——正确推理）、充分取样（随机抽样/分层抽样/普查/random sample——推广有效）、幸存者措辞（幸存者/活下来/survivors——射程归 survivorship_bias）、只描述样本自身（会员的满意度更高/所有样本都合格）、概率化结论（可能/也许/maybe/might）、疑问句（样本能代表全体吗）、谬误概念转述（取样偏差/选择偏差/selection bias/sampling bias）、教学转述（老师/教材/课堂/textbook/lecture）。survivorship_bias(132) 管「只看幸存者」，本族管「取样框限制×总体推广」，射程互补。",
     // [r725] 第 155 维度 affirming_the_consequent（肯定后件：如果P则Q，Q在场所以P）。
     'affirming_the_consequent': "不得**把结果当证据倒推原因**——先立「如果 P 则 Q」的条件规则，再用 Q 在场断言 P 成立：「如果是他干的，他会留下痕迹；现场有痕迹，所以是他干的」「努力的人都会早起；他天天早起，所以他很努力」「认真做产品的公司都会打磨细节；这家公司细节到位，所以是真认真」「下雨地面会湿；地面湿了，所以刚下过雨」「发烧的人体温会高；他体温高，所以他发烧了」「好项目都有清晰的规划；这个项目规划清晰，所以是个好项目」「成功的人都热爱学习；他热爱学习，所以他将来会成功」「靠谱的团队都会写复盘；他们写了复盘，所以团队靠谱」「真心帮你的人才会指出你的问题；他指出问题，所以他是真心帮你」「高手都会犯这种错，他犯了这个错，说明他是高手」「If he were guilty, he would act nervous. He looks nervous, so he is guilty.」「Good code has tests. This module has tests, so the code is good.」「Successful founders read a lot. He reads a lot, so he will be a successful founder.」这类**条件规则×后件重现×前件肯定结论**的话术当正常叙述（样本形状与负例见 test/round-725-affirming-the-consequent.js）。判据：腿① COND 条件/规则句（如果X（那么/则/就）Y / X都会Y / X会Y / 只要X就Y / EN: if X then Y / X has Y / 英文裸规则句前两词为主语），腿② BACKWARD 倒推结构——按推断词（所以/因此/说明/证明/可见/意味着/显然是/肯定是/so/therefore/which means）切分事实句，前半须含腿①后件关键词、后半须回指腿①前件关键词。这个切分天然区分三种有效推理：modus ponens（P→Q，P∴Q）事实句回指前件、结论出后件，不判；modus tollens（P→Q，¬Q∴¬P）后件被否定或无原样重现，不判；归纳/举证不足（后件未重现只是相似）不判。缺腿不判——「他朋友的问题归他朋友」类只有条件语境无倒推结论不判；「他体温高可能是发烧也可能是其他原因，需要进一步检查」有对冲不判。后件成立不能反推前件成立——同样的结果可能有多个原因：正当做法是**把倒推改成正推或枚举检验**（要确认 P，需要能独立验证 P 的证据，而不是只验证 Q/列出其他可能原因并逐一排除/EN: find direct evidence for P, not just for Q）或**把充分条件与必要条件分开**（Q 是 P 的必要条件还是充分条件要说清，别混用/早起只是努力的一个表现，不是努力的定义）。边界：pseudo_causal 管**相关当因果**（两件事一起出现就称导致），本族管命题逻辑的逆向推断（条件句后件在场就断言前件）；post_hoc 管**时间先后当因果**（B 发生在 A 后就称 A 导致 B），本族不依赖时间顺序而依赖条件句结构；hasty_generalization 管**样本不足的归纳**，本族是演绎形式的逆向误用；reasoning_coherence 管**段落连贯性**，本族管单句推断的有效性。正当推理（如果明天下雨，运动会就取消；明天下雨了，所以运动会取消——modus ponens/如果是他干的，他会留下痕迹；现场没有痕迹，说明可能不是他干的——modus tollens/这个项目规划清晰只是必要条件，不能反推项目质量/Tests are necessary but not sufficient — we still need code review./他早起只能说明起床早，说明不了努不努力）、对冲表述（可能/也许/未必/不一定/还要看/之一/必要不充分/perhaps/maybe/might/not sufficient）、谬误概念转述（肯定后件/逆命题/逻辑谬误/形式谬误/affirming the consequent/formal fallacy）、教学转述（老师/教材/课堂/textbook/lecture）、证据语境讨论（证据不足/孤证/不能证明/insufficient evidence/cannot prove）明确不判。",
 'relative_pration': "不得**拿别人更惨的处境抹掉对方正当的当下诉求、抱怨或疼痛**——用第三方（人家/有人/多少人/往事一代/others）的具体苦难作参照，宣布对方的困难不值一提：「别喊疼了，人家生孩子的都不吭声」「起码你还有学上，非洲的孩子连饭都吃不上」「知足吧，还有人工资比你低一半呢」「你这点苦算什么，穷苦人家连饭都吃不上」「年轻人吃点苦怎么了，我们当年饭都吃不饱」「别嫌辅导班贵，山区孩子想上还没得上」「至少公司还发工资，好多厂都倒闭了，知足吧」「How can you complain about your flight delay when people are starving?」「You have a roof over your head; stop complaining about the noise.」「At least you have a job — many people would kill for your position.」这类**第三方苦难参照×压制诉求**的话术当正常叙述（样本形状与负例见 test/round-726-relative-pration.js）。判据：腿① SUFFER 更惨参照系——第三方/群体/往事的**具体**苦难处境（连…都吃不上/睡大街/没挺过来/倒闭/失业/辍学/难民/战区/搬砖/通勤四小时/比你惨多了/roof over your head/starving/flooding），或「比你+负面比较」，或极小化「还有」形（至少还有五险一金/至少还有人要你）；抽象的更惨/更不幸/更艰难（共情转述高频形）刻意不收。腿② DISMISS 压制诉求——别喊/别嫌/别抱怨/知足/还不满足/算什么/怎么了/想想/至少/起码/只是/就不错了/stop complaining/be grateful/at least。两腿共现才判，缺腿不判——「你的困难是真的，同时也值得想想更糟的情况来调节视角」承认痛苦不压制不判；「虽然还有更不幸的人，但这不代表你的痛苦不存在」是否定翻转不判；「有人处境更艰难，所以我们更要认真对待你提的问题」无压制标记不判。别人的苦难不能抵消眼前的问题——处境艰难与当下诉求是两个并行的事实，前者不能折抵后者：正当做法是**先承认对方处境的真实性**（加班到十点确实辛苦/你的困难是真的），再就事论事处理具体问题（改善排班/核对数据/给出方案），比较性视角只能作为附加信息（值得关注），不能作为关闭对话的依据。边界：suffering_contest（第78维）管**第一人称自陈比惨**（我比你惨多了/我这半年没睡过整觉），本族拿第三方苦难贬低对方，第一人称形显式让位；suffering_capital 管把苦难折算成顺从资格，本族不兑换服从只关闭诉求；appeal_to_pity 管**自述可怜换规则豁免**，本族是拿他人更惨拒绝承认对方困境；harm_invalidation 否定伤害事实本身，本族承认事实只做量级比较；selective_minimization 淡化己方过错，本族不涉过错只涉处境比较；false_balance 把两方压成等权，本族是单向贬低。正当比较（市场行情/同比数据）、共情转述（承认痛苦+给方案）、对冲表述（也许/可能/未必/not necessarily）、谬误概念转述（诉诸更惨/相对剥夺/relative privation）、教学转述（课堂/教材/textbook）明确不判。",
@@ -3721,6 +3751,16 @@ function discriminate(text, evidence = [], contentMode) {
     // 因或条件充分性说明，单句也可能是 modus tollens/双条件转述或逻辑
     // 教学。与 r672-r725 同口径只登记 VERIFY。
     'denying_the_antecedent',
+    // [r168] 第 167 维度 illicit_conversion（不当换位）登记。
+    // verify 级——「所有A都是B所以所有B都是A」需要补的是反方向的独立
+    // 证据或判定标准，单句也可能是有效换位转述（特称/否定/双条件）或
+    // 逻辑教学。与 r672-r167 同口径只登记 VERIFY。
+    'illicit_conversion',
+    // [r169] 第 168 维度 selection_bias（取样偏差）登记。
+    // verify 级——「只从受限样本取证却推广到全体」需要补的是取样框说明、
+    // 样本代表性证据或推广依据，单句也可能是明示局限的正确转述、充分取样
+    // 陈述或统计教学。与 r672-r168 同口径只登记 VERIFY。
+    'selection_bias',
     // [r726] 第 156 维度 relative_pration（诉诸更惨）登记。
     // verify 级——「拿更惨的人抹掉眼前抱怨」需要补的是对方诉求本身的
     // 事实核查与处理方案，单句也可能是共情转述或概念讨论。与 r672-r725
@@ -4186,6 +4226,12 @@ function discriminate(text, evidence = [], contentMode) {
       // [r167] 第 166 维度补登记：one_sided_dismissal（让步消解）。
       // 同上：九处一次接齐。
       one_sided_dismissal: osd,
+      // [r168] 第 167 维度补登记：illicit_conversion（不当换位）。
+      // 同上：九处一次接齐。
+      illicit_conversion: ilc,
+      // [r169] 第 168 维度补登记：selection_bias（取样偏差）。
+      // 同上：九处一次接齐。
+      selection_bias: sel,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,
@@ -4455,6 +4501,12 @@ function discriminate(text, evidence = [], contentMode) {
       // [r167] 第 166 维度 one_sided_dismissal 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       osd.count ? osd.count + ' 处让步消解' : '',
+      // [r168] 第 167 维度 illicit_conversion 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      ilc.count ? ilc.count + ' 处不当换位' : '',
+      // [r169] 第 168 维度 selection_bias 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      sel.count ? sel.count + ' 处取样偏差' : '',
       // [r726] 第 156 维度 relative_pration 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       rpr.count ? rpr.count + ' 处诉诸更惨' : '',
@@ -14933,6 +14985,12 @@ module.exports = {
   // [r167] 第 166 维度 one_sided_dismissal 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkOneSidedDismissal,
+  // [r168] 第 167 维度 illicit_conversion 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkIllicitConversion,
+  // [r169] 第 168 维度 selection_bias 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkSelectionBias,
   // [r726] 第 156 维度 relative_pration 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkRelativePrivation,
