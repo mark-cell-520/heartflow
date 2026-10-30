@@ -1,4 +1,34 @@
 
+# 第 167 轮报告（v6.8.95 — 第 166 维度 one_sided_dismissal 让步消解上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向：**证据对称性 / 单边论证判别**（任务书轮换池「证据充分性与幻觉检测」一线的认识论支族；主动离开近 3 轮的演绎/非形式谬误簇——denying_the_antecedent 否定前件 / appeal_to_consequences 诉诸后果 / doublespeak 语义洗白）。
+- 攻击族定义：先让步承认反面证据存在，再用一句总体性概括把它**不作量化权衡地**扫掉，直接收尾到单边结论——「这个药虽然有副作用，但临床试验显示它利远大于弊，所以值得推广」「当然反对者也能举出一些反例，但主流数据都站在我们这边」「Side effects exist, but the benefits overwhelmingly outweigh the risks.」。这是 false_balance（把一边倒说成势均力敌）的**镜像**：把势均力敌/有真实反面证据的说成一边倒。
+- 缺口核验：grep src/ one_sided_dismissal / 让步消解 / 选择性证据 / cherry pick = 0 独立维度（false_balance 管相反方向，survivorship_bias 管样本存活偏误，均不覆盖本族）。
+- 缺口实证（/tmp/r167-probe.js + /tmp/r167-probe2.js，当前 v6.8.94 / 165 维引擎实测）：三个候选族对比——让步消解族 **8/8 真零命中**（全池最高）、不可证伪断言族 6/8、自选择样本族 3/6；误拦样本库（gate-benchmark / extended / vertical-benign / benign-mixed 共 326 条）让步句密度 1/326 且该条无消解短语，风险可控。另测 fabricated_source 候选族 16 条仅 2 条零命中（存量 unsupported_claim 已覆盖 14/16），故弃选。
+- 外部来源（真实，未编造）：Semantic Scholar 检索 "evidence sufficiency hallucination detection" 命中 Evidence-Chain Reliable RAG（2025，source attribution / provenance 方向）、Medico（arXiv:2410.10408，cit 5）、Evidence-Aligned Entity Verification（arXiv:2609.08267）等——**均需 LLM/embedding 检索比对，与心虫纯规则引擎不同构，仅背景参考**。本族判据为心虫自有纯规则实现。侦察落盘：/tmp/hf-scout-1793379566.txt。
+
+## 二、心虫裁决门禁
+- heartflow_philosophy_decision：**type=accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions）。如实说明：rationale 里 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎未实测按低负荷处理），不作为实质背书；accelerate 的依据是任务上下文本身的方向明确性。
+
+## 三、实现内容
+- 新文件 **src/one-sided-dismissal.js**（~230 行）：checkOneSidedDismissal() + __internals 注入接口。双腿判据（缺一不判）：腿① CONCESSION 让步标记（虽然/尽管/固然/诚然/不可否认/必须承认/确实/当然/ admittedly/although/though/while/granted/critics/skeptics/there are/exist）× **反面证据词**（副作用/风险/反例/批评/质疑/缺陷/过错/失败/争议/代价/受损/冲击/ side effects/risks/criticism/concerns/failures/flaws/drawbacks/dissenting——全部裸名词形态，自查同族词去后缀仍命中）；腿② DISMISSAL 消解短语（瑕不掩瑜/不能掩盖/利远大于弊/总体而言/归根结底/主流/大势所趋/实践证明/时间会证明/ overwhelmingly/outweighs/on balance/consensus is clear）。计分 72 起，强消解 +8，消解后接单边结论收尾 +4，上限 90。
+- 豁免表（全部负例注入承重）：BALANCED_QUANT 双方量化（让步与消解前后均出现具体数字）、MITIGATION 处置措施（可以监测/及时调整/有对策/停药即可/可控/可逆——**全文检查**，处置声明常出现在消解短语之前）、META_CONCEPT 概念转述（选择性证据/单边论证/cherry picking/false balance）、TEACH 教学转述。
+- index.js **九处接线**：require / 计算点 / allDims 参与判定 / dimMap / 补登记 dimMap / DIM_GUIDANCE / VERIFY_DIMS（第 166 维度，VERIFY 124→125）/ summary 补登记 / module.exports 导出。
+
+## 四、验证数据（五门禁 + 变体矩阵）
+- 轮测试 test/round-167-one-sided-dismissal.js：**44/44 通过**（攻击 ZH 10/10 + EN 5/5 命中，含倒装形「利远大于弊——虽然这个药也存在一些副作用」；良性 ZH 8 + EN 4 零误判；8 个常量负例注入承重翻转；区分锁 false_balance 2 条；存量回归；登记断言 3 条；gate 层实测 2 条）。
+- bin/verify.js：**16 passed / 0 failed**。
+- guard-abilities.js：**20/20**。
+- doc-numbers-accuracy.test.js：**22/22**（三份文档 165→166、VERIFY 124→125 同步后）。
+- bidirectional-guard.js：召回 **52/52** 不降、误拦 **302/326** 不升（与基线一致）。
+- 变体矩阵实测（node require('./src/gate.js')）：攻击 11 条（中英双语、裸名词「虽然有反对声」、带修饰「临床试验显示它利远大于弊」、倒装、长句、critics/dissenting 裸承认句）**11/11 gate.action 非 pass 且 findings 全部含 one_sided_dismissal**；良性 8 条模块层 0 误伤，gate 层 2 条 verify 经查来自存量维度（reasoning_coherence / perfect_error，findings 不含 one_sided_dismissal），非本轮回归。
+
+## 五、已知边界
+- 「当然」类让步标记 + 宽泛「问题」词 + 强消解短语的三条件叠加在极端压缩句上可能误伤（如会议纪要式的「虽然有问题，但大方向是对的」）——取 VERIFY/rewrite 提示而非 block，且双向守卫误拦未升。
+- 消解短语表以四字格/常见套话为主，口语化变体（「反正总的来说是好的」）暂不覆盖，下轮可扩。
+- 「得不偿失」目前收在 DISMISSAL_ZH（同属总体扫荡），若下轮实测误伤可单独拆分。
+
 # 第 166 轮报告（v6.8.94 — 第 165 维度 denying_the_antecedent 否定前件上线 — 2026-10-30）
 
 > **接手说明（如实）**：本轮 cron 开工即发现上一轮（r165/v6.8.93）自己的

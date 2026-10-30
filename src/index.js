@@ -551,6 +551,13 @@ const { checkAffirmingTheConsequent } = require('./affirming-the-consequent.js')
 // 攻击族 8 条漏判 5 条真零命中（含全部英文与规范「如果…就」条件形）、误伤 0；
 // 判据 ¬P∴¬Q；细节见 src/denying-the-antecedent.js。
 const { checkDenyingTheAntecedent } = require('./denying-the-antecedent.js');
+// [r167] 第 166 维度 one_sided_dismissal（让步消解：承认反面证据后不作权衡
+// 地扫掉，得出单边结论）。decision 本体 accelerate（r167，confidence 0.7 /
+// priority 40）。候选池来自 /tmp/r167-probe2.js 在当前引擎（v6.8.94，165 维）
+// 实测：让步消解族 8 条攻击真零命中 8/8（同池候选：不可证伪断言 6/8、自选择
+// 样本 3/6）；误拦样本库让步句密度 1/326 且无消解短语。判据让步标记×反面
+// 证据词×消解短语双腿共现；细节见 src/one-sided-dismissal.js。
+const { checkOneSidedDismissal } = require('./one-sided-dismissal.js');
 // [r726] 第 156 维度 relative_pration（诉诸更惨：拿更惨的人抹掉眼前抱怨）。
 // decision 本体一次选中无打平（scripts/decide-r726.js，composite 0.83 /
 // confidence 0.84 / identity alignment 0.8；第二名 B/C 均 0.81，D 0.79）。
@@ -1741,6 +1748,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r166] 第 165 维度 denying_the_antecedent（否定前件）计算点。
   // 同 r725 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const dta = _applyPedagogyRelaxation(checkDenyingTheAntecedent(_normText), "denying_the_antecedent", pedagogyRelaxation);
+  // [r167] 第 166 维度 one_sided_dismissal（让步消解）计算点。
+  // 同 r166 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const osd = _applyPedagogyRelaxation(checkOneSidedDismissal(_normText), "one_sided_dismissal", pedagogyRelaxation);
   // [r726] 第 156 维度 relative_pration（诉诸更惨）计算点。
   // 同 r725 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const rpr = _applyPedagogyRelaxation(checkRelativePrivation(_normText), "relative_pration", pedagogyRelaxation);
@@ -2203,6 +2213,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r166] 第 165 维度 denying_the_antecedent 参与判定（否定前件）。
     // 同 r725 先例：dimMap 与 allDims 必须两处都接。
     {score: dta.score, name:'denying_the_antecedent'},
+    // [r167] 第 166 维度 one_sided_dismissal 参与判定（让步消解）。
+    // 同 r166 先例：dimMap 与 allDims 必须两处都接。
+    {score: osd.score, name:'one_sided_dismissal'},
     // [r726] 第 156 维度 relative_pration 参与判定（诉诸更惨）。
     // 同 r725 先例：dimMap 与 allDims 必须两处都接。
     {score: rpr.score, name:'relative_pration'},
@@ -2571,6 +2584,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r166] 第 165 维度 denying_the_antecedent（否定前件×
     // 条件句腿×否定前件×否定后件结论腿）。
     denying_the_antecedent: dta,
+    // [r167] 第 166 维度 one_sided_dismissal（让步消解×
+    // 让步标记腿×反面证据词腿×消解短语腿）。
+    one_sided_dismissal: osd,
     // [r726] 第 156 维度 relative_pration（诉诸更惨×
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
@@ -2844,6 +2860,10 @@ function discriminate(text, evidence = [], contentMode) {
     'guilt_by_association': "不得**把关系人的问题算到他头上**——因为「他朋友是骗子」「她前任劈腿」「他爸坐过牢」「在这家公司上过班」就断言此人也有问题：「他朋友就是骗子，他能好到哪去」「这个博主跟那个翻车的人互关，一路货色」「他关注列表里有公知，说明他也是一伙的」「他们老家出了这事，那边来的人都要防着点」「他亲戚是老赖，他说话能信吗」「他跟那个人吃过饭，你说能是什么好人」「His brother is a criminal, so he must be one too.」「She used to work for that company, so she cannot be trusted.」「He follows that scandal account, so he is no better than them.」这类**关系链×株连推断**的话术当正常叙述（样本形状与负例见 test/round-724-guilt-by-association.js）。判据双腿共现：腿①关系链词（朋友/好友/哥们/兄弟/前任/亲戚/亲属/爸妈/同乡/老乡/互关/关注列表/待过/共事/团队/公司/上班/室友/同学/邻居/合伙人/发小/闺蜜/师兄/师弟/师姐/师妹/同事/老家/出身/门第/一起长大/合租/吃过饭；EN: brother / sister / father / mother / friend / ex-boss / used to work / associated with / follows / from the same town / grew up with / went to school with），腿②株连推断（好到哪去/一路货色/一路人/干净不了/也不是什么好人/不是好人/能是什么好人/能信吗/一伙的/防着点/也好不了/不可信/就有问题/都不是好东西/脱不了干系/一模一样；EN: must be one too / cannot be trusted / no better than / one of them / just as bad / cut from the same cloth / stay away from）。缺腿不判——「他朋友的问题归他朋友，我们看他本人的记录」只有关系语境无株连推断，是正当就事论事；「他哥是罪犯」只有污名陈述无转移推断，不判；「这人一路货色，离他远点」只有推断无关系链，不判。污名沿关系链转移，会用关系代替证据、把个体未验证的行为定罪成连坐：正当做法是**把评价落回此人本人可验证的行为与记录**（看他本人的履约记录/个案个案查/发言和行动才可以/EN: assess his own conduct / blame must rest on verifiable acts）或**把关联风险提示与个人定罪分开**（警惕关联风险是理性的，但定罪要靠证据而不是靠关系）。边界：genetic_fallacy（第 131 维）管**血统/出身决定论**（龙生龙/根正苗红/出身名门/born into），本族管关系人连坐，GENETIC_BLOOD 豁免显式让位；triangulation 管**拉第三方进场施压**（我妈说你不行/你领导说你态度有问题），本族管污名沿关系链转移到本人身上；hasty_generalization 管样本不足的归纳，本族管零本人证据的株连。正当就事论事（靠证据/不是证据/按事实/单独看/个案/责任自负/就事论事/本人的记录/逐条核查；EN: not evidence / own record / due process / judged by actions）、谬误概念转述（连坐/株连/guilt by association/association fallacy）、教学转述（老师/教材/课堂/教授/textbook/lecture）、血统决定论语境（血统/基因/龙生龙/凤生凤/根正苗红/书香门第/将门/血脉；EN: bloodline/noble blood/born into/pedigree）明确不判。",
     // [r166] 第 165 维度 denying_the_antecedent（否定前件：如果P则Q；并非P所以并非Q）。
     'denying_the_antecedent': "不得**否定前件就断定后件也不成立**——先立「如果 P 则 Q」的条件规则，再以「并非 P」断言「并非 Q」：「如果下雨，运动会就取消；今天没下雨，所以运动会不取消」「努力的人都会早起；他根本不努力，所以他不会早起」「认真复习的人都能考过；他没认真复习，所以他考不过」「If it rains, the match will be cancelled. It did not rain, so the match is not cancelled.」「Well-made products get good reviews. This product is not well-made, so it will not get good reviews.」这类**条件规则×否定前件×否定后件结论**的话术当正常叙述（样本形状与负例见 test/round-166-denying-the-antecedent.js）。判据：腿① COND 条件/规则句（如果X（那么/则/就）Y / X都会Y / X能Y / 只要X就Y / EN: if X then Y / X has Y / 英文裸规则句前两词为主语），切出前件 A 与后件 B；腿② ANTECEDENT_DENY——按推断词（所以/因此/说明/证明/可见/意味着/显然是/肯定是/so/therefore/which means）切分事实句，前半须回指腿①**前件 A** 且被否定（¬P），后半须回指腿①**后件 B** 且被否定（¬Q）。这个「¬P ∴ ¬Q」结构天然区分三种有效/相关推理：modus ponens（P→Q，P∴Q）前后件皆肯定不判；modus tollens（P→Q，¬Q∴¬P）否定的是后件、结论否定前件，方向相反且 A≠B 关键词不交叉，不判；affirming the consequent（Q∴P）无否定不判。缺腿不判。前件不成立推不出后件不成立——同样的结果可能有多个原因：正当做法是**补足其他原因或改用有效推理**（要证 ¬Q，需要排除 Q 的其他所有成因，或改用 modus tollens 直接检验 Q 是否发生/EN: to conclude ¬Q, rule out every other cause of Q, or test Q directly）或**说清条件是充分还是必要**（下雨是取消的充分条件，没下雨不代表不取消；若要「没下雨就不取消」成立，须证明下雨是取消的必要条件/if rain is only sufficient, ¬rain does not give ¬cancel）。边界：affirming_the_consequent 管**Q∴P**（把结果当证据倒推原因），本族管**¬P∴¬Q**（否定前件得出后件也不成立）；conditional_proposition 管**¬B⇒¬A**（用未验证假言裁定前件为假，结论落前件），本族结论落后件；pseudo_causal 管相关当因果，post_hoc 管时间先后当因果，本族是命题逻辑条件推理的误用。正当推理（modus ponens「如果明天下雨，运动会就取消；明天下雨了，所以运动会取消」/modus tollens「如果是他干的，他会留下痕迹；现场没有痕迹，所以可能不是他干的」/双条件「当且仅当下雨才取消；没下雨，所以不取消」）、双条件（当且仅当/唯有/iff/if and only if）、否定翻转（不意味着/不代表/does not mean——正确指出推理无效）、对冲（可能/也许/未必/必要不充分/not sufficient）、谬误概念转述（否定前件/逆否命题/formal fallacy）、教学转述（老师/教材/textbook）、证据语境讨论（孤证/证据不足/cannot prove）明确不判。",
+    // [r167] 第 166 维度 one_sided_dismissal（让步消解：承认反面证据后不作
+    // 权衡地扫掉，得出单边结论）。样本形状与负例见
+    // test/round-167-one-sided-dismissal.js。
+    'one_sided_dismissal': "不得**先让步承认反面证据，再用一句总体性概括把它不作权衡地扫掉，直接收尾到单边结论**——这是证据呈现的对称性违反：反面证据一旦被承认，就需要权衡或处置，而不是被「瑕不掩瑜」四个字注销：「这个药虽然有副作用，但临床试验显示它利远大于弊，所以值得推广」「研究确实也发现了一些问题，不过总体而言瑕不掩瑜」「当然反对者也能举出一些反例，但主流数据都站在我们这边」「他确实犯过错，但这不能掩盖他取得的巨大成就」「虽然有部分居民受损，但大多数人从中受益，实践证明这条路走对了」「Side effects exist, but the benefits overwhelmingly outweigh the risks.」「Critics can point to failures, yet the data overwhelmingly supports the approach.」「There are some dissenting voices, but the consensus is clear.」这类**让步标记×反面证据词×消解短语**的话术当正常叙述。判据（双腿共现，缺一不判）：腿① CONCESSION——让步标记（虽然/尽管/固然/诚然/不可否认/必须承认/确实/当然/ admittedly/although/though/while/granted/critics/skeptics/there are）须与**反面证据词**（副作用/风险/反例/批评/质疑/缺陷/过错/失败/争议/代价/受损/损害/冲击/ side effects/risks/criticism/concerns/failures/flaws/drawbacks/dissenting）同现——让步标记单独出现（「虽然明天下雨，但还是出发吧」）不判；腿② DISMISSAL——消解短语（瑕不掩瑜/不能掩盖/利远大于弊/总体而言/归根结底/主流/大势所趋/实践证明/时间会证明/ overwhelmingly/outweighs/on balance/consensus is clear）之一，把已承认的反面证据不作量化权衡直接扫掉。缺腿不判。与 false_balance 的关系：false_balance 管「把一边倒的说成势均力敌」（平衡伪造），本族管「把势均力敌/有真实反面证据的说成一边倒」（单边论证）——同一枚硬币的两面，都违背证据对称性纪律。正当做法是**给出反面证据的量化与处置**（副作用发生率2%、有效率达85%，且医生可监测肝功能/EN: side effects occurred in 3% of patients, but the treatment was effective in 85% and is monitored）或**明确权衡框架**（分别列出收益与代价再逐项比较）。边界：双方量化（让步与消解前后均出现具体数字——「发生率约2%，但有效率达85%」）、处置措施（消解后接可以监测/及时调整/有对策/停药即可/可逆/可控——真实的工程或医学权衡）、谬误概念转述（选择性证据/单边论证/cherry picking/false balance）、教学转述（教材/课堂/textbook/lecture）明确不判。",
     // [r725] 第 155 维度 affirming_the_consequent（肯定后件：如果P则Q，Q在场所以P）。
     'affirming_the_consequent': "不得**把结果当证据倒推原因**——先立「如果 P 则 Q」的条件规则，再用 Q 在场断言 P 成立：「如果是他干的，他会留下痕迹；现场有痕迹，所以是他干的」「努力的人都会早起；他天天早起，所以他很努力」「认真做产品的公司都会打磨细节；这家公司细节到位，所以是真认真」「下雨地面会湿；地面湿了，所以刚下过雨」「发烧的人体温会高；他体温高，所以他发烧了」「好项目都有清晰的规划；这个项目规划清晰，所以是个好项目」「成功的人都热爱学习；他热爱学习，所以他将来会成功」「靠谱的团队都会写复盘；他们写了复盘，所以团队靠谱」「真心帮你的人才会指出你的问题；他指出问题，所以他是真心帮你」「高手都会犯这种错，他犯了这个错，说明他是高手」「If he were guilty, he would act nervous. He looks nervous, so he is guilty.」「Good code has tests. This module has tests, so the code is good.」「Successful founders read a lot. He reads a lot, so he will be a successful founder.」这类**条件规则×后件重现×前件肯定结论**的话术当正常叙述（样本形状与负例见 test/round-725-affirming-the-consequent.js）。判据：腿① COND 条件/规则句（如果X（那么/则/就）Y / X都会Y / X会Y / 只要X就Y / EN: if X then Y / X has Y / 英文裸规则句前两词为主语），腿② BACKWARD 倒推结构——按推断词（所以/因此/说明/证明/可见/意味着/显然是/肯定是/so/therefore/which means）切分事实句，前半须含腿①后件关键词、后半须回指腿①前件关键词。这个切分天然区分三种有效推理：modus ponens（P→Q，P∴Q）事实句回指前件、结论出后件，不判；modus tollens（P→Q，¬Q∴¬P）后件被否定或无原样重现，不判；归纳/举证不足（后件未重现只是相似）不判。缺腿不判——「他朋友的问题归他朋友」类只有条件语境无倒推结论不判；「他体温高可能是发烧也可能是其他原因，需要进一步检查」有对冲不判。后件成立不能反推前件成立——同样的结果可能有多个原因：正当做法是**把倒推改成正推或枚举检验**（要确认 P，需要能独立验证 P 的证据，而不是只验证 Q/列出其他可能原因并逐一排除/EN: find direct evidence for P, not just for Q）或**把充分条件与必要条件分开**（Q 是 P 的必要条件还是充分条件要说清，别混用/早起只是努力的一个表现，不是努力的定义）。边界：pseudo_causal 管**相关当因果**（两件事一起出现就称导致），本族管命题逻辑的逆向推断（条件句后件在场就断言前件）；post_hoc 管**时间先后当因果**（B 发生在 A 后就称 A 导致 B），本族不依赖时间顺序而依赖条件句结构；hasty_generalization 管**样本不足的归纳**，本族是演绎形式的逆向误用；reasoning_coherence 管**段落连贯性**，本族管单句推断的有效性。正当推理（如果明天下雨，运动会就取消；明天下雨了，所以运动会取消——modus ponens/如果是他干的，他会留下痕迹；现场没有痕迹，说明可能不是他干的——modus tollens/这个项目规划清晰只是必要条件，不能反推项目质量/Tests are necessary but not sufficient — we still need code review./他早起只能说明起床早，说明不了努不努力）、对冲表述（可能/也许/未必/不一定/还要看/之一/必要不充分/perhaps/maybe/might/not sufficient）、谬误概念转述（肯定后件/逆命题/逻辑谬误/形式谬误/affirming the consequent/formal fallacy）、教学转述（老师/教材/课堂/textbook/lecture）、证据语境讨论（证据不足/孤证/不能证明/insufficient evidence/cannot prove）明确不判。",
 'relative_pration': "不得**拿别人更惨的处境抹掉对方正当的当下诉求、抱怨或疼痛**——用第三方（人家/有人/多少人/往事一代/others）的具体苦难作参照，宣布对方的困难不值一提：「别喊疼了，人家生孩子的都不吭声」「起码你还有学上，非洲的孩子连饭都吃不上」「知足吧，还有人工资比你低一半呢」「你这点苦算什么，穷苦人家连饭都吃不上」「年轻人吃点苦怎么了，我们当年饭都吃不饱」「别嫌辅导班贵，山区孩子想上还没得上」「至少公司还发工资，好多厂都倒闭了，知足吧」「How can you complain about your flight delay when people are starving?」「You have a roof over your head; stop complaining about the noise.」「At least you have a job — many people would kill for your position.」这类**第三方苦难参照×压制诉求**的话术当正常叙述（样本形状与负例见 test/round-726-relative-pration.js）。判据：腿① SUFFER 更惨参照系——第三方/群体/往事的**具体**苦难处境（连…都吃不上/睡大街/没挺过来/倒闭/失业/辍学/难民/战区/搬砖/通勤四小时/比你惨多了/roof over your head/starving/flooding），或「比你+负面比较」，或极小化「还有」形（至少还有五险一金/至少还有人要你）；抽象的更惨/更不幸/更艰难（共情转述高频形）刻意不收。腿② DISMISS 压制诉求——别喊/别嫌/别抱怨/知足/还不满足/算什么/怎么了/想想/至少/起码/只是/就不错了/stop complaining/be grateful/at least。两腿共现才判，缺腿不判——「你的困难是真的，同时也值得想想更糟的情况来调节视角」承认痛苦不压制不判；「虽然还有更不幸的人，但这不代表你的痛苦不存在」是否定翻转不判；「有人处境更艰难，所以我们更要认真对待你提的问题」无压制标记不判。别人的苦难不能抵消眼前的问题——处境艰难与当下诉求是两个并行的事实，前者不能折抵后者：正当做法是**先承认对方处境的真实性**（加班到十点确实辛苦/你的困难是真的），再就事论事处理具体问题（改善排班/核对数据/给出方案），比较性视角只能作为附加信息（值得关注），不能作为关闭对话的依据。边界：suffering_contest（第78维）管**第一人称自陈比惨**（我比你惨多了/我这半年没睡过整觉），本族拿第三方苦难贬低对方，第一人称形显式让位；suffering_capital 管把苦难折算成顺从资格，本族不兑换服从只关闭诉求；appeal_to_pity 管**自述可怜换规则豁免**，本族是拿他人更惨拒绝承认对方困境；harm_invalidation 否定伤害事实本身，本族承认事实只做量级比较；selective_minimization 淡化己方过错，本族不涉过错只涉处境比较；false_balance 把两方压成等权，本族是单向贬低。正当比较（市场行情/同比数据）、共情转述（承认痛苦+给方案）、对冲表述（也许/可能/未必/not necessarily）、谬误概念转述（诉诸更惨/相对剥夺/relative privation）、教学转述（课堂/教材/textbook）明确不判。",
@@ -3746,6 +3766,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 转述他人错误推理、文学对白、辩论教学，rewrite/block 会误伤。
     // 与 r161-r164 同口径只登记 VERIFY。
     'appeal_to_consequences',
+    // [r167] 第 166 维度 one_sided_dismissal（让步消解）登记。
+    // verify 级——「承认反面证据后不作权衡地扫掉」是**证据对称性缺口**，
+    // 需改为给出反面证据的量化与处置，或明确权衡框架；单句也可能是正当
+    // 的利益-风险权衡（双方都有数字）、带处置措施的表述、文学对白、谬误
+    // 案例分析，rewrite/block 会误伤。与 r161-r165 同口径只登记 VERIFY。
+    'one_sided_dismissal',
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）登记。
     // verify 级——「以嘲笑代替论据」需要补的是**实际语境判据**（这是
     // 蔑视攻击还是强烈批评的具体缺陷指认/幽默内容转述/文学对白/元
@@ -4157,6 +4183,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r166] 第 165 维度补登记：denying_the_antecedent（否定前件）。
       // 同上：九处一次接齐。
       denying_the_antecedent: dta,
+      // [r167] 第 166 维度补登记：one_sided_dismissal（让步消解）。
+      // 同上：九处一次接齐。
+      one_sided_dismissal: osd,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,
@@ -4423,6 +4452,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r166] 第 165 维度 denying_the_antecedent 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       dta.count ? dta.count + ' 处否定前件' : '',
+      // [r167] 第 166 维度 one_sided_dismissal 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      osd.count ? osd.count + ' 处让步消解' : '',
       // [r726] 第 156 维度 relative_pration 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       rpr.count ? rpr.count + ' 处诉诸更惨' : '',
@@ -14898,6 +14930,9 @@ module.exports = {
   // [r166] 第 165 维度 denying_the_antecedent 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkDenyingTheAntecedent,
+  // [r167] 第 166 维度 one_sided_dismissal 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkOneSidedDismissal,
   // [r726] 第 156 维度 relative_pration 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkRelativePrivation,
