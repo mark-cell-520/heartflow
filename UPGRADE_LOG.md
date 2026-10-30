@@ -1,3 +1,41 @@
+
+# 第 163 轮报告（v6.8.91 — 第 162 维度 incredulity 诉诸个人怀疑上线 — 2026-10-30）
+
+## 一、方向与来源
+- 方向：证据纪律 / 逻辑谬误检测（按任务书轮换要求避开上一轮 r162/v6.8.90 的因果/归因方向 monocause，选自证/证据充分性家族）。
+- 缺口核验：grep src/（排除 test/）无法想象|难以置信|不可思议|can'?t imagine|inconceivable|unfathomable = 0 命中（真缺口，射程外）。psychologists_fallacy（fallacies 子标签）只管「以为别人都和自己想的一样」，不管「对事实的真值否定」；appeal_to_ignorance 管「不能证伪所以为真」，方向相反；unsupported_claim 管无依据断言本身，不管「以主观难以置信替代证据」的推理结构。
+- 外部来源（如实，不编造 arXiv ID）：HN Algolia 命中真实故事 "Translating natural language to first-order logic for logical fallacy detection"（https://arxiv.org/abs/2405.02318，hn id 43257719）——LLM 路线，与心虫纯规则引擎不同构，仅作背景；GitHub fallacy detection 检索最高星 latent-variable/Real_time_fallacy_detection（119★，LLM 实时检测，无可复用规则）、tmakesense/logical-fallacy（20★）；Semantic Scholar 4 次尝试全部 HTTP 失败（响应 total undefined），不可用。本族定性为标准非形式谬误 "argument from personal incredulity（诉诸个人怀疑）"，实现为心虫自有规则（仿 src/monocause.js）。搜索落盘：/tmp/hf-scout-1793345497.txt。
+
+## 二、心虫裁决门禁
+heartflow_philosophy_decision：type=accelerate / confidence 0.7 / priority 40 / goalReviewed true。如实说明：rationale 的 cognitiveLoad 与 uncertainty 为字符串 "unknown"（引擎把未测到当很低），不构成实质背书；psychologySnapshot healthScore 0.98。
+
+## 三、实现内容
+1. 新文件 src/incredulity.js（~270 行）：checkIncredulity(text, inject) + __internals（10 个常量可注入）。第 162 维度 incredulity（诉诸个人怀疑），VERIFY 级。
+   - 腿① INCREDULITY_ZH：无法/难以/很难/没法/不能/不敢 + 想象/想像/相信/理解，裸词干 想象不到/想不到/相信不了，固定短语 难以置信/难以相信/匪夷所思/不可思议/超乎想象/无法理喻（含裸名词形态，[r161] 裸词教训：让人难以置信/想象不到 无修饰也命中）。
+   - 腿① INCREDULITY_EN：主语+否定情态+认知动词（can't imagine/fathom/conceive/comprehend/believe）、it's hard/impossible to imagine/believe、inconceivable/unimaginable/unfathomable/unbelievable、beyond comprehension、strains credulity、boggles the mind、hard to believe。
+   - 腿②a 推断词+否定断言（中文：所以/因此/这说明/足以证明 + 不是真的/是假的/纯属/不可信/作弊/编造/摆拍/有黑幕/刷单/吹牛…；英文 TRUTHDENIAL_EN：so/therefore/which means + can't be true / must be fake / must have been edited / didn't really happen / clearly doctored / no way that happened / can't be true, because I cannot imagine…）。
+   - 腿②b TRUTHDENIAL_ZH_B 直接否定断言（一看/显然/肯定/一定…就是假的/作弊/后期剪辑/吃药；不可能…是真的/存在/做过；纯属/根本+造假族）——倒装形（真值否定在前、难以置信在后作理由）由两腿共现覆盖。
+   - 三类豁免：EVIDENCE_EXEMPT（有据可查的惊讶：转折+录像/记录/第三方/经核实/verified by…）、QUESTION_EXEMPT（含问号——求知/反问不是断言）、META_EXEMPT（诉诸个人怀疑/argument from personal incredulity 的概念评析）。
+2. src/index.js 九处接线（同 r161 先例，漏一处 gate.action 恒 pass）：require（第 578 行起）/ 计算点 _applyPedagogyRelaxation / dimMap 参与判定 / dimensions 返回对象 / DIM_GUIDANCE 概念条文 / VERIFY_DIMS 登记 / allDims 补登记 / summary 计数（N 处诉诸个人怀疑）/ module.exports 导出。
+3. 测试 test/round-163-incredulity.js（20 断言，不带 .test.js 后缀，同 r720-r729/r161 纪律）：攻击集 ZH 8 + EN 5（变体矩阵：基本形/带修饰/裸词干/倒装/长句/刷量族/吃药族/不可思议族）、良性集 11、边界锁 4（豁免承重）、分工边界锁 3、存量回归 2、登记断言 8、负例注入 3（腿①/腿②全置空攻击全停判；豁免常量逐项置空翻转为命中）。
+
+## 四、验证数据（五门禁 + 变体矩阵，全部实测）
+- bin/verify.js：16 passed / 0 failed
+- guard-abilities.js：20/20（dimensions 键 162）
+- doc-numbers-accuracy.test.js：22/22（同轮同步 README badge/横幅/规格表、SKILL、AGENTS 三处文档：维度 161→162、VERIFY 120→121；模块数经实测仍为 161——incredulity.js 是维度探测器不入模块注册表，同 r161 monocause 先例，故文档模块数不改；另补录 r161 遗漏的 README 6.8.90 历史行与版本戳）
+- bidirectional-guard.js：召回 52/52、误拦 302/326（与基线逐位一致，零新增误伤）
+- round-162 轮测：20/20
+- 变体矩阵（负例测试之外的强制项，[r161] 教训）：同族 10 变体全命中——ZH 基本形/修饰形/裸词干/倒装/长句/刷量族/想象不到+吃药/不可思议+后期合成 + EN 基本形/裸词+clearly doctored/倒装 can't be real because I cannot conceive/no way that happened/inconceivable→must have been edited；良性 9 条全 miss（含边缘良性：证据豁免、无否定腿感叹、提问、元评析、EN verified props）
+- gate 层实测：11 条攻击 gate.action 全非 pass（verify×9 / rewrite×2，rewrite 来自 absolute_claim 并存命中），incredulity 维度 count=1 承重（非存量维度代拦）；良性 gate 全 pass（唯一一条 EN verified props 为 verify，来自存量维度、incredulity count=0）
+
+## 五、已知边界
+- 倒装形只覆盖「否定断言+难以置信理由」共现，裸「这不可能」无真值词不判（精度取舍）。
+- 提问豁免是整句级（含问号即豁免），反问式真值否定（「我无法想象这一切，这怎么可能不是真的？」）会被豁免——保精度弃召回，记录在案。
+- 「不可信」不进腿①（本身是结论不是难以置信陈述），「implausible」不进 EN 腿①（implausible→likely false 是正常贝叶斯推理，误伤风险高）。
+- 下一轮可继续方向：自我验证/执行验证/记忆/价值对齐（任务书轮换池）；诉诸后果（appeal to consequences）是已核实的相邻缺口（grep 0 命中），可作为候选。
+
+---
+
 # 第 162 轮报告（v6.8.90 — monocause 腿①枚举补缺 + 首轮 cron 任务修复 — 2026-10-30）
 
 ## 一、背景

@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-18%2C157%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-161-blueviolet.svg)](#what-it-catches-160-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-162-blueviolet.svg)](#what-it-catches-162-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-161 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
+162 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
 ×  1,314 dispatch routes  ×  18,157 passing tests  ×  2 npm dependencies
 ```
 
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (160 dimensions)
+## What it catches (162 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **119 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **121 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.89**. Not marketing copy.
+Measured on this repository at **v6.8.91**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 161 |
+| Discrimination dimensions | 162 |
 | MCP tools | 184 |
 | Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,8 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.91 | 2026-10-30 | **第 162 维度 incredulity（诉诸个人怀疑 / argument from personal incredulity）上线** — 新增判别维度，补上心虫「证据纪律」里缺失的认知越界族：以主观「无法想象/难以置信」替代证据，据此否定事实真值（「我无法想象他怎么能做到，所以这成绩一定是假的」「一看就是后期剪辑的」「不可能是真的，我实在无法想象它怎么采集的」；I cannot imagine how this is possible, so it cannot be true. / There is no way that happened; I cannot fathom it.）。双腿判据：腿① INCREDULITY 难以置信陈述（无法想象/难以想象/想象不到/难以置信/不可思议/匪夷所思；EN：can't imagine / hard to believe / inconceivable / unfathomable / unbelievable）× 腿② TRUTH-DENIAL 真值否定推导（推断词+否定断言：所以/因此/这说明…+不是真的/是假的/纯属/不可信/作弊/编造/摆拍/有黑幕；直接否定断言：一看就是假的/肯定是作弊的/不可能是真的；倒装形同样命中）。三类豁免（有据可查的惊讶、提问句式、概念分析）。仿 monocause.js 结构，新文件 src/incredulity.js（~260 行），index.js 九处接线。来源：标准非形式谬误 taxonomy（argument from personal incredulity）；HN Algolia 命中真实基准故事 arXiv 2405.02318（LLM 路线，与纯规则引擎不同构）、GitHub 最高星 latent-variable/Real_time_fallacy_detection（119★，无可复用规则）、Semantic Scholar 全程失败，不编造 arXiv ID。维度 161→162、VERIFY 120→121。验证：round-163 轮测 20/20（变体矩阵 ZH/EN×裸词干/修饰/倒装/长句 10/10 命中、良性 9/9 零误伤、负例注入逐常量承重）、gate 层攻击非 pass、incredulity 维度 count>0 承重、双向门禁不升误拦。 |
+| 6.8.90 | 2026-10-30 | **v6.8.90 monocause 腿①裸战争补缺 + README badge 同步（r161 首轮 cron 产出实测修补）** — 实测发现 monocause 腿①只收带后缀的「战争爆发」，裸名词形「战争纯粹是因为资源争夺」整句漏判，补 COMPLEX_ZH 裸词形态；README badge/横幅数字同步至 161/161。 |
 | 6.8.89 | 2026-10-30 | **第 161 维度 monocause（单一因果过度简化 / fallacy of the single cause）上线** — 新增判别维度，补上心虫三大支柱「因果纪律」里缺失的归约谬误射程：post_hoc 管时序→因、false_cause 管相关→因、pseudo_causal 管虚构机制，但都没有管「把真实多因的系统性复杂现象压成单一原因并否认多因性」。辨别把经济危机/公司倒闭/犯罪率/战争爆发/王朝覆灭/帝国衰落/社会撕裂/创业失败等已知多因现象，归结为「完全是因为X」「纯粹是X」「唯一的原因」「说到底/归根结底」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty.）。双腿判据：腿① COMPLEX-OUTCOME 已知多因的系统性现象（只收系统性现象，不收考试/比赛/普通项目等可单一归因的琐事——精度锚）× 腿② SINGLE-CAUSE 绝对化单一归因框架；四类豁免（多因并列/共同作用、hedged 单一贡献者「…之一/one of the main drivers」、提问句式、概念分析）。仿 appeal-to-novelty.js 结构，新文件 src/monocause.js（~230 行），index.js 九处接线（require/计算点/allDims/dimMap/DIM_GUIDANCE/VERIFY_DIMS/dimensions/summary/module.exports）。来源：标准非形式谬误 taxonomy + HN 基准故事 16200526（Recognising the fallacy of a single root cause）；Semantic Scholar 全程 429 限流、GitHub 无成熟规则引擎实现，不编造 arXiv ID。维度 160→161、VERIFY 119→120。验证：round-161 轮测 20/20（攻击 ZH/EN 全命中、良性 0 误伤、负例注入逐常量承重）、gate 层攻击=verify、隔离良性 0/17 误伤、双向门禁不升误拦。 |
 | 6.8.88 | 2026-10-28 | **审计修复批（multi-agent audit patch — 异步委托 4 子代理全量审计闭环）** — 委托批次 deleg_39686998 发现的真问题逐条亲验后修复：① [HIGH] `getOrCreateInstance` 全仓库 4 处调用 0 处定义——`src/mcp-server.js` 与 `mcp/mcp-server-http.js` 的 SSE 会话级 benchmark 工具 100% 落进 dispatch try/catch 被 ReferenceError 吞掉静默回退全局实例；两文件落地 `_sessionInstances` Map 注册表（按 sessionId 缓存、上限 16 FIFO 淘汰、start() 失败上抛不回退），4 处调用点改 `await`，等价逻辑单测 cache_hit/隔离/兜底三项全 true。② [MEDIUM] `src/cortex/self-benchmark.js` 调用 `anchorSync` 但 `benchmark-external-anchor.js` 9 行全 Stub 未导出该符号——外部基准锚定从未生效且错误被 catch 吞；删除 stub 模块与死导入/死调用，assess() 诚实走未验证分支（内评 0.7 折 + verified:false），`heartflow.js` 启动日志假宣称「外部锚定防自欺已启用」改为实况。③ [MEDIUM] `BUILD_DATE` 落后一个补丁（6.8.86→6.8.87）。④ [LOW] `src/dream/dream-loop.js` / `interactive-dream.js` 对 `dream.js` 的 `LEVELS`/`DEFAULT_SCORING` 死解构死导出（运行时实测 undefined）、`module-registry.js` 死导出 `createSpecialModule`（heartflow.js 用本地副本 `_createSpecialModule`），四处清除。⑤ [LOW] `package.json` 4 个 script 指向已归档 `tests/` 死目录，重指向现存文件。⑥ [LOW] `src/report/report-generator.js` `_extract` 缺 think() 实际形态（七阶段住在 `chain` 键，`thoughtChain` 恒不存在）——CLI/MCP 两条报告路径全输入输出「未捕获思维链」，补形态 (c) 规范化 + `_stageText` 对象 output 的 `[object Object]` 渲染修复。⑦ [LOW] SSRF 保留网段补齐：`url-validator.js` CIDR 表增 CGNAT/TEST-NET1-3/198.18/组播/240÷4/广播 8 段并导出 `isBlockedV4`，`fetch-safe.js` 两处会漂移的内联私网副本改复用单一事实源。⑧ 文档：`heartflow-architecture-tracing/SKILL.md` 架构描述与实码相反（实际 ThoughtChain 主路径 + think-pipeline 后置），勘误；规格表测试数改实测 4 段聚合 18,996/72/19,068。验证：s2/s3 与改动前基线逐分一致、s4 失败集合同源（round-608 等既有 flaky）、security-audit 16/16、fetch-safe 2/2、gate-verdict 27/27、recovered-modules 16/16、doc-numbers 3 条失败为 r412 既有切片噪声。 |
 | 6.8.87 | 2026-10-28 | **console 残留清理（code-quality patch — 25 处调试噪声接入 house logger）** — 全局审计（安全/运行时/质量三线 + 4 代理交叉）发现全部闭环后，将 src/ 下 25 处调试噪声 console 调用接入既有 house 标准 `src/utils/logger.js`（`logger.debug/info/warn(module, ...)`，LOG_LEVEL 默认 WARN 静默、`LOG_LEVEL=1` 恢复）：`src/cortex/meta-engine.js` 10 处 cycle 追踪、`src/formula/formula-engine.js` 7 处加载/推导调试（含 2 处「简化版」提示行）、`src/memory/memory-bank.js` 2 处加载状态、`src/memory/memory-encrypt.js` 4 处（2 消息 × 2 份重复块）密钥状态、`src/formula/formula-search.js` 1 处加载完成统计、`src/emotion/deep-emotion.js` 1 处初始化、`src/core/uncertainty-quantifier.js` 1 处校准告警（升 logger.warn）、`src/core/engine-initializer.js` 1 处会话间隔。排除项（40+ 处不动）：aipay-server/api-server/a2m-notify 支付与通知操作日志、mcp-server/gate 的 console.error 安全输出、repo-audit 的 REPORT/FILES/LINES 机器可读契约、utils/logger 与 infra/logger 自身实现、heartflow.js 内部 logger 与 HEARTFLOW_DEBUG 门控行、transmission-engine 全注释形态。grep 验证零测试 spy stdout/断言这些前缀；默认输出实测零噪声（CLI status 常驻 [MemoryBank] 行消失），`LOG_LEVEL=1` 恢复。8 个被改模块 require 冒烟 EXIT=0；靶向测试（engine-initializer / round-621-uncertaintyquantifier-dispatch / meta-audit / meta-calibration / metaMemory）全过；全量分段回归 19,005 通过 / 70 失败 / 19,075，与清理前逐段一致（零回归）。 |

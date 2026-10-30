@@ -569,6 +569,14 @@ const { checkConditionalProposition } = require('./conditional-proposition.js');
 // 攻击样本预计现有维度零命中、良性样本（多因并列/hedged/提问/概念分析）不误伤。
 // 双腿共现：系统性复杂现象 × 绝对化单一归因；细节见 src/monocause.js。
 const { checkMonocause } = require('./monocause.js');
+// [r162] 第 162 维度 incredulity（诉诸个人怀疑：以主观「无法想象/
+// 难以置信」替代证据，据此否定事实真值）。decision 本体一次选出
+// （heartflow_philosophy_decision type=accelerate/confidence 0.7/
+// goalReviewed true）。探测器证据：grep src/ incredulity/
+// 无法想象|难以置信|can'?t imagine|inconceivable = 0 命中（真缺口，
+// psychologists_fallacy 只管别人怎么想、不管真值否定）。双腿共现：
+// 难以置信陈述 × 真值否定推导；细节见 src/incredulity.js。
+const { checkIncredulity } = require('./incredulity.js');
 // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽：以嘲笑/蔑视/智商贬低
 // 对方的观点或发言代替论据）。decision 本体一次选出（/tmp/decide-run-r704.js
 // 读 /tmp/decide-opts-r704.json，composite_score 0.87 / confidence 0.80 /
@@ -1715,6 +1723,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r161] 第 161 维度 monocause（单一因果过度简化）计算点。
   // 同 r729 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const mono = _applyPedagogyRelaxation(checkMonocause(_normText), "monocause", pedagogyRelaxation);
+  // [r162] 第 162 维度 incredulity（诉诸个人怀疑）计算点。
+  // 同 r161 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const inc = _applyPedagogyRelaxation(checkIncredulity(_normText), "incredulity", pedagogyRelaxation);
   // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）计算点。
   // 同 r701 先例：十处一次接齐，漏一处 gate.action 恒 pass。
   const ar = _applyPedagogyRelaxation(checkAppealToRidicule(_normText), "appeal_to_ridicule", pedagogyRelaxation);
@@ -2165,6 +2176,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r161] 第 161 维度 monocause 参与判定（单一因果过度简化）。
     // 同 r729 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: mono.score, name:'monocause'},
+    // [r162] 第 162 维度 incredulity 参与判定（诉诸个人怀疑）。
+    // 同 r161 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: inc.score, name:'incredulity'},
     // [r704] 第 137 维度 appeal_to_ridicule 参与判定（诉诸嘲讽）。
     // 同 r701 先例：dimMap 与 allDims 必须两处都接。
     {score: ar.score, name:'appeal_to_ridicule'},
@@ -2521,6 +2535,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r161] 第 161 维度 monocause（单一因果过度简化×
     // 系统性复杂现象腿×绝对化单一归因腿）。
     monocause: mono,
+    // [r162] 第 162 维度 incredulity（诉诸个人怀疑×
+    // 难以置信陈述腿×真值否定推导腿）。
+    incredulity: inc,
     // 第三方苦难参照腿×压制诉求腿）。
     relative_pration: rpr,
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽×
@@ -2778,6 +2795,8 @@ function discriminate(text, evidence = [], contentMode) {
     'no_true_scotsman': "不得**先立一个带 authenticity 标准的类别，再用行为把反例驱逐出该类别，使类别不可证伪**——「真正的X不会这样」：先规定「真正的专家/粉丝/朋友/领导」应当如何，再把不符合该行为标准的对象开除类别：「真正爱你的男人，不会计较你花多少钱」「真正的专家不会犯这种低级错误」「真正有格局的领导，不会盯着考勤」「真兄弟不会计较这些，计较就不是真兄弟」「合格的妈妈怎么会让孩子哭成这样」「真爱一个人就不会计较得失」「He is not a true fan if he criticizes the team.」「If she were a real friend, she would have shown up.」这类**authenticity 短语×驱逐断言**的话术当循环定义谬误（样本形状与负例见 test/round-728-no-true-scotsman.js）。判据：腿① AUTH authenticity 短语——「真正/真心/真爱/合格/称职/敬业/但凡/有良心/有自尊/吃得苦」+ 社会角色名词（专家/粉丝/朋友/兄弟/男人/女人/领导/学生…）或 true/real/genuine + fan/expert/friend/partner…；腿② EXCLUSION 驱逐断言——否定行为谓词（不会/从来不/怎么会/算不上/根本不/就不配/would never/not a true…），或 CONDITIONAL 反事实条件句（如果她是真朋友，早就…/If she were a real friend, she would have…）。两腿共现才判，缺腿不判——只说「真正的专家」而无驱逐断言是普通描述不判；只说「他不会计较」而无 authenticity 短语是普通陈述不判。多处共现或含类别否认/反事实条件则加权。正当做法是**给出可检验的类别定义**（操作化指标/可复现的标准）再评估个体是否符合，或承认反例并修正定义而非开除反例。边界：无真正的苏格兰人谬误的概念转述（「这是无真正的苏格兰人谬误」）、术语约定与定义先行（先定义「真正的粉丝」的标准/约定术语/可检验的定义）、对冲（也许/可能/未必/not necessarily）、否定翻转（不是不会/不意味着/does not mean）、证据挑战（自称真正的专家但拿不出依据）明确不判。",
     // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
+    // [r162] 第 162 维度 incredulity（诉诸个人怀疑）guidance。
+    'incredulity': "不得用**主观上的「无法想象/难以置信」替代证据**，据此**否定事实的真值或真实性**——「我无法想象他怎么能做到，所以这成绩一定是假的」「实验结果简直令人难以置信，一看就是后期剪辑的」「播放量高得离谱，肯定是刷出来的」「他年纪轻轻就身居高位，我根本想象不到他凭什么，背后一定有推手」（I cannot imagine how this is possible, so it cannot be true. / The results are unbelievable, therefore the data must be fabricated. / There is no way that happened; I cannot fathom it.；样本形状与负例见 test/round-163-incredulity.js）。判据**双腿共现**：腿① INCREDULITY 难以置信陈述（无法想象/难以想象/想象不到/难以置信/不可思议/匪夷所思；EN：can't imagine / hard to believe / inconceivable / unfathomable / unbelievable）——只收主观认知动词被否定的陈述，孤立的感叹不是本族；腿② TRUTH-DENIAL 真值否定推导，两种子形：(a) 推断词+否定断言（所以/因此/这说明…+ 不是真的/是假的/纯属/不可信/作弊/编造/摆拍/有黑幕；EN：so/therefore/which means…+ can't be true / must be fake / fabricated）；(b) 直接否定断言（一看就是假的/肯定是作弊的/不可能是真的；EN：clearly fake / no way that happened / is obviously staged），倒装形（真值否定在前、难以置信在后作理由：「这数据不可能是真的，我实在无法想象它怎么采集的」）同样命中。缺一不判——「实验结果令人难以置信」只有惊讶无否定；「这一定是假的」无难以置信前提是别的语境。以主观难以置信否定事实会把**认知边界当成证据**，让未经检验的怀疑驱逐可验证的真相：正当做法是**回到可验证依据**（录像/计时数据/第三方复核/原始记录）再下真值判断，或把结论降级为待核查假设（成绩异常需要核查，但在调取证据前不断言作弊）。边界：psychologists_fallacy 管「以为别人都和自己想的一样」，本族管对事实真值的否定；appeal_to_ignorance 管「不能证伪所以为真」，本族方向相反——「我不能想象所以为假」；unsupported_claim 管无依据断言本身，本族的断言由主观难以置信驱动；absolute_claim 管绝对化措辞，本族必须有难以置信陈述腿在场。明确不判：有据可查的惊讶（成绩提升令人难以置信，但有三次模考记录和批改痕迹可查/经第三方核实）、提问句式（含问号——求知/反问不是断言）、评析话术本身（诉诸个人怀疑/argument from personal incredulity）、无否定推导的纯感叹（快得难以置信/美味得不可思议）。",
     // [r729] 第 160 维度 conditional_proposition（条件句武器化）。
     'conditional_proposition': "不得**用未经验证的假设性条件句直接裁定现实结论**——把「如果A真就B」的存在性推断当作A真假的证据，替代事实核查：「如果他真的爱你，就不会让你受这种委屈」「如果这个方案可行，我们早就看到成果了」「要是她问心无愧，为什么不敢出来回应」「如果早听我的，现在也不会这样」「If he really loved you, he would never treat you like that.」「If this strategy worked, we would have seen results by now.」「If she were innocent, she would have come forward.」这类**假设条件句×否定推断**的话术当条件句武器化谬误（样本形状与负例见 test/round-729-conditional-proposition.js）。判据：腿① HYPOTHETICAL 假设条件句——「如果/要是/若/假如/倘若/若是/换了是我/如果当时」+ if/were 引导的待验证命题；腿② NEG_INFERENCE 否定推断——条件之后紧跟对前件真值的否定性断言：反事实完成标记（早就…了/早该）、否定结果断言（就不会/也不会/不可能/定然不会）、反问否定（怎么会/怎么可能/为什么没/为什么不敢/为什么不/会不）、EN（would never/would not/would have …ed/'d have/there would be）。两腿共现才判，缺腿不判——「如果明天下雨，运动会就取消」「If it rains tomorrow, the match will be postponed.」这类规则/预报条件缺否定推断腿，是普通陈述不判。多处共现或含反事实完成标记则加权。正当做法是**分别核查前件与后件各自的证据**（条件句的真假取决于两个命题的证据，不取决于假设本身），或把假设明确标注为待验证前提再讨论。边界：条件命题/条件句/反事实推理的谬误概念转述、规则合同条件句（制度明文的触发条件）、对冲（也许/可能/未必/not necessarily/might）、否定翻转（不能说明/不代表/并不意味着/does not mean）、显式证据模式（实测/数据/证据/experiment/data）明确不判。",
     'appeal_to_ridicule': "不得用**嘲笑/蔑视/智商贬低对方的观点或发言**代替论据——把「这种想法也太可笑了，亏你想得出来」「这么幼稚的观点也拿出来说」「笑死我了，这也叫方案」「你的逻辑太搞笑了，认真读过文档吗」「脑子正常的人都不会这么想」「这也信？智商堪忧」「你的方案蠢得让人无语」「哈哈，就这水平还敢发言」当成对某个立场的反驳（This idea is ridiculous. I can't believe you came up with it./What a childish argument. Did you even read the docs?/LOL, you call this a plan?/Anyone with a functioning brain wouldn't think that.；样本形状与负例见 test/round-704-appeal-to-ridicule.js）。判据是**三条路由任一命中**：①双腿共现——腿①嘲笑/蔑视表达（可笑/搞笑/笑话/蠢/幼稚/天真/弱智/无语/好意思/笑死/笑哭/智商堪忧/脑子进水；EN：ridiculous/laughable/hilarious/pathetic/absurd/stupid/idiotic/childish/naive/lol/lmao/your IQ is concerning）× 腿②指向对方观点/发言/产出的目标腿（这种/这个/这么/这也/这叫/就这 + 想法/观点/论调/方案/逻辑/设计/说法/主意/水平/东西/叫/信/想；你的 + 方案/逻辑/想法/观点/设计/说法/主意/水平/脑子/智商/作品/成果/回答/结论；拿出来说/敢发言/也敢说；EN：this/that/such a/what a + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level、your + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level/brain/iq/work/output、you call this/you believe this/dare to speak/only someone like you）② 自含指向的固定嘲讽习语单独成支（亏你想得出来/也只有你/只有你能有/不值一驳/脑子正常的人都不会/就这水平；EN：can't believe you came up with this/not even worth refuting/anyone with a functioning brain/with this level）③ 缺一不判——「这个桥段很搞笑」只有笑料描述无指向腿；「你这个想法需要数据支撑」只有指向无蔑视表达。诉诸嘲讽把讨论从**论据核对**转成**立场羞辱**，让对方为「敢提出这个想法」本身付出代价：正当做法是**针对观点给出可核验的反驳**（这个方案的第三步推不出来，因为样本量只有 12，结论不显著/我不同意这个观点，理由是数据不支持：对照组缺失）或**把嘲笑换成具体缺陷指认**（这个方案确实有可笑的漏洞：缓存没有过期策略，我们来修复它）。边界：sarcasm 管反讽语气标记（呵呵/你说得都对/笑死了），是语气描述且不强制行动，本族要求嘲词×观点指向共现或固定习语；hate_speech/dehumanization 管对人的侮辱与人格否定（你就是个废物/这种人就是垃圾），落点是人，本族落点是观点/发言/产出；bad_faith 管论证动机的恶意推定，本族不管动机只管以嘲代替论据；FALLACY_PATTERNS 既有 straw_man 正则只认「你的意思就是说…但这显然」转述形。明确不判：缺陷对象在场（这种方案确实有可笑的漏洞/This plan does have a ridiculous flaw——可笑修饰的是漏洞不是方案整体，是具体指认）、评析话术本身（把「这种想法太可笑了」当作论据，就是诉诸嘲讽/Appeal to ridicule is a common logical fallacy.）、提问咨询句式**不豁免**（「你的逻辑太搞笑了，认真读过文档吗」「这也信？智商堪忧」以反问收尾的攻击形态占比高，豁免问句会把整族放行）、幽默内容转述（喜剧电影里的这个桥段很搞笑/他讲的笑话让全场都笑了/这个段子写得真幽默——笑料内容描述不是攻击）、正当反对（我不同意这个观点，理由是数据不支持/你的逻辑有问题，第 3 步推不出来）",
@@ -3645,6 +3664,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 并权衡多因；单句也可能是转述他人观点、文学对白、历史归因的教学
     // 讨论，rewrite/block 会误伤。与 r724-r729 同口径只登记 VERIFY。
     'monocause',
+    // [r162] 第 162 维度 incredulity（诉诸个人怀疑）登记。
+    // verify 级——「以主观难以置信否定事实真值」是**证据缺口**，需改为
+    // 回到可验证依据再下真值判断；单句也可能是转述他人错误推理、文学
+    // 对白、评析对象，rewrite/block 会误伤。与 r161 同口径只登记 VERIFY。
+    'incredulity',
     // [r704] 第 137 维度 appeal_to_ridicule（诉诸嘲讽）登记。
     // verify 级——「以嘲笑代替论据」需要补的是**实际语境判据**（这是
     // 蔑视攻击还是强烈批评的具体缺陷指认/幽默内容转述/文学对白/元
@@ -4068,6 +4092,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r161] 第 161 维度 monocause 补登记（单一因果过度简化）。
       // 同上：九处一次接齐。
       monocause: mono,
+      // [r162] 第 162 维度 incredulity 补登记（诉诸个人怀疑）。
+      // 同上：九处一次接齐。
+      incredulity: inc,
       // [r704] 第 137 维度补登记：appeal_to_ridicule（诉诸嘲讽）。
       // 同上：十处一次接齐。
       appeal_to_ridicule: ar,
@@ -4320,6 +4347,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r161] 第 161 维度 monocause 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       mono.count ? mono.count + ' 处单一因果过度简化' : '',
+      // [r162] 第 162 维度 incredulity 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      inc.count ? inc.count + ' 处诉诸个人怀疑' : '',
       // [r704] 第 137 维度 appeal_to_ridicule 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ar.count ? ar.count + ' 处诉诸嘲讽' : '',
@@ -14781,6 +14811,9 @@ module.exports = {
   // [r161] 第 161 维度 monocause 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkMonocause,
+  // [r162] 第 162 维度 incredulity 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkIncredulity,
   // [r704] 第 137 维度 appeal_to_ridicule 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkAppealToRidicule,
