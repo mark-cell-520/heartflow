@@ -112,7 +112,15 @@ const path = require('path');
 //                 一个字母）。新增 describeDelimiterChannel 逐 run 诊断。
 //                 13 条绕过 → 10 条 block，双向门禁 52/52 + 306/326 不变，
 //                 570,889 句全仓库散文送检与 HEAD 差额 0）。
-let VERSION = '6.8.92';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.93] 第 738 轮同步：6.8.92 → 6.8.93（post_hoc R2 的 EN 侧第三腿
+//                 「归因主张」补线：guidance 明文承诺「只有时间陈述无归因
+//                 主张，是正常事件记录」，但 r720 建维度时 EN 侧只有
+//                 「干预 × 变化」两腿，ZH 侧靠 CHANGE_ZH 统一带「就」做
+//                 紧随相随的形状区分，EN 侧自建维度起没有对应约束。中性工程
+//                 复盘 15 条误判 14 条全 rewrite → 0 条；r720 存量攻击样本
+//                 20 条零退化；存量红测试 dimension-action-wiring 转绿。
+//                 新增 describePostHoc / postHocLegs 逐路由逐腿诊断）。
+let VERSION = '6.8.93';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

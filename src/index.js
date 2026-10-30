@@ -560,7 +560,7 @@ const { checkSpecialPleading } = require('./special-pleading.js');
 // scripts/round-720-family-probe.js；本轮在当前引擎（150 维）复测：
 // 攻击漏判 10/14（71%）、真零命中 10/10、误伤 0/10。判据四路由双腿
 // 共现；细节见 src/post-hoc.js。
-const { checkPostHoc } = require('./post-hoc.js');
+const { checkPostHoc, describePostHoc } = require('./post-hoc.js');
 // [r721] 第 152 维度 appeal_to_probability（诉诸概率/可能性误当必然）。
 // decision 本体选出（scripts/decide-r721.js，composite_score 0.81 /
 // confidence 0.78 / identity alignment 0.8，无弃权）。候选池来自 r721
@@ -14820,6 +14820,10 @@ module.exports = {
   // [r720] 第 151 维度 post_hoc 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkPostHoc,
+  // [r738] post_hoc 逐路由逐腿诊断导出。r738 补的是 R2 的 EN 侧第三腿
+  // （归因主张），缺腿时对外只显示 count=0，分不清「扫描过但缺腿」与
+  // 「守卫路径早退」——R2 EN 侧的缺口因此连续五轮复测才定位到根因。
+  describePostHoc,
   // [r721] 第 152 维度 appeal_to_probability 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkAppealToProbability,

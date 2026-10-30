@@ -3111,6 +3111,28 @@ function handleDelimiterChannel(args) {
   }
 }
 
+function handlePostHocLegs(args) {
+  const { text } = args || {};
+  if (!text) throw new Error('text 是必填参数');
+  try {
+    const gate = require(HF_DIR + '/src/gate.js');
+    const legs = gate.postHocLegs(text);
+    return {
+      ...legs,
+      // 附带一次真实 gate 判定，让「逐腿诊断 → 动作」的因果在同一响应里可核对
+      gate: (() => {
+        try {
+          const r = gate.gate(text);
+          return { action: r.gate.action, reason: r.gate.reason, findings: (r.findings || []).map(f => f.dimension) };
+        } catch (_) { return null; }
+      })(),
+      timestamp: Date.now(),
+    };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
 function handleGatePipeline(args) {
   const { text, evidence = [] } = args || {};
   if (!text) throw new Error('text 是必填参数');
@@ -3354,6 +3376,9 @@ const HANDLERS = {
   // [v6.8.92 第 737 轮] 分隔符混淆通道逐 run 诊断（三处同步第 2 处：
   // tools-registry 工具定义 + 本映射 + handleDelimiterChannel）
   heartflow_delimiter_channel: handleDelimiterChannel,
+  // [v6.8.93 第 738 轮] post_hoc 逐路由逐腿诊断（三处同步第 2 处：
+  // tools-registry 工具定义 + 本映射 + handlePostHocLegs）
+  heartflow_post_hoc_legs: handlePostHocLegs,
   // [v6.7.72] 误报反馈闭环（心虫 decision.decide 选定 0.92）
   heartflow_false_positive: handleFalsePositiveTool,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,

@@ -27,6 +27,8 @@ const { normalize } = require('./text-normalizer.js');
 const { describeQuotationFrame } = require('./quotation-context.js');
 // [v6.8.92 第 737 轮] 分隔符混淆通道的逐 run 诊断（AGENTS.md 约定 3 同步到 MCP）。
 const { describeDelimiterChannel } = require('./injection-obfuscation.js');
+// [v6.8.93 第 738 轮] post_hoc 的逐路由逐腿诊断（AGENTS.md 约定 3 同步到 MCP）。
+const { describePostHoc } = require('./post-hoc.js');
 
 function _pedagogyMode(text) {
   return detectPedagogicalContent(text) ? 'pedagogical' : undefined;
@@ -135,4 +137,33 @@ function delimiterChannel(text) {
   }
 }
 
-module.exports = { gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput, quotationFrame, delimiterChannel };
+/**
+ * post_hoc（后此谬误）逐路由逐腿诊断（对外公开方法，MCP 工具
+ * heartflow_post_hoc_legs）。
+ *
+ * 回答「这段文本被判/没判后此谬误，是哪条路由的哪条腿说了算」。用于 agent
+ * 自证一次 pass 不是漏放、一次 rewrite 不是误伤——r738 修的正是这条维度
+ * 此前无法自证的部分：R2 的 EN 侧缺第三条腿（归因主张），导致中性工程复盘
+ * 与真谬误样本形状同构，而对外只显示 count=0，看不出「干预×变化两腿都中了，
+ * 只差归因主张」。
+ *
+ * @param {string} text
+ * @returns {{dimension:string, exempt:boolean, exemptSource:string, routes:object[],
+ *            score:number, count:number}}
+ */
+function postHocLegs(text) {
+  try {
+    const d = describePostHoc(text);
+    return {
+      dimension: 'post_hoc',
+      exempt: d.exempt, exemptSource: d.exemptSource || '',
+      exemptEvidence: d.exemptEvidence || [],
+      routes: d.routes || [],
+      score: d.score, count: d.count,
+    };
+  } catch (_) {
+    return { dimension: 'post_hoc', exempt: false, exemptSource: '', routes: [], score: 0, count: 0 };
+  }
+}
+
+module.exports = { gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput, quotationFrame, delimiterChannel, postHocLegs };

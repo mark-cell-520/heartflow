@@ -265,6 +265,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_post_hoc_legs',
+    description: "后此谬误逐路由逐腿诊断（post_hoc）：把「判了/没判」摊开成 R1~R4 四条路由各自哪些腿命中、命中的是哪个词、哪条腿缺。R1=时序连接×因果断言，R2=干预×变化×归因主张（EN 侧第三腿归因主张是 r738 补的：so/therefore/thus/hence/that's why/which proves 或 right after/immediately/instantly；缺它时中性工程复盘如 'We applied the patch. Latency dropped 40%.' 与真谬误 'I took the medicine and got better, so the medicine works.' 形状同构，判据无法区分），R3=缺失×灾殃×规避，R4=到场×垮掉。附带调查语境豁免标记（need more data/correlation/not necessarily/需要分析/控制变量 等）与一次真实 gate 判定。用于 agent 自证一次 pass 不是漏放、一次 rewrite 不是误伤。只读工具，不改文本不碰引擎状态。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待诊断文本（原文，只读不改）"}},"required":["text"]}
+  },
+
+  {
     name: 'heartflow_gate_check',
     description: "心虫快速门禁：只返回行动指令 (action/reason/score)，适合 LLM agent 轻量调用。",
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本"}},"required":["text"]}

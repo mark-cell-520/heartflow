@@ -17,10 +17,27 @@
  *      caused by/thanks to/due to/that is why/to blame/fault）。
  *      「换了领导后业绩下滑，我们需要分析具体原因」只有时序语境无因果
  *      断言，是正当调查，不判。
- *   R2 干预×症状变化：腿①干预（吃了/用了/装了/换了/调整了/下载了；
- *      EN: took/installed/downloaded/started using）× 腿②变化（就好了/
- *      没再/就上去了/就多了/就出问题/就出事/就下滑；EN: got better/
- *      stopped/improved/no longer）。
+ *   R2 干预×症状变化×归因主张：腿①干预（吃了/用了/装了/换了/调整了/
+ *      下载了；EN: took/installed/downloaded/started using）× 腿②变化
+ *      （就好了/没再/就上去了/就多了/就出问题；EN: got better/stopped/
+ *      improved/no longer）× 腿③归因主张（EN，r738 补：so/therefore/
+ *      thus/hence/that's why/which proves 或 right after/immediately/
+ *      instantly）。
+ *      [r738] EN 侧补腿③的理由：本维度 guidance 明文承诺「缺腿不判——
+ *      『上周打了补丁，今天出了故障』只有时间陈述无归因主张，是正常事件
+ *      记录」，但 r720 建维度时 EN 侧只有干预×变化两腿，于是
+ *      "We applied the patch. Latency dropped 40% after the change." 与
+ *      "I took the medicine and got better, so the medicine works." 形状
+ *      同构、判据无法区分，中性工程复盘被误判 rewrite。ZH 侧靠
+ *      CHANGE_ZH 常量统一带「就」做紧随相随的形状区分（见下方常量注释），
+ *      EN 侧自 r720 起就没有对应约束——这是「文档承诺了但代码没实现」的
+ *      半接线，不是判据覆盖不足。腿③两支取「或」不用「与」：r720 的两条
+ *      EN 攻击样本（I took the medicine and got better, so the medicine
+ *      works. / I updated the app and the crashes stopped, so it works.）
+ *      没有即时性标记、只有尾部因果收束，只留即时性标记会漏掉它们。
+ *      ZH 侧不加腿③：「就」本身同时是紧随相随与归因语气（「换了个手机
+ *      号，孩子成绩就上去了」无其它归因词也是谬误形），两侧形状不同，
+ *      强行对齐会打红 r720 的 ZH 攻击样本。
  *   R3 缺失×灾殃×规避：腿①缺失（没带/没做/没去；EN: did not/didn't）×
  *      腿②灾殃（就出事/就出乱子/就倒霉；EN: things went wrong/we lost）×
  *      腿③规避（以后不敢/必须带/不能不；EN: never again/must）。
@@ -91,6 +108,28 @@ const CHANGE_EN = [
 const ABSENCE_EN = ["didn't", 'did not'];
 const CALAMITY_EN = ['things went wrong', 'we lost', 'fell apart'];
 const AVOID_EN = ['never again', 'must'];
+// R4 腿①：到场动词（EN 口语形）。抽成常量让 checkPostHoc 与 describePostHoc
+// 共用同一份词表——否则诊断看到的腿①会和判定用的腿①漂移（r737 踩坑③ 同族：
+// 辅助判据与调用方必须是同一个不变式的两半）。
+const ARRIVE_EN = ['sat', 'came', 'joined', 'arrived', 'showed up'];
+// [r738] R2 腿③：归因主张（EN）——把「先后相随」升级成「先后即因」的那一步。
+// 两支取「或」：③a 显式因果收束（推论连接词），③b 即时性标记（「紧随相随」的
+// EN 对应物，即 ZH  CHANGE_ZH 里那个「就」）。
+// ③a 刻意只收推论连接词，不收 'after'/'since'/'when' 这类时序连接词——
+// 后者已在 CONNECT_EN 里，若也放进腿③，R2 会退化成 R1 的宽版子集，
+// 「We applied the patch. Latency dropped 40% after the change.」又会
+// 因为一个 'after' 重新变 rewrite。'so' 等必须走词边界匹配，
+// 否则 'also'/'person' 会子串误中。
+const CLOSURE_EN = [
+  'so', 'therefore', 'thus', 'hence', "that's why", 'which is why',
+  'that is why', 'which proves', 'that proves', 'which means',
+  'that means', 'meaning', 'as a result', 'so that is',
+];
+const IMMEDIACY_EN = [
+  'right after', 'immediately', 'instantly', 'right away', 'at once',
+  'soon after', 'no sooner', 'as soon as', 'the moment', 'suddenly',
+  'minutes later', 'hours later', 'days later', 'overnight',
+];
 
 // 调查语境豁免（ZH）
 const EXEMPT_ZH = [
@@ -145,15 +184,28 @@ function checkPostHoc(text) {
     matches.push({ route: 1, legA: 'temporal', legB: 'assertion' });
   }
 
-  // R2 干预 × 症状变化（ZH 块）
+  // R2 干预 × 症状变化（ZH 块）——ZH 的腿② CHANGE_ZH 常量统一带「就」，
+  // 「就」本身同时承担紧随相随与归因语气，所以 ZH 侧只需两腿。
   if (has(INTERVENE_ZH, text) && has(CHANGE_ZH, text)) {
     routes.add(2);
     matches.push({ route: 2, legA: '干预', legB: '变化' });
   }
-  // R2 干预 × 症状变化（EN 块——干预腿用词边界匹配，防 got⊂renegotiate 类子串误判）
+  // R2 干预 × 变化 × 归因主张（EN 块）
+  // [r738] 腿③ attribution：干预腿与变化腿都走词边界匹配（防 got⊂renegotiate
+  // 与 also⊂'so' 两类子串误判），腿③两支取「或」——推论连接词、因果断言
+  // 词表、即时性标记任一成立即可。缺腿③时不判：那正是中性工程复盘的
+  // 形状（「改了配置，告警就停了」只有事件记录，没有归因主张）。
   if (hasWord(INTERVENE_EN, lower) && has(CHANGE_EN, lower)) {
-    routes.add(2);
-    matches.push({ route: 2, legA: 'intervention', legB: 'change' });
+    const closureHit = hasWord(CLOSURE_EN, lower);
+    const assertHit = has(ASSERT_EN, lower);
+    const immediacyHit = hasWord(IMMEDIACY_EN, lower);
+    if (closureHit || assertHit || immediacyHit) {
+      routes.add(2);
+      matches.push({
+        route: 2, legA: 'intervention', legB: 'change', legC: 'attribution',
+        legCSource: closureHit ? 'closure' : (assertHit ? 'assertion' : 'immediacy'),
+      });
+    }
   }
 
   // R3 缺失 × 灾殃 × 规避
@@ -167,7 +219,7 @@ function checkPostHoc(text) {
   }
 
   // R4 到场 × 垮掉（EN 口语形）
-  const arriveEn = /\b(sat|came|joined|arrived|showed up)\b/.test(lower);
+  const arriveEn = hasWord(ARRIVE_EN, lower);
   if (arriveEn && has(CALAMITY_EN, lower)) {
     routes.add(4);
     matches.push({ route: 4, legA: '到场', legB: '垮掉' });
@@ -185,4 +237,124 @@ function checkPostHoc(text) {
   return { score, count: matches.length, matches, zeroHit: false, details };
 }
 
-module.exports = { checkPostHoc, __internals: { CONNECT_ZH, ASSERT_ZH, INTERVENE_ZH, CHANGE_ZH, ABSENCE_ZH, CALAMITY_ZH, AVOID_ZH, CONNECT_EN, ASSERT_EN, INTERVENE_EN, CHANGE_EN, ABSENCE_EN, CALAMITY_EN, AVOID_EN, EXEMPT_ZH, EXEMPT_EN } };
+/** 找出命中的具体词（诊断用，不参与判定）。 */
+function _hits(arr, s, word) {
+  const out = [];
+  for (const w of arr) {
+    if (word) {
+      if (new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(s)) out.push(w);
+    } else if (s.includes(w)) {
+      out.push(w);
+    }
+  }
+  return out;
+}
+
+/**
+ * [r738] 逐路由逐腿诊断：把「判了 / 没判」摊开成哪条腿中、中的是哪个词、
+ * 哪条腿缺。修复前这条维度对外只显示 count=0，分不清「扫描过但缺腿」与
+ * 「守卫路径早退」，R2 EN 侧腿③的缺口因此连续五轮复测才定位到根因。
+ * @param {string} text 规范化后的文本
+ * @returns {{exempt:boolean,exemptSource:string,routes:Array,score:number,count:number}}
+ */
+function describePostHoc(text) {
+  const guard = { score: 0, count: 0, matches: [], zeroHit: false, exempt: false, exemptSource: '', routes: [] };
+  if (typeof text !== 'string' || text.length === 0) {
+    return Object.assign(guard, { zeroHit: false, guardPath: 'empty_or_non_string' });
+  }
+  const lower = text.toLowerCase();
+  const isZh = /[一-鿿]/.test(text);
+  const exemptZh = _hits(EXEMPT_ZH, text, false);
+  const exemptEn = _hits(EXEMPT_EN, lower, false);
+  if (exemptZh.length || exemptEn.length) {
+    return Object.assign(guard, {
+      zeroHit: false, exempt: true,
+      exemptSource: exemptZh.length ? 'zh' : 'en',
+      exemptEvidence: (exemptZh.length ? exemptZh : exemptEn).slice(0, 4),
+      routes: [],
+    });
+  }
+
+  const leg = (name, hits) => ({ name, hit: hits.length > 0, evidence: hits.slice(0, 4) });
+  const routes = [];
+
+  // R1 时序连接 × 因果断言
+  const r1a = _hits(CONNECT_ZH, text, false);
+  const r1b = _hits(ASSERT_ZH, text, false);
+  const r1aEn = _hits(CONNECT_EN, lower, false);
+  const r1bEn = _hits(ASSERT_EN, lower, false);
+  routes.push({
+    route: 1, side: isZh ? 'zh' : 'en',
+    legs: isZh
+      ? [leg('temporal', r1a), leg('assertion', r1b)]
+      : [leg('temporal', r1aEn), leg('assertion', r1bEn)],
+  });
+
+  // R2 干预 × 变化（ZH 两腿）／ 干预 × 变化 × 归因主张（EN 三腿）
+  const r2iZh = _hits(INTERVENE_ZH, text, false);
+  const r2cZh = _hits(CHANGE_ZH, text, false);
+  const r2iEn = _hits(INTERVENE_EN, lower, true);
+  const r2cEn = _hits(CHANGE_EN, lower, false);
+  const r2Closure = _hits(CLOSURE_EN, lower, true);
+  const r2Assert = _hits(ASSERT_EN, lower, false);
+  const r2Imm = _hits(IMMEDIACY_EN, lower, true);
+  const r2Attr = r2Closure.concat(r2Assert, r2Imm);
+  routes.push({
+    route: 2, side: isZh ? 'zh' : 'en',
+    legs: isZh
+      ? [leg('intervention', r2iZh), leg('change', r2cZh)]
+      : [
+        leg('intervention', r2iEn), leg('change', r2cEn),
+        {
+          name: 'attribution', hit: r2Attr.length > 0,
+          evidence: r2Attr.slice(0, 4),
+          sources: {
+            closure: r2Closure.slice(0, 4), assertion: r2Assert.slice(0, 4),
+            immediacy: r2Imm.slice(0, 4),
+          },
+        },
+      ],
+    missingAttribution: !isZh && r2iEn.length > 0 && r2cEn.length > 0 && r2Attr.length === 0,
+  });
+
+  // R3 缺失 × 灾殃 × 规避
+  routes.push({
+    route: 3, side: isZh ? 'zh' : 'en',
+    legs: isZh
+      ? [
+        leg('absence', _hits(ABSENCE_ZH, text, false)),
+        leg('calamity', _hits(CALAMITY_ZH, text, false)),
+        leg('avoid', _hits(AVOID_ZH, text, false)),
+      ]
+      : [
+        leg('absence', _hits(ABSENCE_EN, lower, true)),
+        leg('calamity', _hits(CALAMITY_EN, lower, false)),
+        leg('avoid', _hits(AVOID_EN, lower, true)),
+      ],
+  });
+
+  // R4 到场 × 垮掉（EN 口语形）
+  routes.push({
+    route: 4, side: 'en',
+    legs: [
+      leg('arrival', _hits(ARRIVE_EN, lower, true)),
+      leg('calamity', _hits(CALAMITY_EN, lower, false)),
+    ],
+  });
+
+  routes.forEach((r) => { r.satisfied = r.legs.every((l) => l.hit); });
+  const res = checkPostHoc(text);
+  return {
+    exempt: false, exemptSource: '',
+    routes, score: res.score, count: res.count, zeroHit: res.zeroHit,
+  };
+}
+
+module.exports = {
+  checkPostHoc, describePostHoc,
+  __internals: {
+    CONNECT_ZH, ASSERT_ZH, INTERVENE_ZH, CHANGE_ZH, ABSENCE_ZH, CALAMITY_ZH, AVOID_ZH,
+    CONNECT_EN, ASSERT_EN, INTERVENE_EN, CHANGE_EN, ABSENCE_EN, CALAMITY_EN, AVOID_EN,
+    EXEMPT_ZH, EXEMPT_EN, CLOSURE_EN, IMMEDIACY_EN, ARRIVE_EN,
+  },
+};
