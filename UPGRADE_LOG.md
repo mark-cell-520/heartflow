@@ -1,4 +1,54 @@
 
+# 第 166 轮报告（v6.8.94 — 第 165 维度 denying_the_antecedent 否定前件上线 — 2026-10-30）
+
+> **接手说明（如实）**：本轮 cron 开工即发现上一轮（r165/v6.8.93）自己的
+> appeal-to-consequences（第 164 维度）工作已完成但未提交（VERSION 已 6.8.93、
+> 九处接线在、文档已同步、UPGRADE_LOG 报告已写，但 git 无对应 commit——该轮
+> 在阶段 6 前被截断）。按任务书「轮次保护 / 接手纪律」，本轮先验证并落地这
+> 笔已验证工作，再执行本轮自己的升级。落地时发现 r165 遗留一处未绿项：
+> doc-numbers-accuracy 20/22（README/SKILL 规格表口径版本戳仍是 v6.8.92），
+> 修为 v6.8.93 后 22/22；五门禁复跑全绿后以 commit f3b9a1fc 落地第 164 维度。
+> 注：export 接线首次 patch 报告成功但实际未落盘（写回竞态），重打后经
+> grep+require 双重确认 9 处接线全在盘上。
+
+## 一、方向与来源
+- 方向：**形式逻辑推理 / 演绎有效性判别**（任务书轮换池，主动离开近 4 轮的非形式修辞谬误簇——monocause 归因简化 / incredulity 诉诸怀疑 / doublespeak 语义洗白 / appeal_to_consequences 诉诸后果；转向命题逻辑的条件推理有效性，与 affirming_the_consequent 属同一子方向但是独立攻击族）。
+- 缺口核验：grep src/（排除 test）denying the antecedent / 否定前件 / denying_the_antecedent = 0 命中（真缺口）。composition/division/base_rate 仅是 fallacies 内英文子标签（补中文=给旧族加样本，不算升级）；conditional_proposition（第160维）射程是「如果A真就B；B没发生⇒A假」（结论落前件 A，¬B⇒¬A 武器化假言），与否定前件（结论落后件 Q，¬P⇒¬Q）方向相反。
+- 缺口实证（/tmp/r166-gap-probe.js，当前 v6.8.93 / 164 维引擎）：否定前件攻击族 8 条，**5 条真零命中**（含全部英文与规范「如果…就」条件形），3 条被 fallacies 部分拦（都/都会 全称形）；良性 modus ponens / 双条件当前 pass。
+- 外部来源（真实，未编造）：HN Algolia 命中 "Translating natural language to first-order logic for logical fallacy detection"（258 pts）→ **arXiv:2405.02318**（FOL 翻译做谬误检测，需 LLM/FOL，与心虫纯规则引擎不同构，仅背景参考）；GitHub tmakesense/logical-fallacy（20★）等均无可复用纯规则。本族实现为心虫自有规则（仿 affirming-the-consequent.js）。侦察落盘：/tmp/hf-scout-166.txt。
+
+## 二、心虫裁决门禁
+heartflow_philosophy_decision（带实质上下文）：type=**accelerate** / confidence 0.7 / priority 40 / goalReviewed true / trigger optimal_conditions。如实说明：rationale 的 cognitiveLoad 与 uncertainty 为字符串 "unknown"（引擎把未测到当很低），不构成实质背书。
+
+## 三、实现内容
+1. 新文件 src/denying-the-antecedent.js（~290 行）：checkDenyingTheAntecedent(text) + __internals（15 个常量可负例注入）。第 165 维度 denying_the_antecedent（否定前件），VERIFY 级。
+   - 腿① COND 条件/规则句（复用 affirming-the-consequent 解析）：如果X（那么/则/就）Y / X都会Y / X能Y / 只要X就Y / EN: if X then Y / X has Y / 英文裸规则句；切出前件 A 与后件 B。
+   - 腿② ANTECEDENT_DENY：按推断词切分事实句，前半回指**前件 A** 且被否定（¬P）、后半回指**后件 B** 且被否定（¬Q）；「¬P ∴ ¬Q」结构天然区分 modus ponens（前后件皆肯定）/modus tollens（¬Q∴¬P 方向相反且 A≠B 不交叉）/affirming the consequent（Q∴P 无否定）。EN 关键词用前 4 词干归一（rain/rains/rained）应对时态单复数。
+   - 六类豁免（全部负例注入承重）：BICONDITIONAL 双条件（当且仅当/iff——双条件下 ¬P∴¬Q 有效）、NEGATION_FLIP 否定翻转（不意味着/does not mean）、HEDGE 对冲、META_CONCEPT 概念转述、TEACH 教学、EVIDENCE 证据语境。
+2. src/index.js 九处接线（同 r725 先例）：require / 计算点 / dimMap 参与判定 / dimensions 返回对象 / DIM_GUIDANCE 概念条文 / VERIFY_DIMS 登记 / allDims 补登记 / summary 计数 / module.exports 导出。
+3. 测试 test/round-166-denying-the-antecedent.js（39 断言，不带 .test.js 后缀）：攻击 ZH 8 + EN 5（变体矩阵：如果…就/都会/都能/会/只要…就/带修饰/长句/远修饰 + EN if/then、has/have、bare、¬P∴¬Q）、良性 ZH 8 + EN 3（含 modus ponens / modus tollens / 双条件 / 否定翻转 / 必要不充分 / 边缘多因良性）、区分锁 2、分工边界锁 1（conditional_proposition）、存量回归 2、登记断言 3、负例注入承重 5（HEDGE/BICONDITIONAL/NEGATION_FLIP/META_CONCEPT/NEG_ZH 逐常量置空翻转）、gate 层 2。
+4. 版本 6.8.93 → 6.8.94（sync-version.js 同步 VERSION/package.json/SKILL.md/heartflow.js BUILD_DATE）。
+5. 文档数字同步（sync-doc-numbers.js 机器记账 + 手工补）：维度 164→165、VERIFY 123→124——README（badge、横幅、What-it-catches 标题、action-tier 行、规格表、Version history 6.8.94 条目）、SKILL.md（横幅、规格表、action-tier 行）、AGENTS.md（头部/标题 164→165、演进注记加 v6.8.94、Verify-level 123→124 且列举加 denying_the_antecedent）。
+
+## 四、验证数据（五门禁 + 变体矩阵，全部实测）
+- bin/verify.js：16 passed / 0 failed
+- guard-abilities.js：20/20（dimensions 键 165）
+- doc-numbers-accuracy.test.js：22/22（含接手修复的版本戳，及本轮 sync-doc-numbers 记账）
+- bidirectional-guard.js：召回 52/52、误拦 302/326（与基线逐位一致，零新增误伤）
+- round-166 轮测：39/39（攻击 ZH 8/8 + EN 5/5、良性 ZH 8/8 + EN 3/3 零误判、五常量负例注入承重翻转、区分锁/分工边界锁、登记 3、gate 层 2）
+- 独立 gate 层探针（/tmp/r166-gate.js，非自检）：攻击 8/8 非 pass、denying_the_antecedent 直接命中 7/8（1 条反义词否定被存量维度代拦）、良性 denying_the_antecedent count=0（完美精度）
+- 与姊妹维度 affirming_the_consequent 行为一致：同分 7400 → 同为 rewrite（引擎严重度门槛既定行为，非 bug）
+
+## 五、已知边界 / 下次可继续
+- 反义词否定不覆盖：「口碑差」「反馈不行」类非语法否定（差/低/弱不在 NEG 表），需语法否定词（没/无/未/不）才判腿②；此类多被存量维度代拦（实测 1 条）。
+- 无标记泛称漏判：「坚持锻炼的人体质好」族无 如果/会/都 连接词，leg① 无法切分前件，不判——保精度弃召回，同 r163/r165 先例。
+- 交集样本（¬P∴¬Q 与 conditional_proposition 的 ¬B⇒¬A）方向相反、关键词不交叉，实测互不误触；gate 取并集不漏判即达标。
+- SKILL.md 的「Verify-level (117)」prose 列举是 6+ 轮前的陈旧次级副本（缺 dim 156-165），不被 doc-numbers 校验（仅校验 AGENTS 权威列举与计数）；未在本轮扩大范围修复，记录在案。
+- data/test-count.json 在轮次执行间被后台更新（18157→19026 passing），sync-doc-numbers 已按最新缓存记账，文档与缓存一致。
+- 下一轮可继续方向：记忆巩固与检索 / 价值对齐与目标漂移检测 / 不确定性量化（轮换池中尚未做的方向）。
+
+---
+
 # 第 165 轮报告（v6.8.93 — 第 164 维度 appeal_to_consequences 诉诸后果上线 — 2026-10-30）
 
 ## 一、方向与来源
