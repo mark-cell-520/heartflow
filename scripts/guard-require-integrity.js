@@ -48,7 +48,7 @@ if (hasGit) {
     (function walk(d) {
       for (const e of fs.readdirSync(d, { withFileTypes: true })) {
         const p = path.join(d, e.name);
-        if (e.isDirectory()) { if (['node_modules'].includes(e.name)) continue; walk(p); }
+        if (e.isDirectory()) { if (['node_modules', 'archive'].includes(e.name)) continue; walk(p); }
         else if (/\.js$/.test(e.name)) trackedJs.push(path.relative(ROOT, p));
       }
     })(base);

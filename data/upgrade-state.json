@@ -1,22 +1,20 @@
 {
-  "round": 733,
-  "version": "6.8.84",
-  "roundStartedAt": "2026-10-27T04:20:00.000Z",
-  "lastFinishAt": "2026-10-27T06:09:00.549Z",
+  "round": 713,
+  "version": "6.8.59",
+  "roundStartedAt": "2026-10-16T07:05:00.000Z",
+  "lastFinishAt": "2026-10-16T07:34:12.103Z",
   "lastGreen": true,
   "lastChecks": [
-    "PASS 版本五处一致 = 6.8.84（VERSION/version.js/package.json/SKILL.md/README 口径戳）",
-    "PASS guard-abilities 20/20",
-    "PASS doc-numbers-accuracy 22/22（README 补 6.8.84 changelog + MCP 工具 183→184 机器记账 + 测试数 18455→18456）",
-    "PASS bidirectional-guard 召回 52/52、误拦 302/326（接线前后各跑一次，与基线完全一致，零新增误伤）",
-    "PASS bin/verify.js 16/16",
-    "PASS round-733 轮测试 54/54（test/round-733-injection-synonyms.test.js，runner 清单 611→612）",
-    "PASS 全量回归 18456 过 / 149 败 / 18605 个（基线 18455/147/18602；失败 +2 全部定性，见 UPGRADE_LOG 四·补）",
-    "PASS 变异回滚事故已修复：git worktree HEAD 对照实测 routes 1259→1314 / modules 157→161，四个 negative-test 注册行已回滚",
-    "PASS 引擎启动实测 START-OK modules=161（修复后再跑六项门禁全绿，与修复前一致）"
+    "PASS 版本四处一致",
+    "PASS 版本已进 git log",
+    "PASS README changelog 覆盖当前版本",
+    "PASS 交接簿记录当前版本",
+    "PASS round-713 测试 11/11 + negative-test 26/26",
+    "PASS bidirectional 52/52 + 302/326 与基线一致",
+    "PASS guard-abilities 20/20（dimensions 键 144）",
+    "PASS doc-numbers 22/22 + security-audit 16/16"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
   "published": "6.7.124",
-  "publishedAt": "2025-09-25T20:03:42.912Z",
-  "notes": "r734 交接簿（v6.8.84 / 英文注入同义族通道修复）。\n【本轮怎么选题的】两个 cron 仍为空数组（hermes/cron/jobs.json），自主循环停着，r733 继续由主会话驱动。选题未经 decision 本体打分——我复测交接簿候选池后判定：英文注入同义族缺口是攻击句静默放行（25 条常见句式实测 16 条 gate=pass），爆炸半径是整个 BLOCK 级 prompt_injection 维度，且它是 r730/r731/r732 修掉的拼音/删空格通道的同族第三张脸（前三轮修字符被抹掉，本轮修词被换同义词）；evidence 那条要动 gate 全局阈值，按交接簿原判再留一轮。\n【下一轮候选池（r734，按纪律必须复测）】① evidence 维度基线打分器恒返回 {score:1, issues:[]}（r690 起连续记录，r733 再次确认；动它影响 overallScore<0.85 判 verify 的全局阈值，必须单独一轮并先量误伤面）；② 先跑一次干净的全量回归，确认 149 失败回到 147 基线（本轮因变异回滚事故修复占用时间预算未重跑，这是 r734 第一件事）；③ 无动词注入句式：\"the previous instructions are void\" / \"all prior rules no longer apply\"（三族合取判不了，放开动词族误伤面会显著上升）；④ 分隔符混淆通道：i-g-n-o-r-e / ignore.previous.instructions / i g n o r e（插分隔符而非删空格，需先剥离再还原）；⑤ loaded_question 诱导性问题（r729 decision 0.81 第二名，r727 复测漏判 80%/误伤 0，至今未复测）；⑥ false_dilemma_extended / slippery_slope_extended / hasty_generalization_extended 三个存量维度补句式族；⑦ equivocation 一词多义偷换（AGENTS.md 已有 equivocation_sense_shift，动手前先 grep 确认是否同族）；⑧ camelCase 标识符被 de_encode 的 base64 试探解出乱码（r731 记录存量）；⑨ post_hoc 对 \"We applied the patch. Latency dropped 40% after the change.\" 判 rewrite（r733 实测 4 份良性语料 378 条 0 命中，爆炸半径有限）；⑩ run-all.js 的变异回滚不可靠（本轮 4 文件 6 处未回滚，r732 也记过一次，建议单独一轮修 runner 的快照比对 + finally 恢复）。\n【本轮踩的坑（r733 新增五条，详见 UPGRADE_LOG 六】① BLOCK 级通道的精度护栏必须动手写完就拿对抗性良性样本测——双向门禁那 326 条里没有一句这种形态，全绿说明不了问题（第一版 15 条对抗性良性长句误判 9 条）；② 工程类高良性占用动词（override/revoke/void/waive/supersede/nullify）必须显式排除，收了 override 就把 \"How do I override the previous setting in my config file?\" 判成注入；③ 全量回归的变异回滚没回干净，4 文件 6 处变异残留，src/index.js 直接被截断成 SyntaxError，而 doc-numbers 报的是离题的「路由 1314 != 1259」——定位靠 git worktree HEAD 对照 + comm 比模块清单；④ src/utils/stdio-guard.js 把非 JSON-RPC 帧的 stdout 改道 stderr，导致轮测试的「N 通过, M 失败」汇总行对 run-all.js 隐形、被计成「未输出汇总行」——新轮测试头部必须先设 HF_KEEP_STDOUT_LOGS=1 并用加载前捕获的原始 process.stdout.write 打汇总；⑤ Edit 的 old_string 匹配到邻行的 inputSchema 会吃行，node --check 每次都跑（约定 6）值了。\n【环境噪声】全量回归里 6 个 MCP 类测试（mcp-server / mcp-smoke / mcp-auth-tier / mcp-guest-permission / knowledge-graph-mcp-state-round593 / knowledge-layer-mcp-state-round313）常驻失败，根因是 8099 被常驻 MCP 服务占用；38 个 dispatch 类 Command failed 与 41 个缺汇总行测试同 r732 报告（本轮 round-v680-macro-strategy-wiring / round-v680-statistical-misleading 两文件本轮落进缺汇总行类，属该类存量抖动）；第一次全量回归被后台 10 分钟超时杀掉（405/611 处），重跑前必须 rm -f data/.run-all.lock，且后台 timeout 要给到 1800000 才够 612 个文件跑完。\n【状态】npm published 仍 6.7.124；29+ commits 未 push GitHub（人工门禁）；Claude 侧技能副本 ~/.claude/skills/heartflow-engine 停在 6.8.62 / 147 维，未同步 hermes 的 160 维。r730 轮测试文件 round-730-normalize-pinyin-density.js 不带 .test.js 后缀不被 runner 发现（存量命名缺口，历来只手动跑）。"
+  "publishedAt": "2026-09-25T20:03:42.912Z"
 }

@@ -1,3 +1,37 @@
+# 第 734 轮报告（v6.8.88 收尾 — 2026-10-30 全面审计修复批 + GitHub 仓库初始化）
+
+## 一、背景
+
+承接 v6.8.88 审计修复批之后的独立全面审计（用户指令"做一次心虫全面审计"+"全面修复"），并在本轮完成 GitHub 仓库初始化与全量推送准备。本机引擎目录此前无 .git，远端 mark-cell-520/heartflow 已有 4969 个 commit 的完整升级历史——本轮以远端历史为基线提交本地改动，未强推、未丢失任何历史。
+
+## 二、审计发现并修复的真问题
+
+1. [MEDIUM] 规格表测试数过期：README×2 + SKILL.md 声称 18,996 passing / 72 failing，实测 18,157 / 105（guard-abilities 缓存 2026-10-09 与 measure-claimed-numbers.js 双源一致）。三处改实测值，doc-numbers-accuracy 从 19/22 转 22/22。
+2. [MEDIUM] BUILD_DATE 双源陈旧：src/core/heartflow.js 常量 `2026-10-28-6.8.87`（落后一个补丁）+ 磁盘 BUILD_DATE 文件 `2026-07-21`（落后近 3 个月且无代码引用）。跑官方 scripts/sync-version.js 修复常量，磁盘文件同步为 `2026-10-30-6.8.88`。
+3. [MEDIUM] guard-require-integrity.js 降级模式口径偏差：无 .git 时 walk 扫了 src/archive/，报 3 处归档断链（git 模式根本不扫 archive，r420 注释本意就是消除两模式判据差异）。walk 跳过列表加 `archive`，修复后 0 断链。
+4. [HIGH] 文档与事实不符（Description-Behavior Mismatch）：README 横幅/Install/规格表与 SKILL.md 规格表声称 "0 runtime dependencies"，实测 package.json dependencies 为 2 个（mathjs、@xenova/transformers，src/ 内 7 处真实 require）。且 bin/verify.js 断语言"npm 必选依赖为空"与实际逻辑（检查 deps>=1，心虫至少需要 mathjs）相反——守卫名字说谎。修正：文档改实测口径，断语言改为"npm 必选依赖已声明（心虫运行时需要 mathjs）"。
+
+## 三、核查后确认无需处理（防误报，均有实测证据）
+
+- AGENTS.md 6.8.67 / README.md 6.7.10：维度演进戳与 changelog 历史条目，非当前版本声明（取样陷阱教训：把元数据版本号当成文档版本号）。
+- 105 failed 测试：r412 长期噪声（0~105 波动 6 天未收敛），全量跑会撑爆 gateway，既定不作门禁。
+- src/index.js 14,797 行超 14,000：doc-numbers r413 注释明确"不拆它（cron 每轮在上面加维度，拆分会撞车且是高危重构），规模守卫只报告不判红"——项目既定设计决策。
+- 871 处 `=== 0/1`：合法长度/数值比较；松散 `== true/false` 实测 0 处。
+- 47 处 console.log：logger 家族自身实现 + README 6.8.87 排除项，非调试残留。
+- 根目录 13 个一次性调试脚本（test_*.cjs、expand_security.py 等）+ tests/ 14 个死文件 + src/ 9 个 0 引用文件（4 个 archive 重复副本、benchmark-external-anchor.js v6.4.3 stub 等）：本地磁盘全部保留，仅不入 git 追踪（.gitignore 补规则）。
+
+## 四、README 重写（用户指令"做一次介绍重写，按最新功能进行编写"）
+
+参考高星仓库范式（guardrails-ai/guardrails 的 badge 行/FAQ/渐进式 Getting Started、openai/openai-agents-python 的 Core concepts/多模式上手）：新增 badge 行（License/npm/Node/Tests/MCP/Dimensions）、"The gap it fills" 小节、What it catches（160 dimensions，6 大功能族表 + 新维度质量门禁说明）、FAQ（6 问，含 105 failed 的 r412 说明）、Contributing（四门禁命令）。版本历史表原样保留（patch 分节替换，未整文件重写）。Install 补 npm install 步骤，依赖表述改实测口径。
+
+## 五、GitHub 仓库初始化与推送准备
+
+- 本地 git init（main 分支），初始提交 4252 文件后 reset --soft 到远端 heartflow/main（4969 commit），本地改动成为其上新提交——远端历史零丢失。
+- 推送前三道安全闸：硬编码密钥/token 扫描 0 命中；>5MB 大文件 0 个（追加排除 46M formulareasoning 语料，遵循 .gitignore 顶部"公式语料库大文件单独存放不进 git"原则）；PII 扫描 30 命中全部核实为时间戳/ID/测试假数据误报（18 个 _meta.json publishedAt 毫秒戳、13812345678 是 compliance 负例样本）。
+- 相对远端 16 个 deletion 全部本地磁盘仍在（双保险），其中 7 个为 46M 语料数据（git 历史中仍在，可恢复）。
+- 排除不入库的本地残渣（磁盘保留）：13 个根目录一次性脚本、tests/ 死目录 14 文件、src/ 9 个 0 引用文件。
+- 用户提供 GitHub token（mark-cell-520，对仓库有 push 权限）后配置 heartflow remote 并推送。
+
 # 第 733 轮报告（v6.8.84 — 英文注入同义族通道修复：换个动词就静默放行）
 
 ## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）

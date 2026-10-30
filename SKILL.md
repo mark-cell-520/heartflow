@@ -89,10 +89,10 @@ from marketing copy.
 | Dispatch routes | 1,314 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 160 | `dimMap` keys in `src/index.js` |
 | MCP tools | 184 | tool definitions exposed via `tools/list` |
-| Test suite | 18,996 passing / 72 failing | `node test/run-all.js` (4-slice aggregate; failed set is pre-existing runner/flaky noise — s2/s3 byte-identical to pre-change baseline) |
+| Test suite | 18,157 passing / 105 failing | `node test/run-all.js` (4-slice aggregate; failed set is pre-existing runner/flaky noise — s2/s3 byte-identical to pre-change baseline) |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
-| Runtime dependencies | 0 | `dependencies` in `package.json` is empty |
+| Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
 
 |Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
 a `rewrite`, **119 request `verify`**. The remainder contribute to the overall score

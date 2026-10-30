@@ -20,6 +20,7 @@ const ALLOWED_ROOTS = [
   path.resolve(process.cwd(), 'data'),
   path.resolve(process.cwd(), 'tmp'),
   path.resolve('/tmp'),
+  _os.tmpdir(),                                    // [SAFE-FS] os.tmpdir() 不一定是 /tmp（TMPDIR 指向处），不纳入则 reflection/kv-cache 临时目录被误判越界
 ];
 
 // [v6.5.5 AUDIT-FIX P2-3] 写操作禁止覆盖的路径前缀/后缀（防意外或恶意覆盖引擎源码与配置）

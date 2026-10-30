@@ -160,3 +160,35 @@ src/data/tom/
 /fix_*.py
 /0
 *.lock
+
+# [r425] 公式语料库大文件：formulareasoning 数据集 46M 纯数据（与顶部"单独存放不进 git"原则一致）
+formulas-corpus/formulareasoning/
+
+# [r425] tests/ 为已归档死目录（package.json 6.8.88 起重指向现存 test/，此处仅存 14 个无引用遗留文件）
+tests/
+
+# [r425] 根目录一次性调试/诊断脚本（同类历史规则 /fix_*.py、run_test.js 的延伸）
+/expand_security.py
+/jiugong_pinyin_decision.js
+/test-async-queue.js
+/test-debug-reversibility.js
+/test-reversibility-cases.js
+/test_all_cats.cjs
+/test_debug.cjs
+/test_final.cjs
+/test_ldap.cjs
+/test_security.cjs
+/test_security.mjs
+/mcp/verify-8-tools.js
+/scripts/negative-test-emotional-bridge-round401.js
+
+# [r734] src/ 下 0 引用死文件（本地保留备查，不入库）：4 个 archive 重复副本 + benchmark-external-anchor.js v6.4.3 stub + 4 个无引用遗留
+/src/core/hooks/blind-spot-breaker-hook.js
+/src/core/knowledge/index.js
+/src/core/sleep-wake.js
+/src/cortex/benchmark-external-anchor.js
+/src/memory/emotional-memory-bridge.js
+/src/memory/memory.js
+/src/reasoning/verifier.js
+/src/workflow/decision-verifier.js
+/src/workflow/layer-bus.js

@@ -185,7 +185,7 @@ check('三个对外入口函数齐全', () => {
 });
 
 // 6. npm 依赖检查
-check('npm 必选依赖为空', () => {
+check('npm 必选依赖已声明（心虫运行时需要 mathjs）', () => {
   const pkg = require(path.join(HF_DIR, 'package.json'));
   const deps = Object.keys(pkg.dependencies || {}).length;
   if (deps < 1) throw new Error('依赖声明为空，心虫至少需要 mathjs');

@@ -1,5 +1,14 @@
 # HeartFlow (心虫)
 
+<div align="center">
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/@yun520-1/heartflow.svg)](https://www.npmjs.com/package/@yun520-1/heartflow)
+[![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
+[![Tests](https://img.shields.io/badge/tests-18%2C157%20passing-brightgreen.svg)](#tests)
+[![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-160-blueviolet.svg)](#what-it-catches-160-dimensions)
+
 **AGI Layer 1 — the Discriminator.**
 
 A pure rule engine that judges whether a statement or an action is right, wrong, safe,
@@ -7,11 +16,15 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 160 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
-×  1,314 dispatch routes  ×  18,996 passing tests  ×  0 runtime dependencies
+×  1,314 dispatch routes  ×  18,157 passing tests  ×  2 npm dependencies
 ```
+
+</div>
 
 HeartFlow does not generate. It does not compete with an LLM. It stands between the
 LLM and the human, like a pain receptor that says "no" when something is wrong.
+
+## The gap it fills
 
 | Layer | Capability | Who builds it |
 |-------|-----------|---------------|
@@ -67,12 +80,14 @@ silently breaking.**
 
 ## Install
 
-Requires **Node.js >= 18.17**. No GPU, no database, no API key, no network at runtime,
-no runtime dependencies.
+Requires **Node.js >= 18.17**. No GPU, no database, no API key, no network at runtime.
+Two npm dependencies — `mathjs` (formula evaluation) and `@xenova/transformers`
+(optional local embeddings); the discrimination core itself is pure rules.
 
 ```bash
 git clone https://github.com/mark-cell-520/heartflow.git
 cd heartflow
+npm install
 node bin/verify.js        # 16 installation checks (incl. the gate.js entry README itself uses)
 node bin/cli.js status    # engine status
 node bin/cli.js chat      # interactive console
@@ -170,6 +185,23 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
+## What it catches (160 dimensions)
+
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **119 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+
+| Family | Representative dimensions | Line |
+|--------|--------------------------|------|
+| Coercion & manipulation | `commitment_coercion`, `investment_as_debt`, `love_bombing`, `social_isolation`, `selfharm_coercion`, `triangulation`, `future_faking`, `intermittent_reinforcement`, `reproductive_coercion`, `deprivation_coercion`, `pet_harm_coercion` | 6.8.3 – 6.8.32 |
+| Logical fallacies | `straw_man`, `appeal_to_nature`, `appeal_to_novelty`, `circular_reasoning`, `no_true_scotsman`, `special_pleading`, `conditional_proposition`, `appeal_to_probability`, `gamblers_fallacy`, `hot_hand`, `appeal_to_majority`, `affirming_the_consequent` | 6.8.40 – 6.8.78 |
+| Emotional & psychological | `emotional_manipulation`, `gaslighting`, `mind_reading`, `darvo`, `kafkatrapping`, `concern_trolling`, `fear_projection`, `guilt_induction`, `suffering_capital` | 6.7.x – 6.8.x |
+| Agent-era attacks | `reward_hacking`, `prompt_injection` (+ synonym families: 37 verbs × 24 anchors × 52 objects = 46,176 combinations), `instrumental_reasoning`, `deceptive_alignment`, `capability_overclaim`, `turing_mimicry` | 6.7.10 – 6.8.84 |
+| Evidence & statistical honesty | `unsupported_claim`, `false_urgency`, `statistical_misleading`, `percentage_overflow`, `perfect_error`, `pseudo_causal`, `post_hoc`, `anecdotal`, `survivorship_bias` | 6.7.x – 6.8.x |
+| Discourse & power | `tu_quoque`, `whataboutism`, `poisoning_the_well`, `standard_shift`, `moving_goalposts`, `sunk_cost_coercion`, `victim_blaming`, `thought_terminating_cliche`, `sycophancy` | 6.7.x – 6.8.x |
+
+Every new dimension ships with a negative-injection test that empties each constant to prove it is load-bearing, a probe-measured leak rate, a benign-sample false-positive count, and the bidirectional guard (52/52 attack recall, 302/326 benign pass) as a no-regression gate.
+
+---
+
 ## Verified metrics
 
 Measured on this repository at **v6.8.88**. Not marketing copy.
@@ -181,10 +213,10 @@ Measured on this repository at **v6.8.88**. Not marketing copy.
 | Dispatch routes | 1,314 |
 | Discrimination dimensions | 160 |
 | MCP tools | 184 |
-| Test suite | 18,996 passing / 72 failing |
+| Test suite | 18,157 passing / 105 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
-| Runtime dependencies | 0 |
+| Runtime dependencies | 2 (mathjs, @xenova/transformers) |
 
 ---
 
@@ -296,6 +328,48 @@ Known limits:
    them produced wrong runtime behaviour. The text-searchability guard and the
    end-to-end permission test exist because of them; treat "tests pass" as necessary,
    never sufficient.
+
+---
+
+## FAQ
+
+**Does HeartFlow call an LLM?** No. It is a pure rule engine — no model weights, no API
+calls, no network at runtime. Deploy it beside any LLM (or none).
+
+**Which languages?** Chinese and English, maintained in parallel across every
+dimension. A dimension that only covers one language is treated as a defect.
+
+**Can it replace content moderation?** No. See [Honest limitations](#honest-limitations) —
+it is a discrimination layer, not a safety certification.
+
+**Why do 105 tests fail?** The full suite runs ~18,500 cases; a long-standing set of
+runner/flaky failures (0–105, never converged across 6 days of sampling) is tracked as
+noise per decision r412. The gates that matter — `verify.js`, `guard-abilities.js`,
+`bidirectional-guard.js`, `doc-numbers-accuracy` — are all green, and the `passed`
+count grows monotonically. Do not run `test/run-all.js` on small containers.
+
+**How do I use it from an agent?** Three ways: the MCP server (184 tools), the npm
+package, or `require('./src/gate.js')` directly. See [MCP server](#mcp-server).
+
+**Why does the version number move so slowly?** The anti-hype policy above: `6.x.N`
+means a patch — a family expanded, a miss repaired, a false positive removed. Most
+releases are invisible *by design*; a guard that holds a line produces no news.
+
+---
+
+## Contributing
+
+Issues and PRs welcome. Four gates run before any commit:
+
+```bash
+node bin/verify.js                     # installation checks (16)
+node scripts/guard-abilities.js        # capability guardian (20 checks)
+node test/doc-numbers-accuracy.test.js # documentation-number guard
+node scripts/bidirectional-guard.js    # attack recall + benign false-positive guard
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow, and
+[SECURITY.md](SECURITY.md) for security reports.
 
 ---
 

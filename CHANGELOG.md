@@ -1,3 +1,14 @@
+## [6.8.88] - 2026-10-30
+
+### Fixed
+- **Documentation accuracy (full audit patch)**: README/SKILL.md spec tables claimed 18,996 passing / 72 failing tests; measured values are 18,157 / 105 (guard-abilities cache 2026-10-09 and measure-claimed-numbers.js agree). `BUILD_DATE` was two sources stale (`2026-10-28-6.8.87` constant, `2026-07-21` file); synced to `2026-10-30-6.8.88` via the official `scripts/sync-version.js`.
+- **guard-require-integrity.js degraded-mode scope**: without `.git` the walker scanned `src/archive/` and reported 3 archived broken links that git mode never scans (the r420 comment's own intent); the walker now skips `archive`, matching both modes. 0 broken links after the fix.
+- **"0 runtime dependencies" was false**: `package.json` declares 2 (`mathjs`, `@xenova/transformers`; 7 real `require` sites in `src/`). README banner/Install/spec table and SKILL.md spec table corrected; `bin/verify.js`'s assertion renamed from "npm 必选依赖为空" (it actually checks deps >= 1) to "npm 必选依赖已声明（心虫运行时需要 mathjs）".
+
+### Changed
+- **README rewritten** against high-star repository conventions (Guardrails / OpenAI Agents SDK): badge row, "The gap it fills", a "What it catches" section mapping the 160 dimensions into 6 families, FAQ (including the r412 noise explanation for the 105 tracked failures), and Contributing gates. The full version-history table is preserved untouched.
+- **GitHub repository initialized**: 4,252 files committed on top of the existing 4,969-commit remote history (no force-push, no history loss). Pre-push gates: 0 hardcoded secrets, 0 files >5MB (46M formula corpus excluded), all 30 PII hits verified as timestamps/IDs/test fixtures.
+
 ## [6.7.69] - 2026-09-18
 
 ### Added
