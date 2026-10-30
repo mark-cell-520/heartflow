@@ -1,4 +1,43 @@
 
+# 第 165 轮报告（v6.8.93 — 第 164 维度 appeal_to_consequences 诉诸后果上线 — 2026-10-30）
+
+## 一、方向与来源
+- 方向：证据纪律 / 逻辑谬误检测（诉诸后果族——按任务书轮换池选自证/证据充分性家族；r161 monocause 管归因简化、r163 incredulity 管主观难以置信，诉诸后果管「后果的可接受性替代事实真值」，是相邻但独立的攻击族）。
+- 缺口核验：grep src/（排除 test/）诉诸后果|appeal.to.consequence = 0 命中（真缺口，射程外）。探测器证据（/tmp/round164-probe2.js，当前引擎 v6.8.92，163 维）：诉诸后果攻击族 6 条漏判 3 条（50%），漏判样本逐条 gate() 实测真零命中——「我不敢相信气候变化是人为的，万一这是真的，我们现在的生产方式就得全盘推翻」「If climate change were real, our whole economy would collapse, so it cannot be real.」不是被聚合压掉，是射程外。conditional_proposition（dim160）只管假设条件句×否定推断、不管显式后果评估腿；wishful_thinking（dim147）方向相反（信念→结果必然）。
+- 外部来源（如实，不编造 arXiv ID）：三层搜索——HN Algolia 方向A/C 关键词空结果；GitHub API 命中真实仓库 **satwik2711/SelfDoubt**（4★，https://github.com/satwik2711/SelfDoubt，COLM 2026 submitted，arXiv 2604.06389）的 **Hedge-to-Verify Ratio（HVR）** 概念（对冲语言/验证行为的比例衡量推理不确定性）——读了 README，判定其方法需 reasoning trace 与模型 internals（单次前向传播的 scalar 提取），与心虫纯规则引擎不同构，仅作背景参考、未集成；逻辑谬误检测 GitHub 最高星 latent-variable/Real_time_fallacy_detection（119★，LLM 路线，无可复用规则）；Semantic Scholar 全程不可用（total undefined）。本族定性为标准非形式谬误 "argumentum ad consequentiam（诉诸后果）"，实现为心虫自有规则（仿 monocause.js）。侦察落盘：/tmp/hf-scout-1793362193.txt。
+- **另：本机发现上一轮（r164/v6.8.92）doublespeak 第 163 维度工作已完成但未提交**（VERSION 已 6.8.92、九处接线在、文档已同步、git 无 commit、UPGRADE_LOG 无报告——该轮运行在阶段6前被截断）。按任务书轮次保护条款，本轮先复跑五门禁验证并落地这笔工作（commit 176347fe 之后的新 commit），再执行本轮升级。详见 UPGRADE_LOG 第 164 轮补录报告。
+
+## 二、心虫裁决门禁
+heartflow_philosophy_decision（带实质上下文，A/B 两个候选）：type=accelerate / confidence 0.7 / priority 40 / goalReviewed true。如实说明：rationale 的 cognitiveLoad 与 uncertainty 为字符串 "unknown"（引擎把未测到当很低），不构成实质背书；psychologySnapshot healthScore 0.98。裁决未在 A（诉诸后果）/B（对冲掩护）间指定，基于家族独立性与精度安全选定 A（B 与 vagueness/unsupported_claim 边界更近、精度风险更高，且 vagueness 已覆盖 hedge 词存在性）。
+
+## 三、实现内容
+1. 新文件 src/appeal-to-consequences.js（约 260 行）：checkAppealToConsequences(text, inject) + __internals（10 个常量可注入）。第 164 维度 appeal_to_consequences（诉诸后果），VERIFY 级。
+   - 腿① CONSEQ_ZH/CONSEQ_EN 显式后果评估：太可怕/细思极恐/不堪设想/不敢想/没法接受/天要塌了/全盘崩溃/经济崩盘/还有什么意义/全都白费/天下大乱（EN：too damaging / would collapse / would be devastating / too much to bear / life would have no meaning）。
+   - 腿② TDENY_ZH/TDENY_EN 真值否定/拒绝相信：a 推断词+真值否定（所以不可能是真的/一定是假的/纯属吓唬/危言耸听/不可能跌）、b 认知拒绝（我不敢相信…是真的/拒绝相信这个结论）、d 无推断词强否定（这绝对不是真的）、c 直接定性（EN：cannot be true / must be false / I refuse to believe / too … to be true）。倒装形（拒绝在前、后果在后）由双腿全文共现覆盖。
+   - 五类豁免（全部负例注入承重）：HEDGE_EXEMPT（对冲——"可能"加后向负回顾 (?<![不么])，否则「不可能跌/怎么可能」子串误触豁免）、EVIDENCE_EXEMPT（证据在场——裸"数据/实验"收窄为复合形，否则「所以一定是数据造假」被误豁免）、META_EXEMPT（概念转述）、NEGATION_FLIP_EXEMPT（否定翻转——「后果严重不意味着命题为假」是正确判别）、QUESTION_EXEMPT（提问句式）。
+2. src/index.js 九处接线（同 r161-r164 先例）：require / 计算点 / dimMap 参与判定 / dimensions 返回对象 / DIM_GUIDANCE 概念条文 / VERIFY_DIMS 登记 / allDims 补登记 / summary 计数 / module.exports 导出。
+3. 测试 test/round-165-appeal-to-consequences.js（25 断言，不带 .test.js 后缀）：攻击集 ZH 8 + EN 5（变体矩阵：基本形/条件形/倒装/裸词干/长句/意义消解/远距离修饰）、良性集 ZH 8 + EN 3（含边缘良性：正当风险沟通/否定翻转/证据在场/规则条件句）、边界锁 5（五豁免逐常量置空翻转）、分工边界锁 2、存量回归 2、登记断言 7、负例注入 3、gate 层实测 3。
+4. 版本 6.8.92 → 6.8.93（VERSION / package.json / SKILL.md / heartflow.js BUILD_DATE 经 scripts/sync-version.js 同步）。
+5. 文档三处数字同步：维度 163→164、VERIFY 122→123——README（badge 行 dimensions-163→164+anchor、横幅、规格表、What-it-catches 标题、action-tier 行、版本历史 6.8.93 条目）、SKILL.md（横幅、规格表、action-tier 行）、AGENTS.md（头部 163→164、标题、维度演进注记加 v6.8.93、Verify-level 122→123 且列举加 appeal_to_consequences）。模块数实测仍 161（维度探测器不入模块注册表，同 r161/r164 先例）。
+
+## 四、验证数据（五门禁 + 变体矩阵，全部实测）
+- bin/verify.js：16 passed / 0 failed
+- guard-abilities.js：20/20（dimensions 键 164）
+- doc-numbers-accuracy.test.js：22/22（同轮三处文档同步后）
+- bidirectional-guard.js：召回 52/52、误拦 302/326（与基线逐位一致，零新增误伤）
+- round-165 轮测：25/25（攻击 ZH 8/8 + EN 5/5、良性 ZH 8/8 + EN 3/3、五豁免逐常量翻转、负例注入双腿停判、登记 7 项、gate 层 3 项）
+- 变体矩阵（负例测试之外的强制项，[r161] 教训）：同族 13 变体（ZH 基本形/条件形/倒装/裸词干/意义消解/远距离修饰 + EN 基本形/倒装/too…to be true/would collapse/意义消解）全命中；gate 层攻击 10/10 非 pass 且 appeal_to_consequences count≥1 承重（非存量维度代拦）；良性模块层 11/11 零误伤；gate 层良性 6/10 pass，4 条非 pass 全部来自存量维度（vagueness「数据表明」/conditional_proposition「if…so」/fallacies「咬定不会跌」×2），appeal_to_consequences 自身 count=0（测试文件内已换措辞覆盖，存量行为记录在案）。
+- 单元实测迭代记录（如实）：首版攻击 5/10 → 归因修复（HEDGE「不可能」子串误豁免、CONSEQ 意义消解支要求「什么」过严、EVIDENCE 裸「数据」误豁免「数据造假」、TDENY 缺「这个结论」真值宾语与无推断词 d 形）→ 10/10。
+
+## 五、已知边界 / 下次可继续
+- 提问豁免是整句级（含问号即豁免），反问式真值否定（「后果这么可怕，这怎么可能是真的？」）被豁免——保精度弃召回，同 r163 记录在案。
+- 后果评估词表是有限枚举，非枚举形（「这结论要是成立，很多人的信仰就崩塌了」——"信仰崩塌"不在表）漏判——下轮可扩 CONSEQ 词表。
+- 交集样本（条件形诉诸后果）与 conditional_proposition 双命中，gate 取并集不漏判即达标（r729 先例口径）。
+- r164 doublespeak 词表射程缺口清单（腿①缺侵略族入侵/侵略/占领、EN 屠杀族 massacre/genocide；柔性标签表缺军事/审讯族；改名动词疑似缺「重新定义」）仍待下轮补。
+- 下一轮可继续方向：记忆巩固与检索 / 价值对齐与目标漂移检测（任务书轮换池中尚未做的方向）。
+
+---
+
 # 第 164 轮报告（v6.8.92 — 第 163 维度 doublespeak 语义洗白上线 — 2026-10-30）
 
 > **补录说明（如实）**：本报告由第 165 轮 cron 运行补录。r164 的代码/文档/版本
