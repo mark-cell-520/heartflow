@@ -1,3 +1,17 @@
+## [6.8.106] - 2026-10-31
+
+### Added
+- **`conjunction_fallacy` — dimension 176 (合取谬误 / conjunction fallacy / Linda problem)** — 把合取事件（A 且 B）的概率/可能性宣称高于其任一组分事件（A 或 B）的概率，违反概率公理 P(A∧B) ≤ P(A)：两个条件同时满足的场合必然少于任一条件单独满足的场合，与描述生动与否无关；把合取描述得更具体就认为它「更可能」，是把叙事的代表性冒充概率的大小。判据三腿共现（缺一不判）：腿① CONJ 合取标记（组合形/裸词形/裸连接词「且」「以及」×概率词邻近）、腿② PROB 概率词（概率/可能性/几率；EN probability/probable/chance/likelihood/odds/likely）、腿③ CMP 概率比较结构两条路线（算子×组分回指「只是/alone」；双概率词夹算子覆盖数学陈述形与倒装形）。
+- `src/conjunction-fallacy.js` — new detector module with 19 injectable constants (CONJ_PAIR/BARE/AND_ZH×EN, PROB_ZH×EN, CMP_OP/BACK_ZH×EN, GROUP_SUFFIX_ZH×EN, EXEMPT_CONCEPT/NEG/HEDGE_ZH×EN) plus group-conditional structural exemption (P(结果|X∧Y) vs P(结果|Y) 可能为真，不判) and same-sentence second-CONJ rule.
+- `test/round-178-conjunction-fallacy.js` — negative-injection + variant-matrix suite (29 assertions).
+
+### Verification
+- round-178 suite: 29/29 (attacks 10/10 incl. ZH/EN, bare-noun short form, modified, inverted conclusion-first, long form; benign 11/11 incl. edge-benign correct multi-cause statement and group-conditional comparisons; 12 constant negative-injection load-bearing; 6 exemption-trap flips incl. ZH/EN group-form flips; hedge-does-not-swallow-可能性 check)
+- Gate variant matrix: attacks 7/7 non-pass with conjunction_fallacy in findings; benign 5/5 pass
+- Bidirectional guard: recall 52/52, false-block 302/326 (92.6%, unchanged — zero new false positives)
+- `bin/verify.js` 16/16; `guard-abilities.js` 20/20 (176 dimension keys); `doc-numbers-accuracy.test.js` 22/22
+- Measured: 176 dimensions (BLOCK 11 / REWRITE 19 / VERIFY 135), 161 modules, 184 MCP tools, 1,314 routes
+
 ## [6.8.105] - 2026-10-31
 
 ### Added

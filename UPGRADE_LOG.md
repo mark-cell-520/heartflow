@@ -1,3 +1,34 @@
+# 第 178 轮报告（v6.8.106 — 第176维度 conjunction_fallacy 合取谬误上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切到**证据纪律/概率推断**一线——r175-r177 连续三轮为判断纪律方向（outcome_bias/common_cause/hindsight_bias），本轮轮换）：**合取谬误（conjunction fallacy / Linda problem）**——把**合取事件（A 且 B）的概率/可能性宣称高于其任一组分事件（A 或 B）的概率**，违反概率公理 P(A∧B) ≤ P(A)：两个条件同时满足的场合必然少于任一条件单独满足的场合，与描述生动与否无关；把合取描述得更具体就认为它「更可能」，是把叙事的代表性（representativeness）冒充概率的大小。
+- 缺口实证（侦察阶段 /tmp/hf-probe-candidates.js，直调 src/gate.js 实测，v6.8.105 175 维引擎）：合取谬误样本 **0/5 零命中**（「琳达既是银行出纳又是女权主义者的概率，高于她只是银行出纳的概率」「The probability that Linda is both a bank teller and a feminist is higher than the probability that she is a bank teller.」等全穿）；同池对照候选 p 值误读 5/5、置信区间误读 4/5 已被 perfect_error 代拦，不可证伪族 2/5 部分被 contradiction/kafkatrapping 代拦——合取谬误为唯一零覆盖真缺口。hot_hand/post_hoc/pseudo_causal/selection_bias/survivorship_bias/clustering_illusion 均不管「概率比较句内部的结构违规」。
+- 外部来源（真实，未编造）：HN Algolia "uncertainty quantification language model" 命中 **UQLM: Uncertainty Quantification for Language Models（cvs-health/uqlm）**——LLM-based 多采样一致性方案，与纯规则引擎不同构，仅作概念背景（心虫不引 LLM 依赖，遵守硬约束）；GitHub API 检索 "conjunction fallacy OR availability heuristic reasoning" 无返回、Semantic Scholar "uncertainty quantification hallucination detection" 无返回，如实记录。clustering_illusion.js（r173）头部注释记录 r173 时 HN Algolia "conjunction fallacy" 曾命中 Wikipedia Conjunction_fallacy 经典文献链与 Linda the Bank Teller（Tversky & Kahneman）——本族是公认认知偏差，**判据为心虫自有纯规则实现**（三腿共现 + 结构豁免，见下）。侦察落盘 /tmp/hf-probe-candidates.js（探针脚本）。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true；cognitiveLoad 与 uncertainty 均为 "unknown"，按轮次纪律不当实质背书；accelerate 依据是缺口实测（0/5 真零命中）与轮换纪律。
+
+## 二、实现内容
+- **src/conjunction-fallacy.js（新增，约 320 行）**：第 176 维度检测器。19 个可注入常量 + 三腿共现判定。
+  - 腿① CONJ 合取标记：组合形（既是…又是/既…又…/既…也…/不但…而且/不仅…还/既会…又会/又…又…；EN both … and / as well as / and also）或裸词形（兼具/兼有/兼备/同时具备/同时具有）或裸连接词「且」「以及」（与腿②概率词 ≤12 字窗邻近，不单独承重——「便宜而且耐用」是语篇递进不是逻辑合取）。裸名词形态自查（161 轮教训）：组合形收双关键词同窗，裸词形可独立出现。
+  - 腿② PROB 概率词（概率/可能性/几率/机率/或然率；EN probability / probable / chance / likelihood / odds / likely——裸名词形态）。
+  - 腿③ CMP 概率比较结构两条路线任一：C-a 比较算子（高于/大于/超过/胜过/优于/更可能/可能性更大/更高/更大；EN higher than / greater than / larger than / more probable / more likely / exceeds）× 组分回指（只是/仅仅是/单是/不过是/仅/只/无非；EN just / only / merely / simply / purely / alone）落在算子后 25 字（EN 80 字符）窗内；C-b 两个概率词 × 中间夹比较算子（覆盖「A 的概率高于 B 的概率」的数学陈述形与倒装形）。
+  - 结构豁免（防误伤良性条件概率比较）：合取标记前后 12 字（EN 40 字符）内有人群后缀（的人/的学生/的应聘者/的选手/的群体/的成员；EN people who / those who / students who / candidates who / employees who / applicants who / groups of）时，该句是 P(结果|X∧Y) 与 P(结果|Y) 的条件概率比较（可能为真）；**同句第二 CONJ 规则**：触发分组词的 CONJ 之后 25 字内若还有另一合取描述，说明句中另有概率比较主体，分组形只修饰其中一个，不得据此豁免全句（r178 长句教训）。
+  - 五类豁免全部可负例注入置空：概念/教学转述、推理否定/方向纠正（含「计算错误/算错」族——「如果 A 且 B 的概率大于 A 的概率，那一定是计算错误」是正确判别）、对冲、疑问句、分组条件比较形。
+- **src/index.js 九处接线**（require / 计算点 _applyPedagogyRelaxation / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / module.exports），同 r173-r177 先例。变量名 **cjf**（cf 已被 counterfactual 占用——L1960，首版命名冲突被 node --check 抓出后改名）。
+- r178 实现教训（已固化进测试与源码注释）：① 腿②「可能性」自带「可能」子串——宽松对冲豁免把自己的腿②吃掉，负向断言 (?<![不未的可])可能(?![性]) 三处一起收（攻击腿与否定腿都不被误豁免）；② 概念转述豁免的裸「琳达」吃掉原型攻击句、「老师」吃掉含「支教老师」的长句——人名/职业名词不能进教学转述表，只收「琳达问题/教材/课堂」等复合形；③ 分组条件比较形（「既努力又有天赋的学生获奖比例更高」）与合取谬误同形——用人群后缀做结构豁免，误把条件比较当谬误比漏判更伤（该族良性文本量更大）；④ 长句中修饰性 CONJ（「一位青年：既支教又出诗集」）会触发分组豁免吞掉全句——同句第二 CONJ 规则兜底；⑤ PROB_EN 首版漏 probable 词形（"more probable than just" 整句漏判）；⑥ 推理否定豁免必须含「计算错误/算错」族，否则良性元陈述句误判。
+
+## 三、验证数据
+- round-178 轮测（test/round-178-conjunction-fallacy.js）：**29/29**（攻击 10/10 含中英双语/裸名词短句/带修饰/倒装结论先行/长句、良性 11/11 零误判含边缘良性「战争是多因共同造成的」正确多因陈述与分组条件比较形、12 项常量负例注入承重、6 条豁免陷阱翻转含分组形中英双翻、对冲不吞「可能性」专项、登记断言）
+- gate 层变体矩阵（真实 gate() 复量）：攻击变体 **7/7 非 pass**（原型/带修饰个体主语/裸名词短句/倒装/长句/EN 原型/EN 短句，全部 verify 且 conjunction_fallacy 进 findings），良性变体 **5/5 pass**（含「Students who both practice daily and rest well tend to win more often.」边缘良性与 Linda 问题教学转述）
+- 双向门禁：召回 **52/52**、误拦 **302/326**（92.6%，与基线一致，零新增误拦）
+- bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 176 键）；doc-numbers-accuracy.test.js **22/22**（AGENTS/README/SKILL 三处 175→176 与 verify 134→135 已同步）
+- 实测计数：维度 **176**（BLOCK 11 / REWRITE 19 / VERIFY 135），模块 161，MCP 工具 184，路由 1,314
+
+## 四、已知边界
+- 纯数学符号形（P(A且B) > P(A)）不收——无自然语言概率词，且数学教学语境由豁免表兜底；真实 AI 输出中该形罕见。
+- 谬误形若主语带人群后缀（「认为她是既聪明又努力的人的概率高于她只是聪明的人的概率」），会被分组豁免保守放行（漏判方向优先）。
+- 条件概率比较若写成概率词紧贴算子形（「既X又Y的人成功概率比只有Y的人高」），靠分组后缀豁免；若主语无「的人」而语义实为两组比较（「既聪明又勤奋的选手夺冠概率高于只勤奋的选手」），可能误判——该族良性文本量更大，保守方向取漏判。
+- p 值/置信区间误读族（探针 5/5、4/5）已被 perfect_error 代拦，未构成本轮维度；下轮可评估把统计误解族从 perfect_error 提升为独立维度（perfect_error 是复合检测器，独立族判别更精准）。
+
 # 第 177 轮报告（v6.8.105 — 第175维度 hindsight_bias 事后聪明偏差上线 — 2026-10-31）
 
 ## 一、方向与来源
