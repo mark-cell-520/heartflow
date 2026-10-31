@@ -1,3 +1,41 @@
+# 第 175 轮报告（v6.8.103 — 第173维度 outcome_bias 结果偏误上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切到**决策评价/判断纪律**一线——r169/r170/r171/r172/r173/r174 连续六轮均为新判别维度 selection_bias / survivorship_bias / base_rate_neglect / whole_part_transfer / clustering_illusion / reverse_causation，且 r174 起连续两轮在因果结构族内，本轮按轮换纪律换线）：**结果偏误（outcome bias / 结局偏见）**——用**结果的好坏**评判**决策/选择的质量**，忽视决策当时可获得的信息与论证质量，把运气当成能力。
+- 缺口实证（侦察阶段 /tmp/hf-probe-r175.js，直调 src/gate.js 实测）：第一轮候选池扫描（结果偏误/共同原因/事后聪明）中，**结果偏误族 8 条攻击样本 7 条穿过硬闸门且零维度命中**（仅「新产品卖爆了」1 条被 reasoning_coherence 兜住），良性 5 条零误判——同池候选中共同原因 4/5 穿过、事后聪明已被 overclaim_already_knew/overclaim_predict 子信号部分覆盖，结果偏误为唯一真零覆盖族。overclaim 子信号仅计分不触发闸门，本族补的正是「已发生结果 × 决策质量归因」的闸门级判别。
+- 外部来源（真实，未编造）：HN Algolia "outcome bias" 命中 "Outcome Bias and the Interpreter: How Our Minds Confuse Skill and Luck"（objectID 6563620）、"Introduction to the Outcome Bias – Don't Judge Decisions by Their Outcome"（16543449）、"Outcome Bias: The Bias Behind the World's Greatest Catastrophes"（21131582）——确认「把结果当决策质量判据、混淆技能与运气」是公认判断失误；GitHub 无纯规则实现（jbarach2012/AIBF_API ★195 属招聘反歧视域，与纯规则引擎不同构，仅作概念背景）；Semantic Scholar 关键词检索无返回，如实记录。**本族判据为心虫自有纯规则实现**。侦察落盘 /tmp/hf-scout-r175.txt。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true；cognitiveLoad 与 uncertainty 均为 "unknown"，按轮次纪律不当实质背书；accelerate 依据是缺口实测（7/8 真零命中）与轮换纪律。
+
+## 二、实现内容
+- **src/outcome-bias.js（新增，约 300 行）**：第 173 维度检测器。16 个可注入常量 + 三腿判定。
+  - 腿① OUTCOME 高方差结果事件：运气支配型结果词（赌对/赌错/赌赢/赌输/押对/蒙对/猜对/赚翻/翻倍/翻了三倍/获利/盈利/血本无归/亏光/爆仓/套牢/割肉/暴涨/暴跌/翻车/踩雷/暴雷/翻身/夺冠/出局/淘汰/落榜/考上/没考上/卖爆/大卖/滞销/中奖/活下来/去世/救回来/手术成功/手术失败/赢麻了/躺赢……裸名词形态；EN paid off / won / lost / hit the jackpot / struck it rich / made a fortune / went bankrupt / lost everything / came out ahead / fell flat / crashed / tanked / doubled / tripled / lottery）。刻意不收泛化「成功/失败/赢了/输了」（良性暴露面过大，由三腿兜精度）。
+  - 腿② EVAL 决策评价：决策名词（决策/决断/决定/抉择/选择/判断/策略/方案/战术/思路/想法/做法/打法/布局/操作/下注/押注/买入/卖出/投资/出手/转型/放弃/坚持/路线/赌注/定夺/拍板；EN decision / choice / call / bet / gamble / strategy / tactics / plan / move / pick / investment / trade / wager）× 评价词（明智/英明/睿智/高明/正确/是对的/果断/清醒/理性/聪明/精明/厉害/眼光独到/有远见/独到/愚蠢/草率/鲁莽/失误/失策/错误/糊涂/短视/冒进/不该/欠妥/败笔；EN wise / correct / brilliant / shrewd / sound / reckless / foolish / hasty / poor / well-judged / ill-judged / good call / bad call）落在 15 字（EN 60 字符）窗内（前后双向）。
+  - 腿③ LINK 归因连接词：说明/证明/可见/足以证明/表明/意味着/证实/印证/体现出/反映出/所以/因此/因而/故而/毕竟/说到底/事实证明/结果证明/归功于/全靠/多亏；EN proves / show / demonstrating / confirms / means / which means / indicating / therefore / thus / hence / so / after all / thanks to / proof。连接结构：LINK 匹配点前 60 字（EN 120 字符）内有 OUTCOME 且后有 EVAL，或前有 EVAL 且后有 OUTCOME（结论先行的倒装形）——双朝向任一。
+  - 五类豁免全部可负例注入置空：概念/教学转述、实验/证据语境（受控实验中结果经设计成为方法的有效证据，ex-ante 论证就是实验设计本身）、ex-ante 推理/推理否定/反向承认（不能只凭/在当时/事前/ex ante……）、对冲与运气承认、疑问句。
+- **src/index.js 九处接线**（require / 计算点 _applyPedagogyRelaxation / dimMap / allDims / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / module.exports），同 r173/r174 先例。
+- **r175 实现教训（三条，已固化进测试与源码注释）**：① EVAL 腿必须收「是对的/是错的」与裸「独到」词形——「新产品卖爆了，这说明当初的市场定位判断是对的」整句因只收「正确/没错」漏判；「眼光向来独到」这类带插入语的形式因只收连续「眼光独到」漏判（161 轮教训的裸名词形态自查再次应验）。② DECISION 腿必须收 tactics/tactic 与「思路/想法/做法」——「the coach's tactics were brilliant」「答题思路非常聪明」整族因词表缺形而漏判。③ LINK_EN 必须收裸 prove/show——「does not prove」式否定陷阱在抹掉豁免后无法翻转（词表只收 proves/showing 等带后缀形）。
+- **test/round-175-outcome-bias.js（新增，约 240 行）**：正向（攻击 12 中文 + 4 英文 / 良性 15）+ 16 项常量负例注入承重（OUTCOME/DECISION/EVAL/LINK × ZH/EN）+ 8 条豁免陷阱翻转（META/EVID/NEG/HEDGE × ZH/EN）+ 疑问句豁免承重（摘问号翻转）+ gate 层变体矩阵 + 登记断言×3。
+- 文档：AGENTS.md / README.md / SKILL.md 三处数字（维度 172→173、VERIFY 131→132、What it catches 128→129 request verify、规格表维度数、版本戳 6.8.102→6.8.103、AGENTS 维度列举补 outcome_bias 与三层合计 157→158）+ README version-history 追加 6.8.103 行 + CHANGELOG.md 6.8.103 条目；VERSION 6.8.102→6.8.103（sync-version.js 同步 package.json / SKILL.md / heartflow.js BUILD_DATE）。
+- **r174 未提交工作的固化（接手纪律）**：本轮开工时 r174（v6.8.102 reverse_causation 第172维度）的源码/测试/接线/文档/版本已全部写完但未 commit（git log 仍停在 v6.8.101）。按接手纪律先复验五门禁（全绿，24/24 轮测、双向 52/52 + 302/326 不升）并重启 MCP 确认真实运行态 6.8.102 后，以 commit 3c943f9b 固化（11 文件，632 insertions），再进行本轮 r175 工作。
+
+## 三、验证数据（五门禁全绿）
+- round-175 轮测：**25/25**（攻击 16/16 命中含中英/裸名词「蒙对」「夺冠」/带修饰/倒装结论先行/长句/越字类连接词；良性 15/15 零误判含 ex-ante 正确评价「在当时的信息条件下这个决定是合理的」/推理否定/运气承认/概念教学/实验证据/疑问/战争多因边缘良性；16 项常量负例注入承重；8 条豁免陷阱翻转；登记断言×3）
+- gate 层变体矩阵：攻击 **7/7 非 pass**（verify）且 findings 全含 outcome_bias；良性 **7/7 pass** 且零 outcome_bias 命中（161 轮强制项，真实 gate() 复量）
+- 双向门禁：召回 **52/52**，误拦 **302/326 不升**（92.6%，与基线完全一致——本维度未新增任何误拦）
+- bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 173 键）；doc-numbers-accuracy.test.js **22/22**（修复过程：首轮 21/22——README「Verified metrics」规格表 Discrimination dimensions 漏改一处 172，补后 22/22）
+- 实测终值：维度 173（BLOCK 11 / REWRITE 19 / VERIFY 132）、模块 161、工具 184、路由 1314、src JS 文件 503
+- 运行态：MCP 重启后 status 返回 version 6.8.103（见下）
+
+## 四、已知边界 / 下次可继续
+- OUTCOME 腿只收高方差/运气支配型结果词，刻意不收泛化「成功/失败/赢了/输了」——「项目成功了，说明方向选对了」这类形暂不判（精度优先，可下轮以「成功/失败 + 强评价词 + 强连接词」的收紧三腿单独评估扩容）。
+- 连接结构为「同句内双朝向」，跨句归因（「他赌对了。（另起一句）这说明选择明智。」）不判；「他赌对了，所以请大家吃饭」类无决策名词×评价词的形不判。
+- 「实验成功说明方案正确」落在实验证据豁免（受控实验中结果经设计成为有效证据）；「手术成功证明方案正确」会判 verify——规则引擎无法独立判定方差结构，verify 的含义正是「先过 ex-ante 检验（做决定时知道什么、排除过哪些选项、为什么选它）再采信」。
+- 对冲豁免含「运气/偶然/luck/chance」——「他赌对了，也有运气成分」式混合陈述不判（承认运气本身是反偏误的正确动作）。
+- 同池候选**共同原因（common cause / 混杂因素）**族 4/5 攻击穿过仍零覆盖（「夏天冰淇淋销量和溺水死亡同步上升，说明吃冰淇淋导致溺水」——文本内已点名第三因素却仍断言直接因果），是明确的下一轮立项候选；**事后聪明（hindsight bias）** 的闸门级维度亦可评估（现仅有 overclaim 子信号计分）。
+- 未跑 test/run-all.js（20+ 分钟/4GB，按任务书纪律不跑）；新测试文件由下次全量 run-all 收编。
+
+
+
 # 第 174 轮报告（v6.8.102 — 第172维度 reverse_causation 因果倒置上线 — 2026-10-31）
 
 ## 一、方向与来源
