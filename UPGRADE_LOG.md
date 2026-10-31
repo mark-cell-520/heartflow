@@ -1,3 +1,37 @@
+# 第 176 轮报告（v6.8.104 — 第174维度 common_cause 共同原因谬误上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切回**因果与反事实推理**一线——r175 为决策评价/判断纪律方向 outcome_bias，本轮接 r175 报告预立的下一轮候选「共同原因族 4/5 穿过」）：**共同原因谬误（common cause / confounding factor / 混杂因素）**——观察到**两个变量共变或相关**，就**直接断言其中一个导致另一个**，不排查、不提及背后同驱的第三因素（Z→X 且 Z→Y，被误读成 X→Y）。共变符合同因结构也符合因果结构，文本内完全同形；共同原因被排查之前，「X 和 Y 同步上升，说明 X 导致 Y」是把相关性冒充因果。
+- 缺口实证（侦察阶段 /tmp/hf-probe-r176.js，直调 src/gate.js 实测）：候选池扫描（共同原因 8 条 / 事后聪明 8 条）中，**共同原因族 8 条攻击样本 4 条穿过硬闸门且零维度命中**（冰淇淋溺水/背单词长高/蚊香登革热/雷雨哮喘；其余 4 条被 pseudo_causal 的「越…越…」相关框兜住），良性零误判——pseudo_causal 只管精确倍数伪因果与时序/玄学归因（read 源码确认 PC_CAUSAL_ZH_PATS 射程），post_hoc 只管时序连接，reverse_causation（第172维）只管方向倒置，monocause（第161维）只管多因结果压单一原因+绝对化归因，射程均不重叠。事后聪明族 5/8 穿过为零覆盖次级候选（overclaim_already_knew/overclaim_predict 子信号仅计分不触发闸门），留作下轮候选。
+- 外部来源（真实，未编造）：HN Algolia "confounding variable" 命中 "Statistics: When Confounding Variables Are Out of Control"（objectID 11414793，4 分）与 "Understanding Confounding Variables: A Comprehensive Guide (2024)"（41779877）——确认混杂/共同原因是统计与因果推断的公认盲区；GitHub causal-inference 仓库群 NSAPH-Projects/space ★19 / Trhova/Causal-Microbiome-Omics ★19 / imkemayer/causal-inference-missing ★9 / moprescu/GSTUNet ★8 / UbaldoHervas/PyDay-BCN-2025 ★7 全部为学术数据科学工具（benchmark/simulation/guide），非纯规则文本判别，仅作概念背景；Semantic Scholar 两次关键词检索均 HTTP 429 限流（无 key），如实记录。**本族判据为心虫自有纯规则实现**。侦察落盘 /tmp/hf-scout-r176.txt。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true；cognitiveLoad 与 uncertainty 均为 "unknown"，按轮次纪律不当实质背书；accelerate 依据是缺口实测（4/8 真零命中）与射程归因（既有因果族无一覆盖共变→单向因果）。
+
+## 二、实现内容
+- **src/common-cause.js（新增，约 300 行）**：第 174 维度检测器。18 个可注入常量 + 三腿判定。
+  - 腿① COVARIATION 共变/相关陈述，两形任一：C-a 相关名词形（相关/关联——裸名词形态，同族词「相关性/高度相关/正相关」均以「相关」二字命中，必含双变量、免并列结构；EN correlated / correlation / covary / covariation）；C-b 共变动词形（同步上升/同步增长/同步下降/一同/一齐/一起+上升类/齐涨/齐升/齐跌/同涨同跌/同升同降/相伴上升/如影随形/齐头并进/亦步亦趋/水涨船高/随之上升/联动——裸名词形态；EN rise(s)/rose together / move(s)/moved together / in lockstep / hand in hand / in tandem / in sync / track each other / rise and fall together）**且**共变词前 40 字（EN 100 字符）窗内有并列双变量结构（和/与/跟/及/以及/这[两几][个种]/那[两几][个种]/两者/二者；EN and / & / both / the two / these two / two variables / two metrics）。
+  - 腿② CAUSAL 直接因果动词（导致/造成/引发/引起/带来/催生/促成/使得/令/让/驱动/推动/推升/推高/拉高/抬高/造就/滋生/助长/加剧/加大了/增加了/提高了/提升了/带动/拉动/源于/来自于/归因于/归功于/是…的原因/根源在于/罪魁祸首；EN causes / leads to / results in / results from / drives / boosts / increases / reduces / makes / creates / produces / is responsible for / brings about / stems from / originates from / is due to）与腿①**双朝向 60 字（EN 120 字符）窗共现**——覆盖「共变→因果」主形与「A 是 B 的原因，因为 A 与 B 高度相关」倒装形。**刻意不收「说明/表明/证明/可见」等推断词**：「与去年同期同步上升，说明旺季策略见效」是良性同比对照，收推断词会整类误判。
+  - 腿③ NO_CONFOUND 未点名/未控制共同因素（共同原因/混杂/第三因素/同一个原因/都源于/均由/都由/控制了/剔除/回归/辛普森/DAG/工具变量/倾向得分；EN common cause / confounding / confounder / third variable / lurking variable / controlling for / adjusted for / Simpson / DAG / instrumental variable / propensity / causal inference）——已点名或已控制混杂是正确判别。
+  - 五类豁免全部可负例注入置空：概念/教学转述、实验/证据语境、推理否定/反向承认、对冲、已点名/已控制共同因素、疑问句。
+- **src/index.js 九处接线**（require / 计算点 _applyPedagogyRelaxation / dimMap / allDims / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / module.exports），同 r175 先例。变量名 **ccau**——`cc` 已被 dimMap 的 confidence 读数占用（`confidence: cc`），命名冲突会静默污染 confidence 维度。
+- **r176 实现教训（五条，已固化进测试与源码注释）**：① 腿②刻意不收「说明/表明/证明」推断词——首版设计时若图省事收推断词，「销售额与去年同期同步上升，说明旺季策略见效了」整类良性同比对照误判；② CAUSE_ZH 首版漏「推动/推升」词形，「足以证明前者推动了后者」整句漏判；③ NO_CONFOUND_EN 的 both driven by 必须收插入语形 both are driven by——「but both are driven by age」整句漏判（161 轮教训的裸形态自查在英文侧同样应验）；④ META_ZH 首版漏「教材」词形，教学转述陷阱无法翻转；⑤ NEG_EN 必须收 does not cause/drive/lead 否定形——「rainfall does not cause umbrella sales」整句误判。
+- **test/round-176-common-cause.js（新增，约 240 行）**：正向（攻击 12 中文 + 6 英文 / 良性 12 中文 + 4 英文）+ 12 项常量负例注入承重（COVARY_REL/COVARY_MOVE/PAIR/CAUSE × ZH/EN）+ 5 条豁免陷阱翻转（NO_CONFOUND_ZH/EN、META_ZH、NEG_ZH、HEDGE_ZH、EVID_ZH）+ 疑问句豁免承重（摘问号翻转）+ 腿②推断词不承重专项 + gate 层变体矩阵 + 登记断言×4。
+- 文档：AGENTS.md / README.md / SKILL.md 三处数字（维度 173→174、VERIFY 132→133、What it catches 129→130 request verify、规格表维度数、版本戳 6.8.103→6.8.104、AGENTS 维度列举补 common_cause 与三层合计 158→159）+ README version-history 追加 6.8.104 行 + CHANGELOG.md 6.8.104 条目；VERSION 6.8.103→6.8.104（sync-version.js 同步 package.json / SKILL.md / heartflow.js BUILD_DATE）。
+
+## 三、验证数据（五门禁全绿）
+- round-176 轮测：**27/27**（攻击 18/18 命中含中英/裸名词「相关」「同涨同跌」/带修饰长句/倒装结论先行/越字类无关形；良性 16/16 零误判含正确多因陈述「同因于气温」、同比对照「与去年同期同步上升」、纯描述「反映了城市化进程」、推理否定、对冲、概念教学、实验证据、已点名共同因素「都由年龄驱动」；12 项常量负例注入承重；5 条豁免陷阱翻转；疑问句豁免；腿②推断词不承重；登记断言×4）
+- gate 层变体矩阵：攻击 **7/7 非 pass**（verify）且 findings 全含 common_cause；良性 **7/7 pass** 且零 common_cause 命中（161 轮强制项，真实 gate() 复量）
+- 双向门禁：召回 **52/52**，误拦 **302/326 不升**（92.6%，与基线完全一致——本维度未新增任何误拦）
+- bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 174 键）；doc-numbers-accuracy.test.js **22/22**
+- 实测终值：维度 174（BLOCK 11 / REWRITE 19 / VERIFY 133）、模块 161、工具 184、路由 1314
+- 运行态：MCP 重启后 status 返回 version 6.8.104（见阶段7 汇报）
+
+## 四、已知边界 / 下次可继续
+- 连接结构为「同句内双朝向」，跨句共变→因果（「A 和 B 同步上升。（另起一句）A 导致 B。」）不判。
+- 腿③把「已点名第三因素」整体豁免——「冰淇淋与溺水同因于气温，但吃冰淇淋仍直接导致了溺水」这种**点名第三因素仍断言直接因果**的更强谬误形态暂不判（精度优先：正确排除陈述与更强谬误同形，可下轮以「点名共同因素 × 仍断言单向因果 × 无控制语」的增强路由单独评估）。
+- 「实验表明 A 和 B 相关，说明 A 导致 B」落在实验证据豁免（受控设计中相关经设计成为证据）；规则引擎无法独立判定数据结构，verify 的含义正是「先过混杂检验（控制变量/实验设计/机制论证）再采信」。
+- 同池候选**事后聪明（hindsight bias）**族 5/8 攻击穿过仍零覆盖（「这件事早就注定会失败，明眼人一开始都能看出来」），overclaim_already_knew/overclaim_predict 子信号仅计分不触发闸门，是明确的下一轮立项候选。
+- 未跑 test/run-all.js（20+ 分钟/4GB，按任务书纪律不跑）；新测试文件由下次全量 run-all 收编。
+
 # 第 175 轮报告（v6.8.103 — 第173维度 outcome_bias 结果偏误上线 — 2026-10-31）
 
 ## 一、方向与来源
