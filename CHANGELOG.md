@@ -1,3 +1,17 @@
+## [6.8.107] - 2026-11-01
+
+### Added
+- **`moralistic_fallacy` — dimension 177 (道德主义谬误 / moralistic fallacy)** — 把应然规范倒推为实然事实：「世界应该公平」推不出「世界本来公平」，「人理应诚实」推不出「人的天性就是诚实」——规范（ought）描述应当如何，事实（is）描述实际如何，用规范词给事实断言作前提，是把价值主张冒充成事实陈述（appeal_to_nature「自然性→优越性」的镜像族，判据腿完全反置）。判据三要素共现（缺一不判）：腿① OUGHT 应然规范词（应该/应当/理应/理当/本该/应然/按理；EN ought to / should / supposed to / meant to——裸名词形态）、腿② ISNATURE 实然自然/本质等式断言（本来就是/事实上就是/本质上都是/天性就是/天生就是/本性就是/归根到底就是/就是事实；EN by nature / naturally / innately / inherently / fundamentally / only natural——只收「自然/本质/事实标记+肯定系动词」形，「天性未必就是」「本质上并非」等否定形因缺肯定系动词天然不匹配）、腿③ ORDER 顺序——腿①必须早于腿②（顺序倒置即非本族：「善良是人性的一部分，所以人应该向善」是合法论证）。
+- `src/moralistic-fallacy.js` — new detector module with 14 injectable constants (OUGHT_ZH×EN, ISNATURE_ZH×EN, PREMISE_ZH×EN, NEG_ZH×EN, NORMNOUN_ZH, OUGHT_AFTER_ZH, META_EXEMPT_ZH×EN, HEDGE_ZH×EN) plus premise-connector interception (因为/由于/because/since 两腿相隔 = 实然作前提的合法论证), norm-noun restatement exemption (本来就是底线/义务/追求) and ought-after restatement exemption (本性就是应该诚实的).
+- `test/round-179-moralistic-fallacy.js` — negative-injection + variant-matrix suite (29 assertions).
+
+### Verification
+- round-179 suite: 29/29 (attacks 11/11 incl. ZH/EN, bare-noun short form, modified, conditional form, long form; benign 16/16 incl. edge-benign reversed-order legal form / critical analysis / legal provision / meta-discussion; 10 constant negative-injection load-bearing; 8 exemption-trap flips incl. ZH/EN premise-connector and negation flips; reversed-order dedicated test; 2 registration assertions)
+- Gate variant matrix: attacks 7/7 non-pass with moralistic_fallacy in findings; benign 5/5 pass
+- Bidirectional guard: recall 52/52, false-block 302/326 (92.6%, unchanged — zero new false positives)
+- `bin/verify.js` 16/16; `guard-abilities.js` 20/20 (177 dimension keys); `doc-numbers-accuracy.test.js` 22/22 (also fixed pre-existing stale version stamps in README/SKILL left by r178)
+- Measured: 177 dimensions (BLOCK 11 / REWRITE 19 / VERIFY 136), 161 modules, 184 MCP tools, 1,314 routes
+
 ## [6.8.106] - 2026-10-31
 
 ### Added

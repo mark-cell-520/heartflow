@@ -1,3 +1,35 @@
+# 第 179 轮报告（v6.8.107 — 第177维度 moralistic_fallacy 道德主义谬误上线 — 2026-11-01）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切回**逻辑谬误检测**一线——r176/r177/r178 连续三轮为因果纪律（common_cause）/判断纪律（hindsight_bias）/证据纪律（conjunction_fallacy），该线上轮使用为 r172 whole_part_transfer，已空 7 轮，按轮换纪律回填）：**道德主义谬误（moralistic fallacy）**——以**应然规范**（应该/应当/理应/ought to）为据，倒推**实然事实**（事物「本来/本质上/天性/by nature」就是如此），把价值主张冒充成事实陈述。与 r706 上线的 appeal_to_nature（第139维，自然性→优越性）正好是**镜像族**：那边是实然依据推规范结论，这边是规范前提推实然结论，判据腿完全反置。
+- 缺口实证（侦察阶段双探针，直调 src/gate.js，v6.8.106 176 维引擎）：/tmp/hf-probe-r179.js 候选池 10 族扫描（moralistic/ecological/regression/sample_size/reactive_devaluation/appeal_to_wealth/false_precision/illusory_truth/motte_bailey/halo），攻击 39 条穿过 26 条；/tmp/hf-probe-r179b.js 对本族深探 12 攻击 + 12 良性：**攻击 8/12 真零命中**（「人理应诚实，所以人的天性就是诚实的」「既然人生而平等是应然，那么人人生而平等就是事实」「Since the world ought to be fair, the world is fair by nature.」等穿过硬闸门且全维度零命中——存量维度无任何一腿覆盖「应然→实然倒置」结构），另 4 条被 illicit_conversion / reasoning_coherence / sexual_compliance_pressure+social_norm 误伤性代拦（非本族结构命中）；良性 12 条按新判据设计零命中（2 条 verify 为存量维度既有行为，r179 改动前实测一致）。零覆盖候选池中另有 sample_size_neglect / reactive_devaluation / appeal_to_wealth / halo_effect 四族 0 覆盖，留作后续轮次候选。
+- 外部来源（真实，未编造）：HN Algolia "moralistic fallacy" 与 "is-ought" 两关键词 **0 命中**；GitHub API "moralistic fallacy" **total_count=0**，"logical fallacy detection" 检索群（tmakesense/logical-fallacy ★20 / SeanFlannery/Logical.ly ★4 / graciolli-f/sophron-bot ★4 / EPITA-SCIA/Fallacy-Detection-LLM ★2 / IMJONEZZ/Fallacy-Detection ★1）全部 LLM-based，与纯规则引擎不同构，仅作概念背景；Semantic Scholar 两次检索均 **HTTP 429 限流**，如实记录。**本族判据为心虫自有纯规则实现**。侦察落盘 /tmp/hf-scout/hf-scout-r179.txt。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true；cognitiveLoad 与 uncertainty 均为 "unknown"，按轮次纪律不当实质背书；accelerate 依据是缺口实测（8/12 真零命中）与轮换纪律。
+
+## 二、实现内容
+- **src/moralistic-fallacy.js（新增，约 300 行）**：第 177 维度检测器。14 个可注入常量 + 三要素共现判定。
+  - 腿① OUGHT 应然规范词：应该/应当/理应/理当/本该/原该/应然/按理/按理说/理该/理应如此（裸名词形态——「应然」可单独成词，「人生而平等是应然」收）；EN ought to / should / supposed to / meant to。刻意不收「须/必/要」泛情态（「必须双盲进行」类程序陈述会误入）。
+  - 腿② ISNATURE 实然自然/本质等式断言：本来就是/事实上就是/本质上都是/天性就是/天生就是/本性就是/归根到底就是/就是事实；EN by nature / naturally / innately / inherently / fundamentally / only natural。**只收「自然/本质/事实标记+肯定系动词」形**——系动词必须紧跟标记（可夹 都/就/也/便），「天性未必就是」「本质上并非」等否定形因缺肯定系动词天然不匹配（r179 设计：把否定排挤出腿②本身，不依赖事后否定豁免，避免误伤「本质上都是无私的」攻击形）。
+  - 腿③ ORDER 顺序：腿①出现位置必须**早于**腿②——顺序倒置即非本族（「善良是人性的一部分，所以人应该向善」是实然前提推规范结论的合法论证，归 appeal_to_nature 一族评价）。
+  - 结构拦截：两腿之间的**前提连接词**（因为/由于/缘于/鉴于/出于/依据/根据；EN because/since/given that）——「人应该善良，因为善良本来就是人性的一部分」是实然作前提的合法论证。
+  - 七类豁免全部可负例注入置空：概念/教学转述（应然与实然/道德主义谬误/休谟问题/is-ought/moralistic fallacy）、前提连接词、规范名词回指（本来就是底线/原则/常识/天理/公理/义务/责任/天职/追求/理想/目标/愿望——「人理应得到尊重，这本来就是底线」是规范性重申）、规范词后置复述（本性就是应该诚实的——腿②后 8 字内复现规范词的元陈述形）、腿②前 10 字（EN 40 字符）内否定词、对冲、疑问句。
+  - 实现形态同 r178 conjunction-fallacy.js 先例：常量全部为 RegExp 数组 + anyHit 助手，负例注入以 [] 置空指定常量。
+- **src/index.js 九处接线**（require / 计算点 _applyPedagogyRelaxation / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / module.exports），同 r173-r178 先例。变量名 **mof**——首版命名 mf 与既有 moral_foundations 的读数变量冲突，被 node --check 抓出后改名（同 r178 cjf 命名冲突先例，本轮 lint 门禁实际承重一次）。
+- **文档三处同步**：README.md（badge 行/管线图/维度表 176→177、verify 计数 131→136 顺手修正 r178 遗留的过期值、口径版本戳 v6.8.105→v6.8.107、changelog 新行）、SKILL.md（描述行/规格表 176→177、verify 135→136、口径戳 v6.8.100→v6.8.107、引擎版本行 6.8.105→v6.8.107）、AGENTS.md（头部 176→177、版本注释追加 v6.8.107 行、Verify 层列举 (135)→(136) 并补 moralistic_fallacy）。doc-numbers-accuracy 从本轮开工时的 20/22（r178 递版本漏改两个口径戳）修复到 22/22。
+- **VERSION 6.8.106→6.8.107**，sync-version.js 同步 package.json/SKILL.md/heartflow.js BUILD_DATE；UPGRADE_LOG.md 与 CHANGELOG.md 追加本轮条目。
+
+## 三、验证数据
+- round-179 轮测（test/round-179-moralistic-fallacy.js）：**29/29**（攻击 11/11 含中英双语/裸名词短句/带修饰/条件形/长句、良性 16/16 零误判含顺序倒置合法形/批评性分析/法律条文/概念转述/对冲/疑问、10 项常量负例注入承重、8 条豁免陷阱翻转含中英前提连接词与否定翻转、顺序倒置专测、登记断言×2）
+- gate 层变体矩阵（真实 gate() 复量）：攻击变体 **7/7 非 pass**（原型/裸名词短句/应然裸名词+就是事实/带修饰/长句/EN 原型/EN 短句，全部 verify 且 moralistic_fallacy 进 findings），良性变体 **5/5 pass**（含「善良是人性的一部分，所以人应该向善」顺序倒置边缘良性、「世界本该公平，但现实中远非如此」批评性分析边缘良性、EN ought-不推出-is 边缘良性）
+- 双向门禁：召回 **52/52**、误拦 **302/326**（92.6%，与基线一致，零新增误拦）
+- bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 177 键）；doc-numbers-accuracy.test.js **22/22**（含修复 r178 遗留版本戳）
+- 实测计数：维度 **177**（BLOCK 11 / REWRITE 19 / VERIFY 136），模块 161，MCP 工具 184，路由 1,314
+
+## 四、已知边界
+- 规范词在前、自然/本质等式断言在后但**两腿间无任何连接词**的句子（「学生应该多读书，读书本来就是人类的天性」）会被判 verify——该形状语义上更接近「以实然为依据支撑规范」，但无前提连接词可拦截；该族良性文本量更大，保守方向取 VERIFY 级（要求核查而非拦截），双向门禁实测零新增误拦。
+- 英文侧 `fundamental`（形容词形，如 "kindness is fundamental to human nature"）不收——只收 `fundamentally` 副词形，避免 "fundamental rights/principles" 类形容词短语误入；代价是 "is fundamental to" 形漏判（可下轮补副词/形容词双形 + 更强的谓语位置约束）。
+- 工作树遗留说明：本轮开工时 git 工作树有 61 个文件的历史遗留未提交改动（r166/r177 审计修复的 src 正则 + 若干轮次的测试维度数断言放宽），非本轮产生，按「只提交本轮显式文件」纪律原样保留未动；五门禁均在该遗留状态之上实测通过。
+
 # 第 178 轮报告（v6.8.106 — 第176维度 conjunction_fallacy 合取谬误上线 — 2026-10-31）
 
 ## 一、方向与来源
