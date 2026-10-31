@@ -1,4 +1,32 @@
 
+# 第 172 轮报告（v6.8.100 — 第170维度 whole_part_transfer 整体-部分属性迁移上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向：**整体-部分属性迁移（fallacy of composition / fallacy of division，组合谬误/分解谬误）**——任务书轮换池「逻辑谬误检测」一线（r169/r170/r171 连续三轮为统计偏差族 selection_bias / survivorship_bias / base_rate_neglect，本轮按轮换纪律切到经典逻辑谬误方向）。攻击族：把**部分层面的属性**直接当成**整体层面的属性**（组合形），或把**整体层面的属性**直接摊到**每个部分头上**（分解形），且该属性是**涌现性/非可加**的（强/优秀/顶级/清廉/竞争力…，不是重量/个数/总价这类可加量）。
+- 缺口实证（侦察阶段 grep src/ 实测）：composition_fallacy / division_fallacy 仅作为 `fallacies` 维度内的 sub-family tag 存在（src/index.js:5453-5459，共 6 条**纯英文**窄模式，要求 so/therefore/thus + whole/part 紧邻词形）——**中文整族零覆盖**，英文裸名词/倒装/长句也漏；无任何独立维度覆盖整体↔部分迁移。同 r171 先例（base_rate_neglect 与 fallacies 内 base_rate_fallacy 子标签共存不算重复）。
+- 外部来源（真实，未编造）：HN Algolia "logical fallacy detection" 命中 arXiv 2405.02318「Translating natural language to first-order logic for logical fallacy detection」（258 分，NL2FOL 框架，SMT 求解器检验逻辑有效性，LOGIC 数据集 F1 78%——确认谬误检测为形式逻辑驱动任务族）；GitHub fallacy-detection 仓库群 latent-variable/Real_time_fallacy_detection（★119）/ tmakesense/logical-fallacy（★20）/ panFJCharlotte98/Fallacy_Detection（EMNLP 2024 zero-shot，★5）——全部 LLM-based，与纯规则引擎不同构，仅作概念背景；Semantic Scholar 与 arXiv API 关键词检索本轮无可用返回，如实记录。**本族判据为心虫自有纯规则实现**。侦察落盘：/tmp/hf-scout-r172.txt。
+
+## 二、心虫裁决门禁
+- heartflow_philosophy_decision：**type=accelerate**（confidence 0.7 / priority 40 / goalReviewed true / trigger optimal_conditions）。如实说明：rationale 里 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎未实测按低负荷处理），不作为实质背书；accelerate 依据是缺口实测与既有维度射程归因。
+
+## 三、实现内容
+- **src/whole-part-transfer.js**（新增，~310 行）：第 170 维度检测器。两路由判定腿（组合形部分→整体 + 分解形整体→部分）+ 结论先行退回路由；16 个可负例注入常量（PART_QUANT_ZH/EN、WHOLE_ZH/EN、QUALITY_ZH/EN、INFER_ZH/EN、MODAL_ZH/EN、EXEMPT_AGG/NEG/HEDGE/CONCEPT_ZH/EN）。r172 实现期实测教训两条：①裸「强」用前后排除法（(?<![增改])强(?![制推行权])）避开增强/强制/强行/强权/强化；②结论标记 TAIL = 推断词∪必然性情态——「整个团队攻克难关自然不在话下」的结论标记是推断词之后的「自然」，夹在部分侧与整体侧之间找推断词会整句漏判；③部分名词表必须收裸「人」（首版漏收导致「每个人都是精英，所以这个团队很强」与良性句「每个人都付出了努力」同因 pq 不匹配而假性通过——良性句曾因错误的原因通过，补裸名词后良性改由质量词腿正确拦下）。
+- **src/index.js**：九处一次接齐（require / 计算点 _applyPedagogyRelaxation / dimMap / allDims / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / module.exports）。首轮接线漏 dimensions 与 summary 两处（dimensions 读数仍 169、summary 无命中行），由轮测登记断言当场抓出后补齐。
+- **test/round-172-whole-part-transfer.js**（新增，20 断言）：正向（攻击 7 + 良性 9）+ 8 常量负例注入承重 + 4 类豁免陷阱翻转 + gate 变体矩阵（攻击 13 / 良性 8）+ 登记断言×3。
+- 文档：AGENTS.md / README.md / SKILL.md 维度 169→170、VERIFY 128→129、版本戳 6.8.100、维度列举补 whole_part_transfer；README version-history 追加 6.8.100 行；VERSION 6.8.99→6.8.100（sync-version.js 同步 package.json/SKILL.md/heartflow.js BUILD_DATE）。
+
+## 四、验证数据（五门禁 + 变体矩阵）
+- round-172 轮测：**20/20**（攻击 13/13 含中英/裸名词/带修饰/倒装/长句；良性 15/15 零误判含显式合计/投入非质量/否定翻转/概念教学/疑问/对冲/战争多因边缘良性；8 常量负例注入承重翻转；4 类豁免陷阱翻转；登记断言×3）。
+- gate 层变体矩阵：攻击 **13/13 非 pass** 且 findings 全含 whole_part_transfer；良性 **8/8 pass**。
+- bin/verify.js **16/16**；guard-abilities.js **20/20**（dimensions 键 170 已登记）；doc-numbers-accuracy.test.js **22/22**；bidirectional-guard **召回 52/52、误拦 302/326 不升**（92.6%，与基线一致）。
+- 运行态：MCP 重启后 status 返回 version 6.8.100。
+
+## 五、已知边界 / 下次可继续
+- 分解形只收「每个/所有/各个/each/every」全称部分指代；「多数/部分成员」形不收（结论非全称，攻击性弱）。
+- 组合形结论先行变体（「球队一定很强，因为每个队员都很强」）靠退回路由覆盖，含「因为」的前提句若夹带其他豁免词可能漏，留待后续轮次在同族内扩句式族。
+- 「人均/平均」类统计量未入豁免也未入质量词（「全队平均工资很高，所以每个球员工资都很高」现不判——区群谬误的统计形态，可作下轮候选）。
+- 未跑 test/run-all.js（20+ 分钟/4GB，按任务书纪律不跑）；新测试文件由下次全量 run-all 收编。
+
 # 第 171 轮报告（v6.8.99 — 第169维度 base_rate_neglect 基础概率忽视上线 — 2026-10-31）
 
 ## 一、方向与来源

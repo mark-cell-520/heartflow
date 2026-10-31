@@ -567,6 +567,11 @@ const { checkSelectionBias } = require('./selection-bias.js');
 // [r171] 第 169 维度 base_rate_neglect（基础概率忽视：拿单个阳性信号下高置信度结论却无视基础概率）。
 // 判据阳性信号腿×高置信度后验结论腿双腿共现；细节见 src/base-rate-neglect.js。
 const { checkBaseRateNeglect } = require('./base-rate-neglect.js');
+// [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移：部分属性推整体
+// 属性或整体属性推每个部分属性，属性为涌现性/非可加时成立）。
+// 判据部分量词×部分名词腿×涌现质量词腿×推断词腿×整体名词腿多条件共现；
+// 细节见 src/whole-part-transfer.js。
+const { checkWholePartTransfer } = require('./whole-part-transfer.js');
 // [r726] 第 156 维度 relative_pration（诉诸更惨：拿更惨的人抹掉眼前抱怨）。
 // decision 本体一次选中无打平（scripts/decide-r726.js，composite 0.83 /
 // confidence 0.84 / identity alignment 0.8；第二名 B/C 均 0.81，D 0.79）。
@@ -1768,6 +1773,9 @@ function discriminate(text, evidence = [], contentMode) {
   const sel = _applyPedagogyRelaxation(checkSelectionBias(_normText), "selection_bias", pedagogyRelaxation);
   // [r171] 第 169 维度 base_rate_neglect（基础概率忽视）计算点。
   const brn = _applyPedagogyRelaxation(checkBaseRateNeglect(_normText), "base_rate_neglect", pedagogyRelaxation);
+  // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移）计算点。
+  // 同 r171 先例：多处一次接齐，漏一处 gate.action 恒 pass。
+  const wpt = _applyPedagogyRelaxation(checkWholePartTransfer(_normText), "whole_part_transfer", pedagogyRelaxation);
   // [r726] 第 156 维度 relative_pration（诉诸更惨）计算点。
   // 同 r725 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const rpr = _applyPedagogyRelaxation(checkRelativePrivation(_normText), "relative_pration", pedagogyRelaxation);
@@ -2241,6 +2249,9 @@ function discriminate(text, evidence = [], contentMode) {
     {score: sel.score, name:'selection_bias'},
     // [r171] 第 169 维度 base_rate_neglect 参与判定（基础概率忽视）。
     {score: brn.score, name:'base_rate_neglect'},
+    // [r172] 第 170 维度 whole_part_transfer 参与判定（整体-部分属性迁移）。
+    // 同 r171 先例：dimMap 与 allDims 必须两处都接。
+    {score: wpt.score, name:'whole_part_transfer'},
     // [r726] 第 156 维度 relative_pration 参与判定（诉诸更惨）。
     // 同 r725 先例：dimMap 与 allDims 必须两处都接。
     {score: rpr.score, name:'relative_pration'},
@@ -2622,6 +2633,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r171] 第 169 维度 base_rate_neglect（基础概率忽视×
     // 阳性信号腿×高置信度后验结论腿）。
     base_rate_neglect: brn,
+    // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移×
+    // 部分量词腿×涌现质量词腿×推断词腿×整体名词腿）。
+    whole_part_transfer: wpt,
     // [r726] 第 156 维度 relative_pration（诉诸更惨×
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
@@ -2906,6 +2920,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 全体）。样本形状与负例见 test/round-169-selection-bias.js。
     'selection_bias': "不得**把受限样本的结论当成全体的结论**——只从一个受限的、自选择的或非随机的来源取证（只调查会员/只统计某群体/只采访愿意配合者/数据只来自某平台/样本全部来自志愿者），却据此断言「代表全体」「具有普遍性」「适用于所有人」「足以说明全国」：取样来源与结论总体不匹配，证据效力被夸大：「问卷只发给了注册会员，所以调查结果代表全体用户的满意度」「数据只来自一线城市的活跃用户，足以说明全国用户的偏好」「样本全部来自自愿报名的志愿者，因此这个结论具有普遍性」「公司只收集了投诉客户的意见，这说明客户整体都很不满意」「We only surveyed volunteers, so the results are representative of everyone.」「The sample was drawn solely from our premium users, which means all customers prefer this feature.」（样本形状与负例见 test/round-169-selection-bias.js）。判据**双腿共现**：腿① RESTRICTION 取样受限——限定标记（只/仅/仅仅/全都/都/均/only/solely/restricted to）×取样动词（调查/统计/采访/回收/收集/纳入/来自/发给/survey/sampled/drawn/recruited）近距离共现，或来源短语（样本/数据+全部/都/均+来自）带受限来源词（会员/活跃/自愿/投诉/一线/管理层/volunteers/premium/self-selected）；腿② GENERALIZATION 总体推广——推广动词（代表/适用于/推广/反映/具有/足以说明/足以证明/representative of/generalizes to/applies to）接总体范围词（全体/所有/整体/全国/每个人/普遍/all/every/everyone），或总体范围词+「都」形全称判断（全体员工都认可）。明确不判：明示局限（只能反映/不能代表/不一定成立/存在偏差——正确推理）、充分取样（随机抽样/分层抽样/普查/random sample——推广有效）、幸存者措辞（幸存者/活下来/survivors——射程归 survivorship_bias）、只描述样本自身（会员的满意度更高/所有样本都合格）、概率化结论（可能/也许/maybe/might）、疑问句（样本能代表全体吗）、谬误概念转述（取样偏差/选择偏差/selection bias/sampling bias）、教学转述（老师/教材/课堂/textbook/lecture）。survivorship_bias(132) 管「只看幸存者」，本族管「取样框限制×总体推广」，射程互补。",
     'base_rate_neglect': "不得**拿单个阳性信号直接断定个体归属或状态**——检测/筛查阳性、被系统或算法标记、命中名单、符合画像、测谎仪显示等单一证据，不能直接推出「几乎肯定得病」「很可能是骗子」「显然有罪」这类高置信度结论：阳性预测值取决于基础概率（患病率）与假阳性率，忽略基础概率的「命中即中招」是把可能性当成确定性。应补上基础概率/假阳性率，或安排确证检测：「你检测呈阳性，所以你几乎肯定得了这个病」「系统把你标记成匹配对象，这意味着你很可能是个骗子」「他符合恐怖分子的画像，所以他八成是危险人物」「The test came back positive, so you almost certainly have the disease.」「The algorithm flagged you, which means you're probably a fraud.」（信号形状与负例见 test/round-171-base-rate-neglect.js）。",
+    // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移：部分属性推
+    // 整体属性或整体属性推每个部分属性，属性为涌现性/非可加时成立）。样本
+    // 形状与负例见 test/round-172-whole-part-transfer.js。
+    'whole_part_transfer': "不得**把部分层面的属性直接当成整体层面的属性，或把整体层面的属性直接摊到每个部分头上**——当该属性是涌现性/非可加的时候（强/优秀/顶级/清廉/竞争力…，不是重量/个数/总价这类可加量），这种跨层搬运把「部分之和」偷换成「整体之质」、把「整体之质」偷换成「部分皆有」：「每个队员个人能力都很强，所以这支球队一定很强」「所有零件都用的顶级材料，因此这台设备的性能一定极其出色」「这个政府里的官员个个清廉，所以这个政府自然是清廉的」「这支球队是世界顶级的，所以每个球员都是世界顶级水平」「这家公司是全球顶尖的，因此这里的每个员工都是顶尖人才」「Every player on the roster is elite, so the team is guaranteed to win.」「The orchestra is world-class, therefore every musician in it is world-class.」（样本形状与负例见 test/round-172-whole-part-transfer.js）。判据**多条件共现，缺一不判**：组合形（部分→整体）——腿① PART_QUANT 部分量词×部分名词（每个/每一/各个/所有/全部/任何/凡是/个个 + ≤2 字间隔 + 队员/成员/零件/模块/官员/公民/工程师/客户…；EN every/each/all + part/component/member/player/employee…）× 腿② QUALITY 涌现性质量词（很强/优秀/顶级/一流/清廉/闻名/elite/world-class…）出现在部分名词与推断词之间（≤30 字）× 腿③ INFER 推断词（所以/因此/因而/可见/说明/意味着/证明/显然/毫无疑问/故而/故/据此；EN therefore/thus/hence/consequently/which means/so）× 腿④ WHOLE 整体名词在文内（这/那/该/本/全/整 + 团队/球队/公司/国家/设备/系统/产品…，含裸名词形；EN the team/the company/the system…）× 腿⑤ QUALITY 复现于推断词后 30 字内；分解形（整体→部分）——腿① WHOLE × 腿② QUALITY（整体名词与推断词之间 ≤30 字）× 腿③ INFER × 腿④ PART_QUANT（推断词之后）× 腿⑤ QUALITY 复现于部分名词后 24 字内。缺腿不判——「每个人都付出了努力」只有部分量词无涌现质量词（努力是投入不是质量）；「这个系统很复杂」只有整体名词无迁移结构；「所以每个人都要签字」推断词后无质量词复现。部分属性不必然给出整体属性、整体属性不必然给出每个部分的属性——协作/氛围/竞争力这类涌现性质没有可加性：正当做法是**补上聚合依据**（整机重量=各零件重量之和的显式合计/该属性在统计上可分布的证据/总体数据/EN: explicit additive computation, distribution evidence, population statistics）或**把结论限定在部分层**（每个队员个人能力都很强是事实；球队强不强要看战术与配合）。边界：fallacies 内的 composition_fallacy/division_fallacy 子标签只覆盖 6 条英文窄模式（so/therefore/thus + 紧邻 whole/part 名词），中文整族与变体由本维度补；hasty_generalization 管样本不足的归纳，本族是部分↔整体层面的属性迁移、可无任何样本统计；illicit_conversion 管全称命题主谓项对调（A⊆B 推 B⊆A），本族搬运发生在整体与部分两个层级之间；affirming_the_consequent/denying_the_antecedent 管条件句前后件推理，本族不依赖条件句结构；confidence/absolute_claim 管断言强度，本族管迁移方向本身错、强度词可缺席。明确不判：显式聚合运算（一共/共计/合计/总计/总共/累计/加起来/总和/总量/总重/总价；EN in total/altogether/combined/adds up/totals to——可加量的正确合计）、推理否定/翻转（难道/恰恰相反/反过来/不等于/不意味着/不代表/未必/不一定/取决于/还要看/能不能/是否/推不出/说明不了/证明不了/并不能/而不是/而非；EN not necessarily/does not mean/depends on/cannot be inferred——指出迁移无效本身是正确判别）、对冲（可能/也许/或许/大概/恐怕/多半/倾向于；EN maybe/perhaps/might/probably/tends to）、概念/教学转述（组合谬误/合成谬误/分解谬误/分割谬误/整体与部分/区群谬误/生态谬误/逻辑谬误/老师/教材/课堂/教授/课本；EN composition fallacy/division fallacy/fallacy of composition/ecological fallacy/textbook/lecture）、疑问句（含 ?/？）。",
     // [r725] 第 155 维度 affirming_the_consequent（肯定后件：如果P则Q，Q在场所以P）。
     'affirming_the_consequent': "不得**把结果当证据倒推原因**——先立「如果 P 则 Q」的条件规则，再用 Q 在场断言 P 成立：「如果是他干的，他会留下痕迹；现场有痕迹，所以是他干的」「努力的人都会早起；他天天早起，所以他很努力」「认真做产品的公司都会打磨细节；这家公司细节到位，所以是真认真」「下雨地面会湿；地面湿了，所以刚下过雨」「发烧的人体温会高；他体温高，所以他发烧了」「好项目都有清晰的规划；这个项目规划清晰，所以是个好项目」「成功的人都热爱学习；他热爱学习，所以他将来会成功」「靠谱的团队都会写复盘；他们写了复盘，所以团队靠谱」「真心帮你的人才会指出你的问题；他指出问题，所以他是真心帮你」「高手都会犯这种错，他犯了这个错，说明他是高手」「If he were guilty, he would act nervous. He looks nervous, so he is guilty.」「Good code has tests. This module has tests, so the code is good.」「Successful founders read a lot. He reads a lot, so he will be a successful founder.」这类**条件规则×后件重现×前件肯定结论**的话术当正常叙述（样本形状与负例见 test/round-725-affirming-the-consequent.js）。判据：腿① COND 条件/规则句（如果X（那么/则/就）Y / X都会Y / X会Y / 只要X就Y / EN: if X then Y / X has Y / 英文裸规则句前两词为主语），腿② BACKWARD 倒推结构——按推断词（所以/因此/说明/证明/可见/意味着/显然是/肯定是/so/therefore/which means）切分事实句，前半须含腿①后件关键词、后半须回指腿①前件关键词。这个切分天然区分三种有效推理：modus ponens（P→Q，P∴Q）事实句回指前件、结论出后件，不判；modus tollens（P→Q，¬Q∴¬P）后件被否定或无原样重现，不判；归纳/举证不足（后件未重现只是相似）不判。缺腿不判——「他朋友的问题归他朋友」类只有条件语境无倒推结论不判；「他体温高可能是发烧也可能是其他原因，需要进一步检查」有对冲不判。后件成立不能反推前件成立——同样的结果可能有多个原因：正当做法是**把倒推改成正推或枚举检验**（要确认 P，需要能独立验证 P 的证据，而不是只验证 Q/列出其他可能原因并逐一排除/EN: find direct evidence for P, not just for Q）或**把充分条件与必要条件分开**（Q 是 P 的必要条件还是充分条件要说清，别混用/早起只是努力的一个表现，不是努力的定义）。边界：pseudo_causal 管**相关当因果**（两件事一起出现就称导致），本族管命题逻辑的逆向推断（条件句后件在场就断言前件）；post_hoc 管**时间先后当因果**（B 发生在 A 后就称 A 导致 B），本族不依赖时间顺序而依赖条件句结构；hasty_generalization 管**样本不足的归纳**，本族是演绎形式的逆向误用；reasoning_coherence 管**段落连贯性**，本族管单句推断的有效性。正当推理（如果明天下雨，运动会就取消；明天下雨了，所以运动会取消——modus ponens/如果是他干的，他会留下痕迹；现场没有痕迹，说明可能不是他干的——modus tollens/这个项目规划清晰只是必要条件，不能反推项目质量/Tests are necessary but not sufficient — we still need code review./他早起只能说明起床早，说明不了努不努力）、对冲表述（可能/也许/未必/不一定/还要看/之一/必要不充分/perhaps/maybe/might/not sufficient）、谬误概念转述（肯定后件/逆命题/逻辑谬误/形式谬误/affirming the consequent/formal fallacy）、教学转述（老师/教材/课堂/textbook/lecture）、证据语境讨论（证据不足/孤证/不能证明/insufficient evidence/cannot prove）明确不判。",
 'relative_pration': "不得**拿别人更惨的处境抹掉对方正当的当下诉求、抱怨或疼痛**——用第三方（人家/有人/多少人/往事一代/others）的具体苦难作参照，宣布对方的困难不值一提：「别喊疼了，人家生孩子的都不吭声」「起码你还有学上，非洲的孩子连饭都吃不上」「知足吧，还有人工资比你低一半呢」「你这点苦算什么，穷苦人家连饭都吃不上」「年轻人吃点苦怎么了，我们当年饭都吃不饱」「别嫌辅导班贵，山区孩子想上还没得上」「至少公司还发工资，好多厂都倒闭了，知足吧」「How can you complain about your flight delay when people are starving?」「You have a roof over your head; stop complaining about the noise.」「At least you have a job — many people would kill for your position.」这类**第三方苦难参照×压制诉求**的话术当正常叙述（样本形状与负例见 test/round-726-relative-pration.js）。判据：腿① SUFFER 更惨参照系——第三方/群体/往事的**具体**苦难处境（连…都吃不上/睡大街/没挺过来/倒闭/失业/辍学/难民/战区/搬砖/通勤四小时/比你惨多了/roof over your head/starving/flooding），或「比你+负面比较」，或极小化「还有」形（至少还有五险一金/至少还有人要你）；抽象的更惨/更不幸/更艰难（共情转述高频形）刻意不收。腿② DISMISS 压制诉求——别喊/别嫌/别抱怨/知足/还不满足/算什么/怎么了/想想/至少/起码/只是/就不错了/stop complaining/be grateful/at least。两腿共现才判，缺腿不判——「你的困难是真的，同时也值得想想更糟的情况来调节视角」承认痛苦不压制不判；「虽然还有更不幸的人，但这不代表你的痛苦不存在」是否定翻转不判；「有人处境更艰难，所以我们更要认真对待你提的问题」无压制标记不判。别人的苦难不能抵消眼前的问题——处境艰难与当下诉求是两个并行的事实，前者不能折抵后者：正当做法是**先承认对方处境的真实性**（加班到十点确实辛苦/你的困难是真的），再就事论事处理具体问题（改善排班/核对数据/给出方案），比较性视角只能作为附加信息（值得关注），不能作为关闭对话的依据。边界：suffering_contest（第78维）管**第一人称自陈比惨**（我比你惨多了/我这半年没睡过整觉），本族拿第三方苦难贬低对方，第一人称形显式让位；suffering_capital 管把苦难折算成顺从资格，本族不兑换服从只关闭诉求；appeal_to_pity 管**自述可怜换规则豁免**，本族是拿他人更惨拒绝承认对方困境；harm_invalidation 否定伤害事实本身，本族承认事实只做量级比较；selective_minimization 淡化己方过错，本族不涉过错只涉处境比较；false_balance 把两方压成等权，本族是单向贬低。正当比较（市场行情/同比数据）、共情转述（承认痛苦+给方案）、对冲表述（也许/可能/未必/not necessarily）、谬误概念转述（诉诸更惨/相对剥夺/relative privation）、教学转述（课堂/教材/textbook）明确不判。",
@@ -3779,6 +3797,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 基础概率/假阳性率或确证检测，单句也可能是待确认的正确处置、计及先验的
     // 概率陈述或概念教学。与 r152-r170 同口径只登记 VERIFY。
     'base_rate_neglect',
+    // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移）登记。
+    // verify 级——部分属性推整体属性/整体属性推每个部分属性需要补的是
+    // 「该属性在部分与整体间是否可加/可分布」的聚合依据，单句也可能是
+    // 显式合计的正确聚合陈述、文学对白转述或概念教学。与 r161-r171
+    // 同口径只登记 VERIFY。
+    'whole_part_transfer',
     // [r726] 第 156 维度 relative_pration（诉诸更惨）登记。
     // verify 级——「拿更惨的人抹掉眼前抱怨」需要补的是对方诉求本身的
     // 事实核查与处理方案，单句也可能是共情转述或概念讨论。与 r672-r725
@@ -4253,6 +4277,9 @@ function discriminate(text, evidence = [], contentMode) {
 
       // [r171] 第 169 维度 base_rate_neglect（基础概率忽视）。
       base_rate_neglect: brn,
+      // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移）。
+      // 同 r171 先例：九处一次接齐，漏一处 dimensions 读数缺键。
+      whole_part_transfer: wpt,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,
@@ -4532,6 +4559,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r171] 第 169 维度 base_rate_neglect 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       brn.count ? brn.count + ' 处基础概率忽视' : '',
+      // [r172] 第 170 维度 whole_part_transfer 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      wpt.count ? wpt.count + ' 处整体-部分属性迁移' : '',
       // [r726] 第 156 维度 relative_pration 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       rpr.count ? rpr.count + ' 处诉诸更惨' : '',
@@ -15020,6 +15050,9 @@ module.exports = {
   // [r171] 第 169 维度 base_rate_neglect 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkBaseRateNeglect,
+  // [r172] 第 170 维度 whole_part_transfer 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkWholePartTransfer,
   // [r726] 第 156 维度 relative_pration 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkRelativePrivation,
