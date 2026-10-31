@@ -572,6 +572,10 @@ const { checkBaseRateNeglect } = require('./base-rate-neglect.js');
 // 判据部分量词×部分名词腿×涌现质量词腿×推断词腿×整体名词腿多条件共现；
 // 细节见 src/whole-part-transfer.js。
 const { checkWholePartTransfer } = require('./whole-part-transfer.js');
+// [r173] 第 171 维度 clustering_illusion（集群错觉/Texas sharpshooter：把随机
+// 数据中的聚集、连续、扎堆当成显著性证据或特殊原因）。
+// 判据聚集陈述腿×显著性归因腿两腿共现；细节见 src/clustering-illusion.js。
+const { checkClusteringIllusion } = require('./clustering-illusion.js');
 // [r726] 第 156 维度 relative_pration（诉诸更惨：拿更惨的人抹掉眼前抱怨）。
 // decision 本体一次选中无打平（scripts/decide-r726.js，composite 0.83 /
 // confidence 0.84 / identity alignment 0.8；第二名 B/C 均 0.81，D 0.79）。
@@ -1776,6 +1780,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移）计算点。
   // 同 r171 先例：多处一次接齐，漏一处 gate.action 恒 pass。
   const wpt = _applyPedagogyRelaxation(checkWholePartTransfer(_normText), "whole_part_transfer", pedagogyRelaxation);
+  // [r173] 第 171 维度 clustering_illusion（集群错觉）计算点。
+  // 同 r172 先例：多处一次接齐，漏一处 gate.action 恒 pass。
+  const clu = _applyPedagogyRelaxation(checkClusteringIllusion(_normText), "clustering_illusion", pedagogyRelaxation);
   // [r726] 第 156 维度 relative_pration（诉诸更惨）计算点。
   // 同 r725 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const rpr = _applyPedagogyRelaxation(checkRelativePrivation(_normText), "relative_pration", pedagogyRelaxation);
@@ -2252,6 +2259,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r172] 第 170 维度 whole_part_transfer 参与判定（整体-部分属性迁移）。
     // 同 r171 先例：dimMap 与 allDims 必须两处都接。
     {score: wpt.score, name:'whole_part_transfer'},
+    // [r173] 第 171 维度 clustering_illusion 参与判定（集群错觉）。
+    // 同 r172 先例：dimMap 与 allDims 必须两处都接。
+    {score: clu.score, name:'clustering_illusion'},
     // [r726] 第 156 维度 relative_pration 参与判定（诉诸更惨）。
     // 同 r725 先例：dimMap 与 allDims 必须两处都接。
     {score: rpr.score, name:'relative_pration'},
@@ -2636,6 +2646,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移×
     // 部分量词腿×涌现质量词腿×推断词腿×整体名词腿）。
     whole_part_transfer: wpt,
+
+    // [r173] 第 171 维度 clustering_illusion（集群错觉×
+    // 聚集陈述腿×显著性归因腿）。
+    clustering_illusion: clu,
     // [r726] 第 156 维度 relative_pration（诉诸更惨×
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
@@ -2920,6 +2934,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 全体）。样本形状与负例见 test/round-169-selection-bias.js。
     'selection_bias': "不得**把受限样本的结论当成全体的结论**——只从一个受限的、自选择的或非随机的来源取证（只调查会员/只统计某群体/只采访愿意配合者/数据只来自某平台/样本全部来自志愿者），却据此断言「代表全体」「具有普遍性」「适用于所有人」「足以说明全国」：取样来源与结论总体不匹配，证据效力被夸大：「问卷只发给了注册会员，所以调查结果代表全体用户的满意度」「数据只来自一线城市的活跃用户，足以说明全国用户的偏好」「样本全部来自自愿报名的志愿者，因此这个结论具有普遍性」「公司只收集了投诉客户的意见，这说明客户整体都很不满意」「We only surveyed volunteers, so the results are representative of everyone.」「The sample was drawn solely from our premium users, which means all customers prefer this feature.」（样本形状与负例见 test/round-169-selection-bias.js）。判据**双腿共现**：腿① RESTRICTION 取样受限——限定标记（只/仅/仅仅/全都/都/均/only/solely/restricted to）×取样动词（调查/统计/采访/回收/收集/纳入/来自/发给/survey/sampled/drawn/recruited）近距离共现，或来源短语（样本/数据+全部/都/均+来自）带受限来源词（会员/活跃/自愿/投诉/一线/管理层/volunteers/premium/self-selected）；腿② GENERALIZATION 总体推广——推广动词（代表/适用于/推广/反映/具有/足以说明/足以证明/representative of/generalizes to/applies to）接总体范围词（全体/所有/整体/全国/每个人/普遍/all/every/everyone），或总体范围词+「都」形全称判断（全体员工都认可）。明确不判：明示局限（只能反映/不能代表/不一定成立/存在偏差——正确推理）、充分取样（随机抽样/分层抽样/普查/random sample——推广有效）、幸存者措辞（幸存者/活下来/survivors——射程归 survivorship_bias）、只描述样本自身（会员的满意度更高/所有样本都合格）、概率化结论（可能/也许/maybe/might）、疑问句（样本能代表全体吗）、谬误概念转述（取样偏差/选择偏差/selection bias/sampling bias）、教学转述（老师/教材/课堂/textbook/lecture）。survivorship_bias(132) 管「只看幸存者」，本族管「取样框限制×总体推广」，射程互补。",
     'base_rate_neglect': "不得**拿单个阳性信号直接断定个体归属或状态**——检测/筛查阳性、被系统或算法标记、命中名单、符合画像、测谎仪显示等单一证据，不能直接推出「几乎肯定得病」「很可能是骗子」「显然有罪」这类高置信度结论：阳性预测值取决于基础概率（患病率）与假阳性率，忽略基础概率的「命中即中招」是把可能性当成确定性。应补上基础概率/假阳性率，或安排确证检测：「你检测呈阳性，所以你几乎肯定得了这个病」「系统把你标记成匹配对象，这意味着你很可能是个骗子」「他符合恐怖分子的画像，所以他八成是危险人物」「The test came back positive, so you almost certainly have the disease.」「The algorithm flagged you, which means you're probably a fraud.」（信号形状与负例见 test/round-171-base-rate-neglect.js）。",
+    // [r173] 第 171 维度 clustering_illusion（集群错觉：把随机数据中的聚集
+    // 当成「绝不是巧合」「显然有蹊跷」「逃不掉的规律」的显著性证据）。
+    // 形状与负例见 test/round-173-clustering-illusion.js。
+    'clustering_illusion': "不得**把随机数据里的聚集、连续、扎堆、集中出现的事件，当成「绝不是巧合」「显然有蹊跷」「一定有特殊原因」「这是逃不掉的规律」的显著性证据**——随机分布在时间、空间、类别上本就会出现聚集；把聚集读成必然、反常或神秘规律，是把噪声当信号：「这个路口一个月出了四起事故，绝不可能是巧合」「最近三个月，同一个小区接连发生了五起入室盗窃，显然这里面有蹊跷」「三个中奖者全都来自同一条街，这绝不是偶然」「这个部门每逢周一必出事，简直是逃不掉的魔咒」「Four accidents happened at the same intersection in one month, which cannot be a coincidence.」「Three lottery winners all came from the same street — that can't be random.」（样本形状与负例见 test/round-173-clustering-illusion.js）。判据**两腿共现，缺一不判**：腿① CLUSTER 聚集陈述三条路线任一——路线 a 聚集语义词（连续/接连/接二连三/扎堆/集中/频发/高发/屡屡/频频/隔三差五/每逢/每当/每次/历来/向来；EN in a row/in succession/consecutive/clustered/spate/streak/every Friday）× 事件名词（事故/案件/盗窃/中奖/倒闭/猝死/投诉/故障/纠纷/空难/坠机/失踪/复发……裸名词形态；EN accidents/incidents/crashes/complaints/lawsuits/suicides）落在 14 字（EN 20 字符）窗内（前后双向）；路线 b 同一来源（全都/都/皆/清一色/无一例外 + 来自/出自/毕业于/就职于/指向/死于 + 同一/同一个/同一条/同属；EN all … from/at/in … same）；路线 c 数量≥2（四起/五起/好几个/数次；EN two/three/four/several/multiple）× 事件名词（后 6 字窗，含倒装「事故四起」）；腿② SIGNIF 显著性归因五形任一——R1 否认巧合（绝不是/绝非/一定不是/不可能只是/并非只是/不只是 × 巧合/偶然/随机；EN can't be / is not just / more than / far from × coincidence/chance/random）、R2 异常断言（显然/肯定/一定/可见/说明/意味着/证明 × 蹊跷/反常/有猫腻/说不通/邪门/诡异/离奇/不同寻常；EN clearly/obviously/must/means × sinister/fishy/inexplicable/pattern/law）、R3 神秘归因（天意/天命/劫数/魔咒/宿命/冥冥/幕后黑手/暗中操控/风水/玄学/诅咒/看不见的手；EN cursed/doomed/destiny/fate/omen/universe is telling）、R4 定律化（逃不过/躲不掉/在劫难逃/铁律/命中注定/历史重演；EN doomed/inescapable/bound to happen/same fate）、R5 周期迷信（每逢/每当/每次 × 必/准/总 × 出事/故障/复发/吵架；EN every Friday something goes wrong）。R1 先于对冲豁免判定（「绝不可能是巧合」的「可能」是否认式组成部分，不是对冲）。缺腿不判——「这个路口一个月出了四起事故，交警排查后发现是信号灯配时问题」只有聚集陈述、无显著性归因（且排查属证据处理）；「连续三起投诉都指向同一个客服，说明培训有问题」指向已识别的共同原因而非任意属性的特异性；「三起案件虽然时间接近，但警方认定是同一伙流窜作案」是事实认定不是噪声判读。正当做法是**把聚集当假设而不是结论**：先做统计检验（该聚集相对基准率/泊松期望是否显著）、给出共同机制的证据（信号灯配时数据/同一批零件/同一伙人的痕迹）、或明确说「按概率这可能是正常波动」。边界：hot_hand 管势头×延续性预测（热手会继续），本族管回顾性聚集×显著性归因（聚集必有蹊跷），可无任何预测；post_hoc/pseudo_causal 管时序连接×因果断言（A 在 B 前所以 A 导致 B），本族聚集不依赖时间先后、结论也不是具体因果而是特异性/必然性；selection_bias 管取样受限×总体推广，本族可无总体推广、只判聚集本身被赋予的意义。明确不判：显式随机性/统计处理（随机序列/随机波动/按概率/概率论/大数定律/正态分布/独立事件/统计显著/置信区间/样本量/基准率/正常波动/不足为奇/查明/排查/数据显示/研究表明/对照组/归因于；EN randomly/by chance/probability/statistically significant/confidence interval/sample size/base rate/root cause/investigation found/attributed to——承认随机性或给出统计与调查处理本身是正确判别）、推理否定/证据不足（不代表/不意味着/推不出/说明不了/未必/不一定/证据不足/样本不足；EN does not mean/cannot conclude/insufficient evidence/not enough data）、对冲（可能/也许/或许/大概/恐怕/倾向于/碰巧/恰巧；EN maybe/perhaps/might/probably/seems——概率化结论不作谬误判定）、概念/教学转述（集群错觉/赌徒谬误/德州神枪手/热手谬误/概率论/统计学/老师/教材/课堂/卡尼曼；EN clustering illusion/Texas sharpshooter/apophenia/gambler's fallacy/hot hand/textbook/lecture）、疑问句（含 ?/？）。",
     // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移：部分属性推
     // 整体属性或整体属性推每个部分属性，属性为涌现性/非可加时成立）。样本
     // 形状与负例见 test/round-172-whole-part-transfer.js。
@@ -3803,6 +3821,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 显式合计的正确聚合陈述、文学对白转述或概念教学。与 r161-r171
     // 同口径只登记 VERIFY。
     'whole_part_transfer',
+
+    // [r173] 第 171 维度 clustering_illusion（集群错觉）登记。
+    // verify 级——「随机聚集被赋予显著性」需要补的是统计检验或共同机制
+    // 证据，单句也可能是真实信号、证据归因或概念教学。与 r161-r172
+    // 同口径只登记 VERIFY。
+    'clustering_illusion',
     // [r726] 第 156 维度 relative_pration（诉诸更惨）登记。
     // verify 级——「拿更惨的人抹掉眼前抱怨」需要补的是对方诉求本身的
     // 事实核查与处理方案，单句也可能是共情转述或概念讨论。与 r672-r725
@@ -4280,6 +4304,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移）。
       // 同 r171 先例：九处一次接齐，漏一处 dimensions 读数缺键。
       whole_part_transfer: wpt,
+      // [r173] 第 171 维度 clustering_illusion（集群错觉）。
+      // 同 r172 先例：九处一次接齐，漏一处 dimensions 读数缺键。
+      clustering_illusion: clu,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,
@@ -4562,6 +4589,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r172] 第 170 维度 whole_part_transfer 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       wpt.count ? wpt.count + ' 处整体-部分属性迁移' : '',
+      // [r173] 第 171 维度 clustering_illusion 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      clu.count ? clu.count + ' 处集群错觉' : '',
       // [r726] 第 156 维度 relative_pration 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       rpr.count ? rpr.count + ' 处诉诸更惨' : '',
@@ -15053,6 +15083,9 @@ module.exports = {
   // [r172] 第 170 维度 whole_part_transfer 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkWholePartTransfer,
+  // [r173] 第 171 维度 clustering_illusion 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkClusteringIllusion,
   // [r726] 第 156 维度 relative_pration 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkRelativePrivation,

@@ -1,4 +1,33 @@
 
+# 第 173 轮报告（v6.8.101 — 第171维度 clustering_illusion 集群错觉上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切到**证据纪律/随机性判读**一线——r170/r171/r172 连续三轮均为新判别维度 survivorship_bias/base_rate_neglect/whole_part_transfer）：**集群错觉（clustering illusion / Texas sharpshooter fallacy，集群错觉/德州神枪手谬误）**——把随机数据中的聚集、连续、扎堆、集中出现的事件，当成「绝不是巧合」「显然有蹊跷」「一定有特殊原因」「这是逃不掉的规律」的显著性证据。随机分布在时间、空间、类别上本就会出现聚集；把聚集读成必然、反常或神秘规律，是把噪声当信号。
+- 缺口实证（侦察阶段 grep src/ 实测）：`hot_hand` 只管「势头×延续性预测」（前瞻），`post_hoc/pseudo_causal` 只管「时序连接×因果断言」（A 在 B 前→A 导致 B），`selection_bias/survivorship_bias` 只管「取样受限×总体推广」；「随机聚集×否认巧合/特殊归因」这一族零覆盖。
+- 外部来源（真实，未编造）：HN Algolia "conjunction fallacy" 命中 Wikipedia Conjunction_fallacy 经典文献链（objectID 10629797 等 4 条）与 "Linda the Bank Teller, by Tversky&Kahneman"（16467558）；GitHub fallacy-detection 仓库群（latent-variable/Real_time_fallacy_detection ★119 / tmakesense/logical-fallacy ★20 / panFJCharlotte98/Fallacy_Detection EMNLP2024 ★5 / dhfbk/faina NAACL2025 ★5）——全部 LLM-based，与纯规则引擎不同构，仅作概念背景；Semantic Scholar 查询返回空。判据为心虫自有纯规则实现。侦察落盘 /tmp/hf-scout-r173.txt。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / trigger optimal_conditions；cognitiveLoad 与 uncertainty 均为 "unknown"，按轮次纪律不当实质背书。
+
+## 二、实现内容
+- **src/clustering-illusion.js（新增，约 380 行）**：22 个可注入常量 + 三路线聚集判定（nearAny 全量扫描）+ 五形显著性判定。
+  - 腿① CLUSTER 聚集陈述：路线 a 聚集语义词（连续/接连/接二连三/扎堆/集中/频发/高发/屡屡/频频/隔三差五/每逢/每当/每次/历来/向来；EN in a row/in succession/consecutive/clustered/spate/streak/every Friday）× 事件名词（事故/案件/盗窃/中奖/倒闭/猝死/投诉/故障/纠纷/空难/坠机/失踪/复发……裸名词形态；EN accidents/incidents/crashes/complaints/lawsuits/suicides）落在 14 字（EN 20 字符）窗内、前后双向；路线 b 同一来源（全都/都/皆/清一色/无一例外 + 来自/出自/毕业于/就职于/指向/死于 + 同一/同一个/同一条/同属；EN all … from/at/in … same）；路线 c 数量≥2（四起/五起/好几个/数次；EN two/three/four/several/multiple）× 事件名词（后 6 字窗 + 倒装「事故四起」前 4 字窗）。
+  - 腿② SIGNIF 显著性归因：R1 否认巧合（绝不是/绝非/一定不是/不可能只是/并非只是/不只是 × 巧合/偶然/随机；EN can't be / is not just / more than / far from × coincidence/chance/random）、R2 异常断言（显然/肯定/一定/可见/说明/意味着/证明 × 蹊跷/反常/有猫腻/说不通/邪门/诡异/离奇/不同寻常；EN clearly/obviously/must/means × sinister/fishy/inexplicable/pattern/law）、R3 神秘归因（天意/天命/劫数/魔咒/宿命/冥冥/幕后黑手/暗中操控/风水/玄学/诅咒/看不见的手；EN cursed/doomed/destiny/fate/omen/universe is telling）、R4 定律化（逃不过/躲不掉/在劫难逃/铁律/命中注定/历史重演；EN doomed/inescapable/bound to happen/same fate）、R5 周期迷信（每逢/每当/每次 × 必/准/总 × 出事/故障/复发/吵架；EN every Friday something goes wrong）。
+  - 四类豁免负例注入承重：显式随机性/统计处理、推理否定/证据不足、对冲、概念/教学转述、疑问句。
+- **src/index.js 九处接线**（require / 计算点 / dimMap / allDims / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / exports），由带断言的接线脚本一次接齐（同 r171/r172 先例）。
+- **r173 实现教训（已固化进测试与 README 记录）**：① 对冲豁免若置于 R1 之前，「绝不可能是巧合」里的「可能」会把攻击腿自己豁免掉——R1 必须先于对冲豁免判定（曾因此整族漏判，修法：对冲豁免移出全局块、只在 R1 未命中后适用）；② 聚集路线取「首个匹配」会漏（「三个月」先于「五起」命中时真正的聚集对被跳过）——改为全量匹配扫描 nearAny；③ 英文路线 a 缺倒装双向窗（"crashes in a row"）——补双向。
+- **test/round-173-clustering-illusion.js（新增，约 210 行）**：正向 12 攻击/16 良性、17 项常量负例注入承重（含单形样本 + 组合注入隔离证明每条聚集路线与每个显著性形态独立承重）、4 类豁免陷阱翻转、gate 层变体矩阵、登记断言×3。
+
+## 三、验证数据（五门禁全绿）
+- round-173 轮测：**28/28**（攻击 12/12 命中含中英/裸名词/带修饰/倒装/长句；良性 16/16 零误判，含证据归因、确认随机、事实认定、疑问、对冲、统计显著性证据、周期日程、概念教学、「战争是多因共同造成的」边缘良性）
+- gate 层变体矩阵：攻击 **12/12 非 pass**，良性 **10/10 pass**（161 轮强制项，真实 gate() 复量）
+- 双向门禁：召回 **52/52**，误拦 **302/326 不升**（与基线一致）
+- bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 171 键）；doc-numbers-accuracy.test.js **22/22**
+- 文档同步：README/SKILL/AGENTS 三处数字（维度 170→171、VERIFY 129→130、规格表两处）+ README 版本表 6.8.101 行
+
+## 四、已知边界 / 下次可继续
+- 集群陈述的「同一来源」路线只认来源动词族（来自/出自/毕业于/就职于/指向/死于…），「三人都是 A 俱乐部会员」这类无来源动词的共同点暂不接（可下轮扩 SAME_SRC 动词族或加形容词同位路线）。
+- 事件名词表未收价格/涨跌类（上涨/下跌/盈利）与日常高频词（离婚/出轨/判刑），经济聚集句（「连续三天涨停，必有蹊跷」）暂漏——收表即误伤风险，需先做双向守卫基线比对再扩。
+- 概念豁免里的「老师」为裸词（同 r172 口径），「老师傅都说邪门」式口语会被误豁免——样本层已绕开，引擎层可下轮收紧为老师(讲|说|在|曾)。
+
 # 第 172 轮报告（v6.8.100 — 第170维度 whole_part_transfer 整体-部分属性迁移上线 — 2026-10-31）
 
 ## 一、方向与来源
