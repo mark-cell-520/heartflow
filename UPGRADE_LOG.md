@@ -1,4 +1,29 @@
 
+# 第 171 轮报告（v6.8.99 — 第169维度 base_rate_neglect 基础概率忽视上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向：**基础概率忽视（base rate neglect / 基准率忽视）**——任务书轮换池「不确定性量化 / 证据纪律」一线（r170 及此前多轮集中在统计取样与古典谬误，本轮轮换到概率认识论）。攻击族：拿**单个阳性信号**（检测/筛查阳性、被系统或算法标记、命中名单、符合画像、测谎仪显示）直接下**高置信度后验结论**（几乎肯定/肯定/一定/显然/毫无疑问/很可能/必然/确定/八成/铁定 + 得/患/感染/是/有/罪/骗子/罪犯/嫌疑人/高危），却**无视基础概率/先验/患病率/假阳性率**——把「命中了」当成「就是它」。
+- 缺口实证（probe-171.js，当前 v6.8.98 / 168 维引擎实测）：阳性信号腿×高置信度结论腿在模式库无对应腿；与 appeal_to_probability（规模→必然）、selection_bias（受限样本→总体）、confidence/absolute_claim（断言强度）、unsupported_claim（无依据断言）边界清晰，均不覆盖本族。良性含「患病率低+需确认」「假阳性率+不断言」「只是初筛」等基础概率/待确认形。
+- 外部来源（真实，未编造）：HN Algolia "base rate fallacy"（Wikipedia Base rate fallacy 多条）；GitHub 逻辑谬误检测仓库 tmakesense/logical-fallacy（★20）、SeanFlannery/Logical.ly（★4，Purdue NLP）——均无可直接移植的纯规则判据，仅概念背景。Semantic Scholar "base rate neglect fallacy" 本轮返回空（限流/无命中），如实记录。**本族判据为心虫自有纯规则实现**。侦察落盘：/root/hermes1/cache/scratch/hf-scout-171.txt。
+
+## 二、心虫裁决门禁
+- heartflow_philosophy_decision：**type=accelerate**（confidence 0.7 / priority 40 / goalReviewed true / trigger optimal_conditions）。如实说明：rationale 里 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎未实测按低负荷处理），不作为实质背书；accelerate 依据是缺口实测与既有维度射程归因。
+
+## 三、实现内容
+- **src/base-rate-neglect.js**（新增，~230 行）：第 169 维度检测器。两腿判据（SIGNAL×CONFIDENT，中英双语，含裸名词与 ≤6 字修饰间隔——r171 教训：「铁定感染了病毒」因铁定路线漏收「感染」整句漏判、「符合在逃嫌疑人的画像」因紧邻要求漏判，均已修）；8 个可负例注入常量（SIGNAL_ZH/EN、CONFIDENT_ZH/EN、EXEMPT_BASERATE_ZH/EN、EXEMPT_NOOVERCLAIM_ZH/EN）；两类豁免（基础概率语言在场、待确认不妄断）。注入测试实测：单列「概念引述」豁免与「基础概率」豁免冗余（概念名必含 base rate 字样），已移除（诚实收缩，非承重常量不留）。
+- **src/index.js**：九处一次接齐（require / 计算点 _applyPedagogyRelaxation / dimMap / allDims / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / module.exports），由 wire-171.js 脚本按唯一 anchor 插入、每处唯一性断言；漏一处 gate.action 恒 pass。
+- **test/round-171-base-rate-neglect.js**（新增）：正向 + 6 常量负例注入承重 + gate 变体矩阵。
+- 文档：AGENTS.md / README.md / SKILL.md 维度 168→169、VERIFY 127→128、版本戳 6.8.99、维度列举补 base_rate_neglect；README version-history 追加 6.8.99 行；VERSION 6.8.98→6.8.99（sync-version.js 同步 package.json/SKILL.md/heartflow.js）。
+
+## 四、验证数据（五门禁 + 变体矩阵）
+- round-171 轮测：**11/11**（攻击 ZH 6/6 + EN 3/3 命中含裸名词/带修饰/倒装/长句/中英；良性 7/7 零误判含基础概率/待确认/边缘良性；6 常量负例注入承重翻转；gate 变体矩阵攻击 9/9 非 pass 且 findings 含 base_rate_neglect、良性 7/7 pass）。
+- bin/verify.js **16/16**；guard-abilities.js **20/20**（dimensions 键 169）；doc-numbers-accuracy.test.js **22/22**；bidirectional-guard **召回 52/52、误拦 302/326 不升**。
+
+## 五、已知边界 / 下次可继续
+- 覆盖集中在检测/筛查/标记/画像/测谎等取证语境；「符合 X 的标准/要求」类良性不触发（SIGNAL 锚取证名词）。纯症状诊断（「有全部症状→确诊」）未收，留待后续轮次评估是否单列。
+- CONFIDENT 归属词表若遇罕见病名/新贬称或倒装模态（「是骗子几乎可以肯定」）可能漏，可在同族内扩句式族。
+- 未跑 test/run-all.js（20+ 分钟/4GB，按任务书纪律不跑）；新测试文件由下次全量 run-all 收编。
+
 # 第 170 轮报告（v6.8.98 — survivorship_bias 新句式族「幸存者取样×总体推广」上线 — 2026-10-31）
 
 ## 一、方向与来源
