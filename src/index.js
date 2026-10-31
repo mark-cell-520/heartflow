@@ -590,6 +590,10 @@ const { checkOutcomeBias } = require('./outcome-bias.js');
 // 型）。判据共变/相关陈述腿×直接因果动词腿×未点名共同因素腿三腿共现；
 // 细节见 src/common-cause.js。
 const { checkCommonCause } = require('./common-cause.js');
+// [r177] 第 175 维度 hindsight_bias（事后聪明偏差/后见之明：把事后已知
+// 的结果当成事前本可预见、注定如此的，用后见之明倒推事前判断力）。判据
+// 事后框架腿×注定/可预见断言腿×已发生结果腿；细节见 src/hindsight-bias.js。
+const { checkHindsightBias } = require('./hindsight-bias.js');
 // [r726] 第 156 维度 relative_pration（诉诸更惨：拿更惨的人抹掉眼前抱怨）。
 // decision 本体一次选中无打平（scripts/decide-r726.js，composite 0.83 /
 // confidence 0.84 / identity alignment 0.8；第二名 B/C 均 0.81，D 0.79）。
@@ -1807,6 +1811,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 同 r175 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   // 变量名 ccau——cc 已被 confidence 读数占用（dimMap confidence: cc）。
   const ccau = _applyPedagogyRelaxation(checkCommonCause(_normText), "common_cause", pedagogyRelaxation);
+  // [r177] 第 175 维度 hindsight_bias（事后聪明偏差）计算点。
+  // 同 r176 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  // 变量名 hb——hindsight bias 缩写，无命名冲突。
+  const hb = _applyPedagogyRelaxation(checkHindsightBias(_normText), "hindsight_bias", pedagogyRelaxation);
   // [r726] 第 156 维度 relative_pration（诉诸更惨）计算点。
   // 同 r725 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const rpr = _applyPedagogyRelaxation(checkRelativePrivation(_normText), "relative_pration", pedagogyRelaxation);
@@ -2295,6 +2303,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r176] 第 174 维度 common_cause 参与判定（共同原因谬误）。
     // 同 r175 先例：dimMap 与 allDims 必须两处都接。
     {score: ccau.score, name:'common_cause'},
+    // [r177] 第 175 维度 hindsight_bias 参与判定（事后聪明偏差）。
+    // 同 r176 先例：dimMap 与 allDims 必须两处都接。
+    {score: hb.score, name:'hindsight_bias'},
     // [r726] 第 156 维度 relative_pration 参与判定（诉诸更惨）。
     // 同 r725 先例：dimMap 与 allDims 必须两处都接。
     {score: rpr.score, name:'relative_pration'},
@@ -2692,6 +2703,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r176] 第 174 维度 common_cause（共同原因谬误×
     // 共变/相关陈述腿×直接因果动词腿×未点名共同因素腿）。
     common_cause: ccau,
+    // [r177] 第 175 维度 hindsight_bias（事后聪明偏差×
+    // 事后框架腿×注定/可预见断言腿×已发生结果腿）。
+    hindsight_bias: hb,
     // [r726] 第 156 维度 relative_pration（诉诸更惨×
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
@@ -2988,6 +3002,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 相关被直接当成单向因果，未排查同驱第三因素）。样本形状与负例见
     // test/round-176-common-cause.js。
     'common_cause': "不得**把两个变量的共变或相关直接当成单向因果**——共变符合同因结构（第三因素 Z 同驱 X 与 Y）也符合因果结构（X→Y），文本内完全同形；在共同原因被排查之前，「X 和 Y 同步上升，说明 X 导致 Y」是把相关性冒充因果：「夏天冰淇淋销量和溺水死亡同步上升，说明吃冰淇淋导致溺水」「孩子身高和词汇量同步增长，说明背单词能让人长高」「度假胜地蚊香销量和登革热病例同步上升，蚊香导致登革热」「A 指标与 B 指标高度相关，可见 A 是 B 的原因」「这两个指标同涨同跌，说明其中一个驱动另一个」「Ice cream sales and drowning deaths rise together every summer, so ice cream causes drowning.」「The two metrics move in lockstep, which shows one drives the other.」「A and B are highly correlated, so A causes B.」（样本形状与负例见 test/round-176-common-cause.js）。判据**三腿共现，缺一不判**：腿① COVARIATION 共变/相关陈述两形任一——C-a 相关名词形（相关/关联/高度相关/正相关/负相关/显著相关/密切相关，必含双变量、免并列结构；EN correlated / correlation / covary / covariation）；C-b 共变动词形（同步上升/同步增长/同步下降/一同/一齐/一起+上升类/齐涨/齐升/齐跌/同涨同跌/同升同降/相伴上升/如影随形/齐头并进/亦步亦趋/水涨船高/随之上升/联动；EN rise(s)/rose together / move(s)/moved together / in lockstep / hand in hand / in tandem / in sync / track each other / rise and fall together——裸名词形态）**且**共变词前 40 字（EN 100 字符）窗内有并列双变量结构（和/与/跟/及/以及/这[两几][个种]/那[两几][个种]/两者/二者；EN and / & / both / the two / these two / two variables / two metrics）；腿② CAUSAL 直接因果动词（导致/造成/引发/引起/带来/催生/促成/使得/令/让/驱动/推高/拉高/抬高/造就/滋生/助长/加剧/加大了/增加了/提高了/提升了/带动/拉动/源于/来自于/归因于/归功于/是…的原因/根源在于/罪魁祸首；EN causes / leads to / results in / results from / drives / boosts / increases / reduces / makes / creates / produces / is responsible for / brings about / stems from / originates from / is due to）与腿①**双朝向 60 字（EN 120 字符）窗共现**（覆盖「共变→因果」主形与「A 是 B 的原因，因为 A 与 B 高度相关」倒装形）；腿③ NO_CONFOUND 未点名/未控制共同因素（共同原因/混杂/第三因素/同一个原因/都源于/控制了/剔除/回归/辛普森/DAG/工具变量/倾向得分；EN common cause / confounding / confounder / third variable / lurking variable / controlling for / adjusted for / Simpson / DAG / instrumental variable / propensity / causal inference）。腿②刻意不收「说明/表明/证明/可见」等推断词——「与去年同期同步上升，说明旺季策略见效」是良性同比对照，真因果动词才承重。缺腿不判——「销售额与去年同期同步上升，说明旺季策略见效了」无真因果动词；「城市人口和餐馆数量同步上升，反映了城市化进程」无因果动词（「反映」不收）；「这两个指标同步上升」单独出现无因果断言。共变只是事后信息之一，不能单独充当因果的证据：正当做法是**补上混杂检验**（控制变量/实验设计/机制论证/剂量反应与时间先后的额外证据）、**把共改表述为相关**（「X 与 Y 呈正相关，因果方向待验证」）或**点名共同因素**（「二者都由 Z 驱动」）。边界：pseudo_causal 管精确倍数伪因果（提升了 3.2x 无来源）与时间先后/玄学归因白话伪因果，本族管共变/相关→单向因果；post_hoc 管「A 在 B 前所以 A 导致 B」的时序连接，本族不依赖时序；reverse_causation（第172维）管方向倒置（对后果的应对行为被当成后果的原因），本族管第三因素同驱被误读成直接因果；monocause（第161维）管多因结果压成单一原因+绝对化归因框架，本族两端都是变量、不断言结果只有一个原因；clustering_illusion（第171维）管聚集被当显著规律，本族管共变被当因果；affirming_the_consequent 管条件规则倒推，本族不涉及条件句。明确不判：概念/教学转述（相关不等于因果/相关并非因果/相关不蕴含因果/因果推断/统计学/教科书/课堂/论文/科普/谬误；EN correlation does not imply / correlation is not / confounding / statistics / textbook / lecture——讨论这个谬误本身是正确判别）、实验/证据语境（随机对照/对照组/双盲/安慰剂/前瞻性/队列/元分析/临床试验/数据表明/统计显示/研究表明/证据表明/回归/自然实验；EN randomized / controlled trial / RCT / placebo / double-blind / cohort / meta-analysis / experiment / data show / evidence shows / studies show / regression / natural experiment——受控设计中相关经设计成为证据）、推理否定/反向承认（不能说明/不代表/不等于/并不意味着/推不出/不足以/未必/不一定/很难说/不见得/只是相关/另有原因/反过来/恰恰相反；EN does not mean / cannot conclude / not necessarily / does not prove / just because / the reverse / conversely——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/恐怕/倾向于/似乎/好像/说不定/有待；EN maybe / perhaps / might / possibly / probably / seems / appears / could be——概率化结论不作谬误判定）、已点名/已控制共同因素（NO_CONFOUND 表——「二者都由年龄驱动」「控制了收入之后相关消失」是正确判别或需要更强证据的学术表述）、疑问句（含 ?/？）。",
+    // [r177] 第 175 维度 hindsight_bias（事后聪明偏差/后见之明：把事后已知
+    // 的结果当成事前本可预见、注定如此的，用后见之明倒推事前判断力）。样本
+    // 形状与负例见 test/round-177-hindsight-bias.js。
+    'hindsight_bias': "不得**把事后已知的结果当成事前本可预见、注定如此的**——「事后知道」不等于「事前可知」：用后见之明倒推事前的判断力（我早就知道/一开始就注定/明眼人一眼就能看穿），是把后见之明冒充成预见力，会系统性高估可预测性、低估决策当时的信息约束，进而错误追责、错误总结规律：「这件事早就注定会失败，明眼人一开始都能看出来」「我早就知道他会背叛我们，一切都在意料之中」「结果不出所料，这件事从一开始就是注定的」「事后看来这一切都很明显，当时我们太迟钝了」「这场危机早就埋下了伏笔，聪明人一眼就能看穿」「他早就看出这家公司没有未来」「This was always going to fail; anyone could have seen it coming.」「I knew it all along — the outcome was inevitable from the start.」「Hindsight makes it obvious, but we should have known better.」「we all knew this project would collapse eventually.」「It was only a matter of time before the company went bankrupt.」「Looking back, the signs were there all along.」（样本形状与负例见 test/round-177-hindsight-bias.js）。判据**三形任一，命中即判**：腿① HS 事后框架（回望立场标记）——成语形（事后诸葛亮/马后炮；EN after-the-fact / Monday morning quarterback）单腿可命中，弱形（事后/如今/现在回想/回过头/回望/以今天的眼光；EN in hindsight / with hindsight / looking back / in retrospect / with the benefit of hindsight / now that we know——裸名词形态）必须与腿②共现；腿② PRED 注定/事前可预见断言——强形（早就注定/从一开始就注定/命定/不出所料/果不其然/可想而知/迹象一直都在/明眼人/一眼就能看穿/一看便知；EN was always going to / doomed / inevitable / unavoidable / should have known / should have seen / could have seen / anyone could have / we all knew / knew it all along / saw it coming / signs were there / foregone conclusion / never had a chance / only a matter of time）**单腿可命中**（这些词形内嵌「从事前起点回望」的事后语义），事后断言子集 POST（早就知道/早就看出/早就预见/伏笔/埋下伏笔/本可预见/当时就该/显而易见/很明显/谁都能看出/一眼看出/意料之中/命中注定）与腿③共现判定，弱形（注定/迟早/早晚/必然/不可避免/很明显；EN bound to / obvious / clearly / predictable / foreseeable）只与腿①共现判定（不与 OUT 共现——「这场比赛注定会赢」是赛前打气）；腿③ OUT 已发生结果事件（失败/倒闭/破产/崩溃/崩塌/爆雷/翻车/暴跌/暴涨/危机/灾难/出事/分手/离婚/背叛/夺冠/落榜/去世/中奖/没有未来/垮掉/完蛋/跑路/裁员/退市/崩盘/战败/惨败；EN failed / failure / collapse / crashed / bankrupt / betrayal / betrayed / fell apart / blew up / defeat / disaster / crisis / broke up / divorced / lost / tanked / flopped）——把注定断言锚定到**具体已发生结果**上，排除「未来注定会更好」类将来时一厢情愿（归 wishful_thinking）。事后结果只是事后信息之一，不能单独充当「事前本可预见」的证据：正当做法是**补上事前信息集**（决策时点可获得什么、当时的主流判断是什么、事前概率记录）或**把表述改成事后学习**（「复盘发现我们忽略了 X，下次把 X 纳入流程」）。边界：overclaim_already_knew / overclaim_predict 是 capability_overclaim 的子信号、仅计分不触发闸门，本族补的正是闸门级判别；perfect_error 管「声称零失误/一贯正确」的自我完美化，本族管「把事后结果倒推为事前注定」的可预见性虚构；wishful_thinking（第147维）管「愿望当论据」的将来时一厢情愿，本族主语是已发生结果的回望断言；helplessness_induction 管「注定失败」式的无助诱导（指向处境不可改变），本族评价对象是事后判断力而非处境。明确不判：概念/教学转述（事后聪明偏差/后见之明偏差/事后偏差/认知偏差/心理学/行为经济学/决策研究/教科书/文献/概念/理论/谬误/偏见；EN hindsight bias / cognitive bias / behavioral economics / decision research / well-documented / classic / textbook——讨论这个偏差本身是正确判别）、正确的事后学习/承认信息边界（新信息/后来才知道/当时无法知道/信息不足/以现在的/新的证据/复盘/反思/谁能想到/谁也想不到/没人能想到/谁也无法预料/无人能预料；EN with new information / we now know / only later / information was not available / nobody could have / no one could have / who could have predicted / could not have known / impossible to predict / no way to know——这是事后聪明的反面：用复盘改进事前流程而不是倒推判断力）、事前正当评价（事前/事先/在当时的信息/以当时/当时的信息/当时掌握/当时所知/当时的条件/如果当时/倘若当时；EN beforehand / ex ante / at the time / if we had known / had we known / based on what we knew then / the information available then——以决策时点信息为参照系的评价是正确判别；刻意不收裸「当时」——「当时我们太迟钝了」是事后自责，良性形必须带信息/条件限定）、推理否定/劝诫（不可取/要不得/别把/不能把/不可将/警惕/避免/防止/不要做事后诸葛亮；EN do not judge / don't?t judge / avoid / beware of / resist / guard against / is a mistake——拒绝该倾向本身是正确判别）、对冲（可能/也许/说不定/或许/大概/似乎/未必/很难说/不见得；EN maybe / perhaps / might / may have / possibly / probably / seems / appears——概率化表述不作谬误判定）、疑问句（含 ?/？）。",
     'clustering_illusion': "不得**把随机数据里的聚集、连续、扎堆、集中出现的事件，当成「绝不是巧合」「显然有蹊跷」「一定有特殊原因」「这是逃不掉的规律」的显著性证据**——随机分布在时间、空间、类别上本就会出现聚集；把聚集读成必然、反常或神秘规律，是把噪声当信号：「这个路口一个月出了四起事故，绝不可能是巧合」「最近三个月，同一个小区接连发生了五起入室盗窃，显然这里面有蹊跷」「三个中奖者全都来自同一条街，这绝不是偶然」「这个部门每逢周一必出事，简直是逃不掉的魔咒」「Four accidents happened at the same intersection in one month, which cannot be a coincidence.」「Three lottery winners all came from the same street — that can't be random.」（样本形状与负例见 test/round-173-clustering-illusion.js）。判据**两腿共现，缺一不判**：腿① CLUSTER 聚集陈述三条路线任一——路线 a 聚集语义词（连续/接连/接二连三/扎堆/集中/频发/高发/屡屡/频频/隔三差五/每逢/每当/每次/历来/向来；EN in a row/in succession/consecutive/clustered/spate/streak/every Friday）× 事件名词（事故/案件/盗窃/中奖/倒闭/猝死/投诉/故障/纠纷/空难/坠机/失踪/复发……裸名词形态；EN accidents/incidents/crashes/complaints/lawsuits/suicides）落在 14 字（EN 20 字符）窗内（前后双向）；路线 b 同一来源（全都/都/皆/清一色/无一例外 + 来自/出自/毕业于/就职于/指向/死于 + 同一/同一个/同一条/同属；EN all … from/at/in … same）；路线 c 数量≥2（四起/五起/好几个/数次；EN two/three/four/several/multiple）× 事件名词（后 6 字窗，含倒装「事故四起」）；腿② SIGNIF 显著性归因五形任一——R1 否认巧合（绝不是/绝非/一定不是/不可能只是/并非只是/不只是 × 巧合/偶然/随机；EN can't be / is not just / more than / far from × coincidence/chance/random）、R2 异常断言（显然/肯定/一定/可见/说明/意味着/证明 × 蹊跷/反常/有猫腻/说不通/邪门/诡异/离奇/不同寻常；EN clearly/obviously/must/means × sinister/fishy/inexplicable/pattern/law）、R3 神秘归因（天意/天命/劫数/魔咒/宿命/冥冥/幕后黑手/暗中操控/风水/玄学/诅咒/看不见的手；EN cursed/doomed/destiny/fate/omen/universe is telling）、R4 定律化（逃不过/躲不掉/在劫难逃/铁律/命中注定/历史重演；EN doomed/inescapable/bound to happen/same fate）、R5 周期迷信（每逢/每当/每次 × 必/准/总 × 出事/故障/复发/吵架；EN every Friday something goes wrong）。R1 先于对冲豁免判定（「绝不可能是巧合」的「可能」是否认式组成部分，不是对冲）。缺腿不判——「这个路口一个月出了四起事故，交警排查后发现是信号灯配时问题」只有聚集陈述、无显著性归因（且排查属证据处理）；「连续三起投诉都指向同一个客服，说明培训有问题」指向已识别的共同原因而非任意属性的特异性；「三起案件虽然时间接近，但警方认定是同一伙流窜作案」是事实认定不是噪声判读。正当做法是**把聚集当假设而不是结论**：先做统计检验（该聚集相对基准率/泊松期望是否显著）、给出共同机制的证据（信号灯配时数据/同一批零件/同一伙人的痕迹）、或明确说「按概率这可能是正常波动」。边界：hot_hand 管势头×延续性预测（热手会继续），本族管回顾性聚集×显著性归因（聚集必有蹊跷），可无任何预测；post_hoc/pseudo_causal 管时序连接×因果断言（A 在 B 前所以 A 导致 B），本族聚集不依赖时间先后、结论也不是具体因果而是特异性/必然性；selection_bias 管取样受限×总体推广，本族可无总体推广、只判聚集本身被赋予的意义。明确不判：显式随机性/统计处理（随机序列/随机波动/按概率/概率论/大数定律/正态分布/独立事件/统计显著/置信区间/样本量/基准率/正常波动/不足为奇/查明/排查/数据显示/研究表明/对照组/归因于；EN randomly/by chance/probability/statistically significant/confidence interval/sample size/base rate/root cause/investigation found/attributed to——承认随机性或给出统计与调查处理本身是正确判别）、推理否定/证据不足（不代表/不意味着/推不出/说明不了/未必/不一定/证据不足/样本不足；EN does not mean/cannot conclude/insufficient evidence/not enough data）、对冲（可能/也许/或许/大概/恐怕/倾向于/碰巧/恰巧；EN maybe/perhaps/might/probably/seems——概率化结论不作谬误判定）、概念/教学转述（集群错觉/赌徒谬误/德州神枪手/热手谬误/概率论/统计学/老师/教材/课堂/卡尼曼；EN clustering illusion/Texas sharpshooter/apophenia/gambler's fallacy/hot hand/textbook/lecture）、疑问句（含 ?/？）。",
     // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移：部分属性推
     // 整体属性或整体属性推每个部分属性，属性为涌现性/非可加时成立）。样本
@@ -3895,6 +3913,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 设计/机制论证），受控实验中共变经设计成为证据。与 r161-r175
     // 同口径只登记 VERIFY。
     'common_cause',
+    // [r177] 第 175 维度 hindsight_bias（事后聪明偏差）登记。
+    // verify 级——「事后回望×注定断言」需要补的是事前信息集核查（决策
+    // 时点信息/当时主流判断/事前概率记录），正确的事后学习与事前正当
+    // 评价不判。与 r161-r176 同口径只登记 VERIFY。
+    'hindsight_bias',
     // [r726] 第 156 维度 relative_pration（诉诸更惨）登记。
     // verify 级——「拿更惨的人抹掉眼前抱怨」需要补的是对方诉求本身的
     // 事实核查与处理方案，单句也可能是共情转述或概念讨论。与 r672-r725
@@ -4384,6 +4407,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r176] 第 174 维度 common_cause（共同原因谬误）。
       // 同 r175 先例：九处一次接齐，漏一处 dimensions 读数缺键。
       common_cause: ccau,
+      // [r177] 第 175 维度 hindsight_bias（事后聪明偏差）。
+      // 同 r176 先例：九处一次接齐，漏一处 dimensions 读数缺键。
+      hindsight_bias: hb,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,
@@ -4678,6 +4704,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r176] 第 174 维度 common_cause 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       ccau.count ? ccau.count + ' 处共同原因谬误' : '',
+      // [r177] 第 175 维度 hindsight_bias 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      hb.count ? hb.count + ' 处事后聪明偏差' : '',
       // [r726] 第 156 维度 relative_pration 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       rpr.count ? rpr.count + ' 处诉诸更惨' : '',
@@ -15181,6 +15210,9 @@ module.exports = {
   // [r176] 第 174 维度 common_cause 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkCommonCause,
+  // [r177] 第 175 维度 hindsight_bias 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkHindsightBias,
   // [r726] 第 156 维度 relative_pration 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkRelativePrivation,

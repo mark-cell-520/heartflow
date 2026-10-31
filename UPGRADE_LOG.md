@@ -1,3 +1,36 @@
+# 第 177 轮报告（v6.8.105 — 第175维度 hindsight_bias 事后聪明偏差上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切到**判断纪律**一线——r176 为因果纪律方向 common_cause，本轮接 r176 报告预立的下一轮候选「事后聪明族 5/8 攻击穿过零覆盖」）：**事后聪明偏差（hindsight bias / 后见之明 / knew-it-all-along effect）**——把**事后已知的结果**当成**事前本可预见、注定如此的**，用后见之明倒推事前的判断力，混淆「事后知道」与「事前可知」：系统性高估可预测性、低估决策当时的信息约束，进而错误追责、错误总结规律。
+- 缺口实证（侦察阶段 /tmp/hf-probe-r177.js，直调 src/gate.js 实测）：事后聪明族 10 条攻击样本 **7 条穿过硬闸门且零维度命中**（「这件事早就注定会失败，明眼人一开始都能看出来」「I knew it all along — the outcome was inevitable from the start.」「Hindsight makes it obvious, but we should have known better.」「这场危机早就埋下了伏笔，聪明人一眼就能看穿」「we all knew this project would collapse eventually」「他早就看出这家公司没有未来」「结果不出所料，这件事从一开始就是注定的」），良性 6/6 零误判。overclaim_already_knew / overclaim_predict 子信号仅计分不触发闸门（r176 归因实测确认），perfect_error / capability_overclaim 与本族射程不重叠。
+- 外部来源（真实，未编造）：HN Algolia "hindsight bias" 命中 "Hindsight bias: unobvious effects of (in Software Engineering)"（objectID 15429242）、"Hindsight Bias and Innovation"（14115127）、"Software Requirements and Hindsight Bias"（12925764）、"Hindsight Bias"（32686901，2 分）——确认事后聪明是公认认知偏差；GitHub 检索无纯规则文本判别实现，均为学术数据科学仓库（Baichenjia/BHER ★7 / mr-monaco/hsbbrazil ★1 / TheoV22/Hindsight-Bias ★0 / chenye1227/Hindsight-bias-study ★0），仅作概念背景；Semantic Scholar 无返回，如实记录。**本族判据为心虫自有纯规则实现**。侦察落盘 /tmp/hf-scout-r177.txt。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true；cognitiveLoad 与 uncertainty 均为 "unknown"，按轮次纪律不当实质背书；accelerate 依据是缺口实测（7/10 真零命中）与轮换纪律。
+
+## 二、实现内容
+- **src/hindsight-bias.js（新增，约 260 行）**：第 175 维度检测器。20 个可注入常量 + 三形判定。
+  - 腿① HS 事后框架（回望立场标记）：成语形（事后诸葛亮/马后炮；EN after-the-fact / Monday morning quarterback）单腿可命中；弱形（事后/如今/现在回想/回过头/回望/以今天的眼光；EN in hindsight / with hindsight / looking back / in retrospect / with the benefit of hindsight / now that we know——裸名词形态）必须与腿②共现。
+  - 腿② PRED 注定/事前可预见断言：强形（早就注定/从一开始就注定/命定/不出所料/果不其然/可想而知/迹象一直都在/明眼人/一眼就能看穿/一看便知；EN was always going to / doomed / inevitable / unavoidable / should have known / should have seen / could have seen / anyone could have / we all knew / knew it all along / saw it coming / signs were there / foregone conclusion / never had a chance / only a matter of time）**单腿可命中**（词形内嵌「从事前起点回望」的事后语义）；POST 事后断言子集（早就知道/早就看出/早就预见/伏笔/埋下伏笔/本可预见/当时就该/显而易见/很明显/谁都能看出/都能看出/谁都看得出来/一眼看出/意料之中/命中注定…）与腿③共现判定；弱形（注定/迟早/早晚/必然/不可避免/很明显；EN bound to / obvious / clearly / predictable / foreseeable）只与腿①共现判定（**刻意不与 OUT 共现**——「这场比赛注定会赢」是赛前打气，良性）。
+  - 腿③ OUT 已发生结果事件（失败/倒闭/破产/崩溃/崩塌/爆雷/翻车/暴跌/暴涨/危机/灾难/出事/分手/离婚/背叛/夺冠/落榜/去世/中奖/没有未来/垮掉/完蛋/跑路/裁员/退市/崩盘/战败/惨败/栽[^标点]{0,4}跟头；EN failed / failure / collapse / crashed / bankrupt / betrayal / betrayed / fell apart / blew up / defeat / disaster / crisis / broke up / divorced / lost / tanked / flopped）——把注定断言锚定到具体已发生结果上，排除「未来注定会更好」类将来时一厢情愿（归 wishful_thinking）。
+  - 五类豁免全部可负例注入置空：概念/教学转述、正确的事后学习（承认信息边界——事后聪明的反面）、事前正当评价、推理否定/劝诫、对冲、疑问句。
+- **src/index.js 九处接线**（require / 计算点 _applyPedagogyRelaxation / dimMap / allDims / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / module.exports），同 r173-r176 先例。变量名 **hb**。
+- **r177 实现教训（五条，已固化进测试与源码注释）**：① PRED_ANY 拼接首版漏走注入通道（PRED_WEAK/STRONG 直接用模块常量），负例注入承重项假绿——共现判定腿的每个常量都必须经 R.XXX || XXX 通道；② NEG 豁免的裸「避免」会整吞「不可避免」——「事后回望，那场股灾的爆发是不可避免的」整句被误豁免，劝诫形必须收复合式（要避免/须避免/尽量避免/以避免/避免陷入）；③ OUT 的「栽跟头」漏「栽这个跟头」插入语形（161 轮裸形态教训的又一应验），宽松形栽[^标点]{0,4}跟头 才兜住；④ POST 词表首版漏「谁都能看出/谁都看得出来/意料之中」族，「当初谁都能看出这个骗局」整句漏判；⑤ EXEMPT_EXANTE 刻意不收裸「当时」——「当时我们太迟钝了」是事后自责（攻击形），良性形必须带信息/条件限定（「在当时的信息条件下这个决定是合理的」）。
+- **test/round-177-hindsight-bias.js（新增，约 240 行）**：正向（攻击 12 中文 + 7 英文 / 良性 12 中文 + 6 英文）+ 8 项常量负例注入承重（PRED_STRONG_ZH/EN、HS_ZH/EN、OUT_ZH/EN、PRED_POST_ZH、PRED_WEAK_ZH）+ 9 条豁免陷阱翻转（NEWINFO/META/EXANTE/NEG/HEDGE × ZH/EN、疑问句摘问号）+ 腿缺位不靠豁免专项 + gate 层变体矩阵 + 登记断言×4。
+- 文档：AGENTS.md / README.md / SKILL.md 三处数字（维度 174→175、VERIFY 133→134、What it catches 130→131 request verify、规格表维度数、版本戳 6.8.104→6.8.105、AGENTS 维度列举补 hindsight_bias、编年史补 v6.8.105 条目与三层合计 159→160）+ README version-history 追加 6.8.105 行 + CHANGELOG.md 6.8.105 条目；VERSION 6.8.104→6.8.105（sync-version.js 同步 package.json / SKILL.md / heartflow.js BUILD_DATE）。
+
+## 三、验证数据（五门禁全绿）
+- round-177 轮测：**28/28**（攻击 19/19 命中含中英/裸名词「事后」「早就知道」/带修饰长句/倒装/成语形；良性 18/18 零误判含正确多因陈述「回顾历史，这场战争的发生是多重因素长期共同作用的结果」、真预见「我早就知道会下雨，所以出门带了伞」、赛前打气「这场比赛我们注定会赢」、事后学习「通过复盘我们才发现…」、事前正当评价「以当时的条件，这个决定是合理的」、概念教学、对冲；8 项常量负例注入承重；9 条豁免陷阱翻转；腿缺位不靠豁免专项；登记断言×4）
+- gate 层变体矩阵：攻击 **7/7 非 pass**（verify）且 findings 全含 hindsight_bias；良性 **7/7 pass** 且零 hindsight_bias 命中（161 轮强制项，真实 gate() 复量）
+- 双向门禁：召回 **52/52**，误拦 **302/326 不升**（92.6%，与基线完全一致——本维度未新增任何误拦）
+- bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 175 键）；doc-numbers-accuracy.test.js **22/22**
+- 实测终值：维度 175（BLOCK 11 / REWRITE 19 / VERIFY 134）、模块 161、工具 184、路由 1314、src JS 505
+- 运行态：MCP 重启后 status 返回 version 6.8.105（见阶段7 汇报）
+
+## 四、已知边界 / 下次可继续
+- 跨句结构不判：「我早就知道会这样。（另起一句）失败是必然的。」两腿分居两句时不命中（同句/60 字窗共现）。
+- 「早就注定」强形单腿命中不含结果锚点时的边界形（「这一切早就注定」无 OUT）按强形单腿判 verify——哲学/命运感慨类表述可能误报，由 verify 级与对冲/概念教学豁免兜底。
+- 同池候选**「事后追责倒推」**（用 hindsight 做问责：「当初要是听我的就不会出事」型）与**「predictable in hindsight 的统计化表述」**（学术文本中的规范用法）可作下轮候选。
+- 未跑 test/run-all.js（20+ 分钟/4GB，按任务书纪律不跑）；新测试文件由下次全量 run-all 收编。
+
 # 第 176 轮报告（v6.8.104 — 第174维度 common_cause 共同原因谬误上线 — 2026-10-31）
 
 ## 一、方向与来源

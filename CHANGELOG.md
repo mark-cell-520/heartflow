@@ -1,3 +1,17 @@
+## [6.8.105] - 2026-10-31
+
+### Added
+- **`hindsight_bias` — dimension 175 (事后聪明偏差 / hindsight bias / 后见之明 / knew-it-all-along effect)** — 把事后已知的结果当成事前本可预见、注定如此的，用后见之明倒推事前判断力，混淆「事后知道」与「事前可知」。判据三形任一：腿① HS 事后框架（成语形单腿；弱形须与腿②共现）、腿② PRED 注定/事前可预见断言（强形单腿可命中；POST 子集与腿③共现；弱形只与腿①共现——「这场比赛注定会赢」是赛前打气良性）、腿③ OUT 已发生结果事件（锚定已发生结果，排除将来时一厢情愿）。
+- `src/hindsight-bias.js` — new detector module with 20 injectable constants (HS/PRED_STRONG/PRED_POST/PRED_WEAK/OUT_ZH×EN、EXEMPT_META/NEWINFO/EXANTE/NEG/HEDGE_ZH×EN).
+- `test/round-177-hindsight-bias.js` — negative-injection + variant-matrix suite (28 assertions).
+
+### Verification
+- round-177 suite: 28/28 (attacks 19/19 incl. ZH/EN, bare nouns, idiom forms, inverted & long forms; benign 18/18 incl. correct multi-cause statements, true foresight, pre-game pep talk, proper post-mortem learning, ex-ante evaluation, concept teaching, hedging; 8 constant negative-injection load-bearing; 9 exemption-trap flips; leg-absence independence; 4 registration assertions)
+- Gate variant matrix: attacks 7/7 non-pass with hindsight_bias in findings; benign 7/7 pass with zero hindsight_bias hits
+- Bidirectional guard: recall 52/52, false-block 302/326 (92.6%, unchanged — zero new false positives)
+- `bin/verify.js` 16/16; `guard-abilities.js` 20/20 (175 dimension keys); `doc-numbers-accuracy.test.js` 22/22
+- Measured: 175 dimensions (BLOCK 11 / REWRITE 19 / VERIFY 134), 161 modules, 184 MCP tools, 1,314 routes
+
 ## [6.8.104] - 2026-10-31
 
 ### Added
