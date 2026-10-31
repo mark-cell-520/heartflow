@@ -1,4 +1,42 @@
 
+# 第 170 轮报告（v6.8.98 — survivorship_bias 新句式族「幸存者取样×总体推广」上线 — 2026-10-31）
+
+## 一、方向与来源
+- 方向：**幸存者偏差的取样框形态**（任务书轮换池「证据充分性与幻觉检测」一线；r169 交接簿明确列为下一轮首选缺口）。攻击族定义：只从**活下来的样本**取证（只采访幸存者/只统计留存客户/只访谈没退出的员工/只观察存活下来的企业），却把结论**推广到全体**（代表全体/适用于所有人/人人都有效/大多能成功）——沉默的大多数（退出者/失败者/遇难者）被系统性排除在证据之外。
+- 缺口实证（/tmp/r170-gap-probe.js，当前 v6.8.97 / 168 维引擎实测）：本族 12 条攻击 **6 条真零命中**（「只采访了事故的幸存者，所以这反映了全体乘客的体验」「事故调查只访谈了生还者，由此认定安全措施对全体乘客都有效」「只观察存活下来的企业，所以创业公司大多能成功」「我们只听见坚持到现在的人，可见人人都适应这里的环境」「We only interviewed the survivors, so this reflects every passenger's experience.」「Only those who survived are counted, which shows the treatment works for everyone.」）；已被代拦的 6 条走 selection_bias 的「只统计了活下来的用户」类无幸存者字样句式。良性 6/6 零误伤。
+- 射程依据：r169 的 selection_bias 八类豁免中「幸存者措辞（幸存者/活下来/survivors——射程让给 survivorship_bias）」主动让出本族，本轮在 survivorship_bias 内接住——升级类型 2（已有维度的全新句式族），非新维度。
+- 外部来源（真实，未编造）：HN Algolia "survivorship bias" 命中 Wikipedia Survivorship Bias（464 pts）、Survivorship bias and startup hype（340 pts）、Beware survivorship bias in advice on science careers（197 pts）；Semantic Scholar "survivorship bias" 2023-2025 领域应用论文（Survivorship Bias in Psychological Research: An Analysis of Trends and Implications 2025 / The Impact of Survivorship Bias in Glioblastoma Research 2023，27 次引用）——均无可直接移植的规则判据，仅概念背景。**本族判据为心虫自有纯规则实现**。侦察落盘：/tmp/hf-scout-1793404301.txt。
+
+## 二、心虫裁决门禁
+- heartflow_philosophy_decision：**type=accelerate**（confidence 0.7 / priority 40 / goalReviewed true / trigger optimal_conditions）。如实说明：rationale 里 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎未实测按低负荷处理），不作为实质背书；accelerate 依据是缺口实测数据本身（6/12 真零命中 + 射程让出记录明确）。
+
+## 三、实现内容
+- **src/survivorship-bias.js**（249→~330 行）：新增 r170 判定腿与 12 个可负例注入常量。
+  - 腿① SURV_SAMPLE 幸存者取样三路由：(a) 限定标记（只/仅/仅仅/唯独/全/都/均/统统/only/solely/just/merely）× 取样动词（采访/访谈/统计/调查/复盘/询问/回收/收集/纳入/观察/听见/记录/追踪/随访/筛选/报道/发给/surveyed/interviewed/counted/heard from）× 幸存者词（幸存者/生还者/活下来/存活/没退出/没流失/坚持下来/留存/没被裁员/没被淘汰/毫发无损/安然无恙/survivors/who survived/who stayed/still active）近距离共现——裸名词形态「只观察存活下来的企业」无「的」也收；(b) 标记×幸存者词×动词倒序（「只把生还者纳入统计」）；(c) 样本来源短语（样本/数据/问卷/名单 + 全部/都/只/仅 + 来自/源于/发给 + 幸存者词——「样本全部来自生还者」「问卷只发给了没退出的订户」）。
+  - 腿② SURV_GEN 总体推广两路由：(a) 推广动词（代表/适用于/反映/认定/说明/证明/可见/意味着/足以证明/represents/reflects/shows/means/proves/works for）× 总体范围词（全体/所有/整体/人人/每个人/大多数人/普遍/大众/all/every/everyone）；(b) 总体范围词×全称能力状态判断（人人都能成功/整体都很满意/大多能成功/so all customers love the new plan——无推广动词形）。
+  - 四类豁免（全部负例注入承重）：假设条件句（如果只统计活下来的用户，结果就会偏乐观——阐述偏差而非犯偏差）、否定前置（不是只采访幸存者）、反驳本族（结论不能反映全体/不足以推广）、疑问句。
+  - 枚举腿自查（161 轮教训）：「活下来/存活/幸存者/生还者/没退出/留存/没被裁员」等词根同时收带「的」与不带「的」形态。
+- **src/index.js**：DIM_GUIDANCE 的 survivorship_bias 概念条文扩写（新增「[r170 新增句式族] 幸存者取样×总体推广」整段：双腿判据 + 四类豁免 + 充分取样良性）。维度登记/维度集合/tier 不变（既有维度新句式族，168 维、VERIFY 级均不变）。
+- **test/round-170-survivor-sampling.js**（~200 行，新文件）：攻击 ZH 10 + EN 4、良性 ZH 12 + EN 4、分工边界锁×2、存量回归×3（r694 两腿族 + r694 良性）、登记断言×3、负例注入承重×11、gate 层×2。
+- 文档：VERSION 6.8.97→6.8.98；sync-version.js 同步 package.json/SKILL.md/heartflow.js BUILD_DATE；sync-doc-numbers.js 同步 README/SKILL 口径戳 6.8.98（可计数项零变化：维度 168/模块 161/工具 184/路由 1314 全部不变，doc-numbers 硬天花板 22/22 保持）；README  changelog 表追加 6.8.98 行；CHANGELOG.md 追加 6.8.98 条目；AGENTS.md 无可计数项变化（survivorship_bias 已在册），无需改。
+
+## 四、验证数据（五门禁 + 变体矩阵，全部实测）
+- 轮测试 test/round-170-survivor-sampling.js：**49/49 通过**。
+- 模块层独立探针（/tmp/r170-module-probe.js，非自检）：攻击 13/13 命中、良性 12/12 零误伤。
+- bin/verify.js：**16 passed / 0 failed**。
+- guard-abilities.js：**20/20**（dimensions 键 168，summary 引用 131）。
+- doc-numbers-accuracy.test.js：**22/22**。
+- bidirectional-guard.js：召回 **52/52**、误拦 **302/326 不升**（与基线逐位一致，零新增误伤）。
+- 变体矩阵实测（node require('./src/gate.js')，独立探针 /tmp/r170-gate-probe.js）：攻击 8 条（核心形/裸名词「只观察存活下来的企业」/带修饰「只访谈了今年获救的生还者」/倒装「毕竟复盘只统计了…」/长句/跨句「随访只纳入了活到现在的患者。据此得出结论…」/EN×2）**8/8 gate.action 非 pass 且 findings 全部含 survivorship_bias**；良性 8 条中 7 条 gate pass，1 条英文假设句（If we only counted the survivors…）为 conditional_proposition 维度预存 rewrite（git stash 对照实测：本轮改动前同为 rewrite，非本族引入）。
+
+## 五、已知边界 / 下次可继续
+- **可得性启发**（媒体/回忆暴露→频率判断，r169 实测 5/6 零命中）与**聚类错觉**（连续事件→「绝不是偶然」，4/5 零命中）仍是实测缺口，下一轮首选候选；两者的良性边界（「很火」类流行度推断 vs 「很普遍」类基础概率断言）需要更细豁免设计。
+- 隐式率推广（「只统计了投诉的人，所以投诉率很高」——结论无显式总体范围词）不判，腿②要求显式总体范围词或全称判断形，保精度弃召回。
+- 无「只/仅/都/全」标记的弱受限取样（「访谈了生还者，所以代表全体」）不判——腿①要求显式限定信号。
+- 幸存者词×取样动词窗口 ≤8/10 字，超长插入语（「只采访了在去年那场事故中幸存的乘客」——「在去年那场事故中」9 字）可能漏判，属保精度取舍。
+
+---
+
 # 第 169 轮报告（v6.8.97 — 第 168 维度 selection_bias 取样偏差上线 — 2026-10-31）
 
 ## 一、方向与来源

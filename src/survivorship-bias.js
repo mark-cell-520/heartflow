@@ -44,25 +44,31 @@
  *   statistical 只认数字、confidence 只认能力形容词。这是整族
  *   射程外，不是某个维度正则弱。
  *
- * 判据（两组双腿，任一组成立即判定，缺一不判）：
- *   · 腿① SURVIVOR 可见成功个案（成功结果名词/动词）：
- *     首富/富豪/财富自由/年薪百万/月入X万/赚了X万/中大奖/影后/
- *     冠军/痊愈/成名/暴富/买了房/活到九十/考上清华……；
- *   · 腿② GENERALIZE 推及结论（三类任中一类）：
+ * 判据（三组双腿，任一组成立即判定，缺一不判）：
+ * · 腿① SURVIVOR 可见成功个案（成功结果名词/动词）：
+ *     首富/富豪/财富自由/年薪百万/月入X万/赚X万/中大奖/影后/冠军/
+ *     痊愈/成名/暴富/买房/活到高龄/考上名校……；
+ * · 腿② GENERALIZE 推及结论（三类任中一类）：
  *     a 推及听者（所以你也该/你肯定也/照这个方法你家孩子也能/
  *         人人都能/每个人都能）；
  *     b 领域评价（读书没用/真轻松/能发财/可靠出路/捷径/好时候/
  *         不影响健康）；
  *     c EN 对应（so you should/you can too/is unnecessary/is
  *         pointless/is a solid plan/anyone can）。
- *   · 补充双腿 PATH × SURVIVOR（非常规路径 × 成功结果，无显式
+ * · 补充双腿 PATH × SURVIVOR（非常规路径 × 成功结果，无显式
  *     推及句的经典叙事形）：「隔壁老王的儿子退学打游戏现在年薪
  *     百万」「他辍学摆地摊，如今身家过亿」——媒体幸存者叙事
  *     标题句，推及结论隐含在并置里。
- *   · 单有成功结果不判：「他考上了清华，这是他个人多年努力的
+ * · [r170 新增句式族] SURV_SAMPLE × SURV_GEN（幸存者取样 × 总体
+ *     推广）——幸存者偏差的「取样框」形态：只从活下来的样本取证
+ *     （只采访幸存者/只统计留存客户/只访谈没退出的员工），却把
+ *     结论推广到全体（代表全体/适用于所有人/人人都有效/大多能
+ *     成功）。r169 实测缺口：12 条攻击 6 条零命中（含 EN 双语），
+ *     selection_bias 的幸存者豁免把本族整体让出，故在此接住。
+ * · 单有成功结果不判：「他考上了清华，这是他个人多年努力的
  *     结果」是个案归因陈述，无推及腿；「这位演员为角色减重二十斤」
  *     是无推及的事实陈述。
- *   · 单有推及不判：「这个方法很可靠」无成功个案腿。
+ * · 单有推及不判：「这个方法很可靠」无成功个案腿。
  *
  * 为什么取 VERIFY 级：单句可能是小说对白/偏见案例引述/逻辑课
  * 反面教材/人物报道转述，rewrite 会误伤（与 r672-r693 全部评价/
@@ -170,6 +176,70 @@ const PATH_EN = new RegExp([
   "\\bstarted\\s+(?:from\\s+)?(?:nothing|zero|scratch)\\b",
 ].join('|'), 'i');
 
+// ─── r170 新句式族腿① SURV_SAMPLE 幸存者取样 ─────────────────────
+// 只从「活下来的样本」取证：限定标记 × 取样动词 × 幸存者词
+// （只采访了事故的幸存者 / 只统计了活下来的用户 / 复盘只采访了
+// 没被裁员的员工），或样本来源短语（样本全部来自生还者 / 问卷
+// 只发给了没退出的订户）。沉默的大多数（退出者/失败者/遇难者）
+// 被系统性排除在证据之外——这是幸存者偏差的取样框形态。
+// 枚举腿自查（161 轮教训）：同族词去掉后缀仍命中——「幸存者/
+// 生还者/活下来/存活/没退出/没流失/坚持下来/留存/没被裁员/
+// 没被淘汰」均同时收带「的」与不带「的」形态（词根本身即裸名词）。
+const SURV_MARK_ZH = '(?:只|仅|仅仅|唯独|全|都|均|统统|一概|净)';
+const SURV_VERB_ZH = '(?:采访|访谈|统计|调查|复盘|询问|问|回收|收集|纳入|分析|观察|听见|听到|记录|追踪|随访|筛选|审查|审|列举|报道|拍|取样|抽样|覆盖|发给|寄给|发过|调研)';
+// 幸存者词：含「活下来/存活/幸存下来」的裸形态与带「的」形态，
+// 以及退出/流失/淘汰/裁员侧的结果筛选词（毫发无损/安然无恙等）。
+const SURV_WORD_ZH = '(?:幸存者|生还者|幸存下来|活下来|存活|生存下来|没退出|未退出|没有退出|没流失|未流失|没有流失|坚持下来|坚持到现在|留存|留下来|没被裁员|未被裁员|没被裁|没被淘汰|未被淘汰|活到现在|活着回来|完好无损|毫发无损|安然无恙|没出事的|没出问题)';
+// 路由 a：标记 × 动词 × 幸存者词（「只采访了事故的幸存者」）
+const SURV_SAMPLE_ZH_A = new RegExp(SURV_MARK_ZH + '[^。；，!?！？]{0,8}' + SURV_VERB_ZH + '[^。；，!?！？]{0,10}' + SURV_WORD_ZH);
+// 路由 b：标记 × 幸存者词 × 动词（「只把生还者纳入统计」）
+const SURV_SAMPLE_ZH_B = new RegExp(SURV_MARK_ZH + '[^。；，!?！？]{0,10}' + SURV_WORD_ZH + '[^。；，!?！？]{0,8}' + SURV_VERB_ZH);
+// 路由 c：样本来源短语（「样本全部来自生还者」「问卷只发给了没退出的订户」）
+const SURV_SAMPLE_ZH_C = new RegExp('(?:样本|数据|问卷|名单|案例|对象|受访者|访谈记录|调研)(?:全部|都|均|只|仅|统统|一共)?(?:来自|源于|取自|集中于|限于|是|为|发给|寄给|发过)' + SURV_WORD_ZH);
+
+// 英文：only interviewed the survivors / Only those who survived are counted /
+// We only heard from the customers who stayed。
+const SURV_MARK_EN = "\\b(?:only|solely|just|merely|purely)\\b";
+const SURV_VERB_EN = "\\b(?:surveyed|interviewed|counted|asked|observed|tracked|heard\\s+from|enrolled|included|studied|polled|reported|analyzed|profiled|featured|covered|recruited|consulted)\\b";
+const SURV_WORD_EN = "\\b(?:survivors?|those\\s+who\\s+survived|who\\s+survived|that\\s+survived|the\\s+ones\\s+who\\s+made\\s+it|who\\s+remained|who\\s+stayed|who\\s+made\\s+it|who\\s+didn't\\s+quit|who\\s+were\\s+not\\s+laid\\s+off|still\\s+(?:active|subscribed|employed|alive|using))\\b";
+const SURV_SAMPLE_EN_A = new RegExp(SURV_MARK_EN + "[^.]{0,20}" + SURV_VERB_EN + "[^.]{0,15}" + SURV_WORD_EN, 'i');
+const SURV_SAMPLE_EN_B = new RegExp(SURV_MARK_EN + "[^.]{0,15}" + SURV_WORD_EN + "[^.]{0,15}" + SURV_VERB_EN, 'i');
+
+// ─── r170 新句式族腿② SURV_GEN 总体推广 ─────────────────────────
+// 推广动词 × 总体范围词（反映了全体乘客的体验 / 认定…对全体乘客都
+// 有效 / shows the treatment works for everyone），或总体范围词 ×
+// 全称能力状态判断（人人都能成功 / 整体都很满意 / 大多能成功 /
+// so all customers love the new plan）。
+const SURV_GEN_VERB_ZH = '(?:代表|代表着|代表的是|适用于|适合于|宜于|推广到|外推到|反映|反映出|足以说明|足以证明|说明|证明|可见|认定|由此认定|得出结论|意味着|表明|显示出|揭示出|说明的是|判断出|推断出)';
+const SURV_GEN_SCOPE_ZH = '(?:全体|所有|整体|全部|人人|每个人|所有人|任何人|大多数|大多|普遍|大众|公众|整个|一律|无一例外|方方面面|各界|任何|通通|大家|大伙)';
+// 路由 a：推广动词 × 总体范围词
+const SURV_GEN_ZH_A = new RegExp(SURV_GEN_VERB_ZH + '[^。；，!?！？]{0,12}' + SURV_GEN_SCOPE_ZH);
+// 路由 b：总体范围词 × 全称能力/状态判断（无推广动词形）
+const SURV_GEN_ZH_B = new RegExp(SURV_GEN_SCOPE_ZH + '(?:都|也|全都|统统)?(?:能|可以|会|适应|认可|喜欢|满意|有效|成功|没事|安全|健康|没问题|适用|学完|通过|留下|存活|活下来|留下来)');
+
+const SURV_GEN_VERB_EN = "\\b(?:represents?|reflects?|applies?\\s+to|generalizes?\\s+to|shows?|means?|proves?|demonstrates?|indicates?|works?\\s+for|holds?\\s+for|suggests?)\\b";
+const SURV_GEN_SCOPE_EN = "\\b(?:all|every|everyone|everybody|the\\s+whole|any|anyone|in\\s+general|across\\s+the\\s+board|universal)\\b";
+const SURV_GEN_EN_A = new RegExp(SURV_GEN_VERB_EN + "[^.]{0,15}" + SURV_GEN_SCOPE_EN, 'i');
+// 「so all customers love the new plan」——范围词 × 状态动词（无推广动词形）
+const SURV_GEN_EN_B = new RegExp("\\b(?:all|every)\\s+\\w+(?:s)?\\s+(?:love|like|enjoy|approve|are|were|can|will|works?|thrive|succeed)", 'i');
+
+// ─── r170 新句式族豁免 ────────────────────────────────────────
+// ① 假设条件形（如果只统计活下来的用户，结果就会偏乐观——在阐述
+//    偏差而非犯偏差）；② 否定前置（不是只采访幸存者）；③ 反驳
+//    本族（结论不能反映全体/不足以推广）；④ 疑问句。
+const SURV_EXEMPT_ZH = new RegExp([
+  '(?:如果|若|假设|假如|要是|倘若|设想|一旦|比方说|换句话说)[^。]{0,40}(?:只|仅|仅仅|全|都)',
+  '(?:不是|并非|没有|未|绝不|从不|而非|而不是)[^。]{0,6}(?:只|仅|仅仅)',
+  '(?:不能|无法|没法|难以|不宜|不足以|并不能)(?:据此|就此|因此|所以|就|能)?(?:代表|反映|推广|外推|说明|证明|适用于|推断|得出)',
+  '[?？]|(?:吗|是否|能否|能不能|难道)[^。]{0,8}$',
+].join('|'));
+const SURV_EXEMPT_EN = new RegExp([
+  "\\b(?:if|suppose|imagine|assume|let's\\s+say)\\b[^.]{0,40}\\b(?:only|just|solely)\\b",
+  "\\b(?:not|never)\\s+(?:only|just|solely)\\b",
+  "\\b(?:can't|cannot|couldn't|doesn't|does\\s+not|can\\s+not)\\s+(?:represent|reflect|generalize|apply|prove|show|mean)",
+  "\\?",
+].join('|'), 'i');
+
 // ─── 豁免：统计/概率/反驳语境与概念分析 ────────────────────────
 // 三类：① META 概念分析（含倒装形）；② 统计与概率陈述（正是反驳
 // 本族的标准句式）；③ 医疗与试验规范。
@@ -203,6 +273,17 @@ function checkSurvivorshipBias(text, inject) {
   const GENERALIZE_EN_ = R.GENERALIZE_EN || GENERALIZE_EN;
   const PATH_ZH_ = R.PATH_ZH || PATH_ZH;
   const PATH_EN_ = R.PATH_EN || PATH_EN;
+  const SURV_SAMPLE_ZH_A_ = R.SURV_SAMPLE_ZH_A || SURV_SAMPLE_ZH_A;
+  const SURV_SAMPLE_ZH_B_ = R.SURV_SAMPLE_ZH_B || SURV_SAMPLE_ZH_B;
+  const SURV_SAMPLE_ZH_C_ = R.SURV_SAMPLE_ZH_C || SURV_SAMPLE_ZH_C;
+  const SURV_SAMPLE_EN_A_ = R.SURV_SAMPLE_EN_A || SURV_SAMPLE_EN_A;
+  const SURV_SAMPLE_EN_B_ = R.SURV_SAMPLE_EN_B || SURV_SAMPLE_EN_B;
+  const SURV_GEN_ZH_A_ = R.SURV_GEN_ZH_A || SURV_GEN_ZH_A;
+  const SURV_GEN_ZH_B_ = R.SURV_GEN_ZH_B || SURV_GEN_ZH_B;
+  const SURV_GEN_EN_A_ = R.SURV_GEN_EN_A || SURV_GEN_EN_A;
+  const SURV_GEN_EN_B_ = R.SURV_GEN_EN_B || SURV_GEN_EN_B;
+  const SURV_EXEMPT_ZH_ = R.SURV_EXEMPT_ZH || SURV_EXEMPT_ZH;
+  const SURV_EXEMPT_EN_ = R.SURV_EXEMPT_EN || SURV_EXEMPT_EN;
   const META_EXEMPT_ZH_ = R.META_EXEMPT_ZH || META_EXEMPT_ZH;
   const META_EXEMPT_EN_ = R.META_EXEMPT_EN || META_EXEMPT_EN;
 
@@ -240,10 +321,34 @@ function checkSurvivorshipBias(text, inject) {
     };
   }
 
+  // ─── r170 新句式族：幸存者取样 × 总体推广 ───────────────────
+  // 腿① SURV_SAMPLE：只从活下来的样本取证（只采访幸存者/只统计
+  // 留存客户/只访谈没退出的员工/Only those who survived are
+  // counted）；腿② SURV_GEN：据此推广到全体（代表全体/人人都
+  // 有效/大多能成功/works for everyone）。缺一不判。
+  // 豁免先于判定：假设条件句/否定前置/反驳本族/疑问句不是运用它。
+  if (SURV_EXEMPT_ZH_.test(text) || SURV_EXEMPT_EN_.test(text)) {
+    return { hit: false, score: 0, detail: '', count: 0 };
+  }
+  const survSampleZh = SURV_SAMPLE_ZH_A_.test(text) || SURV_SAMPLE_ZH_B_.test(text) || SURV_SAMPLE_ZH_C_.test(text);
+  const survSampleEn = SURV_SAMPLE_EN_A_.test(text) || SURV_SAMPLE_EN_B_.test(text);
+  const survGenZh = SURV_GEN_ZH_A_.test(text) || SURV_GEN_ZH_B_.test(text);
+  const survGenEn = SURV_GEN_EN_A_.test(text) || SURV_GEN_EN_B_.test(text);
+  if ((survSampleZh || survSampleEn) && (survGenZh || survGenEn)) {
+    return {
+      hit: true,
+      score: 0.6,
+      count: 1,
+      detail: isZh ? '幸存者取样×总体推广(zh)' : '幸存者取样×总体推广(en)',
+    };
+  }
+
   return { hit: false, score: 0, detail: '', count: 0 };
 }
 
 module.exports = {
   checkSurvivorshipBias,
-  __internals: () => ({ SURVIVOR_ZH, SURVIVOR_EN, GENERALIZE_ZH, GENERALIZE_EN, PATH_ZH, PATH_EN, META_EXEMPT_ZH, META_EXEMPT_EN }),
+  __internals: () => ({ SURVIVOR_ZH, SURVIVOR_EN, GENERALIZE_ZH, GENERALIZE_EN, PATH_ZH, PATH_EN, META_EXEMPT_ZH, META_EXEMPT_EN,
+    SURV_SAMPLE_ZH_A, SURV_SAMPLE_ZH_B, SURV_SAMPLE_ZH_C, SURV_SAMPLE_EN_A, SURV_SAMPLE_EN_B,
+    SURV_GEN_ZH_A, SURV_GEN_ZH_B, SURV_GEN_EN_A, SURV_GEN_EN_B, SURV_EXEMPT_ZH, SURV_EXEMPT_EN }),
 };
