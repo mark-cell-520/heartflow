@@ -1,3 +1,48 @@
+# 第 180 轮报告（v6.8.108 — 第178维度 fallacy_fallacy 谬误谬误上线 — 2026-11-01）
+
+## 一、方向与来源
+- 方向（任务书轮换池，仍切**逻辑谬误检测**一线——r176/r177/r178/r179 连续四轮为证据/判断/逻辑纪律，本轮补的是该方向的**结论侧**缺口：存量谬误维度 ad_hominem/straw_man/tu_quoque/appeal_*/circular_reasoning 与 fallacies 内的子标签全在**前提侧**（判「这条论证是不是谬误」），没有一个维度判「指控成立之后能不能推出对方的事实主张为假」）。
+- 缺口实证（侦察阶段 grep -rl 逐候选族计数 src/）：fallacy_fallacy / ecological_fallacy / planning_fallacy / attribute_substitution / galileo_fallacy 在 src/ 下 **0 命中**；ad_hominem（index.js 模式族）、prosecutors_fallacy（fallacies 子标签）、whole_part_transfer（第170维）已有。
+- 外部来源（真实，未编造，三层搜索全部拿到结果）：
+  - HN Algolia "logical fallacy"：arXiv 2405.02318 *Translating natural language to first-order logic for logical fallacy detection*（258 pts）；*Logical Fallacies Are Usually Irrelevant or Cited Incorrectly*（176 pts）；*Show HN: Aristotl – an intuitive logical fallacy lookup tool*（173 pts）；*Master List of Logical Fallacies (2018)*（113 pts）。
+  - GitHub API：LukeStonehm/LogicalDefence ★140（https://github.com/LukeStonehm/LogicalDefence）；causalNLP/logical-fallacy ★96（https://github.com/causalNLP/logical-fallacy，论文 *Detecting Logical Fallacies: From Quiz to Climate Change News*）；andrewscwei/aristotl ★43。
+  - UTEP Master List of Logical Fallacies 全文 223,983 字节已落盘 /tmp/hf-master-fallacies.txt。Semantic Scholar 一次检索无返回，如实记录。
+  - 三个仓库均为 LLM-based 或查阅工具，与纯规则引擎不同构，仅作概念背景；判据为心虫自有纯规则实现。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true；rationale.detail「低负荷+低不确定性+方向明确+目标合理，安全加速」；**cognitiveLoad 与 uncertainty 均为字符串 "unknown"**（引擎把未测到当很低），按轮次纪律不当实质背书，accelerate 依据是缺口实证而非负荷读数。
+
+## 二、实现内容
+- 新增 `src/fallacy-fallacy.js`（约 21 KB，14 个可注入常量）：`checkFallacyFallacy(text, inject)` + `__internals()`。
+  - 判据**三腿共现，缺一不判**：
+    - 腿① FALLACY 谬误指认——指名谬误**裸名词**（FALLACY_ZH 13 组 / FALLACY_EN 4 条）+ 泛指论证缺陷（FALLACY_GENERIC_ZH 2 条）。161 轮教训落地：不收裸「滑坡」（与地质义同形），只收滑坡谬误/滑坡论证/滑坡推论；收「稻草人/偷换概念/诉诸权威/幸存者偏差/确认偏误/可得性偏差/锚定效应」等无后缀裸名词。
+    - 腿② REJECT 结论废弃——连接词 → 结论名词 → 假值谓语。**腿②必须落在结论名词上，不能落在论证名词上**：「你的论证不成立」是正确判别（论证未获支持），「你的观点不成立」才是本族。CLAIM 表显式不收 论证/推理/论据/逻辑/证据。
+    - 腿③ ORDER 顺序——腿①必须早于腿②。
+  - 七类豁免（全部负例注入承重）：概念/教学转述（META_EXEMPT）、谓语前否定与对冲（PREFALSE）、不等于/推不出（CORRECT）、结论名词缺失或落在论证名词上（结构性）、对冲（HEDGE）、疑问句。
+- `src/index.js` 九处接线：require 注释块 / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / exports。变量名 **flf**（ff 已被 future_faking 占用，命名冲突被 node --check 抓出后改名，同 r178 cjf / r179 mof 先例）。
+- 新增 `test/round-180-fallacy-fallacy.js`：37 项断言。
+- 文档三处同步数字 + 版本 6.8.107 → 6.8.108。
+
+## 三、r180 实现教训（已固化进测试与源码注释）
+1. **腿②谓语必须用末组捕获组定位**：首版 PREFALSE 否定前置豁免取整条腿②匹配起点，落在连接词之前——「你犯了稻草人谬误，所以你的观点不是错的」的否定豁免**永不承重**（负例测试假绿）。改为 `falsePos = m.index + m[0].length - m[1].length`（REJECT_ZH/REJECT_EN 末组捕获谓语）后，陷阱才真正翻转。这是本轮最重的一条：假绿比漏判更危险。
+2. CORRECT「不等于/推不出」豁免必须查腿①**之后全段**而非仅两腿之间，否则尾句补刀形（「……所以你的观点是假的；不过我要说明，论证无效这一事实本身，推不出任何关于结论真假的判断」）漏豁免。
+3. PREFALSE 词表刻意不放宽到裸「不能/不会/不可能」——那会误杀「所以你的观点在逻辑上就不能成立」这类攻击形；只收能明确否定假值断言本身的形式。
+4. 豁免表不能收「犯了谬误」这类同时是攻击形的组合，否则把自己的腿①豁免掉（META_EXEMPT 因此只收谬误谬误/谬误清单/常见谬误等复合形）。
+5. 探测阶段两个良性样本是**偶然通过**（「但这只说明……」中「这只说明」打断「这说明」连接词；「Your reasoning is circular, which does not prove…」无连接词）——偶然通过不算通过，已全部替换为依赖具名豁免的样本。
+
+## 四、验证数据（五门禁全绿）
+- `node --check` src/index.js / src/fallacy-fallacy.js / test/round-180-fallacy-fallacy.js：全部 OK。
+- `bin/verify.js`：**16 passed / 0 failed**。
+- `scripts/guard-abilities.js`：**20/20**（维度登记 dimensions 键 178 个、summary 引用 141 个）。
+- `scripts/bidirectional-guard.js`：**召回 52/52（100%）不降**，**误拦 302/326（92.6%）不升**——与 r179 基线完全一致，零新增误拦。
+- `test/doc-numbers-accuracy.test.js`：**22 passed / 0 failed**。
+- 轮测 `test/round-180-fallacy-fallacy.js`：**37 passed / 0 failed**（攻击 16/16 含中英/裸名词/带修饰/倒装/长句；良性 17/17 零误判含谓语前否定/不等于推不出/概念转述/结论名词不匹配/对冲/疑问句；7 项常量负例注入承重；7 条豁免陷阱翻转含 PREFALSE_ZH/PREFALSE_EN/CORRECT_ZH/CORRECT_EN/META_EXEMPT_ZH/META_EXEMPT_EN/HEDGE_ZH 七族；腿②落在论证名词专测、结论名词不匹配专测、顺序倒置专测；登记断言×2）。
+- **变体矩阵实测（真实 gate()，161 轮教训强制项）**：攻击 **11/11 全部非 pass**（10 条 verify + 1 条 rewrite）；良性 **6/6 全部 pass**（含「你的论证确实无效，但这与结论的真假是两个问题」「常见谬误有稻草人、偷换概念、滑坡谬误等几十种」「这个方案不成立，我们需要重新设计」「That argument is flawed, so we should gather more evidence.」等边缘良性）。
+
+## 五、已知边界与下次可继续
+- 腿③只做前向（先谬误指控、后结论废弃）。反向形「你的观点是错的，因为你犯了稻草人谬误」语义同族，但因几乎总以「因为」连接、与大量合法因果解释同形，本轮保守不收——下轮可设计「因为 + 谬误指控 + 结论废弃」的双向路由，配套更严的 FP 探针。
+- 长句中修饰性谬误指认（「一位既支教又出诗集的青年：你这是稻草人」）可能触发泛指缺陷腿；该族良性文本量更大，保守方向取误判率可控的 VERIFY 级。
+- 存量维度 scrutiny_evasion / presupposition / bad_faith / fallacies 会代拦部分本族边缘长句（r180 实测：良性样本「你的论证确实有谬误，但这只说明推理有问题，不等于你的结论为假」被 scrutiny_evasion 判 verify——非本维度引入，改动前行为一致）。
+- 下一轮候选池（侦察阶段已扫描，均未覆盖）：ecological_fallacy（生态谬误/区群谬误，群体统计→个体属性）、planning_fallacy（规划谬误，低估时间成本）、attribute_substitution（属性替代）、galileo_fallacy（伽利略赌局：被嘲笑≠正确）。注意 ecological_fallacy 与既有 stereotype 维度射程有重叠风险，需先做 FP 探针。
+
 # 第 179 轮报告（v6.8.107 — 第177维度 moralistic_fallacy 道德主义谬误上线 — 2026-11-01）
 
 ## 一、方向与来源

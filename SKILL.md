@@ -1,11 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.107"
+version: "6.8.108"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  177 discrimination dimensions × 11-layer pipeline × 161 modules ×
+  178 discrimination dimensions × 11-layer pipeline × 161 modules ×
   184 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
@@ -83,11 +83,11 @@ from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.107 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.108 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 161 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,314 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 177 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 178 | `dimMap` keys in `src/index.js` |
 | MCP tools | 184 | tool definitions exposed via `tools/list` |
 | Test suite | 18,157 passing / 105 failing | `node test/run-all.js` (4-slice aggregate; failed set is pre-existing runner/flaky noise — s2/s3 byte-identical to pre-change baseline) |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -95,7 +95,7 @@ from marketing copy.
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
 
 |Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
-a `rewrite`, **136 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **137 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -257,7 +257,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 ---
 
-## The 168 dimensions
+## The 178 dimensions
 
 **Block-level (11):** hate_speech, dehumanization, prompt_injection, code_security, deceptive_alignment, phishing_coercion, coverup_induction, dangerous_instruction, indirect_injection, reward_hacking, pzombie_claim
 

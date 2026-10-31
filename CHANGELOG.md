@@ -1,3 +1,16 @@
+## [6.8.108] - 2026-11-01
+
+### Added
+- **`fallacy_fallacy` — dimension 178 (谬误谬误 / fallacy fallacy / argumentum ad logicam)** — 指认对方的论证犯有谬误或推理无效，据此断定对方的结论为假、应被驳回、不可信：把「驳倒论证」冒充「驳倒事实」。论证无效（invalid）与结论为假（false）是两个独立的命题状态——一个无效论证完全可以推出一个**为真**的结论；把「我驳倒了你的推理」当成「我驳倒了你的主张」，是用修辞胜利冒充真理判定，会系统性地把「还没被证明」误报成「已被证伪」。三腿共现判据（缺一不判）：腿① FALLACY 谬误指认（指名谬误裸名词 + 泛指论证缺陷）；腿② REJECT 结论废弃（连接词 → 结论名词 → 假值谓语，**必须落在结论名词上、不能落在论证名词上**——「你的论证不成立」是正确判别，「你的观点不成立」才是本族）；腿③ ORDER 顺序（腿①早于腿②）。
+- `src/fallacy-fallacy.js` — new detector module with 14 injectable constants (FALLACY_ZH, FALLACY_GENERIC_ZH, FALLACY_EN, REJECT_ZH, REJECT_EN, PREFALSE_ZH×EN, CORRECT_ZH×EN, META_EXEMPT_ZH×EN, HEDGE_ZH×EN).
+- `test/round-180-fallacy-fallacy.js` — negative-injection + variant-matrix suite (37 assertions).
+
+### Verification
+- round-180 suite: 37/37 (attacks 16/16 incl. ZH/EN, bare-noun, modified, inverted, long form; benign 17/17 incl. predicate-front negation / 不等于-推不出 / concept transposition / claim-noun mismatch / hedge / question)
+- Gate variant matrix (real `gate()`): attacks 11/11 non-pass (10 verify + 1 rewrite); benign 6/6 pass
+- Bidirectional guard: recall 52/52, false-block 302/326 (92.6%, unchanged — zero new false positives)
+- `bin/verify.js` 16/16; `guard-abilities.js` 20/20 (178 dimension keys); `doc-numbers-accuracy.test.js` 22/22
+
 ## [6.8.107] - 2026-11-01
 
 ### Added
