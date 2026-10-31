@@ -576,6 +576,10 @@ const { checkWholePartTransfer } = require('./whole-part-transfer.js');
 // 数据中的聚集、连续、扎堆当成显著性证据或特殊原因）。
 // 判据聚集陈述腿×显著性归因腿两腿共现；细节见 src/clustering-illusion.js。
 const { checkClusteringIllusion } = require('./clustering-illusion.js');
+// [r174] 第 172 维度 reverse_causation（因果倒置/反向因果：把对后果的应对
+// 行为当成后果本身的原因——住院患者死亡率更高所以住院增加死亡风险）。
+// 判据反应型行为×相关框腿×因果归因腿两腿共现；细节见 src/reverse-causation.js。
+const { checkReverseCausation } = require('./reverse-causation.js');
 // [r726] 第 156 维度 relative_pration（诉诸更惨：拿更惨的人抹掉眼前抱怨）。
 // decision 本体一次选中无打平（scripts/decide-r726.js，composite 0.83 /
 // confidence 0.84 / identity alignment 0.8；第二名 B/C 均 0.81，D 0.79）。
@@ -1783,6 +1787,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r173] 第 171 维度 clustering_illusion（集群错觉）计算点。
   // 同 r172 先例：多处一次接齐，漏一处 gate.action 恒 pass。
   const clu = _applyPedagogyRelaxation(checkClusteringIllusion(_normText), "clustering_illusion", pedagogyRelaxation);
+  // [r174] 第 172 维度 reverse_causation（因果倒置）计算点。
+  // 同 r173 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const rcau = _applyPedagogyRelaxation(checkReverseCausation(_normText), "reverse_causation", pedagogyRelaxation);
   // [r726] 第 156 维度 relative_pration（诉诸更惨）计算点。
   // 同 r725 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const rpr = _applyPedagogyRelaxation(checkRelativePrivation(_normText), "relative_pration", pedagogyRelaxation);
@@ -2262,6 +2269,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r173] 第 171 维度 clustering_illusion 参与判定（集群错觉）。
     // 同 r172 先例：dimMap 与 allDims 必须两处都接。
     {score: clu.score, name:'clustering_illusion'},
+    // [r174] 第 172 维度 reverse_causation 参与判定（因果倒置）。
+    // 同 r173 先例：dimMap 与 allDims 必须两处都接。
+    {score: rcau.score, name:'reverse_causation'},
     // [r726] 第 156 维度 relative_pration 参与判定（诉诸更惨）。
     // 同 r725 先例：dimMap 与 allDims 必须两处都接。
     {score: rpr.score, name:'relative_pration'},
@@ -2650,6 +2660,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r173] 第 171 维度 clustering_illusion（集群错觉×
     // 聚集陈述腿×显著性归因腿）。
     clustering_illusion: clu,
+    // [r174] 第 172 维度 reverse_causation（因果倒置×
+    // 反应型行为×相关框腿×因果归因腿）。
+    reverse_causation: rcau,
     // [r726] 第 156 维度 relative_pration（诉诸更惨×
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
@@ -2937,6 +2950,7 @@ function discriminate(text, evidence = [], contentMode) {
     // [r173] 第 171 维度 clustering_illusion（集群错觉：把随机数据中的聚集
     // 当成「绝不是巧合」「显然有蹊跷」「逃不掉的规律」的显著性证据）。
     // 形状与负例见 test/round-173-clustering-illusion.js。
+    'reverse_causation': "不得**把对后果的应对行为当成后果本身的原因**——人之所以采取某个行为，恰恰是因为不利后果已经存在或风险已经很高；于是「做这件事的人/地方，后果更严重」是**选择效应**（后果筛出了行为人），不是该行为制造了后果：「住院患者的死亡率明显更高，所以住院本身增加了死亡风险」「接受心理治疗的人自杀率更高，所以心理治疗会把人推向自杀」「报警越多的社区犯罪率越高，说明报警反而会招来犯罪」「报了补习班的孩子成绩更差，所以补习班让孩子成绩更差」「吃安眠药的人失眠更严重，因此安眠药是造成失眠的原因」「装防盗窗的家庭被盗更多，可见防盗窗反而会吸引小偷」「被约谈的官员更容易落马，所以约谈导致了他们落马」「裁员越多的公司效益越差，因此裁员是公司衰败的原因」「Patients who were hospitalized had much higher mortality, so hospitalization itself increases the risk of death.」「Areas with more police reports have higher crime, which means reporting crimes actually attracts more crime.」（样本形状与负例见 test/round-174-reverse-causation.js）。判据**两腿共现，缺一不判**：腿① RESPONSE_CORR 反应型行为×相关/选择框，两形任一——R-a 选择差异框：反应型行为名词（住院/就医/吃药/报警/投诉/补习/约谈/戴口罩/头盔/装监控/装防盗窗/买保险/裁员/封号……裸名词形态；EN hospitali[sz]ed / therapy / police reports / tutoring / wearing masks / cameras / insurance / layoffs）+ 群体名词（人/患者/孩子/社区/地区/公司/官员/家庭/用户/员工/骑手/居民/账号；EN patients / people / those who / areas / children / drivers）落在 6 字（EN 30 字符）窗内（前后双向，群体名词必须与「的」相邻——「住院**患者的**死亡率」与「住院**的**患者」两种框架都收，无「的」的巧合邻近不收），**且**句中存在差异/相关标记（更/多/高/严重/差/容易/越/集中/往往/大都/明显/显著/频繁；EN more / higher / worse / more often / likely / tend）；R-b 递增相关框：反应型行为 + 「越」（12 字窗）且全文「越」出现 ≥2 次（「报警越多的社区犯罪率越高」「裁员越多的公司效益越差」；EN the more X … the worse Y）；腿② CAUSE 因果归因：因果动词（导致/造成/引发/引起/带来/招来/引来/吸引/催生/制造/滋生/助长/加剧/加重/诱发/促成/酿成/加大了/增加了/提高了/提升了/推向/是…的原因/原因就在于/根源在于/罪魁祸首/让/令/使得；EN causes / leads to / results in / increases / worsens / is responsible for / contributes to / makes / attracts / draws） × 负面结果名词（死亡/死亡率/事故/犯罪/小偷/复发/恶化/失眠/抑郁/自杀/落马/倒闭/亏损/被骗/被盗/感染/感冒/更差/退步/风险/问题；EN death / mortality / accidents / crime / relapse / insomnia / depression / suicide / addiction / infections / losses / worse）落在 18 字（EN 45 字符）窗内（**从因果动词起点起算**——「是公司衰败的原因」形的结果名词在动词匹配内部）。缺腿不判：「住院病人的死亡率更高，是因为重症患者本来就更容易住院」给出的是正确方向；「住院治疗降低了死亡率，这是有随机对照试验支持的」落在实验证据豁免；「戴口罩的人感冒更多，但这不代表戴口罩导致感冒」落在推理否定豁免。正当做法是**先定方向再谈因果**：给出该行为与后果的**时间先后**（行为发生在后果之前还是之后）、**对照组**（没做这件事的同质群体后果如何）、**机制**（该行为通过什么路径制造后果）；方向未定时把结论降级为「观察到相关，方向待定」。边界：post_hoc / pseudo_causal 管「A 在 B 前发生所以 A 导致 B」的时序连接，本族管**方向搞反**——被指为原因的行为是对后果的应对，后果在前、行为在后，因果链被整体倒置；conditional_proposition 管「如果A真就B」假设条件句当既成论据，本族不依赖假设条件句；monocause 管多因压成单因，本族的方向本身就是错的；selection_bias / survivorship_bias 管取样受限向总体推广，本族是「后果筛出行为人」的选择效应且不需要向任何总体推广；base_rate_neglect 管拿单个阳性信号无视基础概率，本族管两个变量间的因果方向。明确不判：概念/教学转述（因果倒置/反向因果/混淆变量/相关不等于因果/辛普森悖论/内生性/统计学/教材/课堂；EN reverse causation / confounding / endogeneity / Simpson's paradox / textbook / lecture——讨论这个谬误本身是正确判别）、实验/证据语境（随机对照/对照组/实验组/双盲/前瞻性研究/队列研究/元分析/实验表明/数据显示/研究表明/实测/证据表明；EN randomized / controlled trial / RCT / control group / prospective / cohort study / meta-analysis / data show / evidence shows——以证据而非观察性相关立论时方向已被检验）、推理否定/反向承认（不能说明/不代表/不等于/并不意味着/推不出/不足以/未必/不一定/是因为/其实是因为/反过来/恰恰相反/反之；EN does not mean / cannot conclude / not necessarily / is because / the reverse / conversely）、对冲（可能/也许/或许/大概/恐怕/倾向于/似乎/有待；EN maybe / perhaps / might / possibly / probably / seems）、疑问句（含 ?/？）。",
     'clustering_illusion': "不得**把随机数据里的聚集、连续、扎堆、集中出现的事件，当成「绝不是巧合」「显然有蹊跷」「一定有特殊原因」「这是逃不掉的规律」的显著性证据**——随机分布在时间、空间、类别上本就会出现聚集；把聚集读成必然、反常或神秘规律，是把噪声当信号：「这个路口一个月出了四起事故，绝不可能是巧合」「最近三个月，同一个小区接连发生了五起入室盗窃，显然这里面有蹊跷」「三个中奖者全都来自同一条街，这绝不是偶然」「这个部门每逢周一必出事，简直是逃不掉的魔咒」「Four accidents happened at the same intersection in one month, which cannot be a coincidence.」「Three lottery winners all came from the same street — that can't be random.」（样本形状与负例见 test/round-173-clustering-illusion.js）。判据**两腿共现，缺一不判**：腿① CLUSTER 聚集陈述三条路线任一——路线 a 聚集语义词（连续/接连/接二连三/扎堆/集中/频发/高发/屡屡/频频/隔三差五/每逢/每当/每次/历来/向来；EN in a row/in succession/consecutive/clustered/spate/streak/every Friday）× 事件名词（事故/案件/盗窃/中奖/倒闭/猝死/投诉/故障/纠纷/空难/坠机/失踪/复发……裸名词形态；EN accidents/incidents/crashes/complaints/lawsuits/suicides）落在 14 字（EN 20 字符）窗内（前后双向）；路线 b 同一来源（全都/都/皆/清一色/无一例外 + 来自/出自/毕业于/就职于/指向/死于 + 同一/同一个/同一条/同属；EN all … from/at/in … same）；路线 c 数量≥2（四起/五起/好几个/数次；EN two/three/four/several/multiple）× 事件名词（后 6 字窗，含倒装「事故四起」）；腿② SIGNIF 显著性归因五形任一——R1 否认巧合（绝不是/绝非/一定不是/不可能只是/并非只是/不只是 × 巧合/偶然/随机；EN can't be / is not just / more than / far from × coincidence/chance/random）、R2 异常断言（显然/肯定/一定/可见/说明/意味着/证明 × 蹊跷/反常/有猫腻/说不通/邪门/诡异/离奇/不同寻常；EN clearly/obviously/must/means × sinister/fishy/inexplicable/pattern/law）、R3 神秘归因（天意/天命/劫数/魔咒/宿命/冥冥/幕后黑手/暗中操控/风水/玄学/诅咒/看不见的手；EN cursed/doomed/destiny/fate/omen/universe is telling）、R4 定律化（逃不过/躲不掉/在劫难逃/铁律/命中注定/历史重演；EN doomed/inescapable/bound to happen/same fate）、R5 周期迷信（每逢/每当/每次 × 必/准/总 × 出事/故障/复发/吵架；EN every Friday something goes wrong）。R1 先于对冲豁免判定（「绝不可能是巧合」的「可能」是否认式组成部分，不是对冲）。缺腿不判——「这个路口一个月出了四起事故，交警排查后发现是信号灯配时问题」只有聚集陈述、无显著性归因（且排查属证据处理）；「连续三起投诉都指向同一个客服，说明培训有问题」指向已识别的共同原因而非任意属性的特异性；「三起案件虽然时间接近，但警方认定是同一伙流窜作案」是事实认定不是噪声判读。正当做法是**把聚集当假设而不是结论**：先做统计检验（该聚集相对基准率/泊松期望是否显著）、给出共同机制的证据（信号灯配时数据/同一批零件/同一伙人的痕迹）、或明确说「按概率这可能是正常波动」。边界：hot_hand 管势头×延续性预测（热手会继续），本族管回顾性聚集×显著性归因（聚集必有蹊跷），可无任何预测；post_hoc/pseudo_causal 管时序连接×因果断言（A 在 B 前所以 A 导致 B），本族聚集不依赖时间先后、结论也不是具体因果而是特异性/必然性；selection_bias 管取样受限×总体推广，本族可无总体推广、只判聚集本身被赋予的意义。明确不判：显式随机性/统计处理（随机序列/随机波动/按概率/概率论/大数定律/正态分布/独立事件/统计显著/置信区间/样本量/基准率/正常波动/不足为奇/查明/排查/数据显示/研究表明/对照组/归因于；EN randomly/by chance/probability/statistically significant/confidence interval/sample size/base rate/root cause/investigation found/attributed to——承认随机性或给出统计与调查处理本身是正确判别）、推理否定/证据不足（不代表/不意味着/推不出/说明不了/未必/不一定/证据不足/样本不足；EN does not mean/cannot conclude/insufficient evidence/not enough data）、对冲（可能/也许/或许/大概/恐怕/倾向于/碰巧/恰巧；EN maybe/perhaps/might/probably/seems——概率化结论不作谬误判定）、概念/教学转述（集群错觉/赌徒谬误/德州神枪手/热手谬误/概率论/统计学/老师/教材/课堂/卡尼曼；EN clustering illusion/Texas sharpshooter/apophenia/gambler's fallacy/hot hand/textbook/lecture）、疑问句（含 ?/？）。",
     // [r172] 第 170 维度 whole_part_transfer（整体-部分属性迁移：部分属性推
     // 整体属性或整体属性推每个部分属性，属性为涌现性/非可加时成立）。样本
@@ -3827,6 +3841,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 证据，单句也可能是真实信号、证据归因或概念教学。与 r161-r172
     // 同口径只登记 VERIFY。
     'clustering_illusion',
+    // [r174] 第 172 维度 reverse_causation（因果倒置）登记。
+    // verify 级——「把后果的应对行为当成后果的原因」需要补的是方向判据
+    //（该行为发生在后果之前还是之后、有没有对照组、机制是什么），单句也
+    // 可能是正确方向的陈述、随机对照证据或概念教学。与 r161-r173
+    // 同口径只登记 VERIFY。
+    'reverse_causation',
     // [r726] 第 156 维度 relative_pration（诉诸更惨）登记。
     // verify 级——「拿更惨的人抹掉眼前抱怨」需要补的是对方诉求本身的
     // 事实核查与处理方案，单句也可能是共情转述或概念讨论。与 r672-r725
@@ -4307,6 +4327,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r173] 第 171 维度 clustering_illusion（集群错觉）。
       // 同 r172 先例：九处一次接齐，漏一处 dimensions 读数缺键。
       clustering_illusion: clu,
+      // [r174] 第 172 维度 reverse_causation（因果倒置）。
+      // 同 r173 先例：九处一次接齐，漏一处 dimensions 读数缺键。
+      reverse_causation: rcau,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,
@@ -4592,6 +4615,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r173] 第 171 维度 clustering_illusion 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       clu.count ? clu.count + ' 处集群错觉' : '',
+      // [r174] 第 172 维度 reverse_causation 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      rcau.count ? rcau.count + ' 处因果倒置' : '',
       // [r726] 第 156 维度 relative_pration 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       rpr.count ? rpr.count + ' 处诉诸更惨' : '',
@@ -15086,6 +15112,9 @@ module.exports = {
   // [r173] 第 171 维度 clustering_illusion 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkClusteringIllusion,
+  // [r174] 第 172 维度 reverse_causation 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkReverseCausation,
   // [r726] 第 156 维度 relative_pration 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkRelativePrivation,
