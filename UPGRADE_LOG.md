@@ -1,3 +1,38 @@
+# 第 189 轮报告（v6.8.117 — 第186维度 appeal_to_wealth「诉诸财富/诉诸贫穷谬误」上线 — 2026-11-02）
+
+## 一、方向与来源
+- 方向（轮换纪律）：r188 为逻辑谬误检测 + 证据纪律一线。本轮按轮换纪律扫三个方向各一个候选族，探针 `/tmp/hf-probe-r189.js` 直调 gate()（v6.8.116 / 185 维引擎）实测：
+  - **A 零和思维**（fixed-pie，统计/博弈推理方向）：攻击 6/6 被 fallacies/absolute_claim/confidence 代拦且良性 2 条误伤（false_balance/confidence）——不是干净缺口，淘汰。
+  - **B 均值回归**（regression to the mean，因果归因方向）：攻击 4/6 真零命中，但良性 3 条被 contradiction/post_hoc 误伤（含「系统故障排除后恢复」被 post_hoc 判 rewrite）——存量误伤未清，淘汰。
+  - **C 诉诸财富/诉诸贫穷**（appeal to wealth / argumentum ad crumenam + ad lazarum，逻辑谬误 + 证据纪律方向）：攻击 6 条中 **4 条真零命中**（「马云…身家…真理」「穷得叮当响…观点无价值」、EN "He is a billionaire, so his advice…must be sound"、"She married into one of the richest families…superior"），**6 条边缘良性零误伤**（亲身经历建议/审计业绩/巴菲特也犯错/按证据评估/EN first-hand experience/EN poverty does not determine）——唯一干净缺口，选 C。
+- 外部来源（真实，未编造）：HN Algolia "The Fallacy Of Zero Sum Game Thinking"（26 分，https://news.ycombinator.com/item?id=6390466）、"Humanity is not a Zero-Sum Game"（https://news.ycombinator.com/item?id=30773049）作零和与阶层推理概念背景；GitHub API `logical fallacies detection`（sort=stars）最高星 tmakesense/logical-fallacy（21★，https://github.com/tmakesense/logical-fallacy）、SeanFlannery/Logical.ly（4★）为谬误检测成熟代码参考（均 LLM 路线，无可移植纯规则判据）。Semantic Scholar 检索 HTTP 429 空返。判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 `/tmp/hf-scout-r189.txt`，探针 `/tmp/hf-probe-r189.js`、`/tmp/hf-atw-smoke.js`。
+- 心虫裁决：philosophy_decision **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true）。rationale 的 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎把未测到当很低），按轮次纪律不当实质背书——加速依据是缺口实证与轮换纪律。
+
+## 二、实现内容
+- `src/appeal-to-wealth.js`（新增，约 290 行）：第 186 维度 appeal_to_wealth 检测器。判据**两腿+连接，缺一不判**：
+  - 腿① STATUS 财富/贫困状态词（有钱/富翁/富豪/身家/富人/成功人士/白手起家/穷困/贫寒/穷得叮当响/寒门/底层出身…；EN billionaire/rich/wealthy/made billions/poor/poverty/the poor）——**161 轮教训自查**：全部收裸名词形态（同族词去掉前后缀仍独立命中），同时**限定搭配收录**：不收裸「穷」（穷尽/穷尽可能误伤）、不收裸「富」（丰富误伤）、不收裸「成功」（实验成功误伤）、不收裸「底层」（底层逻辑/架构误伤）。
+  - 腿② VALIDITY 认知有效性结论（有道理/是对的/高明/靠谱/眼光好/最懂/更懂…；EN sound/right/superior/credible/gets it）——必须是对**观点/判断/言论有效性**的断言，刻意不收「值得参考」（经验价值）、「犯错/失误」（错误承认）、「业绩/收益」（实测数据）。
+  - 腿③ 连接——路线 A（正向断言）：腿①与腿②之间有推断连接词（所以/当然/一定/因为…；EN so/because/must/obviously）且间距 ≤50 字（EN 110 字符）；路线 B（反问断言）：腿① ±50 字（EN 110）内有反问有效性形（眼光还能错吗/能有什么价值/懂什么；EN how could he be wrong），反问自身携带推断、免连接词（覆盖「马云说的都是真理，他能赚到几千亿身家，眼光还能错吗？」结论先行倒装形）。
+  - **否定守卫**（精度核心）：有效性断言前置 10 字有短语否定（不是因为/不总是/does not determine…）或前置 4 字有单字否定（不/没/未/非/别）时不是有效性断言——「不是因为眼光好」「观点不总是对的」「Poverty does not determine whether someone is right」天然不判。
+  - 豁免（全部可负例注入置空）：META_EXEMPT（诉诸财富/诉诸贫穷/argumentum ad crumenam/逻辑谬误/老师/课堂/textbook…）、HEDGE（可能/也许/往往/maybe…，看 raw 原串）。
+  - r189 实现教训（已固化进测试）：① 相邻匹配 gap 计算必须用 `Math.max(r.start - s.end, s.start - r.end)`——三元式在 r.start === s.end 时算出负数导致「穷人懂什么」整族漏判；② 反问形「how could his judgment possibly be wrong」里的 possibly 会被 HEDGE 误吞——HEDGE_EN 不收 possibly；③ 否定守卫的单字否定窗若不常量化为可注入常量，注入陷阱无法翻转——拆出 NEG1_ZH。
+- `src/index.js` 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 读数 / summary；变量名 atw，grep 实测 0 命中无冲突），DIM_GUIDANCE 含完整判据+边界+正当做法指引。
+- `test/round-189-appeal-to-wealth.js`（新增，16 项断言）：攻击 21/21（中英/裸名词/带修饰/倒装/长句/反问路线）、良性 20/20 零误判（含亲历依据/审计业绩/错误承认/按证据评估/否认关联/谚语/边缘贫困叙事）、9 项常量负例注入承重、3 条豁免陷阱翻转（含 NEG_ZH+NEG1_ZH 否定守卫）、gate 层变体矩阵（攻击 7/7 非 pass 且维度承重、良性 7/7 pass）。
+- 文档三处同步 + 版本传播：README（badge/横幅/行内 5 处/规格表/Version history 新行）、SKILL（version 戳/横幅/规格表/action-tier 145/pipeline 图）、AGENTS（横幅/checkInput 行/维度注记 v6.8.117 条目/Verify-level 145 + appeal_to_wealth 入列）；`src/core/version.js` 兜底值 6.8.116→6.8.117（r187 立规项）；VERSION 6.8.116→6.8.117 + sync-version.js；CHANGELOG.md 追加 6.8.117 条目。
+
+## 三、验证数据（全部本轮真实运行）
+- 五门禁：bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 186 键）；doc-numbers-accuracy.test.js **22/22**；bidirectional-guard.js 召回 **52/52**、误拦 **302/326 不升**（与基线一致、零新增误拦）；measure-claimed-numbers 维度 **186** / 模块 **161 不变**（纯函数维度模块不进 _modules registry，r186/r188 同口径）/ 工具 184 / 路由 1,314。
+- 轮测：test/round-189-appeal-to-wealth.js **16/16**（正向攻击 21/21、良性 20/20、注入承重 9 项、豁免陷阱 3 项、gate 矩阵攻击 7/7 承重 + 良性 7/7 pass）。
+- 新维度实测（node 直调 gate() + MCP 双路）：攻击样本 gate.action 全部非 pass（verify×7 实测）且 findings 承重 appeal_to_wealth（severity 50）；良性样本全部 pass。运行态重启后 heartflow_status 确认（见第五节）。
+
+## 四、已知边界（下轮可继续）
+- ① 腿①与腿②限同句或相邻分句、总跨度 ≤50 字（EN 110 字符），跨段形本轮保守不收。
+- ② 「不无道理」类双重否定会被否定守卫挡下（保守方向，漏判优于误判）。
+- ③ 隐含有效性断言（「他有钱，说话就是硬气」——硬气是气势非有效性）暂不判，下轮可评估扩容腿②。
+- ④ 存量代拦误伤（非本轮引入）：scrutiny_evasion 误拦良性「实验成功了，说明配方没有问题」（r189 gate 矩阵实测发现，已换等价边缘良性绕开）；r188 记录的 affirming_the_consequent 误拦有效三段论、contradiction 误伤「努力必要但不充分」类边缘良性仍在——下轮可评估修代拦维度的误伤。
+
+---
+
 # 第 188 轮报告（v6.8.116 — 第185维度 most_transitivity「『大多数』链式传递谬误」上线 — 2026-11-02）
 
 ## 一、方向与来源

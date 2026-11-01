@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-185-blueviolet.svg)](#what-it-catches-185-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-186-blueviolet.svg)](#what-it-catches-186-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-185 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
+186 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
 ×  1,314 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 185 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 186 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (185 dimensions) -> gate
+scope-check -> premise-check -> discriminate (186 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (185 dimensions)
+## What it catches (186 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **144 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **145 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.116**. Not marketing copy.
+Measured on this repository at **v6.8.117**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 185 |
+| Discrimination dimensions | 186 |
 | MCP tools | 184 |
 | Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
@@ -383,6 +383,7 @@ duplicate the log.
 | Version | Date | Change |
 |---------|------|--------|
 | 6.8.116 | 2026-11-02 | **第185维度 most_transitivity（「大多数」链式传递谬误：most 量词不满足传递性）上线** — 判别「**两个「大多数」前提推不出「大多数」结论**」结构：「大多数A是B，大多数B是C」的证据不能沿中间项累积——100 人里 60 人喝茶、60 个喝茶的人里只有 35 人喝咖啡时，「大多数人喝咖啡」就不成立，两段「大多数」各自只覆盖自己前提的大部分、交集可以远小于半数：「大多数A队球迷支持主队，大多数支持主队的人会买季票，所以大多数A队球迷会买季票」「大部分用户点了同意，大部分点了同意的人都没读协议，所以大部分用户都没读协议」「七成受访者表示满意，七成表示满意的受访者购买了会员，所以七成受访者都买了会员」「Most students passed the exam, and most people who passed got certificates, so most students got certificates.」。判据**链式三件共现，缺一不判**：件① 第一段「大多数」前提（量词+主项+非空谓项，中间项素材在谓项里）；件② 第二段「大多数」前提的主项**包含第一段谓项的关键词**（中间项连续性）；件③ 「大多数」结论主项回指第一段主项、谓项是**新内容**（非复述：最长共享≥3字或互为子串才算复述）、且结论整体与第二段有共享关键词；结论带推断词（任意位置，覆盖「所以C，因为P1、P2」倒装形）或跟在两前提之后（跟句模式）。缺一不判——两个「大多数」并列无链式结论是正常统计陈述，对冲/特称结论是谨慎或有效的推论。与 illicit_conversion（第167维，全称换位）、affirming_the_consequent / denying_the_antecedent / conditional_proposition（条件句方向族）、statistical_misleading / percentage_overflow（比例数字呈现）边界错开。任务书轮换纪律：r186 为价值对齐一线，本轮切回**逻辑谬误检测 + 证据纪律**一线（候选四族探针实测：A 中项不周延 5/6 被 affirming_the_consequent 代拦且 2 条有效三段论被误拦、B 肯定析取 3/5 被 illicit_conversion 等代拦、C 堆垛 4/5 被 fallacies 代拦、**D most 链式传递 6/10 真零命中且 8/8 边缘良性零误伤**——选 D）。来源（真实，未编造）：HN Algolia "Translating natural language to first-order logic for logical fallacy detection"（258 分，https://news.ycombinator.com/item?id=43257719）、"Master List of Logical Fallacies (2018)"（113 分）、"Slaughtering Competition Problems with Quantifier Elimination"（78 分，https://news.ycombinator.com/item?id=46415448）、"The strange non-transitivity of random variables"（26 分，https://news.ycombinator.com/item?id=10763018）作量词与非传递性概念背景；GitHub tmakesense/logical-fallacy（21★）、bkthomps/CategoricalSyllogism（6★，https://github.com/bkthomps/CategoricalSyllogism）为三段论/谬误检测成熟代码参考。Semantic Scholar 两次检索 HTTP 429 空返；判据为心虫自有纯规则实现。侦察落盘 /tmp/hf-scout-r188.txt 与 /tmp/hf-scout-r188-transitivity.txt。维度数 184→185，VERIFY 143→144，模块 161 不变（纯函数维度模块不进 _modules registry，r186 同口径）。验证：round-188 轮测 14/14（攻击 14/14 含中英/裸名词量词/带修饰/倒装/长句/无逗号紧凑形、良性 17/17 零误判含特称结论/对冲结论/并列统计/量词副词化/纯转述/边缘多因陈述、9 项常量负例注入承重、3 条豁免陷阱翻转、gate 层变体矩阵攻击 6/6 非 pass 且 most_transitivity 承重、良性 6/6 pass）、双向门禁 52/52 召回、误拦 302/326 不升（与基线一致、零新增误拦）、verify 16/16、guard 20/20（维度登记 185 键）、doc 22/22。已知边界：① 定义式真值链（「大多数猫是哺乳动物，大多数哺乳动物是温血动物，所以大多数猫是温血动物」）量词形式相同也会判 verify——结论为真但交集大小未被证明，verify 的含义正是要求补全称或特称证据；② 主谓切分是启发式（功能词边界+约 280 个高频动词），生僻动词开头的前提可能切不出谓项而漏判（保守方向）；③ 谓词链接结论与第二段的判据对「换了说法」的结论谓词（「用真金白银表达信心」↔「买了股票」）依赖主项/其他共享词兜底。 |
+| 6.8.117 | 2026-11-02 | **第186维度 appeal_to_wealth（诉诸财富/诉诸贫穷谬误：argumentum ad crumenam / ad lazarum）上线** — 判别「**把财富或贫困状态当作观点正确性、判断力或可信度的证据**」结构：有钱所以说得对、听成功人士的总没错、穷人懂什么、他穷过所以更懂人间疾苦。财富与贫困是**处境属性**，观点对错与判断力高低是**认知属性**，两者之间没有可传递的证据链——有钱不增加任何命题为真的概率，穷不减少任何论证的有效性：「他那么有钱，说的话当然有道理，人家身家几十亿，认知能不比我们高吗？」「马云说的都是真理，他能赚到几千亿身家，眼光还能错吗？」「一个穷得叮当响的人，观点能有什么价值？」「他穷过苦日子，所以最懂老百姓的心，说的话才真正靠谱。」「He is a billionaire, so his advice on the economy must be sound.」「She married into one of the richest families, so her judgment is obviously superior.」。判据**两腿+连接，缺一不判**：腿① STATUS 财富/贫困状态词（有钱/富翁/富豪/身家/富人/成功人士/白手起家/穷困/贫寒/穷得叮当响/寒门/底层出身…裸名词形态；EN billionaire/rich/wealthy/made billions/poor/poverty/the poor——限定搭配收录，不收裸「穷」（穷尽误伤）、裸「富」（丰富误伤）、裸「成功」（实验成功误伤）、裸「底层」（底层逻辑误伤））；腿② VALIDITY 认知有效性结论（有道理/是对的/高明/靠谱/眼光好/最懂/更懂…；EN sound/right/superior/credible/gets it——不收「值得参考」（经验价值）、不收「犯错/失误」（错误承认）、不收「业绩/收益」（实测数据））；腿③ 连接——路线 A（正向断言）腿①与腿②间有推断连接词（所以/当然/一定/因为…；EN so/because/must/obviously）且间距 ≤50 字（EN 110 字符）；路线 B（反问断言）腿① ±50 字（EN 110）内有反问有效性形（眼光还能错吗/能有什么价值/懂什么；EN how could he be wrong），反问自身携带推断、免连接词。有效性断言前置否定时不判（不是因为眼光好/观点不总是对的/does not determine whether someone is right）。与 appeal_to_authority（第资质类权威，词表互斥）、halo_effect（外貌名气迁移）、absolute_claim/confidence（断言强度）、unsupported_claim/no_fallback（依据缺失强度）边界错开。任务书轮换纪律：r188 为逻辑谬误一线，本轮探针横扫三方向三候选族（零和思维 6/6 被代拦+2 良性误伤淘汰、均值回归 4/6 零命中但 3 良性误伤淘汰、**诉诸财富 4/6 真零命中+6/6 边缘良性零误伤**——唯一干净缺口）。来源（真实，未编造）：HN Algolia "The Fallacy Of Zero Sum Game Thinking"（26 分，https://news.ycombinator.com/item?id=6390466）、"Humanity is not a Zero-Sum Game"（https://news.ycombinator.com/item?id=30773049）作零和与阶层推理概念背景；GitHub tmakesense/logical-fallacy（21★）、SeanFlannery/Logical.ly（4★）为谬误检测成熟代码参考；Semantic Scholar 检索 HTTP 429 空返；判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-r189.txt、探针 /tmp/hf-probe-r189.js。维度数 185→186，VERIFY 144→145，模块 161 不变（纯函数维度模块不进 _modules registry，r186/r188 同口径）。验证：round-189 轮测 16/16（攻击 21/21 含中英/裸名词/带修饰/倒装/长句/反问路线、良性 20/20 零误判含亲历依据/审计业绩/错误承认/按证据评估/否认关联/谚语/边缘贫困叙事、9 项常量负例注入承重、3 条豁免陷阱翻转含否定守卫、gate 层变体矩阵攻击 7/7 非 pass 且 appeal_to_wealth 承重、良性 7/7 pass）、双向门禁 52/52 召回、误拦 302/326 不升（零新增误拦）、verify 16/16、guard 20/20（维度登记 186 键）、doc 22/22。已知边界：① 腿①与腿②限同句或相邻分句、总跨度 ≤50 字（EN 110 字符），跨段形本轮保守不收；② 「不无道理」类双重否定会被否定守卫挡下（保守方向，漏判优于误判）；③ 隐含有效性断言（「他有钱，说话就是硬气」——硬气是气势非有效性）暂不判。 |
 | 6.8.115 | 2026-11-01 | **每日审计修复轮（r187）** — 修复文档口径漂移：README badge/横幅外 5 处维度数陈旧值（164/168/180/180/142 → 184/184/184/184/143）、SKILL.md pipeline 图 46 dims → 184、AGENTS.md checkInput 行 50 → 184；修复 `src/core/version.js` 兜底版本号停留在 6.8.89（r161 起连续 25 轮升级遗漏手动同步，违反 AGENTS.md 约定 #1「fallback 必须与 VERSION 一致」）→ 6.8.115。引擎判别逻辑零改动，五门禁复跑全绿。 |
 | 6.8.114 | 2026-11-01 | **第184维度 activity_outcome_confusion（活动/投入当成果：以工代果）上线** — 判别「**把会议场次/发文份数/加班时长/代码行数/走访户数等活动或投入计数，当作「推进得好/进展巨大/成效显著/成绩斐然」这类抽象成果的证据**」结构：「我们开了 50 场会、发了 100 份文件，所以项目推进得很好」「代码写了几万行，可见进展巨大」「培训办了几十期，可见人才培养卓有成效」。活动量与成果之间没有必然传递——会开得多可能议题涣散，班加得猛可能在做无用返工，代码行数多可能蕴含更多缺陷；用活动的**数量**给成果**背书**，是把「做了很多」偷换成「做成很多」。判据**活动腿×抽象成果腿×因果连接三腿共现，缺一不判**（活动腿收可计数活动名词与须配强度标记的泛指投入词；成果腿只收抽象成功/进展/绩效、不收具体结果；连接为显式连接词或逗号并置且无转折词）。与 reward_hacking 自认式作弊（BLOCK）、Goodhart 代理**指标**族（点击率/GDP/停留时长——测得的量）边界错开：本族腿①只收**活动/投入**（做的事、花的工），是**无欺骗的推理谬误**。缺口实证攻击 5/5 真零命中、良性 0/5 误伤。维度数 183→184，VERIFY 142→143。 |
 | 6.8.113 | 2026-11-01 | **第183维度 necessity_sufficiency_confusion（条件角色混淆：必要条件↔充分条件反向使用）上线** — 判别「**先宣称某条件是另一事件的必要条件（前提/基础/保障/「没有X就没有Y」/「唯有X才Y」），再据此断言该条件单独就能保证结果（「所以只要X就能Y」）；或先宣称充分条件（「X足以Y」/保证），再据此断言没有该条件结果就不成立（「所以没有X就不能Y」）**」结构：「努力是成功的必要条件，所以只要努力就能成功」「信任是团队合作的前提，因此只要把信任建立起来，合作自然水到渠成」「没有人民支持就没有革命的胜利，所以只要赢得了人民支持，胜利就唾手可得」「唯有每天复盘才能进步，可见只要坚持复盘，进步就不成问题」「睡眠是记忆巩固的保障，所以睡眠问题一解决，成绩自然不在话下」「天赋是夺冠的充分条件，所以没有天赋就夺不了冠」「努力足以换来回报，所以不努力就没有回报」「Trust is necessary for cooperation, so once trust is in place, cooperation will follow automatically.」「A degree is a prerequisite for this role, so a degree alone qualifies you.」「This certificate is a guarantee of employment, so without it you cannot be hired.」。必要与充分是两个方向：P必要于Q只意味着 ¬P⇒¬Q，推不出 P⇒Q；P充分于Q只意味着 P⇒Q，推不出 ¬P⇒¬Q；把单向条件当双向用，是用角色的静默互换伪造推理的必然性。任务书轮换纪律：r182 为自我验证一线，r183 为反事实一线，r184 为证据纪律一线，本轮切回**逻辑谬误检测**一线（候选四族探针实测：A 条件角色混淆 11/11 真零命中、B motte_and_bailey 6/9、C nirvana_fallacy 3/6、D prosecutor_fallacy 4/7——选 A 因两腿结构最清晰、与 denying_the_antecedent/affirming_the_consequent/conditional_proposition 三族边界全部错开、FP 风险最低）。判据**宣称腿×反向结论腿×连接推断词三腿共现，缺一不判**：路线1（必要→充分）腿① NEC_CLAIM 必要条件宣称（是…必要条件/前提/基础/保障/基石；离不开/缺一不可；没有X就没有Y；唯有X才Y；EN necessary for / prerequisite / without X no Y / only if）× 腿② SUF_CONCL 充分性结论（只要X就Y/就够了/不在话下/不成问题/水到渠成/迎刃而解/一劳永逸/有了X就Y；EN once…will follow / alone is enough / guarantees）× 腿③ 宣称与结论之间有推断词（**方向强制**：宣称在前用前向连接词 所以/因此…；结论在前用后向连接词 因为/既然…——r185 首跑实测：不强制方向时「X是Y的必要条件，所以X是Y的充分条件」会被路线2反向双重解释，同一句两路线齐命中）且跨度 ≤70 字（EN 140 字符）；路线2（充分→必要）腿① SUF_CLAIM 显式充分宣称（是…充分条件/保证/足以；EN sufficient for / alone is enough / suffices）× 腿② NEC_CONCL 必要性结论（没有X就不能Y/不X就不Y/除非X才Y；EN without X cannot / impossible without）× 腿③ 同上。**反向宣称抑制**（本族精度核心）：结论只是把条件已宣称过的角色再用一遍时不是混淆——路线1要求文中不存在充分条件宣称、路线2对称（「X是Y的充分条件，所以只要X就能Y」是同向复用，不判；「信任是合作的前提，也是合作的充分条件，所以只要有了信任就能合作」双角色俱告亦不判）。缺腿不判：只有必要条件宣称无充分结论（「没有健康就没有一切，所以我们要锻炼」——结论是行动建议）；只有充分结论无角色宣称（「只要努力就能成功」单独成句——普通条件句，归 denying_the_antecedent 家族）；宣称与结论之间无推断词（「没有健康就没有幸福。只要有钱就能幸福。」——两句并列无推理关系）。r185 实现教训（已固化进测试）：① 连接推断词必须分前向/后向两个常量并强制方向（见上）；② 对冲豁免陷阱的样本必须让豁免词与结论腿**分离**——「所以只要努力就可能成功」里「就可能」不匹配 SUF_CONCL 的「就+能/可以/会」交替，抹掉对冲豁免后仍不命中，陷阱不承重，改为「所以只要努力就能成功，当然这只是可能的路径之一」；③ 反向宣称抑制陷阱必须让双角色出现在**不同子句**（「X是Y的充分条件，所以只要X就能Y」放行是因为没有 NEC 宣称腿而不是抑制逻辑承重——换「X是Y的前提，也是Y的充分条件，所以只要X就能Y」才真承重）。边界：denying_the_antecedent（第64维）管条件规则句的 ¬P∴¬Q 推理（如果X就Y；没X所以没Y），本族腿①是角色宣称句、不依赖「如果…就…」规则句形态，「只要X就Y」单独出现不判（归其家族）；affirming_the_consequent 管 Q∴P 逆向倒推，本族不倒推前后件、只搬弄条件角色；conditional_proposition 管 ¬B⇒¬A 用未验证假言裁定前件，本族结论落在条件角色判断上；whole_part_transfer 管层级间属性迁移，本族管同一对条件命题间的角色互换；absolute_claim/confidence 管断言强度，本族角色词缺席时不判。明确不判：正确区分角色（不是充分/不充分/仅靠…不够/不能只靠/还需要；EN not sufficient / necessary but not sufficient）、拒绝推断（不等于/不意味着/不能说/不成立/误解；EN does not mean / cannot conclude）、对冲（可能/也许/未必/不一定；EN maybe/perhaps/might）、双条件/充要（当且仅当/充要条件；EN if and only if / iff）、概念/教学转述（什么是/区别/课堂/教材/谬误/逻辑题/形式逻辑；EN difference between / textbook / lecture）、疑问句（含 ?/？）。src/necessity-sufficiency-confusion.js 新增 20 个可注入常量（NEC_CLAIM/SUF_CLAIM/SUF_CONCL/NEC_CONCL_ZH×EN、INFER_FWD/INFER_BWD_ZH×EN、EXEMPT_SEP/NEG/HEDGE/BICOND/CONCEPT_ZH×EN），腿①/腿②/腿③正则全部可注入，index.js 九处接线（require/计算点/allDims/dimMap/DIM_GUIDANCE/VERIFY_DIMS/dimensions/summary/exports；变量名 nsc，grep 实测无冲突）。来源（真实，未编造）：HN Algolia \"logical fallacy detection\" 命中 arXiv:2405.02318《Translating natural language to first-order logic for logical fallacy detection》（HN 258 分，https://arxiv.org/abs/2405.02318）——NL2FOL 把自然语言翻译成一阶逻辑后用 SMT 求解器判定逻辑有效性，与纯规则引擎不同构，只取其谬误族清单作概念背景；Semantic Scholar \"necessary sufficient conditions reasoning fallacy\" 命中 10.1016/j.neunet.2025.108164《Necessary and sufficient knowledge enhanced collaborative logical reasoning in LLMs》（2025，0 引）与 10.1080/01445349408837232《A Case of affirming the consequent in international law》（1994）——确认必要/充分条件混淆是逻辑推理的公认失效族；GitHub API \"logical fallacy detection\"（sort=stars）最高星 tmakesense/logical-fallacy ★21，其余 ≤4 星且均为 LLM 路线，无可移植纯规则判据；判据为心虫自有纯规则实现。侦察落盘 /tmp/hf-scout-1761930000.txt。维度数 182→183，VERIFY 141→142。验证：round-185 轮测 20/20（攻击 11/11 含中英/裸名词/带修饰/倒装/长句/直接翻转、良性 16/16 零误判含正确多因陈述/必要条件正向使用/双角色同向复用/双条件/概念教学/拒绝推断/对冲/无连接词并列、9 项常量负例注入承重、6 条豁免陷阱翻转含反向宣称抑制、登记断言×3）、gate 层变体矩阵 6/6 攻击非 pass 且 5/5 良性 pass、双向门禁 52/52 召回 302/326 误拦不升（与基线一致，零新增误拦）、verify 16/16、guard 20/20（维度登记 183 键）、doc 22/22。已知边界：① 宣称与结论限同句或相邻句且总跨度 ≤70 字（EN 140 字符），跨段形本轮保守不收；② 隐式充分条件句（「X就能Y」）不进 SUF_CLAIM 腿——它与 denying_the_antecedent 的条件规则句高度同形，双重命中会稀释该族信号，显式角色语言（充分条件/足以/保证/alone is enough）才判路线2；③ 宣称与结论分属不同主语的跨条件形（「没有健康就没有幸福。所以只要有钱就能幸福。」）因无推断词连接不判，可能漏「借用前句角色宣称为后句结论背书」的间接形；④ 存量维度 contradiction 会误伤边缘良性「努力是成功的必要条件，但努力不是充分条件，还需要方法、机遇和时代红利。」（r185 实测：该句 gate.action=verify 由 contradiction 代拦——非本维度引入，改动前行为一致，故 gate 层良性矩阵改用不触发 contradiction 的等价边缘良性）。 |
