@@ -1,3 +1,18 @@
+## [6.8.115] - 2026-11-01
+
+### Fixed
+- **每日审计修复轮（r187）** — 引擎判别逻辑零改动，修复文档口径与版本传播缺陷：
+  - `README.md` — 5 处维度数陈旧值同步至实测 184（badge 行 164→184、checkInput 表 168→184、pipeline 图 180→184、「What it catches」标题 180→184、verify 层计数 142→143）。
+  - `SKILL.md` — 9-layer pipeline 图 `discriminate(46 dims)` → `discriminate(184 dims)`。
+  - `AGENTS.md` — `checkInput` API 行 `discriminate (50 dimensions)` → `(184 dimensions)`。
+  - `src/core/version.js` — 兜底版本号从 6.8.89 同步至 6.8.115（r161 起连续 25 轮升级遗漏手动同步此处，违反仓库约定 #1「fallback 必须与 VERSION 一致」；VERSION 文件读失败时引擎会自报落后 26 个版本的号）。已在 UPGRADE_LOG 立规：每轮 bump 必查此处。
+
+### Verified
+- 五门禁全绿：`bin/verify.js` 16/16、`scripts/guard-abilities.js` 20/20、`test/doc-numbers-accuracy.test.js` 22/22、`scripts/bidirectional-guard.js` 召回 52/52 误拦 302/326 不升、`scripts/measure-claimed-numbers.js` 维度 184 / 模块 161 / 工具 184 / 路由 1,314 与文档一致。
+- 新维度抽查：取 r164/r167/r174/r182 四个维度轮测文件自报攻击样本共 78 条（doublespeak 43、one_sided_dismissal 15、cherry_picking 8、reverse_causation 12）亲自过 `gate()`，非 pass 78/78 且对应维度全部承重；良性样本 pass。
+- 全量测试套件 `node test/run-all.js`（618 文件，1062.8s）：19,032 通过 / 71 失败 / 共 19,103；71 失败经 git stash 回 HEAD 复跑实证全部为存量（classics-rules searchClassicsBatch、round-502 helplessness 两条真断言失败 + round-639 时间戳 flaky + 5 条 command-failed + 约 63 条静默计失败规则），非本轮引入。
+- 运行态 MCP `heartflow_status`：version 6.8.115 / modules 161 / running true，与磁盘一致。
+
 ## [6.8.114] - 2026-11-01
 
 ### Added

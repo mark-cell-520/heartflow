@@ -84,7 +84,13 @@ const path = require('path');
 //                 pass → block，326 条良性语料 + 3255 个文档英文 token 零误伤）。
 // [v6.8.89] 第 161 轮同步：6.8.88 → 6.8.89（第 161 维度 monocause
 //                 单一因果过度简化 / fallacy of the single cause 上线）。
-let VERSION = '6.8.89';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.115] 第 187 轮（每日审计修复）同步：6.8.89 → 6.8.115。实测发现兜底值
+//                 从 r161 起被连续 25 轮升级遗漏（r162-r186 均未手动同步此处），
+//                 VERSION 文件读失败时引擎会自报落后 26 个版本的号——正是本注释
+//                 想防的情况。本轮补齐，并在 UPGRADE_LOG 立规：每轮 bump 必查此处。
+// [v6.8.115 补记] test/run-all.js 并发池的突变回滚机制会把本文件还原到 git HEAD
+//                 （r187 首次编辑即被吞，已重写）；跑全量测试期间勿并发编辑 src/。
+let VERSION = '6.8.115';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

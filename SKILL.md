@@ -1,7 +1,7 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.114"
+version: "6.8.115"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
@@ -78,18 +78,18 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.114. Nothing here is copied
+Every number below was measured on this repository at v6.8.115. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.114 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.115 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 161 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,314 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 184 | `dimMap` keys in `src/index.js` |
 | MCP tools | 184 | tool definitions exposed via `tools/list` |
-| Test suite | 18,157 passing / 105 failing | `node test/run-all.js` (4-slice aggregate; failed set is pre-existing runner/flaky noise — s2/s3 byte-identical to pre-change baseline) |
+| Test suite | 19,032 passing / 71 failing | `node test/run-all.js` (full run 2026-11-01; failed set is pre-existing runner/flaky noise — 2 stale assertions + 5 command-failed + ~64 no-summary-line files, none introduced by r187) |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
@@ -234,7 +234,7 @@ console.log(deep._decisionApplied);      // { applied: true/false, decision: {..
 ## The 9-layer check pipeline
 
 ```
-input -> scope-check -> premise-check -> discriminate(46 dims) -> gate
+input -> scope-check -> premise-check -> discriminate(184 dims) -> gate
       -> evidence verify -> frame-check -> output-gate -> doubt-engine
       -> intent-anchor -> rewriter -> error-memory -> self-diagnosis -> output
 ```

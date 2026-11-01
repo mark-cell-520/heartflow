@@ -5,9 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![npm version](https://img.shields.io/npm/v/@yun520-1/heartflow.svg)](https://www.npmjs.com/package/@yun520-1/heartflow)
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
-[![Tests](https://img.shields.io/badge/tests-18%2C157%20passing-brightgreen.svg)](#tests)
+[![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-164-blueviolet.svg)](#what-it-catches-164-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-184-blueviolet.svg)](#what-it-catches-184-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 184 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
-×  1,314 dispatch routes  ×  18,157 passing tests  ×  2 npm dependencies
+×  1,314 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 168 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 184 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (180 dimensions) -> gate
+scope-check -> premise-check -> discriminate (184 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (180 dimensions)
+## What it catches (184 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **142 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **143 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.114**. Not marketing copy.
+Measured on this repository at **v6.8.115**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.114**. Not marketing copy.
 | Dispatch routes | 1,314 |
 | Discrimination dimensions | 184 |
 | MCP tools | 184 |
-| Test suite | 18,157 passing / 105 failing |
+| Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.115 | 2026-11-01 | **每日审计修复轮（r187）** — 修复文档口径漂移：README badge/横幅外 5 处维度数陈旧值（164/168/180/180/142 → 184/184/184/184/143）、SKILL.md pipeline 图 46 dims → 184、AGENTS.md checkInput 行 50 → 184；修复 `src/core/version.js` 兜底版本号停留在 6.8.89（r161 起连续 25 轮升级遗漏手动同步，违反 AGENTS.md 约定 #1「fallback 必须与 VERSION 一致」）→ 6.8.115。引擎判别逻辑零改动，五门禁复跑全绿。 |
 | 6.8.114 | 2026-11-01 | **第184维度 activity_outcome_confusion（活动/投入当成果：以工代果）上线** — 判别「**把会议场次/发文份数/加班时长/代码行数/走访户数等活动或投入计数，当作「推进得好/进展巨大/成效显著/成绩斐然」这类抽象成果的证据**」结构：「我们开了 50 场会、发了 100 份文件，所以项目推进得很好」「代码写了几万行，可见进展巨大」「培训办了几十期，可见人才培养卓有成效」。活动量与成果之间没有必然传递——会开得多可能议题涣散，班加得猛可能在做无用返工，代码行数多可能蕴含更多缺陷；用活动的**数量**给成果**背书**，是把「做了很多」偷换成「做成很多」。判据**活动腿×抽象成果腿×因果连接三腿共现，缺一不判**（活动腿收可计数活动名词与须配强度标记的泛指投入词；成果腿只收抽象成功/进展/绩效、不收具体结果；连接为显式连接词或逗号并置且无转折词）。与 reward_hacking 自认式作弊（BLOCK）、Goodhart 代理**指标**族（点击率/GDP/停留时长——测得的量）边界错开：本族腿①只收**活动/投入**（做的事、花的工），是**无欺骗的推理谬误**。缺口实证攻击 5/5 真零命中、良性 0/5 误伤。维度数 183→184，VERIFY 142→143。 |
 | 6.8.113 | 2026-11-01 | **第183维度 necessity_sufficiency_confusion（条件角色混淆：必要条件↔充分条件反向使用）上线** — 判别「**先宣称某条件是另一事件的必要条件（前提/基础/保障/「没有X就没有Y」/「唯有X才Y」），再据此断言该条件单独就能保证结果（「所以只要X就能Y」）；或先宣称充分条件（「X足以Y」/保证），再据此断言没有该条件结果就不成立（「所以没有X就不能Y」）**」结构：「努力是成功的必要条件，所以只要努力就能成功」「信任是团队合作的前提，因此只要把信任建立起来，合作自然水到渠成」「没有人民支持就没有革命的胜利，所以只要赢得了人民支持，胜利就唾手可得」「唯有每天复盘才能进步，可见只要坚持复盘，进步就不成问题」「睡眠是记忆巩固的保障，所以睡眠问题一解决，成绩自然不在话下」「天赋是夺冠的充分条件，所以没有天赋就夺不了冠」「努力足以换来回报，所以不努力就没有回报」「Trust is necessary for cooperation, so once trust is in place, cooperation will follow automatically.」「A degree is a prerequisite for this role, so a degree alone qualifies you.」「This certificate is a guarantee of employment, so without it you cannot be hired.」。必要与充分是两个方向：P必要于Q只意味着 ¬P⇒¬Q，推不出 P⇒Q；P充分于Q只意味着 P⇒Q，推不出 ¬P⇒¬Q；把单向条件当双向用，是用角色的静默互换伪造推理的必然性。任务书轮换纪律：r182 为自我验证一线，r183 为反事实一线，r184 为证据纪律一线，本轮切回**逻辑谬误检测**一线（候选四族探针实测：A 条件角色混淆 11/11 真零命中、B motte_and_bailey 6/9、C nirvana_fallacy 3/6、D prosecutor_fallacy 4/7——选 A 因两腿结构最清晰、与 denying_the_antecedent/affirming_the_consequent/conditional_proposition 三族边界全部错开、FP 风险最低）。判据**宣称腿×反向结论腿×连接推断词三腿共现，缺一不判**：路线1（必要→充分）腿① NEC_CLAIM 必要条件宣称（是…必要条件/前提/基础/保障/基石；离不开/缺一不可；没有X就没有Y；唯有X才Y；EN necessary for / prerequisite / without X no Y / only if）× 腿② SUF_CONCL 充分性结论（只要X就Y/就够了/不在话下/不成问题/水到渠成/迎刃而解/一劳永逸/有了X就Y；EN once…will follow / alone is enough / guarantees）× 腿③ 宣称与结论之间有推断词（**方向强制**：宣称在前用前向连接词 所以/因此…；结论在前用后向连接词 因为/既然…——r185 首跑实测：不强制方向时「X是Y的必要条件，所以X是Y的充分条件」会被路线2反向双重解释，同一句两路线齐命中）且跨度 ≤70 字（EN 140 字符）；路线2（充分→必要）腿① SUF_CLAIM 显式充分宣称（是…充分条件/保证/足以；EN sufficient for / alone is enough / suffices）× 腿② NEC_CONCL 必要性结论（没有X就不能Y/不X就不Y/除非X才Y；EN without X cannot / impossible without）× 腿③ 同上。**反向宣称抑制**（本族精度核心）：结论只是把条件已宣称过的角色再用一遍时不是混淆——路线1要求文中不存在充分条件宣称、路线2对称（「X是Y的充分条件，所以只要X就能Y」是同向复用，不判；「信任是合作的前提，也是合作的充分条件，所以只要有了信任就能合作」双角色俱告亦不判）。缺腿不判：只有必要条件宣称无充分结论（「没有健康就没有一切，所以我们要锻炼」——结论是行动建议）；只有充分结论无角色宣称（「只要努力就能成功」单独成句——普通条件句，归 denying_the_antecedent 家族）；宣称与结论之间无推断词（「没有健康就没有幸福。只要有钱就能幸福。」——两句并列无推理关系）。r185 实现教训（已固化进测试）：① 连接推断词必须分前向/后向两个常量并强制方向（见上）；② 对冲豁免陷阱的样本必须让豁免词与结论腿**分离**——「所以只要努力就可能成功」里「就可能」不匹配 SUF_CONCL 的「就+能/可以/会」交替，抹掉对冲豁免后仍不命中，陷阱不承重，改为「所以只要努力就能成功，当然这只是可能的路径之一」；③ 反向宣称抑制陷阱必须让双角色出现在**不同子句**（「X是Y的充分条件，所以只要X就能Y」放行是因为没有 NEC 宣称腿而不是抑制逻辑承重——换「X是Y的前提，也是Y的充分条件，所以只要X就能Y」才真承重）。边界：denying_the_antecedent（第64维）管条件规则句的 ¬P∴¬Q 推理（如果X就Y；没X所以没Y），本族腿①是角色宣称句、不依赖「如果…就…」规则句形态，「只要X就Y」单独出现不判（归其家族）；affirming_the_consequent 管 Q∴P 逆向倒推，本族不倒推前后件、只搬弄条件角色；conditional_proposition 管 ¬B⇒¬A 用未验证假言裁定前件，本族结论落在条件角色判断上；whole_part_transfer 管层级间属性迁移，本族管同一对条件命题间的角色互换；absolute_claim/confidence 管断言强度，本族角色词缺席时不判。明确不判：正确区分角色（不是充分/不充分/仅靠…不够/不能只靠/还需要；EN not sufficient / necessary but not sufficient）、拒绝推断（不等于/不意味着/不能说/不成立/误解；EN does not mean / cannot conclude）、对冲（可能/也许/未必/不一定；EN maybe/perhaps/might）、双条件/充要（当且仅当/充要条件；EN if and only if / iff）、概念/教学转述（什么是/区别/课堂/教材/谬误/逻辑题/形式逻辑；EN difference between / textbook / lecture）、疑问句（含 ?/？）。src/necessity-sufficiency-confusion.js 新增 20 个可注入常量（NEC_CLAIM/SUF_CLAIM/SUF_CONCL/NEC_CONCL_ZH×EN、INFER_FWD/INFER_BWD_ZH×EN、EXEMPT_SEP/NEG/HEDGE/BICOND/CONCEPT_ZH×EN），腿①/腿②/腿③正则全部可注入，index.js 九处接线（require/计算点/allDims/dimMap/DIM_GUIDANCE/VERIFY_DIMS/dimensions/summary/exports；变量名 nsc，grep 实测无冲突）。来源（真实，未编造）：HN Algolia \"logical fallacy detection\" 命中 arXiv:2405.02318《Translating natural language to first-order logic for logical fallacy detection》（HN 258 分，https://arxiv.org/abs/2405.02318）——NL2FOL 把自然语言翻译成一阶逻辑后用 SMT 求解器判定逻辑有效性，与纯规则引擎不同构，只取其谬误族清单作概念背景；Semantic Scholar \"necessary sufficient conditions reasoning fallacy\" 命中 10.1016/j.neunet.2025.108164《Necessary and sufficient knowledge enhanced collaborative logical reasoning in LLMs》（2025，0 引）与 10.1080/01445349408837232《A Case of affirming the consequent in international law》（1994）——确认必要/充分条件混淆是逻辑推理的公认失效族；GitHub API \"logical fallacy detection\"（sort=stars）最高星 tmakesense/logical-fallacy ★21，其余 ≤4 星且均为 LLM 路线，无可移植纯规则判据；判据为心虫自有纯规则实现。侦察落盘 /tmp/hf-scout-1761930000.txt。维度数 182→183，VERIFY 141→142。验证：round-185 轮测 20/20（攻击 11/11 含中英/裸名词/带修饰/倒装/长句/直接翻转、良性 16/16 零误判含正确多因陈述/必要条件正向使用/双角色同向复用/双条件/概念教学/拒绝推断/对冲/无连接词并列、9 项常量负例注入承重、6 条豁免陷阱翻转含反向宣称抑制、登记断言×3）、gate 层变体矩阵 6/6 攻击非 pass 且 5/5 良性 pass、双向门禁 52/52 召回 302/326 误拦不升（与基线一致，零新增误拦）、verify 16/16、guard 20/20（维度登记 183 键）、doc 22/22。已知边界：① 宣称与结论限同句或相邻句且总跨度 ≤70 字（EN 140 字符），跨段形本轮保守不收；② 隐式充分条件句（「X就能Y」）不进 SUF_CLAIM 腿——它与 denying_the_antecedent 的条件规则句高度同形，双重命中会稀释该族信号，显式角色语言（充分条件/足以/保证/alone is enough）才判路线2；③ 宣称与结论分属不同主语的跨条件形（「没有健康就没有幸福。所以只要有钱就能幸福。」）因无推断词连接不判，可能漏「借用前句角色宣称为后句结论背书」的间接形；④ 存量维度 contradiction 会误伤边缘良性「努力是成功的必要条件，但努力不是充分条件，还需要方法、机遇和时代红利。」（r185 实测：该句 gate.action=verify 由 contradiction 代拦——非本维度引入，改动前行为一致，故 gate 层良性矩阵改用不触发 contradiction 的等价边缘良性）。 |
 | 6.8.112 | 2026-11-01 | **第182维度 absence_of_problems（未检出≠不存在：把有限检验的阴性结果当作完备证明）上线** — 判别「**测试/扫描/审查/调研只覆盖有界范围，却把「本次未检出」升级为「不存在」**」结构：「测试全跑过了没报错，所以代码肯定没问题」「扫了一遍没发现漏洞，说明系统是安全的」「没人投诉，说明产品体验没问题」「三年没出过事故，这座桥梁绝对安全」「尽调没查出任何问题，这家公司完全可以放心投资」「抽样检查没有发现缺陷，产品百分之百合格」「The tests did not fail, so the code must be correct.」「We scanned and found no vulnerabilities, therefore the system is secure.」「No bugs were reported during the audit, so the release is completely safe.」。检验的效力受其覆盖范围约束：测试只覆盖已写下的用例，扫描只匹配已知漏洞特征库，审查只覆盖审查者看得见的层面，调研只覆盖愿意开口的人；把「本次未检出」升级为「不存在」，是用有界搜索的阴性结果冒充无界全域的证明，让**未被检验的部分**获得与**已检验部分**相同的可信度——这是 AI 工程汇报、代码审查结论、上线评审中最典型的似是而非：听起来是验证结论，实则是验证范围的静默扩张。任务书轮换纪律：r176-r183 连续八轮为逻辑谬误/证据纪律/反事实一线，本轮切**自我验证与纠错 + agent 执行验证**一线（候选四族探针实测真零命中：A nirvana_fallacy 3/6、**B absence_of_problems 5/6**、C red_herring 6/6、D common_sense 4/4；选 B 因两腿结构最清晰、FP 风险最低、与既有维度边界全部错开）。判据**两腿共现，缺一不判**（同句或相邻句）：腿① CHECK 已执行检验+阴性结果三形任一——CN-A 阴性结果形（检验动词 测试/跑过/回归/扫描/检查/审查/核查/排查/审计/验证/复测/体检/走访/调研/问卷/回访/抽查/化验/检测/验收/评审/复盘/对照/巡检/观察/试用/实测/压测/演练/试运行/评测/筛查/尽调/背调/复查/复审/复核/校验/自查/互查/巡查/专访/暗访/抽样 **设为可选前缀**——「扫了一遍没发现漏洞」有动词，「没发现问题」「三年没出过事故」无动词亦可，工程汇报里动词省略是常态 → [≤12字] → 否定 没/未/没有/并无/未能/不曾/从无/毫无/压根没/根本没/从未 → [≤6字] → {检出动词 报错/发现/找到/查出/检出/测出/暴露/出现/触发/冒出/见到/遇到/收到/得到/报出/显现/看出/听出/出过/发生过 → [≤10字] → 问题名词 问题/漏洞/缺陷/错误/异常/故障/风险/隐患/毛病/弊病/差错/事故/副作用/不良反应/反馈/差评/恶评/意见/不满/异议/警告/报警/疑点/破绽/把柄/bug | **自足投诉类** 投诉/举报/抱怨/质疑/反对/反映/异议/有意见/提意见/告状/上访——这类词本身即问题名词，不得再要求后接问题名词，否则「回访没收到投诉，说明政策没有问题」整句漏判}）、CN-B 通过形（检验动词 → [≤8字] → 全部/完全/都/皆/悉数/尽数/无一例外/清一色 → [≤4字] → 通过/合格/达标/过关/全绿/绿灯/一次过/顺利过）、CN-C 失败裸形（检验动词 → [≤12字] → 否定 → [≤6字] → 出错/报错/失败/挂掉/崩溃/卡住/卡死/超时/漏数据/掉数据/丢数据/漏单/掉单——无需问题名词后缀）；EN-A 检验名词+阴性动词（tests passed / did not fail / found no / reported no / showed no / produced no / came back clean / returned no / detected no / turned up nothing）、EN-B no+问题名词+were found/reported/detected/observed/raised/encountered、EN-C 检验名词+all passed/are green/came back green；腿② SEAL 全称化结论三形任一——CN-A 连接词+无问题族结论（所以/因此/因而/可见/足见/据此/故而/于是/那么/说明/证明/表明/足以说明/足以证明/也就是说/即 → [≤25字] → 没问题/没有问题/没有啥问题/毫无问题/没有任何问题/没漏洞/没有漏洞/没有缺陷/没有错误/没有异常/没有隐患/没有风险/无风险/是安全/是正确/是可靠/是可行/是成立/是有效/可放心/可以放心/放心使用/放心用/万无一失/固若金汤/天衣无缝/一点儿问题都没有）、CN-B 连接词+确定性副词+其他结论（→ 肯定/一定/必然/必定/势必/完全/绝对/百分之百/百分百/毫无疑问/毋庸置疑/不容置疑/毫无/丝毫/压根/根本/铁定/稳稳/妥妥 → [≤10字] → 安全/正确/可靠/可行/成立/有效/稳定/健康/干净/靠得住/说得通/站得住/成功/受欢迎/叫好）、CN-C 无连接词+确定性副词+无问题族结论（「绝对安全」「完全没问题」「百分百可靠」——跨句亦判）；EN-A so/therefore/thus/hence/which means/that means/meaning/proves/shows/demonstrates/indicates/confirms/establishes+无问题族结论、EN-B so/therefore/thus/hence/which means/proves/shows/demonstrates+must be/certainly/definitely/absolutely/completely/totally/entirely/100%/without a doubt+结论。**161 轮教训：全部收裸名词形态**（收「风险」而非只收「风险点」，收「投诉」而非只收「投诉量」；英文侧**过去时态必须显式收**——`\bscans?\b` 匹配不到 "scanned"（scan 后紧跟 ned、词边界失败），r184 首跑实测「We scanned and found no vulnerabilities, therefore the system is secure.」整句漏判即因此）。边界：appeal_to_ignorance（第62维）管**举证责任分配**（「你拿不出反证，所以你是错的」），无「检验已执行」腿，本族核心恰是检验已执行、只是覆盖有界；scrutiny_evasion（第72维）管「**检验这个动作不该发生**」（别查了，查就是不信任我），落点在拒绝检验，本族落点是检验已发生、结果被全称化；unsupported_claim / confidence / absolute_claim 管断言强度与依据缺失，本族有明确的「检验陈述→全称结论」两步结构；perfect_error S6「无来源」管长断言无来源，本族腿①恰是**有**执行记录的检验陈述。明确不判：范围限定（在…范围内/在…之内/在…以内/在…覆盖的/仅限于/只限于/仅就/只就/就…而言/截至目前/到目前为止/迄今为止/就目前/在现阶段/在此范围内；EN within/inside/limited to/only for/as far as/so far/for now/in the covered scope/to the extent/at this stage——「在已覆盖的用例范围内，回归测试没有发现问题」是正确判别）、对冲（可能/也许/或许/未必/不一定/不见得/说不定/很难说/说不准/不能排除/难以排除/无法排除/不排除/有待/尚需/还需/仍待/待观察/待验证/待定；EN may/might/could/possibly/perhaps/maybe/not necessarily/cannot rule out/can't rule out/still possible/remains possible/to be determined/pending）、拒绝推断（不等于/不代表/不意味着/并不意味着/推不出/推断不出/不能说明/不足以/并不说明/无法说明/算不了/算不上/说明不了/证明不了/不构成/不能据此/无法据此/不可据此；EN does not mean/doesn't mean/does not prove/doesn't prove/cannot conclude/can't conclude/no evidence for/not the same as/absence of evidence is not——「测试通过只能说明已写用例通过，不能证明代码没有问题」是正确判别）、概念/教学转述（测试覆盖/覆盖率/覆盖不足/假阴性/漏检/误检/贝叶斯/证据缺席/检验的局限/验证的局限/样本偏差/抽样误差/检出限/盲区/黑盒测试/白盒测试/边界用例/回归范围/测试用例设计；EN test coverage/code coverage/coverage rate/false negative/false positive/absence of evidence/verification/falsifiable/null result/underpowered/sampling error/selection bias/detection limit/blind spot——讨论检验局限本身是正确判别）、构造上完备的检验（穷举/枚举了/逐一验证/逐一核对/逐个验证/逐个核对/全部枚举/遍历了所有/遍历全部/数学证明/形式化验证/可证明/定理证明/完全归纳/所有可能的输入/每一种情况/无一遗漏/面面俱到；EN exhaustively/all possible/every possible/complete enumeration/mathematical proof/proved for all/verified all/brute-forced all/full exhaustive formal verification/by exhaustion——这是真正的完备性证明，不是谬误）、疑问句（含 ?/？）。已知边界：① 腿①腿②限同句或相邻句，「测试全部通过。（隔两段）代码没有问题。」跨段形本轮保守不收；② 结论族限定为「无问题/安全/可靠/放心」家族与带确定性副词的其他结论，「测试通过，方案可行」这类无副词弱结论不在射程；③ 「成立/为真/有效」类结论只在确定性副词在场时判定（SEAL_ZH_B），避免误伤「数据说明理论成立」这类合法科学陈述；④ 存量维度 genetic_fallacy + appeal_to_ignorance 误伤边缘良性「测试通过只能说明已写用例通过，不能证明代码没有问题」、confidence 误伤「The scan may still have missed zero-day vulnerabilities.」（r184 用 git stash 回退 index.js 实证：改动前行为完全一致，非本维度引入）。 |

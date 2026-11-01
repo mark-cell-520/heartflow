@@ -1,3 +1,36 @@
+# 第 187 轮报告（v6.8.115 — 每日审计·修复·同步轮，无新维度 — 2026-11-01）
+
+## 一、审计对象与结论
+- 审计范围：过去 24 小时升级 commit 10 条（r177-r186，v6.8.105→6.8.114，第175-184维度）+ 本地未推送积累 23 条。UPGRADE_LOG 轮次报告 r161-r186 与 commit 一一对应（r183 标题格式为「第183轮」无空格，首轮 grep 漏检后已人工核实存在）。
+- 引擎健康：运行态 MCP `heartflow_status` 实测 version 6.8.114（修复后 6.8.115）/ modules 161 / running true，与磁盘一致。
+- 升级产出真实性：不采信自报告，取 r164/r167/r174/r182 四个维度**轮测文件自报攻击样本**共 78 条亲自过 `gate()`——doublespeak ZH25+EN18、one_sided_dismissal ZH10+EN5、cherry_picking 8、reverse_causation ZH12，全部 action 非 pass 且对应维度在 findings 承重（78/78）。measure-claimed-numbers.js 实测维度 184 / BLOCK 11 / REWRITE 19 / VERIFY 143 / 工具 184 / 路由 1,314 / 模块 161，与文档口径一致。
+
+## 二、发现问题（分级）
+- **P2-1 文档口径漂移（5+2 处）**：README badge 行维度数 164（应为 184）、checkInput 表 168、pipeline 图 180、「What it catches」标题 180、verify 层计数 142（应为 143）；SKILL.md pipeline 图 `46 dims`；AGENTS.md checkInput 行 `50 dimensions`。doc-numbers-accuracy 测试只校验 README 横幅行与 AGENTS 主声明，这些行内引用无守卫覆盖——r186 各轮「文档三处同步」只改了横幅附近，漏了全文其他位置。
+- **P2-2 版本兜底值停滞（真代码缺陷）**：`src/core/version.js` 兜底版本号停留在 6.8.89（r161 手动同步后，r162-r186 连续 25 轮升级均遗漏该处，sync-version.js 明确不管这里）。违反 AGENTS.md 仓库约定 #1「fallback 必须与 VERSION 一致」。后果：VERSION 文件读失败（打包遗漏/权限问题）时引擎自报落后 26 个版本的号，且外部无提示。
+- **P3-1 测试计数缓存陈旧**：`data/test-count.json` 停留在 2026-10-09（18,157 通过 / 105 失败），measure 脚本读缓存展示过期失败数。本轮已触发全量重跑（见第四节）。
+- **P3-2 良性边缘误伤（存量维度，非本轮引入）**：实测「所有猫都是哺乳动物，所以我的猫是哺乳动物」被 stereotype+perfect_error 判 verify；「根据当时公开的财报数据，这家公司已连续两年亏损」被 unsupported_claim 判 verify。多轮 UPGRADE_LOG 已记录同类存量代拦误伤，建议后续升级轮评估。
+- 无 P0/P1：引擎无崩溃、无数据丢失、新维度族真实注册且承重。
+
+## 三、修复内容
+- `README.md`：badge 164→184（含锚点）、checkInput 表 168→184、pipeline 图 180→184、标题 180→184、verify 142→143；Version history 追加 v6.8.115 行。
+- `SKILL.md`：pipeline 图 46 dims→184 dims；measured-at 与 Engine version 行 6.8.114→6.8.115。
+- `AGENTS.md`：checkInput 行 50→184 dimensions；维度注记追加 v6.8.115 审计修复轮。
+- `src/core/version.js`：兜底值 6.8.89→6.8.115 并留同步注记（**本文件是引擎代码，为本轮唯一代码变更**；判别逻辑零改动）。
+- `VERSION` 6.8.114→6.8.115 + `node scripts/sync-version.js`（package.json / SKILL.md / heartflow.js BUILD_DATE 已同步）。
+- `CHANGELOG.md` / `UPGRADE_LOG.md`：追加 r187 轮报告。
+
+## 四、验证数据（全部本轮真实运行）
+- 五门禁：bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 184 键）；doc-numbers-accuracy.test.js **22/22**；bidirectional-guard.js 召回 **52/52**、误拦 **302/326 不升**；measure-claimed-numbers 维度 184/模块 161/工具 184/路由 1,314。
+- 新维度攻击样本复测（轮测文件自报样本，非手写）：**78/78 非 pass 且维度承重**（doublespeak 43、one_sided_dismissal 15、cherry_picking 8、reverse_causation 12）。
+- 全量测试套件 `node test/run-all.js`（618 文件，1062.8s）：**19,032 通过 / 71 失败 / 共 19,103**。71 失败逐类归因（全部实证存量，非 r187 引入）：① 2 条真断言失败——classics-rules searchClassicsBatch（git stash 回 HEAD 复跑仍 19/20 同款失败）、round-502-helplessness「模块层漏检 7」（stash 复跑仍失败）；② 1 条时间戳 flaky——round-639 lastWriteTs 未推进；③ 5 条 command-failed——4 条直接跑即崩（同①类断言失败上抛）+ mcp-auth-tier 无 MCP_HEARTFLOW_KEY 按设计跳过不退 0；④ 约 63 条「未输出结果行」计失败（harness 静默计失败规则，直接跑多数通过，round-378 直接跑 EXIT=0 系并发池输出交织误报）。README/SKILL 测试数规格表按实测同步 18,157→19,032（r412 同款处理：failed 集合作门禁噪声记录）。
+- 心虫裁决：philosophy_decision 维持 accelerate（本轮为审计修复轮，判别能力零增长，honest numbers 纪律要求如实标注「无新维度」）。
+
+## 五、立规（防复发）
+① 每轮升级 bump 版本后必须同步 `src/core/version.js` 兜底值——建议升级任务 prompt 的阶段0 基线增加 `grep "let VERSION" src/core/version.js` 一项；② doc-numbers-accuracy.test.js 增补行内引用守卫（README badge 行以外/AGENTS/SKILL pipeline 图的维度数），防「只同步横幅不同步全文」型漂移；③ data/test-count.json 应在每轮验证后刷新，不用过期缓存对外展示；④ **跑 test/run-all.js 期间不得并发编辑 src/**——r187 实测：并发池突变回滚机制把 r187 对 version.js/heartflow.js 的首次编辑静默还原到 git HEAD（日志有「[残留回滚]…已还原」行），跑完全量后重写才生效，已在这两个文件留补记注释。
+
+---
+
 # 第 186 轮报告（v6.8.114 — 第184维度 activity_outcome_confusion「活动/投入当成果（以工代果）」上线 — 2026-11-01）
 
 ## 一、方向与来源
