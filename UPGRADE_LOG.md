@@ -1,3 +1,44 @@
+# 第 183 轮报告（v6.8.111 — 第181维度 counterfactual_overclaim 反事实独断上线 — 2026-11-01）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切**因果与反事实推理 + 不确定性量化**一线——r176-r181 连续六轮为逻辑谬误/判断偏差一线、r182 为证据纪律一线，按轮换纪律回填）：**反事实独断（counterfactual overclaim）**——把另一条**未走路径**的结果当作**确定可知**（「如果当初X，现在一定/必然/势必Y」）。反事实的前提是结果对路径敏感：复杂系统中同一前件在不同参数、随机性与耦合作用下发散出不同后果，未走路径的结局原则上不可事先确定；用确定性副词封装反事实结果，是把不可验证的假设当结论，用叙述的确定性替代因果的开放性，是 AI 复盘类输出中最典型的单线决定论。
+- 缺口实证（/tmp/hf-probe-r183.js，直调 src/gate.js，v6.8.110 180 维引擎）：本族 8 条攻击样本中 **2 条真零命中**（「如果当初投入研发，现在我们一定已经领先市场三年了。」「倘若当初选择另一条技术路线，我们现在势必已经主导整个行业。」），其余为 appeal_to_authority / hindsight_bias / conditional_proposition / perfect_error / confidence 代拦——「反事实框架 × 确定性断言」结构本身零维度覆盖。读码核查：src/conditional-proposition.js（第160维）只收否定推断形（早就…了/就不会/怎么可能/would have），确定性副词形不在其射程。候选族对比（/tmp/hf-probe-r183b.js）：B 验证表演 1/6 零命中、C 未验证完成声明 2/6 零命中——本族理论依据与轮换纪律占优，选定。
+- 外部来源（真实，未编造）：HN Algolia "counterfactual reasoning" 命中 Steve Kinney 论文笔记《The Hidden Dangers of Counterfactual Reasoning in AI》（2025-04-21，https://stevekinney.com/writing/counter-factual-reasoning-in-ai）——评述 Yahya Aalaila / Gerrit Großmann / Sumantrak Mukherjee / Jonas Wahl / Sebastian Vollmer《When Counterfactual Reasoning Fails: Chaos and Real-World Complexity》：复杂/混沌系统中反事实推理脆弱、小扰动即发散，确定性反事实断言缺乏依据；**该论文 arXiv API 检索 0 收录、Semantic Scholar 空返，未编造 arXiv ID**，引用以笔记 URL 为准。同检索另命中 arXiv:2402.08955《Counterfactual Tasks to Evaluate the Generality of Analogical Reasoning in LLMs》（HN 2 分，LLM 评测路线，只作概念背景）。GitHub API "counterfactual reasoning fallacy" 空返回，无高星纯规则方案。侦察落盘 /tmp/hf-scout-r183.txt。判据为心虫自有纯规则实现。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / goalReviewed true；rationale 的 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎把未测到当很低），按轮次纪律不当实质背书，accelerate 依据是缺口实证与轮换纪律。
+
+## 二、实现内容
+- 新增 `src/counterfactual-overclaim.js`（约 9.4 KB，**15 个可注入常量**）：`checkCounterfactualOverclaim(text)` + `__internals()`。
+  - 判据**双腿共现，缺一不判**（同句）：
+    - 腿① CF 反事实框架三形：CN-A 连接词先行形（连接词 如果/若/要是/假如/倘若/倘使/若是/设若/要不是/若非 → [≤12字] → 过去时点锚 当初/当时/那时/那年/当年/早年/一开始/最开始/早些时候/早点/最初/早先）；CN-B 锚先行形（过去时点锚 → [≤8字] → 连接词/否定动作——「当初要是听我的」「那时如果没停电」）；EN-A if+主语+had+过去分词 / EN-B 倒装 had we/they+PP / EN-C if only+主语+had。
+    - 腿② CERT 确定性断言：一定/肯定/必然/势必/必定/注定/毫无疑问/毋庸置疑/不容置疑/必将；EN certainly/definitely/bound to/undoubtedly/without a doubt/no doubt/surely。**刻意不收「早就/就不会/would have」**——conditional_proposition（第160维）否定推断形射程，两族可同句共现但判定结构不同。
+    - **161 轮教训：全部收裸名词形态**（收「一定」而非只收「一定会」，收「当初」而非只收「当初的」）。
+    - 锚点**窄收设计**：刻意不收「之前/先前/此前」——「如果之前的数据有误，现在一定要回头修正」的「一定」是义务情态而非确定性断言，宽锚会把义务句扫进谬误族。
+  - 四类豁免全部可负例注入置空：HEDGE 对冲（也许/或许/可能/大概/未必/不一定/说不定/无法知道/谁也说不准/难以预料；EN maybe/perhaps/might/may have/no one can say/impossible to know）、NEGFLIP 拒绝推断（不要以为/别以为/无法断定/难以断言/推不出/不意味着/不恰当/轻率/武断/臆测/想当然；EN does not mean/cannot conclude/unwarranted/unjustified/speculative）、META 概念/教学转述（反事实/复杂系统/混沌/决定论/因果推断/条件命题/平行宇宙；EN counterfactual/causal inference/determinism/chaos theory/complex systems）、NEGSEAL 结论侧否定（不足以/无法/难以/不能/不构成 + 证明/证实/说明/支撑/确立/意味；EN insufficient/does not prove/cannot prove），另加 QUESTION 疑问句逐句豁免（splitSentences 刻意不按 ?/？ 切分，问号留在句内供豁免判定——r183 实测修得的坑）。
+  - 评分：单处共现 75；多处或强确定性词（毫无疑问/注定/bound to）95。
+- `src/index.js` 九处接线：require 注释块 / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / exports。变量名 **cfo**（grep 实测 0 冲突）。
+- 新增 `test/round-183-counterfactual-overclaim.js`：67 项断言。
+- 文档三处同步数字（README.md / SKILL.md / AGENTS.md：维度 180→181、VERIFY 139→140、tiers 合计 169→170、AGENTS 版本注记追加 v6.8.111、SKILL Engine version 行 6.8.108→6.8.111 顺手修正陈旧值）+ 版本 6.8.110 → 6.8.111 + CHANGELOG/UPGRADE_LOG。
+
+## 三、r183 实现教训（已固化进测试与源码注释）
+1. **注入置空用永不匹配正则 `/(?!)/` 而非 `[]`**：本模块 RE 值为 RegExp 直接量（非子表数组），注入 `[]` 会炸 `.test is not a function`；`/(?!)/` 语义等同置空且承重判定不受影响。
+2. **splitSentences 不能按问号切分**：问号被切掉后句内疑问豁免永不触发，「……一定已经领先市场三年了吗？」被误判命中——问号必须留在句内。
+3. **两豁免表不能交叠**：HEDGE_ZH 刻意不收「并非」（「结果并非一定更好」由 META 承重），NEGSEAL_ZH 动词表刻意不收「断定」（「无法事先断定」归 NEGFLIP 承重）——收了会让对方豁免的注入样本假绿（r182 教训 4 同款）。
+4. **锚点词表按情态歧义窄收**：过去时点锚排除「之前/先前/此类」，否则义务情态「一定要」被扫进谬误族；这是枚举腿的语义边界问题，不是样本量问题。
+
+## 四、验证数据（五门禁全绿）
+- `node --check` src/index.js / src/counterfactual-overclaim.js / test/round-183-counterfactual-overclaim.js：全部 OK。
+- `bin/verify.js`：**16 passed / 0 failed**。
+- `scripts/guard-abilities.js`：**20/20**（维度登记 dimensions 键 **181** 个、summary 引用符合预期；双向回归门禁召回 **52/52**、误拦 **302/326**，与基线一致、零新增误拦）。
+- `test/doc-numbers-accuracy.test.js`：**22/22**。
+- `scripts/bidirectional-guard.js`（由 guard-abilities 第 7 项执行）：召回 52/52、误拦 302/326 不升。
+- round-183 轮测：**67/67**（攻击 13/13 含中英/裸名词/带修饰/长句/锚先行/倒装；良性 15/15 零误判含对冲/拒绝推断/概念转述/结论侧否定/疑问句/将来时条件句；15 项常量负例注入承重含 8 条豁免陷阱翻转；登记断言×5）。
+- gate 层变体矩阵（真实 gate()）：攻击 6/6 非 pass 且 findings 全含 counterfactual_overclaim；良性 6/6 pass。
+
+## 五、已知边界（下轮可继续）
+- 腿①腿②限同句共现，「如果当初投入研发。现在我们一定已经领先三年。」跨句形语义同族但保守不收。
+- 将来时条件句（「如果明天发布新版本，用户量一定会涨」）不在射程（无过去时点锚，归 absolute_claim 类）。
+- 存量维度误伤两条边缘良性（absolute_claim 误伤「不要以为如果当初买了那套房现在就一定过得更好」；hindsight_bias 误伤「当初的决策基于当时可获得的信息，事后假设另一种选择必然更好是不恰当的」）——r183 实测复现，非本维度引入，改动前行为一致，下轮可评估修复。
+
 # 第 182 轮报告（v6.8.110 — 第180维度 cherry_picking 选择性取证上线 — 2026-11-01）
 
 ## 一、方向与来源

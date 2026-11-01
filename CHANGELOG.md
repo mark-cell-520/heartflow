@@ -1,3 +1,22 @@
+## [6.8.111] - 2026-11-01
+
+### Added
+- **`counterfactual_overclaim` — dimension 181 (反事实独断：把另一条未走路径的结果当作确定可知)** — 判别「**如果当初X，现在一定/必然/势必Y**」结构：「如果当初投入研发，现在我们一定已经领先市场三年了」「要是当时听我的做了对冲，公司肯定不会陷入今天的困境」「倘若当初选择另一条技术路线，我们现在势必已经主导整个行业」「当初要是果断止损，这笔投资毫无疑问现在已经回本了」「If we had invested in that startup, we would certainly be market leaders today.」「Had we taken the other path, the project would definitely have succeeded by now.」「If only we had acted sooner, we would certainly have avoided the crisis.」。复杂系统中未走路径的结局原则上不可事先确定——用确定性副词封装反事实结果，是把不可验证的假设当结论，用叙述的确定性替代因果的开放性。判据**双腿共现，缺一不判**：腿① CF 反事实框架三形——CN-A 连接词先行形（连接词 → [≤12字] → 过去时点锚 当初/当时/那时/那年/当年/一开始/最开始/早些时候/早点/最初/早先；**刻意不收「之前/先前/此前」**，宽锚会把「如果之前的数据有误，现在一定要回头修正」的义务情态扫进谬误族）、CN-B 锚先行形（过去时点锚 → [≤8字] → 连接词/否定动作）、EN-A if+主语+had+PP / EN-B 倒装 had we/they+PP / EN-C if only+主语+had；腿② CERT 确定性断言（一定/肯定/必然/势必/必定/注定/毫无疑问/毋庸置疑/不容置疑/必将；EN certainly/definitely/bound to/undoubtedly/without a doubt/no doubt/surely——**刻意不收「早就/就不会/would have」**，那是 conditional_proposition 第160维否定推断形的射程）。**161 轮教训：全部收裸名词形态**。四类豁免全部负例注入承重：对冲、拒绝推断（不要以为/无法断定/unjustified）、概念/教学转述、结论侧否定（不足以…证明/does not prove），另加疑问句逐句豁免。来源（真实，未编造）：Steve Kinney 论文笔记《The Hidden Dangers of Counterfactual Reasoning in AI》（2025-04-21，https://stevekinney.com/writing/counter-factual-reasoning-in-ai）——评述 Aalaila / Großmann / Mukherjee / Wahl / Vollmer《When Counterfactual Reasoning Fails: Chaos and Real-World Complexity》（arXiv 无收录，未编造 ID）；arXiv:2402.08955《Counterfactual Tasks to Evaluate the Generality of Analogical Reasoning in LLMs》作概念背景。判据为心虫自有纯规则实现。
+- `src/counterfactual-overclaim.js` — new detector module with 15 injectable constants (CF_CN_A_RE, CF_CN_B_RE, CF_EN_A_RE, CF_EN_B_RE, CF_EN_C_RE, CERT_ZH_RE, CERT_EN_RE, HEDGE_ZH×EN, NEGFLIP_ZH×EN, META_ZH×EN, NEGSEAL_ZH×EN); sentence-level two-leg co-occurrence with whole-text exemption table.
+- `test/round-183-counterfactual-overclaim.js` — negative-injection + variant-matrix suite (67 assertions).
+
+### Verification
+- round-183 suite: 67/67 (attacks 13/13 incl. ZH/EN, bare-noun, modified, long form, anchor-first, inversion; benign 15/15 incl. hedge / rejection-of-inference / concept transposition / conclusion-side negation / question / future conditional; 15 constant injection load-bearing tests incl. 8 exemption trap flips; 5 registration assertions)
+- Gate variant matrix (real `gate()`): attacks 6/6 non-pass, all carrying the `counterfactual_overclaim` finding; benign 6/6 pass
+- Bidirectional guard: recall 52/52, false-block 302/326 (unchanged — zero new false positives)
+- `bin/verify.js` 16/16; `guard-abilities.js` 20/20 (181 dimension keys); `doc-numbers-accuracy.test.js` 22/22
+- Runtime: `heartflow-mcp` restarted; `heartflow_status` returns version 6.8.111 / 181 dimensions
+
+### Known boundaries
+- Two legs limited to same-sentence co-occurrence; cross-sentence form (「如果当初投入研发。现在我们一定已经领先三年。」) conservatively not covered.
+- Future-tense conditionals (「如果明天发布新版本，用户量一定会涨」) out of scope (no past anchor; belongs to absolute_claim family).
+- Pre-existing dimensions false-positive on two edge benigns (absolute_claim on 「不要以为如果当初买了那套房现在就一定过得更好」; hindsight_bias on 「当初的决策基于当时可获得的信息，事后假设另一种选择必然更好是不恰当的」) — not introduced this round, candidates for a future round.
+
 ## [6.8.110] - 2026-11-01
 
 ### Added
