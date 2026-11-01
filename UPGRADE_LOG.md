@@ -1,3 +1,39 @@
+# 第 188 轮报告（v6.8.116 — 第185维度 most_transitivity「『大多数』链式传递谬误」上线 — 2026-11-02）
+
+## 一、方向与来源
+- 方向（轮换纪律）：r186 为价值对齐与目标漂移检测 + 不确定性量化一线，r185/r184/r183/r182 为逻辑谬误/证据纪律/反事实，本轮切回**逻辑谬误检测 + 证据纪律**一线。
+- 候选族与缺口实证（/tmp/hf-probe-r188.js、/tmp/hf-probe-r188b.js，直调 gate.js v6.8.115 / 184 维引擎）：
+  - A 中项不周延（undistributed middle）：攻击 6 条中 5 条被 affirming_the_consequent 代拦（代拦维度非本族设计），EN 形 1 条真零命中，且 2 条**有效三段论被 affirming_the_consequent 误拦**——不是干净缺口。
+  - B 肯定析取（affirming the disjunct）：3/5 被 illicit_conversion / reasoning_coherence / contradiction 代拦。
+  - C 堆垛（sorites）：4/5 被 fallacies 代拦。
+  - **D most 链式传递（non-transitivity of "most」）：扩展矩阵 10 条攻击 6 条真零命中、8 条边缘良性零误伤——唯一干净缺口**，被代拦的 4 条归因维度（illicit_conversion / circular_reasoning / unsupported_claim）也非本族设计。选 D。
+- 外部来源（真实，未编造）：HN Algolia "Translating natural language to first-order logic for logical fallacy detection"（258 分，https://news.ycombinator.com/item?id=43257719）、"Master List of Logical Fallacies (2018)"（113 分，https://news.ycombinator.com/item?id=27287363）、"Slaughtering Competition Problems with Quantifier Elimination"（78 分，https://news.ycombinator.com/item?id=46415448）、"The strange non-transitivity of random variables"（26 分，https://news.ycombinator.com/item?id=10763018）作量词与非传递性概念背景；GitHub tmakesense/logical-fallacy（21★）、bkthomps/CategoricalSyllogism（6★，https://github.com/bkthomps/CategoricalSyllogism）为三段论/谬误检测成熟代码方案参考。Semantic Scholar 两次检索 HTTP 429 空返；判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-r188.txt 与 /tmp/hf-scout-r188-transitivity.txt。
+- 心虫裁决：philosophy_decision **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true）。rationale 的 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎把未测到当很低），按轮次纪律不当实质背书——加速依据是缺口实证与轮换纪律。
+
+## 二、实现内容
+- `src/most-transitivity.js`（新增，约 500 行）：第 185 维度 most_transitivity 检测器。判据**链式三件共现，缺一不判**：
+  - 件① 第一段「大多数」前提——MOST 量词（大多数/大部分/多数/过半/七成/八成/九成/超过半数/半数以上/十有八九…裸名词形态；EN most / the majority of，不限句首、「调查显示大多数…」前缀可入）+ 主项 + **非空谓项**（中间项素材在谓项里）。主谓切分=功能词边界（都/是/会/能/也/仍/在…，刻意不收「有/为」——「有害」「认为」里不是谓词标记）+ 约 280 个高频动词 + 单字谓词兜底；谓词仅边界词本身时收回边界词（「房价高」的「高」即谓词）。
+  - 件② 第二段「大多数」前提的主项**包含第一段谓项的关键词**（中间项连续性 gram/词匹配）。
+  - 件③ 「大多数」结论——主项回指第一段主项；谓项是**新内容**（非复述：最长共享 ≥3 字或互为子串才算复述，2 字巧合共享如「公司」不拦）；结论整体与第二段有共享关键词（玩具形 A/B/C 无 2-grams 时结论谓项↔第二段全文亦算链接）。结论带推断词（任意位置，覆盖「所以C，因为P1、P2」倒装形）或跟在两前提之后（跟句模式）。
+  - 豁免（全部可负例注入置空）：META_CONCEPT（传递性/量词谬误/三段论/逻辑谬误…）、TEACH（老师/课堂/教材/textbook…，**刻意不收裸 exam**——r188 实测英文攻击样本 "passed the exam" 被 TEACH 误豁免整句）、HEDGE（可能/也许/往往/maybe…，豁免判定看 raw 原串，对冲词不挡边界切分）、疑问句。结论须以 MOST 量词开头——「至少有些A是C」的特称结论与「A和C之间可能有关」的对冲结论天然不判。
+  - r188 实现教训（已固化进测试）：① EN 谓词解析须有一般动词兜底（got/went/made 不以 s/ed/en 结尾）；② EN 中间项源要含 verb 字段（"passed" 在动词位不在谓项位）；③ 量词正则「超过八成」的字符类要含「成」，否则吃掉「八成」剩下「成的…」；④ 玩具形（A/B/C）单字项无 2-grams，_share 须有非停用单字回退，否则整族漏判。
+- `src/index.js` 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 读数 / summary；变量名 mtr，grep 实测 0 命中无冲突），DIM_GUIDANCE 含完整判据+边界+正当做法指引。
+- `test/round-188-most-transitivity.js`（新增，14 项断言）：攻击 14/14（中英/裸名词量词/带修饰/倒装/长句/无逗号紧凑形）、良性 17/17 零误判（含特称结论/对冲结论/并列统计/量词副词化/纯转述/边缘多因陈述「战争是多因共同造成的」）、9 项常量负例注入承重、3 条豁免陷阱翻转（HEDGE/META_CONCEPT/TEACH）、gate 层变体矩阵（攻击 6/6 非 pass 且维度承重、良性 6/6 pass）。
+- 文档三处同步 + 版本传播：README（badge/横幅/行内 5 处/规格表/Version history 新行）、SKILL（横幅/规格表/action-tier 144/pipeline 图/版本戳）、AGENTS（横幅/checkInput 行/维度注记 v6.8.116 条目/Verify-level 144 + most_transitivity 入列）；`src/core/version.js` 兜底值 6.8.115→6.8.116（r187 立规项）；VERSION 6.8.115→6.8.116 + sync-version.js；CHANGELOG.md 追加 6.8.116 条目。
+
+## 三、验证数据（全部本轮真实运行）
+- 五门禁：bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 185 键、summary 引用 148）；doc-numbers-accuracy.test.js **22/22**；bidirectional-guard.js 召回 **52/52**、误拦 **302/326 不升**（与基线一致、零新增误拦）；measure-claimed-numbers 维度 **185** / 模块 **161 不变**（纯函数维度模块不进 _modules registry，r186 同口径）/ 工具 184 / 路由 1,314。
+- 轮测：test/round-188-most-transitivity.js **14/14**（正向攻击 14/14、良性 17/17、注入承重 9 项、豁免陷阱 3 项、gate 矩阵攻击 6/6 承重 + 良性 6/6 pass）。
+- 新维度实测（curl/MCP 与 node 直调双路）：攻击样本 gate.action 全部非 pass（verify×4 / rewrite×1）且 findings 承重 most_transitivity（severity 65-67）；良性样本全部 pass。运行态重启后 heartflow_status 确认 version 6.8.116 / modules 161 / running true（见第五节）。
+
+## 四、已知边界（下轮可继续）
+- ① 定义式真值链（「大多数猫是哺乳动物，大多数哺乳动物是温血动物，所以大多数猫是温血动物」）量词形式相同也会判 verify——结论为真但交集大小未被证明；verify 的含义正是要求补全称或特称证据，不作 block/rewrite。
+- ② 主谓切分是启发式（功能词边界 + 高频动词表），生僻动词开头的前提可能切不出谓项而漏判（保守方向，不漏判优先于多判）。
+- ③ 结论谓词「换了说法」的样本（「用真金白银表达信心」↔第二段「买了股票」无词汇共享）依赖主项/其他共享词兜底链接——纯谓词改写的链式结论可能漏判。
+- ④ 存量代拦误伤（非本轮引入）：affirming_the_consequent 误拦有效三段论（「所有正方形都是矩形，所有矩形都是多边形，所以所有正方形都是多边形」被判 rewrite）、contradiction 误伤「努力是成功的必要条件，但努力不是充分条件……」类边缘良性——下轮可评估修代拦维度的误伤。
+
+---
+
 # 第 187 轮报告（v6.8.115 — 每日审计·修复·同步轮，无新维度 — 2026-11-01）
 
 ## 一、审计对象与结论

@@ -1,3 +1,11 @@
+## [6.8.116] - 2026-11-02
+
+### Added
+- **第185维度 most_transitivity（「大多数」链式传递谬误，r188）** — 新增 `src/most-transitivity.js`（约 500 行，20+ 可注入常量），登记 VERIFY_DIMS（143→144），维度总数 184→185。判别「**两个「大多数」前提推不出「大多数」结论**」——most 量词不满足传递性，两段「大多数」各自只覆盖自己前提的大部分，交集可以远小于半数，证据不能沿中间项累积：「大多数A队球迷支持主队，大多数支持主队的人会买季票，所以大多数A队球迷会买季票」「大部分用户点了同意，大部分点了同意的人都没读协议，所以大部分用户都没读协议」「Most students passed the exam, and most people who passed got certificates, so most students got certificates.」。判据**链式三件共现，缺一不判**：第一段「大多数」前提（量词+主项+非空谓项）× 第二段「大多数」前提主项包含第一段谓项关键词（中间项连续性）× 「大多数」结论（主项回指第一段主项、谓项是新内容、整体与第二段有共享关键词；结论带推断词覆盖倒装形，或跟句模式）。豁免：概念/教学转述、对冲结论、疑问句；结论须以 MOST 量词开头（「至少有些A是C」的特称结论与「A和C可能有关」的对冲结论天然不判）。与 illicit_conversion（全称换位）、affirming_the_consequent/denying_the_antecedent/conditional_proposition（条件句方向族）边界错开。缺口实证：候选四族探针（/tmp/hf-probe-r188.js、/tmp/hf-probe-r188b.js）实测中项不周延 5/6、肯定析取 3/5、堆垛 4/5 均被既有维度代拦，唯本族扩展矩阵 6/10 真零命中、8/8 边缘良性零误伤。`src/index.js` 八处接线（require/计算点/allDims/dimMap/DIM_GUIDANCE/VERIFY_DIMS/dimensions 读数/summary；变量名 mtr）。
+
+### Fixed
+- `src/core/version.js` — 兜底版本号同步 6.8.115 → 6.8.116（r187 立规的每轮手动同步项）。
+
 ## [6.8.115] - 2026-11-01
 
 ### Fixed
