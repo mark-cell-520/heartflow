@@ -1,3 +1,16 @@
+## [6.8.109] - 2026-11-01
+
+### Added
+- **`halo_effect` — dimension 179 (光环效应 / halo effect)** — 由**无关的正面特征**（外貌/名气/穿着/装修包装/平台品牌/口才嗓音等非认知特征）推断对象在另一维度上的人品、能力、技术或观点正确性，且迁移总以肯定情态封装（肯定/一定/想必/must be），看上去像结论，实则零证据：「他长得这么帅，人品肯定也没问题」「这家公司装修得这么高档，产品技术肯定是一流的」「他口才这么好，做事能力一定也很强」「He is tall and handsome, so his judgment must be sound.」。呈现维度的属性与实质维度的属性之间没有可传递的证据链——对呈现的好感不能增加对实质的任何支持。判据**三件共现（缺一不判）**：腿① TRAIT 无关正面特征（外貌/声音风度口才/名气流量/包装装修地段/平台品牌五族，中英双语，**全部裸名词形态**且容忍中间插入修饰语——「口才这么好」「人气很高」「装修得这么高档」）；腿② TRANSFER 质量迁移断言两形——A 连接词形（所以/因此/可见/说明 + 结论名词 + 肯定情态）与 B 并置迁移形（特征词 + [≤12字] + 结论名词 + [≤6字] + 肯定情态——「他长得帅，人品肯定也没问题」无连接词、仅靠并置完成迁移，是最常见攻击形）；腿③ ORDER 顺序（A 形要求特征早于迁移断言）。**情态词表刻意不收「也」**——「她长得漂亮，成绩也很好」是并列陈述非迁移推断。
+- `src/halo-effect.js` — new detector module with 14 injectable constants (TRAIT_ZH 五子族 LOOK/MANNER/FAME/WRAP/BRAND 可分别注入 + TRAIT_EN, QUALITY_ZH×EN, MODAL_ZH×EN, CONNECT_ZH×EN, CONTRAST_ZH×EN, META_ZH×EN, HEDGE_ZH×EN) plus modifier-tolerant trait windows and two-form transfer construction (leg-2 regex dynamically assembled from trait/quality/modal tables so all three stay injectable).
+- `test/round-181-halo-effect.js` — negative-injection + variant-matrix suite (45 assertions).
+
+### Verification
+- round-181 suite: 45/45 (attacks 17/17 incl. ZH/EN five trait families + A-only-connect form; benign 15/15 incl. contrast/separation, concept transposition, hedge, no-modal parallel statement, question; 13 injection load-bearing tests incl. five trait sub-families individually; 6 exemption trap flips CONTRAST/META/HEDGE ×ZH/EN; 5 structural distinctions; 2 registration assertions)
+- Gate variant matrix (real `gate()`): attacks 10/10 non-pass (all verify); benign 7/7 pass (incl. bare-noun, modified, inverted, long form, EN)
+- Bidirectional guard: recall 52/52, false-block 302/326 (92.6%, unchanged — zero new false positives)
+- `bin/verify.js` 16/16; `guard-abilities.js` 20/20 (179 dimension keys); `doc-numbers-accuracy.test.js` 22/22
+
 ## [6.8.108] - 2026-11-01
 
 ### Added

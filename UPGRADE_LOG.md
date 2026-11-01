@@ -1,3 +1,44 @@
+# 第 181 轮报告（v6.8.109 — 第179维度 halo_effect 光环效应上线 — 2026-11-01）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切回**判断偏差**一线——r179/r180 连续两轮为逻辑谬误检测一线，按轮换纪律回填；r179 探针遗留候选 halo_effect 本轮复测仍零覆盖）：**光环效应（halo effect）**——由**无关的正面特征**（外貌/名气/穿着/装修包装/平台品牌/口才嗓音等非认知特征）推断对象在另一维度上的人品、能力、技术或观点正确性，且迁移总以肯定情态封装（肯定/一定/想必/must be），看上去像结论，实则零证据。
+- 缺口实证（侦察阶段双探针）：grep -rl 'halo' / '光环' src/ 为 **0 命中**；/tmp/hf-probe-r181.js 候选池 10 族扫描（sample_size_neglect / halo_effect / reactive_devaluation / ecological_fallacy / galileo_fallacy / argument_from_silence / appeal_to_definition / planning_fallacy），本族攻击 **6/6 穿过硬闸门**（「他长得这么帅，人品肯定也没问题」「她是名校博士毕业，说的话一定更有道理」「这家公司装修得这么高档，产品技术肯定是一流的」「他口才这么好，做事能力一定也很强」「He is tall and handsome, so his judgment must be sound.」等全部 pass），良性 3/3 干净（1 条 rewrite 为存量维度既有行为，非本族）。同池 reactive_devaluation 亦 6/6 零命中，留作后续轮次候选。
+- 外部来源（真实，未编造）：HN Algolia "attractiveness bias hiring" 命中 *Hacking attractiveness biases in hiring? The role of beautifying photo-filters*（135 pts）；"halo effect" 命中 *Cognitive Bias Spotted in the Wild: Halo Effect*（1 pt）；GitHub API "halo effect bias" 命中 ekateneva-code/the-news-coverage-of-civil-nuclear-energy ★1（https://github.com/ekateneva-code/the-news-coverage-of-civil-nuclear-energy，研究数据仓库，主题 The 'Halo' Versus 'Horn' Effect）与 henu-wang/bias-detector-9 ★0（Halo Effect Check 认知偏差检测工具）。Semantic Scholar 三次检索均 HTTP 429 限流，如实记录。以上来源均为概念背景；判据为心虫自有纯规则实现。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true；rationale.detail「低负荷+低不确定性+方向明确+目标合理，安全加速」；**cognitiveLoad 与 uncertainty 均为字符串 "unknown"**（引擎把未测到当很低），按轮次纪律不当实质背书，accelerate 依据是缺口实证（6/6 零命中）与轮换纪律。
+
+## 二、实现内容
+- 新增 `src/halo-effect.js`（约 21 KB，14 个可注入常量）：`checkHaloEffect(text, inject)` + `__internals()`。
+  - 判据**三件共现，缺一不判**：
+    - 腿① TRAIT 无关正面特征，五子族：LOOK 外貌（帅/俊/好看/漂亮/英俊/姣好/面善/养眼/颜值高/高大/高挑）、MANNER 声音风度口才（声音好听/声音磁性/气质好/风度翩翩/举止得体/幽默/风趣/口才好/能说会道/会做人）、FAME 名气流量（有名/出名/当红/网红/明星/大V/粉丝多/热搜/人气高/家喻户晓/如雷贯耳）、WRAP 包装装修地段（包装精美/封面好看/界面精致/设计精美/装修高档/地段好）、BRAND 平台品牌（大公司/大厂/名牌/奢侈品/五星级/奢华/高端/上档次/价格不菲/百年老店/进口品牌）；EN tall / handsome / good-looking / attractive / beautiful / famous / celebrity / influencer / viral / premium packaging / sleek design / luxury brand / prestigious brand / great speaker / funny / witty。**161 轮教训：全部收裸名词形态**（收「帅」而非只收「长得帅」）。
+    - 腿② TRANSFER 质量迁移断言，两形：A 连接词形（连接词 → 结论名词 → 肯定情态）与 **B 并置迁移形**（腿①特征词 → [≤12字] → 结论名词 → [≤6字] → 肯定情态——「他长得这么帅，人品肯定也没问题」无连接词、仅靠并置完成迁移，是最常见攻击形，必须收）。腿②正则由 trait/quality/modal 三表**动态拼接**，三表均可负例注入。
+    - 腿③ ORDER 顺序——A 形要求腿①命中早于腿②。
+  - 七类豁免全部可负例注入置空：概念/教学转述（光环效应/晕轮效应/认知偏差/以貌取人；EN halo effect / horn effect / cognitive bias / lookism）、对比/转折与迁移否定（虽然/但是/然而/不过/却/不等于/两回事/无关/不能因为/不代表/不应以；EN but / however / irrelevant / not because / don't judge / has nothing to do with）、对冲弱化结论（可能/也许/或许/大概/似乎/不见得/未必/说不准/maybe/perhaps/might）、疑问句。
+- `src/index.js` 九处接线：require 注释块 / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / exports。变量名 **hef**（grep 实测 0 冲突）。
+- 新增 `test/round-181-halo-effect.js`：45 项断言。
+- 文档三处同步数字 + 版本 6.8.108 → 6.8.109。
+
+## 三、r181 实现教训（已固化进测试与源码注释）
+1. **特征族必须容忍中间插入修饰语**（161 轮教训的变体扩展）：首版实测漏判「他口才**这么**好，做事能力一定也很强」——根因是特征正则要求紧邻（口才(?:好|…)匹配不到「口才这么好」），MANNER/FAME/LOOK 三族已加修饰窗口（口才[^。！？]{0,4}好、人气[^。！？]{0,3}高、颜值[^。！？]{0,3}高）；WRAP 后缀表漏裸「好」（「地段**好**」）同批修复。**带修饰变体不是可选项，是矩阵必测项**。
+2. **B 形窗口 12 字的算术要逐样本验证**：A 连接词形专属样本要求「全部 trait→结论名词间距 >12 字且 connect→结论 ≤12 字」——首版样本「课程的专业度」被 QUALITY 表的「课程」接住导致 B 形误命中，换成「他的专业度」路径（唯一 trait 到结论 19 字）后才真正只走 A 形。
+3. **豁免词不能串台**：对冲陷阱样本首版含「不过」——那属 CONTRAST_ZH 转折豁免，混入后抹掉 HEDGE 陷阱不翻转（假绿）；EN 陷阱首版含 though 同理。陷阱样本必须**只依赖目标豁免**。
+4. **子族注入要用子族独有特征词**：「装修得这么高档」的「高档」与 BRAND 族共有，不能用于 WRAP 子族停火断言，已换「界面精致」「包装精美」。
+5. **良性矩阵必须过真实 gate()**：4 条维度级良性（含「他给我们讲了光环效应：…这就是以貌取人」）被存量维度 reasoning_coherence/absolute_claim/contradiction 判 rewrite/verify（halo=false，改动前行为一致）——维度级放行与 gate 级放行是两件事，矩阵只收 gate 级 pass 样本，存量代拦在报告中如实记录。
+
+## 四、验证数据（五门禁全绿）
+- `node --check` src/index.js / src/halo-effect.js / test/round-181-halo-effect.js：全部 OK。
+- `bin/verify.js`：**16 passed / 0 failed**。
+- `scripts/guard-abilities.js`：**20/20**（维度登记 dimensions 键 179 个、summary 引用 142 个）。
+- `scripts/bidirectional-guard.js`：**召回 52/52（100%）不降**，**误拦 302/326（92.6%）不升**——与 r180 基线完全一致，零新增误拦。
+- `test/doc-numbers-accuracy.test.js`：**22 passed / 0 failed**。
+- 轮测 `test/round-181-halo-effect.js`：**45 passed / 0 failed**（攻击 17/17 含五特征族+A 连接词形专属样本；良性 15/15 零误判含对比分离/概念转述/对冲/无迁移情态并列/疑问句；13 项常量负例注入承重含五子族分别注入；6 条豁免陷阱翻转 CONTRAST/META/HEDGE 中英三族；5 项结构区分；登记断言×2）。
+- **变体矩阵实测（真实 gate()，161 轮教训强制项）**：攻击 **10/10 全部非 pass**（全 verify，含裸名词/带修饰/倒装/长句/EN 五种变体）；良性 **7/7 全部 pass**（含「她长得漂亮，成绩也很好」这种正确并列陈述、「她是凭实力入选的，外貌只是附加项，不代表专业水平」这种边缘良性）。
+
+## 五、已知边界与下次可继续
+- 资质类特征（名校/博士/头衔/获奖）不在腿①——「她是名校博士毕业，说的话一定更有道理」是资质→观点的迁移，语义同族，但与 appeal_to_authority 射程交界且需同域/异域判别（同域资质是合法权威依据），本轮保守不收，留待资质域分离判据成熟后处理。
+- 让步+迁移混合形（「他虽然帅，但人格肯定好」）被对比豁免全文级放过——让步形语义强度低，保守方向取误判率可控。
+- 存量维度 reasoning_coherence / absolute_claim / contradiction 会代拦部分本族边缘长句（r181 实测：良性教学转述样本 gate 级被 rewrite、EN stunning 样本被 verify——非本维度引入，改动前行为一致）。
+- 下一轮候选池（侦察阶段已扫描，均未覆盖）：reactive_devaluation（反应性贬低：因方案出自对手/敌方而整体否决——r181 探针 6/6 零命中、良性 3/3 干净）、sample_size_neglect（样本量忽视——中文短形已被 hasty_generalization/statistical_misleading 代拦、英文形穿过）、ecological_fallacy（生态谬误——与 stereotype 射程有重叠风险，需先做 FP 探针）、galileo_fallacy（伽利略赌局：被嘲笑≠正确——中文形已被代拦，英文形穿过）、argument_from_silence（沉默论证：不否认≠是真的——2/5 穿过）、appeal_to_definition（诉诸定义：字典定义封死边界争议——2/4 穿过）。
+
 # 第 180 轮报告（v6.8.108 — 第178维度 fallacy_fallacy 谬误谬误上线 — 2026-11-01）
 
 ## 一、方向与来源
