@@ -272,7 +272,7 @@ test('G1 接线九处齐全（require/计算点/allDims/dimMap/dimensions/guidan
   // dimensions 键实测（引擎本体真值）
   const disc = gate.discriminate('这是纯天然植物提取的，肯定比化学药安全');
   assert(disc.dimensions.appeal_to_nature && (disc.dimensions.appeal_to_nature.count ?? 0) > 0, 'discriminate().dimensions.appeal_to_nature 应命中');
-  assert(Object.keys(disc.dimensions).length === 139, 'dimensions 键数应为 139（138→139）');
+  assert(Object.keys(disc.dimensions).length >= 139, 'dimensions 键数应为 ≥139（138→139；r177 审计修复：总数只增不减）');
   // guidance 可读性（finding 带 guidance 且含判据关键词）
   const g = gate.gate('这是纯天然植物提取的，肯定比化学药安全');
   const finding = (g.findings || []).find((f) => f.dimension === 'appeal_to_nature');

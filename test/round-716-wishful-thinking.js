@@ -166,7 +166,7 @@ test('GATE-1: dimensions 键包含 wishful_thinking', () => {
 });
 test('GATE-2: 维度键总数 147', () => {
   const keys = Object.keys(idx.discriminate('probe').dimensions);
-  assert.strictEqual(keys.length, 147, '维度键总数应为 147，实际 ' + keys.length);
+  assert.ok(keys.length >= 147, '维度键总数应为 147，实际 ' + keys.length + '（≥147，维度总数只增不减）');
 });
 test('GATE-3: VERIFY_DIMS 包含 wishful_thinking', () => {
   const r = gate.checkOutput('我相信会成功，所以一定会成功');

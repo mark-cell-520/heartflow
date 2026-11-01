@@ -132,6 +132,20 @@ function checkPostHoc(text) {
     return { score: 0, count: 0, matches: [], zeroHit: false, details: '调查语境豁免' };
   }
 
+  // [audit-fix r177] 技术测量报告豁免（r166 审计设计、当日未落地，本轮补）：
+  // 工程语境「We applied the patch. Latency dropped 40% after the
+  // change.」是对改动前后量化指标的客观记录，干预动词×变化词同句即触发
+  // R2 被误判 rewrite（r166 审计实测复现）。判据：量化变化（数字+%/
+  // 百分点）× 技术测量名词（延迟/吞吐/错误率/CPU…）双在场才是测量报告。
+  // 刻意不收医学症状名词（体温/疼痛/评分）——「吃了药疼痛减轻了40%」
+  // 仍是后此谬误族；round-720 唯一 R2 攻击样本无数值，不受影响。
+  const QUANT_MEASURE = /\d+(?:\.\d+)?\s*(?:%|percent|percentage\s+points?|百分点)/i;
+  const TECH_METRIC_EN = /\b(?:latency|throughput|error\s+rate|response\s+time|cpu|memory|qps|p99|p95|rps|i\/o|disk|benchmark)s?\b/i;
+  const TECH_METRIC_ZH = /(?:延迟|吞吐|错误率|响应时间|内存|耗时|成功率|失败率|占比|均值|qps|p99|p95|基准)/i;
+  if (QUANT_MEASURE.test(text) && (TECH_METRIC_EN.test(lower) || TECH_METRIC_ZH.test(text))) {
+    return { score: 0, count: 0, matches: [], zeroHit: false, details: '测量报告豁免' };
+  }
+
   const matches = [];
   const routes = new Set();
 

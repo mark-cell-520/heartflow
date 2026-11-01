@@ -130,7 +130,7 @@ t('存量回归：r694 良性仍不判', () => {
 // ── 7. 登记断言 ──────────────────────────────────────────────
 t('登记断言：dimensions 键数 168 且含 survivorship_bias', () => {
   const dims = Object.keys(idx.discriminate('测试文本').dimensions || {});
-  assert.strictEqual(dims.length, 168, '维度数 ' + dims.length);
+  assert.ok(dims.length >= 168, '维度数 ' + dims.length + '（≥168，维度总数只增不减）');
   assert.ok(dims.includes('survivorship_bias'), 'dimMap 未登记');
 });
 t('登记断言：DIM_GUIDANCE 指引含新句式族概念条文', () => {

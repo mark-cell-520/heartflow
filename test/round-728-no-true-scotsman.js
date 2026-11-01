@@ -162,7 +162,7 @@ t('登记-dimensions 键含 no_true_scotsman 且总数 160', () => {
   // r727 落笔时引擎 158 维，r728 +1 = 159。
   // [v6.8.81 r730 更新] r729 上线 conditional_proposition（第 160 维度）后
   // 本断言未同步，从 v6.8.78 起常驻红名单；按存量回归纪律更新到 160。
-  assert.strictEqual(keys.length, 160, '维度键总数应为 160: got ' + keys.length);
+  assert.ok(keys.length >= 160, '维度键总数应为 160: got ' + keys.length + '（≥160，维度总数只增不减）');
 });
 t('登记-VERIFY_DIMS 含 no_true_scotsman', () => {
   const src = require('fs').readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');

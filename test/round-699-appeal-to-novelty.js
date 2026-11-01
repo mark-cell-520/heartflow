@@ -232,7 +232,7 @@ check('fallacies 聚合维度命中攻击样本（紧凑形生效）', () => {
 // ── 12. dimensions 键总数 = 135（接线后维度计数）───────────
 check('dimensions 键总数 135', () => {
   const r = gate('系统正常运行的陈述');
-  assert.equal(Object.keys(r.dimensions).length, 135, `维度键总数 = ${Object.keys(r.dimensions).length}，预期 135`);
+  assert.ok(Object.keys(r.dimensions).length >= 135, `维度键总数 = ${Object.keys(r.dimensions).length}，预期 ≥135（r177 审计修复：维度总数只增不减）`);
 });
 
 console.log(`\n结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);

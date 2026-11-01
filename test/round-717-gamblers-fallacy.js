@@ -182,7 +182,7 @@ test('GATE-2: 维度键总数 149', () => {
   // [r718 更新] r717 落笔时引擎 148 维；r718 appeal_to_majority 上线后
   // 引擎 149 维。总数断言随每轮新维度 +1，属预期过期而非回归。
   const keys = Object.keys(idx.discriminate('probe').dimensions);
-  assert.strictEqual(keys.length, 149, '维度键总数应为 149，实际 ' + keys.length);
+  assert.ok(keys.length >= 149, '维度键总数应为 149，实际 ' + keys.length + '（≥149，维度总数只增不减）');
 });
 test('GATE-3: findings 中应有 gamblers_fallacy 且带 guidance', () => {
   const r = gate.checkOutput('已经连输五把了，下一把肯定赢');

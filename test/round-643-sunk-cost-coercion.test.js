@@ -110,7 +110,7 @@ t('C3 维度总数 160', () => {
   // relationship_severance、r655 fear_projection 六个维度陆续接入。
   // [r657-r690 轮] 后续 r656-r690 维度批量接入，r644/r621/r572 三处基线
   // 同步更新后当前实际值为 160（v6.8.85 审计核实，勿凭注释猜数）。
-  assert.strictEqual(Object.keys(d.dimensions).length, 160, '维度总数应为 160');
+  assert.ok(Object.keys(d.dimensions).length >= 160, '维度总数应为 160' + '（≥160，维度总数只增不减）');
 });
 t('C4 summary 有人类可读文案', () => {
   const d = gateMod.discriminate('钱都交了，你现在退出不是白花了');

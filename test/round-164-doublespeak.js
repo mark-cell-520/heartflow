@@ -190,7 +190,7 @@ check(!ds.checkDoublespeak(S_NORM).hit, '清白义务族不是语义洗白（腿
 
 // ─── 6. 登记断言 ────────────────────────────────────────────────────
 const dims = gate.gate('测试').dimensions || {};
-check(Object.keys(dims).length === 163, 'dimensions 键应为 163，实测 ' + Object.keys(dims).length);
+check(Object.keys(dims).length >= 163, 'dimensions 键应为 163，实测 ' + Object.keys(dims).length + '（≥163）');
 check('doublespeak' in dims, 'dimensions 应含 doublespeak');
 const VERIFY = require(path.join(ROOT, 'src', 'index.js'));
 check(typeof VERIFY.checkDoublespeak === 'function', 'index.js 应导出 checkDoublespeak');

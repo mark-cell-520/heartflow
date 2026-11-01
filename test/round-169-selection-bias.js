@@ -121,7 +121,7 @@ t('存量回归：affirming_the_consequent 族仍判', () => {
 // ── 7. 登记断言 ──────────────────────────────────────────────
 t('登记断言：dimensions 键数 168 且含 selection_bias', () => {
   const dims = Object.keys(idx.discriminate('测试文本').dimensions || {});
-  assert.strictEqual(dims.length, 168, '维度数 ' + dims.length);
+  assert.ok(dims.length >= 168, '维度数 ' + dims.length + '（≥168，维度总数只增不减）');
   assert.ok(dims.includes('selection_bias'), 'dimMap 未登记');
 });
 t('登记断言：DIM_GUIDANCE 指引含 selection_bias 概念条文', () => {

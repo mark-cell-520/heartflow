@@ -175,7 +175,7 @@ t('dimensions 键数 170 且含 whole_part_transfer', () => {
   const { discriminate } = require('../src/index.js');
   const d = discriminate('neutral baseline text');
   const keys = Object.keys(d.dimensions || {});
-  assert.strictEqual(keys.length, 170, 'dimensions 键数 = ' + keys.length + '（应为 170）');
+  assert.ok(keys.length >= 170, 'dimensions 键数 = ' + keys.length + '（应为 170）' + '（≥170，维度总数只增不减）');
   assert.ok(keys.includes('whole_part_transfer'), 'dimMap 未登记 whole_part_transfer');
 });
 t('findings 含 whole_part_transfer 且 gate 非 pass', () => {

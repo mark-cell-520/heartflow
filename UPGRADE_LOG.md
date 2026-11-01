@@ -1,3 +1,49 @@
+# 第 182 轮报告（v6.8.110 — 第180维度 cherry_picking 选择性取证上线 — 2026-11-01）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切**证据充分性与寻真纪律**一线——r176-r181 连续六轮为逻辑谬误/判断偏差一线，按轮换纪律回填证据纪律方向）：**选择性取证（cherry-picking / 采樱桃谬误，确认偏误的证据纪律形态）**——只从支持某结论的证据池取证（只找/只引用/只保留支持性证据，或隐去/略去/屏蔽不利与反面证据），却把结论封装为「证明/证实/成立/毫无疑问」。寻真的前提是证据对称性；该族把取证本身变成结论的傀儡：先裁掉不利证据，再宣布「证据充分」，且常以方法论口吻出现（「我们核查了」「报告显示」），是 AI 输出中最典型的似是而非。
+- 缺口实证（/tmp/hf-probe-r182.js，直调 src/gate.js，v6.8.109 179 维引擎）：本族 6 条攻击样本中 **1 条真零命中**（EN「We only cited the studies that supported our hypothesis, which proves the theory is correct.」穿过硬闸门且无任何维度代拦），其余 5 条仅被 absolute_claim / confidence / contradiction / reasoning_coherence 兜底代拦——无一维覆盖「选择性取证 × 确定性结论封装」结构本身；良性 6/6 干净。grep -rl 差距扫描：fallacies 维度内仅 1 条英文窄模式（cherry-pick + data/evidence + to prove，src/index.js:5680）与 3 条中文确认偏误窄句（5567-5569），**中文选择性取证族零覆盖**；selection_bias 管受限来源→总体推广、one_sided_dismissal 管让步后消解、survivorship_bias 管成败不对称，射程均不覆盖本族。
+- 外部来源（真实，未编造）：HN Algolia "logical fallacy detection" 命中 **arXiv:2405.02318v3《Autoformalizing Natural Language to First-Order Logic: A Case Study in Logical Fallacy Detection》**（HN 258 分 / 143 评论，2025-03-04，https://arxiv.org/abs/2405.02318）——NL2FOL 框架把自然语言逐步翻译成一阶逻辑，用 SMT 求解器判定陈述的逻辑有效性，以逻辑谬误检测为案例；该框架依赖 LLM 翻译，与纯规则引擎不同构，只取其谬误族清单作概念背景（与 r169-r181 同口径）。GitHub API "logical fallacy detection"（sort=stars）：tmakesense/logical-fallacy ★20 / SeanFlannery/Logical.ly ★4 / graciolli-f/sophron-bot ★4 / EPITA-SCIA/Fallacy-Detection-LLM ★2 / IMJONEZZ/Fallacy-Detection ★1——全部 LLM 路线，无可移植纯规则判据。Semantic Scholar 三次检索均 HTTP 429 限流，如实记录。侦察落盘 /tmp/hf-scout-1761925800.txt。判据为心虫自有纯规则实现。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed true；rationale.detail「低负荷+低不确定性+方向明确+目标合理，安全加速」；**cognitiveLoad 与 uncertainty 均为字符串 "unknown"**（引擎把未测到当很低），按轮次纪律不当实质背书，accelerate 依据是缺口实证（EN 攻击真零命中 + 中文族零覆盖）与轮换纪律。
+
+## 二、实现内容
+- 新增 `src/cherry-picking.js`（约 26 KB，**26 个可注入常量**）：`checkCherryPicking(text, inject)` + `__internals()`。
+  - 判据**两腿共现 + 顺序腿，缺一不判**：
+    - 腿① SELECT 选择性取证陈述四形：A 支持性取样形（选择性副词 只/仅/唯独/单/专门/专挑/净挑 → [≤8字] → 取证动词 找/搜集/收集/采集/挑选/选取/筛选/引用/援引/摘取/保留/留存/呈现/列举/列出/展示/报告/提及/分析/统计/纳入/采信/采纳 → [≤10字] → 方向标记 支持/有利/符合/赞同/迎合/顺着/证明/附和/正面/利好/唱好 → [≤8字] → 取证对象 证据/数据/案例/材料/例子/事实/文献/报道/样本/记录/证言/反馈/评价/意见/说法/信息/研究/调查/问卷/言论）；A2 无副词形（动词 → [≤6字] → 方向标记 → [≤8字] → 对象——「筛选符合预期的实验记录」选择性由紧邻结构自足）；B 反向抑制形两种语序（反面/不利/负面/反对/异议/相反 + 对象 + 略去/隐去/删除/抹掉/屏蔽/过滤/排除/剔除/忽略/回避/不谈；或抑制动词在前 + 不利/反面 + 对象——「隐瞒了所有不利记录」）；C 定性短语形（选择性取证/举证/采证/引用/采信/呈现/报告/披露、断章取义、报喜不报忧、只捡好的、只拣好的、只谈成绩；EN cherry-pick + 对象 / quote out of context / suppress/omit/exclude + contrary/negative + 对象；EN only/solely/selectively + 取证动词 + 支持性标记 + 对象两种语序）。
+    - 腿② SEAL 确定性结论封装三形：A 连接词形（连接词 所以/因此/因而/足见/据此/可见/故而/于是/那么；EN so/therefore/thus/hence/which means → [≤18字] → [确定性副词 一定/必然/必定/肯定/完全/毫无疑问/毋庸置疑/不容置疑/无疑 → [≤6字] →] 封结论名词 成立/为真/属实/正确/没错/无误/可靠/可信/有效/没有问题/无懈可击/站得住/毫无疑问/准确/更优/更好/更强/更高；EN correct/true/valid/reliable/sound/right/accurate/solid/watertight；或封结论动词 证明/证实/印证/坐实/说明/确立；EN proves/confirms/validates/establishes/demonstrates → [≤10字] → 封结论名词；EN A' 形：连接词 → [≤40] → 封结论名词）、B 直接封装形（[足以/完全可以] + 封结论动词 → [≤8字] → 封结论名词——「足以证明产品没有问题」无连接词，是最常见攻击形，必须收）、C 情态封装形（确定性副词 → [≤6字] → 封结论名词，跨句亦判：「报告只引用正面评价。方案完全可靠。」）。
+    - 腿③ ORDER 顺序——腿①必须早于腿②（先选择性取证、后确定性封装）。
+    - **161 轮教训：全部收裸名词形态**（收「支持」而非只收「支持性」，收「正面」而非只收「正面的」）。
+  - 六类豁免全部可负例注入置空：概念/教学转述（确认偏误/确认偏差/认知偏差/幸存者偏差/采樱桃谬误/逻辑谬误/教材/课堂；EN confirmation bias / selection bias / survivorship bias / cognitive bias / logical fallacy / cherry-picking fallacy / textbook / lecture）、纪律性否定（不能/不可/不得/不要/别/切勿/切忌/避免/没/没有/并未/决不 + 只/选择性/断章/报喜/隐去/隐瞒/略去/cherry）、结论侧否定与存疑（不足以/无法/难以/不能/不构成/谈不上/算不上 + 证明/证实/说明/采信/支撑/确立，或不足为凭/不足为证/存疑/待验证/待定/有待/仍需/尚需/还需/不宜轻信/要打折扣）、对冲弱化结论（可能/也许/或许/大概/似乎/不见得/未必/maybe/perhaps/might/may/probably）、疑问句。
+- `src/index.js` 九处接线：require 注释块 / 计算点 / allDims(score) / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / exports。变量名 **chp**（grep 实测 0 冲突）。
+- 新增 `test/round-182-cherry-picking.js`：73 项断言。
+- 文档三处同步数字（README.md / SKILL.md / AGENTS.md：维度 179→180、VERIFY 138→139、AGENTS 版本注记追加 v6.8.110）+ 版本 6.8.109 → 6.8.110 + CHANGELOG/UPGRADE_LOG。
+
+## 三、r182 实现教训（已固化进测试与源码注释）
+1. **封结论动词词表与连接词词表必须互斥**：首版把「足以证明」放进 CONNECT_ZH，导致 A 形跨承重——注入 SEAL_VERB_ZH 后「足以证明产品没有问题」仍被 A 形（连接词 + 封结论名词）命中，负例测试**假绿**；剔除后 B 形才独家承重（同 r180「谓语必须用末组捕获组定位」教训：注入样本必须命中只走目标腿的句子）。
+2. **CONNECT_EN 不收 which proves / that proves**：它们同时是 EN B 形的封结论动词前缀，收了会让 EN A' 形跨承重（注入 SEAL_VERB_EN 假绿）——连接词与封结论动词的词表交叠是注入承重的隐形杀手。
+3. **A2 无副词形让 SEL_ADV_ZH 只对长句独立承重**：A2（动词 + [≤6] + 标记 + 对象）覆盖了绝大多数短句，注入 SEL_ADV_ZH 必须专门取「动词-标记间隔 7-10 字」的长句（「只收集了来自三个渠道的支持性反馈」），否则该常量永远不承重、负例测试退化为摆设。
+4. **豁免表不能收同时是攻击形的词**：META_ZH 首版想收「选择性取证/断章取义」裸词——它们正是腿① C 形攻击词，收了会把自己的腿①豁免掉（r180 同款教训）；META 只收「确认偏误/认知偏差/cherry-picking fallacy」等概念名。
+5. **NEGSEAL 与 HEDGE 的边界要靠陷阱样本钉死**：「他只收集支持性反馈，因此结果无疑是准确的，但这仍不足以证明因果」同时含腿②与结论侧否定——抹掉 NEGSEAL 必须翻转为命中，否则「不足以采信」类正确判别会被误判；EN 对冲陷阱首版用 might 不命中（HEDGE_EN 无 might），补 may 后才真正承重。
+
+## 四、验证数据（五门禁全绿）
+- `node --check` src/index.js / src/cherry-picking.js / test/round-182-cherry-picking.js：全部 OK。
+- `bin/verify.js`：**16 passed / 0 failed**。
+- `scripts/guard-abilities.js`：**20/20**（维度登记 dimensions 键 **180** 个、summary 引用 143 个；双向回归门禁召回 **52/52**、误拦 **302/326**，与基线一致、零新增误拦）。
+- `test/doc-numbers-accuracy.test.js`：**22/22**。
+- `scripts/bidirectional-guard.js`（由 guard-abilities 第 7 项执行）：召回 52/52、误拦 302/326 不升。
+- round-182 轮测：**73/73**（攻击 10/10 含中英/裸名词/带修饰/长句/跨句/无连接词；良性 17/17 零误判含纪律否定/结论侧否定/概念转述/对冲/无标记/边缘多因陈述/selection_bias 与 survivorship_bias 射程交界良性；20 项常量负例注入承重；6 条豁免陷阱翻转含 META/NEG/NEGSEAL/HEDGE 中英三族；登记断言×4）。
+- gate 层变体矩阵（真实 gate()）：攻击 8/8 非 pass 且 findings 全含 cherry_picking；良性 8/8 pass（含自建豁免/对冲/概念转述/无标记/无关多因陈述/EN 来源受限）。
+- 运行态：supervisorctl restart heartflow-mcp 后 /health 与 heartflow_status 实测返回 version=**6.8.110**、modules 161、dimensions 180（见第六节）。
+
+## 五、已知边界（下轮可继续）
+- 腿③只做前向（先取证、后封装），「结论毫无疑问，因为报告只引用正面评价」倒装形语义同族但极少见，本轮保守不收（与 r180 先例同口径）。
+- 「成功案例/活下来的样本」形（「只统计了成功案例，足以证明方法有效」）与 survivorship_bias 射程交界，本轮保守不收。
+- 存量维度 absolute_claim / confidence / reasoning_coherence 会代拦部分本族边缘长句（r182 实测：攻击「为了说明这项政策有效，研究者只摘取了成功地区的材料，结论毋庸置疑。」由 reasoning_coherence + confidence 代拦——非本维度引入，改动前行为一致）。
+- 下一轮候选（侦察阶段已记录未立项）：availability_heuristic 可得性启发（新闻醒目度→频率判断）、ecological_fallacy 生态谬误（群体统计→个体推断）、undistributed_middle 中项不周延（范畴三段论）。
+
+## 六、运行态生效确认
+- `supervisorctl restart heartflow-mcp` → sleep 6 → `curl /health` 与 `heartflow_status` 实测（见最终汇报）。
+
 # 第 181 轮报告（v6.8.109 — 第179维度 halo_effect 光环效应上线 — 2026-11-01）
 
 ## 一、方向与来源

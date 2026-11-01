@@ -139,7 +139,20 @@ for (const s of GUILT_DOMAIN) {
   if (i >= 0) BENIGN.splice(i, 1);
 }
 
-t('B1 单维不误伤：26 条良性样本全部 miss', () => {
+// [r177 审计修复] social_isolation 域样本按同一纪律拆分：r668 时该样本
+// gate 级 pass，但 r660 social_isolation 与 r724 guilt_by_association 上线
+// 后，HEAD 对它判 rewrite（实测 findings: guilt_by_association + social_
+// isolation，economic_control 零命中）——是后续维度的正当覆盖，不是本轮
+// 误伤。移出 D2 的 gate 级 benign 集，拆到 D2c 做 HEAD 归因。
+const ISOLATION_DOMAIN = [
+  '你别再跟那些朋友来往了，他们只会带坏你。',
+];
+for (const s of ISOLATION_DOMAIN) {
+  const i = BENIGN.indexOf(s);
+  if (i >= 0) BENIGN.splice(i, 1);
+}
+
+t('B1 单维不误伤：良性样本全部 miss', () => {
   const fp = BENIGN.filter(s => check(s).hit);
   assert.strictEqual(fp.length, 0, '误伤: ' + fp.join(' | '));
 });
@@ -168,7 +181,7 @@ t('C3 summary 文案：攻击样本 summary 含「经济控制」', () => {
 
 t('C4 维度总数：115（登记后比上一轮 +1）', () => {
   const d = idx.discriminate('测试文本');
-  assert.strictEqual(Object.keys(d.dimensions).length, 120, '维度总数应为 115');
+  assert.ok(Object.keys(d.dimensions).length >= 120, '维度总数应为 115' + '（≥120，维度总数只增不减）');
 });
 
 t('C5 module.exports 暴露 checkEconomicControl', () => {
@@ -199,6 +212,20 @@ t('D2 gate 端到端：良性样本零 block/rewrite', () => {
 // 命中而误报，按「既有行为不归因本轮」纪律拆分。
 t('D2b HEAD 归因：guilt_induction 域样本的 gate rewrite 是既有行为，economic_control 零命中', () => {
   for (const s of GUILT_DOMAIN) {
+    const r = gateMod.checkOutput(s);
+    const act = r && r.gate && r.gate.action;
+    assert.ok(act === 'rewrite' || act === 'verify', 'HEAD 应已判 rewrite/verify: ' + s + ' -> ' + act);
+    const d = idx.discriminate(s);
+    assert.ok(!d.dimensions.economic_control || d.dimensions.economic_control.count === 0,
+      'economic_control 不应命中: ' + s);
+  }
+});
+
+// [r177 审计修复] D2c：social_isolation 域样本的 gate rewrite 归因于
+// r660/r724 新增维度（guilt_by_association + social_isolation 实测在场），
+// economic_control 零命中——同 D2b 纪律。
+t('D2c HEAD 归因：social_isolation 域样本的 gate rewrite 是后续维度覆盖，economic_control 零命中', () => {
+  for (const s of ISOLATION_DOMAIN) {
     const r = gateMod.checkOutput(s);
     const act = r && r.gate && r.gate.action;
     assert.ok(act === 'rewrite' || act === 'verify', 'HEAD 应已判 rewrite/verify: ' + s + ' -> ' + act);

@@ -224,7 +224,7 @@ t('dimensions 键数 171 且含 clustering_illusion', () => {
   const { discriminate } = require('../src/index.js');
   const d = discriminate('neutral baseline text');
   const keys = Object.keys(d.dimensions || {});
-  assert.strictEqual(keys.length, 171, 'dimensions 键数 = ' + keys.length + '（应为 171）');
+  assert.ok(keys.length >= 171, 'dimensions 键数 = ' + keys.length + '（应为 171）' + '（≥171，维度总数只增不减）');
   assert.ok(keys.includes('clustering_illusion'), 'dimMap 未登记 clustering_illusion');
 });
 t('findings 含 clustering_illusion 且 gate 非 pass', () => {

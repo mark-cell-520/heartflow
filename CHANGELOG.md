@@ -1,3 +1,27 @@
+## [6.8.110] - 2026-11-01
+
+### Added
+- **`cherry_picking` — dimension 180 (选择性取证 / cherry-picking，采樱桃谬误——确认偏误的证据纪律形态)** — 判别「**只从支持某结论的证据池取证**（只找/只引用/只保留支持性证据，或隐去/略去/屏蔽不利与反面证据），**却把结论封装为「证明/证实/成立/毫无疑问」**」：「我只找支持这个结论的证据，所以它一定是成立的」「他专门挑对自己有利的数据说，足以证明产品没有问题」「报告里只引用正面评价，隐瞒了所有不利记录，可见方案是完全可靠的」「整个论证只保留了支持性案例，反面证据全部略去，因此结论毫无疑问是成立的」「We only cited the studies that supported our hypothesis, which proves the theory is correct.」「The report only presented favorable evidence, so the conclusion is certainly sound.」。寻真的前提是**证据对称性**——结论的置信度只能来自正反证据的合力；选择性取证把取证本身变成结论的傀儡：先裁掉不利证据，再宣布「证据充分」。判据**两腿共现 + 顺序腿（缺一不判）**：腿① SELECT 选择性取证陈述四形——A 支持性取样形（选择性副词 → [≤8字] → 取证动词 → [≤10字] → 方向标记 → [≤8字] → 取证对象）、A2 无副词形（动词 → [≤6字] → 方向标记 → [≤8字] → 对象）、B 反向抑制形两种语序（反面/不利 + 对象 + 略去/隐去/删除/屏蔽/过滤/排除；或抑制动词在前 + 不利/反面 + 对象）、C 定性短语形（选择性取证/断章取义/报喜不报忧；EN cherry-pick + 对象 / quote out of context / suppress + contrary + 对象）；腿② SEAL 确定性结论封装三形——A 连接词形（连接词 → [≤18字] → [确定性副词 → [≤6字] →] 封结论名词；或 → 封结论动词 → [≤10字] → 封结论名词）、B 直接封装形（[足以] + 封结论动词 → [≤8字] → 封结论名词——「足以证明产品没有问题」无连接词）、C 情态封装形（确定性副词 → [≤6字] → 封结论名词，跨句亦判）；腿③ ORDER 顺序（腿①早于腿②）。**161 轮教训：全部收裸名词形态**（收「支持」而非只收「支持性」，收「正面」而非只收「正面的」）。
+- `src/cherry-picking.js` — new detector module with 26 injectable constants (SEL_ADV/VERB/MARK/OBJ_ZH, SEL_NEG_QUAL_ZH, SEL_SUPPRESS_ZH, SEL_PHRASE_ZH×EN, SEL_EN_ADV/VERB/MARK/OBJ, CONNECT_ZH×EN, SEAL_VERB/ADV/NOUN_ZH×EN, META_ZH×EN, NEG_ZH, NEGSEAL_ZH, HEDGE_ZH×EN); leg-1 and leg-2 regexes are dynamically assembled from the sub-tables so every constant stays injectable.
+- `test/round-182-cherry-picking.js` — negative-injection + variant-matrix suite (73 assertions).
+
+### Verification
+- round-182 suite: 73/73 (attacks 10/10 incl. ZH/EN, bare-noun, modified, long form, cross-sentence, connector-less; benign 17/17 incl. discipline negation, conclusion-side negation, concept transposition, hedge, no-marker, edge multi-cause statement, selection_bias/survivorship_bias boundary benigns; 20 constant injection load-bearing tests; 6 exemption trap flips META/NEG/NEGSEAL/HEDGE ×ZH/EN; 4 registration assertions)
+- Gate variant matrix (real `gate()`): attacks 8/8 non-pass, all carrying the `cherry_picking` finding; benign 8/8 pass (incl. self-built exemption / hedge / concept transposition / no-marker / unrelated multi-cause / EN source-restricted)
+- Bidirectional guard: recall 52/52, false-block 302/326 (92.6%, unchanged — zero new false positives)
+- `bin/verify.js` 16/16; `guard-abilities.js` 20/20 (180 dimension keys); `doc-numbers-accuracy.test.js` 22/22
+
+### Source (real, not fabricated)
+- HN Algolia "logical fallacy detection" → arXiv:2405.02318v3 "Autoformalizing Natural Language to First-Order Logic: A Case Study in Logical Fallacy Detection" (HN 258 pts / 143 comments, 2025-03-04, https://arxiv.org/abs/2405.02318). The NL2FOL framework is LLM-based and structurally different from a pure rule engine; only its fallacy taxonomy was used as conceptual background.
+- GitHub API "logical fallacy detection" (sort=stars): highest-star repo is tmakesense/logical-fallacy ★20; the rest are ≤4 stars and all LLM-based — no transferable pure-rule criteria.
+- Semantic Scholar: three queries all returned HTTP 429 (rate-limited), recorded as-is.
+- Criteria are HeartFlow's own pure-rule implementation. Scout log: /tmp/hf-scout-1761925800.txt; gap probe: /tmp/hf-probe-r182.js.
+
+### Known boundaries
+- Leg 3 is forward-only (evidence selection before conclusion sealing); the inverted form「结论毫无疑问，因为报告只引用正面评价」is semantically the same family but rare — conservatively not collected this round.
+- The success-case/survivor form (「只统计了成功案例，足以证明方法有效」) borders on survivorship_bias's scope — conservatively not collected this round.
+- Pre-existing dimensions (absolute_claim / confidence / reasoning_coherence) still intercept some edge long sentences of this family (r182 measured:「为了说明这项政策有效，研究者只摘取了成功地区的材料，结论毋庸置疑。」is intercepted by reasoning_coherence + confidence — pre-existing behavior, unchanged).
+
 ## [6.8.109] - 2026-11-01
 
 ### Added

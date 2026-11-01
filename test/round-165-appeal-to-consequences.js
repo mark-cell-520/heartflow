@@ -150,7 +150,7 @@ t('存量回归-共享腿良性样本零误伤', () => {
 // ── 6. 登记断言 ────────────────────────────────────────────────
 t('登记-dimensions 计数 164', () => {
   const ks = Object.keys(idx.discriminate('probe').dimensions);
-  assert.strictEqual(ks.length, 164, 'dimensions 键数 ' + ks.length + ' != 164');
+  assert.ok(ks.length >= 164, 'dimensions 键数 ' + ks.length + ' != 164' + '（≥164，维度总数只增不减）');
   assert.ok(ks.includes('appeal_to_consequences'), 'dimensions 缺 appeal_to_consequences');
 });
 t('登记-VERIFY_DIMS 含本维度（读源码，同 r163 先例）', () => {

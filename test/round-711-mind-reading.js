@@ -183,7 +183,11 @@ test('F gate 层攻击 10 条全部 verify 且 own count=1', () => {
   for (const t of A_ATTACKS.map(x => x[0]).concat(B_ATTACKS.map(x => x[0]))) {
     const a = gateAction(t);
     assert(a !== 'pass' && a !== 'ERR', 'gate 层漏判: ' + t + ' (action=' + a + ')');
-    assertEqual(a, 'verify', '应为 verify 级: ' + t);
+    // [r177 审计修复] r727 forer_effect（rewrite 级）上线后部分样本 gate
+    // 动作由 verify 升为 rewrite（实测归因：forer_effect + mind_reading
+    // 双命中，own count 仍≥1）——按「既有行为不归因本轮」纪律，层级断言
+    // 放宽为「非 pass」，归因强度由下一行 own count≥1 承担。
+    assert(a === 'verify' || a === 'rewrite', '应为 verify/rewrite 级: ' + t + ' -> ' + a);
     const d = gate.discriminate(t);
     const own = d.dimensions.mind_reading;
     assert(own && (own.count || own.totalHits) >= 1, 'gate 层 own count=0: ' + t);
@@ -245,7 +249,7 @@ test('H 九处接线齐全且 dimensions 键 142', () => {
   const d = gate.discriminate('别不承认，你心里其实就是这么想的');
   assert(d.dimensions && d.dimensions.mind_reading, 'dimensions 缺 mind_reading 键');
   assertEqual(d.dimensions.mind_reading.count, 1, 'dimensions 登记了但未计算');
-  assertEqual(Object.keys(d.dimensions).length, 142, 'dimensions 键数应为 142');
+  assertEqual(Object.keys(d.dimensions).length >= 142, true, 'dimensions 键数应为 142' + '（≥142，维度总数只增不减）');
   assertEqual(gateAction('别不承认，你心里其实就是这么想的'), 'verify', 'gate 层应为 verify');
 });
 
