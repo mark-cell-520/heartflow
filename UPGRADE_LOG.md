@@ -1,4 +1,33 @@
+# 第 185 轮报告（v6.8.113 — 第183维度 necessity_sufficiency_confusion「条件角色混淆」上线 — 2026-11-01）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切回**逻辑谬误检测**一线——r182 自我验证、r183 反事实、r184 证据纪律之后）：必要条件↔充分条件角色混淆（confusion of necessity and sufficiency）。
+- 缺口实证（grep src/ 实测）：必要条件/充分条件在引擎内只作为 denying_the_antecedent / affirming_the_consequent 的描述附论与 conditional_proposition 的元话语豁免词存在，**没有任何独立维度**判别「条件角色被反向使用」这一攻击族；fallacies 维度内亦无对应子标签。
+- 外部来源（真实，未编造）：HN Algolia "logical fallacy detection" 命中 arXiv:2405.02318《Translating natural language to first-order logic for logical fallacy detection》（HN 258 分，https://arxiv.org/abs/2405.02318，NL2FOL 路线，只作概念背景）；Semantic Scholar "necessary sufficient conditions reasoning fallacy" 命中 10.1016/j.neunet.2025.108164《Necessary and sufficient knowledge enhanced collaborative logical reasoning in LLMs》（2025，0 引）与 10.1080/01445349408837232《A Case of affirming the consequent in international law》（1994）；GitHub API "logical fallacy detection"（sort=stars）最高星 tmakesense/logical-fallacy ★21，其余 ≤4 星且均为 LLM 路线，无可移植纯规则判据。判据为心虫自有纯规则实现。侦察落盘 /tmp/hf-scout-1761930000.txt。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / goalReviewed true；rationale.detail「低负荷+低不确定性+方向明确+目标合理，安全加速」；rationale 的 cognitiveLoad 与 uncertainty 均为字符串 "unknown"，按轮次纪律不当实质背书。
+
+## 二、实现内容
+- 新文件 src/necessity-sufficiency-confusion.js（约 380 行）：条件角色混淆检测器，20 个可注入常量（NEC_CLAIM/SUF_CLAIM/SUF_CONCL/NEC_CONCL_ZH×EN、INFER_FWD/INFER_BWD_ZH×EN、EXEMPT_SEP/NEG/HEDGE/BICOND/CONCEPT_ZH×EN）。
+- 判据**宣称腿×反向结论腿×连接推断词三腿共现，缺一不判**：路线1（必要→充分）NEC_CLAIM × SUF_CONCL × 前向推断词；路线2（充分→必要）SUF_CLAIM × NEC_CONCL × 推断词（倒装形用后向连接词）；跨度 ≤70 字（EN 140 字符）；**反向宣称抑制**（结论只是复用已宣称角色时不判）为本族精度核心。
+- index.js 九处接线：require / 计算点（变量名 nsc）/ allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 读数 / summary / exports。
+- 新测试 test/round-185-necessity-sufficiency-confusion.js：正向（攻击 11/11 命中、良性 16/16 放行）、9 项常量负例注入承重、6 条豁免陷阱翻转（含反向宣称抑制陷阱）、gate 层变体矩阵（6/6 攻击非 pass、5/5 良性 pass）、登记断言。
+
+## 三、r185 实现教训（已固化进测试）
+① 连接推断词必须分前向/后向两个常量并**强制方向**——不强制时「X是Y的必要条件，所以X是Y的充分条件」会被路线2反向双重解释（结论句的充分宣称作宣称、前提句的必要宣称作结论），同一句两路线齐命中；② 对冲豁免陷阱的样本必须让豁免词与结论腿分离——「所以只要努力就可能成功」里「就可能」不匹配 SUF_CONCL 的「就+能/可以/会」交替，抹掉对冲豁免后仍不命中，陷阱不承重；③ 反向宣称抑制陷阱必须让双角色出现在不同子句——「X是Y的充分条件，所以只要X就能Y」放行是因为没有 NEC 宣称腿而非抑制逻辑承重。
+
+## 四、验证数据（五门禁 + 变体矩阵）
+- round-185 轮测：**20/20**（攻击 11/11 含中英/裸名词/带修饰/倒装/长句/直接翻转；良性 16/16 零误判含正确多因陈述「战争是多因共同造成的，资源争夺只是必要条件之一」/必要条件正向使用/双角色同向复用/双条件/概念教学/拒绝推断/对冲/无连接词并列；9 项常量负例注入承重；6 条豁免陷阱翻转）。
+- gate 层变体矩阵（真实 gate()）：攻击 6/6 全部 action 非 pass（基准形/裸名词/带修饰长句/倒装「只要努力就能成功，因为努力是成功的必要条件。」/长句/EN）；良性 5/5 全部 pass（含边缘良性：正确多因、必要条件正向使用、双角色同向复用）。
+- bin/verify.js：**16 passed / 0 failed**；guard-abilities.js：**20/20**（维度登记 183 键）；doc-numbers-accuracy.test.js：**22/22**；bidirectional-guard.js：**召回 52/52，误拦 302/326 不升**（与基线一致，零新增误拦）。
+- 维度数 182→183，VERIFY 141→142；模块数 161 不变（纯函数模块不进 _modules registry）；MCP 工具 184、路由 1,314 不变。
+
+## 五、已知边界
+① 宣称与结论限同句或相邻句且总跨度 ≤70 字（EN 140 字符），跨段形保守不收；② 隐式充分条件句（「X就能Y」）不进 SUF_CLAIM 腿（与 denying_the_antecedent 的条件规则句高度同形，双重命中会稀释该族信号），显式角色语言才判路线2；③ 宣称与结论分属不同主语且无推断词连接的跨条件形不判；④ 存量维度 contradiction 误伤边缘良性「努力是成功的必要条件，但努力不是充分条件，还需要方法、机遇和时代红利。」（gate.action=verify 由 contradiction 代拦——非本维度引入，改动前行为一致，故 gate 层良性矩阵改用不触发 contradiction 的等价边缘良性；下轮可评估 contradiction 对该族的误伤）。
+
+---
+
 # 第 184 轮报告（v6.8.112 — 第182维度 absence_of_problems「未检出≠不存在」上线 — 2026-11-01）
+
 
 ## 一、方向与来源
 - 方向（任务书轮换池，切**自我验证与纠错 + agent 执行验证**一线——r176-r181 连续六轮为逻辑谬误/判断偏差一线、r182 为证据纪律一线、r183 为因果与反事实一线，按轮换纪律回填）：**把有限检验的阴性结果当作完备证明**（未检出 ≠ 不存在）。测试只覆盖已写下的用例，扫描只匹配已知漏洞特征库，审查只覆盖审查者看得见的层面，调研只覆盖愿意开口的人；把「本次未检出」升级为「不存在」，是用有界搜索的阴性结果冒充无界全域的证明，让**未被检验的部分**获得与**已检验部分**相同的可信度。这是 AI 工程汇报、代码审查结论、上线评审中最典型的似是而非：听起来是验证结论，实则是验证范围的静默扩张，直接击中「寻真而非似是而非」的长期目标。

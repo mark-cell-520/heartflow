@@ -1,3 +1,14 @@
+## [6.8.113] - 2026-11-01
+
+### Added
+- **`necessity_sufficiency_confusion` — dimension 183 (条件角色混淆：必要条件↔充分条件反向使用)** — 判别「**先宣称某条件是另一事件的必要条件（前提/基础/保障/没有X就没有Y/唯有X才Y），再据此断言该条件单独就能保证结果（所以只要X就能Y）；或先宣称充分条件（X足以Y/保证），再据此断言没有该条件结果就不成立（所以没有X就不能Y）**」结构。必要与充分是两个方向：P必要于Q只意味着 ¬P⇒¬Q，推不出 P⇒Q；P充分于Q只意味着 P⇒Q，推不出 ¬P⇒¬Q。判据**宣称腿×反向结论腿×连接推断词三腿共现，缺一不判**：路线1（必要→充分）NEC_CLAIM × SUF_CONCL × 前向推断词；路线2（充分→必要）SUF_CLAIM × NEC_CONCL × 推断词；跨度 ≤70 字（EN 140 字符）；反向宣称抑制（结论只是复用已宣称角色时不判）。来源：arXiv:2405.02318（HN 258 分，概念背景）+ Semantic Scholar 10.1016/j.neunet.2025.108164 / 10.1080/01445349408837232；判据为心虫自有纯规则实现。
+- `src/necessity-sufficiency-confusion.js` — new detector module with 20 injectable constants (NEC_CLAIM/SUF_CLAIM/SUF_CONCL/NEC_CONCL_ZH×EN, INFER_FWD/INFER_BWD_ZH×EN, EXEMPT_SEP/NEG/HEDGE/BICOND/CONCEPT_ZH×EN); direction-enforced connector (forward 所以/因此 for claim→conclusion, backward 因为/既然 for inverted forms) and opposite-claim suppression as the family's precision core.
+- `test/round-185-necessity-sufficiency-confusion.js` — 20 assertions (11 attacks ZH+EN incl. bare-noun/modified/inverted/long/direct-flip, 16 benign incl. correct multi-factor statement and forward necessity use, 9 constant injection load-bearing checks, 6 exemption trap flips incl. opposite-claim suppression, gate-layer variant matrix 6/6 attack non-pass + 5/5 benign pass).
+
+### Changed
+- `src/index.js` — nine wiring points for dimension 183 (require / compute point `nsc` / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions reading / summary / exports). Dimensions 182→183, VERIFY 141→142.
+- `README.md` / `SKILL.md` / `AGENTS.md` — dimension count 183 and verify-tier count 142 synced across banner, spec tables, and tier lists.
+
 ## [6.8.112] - 2026-11-01
 
 ### Added
