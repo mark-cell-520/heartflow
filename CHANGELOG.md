@@ -1,3 +1,9 @@
+## [6.8.112] - 2026-11-01
+
+### Added
+- **`absence_of_problems` — dimension 182 (未检出≠不存在：把有限检验的阴性结果当作完备证明)** — 判别「**测试/扫描/审查/调研只覆盖了有界范围，却把「本次未检出」升级为「不存在」**」结构：「测试全跑过了没报错，所以代码肯定没问题」「扫了一遍没发现漏洞，说明系统是安全的」「没人投诉，说明产品体验没问题」「三年没出过事故，这座桥梁绝对安全」「尽调没查出任何问题，这家公司完全可以放心投资」「抽样检查没有发现缺陷，产品百分之百合格」「The tests did not fail, so the code must be correct.」「We scanned and found no vulnerabilities, therefore the system is secure.」「No bugs were reported during the audit, so the release is completely safe.」。检验的效力受其覆盖范围约束：测试只覆盖已写下的用例，扫描只匹配已知漏洞特征库，审查只覆盖审查者看得见的层面，调研只覆盖愿意开口的人；用有界搜索的阴性结果冒充无界全域的证明，让**未被检验的部分**获得与**已检验部分**相同的可信度——这是 AI 工程汇报、代码审查结论、上线评审中最典型的似是而非。判据**两腿共现，缺一不判**（同句或相邻句）：腿① CHECK 已执行检验+阴性结果三形——CN-A 阴性结果形（检验动词**可选前缀** → [≤12字] → 否定 → [≤6字] → {检出动词 → [≤10字] → 问题名词 | 自足投诉类}）、CN-B 通过形（检验动词 → 全部/完全/都 → 通过/合格/达标/全绿）、CN-C 失败裸形（检验动词 → 否定 → 出错/报错/失败/崩溃/超时）；EN-A 检验名词+阴性动词、EN-B no+问题名词+were found/reported/detected、EN-C 检验名词+all passed/are green。腿② SEAL 全称化结论三形——CN-A 连接词+无问题族结论、CN-B 连接词+确定性副词+其他结论、CN-C 无连接词+确定性副词+无问题族结论（跨句亦判）；EN-A so/therefore/which means/proves+无问题族结论、EN-B so/therefore+must be/certainly/100%+结论。**161 轮教训：全部收裸名词形态**。六类豁免全部负例注入承重：SCOPE 范围限定与 HEDGE 对冲为**跨度豁免**（腿①句首→腿②句尾），NEGFLIP 拒绝推断、META 概念/教学转述、EXHAUSTIVE 构造上完备的检验为**整篇豁免**——两类表刻意不交叠，另加疑问句逐句豁免。来源（真实，未编造）：arXiv:2405.02318v3《Autoformalizing Natural Language to First-Order Logic: A Case Study in Logical Fallacy Detection》（HN 258 分/143 评论，LLM 路线，只作概念背景）；GitHub 5 个谬误检测仓库全为模型路线；Semantic Scholar 两次 HTTP 429 限流，如实记录。判据为心虫自有纯规则实现。
+- `src/absence-of-problems.js` — new detector module with 21 injectable constants (CHECK_ZH_A/C/D_RE, CHECK_EN_A/B/C_RE, SEAL_ZH_A/B/C_RE, SEAL_EN_A/B_RE, SCOPE_ZH×EN, HEDGE_ZH×EN, NEGFLIP_ZH×EN, META_ZH×EN, EXHAUSTIVE_ZH×EN); two-leg co-occurrence (same or adjacent sentence) with span-scoped and whole-text exemption tables.
+
 ## [6.8.111] - 2026-11-01
 
 ### Added

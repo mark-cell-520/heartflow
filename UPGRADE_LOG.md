@@ -1,4 +1,49 @@
-# 第 183 轮报告（v6.8.111 — 第181维度 counterfactual_overclaim 反事实独断上线 — 2026-11-01）
+# 第 184 轮报告（v6.8.112 — 第182维度 absence_of_problems「未检出≠不存在」上线 — 2026-11-01）
+
+## 一、方向与来源
+- 方向（任务书轮换池，切**自我验证与纠错 + agent 执行验证**一线——r176-r181 连续六轮为逻辑谬误/判断偏差一线、r182 为证据纪律一线、r183 为因果与反事实一线，按轮换纪律回填）：**把有限检验的阴性结果当作完备证明**（未检出 ≠ 不存在）。测试只覆盖已写下的用例，扫描只匹配已知漏洞特征库，审查只覆盖审查者看得见的层面，调研只覆盖愿意开口的人；把「本次未检出」升级为「不存在」，是用有界搜索的阴性结果冒充无界全域的证明，让**未被检验的部分**获得与**已检验部分**相同的可信度。这是 AI 工程汇报、代码审查结论、上线评审中最典型的似是而非：听起来是验证结论，实则是验证范围的静默扩张，直接击中「寻真而非似是而非」的长期目标。
+- 缺口实证（/tmp/hf-probe-r184.js，直调 src/gate.js，v6.8.111 181 维引擎）：候选四族实测真零命中——A nirvana_fallacy 3/6（其余被 fallacies/absolute_claim/perfect_error/unsupported_claim 代拦，部分覆盖）、**B absence_of_problems 5/6**（仅 EN「We scanned and found no vulnerabilities…」被 confidence 代拦）、C red_herring 6/6、D common_sense 4/4。选 B：两腿结构最清晰、FP 风险最低（良性工程陈述几乎必带范围限定或对冲），且与既有维度边界全部错开。侦察落盘 /tmp/hf-scout-r184.txt。
+- 外部来源（真实，未编造）：HN Algolia "logical fallacy detection" 命中 **arXiv:2405.02318v3《Autoformalizing Natural Language to First-Order Logic: A Case Study in Logical Fallacy Detection》**（HN 258 分 / 143 评论，2025-03-04，https://arxiv.org/abs/2405.02318）——NL2FOL 框架把自然语言逐步翻译成一阶逻辑、用 SMT 求解器判定陈述的逻辑有效性；该框架依赖 LLM 翻译，与纯规则引擎不同构，只取其谬误族清单作概念背景。GitHub API "logical fallacy detection"（sort=stars）：tmakesense/logical-fallacy ★21 / SeanFlannery/Logical.ly ★4 / graciolli-f/sophron-bot ★4 / EPITA-SCIA/Fallacy-Detection-LLM ★2 / IMJONEZZ/Fallacy-Detection ★1——全部 LLM/模型路线，无可移植纯规则判据。Semantic Scholar 两次检索均 HTTP 429 限流，空返，如实记录。判据为心虫自有纯规则实现。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / goalReviewed true；rationale.detail「低负荷+低不确定性+方向明确+目标合理，安全加速」；**cognitiveLoad 与 uncertainty 均为字符串 "unknown"**（引擎把未测到当很低），按轮次纪律不当实质背书，accelerate 依据是缺口实证（5/6 真零命中 + 边界全部错开）与轮换纪律。
+
+## 二、实现内容
+- 新增 `src/absence-of-problems.js`（约 21 KB，**21 个可注入常量**）：`checkAbsenceOfProblems(text)` + `__internals()`。
+  - 判据**两腿共现，缺一不判**（同句或相邻句）：
+    - 腿① CHECK 已执行检验 + 阴性结果（未检出问题）三形：CN-A 阴性结果形（**检验动词设为可选前缀** → [≤12字] → 否定 没/未/没有/并无/未能/不曾/从无/毫无/压根没/根本没/从未 → [≤6字] → {检出动词 → [≤10字] → 问题名词 | **自足投诉类**}）、CN-B 通过形（检验动词 → [≤8字] → 全部/完全/都/皆/悉数 → [≤4字] → 通过/合格/达标/过关/全绿/一次过）、CN-C 失败裸形（检验动词 → [≤12字] → 否定 → [≤6字] → 出错/报错/失败/挂掉/崩溃/超时/漏数据）；EN-A 检验名词+阴性动词、EN-B no+问题名词+were found/reported/detected、EN-C 检验名词+all passed/are green。
+    - 腿② SEAL 全称化结论三形：CN-A 连接词+无问题族结论、CN-B 连接词+确定性副词+其他结论、CN-C 无连接词+确定性副词+无问题族结论（跨句亦判）；EN-A so/therefore/thus/hence/which means/proves/shows+无问题族结论、EN-B so/therefore+must be/certainly/definitely/100%+结论。
+    - **161 轮教训：全部收裸名词形态**（收「风险」而非只收「风险点」，收「投诉」而非只收「投诉量」）。
+  - 豁免常量（全部可负例注入置空）：SCOPE 范围限定（**跨度豁免**，腿①句首→腿②句尾）、HEDGE 对冲（跨度豁免）、NEGFLIP 拒绝推断、META 概念/教学转述、EXHAUSTIVE 构造上完备的检验（后三者为整篇豁免）+ QUESTION 疑问句（逐句）。**跨度豁免与整篇豁免两类表刻意不交叠**——交叠会让对方的注入样本假绿（r182 教训 4 / r183 教训 3 同款）。
+  - 评分：单处共现 75；强全称词（毫无疑问/百分之百/100%/without a doubt）或多处 90。
+- `src/index.js` 九处接线：require 注释块 / 计算点 / allDims(score) / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / exports。变量名 **aop**（grep 实测 0 冲突；注意 cfo 已被 index.js:10897 的 `ceo|cto|cfo` 正则占用，不可复用）。
+- 新增 `test/round-184-absence-of-problems.js`：56 项断言。
+- 文档三处同步数字（README.md / SKILL.md / AGENTS.md：维度 181→182、VERIFY 140→141、tiers 合计 170→171、剩余不触发维度 11→10、AGENTS 版本注记追加 v6.8.112、SKILL Engine version 行 6.8.111→6.8.112）+ 版本 6.8.111 → 6.8.112 + CHANGELOG/UPGRADE_LOG。
+
+## 三、r184 实现教训（已固化进测试与源码注释）
+1. **「有检验动词」形是「裸阴性结果」形的严格子集，单列即死常量**：首版把 CN-A（检验动词+否定+检出+问题名词）与 CN-B（裸否定+检出+问题名词）分列两个常量，注入实测发现 CN-A 永不被承重——CN-B 的否定→检出段 gap（6+4 字）比 CN-A（6 字）更宽且不要求前缀，CN-A 的命中集是 CN-B 的子集。合并为单一 `CHECK_ZH_A_RE`（检验动词改可选前缀），常量数 22→21，全部承重。
+2. **自足投诉类不得要求后接问题名词**：投诉/举报/抱怨/质疑/反对/反映/异议本身即问题名词。「回访没收到投诉，说明政策没有问题」的「投诉」后紧跟逗号，强制后置名词整句漏判（首跑 5 漏之一）。
+3. **英文过去时态必须显式收**：`\bscans?\b` 匹配不到 "scanned"（scan 后紧跟 ned、词边界失败）——「We scanned and found no vulnerabilities, therefore the system is secure.」整句漏判即因此。改为 `scan(?:s|ned|ning)?`，并对 audit/review/inspect/survey/probe 同法处理。
+4. **SEAL 结论族限定为「无问题/安全/可靠/放心」家族**：「成立/为真/有效」只在确定性副词在场时由 SEAL_ZH_B 收，避免误伤「数据说明理论成立」这类合法科学陈述。
+5. **SEAL 腿 gap 允许跨逗号**：禁逗号会让「审计没发现问题，所以可以先上线，系统是安全的」这类结论被逗号隔开的攻击形整句漏判；只禁 。？！；\n。
+6. **边缘良性被存量维度代拦时，测试只断言本维度不误伤**：gate 层 2 条良性（「测试通过只能说明已写用例通过，不能证明代码没有问题」「The scan may still have missed zero-day vulnerabilities.」）被 genetic_fallacy+appeal_to_ignorance / confidence 判 verify。已用 `git stash push src/index.js` 回退至 HEAD 实证：**改动前行为完全一致（同 action、同维度）**，非本维度引入。测试因此拆为「良性放行（assert pass）」与「边缘良性本维度不误伤（assert findings 不含 absence_of_problems）」两组，不替存量维度背书。
+7. **DIM_GUIDANCE 条文里的花括号必须配平**（r184 新教训，咬得最隐蔽）：`scripts/dimension-registry-guard.js` 用**朴素字符计数**从 `function discriminate(` 起配平 `{`/`}` 定函数体，不识别字符串字面量。首版 guidance 写了分肢的闭括号 `}` 却漏了开括号 `{`（「→ [≤6字] → 检出动词 … | **自足投诉类** …整句漏判}」），多出的一个 `}` 把配平深度提前打到 0，`dEnd` 落在 guidance 串内部（第 3150 行），`dimensions: {`（第 4244 行）随之落到 body 之外——guard 报「找不到 dimensions/summary」，`node --check` 与全部单测却全绿。**症状与真实原因相距一个文件长度，是本轮唯一卡死的门禁**。修复：在 guidance 里补回 `{`。写入纪律：凡在 DIM_GUIDANCE 字符串中使用 `{`/`}` 描述分岔结构，必须成对写，写完用 `node -e` 数一遍该串内两字符个数是否相等。
+
+## 四、验证数据（五门禁全绿）
+- `node --check` src/index.js / src/absence-of-problems.js / test/round-184-absence-of-problems.js：全部 OK。
+- `bin/verify.js`：**16 passed / 0 failed**。
+- `scripts/guard-abilities.js`：**20/20**（维度登记 dimensions 键 **182** 个、summary 引用符合预期；双向回归门禁召回 **52/52**、误拦 **302/326**，与基线一致、零新增误拦）。
+- `test/doc-numbers-accuracy.test.js`：**22/22**。
+- `scripts/bidirectional-guard.js`（由 guard-abilities 第 7 项执行）：召回 52/52、误拦 302/326 不升。
+- round-184 轮测：**56/56**（攻击 18/18 含中英/裸名词/带修饰/长句/无检验动词/跨句；良性 19/19 零误判含范围限定/拒绝推断/对冲/穷举/概念转述/疑问句/工程正常收尾；21 项常量负例注入承重 + 10 条豁免陷阱翻转；登记断言×4）。
+- gate 层变体矩阵（真实 gate()）：攻击 8/8 非 pass 且 findings 全含 absence_of_problems（含裸名词、带修饰、无检验动词、长句、EN 过去时、EN-B、相邻跨句）；良性 7/7 pass + 边缘良性 2/2 本维度不误伤。
+
+## 五、已知边界（下轮可继续）
+- 腿①腿②限同句或相邻句，「测试全部通过。（隔两段）代码没有问题。」跨段形本轮保守不收。
+- 结论族限定为「无问题/安全/可靠/放心」家族与带确定性副词的其他结论，「测试通过，方案可行」这类无副词弱结论不在射程。
+- 「成立/为真/有效」类结论只在确定性副词在场时判定，避免误伤「数据说明理论成立」这类合法科学陈述。
+- 存量维度 genetic_fallacy + appeal_to_ignorance 误伤边缘良性「测试通过只能说明已写用例通过，不能证明代码没有问题」、confidence 误伤「The scan may still have missed zero-day vulnerabilities.」——r184 用 git stash 实证复现，非本维度引入，改动前行为一致，下轮可评估修复。
+- 未实施候选（下轮可继续）：C red_herring（6/6 真零命中，但「关键是/真正重要的是」高频良性、FP 风险高于本族）；D common_sense（4/4 真零命中，「明摆着」FP 风险高）；A nirvana_fallacy（3/6 真零命中，其余已被存量维度代拦）。
+
+
 
 ## 一、方向与来源
 - 方向（任务书轮换池，切**因果与反事实推理 + 不确定性量化**一线——r176-r181 连续六轮为逻辑谬误/判断偏差一线、r182 为证据纪律一线，按轮换纪律回填）：**反事实独断（counterfactual overclaim）**——把另一条**未走路径**的结果当作**确定可知**（「如果当初X，现在一定/必然/势必Y」）。反事实的前提是结果对路径敏感：复杂系统中同一前件在不同参数、随机性与耦合作用下发散出不同后果，未走路径的结局原则上不可事先确定；用确定性副词封装反事实结果，是把不可验证的假设当结论，用叙述的确定性替代因果的开放性，是 AI 复盘类输出中最典型的单线决定论。
