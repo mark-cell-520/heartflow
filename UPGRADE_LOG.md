@@ -1,3 +1,36 @@
+# 第 186 轮报告（v6.8.114 — 第184维度 activity_outcome_confusion「活动/投入当成果（以工代果）」上线 — 2026-11-01）
+
+## 一、方向与来源
+- 方向（轮换纪律）：切**价值对齐与目标漂移检测 + 不确定性量化**一线——r182 证据纪律、r183 反事实、r184 证据纪律、r185 逻辑谬误之后回填。候选族：把**活动/投入的计数**（会议场次/发文份数/加班时长/代码行数/走访户数）当作**抽象成果**（推进得好/进展巨大/成效显著）的证据——「以工代果」。
+- 缺口实证（/tmp/hf-probe-r186b.js，直调 gate.js v6.8.113）：候选四族实测——A Goodhart 代理指标 3/5 零命中但被 reward_hacking/perfect_error 代拦且 1 良性误伤、B nirvana 2/5、**C activity-as-achievement 5/5 真零命中、良性 0/5 误伤**、D false precision 2/4 被 perfect_error 代拦。选 C：唯一干净缺口，且与 reward_hacking（BLOCK，自认式作弊）边界错开。
+- 读码核查：src/reward-hacking.js（4120 行）已极密集覆盖自认式指标作弊族（metric_substitution/metric_denominator_gaming/best_run_picking/HAP-Z1~Z5 等），但全部要求自认标记（换成/改为/优化…而不是/刷分/让指标好看）；与「无欺骗的活动当成果推理谬误」本质不同、判定结构不同。
+- 外部来源（真实，未编造）：HN Algolia "vanity metrics" 命中 Eric Ries《Vanity Metrics vs. Actionable Metrics》（42 分，https://news.ycombinator.com/item?id=617517）与《Vanity Metrics》（79 分，https://news.ycombinator.com/item?id=14167843）；"Goodhart's law" 多篇高分（229/187/178/160 分，https://news.ycombinator.com/item?id=17320640 等）作概念背景。Semantic Scholar 两次检索 HTTP 429 空返；GitHub vanity/actionable metrics 无高星纯规则方案（最高 1★ 无关）。判据为心虫自有纯规则实现。侦察落盘 /tmp/hf-scout-r186.txt。
+- 心虫裁决：philosophy_decision type=**accelerate** / confidence 0.7 / priority 40 / goalReviewed true；rationale.detail「低负荷+低不确定性+方向明确+目标合理，安全加速」；cognitiveLoad 与 uncertainty 均为字符串 "unknown"，按轮次纪律不当实质背书，accelerate 依据是缺口实证（5/5 真零命中 + 边界全部错开）与轮换纪律。
+
+## 二、实现内容
+- 新文件 src/activity-outcome-confusion.js（约 19 KB，**16 个可注入常量**）：checkActivityOutcomeConfusion(text) + __internals()。
+- 判据**活动腿×抽象成果腿×因果连接三腿共现，缺一不判**：
+  - 腿① ACT 两类——A 可计数活动名词（会议/开会/文件/发文/代码/加班/工时/走访/巡查/培训/邮件/对接 + 数字型「N场会」+ 忙碌标记 忙得脚不沾地/夜以继日/起早贪黑/通宵；EN meetings/emails/reports/training sessions/overtime/lines of code/all-nighters），B 泛指投入词（投入/付出/辛劳/心血/奔波——**须与强度标记同现** 大量/天天/日夜/数十/上百/几万/无数，否则不判，避免误伤「投入研发取得突破」这类正常因果叙述）。
+  - 腿② OUT 抽象成果结论（**只收抽象成功/进展/绩效，不收具体结果**；名词与形容词间留 [^。！？]{0,6} 强度窗——吃「推进得**很**好」「成绩**必然**斐然」「绩效**十分**突出」这类插入强度副词的形）。
+  - 腿③ CONN 因果连接（显式连接词 所以/因此/说明/可见/足以证明；EN so/therefore/which shows/proving，**或**两腿以逗号并置且无转折词——中文逗号常承载隐性因果；句号分隔或含转折词 但/然而/却/不过/虽然 不判）。活动腿与成果腿总跨度 ≤80 字（EN 160 字符）。
+- index.js 九处接线：require / 计算点（变量名 aoc）/ allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions / summary / exports。
+- 新测试 test/round-186-activity-outcome-confusion.js：18 项断言。
+- 文档三处同步数字（README/SKILL/AGENTS：维度 183→184、VERIFY 142→143、tiers 合计 172→173、剩余不触发 11 不变、Verify-level 清单加 activity_outcome_confusion、README/SKILL 版本戳与 Version history 加 v6.8.114）+ 版本 6.8.113→6.8.114 + CHANGELOG/UPGRADE_LOG。
+
+## 三、r186 实现教训（已固化进测试）
+① OUT 成果正则名词与形容词之间必须留强度窗——中文常在「进展/成绩/成效」与「巨大/显著/斐然」之间插入「很/十分/必然/非常」；紧邻写法导致「推进得很好」「成绩必然斐然」「绩效十分突出」整句漏判（首跑 6 漏之一）。② ACT 会议形必须收数字型「N场会」——「开了 50 场会」的「开」与「会」被数字隔开，紧邻「开会/会议」吃不到，豁免陷阱样本因此不承重。③ 连接词承重测试必须用**无逗号**样本——本族有「逗号并置即因果」兜底，带逗号样本抹掉 CONN 后仍靠并置命中、负例测试假绿；改用「发了50份文件所以…」（无逗号）才隔离出 CONN 常量独家承重。④ 泛指投入腿（投入/付出）须与强度标记同现，否则「投入研发取得突破」这类正常因果叙述被误判——单列 INTENSITY 共现要求。
+
+## 四、验证数据（五门禁 + 变体矩阵）
+- round-186 轮测：**18/18**（攻击 12/12 含中英/裸名词/带修饰/逗号并置/长句/投入+强度；良性 13/13 零误判含正确分离/具体成果在场/对冲/疑问句/转折并置/EN；8 项常量负例注入承重含 CONN 无逗号隔离；3 条豁免陷阱翻转；登记断言）。
+- gate 层变体矩阵（真实 gate()）：攻击 6/6 全部 action 非 pass 且 findings 含 activity_outcome_confusion；良性 5/5 全部 pass（含边缘良性：正确分离/具体成果在场/投入+具体成果）。
+- bin/verify.js：**16 passed / 0 failed**；guard-abilities.js：**20/20**（维度登记 184 键；双向回归门禁召回 **52/52**、误拦 **302/326 不升**——新维度在 326 基线良性池零新增误报）；doc-numbers-accuracy.test.js：**22/22**；bidirectional-guard.js：召回 52/52、误拦 302/326 不升。
+- 维度数 183→184，VERIFY 142→143；模块数 161 不变（纯函数模块不进 _modules registry）；MCP 工具 184、路由 1,314 不变。
+
+## 五、已知边界
+① 活动腿与成果腿限同句，总跨度 ≤80 字（EN 160 字符），跨段形保守不收；② 两腿仅以句号分隔、无显式连接词时不判（保守，避免把两个独立事实误并为一个因果断言）；③ 泛指投入词单独出现不判，须与强度标记同现；④ 含转折词（但/然而/却/不过/虽然）的并置不判；⑤ 本维度是 VERIFY 级（用活动计数给成果背书需补成果证据），不阻断交付；⑥ Goodhart 代理**指标**族（点击率/GDP/停留时长/分数）明确不碰，归 reward_hacking 及未来代理指标维度——「下载量破百万所以满足需求」这类不在本维度射程。
+
+---
+
 # 第 185 轮报告（v6.8.113 — 第183维度 necessity_sufficiency_confusion「条件角色混淆」上线 — 2026-11-01）
 
 ## 一、方向与来源

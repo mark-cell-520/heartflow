@@ -1,3 +1,14 @@
+## [6.8.114] - 2026-11-01
+
+### Added
+- **`activity_outcome_confusion` — dimension 184 (活动/投入当成果：以工代果)** — 判别「**把会议场次/发文份数/加班时长/代码行数/走访户数等活动或投入计数，当作「推进得好/进展巨大/成效显著/成绩斐然」这类抽象成果的证据**」结构。活动量与成果之间没有必然传递——会开得多可能议题涣散，班加得猛可能在做无用返工，代码行数多可能蕴含更多缺陷；用活动的**数量**给成果**背书**，是把「做了很多」偷换成「做成很多」。判据**活动腿×抽象成果腿×因果连接三腿共现，缺一不判**：腿① ACT 两类——A 可计数活动名词（会议/开会/文件/发文/代码/加班/工时/走访/巡查/培训/邮件/对接 + 数字型「N场会」+ 忙碌标记 忙得脚不沾地/夜以继日/起早贪黑/通宵；EN meetings/emails/reports/training sessions/overtime/lines of code/all-nighters），B 泛指投入词（投入/付出/辛劳/心血/奔波——**须与强度标记同现** 大量/天天/日夜/数十/上百/几万/无数）；腿② OUT 抽象成果结论（**只收抽象成功/进展/绩效，不收具体结果**；名词与形容词间留强度窗吃「推进得**很**好」「成绩**必然**斐然」「绩效**十分**突出」）；腿③ CONN 因果连接（显式连接词 所以/因此/说明/可见/足以证明；EN so/therefore/which shows/proving，**或**两腿以逗号并置且无转折词——句号分隔或含转折词 但/然而/却/不过/虽然 不判）。与 reward_hacking 自认式作弊（BLOCK）、Goodhart 代理**指标**族（点击率/GDP/停留时长——测得的量）边界错开：本族腿①只收**活动/投入**（做的事、花的工），是**无欺骗的推理谬误**。来源（真实，未编造）：HN Algolia "vanity metrics" 命中 Eric Ries《Vanity Metrics vs. Actionable Metrics》（42 分，https://news.ycombinator.com/item?id=617517）与《Vanity Metrics》（79 分，https://news.ycombinator.com/item?id=14167843）；Goodhart's law 多篇高分（229/187/178 分）作概念背景；Semantic Scholar 两次 HTTP 429 空返；GitHub 无高星纯规则方案。判据为心虫自有纯规则实现。缺口实证攻击 5/5 真零命中、良性 0/5 误伤。
+- `src/activity-outcome-confusion.js` — new detector module with 16 injectable constants (ACT_ZH/EN, EFFORT_ZH, INTENSITY_ZH/EN, OUT_ZH/EN, CONN_ZH/EN, EXEMPT_SEP/CONCRETE/HEDGE_ZH×EN); effort-leg requires intensity co-occurrence; juxtaposition-as-causation with contrast guard; intensity gap between OUT noun and adjective.
+- `test/round-186-activity-outcome-confusion.js` — 18 assertions (12 attacks ZH+EN incl. bare-noun/modified/juxtaposition/long/effort+intensity, 13 benign incl. reflexive-separation/concrete-outcome/hedge/question/contrast, 8 constant injection load-bearing checks incl. CONN no-comma isolation, 3 exemption trap flips, gate-layer variant matrix 6/6 attack non-pass + 5/5 benign pass, export registration).
+
+### Changed
+- `src/index.js` — nine wiring points for dimension 184 (require / compute point `aoc` / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions reading / summary / exports). Dimensions 183→184, VERIFY 142→143.
+- `README.md` / `SKILL.md` / `AGENTS.md` — dimension count 184, verify-tier count 143, tier sum 173, Verify-level list + `activity_outcome_confusion`, version stamps → v6.8.114.
+
 ## [6.8.113] - 2026-11-01
 
 ### Added
