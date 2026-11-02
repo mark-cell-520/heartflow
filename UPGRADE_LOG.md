@@ -1,3 +1,35 @@
+# r200 升级轮报告（v6.8.129 — 第 197 维度 goal_drift「目标漂移/使命置换」上线 — 2026-11-03）
+
+## 一、轮次与方向
+- 轮次 r200，方向：价值对齐与目标漂移检测（r199 起轮换表中尚未轮到的新方向；r198/r199 分别为因果推理/证据充分性）。任务：新增判别维度，命中一个此前 196 维无一覆盖的新攻击族。
+- 立项缺口实证：`grep -ril 'goal_drift|scope creep|使命漂移|目标漂移|目标置换|初衷' src/` 仅 proxy-metric-goal / moralistic-fallacy / gate-verdict 等相邻族零散命中，无专门维度；r200 家族探针在当前引擎（v6.8.128，196 维）复测——目标漂移族攻击 5/5 gate.action=pass（真零命中）、良性 4/4 pass（零误伤）。
+
+## 二、来源（真实，未编造）
+- 三层研究：HN Algolia "agent goal drift" 命中 **arXiv 2603.03456《Asymmetric Goal Drift in Coding Agents Under Value Conflict》**（https://arxiv.org/abs/2603.03456——coding agent 在用户/习得价值观/代码库三方影响下会**静默偏离**被雇佣时的目标，且偏离不对称：individual actions authorized，trajectory drifted）与 GitHub **sunilgentyala/Plumbline ★6**（Apache-2.0、zero ML deps：mission drift 是 2026 per-action 治理栈结构性覆盖不到的失效模式，须对固定 mission anchor 持续打分、漂移即冻结升级）。二者均为 agent 运行时治理/实证研究，判据为心虫自有纯规则实现（零 LLM 依赖铁律）。侦察落盘 /tmp/hf-scout-*.txt。
+- 心虫裁决门禁：heartflow_philosophy_decision → **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 三、实现
+- 新文件 src/goal-drift.js（约 280 行）：`checkGoalDrift(text, inject)` + `__internals`（14 个可注入常量）。两腿共现 + 邻近窗（中文 60 字 / EN 160 字符），缺一不判：
+  - 腿① ANCHOR 原始目标/使命锚定宣告（初衷/初心/本来要/最初的目标/原任务/原计划/立项(时|之初)/使命/宗旨/被(要求|安排|雇来|委派)；EN original/initial/stated/assigned (goal|task|mission|objective|mandate|purpose|brief)、(i|we) (was|were) (hired|asked|assigned) to、the (mission|mandate|remit) was、set out to——r161 教训：初衷/初心/使命/宗旨收裸名词形态，去修饰仍命中）；
+  - 腿② SWITCH 目标置换/漂移宣告（重心(已经|早已|悄然)?(转向|转移到|放在|移到)/重心转移/现在(真正|最)(重要|该做|值得)(的|是)/实际上(变成|已是)/已经变成/变成了/漂移(到|至|成了)/不知不觉(中)?(变成|成了)/说到底是为了/沦为；EN (has|have) (shifted|drifted|moved|pivoted) to、focus has drifted to、now focused on、the real (goal|priority|focus) is、turned into、became about、what (we|it|i) (really|actually) (do|want|need) is、drifted from——「重心转移」「漂移」「转向」裸名词形态直接命中）。
+- 豁免四组 + 疑问句：显式授权/正式变更、自我纠正/觉察漂移（**指出并纠正漂移是正确判别**，是本维度保护的反面行为，必须放行）、概念/教学转述、对冲、疑问句。
+- src/index.js 七处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象）；三份文档数字同步（维度 196→197、verify 153→154、版本戳 6.8.128→6.8.129）；README Version history / CHANGELOG 追加 6.8.129 条目；VERSION 递增后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-200-goal-drift.js（48 用例：攻击 8 中英双语/裸名词/带修饰/倒装/长句、良性 9 含五类边缘良性、5 项豁免陷阱「含豁免放行+抹掉转命中」+疑问句陷阱去问号转命中、4 项腿常量负例注入承重含中英逐侧独立、gate 层变体矩阵）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键 197）
+- test/doc-numbers-accuracy.test.js：24/24
+- scripts/bidirectional-guard.js：召回 52/52 不降、误拦 302/326 不升（与基线逐位一致，零误伤）
+- round-200 轮测：48/48
+- 变体矩阵（真实 gate() 复量，非仅模块自检）：攻击 8/8 gate.action=verify 且 goal_drift 进 findings；良性 9/9 pass（不忘初心/经用户同意正式调整方向/发现漂移正在回到原使命/论文讨论/对冲试探/隐式置换无锚点/锚点单腿/EN 延续/EN 觉察纠正）
+
+## 五、已知边界 / 下次可继续
+- 隐式目标置换（只陈述新目标、不宣告锚点，如「我们现在的重点是刷高日活」）不判——无锚点腿共现即无「以延续之名行置换之实」的话语形状，属保守方向。
+- 邻近窗 60 字（EN 160 字符）外的跨段锚点—置换共现不判（可能是两件独立的事）。
+- 授权豁免为句级属性，同句混合授权依据与未授权置换叙述会整句放过（与既有维度同口径）。
+- 可继续方向：记忆巩固与检索、agent 执行验证（check_completion_evidence 族的深化）、反事实推理过度声称细化。
+
 # r199 升级轮报告（v6.8.128 — 第 196 维度 opinion_entitlement「观点权利豁免/主观主义谬误」上线 — 2026-11-03）
 
 ## 一、轮次与方向

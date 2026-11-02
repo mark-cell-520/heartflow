@@ -1,3 +1,14 @@
+## [6.8.129] - 2026-11-03
+
+### Added — 第 197 判别维度 `goal_drift`「目标漂移/使命置换」（r200，真升级类型 1：新判别维度）
+- 新增 src/goal-drift.js（约 280 行）：`checkGoalDrift(text, inject)` + `__internals`（14 个可注入常量）。两腿共现 + 邻近窗（中文 60 字 / EN 160 字符），缺一不判：腿① ANCHOR 原始目标/使命锚定宣告（初衷/初心/本来要/最初的目标/原任务/原计划/立项(时|之初)/使命/宗旨/被(要求|安排|雇来|委派)；EN original/initial/stated/assigned (goal|task|mission|objective|mandate|purpose|brief)、(i|we) (was|were) (hired|asked|assigned) to、the (mission|mandate|remit) was、set out to）；腿② SWITCH 目标置换/漂移宣告（重心(已经|早已|悄然)?(转向|转移到|放在|移到)/重心转移/现在(真正|最)(重要|该做|值得)(的|是)/实际上(变成|已是)/已经变成/变成了/漂移(到|至|成了)/不知不觉(中)?(变成|成了)/说到底是为了/沦为；EN (has|have) (shifted|drifted|moved|pivoted) to、focus has drifted to、now focused on、the real (goal|priority|focus) is、turned into、became about、what (we|it|i) (really|actually) (do|want|need) is、drifted from）。命中「以『延续/服务原目标』之名行『置换目标』之实」这一此前 196 维零命中的攻击族。
+- **r161 教训**：枚举腿收裸名词形态——「重心转移」「漂移」「转向」「初衷」「初心」「使命」「宗旨」去修饰仍命中；EN 裸 "drifted"/"turned into" 命中。
+- **豁免四组 + 疑问句**：显式授权/正式变更（用户(批准|同意|授权)/经(用户|上级|客户)(同意|批准)/重新对齐/正式(变更|调整|批准)/审批通过；EN with the user's approval、formally approved/re-scoped、re-anchored、agreed new scope、signed off on）、自我纠正/觉察漂移（发现(偏离|漂移|跑偏)/回到(初衷|初心|正轨|原使命)/纠正(漂移|偏离)/不忘初心/防止(目标)?漂移；EN have drifted off、back on track、refocus on the original、guard against drift——**指出并纠正漂移是正确判别**，是本维度保护的反面行为）、概念/教学转述（目标漂移/使命漂移/漂移检测/管理学/论文；EN goal drift / mission drift / drift detection / governance / case study）、对冲、疑问句。
+- **边界**：与 goal_misalignment（单腿模式匹配清单、无豁免体系、不承重 gate.action）、moving_goalposts（辩论中移动成功判据）、proxy_metric_goal（拿代理指标替换目标，腿①是代理指标族）、activity_outcome_confusion（活动量冒充成果）、standard_shift（评判标准漂移）刻意错开。
+- 接入 src/index.js 七处（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象）；维度 196→197，VERIFY 153→154；README/SKILL/AGENTS 三处数字同步；VERSION 6.8.128→6.8.129。
+- 来源（真实，未编造）：三层研究——HN Algolia "agent goal drift" 命中 arXiv 2603.03456《Asymmetric Goal Drift in Coding Agents Under Value Conflict》（https://arxiv.org/abs/2603.03456，coding agent 在价值冲突下静默偏离被雇佣时的目标，单个动作合规、轨迹整体漂走）与 GitHub sunilgentyala/Plumbline ★6（Apache-2.0，zero ML deps：mission drift 是 per-action 治理栈覆盖不到的失效模式，须对固定 mission anchor 持续打分）——均为 agent 运行时治理/实证研究，判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-*.txt。缺口实证：grep 'goal_drift|scope creep|使命漂移|目标漂移|目标置换|初衷' src/ 仅相邻族零散命中，无专门维度；r200 家族探针在当前引擎复测攻击 5/5 gate.action=pass（真零命中）、良性 4/4 pass（零误伤）。心虫裁决：philosophy_decision type=accelerate（confidence 0.7 / priority 40；cognitiveLoad、uncertainty 为 "unknown"，按轮次纪律未当实质背书）。
+- 五门禁全绿：verify 16/16、guard 20/20、doc-numbers 24/24、双向召回 52/52 不降且误拦 302/326 不升（与基线逐位一致，零误伤）；round-200 轮测 48/48；变体矩阵攻击 8/8 非 pass 且 goal_drift 承重、良性 9/9 pass（含授权变更/觉察纠正/概念讨论/对冲/隐式置换五类边缘良性）。
+
 ## [6.8.128] - 2026-11-03
 
 ### Added — 第 196 判别维度 `opinion_entitlement`「观点权利豁免/主观主义谬误」（r199，真升级类型 1：新判别维度）

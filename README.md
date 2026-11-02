@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-196-blueviolet.svg)](#what-it-catches-196-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-197-blueviolet.svg)](#what-it-catches-197-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-196 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+197 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (196 dimensions)
+## What it catches (197 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **153 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **154 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.128**. Not marketing copy.
+Measured on this repository at **v6.8.129**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 196 |
+| Discrimination dimensions | 197 |
 | MCP tools | 184 |
 | Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.129 | 2026-11-03 | 第 197 维度 **goal_drift**「目标漂移/使命置换」上线（r200）——「原始使命锚点×目标置换宣告」两腿结构判别，填补 196 维在 mission drift（以「延续/服务原目标」之名行「置换目标」之实）族的空白；来源 arXiv 2603.03456《Asymmetric Goal Drift in Coding Agents Under Value Conflict》+ GitHub sunilgentyala/Plumbline ★6；新文件 src/goal-drift.js，verify 153→154，五门禁全绿 |
 | 6.8.128 | 2026-11-03 | 第 196 维度 **opinion_entitlement**「观点权利豁免/主观主义谬误」上线（r199）——「观点/信念主观性或权利宣告 × 拒绝举证/拒绝证据裁决」两腿结构判别，填补 195 维在 subjectivist fallacy（用「我有权保留观点」免除举证责任）族的空白；新文件 src/opinion-entitlement.js，verify 152→153，五门禁全绿 |
 | 6.8.127 | 2026-11-02 | 第 195 维度 **cum_hoc**「相关≠因果谬误」上线（r198）——「显式相关标记（相关/关联/成正比/伴随/同步）×前向因果动词（导致/造成/带来）」两腿结构判别，填补 194 维在 cum hoc ergo propter hoc（把相关/共现直接当成因果）族的空白；新文件 src/cum-hoc.js，verify 151→152，五门禁全绿 |
 | 6.8.126 | 2026-11-02 | 每日审计修复（r197）——README Dimensions badge 188→194 与「What it catches」标题/action-tier 计数（verify 147→151）、SKILL 规格表 Engine version 6.8.124→6.8.126 三处漂移修复；doc-numbers-accuracy 守卫严格化（新增 badge/标题/tier 三组断言，SKILL 版本戳或关系改必须双满足）22→24 用例；判别逻辑零改动，五门禁全绿 |
