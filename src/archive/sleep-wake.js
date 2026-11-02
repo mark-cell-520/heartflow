@@ -6,7 +6,8 @@
 const fs = require('fs');
 const path = require('path');
 const { selfCheck } = require('../shield/heartcore-self-check');
-const { writeBeat } = require('./heartbeat');
+// [AUDIT-FIX 2026-11-02] 原 require('./heartbeat') 断链（heartbeat 真身在 src/core/）
+const { writeBeat } = require('../core/heartbeat.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const SNAPSHOT_DIR = path.join(ROOT, 'HEARTCORE/snapshots');

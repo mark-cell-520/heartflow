@@ -114,10 +114,11 @@ check('模块数 >= 40', () => {
   if (count < 40) throw new Error(`只有 ${count} 个模块，期望 >= 40`);
 });
 
-check('模块数 >= 124', () => {
+check('模块数 >= 150', () => {
   if (!engine) throw new Error('引擎未启动');
   const count = Object.keys(engine._modules || {}).length;
-  if (count < 124) throw new Error(`只有 ${count} 个模块，期望 >= 124`);
+  // [AUDIT-FIX 2026-11-02] 地板值 124→150：实测 162，原地板值失去回归意义
+  if (count < 150) throw new Error(`只有 ${count} 个模块，期望 >= 150`);
 });
 
 check('测试文件数 >= 10', () => {

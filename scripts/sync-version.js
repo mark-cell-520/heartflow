@@ -33,6 +33,27 @@ function syncSkill(version) {
   }
 }
 
+// [AUDIT-FIX 2026-11-02] version.js 的兜底常量（let VERSION = 'x.y.z'）此前无人管理：
+// runtime 读 VERSION 文件所以不报错，兜底值静默滞后（实测停过 6.8.120 落后两个版本）。
+// 兜底常量在 VERSION 文件丢失时是唯一版本源，必须同步。
+function syncVersionFallback(version) {
+  const vf = path.join(ROOT, 'src', 'core', 'version.js');
+  if (!fs.existsSync(vf)) return;
+  let content = fs.readFileSync(vf, 'utf-8');
+  const re = /let VERSION = '[^']*';/;
+  if (re.test(content)) {
+    const cur = content.match(re)[0];
+    const want = `let VERSION = '${version}';`;
+    if (cur !== want) {
+      content = content.replace(re, want);
+      fs.writeFileSync(vf, content);
+      console.log('Updated version.js fallback →', version);
+    } else {
+      console.log('version.js fallback already at', version);
+    }
+  }
+}
+
 function syncHeartflowBuildDate(version) {
   if (!fs.existsSync(HEARTFLOW_FILE)) return;
   let content = fs.readFileSync(HEARTFLOW_FILE, 'utf-8');
@@ -69,5 +90,6 @@ if (fs.existsSync(vf)) {
 
 syncPackage(version);
 syncSkill(version);
+syncVersionFallback(version);
 syncHeartflowBuildDate(version);
 console.log('Version sync complete:', version);

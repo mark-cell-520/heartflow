@@ -1,4 +1,33 @@
 
+# LOW 批次收尾轮报告（v6.8.122 — 2026-11-02）
+
+## 一、范围
+
+v6.8.120 全面审计轮（用户指令）遗留的 LOW 批次 + M10 门禁严格化 + 合并（v6.8.121）回归暴露项。用户指令「继续」。
+
+## 二、修复清单
+
+| # | 问题 | 修复 | 实测 |
+|---|---|---|---|
+| L4 | think() 并发互斥：_pendingInputCheck 实例字段跨 await 边界，并发 think 互相清掉/丢计数 | 改局部变量（heartflow.js 外零引用方） | 输入辨别合并 OK（情感操纵句 1 issue）+ 并发双 think ok |
+| L3 | archive 断链：sleep-wake.js require('./heartbeat') 指向不存在路径 | 改 '../core/heartbeat.js' | audit-missing-requires 待分类 1→0 |
+| L1 | v6.1.7 注释残留死行（try 体丢失、catch 被注释吸收） | 删除 | 语法过、冒烟过 |
+| M10 | doc-numbers 五处条件断言：行缺失/形状改名即静默跳过（守卫失守） | 先断言行存在再比对 | 22/22 仍全过=规格表形状完好 |
+| L6a | guard-abilities 注释「51 个 check 函数」过时 | →176 | — |
+| L6b | verify 模块数地板 124（实测 162，失去回归意义） | →150 | 16/16 |
+| L6c | sync-version.js 不管 version.js 兜底常量，实测停滞 6.8.120 落后两版本 | 新增 syncVersionFallback 自动同步 | bump 6.8.121→122 全源一致 |
+| 回归 | 合并暴露：verify.js 同步 stop() 先于 await 异步检查 → think 续跑撞 started 检查（16 必挂 1） | 停止引擎移至 Promise.all 后（merge commit 6572497f 已修，此处补录） | 16/16 |
+
+## 三、未修项（如实）
+
+- **start() 约 12 处关键路径实例化无 try/catch**：identityCore 等关键路径 fail-fast 是设计意图；批量包 try/catch 的回归风险大于理论收益（当前 162 模块 0 加载失败）。engine-initializer 路径已由 v6.8.121 远端提交修复（typeof 守卫 + _missingPhases）。留作文档化隐患，下一轮审计复核。
+- 未跑全量回归（遵禁令）；71 项存量失败未逐条归因。
+
+## 四、验证
+
+五门禁全绿 + 冒烟 restart ok + round-193 33/33 + security-audit 16/16 + fetch-safe 2/2 + progress-judgment 34/34 + 并发 think 双 ok + 断链 0 + sync --check 四份全绿。
+
+
 # r193 升级轮报告（v6.8.121 — 第 191 维度 ad_nauseam「诉诸重复」上线 — 2026-11-02）
 
 ## 方向

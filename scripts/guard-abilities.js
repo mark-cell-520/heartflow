@@ -5,7 +5,7 @@
  * 用户核心诉求：升级/优化可以，但绝不能破坏心虫现有能力。
  * 本脚本在任何升级提交前运行，自动验证核心能力基线：
  *
- * 1. 入口能力：index.js 的 51 个 check 函数 + gate/pipeline 的 checkInput/checkOutput
+ * 1. 入口能力：index.js 的 176 个 check 函数（[AUDIT-FIX 2026-11-02] 原注释 51 为 v6.x 早期值）+ gate/pipeline 的 checkInput/checkOutput
  * 2. 判别能力：对一组"标准样本"的判别结果必须与基线一致
  * 3. 引擎能力：think/dispatch 主链路可运行
  * 4. 全量回归记账：读 data/test-count.json 缓存（[r646] 起不再内联跑全量）

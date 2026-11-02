@@ -1,3 +1,27 @@
+## [6.8.122] - 2026-11-02
+
+### Fixed — LOW 批次收尾轮（v6.8.120 审计轮遗留 + 合并回归暴露项）
+
+- **think() 并发互斥**：`_pendingInputCheck` 实例字段跨 await 边界，并发 think() 互相清掉/丢计数（读-改-写无互斥）。改局部变量（heartflow.js 之外零引用方，安全）。实测：输入辨别合并仍在（情感操纵句 1 issue）+ 并发双 think 互不干扰。
+- **archive 断链清零**：src/archive/sleep-wake.js `require('./heartbeat')` → `require('../core/heartbeat.js')`；audit-missing-requires 待分类引用 1→0。
+- **v6.1.7 注释残留死行**：heartflow.js 中 `// [v6.1.7]    } catch (_) {...}`（try 体丢失、catch 被注释吸收，语法合法故从不报错）删除；能力后由 v6.4.6 接线承载。
+- **门禁严格化**：
+  - doc-numbers-accuracy.test.js 五处条件断言（`if (rows[X] !== undefined)` / `if (t)`）改为先断言行存在再比对——规格表形状漂移必须红灯，不能静默跳过。
+  - guard-abilities.js 过时注释「51 个 check 函数」→ 176。
+  - verify.js 模块数地板 124 → 150（实测 162，原地板值失去回归意义）。
+- **sync-version.js 补兜底常量同步**：src/core/version.js 的 `let VERSION` 兜底常量此前无人管理，实测静默停滞 6.8.120 落后两个版本（runtime 读 VERSION 文件所以不报错；兜底值是 VERSION 文件丢失时的唯一版本源）。新增 syncVersionFallback() 每次 bump 自动同步。
+- **合并回归修复**（v6.8.121 合入时暴露，已在 merge commit 6572497f 修复，此处补录）：openmem 先例查询在 think() 开头引入 await 边界后，verify.js「同步阶段 stop() → 之后 await 异步检查」顺序使 think 续跑撞 started 检查（16 项必挂 1 项）——停止引擎移至 Promise.all 完成后。
+
+### 未修（如实记录）
+
+- start() 约 12 处关键路径实例化无 try/catch：identityCore 等关键路径 fail-fast 是设计意图，批量包 try/catch 回归风险大于理论收益；engine-initializer 路径已由 v6.8.121 远端提交修复（typeof 守卫 + _missingPhases）。
+
+### Verification
+
+- 五门禁全绿：verify 16/16、guard 20/20、doc-numbers 22/22（严格化后仍全过=规格表形状完好）、bidirectional 52/52 误拦 302/326 不升。
+- 冒烟 restart ok、think 6 分支 initErrors=0；round-193 33/33、security-audit 16/16、fetch-safe 2/2、progress-judgment 34/34。
+- 单点：输入辨别合并 OK（1 issue）、并发 think 双 ok、audit-missing-requires 0 待分类、version.js 兜底 6.8.122。
+
 ## [6.8.121] - 2026-11-02
 
 ### Added — 第 191 维度 ad_nauseam「诉诸重复/反复断言冒充论据」上线（r193）

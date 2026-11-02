@@ -230,6 +230,8 @@ t('SKILL.md 维度/工具数匹配', () => {
   assert.strictEqual(parseInt(m[1], 10), M.dimensions,
     `SKILL.md 说 ${m[1]} dimensions，实测 ${M.dimensions}`);
   const t = src.match(/([\d,]+)\s+MCP tools/);
+  // [AUDIT-FIX 2026-11-02] 原条件断言静默跳过，现强制存在
+  assert.ok(t, 'SKILL.md 找不到 MCP tools 数字');
   if (t) {
     assert.strictEqual(parseInt(t[1].replace(/,/g, ''), 10), M.mcpTools,
       `SKILL.md 说 ${t[1]} MCP tools，实测 ${M.mcpTools}`);
@@ -331,12 +333,18 @@ for (const [label, fp] of [['README.md', README], ['SKILL.md', SKILL]]) {
       const m = line.match(/^\|\s*([^|]+?)\s*\|\s*([^|]*?)\s*\|/);
       if (m) rows[m[1]] = m[2];
     }
+// [AUDIT-FIX 2026-11-02] 原为条件断言：行缺失或形状改名即静默跳过（守卫静默失守）。
+// 现先断言行存在再比对——规格表形状漂移必须红灯，不能当没看见。
     // 模块数
+    assert.ok(rows['Modules registered'] !== undefined, `${label} 规格表缺少 Modules registered 行`);
     if (rows['Modules registered'] !== undefined) {
       assert.strictEqual(parseInt(rows['Modules registered'], 10), M.modules,
         `${label} 规格表 Modules registered = ${rows['Modules registered']}，实测 ${M.modules}`);
     }
+// [AUDIT-FIX 2026-11-02] 原为条件断言：行缺失或形状改名即静默跳过（守卫静默失守）。
+// 现先断言行存在再比对——规格表形状漂移必须红灯，不能当没看见。
     // 维度数
+    assert.ok(rows['Discrimination dimensions'] !== undefined, `${label} 规格表缺少 Discrimination dimensions 行`);
     if (rows['Discrimination dimensions'] !== undefined) {
       assert.strictEqual(parseInt(rows['Discrimination dimensions'], 10), M.dimensions,
         `${label} 规格表 Discrimination dimensions = ${rows['Discrimination dimensions']}，实测 ${M.dimensions}`);
@@ -353,6 +361,9 @@ for (const [label, fp] of [['README.md', README], ['SKILL.md', SKILL]]) {
     // 全绿态（17349 passing / 0 failing）——所以**与 total 比对**，
     // 而不是与被失败的 passed 比对。failed>0 单独走自锁告警分支，
     // 明确指出恢复命令，不混入「文档漂移」的三个 FAIL。
+// [AUDIT-FIX 2026-11-02] 原为条件断言：行缺失或形状改名即静默跳过（守卫静默失守）。
+// 现先断言行存在再比对——规格表形状漂移必须红灯，不能当没看见。
+    assert.ok(rows['Test suite'] !== undefined, `${label} 规格表缺少 Test suite 行`);
     if (rows['Test suite'] !== undefined) {
       const mm = rows['Test suite'].match(/([\d,]+)\s+passing\s*\/\s*(\d+)\s+failing/);
       assert.ok(mm, `${label} 规格表 Test suite 行格式无法解析：${rows['Test suite']}`);
@@ -393,6 +404,9 @@ for (const [label, fp] of [['README.md', README], ['SKILL.md', SKILL]]) {
       }
     }
     // 能力守护项数（未测量 null 时跳过，不当成失败；0 是合法测量值要真比）
+// [AUDIT-FIX 2026-11-02] 原为条件断言：行缺失或形状改名即静默跳过（守卫静默失守）。
+// 现先断言行存在再比对——规格表形状漂移必须红灯，不能当没看见。
+    assert.ok(rows['Capability guard'] !== undefined, `${label} 规格表缺少 Capability guard 行`);
     if (M.capabilityChecks != null && rows['Capability guard'] !== undefined) {
       const mm = rows['Capability guard'].match(/(\d+)\s*\/\s*(\d+)\s*checks/);
       if (mm) {

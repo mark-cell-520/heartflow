@@ -792,7 +792,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-02-6.8.121';
+const BUILD_DATE = '2026-11-02-6.8.122';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -4956,12 +4956,15 @@ class HeartFlow {
 
     // ─── [v6.3.6] 输入辨别检测——在核心推理前先用 outputChecklist 扫描输入 ──
     // 用户输入可能含预设陷阱（情感操纵/诱导/过度框架化），提前标记风险
-    // result 尚不存在，先存到 this._pendingInputCheck，run 后合并
+    // result 尚不存在，先存到局部变量，run 后合并。
+    // [AUDIT-FIX 2026-11-02] 原存 this._pendingInputCheck 实例字段：跨 await 边界+
+    // 并发 think() 时互相清掉/丢计数（读-改-写无互斥）。改局部变量后每次调用独立。
+    let _pendingInputCheck = null;
     try {
       if (this.outputChecklist && typeof input === 'string') {
         const inputCheck = this.outputChecklist.runChecklist(input, input, { _inputCheck: true });
         if (inputCheck && !inputCheck.passed) {
-          this._pendingInputCheck = {
+          _pendingInputCheck = {
             issues: inputCheck.warnings,
             blocked: inputCheck.recommendation === 'block' || inputCheck.recommendation === 'reject',
             full: inputCheck,
@@ -5077,16 +5080,16 @@ class HeartFlow {
       }
     }
     // ─── 合并输入辨别检测结果到 result ──
-    if (this._pendingInputCheck) {
+    if (_pendingInputCheck) {
       try {
         if (result) {
-          result._inputCheck = this._pendingInputCheck.full;
-          result._inputCheckIssues = this._pendingInputCheck.issues;
-          if (this._pendingInputCheck.blocked) {
+          result._inputCheck = _pendingInputCheck.full;
+          result._inputCheckIssues = _pendingInputCheck.issues;
+          if (_pendingInputCheck.blocked) {
             result._inputCheckBlocked = true;
           }
         }
-      } finally { this._pendingInputCheck = null; }
+      } finally { _pendingInputCheck = null; }
     }
     // [v6.2.7] 心虫的真正价值：拿规则引擎验证外部结论（LLM/用户输入）的自洽性
     // 这不是回答，是 AGI 需要的验证层——心虫的 31 条路由规则 + 决策验证引擎
@@ -5151,8 +5154,6 @@ class HeartFlow {
       const adv = this._adversarial.synthesize(input);
       if (adv && adv.ok && result) result.adversarialSynthesis = adv;
     } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '对抗推演失败不阻断主链路' }, MAX_HISTORY_SIZE); }
-
-    // [v6.1.7]    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: '元认知执行控制失败不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // [v6.1.7] 元认知诚实外显层: 基于校准结果显式说"我不确定", 不强行结论
     try {
