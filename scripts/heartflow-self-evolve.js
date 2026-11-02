@@ -37,11 +37,13 @@ function bumpVersion(v) {
   return parts.join('.');
 }
 
-function run(cmd) {
+function run(cmd, timeoutMs) {
   try {
     // [全局修复 2026-10-26] 默认 180s——execSync 不传 timeout 是无限等待，
     // cron 无人值守场景下 git/网络挂起会把整轮升级永久阻塞。
-    return execSync(cmd, { cwd: ROOT, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 180000 });
+    // [AUDIT-FIX 2026-11-02] 支持按命令覆盖超时：run-all.js 全量回归实测约 27 分钟，
+    // 180s 必被杀（配合 fail-closed 判据至少不会假放行，但直接给足超时更诚实）。
+    return execSync(cmd, { cwd: ROOT, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: timeoutMs || 180000 });
   } catch (e) {
     return (e.stdout || '') + (e.stderr || '');
   }
@@ -112,18 +114,29 @@ function main() {
   }
 
   // 测试套件必须通过（回归门禁）—— 动态统计
+  // [AUDIT-FIX 2026-11-02] 原门禁两个失效路径（全面审计 HIGH）：
+  // ① 判据 /(\d+) failed/ 只匹配英文行，而 run-all.js 汇总为中文「N 通过, M 失败」
+  //    → 失败永远抓不到，failedCount 恒 0；
+  // ② run() 的 180s 超时远短于 run-all 实测 27 分钟，execSync 超时被杀后输出
+  //    不含汇总行 → 同样 failedCount=0 → 「测试通过 ✓ (0 passed)」空放行，
+  //    继续走后面的 commit/push——静默失败比失败本身危险。
+  // 修法：中英双语判据 + 超时/无汇总行一律判失败（fail-closed）。
   console.log('[self-evolve] 运行测试套件...');
-  const testOut = run(`node ${path.join(TEST_DIR, 'run-all.js')} 2>&1`);
-  const failedM = /(\d+) failed/.exec(testOut);
+  const testOut = run(`node ${path.join(TEST_DIR, 'run-all.js')} 2>&1`, 30 * 60 * 1000);
+  // 双语失败判据：英文 "N failed" 与中文 "N 失败"（run-all 实际输出形态）
+  const failedM = /(\d+)\s+failed/.exec(testOut) || /(\d+)\s*失败/.exec(testOut);
   const failedCount = failedM ? parseInt(failedM[1], 10) : 0;
   // 取最终汇总行的通过数（run-all.js 最后一个 "测试结果: N 通过" 是总计）
   const allSummary = [...testOut.matchAll(/测试结果:\s*(\d+) 通过/g)];
   const passedCount = allSummary.length > 0
     ? parseInt(allSummary[allSummary.length - 1][1], 10)
     : 0;
+  // fail-closed：拿不到汇总行 = 超时被杀/解析失败，不允许当通过
+  const summaryMissing = allSummary.length === 0;
 
-  if (failedCount > 0) {
-    console.log('[self-evolve] 测试失败，中止自主升级（不引入回归）');
+  if (failedCount > 0 || summaryMissing) {
+    console.log('[self-evolve] 测试失败或未拿到汇总（超时/被杀），中止自主升级（不引入回归）');
+    if (summaryMissing) console.log('[self-evolve] ⚠️ run-all 未产出汇总行——180s 超时对全量回归（实测约27分钟）必然触发，请提高 timeout 或改用分片回归');
     console.log(testOut.slice(-800));
     process.exit(0);
   }

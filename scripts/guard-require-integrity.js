@@ -48,7 +48,10 @@ if (hasGit) {
     (function walk(d) {
       for (const e of fs.readdirSync(d, { withFileTypes: true })) {
         const p = path.join(d, e.name);
-        if (e.isDirectory()) { if (['node_modules', 'archive'].includes(e.name)) continue; walk(p); }
+        // [AUDIT-FIX 2026-11-02] 口径统一：无-git 模式原先跳过 archive，与 git 模式
+        //（ls-files 含 archive 15 文件）判据不同，冒烟误报。archive 内断链已修，
+        // 两模式现在都扫 archive。
+        if (e.isDirectory()) { if (['node_modules'].includes(e.name)) continue; walk(p); }
         else if (/\.js$/.test(e.name)) trackedJs.push(path.relative(ROOT, p));
       }
     })(base);

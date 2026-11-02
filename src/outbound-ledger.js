@@ -17,6 +17,9 @@ class OutboundLedger {
   constructor(opts = {}) {
     this.file = opts.file || LEDGER_FILE;
     this._buffer = [];
+    // [AUDIT-FIX 2026-11-02] _buffer 原只进不出：record() 每调用 push（mcp-server.js live），
+    // query 读文件不读 buffer，无任何清理。加 CAP + 逐出（条目已可从句柄文件查回，内存只留近期）。
+    this._bufferCap = opts.bufferCap || 500;
     this._ensureDir();
   }
 
@@ -41,6 +44,7 @@ class OutboundLedger {
       result: entry.result || '',
     };
     this._buffer.push(rec);
+    while (this._buffer.length > this._bufferCap) this._buffer.shift();
     fs.appendFileSync(this.file, JSON.stringify(rec) + '\n', 'utf-8');
   }
 

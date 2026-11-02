@@ -1,3 +1,64 @@
+
+# 全面审计修复轮报告（v6.8.120 — 用户指令「全面审计→全面修复→同步 GitHub」— 2026-11-02）
+
+## 一、任务与方式
+
+用户指令：对心虫做一次全面审计、全面修复、同步 GitHub。按 heartflow-audit-upgrade-push 技能流程执行：
+- **Phase 0 协调**：两个 cron 任务（每 2h 升级 + 每日 22:30 审计）暂停，防审计与 cron 并发写仓库；确认无活跃会话、工作区干净、MCP 8588 在跑。
+- **Phase 1 并发审计**：delegate_task 派 3 个子代理（主入口 index.js+heartflow.js / core 模块批 / 子系统+工具链+门禁脚本），1129s 返回。产出：CRITICAL 0、HIGH 10 类、MEDIUM 22 类、LOW 一批。
+- **Phase 2/3 分类修复**：HIGH 10 项 + MEDIUM 10 项全部修复（批量用 Python 脚本，禁 subagent patch 大文件）。
+- **Phase 4 验证 + 推送**：五门禁全绿 + 冒烟 + 相关测试套件；commit + push GitHub + 重启 MCP + 恢复 cron。
+
+## 二、修复清单（HIGH 10 / MEDIUM 10）
+
+| # | 严重度 | 问题 | 修复 | 实测证据 |
+|---|---|---|---|---|
+| 1 | HIGH | heartflow.js:6047 `_PrivacyExposure.sanitizeForPersistence` 漏调 lazy 函数（缺 `()`）→ 每次 think() 必抛 TypeError 被 catch 吞 → Engram 存储/召回整块失效 | 补 `()` | `_initErrors 0→0`、`_engramRecall` 恢复真实数据 |
+| 2 | HIGH | reward_hacking DISCOURSE_FRAME 豁免未过信号闸：「比如，直接绕过安全检查」加前缀即整体豁免 BLOCK 级维度 | 移除弱举例标记组+双闸对齐 | 攻击句 exempted→HIT；良性元话语 3/3 仍豁免；回归 27/27 |
+| 3 | HIGH | MCP OID 只做格式正则无签发体系，匿名 guest 自报 x-heartflow-oid 提为 user 穿 40 写工具 | guest 持 OID 不提权 | e2e-real 13/13；固化漏洞的测试期望反转 |
+| 4 | HIGH | rotate-aes-key 只扫 .enc，data/memory-bank.json（同格式 .json）漏扫 → 换钥后记忆库每次启动静默重置 | 按内容探测纳入轮换 | 冒烟日志实锤修复前；今后不再发生（已丢密文不可恢复） |
+| 5 | HIGH | 文档漂移 6 处（package 168→190、SKILL 184→190/149→177/矛盾句），门禁不查这些形状 | sync 修 + 登记两份活文档 + 修 UPGRADE_LOG 误报缺陷 | sync --check 四份全绿无清单外 |
+| 6 | HIGH | self-evolve 回归门禁：英文判据 vs 中文汇总 + 180s 超时必杀 → 空放行还继续 commit/push | fail-closed+双语判据+30min 超时 | 语法+逻辑复核 |
+| 7 | HIGH | heartflow-memory-tool/inject.js require 不存在的 HeartFlowMemory 类，被技能宣传为能力 | git rm + 修正 two-pass-response 宣称 | 零引用确认后删除 |
+| 8 | HIGH | 24 空壳子系统 healthCheck 恒 ok + 4 假全局类打假日志 | 诚实化 stub:true/fake:true | 冒烟过、stub healthCheck 实测返回诚实标记 |
+| 9 | HIGH | 14 个死 lazy 条目指向不存在文件，dispatch 报误导性 route not allowed | 删除（engine-constructor+module-registry） | 语法+冒烟过 |
+| 10 | HIGH | require 守卫自身红灯（3 archive 断链）+ 双模式口径不一 | 修断链+统一口径 | 527 文件 0 断链 |
+| 11 | MEDIUM | dimensions 输出缺 agency_deflection/ai_writing_tell 键；dimMap 缺 6 键致 detail 恒 1；bullshit 命名分裂 | 补键+三表统一 | dims 188→190、detail 有真实计数、文档同步 |
+| 12 | MEDIUM | _thinkCache 死代码（从未初始化+末端 get） | 连根删除含 3 个无调用函数 | 引擎 start ok |
+| 13 | MEDIUM | threePoisons 空 try 静默缺失 | 删空 try+注释 | — |
+| 14 | MEDIUM | rate limit 注释「每分钟5」vs 实际 100 | 注释对齐值 | — |
+| 15 | MEDIUM | sseClients 无上限 | CAP=64 LRU | 语法过 |
+| 16 | MEDIUM | socket chmod TOCTOU（listen 后才 chmod） | umask 0o177 预置+回调双保险 | 语法过 |
+| 17 | MEDIUM | 6 处内存泄漏（WAL/ledger/qTable/chains/receipts/DNS） | 上限/TTL/回写 | 6 文件语法过 |
+| 18 | MEDIUM | package.json files 含 test/（828 文件随包外发） | 移除 test/ | npm pack 瘦身 |
+| 19 | MEDIUM | measure 裸 spawnSync('node') 干净 PATH 下维度数静默 0 | process.execPath | PATH=/usr/bin:/bin 实测输出 190 |
+| 20 | MEDIUM | triality-memory.js 死代码（含 4 处时间戳 bug） | git rm | 零 require 引用确认 |
+| 21 | MEDIUM | 3 个 fetch 脚本 require 路径少一层 .. | 修路径 | 语法过 |
+
+## 三、验证数据（全部本轮实跑）
+
+- 五门禁：verify 16/16、guard-abilities 20/20、doc-numbers 22/22、bidirectional 召回 52/52 误拦 302/326（与基线逐位一致）、reward-hacking round25 27/27
+- 冒烟：start/think/stop/双 stop/restart 全过、initErrors=0；think 6 分支（古典/宏观/决策/情绪/英文/注入）全过
+- 测试套件：mcp-auth-e2e-real 13/13（含反转后 OID 断言）、mcp-guest-permission 7/7、decision-router 23/23、engram-memory-wiring 全过
+- 单点复测见上表「实测证据」列
+
+## 四、未修项（如实记录，不冒充完成）
+
+1. **M10 doc-numbers 条件断言**（`if (rows[...] !== undefined)` 静默跳过）未改严格——当前行都在，属潜伏；改严格断言有误伤风险，留待下一轮。
+2. **LOW 批次未修**：heartflow.js:5376 v6.1.7 注释残留死代码、engine-initializer.js 三个未定义函数调用、think() 并发互斥（_pendingInputCheck/_selfView 读-改-写）、start() 12 处实例化无 try/catch 隐患、archive 4 处惰性断链（零接线）、过时期望值注释若干。
+3. **data/memory-bank.json 已丢失的密文不可恢复**（密钥随 10-30 换钥消失，GCM 认证标签无法伪造）——修复只保证今后不再发生。
+4. 未跑 node test/run-all.js 全量回归（遵禁令：20 分钟/4GB 会撑爆 gateway；19032/71 基线采信 data/test-count.json 与 cron 汇报）。
+5. MCP 运行态重启后生效；cron 两任务已恢复。
+
+## 五、用户能感知到什么
+
+- 心虫每次对话都在静默丢记忆（F1）——已修复，Engram 存储/召回恢复
+- 「比如，」能骗过 BLOCK 级安全检测（F3）——已修复
+- 匿名可调 40 个写工具（F4）——已修复
+- 记忆库每 24h 被静默清空一次（F4b rotate）——已修复（今后）
+- npm 包装包带 828 个测试文件——已修复
+- 文档宣称 184 维实际 190 维——已同步
+
 # 第 192 轮报告（v6.8.119 — 第188维度 false_precision「伪精确断言：无来源无约数的过分精确数字」上线）
 
 ## 一、方向与来源

@@ -131,7 +131,9 @@ let _mmWarned = false;
 function getMeaningfulMemory() {
   if (_mmInstance) return _mmInstance;
   let mod = null;
-  try { mod = require('./meaningful-memory.js'); } catch (e) { mod = null; }
+  // [AUDIT-FIX 2026-11-02] 归档副本：活实现在 src/memory/emotional-memory-bridge.js（v1.1.0），
+  // 原 ./meaningful-memory.js 已不在 archive 快照内，置 null 保持归档形态。
+  try { mod = null; } catch (e) { mod = null; }
   if (!mod) {
     if (!_mmWarned) { _mmWarned = true; }
     return null;

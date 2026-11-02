@@ -12,7 +12,9 @@
  *  - 输出拦截信号：verified / confidence / issues / recommendation
  */
 
-const { factChecker } = require('./fact-checker.js');
+// [AUDIT-FIX 2026-11-02] 归档副本：fact-checker.js 已不在 archive 快照内（活实现
+// 经主树 fact-check 维度承接），置 null 保持归档形态不断链。
+const factChecker = null;
 
 function _tryRequire(p) {
   try {

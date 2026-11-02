@@ -256,7 +256,10 @@ class WriteAheadLog {
 
       }
 
+      // [AUDIT-FIX 2026-11-02] compaction 的 filter 结果此前只用于 newLines，
+      // 从不写回 this._pending——已提交条目永留内存（只进不出）。现写回。
       const uncommitted = this._pending.filter(p => !committed.has(p.seq));
+      this._pending = uncommitted;
 
       const newLines = uncommitted.map(p => {
 

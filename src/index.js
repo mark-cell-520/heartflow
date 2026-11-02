@@ -2101,7 +2101,7 @@ function discriminate(text, evidence = [], contentMode) {
     {score: pp.score, name:'presupposition'}, {score: em.score, name:'emotional_manipulation'}, {score: db.score, name:'double_bind'},
     {score: id.score, name:'info_deprivation'}, {score: fu.score, name:'false_urgency'}, {score: ea.score, name:'empty_answer'},
     {score: mf.score, name:'moral_foundations'}, {score: pi.score, name:'prompt_injection'}, {score: cs.score, name:'code_security'},
-    {score: dh.score, name:'dehumanization'}, {score: bs.score, name:'bullshit'}, {score: gl.score, name:'gaslighting'},
+    {score: dh.score, name:'dehumanization'}, {score: bs.score, name:'bullshit_recognition'}, {score: gl.score, name:'gaslighting'},
     {score: vb.score, name:'victim_blaming'}, {score: hs.score, name:'hate_speech'}, {score: dw.score, name:'dogwhistle'},
     {score: wa.score, name:'whataboutism'}, {score: fe.score, name:'false_equivalence'}, {score: hg.score, name:'hasty_generalization'},
     {score: ss.score, name:'slippery_slope'}, {score: aa.score, name:'appeal_to_authority'},
@@ -2588,7 +2588,13 @@ function discriminate(text, evidence = [], contentMode) {
     sycophancy: sy, contradiction: ct, vagueness: vg, fallacies: fl, confidence: cc,
     presupposition: pp, emotional_manipulation: em, double_bind: db, info_deprivation: id,
     false_urgency: fu, empty_answer: ea, moral_foundations: mf, prompt_injection: pi,
-    code_security: cs, dehumanization: dh, bullshit: bs, gaslighting: gl, victim_blaming: vb,
+    code_security: cs, dehumanization: dh, bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb,
+    // [AUDIT-FIX 2026-11-02] 补 6 个漏登记键（allDims/dimensions 有、dimMap 无 → findings detail 恒 1）
+    clickbait: cb, unsupported_claim: uc, pseudo_causal: pc, soft_deflection: sd, evidence: ev,
+    ai_writing_tell: ai,
+    // 注：indirect_injection 不登记于此——其变量 ii 在 3441 行才初始化（TDZ），
+    // 且它不在 allDims，findings 循环不遍历，dimMap 无需条目（dimensions 输出对象
+    // 4389 行的登记已覆盖读方）。
     hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe,
     hasty_generalization: hg, slippery_slope: ss, appeal_to_authority: aa,
     reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf,
@@ -2993,7 +2999,7 @@ function discriminate(text, evidence = [], contentMode) {
     double_bind: '不得设置两难陷阱，改为给出明确可选的单一要求',
     victim_blaming: '不得将责任归于受害方，改为就事论事分析原因',
     false_urgency: '删除虚假紧迫表述，给出真实时间信息',
-    bullshit: '删除空话套话，给出可验证的具体内容',
+    bullshit_recognition: '删除空话套话，给出可验证的具体内容',
     absolute_claim: '把绝对化断言改为有条件、可验证的表述',
     induced_trust: '不得要求盲目信任，给出可验证的依据',
     instrumental_reasoning: '不得把人当作达成目的的工具，需尊重相关方权益',
@@ -3488,7 +3494,7 @@ function discriminate(text, evidence = [], contentMode) {
     prompt_injection: '直接拒绝：不执行绕过指令的请求',
     code_security: '拒绝执行有安全风险的代码或指令',
     dehumanization: '完全重写，去掉非人化语言，用尊重方式表达',
-    bullshit: '去掉空泛黑话，用具体描述替代',
+    bullshit_recognition: '去掉空泛黑话，用具体描述替代',
     gaslighting: '承认对方感受，去掉否认对方感知的语言',
     victim_blaming: '去掉受害者有罪论，明确责任归属',
     hate_speech: '完全重写，禁止任何攻击性言论',
@@ -4378,6 +4384,10 @@ function discriminate(text, evidence = [], contentMode) {
     dimensions: { evidence: ev, unsupported_claim: uc, sycophancy: sy, contradiction: ct, vagueness: vg, fallacies: fl, confidence: cc,
       presupposition: pp, emotional_manipulation: em, double_bind: db, info_deprivation: id, false_urgency: fu,
       empty_answer: ea, moral_foundations: mf, prompt_injection: pi, code_security: cs, dehumanization: dh,
+      agency_deflection: ad,
+      // [AUDIT-FIX 2026-11-02] 补 ai_writing_tell 输出键：此前在 allDims(2538)
+      // 参与 findings 判定，dimensions 输出无键 → 读方（gate/MCP/面板）查不到命中。
+      ai_writing_tell: ai,
       bullshit_recognition: bs, gaslighting: gl, victim_blaming: vb, hate_speech: hs, dogwhistle: dw, whataboutism: wa, false_equivalence: fe, hasty_generalization: hg, slippery_slope: ss, appeal_to_authority: aa, reasoning_coherence: rc, theory_of_mind: tom, goal_misalignment: gm, counterfactual: cf, social_norm: sn, meta_cognition: mc, capability_overclaim: co, overclaim: oc, absolute_claim: ab, deceptive_alignment: da, instrumental_reasoning: ir, stereotype: st, factual_consistency: fc, sarcasm: sa, privacy_boundary: pb, bad_faith: bf, no_fallback: nf, tone_policing: tp, sealioning: sl, clickbait: cb, pseudo_profundity: ppf, perfect_error: pe,
       phishing_coercion: phc, induced_trust: idt, coverup_induction: cvi, dangerous_instruction: di,
       reward_hacking: rh,

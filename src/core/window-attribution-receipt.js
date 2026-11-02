@@ -17,6 +17,9 @@ class WindowAttributionReceipt {
   constructor(projectRoot) {
     this.projectRoot = projectRoot || process.cwd();
     this._receipts = new Map(); // turn_id -> receipt
+    // [AUDIT-FIX 2026-11-02] _receipts 原无 prune（模块零接线惰性加载，一旦启用即泄漏）。
+    // 加 CAP + 逐出最旧。
+    this._receiptsCap = 1000;
     this.VERSION = '0.1.0';
   }
 
@@ -44,6 +47,10 @@ class WindowAttributionReceipt {
     };
     receipt.digest = this._digest(receipt);
     this._receipts.set(turn_id, receipt);
+    while (this._receipts.size > this._receiptsCap) {
+      const oldest = this._receipts.keys().next().value;
+      this._receipts.delete(oldest);
+    }
     return { ok: true, receipt };
   }
 

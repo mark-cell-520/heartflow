@@ -135,24 +135,21 @@ function initializeConfig(hf, config) {
 }
 
 function initializeLazyRegistry(hf) {
+// [AUDIT-FIX 2026-11-02] 删除 14 个死 lazy 条目（文件全仓不存在，加载必 MODULE_NOT_FOUND，
+// dispatch 报误导性的 route not allowed）：planner 族 8（adaptive-planner/strategy-selector/
+// replan-trigger/curiosity-engine/desire-engine/goal-pursuer/self-initiator/hierarchical-planner）、
+// code 族 4（code-executor/code-planner/code-writer/code-self-debug）、memory 族 2
+// （session-memory/cross-session-index）。真能力在 heartflow.js 的 _lazy 体系（含 stub 兜底）。
+
   hf._lazy = {
-    adaptivePlanner: { lazy: true, path: '../planner/adaptive-planner.js', Ctor: 'AdaptivePlanner', args: {} },
-    strategySelector: { lazy: true, path: '../planner/strategy-selector.js', Ctor: 'StrategySelector', args: {} },
-    replanTrigger: { lazy: true, path: '../planner/replan-trigger.js', Ctor: 'ReplanTrigger', args: {} },
     experienceCollector: { lazy: true, path: '../cortex/experience-collector.js', Ctor: 'ExperienceCollector', args: {} },
     strategyAdapter: { lazy: true, path: '../cortex/strategy-adapter.js', Ctor: 'StrategyAdapter', args: {} },
     failureAnalyzer: { lazy: true, path: '../cortex/failure-analyzer.js', Ctor: 'FailureAnalyzer', args: {} },
     qualityVerifier: { lazy: true, path: '../verifier/quality-verifier.js', Ctor: 'QualityVerifier', args: {} },
     outputChecker: { lazy: true, path: '../verifier/output-checker.js', Ctor: 'OutputChecker', args: {} },
     patternMatcher: { lazy: true, path: '../verifier/pattern-matcher.js', Ctor: 'PatternMatcher', args: {} },
-    curiosityEngine: { lazy: true, path: '../planner/curiosity-engine.js', Ctor: 'CuriosityEngine', args: {} },
-    desireEngine: { lazy: true, path: '../planner/desire-engine.js', Ctor: 'DesireEngine', args: {} },
-    goalPursuer: { lazy: true, path: '../planner/goal-pursuer.js', Ctor: 'GoalPursuer', args: {} },
-    selfInitiator: { lazy: true, path: '../planner/self-initiator.js', Ctor: 'SelfInitiator', args: {} },
-    sessionMemory: { lazy: true, path: '../memory/session-memory.js', Ctor: 'SessionMemory', args: {} },
     projectContext: { lazy: true, path: '../memory/project-context.js', Ctor: 'ProjectContext', args: {} },
     longTermMemory: { lazy: true, path: '../memory/long-term-memory.js', Ctor: 'LongTermMemory', args: {} },
-    crossSessionIndex: { lazy: true, path: '../memory/cross-session-index.js', Ctor: 'CrossSessionIndex', args: {} },
     knowledgeBase: { lazy: true, path: '../reasoning/knowledge-base.js', Ctor: 'KnowledgeBase', args: {} },
     commonsenseEngine: { lazy: true, path: '../reasoning/commonsense-engine.js', Ctor: 'CommonsenseEngine', args: {} },
     causalInference: { lazy: true, path: '../reasoning/causal-inference.js', Ctor: 'CausalInference', args: {} },
@@ -161,9 +158,6 @@ function initializeLazyRegistry(hf) {
     desireSystem: { lazy: true, path: '../emotion/desire-system.js', Ctor: 'DesireSystem', args: {} },
     emotionalGrowth: { lazy: true, path: '../emotion/emotional-growth.js', Ctor: 'EmotionalGrowth', args: {} },
     moodEvolution: { lazy: true, path: '../emotion/mood-evolution.js', Ctor: 'MoodEvolution', args: {} },
-    codeExecutor: { lazy: true, path: '../code/code-executor.js', Ctor: 'CodeExecutor', args: { hf: null } },
-    codePlanner: { lazy: true, path: '../code/code-planner.js', Ctor: 'CodePlanner', args: { hf: null } },
-    codeWriter: { lazy: true, path: '../code/code-writer.js', Ctor: 'CodeWriter', args: {} },
     knowledgeGraph: { lazy: true, path: '../memory/knowledge-graph.js', Ctor: 'KnowledgeGraph', args: { dataDir: null } },
     bigFive: { lazy: true, path: '../identity/BigFivePersonality.js', Ctor: '', args: {} },
     empathy: { lazy: true, path: '../identity/EmpathyAssessment.js', Ctor: '', args: {} },
@@ -185,12 +179,10 @@ function initializeLazyRegistry(hf) {
     // [v6.8.86] 路径修正：真身在 src/shield/ 下
     auditLogger: { lazy: true, path: '../shield/audit-logger.js', Ctor: 'AuditLogger', args: {} },
     focusOfAttention: { lazy: true, path: '../memory/focus-of-attention.js', Ctor: 'FocusOfAttention', args: {} },
-    codeSelfDebug: { lazy: true, path: '../code/code-self-debug.js', Ctor: 'CodeSelfDebug', args: {} },
     reflexionEngine: { lazy: true, path: '../cortex/reflexion-engine.js', Ctor: 'ReflexionEngine', args: {} },
     memoryConsolidator: { lazy: true, path: '../memory/memory-consolidator.js', Ctor: 'MemoryConsolidator', args: {} },
     multiAgentDialogue: { lazy: true, path: '../consciousness/multi-agent-dialogue.js', Ctor: 'MultiAgentDialogue', args: {} },
     mctsReasoning: { lazy: true, path: '../reasoning/mcts-reasoning.js', Ctor: 'MCTSReasoning', args: {} },
-    hierarchicalPlanner: { lazy: true, path: '../planner/hierarchical-planner.js', Ctor: 'HierarchicalPlanner', args: {} },
   };
 }
 

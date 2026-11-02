@@ -9,7 +9,9 @@
 let _bsb = null;
 function _getBSB() {
   if (!_bsb) {
-    _bsb = require('../../cortex/blind-spot-breaker.js');
+    // [AUDIT-FIX 2026-11-02] 归档副本：活实现在 src/core/hooks/blind-spot-breaker-hook.js，
+    // 原 cortex/blind-spot-breaker.js 已被主树重构移除，归档快照保留历史形态不断链。
+    _bsb = null;
   }
   return _bsb;
 }

@@ -18,7 +18,7 @@ const reg = fs.readFileSync(path.join(ROOT, 'src/mcp/tools-registry.js'), 'utf8'
 let dimCount = 0, dimNames = [];
 try {
   const cp = require('child_process');
-  const r = cp.spawnSync('node', ['-e', `
+  const r = cp.spawnSync(process.execPath, ['-e', `
     const path=require('path');
     const {discriminate}=require('${path.join(ROOT, 'src/index.js')}');
     const d=discriminate('neutral baseline text');
@@ -75,7 +75,7 @@ let handlers = 0;
 let routes = 0;
 {
   const cp = require('child_process');
-  const r = cp.spawnSync('node', ['-e', `
+  const r = cp.spawnSync(process.execPath, ['-e', `
     const path=require('path');
     const {HeartFlow}=require('${path.join(ROOT, 'src/core/heartflow.js')}');
     const hf=new HeartFlow({dataDir:'${path.join(ROOT, 'data')}',silent:true});
@@ -89,7 +89,7 @@ let routes = 0;
 let modules = 0;
 try {
   const cp = require('child_process');
-  const r = cp.spawnSync('node', ['-e', `
+  const r = cp.spawnSync(process.execPath, ['-e', `
     const path=require('path');
     const {HeartFlow}=require('${path.join(ROOT, 'src/core/heartflow.js')}');
     const hf=new HeartFlow({dataDir:'${path.join(ROOT, 'data')}',silent:true});

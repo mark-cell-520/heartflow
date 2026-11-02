@@ -48,7 +48,7 @@ const ROOT = path.resolve(__dirname, '..');
 /** 运行时实测全部数字（唯一真相，量不到就拒绝记账） */
 function measure() {
   // 一次子进程同时量 工具/路由/模块/维度/tier —— 共享 4 秒的 start() 启动成本
-  const r = cp.spawnSync('node', ['-e', [
+  const r = cp.spawnSync(process.execPath, ['-e', [
     "const {HeartFlow}=require(" + JSON.stringify(path.join(ROOT, 'src/core/heartflow.js')) + ");",
     "const hf=new HeartFlow({dataDir:" + JSON.stringify(path.join(ROOT, 'data')) + ",silent:true});",
     "hf.start();",
@@ -142,6 +142,12 @@ function measure() {
  * 「previously claimed」）是当时的事实，不在这份清单里。
  */
 const TARGETS = [
+  // [AUDIT-FIX 2026-11-02] 登记两份清单外活文档（全面审计抓到 CONTRIBUTING.md 121≠188、
+  // CURRENT_STATE.md 128≠161 两处漏网漂移）：形状没登记过的句子 sync 一律视为无漂移，
+  // 报绿 ≠ 真一致。修文档同时登记 pattern，今后自动同步。
+  { num: 'dims', re: /(The )(\d+)( discrimination dimensions live in)/, docs: ['CONTRIBUTING.md'] },
+  { num: 'modules', re: /(审计状态 \| status running, )(\d+)( modules)/, docs: ['CURRENT_STATE.md'] },
+  { num: 'tests', re: /(审计状态 \| status running, \d+ modules, )(\d+)( tests passed \/ )(\d+)( failed)/, docs: ['CURRENT_STATE.md'] },
   // ── 工具数 ──
   // AGENTS.md 横幅：... 60 MCP tools, 1,761 dispatch routes.
   // 注意：工具数与路由数在同一行但**分两个捕获组**，合成一条正则会把
@@ -467,7 +473,11 @@ function main() {
       模块数: String(want.modules),
     };
     const SKIP = ['node_modules', '/.git', '/data', '/docs', '/scratch', '/archive', '/references', '/skills'];
-    const KNOWN = ['AGENTS.md', 'README.md', 'SKILL.md', 'package.json'];
+    // [AUDIT-FIX 2026-11-02] UPGRADE_LOG.md/CHANGELOG.md 是逐轮追加的历史档案：
+    // 每轮报告记录**当时的**维度/工具数（如「第 713 轮 v6.8.59 143 维」），mtime 新
+    // 但内容是历史快照，无「Version history」标题可截断。兜底扫描会把它们全量
+    // 误报成漂移噪声。加入 KNOWN 排除（它们由各轮次报告自身保证一致性）。
+    const KNOWN = ['AGENTS.md', 'README.md', 'SKILL.md', 'package.json', 'UPGRADE_LOG.md', 'CHANGELOG.md'];
     const out = [];
     (function walk(dir) {
       let es;

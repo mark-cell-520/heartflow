@@ -16,6 +16,8 @@ function _boundedPush(arr, item, maxSize = 500) {
 
 // ─── Special module registry (v5.8.0) ────────────────────────────────────────
 // entry: { type: 'object'|'ctor'|'ctor-hf'|'ctor-path'|'ctor-args'|'special', factory: Function|string, path?, ctor?, args? }
+// [AUDIT-FIX 2026-11-02] 移除 4 个指向不存在文件的死条目（session-memory/cross-session-index/
+// code-executor/code-planner 全仓不存在，与 engine-constructor.js 同类清理同步）。
 const SPECIAL_MODULES = {
   bigFive:         { type: 'object',  factory: () => require('../identity/BigFivePersonality.js') },
   empathy:         { type: 'object',  factory: () => require('../identity/EmpathyAssessment.js') },
@@ -35,12 +37,12 @@ const SPECIAL_MODULES = {
   adaptivePlanner: { type: 'special', factory: 'adaptivePlanner' },
   strategyAdapter: { type: 'special', factory: 'strategyAdapter' },
   knowledgeBase:   { type: 'ctor-args', factory: () => ({ path: '../reasoning/knowledge-base.js', ctor: 'KnowledgeBase', args: { storagePath: path.join(__dirname, '..', '..', 'data', 'knowledge') } }) },
-  sessionMemory:   { type: 'ctor-args', factory: () => ({ path: '../memory/session-memory.js', ctor: 'SessionMemory', args: { storagePath: path.join(__dirname, '..', '..', 'data', 'sessions') } }) },
+
   projectContext:  { type: 'ctor-args', factory: () => ({ path: '../memory/project-context.js', ctor: 'ProjectContext', args: { storagePath: path.join(__dirname, '..', '..', 'data', 'projects') } }) },
   longTermMemory:  { type: 'ctor-args', factory: () => ({ path: '../memory/long-term-memory.js', ctor: 'LongTermMemory', args: { storagePath: path.join(__dirname, '..', '..', 'data', 'longterm') } }) },
-  crossSessionIndex:{ type: 'ctor-args', factory: () => ({ path: '../memory/cross-session-index.js', ctor: 'CrossSessionIndex', args: { storagePath: path.join(__dirname, '..', '..', 'data', 'cross-session') } }) },
-  codeExecutor:    { type: 'ctor-hf',  factory: () => ({ path: '../code/code-executor.js', ctor: 'CodeExecutor', args: { hf: null } }) },
-  codePlanner:     { type: 'ctor-hf',  factory: () => ({ path: '../code/code-planner.js', ctor: 'CodePlanner', args: { hf: null } }) },
+
+
+
 };
 
 function createSpecialModule(subsystem, hf) {

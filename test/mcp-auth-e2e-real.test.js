@@ -154,13 +154,16 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   }
 
   // ── 5. OID header → user 档 ──
-  console.log('\n【5】OID header → 至少 user 档');
+  // [AUDIT-FIX 2026-11-02] 原断言「持 OID 可过写权限门槛（user 档）」固化的正是
+  // 全面审计判定的 HIGH 漏洞：OID 只做格式正则无签发体系，匿名自报即提权。
+  // 现行为：无 token 仅持 OID → guest 档，写工具被「权限不足」拦截。
+  console.log('\n【5】无 token 仅持 OID → guest 档，写工具应被拦');
   const oid = 'HeartFlow-OID-' + crypto.randomBytes(8).toString('hex');
   const r = await rpc('tools/call', { name: 'heartflow_memory_write_control', arguments: {} },
     { ...initHdr, 'x-heartflow-oid': oid }, PORT);
   let blocked = false;
   try { blocked = /权限不足/.test(JSON.parse(r.body).result.content[0].text); } catch (_) {}
-  T('持 OID 可过写权限门槛（user 档）', !blocked, blocked ? '仍被拦' : `HTTP ${r.status}`);
+  T('无 token 仅持 OID 写工具被拦（guest 档）', blocked, blocked ? `HTTP ${r.status}` : '竟被放行');
 
   // ── 收尾 ──
   child.kill('SIGTERM');

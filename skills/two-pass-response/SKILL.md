@@ -235,7 +235,7 @@ Layer 1 在后台运行，Layer 2 是可见的心虫自省输出。两者同时�
 | 层 | 文件 | 修改内容 |
 |---|---|---|
 | 推理引擎输出 | thought-chain.js | 假设描述去掉"最可能/相关的标准解释"等身份语言 |
-| 记忆注入 | heartflow-memory-inject.js | 去掉身份记忆、对话记录、梦境记录、装饰标题 |
+| 记忆注入 | plugins/heartflow-memory-inject.py（Hermes 插件层，js 伴生脚本已于 2026-11-02 审计删除：其依赖的 HeartFlowMemory 类全仓无实现） | 去掉身份记忆、对话记录、梦境记录、装饰标题 |
 | MCP 输出 | mcp-server.js | 所有 handler 返回中去掉 version 字段 |
 | 引擎启动响应 | heartflow.js | 状态响应从展示内部状态→仅版本和模块数 |
 

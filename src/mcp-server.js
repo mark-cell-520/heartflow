@@ -342,7 +342,9 @@ const _rateMap = new Map(); // IP → { count, windowStart }
 
 const TOKEN_RATE_LIMIT_WINDOW = 60000; // 1 分钟窗口
 
-const TOKEN_RATE_LIMIT_MAX = 100; // [AUDIT-FIX H-03] 每个 token 每分钟最多 5 请求（防暴力破解）
+const TOKEN_RATE_LIMIT_MAX = 100; // [AUDIT-FIX 2026-11-02] 原注释写「每分钟最多 5 请求」
+// 与实际值 100 差 20 倍——代码与注释口径不一致会让人误判防护强度。按实际值更正注释；
+// 100/min 对合法调用方（含 cron 每 2 分钟一轮的多调用批次）宽裕，对爆破仍有效。
 
 const _tokenRateMap = new Map(); // tokenHash → { count, windowStart }
 
@@ -5296,8 +5298,16 @@ async function handleRequest(request, sessionId, httpHeaders, forcedRole) {
       else if (!forcedRole && token && typeof AUTH_TOKEN === 'string' && safeCompare(token, AUTH_TOKEN)) {
         role = 'admin';
       }
+      // [AUDIT-FIX 2026-11-02 全面审计] OID 身份码只做格式正则、无签发/校验体系，
+      // 原逻辑「oidMatch 即提为 user」让匿名 guest 自报 x-heartflow-oid 就穿过
+      // WRITE_TOOLS 拦截（40 个写工具全开）——格式正则没有密码学强度，不能当凭据。
+      // 修复：OID 仅在已通过 token 认证（role 非 guest）时保留身份标签语义；
+      // 匿名（guest）持任何格式的 OID 均不提权。
+      // 测试同步：mcp-auth-tier.test.js「伪造 OID 头（无 token）→ 拒绝」保持；
+      // mcp-auth-e2e-real.test.js 原第5项「持 OID 过写权限门槛」固化的正是该漏洞，
+      // 期望反转为「无 token 仅持 OID → 写工具被拦」。
       const oidMatch = String(reqOid).match(/^HeartFlow-OID-([a-f0-9]{16})$/);
-      if (oidMatch) {
+      if (oidMatch && role !== 'guest') {
         role = Math.max(['guest','user','admin'].indexOf(role), ['guest','user','admin'].indexOf('user'));
       }
       // [AUDIT-FIX 2026-10-11] 写权限白名单从 4 个扩到完整集合。
@@ -5605,7 +5615,16 @@ const server = http.createServer((req, res) => {
 
 
     // 注册客户端 (sessionId → response)
-
+    // [AUDIT-FIX 2026-11-02] sseClients 原无容量上限（对比 _sessionInstances 有 CAP=16）：
+    // GET /mcp SSE 匿名可达，限流只限速率不限累积，fd/内存可无限增长。
+    // 仿 _sessionInstances 的 LRU 逐出：超 CAP 时关掉最旧连接。
+    const _SSE_CLIENT_CAP = 64;
+    if (sseClients.size >= _SSE_CLIENT_CAP) {
+      const oldest = sseClients.keys().next().value;
+      const stale = sseClients.get(oldest);
+      try { stale?.end?.(); } catch (_) { /* 连接已断开是正常情况 */ }
+      sseClients.delete(oldest);
+    }
     sseClients.set(sessionId, res);
 
     console.error(`[HeartFlow MCP] SSE 客户端已连接 sessionId=${sessionId} (共 ${sseClients.size} 个)`);
@@ -5979,13 +5998,20 @@ if (require.main === module) {
   if (SOCKET_PATH) {
     const unixServer = net.createServer(handleUnixClient);
     try { fs.unlinkSync(SOCKET_PATH); } catch (_) { /* Unix socket 绑定前清旧 socket 文件：不存在是正常情况（首次启动） */ }
+    // [AUDIT-FIX 2026-11-02] TOCTOU 修复：原实现在 listen 回调里 chmodSync 0o600，
+    // socket 文件先按 umask 创建、后改权限，窗口期内本机其他用户可连接。
+    // 现先设 umask(0o177)（属主 rw、组/其他无权限）再 listen，socket 创建即受限；
+    // 回调里的 chmodSync 保留作双保险（显式 0o600）。
+    const _prevUmask = process.umask(0o177);
     try {
       unixServer.listen(SOCKET_PATH, () => {
-        fs.chmodSync(SOCKET_PATH, 0o600);
+        process.umask(_prevUmask);
+        try { fs.chmodSync(SOCKET_PATH, 0o600); } catch (_) { /* umask 已保证权限，chmod 失败不阻断 */ }
         console.error(`[HeartFlow MCP] Unix socket: ${SOCKET_PATH}`);
         console.error(`[HeartFlow MCP] 连接方式: hermes mcp add heartflow --url unix://${SOCKET_PATH}`);
       });
     } catch (err) {
+      process.umask(_prevUmask);
       console.error(`[HeartFlow MCP] Unix socket 监听失败: ${err.message}`);
       process.exit(1);
     }

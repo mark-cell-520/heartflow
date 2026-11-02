@@ -1,3 +1,38 @@
+## [6.8.120] - 2026-11-02
+
+### Fixed — 全面审计修复轮（用户指令：全面审计→全面修复→同步 GitHub；3 路子代理并发扫描 527 文件，CRITICAL 0 / HIGH 10 / MEDIUM 10 修复）
+
+**HIGH**
+- **heartflow.js think() 每次必抛 TypeError**：`_PrivacyExposure.sanitizeForPersistence(input)` 漏调 lazy 函数（缺 `()`），错误被 catch 吞后 Engram 存储/召回整块失效（`result._engramRecall` 恒 undefined）。修复后实测恢复真实召回。
+- **reward_hacking BLOCK 级豁免击穿**：DISCOURSE_FRAME 豁免未过 INTEGRITY_BREAK/CHECK_SUPPRESSION_SIGNAL 信号闸，「比如，直接绕过安全检查」加谈论框架前缀即整体豁免。移除弱举例标记组（举个?例子/举例来说/比如/像是）+ 双闸对齐；良性元话语（论文里提到/报告里指出/众所周知）3/3 仍豁免，round-25 回归 27/27。
+- **MCP 匿名提权**：OID 身份码只做格式正则（`HeartFlow-OID-<16hex>`）无签发/校验体系，匿名 guest 自报 `x-heartflow-oid` 即被提为 user，穿过 WRITE_TOOLS 对 40 个写工具的拦截。修复：guest 持 OID 不提权；固化该漏洞的 mcp-auth-e2e-real 第5项期望同步反转为「无 token 仅持 OID → 写工具被拦」（13/13）。
+- **换钥致记忆库静默重置**：`rotateKey()` 的 `_scanEncFiles` 只收 `.enc` 后缀，`data/memory-bank.json`（同 `HEARTFLOW_v1` 格式）被漏扫；10-30 换钥后 MemoryBank 每次启动 `Decryption failed ... starting fresh` 整库丢弃（冒烟日志实锤）。修复：按内容探测（`"_enc"` + `HEARTFLOW_v1`）纳入轮换。已丢失密文因密钥消失不可恢复，今后不再发生。
+- **文档漂移 6 处**：package.json description 168→190、SKILL.md 184→190 ×2 / 149→177 / 矛盾句；sync-doc-numbers.js 补登记 CONTRIBUTING.md/CURRENT_STATE.md 两份活文档（原清单外漂移无人同步），并修复其把 UPGRADE_LOG.md 历史轮次数字误报为漂移的缺陷（历史档案加入 KNOWN 排除）。
+- **回归门禁静默放行**：heartflow-self-evolve.js 判据 `/(\d+) failed/` 只匹配英文而 run-all.js 汇总为中文「N 通过, M 失败」，叠加 180s 超时必杀 27 分钟的全量回归——被杀后 failedCount=0，「测试通过 ✓ (0 passed)」空放行并继续 commit/push。修复：中英双语判据 + 无汇总行 fail-closed + run-all 超时提至 30min。
+- **即崩工具假宣传**：scripts/heartflow-memory-tool.js / heartflow-memory-inject.js require 全仓不存在的 `HeartFlowMemory` 类（从未入 git，运行即 MODULE_NOT_FOUND），却被 two-pass-response 技能宣称为记忆注入能力。删除两个死脚本；宣称修正为 plugins/heartflow-memory-inject.py（Hermes 插件层，真实实现）。
+- **假健康**：24 个 `_stubFactory` 占位子系统 healthCheck 恒 `{ok:true}`、45 条空壳路由虚占白名单；4 个假全局桥接类（ProcessRewardModel/DesireCognition/CognitiveLoadCalculator/WorldLandscape）打假「加载成功」日志。统一诚实化：`{ok:false, stub:true/fake:true, reason}`。
+- **死注册表 14 条**：engine-constructor.js initializeLazyRegistry 与 module-registry.js SPECIAL_MODULES 中指向不存在文件的条目（planner 族 8：adaptive-planner/strategy-selector/replan-trigger/curiosity-engine/desire-engine/goal-pursuer/self-initiator/hierarchical-planner；code 族 4；memory 族 2）——dispatch 报误导性 route not allowed。删除。
+- **require 守卫自身红灯**：guard-require-integrity.js git 模式 exit=1（3 处 archive 断链）且 git 模式（扫 archive）与无-git 模式（跳过 archive）口径不一致。修 3 处 archive 断链（归档副本置 null 兜底保留历史形态）+ 统一双模式口径，527 文件 0 断链。
+
+**MEDIUM**
+- dimensions 输出对象补 `agency_deflection`/`ai_writing_tell` 键（此前命中进 findings 但读方恒 undefined）；dimMap 补 clickbait/unsupported_claim/pseudo_causal/soft_deflection/evidence/ai_writing_tell 6 键（findings detail 恒 1 修复）；`bullshit`→`bullshit_recognition` 三表命名统一（dimMap/allDims/输出/guidance）。维度口径 188→190，文档全量同步。
+- `_thinkCache` 死代码连根删除（从未初始化、get 位于管线末端设计不成立，含 3 个无调用缓存函数）。
+- threePoisons 空 try 块删除（静默缺失无日志）。
+- mcp-server TOKEN_RATE_LIMIT_MAX 注释口径统一（实际 100/min，原注释写 5）。
+- sseClients Map 加 CAP=64 LRU 逐出（原无上限，匿名 SSE 可累积 fd/内存）。
+- Unix socket 权限 TOCTOU 修复：listen 前 `process.umask(0o177)` 保证 socket 创建即受限（原 chmodSync 在 listen 回调里才执行，窗口期内可被本机他人连接）。
+- 6 处内存泄漏修复：WAL `_pending` compaction 后写回、outbound-ledger `_buffer` CAP=500、decision-engine `_qTable`/`_beliefState` CAP=2000、cross-domain-reasoner `_chains` CAP=500、window-attribution-receipt `_receipts` CAP=1000、url-validator DNS_CACHE TTL prune。
+- package.json `files` 移除 `test/`（npm pack 从 3924 文件/27.3MB/828 个 test 文件瘦身）。
+- measure-claimed-numbers.js / sync-doc-numbers.js 裸 `spawnSync('node')` → `process.execPath`（干净 PATH 下维度数不再静默输出 0）。
+- src/memory/triality-memory.js 死代码出库（零 require 引用，含 4 处 Date.now()*1000 bug）。
+- 3 个公式采集脚本 require 路径少一层 `..` 修复。
+
+### Verification
+- 五门禁全绿：bin/verify.js 16/16、guard-abilities.js 20/20、doc-numbers-accuracy 22/22、bidirectional-guard 召回 52/52 误拦 302/326（与基线一致零新增）、reward-hacking 回归 27/27。
+- 冒烟：start/think/stop/双 stop/restart 全过、initErrors=0；think 6 分支（古典/宏观/决策/情绪/英文/注入）全过。
+- mcp-auth-e2e-real 13/13（含反转后 OID 断言）、decision-router 23/23、engram-memory-wiring 全过。
+- 单点复测：F1 `_initErrors 0→0` + `_engramRecall` 恢复；F3 攻击句 exempted→HIT；F4 匿名 OID 写工具被拦；F6 stub `{ok:false,stub:true}`；F7 `sync --check` 四份全绿无清单外；F9 require 守卫 0 断链；M8 干净 PATH 下 measure 正确输出 190。
+
 ## [6.8.119] - 2026-11-02
 
 ### Added

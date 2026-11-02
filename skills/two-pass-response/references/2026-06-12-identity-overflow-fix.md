@@ -12,7 +12,7 @@
 心虫作为 MCP 工具/底层引擎时，它的输出结构让上层 LLM 误以为自己在以"心虫"身份说话。问题在三个层面：
 
 1. **推理引擎输出层**（thought-chain.js）— hypothesis description 包含"最可能"、"相关的标准解释"等身份暗示语言
-2. **记忆注入层**（heartflow-memory-inject.js + .py）— 把心虫身份规则、对话记录、梦境注入到系统提示
+2. **记忆注入层**（plugins/heartflow-memory-inject.py — Hermes 插件层；原伴生 heartflow-memory-inject.js 因依赖不存在的 HeartFlowMemory 类已于 2026-11-02 审计删除）— 把心虫身份规则、对话记录、梦境注入到系统提示
 3. **MCP 输出层**（mcp-server.js）— 所有 handler 返回中包含 `version` 字段
 
 ## 修复内容

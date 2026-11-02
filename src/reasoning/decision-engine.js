@@ -27,7 +27,10 @@ class DecisionEngine {
           catch { return null; }
         })();
     this._beliefState = new Map();  // 信念状态: hypothesis → probability
-    this._qTable = new Map();       // Q值表: state_action → value
+    this._qTable = new Map();       // Q值表: state_action -> value
+    // [AUDIT-FIX 2026-11-02] 两张表原无上限（heartflow.js lazy live）：state/action 空间
+    // 持续增长时只进不出。加 CAP + 逐出最旧（Q 表是增量学习缓存，非权威存储）。
+    this._mapCap = options.mapCap || 2000;
     this._learningRate = options.learningRate || 0.1;
     this._discountFactor = options.discountFactor || 0.95;
     this._explorationRate = options.explorationRate || 0.1;
@@ -238,6 +241,11 @@ class DecisionEngine {
     const tdError = reward + this._discountFactor * maxNextQ - oldQ;
     const newQ = oldQ + this._learningRate * tdError;
     this._qTable.set(key, newQ);
+    // [AUDIT-FIX 2026-11-02] CAP 逐出：Map 保持插入序，队首即最旧
+    while (this._qTable.size > this._mapCap) {
+      const oldest = this._qTable.keys().next().value;
+      this._qTable.delete(oldest);
+    }
     
     return { oldQ: +oldQ.toFixed(4), newQ: +newQ.toFixed(4), tdError: +tdError.toFixed(4) };
   }

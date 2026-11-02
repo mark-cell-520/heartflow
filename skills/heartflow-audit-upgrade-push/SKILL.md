@@ -1,6 +1,6 @@
 ---
 name: heartflow-audit-upgrade-push
-version: "1.5.0"
+version: "1.6.0"
 title: "心虫审计→并发修复→验证→推送 全流程"
 description: |
   心虫大规模升级工作流：全量审计→分类问题→并发修复→验证→推送GitHub。
@@ -26,6 +26,14 @@ tags:
 
 **并发派生子代理，不中间汇报，只看最终汇总结果。**
 用户偏好并行执行——说"并发进行"时直接派生子代理，不请示不解释中间步骤。
+
+#### Phase -1: 并发协调（长任务必做）
+
+动手前先确认没有别人在写同一个仓库：
+1. `cronjob action=list` + `ps aux | grep -E "claude -p|mcp-server"` 看有无活跃 cron/会话
+2. 心虫 cron 在跑 → `cronjob action=pause` 升级与每日审计两个任务，paused_reason 写明"全面审计修复中，防并发写仓库"；全链收尾后 resume
+3. `git status --short` 必须干净再开工；有半成品（上一轮未提交的维度实现等）先看清归属，绝不覆盖别人的在途工作
+4. 推送前置检查提前做（不依赖审计结果，可与子代理并行）：积压 commit 类型统计、隐私闸预扫（`git diff <remote>..HEAD --name-only | grep -iE '\.env$|\.key$|secret|credential|token|\.pem$'` 必须为空）、大模型文件检查（onnx/dat/bin/model）、token 验权（`curl -sI -H "Authorization: token $TOKEN" https://api.github.com/user` 的 x-oauth-scopes 含 repo）
 
 ### 流程分四阶段
 
@@ -105,6 +113,19 @@ cronjob action=list
 3. **_lazy 模块 try/catch 覆盖不均** — 检查 `src/core/heartflow.js` 顶部的 `_lazy` 声明：部分模块已有 try/catch fallback（如 adaptive-planner），部分没有（如 experience-collector）。没有 try/catch 的模块在首次 `dispatch()` 加载失败时会直接 throw，绕过 `_initErrors` 记录机制。修复：全部统一包装 try/catch。
 4. **console.* 残留** — 搜索所有 `console.log/error/warn/info/debug`。生产代码中应全部注释掉（加 `已禁用` 标记），保留原代码用于调试。
 5. **导出不匹配** — 模块实际导出（`module.exports = { xxx }`）与 heartflow.js 实例化方式（`new (_Lazy().ClassName)`）不匹配。修复实例化代码而非模块代码。
+
+**新增审计维度（2026-11-02 全面审计实战，全部有真实命中）：**
+
+1. **假能力报健康** — 搜 `_stubFactory` 与文件头 `globalThis.Xxx = class { ... healthCheck: () => ({ok:true}) }` 假全局类。stub 防崩设计可以留，但 healthCheck 恒 ok 让空壳子系统/路由"零能力报健康"、dispatch 探活无法区分真实现与占位。修复=诚实化（返回 `{ok:false, stub:true, reason}`），不是删除（删除会连锁 start() 崩溃）。
+2. **身份提权** — 搜自报身份头（如 `x-heartflow-oid` 只做格式正则、无签发/校验体系）。匿名持格式合法的身份码即被提权 = HIGH。修复：身份码仅在已通过 token 认证（role 非 guest）时保留标签语义。若两个测试对同一行为期望相反（一个固化提权、一个要求拒绝），按安全方向修代码并反转固化漏洞的测试期望，注释写清原因。
+3. **豁免击穿** — 安全维度的整句豁免（DISCOURSE_FRAME 类）若含"比如/举例/例如"这类弱常见词，攻击句加前缀即整体豁免，BLOCK 级被一行前缀击穿。修复：弱举例词整组移除（教学场景有强载体词"论文/报告里提到"覆盖），其余豁免补 `!INTEGRITY_BREAK && !CHECK_SUPPRESSION_SIGNAL` 双闸。复测必须含"攻击句+豁免前缀"形状，只测原句不测前缀形等于没测。
+4. **三表接线断裂** — 新维度要同时进 dimMap/allDims/dimensions 输出三处（+DIM_GUIDANCE）。dimMap 缺键 → findings detail 恒 1（`dimObj?.count || ... || 1` 兜底）；dimensions 输出缺键 → 读方（gate/MCP/面板）恒 undefined。命名分裂（dimMap 叫 bullshit、输出叫 bullshit_recognition）要连 DIM_GUIDANCE 键一起改（查找按 d.name）。运行时口径探针：`Object.keys(discriminate('t').dimensions)` 对比三表键集，静态 grep 会漏。
+5. **回归门禁失效** — 门禁脚本判据只匹配英文汇总行（`/(\d+) failed/`）而 run-all 输出中文「N 通过, M 失败」→ 失败永远抓不到；且执行超时被杀后无汇总行 → failedCount=0 空放行还继续 commit/push。修复：中英双语判据 + 无汇总行一律判失败（fail-closed）+ 给足真实超时（全量回归约 27 分钟，180s 必被杀）。
+6. **内存泄漏** — Map/数组只进不出：`_pending`（compaction 的 filter 结果算给新数组却不写回 this）、`_buffer`（record 只 push 无清理）、无上限 Q-table/chains/receipts、有 TTL 定义但只读不清理的 DNS_CACHE。修复模式统一：CAP + 利用 Map 插入序逐出最旧，或写入时顺带清过期项。
+7. **加密资产轮换范围** — 换钥脚本按扩展名扫（只收 .enc）会漏同格式 .json 密文（data/memory-bank.json 的 `_enc` 字段），换钥后旧密文永久失效、每次启动静默 starting fresh（日志实锤再动手，别只靠推断）。修复：按内容特征扫（`"_enc"` + `HEARTFLOW_v1`），不按扩展名。已丢密钥的密文不可恢复——如实记录，只保证今后不再发生。
+8. **文档口径盲区** — sync-doc-numbers 的清单（AGENTS/README/SKILL/package）外文件一律视为无漂移，报绿≠真一致；兜底扫描又会把 UPGRADE_LOG/CHANGELOG 的逐轮历史数字误报成漂移。修复：手工修的文件同步登记进 TARGETS；逐轮历史档案类加进 KNOWN 排除（它们 mtime 新但内容是历史快照，无 Version history 标题可截断）。
+
+**修复模式速查**：`references/audit-fix-patterns.md`（诚实化/三表接线/豁免双闸/身份提权/fail-closed 门禁/泄漏逐出/加密轮换范围八类高频发现的修法模板）
 
 每个子代理输出格式：
 每个子代理输出格式：```
@@ -989,6 +1010,11 @@ done
     - **路径字符串引用（非 require）**：`test/readme-test-count-autosync.guard.test.js:19` 用 `path.join(__dirname,'..','scripts','upgrade-engine.js')` + `fs.readFileSync` 读文件、按字符串切出 `syncReadmeTestCount()` 函数源码做单测。归档 `scripts/upgrade-engine.js` 后该测试 ENOENT 崩（基线 26/26 通过）。**删除任何文件前要搜文件名（不带扩展名）在 test/ scripts/ bin/ 里的字符串出现。**
     - **归档后必须全量回归**：本轮 4 处回归全部由「全量 4 段分段测试」抓到，且失败数对基线（71）才发现异常。归档轮的标准动作 = 归档后立刻跑 `HF_RUN_ALL_SLICE=N/4` 全量，对比基线失败数，不是只跑冒烟。
 14. **API 复核 owner/repo 从 `git remote -v` 读**：推送后用 GitHub API 复核远程 HEAD/VERSION 时，凭记忆猜仓库名会 404；先 `git remote -v` 拿准 owner/repo 再发请求。
+15. **补 dimMap 键前先确认变量初始化顺序**：dimMap 在 discriminate 函数体前部构造，引用函数体后部才 `let` 的变量直接抛 `Cannot access 'ii' before initialization` 整个引擎崩；且不在 allDims 的维度（findings 循环不遍历）根本不该补 dimMap——先跑运行时探针对比三表键集再动手。
+16. **测试断言固化漏洞时反转期望，不是改断言过绿灯**：审计发现的安全洞若被既有测试当作期望行为固化（如"持 OID 过写权限门槛"），按安全方向修代码 + 反转该测试期望 + 注释写清"原断言固化的正是该漏洞"；这与"为过门禁改断言"的区别是策略真变了且全程如实记录。
+17. **归档区断链修法**：src/archive/ 里被 git 追踪的历史副本 require 断链时，不删文件（那是历史归档），把断链 require 替换为带注释的 null 兜底；require 守卫的 git 模式（ls-files 含 archive）与 walk 模式（跳过 archive）口径必须先统一再修，否则冒烟误报。
+18. **终端持久 cwd 被删后所有 terminal 调用 exit 126**：scratch 清理会把上次 cd 进去的目录删掉，之后每条命令都在恢复 cwd 时失败、真实命令从不执行（报错指向一个你没 cd 的目录）。恢复法：terminal 调用显式传 workdir 参数指定存在的目录，别在坏 shell 里重试同一命令。
+19. **长任务收尾汇报必须显式列未完成项**：修复轮没走完"五门禁→bump→UPGRADE_LOG→commit→push→重启 MCP→恢复 cron"全链时，汇报如实列出断在哪、每步的恢复命令；用户说"全面修复+同步"就是要全链闭环，用"已完成"掩盖未提交状态是最伤信任的一类汇报。
 
 ---
 

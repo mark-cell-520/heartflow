@@ -11,7 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { safeFetch } = require('./src/core/fetch-safe.js');
+const { safeFetch } = require('../src/core/fetch-safe.js') // [AUDIT-FIX 2026-11-02] 原少一层 ..（scripts/ 下相对 src/）;
 const { execSync } = require('child_process');
 
 const ROOT = process.env.HEARTFLOW_ROOT || __dirname;

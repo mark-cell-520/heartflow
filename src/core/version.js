@@ -94,7 +94,7 @@ const path = require('path');
 // [v6.8.116] 第 188 轮同步：6.8.115 → 6.8.116（most_transitivity 第185维度上线）。
 // [v6.8.115 补记] test/run-all.js 并发池的突变回滚机制会把本文件还原到 git HEAD
 //                 （r187 首次编辑即被吞，已重写）；跑全量测试期间勿并发编辑 src/。
-let VERSION = '6.8.119';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+let VERSION = '6.8.120';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

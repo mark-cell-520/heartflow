@@ -17,6 +17,13 @@ const dns = require('dns');
 // [V-003] DNS resolution cache (60s TTL) to prevent DNS rebinding
 const DNS_CACHE = new Map();
 const DNS_CACHE_TTL = 60000; // 60 seconds
+// [AUDIT-FIX 2026-11-02] DNS_CACHE 原有 TTL 定义但只读不清理——过期条目永留内存
+// （fetch-safe.js live）。set 时顺带清过期项。
+function _dnsCachePrune(now) {
+  for (const [k, v] of DNS_CACHE) {
+    if (now - v.ts > DNS_CACHE_TTL) DNS_CACHE.delete(k);
+  }
+}
 const DNS_RESOLVE_TIMEOUT = 5000; // 5s timeout per lookup
 
 // ─── Private / reserved IPv4 ranges ──────────────────────────────────────────
@@ -239,6 +246,7 @@ async function validateFetchUrl(urlStr) {
     }
   }
 
+  _dnsCachePrune(Date.now());
   DNS_CACHE.set(hostnameLower, { ts: Date.now(), blocked: false, reason: '' });
   return { safe: true, reason: '' };
 }

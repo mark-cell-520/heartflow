@@ -573,6 +573,17 @@ function _scanEncFiles(rootDir) {
       if (entry.isFile() && entry.name.endsWith('.enc')) {
         encFiles.push(path.join(dir, entry.name));
       }
+      // [AUDIT-FIX 2026-11-02] .json 后缀的同格式密文（data/memory-bank.json）曾被漏扫：
+      // rotateKey 只认 .enc 后缀，换钥后 memory-bank.json 用旧密钥加密的密文永久失效，
+      // MemoryBank 每次启动 "Decryption failed ... starting fresh" 静默丢弃整库。
+      // 现按内容探测：JSON 含 "_enc":"HEARTFLOW_v1" 即纳入轮换。
+      if (entry.isFile() && entry.name.endsWith('.json')) {
+        const jp = path.join(dir, entry.name);
+        try {
+          const head = fs.readFileSync(jp, 'utf8').slice(0, 200);
+          if (head.includes('"_enc"') && head.includes('HEARTFLOW_v1')) encFiles.push(jp);
+        } catch (e) { /* 读失败跳过，不影响其他文件 */ }
+      }
     }
   }
 

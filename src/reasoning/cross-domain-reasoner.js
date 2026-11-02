@@ -84,6 +84,9 @@ class CrossDomainReasoner {
     this.causalEngine = null;
     this._knowledgeReasoner = null;
     this._chains = new Map();
+    // [AUDIT-FIX 2026-11-02] _chains 原无上限，chain.id 每次 Date.now()+random 唯一
+    // （knowledge/index.js live）——永不复用键，只进不出。加 CAP + 逐出最旧。
+    this._chainsCap = options.chainsCap || 500;
     this._initEngines();
   }
 
@@ -147,6 +150,10 @@ class CrossDomainReasoner {
     });
 
     this._chains.set(chain.id, chain);
+    while (this._chains.size > this._chainsCap) {
+      const oldest = this._chains.keys().next().value;
+      this._chains.delete(oldest);
+    }
     return {
       ...baseResult,
       mode: 'analogical',
@@ -213,6 +220,10 @@ class CrossDomainReasoner {
     });
 
     this._chains.set(chain.id, chain);
+    while (this._chains.size > this._chainsCap) {
+      const oldest = this._chains.keys().next().value;
+      this._chains.delete(oldest);
+    }
     return {
       ...baseResult,
       mode: 'causal',
