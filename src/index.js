@@ -665,6 +665,9 @@ const { checkCumHoc } = require('./cum-hoc.js');
 // 当成真理）。require 是接线的第 1 处——同 r496 false_dilemma 事故：漏掉
 // 这一行，后续计算点直接 ReferenceError 全线崩。
 const { checkArgumentToModeration } = require('./argument-to-moderation.js');
+// [r199] 第 196 维度 opinion_entitlement（观点权利豁免/主观主义谬误×
+// 观点主观宣告×拒绝举证两腿结构）；细节见 src/opinion-entitlement.js。
+const { checkOpinionEntitlement } = require('./opinion-entitlement.js');
 // [r188] 第 185 维度 most_transitivity（「大多数」链式传递谬误：两个「大多数」
 // 前提推不出「大多数」结论——most 量词不满足传递性，证据不能沿中间项累积）。
 // 判据两段大多数前提×中间项连续性×大多数结论链式三件共现；与 illicit_conversion
@@ -1956,6 +1959,8 @@ function discriminate(text, evidence = [], contentMode) {
   const ch = _applyPedagogyRelaxation(checkCumHoc(_normText), "cum_hoc", pedagogyRelaxation);
   // [r196] 第 194 维度 argument_to_moderation（诉诸中庸）计算点。
   const atm = _applyPedagogyRelaxation(checkArgumentToModeration(_normText), "argument_to_moderation", pedagogyRelaxation);
+  // [r199] 第 196 维度 opinion_entitlement（观点权利豁免）计算点。
+  const oe = _applyPedagogyRelaxation(checkOpinionEntitlement(_normText), "opinion_entitlement", pedagogyRelaxation);
   // [r188] 第 185 维度 most_transitivity（「大多数」链式传递）计算点。
   // 同 r186 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   // 变量名 mtr——most-transitivity 缩写，grep 实测 0 命中无冲突。
@@ -2498,6 +2503,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r196] 第 194 维度 argument_to_moderation 参与判定（诉诸中庸）。
     // 同 r195 先例：dimMap 与 allDims 必须两处都接。
     {score: atm.score, name:'argument_to_moderation'},
+    // [r199] 第 196 维度 opinion_entitlement 参与判定（观点权利豁免）。
+    // 同 r198/r196 先例：dimMap 与 allDims 两处都接。
+    {score: oe.score, name:'opinion_entitlement'},
     // [r188] 第 185 维度 most_transitivity 参与判定（「大多数」链式传递）。
     // 同 r186 先例：dimMap 与 allDims 必须两处都接。
     {score: mtr.score, name:'most_transitivity'},
@@ -2964,6 +2972,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r196] 第 194 维度 argument_to_moderation（诉诸中庸×
     // 中间/折中立场表述×中间=正确断言两腿结构）。
     argument_to_moderation: atm,
+    // [r199] 第 196 维度 opinion_entitlement（观点权利豁免×观点主观
+    // 宣告×拒绝举证两腿结构）。
+    opinion_entitlement: oe,
     // [r726] 第 156 维度 relative_pration（诉诸更惨×
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
@@ -3276,6 +3287,7 @@ function discriminate(text, evidence = [], contentMode) {
     // 无来源无约数的过分精确数字腿×断言/度量语境腿）。
     'ad_nauseam': "不得**把同一断言复读多遍、以重复频率冒充论据强度**——诉诸重复（argumentum ad nauseam / appeal to repetition / broken record）是把**同一内容子句**（≥6 汉字 / ≥3 英文词）在文本里**重复 ≥3 遍**（或 ≥2 遍且带显式重复标记「我已经反复强调/as I've said/over and over」），用出现次数代替递进论证：「这个方案绝对安全。这个方案绝对安全。这个方案绝对安全。」「The policy will work. The policy will work.」「As I've said many times, the science is settled. The science is settled.」（样本形状与负例见 test/round-193-ad-nauseam.js）。为什么重复本身就是问题：论据强度来自**独立证据与机制**，不来自同一句话被念了几遍；复读制造的是「态度笃定」的假象，是「似是而非」的典型。正当做法是**改用递进式论证**（补机制/补数据/补反例/补边界条件）或**明确这是强调而非举证**。判据**两腿共现 + 分组豁免，缺一不判**：腿① UNIT 重复单元——按标点切子句归一化后，取满足长度门槛的内容子句（中文 ≥6 汉字；英文 ≥3 词且含 ≥3 连续字母，排除版本号/纯数字/代码 token 的偶然重复；r161 教训：以「子句」为单位天然覆盖裸名词与倒装/嵌套形）；腿② COUNT 出现次数——该单元在全文归一化串中的非重叠出现次数，纯复读路径 COUNT≥3，标记路径（带显式重复标记）COUNT≥2。边界：sycophancy 管「迎合讨好」语气，本族管「重复即证据」的论证结构；absolute_claim 管绝对化措辞，本族管复读次数；relative_pration 及其余 appeal_* 家族管**内容型**谬误，本族是**结构型**（重复密度）判别，与所有单句内容维度正交。明确不判：引文内复读（「…」、“”、《》内的对话/歌词/引文——先剥离引文再统计，转述不是论证）、元讨论（重复论证/argumentum ad nauseam/ad nauseam/诉诸重复/repetition is a fallacy——讨论这个谬误本身是正确判别）、否定/劝止（别再重复/不要重复/停止重复/stop repeating/don't repeat——劝人别复读是正确判别）、累积式并列（研究表明A…另有研究表明B…还有研究表明C…各子句不同，是正当证据累积）。已知边界：① 演讲/口号/教学复述等真诚强调会落 verify（次数无法断定是操纵，交由调用方确认是否用复读代替论证）；② 跨段重复仍累计计数；③ 无标点的长复读段按整串统计。",
     'motte_and_bailey': "不得**先抛出无法举证的争议主张、再用无法被否证的遁词退守**——稻草城堡谬误（motte-and-bailey fallacy / castle and courtyard）是把**争议性、难举证的主张**（bailey：全称量词形「所有/全部/凡是/一律/毫无例外…都」、群体刻板形「男人/年轻人/专家们都一个德行/不是好东西」、极端处方形「必须彻底消灭/全面封杀」）与**平庸、易守难攻的表述**（motte：「我只是开个玩笑/别较真/认真你就输了/纯属个人观点/我又没让你信/对号入座」「I'm just saying/just asking questions/don't take it seriously/lighten up」）混为一谈：先推进争议主张，被质疑时坚称自己只是在说平庸表述，进而主张争议主张「未被驳倒」或指责质疑者「较真/对号入座」——用遁词把举证责任反向推给质疑者（样本形状与负例见 test/round-194-motte-and-bailey.js）。为什么这本身就是问题：争议主张需要证据，遁词不提供任何证据却单方面宣布争议主张安全；质疑的成本被转嫁给质疑者，审查被结构性回避。正当做法是**要么拿出争议主张的证据，要么撤回争议主张**——退守表述只在「本来就没有争议主张」时才成立。判据**两腿共现 + 分组豁免，缺一不判**：腿① BAILEY 争议主张——命中全称量词/群体刻板/极端处方任一家族（r161 教训：量词与群体名词收裸名词形态，「个个」「男人都」不收「们」后缀才命中）；腿② MOTTE 退守遁词——命中降格陈述族（我只是说说/别当真/个人观点/我又没让你信/对号入座/谁急了谁就是说中等）。边界：absolute_claim 管绝对化措辞本身，本族要求两腿共现；scrutiny_evasion/seizing 管单一逃避审查句式，本族管「争议主张被遁词替换」的成对结构；gaslighting 管关系操纵，本族管论证结构上的主张降级。明确不判：元讨论（稻草城堡/motte/bailey/争议主张退守到平庸表述——讨论这个谬误本身是正确判别）、否定/劝止（不要用「我只是开玩笑」逃避举证/别拿个人观点当挡箭牌——劝止是正确判别）、无争议主张腿的单纯谦逊（这只是我的初步猜测，可能不对/太阳从东边升起，这只是我的个人看法——遁词只在包裹争议主张时才是稻草城堡）、无遁词腿的单纯绝对化（所有人都会死/All men are mortal——那是 absolute_claim 的辖区）。已知边界：① 轻松的闲聊自嘲（玩笑后接遁词）会落 verify（单凭两腿共现无法断定主观恶意，交由调用方确认争议主张是否有证据）；② 遁词与争议主张同段不同句时按共现判定，跨长文间隔的共现可能是巧合；③ 群体名词清单外的群体（如具体行业黑话）依赖结构形兜底。",
+    'opinion_entitlement': "不得用**持有观点的权利或「这只是主观看法」来免除观点的举证责任、拒绝用证据裁决**——观点权利豁免/主观主义谬误（I'm entitled to my opinion / subjectivist fallacy）是指把一个事实/政策主张降格为「只是我个人的主观看法/信念」，再据此宣布**「你拿我没办法」「我不会改」「你的证据不算数」「容不得质疑」「我想怎么相信是我的自由」**，用主观性给未经检验的断言发免检通行证：「我有权保留我的观点，你拿我没办法」「这只是我个人的看法，你可以不认同，但我不会改」「言论自由，我想怎么相信就怎么相信」「这是我的信仰，容不得你来质疑」「你的证据再充分也无所谓，这是我固有的信念」「I'm entitled to my own opinion, so your evidence doesn't matter.」「That's just my personal belief, and I refuse to let your data change my mind.」（样本形状与负例见 test/round-199-opinion-entitlement.js）。为什么这本身就是问题：观点可以自由持有，但**持有观点的权利 ≠ 观点免于举证、免于被证据裁决**——把主张降格为「主观」再拒绝回应证据，是让公共讨论失去以证据收敛的可能，这正是「似是而非」的温床。正当做法是**回到证据与逻辑本身裁决**（给出支持/反对该主张的数据，或说明在何种证据下会修正），而不是用「这是我的自由」终止举证。判据**两腿共现，缺一不判**：腿① ENTITLEMENT 观点/信念/立场的主观性或权利宣告（我有权…/这只是我(个人)(主观)的看法/这是我的(信念|信仰)/我坚持我的立场/言论自由/我的观点；EN: I'm entitled to my opinion / that's just my personal belief / I have a right to / freedom of speech / my own opinion）；腿② IMMUNITY 拒绝举证/拒绝证据裁决/拒绝被说服改变/拒绝审视（你拿我没办法/我不会改/你的证据不算数/容不得质疑/你说服不了我/我想怎么相信就怎么相信；EN: you can't convince me / I won't change / your evidence doesn't matter / closed to debate / no right or wrong）。边界：scrutiny_evasion 管**把核验要求定性为人际猜疑**（「审计你是别有用心」），本族管**以主观性/观点权利免除举证**；complexity_shield 管**用技术复杂性拒绝解释**（「太复杂你不懂」），本族不涉及专业门槛；appeal_to_ignorance 管**举证责任倒置**（无法证伪所以为真），本族不停留在举证倒置、而是明确以「主观/权利」作免检盾；thought_terminating_cliche/sole_narrative 管**口径垄断**，本族承重的是「观点权利=免举证」句式双腿共现。明确不判：主观偏好/价值域（口味/审美/喜好/偏好/颜色/风格/品位/价值观；EN taste/aesthetic/preference/favorite/values——公认主观域里「无对错、各自保留」是正确认知）、尊重他人权利（我尊重你保留观点的权利；EN respect your right to your opinion——尊重他人表达权与自我豁免举证是两回事）、修正/证据开放（愿意修正/如果数据证明我错了，我愿意改/乐于接受批评；EN open to revision / willing to be wrong——接受证据裁决是正确判别）、元话语/概念引述（主观主义/相对主义/诉诸观点/谬误；EN fallacy——分析这个概念本身不是运用它）、对冲与疑问（可能/也许/未必/不一定；EN maybe/perhaps/might；含 ?/？）。",
     'cum_hoc': "不得把**两个变量的相关/共现/同步直接当成其中一个导致另一个的证据**——cum hoc ergo propter hoc（拉丁语「与此并存，故因彼此」）是指看到 A 与 B **相关/成正比/同步波动**，就直接断言 **A 导致/造成 B**：「冰淇淋销量和溺水死亡率高度相关，所以吃冰淇淋会导致溺水」「国家的人均巧克力消费量与诺贝尔奖得主数量呈显著正相关，可见吃巧克力能提升智力」「这两项指标多年来一直同步波动，可见 A 的提高直接带来了 B 的增长」「Iced tea sales are correlated with drowning deaths, so iced tea causes drowning.」「Countries with more Nobel laurets consume more chocolate; therefore chocolate boosts intelligence.」（样本形状与负例见 test/round-198-cum-hoc.js）。为什么这本身就是问题：相关性只说明两变量同变，不说明方向、更不说明因果——同变可能源于**第三变量**（夏天炎热同时推高冰淇淋与溺水）、**双向因果**、或**纯巧合**。把相关当因果，会让未经检验的因果叙事获得数据外衣，驱动错误的干预与决策。正当做法是**补上因果证据**（给出时间先后、对照组、机制路径：没吃冰淇淋的同质群体溺水率如何）或**把结论降级为「观察到相关，因果待检验」**，而不是把相关直接当成因果。判据**两腿共现 + 邻近窗，缺一不判**：腿① CORRELATION 显式相关/共现标记（相关/关联/成正比/成反比/伴随/同步/共现/一同出现/联动/高度相关/显著相关；EN correlated / associated / linked / goes hand in hand / co-occur / proportional）；腿② CAUSAL 前向因果动词（导致/造成/引起/引发/促使/带来/催生/诱发/使得/提升了/能够提升；EN causes / leads to / results in / drives / boosts / brings about / increases）。两腿落在 24 字（EN 70 字符）邻近窗内即视为同一次「相关→因果」推断。边界：post_hoc 管「A 在 B 前所以 A 导致 B」的**时序连接**，本族不依赖时序、承重的是共变/相关这个前提；reverse_causation 管**反应型行为×负面结果**的方向倒置（腿①用比较级 更/多/高），本族腿①用显式相关词，词表不交叉；common_cause 管**伪相关**（A、B 同由 C 导致），本族不管第三变量，且「A 和 B 相关是因为 C」这种正确的共同因素解释因弃用「是因为」作因果腿 + 共同因素豁免而明确放行；pseudo_causal 管**精确倍数**假机制，本族管相关→因果的推断方向；statistical_misleading 管**统计数据呈现误导**，本族管「相关被当成因果证据」的推理谬误；monocause 管多因压单因，本族不断言唯一原因、反对的是推断依据无效。明确不判：概念/教学转述与共同因素解释（相关不等于/相关并非/伪相关/混淆变量/混淆因素/第三变量/共同因素/共同原因/辛普森/内生性/因果推断/相关系数/统计学/教材/论文；EN correlation is not causation / confounding / spurious correlation / common cause / Simpson's paradox / statistics——讨论这个概念本身、或正确指出共同因素，是正确判别）、实验/证据语境（随机对照/对照组/双盲/安慰剂/控制变量/前瞻性/队列/元分析/临床试验/格兰杰/数据显示/研究表明/证据表明；EN randomized / controlled trial / RCT / Granger / data show / evidence shows——以证据而非裸相关立论时因果已被检验）、推理否定/觉察承认（不代表/不等于/并不意味着/推不出/不能说明/未必/不一定/很难说/可能只是/纯属巧合/只是相关；EN does not mean / not necessarily / cannot conclude / may just be / mere coincidence——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/有待；EN maybe / perhaps / might / seems）、疑问句（含 ?/？）。",
     'regression_to_the_mean': "不得把**极端值之后向均值方向的自然移动当成干预的功劳**——回归均值误归因（regression to the mean / regression fallacy）是指某指标先处于**极端值**（最差/谷底/连败/创新低，或巅峰/夺冠/历史新高——回归是**双向**的），随后**朝均值移动**（好转/回升/回到中等，或回落/退潮），文本把这次移动**归功于同期的某个干预**（吃药/贴膏药/换人/报班/换方法/请大师；EN took / hired / switched / started）：「上次考了年级最差，考前吃了巧克力，这次回到班级中等——巧克力确实有用」「他连败五场之后换了新球拍，接着就赢回来了，可见新球拍很关键」「After our worst quarter on record we hired the new consultant, and revenue bounced back — the hire fixed it.」（样本形状与负例见 test/round-195-regression-to-the-mean.js）。为什么这本身就是问题：极端值之后的下一次测量天然朝均值移动，与干预是否有效无关；没有对照组时「干预后好转」证明不了任何事，真正起作用的可能只是统计必然性。正当做法是**补上对照组**（没做这件事的同质群体是否也回归了）、**把结论降级为「观察到改善，功效待检验」**，或**点名自然回归的可能性**（极端值后的回落/回升部分是回归效应），而不是把回归直接当成干预的功劳。判据**三腿共现 + 叙事窗，缺一不判**：腿① EXTREME 极端基线陈述（双向：极端低族最差/谷底/垫底/连败/暴跌，极端高族巅峰/夺冠/历史新高/年级第一）；腿② REGRESSION 回归性变化（双向：自低处回升好转/恢复/回升/回到.{0,8}(正常|平均|中游|中等)，自高处回落回落/减退/平息/回归平淡）；腿③ ATTRIB 干预×功劳/功效归因（干预动词吃了/换了/请了/贴膏药/换帅/报班 × 功劳词多亏/全靠/幸亏/功劳/归功于 或功效词有效/见效/管用/很关键/果然/一贴就，两者 12 字窗内共现）。边界：post_hoc 管「A 在 B 前所以 A 导致 B」的时序连接，本族不依赖时序、承重的是极端基线这个统计前提；gamblers_fallacy 管**预测下一次**结果随 streak 反转，本族管**解释已经发生的**回归；hot_hand 管把连胜势头当成下次胜率升高的根据，本族不预测未来；clustering_illusion 管随机聚集被当规律，本族管单次极端→回归的归因；base_rate_neglect 管拿单个阳性信号无视基础概率，本族管忽略「极端值必然回归」的统计必然性；pseudo_causal 管精确倍数/玄学归因白话伪因果，本族的归因对象是同期干预但缺对照组；common_cause / reverse_causation 管相关→因果与方向倒置，本族不依赖两变量共变；monocause 管多因压成单因，本族不断言唯一原因、反对的是归因本身无效。明确不判：概念/教学转述（均值回归/向均值回归/regression to the mean/统计学/教材/论文——讨论这个概念本身是正确判别）、实验/证据语境（随机对照/对照组/双盲/安慰剂/剔除极端值/截尾/温莎化/基线校正/前瞻性/队列/元分析/纵向/自然实验/随机分组；EN randomized / controlled trial / RCT / placebo / trimmed / winsorized / longitudinal——受控设计或已对回归校正时观察经设计成为证据）、推理否定/反向承认（不能说明/不能证明/不代表/推不出/未必/不一定/很难说/不好说/说不清/难以确定/不能全归/不能单靠/有待验证/可能是自然/其实是因为回归；EN does not mean / cannot conclude / not necessarily / fails to show / may just be / natural regression——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定/有待；EN maybe / perhaps / might / probably / seems——概率化结论不作谬误判定）、疑问句（含 ?/？）。",
     'argument_to_moderation': "不得把**折中立场本身当成真理的依据**——诉诸中庸（argument to moderation / 中间立场谬误）是指把两个立场并置后，断言**「真相/正确答案在中间」「各打五十大板」「折中才是对的」「一个巴掌拍不响」**，用「取中」这个动作替代对双方证据的检验：「甲方乙方各有过错，真相在中间，各打五十大板才是最公道的处理」「这两种观点都太极端了，正确的答案在它们中间」「公说公有理婆说婆有理，其实折中才是对的」「关于这项政策该不该继续，支持和反对的人都走了极端，中间立场才是理性的」「Both extremes are wrong, so the truth lies somewhere in the middle.」「Let's just split the difference — the middle ground is the correct answer.」「When two sides clash, the fairest position is usually the one in between.」（样本形状与负例见 test/round-196-argument-to-moderation.js）。为什么这本身就是问题：中间立场偶尔确实更接近真相，但那要凭证据成立，不能凭「它在中间」成立——以位置取信跳过的是举证责任，两端各自的证据强度、折中结论为何比任一端更成立，都需要单独检验。正当做法是**列出两端各自的证据**并说明折中结论为何更成立，或明确「目前证据不足以在两端间定论」，而不是把「取中」当成结论本身。判据**两腿共现 + 叙事窗，缺一不判**：腿① MIDDLE 中间/折中立场表述（中间立场/中间道路/真相·答案·结论在(两者|双方)之间/折中/中庸/各打五十大板/一个巴掌拍不响/双方都有错/都太极端/走了极端/各让一步/各退一步；EN middle ground / in between / split the difference / meet in the middle / both extremes / compromise position）；腿② TRUTH 中间=正确断言（才是(对|正确|真理|正解|理性|客观|公道|合理|最优)的/(中间|折中)才是X/(都|全)不(完全)(对|错)|都不全对/把(中间|折中)当成(真理|真相|正确)/(最|才)(公平|合理)的(处理|解决|做法|方案|方式)/(正确|真正|对)的(答案|结论|真相|立场)(就)在；EN is the (correct|right|true|rational|fair|fairest|reasonable|best) answer/position/conclusion / truth lies in the middle / both sides are wrong / neither side is entirely right / middle ground is the (correct|fairest|rational) / the (fairest|correct|best) position is (the one) in between），两腿命中相距 ≤50 字（EN ≤200 字符）。边界：false_balance 管**等权并置**（「两种说法/各有道理」把未证实指控并列到已证事实旁），本族不停留在并置、而是进一步断言**中间立场才是正确的**——false_balance 说「一样重」，本族说「中间对」；false_dilemma 管**排除第三选项的二元压迫**（「要么A要么B，没有中间路线」），本族恰好相反——承认两端存在，但把**中间**封为真理，不逼人选边；false_equivalence 管两类事物的错误类比，本族不引入类比对象；sole_narrative 管口径垄断（只许一种说法），本族的主张是「只有中间那种说法对」；monocause 管多因压成单因，本族不断言原因数量，反对的是**以位置取信**而非以证据取信。明确不判：概念/教学转述（诉诸中庸/argument to moderation/中庸之道/儒家/亚里士多德/逻辑谬误/教材/论文——讨论这个概念本身是正确判别）、谈判/交易/和解语境（谈判/协商/和解/调解/协议/签约/签署/成交/报价/让步/调解员/合同；EN negotiated / deal / signed / contract / settlement / mediation / agreement——博弈中「各让一步」是关于成交的程序动作，不是真理断言）、算术/统计取中（平均值/均值/中位数/中间值/取平均；EN average / median / midpoint——取中位数是正当计算）、推理否定/反向承认（并不总是/并不等于/不等于/并不意味着/未必/不一定/推不出/不见得/不是都对也都错/是谬误；EN does not mean / not automatically / not necessarily / is not correct——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定；EN maybe / perhaps / might / probably / seems——概率化结论不作谬误判定）、疑问句（含 ?/？）。",
@@ -4297,6 +4309,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 表述、算术取中、对「诉诸中庸」的概念讨论或文学对白。与 r161-r195
     // 同口径。
     'argument_to_moderation',
+    // [r199] 第 196 维度 opinion_entitlement（观点权利豁免/主观主义：
+    // 观点主观宣告×拒绝举证）。verify 级——「用主观性/观点权利免除举证」
+    // 需要补的是回到证据与逻辑本身裁决，不是改写句式；单句也可能是转述
+    // 他人观点供分析、文学对白或正当价值/偏好分歧中的各自保留。与 r161-r196
+    // 同口径。
+    'opinion_entitlement',
     // [r726] 第 156 维度 relative_pration（诉诸更惨）登记。
     // verify 级——「拿更惨的人抹掉眼前抱怨」需要补的是对方诉求本身的
     // 事实核查与处理方案，单句也可能是共情转述或概念讨论。与 r672-r725
@@ -4838,6 +4856,8 @@ function discriminate(text, evidence = [], contentMode) {
       cum_hoc: ch,
       // [r196] 第 194 维度 argument_to_moderation（诉诸中庸）。同上：九处一次接齐。
       argument_to_moderation: atm,
+      // [r199] 第 196 维度 opinion_entitlement（观点权利豁免）。同上：九处一次接齐。
+      opinion_entitlement: oe,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,

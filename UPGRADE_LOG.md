@@ -1,3 +1,34 @@
+# r199 升级轮报告（v6.8.128 — 第 196 维度 opinion_entitlement「观点权利豁免/主观主义谬误」上线 — 2026-11-03）
+
+## 一、轮次与方向
+- 轮次 r199，方向：证据充分性与逃避检验（轮换自 r198 的逻辑谬误 cum_hoc）。任务：新增判别维度，命中一个此前 195 维无一覆盖的新攻击族。
+- 立项缺口实证：r199 家族探针在当前引擎（v6.8.127，195 维）复测——观点权利豁免族攻击 6/6 gate.action=pass（真零命中）、良性 3/3 pass（零误伤）；Phase 1.5 同律复核 6/6 零命中。相邻族（scrutiny_evasion 逃避核验 / complexity_shield 复杂性盾牌 / no_true_scotsman / special_pleading / moving_goalposts / appeal_to_ignorance）均不覆盖「以主观性/观点权利免除举证」这一形状。
+
+## 二、来源
+- 三层研究：逻辑谬误检测方向命中 HN 258 分 arXiv 2405.02318《Autoformalizing Natural Language to First-Order Logic: A Case Study in Logical Fallacy Detection》（https://arxiv.org/abs/2405.02318）与 GitHub 120★ latent-variable/Real_time_fallacy_detection——**二者均依赖 LLM**，不适合心虫纯规则引擎定位；unfalsifiability / entitled-to-my-opinion 三层搜索（HN / Semantic Scholar / GitHub）空返。侦察落盘 /tmp/hf-scout-<ts>.txt。判据为纯规则自有实现，未集成 LLM 方案（遵守零 LLM 依赖铁律）。
+- 心虫裁决门禁：heartflow_philosophy_decision → **accelerate**（confidence 0.7 / priority 40；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 三、实现
+- 新文件 src/opinion-entitlement.js（约 210 行）：checkOpinionEntitlement(text, inject)，两腿共现 + 6 类豁免。
+  - 腿① ENTITLEMENT 观点/信念/立场的主观性或权利宣告（我有权 / 这只是我个人的看法 / 这是我的信念 / 我坚持我的立场 / 言论自由 / 我的观点；EN: I'm entitled to my opinion / that's just my personal belief / freedom of speech / my own opinion——枚举收裸名词形态，EN 裸 "my belief" 命中）。
+  - 腿② IMMUNITY 拒绝举证 / 拒绝证据裁决 / 拒绝被说服改变 / 拒绝审视（你拿我没办法 / 我不会改 / 你的证据不算数 / 容不得质疑 / 你说服不了我 / 我想怎么相信就怎么相信；EN: you can't convince me / your evidence doesn't matter / closed to debate / no right or wrong）。
+  - 豁免：主观偏好/价值域、尊重他人权利、修正/证据开放、元话语/概念引述、对冲、疑问句。
+- src/index.js 七处代码接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS Set / dimensions 对象）；三份文档数字同步（维度 195→196、VERIFY 152→153、版本戳 6.8.127→6.8.128）。
+- test/round-199-opinion-entitlement.js（43 用例：正向命中/放行 + 逐常量承重注入 + 变体矩阵 gate() 复量）。
+
+## 四、验证（五门禁 + 变体矩阵）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键 196）
+- test/doc-numbers-accuracy.test.js：24/24
+- scripts/bidirectional-guard.js：召回 52/52 不降、误拦 302/326 不升
+- 变体矩阵：攻击 7 变体（中英双语、裸名词、带修饰、倒装、长句）gate.action 全非 pass 且 opinion_entitlement 承重；良性 7（含口味/颜色/价值观边缘良性）全 pass
+- round-199 测试：43/43
+
+## 五、已知边界 / 下次可继续
+- agree to disagree / 求同存异 单独出现且无观点权利宣告时不判（价值分歧中正当）——需腿①共现才命中，故「我们同意各自保留」类纯价值分歧句有意漏判，避免误拦正当价值分歧。
+- 反驳型句（「你说的这只是你的主观臆断」）若同时含腿①+腿②可能误伤，靠对冲/疑问/修正开放豁免缓解；基线误拦率仍会小幅波动，下轮用双向守卫回归监控。
+- 可继续方向：记忆巩固与检索、agent 执行验证、价值对齐与目标漂移检测（尚未轮到）。
+
 # r198 升级轮报告（v6.8.127 — 第 195 维度 cum_hoc「相关≠因果谬误」上线 — 2026-11-02）
 
 ## 一、轮次与方向
