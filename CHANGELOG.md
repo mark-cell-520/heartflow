@@ -1,3 +1,48 @@
+## [6.8.121] - 2026-11-02
+
+### Fixed — 第二轮全面审计修复（5 路子代理并发扫描，CRITICAL 0 / HIGH 4 / MEDIUM 15+；另含 openmem 先例维度加固）
+
+**安全（SSRF 网关）**
+- url-validator `isBlockedV6`：IPv4-mapped IPv6（`::ffff:127.0.0.1`、`::ffff:169.254.169.254` 云元数据）、IPv4-compatible（`::/96`）、NAT64（`64:ff9b::/96` 含 hex 压缩形态）此前均返回 safe:true——SSRF 网关整体可绕过。新增 IPv6 展开器统一解包复走 V4 判定，非标准 NAT64 编码 fail-closed 拦截（实测 11/11 用例通过）
+- 先例维度白名单回归修复：allow-list 检查曾排在协议校验之前，`ftp://127.0.0.1:3468` 可返回 safe:true。白名单收敛为新模块 `src/security/local-service-allow.js`（单一事实源，url-validator 与 fetch-safe 共用），强制三条约束：仅 http/https、仅 IP 字面量（拒绝域名，防重绑定窗口）、localhost/::1 归一化（修复运营误配导致先例维度永久静默降级）
+
+**能力接线（代码存在但能力不存在）**
+- logicReasoning：自实例化起 think() 零调用（v5.x 时代 100% 命中的逻辑辨别在 6.8.x 管线掉线）。接回输入层：`analyze()` 五合一分析 → `_sv.logic` → `result._logicReasoning` + 结论谬误/推理类型行。bench：logic 0/6 → 6/6，零回归，+1ms
+- progressJudgment：实例注册后 think() 零调用，`_sv.progress` 永为 null → 每次 think() 向 decisionFeedback 写一条恒定 `correct:false` 假负样本污染决策反馈权重。按本次实际产出（结论+推理链）做真实进步判断
+- judgmentEngine 多路径判断（核心卖点）死接线两处：① decision-intent 正则漏「应该…吗」最常见决策句式（「我应该接受…吗？」不触发），放宽至 20 字间距；② `context.logicReasoning` 全库无赋值处 → 谬误风险惩罚 -1 从未生效，现传输入层逻辑分析结果
+- eduEngine 注册名错位：实例在 `this._eduEngine` 而 LATE_ADDITIONS 注册 `this['eduEngine']`（恒 undefined）→ dispatch 与健康检查双通道不可达
+- engine-initializer：start() 调用 3 个全仓库不存在的函数（未完成拆分残留），任何人接线即 ReferenceError。改为缺失阶段跳过+记 _initErrors+不谎报 started
+- safe-fs：`safeMkdirSync/safeMkdirSyncRecursive` 定义但未导出
+- adaptive-learning 画像持久化：`_persist` 用 `fs.promises`（safe-fs 无此导出）→ 每次必抛被 catch 静默，画像从未落盘。改用 safe-fs 同步 API
+
+**逻辑/内存 bug**
+- logic-reasoning 环形缓冲区：`new Array(this._maxHistory)` 在赋值前执行（长度 1），容量检查空块 → 实测 maxHistory:3 分析 11 次 length=12 无界增长（该模块现已进 think() 热路径）。按原注释意图真正实现环形缓冲 + getHistory 时间序 + getStats.totalAnalyses 读 _historySize
+- logic-reasoning activeInference 刻度：confidence 是 0.1–1.0 标量，`/100` 与 `<50` 是 0–100 遗留 → exploitation 恒 ≤0.01、needsMoreEvidence 恒 true（实测）
+- experience-collector `_cleanup()` 淘汰公式 `usefulness - timestamp/1e7`：时间项以 6 个数量级压过有用性 → 排序等价于按时间降序 → **淘汰的永远是最新经验**，最旧的反被保留。改为按年龄衰减（每天 -0.05）
+- memory-write-controller `_writeDecisions` 6 个 push 点无裁剪 → 封顶 200
+- memory-bank `sessions` Map 只 set 不 delete → 封顶 200，endSession 淘汰最旧
+- adaptive-learning `profiles` Map 无上限 → 封顶 500
+- memory-consolidator setInterval 无 in-flight 保护（consolidateAll 超间隔时重叠执行）→ 重入守卫 + unref
+- embodied-core BACKOFF 退避：waitMs/waitUntil 算出后均未使用（死变量），同步递归重试零延迟 → 记录 backoffWaitMs 供上层异步调度，不再假装等过
+- platform-adapter 构造函数不保存 config.rootPath → `_isPathAllowed` 恒 false，默认构造路径文件 IO 100% 失效
+- mcp-server ROLES 死解构（index.js 无此导出，handler 内也未用）
+- meta-engine selfEdit `new RegExp('## ' + key)` 未转义（正则注入）
+- dream-loop DreamEngine 假导出（dream.js 无此导出，恒 undefined）
+- engine-reasoner 4 行重复 module.exports
+
+**先例维度隐私加固（B 方案）**
+- 结论行 snippet 进输出前过 `sanitizeForPersistence` 消毒（原注释声称 cred_guard 已打码/LEARNED 层过滤，与实际不符——库侧无 LEARNED 层、cred_guard 只掩密钥字面量，m 层条目可能含用户私有内容）
+- 先例服务 SQL 加 `layer IN ('k','m')` 过滤（p 层提示词库不污染 Top-K）；EMBED_MODEL 与 mem_core.py 读同一 env（防向量不同构致分数失真被 MIN_SCORE 过滤成 hits:0）；top_k 解析 clamp [1,10]（非数字曾断连、负数曾 503）
+- openmem-precedent.js 截断与 openmem 侧对齐 480（bge 512 token 上限；原 2000 传 4 倍无用数据）、逐条 typeof 守卫
+
+### Verification
+- 22 个改动文件 `node --check` 全过；引擎加载 162 模块 `_initErrors: 0`
+- bench 5 维度 34 题 A/B：logic 0/6→6/6，decision 8/8、emotion 4/8、intent 4/6、stability 5/6 分毫不变（零回归），平均 63ms
+- SSRF 修复 11/11 用例通过（IPv4-mapped/NAT64/协议后门/localhost 归一化/IP 字面量约束）
+- 模块测试：logic-reasoning 9/9、logic-patterns 10/10、fetch-safe 2/2、engine-initializer 1/1、adaptive-controller 2/2
+- 先例维度在线：available=true 8 题命中 ~20ms；服务挂掉 8ms 静默降级
+
+
 ## [6.8.120] - 2026-11-02
 
 ### Fixed — 全面审计修复轮（用户指令：全面审计→全面修复→同步 GitHub；3 路子代理并发扫描 527 文件，CRITICAL 0 / HIGH 10 / MEDIUM 10 修复）

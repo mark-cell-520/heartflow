@@ -149,6 +149,11 @@ Object.getOwnPropertyNames(fs).forEach(method => {
 module.exports = safeFs;
 module.exports.safeWriteFileSync = safeWriteFileSync;
 module.exports.safeAppendFileSync = safeAppendFileSync;
+// [审计轮 2026-11-02] 补导出：safeMkdirSync/safeMkdirSyncRecursive 早已定义且过
+// path-guard，但不在导出清单——adaptive-learning._persist 等调用方只能拿到
+// undefined，持久化必抛被 catch 静默（画像从未落盘）。
+module.exports.safeMkdirSync = safeMkdirSync;
+module.exports.safeMkdirSyncRecursive = safeMkdirSyncRecursive;
 module.exports.guardPath = guardPath;
 module.exports._check = _check;
 module.exports._raw = fs;

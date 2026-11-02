@@ -1562,6 +1562,14 @@ class HeartFlow {
       this._engram = new En.EngramMemory({ maxEntries: 200, ttlMs: 30 * 60 * 1000, indexPath: path.join(this.rootPath || process.cwd(), 'data', 'engram-index.json') });
     } catch (_) { this._engram = null; }
 
+    // [B 先例维度 · 2026-11-02] openmem 跨 agent 先例检索（只读输入信号）。
+    // 出处：心虫本体 think() 自主判断（openmem 条目 a7c76d5e）——「B 是唯一不违背
+    // 辨别者定位铁律的接法：判断不外包，只做输入信号」。任何失败静默降级。
+    try {
+      const { OpenmemPrecedent } = require('./openmem-precedent.js');
+      this._precedent = new OpenmemPrecedent();
+    } catch (_) { this._precedent = null; }
+
 
     // MemoryKernel — 记忆核心组件（启动必读）
 
@@ -2751,6 +2759,13 @@ class HeartFlow {
 
       }
 
+    }
+
+    // [审计轮 2026-11-02] eduEngine 注册名错位修复：实例在 this._eduEngine（带下划线），
+    // 而 LATE_ADDITIONS 注册的是 this['eduEngine']（恒 undefined，空操作）——
+    // EduEngine 真实存在却双通道不可达（dispatch 不到、健康检查扫不到）。
+    if (this._eduEngine && !this._modules['eduEngine']) {
+      this._modules['eduEngine'] = this._eduEngine;
     }
 
 
@@ -4890,6 +4905,36 @@ class HeartFlow {
     // [async supervision] shared state container for cross-block results
     const _sv = { dao: null, uncertainty: null, priority: null, progress: null };
 
+    // [B 先例维度] 输入层检索 openmem 历史案例（~20ms，封顶 400ms，失败静默降级）。
+    // 检索位置在输入层（早于全部管线阶段），结果进 _sv 共享容器——各阶段可按需消费，
+    // 输出层可见（result._precedent + 结论先例行）。判断主权仍在本体。
+    if (this._precedent) {
+      try { _sv.precedent = await this._precedent.lookup(input); }
+      catch (_) { _sv.precedent = { available: false, hits: 0, cases: [], elapsedMs: 0, reason: 'lookup_throw' }; }
+    }
+
+    // [logic 接线 · 2026-11-02 审计轮] logicReasoning 自实例化起 think() 零调用
+    // （能力掉线：模块在册、结果从未进输出）。本审计轮接回输入层：五合一分析
+    // （推理类型/前提检查/谬误检测/框架推荐），同步执行 ~1ms。结果进 _sv.logic，
+    // 输出层 result._logicReasoning 可见，检出谬误时结论追加一行。失败静默降级。
+    if (this.logicReasoning && typeof this.logicReasoning.analyze === 'function') {
+      try {
+        const _lr = this.logicReasoning.analyze(input);
+        if (_lr && !_lr.error) {
+          _sv.logic = {
+            primaryType: _lr.reasoningType?.primaryType || null,
+            primaryScore: _lr.reasoningType?.primaryScore ?? null,
+            fallacyCount: (_lr.fallacies || []).length,
+            fallacies: (_lr.fallacies || []).slice(0, 3).map(f => f.name || f.id || 'unknown'),
+            premiseQuality: _lr.premiseCheck?.premiseQuality || null,
+            // [审计轮 2026-11-02] frameworkRecommendation 的导出键是
+            // {primary:{id,name,...}, alternatives[], ...}——原读 .framework 恒 undefined
+            framework: _lr.frameworkRecommendation?.primary?.name || null,
+          };
+        }
+      } catch (_) { _sv.logic = { error: 'analyze_failed' }; }
+    }
+
     // ─── 前置自我反馈：检查上一次 think 是否产生行为建议 ────────
     const fb = this._selfFeedback;
     if (fb && fb.hasItems) {
@@ -5250,11 +5295,18 @@ class HeartFlow {
     try {
       if (this.judgmentEngine && typeof input === 'string') {
         const text = input.trim();
-        const decisionIntent = /(?:该不该|要不要|是否(?:应该|需要|值得)|应该(?:选|怎么|如何)|如何决定|怎么选|选哪个|哪个(?:更好|更合适)|值不值得|要不要(?:买|去|做|换|投资))/i.test(text);
+        // [审计轮 2026-11-02] 补「应该…吗」句式：原正则漏掉最常见决策问法
+        // （「我应该接受…吗？」不匹配 应该(?:选|怎么|如何)），核心卖点多路径判断
+        // 对这类输入完全不触发。
+        const decisionIntent = /(?:该不该|要不要|是否(?:应该|需要|值得)|应该[^。！？\n]{0,20}(?:选|怎么|如何|吗|？)|如何决定|怎么选|选哪个|哪个(?:更好|更合适)|值不值得|要不要(?:买|去|做|换|投资))/i.test(text);
         if (decisionIntent && text.length < 200) {
+          // [审计轮 2026-11-02] 补 logicReasoning 上下文：judgment-engine.js:1112 读
+          // context.logicReasoning.fallacies 做谬误风险惩罚，此前全库无赋值处 →
+          // hasFallacies 恒 false、惩罚从未生效（死接线）。现把输入层逻辑分析结果传进去。
           const judgeResult = await this.judgmentEngine.judge(text, {
             route: result.route || result.type || 'general',
             emotion: result._deepEmotion?.emotion || 'neutral',
+            logicReasoning: _sv.logic && !_sv.logic.error ? { fallacies: _sv.logic.fallacies || [], fallacyCount: _sv.logic.fallacyCount || 0 } : undefined,
           });
           if (judgeResult && judgeResult.paths && judgeResult.paths.length > 0) {
             result.multiPathJudgment = {
@@ -5529,6 +5581,20 @@ class HeartFlow {
 
     // ─── 监督层：进步判断（输出侧）─────────────────────────────
     // [v6.1.5] 盲点打破器接入主链路（恢复测试覆盖）
+    // [审计轮 2026-11-02] 补进步判断接线（注释与代码对齐）：progressJudgment 自注册起
+    // think() 零调用，_sv.progress 永为 null → 每次 think() 都向 decisionFeedback 写一条
+    // supervision_progress 的 correct:false 负样本——恒定假负样本污染决策反馈权重。
+    // 现按本次 think() 的实际产出（结论+推理链）做真实进步判断。
+    try {
+      if (this.progressJudgment && typeof this.progressJudgment.judge === 'function' && result && typeof input === 'string' && input.trim().length > 5) {
+        const pj = this.progressJudgment.judge({
+          action: 'think',
+          claim: (result.output && typeof result.output.conclusion === 'string') ? result.output.conclusion.slice(0, 200) : '',
+          evidence: (result.output && result.output.meta && typeof result.output.meta.reasoningChain !== 'undefined') ? JSON.stringify(result.output.meta.reasoningChain).slice(0, 300) : '',
+        });
+        _sv.progress = { isProgress: !!pj.isProgress, confidence: typeof pj.confidence === 'number' ? pj.confidence : null };
+      }
+    } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'progressJudgment 不阻断主链路' }, MAX_HISTORY_SIZE); }
     try {
       const BlindSpotBreaker = require('../cortex/blind-spot-breaker.js');
       if (!this._blindSpotBreaker) this._blindSpotBreaker = new BlindSpotBreaker();
@@ -5785,6 +5851,37 @@ class HeartFlow {
         }
       }
     } catch (_) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: _.message, note: 'memory 不阻断主链路' }, MAX_HISTORY_SIZE); }
+  }
+
+  // [B 先例维度] 输出层可见：result._precedent + 结论先例行（输入信号的可见出口，
+  // 判断主权仍在本体——先例只作为上下文出现在结论里，不改变判定逻辑）
+  // [审计轮 2026-11-02] 隐私加固：openmem m 层条目可能含用户私有内容（库侧无 LEARNED
+  // 层过滤、cred_guard 只掩密钥字面量），snippet 进结论行前必须过心虫消毒管线
+  // （无敏感原样返回/有敏感转结构指纹），与 engram 落盘同一道闸。
+  if (_sv.precedent) {
+    result._precedent = _sv.precedent;
+    try {
+      if (_sv.precedent.hits > 0 && result.output && typeof result.output.conclusion === 'string') {
+        const top = _sv.precedent.cases[0];
+        const snip = _PrivacyExposure().sanitizeForPersistence(String(top.snippet || '')).replace(/\s+/g, ' ').slice(0, 40);
+        result.output.conclusion += `；历史先例 ${_sv.precedent.hits} 条（最相关：${top.source}/${top.category} 分${top.score}「${snip}…」id ${String(top.id).slice(0, 8)}）`;
+      }
+    } catch (_) { /* 先例行装饰失败不影响主结论 */ }
+  }
+
+  // [logic 接线] 输出层可见：result._logicReasoning + 谬误/推理类型结论行
+  // （与先例维度同性质：输入层分析的可见出口，不改判定逻辑）
+  if (_sv.logic && !_sv.logic.error) {
+    result._logicReasoning = _sv.logic;
+    try {
+      if (result.output && typeof result.output.conclusion === 'string') {
+        if (_sv.logic.fallacyCount > 0) {
+          result.output.conclusion += `；逻辑辨别：检出谬误 ${_sv.logic.fallacyCount}（${_sv.logic.fallacies.join('、')}）`;
+        } else if (_sv.logic.primaryType && _sv.logic.primaryType !== 'general') {
+          result.output.conclusion += `；逻辑辨别：${_sv.logic.primaryType}`;
+        }
+      }
+    } catch (_) { /* 逻辑行装饰失败不影响主结论 */ }
   }
 
   return result;

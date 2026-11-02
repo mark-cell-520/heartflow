@@ -78,9 +78,21 @@ function start(hf, HeartFlowClass) {
     hf.identityCore.updateUserProfile({ lastLogin: new Date().toISOString() });
   } catch (e) { hf._initErrors.push({ module: 'identityCore', error: e.message }); }
 
-  _initIdentityAndMemory(hf);
-  _initBehaviorAndTracking(hf);
-  _initDecisionAndRouting(hf);
+  // [审计轮 2026-11-02] 三个子函数是未完成拆分的残留（注释说 6 子函数，只写了协调器）。
+  // 原样调用即 ReferenceError——本模块从未被生产路径调用（heartflow.js:94 导入后
+  // 未使用，类方法 start() 才是真身），但任何人接线即炸。修法：缺函数时跳过并记
+  // _initErrors，且不置 started——3 个初始化阶段没跑，不能谎报启动成功。
+  const _missingPhases = [];
+  if (typeof _initIdentityAndMemory === 'function') _initIdentityAndMemory(hf); else _missingPhases.push('_initIdentityAndMemory');
+  if (typeof _initBehaviorAndTracking === 'function') _initBehaviorAndTracking(hf); else _missingPhases.push('_initBehaviorAndTracking');
+  if (typeof _initDecisionAndRouting === 'function') _initDecisionAndRouting(hf); else _missingPhases.push('_initDecisionAndRouting');
+
+  if (_missingPhases.length > 0) {
+    hf._initErrors = hf._initErrors || [];
+    _boundedPush(hf._initErrors, { module: 'engine-initializer', error: `未完成的拆分残留，初始化阶段缺失: ${_missingPhases.join(', ')}（引擎未标记为 started）` }, 500);
+    logger.warn('HeartFlow', `engine-initializer: 跳过未实现的初始化阶段 ${_missingPhases.join(', ')}，不置 started`);
+    return hf;
+  }
 
   hf.started = true;
   return hf;

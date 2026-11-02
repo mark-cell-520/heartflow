@@ -124,7 +124,13 @@ class MemoryConsolidator {
 
   startAutoConsolidation(getMemoryCount, consolidate) {
 
+    // [审计轮 2026-11-02] in-flight 保护：consolidateAll 耗时超过间隔时原实现会
+    // 回调重叠执行、重复巩固。另加 unref：未显式 stop 时原 timer 阻止进程退出。
+    this._consolidating = false;
     this._timer = setInterval(async () => {
+
+      if (this._consolidating) return;  // 上一轮未完成，跳过本轮
+      this._consolidating = true;
 
       try {
 
@@ -140,9 +146,14 @@ class MemoryConsolidator {
 
         // 静默失败
 
+      } finally {
+
+        this._consolidating = false;
+
       }
 
     }, this.config.consolidationInterval);
+    if (this._timer && typeof this._timer.unref === 'function') this._timer.unref();
 
   }
 

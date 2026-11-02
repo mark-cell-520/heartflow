@@ -13,6 +13,8 @@
 const { URL } = require('url');
 const net = require('net');
 const dns = require('dns');
+// [审计轮 2026-11-02] 引擎自有本机服务白名单单一事实源（与 fetch-safe 共用）
+const { isEngineLocalService } = require('./local-service-allow.js');
 
 // [V-003] DNS resolution cache (60s TTL) to prevent DNS rebinding
 const DNS_CACHE = new Map();
@@ -112,7 +114,53 @@ function isBlockedV6(ip) {
     return { blocked: true, reason: `IP ${ip} is IPv6 unique local (fc00::/7)` };
   }
 
+  // [审计轮 2026-11-02] IPv4 嵌入型 IPv6 解包复走 V4 判定。
+  // 漏网形态实测（修复前均 safe:true）：https://[::ffff:127.0.0.1]/、
+  // https://[::ffff:169.254.169.254]/（云元数据）、https://[64:ff9b::7f00:1]/。
+  // 覆盖三种前缀：::ffff:0:0/96（IPv4-mapped）、::/96（IPv4-compatible， deprecated）、
+  // 64:ff9b::/96（NAT64 RFC6052）。展开失败的保守放行（net.isIPv6 已验过格式）。
+  const _groups = _expandV6(normalized);
+  if (_groups && _groups.length === 8) {
+    const _last32 = `${(_groups[6] >> 8) & 255}.${_groups[6] & 255}.${(_groups[7] >> 8) & 255}.${_groups[7] & 255}`;
+    const _isV4Mapped = _groups.slice(0, 5).every(g => g === 0) && _groups[5] === 0xffff;
+    const _isV4Compat = _groups.slice(0, 6).every(g => g === 0); // ::/96（deprecated）
+    const _isNat64 = _groups[0] === 0x64 && _groups[1] === 0xff9b && _groups.slice(2, 6).every(g => g === 0);
+    if (_isV4Mapped || _isV4Compat || _isNat64) {
+      const r = isBlockedV4(_last32);
+      return r.blocked
+        ? { blocked: true, reason: `IP ${ip} is IPv4-embedded IPv6 → ${r.reason}` }
+        : { blocked: false, reason: '' };
+    }
+    // 64:ff9b 前缀但非标准 /96 编码（如 64:ff9b:1::/48 变体）——保守拦截，fail-closed
+    if (_groups[0] === 0x64 && _groups[1] === 0xff9b) {
+      return { blocked: true, reason: `IP ${ip} is non-standard NAT64 encoding (64:ff9b::/16), blocked fail-closed` };
+    }
+  }
+
   return { blocked: false, reason: '' };
+}
+
+/** 展开 IPv6 为 8 个 16 位组；失败返回 null（调用方已过 net.isIPv6，失败即异常格式） */
+function _expandV6(ip) {
+  const halves = ip.split('::');
+  if (halves.length > 2) return null;
+  const parse = (s) => (s ? s.split(':').filter(Boolean) : []);
+  const head = parse(halves[0]);
+  const tail = halves.length === 2 ? parse(halves[1]) : null;
+  let groups;
+  if (tail === null) {
+    if (head.length !== 8) return null;
+    groups = head;
+  } else {
+    const missing = 8 - head.length - tail.length;
+    if (missing < 0) return null;
+    groups = [...head, ...new Array(missing).fill('0'), ...tail];
+  }
+  const nums = groups.map(g => {
+    if (!/^[0-9a-f]{1,4}$/i.test(g)) return NaN;
+    return parseInt(g, 16);
+  });
+  return nums.some(Number.isNaN) ? null : nums;
 }
 
 // ─── Main export ─────────────────────────────────────────────────────────────
@@ -132,6 +180,15 @@ function isBlockedV6(ip) {
 async function validateFetchUrl(urlStr) {
   if (!urlStr || typeof urlStr !== 'string') {
     return { safe: false, reason: 'URL is empty or not a string' };
+  }
+
+  // [B 先例维度 · 2026-11-02 审计轮] 引擎自有本机服务白名单。
+  // 审计修复：原实现排在协议校验之前，ftp://127.0.0.1:8588 可返回 safe:true
+  // （白名单不是协议后门）。现由 local-service-allow.js 单一事实源强制三条约束：
+  // 仅 http/https、仅 IP 字面量、localhost 归一化——约束在模块内，与位置无关。
+  // 与 fetch-safe 的 DNS pinning 豁免共用同一份名单，杜绝两处默认值漂移。
+  if (isEngineLocalService(urlStr)) {
+    return { safe: true, reason: 'engine-local-allow' };
   }
 
   // Parse the URL — throws on invalid input

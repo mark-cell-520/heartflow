@@ -38,6 +38,8 @@ class MemoryWriteController {
 
     this._memoryStore = [];
     this._writeDecisions = [];
+    // [审计轮 2026-11-02] 写入决策记录封顶 200 条（6 个 push 点原无裁剪，长运行无界增长）
+    this._maxWriteDecisions = 200;
     this._stats = {
       totalWrites: 0,
       accepted: 0,
@@ -46,6 +48,22 @@ class MemoryWriteController {
       deferred: 0,
       budgetExceeded: 0,
     };
+this._stats = {
+      totalWrites: 0,
+      accepted: 0,
+      rejected: 0,
+      compressed: 0,
+      deferred: 0,
+      budgetExceeded: 0,
+    };
+  }
+
+  // [审计轮 2026-11-02] 有界记录：封顶防无界增长（原 6 个 push 点无裁剪）
+  _recordDecision(d) {
+    this._writeDecisions.push(d);
+    if (this._writeDecisions.length > this._maxWriteDecisions) {
+      this._writeDecisions.splice(0, this._writeDecisions.length - this._maxWriteDecisions);
+    }
   }
 
   // ─── User Profile ───────────────────────────────────────────
@@ -213,7 +231,7 @@ class MemoryWriteController {
     const inj = this.checkInjection(memory);
     if (inj.injected) {
       this._stats.rejected++;
-      this._writeDecisions.push({ action: 'reject', reason: `injection:${inj.reason}`, utility: 0 });
+      this._recordDecision({ action: 'reject', reason: `injection:${inj.reason}`, utility: 0 });
       return 'reject';
     }
 
@@ -221,7 +239,7 @@ class MemoryWriteController {
 
     if (utility < this._config.utilityThreshold * 0.5) {
       this._stats.rejected++;
-      this._writeDecisions.push({ action: 'reject', reason: 'low_utility', utility });
+      this._recordDecision({ action: 'reject', reason: 'low_utility', utility });
       return 'reject';
     }
 
@@ -235,26 +253,26 @@ class MemoryWriteController {
         const evicted = lowest[0];
         this._memoryStore = this._memoryStore.filter(m => m.id !== evicted?.id);
         this._stats.accepted++;
-        this._writeDecisions.push({ action: 'accept', reason: 'replaced_low_utility', utility });
+        this._recordDecision({ action: 'accept', reason: 'replaced_low_utility', utility });
         this._memoryStore.push({ ...memory, utility });
         return 'accept';
       } else {
         this._stats.rejected++;
-        this._writeDecisions.push({ action: 'defer', reason: 'budget_full_low_utility', utility });
+        this._recordDecision({ action: 'defer', reason: 'budget_full_low_utility', utility });
         return 'defer';
       }
     }
 
     if (utility < this._config.utilityThreshold) {
       this._stats.compressed++;
-      this._writeDecisions.push({ action: 'compress', reason: 'medium_utility', utility });
+      this._recordDecision({ action: 'compress', reason: 'medium_utility', utility });
       const compressed = this._compressMemory(memory);
       this._memoryStore.push(compressed);
       return 'compress';
     }
 
     this._stats.accepted++;
-    this._writeDecisions.push({ action: 'accept', reason: 'high_utility', utility });
+    this._recordDecision({ action: 'accept', reason: 'high_utility', utility });
     this._memoryStore.push({ ...memory, utility });
     return 'accept';
   }
