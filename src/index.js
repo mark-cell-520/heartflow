@@ -652,6 +652,8 @@ const { checkProxyMetricGoal } = require('./proxy-metric-goal.js');
 const { checkFalsePrecision } = require('./false-precision.js');
 // [r193] 第 191 维度 ad_nauseam（诉诸重复/反复断言冒充论据）。
 const { checkAdNauseam } = require('./ad-nauseam.js');
+// [r194] 第 192 维度 motte_and_bailey（稻草城堡谬误：争议主张×退守遁词）。
+const { checkMotteAndBailey } = require('./motte-and-bailey.js');
 // [r188] 第 185 维度 most_transitivity（「大多数」链式传递谬误：两个「大多数」
 // 前提推不出「大多数」结论——most 量词不满足传递性，证据不能沿中间项累积）。
 // 判据两段大多数前提×中间项连续性×大多数结论链式三件共现；与 illicit_conversion
@@ -1932,6 +1934,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r193] 第 191 维度 ad_nauseam（诉诸重复）计算点。
   // 同 r192 先例：接线一次接齐，漏一处 gate.action 恒 pass。变量名 adn。
   const adn = _applyPedagogyRelaxation(checkAdNauseam(_normText), "ad_nauseam", pedagogyRelaxation);
+  // [r194] 第 192 维度 motte_and_bailey（稻草城堡谬误）计算点。
+  // 同 r193 先例：接线一次接齐，漏一处 gate.action 恒 pass。变量名 mab。
+  const mab = _applyPedagogyRelaxation(checkMotteAndBailey(_normText), "motte_and_bailey", pedagogyRelaxation);
   // [r188] 第 185 维度 most_transitivity（「大多数」链式传递）计算点。
   // 同 r186 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   // 变量名 mtr——most-transitivity 缩写，grep 实测 0 命中无冲突。
@@ -2465,6 +2470,8 @@ function discriminate(text, evidence = [], contentMode) {
     {score: fp.score, name:'false_precision'},
     // [r193] 第 191 维度 ad_nauseam 参与判定（诉诸重复）。
     {score: adn.score, name:'ad_nauseam'},
+    // [r194] 第 192 维度 motte_and_bailey 参与判定（稻草城堡谬误）。
+    {score: mab.score, name:'motte_and_bailey'},
     // [r188] 第 185 维度 most_transitivity 参与判定（「大多数」链式传递）。
     // 同 r186 先例：dimMap 与 allDims 必须两处都接。
     {score: mtr.score, name:'most_transitivity'},
@@ -2919,6 +2926,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r193] 第 191 维度 ad_nauseam（诉诸重复×
     // 重复单元腿×出现次数腿）。
     ad_nauseam: adn,
+    // [r194] 第 192 维度 motte_and_bailey（稻草城堡谬误×
+    // 争议主张腿×退守遁词腿）。
+    motte_and_bailey: mab,
     // [r726] 第 156 维度 relative_pration（诉诸更惨×
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
@@ -3230,6 +3240,7 @@ function discriminate(text, evidence = [], contentMode) {
     // [r192] 第 188 维度 false_precision（伪精确断言×
     // 无来源无约数的过分精确数字腿×断言/度量语境腿）。
     'ad_nauseam': "不得**把同一断言复读多遍、以重复频率冒充论据强度**——诉诸重复（argumentum ad nauseam / appeal to repetition / broken record）是把**同一内容子句**（≥6 汉字 / ≥3 英文词）在文本里**重复 ≥3 遍**（或 ≥2 遍且带显式重复标记「我已经反复强调/as I've said/over and over」），用出现次数代替递进论证：「这个方案绝对安全。这个方案绝对安全。这个方案绝对安全。」「The policy will work. The policy will work.」「As I've said many times, the science is settled. The science is settled.」（样本形状与负例见 test/round-193-ad-nauseam.js）。为什么重复本身就是问题：论据强度来自**独立证据与机制**，不来自同一句话被念了几遍；复读制造的是「态度笃定」的假象，是「似是而非」的典型。正当做法是**改用递进式论证**（补机制/补数据/补反例/补边界条件）或**明确这是强调而非举证**。判据**两腿共现 + 分组豁免，缺一不判**：腿① UNIT 重复单元——按标点切子句归一化后，取满足长度门槛的内容子句（中文 ≥6 汉字；英文 ≥3 词且含 ≥3 连续字母，排除版本号/纯数字/代码 token 的偶然重复；r161 教训：以「子句」为单位天然覆盖裸名词与倒装/嵌套形）；腿② COUNT 出现次数——该单元在全文归一化串中的非重叠出现次数，纯复读路径 COUNT≥3，标记路径（带显式重复标记）COUNT≥2。边界：sycophancy 管「迎合讨好」语气，本族管「重复即证据」的论证结构；absolute_claim 管绝对化措辞，本族管复读次数；relative_pration 及其余 appeal_* 家族管**内容型**谬误，本族是**结构型**（重复密度）判别，与所有单句内容维度正交。明确不判：引文内复读（「…」、“”、《》内的对话/歌词/引文——先剥离引文再统计，转述不是论证）、元讨论（重复论证/argumentum ad nauseam/ad nauseam/诉诸重复/repetition is a fallacy——讨论这个谬误本身是正确判别）、否定/劝止（别再重复/不要重复/停止重复/stop repeating/don't repeat——劝人别复读是正确判别）、累积式并列（研究表明A…另有研究表明B…还有研究表明C…各子句不同，是正当证据累积）。已知边界：① 演讲/口号/教学复述等真诚强调会落 verify（次数无法断定是操纵，交由调用方确认是否用复读代替论证）；② 跨段重复仍累计计数；③ 无标点的长复读段按整串统计。",
+    'motte_and_bailey': "不得**先抛出无法举证的争议主张、再用无法被否证的遁词退守**——稻草城堡谬误（motte-and-bailey fallacy / castle and courtyard）是把**争议性、难举证的主张**（bailey：全称量词形「所有/全部/凡是/一律/毫无例外…都」、群体刻板形「男人/年轻人/专家们都一个德行/不是好东西」、极端处方形「必须彻底消灭/全面封杀」）与**平庸、易守难攻的表述**（motte：「我只是开个玩笑/别较真/认真你就输了/纯属个人观点/我又没让你信/对号入座」「I'm just saying/just asking questions/don't take it seriously/lighten up」）混为一谈：先推进争议主张，被质疑时坚称自己只是在说平庸表述，进而主张争议主张「未被驳倒」或指责质疑者「较真/对号入座」——用遁词把举证责任反向推给质疑者（样本形状与负例见 test/round-194-motte-and-bailey.js）。为什么这本身就是问题：争议主张需要证据，遁词不提供任何证据却单方面宣布争议主张安全；质疑的成本被转嫁给质疑者，审查被结构性回避。正当做法是**要么拿出争议主张的证据，要么撤回争议主张**——退守表述只在「本来就没有争议主张」时才成立。判据**两腿共现 + 分组豁免，缺一不判**：腿① BAILEY 争议主张——命中全称量词/群体刻板/极端处方任一家族（r161 教训：量词与群体名词收裸名词形态，「个个」「男人都」不收「们」后缀才命中）；腿② MOTTE 退守遁词——命中降格陈述族（我只是说说/别当真/个人观点/我又没让你信/对号入座/谁急了谁就是说中等）。边界：absolute_claim 管绝对化措辞本身，本族要求两腿共现；scrutiny_evasion/seizing 管单一逃避审查句式，本族管「争议主张被遁词替换」的成对结构；gaslighting 管关系操纵，本族管论证结构上的主张降级。明确不判：元讨论（稻草城堡/motte/bailey/争议主张退守到平庸表述——讨论这个谬误本身是正确判别）、否定/劝止（不要用「我只是开玩笑」逃避举证/别拿个人观点当挡箭牌——劝止是正确判别）、无争议主张腿的单纯谦逊（这只是我的初步猜测，可能不对/太阳从东边升起，这只是我的个人看法——遁词只在包裹争议主张时才是稻草城堡）、无遁词腿的单纯绝对化（所有人都会死/All men are mortal——那是 absolute_claim 的辖区）。已知边界：① 轻松的闲聊自嘲（玩笑后接遁词）会落 verify（单凭两腿共现无法断定主观恶意，交由调用方确认争议主张是否有证据）；② 遁词与争议主张同段不同句时按共现判定，跨长文间隔的共现可能是巧合；③ 群体名词清单外的群体（如具体行业黑话）依赖结构形兜底。",
     'false_precision': "不得**用超出证据支撑精度的数字冒充量化证据**——伪精确断言（false precision / spurious precision / overprecision）是把**小数百分比、小数倍数、小数评分、小数年限、精确副词+数字**（37.42% / 3.7 倍 / 92.6 分 / 12.5 年 / 整整 3.7 倍 / exactly 47.83%）以**无来源、无约数、无对冲**的断言形式给出，用过分的数字精度制造「量化严谨」的假象：数字的**精度形态**本身就是证据——样本多大、怎么测的都没说，小数却给到小数点后一两位，是把随机噪声包装成测量读数，是 AI 输出中最典型的数字幻觉形态：「用户满意度达到 92.6 分，远超预期。」「性能提升了整整 3.7 倍，几乎没有代价。」「新药可延长预期寿命 12.5 年。」「该模型在测试集上的准确率达到 99.37%。」「转化率 37.42%，完播率 21.8%。」「The study shows engagement improved by exactly 47.83%.」（样本形状与负例见 test/round-192-false-precision.js）。为什么精度形态本身就是证据：可验证的数字必须同时给出**数值与精度依据**（来源、样本、测量手段）；只给数值不给依据、且精度还异常精致时，数字不可能来自真实测量——「92.6 分」的 0.6 没有出处，「12.5 年」的 0.5 没有队列。它常以汇报、测评、疗效口吻出现，是「似是而非」的典型：看起来是用数据说话，实则是用小数位说话。正当做法是**补上可验证来源**（谁测的、怎么测的、样本多大）、**把数字退回调约形态**（约 37%、大约 3.7 倍、±误差范围）或**声明测量精度**（保留几位小数、置信区间）。判据**两腿共现 + 分组豁免，缺一不判**：腿① PREC 精确数字形（**必须含小数点或精确副词**——四舍五入的整数 37% / 3 倍是约整数的合法形态，不判：小数 %/％、小数倍、小评分（92.6 分，排除分钱/分钟/分利/分贝/分米）、小数年岁（12.5 年/岁）、精确副词+数字（整整/恰好/正好/分毫不差/精确地/准确地/精准地 + ≤4 字 + 数字，含整数形——161 轮教训：副词腿收裸词形态，「准确率 92.6 分」由「准确」前缀+数字命中）；EN 小数 %、小数 x/times、小数 years/months/weeks/days/hours、exactly/precisely/accurately + 数字）；腿② CLAIM 断言/度量语境（腿①匹配点前后 ≤24 字 / EN 48 字符内任一：效果动词 提升/提高/增长/增加/降低/减少/下降/达到/高达/低至/升至/突破/改善/优化/翻番/刷新/创下；EN improves/increases/reduces/reaches/boosts/extends/achieves；度量名词 准确率/满意度/转化率/增长率/覆盖率/留存率/性能/效率/得分/评分/寿命/预期寿命/占比；EN accuracy/satisfaction/conversion/coverage/retention/performance/efficiency/life expectancy；结论标记 证明/表明/显示/说明/意味着/可见/足见；EN proves/shows/demonstrates/indicates/means——**裸名词形即断言语境**：「转化率 37.42%，完播率 21.8%」无动词也是伪精确陈列）。边界：perfect_error 的 S1_false_precision 管**裸**精确百分比（无度量名词、无来源，如「市场份额达到 87.3%」）且是多信号协同判定的一票（[v6.7.93] 起对度量名词语境整体豁免，本为「latency dropped 40%」这类工程读数设计），本族专打**度量名词语境下**的小数断言——正是 S1 豁免腾出的空间，且是单维专项判据、不依赖多信号叠加；statistical_misleading / percentage_overflow 管**比例数字的呈现问题**（基数隐藏/占比合计溢出），本族不管呈现结构、管**数字精度本身是否被证据支撑**；unsupported_claim / bullshit 管断言缺依据的强度，本族有数字在场但数字的**精度形态**无效。明确不判：约数/对冲（约/大约/接近/将近/左右/上下/近似/估算/预计/差不多/误差范围/容差/±/大概/可能/也许/据说；EN about/around/approximately/roughly/nearly/almost/estimated/give or take——概率化或约数化的结论精度已被声明有限）、具名来源（根据X统计局/X大学/X报告/X调查/《X》/据X统计/年报/季报/月报/财报/公报/白皮书/来源于/数据来源/转引自/参见；EN according to X report/study/survey/census/source:——有可定位出处的数字归验证流，不归伪精确）、天然精确语境（数字近邻 ≤40 字 / EN 80 字符内：日期/年份、版本号 v6.8.118、自然计数 12 个/1200 人、物理量纲与精度规格 0.01 毫米/±0.5℃/毫秒、数学常数 π/约等于、时长与历史语境 历时/持续/为期/已有/建于/成立于/研发——这些场合小数是合法精确值）、仪器读数语域（数字近邻内 监控/压测/日志/报表/看板…显示/表明——同 r437「可定位复现」边界，数据可从监控/巡检记录复现）、统计口径（同比/环比/较上期/去年同期/百分点/percentage point/year-over-year——报表变化率引用是统计惯例）、元讨论（有效数字/小数点/四舍五入/位数/保留/精度——讨论精确度本身是正确判别）、疑问句（含 ?/？）。已知边界：① 「实验组有效率为 87.3%」这类**无效果动词、度量名词未入表**的形暂不判（「有效率/完成量/满意度指数」等词可续入腿②，保守方向）；② 豁免为句级属性时，同句混合合法时长与伪精确断言会整句放过（「研发历时 2.5 年，延长预期寿命 12.5 年」——天然精确与仪器豁免已收窄为数字近邻窗，句级豁免仅留约数/来源/口径/元讨论四类真句级属性）；③ 跨段数字（上文给出口径、本段只出现小数）不判。",
     'activity_outcome_confusion': "不得**把活动量/投入工当成成果的证据**——「以工代果」是用**过程与手段的计数**冒充**成果与绩效**：会议开了多少场、文件发了多少份、班加了多少个、代码写了几万行、群众走访了几百户，这些是**投入与活动**，不是**结果**；用它们的数量给「推进得好/进展巨大/成效显著/成绩斐然」这类抽象成果背书，是把「做了很多」偷换成「做成很多」：「我们开了 50 场会、发了 100 份文件，所以项目推进得很好」「团队天天加班到深夜，说明大家成绩显著」「代码写了几万行，可见进展巨大」「今年走访了几百户群众，足以证明基层工作卓有成效」「培训办了几十期，可见人才培养卓有成效」「We held dozens of meetings, so the project is clearly on track.」「The team pulled countless all-nighters, which shows remarkable results.」（样本形状与负例见 test/round-186-activity-outcome-confusion.js）。为什么是无效推理：活动量与成果之间没有必然传递——会开得多可能议题涣散，班加得猛可能在做无用返工，代码行数多可能蕴含更多缺陷，走访户数多可能没有解决任何问题；活动的**数量**不增加成果的**证据**，只增加过程的**成本**。它常以工作汇报的口吻出现，是 AI 总结与绩效陈述中最典型的似是而非：听起来是成绩盘点，实则是把忙碌本身当成了产出。正当做法是**用成果指标替代活动计数**（要证「推进好」就给出交付物完成率/用户留存/收入转化等可验证结果数据）、**把活动与成果分开陈述**（「本月开了 20 次对齐会；上线 3 个模块，留存提升 5 个百分点」——先列活动、再列可验证成果）、或**明示活动只是手段**（「会议只是对齐信息的过程，成果要靠交付来衡量」）。判据**三腿共现，缺一不判**：腿① ACT 活动/投入两类——A 可计数活动名词（会议/开会/文件/发文/代码/代码行/行数/加班/工时/值班/演练/走访/巡查/排查/视察/培训/宣讲/开班/邮件/消息/对接/拜访，及忙碌标记 忙得脚不沾地/夜以继日/起早贪黑/通宵/熬夜；EN meetings/emails/reports/training sessions/inspections/overtime/lines of code/all-nighters），B 泛指投入词（投入/付出/辛劳/辛苦/心血/汗水/精力/奔波——**须与强度标记同现**：大量/很多/天天/每天/日夜/数十/上百/几百/几千/几万/无数；EN a lot of/countless/day and night/dozens of）；腿② OUT 抽象成果结论（**只收抽象成功/进展/绩效**：推进得（好|顺利）/进展（巨大|显著|顺利|喜人）/成效（显著|卓著）/成绩（显著|突出|斐然）/卓有成效/效果（好|显著）/（圆满）成功/势头（好|喜人）/落实有力/扎实有效/干劲十足/业绩（突出）/绩效（优秀|突出）；EN on track/going well/great progress/fruitful/productive/successful/highly effective/remarkable results——**不收具体结果**，具体结果交付归良性）；腿③ CONN 因果连接（活动腿与成果腿之间有 所以/因此/因而/足见/据此/可见/于是/那么/说明/证明/表明/足以证明/足以说明/显然/无疑；EN so/therefore/thus/which means/which shows/proving/demonstrating，**或**两腿以逗号并置且无转折词——中文逗号常承载隐性因果；句号分隔或含转折词不判），活动腿与成果腿总跨度 ≤80 字（EN 160 字符）。边界：reward_hacking（BLOCK）及其 metric_substitution/metric_denominator_gaming/best_run_picking/HAP-Z* 族管**自认式指标作弊**（句中必有「换成/改为/优化…而不是/刷分/让指标好看」的作弊自认标记），本族是**无欺骗的推理谬误**——陈述者真诚相信「做了这么多=成果这么大」，无任何作弊自认，两族可同句共现但判定结构不同；Goodhart 代理**指标**族（点击率/GDP/停留时长/分数——**测得的量**被当作目标）本维度不碰——腿①刻意只收**活动/投入**（开会/加班/代码行/走访——**做的事、花的工**），不收任何度量名词，「下载量破百万所以满足需求」「分数上去所以教学变好」归 Goodhart/代理族射程；bullshit/unsupported_claim 管断言缺依据的强度，本族有明确的「活动量×抽象成果×因果连接」三件结构。明确不判：正确分离过程与成果（只是过程/只是手段/不等于/不代表/不能等同/不能混为一谈/不能只看/关键要看/才是…目标/衡量…的方式/而不是/而非；EN is only a proxy/what matters is/outcomes are/not the same as/a means, not an end——主动区分活动与成果是正确判别）、具体成果在场（交付/上线/发布/出货/签单/成交/收入/营收/转化率/留存率/用户增长/完成了/达标；EN shipped/delivered/deployed/launched/revenue/signed/completed the goal——成果已被具体结果背书，不再是拿活动计数充数）、对冲（可能/也许/或许/未必/不一定/大概/恐怕/有待/仍需；EN maybe/perhaps/might/probably/remains to be seen——概率化结论不作谬误判定）、疑问句（含 ?/？）。已知边界：① 活动腿与成果腿限同句，总跨度 ≤80 字（EN 160 字符），跨段形本轮保守不收；② 两腿仅以句号分隔、无显式连接词时不判（保守，避免把两个独立事实误并为一个因果断言）；③ 泛指投入词（投入/付出）单独出现不判，须与强度标记同现，避免误伤「投入研发取得突破」这类正常因果叙述；④ 含转折词（但/然而/却/不过/虽然）的并置不判——那是并列或反向陈述。",
     // [r188] 第 185 维度 most_transitivity（「大多数」链式传递）guidance。
@@ -4228,6 +4239,10 @@ function discriminate(text, evidence = [], contentMode) {
     // 「重复代替论证」需要补的是**递进内容**（机制/数据/反例），不是改写
     // 句式；单句/整段也可能是真诚强调或教学复述。与 r161-r192 同口径。
     'ad_nauseam',
+    // [r194] 第 192 维度 motte_and_bailey（稻草城堡谬误：争议主张+退守
+    // 遁词）。verify 级——「遁词代替举证」需要补的是争议主张本身的证据
+    // 或撤回主张；单凭两腿共现无法断定主观恶意。与 r161-r193 同口径。
+    'motte_and_bailey',
     // [r726] 第 156 维度 relative_pration（诉诸更惨）登记。
     // verify 级——「拿更惨的人抹掉眼前抱怨」需要补的是对方诉求本身的
     // 事实核查与处理方案，单句也可能是共情转述或概念讨论。与 r672-r725
@@ -4761,6 +4776,8 @@ function discriminate(text, evidence = [], contentMode) {
       false_precision: fp,
       // [r193] 第 191 维度 ad_nauseam（诉诸重复）。同上：九处一次接齐。
       ad_nauseam: adn,
+      // [r194] 第 192 维度 motte_and_bailey（稻草城堡谬误）。同上：九处一次接齐。
+      motte_and_bailey: mab,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,

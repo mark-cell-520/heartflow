@@ -1,4 +1,45 @@
 
+# r194 升级轮报告（v6.8.123 — 第 192 维度 motte_and_bailey「稻草城堡谬误」上线 — 2026-11-02）
+
+## 一、方向与轮换
+
+逻辑谬误检测——轮换至**成对结构型/逃避审查型**子方向（r193 ad_nauseam 为重复密度型，r190-r192 为单句内容型：代理指标/伪精确；本族是「争议主张 + 退守遁词」的**替换结构**，与全部既有维度正交）。
+
+## 二、来源（真实，未编造）
+
+- HN Algolia：`motte and bailey fallacy` 命中 Wikipedia 条目（https://en.wikipedia.org/wiki/Motte-and-bailey_fallacy，HN 30258127 pts=29 等 5 条）与 Slate Star Codex 2014 年命名原文（http://slatestarcodex.com/2014/11/03/all-in-all-another-brick-in-the-motte/，HN 15206367 pts=11）。Wikipedia 摘要原文核实：「The arguer advances the controversial position, but when challenged, insists that only the more modest position is being advanced.」
+- GitHub API `motte bailey fallacy`（sort=stars）：**total=0**，无可复用代码。
+- Semantic Scholar 三次检索 HTTP 429 空返。
+- 缺口实证：`grep -ril 'motte|bailey' src/` **0 命中**——191 维无一覆盖该族。
+- 侦察落盘 `/tmp/hf-scout-1793608728.txt`。判据为心虫自有纯规则实现（零 LLM 依赖）。
+
+## 三、心虫裁决
+
+philosophy_decision（带实质上下文：任务=新增第192维度 motte_and_bailey、意图=获得「争议主张+退守遁词」新攻击族辨别能力）：**type=accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions）。如实说明：rationale 中 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎未测到当很低），按轮次纪律未当作实质背书。
+
+## 四、实现
+
+- 新文件 `src/motte-and-bailey.js`（约 260 行）：`checkMotteAndBailey(text, inject)` + `__internals`（14 组枚举常量可逐族负例注入）。
+- 判据**两腿共现 + 分组豁免，缺一不判**：
+  - 腿① BAILEY 争议主张（三家族）：全称量词形（所有/全部/凡是/一律/统统/毫无例外/无一例外/个个…都/皆/均；EN all/every/everyone/always/never/without exception/every single）；群体刻板形（群体名词裸形态+「们」后缀双形态 × 都/个个/一律/全/统统 × 贬判谓语；无群体词的「都一个样/一个德行」结构形；X 全是 + 智商税/垃圾/骗子强贬义名词；EN men/women/immigrants… are all the same/trash/evil）；极端处方形（必须/应当 × 彻底/完全/全面/永久/无条件 × 禁止/消灭/清除/封杀/铲除；EN must be completely/totally/permanently banned/eliminated/destroyed——动词原形与过去分词双形态）。
+  - 腿② MOTTE 退守遁词：我只是(随便)(说|讲|提|问|猜)/别当真/别较真/何必认真/认真你就输了/纯属个人观点/一家之言/我又没让你信/不信当我没说/对号入座/谁急了谁就是说中了；EN I'm just saying/just asking questions/just a joke/don't take it seriously/lighten up/if the shoe fits/in my opinion/imho/whoever it applies to。其中 MOTTE_DISMISS 子族（别较真/认真你就输了/don't take it seriously/lighten up/if the shoe fits）为审查否定型遁词，计分 +0.05。
+  - 计分：基础 0.60 + 命中家族数 ×0.06 + 遁词否定审查 +0.05，封顶 0.85。
+- 豁免：元讨论（稻草城堡/motte/bailey/castle and courtyard）、否定/劝止（别拿「我只是开玩笑」当挡箭牌/don't hide behind "just saying"）、无争议主张腿的单纯谦逊、无遁词腿的单纯绝对化。
+- `src/index.js` 七处接线（require / compute / gate 数组 / dimMap / DIM_GUIDANCE / VERIFY_DIMS / allDims-dimensions），VERIFY 级。变量名 `mab`（grep 实测 0 命中无冲突）。
+- r161 教训落实：枚举腿收裸名词形态（「男人都不是」「个个」「全都一个德行」——不收「们」后缀才命中的形），且「审查否定型遁词」子类与主遁词腿同源收全（实现中发现并修复：子类初版只登记在加成族、漏出主腿，导致 4/10 攻击漏判——probe 迭代修复后 10/10）。
+
+## 五、验证数据（本轮实跑）
+
+- round-194 轮测 **41/41**：攻击 8/8 命中（score ≥0.6）、单家族攻击 4/4、良性 8/8 放行（含边缘良性「战争是多因共同造成的」「All men are mortal」）、陷阱 2/2（元讨论/劝止放行）、7 项常量负例注入承重（抹 MOTTE 腿→全停；抹 BAILEY 三族→全停；逐族置空互不影响；抹元讨论/劝止豁免→陷阱转命中）、gate 层变体矩阵：攻击 6/6 非 pass 且 motte_and_bailey 承重进 findings、良性 6/6 pass。
+- 五门禁：bin/verify.js **16/16**、guard-abilities.js **20/20**、doc-numbers **22/22**（README/SKILL/AGENTS 三处数字 191→192、VERIFY 148→149 同步后）、bidirectional-guard 召回 **52/52**、误拦 **302/326**（与基线逐位一致，新维度零误伤）。
+- 维度数 191→192、VERIFY 148→149、模块 162 不变（纯函数维度模块不进 _modules registry）。
+
+## 六、已知边界
+
+① 轻松的闲聊自嘲（玩笑后接遁词、无绝对化主张）不判（腿①门槛即挡）；② 遁词与争议主张同段不同句按共现判定，跨长文间隔的共现可能是巧合；③ 群体名词清单外的群体依赖「都一个样」「X 全是智商税」结构形兜底，具体行业黑话可能漏判；④ 元讨论豁免在讨论中顺带引用攻击例句且句中出现「稻草城堡」时整句豁免（保守方向）；⑤ 未跑全量回归（遵禁令），存量 71 项失败未逐条归因。
+
+---
+
 # LOW 批次收尾轮报告（v6.8.122 — 2026-11-02）
 
 ## 一、范围

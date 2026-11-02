@@ -1,3 +1,17 @@
+## [6.8.123] - 2026-11-02
+
+### Added — 第 192 判别维度 `motte_and_bailey`「稻草城堡谬误」（r194，真升级类型 1）
+
+- **新文件 src/motte-and-bailey.js（约 260 行）**：`checkMotteAndBailey(text, inject)` + `__internals`。辨别的族：**争议性、难举证的主张（bailey）与平庸、易守难攻的表述（motte）被混为一谈**——先推进争议主张，被质疑时退守「我只是开玩笑/别较真/个人观点」，并主张原主张「未被驳倒」、指责质疑者「较真/对号入座」，用遁词把举证责任反向推给质疑者。
+- **判据两腿共现 + 分组豁免，缺一不判**：腿① BAILEY 争议主张（全称量词形：所有/全部/凡是/一律/毫无例外/个个…都；群体刻板形：男人/年轻人/专家们都一个德行/不是好东西，裸名词+「们」双形态；极端处方形：必须彻底消灭/全面封杀；EN all/every/everyone…、men/women/immigrants are all the same/trash、must be completely banned）；腿② MOTTE 退守遁词（我只是随便说/别当真/认真你就输了/纯属个人观点/我又没让你信/对号入座/谁急了谁就是说中了；EN I'm just saying/just asking questions/don't take it seriously/lighten up/if the shoe fits）。计分 0.60 起，家族数 ×0.06，审查否定型遁词 +0.05，封顶 0.85。
+- **豁免**：元讨论（稻草城堡/motte/bailey/castle and courtyard）、否定/劝止（别拿「我只是开玩笑」当挡箭牌）、无争议主张腿的单纯谦逊、无遁词腿的单纯绝对化（absolute_claim 辖区）。
+- **src/index.js 七处接线**（require / compute / gate 数组 / dimMap / DIM_GUIDANCE / VERIFY_DIMS / allDims-dimensions），VERIFY 级——遁词代替举证需要补的是争议主张的证据或撤回，单凭两腿共现无法断定主观恶意。
+- **边界**：与 absolute_claim（管绝对化措辞本身，本族要求两腿共现）、scrutiny_evasion/seizing（管单一逃避句式，本族管成对替换结构）、gaslighting（管关系操纵）刻意错开。
+- 来源（真实，未编造）：HN Algolia 命中 Wikipedia「Motte-and-bailey fallacy」条目与 Slate Star Codex 2014 年原文（http://slatestarcodex.com/2014/11/03/all-in-all-another-brick-in-the-motte/）；GitHub `motte bailey fallacy` 检索 total=0（无可复用代码）；Semantic Scholar 429。判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-1793608728.txt。心虫裁决：philosophy_decision type=accelerate（confidence 0.7 / priority 40；cognitiveLoad、uncertainty 为 "unknown"，按轮次纪律未当实质背书）。
+- 验证：round-194 轮测 41/41（攻击 11/11 命中、良性 8/8 放行、单家族攻击 4/4、7 项常量负例注入承重含逐族置空与豁免抹除转命中、gate 层变体矩阵攻击 6/6 非 pass 且 motte_and_bailey 承重 + 良性 6/6 pass）；五门禁：verify 16/16、guard-abilities 20/20、doc-numbers 22/22、双向 召回 52/52 误拦 302/326（与基线逐位一致，零误伤）。维度数 191→192、VERIFY 148→149、模块 162 不变（纯函数维度模块不进 _modules registry）。
+
+---
+
 ## [6.8.122] - 2026-11-02
 
 ### Fixed — LOW 批次收尾轮（v6.8.120 审计轮遗留 + 合并回归暴露项）
