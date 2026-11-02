@@ -1,3 +1,43 @@
+# r196 升级轮报告（v6.8.125 — 第 194 维度 argument_to_moderation「诉诸中庸」上线 — 2026-11-02）
+
+## 一、方向与轮换
+
+逻辑谬误检测一线（r195 为统计因果归因，本轮切回谬误族，候选轮换纪律内）。补齐的族：**诉诸中庸（argument to moderation / 中间立场谬误）**——把两个立场并置后断言「真相/正确答案在中间」「各打五十大板」「折中才是对的」「一个巴掌拍不响」，用「取中」这个动作本身替代对双方证据的检验。缺口实证：grep -rniE 'moderation|中庸|中间立场' src/ 仅命中古籍书名（《中庸》，classics-feedback/classics-rules 的知识词表）与 content moderation 一词（doublespeak 引述语境、injection-synonyms 词表、shield 错误分类）——193 维无一覆盖「以位置取信」族。
+
+## 二、来源（真实，未编造）
+
+- HN Algolia "logical fallacy detection"：arXiv:2405.02318《Translating natural language to first-order logic for logical fallacy detection》（pts=258，comments=143，https://arxiv.org/abs/2405.02318）——确认谬误检测是 NLP 公认任务族；NL2FOL+SMT 路线与纯规则引擎不同构，只作概念背景。
+- GitHub API "fallacy detection"（sort=stars）：latent-variable/Real_time_fallacy_detection ★120（whisper+LLaMA/Mistral 实时转写）、tmakesense/logical-fallacy ★21（在线工具）、panFJCharlotte98/Fallacy_Detection ★5（EMNLP 2024 LLM zero-shot 分类器）、dhfbk/faina ★5（NAACL 2025）、SeanFlannery/Logical.ly ★4——全部依赖 LLM 或仅有分类器框架，无可复用的纯规则判据。
+- Semantic Scholar：HTTP 429 空返（如实记录）。
+- 侦察落盘：/tmp/hf-scout-1793624980.txt。
+- 心虫裁决：philosophy_decision type=accelerate（confidence 0.7 / priority 40 / trigger optimal_conditions；cognitiveLoad 与 uncertainty 均为 "unknown"，按轮次纪律未当实质背书）。
+
+## 三、实现内容
+
+- 新文件 src/argument-to-moderation.js（约 300 行）：`checkArgumentToModeration(text, inject)` + `__internals`（14 个可注入常量：MIDDLE_ZH/TRUTH_ZH/MIDDLE_EN/TRUTH_EN + 五组豁免 × 中英）。
+- 判据两腿共现 + 叙事窗（≤50 字 / EN ≤200 字符），缺一不判：腿① MIDDLE 中间/折中立场表述（中间立场/中间道路/真相·答案·结论在(两者|双方)之间/折中/中庸/各打五十大板/一个巴掌拍不响/双方都有错/都太极端/走了极端/各让一步/各退一步/取(个)中间；EN middle ground / in between / split the difference / meet in the middle / halfway / compromise position / both extremes）；腿② TRUTH 中间=正确断言（才是[^。；，]{0,8}(对|正确|真理|正解|理性|客观|公道|合理|最优|出路|公平)/(中间|折中)才是X/都不全对/把(中间|折中)当成(真理|真相|正确)/(最|才)(公平|合理)的(处理|解决|做法|方案|方式)/(正确|真正|对)的(答案|结论|真相|立场)(就)在；EN is the (correct|right|true|rational|fair|fairest|reasonable|best) answer/position/conclusion / truth lies in the middle / both sides are wrong / neither side is entirely right / middle ground is the (correct|fairest|rational) / the (fairest|correct|best) position is (the one) in between / between the two extremes）。计分 0.62 + 俗语形 0.06 + 显式断言 0.04，封顶 0.85。
+- r161 教训落实：「中间立场」「折中」「各打五十大板」「双方都有错」收裸名词形态；「取中间」受限形（不收「中间价/中间值」，另有算术豁免兜底）。
+- 豁免五组 + 疑问句：概念教学 / 谈判交易和解 / 算术统计取中 / 推理否定 / 对冲。
+- src/index.js 七处接线：require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象。变量名 atm（grep 实测无冲突）。
+- 测试 test/round-196-argument-to-moderation.js（54 断言）。
+
+## 四、验证数据（五门禁 + 变体矩阵）
+
+- node --check：src/argument-to-moderation.js + src/index.js 通过。
+- bin/verify.js：16 passed / 0 failed。
+- scripts/guard-abilities.js：20/20（维度登记 194 键；summary 引用 150）。
+- test/doc-numbers-accuracy.test.js：22 passed / 0 failed（README/SKILL/AGENTS 三处 193→194、verify 150→151、tiers 180→181、版本戳 6.8.125 同步后转绿）。
+- scripts/bidirectional-guard.js：召回 52/52（100%）、误拦 302/326 pass（92.6%）——与基线逐位一致，零新增误伤。
+- round-196 轮测 54/54：攻击 10/10（中英双语、裸名词、带修饰、倒装、长句）；良性 14/14（谈判成交/算术取中/元讨论/推理否定/市场行情/拼合优点/EN 同类）；7 项豁免陷阱全部「含豁免词放行 + 抹掉豁免转命中」；4 项腿常量负例注入（MIDDLE_ZH/TRUTH_ZH/MIDDLE_EN/TRUTH_EN 置空后对应攻击全停）；gate 层变体矩阵攻击 6/6 非 pass 且 argument_to_moderation 承重、良性 7/7 pass。
+- 运行态：supervisorctl restart heartflow-mcp 后 /health 与 heartflow_status 确认（见提交记录）。
+
+## 五、已知边界 / 下次可继续
+
+- 两腿限同句/邻句叙事窗（≤50 字 / EN ≤200 字符），跨长文的「上文立两端、下文断言取中」不收。
+- 「各让一步才是最公平的方案」在无谈判标记的纯论断句会落 verify（verify 级设计即「先验证据再采信」，非误拦，但边界样本依赖调用方判断）。
+- 隐式折中（「两家各认一部分损失」无中间/折中字样）不入腿①，保守不放宽。
+- 候选池轮换记录：r195 统计因果 → r196 逻辑谬误；下轮可回证据充分性/幻觉检测或自我验证一线（nirvana_fallacy「不完美就没用」与 loaded_question 预设问句两族在 r196 探针中评分次席，可作下轮候选）。
+
 # r195 升级轮报告（v6.8.124 — 第 193 维度 regression_to_the_mean「回归均值误归因」上线 — 2026-11-02）
 
 ## 一、方向与轮换

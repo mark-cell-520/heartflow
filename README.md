@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-193 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+194 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 193 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 194 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (193 dimensions) -> gate
+scope-check -> premise-check -> discriminate (194 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.124**. Not marketing copy.
+Measured on this repository at **v6.8.125**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 193 |
+| Discrimination dimensions | 194 |
 | MCP tools | 184 |
 | Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.125 | 2026-11-02 | 第 194 维度 **argument_to_moderation**「诉诸中庸」上线（r196）——「中间/折中立场表述×中间=正确断言」两腿结构判别，填补 193 维在「以位置取信」族的空白 |
 | 6.8.124 | 2026-11-02 | 第 193 维度 **regression_to_the_mean**「回归均值误归因」上线（r195）——「极端基线×回归性变化×干预功劳归因」三腿结构判别，填补 192 维在统计因果归因族的空白 |
 | 6.8.123 | 2026-11-02 | 第 192 维度 **motte_and_bailey**「稻草城堡谬误」上线（r194）——「争议主张+退守遁词」替换结构的判别，填补 191 维在该族的空白 | 
 | 6.8.121 | 2026-11-02 | 第 191 维度 **ad_nauseam**「诉诸重复」上线（r193）——复读冒充论据的结构型判别，补齐单句内容型谬误之外的重复密度盲区 |
