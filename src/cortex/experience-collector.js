@@ -587,13 +587,24 @@ class ExperienceCollector {
 
     // 按有用性和时间排序
 
+    // [审计轮 2026-11-02] 淘汰公式修复：原式 `usefulness - timestamp/1e7`——
+    // timestamp 是 Date.now() 毫秒（~1.76e12），除以 1e7 ≈ 17.6 万，而 usefulness
+    // 量级 0~1，时间项以 6 个数量级压过有用性项 → 排序实际等价于按 timestamp 降序
+    // → slice(0, 超出量) 淘汰的永远是最新经验，最旧的反被保留（与注释意图相反，
+    // 超量后缓冲区收敛为只存最旧 maxExperiences 条，新经验进不来）。
+    // 修法：衰减按**年龄**算（旧才该被淘汰），每天 -0.05，约 20 天归零。
+    const _now = Date.now();
     const sorted = [...this.experiences.entries()]
 
       .sort((a, b) => {
 
-        const scoreA = (a[1].usefulness || 0) - (a[1].timestamp / 10000000);
+        const _ageA = a[1].timestamp ? Math.max(0, (_now - a[1].timestamp) / 86400000) : 0;
 
-        const scoreB = (b[1].usefulness || 0) - (b[1].timestamp / 10000000);
+        const _ageB = b[1].timestamp ? Math.max(0, (_now - b[1].timestamp) / 86400000) : 0;
+
+        const scoreA = (a[1].usefulness || 0) - _ageA * 0.05;
+
+        const scoreB = (b[1].usefulness || 0) - _ageB * 0.05;
 
         return scoreA - scoreB;
 

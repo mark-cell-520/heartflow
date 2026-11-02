@@ -313,7 +313,10 @@ class MetaEngine {
       let content = fs.readFileSync(skillPath, 'utf8');
       
       for (const [key, value] of Object.entries(updates)) {
-        const regex = new RegExp(`## ${key}[\\s\\S]*?(?=## |$)`, 'i');
+        // [审计轮 2026-11-02] key 转义后再入正则：原样拼接遇 . * ( ) 等元字符会
+        // 正则注入/行为异常（如 key='a.b' 匹配 'axb'）
+        const _reEsc = String(key).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`## ${_reEsc}[\s\S]*?(?=## |$)`, 'i');
         if (regex.test(content)) {
           content = content.replace(regex, `## ${key}\n${value}\n`);
         } else {

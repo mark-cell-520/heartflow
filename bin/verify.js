@@ -149,10 +149,11 @@ checkResults.push(check('think() 可用', async () => {
   }
 }));
 
-// 5. 停止引擎
-if (engine) {
-  try { engine.stop(); } catch(e) { /* stop may fail on circular ref */ }
-}
+// [AUDIT-FIX 2026-11-02 合并回归修复] 「停止引擎」块从原第 152 行（同步阶段）移除。
+// 原顺序：同步 stop() → 之后才 await 异步检查。openmem 先例查询（v6.8.121 合入）在
+// think() 开头引入 await 边界后，think 续跑在 stopped 引擎上，thought-chain.js:1539 的
+// started 检查抛「HeartFlow not started」——verify 16 项必挂 1 项。
+// 停止引擎移到全部异步检查完成后（见文件末尾 Promise.all 内）。
 
 // 4b. [r422] 对外入口 gate.js 校验 —— 修「自检走 heartflow.js，用户走 gate.js」的盲区
 //
@@ -273,6 +274,11 @@ checkResults.push(check('扫描新增.txt/.json明文记忆', async () => {
 
 // Wait for all async checks, then print results
 Promise.all(checkResults).then(() => {
+  // [AUDIT-FIX 2026-11-02] 全部异步检查（含 think() 可用）完成后再停止引擎——
+  // 提前 stop 会让 think 续跑撞上 started 检查（详见上方 4b 注释）。
+  if (engine) {
+    try { engine.stop(); } catch(e) { /* stop may fail on circular ref */ }
+  }
   console.log(RESULTS.join('\n'));
   const passed = RESULTS.filter(r => r.includes('✅')).length;
   const failed = RESULTS.filter(r => r.includes('❌')).length;

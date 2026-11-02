@@ -4,11 +4,34 @@ const { _matchKeywords, _matchAnyRegex, REASONING_PATTERNS, FALLACY_PATTERNS, FR
 class LogicReasoning {
   constructor(options = {}) {
     this.version = '5.5.0';
-    // [HIGH FIX] 环形缓冲区（避免 shift() O(n) 开销）
+    // [审计轮 2026-11-02] 环形缓冲区修复：原代码先 `new Array(this._maxHistory)` 后赋值
+    // _maxHistory——undefined → 长度 1 的数组；_historyHead/_historySize 赋值后全文零
+    // 读取；容量检查是空块。实测 maxHistory:3 分析 11 次后 length=12（无界增长）。
+    // 本模块自 v6.8.120 起进 think() 热路径（心虫主入口输入层调用），泄漏会随每次
+    // think() 累积，故按原注释意图真正实现环形缓冲。
+    this._maxHistory = options.maxHistory || 50;
     this._history = new Array(this._maxHistory);
     this._historyHead = 0;  // 写入位置
     this._historySize = 0;  // 当前大小
-    this._maxHistory = options.maxHistory || 50;
+  }
+
+  /** 环形缓冲追加（覆盖最旧，O(1)，无 shift） */
+  _pushHistory(entry) {
+    if (this._maxHistory <= 0) return;
+    this._history[this._historyHead] = entry;
+    this._historyHead = (this._historyHead + 1) % this._maxHistory;
+    if (this._historySize < this._maxHistory) this._historySize++;
+  }
+
+  /** 按时间序读取历史（最新在末） */
+  getHistory() {
+    const out = [];
+    for (let i = 0; i < this._historySize; i++) {
+      const idx = (this._historyHead - this._historySize + i + this._maxHistory * 2) % this._maxHistory;
+      const e = this._history[idx];
+      if (e) out.push(e);
+    }
+    return out;
   }
 
   /**
@@ -40,16 +63,12 @@ class LogicReasoning {
       },
     };
 
-    this._history.push({
+    this._pushHistory({
       input: input.slice(0, 100),
       type: reasoningType.primaryType,
       fallacyCount: fallacies.length,
-      answer: answerSelection?.selectedAnswer || null,
       ts: Date.now(),
     });
-    if (this._history.length > this._maxHistory) {
-      // [HIGH FIX] 环形缓冲区无需 shift()（超过容量时自动覆盖）
-    }
 
     return result;
   }
@@ -574,10 +593,12 @@ class LogicReasoning {
       llmFallback: best.score < 0.1 ? true : false,
       // [v5.17.16 M2] 主动推理EFE原型 — 探索(epistemic) vs 利用(pragmatic)
       // EFE = 实用价值(偏好满足) + 认知价值(信息增益)
+      // [审计轮 2026-11-02] 刻度修复：confidence 是 0.1–1.0 标量，原 /100 与 <50
+      // 是 0–100 刻度遗留——exploitation 恒 ≤0.01、needsMoreEvidence 恒 true（实测）。
       activeInference: {
-        exploitation: +(confidence / 100).toFixed(3),
-        exploration: +(1 - confidence / 100 - (scored.length > 1 ? scored[1].score / 100 : 0)).toFixed(3),
-        needsMoreEvidence: confidence < 50 || (scored.length > 1 && scored[1].score > finalBest.score * 0.7),
+        exploitation: +confidence.toFixed(3),
+        exploration: +Math.max(0, 1 - confidence - (scored.length > 1 ? scored[1].score : 0)).toFixed(3),
+        needsMoreEvidence: confidence < 0.5 || (scored.length > 1 && scored[1].score > finalBest.score * 0.7),
       },
     };
   }
@@ -1199,16 +1220,17 @@ class LogicReasoning {
   getStats() {
     return {
       version: this.version,
-      totalAnalyses: this._history.length,
+      // [审计轮 2026-11-02] totalAnalyses 改读 _historySize——原读 _history.length，
+      // 环形缓冲修复后 length 恒等于容量（零分析也返回 50）
+      totalAnalyses: this._historySize,
       reasoningTypes: REASONING_PATTERNS.length,
       fallacyTypes: FALLACY_PATTERNS.length,
       frameworks: Object.keys(FRAMEWORKS).length,
     };
   }
 
-  getHistory() {
-    return this._history.slice(-10);
-  }
+  // [审计轮 2026-11-02] 原 getHistory（this._history.slice(-10)）已移至类前部
+  // （环形缓冲按时间序读取）；此处旧副本删除，避免后定义覆盖前定义。
 }
 
 // [v5.17.9 H1] P0已修复: host白名单校验 + safeFetch SSRF防护

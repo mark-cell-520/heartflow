@@ -18,6 +18,8 @@ class AdaptiveLearningEngine {
     this.memory = memory;
     this.storeDir = storeDir || path.join(process.env.HEARTFLOW_DIR || '.', 'profiles');
     this.profiles = new Map();
+    // [审计轮 2026-11-02] 用户画像缓存封顶 500（原无淘汰无 TTL，userId 基数大时无界增长）
+    this._maxProfiles = 500;
   }
 
   _key(userId) { return userId || 'anonymous'; }
@@ -38,6 +40,11 @@ class AdaptiveLearningEngine {
     }
     p.updatedAt = Date.now();
     this.profiles.set(k, p);
+this.profiles.set(k, p);
+    if (this.profiles.size > this._maxProfiles) {
+      const oldest = this.profiles.keys().next().value;
+      this.profiles.delete(oldest);
+    }
     await this._persist(k, p);
     return p;
   }
@@ -75,8 +82,11 @@ class AdaptiveLearningEngine {
 
   async _persist(k, p) {
     try {
-      await fs.promises.mkdir(this.storeDir, { recursive: true });
-      await fs.promises.writeFile(path.join(this.storeDir, `${k}.json`), JSON.stringify(p), 'utf8');
+      // [审计轮 2026-11-02] 持久化修复：原用 fs.promises.mkdir/writeFile——safe-fs
+      // 没有 .promises 导出，每次调用必抛（被 catch 静默记 warn）——画像从未真正
+      // 落盘，进程重启全丢。改用 safe-fs 同步 API（storeDir 在项目内，过 path-guard）。
+      fs.safeMkdirSyncRecursive(this.storeDir);
+      fs.safeWriteFileSync(path.join(this.storeDir, `${k}.json`), JSON.stringify(p), 'utf8');
     } catch (e) {
       log.warn('persist profile failed', { error: e.message });
     }

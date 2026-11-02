@@ -300,8 +300,9 @@ class DecisionFeedback {
         currentPriorities = { ...routerModule.DECISION_PRIORITY };
       }
     } catch (e) {
-      // 回退：尝试从路由器实例上获取
-      // (router 内部引用 DECISION_PRIORITY 但并未作为属性暴露)
+      // [审计轮 2026-11-02] 原空 catch：注释描述的「回退从路由器实例获取」未实现，
+      // 失败完全静默。补 debug 级记录（不改变控制流，失败仍走原 default 值）。
+      try { require('../utils/debug-log').debugLog('decision-feedback', `DECISION_PRIORITY 获取失败，走默认值: ${e.message}`); } catch (_) { /* 日志不可用不阻断 */ }
     }
 
     if (!currentPriorities) {

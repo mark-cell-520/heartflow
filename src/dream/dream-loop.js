@@ -722,7 +722,6 @@ module.exports = {
   _validateMemoryItems,
   _detectOscillation,
   _pruneStaleDreams,
-  DreamEngine: require('./dream.js').DreamEngine,
 };
 
 if (require.main === module) {

@@ -5,6 +5,8 @@
 
 const DEFAULT_TIMEOUT = 10000; // 10秒默认超时
 const DEFAULT_MAX_RETRIES = 2;
+// [审计轮 2026-11-02] 引擎自有本机服务白名单单一事实源（与 url-validator 共用）
+const { isEngineLocalService } = require('../security/local-service-allow.js');
 
 /**
  * 带超时 + SSRF防护的安全 fetch
@@ -30,8 +32,15 @@ async function safeFetch(url, options = {}) {
     throw new Error(`SSRF validation unavailable for: ${url}`);
   }
 
+  // [B 先例维度 · 2026-11-02 审计轮] 引擎自有本机服务白名单豁免 DNS pinning：
+  // 与 url-validator 共用 local-service-allow.js 单一事实源（host:port 精确匹配，
+  // 仅 http/https、仅 IP 字面量、localhost 归一化）。这些端点是引擎硬编码的本机
+  // 服务，不存在 DNS 重绑定窗口（host 就是字面 IP，无可解析的域名）。
+  // 除此之外 loopback/内网 IP 的 pinning 二次校验照旧执行。
+  const _engLocal = isEngineLocalService(url);
+
   // [v5.17.11 M3] DNS pinning: 解析后二次校验IP,消除TOCTOU重绑定窗口
-  if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
+  if ((parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') && !_engLocal) {
     try {
       const dns = require('dns').promises;
       const net = require('net');
@@ -103,7 +112,9 @@ async function safeFetch(url, options = {}) {
         lastError = new Error(`fetch timeout after ${timeout}ms: ${url}`);
       }
       if (attempt < maxRetries) {
-        await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // 指数退避
+        // [审计轮 2026-11-02] 注释修正：1000*(attempt+1) 是线性退避（1s/2s），非指数；
+        // 行为不变（先例维度走 maxRetries:0，本路径不触及）
+        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
       }
     }
   }

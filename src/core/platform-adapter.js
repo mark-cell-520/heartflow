@@ -29,6 +29,14 @@ class PlatformAdapter {
     this.platform = config.platform || 'unknown';
     this.capabilities = new Set();
     this.connected = false;
+    // [审计轮 2026-11-02] 保存 config.rootPath：原构造函数不保存，全部子类/
+    // createAdapter 也无处赋值 → _isPathAllowed() 首行 `if (!this.rootPath)
+    // return false` 恒 false → HermesAdapter.readFile/writeFile 对所有路径返回
+    // path_not_allowed。引擎主路径因 heartflow.js 外部补设 rootPath 而正常，
+    // 但 capability-abstraction.js:23 默认 createAdapter('hermes')（无 config）
+    // 构造路径下文件 IO 100% 失效。fail-closed 方向是对的，但功能是死的。
+    this.rootPath = config.rootPath || null;
+    this._config = config;
   }
 
   // 必须实现：发送消息到用户

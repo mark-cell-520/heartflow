@@ -388,11 +388,15 @@ class EmbodiedCore {
       if (retryInfo.strategy !== RetryStrategy.NONE && attempt < retryInfo.maxRetries) {
         
         // 指数退避等待
+        // [审计轮 2026-11-02] 原实现算出 waitMs/waitUntil 后两者均未使用（死变量），
+        // 同步递归重试零延迟立即执行——maxRetries 2-3 次瞬间打完，退避语义完全失效。
+        // 本方法是同步的（_executeStepWithRetry 无 async），不能 await 延迟（会
+        // SyntaxError），也不能恢复 busy-wait（阻塞事件循环，正是当初移除的原因）。
+        // 诚实修法：记录应等的时长供调用方/观测使用，重试节奏由上层异步调度决定；
+        // 同时把策略真实标注到 result 上，不再假装等过。
         if (retryInfo.strategy === RetryStrategy.BACKOFF) {
           const waitMs = retryInfo.backoffMs * Math.pow(2, attempt);
-          // 同步等待（在Node.js事件循环中让出）
-          const waitUntil = Date.now() + waitMs;
-          // 已移除忙等待：请使用异步延迟
+          result.backoffWaitMs = waitMs;  // 观测用：上层可据此做异步退避
         }
         
         // 替换执行器（ALTERNATE策略）

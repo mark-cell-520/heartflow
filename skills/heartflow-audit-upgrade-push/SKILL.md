@@ -727,6 +727,7 @@ npm view @yun520-1/heartflow version --registry=https://npm.pkg.github.com
 **SKILL.md 模块索引表必须同步**：
 - 升级新模块后，必须补上模块索引表（`## 模块架构` 附近的表格行）
 - 否则下一版升级时新模块被遗漏
+**README Version history 表行是 doc-numbers 硬 gate，且 sync-doc-numbers.js 不写它**：bump 后 doc-numbers 报「README changelog 覆盖当前版本」失败 = Version history 表缺当前版本行——counts 走 sync 脚本，版本行必须手写（`| 版本 | 日期 | 本轮真实内容一行摘要 |`）。另注意 `src/core/version.js` 的兜底常量 sync-version.js 也不管，bump 后要手动同步（否则五源差一源）。正确顺序：代码修复→五门禁全绿→bump VERSION + sync-version.js + 手动同步 version.js 兜底值→手写 README 版本行 + CHANGELOG 条目 + UPGRADE_LOG 报告→重跑 doc-numbers→commit。
 
 **版本号严格 +0.0.1（2026-06-29 用户纠正）**：
 - 每次升级只加 0.0.1，不跳版本
@@ -992,7 +993,7 @@ done
 3. **psychology.js 修复**：这个文件有多个 `resetCrisisCounter` 定义——修改前必须读完整文件确认
 4. **Date.now() * 1000**：meaningful-memory.js 中有3处，改一处漏一处会导致时间戳单位不一致
 5. **model.onnx 86MB**：绝不能提交到 GitHub，必须 gitignore
-6. **git remote**：心虫的 GitHub remote 是 `origin`，不是 `origin-sync`
+6. **git remote 名与直推**：remote 名因实例而异（本机 hermes1 叫 `heartflow`，别处曾用 `origin`）——动手前 `git remote -v` 核实，不凭记忆；本机 URL 内嵌 token，内嵌 token 时 `git push <remote> main:main` 直接可通，gh CLI/credential helper/URL 拼 token 那一串是直推失败后的 fallback 不是首选；推完 `git log --oneline <remote>/main..HEAD | wc -l` 必须为 0 复核
 7. **Git hook 阻断**：push 被 hook 阻断时，**先查 hook 为什么拦**——hook 是拦住密钥/未验证改动的最后一道闸。确认是误报后再修 hook 或按项目规范豁免，不要一律 `--no-verify` 绕过。
 8. **子代理写入大型JS文件（>1000行）时产生严重损坏**：
    - 子代理用patch工具追加新方法到大型文件时，经常出现缩进错乱（2空格vs4空格）、类结束`}`位置错误、重复代码段
@@ -1015,6 +1016,7 @@ done
 17. **归档区断链修法**：src/archive/ 里被 git 追踪的历史副本 require 断链时，不删文件（那是历史归档），把断链 require 替换为带注释的 null 兜底；require 守卫的 git 模式（ls-files 含 archive）与 walk 模式（跳过 archive）口径必须先统一再修，否则冒烟误报。
 18. **终端持久 cwd 被删后所有 terminal 调用 exit 126**：scratch 清理会把上次 cd 进去的目录删掉，之后每条命令都在恢复 cwd 时失败、真实命令从不执行（报错指向一个你没 cd 的目录）。恢复法：terminal 调用显式传 workdir 参数指定存在的目录，别在坏 shell 里重试同一命令。
 19. **长任务收尾汇报必须显式列未完成项**：修复轮没走完"五门禁→bump→UPGRADE_LOG→commit→push→重启 MCP→恢复 cron"全链时，汇报如实列出断在哪、每步的恢复命令；用户说"全面修复+同步"就是要全链闭环，用"已完成"掩盖未提交状态是最伤信任的一类汇报。
+20. **跑 MCP 鉴权测试前清掉三个 token 环境变量**：`test/mcp-auth-e2e-real.test.js` 自生成 token 并 spawn 自己的 server，而 server 的 AUTH_TOKEN 读 `HEARTFLOW_MCP_TOKEN || MCP_HEARTFLOW_API_KEY || MCP_HEARTFLOW_KEY`——shell 里 export 过其中任何一个，spawn 的 server 就用环境 token 而非测试 token，admin 项全部 401 假失败（子代理曾把这当发现上报过）。跑法：`env -u HEARTFLOW_MCP_TOKEN -u MCP_HEARTFLOW_API_KEY -u MCP_HEARTFLOW_KEY node test/mcp-auth-e2e-real.test.js`；guest-permission 测试同理。先排除环境再归因代码。
 
 ---
 

@@ -5138,7 +5138,8 @@ const HANDLERS = {
   // [P2-5] debate-engine
   heartflow_debate: async (args) => {
     try {
-      const { debateEngine, ROLES } = require('./index.js');
+      // [审计轮 2026-11-02] 移除 ROLES 死解构：index.js 无此导出（恒 undefined），handler 内也未使用
+      const { debateEngine } = require('./index.js');
       const { action = 'create', sessionId, topic, roleId, argument, evidence, roles, maxRounds } = args;
       if (action === 'create' || action === 'createSession') {
         if (!topic) return { error: 'topic required' };

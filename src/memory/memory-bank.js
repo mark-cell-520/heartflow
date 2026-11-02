@@ -54,6 +54,8 @@ class MemoryBank {
 
     // 会话索引：sessionId -> { id, label, startTime, endTime, memoryIds, stats }
     this.sessions = new Map();
+    // [审计轮 2026-11-02] 会话索引封顶 200（原只 set 不 delete，endSession 仅标 endTime，无 prune）
+    this._maxSessions = 200;
 
     // 记忆存储：memoryId -> MemoryRecord
     this.memories = new Map();
@@ -378,6 +380,11 @@ class MemoryBank {
    * @returns {object} session summary
    */
   endSession() {
+    // [审计轮 2026-11-02] 超限淘汰最旧会话（按 startTime）
+    if (this.sessions.size > this._maxSessions) {
+      const byAge = [...this.sessions.entries()].sort((a, b) => (a[1].startTime || 0) - (b[1].startTime || 0));
+      for (const [sid] of byAge.slice(0, this.sessions.size - this._maxSessions)) this.sessions.delete(sid);
+    }
     if (!this.currentSessionId) return null;
     const session = this.sessions.get(this.currentSessionId);
     if (session) {
