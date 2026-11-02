@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-187-blueviolet.svg)](#what-it-catches-187-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-188-blueviolet.svg)](#what-it-catches-188-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-187 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
+188 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
 ×  1,314 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 187 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 188 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (187 dimensions) -> gate
+scope-check -> premise-check -> discriminate (188 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (187 dimensions)
+## What it catches (188 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **145 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **147 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.118**. Not marketing copy.
+Measured on this repository at **v6.8.119**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 187 |
+| Discrimination dimensions | 188 |
 | MCP tools | 184 |
 | Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
@@ -383,6 +383,7 @@ duplicate the log.
 | Version | Date | Change |
 |---------|------|--------|
 | 6.8.118 | 2026-11-02 | **第187维度 proxy_metric_goal（代理指标当目标：古德哈特定律的谬误应用）上线** — 判别「**把测得的量（代理指标）当作目标本身达成或真实效果出现的证据**」结构：KPI 完成了所以目标肯定达成、下载量破百万所以产品满足需求、平均分上去了所以教学变好、测试覆盖率 100% 所以代码质量没问题、满意度打分都是五分所以客户真的满意。指标是目标的**代理度量**，目标是**被测量的事物本身**，代理读数上升不增加目标达成的证据——指标可被扭曲、博弈、与目标脱钩（刷分刷出的 KPI、为凑覆盖率写的空测试、怕差评不敢打分的问卷），古德哈特定律正是「度量变成目标之日，即它不再是好度量之时」：「KPI完成了，说明目标肯定达成了。」「这个季度下载量破了五百万，说明产品已经满足了用户需求。」「测试覆盖率到了100%，说明代码质量没有问题。」「The metric hit its target, so the goal must have been achieved.」「Coverage is at 100%, which proves code quality is fine.」。判据**三腿共现，缺一不判**：腿① METRIC 被测得的量（点击率/播放量/下载量/KPI/指标/完成率/覆盖率/分数/平均分/引用量/日活/留存率/满意度打分/GDP…全部裸名词；EN metric/downloads/coverage/score/KPI/views/revenue…）、腿② GOAL 目标/真实效果结论（目标达成/需求满足/质量没有问题/客户满意/效果显著/实力提高…；EN goal achieved/needs met/quality is fine/customers are satisfied/capability improved…）、腿③ CONN 连接（显式连接词或逗号并置且无转折词，跨度 ≤80 字/EN 160 字符）。与 activity_outcome_confusion（第184维 活动/投入计数→抽象成果）、reward_hacking（BLOCK 自认式指标作弊）、statistical_misleading / percentage_overflow（比例数字呈现）边界错开：本族腿①只收**测得的量**、是**无欺骗的推理谬误**（陈述者真诚相信「指标读数=目标达成」）。主动分离指标与目标（不等于/不代表/只能说明/分开看）、目标本身直接证据在场（访谈/实测/复购/问题解决率）、对冲、概念转述（古德哈特/代理指标/vanity metric）均明确不判。来源（真实，未编造）：本族立项由 r186 activity-outcome-confusion.js 文档显式划界留白（「下载量破百万所以满足需求」「分数上去所以教学变好」归 Goodhart 族）；GitHub `search?q=Goodhart's law`（sort=stars）参考 agamm/Gobert（Goodhart's law 演示，https://github.com/agamm/Gobert）与 math 评估类成熟方案作概念背景；HN Algolia 检索 Goodhart / proxy metric 作背景；判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-r190.txt、探针 /tmp/hf-probe-r190.js。维度数 186→187，VERIFY 145→146，模块 161 不变（纯函数维度模块不进 _modules registry，r186/r189 同口径）。验证：round-190 轮测 17/17（攻击 20/20 含中英/裸名词/倒装/逗号并置/反问/长句、良性 16/16 零误判含主动分离/直接证据/指标到指标/边缘多因陈述、12 项常量负例注入承重、gate 层变体矩阵攻击 8/8 非 pass 且维度承重 + 良性 7/7 pass）。本行由 r191 接手 r190 爆截断存量工作补齐（r190 已实现并全绿，漏补 Version history 与 CHANGELOG/UPGRADE_LOG 即被截断）。 |
+| 6.8.119 | 2026-11-02 | **第188维度 false_precision（伪精确断言：无来源无约数的过分精确数字冒充量化证据）上线** — 判别把**超出证据支撑精度的数字**（小数百分比/小数倍数/小数评分/小数年限/精确副词+数字：37.42% / 3.7 倍 / 92.6 分 / 12.5 年 / 整整 3.7 倍 / exactly 47.83%）以**无来源、无约数、无对冲**的断言形式给出、制造「量化严谨」假象的结构：数字的**精度形态**本身就是证据——样本多大、怎么测的都没说，小数却给到小数点后一两位，是把随机噪声包装成测量读数，是 AI 输出中最典型的数字幻觉形态：「用户满意度达到 92.6 分，远超预期。」「性能提升了整整 3.7 倍，几乎没有代价。」「新药可延长预期寿命 12.5 年。」「该模型在测试集上的准确率达到 99.37%。」「The study shows engagement improved by exactly 47.83%.」。判据**两腿共现 + 分组豁免，缺一不判**：腿① PREC 精确数字形（**必须含小数点或精确副词**——四舍五入的整数 37% / 3 倍是约整数的合法形态，不判：小数 %/％、小数倍、小评分（92.6 分，排除分钱/分钟/分利/分贝/分米）、小数年岁（12.5 年/岁）、精确副词+数字（整整/恰好/正好/分毫不差/精确地/准确地/精准地 + ≤4 字 + 数字，含整数形——161 轮教训：副词腿收裸词形态，「准确率 92.6 分」由「准确」前缀+数字命中）；EN 小数 %、小数 x/times、小数 years/months/weeks/days/hours/points、exactly/precisely/accurately + 数字）；腿② CLAIM 断言/度量语境（腿①匹配点前后 ≤24 字 / EN 48 字符内任一：效果动词 提升/提高/增长/增加/降低/减少/下降/达到/高达/低至/升至/突破/改善/优化/翻番/刷新/创下；EN improves/increases/reduces/reaches/boosts/extends/achieves/drops/agrees…；度量名词 准确率/满意度/转化率/增长率/覆盖率/留存率/性能/得分/评分/寿命/预期寿命/占比…；EN accuracy/satisfaction/conversion/coverage/retention/performance/life expectancy…；结论标记 证明/表明/显示/说明/意味着/可见/足见；EN proves/shows/demonstrates/indicates/means——**裸名词形即断言语境**：「转化率 37.42%，完播率 21.8%」无动词也是伪精确陈列）。边界：perfect_error 的 S1_false_precision 管**裸**精确百分比（无度量名词、无来源，如「市场份额达到 87.3%」）且是多信号协同判定的一票（[v6.7.93] 起对度量名词语境整体豁免，本为「latency dropped 40%」这类工程读数设计），本族专打**度量名词语境下**的小数断言——正是 S1 豁免腾出的空间，且是单维专项判据、不依赖多信号叠加；statistical_misleading / percentage_overflow 管**比例数字的呈现问题**（基数隐藏/占比合计溢出），本族不管呈现结构、管**数字精度本身是否被证据支撑**；unsupported_claim / bullshit 管断言缺依据的强度，本族有数字在场但数字的**精度形态**无效。明确不判：约数/对冲（约/大约/接近/将近/左右/上下/近似/估算/预计/差不多/误差范围/容差/±/大概/可能/也许/据说；EN about/around/approximately/roughly/nearly/almost/estimated/give or take）、具名来源（根据X统计局/X大学/X报告/X调查/《X》/据X统计/年报/季报/月报/财报/公报/白皮书/来源于/数据来源/转引自/参见；EN according to X report/study/survey/census/source:）、天然精确语境（数字近邻 ≤40 字 / EN 80 字符内：完整日期、版本号 v6.8.118、自然计数 12 个/1200 人、物理量纲与精度规格 0.01 毫米/±0.5℃、数学常数 π/约等于、时长与历史语境 历时/持续/为期/已有/建于/成立于）、仪器读数语域（数字近邻内 监控/压测/日志/报表/看板…显示/表明——同 r437「可定位复现」边界）、统计口径（同比/环比/较上期/去年同期/百分点/percentage point/year-over-year）、元讨论（有效数字/小数点/四舍五入/位数/保留/精度）、疑问句（含 ?/？）。已知边界：① 「实验组有效率为 87.3%」这类度量名词未入表且无效果动词的形暂不判（「有效率/完成量/满意度指数」等词可续入腿②，保守方向）；② 句级豁免仅留约数/来源/口径/元讨论四类真句级属性，天然精确与仪器豁免已收窄为数字近邻窗；③ 跨段数字不判。来源（真实，未编造）：HN Algolia 命中 Wikipedia "False precision"（https://en.wikipedia.org/wiki/False_precision）；GitHub API `hallucination detection benchmark`（sort=stars）最高星 zjunlp/FactCHD（IJCAI 2024，92★，https://github.com/zjunlp/FactCHD，事实冲突幻觉检测基准）作数字幻觉背景；Semantic Scholar 三次检索均 HTTP 429 空返。缺口实证 /tmp/hf-probe-r192.js：本族 6 条攻击 4 条真零命中、6 条边缘良性零误伤。侦察落盘 /tmp/hf-scout-r192.txt、探针 /tmp/hf-probe-r192.js。维度数 187→188，VERIFY 146→147，模块 161 不变（纯函数维度模块不进 _modules registry，r190 同口径）。验证：round-192 轮测 61/61（攻击 17/17 含中英/裸名词/倒装/长句/精确副词/小数年/小数评分、良性 17/17 零误判含来源/对冲/仪器/时长/口径/元讨论/疑问/天然精确/边缘多因陈述、11 项常量负例注入承重、gate 层变体矩阵攻击 8/8 非 pass 且维度承重 + 良性 8/8 pass）。 |
 | 6.8.116 | 2026-11-02 | **第185维度 most_transitivity（「大多数」链式传递谬误：most 量词不满足传递性）上线** — 判别「**两个「大多数」前提推不出「大多数」结论**」结构：「大多数A是B，大多数B是C」的证据不能沿中间项累积——100 人里 60 人喝茶、60 个喝茶的人里只有 35 人喝咖啡时，「大多数人喝咖啡」就不成立，两段「大多数」各自只覆盖自己前提的大部分、交集可以远小于半数：「大多数A队球迷支持主队，大多数支持主队的人会买季票，所以大多数A队球迷会买季票」「大部分用户点了同意，大部分点了同意的人都没读协议，所以大部分用户都没读协议」「七成受访者表示满意，七成表示满意的受访者购买了会员，所以七成受访者都买了会员」「Most students passed the exam, and most people who passed got certificates, so most students got certificates.」。判据**链式三件共现，缺一不判**：件① 第一段「大多数」前提（量词+主项+非空谓项，中间项素材在谓项里）；件② 第二段「大多数」前提的主项**包含第一段谓项的关键词**（中间项连续性）；件③ 「大多数」结论主项回指第一段主项、谓项是**新内容**（非复述：最长共享≥3字或互为子串才算复述）、且结论整体与第二段有共享关键词；结论带推断词（任意位置，覆盖「所以C，因为P1、P2」倒装形）或跟在两前提之后（跟句模式）。缺一不判——两个「大多数」并列无链式结论是正常统计陈述，对冲/特称结论是谨慎或有效的推论。与 illicit_conversion（第167维，全称换位）、affirming_the_consequent / denying_the_antecedent / conditional_proposition（条件句方向族）、statistical_misleading / percentage_overflow（比例数字呈现）边界错开。任务书轮换纪律：r186 为价值对齐一线，本轮切回**逻辑谬误检测 + 证据纪律**一线（候选四族探针实测：A 中项不周延 5/6 被 affirming_the_consequent 代拦且 2 条有效三段论被误拦、B 肯定析取 3/5 被 illicit_conversion 等代拦、C 堆垛 4/5 被 fallacies 代拦、**D most 链式传递 6/10 真零命中且 8/8 边缘良性零误伤**——选 D）。来源（真实，未编造）：HN Algolia "Translating natural language to first-order logic for logical fallacy detection"（258 分，https://news.ycombinator.com/item?id=43257719）、"Master List of Logical Fallacies (2018)"（113 分）、"Slaughtering Competition Problems with Quantifier Elimination"（78 分，https://news.ycombinator.com/item?id=46415448）、"The strange non-transitivity of random variables"（26 分，https://news.ycombinator.com/item?id=10763018）作量词与非传递性概念背景；GitHub tmakesense/logical-fallacy（21★）、bkthomps/CategoricalSyllogism（6★，https://github.com/bkthomps/CategoricalSyllogism）为三段论/谬误检测成熟代码参考。Semantic Scholar 两次检索 HTTP 429 空返；判据为心虫自有纯规则实现。侦察落盘 /tmp/hf-scout-r188.txt 与 /tmp/hf-scout-r188-transitivity.txt。维度数 184→185，VERIFY 143→144，模块 161 不变（纯函数维度模块不进 _modules registry，r186 同口径）。验证：round-188 轮测 14/14（攻击 14/14 含中英/裸名词量词/带修饰/倒装/长句/无逗号紧凑形、良性 17/17 零误判含特称结论/对冲结论/并列统计/量词副词化/纯转述/边缘多因陈述、9 项常量负例注入承重、3 条豁免陷阱翻转、gate 层变体矩阵攻击 6/6 非 pass 且 most_transitivity 承重、良性 6/6 pass）、双向门禁 52/52 召回、误拦 302/326 不升（与基线一致、零新增误拦）、verify 16/16、guard 20/20（维度登记 185 键）、doc 22/22。已知边界：① 定义式真值链（「大多数猫是哺乳动物，大多数哺乳动物是温血动物，所以大多数猫是温血动物」）量词形式相同也会判 verify——结论为真但交集大小未被证明，verify 的含义正是要求补全称或特称证据；② 主谓切分是启发式（功能词边界+约 280 个高频动词），生僻动词开头的前提可能切不出谓项而漏判（保守方向）；③ 谓词链接结论与第二段的判据对「换了说法」的结论谓词（「用真金白银表达信心」↔「买了股票」）依赖主项/其他共享词兜底。 |
 | 6.8.117 | 2026-11-02 | **第186维度 appeal_to_wealth（诉诸财富/诉诸贫穷谬误：argumentum ad crumenam / ad lazarum）上线** — 判别「**把财富或贫困状态当作观点正确性、判断力或可信度的证据**」结构：有钱所以说得对、听成功人士的总没错、穷人懂什么、他穷过所以更懂人间疾苦。财富与贫困是**处境属性**，观点对错与判断力高低是**认知属性**，两者之间没有可传递的证据链——有钱不增加任何命题为真的概率，穷不减少任何论证的有效性：「他那么有钱，说的话当然有道理，人家身家几十亿，认知能不比我们高吗？」「马云说的都是真理，他能赚到几千亿身家，眼光还能错吗？」「一个穷得叮当响的人，观点能有什么价值？」「他穷过苦日子，所以最懂老百姓的心，说的话才真正靠谱。」「He is a billionaire, so his advice on the economy must be sound.」「She married into one of the richest families, so her judgment is obviously superior.」。判据**两腿+连接，缺一不判**：腿① STATUS 财富/贫困状态词（有钱/富翁/富豪/身家/富人/成功人士/白手起家/穷困/贫寒/穷得叮当响/寒门/底层出身…裸名词形态；EN billionaire/rich/wealthy/made billions/poor/poverty/the poor——限定搭配收录，不收裸「穷」（穷尽误伤）、裸「富」（丰富误伤）、裸「成功」（实验成功误伤）、裸「底层」（底层逻辑误伤））；腿② VALIDITY 认知有效性结论（有道理/是对的/高明/靠谱/眼光好/最懂/更懂…；EN sound/right/superior/credible/gets it——不收「值得参考」（经验价值）、不收「犯错/失误」（错误承认）、不收「业绩/收益」（实测数据））；腿③ 连接——路线 A（正向断言）腿①与腿②间有推断连接词（所以/当然/一定/因为…；EN so/because/must/obviously）且间距 ≤50 字（EN 110 字符）；路线 B（反问断言）腿① ±50 字（EN 110）内有反问有效性形（眼光还能错吗/能有什么价值/懂什么；EN how could he be wrong），反问自身携带推断、免连接词。有效性断言前置否定时不判（不是因为眼光好/观点不总是对的/does not determine whether someone is right）。与 appeal_to_authority（第资质类权威，词表互斥）、halo_effect（外貌名气迁移）、absolute_claim/confidence（断言强度）、unsupported_claim/no_fallback（依据缺失强度）边界错开。任务书轮换纪律：r188 为逻辑谬误一线，本轮探针横扫三方向三候选族（零和思维 6/6 被代拦+2 良性误伤淘汰、均值回归 4/6 零命中但 3 良性误伤淘汰、**诉诸财富 4/6 真零命中+6/6 边缘良性零误伤**——唯一干净缺口）。来源（真实，未编造）：HN Algolia "The Fallacy Of Zero Sum Game Thinking"（26 分，https://news.ycombinator.com/item?id=6390466）、"Humanity is not a Zero-Sum Game"（https://news.ycombinator.com/item?id=30773049）作零和与阶层推理概念背景；GitHub tmakesense/logical-fallacy（21★）、SeanFlannery/Logical.ly（4★）为谬误检测成熟代码参考；Semantic Scholar 检索 HTTP 429 空返；判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-r189.txt、探针 /tmp/hf-probe-r189.js。维度数 185→186，VERIFY 144→145，模块 161 不变（纯函数维度模块不进 _modules registry，r186/r188 同口径）。验证：round-189 轮测 16/16（攻击 21/21 含中英/裸名词/带修饰/倒装/长句/反问路线、良性 20/20 零误判含亲历依据/审计业绩/错误承认/按证据评估/否认关联/谚语/边缘贫困叙事、9 项常量负例注入承重、3 条豁免陷阱翻转含否定守卫、gate 层变体矩阵攻击 7/7 非 pass 且 appeal_to_wealth 承重、良性 7/7 pass）、双向门禁 52/52 召回、误拦 302/326 不升（零新增误拦）、verify 16/16、guard 20/20（维度登记 186 键）、doc 22/22。已知边界：① 腿①与腿②限同句或相邻分句、总跨度 ≤50 字（EN 110 字符），跨段形本轮保守不收；② 「不无道理」类双重否定会被否定守卫挡下（保守方向，漏判优于误判）；③ 隐含有效性断言（「他有钱，说话就是硬气」——硬气是气势非有效性）暂不判。 |
 | 6.8.115 | 2026-11-01 | **每日审计修复轮（r187）** — 修复文档口径漂移：README badge/横幅外 5 处维度数陈旧值（164/168/180/180/142 → 184/184/184/184/143）、SKILL.md pipeline 图 46 dims → 184、AGENTS.md checkInput 行 50 → 184；修复 `src/core/version.js` 兜底版本号停留在 6.8.89（r161 起连续 25 轮升级遗漏手动同步，违反 AGENTS.md 约定 #1「fallback 必须与 VERSION 一致」）→ 6.8.115。引擎判别逻辑零改动，五门禁复跑全绿。 |

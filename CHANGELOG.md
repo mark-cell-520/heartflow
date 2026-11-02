@@ -1,3 +1,8 @@
+## [6.8.119] - 2026-11-02
+
+### Added
+- **第188维度 `false_precision`（伪精确断言：无来源无约数的过分精确数字冒充量化证据，r192）** — 新增 `src/false-precision.js`（约 300 行，导出 `checkFalsePrecision` + 13 个可负例注入常量：`PREC_ZH/EN`、`CLAIM_ZH/EN`、`EXEMPT_HEDGE/SOURCE/EXACT/INSTRUMENT/YOY/META_ZH/EN`），登记 VERIFY_DIMS（146→147），维度总数 187→188。判别把**超出证据支撑精度的数字**（小数百分比/小数倍数/小数评分/小数年限/精确副词+数字：37.42% / 3.7 倍 / 92.6 分 / 12.5 年 / 整整 3.7 倍 / exactly 47.83%）以**无来源、无约数、无对冲**的断言形式给出、制造「量化严谨」假象的结构：数字的精度形态本身就是证据——「92.6 分」的 0.6 没有出处，「12.5 年」的 0.5 没有队列，是 AI 输出中最典型的数字幻觉形态。判据**两腿共现 + 分组豁免，缺一不判**：腿① PREC 精确数字形（必须含小数点或精确副词——四舍五入的整数是约整数的合法形态不判；161 轮教训：副词腿收裸词形态，「准确率 92.6 分」由「准确」前缀+数字命中）；腿② CLAIM 断言/度量语境（腿①前后 ≤24 字 / EN 48 字符内：效果动词/度量名词/结论标记——**裸名词形即断言语境**：「转化率 37.42%，完播率 21.8%」无动词也是伪精确陈列）。与 `perfect_error` S1_false_precision（管**裸**精确百分比、多信号协同判定，[v6.7.93] 起对度量名词语境整体豁免——本族专打该豁免腾出的空间）、`statistical_misleading`/`percentage_overflow`（比例数字呈现）、`unsupported_claim`/`bullshit`（断言缺依据强度）边界错开。明确不判：约数/对冲、具名来源、天然精确语境（日期/版本/计数/量纲/数学常数/时长历史，数字近邻窗）、仪器读数语域（同 r437 可定位复现边界）、统计口径（同比/环比/百分点）、元讨论（有效数字/小数点）、疑问句。缺口实证（/tmp/hf-probe-r192.js，v6.8.118 引擎）：本族 6 条攻击 4 条真零命中、6 条边缘良性零误伤。`src/index.js` 八处接线（require/计算点/allDims/dimMap/dimensions 读数/DIM_GUIDANCE/VERIFY_DIMS；变量名 fp）。模块 161 不变（纯函数维度模块不进 `_modules` registry）。外部来源（真实，未编造）：Wikipedia "False precision"（经 HN Algolia 检索命中）、zjunlp/FactCHD（IJCAI 2024，92★，事实冲突幻觉检测基准）；Semantic Scholar 三次检索 HTTP 429 空返。
+
 ## [6.8.118] - 2026-11-02
 
 ### Added

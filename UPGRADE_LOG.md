@@ -1,4 +1,33 @@
-# 第 190 轮报告（v6.8.118 — 第187维度 proxy_metric_goal「代理指标当目标：古德哈特定律的谬误应用」上线 — r190 实现 / r191 接手补齐提交）
+# 第 192 轮报告（v6.8.119 — 第188维度 false_precision「伪精确断言：无来源无约数的过分精确数字」上线）
+
+## 一、方向与来源
+- 方向（轮换纪律）：r188/r189 为逻辑谬误检测、r190/r191 为代理指标（推理有效性）一线。本轮轮换到**证据充分性与幻觉检测**一线，落点「**伪精确断言**」（false precision / spurious precision / overprecision）。
+- 缺口实证（/tmp/hf-probe-r192.js，直调 gate.js v6.8.118 / 187 维引擎）：本族 6 条攻击样本 **4 条真零命中**（「用户满意度达到 92.6 分」「性能提升了整整 3.7 倍」「新药可延长预期寿命 12.5 年」「The study shows engagement improved by exactly 47.83%.」全部 pass 且 findings 全空），另 2 条仅被非本族维度（proxy_metric_goal / unsupported_claim）代拦；6 条边缘良性零误伤——整族无任何维度覆盖。盲区根因：`perfect_error` 的 S1_false_precision 自 [v6.7.93] 起对**度量名词语境整体豁免**（「latency dropped 40%」「准确率提升到 91.2%」是工程结论不是伪装精确），该豁免本为有采集手段的工程读数设计，但 AI 输出中「准确率/满意度/转化率 + 无来源小数」正是最典型的数字幻觉形态，豁免空间被滥用。
+- 外部来源（真实，未编造）：HN Algolia 检索 "false precision" 命中 Wikipedia "False precision" 词条（https://en.wikipedia.org/wiki/False_precision，该谬误的权威定义：数值以优于证据所支持的精度呈现）；GitHub API `search?q=hallucination detection benchmark`（sort=stars）最高星 zjunlp/FactCHD（IJCAI 2024，92★，https://github.com/zjunlp/FactCHD，事实冲突幻觉检测基准）作数字幻觉背景；Semantic Scholar 三次检索均 HTTP 429 空返。判据为心虫自有纯规则实现（零 LLM 依赖，未移植任何外部代码）。侦察落盘 /tmp/hf-scout-r192.txt、探针 /tmp/hf-probe-r192.js。
+- 心虫裁决：philosophy_decision 裁决 **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions；cognitiveLoad 与 uncertainty 均为 "unknown"，按轮次纪律不当实质背书）。
+
+## 二、实现内容
+- `src/false-precision.js`（新增，约 300 行）：第 188 维度 false_precision 检测器。判据**两腿共现 + 分组豁免，缺一不判**：
+  - 腿① PREC 精确数字形（**必须含小数点或精确副词**——四舍五入的整数 37% / 3 倍是约整数的合法形态，不判）：小数 %/％、小数倍、小评分（92.6 分，排除分钱/分钟/分利/分贝/分米）、小数年岁（12.5 年/岁）、精确副词+数字（整整/恰好/正好/分毫不差/精确地/准确地/精准地 + ≤4 字 + 数字，含整数形——**161 轮教训：副词腿收裸词形态**，「准确率 92.6 分」由「准确」前缀+数字命中）；EN 小数 %、小数 x/times、小数 years/months/weeks/days/hours/points、exactly/precisely/accurately + 数字。
+  - 腿② CLAIM 断言/度量语境（腿①匹配点前后 ≤24 字 / EN 48 字符内任一）：效果动词（提升/提高/增长/增加/降低/减少/下降/达到/高达/低至/升至/突破/改善/优化/翻番/刷新/创下；EN improves/increases/reduces/reaches/boosts/extends/achieves/drops/agrees…）、度量名词（准确率/满意度/转化率/增长率/覆盖率/留存率/性能/得分/评分/寿命/预期寿命/占比…；EN accuracy/satisfaction/conversion/coverage/retention/performance/life expectancy…）、结论标记（证明/表明/显示/说明/意味着/可见/足见；EN proves/shows/demonstrates/indicates/means）——**裸名词形即断言语境**：「转化率 37.42%，完播率 21.8%」无动词也是伪精确陈列。
+  - 豁免（13 个可负例注入常量，句级/近邻两级）：句级——约数/对冲（约/大约/左右/近似/估算/误差范围/±；EN about/around/approximately/roughly/nearly/estimated/give or take）、具名来源（根据X统计局/X大学/X报告/《X》/据X统计/年报/季报/白皮书/转引自；EN according to X report/study/survey/source:）、统计口径（同比/环比/较上期/百分点/percentage point）、元讨论（有效数字/小数点/四舍五入/位数/精度）、疑问句；近邻窗（数字 ±40 字 / EN 80 字符）——天然精确语境（完整日期/版本号/自然计数/物理量纲与精度规格/数学常数/时长历史语境 历时/已有/建于）、仪器读数语域（监控/压测/日志/报表…显示——同 r437「可定位复现」边界）。
+  - 边界：perfect_error S1_false_precision 管**裸**精确百分比（无度量名词、无来源）且是多信号协同判定一票，本族专打**度量名词语境下**的小数断言——正是 S1 豁免腾出的空间；statistical_misleading / percentage_overflow 管比例数字呈现，本族管**数字精度本身是否被证据支撑**；unsupported_claim / bullshit 管断言缺依据强度，本族有数字在场但**精度形态**无效。
+- `src/index.js` 八处接线（require / 计算点 / allDims / dimMap / dimensions 读数 / DIM_GUIDANCE / VERIFY_DIMS；变量名 fp，grep 实测 0 命中无冲突——fpr 已被 fear_projection 占用，r192 实测改名），DIM_GUIDANCE 含完整判据+边界+正当做法指引。
+- `test/round-192-false-precision.js`（新增，约 200 行，61 项断言）：攻击 17/17（中英/裸名词/倒装/长句/精确副词/小数年/小数评分）、良性 17/17 零误判（来源/对冲/仪器/时长/口径/元讨论/疑问/天然精确/边缘多因陈述「战争是多因共同造成的」）、11 项常量负例注入承重（含中英百分比形同源腿的分离验证）、gate 层变体矩阵（攻击 8/8 非 pass 且维度承重、良性 8/8 pass）。
+- 文档三处同步 + 版本传播：README（badge/横幅/行内/规格表/What-it-catches 横幅 verify 计数 145→147 陈账修订/Version history 6.8.119 新行）、SKILL（版本戳/横幅/规格表/action-tier 147/pipeline 图）、AGENTS（横幅/dimensions 注记 v6.8.119 条目/层级合计 173→177 陈账修订/Verify-level 147 + false_precision 入列）；`src/core/version.js` 兜底值 6.8.118→6.8.119；VERSION 6.8.118→6.8.119 + sync-version.js；CHANGELOG.md 追加 6.8.119 条目。
+
+## 三、验证数据（全部本轮真实运行）
+- 五门禁：bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 188 键）；doc-numbers-accuracy.test.js **22/22**；bidirectional-guard.js 召回 **52/52**、误拦 **302/326 不升**（与基线一致、零新增误拦）；measure-claimed-numbers 维度 **188** / 模块 **161 不变**（纯函数维度模块不进 _modules registry）/ 工具 184 / 路由 1,314。
+- 轮测：test/round-192-false-precision.js **61/61**（正向攻击 17/17、良性 17/17、注入承重 11 项、gate 矩阵攻击 8/8 承重 + 良性 8/8 pass）。
+- 实现期实测修正（/tmp/hf-smoke-r192.js、/tmp/hf-dbg-r192.js）：三处子串陷阱——裸「升」吃掉「提升」（量纲表）、裸「历史」吃掉「创历史新高」（时长表）、裸「效率」吃掉「有效率」（度量名词表），以及裸「2025 年」年份邻近误豁免、误差/容差双重豁免——全部修正后 9/9 攻击命中、18/18 良性零误伤。
+
+## 四、已知边界（下轮可继续）
+- ① 「实验组有效率为 87.3%」这类**度量名词未入表且无效果动词**的形暂不判（「有效率/完成量/满意度指数」等词可续入腿②，保守方向）。
+- ② 句级豁免仅留约数/来源/口径/元讨论四类真句级属性；天然精确与仪器豁免已收窄为数字近邻窗，但同句混合「合法时长 + 伪精确断言」且时长词在近邻窗内时仍会整则放过（「研发历时 2.5 年，延长预期寿命 12.5 年」）。
+- ③ 跨段数字（上文给出口径、本段只出现小数）不判。
+- ④ 中英百分比形同源（PREC_ZH 与 PREC_EN 的 % 模式互备），单腿注入测试须选异形样本验证（轮测已按此设计）。
+
+
 
 ## 〇、接手说明（r191，诚实记录）
 r190 已完成本维度全部代码实现（src/proxy-metric-goal.js + test/round-190-proxy-metric-goal.js + src/index.js 九处接线 + README/SKILL/AGENTS 数字 + VERSION 6.8.118），且**轮测 17/17 全绿**，但在追加 CHANGELOG/UPGRADE_LOG、重启运行态、git commit 之前**爆截断**（agent.max_turns=90 燃尽）。r191 按「下轮接手纪律」接手：第一优先修绿并补 feat 语义。接手时核验：五门禁 verify 16/16、guard 20/20、doc 22/22（接手方补齐 README Version history 6.8.118 行后由 21/22→22/22）、双向 52/52 召回 + 误拦 302/326 不升；轮测 17/17 全绿。本报告由 r191 代 r190 补齐落盘。
