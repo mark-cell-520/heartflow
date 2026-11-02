@@ -431,8 +431,53 @@ t('README 规格表口径版本戳为当前 VERSION', () => {
 t('SKILL 规格表口径版本戳为当前 VERSION', () => {
   const ver = fs.readFileSync(path.join(HF, 'VERSION'), 'utf8').trim();
   const src = fs.readFileSync(SKILL, 'utf8');
-  assert.ok(src.includes(`at v${ver}.`) || src.includes(`| Engine version | ${ver} |`),
+  // [AUDIT-FIX 2026-11-02] 原断言是 `at v${ver}.` **或** `| Engine version | ${ver} |`
+  // 的或关系：measured-at 行更新后短路放行，规格表 Engine version 行继续腐烂
+  // （实测抓到 6.8.124 而 VERSION=6.8.125）。两处都是给读者看的版本口径，
+  // 都必须等于 VERSION，缺一即漂移。
+  assert.ok(src.includes(`at v${ver}.`),
     `SKILL 规格表口径戳仍是旧版本，应为 at v${ver}.`);
+  assert.ok(src.includes(`| Engine version | ${ver} |`),
+    `SKILL 规格表 Engine version 行不是当前 VERSION ${ver}——或关系断言曾放行该漂移`);
+});
+
+t('README badge 与章节标题维度数为当前实测值', () => {
+  // [AUDIT-FIX 2026-11-02] badge 行（discrimination dimensions-N）与
+  // 「What it catches (N dimensions)」标题从未被任何断言覆盖：
+  // r187 维度 184→194 全量同步时这两处仍停在 188/147，doc 守卫 22/22
+  // 全绿——守卫没量 = 漂移自由。横幅守卫查不到 badge，标题守卫
+  // 只查 SKILL/AGENTS 的三层计数，README 标题无人守。
+  const src = fs.readFileSync(README, 'utf8');
+  const vh = src.indexOf('## Version history');
+  const live = vh > 0 ? src.slice(0, vh) : src;
+  const badge = live.match(/discrimination%20dimensions-(\d+)-blueviolet/);
+  assert.ok(badge, 'README.md 找不到 Dimensions badge（格式可能变了）');
+  assert.strictEqual(parseInt(badge[1], 10), M.dimensions,
+    `README Dimensions badge 说 ${badge[1]}，实测 dimensions = ${M.dimensions}`);
+  const anchor = live.match(/\]\(#what-it-catches-(\d+)-dimensions\)/);
+  assert.ok(anchor, 'README.md 找不到 badge 锚文本');
+  assert.strictEqual(parseInt(anchor[1], 10), M.dimensions,
+    `README badge 锚文本 #what-it-catches-${anchor[1]}-dimensions 与实测 ${M.dimensions} 不一致`);
+  const heading = live.match(/^## What it catches \((\d+) dimensions\)/m);
+  assert.ok(heading, 'README.md 找不到 "What it catches (N dimensions)" 标题');
+  assert.strictEqual(parseInt(heading[1], 10), M.dimensions,
+    `README 章节标题说 ${heading[1]} dimensions，实测 ${M.dimensions}`);
+});
+
+t('README action-tier 计数与三个集合一致', () => {
+  // [AUDIT-FIX 2026-11-02] 与 SKILL 的 action-tier 断言同族：README 的
+  // 「**11 can `block`**, **19 can force a `rewrite`**, **151 request `verify`**」
+  // 此前无人校验，verify 数停在 147 而 VERIFY_DIMS 已 151。
+  const src = fs.readFileSync(README, 'utf8');
+  const vh = src.indexOf('## Version history');
+  const live = vh > 0 ? src.slice(0, vh) : src;
+  const b = live.match(/\*\*(\d+)\s+can\s+`block`\*\*/);
+  const r = live.match(/\*\*(\d+)\s+can\s+force/);
+  const v = live.match(/\*\*(\d+)\s+request\s+`verify`\*\*/);
+  assert.ok(b && r && v, 'README.md 找不到 action-tier 计数三兄弟');
+  assert.strictEqual(parseInt(b[1], 10), M.block, `README block 计数 ${b[1]} != BLOCK_DIMS ${M.block}`);
+  assert.strictEqual(parseInt(r[1], 10), M.rewrite, `README rewrite 计数 ${r[1]} != REWRITE_DIMS ${M.rewrite}`);
+  assert.strictEqual(parseInt(v[1], 10), M.verify, `README verify 计数 ${v[1]} != VERIFY_DIMS ${M.verify}`);
 });
 
 t('SKILL action-tier 计数与三个集合一致', () => {

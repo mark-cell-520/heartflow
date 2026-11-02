@@ -1,6 +1,6 @@
 # 心虫审计高频发现与修复模式
 
-> 八类在全面审计中反复出现的发现，每类含：识别签名 → 修法 → 验证。修法均为最小改动、可批量（execute_code Python 脚本），禁删防崩设计只做诚实化。
+> 十一类在全面审计中反复出现的发现，每类含：识别签名 → 修法 → 验证。修法均为最小改动、可批量（execute_code Python 脚本），禁删防崩设计只做诚实化。
 
 ## 1. 假能力报健康（stub / 假全局类）
 
@@ -91,6 +91,39 @@ if (failedCount > 0 || summaryMissing) { /* 中止，打原因 */ }
 3. dimensions 键数是 measure 的 dims 口径：补接线键会变总维数，必须同轮 `sync-doc-numbers.js`（写入模式）同步全部文档再跑 doc-numbers 门禁
 
 **验证**：`sync-doc-numbers.js --check` 四份全绿且清单外 0 处 + `test/doc-numbers-accuracy.test.js` 全绿。
+
+## 9. 被吞错误致能力静默失效
+
+**签名**：`const safeInput = _PrivacyExposure.sanitizeForPersistence(input);`——lazy loader 漏调 `()`（_PrivacyExposure 是 loader 函数对象，正确用法 `_PrivacyExposure().sanitizeForPersistence`）。抛出的 TypeError 被外层 catch 吞（note 写「不阻断主链路」），症状是**没报错但能力永远没数据**：Engram 存储/召回整块失效，`result._engramRecall` 恒 undefined，`_initErrors` 每次 think +1 噪声。
+
+**修法**：补 `()`。同文件搜该 loader 的全部用法（grep `_LoaderName`），对照正确形态，只修漏的那处。
+
+**探针（审计每轮必跑，专抓「被吞的高频错误」）**：
+```js
+const hf = new HeartFlow({silent:true, modules:false}); hf.start();
+const before = hf._initErrors.length;
+const r = await hf.think('测试输入');
+console.log('initErrors', before, '→', hf._initErrors.length);   // 0→1 = 每次必炸
+console.log('engramRecall:', r._engramRecall);                    // undefined = 存储/召回整块死
+```
+
+**验证**：探针复跑 0→0 且 `_engramRecall` 有真实数据。
+
+## 10. 跨 await 的实例临时状态
+
+**签名**：async 方法内 `this._pendingXxx = {...}` 存中间态，跨 await 边界后在别处读取并 `finally { this._pendingXxx = null }`。单次调用模型不触发，并发调用互相清掉/丢计数。
+
+**修法**：改局部变量（`let _pendingXxx = null` 声明在首个使用点前）。改前 `grep -rn "_pendingXxx" src/ bin/ test/ mcp/` 确认无外部读取方（MCP/测试可能直接摸 `hf._xxx`，有外部方则不能简单改局部）。
+
+**验证**：`Promise.all([hf.think(a), hf.think(b)])` 双调不互踩 + 原合并功能仍在（构造能触发该分支的输入，检查 result 上合并字段非空）。
+
+## 11. 守卫条件断言与地板值腐烂
+
+**签名**：`if (rows['X'] !== undefined) { assert.strictEqual(...) }`——行缺失/改名即静默跳过，守卫绿但实际什么都没查；`if (count < 124)` 地板值远低于实测（162）时任何模块删除 38 个以内都不报警。
+
+**修法**：条件断言改「先断言行存在再比对」：`assert.ok(rows['X'] !== undefined, '规格表缺少 X 行');` 放在原 if 之前；地板值随实测增长维护（留约 10% 余量，如 162 → >= 150）。
+
+**验证**：门禁全绿（严格化后仍全过 = 规格表形状完好）；抽删一行确认红灯（证明守卫真的在看）。
 
 ## 通用纪律
 

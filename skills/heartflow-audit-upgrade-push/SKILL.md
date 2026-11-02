@@ -1,6 +1,6 @@
 ---
 name: heartflow-audit-upgrade-push
-version: "1.7.0"
+version: "1.8.0"
 title: "心虫审计→并发修复→验证→推送 全流程"
 description: |
   心虫大规模升级工作流：全量审计→分类问题→并发修复→验证→推送GitHub。
@@ -125,7 +125,11 @@ cronjob action=list
 7. **加密资产轮换范围** — 换钥脚本按扩展名扫（只收 .enc）会漏同格式 .json 密文（data/memory-bank.json 的 `_enc` 字段），换钥后旧密文永久失效、每次启动静默 starting fresh（日志实锤再动手，别只靠推断）。修复：按内容特征扫（`"_enc"` + `HEARTFLOW_v1`），不按扩展名。已丢密钥的密文不可恢复——如实记录，只保证今后不再发生。
 8. **文档口径盲区** — sync-doc-numbers 的清单（AGENTS/README/SKILL/package）外文件一律视为无漂移，报绿≠真一致；兜底扫描又会把 UPGRADE_LOG/CHANGELOG 的逐轮历史数字误报成漂移。修复：手工修的文件同步登记进 TARGETS；逐轮历史档案类加进 KNOWN 排除（它们 mtime 新但内容是历史快照，无 Version history 标题可截断）。
 
-**修复模式速查**：`references/audit-fix-patterns.md`（诚实化/三表接线/豁免双闸/身份提权/fail-closed 门禁/泄漏逐出/加密轮换范围八类高频发现的修法模板）
+9. **被吞错误致能力静默失效** — lazy loader 漏调 `()`（`_PrivacyExposure.sanitizeForPersistence` 缺 `()`，同文件另两处同用法都带）→ 每次 think() 必抛 TypeError 被 catch 吞 → 整块能力（Engram 存储/召回）静默失效：`_initErrors` 每次 +1 噪声，下次 start() 把陈旧错误当新故障上报，而功能调用方看到的是"没报错但永远没数据"。识别探针（每次审计跑一次）：think 前后对比 `_initErrors` 计数（0→1 = 每次必炸）+ 检查能力输出是否有数据（`result._engramRecall` 恒 undefined = 存储/召回整块死）。修复=补调用（一处），验证=探针复跑 0→0 且输出有真实数据。
+10. **跨 await 的实例临时状态** — async 方法内把中间态挂 `this._xxx`（如 think() 的 `_pendingInputCheck`），跨 await 边界后并发调用互相清掉/丢计数（读-改-写无互斥；单次调用模型不触发所以长期潜伏）。规则：async 函数内跨 await 的临时状态一律局部变量；改前先 grep 全仓确认无外部读取方（MCP/测试可能直接摸 `hf._xxx`）。验证=构造并发 think（`Promise.all` 双调）+ 合并结果仍在。
+11. **守卫条件断言与地板值腐烂** — 门禁脚本写成 `if (rows[X] !== undefined) { assert... }`：规格表行缺失/改名即静默跳过，守卫静默失守（当前行都在，属潜伏）；地板值（模块数 >= 124）远低于实测（162）时失去回归意义。修法：先 `assert.ok(rows[X] !== undefined, '缺少 X 行')` 再比对；地板值随实测增长维护（留 ~10% 余量）。
+
+**修复模式速查**：`references/audit-fix-patterns.md`（诚实化/三表接线/豁免双闸/身份提权/fail-closed 门禁/泄漏逐出/加密轮换范围/被吞错误探针/跨 await 状态/守卫严格化十一类高频发现的修法模板）
 
 每个子代理输出格式：
 每个子代理输出格式：```
@@ -299,6 +303,7 @@ for dir_name in ['src/core', 'src/cortex', 'src/memory']:
 - 每次批量修改后立即 `node --check` 验证语法
 - 不改动非问题代码（最小改动原则）
 - 修完立即验证引擎加载
+- 「全面修复」≠ 无条件全包：fail-fast 关键路径（identityCore 等，启动即崩是对的失败语义）的实例化不包 try/catch——批量包裹的回归风险大于理论收益时，诚实决定不修并写进 UPGRADE_LOG 未修项（文档化隐患优于高风险包裹）。与附录 B「不替用户裁剪」不矛盾：不裁剪指不无故跳过该修的，不是把设计意图的 fail-fast 也乱包一通
 
 **心虫特有的修复模式**：
 - `_lazy` 注册表的模块用 `_XXX()` 惰性加载函数，不要直接 `new XXX()`
@@ -715,6 +720,8 @@ npm view @yun520-1/heartflow version --registry=https://npm.pkg.github.com
 - 启用 toolsets：`["terminal","file","skills"]`
 - 交付到微信
 
+**升级 cron prompt 必须含迭代预算分配纪律**：单轮 agent.max_turns=90 上限内按阶段切分（基线+研究+裁决 ≤15、实现 ≤30、验证 ≤20、版本+文档+提交 ≤15）；累计 45 次调用尚未 commit 必须跳阶段6 保底提交——测试未全绿时先给 ≤10 次修复，仍红则带「测试 N/M，剩余项下轮续」标注整体提交（源码+测试+接线+文档+版本作为一个完整 commit），UPGRADE_LOG 记录未绿项。提交不完整的真实进展远胜爆截断丢整轮。下轮接手纪律：开工先读 `git log -1` 与 UPGRADE_LOG 顶部，上一轮有未绿项时第一优先修绿并补 feat 语义。
+
 **Cron prompt 不能调用 CodeEngine auditCodebase**：之前的 cron prompt 写"先用 CodeEngine 做 `auditCodebase('src/core')` 全库审计"，但 `auditCodebase` 因 `_estimateDuplication` O(n²) 挂起。改为：用 `find src/core -name '*.js' | wc -l` 统计文件数，用 `wc -c` 检查文件大小分布，手动选择 1500-5000B 的最小模块。**不要调用 `auditCodebase` 或 `runAudit`**。
 
 **创建 cron 前先清理旧 cron**：
@@ -739,7 +746,7 @@ npm view @yun520-1/heartflow version --registry=https://npm.pkg.github.com
 **SKILL.md 模块索引表必须同步**：
 - 升级新模块后，必须补上模块索引表（`## 模块架构` 附近的表格行）
 - 否则下一版升级时新模块被遗漏
-**README Version history 表行是 doc-numbers 硬 gate，且 sync-doc-numbers.js 不写它**：bump 后 doc-numbers 报「README changelog 覆盖当前版本」失败 = Version history 表缺当前版本行——counts 走 sync 脚本，版本行必须手写（`| 版本 | 日期 | 本轮真实内容一行摘要 |`）。另注意 `src/core/version.js` 的兜底常量 sync-version.js 也不管，bump 后要手动同步（否则五源差一源）。正确顺序：代码修复→五门禁全绿→bump VERSION + sync-version.js + 手动同步 version.js 兜底值→手写 README 版本行 + CHANGELOG 条目 + UPGRADE_LOG 报告→重跑 doc-numbers→commit。
+**README Version history 表行是 doc-numbers 硬 gate，且 sync-doc-numbers.js 不写它**：bump 后 doc-numbers 报「README changelog 覆盖当前版本」失败 = Version history 表缺当前版本行——counts 走 sync 脚本，版本行必须手写（`| 版本 | 日期 | 本轮真实内容一行摘要 |`）。`src/core/version.js` 的兜底常量曾无人管理（sync-version.js 只管四源），实测静默腐烂两个版本——runtime 读 VERSION 文件所以不报错，而兜底值是 VERSION 文件丢失时的唯一版本源。现 sync-version.js 的 syncVersionFallback 已自动同步它；通用规则：**每个版本源都要有同步机制**，bump 后 `grep -rn "<版本号>" VERSION package.json SKILL.md src/core/version.js` 复核全部来源，不能只信同步脚本的 ✅。正确顺序：代码修复→五门禁全绿→bump VERSION + sync-version.js（含兜底）→手写 README 版本行 + CHANGELOG 条目 + UPGRADE_LOG 报告→重跑 doc-numbers→commit。
 
 **版本号严格 +0.0.1（2026-06-29 用户纠正）**：
 - 每次升级只加 0.0.1，不跳版本
@@ -1025,7 +1032,7 @@ done
 14. **API 复核 owner/repo 从 `git remote -v` 读**：推送后用 GitHub API 复核远程 HEAD/VERSION 时，凭记忆猜仓库名会 404；先 `git remote -v` 拿准 owner/repo 再发请求。
 15. **补 dimMap 键前先确认变量初始化顺序**：dimMap 在 discriminate 函数体前部构造，引用函数体后部才 `let` 的变量直接抛 `Cannot access 'ii' before initialization` 整个引擎崩；且不在 allDims 的维度（findings 循环不遍历）根本不该补 dimMap——先跑运行时探针对比三表键集再动手。
 16. **测试断言固化漏洞时反转期望，不是改断言过绿灯**：审计发现的安全洞若被既有测试当作期望行为固化（如"持 OID 过写权限门槛"），按安全方向修代码 + 反转该测试期望 + 注释写清"原断言固化的正是该漏洞"；这与"为过门禁改断言"的区别是策略真变了且全程如实记录。
-17. **归档区断链修法**：src/archive/ 里被 git 追踪的历史副本 require 断链时，不删文件（那是历史归档），把断链 require 替换为带注释的 null 兜底；require 守卫的 git 模式（ls-files 含 archive）与 walk 模式（跳过 archive）口径必须先统一再修，否则冒烟误报。
+17. **归档区断链先分类型再修**：src/archive/ 里被 git 追踪的历史副本 require 断链分两类——①路径写错（目标存在，如归档副本 require './heartbeat' 而真身在 src/core/，`audit-missing-requires.js` 分到 [A] 可修复）→ 直接修相对路径；②目标真不存在 → 不删文件（那是历史归档），替换为带注释的 null 兜底保留归档形态。require 守卫的 git 模式（ls-files 含 archive）与 walk 模式（跳过 archive）口径必须先统一再修，否则冒烟误报。
 18. **终端持久 cwd 被删后所有 terminal 调用 exit 126**：scratch 清理会把上次 cd 进去的目录删掉，之后每条命令都在恢复 cwd 时失败、真实命令从不执行（报错指向一个你没 cd 的目录）。恢复法：terminal 调用显式传 workdir 参数指定存在的目录，别在坏 shell 里重试同一命令。
 19. **长任务收尾汇报必须显式列未完成项**：修复轮没走完"五门禁→bump→UPGRADE_LOG→commit→push→重启 MCP→恢复 cron"全链时，汇报如实列出断在哪、每步的恢复命令；用户说"全面修复+同步"就是要全链闭环，用"已完成"掩盖未提交状态是最伤信任的一类汇报。
 20. **跑 MCP 鉴权测试前清掉三个 token 环境变量**：`test/mcp-auth-e2e-real.test.js` 自生成 token 并 spawn 自己的 server，而 server 的 AUTH_TOKEN 读 `HEARTFLOW_MCP_TOKEN || MCP_HEARTFLOW_API_KEY || MCP_HEARTFLOW_KEY`——shell 里 export 过其中任何一个，spawn 的 server 就用环境 token 而非测试 token，admin 项全部 401 假失败（子代理曾把这当发现上报过）。跑法：`env -u HEARTFLOW_MCP_TOKEN -u MCP_HEARTFLOW_API_KEY -u MCP_HEARTFLOW_KEY node test/mcp-auth-e2e-real.test.js`；guest-permission 测试同理。先排除环境再归因代码。

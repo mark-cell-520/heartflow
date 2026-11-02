@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-188-blueviolet.svg)](#what-it-catches-188-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-194-blueviolet.svg)](#what-it-catches-194-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (188 dimensions)
+## What it catches (194 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **147 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **151 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.125**. Not marketing copy.
+Measured on this repository at **v6.8.126**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.126 | 2026-11-02 | 每日审计修复（r197）——README Dimensions badge 188→194 与「What it catches」标题/action-tier 计数（verify 147→151）、SKILL 规格表 Engine version 6.8.124→6.8.126 三处漂移修复；doc-numbers-accuracy 守卫严格化（新增 badge/标题/tier 三组断言，SKILL 版本戳或关系改必须双满足）22→24 用例；判别逻辑零改动，五门禁全绿 |
 | 6.8.125 | 2026-11-02 | 第 194 维度 **argument_to_moderation**「诉诸中庸」上线（r196）——「中间/折中立场表述×中间=正确断言」两腿结构判别，填补 193 维在「以位置取信」族的空白 |
 | 6.8.124 | 2026-11-02 | 第 193 维度 **regression_to_the_mean**「回归均值误归因」上线（r195）——「极端基线×回归性变化×干预功劳归因」三腿结构判别，填补 192 维在统计因果归因族的空白 |
 | 6.8.123 | 2026-11-02 | 第 192 维度 **motte_and_bailey**「稻草城堡谬误」上线（r194）——「争议主张+退守遁词」替换结构的判别，填补 191 维在该族的空白 | 

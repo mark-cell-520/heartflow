@@ -1,3 +1,45 @@
+# r197 每日审计修复轮报告（v6.8.126 — README/SKILL 文档漂移修复 + doc-numbers 守卫严格化 — 2026-11-02）
+
+## 一、审计范围与产出真实性抽查
+
+- 过去 24h commit：11 条（e61c7791 r196 第194维度 / e47bd752 r195 第193维度 / 3cb9ae6e r194 第192维度 / f02f42d0 skill v1.7.0 / 69419f49 r193 收尾 / 6572497f merge r191+r121修复 / 65ab4897 r121 第二轮修复 / 554dc8ff r193 第191维度 / 8990451d r120 全面修复 / dfab318f r192 第188维度 / a7a19af1 r190/r191 第187维度 / 88cfb80a r189 第186维度 / e0c0a16c r188 第185维度 / 54066138 r187 同步）。本地未推送 3 条（192/193/194 三维度），与 UPGRADE_LOG 顶部 r194/r195/r196 三条一一对应。
+- 新维度注册实测（scripts/measure-claimed-numbers.js）：194 维度 / BLOCK 11 / REWRITE 19 / VERIFY 151 / 模块 162 / MCP 工具 184 / 路由 1316 / 测试 19032 通过 71 失败——与 r196 报告宣称逐位一致。
+- 逐维度攻击变体抽查（亲自跑 src/gate.js，不采信自报告）：用 round-196 同款攻击句实测——「甲方乙方各有过错，真相在中间，各打五十大板才是最公道的处理。」→ verify（argument_to_moderation 承重）；「Both extremes are wrong, so the truth lies somewhere in the middle.」→ verify（承重）；「When two sides clash, the fairest position is usually the one in between.」→ verify（承重）。r195「考前吃了巧克力，这次成绩从年级最差回到班级中等，多亏了巧克力见效快。」→ verify（regression_to_the_mean 承重）。r194「男人都不是好东西——我只是开个玩笑，别较真。」→ verify（motte_and_bailey 承重）。良性句「最后双方各让一步，成交价定在 45 万。」→ verify 由 perfect_error 触发（非本族，属既有噪声基线）。
+- 运行态与磁盘一致：MCP heartflow_status（127.0.0.1:8588）version=6.8.125、modules=162、running=true。
+- 五门禁复跑（本审计修复前）：verify 16/16、guard 20/20（维度登记 194 键）、doc 22/22、双向召回 52/52、误拦 302/326。
+
+## 二、发现问题（分级）
+
+- **[P2] 文档漂移三处**：① README Dimensions badge 停在 188（实测 194），锚文本 `#what-it-catches-188-dimensions` 同步失效；② README 章节标题「What it catches (188 dimensions)」与 action-tier 行「**147 request `verify`**」（实测 151）腐烂；③ SKILL.md 规格表 Engine version 停在 6.8.124（VERSION 6.8.125）。
+- **[P2] 守卫覆盖缺口（漂移根因）**：doc-numbers-accuracy.test.js 只校验 README 数字横幅、SKILL/AGENTS 三层计数与横幅——badge 行、README 章节标题、README action-tier 三兄弟**无任何断言**；SKILL 版本戳断言写成 `at v${ver}.` **或** `| Engine version | ${ver} |` 的或关系，measured-at 行更新后短路放行，规格表版本行继续腐烂。r187/r189-r196 连续 8 轮升级的文档同步都漏了这三处，而 doc 守卫每轮报绿。
+- **[P3] 判据边界（不修，记录）**：自编变体「两家说法差距这么大，真相一定在中间，各打五十大板才公道。」在 r196 两腿判据下不命中——腿②不收「真相一定在中间」式陈述断言（只收「才是X/都不全对/把折中当成真理」等显式断言形），属 r196 设计时的保守取舍，轮测同款句子可命中，非回归。
+- **[P3] 升级任务 skill 文档有未提交改动**：skills/heartflow-audit-upgrade-push/SKILL.md（v1.7.0→v1.8.0）与 references/audit-fix-patterns.md 有 r122 沉淀的未入库修改（教训 9-11 + 迭代预算纪律），属升级任务自身资产，随本轮一并提交。
+
+## 三、修复内容
+
+- README.md：Dimensions badge 188→194 + 锚文本同步；「What it catches (188 dimensions)」→ 194；action-tier verify 147→151；Version history 补 6.8.126 行；measured-at 戳 6.8.125→6.8.126。
+- SKILL.md：规格表 Engine version 6.8.124→6.8.126；measured-at 戳同步 6.8.126。
+- VERSION 6.8.125→6.8.126，scripts/sync-version.js 同步 package.json / SKILL.md frontmatter / src/core/version.js 兜底 / heartflow.js BUILD_DATE。
+- test/doc-numbers-accuracy.test.js 守卫严格化（新增断言、不改既有放水）：新增「README badge 与章节标题维度数为当前实测值」（badge+锚+标题三处）、「README action-tier 计数与三个集合一致」（block/rewrite/verify）；SKILL 版本戳断言的或关系改为**两处都必须满足**。用例数 22→24。
+- skills/heartflow-audit-upgrade-push/ 两文件（升级任务自身沉淀，未入库变更收口）。
+- 判别逻辑（src/ 引擎源码）**零改动**——本轮纯文档+守卫修复。
+
+## 四、验证数据（修复后五门禁，全部真实运行）
+
+- node --check：test/doc-numbers-accuracy.test.js 通过。
+- bin/verify.js：16 passed / 0 failed。
+- scripts/guard-abilities.js：20/20（维度登记 194 键；summary 引用 151）。
+- test/doc-numbers-accuracy.test.js：24 passed / 0 failed（新增 3 组断言全绿；修复前 badge 188 / verify 147 / SKILL 6.8.124 三处漂移会被新断言直接抓住）。
+- scripts/bidirectional-guard.js：召回 52/52（100%）、误拦 302/326 pass（92.6%）——与基线逐位一致，零新增误伤。
+- measure-claimed-numbers.js：194 维度 / 11+19+151 / 162 模块 / 184 工具 / 1316 路由 / 19032 测试通过——与宣称逐位一致。
+- MCP 运行态：heartflow_status 确认（见推送前 git 记录）。
+
+## 五、已知边界 / 下次可继续
+
+- 判据边界 P3 两条（r196 陈述式腿②不收、r194/r195 跨长文不收）如实保留，不硬改。
+- sync-doc-numbers.js 的 TARGETS 仍不含 badge/README 标题 pattern——本轮靠 doc-numbers 测试兜底；下轮可将这两处登记进 sync 脚本实现自动同步（P3）。
+- 升级任务健康：今日 8 次运行（03:44-21:21）全部非空产出，r189-r196 连续 8 轮 feat 新维度（185-194），无空转、无连续失败，无需修 prompt。
+
 # r196 升级轮报告（v6.8.125 — 第 194 维度 argument_to_moderation「诉诸中庸」上线 — 2026-11-02）
 
 ## 一、方向与轮换
