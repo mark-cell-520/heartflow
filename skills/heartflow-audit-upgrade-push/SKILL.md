@@ -1,6 +1,6 @@
 ---
 name: heartflow-audit-upgrade-push
-version: "1.6.0"
+version: "1.7.0"
 title: "心虫审计→并发修复→验证→推送 全流程"
 description: |
   心虫大规模升级工作流：全量审计→分类问题→并发修复→验证→推送GitHub。
@@ -447,6 +447,18 @@ LEFTHOOK=0 git push "https://USERNAME:$TOKEN@github.com/OWNER/REPO.git" main:mai
 ```
 
 推完复查 `git remote -v` 与 `grep -c 'ghp_\|[0-9a-f]\{40\}' .git/config` 确认无残留。
+
+#### Phase 5: GitHub 同步（分叉合并）与运行态/定时任务收尾
+
+多实例共用同一 remote（本机 cron 定时推、另一实例也推）必然产生分叉。用户说"拉取新内容/同步/重新部署定时任务"时按本段执行：
+
+1. **先 fetch 再判形态**：`git fetch <remote> main`，双向数 `git log --oneline HEAD..<remote>/main` 与 `<remote>/main..HEAD`。双边非零=真分叉（走合并）；单边=快进。**合并前 pause 两个 cron**（见 Phase -1），且 `git status --short` 必须干净。
+2. **冲突固定五件套**：CHANGELOG.md、package.json、SKILL.md、VERSION、src/core/heartflow.js。解法：
+   - CHANGELOG：双边同版本号记录并入同一版本头下（Added+Fixed 并存），不删任何一侧
+   - 维度/模块/工具/路由数取**合并后实测值**（`scripts/measure-claimed-numbers.js`），随后 `sync-doc-numbers.js` 全量同步 + `--check` 复绿；CONTRIBUTING.md/CURRENT_STATE.md 两份活文档是既有漏网户，跟着修
+   - VERSION/package.json/SKILL.md 版本号两边相同就保持，不为合并额外 bump
+3. **合并后必须重跑五门禁 + 冒烟**（不是只跑冒烟）：两条线的变更组合可能产生单线各自全绿、组合红的花样。典型回归形态——**验证脚本 teardown 竞态**：被检代码新增 await 边界（如先例查询接入 think() 开头）后，"同步阶段 stop() 引擎、之后才 await 异步检查"的验证脚本会让续跑撞 started 检查整项挂（verify 16 项必挂 1 项）。判据：任何 verify 脚本的 stop/teardown 必须位于 `Promise.all(checkResults)` 之后。
+4. **收尾三件套**：push 后 `git ls-remote` 复核远端 HEAD=本地且 `<remote>/main..HEAD | wc -l` 为 0 → `supervisorctl restart heartflow-mcp` + `/health` 与 `heartflow_status` 确认新版本新模块数 → resume 两个 cron，`cronjob list` 确认 enabled/state=scheduled/next_run_at，`cat ~/hermes1/cron/ticker_heartbeat` 确认调度器活着。
 
 ### 推送策略（当网络环境复杂时）
 
