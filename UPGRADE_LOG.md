@@ -1,3 +1,45 @@
+# r195 升级轮报告（v6.8.124 — 第 193 维度 regression_to_the_mean「回归均值误归因」上线 — 2026-11-02）
+
+## 一、方向与轮换
+
+因果与统计推理（证据纪律）一线。r193/r194 连续两轮为逻辑谬误单句内容型与成对结构型，本轮按轮换纪律切至**统计因果归因盲区**：极端值之后的自然回归被当成干预功劳。与全部 192 个既有维度正交（grep 实证 0 命中）。
+
+## 二、来源（真实，未编造）
+
+- HN Algolia `regression to the mean`（tags=story）："Regression to the mean is the main reason ineffective treatments appear to work"（objectID 10731023，pts=137，http://www.dcscience.net/2015/12/11/placebo-effects-are-weak-regression-to-the-mean-is-the-main-reason-ineffective-treatments-appear-to-work/）、"Regression to the Mean: on LLMs and the quiet death of the new"（48804219，pts=71）、"Gambler's Fallacy and the Regression to the Mean"（29845334，pts=68）——确认「极端值后的自然移动被当成干预效果」是统计与因果推断的公认盲区。
+- GitHub API：`regression to the mean fallacy`（sort=stars）**total_count=0**；`logical fallacies list` 最高 LukeStonehm/LogicalDefence ★140（https://github.com/LukeStonehm/LogicalDefence，通用谬误列表，无可移植纯规则判据）。
+- Semantic Scholar：连续三次 HTTP 429 空返，按轮次纪律如实记录。
+- 缺口实证：`grep -ril 'regression_to_mean|regression-to-the-mean' src/` **0 命中**——192 维无一覆盖该族。
+- 侦察落盘 `/tmp/hf-scout-1793616770.txt`。判据为心虫自有纯规则实现（零 LLM 依赖）。
+
+## 三、心虫裁决
+
+philosophy_decision（带实质上下文：任务=新增第193维度 regression_to_the_mean、意图=获得「极端基线→自然回归→干预功劳归因」新攻击族辨别能力，服务长期目标中「符合宇宙规律」与「寻真」）：**type=accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions）。如实说明：rationale 中 cognitiveLoad 与 uncertainty 均为字符串 "unknown"（引擎未测到当很低），按轮次纪律未当作实质背书。
+
+## 四、实现
+
+- 新文件 `src/regression-to-the-mean.js`（约 330 行）：`checkRegressionToMean(text, inject)` + `__internals`（22 组枚举常量可逐族负例注入）。
+- 判据**三腿共现 + 叙事窗，缺一不判**：
+  - 腿① EXTREME 极端基线（双向）：极端低族（最差/最糟/最低/最惨/最重/最严重/最疼/倒数/垫底/谷底/低谷/跌到谷底/至暗时刻/冰点/触底/崩盘/暴跌/连跌/创新低/历史新低/最低点/连败/连输/屡败；EN worst/lowest/rock bottom/nadir/slump/hit bottom/crash/tanked/lost N in a row/all-time low/worst ever）；极端高族（史上最好/历史最好/最好成绩/巅峰/顶点/峰值/最高点/登顶/夺冠/考了第一/年级第一/班级第一/排名第一/创新高/历史新高/最辉煌/势头最猛；EN best/highest/peak/pinnacle/record high/winning streak/best ever）——**回归是双向的，两个方向都收**。
+  - 腿② REGRESSION 回归性变化（双向）：自低处回升（好转/恢复/康复/痊愈/回升/反弹/回暖/止跌/企稳/回到.{0,8}(正常|平均|中游|中等|上游|前列|前十|正轨|均值)/好起来/好多了/追平/又赢了/赢回来/扳回/不疼了/就好了/退烧/睡好/挺过来/平复；EN recovered/improved/bounced back/returned to/back to normal/got better/won again/leveled off/stabilized）；自高处回落（回落/跌回/降回/减退/消退/平息/退潮/归于平淡/回归平淡/回归正常/回归均值/热度退了/风头过了；EN dropped back/fell back/faded/wore off/subsided/cooled off）。
+  - 腿③ ATTRIB 干预×功劳/功效归因：INTERVENE 干预动作（动词形 吃了/贴了/换了/请了/试了/报了/买了 + 裸名词形 贴膏药/换帅/换教练/报班/抄底/拜佛/看风水/请大师/换方法/调整作息；EN took/tried/hired/switched/started/enrolled） × CREDIT 功劳归因（多亏/全靠/幸亏/好在/幸好/功劳/靠的是/归功于/居功至伟/之所以；EN because of/thanks to/credit to）或 EFFECT 功效断言（有效/见效/起作用/有用/管用/很灵/立竿见影/药到病除/很关键/果然/没白/靠谱/一贴就；EN work/effective/fixed/cured/paid off/made the difference），两者 12 字（EN 40 字符）叙事窗内共现；三腿整体落在 40 字（EN 120 字符）叙事窗内。
+  - 计分：基础 0.62 + 功劳归因形 0.06 + 显式干预动词形 0.04，封顶 0.85。
+- 豁免四组 + 疑问句：概念/教学转述（均值回归/回归均值/regression to the mean/统计学/教材/论文）、实验/证据语境（随机对照/对照组/双盲/安慰剂/剔除极端值/截尾/温莎化/基线校正/前瞻性/队列/元分析/纵向/自然实验；EN randomized/controlled trial/placebo/trimmed/winsorized/longitudinal）、推理否定/反向承认（不能说明/不能排除/不能全归/推不出/未必/很难说/不好说/说不清/难以确定/可能是自然；EN does not mean/cannot conclude/not necessarily/fails to show/may just be/natural regression）、对冲（可能/也许/或许/大概/似乎/好像/有待）。
+- r161 教训落实：枚举腿全部收裸名词形态（「谷底」「连败」「赢回来」「贴膏药」「换帅」不收「了/之后」后缀才命中的形）；「回到」收「回到.{0,8}(正常|平均|中游|中等…)」受限形，避免误收「回到家/回到公司」。
+- `src/index.js` 七处接线（require / compute / gate 数组 / dimMap / DIM_GUIDANCE / VERIFY_DIMS / allDims-dimensions），VERIFY 级。变量名 `rtm`（grep 实测 0 命中无冲突）。
+
+## 五、验证数据（本轮实跑）
+
+- round-195 轮测 **43/43**：攻击 8/8 命中（score ≥0.6，含中英双语、裸名词、带修饰长句、倒装归因前置、双向回归-自高处回落）、良性 7/7 放行（含元讨论/推理否定/无归因腿/对冲/边缘多因不可归）、11 项常量负例注入承重（抹 EXTREME/REGRESSION/INTERVENE 任一腿→全停；抹 CREDIT→仅功劳形停、抹 EFFECT→仅功效形停，两子族互相独立；抹 EXTREME_LOW→低攻击停高攻击仍命中，抹 EXTREME_HIGH/REG_DOWN 反之；抹三类豁免→对应陷阱转命中）、gate 层变体矩阵：攻击 7/7 非 pass 且 regression_to_the_mean 承重进 findings、良性 7/7 pass（良性矩阵样本经全引擎实测筛选，避开 confidence/post_hoc/gamblers_fallacy 等既有维度对部分表述的既有行为）。
+- 五门禁：bin/verify.js **16/16**、guard-abilities.js **20/20**、doc-numbers **22/22**（README/SKILL/AGENTS 三处数字 192→193、VERIFY 149→150 同步后）、bidirectional-guard 召回 **52/52**、误拦 **302/326**（与基线逐位一致，新维度零误伤）。
+- 维度数 192→193、VERIFY 149→150、模块 162 不变（纯函数维度模块不进 _modules registry）。
+
+## 六、已知边界
+
+① 「连败后换教练又赢了几场」类良性表述会被既有维度 gamblers_fallacy 代拦（既有行为，非本轮引入，良性矩阵样本已避开）；② 极端高方向只收显式峰值词（夺冠/历史新高/巅峰），「表现很好」类弱极端不收；③ 干预动词清单外的干预（如「换了风水布局」未入表的具体黑话）依赖动词形兜底，可能漏判；④ 三腿限 40 字叙事窗，跨长文间隔的共现不判；⑤ 跨段数字（上文给极端值、本段只讲回归）不判；⑥ 未跑全量回归（遵禁令），存量 71 项失败未逐条归因。
+
+---
+
 
 # r194 升级轮报告（v6.8.123 — 第 192 维度 motte_and_bailey「稻草城堡谬误」上线 — 2026-11-02）
 

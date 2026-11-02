@@ -1,3 +1,15 @@
+## [6.8.124] - 2026-11-02
+
+### Added — 第 193 判别维度 `regression_to_the_mean`「回归均值误归因」（r195，真升级类型 1）
+
+- **新文件 src/regression-to-the-mean.js（约 330 行）**：`checkRegressionToMean(text, inject)` + `__internals`。辨别的族：某指标先处于**极端值**（最差/谷底/连败/创新低，或巅峰/夺冠/历史新高——回归是**双向**的），随后**朝均值方向移动**（好转/回升/回到中等，或回落/退潮），文本把这次移动**归功于同期的某个干预**（吃药/贴膏药/换人/报班/换方法/请大师；EN took / hired / switched / started）。极端值之后的下一次测量天然朝均值移动，与干预是否有效无关；没有对照组时「干预后好转」证明不了任何事。
+- **判据三腿共现 + 叙事窗，缺一不判**：腿① EXTREME 极端基线（双向：极端低族 最差/谷底/垫底/连败/暴跌/历史新低；极端高族 巅峰/夺冠/历史新高/年级第一/创新高；EN worst/lowest/rock bottom/lost N in a row、best/highest/peak/record high）；腿② REGRESSION 回归性变化（双向：自低处回升 好转/恢复/回升/回暖/回到.{0,8}(正常|平均|中游|中等)/赢回来/不疼了；自高处回落 回落/减退/平息/回归平淡/热度退了；EN recovered/bounced back/back to normal、dropped back/faded/subsided）；腿③ ATTRIB 干预×功劳/功效归因（干预动词 吃了/换了/请了/试了 + 裸名词形 贴膏药/换帅/报班/抄底/拜佛 × 功劳词 多亏/全靠/幸亏/功劳/归功于 或功效词 有效/见效/管用/很关键/果然/一贴就，12 字窗内共现）。计分 0.62 + 功劳归因形 0.06 + 显式干预动词形 0.04，封顶 0.85。**r161 教训**：「谷底/连败/赢回来/贴膏药」全部收裸名词形态；「回到」收「回到.{0,8}(正常|平均|中游|中等…)」受限形，避免误收「回到家/回到公司」。
+- **豁免四组 + 疑问句**：概念/教学转述（均值回归/regression to the mean/统计学/教材）、实验/证据语境（随机对照/对照组/双盲/安慰剂/剔除极端值/截尾/温莎化/基线校正/纵向/自然实验）、推理否定（不能说明/不能排除/推不出/未必/很难说/不好说/说不清/难以确定/可能是自然）、对冲（可能/也许/或许/大概/似乎/有待）。
+- **src/index.js 七处接线**（require / compute / gate 数组 / dimMap / DIM_GUIDANCE / VERIFY_DIMS / allDims-dimensions），VERIFY 级——「干预后好转」需要补的是对照组与机制证据（没做干预的同质群体是否也回归了），不是改写句式。
+- **边界**：与 post_hoc（管时序连接，本族不依赖时序、承重的是极端基线这个统计前提）、gamblers_fallacy（管预测下一次，本族管解释已经发生的回归）、hot_hand（管连胜→下次胜率）、clustering_illusion（管聚集当规律）、base_rate_neglect（管单信号无视基础概率）、pseudo_causal（管精确倍数/玄学归因）、common_cause / reverse_causation（管相关→因果与方向倒置）、monocause（管多因压成单因）刻意错开。
+- 来源（真实，未编造）：HN Algolia "regression to the mean" 命中 "Regression to the mean is the main reason ineffective treatments appear to work"（objectID 10731023，pts=137，http://www.dcscience.net/2015/12/11/placebo-effects-are-weak-regression-to-the-mean-is-the-main-reason-ineffective-treatments-appear-to-work/）、"Regression to the Mean: on LLMs and the quiet death of the new"（48804219，pts=71）、"Gambler's Fallacy and the Regression to the Mean"（29845334，pts=68）；GitHub `regression to the mean fallacy` total_count=0、`logical fallacies list` 最高 LukeStonehm/LogicalDefence ★140（通用列表无可移植判据）；Semantic Scholar 连续三次 HTTP 429 空返。判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-1793616770.txt。缺口实证：grep -ril 'regression_to_mean|regression-to-the-mean' src/ 0 命中。心虫裁决：philosophy_decision type=accelerate（confidence 0.7 / priority 40；cognitiveLoad、uncertainty 为 "unknown"，按轮次纪律未当实质背书）。
+- 验证：round-195 轮测 43/43（攻击 8/8 命中含中英/裸名词/带修饰/倒装/长句/双向回归、良性 7/7 放行含元讨论/推理否定/无归因腿/对冲/边缘多因不可归、11 项常量负例注入承重含逐族置空互不影响与三类豁免抹除转命中、gate 层变体矩阵攻击 7/7 非 pass 且 regression_to_the_mean 承重 + 良性 7/7 pass）；五门禁：verify 16/16、guard-abilities 20/20、doc-numbers 22/22、双向 召回 52/52 误拦 302/326（与基线逐位一致，零误伤）。维度数 192→193、VERIFY 149→150、模块 162 不变（纯函数维度模块不进 _modules registry）。
+
 ## [6.8.123] - 2026-11-02
 
 ### Added — 第 192 判别维度 `motte_and_bailey`「稻草城堡谬误」（r194，真升级类型 1）

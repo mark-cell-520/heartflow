@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-192 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+193 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 192 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 193 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (192 dimensions) -> gate
+scope-check -> premise-check -> discriminate (193 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.123**. Not marketing copy.
+Measured on this repository at **v6.8.124**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 192 |
+| Discrimination dimensions | 193 |
 | MCP tools | 184 |
 | Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.124 | 2026-11-02 | 第 193 维度 **regression_to_the_mean**「回归均值误归因」上线（r195）——「极端基线×回归性变化×干预功劳归因」三腿结构判别，填补 192 维在统计因果归因族的空白 |
 | 6.8.123 | 2026-11-02 | 第 192 维度 **motte_and_bailey**「稻草城堡谬误」上线（r194）——「争议主张+退守遁词」替换结构的判别，填补 191 维在该族的空白 | 
 | 6.8.121 | 2026-11-02 | 第 191 维度 **ad_nauseam**「诉诸重复」上线（r193）——复读冒充论据的结构型判别，补齐单句内容型谬误之外的重复密度盲区 |
 | 6.8.118 | 2026-11-02 | **第187维度 proxy_metric_goal（代理指标当目标：古德哈特定律的谬误应用）上线** — 判别「**把测得的量（代理指标）当作目标本身达成或真实效果出现的证据**」结构：KPI 完成了所以目标肯定达成、下载量破百万所以产品满足需求、平均分上去了所以教学变好、测试覆盖率 100% 所以代码质量没问题、满意度打分都是五分所以客户真的满意。指标是目标的**代理度量**，目标是**被测量的事物本身**，代理读数上升不增加目标达成的证据——指标可被扭曲、博弈、与目标脱钩（刷分刷出的 KPI、为凑覆盖率写的空测试、怕差评不敢打分的问卷），古德哈特定律正是「度量变成目标之日，即它不再是好度量之时」：「KPI完成了，说明目标肯定达成了。」「这个季度下载量破了五百万，说明产品已经满足了用户需求。」「测试覆盖率到了100%，说明代码质量没有问题。」「The metric hit its target, so the goal must have been achieved.」「Coverage is at 100%, which proves code quality is fine.」。判据**三腿共现，缺一不判**：腿① METRIC 被测得的量（点击率/播放量/下载量/KPI/指标/完成率/覆盖率/分数/平均分/引用量/日活/留存率/满意度打分/GDP…全部裸名词；EN metric/downloads/coverage/score/KPI/views/revenue…）、腿② GOAL 目标/真实效果结论（目标达成/需求满足/质量没有问题/客户满意/效果显著/实力提高…；EN goal achieved/needs met/quality is fine/customers are satisfied/capability improved…）、腿③ CONN 连接（显式连接词或逗号并置且无转折词，跨度 ≤80 字/EN 160 字符）。与 activity_outcome_confusion（第184维 活动/投入计数→抽象成果）、reward_hacking（BLOCK 自认式指标作弊）、statistical_misleading / percentage_overflow（比例数字呈现）边界错开：本族腿①只收**测得的量**、是**无欺骗的推理谬误**（陈述者真诚相信「指标读数=目标达成」）。主动分离指标与目标（不等于/不代表/只能说明/分开看）、目标本身直接证据在场（访谈/实测/复购/问题解决率）、对冲、概念转述（古德哈特/代理指标/vanity metric）均明确不判。来源（真实，未编造）：本族立项由 r186 activity-outcome-confusion.js 文档显式划界留白（「下载量破百万所以满足需求」「分数上去所以教学变好」归 Goodhart 族）；GitHub `search?q=Goodhart's law`（sort=stars）参考 agamm/Gobert（Goodhart's law 演示，https://github.com/agamm/Gobert）与 math 评估类成熟方案作概念背景；HN Algolia 检索 Goodhart / proxy metric 作背景；判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-r190.txt、探针 /tmp/hf-probe-r190.js。维度数 186→187，VERIFY 145→146，模块 161 不变（纯函数维度模块不进 _modules registry，r186/r189 同口径）。验证：round-190 轮测 17/17（攻击 20/20 含中英/裸名词/倒装/逗号并置/反问/长句、良性 16/16 零误判含主动分离/直接证据/指标到指标/边缘多因陈述、12 项常量负例注入承重、gate 层变体矩阵攻击 8/8 非 pass 且维度承重 + 良性 7/7 pass）。本行由 r191 接手 r190 爆截断存量工作补齐（r190 已实现并全绿，漏补 Version history 与 CHANGELOG/UPGRADE_LOG 即被截断）。 |
