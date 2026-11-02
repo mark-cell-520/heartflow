@@ -1,3 +1,35 @@
+# r201 升级轮报告（v6.8.130 — 第 198 维度 nirvana_fallacy「完美方案谬误」上线 — 2026-11-03）
+
+## 一、轮次与方向
+- 轮次 r201，方向：逻辑谬误检测（轮换表——r198/r199/r200 分别为因果推理/证据充分性/价值对齐与目标漂移，本轮回到谬误检测族中尚未覆盖的 perfect solution fallacy）。任务：新增判别维度，命中一个此前 197 维无一覆盖的新攻击族。
+- 立项缺口实证：`grep -ril 'nirvana|perfect solution|治标不治本|完美方案|一劳永逸|银弹' src/` 仅命中 fallacy-fallacy.js 的概念引述豁免表（分析谬误概念时豁免）与 index.js:5866 一条窄正则（「不完美…等于…没用」固定连接词句式），无任何维度以「不完美宣告×行动废止」两腿结构覆盖本族；本族探针在当前引擎（v6.8.129，197 维）复测——攻击 5/5 gate.action=pass（真零命中）、良性 5/5 pass（零误伤）。
+
+## 二、来源（真实，未编造）
+- 三层研究：HN Algolia "hallucination detection" 命中的故事均为 LLM 路线（HDM-1/UQLM/HalluMix），与零 LLM 依赖铁律不符，不作集成源；GitHub 命中 **dhfbk/faina ★5**（NAACL 2025《Fine-grained Fallacy Detection with Human Label Variation》，https://github.com/dhfbk/faina ，论文 aclanthology.org/2025.naacl-long.34/——意大利语社交媒体 11K+ span 级标注、20 类谬误分类学，perfect solution fallacy 为其中一类），作分类学对照确认本族是标准谬误目录中独立一族；判据为心虫自有纯规则实现（零 LLM 依赖铁律）。侦察落盘 /tmp/hf-scout-*.txt。
+- 心虫裁决门禁：heartflow_philosophy_decision → **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 三、实现
+- 新文件 src/nirvana-fallacy.js（约 300 行）：`checkNirvanaFallacy(text, inject)` + `__internals`（12 个可注入常量）。两腿共现 + 邻近窗（中文 60 字 / EN 160 字符），缺一不判：
+  - 腿① IMPERFECT 不完美宣告（不能/无法/难以/做不到×根治/根除/彻底/100%/一劳永逸；裸不完美名词 不完美/有缺陷/有漏洞/有短板/有死角/有局限/有副作用/治标不治本/不是万能/没有银弹；「找不到+根治方法」句式；EN isn't perfect / imperfect / flawed / can't fully solve / won't eradicate / only treats the symptoms / not a cure / no silver bullet / has flaws / not 100%——r161 教训：裸名词形态去后缀仍命中，「不可能完美」经否定词×完美词族覆盖）；
+  - 腿② REJECT 行动废止（毫无/没有+意义|价值、一文不值、杯水车薪、徒劳、白费、多此一举、画蛇添足、否定前缀 lookbehind 保护的裸废止动词 放弃/取消/废止/废除/终止/停止/叫停/下马/抵制/拒绝/搁置、「不该|不应该+存在|推行|采用|使用|保留|尝试」、干脆|不如|索性+废止；EN pointless / no point / not worth / might as well give up / should be abandoned / why bother / waste of time / wait for a perfect solution——「不该放弃」「没有取消」因 lookbehind 保护不误判）。
+- 豁免四组 + 疑问句：让步-肯定（但/然而/不过 + 值得/仍/继续/缓解/控制/改善/推进/采用/降低/延长/有用/试点/过渡/没有放弃——「不能根治，但能缓解症状，值得推广」是正确坚持）、证据型废止（严重副作用/风险大于收益/弊大于利/完全无效——因危害或无效而废止是正确的）、概念/教学转述（nirvana fallacy/完美方案谬误/all-or-nothing thinking）、过渡/interim（在…之前先…/暂行/过渡；EN in the meantime / interim measure / stopgap）、疑问句。
+- src/index.js 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出——计算点变量名 nvf，避开既有 nf=no_fallback）；三份文档数字同步（维度 197→198、verify 154→155、版本戳 6.8.129→6.8.130）；README Version history / CHANGELOG 追加 6.8.130 条目；VERSION 递增后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-201-nirvana-fallacy.js（44 用例：攻击 8 中英双语/裸名词/带修饰/倒装/长句、良性 7 含五类边缘良性（含「战争是多因共同造成的」多因陈述）、5 项豁免陷阱「含豁免放行+抹掉转命中」+疑问句去问号转命中、8 项腿常量负例注入承重含中英逐侧独立与邻近窗外不判、gate 层变体矩阵）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键 198）
+- test/doc-numbers-accuracy.test.js：24/24
+- scripts/bidirectional-guard.js：召回 52/52 不降、误拦 302/326 不升（与基线逐位一致，零误伤）
+- round-201 轮测：44/44
+- 变体矩阵（真实 gate() 复量，非仅模块自检）：攻击 8/8 gate.action=verify 且 nirvana_fallacy 进 findings；良性 7/7 pass（多因陈述/缺废止腿/让步-肯定×2/interim/仅缺陷认知/EN 缺废止腿+EN 让步）
+
+## 五、已知边界 / 下次可继续
+- 隐式废止（只说「不完美」不宣告废止行动，如「这个方案有漏洞」止步）不判——缺腿②即无「以完美标准否决行动」的话语形状，属保守方向；口语里「啧啧，这漏洞」式反讽不判。
+- 邻近窗 60 字（EN 160 字符）外的跨段「不完美…废止」共现不判（可能是两件独立的事）。
+- 让步-肯定豁免为句级属性，同句混合「但值得做」与真废止叙述会整句放过（与既有维度同口径）。
+- 成本/收益类废止（「成本太高所以不做」）不判——那是正当的成本收益论证，只有拿「完美标准」作对照才落本族；下次可在证据纪律方向补「成本收益论证的完整性」族。
+
 # r200 升级轮报告（v6.8.129 — 第 197 维度 goal_drift「目标漂移/使命置换」上线 — 2026-11-03）
 
 ## 一、轮次与方向

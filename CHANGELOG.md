@@ -1,3 +1,12 @@
+## [6.8.130] - 2026-11-03
+
+### Added — 第 198 判别维度 `nirvana_fallacy`「完美方案谬误」（r201，真升级类型 1：新判别维度）
+- 新增 src/nirvana-fallacy.js（约 300 行）：`checkNirvanaFallacy(text, inject)` + `__internals`（12 个可注入常量）。两腿共现 + 邻近窗（中文 60 字 / EN 160 字符），缺一不判：腿① IMPERFECT 不完美宣告（不能/无法/难以/做不到×根治/根除/彻底/100%/一劳永逸，裸不完美名词 不完美/有缺陷/有漏洞/有短板/有死角/有局限/有副作用/治标不治本/不是万能/没有银弹，「找不到+根治方法」句式；EN isn't perfect / imperfect / flawed / can't fully solve / won't eradicate / only treats the symptoms / not a cure / no silver bullet / has flaws / not 100%）；腿② REJECT 行动废止（毫无/没有+意义|价值、一文不值、杯水车薪、徒劳、白费、多此一举、画蛇添足、否定前缀 lookbehind 保护的裸废止动词 放弃/取消/废止/废除/终止/停止/叫停/下马/抵制/拒绝/搁置、「不该|不应该+存在|推行|采用|使用|保留|尝试」、干脆|不如|索性+废止；EN pointless / no point / not worth / might as well give up / should be abandoned / why bother / waste of time / wait for a perfect solution）。命中「拿方案的不完美直接废止行动，用理想化对照否决现实选项」这一此前 197 维零命中的攻击族。
+- **r161 教训**：枚举腿收裸名词形态——「不完美」「有漏洞」「治标不治本」「一劳永逸」「放弃」「废止」去后缀仍命中；废止动词带否定前缀 lookbehind 保护（「不该放弃」「没有取消」是正确坚持，不判）。
+- **豁免四组 + 疑问句**：让步-肯定（但/然而/不过 + 值得/应当/仍/继续/缓解/控制/改善/推进/采用/降低/延长/有用/有效/试点/试行/过渡/没有放弃；EN but/however + worth/valuable/useful/effective/reduces/slows/improves/better than nothing——「不能根治，但能缓解症状，值得推广」是对渐进改进的正确坚持）、证据型废止（严重副作用/风险大于收益/弊大于利/完全无效；EN severe side effects / outweighs the benefits / more harm than good / completely ineffective——因危害或无效而废止是正确的，本族只管「因不完美而废止」）、概念/教学转述（nirvana fallacy/完美方案谬误/要么完美要么不做/all-or-nothing thinking）、过渡/interim（在…之前先…/暂行/过渡/权宜之计；EN in the meantime / interim measure / stopgap）、疑问句。
+- **边界**：与 base_rate_neglect（单点阳性信号→高置信度个体结论，可无概率语言区分）、perfect_error（指标数字精确度假象）、false_dilemma（虚假二元对立，本族选项可只有一个）、appeal_to_consequences（怕后果所以信/不信，本族落点是行动存废）刻意错开；index.js:5866 遗留 perfect_solution 窄正则（「不完美…等于…没用」固定句式）由本维度覆盖更全句式族。
+- 接入 src/index.js 八处（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出）；维度 197→198，VERIFY 154→155；README/SKILL/AGENTS 三处数字同步；VERSION 6.8.129→6.8.130。
+
 ## [6.8.129] - 2026-11-03
 
 ### Added — 第 197 判别维度 `goal_drift`「目标漂移/使命置换」（r200，真升级类型 1：新判别维度）
