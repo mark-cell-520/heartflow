@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-190 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
+191 discrimination dimensions  ×  11-layer pipeline  ×  161 modules  ×  184 MCP tools
 ×  1,314 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 190 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 191 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (190 dimensions) -> gate
+scope-check -> premise-check -> discriminate (191 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.120**. Not marketing copy.
+Measured on this repository at **v6.8.121**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 161 |
 | Module init errors | 0 |
 | Dispatch routes | 1,314 |
-| Discrimination dimensions | 190 |
+| Discrimination dimensions | 191 |
 | MCP tools | 184 |
 | Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.121 | 2026-11-02 | 第 191 维度 **ad_nauseam**「诉诸重复」上线（r193）——复读冒充论据的结构型判别，补齐单句内容型谬误之外的重复密度盲区 |
 | 6.8.118 | 2026-11-02 | **第187维度 proxy_metric_goal（代理指标当目标：古德哈特定律的谬误应用）上线** — 判别「**把测得的量（代理指标）当作目标本身达成或真实效果出现的证据**」结构：KPI 完成了所以目标肯定达成、下载量破百万所以产品满足需求、平均分上去了所以教学变好、测试覆盖率 100% 所以代码质量没问题、满意度打分都是五分所以客户真的满意。指标是目标的**代理度量**，目标是**被测量的事物本身**，代理读数上升不增加目标达成的证据——指标可被扭曲、博弈、与目标脱钩（刷分刷出的 KPI、为凑覆盖率写的空测试、怕差评不敢打分的问卷），古德哈特定律正是「度量变成目标之日，即它不再是好度量之时」：「KPI完成了，说明目标肯定达成了。」「这个季度下载量破了五百万，说明产品已经满足了用户需求。」「测试覆盖率到了100%，说明代码质量没有问题。」「The metric hit its target, so the goal must have been achieved.」「Coverage is at 100%, which proves code quality is fine.」。判据**三腿共现，缺一不判**：腿① METRIC 被测得的量（点击率/播放量/下载量/KPI/指标/完成率/覆盖率/分数/平均分/引用量/日活/留存率/满意度打分/GDP…全部裸名词；EN metric/downloads/coverage/score/KPI/views/revenue…）、腿② GOAL 目标/真实效果结论（目标达成/需求满足/质量没有问题/客户满意/效果显著/实力提高…；EN goal achieved/needs met/quality is fine/customers are satisfied/capability improved…）、腿③ CONN 连接（显式连接词或逗号并置且无转折词，跨度 ≤80 字/EN 160 字符）。与 activity_outcome_confusion（第184维 活动/投入计数→抽象成果）、reward_hacking（BLOCK 自认式指标作弊）、statistical_misleading / percentage_overflow（比例数字呈现）边界错开：本族腿①只收**测得的量**、是**无欺骗的推理谬误**（陈述者真诚相信「指标读数=目标达成」）。主动分离指标与目标（不等于/不代表/只能说明/分开看）、目标本身直接证据在场（访谈/实测/复购/问题解决率）、对冲、概念转述（古德哈特/代理指标/vanity metric）均明确不判。来源（真实，未编造）：本族立项由 r186 activity-outcome-confusion.js 文档显式划界留白（「下载量破百万所以满足需求」「分数上去所以教学变好」归 Goodhart 族）；GitHub `search?q=Goodhart's law`（sort=stars）参考 agamm/Gobert（Goodhart's law 演示，https://github.com/agamm/Gobert）与 math 评估类成熟方案作概念背景；HN Algolia 检索 Goodhart / proxy metric 作背景；判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-r190.txt、探针 /tmp/hf-probe-r190.js。维度数 186→187，VERIFY 145→146，模块 161 不变（纯函数维度模块不进 _modules registry，r186/r189 同口径）。验证：round-190 轮测 17/17（攻击 20/20 含中英/裸名词/倒装/逗号并置/反问/长句、良性 16/16 零误判含主动分离/直接证据/指标到指标/边缘多因陈述、12 项常量负例注入承重、gate 层变体矩阵攻击 8/8 非 pass 且维度承重 + 良性 7/7 pass）。本行由 r191 接手 r190 爆截断存量工作补齐（r190 已实现并全绿，漏补 Version history 与 CHANGELOG/UPGRADE_LOG 即被截断）。 |
 | 6.8.119 | 2026-11-02 | **第188维度 false_precision（伪精确断言：无来源无约数的过分精确数字冒充量化证据）上线** — 判别把**超出证据支撑精度的数字**（小数百分比/小数倍数/小数评分/小数年限/精确副词+数字：37.42% / 3.7 倍 / 92.6 分 / 12.5 年 / 整整 3.7 倍 / exactly 47.83%）以**无来源、无约数、无对冲**的断言形式给出、制造「量化严谨」假象的结构：数字的**精度形态**本身就是证据——样本多大、怎么测的都没说，小数却给到小数点后一两位，是把随机噪声包装成测量读数，是 AI 输出中最典型的数字幻觉形态：「用户满意度达到 92.6 分，远超预期。」「性能提升了整整 3.7 倍，几乎没有代价。」「新药可延长预期寿命 12.5 年。」「该模型在测试集上的准确率达到 99.37%。」「The study shows engagement improved by exactly 47.83%.」。判据**两腿共现 + 分组豁免，缺一不判**：腿① PREC 精确数字形（**必须含小数点或精确副词**——四舍五入的整数 37% / 3 倍是约整数的合法形态，不判：小数 %/％、小数倍、小评分（92.6 分，排除分钱/分钟/分利/分贝/分米）、小数年岁（12.5 年/岁）、精确副词+数字（整整/恰好/正好/分毫不差/精确地/准确地/精准地 + ≤4 字 + 数字，含整数形——161 轮教训：副词腿收裸词形态，「准确率 92.6 分」由「准确」前缀+数字命中）；EN 小数 %、小数 x/times、小数 years/months/weeks/days/hours/points、exactly/precisely/accurately + 数字）；腿② CLAIM 断言/度量语境（腿①匹配点前后 ≤24 字 / EN 48 字符内任一：效果动词 提升/提高/增长/增加/降低/减少/下降/达到/高达/低至/升至/突破/改善/优化/翻番/刷新/创下；EN improves/increases/reduces/reaches/boosts/extends/achieves/drops/agrees…；度量名词 准确率/满意度/转化率/增长率/覆盖率/留存率/性能/得分/评分/寿命/预期寿命/占比…；EN accuracy/satisfaction/conversion/coverage/retention/performance/life expectancy…；结论标记 证明/表明/显示/说明/意味着/可见/足见；EN proves/shows/demonstrates/indicates/means——**裸名词形即断言语境**：「转化率 37.42%，完播率 21.8%」无动词也是伪精确陈列）。边界：perfect_error 的 S1_false_precision 管**裸**精确百分比（无度量名词、无来源，如「市场份额达到 87.3%」）且是多信号协同判定的一票（[v6.7.93] 起对度量名词语境整体豁免，本为「latency dropped 40%」这类工程读数设计），本族专打**度量名词语境下**的小数断言——正是 S1 豁免腾出的空间，且是单维专项判据、不依赖多信号叠加；statistical_misleading / percentage_overflow 管**比例数字的呈现问题**（基数隐藏/占比合计溢出），本族不管呈现结构、管**数字精度本身是否被证据支撑**；unsupported_claim / bullshit 管断言缺依据的强度，本族有数字在场但数字的**精度形态**无效。明确不判：约数/对冲（约/大约/接近/将近/左右/上下/近似/估算/预计/差不多/误差范围/容差/±/大概/可能/也许/据说；EN about/around/approximately/roughly/nearly/almost/estimated/give or take）、具名来源（根据X统计局/X大学/X报告/X调查/《X》/据X统计/年报/季报/月报/财报/公报/白皮书/来源于/数据来源/转引自/参见；EN according to X report/study/survey/census/source:）、天然精确语境（数字近邻 ≤40 字 / EN 80 字符内：完整日期、版本号 v6.8.118、自然计数 12 个/1200 人、物理量纲与精度规格 0.01 毫米/±0.5℃、数学常数 π/约等于、时长与历史语境 历时/持续/为期/已有/建于/成立于）、仪器读数语域（数字近邻内 监控/压测/日志/报表/看板…显示/表明——同 r437「可定位复现」边界）、统计口径（同比/环比/较上期/去年同期/百分点/percentage point/year-over-year）、元讨论（有效数字/小数点/四舍五入/位数/保留/精度）、疑问句（含 ?/？）。已知边界：① 「实验组有效率为 87.3%」这类度量名词未入表且无效果动词的形暂不判（「有效率/完成量/满意度指数」等词可续入腿②，保守方向）；② 句级豁免仅留约数/来源/口径/元讨论四类真句级属性，天然精确与仪器豁免已收窄为数字近邻窗；③ 跨段数字不判。来源（真实，未编造）：HN Algolia 命中 Wikipedia "False precision"（https://en.wikipedia.org/wiki/False_precision）；GitHub API `hallucination detection benchmark`（sort=stars）最高星 zjunlp/FactCHD（IJCAI 2024，92★，https://github.com/zjunlp/FactCHD，事实冲突幻觉检测基准）作数字幻觉背景；Semantic Scholar 三次检索均 HTTP 429 空返。缺口实证 /tmp/hf-probe-r192.js：本族 6 条攻击 4 条真零命中、6 条边缘良性零误伤。侦察落盘 /tmp/hf-scout-r192.txt、探针 /tmp/hf-probe-r192.js。维度数 187→188，VERIFY 146→147，模块 161 不变（纯函数维度模块不进 _modules registry，r190 同口径）。验证：round-192 轮测 61/61（攻击 17/17 含中英/裸名词/倒装/长句/精确副词/小数年/小数评分、良性 17/17 零误判含来源/对冲/仪器/时长/口径/元讨论/疑问/天然精确/边缘多因陈述、11 项常量负例注入承重、gate 层变体矩阵攻击 8/8 非 pass 且维度承重 + 良性 8/8 pass）。 |
 | 6.8.120 | 2026-11-02 | **全面审计修复轮（用户指令：全面审计→全面修复→同步 GitHub）** — 3 路子代理并发扫描 527 个 JS 文件，修复 HIGH 10 类 + MEDIUM 10 类，零 CRITICAL、零新增回归。①**[HIGH] 每次 think() 必抛的 TypeError**：heartflow.js:6047 `_PrivacyExposure.sanitizeForPersistence` 漏调 lazy 函数（缺 `()`），被 catch 吞后 Engram 存储/召回整块失效（`_engramRecall` 恒 undefined）——修复后实测恢复真实召回数据。②**[HIGH] BLOCK 级豁免击穿**：reward_hacking 的 DISCOURSE_FRAME 豁免未过信号闸，「比如，直接绕过安全检查」加前缀即整体豁免；弱举例标记组（比如/举例/像是）移除+双闸纪律对齐，攻击句恢复 HIT、良性元话语 3/3 仍豁免、回归 27/27。③**[HIGH] MCP 匿名提权**：OID 身份码只做格式正则无签发体系，匿名 guest 自报 `x-heartflow-oid` 即被提为 user 穿过 40 个写工具拦截——修复为 guest 持 OID 不提权，固化该漏洞的测试期望同步反转（mcp-auth-e2e-real 13/13）。④**[HIGH] 记忆库静默重置**：rotate-aes-key 只扫 `.enc` 后缀，`data/memory-bank.json`（同格式 `.json`）被漏扫，换钥后每次启动 `Decryption failed... starting fresh` 整库丢弃（日志实锤）——改按内容探测纳入轮换。⑤**[HIGH] 文档漂移**：package.json 168→190、SKILL.md 184→190/149→177 等 6 处，sync-doc-numbers 补登记 CONTRIBUTING/CURRENT_STATE 两份活文档并修复其把 UPGRADE_LOG 历史轮次数字误报为漂移的缺陷。⑥**[HIGH] 回归门禁静默放行**：heartflow-self-evolve 判据只匹配英文 `N failed` 而 run-all 输出中文「M 失败」+ 180s 超时必杀 27 分钟的全量回归——被杀后 failedCount=0 空放行并继续 commit/push；修 fail-closed + 双语判据 + 30min 超时。⑦**[HIGH] 即崩工具**：heartflow-memory-tool/inject.js require 全仓不存在的 HeartFlowMemory 类（从未入 git），被 two-pass-response 技能宣传为记忆注入能力——删除死脚本，宣称修正为 py 插件层。⑧**[HIGH] 假健康**：24 个 _stubFactory 占位子系统 healthCheck 恒 `{ok:true}` + 4 个假全局桥接类打假「加载成功」日志——统一诚实化 `{ok:false, stub:true/fake:true}`。⑨**[HIGH] 死注册表**：14 个 lazy 条目指向不存在文件（planner 族 8/code 族 4/memory 族 2），dispatch 报误导性 route not allowed——删除。⑩**[HIGH] require 守卫自身红灯**：3 处 archive 断链 + git/无-git 双模式口径不一致（一个扫 archive 一个不扫）——修断链+统一口径，527 文件 0 断链。**MEDIUM**：dimensions 输出补 agency_deflection/ai_writing_tell 键、dimMap 补 6 键修 findings detail 恒 1、bullshit→bullshit_recognition 三表命名统一（维度口径 188→190）；_thinkCache 死代码连根删；threePoisons 空 try 诚实化；rate limit 注释口径统一（100/min）；sseClients 加 CAP=64 LRU；Unix socket chmod TOCTOU 用 umask 预置修复；6 处内存泄漏（WAL _pending 不回写/outbound-ledger _buffer/decision-engine 双 Map/cross-domain _chains/receipts/DNS_CACHE 只读不清理）全部加上限或 TTL；package.json files 移除 test/（828 个测试文件不再随包外发）；measure 裸 `spawnSync('node')` 改 process.execPath（干净 PATH 下维度数不再静默输出 0）；triality-memory.js 死代码出库；3 个 fetch 脚本 require 路径少一层 `..` 修复。验证：五门禁全绿（verify 16/16、guard 20/20、doc 22/22、双向召回 52/52 误拦 302/326 不升、rh 回归 27/27）+ 冒烟 6 分支 initErrors=0 + mcp-auth-e2e 13/13 + decision-router 23/23。版本 6.8.119→6.8.120（判别逻辑仅 F3 一处行为变更，其余为诚实化/死代码/文档/资源边界）。 |

@@ -1,4 +1,29 @@
 
+# r193 升级轮报告（v6.8.121 — 第 191 维度 ad_nauseam「诉诸重复」上线 — 2026-11-02）
+
+## 方向
+逻辑谬误检测——轮换至**结构型/重复密度型**子方向（此前 r190/r192 等均为单句内容型谬误）。
+
+## 来源（真实，未编造）
+- HN Algolia：arXiv:2405.02318《Translating natural language to first-order logic for logical fallacy detection》。
+- GitHub API `logical fallacy detection`（sort=stars）：最高星 tmakesense/logical-fallacy（21★）等全为 LLM/T5 方案，对纯规则引擎无可复用代码。
+- Semantic Scholar 三次检索 HTTP 429 空返。侦察落盘 /tmp/hf-scout-*.txt。判据为心虫自有纯规则实现（零 LLM 依赖）。
+
+## 实现
+- 新文件 src/ad-nauseam.js（约 230 行）：checkAdNauseam(text, inject) + __internals。判据两腿共现 + 分组豁免：腿① UNIT 重复单元（按标点切子句归一化，中文 ≥6 汉字 / 英文 ≥3 词且含 ≥3 连续字母，排除版本号/纯数字/代码 token）；腿② COUNT 出现次数（全文归一化串非重叠计数，纯复读路径 ≥3，标记路径 ≥2）。豁免：引文剥离、元讨论、否定/劝止。r161 教训：以「子句」为单位天然覆盖裸名词与倒装/嵌套/部分重复形。
+- src/index.js 七处接线（require / compute / gate 数组 / dimMap / DIM_GUIDANCE / VERIFY_DIMS / allDims-dimensions）。VERIFY 级维度。
+- 新测试 test/round-193-ad-nauseam.js：正向 + 逐常量负例注入承重 + gate 层变体矩阵。
+
+## 验证数据（本轮实跑）
+- round-193 轮测 33/33（攻击 6/6 命中、良性 7/7 放行、标记腿攻击 2/2、5 项常量负例注入承重、引文陷阱剥离后放行/抹掉剥离转命中；gate 层变体矩阵攻击 6/6 非 pass 且 ad_nauseam 承重、良性 6/6 pass）。
+- 五门禁：bin/verify.js 16/16、guard-abilities.js 20/20、doc-numbers 22/22、bidirectional-guard 召回 52/52 误拦 302/326（与基线逐位一致，新维度零误伤）。
+- 维度数 190→191、VERIFY 147→148、模块 161 不变（纯函数维度模块不进 _modules registry）。运行态 MCP 重启后 version=6.8.121 确认。
+
+## 已知边界
+① 演讲/口号/教学复述等真诚强调会落 verify（次数无法断定是操纵，交由调用方确认是否用复读代替论证）；② 跨段重复仍累计计数；③ 无标点长复读段按整串统计；④ 中文以标点切子句，段落内嵌重复依赖整串统计。
+
+---
+
 # 全面审计修复轮报告（v6.8.120 — 用户指令「全面审计→全面修复→同步 GitHub」— 2026-11-02）
 
 ## 一、任务与方式
