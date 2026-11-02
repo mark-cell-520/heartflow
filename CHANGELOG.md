@@ -1,3 +1,15 @@
+## [6.8.127] - 2026-11-02
+
+### Added — 第 195 判别维度 `cum_hoc`「相关≠因果谬误」（r198，真升级类型 1：新判别维度）
+
+- **新文件 src/cum-hoc.js（289 行）**：`checkCumHoc(text, inject)` + `__internals`（14 个可注入常量）。辨别的族：cum hoc ergo propter hoc（拉丁语「与此并存，故因彼此」）——把**两个变量的相关/共现/同步**直接当成**其中一个导致另一个**的证据。相关性只说明两变量同变，不说明方向、更不说明因果（同变可能源于第三变量、双向因果、或纯巧合）；把相关当因果，会让未经检验的因果叙事获得数据外衣，驱动错误的干预与决策。
+- **判据两腿共现 + 邻近窗（中文 24 字 / EN 70 字符），缺一不判**：腿① CORRELATION 显式相关/共现标记（相关/关联/成正比/成反比/伴随/同步/共现/一同出现/联动/高度相关/显著相关；EN correlated / associated / linked / goes hand in hand / co-occur / proportional）；腿② CAUSAL 前向因果动词（导致/造成/引起/引发/促使/带来/催生/诱发/使得/提升了/能够提升；EN causes / leads to / results in / drives / boosts / brings about / increases）。计分 0.60 + 推断连接词 0.06 + 显式强度相关词 0.05，封顶 0.85。**r161 教训**：相关/关联/同步/成正比收裸名词形态；结果动词（提升/提高/增加/降低/减少）须带因果模态前缀（能够/会/将/使…），既收「能够提升」又不误收「努力提高」这类目标句。**关键边界取舍**：刻意弃用「是因为」作因果腿——「A 和 B 相关是因为 C」是 common_cause 的正确解释，前向腿只收「A 导致/造成 B」。
+- **豁免五组 + 疑问句**：概念/教学转述与共同因素解释（相关不等于/伪相关/混淆变量/共同因素/辛普森/内生性/相关系数/统计学；EN correlation is not causation / confounding / spurious correlation / common cause / Simpson's paradox）、实验/证据语境（随机对照/双盲/安慰剂/前瞻性/队列/元分析/格兰杰/数据显示/研究表明；EN randomized / controlled trial / RCT / Granger / data show / evidence shows）、推理否定/觉察承认（不代表/不等于/并不意味着/推不出/未必/可能只是/纯属巧合；EN does not mean / not necessarily / may just be / mere coincidence / open question / remains unclear）、对冲、疑问句。
+- **src/index.js 七处接线**（+20 行：require / compute / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象），VERIFY 级——「相关到底是不是因果」需要补的是时间先后、对照组、机制路径，不是改写句式。
+- **边界**：与 post_hoc（管**时序连接**「A 在 B 前所以 A 导致 B」，本族不依赖时序、承重的是共变/相关）、reverse_causation（管**反应型行为×负面结果**方向倒置，腿①用比较级 更/多/高，本族腿①用显式相关词，词表不交叉）、common_cause（管**伪相关**第三变量，本族不管第三变量且共同因素解释明确放行）、pseudo_causal（管**精确倍数**假机制，本族管相关→因果方向）、statistical_misleading（管**数据呈现误导**）、monocause（管多因压单因）刻意错开。
+- 来源（真实，未编造）：三层研究——HN Algolia "causal reasoning LLM" 命中 observability/时序推理类文章（非判据可复用）；GitHub API "fallacy detection"（sort=stars）命中 dhfbk/faina ★5（NAACL 2025《Fine-grained Fallacy Detection with Human Label Variation》，aclanthology.org/2025.naacl-long.34/，20 类谬误细粒度标注，作分类学参考）、panFJCharlotte98/Fallacy_Detection ★5（EMNLP 2024 LLM zero-shot 分类器）——均依赖 LLM 或仅分类器框架，无可复用纯规则判据；Semantic Scholar 连续 HTTP 429 空返，如实记录。判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-*.txt。缺口实证：grep -ril 'cum_hoc|cum-hoc' src/ 0 命中（194 维无一覆盖「相关→因果」族）。心虫裁决：philosophy_decision type=accelerate（confidence 0.7 / priority 40；cognitiveLoad、uncertainty 为 "unknown"，按轮次纪律未当实质背书）。
+- 验证：round-198 轮测 45/45（攻击 8/8 命中含中英/裸名词/带修饰/倒装/长句、良性 10/10 放行含觉察/元讨论/证据/仅相关/共同因素/仅因果/对冲/目标句、3 项豁免陷阱「含豁免放行+抹掉转命中」、5 项腿常量负例注入承重含中英逐侧独立、gate 层变体矩阵攻击 8/8 非 pass 且 cum_hoc 承重 + 良性 10/10 pass）；五门禁：verify 16/16、guard-abilities 20/20、doc-numbers 24/24、双向召回 52/52、误拦 302/326（与基线逐位一致，零误伤）。维度数 194→195、VERIFY 151→152、模块 162 不变（纯函数维度模块不进 _modules registry）。
+
 ## [6.8.125] - 2026-11-02
 
 ### Added — 第 194 判别维度 `argument_to_moderation`「诉诸中庸」（r196，真升级类型 1：新判别维度）

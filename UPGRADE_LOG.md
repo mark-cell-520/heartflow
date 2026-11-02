@@ -1,3 +1,30 @@
+# r198 升级轮报告（v6.8.127 — 第 195 维度 cum_hoc「相关≠因果谬误」上线 — 2026-11-02）
+
+## 一、轮次与方向
+- 轮次 r198，方向：因果与反事实推理（轮换自 r194-r196 的逻辑谬误族）。任务：为心虫新增判别维度，命中一个**此前 194 维无一覆盖的新攻击族**。
+- 立项缺口实证：`grep -ril 'cum_hoc|cum-hoc' src/` 0 命中；因果族已有 post_hoc（时序）/reverse_causation（反应型×负面）/common_cause（第三变量）/monocause/pseudo_causal（精确倍数）/outcome_bias/hindsight_bias/regression_to_the_mean，**唯独缺 cum hoc ergo propter hoc（把相关/共现直接当成因果）**。
+
+## 二、来源（真实，未编造）
+- 三层研究：HN Algolia "causal reasoning LLM" 命中 observability/时序推理类（非判据可复用）；GitHub API "fallacy detection"（sort=stars）命中 **dhfbk/faina ★5**（NAACL 2025《Fine-grained Fallacy Detection with Human Label Variation》，https://aclanthology.org/2025.naacl-long.34/，20 类谬误细粒度标注，作分类学参考）与 panFJCharlotte98/Fallacy_Detection ★5（EMNLP 2024 LLM zero-shot 分类器）——均依赖 LLM 或仅分类器框架，无可复用纯规则判据；Semantic Scholar 连续 HTTP 429 空返，如实记录。判据为心虫自有纯规则实现（零 LLM 依赖）。侦察落盘 /tmp/hf-scout-*.txt。
+- 心虫裁决：`heartflow_philosophy_decision` type=**accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad、uncertainty 均为字符串 "unknown"，按轮次纪律未当实质背书）。
+
+## 三、实现内容
+- **新文件 src/cum-hoc.js（289 行）**：`checkCumHoc(text, inject)` + `__internals`（14 个可注入常量）。两腿判据：腿① CORRELATION 显式相关/共现标记（相关/关联/成正比/伴随/同步/共现…）；腿② CAUSAL 前向因果动词（导致/造成/带来/提升了/能够提升…），24 字（EN 70 字符）邻近窗共现，缺一不判。**关键取舍**：弃用「是因为」作因果腿（那是 common_cause 的正确解释）；结果动词须带因果模态前缀（收「能够提升」不收「努力提高」）。豁免五组 + 疑问句（概念/共同因素、实验证据、推理否定/觉察、对冲、疑问）。
+- **src/index.js 七处接线（+20 行）**：require / compute（`const ch = …`）/ allDims 打分 / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象。
+- **新测试 test/round-198-cum-hoc.js（116 行）**：攻击 8、良性 10、豁免陷阱 3、腿常量负例注入 5、gate 层变体矩阵。
+- **文档同步**：README / SKILL / AGENTS 三处维度数 194→195、verify 151→152、版本戳 6.8.126→6.8.127、cum_hoc 写入 AGENTS verify 列举与版本沿革注记；README Version history 追加 6.8.127 行；CHANGELOG 追加 6.8.127 条目。VERSION 6.8.126→6.8.127，sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+
+## 四、验证数据（五门禁 + 变体矩阵，全绿）
+- round-198 轮测：**45/45**（攻击 8/8 命中、良性 10/10 放行、3 豁免陷阱「含豁免放行+抹掉转命中」、5 项腿常量负例注入承重含中英逐侧独立、gate 层变体矩阵攻击 8/8 非 pass 且 cum_hoc 承重 + 良性 10/10 pass）。
+- 五门禁：**verify 16/16**、**guard-abilities 20/20**（维度登记 195 键）、**doc-numbers 24/24**、**双向召回 52/52**、**误拦 302/326 不升**（与基线逐位一致，零误伤）。
+- 全管线实测（非仅模块）：`gate("冰淇淋销量和溺水死亡率高度相关，所以吃冰淇淋会导致溺水。")` → rewrite 且 cum_hoc 进 findings；良性句 pass。
+
+## 五、已知边界 / 下次可继续
+- 只收**显式相关词**形式；「喝红酒的人更长寿，所以…」这类**隐式比较级**因果声称不在本族（比较级地形归 reverse_causation 等），本族不追求覆盖所有表面形。
+- 邻近窗 24 字（EN 70 字符）内的「相关+前向因果」即判；跨长文间隔的共现不判（可能是巧合）。
+- 豁免为句级属性时，同句混合合法证据与裸相关断言会整句放过（与既有维度同口径）。
+- 下次可继续方向：反事实推理过度声称（counterfactual）细化、或证据充分性族补强。
+
 # r197 每日审计修复轮报告（v6.8.126 — README/SKILL 文档漂移修复 + doc-numbers 守卫严格化 — 2026-11-02）
 
 ## 一、审计范围与产出真实性抽查
