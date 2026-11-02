@@ -1,3 +1,8 @@
+## [6.8.118] - 2026-11-02
+
+### Added
+- **第187维度 `proxy_metric_goal`（代理指标当目标：古德哈特定律的谬误应用，r190 实现 / r191 接手补齐提交）** — 新增 `src/proxy-metric-goal.js`（353 行，导出 `checkProxyMetricGoal` + 14 个可负例注入常量：`METRIC_ZH/EN`、`GOAL_ZH/EN`、`CONN_ZH/EN`、`EXEMPT_SEP/DIRECT/HEDGE/META_ZH/EN`），登记 VERIFY_DIMS（145→146），维度总数 186→187。判别「**把测得的量（代理指标）当作目标本身达成或真实效果出现的证据**」结构：KPI 完成了所以目标肯定达成、下载量破百万所以产品满足需求、平均分上去了所以教学变好、测试覆盖率 100% 所以代码质量没问题、满意度打分都是五分所以客户真的满意。指标是目标的**代理度量**，代理读数上升不增加目标达成的证据——指标可被扭曲、博弈、与目标脱钩，古德哈特定律正是「度量变成目标之日，即它不再是好度量之时」。判据**三腿共现，缺一不判**：腿① METRIC 被测得的量（点击率/播放量/下载量/KPI/指标/完成率/覆盖率/分数/平均分/引用量/日活/留存率/满意度打分/GDP…全部裸名词形态；EN metric/downloads/coverage/score/KPI/views/revenue…）；腿② GOAL 目标/真实效果结论（目标达成/需求满足/质量没有问题/客户满意/效果显著/实力提高…；EN goal achieved/needs met/quality is fine/customers are satisfied/capability improved…）；腿③ CONN 连接（显式连接词，或两腿逗号并置且窗口内无转折词，总跨度 ≤80 字 / EN 160 字符）。与 `activity_outcome_confusion`（第184维 活动/投入计数→抽象成果）、`reward_hacking`（BLOCK 自认式指标作弊）、`statistical_misleading`/`percentage_overflow`（比例数字呈现）边界错开：本族腿①只收**测得的量**、是**无欺骗的推理谬误**（陈述者真诚相信「指标读数=目标达成」）。明确不判：主动分离指标与目标（不等于/不代表/只能说明/分开看）、目标本身直接证据在场（访谈/实测/复购/问题解决率）、对冲结论、概念/教学转述（古德哈特/代理指标/vanity metric）、疑问句。`src/index.js` 九处接线（require/计算点/allDims/dimMap/DIM_GUIDANCE/VERIFY_DIMS/dimensions 读数/summary；变量名 pmg）。缺口立项由 r186 `activity-outcome-confusion.js` 文档显式划界留白（「下载量破百万所以满足需求」「分数上去所以教学变好」归 Goodhart 族）。模块 161 不变（纯函数维度模块不进 `_modules` registry）。
+
 ## [6.8.117] - 2026-11-02
 
 ### Added

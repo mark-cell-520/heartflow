@@ -1,3 +1,38 @@
+# 第 190 轮报告（v6.8.118 — 第187维度 proxy_metric_goal「代理指标当目标：古德哈特定律的谬误应用」上线 — r190 实现 / r191 接手补齐提交）
+
+## 〇、接手说明（r191，诚实记录）
+r190 已完成本维度全部代码实现（src/proxy-metric-goal.js + test/round-190-proxy-metric-goal.js + src/index.js 九处接线 + README/SKILL/AGENTS 数字 + VERSION 6.8.118），且**轮测 17/17 全绿**，但在追加 CHANGELOG/UPGRADE_LOG、重启运行态、git commit 之前**爆截断**（agent.max_turns=90 燃尽）。r191 按「下轮接手纪律」接手：第一优先修绿并补 feat 语义。接手时核验：五门禁 verify 16/16、guard 20/20、doc 22/22（接手方补齐 README Version history 6.8.118 行后由 21/22→22/22）、双向 52/52 召回 + 误拦 302/326 不升；轮测 17/17 全绿。本报告由 r191 代 r190 补齐落盘。
+
+## 一、方向与来源
+- 方向（轮换纪律）：r188/r189 为逻辑谬误检测 + 证据纪律一线。本轮继续**证据纪律 + 因果/推理有效性**一线，落点「**代理指标当目标**」（proxy metric as goal / Goodhart's law 的谬误应用）。
+- 缺口实证（/tmp/hf-probe-r190.js，直调 gate.js v6.8.117 / 186 维引擎）：本族 6 条攻击 **5 条真零命中**、5 条边缘良性零误伤；且 r186 `activity-outcome-confusion.js` 文档已显式把代理指标族划出射程留白（「下载量破百万所以满足需求」「分数上去所以教学变好」归 Goodhart 族）——是本族立项的直接依据，非凭空造维。
+- 外部来源（真实，未编造）：GitHub API `search?q=Goodhart's law`（sort=stars）参考 agamm/Gobert（Goodhart's law 交互演示，https://github.com/agamm/Gobert）作概念背景；HN Algolia 检索 Goodhart / proxy metric 作背景。判据为心虫自有纯规则实现（零 LLM 依赖，未移植任何 LLM 路线代码）。侦察落盘 /tmp/hf-scout-r190.txt、探针 /tmp/hf-probe-r190.js。
+- 心虫裁决：philosophy_decision（r190 裁决，accelerate 级缺口实证 + 轮换纪律）。
+
+## 二、实现内容
+- `src/proxy-metric-goal.js`（新增，353 行）：第 187 维度 proxy_metric_goal 检测器。判据**三腿共现，缺一不判**：
+  - 腿① METRIC 被测得的量（流量参与类 点击率/播放量/下载量/阅读量/转发量/点赞/粉丝/浏览量/曝光量；商业类 票房/收视率/营收/销售额/成交量/GDP；考核类 KPI/指标/绩效分/完成率/达标率/通过率/覆盖率；教育科研类 分数/成绩/得分/平均分/论文数/引用量/影响因子；用户类 日活/月活/留存率/复购率/转化率/NPS——**161 轮教训：全部裸名词形态**；EN metric/downloads/coverage/score/KPI/views/revenue/ranking/conversion/retention/DAU/MAU/citations）。
+  - 腿② GOAL 目标/真实效果结论（目标/目的/初衷/使命 达成|实现|完成|达到；需求|需要 满足|解决；质量 好|没有问题|提升；客户|用户|学生 真的|确实 满意；效果 显著|管用|见效；问题 解决|根治；实力|能力|水平 提升；EN goal achieved / needs met / quality is fine / customers are satisfied / capability improved——**只收目标达成与真实效果语言**，不收中间度量描述）。
+  - 腿③ CONN 连接（所以/因此/足见/可见/说明/证明/显然/肯定/一定/自然就/因为/既然；EN so/therefore/which means/which proves/means/because，**或**两腿逗号并置且窗口内无转折词——中文逗号常承载隐性因果；句号分隔或含转折词不判），指标腿与目标腿总跨度 ≤80 字（EN 160 字符）。
+  - 豁免（14 个可负例注入常量）：EXEMPT_SEP（主动分离：不等于/不代表/只能说明/仅供参考/分开看；EN is only a proxy/does not mean）、EXEMPT_DIRECT（目标本身直接证据在场：访谈/问卷原文/实测数据/现场调研/临床数据/审计报告；EN interviews/measured directly/clinical）、EXEMPT_HEDGE（对冲：可能/也许/未必/有待；EN maybe/perhaps/might）、EXEMPT_META（概念/教学转述：古德哈特/Goodhart/代理指标/虚荣指标/vanity metric/唯GDP/唯分数；EN Goodhart/vanity metric/textbook）。
+  - 边界：activity_outcome_confusion（第184维）管**活动/投入计数→抽象成果**（做的事、花的工），本族腿①只收**测得的量**、腿②只收**目标/真实效果结论**，两族词表互斥；reward_hacking（BLOCK）管**自认式指标作弊**（必有作弊自认标记），本族是**无欺骗的推理谬误**——陈述者真诚相信「指标读数=目标达成」；statistical_misleading/percentage_overflow 管**比例数字呈现**，本族不管数字大小、管「度量替代目标」的证据结构。
+- `src/index.js` 九处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 读数 / summary；变量名 pmg，grep 实测 0 命中无冲突），DIM_GUIDANCE 含完整判据+边界+正当做法指引。
+- `test/round-190-proxy-metric-goal.js`（新增，190 行，17 项断言）：攻击 20/20（中英/裸名词/倒装/逗号并置/长句）、良性 16/16 零误判（含主动分离/直接证据/指标到指标/边缘多因陈述「战争是多因共同造成的」）、12 项常量负例注入承重（含逗号并置路线与连接词路线分离的独立承重验证）、gate 层变体矩阵（攻击 8/8 非 pass 且维度承重、良性 7/7 pass）。
+- 文档三处同步 + 版本传播：README（badge/横幅/行内/规格表/Version history 6.8.118 新行——r191 补齐）、SKILL（版本戳/横幅/规格表/action-tier 146）、AGENTS（横幅/checkInput 行/维度注记 v6.8.118 条目/Verify-level 146 + proxy_metric_goal 入列）；`src/core/version.js` 兜底值同步；VERSION 6.8.117→6.8.118 + sync-version.js；CHANGELOG.md 追加 6.8.118 条目（r191 补齐）。
+
+## 三、验证数据（全部本轮真实运行）
+- 五门禁：bin/verify.js **16/16**；guard-abilities.js **20/20**（维度登记 187 键）；doc-numbers-accuracy.test.js **22/22**（r191 补齐 README Version history 后转绿）；bidirectional-guard.js 召回 **52/52**、误拦 **302/326 不升**（与基线一致、零新增误拦）；measure-claimed-numbers 维度 **187** / 模块 **161 不变**（纯函数维度模块不进 _modules registry）/ 工具 184 / 路由 1,314。
+- 轮测：test/round-190-proxy-metric-goal.js **17/17**（正向攻击 20/20、良性 16/16、注入承重 12 项、gate 矩阵攻击 8/8 承重 + 良性 7/7 pass）。
+
+## 四、已知边界（下轮可继续）
+- ① 指标腿与目标腿限同句或相邻分句、总跨度 ≤80 字（EN 160 字符），跨段形保守不收。
+- ② 含转折词（但/然而/却/不过）的并置不判——那是并列或反向陈述（「GDP 上去了，但居民收入是另一回事」是正确判别）。
+- ③ 「执行力/抗压/态度」等未列入腿②的软性目标词暂不判（「KPI 完成说明执行力强」漏判，保守方向）。
+- ④ 目标词与指标词同族时（「留存率提升说明留存效果显著」）会判 verify——结论为真但目标侧证据未独立给出，verify 的含义正是要求补直接测量。
+- ⑤ 存量代拦误伤（非本轮引入，r189/r188 记录）仍在：scrutiny_evasion 误拦良性「实验成功了，说明配方没有问题」、affirming_the_consequent 误拦有效三段论、contradiction 误伤「努力必要但不充分」类边缘良性——下轮可评估修代拦维度误伤。
+
+---
+
 # 第 189 轮报告（v6.8.117 — 第186维度 appeal_to_wealth「诉诸财富/诉诸贫穷谬误」上线 — 2026-11-02）
 
 ## 一、方向与来源
