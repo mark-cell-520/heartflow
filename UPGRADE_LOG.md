@@ -1,3 +1,34 @@
+# r205 升级轮报告（v6.8.134 — 第 202 维度 unfalsifiable_confirmation「双果自证」上线 — 2026-11-03）
+
+## 一、轮次与方向
+- 轮次 r205，方向：自我验证与纠错 / 证据纪律（轮换——r203 为认知偏差/可得性启发式，r204 为逻辑谬误/伽利略赌局；本轮切到「寻真而非似是而非」的免疫结构缺口：一个不存在任何能推翻它的观察的命题，不是陈述世界而是规避判别）。任务：新增判别维度，命中一个此前 201 维无一覆盖的新攻击族。
+- 立项缺口实证：r167 轮探针曾把「不可证伪断言」登记为候选族（src/one-sided-dismissal.js 注释留档：当时仅 6/8 被其他维度顺带代拦，无维度实现其两腿结构）；r205 在当前引擎（v6.8.133，201 维）复测——攻击样本 8 条中 5 条 gate.action=pass（现有维度真零命中，含中英双语/裸词/倒装极性/长句变体）、良性 6 条中 4 条 pass（另 2 条被 perfect_error / activity_outcome_confusion 既有拦截，非本族误伤）。侦察落盘 /tmp/hf-scout-1793689206.txt。
+
+## 二、来源（真实，未编造）
+- 三层研究全部执行：① HN Algolia `search?query=falsifiability&tags=story` 前八命中——均为 Popper 证伪主义/Sagan《我车库里的喷火龙》/Hans Albert Immunisierung gegen Kritik 免疫策略的哲学博客与维基条目（Falsificationism and Falsifiability、Is That Covid-19 Model True? The Myth of Falsifiability、Multiverses and Falsifiability、Nonsense: Forms thereof, falsifiability, pseudoscience, and bullshit 等），无代码方案；② Semantic Scholar `unfalsifiable claims pseudoscience demarcation` 一次检索 HTTP 429 限流空返（如实记录）；③ GitHub API `falsifiability&per_page=5&sort=stars` 前二——cpt13-g/clarify-research-idea ★282（把模糊研究方向转成可证伪研究想法，LLM 驱动）、tonyblu331/research-proof ★52（用可证伪证据计划压力测试研究主张，LLM 驱动），均与心虫零 LLM 依赖铁律冲突，无纯规则成熟实现可集成——按心虫既有维度形态自建纯规则判据（双果自证为经典 demarcation 问题核心结构，哲学文献仅作分类学参考）。
+- 心虫裁决门禁：heartflow_philosophy_decision → **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 三、实现
+- 新文件 src/unfalsifiable-confirmation.js（约 330 行）：`checkUnfalsifiableConfirmation(text, inject)` + `__internals`（8 个可注入常量）。两腿共现 + 邻近窗（中文 80 字 / EN 200 字符），缺一不判：
+  - 腿① OUTCOMES 互斥结果对（七形态）：双条件分句（如果/若/一旦/要是+条件A；否则/不然/反之/反过来+条件B）、双条件同句逗号型、无论句型（无论/不管/不论+（A 还是 B / A 与否 / 是否 A / A 不 A / 结果如何 / 好坏 / 胜负）+都/也）、对举极性型（实现/应验/灵验/成功/出现/上涨/赢了+没/未/不+同族词）、「测出来是A，测不出来是B」极性否定嵌内倒装（A3b）、「测出来是A，没测出来是B」语序（A3c）、裸反义对举（涨了…跌了）、横竖/反正+都、显式不可推翻宣告（任何结果都不能推翻）；EN whether X or not / whether X or Y / either way / no matter what / whatever happens / if it works…if not / works or it doesn't / nothing could disprove——**r161 教训落地**：实现/没实现、涨了/跌了、测出来/测不出来 收裸词形态，去后缀仍命中）。
+  - 腿② CONFIRM 同一自证结论：都/也/照样/依然+证明/验证/说明/表明/意味着/印证/坐实+我/我们、说明/证明+我+对·正确·没错·成立·有效·准·高明·领先·了不起、我的（理论/观点/学说/预言/判断/方法/模型/能力/框架）+是+对/正确/成立/有效（允许「我这个被否定的观点」插入修饰）、反正/横竖/左右+都+我+对、恰恰/正好+说明/证明+我、所以…永远/终究+成立；EN proves/confirms/shows/vindicates + I'm/my theory is + right/correct/valid/true、my theory is vindicated/confirmed、either way + confirms、right either way / no matter the outcome、no outcome can disprove it。
+- 豁免两组 + 疑问句：概念/批判转述（不可证伪/可证伪性/证伪主义/自我证实/免疫策略/两头堵/怎么说都对/双果自证+是谬误·问题·不是科学；EN unfalsifiable claim is a fallacy / falsifiability / Popper / Sagan's dragon）、诚实不确定性/验证纪律（需要更多数据/证据才能判断、两种结果都可能、下结论为时过早、要先验证/检验/同行评议、如实报告负面结果；EN needs more evidence before / both outcomes remain possible / premature to conclude / report the negative results）、疑问句（含 ?/？）。
+- **r205 实测修复（初版缺陷，两轮）**：① 腿① A3 初版只收 neg 在第二分句句首一种语序，「测出来是我功力起作用，测不出来是你心不诚」整句漏判——补 A3b（极性否定嵌在动词内的倒装）与 A3c（neg 在重复动词前）两族；② EN 侧 if X…if not 分支句分隔符初版只收逗号，「…vindicated; if not, …」分号形漏判——改 `[;,]?`；③ 良性矩阵初版含「这种『无论怎样都成立』的说法是不可证伪的」一句，被既有 contradiction 维度判 verify（既有引擎行为非本维度误伤）——换成带同行评议验证纪律的边缘良性样本。
+- src/index.js 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出——计算点变量名 ufc，grep 实测无冲突）；三份文档数字同步（维度 201→202、verify 158→159、三层级合计 188→189/剩余 13 不变、README badge/横幅/规格表/章节标题/版本历史、SKILL 横幅/规格表/tier 计数/pipeline 图、AGENTS 横幅/标题/层级列举/版本戳）；README Version history / CHANGELOG 追加 6.8.134 条目；VERSION 6.8.133→6.8.134 后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-205-unfalsifiable-confirmation.js（12 断言全绿：11 攻击全命中含中英双语/裸词/倒装极性/长句、8 良性全放行含设计保证/诚实不确定性/条件规划/概念批判、2 项豁免陷阱「含豁免放行+抹掉豁免转命中」、4 项腿常量负例注入承重含中英逐侧独立、2 项豁免常量负例注入、gate 层变体矩阵 6 攻击全非 pass 且 unfalsifiable_confirmation 承重 + 6 良性全 pass）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键实测 202）
+- test/doc-numbers-accuracy.test.js：24 passed / 0 failed（任务口径 22/22，实际断言 24 条全过）
+- scripts/bidirectional-guard.js：召回 52/52、误拦 302/326 pass（92.6%，与上轮持平不升——零新增误拦）
+- 变体矩阵（真实 gate() 实测）：攻击 6/6 gate.action=verify 且 findings 中 unfalsifiable_confirmation 承重（含「如果数据涨了，说明我的方法有效；如果数据跌了，那是市场还没认识到它的价值」「不管实验结果如何，都说明我的理论领先同行十年」「测出来是我功力起作用，测不出来是你心不诚——横竖都说明我没错」「这个预言实现了说明我准，没实现说明天机不可泄露，反正都是我对」「Whether the stock goes up or down, it proves my analysis is right.」「Either way, this confirms my model — no outcome can disprove it.」）；良性 6/6 gate pass（含边缘良性「无论用户怎么操作，系统都不会崩溃——这是渗透测试的设计目标」「这种情况…需要更多数据才能判断，现在下结论为时过早」「不管谈判结果如何，我们都准备了备选方案」「Whether the experiment succeeds or fails, we will report the results honestly.」）。
+- 已知边界记录：工程 Robustness 语境（可真证伪的设计保证，无自证结论腿）不判；邻近窗 80 字（EN 200 字符）外的跨段双果—自证共现不判；科学定律式全称陈述（结论指向客观属性而非自我正确性）不判；转述他人免疫论证且同句带验证纪律陈述时会整句放过（与既有维度同口径的取舍）。
+
+## 五、运行态
+- supervisorctl restart heartflow-mcp 后 /health 实测 `{"status":"ok","version":"6.8.134"}`，heartflow_status 实测 version=6.8.134、modules=162（重启生效确认，防 161 轮教训「MCP 调用方拿旧代码判别结果」）。
+- MCP 端点 heartflow_gate 实测：攻击句「无论实验结果如何，都说明我的理论领先同行十年」→ gate.action=verify 且 findings 首条 unfalsifiable_confirmation（severity 58）承重；良性句「如果实验成功，我们发表结果；如果失败，我们如实报告负面结果」→ 仅被既有 activity_outcome_confusion 拦截（v6.8.133 起既有行为，本维度零误伤）。
+
 # r204 升级轮报告（v6.8.133 — 第 201 维度 galileo_gambit「伽利略赌局」上线 — 2026-11-03）
 
 ## 一、轮次与方向
