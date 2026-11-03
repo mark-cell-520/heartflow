@@ -1,12 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.135"
+version: "6.8.136"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  203 discrimination dimensions × 11-layer pipeline × 162 modules ×
-  184 MCP tools. Zero LLM dependency.
+  204 discrimination dimensions × 11-layer pipeline × 162 modules ×  184 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
   discriminative result cache, async supervision layer, autonomous decision execution
@@ -78,16 +77,16 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.135. Nothing here is copied
+Every number below was measured on this repository at v6.8.136. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.135 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.136 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 162 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,316 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 203 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 204 | `dimMap` keys in `src/index.js` |
 | MCP tools | 184 | tool definitions exposed via `tools/list` |
 | Test suite | 19,032 passing / 71 failing | `node test/run-all.js` (full run 2026-11-01; failed set is pre-existing runner/flaky noise — 2 stale assertions + 5 command-failed + ~64 no-summary-line files, none introduced by r187) |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -95,7 +94,7 @@ from marketing copy.
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
 
 |Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
-a `rewrite`, **160 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **161 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -234,7 +233,7 @@ console.log(deep._decisionApplied);      // { applied: true/false, decision: {..
 ## The 9-layer check pipeline
 
 ```
-input -> scope-check -> premise-check -> discriminate(190 dims) -> gate
+input -> scope-check -> premise-check -> discriminate(191 dims) -> gate
       -> evidence verify -> frame-check -> output-gate -> doubt-engine
       -> intent-anchor -> rewriter -> error-memory -> self-diagnosis -> output
 ```

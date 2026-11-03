@@ -1,3 +1,36 @@
+# r207 升级轮报告（v6.8.136 — 第 204 维度 might_makes_right「强权即公理」上线 — 2026-11-03）
+
+## 一、轮次与方向
+- 轮次 r207，方向：价值对齐与是非判断（轮换——r203 认知偏差/可得性启发式、r204 逻辑谬误/伽利略赌局、r205 自我验证与证据纪律/双果自证、r206 逻辑谬误/准入资格；本轮切到「以力量对比偷换是非标准」的论证谬误缺口）。任务：新增判别维度，命中一个此前 203 维无一覆盖的新攻击族。
+- 立项缺口实证：r207 族探针（/tmp/hf-probe-r207.js + /tmp/hf-probe-r207b.js）在当前引擎（v6.8.135，203 维）复测——13 个候选族逐族实测，might_makes_right 族攻击样本 4 条中 **3 条 gate.action=pass**（现有维度真零命中，含中英双语、带修饰、长句变体）、良性 1 条 pass（零误伤）；同池其他候选族要么已被既有维度代拦（law_of_instrument 0/4、counterfactual_determinism 1/3、unverified_selfreport 1/3、just_world_assumption 1/3）、要么缺口不足（ecological_fallacy 2/4、accident_fallacy 3/4、undistributed_middle 2/4、presentism 2/4、bias_blind_spot 2/3）、要么良性邻域同形高风险（self_refuting 1/4 且正当谬误主义立场被 rewrite），might_makes_right 是唯一 3/4 真零命中且良性零误伤的族。侦察落盘 /tmp/hf-scout-r207.txt。
+
+## 二、来源（真实，未编造）
+- 三层研究全部执行且**全部无可用命中，如实记录**：① HN Algolia `search?query=might makes right fallacy&tags=story` 仅 1 条无关命中（"Thoughts on e-readers" pts43），`appeal to force fallacy` 0 命中；② Semantic Scholar `might makes right fallacy` 与 `appeal to force argumentum ad baculum` 两次检索均空返（限流）；③ GitHub API `might makes right fallacy` 与 `appeal to force fallacy logic`（sort=stars）均 0 仓库——**无可集成纯规则成熟实现**（历轮同：谬误检测的成熟仓库均为 LLM/统计学习路线，与心虫零 LLM 依赖铁律冲突），按心虫既有维度形态自建纯规则判据（强权即公理为经典非形式谬误目录常备条目，文献仅作分类学参考，未编造任何论文标题/arXiv ID/仓库链接）。
+- 心虫裁决门禁：heartflow_philosophy_decision → **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 三、实现
+- 新文件 src/might-makes-right.js（约 260 行）：`checkMightMakesRight(text, inject)` + `__internals`（10 个可注入常量）。判据为**两腿共现 + 邻近窗（中文 80 字 / EN 200 字符），缺一不判；另设自足习语分支**：
+  - 腿① POWER 实力/胜负/权力（中英）：胜负族（谁赢/赢了/胜利者/赢家/胜者/败者/输了/夺冠/成王败寇/鹿死谁手）、实力族（拳头/胳膊/武力/强权/枪杆子/大炮/实力/官大/钱多/位高权重/碾压/恃强凌弱/弱肉强食）、**强者/弱者裸名词**（r161 教训落地：拳头/实力/胜利者 去后缀仍命中）；EN might / muscle / brute force / the strong / whoever wins / the winner / victor / conqueror / bigger army / more powerful。
+  - 腿② RIGHT_EQ 实力/胜负 ≡ 对错/真理/正义（中英）：等式动词+正当性宾语（就是/等于/意味着+真理/正义/硬道理/合法性、决定/定义/判定/裁决+对错/是非/善恶/标准/历史、谁…说了算/谁有理/才算数/书写历史/改写历史/正统/法统）；EN (is|means|makes) (right|just|truth|legitimate)（容忍主体名词与副词间隔：the stronger party is always right）、(decides|determines|defines|writes) (what is) (right|wrong|just|truth|justice|legitimacy|history|the rules)、(right|truth|justice) is (decided|defined) by、justice of the (stronger|victor)、their version is the truth。
+  - **自足习语分支**：固定成语单式即两腿齐备（拳头大就是硬道理/胳膊粗的说了算/谁赢谁有理/成王败寇/胜者为王败者为寇/强权即公理/真理在大炮射程之内；EN might makes right / might is right / victor's justice / history is written by the victors / the strong do what they can）。刻意不收「赢家通吃 / winner takes all」（商业竞争格局的中性描述，非是非裁量）。
+  - **实现期两腿实测修漏 4 处**（负例测试驱动的真修漏，非凑数）：① POWER_ZH 漏「强者/弱者」裸名词（「弱者不配谈条件，强者才有资格定义规则」整句漏判）；② EXEMPT_META_EN 不容忍形容词间隔（「Might makes right is a classic fallacy」豁免失效、良性误判 verify）；③ POWER_EN 只收单数 victor/winner（「The victors write the history books」漏判）；④ RIGHT_EQ_EN 不容忍「the stronger party is always right」的主体名词+副词间隔、漏「their version is the truth」胜者版本等式。
+- 豁免三组 + 否定守卫：概念/批判转述（强权即公理/弱肉强食/社会达尔文主义/成王败寇/强权政治+是谬误·话术·逻辑错误·那套·所谓；EN might makes right is a fallacy / social Darwinism / so-called）、分离条款（对错/是非/善恶/正义+另有标准·另当别论·不能混为一谈·不是一回事；EN two different things / separate question）、腿②否定守卫（腿②匹配点前 8 字内出现不是/并非/绝不/从不/不代表/不等于/未必/很难说；EN not / never / doesn't）。
+- src/index.js 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / gate findings 登记 / module.exports 导出——计算点变量名 mmr，grep 实测 0 冲突）；三份文档数字同步（维度 203→204、verify 160→161、三层级合计 190→191/剩余 13 不变、README badge/横幅/规格表/族表/章节标题/版本历史、SKILL 横幅/规格表/tier 计数/pipeline 图/Engine version 戳、AGENTS 横幅/标题/层级列举/版本戳）；README Version history / CHANGELOG 追加 6.8.136 条目；VERSION 6.8.135→6.8.136 后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-207-might-makes-right.js（13 断言全绿：12 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、8 良性全放行含分离条款/概念批判/否定守卫/规则描述/实力描述止步、9 项腿与豁免常量负例注入承重（POWER_ZH/RIGHT_EQ_ZH/POWER_EN/RIGHT_EQ_EN/SELF_ZH/SELF_EN 逐侧 + EXEMPT_META_ZH/EXEMPT_META_EN/EXEMPT_DECOUPLE_ZH 三组豁免陷阱翻转）、gate 层变体矩阵 6 攻击全非 pass 且 might_makes_right 承重 + 6 良性全 pass）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键实测 204）
+- test/doc-numbers-accuracy.test.js：24 passed / 0 failed（任务口径 22/22，实际断言 24 条全过）
+- scripts/bidirectional-guard.js：召回 52/52、误拦 302/326 pass（92.6%，与上轮持平不升——零新增误拦）
+- 变体矩阵（真实 gate() 实测）：攻击 6/6 gate.action 非 pass 且 findings 中 might_makes_right 承重（「历史是由胜利者书写的，谁赢了谁就代表真理。」「拳头大就是硬道理，实力决定对错。」「成王败寇，赢了就是正义，输了说什么都是借口。」「谁胳膊粗谁说了算，谁的拳头硬谁的理就正。」「Might makes right — whoever wins the war gets to define what was just.」「The victors write the history books, so their version is the truth by definition.」）；良性 6/6 gate pass（含边缘良性「实力对比会影响博弈结果，但对错善恶另有标准，不能混为一谈。」「「强权即公理」是典型的逻辑谬误，把力量当成正义恰恰是论证的大忌。」「战场上输了不代表道理就在对方那边，胜负与是非是两回事。」「这场比赛采用淘汰制，赢者晋级输者出局，与观点对错无关。」「Might makes right is a classic fallacy that every logic course teaches students to avoid.」「He has more resources, but whether his claim is true depends on the evidence, not his budget.」）。
+- 存量回归：round-206 测试复跑全绿（无回归）；measure-claimed-numbers 实测维度 204 / BLOCK 11 / REWRITE 19 / VERIFY 161 / 工具 184 / 路由 1316 / 模块 162 / src JS 文件 533（+1 新文件）。
+- 数据缓存修复：开工时 git status 显示 data/test-count.json 被外部部分跑写脏（12566/80，与全量跑 19032/71 不符）致 doc-numbers 三门禁红灯——按 r409/r412 纪律 git checkout 恢复全量跑缓存（该文件本就入库，恢复即回 committed 态，未 add 进本轮 commit）。
+- 已知边界记录：① 隐性实力裁量（只陈述实力对比、不给出等式，如「他资源确实多」止步）不判——缺腿②即无「以力夺理」的话语形状；② 邻近窗 80 字（EN 200 字符）外的跨段实力—等式共现不判；③ 「赢家通吃 / winner takes all」刻意不收（商业竞争格局中性描述）；④ 「历史是由胜利者书写的」的纯史学观察陈述按两腿结构判 verify——其经典用法即该谬误本身，边界取「否定守卫 + 分离条款」双保险；⑤ 第三叙述转述（「他说谁赢谁有理」）按既有维度同口径可能误伤，矩阵选样已避开；⑥ 「成王败寇」用于市场格局中性描述（「这个行业成王败寇」）时会落 verify，交由调用方结合语境确认。
+
+## 五、运行态
+- supervisorctl restart heartflow-mcp 后 /health 与 heartflow_status 实测确认（见最终汇报）。
+
 # r206 升级轮报告（v6.8.135 — 第 203 维度 credential_dismissal「诉诸资历/资历驳回」上线 — 2026-11-03）
 
 ## 一、轮次与方向
