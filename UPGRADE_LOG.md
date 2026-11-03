@@ -1,3 +1,34 @@
+# r202 升级轮报告（v6.8.131 — 第 199 维度 appeal_to_legality「诉诸合法性谬误」上线 — 2026-11-03）
+
+## 一、轮次与方向
+- 轮次 r202，方向：逻辑谬误检测（轮换——r198/r199/r200/r201 分别为因果推理/证据充分性/价值对齐与目标漂移/谬误检测；本轮补齐 appeal_* 既有系列中缺失的「法律/合规」一支）。任务：新增判别维度，命中一个此前 198 维无一覆盖的新攻击族。
+- 立项缺口实证：`grep -ril 'appeal_to_legality|argumentum ad legem|诉诸合法性|守法即正当|法无禁止' src/` 无任何维度覆盖本族；本族探针在当前引擎（v6.8.130，198 维）复测——攻击 5/5 中 4 条 gate.action=pass（真零命中）、良性 5/5 pass（零误伤）。侦察落盘 /tmp/hf-scout-1793665416.txt。
+
+## 二、来源（真实，未编造）
+- 三层研究：HN Algolia "logical fallacy detection" 命中 arXiv 2405.02318《Translating natural language to first-order logic for logical fallacy detection》（258 points，依赖 LLM 把自然语言译成一阶逻辑，与零 LLM 依赖铁律冲突，仅作方向佐证）；Semantic Scholar 该查询返回空；GitHub 同查询 sort=stars 前五（tmakesense/logical-fallacy 21★、SeanFlannery/Logical.ly 4★、graciolli-f/sophron-bot 4★、EPITA-SCIA/Fallacy-Detection-LLM 2★、IMJONEZZ/Fallacy-Detection 1★）全部为 LLM 路线工具/课程项目/模型服务，无可集成的纯规则成熟方案。据此按心虫既有维度形态自建纯规则实现（判据结构为心虫自有，谬误族本身为经典目录中的 argumentum ad legem，与 appeal_to_wealth/nature/novelty 等同系列并列）。
+- 心虫裁决门禁：heartflow_philosophy_decision → **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 三、实现
+- 新文件 src/appeal-to-legality.js（约 330 行）：`checkAppealToLegality(text, inject)` + `__internals`（12 个可注入常量）。两腿共现 + 邻近窗（中文 60 字 / EN 160 字符），缺一不判：
+  - 腿① LEGAL 守法宣告（不违法/未违法/没犯法/不违反（任何）法律法规、法无禁止即可为/法无禁止则可为、法律（暂）未（有）禁止/没有法律规定、合法（「合法性」概念形态用否定断言避开）/合规/法律赋予的权利·法定权利·合法权利；EN not illegal / nothing illegal / broke no law / doesn't break the law / perfectly legal / within my legal rights / no law against it / complied with every regulation——r161 教训：裸名词形态去后缀仍命中，「法律没有禁止」允许 没+有 插入）；
+  - 腿② EXONERATE 道德/批评豁免（等于|意味着|代表着 紧邻 lookbehind 保护的 没问题/没错族（覆盖「不存在任何法律问题」「毫无问题」）、并无不妥/无可厚非/无可指责/无可指摘、不能|无权|少|不要|别|何必|凭什么 + 指责|批评|谴责|质疑|评判|苛责|说三道四|指手画脚|干涉|干预|过问|说教、管不着/轮不到/与你无关/多管闲事、少|别 + 大惊小怪|小题大做|上纲上线|扣帽子|道德绑架、占据类动词+道德高地、私事|个人选择+无权干涉（正反两序）；EN nothing wrong with it / no grounds to criticize / any grounds to criticize / can't criticize / nobody has the right to judge / who are you to judge / what gives you the right / stop being judgmental / mind your own business / it's perfectly fine to）。
+- 豁免四组：合规场景（合同/协议/条款/签约/法务/合规/审批/审计/监管/许可/执照/上市/起诉/仲裁/劳动法/交通法；EN contract / compliance / regulatory / audit / permit / license——合法性正是该场景的评判标准）、法律-道德区分陈述（不违法≠没问题/虽然不违法但道德上有争议/不违法不意味着正当；EN legal but wrong / doesn't make it right——把两套标准分开的正确判别）、概念/教学转述（诉诸合法性/守法即正当/argumentum ad legem / appeal to legality）、质疑该推理的窄口径疑问（「不违法就不能指责吗？」——反问的是推理本身；攻击常用的「你凭什么指责？」反问不在豁免内）。
+- src/index.js 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出——计算点变量名 atl）；三份文档数字同步（维度 198→199、verify 155→156、README/SKILL 版本戳 v6.8.129→v6.8.131——**r201 遗留漂移本轮修复**：r201 只递进了 SKILL frontmatter 与 package.json，README「Measured at **v6.8.129**」与 SKILL「at v6.8.129. / Engine version 6.8.129」两处戳没跟上，导致 doc-numbers-accuracy 在本轮开工时就是 13/24 红态）；README Version history / CHANGELOG 追加 6.8.131 条目；VERSION 6.8.130→6.8.131 后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-202-appeal-to-legality.js（48 断言：攻击 9 中英双语/裸名词/带修饰/反问/倒装长句、良性 9 含五类边缘良性（合规判断/法律-道德区分×2/让步+道德关注/概念转述/窄口径质疑/缺豁免腿×2）、4 项豁免陷阱「含豁免放行+抹掉转命中」、8 项腿常量负例注入承重含中英逐侧独立、邻近窗外不判、NEG_GUARD 否定前缀保护、gate 层变体矩阵）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键 199 个）
+- test/doc-numbers-accuracy.test.js：24 passed / 0 failed（含 r201 遗留版本戳漂移修复后转绿）
+- scripts/bidirectional-guard.js：召回 52/52（100%）、误拦 302/326（92.6%，与基线逐位一致、零新增误伤）
+- 变体矩阵（真实 gate()）：攻击 9/9 gate.action≠pass 且 appeal_to_legality 承重进 findings；良性 8/8 gate.action=pass（「不违法不等于没问题，我们还要看行业规范和社会影响。」被既有 false_equivalence 维度判 verify——r202 立项 probe 实测本轮改动前同样 verify，与本维度无关，本维度直接函数判定放行，故不入 gate 矩阵、留在直接函数良性列）
+
+## 五、已知边界 / 下次可继续
+- 「法定权利+无权说三道四」短句（「他行使的是法定权利，别人无权说三道四。」）判 verify：权利宣告×批评否决是本族定义形态，但正当维权话语（「我行使法定权利，拒绝网络暴力」）在豁免缺位时会误入——可在后续轮次补「正当维权」豁免（被侵权/维权/举报/投诉/拒绝网暴语境）。
+- 占据类动词+道德高地 收得较窄（「站在道德高地上」命中，「抢占道德高地」作名词短语单现不判），防的是误伤；攻击若用名词化变体（「又没人违法，别抢占道德高地了」）会漏——记入观察名单。
+- 合规豁免为句级属性：公司合规宣传句（「我们完全合规，所以没问题」）若同时出现合规域名词（如「审计通过」）会整句放过——与既有维度同口径的已知取舍。
+- 备选方向 availability_bias（可得性偏差：刷到/老听说/身边全是 × 越来越普遍）本轮未做，侦察已记录，可作下轮候选。
+
 # r201 升级轮报告（v6.8.130 — 第 198 维度 nirvana_fallacy「完美方案谬误」上线 — 2026-11-03）
 
 ## 一、轮次与方向

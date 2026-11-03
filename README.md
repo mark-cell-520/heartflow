@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-198-blueviolet.svg)](#what-it-catches-198-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-199-blueviolet.svg)](#what-it-catches-199-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-198 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+199 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (198 dimensions)
+## What it catches (199 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **155 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **156 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.129**. Not marketing copy.
+Measured on this repository at **v6.8.131**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 198 |
+| Discrimination dimensions | 199 |
 | MCP tools | 184 |
 | Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.131 | 2026-11-03 | 第 199 维度 **appeal_to_legality**「诉诸合法性谬误」上线（r202）——「守法宣告（不违法/没犯法/法无禁止即可为/法律没有禁止/完全合法/合规；EN it's not illegal / broke no law / perfectly legal）×道德或批评豁免（所以没错/不能指责/管不着/少大惊小怪/凭什么指责；EN nothing wrong with it / no grounds to criticize / who are you to judge）」两腿结构判别，把「合不合法」偷换成「该不该做、能不能批评」的新攻击族；补齐 appeal_* 系列缺失的「法律/合规」一支（argumentum ad legem），与 legal_status_coercion（以法律后果胁迫）方向相反、与 opinion_entitlement（免举证义务）豁免对象错开；外部搜索（arXiv 2405.02318、GitHub tmakesense/logical-fallacy 21★ 等）全部为 LLM 路线与零 LLM 依赖铁律冲突，按既有维度形态纯规则自建；新文件 src/appeal-to-legality.js + test/round-202-appeal-to-legality.js（48 断言：9 攻击全命中/9 良性全放行/6 豁免逐常量承重/中英逐侧独立/邻近窗/否定前缀保护/矩阵 9 攻击 gate 非 pass 且维度承重 + 8 良性全 pass），verify 155→156，五门禁全绿（另修复 r201 遗留的 README/SKILL 版本戳 v6.8.129 漂移） |
 | 6.8.130 | 2026-11-03 | 第 198 维度 **nirvana_fallacy**「完美方案谬误」上线（r201）——「不完美宣告×行动废止」两腿结构判别，填补 197 维在 perfect solution fallacy（拿方案的不完美直接废止行动，用理想化对照否决现实选项）族的空白；来源 GitHub dhfbk/faina ★5（NAACL 2025 谬误分类学对照，aclanthology.org/2025.naacl-long.34/）；新文件 src/nirvana-fallacy.js，verify 154→155，五门禁全绿 |
 | 6.8.129 | 2026-11-03 | 第 197 维度 **goal_drift**「目标漂移/使命置换」上线（r200）——「原始使命锚点×目标置换宣告」两腿结构判别，填补 196 维在 mission drift（以「延续/服务原目标」之名行「置换目标」之实）族的空白；来源 arXiv 2603.03456《Asymmetric Goal Drift in Coding Agents Under Value Conflict》+ GitHub sunilgentyala/Plumbline ★6；新文件 src/goal-drift.js，verify 153→154，五门禁全绿 |
 | 6.8.128 | 2026-11-03 | 第 196 维度 **opinion_entitlement**「观点权利豁免/主观主义谬误」上线（r199）——「观点/信念主观性或权利宣告 × 拒绝举证/拒绝证据裁决」两腿结构判别，填补 195 维在 subjectivist fallacy（用「我有权保留观点」免除举证责任）族的空白；新文件 src/opinion-entitlement.js，verify 152→153，五门禁全绿 |

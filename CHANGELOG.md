@@ -1,3 +1,13 @@
+## [6.8.131] - 2026-11-03
+
+### Added — 第 199 判别维度 `appeal_to_legality`「诉诸合法性谬误」（r202，真升级类型 1：新判别维度）
+- 新增 src/appeal-to-legality.js（约 330 行）：`checkAppealToLegality(text, inject)` + `__internals`（12 个可注入常量）。两腿共现 + 邻近窗（中文 60 字 / EN 160 字符），缺一不判：腿① LEGAL 守法宣告（不违法/没犯法/不违反法律法规、法无禁止即可为、法律没有禁止、合法（「合法性」概念形态除外）/合规/法定权利·合法权利；EN not illegal / broke no law / perfectly legal / within my legal rights / complied with every regulation）；腿② EXONERATE 道德/批评豁免（等于|意味着|代表着 lookbehind 保护的 没问题/没错族、「不存在任何法律问题」、并无不妥/无可厚非/无可指责、不能|无权|少|凭什么+指责|批评|质疑|评判|干涉|干预、管不着/轮不到/多管闲事、少|别+大惊小怪|上纲上线|道德绑架、私事|个人选择+无权干涉；EN nothing wrong with it / no grounds to criticize / can't criticize / who are you to judge / mind your own business / stop being judgmental）。命中「拿守法宣告直接推出道德或批评豁免，把合不合法偷换成该不该做、能不能批评」这一此前 198 维零命中的攻击族，补齐 appeal_* 系列缺失的「法律/合规」一支（argumentum ad legem）。
+- **r161 教训**：枚举腿收裸名词形态——「不违法」「没犯法」「法无禁止即可为」「合法」「合规」「没问题」「没错」去后缀仍命中；「没问题/没错」带否定前缀 lookbehind 保护（「不等于没问题」是正确判别，不判）；「合法」后接「性」的政治合法性概念形态用否定断言避开。
+- **豁免四组**：合规场景（合同/协议/条款/签约/法务/合规/审批/审计/监管/许可/执照/上市/起诉/仲裁/劳动法/交通法；EN contract / compliance / regulatory / audit / permit / license——合法性正是该场景的评判标准）、法律-道德区分陈述（不违法≠没问题/虽然不违法但道德上有争议；EN legal but wrong / doesn't make it right）、概念/教学转述（诉诸合法性/守法即正当/argumentum ad legem / appeal to legality）、质疑该推理的窄口径疑问（「不违法就不能指责吗？」——反问的是推理本身；攻击常用的「你凭什么指责？」反问不在豁免内）。
+- **边界**：与 legal_status_coercion（第 122 维，以法律后果胁迫——「我会让你吃官司」）方向相反，本族拿已守法证明道德无瑕；与 opinion_entitlement（第 196 维，免举证义务）豁免对象错开，本族免的是道德批评资格、依据是法律合规；unsupported_claim 管断言无依据，本族有明确两步推理结构。
+- **本轮另修复 r201 遗留文档漂移**：README「Measured at **v6.8.129**」与 SKILL「at v6.8.129. / Engine version 6.8.129」三处版本戳未随 6.8.130 递进，doc-numbers-accuracy 开工时实测 13/24 红态；本轮同步至 v6.8.131 后转 24/24。
+- 接入 src/index.js 八处（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出）；维度 198→199，VERIFY 155→156；README/SKILL/AGENTS 三处数字同步；VERSION 6.8.130→6.8.131。
+
 ## [6.8.130] - 2026-11-03
 
 ### Added — 第 198 判别维度 `nirvana_fallacy`「完美方案谬误」（r201，真升级类型 1：新判别维度）
