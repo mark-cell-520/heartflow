@@ -1,3 +1,34 @@
+# r206 升级轮报告（v6.8.135 — 第 203 维度 credential_dismissal「诉诸资历/资历驳回」上线 — 2026-11-03）
+
+## 一、轮次与方向
+- 轮次 r206，方向：逻辑谬误检测（轮换——r203 为认知偏差/可得性启发式、r204 为逻辑谬误/伽利略赌局、r205 为自我验证与纠错/证据纪律；本轮切到「以人的准入条件偷换观点的判别条件」的论证谬误缺口）。任务：新增判别维度，命中一个此前 202 维无一覆盖的新攻击族。
+- 立项缺口实证：r206 族探针（/tmp/hf-probe-families.js）在当前引擎（v6.8.134，202 维）复测——候选 13 族逐族实测，credential_dismissal 族攻击样本 4 条中 **4 条 gate.action=pass**（现有维度真零命中，含中英双语/裸名词/带修饰/反问/长句变体）、良性 2 条中 2 条 pass（零误伤）；同池其他候选族要么已被既有维度代拦（gish_gallop 0/4、naive_realism 0/4、zero_sum 0/4）、要么缺口不足（declinism 3/4、reification 3/4、status_quo 2/4、automation_bias 2/4、relative_pration 2/4、moral_licensing 2/4、continuum 2/4、dictionary_appeal 1/4），credential_dismissal 是唯一 4/4 真零命中且良性零误伤的族。侦察落盘 /tmp/hf-scout-1793711319.txt。
+
+## 二、来源（真实，未编造）
+- 三层研究全部执行：① HN Algolia `search?query=courtier's reply&tags=story` 前五——courier/courier service 同形词干扰，无相关命中（如实记录）；② Semantic Scholar 两次检索（ad hominem fallacy detection / courtier reply）均空返（限流，如实记录）；③ GitHub API `ad hominem fallacy&sort=stars` 前五——UKPLab/naacl2018-before-name-calling-habernal-et-al ★13（NAACL 2018，谩骂前的 ad hominem 动力学，ML 路线）、jghibiki/NeuralAdHominem ★2（CNN）、utkarsh512/logical-fallacy ★1；`courtier reply fallacy` 检索零仓库——**全部为 LLM/统计学习路线，与心虫零 LLM 依赖铁律冲突，无纯规则成熟实现可集成**——按心虫既有维度形态自建纯规则判据（诉诸资历/侍臣回复 courtier's reply 为经典非形式谬误目录常备条目，文献仅作分类学参考）。
+- 心虫裁决门禁：heartflow_philosophy_decision → **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 三、实现
+- 新文件 src/credential-dismissal.js（约 300 行）：`checkCredentialDismissal(text, inject)` + `__internals`（12 个可注入常量）。判据为**两腿共现 + 邻近窗（中文 80 字 / EN 200 字符），缺一不判；另设自足祈使分支**：
+  - 腿① GAP 资历/学识/经验缺口（中英）：第二人称+否定+资历动词（你不是…/你没学过/没读过/没做过/没干过/没经历过/没当过/连…都没…）、裸名词缺口（没在行业里干过十年/没结过婚/没带过孩子——允许 没 与动词间隔短定语）、身份与角色否定（不是专业的/非科班/外行/门外汉/业余/不是家长/不是过来人/不是圈内人）；EN you have not (read|studied|done|run|worked|experienced|managed)、you are not a (professional|expert|scholar|parent)、who has never、never (run|worked|built) a (business|team)、no (degree|experience|training|track record)、outsider/amateur/layman——**r161 教训落地**：缺口词收裸名词形态（没读过/没做过/外行/amateur 去后缀仍命中）。
+  - 腿② STANDING 发言资格剥夺（中英）：资格剥夺（没资格/不够资格/无权/有什么资格/哪来的资格+发言动作——**发言动作必选**，「没资格给病人开方」类执业许可因开方不在发言动作表天然不判）、凭什么+发言动作（无资格名词的直接禁言形）、不配族（不配谈/也配/哪配）、禁言族（闭嘴/免谈/插什么嘴/掺和什么/指手画脚/也敢/少来）、价值抹杀（批评/质疑/观点+一文不值/不算数/毫无价值/说明不了任何问题）；EN not qualified to (criticize|critique|…)、have no (right|standing|authority|business) to、who (are|is) (you|he|she|they) to、shut up、stay in your lane、(do not) (talk|comment)、until you have (read|studied|earned)、(criticism|opinion) means nothing。
+  - **自足祈使分支**：「先+长周期资历动作（读书/上学/拿学位/考上/毕业/入行/做过…年/经历过/创业/当过/考个/读个/学个/读完/学完）+再+发言动作（说/谈/评论/批评/评价/开口/插嘴/指点/跟我）」单式即两腿齐备（祈使本身同时宣告缺口与禁言）；EN until/before you have (read|studied|earned|done|run) 同权。资历动作限长周期资格取得——「先把方案熟悉了再谈」的熟悉、「先完成培训再上岗」的上岗均不在表内。
+- 豁免三组：概念/批判转述（诉诸资历/资历攻击/资历谬误/资格歧视/侍臣回复/门禁+是谬误·话术·逻辑错误，含「X是典型的诉诸资历谬误」尾部形态；EN credentialism / courtier's reply is a fallacy）、资源指引/教学邀请（我建议/欢迎/我可以介绍/不妨先了解/供参考/一起查证；EN I suggest / feel free to ask / happy to explain——给路径而不是关通道；**禁言祈现在场时指引豁免不生效**，混合句以禁言优先）、执业许可/任职要求（执照/资格证/执业资格/资质+才能·方可·前提·规定——法定准入不是对批评的压制）。
+- src/index.js 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出——计算点变量名 cdl，grep 实测无冲突）；三份文档数字同步（维度 202→203、verify 159→160、三层级合计 189→190/剩余 13 不变、README badge/横幅/规格表/章节标题/版本历史、SKILL 横幅/规格表/tier 计数/pipeline 图、AGENTS 横幅/标题/层级列举/版本戳）；README Version history / CHANGELOG 追加 6.8.135 条目；VERSION 6.8.134→6.8.135 后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-206-credential-dismissal.js（16 断言全绿：12 攻击全命中含中英双语/裸名词/带修饰/反问/长句/纯祈使形、12 良性全放行含资源指引/教学邀请/执业许可/概念批判/工作流祈使/禁言口语无缺口腿、3 项豁免陷阱「含豁免放行+抹掉豁免转命中」、8 项常量负例注入承重（GAP/STANDING 逐侧中英 + IMPERATIVE 中英 + 三组豁免逐常量）、gate 层变体矩阵 6 攻击全非 pass 且 credential_dismissal 承重 + 6 良性全 pass）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键实测 203）
+- test/doc-numbers-accuracy.test.js：24 passed / 0 failed（任务口径 22/22，实际断言 24 条全过）
+- scripts/bidirectional-guard.js：召回 52/52、误拦 302/326 pass（92.6%，与上轮持平不升——零新增误拦）
+- 变体矩阵（真实 gate() 实测）：攻击 12/12 gate.action=verify 且 findings 中 credential_dismissal 承重（含「你连这本专著都没读过，有什么资格批评我的理论？先去读书再说话」「你不是经济学博士，讨论货币政策就是班门弄斧，先拿个学位再说」「没在行业里干过十年的人，没资格评论这套打法」「你又不是家长，凭什么对学校教学指手画脚？」「没结过婚的人少来讨论婚姻，先把自己的人生过明白」「You have not read the original 800-page treatise, so you are not qualified to critique my position.」「He has never run a business, so his criticism of the company means nothing — who is he to lecture us?」「Stay in your lane — you have never managed a team, so your opinion on our process is worthless.」）；良性 12/12 gate pass（含边缘良性「这个结论需要专业知识才能充分评估，我建议参考该领域的三篇综述后再讨论」「没执照不能行医，这是法律规定，与能不能讨论医疗政策是两回事」「「你没读过原著就没资格批评」是典型的诉诸资历谬误」「先把流程熟悉了再谈优化，新人先看操作手册」）。
+- 存量回归：round-205 12/12、round-204 13/13 复跑全绿（无回归）；measure-claimed-numbers 实测维度 203 / BLOCK 11 / REWRITE 19 / VERIFY 160 / 工具 184 / 路由 1316 / 模块 162 / src JS 文件 532（+1 新文件）。
+- 已知边界记录：① 隐性资历驳回（只陈述缺口、不宣告剥夺，如「他确实是外行」止步）不判——缺腿②即无「以资历禁言」的话语形状；② 邻近窗 80 字（EN 200 字符）外的跨段缺口—剥夺共现不判；③ 资源指引豁免为句级属性，同句混合指引与禁言祈使时以禁言祈使优先；④ 第三叙述转述（「他说我没资格」）按既有维度同口径可能误伤，矩阵选样已避开；⑤ 执业许可与批评压制的边界取「发言动作必选 + 执业许可语境豁免」双保险，边缘句（「没学过医就没资格评判治疗方案」带「这是执业资格的要求」后缀）按执业语境放过。
+
+## 五、运行态
+- supervisorctl restart heartflow-mcp 后 /health 与 heartflow_status 实测确认（见最终汇报）。
+
 # r205 升级轮报告（v6.8.134 — 第 202 维度 unfalsifiable_confirmation「双果自证」上线 — 2026-11-03）
 
 ## 一、轮次与方向
