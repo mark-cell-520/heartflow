@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-204-blueviolet.svg)](#what-it-catches-204-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-205-blueviolet.svg)](#what-it-catches-205-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-204 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+205 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (204 dimensions)
+## What it catches (205 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **161 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **162 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -196,7 +196,7 @@ Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 
 | Emotional & psychological | `emotional_manipulation`, `gaslighting`, `mind_reading`, `darvo`, `kafkatrapping`, `concern_trolling`, `fear_projection`, `guilt_induction`, `suffering_capital` | 6.7.x – 6.8.x |
 | Agent-era attacks | `reward_hacking`, `prompt_injection` (+ synonym families: 37 verbs × 24 anchors × 52 objects = 46,176 combinations), `instrumental_reasoning`, `deceptive_alignment`, `capability_overclaim`, `turing_mimicry` | 6.7.10 – 6.8.84 |
 | Evidence & statistical honesty | `unsupported_claim`, `false_urgency`, `statistical_misleading`, `percentage_overflow`, `perfect_error`, `pseudo_causal`, `post_hoc`, `anecdotal`, `survivorship_bias`, `selection_bias` | 6.7.x – 6.8.97 |
-| Discourse & power | `tu_quoque`, `whataboutism`, `poisoning_the_well`, `standard_shift`, `moving_goalposts`, `sunk_cost_coercion`, `victim_blaming`, `thought_terminating_cliche`, `sycophancy`, `doublespeak`, `might_makes_right`, `credential_dismissal` | 6.7.x – 6.8.136 |
+| Discourse & power | `tu_quoque`, `whataboutism`, `poisoning_the_well`, `standard_shift`, `moving_goalposts`, `sunk_cost_coercion`, `victim_blaming`, `thought_terminating_cliche`, `sycophancy`, `doublespeak`, `might_makes_right`, `credential_dismissal`, `scale_dismissal` | 6.7.x – 6.8.137 |
 
 Every new dimension ships with a negative-injection test that empties each constant to prove it is load-bearing, a probe-measured leak rate, a benign-sample false-positive count, and the bidirectional guard (52/52 attack recall, 302/326 benign pass) as a no-regression gate.
 
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.136**. Not marketing copy.
+Measured on this repository at **v6.8.137**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 204 |
+| Discrimination dimensions | 205 |
 | MCP tools | 184 |
 | Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
@@ -380,6 +380,7 @@ margins, and why every prior dimension missed — lives in **`UPGRADE_LOG.md`** 
 This table exists so a reader can see the shape of the line in ten seconds, not to
 duplicate the log.
 
+| 6.8.137 | 2026-11-04 | 第 205 维度 **scale_dismissal**「规模 dismiss」上线（r208）——「小规模/低占比宣告（才几个人/个别案例/占比不到千分之一/区区几个家庭/这么小的比例；EN only a few / a handful of users / a tiny fraction / statistically negligible / a few out of millions）×风险 dismiss（不值得大惊小怪/没必要上纲上线/忽略不计/不值一提/翻篇；EN not a big deal / not worth the fuss / no need to panic / we can move on）」两腿结构 + 「忽略不计」融合分支判别，把「相对占比」偷换成「绝对代价免检通行证」的新攻击族——风险与伤害的严重性取决于绝对后果与可逆性，不取决于它占总体的比例；与 selective_minimization（过错定级降级）/harm_invalidation（具体伤害抹除）/percentage_overflow（百分比演算）边界错开，探针实测本族 8/8 攻击样本它们零命中；r208 探针 12 候选族实测，scale_dismissal 是唯一 8/8 真零命中且 4/4 良性零误伤的族（次优 token_gesture 7/8、burden_inversion 7/8）；外部三层搜索（HN Algolia 无相关命中、Semantic Scholar 两次 429 限流、GitHub agent execution verification 前五全部 LLM 驱动的 agent harness 与心虫铁律冲突）无纯规则成熟实现可集成，按既有维度形态纯规则自建；新文件 src/scale-dismissal.js + test/round-208-scale-dismissal.js（13 断言全绿：11 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、8 良性全放行含让步转折/测量语境/统计报告/概念批判、9 项腿与豁免常量负例注入承重、gate 矩阵 6 攻击非 pass 且维度承重 + 6 良性全 pass），verify 161→162、维度 204→205、三层级合计 191→192/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry），五门禁全绿（verify 16/16 / guard 20/20 / doc 24/24 / 双向 52/52+302/326 不升） |
 | Version | Date | Change |
 |---------|------|--------|
 | 6.8.136 | 2026-11-03 | 第 204 维度 **might_makes_right**「强权即公理」上线（r207）——「实力/胜负/权力依据（谁赢/赢了/胜利者/拳头/胳膊/武力/强权/枪杆子/实力/官大/钱多/碾压/弱肉强食；EN might / muscle / the stronger / whoever wins / victor / power / bigger army）×是非裁量等式（就是真理/就是正义/代表真理/决定对错/定义是非/判定善恶/谁有理/说了算/才算数/书写历史/正统/合法性/硬道理；EN (might|power) is right / (decides|defines|determines) what is right / justice of the stronger）」两腿结构 + 邻近窗（中文 80 字 / EN 200 字符）+ 自足习语分支（拳头大就是硬道理/胳膊粗的说了算/谁赢谁有理/成王败寇/胜者为王败者为寇/强权即公理/真理在大炮射程之内；EN might makes right / might is right / victor's justice / history is written by the victors / the strong do what they can）判别，把「力量对比」偷换成「是非标准」的新攻击族——观点是否正确只取决于证据与推理，与谁赢了、谁拳头硬、谁钱多无关；强权裁量一旦成立，讨论退化成比大小，弱者合理主张、败者正当诉求、少数派事实陈述被系统性压制；与 instrumental_reasoning（手段选择压倒价值判断）边界错开，探针实测本族 3/4 攻击样本它零命中；r207 探针 13 候选族实测，might_makes_right 是唯一 3/4 真零命中且良性零误伤的族；外部三层搜索（HN Algolia ×2 / Semantic Scholar ×2 / GitHub API ×2 关键词）全部无可用命中，如实记录，按既有维度形态纯规则自建；新文件 src/might-makes-right.js + test/round-207-might-makes-right.js（13 断言全绿：12 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、8 良性全放行含分离条款/概念批判/否定守卫/规则描述、9 项腿与豁免常量负例注入含中英逐侧与自足习语分支、gate 矩阵 6 攻击非 pass 且维度承重 + 6 良性全 pass），verify 160→161、维度 203→204、三层级合计 190→191/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry），五门禁全绿（verify 16/16 / guard 20/20 / doc 22/22 / 双向 52/52+302/326 不升） |

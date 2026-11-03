@@ -1,3 +1,16 @@
+## [6.8.137] - 2026-11-04
+
+### Added — 第 205 判别维度 `scale_dismissal`「规模 dismiss」（r208，真升级类型 1：新判别维度）
+- 新增 src/scale-dismissal.js（约 300 行）：`checkScaleDismissal(text, inject)` + `__internals`（10 个可注入常量）。两腿共现 + 邻近窗（中文 80 字 / EN 200 字符），缺一不判；另设「忽略不计」融合分支（单式同时含小规模与 dismiss）。
+- **腿① SMALL 小规模/低占比宣告**：才/仅仅/不过+几…两…三…、占比/比例/发生率+不到/低于/不大/不高/很少、倒装形「这么小的比例」、裸名词小量级（个别/极少数/一小部分/微不足道/微乎其微/区区/屈指可数——r161 教训：去后缀仍命中）；EN only a few / a handful of users / a tiny fraction / statistically negligible / a few out of millions / less than one in a thousand。
+- **腿② DISMISS 风险/问题 dismiss**：不值得/没必要/不必+大惊小怪/担心/在意/调整/处理/管、不是+大问题/大不了/要紧、可以/大可+忽略/无视/搁置、没什么大不了/无伤大雅/不足挂齿/不值一提、上纲上线/小题大做/大惊小怪/反应过度、翻篇/告一段落、不影响大局；EN not a big deal / not worth the fuss / no need to panic / we can ignore / move on / overreacting / much ado about nothing。
+- **五轮实现期实测修漏**：① 测量豁免不容忍逗号间隔（「舍入误差在允许范围内，可忽略不计」误判）——放宽为句内 12 字符窗；② DISMISS_EN 漏 panicking/moving on/ignoring 词形；③ EXEMPT_META_ZH 只收一种语序（「是典型的极小化谬误」尾部形态漏豁免）——补倒装语序与「把X说成Y是谬误」形状；④ 让步豁免初版过宽——收紧为「规模小 + 但 + 坚持处置词」结构；⑤ S1 初版只收「几」（「才两起投诉」漏判）——补两/三。
+- **豁免四组 + 否定守卫**：让步转折（虽低…但仍要防控 / although… yet…）、统计测量语境（舍入/误差/精度+忽略不计）、概念/批判转述（极小化/大事化小/比烂+是谬误；EN scale dismissal is a fallacy）、腿②否定守卫（不是/并非/绝不/不能/别/不要/未必；EN not / never / doesn't）。
+- **边界**：selective_minimization（过错/情节严重性降级——法律分级语境，落点是已认定行为的定级）vs 本族（用规模注销风险本身）；harm_invalidation（对已发生的具体伤害的否认抹除，要求伤害名词在场）vs 本族（规模宣告 + dismiss 态度即构成，不要求伤害已在场）；percentage_overflow（百分比演算错误）vs 本族（「以比注销」话语结构，不涉算术）；normalization_of_deviation（偏差被渐进接纳）vs 本族（一次性以规模注销）。探针实测本族 8/8 攻击样本 selective_minimization 零命中。
+- 接入 src/index.js 八处（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出；变量名 scd）；维度 204→205，VERIFY 161→162，三层级合计 191→192/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry）。
+- 新测试 test/round-208-scale-dismissal.js（13 断言：11 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、8 良性全放行含让步转折/测量语境/统计报告/概念批判、9 项腿与豁免常量负例注入承重、gate 矩阵 6 攻击非 pass 且维度承重 + 6 良性全 pass）。
+- **来源（真实，未编造）**：r208 族探针 12 个候选族实测，scale_dismissal 是唯一 8/8 真零命中且 4/4 良性零误伤的族（次优 token_gesture 7/8、burden_inversion 7/8）；外部三层搜索（HN Algolia 无相关命中、Semantic Scholar 两次 429 限流、GitHub agent execution verification 前五全部 LLM 驱动的 agent harness 与心虫铁律冲突）无纯规则成熟实现可集成，按既有维度形态纯规则自建。五门禁全绿（verify 16/16 / guard 20/20 / doc 24/24 / 双向 52/52+302/326 不升）。
+
 ## [6.8.136] - 2026-11-03
 
 ### Added — 第 204 判别维度 `might_makes_right`「强权即公理」（r207，真升级类型 1：新判别维度）

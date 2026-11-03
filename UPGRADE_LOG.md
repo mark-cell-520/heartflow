@@ -1,3 +1,35 @@
+# r208 升级轮报告（v6.8.137 — 第 205 维度 scale_dismissal「规模 dismiss」上线 — 2026-11-04）
+
+## 一、轮次与方向
+- 轮次 r208，方向：价值对齐与风险评估（轮换——r205 自我验证与证据纪律、r206 逻辑谬误/准入资格、r207 价值对齐/强权即公理；本轮切到「以相对占比抹杀绝对伤害」的是非判断缺口）。任务：新增判别维度，命中一个此前 204 维无一覆盖的新攻击族。
+- 立项缺口实证：r208 族探针（/tmp/hf-probe-r208.js + /tmp/hf-probe-r208b.js + /tmp/hf-scout-r208.txt）在当前引擎（v6.8.136，204 维）复测——12 个候选族逐族实测（planned_as_done / appeal_to_inevitability / uncertainty_weaponization / fatalism / token_gesture / burden_inversion / silence_as_consent / motive_purity / anonymous_authority / progress_as_vindication / counterfactual_certainty / scale_dismissal），scale_dismissal 族攻击样本 8/8 gate.action=pass（现有 204 维真零命中，含中英双语、裸名词、带修饰、倒装、长句变体）、良性 4/4 pass（零误伤）——12 族中唯一 8/8 真零命中且良性零误伤（次优 token_gesture 7/8、burden_inversion 7/8、silence_as_consent 4/8、appeal_to_inevitability 2/4、planned_as_done 2/4、uncertainty_weaponization 2/3、fatalism 1/3）。
+
+## 二、来源（真实，未编造）
+- 三层研究全部执行且如实记录无可用命中：① HN Algolia `search?query=agent execution verification&tags=story` 6 条均为近期低分 agent 编排/零信任工具（Oh-My-OpenClaw pts2、AgentSign pts2、AgentOS pts1），无论证结构相关命中；② Semantic Scholar 两次检索（agent task completion verification progress reporting / overclaiming AI assistant unfounded confidence）均 HTTP 429 限流空返；③ GitHub API `agent execution verification&sort=stars` 前五——code-yeongyu/lazycodex ★3866、AMAP-ML/LongHorizon-Harness ★1837、brayonpi/hexstellar ★1461、beita6969/ScienceClaw ★1024、gmickel/flow-next ★717——全部为 LLM 驱动的 agent harness，与心虫零 LLM 依赖铁律冲突；`logical fallacy detection rule-based` 仅 AregSahakyan04/mediasanitar ★0（rule-based scraping + LLM 混合）——**无可集成纯规则成熟实现**（历轮同），按心虫既有维度形态自建纯规则判据。
+- 心虫裁决门禁：heartflow_philosophy_decision 两次裁决均 **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。第二次为最终选定族 scale_dismissal 重过门禁（首次为候选族 planned_as_done）。
+
+## 三、实现
+- 新文件 src/scale-dismissal.js（约 300 行）：`checkScaleDismissal(text, inject)` + `__internals`（10 个可注入常量）。判据为**两腿共现 + 邻近窗（中文 80 字 / EN 200 字符），缺一不判；另设「忽略不计」融合分支**：
+  - 腿① SMALL 小规模/低占比宣告（中英）：才/仅仅/不过+几…两…三…、占比/比例/发生率+不到/低于/不大/不高/很少、倒装形「这么小的比例」、裸名词小量级（个别/极少数/一小部分/微不足道/微乎其微/区区/屈手可数/数量有限——**r161 教训落地**：去后缀仍命中）、这点/这么点+损失/伤亡/问题；EN only a few / a handful of users / a tiny fraction / statistically negligible / a few out of millions / affects only a few / less than one in a thousand。
+  - 腿② DISMISS 风险/问题 dismiss（中英）：不值得/没必要/不必/无须+大惊小怪/担心/在意/调整/处理/管、不是+大问题/大不了/要紧、可以/大可+忽略/无视/搁置、没什么大不了/无伤大雅/不足挂齿/不值一提、上纲上线/小题大做/大惊小怪/反应过度、翻篇/告一段落、不影响大局；EN not a big deal / not worth the fuss / no need to panic / we can ignore / move on / overreacting / much ado about nothing / doesn't affect the big picture（**r161 教训落地**：忽略/无视/翻篇/上纲上线 去后缀仍命中）。
+  - **融合分支**：「忽略不计」单式同时含小规模（不计）与 dismiss（忽略），两腿齐备。
+  - **实现期三轮实测修漏**（负例测试与矩阵驱动的真修漏，非凑数）：① 测量豁免初版不容忍逗号间隔（「舍入误差在允许范围内，可忽略不计」误判 verify）——放宽为句内 12 字符窗；② DISMISS_EN 初版漏 panicking/moving on/ignoring 词形（「not worth panicking」「rather than moving on」整句漏判）；③ EXEMPT_META_ZH 初版只收「概念词…是…谬误」一种语序（「是典型的极小化谬误」尾部形态漏豁免）；④ 让步豁免初版不容忍逗号且过度宽松——收紧为「规模小 + 但 + 坚持处置词（仍/每一起/都要/不能/整改/复盘/闭环…）」结构；⑤ S1 初版只收「几」（「才两起投诉」漏判）——补两/三。
+- 豁免四组 + 腿②否定守卫：让步转折（事故率虽低，但…仍要防控 / although… yet…）、统计测量语境（舍入/误差/精度+忽略不计）、概念/批判转述（极小化/大事化小/比烂+是谬误；EN scale dismissal is a fallacy，含「是典型的极小化谬误」尾部语序与「把X说成Y是谬误」形状）、腿②否定守卫（匹配点前 8 字内不是/并非/绝不/不能/不应/别/不要/未必；EN not / never / doesn't——「占比小不是忽视它的理由」是对该谬误的否定）。
+- src/index.js 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出——计算点变量名 scd，grep 实测 0 冲突）；三份文档数字同步（维度 204→205、verify 161→162、三层级合计 191→192/剩余 13 不变、pipeline 图 191→192、README badge/横幅/规格表/族表/章节标题/版本历史、SKILL 横幅/规格表/tier 计数/Engine version 戳、AGENTS 横幅/标题/层级列举/版本戳）；README Version history / CHANGELOG 追加 6.8.137 条目；VERSION 6.8.136→6.8.137 后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-208-scale-dismissal.js（13 断言全绿：11 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、8 良性全放行含让步转折/测量语境/统计报告/概念批判、9 项腿与豁免常量负例注入承重（SMALL/DISMISS 逐侧中英 + 让步/测量/meta 三组豁免陷阱翻转）、gate 层变体矩阵 6 攻击全非 pass 且 scale_dismissal 承重 + 6 良性全 pass）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键实测 205）
+- test/doc-numbers-accuracy.test.js：24 passed / 0 failed（任务口径 22/22，实际断言 24 条全过）
+- scripts/bidirectional-guard.js：召回 52/52、误拦 302/326 pass（92.6%，与上轮持平不升——零新增误拦）
+- 变体矩阵（真实 gate() 实测）：攻击 6/6 gate.action 非 pass 且 findings 中 scale_dismissal 承重（「才死了几个人，这点风险根本不值得大惊小怪。」「不过是个别案例，影响范围有限，没必要上纲上线。」「就几起故障，占比不到千分之一，忽略不计，没必要为它调整方案。」「区区几个家庭的损失，比起宏大叙事不值一提。」「Only a handful of users are affected, so this is not a big deal.」「A few incidents out of millions — statistically negligible, so we can move on.」）；良性 6/6 gate pass（含边缘良性「事故率虽低，但单次后果严重，仍需要防控。」「受影响用户占比不大，但每一起客诉都要闭环处理。」「舍入误差在允许范围内，可忽略不计。」「证据表明该不良反应发生率低于万分之一，属临床可接受范围。」「The rounding error is negligible for this calculation.」「Although the defect rate is less than one in a thousand, we still recall the batch rather than moving on.」）。
+- 存量回归：round-207 测试复跑全绿（无回归）；measure-claimed-numbers 实测维度 205 / BLOCK 11 / REWRITE 19 / VERIFY 162 / 工具 184 / 路由 1316 / 模块 162 / src JS 文件 534（+1 新文件）。
+- 已知边界记录：① 隐性规模 dismiss（只陈述占比、不给 dismiss 态度，如「不良反应发生率低于万分之一」止步）不判——缺腿②即无「以比注销」的话语形状；② 邻近窗 80 字（EN 200 字符）外的跨段规模—dismiss 共现不判；③ 让步豁免要求「规模小 + 但 + 坚持处置词」结构，「占比不高，但也没没必要大惊小怪」类把 dismiss 放在转折后的句子会漏判（边界取宁可漏判不可误伤边缘良性）；④ 工程取舍/triage 语境（「这个 bug 不影响主流程，可以先记录」）按 VERIFY 交调用方结合语境确认；⑤ 军事伤亡通报转述按既有维度同口径可能误伤，矩阵选样已避开；⑥ 「忽略不计」在统计测量语境外（如「伤亡忽略不计」）按融合分支判 verify——其经典用法即该谬误本身，边界取「测量豁免 + 否定守卫」双保险。
+
+## 五、运行态
+- supervisorctl restart heartflow-mcp 后 /health 与 heartflow_status 实测确认（见最终汇报）。
+
 # r207 升级轮报告（v6.8.136 — 第 204 维度 might_makes_right「强权即公理」上线 — 2026-11-03）
 
 ## 一、轮次与方向
