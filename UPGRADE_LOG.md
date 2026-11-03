@@ -1,3 +1,34 @@
+# r203 升级轮报告（v6.8.132 — 第 200 维度 availability_bias「可得性偏差」上线 — 2026-11-03）
+
+## 一、轮次与方向
+- 轮次 r203，方向：认知偏差/谬误检测（轮换——r198/r199/r200/r201/r202 分别为因果推理/证据充分性/价值对齐与目标漂移/谬误检测×2；r202 报告明确记录的下一轮候选即 availability_bias，本轮兑现）。任务：新增判别维度，命中一个此前 199 维无一覆盖的新攻击族。
+- 立项缺口实证：`grep -ril '可得性偏差|可得性启发|availability heuristic|老听说|满屏都是' src/` 仅命中 fallacy_fallacy 的概念豁免清单（「可得性偏差」作为谬误名词）与 selection-bias.js 注释，无任何维度以「可得性线索×频率推断」两腿结构覆盖本族；本族探针在当前引擎（v6.8.131，199 维）复测——攻击 5/5 gate.action=pass（真零命中）、良性 5/5 pass（零误伤）。侦察落盘 /tmp/hf-scout-1793675000.txt。
+
+## 二、来源（真实，未编造）
+- 三层研究：HN Algolia "availability bias" 无直接相关成熟方案；Semantic Scholar "availability bias frequency judgment" 返回空 data；GitHub API sort=stars 前四（abusufyanvu/6S191_MIT_DeepLearning ★269、mt1022/cubar ★13、aliasgharheidaricom/RUN-Beyond-the-Metaphor ★12、BlockchainLabs/MaxCoin ★10）全部为课程仓库/统计软件包/优化算法代码，与本方向无关，无可集成纯规则方案。据此按心虫既有维度形态自建纯规则实现（谬误族本身为经典目录中的 availability heuristic，与 base_rate_neglect / selection_bias / clustering_illusion 等认知偏差系列并列）。
+- 心虫裁决门禁：heartflow_philosophy_decision → **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 三、实现
+- 新文件 src/availability-bias.js（约 340 行）：`checkAvailabilityBias(text, inject)` + `__internals`（12 个可注入常量）。两腿共现 + 邻近窗（中文 60 字 / EN 160 字符），缺一不判：
+  - 腿① AVAIL 可得性线索（老/经常/时不时+听说·听到·看到·刷到、刷屏/满屏都是/热搜/热榜、电视里·新闻里+播·放·连篇累牍·铺天盖地、身边·周围·遍地+全是·全在·都在、听得多了/看得多了、印象里·一想就能想起·张口就能举出+一大堆/好多；EN keep hearing about / all I hear about / all over my feed / keeps coming up / see it all the time / everywhere in the news / constant coverage / bombarded with——**r161 教训落地三轮自查**：初版只收「看到」族漏「老听到」整句（听说/看到/听到/刷到四裸动词同级收录）；身边族初版只收「全是/都是」漏「身边朋友全在聊」（补「全在/都在」）；记忆提取族初版只收名词在前的「例子…想起」，漏倒装「一想就能想起好多例子」（补动词在前的「一想/张口/随口/信手+就能…想起」族）；不收「多地/多起/大量案例」等可验证证据词）；
+  - 腿② FREQ 频率/概率推断（很常见/越来越普遍/比比皆是/屡见不鲜/遍地开花/蔚然成风/多如牛毛/满地都是、大幅·激增·暴涨、十有八九/大概率/八成/多半、屡屡·频频发生、说明·表明·可见+很多·增多·上升·普遍、看来·显然·肯定+频率量；EN must be common / increasingly common / rampant / happening all the time / skyrocketing / must be rising / it's an epidemic of——否定前缀 lookbehind 保护「不代表/未必/不一定/不能说明/不等于/不意味着/推不出/说明不了/算不上」，「老听说很多，但不代表真的多」是正确判别）。
+- 豁免三组 + 疑问句：数据/统计依据在场（统计显示/数据显示/官方通报/报告显示/研究表明/同比/环比/发生率；EN statistics show / according to data / per capita——结论有独立证据支持时曝光只是引子）、求证/纠正陈述（但要看数据/以数据为准/有待核实/不代表/不等于/不能说明；EN I should check / doesn't necessarily mean / need more data）、概念/教学转述（可得性偏差/可得性启发式/认知偏差；EN availability bias / availability heuristic / cognitive bias）、疑问句（含 ?/？）。
+- src/index.js 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出——计算点变量名 avb，grep 实测无冲突）；三份文档数字同步（维度 199→200、verify 156→157、三层级合计 186→187/剩余 13→12、版本戳 6.8.131→6.8.132）；README Version history / CHANGELOG 追加 6.8.132 条目；VERSION 递增后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-203-availability-bias.js（19 断言全绿：9 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、9 良性全放行含数据依据/主动求证/概念讨论/疑问句/缺腿、4 项豁免陷阱「含豁免放行+抹掉转命中」、7 项腿常量负例注入承重含中英逐侧独立、缺腿/邻近窗外/短文本结构性不判、gate 层变体矩阵）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键 200 个）
+- test/doc-numbers-accuracy.test.js：24 passed / 0 失败
+- scripts/bidirectional-guard.js：召回 52/52（100%）、误拦 302/326（92.6%，与基线逐位一致、零新增误伤）
+- 变体矩阵（真实 gate()）：攻击 7/7 gate.action≠pass（verify）且 availability_bias 承重进 findings；良性 6/6 gate.action=pass（多地通报/主观体验无推断/否认推断/数据依据/EN 求证/「战争是多因共同造成的」边缘多因陈述）
+
+## 五、已知边界 / 下次可继续
+- 隐式频率推断（只说曝光、不宣告结论，如「最近老听到这事」止步）不判——缺腿②即无「以曝光替代频率」的话语形状，属保守方向。
+- 邻近窗 60 字（EN 160 字符）外的跨段「曝光…推断」共现不判（可能是两件独立的事）。
+- 证据豁免为句级属性：同句混合数据依据与曝光推断（「据统计报道越来越多，所以越来越普遍」）会整句放过——与既有维度同口径的已知取舍；「报道量上升≠发生率上升」的显式混淆句若不出现 AVAIL 主观曝光词，由统计误导族负责。
+- 备选下一轮方向：just-world hypothesis（公正世界假设：遭遇不幸×「活该/有原因/苍蝇不叮无缝蛋」——grep 实测 VERDICT_LABELS 仅含「活该」单词、无受害者归因结构腿）、omission bias（不作为偏差：出手之错大于不出手之错）、scope insensitivity（规模脱敏：大规模伤害×「只是个数字/没区别」）。
+
 # r202 升级轮报告（v6.8.131 — 第 199 维度 appeal_to_legality「诉诸合法性谬误」上线 — 2026-11-03）
 
 ## 一、轮次与方向

@@ -1,3 +1,13 @@
+## [6.8.132] - 2026-11-03
+
+### Added — 第 200 判别维度 `availability_bias`「可得性偏差」（r203，真升级类型 1：新判别维度）
+- 新增 src/availability-bias.js（约 340 行）：`checkAvailabilityBias(text, inject)` + `__internals`（12 个可注入常量）。两腿共现 + 邻近窗（中文 60 字 / EN 160 字符），缺一不判：腿① AVAIL 可得性线索（老/经常/时不时+听说·听到·看到·刷到、刷屏/满屏都是/热搜/热榜、电视里·新闻里+播·放·连篇累牍·铺天盖地、身边·周围·遍地+全是·全在·都在、听得多了/看得多了、印象里·一想就能想起·张口就能举出+一大堆/好多；EN keep hearing about / all I hear about / all over my feed / keeps coming up / see it all the time / everywhere in the news / constant coverage / bombarded with）；腿② FREQ 频率/概率推断（很常见/越来越普遍/比比皆是/屡见不鲜/遍地开花/蔚然成风/多如牛毛/满地都是、大幅·激增·暴涨、十有八九/大概率/八成/多半、屡屡·频频发生、说明·表明·可见+很多·增多·上升·普遍、看来·显然·肯定+频率量；EN must be common / increasingly common / rampant / happening all the time / skyrocketing / must be rising / it's an epidemic of）。命中「拿媒体/环境曝光线索直接推出频率结论，把回忆容易度偷换成实际发生率」这一此前 199 维零命中的攻击族，补齐认知偏差系列（base_rate_neglect/selection_bias/clustering_illusion/regression_to_the_mean）中缺失的可得性启发式一支。
+- **r161 教训**：枚举腿收裸名词形态——「听说/听到/看到/刷到/热搜/报道」去后缀仍命中；实测两轮自查修漏：① 初版只收「看到」族漏「老听到」整句（听说/看到/听到/刷到四个裸动词必须同级收录）；② 身边族初版只收「全是/都是」漏「身边朋友全在聊」（补「全在/都在」）；③ 记忆提取族初版只收名词在前的「例子…想起」，漏倒装「一想就能想起好多例子」（补动词在前的「一想/张口/随口/信手+就能…想起」族）。腿②的「很常见/越来越普遍」等裸频率词带否定前缀 lookbehind 保护（「老听说很多，但不代表真的多」是正确判别，不判）。
+- **豁免三组 + 疑问句**：数据/统计依据在场（统计显示/数据显示/官方通报/报告显示/研究表明/同比/环比/发生率；EN statistics show / according to data / per capita——结论有独立证据支持时曝光只是引子）、求证/纠正陈述（但要看数据/以数据为准/有待核实/不代表/不等于/不能说明；EN I should check / doesn't necessarily mean / need more data——认知到偏差并主动求证是正确判别）、概念/教学转述（可得性偏差/可得性启发式/认知偏差；EN availability bias / availability heuristic / cognitive bias）、疑问句（「最近老听到这事，是不是变多了？」——问的是趋势本身）。
+- **边界**：base_rate_neglect（第 169 维）判据是具体阳性信号×高置信后验（检测阳性→几乎肯定中招），本族判据是媒体/环境曝光度、可能根本没给出任何具体案例（「满屏都是」不是样本）；anecdotal（第 140 维）管第一人称亲身经历×推广，本族主体常无亲身经历、依据是看到听到的密度；hasty_generalization 管少数样本×普遍结论，本族连样本都未给出、判的是「回忆容易度→频率」这一替代关系本身；synthetic_social_proof 管伪造社会认同，本族不主张他人立场、只推断事件频率。
+- 接入 src/index.js 八处（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出）；维度 199→200，VERIFY 156→157；README/SKILL/AGENTS 三处数字同步；VERSION 6.8.131→6.8.132。
+- 新测试 test/round-203-availability-bias.js（19 断言全绿：9 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、9 良性全放行含数据依据/主动求证/概念讨论/疑问句/缺腿、4 项豁免陷阱「含豁免放行+抹掉转命中」、7 项腿常量负例注入承重含中英逐侧独立、缺腿/邻近窗外/短文本结构性不判、gate 层变体矩阵 7 攻击全非 pass 且 availability_bias 承重 + 6 良性全 pass 含「战争是多因共同造成的」边缘良性）。
+
 ## [6.8.131] - 2026-11-03
 
 ### Added — 第 199 判别维度 `appeal_to_legality`「诉诸合法性谬误」（r202，真升级类型 1：新判别维度）

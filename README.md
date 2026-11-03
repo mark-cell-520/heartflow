@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-199-blueviolet.svg)](#what-it-catches-199-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-200-blueviolet.svg)](#what-it-catches-200-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-199 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+200 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (199 dimensions)
+## What it catches (200 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **156 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **157 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.131**. Not marketing copy.
+Measured on this repository at **v6.8.132**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 199 |
+| Discrimination dimensions | 200 |
 | MCP tools | 184 |
 | Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.132 | 2026-11-03 | 第 200 维度 **availability_bias**「可得性偏差」上线（r203）——「可得性线索（老听说/经常听到/刷到/满屏都是/热搜霸榜/电视里天天放/身边全在聊/一听就能想起好多例子；EN keep hearing about / all over my feed / keeps coming up / see it all the time）×频率或概率推断（所以很常见/越来越普遍/比比皆是/十有八九/激增/成风；EN must be common / increasingly common / rampant / happening all the time）」两腿结构判别，把「回忆容易度」偷换成「实际发生率」的新攻击族；与 base_rate_neglect（阳性信号×高置信后验）判据错开、与 anecdotal（第一人称经历×推广）主体错开；外部搜索（HN Algolia / Semantic Scholar / GitHub 高星仓库）无纯规则成熟方案可集成，按既有维度形态纯规则自建；新文件 src/availability-bias.js + test/round-203-availability-bias.js（19 断言：9 攻击全命中/9 良性全放行/4 豁免陷阱逐常量承重/7 项腿常量负例注入含中英逐侧/邻近窗/疑问句/gate 矩阵 7 攻击非 pass 且维度承重 + 6 良性全 pass），verify 156→157，五门禁全绿 |
 | 6.8.131 | 2026-11-03 | 第 199 维度 **appeal_to_legality**「诉诸合法性谬误」上线（r202）——「守法宣告（不违法/没犯法/法无禁止即可为/法律没有禁止/完全合法/合规；EN it's not illegal / broke no law / perfectly legal）×道德或批评豁免（所以没错/不能指责/管不着/少大惊小怪/凭什么指责；EN nothing wrong with it / no grounds to criticize / who are you to judge）」两腿结构判别，把「合不合法」偷换成「该不该做、能不能批评」的新攻击族；补齐 appeal_* 系列缺失的「法律/合规」一支（argumentum ad legem），与 legal_status_coercion（以法律后果胁迫）方向相反、与 opinion_entitlement（免举证义务）豁免对象错开；外部搜索（arXiv 2405.02318、GitHub tmakesense/logical-fallacy 21★ 等）全部为 LLM 路线与零 LLM 依赖铁律冲突，按既有维度形态纯规则自建；新文件 src/appeal-to-legality.js + test/round-202-appeal-to-legality.js（48 断言：9 攻击全命中/9 良性全放行/6 豁免逐常量承重/中英逐侧独立/邻近窗/否定前缀保护/矩阵 9 攻击 gate 非 pass 且维度承重 + 8 良性全 pass），verify 155→156，五门禁全绿（另修复 r201 遗留的 README/SKILL 版本戳 v6.8.129 漂移） |
 | 6.8.130 | 2026-11-03 | 第 198 维度 **nirvana_fallacy**「完美方案谬误」上线（r201）——「不完美宣告×行动废止」两腿结构判别，填补 197 维在 perfect solution fallacy（拿方案的不完美直接废止行动，用理想化对照否决现实选项）族的空白；来源 GitHub dhfbk/faina ★5（NAACL 2025 谬误分类学对照，aclanthology.org/2025.naacl-long.34/）；新文件 src/nirvana-fallacy.js，verify 154→155，五门禁全绿 |
 | 6.8.129 | 2026-11-03 | 第 197 维度 **goal_drift**「目标漂移/使命置换」上线（r200）——「原始使命锚点×目标置换宣告」两腿结构判别，填补 196 维在 mission drift（以「延续/服务原目标」之名行「置换目标」之实）族的空白；来源 arXiv 2603.03456《Asymmetric Goal Drift in Coding Agents Under Value Conflict》+ GitHub sunilgentyala/Plumbline ★6；新文件 src/goal-drift.js，verify 153→154，五门禁全绿 |
