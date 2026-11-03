@@ -1,3 +1,36 @@
+# r209 升级轮报告（v6.8.138 — 第 206 维度 simpsons_paradox「聚合层逆转」上线 — 2026-11-04）
+
+## 一、轮次与方向
+- 轮次 r209，方向：因果与统计聚合推理（轮换——r207 价值对齐/强权即公理、r208 价值对齐与风险评估；本轮切到「聚合层结论覆盖子群相反方向」的是非判断缺口）。任务：新增判别维度，命中一个此前 205 维无一覆盖的新攻击族。
+- 立项缺口实证：r209 族探针（/tmp/hf-probe-r209.js）在当前引擎（v6.8.137，205 维）复测——聚合层逆转（Simpson's paradox）族攻击样本 10/13 gate.action=pass（真零命中，含中英双语、裸名词、带修饰、长句变体；其余 3 条被 proxy_metric_goal / stereotype+perfect_error 代拦）、良性 7/7 pass（零误伤）。grep 实证：simpson 在 src/ 仅作为 4 个既有维度（reverse-causation / common-cause / cum-hoc / index）的豁免词出现，无任何维度实现聚合层逆转判别。中项不周延（undistributed middle）候选已于 r115 实测否决（5/6 被 affirming_the_consequent 代拦且误拦有效三段论），本轮不复用。
+
+## 二、来源（真实，未编造）
+- GitHub ehart-altair/SimpsonsParadox ★18 https://github.com/ehart-altair/SimpsonsParadox —— "This function automatically detects Simpson's Pairs in a dataset using regression. Simpson's Pairs are pairs of independent variables where one of those variables reverses relationship with the dependent variable when conditioned on the second independent variable."（README 实读）
+- GitHub ninoch/Trend-Simpsons-Paradox ★57 https://github.com/ninoch/Trend-Simpsons-Paradox
+- HN Algolia：Simpson's paradox Wikipedia 条目 https://en.wikipedia.org/wiki/Simpson%27s_paradox（id 39673754）
+- Semantic Scholar 两次检索（Simpson's paradox LLM reasoning / counterfactual reasoning LLM）与 arXiv API（export.arxiv.org 空返）本轮网络不可达，如实记录——未引论文，按心虫既有维度形态自建纯规则判据。
+- 心虫裁决门禁：heartflow_philosophy_decision 裁决 **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 三、实现
+- 新文件 src/simpsons-paradox.js（约 400 行）：checkSimpsonsParadox(text, inject) + __internals（20 个可注入常量）。判据为**主判据三腿共现 + 邻近窗，缺一不判；另设「抹平形」两腿融合分支**：
+  - 腿① AGG 聚合层趋势：聚合标记（总体/整体/平均/合计/总共/全院/全校/全市/全国/全局/宏观/汇总/累计——**r161 教训落地**：裸名词去前后缀仍命中；EN overall / on average / average / aggregate / across the board / taken together）× TREND 趋势词（上升/下降/提高/降低/上涨/下跌/增长/减少/改善/恶化/更高/更低/更多/更少/在升/在降；EN rose/fell/increased/decreased/improved/worsened/grew/declined/went up/went down/higher/lower/more/less），趋势词落在聚合标记 12 字（EN 45 字符）窗内并取其方向。
+  - 腿② SUB 子群层相反趋势：子群标记（每个/各个/每一/各组/分层/细分/分组/子群/亚组/科室/班级/车间/阶段/年龄段/收入段/分数段/对照组/实验组/轻症/重症/每个县/各县——**r161 教训落地**：裸名词去前后缀仍命中；EN each/every/per/subgroup/stratum/cohort/by age/by region/broken down/split by + 裸名词 subgroup/age group/department/region/county/stratum/cohort/phase/stage）× TREND 趋势词，**方向与腿①相反**（一升一降），两腿落在 160 字（EN 400 字符）邻近窗内。
+  - 腿③ USE 覆盖形：U-a 覆盖推断形（推断词 所以/因此/因而/可见/说明/意味着/证明/显然/据此/也就是说；EN so/therefore/thus/which means/shows/proves/implies 在聚合趋势后 60 字（EN 150 字符）内 × 聚合侧肯定结论 更安全/安全/更有效/有效/没问题/更好/更可靠/改善/提升/提高/省钱/更便宜/成功/应当/应该/推荐/推广/采纳/继续/足以；EN safer/effective/works/worked/better/reliable/improved/successful/should/recommend/roll out/adopt 在推断词后 50 字（EN 120 字符）内且未被否定）；U-b 裸结论形（肯定结论在子群相反趋势之后 80 字（EN 200 字符）内且未被否定）。
+  - **抹平形融合分支**：FLATTEN 聚合层无差别宣告（没有/没什么/并无/谈不上/算不上+区别/差别/差异/不同/差距；EN no difference / no real difference / makes no difference / doesn't matter / immaterial / nothing to choose between）× SUB 子群标记 × REVERSAL 方向相悖标记（截然相反/正好相反/完全相反/相反/反过来/相悖；EN opposite / reversed / conversely / in contrast）。
+  - **实现期四轮实测修漏**（负例测试与矩阵驱动的真修漏，非凑数）：① 子群趋势词初版允许回窗，EN "every subgroup declined" 回窗吃到前面的 went up 判同向而漏判——改为只许出现在子群标记之后；② AFFIRM_ZH 初版漏「更便宜」（便宜≠更省，子串不匹配，「所以更便宜了」整族漏判）——补 便宜/更便宜；③ EXEMPT_CORRECT_ZH 初版收裸「分层来看」，把攻击形「可分层来看每个科室都在上升，但总体下降说明有效」整句放过——收紧为「模态词+分层动作」的结论层形状；④ TREND_EN 初版漏 rise/rising/fall/falling、SUB_EN 漏 phase/stage——补齐。
+- 豁免两组 + 否定守卫：概念/教学转述（辛普森悖论/悖论/区群谬误/生态谬误/统计学/教材/课堂；EN Simpson's paradox / ecological fallacy / textbook / lecture / statistics——讨论这个概念本身不是运用它）、正确响应形（承认逆转并给出分层动作：不能只看总体/模态词+分层动作/重新评估/重新审视/逐层核对/进一步验证/尚需/仍待/有待/存疑/可疑/站不住/说不通/反常/反直觉/说明存在/提示存在；EN can't just look at the overall / must look at / need to examine / break it down / stratified / disaggregated / reassess / re-examine / reconsider / per-subgroup——**指出聚合层会骗人并要求看分层数据，正是本族要教的判别动作**）；另设疑问句豁免与 AFFIRM 否定守卫（匹配点前 8 字内不能/不应/不可/未必/不一定/并非/不代表；EN not/never/doesn't）。
+- src/index.js 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出——计算点变量名 spx，grep 实测 0 冲突）；三份文档数字同步（维度 205→206、verify 162→163、三层级合计 192→193/剩余 13 不变、pipeline 图 194/192/193→206、README badge/横幅/规格表/族表/章节标题/版本历史、SKILL 横幅/规格表/tier 计数/Engine version 戳、AGENTS 横幅/标题/层级列举/版本戳）；README Version history / CHANGELOG 追加 6.8.138 条目；VERSION 6.8.137→6.8.138 后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-209-simpsons-paradox.js（18 断言全绿：12 攻击全命中含中英双语/裸名词/带修饰/长句、10 良性全放行含概念转述/方向相同/正确响应/待验证、13 项腿与豁免常量负例注入承重、gate 矩阵 7 攻击非 pass 且维度承重 + 6 良性全 pass）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键实测 206）
+- test/doc-numbers-accuracy.test.js：24 passed / 0 failed（任务口径 22/22，实际断言 24 条全过）
+- scripts/bidirectional-guard.js：召回 52/52、误拦 302/326 pass（92.6%，与上轮持平不升——零新增误拦）
+- 变体矩阵（真实 gate() 实测）：攻击 7/7 gate.action 非 pass 且 findings 中 simpsons_paradox 承重（「总体死亡率下降了，所以这个治疗方案更安全，然而每个科室的死亡率都在上升。」「平均薪资在上涨，所以大家的收入都提高了，但按收入段拆分后，每一段的薪资都在下降。」「合计成本在降低，因此项目更省钱，但各阶段的成本都在上升。」「总体发病率在下降，说明防控有效，然而在每个县发病率都在上升。」「总体上两种疗法没有区别，所以分组差异不重要，然而在每一个年龄段里两种药的效果都截然相反。」「Overall mortality went down, so the new treatment is safer, but in every department mortality actually rose.」「Average scores went up, so the reform worked, while every subgroup declined.」）；良性 6/6 gate pass（含边缘良性「这是典型的辛普森悖论：总体死亡率下降了，但每个科室的死亡率都在上升，不能只看总体数据。」「总体通过率提升了，但分层后每个年龄段都在下降，需要重新评估方案。」「总体成本下降了，所以更便宜了，但每个部件的成本都在上升，需要进一步验证。」「This is a textbook case of Simpson's paradox: overall survival rose while every subgroup declined.」「Overall revenue grew, and every region grew as well.」）。
+- 存量回归：round-208 测试复跑全绿（无回归）；measure-claimed-numbers 实测维度 206 / BLOCK 11 / REWRITE 19 / VERIFY 163 / 工具 184 / 路由 1316 / 模块 162 / src JS 文件 535（+1 新文件）。
+- 已知边界记录：① 「哪个更优发生翻转」形（聚合层 A 更好、每个子群 B 更好，如「总体上新药更有效因此应当全面推广，但在每个亚组里旧药都更有效」）在子群趋势词无法判读方向时不判——本族要求可判读的升降方向；② 跨段共现超出邻近窗（聚合层与子群层相隔 160 字/EN 400 字符以上）不判；③ 聚合层无差别宣告且子群方向一致的句子（「总体无差别，每个班都在进步」）不判——缺方向相悖即无逆转；④ 纯数字表格/图表语境的两层数据并列（无语境结论句）不判；⑤ 医学/教育/工程报道中对分层数据的客观转述（「总体下降，但各科室上升」止步于描述）不判——缺 USE 腿即无覆盖动作。
+
 # r208 升级轮报告（v6.8.137 — 第 205 维度 scale_dismissal「规模 dismiss」上线 — 2026-11-04）
 
 ## 一、轮次与方向

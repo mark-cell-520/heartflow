@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-205-blueviolet.svg)](#what-it-catches-205-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-206-blueviolet.svg)](#what-it-catches-206-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-205 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+206 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
 ```
 
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (194 dimensions) -> gate
+scope-check -> premise-check -> discriminate (206 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (205 dimensions)
+## What it catches (206 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **162 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **163 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.137**. Not marketing copy.
+Measured on this repository at **v6.8.138**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 205 |
+| Discrimination dimensions | 206 |
 | MCP tools | 184 |
 | Test suite | 19,032 passing / 71 failing |
 | Capability guard | 20 / 20 checks |
@@ -380,9 +380,10 @@ margins, and why every prior dimension missed — lives in **`UPGRADE_LOG.md`** 
 This table exists so a reader can see the shape of the line in ten seconds, not to
 duplicate the log.
 
-| 6.8.137 | 2026-11-04 | 第 205 维度 **scale_dismissal**「规模 dismiss」上线（r208）——「小规模/低占比宣告（才几个人/个别案例/占比不到千分之一/区区几个家庭/这么小的比例；EN only a few / a handful of users / a tiny fraction / statistically negligible / a few out of millions）×风险 dismiss（不值得大惊小怪/没必要上纲上线/忽略不计/不值一提/翻篇；EN not a big deal / not worth the fuss / no need to panic / we can move on）」两腿结构 + 「忽略不计」融合分支判别，把「相对占比」偷换成「绝对代价免检通行证」的新攻击族——风险与伤害的严重性取决于绝对后果与可逆性，不取决于它占总体的比例；与 selective_minimization（过错定级降级）/harm_invalidation（具体伤害抹除）/percentage_overflow（百分比演算）边界错开，探针实测本族 8/8 攻击样本它们零命中；r208 探针 12 候选族实测，scale_dismissal 是唯一 8/8 真零命中且 4/4 良性零误伤的族（次优 token_gesture 7/8、burden_inversion 7/8）；外部三层搜索（HN Algolia 无相关命中、Semantic Scholar 两次 429 限流、GitHub agent execution verification 前五全部 LLM 驱动的 agent harness 与心虫铁律冲突）无纯规则成熟实现可集成，按既有维度形态纯规则自建；新文件 src/scale-dismissal.js + test/round-208-scale-dismissal.js（13 断言全绿：11 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、8 良性全放行含让步转折/测量语境/统计报告/概念批判、9 项腿与豁免常量负例注入承重、gate 矩阵 6 攻击非 pass 且维度承重 + 6 良性全 pass），verify 161→162、维度 204→205、三层级合计 191→192/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry），五门禁全绿（verify 16/16 / guard 20/20 / doc 24/24 / 双向 52/52+302/326 不升） |
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.138 | 2026-11-04 | 第 206 维度 **simpsons_paradox**「聚合层逆转」上线（r209）——「聚合层趋势（总体/整体/平均/合计+上升/下降/提高/降低/上涨/下跌/增长/减少，裸名词形态；EN overall / on average / aggregate × rose/fell/increased/decreased/improved/worsened）×子群层相反趋势（每个/各个/每一/分层/科室/班级/亚组/年龄段/收入段/对照组/每个县，裸名词形态；EN each/every/per/subgroup/stratum/cohort/by age/broken down）×覆盖使用腿（U-a 覆盖推断形：所以/因此/说明/意味着+更安全/更有效/有效/更好/更可靠/省钱/成功/应当/推广/采纳；EN so/therefore/which means+safer/effective/works/better/should/roll out；U-b 裸结论形：肯定结论出现在子群相反趋势之后）」三腿结构 + 「抹平形」融合分支（聚合层无差别宣告×子群方向截然相反）判别，把「混合权重」偷换成「每个分组真实方向」的新攻击族——聚合量是子群量的加权混合，子群构成一变，聚合方向可以与每一个子群相反（辛普森悖论的结构性质）；与 whole_part_transfer（涌现性质量搬运）/statistical_misleading（小基数比例）/proxy_metric_goal（代理指标当目标）边界错开，探针实测本族 10/13 攻击样本现有 205 维真零命中（其余 3 条被 proxy_metric_goal / stereotype+perfect_error 代拦）；外部来源 GitHub ehart-altair/SimpsonsParadox ★18（Simpson's Pairs = variables whose relationship with the dependent variable reverses when conditioned on a second variable）+ ninoch/Trend-Simpsons-Paradox ★57 + HN/Wikipedia Simpson's paradox 条目，Semantic Scholar / arXiv 本轮网络不可达（空返）未引论文，按既有维度形态纯规则自建；新文件 src/simpsons-paradox.js + test/round-209-simpsons-paradox.js（18 断言全绿：12 攻击全命中含中英双语/裸名词/带修饰/长句、10 良性全放行含概念转述/方向相同/正确响应/待验证、13 项腿与豁免常量负例注入承重、gate 矩阵 7 攻击非 pass 且维度承重 + 6 良性全 pass），verify 162→163、维度 205→206、三层级合计 192→193/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry），五门禁全绿（verify 16/16 / guard 20/20 / doc 24/24 / 双向 52/52+302/326 不升） |
+| 6.8.137 | 2026-11-04 | 第 205 维度 **scale_dismissal**「规模 dismiss」上线（r208）——「小规模/低占比宣告（才几个人/个别案例/占比不到千分之一/区区几个家庭/这么小的比例；EN only a few / a handful of users / a tiny fraction / statistically negligible / a few out of millions）×风险 dismiss（不值得大惊小怪/没必要上纲上线/忽略不计/不值一提/翻篇；EN not a big deal / not worth the fuss / no need to panic / we can move on）」两腿结构 + 「忽略不计」融合分支判别，把「相对占比」偷换成「绝对代价免检通行证」的新攻击族——风险与伤害的严重性取决于绝对后果与可逆性，不取决于它占总体的比例；与 selective_minimization（过错定级降级）/harm_invalidation（具体伤害抹除）/percentage_overflow（百分比演算）边界错开，探针实测本族 8/8 攻击样本它们零命中；r208 探针 12 候选族实测，scale_dismissal 是唯一 8/8 真零命中且 4/4 良性零误伤的族（次优 token_gesture 7/8、burden_inversion 7/8）；外部三层搜索（HN Algolia 无相关命中、Semantic Scholar 两次 429 限流、GitHub agent execution verification 前五全部 LLM 驱动的 agent harness 与心虫铁律冲突）无纯规则成熟实现可集成，按既有维度形态纯规则自建；新文件 src/scale-dismissal.js + test/round-208-scale-dismissal.js（13 断言全绿：11 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、8 良性全放行含让步转折/测量语境/统计报告/概念批判、9 项腿与豁免常量负例注入承重、gate 矩阵 6 攻击非 pass 且维度承重 + 6 良性全 pass），verify 161→162、维度 204→205、三层级合计 191→192/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry），五门禁全绿（verify 16/16 / guard 20/20 / doc 24/24 / 双向 52/52+302/326 不升） |
 | 6.8.136 | 2026-11-03 | 第 204 维度 **might_makes_right**「强权即公理」上线（r207）——「实力/胜负/权力依据（谁赢/赢了/胜利者/拳头/胳膊/武力/强权/枪杆子/实力/官大/钱多/碾压/弱肉强食；EN might / muscle / the stronger / whoever wins / victor / power / bigger army）×是非裁量等式（就是真理/就是正义/代表真理/决定对错/定义是非/判定善恶/谁有理/说了算/才算数/书写历史/正统/合法性/硬道理；EN (might|power) is right / (decides|defines|determines) what is right / justice of the stronger）」两腿结构 + 邻近窗（中文 80 字 / EN 200 字符）+ 自足习语分支（拳头大就是硬道理/胳膊粗的说了算/谁赢谁有理/成王败寇/胜者为王败者为寇/强权即公理/真理在大炮射程之内；EN might makes right / might is right / victor's justice / history is written by the victors / the strong do what they can）判别，把「力量对比」偷换成「是非标准」的新攻击族——观点是否正确只取决于证据与推理，与谁赢了、谁拳头硬、谁钱多无关；强权裁量一旦成立，讨论退化成比大小，弱者合理主张、败者正当诉求、少数派事实陈述被系统性压制；与 instrumental_reasoning（手段选择压倒价值判断）边界错开，探针实测本族 3/4 攻击样本它零命中；r207 探针 13 候选族实测，might_makes_right 是唯一 3/4 真零命中且良性零误伤的族；外部三层搜索（HN Algolia ×2 / Semantic Scholar ×2 / GitHub API ×2 关键词）全部无可用命中，如实记录，按既有维度形态纯规则自建；新文件 src/might-makes-right.js + test/round-207-might-makes-right.js（13 断言全绿：12 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、8 良性全放行含分离条款/概念批判/否定守卫/规则描述、9 项腿与豁免常量负例注入含中英逐侧与自足习语分支、gate 矩阵 6 攻击非 pass 且维度承重 + 6 良性全 pass），verify 160→161、维度 203→204、三层级合计 190→191/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry），五门禁全绿（verify 16/16 / guard 20/20 / doc 22/22 / 双向 52/52+302/326 不升） |
 | 6.8.135 | 2026-11-03 | 第 203 维度 **credential_dismissal**「诉诸资历/资历驳回」上线（r206）——「批评者的资历/学识/经验缺口（没读过这本专著/不是经济学博士/没在行业干过十年/外行/没结过婚/连一天都没做过；EN you have not read / you are not a professional / who has never / no degree / outsider / amateur）×发言资格剥夺（没资格批评/不配谈/有什么资格/先读书再说话/闭嘴/插什么嘴/也配/班门弄斧；EN not qualified to criticize / have no right to comment / who are you to / shut up / stay in your lane / until you have read）」两腿结构 + 自足祈使分支（先+长周期资历动作+再+发言动作单式即两腿齐备）判别，把「人的准入条件」偷换成「观点的判别条件」的新攻击族（学术圈「没读完全集就没资格评论」/行业「没干过十年少插嘴」/公共议题「不是X国人别说话」同族——用「你是谁」代替「你说了什么」）；与 genetic_fallacy（第 131 维起源谬误：来源×质量贬损，落点是内容价值）边界错开，探针实测本族 4/4 攻击样本它零命中；r206 族探针实测攻击 4/4 真零命中、良性 2/2 零误伤；外部搜索（HN Algolia "courtier's reply" 前五无相关命中 courier 同形词干扰、Semantic Scholar 两次空返限流、GitHub "ad hominem fallacy" sort=stars 前五 UKPLab/naacl2018-before-name-calling ★13 / jghibiki/NeuralAdHominem ★2 / utkarsh512/logical-fallacy ★1 全部 LLM/统计学习路线、"courtier reply fallacy" 零仓库）无纯规则成熟方案可集成，按既有维度形态纯规则自建；新文件 src/credential-dismissal.js + test/round-206-credential-dismissal.js（16 断言：12 攻击全命中含中英双语/裸名词/带修饰/反问/长句、12 良性全放行含资源指引/教学邀请/执业许可/概念批判、3 项豁免陷阱逐常量承重、8 项腿与豁免常量负例注入含中英逐侧与自足祈使分支、gate 矩阵 6 攻击非 pass 且维度承重 + 6 良性全 pass），verify 159→160、维度 202→203，模块 162 不变（纯函数维度模块不进 _modules registry），五门禁全绿（verify 16/16 / guard 20/20 / doc 22/22 / 双向 52/52+302/326 不升） |
 | 6.8.134 | 2026-11-03 | 第 202 维度 **unfalsifiable_confirmation**「双果自证」上线（r205）——「互斥结果对（如果数据涨了…如果数据跌了、无论实验灵不灵、不管结果如何、预言实现了…没实现、测出来是A…测不出来是B、涨了是A…跌了是B；EN whether X or not / either way / no matter what / if it works…if not / whatever happens）×同一自证结论（都说明/证明/验证+我+对·正确·成立·有效·准·高明·领先、我的（理论/观点/学说/预言/判断/方法/模型/能力/框架）+是+对/正确/成立/有效、反正/横竖+都+我+对；EN proves/confirms/shows/vindicates + I'm/my theory is + right/correct/valid、my theory is vindicated、either way + confirms、right either way / no matter the outcome、nothing could disprove it）」两腿结构判别，把「一对互斥结果」偷换成「同一个自我结论的证据」的新攻击族（伪科学免疫策略/阴谋论/营销自证话术核心结构——不存在任何能推翻它的观察，举证责任反向消灭）；立项缺口由 r167 one-sided-dismissal.js 注释显式留白（「不可证伪断言」候选族当时仅 6/8 被其他维度代拦，无维度实现其两腿结构）；外部搜索（HN Algolia "falsifiability" 前八均为 Popper 证伪主义/Sagan 车库里喷火龙/Hans Albert 免疫策略哲学博客、Semantic Scholar 429 限流、GitHub sort=stars 前二 cpt13-g/clarify-research-idea ★282 与 tonyblu331/research-proof ★52 均 LLM 驱动）无纯规则成熟方案可集成，按既有维度形态纯规则自建；新文件 src/unfalsifiable-confirmation.js + test/round-205-unfalsifiable-confirmation.js（12 断言：11 攻击全命中含中英双语/裸词/倒装极性/长句、8 良性全放行、8 项腿与豁免常量负例注入承重、gate 矩阵 6 攻击非 pass 且维度承重 + 6 良性全 pass），verify 158→159、维度 201→202，五门禁全绿（verify 16/16 / guard 20/20 / doc 22/22 / 双向 52/52+302/326 不升） |
