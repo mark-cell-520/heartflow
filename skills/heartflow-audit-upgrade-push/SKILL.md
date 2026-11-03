@@ -1,6 +1,6 @@
 ---
 name: heartflow-audit-upgrade-push
-version: "1.8.0"
+version: "1.9.0"
 title: "心虫审计→并发修复→验证→推送 全流程"
 description: |
   心虫大规模升级工作流：全量审计→分类问题→并发修复→验证→推送GitHub。
@@ -1036,6 +1036,7 @@ done
 18. **终端持久 cwd 被删后所有 terminal 调用 exit 126**：scratch 清理会把上次 cd 进去的目录删掉，之后每条命令都在恢复 cwd 时失败、真实命令从不执行（报错指向一个你没 cd 的目录）。恢复法：terminal 调用显式传 workdir 参数指定存在的目录，别在坏 shell 里重试同一命令。
 19. **长任务收尾汇报必须显式列未完成项**：修复轮没走完"五门禁→bump→UPGRADE_LOG→commit→push→重启 MCP→恢复 cron"全链时，汇报如实列出断在哪、每步的恢复命令；用户说"全面修复+同步"就是要全链闭环，用"已完成"掩盖未提交状态是最伤信任的一类汇报。
 20. **跑 MCP 鉴权测试前清掉三个 token 环境变量**：`test/mcp-auth-e2e-real.test.js` 自生成 token 并 spawn 自己的 server，而 server 的 AUTH_TOKEN 读 `HEARTFLOW_MCP_TOKEN || MCP_HEARTFLOW_API_KEY || MCP_HEARTFLOW_KEY`——shell 里 export 过其中任何一个，spawn 的 server 就用环境 token 而非测试 token，admin 项全部 401 假失败（子代理曾把这当发现上报过）。跑法：`env -u HEARTFLOW_MCP_TOKEN -u MCP_HEARTFLOW_API_KEY -u MCP_HEARTFLOW_KEY node test/mcp-auth-e2e-real.test.js`；guest-permission 测试同理。先排除环境再归因代码。
+21. **修 secret 类字符串前必须验原始字节**：agent 自己的工具输出层会把 key/token 类字符串脱敏显示（文件里明明是 `$INSTABOX_API_KEY`，终端/grep 输出显示成 `$INSTA...KEY` 一类形态，各次还可能不同）——照显示文本判定「文件里是坏变量」并去"修"正确文件，是真实差点发生的误修。规矩：任何「密钥被写坏」的发现，先用 `execute_code` 读原始字节（`repr()` + `.encode().hex()`）或 `subprocess.run(['git','show','HEAD:'+f], capture_output=True)` 拿 stdout decode 复核（两条路都绕开输出脱敏层），再决定改不改；显示文本与 hex 冲突时以 hex 为准。
 
 ---
 
