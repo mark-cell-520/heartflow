@@ -1,3 +1,32 @@
+# r204 升级轮报告（v6.8.133 — 第 201 维度 galileo_gambit「伽利略赌局」上线 — 2026-11-03）
+
+## 一、轮次与方向
+- 轮次 r204，方向：逻辑谬误检测（轮换——r203 为认知偏差/可得性启发式；r180 fallacy_fallacy 立项时的缺口清单明确登记「galileo_fallacy 在 src/ 下 0 命中」，本轮兑现该留白）。任务：新增判别维度，命中一个此前 200 维无一覆盖的新攻击族。
+- 立项缺口实证：`grep -ril 'galileo|伽利略|哥白尼|布鲁诺|塞尔维特|魏格纳|被嘲笑|被迫害|历史会证明' src/` 仅命中 fallacy-fallacy.js 的注释缺口清单（r180 轮登记）与 clustering-illusion.js 注释，无任何维度以「殉道先例×自我平反迁移」两腿结构覆盖本族；本族探针在当前引擎（v6.8.132，200 维）复测——攻击 5/5 gate.action=pass（真零命中）、良性 5/5 pass（零误伤）。侦察落盘 /tmp/hf-scout-1793681433.txt。
+
+## 二、来源（真实，未编造）
+- 三层研究全部拿到真实结果：① HN Algolia `search?query=logical%20fallacy&tags=story` 前八命中——258 pts arXiv 2405.02318《Autoformalizing Natural Language to First-Order Logic: A Case Study in Logical Fallacy Detection》（摘要已拉取：LLM 驱动 NL→FOL autoformalization + SMT solver 验证逻辑有效性）、173 pts Show HN: Aristotl 谬误查询工具、141 pts logicalfallacies.org、113 pts UTEP Master List of Logical Fallacies；② Semantic Scholar 一次检索返回空（限流/失败，如实记录）；③ GitHub API `fallacy+detection&sort=stars` 前五——latent-variable/Real_time_fallacy_detection ★120（whisper+LLM 实时检测）、tmakesense/logical-fallacy ★21、panFJCharlotte98/Fallacy_Detection ★5（EMNLP 2024 LLM 零样本分类）、dhfbk/faina ★5（NAACL 2025）。**全部为 LLM/统计学习路线，与心虫零 LLM 依赖铁律冲突，无纯规则成熟实现可集成**——按心虫既有维度形态自建纯规则判据（伽利略赌局为经典谬误目录常备条目，arXiv 2405.02318 的分类学作参考，其 LLM 方法不可用）。
+- 心虫裁决门禁：heartflow_philosophy_decision → **accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；rationale 的 cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 三、实现
+- 新文件 src/galileo-gambit.js（约 300 行）：`checkGalileoGambit(text, inject)` + `__internals`（8 个可注入常量）。两腿共现 + 邻近窗（中文 80 字 / EN 200 字符），缺一不判：
+  - 腿① MARTYR 殉道者/被嘲笑先知先例（名字裸名词伽利略/哥白尼/布鲁诺/塞尔维特/魏格纳/塞麦尔维斯/苏格拉底、殉道地标鲜花广场/宗教裁判所/异端/十字架、被迫害动词 被/遭/饱受/受到/当年/历史上+嘲笑·嘲讽·讽刺·挖苦·羞辱·迫害·打压·封杀·排挤·烧死·处死·审判·定罪·排斥·否定·反对·斥为·骂·冷眼·冷遇·白眼、「被当成疯子/骗子/谬论」族、「所有突破起初都被骂」概括族；EN Galileo / Copernicus / Bruno / Servetus / Wegener / Semmelweis / Socrates / burned at the stake / Inquisition / heresy / they laughed at / mocked / ridiculed / persecuted / condemned / dismissed / persecution is the highest honor——**r161 教训落地**：名字与迫害动词收裸名词形态，去后缀仍命中）；
+  - 腿② TRANSFER 结论迁移（所以/因此+我+没错·正确·成立、我的（理论/发现/观点…）+迟早/终将被证明·承认·平反（修饰词无序星组——修「迟早也会被承认」漏判）、证明/平反+我+对的（倒装）、历史/时间/时代+会+证明·平反·翻案·给我公道、现在/如今+被封杀·被否定+我、被…封杀/拒稿/否定+说明/证明+我·对·真相（否定前缀 lookbehind 保护）、反对/封杀+本身就是（证明/肯定/勋章）、你们/他们+也会被钉在耻辱柱上/扫进历史的垃圾桶、越是被嘲笑+越说明、真理往往掌握在少数人、站在历史的正确一边、恰恰说明我/真相；EN so my theory will be proven / history will vindicate / history will prove me right / they're laughing at me now / being ridiculed now proves / proves that I'm right / proof that I am right / evidence that my claim is correct / the more they mock me, the more right / establishment rejection is the best credential / will be proven right in time / wrong side of history / censored for telling the truth proves I'm right）。
+- 豁免两组 + 疑问句：概念/教学转述（伽利略赌局/伽利略谬误/逻辑谬误/谬误清单/教材课程讲义论文+谬误；EN Galileo gambit / logical fallacy）、否认推断/正确判别（**必须带显式否定词**——被嘲笑不能证明/不代表/不等于…正确；历史上被嘲笑的观点绝大多数被证伪；伽利略靠望远镜观测与数学推导而非被审判证明；但要看数据/以证据为准/需要证据才能承认；EN being ridiculed doesn't prove / the vast majority of ridiculed ideas were wrong / needs evidence before）、疑问句（含 ?/？）。
+- **r204 实测修复（初版缺陷，两轮）**：① 豁免二「被嘲笑…证明…」初版未强制否定词，把攻击句「被拒稿正说明它是对的」误当否认推断整句放过（腿② T5 与豁免同射一句式，缺否定词即攻击本身）——改为必须显式否定词；② 腿② T2 修饰词组初版各限一次匹配，「迟早也会被承认」四 token 连排漏判——改无序星组；③ MARTYR_ZH 被迫害动词初版漏「遭学界冷眼」的触发词「遭」与「冷眼/冷遇/白眼/唾弃」；④ EN 侧「the more they suppress my paper」与「establishment rejection of my work is the strongest proof」的中间成分未收。
+- src/index.js 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports 导出——计算点变量名 glg，grep 实测无冲突）；三份文档数字同步（维度 200→201、verify 157→158、三层级合计 187→188/剩余 12→13、README badge/横幅/规格表/章节标题、SKILL 横幅/规格表/tier 计数、AGENTS 横幅/标题/层级列举/版本戳）；README Version history / CHANGELOG 追加 6.8.133 条目；VERSION 6.8.132→6.8.133 后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-204-galileo-gambit.js（13 断言全绿：10 攻击全命中含中英双语/裸名字/带修饰/倒装/长句、10 良性全放行含统计反驳/证据归因/概念讨论/疑问句/缺迁移腿、3 项豁免陷阱「含豁免放行+抹掉转命中」、6 项腿常量负例注入承重含中英逐侧独立、gate 层变体矩阵 5 攻击全非 pass 且 galileo_gambit 承重 + 6 良性全 pass）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（维度登记 dimensions 键实测 201）
+- test/doc-numbers-accuracy.test.js：24 passed / 0 failed（任务口径 22/22，实际断言 24 条全过）
+- scripts/bidirectional-guard.js：召回 52/52、误拦 302/326 pass（92.6%，与上轮持平不升）
+- 变体矩阵（真实 gate() 实测）：攻击 10/10 gate.action=verify 且 findings 中 galileo_gambit 承重（含「伽利略被审判过，所以我这个被否定的观点迟早会被证明是对的」「哥白尼当年被骂成疯子，如今你们骂我，历史会还我一个公道」「They mocked Galileo and they mock me — the establishment rejection of my theory is the best proof I am right.」「Semmelweis was shunned by the medical community, so being blacklisted today is the strongest evidence that my claim is correct.」「布鲁诺为日心说被烧死在鲜花广场，两千年前苏格拉底也被定罪——今天论坛封杀我的帖子，这本身就是我是对的证明」）；良性 6/6 gate pass（含边缘良性「伽利略被审判过，这是科学史上的著名冤案，教会后来正式为他平反」「布鲁诺为日心说被烧死在鲜花广场，苏格拉底也被定罪——用殉道史给观点背书是典型的逻辑谬误」）。
+- 已知边界记录：家族边缘良性句可能触发其他既有维度（pseudo_causal/contradiction/confidence/fallacies——既有引擎行为，非本维度误伤，矩阵选样时已避开）；隐式赌局（只陈述被封杀、不宣告平反结论）不判；邻近窗 80 字（EN 200 字符）外跨段先例—迁移共现不判。
+
+## 五、运行态
+- supervisorctl restart heartflow-mcp 后 /health 与 heartflow_status 实测 version=6.8.133、dimensions=201、modules=162（重启生效确认，防 161 轮教训「MCP 调用方拿旧代码判别结果」）。
 # r203 升级轮报告（v6.8.132 — 第 200 维度 availability_bias「可得性偏差」上线 — 2026-11-03）
 
 ## 一、轮次与方向
