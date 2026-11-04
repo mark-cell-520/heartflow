@@ -1,3 +1,30 @@
+# r211 升级轮报告（v6.8.140 — 第 208 维度 hypostatization「实体化/拟人化谬误」上线 — 2026-11-04）
+
+## 一、轮次与方向
+- 轮次 r211，方向：**逻辑谬误检测**（轮换——r208/r209/r210 连续三轮统计与证据纪律一线：规模 dismiss / 聚合层逆转 / 证据确定性要挟；本轮切回经典非形式谬误族）。任务：新增判别维度，命中一个此前 207 维无一覆盖的新攻击族。
+- 立项缺口实证：r211 族探针（/tmp/hf-probe-r211.js，四候选族同测）在当前引擎（v6.8.139，207 维）复测——实体化族攻击 5/7 gate.action=pass（真零命中，含中英双语、裸名词、带修饰、倒装、长句；另 2 条被 fallacies/reasoning_coherence/absolute_claim/confidence 代拦）、良性 4/4 pass（零误伤）；良性语料（gate-benchmark*.js）grep 实体化族标记 0 命中。排除的候选：匿名权威援引 5/6 已被 appeal_to_authority/unsupported_claim 代拦（非新族）、年代势利与 genetic_fallacy 家族相邻、诉诸沉默已被 manufactured-consent 覆盖、基础概率/检察官谬误已被 base_rate_neglect 覆盖。grep 实证 src/ 无任何维度实现「抽象实体×主体行动词」判别（index.js 命中均为 turing_mimicry 拟人共情，语义指向完全不同）。
+- 心虫裁决门禁：philosophy_decision 裁决 accelerate（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true；cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 二、来源（真实，未编造）
+- 外部三层研究无成熟纯规则方案可集成：HN Algolia「logical fallacy detection」仅命中 arXiv:2405.02318（NL→FOL 翻译法，非规则可集成）；Semantic Scholar 两次检索（prosecutor's fallacy / causal reasoning fallacy detection）均空返（网络/限流）；GitHub API「fallacy detection」前 5 = latent-variable/Real_time_fallacy_detection ★120（OpenAI whisper+LLaMA LLM 方案）、tmakesense/logical-fallacy ★21、panFJCharlotte98/Fallacy_Detection ★5（EMNLP2024 LLM zero-shot）、dhfbk/faina ★5（NAACL2025 LLM）、SeanFlannery/Logical.ly ★4——全部 LLM 路线，无可移植纯规则判据。按心虫既有维度形态自建纯规则判据（实体化/拟人化为经典非形式谬误，文献仅作分类学背景）。侦察落盘 /tmp/hf-scout-r211.txt。
+
+## 三、实现
+- 新文件 src/hypostatization.js（约 380 行）：checkHypostatization(text, inject) + __internals（14 个可注入常量）。
+- 判据两条路由，任一成立即 verify 级：
+  - R1 主判据三腿共现 + 双邻近窗（缺一不判）：腿① ABS 抽象实体（裸名词两形态，r161 教训落地——历史/时代/市场/资本/数据/社会/规律/命运/科技/系统/算法/自然/文化/竞争/进步；EN history / the market / capital / data / society / the system / the algorithm / nature / the future / justice / progress）→ 腿② AGENCY 主体行动词（心理/意志/道义/言语动词；趋势词与功能词不收——「市场上升」是走势不是主体；中文窗 12 字/EN 50 字符，容「终究会/绝不会」类修饰）→ 腿③ INF 结论承重（所以/因此/必须/应该/必将/注定或后果分句「现在不…就…」，在腿②后中文 50 字/EN 180 字符内）。
+  - R2 判定型分支两腿共现：腿① × STRONG 审判-报应动词（审判/惩罚/报复/报答/谴责/辜负/背叛/定罪/天谴/报应；EN judge / punish / reward / betray / revenge / will not tolerate）——「X 将审判/惩罚 Y」裸断言自带攻击性。
+- 豁免四组 + 疑问句：概念/教学/文学转述、明示修辞标记（拟人地/某种意义上/可以说）、主体性否认（没有意志/并无意识/doesn't actually choose——否认抽象物主体性正是本族要保护的行为）、谚语格言（古人云/俗话说/as the saying goes）。
+- src/index.js 八处接线（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports——变量名 hyp，grep 实测 0 冲突）；三份文档数字同步（维度 207→208、verify 164→165、三层级合计 194→195/剩余 13 不变、README badge/横幅/pipeline 图/规格表/action-tier/章节标题/版本历史、SKILL 横幅/规格表/tier 计数/pipeline 图/Engine version 戳、AGENTS 横幅/checkInput 行/标题/层级列举/版本戳——含补登 r210 遗漏的 v6.8.139 戳）；CHANGELOG 追加 6.8.140 条目；VERSION 6.8.139→6.8.140 后 sync-version.js 同步 package.json/SKILL frontmatter/version.js 兜底/BUILD_DATE。
+- 新测试 test/round-211-hypostatization.js（56 断言全绿：12 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、13 良性全放行含概念转述/明示修辞/主体性否认/谚语/孤立套话/趋势句/经济缩略、14 项腿与豁免常量负例注入承重、gate 矩阵 7 攻击非 pass 且维度承重 + 6 良性全 pass）。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（dimensions 键实测 208）
+- test/doc-numbers-accuracy.test.js：24/24
+- scripts/bidirectional-guard.js：召回 52/52、误拦 302/326（92.6%，与上轮持平不升——零新增误拦）
+- 变体矩阵（真实 gate() 实测）：攻击 7/7 gate.action 非 pass 且 findings 中 hypostatization 承重（「历史会惩罚那些忘记过去的人，所以我们必须按老规矩来。」「市场不会允许这种价格长期存在，因此泡沫一定会破。」「资本知道什么时候该撤退，所以它早就放弃了这块业务。」「时代终究不会等待犹豫不决的人，现在不转型就会被淘汰。」「数据知道用户真正想要什么，因此必须按它的推荐来。」「The market will punish anyone who doubts this strategy.」「History will judge those who stood in the way of progress.」）；良性 6/6 gate pass（含概念转述/主体性否认/孤立套话/趋势句/经济缩略/英文良性）。模块级探针：攻击 12/12 命中、良性 13/13 放行（含边缘良性）。
+- 已知边界：① 孤立套话（「历史不会忘记」「正义会迟到」止步于修辞、无 INF 承重词）不判；② 经济分析惯用缩略（「市场选择赢家/市场淘汰落后产能」止步于描述）不判，带结论承重仍判 verify；③ 跨段共现超出双邻近窗（抽象实体与主体行动词相隔 12 字/EN 50 字符以上，或 INF 远离腿② 50 字/EN 180 字符以上）不判；④ 游戏/文学语境（「系统会惩罚违规玩家」）按 R2 判 verify——规则世界里的拟人是设计陈述，边界由调用方结合语境确认；⑤ 文学诗歌呼告无 INF 词时不判（缺腿③）。
+
 # r210 升级轮报告（v6.8.139 — 第 207 维度 uncertainty_weaponization「证据确定性要挟」上线 — 2026-11-04）
 
 ## 一、轮次与方向

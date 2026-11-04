@@ -1,3 +1,15 @@
+## [6.8.140] - 2026-11-04
+
+### Added — 第 208 判别维度 `hypostatization`「实体化/拟人化谬误 / reification」（r211，真升级类型 1：新判别维度）
+- 新增 src/hypostatization.js（约 380 行）：`checkHypostatization(text, inject)` + `__internals`（14 个可注入常量）。两条路由任一成立即 verify 级。
+- **R1 主判据三腿共现 + 双邻近窗，缺一不判**：腿① ABS 抽象实体（历史/时代/市场/资本/数据/社会/规律/命运/科技/系统/算法/自然/文化/竞争/进步——裸名词两形态，r161 教训落地；EN history / the market / capital / data / society / the system / the algorithm / nature / the future / justice / progress）→ 腿② AGENCY 主体行动词（心理动词 知道/记得/相信/希望/担忧/容忍、意志动词 决定/选择/拒绝/允许/不容/等待/见证/觉醒/反噬、道义动词 审判/惩罚/奖励/报答/谴责/辜负、言语动词 回答/回应/警告/呼唤/预言；EN knows / decides / chooses / refuses / allows / answers / warns / punishes / judges——趋势词与功能词上升/下降/优化不收，中文窗 12 字/EN 50 字符，容「终究会/绝不会」类修饰）→ 腿③ INF 结论承重（所以/因此/必须/应该/必将/注定/迟早/势必或后果分句「现在不…就…」，在腿②后中文 50 字/EN 180 字符内）。
+- **R2 判定型分支两腿共现**：腿① × STRONG 审判-报应动词（审判/惩罚/报复/报答/谴责/辜负/背叛/定罪/天谴/报应；EN judge / punish / reward / betray / revenge / will not tolerate）——「X 将审判/惩罚 Y」作为裸断言自带攻击性，单式即预设抽象物主体性。
+- **四组豁免 + 疑问句**：概念/教学/文学转述（实体化/拟人/谬误/修辞/比喻/诗歌/散文/小说；EN reification / personification / fallacy / metaphor / poetry / fiction）、明示修辞标记（拟人地/形象地说/打个比方/某种意义上/可以说/俗称；EN metaphorically / figuratively / so to speak）、主体性否认（没有意志/并无意识/不是有意志的主体；EN has no will / isn't a conscious agent / doesn't actually choose——否认抽象物的主体性正是本族要保护的行为）、谚语格言（古人云/俗话说/常言道/格言；EN as the saying goes）。
+- **边界**：confidence 管证据确定性措辞的过度自信 vs 本族不依赖任何自信词、射程是主体性虚构本身；appeal_to_novelty/tradition（新/旧=对错）vs 本族不管时间先后、管主体性虚构；appeal_to_authority 管引具体权威 vs 本族援引对象是无主体之物；fallacies/reasoning_coherence 通用腿代拦个案（本族 7 条攻击中 2 条被其带落）但不构成族级覆盖——其余 5/7 真零命中。
+- 接入 src/index.js 八处（require / 计算点 / allDims / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports——变量名 hyp）；三份文档数字同步（维度 207→208、verify 164→165、三层级合计 194→195/剩余 13 不变、README badge/横幅/pipeline 图/族表/规格表/action-tier/章节标题/版本历史、SKILL 横幅/规格表/tier 计数/pipeline 图/Engine version 戳、AGENTS 横幅/checkInput 行/标题/层级列举/版本戳）；VERSION 6.8.139→6.8.140 后 sync-version.js 同步。
+- 新测试 test/round-211-hypostatization.js（56 断言全绿：12 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、13 良性全放行含概念转述/明示修辞/主体性否认/谚语/孤立套话/趋势句/经济缩略、14 项腿与豁免常量负例注入承重、gate 矩阵 7 攻击非 pass 且维度承重 + 6 良性全 pass）。
+- **来源（真实，未编造）**：r211 族探针（/tmp/hf-probe-r211.js）在当前引擎（v6.8.139，207 维）复测——实体化族攻击 5/7 gate.action=pass（真零命中，含中英双语、裸名词、带修饰）、良性 4/4 pass（零误伤），良性语料 grep 0 命中；grep 实证 src/ 无任何维度实现「抽象实体×主体行动词」判别。外部三层研究（HN Algolia 命中 arXiv:2405.02318 NL→FOL 法非规则可集成；Semantic Scholar 两次检索空返；GitHub API fallacy detection 仓库前 5 最高 ★120 且全部 LLM 方案）无可集成纯规则方案，按心虫既有维度形态自建纯规则判据（实体化/拟人化为经典非形式谬误，文献仅作分类学背景）。侦察落盘 /tmp/hf-scout-r211.txt。
+
 ## [6.8.139] - 2026-11-04
 
 ### Added — 第 207 判别维度 `uncertainty_weaponization`「证据确定性要挟 / perfect-evidence demand」（r210，真升级类型 1：新判别维度）
