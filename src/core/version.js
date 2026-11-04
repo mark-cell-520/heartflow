@@ -133,7 +133,18 @@ const path = require('path');
 //                 残留。新模块 src/core/mutation-guard.js，刻意不进
 //                 _modules 以保 161/1314 基线，MCP 只读工具
 //                 heartflow_mutation_guard 三处接线）。
-let VERSION = '6.8.95';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.96] 第 741 轮同步：6.8.95 → 6.8.96（数字记账唯一测量实现：
+//                 measure-claimed-numbers.js 在 Windows 上把判别维度数 /
+//                 路由 / 模块全报成 0 —— Windows 绝对路径裸插进 require('…')
+//                  的单引号字面量，反斜杠在子进程解析时被当转义序列吃掉
+//                  → MODULE_NOT_FOUND，三处 catch / `|| 0` 把「测量失败」
+//                  洗成「实测为 0」；而 sync-doc-numbers.js 的同一表达式
+//                  实测 160/1314/161。同一份测量被复制三份，两份恰好各有
+//                  一道保险所以是对的。新模块 src/core/measure-core.js 合成
+//                  一处，_lit() 双保险拼路径 + 「量不到就拒绝出数」；
+//                  MCP 只读工具 heartflow_measure_numbers 三处接线，
+//                  刻意不进 _modules 以保 161/1314 基线）。
+let VERSION = '6.8.96';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

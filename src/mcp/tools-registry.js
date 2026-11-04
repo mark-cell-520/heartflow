@@ -427,6 +427,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_measure_numbers',
+    description: "数字记账测量器（MeasureCore，只读）：把「引擎到底有多少维度/模块/路由/工具」变成一次可复现的调用，并回答「文档宣称的与引擎实测的对不对得上」。背景（r741 事故实测）：AGENTS.md 设计原则 #5 Honest numbers 靠 scripts/measure-claimed-numbers.js 与 scripts/sync-doc-numbers.js 两个脚本守着，而 r741 轮初实测前者把三个头条数字全报成 0（判别维度数 0 / 路由 0 / 模块 0），后者同一表达式实测 160 / 1314 / 161 —— 根因是它把 Windows 绝对路径直接插进 require('…') 的单引号字面量，反斜杠在子进程解析时被当转义序列吃掉（\\U→U、\\s→s）→ MODULE_NOT_FOUND，而三处 catch 把「测量失败」洗成「实测为 0」。本工具是那份测量的唯一实现（src/core/measure-core.js），三个调用方（两个记账脚本 + doc-numbers 门禁测试）共用它，且量不到就拒绝出数而不是洗成 0。action: runtime（默认）起子进程 start() 引擎实测 tools/routes/modules/dims 四数，任一量不到即 ok=false 并附 stderr 尾部；static 只读源码与缓存（tier 三层计数 / 静态工具数 / HANDLERS 键数 / 测试文件数 / src 文件数 / data 缓存），毫秒级不起子进程；all 全量实测（含 tier 合计与剩余只计分维度数、测试数、能力守护项数，并校验 dims ≥ tiersSum 这条不变量）；check 对照 AGENTS.md / README.md / SKILL.md 三份文档的横幅宣称与实测，逐项报 drift（宣称值 / 实测值 / 文件）。零 LLM 依赖，除 runtime/all/check 会起一个子进程外无任何副作用。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"runtime（默认）/ static / all / check"},"label":{"type":"string","description":"调用方标注（如 sync-doc-numbers / mcp），仅用于日志与拒绝理由回溯"}},"required":[]}
+  },
+
+  {
     name: 'heartflow_check_outbound',
     description: "出站保护闸门：在内容离开系统之前做最后一道判别——判断即将发给用户/外部的文本是否含未声明的不确定、夸大宣称、或需要附加限定的表述。返回 gate 动作（pass/verify/rewrite）与命中维度。这是 SKILL.md「Outbound protection」检查点的主工具，纯只读、无副作用。",
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检查的出站文本"},"context":{"type":"string","description":"可选上下文（如对话历史、任务背景），用于判断宣称是否有支撑"},"classification":{"type":"string","description":"强制指定级别（可选），不给则由引擎自动判定"}},"required":["text"]}

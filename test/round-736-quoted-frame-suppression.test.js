@@ -323,8 +323,9 @@ t('① 工具定义 + ② handler 映射 + ③ handler 函数', () => {
   // 工具总数滚动快照：r735 记 186，r736 新增本工具后为 187，
   // r737 新增 heartflow_delimiter_channel 后为 188，
   // r738 新增 heartflow_post_hoc_legs 后为 189，
-  // r740 新增 heartflow_mutation_guard 后为 190
-  assert.strictEqual(TOOLS.length, 190, `工具总数应 190，实为 ${TOOLS.length}`);
+  // r740 新增 heartflow_mutation_guard 后为 190，
+  // r741 新增 heartflow_measure_numbers 后为 191
+  assert.strictEqual(TOOLS.length, 191, `工具总数应 191，实为 ${TOOLS.length}`);
   const names = TOOLS.map(x => x.name);
   assert.strictEqual(names.filter((n, i) => names.indexOf(n) !== i).length, 0, '工具名重复');
 });

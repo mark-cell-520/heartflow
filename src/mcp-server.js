@@ -3435,6 +3435,115 @@ function handleMutationGuard(args) {
   };
 }
 
+// [r741] measureCore 回退单例：MCP 进程未启动引擎时仍要能回答
+// 「引擎到底多少维度/模块/路由/工具」，否则 --check 形态下工具恒不可用。
+let _mcFallback = null;
+function _measureCoreFallback() {
+  if (_mcFallback) return _mcFallback;
+  try {
+    const { MeasureCore } = require('./core/measure-core.js');
+    _mcFallback = new MeasureCore({ rootPath: HF_DIR, silent: true });
+  } catch (_) { _mcFallback = null; }
+  return _mcFallback;
+}
+
+/**
+ * [r741] heartflow_measure_numbers —— 数字记账测量器（只读）。
+ * r741 事故的机器可判定制：measure-claimed-numbers.js 在 Windows 上把
+ * dims/routes/modules 全报成 0（反斜杠被子进程解析吃掉 → MODULE_NOT_FOUND
+ * → catch 洗成 0），而 sync-doc-numbers.js 的同一表达式实测 160/1314/161。
+ * 本工具让那份测量只有一个实现、且量不到就拒绝出数，见 tools-registry 长描述。
+ */
+function handleMeasureNumbers(args) {
+  const action = (args && args.action) || 'runtime';
+  const label = (args && args.label) || 'mcp';
+  const mc = (heartflow && heartflow.measureCore) || _measureCoreFallback();
+  if (!mc) return { error: 'measureCore 不可用（引擎未启动且回退单例创建失败）', action, label, timestamp: Date.now() };
+
+  if (action === 'static') {
+    const st = mc.status();
+    return {
+      action: 'static',
+      ok: true,
+      label,
+      ...st,
+      advice: 'static/cached 都是读源码与缓存，毫秒级；runtime 四数要起子进程 start() 引擎',
+      timestamp: Date.now(),
+    };
+  }
+
+  if (action === 'runtime') {
+    const rt = mc.measureRuntime();
+    return {
+      action: 'runtime',
+      ok: rt.ok,
+      reason: rt.ok ? null : rt.reason,
+      stderrTail: rt.ok ? undefined : rt.stderrTail,
+      tools: rt.tools,
+      routes: rt.routes,
+      modules: rt.modules,
+      dims: rt.dims,
+      elapsedMs: rt.elapsedMs,
+      advice: rt.ok
+        ? '实测四数可信（' + rt.elapsedMs + 'ms）'
+        : '拒绝出数——不要拿 0 或任何默认值冒充实测值（宁可不记也不记错）',
+      timestamp: Date.now(),
+    };
+  }
+
+  if (action === 'check') {
+    const r = mc.checkDocs();
+    return {
+      action: 'check',
+      ok: r.ok,
+      reason: r.reason || null,
+      claims: r.claims,
+      actual: r.actual,
+      drift: r.drift,
+      driftCount: r.drift.length,
+      advice: r.ok
+        ? '三份文档横幅宣称与引擎实测逐项一致'
+        : (r.drift.length
+          ? '文档宣称与实测不符，先跑 node scripts/sync-doc-numbers.js 或人工核对'
+          : '拒绝对照（实测不可信），先解决 reason'),
+      timestamp: Date.now(),
+    };
+  }
+
+  if (action === 'all') {
+    // 全量实测，带两道闸（runtime 量不到 / dims < tiersSum）
+    try {
+      const m = mc.measureAll();
+      return {
+        action: 'all',
+        ok: true,
+        label,
+        measured: m,
+        advice: m.consistent
+          ? 'dims(' + m.dims + ') ≥ tiersSum(' + m.tiersSum + ')，dimensions 键与 tier 集合自洽'
+          : m.consistencyNote,
+        timestamp: Date.now(),
+      };
+    } catch (e) {
+      return {
+        action: 'all',
+        ok: false,
+        reason: e.message,
+        advice: '拒绝出数——宁可不记也不记错，不要拿 0 冒充实测值',
+        timestamp: Date.now(),
+      };
+    }
+  }
+
+  return {
+    action,
+    ok: false,
+    reason: '未知 action: ' + action + '（可用 runtime / static / all / check）',
+    advice: '换一个 action 再试',
+    timestamp: Date.now(),
+  };
+}
+
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
@@ -4353,6 +4462,9 @@ const HANDLERS = {
   // [r740] 回归突变守卫（只读：status / audit / guard）。r739 事故的制：
   // 记账脚本不看 run-all.js 的单例锁，在删条突变窗口内量到 157/1264。
   heartflow_mutation_guard: handleMutationGuard,
+  // [r741] 数字记账测量器（三处同步第 3 处：
+  // tools-registry 工具定义 + 本映射 + handleMeasureNumbers）
+  heartflow_measure_numbers: handleMeasureNumbers,
 
   heartflow_strategic_restraint: (args) => {
     try {

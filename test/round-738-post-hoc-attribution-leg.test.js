@@ -280,7 +280,7 @@ t('MCP-工具定义存在', () => {
   const tools = Array.isArray(reg) ? reg : (reg.TOOLS || reg.tools || []);
   const names = tools.map((x) => x.name);
   assert.ok(names.indexOf('heartflow_post_hoc_legs') !== -1, '工具定义缺失');
-  assert.strictEqual(tools.length, 190, '工具总数应为 190，实为 ' + tools.length);
+  assert.strictEqual(tools.length, 191, '工具总数应为 191，实为 ' + tools.length);
   const dup = names.filter((n, i) => names.indexOf(n) !== i);
   assert.strictEqual(dup.length, 0, '工具名重复: ' + dup.join(','));
 });

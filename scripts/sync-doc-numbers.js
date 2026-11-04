@@ -45,7 +45,17 @@ const cp = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 
-/** 运行时实测全部数字（唯一真相，量不到就拒绝记账） */
+/**
+ * 运行时实测全部数字（唯一真相，量不到就拒绝记账）。
+ *
+ * [r741] 原实现在这里自己起子进程拼 `-e` 程序（本文件 63-80 行），
+ * 与 measure-claimed-numbers.js / doc-numbers-accuracy.test.js 三份复制。
+ * r741 轮初实测那份复制在 Windows 上把三个头条数字全报成 0（反斜杠被
+ * 子进程解析时吃掉 → MODULE_NOT_FOUND → catch 洗成 0），而本文件的同一
+ * 表达式实测 160/1314/161 —— 同一个 discriminate()，两个入口两个结果。
+ * 现在统一走 src/core/measure-core.js：一处实现、一处拼路径、一处拒绝策略。
+ * 本函数只做键名映射，不再自己量任何东西。
+ */
 function measure() {
   // [v6.8.95 第 740 轮] 突变期互斥闸：全量回归在飞时一律拒绝记账。
   // r739 实测事故链：回归串行车道里 reward-hacking-* 一族正在原地删条
@@ -60,91 +70,17 @@ function measure() {
     .guardMeasurement('sync-doc-numbers');
   if (!gate.ok) throw new Error(gate.reason);
 
-  // 一次子进程同时量 工具/路由/模块/维度/tier —— 共享 4 秒的 start() 启动成本
-  const r = cp.spawnSync('node', ['-e', [
-    "const {HeartFlow}=require(" + JSON.stringify(path.join(ROOT, 'src/core/heartflow.js')) + ");",
-    "const hf=new HeartFlow({dataDir:" + JSON.stringify(path.join(ROOT, 'data')) + ",silent:true});",
-    "hf.start();",
-    "setTimeout(()=>{",
-    "  const reg=require(" + JSON.stringify(path.join(ROOT, 'src/mcp/tools-registry.js')) + ");",
-    "  const {discriminate}=require(" + JSON.stringify(path.join(ROOT, 'src/index.js')) + ");",
-    "  const dk=Object.keys(discriminate('neutral baseline text').dimensions||{});",
-    "  console.log(JSON.stringify({",
-    "    tools:new Set(reg.TOOLS.map(x=>x.name)).size,",
-    "    routes:HeartFlow.ALLOWED_ROUTES.size,",
-    "    modules:Object.keys(hf._modules||{}).length,",
-    "    dims:dk.length,",
-    "  }));",
-    "  process.exit(0)},",
-    "4000);",
-  ].join('\n')], { encoding: 'utf8', timeout: 120000 });
-  let d = null;
-  for (const line of (r.stdout || '').split('\n')) {
-    const i = line.indexOf('{"tools":');
-    if (i >= 0) { try { d = JSON.parse(line.slice(i)); } catch (_) { /* 继续找下一行 */ } }
-  }
-  if (!d || !d.tools || !d.routes || !d.modules || !d.dims) {
-    throw new Error('ALLOWED_ROUTES / TOOLS / _modules / dimensions 未返回，拒绝记账——宁可不改也不猜');
-  }
+  // [r741] 共享测量实现（含 runtime 四数 + tier 三层 + 测试/能力缓存）。
+  // measureAll 自己带两道闸：量不到抛错、dims < tiersSum 抛错。
+  const { MeasureCore } = require(path.join(ROOT, 'src/core/measure-core.js'));
+  const m = new MeasureCore({ rootPath: ROOT, silent: true }).measureAll();
 
-  // tier 计数（BLOCK/REWRITE/VERIFY 集合大小，静态源码可判定）
-  const idx = fs.readFileSync(path.join(ROOT, 'src/index.js'), 'utf8');
-  const cnt = label => {
-    const m = idx.match(new RegExp(`const ${label} = new Set\\(\\[([\\s\\S]*?)\\]\\)`));
-    if (!m) return 0;
-    return m[1].match(/['"][a-z_]+['"]/g)?.length || 0;
-  };
-  // 一次算清三层，供 return / tiersSum / tiersRest 共用（避免同一计数被
-  // 三个常量各写一遍、改一处漏两处）
-  const tierBlock = cnt('BLOCK_DIMS');
-  const tierRewrite = cnt('REWRITE_DIMS');
-  const tierVerify = cnt('VERIFY_DIMS');
-
-  // 测试数：读 run-all.js 每次跑完写下的 data/test-count.json 实测缓存
-  // [r408 修正] `null` = 未测量（缓存不存在/无 passed），`0` = 合法测量值。
-  // 此前两者混同为 falsy，加上下方防呆也用 falsy 判断，导致「失败数 = 0」
-  // 这种最常见的真实值永远记不上账 —— r407 引入后实测规格表停在历史的
-  // "2 failing"，doc-numbers 从 21/21 掉到 18/21，每跑一次 run-all 就红。
-  let tests = null, testsFailed = null;
-  try {
-    const cf = path.join(ROOT, 'data/test-count.json');
-    if (fs.existsSync(cf)) {
-      const j = JSON.parse(fs.readFileSync(cf, 'utf8'));
-      // passed 为 0/缺失说明 run-all 没真正跑过，两个数字都算未测量
-      if (j.passed) {
-        tests = j.passed;
-        testsFailed = Number.isFinite(j.failed) ? j.failed : 0;
-      }
-    }
-  } catch (_) { /* 无缓存就是 null，调用方按「未测量」跳过记账 */ }
-
-  // 能力守护检查项数：读 data/capability-check-count.json（由 guard-abilities.js
-  // 自己写）。本脚本不跑 guard-abilities —— 实测 105s 且会超时，不能进记账链路。
-  // [r408] 同样区分 null（未测量）与 0：缓存不存在 / checks 为 0（空壳）都算未测量，
-  // 缓存存在且 checks>0 时 passed 即使是 0 也是合法测量值。
-  let capabilityChecks = null, capabilityPassed = null;
-  try {
-    const cf = path.join(ROOT, 'data', 'capability-check-count.json');
-    if (fs.existsSync(cf)) {
-      const j = JSON.parse(fs.readFileSync(cf, 'utf8'));
-      if (j.checks) { capabilityChecks = j.checks; capabilityPassed = j.passed; }
-    }
-  } catch (_) { /* 无缓存则该目标不记账 */ }
-
-  const stamp = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
-
-  // [r557 补齐] tier 合计与「计分但不强制 action」的剩余维度数。
-  // AGENTS.md 的说明句写「三层合计 X；剩下 Y 个只计分」——这两个数字
-  // 此前不在 TARGETS 里（-check 与 doc-numbers 都不查），加到 TARGETS 后
-  // 必须由这里供给，否则 measure() 不返回 → 按「未测量」跳过记账。
-  // 合计 = 三层集合大小之和；剩余 = 总维度数 - 合计。
-  const tiersSum = tierBlock + tierRewrite + tierVerify;
-  const tiersRest = d.dims - tiersSum;
-
-  return { tools: d.tools, routes: d.routes, modules: d.modules, dims: d.dims,
-    block: tierBlock, rewrite: tierRewrite, verify: tierVerify,
-    tiersSum, tiersRest,
-    tests, testsFailed, capabilityChecks, capabilityPassed, stamp };
+  return { tools: m.tools, routes: m.routes, modules: m.modules, dims: m.dims,
+    block: m.block, rewrite: m.rewrite, verify: m.verify,
+    tiersSum: m.tiersSum, tiersRest: m.tiersRest,
+    tests: m.testCases, testsFailed: m.testCasesFailed,
+    capabilityChecks: m.capabilityChecks, capabilityPassed: m.capabilityPassed,
+    stamp: m.version };
 }
 
 /**

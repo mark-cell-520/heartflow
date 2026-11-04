@@ -1,4 +1,227 @@
+# 第 741 轮报告（v6.8.96 — 数字记账唯一测量实现：AGENTS.md 第 18 行点名的那把尺子，在 Windows 上把判别维度数 / 路由 / 模块全报成 0）
+
+## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
+
+两个 cron 仍为空数组（`hermes/cron/jobs.json`），自主循环停着，r741 继续由主会话驱动。
+**选题判定由我下，不是 decision 本体打分。**
+
+选题直接取自 r740 交接簿候选池①——那条被标注「**强烈建议 r741 直接做这条**」的项：
+「`measure-claimed-numbers.js` 的 dimCount 实测为 0：它的子进程口径
+`discriminate('neutral baseline text').dimensions` 返回 0 个键，而 `sync-doc-numbers.js`
+的同一表达式实测 160。同一表达式两个入口两个结果，必有一个是错的——doc-numbers 的
+维度断言依赖它，属高危口径分裂。」
+
+轮初先复测做实，不猜——**交接簿说的比实际更严重：不止维度一个数是 0，三个头条数字全是 0。**
+
+## 二、根因 / 缺口分析（带证据）
+
+### 2.1 症状：同一表达式，两个入口，三个 0 vs 三个真值
+
+```
+$ node scripts/measure-claimed-numbers.js          ← 旧实现
+判别维度数（dimensions 键实测）: 0
+ALLOWED_ROUTES 路由数        : 0
+_modules 模块数              : 0
+
+$ node scripts/sync-doc-numbers.js                 ← 另一份实现
+实测：MCP 工具 190 个 / 路由 1314 条 / 模块 161 个 / 维度 160 个
+```
+
+而 `test/doc-numbers-accuracy.test.js`（第三份实现）是 22/22 绿的。AGENTS.md 第 18 行
+原文：「Numbers below were measured by `scripts/measure-claimed-numbers.js`」——
+**对外宣称数字的唯一真相来源，自己报 0。**
+
+### 2.2 直接复现子进程，根因是一行
+
+把旧脚本第 33-39 行的子进程原样抠出来跑，stderr 第一行就是答案：
+
+```
+Error: Cannot find module 'C:UsersUSER782663AppDataLocalhermesskillsaimark-heartflow-skillrcindex.js'
+```
+
+旧写法：
+
+```js
+const r = cp.spawnSync('node', ['-e', `
+  const {discriminate}=require('${path.join(ROOT, 'src/index.js')}');   // ← 病在这里
+```
+
+`path.join` 在 Windows 上给出 `C:\Users\…\src\index.js`。这个字符串被**原样插进** `-e`
+程序的 `require('…')` 单引号字面量；子进程 `node -e` **解析**那份源码时，单引号串里的
+`\U`→`U`、`\s`→`s`、`\i`→`i`、`\n`→换行 —— **路径被嚼碎，MODULE_NOT_FOUND**。
+`routes` / `modules` 两处同病（同样是 `require('${path.join(…)}')`）。
+
+### 2.3 为什么三处复制里两处对、一处错
+
+同一份测量逻辑被复制了三份，拼路径的写法各不相同：
+
+| 位置 | 拼路径写法 | 结果 |
+|---|---|---|
+| `scripts/measure-claimed-numbers.js` | 裸插值 `'${path.join(...)}'` | **错**（0/0/0） |
+| `scripts/sync-doc-numbers.js` | `JSON.stringify(path.join(...))` | 对 |
+| `test/doc-numbers-accuracy.test.js` | `JSON.stringify(...).replace(/\\/g,'/')` | 对 |
+
+另两份不是「设计对了」，是**恰好各写了一道保险**。这不是三个 bug，是**一个 bug 被复制了三份**。
+
+### 2.4 第二层病：测量失败被洗成「实测为 0」
+
+三处 `catch (_) { dimCount = 0 }` / `|| 0` 让「量不到」与「真的是 0」在输出里完全同形。
+0 是合法测量值的形状，于是没有任何一道守卫报警——`doc-numbers-accuracy` 拿的是
+**另一份实现的 160**，所以它绿着；而 AGENTS.md 的 160 恰好也是对的，于是连文档都没漂移。
+**尺子坏了但没人受伤，只是因为还有第二把尺子恰好是好的。**
+
+## 三、落地项
+
+### ① 新模块 `src/core/measure-core.js`（MeasureCore，非注释代码 ~300 行）
+
+唯一测量实现，12 个公开方法：
+
+| 方法 | 作用 |
+|---|---|
+| `measureRuntime()` | 一次子进程实测 tools/routes/modules/dims；**任一 ≤0 → `ok:false` + stderr 尾部，一个数字字段都不返回** |
+| `measureAll()` | 汇总 runtime + tier 三层 + 测试/能力缓存；两道闸：runtime 量不到抛错、`dims < tiersSum` 抛错 |
+| `checkDocs(opts)` | 抽三份文档横幅宣称，与实测逐项比对，`drift[]` 每项带 file/key/claimed/actual；`opts.actual` 可复用已有实测省一次子进程 |
+| `countTiers()` / `countToolsStatic()` / `countHandlers()` / `countTestFiles()` / `readTestCount()` / `readCapabilityCount()` / `countSrcFiles()` / `readVersion()` | 静态口径与缓存口径 |
+| `status()` | MCP 轻量汇总，不起子进程 |
+
+两处 r741 之前谁都没有的闸：
+
+- **`_lit(p)` 双保险**：`JSON.stringify`（`\`→`\\`）+ 分隔符归一化成 `/`（Windows 两种都认）。
+- **拒绝零值**：量不到必须看起来像量不到。`B5/B6/B7` 三条断言钉死：坏 rootPath 喂进去
+  返回 `ok:false`，且 `tools/routes/modules/dims` **四个键一个都不在返回对象里**。
+
+**刻意不进 `_modules`**（同 mutation-guard）：一进就撬 161→162 与 1314 基线。
+
+### ② 三个调用方全部改嫁（一处实现）
+
+- `scripts/measure-claimed-numbers.js`：`measure()` 整段删除，改调 `mc.measureAll()`；
+  另加 `--json`（机器读全量）与 `--check`（只做文档对照，漂移 exit 1）两个形态。
+- `scripts/sync-doc-numbers.js` 的 `measure()`：63-80 行的 `spawnSync('node',['-e',…])`
+  整段删除，改调 `mc.measureAll()`，只做键名映射。**它原来是对的，也一起改嫁**——
+  留一份「对的复制品」正是这个 bug 能活下来的原因。
+- `test/doc-numbers-accuracy.test.js` 的 `measure()`：同样改嫁，并**刻意改掉一处行为**：
+  旧口径 `dimensions: dimsRuntime || checkFns.size` 在 runtime 量不到时悄悄退回静态
+  `function check*` 计数（v6.7.126 第 286 轮修掉的旧口径，实测少 7 个外置模块维度）。
+  现在 runtime 量不到就**抛错让门禁红**——守卫拿不到尺子时必须报警，不许换一把已知偏小的尺子。
+
+### ③ `src/mcp-server.js` + `src/mcp/tools-registry.js`：`heartflow_measure_numbers`（三处）
+
+工具定义（长描述，含 r741 事故链）+ `HANDLERS` 映射 + `handleMeasureNumbers()`。
+四个 action：`runtime`（默认，起子进程实测四数）、`static`（只读源码与缓存，毫秒级）、
+`all`（全量 + 两道一致性闸）、`check`（文档对照）。**只读、不进 `needsWrite`**，
+未启动引擎时退化到进程内单例 `_measureCoreFallback()`。未知 action 显式返回
+`ok:false`（原来 `all` 是兜底分支，会把打错的 action 静静吞掉）。
+
+## 四、验收数字（全部实测）
+
+| 项 | 旧 | 新 | 命令 |
+|---|---|---|---|
+| 判别维度数 | **0** | **160** | `node scripts/measure-claimed-numbers.js` |
+| ALLOWED_ROUTES | **0** | **1314** | 同上 |
+| _modules | **0** | **161** | 同上 |
+| 静态工具数 vs runtime | 口径分裂（两入口两结果） | **191 = 191** | `test/round-741-measure-core.test.js` C1 |
+| `doc-numbers-accuracy` 耗时 | **10.681s**（3 次子进程：1 快 + 2×4s） | **5.647s**（1 次子进程，−47%） | `time node test/doc-numbers-accuracy.test.js` |
+| `doc-numbers-accuracy` 结果 | 22/22 | **22/22** | 同上 |
+| 坏 rootPath | 洗成 0 | `ok:false`，**0 个数字字段** | 本轮测试 B5/B6/B7 |
+| 本轮测试 | — | **45 通过 / 0 失败** | `node test/round-741-measure-core.test.js` |
+| `bin/verify.js` | 16/16 | **16/16** | — |
+| `bidirectional-guard` | 召回 52/52、误拦 306/326 | **召回 52/52、误拦 306/326（逐项一致，判别逻辑 `src/index.js` 零改动）** | — |
+| `guard-abilities` | 20/20（dimensions 160 / summary 123） | **20/20（dimensions 160 / summary 123）** | — |
+| `doc-numbers-accuracy` | 22/22 | **22/22** | — |
+| `security-audit` | 15/16（S2 等本轮 commit） | 15/16，唯一失败 S2「git log/tag 未命中 6.8.96」**本轮提交后转绿** | — |
+| 引擎基线 | modules 161 / routes 1314 | **逐字不变** | 本轮测试 H1/H2 |
+| MCP 工具数 | 190 | **191** | — |
+| **全量回归** | 19890 过 / 29 败 / 19919 个（677.9s） | **19972 过 / 25 败 / 19997 个（666.4s，并发 4，624 个测试文件）** | `node test/run-all.js` |
+| 本轮测试 | — | **45 通过 / 0 失败** | `node test/round-741-measure-core.test.js` |
+
+**G 段承重证明**（证明新实现承重、不是装饰）：照抄 r740 及之前 `measure-claimed-numbers.js`
+的原样写法起子进程，实测 `exit=1` + stderr 点名 `Cannot find module 'C:Users…'`（洞复现）；
+**同一路径换 `_lit()` 立刻量到 `dims=160`** —— 差别只在拼路径这一件事上。
+
+**E 段文档对照**：temp root 放一份假 AGENTS.md（宣称 999/888/777/666），
+`checkDocs({actual})` 实测报出 4 条 drift，每项都带 `claimed` 与 `actual`；
+真仓三份文档实测零漂移。
+
+## 五、已知未修（含为什么不修）
+
+- **全量回归的失败清单与 r740 基线是同一批文件，失败数 29 → 25（不增反降）**，
+  逐项定位如下（全部为存量，零条本轮新引入）：
+  - **6 个 MCP 类常驻失败**（`mcp-auth-tier` Command failed / `mcp-guest-permission`
+    文件自报失败×2 / `mcp-server` 未输出 / `mcp-smoke` 未输出 /
+    `round-572-associative-handler` 未输出）—— 根因是 8099 端口被常驻 MCP 服务占用，
+    与 r739/r740 同因。
+  - **3 个文件自报失败**（ClassicsRules `searchClassicsBatch` /
+    AgentBoundaryGuard `unknown dot-dir` / mcp-guest-permission 端到端）。
+  - **4 个 Command failed**（round-502 / round-506 / round-572-associative-wiring /
+    round-630 落进未输出桶）。
+  - **1 个注册 0 个用例**（round-410）+ **round-498 从 Command failed 漂移进未输出桶**
+    （r740 已标注的同一处漂移）。
+  - **唯一需要说明的一处：`round-740-mutation-guard.test.js` 在全量回归里 45/46，
+    F2「无回归在飞（轮次自检时不该有锁）」失败。这是存量结构性 flake，不是本轮引入**，
+    证据三条：① `git status --porcelain` 对该测试文件、`test/run-all.js`、
+    `src/core/mutation-guard.js` **三个文件全部为空**（我一个字都没改）；
+    ② 写探针精确复现 run-all.js 的场景——父进程持有单例锁（活 PID）、子进程跑该测试
+    ——F2 **必现失败**；③ 单独跑同一测试 46/46 全绿。根因：`run-all.js` 的
+    `acquireSingleton()` 全程持有 `data/.run-all.lock`（写自己的 PID），
+    而该测试的 F2 断言「轮次自检时不该有锁」在**作为 run-all 子进程跑时必然为假**；
+    `isRegressionInFlight()` 的「锁里是自己不算在飞」只覆盖测试进程自己写锁的情况，
+    覆盖不到「锁里是父 runner」。修法（留给 r742）：F2 应容忍「锁里的 PID 是自己的
+    祖先链 / 或自己在 run-all 子进程里」，判据用 `process.env` 或父进程链，不是删断言。
+  - **总数 19919 → 19997（+78）的口径**：+45 是本轮新测试；
+    +33 来自 `round-608` 这个存量 flaky（它自报 33 条用例，r740 那遍回归它失败所以
+    总数少 33、失败数多 1，这一遍它过了）——r740 坑⑤ 记的正是这个。
+- **HANDLERS 键数 193 > 静态工具数 191**：`extended-tools.js` 一族有 handler 映射但
+  工具定义不在 `TOOLS` 数组里（或反之），差 2 个。本轮只在 C3 立了
+  「每个工具都有 handler」的断言方向，没逐项对齐——那是另一轮的题，且动它会打红
+  一堆工具总数快照。
+- **`scripts/round-208/tmp-old-di.js`** 这个 tmp-* 探针从 r208 留到现在，round-guard
+  每轮提示一次。它已入库（`git ls-files` 可查），不是残留，删它要走单独的清理轮。
+- **r740 候选池②~⑧ 全部沿用**：② 变更测试统一走 mutation-guard-recovery 的 arm/disarm
+  侧车（keptNew 只报不删）；③ round-630 的 RESULT 无 pass/fail 键；④ 3 个零输出文件
+  （mcp-server/mcp-smoke/round-572-associative-handler）；⑤ round-498 归类；⑥ r738 候选池
+  ②~⑨（撒点多字母中段、通道 B OBJECT_PATTERN 收窄、loaded_question 4/8 漏判、evidence
+  提级 VERIFY_DIMS、三个 extended 维度补句式族、引述内含红线通道、post_hoc ZH 侧第三腿）；
+  ⑦ `api-surface-consistency.test.js` 的 2 个存量失败（checkEvidence 幽灵方法 +
+  quotationFrame/delimiterChannel/postHocLegs 三个导出无文档提及——**本轮新增的
+  measureCore 又会多一个这样的导出**，属「AGENTS.md 约定 3 只要求接 MCP 不要求接文档」
+  的口径洞，建议下轮一次性补齐）；⑧ `src/index.js` 14893 行（阈值 14000）。
+- **npm published 仍 6.7.124、30+ commits 未 push**：人工门禁，不自行推送。
+
+## 六、踩坑
+
+1. **「同一表达式两个结果」的复现方法**：不要把两个脚本的输出对比完就下结论，要把
+   子进程**原样抠出来单独跑**。本例中只看输出会以为是 `discriminate` 口径问题，
+   抠出来看到 `Cannot find module 'C:Users…'` 才知道是拼路径——**根因在脚本，不在表达式**。
+2. **反斜杠是在子进程「解析」时被吃掉的，不是插值时**。父进程里
+   `` `${path.join(...)}` `` 插出来的值带着完整反斜杠（模板字符串不会二次处理插值），
+   是那份 `-e` 源码被 `node` 解析时，单引号串字面量把 `\U`/`\s`/`\n` 当转义序列。
+   所以 `console.log` 父进程的路径是**看不出问题**的，必须看子进程的 stderr。
+3. **`JSON.stringify` 就够，但别只写一半**：`JSON.stringify(path)` 出来的
+   `"C:\\Users\\…"` 在 Windows 上能 require，但 `_lit()` 仍额外把分隔符归一化成 `/`——
+   因为 `.replace(/\\/g,'/')` 那第三份实现证明正斜杠在这台机器上也通，两道保险
+   总比一道好，且正斜杠形式在报错信息里更可读。
+4. **`checkDocs()` 一开始设计成必须自己实测**，导致 temp root 造假测试跑不起来
+   （temp root 里没有能 `start()` 的引擎，runtime 量不到就整体拒绝对照）。
+   加 `opts.actual` 参数后，「抽取宣称 → 逐项比对」这段逻辑才被真正测到，
+   顺带省掉调用方手里已有实测时的第二次 5 秒子进程。
+5. **`action === 'all'` 原来是兜底分支**（`if…if…if` 之后直接跑），打错的 action 会被
+   静默当成 `all`。改成显式分支 + 未知 action 返回 `ok:false`，F8 断言才钉得住四个 action。
+6. **加 MCP 工具照例打红三处工具总数滚动快照**（round-735/736/738 的
+   `assert.strictEqual(tools.length, 190)`）——仓库既定约定不是回归，改 190→191 即可
+   （r740 坑④ 的预判这次直接兑现）。
+7. **全量回归跑完会改 `data/test-count.json`，文档数字必须再记一次账**。本轮回归后
+   缓存从 19890/29 变 19972/25，README/SKILL 的「N passing / M failing」立刻与缓存
+   不一致，`doc-numbers-accuracy` 的 `assert.strictEqual(testsClaimed, M.tests)` 直接红。
+   **回归之后再跑一次 `node scripts/sync-doc-numbers.js`**，否则提交进去的是旧测试数。
+8. **`round-740-mutation-guard.test.js` 的 F2 是存量结构性 flake**（见五）。定位它花了
+   一轮回归 + 一个探针：先单独复跑（46/46 绿，差点误判成「回归环境噪声」），再用
+   `git status --porcelain` 证明三个相关文件我都没改，最后写探针精确复现
+   「父进程持锁 + 子进程跑测试」才坐实是**结构必现**而非偶发。
+   **教训：测试在自己的 runner 里失败，第一嫌疑是「这个测试假设自己不在 runner 里」。**
+
 # 第 740 轮报告（v6.8.95 — 回归突变期与数字记账互斥 + 突变残留完整收底：r739 把模块数 161 记成 157、路由 1314 记成 1264，根因不是记账脚本会删源码，而是测量与删条突变窗口没有互斥）
+
+
 
 ## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
 

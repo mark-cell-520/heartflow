@@ -581,6 +581,9 @@ const _DaoDecision = _lazy('daoDecision', () => require('./dao-decision.js'));
 
 // [r740] 回归突变守卫：记账前问「现在是不是突变期」+ 突变残留收底。
 const _MutationGuard = _lazy('mutationGuard', () => require('./mutation-guard.js'));
+// [r741] MeasureCore —— 数字记账的唯一测量实现（两个记账脚本 + doc-numbers
+// 门禁测试 + MCP heartflow_measure_numbers 共用它）。同样刻意不进 _modules。
+const _MeasureCore = _lazy('measureCore', () => require('./measure-core.js'));
 const _UncertaintyQuantifier = _lazy('uncertaintyQuantifier', () => require('./uncertainty-quantifier.js'));
 const _PriorityGuardian = _lazy('priorityGuardian', () => require('./priority-guardian.js'));
 const _ProgressJudgment = _lazy('progressJudgment', () => require('./progress-judgment.js'));
@@ -919,7 +922,7 @@ const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('
 
 
 
-const BUILD_DATE = '2026-11-04-6.8.95';
+const BUILD_DATE = '2026-11-04-6.8.96';
 
 
 
@@ -4673,6 +4676,18 @@ class HeartFlow {
     try {
       this.mutationGuard = new (_MutationGuard().MutationGuard)({ rootPath: this.rootPath });
     } catch (e) { _boundedPush(this._initErrors, { module: 'mutationGuard', error: e.message, note: 'optional 不阻断主链路' }, MAX_HISTORY_SIZE); }
+
+    // [r741] measureCore 接线（数字记账唯一测量实现）。
+    // r741 轮初实测：measure-claimed-numbers.js 把 Windows 绝对路径直接插进
+    // require('…') 的单引号字面量，反斜杠在子进程解析时被当转义序列吃掉
+    // （\U→U、\s→s）→ MODULE_NOT_FOUND，而三处 catch / `|| 0` 把「测量失败」
+    // 洗成「实测为 0」→ 判别维度数 0 / 路由 0 / 模块 0，而
+    // sync-doc-numbers.js 的同一表达式实测 160 / 1314 / 161。
+    // 本模块把三份复制合成一处（_lit() 用 JSON.stringify + 正斜杠），
+    // 并规定「量不到就拒绝出数，不许洗成 0」。同样不进 _modules。
+    try {
+      this.measureCore = new (_MeasureCore().MeasureCore)({ rootPath: this.rootPath, silent: true });
+    } catch (e) { _boundedPush(this._initErrors, { module: 'measureCore', error: e.message, note: 'optional 不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // [v6.5.1] heartflow 子系统：必须在 _registerModules 之后注册
     // （否则被 engine-lifecycle 用整个 hf 实例覆盖，introspect 不可用）

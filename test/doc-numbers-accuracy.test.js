@@ -41,129 +41,50 @@ function t(name, fn) {
 
 console.log('\n[实测值采集]');
 
-/** 与 scripts/measure-claimed-numbers.js 同一套口径 */
+/**
+ * 与 scripts/measure-claimed-numbers.js / scripts/sync-doc-numbers.js
+ * 同一套口径 —— 而且现在是**同一份实现**（src/core/measure-core.js）。
+ *
+ * [r741] 原来这里第三份复制：自己起子进程、自己拼路径、自己做「量不到就
+ * 降级」的决策。r741 轮初实测那份复制在 Windows 上把三个头条数字全报成 0
+ * （measure-claimed-numbers.js：dims/routes/modules = 0/0/0，根因是
+ * require('C:\Users\…') 里的反斜杠被子进程解析时吃掉 → MODULE_NOT_FOUND →
+ * catch 洗成 0），而本测试因为多写了一个 .replace(/\\/g,'/') 是对的。
+ * 同一个 discriminate() 三个入口、两份结果 —— 守卫自己拿着错的尺子。
+ * 现在三处统一走 MeasureCore，本函数只做键名映射。
+ *
+ * ⚠️ 与旧实现的一处**行为差异是刻意的**：旧口径
+ * `dimensions: dimsRuntime || checkFns.size` 在 runtime 量不到时悄悄退回
+ * 静态 function check* 计数（v6.7.126 第 286 轮修过的旧口径，实测少 7 个
+ * 外置模块维度）。本测试改为 runtime 量不到就**抛错让测试红**——
+ * 守卫拿不到尺子时必须报警，不许换一把已知偏小的尺子继续量。
+ */
 function measure() {
-  const idx = fs.readFileSync(path.join(HF, 'src/index.js'), 'utf8');
-  const reg = fs.readFileSync(path.join(HF, 'src/mcp/tools-registry.js'), 'utf8');
-  const srv = fs.readFileSync(path.join(HF, 'src/mcp-server.js'), 'utf8');
-
-  // [v6.7.126 第 286 轮] 维度数改为**运行时实测**，与
-  // scripts/measure-claimed-numbers.js 同口径（v6.7.111 的修正）。
-  // 旧口径数 index.js 顶层 `function check*` = 50，漏掉判别函数
-  // 定义在外置模块的 7 个真维度（perfect_error / phishing_coercion /
-  // induced_trust / coverup_induction / dangerous_instruction /
-  // reward_hacking / premature_termination —— 定义在
-  // src/premature-termination.js、src/manipulation-tactics.js 等）。
-  // 它们各有 score + guidance，成员身份在 BLOCK_DIMS / VERIFY_DIMS 内，
-  // 是独立维度。用旧口径的测试守着新口径产出的「50」，等于拿错尺子。
-  const dr = cp.spawnSync('node', ['-e', `
-    const {discriminate}=require(${JSON.stringify(path.join(HF, 'src/index.js').replace(/\\/g, '/'))});
-    const d=discriminate('neutral baseline text');
-    const k=Object.keys(d.dimensions||{});
-    console.log(k.length);
-  `], { encoding: 'utf8', timeout: 60000 });
-  const dimsRuntime = parseInt((dr.stdout || '').trim().split('\n')[0], 10) || 0;
+  const { MeasureCore } = require(path.join(HF, 'src/core/measure-core.js'));
+  const mc = new MeasureCore({ rootPath: HF, silent: true });
+  // measureAll 自带两道闸：runtime 四数任一量不到即抛；dims < tiersSum 即抛。
+  const m = mc.measureAll();
 
   // 静态口径仅作参考值保留（用于「哪些维度有专属顶层 check 函数」诊断）
+  const idx = fs.readFileSync(path.join(HF, 'src/index.js'), 'utf8');
   const checkFns = new Set();
-  for (const m of idx.matchAll(/^function (check[A-Z]\w*)\s*\(/gm)) checkFns.add(m[1]);
-
-  const tier = label => {
-    const m = idx.match(new RegExp(`const ${label} = new Set\\(\\[([\\s\\S]*?)\\]\\)`));
-    return m ? (m[1].match(/['"][a-z_]+['"]/g) || []).length : 0;
-  };
-
-  const tools = new Set();
-  for (const m of reg.matchAll(/name:\s*['"](heartflow_[a-z0-9_]+)['"]/g)) tools.add(m[1]);
-  // [AUDIT-FIX 2026-10-11] 并入 EXTENDED_TOOLS（86 个运行时验证过的只读工具）。
-  // 旧逻辑只数 tools-registry.js → 得 68，而真实 tools/list 返回 154，
-  // 守卫于是把正确的文档判成漂移。与 measure-claimed-numbers.js 同源修正。
-  // 注意 extended-tools.js 是 JSON 产物，键形如 "name": "heartflow_x"。
-  try {
-    const extPath = path.join(HF, 'src/mcp/extended-tools.js');
-    if (fs.existsSync(extPath)) {
-      const ext = fs.readFileSync(extPath, 'utf8');
-      for (const m of ext.matchAll(/['"]?name['"]?\s*:\s*['"](heartflow_[a-z0-9_]+)['"]/g)) tools.add(m[1]);
-    }
-  } catch (_) { /* 降级为主表 */ }
-
-  const hStart = srv.indexOf('const HANDLERS');
-  const hb = srv.slice(hStart, srv.indexOf('\n};', hStart));
-  const handlerKeys = new Set();
-  for (const m of hb.matchAll(/^\s{2}(heartflow_[a-z0-9_]+):/gm)) handlerKeys.add(m[1]);
-
-  // 路由数是运行时值（static 只是种子）
-  const r = cp.spawnSync('node', ['-e', `
-    const {HeartFlow}=require(${JSON.stringify(path.join(HF, 'src/core/heartflow.js').replace(/\\/g, '/'))});
-    const hf=new HeartFlow({dataDir:${JSON.stringify(path.join(HF, 'data').replace(/\\/g, '/'))},silent:true});
-    hf.start();
-    setTimeout(()=>{ console.log(HeartFlow.ALLOWED_ROUTES.size); process.exit(0); }, 4000);
-  `], { encoding: 'utf8', timeout: 60000 });
-  const routes = parseInt((r.stdout || '').trim().split('\n').pop(), 10) || 0;
-
-  // 测试数：读 run-all.js 每次跑完写下的 data/test-count.json。
-  // [v6.7.87] 用例数：与 scripts/measure-claimed-numbers.js 保持同一口径。
-  // [r408] 区分 null（未测量）与 0（合法测量值）—— doc-numbers 的规格表
-  // 断言要精确比对 failing 数，而它最常见的真实值就是 0。
-  let testCases = null;
-  let testFailed = null;
-  let testCountAt = null;
-  {
-    const cf = path.join(HF, 'data/test-count.json');
-    try {
-      if (fs.existsSync(cf)) {
-        const d = JSON.parse(fs.readFileSync(cf, 'utf8'));
-        if (d.passed) {
-          testCases = d.passed;
-          testFailed = Number.isFinite(d.failed) ? d.failed : 0;
-          // [r411] 缓存时间戳：供下方时效判定用（过期缓存不当成本轮失败）
-          testCountAt = typeof d.at === 'string' ? d.at : null;
-        }
-      }
-    } catch (_) { /* 无缓存 → null，下方断言按未测量处理 */ }
-  }
-
-  // [r407] 模块数运行时实测（与 sync-doc-numbers.js / measure-claimed-numbers.js
-  // 同口径）。此前模块数只在 README/SKILL 规格表出现且**没有任何断言**——
-  // 从 v6.7.69 的 137 一路腐化到实测 143 无人发现，40+ 个版本号没人记账。
-  const mr = cp.spawnSync('node', ['-e', `
-    const {HeartFlow}=require(${JSON.stringify(path.join(HF, 'src/core/heartflow.js').replace(/\\/g, '/'))});
-    const hf=new HeartFlow({dataDir:${JSON.stringify(path.join(HF, 'data').replace(/\\/g, '/'))},silent:true});
-    hf.start();
-    setTimeout(()=>{ console.log(Object.keys(hf._modules||{}).length); process.exit(0); }, 4000);
-  `], { encoding: 'utf8', timeout: 60000 });
-  const modules = parseInt((mr.stdout || '').trim().split('\n').pop(), 10) || 0;
-
-  // 能力守护检查项数：读 guard-abilities.js 自己落盘的缓存（不跑那 105s 的脚本）
-  // [r408] null（未测量）与 0（合法测量值，checks>0 但全挂）区分
-  let capabilityChecks = null, capabilityPassed = null;
-  {
-    const cf = path.join(HF, 'data/capability-check-count.json');
-    try {
-      if (fs.existsSync(cf)) {
-        const j = JSON.parse(fs.readFileSync(cf, 'utf8'));
-        if (j.checks) { capabilityChecks = j.checks; capabilityPassed = j.passed; }
-      }
-    } catch (_) { /* 无缓存则 capability 断言自己跳过 */ }
-  }
+  for (const x of idx.matchAll(/^function (check[A-Z]\w*)\s*\(/gm)) checkFns.add(x[1]);
 
   return {
-    // [v6.7.126 第 286 轮] 用运行时实测（discriminate dimensions 键）。
-    // 旧值 checkFns.size 漏计 7 个外置模块维度，让三份文档少报。
-    dimensions: dimsRuntime || checkFns.size,
+    dimensions: m.dims,
     staticCheckFns: checkFns.size,
-    block: tier('BLOCK_DIMS'),
-    rewrite: tier('REWRITE_DIMS'),
-    verify: tier('VERIFY_DIMS'),
-    mcpTools: tools.size,
-    handlers: handlerKeys.size,
-    routes,
-    tests: testCases,
-    testFailed,
-    testCountAt,
-    modules,
-    capabilityChecks,
-    capabilityPassed,
+    block: m.block,
+    rewrite: m.rewrite,
+    verify: m.verify,
+    mcpTools: m.tools,
+    handlers: m.handlers,
+    routes: m.routes,
+    tests: m.testCases,
+    testFailed: m.testCasesFailed,
+    testCountAt: m.testCountAt,
+    modules: m.modules,
+    capabilityChecks: m.capabilityChecks,
+    capabilityPassed: m.capabilityPassed,
   };
 }
 
