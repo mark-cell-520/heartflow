@@ -76,6 +76,14 @@ function execCapture(argv, timeout) {
       timeout,
       maxBuffer: 48 * 1024 * 1024,
       windowsHide: true,
+      // [v6.8.97 第 742 轮] 把 runner 自己的 PID 注入每个测试子进程。
+      // 为什么必须由 runner 主动给：MutationGuard.attributeFlight() 要认出
+      // 「锁是我的祖先 runner 的」，process.ppid 只覆盖直接子进程这一层，
+      // 更深的后代（测试自己再 spawn 的进程）只有 env 能一路带过去。
+      // 没有这个标记，round-740 测试的 F2「无外来回归在飞」在全量回归里
+      // 每轮必红一次（r741 实测 45/46；单独跑 46/46 绿）——父 runner 从
+      // acquireSingleton 起就全程持锁，锁必然在，断言却假设它不在。
+      env: Object.assign({}, process.env, { HF_RUN_ALL_PID: String(process.pid) }),
     }, (err, stdout) => {
       resolve({ stdout: (stdout || '').toString(), err: err || null });
     });

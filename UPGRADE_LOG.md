@@ -1,4 +1,216 @@
-# 第 741 轮报告（v6.8.96 — 数字记账唯一测量实现：AGENTS.md 第 18 行点名的那把尺子，在 Windows 上把判别维度数 / 路由 / 模块全报成 0）
+# 第 742 轮报告（v6.8.97 — 回归锁归属归因：r741 交接簿候选池①，round-740 测试的 F2「无回归在飞」作为 run-all.js 子进程每轮必红，根因是它把「没有锁」与「没有外来回归」混成一句）
+
+## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
+
+两个 cron 仍为空数组（`hermes/cron/jobs.json`），自主循环停着，r742 继续由主会话驱动。
+**选题判定由我下，不是 decision 本体打分。**
+
+直接做 r741 交接簿候选池①（那条被标注「【建议直接做】」的项）：
+「`round-740-mutation-guard.test.js` 的 F2『无回归在飞（轮次自检时不该有锁）』在作为
+run-all.js 子进程跑时**必现失败**（存量结构性 flake，r741 已用探针坐实）。根因是
+run-all.js 的 `acquireSingleton()` 全程持有 `data/.run-all.lock`（写自己的 PID），而
+`isRegressionInFlight()` 的『锁里是自己不算在飞』只覆盖测试进程自己写锁，覆盖不到
+『锁里是父 runner』。修法：F2 判据改成『锁里的 PID 在自己的祖先链上就不算在飞』，
+**不是删断言**。」
+
+轮初先复测，不猜——**r741 报告的形态逐字复现**。
+
+## 二、根因 / 缺口分析（带证据）
+
+### 2.1 症状复现：父进程持锁 + 子进程跑该测试
+
+轮初探针（原样照抄 run-all.js 的场景：父写锁，锁里是父自己的活 PID，env 带
+`HF_RUN_ALL_PID`，子进程跑 `node test/round-740-mutation-guard.test.js`）：
+
+```
+[probe] 锁写入 PID = 20232 （父 runner）
+[probe] 子进程 exit = 1
+  ❌ F2 无回归在飞（轮次自检时不该有锁）
+第 740 轮突变守卫测试: 45 通过, 1 失败, 共 46 个
+```
+
+与 r741 全量回归实测的 45/46 逐字一致（单独跑 46/46 全绿）。**不是偶发，是结构必现。**
+
+### 2.2 根因：F2 问错了问题，不是写错了判据
+
+`isRegressionInFlight()` 的判据链是：无锁 → 不在飞；锁里 PID 非法 → 不在飞；
+**锁里 PID 就是自己 → 不算在飞**；锁里 PID 已死 → 不在飞；其余（活 PID）→ 在飞。
+
+问题在第三条：它只覆盖「测试进程自己写锁」。而 `run-all.js` 的 `acquireSingleton()`
+从启动第一行起就 `fs.writeSync(fd, String(process.pid))` 全程持锁，**进程退出才删**。
+于是本测试作为它的子进程跑时：
+
+- 锁文件：**必然存在**
+- 锁里的 PID：**父 runner 的活 PID**
+- 与本测试进程的 PID：**不同**
+
+→ 判据落到最后一条 → `inFlight: true` → F2 红。**F2 假设的前提（"没有锁"）在
+runner 里恒为假。**
+
+但 F2 真正想说的不是「没有锁」。它是**轮次自检**的一部分，想确认的是
+「仓库此刻干净、没有别人的回归在飞，所以我可以信任本轮实测数字」。
+锁握在**自己的祖先 runner** 手上，是这个测试被运行的**前提**，不是污染。
+把这两句混成一句，就是每轮全量回归固定红一条的结构性 flake。
+
+### 2.3 为什么不能靠删断言或放宽 inFlight 解决
+
+两条看起来更省事的路都是错的：
+
+- **删掉 F2**：那 46 个断言里唯一盯着「真仓锁状态」的就是它，删了 r739 之后
+  再没人检查轮次自检时的锁。
+- **把 `isRegressionInFlight()` 改成"祖先持锁不算在飞"**：这会**直接重开 r739 的洞**。
+  祖先 runner 是真的在跑全量回归，此刻 `reward-hacking-*` 一族正在做原地删条突变，
+  源码可能正处在删条态；若记账脚本恰好是它的子孙，`guardMeasurement()` 会放行，
+  于是又把 161 记成 157、1314 记成 1264。**保护语义一个字都不能动。**
+
+所以正确的修法是把 F2 的问句拆开：`inFlight`（有没有别人的回归在飞）保持原样，
+另给一个**归因**：锁里那个活 PID 与「我」是什么关系。
+
+## 三、落地项
+
+### ① `src/core/mutation-guard.js`：第四个能力 `attributeFlight()`
+
+新增非注释代码 ~100 行。公开方法 `attributeFlight()` 把锁里的活 PID 归成四态：
+
+| relation | 含义 | inFlight |
+|---|---|---|
+| `none` | 无锁 / 锁里是死 PID / 锁里无合法 PID | false |
+| `self` | 锁里的 PID 就是自己（自己是 runner） | false |
+| `ancestor` | 锁里的 PID 在自己的祖先链上（自己是 run-all 的子进程） | **true** |
+| `foreign` | 锁里是无关活进程（真·外来回归，或残留锁 PID 被复用） | true |
+
+返回体在 `isRegressionInFlight()` 的字段之外多带 `relation` 与 `ancestors`（祖先 PID 链）。
+**`inFlight` 语义零改动**——`ancestor` 时仍为 true，`guardMeasurement()` 照样拒绝记账，
+拒绝理由仍点名 `r739` / `157` / `1264`。`status()` 改调 `attributeFlight()`，
+于是 `regression` 字段自动带上归因。
+
+祖先链 `_parentPids()` 走两条互补通道：
+
+- `process.ppid`（Node 内建，Linux / Windows 一致）——但只到**直接父进程**；
+- `HF_RUN_ALL_PID` 环境变量（`run-all.js` 注入）——Node 没有「任意 PID 的父 PID」API，
+  而 **env 会随 spawn 传给所有后代**，所以一个标记覆盖任意深度的子孙。
+
+带去重 + `MAX_ANCESTORS = 32` 上限，PID 环不会死循环。新增导出
+`RUNNER_ENV` / `MAX_ANCESTORS`。
+
+### ② `test/run-all.js`：`execCapture` 注入祖先标记
+
+```js
+env: Object.assign({}, process.env, { HF_RUN_ALL_PID: String(process.pid) }),
+```
+
+**必须由 runner 主动给**：测试进程自己算不出"我是不是 run-all 的子进程"，
+而 `process.ppid` 只覆盖直接子进程那一层，更深的后代（测试自己再 spawn 的进程）
+只有 env 能一路带过去。
+
+### ③ `test/round-740-mutation-guard.test.js`：F2 改判据，不删断言
+
+```js
+const att = mg.attributeFlight();
+check('F2 无外来回归在飞（锁只能是自己的祖先 runner，或没有）',
+  att.inFlight === false || att.relation === 'ancestor', …);
+```
+
+另加两条：C3c（锁里是**子孙**活进程 → `foreign`，容忍不适用于反向关系）、
+F2b（**反向钉死**：`relation === 'ancestor'` 时 `guardMeasurement()` 必须仍 `ok === false`；
+非 runner 子进程时放行）。该测试断言数 **46 → 48**。
+
+### ④ `src/mcp-server.js` + `src/mcp/tools-registry.js`：既有工具加 `attribution` action
+
+AGENTS.md 约定 3 要求新公开方法接进 MCP。**不新增工具**（加了就打红 round-735/736/738
+三处工具总数快照 191），而是在既有只读工具 `heartflow_mutation_guard` 上开
+`action: 'attribution'`，`status` action 增 `flightRelation`，`advice` 按四态分别给话。
+工具数仍 **191**，`needsWrite` 未动。
+
+### ⑤ 本轮测试 `test/round-742-mutation-flight-attribution.test.js`（42 断言）
+
+八段：A 归因五态（temp root）/ B 祖先链两条通道 / C 保护语义没被放松 / D run-all 接线 /
+E 真仓复现事故形态 / F 反向对照 / G 引擎与 MCP 接线 / H 承重证明。
+
+## 四、验收数字（全部实测）
+
+| 项 | 旧 | 新 | 命令 |
+|---|---|---|---|
+| 探针：父持锁 + 子进程跑 round-740 测试 | **exit 1**、45/46、❌ F2 | **exit 0**、48/48、✅ F2 | 轮初探针 vs 本轮测试 E1/E2 |
+| round-740 测试断言数 | 46 | **48** | `node test/round-740-mutation-guard.test.js` |
+| 外来活进程持锁（反向对照） | — | **exit 仍 1**，红的正是 F2 且 `relation=foreign` | 本轮测试 F1/F2 |
+| 孙进程（ppid 不是锁 PID） | — | `relation=ancestor`、`guardOk=false` | 本轮测试 B2/B2b |
+| 同场景抽掉 env 标记 | — | 立刻变 `relation=foreign` | 本轮测试 B3 |
+| 新旧判据一致性 | — | `inFlight`/`pid` **逐字一致** | 本轮测试 H3 |
+| 本轮测试 | — | **42 通过 / 0 失败**（3.36s） | `node test/round-742-mutation-flight-attribution.test.js` |
+| 本轮测试在 runner 下 | — | **42 通过 / 0 失败**（3.6s） | `HF_RUN_ALL_SLICE=565/625 node test/run-all.js` |
+| `bin/verify.js` | 16/16 | **16/16** | — |
+| `bidirectional-guard` | 召回 52/52、误拦 306/326 | **召回 52/52、误拦 306/326（逐项一致，判别逻辑 `src/index.js` 零改动）** | — |
+| `guard-abilities` | 20/20 | **20/20**（dimensions 160 / summary 123） | — |
+| `doc-numbers-accuracy` | 22/22 | **22/22** | — |
+| `security-audit` | 15/16（S2 等 commit） | 15/16，唯一失败 S2「git log/tag 未命中 6.8.97」**本轮提交后转绿** | — |
+| 引擎基线 | modules 161 / routes 1314 | **逐字不变** | 本轮测试 G1/G2 |
+| MCP 工具数 | 191 | **191**（不加新工具，只加 action） | — |
+| **全量回归** | 19972 过 / 25 败 / 19997 个（666.4s，624 文件） | **19993 过 / 25 败 / 20018 个（649.2s，并发 4，625 个测试文件）** | `node test/run-all.js` |
+
+**失败数 25 → 25 不增**。失败清单与 r741 基线同一批（见五），零条本轮新引入。
+
+**E 段是真仓端到端**：临时把真仓 `data/.run-all.lock` 写成自己的 PID（`finally` 里恢复原值），
+按 run-all 的 env 拼法起子进程跑 round-740 测试——这正是 r741 那轮固定红一条的路径。
+**F 段是它的反向对照**：换成一把无关活进程（spawn 一个 sleeper）的锁，子进程必须**仍然 exit 1**。
+两条合起来证明「容忍祖先」没有把 F2 改成永真断言。
+
+## 五、已知未修（含为什么不修）
+
+- **全量回归失败清单与 r741 基线同一批，失败数 25 = 25**，逐项定位（全部存量）：
+  - **6 个 MCP 类常驻失败**（`mcp-auth-tier` Command failed / `mcp-guest-permission`
+    文件自报失败×2 / `mcp-server` 未输出 / `mcp-smoke` 未输出 /
+    `round-572-associative-handler` 未输出）—— 根因 8099 端口被常驻 MCP 服务占用。
+  - **3 个文件自报失败**（ClassicsRules `searchClassicsBatch` /
+    AgentBoundaryGuard `unknown dot-dir` / mcp-guest-permission 端到端）。
+  - **4 个 Command failed**：`round-502` / `round-506` / `round-572-associative-wiring` /
+    **`round-621-uncertaintyquantifier-dispatch`**。
+    最后一槽本轮从 `round-608`（r741 那轮）转成了 `round-621`——**同一槽位轮换的存量 flake**，
+    单独复跑 `node test/round-621-uncertaintyquantifier-dispatch.test.js` 实测 **30 通过 / 0 失败**，
+    证明是并发池下的 Command failed 噪声而非本轮引入。
+  - **1 个注册 0 个用例**（`round-410`）+ **`round-498` 从 Command failed 漂移进未输出桶**
+    （r740/r741 已标注的同一处漂移）。
+- **总数 19997 → 20018（+21）的口径**：round-740 断言 +2、round-742 新增 42，
+    扣除 `round-608` 这个存量 flaky（r741 那遍它过了所以多 33 条，这遍它失败所以少 33 条），
+    其余为零星浮动。**没有任何一个测试文件因本轮改动从绿变红。**
+- **`api-surface-consistency.test.js` 的 2 个存量失败仍在**（r734/r735/r738/r741 连漏四轮的
+  口径洞：`checkEvidence` 幽灵方法 + 三个导出无任何文档提及，现在又多一个 `attributeFlight`）。
+  正解仍是「给新增公开导出必须同时出现在某份文档加一道机器守卫」，不是每轮手工补——
+  需要单独一轮，动它会打红一批工具总数快照。
+- **HANDLERS 键数 193 > 静态工具数 191**（r741 候选池③）未动：逐项对齐会打红一堆
+  工具总数滚动快照，需单独一轮。
+- **`scripts/round-208/tmp-old-di.js`** 这个 tmp-* 探针 round-guard 每轮提示一次；
+  它已入库不是残留，删它要走单独清理轮。
+- **`src/index.js` 14893 行**（阈值 14000）：doc-numbers 每轮只报警不自动处理。
+- **npm published 仍 6.7.124、30+ commits 未 push**：人工门禁，不自行推送。
+
+## 六、踩坑
+
+1. **「父进程持锁」这个场景只能从子孙进程的视角验证**——没有进程会是自己的祖先。
+   本轮初版把 C 段写成「父进程写自己的 PID，然后在父进程里断言 `relation === 'ancestor'`」，
+   实测五条全红（`relation=self`）。改成一个探针子进程去问，才第一次真正测到
+   `ancestor` 态。**设计断言前先问一句"这个状态在谁的视角下存在"。**
+2. **E/F 段第一版写的是 temp root 的锁，round-740 测试的 F 段读的是真仓 `ROOT`**——
+   子进程看到「无锁文件」，E1/F1 双双失去意义（一个假绿、一个假红）。
+   凡是「起子进程验证子进程看到的真仓状态」，锁/文件必须落在**子进程会看的那个根**上。
+3. **`cp.spawn` 的 `stdout` 是 Stream 不是 string**（`spawnSync` 才是 string）。
+   中间层进程用 `spawn` 起，`.stdout.split('\n')` 直接 TypeError。中间层也要 `spawnSync`。
+4. **跑任何 `HF_RUN_ALL_SLICE` 切片都会覆写 `data/test-count.json`**，而
+   `sync-doc-numbers.js` 随后会把**切片数字**写进 README/SKILL——本轮实测把
+   「19,972 passing / 25 failing」写成了「48 passing / 0 failing」。
+   这是 r741 坑⑦（"回归后要再记一次账"）没覆盖到的一半：**切片也算一次回归**。
+   修完必须把 `data/test-count.json` 恢复成全量回归的真实值再记一次账。
+   下一轮若还要跑切片验证，**先记帐再跑切片**。
+5. **确认新测试真的被 run-all 跑到，不能靠 `tail` 看输出**——`node test/run-all.js | tail -40`
+   只留最后 40 行，中段跑的 round-742 整段消失，看起来像"没跑"。
+   可靠做法是复刻 `collectTestFiles()` 的排序算出它在任务数组里的下标
+   （注意前 21 个显式 CORE_TESTS 也占任务位，且 `route-whitelist.test.js` 排序在
+   `round-742` 之后），再用 `HF_RUN_ALL_SLICE=<idx+1>/<n>` 单独跑它一遍。
+6. **round-742 作为 run-all 子进程时，runner 汇总行把它报成 48 通过而不是 42**——
+   因为它的 E 段会 spawn round-740 测试，那条子进程也吐一行「48 通过, 0 失败」，
+   `parseSummary` 取了最后一行。这是 runner 既有的嵌套汇总行行为，不影响判定
+   （0 失败、全部通过），但**别用这个数字反推本轮断言数**。
+
 
 ## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
 

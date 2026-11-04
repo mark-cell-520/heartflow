@@ -141,6 +141,10 @@ console.log('── C 突变期探活三态');
   fs.writeFileSync(lock, String(child.pid), 'utf8');
   const c3 = g().isRegressionInFlight();
   check('C3b 锁里是活 PID → 在飞', c3.inFlight === true && c3.pid === child.pid, c3.reason);
+  // [v6.8.97] 同场景过一遍归因：这个活 PID 是我 spawn 的**子孙**，不是祖先
+  const c3attr = g().attributeFlight();
+  check('C3c 锁里是子孙进程 → 归因 foreign（不是祖先，容忍不适用）',
+    c3attr.relation === 'foreign' && c3attr.inFlight === true, c3attr.reason);
   const gd = g().guardMeasurement('round-740-test');
   check('C4 在飞时 guardMeasurement 拒绝', gd.ok === false);
   check('C4b 拒绝理由点名两个错数字（157/1264）', /157/.test(gd.reason) && /1264/.test(gd.reason));
@@ -234,7 +238,25 @@ console.log('── F 真仓当前干净性');
   const res = mg.auditResidue();
   check('F1 真仓无 48 小时内的突变残族文件', res.suspicious.length === 0,
     JSON.stringify(res.suspicious));
-  check('F2 无回归在飞（轮次自检时不该有锁）', mg.isRegressionInFlight().inFlight === false);
+  // [v6.8.97 第 742 轮] F2 判据整改（原断言是存量结构性 flake，r741 实测）：
+  //   原句「轮次自检时不该有锁」问错了问题。run-all.js 从 acquireSingleton
+  //   起就全程持有 data/.run-all.lock 并写自己的 PID，所以本测试**作为它的
+  //   子进程跑时锁必然在**——r741 全量回归实测 45/46（F2 红），单独跑 46/46 绿。
+  //   本断言真正想说的是「没有**外来**回归在飞」：锁握在自己祖先链上是
+  //   run-all 的正常工作方式，无关活进程持锁才是问题。
+  //   改判据不改方向——F2b 与 round-742 测试的 G2 钉死「容忍祖先」没有
+  //   把守卫放松：祖先持锁时记账闸照样拒绝（r739 的洞不许重开）。
+  const att = mg.attributeFlight();
+  check('F2 无外来回归在飞（锁只能是自己的祖先 runner，或没有）',
+    att.inFlight === false || att.relation === 'ancestor',
+    `relation=${att.relation} pid=${att.pid} ancestors=${JSON.stringify(att.ancestors)} reason=${att.reason}`);
+  if (att.relation === 'ancestor') {
+    check('F2b 祖先 runner 持锁时记账闸仍拒绝（容忍 ≠ 放松）',
+      mg.guardMeasurement('round-740-test').ok === false, att.reason);
+  } else {
+    check('F2b 非 runner 子进程：无外来锁，记账闸放行',
+      mg.guardMeasurement('round-740-test').ok === true, att.reason);
+  }
   check('F3 known 桶里只有已入库驱动（git ls-files 可查）',
     res.known.every(x => /^test\/round-434-mutant-(child|runner)\.js$/.test(x.path)),
     JSON.stringify(res.known.map(x => x.path)));

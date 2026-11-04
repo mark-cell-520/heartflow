@@ -144,7 +144,20 @@ const path = require('path');
 //                  一处，_lit() 双保险拼路径 + 「量不到就拒绝出数」；
 //                  MCP 只读工具 heartflow_measure_numbers 三处接线，
 //                  刻意不进 _modules 以保 161/1314 基线）。
-let VERSION = '6.8.96';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.97] 第 742 轮同步：6.8.96 → 6.8.97（回归锁归属归因：
+//                 round-740 测试的 F2「无回归在飞」作为 run-all.js 子进程
+//                 每轮必红（单独跑 46/46 绿、全量回归 45/46 红）——父 runner
+//                 从 acquireSingleton 起就全程持锁写自己的 PID，而
+//                 「锁里是自己不算在飞」只覆盖自己写锁，覆盖不到锁里是父
+//                 runner，于是 F2 假设的前提在 runner 里恒为假。它真正想问
+//                 的是「没有**外来**回归在飞」。新能力 attributeFlight()
+//                 把锁里的活 PID 归成 none/self/ancestor/foreign 四态，
+//                 祖先链走 process.ppid + run-all.js 注入的 HF_RUN_ALL_PID
+//                 两条通道；run-all.js 的 execCapture 因此把 runner PID
+//                 注入每个测试子进程。round-740 的 F2 改判据不删断言，
+//                 inFlight 语义一字未改（祖先持锁时记账闸仍拒绝），
+//                 MCP heartflow_mutation_guard 加 action: attribution）。
+let VERSION = '6.8.97';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

@@ -33,6 +33,16 @@
  *        新增的一个不删 —— r739 实测留下 7 个未跟踪残留就是这个洞）。
  *   ③ auditResidue() —— 只读扫一遍三块地盘，报出突变残族文件及其年龄。
  *
+ * [v6.8.97 第 742 轮] 第四个能力：④ attributeFlight() —— 锁归属归因。
+ *   r741 全量回归实测 round-740 测试的 F2「无回归在飞」在作为 run-all.js
+ *   子进程跑时必现失败（单独跑 46/46 绿、挂进回归 45/46 红）。根因不是
+ *   断言写错，是它把两件事混成一句：「没有锁」与「没有**外来**回归」。
+ *   run-all.js 从 acquireSingleton 起就全程持锁写自己的 PID，所以
+ *   「作为它的子进程跑」时锁必然在——F2 问错了问题。attributeFlight()
+ *   把锁里的 PID 归因成 none / self / ancestor / foreign 四态，让轮次自检
+ *   能只说它真正想说的那句。**inFlight 语义一字未改**：祖先持锁时仍在飞、
+ *   记账闸照样拒绝，否则就是把 r739 的洞重新打开。
+ *
  * 删除的两道闸（缺一不可，都是 r740 实测踩出来的）：
  *   · 形状闸：basename 必须以 round-<N>-mutant- / .mut- / .tmp-mutant- 开头。
  *     只按「mutant-」这种宽形状匹配会咬到**已入库**的测试驱动
@@ -47,6 +57,16 @@ const path = require('path');
 
 /** 全量回归单例锁（run-all.js 写 PID，见该文件 acquireSingleton） */
 const LOCK_REL = path.join('data', '.run-all.lock');
+
+/**
+ * [v6.8.97 第 742 轮] run-all.js 注入测试子进程的祖先标记。
+ * env 会随 execFile 传给所有后代进程，所以它能标出「链路上任何一层的 runner」，
+ * 而 process.ppid 只看得到直接父进程——两者互补，缺一个都有漏认的场景。
+ */
+const RUNNER_ENV = 'HF_RUN_ALL_PID';
+
+/** 祖先链最长回溯层数（防 PID 环 / 异常进程表死循环） */
+const MAX_ANCESTORS = 32;
 
 /** 突变残族形状：basename 前缀，锚定在文件名开头（宽匹配会咬到已入库驱动） */
 const RESIDUE_RE = /^(?:round-\d+-mutant-|\.mut-|\.tmp-mutant-)/;
@@ -108,6 +128,28 @@ class MutationGuard {
   lockPath() { return this._abs(this.lockRel); }
 
   /**
+   * 我自己的祖先 PID 链（含直接父进程）。跨平台零外部依赖：
+   *   · 第一层来自 process.ppid（Node 内建，Linux / Windows 一致）；
+   *   · 更深层来自 run-all.js 注入的 HF_RUN_ALL_PID —— Node 没有
+   *     「任意 PID 的父 PID」API，而 env 会一路传给所有后代进程，
+   *     所以一个标记就能覆盖任意深度的子孙。
+   * 去重 + 上限保护：PID 环（理论上的 ppid 自指）不会死循环。
+   */
+  _parentPids() {
+    const out = [];
+    const seen = new Set([process.pid]);
+    let p = Number.isInteger(process.ppid) ? process.ppid : 0;
+    while (p > 0 && !seen.has(p) && out.length < MAX_ANCESTORS) {
+      seen.add(p);
+      out.push(p);
+      p = 0; // Node 无法再往上走一层，交给 env 标记补
+    }
+    const marked = parseInt((process.env && process.env[RUNNER_ENV]) || '', 10);
+    if (Number.isInteger(marked) && marked > 0 && !seen.has(marked)) out.push(marked);
+    return out;
+  }
+
+  /**
    * 全量回归是否在飞。判据与 run-all.js 的 acquireSingleton 同源：
    * 锁文件里的 PID 探活。锁文件残留但 PID 已死 → 不在飞（不留死锁）。
    */
@@ -129,6 +171,44 @@ class MutationGuard {
       return { inFlight: false, pid, reason: `锁记录 PID ${pid} 已死，视为残留锁` };
     }
     return { inFlight: true, pid, reason: `全量回归在飞（锁 PID ${pid}），源码可能处于删条突变态` };
+  }
+
+  /**
+   * [v6.8.97 第 742 轮] 锁归属归因：锁里的那个活 PID 与「我」是什么关系。
+   *
+   * 为什么需要它（r741 全量回归实测的存量结构性 flake）：
+   *   round-740 测试的 F2 断言「轮次自检时不该有锁」，在作为 run-all.js 的
+   *   子进程跑时**必然为假**——父 runner 从 acquireSingleton 起就全程持有
+   *   data/.run-all.lock 并写自己的 PID，而 isRegressionInFlight() 的
+   *   「锁里是自己不算在飞」只覆盖测试进程自己写锁，覆盖不到「锁里是父 runner」。
+   *   r741 实测：单独跑 46/46 全绿，挂进全量回归 45/46 红一次。
+   *   F2 真正想说的不是「没有锁」，而是「没有**外来**回归在飞」——
+   *   锁握在自己祖先链上是 run-all 的正常工作方式，无关活进程持锁才是问题。
+   *
+   * relation 五态：
+   *   none     没有锁 / 锁里是死 PID / 锁文件无合法 PID
+   *   self     锁里的 PID 就是自己（自己是 runner）
+   *   ancestor 锁里的 PID 在自己的祖先链上（自己是 run-all 的子进程）
+   *   foreign  锁里是别的活进程（真·外来回归，或残留锁的 PID 被复用）
+   *
+   * **注意 relation === 'ancestor' 时 inFlight 仍为 true。** 容忍祖先只改
+   * 「轮次自检该不该红」，不改守卫的保护语义：祖先 runner 是真的在跑全量回归，
+   * 源码此刻可能正处于删条突变态，guardMeasurement() 照样拒绝记账。
+   * r742 测试 E3/G2 两条断言钉死这个方向——放松它就会重开 r739 那个洞。
+   */
+  attributeFlight() {
+    const base = this.isRegressionInFlight();
+    const ancestors = this._parentPids();
+    if (!base.inFlight) {
+      return Object.assign({}, base, {
+        relation: base.pid === process.pid ? 'self' : 'none',
+        ancestors,
+      });
+    }
+    return Object.assign({}, base, {
+      relation: ancestors.indexOf(base.pid) >= 0 ? 'ancestor' : 'foreign',
+      ancestors,
+    });
   }
 
   /**
@@ -245,7 +325,7 @@ class MutationGuard {
 
   /** 汇总状态（MCP 只读工具与轮次自检用） */
   status() {
-    const flight = this.isRegressionInFlight();
+    const flight = this.attributeFlight();
     const residue = this.auditResidue();
     const sidecar = this.auditSidecar();
     return {
@@ -259,4 +339,4 @@ class MutationGuard {
   }
 }
 
-module.exports = { MutationGuard, RESIDUE_RE, DEFAULT_DIRS, LOCK_REL };
+module.exports = { MutationGuard, RESIDUE_RE, DEFAULT_DIRS, LOCK_REL, RUNNER_ENV, MAX_ANCESTORS };

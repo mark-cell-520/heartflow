@@ -3414,11 +3414,42 @@ function handleMutationGuard(args) {
     };
   }
 
+  // [v6.8.97 第 742 轮] attribution：锁里的活 PID 与「我」是什么关系。
+  // 为什么值得单开一个 action：inFlight 只说「有没有别人的回归在飞」，
+  // 而轮次自检真正想问的是「有没有**外来**回归在飞」。r741 全量回归实测
+  // round-740 测试的 F2 每轮必红一次（单独跑 46/46 绿、回归里 45/46 红），
+  // 根因就是它把这两句混成一句——run-all.js 全程持锁写自己的 PID，
+  // 作为它的子进程跑时锁必然在。归因四态 none/self/ancestor/foreign
+  // 让调用方能区分「我的祖先 runner 持锁（预期）」与「无关进程持锁（问题）」。
+  // **relation=ancestor 时 inFlight 仍为 true、记账闸仍拒绝**——容忍祖先
+  // 只改轮次自检的问句，不改守卫的保护语义。
+  if (action === 'attribution') {
+    const att = mg.attributeFlight();
+    return {
+      action: 'attribution',
+      inFlight: att.inFlight,
+      relation: att.relation,
+      pid: att.pid,
+      ancestors: att.ancestors,
+      reason: att.reason,
+      advice: att.relation === 'ancestor'
+        ? '锁握在你的祖先 runner 手上——你是 run-all.js 的子进程，锁在是预期；'
+          + '但此刻源码可能正处于删条突变态，仍不要测量/记账'
+        : (att.relation === 'foreign'
+          ? '锁握在无关活进程手上——真·外来回归在飞，拒绝记账并人工核对那个 PID'
+          : (att.relation === 'self'
+            ? '锁里的 PID 就是你自己（你自己是 runner）'
+            : '没有锁（或锁里是已死的残留 PID），可以正常测量')),
+      timestamp: Date.now(),
+    };
+  }
+
   const st = mg.status();
   return {
     action: 'status',
     clean: st.clean,
     regression: st.regression,
+    flightRelation: st.regression.relation,
     residue: {
       suspicious: st.residue.suspicious,
       suspiciousCount: st.residue.suspicious.length,
@@ -3430,6 +3461,9 @@ function handleMutationGuard(args) {
       ? '仓库干净且无回归在飞，实测数字可信'
       : (st.regression.inFlight
         ? '全量回归在飞——此刻任何 measure() 都会量到删条突变中的源码，拒绝记账'
+          + (st.regression.relation === 'ancestor'
+            ? '（锁在你的祖先链上：你是 run-all.js 的子进程，这属预期）'
+            : '')
         : '发现 48 小时内的突变残族文件，先人工核对再信任任何数字'),
     timestamp: Date.now(),
   };
