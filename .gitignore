@@ -54,6 +54,8 @@ data/.mcp_token_plain
 !data/upgrade-queue.json
 !data/test-count.json
 data/.run-all.lock       # [r645] 全量回归单例锁，运行时状态不入库
+# [r743] 分段回归（HF_RUN_ALL_SLICE）的用例数侧车：只给人看，不进文档记账
+data/test-count-slice.json
 # 例外之外：upgrade-engine.js 的 flock 锁文件永不入库
 data/.upgrade.lock
 data/audit/

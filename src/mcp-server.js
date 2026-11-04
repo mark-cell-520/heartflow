@@ -3544,6 +3544,47 @@ function handleMeasureNumbers(args) {
     };
   }
 
+  // [v6.8.98 第 743 轮] 用例数缓存口径：主缓存 vs 切片侧车，只读、毫秒级。
+  // 回答的是「文档记账此刻能信哪个数字」——r742 事故里这个问题没人答得上来：
+  // 分段回归跑完 sync-doc-numbers 把 48 记进了 README/SKILL，而真值 19,993。
+  if (action === 'testcount') {
+    const { readTestCountFile,
+      TEST_COUNT_FILE: _MAIN, TEST_COUNT_SLICE_FILE: _SIDE } = require('./core/measure-core.js');
+    const dataDir = path.join(HF_DIR, 'data');
+    const main = readTestCountFile(dataDir);
+    let side = null;
+    try {
+      const sf = path.join(dataDir, _SIDE);
+      if (fs.existsSync(sf)) side = JSON.parse(fs.readFileSync(sf, 'utf8'));
+    } catch (_) { side = null; }
+    return {
+      action: 'testcount',
+      ok: main.trusted,
+      label,
+      main: {
+        file: 'data/' + _MAIN,
+        exists: main.exists,
+        scope: main.scope,
+        passed: main.passed,
+        failed: main.failed,
+        total: main.total,
+        files: main.files,
+        at: main.at,
+        trusted: main.trusted,
+      },
+      sidecar: side
+        ? { file: 'data/' + _SIDE, scope: side.scope, slice: side.slice,
+            passed: side.passed, failed: side.failed, total: side.total,
+            files: side.files, at: side.at }
+        : null,
+      reason: main.reason,
+      advice: main.trusted
+        ? '主缓存是全量口径（scope=full），sync-doc-numbers / doc-numbers 可以采信它的数字'
+        : '主缓存不可采信（' + (main.reason || '不存在') + '）—— 记账路径会拒绝出数而不是记错；要刷新请跑一次不带 HF_RUN_ALL_SLICE 的全量 node test/run-all.js',
+      timestamp: Date.now(),
+    };
+  }
+
   if (action === 'all') {
     // 全量实测，带两道闸（runtime 量不到 / dims < tiersSum）
     try {
@@ -3572,7 +3613,7 @@ function handleMeasureNumbers(args) {
   return {
     action,
     ok: false,
-    reason: '未知 action: ' + action + '（可用 runtime / static / all / check）',
+    reason: '未知 action: ' + action + '（可用 runtime / static / all / check / testcount）',
     advice: '换一个 action 再试',
     timestamp: Date.now(),
   };

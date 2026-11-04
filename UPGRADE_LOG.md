@@ -1,3 +1,235 @@
+# 第 743 轮报告（v6.8.98 — 分段回归不许污染全量记账缓存：r742 交接簿候选池①，`HF_RUN_ALL_SLICE` 切片跑完接着记账会把「1 passing / 0 failing」写进 README/SKILL，根因是 run-all.js 无条件把本次数字写进 data/test-count.json）
+
+## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
+
+两个 cron 仍为空数组（`hermes/cron/jobs.json`），自主循环停着，r743 继续由主会话驱动。
+**选题判定由我下，不是 decision 本体打分。**
+
+直接做 r742 交接簿候选池①（那条被标注「【建议直接做】」的项）：
+「跑任何 `HF_RUN_ALL_SLICE` 切片都会覆写 `data/test-count.json`，而
+`sync-doc-numbers.js` 随后会把切片数字写进 README/SKILL」。这是 r741 坑⑦
+「回归后要再记一次账」没覆盖的另一半——**切片也算一次回归**。
+
+轮初复测：先用 A/B 探针把「旧实现会不会污染」跑成二进制结论（见 ②.1），
+不猜。
+
+## 二、根因 / 缺口分析（带证据）
+
+### 2.1 A/B 实测：同一临时仓夹具 + 同一 `HF_RUN_ALL_SLICE=2/2`
+
+探针 `scripts/round-743-ab-slice-pollution.js`（旧实现不落盘副本，每次从
+`git show HEAD:test/run-all.js` 现取，保证比的真是 HEAD 那一份；临时仓只放 run-all.js
+必需的最小集合，全部是真实文件的逐字节副本；主缓存预置一份全量真值
+`19993/25/20018`，两个实现各跑一遍同一切片）：
+
+```
+[旧实现 git HEAD:test/run-all.js] exit=0
+  主缓存 data/test-count.json：❌ 被改写
+  改写后内容：{ "passed": 1, "failed": 0, "total": 1, "at": "..." }
+  侧车 data/test-count-slice.json：— 无
+
+[新实现 工作区 test/run-all.js] exit=0
+  主缓存 data/test-count.json：✅ 逐字节未动
+  侧车 data/test-count-slice.json：✅ 有
+  侧车内容：{ "passed": 1, "failed": 0, "total": 1, "at": "...",
+              "files": 1, "scope": "slice", "slice": "2/2" }
+  记账行：[记账] 切片 2/2：1 通过 / 0 失败 → data/test-count-slice.json |
+           [记账] 全量缓存 data/test-count.json 未动（scope=full 才进文档记账…）
+
+把旧实现写出的主缓存喂给读取方：passed=1 refused=(无)
+新实现写出的主缓存喂给读取方：passed=19993 scope=full
+```
+
+最后两行是事故的完整机制：**旧实现写出的 `passed=1` 一路畅通**——
+`MeasureCore.readTestCount()` 拿到 1、不拒绝，`sync-doc-numbers.js`
+于是把规格表记成「1 passing / 0 failing」。r742 在真仓上跑 565/625 时
+同一个机制记出的是「48 passing / 0 failing」（真值 19,993 / 25）。
+
+### 2.2 根因：写入方无条件、读取方无口径字段
+
+`test/run-all.js` 汇总段（原第 588-594 行）**无条件**：
+
+```js
+fs.writeFileSync(path.join(__dirname, '..', 'data', 'test-count.json'),
+  JSON.stringify({ passed, failed, total: passed + failed, at: new Date().toISOString() }, null, 2));
+```
+
+而分段回归（v6.8.86 加的 `HF_RUN_ALL_SLICE`）只改任务集合、不改这段写入，
+于是 1/n 的文件数被当成全量数字落进唯一那份「被文档记账信任」的缓存。
+读取侧 `MeasureCore.readTestCount()` 只有 `passed/failed/at` 三个键可读，
+**没有任何字段能告诉它「这是切片」**——污染不可检出，只能靠人发现。
+
+### 2.3 为什么不能靠「记得手工恢复」或「跑完再记一次账」
+
+r742 的处置就是手工 `git checkout -- data/test-count.json` 再记一次账。
+那条路每轮都要人记得，且**污染窗口内** README/SKILL 已经是错的：
+`doc-numbers-accuracy.test.js`、`round-guard.js` 第 5 项、
+`upgrade-engine.js` 的 `syncReadmeTestCount` 三个读取方都直接读主缓存，
+谁先跑谁吃到切片数字。这是结构性缺陷，不是纪律问题。
+
+## 三、落地项
+
+### ① `src/core/measure-core.js`：缓存 scope 契约（写入/读取单一来源，新增 ~95 行非注释代码）
+
+新增四个导出 + 两个函数：
+
+| 导出 | 作用 |
+|---|---|
+| `TEST_COUNT_FILE` / `TEST_COUNT_SLICE_FILE` | `test-count.json`（全量口径，唯一被记账信任）/ `test-count-slice.json`（切片侧车） |
+| `SCOPE_FULL` / `SCOPE_SLICE` | 口径常量 |
+| `writeTestCount(dataDir, entry)` | **按 scope 分流落盘**：切片绝不写主缓存 |
+| `readTestCountFile(dataDir)` | 读主缓存并判口径，返回 `trusted` + `reason` |
+
+`readTestCount()`（方法）改为委托 `readTestCountFile()`：`scope=slice` 的
+主缓存 → `passed/failed` 都是 `null` 且带 `refused` 理由（宁可不记也不记错）。
+`measureAll()` / `status().cached` 新增 `testCountScope` / `testCountRefused`
+两个透出字段。存量缓存（无 `scope` 字段）按 `full` 采信——向后兼容，
+不制造新的红门禁。
+
+放在 `src/` 而不是 `test/_xxx.js`：读取方 measure-core 在 src/，不能 require
+test/ 下的模块（npm 发包只含 src/）；而写入方是 `test/run-all.js`，
+test → src 是正常依赖方向。r739 的教训（判定与契约必须同一份代码）在这里
+同样成立：判 scope 的逻辑只有这一份。
+
+### ② `test/run-all.js`：写入改走共享实现 + 分段记账可见
+
+- 汇总段的 `fs.writeFileSync` 内联写入**整段删除**，改调 `writeTestCount()`；
+- `sliceLabel`（`let sliceLabel = null` → 分段时赋 `${sk}/${sn}`）贯通到写入，
+  分段才知道自己该写侧车；
+- 分段时 `files` 记**本段**任务数而非总文件数（侧车里 `passed=1 / files=625`
+  会让人以为 625 个文件只过了 1 个——正是本轮要消灭的误导数字）；
+- 两行可见输出：分段跑打印「只落侧车 / 全量缓存未动」，全量跑打印落点与 scope。
+
+### ③ 四个读取方补口径闸（纵深，非根因修法）
+
+| 位置 | 改动 |
+|---|---|
+| `scripts/sync-doc-numbers.js` | `measure()` 透出 `testCountScope/Refused`；主缓存是切片口径时打印醒目警告，并说明「下面报已一致是因为没有可写值，不是真的核对过」 |
+| `scripts/round-guard.js` 第 5 项 | 先判口径再比数字：`scope=slice` 时点名「分段回归不许覆写全量缓存」，而不是含糊报成文档漂移 |
+| `scripts/upgrade-engine.js` `syncReadmeTestCount` | 切片口径拒绝写 README 横幅（r742 的污染点是横幅 + 规格表两处） |
+| `test/doc-numbers-accuracy.test.js` | 无缓存可采信时，报错区分「没跑过全量」与「缓存是切片口径」，后者直接点名 |
+
+### ④ MCP 接线（AGENTS.md 约定 3）
+
+`heartflow_measure_numbers` 新增 **action `testcount`**（刻意不新增工具——
+加了就打红 round-735/736/738 三处 191 快照）。三处同步：tools-registry 的
+`inputSchema` 枚举 + 长描述、handler 的 `action === 'testcount'` 分支、
+未知 action 提示串。返回主缓存（scope/passed/failed/total/files/at/trusted）、
+侧车内容与 `advice`。实测（真仓）：
+
+```
+$ node -e "require('./src/mcp-server.js').handleRequest({…action:'testcount'…})"
+{"action":"testcount","ok":true,
+ "main":{"file":"data/test-count.json","exists":true,"scope":"full",
+         "passed":19993,"failed":25,"total":20018,"trusted":true},
+ "sidecar":null,
+ "advice":"主缓存是全量口径（scope=full），sync-doc-numbers / doc-numbers 可以采信它的数字"}
+```
+
+### ⑤ 本轮测试 `test/round-743-testcount-slice-isolation.test.js`（39 断言）
+
+七段：A 写入分流（11）/ B 读取闸（5）/ C 透出接线（4）/ D run-all 接线（5）/
+E 端到端（7）/ F 承重证明（3）/ G MCP 接线（4）。
+E 段在临时仓里跑**真的** `test/run-all.js`（真实文件逐字节副本 + 两个夹具
+测试），同仓连跑两次：分段 → 主缓存逐字节未动、数字进侧车；全量 → 主缓存
+照写（证明没被修成「永不写缓存」）。
+
+## 四、验收数字（全部实测，命令可复跑）
+
+| 项 | 实测 |
+|---|---|
+| A/B 污染判定 | 旧实现污染主缓存 = **true**（`{passed:1,failed:0,total:1}`）；新实现 = **false**（逐字节未动，md5 前后一致） |
+| 旧实现污染后的读取 | `readTestCount().passed = 1`、`refused = (无)` —— 一路畅通，即 r742 事故机制 |
+| 新实现的读取 | `passed = 19993`、`scope = full` |
+| 真仓分段回归 | `HF_RUN_ALL_SLICE=9999/9999 HF_RUN_ALL_JOBS=1 node test/run-all.js` → **0.557s**，`data/test-count.json` md5 前后同为 `bcffb1e6f1e7f06a5b265fe1410b9611`，侧车落 `{passed:0,failed:0,files:0,scope:"slice",slice:"9999/9999"}` |
+| 本轮测试 | `node test/round-743-testcount-slice-isolation.test.js` → **39 通过 / 0 失败** |
+| `bin/verify.js` | **16 passed, 0 failed** |
+| `bidirectional-guard` | 召回 **52/52**、误拦 **306/326**（与 r741/r742 基线逐项一致，`src/index.js` 零改动） |
+| `guard-abilities.js` | **20/20**（dimensions 键 160 / summary 引用 123） |
+| `doc-numbers-accuracy` | **22 通过, 0 失败** |
+| `security-audit` | bump 前 **16 通过, 0 失败**；bump 后 15/16（唯一失败 S2「git log/tag 未命中 6.8.98」，**本轮提交后转绿**，与 r740/r741/r742 同一形态） |
+| 引擎基线零变化 | `measure-claimed-numbers.js`：模块 **161** / 路由 **1314** / 维度 **160** / 工具 **191**（与 r742 逐项一致；`tools-registry` 条目数改动前后都用同一段代码数过：**191 = 191、新增 []、移除 []**） |
+| 全量回归 | **19997 过 / 27 败 / 20024 个（649.3s，并发 4，626 个测试文件）**；基线 r742 = 19993 过 / 25 败 / 20018 个（625 个文件） |
+| 失败数 25 → 27 的归因 | **+2 全是轮内瞬态，存量 25 个失败零新增**（逐项定位见下） |
+| 新增非注释代码 | `src/core/measure-core.js` 契约段 ~95 行 + run-all 接线 ~20 行 + MCP 分支 ~30 行 + 四个读取方闸 ~25 行 |
+
+### 4.1 全量回归失败数 25 → 27 逐项定位（+2 均为轮内瞬态，非本轮引入）
+
+`node test/run-all.js`（626 个文件，649.3s）实测 19997 通过 / 27 失败。逐项定位后，
+**+2 全部是「版本已 bump 但尚未提交/尚未补文档」造成的轮内瞬态**，与代码改动无关：
+
+- **+1 `doc-numbers-accuracy.test.js`「README changelog 覆盖当前版本」**：回归跑在
+  「VERSION 已 bump 到 6.8.98、README Version history 还没加 6.8.98 行」这个中间态上。
+  补上该行 + 跑 `sync-doc-numbers.js` 后单独复跑 **22 通过 / 0 失败**。
+- **+1 `security-audit.test.js` S2「git log/tag 未命中 6.8.98」**：同一类中间态
+  （改动还在工作区），提交后转绿，r740/r741/r742 每轮同样形态。
+- 其余 **25 个失败与 r742 基线同一批**，其中需要点名确认「不是本轮引入」的三处，
+  全部用**单独复跑 + HEAD 对照**坐实：
+  - `round-737-delimiter-run-boundary.test.js`「工具数应为 188，实得 191」：
+    硬编码快照过期（r736/r737/r738 各加一个工具后 188 → 191）。**用
+    `git show HEAD:src/mcp/tools-registry.js` 数过：改动前就是 191**，本轮零新增零移除。
+  - `round-733-injection-synonyms.test.js` 2 个失败（良性英文句误伤 block +
+    仓库散文新增误伤）：把 `UPGRADE_LOG.md` 换回 `git show HEAD:` 版本再跑，
+    **同样 2 个失败** → 与本轮新增的 191 行报告无关。
+  - `round-608-forgettingengine-dispatch.test.js` Command failed：单独复跑
+    **34 通过 / 0 失败**，是并发池轮换槽位上的存量 flake（r741 红、r742 绿、r743 红）。
+  - 其余为 r742 已记的同一批：6 个 MCP 类（8099 端口被常驻服务占用）、
+    classics-rules / agent-boundary-guard 文件自报失败、
+    api-surface-consistency 2 个存量失败（`checkEvidence` 幽灵方法 +
+    三个导出无文档提及）、round-559 / cjk-word-boundary-round128 等
+    硬编码快照类失败、round-410 零用例、round-498/round-630 等未输出桶。
+- **顺带发现（给下一轮）**：r742 报告对 25 个失败的逐项清单**漏记了自报失败数的一族**
+  （`round-733`×2、`round-737`×1、`round-559`×1、`cjk-word-boundary-round128`×2、
+  `api-surface-consistency`×2）——它们只在自己文件的汇总行里报失败、不打印 `✗` 行，
+  因此不进 runner 的「失败的测试」清单。r742 的「清单与基线同一批」结论仍成立，
+  但清单本身不全：**要数准失败数，必须解析每个文件的汇总行，不能只看末尾清单**。
+
+## 五、已知未修（含为什么不修）
+
+① **切片数字没有汇总入口。** 侧车 `data/test-count-slice.json` 只落盘、只被
+   MCP `testcount` 读到，没有一个「把 n 段侧车加成全量口径」的脚本。分段
+   回归的原始动机（v6.8.86）就是「超出单次前台调用上限」，逐段人工汇总仍是
+   唯一口径。本轮只切污染，不新增汇总机制——那会是另一个主题，且需要先约定
+   「各段并集 = 全量」在失败重试下的语义（重试会改变段内文件集合）。
+② **`data/test-count-slice.json` 会累积。** 全量跑不删它（E7 断言钉住这个
+   行为：历史分段数字留痕）。删它要单独一轮，且要想清楚「上一段的分段数字
+   有没有核对价值」。
+③ **r742 候选池②~⑦ 全部沿用**：新测试是否被 run-all 跑到的自检、
+   `parseSummary` 取到子进程汇总行、api-surface-consistency 的 5 处文档漏登记
+   （本轮又新增 `readTestCountFile/writeTestCount/SCOPE_*` 六个导出，
+   连漏变六处）、HANDLERS 键数 193 > 静态工具数 191、变更测试统一走
+   mutation-guard-recovery 侧车、round-630 的 RESULT 无 pass/fail 键、
+   3 个零输出文件、`src/index.js` 14893 行（阈值 14000）。
+④ **本轮的 scope 纪律只管 test-count 一个缓存。** `data/` 下还有
+   `capability-check-count.json` 等缓存，同样没有口径标记；它们的写入方都是
+   一次性全量脚本，没有被分段覆写的路径，故本轮不扩。
+⑤ **`src/core/version.js` 的兜底版本每次 bump 都要手工同步**（`sync-version.js`
+   明确不管它，见第 160 行注释）。本轮 bump 后 `round-guard --stage=after` 立刻
+   报 `version.js = 6.8.97 != VERSION 6.8.98`。这不是本轮引入的问题（注释里记着
+   从 v6.7.69 起就漏过 33 个版本），但它是每轮必踩的一次性红：正解是让
+   `sync-version.js` 把 `let VERSION = '…'` 一起写掉，或让 round-guard 在
+   `--stage=before` 就提醒「bump 后记得同步 version.js」。要动就得单独一轮，
+   且会改到每轮都跑的守卫脚本。
+
+## 六、踩坑
+
+① **临时仓端到端必须自带 `src/core/measure-core.js` 与 `src/core/mutation-guard.js`。**
+   `run-all.js` 顶部就 require 前者（写入器），`_MG()` 又 require 后者
+   （快照/回滚）。第一版临时仓只拷了 `run-all.js` + `_summary-parse.js`，
+   直接 MODULE_NOT_FOUND。两个模块都只依赖 fs/path，拷进去零风险。
+② **`files` 键第一版记的是 `totalTasks`（总文件数）而非本段任务数**，
+   侧车出现 `passed=1 / files=625` 的误导组合，被本轮测试 E3 抓出来。
+   分段场景下「跑了几个文件」必须是切片后的 `tasks.length`。
+③ **A/B 探针的「旧实现」要从 `git show HEAD:test/run-all.js` 取**，
+   不能手写一个「模拟旧行为」的脚本——手写的模拟证明不了真仓上那条路径。
+④ **端到端不能在真仓跑嵌套 run-all.js**：父 runner 全程持
+   `data/.run-all.lock`，嵌套进程会被 `acquireSingleton()` 拒掉（exit 2）；
+   更坏的情况是嵌套 runner 的 `rollbackSrcIfDirty` 会在父 runner 的突变窗口
+   里回滚 src/（r739 家族事故）。所以 E 段用临时仓，探针用真实文件副本。
+⑤ **round-guard 第 5 项原来会把「切片污染」报成「文档漂移」**——
+   `README 19993 != test-count.json 48`，指向错误的方向（让人去改文档）。
+   修法是先判口径，再比数字。
+
 # 第 742 轮报告（v6.8.97 — 回归锁归属归因：r741 交接簿候选池①，round-740 测试的 F2「无回归在飞」作为 run-all.js 子进程每轮必红，根因是它把「没有锁」与「没有外来回归」混成一句）
 
 ## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）

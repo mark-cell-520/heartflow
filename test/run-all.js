@@ -19,6 +19,14 @@
  *
  * Usage: node test/run-all.js
  *        HF_RUN_ALL_JOBS=1 node test/run-all.js   # 强制串行（排查 flaky 用）
+ *        HF_RUN_ALL_SLICE=k/n node test/run-all.js  # 只跑第 k 段（见下方分段说明）
+ *
+ * [v6.8.98 第 743 轮] 分段回归的记账纪律：HF_RUN_ALL_SLICE 下只跑 1/n 的文件，
+ * 数字天然小一个量级，**绝不覆写 data/test-count.json**（全量口径缓存）——
+ * r742 实测事故：切片跑完接着跑 sync-doc-numbers.js，README/SKILL 规格表被记成
+ * 「48 passing / 0 failing」（真值 19,993 / 25），手工恢复才补回。现在切片数字
+ * 只落 data/test-count-slice.json 侧车，写入/判定都走
+ * src/core/measure-core.js 的 writeTestCount / readTestCountFile 单一实现。
  */
 'use strict';
 
@@ -27,6 +35,11 @@ const path = require('path');
 const { execFile } = require('child_process');
 // [v6.8.94] 汇总行解析的单一来源：run-all 与 r311 契约守卫共用，杜绝副本漂移。
 const { parseSummary } = require('./_summary-parse.js');
+// [v6.8.98 第 743 轮] 用例数缓存的单一来源：写入方（本文件）与读取方
+// （measure-core / sync-doc-numbers / doc-numbers 门禁）共用同一份 scope 判据。
+const {
+  writeTestCount, SCOPE_FULL, SCOPE_SLICE, TEST_COUNT_FILE, TEST_COUNT_SLICE_FILE,
+} = require('../src/core/measure-core.js');
 
 const TEST_DIR = __dirname;
 const ROOT = path.join(__dirname, '..');
@@ -527,6 +540,9 @@ async function runAllTests() {
   // 而本机后台执行通道对 node 不可用（wrapper 秒杀，exit 1 + "stdin is
   // not a tty"，2026-10-28 实测三种写法全挂）。分段只改任务集合，
   // 不改 runner/判定/两阶段语义——各段并集即全量，逐段人工汇总。
+  // [v6.8.98 第 743 轮] 但分段**只改任务集合与记账落点**：数字不许进
+  // data/test-count.json（全量口径缓存），只能落侧车。原因见文件头。
+  let sliceLabel = null;
   const sliceEnv = (process.env.HF_RUN_ALL_SLICE || '').match(/^(\d+)\s*\/\s*(\d+)$/);
   if (sliceEnv) {
     const sk = Math.max(1, parseInt(sliceEnv[1], 10));
@@ -536,7 +552,9 @@ async function runAllTests() {
     const kept = tasks.filter((t, i) => (i % sn) === (sk - 1));
     for (let i = 0; i < kept.length; i++) { kept[i].idx = i; kept[i].total = kept.length; }
     tasks.length = 0; tasks.push(...kept);
-    console.log(`[分段] HF_RUN_ALL_SLICE=${sk}/${sn}：${before} → ${tasks.length} 个文件`);
+    sliceLabel = `${sk}/${sn}`;
+    console.log(`[分段] HF_RUN_ALL_SLICE=${sliceLabel}：${before} → ${tasks.length} 个文件`);
+    console.log(`[分段] 本段数字只落 data/${TEST_COUNT_SLICE_FILE}，全量缓存 data/${TEST_COUNT_FILE} 不动（文档记账只信 scope=full）`);
   }
   // [v6.8.80] 两阶段调度：变更测试（写 src/ 源码）与 MCP 服务类测试
   // 独占串行车道——前者与并发读者/同类互踩（详见 detectWriteToSrc 注释），
@@ -585,12 +603,27 @@ async function runAllTests() {
   // measure-claimed-numbers 读取——README 横幅的 "N passing tests"
   // 从此有实测值可比对（此前只有测试文件数，用例数无从校验，
   // 从 1,138 胀到 1754 都没人发现）。
+  // [v6.8.98 第 743 轮] 改走单一实现并按 scope 分流：全量写
+  // data/test-count.json，切片只写 data/test-count-slice.json。
+  // r742 实测事故：无条件写主缓存 → 分段回归跑完 sync-doc-numbers 把
+  // 「48 passing / 0 failing」记进 README/SKILL（真值 19,993/25）。
+  // 写失败不影响测试结果（与原语义一致）。
   try {
-    fs.mkdirSync(path.join(__dirname, '..', 'data'), { recursive: true });
-    fs.writeFileSync(
-      path.join(__dirname, '..', 'data', 'test-count.json'),
-      JSON.stringify({ passed, failed, total: passed + failed, at: new Date().toISOString() }, null, 2)
-    );
+    const w = writeTestCount(path.join(ROOT, 'data'), {
+      scope: sliceLabel ? SCOPE_SLICE : SCOPE_FULL,
+      slice: sliceLabel,
+      passed,
+      failed,
+      // 分段时记**本段**的任务数，不是总文件数：侧车里 passed=1 / files=625
+      // 会让人以为 625 个文件只过了 1 个（正是本轮要消灭的误导数字）。
+      files: sliceLabel ? tasks.length : totalTasks,
+    });
+    if (w.scope === SCOPE_SLICE) {
+      console.log(`[记账] 切片 ${sliceLabel}：${passed} 通过 / ${failed} 失败 → data/${TEST_COUNT_SLICE_FILE}`);
+      console.log(`[记账] 全量缓存 data/${TEST_COUNT_FILE} 未动（scope=full 才进文档记账；要刷新它请跑一次不带 HF_RUN_ALL_SLICE 的全量）`);
+    } else {
+      console.log(`[记账] 全量 ${totalTasks} 个文件：${passed} 通过 / ${failed} 失败 → data/${TEST_COUNT_FILE}（scope=${SCOPE_FULL}）`);
+    }
   } catch (_) { /* 缓存写失败不影响测试结果 */ }
   if (failures.length > 0) {
     console.log('\n失败的测试:');

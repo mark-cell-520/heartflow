@@ -70,6 +70,81 @@ const CHILD_TIMEOUT_MS = 120000;
 /** countSrcFiles 排除的目录名 */
 const SRC_SKIP_DIRS = ['node_modules', '.git', 'archive', 'data', 'models', 'formulas-corpus', 'dict-data'];
 
+// ── 全量回归用例数缓存：文件名与 scope 常量 ────────────────────
+/** 全量口径缓存（唯一被文档记账信任的文件；r412 起仍是 git 跟踪的例外项） */
+const TEST_COUNT_FILE = 'test-count.json';
+/** 切片口径侧车（HF_RUN_ALL_SLICE 分段回归的数字落这里，不进文档记账） */
+const TEST_COUNT_SLICE_FILE = 'test-count-slice.json';
+const SCOPE_FULL = 'full';
+const SCOPE_SLICE = 'slice';
+
+/**
+ * 读主缓存并判口径。返回体自带 `trusted`：只有 scope=full 的文件才允许
+ * 被记账路径采信。
+ *
+ * 旧缓存（r743 之前写的）没有 scope 字段 —— 按 full 处理：那一整个时期的
+ * 语义就是「run-all.js 跑完写下的数字」，而 run-all.js 在那时只被全量调用
+ * 过（分段是 v6.8.86 才加的 env 开关，且从未有人约定它可以覆写缓存）。
+ * 这条向后兼容只对**存量文件**有效；从 r743 起写入方一律带 scope。
+ */
+function readTestCountFile(dataDir) {
+  const file = path.join(dataDir, TEST_COUNT_FILE);
+  let j = null;
+  try {
+    if (fs.existsSync(file)) j = JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (_) { j = null; }
+  if (!j || typeof j !== 'object') {
+    return {
+      file, exists: false, scope: null, slice: null,
+      passed: null, failed: null, total: null, files: null, at: null,
+      trusted: false, reason: '无 data/' + TEST_COUNT_FILE + ' 缓存或不可解析',
+    };
+  }
+  const scope = j.scope === SCOPE_SLICE ? SCOPE_SLICE : SCOPE_FULL;
+  const passed = Number.isFinite(j.passed) ? j.passed : null;
+  const failed = Number.isFinite(j.failed) ? j.failed : null;
+  const total = Number.isFinite(j.total)
+    ? j.total
+    : (passed !== null ? passed + (failed || 0) : null);
+  return {
+    file,
+    exists: true,
+    scope,
+    slice: typeof j.slice === 'string' ? j.slice : null,
+    passed,
+    failed,
+    total,
+    files: Number.isFinite(j.files) ? j.files : null,
+    at: typeof j.at === 'string' ? j.at : null,
+    trusted: scope === SCOPE_FULL,
+    reason: scope === SCOPE_FULL
+      ? null
+      : 'data/' + TEST_COUNT_FILE + ' 是切片口径（scope=slice'
+        + (typeof j.slice === 'string' ? ', slice=' + j.slice : '')
+        + '）—— 分段回归不许覆写全量缓存，记账路径拒绝采信',
+  };
+}
+
+/**
+ * 写缓存，按 scope 分流文件。**切片绝不写主缓存**，这是 r742 事故的根因修法。
+ * 返回 { file, scope, wrote } 供调用方打印落点。
+ */
+function writeTestCount(dataDir, entry) {
+  const at = (entry && entry.at) || new Date().toISOString();
+  const passed = Number(entry.passed) || 0;
+  const failed = Number(entry.failed) || 0;
+  const base = { passed, failed, total: passed + failed, at };
+  if (Number.isFinite(entry.files)) base.files = entry.files;
+  const isSlice = entry.scope === SCOPE_SLICE;
+  const file = path.join(dataDir, isSlice ? TEST_COUNT_SLICE_FILE : TEST_COUNT_FILE);
+  const payload = isSlice
+    ? Object.assign({}, base, { scope: SCOPE_SLICE, slice: entry.slice || null })
+    : Object.assign({}, base, { scope: SCOPE_FULL });
+  fs.mkdirSync(dataDir, { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(payload, null, 2));
+  return { file, scope: isSlice ? SCOPE_SLICE : SCOPE_FULL, wrote: true };
+}
+
 class MeasureCore {
   constructor(opts = {}) {
     this.rootPath = opts.rootPath || process.cwd();
@@ -260,25 +335,47 @@ class MeasureCore {
     return walk(this._abs(REL.test)).length;
   }
 
+  // ── ② 全量回归用例数缓存：scope 纪律 ─────────────────────────
+
   /**
-   * 读 run-all.js 跑完落盘的用例数缓存。
-   * [r408] 区分 null（未测量）与 0（合法测量值）—— 旧实现 `|| 0` 把两者
-   * 混同，导致规格表的 failing 数永远记不上账。
+   * [v6.8.98 第 743 轮] 缓存文件的 scope 契约（**写入方与读取方的单一来源**）。
+   *
+   * r742 实测事故（交接簿候选池①，非推测）：`HF_RUN_ALL_SLICE=565/625` 跑完
+   * 分段回归后跑 `node scripts/sync-doc-numbers.js`，README/SKILL 的规格表
+   * 被记成「48 passing / 0 failing」——而真值是 19,993 passing / 25 failing。
+   * 根因：run-all.js 汇总段**无条件**把本次数字写进 data/test-count.json，
+   * 切片回归只跑了 1/625 的文件，数字天然小一个量级；而 sync-doc-numbers
+   * 经 readTestCount() 读那个文件时，没有任何字段能告诉它「这是切片」。
+   *
+   * 修法是一处：缓存带 scope 标记，且**写入时就分流**——
+   *   · scope=full → data/test-count.json（唯一被文档记账信任的文件）
+   *   · scope=slice → data/test-count-slice.json（侧车，只给人看）
+   * 切片回归从此**不碰**全量缓存， readTestCount() 再对 scope=slice 的主缓存
+   * 拒绝采信（纵深：万一有人手工把切片数字写回主缓存，记账路径宁可不出数）。
+   *
+   * 为什么放在 src/ 而不是 test/_xxx.js：读取方 measure-core（src/）不能
+   * require test/ 下的模块（npm 发包只含 src/，见 package.json files），
+   * 而写入方是 test/run-all.js —— test → src 是正常依赖方向。
+   * r739 的教训（判定与契约必须同一份代码）在这里同样成立：判 scope 的
+   * 逻辑只有这一份，runner 与所有记账方共用。
    */
   readTestCount() {
-    const cf = this._abs(path.join(REL.data, 'test-count.json'));
-    try {
-      if (!fs.existsSync(cf)) return { passed: null, failed: null, at: null };
-      const j = JSON.parse(fs.readFileSync(cf, 'utf8'));
-      if (!j.passed) return { passed: null, failed: null, at: null };
-      return {
-        passed: j.passed,
-        failed: Number.isFinite(j.failed) ? j.failed : 0,
-        at: typeof j.at === 'string' ? j.at : null,
-      };
-    } catch (_) {
-      return { passed: null, failed: null, at: null };
+    const r = readTestCountFile(path.join(this.rootPath, REL.data));
+    // 旧口径：passed 取不到（无文件 / 0 / 非法）＝ 未测量，与 0 区分开
+    if (!r.exists || !r.passed) {
+      return { passed: null, failed: null, at: null, scope: null, files: null };
     }
+    if (!r.trusted) {
+      // 纵深：主缓存里躺着切片口径的数字 → 记账路径拒绝采信，不洗成可用值
+      return { passed: null, failed: null, at: r.at, scope: r.scope, files: null, refused: r.reason };
+    }
+    return {
+      passed: r.passed,
+      failed: Number.isFinite(r.failed) ? r.failed : 0,
+      at: r.at,
+      scope: r.scope,
+      files: r.files,
+    };
   }
 
   /** 读 guard-abilities.js 自己落盘的缓存（本模块不跑那个 105s 的脚本） */
@@ -352,6 +449,9 @@ class MeasureCore {
       testCases: tests.passed,
       testCasesFailed: tests.failed,
       testCountAt: tests.at,
+      testCountScope: tests.scope,
+      testCountFiles: tests.files,
+      testCountRefused: tests.refused || null,
       capabilityChecks: capability.checks,
       capabilityPassed: capability.passed,
       srcFiles: this.countSrcFiles(),
@@ -445,6 +545,8 @@ class MeasureCore {
         testCases: tests.passed,
         testCasesFailed: tests.failed,
         testCountAt: tests.at,
+        testCountScope: tests.scope,
+        testCountRefused: tests.refused || null,
         capabilityChecks: this.readCapabilityCount().checks,
       },
       note: 'static/cached 都是读源码与缓存，毫秒级；runtime 四个数（tools/routes/modules/dims）'
@@ -453,4 +555,8 @@ class MeasureCore {
   }
 }
 
-module.exports = { MeasureCore, REL, TIERS, START_WAIT_MS, CHILD_TIMEOUT_MS, SRC_SKIP_DIRS };
+module.exports = {
+  MeasureCore, REL, TIERS, START_WAIT_MS, CHILD_TIMEOUT_MS, SRC_SKIP_DIRS,
+  TEST_COUNT_FILE, TEST_COUNT_SLICE_FILE, SCOPE_FULL, SCOPE_SLICE,
+  readTestCountFile, writeTestCount,
+};

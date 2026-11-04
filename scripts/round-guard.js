@@ -115,11 +115,17 @@ if (stage === 'after') {
   });
 
   // 5. README 测试数与 test-count.json 严格一致（契约是 strictEqual 不是 ≥）
+  // [v6.8.98 第 743 轮] 先判口径再比数字：主缓存是切片口径时，比大小毫无意义
+  // （r742 实测：切片跑完缓存是 48，README 是全量 19,993，报出来像文档漂移，
+  // 真因是分段回归覆写了全量缓存）。现在 run-all.js 已按 scope 分流，
+  // 走到这条分支只可能是有人手工写了切片数字，必须点名而不是含糊报漂移。
   const cnt = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/test-count.json'), 'utf8'));
   const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
   const claimed = (readme.match(/([\d,]+) passing tests/) || [])[1];
   const claimedN = claimed ? Number(claimed.replace(/,/g, '')) : null;
-  if (claimedN === cnt.passed) ok(`README 测试数 = ${cnt.passed}（与缓存严格一致）`);
+  if (cnt.scope === 'slice') {
+    bad(`data/test-count.json 是切片口径（slice=${cnt.slice}，${cnt.passed} 通过）—— 分段回归不许覆写全量缓存（r743），重跑一次不带 HF_RUN_ALL_SLICE 的全量再同步文档`);
+  } else if (claimedN === cnt.passed) ok(`README 测试数 = ${cnt.passed}（与缓存严格一致）`);
   else bad(`README 测试数 ${claimedN} != test-count.json ${cnt.passed}（契约是 strictEqual）`);
 
   // 6. 交接簿已记录本轮

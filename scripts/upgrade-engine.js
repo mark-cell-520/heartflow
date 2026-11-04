@@ -213,6 +213,13 @@ function syncReadmeTestCount() {
   const readme = path.join(ROOT, 'README.md');
   const cnt = readJson(path.join(ROOT, 'data/test-count.json'), {});
   if (!cnt.passed) return { synced: false, reason: '无 test-count 缓存' };
+  // [v6.8.98 第 743 轮] 口径闸：分段回归（HF_RUN_ALL_SLICE）的数字只该进侧车
+  // data/test-count-slice.json。r742 实测：切片跑完本函数把 README 横幅写成
+  // 「48 passing tests」（真值 19,993），与 sync-doc-numbers 记的规格表一起
+  // 把文档污染了两个位置。宁可不改也不记错。
+  if (cnt.scope === 'slice') {
+    return { synced: false, reason: `缓存是切片口径（slice=${cnt.slice}，${cnt.passed} 通过）—— 拒绝把分段数字写进 README，请跑一次全量` };
+  }
   let s = fs.readFileSync(readme, 'utf8');
   const want = cnt.passed.toLocaleString('en-US');
   const m = s.match(/([\d,]+) passing tests/);

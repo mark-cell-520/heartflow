@@ -82,6 +82,8 @@ function measure() {
     tests: m.testCases,
     testFailed: m.testCasesFailed,
     testCountAt: m.testCountAt,
+    testCountScope: m.testCountScope,
+    testCountRefused: m.testCountRefused,
     modules: m.modules,
     capabilityChecks: m.capabilityChecks,
     capabilityPassed: m.capabilityPassed,
@@ -278,7 +280,13 @@ for (const [label, fp] of [['README.md', README], ['SKILL.md', SKILL]]) {
       const mm = rows['Test suite'].match(/([\d,]+)\s+passing\s*\/\s*(\d+)\s+failing/);
       assert.ok(mm, `${label} 规格表 Test suite 行格式无法解析：${rows['Test suite']}`);
       if (M.tests == null) {
-        throw new Error(`${label} 规格表 Test suite = ${rows['Test suite']}，但本机没有 data/test-count.json 实测缓存（先跑 node test/run-all.js）`);
+        // [v6.8.98 第 743 轮] 区分「没跑过全量」与「缓存是切片口径」。
+        // 后者是 r742 事故形态（HF_RUN_ALL_SLICE 跑完接着记账），报错必须
+        // 点名它，否则看到「先跑 node test/run-all.js」的人会再跑一次分段。
+        const why = M.testCountRefused
+          ? `（${M.testCountRefused}）`
+          : '';
+        throw new Error(`${label} 规格表 Test suite = ${rows['Test suite']}，但本机没有可采信的 data/test-count.json 实测缓存${why}（先跑一次不带 HF_RUN_ALL_SLICE 的 node test/run-all.js）`);
       }
       // total = passed + failed，是 run-all 本轮真实跑过的用例总数
       const total = M.tests + (Number.isFinite(M.testFailed) ? M.testFailed : 0);

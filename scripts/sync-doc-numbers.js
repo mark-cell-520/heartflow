@@ -79,6 +79,8 @@ function measure() {
     block: m.block, rewrite: m.rewrite, verify: m.verify,
     tiersSum: m.tiersSum, tiersRest: m.tiersRest,
     tests: m.testCases, testsFailed: m.testCasesFailed,
+    testCountScope: m.testCountScope, testCountFiles: m.testCountFiles,
+    testCountRefused: m.testCountRefused,
     capabilityChecks: m.capabilityChecks, capabilityPassed: m.capabilityPassed,
     stamp: m.version };
 }
@@ -349,6 +351,16 @@ function main() {
   console.log(`实测：MCP 工具 ${want.tools} 个 / 路由 ${want.routes} 条 / 模块 ${want.modules} 个 / 维度 ${want.dims} 个`);
   console.log(`      tier: block ${want.block} / rewrite ${want.rewrite} / verify ${want.verify}`);
   console.log(`      测试 ${want.tests} 通过 / ${want.testsFailed} 失败 / 口径版本戳 v${want.stamp}\n`);
+  // [v6.8.98 第 743 轮] 缓存口径闸。readTestCount() 只信 scope=full 的主缓存；
+  // 一旦读到切片口径（r742 事故形态：HF_RUN_ALL_SLICE 跑完接着记账），
+  // tests/testsFailed 是 null —— 上面那行会打印 "null 通过"，容易被当成
+  // 「没有测试」。这里把理由讲明，并说明为什么下面会报「已一致」：
+  // 没有实测值就不改文档（宁可不记也不记错），不是文档真的对上了。
+  if (want.testCountRefused) {
+    console.log(`  ⚠️  测试数拒绝记账：${want.testCountRefused}`);
+    console.log(`     → 下面文档的 Test suite 行会显示「已一致」是因为没有可写值，不是真的核对过。`);
+    console.log(`     → 要刷新全量口径：跑一次不带 HF_RUN_ALL_SLICE 的 node test/run-all.js，再回本脚本。\n`);
+  }
 
   let dirty = 0;
   // [r414] 增补 package.json。

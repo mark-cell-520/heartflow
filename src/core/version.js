@@ -157,7 +157,9 @@ const path = require('path');
 //                 注入每个测试子进程。round-740 的 F2 改判据不删断言，
 //                 inFlight 语义一字未改（祖先持锁时记账闸仍拒绝），
 //                 MCP heartflow_mutation_guard 加 action: attribution）。
-let VERSION = '6.8.97';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.98] 第 743 轮同步：6.8.97 → 6.8.98。分段回归记账隔离（切片数字
+//           只落 data/test-count-slice.json，主缓存 scope=full 才被采信）。
+let VERSION = '6.8.98';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');
