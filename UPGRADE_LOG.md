@@ -1,3 +1,48 @@
+## r212 — 第 209 判别维度 `collider_bias`「对撞偏差 / endogenous selection bias」（因果与反事实推理方向轮换）
+
+> **r213 接手修复记录**：r212 实现完整但只跑了负例注入测试（32/32 全绿）未跑 gate 层变体矩阵，违反阶段4 强制项。r213 补测暴露 3 处常量漏判（CAUSAL_ZH 缺「削弱/拖垮/减弱」、ASSOC_EN 缺单边比较级形、CAUSAL_EN 缺 degrades?/slower），已修复并重测全绿——修复详情见下文「验证期关键修复」与「已知边界 6」，测试样本 32→36 断言。
+
+**轮次**：r212（r213 补测修复）｜ **日期**：2026-11-05 ｜ **方向**：因果与反事实推理（条件化结构性偏差族）
+**真升级类型**：1 — 新判别维度（dimMap 新键 collider_bias，独立命中一个新攻击族）
+**来源（真实，未编造）**：arXiv 2406.12158（EMNLP 2024，collider/endogenous selection 方向背景）+ GitHub 三层搜索命中 joshinh/causal-fallacies、causalNLP/logical-fallacy、latent-variable/Real_time_fallacy_detection（README 已读，均非纯规则可集成方案）；Semantic Scholar `collider bias endogenous selection` 空返。侦察落盘 /tmp/hf-scout-1793816114.txt。
+**心虫裁决**：accelerate（confidence 0.7 / priority 40 / goalReviewed=true / trigger optimal_conditions；rationale 中 cognitiveLoad 与 uncertainty 均为字符串 "unknown"，按纪律不当实质背书，如实说明）。
+
+### 实现内容
+- 新文件 `src/collider-bias.js`（约 380 行）：`checkColliderBias(text, inject)` + `__internals()`（12 个可注入常量：COND_ZH/EN、ASSOC_ZH/EN、CAUSAL_ZH/EN、EXEMPT_META_ZH/EN、EXEMPT_CORRECT_ZH/EN）。
+- **判据（三腿共现 + 邻近窗，缺一不判）**：
+  - 腿① COND 条件筛选标记——介词限定形「在…里/之中/中间/中」+ 动作限定形（只看/入选/活过/留任/被淘汰前，**裸名词形态**）+ 筛选结果名词（入选/入围/存活/幸存/活过/留下来/留任/现存/未被淘汰/通过初筛/进入决赛）；EN among the admitted / only those who / conditioned on / restricted to / survivors / survived / made it through。窗 30 字/EN 100 字符。
+  - 腿② ASSOC 样本内观察到的相关共变——负相关/正相关/相关性/相关关系/成反比/共变 + 比较级反向共变（越少…越高/更低/更高/更好/更差/反而/反倒/却更）；EN negatively correlated / correlated with / inversely related / associated with / less…more / the less…the more / tends to。**不要求显式「相关」字样**。
+  - 腿③ CONCL 总体因果结论——C-a 推断+因果形（推断词 所以/因此/因而/可见/说明/意味着/证明/显然/据此 + 因果词 导致/造成/拖累/损害/抑制/促进/有助/有害/不利于/更有效/更安全/推荐/推广/越好；EN causes / leads to / hurts / harms / improves / boosts / better / effective / should / recommend）；C-b 裸结论形（因果词在腿②后 80 字/EN 200 字符内且未被否定）。
+- **否定守卫窗口化**（实现期发现并修复）：原设计查「紧邻结尾」否定标记，导致「这看起来像加班拖累绩效，但其实是筛选制造的伪相关」句中 "拖累" 前的 "看起来像" 未被识别为对冲；改为查因果词前 8 字窗口内的否定标记。
+- **四组豁免 + 疑问句**：概念/教学转述（对撞偏差/对撞因子/内生选择/内生性/选择偏差/自选择偏差/幸存者偏差/辛普森/统计学/教材/课堂/因果推断；EN collider bias / endogenous selection / selection bias / self-selection / survivorship bias / Simpson's paradox / textbook / statistics / causal inference）；正确响应形（不能只看/不能推广/不能外推/不能据此下结论/假相关/伪相关/是筛选造成的/由筛选制造/需要随机对照/需要全样本/尚需/仍待/有待验证/存疑/站不住/说不通；EN can't be generalized / cannot conclude / not evidence / spurious / artifact of the selection / needs the full sample / randomized / conditioning on the selection）；无腿②；推理否定/对冲（不代表/不意味着/推不出/未必/不一定/取决于/还要看/而不是；EN does not mean / not necessarily / depends on / cannot conclude）；疑问句。
+- **实现期关键修复（r161 教训落地）**：概念豁免初版收裸词 "自选择"，导致正当攻击句「在留下来的员工里，加班少的反而绩效更高，这看起来像加班拖累绩效，但其实是自选择造成的假相关」被误放行——负例注入测试 C5 抓到后，只保留 "自选择偏差" 复合形。
+- **验证期关键修复（r161 变体矩阵教训落地，r213 补测发现）**：上一轮只跑负例注入测试（32/32 全绿）未跑 gate 层变体矩阵，r213 接手补测时暴露三处常量漏判——① CAUSAL_ZH 缺裸因果词「削弱/拖垮/减弱」（「这说明高配合度会削弱队伍的存活率」整句漏判，score=1 全放行）；② ASSOC_EN 比较级反向共变只收 less…more / more…less 双向对，漏单边比较级形（"reported slower response times" 无配对比较词，腿②不命中）；③ CAUSAL_EN 缺 degrades?/degraded/degradation 与 slower 结论形。修复后三处攻击变体由 gate.action=pass 转为 verify 且由 collider_bias 直接承重，良性 6/6 不变。测试样本扩为 10 攻击 + 8 良性（36 断言全绿）。
+- 接入 `src/index.js` 八处（require / 计算点 / 评分数组 / dimMap / DIM_GUIDANCE / VERIFY_DIMS / dimensions 输出对象 / module.exports——变量名 `cbi`）。
+
+### 验证数据（五门禁 + 变体矩阵，全部真实执行）
+| 门禁 | 结果 |
+|---|---|
+| `node --check`（collider-bias.js / index.js / test） | 全部通过 |
+| `bin/verify.js` | **16 passed / 0 failed** |
+| `scripts/guard-abilities.js` | **20/20**（维度登记 209 键） |
+| `test/doc-numbers-accuracy.test.js` | **24/24**（同步后） |
+| `scripts/bidirectional-guard.js` | **召回 52/52 不降、误拦 302/326 不升**（92.6%，与基线一致） |
+| 新维度负例注入测试 | **36 passed / 0 failed**（r213 修复 3 处常量漏判后由 32 扩至 36） |
+| gate 层变体矩阵（攻击） | **6/6 非 pass 且全部由 collider_bias 直接承重**（r213 修复后重测；修复前 3/6） |
+| gate 层变体矩阵（良性） | **6/6 全 pass**（含边缘良性：正确多因陈述、正确响应形、筛选后描述、对冲、英文观察性数据、待验证陈述） |
+
+### 已知边界
+1. 只描述筛选后观察、止步于相关陈述而无因果结论词的句子不判（缺腿③）——医学/社科论文对入院人群的客观描述属此类。
+2. 筛选标记与相关观察相隔超出 30 字/EN 100 字符邻近窗不判；跨段共现不判。
+3. 正当的条件化分析（「在控制年龄后 X 与 Y 仍相关」——正确的混杂控制）若含「控制/调整/在控制」标记由既有混杂维度处理，本族不代拦。
+4. 腿② 的比较级反向共变（「越少…越高」）在某些叙述中可能是真实因果的巧合描述，需调用方结合证据链判断；本族只负责标记「需验证」。
+5. 英文单边比较级（slower/higher/fewer）虽已入 ASSOC_EN，但无「相关/共变」语义词而纯靠比较级的句子在真实语料中较少，覆盖以显式相关标记 + 比较级配对形为主。
+6. **运行态生效待确认（r213 接手项）**：本轮修复完成时 MCP 服务仍跑 v6.8.140，需 restart heartflow-mcp 后复核 health/status 返回新版本。
+5. 中英混排长句中，COND 与 ASSOC 若被长插入语隔开（>30 字）会漏判。
+
+**指标变化**：维度 208→209、verify 165→166、三层级合计 195→196/剩余 13 不变、模块 162 不变（纯函数维度模块不进 _modules registry）。
+
+
 # r211 升级轮报告（v6.8.140 — 第 208 维度 hypostatization「实体化/拟人化谬误」上线 — 2026-11-04）
 
 ## 一、轮次与方向

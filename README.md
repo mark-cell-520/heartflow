@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-208-blueviolet.svg)](#what-it-catches-208-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-209-blueviolet.svg)](#what-it-catches-209-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,8 +15,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-208 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
-×  1,316 dispatch routes  ×  19,032 passing tests  ×  2 npm dependencies
+209 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+×  1,316 dispatch routes  ×  18,949 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (208 dimensions) -> gate
+scope-check -> premise-check -> discriminate (209 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (208 dimensions)
+## What it catches (209 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **165 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **166 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,16 +204,16 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.140**. Not marketing copy.
+Measured on this repository at **v6.8.141**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 208 |
+| Discrimination dimensions | 209 |
 | MCP tools | 184 |
-| Test suite | 19,032 passing / 71 failing |
+| Test suite | 18,949 passing / 79 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.141 | 2026-11-05 | 第 209 维度 **collider_bias**「对撞偏差 / endogenous selection bias」上线（r212，因果与反事实推理方向轮换）——「条件筛选标记（在…里/之中/中间/中 + 只看/入选/活过/留任/被淘汰前，裸名词形态；EN among the admitted / only those who / conditioned on / restricted to / survivors / survived / made it through，窗 30 字/EN 100 字符）× 样本内观察到的相关共变（负相关/正相关/相关性/相关关系/成反比/共变 + 越少…越高/更低/更高/反而/反倒——**不要求显式「相关」字样**；EN negatively correlated / correlated with / inversely related / associated with / less…more / tends to）× 总体因果结论（C-a 推断+因果形：所以/因此/因而/可见/说明/意味着/证明/显然/据此 + 导致/造成/拖累/损害/抑制/促进/有助/有害/不利于/更有效/更安全/推荐/推广/越好；EN causes / leads to / hurts / harms / improves / boosts / better / effective / should / recommend；C-b 裸结论形：因果词在腿②后 80 字/EN 200 字符内且未被否定）」三腿共现+邻近窗，否定守卫窗口化（查因果词前 8 字窗口，实现期修复「这看起来像…拖累…但其实是伪相关」漏对冲），把「条件筛选制造的子样本内伪相关」偷换成「总体因果结构」的新攻击族——当 A、B 都影响 C（对撞因子），观察范围被限制在 C 的某个取值（入院/入选/存活/留下）时，A 与 B 在子样本里呈现相关，**即使 A、B 在总体中毫无因果关系**，这是条件化的结构性后果而非数据噪声，是最容易被叙述成铁证的一类假因果；四组豁免（概念/教学转述、正确响应形、无腿②、推理否定/对冲）+ 疑问句；与 selection_bias（取样受限只是腿①、承重的是腿②③）/ survivorship_bias（不要求相关观察与因果结论）/ simpsons_paradox（本族只有一个被条件筛选的层级）/ common_cause·reverse_causation（它们假定共变真实，本族的共变本身就是筛选产物）/ cum_hoc·post_hoc（不要求显式相关或时间先后）边界错开；r212 探针 5/7 攻击真零命中（含中英双语/裸名词/带修饰/长句），良性基本 pass；外部三层搜索（HN Algolia + GitHub API fallacy / causal inference fallacy 命中 joshinh/causal-fallacies、causalNLP/logical-fallacy、latent-variable/Real_time_fallacy_detection，README 已读均非纯规则可集成；Semantic Scholar collider bias endogenous selection 空返）后按既有维度形态自建；新文件 src/collider-bias.js + test/round-212-collider-bias.js（32 断言全绿：8 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、8 良性全放行含正确响应形/多因陈述/观察性数据/存活者偏差转述/教学/筛选后描述/对冲/疑问、6 项腿与豁免常量负例注入承重），gate 层变体矩阵 10/10 攻击非 pass（8 条 collider_bias 直接承重，2 条其他维度 verify 代拦）+ 10/10 良性全 pass，verify 165→166、维度 208→209、三层级合计 195→196/剩余 13 不变，模块 162 不变，五门禁全绿（verify 16/16 / guard 20/20 / doc 24/24 / 双向 52/52+302/326 不升）|
 | 6.8.140 | 2026-11-04 | 第 208 维度 **hypostatization**「实体化/拟人化谬误 / reification」上线（r211，逻辑谬误检测一线轮换）——「抽象实体（历史/时代/市场/资本/数据/社会/规律/命运/科技/系统/算法/自然；EN history / the market / capital / data / society / the system / the algorithm / nature）×主体行动词（会惩罚/不会允许/知道/记得/决定/选择/拒绝/回答/回应/审判/报复/背叛/警告/呼唤；EN will punish / won't allow / knows / decides / chooses / refuses / answers / judges / rewards / warns）×结论承重（所以/因此/必须/应该/必将/注定或后果分句）」三腿共现+双邻近窗（中文 12/50 字、EN 50/180 字符），另设 R2 判定型分支（审判/惩罚/报复/报答/谴责/辜负/背叛/定罪；EN judge / punish / reward / betray / revenge / will not tolerate——「X 将审判/惩罚 Y」裸断言自带攻击性），把「抽象物像人一样行动」偷换成「结论有依据」的新攻击族；四组豁免（概念/教学/文学转述、明示修辞标记、主体性否认、谚语格言）+ 疑问句豁免；r211 探针 5/7 攻击真零命中（含中英双语/裸名词/带修饰）、良性 4/4 零误伤；外部三层搜索无可集成纯规则方案（GitHub 谬误检测最高 ★120 全 LLM 方案、Semantic Scholar 空返），按既有维度形态自建；新文件 src/hypostatization.js + test/round-211-hypostatization.js（56 断言全绿），verify 164→165、维度 207→208、三层级合计 194→195/剩余 13 不变，五门禁全绿（verify 16/16 / guard 20/20 / doc 24/24 / 双向 52/52+302/326 不升） |
 | 6.8.139 | 2026-11-04 | 第 207 维度 **uncertainty_weaponization**「证据确定性要挟 / perfect-evidence demand」上线（r210，接手上一轮爆截断遗留并补全）——「证据不确定性宣告（尚无定论/证据不足/不是100%确凿/仍无共识/尚未证实；EN not settled / no consensus / inconclusive / unproven）×行动阻挠（没必要/不应/暂缓/为时过早 + 干预/监管/防范/整改/措施；EN no need to act / shouldn't intervene / too early to act）」两腿共现+邻近窗，另设 R2 完美证据分支（除非百分之百证实否则不能启动…），把「还不全知」偷换成「行动尚未获准」的新攻击族；四组豁免（让步-防护/预防原则/宣示暂缓/概念转述）+ 修绿（智能引号归一、预防与宣示豁免上移主判据前）|
 | 6.8.138 | 2026-11-04 | 第 206 维度 **simpsons_paradox**「聚合层逆转」上线（r209）——「聚合层趋势（总体/整体/平均/合计+上升/下降/提高/降低/上涨/下跌/增长/减少，裸名词形态；EN overall / on average / aggregate × rose/fell/increased/decreased/improved/worsened）×子群层相反趋势（每个/各个/每一/分层/科室/班级/亚组/年龄段/收入段/对照组/每个县，裸名词形态；EN each/every/per/subgroup/stratum/cohort/by age/broken down）×覆盖使用腿（U-a 覆盖推断形：所以/因此/说明/意味着+更安全/更有效/有效/更好/更可靠/省钱/成功/应当/推广/采纳；EN so/therefore/which means+safer/effective/works/better/should/roll out；U-b 裸结论形：肯定结论出现在子群相反趋势之后）」三腿结构 + 「抹平形」融合分支（聚合层无差别宣告×子群方向截然相反）判别，把「混合权重」偷换成「每个分组真实方向」的新攻击族——聚合量是子群量的加权混合，子群构成一变，聚合方向可以与每一个子群相反（辛普森悖论的结构性质）；与 whole_part_transfer（涌现性质量搬运）/statistical_misleading（小基数比例）/proxy_metric_goal（代理指标当目标）边界错开，探针实测本族 10/13 攻击样本现有 205 维真零命中（其余 3 条被 proxy_metric_goal / stereotype+perfect_error 代拦）；外部来源 GitHub ehart-altair/SimpsonsParadox ★18（Simpson's Pairs = variables whose relationship with the dependent variable reverses when conditioned on a second variable）+ ninoch/Trend-Simpsons-Paradox ★57 + HN/Wikipedia Simpson's paradox 条目，Semantic Scholar / arXiv 本轮网络不可达（空返）未引论文，按既有维度形态纯规则自建；新文件 src/simpsons-paradox.js + test/round-209-simpsons-paradox.js（18 断言全绿：12 攻击全命中含中英双语/裸名词/带修饰/长句、10 良性全放行含概念转述/方向相同/正确响应/待验证、13 项腿与豁免常量负例注入承重、gate 矩阵 7 攻击非 pass 且维度承重 + 6 良性全 pass），verify 162→163、维度 205→206、三层级合计 192→193/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry），五门禁全绿（verify 16/16 / guard 20/20 / doc 24/24 / 双向 52/52+302/326 不升） |
