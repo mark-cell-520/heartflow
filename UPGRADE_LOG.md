@@ -1,3 +1,28 @@
+# r210 升级轮报告（v6.8.139 — 第 207 维度 uncertainty_weaponization「证据确定性要挟」上线 — 2026-11-04）
+
+## 一、轮次与方向
+- 轮次 r210，方向：证据充分性与不确定性量化（轮换——r209 因果与统计聚合推理）。任务：新增判别维度，命中一个此前 206 维无一覆盖的新攻击族。
+- **本轮为接手轮**：开工 `git status` 发现上一轮 r210 已写好 src/uncertainty-weaponization.js 并在 src/index.js 八处接齐，但测试/门禁/版本/日志/commit 全未做即被截断（r164 式爆截断遗留：UPGRADE_LOG 顶部仍 r209、VERSION 仍 6.8.138、doc-numbers 因文档未同步 15/24 红）。按接手纪律第一优先修绿并补全，而非丢弃重起炉灶。
+- 立项缺口实证（上一轮探针，模块头部记录）：本族攻击 3/3 gate.action=pass（真零命中，含中英双语）、良性 2/2 pass（零误伤）；grep 实证 src/ 无任何维度以「不确定性宣告×行动阻挠」两腿结构覆盖本族。
+- 心虫裁决门禁：philosophy_decision 裁决 accelerate（confidence 0.7 / priority 40 / trigger optimal_conditions；cognitiveLoad/uncertainty 记 "unknown"，按约定未当实质背书）。
+
+## 二、来源（真实，未编造）
+- 外部三层研究（HN Algolia / Semantic Scholar / GitHub API）无成熟纯规则方案可集成（GitHub 谬误检测仓库最高仅 21 星且均为 LLM 方案；arXiv 2405.02318 为 NL→FOL 翻译法非规则可集成），如实记录，按心虫既有维度形态自建纯规则判据（证据确定性要挟 / perfect-evidence demand 为经典非形式谬误，文献仅作分类学参考）。
+
+## 三、实现
+- 完成上一轮未竟：src/uncertainty-weaponization.js（约 350 行，checkUncertaintyWeaponization + __internals 14 常量）+ index.js 八处接线（上一轮已接，本轮 grep 复核 0 冲突、node --check 通过）。
+- 判据：R1 主判据（腿① 不确定性宣告 × 腿② 行动阻挠 + 邻近窗 60/160）+ R2 完美证据分支；四组豁免（让步-防护/预防原则/宣示暂缓/概念转述）+ 疑问句豁免。
+- **本轮两处修绿（变体矩阵 + 负例注入实测发现，非凑数）**：① EN 正则 '? 只认直引号，真实文本 isn’t（U+2019）整条漏判——入口加智能引号归一（U+2018/U+2019/U+02BC/U+2032→直引号，只增匹配不删）；② 预防原则与宣示型暂缓豁免原置于 R1 之后，含腿②词的宣示/预防句（「暂不发布处理结果」——「处理」落入腿②）被 R1 抢命中误伤——两类豁免上移主判据之前（只减命中、不增误伤）。
+- 新测试 test/round-210-uncertainty-weaponization.js（13 断言全绿）；三份文档数字同步（维度 206→207、verify 163→164、合计 193→194）；README Version history / CHANGELOG 追加 6.8.139 条目；VERSION 6.8.138→6.8.139 后 sync-version.js 同步。
+
+## 四、验证（五门禁 + 变体矩阵，全绿）
+- bin/verify.js：16 passed / 0 failed
+- scripts/guard-abilities.js：20/20（dimensions 键实测 207）
+- test/doc-numbers-accuracy.test.js：24/24（修文档同步后由 15/24 转绿）
+- scripts/bidirectional-guard.js：召回 52/52、误拦 302/326（92.6%，与上轮持平不升——零新增误拦）
+- 变体矩阵（真实 gate() 实测）：攻击 7/7 gate.action 非 pass 且 uncertainty_weaponization 承重；良性 5/5 gate pass（含让步-防护/宣示暂缓/预防原则/概念转述边缘良性）。模块级探针：攻击 10/10 命中、良性 10/10 放行。
+- 已知边界：① 跨段共现超出邻近窗（不确定宣告与阻挠相隔 60 字/EN 160 字符以上）不判；② 让步-防护豁免要求「但…仍要防范」结构在场，缺转折防护词的混合句仍可能走 R1；③ 宣示型暂缓豁免只豁免「冻结动作纯属宣示性」的句子，若同句还冻结防护/监管行动（「暂缓干预，也暂不公布」）本族标记之（冻结防护行动即落在射程内，属正确判别）。
+
 # r209 升级轮报告（v6.8.138 — 第 206 维度 simpsons_paradox「聚合层逆转」上线 — 2026-11-04）
 
 ## 一、轮次与方向
