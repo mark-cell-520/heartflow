@@ -1,3 +1,284 @@
+# 第 740 轮报告（v6.8.95 — 回归突变期与数字记账互斥 + 突变残留完整收底：r739 把模块数 161 记成 157、路由 1314 记成 1264，根因不是记账脚本会删源码，而是测量与删条突变窗口没有互斥）
+
+## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
+
+两个 cron 仍为空数组（`hermes/cron/jobs.json`），自主循环停着，r740 继续由主会话驱动。
+**选题判定由我下，不是 decision 本体打分。**
+
+选题直接取自 r739 交接簿候选池①——那条被标注「**强烈建议 r740 直接做这条**」的项：
+「`scripts/sync-doc-numbers.js` 的破坏性：本轮实测它删 `src/reward-hacking.js` 103 行 +
+`src/core/heartflow.js` 32 行、把模块数 161→157 / 路由 1314→1264……必修：查清它为什么
+实测出 157/1264，并把它对 src/ 的写权限去掉。」
+
+**轮初先复测做实，不猜**——这一步直接推翻了交接簿的归因（见二）。它同时满足三个条件：
+r732~r738 **第七次复测确认**的存量缺陷、机器可判定（不占 LLM 迭代预算）、
+收益可用退出码与文件数直接度量。
+
+## 二、根因 / 缺口分析（带证据）
+
+### 2.1 交接簿的归因是错的：记账脚本零 src/ 写入
+
+`node scripts/sync-doc-numbers.js` 单独跑（仓库干净态），实测：
+
+```
+实测：MCP 工具 189 个 / 路由 1314 条 / 模块 161 个 / 维度 160 个
+  ✅ AGENTS.md 已一致   ✅ README.md 已一致   ✅ SKILL.md 已一致   ✅ package.json
+```
+
+`git status --porcelain` **零 src/ 改动**。读源码坐实：`main()` 的写盘清单是
+`['AGENTS.md','README.md','SKILL.md','package.json']` 四个字面量，`syncFile()` 的
+`fp = path.join(ROOT, file)` 只可能落在那四个文件上——**没有任何路径能写到 src/**。
+「把它对 src/ 的写权限去掉」这个处方针对的是一个不存在的病因。
+
+### 2.2 真正的因①：记账与回归的删条突变窗口没有互斥
+
+`test/run-all.js` 有单例锁（`data/.run-all.lock` 存 PID + `process.kill(pid,0)` 探活，
+`acquireSingleton()`），但它只回答「**另一个 run-all 在跑吗**」。两个记账脚本
+（`sync-doc-numbers.js` 的 `measure()` 与 `measure-claimed-numbers.js`）**完全不看它**，
+各起一个 `spawnSync('node', ['-e', …])` 子进程去 `require('src/core/heartflow.js')`。
+
+而回归串行车道里有一整族是**原地删条突变**（探针 `grep -n writeFileSync` 实测，
+`test/reward-hacking-covert-en-token-round154.test.js:133-147` 等 6 个文件同形）：
+
+```js
+const SRC = …;  const original = fs.readFileSync(SRC, 'utf8');
+fs.writeFileSync(SRC, stripped);          // ← src/reward-hacking.js 被删段
+try { … } finally { fs.writeFileSync(SRC, original); }
+```
+
+`runChild()` 用 `execSync(timeout = CHILD_TIMEOUT)`，超时先 `killOrphans()` 发 **SIGKILL**
+——SIGKILL 不可捕获，`finally` 不跑，源文件永久留在删条态（这一点
+`test/mutation-guard-recovery.js` 的头注释已记载，是 r469 的结构性复发）。
+**在删条窗口内 `require` 那份 heartflow.js，量出的就是 157/1264。**
+r739 记录的「src/reward-hacking.js 少 103 行 + src/core/heartflow.js 少 32 行」正是
+`stripped` 的形状，与记账脚本无关。
+
+### 2.3 真正的因②：runner 回滚不删新增残留，且覆盖面只到 src/
+
+`test/run-all.js` 的 `rollbackSrcIfDirty(snap)` 遍历**快照 Map**：
+
+```js
+for (const [p, content] of snap) { if (fs.readFileSync(p,'utf8') !== content) { 还原 } }
+```
+
+两个洞，都是实测的：
+- **只增不减**：快照外**新增**的文件一个不删。r739 实测 runner 被 kill 后留下 7 个
+  未跟踪残留（`src/round-448-mutant-*.js` 5 个 + `round-448-mutant-runner.js` +
+  `samples.json`），只能手工 `rm`。
+- **覆盖面只到 src/**：`snapshotSrc()` 只 `walk(path.join(ROOT,'src'))`。而突变落点
+  实测有**三块**：`src/round-448-mutant-*.js`（副本）、仓库根 `.mut-488-*.js`
+  （`test/round-488-powerless-deflection.test.js:166` 写
+  `path.join(__dirname,'..','.mut-488-'+mut.name+'.js')`）、
+  `test/.tmp-mutant-r507-*.js`（`test/round-507-standard-shift.test.js:97` 等写
+  `__dirname` 下）。后两块原快照**零覆盖**。
+
+## 三、落地项
+
+### ① 新模块 `src/core/mutation-guard.js`（MutationGuard，非注释代码 ~150 行）
+
+三个公有方法 + 四个辅助：
+
+| 方法 | 作用 |
+|---|---|
+| `guardMeasurement(label)` | 记账闸：回归在飞 → `{ok:false, reason}`，调用方必须放弃记账 |
+| `snapshot(dirs)` / `rollback(snap)` | 快照 src/ + test/ + 仓库根顶层；回滚还原被改的 **+ 删新增残留** |
+| `auditResidue()` | 只读扫三块地盘，按年龄分 `suspicious`(≤48h) / `known` 两桶 |
+| `isRegressionInFlight()` / `auditSidecar()` / `status()` | 锁探活 / 侧车 .bak 清点 / 汇总 |
+
+**删除残留设两道闸，缺一不可**（都是本轮实测踩出来的）：
+- **形状闸**：basename 必须以 `round-<N>-mutant-` / `.mut-` / `.tmp-mutant-` 开头。
+  第一版用宽形状 `mutant-`，实测咬到**已入库**的正常驱动 9 个
+  （`test/round-434-mutant-{child,runner}.js`、`scripts/round-327/mutant-driver.js` 等，
+  `git ls-files` 可查）——那不是残留。
+- **新鲜度闸**：`mtime >= 快照时刻 - 2s`。已入库文件 mtime 旧，本轮新写的突变体新。
+  不匹配两道闸的只报 `keptNew` 不删：宁可留一个残留让人看，也不误删别人的新模块。
+
+**刻意不进 `_modules`**：一进就撬动模块数 161→162 与 `ALLOWED_ROUTES` 基线，
+而 `round-606/608/609/614/615` 等 **15+ 个测试把 161/1314 当硬断言**钉着
+（`assert.strictEqual(Object.keys(hf._modules).length, 161)`）。一个纯工具件不该为它
+改一屋子基线。接线按 AGENTS.md 约定 2 走懒加载
+（`_lazy('mutationGuard', () => require('./mutation-guard.js'))`），
+按约定 3 三处接进 MCP。
+
+### ② `src/mcp-server.js` + `src/mcp/tools-registry.js`：`heartflow_mutation_guard`（三处）
+
+工具定义（含长描述，与 r727~r738 同款口径）+ `HANDLERS` 映射 + `handleMutationGuard()`
+三个 action：`status`（默认，汇总回归在飞/残族/侧车）、`audit`（只跑残族审计）、
+`guard`（跑记账闸，返回 `ok=false` 时 advice 明写「放弃记账」）。
+**只读、不进 `needsWrite` 写权限清单**——删除残留只由 run-all.js 在测试间隙做，
+MCP 侧不给 guest 删文件的权力（AGENTS.md 的三处写权限清单因此一字未动）。
+未启动引擎时退化到进程内单例 `_mutationGuardFallback()`（r627 同款范式）。
+
+### ③ `test/run-all.js`：改调共享模块 + 串行车道收尾再回滚一次
+
+`snapshotSrc()`/`rollbackSrcIfDirty()` 变成 `_MG().snapshot()` / `_MG().rollback(snap)`
+的薄封装（原「只走 src/」的 walk 实现整段删除），新增 `reportRollback()` 把
+`restored` / `removed` / `keptNew` **三类结果分别报出**（不许悄悄还原、悄悄删）。
+调度侧在串行车道**收尾**再回滚一次：任务 exit 0 但 `finally` 被绕过 / `unlink` 漏文件时，
+原实现整段跑完不再看一眼，残留就带进下一轮。
+
+### ④ 两个记账脚本过闸（退出码 2）
+
+`sync-doc-numbers.js` 的 `measure()` 开头、`measure-claimed-numbers.js` 顶部各加
+`guardMeasurement(...)`，在飞即拒绝：前者 `throw` → `main()` 捕住 `exit(2)`，
+后者直接 `console.error + process.exit(2)`。**退出码 2 与「数字不一致」的 1 区分**：
+1 = 量到了但不一致，2 = 拒绝测量。纪律与脚本既有的「量不到就拒绝记账」同一条：
+宁可不记也不记错。
+
+### ⑤ 本轮测试 `test/round-740-mutation-guard.test.js`：46 通过 / 0 失败
+
+七段：A 快照/回滚四闸（全部在 `os.tmpdir()` 造的临时仓库根上做，**绝不碰真仓**）、
+B 残族审计分桶、C 突变期探活三态（无锁 / 死 PID / 活 PID，活 PID 用真 spawn 的子进程）、
+D 五处接线守卫（run-all / 两个记账脚本 / MCP 三处 / 引擎懒加载与实例化）、
+E 引擎运行时（`modules=161` / `routes=1314` 逐字不变 + 三个公有方法在场）、
+F 真仓干净性、**G 回归段**——把 r739 之前的旧实现照抄一份喂同一场景，
+它必须漏（G1 洞复现 → G2 新实现删掉），证明守卫承重不是装饰。
+
+## 四、验收数字（全部实测）
+
+### 互斥闸（活 PID 锁，子进程真探活）
+
+| 脚本 | 结果 |
+|---|---|
+| `scripts/measure-claimed-numbers.js` | **EXIT=2**，stderr：`❌ 拒绝记账（measure-claimed-numbers）：全量回归在飞（锁 PID 35928）……r739 实测就这样把模块数 161 记成 157、路由 1314 记成 1264` |
+| `scripts/sync-doc-numbers.js` | **EXIT=2**，stderr：`实测失败：拒绝记账（sync-doc-numbers）：……` |
+
+（锁文件写一个**已退出**的 PID 时两个脚本都正常出数——死 PID 不留死锁，
+与 `acquireSingleton()` 的判据同源。）
+
+### 残留收底（临时仓库根，不碰真仓）
+
+| 场景 | 结果 |
+|---|---|
+| 内容被改的 `src/real.js` | 还原，`restored=['src/real.js']`，还原后与快照逐字一致 |
+| 三类新增残族（`src/round-448-mutant-*` / 仓库根 `.mut-488-*` / `test/.tmp-mutant-r507-*`） | **3 个全删**，`removed` 三条、文件确已不存在 |
+| 同形状但 mtime 400 小时前的 `test/round-434-mutant-runner.js` | **不删**，进 `keptNew`（已入库驱动） |
+| 新增但不属残族形状的 `src/brand-new-module.js` | **不删**，进 `keptNew` |
+| 旧实现（照抄 r739 之前那 8 行）同场景 | `restored=[]` 且残留文件**仍在** → 洞复现 |
+
+### 覆盖面与开销（真仓实测）
+
+| 指标 | 数值 |
+|---|---|
+| 快照文件数 | **1278** 个 .js（原实现只快照 src/ 的 499 个） |
+| 快照耗时 | **173 ms** |
+| 回滚耗时（无突变时） | **172 ms** |
+| 快照 `dirs` | `['src','test','.']`（仓库根只扫顶层，避免走全仓库） |
+
+串行车道 88 个任务各回滚一次 ≈ 多花 15s，可接受。
+
+### 引擎行为零变化的证据
+
+| 指标 | r739 基线 | r740 |
+|---|---|---|
+| `Object.keys(hf._modules).length` | 161 | **161** |
+| `HeartFlow.ALLOWED_ROUTES.size` | 1314 | **1314** |
+| 双向门禁召回 | 52/52 | **52/52** |
+| 双向门禁误拦 | 306/326 | **306/326**（一条不增不减） |
+| MCP 工具数 | 189 | **190**（+`heartflow_mutation_guard`，记账已同步） |
+
+`git diff src/` 只有：新模块 `mutation-guard.js`、`heartflow.js` 的懒加载 + 实例化 +
+BUILD_DATE、`version.js` 兜底 6.8.94→6.8.95、`mcp-server.js` 的工具三处、`tools-registry.js`
+一条定义。判别逻辑（`src/index.js`）**一个字未动**，双向门禁因此与基线逐项一致。
+
+### 全量回归：`node test/run-all.js`（677.9s，并发 4，623 个测试文件）
+
+**19890 通过 / 29 失败 / 19919 个**（`data/test-count.json` 由 runner 自动写入，
+README/SKILL 规格表已按此缓存同步）。基线 r739 是 19852 / 25 / 19877。
+
+**诚实标注：本轮跑了两次，两次数字不同，原因是存量 flaky 而不是本轮改动。**
+第一次（改三处工具数基线**之前**）19924 / 28 / 19952，第二次（改完之后）19890 / 29 / 19919。
+差额全部来自 `round-608-forgettingengine-dispatch.test.js` 这个存量 flaky：
+它单独跑 **33 通过 / 1 失败**（`B7 detectOscillation 触发 frequent_thrashing 震荡型
+:: 实得 type=rapid_access`），在回归里随机落「Command failed」或「通过」——
+r738/r739 交接簿原文即「round-608 本轮未失败（漂移）」。它自报 33 条用例，
+所以它一失败，总数就掉 ~33、失败数就 +1，两次运行的差额由此完全解释。
+
+### 本轮引入的 3 个失败已修（教训记在六）
+
+第一次回归暴露：`round-735-injection-obfuscation`（52 过 **2 败**）、
+`round-736-quoted-frame-suppression`（22 过 **1 败**）、
+`round-738-post-hoc-attribution-leg`（108 过 **1 败**）——三个都是**工具总数滚动快照**
+硬断言（`assert.strictEqual(tools.length, 189)`），新工具让它变成 190。
+按仓库自己的约定修（`round-735` 的注释原文：「本断言是工具总数的滚动快照，
+每轮新增 MCP 工具都要跟着走」，链 185→186→187→188→189），补记 r740 的 189→190。
+修后单独复跑：**52/0、22/0、108/0**。
+
+### 剩余 29 个失败逐条核对，零条本轮新引入
+
+| 桶 | 文件 | 与 r739 的关系 |
+|---|---|---|
+| 文件自报失败 | ClassicsRules（searchClassicsBatch）/ AgentBoundaryGuard（unknown dot-dir in home）/ mcp-guest-permission（端到端） | 逐字同族 |
+| 未输出结果行 | mcp-server / mcp-smoke / round-572-associative-handler / round-498 / round-630 | 前 3 个零输出（8099 端口被常驻 MCP 服务占用）；后 2 个同 r739 |
+| Command failed | mcp-auth-tier / round-502 / round-506 / round-572-associative-wiring / **round-608** | 前 4 个同 r739；round-608 是存量 flaky（单独跑 33/1，见上） |
+| 注册 0 用例 | round-410-checktests-catchguard | 同 r739 |
+
+另有 8 个自报失败的文件（`RecoveredModules` / `api-surface-consistency` /
+`round-735` / `round-737` / `round-738` / `round-v680-macro-strategy-wiring` /
+`round-v680-statistical-misleading` / `run-all-no-silent-skip`）**r739 的报告没有逐条列**——
+r739 自称 25 个失败却只列出 17 条，差的 8 条正是这批。本轮逐个单跑核实：
+`api-surface-consistency` 的 2 个失败是 `checkEvidence` 幽灵方法 + `quotationFrame`/
+`delimiterChannel`/`postHocLegs` 三个导出无文档提及（r734/r735/r738 遗留，与本轮无关）；
+`RecoveredModules` 是 `unknown dot-dir in home`（Windows 家用目录，环境噪声）；
+其余为存量维度守卫的既有失败。**三个工具数失败是本轮唯一引入项，已修并复跑转绿。**
+
+### 六项门禁
+
+| 门禁 | 结果 |
+|---|---|
+| `bin/verify.js` | **16/16** |
+| `scripts/bidirectional-guard.js` | **召回 52/52、误拦 306/326**（与 r739 逐项一致） |
+| `scripts/guard-abilities.js` | **20/20**（dimensions 键 160 / summary 引用 123） |
+| `test/doc-numbers-accuracy.test.js` | **22/22** |
+| `test/security-audit.test.js` | 15/16，唯一失败 S2「git log/tag 未命中 6.8.95」，本轮提交后自动转绿（与 r735~r739 同） |
+| `scripts/round-guard.js --stage=after` | 见六（提交后通过） |
+
+## 五、已知未修（含为什么不修）
+
+1. **`measure-claimed-numbers.js` 的 `dimCount` 实测为 0**——它的子进程口径
+   （`discriminate('neutral baseline text').dimensions`）返回 0 个键，
+   与 `sync-doc-numbers.js` 的同一表达式（实测 160）不同。**本轮不动**：
+   它是独立的度量口径 bug，改它会动 doc-numbers 的维度断言，属另一主题；
+   已记入 r741 候选池。
+2. **`rollback` 的 `keptNew` 只报不删**：不匹配两道闸的新 .js 不删。这是**刻意**的
+   安全边界（防误删新模块），但意味着「新写的、形状不在残族表里的突变文件」仍会漏。
+   正解是让变更测试统一走 `mutation-guard-recovery.js` 的 `arm/disarm` 侧车，
+   那是测试侧的批量改造，属独立主题。
+3. **`auditSidecar()` 报出 3 个 `.bak`**（`data/.mutation-guard/`）：
+   `recover()` 只在「arming 进程已死」时还原，这 3 个的 owner 可能仍活着。
+   本模块只报不碰，正解属于 r469/r472 那套侧车机制自己的事。
+4. **`run-all.js` 自己被 runner 当测试文件执行**（`test/run-all.js` 在 `test/` 下、
+   以 `.js` 结尾，`collectTestFiles` 会收它）。它自己打印的汇总行于是被当成
+   一个测试的结果计入。这是 r739 解析器扩容的后遗症，改动它会牵动
+   `run-all-no-silent-skip` 一屋子断言，属独立主题。
+5. **`src/index.js` 14893 行（阈值 14000）**：doc-numbers 每轮报警，拆分是高危重构，
+   cron 每轮在此加维度，暂不自动处理。
+
+## 六、踩坑（r740 新增五条）
+
+1. **「谁写了文件」必须复测，不能接手交接簿的归因。** r739 写「sync-doc-numbers.js
+   删了 src/ 103 行」，我照做就会去给一个只写 4 份 markdown 的脚本加 src/ 写保护——
+   修一个不存在的病，真病因（测量与突变期不互斥）继续躺 8 轮。
+   **教训：动手前先 `git status` + 读写盘清单，把「它真的会写吗」问到底。**
+2. **heredoc（`cat <<'EOF'`）会吞反斜杠。** 我用 bash heredoc 写探针复测
+   `detectWriteToSrc`，`\\s` 被写成 `\s`，JS 模板字符串里 `\s` → 字面 `s`，
+   正则变成 `(?:const|let|var)s+MUT_PATHs*=s*…`，恒不匹配 → 探针报「0 个变更测试」，
+   我差点据此得出「串行车道整个是死的」这个**假结论**。改用 Write 工具写文件后
+   同一探针实测 76 个。**教训：含正则/反斜杠的探针一律用文件写入，不用 heredoc。**
+3. **残族形状不能宽匹配。** 第一版 `RESIDUE_RE` 用 `mutant-`，真仓审计命中 9 个
+   **已入库**驱动（`git ls-files` 可查），若直接拿去删就是删源码。
+   加了「basename 前缀锚定 + mtime 新鲜度」两道闸才敢删。
+4. **加 MCP 工具会打红三处「工具总数滚动快照」。** 本轮实测
+   `round-735`（2 败）/ `round-736`（1 败）/ `round-738`（1 败）全是
+   `assert.strictEqual(tools.length, 189)`。这是仓库既定约定（注释原文
+   「每轮新增 MCP 工具都要跟着走」），**不是回归**——但第一次回归里我把它当成
+   「失败数 +3」去逐条核对，花了时间。下轮直接先改这三处再跑回归。
+5. **同一次回归跑两遍数字会变，报数必须说清是哪一遍。** 本轮 19924/28 与 19890/29
+   的差额全部由 `round-608` 这个存量 flaky 造成（它自报 33 条用例，一失败总数就掉 33）。
+   **教训：全量回归的通过/失败数不是确定性量，跨轮比较必须先固定 flaky 或明示波动来源。**
+
+---
+
 # 第 739 轮报告（v6.8.94 — 全量回归汇总行解析面扩容：49 个测试文件跑完、有输出、exit 0，只是汇总行格式不被 runner 认识，每轮通过数一直在低报）
 
 

@@ -126,7 +126,14 @@ const path = require('path');
 //                 解析器抽成单一来源 test/_summary-parse.js，新增 6 族格式，
 //                 45/49 救回、496 个此前隐形的断言数得以计入。纯 runner 侧
 //                 改动，引擎零行为变化）。
-let VERSION = '6.8.94';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+// [v6.8.95] 第 740 轮同步：6.8.94 → 6.8.95（回归突变期与数字记账互斥 +
+//                 突变残留完整收底：r739 把模块数 161 记成 157、路由 1314
+//                 记成 1264，轮初复测证明记账脚本零 src/ 写入，真正的因是
+//                 测量与回归的删条突变窗口没有互斥 + runner 回滚不删新增
+//                 残留。新模块 src/core/mutation-guard.js，刻意不进
+//                 _modules 以保 161/1314 基线，MCP 只读工具
+//                 heartflow_mutation_guard 三处接线）。
+let VERSION = '6.8.95';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

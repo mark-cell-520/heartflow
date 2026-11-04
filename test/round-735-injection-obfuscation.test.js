@@ -309,9 +309,10 @@ t('内部 API：通道 A 与通道 B 互不重复计数', () => {
     // [r736 增补] 本断言是工具总数的滚动快照，每轮新增 MCP 工具都要跟着走：
     // r735 记 185→186，r736 新增 heartflow_quotation_frame 后为 186→187，
     // r737 新增 heartflow_delimiter_channel 后为 187→188，
-    // r738 新增 heartflow_post_hoc_legs 后为 188→189。
-    t('MCP 工具总数 186 → 187 → 188 → 189', () => {
-      ok(tools.length === 189, '工具总数应 189，实为 ' + tools.length);
+    // r738 新增 heartflow_post_hoc_legs 后为 188→189，
+    // r740 新增 heartflow_mutation_guard 后为 189→190。
+    t('MCP 工具总数 186 → 187 → 188 → 189 → 190', () => {
+      ok(tools.length === 190, '工具总数应 190，实为 ' + tools.length);
     });
   } catch (e) {
     fail++; say('  ❌ MCP 接线整段失败 → ' + e.message);

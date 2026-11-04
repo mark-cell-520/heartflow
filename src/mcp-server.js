@@ -3361,6 +3361,80 @@ function _strategicRestraintFallback() {
   return _srFallback;
 }
 
+// [r740] mutationGuard 回退单例：MCP 进程未启动引擎时仍要能回答
+// 「现在是不是突变期 / 有没有突变残留」，否则工具在 CLI 形态下恒不可用。
+let _mgFallback = null;
+function _mutationGuardFallback() {
+  if (_mgFallback) return _mgFallback;
+  try {
+    const { MutationGuard } = require('./core/mutation-guard.js');
+    _mgFallback = new MutationGuard({ rootPath: HF_DIR, silent: true });
+  } catch (_) { _mgFallback = null; }
+  return _mgFallback;
+}
+
+/**
+ * [r740] heartflow_mutation_guard —— 回归突变守卫（只读）。
+ * r739 事故的机器可判定制：全量回归在飞时，任何实测数字都不可信
+ * （变更测试正在原地删条 src/reward-hacking.js 一族）。本工具把
+ * 「能不能记账」与「有没有残留」变成一次调用，见 tools-registry 长描述。
+ */
+function handleMutationGuard(args) {
+  const action = (args && args.action) || 'status';
+  const label = (args && args.label) || 'mcp';
+  const mg = (heartflow && heartflow.mutationGuard) || _mutationGuardFallback();
+  if (!mg) return { error: 'mutationGuard 不可用（引擎未启动且回退单例创建失败）', action, timestamp: Date.now() };
+
+  if (action === 'audit') {
+    const residue = mg.auditResidue();
+    const sidecar = mg.auditSidecar();
+    return {
+      action: 'audit',
+      suspicious: residue.suspicious,
+      suspiciousCount: residue.suspicious.length,
+      known: residue.known,
+      knownCount: residue.known.length,
+      sidecar,
+      clean: residue.suspicious.length === 0,
+      note: 'suspicious = 48 小时内的突变残族文件（可能是被杀的回归留下的）；'
+        + 'known = 更早的同形文件（已入库测试驱动，不是残留）',
+      timestamp: Date.now(),
+    };
+  }
+
+  if (action === 'guard') {
+    const g = mg.guardMeasurement(label);
+    return {
+      action: 'guard',
+      ok: g.ok,
+      reason: g.reason,
+      pid: g.pid,
+      advice: g.ok ? '可以记账' : '放弃记账，等回归跑完再记（宁可不记也不记错）',
+      timestamp: Date.now(),
+    };
+  }
+
+  const st = mg.status();
+  return {
+    action: 'status',
+    clean: st.clean,
+    regression: st.regression,
+    residue: {
+      suspicious: st.residue.suspicious,
+      suspiciousCount: st.residue.suspicious.length,
+      knownCount: st.residue.known.length,
+    },
+    sidecar: st.sidecar,
+    residueDirs: st.residueDirs,
+    advice: st.clean
+      ? '仓库干净且无回归在飞，实测数字可信'
+      : (st.regression.inFlight
+        ? '全量回归在飞——此刻任何 measure() 都会量到删条突变中的源码，拒绝记账'
+        : '发现 48 小时内的突变残族文件，先人工核对再信任任何数字'),
+    timestamp: Date.now(),
+  };
+}
+
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
@@ -4276,6 +4350,10 @@ const HANDLERS = {
   //   ② 暴露全部 7 个有辨别作用的方法（evaluate / getDontList / addDont /
   //      removeDont / checkMission / getStats / listMissions）；
   //   ③ tools-registry 补 inputSchema 定义（三处同步最后一处）。
+  // [r740] 回归突变守卫（只读：status / audit / guard）。r739 事故的制：
+  // 记账脚本不看 run-all.js 的单例锁，在删条突变窗口内量到 157/1264。
+  heartflow_mutation_guard: handleMutationGuard,
+
   heartflow_strategic_restraint: (args) => {
     try {
       const sr = (heartflow && heartflow.strategicRestraint) || _strategicRestraintFallback();

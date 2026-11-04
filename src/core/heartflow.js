@@ -578,6 +578,9 @@ const _BoundaryNegotiation = _lazy('boundaryNegotiation', () => require('../shie
 const _ValueInternalizer = _lazy('valueInternalizer', () => require('../shield/ethics/value-internalizer.js'));
 
 const _DaoDecision = _lazy('daoDecision', () => require('./dao-decision.js'));
+
+// [r740] 回归突变守卫：记账前问「现在是不是突变期」+ 突变残留收底。
+const _MutationGuard = _lazy('mutationGuard', () => require('./mutation-guard.js'));
 const _UncertaintyQuantifier = _lazy('uncertaintyQuantifier', () => require('./uncertainty-quantifier.js'));
 const _PriorityGuardian = _lazy('priorityGuardian', () => require('./priority-guardian.js'));
 const _ProgressJudgment = _lazy('progressJudgment', () => require('./progress-judgment.js'));
@@ -916,7 +919,7 @@ const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('
 
 
 
-const BUILD_DATE = '2026-10-30-6.8.94';
+const BUILD_DATE = '2026-11-04-6.8.95';
 
 
 
@@ -4656,6 +4659,20 @@ class HeartFlow {
 
     // [v6.0.71] _registerModules extracted to engine-lifecycle.js
     require('./engine-lifecycle.js')._registerModules(this);
+
+    // [r740] mutationGuard 接线（回归突变期互斥 + 突变残留完整收底）。
+    // 事故链见 src/core/mutation-guard.js 头注释：r739 实测全量回归的删条突变
+    // 窗口内，sync-doc-numbers.js 的 measure() 起了子进程 require 那份被删条的
+    // heartflow.js → 模块数 161→157、路由 1314→1264 被写进三份文档。
+    // 本守卫给记账链路一道「突变期拒绝记账」的闸，并给 runner 一道
+    // 「连新增残留一起删」的回滚（原 rollbackSrcIfDirty 只还原内容被改的）。
+    // ⚠️ 刻意**不进 _modules**：一进就改模块数 161→162 与 ALLOWED_ROUTES 基线，
+    // 而 round-606/608/609/614/615 等 15+ 个测试把 161/1314 当硬断言钉着。
+    // 一个纯工具件不该为它改一屋子基线；对外经 MCP heartflow_mutation_guard
+    // （只读：status / audit / guard）暴露。
+    try {
+      this.mutationGuard = new (_MutationGuard().MutationGuard)({ rootPath: this.rootPath });
+    } catch (e) { _boundedPush(this._initErrors, { module: 'mutationGuard', error: e.message, note: 'optional 不阻断主链路' }, MAX_HISTORY_SIZE); }
 
     // [v6.5.1] heartflow 子系统：必须在 _registerModules 之后注册
     // （否则被 engine-lifecycle 用整个 hf 实例覆盖，introspect 不可用）

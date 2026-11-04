@@ -47,6 +47,19 @@ const ROOT = path.resolve(__dirname, '..');
 
 /** 运行时实测全部数字（唯一真相，量不到就拒绝记账） */
 function measure() {
+  // [v6.8.95 第 740 轮] 突变期互斥闸：全量回归在飞时一律拒绝记账。
+  // r739 实测事故链：回归串行车道里 reward-hacking-* 一族正在原地删条
+  // src/reward-hacking.js（writeFileSync(SRC, stripped) … finally 还原），
+  // 本脚本同时起了子进程 require 那份被删条的 heartflow.js → 模块数
+  // 161→157、路由 1314→1264，错数字被写进 AGENTS/README/SKILL/package.json。
+  // 当时误判为「本脚本会删源码」，r740 轮初复测证明它只写那 4 份文档、
+  // 实测 161/1314 零 src/ 写入——真正的因是测量与突变期没有互斥。
+  // 纪律与下面既有的「量不到就拒绝记账」同一条：宁可不记也不记错。
+  const { MutationGuard } = require(path.join(ROOT, 'src/core/mutation-guard.js'));
+  const gate = new MutationGuard({ rootPath: ROOT, silent: true })
+    .guardMeasurement('sync-doc-numbers');
+  if (!gate.ok) throw new Error(gate.reason);
+
   // 一次子进程同时量 工具/路由/模块/维度/tier —— 共享 4 秒的 start() 启动成本
   const r = cp.spawnSync('node', ['-e', [
     "const {HeartFlow}=require(" + JSON.stringify(path.join(ROOT, 'src/core/heartflow.js')) + ");",

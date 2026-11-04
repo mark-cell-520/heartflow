@@ -5,6 +5,18 @@ const fs = require('fs');
 const path = require('path');
 const ROOT = __HF;
 
+// [v6.8.95 第 740 轮] 突变期互斥闸（与 sync-doc-numbers.js 的 measure() 同源）。
+// r739 实测：全量回归串行车道里的原地删条突变窗口内，本脚本起子进程
+// require 那份被删条的 heartflow.js，量出模块 161→157、路由 1314→1264。
+// 此刻出的每一个数字都不可信 —— 直接拒绝出数，退出码 2（与「量不到」
+// 的拒绝语义区分：1 = 数字不一致，2 = 拒绝测量）。
+const { MutationGuard: _MG } = require(path.join(ROOT, 'src/core/mutation-guard.js'));
+const _mgGate = new _MG({ rootPath: ROOT, silent: true }).guardMeasurement('measure-claimed-numbers');
+if (!_mgGate.ok) {
+  console.error('❌ ' + _mgGate.reason);
+  process.exit(2);
+}
+
 const idx = fs.readFileSync(path.join(ROOT, 'src/index.js'), 'utf8');
 const srv = fs.readFileSync(path.join(ROOT, 'src/mcp-server.js'), 'utf8');
 const reg = fs.readFileSync(path.join(ROOT, 'src/mcp/tools-registry.js'), 'utf8');

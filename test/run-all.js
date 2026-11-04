@@ -242,36 +242,43 @@ function isServerTest(rel) {
  * 没跑到，4 个 src 文件带着负例突变残留（删 regex/删接线/删归并）污染
  * 仓库，之后所有结果不可信，只能 git checkout 人工恢复。本兜底让 runner
  * 自己善后：串行车道每个失败任务后 + 并发池整段结束后各回滚一次。
+ *
+ * [v6.8.95 第 740 轮] 改调 src/core/mutation-guard.js，补两个实测洞：
+ *   ① 覆盖面：原 snapshotSrc 只走 src/，而突变落点实测有三块——
+ *      src/round-448-mutant-*.js（副本）、仓库根 .mut-488-*.js
+ *      （round-488 写 path.join(__dirname,'..','.mut-488-*.js')）、
+ *      test/.tmp-mutant-r507-*.js（round-507/551/696 写 __dirname 下）。
+ *      原快照对后两块零覆盖。
+ *   ② 只增不减：原 rollbackSrcIfDirty 遍历快照 Map，只还原「内容被改的」，
+ *      **新增的文件一个不删** —— r739 实测 runner 被 kill 后留下 7 个
+ *      未跟踪残留（src/round-448-mutant-*.js 5 个 + mutant-runner.js +
+ *      samples.json），只能手工 rm。MutationGuard.rollback 两道闸
+ *      （basename 残族形状 + mtime 不早于快照时刻）删新增残留，
+ *      不匹配的只报不删，不会误删已入库的 round-434-mutant-*.js。
  */
 function snapshotSrc() {
-  const snap = new Map();
-  const walk = (dir) => {
-    let entries;
-    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return; }
-    for (const e of entries) {
-      const p = path.join(dir, e.name);
-      if (e.isDirectory()) walk(p);
-      else if (e.name.endsWith('.js')) {
-        try { snap.set(p, fs.readFileSync(p, 'utf8')); } catch (err) { /* 读不了的文件不纳入快照 */ }
-      }
-    }
-  };
-  walk(path.join(ROOT, 'src'));
-  return snap;
+  return _MG().snapshot();
 }
 
 function rollbackSrcIfDirty(snap) {
-  if (!snap) return [];
-  const restored = [];
-  for (const [p, content] of snap) {
-    try {
-      if (fs.readFileSync(p, 'utf8') !== content) {
-        fs.writeFileSync(p, content);
-        restored.push(path.relative(ROOT, p));
-      }
-    } catch (err) { /* 文件被删则无法回滚，交给 guard 测试报告 */ }
-  }
-  return restored;
+  return _MG().rollback(snap);
+}
+
+/** MutationGuard 进程内单例（runner 只读 + 测试间隙回滚用） */
+let _mgInst = null;
+function _MG() {
+  if (_mgInst) return _mgInst;
+  const { MutationGuard } = require(path.join(ROOT, 'src/core/mutation-guard.js'));
+  _mgInst = new MutationGuard({ rootPath: ROOT, silent: true });
+  return _mgInst;
+}
+
+/** [v6.8.95] 把 rollback 的三类结果各自报出来（不许悄悄还原/悄悄删） */
+function reportRollback(r, where) {
+  if (!r) return;
+  for (const x of r.restored) console.log(`[残留回滚] ${where}: 还原被改文件 ${x}`);
+  for (const x of r.removed) console.log(`[残留回滚] ${where}: 删除新增突变残留 ${x}`);
+  for (const x of r.keptNew) console.log(`[残留告警] ${where}: 新增 .js 但不属突变残族，未动它 —— ${x}`);
 }
 
 /**
@@ -535,10 +542,7 @@ async function runAllTests() {
   const srcSnapshot = snapshotSrc();
   const startedAt = Date.now();
   await runQueue(parallelTasks);
-  {
-    const restored = rollbackSrcIfDirty(srcSnapshot);
-    for (const r of restored) console.log(`[残留回滚] 并发池阶段发现未还原突变，已还原: ${r}`);
-  }
+  reportRollback(rollbackSrcIfDirty(srcSnapshot), '并发池阶段');
   if (serialTasks.length > 0) {
     console.log('\n=== 变更/服务类测试（串行车道）===');
     for (const t of serialTasks) {
@@ -555,10 +559,13 @@ async function runAllTests() {
         });
       }
       if (!ok) {
-        const restored = rollbackSrcIfDirty(srcSnapshot);
-        for (const r of restored) console.log(`[残留回滚] ${t.label.trim()} 留下未还原突变，已还原: ${r}`);
+        reportRollback(rollbackSrcIfDirty(srcSnapshot), t.label.trim());
       }
     }
+    // [v6.8.95 第 740 轮] 串行车道收尾再回滚一次：任务 exit 0 但清理不完整
+    // 时（finally 被绕过、unlink 漏文件），原实现整段跑完不再看一眼，
+    // 残留就带进了下一轮。这一遍是最后一道闸。
+    reportRollback(rollbackSrcIfDirty(srcSnapshot), '串行车道收尾');
   }
   const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
   console.log(`\n[耗时] ${elapsed}s（并发 ${poolSize}）`);

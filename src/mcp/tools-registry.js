@@ -421,6 +421,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_mutation_guard',
+    description: "回归突变守卫（MutationGuard，只读无副作用）：回答「现在能不能信引擎的实测数字」与「仓库里有没有突变残留」。背景（r739 事故实测）：全量回归的串行车道里有 76 个变更测试，其中 reward-hacking-* 一族是原地删条突变（fs.writeFileSync(SRC, stripped) … finally 还原），SIGKILL 不可捕获 → 源文件永久留在删条态；而记账脚本（sync-doc-numbers.js / measure-claimed-numbers.js）不看 run-all.js 的单例锁，照样起子进程 require 那份被删条的源码 → r739 实测模块数 161→157、路由 1314→1264 被写进 AGENTS.md/README.md/SKILL.md/package.json。action: status（默认）汇总三项——回归是否在飞（data/.run-all.lock 的 PID 探活，与 run-all.js acquireSingleton 同源）、突变残族文件审计（src/ + test/ + 仓库根顶层，basename 以 round-<N>-mutant- / .mut- / .tmp-mutant- 开头且 48 小时内的记为 suspicious，更早的记为 known——实测 test/round-434-mutant-{child,runner}.js 两个是已入库驱动不能当残留）、侧车备份残留（data/.mutation-guard/*.bak）；audit 只跑残族审计；guard 跑记账闸，返回 ok=false 时调用方必须放弃记账而不是记错（宁可不记也不记错）。删除残留与还原源码不在本工具里——那是 run-all.js 在测试间隙做的事，MCP 侧只读。零 LLM 依赖。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"status（默认）/ audit / guard"},"label":{"type":"string","description":"guard 动作的调用方标注（如 sync-doc-numbers），写进拒绝理由里便于回溯"}},"required":[]}
+  },
+
+  {
     name: 'heartflow_check_outbound',
     description: "出站保护闸门：在内容离开系统之前做最后一道判别——判断即将发给用户/外部的文本是否含未声明的不确定、夸大宣称、或需要附加限定的表述。返回 gate 动作（pass/verify/rewrite）与命中维度。这是 SKILL.md「Outbound protection」检查点的主工具，纯只读、无副作用。",
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检查的出站文本"},"context":{"type":"string","description":"可选上下文（如对话历史、任务背景），用于判断宣称是否有支撑"},"classification":{"type":"string","description":"强制指定级别（可选），不给则由引擎自动判定"}},"required":["text"]}
