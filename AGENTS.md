@@ -76,6 +76,29 @@ The three entry points above are wrappers around these, which `main`
 | `pipeline(text, opts)` | Raw pipeline stages (prefer `runPipeline`) |
 | `discriminate(text)` | Per-dimension scoring without the gate layer — **no `gate.action` assigned** |
 
+| `quotationFrame(text)` | Why a quoted / meta-discussion passage was (or was not) downgraded: `tier` / `confidence` / `signals` / `effect` / `reason`. Use it to explain a missing block instead of guessing |
+| `delimiterChannel(text)` | Per-run diagnosis of the delimiter-confusion channel: which runs were `accepted` (with `repair`) / `rejected` (with reason), plus the compacted `view` |
+| `postHocLegs(text)` | Per-route, per-leg diagnosis of the post-hoc dimension: which of R1~R4 fired and which leg is `missing` (e.g. R2 `missingAttribution`) |
+
+### Other public surfaces
+
+`src/gate.js` is the discrimination entry, but two other modules are part of the
+published contract:
+
+| Function | Module | Returns |
+|----------|--------|---------|
+| `createHeartFlow(opts)` | `src/core/heartflow.js` | Engine factory, the programmatic way in when you do not want the package default singleton |
+| `MentalEffortTracker` | `src/core/heartflow.js` | Effort tracker class, exported for callers that budget reasoning effort themselves |
+| `MeasureCore` | `src/core/measure-core.js` | The single measurement implementation behind the honest-numbers docs (also MCP `heartflow_measure_numbers`). `measureAll()` / `checkDocs()` / `status()` |
+| `readTestCountFile(dataDir)` | `src/core/measure-core.js` | Read the test-count cache **with its scope**: `trusted` + `reason`. A `scope=slice` main cache returns `passed/failed = null` rather than a wrong number |
+| `writeTestCount(dataDir, entry)` | `src/core/measure-core.js` | The only writer of the test-count cache, routes by `scope` (`full` to `data/test-count.json`, `slice` to the sidecar) |
+
+`src/core/api-surface.js` guards these tables: it fails when a documented
+contract-position claim has no matching export, or when a public module gains an
+export that no non-changelog doc section mentions. Run
+`node -e "require('./src/core/api-surface.js').describe(process.cwd())"`, or MCP
+`heartflow_measure_numbers` with `action: 'apisurface'`.
+
 ## Return value
 
 ```javascript

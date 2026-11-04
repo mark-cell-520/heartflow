@@ -1,3 +1,263 @@
+# 第 744 轮报告（v6.8.99 — API 表面守卫：文档承诺的 API 与代码真正导出的对不上，而守它的测试自己两条判据都在失效——叙述区被当成 API 区（每轮必红一条幽灵方法 checkEvidence）、覆盖面只有 1/161 个模块（r736~r743 四轮新增导出全部漏列）。新模块 src/core/api-surface.js 把两份判定合成 region-aware 的单一实现，公开面扩到三个模块，按 AGENTS.md 约定 3 接进既有 MCP 工具 heartflow_measure_numbers（action: apisurface，不新增工具））
+
+## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
+
+两个 cron 仍为空数组（`hermes/cron/jobs.json`），自主循环停着，r744 继续由主会话驱动。
+**选题判定由我下，不是 decision 本体打分。**
+
+直接做 r742/r743 交接簿候选池④（连漏五轮那条）：「api-surface-consistency 的 2 个存量失败
+（checkEvidence 幽灵方法 + quotationFrame/delimiterChannel/postHocLegs 三个导出无文档）
+连漏五轮，r743 又新增 6 个 measure-core 导出仍未进任何文档——正解是给『新增公开导出
+必须同时出现在某份文档』加一道机器守卫」。
+
+轮初复测（真仓，未改一行代码）：
+
+```
+$ node test/api-surface-consistency.test.js
+[零幽灵方法]
+  ❌ 文档提到的每个方法都真实存在 → 文档列了导出里不存在的方法: checkEvidence。调用方复制即崩。
+[导出不漏列]
+  ❌ 全部导出都被至少一份文档提及 → 这些导出没有任何文档提及: quotationFrame, delimiterChannel, postHocLegs。
+结果: 1 通过, 2 失败, 共 3 个
+```
+
+而同一份 `require('./src/core/measure-core.js')` 实测导出 12 个键，其中
+`readTestCountFile` / `writeTestCount` / `TEST_COUNT_FILE` / `TEST_COUNT_SLICE_FILE` /
+`SCOPE_FULL` / `SCOPE_SLICE` 六个是 r743 新增——**旧守卫只扫 `src/gate.js`，一条都报不出来**。
+
+## 二、根因 / 缺口分析（带证据）
+
+### 2.1 假阳性：把叙述区（变更记录）当成了 API 区
+
+`README.md` 的 `## Version history` 表格里（第 311 行，6.8.89 那一行）写着：
+
+> `checkEvidence(claim, evidence)` 的 `score = evidence.length>0 ? 0.5 : 1.0` …
+
+同一段前面还写着 `src/index.js checkEvidence(claim, evidence)`——**文档自己就说明了它是
+`src/index.js` 的内部函数**。而测试的第三条正则
+
+```js
+for (const m of src.matchAll(/`(\w+)\s*\(/g)) mentioned.add(m[1]);
+```
+
+把任何反引号包裹的 `name(` 都收进「文档提到的方法名」，再拿 `src/gate.js` 的导出核对，
+于是每轮必红一条幽灵方法。**根因不是词表不全，是区域判定缺失**：变更记录是散文，
+不是 API 契约。
+
+### 2.2 漏列：覆盖面只有 1/161 个模块
+
+测试第 44 行起只 `require('src/gate.js')`。于是：
+
+| 轮次 | 新增导出 | 旧守卫报了吗 |
+|---|---|---|
+| r736 | `gate.quotationFrame` | ❌（只在 README 变更记录里提过） |
+| r737 | `gate.delimiterChannel` | ❌ |
+| r738 | `gate.postHocLegs` | ❌ |
+| r743 | `measure-core` 的 `readTestCountFile` / `writeTestCount` 等 6 个 | ❌（模块压根不在扫描范围） |
+
+连漏五轮的机制：**守卫的覆盖面是硬编码的一个文件**，而新增导出的人看到「测试是绿的」
+就以为文档齐了。
+
+### 2.3 为什么不能靠「补文档」了事
+
+补文档只治本轮这 8 个名字。下一轮任何人给 `src/gate.js` / `src/core/heartflow.js` /
+`src/core/measure-core.js` 加一个导出，仍然没有任何机器会问「文档说了吗」。
+r736~r743 四轮连续漏，就是这条路径每轮都静默的证据。
+
+## 三、落地项
+
+### ① `src/core/api-surface.js`：两份判定合成单一实现（新增 164 行非注释代码）
+
+| 导出 | 作用 |
+|---|---|
+| `DOC_FILES` / `PUBLIC_MODULES` / `EXEMPT_CLAIMS` | 三张清单：参与核对的文档、公开面（3 个模块）、契约位豁免（每条必须带 `reason`） |
+| `scanDoc(text, file)` | 按 ATX 标题切 region（栈式，叙述性**向子章节继承**），抽契约位声称与宽口径提及 |
+| `loadExports(rootPath, rel)` | require 公开模块，只审计函数导出；失败即 `ok:false` + `error` |
+| `audit(rootPath, opts)` | 两侧对着报：`ghosts` / `undocumented` / `claims` / `counts`，每条带证据字段 |
+| `describe(rootPath)` | 人读报告（脚本 / MCP / 交接簿直接贴） |
+
+两条判据都是**可解释的位置规则，不是词表**：
+
+- **契约位** = 非叙述区章节里的 markdown 表格首列 `| `name(` |`，或 ATX 小节标题
+  `### `name(` `。选这两个位置的理由：调用方「复制即崩」的正是这两种位置，
+  而散文行内提到一个内部函数名不是契约。
+- **叙述区** = 标题命中 `version history / changelog / change log / release notes /
+  历史 / 变更 / 版本 / 记录 / roadmap / limitation / honest numbers` 的章节
+  **及其全部子章节**（继承判定，`## Version history` 下的 `### Sub-section` 同样排除）。
+- **公开面** = `PUBLIC_MODULES` 登记的 3 个模块（`src/gate.js` / `src/core/heartflow.js` /
+  `src/core/measure-core.js`）——docs 明文对外的契约边界。161 个模块里的其余部分是引擎
+  内部实现，不对调用方承诺 API，所以不进硬闸门（进了就是另一种噪声）。
+
+每条声称带 `file:line [section] (form)` 四个证据字段，漏列条目带模块路径——
+修的时候能定点，不用再 grep。
+
+### ② 补掉九年期的文档欠账（AGENTS.md）
+
+- § Lower-level exports 表加三行：`quotationFrame(text)` / `delimiterChannel(text)` /
+  `postHocLegs(text)`，各写清返回什么、什么时候该调。
+- 新增 § Other public surfaces 表：`createHeartFlow(opts)` / `MentalEffortTracker` /
+  `MeasureCore` / `readTestCountFile(dataDir)` / `writeTestCount(dataDir, entry)`，
+  并点名 `src/core/api-surface.js` 守这张表、怎么跑。
+
+### ③ MCP 接线（AGENTS.md 约定 3，三处同步）
+
+`heartflow_measure_numbers` 新增 **`action: apisurface`**（刻意不新增工具——
+加了会打红 round-735/736/738 三处 191 硬编码快照，本轮测试 G5 钉住工具数仍 191）：
+
+1. `src/mcp/tools-registry.js`：`inputSchema` 的 action 枚举 + 长描述补 apisurface 段
+2. `src/mcp-server.js` `HANDLERS` 映射（`heartflow_measure_numbers` 已在映射里，无改动）
+3. `src/mcp-server.js` `handleMeasureNumbers` 的 `action === 'apisurface'` 分支 +
+   未知 action 提示串
+
+真仓实测（`handleRequest` 直调）：
+
+```json
+{"action":"apisurface","ok":true,
+ "counts":{"publicModules":3,"exports":17,"documented":17,
+           "undocumented":0,"claims":22,"ghosts":0,"exemptions":0},
+ "docs":[{"file":"README.md","exists":true,"claims":8,"lines":432}, …]}
+```
+
+### ④ 两个测试
+
+- `test/api-surface-consistency.test.js` **改写**：判定全部委托 `src/core/api-surface.js`，
+  本测试只留门禁断言（7 条）。原三条断言语义一字未删，另加「checkEvidence 不再被当成
+  gate.js 导出」「公开面覆盖 3 个模块」「量不到就拒绝出数」三条。
+- `test/round-744-api-surface-guard.test.js` **新增**：31 断言八段
+  （A region 切分 7 / B 契约位位置规则 3 / C 导出抽取 2 / D 幽灵与豁免 4 /
+  E 漏列 3 / F 拒绝出数 2 / G MCP 接线 5 / H 承重 5）。
+  A/B 段用夹具文档把全部组合钉住：表格首列 ✅、ATX 标题 ✅、行内散文 ❌、
+  表格非首列 ❌、围栏代码块 ❌、Version history 整章 ❌、叙述区子章节 ❌（继承）。
+
+## 四、验收数字（全部实测，命令可复跑）
+
+| 项 | 实测 |
+|---|---|
+| 轮初（改之前）`api-surface-consistency` | **1 通过 / 2 失败**（幽灵 checkEvidence + 漏列 3 个诊断导出） |
+| 轮末同一测试 | **7 通过 / 0 失败** |
+| 本轮新测试 `round-744-api-surface-guard` | **31 通过 / 0 失败** |
+| 真仓审计 `audit()` | `ok=true`，契约位声称 **22 条**、幽灵 **0**、公开导出 **17 个全部有文档**（改之前 **8 个漏列**） |
+| MCP `action: apisurface` | `ok=true`，`publicModules=3 / exports=17 / documented=17 / undocumented=0 / claims=22 / ghosts=0` |
+| 新增非注释代码 | `src/core/api-surface.js` **164 行**非注释（+ MCP 分支 ~35 行 + 测试 203 行） |
+| `bin/verify.js` | **16 passed, 0 failed** |
+| `bidirectional-guard` | 召回 **52/52**、误拦 **306/326**（93.9%）——与 r741/r742/r743 基线逐项一致（本轮零 `src/index.js` 改动） |
+| `guard-abilities.js` | **20/20**（dimensions 键 160 / summary 引用 123） |
+| `doc-numbers-accuracy` | **22 通过, 0 失败** |
+| `security-audit` | bump 前 **15/16**（唯一失败 S2「git log/tag 未命中 6.8.99」，本轮提交后转绿，与 r740~r743 同一形态） |
+| 引擎基线零变化 | `modules=161` / `routes=1314` / `dims=160` / `tools=191`（逐字不变） |
+| MCP 工具数 | 仍 **191**（base 77 + extended 114；刻意不新增工具） |
+| 全量回归 | **20069 过 / 23 败 / 20092 个（665.1s，并发 4，627 个测试文件）**；基线 r743 = 19997 过 / 27 败 / 20024 个（626 个文件） |
+| 失败数 27 → 23 | **−4，零新增**：−2 是本轮修好的 `api-surface-consistency`（2 个存量失败），−2 是轮内瞬态（`doc-numbers-accuracy` 的 README changelog 行、`security-audit` 的 S2 等 commit），存量噪声 23 项与 r743 同一批 |
+| 本轮测试在回归里的位置 | `api-surface-consistency` idx 43 → **7 通过 / 0 失败**；`round-744-api-surface-guard` idx 567 → **31 通过 / 0 失败** |
+
+### 4.1 全量回归 23 个失败的构成（逐项定位，无一是本轮引入）
+
+`node test/run-all.js`（627 个文件，665.1s）实测 20069 通过 / 23 失败。
+按 r743 坑⑥ 的教训，**不只看 runner 末尾的「失败的测试」清单**——那份清单只有 14 个
+文件（17 行里有 3 行是同文件的两条表述），剩下 9 个是「自报失败数但不打 ✗ 行」的一族，
+必须逐个文件解析汇总行才数得准：
+
+| 桶 | 文件 | 失败数 | 归因 |
+|---|---|---|---|
+| 清单内 | ClassicsRules / AgentBoundaryGuard | 1 + 1 | 存量（r742/r743 同批，文件自报失败） |
+| 清单内 | mcp-auth-tier / mcp-guest-permission | 1 + 1 | 存量：8099 端口被常驻服务占用 |
+| 清单内 | mcp-server / mcp-smoke / round-498 / round-572-associative-handler / round-630 | 5 | 存量：不输出汇总行（未输出桶，runner 对 SILENT_FAIL 各记 1 个合成失败） |
+| 清单内 | round-410 | 1 | 存量：注册 0 个用例（runner 记 1 个合成失败） |
+| 清单内 | round-502 / round-506 / round-572-associative-wiring / round-621 | 4 | 存量：Command failed |
+| 清单外（自报） | security-audit | 1 | 轮内瞬态：S2「git log/tag 未命中 6.8.99」，**本轮提交后转绿** |
+| 清单外（自报） | round-559 | 1 | 存量硬编码快照（r742/r743 同批） |
+| 清单外（自报） | round-733 | 2 | 存量（r742 实测：把 UPGRADE_LOG 换回 HEAD 版本仍同样 2 个失败） |
+| 清单外（自报） | round-734 | 1 | **存量，本轮用 HEAD 工作树坐实**（见下） |
+| 清单外（自报） | round-737 | 1 | 存量硬编码快照「工具数应为 188，实得 191」（r736/r737/r738 各加一个工具后 188 → 191，**改动前就是 191**）；单独复跑同样 1 失败 |
+| 清单外（自报） | cjk-word-boundary-round128 | 2 | 存量（r742/r743 同批） |
+| runner 计数 vs 自下而上求和 | — | 23 vs 22 | **差 1，未定位到具体文件**（见 4.2，交给下一轮） |
+
+**新增一条坐实（round-734）**：`round-734-evidence-gap.test.js` 报
+`378 条语料 gate.action 分布与基线逐项相同 → gate-benchmark-extended.pass 期望 53 实得 57`，
+单独复跑同样红。为确认不是本轮引入，用 `git worktree add /tmp/hf-head-check HEAD`
+在 **HEAD（v6.8.98，本轮改动之前）** 上复跑同一文件：**同样这一条红、数字逐字相同**
+（`期望 53 实得 57`）。所以它是 r735~r738 改 `src/index.js` 判别行为时漂走、之后每轮都被
+「自报失败但不打 ✗ 行」藏住的存量（r734 建轮时是 21/21 全绿）。**本轮零 `src/index.js`
+改动**，与它无关。
+
+### 4.2 runner 的失败计数不能完全自下而上复现（差 1）
+
+runner 报 23，按上表逐文件求和是 22。差的那 1 个定位不到具体文件：runner 对
+SILENT_FAIL（不输出汇总行）、0 用例注册、Command failed 三类各记 1 个「合成失败」，
+这三类不计入 `passed + failed = total` 的断言总数（20092），所以失败数与断言总数之间
+不存在可加性；而末尾「失败的测试」清单又不是 1:1（17 行只对应 14 个文件，
+其中 3 行是同文件的第二种表述）。**结论：数失败数必须同时
+① 解析每个文件的汇总行 ② 认这三类合成失败 ③ 接受清单不是全集**，
+r743 坑⑥ 在这条上还要再加一句。本轮不影响任何结论（−4 的方向明确：
+api-surface 修好 2 + 两个轮内瞬态转绿）。
+
+对比 r743 的 27：27 = 25 存量 + 2 轮内瞬态（doc-numbers 的 README changelog 行 +
+security-audit 的 S2）。本轮 23 = 25 存量 − 2（api-surface 修好）+ 1 轮内瞬态
+（doc-numbers 的 changelog 行本轮已随报告补上讲 README，故不再红）。
+**没有任何一个失败是本轮引入的**，且 `src/index.js` 零改动（双向门禁 52/52 + 306/326
+与基线逐项一致即为旁证）。
+
+## 五、已知未修（含为什么不修）
+
+① **非函数导出不在硬闸门内。** `measure-core.js` 的 `REL` / `TIERS` /
+   `START_WAIT_MS` / `CHILD_TIMEOUT_MS` / `SRC_SKIP_DIRS` / `TEST_COUNT_FILE` /
+   `TEST_COUNT_SLICE_FILE` / `SCOPE_FULL` / `SCOPE_SLICE` 与 `heartflow.js` 的 `VERSION`
+   共 10 个非函数导出，`audit()` 只报进 `otherExports` 不判红。理由：本守卫的契约是
+   「调用方**会调**的东西必须有文档」，把调优常量也纳入会让每次调阈值都红一次，
+   逼出删断言而不是补文档。`readTestCountFile` / `writeTestCount` / `TEST_COUNT_FILE` /
+   `SCOPE_FULL` 四个真正属契约的已在 § Other public surfaces 里写明。
+② **公开面只有 3 个模块。** 其余 158 个模块是引擎内部实现。要扩面必须先回答
+   「哪些模块算对外承诺」——那是产品决策不是技术决策，单独一轮。
+③ **`EXEMPT_CLAIMS` 现在是空的。** 机制有了但还没有条目。将来若某份文档在契约位
+   写某个类的实例方法（如 `| `assessEffectiveness()` |`），要走豁免并带 reason，
+   不许改正则——那正是 r744 之前每条红掉的成因。
+④ **r742/r743 候选池①（`src/core/version.js` 兜底版本每次 bump 要手工同步）本轮又踩一次**：
+   bump 后 `let VERSION = '6.8.98'` 与 `VERSION 6.8.99` 不一致，本轮手工补。
+   正解仍是让 `sync-version.js` 把兜底值一起写掉，或让 round-guard 在 `--stage=before`
+   就提醒；要动每轮都跑的守卫脚本，单独一轮。
+⑤ **`round-734-evidence-gap.test.js` 的 1 个存量失败（本轮新发现，未修）。**
+   `gate-benchmark-extended.pass 期望 53 实得 57`——四份基准语料 378 条的 gate.action
+   分布在 r735~r738 改 `src/index.js` 时漂走了，而它「自报失败但不打 ✗ 行」，
+   连漏多轮没人看见（本轮用 HEAD 工作树坐实是存量）。修它要逐条比对 378 条语料里
+   哪 4 条从 verify/rewrite/block 变成 pass，判断是新行为更对还是基线该更新——
+   **这是判别行为变更，不是文档问题，必须单独一轮**，且要先有双向门禁背书。
+⑥ **runner 的失败计数不能自下而上复现（差 1，见 4.2）。** 三类「合成失败」
+   （SILENT_FAIL / 0 用例 / Command failed）不计入断言总数，「失败的测试」清单
+   又不是 1:1。要修就得让 runner 同时输出「合成失败清单」与「断言失败清单」两份。
+⑦ **r742/r743 候选池②③⑤⑥⑦ 全部沿用**：新测试是否被 run-all 跑到的机器自检、
+   `parseSummary` 取到子进程汇总行、HANDLERS 键数 193 > 静态工具数 191、
+   变更测试统一走 mutation-guard-recovery 侧车、round-630 的 RESULT 无 pass/fail 键、
+   3 个零输出文件、round-498 漂移、`src/index.js` 14893 行（阈值 14000）、
+   `scripts/round-743/tmp-old-di.js` 探针残留。
+
+## 六、踩坑
+
+① **Edit 工具改不了含 U+2014 的 AGENTS.md 表格行。** `old_string` 里带长破折号
+   「—」时连续两次报「String to replace not found」，而 `node` 读出来 `JSON.stringify`
+   显示的字节完全一致（码点 U+2014）。绕法是换一个不含破折号的锚点
+   （用后面的 `## Return value` 标题做锚点往前插），不要在这上面耗时间。
+② **MCP `handleRequest` 是 async。** 第一次同步调用拿到的是 Promise，
+   `r.result.content` 直接 `Cannot read properties of undefined`。必须 `await`。
+③ **工具总数不能数 `name: 'heartflow_` 的出现次数。** `src/mcp/tools-registry.js`
+   里只有 77 个（base 数组），另外 114 个来自 `./extended-tools.js` 的
+   `EXTENDED_TOOLS`，`module.exports = { TOOLS: TOOLS.concat(_EXTENDED) }`。
+   数工具必须 `require` 后数 `TOOLS.length`（=191），我第一版测试就是这么红的。
+④ **ATX 标题行本身也是契约位，但第一版漏了。** 原来的 `scanDoc` 在遇到标题时
+   `continue`，于是 `### `checkInput(text)`` 这种 AGENTS.md 的 API 小节标题
+   （4 个）没被抽到，声称数只有 12 而不是 16。修法是在 push 进章节栈**之后**
+   再判标题文本，否则新章节自己的叙述性会被漏掉。
+⑤ **`describe()` 第一版在只有漏列、没有幽灵时打出 `❌ ；8 个公开导出…`**（前导分号）。
+  `reason` 改成数组 join，别用字符串拼有条件前缀。
+⑥ **要证明「这个存量失败不是本轮引入」，用 `git worktree add <tmp> HEAD` 在 HEAD 上
+  复跑，别用 `git stash`。** stash 会把本轮全部改动收走，万一 pop 出错就丢工作区；
+   worktree 是只读副本、零风险（本轮 round-734 就是这么坐实的：HEAD 上同样
+   `期望 53 实得 57`）。注意测试文件用 `__dirname/..` 定位仓库根，所以必须连
+   `test/` 一起 checkout（worktree 默认就是全量），不能只拷单个测试文件。
+⑦ **并发回归里测试输出的归属不能按「上一条进度标记」判。** worker 的输出会缓冲后
+   延迟刷，`[559/627] round-736` 后面跟着的可能是 round-733 的汇总行。要定位某个
+   汇总行属于哪个文件，看**断言内容**（如 `crossProduct=46176` 只可能是 r733），
+   或对该文件单独复跑。
+
 # 第 743 轮报告（v6.8.98 — 分段回归不许污染全量记账缓存：r742 交接簿候选池①，`HF_RUN_ALL_SLICE` 切片跑完接着记账会把「1 passing / 0 failing」写进 README/SKILL，根因是 run-all.js 无条件把本次数字写进 data/test-count.json）
 
 ## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）

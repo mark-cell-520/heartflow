@@ -3610,10 +3610,43 @@ function handleMeasureNumbers(args) {
     }
   }
 
+  // [v6.8.99 第 744 轮] API 表面对账：文档契约位 ↔ 公开模块导出，只读、毫秒级。
+  // 回答的是「文档承诺的 API 和代码真正导出的还对得上吗」——r744 轮初实测
+  // test/api-surface-consistency.test.js 两条判据都在失效：README 的 Version
+  // history 段落把内部函数 checkEvidence 当成 gate.js 导出契约（每轮必红一条
+  // 幽灵方法），而只扫 src/gate.js 一个模块，r736~r738 三个诊断导出与 r743
+  // measure-core 六个新导出全部漏列。现在两侧判定都在 src/core/api-surface.js。
+  if (action === 'apisurface') {
+    const api = require('./core/api-surface.js');
+    const r = api.audit(HF_DIR);
+    return {
+      action: 'apisurface',
+      ok: r.ok,
+      label,
+      reason: r.reason,
+      counts: r.counts,
+      docs: r.docs,
+      modules: r.modules.map(m => ({
+        key: m.key, rel: m.rel, contract: m.contract, ok: m.ok, error: m.error,
+        exports: m.exports, documented: m.documented, undocumented: m.undocumented,
+        otherExports: m.otherExports,
+      })),
+      claims: r.claims,
+      ghosts: r.ghosts,
+      exempted: r.exempted,
+      undocumented: r.undocumented,
+      report: api.describe(HF_DIR),
+      advice: r.ok
+        ? '契约位声称与公开导出逐项对齐（' + r.counts.claims + ' 条声称 / ' + r.counts.exports + ' 个导出）'
+        : '先补文档或补导出：' + r.reason + '。改动 src/gate.js、src/core/heartflow.js、src/core/measure-core.js 的导出面后必须重跑',
+      timestamp: Date.now(),
+    };
+  }
+
   return {
     action,
     ok: false,
-    reason: '未知 action: ' + action + '（可用 runtime / static / all / check / testcount）',
+    reason: '未知 action: ' + action + '（可用 runtime / static / all / check / testcount / apisurface）',
     advice: '换一个 action 再试',
     timestamp: Date.now(),
   };
