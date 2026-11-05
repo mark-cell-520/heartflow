@@ -1,0 +1,26 @@
+name: gates
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - run: npm install --ignore-scripts --no-fund --no-audit
+      - name: gate 1 verify
+        run: node bin/verify.js
+      - name: gate 2 abilities
+        run: node scripts/guard-abilities.js
+      - name: gate 3 doc numbers
+        run: node test/doc-numbers-accuracy.test.js
+      - name: gate 4 bidirectional
+        run: node scripts/bidirectional-guard.js
