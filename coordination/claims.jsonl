@@ -9,3 +9,4 @@
 {"round":"r220","agent":"agent-4","kind":"dimension","direction":"经济与资源推理：平均成本≠边际成本（average-marginal cost conflation）第214维度模块起草+测试+接线规格交1号；前置零命中探针+海外扫描","claim_at":"2026-11-05T17:24:35Z","expires_hours":6,"status":"active"}
 {"round":"r220","agent":"agent-4","kind":"release","status":"completed"}
 {"round":"r221","agent":"agent-4","kind":"fix","direction":"补强 equivocation_sense_shift(第67维度,已接线) 新增4个中英双语多义词家族(理论/证明/模型/显著=科学推理vs猜测/经验/榜样/重要性)，真升级类型②激活，零命中探针证补强前10/10穿引擎","claim_at":"2026-11-05T19:27:18Z","expires_hours":6,"status":"active"}
+{"round":"r221","agent":"agent-4","kind":"release","status":"completed","note":"equivocation_sense_shift(67)补强4个中英双语多义词家族(理论/证明/模型/显著),真升级类型②激活(dab4545),模块已接线故立即生效无需改src/index.js;零命中探针补强前10/10穿引擎;测试50断言含10项注入全过;四门禁全绿双向302/326零变化;VERSION未bump留1号版本轮与212/213/214一并处理"}
