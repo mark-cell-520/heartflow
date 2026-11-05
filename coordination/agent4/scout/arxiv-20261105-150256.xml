@@ -1,0 +1,438 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/GdAXgRmRGAhTC8ueBMpxwfogtA0</id>
+  <title>arXiv Query: search_query=all:budget OR all:constraint OR all:conflated OR all:with OR all:value OR all:judgment OR all:fallacy OR all:affordability OR all:worth&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-05T15:02:56Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:budget+OR+(all:constraint+OR+(all:conflated+OR+(all:with+OR+(all:value+OR+(all:judgment+OR+(all:fallacy+OR+(all:affordability+OR+all:worth)))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>525735</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06913v1</id>
+    <title>cuRoboV2-Fast: Fast Torque-Limited Collision-Free Motion Planning</title>
+    <updated>2026-11-04T18:58:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.06913v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06913v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present cuRoboV2-Fast, a GPU-accelerated planner that reduces both planning latency and execution time for collision-free, payload-aware, torque-limited motions. B-spline trajectory optimization reduces the required iterations, while accelerated robot computations and differentiable inverse dynamics reduce refinement cost and accommodate changing payloads. TimeOpt optimizes traversal speed along the fixed path under sampled velocity, acceleration, jerk, and torque constraints, exploiting local spline support to solve banded Newton systems efficiently on the GPU. With a 3,kg payload, cuRoboV2-Fast achieves 4.4 ms mean planning time on RTX 5090, 14.7x faster than cuRoboV2. Our method on Jetson AGX Orin plans faster than cuRoboV1 + TOPPRA on RTX 5090. A stereo-camera-based deployment on YAM achieves 5.93 s mean completed pick-and-drop cycles, 34.6% shorter than cuRoboV2. Code (Apache 2.0): www.github.com/NVlabs/curobo , Project Page: www.research.nvidia.com/labs/lpr/curobov2-fast .</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:58:20Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Balakumar Sundaralingam</name>
+    </author>
+    <author>
+      <name>Adithyavairavan Murali</name>
+    </author>
+    <author>
+      <name>Stan Birchfield</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06912v1</id>
+    <title>FlowReconBench: Accuracy, calibration and cost of learned and classical flow reconstruction from sparse sensors</title>
+    <updated>2026-11-04T18:57:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.06912v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06912v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reconstructing full flow fields from sparse sensors requires prior assumptions about unmeasured regions and physical variables. Yet it remains unclear when learned models outperform classical estimators and which aspects of their predictions can be trusted. FlowReconBench evaluates ten learned and five classical methods on three regimes: a laminar cylinder wake across Reynolds numbers, two-dimensional Kolmogorov turbulence and a large-scale three-dimensional (3D) isotropic turbulence. Methods share leakage-controlled splits and sensor draws and are scored on per-channel error, ensemble spread, calibration, spectra and cost. The leading method changes for each regime. Classical methods perform strongly in low-order and dense-sensing regimes. On the cylinder wake, linear stochastic estimation and gappy proper orthogonal decomposition lead, including for unobserved pressure. In 3D, inverse-distance weighting matches the best learned methods on observed channels. Data-driven methods become superior at decreasing sensor density or poor sensor observability. On Kolmogorov flow, continuous ranked probability score and error yield different method rankings: generative models offer broader but underdispersed ensembles, while deterministic models prioritize pointwise error. Generative models balance this tradeoff through their sampler budget, with a larger budget improving ensemble quality at higher computational cost. In 3D, scaling tests demonstrate that queryable methods are flat in memory, while full-grid construction methods run out of memory. Observing only 2 of 4 fields leaves the problem kinematically underconstrained, yet a latent model can reproduce structural similarities to the ground truth.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:57:47Z</published>
+    <arxiv:comment>18 pages, 7 figures, 8 tables. Supplementary material (16 pages, 2 figures, 5 tables) is included as an ancillary file</arxiv:comment>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Nicolas Tricard</name>
+    </author>
+    <author>
+      <name>Linzheng Wang</name>
+    </author>
+    <author>
+      <name>Jason Chen</name>
+    </author>
+    <author>
+      <name>Sili Deng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06911v1</id>
+    <title>BEAKER: An Expert-Curated Benchmark for Embodied Brains in Self-Driving Chemical Laboratories</title>
+    <updated>2026-11-04T18:57:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.06911v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06911v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Self-Driving Chemical Laboratories (SDCLs) are moving chemical experimentation toward embodied automation, where machines must perceive laboratory scenes, reason about experimental states, and act under physical, procedural, and safety constraints. Although Multimodal Large Language Models (MLLMs) are increasingly considered as embodied brains for such systems, existing laboratory benchmarks mainly focus on safety, anomaly detection, or general scientific understanding, leaving their execution-oriented embodied capabilities underexplored. To fill this gap, we introduce BEAKER, a Benchmark for evaluating Embodied Actionability, Knowledge, Experimentation, and Reasoning in SDCLs. BEAKER contains 1,000 expert-curated question-answer samples across 11 image and video task types, covering key judgments required for chemical laboratory execution, including affordance grounding, trajectory planning, equipment, state, and safety recognition, apparatus setup, operation and step reasoning, and temporal procedure reasoning. All questions and annotations are manually created and reviewed by chemistry and embodied Artificial Intelligence (AI) experts, without AI-assisted generation or annotation. We evaluate 28 general-purpose, science-oriented, chemistry-specialized, and embodied MLLMs in an offline, single-turn setting. Results show that current models can follow coarse experimental procedures in videos, but still struggle to ground actions into operable regions and feasible trajectories, to recognize fine-grained laboratory apparatus, states, and safety norms, and to order steps in mid-length procedures. BEAKER thus reveals a clear gap between coarse procedural understanding and the precise, action-grounded perception required for laboratory execution, providing a diagnostic benchmark for future MLLMs in SDCLs.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:57:17Z</published>
+    <arxiv:comment>Accepted by NeurIPS 2026 (Track on Evaluations and Datasets, Spotlight)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Fei Lin</name>
+    </author>
+    <author>
+      <name>Tengchao Zhang</name>
+    </author>
+    <author>
+      <name>Ziyang Gong</name>
+    </author>
+    <author>
+      <name>Xiaotong Yu</name>
+    </author>
+    <author>
+      <name>Bohan Zhang</name>
+    </author>
+    <author>
+      <name>Yifan Zhou</name>
+    </author>
+    <author>
+      <name>Qihao Yang</name>
+    </author>
+    <author>
+      <name>Ji Dai</name>
+    </author>
+    <author>
+      <name>Dong Li</name>
+    </author>
+    <author>
+      <name>Yining Jiang</name>
+    </author>
+    <author>
+      <name>Qinghua Ni</name>
+    </author>
+    <author>
+      <name>Jun Huang</name>
+    </author>
+    <author>
+      <name>Qiang Zhang</name>
+    </author>
+    <author>
+      <name>Yue Zhou</name>
+    </author>
+    <author>
+      <name>Zhihang Zhong</name>
+    </author>
+    <author>
+      <name>Yonglin Tian</name>
+    </author>
+    <author>
+      <name>Fei-Yue Wang</name>
+    </author>
+    <author>
+      <name>Xue Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06906v1</id>
+    <title>A Simple Subquadratic Cut Query Protocol for Directed Reachability</title>
+    <updated>2026-11-04T18:53:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.06906v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06906v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study $s$--$t$ reachability in an unweighted directed graph on $n$ vertices, accessed through a directed cut oracle: given $S\subseteq V$, the oracle returns the number of edges directed from $S$ to $V\setminus S$. Directed cut functions are submodular, and reachability asks whether the minimum $s$--$t$ cut has positive value. This connects the problem to the query complexity of submodular function minimisation. Whether or not reachability can be solved in truly subquadratic query complexity has been an outstanding open question for a decade.
+  We give a simple algorithmic blueprint with two randomised implementations. The first uses $\widetilde O(n^{9/5})$ outgoing-cut queries; the second improves this bound to $\widetilde O(n^{5/3})$. The common idea is to construct an alternative orientation with the same underlying undirected graph and vertex-wise degree imbalances, thereby preserving reachability. We first approximate the target imbalances using an averaging and rounding procedure, then correct the remaining error with a flow.
+  An earlier manuscript, made available in August 2026 in an online AI repository, reports an $\widetilde O(n^{3/2})$ query bound. Our contribution is a simple and comprehensible alternative approach that already achieves a polynomial saving over quadratic query complexity.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:53:36Z</published>
+    <arxiv:comment>17 + 22 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Henry Fleischmann</name>
+    </author>
+    <author>
+      <name>Sagnik Mukhopadhyay</name>
+    </author>
+    <author>
+      <name>Swagato Sanyal</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06905v1</id>
+    <title>Reinforcement Learning Enables Scaling Generalist Robot Policy Improvement</title>
+    <updated>2026-11-04T18:52:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.06905v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06905v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The introduction of generalist robot policies has enabled a single, large model to learn to perform a variety of tasks from a vast pre-training corpus. While these models often exhibit powerful zero-shot generalization capabilities, they typically require an adaptation phase to achieve sufficient performance in deployment. Iterated self-improvement via reinforcement learning (RL) has demonstrated promise in enabling this adaptation, yet such approaches have been largely explored in single-task settings - where the goal is to simply improve on a narrow deployment task - which lies in stark contrast to the multi-task capabilities of the base policy. In this work we ask whether generalist robot policies are capable of multi-task, generalist improvement in deployment - targeting many diverse tasks simultaneously - and what algorithmic recipe enables this. To answer this question, we first develop a set of structured evaluations to test generalist improvement capabilities, and systematically evaluate algorithmic and practical design choices regarding value estimation, policy extraction and resource allocation. We show that not only can generalist policies be improved online across diverse tasks, but that the right recipe can enable generalization and increase performance on tasks not considered during online training. We characterize when this generalization occurs and show that both the training task distribution and the use of value-based RL are critical. To the best of our knowledge, this is among the first evidence for online generalist improvement for robot foundation models.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:52:28Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Michal Korniak</name>
+    </author>
+    <author>
+      <name>Marco Bagatella</name>
+    </author>
+    <author>
+      <name>Ralf Römer</name>
+    </author>
+    <author>
+      <name>Michal Nauman</name>
+    </author>
+    <author>
+      <name>Yarden As</name>
+    </author>
+    <author>
+      <name>Pranav Vignesh</name>
+    </author>
+    <author>
+      <name>Manan Agarwal</name>
+    </author>
+    <author>
+      <name>Leander Diaz-Bone</name>
+    </author>
+    <author>
+      <name>Piotr Zalewski</name>
+    </author>
+    <author>
+      <name>Mikołaj Czarnecki</name>
+    </author>
+    <author>
+      <name>Lenart Treven</name>
+    </author>
+    <author>
+      <name>Shashwat Saxena</name>
+    </author>
+    <author>
+      <name>Sreyas Venkataraman</name>
+    </author>
+    <author>
+      <name>Sarvesh Patil</name>
+    </author>
+    <author>
+      <name>Zhiyuan Zhou</name>
+    </author>
+    <author>
+      <name>Daniel Marta</name>
+    </author>
+    <author>
+      <name>Oier Mees</name>
+    </author>
+    <author>
+      <name>Nur Muhammad Mahi Shafiullah</name>
+    </author>
+    <author>
+      <name>Carmelo Sferrazza</name>
+    </author>
+    <author>
+      <name>Bhavya Sukhija</name>
+    </author>
+    <author>
+      <name>Angela P. Schoellig</name>
+    </author>
+    <author>
+      <name>Andreas Krause</name>
+    </author>
+    <author>
+      <name>Max Simchowitz</name>
+    </author>
+    <author>
+      <name>Andrew Wagenmaker</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06902v1</id>
+    <title>Gravitational-Wave Constraints on $R^2$ Gravity</title>
+    <updated>2026-11-04T18:49:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.06902v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06902v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Gravitational waves from compact binary coalescences provide a unique opportunity to test general relativity in the strong-field regime. Quadratic $f(R)=R+aR^2$ gravity is among the simplest higher-curvature extensions of general relativity and introduces a massive scalar degree of freedom whose finite interaction range can modify compact-binary dynamics and gravitational-wave emission. We map this theory onto the effective-field-theory waveform for generic massive scalar-tensor gravity, obtaining a theory-specific inspiral phase correction governed by the single coupling parameter $a$. Using Bayesian analyses of the binary-neutron-star events GW170817 and GW190425, we obtain a combined constraint on the quadratic-curvature coupling of $a\lesssim6.2\times10^6\,\mathrm{m}^2$ at $90\%$ credibility, corresponding to a lower bound on the scalar mass of $m_s\gtrsim3.2\times10^{-11}\,\mathrm{eV}$. This constitutes the strongest astrophysical constraint on the quadratic-curvature coupling, improving the previous best bound by approximately five orders of magnitude and demonstrating the sensitivity of binary-neutron-star inspirals to finite-range scalar interactions in the strong-field regime.</summary>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.HE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:49:50Z</published>
+    <arxiv:comment>13 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="gr-qc"/>
+    <author>
+      <name>Pawan Kumar Gupta</name>
+    </author>
+    <author>
+      <name>Laura Sagunski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06899v1</id>
+    <title>Occlusion for Free: Detecting Occlusion from the Disagreement Between Two Monocular Distance Cues</title>
+    <updated>2026-11-04T18:49:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.06899v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06899v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Knowing that a pedestrian is occluded is useful to a robot even when the detector cannot recover the hidden pixels, but occlusion estimators are normally trained on occlusion annotations that deployment settings rarely have. We show that occlusion can be read off two distance estimates a camera-only pipeline already computes. Apparent height is largely unchanged by occlusion, because the detected box still spans the whole person; monocular metric depth is pulled toward the occluder, because the nearest surface inside the box is what a depth map reports. Only their ordering matters, so no focal length, stature, or depth scale is needed, provided the depth model's error is close to a pure gain, a condition that can be checked without labels. The score detects heavy occlusion on KITTI with AUC 0.909 (0.888 over all annotated pedestrians, including those the detector misses), requires no training and no occlusion labels, and is not a proxy for range: within fixed distance bands it holds AUC 0.894-0.925 while true distance alone sits near chance. On synthetic CARLA scenes with measured visibility it reaches 0.819, against 0.644 for distance alone. We arrived here after measuring three standard architectural responses to occlusion, depth fusion, occlusion-simulating augmentation, and attention, none of which improved detection outside its training distribution in the configurations we tested, and after finding that a detector trained on German roads loses half its accuracy on self-annotated street scenes in Lagos, Nigeria. Signals that need no local annotation are worth more in settings that benchmarks do not represent.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:49:13Z</published>
+    <arxiv:comment>Accepted at the NeurIPS 2026 GlobalSouthAI Workshop</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Chibueze Praise Onyenweaku</name>
+    </author>
+    <author>
+      <name>Toyibat Adele</name>
+    </author>
+    <author>
+      <name>Sikirulahi Opeyemi Abdulkareem</name>
+    </author>
+    <author>
+      <name>Obed Honour Eje</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06896v1</id>
+    <title>Online Edge-Weighted Matching Beyond 0.55</title>
+    <updated>2026-11-04T18:47:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.06896v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06896v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We give a $0.556195$-competitive randomized algorithm for edge-weighted online bipartite matching with free disposal, improving the $0.5368$ guarantee of Blanc and Charikar. The result holds for arbitrary nonnegative edge weights and any input sequence fixed independently of the algorithm's randomness. Our algorithm builds on online correlated selection, introduced by Fahrbach, Huang, Tao, and Zadimoghaddam, and its multiway extension due to Blanc and Charikar.
+  Our main contribution is a state-dependent primal--dual analysis of correlated selection. At each weight threshold, we track the state of the selection process jointly with an auxiliary failure event. The analysis accounts for arrivals below the threshold, which change the state without improving the matching value at that threshold. A potential function bounds the dual increase in both cases. We instantiate the analysis with an explicit win map that assigns a common score to an initial range of states. Its selection inequalities are verified by a finite computer-assisted proof covering every required candidate multiplicity and every real threshold; the verifiers are available in an accompanying repository. Triangular unit-weight inputs asymptotically attain the guarantee of the underlying ideal algorithm, proving that its analysis is tight.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:47:40Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Alireza Farhadi</name>
+    </author>
+    <author>
+      <name>Mohammad Hajiaghayi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06894v1</id>
+    <title>Nonuniform Buy-at-Bulk Network Design: Improved Approximation and LP Integrality Gap</title>
+    <updated>2026-11-04T18:46:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.06894v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06894v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In nonuniform buy-at-bulk network design, we are given an undirected graph and $h$ terminal pairs with positive demands, and we must route every demand at minimum total cost when each network resource has two independent parameters: a fixed buying price paid once if the resource is used, and a per-unit rental cost (or physical length) paid proportionally to the traffic it carries. Unlike the uniform-cost or single-sink variants, the general multicommodity problem allows unrelated buying and rental metrics across arbitrary source--sink pairs, arbitrary demands, and both edge and node resources.
+  We give a deterministic polynomial-time $O(\log^2 h / (\log\log h)^2)$-approximation algorithm for undirected nonuniform buy-at-bulk network design. The guarantee holds for edge costs, node costs, and their combination, and applies to arbitrary positive rational demands with no dependence on the number of vertices or the numerical demand ratio. This improves upon the $O(\log^4 h)$ bound of Chekuri, Hajiaghayi, Kortsarz, and Salavatipour (2010) for unrestricted instances. Our result also establishes the same $O(\log^2 h / (\log\log h)^2)$ upper bound on the integrality gap of the natural affine multicommodity flow LP, bounding integral buying and rental costs separately against their fractional counterparts and preserving zero rental budgets exactly.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:46:32Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Iman Gholami</name>
+    </author>
+    <author>
+      <name>MohammadTaghi Hajiaghayi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06891v1</id>
+    <title>Prophet Secretary for Matroids and XOS Valuations: A Strict Separation at $1-1/e$</title>
+    <updated>2026-11-04T18:44:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.06891v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06891v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The matroid prophet-secretary problem asks an online algorithm to select an independent set of elements whose nonnegative values are drawn independently and revealed in uniformly random order. Its combinatorial-auction counterpart asks the algorithm to allocate disjoint bundles to arriving buyers with independently drawn XOS valuation functions. In both problems the distributions are known, and the benchmark is the expected offline optimum. Ehsani, Hajiaghayi, Kesselheim, and Singla (SODA 2018) give $(1-1/e)$-competitive algorithms for both settings. In this work we show that these two guarantees have different limits.
+  For every matroid, we give a randomized $(1-1/e+\varepsilon_0)$-competitive algorithm, where $\varepsilon_0=10^{-6}$. The guarantee holds for independent nonnegative values with finite expected optimum. For explicitly given finite distributions with rational values and probabilities, the algorithm has polynomial worst-case running time in the matroid independence-oracle model. The oracle tests whether a queried set is independent. The algorithm makes $O(N^4)$ such queries in expectation and $O(N^4\log(N+2))$ in the worst case, where $N$ is the number of elements.
+  For combinatorial auctions with XOS valuations, however, we show that $1-1/e$ is the optimal competitive ratio. We give an explicit family of finite instances showing that no online algorithm can guarantee a larger competitive ratio than $1-1/e$, even when the buyers' valuations are independent and identically distributed, every additive clause has coefficients in $\{0,1\}$, and computation is unrestricted. Thus the matroid improvement exploits structure absent from general allocation with XOS valuations.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:44:02Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Hossein Esfandiari</name>
+    </author>
+    <author>
+      <name>MohammadTaghi Hajiaghayi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06887v1</id>
+    <title>Risk-Sensitive Stochastic Optimal Control on Positive Cones</title>
+    <updated>2026-11-04T18:41:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.06887v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06887v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider stochastic optimal control problems in which the state is constrained to a proper cone. Specifically, we consider risk-neutral, risk-averse, and risk-seeking formulations within a single entropic-risk framework. We investigate classes of problems whose Bellman operator preserves affine functions and characterize their optimal value functions and feedback policies for both finite-horizon and time-average infinite-horizon problems. Additionally, we establish convergence and state-bound results under finite-step cost observability. Moreover, we demonstrate an exact connection between entropic-risk optimal control on proper cones and deterministic infsup control for systems whose dynamics and stage costs are affine in the disturbances. In addition, we provide examples of classes of systems for which explicit solutions can be obtained.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:41:32Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Mohamad Al Ahdab</name>
+    </author>
+    <author>
+      <name>John-Josef Leth</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06883v1</id>
+    <title>Density-driven $α$-particle clustering in neutron-rich oxygen isotopes</title>
+    <updated>2026-11-04T18:39:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.06883v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06883v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this work, we study the effect of valence neutrons on density-driven localisation in the neutron-rich oxygen isotopes. Calculations are performed within the multidimensionally constrained relativistic Hartree--Bogoliubov model using the DD-ME2 covariant energy-density functional. By constraining the mass rms radius to larger values, we study the structural evolution of these nuclei under progressive dilution, from spatially delocalised configurations to localised clustered states. The total energy, pairing correlations, deformation, and proton and neutron density distributions are analysed to determine how valence neutrons influence the emergence of $α$-like clustering. For all three isotopes, we find a transition from a spatially delocalised nucleonic configuration to a tetrahedral $4α$-like structure. The onset of this transition occurs at similar values of the radius-derived relative dilution parameter, $χ_{\mathrm{PT}}=ρ_{\mathrm{PT}}/ ρ_{\mathrm{GS}}\simeq 0.28$--$0.31$, and shows only a weak dependence on neutron number. The excess neutrons modify the clustered density by increasing the density in the central regions and between clusters, while leaving the underlying tetrahedral core structure largely intact. Finally, we also use a phenomenological four-centre Hückel-type mapping of nuclei, which provides a molecular-orbital-like interpretation of cluster structures. We find that the effective coupling between the cluster centers decreases by progressively expanding the nucleus. The centroid-referenced energy shift $ΔE_{\mathrm{val}}$ also becomes less negative and provides smaller net molecular-orbital-like energy lowering relative to its centroid with increasing neutron number.</summary>
+    <category term="nucl-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:39:41Z</published>
+    <arxiv:comment>7 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="nucl-th"/>
+    <arxiv:journal_ref>Phys. Lett. B 882 (2026) 141053</arxiv:journal_ref>
+    <author>
+      <name>M. Davies</name>
+    </author>
+    <author>
+      <name>E. Yüksel</name>
+    </author>
+    <author>
+      <name>J. -P. Ebran</name>
+    </author>
+    <author>
+      <name>E. Khan</name>
+    </author>
+    <arxiv:doi>10.1016/j.physletb.2026.141053</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.physletb.2026.141053" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06879v1</id>
+    <title>Adaptive Multi Mode: Budget-Aware Routing of Optimizers By Online Landscape Probes</title>
+    <updated>2026-11-04T18:35:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.06879v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06879v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The best classical optimizer for a continuous black-box problem depends on its budget and landscape. Existing routers decide from the dimension and budget, past improvement or features fitted to one benchmark, and few test an optimizer's implicit assumptions online. AMM (Adaptive Multi Mode) routes a known budget among quasi-Newton, trust-region, coordinate, multistart and evolution-strategy optimization engines with online probes of curvature, plateaus, separability, kinks, basins and fractal structure. Each probe has a default, a dimension-by-budget validity range and a cost charged to the budget. In its pre-registered development loop on bbob, 32 of 36 predictions held over the last 16 confirmations. AMM was then tested once on held-out bbob instances 101-110 (D=2-40, 10*D-1000*D) against up to seven competitors. It has the highest target share in 382 of 600 function-dimension-budget cells (236 outright, 146 tied) and, by a descriptive posterior rule, is credibly behind in 35, mostly at 10*D and 30*D. At every budget it also leads the controls built from its own engines (the best engine alone, the best engine per dimension and budget, and a greedy schedule), narrowly at 10*D and 30*D, and nevergrad's NgIohTuned. In pre-registered runs its lead over IPOP-CMA-ES holds under affine and box transformations, on box-constrained bbob and, pooled, on rotated f2-f4, but rotating the separable f3 and f4 removes most of the lead there. On held-out MA-BBOB its final share at 2000*D is level with IPOP-CMA-ES's and its anytime area lower. We published AMM as an open-source Python package (pip install amm-optimizer; https://github.com/BjBodner/amm-optimizer).</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:35:35Z</published>
+    <arxiv:comment>29 pages, 8 figures, 19 tables. Code: https://github.com/BjBodner/amm-optimizer</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Benjamin Jacob Bodner</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06877v1</id>
+    <title>A property of boundary extensions of atomic singular inner functions</title>
+    <updated>2026-11-04T18:34:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.06877v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06877v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Using a property of the Hilbert transform, we prove a measure theoretic result concerning the extensions of atomic singular inner functions to the circle. Various alternative proofs are presented using the mean value theorem for harmonic functions and a well-known property of Blaschke products. Using the main result, we establish several facts concerning atomic singular inner functions and their logarithms.</summary>
+    <category term="math.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:34:45Z</published>
+    <arxiv:comment>12 pages</arxiv:comment>
+    <arxiv:primary_category term="math.CV"/>
+    <author>
+      <name>Iason Efraimidis</name>
+    </author>
+    <author>
+      <name>Adrian Llinares</name>
+    </author>
+    <author>
+      <name>Sullivan MacDonald</name>
+    </author>
+    <author>
+      <name>Ignacio Uriarte-Tuero</name>
+    </author>
+    <author>
+      <name>Dragan Vukotic</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06863v1</id>
+    <title>Rethinking Self-Repair in Code-as-Policy Agents: What Drives Retry Success?</title>
+    <updated>2026-11-04T18:19:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.06863v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06863v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Code-as-policy agents often use execution feedback to retry failed programs. Additional sampling and task guidance can also improve success, leaving the contribution of failure-specific feedback unclear. We study this question in simulated robot manipulation. A fixed lookup selects feedback templates using failure labels and the API variant. A frozen code model generates a fresh program after each scene reset. On the same 252 initial failures, Qwen2.5-Coder-7B recovers 85.3% within five retries, compared with 68.3% for resampling with the same retry cap. The advantage persists under fixed total-token budgets. Feedback from other episodes and fixed task guidance yield similar recovery point estimates, with no detected benefit from matching the coarse failure label. In a separate study, a fixed guided prompt used from the first attempt achieves an observed overall success rate similar to that of template-based feedback. Template-based feedback also lowers recovery on a nut-insertion task requiring a rim grasp, consistent with an incompatible center-grasp instruction. Evaluations of robot self-repair should include resampling, mismatched feedback, and concise, task-compatible static guidance as baselines.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:19:24Z</published>
+    <arxiv:comment>Accepted to the CoRL 2026 Learn@Deploy workshop</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Siddharth Aphale</name>
+    </author>
+    <author>
+      <name>Ayushman Singh</name>
+    </author>
+  </entry>
+</feed>
