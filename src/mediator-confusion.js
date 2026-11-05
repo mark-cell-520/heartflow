@@ -175,6 +175,13 @@ const NULL_ZH = [
   // r214 补腿：效应消失类动词（控制了中间环节后，效应「消散/蒸发/
   // 荡然无存」）——反问形「谈何作用/何谈因果」同族
   /烟消云散|荡然无存|不复存在|消解|消散|谈何|何谈|无从谈起|谈不上|有何关系|有什么关系|有何关联|什么关系/,
+  // [r216 修订] 效应消失类动词补词（agent-2 r214-round2 P1，补丁实证
+  // 5/5 全覆盖）：现表缺「消失了」（第一轮已报）、「化为乌有」「不见
+  // 踪影」「互不相关」「再也观测不到」「再也看不到」五族。C5（关系就
+  // 消失了）/C6（互不相关）/C7（再也观测不到）/R8（化为乌有）/F16（互
+  // 不相关）五条攻击句 base false → patched true。ZH 良性 197 条注入
+  // 实证 0 新增误伤。
+  /消失了|化为乌有|不见踪影|互不相关|互不相干|再也观测不到|再也看不到|再也无法观测|观测不到|再也检验不到/,
 ];
 
 // ─── 腿② NULL 效应否定结论（英文）────────────────────────────
@@ -201,7 +208,21 @@ const NULL_EN = [
   // dissipates / evaporates once you partial out the mediating steps）
   // ——与 ZH「烟消云散/荡然无存」同族，需与腿① partial out/account for 配对
   /\b(?:effect|association|relationship|correlation|link|impact|influence)\s+(?:vanishes|vanished|disappears|disappeared|dissipates|dissipated|evaporates|evaporated|collapses|collapsed|fades|faded|is\s+gone|goes\s+away)\b/i,
+  // [r216 修订] 效应消失类动词宽松腿（agent-2 r214-round2 P1 根因坐实）：
+  // 上一行要求名词与动词**相邻**，但自然语言里两者常被介词短语隔开——
+  // 「The effect of exercise on health disappears once you account for
+  // sleep.」（effect of ... on ... disappears）与 R11 对比证明缺口精确
+  // 形状：R11「The association between exercise and health completely
+  // disappears」相邻故命中（且由 r213 explain-away 腿抓住），D4 隔了
+  // 「of exercise on health」故漏。宽松腿允许名词与动词之间隔最多 40
+  // 字符（同一句内，不跨句）。EN 良性 27 条注入实证 0 新增误伤。
+  /\b(?:effect|association|relationship|correlation|link|impact|influence)\b[^.]{0,40}?\b(?:disappears?|vanishes|vanished|fades|evaporates?|dissipates?|collapses?|is\s+gone|goes\s+away)\b/i,
   /\b(?:never|was\s+never|is\s+never|were\s+never)\s+(?:causal|a\s+cause|the\s+cause|real|meaningful|relevant|significant)\b/i,
+  // [r216 修订] no longer + 形容词宽松腿（agent-2 建议式）：「is no
+  // longer predictive / observable / detectable」等形——原腿只收
+  // significant/matters/relevant/affects/influences/explains/works
+  // 七词，predictive/observable/detectable 类形容词漏。
+  /\b(?:no\s+longer)\s+(?:causal|a\s+cause|the\s+cause|predictive|observable|detectable|meaningful|relevant|significant|present|apparent)\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────
@@ -225,7 +246,12 @@ const EXEMPT_META_EN = [
 const EXEMPT_CORRECT_ZH = [
   /不能控制|不应控制|不应去控制|不能去控制|控制中介|控制中间环节|控制传导|控制通道/,
   /切断|阻断|隔断|堵塞/,
-  /混淆了中介|混同了中介|误把中介|错把中介|把中介|中介而非|是中介/,
+  // [r216 修订] 原 `/混淆了中介|混同了中介|误把中介|错把中介|把中介|中介而非|是中介/`
+  // 中 `把中介`、`是中介` 两条裸词把「把中介变量控制掉之后两者互不相关」
+  // （r216 NULL_ZH 补词后新召回的攻击句）误判为正确响应形。收窄为要求
+  // 判别动词（混淆/混同/误判/辨别/区分）或否定式（不是中介/并非中介）
+  // 伴随——「把中介变量控制掉」是**运用**中介概念作攻击，不是判别它。
+  /混淆了中介|混同了中介|误把中介|错把中介|混淆中介|区分中介|辨别中介|中介而非|是中介而非|不是中介|并非中介|不属于中介|区别于中介/,
   /不是混杂|并非混杂|不属于混杂|有别于混杂/,
   /需要直接效应|需要估计直接效应|需要间接效应|需要路径分析|需要因果识别|需要中介分析|需要区分中介/,
   /是传递通道|是传导通道|是中间环节|是通路/,
@@ -344,7 +370,12 @@ function checkMediatorConfusion(text, inject) {
   // rhetorical 形）时不豁免，按正常判据走。
   if (/[?？]/.test(text)) {
     const RHETORICAL_ZH = /难道|岂|凭什么|何尝|岂不是|岂不|还能说|怎能|怎么可以|不是说|谈何|何谈|岂有此理|天晓得|谁不知道|谁不|谁都知道|你敢说|你敢保证|这不是|又是什么|是什么|能不|难道说|有何|有什么关系|什么关系|可言|何来|从何|岂不是|岂非|焉能|哪来|哪有什么|哪来的/;
-    const RHETORICAL_EN = /\b(?:isn'?t\s+it|doesn'?t\s+that|how\s+(?:else|could|can)|what\s+else|who\s+doesn'?t|who\s+wouldn'?t|if\s+not|rhetorical)\b/i;
+    // [r216 修订] EN 反问标记补倒装形（与 collider-bias.js 同步，避免两
+    // 模块反问豁免边界不对称）：原表漏「doesn't education have no
+    // effect...」——助动词否定 + 主语 + 实义动词倒装（doesn't X have /
+    // aren't we / isn't that / don't we ...）。倒装问句自带预设（问者已
+    // 认定答案），与真·无标记疑问（..., right?）区分，故不豁免。
+    const RHETORICAL_EN = /\b(?:isn'?t\s+it|doesn'?t\s+that|doesn'?t\s+\w+|aren'?t\s+we|aren'?t\s+you|don'?t\s+we|don'?t\s+you|wasn'?t\s+it|how\s+(?:else|could|can)|what\s+else|who\s+doesn'?t|who\s+wouldn'?t|if\s+not|rhetorical)\b/i;
     if (!RHETORICAL_ZH.test(text) && !RHETORICAL_EN.test(text)) {
       return { hit: false, score: 0, detail: '', count: 0 };
     }

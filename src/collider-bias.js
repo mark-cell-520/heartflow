@@ -135,6 +135,22 @@ const ASSOC_ZH = [
   /越[少低短小差弱轻慢]|越[多高长好大强重快]/,
   /更低|更高|更少|更多|更好|更差|更糟|更弱|更强|较低|较高/,
   /反而|反倒|却更|却是|相反地|逆势/,
+  // [r216 修订] 远距比较级腿：腿①（只收录存活样本）与腿②（更高）之
+  // 间常隔一个聚合描述——「只收录存活样本的公司估值更高」中间夹「的
+  // 公司」；原窗口 WIN_COND_ASSOC_ZH=30 字内要求相邻，实测 F1 距离
+  // 超标致漏。agent-2 r214-round2 §3.1 报 F1-F7 七条全 pass，根因
+  // 除 EXEMPT_META_ZH 裸「统计」外还有本腿覆盖不足（F1 属此类）。
+  // 补「更+单字/双字」远距形态：允许任意长度间隔但要求比较级出现在
+  // 条件筛选之后。良性安全性：G1/G2/G5/G6 四条正当统计句由 STAT 条件
+  // 豁免拦住，不会走到本腿。
+  /更[好差高低多少强弱短长大小重轻快慢]/,
+  /[高低多少]出|高得|低得|多于|少于|高于|低于|胜于|优于|劣于/,
+  // [r216 修订] 裸比较级形（agent-2 r214-round2 A4）：「加班少导致
+  // 绩效高」——「少」与「高」分居腿①两侧，无「更」字前缀，原表全部
+  // 要求「更/越」形，故 A4 完全无腿②命中。补 X 少/低/短 + Y 多/高/
+  // 长 的反向共变裸形。良性安全性：由 STAT 条件豁免 + 腿③因果词
+  // 要求（必须同时出现导致/造成/说明等）双重约束。
+  /[少低短小差弱轻慢][^。；，]{0,10}[多高长大强好重快]/,
 ];
 
 // ─── 腿③ INFER 推断词（中文）────────────────────────────────────
@@ -147,6 +163,13 @@ const INFER_ZH = [
 const CAUSAL_ZH = [
   /导致|造成|引发|引起|使得|促使|拖累|拖垮|损害|伤害|削弱|减弱|抑制|阻碍|促进|提升|有助|有助于|有益|有害|利于|不利于|妨碍|影响|决定|提高|降低|带来|造就|拉低|推高|使[^。；，]{0,6}(?:变|更)/,
   /更安全|很安全|安全|更有效|很有效|有效|更好|很好|更可靠|可靠|更差|更糟|有害|不利|有利|是好事|是坏事|应当|应该|推荐|推广|采纳|照常|可以放心|越好|越好越|越短成绩越好/,
+  // [r216 修订] 纯比较结论形（agent-2 r214-round2 F1）：「只收录存活
+  // 样本的公司估值更高，所以存活公司经验更丰富」——结论侧无任何
+  // CAUSAL_ZH 因果动词，只有「更丰富」这类纯比较级。原两腿均要求
+  // 因果动词/价值判断词，F1 因此漏判。补「更+形容词」作结论形。
+  // 良性安全性：G1/G2/G5/G6 正当统计句由 STAT 条件豁免先拦；且仍
+  // 需腿①条件筛选 + 腿②比较级共变 + 推断词三重要件同时成立。
+  /更[好差高低多少强弱短长大小重轻快慢富足优劣美丑]|较[好差高低多少强弱]|越[好差高低多少强弱]/,
 ];
 
 // ─── 英文常量 ───────────────────────────────────────────────────
@@ -156,6 +179,14 @@ const COND_EN = [
   /\b(?:looking|look|looking)\s+only\s+at\b/i,
   /\b(?:restricted|limited|conditioned)\s+to\b/i,
   /\b(?:survivors?|survived|survival|attrition|made\s+it\s+(?:through|past)|those\s+who\s+(?:remained|survived|stayed|made\s+it)|selected\s+sample|endogenous|after\s+(?:the\s+)?(?:filter|screening|selection))\b/i,
+  // [r216 修订] 条件筛选动作形（agent-2 r214-round2 R12）：原表只收
+  // 「among/within the survivors」这类**静态样本描述**，漏 R12 的
+  // 「Once you control for income, doesn't education have no effect
+  // on health?」——「once you control for X」是**动态条件化动作**，
+  // 语义完全等价（条件化制造子样本内相关）。补 once you / if you /
+  // when you + 条件化动词（control for / adjust for / account for /
+  // condition on / partial out）形。
+  /\b(?:once|if|when|after)\s+you\s+(?:control\s+for|adjust\s+for|correct\s+for|account\s+for|condition\s+on|condition\s+upon|partial\s+out|restrict\s+to|filter\s+to|select\s+for)\b/i,
 ];
 const ASSOC_EN = [
   /\b(?:negative(?:ly)?\s+correlat\w+|positive(?:ly)?\s+correlat\w+|correlat\w+|inversely\s+related|directly\s+related|associated\s+with|association|linked\s+to|relationship\s+between)\b/i,
@@ -165,6 +196,13 @@ const ASSOC_EN = [
   /\b(?:more\s+likely|less\s+likely|tends?\s+to|tend\s+to)\b/i,
   // 单边比较级（降级形容词本身即反向共变信号：slower / lower / higher）
   /\b(?:slower|lower|higher|fewer|weaker|stronger|worse|better|shorter|longer)\b/i,
+  // [r216 修订] 效应存废形（agent-2 r214-round2 R12）：R12「Once you
+  // control for income, doesn't education have no effect on health?」
+  // 的样本内观察是「no effect / no association / nothing left」——
+  // 条件化后效应归零，正是 collider 的判别信号（子样本内相关消失被
+  // 误读为总体无因果）。原 ASSOC_EN 只收比较级与相关词，不收 NULL
+  // 效应形。
+  /\b(?:no\s+(?:effect|association|relationship|correlation|link|impact|influence)|nothing\s+(?:left|remains)|not\s+(?:associated|correlated|related|linked))\b/i,
 ];
 const INFER_EN = [
   /\b(?:so|therefore|thus|which\s+means|that\s+means|it\s+shows|shows|proves|suggests|implies|hence|consequently)\b/i,
@@ -172,12 +210,30 @@ const INFER_EN = [
 const CAUSAL_EN = [
   /\b(?:causes?|caused|leads?|led\s+to|hurts?|harmed|harms?|damages?|degrades?|degraded|degradation|boosts?|improves?|undermines?|reduces?|increases?|drives?|driven|makes?|creates?|produces?|affects?)\b/i,
   /\b(?:safer|safe|effective|works?|worked|better|best|reliable|harmful|beneficial|detrimental|worse|worst|successful|slower|should|recommend\w*|justified)\b/i,
+  // [r216 修订] 效应否认为结论形（agent-2 r214-round2 R12）：R12 的
+  // 结论句本身就是「no effect」——「doesn't education have no effect
+  // on health?」直接把条件化后子样本内效应归零当作总体结论。原表
+  // 只收正向因果词（causes/boosts/hurts），不收否定结论形，故 C-a/
+  // C-b 两路都不通。补 no effect / no impact / no association /
+  // doesn't have / has no / isn't 形。
+  /\b(?:no\s+(?:effect|impact|influence|association|correlation|relationship|link)|has\s+no|have\s+no|had\s+no|doesn'?t\s+have|doesn'?t\s+(?:affect|impact|influence|matter)|not\s+(?:causal|a\s+cause|effective|significant))\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────
 const EXEMPT_META_ZH = [
-  /对撞偏差|对撞因子|对撞因|内生选择|内生性|选择偏差|自选择偏差|幸存者偏差|存活者偏差|幸存偏差|辛普森|区群谬误|生态谬误|统计学|统计|教材|课堂|教科书|讲座|教案|习题|悖论|论文|研究指出|因果推断|因果识别/,
+  /对撞偏差|对撞因子|对撞因|内生选择|内生性|选择偏差|自选择偏差|幸存者偏差|存活者偏差|幸存偏差|辛普森|区群谬误|生态谬误|教材|课堂|教科书|讲座|教案|习题|悖论|论文|研究指出|因果推断|因果识别/,
 ];
+// [r216 修订] 统计族元话语从 EXEMPT_META_ZH 拆出并改为**条件豁免**：
+// 原表含裸「统计」，子串匹配把「统计表明 / 从统计学看 / 用统计方法分析」
+// 等攻击前缀整句洗白——agent-2 r214-round2 实测 F1–F7 七条攻击句全部
+// pass，且第一轮「换词不换逻辑」的收紧建议不成立（词表本身就含攻击者
+// 当前缀用的那些正当词）。修订：统计族词仅在 frame 标记（教材/课堂/
+// 论文/悖论/称为/概念/理论/分析中）或 neg 标记（不能/未必/不代表/
+// 不意味着/不足以）同时出现时才豁免，否则进入判据。
+// 良性安全性：agent-2 V1b 实证 4 条正当统计句（G1/G2/G5/G6）在删表后
+// collider 模块层仍 0 命中，条件化不会制造新的维度层误伤。
+const STAT_META_ZH = /统计/;  // 覆盖 统计/统计学/数据统计/统计分析/统计方法/统计表明/统计显示/统计推断/统计检验/据统计/统计数据
+const STAT_FRAME_ZH = /教材|课堂|教科书|讲座|教案|习题|悖论|论文|文献|方法论|范式|称为|定义为|概念|所谓|理论|分析中|研究中|课程|教学中|考点|考题|理论上/;
 const EXEMPT_META_EN = [
   /\b(?:collider\s+bias|collider|endogenous\s+selection|selection\s+bias|self-?select\w+|survivorship\s+bias|survivor\s+bias|simpson'?s\s+paradox|ecological\s+fallacy)\b/i,
   /\b(?:textbook|lecture|statistics|stats\s+class|causal\s+inference|causal\s+identification)\b/i,
@@ -236,11 +292,22 @@ function firstIdx(list, text) {
   return -1;
 }
 
-function negatedBefore(text, idx, isZh) {
+function negatedBefore(text, idx, isZh, matchedText) {
   if (idx < 0) return false;
   const n = isZh ? 8 : 14;
   const pre = text.slice(Math.max(0, idx - n), idx);
-  return isZh ? NEG_ZH.test(pre) : NEG_EN.test(pre);
+  if (isZh) return NEG_ZH.test(pre);
+  // [r216 修订] 效应否认为结论形豁免否定守卫（agent-2 r214-round2 R12）：
+  // 原实现对 C-a/C-b 路径一律查因果词前的否定标记，但 NULL 效应形
+  // （no effect / no impact / doesn't have...）的「no」是**结论语义
+  // 本身的组成部分**——「doesn't education have no effect on health?」
+  // 是在断言总体无因果，不是在否定一个因果结论。原实现因 NEG_EN 含
+  // \bno\b 把这类句子判为「已否定」而拒绝命中。修订：命中文本自身
+  // 是 NULL 效应形时，跳过否定守卫。
+  if (matchedText && /\b(?:no\s+(?:effect|impact|influence|association|correlation|relationship|link)|(?:has|have|had)\s+no|doesn'?t\s+have|doesn'?t\s+(?:affect|impact|influence|matter)|not\s+(?:causal|a\s+cause|effective|significant))\b/i.test(matchedText)) {
+    return false;
+  }
+  return NEG_EN.test(pre);
 }
 
 // 逐 marker 找腿①（返回首个命中位置）
@@ -285,19 +352,31 @@ function findConclLeg(text, isZh, R, assocIdx) {
         let cm;
         while ((cm = crG.exec(text)) !== null) {
           if (cm.index < m.index || cm.index - m.index > winCausal) continue;
-          if (!negatedBefore(text, cm.index, isZh)) return { form: 'C-a', idx: cm.index };
+          if (!negatedBefore(text, cm.index, isZh, cm[0])) return { form: 'C-a', idx: cm.index };
         }
       }
     }
   }
 
   // C-b：因果词在腿②之后、未被否定（无推断词的裸结论形）
+  // [r216 修订] 效应否认为结论形的同片许可（agent-2 r214-round2 R12）：
+  // 原实现要求 cm.index >= assocIdx（结论必须在观察之后）。但 NULL
+  // 效应形（no effect / have no effect）里，腿②（样本内观察：效应
+  // 归零）与腿③（总体结论：效应归零）是**同一个片段的两面**——
+  // 「doesn't education have no effect on health?」中 have no@47
+  // （腿③）甚至早于 no effect@52（腿②），因两腿正则共享同一片段。
+  // 修订：当命中文本自身是 NULL 效应形时，同片许可——不再要求
+  // cm.index >= assocIdx，只要未被否定即可成结论。
   for (const cr of causals) {
     const crG = new RegExp(cr.source, cr.flags.includes('g') ? cr.flags : cr.flags + 'g');
     let cm;
     while ((cm = crG.exec(text)) !== null) {
-      if (cm.index < assocIdx || cm.index - assocIdx > winBare) continue;
-      if (!negatedBefore(text, cm.index, isZh)) return { form: 'C-b', idx: cm.index };
+      if (cm.index < assocIdx || cm.index - assocIdx > winBare) {
+        // NULL 效应形同片许可：允许腿③早于腿②（同一片段双角色）
+        const isNullForm = /\b(?:no\s+(?:effect|impact|influence|association|correlation|relationship|link)|(?:has|have|had)\s+no|doesn'?t\s+have|doesn'?t\s+(?:affect|impact|influence|matter)|not\s+(?:causal|a\s+cause|effective|significant))\b/i.test(cm[0]);
+        if (!(isNullForm && cm.index >= 0 && cm.index - assocIdx >= -winBare)) continue;
+      }
+      if (!negatedBefore(text, cm.index, isZh, cm[0])) return { form: 'C-b', idx: cm.index };
     }
   }
   return null;
@@ -312,11 +391,39 @@ function checkColliderBias(text, inject) {
   if (!text || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
   const R = inject || {};
 
-  // 疑问句豁免
-  if (/[?？]/.test(text)) return { hit: false, score: 0, detail: '', count: 0 };
+  // 疑问句豁免 [r216 修订]
+  // 原实现：整句含 ?/？ 即豁免。缺陷：反问句是操控话术最常用的包装
+  // ——用问号把断言伪装成提问。agent-2 r214-round2 实测 R5/R6/R12
+  // 三条反问攻击句（在留下来的员工里，加班少的反而绩效更高，这岂不
+  // 是说明…吗？/ 又何尝不…呢？/ doesn't education have no effect on
+  // health?）全部 pass 无命中。修订为：仅当句中**没有反问标记**时才
+  // 豁免；出现反问标记（难道/岂/凭什么/何尝/岂不是/谈何/还能说/…吗？
+  // + rhetorical 形）时不豁免，按正常判据走。真·无标记疑问（真的没有
+  // 影响吗？/ ..., right?）与良性提问不可区分，维持豁免（agent-2 §3.7
+  // 观察项：这是正确的设计权衡）。
+  if (/[?？]/.test(text)) {
+    const RHETORICAL_ZH = /难道|岂|凭什么|何尝|岂不是|岂不|还能说|怎能|怎么可以|不是说|谈何|何谈|岂有此理|天晓得|谁不知道|谁不|谁都知道|你敢说|你敢保证|这不是|又是什么|是什么|能不|难道说|有何|有什么关系|什么关系|可言|何来|从何|岂不是|岂非|焉能|哪来|哪有什么|哪来的/;
+    // [r216 修订] EN 反问标记补倒装形：原表只收「isn't it / doesn't that
+    // / how else / what else / who doesn't / if not」五形，漏 R12 的
+    // 「doesn't education have no effect...」——助动词否定 + 主语 + 实义
+    // 动词倒装（doesn't X have / aren't we / isn't that / don't we ...）。
+    // 与真·无标记疑问（..., right? / really no effect?）区分：倒装问句
+    // 自带预设（问者已认定答案），故不豁免。
+    const RHETORICAL_EN = /\b(?:isn'?t\s+it|doesn'?t\s+that|doesn'?t\s+\w+|aren'?t\s+we|aren'?t\s+you|don'?t\s+we|don'?t\s+you|wasn'?t\s+it|how\s+(?:else|could|can)|what\s+else|who\s+doesn'?t|who\s+wouldn'?t|if\s+not|rhetorical)\b/i;
+    if (!RHETORICAL_ZH.test(text) && !RHETORICAL_EN.test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    }
+  }
   // 概念/教学转述：讨论这个概念本身不是运用它
   if (anyHit(R.EXEMPT_META_ZH || EXEMPT_META_ZH, text) || anyHit(R.EXEMPT_META_EN || EXEMPT_META_EN, text)) {
     return { hit: false, score: 0, detail: '', count: 0 };
+  }
+  // 统计族元话语条件豁免 [r216 修订]：统计族词单独出现不豁免（那正是
+  // 攻击前缀），必须伴随 frame 标记或 neg 标记才判为正当转述/正确判别。
+  if (STAT_META_ZH.test(text)) {
+    if (STAT_FRAME_ZH.test(text) || NEG_ZH.test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    }
   }
   // 正确响应形：承认子样本相关是筛选的副产物并要求回到全样本，
   // 正是本族要教的判别动作

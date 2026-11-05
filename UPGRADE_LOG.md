@@ -1,3 +1,31 @@
+## r216 — 存量维度修复轮：`collider_bias`(209) + `mediator_confusion`(210) 红队发现缺陷修复（无新维度）
+
+**轮次**：r216｜ **上线 commit**：见 git log｜ **日期**：2026-11-05｜ **方向**：红队（agent-2）第二轮报告 §3/§5 缺陷修复
+**真升级类型**：0 — 存量维度判别能力修复（无新维度，不递增维度数；按宪法修复轮处理）
+**来源**：agent-2 `coordination/reports/r214-round2-variants-agent2.md` §3 攻击族漏判 + §5 修复清单 1–4 项
+**验证口径**：agent-2 归档探针 `r214-round2-probe-agent2.js` 复跑对比（r215 基线 stash 对照）+ 本轮探针 `r216-round1-probe.js`
+
+### 修复项（4 P0/P1 + 3 项根因连带）
+
+1. **P0-1 `collider_bias` 统计族豁免洗白**（agent-2 §3.1，第一轮换词式修复被证伪）：
+   `EXEMPT_META_ZH` 原含裸「统计」，子串匹配把「统计表明 / 从统计学看 / 用统计方法分析」等攻击前缀整句洗白。修订：统计族词从表拆出为 `STAT_META_ZH`，改为**条件豁免**——仅在 frame 标记（教材/课堂/论文/悖论/称为/概念/理论/分析中）或 neg 标记（不能/未必/不代表/不意味着/不足以）同时出现时才豁免。第一轮「收紧词表」建议经 agent-2 实测不成立（词表本身就含攻击者当前缀用的正当词），故改为条件化而非换词。
+2. **P0-2 `collider_bias` 疑问豁免一刀切**（agent-2 §3.2）：原 `if (/[?？]/.test(text)) return hit:false` 把反问句（岂不…吗 / 又何尝不…呢 / doesn't X have...）整句放行。修订：仅当句中**无反问标记**（RHETORICAL_ZH 40 族 + RHETORICAL_EN 倒装形）时才豁免；真·无标记疑问（真的没有影响吗？/ ..., right?）维持豁免（agent-2 §3.7 观察项：正确设计权衡）。`mediator-confusion.js` 的 RHETORICAL_EN 同步补倒装形，避免两模块边界不对称。
+3. **P1 `mediator_confusion` NULL_EN 名词-动词相邻缺口**（agent-2 §3.3）：原腿要求 effect/association 与 vanishes/disappears **相邻**，「The effect of exercise on health disappears」隔了「of exercise on health」故漏。补宽松腿 `[^.]{0,40}?` + `no longer + 形容词`（predictive/observable/detectable）腿。
+4. **P1 `mediator_confusion` NULL_ZH 缺词**（agent-2 §3.4）：补「消失了 / 化为乌有 / 不见踪影 / 互不相关 / 互不相干 / 再也观测不到 / 再也看不到 / 再也无法观测 / 观测不到 / 再也检验不到」。
+5. **连带修复 A `EXEMPT_CORRECT_ZH` 存量误伤**（r216 新腿触发的连坐纪律项）：原表 `把中介`、`是中介` 两条裸词把「把中介变量控制掉之后两者互不相关」（r216 补词后新召回的攻击句）误判为正确响应形。收窄为要求判别动词（混淆/混同/误判/辨别/区分）或否定式（不是中介/并非中介）伴随。
+6. **连带修复 B `negatedBefore` 否定守卫误杀**（R12 根因）：`NEG_EN` 含 `\bno\b`，「education have **no** effect」被判为「结论已被否定」而拒绝命中——但 NULL 效应形的「no」是结论语义本身的组成部分。修订：命中文本自身是 NULL 效应形（no effect / have no / doesn't have / not causal）时跳过否定守卫；C-b 路径给 NULL 效应形**同片许可**（腿②样本内观察与腿③总体结论是同一片段的两面，允许腿③早于腿②）。
+7. **连带修复 C `collider_bias` 判据腿覆盖缺口**（F1/A4）：ASSOC_ZH 补远距比较级与裸比较级反向共变形（「加班少…绩效高」无「更/越」前缀原全表漏）；CAUSAL_ZH 补纯比较结论形（「经验更丰富」无因果动词原全表漏）；COND_EN 补动态条件化动作形（once you control for X）；ASSOC_EN 补效应存废形（no effect / nothing left）；CAUSAL_EN 补效应否认为结论形。
+
+### 验证
+- **本轮探针 `coordination/reports/r216-round1-probe.js`：30/30 全通过**（14 攻击 + 13 良性，含 agent-2 F1–F7/A4/R5/R6/R12/C5–C7/R8/F16/D4 攻击样本与 G1/G2/G5/G6/M1/M2/C1/C2/CF/R1/R3/S1/S2 良性样本）。
+- **agent-2 归档探针复跑对比（stash 对照）**：攻击漏判 **14 → 3**（R1/R3/F15 为 agent-2 §3.7 观察项与 P2 遗留，属设计权衡）；目标维度承重 8 → 22；**良性误拦 4 → 4（G2/G3/G7/G8 与基线完全相同，全部由 reasoning_coherence/presupposition/post_hoc/pseudo_causal/moral_foundations 承重，非本两模块引入的存量问题，agent-2 §4 已自行记录归因）**——零新增误伤。
+- 四门禁全绿：verify 16/16、guard 20/20、doc 24/24、双向召回 52/52 + 误拦 302/326（与 r215 基线逐项一致）。
+- 存量测试无回归：r213 单测 57/57、r214 矩阵 22/22。
+- VERSION 6.8.143 → 6.8.144（修复轮递增，宪法 1.2）。
+
+### 边界纪律
+本轮无新维度，维度总数仍 211；修复全部收敛在 `collider_bias`(209) 与 `mediator_confusion`(210) 两模块内部，未触碰 `simpsons_paradox`(206) / `whole_part_transfer`(170) / `ecological_fallacy`(211) 的判据文本。agent-2 §5 清单第 5 项（P2 CAUSAL_ZH/COND_EN 补形）与第 6 项（G2/G3/E5 误拦侧，属其他维度）留待下轮，本轮不扩 scope。
+
 ## r215 — 第 211 判别维度 `ecological_fallacy`「生态谬误 / 区群谬误 / ecological fallacy」（跨层统计推断方向轮换）
 
 **轮次**：r215｜ **上线 commit**：见 git log｜ **日期**：2026-11-05｜ **方向**：统计推断的层级桥接（群体统计 → 个体属性）
