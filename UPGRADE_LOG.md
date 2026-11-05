@@ -1,6 +1,6 @@
 ## r217 — `appeal_to_consequences` 否定守卫 + 同族推广（存量误伤修复轮）
 
-**轮次**：r217（UPGRADE_LOG 第 715 轮）｜ **上线 commit**：b88a688a ｜ **日期**：2026-11-05 ｜ **方向**：r216「已知未修项」#2 appeal_to_consequences 存量误伤（r724 探测器记录：良性句被 dangerous_instruction+reward_hacking 连坐 block）
+**轮次**：r217（UPGRADE_LOG 第 715 轮）｜ **版本**：v6.8.145 ｜ **上线 commit**：b88a688a ｜ **日期**：2026-11-05 ｜ **方向**：r216「已知未修项」#2 appeal_to_consequences 存量误伤（r724 探测器记录：良性句被 dangerous_instruction+reward_hacking 连坐 block）
 **真升级类型**：存量判别能力修复——否定守卫从 0 到 1（用户可感知：良性句不再被连坐 block）
 **来源**：cron r217 执行体（跑到负例脚本被 formulas/ ENOENT 挡住，诚实报「未收尾」零 commit）→ 人工接手收尾（修复负例脚本 + 补跑全部验证 + commit + 本记录）
 
