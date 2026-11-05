@@ -18,6 +18,15 @@
  *   非 pass 数 25→25 零增加。此为「已有维度的全新措辞家族」（真升级
  *   类型②），模块已接线故立即激活，无需改 src/index.js。
  *
+ * [r224 · agent-4 补强] POLYSEMY_TABLE 再增 3 个中英双语多义词家族：
+ *   规则(人为约定 vs 客观规律)、实验(科学受控检验 vs 随意尝试)、
+ *   控制(实验控制 vs 社会控制)。零命中探针（内存摘除/注入对照）实测：
+ *   18 条攻击 14 条补强前 gate.action=pass 穿引擎，补强后 14/14 翻转
+ *   verify、17/18 被本维度直接承重；干跑探针实测官方良性集 326 条非
+ *   pass 数 25→25 零增加。同为真升级类型②，模块已接线立即激活。
+ *   弃选：选择/selection（反驳句与攻击句词汇同构，系统性误伤）、
+ *   机会/chance（机会×概率良性合法共现，FP 面最大）。
+ *
  * 论文来源（2026-10-10 升级轮调研）：
  *   arXiv 2606.31039《Truth or Sophistry? LoFa: A Benchmark for LLM
  *   Robustness Against Logical Fallacies》。实测 10 类谬误的 LFR@k：
@@ -234,6 +243,55 @@ const POLYSEMY_TABLE = {
   'liberty': [
     ['coercion', 'coerce', 'coerced', 'interfere', 'interferes', 'intervention', 'constraint', 'prohibit', 'rights', 'freedom', 'absence'],
     ['ability', 'capability', 'resources', 'poverty', 'poor', 'cannot afford', 'wealth', 'self-realization'],
+  ],
+  // ── [r224] agent-4 补强：约定/规律、科学实验/随意尝试、实验控制/社会控制三族 ──
+  // 判据同既有条目：① 两义位语义域区分度高 ② 真实攻击样本验证此前漏判
+  //   （coordination/agent4/probes/r224-zerohit-probe.js 实测：18 条攻击
+  //    14 条补强前 gate.action=pass 穿引擎，补强后 14/14 翻转 verify 且
+  //    17/18 被本维度直接承重）
+  // ③ 良性单一义位只命中单域 → 不误伤（r224-dryrun-probe.js 实测官方
+  //    良性集 326 条非 pass 数 25→25 零增加，equivocation 新增承重 0）。
+  // 压 FP 关键决策：域标记一律用强指示词——规则族不收"要/必须"等泛词，
+  //   B 域只用自然/物理/必然/无一例外等规律词；实验族 B 域用试试/尝试/
+  //   亲身/业余等尝试词，不收"新方法/不同"（良性方法论文本合法共现）；
+  //   控制族 B 域只用统治/压迫/监控/操纵/专政/镇压/舆论/言论/思想/规训
+  //   等强支配词，**不收"政府/国家/权力"**——"政府资助的对照实验严格
+  //   控制变量，因此结果可信"这类良性学术句会因政府×控制×因此误触。
+  // 弃选家族（诚实记录）：选择/selection（"自然选择不需要选择者"这类
+  //   反驳句与攻击句词汇同构，±90 字符窗内必然双命中，系统性误伤）；
+  //   机会/chance（机会×概率在良性职业/统计语境合法共现，FP 面最大，
+  //   同 r223 弃 risk 的理由）。
+  // 逻辑要求 hitA && hitB（可同一出现双命中或跨出现合并）+ 多义词出现
+  // ≥2 次 + 有推理连接词，纯单义文本天然放行。中英双语，VERIFY 级。
+  '规则': [
+    // 域A：人为约定（比赛/章程/可修改）
+    ['比赛', '游戏', '棋', '裁判', '章程', '条约', '制度', '制定', '约定', '习俗', '人为', '可变', '修改', '打破', '违反'],
+    // 域B：客观规律（自然/物理/必然/无一例外）
+    ['自然', '自然界', '物理', '必然', '无一例外', '不变', '客观', '铁律', '天地', '万物'],
+  ],
+  'rule': [
+    ['game', 'chess', 'sport', 'referee', 'charter', 'bylaw', 'bylaws', 'treaty', 'convention', 'custom', 'invented', 'changed', 'modified', 'broken', 'human'],
+    ['nature', 'natural', 'physics', 'physical', 'gravity', 'inevitable', 'invariable', 'unchanging', 'objective', 'iron law', 'universal'],
+  ],
+  '实验': [
+    // 域A：科学受控检验（对照/统计/同行评审）
+    ['对照', '双盲', '随机', '数据', '统计', '同行', '实验室', '发表', '可重复', '检验', '科学', '严谨', '假设'],
+    // 域B：随意尝试（试试/亲身/业余）
+    ['试试', '尝试', '亲身体验', '大胆', '尝鲜', '玩玩', '随便', '业余'],
+  ],
+  'experiment': [
+    ['controlled', 'control', 'lab', 'laboratory', 'data', 'statistical', 'peer', 'published', 'replicated', 'hypothesis', 'scientific', 'rigorous', 'randomized'],
+    ['try', 'trying', 'tried', 'yourself', 'personal', 'dabble', 'boldly', 'firsthand', 'casually', 'amateur'],
+  ],
+  '控制': [
+    // 域A：实验控制（变量/对照/混杂因素）
+    ['对照', '变量', '对照组', '随机', '双盲', '盲法', '实验', '检验', '混杂', '科学', '方法'],
+    // 域B：社会控制（统治/监控/操纵/思想规训）
+    ['统治', '压迫', '监控', '操纵', '专政', '镇压', '舆论', '言论', '思想', '规训', '禁锢', '民意'],
+  ],
+  'control': [
+    ['experiment', 'experiments', 'controlled', 'variables', 'group', 'randomized', 'blinded', 'confounder', 'scientific', 'lab', 'laboratory'],
+    ['dominate', 'domination', 'oppression', 'surveillance', 'manipulate', 'manipulation', 'authoritarian', 'tyranny', 'regime', 'populace'],
   ],
 };
 
