@@ -1,0 +1,441 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/1UFKinnuiwdzs4PR206Ib8xGCk4</id>
+  <title>arXiv Query: search_query=all:equivocation OR all:polysemy OR all:logical OR all:fallacy OR all:detection OR all:rules&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-05T21:50:44Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:equivocation+OR+(all:polysemy+OR+(all:logical+OR+(all:fallacy+OR+(all:detection+OR+all:rules))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>386688</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06915v1</id>
+    <title>Preparing for the Gaia DR4 Epochalypse: Simulated Epoch Astrometry for Substellar Companion Orbit-Modeling Benchmarks</title>
+    <updated>2026-11-04T18:59:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.06915v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06915v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Gaia's fourth data release (DR4) will provide epoch astrometry for billions of sources, enabling the detection of potentially tens of thousands of substellar companions. We present the epochalypse catalog: Gaia DR4-like epoch astrometry for testing orbit-modeling pipelines on a common set of injected systems with known parameters. Onto each of the $5{,}040{,}328$ main-sequence Gaia stars within $500\,{ \rm pc}$ in the G23H catalog, we inject a zero-, one-, and two-companions system, for $15{,}120{,}984$ systems in total. Companion masses and semimajor axes are drawn log-uniformly over $1\,M_{ \rm Mars}$--$80\,M_{ \rm Jup}$ and $0.03$--$100\,{ \rm au}$, with no occurrence model and no detectability cut, so orbital periods extend well beyond the mission baseline and the companion-free population serves as a matched null. We also flag sub-populations of one- and two-companions systems whose companions are potentially detectable, based on an estimated signal-to-noise ratio that accounts for each star's noise, number of transits, and the suppression of signals with periods longer than the baseline. As a demonstration, we run the kepmodel astrometric periodogram on every system and find that signal detection and period localization decouple beyond the DR4 baseline: long-period companions can produce significant astrometric curvature while their periods, and therefore their masses, remain poorly constrained. Under any companion occurrence model, this population of systems where the orbit is detectable but not characterizable will far outnumber the population with fully characterizable orbits. The epochalypse catalog, its full generation pipeline, and a modeling tutorial are publicly available.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:59:05Z</published>
+    <arxiv:comment>Submitted to AAS journals. 24 pages, 9 figures, 2 tables. For catalog generation and analysis code, see https://github.com/dyahalomi/epochalypse. For the full epochalypse catalog, see https://doi.org/10.5281/zenodo.23789041</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Daniel A. Yahalomi</name>
+    </author>
+    <author>
+      <name>Adrian M. Price-Whelan</name>
+    </author>
+    <author>
+      <name>Jessica Speedie</name>
+    </author>
+    <author>
+      <name>William Thompson</name>
+    </author>
+    <author>
+      <name>Megan Bedell</name>
+    </author>
+    <author>
+      <name>Victor Ramirez Delgado</name>
+    </author>
+    <author>
+      <name>Aida Behmard</name>
+    </author>
+    <author>
+      <name>Avraham Binnenfeld</name>
+    </author>
+    <author>
+      <name>Dori Blakely</name>
+    </author>
+    <author>
+      <name>Anthony G. A. Brown</name>
+    </author>
+    <author>
+      <name>Andrew R. Casey</name>
+    </author>
+    <author>
+      <name>Jiayin Dong</name>
+    </author>
+    <author>
+      <name>Clarissa R. Do Ó</name>
+    </author>
+    <author>
+      <name>Caleb Lammers</name>
+    </author>
+    <author>
+      <name>Cheyanne Shariat</name>
+    </author>
+    <author>
+      <name>Joshua N. Winn</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06914v1</id>
+    <title>A Framework for Context Enrichment and Selective Robustness in LLM Social Agents</title>
+    <updated>2026-11-04T18:58:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.06914v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06914v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Researchers use large language models as agents in social simulations, where agents are prompted with observations and background information intended to shape their actions. Yet LLM agents have been shown to substantially change their behavior under meaning-preserving prompt variations, creating a validation problem for social simulation. One plausible hypothesis is that this brittleness reflects a lack of grounding and can be reduced by enriching the context provided to the agents. Whether richer context improves robustness remains unclear, in part because context richness and robustness are rarely defined in ways that support controlled comparisons. We address the first need with controlled context enrichment, a set of prompt substitution rules that systematically enriches distinct types of context: neutral padding, generic social background, descriptive decision grounding, and normative decision grounding. We address the second by introducing selective robustness as a validation criterion: insensitivity to meaning-preserving prompt variation combined with a directional response to decision-relevant changes in the social world. We demonstrate the framework in a Prisoner's Dilemma-like game, showing how it can be used to identify which forms of context enrichment produce more desirable and robust agent behavior. We find that these forms of enrichment produce distinct behavioral patterns that vary between the two models tested.</summary>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:58:23Z</published>
+    <arxiv:comment>Accepted to the SocialAgent Workshop @ NeurIPS 2026. 12 pages, 1 figure, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.MA"/>
+    <author>
+      <name>Mattia Greiche</name>
+    </author>
+    <author>
+      <name>Reihaneh Rabbany</name>
+    </author>
+    <author>
+      <name>Maximilian Puelma Touzel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06911v1</id>
+    <title>BEAKER: An Expert-Curated Benchmark for Embodied Brains in Self-Driving Chemical Laboratories</title>
+    <updated>2026-11-04T18:57:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.06911v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06911v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Self-Driving Chemical Laboratories (SDCLs) are moving chemical experimentation toward embodied automation, where machines must perceive laboratory scenes, reason about experimental states, and act under physical, procedural, and safety constraints. Although Multimodal Large Language Models (MLLMs) are increasingly considered as embodied brains for such systems, existing laboratory benchmarks mainly focus on safety, anomaly detection, or general scientific understanding, leaving their execution-oriented embodied capabilities underexplored. To fill this gap, we introduce BEAKER, a Benchmark for evaluating Embodied Actionability, Knowledge, Experimentation, and Reasoning in SDCLs. BEAKER contains 1,000 expert-curated question-answer samples across 11 image and video task types, covering key judgments required for chemical laboratory execution, including affordance grounding, trajectory planning, equipment, state, and safety recognition, apparatus setup, operation and step reasoning, and temporal procedure reasoning. All questions and annotations are manually created and reviewed by chemistry and embodied Artificial Intelligence (AI) experts, without AI-assisted generation or annotation. We evaluate 28 general-purpose, science-oriented, chemistry-specialized, and embodied MLLMs in an offline, single-turn setting. Results show that current models can follow coarse experimental procedures in videos, but still struggle to ground actions into operable regions and feasible trajectories, to recognize fine-grained laboratory apparatus, states, and safety norms, and to order steps in mid-length procedures. BEAKER thus reveals a clear gap between coarse procedural understanding and the precise, action-grounded perception required for laboratory execution, providing a diagnostic benchmark for future MLLMs in SDCLs.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:57:17Z</published>
+    <arxiv:comment>Accepted by NeurIPS 2026 (Track on Evaluations and Datasets, Spotlight)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Fei Lin</name>
+    </author>
+    <author>
+      <name>Tengchao Zhang</name>
+    </author>
+    <author>
+      <name>Ziyang Gong</name>
+    </author>
+    <author>
+      <name>Xiaotong Yu</name>
+    </author>
+    <author>
+      <name>Bohan Zhang</name>
+    </author>
+    <author>
+      <name>Yifan Zhou</name>
+    </author>
+    <author>
+      <name>Qihao Yang</name>
+    </author>
+    <author>
+      <name>Ji Dai</name>
+    </author>
+    <author>
+      <name>Dong Li</name>
+    </author>
+    <author>
+      <name>Yining Jiang</name>
+    </author>
+    <author>
+      <name>Qinghua Ni</name>
+    </author>
+    <author>
+      <name>Jun Huang</name>
+    </author>
+    <author>
+      <name>Qiang Zhang</name>
+    </author>
+    <author>
+      <name>Yue Zhou</name>
+    </author>
+    <author>
+      <name>Zhihang Zhong</name>
+    </author>
+    <author>
+      <name>Yonglin Tian</name>
+    </author>
+    <author>
+      <name>Fei-Yue Wang</name>
+    </author>
+    <author>
+      <name>Xue Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06899v1</id>
+    <title>Occlusion for Free: Detecting Occlusion from the Disagreement Between Two Monocular Distance Cues</title>
+    <updated>2026-11-04T18:49:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.06899v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06899v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Knowing that a pedestrian is occluded is useful to a robot even when the detector cannot recover the hidden pixels, but occlusion estimators are normally trained on occlusion annotations that deployment settings rarely have. We show that occlusion can be read off two distance estimates a camera-only pipeline already computes. Apparent height is largely unchanged by occlusion, because the detected box still spans the whole person; monocular metric depth is pulled toward the occluder, because the nearest surface inside the box is what a depth map reports. Only their ordering matters, so no focal length, stature, or depth scale is needed, provided the depth model's error is close to a pure gain, a condition that can be checked without labels. The score detects heavy occlusion on KITTI with AUC 0.909 (0.888 over all annotated pedestrians, including those the detector misses), requires no training and no occlusion labels, and is not a proxy for range: within fixed distance bands it holds AUC 0.894-0.925 while true distance alone sits near chance. On synthetic CARLA scenes with measured visibility it reaches 0.819, against 0.644 for distance alone. We arrived here after measuring three standard architectural responses to occlusion, depth fusion, occlusion-simulating augmentation, and attention, none of which improved detection outside its training distribution in the configurations we tested, and after finding that a detector trained on German roads loses half its accuracy on self-annotated street scenes in Lagos, Nigeria. Signals that need no local annotation are worth more in settings that benchmarks do not represent.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:49:13Z</published>
+    <arxiv:comment>Accepted at the NeurIPS 2026 GlobalSouthAI Workshop</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Chibueze Praise Onyenweaku</name>
+    </author>
+    <author>
+      <name>Toyibat Adele</name>
+    </author>
+    <author>
+      <name>Sikirulahi Opeyemi Abdulkareem</name>
+    </author>
+    <author>
+      <name>Obed Honour Eje</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06893v1</id>
+    <title>Probing gravity at megahertz frequencies with levitated rotors</title>
+    <updated>2026-11-04T18:46:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.06893v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06893v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The near-field gravitational interaction between masses is always thought of as instantaneous, an assumption experimentally tested only up to 1.7 kHz, where measurements yield a bounds at the $10^{-5}$ s level. We propose a near-field experiment reaching up to megahertz frequencies, in which a levitated microrotor modulates a mass quadrupole and a second rotor measures the resulting gravitational tidal field as a torque. Because the detector rotor acts as a mechanical local oscillator, the megahertz signal is downconverted to a convenient band of a few hertz, and since at fixed geometry neither the torque nor the integration time depends on the rotation rate, higher frequencies are reached at no cost in sensitivity. With parameters within reach of magnetically levitated NdFeB rotors, a signal at 2 MHz yields a torque of $2\cdot 10^{-25}$ Nm, detectable in under an hour at 10 mK. Treating a possible departure from instantaneous gravitational coupling through a field relaxation time, the measured torque could constrain it at the $10^{-8}$ s level, improving on the existing bounds by more than three orders of magnitude. As a byproduct of our analysis, we derive the sensitivity of a rotor operated as a tunable high-frequency gravitational-wave detector, finding that a noise-equivalent strain around $10^{-22}$ Hz$^{-1/2}$ could be achievable in the megahertz band.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:46:09Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Matteo Fadel</name>
+    </author>
+    <author>
+      <name>Andrea Vinante</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06879v1</id>
+    <title>Adaptive Multi Mode: Budget-Aware Routing of Optimizers By Online Landscape Probes</title>
+    <updated>2026-11-04T18:35:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.06879v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06879v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The best classical optimizer for a continuous black-box problem depends on its budget and landscape. Existing routers decide from the dimension and budget, past improvement or features fitted to one benchmark, and few test an optimizer's implicit assumptions online. AMM (Adaptive Multi Mode) routes a known budget among quasi-Newton, trust-region, coordinate, multistart and evolution-strategy optimization engines with online probes of curvature, plateaus, separability, kinks, basins and fractal structure. Each probe has a default, a dimension-by-budget validity range and a cost charged to the budget. In its pre-registered development loop on bbob, 32 of 36 predictions held over the last 16 confirmations. AMM was then tested once on held-out bbob instances 101-110 (D=2-40, 10*D-1000*D) against up to seven competitors. It has the highest target share in 382 of 600 function-dimension-budget cells (236 outright, 146 tied) and, by a descriptive posterior rule, is credibly behind in 35, mostly at 10*D and 30*D. At every budget it also leads the controls built from its own engines (the best engine alone, the best engine per dimension and budget, and a greedy schedule), narrowly at 10*D and 30*D, and nevergrad's NgIohTuned. In pre-registered runs its lead over IPOP-CMA-ES holds under affine and box transformations, on box-constrained bbob and, pooled, on rotated f2-f4, but rotating the separable f3 and f4 removes most of the lead there. On held-out MA-BBOB its final share at 2000*D is level with IPOP-CMA-ES's and its anytime area lower. We published AMM as an open-source Python package (pip install amm-optimizer; https://github.com/BjBodner/amm-optimizer).</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:35:35Z</published>
+    <arxiv:comment>29 pages, 8 figures, 19 tables. Code: https://github.com/BjBodner/amm-optimizer</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Benjamin Jacob Bodner</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06863v1</id>
+    <title>Rethinking Self-Repair in Code-as-Policy Agents: What Drives Retry Success?</title>
+    <updated>2026-11-04T18:19:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.06863v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06863v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Code-as-policy agents often use execution feedback to retry failed programs. Additional sampling and task guidance can also improve success, leaving the contribution of failure-specific feedback unclear. We study this question in simulated robot manipulation. A fixed lookup selects feedback templates using failure labels and the API variant. A frozen code model generates a fresh program after each scene reset. On the same 252 initial failures, Qwen2.5-Coder-7B recovers 85.3% within five retries, compared with 68.3% for resampling with the same retry cap. The advantage persists under fixed total-token budgets. Feedback from other episodes and fixed task guidance yield similar recovery point estimates, with no detected benefit from matching the coarse failure label. In a separate study, a fixed guided prompt used from the first attempt achieves an observed overall success rate similar to that of template-based feedback. Template-based feedback also lowers recovery on a nut-insertion task requiring a rim grasp, consistent with an incompatible center-grasp instruction. Evaluations of robot self-repair should include resampling, mismatched feedback, and concise, task-compatible static guidance as baselines.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:19:24Z</published>
+    <arxiv:comment>Accepted to the CoRL 2026 Learn@Deploy workshop</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Siddharth Aphale</name>
+    </author>
+    <author>
+      <name>Ayushman Singh</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06859v1</id>
+    <title>Balancing hierarchical representation and quantization: A performance trade-off in text embeddings</title>
+    <updated>2026-11-04T18:15:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.06859v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06859v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Hierarchical text embedding models offer variable-length representations, while quantization reduces numerical precision; both aim to improve computational efficiency. This work is an empirical benchmark study of how these two orthogonal, already-established techniques interact. We evaluate 38 tasks from the Massive Text Embedding Benchmark (MTEB) using four transformer-based embedding models, covering 1D and 2D hierarchical representations combined with 32-bit, 8-bit, and binary quantization, for 168 configurations per task. We report each efficiency dimension separately: theoretical per-vector storage and end-to-end evaluation time. Under a Friedman test with Nemenyi post-hoc analysis, int8 quantization is statistically indistinguishable from float32 for pair classification and re-ranking and costs at most 1.5 percentage points overall, whereas binary quantization is significantly worse across every task category. Halving the embedding dimension once is not statistically detectable above $m=16$; two successive halvings always are. Combining an 8x dimensionality reduction with int8 yields a 32x reduction in per-vector storage at 94.4% of baseline effectiveness. Because evaluation times were measured once, we treat them as indicative: we find no evidence that quantization speeds up evaluation, whereas sampling from intermediate layers shortens it substantially. Retrieval degrades far faster than every other category, so we report findings per task category.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:15:08Z</published>
+    <arxiv:comment>29 pages. Authors' version of the open access article published in Information Sciences (CC BY 4.0). This version corrects the second affiliation of Marco Polignano (Otto von Guericke University Magdeburg); the published version lists the European Commission, Joint Research Centre (JRC) in error. Marco Polignano is not affiliated with the JRC. No other content has been changed</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>Information Sciences 763 (2027) 124271</arxiv:journal_ref>
+    <author>
+      <name>Kai Ponel</name>
+    </author>
+    <author>
+      <name>Marco Polignano</name>
+    </author>
+    <author>
+      <name>Erasmo Purificato</name>
+    </author>
+    <author>
+      <name>Aylin Julia Temizkan</name>
+    </author>
+    <author>
+      <name>Marco Levantesi</name>
+    </author>
+    <author>
+      <name>Giovanni Semeraro</name>
+    </author>
+    <author>
+      <name>Ernesto William De Luca</name>
+    </author>
+    <arxiv:doi>10.1016/j.ins.2026.124271</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.ins.2026.124271" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06839v1</id>
+    <title>Before You Continue: Evaluating Time-Sensitive Safety Awareness in Conversational Assistants</title>
+    <updated>2026-11-04T17:54:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.06839v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06839v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language model (LLM) assistants increasingly help users with everyday activities that involve time-dependent constraints. However, users may not mention these constraints in later requests, requiring assistants to recognize and adjust their advice accordingly. To evaluate such capability, we introduce TASC (Temporal Action Safety in Conversation), a benchmark that evaluates whether LLMs apply time-dependent constraints when responding to conversational requests. TASC consists of 3,418 inputs derived from 128 templates, along with a separate set of 33 scenarios designed to compare models' ability to calculate elapsed time with their ability to apply that information. Across 13 models, assistants account for time-dependent constraints in only 30.5% of cases where the proposed action violates a rule, while rarely warning users unnecessarily. More importantly, models fail to apply these constraints in 62.1% of cases despite correctly calculating the elapsed time. Explicitly providing the timing resolves only about half of these failures, revealing a gap between temporal reasoning and its application in conversational advice.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:54:49Z</published>
+    <arxiv:comment>Preprint</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Peidi Dong</name>
+    </author>
+    <author>
+      <name>Yunze Xiao</name>
+    </author>
+    <author>
+      <name>Yu-Lin Tsai</name>
+    </author>
+    <author>
+      <name>Yichen Zheng</name>
+    </author>
+    <author>
+      <name>Heyuan Huang</name>
+    </author>
+    <author>
+      <name>Weihao Xuan</name>
+    </author>
+    <author>
+      <name>Mark Dredze</name>
+    </author>
+    <author>
+      <name>Jen-tse Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06832v1</id>
+    <title>Coexistence-Aware Antenna Tilt and Resource Allocation for Cellular-Connected UAV Corridors</title>
+    <updated>2026-11-04T17:44:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.06832v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06832v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cellular-connected UAV corridors reuse terrestrial infrastructure to provide predictable aerial connectivity, but coexistence with ground users (GUEs) creates competing demands on antenna tilt and physical resource blocks (PRBs). Prior work optimizes tilt for signal quality alone and does not address joint tilt-PRB planning under corridor rate and GUE delay constraints, nor the allocation policy needed when combined resource claims exceed the PRB budget. We address both gaps by formulating a joint antenna-tilt and PRB-allocation problem that maximizes GUE sum-log-rate subject to a minimum UAV corridor rate and an $ M/G/1$-based GUE mean-delay bound. We decompose the problem into two subproblems: antenna tilts are adapted via projected gradient ascent, while PRB allocation follows a techno-economic approach. Under resource scarcity, we cast the PRB scarcity as a bankruptcy problem and apply the weighted Talmud rule to balance GUE and UAV claims. Simulation results demonstrate that relaxing the GUE delay bound consistently reduces UAV rate dissatisfaction under the proposed allocation.</summary>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:44:50Z</published>
+    <arxiv:comment>6 pages, 6 figures, accepted for publication in IEEE ANTS 2026 Conference WS-08</arxiv:comment>
+    <arxiv:primary_category term="cs.NI"/>
+    <author>
+      <name>Tarun Singh Rawat</name>
+    </author>
+    <author>
+      <name>Pradyumna Kumar Bishoyi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06827v1</id>
+    <title>Rules, Traces and Routing Statistics: Training and Calibration Data for Open Models on ARC-AGI-2</title>
+    <updated>2026-11-04T17:41:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.06827v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06827v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study which training and calibration data help three open models solve ARC-AGI-2 tasks when the solver runs offline on four L4 GPUs for at most 12 hours. We compare data offline on public tasks and report 189 runs on the 120 hidden semi-private tasks. For the NVARC Qwen3-4B grid model, we built a corpus of 12,000 executable rules in a typed language and 95,993 tasks; a rule is admitted only if its behaviour on a fixed probe set differs from that of every admitted rule, and a task only if its pairs refute a shortlist of nearest competing rules and defeat 12 shortcut solvers. Continued fine-tuning on 1,920 real task records with revised four-GPU scheduling raised the semi-private score from 28.96 (mean of the released model) to 33.06 (mean of five runs, best 34.86); no checkpoint trained with synthetic tasks, even all 95,993 of them, improved on the real-task model. For the Qwen3.8-27B reasoning model, we fine-tuned on 1,036 of its own reasoning traces with correct final answers and compared sets that add traces of other models and synthetic tasks. With an inference procedure built around the model (a thinking cap enforced in the serving engine, a Python program checked on the demonstrations after each answer, a long first attempt per input), the score rose from 26.81 to 44.03, the level the ARC Prize Foundation measured for the base model without a time limit (42.36); most of the gain came from the inference procedure. For the Qwen3.8-Flash-Next mixture-of-experts model (125B parameters, 6B active), GPU memory limited concurrency. Pruning from 512 to 384 experts per layer by router-weighted activation saliency grew the key-value cache from 0.55M to 1.39M tokens; a 296-expert list adapted with ARC routing statistics, keeping experts for program tokens, plus an FP8 indexer cache, reached 1.96M. With a tool that checks programs, the model scored 56.67, our best result.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:41:09Z</published>
+    <arxiv:comment>39 pages, 7 figures, 23 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Nguyen Minh Thang</name>
+    </author>
+    <author>
+      <name>Trinh Thi Phuong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06819v1</id>
+    <title>GFlowQEC: Generative Flow Networks that Learn to Sample Quantum LDPC Codes</title>
+    <updated>2026-11-04T17:31:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.06819v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06819v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Choosing a quantum error-correcting code for a real device means scoring candidates with circuit-level simulations so slow that only a few hundred can be run. So every evaluation counts, and a search is judged by how many good codes it finds per paid evaluation. Quantum LDPC codes built from a few group elements protect many logical qubits, but good ones are rare in a huge space. We introduce GFlowQEC, to our knowledge the first generative flow network (GFlowNet) for quantum code design. It builds a code one group element at a time and learns to propose codes in proportion to a power of their score. We train it once on scores from earlier searches, freeze it, and let it propose lifted-product codes with 180 physical qubits, scored by their distances. Ranking ten of its draws per paid call, it finds more than twice as many new top-scoring codes (inequivalent to any it was trained on) as tuned parallel tempering, even when tempering starts from GFlowQEC's training codes. It finds more than three and a half times as many as a supervised screen ranking ten random candidates per call. When both rank a hundred, the screen beats GFlowQEC, and does best ranking GFlowQEC's draws. Soft Q-learning, which shares the GFlowNet's optimal policy, does as well at one noise bias and better at the other, so the gain does not depend on the GFlowNet's training loss. Trained proposers can make a budget of expensive evaluations go further when good codes are rare.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:31:57Z</published>
+    <arxiv:comment>16 pages, 1 figure, 2 tables and 42 references</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Nuno Batista</name>
+    </author>
+    <author>
+      <name>Gabriel Falcao</name>
+    </author>
+    <author>
+      <name>Penousal Machado</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06813v1</id>
+    <title>The 3-Uniform Hyperclique Hypothesis is False</title>
+    <updated>2026-11-04T17:25:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.06813v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06813v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present truly subquartic algorithms for detecting or counting 4-hypercliques in a 3-uniform hypergraph with $n$ vertices, disproving a popular hypothesis in fine-grained complexity. The result immediately implies a faster algorithm for finding a $k$-hyperclique in a 3-uniform hypergraph for all constant $k\ge 4$, and a faster exponential-time algorithm for Max-3-SAT.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:25:51Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Timothy M. Chan</name>
+    </author>
+    <author>
+      <name>Reina Itakura</name>
+    </author>
+    <author>
+      <name>Zhiyuan Ma</name>
+    </author>
+    <author>
+      <name>Yuancheng Yu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06811v1</id>
+    <title>Evolutionary Design of Interpretable Spatial Descriptors for Structure-Property Relationship Discovery</title>
+    <updated>2026-11-04T17:25:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.06811v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06811v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Structure property prediction is a classical task in machine learning, ranging from molecular activity and materials properties to local functional responses measured in microscopy. For image-based regression, two choices define the information available to the predictor: the size of the image neighborhood and the spatial resolution retained within it. A small neighborhood can omit relevant surrounding structure, whereas a large, finely sampled neighborhood can introduce redundant or irrelevant information. Here, we develop a framework for constructing spatial descriptors for prediction of local spectra and hysteresis loops. We benchmark regression models, use SHAP maps to examine their spatial attribution, and explore the effect of the patch size and compression to establish the relationship between predictive accuracy and descriptor dimensionality. We then use a genetic algorithm to optimize spatial partitions and the assignment of mean, minimum, and maximum pooling operations. Each retained region contributes an explicit measurement of the image, allowing the search to balance prediction error against the number of descriptor values. Cartesian and polar constructions provide complementary ways to organize this information. The resulting descriptors make it possible to examine where spatial detail is needed, where regional summaries are sufficient, and how these choices depend on the predictor and the measured response. The same approach can be used for molecules and solids once the genetic algorithm rules for these are established.</summary>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:25:10Z</published>
+    <arxiv:primary_category term="cond-mat.mtrl-sci"/>
+    <author>
+      <name>Aditya Raghavan</name>
+    </author>
+    <author>
+      <name>Sergei V Kalinin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06806v1</id>
+    <title>Measuring Risk, Not Harm: Detecting Psychological Harm Risk Factors in LLM Conversations</title>
+    <updated>2026-11-04T17:22:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.06806v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06806v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Psychological harms from interactions with large language models cannot be monitored directly because they may emerge over repeated interactions and depend strongly on subjective individual user context. We propose measuring risk, not harm: detecting observable AI behaviors that constitute risk factors for psychological harm at the AI response level and aggregating these signals to support longitudinal monitoring. We operationalize eight such behaviors and construct a synthetic multi-label corpus of 47,062 AI responses and 373,873 response-factor labels, with targeted human annotations for validation and evaluation. We then compare trained embedding-based classifiers, direct LLM judging, and a classifier--judge cascade. All detectors are model-agnostic and operate only on LLM outputs, requiring no access to internal model states. We apply these detectors to several out-of-distribution human-AI conversation data sets from prior research. On held-out human-labeled data, the best cascade achieves macro precision of 0.86, recall of 0.76, and F1 of 0.79. On WildChat, it reduces LLM-judge calls by 97.1\% relative to direct judging. On DelusionEval, risk-factor detections cluster within conversations. Together, our results show that response-level behavioral risk-factor detection can provide a scalable measurement layer for longitudinal psychological-safety monitoring without conflating observable AI behavior with latent user harm.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:22:23Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Nil-Jana Akpinar</name>
+    </author>
+    <author>
+      <name>Eugenia Kim</name>
+    </author>
+    <author>
+      <name>Natalie Isak</name>
+    </author>
+    <author>
+      <name>Amanda Minnich</name>
+    </author>
+    <author>
+      <name>Victoria Westerhoff</name>
+    </author>
+    <author>
+      <name>Matthew Dressman</name>
+    </author>
+  </entry>
+</feed>

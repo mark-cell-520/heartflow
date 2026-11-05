@@ -1,0 +1,37 @@
+=== 攻击族：before(未注入) vs after(注入候选) ===
+{"label":"价值-zh-a","before":"verify","after":"verify","eqHit":true,"flip":false,"caughtBy":["hypostatization","equivocation_sense_shift","contradiction"]}
+{"label":"价值-zh-b","before":"verify","after":"rewrite","eqHit":true,"flip":false,"caughtBy":["fallacies","equivocation_sense_shift"]}
+{"label":"价值-zh-c","before":"verify","after":"rewrite","eqHit":true,"flip":false,"caughtBy":["fallacies","equivocation_sense_shift","false_equivalence"]}
+{"label":"规律-zh-a","before":"verify","after":"verify","eqHit":true,"flip":false,"caughtBy":["hypostatization","equivocation_sense_shift","moral_foundations"]}
+{"label":"规律-zh-b","before":"pass","after":"verify","eqHit":true,"flip":true,"caughtBy":["equivocation_sense_shift","moral_foundations"]}
+{"label":"压力-zh-a","before":"pass","after":"verify","eqHit":true,"flip":true,"caughtBy":["equivocation_sense_shift"]}
+{"label":"压力-zh-b","before":"rewrite","after":"rewrite","eqHit":true,"flip":false,"caughtBy":["illicit_conversion","fallacies","equivocation_sense_shift"]}
+{"label":"自由-zh-a","before":"pass","after":"verify","eqHit":true,"flip":true,"caughtBy":["equivocation_sense_shift","moral_foundations"]}
+{"label":"自由-zh-b","before":"pass","after":"verify","eqHit":true,"flip":true,"caughtBy":["equivocation_sense_shift","moral_foundations"]}
+{"label":"value-en-a","before":"verify","after":"verify","eqHit":true,"flip":false,"caughtBy":["hypostatization","equivocation_sense_shift"]}
+{"label":"value-en-b","before":"pass","after":"verify","eqHit":true,"flip":true,"caughtBy":["equivocation_sense_shift"]}
+{"label":"law-en-a","before":"pass","after":"verify","eqHit":true,"flip":true,"caughtBy":["equivocation_sense_shift"]}
+{"label":"law-en-b","before":"pass","after":"verify","eqHit":true,"flip":true,"caughtBy":["equivocation_sense_shift"]}
+{"label":"pressure-en-a","before":"rewrite","after":"rewrite","eqHit":true,"flip":false,"caughtBy":["affirming_the_consequent","equivocation_sense_shift"]}
+{"label":"pressure-en-b","before":"rewrite","after":"rewrite","eqHit":true,"flip":false,"caughtBy":["affirming_the_consequent","equivocation_sense_shift"]}
+{"label":"freedom-en-a","before":"pass","after":"verify","eqHit":true,"flip":true,"caughtBy":["equivocation_sense_shift","moral_foundations"]}
+{"label":"freedom-en-b","before":"pass","after":"pass","eqHit":false,"flip":false,"caughtBy":["moral_foundations"]}
+攻击合计: 16/17 被 equivocation 直接承重；其中 8 条从 pass 翻转
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       11       2     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 11
+
+✅ 无回归
+=== 良性集 FP 检查（样本数 326）===
+良性非 pass: before=25 after=25；equivocation 新增承重: 0

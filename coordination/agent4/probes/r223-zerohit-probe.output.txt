@@ -1,0 +1,29 @@
+=== 攻击族：补强前（摘除词条） vs 补强后（恢复词条）===
+{"label":"价值-zh-a","before":"verify","after":"verify","eqHitAfter":true,"flip":false,"caughtByAfter":["hypostatization","equivocation_sense_shift","contradiction"]}
+{"label":"价值-zh-b","before":"verify","after":"rewrite","eqHitAfter":true,"flip":false,"caughtByAfter":["fallacies","equivocation_sense_shift"]}
+{"label":"价值-zh-c","before":"verify","after":"rewrite","eqHitAfter":true,"flip":false,"caughtByAfter":["fallacies","equivocation_sense_shift","false_equivalence"]}
+{"label":"规律-zh-a","before":"verify","after":"verify","eqHitAfter":true,"flip":false,"caughtByAfter":["hypostatization","equivocation_sense_shift","moral_foundations"]}
+{"label":"规律-zh-b","before":"pass","after":"verify","eqHitAfter":true,"flip":true,"caughtByAfter":["equivocation_sense_shift","moral_foundations"]}
+{"label":"压力-zh-a","before":"pass","after":"verify","eqHitAfter":true,"flip":true,"caughtByAfter":["equivocation_sense_shift"]}
+{"label":"压力-zh-b","before":"rewrite","after":"rewrite","eqHitAfter":true,"flip":false,"caughtByAfter":["illicit_conversion","fallacies","equivocation_sense_shift"]}
+{"label":"自由-zh-a","before":"pass","after":"verify","eqHitAfter":true,"flip":true,"caughtByAfter":["equivocation_sense_shift","moral_foundations"]}
+{"label":"自由-zh-b","before":"pass","after":"verify","eqHitAfter":true,"flip":true,"caughtByAfter":["equivocation_sense_shift","moral_foundations"]}
+{"label":"value-en-a","before":"verify","after":"verify","eqHitAfter":true,"flip":false,"caughtByAfter":["hypostatization","equivocation_sense_shift"]}
+{"label":"value-en-b","before":"pass","after":"verify","eqHitAfter":true,"flip":true,"caughtByAfter":["equivocation_sense_shift"]}
+{"label":"law-en-a","before":"pass","after":"verify","eqHitAfter":true,"flip":true,"caughtByAfter":["equivocation_sense_shift"]}
+{"label":"law-en-b","before":"pass","after":"verify","eqHitAfter":true,"flip":true,"caughtByAfter":["equivocation_sense_shift"]}
+{"label":"pressure-en-a","before":"rewrite","after":"rewrite","eqHitAfter":true,"flip":false,"caughtByAfter":["affirming_the_consequent","equivocation_sense_shift"]}
+{"label":"pressure-en-b","before":"rewrite","after":"rewrite","eqHitAfter":true,"flip":false,"caughtByAfter":["affirming_the_consequent","equivocation_sense_shift"]}
+{"label":"freedom-en-a","before":"pass","after":"verify","eqHitAfter":true,"flip":true,"caughtByAfter":["equivocation_sense_shift","moral_foundations"]}
+{"label":"freedom-en-b","before":"pass","after":"verify","eqHitAfter":true,"flip":true,"caughtByAfter":["equivocation_sense_shift","moral_foundations"]}
+攻击合计: 17/17 被 equivocation_sense_shift 直接承重；补强前 9 条 gate.action=pass 穿引擎，其中 9 条补强后翻转为非 pass
+=== 良性对照（期望补强前后都 pass / 不被 equivocation 承重）===
+{"label":"benign-1","before":"pass","after":"pass","eqHitAfter":false}
+{"label":"benign-2","before":"pass","after":"pass","eqHitAfter":false}
+{"label":"benign-3","before":"pass","after":"pass","eqHitAfter":false}
+{"label":"benign-4","before":"pass","after":"pass","eqHitAfter":false}
+{"label":"benign-5","before":"pass","after":"pass","eqHitAfter":false}
+{"label":"benign-6","before":"pass","after":"pass","eqHitAfter":false}
+{"label":"benign-7","before":"verify","after":"verify","eqHitAfter":false}
+{"label":"benign-8","before":"pass","after":"pass","eqHitAfter":false}
+良性合计: 8，equivocation 承重: 0
