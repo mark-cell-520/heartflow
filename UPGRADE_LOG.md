@@ -1,3 +1,39 @@
+## r217 — `appeal_to_consequences` 否定守卫 + 同族推广（存量误伤修复轮）
+
+**轮次**：r217（UPGRADE_LOG 第 715 轮）｜ **上线 commit**：b88a688a ｜ **日期**：2026-11-05 ｜ **方向**：r216「已知未修项」#2 appeal_to_consequences 存量误伤（r724 探测器记录：良性句被 dangerous_instruction+reward_hacking 连坐 block）
+**真升级类型**：存量判别能力修复——否定守卫从 0 到 1（用户可感知：良性句不再被连坐 block）
+**来源**：cron r217 执行体（跑到负例脚本被 formulas/ ENOENT 挡住，诚实报「未收尾」零 commit）→ 人工接手收尾（修复负例脚本 + 补跑全部验证 + commit + 本记录）
+
+### 实现内容
+- `src/dev-exemptions.js`：新增 `isNegatedBypassHit(text, idx, len)` 与 `isNegatedCrisisWaiverSpan(text, span)`——命中词前 40 字窗口内出现否定词（不是/并非/并不/毫无/谈不上/算不上/远说不上 + EN not/no/never/without/hardly/barely/scarcely）即判否定，豁免该命中
+- **四处接线**（负例逐点注入证明承重）：
+  - `src/dangerous-instruction.js`：pm 命中前查否定 → continue
+  - `src/reward-hacking.js`：同上
+  - `src/crisis-exceptionalism.js`：危机豁免跨度查否定（防「这不是紧急情况」被危机豁免放行）
+  - `src/multi-turn-tactics.js`：同族推广
+- 形态探针 `scripts/round-217/probe-r217-shape.js`（同族 3 模块复量）
+- 测试 `test/round-217-negation-guard.test.js`（22 断言）；负例 `scripts/negative-test-negation-guard-r217.js`（对照基线 + A/B/C/D 四注入点）
+
+### 验证（全部实测；人工接手后独立复跑，数字与 cron 自述逐项核对一致）
+- `test/round-217-negation-guard.test.js` — **22 passed, 0 failed**
+- `scripts/negative-test-negation-guard-r217.js` — **5 passed, 0 failed**（对照副本全绿；A 守卫本体死 / B 危机跨度守卫死 / C dangerous-instruction 接线死 / D reward-hacking 接线死 → 全部如期变红且良性 36 条全 pass，证明注入只杀守卫不误伤）
+- `node bin/verify.js` — **16 passed, 0 failed**
+- `node scripts/bidirectional-guard.js` — 召回 **52/52**、误拦 **302/326**（92.6%，与基线完全一致，零新增误伤）
+- `node test/doc-numbers-accuracy.test.js` — **24 passed, 0 failed**
+- `node test/security-audit.test.js` — **16 passed, 0 failed**
+- `node scripts/round-guard.js --stage=after` — **通过**
+- `git diff --shortstat`（commit 前）— 6 files changed, 171 insertions(+), 5 deletions(-)
+
+### 新踩坑（工具改进候选，已写进下一轮池）
+1. **负例脚本一次性工作区拷贝遗漏 `formulas/`**：`makeWorkspace()` 只拷 src/test/scripts/bin/data，公式库缺失 → 引擎日志 ENOENT → 被脚本的 crash 正则误判为「崩溃假阴性」，本轮 cron 执行体因此卡在收尾前。已修复（拷贝列表补 formulas）。同类隐患：`scripts/negative-test-absolute-claim-en.js` 同样的拷贝逻辑待查。
+2. **`auto-commit-round.js` Windows 反斜杠 pathspec bug**：require 完整性扫描 `path.relative` 产出 `src\xxx.js`（反斜杠），与 `git ls-files` 的正斜杠集合比对永远 false → 误判「被引用但未入库」→ 反斜杠 pathspec 混入 `git add` → 整条 add 失败 → "no changes added to commit" 零提交。本轮按既定人工 commit 路径绕过（b88a688a）；脚本修复留待专门轮次（`path.relative` 后统一 `replace(/\\/g,'/')`）。
+
+### 已知未修项（下一轮候选池）
+1. `negative-test-absolute-claim-en.js` 的 formulas/ 拷贝遗漏（与踩坑 1 同类）
+2. `auto-commit-round.js` Windows pathspec bug 修复（与踩坑 2 对应）
+3. middle_ground 良性误伤（r724 池 68% 漏判但 fp≠0）——需复测后按 Phase 0.7b 决定
+4. chronological_snobbery 残余（r730 侦察族，3/8 漏判）——下一轮可直接做
+
 ## r216 — 第 212 判别维度 `texas_sharpshooter`「德州神枪手谬误 / post hoc data dredging」（统计与因果谬误方向轮换）
 
 **轮次**：r216（UPGRADE_LOG 第 714 轮）｜ **上线 commit**：见 git log｜ **日期**：2026-11-05｜ **方向**：按结果筛子集 → 从子集归纳「规律」（先画靶再射箭）
