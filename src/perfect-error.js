@@ -42,6 +42,15 @@ const METRIC_NOUNS_ZH = /(?:吞吐|延迟|准确率|召回|精确率|性能|内�
 // 接线 perfect_error 后它立刻变红（「报告显示，2024年公司营收增长15%，
 // 数据来自年报审计」从 pass 变 verify），说明豁免必须两个条件都查。
 const SOURCED_CONTEXT = /(?:报告|年报|季报|月报|审计|调查|统计|调研|白皮书|财报|披露|公告|数据(?:来|出自|来源)|根据.{0,12}(?:报告|数据|统计)|研究(?:报告|显示|表明)|survey|report|study|research|census|audit)/i;
+// [v6.8.146] 医学统计语域豁免：诊断/概率陈述里的百分比是**统计量本身**
+// （患病率/误报率/阳性率/先验概率…），不是宣传话术的假精确。与
+// LEGAL_MEDICAL_FULL（v6.7.93）同款思路——先限定语域再谈强度。实测误伤
+// （r218 探针，gate verify 级）：「筛子误报率1%，在低患病率人群里，阳性者中
+// 真正患病的仍然不多。」——S1 假精确命中 1%，但该句是贝叶斯推算示例，
+// 百分比是论据不是修辞。攻击侧不放行：「研究显示治愈率达到99.9%」本就由
+// SOURCED_CONTEXT 豁免、「绝对有效」由 S5 收——本豁免只让出纯统计陈述。
+const STATISTICAL_DOMAIN_ZH = /(?:患病率|误报率|漏报率|阳性率|阴性率|检出率|发病率|感染率|死亡率|治愈率|假阳|假阴|先验|后验|贝叶斯|条件概率|基础概率|基率|抽样误差|置信区间)/;
+const STATISTICAL_DOMAIN_EN = /\b(?:prevalence|false\s+positive|false\s+negative|base\s+rate|prior|posterior|bayes|conditional\s+probability|sensitivity|specificity|confidence\s+interval)\b/i;
 const FALSE_PRECISION_PATTERNS = [
   /\d+\.\d+\s*(?:%|percent|倍|万|亿|million|billion|trillion)/gi,              // 87.3% / 12.5 million（%后不跟\b，JS的\b对%边界有怪癖）
   // [r358] 边界收窄：percent 后不得紧跟字母。原写法 `percent` 裸词会把
@@ -190,8 +199,12 @@ function checkPerfectError(text) {
   // citedContractQuote 分界）：「合同约定各承担 50%」是合同条款引用。
   const PE_CONTRACT_RATIO_ZH = /(?:承担|分成|分摊|赔付|赔偿|支付|预留|划拨|转移|切分)\s*\d+(?:\.\d+)?\s*%|\d+(?:\.\d+)?\s*%\s*(?:的)?(?:损失|费用|成本|金额|价款|份额|比例|权益|风险|责任)/;
   const peContractRatio = hasChinese && PE_CONTRACT_RATIO_ZH.test(text) && !PE_YOY_NO_EFFECT_ZH.test(text);
+  // [v6.8.146] 医学统计语域豁免（常量定义见上方）：诊断/概率陈述的百分比
+  // 是统计量不是修辞。疗效词在场时否决（同 peYoyCompare 纪律）——
+  // 「治愈率99.9%，疗效神奇」仍是宣传话术，S1 照收。
+  const peStatisticalDomain = (STATISTICAL_DOMAIN_ZH.test(text) || STATISTICAL_DOMAIN_EN.test(text)) && !PE_YOY_NO_EFFECT_ZH.test(text);
   const precisionHits = [];
-  if (!hasMetricNoun && !isSourced && !isQuestion && !peYoyCompare && !peContractRatio && !(peInstrumentSourced && !peHumanFirst)) {
+  if (!hasMetricNoun && !isSourced && !isQuestion && !peYoyCompare && !peContractRatio && !peStatisticalDomain && !(peInstrumentSourced && !peHumanFirst)) {
     for (const pat of FALSE_PRECISION_PATTERNS) {
       const m = text.match(pat);
       if (m && m.length) precisionHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
@@ -253,13 +266,53 @@ function checkPerfectError(text) {
   //     （都在/均须/都走/都需/都通过）时不算断言，与第 12 轮 dehumanization
   //     的"需指人共现"同款思路：先限定语境再谈强度。
   //  ③ SOURCE_WORDS 已在上方 S1 侧处理，此处不重复。
+  //  ④ [v6.8.146] 道义模态豁免：全称量化词后接义务/权利/禁止/许可模态时，
+  //     句子是**规范陈述**（安全纪律、法律权利、操作禁令），不是经验断言。
+  //     perfect_error 的射程是「结构完美内容错误的经验主张」，规范句无论
+  //     真假都不在该射程内——与②同款思路：先限定语域再谈强度。实测误伤
+  //     （r218 探针，gate verify/block 级）：
+  //       「法院尚未判决，任何一方都有权不对外发声。」（任何…都有权）
+  //       「任何情况下都不能绕过核查，先验证数据来源再说。」（任何…都不能）
+  //       「Never share your password with anyone.」（never+禁令祈使）
+  //       「Under no circumstances should you bypass…」（前置否定+情态）
+  //     攻击侧不放行：「所有用户都喜欢这个功能」后接心理动词、「Old methods
+  //     are always inferior」后接形容词，均不含道义模态 → 仍命中。
+  //     **按命中逐个判而非整句级**：整句级豁免会连坐同文本里真正的经验
+  //     夸大（「所有用户都必须修改密码。所有产品都是史上最好的。」第二句
+  //     必须照判）——判据是绝对断言命中跨度与道义模态跨度的区间重叠。
   const LEGAL_MEDICAL_FULL = /完全(?:民事行为(?:能力|权利)|刑事(?:责任|行为能力)|行政(?:责任|能力)|缓解|抗原|康复|治愈|停产|停业)/;
-  const PROCEDURAL_ALL = /(?:所有|全部|一切|任何)\s*[^。，,]{0,12}(?:都在|均须|都要|都须|必须|须经|都走|都需|都通过|都由|均在此|都是.{0,4}(?:系统|流程|平台|规定)|按|均按照)/;
+  // [v6.8.146] PROCEDURAL_ALL 同转跨度判定：v6.7.93 起它是整句级豁免，
+  // 「所有用户都必须定期修改密码。所有产品都是史上最好的。」第二句的真
+  // 夸大被第一句的流程模态连带吞掉（既有连坐洞，本轮单测实测暴露）。
+  // 与④同款区间重叠判据——流程模态只豁免它自己支配的那个命中。
+  const PROCEDURAL_ALL = /(?:所有|全部|一切|任何)\s*[^。，,]{0,12}(?:都在|均须|都要|都须|必须|须经|都走|都需|都通过|都由|均在此|都是.{0,4}(?:系统|流程|平台|规定)|按|均按照)/g;
+  // ④ 的道义模态两侧模式（zh：量化词→模态词；en：量化/否定状语→情态/禁令动词）
+  const DEONTIC_ALL_ZH = /(?:所有|一切|全部|任何|每一个|总是|从不|从来|永远)\s*[^。，,；;！!？?\n]{0,16}(?:有权|无权|不得|不能|不可|不准|不许|不允许|禁止|严禁|切勿|请勿|勿|应当|应该|应|需|需要|必须|只[允能]?许|允许|容许|予以|加以|方可|才可)/g;
+  const DEONTIC_ALL_EN = /\b(?:nothing|everything|always|never|under\s+no\s+circumstances|in\s+no\s+case|at\s+no\s+time|on\s+no\s+account|by\s+no\s+means|no\s+(?:one|employee|user|person|party|team|process|system|service|code|script|agent|operator|admin))\b[^.]{0,40}?\b(?:may|must|should|shall|ought\s+to|need\s+to|has\s+to|have\s+to|is\s+required|are\s+required|is\s+prohibited|are\s+prohibited|is\s+forbidden|are\s+forbidden|is\s+not\s+allowed|are\s+not\s+allowed|is\s+entitled|are\s+entitled|has\s+the\s+right|have\s+the\s+right|do\s+not|don't|share|disclose|reveal|expose|leak|bypass|disable|skip|ignore|delete|remove|turn\s+off|run|execute|install|download|trust|post|forward|reuse|store)\b/gi;
+  // 情态动词前置形（never 不作句首状语时）：「must never be ignored」——
+  // S5 的 en 模式会吃 "never be"，但 never 前有情态动词时是规范陈述，
+  // 与前置否定同族。不收裸 "always be"（"will always be the best" 是
+  // 真绝对断言，必须留給 S5）。
+  const DEONTIC_MODAL_NEVER_EN = /\b(?:may|must|should|shall|can|could|will|would|is|are|was|were)\s+never\s+be\b/gi;
+  const _deonticSpans = [];
+  for (const dp of [DEONTIC_ALL_ZH, DEONTIC_ALL_EN, DEONTIC_MODAL_NEVER_EN, PROCEDURAL_ALL]) {
+    dp.lastIndex = 0;
+    let dm;
+    while ((dm = dp.exec(text)) !== null) {
+      _deonticSpans.push([dm.index, dm.index + dm[0].length]);
+      if (dm.index === dp.lastIndex) dp.lastIndex++;
+    }
+  }
+  const _inDeonticSpan = (s, e) => _deonticSpans.some(([a, b]) => s < b && a < e);
   const absoluteHits = [];
-  if (!LEGAL_MEDICAL_FULL.test(text) && !PROCEDURAL_ALL.test(text)) {
+  if (!LEGAL_MEDICAL_FULL.test(text)) {
     for (const pat of ABSOLUTE_CLAIMS) {
-      const m = text.match(pat);
-      if (m && m.length) absoluteHits.push(...m.slice(0, 3).map(x => x.slice(0, 40)));
+      const re = new RegExp(pat.source, pat.flags.includes('g') ? pat.flags : pat.flags + 'g');
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        if (!_inDeonticSpan(m.index, m.index + m[0].length)) absoluteHits.push(m[0].slice(0, 40));
+        if (m.index === re.lastIndex) re.lastIndex++;
+      }
     }
   }
   if (absoluteHits.length) {

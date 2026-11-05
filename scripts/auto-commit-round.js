@@ -89,7 +89,12 @@ try {
     try { src = fs.readFileSync(abs, 'utf8'); } catch (_) { continue; }
     for (const m of src.matchAll(/require\(['"](\.[^'"]+\.js)['"]\)/g)) {
       const target = path.resolve(path.dirname(abs), m[1]);
-      const targetRel = path.relative(ROOT, target);
+      // [r218] Windows pathspec bug 修复（UPGRADE_LOG「踩坑 2」）：path.relative
+      // 在 Windows 产出 `src\xxx.js`（反斜杠），与 git ls-files 的正斜杠集合
+      // 比对永远 false → 误判「被引用但未入库」→ 反斜杠 pathspec 混入 git add
+      // （git pathspec 里 \ 是转义符）→ 整条 add 失败 → 零提交。统一折成正
+      // 斜杠；POSIX 上该 replace 是恒等变换，无副作用。
+      const targetRel = path.relative(ROOT, target).replace(/\\/g, '/');
       if (!fs.existsSync(target)) {
         // JSDoc 注释里的示例路径不算断链（历史上多次误报）
         const lineStart = src.lastIndexOf('\n', m.index) + 1;

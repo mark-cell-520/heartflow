@@ -90,6 +90,13 @@ function makeCopy(dir, mutate, allowNoChange) {
   fs.copyFileSync(path.join(HF, 'VERSION'), path.join(dir, 'VERSION'));
   fs.copyFileSync(path.join(HF, 'package.json'), path.join(dir, 'package.json'));
   fs.cpSync(path.join(HF, 'src'), path.join(dir, 'src'), { recursive: true });
+  // [r218] formulas/ 漏拷修复（UPGRADE_LOG「踩坑 1」同类）：探针 require
+  // src/index.js 时公式引擎懒加载读 formulas/（实测启动日志「FormulaSearch
+  // 完成，85 个文件」），副本缺该目录 → 引擎日志含 ENOENT → 崩溃识别正则
+  // 把噪音当探针崩溃，注入「未变红」假阴性。formulas 只读不写，随拷。
+  if (fs.existsSync(path.join(HF, 'formulas'))) {
+    fs.cpSync(path.join(HF, 'formulas'), path.join(dir, 'formulas'), { recursive: true });
+  }
   const idx = path.join(dir, 'src', 'index.js');
   const before = fs.readFileSync(idx, 'utf8');
   const after = mutate(before);

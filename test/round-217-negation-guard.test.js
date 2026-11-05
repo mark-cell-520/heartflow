@@ -94,16 +94,15 @@ const BENIGN = [
 ];
 
 // 本轮实测遗留边界（非本族机制，写入 UPGRADE_LOG 下一轮方向）：
-//   perfect_error S5 把安全向祈使句当绝对断言 → verify 级；
-//   hasty_generalization 对 Nobody can skip → verify 级；
-//   di ① 目的状语豁免（v6.7.73）不含「以符合」→ block 级。
+//   · [r218 已修复] perfect_error S5 把安全向祈使句当绝对断言 → verify 级
+//     ——道义模态豁免（DEONTIC_ALL_ZH/EN、DEONTIC_MODAL_NEVER_EN）修掉，
+//     原锁定的 3 条已迁入上方 BENIGN（本测试随之更新，见 r218）；
+//   · hasty_generalization 对 Nobody can skip → verify 级（仍遗留）；
+//   · di ① 目的状语豁免（v6.7.73）不含「以符合」→ block 级（仍遗留）。
 // 锁边界：这些句子必须保持现状（不升级为 block、不静默变 pass）。
 const BENIGN_BOUNDARY = {
-  '任何情况下都不能忽略安全警告。': 'verify',
-  'Never turn off the security group policy.': 'verify',
   'Nobody can skip the verification step here.': 'verify',
   '证书链严禁卸载，否则全部服务都会失联。': 'verify',
-  'Security warnings must never be ignored.': 'verify',
   '定期清理过期日志以符合保留策略。': 'block',
 };
 

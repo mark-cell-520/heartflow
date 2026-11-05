@@ -6109,12 +6109,36 @@ function checkVagueness(text) {
   const explicitSource = explicitSourceFollow.some(p => p.test(text));
   const patterns = hasChinese ? VAGUE_PATTERNS.zh : VAGUE_PATTERNS.en;
   const matches = [];
+  // [v6.8.146] 可验证结论锚豁免：模糊标记所在句给出**可执行的检验/处置
+  // 路径**时，发言者是在量化不确定性、承诺可追责的核验动作，不是回避性
+  // 模糊。实测误伤（r218 探针，gate verify 级）：
+  //   「每个部件都通过质检，整机大概率也可靠，但仍需整机测试。」（大概率+测试）
+  //   「报告显示问题集中在管理不善的部门，需对这些部门专项整改。」（报告显示+整改）
+  // 攻击侧不放行：「报告显示本季度无安全事故」「数据显示整体表现尚可」
+  // 无锚词 → 仍命中（r436 攻击池回归见 test/round-436-vagueness-report-quote）。
+  // 句窗按句读切分取命中所在句——锚词必须与模糊标记同句，隔句的合规动作
+  // 不掩护前一句的模糊口径。锚词表为中文，en 模式不受影响（无实测 en 误伤）。
+  // 已知边界：「相关部门已开展专项整改」同句含锚 → 豁免——发言者已承诺
+  // 可核验动作， vagueness 的「无人担责」指控不成立，记入 UPGRADE_LOG。
+  const _sentenceWindow = (idx) => {
+    let s = 0;
+    for (let i = idx - 1; i >= 0; i--) {
+      if ('。！？!?\n'.includes(text[i])) { s = i + 1; break; }
+    }
+    let e = text.length;
+    for (const ch of ['。', '！', '？', '!', '?', '\n']) {
+      const i = text.indexOf(ch, idx);
+      if (i >= 0 && i < e) e = i;
+    }
+    return text.slice(s, e);
+  };
+  const VERIFICATION_ANCHOR = /(?:测试|验证|核实|确认|检查|审计|复核|评审|抽检|检验|检测|监测|评估|试点|对照|整改|督办|复查|复盘|约谈|问责|处罚|专项|校准|溯源)/;
   for (const pat of patterns) {
     const m = text.match(pat);
     // [v6.7.73] 存匹配到的原文而非正则源码——否则 trace/evidence 吐出
     // `{"pattern":"报告显示","count":1}` 这种 JSON 噪音（第四个证据可读性问题，
     // 前三个：hasty_generalization/double_bind/cyrillic 已修）
-    if (m) matches.push({ pattern: m[0].slice(0, 20), count: m.length });
+    if (m && !VERIFICATION_ANCHOR.test(_sentenceWindow(m.index))) matches.push({ pattern: m[0].slice(0, 20), count: m.length });
   }
   const count = matches.length;
   // [r356] 群体事实差异句豁免：studies show + differ/higher/average 形状
@@ -7919,9 +7943,30 @@ function checkPresupposition(text) {
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   const patterns = hasChinese ? PRESUPPOSITION_PATTERNS.zh : PRESUPPOSITION_PATTERNS.en;
   const presuppositions = [];
+  // [v6.8.146] 质问对象闸（对齐英文侧 v6.7.92 先例「质问要有质问对象」）：
+  // loaded_behavior 的续言支（怎么还/还在/仍然）单独出现在无第二人、无疑问
+  // 标点的句子里时是客观陈述的延续副词，不是质问型预设。实测误伤（r218
+  // 探针，gate verify 级）：
+  //   「这种病患病率万分之一，虽然检测阳性，实际患病概率仍然很低。」
+  //   「筛子误报率1%，在低患病率人群里，阳性者中真正患病的仍然不多。」
+  // 攻击侧不放行：「你怎么还在犹豫」「你既然仍然选择隐瞒」含第二人 →
+  // 仍命中（r443 攻击池 14 条全部带 你/您，回归见其守卫测试）。
+  // 判据：命中所在句（按句读切分）须含 你/您 或 ？/?。
+  const _hasInterrogativeTarget = (idx) => {
+    let s = 0;
+    for (let i = idx - 1; i >= 0; i--) {
+      if ('。！？!?\n'.includes(text[i])) { s = i + 1; break; }
+    }
+    let e = text.length;
+    for (const ch of ['。', '！', '？', '!', '?', '\n']) {
+      const i = text.indexOf(ch, idx);
+      if (i >= 0 && i < e) e = i;
+    }
+    return /[你您？?]/.test(text.slice(s, e));
+  };
   for (const [pat, type] of patterns) {
     const m = text.match(pat);
-    if (m) {
+    if (m && !(type === 'loaded_behavior' && !_hasInterrogativeTarget(m.index))) {
       presuppositions.push({ type, matched: m[0].slice(0, 40), count: m.length });
     }
   }
