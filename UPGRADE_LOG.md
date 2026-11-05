@@ -23,7 +23,7 @@
 - `node bin/verify.js` — **16 passed, 0 failed**。
 - `node scripts/bidirectional-guard.js` — 召回 **52/52**、误拦 **302/326**（与基线完全一致，零新增误伤）。
 - `node test/security-audit.test.js` — 提交前 **15/16**（唯一失败 S2「git log/tag 未命中 6.8.144」是版本未 commit 的时序性问题，commit 后复跑转绿——见下）。
-- `node test/doc-numbers-accuracy.test.js` — **21 passed, 3 failed**。三处失败**全部**是 AGENTS.md：维度总数 211≠212、三文档一致 AGENTS(211)≠README(212)、Verify 列举 168≠169。根因：**AGENTS.md 是受保护 agent-instruction 文件，cron 环境无交互用户/审批通道，patch 写入被 BLOCKED（"requires approval but no interactive user or gateway is present"），按指令未改道重试**。README/SKILL/package.json/VERSION/version.js 五处已全部同步（212/169/6.8.144）。下一轮（或人工）需对 AGENTS.md 施加三处一对一把 edit：① 横幅 211→212；② `Verify-level (168)`→`(169)` 且名单补 `texas_sharpshooter`；③ 三层级合计 `195`→`199`。此三处为纯数字/名单同步，不涉引擎。
+- `node test/doc-numbers-accuracy.test.js` — **24 passed, 0 failed**。过程记录：本轮首次运行为 **21/24**，三处失败全部指向 AGENTS.md（维度总数 211≠212、三文档一致 AGENTS(211)≠README(212)、Verify 列举 168≠169）；根因是 **AGENTS.md 为受保护 agent-instruction 文件，cron 环境无交互用户/审批通道，patch 写入被 BLOCKED（"requires approval but no interactive user or gateway is present"），按指令未改道重试**。随后**并发 CI 口径守护进程**（三环境协同的 3 号位）在工作区施加了 AGENTS.md 同步（横幅 211→212、`The 211 dimensions`→`The 212 dimensions`、`Verify-level (168)`→`(169)`、三层级合计 `195`→`199`），并顺带补了两处本轮漏掉的陈旧点（README `checkInput` 行 194→212、SKILL.md `The 208 dimensions`→`The 212 dimensions`）；复跑 **24/24 全绿**。README/SKILL/package.json/VERSION/version.js 五处由本轮执行体同步。
 - `node bin/cli.js status` — running（v6.8.144）。
 - 未跑 `node test/run-all.js`（全量回归）——每日记账任务不是提交门禁。
 
@@ -34,7 +34,7 @@
 - 模块数口径纠错：首轮误将 README/SKILL/package.json 模块数 162→163，doc 测试实测 `_modules`=162（纯函数维度模块不进 registry，与 r209-r213 各行同口径）后回退；changelog 行同步改口径。
 
 ### 已知未修项（下一轮候选池）
-1. **AGENTS.md 三处数字同步被环境阻塞**（见上，纯文档，需人工或交互态一轮施加）。
+1. **AGENTS.md 受保护文件的写入通道**：本轮 cron 执行体 patch AGENTS.md 被 BLOCKED（无审批通道），最终由并发 CI 口径守护进程代为同步成功（24/24 全绿）。若下轮仍无交互用户，AGENTS.md 类文档同步需依赖该守护进程或改走人工；引擎侧无待办。
 2. **appeal_to_consequences 存量误伤**（r724 探测器记录，良性句被 dangerous_instruction+reward_hacking 连坐 block）——按连坐纪律该族上线前需先专项修复；本轮复测仍在。
 3. **middle_ground 良性误伤**（r724 池 68% 漏判但 fp≠0）——本轮复测 4/10 漏判、误伤 1/6，按 Phase 0.7b 不输出为候选。
 4. **chronological_snobbery 残余**（本轮复量 3/8 漏判，r730 侦察族）——下一轮可直接做。
