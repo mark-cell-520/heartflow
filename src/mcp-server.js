@@ -3060,20 +3060,29 @@ function handleGateCheck(args) {
  * 回答「为什么这次没拦」——否则抑制动作在调用侧就是不可解释的黑箱。
  */
 function handleQuotationFrame(args) {
-  const { text } = args || {};
+  const { text, action } = args || {};
   if (!text) throw new Error('text 是必填参数');
   try {
     const gate = require(HF_DIR + '/src/gate.js');
+    // 附带一次真实 gate 判定，让「框架 → 动作」的因果在同一响应里可核对
+    const gateVerdict = () => {
+      try {
+        const r = gate.gate(text);
+        return { action: r.gate.action, reason: r.gate.reason, findings: (r.findings || []).map(f => f.dimension) };
+      } catch (_) { return null; }
+    };
+    // [v6.8.100 第 745 轮] action: families —— 逐族拆解，回答「离下一级还差多少」
+    if (action === 'families') {
+      const fam = gate.quotationFrameFamilies(text);
+      return { ...fam, gate: gateVerdict(), timestamp: Date.now() };
+    }
+    if (action && action !== 'frame') {
+      throw new Error('未知 action: ' + action + '（可选 frame / families）');
+    }
     const frame = gate.quotationFrame(text);
     return {
       ...frame,
-      // 附带一次真实 gate 判定，让「框架 → 动作」的因果在同一响应里可核对
-      gate: (() => {
-        try {
-          const r = gate.gate(text);
-          return { action: r.gate.action, reason: r.gate.reason, findings: (r.findings || []).map(f => f.dimension) };
-        } catch (_) { return null; }
-      })(),
+      gate: gateVerdict(),
       timestamp: Date.now(),
     };
   } catch (e) {

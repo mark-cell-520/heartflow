@@ -160,7 +160,7 @@ const path = require('path');
 // [v6.8.98] 第 743 轮同步：6.8.97 → 6.8.98。分段回归记账隔离（切片数字
 //           只落 data/test-count-slice.json，主缓存 scope=full 才被采信）。
 // [v6.8.99] 第 744 轮同步：6.8.98 → 6.8.99。API 表面守卫（region-aware 文档契约核对）。
-let VERSION = '6.8.99';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
+let VERSION = '6.8.100';  // 兜底版本（与 VERSION 文件一致；sync-version.js 不管这里，每次 bump 需手动同步）
 
 try {
   const versionPath = path.join(__dirname, '..', '..', 'VERSION');

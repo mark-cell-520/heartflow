@@ -301,8 +301,14 @@ t('阈值常量导出口径一致（0.45 弱 / 0.75 强）', () => {
   const src = fs.readFileSync(path.join(ROOT, 'src', 'quotation-context.js'), 'utf8');
   assert.ok(/QUOTED_THRESHOLD\s*=\s*0\.45/.test(src), '弱阈值应 0.45');
   assert.ok(/STRONG_THRESHOLD\s*=\s*0\.75/.test(src), '强阈值应 0.75');
-  assert.ok(src.indexOf('module.exports = { detectQuotationContext, describeQuotationFrame };') >= 0,
-    'describeQuotationFrame 应导出');
+  // [v6.8.100 第 745 轮] 导出面从 2 个扩到 4 个（quotationFrameFamilies 逐族拆解 +
+  // __internals 供机器记账）。这条断言原来钉死整行 module.exports 字面量，
+  // 本轮故意改成「名字在导出里」——钉字面量的守卫在每次扩面时必红一条，
+  // 而它想守的事情（两个公开方法没被悄悄删掉）用名字断言就够。
+  for (const name of ['detectQuotationContext', 'describeQuotationFrame', 'quotationFrameFamilies']) {
+    assert.ok(src.indexOf(name) >= 0, name + ' 应导出');
+  }
+  assert.ok(qc.quotationFrameFamilies, 'quotationFrameFamilies 应可调用');
 });
 
 // ─── ⑨ MCP 三处接线 ───

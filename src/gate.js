@@ -24,7 +24,7 @@ const { detectPedagogicalContent } = require('./pedagogy.js');
 const { buildTrace, summarizeTrace } = require('./discrimination-trace.js');
 const { normalize } = require('./text-normalizer.js');
 // [v6.8.91 第 736 轮] 引述框架的对外可解释入口（AGENTS.md 约定 3 同步到 MCP）。
-const { describeQuotationFrame } = require('./quotation-context.js');
+const { describeQuotationFrame, quotationFrameFamilies: _quotationFamilies } = require('./quotation-context.js');
 // [v6.8.92 第 737 轮] 分隔符混淆通道的逐 run 诊断（AGENTS.md 约定 3 同步到 MCP）。
 const { describeDelimiterChannel } = require('./injection-obfuscation.js');
 // [v6.8.93 第 738 轮] post_hoc 的逐路由逐腿诊断（AGENTS.md 约定 3 同步到 MCP）。
@@ -115,6 +115,29 @@ function quotationFrame(text) {
 }
 
 /**
+ * [v6.8.100 第 745 轮] 引述家族逐族拆解（对外公开方法，MCP 工具
+ * heartflow_quotation_frame 的 action: 'families'）。
+ *
+ * 与 `quotationFrame` 的分工：后者给「这一条文本的结论」，本函数给「结论是
+ * 怎么逐族累加出来的、离下一级阈值还差多少、补哪一族能补上」。
+ * 立项实测（r745）20 条良性元话语里 8 条漏识别，靠人读 reason 才定位到三个
+ * 家族缺失——这个定位过程必须是机器可做的。
+ *
+ * @param {string} text
+ * @returns {{tier:string|null, confidence:number, signals:string[],
+ *            thresholds:object, nextTier:string|null, deficit:number,
+ *            sufficientFamilies:string[], matched:object[], unmatched:object[],
+ *            families:object[]}}
+ */
+function quotationFrameFamilies(text) {
+  try {
+    return _quotationFamilies(text);
+  } catch (_) {
+    return { tier: null, confidence: 0, signals: [], thresholds: {}, nextTier: 'weak', deficit: 0.45, sufficientFamilies: [], matched: [], unmatched: [], families: [], error: '引述家族拆解失败' };
+  }
+}
+
+/**
  * 分隔符混淆通道诊断（对外公开方法，MCP 工具 heartflow_delimiter_channel）。
  *
  * 回答「这段文本里的字母撒点 run 各自还原成了什么、有没有被边界修剪」。
@@ -166,4 +189,4 @@ function postHocLegs(text) {
   }
 }
 
-module.exports = { gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput, quotationFrame, delimiterChannel, postHocLegs };
+module.exports = { gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput, quotationFrame, quotationFrameFamilies, delimiterChannel, postHocLegs };

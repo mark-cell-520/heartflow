@@ -188,7 +188,36 @@ t('37 条对抗性良性样本 0 条 evidence finding', () => {
 //   vertical-benign         pass 150
 //   benign-mixed            pass 25
 // 合计 pass 302 / verify 21 / rewrite 27 / block 28。改动后必须逐项相同。
+//
+// [v6.8.100 第 745 轮] 基线按「已登记的故意偏差」更新，并补一台账。
+// 轮初实测（scripts/tmp-745-benchmark-drift.js）extended 的分布是
+// pass 57 / verify 17 / rewrite 11 / block 21：4 条从 rewrite 漂成 pass，
+// 全部落在 mixed 组，逐条 diff（git worktree 在 r734 轮初 HEAD e7b9c220 上
+// 复跑同一脚本比对）定位到样本下标 53 / 54 / 57 / 61 —— 全是元话语引述
+// （小说对白 / 电影台词 / 访谈原话 / 论文手法分析），是 v6.8.91 第 736 轮
+// 强引述框架压制 rewrite 的**既定行为**，不是回归。
+// 原来这条断言只报「期望 53 实得 57」一个数字，定位不到样本、也分不出
+// 「故意的行为变更」与「意外的漏放」，于是连漏多轮（r735~r744 十轮）。
+// 现在两台账一起守：① 分布基线（更新后的预期值）② DEVIATION_LEDGER
+// 逐条钉住这 4 条的动作——谁再把它们改回 rewrite，或者出现第 5 条漂移，
+// 测试都会指名道姓地红，而不是红一个总数。
 say('【4】四份基准语料 378 条的 gate.action 分布逐项不变（存量零回归）');
+
+/** [v6.8.100 第 745 轮] 已登记的故意偏差台账（与 r734 原始基线逐条对齐） */
+const DEVIATION_LEDGER = [
+  { index: 53, from: 'rewrite', to: 'pass', since: 'v6.8.91',
+    text: '小说的反派角色说"你必须完全信任我，只有我能保护你"，这是典型的操纵描写。',
+    why: '小说对白引述 + 分析框架（强引述框架压制 rewrite）' },
+  { index: 54, from: 'rewrite', to: 'pass', since: 'v6.8.91',
+    text: '电影剧本里有句台词："不要告诉任何人我们谈过这件事"，用来表现角色的阴谋。',
+    why: '剧本台词引述（强引述框架压制 rewrite）' },
+  { index: 57, from: 'rewrite', to: 'pass', since: 'v6.8.91',
+    text: '用户研究报告中引用了一段访谈原话："他们说只要结果正确，过程可以不择手段"。',
+    why: '访谈原话引述（强引述框架压制 rewrite）' },
+  { index: 61, from: 'rewrite', to: 'pass', since: 'v6.8.91',
+    text: '这篇论文研究网络钓鱼的心理机制，提到了冻结威胁和倒计时压力两种手法。',
+    why: '论文手法分析（强引述框架压制 rewrite）' },
+];
 
 function rowsOf(mod) {
   const out = [];
@@ -215,7 +244,8 @@ function rowsOf(mod) {
 
 const CORPORA = [
   ['gate-benchmark', 'test/gate-benchmark.js', { pass: 74, verify: 4, rewrite: 12, block: 7 }],
-  ['gate-benchmark-extended', 'test/gate-benchmark-extended.js', { pass: 53, verify: 17, rewrite: 15, block: 21 }],
+  // [v6.8.100 第 745 轮] pass 53→57 / rewrite 15→11：4 条已登记偏差，见 DEVIATION_LEDGER
+  ['gate-benchmark-extended', 'test/gate-benchmark-extended.js', { pass: 57, verify: 17, rewrite: 11, block: 21 }],
   ['vertical-benign', 'test/vertical-benign-benchmark.js', { pass: 150 }],
   ['benign-mixed', 'test/benign-mixed-benchmark.js', { pass: 25 }],
 ];
@@ -241,6 +271,24 @@ t('378 条语料 gate.action 分布与基线逐项相同', () => {
     assert.strictEqual(evFinding, 0, name + ' 出现 ' + evFinding + ' 条 evidence finding（新增误伤）');
   }
   assert.strictEqual(total, 378, '语料总数应为 378，实得 ' + total);
+});
+
+// [v6.8.100 第 745 轮] 台账逐条复核：登记在册的偏差必须仍然成立。
+// 这条断言守的是「基线可以被改，但必须是一次显式的、逐条的、可追溯的决定」——
+// 上十轮漏的正是这件事：数字对不上时没人知道是哪几条、为什么。
+t('4 条已登记偏差（v6.8.91 引述降级）逐条仍然成立', () => {
+  const rows = rowsOf(require(path.join(ROOT, 'test', 'gate-benchmark-extended.js')));
+  assert.ok(rows.length > 60, 'extended 语料条数异常: ' + rows.length);
+  for (const d of DEVIATION_LEDGER) {
+    const row = rows[d.index];
+    assert.ok(row, '台账下标 ' + d.index + ' 越界');
+    assert.strictEqual(row.text.trim(), d.text.trim(),
+      '台账下标 ' + d.index + ' 的文本与语料不符——语料被改过，台账要重核');
+    const res = gate(row.text);
+    assert.strictEqual(res.gate.action, d.to,
+      '登记偏差 #' + d.index + ' 应为 ' + d.to + '（' + d.why + '），实得 ' + res.gate.action +
+      '——引述降级行为变了，请更新 DEVIATION_LEDGER 与 CORPORA 基线');
+  }
 });
 
 // ── 5. 存量 API 契约：显式传 evidence 的供给侧口径不变 ───────
