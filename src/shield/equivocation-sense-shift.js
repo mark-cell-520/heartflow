@@ -10,6 +10,14 @@
  *   10/10 攻击穿引擎（6 条 gate.action=pass 完全漏判）。此为「已有维度的
  *   全新措辞家族」（真升级类型②），模块已接线故立即激活，无需改 src/index.js。
  *
+ * [r223 · agent-4 补强] POLYSEMY_TABLE 再增 4 个中英双语多义词家族：
+ *   价值(交换价值 vs 效用/伦理价值)、规律(自然法则 vs 社会法律)、
+ *   压力(物理压强 vs 心理压力)、自由(消极自由 vs 积极自由)。
+ *   干跑探针（内存注入候选、不落盘）实测：17 条攻击 16 条被本维度直接
+ *   承重，其中 8 条 gate.action 从 pass 翻转为 verify；官方良性集 326 条
+ *   非 pass 数 25→25 零增加。此为「已有维度的全新措辞家族」（真升级
+ *   类型②），模块已接线故立即激活，无需改 src/index.js。
+ *
  * 论文来源（2026-10-10 升级轮调研）：
  *   arXiv 2606.31039《Truth or Sophistry? LoFa: A Benchmark for LLM
  *   Robustness Against Logical Fallacies》。实测 10 类谬误的 LFR@k：
@@ -171,6 +179,61 @@ const POLYSEMY_TABLE = {
   'normal': [
     ['statistical', 'statistically', 'statistics', 'the mean', 'sample mean', 'on average', 'standard deviation', 'distribution', 'baseline', 'bell curve'],
     ['healthy', 'health', 'developed', 'illness', 'sick', 'doctor', 'symptom', 'should be', 'ought'],
+  ],
+  // ── [r223] agent-4 补强：经济/伦理、自然/社会、物理/心理、消极/积极自由四族 ──
+  // 判据同既有条目：① 两义位语义域区分度高 ② 真实攻击样本验证此前漏判
+  //   （coordination/agent4/probes/r223-dryrun-probe.js 实测：8 条补强前
+  //    gate.action=pass 完全穿引擎，补强后翻 verify 且本维度直接承重）
+  // ③ 良性单一义位只命中单域 → 不误伤（同探针实测官方良性集 326 条
+  //    非 pass 数 25→25 零增加）。
+  // 压 FP 关键决策：域标记一律用**强指示词**（价格/报酬/法律/液体/强制…），
+  //   不收"工作/条件/意义"等泛词；价值族的"价格"与"尊严"在良性句里极少
+  //   跨句共现，实测零误伤。逻辑要求 hitA && hitB 跨出现位置合并，故纯
+  //   单义文本天然放行。中英双语，VERIFY 级。
+  '价值': [
+    // 域A：交换价值（价格/报酬/市场）
+    ['价格', '售价', '标价', '定价', '供需', '市场', '交换', '报酬', '薪酬', '工资', '薪水', '薪资', '成交', '免费', '不要钱', '金钱', '货币', '交易', '付费', '行情'],
+    // 域B：效用/伦理价值（福利/公益/尊严）
+    ['效用', '用途', '实用', '福利', '幸福', '尊严', '伦理', '道德', '生命', '人权', '公益', '志愿', '义工', '无偿'],
+  ],
+  'value': [
+    ['price', 'pricing', 'market', 'exchange', 'salary', 'wage', 'wages', 'paid', 'compensation', 'free', 'cost', 'trade', 'commodity', 'sell'],
+    ['utility', 'usefulness', 'useful', 'welfare', 'well-being', 'dignity', 'ethical', 'moral', 'ethics', 'life', 'human rights', 'public good', 'volunteer', 'volunteering', 'community service'],
+  ],
+  '规律': [
+    // 域A：自然法则（进化/重力/必然）
+    ['自然', '自然界', '生物', '进化', '自然选择', '物理', '重力', '优胜劣汰', '客观', '科学定律', '必然'],
+    // 域B：社会规则（法律/制度/立法）
+    ['法律', '社会', '制度', '规则', '人为', '立法', '司法', '习俗', '制定'],
+  ],
+  'law': [
+    ['nature', 'natural', 'natural selection', 'biology', 'biological', 'physics', 'physical', 'gravity', 'evolution', 'thermodynamics'],
+    ['legal', 'court', 'statute', 'legislation', 'society', 'social', 'regulation', 'crime', 'criminal', 'justice', 'enacted'],
+  ],
+  '压力': [
+    // 域A：物理压强（液体/帕斯卡/深度）
+    ['液体', '气体', '压强', '帕斯卡', '大气', '物理', '深度', '仪表', '兆帕', '压缩', '液压'],
+    // 域B：心理压力（情绪/焦虑/职场）
+    ['心理', '情绪', '精神', '焦虑', '紧张', '职场', '员工', '问卷', '缓解', '抗压'],
+  ],
+  'pressure': [
+    ['liquid', 'fluid', 'gas', 'pascals', 'atmospheric', 'physics', 'physical', 'depth', 'gauge', 'hydraulic', 'compressed'],
+    ['psychological', 'mental', 'emotional', 'stress', 'anxiety', 'workplace', 'employees', 'burnout', 'questionnaire'],
+  ],
+  '自由': [
+    // 域A：消极自由（免于强制/干涉）
+    ['强制', '干涉', '干预', '阻碍', '禁止', '权利', '免于', '外部', '约束'],
+    // 域B：积极自由（能力/资源/实质）
+    ['能力', '资源', '贫穷', '贫困', '没钱', '财富', '自我实现', '实质自由'],
+  ],
+  'freedom': [
+    ['coercion', 'coerce', 'coerced', 'interfere', 'interferes', 'intervention', 'constraint', 'prohibit', 'rights', 'liberty', 'absence'],
+    ['ability', 'capability', 'resources', 'poverty', 'poor', 'cannot afford', 'wealth', 'self-realization'],
+  ],
+  // liberty 与 freedom 同义位结构（EN 高频替换词），域标记同 freedom
+  'liberty': [
+    ['coercion', 'coerce', 'coerced', 'interfere', 'interferes', 'intervention', 'constraint', 'prohibit', 'rights', 'freedom', 'absence'],
+    ['ability', 'capability', 'resources', 'poverty', 'poor', 'cannot afford', 'wealth', 'self-realization'],
   ],
 };
 
