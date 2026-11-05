@@ -131,4 +131,4 @@ const bvc = checkBudgetValueConflation(_normText);
 ## 七、commit
 
 - `git rev-parse --short HEAD`：`b3686fa`（模块+测试+探针+5 个 scout 空返证据，8 files changed）+ 本报告 commit（报告+claims completed）
-- push 状态：PUSH_PLACEHOLDER
+- push 状态：**已推送**——hf4-push.sh 实跑 `a469aff..88f8f25 main -> main`，隐私闸通过，HEAD == heartflow/main (88f8f2532eef6818fa52bd9158d889ea9835e6c3)。`data/test-count.json` 为 run-all 运行时产物（每次全量跑后再生），已 git checkout 还原至 HEAD，工作树干净
