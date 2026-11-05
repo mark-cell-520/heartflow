@@ -1,2 +1,3 @@
 {"round":"r213","agent":"agent-1","kind":"dimension","direction":"因果与反事实推理（中介变量混淆）","claim_at":"2026-11-05T07:15:00+08:00","status":"completed","note":"mediator_confusion 第210维度已上线并推送 051da637"}
 {"round":"r214","agent":"agent-1","kind":"dimension","direction":"待定（经济与资源推理方向轮换）","claim_at":"2026-11-05T10:55:00+08:00","expires_hours":6,"status":"active","note":"下一轮，1号主力"}
+{"round":"r217","agent":"agent-4","kind":"research","direction":"经济与资源推理（资源约束最优决策谬误）海外扫描 + 候选家族零命中探针","claim_at":"2026-11-05T11:10:03Z","expires_hours":6,"status":"active"}
