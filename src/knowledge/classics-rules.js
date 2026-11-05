@@ -1076,12 +1076,16 @@ function evaluateRules(input) {
     && domain.keywords.some(kw => typeof kw === 'string' && kw.length >= 2 && input.includes(kw)));
 
   if (!domain && typeof input === 'string' && input.length >= 10) {
-    const buddhistSoft = /戒|定|慧|出离|寂静|涅槃|无明|爱憎|苦集|灭道|四谛|八正道|十二因缘|般若|波罗蜜|菩萨|菩提|忍辱|精进|禅定|三学|四生|八苦|三毒|五蕴|六度|七觉/.test(input);
+    // [r217] 原 `\b戒\b|\b定\b|\b慧\b|…` 的 \b 对汉字永不成立（第 126/127 轮根因，
+    // 第 128 轮拆支约定）：这三个单字支实际失明，多字支（出离/寂静/涅槃…）裸子串
+    // 仍生效。按同函数 confucianSoft / classicalMarkers 的裸子串惯例去掉 \b，
+    // 与兄弟模式形态对齐（confucianSoft 同样含单字 礼/法）。
+    const buddhistSoft = /戒|定|慧|出离|寂静|涅槃|无明|爱憎|苦集|灭道|四谛|八正道|十二因缘|般若|波罗蜜|菩萨|菩提|忍辱|精进|禅定|三学|四生|八苦|三毒|五蕴|六度|七觉/.test(input);
     const confucianSoft = /为政|治国|礼|仁政|德治|法|刑|王道|霸道|君臣|教化/.test(input);
     if (buddhistSoft && !confucianSoft) {
       domain = { id: 'buddhist-suffering', keywords: ['苦','集','灭','道','般若','空','缘起','无明','涅槃','众生'], scope: '佛藏/大藏经' };
     } else if (buddhistSoft && confucianSoft) {
-      const bScore = input.match(/戒|定|慧|出离|寂静|涅槃|无明|爱憎|苦集|灭道|四谛|八正道|十二因缘|般若|波罗蜜|菩萨|菩提|忍辱|精进|禅定|三学|四生|八苦|三毒|五蕴|六度|七觉/g) || [];
+      const bScore = input.match(/戒|定|慧|出离|寂静|涅槃|无明|爱憎|苦集|灭道|四谛|八正道|十二因缘|般若|波罗蜜|菩萨|菩提|忍辱|精进|禅定|三学|四生|八苦|三毒|五蕴|六度|七觉/g) || [];
       const cScore = input.match(/为政|治国|礼|仁政|德治|法|刑|王道|霸道|君臣|教化/g) || [];
       if (bScore.length > cScore.length) {
         domain = { id: 'buddhist-suffering', keywords: ['苦','集','灭','道','般若','空','缘起','无明','涅槃','众生'], scope: '佛藏/大藏经' };

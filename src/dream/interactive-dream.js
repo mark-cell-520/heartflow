@@ -45,20 +45,24 @@
     }
 
     tagMemory(text) {
-      if (/(version|versioning|历史|当前|current|old|new)/i.test(text)) return 'version';
-      if (/(memory|记忆|fragment|replay|consolidation|palace)/i.test(text)) return 'memory';
-      if (/(dream|梦|sleep|wake|lucid|lucid dream)/i.test(text)) return 'dream';
-      if (/(error|bug|fix|verify|check|校正|逻辑|truth|upgrade)/i.test(text)) return 'correction';
-      if (/(feel|emotion|情感|关系|信任)/i.test(text)) return 'emotion';
+      // [r217] \b 只对 ASCII \w 定义：原 `\b(…|历史|当前|…)\b` 把中文候选包进
+      // \b 组，尾部 \b 对汉字永不成立 —— 中文侧静默 0 命中（第 126/127 轮根因，
+      // 第 128 轮定下拆支约定）。按 r128 口径拆为 ASCII 支保留 \b、中文支裸子串。
+      if (/(?:\b(?:version|versioning|current|old|new)\b|历史|当前)/i.test(text)) return 'version';
+      if (/(?:\b(?:memory|fragment|replay|consolidation|palace)\b|记忆)/i.test(text)) return 'memory';
+      if (/(?:\b(?:dream|sleep|wake|lucid|lucid dream)\b|梦)/i.test(text)) return 'dream';
+      if (/(?:\b(?:error|bug|fix|verify|check|truth|upgrade)\b|校正|逻辑)/i.test(text)) return 'correction';
+      if (/(?:\b(?:feel|emotion)\b|情感|关系|信任)/i.test(text)) return 'emotion';
       return 'ambient';
     }
 
     assignRoom(text) {
-      if (/(wechat|微信|message|聊天)/i.test(text)) return '客厅';
-      if (/(paper|论文|theory|意识|哲学|knowledge)/i.test(text)) return '书房';
-      if (/(feel|emotion|情感|relationship|信任)/i.test(text)) return '厨房';
-      if (/(create|creative|idea|创意|dream|music|code)/i.test(text)) return '花园';
-      if (/(error|bug|fix|truth|upgrade|old|history|log)/i.test(text)) return '地下室';
+      // [r217] 同 tagMemory：按 r128 拆支约定，ASCII 支留 \b、中文支裸子串。
+      if (/(?:\b(?:wechat|message)\b|微信|聊天)/i.test(text)) return '客厅';
+      if (/(?:\b(?:paper|theory|knowledge)\b|论文|意识|哲学)/i.test(text)) return '书房';
+      if (/(?:\b(?:feel|emotion|relationship)\b|情感|信任)/i.test(text)) return '厨房';
+      if (/(?:\b(?:create|creative|idea|dream|music|code)\b|创意)/i.test(text)) return '花园';
+      if (/\b(?:error|bug|fix|truth|upgrade|old|history|log)\b/i.test(text)) return '地下室';
       return '走廊';
     }
 

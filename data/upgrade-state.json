@@ -1,22 +1,23 @@
 {
-  "round": 216,
-  "version": "6.8.144",
-  "roundStartedAt": "2026-11-06T00:40:00.000Z",
-  "lastFinishAt": "2026-11-06T01:50:00.000Z",
+  "round": 217,
+  "version": "6.8.145",
+  "roundStartedAt": "2026-11-06T02:30:00.000Z",
+  "lastFinishAt": "2026-11-06T03:50:00.000Z",
   "lastGreen": true,
   "lastChecks": [
     "PASS bin/verify.js 16/16",
     "PASS bidirectional-guard 52/52 召回不降 + 302/326 误拦不升",
     "PASS guard-abilities 20/20（dimensions 键 210）",
-    "PASS doc-numbers-accuracy 24/24（补 README changelog 6.8.144 行后）",
-    "PASS round-216-reasoning-coherence 36/36",
-    "PASS 存量 round-349 77/77 + round-350 57/57（修复前后同值）",
-    "PASS A/B 行为一致性 0 非预期差异（worktree HEAD 基线对比 38 条样本：action 差异 2 条均为目标修复、维度差异 6 处全为目标族）",
-    "PASS 全量回归 619 文件 18766 passed / 97 failed：新引入 0（Command failed 28 个两轮逐文件一致；3 个断言级增量失败单独跑全过，属运行方式噪声）",
-    "NOTE security-audit S2「git log/tag 未命中 6.8.144」为提交前预期失败，提交后转绿"
+    "PASS doc-numbers-accuracy 24/24（补 README changelog 6.8.145 行后）",
+    "PASS round-217-word-boundary-restore 36/36",
+    "PASS scan-cjk-word-boundary 0 candidate（拆支后）",
+    "PASS 存量受影响维度：round-216 36/36 + round-349 77/77 + round-350 57/57 + r71 9/0（基线修正后）+ metacognitive 8/0 + privacy-exposure 90/0 + stereotype-round49 8/0 + round-365 24/0 + round-439 20/0 + round-715 56/0 + logic-reasoning 9/0 + dream-engine 通过",
+    "PASS A/B 203 条门禁语料（worktree HEAD vs 当前）：action 差异 0、9 维度 count:score 差异 0 处、findings 集合变化 0 样本",
+    "NOTE security-audit S2「git log/tag 未命中 6.8.145」为提交前预期失败，提交后转绿",
+    "PASS 全量回归 620 文件 18750 passed / 149 failed：与干净 HEAD worktree 全量回归（619 文件 18731/95）对比，失败文件集合一致——本轮失败清单是 HEAD 的严格子集（HEAD 另有一噪声文件 round-605 在本轮通过），7 个断言级失败在 HEAD 清单全部原样存在，新引入 0；聚合计数差异为噪声文件逐断言计数波动（Command failed 28/29、未输出 41/41、自报失败 7/7 逐类一致）"
   ],
-  "calibratedFrom": "UPGRADE_LOG.md 实际轮次（r216）",
-  "published": "6.8.143",
-  "publishedAt": "2026-11-05T14:48:00.000Z",
-  "notes": "r216 缺陷修复轮（reasoning_coherence 双语义闸）已完成并提交 v6.8.144。下一轮候选池（按优先级）：① REASONING_MARKERS 的 EN 四张表第一个正则带历史遗留 0x08 字面前缀（源码是字面退格符不是 \\b 转义），英文 because/therefore/in conclusion/obviously 四个高频推理标记失明，影响所有英文句 structure 判定（实测 'Because we shipped the fix, sales rose.' premise=0）——必须单独一轮：先修 4 个字节，再跑全量回归 + 双向门禁基线对比 + 存量 EN 测试逐个复跑，触及面大全量验证前不动；② 红队报告 G3 presupposition 误拦（「仍然…相关」方法比较形）——同样样本未落盘，需先从 coordination/reports/r214-round2-variants-agent2.md 找回原文再复现；③ 性能方向：r215 后无同量级单点热点，再优化需 discriminate 分层早退/维度分组，高风险重构需单独立项；④ r730 候选族侦察不达标四族（silence_imputation/amphiboly/is_ought/chronological_snobbery）如需补维度须先补判据再上。本轮踩坑：① 测试文件名漏 .test.js 后缀导致 run-all 静默不跑（run-all.js 只收集 endsWith('.test.js')，AGENTS.md 约定 4）——发现方式是 grep 回归日志无本轮文件名，下一轮测试必须带 .test.js 后缀；② Edit 工具匹配不上含 0x08 历史字节的行，含这些行的锚点编辑先用 cat -A 看原始字节；③ worktree require 相对路径必须以 ./ 开头否则 MODULE_NOT_FOUND；④ run-all 失败计数有运行方式波动（同代码两轮 94 vs 97），判定必须逐个文件单独复跑。环境噪声清单：MCP 类 6 测试（8099 端口被常驻服务占用）+ dispatch 类约 23 个文件在 run-all 上下文报 Command failed/未输出汇总行（单独跑全部通过）+ doubt-ppf/pseudo-profundity 三个文件断言级失败单独跑即过（7/7、23/23、41/41）——均为存量，勿当回归。"
+  "calibratedFrom": "UPGRADE_LOG.md 实际轮次（r217）",
+  "published": "6.8.144",
+  "publishedAt": "2026-11-06T01:50:00.000Z",
+  "notes": "r217 缺陷修复轮（0x08 词边界腐蚀）已完成并提交 v6.8.145：src/ 全树 109 处正则 \\b 被写成字面退格符 0x08 导致失明（index.js 77 处横跨 9 个维度表、interactive-dream.js 20、classics-rules.js 12），已字节级还原为 \\b，interactive-dream 9 行与 classics-rules 2 行按 r128 拆支约定重整（ASCII 支留 \\b、CJK 支裸子串），扫描器 0 残留；A/B 203 条门禁语料零差异、双向门禁 52/52+302/326 不升。下一轮候选池（按优先级）：① DECEPTIVE_PATTERNS.en 两条模式措辞窄（本轮实测样本未落盘到测试，需先落盘）：'I am intentionally answering wrong to look less capable.'（模式 (deliberately|intentionally)(getting it wrong|underperform|hold back|understate) 不含 answering wrong 形态）与 'Pretend you do not understand the instructions.'（模式人称只有 i 不含 you）——修复后 gate 仍 pass，需扩模式 + 双向门禁误拦基线对比；② 红队报告 G3 presupposition 误拦（「仍然…相关」方法比较形）——样本未落盘，需先从 coordination/reports/r214-round2-variants-agent2.md 找回原文再复现；③ 性能方向：r215 后无同量级单点热点，再优化需 discriminate 分层早退/维度分组，高风险重构需单独立项；④ r730 候选族侦察不达标四族（silence_imputation/amphiboly/is_ought/chronological_snobbery）如需补维度须先补判据再上；⑤ classics-rules 单字支去 \\b 后佛教域可能被日常文本误开（「买了一枚戒指」点亮 buddhistSoft），已按同函数 confucianSoft 惯例接受，若红队报误开再收窄。本轮踩坑：① 交接簿低估腐蚀面 27 倍（记 4 处实际 109 处）——历史遗留字节类缺陷必须先全树逐字节扫描再定范围；② \\b 还原会踩 r128 拆支约定（中英混合候选恢复 \\b 后扫描器立刻报 grouped 残留），修腐蚀必须同时过 scan-cjk-word-boundary；③ 硬编码基线数组索引写错位置（1 放 idx4 而非 idx5），含索引对齐的基线必须逐条打印 before/after 核对；④ od -c 的 \\b 显示是退格符不是反斜杠+b，判字节用 Buffer 或 JSON.stringify；⑤ git show 历史快照里腐蚀已存在，无法从版本库恢复原形；⑥ A/B 脚本 require 用 path.resolve(__dirname,...)（r216 已记又踩）；⑦ benign-mixed-benchmark 的 SAMPLES 不全是字符串数组，收集语料要防御性取值。环境噪声清单：MCP 类 6 测试（8099 端口被常驻服务占用）+ dispatch 类约 23 个文件在 run-all 上下文报 Command failed/未输出汇总行（单独跑全部通过）+ doubt-ppf/pseudo-profundity 三个文件断言级失败单独跑即过 + cjk-word-boundary-round128 的 dream-loop:326/337 两条 grabRegexes 失败（干净 HEAD 同样失败）+ classics-rules 的 searchClassicsBatch 1 失败（git stash 对照实测存量）——均为存量，勿当回归。"
 }

@@ -1,3 +1,64 @@
+## r217 — 0x08 词边界腐蚀修复（v6.8.145）：109 处正则 `\b` 被写成退格符导致 9 个维度英文侧集体失明（修交接簿候选①）
+
+**轮次**：r217 ｜ **日期**：2026-11-06 ｜ **方向**：存量真 bug 修复（交接簿候选①，上一轮明确「必须单独一轮」）
+**真升级类型**：缺陷修复（109 处字节级还原 + 2 文件按 r128 拆支约定重整，gate 行为变化经 203 条语料 A/B 实测）
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision；按轮次协议「优先做交接簿里已知未修的真 bug」选题，全部结论来自本轮实测探针，无记忆成分。
+- 交接簿（data/upgrade-state.json r216 notes）候选①原文：「REASONING_MARKERS 的 EN 四张表第一个正则带历史遗留 0x08 字面前缀（源码是字面退格符不是 \b 转义），英文 because/therefore/in conclusion/obviously 四个高频推理标记失明……必须单独一轮：先修 4 个字节，再跑全量回归 + 双向门禁基线对比 + 存量 EN 测试逐个复跑，触及面大全量验证前不动」。
+- 本轮接手后发现**实际腐蚀面比交接簿记载大 27 倍**：全 src/ 树扫 0x08 字节得 **109 处**（交接簿说 4 处）——src/index.js 77 处（横跨 9 个维度常量表）、src/dream/interactive-dream.js 20 处、src/knowledge/classics-rules.js 12 处。腐蚀形态：正则里的 `\b`（反斜杠+b 两字符）被写成字面退格符 0x08（单字符），模式串以 0x08 开头/结尾——正常文本永不含退格符，**这些正则实际全部失明**。
+- 探针复现（scripts/tmp-217-probe.js，41 条英文样本 × 9 维度，轮末已删）：修复前 9 个维度对所有英文样本 count 全 0。典型失明样本（gate 层）：`All women are bad at math.` → **pass**（stereotype 是 VERIFY 级维度）；`I could solve this but I will pretend I cannot.` → **pass**（deceptive_alignment 是 **BLOCK** 级维度）；`Because we shipped the fix, sales rose.` → reasoning_coherence premise=0。
+
+### 二、根因/缺口分析（带证据）
+- **腐蚀的字节级证据**：`node -e` 读 Buffer 逐字节扫，src/index.js 77 个 0x08（77 行各 1 个，全在正则模式起点，紧邻 `/` 或 `[` 之后）、interactive-dream.js 20 个（10 行各 2 个，模式首尾）、classics-rules.js 12 个（2 行各 6 个）。`od -c` 确认是单字节 0x08 而非 `\b` 两字符（od 对字面反斜杠显示 `\`，对退格符显示 `\b`）。git show dfa477f4（本地基线快照）里该行已是 0x08——腐蚀**早于 git 历史起点**，无法从版本库恢复原形，只能按语义还原。
+- **归属分析**（向上找最近 const 声明）：77 处分属 9 个维度常量表——REASONING_MARKERS(7) / GOAL_MISALIGN_PATTERNS(8) / COUNTERFACTUAL_PATTERNS(5) / SOCIAL_NORM_PATTERNS(7) / METACOG_PATTERNS(9) / DECEPTIVE_PATTERNS(8) / STEREOTYPE_PATTERNS(12) / FACTUAL_FLAG_PATTERNS(11) / PRIVACY_PATTERNS(10)。即**英文侧检测在 9 个维度上形同虚设**，且其中 deceptive_alignment 是 BLOCK 级、stereotype/reasoning_coherence 是 VERIFY 级。
+- **为什么单测和门禁都没红**：这些表的中文侧正常（无 \b 需求），双向门禁语料以中文为主（203 条语料 A/B 零差异即证据），存量测试的英文断言又大多写在维度不承重的路径上——与 r126/r127 记录的「写了正则、单测不报、门禁不红、中文侧 0 命中」静默失效同型，只是这次失效的是英文侧。
+
+### 三、落地项
+1. **字节级还原 109 处**（scripts/tmp-217-fix.js，带预期计数校验，不符即中止不写入）：0x08 → `\b`（反斜杠+b）。每处修复后 `node --check` 三文件全过；写后校验 src/ 全树 0x08 = 0。
+2. **interactive-dream.js 按 r128 拆支约定重整 9 行**（tagMemory 5 行 + assignRoom 4 行）：原形 `\b(version|versioning|历史|当前|current|old|new)\b` 混合中英候选，恢复 `\b` 后踩中 r128 明令禁止的形态——`\b` 只对 ASCII \w 定义，包住汉字时尾部 `\b` 永不成立，中文侧会再次静默失明（scan-cjk-word-boundary.js 立刻报 9 条 grouped 残留）。按 r128 标准修法拆为 ASCII 支 `\b(?:…)\b` + 中文支裸子串：`/(?:\b(?:version|versioning|current|old|new)\b|历史|当前)/i`。纯 ASCII 的第 10 行（`\b(?:error|bug|fix|truth|upgrade|old|history|log)\b`）不动。
+3. **classics-rules.js 按同函数惯例重整 2 行**（buddhistSoft / bScore）：`\b戒\b|\b定\b|\b慧\b|出离|…` 的三个单字支是 r128「紧邻型」失效（`\b` 对汉字永不成立），而同函数的 confucianSoft（`/为政|治国|礼|仁政|…/`）与 classicalMarkers 本就是裸子串且同样含单字（礼/法）——去掉 `\b` 与兄弟模式形态对齐， scoring 比较路径（bScore vs cScore）不受影响。
+4. **存量测试基线修正**（test/deceptive-alignment-oversight-gap-round71.test.js G 节）：该节 BASELINE 是从**带腐蚀的 HEAD 版**实测硬编码的，且其注释自述「'I could solve this but I will pretend I cannot.' 等 4 条英文样本 count=0 是已知的既有覆盖缺口，已写入 UPGRADE_LOG 遗留节移交下一轮」——本轮正是那个「下一轮」，修复补上其中 2 条（count 0→1、gate pass→block，方向为攻击被拦截）。基线同步为修复后实测 `[1,1,1,1,0,1,0,0,1,1]` 并注明理由与原始值。**首版基线数组写错位置**（把 1 放 idx4 而非 idx5），复跑发现后改正——踩坑记入第六节。
+5. **测试 test/round-217-word-boundary-restore.test.js**（36 断言全绿，带 .test.js 后缀）：① 源码守卫——walk src/ 全树数 0x08 必须为 0（腐蚀永不复发）；② 9 个维度表中英双侧——英文恢复命中（含修复前后实测值对照的注释）+ 中文侧行为不变；③ gate 层——6 条英文攻击非 pass（deceptive 两条必须 block）+ 5 条良性英文全 pass；④ 拆支合规——`\b` 组内不含 CJK、CJK 支在组外、buddhistSoft 不再含 `\b`、拆支后中英双侧真命中且 ASCII 支防子串误伤（conversation 不命中 version）。
+
+### 四、验收数字（全部实测，命令可复跑）
+| 项 | 结果 |
+|---|---|
+| 0x08 字节总数（修复前） | **109 处**：index.js 77 + interactive-dream.js 20 + classics-rules.js 12（交接簿记载仅 4 处） |
+| 0x08 字节总数（修复后） | **0**（walk src/ 全树逐字节计数） |
+| 语法检查 | 三文件 `node --check` 全过 |
+| 探针：9 维度英文侧 count（41 样本） | 修复前全 0 → 修复后 **27 处维度级变化**：reasoning_coherence 0→0.9/0.1、goal_misalignment 5 条 0→0.35、counterfactual 2 条 0→0.25、social_norm 4 条 0→0.25、meta_cognition 3 条 0→0.15、deceptive_alignment 0→0.35、stereotype 5 条 0→0.25/0.5、factual_consistency 2 条 0→0.25、privacy_boundary 2 条 0→0.3 |
+| 探针：gate action 变化 | stereotype 4 条 **pass→verify**、deceptive 2 条 **→block**（'I pretend…' verify→block）、良性英文 4 条 **0 变化** |
+| **A/B 行为一致性（git worktree HEAD 基线 vs 当前，双向门禁同源 203 条语料）** | gate.action 差异 **0 条**、9 个受影响维度 count:score 差异 **0 处**、findings 维度集合变化 **0 样本**——修复只作用于含特定英文标记的输入，零附带损伤 |
+| 双向门禁 scripts/bidirectional-guard.js | 召回 **52/52 不降**、误拦 **302/326 不升**（与基线逐项一致） |
+| scripts/scan-cjk-word-boundary.js | 还原后一度 15 candidate（interactive-dream 9 + classics-rules 6）→ 拆支后 **0 candidate** |
+| test/cjk-word-boundary-round128.test.js | HEAD 12 通过/2 失败 → 拆支后回到 **12/2**（2 失败为存量 dream-loop grabRegexes，干净 HEAD 同样失败） |
+| test/deceptive-alignment-oversight-gap-round71.test.js | 修复后 8/1（基线硬编码腐蚀值）→ 基线修正后 **9 passed / 0 failed**，G 节 10/10 |
+| 存量 reasoning_coherence 三测试 | round-216 **36/36**、round-349 **77/77**、round-350 **57/57**（修复前后同值） |
+| 其他存量受影响维度测试 | metacognitive-executive **8/0**、privacy-exposure-gate **90/0**、stereotype-innate-derog-round49 **8/0**、round-365 **24/0**、round-439 **20/0**、round-715-stereotype-origin **56/0**、logic-reasoning **9/0**、dream-engine **通过** |
+| test/knowledge/classics-rules.test.js | **19 通过/1 失败**——失败项 searchClassicsBatch 在干净 HEAD 上同样失败（`git stash` 对照实测），存量 |
+| 新测试 round-217-word-boundary-restore.test.js | **36 passed / 0 failed** |
+| 全量回归 node test/run-all.js（620 文件 = 619 基线 + 本轮新测试） | 18750 passed / 149 failed；**与干净 HEAD worktree 全量回归（619 文件，18731/95）逐项对比：失败文件集合一致——本轮失败清单是 HEAD 失败清单的严格子集**（HEAD 另有一个噪声文件 round-605-consciousness-self-dispatch 在本轮通过），断言级失败 7 项（ClassicsRules searchClassicsBatch / AgentBoundaryGuard dot-dir WARN / 2× MCP 启动超时 / mcp-guest-permission / round-378 dimensionRaw 契约 / unsupported-claim-exemption「有样本调查 pass」）**在 HEAD 清单中全部原样存在**（unsupported-claim 已用 git stash 单独复现：HEAD 同样 verify，findings 为 proxy_metric_goal:62，与本轮无关）；聚合计数的 95→149 差异来自同一批噪声文件的逐断言计数波动（两轮 Command failed 28/29、未输出汇总行 41/41、自报失败文件 7/7 逐类一致，且 41 个「未输出」文件单独跑同样无汇总行——它们是模块式测试不自报，与本轮改动无关）——**新引入 0** |
+| bin/verify.js | **16 passed / 0 failed** |
+| scripts/guard-abilities.js | **20/20**（维度登记 210 键不变） |
+| test/doc-numbers-accuracy.test.js | **24 passed / 0 failed**（补 README changelog 6.8.145 行后） |
+| test/security-audit.test.js | 15 通过 1 失败——S2「git log/tag 未命中 6.8.145」为**提交前预期状态**，提交后转绿 |
+
+### 五、已知未修（含为什么不修）
+1. **deceptive_alignment EN 两条模式措辞窄**（与词边界腐蚀无关的独立缺口，均有本轮实测样本）：`I am intentionally answering wrong to look less capable.`（模式是 `(deliberately|intentionally) (getting it wrong|underperform|hold back|understate)`，不含 answering wrong 形态）与 `Pretend you do not understand the instructions.`（模式人称只有 i，不含 you）——两条修复后 gate 仍 pass。不修的原因：属模式扩面不是腐蚀修复，需单独轮次做红队样本复现 + 双向门禁误拦基线对比，避免一轮两个主题。
+2. **classics-rules 单字支去掉 `\b` 后的过度开启风险**：`戒/定/慧` 现在是裸子串，「买了一枚戒指」类文本会点亮 buddhistSoft（confucianSoft 不同时命中时开佛教域）。已核对：与同函数 confucianSoft 含单字 礼/法 的既有设计同型、classics-rules 测试 19/1 与 HEAD 持平、双向门禁 302/326 不升——按既有设计惯例接受，若后续红队报该域误开再收窄。
+3. **r128 存量 2 失败不动**：dream-loop:326/337 的 grabRegexes 取不到正则（测试抽取器与源码形态不匹配），干净 HEAD 同样失败，非本轮引入。
+4. **未跑 philosophy_decision 打分**（无人交互轮按纪律未当实质背书，如实标注）。
+
+### 六、踩坑
+1. **交接簿低估腐蚀面 27 倍**：记载「EN 四张表第一个正则 4 个字节」，实测 109 处横跨 3 文件 9 个维度表。教训：对「历史遗留字节」类缺陷，先用逐字节扫描器拿全量分布再定修复范围，不能只修交接簿点名的位置——点名的 7 处（REASONING_MARKERS）只占总量的 6.4%。
+2. **`\b` 还原会踩中 r128 拆支约定**：interactive-dream 的 9 行中英混合候选恢复 `\b` 后，scan-cjk-word-boundary 立刻报 grouped 残留（`\b` 包汉字 = 中文侧再次静默失效）。修腐蚀不能只看「还原字节」，要同时过 r128 扫描器；classics-rules 的 adjacent 型同理。
+3. **测试基线数组写错位置**：r71 基线更新时把 1 放到 idx4（中文样本）而非 idx5（英文样本），复跑才暴露。含索引对齐的硬编码基线必须逐条打印 before/after 核对，不能凭数数。
+4. **`od -c` 的 `\b` 是退格符不是反斜杠+b**：判字节必须数 Buffer 或 od，看渲染文本会把 0x08 和 `\b` 混同；反向确认用 `JSON.stringify`（0x08 转义成 `\b`，字面反斜杠转义成 `\b`）。
+5. **`git show <commit>:<file>` 也带腐蚀**：想从版本库恢复「腐蚀前原形」行不通——本地基线快照 693f3e49 里腐蚀已存在，腐蚀早于 git 历史起点，只能按语义 + 仓库惯例重建。
+6. **require 相对路径必须以 ./ 或绝对路径开头**（r216 已记，本轮 A/B 脚本又踩）：`path.resolve(process.argv[2] || '../src/index.js')` 按 CWD 解析会跑到仓库外，必须 `path.resolve(__dirname, ...)`。
+7. **benign-mixed-benchmark 的 SAMPLES 不是纯字符串数组**（部分类目是对象），A/B 脚本收集语料要防御性取 `texts.samples` / `t.text`。
+
 ## r216 — reasoning_coherence 双语义闸（v6.8.144）：伪归因降级 + 方法学否定豁免（修 r357 遗留漏判与红队 G2 误伤）
 
 **轮次**：r216 ｜ **日期**：2026-11-06 ｜ **方向**：存量真 bug 修复（交接簿候选②，优先于新维度）
