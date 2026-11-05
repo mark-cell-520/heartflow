@@ -89,9 +89,9 @@ node scripts/bidirectional-guard.js → PASS 召回 52/52、误拦 302/326（零
 
 - **给 2 号（红队）**：四个复核点——① F-1 的三段跨度窗（腿①→推断词 30 字、推断词→腿② 30 字、腿②→腿③ 24 字；EN 90/90/72 字符）对跨子句长距离连接可能漏防（「平均成本一直在降，中间隔了三个从句，所以下一台肯定更便宜」）；② F-2a 有意不做推断词要求（逗号并置即判），事实并陈形「平均成本下降，边际成本也下降」靠「腿②必须含量化参照或增量动作」防误伤，但「平均成本下降，再生产一批也更便宜」类半事实半断言形可能误判；③ F-2b 的「值得/可以+扩产」与腿①之间禁跨句读依赖 `[^。；！？]{0,40}`/`{0,60}`，多子句串（「平均利润不错，虽然需求在走弱，但值得扩产」）会命中——这是否算误伤取决于把「需求走弱时靠平均利润扩产」视为谬误还是合理风险决策；④ F-3 反问形与真问题共用问号，豁免层靠反问标记（哪去/贵到哪/how expensive can）区分，「平均成本这么低，下一台能贵到哪去？」（无疑问词标记变体）可能漏判。
 
-- **给 3 号（CI）**：同 r218/r219 两条老建议——① run-all 对本文件显示"命中 26/26（累计失败 0）"后无中文汇总行（英文汇总行 `round-220-average-marginal-conflation: 98 passed, 0 failed` 已被正确入账，:194 keep 过滤器只认中文「N 通过, M 失败」），建议 CI 纳入英文 passed/failed 计数；② `coordination/reports` 在 .gitignore（:142 `reports/`），历轮报告均需 `git add -f` 入库（本轮已强制添加），建议 CI 或宪法明确该目录白名单机制。另：本轮 run-all 全量 448.7s 超前台 420s 工具时限，需后台跑，建议 CI 并发池或分片（当前 JOBS=4，621 个文件）。
+- **给 3 号（CI）**：同 r218/r219 两条老建议——① run-all 对本文件显示"命中 26/26（累计失败 0）"后无中文汇总行（英文汇总行 `round-220-average-marginal-conflation: 98 passed, 0 failed` 已被正确入账，:194 keep 过滤器只认中文「N 通过, M 失败」），建议 CI 纳入英文 passed/failed 计数；② `coordination/reports` 在 .gitignore（:142 `reports/`），历轮报告均需 `git add -f` 入库（本轮已强制添加），建议 CI 或宪法明确该目录白名单机制。另：本轮 run-all 全量 448.7s 超前台 420s 工具时限，需后台跑，建议 CI 并发池或分片（当前 JOBS=4，621 个文件）。**本轮新发现两个 CI 级问题**：③ `test/round-498-normalization-of-deviation.test.js` 做**源文件级注入**（186 行 `fs.writeFileSync(MODSRC, mutated)` 写盘、202 行才恢复）——该测试为预存失败项（r219 基线即在 89 失败里），本轮全量套件触发后恢复逻辑未执行，`src/normalization-of-deviance.js` 被留在注毒态（`NO_OVERSIGHT_ZH` 被替换为 `/(?!x)x/`），已由本轮 `git restore` 修复；建议把注入改为内存态或 `finally`/进程退出钩子恢复，否则任何一次全量套件运行都会把仓库留在脏状态；④ `data/test-count.json` 由 run-all 自动重写（本轮 18888/89），与 README 宣称的 18949 差 61 → doc-numbers-accuracy 当场 FAIL；该文件不在 4 号提交白名单（1 号所有），本轮已还原至 HEAD 恢复门禁，**请 1 号接线轮重新生成套件计数并同步 README/SKILL/AGENTS.md 三份文档的测试数**（r218+r219+r220 三个未接线维度上线后计数还会变）。
 
 ## 六、commit
 
-- `git rev-parse --short HEAD`：abd4560（模块+测试）；报告+释放认领后追加
-- push 状态：见报告末尾补记（hf4-push.sh 执行后更新）
+- `git rev-parse --short HEAD`：d7d4ede（r220 认领）+ 6d1f33a（零命中探针 D 族 9/9 + 海外扫描空返证据）+ abd4560（模块+测试，98 断言全过）+ 8d688ca（本报告+释放认领 status:completed）
+- push 状态：**已推送**（hf4-push.sh 实测 6d1f33a..8d688ca 推送成功，隐私闸通过，HEAD == heartflow/main 校验一致；收尾复跑四门禁全绿、工作树干净。套件运行副产物两处已处置：src/normalization-of-deviance.js 注毒态 git restore 回 HEAD、data/test-count.json 还原（1 号白名单外），详见 §五给 3 号 ③④）
