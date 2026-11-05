@@ -718,6 +718,10 @@ const { checkColliderBias } = require('./collider-bias.js');
 // 的真实因果作用）。判据控制/解释动作腿×效应否定结论腿两腿共现 + 邻
 // 近窗；细节见 src/mediator-confusion.js。
 const { checkMediatorConfusion } = require('./mediator-confusion.js');
+// [r215] 第 211 维度 ecological_fallacy（生态谬误/区群谬误：拿群体或
+// 聚合层的统计量直接推断个体成员的属性，缺跨层桥接）。判据聚合统计量
+// 腿×个体层推断腿两腿共现 + 邻近窗；细节见 src/ecological-fallacy.js。
+const { checkEcologicalFallacy } = require('./ecological-fallacy.js');
 // [r196] 第 194 维度 argument_to_moderation（诉诸中庸：折中立场被直接
 // 当成真理）。require 是接线的第 1 处——同 r496 false_dilemma 事故：漏掉
 // 这一行，后续计算点直接 ReferenceError 全线崩。
@@ -2060,6 +2064,8 @@ function discriminate(text, evidence = [], contentMode) {
   // [r213] 第 210 维度 mediator_confusion（中介变量混淆/过度控制偏差）
   // 计算点。同 r212 先例：变量名 mcf。
   const mcf = _applyPedagogyRelaxation(checkMediatorConfusion(_normText), "mediator_confusion", pedagogyRelaxation);
+  // [r215] 第 211 维度 ecological_fallacy（生态谬误）计算点。变量名 eco。
+  const eco = checkEcologicalFallacy(_normText);
   // [r188] 第 185 维度 most_transitivity（「大多数」链式传递）计算点。
   // 同 r186 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   // 变量名 mtr——most-transitivity 缩写，grep 实测 0 命中无冲突。
@@ -2644,6 +2650,8 @@ function discriminate(text, evidence = [], contentMode) {
     {score: cbi.score, name:'collider_bias'},
     // [r213] 第 210 维度 mediator_confusion（中介变量混淆）参与判定。
     {score: mcf.score, name:'mediator_confusion'},
+    // [r215] 第 211 维度 ecological_fallacy（生态谬误）参与判定。
+    {score: eco.score, name:'ecological_fallacy'},
     // [r188] 第 185 维度 most_transitivity 参与判定（「大多数」链式传递）。
     // 同 r186 先例：dimMap 与 allDims 必须两处都接。
     {score: mtr.score, name:'most_transitivity'},
@@ -3154,6 +3162,9 @@ function discriminate(text, evidence = [], contentMode) {
     collider_bias: cbi,
     // [r213] 第 210 维度 mediator_confusion（中介变量混淆/过度控制偏差）。
     mediator_confusion: mcf,
+    // [r215] 第 211 维度 ecological_fallacy（生态谬误：聚合统计量腿×
+    // 个体层推断腿）。
+    ecological_fallacy: eco,
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
     // [r728] 第 159 维度 no_true_scotsman（定义驱逐反例×
@@ -4589,6 +4600,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 否定 A 的真实因果作用）登记。verify 级——单句也可能是对中介分析
     // 的正确描述、课堂案例或论文转述。与 r161-r212 同口径只登记 VERIFY。
     'mediator_confusion',
+    // [r215] 第 211 维度 ecological_fallacy（生态谬误/区群谬误：拿群体
+    // 或聚合层的统计量直接推断个体成员的属性，缺跨层桥接）登记。verify
+    // 级——单句也可能是对群体统计的正确转述、课堂案例或论文摘要。与
+    // r161-r213 同口径只登记 VERIFY。
+    'ecological_fallacy',
     // [r726] 第 156 维度 relative_pration（诉诸更惨）登记。
     // verify 级——「拿更惨的人抹掉眼前抱怨」需要补的是对方诉求本身的
     // 事实核查与处理方案，单句也可能是共情转述或概念讨论。与 r672-r725
@@ -5160,6 +5176,8 @@ function discriminate(text, evidence = [], contentMode) {
       collider_bias: cbi,
       // [r213] 第 210 维度 mediator_confusion（中介变量混淆）。同上。
       mediator_confusion: mcf,
+      // [r215] 第 211 维度 ecological_fallacy（生态谬误/区群谬误）。同上：八处一次接齐。
+      ecological_fallacy: eco,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,
@@ -16024,6 +16042,9 @@ module.exports = {
   // [r213] 第 210 维度 mediator_confusion 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkMediatorConfusion,
+  // [r215] 第 211 维度 ecological_fallacy 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  checkEcologicalFallacy,
   // [r172] 第 170 维度 whole_part_transfer 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkWholePartTransfer,
