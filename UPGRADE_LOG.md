@@ -1,3 +1,244 @@
+# 第 747 轮报告（v6.8.102 — MCP tools/call 错误通道：工具一出错就被跑第二遍，而请求方拿不到能关联的响应。`invokeToolHandler` 把「只调一次 + 两种出口都收敛」收成一处契约，12/182 个让 handleRequest 对外 reject 的工具归零）
+
+## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
+
+两个 cron 仍为空数组（`hermes/cron/jobs.json`），自主循环停着，r747 继续由主会话驱动。
+**选题判定由我下，不是 decision 本体打分。**
+
+直接做 r746 交接簿候选池④（「其余 handler 的 try 外 throw」）。轮初实测发现它比交接簿
+记的更大：不止「21 个 handler 的参数守卫在 try 外」，还有一条**根本没被记下来的逃逸
+路径**——`safeDispatch` 的 `if (!heartflow) throw '引擎未启动'`，全工具扫描实测
+**12 个工具**从这条路冲出 `handleRequest`。
+
+## 二、根因 / 缺口分析（带证据）
+
+### 2.1 `tools/call` 的「签名兼容层」把两件不同的事混成一类
+
+`src/mcp-server.js` 改前的调用点：
+
+```js
+try {
+  result = handler(args, sessionId);
+} catch (_) {
+  result = handler(args);      // ← 猜「签名不匹配」
+}
+```
+
+它想兼容两种签名，但 `catch (_)` 捕的是**任何** throw：
+
+- **签名不匹配**（handler 只收一个参数）—— 极少数，且 `handler.length` 免费可读；
+- **handler 内部报错**（参数缺失 / 内部 bug / `safeDispatch` 的引擎未启动）—— 常见。
+
+于是两个后果：
+
+**后果一：任何 handler 出错都会把 handler 再跑一遍。** 今天 21 个守卫都写在 throw 之前
+没有任何副作用，所以看不出来；但这是活雷——谁先在守卫前做点有状态的事（计数、写文件、
+RL 更新），一次缺参调用就双倍执行。
+
+**后果二（已实测）：第二次 throw 直接冲出 `handleRequest`。** `handleRequest` 是 async
+且**没有外层 try**（5706 行起，switch 直接 return，无包裹），所以对外 reject。
+`scripts/tmp-747-unhandled-probe.js` 实测 5 个缺参调用：
+
+```
+REJECTED  heartflow_gate          → text 是必填参数
+REJECTED  heartflow_check_single  → text 和 dimension 是必填参数
+```
+
+### 2.2 逃逸路径不止参数守卫一条（本轮新发现）
+
+`scripts/tmp-747-handler-probe.js` 做字符级扫描（跳过字符串/模板串/注释，维护 try 块栈），
+65 个 `handle*` 函数里 **21 个** handler 有「不在任何 try 内的 throw」：
+
+```
+handleThink / handleTranslate / handleAgentThink / handleThinkFast / handleSupervise /
+handleCheckSingle / handleMacroStrategy / handlePedagogyDetect / handleMemorySearch /
+handleMemoryEraser / handleEmotion / handleSelfHeal / handleProviderHealth /
+handleCostTracking / handleDecisionRouter / handleBridgeAnalyze / handleGate /
+handleGateCheck / handleDelimiterChannel / handlePostHocLegs / handleGatePipeline
+```
+
+但这只是**静态**形状。真正有多少个工具会对外 reject，要靠**全工具扫描**量
+（`scripts/tmp-747-sweep-probe.js`，按 `inputSchema.properties` 造全字段畸形实参，
+保证穿过中央清洗和空参守卫真正到达 handler）：
+
+```
+工具总数: 191   跳过: 9   实际调用: 182
+REJECTED（handleRequest 对外 reject）: 12
+   · heartflow_think / heartflow_think_fast / heartflow_modules_status / heartflow_emotion
+   · heartflow_agent_psychology / heartflow_engine_pacing / heartflow_cognitive_check
+   · heartflow_philosophy_decision / heartflow_decision_router
+   · heartflow_decision_router_stats / heartflow_memory_consolidate / heartflow_agent_think
+```
+
+**12 个全是 `引擎未启动`**——来自 `safeDispatch(route, ...)` 的 `if (!heartflow) throw`，
+一条交接簿里没记的逃逸路径。所以「21 个 handler 有 try 外 throw」是静态面，
+「12 个工具真的会 reject」是动态面，两者不能互相替代。
+
+### 2.3 传输层把响应的 id 写成了 null
+
+两处传输层都是 `makeError(null, ...)`（HTTP 6259 行、Unix socket 492 行）。
+JSON-RPC 2.0 §5 只允许**「解析失败 / 请求对象非法」**时 id 为 null；方法**内部**出错的
+响应 id 必须与请求一致。实测缺必填参数的 `tools/call`：
+
+```
+改前: {"jsonrpc":"2.0","id":null,"error":{"code":-32603,"message":"text 是必填参数"}}
+```
+
+客户端发的是 `id:1`，拿回 `id:null`——**永远关联不上自己的响应**。另外 code 恒取
+`err.code || -32603`，socket 层更写成 `-32700`（Parse error），与「方法内错误」不符。
+
+### 2.4 `isError` 恒 false：错误被包装成成功
+
+`tools/call` 出口写死 `isError: false`，不管 `result` 是不是 `{ error }`。
+r36 的 `test/mcp-handler-integrity.test.js` 注释里就点名过这个形状
+（「错误被包装成成功，调用方以为拿到了结果」），本轮把它接上。
+
+## 三、落地项
+
+### ① 新函数 `invokeToolHandler(handler, args, sessionId)`（src/mcp-server.js，非注释 ~40 行）
+
+契约四条，全部由测试逐条钉住：
+
+| # | 契约 | 做法 |
+|---|---|---|
+| 1 | **只调一次** | 签名用 `handler.length >= 2` 静态判，不再靠 catch 猜 |
+| 2 | 同步 throw 收敛 | `await result` 与调用同在一个 try 内 |
+| 3 | async reject 收敛 | 同上（async handler 的 reject 也是同一条出口） |
+| 4 | 错误结果可判 | 收敛成 `{ error, isError: true, timestamp }` |
+
+```js
+async function invokeToolHandler(handler, args, sessionId) {
+  try {
+    const result = handler.length >= 2 ? handler(args, sessionId) : handler(args);
+    return await result;
+  } catch (err) {
+    return { error: (err && err.message) ? err.message : String(err),
+             isError: true, timestamp: Date.now() };
+  }
+}
+```
+
+`tools/call` 调用点从 12 行的双调用块换成一行 `result = await invokeToolHandler(handler, args, sessionId);`。
+
+### ② 两处传输层回显请求 id
+
+- Unix socket（`handleUnixClient`）：区分「解析失败」（`req` 还没解析出来 → id null /
+  code -32700）与「方法内错误」（回显 `req.id` / code `err.code || -32603`）。
+- HTTP：`makeError((request && request.id !== undefined) ? request.id : null, ...)`。
+
+静态守卫断言：源码里**无理由的** `makeError(null, ...)` 只剩 1 处（`-32600`
+「请求对象不是 JSON-RPC」，那时 id 确实无法确定）。
+
+### ③ `isError` 按真实结果出，口径刻意收窄
+
+```js
+const toolFailed = !!(result && result.isError === true);
+return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }], isError: toolFailed };
+```
+
+**只让抛出型错误置 true。** handler 主动 `return { error }` 的 20+ 个「XX not available」
+仍是 `isError: false`——那是工具的正常返回，不是执行失败。理由很硬：`recordOutcome`
+喂的是同一个布尔值，若把合法返回也记成失败，熔断器会因客户端的正常用法误开闸
+（`src/circuit-breaker.js` 的 `_stats.failures++` → `_evaluate()`）。
+
+### ④ `invokeToolHandler` 走 `module.exports` 导出
+
+`src/mcp-server.js` 不在 `api-surface.js` 的 `PUBLIC_MODULES` 里（那是 docs 明文对外的
+三个模块），所以不需要改 AGENTS.md 契约表；但导出本身让这条契约能被测试和外部 agent
+**直接**验证，而不是只能靠 `tools/call` 间接观测。
+
+## 四、验收数字（全部实测）
+
+| 项 | 改前 | 改后 | 命令 |
+|---|---|---|---|
+| 让 `handleRequest` 对外 reject 的工具 | **12 / 182** | **0 / 182** | `scripts/tmp-747-sweep-probe.js`（git stash 对比） |
+| 缺必填参数收敛成 result | 2/5 reject | **8/8 全收敛** | `scripts/tmp-747-unhandled-probe.js` + 本轮测试【3】 |
+| HTTP 错误响应 id | `null` | **`4242`（回显）** | `scripts/tmp-747-http-probe.js` + 本轮测试⑬ |
+| 正常调用逐字不变 | — | **14/17**（时间戳归一） | `scripts/tmp-747-baseline-probe.js` 前后对比 |
+| handler 调用次数 | 出错时 **2 次** | **恒 1 次** | 本轮测试③④⑤（计数桩） |
+| `invokeToolHandler` 四条契约 | — | **4/4** | 本轮测试①②③④ |
+| 本轮测试 | — | **18 通过 / 0 失败** | `node test/round-747-mcp-error-channel.test.js` |
+| 双向门禁 | 52/52、306/326 | **52/52、306/326（逐项一致）** | `node scripts/bidirectional-guard.js` |
+| 引擎基线 | 161/1314/160/191 | **161/1314/160/191 不变** | `node scripts/sync-doc-numbers.js` |
+| bin/verify | 16/16 | **16/16** | — |
+| guard-abilities | 20/20 | **20/20**（dims 160 / summary 123） | — |
+| doc-numbers-accuracy | 22/22 | **22/22** | — |
+| security-audit | 15/16 | **15/16**（唯一失败 S2 版本戳，提交后转绿） | — |
+
+### 4.1 全量回归（两次，都实测）
+
+第一次跑完发现**本轮测试一次都没被执行**：文件名写成 `round-747-mcp-error-channel.js`，
+少了 `.test.js` 后缀，而 `test/run-all.js:72` 的发现判据是 `ent.name.endsWith('.test.js')`。
+回归跑完 629 个文件（数量没变）、日志里 grep 不到任何 `round-747` 字样。
+改名后文件计数 **629 → 630**、索引 `570/630` 出现「18 过 / 0 败」。
+**这是 r744~r746 候选池⑦「新测试是否被 run-all 扫到缺机器自检」第一次真被踩到。**
+
+| 轮次口径 | 文件数 | 通过 | 失败 | 合计 |
+|---|---|---|---|---|
+| r746 基线 | 629 | 20134 | 22 | 20156 |
+| r747 第一次（测试未被扫到） | 629 | 20134 | 22 | 20156 |
+| r747 第二次（改名后） | **630** | 20148 | 22 | 20170 |
+| r747 第三次（加固异步断言后） | **630** | 20149 | 25 | 20174 |
+
+第三次比第二次多 3 个失败，全部集中在 `doubt-ppf-en-ontological-r299.test.js`。
+单独复跑该文件：**4 通过 / 0 失败**。同轮还有 `round-735-injection-obfuscation`
+（第二次 2 失败）与 `round-736-quoted-frame-suppression`（第三次 2 失败）互相换岗，
+两者单独跑分别是 52/0 与 22/0。本机实测驻留 10+ 个 node 进程，结论是
+**CPU 争抢下的抖动，不是本轮引入的回归**。
+
+「14/17 逐字不变」的另外 3 条不是回归，是**修好的逃逸**：`heartflow_think` /
+`heartflow_emotion` / `heartflow_decision_router` 改前 REJECTED（`引擎未启动`），
+改后正常返回工具错误。
+
+## 五、已知未修（含为什么不修）
+
+① **21 个 handler 的参数守卫仍在 try 之外。** ①的 dispatcher 已经把它们全部收敛，
+逐个搬进 try 是**冗余**的（r746 对 handleQuotationFrame 那样做是因为当时没有统一收口）。
+刻意不搬：21 处机械编辑换来的是「handler 自己的 catch 多接一次」，而统一收口覆盖
+**未来新增的 handler**，手搬不覆盖。已知代价：`heartflow_gate` 缺参时返回
+`{ error, isError:true }` 而不带它自己 catch 里的 `text` 字段。
+
+② **r746 候选池①**（`客服话术里"仅剩最后3分钟"是常见的人工催促技巧。` 仍 rewrite）：
+需要一条不依赖引号的「分类框架」证据，且必须先解决同构边界，本论不做。
+
+③ **BLOCK 级元话语仍停在 verify**（r745 遗留 3 条）：强框架刻意不压 block 是 r736
+既定设计，扩降级面是产品决定不是技术决定。
+
+④ r744 候选池②③④⑤⑥⑦ 全部沿用：runner 失败计数不能自下而上复现、
+`src/core/version.js` 兜底版本每次 bump 要手工同步、公开面只有 3 个模块是产品决策、
+非函数导出 10 个不在硬闸门内、`src/index.js` 14893 行超阈值（doc-numbers 每轮报警）、
+`HANDLERS` 键数 193 > 静态工具数 191、新测试是否被 run-all 扫到缺机器自检。
+
+⑤ **`isError` 的口径是产品决定**：现在只有抛出型错误置 true。若要把 handler 主动
+return 的 `{ error }` 也算失败，必须先改 `recordOutcome` 的喂法（否则误开熔断），
+那是独立一轮的题目。
+
+## 六、踩坑
+
+① **`/tmp` 在 MSYS 与 node 里不是同一个目录**（r746 踩过，本轮又踩）：`node -e` 读
+`/tmp/x.js` 报 `ENOENT: C:\tmp\probe-handlers.js`。探针一律写进 `scripts/tmp-<轮次>-*.js`。
+
+② **bash 双引号里的反引号是命令替换**：用 `node -e "..."` 写含 `` `tools/call` `` 的中文
+长文案，`` `tools/call` `` 被 bash 当成命令执行掉，README 里留下一个空洞。长文案必须
+用 Write 工具或 quoted heredoc（`<<'EOF'`），不能走 `node -e "..."`。
+
+③ **span 扫描不能在「下一个 handle\*」处断**：第一版探针把 `handleUnixClient` 的 span
+一路吞到 674 行，把 `safeDispatch` / `safeAsyncCall` 里 `if (!heartflow) throw`
+误记成 2 处 handler 违规（实测 22 → 改正 21）。那两个函数只在 handler 的 try 内被调用，
+本就不违规。判据要在**任意**顶层声明处断。
+
+④ **测试的期望值不能凭记忆写**（r745 踩过，本轮又踩）：我把
+`你居然敢反驳我，你还有没有良心。` 的期望写成 `rewrite`，实测是 `pass`。
+本轮快照全部轮初实测后再写进断言。
+
+⑤ **顶层 `await` 会让 CommonJS 测试文件被误判成 ES module**：
+`ERR_AMBIGUOUS_MODULE_SYNTAX`。`await` 必须待在 async IIFE 里，模块顶层只放 promise。
+
+⑥ **探针「参数名全不在 schema 里」会被中央清洗成空对象**，然后被 v6.7.75 的
+「未收到任何有效参数」守卫拦在 handler 之前——那样测的是守卫不是 handler。
+必须按 `inputSchema.properties` 造**已声明**的参数，并把第一个 string 参数置空串。
+
+
 # 第 746 轮报告（v6.8.101 — 分析谓语家族 + 语料级漏识别诊断：「广告文案中"最后3小时"属于制造紧迫感的常见手法」被自己的门禁判成 rewrite，而批量定位它仍要逐条人读。FAMILIES 表加第 14 族 analysis_predicate（权重刻意 <0.4），新公开方法 quotationFrameGaps 把「这批里哪几条卡住、补哪个家族能救回几条」变成一次调用）
 
 ## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）

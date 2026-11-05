@@ -489,7 +489,20 @@ function handleUnixClient(socket) {
 
       } catch (e) {
 
-        socket.write(makeError(null, -32700, 'Parse error: ' + e.message));
+        // [v6.8.102 第 747 轮] 错误响应必须回显请求 id。
+        // 原来两处传输层都是 makeError(null, ...)：JSON-RPC 2.0 §5 只允许
+        // 「解析失败 / 请求对象非法」时 id 为 null；方法**内部**出错的响应
+        // id 必须与请求一致。实测缺必填参数的 tools/call 冲出 handleRequest 后，
+        // 客户端拿到的是 `{"id":null,"error":{...}}`——它发的是 id:1，
+        // 永远等不到能关联的响应。
+        // 另外 code 也从恒 -32700（Parse error）改成按错误类型取：
+        // 解析失败（req 还没解析出来）才是 -32700，方法内错误是 -32603。
+        const parseFailed = (req === undefined);
+        socket.write(makeError(
+          parseFailed ? null : req.id,
+          parseFailed ? -32700 : (e.code || -32603),
+          e.message || 'Internal error'
+        ));
 
       }
 
@@ -5665,6 +5678,50 @@ const HANDLERS = {
   },
 };
 
+// ═══════════════════════════════════════════════
+//
+// [v6.8.102 第 747 轮] 工具调用的一次性语义
+//
+// 为什么要有这个函数（轮初实测，scripts/tmp-747-unhandled-probe.js）：
+//   tools/call 原来用 `try { handler(args, sessionId) } catch (_) { handler(args) }`
+//   兼容两种签名。它把两件完全不同的事混成了一类：
+//     ① handler 只接受一个参数（签名不匹配）—— 极少数，且 handler.length 免费可读
+//     ② handler 内部报错（参数缺失 / 内部 bug）—— 21 个 handler 的参数守卫都是这个形状
+//   后果一：**任何 handler 错误都会把 handler 再跑一遍**。今天 21 个守卫都写在
+//     throw 之前没有任何副作用，所以看不出来；但这是个活雷——谁先在守卫前做点
+//     有状态的事（计数、写文件、RL 更新），缺参调用就会双倍执行。
+//   后果二（已实测）：21 个 handler 的参数守卫 throw 在 try 之外，第二次调用
+//     再抛一次就冲出 case 'tools/call'；handleRequest 是 async 且没有外层 try，
+//     于是 **handleRequest 对外 reject**。实测 5 个缺参调用里 2 个 REJECTED
+//     （heartflow_gate / heartflow_check_single），transport 层的 catch 只能把它
+//     变成 makeError(null, -32603)——id 恒为 null，客户端关联不上自己的请求。
+//
+//   判据与契约必须同一份代码（r739 的教训）：签名兼容用 handler.length 静态判，
+//   错误收敛用一处 try 包住「同步 throw」与「async reject」两种出口。
+// ═══════════════════════════════════════════════
+
+/**
+ * 调用一个工具 handler，保证三件事：
+ *   ① 只调用一次（按 handler.length 分派，不再靠 catch 猜签名）
+ *   ② 同步 throw 与 async reject 都收敛成 `{ error }` 结果，绝不向外抛
+ *   ③ 错误结果带 isError: true，让调用方能按 MCP 规范判失败
+ *
+ * @returns {Promise<object>} handler 的返回值，或 `{ error, isError }`
+ */
+async function invokeToolHandler(handler, args, sessionId) {
+  try {
+    const result = handler.length >= 2 ? handler(args, sessionId) : handler(args);
+    // async handler 的 reject 也是同一条出口：await 必须在 try 内
+    return await result;
+  } catch (err) {
+    return {
+      error: (err && err.message) ? err.message : String(err),
+      isError: true,
+      timestamp: Date.now(),
+    };
+  }
+}
+
 
 
 // ═══════════════════════════════════════════════
@@ -5836,19 +5893,12 @@ async function handleRequest(request, sessionId, httpHeaders, forcedRole) {
 
       let result;
 
-      // 兼容两种签名：handler(args) 和 handler(args, sessionId)
-
-      try {
-
-        result = handler(args, sessionId);
-
-      } catch (_) {
-
-        result = handler(args);
-
-      }
-
-      if (result && typeof result.then === 'function') result = await result;
+      // [v6.8.102 第 747 轮] 兼容两种签名：handler(args) 和 handler(args, sessionId)
+      // 原先用 `try { handler(args, sessionId) } catch (_) { handler(args) }` 猜签名，
+      // 实测两个后果：handler 内部一出错就被跑第二遍；21 个 try 外参数守卫的
+      // 第二次 throw 直接冲出 handleRequest（async 无外层 try → 对外 reject）。
+      // 现在签名用 handler.length 静态判，错误收敛见 invokeToolHandler。
+      result = await invokeToolHandler(handler, args, sessionId);
 
       // ─── [v6.7.70] 统一硬闸门：所有工具的 block 判定都在此层撤内容 ───
       // 心虫 decision.decide 选定（0.90 分，身份对齐 100%）。
@@ -5889,7 +5939,17 @@ async function handleRequest(request, sessionId, httpHeaders, forcedRole) {
       } catch (_) { /* 防御性：熔断统计不阻断主流程 */ }
 
 
-      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }], isError: false };
+      // [v6.8.102 第 747 轮] isError 反映真实结果，不再恒 false。
+      // 原来无论 result 是不是 { error } 都回 isError:false —— 调用方无法
+      // 区分「工具跑成功了」和「工具报错了」（r36 的 mcp-handler-integrity
+      // 测试注释里就点名过这个形状：错误被包装成成功）。
+      // 口径刻意收窄：只有 **invokeToolHandler 捕获到的抛出型错误** 才置 true
+      // （它自己带 isError:true）。handler 主动 return 的 { error } 仍是
+      // isError:false —— 那是工具的正常返回，不是执行失败；否则 20+ 个
+      // 「XX not available」的合法返回会被熔断器记成失败并可能误开闸。
+      const toolFailed = !!(result && result.isError === true);
+
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }], isError: toolFailed };
 
     }
 
@@ -6256,7 +6316,15 @@ const server = http.createServer((req, res) => {
 
         });
 
-        res.end(makeError(null, err.code || -32603, err.message || 'Internal error'));
+        // [v6.8.102 第 747 轮] 回显请求 id（Unix socket 通道同一处已修）。
+        // JSON-RPC 2.0 §5：方法内部出错的响应，id 必须与请求对象一致；
+        // 只有「解析失败 / 请求对象非法」才允许 id 为 null。
+        // 原来恒 null —— 客户端发 id:1，拿回 id:null，无法关联响应。
+        res.end(makeError(
+          (request && request.id !== undefined) ? request.id : null,
+          err.code || -32603,
+          err.message || 'Internal error'
+        ));
 
       }
 
@@ -6472,6 +6540,11 @@ module.exports = {
   createServer: () => server,
   getPort: () => PORT,
   handleRequest,
+  // [v6.8.102 第 747 轮] 工具调用的单一错误契约导出：
+  // 「只调一次 + 同步 throw 与 async reject 都收敛成 { error, isError }」。
+  // 导出的目的是让这条契约可被测试和外部 agent 直接验证，
+  // 而不是只能靠 tools/call 间接观测。
+  invokeToolHandler,
   initHeartFlow,
   start: () => {
     initHeartFlow();
