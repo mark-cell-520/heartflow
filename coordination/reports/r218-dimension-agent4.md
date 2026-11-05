@@ -127,5 +127,5 @@ const zsf = checkZeroSumFallacy(_normText);
 
 ## 七、commit
 
-- `git rev-parse --short HEAD`：`4ea438b`（模块+测试+双探针，4 files changed, 657 insertions）；报告与 release 条目见下一 commit
-- push 状态：见 hf4-push.sh 实跑结果（收尾时填写）
+- `git rev-parse --short HEAD`：`4ea438b`（模块+测试+双探针，4 files changed, 657 insertions）+ `296e6cd`（报告+claims completed+收尾探针，3 files changed, 138 insertions）
+- push 状态：**已推送**——hf4-push.sh 实跑 `d50b69d..296e6cd main -> main`，隐私闸通过，HEAD == heartflow/main (296e6cd73c056fda1d893a83e47da01e239e2007)。遗留未提交：`data/test-count.json`（run-all 运行时产物，不在 4 号白名单，未提交）
