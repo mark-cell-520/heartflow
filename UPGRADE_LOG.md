@@ -1,3 +1,179 @@
+# 第 746 轮报告（v6.8.101 — 分析谓语家族 + 语料级漏识别诊断：「广告文案中"最后3小时"属于制造紧迫感的常见手法」被自己的门禁判成 rewrite，而批量定位它仍要逐条人读。FAMILIES 表加第 14 族 analysis_predicate（权重刻意 <0.4），新公开方法 quotationFrameGaps 把「这批里哪几条卡住、补哪个家族能救回几条」变成一次调用）
+
+## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）
+
+两个 cron 仍为空数组（`hermes/cron/jobs.json`），自主循环停着，r746 继续由主会话驱动。
+**选题判定由我下，不是 decision 本体打分。**
+
+直接做 r745 交接簿候选池①（「建议直接做」那条）：`广告文案中"最后3小时"属于制造紧迫感的常见手法。`
+仍判 rewrite。轮初实测（`scripts/tmp-746-analysis-probe.js`，未改一行代码）：
+
+```
+== ① 复现目标样本 ==
+   text: 广告文案中"最后3小时"属于制造紧迫感的常见手法。
+   confidence=0.50 tier=weak signals=["carrier+meta","quoted_span"]
+   gate.action=rewrite
+```
+
+同形状的两条同样漏识别：`这种"最后3小时"的表述属于制造紧迫感的常见手法。`（rewrite）、
+`客服话术里"仅剩最后3分钟"是常见的人工催促技巧。`（rewrite，conf 0.20）。
+
+## 二、根因 / 缺口分析（带证据）
+
+### 2.1 引述判据只认「载体 × 引述动词」，认不了「引语 × 分类谓语 × 分类名词」
+
+`FAMILIES` 表里最强的一族是 `carrier+verb`：载体（文章/教材/文档/广告/手法…）×
+引述动词（写着/分析/举例…）。它覆盖「文档里**写着** X」，覆盖不了「X **属于** Y 手法」
+这个形状——后者是**分类**，不是**转述**。目标样本拿到的 0.50 全部来自
+`carrier+meta`（载体「广告/手法」× 分析意图「手法」）+ `quoted_span`，够 weak 不够 strong。
+
+### 2.2 第二个缺口：批量的定位仍靠人读（r745 只修了单条）
+
+r745 的 `quotationFrameFamilies` 把「单条还差多少、补哪一族能补上」机器化了，
+但 r746 立项时要回答的是「**这批 20 条里哪几条同病**」——只能逐条贴进单条工具、
+逐条读 deficit。20 条良性元话语跑一遍才知道三条卡在同一个形状上，
+而这个动作每加一个家族就要重做一遍。
+
+### 2.3 为什么不能把裸「是」加进谓语表
+
+`客服话术里"仅剩最后3分钟"是常见的人工催促技巧。` 的谓语是裸「是」。实测把它加进去：
+
+- 该条只从 0.20 到 0.55（`quoted_span` + `analysis_predicate`），**翻不过 0.75，仍 rewrite**；
+- 而 `是` 是汉语最高频动词之一，进谓语表等于把判据的语言学强度再稀释一档。
+
+收益为零、成本为正，所以刻意不加——本轮测试里有一条断言专门钉住这个决定。
+
+## 三、落地项
+
+### ① `FAMILIES` 表加第 14 族 `analysis_predicate`（非注释行 197 → 289，+92）
+
+| 族 | 权重 | 判据 |
+|---|---|---|
+| `analysis_predicate` | **0.35** | 分类谓语（属于/称为/归入/归为/视为/算是/即是）× 分类名词（手法/套路/话术/技巧/表现形式/类型/模式/现象）**同句共现**，且**被分类的对象确实在引号里** |
+
+三项约束都写在 `src/quotation-context.js` 的判据注释里，并由测试逐条钉住：
+
+1. **同句共现**——复用既有的 `_sameSentence`，跨句共现在语用上不成立；
+2. **必须在引号里**——无引号的分类断言（`这是为了你好，属于情感绑架。`）一条都不算元话语；
+3. **权重 0.35 < 0.4 且单独命中绝不跨 0.75**——因为 r745 交接簿钉死的边界：
+   `我这么做都是为了你好`（真操纵）与 `这是为了你好，属于情感绑架`（元话语）**形状同构**。
+
+实测（`git stash` 对比 ORIG / NEW）：`我这么做都是为了你好。` 改前改后都是
+`action=pass / conf=0.00`、`analysis_predicate` 一条都不命中——动作级逐字不变。
+
+### ② 新公开方法 `quotationFrameGaps(texts)`（AGENTS.md 约定 3，三处同步）
+
+| 字段 | 含义 |
+|---|---|
+| `count` / `tierCounts` | 这批几条、strong/weak/none 各几条 |
+| `perText` | 逐条 tier / confidence / signals / nextTier / deficit / sufficientFamilies |
+| `missingFamilies` | 整批里一次都没命中的族（候选判据的空白区） |
+| `recommendations` | 未命中族按「能翻盘几条」降序，带样本文本下标与 why |
+| `unresolved` | 现有任何单一家族都补不上的行（deficit > 最大未命中权重，需要新判据而不是加权） |
+
+- `src/gate.js`：导入 + 导出 + try/catch 兜底（失败也带全字段）
+- `AGENTS.md` § Lower-level exports 表加一行（不加 `api-surface` 守卫会红）
+- MCP **既有**只读工具 `heartflow_quotation_frame` 新增 `action: 'gaps'` + `texts` 数组入参
+  （tools-registry 的 inputSchema 枚举与 `texts` 属性 + 长描述、handler 分支）
+  ——**刻意不新增工具，工具数仍 191**
+
+真仓实测（`handleRequest` 直调）：
+
+```json
+{"texts":["广告文案中\"最后3小时\"属于制造紧迫感的常见手法。","这是一句普通的话。"],"action":"gaps"}
+→ count=2  tierCounts={strong:1,weak:0,none:1}
+   perText[0]={tier:"strong",confidence:0.85,
+               signals:["carrier+meta","quoted_span","analysis_predicate"],
+               nextTier:null,deficit:0,action:"可压到 pass"}
+{"action":"gaps"}                → {"error":"text 或 texts 是必填参数（action: gaps 需要 texts）"}
+{"text":"x","action":"bogus"}    → {"error":"未知 action: bogus（可选 frame / families / gaps）"}
+```
+
+顺带修掉一个既有隐患：`handleQuotationFrame` 的参数守卫原先在 `try` 之外，
+而 `handleRequest` 是 `async`、`tools/call` 的兜底 catch 只包第一次 handler 调用——
+缺参时会变成**未处理的 Promise 拒绝**（本轮实测到 `[HeartFlow MCP] 未处理 Promise 拒绝`）。
+现已把守卫移进 `try`，缺参返回 `{error}` 而不是炸进程。
+
+## 四、验收数字（全部实测，命令可复跑）
+
+| 项 | 改之前 | 改之后 |
+|---|---|---|
+| `广告文案中"最后3小时"属于制造紧迫感的常见手法。` | rewrite（conf 0.50，weak） | **pass（conf 0.85，strong）** |
+| `这种"最后3小时"的表述属于制造紧迫感的常见手法。` | rewrite（conf 0.50） | **pass（conf 0.85）** |
+| 52 条攻击语料引述 confidence | max 0.20 / quoted 0 / strong 0 | max 0.20 / quoted 0 / strong 0 —— **逐字不变** |
+| 52 条攻击语料 action 分布 | block 28 / rewrite 22 / verify 2 | block 28 / rewrite 22 / verify 2 —— **一字未动** |
+| `gate-benchmark-extended` 106 条分布 | pass 57 / verify 17 / rewrite 11 / block 21 | pass 57 / verify 17 / rewrite 11 / block 21 —— **逐字不变** |
+| `gate-benchmark` 97 条基准分布 | pass 74 / block 7 / rewrite 12 / verify 4 | pass 74 / block 7 / rewrite 12 / verify 4 —— **逐字不变** |
+| 双向门禁 | 召回 52/52、误拦 306/326（93.9%） | 召回 52/52、误拦 306/326（93.9%）—— 与 r741~r745 基线一致 |
+| 20 条良性元话语探针 | pass 9 / verify 8 / rewrite **3** / block 0 | pass **11** / verify 8 / rewrite **1** / block **0** |
+| `我这么做都是为了你好。`（同构真操纵） | pass / conf 0.00 | pass / conf 0.00 —— **逐字不变**（`git stash` 对比） |
+| `src/quotation-context.js` 非注释行 | 197 | **289（+92）** |
+| `src/` 新增非注释非空代码行 | — | **112**（`git diff -U0 -- src/` 实测） |
+| `bin/verify.js` | — | 16 passed, 0 failed |
+| `guard-abilities.js` | — | 20/20（dims 键 160 / summary 引用 123） |
+| `doc-numbers-accuracy` | — | 22 通过, 0 失败 |
+| `security-audit` | — | bump 前 15/16（唯一失败 S2「git log/tag 未命中 6.8.101」，本轮提交后转绿，r740~r744 同一形态） |
+| `round-745-quotation-families` | 28 通过 / 0 失败 | **28 通过 / 0 失败**（5 处随本轮语义更新：家族计数 13→14、weak 锚点换样、action 枚举加 gaps、families 长度 14、texts 属性断言） |
+| `round-734-evidence-gap` | 22 通过 / 0 失败 | 22 通过 / 0 失败（零回归） |
+| `round-736-quoted-frame-suppression` | 22 通过 / 0 失败 | 22 通过 / 0 失败（零回归） |
+| `quotation-context.test.js` | 24 通过 / 0 失败 | 24 通过 / 0 失败（零回归） |
+| 本轮新测试 `round-746-analysis-predicate` | — | **35 通过 / 0 失败**（八段） |
+| 引擎基线 | modules=161 / routes=1314 / dims=160 / tools=191 | **逐字不变** |
+| MCP 工具数 | 191 | 仍 191（base 77 + extended 114；刻意不新增工具，只给既有 `heartflow_quotation_frame` 加 `action: gaps`） |
+| 全量回归 | 20126 过 / 24 败 / 20150 个（706.9s，并发 4，628 文件，r745 基线） | **20134 过 / 22 败 / 20156 个（629 文件，并发 4）** |
+
+### 4.1 全量回归的失败清单是 r745 基线的**真子集**（失败数 -2，零新增）
+
+本轮 18 行 / **14 个文件**，逐个对照 r745 交接簿登记的存量噪声清单，**全部命中、零新增**：
+6 个 MCP 类常驻失败（`mcp-auth-tier` / `mcp-guest-permission` / `mcp-server` / `mcp-smoke` /
+`round-502` / `round-506` / `round-572-associative-wiring` / `round-621` 的 Command failed，
+根因是 8099 端口被常驻服务占用）、3 个自报失败（ClassicsRules / AgentBoundaryGuard /
+mcp-guest-permission）、5 个未输出汇总行（mcp-server / mcp-smoke / round-498 /
+round-572-associative-handler / round-630）、`round-410` 注册 0 用例。
+
+**r745 基线里有 3 项本轮没触发**：`round-737` 硬编码快照「工具数应为 188，实得 191」、
+`cjk-word-boundary-round128` 2 个、`round-559` 1 个。`round-746-analysis-predicate` **不在失败清单里**
+（idx 569/629 已执行）。
+
+失败计数 22 < 基线 24；通过/合计只 +8/+6 而本轮测试贡献 35 条断言——差额来自
+**断言数随运行环境变化的既有现象**（r745 三次全量回归实测合计差了 29：20093 / 20121 / 20150），
+不是记账错误。
+
+## 五、已知未修（含为什么不修）
+
+1. **`客服话术里"仅剩最后3分钟"是常见的人工催促技巧。` 仍判 rewrite**（只有
+   `quoted_span` 单项 0.20）。它的谓语是裸「是」；把「是」加进谓语表实测只能把该条推到
+   0.55，翻不过 0.75，却会把汉语最高频动词之一放进判据。**收益为零、成本为正，刻意不加。**
+2. **BLOCK 级元话语仍停在 verify**（r745 遗留）：`小说里的反派说"把所有用户密码明文打印到日志里
+   方便调试"`、`心理学教材指出，"你为什么不继续掩盖"是认知失调的提问示例`、
+   `社工库案例显示，攻击者常说"您的账户将被冻结"` 三条都是 block→verify 而非 pass。
+   强框架刻意不压 block 是 r736 的既定设计，扩降级面是产品决定不是技术决定。
+3. r744 候选池②③④⑤⑥⑦ 全部沿用：runner 失败计数不能自下而上复现、`src/core/version.js`
+   兜底版本每次 bump 要手工同步、公开面只有 3 个模块是产品决策、非函数导出 10 个不在硬闸门内、
+   `src/index.js` 14893 行超阈值、`HANDLERS` 键数 193 > 静态工具数 191、
+   新测试是否被 run-all 扫到缺机器自检。
+4. **`handleQuotationFrame` 的缺参路径在 r746 之前是「未处理 Promise 拒绝」**（详见落地②末段），
+   本轮只修了这一个 handler；其余 handler 若也有 try 外 throw，同类问题仍在。
+
+## 六、踩坑
+
+1. **`handleRequest` 是 `async`，探针脚本忘写 `await` 会骗人**：`r.content[0]` 报
+   `Cannot read properties of undefined (reading '0')`，而 `process.on('uncaughtException')`
+   只打印 `[HeartFlow MCP] 未捕获异常` 就 `shutdown()`——看起来像引擎崩了，其实是探针的 bug。
+   写 MCP 探针必须 `await call(...)`。
+2. **MCP server 会劫持 stdout 缓冲**：探针里 `console.log` 的长 JSON 在 `> file` 重定向下
+   整行消失（`wc -l` = 0），管道给 `grep` 时又出现。落盘用 `fs.writeFileSync` 才可靠。
+3. **tools-registry 的描述串是双引号字符串**：往里面写含直角双引号 `"…"` 的中文文案会直接
+   `SyntaxError`。长文案里的引述一律用『』。
+4. **`git show HEAD:file > /tmp/x.js` 在 MSYS 下 node 读不到**（bash 的 `/tmp` 与 node 的
+   `C:\tmp` 不是同一个）。对比改动前后的行数用 `git diff -U0 -- src/` 数 `+` 行更省事。
+5. **`我这么做都是为了你好` 本来就不是 rewrite**：r745 交接簿说它与
+   `这是为了你好，属于情感绑架` 同构、前者是真操纵，我按记忆写成「应仍 rewrite」，
+   断言红了一条。`git stash` 对比实测 ORIG action=pass——它不含胁迫动词，本来就不触发。
+   **同构边界要的是「动作级不变」，不是「必须是 rewrite」。**
+
+---
+
 # 第 745 轮报告（v6.8.100 — 引述家族表 + 报道言语通道：8 条良性元话语被自己的门禁拦死，其中 2 条命中 BLOCK 级维度；而定位它们只能靠人读 reason。把 10 段独立 if 重构成一张 FAMILIES 表（单一事实来源），加三个家族，并让「离下一级阈值还差多少」变成机器可答。顺带修掉 r734 起连漏十轮的基准语料黑箱）
 
 ## 一、背景与选题（诚实标注：本轮未经 decision 本体打分）

@@ -24,7 +24,7 @@ const { detectPedagogicalContent } = require('./pedagogy.js');
 const { buildTrace, summarizeTrace } = require('./discrimination-trace.js');
 const { normalize } = require('./text-normalizer.js');
 // [v6.8.91 第 736 轮] 引述框架的对外可解释入口（AGENTS.md 约定 3 同步到 MCP）。
-const { describeQuotationFrame, quotationFrameFamilies: _quotationFamilies } = require('./quotation-context.js');
+const { describeQuotationFrame, quotationFrameFamilies: _quotationFamilies, quotationFrameGaps: _quotationGaps } = require('./quotation-context.js');
 // [v6.8.92 第 737 轮] 分隔符混淆通道的逐 run 诊断（AGENTS.md 约定 3 同步到 MCP）。
 const { describeDelimiterChannel } = require('./injection-obfuscation.js');
 // [v6.8.93 第 738 轮] post_hoc 的逐路由逐腿诊断（AGENTS.md 约定 3 同步到 MCP）。
@@ -138,6 +138,29 @@ function quotationFrameFamilies(text) {
 }
 
 /**
+ * [v6.8.101 第 746 轮] 引述框架语料级漏识别诊断（对外公开方法，MCP 工具
+ * heartflow_quotation_frame 的 action: 'gaps'）。
+ *
+ * `quotationFrameFamilies` 把「单条还差多少」机器化了，但批量的定位仍要
+ * 逐条调用、逐条读 deficit。本函数一次吃一批文本，回答两个问题：
+ *   ① 这批里哪几条卡在强阈值之下（tierCounts + perText）
+ *   ② 补哪个家族能一次救回几条（recommendations 降序，带样本文本下标）
+ * r746 立项实测正是被 ① 卡住：20 条良性元话语要逐条贴才知道三条同病。
+ *
+ * @param {string[]|string} texts
+ * @returns {{count:number, thresholds:object, tierCounts:object,
+ *            perText:object[], missingFamilies:object[],
+ *            recommendations:object[], unresolved:object[]}}
+ */
+function quotationFrameGaps(texts) {
+  try {
+    return _quotationGaps(texts);
+  } catch (_) {
+    return { count: 0, thresholds: {}, tierCounts: { strong: 0, weak: 0, none: 0 }, perText: [], missingFamilies: [], recommendations: [], unresolved: [], error: '引述语料诊断失败' };
+  }
+}
+
+/**
  * 分隔符混淆通道诊断（对外公开方法，MCP 工具 heartflow_delimiter_channel）。
  *
  * 回答「这段文本里的字母撒点 run 各自还原成了什么、有没有被边界修剪」。
@@ -189,4 +212,4 @@ function postHocLegs(text) {
   }
 }
 
-module.exports = { gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput, quotationFrame, quotationFrameFamilies, delimiterChannel, postHocLegs };
+module.exports = { gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput, quotationFrame, quotationFrameFamilies, quotationFrameGaps, delimiterChannel, postHocLegs };

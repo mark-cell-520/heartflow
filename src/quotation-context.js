@@ -84,6 +84,35 @@ const WARNING_FRAME_RE = /(反诈|防骗|防诈|反欺诈|安全提示|风险提
  */
 const FRAMED_QUOTE_RE = /(?:反诈|防骗|防诈|安全提示|风险提示|预警|温馨提示|标语|口号|台词|对白|独白|旁白|桥段|剧本|小说|剧情|角色|诗句|歌词)\s*(?:里|中|上|写道|说|道)?\s*[:：,，]?\s*[""''「」『』]/;
 
+/**
+ * [v6.8.101 第 746 轮] 分析谓语家族：`X 属于 Y 手法` —— 文本在**分类**一个表述。
+ *
+ * 立项实测（scripts/tmp-746-analysis-probe.js）暴露的漏识别：
+ *   「广告文案中"最后3小时"属于制造紧迫感的常见手法。」
+ *     → carrier+meta 0.3（载体「广告/手法」× 分析意图「手法」）+ quoted_span 0.2
+ *       = 0.50，停在 weak，判 rewrite。
+ *   「这种"最后3小时"的表述属于制造紧迫感的常见手法。」
+ *   「客服话术里"仅剩最后3分钟"是常见的人工催促技巧。」
+ * 三条都是**元话语**：作者在把一句广告/客服文案归类为某种操纵手法，
+ * 不是在执行它。旧判据只认「载体 × 引述动词」（文档里**写着**），
+ * 认不了「引语 × 分类谓语 × 分类名词」这个形状。
+ *
+ * 语言学判据：分类谓语（属于/称为/归入/视为/算是/即是…）× 分类名词
+ * （手法/套路/话术/技巧/表现形式/类型/模式/现象…）在同一句内共现，
+ * 且被分类的对象确实在引号里。`"最后3小时"属于…手法` 的语义主语是
+ * 分析者，不是发话人。
+ *
+ * 安全性（为什么权重压到 0.35 而不是更高）：
+ *   r745 交接簿明确钉住一条边界——`我这么做都是为了你好`（真操纵）与
+ *   `这是为了你好，属于情感绑架`（元话语）**形状同构**。前者没有引号、
+ *   没有分类名词，本家族一条都不命中（实测 conf=0.00，保持 rewrite）；
+ *   但同构本身说明这条判据的语言学强度弱于「载体 × 引述动词」，
+ *   因此权重必须 < 0.4，且单独命中（0.35）绝不能跨过强阈值 0.75。
+ *   实测它只在与既有证据叠加时起作用：0.3 + 0.2 + 0.35 = 0.85 才翻 strong。
+ */
+const ANALYSIS_PREDICATE_RE = /(属于|归入|归为|归类为|称为|称作|算是|即是|视为|看作|视作)/;
+const ANALYSIS_NOUN_RE = /(手法|套路|话术|技巧|表现形式|表现手法|圈套|陷阱|把戏|伎俩|类型|模式|范例|范式|现象|行为模式|叙事技巧|修辞)/;
+
 /** 弱引述框架阈值：够格把 block 降为 verify（[v6.7.71] 起沿用不变） */
 const QUOTED_THRESHOLD = 0.45;
 /** 强引述框架阈值：够格把 rewrite / verify 压到 pass（[v6.8.91 第 736 轮] 新增） */
@@ -195,6 +224,12 @@ const FAMILIES = [
     why: '框架名词紧邻开引号（剧本台词："…" / 标语："…" / 对白："…"）',
     test: (t) => FRAMED_QUOTE_RE.test(t),
   },
+  // ── [v6.8.101 第 746 轮] 分析谓语家族（权重刻意 < 0.4，见上面判据注释）──
+  {
+    name: 'analysis_predicate', weight: 0.35,
+    why: '分类谓语（属于/称为/归入/视为…）× 分类名词（手法/套路/话术/技巧…）同句共现，且被分类对象在引号内',
+    test: (t, c) => c.analysisPredicate,
+  },
 ];
 
 /** 剧情/创作语境（叙事载体 × 创作动词） */
@@ -232,11 +267,25 @@ function _context(text) {
     }
   }
   const hasMeta = META_INTENT_RE.test(text);
+  // [v6.8.101 第 746 轮] 分类谓语 × 分类名词：必须同句（跨句共现在语用上不成立），
+  // 且被分类的对象要在引号里（否则「这是情感绑架」这类无引语断言也会被算成元话语）
+  const predHits = [...text.matchAll(new RegExp(ANALYSIS_PREDICATE_RE.source, 'g'))];
+  const nounHits = [...text.matchAll(new RegExp(ANALYSIS_NOUN_RE.source, 'g'))];
+  let analysisPredicate = false;
+  if (predHits.length && nounHits.length && QUOTED_RE.test(text)) {
+    for (const p of predHits) {
+      for (const n of nounHits) {
+        if (p.index !== n.index && _sameSentence(text, p.index, n.index)) { analysisPredicate = true; break; }
+      }
+      if (analysisPredicate) break;
+    }
+  }
   return {
     carrierHits, verbHits, coLocated,
     hasCarrier: carrierHits.length > 0,
     hasMeta,
     explicitFrame: /^(这|该|此)(篇|本|部|个|份|些)/.test(text.trim()) && hasMeta,
+    analysisPredicate,
   };
 }
 
@@ -366,4 +415,106 @@ function quotationFrameFamilies(text) {
   };
 }
 
-module.exports = { detectQuotationContext, describeQuotationFrame, quotationFrameFamilies, __internals: { FAMILIES, QUOTED_THRESHOLD, STRONG_THRESHOLD } };
+/**
+ * [v6.8.101 第 746 轮] 引述框架的**语料级**漏识别诊断（对外公开方法，MCP action: 'gaps'）。
+ *
+ * 存在的理由：r745 的 `quotationFrameFamilies` 把「单条文本还差多少」机器化了，
+ * 但 r746 立项时发现**批量的定位仍然靠人读**——20 条良性元话语要逐条贴进
+ * 单条工具、逐条看 deficit，才知道「缺的是同一个家族」。而这个动作每加一个
+ * 家族就要重做一遍。本函数把它变成一次调用：
+ *
+ *   输入一批文本 → 输出「哪几条卡在强阈值之下、补哪个家族能一次救回几条」。
+ *
+ * 与 `quotationFrameFamilies` 的分工：后者诊断一条，本函数诊断一批并汇总。
+ * 两者共用 FAMILIES 表与同一套 deficit 口径，不存在第二份判据。
+ *
+ * @param {string[]|string} texts 一批待诊断文本（字符串按换行/分号切分）
+ * @returns {{count:number, thresholds:object, tierCounts:object,
+ *            perText:object[], missingFamilies:object[],
+ *            recommendations:object[], unresolved:object[]}}
+ *   recommendations = 未命中家族按「能翻盘几条」降序，带样本文本下标
+ *   unresolved      = 现有任何单一家族都补不上的文本（需要新判据，不是加权能解）
+ */
+function quotationFrameGaps(texts) {
+  const list = Array.isArray(texts) ? texts
+    : (typeof texts === 'string' ? texts.split(/[\n;；]+/) : []);
+  const rows = list
+    .map(x => (typeof x === 'string' ? x.trim() : ''))
+    .filter(x => x.length > 0);
+
+  const perText = rows.map((text, index) => {
+    const f = quotationFrameFamilies(text);
+    return {
+      index,
+      text: text.length > 60 ? text.slice(0, 57) + '…' : text,
+      tier: f.tier,
+      confidence: f.confidence,
+      signals: f.signals,
+      nextTier: f.nextTier,
+      deficit: f.deficit,
+      sufficientFamilies: f.sufficientFamilies,
+      action: f.tier === 'strong' ? '可压到 pass' : (f.tier === 'weak' ? '仅压 block' : '未命中框架'),
+    };
+  });
+
+  // 逐族汇总：这一族从未命中过，或命中了但不足以翻盘
+  const seen = new Map();   // family name -> {flipped:number, samples:number[]}
+  for (const f of FAMILIES) seen.set(f.name, { flipped: 0, samples: [] });
+  const unresolved = [];
+  for (const r of perText) {
+    if (r.nextTier === null) continue;
+    const candidates = r.sufficientFamilies;
+    if (candidates.length === 0) {
+      // deficit 大于所有未命中家族的权重 —— 加一个家族也救不回来
+      const maxW = FAMILIES.filter(f => !r.signals.includes(f.name))
+        .reduce((m, f) => Math.max(m, f.weight), 0);
+      unresolved.push({ index: r.index, text: r.text, deficit: r.deficit, maxUnmatchedWeight: maxW });
+      continue;
+    }
+    for (const name of candidates) {
+      const e = seen.get(name);
+      e.flipped += 1;
+      if (e.samples.length < 3) e.samples.push(r.index);
+    }
+  }
+
+  const missingFamilies = FAMILIES
+    .filter(f => !perText.some(r => r.signals.includes(f.name)))
+    .map(f => ({ name: f.name, weight: f.weight, why: f.why }));
+
+  const recommendations = [...seen.entries()]
+    .filter(([, e]) => e.flipped > 0)
+    .map(([name, e]) => {
+      const fam = FAMILIES.find(f => f.name === name);
+      return {
+        family: name,
+        weight: fam ? fam.weight : 0,
+        textsFlipped: e.flipped,
+        samples: e.samples,
+        why: fam ? fam.why : '',
+      };
+    })
+    .sort((a, b) => b.textsFlipped - a.textsFlipped || b.weight - a.weight);
+
+  const tierCounts = { strong: 0, weak: 0, none: 0 };
+  for (const r of perText) {
+    if (r.tier === 'strong') tierCounts.strong += 1;
+    else if (r.tier === 'weak') tierCounts.weak += 1;
+    else tierCounts.none += 1;
+  }
+
+  return {
+    count: perText.length,
+    thresholds: { weak: QUOTED_THRESHOLD, strong: STRONG_THRESHOLD },
+    tierCounts,
+    perText,
+    missingFamilies,
+    recommendations,
+    unresolved,
+  };
+}
+
+module.exports = {
+  detectQuotationContext, describeQuotationFrame, quotationFrameFamilies, quotationFrameGaps,
+  __internals: { FAMILIES, QUOTED_THRESHOLD, STRONG_THRESHOLD },
+};

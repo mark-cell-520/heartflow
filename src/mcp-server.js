@@ -3060,9 +3060,13 @@ function handleGateCheck(args) {
  * 回答「为什么这次没拦」——否则抑制动作在调用侧就是不可解释的黑箱。
  */
 function handleQuotationFrame(args) {
-  const { text, action } = args || {};
-  if (!text) throw new Error('text 是必填参数');
+  const { text, texts, action } = args || {};
   try {
+    // [v6.8.101 第 746 轮] action: gaps 吃 texts 数组，text 不再是唯一入口。
+    // 守卫必须在 try 内：handleRequest 是 async，try 外的 throw 会变成
+    // 未处理的 Promise 拒绝（tools/call 的兜底 catch 只包第一次调用）
+    if (action === 'gaps' && !text && !texts) throw new Error('text 或 texts 是必填参数（action: gaps 需要 texts）');
+    if (!text && !texts) throw new Error('text 是必填参数');
     const gate = require(HF_DIR + '/src/gate.js');
     // 附带一次真实 gate 判定，让「框架 → 动作」的因果在同一响应里可核对
     const gateVerdict = () => {
@@ -3076,8 +3080,14 @@ function handleQuotationFrame(args) {
       const fam = gate.quotationFrameFamilies(text);
       return { ...fam, gate: gateVerdict(), timestamp: Date.now() };
     }
+    // [v6.8.101 第 746 轮] action: gaps —— 语料级漏识别诊断，
+    // 把「这批里哪几条卡住、补哪个家族能救回几条」变成一次调用
+    if (action === 'gaps') {
+      const gaps = gate.quotationFrameGaps(Array.isArray(texts) ? texts : (texts || text));
+      return { ...gaps, gate: text ? gateVerdict() : null, timestamp: Date.now() };
+    }
     if (action && action !== 'frame') {
-      throw new Error('未知 action: ' + action + '（可选 frame / families）');
+      throw new Error('未知 action: ' + action + '（可选 frame / families / gaps）');
     }
     const frame = gate.quotationFrame(text);
     return {

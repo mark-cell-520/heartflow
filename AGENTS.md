@@ -78,6 +78,7 @@ The three entry points above are wrappers around these, which `main`
 
 | `quotationFrame(text)` | Why a quoted / meta-discussion passage was (or was not) downgraded: `tier` / `confidence` / `signals` / `effect` / `reason`. Use it to explain a missing block instead of guessing |
 | `quotationFrameFamilies(text)` | Per-family breakdown of the same judgement: all 13 families with `matched` / `weight` / `contribution`, plus `nextTier` / `deficit` / `sufficientFamilies` (the unmatched families whose weight alone would reach the next tier). Reach it via `quotationFrame`'s MCP tool with `action: 'families'` |
+| `quotationFrameGaps(texts)` | Corpus-level gap diagnosis of the same table: `count` / `tierCounts` / `perText` (tier, confidence, deficit, sufficientFamilies per row) / `missingFamilies` (families that never fired in the batch) / `recommendations` (unmatched families ranked by how many rows they would flip, with sample indices) / `unresolved` (rows no single family can rescue). Reach it via `quotationFrame`'s MCP tool with `action: 'gaps'` |
 | `delimiterChannel(text)` | Per-run diagnosis of the delimiter-confusion channel: which runs were `accepted` (with `repair`) / `rejected` (with reason), plus the compacted `view` |
 | `postHocLegs(text)` | Per-route, per-leg diagnosis of the post-hoc dimension: which of R1~R4 fired and which leg is `missing` (e.g. R2 `missingAttribution`) |
 
