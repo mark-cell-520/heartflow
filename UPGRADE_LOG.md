@@ -1,3 +1,52 @@
+## r216 — 第 212 判别维度 `texas_sharpshooter`「德州神枪手谬误 / post hoc data dredging」（统计与因果谬误方向轮换）
+
+**轮次**：r216（UPGRADE_LOG 第 714 轮）｜ **上线 commit**：见 git log｜ **日期**：2026-11-05｜ **方向**：按结果筛子集 → 从子集归纳「规律」（先画靶再射箭）
+**真升级类型**：1 — 新判别维度（dimMap 新键 `texas_sharpshooter`，独立命中一个新攻击族）
+**来源**：cron r216 执行体（init 简报方向池 + `scripts/probe-r216.js` 复量 + 单点做透）
+
+**边界划分（与既有维度不重叠）**：`cherry_picking`（第 180 维）挑有利证据服务已有立场；`selection_bias`（第 168 维）取样偏差走统计推断口径；`survivorship_bias`（第 132 维）只让活着的样本说话；`collider_bias`（第 209 维）条件筛选制造子样本伪相关；`hasty_generalization` 小样本泛化不要求「按结果筛选」；`clustering_illusion`（第 171 维）在随机噪声里看规律、不要求筛选腿。本族错在**筛选动作的边界由被解释的结果本身定义，子集内的一致性只是筛选条件的同义反复，却被当成外部证据支撑的普遍规律**。
+
+### 实现内容
+- 新文件 `src/texas-sharpshooter.js`（约 340 行）：`checkTexasSharpshooter(text, inject)` + `__internals()`。
+- **判据（两腿共现 + 邻近窗，缺一不判）**：腿① SELECTION 选择性筛选陈述（挑出来/挑出/专挑/选出/筛选出/圈出/圈定/排除掉 + 只看/只研究/只分析/只统计 + 先看答案再…/先看结果再圈/画了个范围/先射箭 + 成功的案例|活得下来|幸存|赢家|涨得最|中奖的 + 从…里挑；EN pick(ed) the successful / only+look|study|analyze / verb+only / looked at the winners / drew|draw the target / around the arrows / the successful companies / left out）；腿② LAWFICATION 规律化宣称（共同点就是 + 规律|法则|信号|秘诀|公式 + 找出…规律 + 证明/说明…正确 + 都是…功劳/原因 + 皆准|四海 + 必然|肯定会再；EN the/a/that/this…pattern|rule|law|formula|secret + they all share + they all took + this proves + that is what + so it will again）。邻近窗：腿②须在腿①后 40 字 / EN 120 字符内且未被否定。
+- **无邻近窗融合形**：「先…再总结共同点，这就是…」类间隔漂移由三条专属融合规则补（挑出×共同点就是 / survey only×formula / looked at the winners×share）。
+- **六层豁免**（全部常量数组化，负例逐项注入证明承重）：EXEMPT_CONTROL（对照组/控制变量/预先登记/失败案例也纳入）、EXEMPT_RANDOM（随机性/独立事件声明）、EXEMPT_META（概念/教学转述，须框架标记共现——r215 收窄先例）、EXEMPT_CORRECT（正确响应形：以偏概全/挑选方式有问题/不能预测/有偏/避免先射箭）、否定守卫（规律词前窗查对冲）、让步豁免。
+- **接线**：`src/index.js` 七处（require / 计算点调用 / allDims 追加 / 结果对象追加 / dimMap 维度登记 / abilityPrompt 注释 / module.exports 导出）。
+- **测试基建**：`test/round-216-texas-sharpshooter.js`（17 断言）、`scripts/negative-test-r216-texas-sharpshooter.js`（57 条近失样本 + 5 项腿注入）、`scripts/smoke-r216.js`（L1 模块/L2 gate/L3a 本体 think()/L3b 包入口四层）、`scripts/head-vs-now-r216.js`（git worktree 取 HEAD 双版实测）、`scripts/probe-r216.js`（r216 候选族复量探测器，上线后自动 SKIP）。
+
+### 验证（全部实测）
+- `scripts/probe-r216.js`（接线后复测）：texas_sharpshooter **SKIP（已上线）**；其余候选 silence_imputation 60%、chronological_snobbery 3/8、is_ought 0/5、middle_ground 4/10、base_rate_fallacy 0/8、composition_division 0/9——r216 选型依据是接线前同探针 **texas_sharpshooter 9/10 漏判、良性 0/6 误伤、真零命中**（唯一被拦 1 条 probe 已记录由 unsupported_claim 代拦）。
+- `test/round-216-texas-sharpshooter.js` — **17 passed, 0 failed**（10 攻击模块命中+gate 非 pass、12 良性全 pass、4 项豁免逐常量注入承重、18 项词表族断言含反向防过宽、存量 3+3 一字不差、接线三处+导出、非字符串安全）。
+- `scripts/negative-test-r216-texas-sharpshooter.js` — **10 passed, 0 failed**（N1 仅腿① 10 / N2 仅腿② 15 / N3 三层豁免 12 / N4 商务日常近失 14 / N5 存量豁免 6，共 57 条近失零命中 + 5 项腿注入承重）。
+- `scripts/smoke-r216.js` — **9 passed, 0 failed**（L1 模块 16/16+12/12；L2 gate 16/16+12/12；L3a 本体 new HeartFlow+think() 攻击得分>0/良性零得分；L3b 包入口 16/16+12/12）。
+- `scripts/head-vs-now-r216.js` — **6 passed, 0 failed，SAME-ZERO-REGRESSION ✓**（探针原样本 10 条旧版漏 9/10 与 probe 复量记录一致；新版全拦 16/16；存量攻击双版均中 6/6；良性双版均放行 12/12；附加样本中 3 条旧版已由 reward_hacking/unsupported_claim 等既有维度拦截，非回归）。
+- `node bin/verify.js` — **16 passed, 0 failed**。
+- `node scripts/bidirectional-guard.js` — 召回 **52/52**、误拦 **302/326**（与基线完全一致，零新增误伤）。
+- `node test/security-audit.test.js` — 提交前 **15/16**（唯一失败 S2「git log/tag 未命中 6.8.144」是版本未 commit 的时序性问题，commit 后复跑转绿——见下）。
+- `node test/doc-numbers-accuracy.test.js` — **21 passed, 3 failed**。三处失败**全部**是 AGENTS.md：维度总数 211≠212、三文档一致 AGENTS(211)≠README(212)、Verify 列举 168≠169。根因：**AGENTS.md 是受保护 agent-instruction 文件，cron 环境无交互用户/审批通道，patch 写入被 BLOCKED（"requires approval but no interactive user or gateway is present"），按指令未改道重试**。README/SKILL/package.json/VERSION/version.js 五处已全部同步（212/169/6.8.144）。下一轮（或人工）需对 AGENTS.md 施加三处一对一把 edit：① 横幅 211→212；② `Verify-level (168)`→`(169)` 且名单补 `texas_sharpshooter`；③ 三层级合计 `195`→`199`。此三处为纯数字/名单同步，不涉引擎。
+- `node bin/cli.js status` — running（v6.8.144）。
+- 未跑 `node test/run-all.js`（全量回归）——每日记账任务不是提交门禁。
+
+### 顺带修复的历史文档缺口（r215/r213 遗留）
+- README Version history **补记 v6.8.143**（r215 ecological_fallacy 整轮漏记，commit 875e7dad 只落引擎与接线）。
+- README Version history **修正 r213 mediator 行误标**：原写 `6.8.143`，按 commit 051da637「补齐 r213 漏掉的 VERSION 递增（6.8.141→6.8.142）」改为 `v6.8.142`。
+- README「What it catches」族表**补「Causal & statistical reasoning」行**（r208-r215 六轮新维度从未进过族表）。
+- 模块数口径纠错：首轮误将 README/SKILL/package.json 模块数 162→163，doc 测试实测 `_modules`=162（纯函数维度模块不进 registry，与 r209-r213 各行同口径）后回退；changelog 行同步改口径。
+
+### 已知未修项（下一轮候选池）
+1. **AGENTS.md 三处数字同步被环境阻塞**（见上，纯文档，需人工或交互态一轮施加）。
+2. **appeal_to_consequences 存量误伤**（r724 探测器记录，良性句被 dangerous_instruction+reward_hacking 连坐 block）——按连坐纪律该族上线前需先专项修复；本轮复测仍在。
+3. **middle_ground 良性误伤**（r724 池 68% 漏判但 fp≠0）——本轮复测 4/10 漏判、误伤 1/6，按 Phase 0.7b 不输出为候选。
+4. **chronological_snobbery 残余**（本轮复量 3/8 漏判，r730 侦察族）——下一轮可直接做。
+5. **silence_imputation**（decide 0.732、60% 漏判但有 1 例误伤）——需先修误伤再上线。
+6. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续记录。
+7. **未推送 commit**——推送是人工门禁。
+
+### 踩坑（三条）
+1. **`_modules` 注册数不含维度模块**：首轮按「新文件=新模块」把 README/SKILL/package.json 模块数 162→163，doc 测试实测 162 才纠错。判据：维度模块是 index.js 直调的纯函数，历来不进 registry（r209-r213 各行均注明「模块 162 不变」）；模块数以 `Object.keys(hf._modules).length` 实测为准，不按新文件数推断。
+2. **head-vs-now 的样本集划分要与 probe 原样本对齐**：首版把 6 条附加变体混进「探针原样本 10 条」，slice(0,10) 取错导致旧版漏判数 7/10≠9/10 假失败。修法：按索引显式重建 probe 原样本集，附加变体单列（旧版已由既有维度拦截的 3 条附维度名 note，不算回归）。
+3. **验收测试的归因断言不能只查 findings**：攻击句被 reward_hacking 抢 block 时 findings 只显 gate_block 维度，texas 断言假失败。修法：归因判据改「模块 chk(s).hit === true 且 gate action ≠ pass」双腿表述，既不漏真漏判也不被他维拦截误伤。
+
 ## r215 — 第 211 判别维度 `ecological_fallacy`「生态谬误 / 区群谬误 / ecological fallacy」（跨层统计推断方向轮换）
 
 **轮次**：r215｜ **上线 commit**：见 git log｜ **日期**：2026-11-05｜ **方向**：统计推断的层级桥接（群体统计 → 个体属性）
