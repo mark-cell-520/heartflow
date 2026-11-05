@@ -143,6 +143,35 @@ const POLYSEMY_TABLE = {
     ['statistical', 'statistically', 'p-value', 'significance', 'test', 'sample', 'confidence', 'difference', 'variance'],
     ['important', 'importance', 'major', 'huge', 'profound', 'breakthrough', 'worth'],
   ],
+  // ── [r222] agent-4 补强：逻辑有效性 + 统计常态的 Equivocation 两族 ──
+  // 判据同既有条目：① 两义位语义域区分度高且**良性写作中罕见共现**（压误伤）
+  // ② 真实攻击样本验证此前漏判（coordination/agent4/probes/r222-zerohit-probe.js
+  //    实测：有效-zh 两种变体/正常-zh/normal-en 改动前 gate.action=pass 完全漏判）
+  // ③ 良性单一义位只命中单域 → 不误伤。
+  // 关键压 FP 决策：域A 只用**严格逻辑/统计标记**（演绎/保真/形式逻辑/均值…），
+  //   不收"论证/前提/结论/方案"等泛词——否则"有效的论证+有效的方案+因此"这类
+  //   合法双义位共现会被误判。健全/sound 族因"逻辑健全+财务健全"合法共现而被弃。
+  // 逻辑要求 hitA && hitB 跨出现位置合并，故纯单义文本天然放行。中英双语，VERIFY 级。
+  '有效': [
+    // 域A：逻辑有效性（保真/演绎严格标记）
+    ['演绎', '归纳', '保真', '形式逻辑', '三段论', '必然为真', '逻辑有效', '有效推理'],
+    // 域B：日常"有道理/站得住脚/有效果"
+    ['说得过去', '说得通', '站得住脚', '有道理', '顾虑', '诉求', '反对意见', '投诉', '办法', '手段'],
+  ],
+  '正常': [
+    // 域A：统计常态（接近均值/分布）
+    ['统计', '均值', '分布', '标准差', '抽样', '基线', '平均', '正态', '样本'],
+    // 域B：健康/发育/规范性判断
+    ['健康', '身体', '发育', '生病', '就诊', '患病', '体征', '应当', '应该'],
+  ],
+  'valid': [
+    ['deductive', 'inductive', 'truth-preserving', 'syllogism', 'logically valid', 'valid argument', 'logical form', 'necessarily true', 'valid inference'],
+    ['objection', 'concern', 'complaint', 'criticism', 'point', 'grievance', 'defensible', 'makes sense', 'reasonable', 'legitimate', 'warranted'],
+  ],
+  'normal': [
+    ['statistical', 'statistically', 'statistics', 'the mean', 'sample mean', 'on average', 'standard deviation', 'distribution', 'baseline', 'bell curve'],
+    ['healthy', 'health', 'developed', 'illness', 'sick', 'doctor', 'symptom', 'should be', 'ought'],
+  ],
 };
 
 // 推理连接词：前提 → 结论

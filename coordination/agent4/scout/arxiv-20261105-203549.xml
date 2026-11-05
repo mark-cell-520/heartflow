@@ -1,0 +1,370 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/KEWoK2icc3P1iGa7mrOelEXiXSg</id>
+  <title>arXiv Query: search_query=all:equivocation OR all:valid OR all:sound OR all:logical OR all:fallacy OR all:polysemy&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-05T20:35:49Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:equivocation+OR+(all:valid+OR+(all:sound+OR+(all:logical+OR+(all:fallacy+OR+all:polysemy))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>256134</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06914v1</id>
+    <title>A Framework for Context Enrichment and Selective Robustness in LLM Social Agents</title>
+    <updated>2026-11-04T18:58:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.06914v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06914v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Researchers use large language models as agents in social simulations, where agents are prompted with observations and background information intended to shape their actions. Yet LLM agents have been shown to substantially change their behavior under meaning-preserving prompt variations, creating a validation problem for social simulation. One plausible hypothesis is that this brittleness reflects a lack of grounding and can be reduced by enriching the context provided to the agents. Whether richer context improves robustness remains unclear, in part because context richness and robustness are rarely defined in ways that support controlled comparisons. We address the first need with controlled context enrichment, a set of prompt substitution rules that systematically enriches distinct types of context: neutral padding, generic social background, descriptive decision grounding, and normative decision grounding. We address the second by introducing selective robustness as a validation criterion: insensitivity to meaning-preserving prompt variation combined with a directional response to decision-relevant changes in the social world. We demonstrate the framework in a Prisoner's Dilemma-like game, showing how it can be used to identify which forms of context enrichment produce more desirable and robust agent behavior. We find that these forms of enrichment produce distinct behavioral patterns that vary between the two models tested.</summary>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:58:23Z</published>
+    <arxiv:comment>Accepted to the SocialAgent Workshop @ NeurIPS 2026. 12 pages, 1 figure, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.MA"/>
+    <author>
+      <name>Mattia Greiche</name>
+    </author>
+    <author>
+      <name>Reihaneh Rabbany</name>
+    </author>
+    <author>
+      <name>Maximilian Puelma Touzel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06900v1</id>
+    <title>Human Mobility Sensing Using Wall-Reflected Beamformed Millimeter-Wave Communication Signals</title>
+    <updated>2026-11-04T18:49:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.06900v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06900v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Existing millimeter-wave (mmWave) communication beam patterns spatially weight human-scattered signals and shape the received-power signatures induced by human motion. We exploit these beam-shaped signatures for device-free walkingpace and walk-direction classification using a wall-reflected 60.8-GHz link with closely spaced phased arrays and fixed communication beamforming vectors. Human movement alters the interference between wall-reflected and scattered signals, producing power oscillations surrounding a central blockage fade. A beam-dependent interference model provides a physical interpretation of these signatures. Using received-power statistics from a continuous-tone experiment, we extract fade duration for walking-pace classification and pre/post-fade asymmetries for walk-direction classification. Measurements comprise 144 crossings from three participants along perpendicular and diagonal trajectories. Under leave-one-participant-out validation, logistic regression achieves 86.1% binary and 79.2% three-class walking pace accuracy, and 77.1% travel-direction accuracy. The results demonstrate mobility sensing using fixed communication beams without channel estimation, Doppler processing, or dedicated radar hardware</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:49:15Z</published>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Tony DiMichele</name>
+    </author>
+    <author>
+      <name>Raees Matheen Mullah</name>
+    </author>
+    <author>
+      <name>Christian Lopez Garcia</name>
+    </author>
+    <author>
+      <name>Zahra Najafi</name>
+    </author>
+    <author>
+      <name>Mohammed E. Eltayeb</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06879v1</id>
+    <title>Adaptive Multi Mode: Budget-Aware Routing of Optimizers By Online Landscape Probes</title>
+    <updated>2026-11-04T18:35:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.06879v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06879v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The best classical optimizer for a continuous black-box problem depends on its budget and landscape. Existing routers decide from the dimension and budget, past improvement or features fitted to one benchmark, and few test an optimizer's implicit assumptions online. AMM (Adaptive Multi Mode) routes a known budget among quasi-Newton, trust-region, coordinate, multistart and evolution-strategy optimization engines with online probes of curvature, plateaus, separability, kinks, basins and fractal structure. Each probe has a default, a dimension-by-budget validity range and a cost charged to the budget. In its pre-registered development loop on bbob, 32 of 36 predictions held over the last 16 confirmations. AMM was then tested once on held-out bbob instances 101-110 (D=2-40, 10*D-1000*D) against up to seven competitors. It has the highest target share in 382 of 600 function-dimension-budget cells (236 outright, 146 tied) and, by a descriptive posterior rule, is credibly behind in 35, mostly at 10*D and 30*D. At every budget it also leads the controls built from its own engines (the best engine alone, the best engine per dimension and budget, and a greedy schedule), narrowly at 10*D and 30*D, and nevergrad's NgIohTuned. In pre-registered runs its lead over IPOP-CMA-ES holds under affine and box transformations, on box-constrained bbob and, pooled, on rotated f2-f4, but rotating the separable f3 and f4 removes most of the lead there. On held-out MA-BBOB its final share at 2000*D is level with IPOP-CMA-ES's and its anytime area lower. We published AMM as an open-source Python package (pip install amm-optimizer; https://github.com/BjBodner/amm-optimizer).</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:35:35Z</published>
+    <arxiv:comment>29 pages, 8 figures, 19 tables. Code: https://github.com/BjBodner/amm-optimizer</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Benjamin Jacob Bodner</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06858v1</id>
+    <title>CompressionBench: How can your coding agents compress LLMs?</title>
+    <updated>2026-11-04T18:14:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.06858v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06858v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recursive self-improvement requires AI systems to improve the models and infrastructure used by subsequent systems. LLM compression offers a concrete efficiency objective: retain a pretrained model's behavior within a smaller model storage budget. We study whether coding agents can carry out this step autonomously. We formulate compression as a terminal task in which an agent receives a source checkpoint, storage limit, inference environment, and time budget, then constructs compressed weights and executable inference code. The agent controls its algorithm and experiments; perplexity feedback guides search, and independent verification checks the final model. Across six agents and six model--size settings, 29 of 36 submissions pass verification. Selecting the lowest-perplexity agent design per task yields an average 3.4% perplexity increase over BF16 and 77.33% downstream accuracy, compared with 79.56% for BF16. Recorded experiments reveal how agents achieve these outcomes and where improvement breaks down. Agents lower PPL in 21 of 24 revisions at nearly fixed storage; complete-model feedback reverses 17 of 79 prior local rankings; and generation and inference tests expose failures that likelihood alone misses. The results identify representation design, experimental judgment, and capability validation as central to agent-driven model compression, a measurable component of efficiency-oriented self-improvement.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:14:50Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Xinrui Zhong</name>
+    </author>
+    <author>
+      <name>Zhifeng Li</name>
+    </author>
+    <author>
+      <name>Zhiming Wang</name>
+    </author>
+    <author>
+      <name>Yongqi Liu</name>
+    </author>
+    <author>
+      <name>Shanglin Yang</name>
+    </author>
+    <author>
+      <name>Yang Zhou</name>
+    </author>
+    <author>
+      <name>Zikun Li</name>
+    </author>
+    <author>
+      <name>Zhuoming Chen</name>
+    </author>
+    <author>
+      <name>Beidi Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06855v1</id>
+    <title>Regression with Many Generated Controls</title>
+    <updated>2026-11-04T18:10:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.06855v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06855v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider linear regression when some covariates are endogenous, a variable sufficient to control for endogeneity exists but is latent, and the practitioner can generate many proxies for the latent control. For instance, one could cheaply but imperfectly impute the latent control using different AI/ML methods, each generating a different proxy. There are several options the practitioner might consider in this scenario: including all proxies or factors computed from the proxies as controls, instrumental variables estimation, and some nonlinear variants thereof. We use a transparent model to derive the implicit estimand each approach targets, determine when these estimands recover the parameter of interest, and provide some practical recommendations. We show that with a sufficiently rich set of generated controls, practitioners can consistently estimate the parameter of interest without relying on validation data.</summary>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:10:56Z</published>
+    <arxiv:primary_category term="econ.EM"/>
+    <author>
+      <name>Timothy Christensen</name>
+    </author>
+    <author>
+      <name>Daniel Vebman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06853v1</id>
+    <title>Joint Association and Beamforming Design for Cooperative ISAC Systems</title>
+    <updated>2026-11-04T18:09:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.06853v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06853v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cooperation among multiple base stations (BSs) improves both communication and sensing in integrated sensing and communication (ISAC) networks. However, it requires deciding which BSs serve each communication user (CU) and each target, and how each BS beamforms. In this work, we consider joint BS-CU and BS-target association, and beamforming for a general cooperative ISAC system, overcoming prior simplifications such as single-user or target setups, fixed BS roles, coherent radar or separate waveforms. We maximize a joint communication rate and position Cramer-Rao lower bound (CRLB) based tradeoff utility while guaranteeing a minimum service per-CU using a data queue model. We develop a successive convex approximation (SCA)-based beamforming with closed-form updates. The discrete association problem is solved as an overarching layer using a low-complexity algorithm. Numerical results validate the effectiveness of the algorithm and unveil benefits of cooperative communication and sensing.</summary>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:09:42Z</published>
+    <arxiv:comment>6 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="eess.SP"/>
+    <author>
+      <name>Abhishek Rajasekaran</name>
+    </author>
+    <author>
+      <name>Mehdi Karbalayghareh</name>
+    </author>
+    <author>
+      <name>Xiaoyan Ma</name>
+    </author>
+    <author>
+      <name>David J. Love</name>
+    </author>
+    <author>
+      <name>Christopher G. Brinton</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06843v1</id>
+    <title>Thermally Conditioned Time-Series Forecasting of Grain Growth in Polycrystalline Materials</title>
+    <updated>2026-11-04T17:59:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.06843v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06843v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Grain growth during heat treatment strongly affects the microstructure of polycrystalline materials and, consequently, their mechanical properties. Although numerical methods such as front-tracking or front-capturing simulations can accurately describe grain growth, their high computational cost limits their use for long or non-isothermal thermal cycles. In previous work, grain growth was successfully predicted under isothermal conditions by treating grain size distributions as time series and forecasting their evolution using recurrent neural networks, allowing complete grain growth trajectories to be generated in seconds rather than through costly PDE-based simulations. In the present work, this forecasting framework is reformulated to handle non-isothermal conditions by explicitly incorporating thermal information into the model architecture. Grain size distributions are encoded using a convolutional neural network, thermal descriptors are embedded through a dedicated multilayer perceptron, and temporal evolution is predicted using a recurrent network. Instantaneous temperature and thermal rate are provided at each time step, allowing the model to adapt its predictions to changing thermal conditions. The framework is trained and evaluated on datasets generated from validated front-tracking simulations across a wide range of non-isothermal thermal paths. The results show that the thermally conditioned model accurately reproduces grain growth dynamics under complex thermal histories, achieving, in k-fold cross-validation over all simulations, mean relative errors of 2.99% (one-hour cycles) and 4.51% (four-hour cycles) with coefficients of determination exceeding 0.99, and mean relative errors between 1.91% and 14.66% on ten simulations following four unseen thermal histories of increasing complexity.</summary>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:59:26Z</published>
+    <arxiv:primary_category term="cond-mat.mtrl-sci"/>
+    <author>
+      <name>Eliane Younes</name>
+    </author>
+    <author>
+      <name>Elie Hachem</name>
+    </author>
+    <author>
+      <name>Marc Bernacki</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06829v1</id>
+    <title>Enabling AWS Cloud FPGA Development Using High-Level Vitis HLS</title>
+    <updated>2026-11-04T17:44:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.06829v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06829v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present a toolchain for development of ML models on AWS EC2 F2 cloud FPGA infrastructure from high-level language, implementing a complete Vitis HLS to HDK bridge to AFI workflow that has been absent from the academic literature despite eight years of AWS FPGA availability. We introduce a four-level methodology (FP32 PyTorch, bit-accurate quantized Python, HLS C-simulation, physical FPGA) to aid in localizing errors, including FPGA-specific circuit errors. Together these tools allow coding agents to effectively implement FPGA designs from user directions, testing and debugging as needed. We document the deployment workflow, timing closure strategies, and practical HLS engineering decisions that proved crucial. We validate using TinyBERT fine-tuned for address Named Entity Recognition, implementing the embedding layer and the first of four encoder layers on the FPGA hardware. Our implementation streams weights from host DRAM, yielding poor performance compared to CPU/GPU implementations; we discuss forward paths.</summary>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:44:04Z</published>
+    <arxiv:primary_category term="cs.AR"/>
+    <author>
+      <name>David Rostcheck</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06825v1</id>
+    <title>Interscale energy transfer in a propeller-driven homogeneous and isotropic turbulence generation device</title>
+    <updated>2026-11-04T17:33:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.06825v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06825v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate the interscale energy dynamics of nearly homogeneous isotropic turbulence (HIT) generated in a spherically forced, propeller-driven device. From a spatial perspective, by employing the Kármán-Howarth-Monin (KHM) framework, we analyze the scale-by-scale energy transfer without isotropy assumptions. In contrast to other forcing strategies, where regions with inverse and forward cascades often coexist in scale space, we show that spherical forcing produces a purely forward energy cascade across the entire scale space. While the energy distribution remains highly isotropic and orientation-averaged structure functions align with Kolmogorov's two-thirds law, the energy flux exhibits a directional dependence, suggesting a higher sensitivity to residual forcing asymmetries. Regarding the temporal dynamics, the reduced mean flow generated by this device allows us to investigate the temporal variability in conditions where Taylor's frozen turbulence hypothesis does not apply. Our results provide experimental validation of Tennekes' Eulerian frequency spectrum, where intermediate scales evidence an inertial-convective range with statistics determined by the integral velocity scale and the dissipation rate. Finally, we adopt a global approach to investigate whether the main turbulent scales can be linked to external experimental parameters. We propose a framework that captures the propeller frequency dependence of the main turbulent variables obtained in our measurements and those of previously reported HIT chambers. These findings contribute to the understanding of how external forcing influences the complex interscale energy dynamics of turbulent flows from a spatial, temporal, and global perspective.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:33:24Z</published>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Luciano Hergenreder</name>
+    </author>
+    <author>
+      <name>Serge Simoëns</name>
+    </author>
+    <author>
+      <name>Cristián Escauriaza</name>
+    </author>
+    <author>
+      <name>Wernher Brevis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06823v1</id>
+    <title>Optimal Holding Times for Entanglement Swapping</title>
+    <updated>2026-11-04T17:32:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.06823v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06823v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We revisit the optimization of entanglement holding times in memory-based quantum repeaters for maximizing entanglement swapping throughput under different fidelity constraints - strict, probabilistic, and mean. We consider two heterogeneous quantum links that are equipped with single or multiple memories and differ in decoherence rates, memory capacities, entanglement attempt rates and success probabilities, as well as classical communication latencies. Efficient models are developed to estimate the expected entanglement throughput and the probability density functions of the conditional wait time to swap. The models are then used to satisfy different fidelity requirements by optimizing the maximum holding times for the two links. Finally, our proposed model and approach are validated with a discrete-event quantum network simulator.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:32:52Z</published>
+    <arxiv:comment>8 pages, 2 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Van Sy Mai</name>
+    </author>
+    <author>
+      <name>Richard J. La</name>
+    </author>
+    <author>
+      <name>Abdella Battou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06819v1</id>
+    <title>GFlowQEC: Generative Flow Networks that Learn to Sample Quantum LDPC Codes</title>
+    <updated>2026-11-04T17:31:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.06819v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06819v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Choosing a quantum error-correcting code for a real device means scoring candidates with circuit-level simulations so slow that only a few hundred can be run. So every evaluation counts, and a search is judged by how many good codes it finds per paid evaluation. Quantum LDPC codes built from a few group elements protect many logical qubits, but good ones are rare in a huge space. We introduce GFlowQEC, to our knowledge the first generative flow network (GFlowNet) for quantum code design. It builds a code one group element at a time and learns to propose codes in proportion to a power of their score. We train it once on scores from earlier searches, freeze it, and let it propose lifted-product codes with 180 physical qubits, scored by their distances. Ranking ten of its draws per paid call, it finds more than twice as many new top-scoring codes (inequivalent to any it was trained on) as tuned parallel tempering, even when tempering starts from GFlowQEC's training codes. It finds more than three and a half times as many as a supervised screen ranking ten random candidates per call. When both rank a hundred, the screen beats GFlowQEC, and does best ranking GFlowQEC's draws. Soft Q-learning, which shares the GFlowNet's optimal policy, does as well at one noise bias and better at the other, so the gain does not depend on the GFlowNet's training loss. Trained proposers can make a budget of expensive evaluations go further when good codes are rare.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:31:57Z</published>
+    <arxiv:comment>16 pages, 1 figure, 2 tables and 42 references</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Nuno Batista</name>
+    </author>
+    <author>
+      <name>Gabriel Falcao</name>
+    </author>
+    <author>
+      <name>Penousal Machado</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06809v1</id>
+    <title>Finite-temperature transition-window weights on a fault-tolerant quantum computer: duplex filtering on a thermal purification</title>
+    <updated>2026-11-04T17:24:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.06809v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06809v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The excite-filter-readout framework of Kharazi et al. computes zero-temperature response windows on a fault-tolerant quantum computer from a pure ground state. We extend it to Gibbs states, where the two objects decouple: filters act on absolute energies, a thermal response on transition frequencies. The extension rests on a Liouville-space/TFD identity, explicit in the block-encoding/QSP setting: the thermally weighted transition-window weight is a spectral projection of H_0 (x) I - I (x) H_0^T onto the Schmidt (thermofield-double) purification, instance of Rall's framework. Around it we assemble a routed-SELECT block encoding (one Hamiltonian query per filter query), a conjugate-pair readout, and a four-route (duplex, bin, Fourier-LCU, METTS) compatibility analysis. The cost is multiplicative and conditional: a per-window query bound M_"AE" * (2*sqrt(d/Z_"lb")*d_"vt" + 4*d_W), with a tight signal-adaptive count, the optimal sqrt(alpha beta) degree, and a window-edge term. The preparation factor sqrt(d/Z) grows exponentially with system size at fixed temperature in positive-entropy-density systems (2.08 -&gt; 25.7, N = 8 to 14 at beta = 2), relieved only as beta -&gt; 0. Zero temperature is recovered for beta G &gt;= ln(2(d-1)||D||^2/epsilon). Identities are cross-checked between independent formula paths to 10^(-16)-10^(-12) and the readout assembly is validated at matrix level under a block-encoding promise.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:24:08Z</published>
+    <arxiv:comment>41 pages,15 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Yujin Tang</name>
+    </author>
+    <author>
+      <name>Yunlong Liu</name>
+    </author>
+    <author>
+      <name>Miao Xu</name>
+    </author>
+    <author>
+      <name>Qing-Xing Xie</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06807v1</id>
+    <title>CMS ECAL Phase-2 upgrade: characterisation and stability analysis of a three-stage low-voltage power-conversion system</title>
+    <updated>2026-11-04T17:23:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.06807v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06807v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As part of the High-Luminosity upgrade of the Large Hadron Collider, the front-end electronics of the Compact Muon Solenoid electromagnetic calorimeter barrel are being replaced. A three-stage low-voltage power-conversion system supplies the upgraded electronics. As the cascade dynamics require characterisation to ensure stable operation, interactions between the three converter stages are assessed at their two interfaces using the Nyquist criterion. A validated shunt-injection setup using a Bode 100 frequency-response analyser provides in-situ impedance measurements under load to assess the accuracy of the averaged converter models. Results show that both interfaces are stable over the evaluated configurations, with modelled minimum distances to the critical point of 0.76 and 0.79, respectively. A turn-on study identifies capacitor charging at Stage 3 as the main cause of inrush currents triggering Stage 2 overcurrent protection. Two Stage 3 board variants stagger converter enables within and between boards, keeping the measured two-tower current below 5 A, within the 8.0 A protection threshold.</summary>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:23:36Z</published>
+    <arxiv:comment>7 pages, 6 figures. Proceedings of the Topical Workshop on Electronics for Particle Physics (TWEPP 2026), 28 September - 2 October 2026, Castelldefels, Spain. Submitted to JINST</arxiv:comment>
+    <arxiv:primary_category term="physics.ins-det"/>
+    <author>
+      <name>Liv Anke Richter</name>
+    </author>
+    <author>
+      <name>Günther Dissertori</name>
+    </author>
+    <author>
+      <name>Werner Lustermann</name>
+    </author>
+    <author>
+      <name>Krzysztof Stachon</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06806v1</id>
+    <title>Measuring Risk, Not Harm: Detecting Psychological Harm Risk Factors in LLM Conversations</title>
+    <updated>2026-11-04T17:22:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.06806v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06806v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Psychological harms from interactions with large language models cannot be monitored directly because they may emerge over repeated interactions and depend strongly on subjective individual user context. We propose measuring risk, not harm: detecting observable AI behaviors that constitute risk factors for psychological harm at the AI response level and aggregating these signals to support longitudinal monitoring. We operationalize eight such behaviors and construct a synthetic multi-label corpus of 47,062 AI responses and 373,873 response-factor labels, with targeted human annotations for validation and evaluation. We then compare trained embedding-based classifiers, direct LLM judging, and a classifier--judge cascade. All detectors are model-agnostic and operate only on LLM outputs, requiring no access to internal model states. We apply these detectors to several out-of-distribution human-AI conversation data sets from prior research. On held-out human-labeled data, the best cascade achieves macro precision of 0.86, recall of 0.76, and F1 of 0.79. On WildChat, it reduces LLM-judge calls by 97.1\% relative to direct judging. On DelusionEval, risk-factor detections cluster within conversations. Together, our results show that response-level behavioral risk-factor detection can provide a scalable measurement layer for longitudinal psychological-safety monitoring without conflating observable AI behavior with latent user harm.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:22:23Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Nil-Jana Akpinar</name>
+    </author>
+    <author>
+      <name>Eugenia Kim</name>
+    </author>
+    <author>
+      <name>Natalie Isak</name>
+    </author>
+    <author>
+      <name>Amanda Minnich</name>
+    </author>
+    <author>
+      <name>Victoria Westerhoff</name>
+    </author>
+    <author>
+      <name>Matthew Dressman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06804v1</id>
+    <title>Monadically Dependent Graph Classes Have Almost Bounded Merge-Width</title>
+    <updated>2026-11-04T17:20:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.06804v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06804v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A graph class $\mathcal{C}$ is monadically dependent if one cannot interpret all graphs in vertex-colored graphs from $\mathcal{C}$ using a fixed formula of first-order logic. We prove that every monadically dependent graph class has almost bounded merge-width, thereby confirming a conjecture of the first and the last author [STOC '25]. Our proof is algorithmic and the witnessing decompositions in the form of merge sequences can be computed in nearly-cubic time. This is a step towards the proof of fixed-parameter tractability of model checking first-order logic on monadically dependent graph classes, which is achieved in a companion paper.</summary>
+    <category term="cs.DM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:20:29Z</published>
+    <arxiv:primary_category term="cs.DM"/>
+    <author>
+      <name>Jan Dreier</name>
+    </author>
+    <author>
+      <name>Nikolas Mählmann</name>
+    </author>
+    <author>
+      <name>Michał Pilipczuk</name>
+    </author>
+    <author>
+      <name>Szymon Toruńczyk</name>
+    </author>
+  </entry>
+</feed>
