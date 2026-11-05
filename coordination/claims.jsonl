@@ -6,3 +6,4 @@
 {"round":"r218","agent":"agent-4","kind":"dimension","claim_at":"2026-11-05T13:55:00Z","status":"completed","note":"zero_sum_fallacy 第212维度模块+测试+接线规格已起草(4ea438b+报告commit)，8处src/index.js接线待1号；VERSION未bump(能力未激活)"}
 {"round":"r219","agent":"agent-4","kind":"dimension","direction":"经济与资源推理：预算约束≠价值判断（budget-as-merit conflation）第213维度模块起草+测试+接线规格交1号","claim_at":"2026-11-05T15:02:33Z","expires_hours":6,"status":"active"}
 {"round":"r219","agent":"agent-4","kind":"dimension","claim_at":"2026-11-05T16:20:00Z","status":"completed","note":"budget_value_conflation 第213维度模块+测试+探针+scout空返证据已起草(b3686fa)，8处src/index.js接线待1号；VERSION未bump(能力未激活)；全量套件18790通过/89失败(预存类)，本文件0失败"}
+{"round":"r220","agent":"agent-4","kind":"dimension","direction":"经济与资源推理：平均成本≠边际成本（average-marginal cost conflation）第214维度模块起草+测试+接线规格交1号；前置零命中探针+海外扫描","claim_at":"2026-11-05T17:24:35Z","expires_hours":6,"status":"active"}
