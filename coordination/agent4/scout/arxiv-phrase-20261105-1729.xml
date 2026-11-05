@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/eNMWr0GZUQTK3ybmUft8BFLCzoc</id>
+  <title>arXiv Query: search_query=all:"marginal cost" AND all:fallacy&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-05T17:28:29Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22marginal+cost%22+AND+all:fallacy&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2607.06093v1</id>
+    <title>Hybrid electrolyzer systems: Smart strategy or economic fallacy?</title>
+    <updated>2026-07-07T10:09:25Z</updated>
+    <link href="https://arxiv.org/abs/2607.06093v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.06093v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Hybrid electrolyzer systems combining alkaline water electrolysis and proton exchange membrane water electrolysis have been investigated in the literature motivated by the expectation that their contrary techno-economic characteristics compensate for the individual technical and economic restrictions of each technology, thereby improving the profitability of green hydrogen production. To reassess the economic potential of hybrid electrolyzer systems beyond these technology-specific assumptions, we independently vary two key characteristics, electrolyzer efficiency and investment cost, in a large-scale sensitivity analysis. For each generated parameter configuration, we performed a techno-economic optimization of a green hydrogen supply chain, including two electrolyzers. The resulting system design, cost objective, and dispatch behavior are subsequently analyzed. Consequently, hybrid electrolyzer systems are identified as optimal if they provide a cost benefit over single electrolyzer systems. The analysis reveals that hybrid electrolyzer systems represent the optimal solution in at most 5.0% of the investigated cases. Furthermore, the maximum cost benefit is 0.057 EUR/kgH2, which corresponds to only about 1% of the total green hydrogen production cost. Additional analyses considering variations in energy purchase prices, storage fees, availability of renewable energy, and baseline electrolyzer efficiency yield negligible changes to these results. Hence, considering that hybrid electrolyzer systems offer marginal cost benefits and prove economically optimal in very few cases, they seem more likely to represent an economic fallacy than a smart strategy.</summary>
+    <category term="cs.CE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-07T10:09:25Z</published>
+    <arxiv:primary_category term="cs.CE"/>
+    <author>
+      <name>Marie Arnold</name>
+    </author>
+    <author>
+      <name>Jonathan Brandt</name>
+    </author>
+    <author>
+      <name>Geert Tjarks</name>
+    </author>
+    <author>
+      <name>Richard Hanke-Rauschenbach</name>
+    </author>
+  </entry>
+</feed>

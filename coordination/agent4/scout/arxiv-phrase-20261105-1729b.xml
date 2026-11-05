@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/yqvDEIjbhXFiiYwPEIz8QkTl6fg</id>
+  <title>arXiv Query: search_query=all:"marginal reasoning"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-05T17:28:33Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22marginal+reasoning%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>2</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2605.21130v1</id>
+    <title>VersusQ: Pairwise Margin Reasoning for Generalizable Video Quality Assessment</title>
+    <updated>2026-05-20T13:03:17Z</updated>
+    <link href="https://arxiv.org/abs/2605.21130v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.21130v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large Multimodal Models (LMMs) have shown promise for video quality assessment, but most methods still predict an absolute score for each video. Such pointwise supervision often mixes perceptual quality with dataset-specific calibration, including annotation protocols, rating habits, and score distributions. As a result, the learned scoring rule may work well within a benchmark but transfer poorly across unseen domains. We argue that relative comparisons alleviate the absolute-scale calibration bias by focusing purely on perceptual differences rather than dataset-specific rating habits. Consequently, we propose \textbf{VersusQ}, a pairwise margin reasoning framework driven entirely by direct comparisons. Specifically, VersusQ performs LMM-based comparison between two videos, reasons about their visual and temporal quality differences, and predicts a signed continuous margin that captures both the preferred choice and the degree of difference. Furthermore, to align interpretable comparison rationales with fine-grained numerical differences, we introduce Margin-Coupled GRPO, which jointly optimizes rollout-based relational reasoning and continuous margin regression. Extensive experiments on multiple public VQA benchmarks demonstrate that VersusQ achieves state-of-the-art performance, strong cross-domain generalization, and reliable fine-grained ranking under heterogeneous evaluation scenarios.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-20T13:03:17Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Shibei Meng</name>
+    </author>
+    <author>
+      <name>Binxin Yang</name>
+    </author>
+    <author>
+      <name>Yuan Liu</name>
+    </author>
+    <author>
+      <name>Jiexuan Zhang</name>
+    </author>
+    <author>
+      <name>Zhengyao Lv</name>
+    </author>
+    <author>
+      <name>Hubery Yin</name>
+    </author>
+    <author>
+      <name>Qiang Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.26235v1</id>
+    <title>The Reasoning Tax: Token Economics of LLM Reasoning Across Task Types and Deployment Contexts</title>
+    <updated>2026-08-26T17:44:50Z</updated>
+    <link href="https://arxiv.org/abs/2608.26235v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.26235v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Accuracy-only benchmarking of reasoning-capable large language models misses a central deployment question: when do extended thinking tokens earn their cost? We introduce the Token Economy Score (TES), a marginal benchmarking metric that measures the accuracy gain of a reasoning model over a non-reasoning baseline, normalized by the generated-token multiplier. We define paired and approximated TES variants for model families with reasoning toggles and frontier models without direct non-reasoning counterparts. We then conduct an empirical benchmarking analysis across 151 model-benchmark evaluation runs on seven benchmarks spanning mathematics, code generation, science reasoning, instruction following, expert knowledge, knowledge recall, and research-level physics. The analysis examines three deployment-facing dimensions: which task structures yield positive marginal reasoning efficiency, how increasing reasoning effort changes TES within model families, and how deployment context changes economic viability. Results show that task structure predicts reasoning efficiency better than nominal difficulty: sequential inferencechain tasks such as AIME 2025 and LiveCodeBench show high TES, while knowledge-recall tasks such as MMLU-Pro show low TES despite their difficulty. We also find systematic diminishing returns at higher reasoning effort levels, including cases where additional thinking reduces accuracy. Finally, Reasoning Cost Share (RCS) shows that inference spend is often dominated by internal thinking, while Deployment Cost Multiplier (DCM) shows how on-premises deployment can change the economics of otherwise costly reasoning workloads. These findings support a benchmarking-driven model-selection rule: enable reasoning selectively by task type, effort level, and deployment context rather than treating it as a universally beneficial mode.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.PF" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-26T17:44:50Z</published>
+    <arxiv:comment>15 pages, 8 figures and tables, accepted at the 2026 TPCTC Conference and will be published at Performance Evaluation and Benchmarking (Springer)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Sachin Gopal Wani</name>
+    </author>
+    <author>
+      <name>Ajay Dholakia</name>
+    </author>
+    <author>
+      <name>David Ellison</name>
+    </author>
+  </entry>
+</feed>

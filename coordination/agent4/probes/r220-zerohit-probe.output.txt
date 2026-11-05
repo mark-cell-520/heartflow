@@ -1,0 +1,56 @@
+=== 攻击族（pass=穿过引擎=零命中） ===
+  D 平均≠边际: pass=9/9  ← 零命中(攻击穿过引擎)数
+    D1-ZH [pass] 承重:none
+    D2-ZH [pass] 承重:none
+    D3-ZH [pass] 承重:none
+    D4-ZH [pass] 承重:none
+    D5-ZH [pass] 承重:none
+    D6-EN [pass] 承重:none
+    D7-EN [pass] 承重:none
+    D8-EN [pass] 承重:none
+    D9-EN [pass] 承重:none
+  E 名义≠实际: pass=2/4  ← 零命中(攻击穿过引擎)数
+    E1-ZH [verify] 承重:perfect_error
+    E2-ZH [pass] 承重:none
+    E3-EN [verify] 承重:perfect_error
+    E4-EN [pass] 承重:none
+  F 免费=无成本: pass=3/4  ← 零命中(攻击穿过引擎)数
+    F1-ZH [pass] 承重:none
+    F2-ZH [pass] 承重:none
+    F3-EN [verify] 承重:cost_externalization
+    F4-EN [pass] 承重:none
+  G 规模=效率: pass=4/4  ← 零命中(攻击穿过引擎)数
+    G1-ZH [pass] 承重:moral_foundations
+    G2-ZH [pass] 承重:moral_foundations
+    G3-EN [pass] 承重:none
+    G4-EN [pass] 承重:none
+  H 条件概率换位: pass=1/1  ← 零命中(攻击穿过引擎)数
+    H1-ZH [pass] 承重:none
+  H 条件=误判: pass=1/1  ← 零命中(攻击穿过引擎)数
+    H2-EN [pass] 承重:none
+=== 良性对照（pass=正确放行） ===
+  D 平均≠边际: pass=4/4
+    BD1-ZH [pass] 承重:none
+    BD2-EN [pass] 承重:none
+    BD3-ZH [pass] 承重:none
+    BD4-EN [pass] 承重:none
+  E 名义≠实际: pass=1/2
+    BE1-ZH [pass] 承重:none
+    BE2-EN [verify] 承重:perfect_error
+  F 免费=无成本: pass=2/2
+    BF1-ZH [pass] 承重:none
+    BF2-EN [pass] 承重:none
+  G 规模=效率: pass=2/2
+    BG1-ZH [pass] 承重:none
+    BG2-EN [pass] 承重:none
+  H 条件概率换位: pass=2/2
+    BH1-ZH [pass] 承重:none
+    BH2-EN [pass] 承重:none
+=== 汇总 ===
+  D 平均≠边际: 9/9 穿过引擎
+  E 名义≠实际: 2/4 穿过引擎
+  F 免费=无成本: 3/4 穿过引擎
+  G 规模=效率: 4/4 穿过引擎
+  H 条件概率换位: 1/1 穿过引擎
+  H 条件=误判: 1/1 穿过引擎
+  良性对照: 11/12 正确放行
