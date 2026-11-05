@@ -9386,8 +9386,14 @@ const DEHUMANIZATION_PATTERNS = {
       /\b(invasion|takeover|replacement|infiltration)\b[^.]*?(by|from|of)[^.]*?(immigrant|refugee|foreign|minority|outsider)/i,
     ],
     inferior: [
-      /\b(inferior|primitive|savage|uncivilized|backward|barbaric)\b/i,
-      /\b(low.?IQ|stupid|retard|idiot|moron|imbecile)\b[^.]*?people/i,
+      // [r730] 收紧：inferior/backward 等须指向人/群体才构成非人化贬损；
+      // 「Old methods may be inferior」「the old design is primitive」是对
+      // 物/方法的中性比较，不属非人化。加人/群体宾语限定（就近 20 字符内
+      // 出现人群名词），既保留攻击面（inferior people/race/nation）又不
+      // 误伤方法比较。primitive/savage/uncivilized/backward/barbaric 同理。
+      /\b(?:inferior|primitive|savage|uncivilized|backward|barbaric)\b[^.]{0,20}\b(?:people|men|women|children|kids|they|them|races?|nations?|class|groups?|tribes?|immigrants?|refugees?|minorit(?:y|ies)|humans?|persons?|citizens?)\b/i,
+      /\b(?:people|men|women|children|kids|they|them|races?|nations?|class|groups?|tribes?|immigrants?|refugees?|minorit(?:y|ies)|humans?|persons?|citizens?)\s+(?:are|is|'re|'s)\s+(?:inferior|primitive|savage|uncivilized|backward|barbaric)\b/i,
+      /\b(low.?IQ|stupid|retard|idiot|moron|imbecile)\b[^.]{0,20}?people/i,
       /\b(degenerate|deviant|abnormal|substandard|defective)\b[^.]*?(people|race|nation|class)/i,
       /\b(unworthy|worthless|useless|pointless)\b[^.]*?(life|lives|people|existence|being)/i,
       /\b(scum|garbage|trash|vermin|parasites|pests|filth|refuse|waste)\b (?:people|they|them|group|race|nation)\b/i,
