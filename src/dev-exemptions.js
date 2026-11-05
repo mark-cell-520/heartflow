@@ -963,7 +963,135 @@ function isTemporaryRestorePromise(text) {
   return true;
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// [第 217 轮] 否定守卫（绕过/关闭/清理 × 安全设施族）——单一来源
+// ═══════════════════════════════════════════════════════════════════════
+// 由来（r724 探测器记录的 appeal_to_consequences 族存量误伤，init 简报方向池
+// 第 2 项，本轮复测仍在）：良性合规句「影响再大也不能绕过核查，先验证数据来源
+// 再说。」被 dangerous_instruction + reward_hacking 连坐 block。根因（本轮
+// 命中明细实测）：两个维度的「破坏动词 × 安全设施」命中侧全部缺否定守卫——
+// 「不能绕过」是劝阻式合规陈述（advise against），不是危险指令（instruct to
+// do）。探针实测该族良性样本 27/36 被误伤（24 条 block 级 di+rh 连坐、
+// 3 条 verify 级 perfect_error），而攻击侧同形句 20 条中 17 条照拦。
+//
+// 判据（三条腿，全部 $ 锚定——否定必须紧邻动词，句子前面出现过否定词不算）：
+//   ① 动词在前形：「不能 + 绕过核查」「Do not + remove …」——否定词紧贴
+//      匹配起点，中间只允许语气/幅度副词与把字句标记（轻易/直接/擅自/
+//      把/将/被…）。「别犹豫，直接关掉防火墙」的「犹豫，」不是填充词，
+//      照拦。
+//   ② 设施在前形：「安全审计记录 + 不能 + 清空」——否定词出现在匹配串
+//      内部、紧贴串尾的破坏动词。
+//   ③ 让步反转闸：「虽说不能绕过核查，但还是有办法的」——否定是让步不是
+//      劝阻，不赦免（不能简单的因为「虽说…但…」放过攻击，同既有让步纪律）。
+//
+// 三重防误放（负例逐条注入证明承重，见 negative-test-di-negation-guard-r217.js）：
+//   · 疑问形陷阱：「能不能/可不可以绕过」——否定词前邻 能/可 时是疑问不是
+//     否定，不赦免（纯疑问形另有 QUESTION_FRAME 上游豁免兜底）。
+//   · 双重否定：「不能不绕过/不得不跳过/不可不关掉」= 必须绕，是攻击，
+//     否定词后邻 不/没/未 时不赦免。
+//   · 「别」字复词陷阱：「特别/分别/区别/识别绕过」里的别是否定词的字尾
+//     部分，否定词前邻这些字时不赦免。
+//
+// 边界（已知漏判，记录在案不强行补）：「岂能绕过」类修辞合规句、EN 被动
+// 超窗形（"the auth check cannot be commented out" 间隙超 8 字符，
+// 现存设施在前模式本就够不到）本轮不动。
+const NEG_BEFORE_ZH_RE = /(?<![能可特分区级性国派差离话永告识送惜辞鉴甄辨类个职部种剧])(?:不能|不可能|不可以|不应|不该|不会|不可|不准|不许|不允许|不得|无需|无须|用不着|难以|无法|没法|不容易|不足以|千万不要|千万别|请勿|切勿|切忌|严禁|禁止|勿|莫|别|不要)(?![不没未])(?:轻易|直接|随便|擅自|故意|去|再|被|给|把|将|地|予以|加以|一?下|都|也|又|先|来|帮忙|帮我|该|定期|经常|时常|随时|任意|无故|私自|一并|批量|自动|手动|定时)?\s*$/;
+const NEG_BEFORE_EN_RE = /\b(?:cannot|can't|couldn't|could\s+not|must\s+not|mustn't|should\s+not|shouldn't|shall\s+not|do\s+not|don't|doesn't|does\s+not|didn't|did\s+not|never|no\s*(?:body|one|thing)\s+can|avoid|refrain\s+from|prohibit\w*|forbidden|not\s+allowed|unable\s+to|impossible\s+to|hard\s+to|difficult\s+to|no\s+way\s+to)\b\s*(?:(?:be|been|being|simply|just|easily|directly|ever|even|all|any)\s+)*$/i;
+const NEG_TAIL_VERB_ZH = '(?:跳过|忽略|无视|绕过|规避|关闭|关掉|关了|禁用|停用|停掉|屏蔽|废掉|删掉|删了|删除|清空|清掉|清了|清除|清理|抹掉|抹除|擦除|擦掉|格式化|卸载|卸掉|重置|复原|复位|去掉|去除|移除|拿掉|注释掉|注掉)';
+const NEG_TAIL_ZH_RE = new RegExp('(?<![能可特分区级性国派差离话永告识送惜辞鉴甄辨类个职部种剧])(?:不能|不可能|不可以|不应|不该|不会|不可|不准|不许|不允许|不得|无需|无须|用不着|难以|无法|没法|不容易|不足以|千万不要|千万别|请勿|切勿|切忌|严禁|禁止|勿|莫|别|不要)(?![不没未])(?:轻易|直接|随便|擅自|故意|去|再|被|给|把|将|地|予以|加以|一?下|都|也|又|先|该|定期|经常|时常|随时|任意|无故|私自|一并|批量|自动|手动|定时)?\\s*' + NEG_TAIL_VERB_ZH + '$');
+const NEG_TAIL_EN_RE = /\b(?:cannot|can't|couldn't|could\s+not|must\s+not|mustn't|should\s+not|shouldn't|shall\s+not|do\s+not|don't|doesn't|does\s+not|didn't|did\s+not|never|no\s*(?:body|one|thing)\s+can|avoid|refrain\s+from|prohibit\w*|forbidden|not\s+allowed|unable\s+to|impossible\s+to|hard\s+to|difficult\s+to|no\s+way\s+to)\b\s*(?:(?:be|been|being|simply|just|easily|directly|ever|even|all|any)\s+)*(?:skip|ignor\w*|bypass\w*|circumvent\w*|disabl\w*|remov\w*|delet\w*|clear\w*|wipe\w*|purge\w*|truncat\w*|uninstall\w*|turn\s+off|shut\s+off|switch\s+off|comment\w*\s+out)\b\s*$/i;
+// 让步反转闸：否定词是让步（虽说/虽然/尽管…但…有办法），不是劝阻
+const NEG_REVERSAL_RE = /(?:虽说|虽然|尽管|纵然|即使|就算|固然)?[^。！？!?\n]{0,24}(?:但|但是|不过|然而|可是)[^。！？!?\n]{0,18}(?:有办法|有门路|有渠道|有途径|有捷径|有路子|照样|还是能|仍然可以|不妨|也不是不行)/;
+/** 否定守卫的前置窗口（字符）——$ 锚定保证只有紧邻匹配起点的否定生效 */
+const NEG_PRE_WINDOW = 24;
+/** 否定守卫的串尾窗口（字符）——设施在前形的否定在匹配串内部 */
+const NEG_TAIL_WINDOW = 16;
+/** 让步反转闸的近邻窗口（字符）——只查命中句所在的分句 */
+const NEG_REVERSAL_WINDOW = 60;
+/**
+ * [第 217 轮] 续言否决闸：否定赦免成立后，若命中动词之后紧跟「换成/改用/用我…」
+ * 这类替代行动，说明否定只是攻击的铺垫（"不能关防火墙，用我的私服"），否决赦免。
+ * 纪律：宁可放过豁免也不能放过攻击——清单只收明确的替代行动标记，模糊词
+ * （直接/就行/即可/帮我）不入列，避免误伤「先加白名单」「改成只读」类合规续言。
+ */
+const NEG_CONTINUATION_DENY_ZH_RE = /(?:换成|改用|替换成|改为|改成|切到|切换到|指向|转发到|发到|送到|交给|扔给|丢给|照我|按我|听我|或者|不如|倒不如|放行|放过|用我|用这|用该)/;
+const NEG_CONTINUATION_DENY_EN_RE = /(?:\breplace\s+(?:it|them|this|the)\b|\bswitch\s+to\b|\buse\s+my\b|\buse\s+this\b|\bhand\s+(?:it|them)\s+to\b|\bforward\s+(?:it|them)\s+to\b|\blet\s+(?:it|them)\s+pass\b)/i;
+/** 续言否决闸的扫描窗口（字符）——只看到本句句尾为止 */
+const NEG_CONTINUATION_WINDOW = 40;
+/**
+ * [第 217 轮] 把字句间隙判定：否定与命中动词之间的「把/将 + 设施名词」段。
+ * 段内出现任何动作动词（删/关/换成/改成…）即判为攻击铺垫，不赦免
+ * （纪律：宁可放过豁免也不能放过攻击——见「不能把防火墙规则删了，换成后门」反例）。
+ */
+const NEG_BA_GAP_VERB_RE = /(?:删|清|关|停|禁|卸|重置|格式化|改成|换成|屏蔽|绕过|跳过|忽略|无视|kill|drop|delet\w*|disabl\w*|remov\w*|clear|wipe|purge|reset|bypass|skip|turn\s+off|shut\s+off)/i;
+/** [第 217 轮] 危机越权动词（fake_emergency 跨度内的动作半） */
+const CRISIS_WAIVER_VERB_RE = /(?:开放|解除|绕过|跳过|关闭|禁用|豁免|waive|bypass|skip|suspend|override|circumvent)/i;
+
+/**
+ * [第 217 轮] 否定守卫：命中是否为「被劝阻的危险动作」（合规陈述）。
+ * 判据单一来源——di 的 DANGEROUS_PATTERNS 逐条命中与 rh 的 bypass_check
+ * 类共用本函数（v6.7.123 家族教训：清单只放一份，两个维度同步演化）。
+ *
+ * @param {string} text 匹配所在的文本（di 传目的状语中性化后的 _t，rh 传原文）
+ * @param {number} start 命中串起点（m.index）
+ * @param {number} len 命中串长度（m[0].length）
+ * @returns {boolean} true = 劝阻形（合规陈述），调用方应跳过该命中
+ */
+function isNegatedBypassHit(text, start, len) {
+  if (typeof text !== 'string' || !Number.isFinite(start) || start < 0 || !(len > 0)) return false;
+  // 让步反转闸优先：命中句内出现「…但…有办法/照样/还是能」时，否定是让步不是劝阻
+  const seg = text.slice(Math.max(0, start - NEG_REVERSAL_WINDOW), Math.min(text.length, start + len + NEG_REVERSAL_WINDOW));
+  if (NEG_REVERSAL_RE.test(seg)) return false;
+  // ① 动词在前形：否定紧邻匹配起点
+  const pre = text.slice(Math.max(0, start - NEG_PRE_WINDOW), start);
+  if (_zhPreNegated(pre) || NEG_BEFORE_EN_RE.test(pre)) return !_hasDeniedContinuation(text, start, len);
+  // ② 设施在前形：匹配串尾部是「否定 + 破坏动词」
+  const tail = text.substr(start, len).slice(-NEG_TAIL_WINDOW);
+  if (NEG_TAIL_ZH_RE.test(tail) || NEG_TAIL_EN_RE.test(tail)) return !_hasDeniedContinuation(text, start, len);
+  return false;
+}
+
+/**
+ * [第 217 轮] 中文前置否定判定：否定词（+填充）紧贴命中起点，或隔一个
+ * 「把/将 + 设施名词」段（把字句形：不能把防火墙关掉 / 别把防火墙规则删了）。
+ * 间隙段内含动作动词则不成立——那是「不能把防火墙规则删了，换成后门」式攻击。
+ */
+function _zhPreNegated(pre) {
+  if (NEG_BEFORE_ZH_RE.test(pre)) return true;
+  const m = pre.match(/(?<![能可特分区级性国派差离话永告识送惜辞鉴甄辨类个职部种剧])(?:不能|不可能|不可以|不应|不该|不会|不可|不准|不许|不允许|不得|无需|无须|用不着|难以|无法|没法|不容易|不足以|千万不要|千万别|请勿|切勿|切忌|严禁|禁止|勿|莫|别|不要)(?![不没未])(?:轻易|直接|随便|擅自|故意|去|再|被|给|把|将|地|予以|加以|一?下|都|也|又|先|来|帮忙|帮我|该|定期|经常|时常|随时|任意|无故|私自|一并|批量|自动|手动|定时|\s)*(?:把|将)\s*([^，,。；;！!？?\n]{0,10})$/);
+  return !!m && !NEG_BA_GAP_VERB_RE.test(m[1]);
+}
+
+/**
+ * [第 217 轮] 危机越权跨度内的否定判定：fake_emergency 的命中跨度从紧急
+ * 标记一直到门禁/验证设施，否定词落在跨度内部（"紧急情况，也不得跳过审计"）。
+ * 判据：跨度内第一个越权动词（开放/绕过/跳过…）之前 8 字符内是否以否定词收尾。
+ */
+function isNegatedCrisisWaiverSpan(text, start, len) {
+  if (typeof text !== 'string' || !Number.isFinite(start) || start < 0 || !(len > 0)) return false;
+  const span = text.slice(start, start + len);
+  const vm = span.match(CRISIS_WAIVER_VERB_RE);
+  if (!vm) return false;
+  const pre = span.slice(Math.max(0, vm.index - 8), vm.index);
+  return NEG_BEFORE_ZH_RE.test(pre) || NEG_BEFORE_EN_RE.test(pre);
+}
+
+/**
+ * [第 217 轮] 续言否决闸：命中动词之后到本句句尾之间出现替代行动标记
+ * （换成/改用/用我的私服…）时，说明否定只是攻击的铺垫，否决赦免。
+ * 只扫本句（遇 。！？；\n 即止），不跨句误伤后续句的合规内容。
+ */
+function _hasDeniedContinuation(text, start, len) {
+  let rest = text.slice(start + len);
+  const stop = rest.search(/[。！？；;\n]/);
+  if (stop >= 0) rest = rest.slice(0, stop);
+  rest = rest.slice(0, NEG_CONTINUATION_WINDOW);
+  return NEG_CONTINUATION_DENY_ZH_RE.test(rest) || NEG_CONTINUATION_DENY_EN_RE.test(rest);
+}
+
 module.exports = {
+  isNegatedBypassHit,
+  isNegatedCrisisWaiverSpan,
   isDevDebugContext,
   isHookSecValidationTrap,
   isHookSecQualifiedFacility,

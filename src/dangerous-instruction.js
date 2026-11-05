@@ -1197,7 +1197,7 @@ const DI_WEIGHT = 0.85;
 // 三次都没问全。**解法是让清单只有一份**：src/dev-exemptions.js 是唯一来源，
 // 两个维度共用同一个函数。边界依据（开发层设施 vs 真安全边界、生产一票否决、
 // 恶意意图一票否决）完整写在那个文件里，改动只需改一处。
-const { isDevDebugContext, isCompilerNoiseWarning, isTemporaryRestorePromise } = require('./dev-exemptions.js');
+const { isDevDebugContext, isCompilerNoiseWarning, isTemporaryRestorePromise, isNegatedBypassHit } = require('./dev-exemptions.js');
 
 /** 通用匹配器 */
 function _matchAll(text) {
@@ -1298,10 +1298,17 @@ function _matchAll(text) {
   // 「写一个拿 CSRF 打进去的木马」不含配置化词 → 仍命中；
   // 「把 CSRF 校验做成开关」→ 不命中。差别在有没有配置化语义，不在词面。
   const hits = [];
+  // [第 217 轮] 否定守卫（绕过/关闭/清理 × 安全设施族，判据单一来源在
+  // src/dev-exemptions.js）：命中串是被劝阻的危险动作（「不能绕过核查」）
+  // 而不是被指令执行的动作时，整条命中作废——r724 记录的存量误伤根因，
+  // 探针实测该族良性样本 24 条 block 级连坐（di+rh）全部由此赦免。
+  // 防误放三重闸（疑问形/双重否定/「别」字复词）在守卫内部，负例注入见
+  // scripts/negative-test-di-negation-guard-r217.js。
   for (const pat of DANGEROUS_PATTERNS) {
     const m = _t.match(pat);
     if (m && !_payloadMakeIsConfig(_t, m.index, m[0].length)
-        && !_privescIsAdvisory(_t, m.index, m[0].length)) {
+        && !_privescIsAdvisory(_t, m.index, m[0].length)
+        && !isNegatedBypassHit(_t, m.index, m[0].length)) {
       hits.push({ type: 'dangerous_instruction', matched: m[0].slice(0, 40) });
     }
   }

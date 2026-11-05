@@ -145,6 +145,14 @@ const GUARD_EN = new RegExp([
   '\\bsubject\\s+to\\s+(?:post[\\-\\s]incident|retrospective|parliamentary|judicial|independent)\\s+(?:review|scrutiny|oversight|audit)\\b',
 ].join('|'), 'i');
 
+const _devExempt = require('./dev-exemptions.js');
+
+/**
+ * [第 217 轮] 程序名词表——否定名词本身仍是让位（"紧急情况下不得审计"），
+ * 不适用否定守卫；只有让位动词被否定（"也不得跳过审计"）才是合规主张。
+ */
+const SUSPEND_NOUN_ZH_RE = /^(?:审批|审核|批准|核签|签批|报备|备案|立项|招投标|评标|比选|采购流程|流程|程序|手续|环节|步骤|听证|公示|公告|复议|复审|验收|审计|评估|尽调|风控)$/;
+
 /**
  * @param {string} text 归一化后的文本
  * @returns {{hit:boolean, score:number, detail:string, count:number}}
@@ -162,6 +170,14 @@ function checkCrisisExceptionalism(text) {
 
   const hasSuspend = SUSPEND_ZH.test(text) || SUSPEND_EN.test(text);
   if (!hasSuspend) return { hit: false, score: 0, detail: '', count: 0 };
+
+  // [第 217 轮] 否定守卫：让位动词被否定（"即使是紧急情况，也不得跳过审计"）
+  // 时，句子主张的是危机中仍守程序——与危机例外化语义相反，不判。
+  const _sm = text.match(SUSPEND_ZH) || text.match(SUSPEND_EN);
+  if (_sm && !SUSPEND_NOUN_ZH_RE.test(_sm[0])
+      && _devExempt.isNegatedBypassHit(text, _sm.index, _sm[0].length)) {
+    return { hit: false, score: 0, detail: '', count: 0 };
+  }
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
   return {

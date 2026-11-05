@@ -44,6 +44,9 @@
  *   固定窗口覆盖不到 → 改为在命中位置之后的文本上做后处理判断。
  */
 const path = require('path');
+// [第 217 轮] 否定守卫单一来源（dev-exemptions 已加载，无循环依赖风险：
+// dev-exemptions 不 require 本模块）
+const _devExempt = require('./dev-exemptions.js');
 
 /**
  * [v6.7.124] 索取指向词表，分强弱两档：
@@ -1187,6 +1190,11 @@ function checkMultiTurnEscalation(text) {
     // [v6.7.124] sensitive_file 软分支的求教排除：命中是"问用法"时不计层。
     // 硬分支不受影响（命中 /etc/passwd、.ssh、密钥落日志等仍计数）。
     if (L.name === 'sensitive_file' && softHitIsConsult(text)) continue;
+    // [第 217 轮] fake_emergency 否定守卫：命中跨度内越权动词被否定
+    // （"即使是紧急情况，也不得跳过审计"）时，句子主张危机中仍守程序，
+    // 不是虚构紧急要求越权，不计层。
+    if (L.name === 'fake_emergency'
+        && _devExempt.isNegatedCrisisWaiverSpan(text, m.index, m[0].length)) continue;
     const _isSoftDb = L.name === 'system_entry' && _RE_SOFT_DB_ONLY.test(text);
     hits.push({ ladder: L.name, label: L.label,
       matched: _isSoftDb ? 'zh:soft-db' : m[0].slice(0, 40),
