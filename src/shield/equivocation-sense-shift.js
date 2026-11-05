@@ -4,6 +4,12 @@
  * [r645] equivocation_sense_shift — 「一词多义被用于跨义位推理」检测器
  * 心虫第 67 判别维度。
  *
+ * [r221 · agent-4 补强] POLYSEMY_TABLE 增补 4 个中英双语多义词家族：
+ *   理论(science vs 猜测)、证明(数理推导 vs 经验表明)、模型(数理建模 vs
+ *   榜样/样品)、显著(统计显著 vs 重要/巨大)。补强前零命中探针实测这四族
+ *   10/10 攻击穿引擎（6 条 gate.action=pass 完全漏判）。此为「已有维度的
+ *   全新措辞家族」（真升级类型②），模块已接线故立即激活，无需改 src/index.js。
+ *
  * 论文来源（2026-10-10 升级轮调研）：
  *   arXiv 2606.31039《Truth or Sophistry? LoFa: A Benchmark for LLM
  *   Robustness Against Logical Fallacies》。实测 10 类谬误的 LFR@k：
@@ -99,6 +105,43 @@ const POLYSEMY_TABLE = {
   'current': [
     ['electric', 'electrical', 'wire', 'circuit', 'voltage', 'power', 'ampere'],
     ['present', 'now', 'today', 'flow', 'trend', 'situation'],
+  ],
+  // ── [r221] agent-4 补强：科学推理/统计素养方向最高频的 Equivocation 四族 ──
+  // 判据同既有条目：① 两义位语义域区分度高（域标记不相交）② 真实攻击样本
+  // 验证此前漏判（coordination/agent4/probes/r221-zerohit-probe.js 实测 10/10
+  // 穿引擎）③ 良性同义重复只命中单一域 → 不误伤。逻辑要求 hitA && hitB 共现，
+  // 故纯单义文本天然放行。中英双语，VERIFY 级。
+  '理论': [
+    ['科学', '验证', '实验', '定律', '假说', '数据', '证据', '相对论', '进化论', '检验', '预测', '物理', '同行评审', '可证伪'],
+    ['猜测', '猜想', '臆测', '推测', '没有依据', '未经证实', '纯属', '异想天开', '未必成立', '不一定对'],
+  ],
+  '证明': [
+    ['数学', '定理', '引理', '逻辑', '推导', '公理', '形式化', '充要条件', '严谨'],
+    ['表明', '说明', '显示', '足以', '实践', '事实胜于雄辩'],
+  ],
+  '模型': [
+    ['数学', '建模', '拟合', '数据', '算法', '预测', '训练', '参数', '回归', '统计', '仿真'],
+    ['榜样', '示范', '模范', '样品', '机型', '模特', '典范', '标杆', '效仿', '学习对象'],
+  ],
+  '显著': [
+    ['统计', 'p值', 'p 值', '显著性', '检验', '样本', '置信', '差异', '方差', '卡方', 't检验'],
+    ['重要', '重大', '巨大', '深远', '可观', '突破', '值得推广', '影响力'],
+  ],
+  'theory': [
+    ['scientific', 'evidence', 'experiment', 'tested', 'verified', 'data', 'hypothesis', 'law', 'physics', 'biology', 'evolution', 'relativity', 'peer-reviewed', 'falsifiable'],
+    ['guess', 'speculation', 'hunch', 'conjecture', 'mere', 'unproven', 'not necessarily', 'opinion', 'made up'],
+  ],
+  'prove': [
+    ['mathematics', 'theorem', 'lemma', 'logic', 'derivation', 'axiom', 'formal', 'deduce'],
+    ['demonstrate', 'guarantee', 'practice', 'effective', 'in practice'],
+  ],
+  'model': [
+    ['mathematical', 'modeling', 'modelling', 'fitted', 'data', 'algorithm', 'predict', 'prediction', 'training', 'parameters', 'regression', 'statistical', 'simulation'],
+    ['role', 'exemplar', 'prototype', 'sample', 'citizen', '榜样'],
+  ],
+  'significant': [
+    ['statistical', 'statistically', 'p-value', 'significance', 'test', 'sample', 'confidence', 'difference', 'variance'],
+    ['important', 'importance', 'major', 'huge', 'profound', 'breakthrough', 'worth'],
   ],
 };
 

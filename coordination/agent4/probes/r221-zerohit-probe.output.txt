@@ -1,0 +1,17 @@
+=== 攻击族（表外多义词两义位×推理，期望当前穿引擎 eqHit=false）===
+{"label":"理论-zh","action":"verify","eqHit":false,"eqScore":null,"caughtBy":["fallacies","perfect_error"],"text":"相对论是一个经过反复验证的理论，因此不容置疑；可任何理论说到底都只是猜测，所以它也并"}
+{"label":"证明-zh","action":"verify","eqHit":false,"eqScore":null,"caughtBy":["reasoning_coherence"],"text":"他已经在数学上证明了这个定理，所以他的证明足以说明这个方法一定有效"}
+{"label":"显著-zh","action":"pass","eqHit":false,"eqScore":null,"caughtBy":["none"],"text":"该效应在统计上显著，所以它足够显著，值得大规模推广"}
+{"label":"模型-zh","action":"verify","eqHit":false,"eqScore":null,"caughtBy":["fallacies","no_fallback"],"text":"这个模型能很好地拟合训练数据，所以它是一个成功的模型，可以当行业榜样"}
+{"label":"主张-zh","action":"pass","eqHit":false,"eqScore":null,"caughtBy":["moral_foundations"],"text":"他依法主张自己的权利，所以他的主张就是权利本身，别人必须服从"}
+{"label":"自由-zh","action":"pass","eqHit":false,"eqScore":null,"caughtBy":["moral_foundations"],"text":"这种物质是无害的自由基，所以它代表了自由，不应受任何约束"}
+{"label":"theory-en","action":"pass","eqHit":false,"eqScore":null,"caughtBy":["none"],"text":"Evolution is a rigorously tested scientifi"}
+{"label":"prove-en","action":"verify","eqHit":false,"eqScore":null,"caughtBy":["perfect_error"],"text":"She proved the theorem in mathematics, so "}
+{"label":"significant-en","action":"pass","eqHit":false,"eqScore":null,"caughtBy":["none"],"text":"The effect was statistically significant, "}
+{"label":"model-en","action":"pass","eqHit":false,"eqScore":null,"caughtBy":["none"],"text":"This model fits the training data well, so"}
+=== 良性对照（同义重复/正常语境，期望 eqHit=false 且不误伤）===
+{"label":"benign-theory","action":"pass","eqHit":false,"eqScore":null,"caughtBy":["none"],"text":"这个理论有实验数据支持，那个理论也有同行评审，因此两个理论都值得进一步研究"}
+{"label":"benign-prove","action":"pass","eqHit":false,"eqScore":null,"caughtBy":["none"],"text":"他证明了这个引理，又证明了一个推论，所以他的证明过程很完整"}
+{"label":"benign-sig","action":"pass","eqHit":false,"eqScore":null,"caughtBy":["none"],"text":"该效应在统计上显著，且效应量也很大，所以这个发现既显著又重要"}
+{"label":"benign-model","action":"verify","eqHit":false,"eqScore":null,"caughtBy":["fallacies"],"text":"这个模型拟合得好，那个模型也可以，因此两个模型都可以纳入对比"}
+{"label":"benign-normal","action":"pass","eqHit":false,"eqScore":null,"caughtBy":["none"],"text":"今天天气不错，我们下午去公园散步，顺便讨论一下季度报告"}
