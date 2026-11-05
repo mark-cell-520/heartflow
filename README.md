@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-212-blueviolet.svg)](#what-it-catches-212-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-213-blueviolet.svg)](#what-it-catches-213-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-212 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+213 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  18,949 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 212 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 213 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (212 dimensions) -> gate
+scope-check -> premise-check -> discriminate (213 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (212 dimensions)
+## What it catches (213 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **169 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **170 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -205,14 +205,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.146**. Not marketing copy.
+Measured on this repository at **v6.8.147**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 212 |
+| Discrimination dimensions | 213 |
 | MCP tools | 184 |
 | Test suite | 18,949 passing / 79 failing |
 | Capability guard | 20 / 20 checks |
@@ -384,6 +384,7 @@ duplicate the log.
 | Version | Date | Change |
 |---------|------|--------|
 | 6.8.145 | 2026-11-05 | `appeal_to_consequences` 存量误伤修复（r217，存量修复轮）——`src/dev-exemptions.js` 新增否定守卫 `isNegatedBypassHit` / `isNegatedCrisisWaiverSpan`（命中词前 40 字窗口内出现否定词即豁免，中英双语：不是/并非/并不/毫无/谈不上/算不上/远说不上 + not/no/never/without/hardly/barely/scarcely），四处接线（dangerous-instruction / reward-hacking / crisis-exceptionalism / multi-turn-tactics——防「这不是紧急情况」被危机豁免放行），修掉 r724 探测器记录的「良性句被 dangerous_instruction+reward_hacking 连坐 block」；test/round-217-negation-guard.test.js 22 断言全绿、负例脚本 4 注入点（守卫本体死×2 / 接线死×2）5/5 全部如期变红且良性 36 条全 pass、双向门禁召回 52/52 误拦 302/326 零新增误伤、verify 16/0、doc-numbers 24/0、security-audit 16/0；新踩坑两条：负例脚本一次性工作区拷贝遗漏 formulas/ 致 ENOENT 被误判崩溃假阴性（已修，negative-test-absolute-claim-en.js 同类待查）、auto-commit-round.js Windows 反斜杠 pathspec 致 git add 整条失败零提交（本轮人工 commit 绕过，修复留待专门轮次）|
+| 6.8.147 | 2026-11-06 | 第 213 判别维度 **silence_imputation**「沉默推定 / 诉诸沉默谬误（argument from silence）」上线（r717）——新维度 src/silence-imputation.js（checkSilenceImputation，含 SILENCE_ZH/EN、IMPUTE_ZH/EN、EXEMPT_QUESTION/EXEMPT_META_ZH/EN、EXEMPT_CORRECT_ZH/EN、__internals()）：双腿共现判据（腿①沉默动作：没/不/未+出来+否认|澄清|回应|回答|解释|辟谣|发声|吭声|置评、一言不发|避而不答|拒绝回答、no denial / declined to comment / refused to answer / silence on the matter；腿②推定结论：就是|等于|意味着|说明|证明|表明|印证|坐实+默认|承认|心虚|是真的、这本身就是答案、显然是心虚、must be true / is telling / speaks for itself）+ 邻近窗 60 字符（覆盖实测英文跨距 46）+ 倒装形（推定前置沉默紧随），把「拿当事人的沉默/不回应/未否认当指控为真或心虚的证据」的新攻击族纳入 verify 级——沉默可能源于律师建议、程序未决、不给传闻加热度，证据价值取决于制度背景，不能跨场景通用；r216 探针口径 10 条攻击从 60% 漏判修复到 10/10 命中、良性 0/6 误伤（合格线两项同时满足）；豁免：疑问句（…就是默认了吗）、概念转述/教学（这是典型的诉诸沉默谬误 / Argument from silence is a fallacy）、正确响应形（不等于认罪 / silence is not evidence / standard practice）；test/round-717-silence-imputation.test.js 40 断言全绿（10 攻击 gate 非 pass、10 良性全 pass、9 模块边界、5 __internals 注入、think() 冒烟、3 存量锚点）、负例脚本 scripts/negative-test-silence-imputation-r717.js 10 注入点 10/10 如期变红（pickRe 全空 / 双腿×4 neutralize / 邻近窗 60→12 / 豁免词×4，对照 ATTACK_HIT=10/10、BEN_FP=0/10、EXTRA_FP=0/4）、双向门禁召回 52/52 误拦 302/326 零回归、verify 16/0、doc-numbers 24/0、security-audit 16/16、cli.js status running；同轮两个存量修复：di 目的状语豁免补「以符合/为符合/以满足/为满足」合规目的族（r216 池遗留边界「定期清理过期日志以符合保留策略」误 block → pass，攻击句仍 block）、manufactured_consent META_EXEMPT_EN 补 argument from silence 概念词（同话题概念句误 verify → pass）；新踩坑三条：负例脚本探针模板多占位符必须全局 replace（String.replace 字符串参数只换第一处，silence 探针因此 11/11 假崩溃）、豁免注入须打在单依赖样本上（「不等于认罪」样本被子串「不等于」冗余豁免、注一个不变红；测试良性矩阵多数句天然不命中判据、豁免机制不承重，须用「双腿共现+唯一豁免词」专属样本）、patch fuzzy 匹配会吞注释字（index.js 接线时「陈述腿×规律化宣称腿」「七处一次接齐」两处历史注释被误改，均当次发现恢复——接线锚点必须逐处核对 diff）；HG 判据③（nobody/no one+行为动词）对 "Nobody can skip the verification step here." 误报 verify（severity 30 低危、同形反义规范句），收窄会掉协作抱怨族召回，留待下轮；verify 169→170、维度 212→213、三层级合计 200→201/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry，与 r209-r213 各行同口径；verify.js 的模块地板 150 不受影响）|
 | 6.8.146 | 2026-11-06 | 存量误伤修复轮（r218，r217 否定守卫同方向延续）——五个 src 文件修误伤：`src/perfect-error.js` S5 绝对断言加**道义模态豁免**（DEONTIC_ALL_ZH/EN 全称量化×义务模态：「任何一方都有权不发声」「Under no circumstances should you bypass…」是规范陈述不是夸大；DEONTIC_MODAL_NEVER_EN 情态动词+never+be）与**医学统计语域豁免**（STATISTICAL_DOMAIN_ZH/EN：患病率/误报率/贝叶斯/条件概率等语域里的「1%」不是假精确；疗效词否决——「治愈率99.9%+疗效神奇」仍照拦），并把 v6.7.93 的 PROCEDURAL_ALL 从**整句级豁免改为跨度判定**（实测连坐洞：「所有用户都必须定期修改密码。所有产品都是史上最好的。」第二句的真夸大被第一句流程模态连带吞掉）；`src/dev-exemptions.js` 否定守卫加**前置否定状语第三腿** NEG_FRONTED_EN_RE（under no circumstances / in no case / at no time / on no account / by no means / in no way + No employee|user|person… 主语前置否定形，r217 只覆盖中文侧，英文安全句仍被 di+rh 连坐 block 的缺口）+ _clauseLead 子句引导段助手 + 续言否决闸补 found a workaround 攻击形；`src/index.js` checkVagueness 加**验证锚豁免** VERIFICATION_ANCHOR（测试/验证/核实/确认/检查/审计/整改/督办…锚词邻窗内的模糊词是程序语言不是搪塞，仅作用于中文模糊词类）、checkPresupposition 加**质问对象闸** _hasInterrogativeTarget（loaded_behavior 须含你/您或？/?——中文侧同步英文 v6.7.92 既有守卫，「患病概率仍然很低」不是质问）；`src/false-balance.js` 加**条件式规范豁免** CONDITIONAL_NORM_ZH（「…时/的话，可以…」是决策规则不是等权结论；许可词表刻意不收 应该/应当——条件祈使攻击照拦）；test/round-218-fp-exemptions.test.js 24 断言全绿（10 误伤全 pass、14 攻击全非 pass、各豁免边界单测、think() 冒烟、r217 边界迁移 3 升级 3 保持、r436 攻击池回归）、负例脚本 scripts/negative-test-fp-exemptions-r218.js 8 注入点 8/8 如期变红、双向门禁召回 52/52 误拦 302/326 零回归、verify 16/0、doc-numbers 24/0、security-audit 16/0、cli.js status running；同轮修两个基础设施脚本已知 bug：negative-test-absolute-claim-en.js 补拷 formulas/（踩坑 1：副本缺 formulas 致公式引擎 ENOENT 被崩溃识别正则误判、注入假阴性）、auto-commit-round.js Windows pathspec bug（踩坑 2：path.relative 反斜杠与 git ls-files 正斜杠集合永不等、误判未入库致 git add 整条失败零提交）|
 | 6.8.144 | 2026-11-05 | 第 212 维度 **texas_sharpshooter**「德州神枪手谬误 / post hoc data dredging」上线（r216，统计与因果谬误方向轮换）——「选择性筛选陈述（挑出来/挑出/专挑/选出/筛选出/圈出/圈定/排除掉 + 只看/只研究/只分析/只统计 + 先看答案再…/先看结果再圈/画了个范围/先射箭 + 成功的案例|活得下来|幸存|赢家|涨得最|中奖的 + 从…里挑；EN pick(ed) the successful / only + look|study|analyze / verb + only / looked at the winners / drew|draw the target / around the arrows / the successful companies / left out）× 规律化宣称（共同点就是 + 规律|法则|信号|秘诀|公式 + 找出…规律 + 证明/说明…正确 + 都是…功劳/原因 + 皆准/四海 + 必然/肯定会再；EN the/a/that/this … pattern|rule|law|formula|secret + they all share + they all took + this proves + that is what + so it will again）」两腿共现 + 邻近窗（中文 40 字 / EN 120 字符）+ 无邻近窗的特定融合形（挑出×共同点就是 / survey only×formula / looked at the winners×share，解决「先…再总结共同点」间隔漂移），把「按结果挑子集」偷换成「从该子集归纳出普遍规律」的新攻击族——先画靶再射箭：当筛选动作的边界由被解释的结果本身定义时，子集内的一致性只是筛选条件的同义反复，不是外部证据；与 cherry_picking（第 180 维挑有利证据：服务于已有立场）/ selection_bias（第 168 维取样偏差：统计推断口径）/ survivorship_bias（第 132 维存活者偏差：活着的样本说话）/ collider_bias（第 209 维条件筛选制造伪相关）/ hasty_generalization（小样本泛化：不要求按结果筛选）/ clustering_illusion（随机噪声里看规律：不要求筛选腿）边界错开；r216 探针 9/10 攻击样本 211 维真零命中（唯一被拦的 1 条 probe 已记录由 unsupported_claim 代拦）、良性 0/6 误伤；外部三层搜索（HN Algolia texas sharpshooter fallacy / cherry picking data dredging、GitHub API texas sharpshooter fallacy / fallacy detection sort=stars、Semantic Scholar texas sharpshooter fallacy detection）无纯规则可集成方案（命中全为 LLM/统计学习路线或条目介绍），按既有维度形态自建；新文件 src/texas-sharpshooter.js（checkTexasSharpshooter，含 SELECTION_ZH/EN、LAWFICATION_ZH/EN、EXEMPT_CONTROL_ZH/EN、EXEMPT_RANDOM_ZH/EN、EXEMPT_META_ZH/EN、EXEMPT_CORRECT_ZH/EN、__internals()）+ test/round-216-texas-sharpshooter.js（17 断言全绿：10 攻击模块命中+gate 非 pass、12 良性全 pass、4 项豁免逐常量注入承重、18 项词表族断言含反向防过宽、存量 3+3 一字不差、接线三处+导出、非字符串安全），verify 168→169、维度 211→212、三层级合计 199→200/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry，与 r209-r213 各行同口径；verify.js 的模块地板 150 不受影响）|
 | v6.8.143 | 2026-11-05 | 第 211 维度 **ecological_fallacy**「生态谬误 / ecological inference」上线（r215，统计与因果谬误方向轮换）——「群体层陈述（全国/全省/本县/这个区/平均分/人均 + 高/低/好/差/上升/下降；EN the county / on average / nationally / the region rose）× 个体层结论（所以本地人/你作为…/这个村里每个人/你家孩子 + 一定/肯定/必然 + 高/低/聪明/富裕；EN so you / people from that region / everyone there must be）」两腿共现 + 邻近窗判别，把「群体统计量」偷换成「个体属性必然值」的新攻击族——辛普森悖误的近亲：聚合层的分布参数不决定层内任一成员的取值；四组豁免（概念/教学转述、正确响应形、个体数据实据、推理否定/对冲）；与 whole_part_transfer（第 170 维整体部分搬运：性质相同方向）/ stereotyping（第 106 维刻板印象：群体标签×个体裁决）/ base_rate_neglect（第 169 维基础率忽视：先验×具体证据）边界错开；r215 探针复量该族攻击样本 210 维真零命中、良性零误伤；新文件 src/ecological-fallacy.js + test/round-215-ecological-fallacy.js，verify 167→168、维度 210→211、三层级合计 198→199/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry）；本行由 r216 补记——r215 收尾 commit 875e7dad 只落了引擎与接线，changelog 整轮漏记（且把 r213 mediator 行误标为 6.8.143，已就地修正为 v6.8.142）|

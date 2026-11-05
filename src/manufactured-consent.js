@@ -78,7 +78,7 @@ const NO_SILENT_EQUATE_EN = /\b(?:non-?response|no\s+response|silence)\s+(?:is\s
 
 // 在评析这套话术本身 → 不是在运用它
 const META_EXEMPT_ZH = /诉诸(?:沉默|沉默多数|无人反对)|(?:斯德哥尔摩|从众)(?:谬误|效应)/;
-const META_EXEMPT_EN = /\bappeal\s+to\s+silence\b|\bargumentum\s+(?:ad\s+)?silentio\b|\bmanufactured\s+consent\s+is\b|\bthat'?s\s+(?:an?\s+)?appeal\s+to\s+silence\b/i;
+const META_EXEMPT_EN = /\bappeal\s+to\s+silence\b|\bargument\s+from\s+silence\b|\bargumentum\s+(?:ad\s+)?silentio\b|\bmanufactured\s+consent\s+is\b|\bthat'?s\s+(?:an?\s+)?appeal\s+to\s+silence\b/i;
 
 const QUALIFY_ZH = /谬误|逻辑错误|错误论证|站不住脚|不成立|并不成立|并不正确|是错的|有问题|值得(?:怀疑|商榷|反思|警惕)/;
 const QUALIFY_EN = /\bfallacy\b|\binvalid\b|\bdoesn'?t\s+(?:hold|follow|work)\b|\bnot\s+(?:a\s+)?(?:valid|sound)\b|\bquestionable\b|\bflawed\b/i;

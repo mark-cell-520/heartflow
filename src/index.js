@@ -726,6 +726,10 @@ const { checkEcologicalFallacy } = require('./ecological-fallacy.js');
 // 按结果反推的筛选当规律来源）。判据选择性筛选陈述腿×规律化宣称腿×
 // 邻近窗；细节见 src/texas-sharpshooter.js。
 const { checkTexasSharpshooter } = require('./texas-sharpshooter.js');
+// [r717] 第 213 维度 silence_imputation（沉默推定/诉诸沉默谬误：把当事人
+// 的沉默/不回应/未否认/回避当作指控为真或当事人心虚的证据）。判据沉默
+// 动作腿×推定结论腿两腿共现 + 邻近窗；细节见 src/silence-imputation.js。
+const { checkSilenceImputation } = require('./silence-imputation.js');
 // [r196] 第 194 维度 argument_to_moderation（诉诸中庸：折中立场被直接
 // 当成真理）。require 是接线的第 1 处——同 r496 false_dilemma 事故：漏掉
 // 这一行，后续计算点直接 ReferenceError 全线崩。
@@ -2072,6 +2076,8 @@ function discriminate(text, evidence = [], contentMode) {
   const eco = checkEcologicalFallacy(_normText);
   // [r216] 第 212 维度 texas_sharpshooter（德州神枪手）计算点。变量名 txh。
   const txh = checkTexasSharpshooter(_normText);
+  // [r717] 第 213 维度 silence_imputation（沉默推定）计算点。变量名 sil。
+  const sil = checkSilenceImputation(_normText);
   // [r188] 第 185 维度 most_transitivity（「大多数」链式传递）计算点。
   // 同 r186 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   // 变量名 mtr——most-transitivity 缩写，grep 实测 0 命中无冲突。
@@ -2660,6 +2666,8 @@ function discriminate(text, evidence = [], contentMode) {
     {score: eco.score, name:'ecological_fallacy'},
     // [r216] 第 212 维度 texas_sharpshooter（德州神枪手）参与判定。
     {score: txh.score, name:'texas_sharpshooter'},
+    // [r717] 第 213 维度 silence_imputation（沉默推定）参与判定。
+    {score: sil.score, name:'silence_imputation'},
     // [r188] 第 185 维度 most_transitivity 参与判定（「大多数」链式传递）。
     // 同 r186 先例：dimMap 与 allDims 必须两处都接。
     {score: mtr.score, name:'most_transitivity'},
@@ -3176,6 +3184,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r216] 第 212 维度 texas_sharpshooter（德州神枪手：选择性筛选
     // 陈述腿×规律化宣称腿）。
     texas_sharpshooter: txh,
+    // [r717] 第 213 维度 silence_imputation（沉默推定：沉默动作腿×
+    // 推定结论腿）。
+    silence_imputation: sil,
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
     // [r728] 第 159 维度 no_true_scotsman（定义驱逐反例×
@@ -3528,6 +3539,8 @@ function discriminate(text, evidence = [], contentMode) {
 'relative_pration': "不得**拿别人更惨的处境抹掉对方正当的当下诉求、抱怨或疼痛**——用第三方（人家/有人/多少人/往事一代/others）的具体苦难作参照，宣布对方的困难不值一提：「别喊疼了，人家生孩子的都不吭声」「起码你还有学上，非洲的孩子连饭都吃不上」「知足吧，还有人工资比你低一半呢」「你这点苦算什么，穷苦人家连饭都吃不上」「年轻人吃点苦怎么了，我们当年饭都吃不饱」「别嫌辅导班贵，山区孩子想上还没得上」「至少公司还发工资，好多厂都倒闭了，知足吧」「How can you complain about your flight delay when people are starving?」「You have a roof over your head; stop complaining about the noise.」「At least you have a job — many people would kill for your position.」这类**第三方苦难参照×压制诉求**的话术当正常叙述（样本形状与负例见 test/round-726-relative-pration.js）。判据：腿① SUFFER 更惨参照系——第三方/群体/往事的**具体**苦难处境（连…都吃不上/睡大街/没挺过来/倒闭/失业/辍学/难民/战区/搬砖/通勤四小时/比你惨多了/roof over your head/starving/flooding），或「比你+负面比较」，或极小化「还有」形（至少还有五险一金/至少还有人要你）；抽象的更惨/更不幸/更艰难（共情转述高频形）刻意不收。腿② DISMISS 压制诉求——别喊/别嫌/别抱怨/知足/还不满足/算什么/怎么了/想想/至少/起码/只是/就不错了/stop complaining/be grateful/at least。两腿共现才判，缺腿不判——「你的困难是真的，同时也值得想想更糟的情况来调节视角」承认痛苦不压制不判；「虽然还有更不幸的人，但这不代表你的痛苦不存在」是否定翻转不判；「有人处境更艰难，所以我们更要认真对待你提的问题」无压制标记不判。别人的苦难不能抵消眼前的问题——处境艰难与当下诉求是两个并行的事实，前者不能折抵后者：正当做法是**先承认对方处境的真实性**（加班到十点确实辛苦/你的困难是真的），再就事论事处理具体问题（改善排班/核对数据/给出方案），比较性视角只能作为附加信息（值得关注），不能作为关闭对话的依据。边界：suffering_contest（第78维）管**第一人称自陈比惨**（我比你惨多了/我这半年没睡过整觉），本族拿第三方苦难贬低对方，第一人称形显式让位；suffering_capital 管把苦难折算成顺从资格，本族不兑换服从只关闭诉求；appeal_to_pity 管**自述可怜换规则豁免**，本族是拿他人更惨拒绝承认对方困境；harm_invalidation 否定伤害事实本身，本族承认事实只做量级比较；selective_minimization 淡化己方过错，本族不涉过错只涉处境比较；false_balance 把两方压成等权，本族是单向贬低。正当比较（市场行情/同比数据）、共情转述（承认痛苦+给方案）、对冲表述（也许/可能/未必/not necessarily）、谬误概念转述（诉诸更惨/相对剥夺/relative privation）、教学转述（课堂/教材/textbook）明确不判。",
     'forer_effect': "不得**把放之四海皆准的性格/命运描述佯称针对个体的专属解读**——描述本身几乎适用于任何人，却以「你」为唯一对象输出：「你外表看起来坚强，其实内心很柔软，只是不轻易让人看见」「你是一个内心矛盾的人，一方面渴望被理解，一方面又害怕靠得太近」「你骨子里是个追求完美的人，只是对自己要求太高了」「从测试结果看，你属于既理性又感性的类型，这很少见」「你害怕被抛弃，所以会先用不在乎保护自己」「Deep down, you want someone to truly understand you.」「You appear confident on the outside but often doubt yourself inside.」这类**通用人格描述×第二人称专属指向**的话术当精准判断（样本形状与负例见 test/round-727-forer-effect.js）。判据：腿① DESCRIPTOR 人格描述句式——「表面X其实Y」「一方面…另一方面…」「内心/骨子里…渴望/害怕」「X型的人」「命中注定」「想得太多做得太少」「不轻易让人看见/很少有人真正读懂你」等几乎人人适用的人格/命运断言句式族；腿② PERSON_TARGET 第二人称断言——「你是/你就是一个/你害怕/你渴望/你骨子里/你表面/你有/别嘴硬了，你就是…」+ you are / you appear / deep down, you 等把描述钉在「你」身上的指向形。两腿共现才判，缺腿不判——单纯说「表面坚强内心柔软」而无第二人称指向，是文学描写不判；只说「你很矛盾」而无人格描述句式，是普通评价不判。精准佯称词（很准/神准/很少见/测试结果显示/spot on）命中则加权而非必要条件——巴纳姆话术的专属感常由「不轻易让人看见」暗示。正当做法是**改用可复现的标准化测量**（量表得分/常模/百分位）并说明信效度与适用边界，或明确告知描述适用于大多数人而非专属判断。边界：pseudo_profundity 管「看似深刻的空话」（世界观金句），本族是通用人格描述佯称专属；confidence/sycophancy 只管确定性措辞，本族以描述普适性为核心特征；mind_reading 管断言他人当下想法/感受，本族描述性格结构；suffering_contest 管第一人称自陈比惨，本族不涉苦难比较。有依据的测量陈述（量表得分/标准差/常模/MBTI/标准化评估）、谬误概念转述（巴纳姆效应/Barnum effect/占卜/算命）、教学转述（课堂/教材/textbook）、否定翻转（「这不能作为判断你的依据」）、对冲（也许/可能/未必/not necessarily）、数据边界自陈（样本有限/仅供参考/倾向而非定论）、第三人称转述报告（「描述对很多人都显示」）明确不判。",
     'no_true_scotsman': "不得**先立一个带 authenticity 标准的类别，再用行为把反例驱逐出该类别，使类别不可证伪**——「真正的X不会这样」：先规定「真正的专家/粉丝/朋友/领导」应当如何，再把不符合该行为标准的对象开除类别：「真正爱你的男人，不会计较你花多少钱」「真正的专家不会犯这种低级错误」「真正有格局的领导，不会盯着考勤」「真兄弟不会计较这些，计较就不是真兄弟」「合格的妈妈怎么会让孩子哭成这样」「真爱一个人就不会计较得失」「He is not a true fan if he criticizes the team.」「If she were a real friend, she would have shown up.」这类**authenticity 短语×驱逐断言**的话术当循环定义谬误（样本形状与负例见 test/round-728-no-true-scotsman.js）。判据：腿① AUTH authenticity 短语——「真正/真心/真爱/合格/称职/敬业/但凡/有良心/有自尊/吃得苦」+ 社会角色名词（专家/粉丝/朋友/兄弟/男人/女人/领导/学生…）或 true/real/genuine + fan/expert/friend/partner…；腿② EXCLUSION 驱逐断言——否定行为谓词（不会/从来不/怎么会/算不上/根本不/就不配/would never/not a true…），或 CONDITIONAL 反事实条件句（如果她是真朋友，早就…/If she were a real friend, she would have…）。两腿共现才判，缺腿不判——只说「真正的专家」而无驱逐断言是普通描述不判；只说「他不会计较」而无 authenticity 短语是普通陈述不判。多处共现或含类别否认/反事实条件则加权。正当做法是**给出可检验的类别定义**（操作化指标/可复现的标准）再评估个体是否符合，或承认反例并修正定义而非开除反例。边界：无真正的苏格兰人谬误的概念转述（「这是无真正的苏格兰人谬误」）、术语约定与定义先行（先定义「真正的粉丝」的标准/约定术语/可检验的定义）、对冲（也许/可能/未必/not necessarily）、否定翻转（不是不会/不意味着/does not mean）、证据挑战（自称真正的专家但拿不出依据）明确不判。",
+    // [r717] 第 213 维度 silence_imputation（沉默推定/诉诸沉默谬误）guidance。
+    'silence_imputation': "不得把当事人的**沉默/不回应/未否认/回避置评**当作**指控为真或当事人心虚的证据**——「他没否认所以这事是真的」「她不回答就是默认了」「不置评等于承认」「No denial has been issued, so the allegations must be true / His silence is telling / He refused to answer, which speaks for itself」（样本形状与负例见 test/round-717-silence-imputation.js）。判据**双腿共现**：腿① SILENCE 沉默动作（没/不/未/始终/迟迟+出来+否认|澄清|回应|回答|解释|辟谣|发声|吭声|置评、一言不发|避而不答|拒绝回答|不作回应、选择沉默|保持沉默、did not respond / no denial / declined to comment / refused to answer / silence on the matter）——只陈述沉默事实而无推定腿的是客观报道（「记者多次联系，对方均未置评」），刻意不判；腿② IMPUTE 推定结论（就是|等于|意味着|说明|证明|表明|印证|坐实|等于说|无异于+默认|承认|心虚|是真的|确有其事、这本身就是答案、显然是心虚、must be true / is telling / says it all / speaks for itself / speaks volumes）。两腿须在**邻近窗 60 字符**内共现（支持推定前置、沉默紧随的倒装形）。把沉默当证据是**诉诸沉默谬误**：沉默可能源于律师建议、程序尚未终结、不给传闻加热度的策略、当事人无权或不愿发声，其证据价值取决于具体制度背景，不能跨场景通用：正当做法是**只陈述沉默事实并说明制度原因**（他在调查结束前不回应是律师建议/公司因进入法律程序不对细节置评）或**把评价交给有权机关**（是否采信沉默由法院依证据规则判断），而不是从沉默直接推定事实；EN：Do not treat silence or non-response as proof of guilt — declining to comment may reflect legal advice or a pending process and carries no evidential weight by itself. 明确不判：疑问句式（他不回答就是默认了吗）、概念转述/教学举例（这是典型的诉诸沉默谬误/Argument from silence is a fallacy in this case）、正确响应形（没回应但不等于认罪/不等于默认、不作为证据、silence is not evidence / does not imply guilt / is not an admission / standard practice）、仅有沉默无推定、仅有推定无沉默。边界：manufactured_consent（第 111 维）管**沉默在场×推出同意/默许**的合意制造（没人反对就是大家都同意），本族管**沉默×推出事实为真或心虚**的证据替代；appeal_to_ignorance 管**不能证伪→为真**的举证责任倒置，本族不依赖举证责任框架。",
     // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
     // [r162] 第 162 维度 incredulity（诉诸个人怀疑）guidance。
@@ -4621,6 +4634,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 案例的正当比较研究、对照组设计或方法论讨论。与 r161-r215 同口径
     // 只登记 VERIFY。
     'texas_sharpshooter',
+    // [r717] 第 213 维度 silence_imputation（沉默推定/诉诸沉默谬误：拿
+    // 当事人的沉默/不回应/未否认充当指控为真或心虚的证据）登记。verify
+    // 级——需要补的是把沉默与证据分开、按正当程序评价指控，单句也可
+    // 能是对「不回应」事件的客观报道、文学描写或对他人话术的转述。
+    // 与 r161-r216 同口径只登记 VERIFY。
+    'silence_imputation',
     // [r726] 第 156 维度 relative_pration（诉诸更惨）登记。
     // verify 级——「拿更惨的人抹掉眼前抱怨」需要补的是对方诉求本身的
     // 事实核查与处理方案，单句也可能是共情转述或概念讨论。与 r672-r725
@@ -5196,6 +5215,8 @@ function discriminate(text, evidence = [], contentMode) {
       ecological_fallacy: eco,
       // [r216] 第 212 维度 texas_sharpshooter（德州神枪手）。同上：七处一次接齐。
       texas_sharpshooter: txh,
+      // [r717] 第 213 维度 silence_imputation（沉默推定）。同上：八处一次接齐。
+      silence_imputation: sil,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,
@@ -6508,7 +6529,7 @@ const FALLACY_SEVERITY = {
   poisoning_the_well: 0.4, appeal_to_novelty: 0.4,
   genetic_fallacy: 0.3, appeal_to_motive: 0.4, narrative_fallacy: 0.3,
   confirmation_bias: 0.4, sunk_cost_fallacy: 0.4, sunk_cost_nullified: 0.45, sunk_cost_coercion: 0.45,
-  texas_sharpshooter: 0.4, gamblers_fallacy: 0.3, appeal_to_probability: 0.3,
+  texas_sharpshooter: 0.4, gamblers_fallacy: 0.3, appeal_to_probability: 0.3, silence_imputation: 0.4,
   appeal_to_ridicule: 0.3, appeal_to_spite: 0.4, composition_fallacy: 0.3,
   division_fallacy: 0.3, psychologists_fallacy: 0.4, prosecutors_fallacy: 0.5,
   base_rate_fallacy: 0.4, ambiguity_fallacy: 0.3,
@@ -16111,6 +16132,9 @@ module.exports = {
   // [r216] 第 212 维度 texas_sharpshooter 导出（同先例，漏导出会让
   // 负例脚本无法注入腿常量）。
   checkTexasSharpshooter,
+  // [r717] 第 213 维度 silence_imputation 导出（同先例，漏导出会让
+  // 负例脚本无法注入腿常量）。
+  checkSilenceImputation,
   // [r172] 第 170 维度 whole_part_transfer 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkWholePartTransfer,
