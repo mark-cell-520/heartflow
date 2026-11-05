@@ -23,6 +23,12 @@
 
 'use strict';
 
+// [r215] 保守预检工具：S3 的「无任何不确定词」词表原先每次调用逐词
+// new RegExp + test（29 个/次）。预检一次判定无可能命中即置
+// uncertaintyHits=0——与逐词扫描零命中完全等价（见 regexp-utils.js
+// 头部的保守性证明）。
+const { getRegExp, escapeRe, screenZH, screenLiteral } = require('./regexp-utils.js');
+
 // ─── S1: 假精确 — 精确数字伪装 ───────────────────────────────
 // [v6.7.93] 度量名词豁免（心虫 C 排查后由 D 修复，0.82）
 // 原来 `latency dropped 40%` 命中 S1（第 29 行的"精确百分比"模式），
@@ -226,9 +232,15 @@ function checkPerfectError(text) {
   const words = hasChinese ? UNCERTAINTY_WORDS_ZH : UNCERTAINTY_WORDS_EN;
   const totalLen = text.length;
   let uncertaintyHits = 0;
-  for (const w of words) {
-    const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    if (re.test(text)) uncertaintyHits++;
+  // [r215] 保守预检：无可能命中则 uncertaintyHits 必为 0，跳过逐词扫描。
+  // 选表逻辑与下面循环严格一致；英文词表原判定是**无 \b 的子串 test**
+  // （escapeRe 后直接 test），故预检必须用无边界字面合并 screenLiteral——
+  // 用 \b 边界预检会漏掉「词首紧贴字母」的子串命中（如 waitabout 含 about）。
+  if (hasChinese ? screenZH(words, text) : screenLiteral(words, text)) {
+    for (const w of words) {
+      const re = getRegExp(escapeRe(w), 'i');
+      if (re.test(text)) uncertaintyHits++;
+    }
   }
   // 长文本 + 无不确定词 + 多断言句 → 全肯定
   if (totalLen > 80 && uncertaintyHits === 0 && sentences.length >= 3) {

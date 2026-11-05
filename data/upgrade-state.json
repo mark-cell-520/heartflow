@@ -1,20 +1,22 @@
 {
-  "round": 713,
-  "version": "6.8.59",
-  "roundStartedAt": "2026-10-16T07:05:00.000Z",
-  "lastFinishAt": "2026-10-16T07:34:12.103Z",
+  "round": 215,
+  "version": "6.8.143",
+  "roundStartedAt": "2026-11-05T15:00:00.000Z",
+  "lastFinishAt": "2026-11-05T16:40:00.000Z",
   "lastGreen": true,
   "lastChecks": [
-    "PASS 版本四处一致",
-    "PASS 版本已进 git log",
-    "PASS README changelog 覆盖当前版本",
-    "PASS 交接簿记录当前版本",
-    "PASS round-713 测试 11/11 + negative-test 26/26",
-    "PASS bidirectional 52/52 + 302/326 与基线一致",
-    "PASS guard-abilities 20/20（dimensions 键 144）",
-    "PASS doc-numbers 22/22 + security-audit 16/16"
+    "PASS bin/verify.js 16/16",
+    "PASS bidirectional-guard 52/52 召回不降 + 302/326 误拦不升",
+    "PASS guard-abilities 20/20（dimensions 键 210）",
+    "PASS doc-numbers-accuracy 24/24",
+    "PASS round-215-regexp-prefilter 23/23",
+    "PASS A/B 行为一致性 0/32 差异（worktree HEAD 基线对比）",
+    "PASS 全量回归问题清单 73 文件基线上同法对比：新失败 0（存量噪声 29 + 运行方式噪声 44）",
+    "PASS 性能基准 2000 次 gate：中文 15140→14779ms（-2.4%）、英文 17215→15951ms（-7.3%）",
+    "NOTE security-audit S2「git log/tag 未命中 6.8.143」为提交前预期失败，提交后转绿"
   ],
-  "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
-  "published": "6.7.124",
-  "publishedAt": "2026-09-25T20:03:42.912Z"
+  "calibratedFrom": "UPGRADE_LOG.md 实际轮次（r215）",
+  "published": "6.8.142",
+  "publishedAt": "2026-11-05T14:48:00.000Z",
+  "notes": "r215 性能轮（保守预检）已完成并提交 v6.8.143。下一轮候选池：① 红队复测报告（commit 81afa5a4）记录的两项新增误拦 G2 reasoning_coherence / G3 presupposition——样本未落盘，需先复现再修（无样本不动手）；② src/index.js:7351-7353 记录的 reasoning_coherence 遗留（pseudo_causal 反序族已修、reasoning_coherence 侧未修：「因为…所以」结构齐备反被判优良推理链 0.9）；③ r730 候选族侦察不达标的四个族（silence_imputation/amphiboly/is_ought/chronological_snobbery）如需补维度须先补判据再上；④ 性能方向：checkRewardHacking 之后无同量级单点热点了（profile top30 仅占 31.9%），再优化需转向算法层（如 discriminate 的分层早退/维度分组），属高风险重构需单独立项。本轮踩坑：① Write 工具会把源码里的 \\u0000 写成真实 NUL 字节，缓存键改用 JSON.stringify；② node -e 内联补丁的正则转义被 shell 吃，补丁必须走脚本文件；③ 后台任务 10 分钟上限会杀全量回归，重启用长 timeout；④ run-all failed 计数有 ±16 存量波动，判定必须逐个文件基线对比。环境噪声清单：MCP 类 6 测试（8099 端口被常驻服务占用）+ dispatch 类约 23 个文件在 run-all 上下文报 Command failed/未输出汇总行，单独跑全部通过——均为存量，勿当回归。"
 }

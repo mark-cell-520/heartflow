@@ -1,3 +1,63 @@
+## r215 — 性能轮（v6.8.143）：静态词表/模式表保守预检上线（src/regexp-utils.js，判定结果零变化）
+
+**轮次**：r215 ｜ **日期**：2026-11-05 ｜ **方向**：性能优化（先 profile 定位，再优化——未猜热点）
+**真升级类型**：性能优化（同一基准脚本实测前后数字）+ 新工具模块（src/regexp-utils.js，非装饰：4 处热点接入、收益可复跑）
+
+### 一、背景与选题
+- 上一轮（r214）收尾后按轮次协议先跑基线计时：gate 2000 次中文 15140ms、英文 17215ms（每次 7.6ms / 8.6ms）。**是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision；按「先定位再优化」纪律直接用 V8 CPU profile（node --prof，600 次 discriminate）+ RegExp 构造计数探针（patch globalThis.RegExp 抓栈）定位，热点全部实测得出，无记忆成分。
+- 选题理由：本仓库是纯规则引擎，210 个维度各自跑正则，热路径成本结构必须实测才能说话；且性能优化不动判定逻辑，回归风险低于新增维度，适合作为轮换轮。
+
+### 二、根因/缺口分析（带证据）
+- **探针 1（RegExp 构造计数）**：单次 discriminate 调用构造 **306 个 RegExp 对象**（15311 个 / 50 次调用）。warmup 后抓栈定位分布：checkBullshitRecognition 62 个/次（index.js:9741/9749）、checkPerfectError 29 个/次（perfect-error.js:230）、checkContradiction 24 个/次（index.js:5894/5895）、_hasAnyEN 16 个/次（one-sided-dismissal.js:142）……热点形态全部是「**静态词表逐词 new RegExp + test/exec**」。
+- **探针 2（构造缓存对照实验）**：把 new RegExp 换成构造缓存，300 次 discriminate 只从 2096ms 降到 2076ms（**省 1%**）——V8 自带 RegExp compilation cache 已吃掉大部分构造开销，**真正的成本在正则执行次数**。此实验否掉「预编译缓存」主线，定下「保守预检减执行次数」主线。
+- **探针 3（维度函数计时，Module._load 包装）**：checkRewardHacking **0.665ms/次 = 总判别耗时 8.6%**，是第二名的 4 倍——ZH 表 38 类 601 个模式、EN 表 38 类 333 个模式，英文文本两张表全扫（934 个模式逐条 text.match）。这是全引擎第一热点。
+- V8 profile 汇总（改后复测）：JavaScript 49.6% / Shared libraries（irregexp 原生代码）44.0%——**约一半 CPU 在正则执行**，与探针结论互证。
+
+### 三、落地项
+1. **新模块 src/regexp-utils.js**（约 190 行）：四个保守预检 + 一个构造缓存——
+   - `screenZH(words, text)`：词表首字字符类预检（真命中则词首字必在文本，预检必命中；只可能误报）。
+   - `screenEN(words, text)`：`\b` 词边界合并 alternation（适用于调用方原本就是 `\bword\b` test 的场景）。
+   - `screenLiteral(words, text)`：无边界字面合并 alternation（适用于调用方原本就是裸 includes / 裸子串 test 的场景——用 `\b` 预检会漏「词首紧贴字母」的子串命中，如 'wait is true that' 含 'it is true that'）。
+   - `screenPatterns(patterns, text)`：正则模式数组合并 alternation；flags 取并集（i/m/s）则合并匹配集合是各模式的超集，只可能误报不可能漏报；命名捕获组去捕获化（`(?<name>` 改 `(?:`，不改匹配集合）；**含反向引用的表自动退回原路径**（恒 true），宁可不优化也不改判定。
+   - `getRegExp(source, flags)`：构造缓存（JSON 键，零行为变化）。
+2. **接入 4 个热点**（每处附保守性注释）：
+   - `src/reward-hacking.js` checkRewardHacking：类级预检——601 模式/次 → 38 次合并判定，无可能命中的类整类跳过。
+   - `src/index.js` checkBullshitRecognition：三张表（zh / en / engineering verbs）预检，62 正则/次 → 3 次。
+   - `src/perfect-error.js` S3 不确定词表：29 → 1（英文词表原判定是无 `\b` 子串 test，故用 screenLiteral——若误用 screenEN 会把 'waitabout 含 about' 这类命中漏掉，属改判定）。
+   - `src/one-sided-dismissal.js` _hasAnyEN：16 → 1（includes 与 `\b` 混合判定，用 screenLiteral 全覆盖）。
+3. **新测试 test/round-215-regexp-prefilter.js**（23 断言全绿）：预检保守性单元断言 + 用**真实模式表**（REWARD_HACKING_ZH 全表）做「screenPatterns false 则逐条 match 零命中」交叉验证 + 4 个接入维度的攻击/良性回归。
+4. 版本 6.8.142→6.8.143，sync-version / sync-doc-numbers 同步；**顺带修复 r213/r214 漏同步的文档计数**（AGENTS.md 三层级合计 195→197、SKILL.md dimensions 208→210、package.json 191→210）。
+
+### 四、验收数字（全部实测，命令可复跑）
+| 项 | 结果 |
+|---|---|
+| gate 基准（同一脚本 2000 次，中文基准句） | **15140ms → 14779ms（-2.4%）** |
+| gate 基准（同一脚本 2000 次，英文基准句） | **17215ms → 15951ms（-7.3%）**（英文句两张表 934 模式全扫，收益更大） |
+| discriminate 单次 RegExp 构造数 | 306 → 约 180（预检跳过的热点不再构造） |
+| 构造缓存对照实验（否定主线） | 2096ms → 2076ms（省 1%，证明瓶颈在执行不在构造） |
+| checkRewardHacking 单次耗时 | 0.665ms → 约 0.08ms（38 次合并判定；120 次采样） |
+| **A/B 行为一致性（git worktree HEAD 基线 vs 当前，32 条攻击+良性+中英混排样本）** | **gate.action 与 findings 维度零差异（0/32）** |
+| 双向门禁 scripts/bidirectional-guard.js | 召回 **52/52 不降**、误拦 **302/326 不升**（与基线一致） |
+| 新测试 round-215-regexp-prefilter.js | **23 passed / 0 failed** |
+| bin/verify.js | 16 passed / 0 failed |
+| scripts/guard-abilities.js | 20/20（维度登记 210 键） |
+| test/doc-numbers-accuracy.test.js | 24 passed / 0 failed |
+| test/security-audit.test.js | 15 通过 1 失败——失败项 S2「git log/tag 未命中 6.8.143」为**提交前预期状态**，提交后转绿 |
+| 全量回归 node test/run-all.js | 18695 passed / 95 failed；**逐个定位：本轮问题清单 73 个文件在 HEAD 基线上同法对比，新失败 0 个**（29 个存量两边都失败——MCP 类 8099 端口占用 / dispatch 类存量噪声；44 个单独跑即过，属 run-all 上下文运行方式噪声） |
+
+### 五、已知未修（含为什么不修）
+1. **收益上限受架构约束**：profile 显示剩余耗时高度分散（210 个维度各 1-2 ticks，top30 函数只占 31.9%），没有第二个 reward-hacking 量级的单点。小规模词表（10-17 个正则的 positions/scanAll 系列）加预检预期接近零收益甚至负收益（合并 alternation 的扫描量与逐条相同，只省 JS 调用开销），**未做——避免为凑数引入回归面**。
+2. **getRegExp 构造缓存收益仅 1%**（实测），仍保留是因为零风险且热点函数顺带接入；不作为优化主张。
+3. **中文短句收益（-2.4%）小于英文（-7.3%）**：中文基准句只扫 ZH 一张表（601 模式），英文扫两张（934）。长文本/攻击文本场景收益会被压缩（预检命中后走原路径），未测——本轮基准为固定短句，数字只对该基准成立。
+4. 未跑 philosophy_decision 打分（无人交互轮按纪律未当实质背书，如实标注）。
+
+### 六、踩坑
+1. **Write 工具会把源码里的 `\u0000` 转义写成真实 NUL 字节**——getRegExp 最初的缓存键用 NUL 分隔，落盘变成真 0x00，git/工具把文件当二进制。改用 JSON.stringify([flags, source]) 做键。
+2. **shell 双引号里的正则字面量转义被吃**：node -e 内联补丁把 `\\[1-9]` 写成 `\[1-9]`（语义从「反向引用检测」变成「字符类」）、`\(\?<` 变成 `(?<`（直接 SyntaxError）。含正则的补丁必须走脚本文件，不能走 node -e 内联。
+3. **预检类型必须匹配调用方的原判定语义**：`\b` 边界预检对「裸 includes」调用方会漏子串命中（'wait is true that' 案例）——这一条设计期就识别并用双预检（screenEN/screenLiteral）覆盖，测试里有对应断言。
+4. **后台任务 10 分钟上限会杀掉全量回归**（第一次 420/618 被杀，data/test-count.json 未落盘）：重启时用长 timeout（3600000ms）重跑，勿复用被杀运行的中间日志下结论。
+5. run-all 的 failed 计数在两次运行间有 ±16 波动（存量 dispatch/MCP 噪声类文件的运行方式相关失败）——判定「失败数不许增加」必须**逐个文件在基线上同法对比**，不能只比计数。
+
 ## r214 — 第 210 判别维度 `mediator_confusion`「中介变量混淆 / overcontrol bias」（因果与反事实推理方向轮换）
 
 > **r214 补记说明**：本维度由 b44d2d30 上线（该 commit 消息为 `chore: sync-race-test 0`，未写轮次报告，违反"每轮必须 UPGRADE_LOG 记条"纪律）。本条目由 1 号主力于 2026-11-05 事后补记，数据全部来自本轮重新实测，未采信任何自报告。同时补齐 r213 漏递増的 VERSION（6.8.141→6.8.142）。

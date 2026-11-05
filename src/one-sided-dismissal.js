@@ -42,6 +42,9 @@
  */
 'use strict';
 
+// [r215] 保守预检 + 构造缓存（见 src/regexp-utils.js 头部的保守性证明）
+const { getRegExp, escapeRe, screenLiteral } = require('./regexp-utils.js');
+
 // ── 腿①：让步标记 ────────────────────────────────────────────
 const CONCESSION_ZH = [
   '虽然', '尽管', '固然', '诚然', '不可否认', '无法否认', '必须承认', '谁也无法否认',
@@ -133,13 +136,18 @@ function _hasAny(text, list) {
 }
 
 // EN 侧词边界匹配（避免 'while' 命中 'meanwhile'、'overall' 命中 'overalls'）
+// [r215] 保守预检：list 是模块级常量词表。screenLiteral 用无边界字面合并
+// alternation 做一次判定——它是比 includes 和 \bword\b 都宽的条件，任何
+// 原判定命中都必然覆盖（含 'wait is true that' 含 'it is true that' 这类
+// 词首紧贴字母的子串命中）。预检不命中 ⇒ 整个循环必然返回 null，跳过。
 function _hasAnyEN(text, list) {
   const low = text.toLowerCase();
+  if (!screenLiteral(list, low)) return null;
   for (const w of list) {
     if (w.includes(' ') || w.includes('-')) {
       if (low.includes(w)) return w;
     } else {
-      const re = new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+      const re = getRegExp('\\b' + escapeRe(w) + '\\b', 'i');
       if (re.test(low)) return w;
     }
   }

@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 210 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
-×  1,316 dispatch routes  ×  18,949 passing tests  ×  2 npm dependencies
+×  1,316 dispatch routes  ×  18,695 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 194 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 210 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.142**. Not marketing copy.
+Measured on this repository at **v6.8.143**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.142**. Not marketing copy.
 | Dispatch routes | 1,316 |
 | Discrimination dimensions | 210 |
 | MCP tools | 184 |
-| Test suite | 18,949 passing / 79 failing |
+| Test suite | 18,695 passing / 95 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.143 | 2026-11-05 | 性能轮（r215）：静态词表/模式表的**保守预检**上线——discriminate 单次调用原先构造并执行 306 个正则（profile 实测热点全部是「静态词表逐词 new RegExp + test/exec」模式：checkRewardHacking 601 模式/次占总判别 8.6% 为第一热点、checkBullshitRecognition 62 个/次、checkPerfectError 29 个/次、_hasAnyEN 16 个/次、checkContradiction 24 个/次）；新模块 src/regexp-utils.js 提供 screenZH（词表首字字符类预检）/screenEN（ 词边界合并 alternation）/screenLiteral（无边界字面合并，覆盖裸 includes 判定）/screenPatterns（模式数组合并 alternation，flags 取并集 ⇒ 匹配集合是超集 ⇒ 只可能误报不可能漏报；含反向引用的表自动退回原路径）+ getRegExp 构造缓存，接入 4 个热点（reward-hacking 类级预检 601→38 次判定、bullshit 62→3、perfect-error 29→1、_hasAnyEN 16→1）；判定结果零变化：HEAD 基线 A/B 对比 32 条样本（攻击+良性+中英混排）gate.action 与 findings 维度**零差异**，双向门禁召回 52/52 不降、误拦 302/326 不升；实测收益（同一基准脚本 2000 次 gate）：中文 15140ms→14779ms（-2.4%）、英文 17215ms→15951ms（-7.3%，英文句两张表 934 模式全扫故收益更大），discriminate 单次 RegExp 构造数 306→约 180；纯构造缓存实测只省 1%（V8 compilation cache 已吃掉构造开销），真正的成本在正则执行次数，故预检而非缓存是主线 |
 | 6.8.142 | 2026-11-05 | 第 210 维度 **mediator_confusion**「中介变量混淆 / overcontrol bias」上线（r213，因果与反事实推理方向轮换）——「控制/解释动作腿（控制/调控/校正/矫正/调整/扣掉/扣除/剔除/除去/去掉/排除/屏蔽/抵消 + 解释/解释掉/完全解释/充分说明/归因/归结 + 只因为/正是因为/是由于/归根到底/本质上是因为 + 反应型行为吃/服/用/接受/采取了 + 因为+行为或变量陈述 + 只有…才…；EN control(s|led) for / adjust(ed) for / correct(s) for / account(s) for / hold(s) constant / condition(s) on / net(ted) out / partial(led) out + explain(s|ed) / fully explain / completely explain / attribute to / reduce to / boils down to / comes down to / is just + only because / simply because / precisely because / because of / due to + because/since + 中介性行为或变量陈述——r161 教训：控制/解释/调整 收裸动词形态）× 效应否定结论腿（没有关系/没有关联/无关/并不相关 + 不存在因果/不是原因/算不上原因/没有因果/并无因果关系 + 没有效果/没有作用/没有影响/不起作用/毫无作用 + 无效/失效/不成立/推不出/说明不了 + 真正的原因/真实原因/真正的解释/替代解释/唯一解释 + 只是/不过是/无非是/仅仅是因为 + 之间的联系/之间的关系 + 就不/便不/再无/并无/并未；EN no effect / no relationship / no correlation / no link / nothing to do with / irrelevant / unrelated + not causal / not the cause / no longer significant / no longer affects / doesn't explain + no impact / has no effect / makes no difference / is meaningless + the real cause / the actual cause / the only cause / a better explanation + merely / just a / nothing but + link|connection|relationship between A and B + only|simply|merely because + 中介性动词）」两腿共现 + 邻近窗（腿②须位于腿①之后 40 字/EN 120 字符内且未被否定），把「控制/解释掉因果链中间环节」偷换成「排除混杂、上游无因果」的新攻击族——当 A 通过 M 影响 B（A→M→B）时 M 是效应的**传递通道**而非**替代解释**，控制 M 会切断这条通道，此时 A 与 B 相关消失是干预的直接后果、不是「A 本来就不是原因」的证据；混杂因素控制它是正确的去偏，中介变量控制它是制造偏差，两者判别方向正好相反；四组豁免（概念/教学转述、正确响应形、混杂控制形、推理否定/对冲）+ 疑问句；与 common_cause（第 174 维共同原因/混杂）/ collider_bias（第 209 维条件筛选子样本）/ reverse_causation（第 172 维因果方向倒置）/ monocause（第 161 维多因压单因）/ necessity_sufficiency_confusion（第 183 维必要充分混用）边界错开；r213 探针 6/6 攻击样本穿透硬闸门且零维度命中（中英双语、带修饰、长句）、12/12 良性零误判；外部三层搜索（HN Algolia causal inference reasoning / causal fallacy detection reasoning / causal reasoning fallacy detection language models、Semantic Scholar 三次 causal fallacy detection reasoning / causal fallacy correlation confusion / causal reasoning fallacy detection language models、GitHub API causal fallacy detection / logical fallacy detection sort=stars）除 HN 命中 arXiv 2405.02318（一阶逻辑翻译检测逻辑谬误，非因果中介方向）外全部空返，无纯规则可集成方案，按既有维度形态自建；新文件 src/mediator-confusion.js（checkMediatorConfusion，含 CONTROL_ZH/EN、NULL_ZH/EN、EXEMPT_META_ZH/EN、__internals()）+ test/round-213-mediator-confusion.js（内联负例注入攻击 16/16、良性 26/26 全绿；6 项腿与豁免常量逐常量负例注入），gate 层变体矩阵 8/8 攻击非 pass（8 条 mediator_confusion 直接承重）+ 5/8 良性 pass（3 条非 pass 均由既有维度 monocause/presupposition/exclusive_trust 触发、findings 中无 mediator_confusion，本维度零误伤），verify 166→167、维度 209→210、三层级合计 196→197/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry），五门禁（verify 16/16 / guard 20/20 / doc 22/22 / 双向 52/52+302/326 不升）|
 | v6.8.141 | 2026-11-05 | 第 209 维度 **collider_bias**「对撞偏差 / endogenous selection bias」上线（r212，因果与反事实推理方向轮换）——「条件筛选标记（在…里/之中/中间/中 + 只看/入选/活过/留任/被淘汰前，裸名词形态；EN among the admitted / only those who / conditioned on / restricted to / survivors / survived / made it through，窗 30 字/EN 100 字符）× 样本内观察到的相关共变（负相关/正相关/相关性/相关关系/成反比/共变 + 越少…越高/更低/更高/反而/反倒——**不要求显式「相关」字样**；EN negatively correlated / correlated with / inversely related / associated with / less…more / tends to）× 总体因果结论（C-a 推断+因果形：所以/因此/因而/可见/说明/意味着/证明/显然/据此 + 导致/造成/拖累/损害/抑制/促进/有助/有害/不利于/更有效/更安全/推荐/推广/越好；EN causes / leads to / hurts / harms / improves / boosts / better / effective / should / recommend；C-b 裸结论形：因果词在腿②后 80 字/EN 200 字符内且未被否定）」三腿共现+邻近窗，否定守卫窗口化（查因果词前 8 字窗口，实现期修复「这看起来像…拖累…但其实是伪相关」漏对冲），把「条件筛选制造的子样本内伪相关」偷换成「总体因果结构」的新攻击族——当 A、B 都影响 C（对撞因子），观察范围被限制在 C 的某个取值（入院/入选/存活/留下）时，A 与 B 在子样本里呈现相关，**即使 A、B 在总体中毫无因果关系**，这是条件化的结构性后果而非数据噪声，是最容易被叙述成铁证的一类假因果；四组豁免（概念/教学转述、正确响应形、无腿②、推理否定/对冲）+ 疑问句；与 selection_bias（取样受限只是腿①、承重的是腿②③）/ survivorship_bias（不要求相关观察与因果结论）/ simpsons_paradox（本族只有一个被条件筛选的层级）/ common_cause·reverse_causation（它们假定共变真实，本族的共变本身就是筛选产物）/ cum_hoc·post_hoc（不要求显式相关或时间先后）边界错开；r212 探针 5/7 攻击真零命中（含中英双语/裸名词/带修饰/长句），良性基本 pass；外部三层搜索（HN Algolia + GitHub API fallacy / causal inference fallacy 命中 joshinh/causal-fallacies、causalNLP/logical-fallacy、latent-variable/Real_time_fallacy_detection，README 已读均非纯规则可集成；Semantic Scholar collider bias endogenous selection 空返）后按既有维度形态自建；新文件 src/collider-bias.js + test/round-212-collider-bias.js（32 断言全绿：8 攻击全命中含中英双语/裸名词/带修饰/倒装/长句、8 良性全放行含正确响应形/多因陈述/观察性数据/存活者偏差转述/教学/筛选后描述/对冲/疑问、6 项腿与豁免常量负例注入承重），gate 层变体矩阵 10/10 攻击非 pass（8 条 collider_bias 直接承重，2 条其他维度 verify 代拦）+ 10/10 良性全 pass，verify 165→166、维度 208→209、三层级合计 195→196/剩余 13 不变，模块 162 不变，五门禁全绿（verify 16/16 / guard 20/20 / doc 24/24 / 双向 52/52+302/326 不升）|
 | 6.8.140 | 2026-11-04 | 第 208 维度 **hypostatization**「实体化/拟人化谬误 / reification」上线（r211，逻辑谬误检测一线轮换）——「抽象实体（历史/时代/市场/资本/数据/社会/规律/命运/科技/系统/算法/自然；EN history / the market / capital / data / society / the system / the algorithm / nature）×主体行动词（会惩罚/不会允许/知道/记得/决定/选择/拒绝/回答/回应/审判/报复/背叛/警告/呼唤；EN will punish / won't allow / knows / decides / chooses / refuses / answers / judges / rewards / warns）×结论承重（所以/因此/必须/应该/必将/注定或后果分句）」三腿共现+双邻近窗（中文 12/50 字、EN 50/180 字符），另设 R2 判定型分支（审判/惩罚/报复/报答/谴责/辜负/背叛/定罪；EN judge / punish / reward / betray / revenge / will not tolerate——「X 将审判/惩罚 Y」裸断言自带攻击性），把「抽象物像人一样行动」偷换成「结论有依据」的新攻击族；四组豁免（概念/教学/文学转述、明示修辞标记、主体性否认、谚语格言）+ 疑问句豁免；r211 探针 5/7 攻击真零命中（含中英双语/裸名词/带修饰）、良性 4/4 零误伤；外部三层搜索无可集成纯规则方案（GitHub 谬误检测最高 ★120 全 LLM 方案、Semantic Scholar 空返），按既有维度形态自建；新文件 src/hypostatization.js + test/round-211-hypostatization.js（56 断言全绿），verify 164→165、维度 207→208、三层级合计 194→195/剩余 13 不变，五门禁全绿（verify 16/16 / guard 20/20 / doc 24/24 / 双向 52/52+302/326 不升） |

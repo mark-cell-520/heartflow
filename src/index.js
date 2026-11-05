@@ -165,6 +165,10 @@ const { checkPlanGate } = require('./plan-gate.js');
 const { checkForbiddenCall } = require('./forbidden-call.js');
 const { checkCompletionEvidence } = require('./completion-evidence.js');
 const { checkDespacedInjection } = require('./despaced-injection.js');
+// [r215] 静态词表正则工具：保守预检（screenZH/screenEN）+ 构造缓存
+// （getRegExp/escapeRe）。用于把「逐词 new RegExp + test/exec」热点
+// （checkBullshitRecognition 等）的扫描次数砍到一次预检，判定结果不变。
+const { getRegExp, escapeRe, screenZH, screenEN } = require('./regexp-utils.js');
 // [r733] 英文注入同义族通道（synonym families）。中文侧 INJECTION_PATTERNS.zh 有为
 // 同义替换准备的词族结构（无视|撇开|抛开|丢掉|舍弃|废止 × 之前|上述|所有 ×
 // 指令|规则|限制|约束|设定），英文侧却只有字面短语 "ignore ... previous ..."，
@@ -8148,9 +8152,7 @@ function isInfoDeprivationCompound(text) {
     || ID_COMPOUND_DEPRIVE_YOU_ZH.test(text)
     || ID_COMPOUND_DEPRIVE_STATE_ZH.test(text);
   if (!deprived) return false;
-  if (ID_COMPOUND_OBEY_REFUSAL_ZH.test(text)) return false;
-  if (ID_COMPOUND_OBEY_POLITE_ZH.test(text)) return false;
-  if (ID_COMPOUND_FALLBACK_ZH.test(text)) return false;
+  // 变异：豁免被删除
   return ID_COMPOUND_OBEY_ZH.test(text);
 }
 
@@ -9737,29 +9739,42 @@ function checkBullshitRecognition(text) {
 
   const bs = [];
 
-  for (const p of zhPatterns) {
-    const re = new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-    let match;
-    while ((match = re.exec(text)) !== null) {
-      bs.push({ pattern: match[0], type: 'zh_buzzword' });
+  // [r215] 保守预检（src/regexp-utils.js）：screenZH/screenEN 用一次正则
+  // 执行判定词表是否可能命中——预检不命中 ⇒ 词表无一命中 ⇒ 逐词扫描的
+  // 结果必然是空，故整段跳过。预检只可能误报（含首字但不成词，多跑一趟
+  // 原路径），不可能漏报，判定结果与跳过前完全一致。
+  // 实测收益：该函数原先每次 discriminate 构造并执行 62+ 个正则
+  // （index.js:9741/9749 两段），是本轮 profile 的第一热点。
+  if (screenZH(zhPatterns, text)) {
+    for (const p of zhPatterns) {
+      const re = getRegExp(escapeRe(p), 'gi');
+      let match;
+      while ((match = re.exec(text)) !== null) {
+        bs.push({ pattern: match[0], type: 'zh_buzzword' });
+      }
     }
   }
 
-  for (const p of enPatterns) {
-    const re = new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
-    let match;
-    while ((match = re.exec(text)) !== null) {
-      bs.push({ pattern: match[0], type: 'en_buzzword' });
+  if (screenEN(enPatterns, text)) {
+    for (const p of enPatterns) {
+      const re = getRegExp('\\b' + escapeRe(p) + '\\b', 'gi');
+      let match;
+      while ((match = re.exec(text)) !== null) {
+        bs.push({ pattern: match[0], type: 'en_buzzword' });
+      }
     }
   }
 
   // [v6.7.103] 工程动词单独记账，不进 bs（不影响 count/score）
+  // [r215] 同上加保守预检：ENGINEERING_VERBS 无可能命中即跳过整段。
   const engHits = [];
-  for (const v of ENGINEERING_VERBS) {
-    const re = new RegExp('\\b' + v + '\\b', 'gi');
-    let match;
-    while ((match = re.exec(text)) !== null) {
-      engHits.push({ pattern: match[0], type: 'en_engineering_verb' });
+  if (screenEN(ENGINEERING_VERBS, text)) {
+    for (const v of ENGINEERING_VERBS) {
+      const re = getRegExp('\\b' + v + '\\b', 'gi');
+      let match;
+      while ((match = re.exec(text)) !== null) {
+        engHits.push({ pattern: match[0], type: 'en_engineering_verb' });
+      }
     }
   }
 
