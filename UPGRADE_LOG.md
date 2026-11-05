@@ -1,3 +1,55 @@
+## r717 — 第 213 判别维度 silence_imputation「沉默推定 / 诉诸沉默谬误」上线 + di 合规目的状语豁免 + manufactured_consent 概念转述修复
+
+**轮次**：r717（UPGRADE_LOG 第 717 轮）｜ **版本**：v6.8.147 ｜ **上线 commit**：e58c1baf（auto-commit-round 落盘）+ 490bf7f1（diag-hg.js 探针）｜ **日期**：2026-11-06 ｜ **方向**：方向池 silence_imputation（r216 探针口径复测 6/10 漏判 + 0/6 误伤，合格线「漏判≥50% 且良性 0 误伤」两项同时满足）——新维度从探测器到豁免到负例到文档口径全链路
+**真升级类型**：新辨别维度（用户可感知：拿「没否认/不回应」当「指控为真/心虚」的推定话术，从 60% 漏判变 10/10 拦截；「以符合保留策略」合规句不再被 di 误 block）
+**来源**：cron r717 执行体（init 简报第 717 轮；r218/r219 收尾链已由上一轮跑完——bdac9c80 + 298ffef2 在盘，round-guard after 已过）
+
+### 新维度 src/silence-imputation.js（第 213 维，verify 级，169→170）
+- 判据**双腿共现**：腿① SILENCE 沉默动作（没/不/未/始终/迟迟+出来+否认|澄清|回应|回答|解释|辟谣|发声|吭声|置评、一言不发|避而不答|拒绝回答、选择沉默|保持沉默；EN no denial / declined to comment / refused to answer / silence on the matter / never issued a statement）；腿② IMPUTE 推定结论（就是|等于|意味着|说明|证明|表明|印证|坐实+默认|承认|心虚|是真的、这本身就是答案、显然是心虚；EN must be true / is telling / says it all / speaks for itself / speaks volumes）。两腿须在**邻近窗 60 字符**内共现（实测英文样本跨距 46，原窗 40 截断漏判），支持**倒装形**（推定前置、沉默紧随——after 为负时按 12 字符紧邻窗判）
+- 四组豁免（全部负例注入承重）：疑问句式（…就是默认了吗）、概念转述/教学（诉诸沉默谬误 / argument from silence / logical fallacy in this case）、正确响应形（不等于认罪/不作为证据/是当事人的权利/律师建议；EN not evidence / does not imply guilt / is not an admission / standard practice / right to decline）
+- 与既有维度边界：manufactured_consent（第 111 维）管沉默×推出**同意/默许**的合意制造，本族管沉默×推出**事实为真或心虚**的证据替代；appeal_to_ignorance 管不能证伪→为真的举证责任倒置，本族不依赖举证责任框架
+- **接线 index.js 十处**：require / 计算点（sil）/ allDims 参与判定 / checked_by 维度对象 / dimensions 汇总 / VERIFY_DIMS 登记 / 5198 行维度对象 / DIM_GUIDANCE guidance 条目（长篇边界说明）/ exports / weight 表 0.4。曾加 attribution 正则表三条，负例实测证明与模块判据**重复防护**（注入模块腿后归因正则仍兜住攻击、造成「未变红」假阴性，与 r218 踩坑 1 同族），已删
+- r216 探针口径复测：攻击 10 条从 6/10 pass（60% 漏判）→ **10/10 非 pass**；良性 6 条 **0 误伤**；扩展良性 4 条全 pass
+
+### 两个存量修复（同轮实测）
+- `src/dangerous-instruction.js`：v6.7.73 目的状语豁免补「以符合/为符合/以满足/为满足」**合规目的族**（r216 方向池遗留边界「定期清理过期日志以符合保留策略」block → **pass**；攻击句「定期清理日志，然后删掉审计痕迹掩盖入侵」仍 **block**）
+- `src/manufactured-consent.js`：META_EXEMPT_EN 补 `argument from silence` 概念词（"Argument from silence is a fallacy in this case." 误 verify → **pass**；r216 探针扩展良性句）
+
+### 新增
+- `test/round-717-silence-imputation.test.js`（**40 断言全绿**：10 攻击 gate 非 pass、10 良性全 pass、9 模块边界含倒装/窗宽/疑问/概念/正确响应形/短文本、5 __internals 注入、think() 冒烟、3 存量锚点含 di 修复前后对照）
+- `scripts/negative-test-silence-imputation-r717.js`（**10 注入点 10/10 如期变红、0 崩溃**：pickRe 默认表全空 ATTACK_HIT 10→4 / SILENCE_ZH neutralize 10→8 / IMPUTE_ZH 10→9 / SILENCE_EN 10→9 / IMPUTE_EN 10→9 / 邻近窗 60→12 得 10→8 / 四个豁免词注入 EXTRA_FP 0→1；对照 ATTACK_HIT=10/10 BEN_FP=0/10 EXTRA_FP=0/4）
+
+### 验证逐项实测
+| 项 | 实测 |
+|---|---|
+| node test/round-717-silence-imputation.test.js | ✅ 40 passed, 0 failed |
+| node scripts/negative-test-silence-imputation-r717.js | ✅ 注入 10 个 10 个变红 0 崩溃，负例验证通过 |
+| node bin/verify.js | ✅ 16 passed, 0 failed |
+| node scripts/bidirectional-guard.js | ✅ 召回 52/52 (100%)、误拦 302/326 (92.6%)——与基线一致，零回归 |
+| node test/security-audit.test.js | ✅ 16 通过, 0 失败（commit 前 15/1：唯一失败 S2 _verifyGitCommit 版本未进 git log，commit e58c1baf 后复跑自愈） |
+| node bin/cli.js status | ✅ running（version 6.8.147） |
+| node test/doc-numbers-accuracy.test.js | ⚠️ **21 通过, 3 失败**——三项全读 AGENTS.md：①维度总数（AGENTS 212 vs 实测 213）②三文档一致（AGENTS 212 vs README/SKILL 213）③Verify 层列举（AGENTS Verify-level (169) vs VERIFY_DIMS 170）。**AGENTS.md 是受保护 agent-instruction 文件，cron 无人审批被护栏 BLOCKED**，本轮无法修改，待人工执行（patch 内容见下） |
+| node scripts/round-guard.js --stage=after | commit 后复跑 ✅（commit 前 3 阻塞均为收尾前正常态） |
+
+### 待人工执行（AGENTS.md 护栏阻塞，两处 patch）
+1. `**Zero LLM dependency.** 212 dimensions` → `213 dimensions`；`## The 212 dimensions` → `## The 213 dimensions`
+2. 注释块 `v6.8.142 — mediator_confusion added as dimension 210（VERIFY，166→167）` 后加 `v6.8.147 — silence_imputation added as dimension 213（VERIFY，169→170）`；`add up to 199` → `add up to 200`
+3. `**Verify-level (169):** mediator_confusion, ...` → `**Verify-level (170):** silence_imputation, mediator_confusion, ...`
+4. 附注：r216 texas_sharpshooter 上线时同样未同步 AGENTS.md Verify 清单（历史口径漂移，grep texas_sharpshooter AGENTS.md = 0 命中），本次一并人工补更省事
+
+### 下一轮方向（可直接做）
+1. **AGENTS.md 人工 patch**（上方 4 处，doc-numbers 即可回 24/24）
+2. HG 判据③（nobody/no one+行为动词）对 "Nobody can skip the verification step here." 误报 verify（severity 30 低危）——同形反义规范句（协作抱怨 vs 安全规范），分界可能在「情态动词 can/must/should 在场」或「物主代词 my/our 在场」，收窄须防掉抱怨族召回，值得一轮做透
+3. 方向池复测结论（本轮 diag-pool.js 实测，供下轮参考）：di「以符合」本轮已修（pass）；HG 英文否定仍误报（上方第 2 项）；silence_imputation 本轮已上线；middle_ground / base_rate_fallacy / composition_division / amphiboly / is_ought 历史复测均不合格（探针在 scripts/round-717/diag-pool.js 可复跑）
+4. 遗留负例：负例脚本探针若再加模块 require，占位符必须全局 replace（本轮踩坑）
+
+### 新踩坑（三条，均已实测踩过）
+1. **负例脚本探针模板多占位符必须全局 replace**：`String.replace('SRC_DIR_PLACEHOLDER', dir)` 字符串参数只换第一处——PROBE 模板里 gate.js 与 silence-imputation.js 两个占位符，第二个原样留在探针里导致 11/11 假崩溃（对照也崩）。修：`PROBE.replace(/SRC_DIR_PLACEHOLDER/g, ...)`
+2. **豁免注入必须打在单依赖样本上**：初版用「他没回应，但这不等于认罪。」注 EXEMPT_CORRECT_ZH「不等于认罪」——句中还含子串「不等于」（同表另一词条）继续豁免，注入不变红；且测试良性矩阵 10 条里 7 条**天然不命中判据**（缺腿②），豁免机制对它们根本不承重。修：构造「双腿共现+唯一豁免词」专属样本 4 条（她不回答是当事人的权利，偏偏有人说这就是默认。/ His silence is telling, but silence is not evidence. / 这是诉诸沉默谬误，不回应就是默认。/ This argument from silence is a fallacy: no response means he's guilty.），负例 EXTRA_FP 判定走模块层（gate 层有 manufactured_consent/fallacies 对同话题句误伤，模块层才纯净）
+3. **patch fuzzy 匹配会吞注释字**：index.js 接线时两处历史注释被误改（「陈述腿×规律化宣称腿）」→「陈述×规律化宣称）」；「七处一次接齐」→「八处一次接齐」）——均当次核对 diff 发现并恢复。纪律：以历史注释行为锚点 patch 后必须逐处核对 diff，不能只看 success
+
+---
+
 ## r218 — 存量误伤修复轮（perfect_error 道义模态/统计语域豁免 + presupposition 质问闸 + vagueness 验证锚 + false_balance 条件式豁免 + di+rh 前置否定英文腿）
 
 **轮次**：r218（UPGRADE_LOG 第 716 轮）｜ **版本**：v6.8.146 ｜ **上线 commit**：bdac9c80 ｜ **日期**：2026-11-06 ｜ **方向**：r217 否定守卫同方向延续——良性合规句/规范句被 perfect_error、presupposition、vagueness、false_balance、dangerous_instruction+reward_hacking 误伤的专项修复
