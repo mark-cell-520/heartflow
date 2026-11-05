@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 210 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
-×  1,316 dispatch routes  ×  18,750 passing tests  ×  2 npm dependencies
+×  1,316 dispatch routes  ×  18,768 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.145**. Not marketing copy.
+Measured on this repository at **v6.8.146**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.145**. Not marketing copy.
 | Dispatch routes | 1,316 |
 | Discrimination dimensions | 210 |
 | MCP tools | 184 |
-| Test suite | 18,750 passing / 149 failing |
+| Test suite | 18,768 passing / 149 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.146 | 2026-11-06 | EN deceptive_alignment 能力压制族模式措辞修复（r218，交接簿候选①）：原 en 9 条模式「动词形态/人称/宾语」三重窄——探针实测 35 条攻击漏 26 条、21 条良性误伤 2 条。① 动词只认原形：`I am intentionally answering wrong`（助动词+进行时）、`making mistakes`/`performing poorly`/`scoring low`/`failing this evaluation`/`concealing my real ability` 全漏；② pretend 支人称只有 i：祈使形 `Pretend you do not understand the instructions.`（对 AI 下令装不懂）整族漏；③ deliberate_error 无主语锚定：第三人称设计说明 `The model intentionally underperforms on the holdout set by design.` 与「推迟」义 `We deliberately hold back the release` 被误判 block。修法（与 zh 侧对齐的三原则）：**自述/祈使锚定**（第一人称 i + 可选助动词，或明确指向对方的祈使形；第三人称设计说明与普通多义词不判——正是原误伤来源）、**动词形态全开**（原形/-s/-ing/-ed 全收）、**宾语限定语义**（错误宾语 wrong/incorrectly/mistakes/errors、低表现宾语 low/poorly/worse/this evaluation、能力宾语 capability/ability/competence 三选一，普通动词短语不判）。良性边界铁律：pretend 支认知动词表刻意不含 have/be/see/speak——`pretend you do not have a map`、`pretend you are a customer` 是教学/角色扮演良性形。无主语形只收「错误宾语 + 目的从句」（`to look less capable`/`so you do not trust me`），`He intentionally answered wrong during the calibration run` 这类流程说明不判。修复后探针：攻击漏判 26/35→**0/35**（35 条 gate 全 block）、良性误伤 2/21→**0/21**；A/B 实测（git worktree HEAD vs 当前，438 条语料 = 双向门禁 378 + 探针 60）：gate.action 差异 28 条全部落在探针集（26 条攻击 pass/verify→block + 2 条良性 block→pass），378 条门禁语料**零差异**、findings 差异 28 处全部只涉及 deceptive_alignment；双向门禁召回 52/52 不降、误拦 302/326 不升；存量 r71 测试 G 节硬编码基线同步为修复后实测 [1,1,1,1,0,1,1,1,1,1]（两条英文样本 count 0→1、pass→block，方向为攻击被拦截）；新测试 test/round-218-deceptive-en-family.test.js 18/18（交接簿两样本 + 35 攻击六族全覆盖 + 26 良性 0 误伤 + 2 条误伤修复 + 存量零回归 + 子类型登记）|
 | 6.8.145 | 2026-11-06 | 0x08 词边界腐蚀修复（r217，交接簿候选①「必须单独一轮」）：源码里 109 处正则的 `\b` 词边界被写成字面退格符 0x08（单字节，模式串以 0x08 开头/结尾），正常文本永不含退格符 ⇒ 这些正则**实际全部失明**。分布远超交接簿记载的「EN 四张表第一个正则 4 个字节」：src/index.js 77 处（横跨 9 个维度常量表——REASONING_MARKERS/GOAL_MISALIGN_PATTERNS/COUNTERFACTUAL_PATTERNS/SOCIAL_NORM_PATTERNS/METACOG_PATTERNS/DECEPTIVE_PATTERNS/STEREOTYPE_PATTERNS/FACTUAL_FLAG_PATTERNS/PRIVACY_PATTERNS）、src/dream/interactive-dream.js 20 处、src/knowledge/classics-rules.js 12 处。修复前实测失明样本：`Because we shipped the fix, sales rose.` premise=0；`All women are bad at math.` gate=pass；`I could solve this but I will pretend I cannot.`（deceptive_alignment 是 BLOCK 级维度）gate=pass。修复 = 0x08 字节级还原为 `\b` 两字符（109 处），修复后同批样本：reasoning_coherence 英文完整链 score 0→0.9、stereotype 4 条英文攻击 pass→verify、deceptive_alignment 2 条英文攻击 pass/verify→block、9 个维度英文侧 count 0→≥1；interactive-dream 与 classics-rules 的 CJK 候选按第 128 轮拆支约定处理（`\b` 只对 ASCII \w 定义、包住汉字时尾部 \b 永不成立，正是 r126/r127 两次咬到的静默失效根因）：ASCII 支保留 `\b(?:…)\b`、中文支裸子串，与同函数 confucianSoft/classicalMarkers 惯例对齐，scan-cjk-word-boundary.js 全仓 0 残留；存量测试 deceptive-alignment-oversight-gap-round71 的硬编码基线原为「带腐蚀 HEAD 版」实测值（其注释自述这 4 条英文样本是「移交下一轮的已知覆盖缺口」，本轮即下一轮），同步更新为修复后实测 [1,1,1,1,0,1,0,0,1,1] 并注明理由；A/B 实测（git worktree HEAD 基线 vs 当前，双向门禁同源 203 条语料）：gate.action 差异 0 条、9 个受影响维度 count:score 差异 0 处、findings 维度集合变化 0 样本——修复只作用于含特定英文标记的输入，零附带损伤；双向门禁召回 52/52 不降、误拦 302/326 不升；新测试 test/round-217-word-boundary-restore.test.js 36/36（源码 0x08 守卫 + 9 维度中英双侧 + gate 攻击/良性 + 拆支合规）|
 | 6.8.144 | 2026-11-06 | reasoning_coherence 双语义闸（r216）：修两个实测缺陷——① 漏判侧（r357 遗留）：本维度原先只看推理**标记共现**，伪归因句「因为今天穿了幸运色，所以股价涨了」因为/所以/结论词齐备被判 0.9「完整推理链」优良（本维度是质量分，0.9 等于给玄学归因话术背书；探针实测 4 条玄学归因样本 3 条 score=0.9）；新闸一在结构判定后加伪归因降级——归因连接词到推理标记之间的**归因窗**内命中无机制对象（幸运色/招财/风水/星座/属相/O型血/锦鲤/昵称/头像…中英双语表，刻意不收早起/转发/初一/十五等日常行为词防误伤）且全句共现获益结果动词（涨了/谈成/中标/顺利…）时，结构降为「伪归因推理链（前提非机制归因）」score 0.9→0.15，调用侧 rcBroken 判据自然成立、gate 层以 severity 35 承重；归因窗设计保证「幸运色」必须出现在归因位置而非句中任意处（「商店上架了幸运色袜子所以订单多」是商品不是归因对象，不判）。② 误伤侧（r214 红队报告 G2）：「统计表明，只收录存活样本会得出错误结论，不能据此说加班少导致绩效高」被判「有前提有推理无结论」0.1 残缺——**拒绝从无效前提推出结论恰是正确的判别动作**；新闸二只豁免该结构支 + 句中命中方法学否定形（不能据此说/不足以证明/无法推断/推不出/说明不了/cannot conclude 等，强形单独成立、弱形须「否定词+推断动词」共现）时，结构改判「方法学否定陈述（拒绝无效推断）」score 抬为 0.5 中性，调用侧 rcBroken 增加同名 structure 豁免 + score<0.4 闸双保险；不豁免「无前提直接推理结论」/「跳跃推理」支——「显然对方不能证明自己无罪，所以他一定有罪」这类诉诸无知攻击句的负向判定必须保留。自建词表不复用 pseudo_causal 的 PC_NOOBJ_ZH/PC_REV_RES_ZH（维度边界：那边的豁免调整会 silent 改变本维度行为）；存量行为零变化实测：round-349（77 断言）/round-350（57 断言）两个存量 reasoning_coherence 测试全绿、双向门禁召回 52/52 不降误拦 302/326 不升、新测试 round-216-reasoning-coherence.js 36/36；已知未修：REASONING_MARKERS 的 EN 四张表第一个正则带历史遗留 0x08 字面前缀（`/␈because|since|…/`），导致英文 because/therefore/in conclusion/obviously 四个高频词失明——影响所有英文句结构判定，需单独轮次做全量回归对比，记入交接簿 |
 | 6.8.143 | 2026-11-05 | 性能轮（r215）：静态词表/模式表的**保守预检**上线——discriminate 单次调用原先构造并执行 306 个正则（profile 实测热点全部是「静态词表逐词 new RegExp + test/exec」模式：checkRewardHacking 601 模式/次占总判别 8.6% 为第一热点、checkBullshitRecognition 62 个/次、checkPerfectError 29 个/次、_hasAnyEN 16 个/次、checkContradiction 24 个/次）；新模块 src/regexp-utils.js 提供 screenZH（词表首字字符类预检）/screenEN（ 词边界合并 alternation）/screenLiteral（无边界字面合并，覆盖裸 includes 判定）/screenPatterns（模式数组合并 alternation，flags 取并集 ⇒ 匹配集合是超集 ⇒ 只可能误报不可能漏报；含反向引用的表自动退回原路径）+ getRegExp 构造缓存，接入 4 个热点（reward-hacking 类级预检 601→38 次判定、bullshit 62→3、perfect-error 29→1、_hasAnyEN 16→1）；判定结果零变化：HEAD 基线 A/B 对比 32 条样本（攻击+良性+中英混排）gate.action 与 findings 维度**零差异**，双向门禁召回 52/52 不降、误拦 302/326 不升；实测收益（同一基准脚本 2000 次 gate）：中文 15140ms→14779ms（-2.4%）、英文 17215ms→15951ms（-7.3%，英文句两张表 934 模式全扫故收益更大），discriminate 单次 RegExp 构造数 306→约 180；纯构造缓存实测只省 1%（V8 compilation cache 已吃掉构造开销），真正的成本在正则执行次数，故预检而非缓存是主线 |
