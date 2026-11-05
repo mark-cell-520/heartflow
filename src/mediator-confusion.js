@@ -172,6 +172,9 @@ const NULL_ZH = [
   // r213 补腿：「之后/以后」+ 否定（控制了X之后，Y就不相关了）——
   // 窗由 CONTROL→NULL 邻近窗覆盖，此处只需否定词本身
   /就不|便不|再无|再无任何|并没有|并无|并未/,
+  // r214 补腿：效应消失类动词（控制了中间环节后，效应「消散/蒸发/
+  // 荡然无存」）——反问形「谈何作用/何谈因果」同族
+  /烟消云散|荡然无存|不复存在|消解|消散|谈何|何谈|无从谈起|谈不上|有何关系|有什么关系|有何关联|什么关系/,
 ];
 
 // ─── 腿② NULL 效应否定结论（英文）────────────────────────────
@@ -194,6 +197,11 @@ const NULL_EN = [
   // helps 类改变中间状态的动词），裸「simply because he studied hard」
   // （努力→结果的直接因果，非中介链条）不命中——良性实测 FP 一例。
   /\b(?:only|simply|merely)\s+because\s+(?:it|they|he|she|the\s+\w+|\w+)\s+(?:improves?|improved|reduces?|reduced|boosts?|boosted|helps?|helped|drives?|drove|raises?|raised|lowers?|lowered|increases?|increased|decreases?|decreased|enhances?|enhanced|mediates?|mediated|channels?|channeled)\b/i,
+  // r214 补腿：效应消失类动词（the apparent effect vanishes /
+  // dissipates / evaporates once you partial out the mediating steps）
+  // ——与 ZH「烟消云散/荡然无存」同族，需与腿① partial out/account for 配对
+  /\b(?:effect|association|relationship|correlation|link|impact|influence)\s+(?:vanishes|vanished|disappears|disappeared|dissipates|dissipated|evaporates|evaporated|collapses|collapsed|fades|faded|is\s+gone|goes\s+away)\b/i,
+  /\b(?:never|was\s+never|is\s+never|were\s+never)\s+(?:causal|a\s+cause|the\s+cause|real|meaningful|relevant|significant)\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────
@@ -290,7 +298,12 @@ function findControlLeg(text, isZh, R) {
   return idxs.sort((a, b) => a - b);
 }
 
-// 腿②：取腿①之后、邻近窗内、未被否定的首个否定结论位置
+// 腿②：取腿①邻近窗内、未被否定的首个否定结论位置
+// [r214 修订] 原实现要求 NULL 必须在 CONTROL **之后**（d >= 0）。缺陷：
+// 「The effect vanishes once you partial out the mediating steps.」——
+// 效应否定出现在控制动作之前，是"先给结论再给原因"的因果倒装，
+// 语义上完全成立，原实现漏判。修订为允许 NULL 出现在 CONTROL 之前
+// （限距 win 内），前后双向配对。
 function findNullLeg(text, isZh, R, controlIdxs) {
   const list = isZh ? (R.NULL_ZH || NULL_ZH) : (R.NULL_EN || NULL_EN);
   const win = isZh ? WIN_CONTROL_NULL_ZH : WIN_CONTROL_NULL_EN;
@@ -302,9 +315,11 @@ function findNullLeg(text, isZh, R, controlIdxs) {
       let m;
       while ((m = reG.exec(text)) !== null) {
         const d = m.index - ci;
-        if (d < 0 || d > win) continue;
-        if (negatedBefore(text, m.index, isZh)) continue;
-        if (d < bestDist) { bestDist = d; best = m.index; }
+        if (Math.abs(d) > win) continue;
+        // 后置形要求未被否定对冲；前置形（NULL 在 CONTROL 前）跳过该
+        // 检查——前置否定词多属"不再/从未"等效应否定本身的一部分
+        if (d > 0 && negatedBefore(text, m.index, isZh)) continue;
+        if (Math.abs(d) < bestDist) { bestDist = Math.abs(d); best = m.index; }
         if (m.index === reG.lastIndex) reG.lastIndex++;
       }
     }
@@ -321,8 +336,19 @@ function checkMediatorConfusion(text, inject) {
   if (!text || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
   const R = inject || {};
 
-  // 疑问句豁免
-  if (/[?？]/.test(text)) return { hit: false, score: 0, detail: '', count: 0 };
+  // 疑问句豁免 [r214 修订]
+  // 原实现：整句含 ?/？ 即豁免。缺陷：反问句（"难道…还能说…？"、
+  // "这不是心虚是什么？"）是操控话术最常用的包装——用问号把断言
+  // 伪装成提问。修订为：仅当句中**没有反问标记**时才豁免；出现
+  // 反问标记（难道/岂/凭什么/何尝/岂不是/谈何/还能说/…吗？+
+  // rhetorical 形）时不豁免，按正常判据走。
+  if (/[?？]/.test(text)) {
+    const RHETORICAL_ZH = /难道|岂|凭什么|何尝|岂不是|岂不|还能说|怎能|怎么可以|不是说|谈何|何谈|岂有此理|天晓得|谁不知道|谁不|谁都知道|你敢说|你敢保证|这不是|又是什么|是什么|能不|难道说|有何|有什么关系|什么关系|可言|何来|从何|岂不是|岂非|焉能|哪来|哪有什么|哪来的/;
+    const RHETORICAL_EN = /\b(?:isn'?t\s+it|doesn'?t\s+that|how\s+(?:else|could|can)|what\s+else|who\s+doesn'?t|who\s+wouldn'?t|if\s+not|rhetorical)\b/i;
+    if (!RHETORICAL_ZH.test(text) && !RHETORICAL_EN.test(text)) {
+      return { hit: false, score: 0, detail: '', count: 0 };
+    }
+  }
   // 概念/教学转述：讨论这个概念本身不是运用它
   // [r213 收窄] 原豁免把「中介变量」整体命中即豁免，导致「因为中介变量
   // 是睡眠，所以运动和健康没有因果关系」这类**运用中介概念作攻击**的

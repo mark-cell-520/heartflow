@@ -121,5 +121,23 @@ const gb = gate.gate ? gate.gate('需要区分中介变量和混杂因素，不�
 const gbDims = ((gb && gb.findings) || []).map(f => f.dimension);
 ok(!gbDims.includes('mediator_confusion'), 'gate 层教学良性不含 mediator_confusion');
 
+// ---- r214 补测：效应消失类腿（vanishes / never causal / 烟消云散）----
+ok(checkMediatorConfusion('The apparent effect vanishes once you partial out the mediating steps.').hit === true, '效应消失腿（EN vanishes + partial out）命中');
+ok(checkMediatorConfusion('The effect dissipates once you account for the intermediate mechanism.').hit === true, '效应消失腿（EN dissipates + account for）命中');
+ok(checkMediatorConfusion('Once you control for income, the upstream cause was never causal at all.').hit === true, 'never causal 腿命中');
+ok(checkMediatorConfusion('控制了中间环节之后，之前的关联便荡然无存。').hit === true, '效应消失腿（ZH 荡然无存）命中');
+ok(checkMediatorConfusion('扣掉传导路径上的环节后，两者之间的关系已无从谈起。').hit === true, '效应消失腿（ZH 无从谈起）命中');
+
+// ---- r214 修订：反问句豁免不再一刀切 ----
+// 原实现整句含 ?/？ 即豁免，导致"用问号包装的断言"逃判
+ok(checkMediatorConfusion('难道控制了中间环节之后，还能说上游因素真的起作用了吗？事实上两者再无关系。').hit === true, '反问形攻击（难道+还能说）不豁免');
+ok(checkMediatorConfusion('控制了中间环节之后，两者之间还有什么关系可言呢？').hit === true, '反问形攻击（谈何类）不豁免');
+// 真询问句仍豁免（无疑问标记 + 两腿齐备时，原判据本会命中，豁免逻辑挡住）
+ok(checkMediatorConfusion('请问控制了消炎药用量之后，炎症和发烧是否就不相关了？').hit !== true, '真询问句仍豁免');
+
+// ---- r214：豁免常量不被新腿误触 ----
+ok(checkMediatorConfusion('中介变量是因果链上的传递通道，控制它会切断总效应。').hit !== true, '概念转述豁免不被效应消失腿误触');
+ok(checkMediatorConfusion('控制了年龄、性别等第三方因素后，暴露与疾病的关联仍然显著。').hit !== true, '混杂控制形不被效应消失腿误触');
+
 console.log(`\nr213 mediator_confusion: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

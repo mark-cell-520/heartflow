@@ -1,3 +1,56 @@
+## r214 — 第 210 判别维度 `mediator_confusion`「中介变量混淆 / overcontrol bias」（因果与反事实推理方向轮换）
+
+> **r214 补记说明**：本维度由 b44d2d30 上线（该 commit 消息为 `chore: sync-race-test 0`，未写轮次报告，违反"每轮必须 UPGRADE_LOG 记条"纪律）。本条目由 1 号主力于 2026-11-05 事后补记，数据全部来自本轮重新实测，未采信任何自报告。同时补齐 r213 漏递増的 VERSION（6.8.141→6.8.142）。
+
+**轮次**：r214（补记）｜ **上线 commit**：b44d2d30 ｜ **日期**：2026-11-05 ｜ **方向**：因果与反事实推理（中介变量 / 过度控制偏差）
+**真升级类型**：1 — 新判别维度（dimMap 新键 `mediator_confusion`，独立命中一个新攻击族）
+**来源**：内部自建（混杂因素 vs 中介变量的经典判别问题；上游轮次 collider_bias / common_cause / reverse_causation 的边界邻域）
+**边界划分（与既有维度不重叠）**：`common_cause`（第 174 维）管共同原因/混杂因素；`collider_bias`（第 209 维）管条件筛选后子样本内相关被当成总体因果结论；`reverse_causation`（第 172 维）管因果方向整体倒置；`monocause`（第 161 维）管多因压成单因；`necessity_sufficiency_confusion`（第 183 维）管必要/充分条件混用。本族错在**把因果链中间环节当成可排除的替代解释**。
+
+### 实现内容
+- 新文件 `src/mediator-confusion.js`（382 行）：`checkMediatorConfusion(text, inject)` + `__internals()`（10 组可注入常量：CONTROL_ZH/EN、NULL_ZH/EN、EXEMPT_META_ZH/EN、EXEMPT_CORRECT_ZH/EN、EXEMPT_CONFOUNDER_ZH/EN、NEG_ZH/EN、WIN_CONTROL_NULL_ZH/EN）。
+- **判据（两腿共现 + 邻近窗，缺一不判）**：腿① CONTROL 控制/解释动作（ZH 控制/调控/校正/矫正/调整/扣掉/扣除/剔除/除去/去掉/排除/屏蔽/抵消 + 解释/解释掉/完全解释/充分说明/归因/归结 + 只因为/正是因为/是由于/归根到底/本质上是因为 + 反应型行为 吃/服/用/接受/采取了 + 因为+行为或变量陈述 + 只有…才…；EN control(s|led) for / adjust(ed) for / correct(s) for / account(s) for / hold(s) constant / condition(s) on / net(ted) out / partial(led) out + explain(s|ed) / fully explain / completely explain / attribute to / reduce to / boils down to / comes down to / is just + only because / simply because / precisely because / because of / due to + because/since + 中介性行为或变量陈述）；腿② NULL 效应否定结论（没有关系/没有关联/无关/并不相关 + 不存在因果/不是原因/算不上原因/没有因果/并无因果关系 + 没有效果/没有作用/没有影响/不起作用/毫无作用 + 无效/失效/不成立/推不出/说明不了 + 真正的原因/真实原因/真正的解释/替代解释/唯一解释 + 只是/不过是/无非是/仅仅是因为 + 之间的联系/之间的关系 + 就不/便不/再无/并无/并未；EN no effect / no relationship / no correlation / no link / nothing to do with / irrelevant / unrelated + not causal / not the cause / no longer significant / no longer affects / doesn't explain + no impact / has no effect / makes no difference / is meaningless + the real cause / the actual cause / the only cause / a better explanation + merely / just a / nothing but + link|connection|relationship between A and B + only|simply|merely because + 中介性动词）。腿②须位于腿①之后 40 字（EN 120 字符）邻近窗内且**未被否定**。
+- `src/index.js` 接入 8 处（17 个引用点）：require 引入、_normText 归一化后调用（带 _applyPedagogyRelaxation 教学松弛）、legs 组合传入 score、dimMap 注册、DIMENSION_GUIDE 判据说明、per-dimension 明细暴露。
+- **r161 教训落地**：腿①控制/解释/调整收裸动词形态，去掉前后缀仍命中（上轮 r213 已在 collider_bias 上修过同类问题，本轮沿用）。
+
+### 豁免设计
+- 元话语/教学转述（中介变量/中介效应/中介分析/中介路径/传导机制/因果链/路径分析/过度控制/直接效应/间接效应/统计学/教材/课堂/论文/悖论/称为/定义为/概念；EN mediator / mediation / mediating pathway / overcontrol / direct effect / indirect effect / path analysis / causal chain / textbook / statistics / called / defined / concept）——讨论概念本身不是运用它。**r213 收窄**：元话语豁免要求句中同时出现教学/学术框架标记或否定标记，裸「中介变量」出现在因果陈述中不豁免。
+- 正确响应形（承认 M 是传递通道并要求补直接效应/区分混杂与中介）——指出控制中介会切断通道并要求区分，正是本族要教的判别动作。
+- 混杂控制形（共同导致/同时导致/既导致/同时影响/第三方因素/外生变量/混杂因素/共同原因；EN confounder / jointly causes / third-party factor / exogenous variable / common cause）——控制真正的混杂因素是正确的去偏，本族明确不判。
+
+### 验证数据（2026-11-05 本轮重新实测）
+
+| 门禁 / 测试 | 结果 |
+|---|---|
+| gate 层变体矩阵（攻击） | **12/12 非 pass 且本维度承重**（裸控制动词形 3/3、修饰长句倒装形 4/4、效应消失倒装形 2/2、反问形 1/1） |
+| gate 层变体矩阵（良性） | **10/10 零误伤**（本维度不承重；其中 3 条被其他维度判 verify 属合理提示，非本族误伤） |
+| 新维度负例注入测试（test/round-213-mediator-confusion.js） | **57 passed / 0 failed**（原 47，r214 补 10 条断言） |
+| `node bin/verify.js` | **16 passed / 0 failed** |
+| `node scripts/guard-abilities.js` | **20/20**（维度登记 210 键） |
+| `node test/doc-numbers-accuracy.test.js` | **24 passed / 0 failed**（修复前 23/24，VERSION 漂移） |
+| `node scripts/bidirectional-guard.js` | **召回 52/52 不降、误拦 302/326 不升** |
+| 维度实测数（measure-claimed-numbers.js） | **210** |
+| 三层级计数 | block 11 / rewrite 19 / verify 167 |
+| 模块注册数 / dispatch 路由数 | 162 / 1316 |
+
+### 本轮顺带修复
+1. **VERSION 漂移（P1）**：r213 上线第 210 维度后漏递増 VERSION，导致 doc-numbers 守卫失败（README changelog 无当前版本行）。已补 6.8.141→6.8.142，`sync-version.js` 同步 package.json / src/core/version.js 兜底 / SKILL.md / README.md 口径戳；README changelog 去掉 `v` 前缀让守卫可抓（格式 `| 6.8.142 |`）。修复后 doc 门禁 24/24。
+2. **UPGRADE_LOG 缺轮次条目（P1）**：本文件即为补记。
+3. **侦察脚本未入库（P3）**：`scripts/round-730-family-probe.js`（181 行，r730 候选族复量探测器）未提交，已纳入版本控制。
+
+### 验证期关键修复（r214 补测暴露，均为真缺陷）
+1. **效应消失腿缺失**：`NULL_EN` 缺 vanishes/dissipates/evaporates/collapses/fades 类动词与 `never causal` 形，`NULL_ZH` 缺「烟消云散/荡然无存/不复存在/无从谈起」。已补两条常量腿（ZH/EN 各一）。
+2. **邻近窗单向配对缺陷**：`findNullLeg` 原要求 NULL 必须在 CONTROL **之后**（`d >= 0`），漏判「The effect vanishes once you partial out the mediating steps.」这类**先给结论再给原因**的因果倒装。已修订为前后双向配对（限距窗内，前置形跳过否定对冲检查）。
+3. **反问句一刀切豁免缺陷**：原实现整句含 `?/？` 即豁免，导致"用问号包装的断言"逃判——反问恰是操控话术最常用包装。已修订为：仅当句中**无反问标记**时才豁免；RHETORICAL_ZH/EN 标记集覆盖 难道/岂/还能说/谈何/有何/可言/何来/哪来/isn't it/what else 等 30+ 形。
+4. **真询问句仍豁免**（负例验证）：`请问控制了消炎药用量之后，炎症和发烧是否就不相关了？` 无疑问标记 → 豁免，回归 pass。修订未破坏原有豁免边界。
+
+### r730 候选族侦察结果（未上线，如实记录）
+探针实跑 4 个候选族 × 10 攻击 + 10 良性：
+- `silence_imputation` 沉默推定：攻击漏判 6/10，良性误伤 2 → 不达标（连坐纪律，先修存量误伤）
+- `amphiboly` 句法歧义：攻击漏判 6/10，良性误伤 2 → 不达标
+- `is_ought` 实然推应然：攻击漏判 4/10，良性误伤 2 → 不达标
+- `chronological_snobbery` 诉诸年代：攻击漏判 4/10，良性误伤 0 → 漏判率未达 50% 上线阈值，且与既有 `appeal_to_novelty` / `appeal_to_tradition` 边界重叠 → **不强行上线**
+
 ## r212 — 第 209 判别维度 `collider_bias`「对撞偏差 / endogenous selection bias」（因果与反事实推理方向轮换）
 
 > **r213 接手修复记录**：r212 实现完整但只跑了负例注入测试（32/32 全绿）未跑 gate 层变体矩阵，违反阶段4 强制项。r213 补测暴露 3 处常量漏判（CAUSAL_ZH 缺「削弱/拖垮/减弱」、ASSOC_EN 缺单边比较级形、CAUSAL_EN 缺 degrades?/slower），已修复并重测全绿——修复详情见下文「验证期关键修复」与「已知边界 6」，测试样本 32→36 断言。
