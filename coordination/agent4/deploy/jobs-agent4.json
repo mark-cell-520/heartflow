@@ -1,0 +1,75 @@
+{
+  "_comment": "4 号 agent（海外产能单元）cronjob 定义。安装方法见同目录 INSTALL.md。",
+  "_note": "prompt 字段从 ../prompts/*.md 读取后整段填入；此处为创建参数的完整记录。",
+  "_warning": "创建后必须 list 验证；base_url 若显示 null，需手动 patch jobs.json。",
+  "upgrade_job": {
+    "name": "agent4-心虫升级（海外单元）",
+    "prompt_file": "../prompts/upgrade-prompt.md",
+    "schedule": "60m",
+    "repeat": 200,
+    "continuity": true,
+    "deliver": "origin",
+    "workdir": "/root/hermes1/skills/ai/mark-heartflow-skill",
+    "enabled_toolsets": [
+      "terminal",
+      "file",
+      "code"
+    ],
+    "enabled_toolouts": [
+      "terminal",
+      "file",
+      "code"
+    ],
+    "base_url": null,
+    "model": null,
+    "provider": null,
+    "purpose": "完整升级轮：状态→同步→认领→基线→海外扫描→改子目录模块→门禁→负例→报告→推送",
+    "writes_engine": true,
+    "model_note": "跟随主模型（本机 stepfun-plan / step-5-preview）。不 pin：pin 会把当前模型锁死，主模型升级后 job 用不上新能力。",
+    "base_url_note": "留空跟随主机 provider。本机 stepfun 双通道（/step_plan/v1 正常、/anthropic/v1 402），pinned/custom base_url 易踩计费坑，故不指定。"
+  },
+  "sync_job": {
+    "name": "agent4-心虫同步（只推不写）",
+    "prompt_file": "../prompts/sync-prompt.md",
+    "schedule": "4h",
+    "repeat": 400,
+    "continuity": true,
+    "deliver": "origin",
+    "workdir": "/root/hermes1/skills/ai/mark-heartflow-skill",
+    "enabled_toolsets": [
+      "terminal",
+      "file"
+    ],
+    "enabled_toolouts": [
+      "terminal",
+      "file"
+    ],
+    "base_url": null,
+    "model": null,
+    "provider": null,
+    "purpose": "纯同步：status → push ahead → pull behind。不写引擎、不 bump VERSION、不跑门禁。",
+    "writes_engine": false,
+    "model_note": "跟随主模型（本机 stepfun-plan / step-5-preview）。不 pin：pin 会把当前模型锁死，主模型升级后 job 用不上新能力。",
+    "base_url_note": "留空跟随主机 provider。本机 stepfun 双通道（/step_plan/v1 正常、/anthropic/v1 402），pinned/custom base_url 易踩计费坑，故不指定。"
+  },
+  "schedule_rationale": {
+    "upgrade_60m": "升级轮重（门禁+负例+报告约 20-40 分钟），60m 留足余量且不与 1 号节奏正面对撞",
+    "sync_4h": "同步必须轻快且高频，确保 4 号的 commit 不积压；同步轮与升级轮解耦，一方掉线不影响另一方",
+    "repeat_200_vs_400": "sync 的 repeat 显著大于 upgrade，保证最后一轮升级之后仍有同步窗口把成果推出去",
+    "continuity_true": "需要跨轮读 UPGRADE_LOG/claims；但每轮开头仍强制 hf4-status.sh 从文件重建上下文，不依赖会话记忆"
+  },
+  "fault_tolerance": {
+    "state_in_files": "轮次号/认领/VERSION/UPGRADE_LOG 全在仓库文件，掉线重启后 hf4-status.sh 5 秒恢复",
+    "round_independent": "每轮不读上轮会话记忆，从 git log + UPGRADE_LOG.md + claims.jsonl 重建",
+    "claim_expiry": "expires_hours=6，超时其他 agent 可 takeover，不死等",
+    "sync_decoupled": "sync job 与升级 job 完全解耦，任一方卡死另一方照跑",
+    "commit_guaranteed": "宁可少改一个文件也要有 commit；无升级可做时降级 research 轮兜底"
+  },
+  "existing_jobs_on_host": {
+    "file": "/root/hermes1/cron/jobs.json",
+    "known_job_ids": [
+      "95f75ea9ea95"
+    ],
+    "rule": "4 号两个 job 独立添加，绝不修改/删除其他 job 的字段"
+  }
+}
