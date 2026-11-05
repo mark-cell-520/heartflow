@@ -1,22 +1,22 @@
 {
-  "round": 215,
-  "version": "6.8.143",
-  "roundStartedAt": "2026-11-05T15:00:00.000Z",
-  "lastFinishAt": "2026-11-05T16:40:00.000Z",
+  "round": 216,
+  "version": "6.8.144",
+  "roundStartedAt": "2026-11-06T00:40:00.000Z",
+  "lastFinishAt": "2026-11-06T01:50:00.000Z",
   "lastGreen": true,
   "lastChecks": [
     "PASS bin/verify.js 16/16",
     "PASS bidirectional-guard 52/52 召回不降 + 302/326 误拦不升",
     "PASS guard-abilities 20/20（dimensions 键 210）",
-    "PASS doc-numbers-accuracy 24/24",
-    "PASS round-215-regexp-prefilter 23/23",
-    "PASS A/B 行为一致性 0/32 差异（worktree HEAD 基线对比）",
-    "PASS 全量回归问题清单 73 文件基线上同法对比：新失败 0（存量噪声 29 + 运行方式噪声 44）",
-    "PASS 性能基准 2000 次 gate：中文 15140→14779ms（-2.4%）、英文 17215→15951ms（-7.3%）",
-    "NOTE security-audit S2「git log/tag 未命中 6.8.143」为提交前预期失败，提交后转绿"
+    "PASS doc-numbers-accuracy 24/24（补 README changelog 6.8.144 行后）",
+    "PASS round-216-reasoning-coherence 36/36",
+    "PASS 存量 round-349 77/77 + round-350 57/57（修复前后同值）",
+    "PASS A/B 行为一致性 0 非预期差异（worktree HEAD 基线对比 38 条样本：action 差异 2 条均为目标修复、维度差异 6 处全为目标族）",
+    "PASS 全量回归 619 文件 18766 passed / 97 failed：新引入 0（Command failed 28 个两轮逐文件一致；3 个断言级增量失败单独跑全过，属运行方式噪声）",
+    "NOTE security-audit S2「git log/tag 未命中 6.8.144」为提交前预期失败，提交后转绿"
   ],
-  "calibratedFrom": "UPGRADE_LOG.md 实际轮次（r215）",
-  "published": "6.8.142",
+  "calibratedFrom": "UPGRADE_LOG.md 实际轮次（r216）",
+  "published": "6.8.143",
   "publishedAt": "2026-11-05T14:48:00.000Z",
-  "notes": "r215 性能轮（保守预检）已完成并提交 v6.8.143。下一轮候选池：① 红队复测报告（commit 81afa5a4）记录的两项新增误拦 G2 reasoning_coherence / G3 presupposition——样本未落盘，需先复现再修（无样本不动手）；② src/index.js:7351-7353 记录的 reasoning_coherence 遗留（pseudo_causal 反序族已修、reasoning_coherence 侧未修：「因为…所以」结构齐备反被判优良推理链 0.9）；③ r730 候选族侦察不达标的四个族（silence_imputation/amphiboly/is_ought/chronological_snobbery）如需补维度须先补判据再上；④ 性能方向：checkRewardHacking 之后无同量级单点热点了（profile top30 仅占 31.9%），再优化需转向算法层（如 discriminate 的分层早退/维度分组），属高风险重构需单独立项。本轮踩坑：① Write 工具会把源码里的 \\u0000 写成真实 NUL 字节，缓存键改用 JSON.stringify；② node -e 内联补丁的正则转义被 shell 吃，补丁必须走脚本文件；③ 后台任务 10 分钟上限会杀全量回归，重启用长 timeout；④ run-all failed 计数有 ±16 存量波动，判定必须逐个文件基线对比。环境噪声清单：MCP 类 6 测试（8099 端口被常驻服务占用）+ dispatch 类约 23 个文件在 run-all 上下文报 Command failed/未输出汇总行，单独跑全部通过——均为存量，勿当回归。"
+  "notes": "r216 缺陷修复轮（reasoning_coherence 双语义闸）已完成并提交 v6.8.144。下一轮候选池（按优先级）：① REASONING_MARKERS 的 EN 四张表第一个正则带历史遗留 0x08 字面前缀（源码是字面退格符不是 \\b 转义），英文 because/therefore/in conclusion/obviously 四个高频推理标记失明，影响所有英文句 structure 判定（实测 'Because we shipped the fix, sales rose.' premise=0）——必须单独一轮：先修 4 个字节，再跑全量回归 + 双向门禁基线对比 + 存量 EN 测试逐个复跑，触及面大全量验证前不动；② 红队报告 G3 presupposition 误拦（「仍然…相关」方法比较形）——同样样本未落盘，需先从 coordination/reports/r214-round2-variants-agent2.md 找回原文再复现；③ 性能方向：r215 后无同量级单点热点，再优化需 discriminate 分层早退/维度分组，高风险重构需单独立项；④ r730 候选族侦察不达标四族（silence_imputation/amphiboly/is_ought/chronological_snobbery）如需补维度须先补判据再上。本轮踩坑：① 测试文件名漏 .test.js 后缀导致 run-all 静默不跑（run-all.js 只收集 endsWith('.test.js')，AGENTS.md 约定 4）——发现方式是 grep 回归日志无本轮文件名，下一轮测试必须带 .test.js 后缀；② Edit 工具匹配不上含 0x08 历史字节的行，含这些行的锚点编辑先用 cat -A 看原始字节；③ worktree require 相对路径必须以 ./ 开头否则 MODULE_NOT_FOUND；④ run-all 失败计数有运行方式波动（同代码两轮 94 vs 97），判定必须逐个文件单独复跑。环境噪声清单：MCP 类 6 测试（8099 端口被常驻服务占用）+ dispatch 类约 23 个文件在 run-all 上下文报 Command failed/未输出汇总行（单独跑全部通过）+ doubt-ppf/pseudo-profundity 三个文件断言级失败单独跑即过（7/7、23/23、41/41）——均为存量，勿当回归。"
 }

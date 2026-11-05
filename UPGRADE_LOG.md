@@ -1,3 +1,62 @@
+## r216 — reasoning_coherence 双语义闸（v6.8.144）：伪归因降级 + 方法学否定豁免（修 r357 遗留漏判与红队 G2 误伤）
+
+**轮次**：r216 ｜ **日期**：2026-11-06 ｜ **方向**：存量真 bug 修复（交接簿候选②，优先于新维度）
+**真升级类型**：缺陷修复（checkReasoningCoherence 两个语义闸，gate 行为变化经 A/B 实测）
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision；按轮次协议「优先做交接簿里已知未修的真 bug」选题，全部结论来自本轮实测探针，无记忆成分。
+- 交接簿（data/upgrade-state.json r215 notes）候选②原文：「src/index.js:7351-7353 记录的 reasoning_coherence 遗留（pseudo_causal 反序族已修、reasoning_coherence 侧未修：『因为…所以』结构齐备反被判优良推理链 0.9）」；候选①「红队报告 G2 reasoning_coherence 误拦，样本未落盘需先复现」。本轮从 commit 81afa5a4 的红队报告中找回 G2 原文样本（coordination/reports/r214-round2-variants-agent2.md:120），两条缺陷**都有样本**，且根因相同（本维度只看标记共现、不看标记承载的语义），合并为一轮修透。
+- 探针复现（scripts/tmp-216-reasoning-probe*.js，轮末已删）：① 4 条玄学归因攻击句 3 条 score=0.9「完整推理链」优良；② G2 三样本 score=0.1「有前提有推理无结论」残缺、severity 40 进 findings 误拦。
+
+### 二、根因/缺口分析（带证据）
+- **缺陷一（漏判侧）**：checkReasoningCoherence 的结构判定只看 premise/inference/conclusion/leap 四组标记的**共现**。「因为今天穿了幸运色，所以股价涨了」三个标记全中（因为=premise、所以=inference+conclusion）→ 判「完整推理链」0.9。本维度是质量分（高分=好，src/index.js 反向处理成 severity=(0.5-score)*100），0.9 等于**给玄学归因话术背书**——r357 修 pseudo_causal 反序族时明确记录「reasoning_coherence 侧记入遗留」。
+- **缺陷二（误伤侧）**：「统计表明，只收录存活样本会得出错误结论，不能据此说加班少导致绩效高」三个标记中 conclusion 缺失 → 判「有前提有推理无结论」0.1。但这句话陈述的是「**这个推断不成立**」——拒绝从无效前提推出结论恰是正确的判别动作，不是推理链残缺。调用侧 rcBroken 判据（rcIntent>0 + ASSERT_CONNECTIVE 命中「据此」+ hasRealPremise 命中「统计表明」）成立，severity 40 误拦。
+- 两缺陷同根：**标记齐备 ≠ 推理有效，拒绝推断 ≠ 推理残缺**——修法是在结构判定后加两个语义闸。
+
+### 三、落地项（全部在 src/index.js，+88 行）
+1. **闸一·伪归因降级**（结构判定 + leap 减分之后）：入口要求 score>=0.7 且 structure==='完整推理链'；判据是双腿 AND——腿①归因窗（归因连接词首次出现处 → 其后第一个推理标记处，无推理标记取 40 字）内命中无机制对象表 RC_NO_MECHANISM_ZH/EN（幸运色/招财/风水/星座/属相/O型血/锦鲤/昵称/头像/护身符…中英双语）；腿②全句共现获益结果动词表 RC_GAIN_ZH/EN（涨了/谈成/中标/顺利/doubled…）。命中则 structure 改「伪归因推理链（前提非机制归因）」、score 0.9→0.15。降级后调用侧 rcBroken 判据（structure≠完整推理链 && score<0.4）自然成立，gate 层 severity 35 承重。
+   - **归因窗设计**：无机制对象必须出现在归因位置而非句中任意处——「商店上架了幸运色袜子，所以订单明显多起来了」里幸运色是商品不是归因对象，不判（测试有对应断言）。
+   - **刻意不收**「早起/转发/抽奖/初一/十五」等日常行为词（pseudo_causal 的 PC_LUCK2_ACT_ZH 收了，但那些词在正常行为归因里高频，收进来会误伤「由于坚持早起，团队精神好转」这类正常句）。
+2. **闸二·方法学否定豁免**：只豁免「有前提有推理无结论」这一结构支；句中命中方法学否定形（RC_NEG_INFER_STRONG_ZH/EN 强形单独成立：推不出/说明不了/不足以证明/cannot conclude；RC_NEG_INFER_WEAK_ZH/EN 弱形须「否定词+推断动词」共现：不能/无法/难以 + 说|认为|推断|证明|得出…）时，structure 改「方法学否定陈述（拒绝无效推断）」、score 抬为 0.5 中性。
+   - **不豁免**「无前提直接推理结论」/「跳跃推理」支：「显然对方不能证明自己无罪，所以他一定有罪」是诉诸无知攻击句，负向判定必须保留（测试有对应断言）。
+   - **调用侧同步**：rcBroken 判据增加 structure !== '方法学否定陈述（拒绝无效推断）' 豁免，与 score<0.4 闸双保险。
+3. **维度边界**：自建词表而非复用 pseudo_causal 的 PC_NOOBJ_ZH/PC_REV_RES_ZH——那边的豁免/判据调整会 silent 改变本维度行为。
+4. **测试 test/round-216-reasoning-coherence.test.js**（36 断言全绿）：闸一攻击族 5 中 + EN + gate 承重、闸二 G2 三样本 + EN、良性完整链 5 条保持 0.9、闸一边界 3 条、闸二边界（诉诸无知不豁免）、存量行为 3 条、下游 count/quality 契约（r349 读方）。
+   - **踩坑记录**：首版文件名漏 .test.js 后缀，run-all.js 只收集 endsWith('.test.js') 的文件（AGENTS.md 约定 4），改名后验证可收集（619 文件）。
+
+### 四、验收数字（全部实测，命令可复跑）
+| 项 | 结果 |
+|---|---|
+| 探针：玄学归因攻击句 score | 0.9 → **0.15**（幸运色/锦鲤/星座/O型血/护身符 5 条实测） |
+| 探针：G2 方法学否定句 score | 0.1 → **0.5**（G2/G2b/G2c 三条实测） |
+| A/B 行为一致性（git worktree HEAD 基线 vs 当前，38 条样本：攻击 14 + 良性 10 + 存量断裂族 8 + 门禁样本 6） | action 差异 **2 条**（「鉴于他是O型血…」pass→verify 漏判修复；G2 verify→pass 误伤修复），findings 维度差异 **6 处全部是目标族**（4 条伪归因攻击新增 reasoning_coherence 承重 + 上述 2 条），**零非预期差异** |
+| gate 层变体矩阵（闸一攻击 5 条） | **5/5 reasoning_coherence 承重** severity 35，details 含「伪归因」 |
+| gate 层变体矩阵（闸二豁免 3 条） | **3/3 reasoning_coherence finding 退出**（G2 action verify→pass） |
+| 良性回归（完整推理链 5 条 + 边界 3 条） | **0 误伤**，score 保持 0.9/不进 findings |
+| 存量测试 round-349-reasoning-coherence-broken.test.js | **77 passed / 0 failed**（修复前同值） |
+| 存量测试 round-350-reasoning-coherence-strong-claim-gate.test.js | **57 passed / 0 failed**（修复前同值） |
+| 新测试 round-216-reasoning-coherence.test.js | **36 passed / 0 failed** |
+| bin/verify.js | **16 passed / 0 failed** |
+| scripts/guard-abilities.js | **20/20**（维度登记 210 键不变） |
+| test/doc-numbers-accuracy.test.js | **24 passed / 0 failed**（补 README changelog 6.8.144 行后） |
+| scripts/bidirectional-guard.js | 召回 **52/52 不降**、误拦 **302/326 不升**（与基线逐项一致） |
+| test/security-audit.test.js | 15 通过 1 失败——S2「git log/tag 未命中 6.8.144」为**提交前预期状态**，提交后转绿 |
+| 全量回归 node test/run-all.js（619 文件，含本轮新测试） | 18766 passed / 97 failed；**逐个定位：新引入 0**——Command failed 28 个与第一轮（同代码 618 文件）逐文件一致（存量 dispatch/MCP 端口噪声），3 个断言级增量失败（doubt-ppf-zh-cultivation-r301、pseudo-profundity-ontological-zh-r289、pseudo-profundity-subtype-zh-r290）**单独跑全部通过**（7/7、23/23、41/41），属 run-all 上下文运行方式噪声，与上轮报告记录的 ±16 波动同型 |
+
+### 五、已知未修（含为什么不修）
+1. **REASONING_MARKERS 的 EN 四张表第一个正则带历史遗留 0x08 字面前缀**（源码是字面退格符 0x08 而非 \b 转义，实测 `Because we shipped the fix, sales rose.` premise=0）：英文 because/therefore/in conclusion/obviously 四个高频推理标记失明，所有英文句的 structure 判定受影响。不修的原因：影响面覆盖全部英文输入，必须单独一轮做全量回归 + 双向门禁基线对比，本轮时间预算内无法完成该验证；已记入交接簿下一轮候选池首位。
+2. **L6 族（「根据我改了昵称的说法，总之现在订单多起来了」gate=pass）不修**：该句 reasoning_coherence 已判 0 分低分，pass 的根因在调用侧 ASSERT_CONNECTIVE 不含「总之」+ pseudo_causal 侧漏判，属另一维度职责，且红队报告无该样本——按「无样本不动手」纪律不扩范围。
+3. **「因为…所以」齐备的正常残缺句豁免不扩**：只修有样本的 G2 形（不能据此说/不足以证明/无法推断）；其他真残缺形状（如「需要进一步验证」类存疑后缀）无红队样本，不扩豁免面。
+4. **闸一降级入口要求「完整推理链」**：标记不齐的玄学归因句（如「基于办公室风水调整了，由此可见业绩会翻红」）走存量「有前提有推理无结论」0.1 分支，severity 40 承重、方向同样是 verify——不强行改判据形状，避免扩大触及面。
+5. 未跑 philosophy_decision 打分（无人交互轮按纪律未当实质背书，如实标注）。
+
+### 六、踩坑
+1. **测试文件名漏 .test.js 后缀**：run-all.js 只收集 endsWith('.test.js') 的文件（约定 4），首版 round-216-reasoning-coherence.js 在全量回归里静默不跑（618 文件无它，test-count passed 只 +33 不含 36 断言）——发现方式是 grep 日志里没有本轮文件名。改名 + 用 collectTestFiles 同逻辑验证可收集后才重跑回归。**下一轮起测试文件必须带 .test.js 后缀**。
+2. **Edit 工具匹配失败于历史 0x08 字节**：REASONING_MARKERS 的 EN 正则源码里是字面退格符（0x08）而非 \b 转义，Read 显示为空、Edit old_string 按可见文本匹配不上——含这些行的锚点编辑必须先用 cat -A 看原始字节。
+3. **A/B 对比的 worktree require 路径**：相对路径 require（.tmp-baseline-216/src/gate.js）不以 ./ 开头会被当模块名报 MODULE_NOT_FOUND，必须传绝对路径。
+4. **run-all 的失败计数有运行方式波动**：两轮同代码回归 failed 94 vs 97（+3），增量三个单独跑全过；判定「失败数不许增加」必须逐个文件单独复跑，不能只比计数（上轮已记录 ±16 波动，本轮再次坐实）。
+5. **runner 日志的「测试结果: N 通过」归属会错位**：round-216 测试显示「14 通过」（实际 36 断言），相邻文件输出串位——断言数以单独跑为准，run-all 日志只用于失败定位。
+
 ## r215 — 性能轮（v6.8.143）：静态词表/模式表保守预检上线（src/regexp-utils.js，判定结果零变化）
 
 **轮次**：r215 ｜ **日期**：2026-11-05 ｜ **方向**：性能优化（先 profile 定位，再优化——未猜热点）

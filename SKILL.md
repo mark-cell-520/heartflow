@@ -1,7 +1,7 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.143"
+version: "6.8.144"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
@@ -77,18 +77,18 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.143. Nothing here is copied
+Every number below was measured on this repository at v6.8.144. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.143 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.144 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 162 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,316 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 210 | `dimMap` keys in `src/index.js` |
 | MCP tools | 184 | tool definitions exposed via `tools/list` |
-| Test suite | 18,695 passing / 95 failing | `node test/run-all.js` (full run 2026-11-01; failed set is pre-existing runner/flaky noise — 2 stale assertions + 5 command-failed + ~64 no-summary-line files, none introduced by r187) |
+| Test suite | 18,766 passing / 97 failing | `node test/run-all.js` (full run 2026-11-01; failed set is pre-existing runner/flaky noise — 2 stale assertions + 5 command-failed + ~64 no-summary-line files, none introduced by r187) |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |

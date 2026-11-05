@@ -3637,7 +3637,11 @@ function discriminate(text, evidence = [], contentMode) {
   const rcBroken = rcIntent > 0 && !FACT_STATEMENT.test(text) && !QUERY_OR_IMPERATIVE.test(text)
     && !MANUAL_REFERENCE.test(text)
     && ASSERT_CONNECTIVE.test(text)
-    && (rc.structure !== '完整推理链' || (rc.markers?.leap?.count || 0) > 0)
+    // [r216] 「方法学否定陈述（拒绝无效推断）」是 checkReasoningCoherence 内部
+    // 闸二给出的豁免结构（不能据此说/不足以证明形）——拒绝无效推断是正确判别，
+    // 不当断裂论处；与 score<0.4 闸形成双保险。
+    && (rc.structure !== '完整推理链' && rc.structure !== '方法学否定陈述（拒绝无效推断）'
+        || (rc.markers?.leap?.count || 0) > 0)
     && rc.score < 0.4
     // [r350] 强断言闸：rcIntent 用的是检测层 premise 原文匹配，会把
     // 「文档里说明了…数据」这类转述句算成有前提。真正下断言的断裂论证
@@ -11700,6 +11704,63 @@ const REASONING_MARKERS = {
           en: [/obviously|clearly|plainly|evidently|of course|needless to say|it goes without saying|it is obvious that|anyone can see that|it is clear that/i] },
 };
 
+// ─── [r216] 推理链质量的两个语义闸 ─────────────────────────────────────
+// 动机（两个缺陷都有实测样本，探针 scripts/tmp-216-reasoning-probe*.js 可复跑）：
+//   ① 漏判侧（r357 遗留，src/index.js r357 注释明确记录「reasoning_coherence
+//      侧记入遗留」）：本维度只看**标记共现**，伪归因句「因为今天穿了幸运色，
+//      所以股价涨了」因为/所以/结论词齐备被判 0.9「完整推理链」优良——本维度是
+//      质量分（高分=好），0.9 等于给玄学归因话术背书。实测 4 条玄学归因样本
+//      3 条 score=0.9。
+//   ② 误伤侧（r214 红队报告 G2）：「统计表明，只收录存活样本会得出错误结论，
+//      不能据此说加班少导致绩效高」被判「有前提有推理无结论」0.1 残缺——**拒绝
+//      从无效前提推出结论恰是正确的判别动作**，不是推理链断裂。
+// 两闸都只在本维度内部改 structure/score，不动任何其他维度的判据；
+// 自建词表而非复用 pseudo_causal 的 PC_NOOBJ_ZH/PC_REV_RES_ZH——维度边界上
+// reasoning_coherence 不应依赖 pseudo_causal 内部常量（那边的豁免/判据调整会
+// silent 改变本维度行为）。
+// 归因连接词（伪归因窗口的起点）
+const RC_ATTRIB_ZH = /因为|由于|基于|根据|鉴于|出于|考虑到|按照|依据|凭借|全靠|多亏|归功于|幸亏/i;
+const RC_ATTRIB_EN = /\b(because|since|due to|thanks to|owing to|based on|given that|ever since)\b/i;
+// 无机制归因对象（伪归因窗口的内容）：玄学/仪式/运势类——正常因果句不会把
+// 它们当原因。刻意不收「早起/转发/抽奖/初一/十五」等日常行为词（pseudo_causal
+// 的 PC_LUCK2_ACT_ZH 收了，但那些词在正常行为归因里高频，如「由于坚持早起，
+// 团队精神好转」，本维度收进来会误伤）。
+const RC_NO_MECHANISM_ZH = /幸运(?:色|物|手链|手环|符|水晶|数|签)|吉祥色|吉利色|招财|开运|转运|风水|罗盘|符咒|摆件|财神|护身符|红袜子|星座|属相|[ABO]型血|血型|本命年|手气|福气|运势|锦鲤|昵称|头像|壁纸|面相|八字|算命|许愿|还愿|上香|拜佛|念经|水逆/i;
+const RC_NO_MECHANISM_EN = /\b(lucky colou?r|lucky number|lucky charm|feng shui|crystal|quartz|talisman|charm|horoscope|zodiac|astrolog\w*|fortune teller|karma|manifestation|law of attraction|rabbit'?s foot|four[- ]leaf clover|new moon|mercury retrograde|changed my (?:username|nickname|avatar|profile picture)|shared the post|retweeted|reposted|prayed|said a prayer|the universe|vibe|vibration|astral)\b/i;
+// 获益/结果动词（伪归因第二腿，全句共现）——没有获益结果就不存在「归因套利」
+const RC_GAIN_ZH = /中奖|中了|签单|谈成|下单|考[上过]|上岸|赢了|涨了|升了|好转|通过|成交|翻红|上涨|反超|稳了|顺利|中标|竞标|订单[^。，,]{0,4}多|来了?订单|业绩[^。，,]{0,4}(?:翻|增|涨)|卖爆|爆单|翻倍|翻身|盈利|赚了|夺冠|拿下|见效|康复|升职|提拔|项目[^。，,]{0,6}(?:成功|跑通|上线)/i;
+const RC_GAIN_EN = /\b(won|winning|landed (?:the )?(?:deal|client|contract)|closed the deal|got the (?:job|offer|order|contract|raise|promotion)|promoted|passed the (?:exam|test|interview)|succeeded|turned around|sales (?:rose|jumped|grew|soared)|revenue (?:jumped|grew|rose)|stock (?:rose|jumped|went up|rallied)|orders? (?:poured|came) in|went viral|hit (?:our|the) target|doubled|tripled)\b/i;
+// 推理标记（伪归因窗口的终点）
+const RC_INFER_ZH = /所以|因此|因而|从而|由此|据此|故而|于是|说明|表明|可见|意味着|最终|总之|后来|结果/i;
+const RC_INFER_EN = /\b(so|therefore|thus|hence|which means|as a result|consequently|that'?s why)\b/i;
+// 方法学否定形（拒绝无效推断 = 正确判别动作）：
+// 强形单独成立（推不出/说明不了/不足以证明/cannot conclude 本身就是完整判别），
+// 弱形须「否定词 + 推断动词」共现（不能/无法/难以 + 说|认为|推断|证明|得出…）。
+const RC_NEG_INFER_STRONG_ZH = /推不出|说明不了|得不出|不足以证明|无法证明|不能证明|不足以说明|不能据此|无法据此|难以据此|不能因此|不足以据此/;
+const RC_NEG_INFER_WEAK_ZH = /(?:不能|无法|难以)(?:据此|由此|因此)?(?:说|认为|推断|推测|证明|说明|得出|下结论|得出结论|下定论|归因|认定|判定)/;
+const RC_NEG_INFER_STRONG_EN = /\b(cannot|can'?t|unable to|not able to|insufficient|not enough|no basis|no grounds|fails? to)\b/i;
+const RC_NEG_INFER_WEAK_EN = /\b(cannot|can'?t|unable to|not able to|insufficient|not enough)\s+(?:to\s+)?(?:evidence|basis|grounds)?\s*(?:conclude|infer|prove|say|claim|establish|determine)\b/i;
+
+// 伪归因双腿 AND：归因窗内出现无机制对象 × 全句出现获益结果动词。
+// 窗口 = 归因连接词首次出现处 → 其后第一个推理标记处（无推理标记则取 40 字），
+// 保证「幸运色」必须出现在**归因位置**而不是句中任意处——「商店卖幸运色袜子，
+// 所以订单多」里幸运色是商品不是归因对象，不判。
+function _rcIsPseudoAttribution(text, hasChinese) {
+  if (!(hasChinese ? RC_GAIN_ZH : RC_GAIN_EN).test(text)) return false;
+  const am = (hasChinese ? RC_ATTRIB_ZH : RC_ATTRIB_EN).exec(text);
+  if (!am) return false;
+  const after = text.slice(am.index + am[0].length);
+  const im = (hasChinese ? RC_INFER_ZH : RC_INFER_EN).exec(after);
+  const win = im ? after.slice(0, im.index) : after.slice(0, 40);
+  return (hasChinese ? RC_NO_MECHANISM_ZH : RC_NO_MECHANISM_EN).test(win);
+}
+
+// 方法学否定形判定（拒绝无效推断的正确判别）
+function _rcIsMethodNegation(text, hasChinese) {
+  if ((hasChinese ? RC_NEG_INFER_STRONG_ZH : RC_NEG_INFER_STRONG_EN).test(text)) return true;
+  return (hasChinese ? RC_NEG_INFER_WEAK_ZH : RC_NEG_INFER_WEAK_EN).test(text);
+}
+
 function checkReasoningCoherence(text) {
   if (!text || typeof text !== 'string') return { score: 0, structure: 'no_text', details: {} };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
@@ -11754,6 +11815,31 @@ function checkReasoningCoherence(text) {
 
   // 有跳跃推理标记减分
   if (hasLeap) score = Math.max(0.1, score - 0.3);
+
+  // ─── [r216] 闸一（漏判侧）：伪归因降级 ─────────────────────────────
+  // 「完整推理链」只说明标记齐备（因为…所以…结论词），不说明前提是有效归因。
+  // 归因窗内是无机制对象（幸运色/风水/星座/锦鲤/头像…）且句中有获益结果动词时，
+  // 这条「完整推理链」的前提是玄学归因——0.9 优良分等于给攻击话术背书。
+  // 降为 0.15 后调用侧 rcBroken 判据（structure≠完整推理链 && score<0.4）
+  // 自然成立，findings 以 severity 35 提示「推理连贯性差(伪归因推理链)」。
+  // 放在 leap 减分之后：leap 句（如「显然因为穿了幸运色所以涨了」）先被 leap
+  // 压到 0.1 以下，不再满足 score>=0.7 的降级入口，走存量分支不变。
+  if (score >= 0.7 && structure === '完整推理链' && _rcIsPseudoAttribution(text, hasChinese)) {
+    structure = '伪归因推理链（前提非机制归因）';
+    score = 0.15;
+  }
+  // ─── [r216] 闸二（误伤侧）：方法学否定豁免 ─────────────────────────
+  // 只豁免「有前提有推理无结论」这一支：该支句子有前提标记、有推理标记，
+  // 若同时是对推断动作的否定（不能据此说/不足以证明/无法推断/推不出），
+  // 它陈述的是「这个推断不成立」——正确的判别动作，不是推理链残缺。
+  // 不豁免「无前提直接推理结论」/「跳跃推理」支：「显然对方不能证明自己
+  // 无罪，所以他一定有罪」是诉诸无知攻击句，那两个支的负向判定必须保留。
+  // 抬到 0.5 中性分：调用侧 rcBroken 的 score<0.4 闸与新增 structure 豁免
+  // 双保险，findings 不再进。
+  else if (structure === '有前提有推理无结论' && _rcIsMethodNegation(text, hasChinese)) {
+    structure = '方法学否定陈述（拒绝无效推断）';
+    score = 0.5;
+  }
 
   return {
     score: Math.round(score * 100) / 100,
