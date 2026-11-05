@@ -265,8 +265,16 @@ const CHECKS = {
     return { ok, msg: ok ? `已记录 v${v}` : `UPGRADE_LOG.md 缺 v${v}` };
   },
   '探针垃圾已清理': () => {
-    const probes = trySh('ls scripts/tmp-* 2>/dev/null').split('\n').filter(Boolean);
-    return { ok: probes.length === 0, msg: probes.length === 0 ? '无 tmp-* 残留' : `${probes.length} 个探针未删` };
+    // [r216] Windows 修复：原实现 trySh('ls scripts/tmp-* 2>/dev/null') 在 cmd.exe 下
+    // stderr 重定向失效——ls 无匹配时以非零码退出，错误信息（"系统找不到指定的路径"）
+    // 被 trySh 捕获进返回值，split('\n').filter(Boolean) 把错误行计成 1 个"探针"，
+    // 造成零残留也误报（r216 finish 连续两次假失败，实测 readdirSync 为零命中）。
+    // 改 readdirSync：跨平台、语义不变（scripts/ 下 tmp- 前缀文件数为 0）。
+    let probes = [];
+    try {
+      probes = fs.readdirSync(path.join(ROOT, 'scripts')).filter(f => /^tmp-/.test(f));
+    } catch (_) { probes = []; }
+    return { ok: probes.length === 0, msg: probes.length === 0 ? '无 tmp-* 残留' : `${probes.length} 个探针未删: ${probes.slice(0, 5).join(', ')}` };
   },
 };
 

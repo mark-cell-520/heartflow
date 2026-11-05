@@ -2,17 +2,16 @@
   "round": 714,
   "version": "6.8.143",
   "roundStartedAt": "2026-11-05T06:59:08.570Z",
-  "lastFinishAt": "2026-10-16T07:34:12.103Z",
-  "lastGreen": true,
+  "lastFinishAt": "2026-11-05T08:06:41.582Z",
+  "lastGreen": false,
   "lastChecks": [
     "PASS 版本四处一致",
     "PASS 版本已进 git log",
+    "FAIL 工作区已跟踪文件干净",
+    "PASS README 测试数与缓存一致",
     "PASS README changelog 覆盖当前版本",
     "PASS 交接簿记录当前版本",
-    "PASS round-713 测试 11/11 + negative-test 26/26",
-    "PASS bidirectional 52/52 + 302/326 与基线一致",
-    "PASS guard-abilities 20/20（dimensions 键 144）",
-    "PASS doc-numbers 22/22 + security-audit 16/16"
+    "PASS 探针垃圾已清理"
   ],
   "calibratedFrom": "UPGRADE_LOG.md 实际轮次",
   "published": "6.7.124",
