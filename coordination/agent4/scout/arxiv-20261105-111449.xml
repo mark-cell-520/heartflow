@@ -1,0 +1,651 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/LlbdjZeg0tiKmNxzTYqrPR3Oc2o</id>
+  <title>arXiv Query: search_query=all:economic OR all:reasoning OR all:cognitive OR all:bias OR all:opportunity OR all:cost&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-05T11:14:49Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:economic+OR+(all:reasoning+OR+(all:cognitive+OR+(all:bias+OR+(all:opportunity+OR+all:cost))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>350883</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06918v1</id>
+    <title>From Pixels to Actions - Towards Native Vision-Language-Action Policies</title>
+    <updated>2026-11-04T18:59:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.06918v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06918v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-language-action models are typically built on a simple premise: perception is first compressed by visual encoders, and action reasoning begins only afterwards. Yet manipulation often hinges on precisely the visual signals most vulnerable to this abstraction, e.g., local geometry, boundaries, depth, and subtle state changes. This raises a fundamental question: should action policies inherit a fixed visual endpoint, or directly access evolving visual computation? We introduce NEO-VLA, a structurally encoder-free vision-language-action framework. Images are tokenized by lightweight patch convolutional layers and evolve jointly with language throughout the backbone, allowing a flow-matching action expert to draw from instruction-conditioned visual representations at different depths. This simple change reveals a consistent pattern. Native architectures outperform encoder-based counterparts under controlled comparisons; full fine-tuning reduces but does not erase the gap, and additional scale alone cannot recover it. More strikingly, layer-wise probing shows that the action-critical signals often peak well before the final visual representation. Across diverse manipulation settings and distribution shifts, NEO-VLA consequently achieves stronger and more robust control. Together, these results suggest that embodied control benefits from access to visual representations across the computational hierarchy, rather than a fixed encoder output.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:59:58Z</published>
+    <arxiv:comment>Code link: https://github.com/EvolvingLMMs-Lab/NEO/tree/main/VLAKit</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Weichen Fan</name>
+    </author>
+    <author>
+      <name>Haiwen Diao</name>
+    </author>
+    <author>
+      <name>Penghao Wu</name>
+    </author>
+    <author>
+      <name>Siyuan Hu</name>
+    </author>
+    <author>
+      <name>Ziqi Huang</name>
+    </author>
+    <author>
+      <name>Tianqi Liu</name>
+    </author>
+    <author>
+      <name>Mingze Sun</name>
+    </author>
+    <author>
+      <name>Ziyi Wang</name>
+    </author>
+    <author>
+      <name>Zhongang Cai</name>
+    </author>
+    <author>
+      <name>Hanming Deng</name>
+    </author>
+    <author>
+      <name>Quan Wang</name>
+    </author>
+    <author>
+      <name>Lei Yang</name>
+    </author>
+    <author>
+      <name>Lewei Lu</name>
+    </author>
+    <author>
+      <name>Fangzhou Hong</name>
+    </author>
+    <author>
+      <name>Zhaoxi Chen</name>
+    </author>
+    <author>
+      <name>Dahua Lin</name>
+    </author>
+    <author>
+      <name>Ziwei Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06913v1</id>
+    <title>cuRoboV2-Fast: Fast Torque-Limited Collision-Free Motion Planning</title>
+    <updated>2026-11-04T18:58:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.06913v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06913v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present cuRoboV2-Fast, a GPU-accelerated planner that reduces both planning latency and execution time for collision-free, payload-aware, torque-limited motions. B-spline trajectory optimization reduces the required iterations, while accelerated robot computations and differentiable inverse dynamics reduce refinement cost and accommodate changing payloads. TimeOpt optimizes traversal speed along the fixed path under sampled velocity, acceleration, jerk, and torque constraints, exploiting local spline support to solve banded Newton systems efficiently on the GPU. With a 3,kg payload, cuRoboV2-Fast achieves 4.4 ms mean planning time on RTX 5090, 14.7x faster than cuRoboV2. Our method on Jetson AGX Orin plans faster than cuRoboV1 + TOPPRA on RTX 5090. A stereo-camera-based deployment on YAM achieves 5.93 s mean completed pick-and-drop cycles, 34.6% shorter than cuRoboV2. Code (Apache 2.0): www.github.com/NVlabs/curobo , Project Page: www.research.nvidia.com/labs/lpr/curobov2-fast .</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:58:20Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Balakumar Sundaralingam</name>
+    </author>
+    <author>
+      <name>Adithyavairavan Murali</name>
+    </author>
+    <author>
+      <name>Stan Birchfield</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06912v1</id>
+    <title>FlowReconBench: Accuracy, calibration and cost of learned and classical flow reconstruction from sparse sensors</title>
+    <updated>2026-11-04T18:57:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.06912v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06912v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reconstructing full flow fields from sparse sensors requires prior assumptions about unmeasured regions and physical variables. Yet it remains unclear when learned models outperform classical estimators and which aspects of their predictions can be trusted. FlowReconBench evaluates ten learned and five classical methods on three regimes: a laminar cylinder wake across Reynolds numbers, two-dimensional Kolmogorov turbulence and a large-scale three-dimensional (3D) isotropic turbulence. Methods share leakage-controlled splits and sensor draws and are scored on per-channel error, ensemble spread, calibration, spectra and cost. The leading method changes for each regime. Classical methods perform strongly in low-order and dense-sensing regimes. On the cylinder wake, linear stochastic estimation and gappy proper orthogonal decomposition lead, including for unobserved pressure. In 3D, inverse-distance weighting matches the best learned methods on observed channels. Data-driven methods become superior at decreasing sensor density or poor sensor observability. On Kolmogorov flow, continuous ranked probability score and error yield different method rankings: generative models offer broader but underdispersed ensembles, while deterministic models prioritize pointwise error. Generative models balance this tradeoff through their sampler budget, with a larger budget improving ensemble quality at higher computational cost. In 3D, scaling tests demonstrate that queryable methods are flat in memory, while full-grid construction methods run out of memory. Observing only 2 of 4 fields leaves the problem kinematically underconstrained, yet a latent model can reproduce structural similarities to the ground truth.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:57:47Z</published>
+    <arxiv:comment>18 pages, 7 figures, 8 tables. Supplementary material (16 pages, 2 figures, 5 tables) is included as an ancillary file</arxiv:comment>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Nicolas Tricard</name>
+    </author>
+    <author>
+      <name>Linzheng Wang</name>
+    </author>
+    <author>
+      <name>Jason Chen</name>
+    </author>
+    <author>
+      <name>Sili Deng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06911v1</id>
+    <title>BEAKER: An Expert-Curated Benchmark for Embodied Brains in Self-Driving Chemical Laboratories</title>
+    <updated>2026-11-04T18:57:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.06911v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06911v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Self-Driving Chemical Laboratories (SDCLs) are moving chemical experimentation toward embodied automation, where machines must perceive laboratory scenes, reason about experimental states, and act under physical, procedural, and safety constraints. Although Multimodal Large Language Models (MLLMs) are increasingly considered as embodied brains for such systems, existing laboratory benchmarks mainly focus on safety, anomaly detection, or general scientific understanding, leaving their execution-oriented embodied capabilities underexplored. To fill this gap, we introduce BEAKER, a Benchmark for evaluating Embodied Actionability, Knowledge, Experimentation, and Reasoning in SDCLs. BEAKER contains 1,000 expert-curated question-answer samples across 11 image and video task types, covering key judgments required for chemical laboratory execution, including affordance grounding, trajectory planning, equipment, state, and safety recognition, apparatus setup, operation and step reasoning, and temporal procedure reasoning. All questions and annotations are manually created and reviewed by chemistry and embodied Artificial Intelligence (AI) experts, without AI-assisted generation or annotation. We evaluate 28 general-purpose, science-oriented, chemistry-specialized, and embodied MLLMs in an offline, single-turn setting. Results show that current models can follow coarse experimental procedures in videos, but still struggle to ground actions into operable regions and feasible trajectories, to recognize fine-grained laboratory apparatus, states, and safety norms, and to order steps in mid-length procedures. BEAKER thus reveals a clear gap between coarse procedural understanding and the precise, action-grounded perception required for laboratory execution, providing a diagnostic benchmark for future MLLMs in SDCLs.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:57:17Z</published>
+    <arxiv:comment>Accepted by NeurIPS 2026 (Track on Evaluations and Datasets, Spotlight)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Fei Lin</name>
+    </author>
+    <author>
+      <name>Tengchao Zhang</name>
+    </author>
+    <author>
+      <name>Ziyang Gong</name>
+    </author>
+    <author>
+      <name>Xiaotong Yu</name>
+    </author>
+    <author>
+      <name>Bohan Zhang</name>
+    </author>
+    <author>
+      <name>Yifan Zhou</name>
+    </author>
+    <author>
+      <name>Qihao Yang</name>
+    </author>
+    <author>
+      <name>Ji Dai</name>
+    </author>
+    <author>
+      <name>Dong Li</name>
+    </author>
+    <author>
+      <name>Yining Jiang</name>
+    </author>
+    <author>
+      <name>Qinghua Ni</name>
+    </author>
+    <author>
+      <name>Jun Huang</name>
+    </author>
+    <author>
+      <name>Qiang Zhang</name>
+    </author>
+    <author>
+      <name>Yue Zhou</name>
+    </author>
+    <author>
+      <name>Zhihang Zhong</name>
+    </author>
+    <author>
+      <name>Yonglin Tian</name>
+    </author>
+    <author>
+      <name>Fei-Yue Wang</name>
+    </author>
+    <author>
+      <name>Xue Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06910v1</id>
+    <title>FrontierPhysics: Evaluating Agents for End-to-End Physics Research</title>
+    <updated>2026-11-04T18:56:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.06910v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06910v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI agents are playing an increasingly important role in physics research. However, existing physics benchmarks only evaluate fixed questions, isolated sub-tasks, or paper reproduction with given solutions, and rarely check research quality alongside correctness. We introduce FrontierPhysics, an end-to-end benchmark with 56 tasks made by 42 physicists based on their own research, covering nine domains across theoretical, computational, and experimental physics. Each task requires agents to review the literature, develop a research plan, conduct research and experiments, and produce structured outputs and scientific manuscripts. Combining deterministic verifiers with expert-authored rubrics, FrontierPhysics evaluates whether agents' research is correct and publishable. Across 22 models in 26 configurations, no configuration passes more than 46 of its 168 rollouts. Manual review of agent trajectories shows that frontier agents' main weaknesses are insufficiently rigorous reasoning and limited expert intuition, rather than gaps in physics knowledge or execution errors.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:56:22Z</published>
+    <arxiv:comment>41 pages (10 pages main text), 19 figures, 11 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Bingran You</name>
+    </author>
+    <author>
+      <name>Wenjun Ke</name>
+    </author>
+    <author>
+      <name>Ria Rosenauer</name>
+    </author>
+    <author>
+      <name>Bo Liu</name>
+    </author>
+    <author>
+      <name>Wenbo Chen</name>
+    </author>
+    <author>
+      <name>Min Chen</name>
+    </author>
+    <author>
+      <name>Shuqi Xu</name>
+    </author>
+    <author>
+      <name>Yue Ma</name>
+    </author>
+    <author>
+      <name>Jiechao Feng</name>
+    </author>
+    <author>
+      <name>Bo Chen</name>
+    </author>
+    <author>
+      <name>Xiangkai Sun</name>
+    </author>
+    <author>
+      <name>Jiarui Liu</name>
+    </author>
+    <author>
+      <name>Jinen Guo</name>
+    </author>
+    <author>
+      <name>Zeyu Zhou</name>
+    </author>
+    <author>
+      <name>Xu Huang</name>
+    </author>
+    <author>
+      <name>Zhuohan Li</name>
+    </author>
+    <author>
+      <name>Haoyu Li</name>
+    </author>
+    <author>
+      <name>Heguang Lin</name>
+    </author>
+    <author>
+      <name>Lijie Ding</name>
+    </author>
+    <author>
+      <name>Yadong Zeng</name>
+    </author>
+    <author>
+      <name>Kangqi Zhang</name>
+    </author>
+    <author>
+      <name>Xinge Liu</name>
+    </author>
+    <author>
+      <name>Hanwen Liu</name>
+    </author>
+    <author>
+      <name>Zhenghong Li</name>
+    </author>
+    <author>
+      <name>Alexander von Recum</name>
+    </author>
+    <author>
+      <name>Yuchen Zhu</name>
+    </author>
+    <author>
+      <name>Felix Schwarzfischer</name>
+    </author>
+    <author>
+      <name>Yizhou Zhao</name>
+    </author>
+    <author>
+      <name>Jicheng Wang</name>
+    </author>
+    <author>
+      <name>Binxu Li</name>
+    </author>
+    <author>
+      <name>Qian Yu</name>
+    </author>
+    <author>
+      <name>Chan Li</name>
+    </author>
+    <author>
+      <name>Cheng Dai</name>
+    </author>
+    <author>
+      <name>Di Wang</name>
+    </author>
+    <author>
+      <name>Haoyu Zhang</name>
+    </author>
+    <author>
+      <name>Jiankai Sun</name>
+    </author>
+    <author>
+      <name>Kaituo Feng</name>
+    </author>
+    <author>
+      <name>Mian Qin</name>
+    </author>
+    <author>
+      <name>Ruihong Yin</name>
+    </author>
+    <author>
+      <name>Yiqun Luo</name>
+    </author>
+    <author>
+      <name>Weiwei Wu</name>
+    </author>
+    <author>
+      <name>Shihong Pan</name>
+    </author>
+    <author>
+      <name>Tsung Yeh Hsieh</name>
+    </author>
+    <author>
+      <name>Xiao Huang</name>
+    </author>
+    <author>
+      <name>Yan Zhang</name>
+    </author>
+    <author>
+      <name>Sihan Li</name>
+    </author>
+    <author>
+      <name>Zirui Ren</name>
+    </author>
+    <author>
+      <name>Zengji Tu</name>
+    </author>
+    <author>
+      <name>Kyoung Whan Choe</name>
+    </author>
+    <author>
+      <name>Ke Sun</name>
+    </author>
+    <author>
+      <name>Vincenzo Galia</name>
+    </author>
+    <author>
+      <name>Vaisakhi Mishra</name>
+    </author>
+    <author>
+      <name>Jiashu He</name>
+    </author>
+    <author>
+      <name>Hongyang Wang</name>
+    </author>
+    <author>
+      <name>Zhiheng Yang</name>
+    </author>
+    <author>
+      <name>Shubham Gaur</name>
+    </author>
+    <author>
+      <name>Yifan Gu</name>
+    </author>
+    <author>
+      <name>Shuyi Wang</name>
+    </author>
+    <author>
+      <name>Zihao Zuo</name>
+    </author>
+    <author>
+      <name>Steven Dillmann</name>
+    </author>
+    <author>
+      <name>Yiyou Sun</name>
+    </author>
+    <author>
+      <name>Xinyang Han</name>
+    </author>
+    <author>
+      <name>Hanchung Lee</name>
+    </author>
+    <author>
+      <name>Molei Tao</name>
+    </author>
+    <author>
+      <name>Yue Zhao</name>
+    </author>
+    <author>
+      <name>Shilong Liu</name>
+    </author>
+    <author>
+      <name>Yuchen Wu</name>
+    </author>
+    <author>
+      <name>Xuandong Zhao</name>
+    </author>
+    <author>
+      <name>Xiangyi Li</name>
+    </author>
+    <author>
+      <name>Florian Brand</name>
+    </author>
+    <author>
+      <name>Gerbrand Ceder</name>
+    </author>
+    <author>
+      <name>Hartmut Haeffner</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06902v1</id>
+    <title>Gravitational-Wave Constraints on $R^2$ Gravity</title>
+    <updated>2026-11-04T18:49:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.06902v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06902v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Gravitational waves from compact binary coalescences provide a unique opportunity to test general relativity in the strong-field regime. Quadratic $f(R)=R+aR^2$ gravity is among the simplest higher-curvature extensions of general relativity and introduces a massive scalar degree of freedom whose finite interaction range can modify compact-binary dynamics and gravitational-wave emission. We map this theory onto the effective-field-theory waveform for generic massive scalar-tensor gravity, obtaining a theory-specific inspiral phase correction governed by the single coupling parameter $a$. Using Bayesian analyses of the binary-neutron-star events GW170817 and GW190425, we obtain a combined constraint on the quadratic-curvature coupling of $a\lesssim6.2\times10^6\,\mathrm{m}^2$ at $90\%$ credibility, corresponding to a lower bound on the scalar mass of $m_s\gtrsim3.2\times10^{-11}\,\mathrm{eV}$. This constitutes the strongest astrophysical constraint on the quadratic-curvature coupling, improving the previous best bound by approximately five orders of magnitude and demonstrating the sensitivity of binary-neutron-star inspirals to finite-range scalar interactions in the strong-field regime.</summary>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.HE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:49:50Z</published>
+    <arxiv:comment>13 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="gr-qc"/>
+    <author>
+      <name>Pawan Kumar Gupta</name>
+    </author>
+    <author>
+      <name>Laura Sagunski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06894v1</id>
+    <title>Nonuniform Buy-at-Bulk Network Design: Improved Approximation and LP Integrality Gap</title>
+    <updated>2026-11-04T18:46:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.06894v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06894v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In nonuniform buy-at-bulk network design, we are given an undirected graph and $h$ terminal pairs with positive demands, and we must route every demand at minimum total cost when each network resource has two independent parameters: a fixed buying price paid once if the resource is used, and a per-unit rental cost (or physical length) paid proportionally to the traffic it carries. Unlike the uniform-cost or single-sink variants, the general multicommodity problem allows unrelated buying and rental metrics across arbitrary source--sink pairs, arbitrary demands, and both edge and node resources.
+  We give a deterministic polynomial-time $O(\log^2 h / (\log\log h)^2)$-approximation algorithm for undirected nonuniform buy-at-bulk network design. The guarantee holds for edge costs, node costs, and their combination, and applies to arbitrary positive rational demands with no dependence on the number of vertices or the numerical demand ratio. This improves upon the $O(\log^4 h)$ bound of Chekuri, Hajiaghayi, Kortsarz, and Salavatipour (2010) for unrestricted instances. Our result also establishes the same $O(\log^2 h / (\log\log h)^2)$ upper bound on the integrality gap of the natural affine multicommodity flow LP, bounding integral buying and rental costs separately against their fractional counterparts and preserving zero rental budgets exactly.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:46:32Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Iman Gholami</name>
+    </author>
+    <author>
+      <name>MohammadTaghi Hajiaghayi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06893v1</id>
+    <title>Probing gravity at megahertz frequencies with levitated rotors</title>
+    <updated>2026-11-04T18:46:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.06893v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06893v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The near-field gravitational interaction between masses is always thought of as instantaneous, an assumption experimentally tested only up to 1.7 kHz, where measurements yield a bounds at the $10^{-5}$ s level. We propose a near-field experiment reaching up to megahertz frequencies, in which a levitated microrotor modulates a mass quadrupole and a second rotor measures the resulting gravitational tidal field as a torque. Because the detector rotor acts as a mechanical local oscillator, the megahertz signal is downconverted to a convenient band of a few hertz, and since at fixed geometry neither the torque nor the integration time depends on the rotation rate, higher frequencies are reached at no cost in sensitivity. With parameters within reach of magnetically levitated NdFeB rotors, a signal at 2 MHz yields a torque of $2\cdot 10^{-25}$ Nm, detectable in under an hour at 10 mK. Treating a possible departure from instantaneous gravitational coupling through a field relaxation time, the measured torque could constrain it at the $10^{-8}$ s level, improving on the existing bounds by more than three orders of magnitude. As a byproduct of our analysis, we derive the sensitivity of a rotor operated as a tunable high-frequency gravitational-wave detector, finding that a noise-equivalent strain around $10^{-22}$ Hz$^{-1/2}$ could be achievable in the megahertz band.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:46:09Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Matteo Fadel</name>
+    </author>
+    <author>
+      <name>Andrea Vinante</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06887v1</id>
+    <title>Risk-Sensitive Stochastic Optimal Control on Positive Cones</title>
+    <updated>2026-11-04T18:41:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.06887v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06887v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider stochastic optimal control problems in which the state is constrained to a proper cone. Specifically, we consider risk-neutral, risk-averse, and risk-seeking formulations within a single entropic-risk framework. We investigate classes of problems whose Bellman operator preserves affine functions and characterize their optimal value functions and feedback policies for both finite-horizon and time-average infinite-horizon problems. Additionally, we establish convergence and state-bound results under finite-step cost observability. Moreover, we demonstrate an exact connection between entropic-risk optimal control on proper cones and deterministic infsup control for systems whose dynamics and stage costs are affine in the disturbances. In addition, we provide examples of classes of systems for which explicit solutions can be obtained.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:41:32Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Mohamad Al Ahdab</name>
+    </author>
+    <author>
+      <name>John-Josef Leth</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06879v1</id>
+    <title>Adaptive Multi Mode: Budget-Aware Routing of Optimizers By Online Landscape Probes</title>
+    <updated>2026-11-04T18:35:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.06879v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06879v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The best classical optimizer for a continuous black-box problem depends on its budget and landscape. Existing routers decide from the dimension and budget, past improvement or features fitted to one benchmark, and few test an optimizer's implicit assumptions online. AMM (Adaptive Multi Mode) routes a known budget among quasi-Newton, trust-region, coordinate, multistart and evolution-strategy optimization engines with online probes of curvature, plateaus, separability, kinks, basins and fractal structure. Each probe has a default, a dimension-by-budget validity range and a cost charged to the budget. In its pre-registered development loop on bbob, 32 of 36 predictions held over the last 16 confirmations. AMM was then tested once on held-out bbob instances 101-110 (D=2-40, 10*D-1000*D) against up to seven competitors. It has the highest target share in 382 of 600 function-dimension-budget cells (236 outright, 146 tied) and, by a descriptive posterior rule, is credibly behind in 35, mostly at 10*D and 30*D. At every budget it also leads the controls built from its own engines (the best engine alone, the best engine per dimension and budget, and a greedy schedule), narrowly at 10*D and 30*D, and nevergrad's NgIohTuned. In pre-registered runs its lead over IPOP-CMA-ES holds under affine and box transformations, on box-constrained bbob and, pooled, on rotated f2-f4, but rotating the separable f3 and f4 removes most of the lead there. On held-out MA-BBOB its final share at 2000*D is level with IPOP-CMA-ES's and its anytime area lower. We published AMM as an open-source Python package (pip install amm-optimizer; https://github.com/BjBodner/amm-optimizer).</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:35:35Z</published>
+    <arxiv:comment>29 pages, 8 figures, 19 tables. Code: https://github.com/BjBodner/amm-optimizer</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Benjamin Jacob Bodner</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06859v1</id>
+    <title>Balancing hierarchical representation and quantization: A performance trade-off in text embeddings</title>
+    <updated>2026-11-04T18:15:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.06859v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06859v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Hierarchical text embedding models offer variable-length representations, while quantization reduces numerical precision; both aim to improve computational efficiency. This work is an empirical benchmark study of how these two orthogonal, already-established techniques interact. We evaluate 38 tasks from the Massive Text Embedding Benchmark (MTEB) using four transformer-based embedding models, covering 1D and 2D hierarchical representations combined with 32-bit, 8-bit, and binary quantization, for 168 configurations per task. We report each efficiency dimension separately: theoretical per-vector storage and end-to-end evaluation time. Under a Friedman test with Nemenyi post-hoc analysis, int8 quantization is statistically indistinguishable from float32 for pair classification and re-ranking and costs at most 1.5 percentage points overall, whereas binary quantization is significantly worse across every task category. Halving the embedding dimension once is not statistically detectable above $m=16$; two successive halvings always are. Combining an 8x dimensionality reduction with int8 yields a 32x reduction in per-vector storage at 94.4% of baseline effectiveness. Because evaluation times were measured once, we treat them as indicative: we find no evidence that quantization speeds up evaluation, whereas sampling from intermediate layers shortens it substantially. Retrieval degrades far faster than every other category, so we report findings per task category.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:15:08Z</published>
+    <arxiv:comment>29 pages. Authors' version of the open access article published in Information Sciences (CC BY 4.0). This version corrects the second affiliation of Marco Polignano (Otto von Guericke University Magdeburg); the published version lists the European Commission, Joint Research Centre (JRC) in error. Marco Polignano is not affiliated with the JRC. No other content has been changed</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>Information Sciences 763 (2027) 124271</arxiv:journal_ref>
+    <author>
+      <name>Kai Ponel</name>
+    </author>
+    <author>
+      <name>Marco Polignano</name>
+    </author>
+    <author>
+      <name>Erasmo Purificato</name>
+    </author>
+    <author>
+      <name>Aylin Julia Temizkan</name>
+    </author>
+    <author>
+      <name>Marco Levantesi</name>
+    </author>
+    <author>
+      <name>Giovanni Semeraro</name>
+    </author>
+    <author>
+      <name>Ernesto William De Luca</name>
+    </author>
+    <arxiv:doi>10.1016/j.ins.2026.124271</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.ins.2026.124271" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06854v1</id>
+    <title>Visual Token Routing: Learning to keep tokens that matter</title>
+    <updated>2026-11-04T18:10:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.06854v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06854v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Computer-use agents (CUAs) have recently achieved superhuman performance on several long-horizon benchmarks. However, their computational cost limits their use in long-horizon tasks and real-time domains such as video games. A key bottleneck is representing each screenshot as thousands of visual tokens, which accumulate into long contexts as agents reason over extended interaction histories. We observe that most of these visual tokens are either semantically irrelevant to the agent's next action or temporally redundant across screenshots. Building on this observation, we introduce Visual Token Routing (VTR), a joint training framework for learning sparse visual representations that preserve the information needed for action prediction. In VTR, we train the vision-language model together with a lightweight spatio-temporal router that examines each image region in the current and previous screenshots and decides whether its visual token enters the language model. We optimize the router using an adaptive loss to keep the number of visual tokens as small as possible while minimizing performance degradation. With just 2,000 training steps, VTR matches the performance of the full-resolution model on OSWorld, CUA-World, and video game action prediction, while using 2.5-5.8x fewer visual tokens. These savings reduce inference cost by up to 3.3x and speed up prefill by up to 2.9x. VTR also outperforms lowering the image resolution and other baselines for dropping tokens, by up to 12.8 points on OSWorld. Overall, VTR enables computer-use agents to process only the visual tokens they need, allowing them to be used in long-horizon tasks and real-time domains at a fraction of the computational cost. Code and models are available at https://pranjal2041.github.io/vtr</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:10:33Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Pranjal Aggarwal</name>
+    </author>
+    <author>
+      <name>Sean Welleck</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06843v1</id>
+    <title>Thermally Conditioned Time-Series Forecasting of Grain Growth in Polycrystalline Materials</title>
+    <updated>2026-11-04T17:59:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.06843v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06843v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Grain growth during heat treatment strongly affects the microstructure of polycrystalline materials and, consequently, their mechanical properties. Although numerical methods such as front-tracking or front-capturing simulations can accurately describe grain growth, their high computational cost limits their use for long or non-isothermal thermal cycles. In previous work, grain growth was successfully predicted under isothermal conditions by treating grain size distributions as time series and forecasting their evolution using recurrent neural networks, allowing complete grain growth trajectories to be generated in seconds rather than through costly PDE-based simulations. In the present work, this forecasting framework is reformulated to handle non-isothermal conditions by explicitly incorporating thermal information into the model architecture. Grain size distributions are encoded using a convolutional neural network, thermal descriptors are embedded through a dedicated multilayer perceptron, and temporal evolution is predicted using a recurrent network. Instantaneous temperature and thermal rate are provided at each time step, allowing the model to adapt its predictions to changing thermal conditions. The framework is trained and evaluated on datasets generated from validated front-tracking simulations across a wide range of non-isothermal thermal paths. The results show that the thermally conditioned model accurately reproduces grain growth dynamics under complex thermal histories, achieving, in k-fold cross-validation over all simulations, mean relative errors of 2.99% (one-hour cycles) and 4.51% (four-hour cycles) with coefficients of determination exceeding 0.99, and mean relative errors between 1.91% and 14.66% on ten simulations following four unseen thermal histories of increasing complexity.</summary>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:59:26Z</published>
+    <arxiv:primary_category term="cond-mat.mtrl-sci"/>
+    <author>
+      <name>Eliane Younes</name>
+    </author>
+    <author>
+      <name>Elie Hachem</name>
+    </author>
+    <author>
+      <name>Marc Bernacki</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06841v1</id>
+    <title>ServerBench: How can your coding agents design specialized LLM serving systems?</title>
+    <updated>2026-11-04T17:59:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.06841v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06841v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language model (LLM) coding agents develop software through experimentation, offering an opportunity to design the serving systems supporting their own operation. Effective serving requires coordinating implementation and operating decisions under session dependencies, latency constraints, and correctness requirements. We introduce ServerBench, a benchmark for agentic design of complete, specialized LLM serving systems. Agents experiment against a common objective, dollars per dollar: latency-qualified token value per dollar of GPU cost. Stateful replay preserves session dependencies, and independent verification checks the submitted system. Across 11 coding-agent models and three deployments, Claude Sonnet 5.5 achieves 2.97 dollars per dollar on Gemma E4B, $4.87\times$ the vLLM reference; 22 of 33 runs yield verified systems, and 13 exceed the strongest baseline. Our analysis identifies three findings: high-value designs coordinate capacity improvements with load selection; agents interpret performance feedback through workload-relevant experiments; and reliable delivery requires verification of the execution paths introduced by optimization. Overall, ServerBench supports systematic study of how agents translate service objectives and feedback into effective, verified serving systems for given task specifications.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:59:07Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Xinrui Zhong</name>
+    </author>
+    <author>
+      <name>Zhiming Wang</name>
+    </author>
+    <author>
+      <name>Yongqi Liu</name>
+    </author>
+    <author>
+      <name>Zhaohui Wang</name>
+    </author>
+    <author>
+      <name>Shanglin Yang</name>
+    </author>
+    <author>
+      <name>Zikun Li</name>
+    </author>
+    <author>
+      <name>Zhuoming Chen</name>
+    </author>
+    <author>
+      <name>Beidi Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06839v1</id>
+    <title>Before You Continue: Evaluating Time-Sensitive Safety Awareness in Conversational Assistants</title>
+    <updated>2026-11-04T17:54:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.06839v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06839v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language model (LLM) assistants increasingly help users with everyday activities that involve time-dependent constraints. However, users may not mention these constraints in later requests, requiring assistants to recognize and adjust their advice accordingly. To evaluate such capability, we introduce TASC (Temporal Action Safety in Conversation), a benchmark that evaluates whether LLMs apply time-dependent constraints when responding to conversational requests. TASC consists of 3,418 inputs derived from 128 templates, along with a separate set of 33 scenarios designed to compare models' ability to calculate elapsed time with their ability to apply that information. Across 13 models, assistants account for time-dependent constraints in only 30.5% of cases where the proposed action violates a rule, while rarely warning users unnecessarily. More importantly, models fail to apply these constraints in 62.1% of cases despite correctly calculating the elapsed time. Explicitly providing the timing resolves only about half of these failures, revealing a gap between temporal reasoning and its application in conversational advice.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:54:49Z</published>
+    <arxiv:comment>Preprint</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Peidi Dong</name>
+    </author>
+    <author>
+      <name>Yunze Xiao</name>
+    </author>
+    <author>
+      <name>Yu-Lin Tsai</name>
+    </author>
+    <author>
+      <name>Yichen Zheng</name>
+    </author>
+    <author>
+      <name>Heyuan Huang</name>
+    </author>
+    <author>
+      <name>Weihao Xuan</name>
+    </author>
+    <author>
+      <name>Mark Dredze</name>
+    </author>
+    <author>
+      <name>Jen-tse Huang</name>
+    </author>
+  </entry>
+</feed>

@@ -1,0 +1,485 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/bXrHg0uI0RR2l6mW9Mt22ipX6IA</id>
+  <title>arXiv Query: search_query=all:resource OR all:constrained OR all:decision OR all:making OR all:fallacy&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-05T11:14:48Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:resource+OR+(all:constrained+OR+(all:decision+OR+(all:making+OR+all:fallacy)))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>468501</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06915v1</id>
+    <title>Preparing for the Gaia DR4 Epochalypse: Simulated Epoch Astrometry for Substellar Companion Orbit-Modeling Benchmarks</title>
+    <updated>2026-11-04T18:59:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.06915v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06915v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Gaia's fourth data release (DR4) will provide epoch astrometry for billions of sources, enabling the detection of potentially tens of thousands of substellar companions. We present the epochalypse catalog: Gaia DR4-like epoch astrometry for testing orbit-modeling pipelines on a common set of injected systems with known parameters. Onto each of the $5{,}040{,}328$ main-sequence Gaia stars within $500\,{ \rm pc}$ in the G23H catalog, we inject a zero-, one-, and two-companions system, for $15{,}120{,}984$ systems in total. Companion masses and semimajor axes are drawn log-uniformly over $1\,M_{ \rm Mars}$--$80\,M_{ \rm Jup}$ and $0.03$--$100\,{ \rm au}$, with no occurrence model and no detectability cut, so orbital periods extend well beyond the mission baseline and the companion-free population serves as a matched null. We also flag sub-populations of one- and two-companions systems whose companions are potentially detectable, based on an estimated signal-to-noise ratio that accounts for each star's noise, number of transits, and the suppression of signals with periods longer than the baseline. As a demonstration, we run the kepmodel astrometric periodogram on every system and find that signal detection and period localization decouple beyond the DR4 baseline: long-period companions can produce significant astrometric curvature while their periods, and therefore their masses, remain poorly constrained. Under any companion occurrence model, this population of systems where the orbit is detectable but not characterizable will far outnumber the population with fully characterizable orbits. The epochalypse catalog, its full generation pipeline, and a modeling tutorial are publicly available.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:59:05Z</published>
+    <arxiv:comment>Submitted to AAS journals. 24 pages, 9 figures, 2 tables. For catalog generation and analysis code, see https://github.com/dyahalomi/epochalypse. For the full epochalypse catalog, see https://doi.org/10.5281/zenodo.23789041</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Daniel A. Yahalomi</name>
+    </author>
+    <author>
+      <name>Adrian M. Price-Whelan</name>
+    </author>
+    <author>
+      <name>Jessica Speedie</name>
+    </author>
+    <author>
+      <name>William Thompson</name>
+    </author>
+    <author>
+      <name>Megan Bedell</name>
+    </author>
+    <author>
+      <name>Victor Ramirez Delgado</name>
+    </author>
+    <author>
+      <name>Aida Behmard</name>
+    </author>
+    <author>
+      <name>Avraham Binnenfeld</name>
+    </author>
+    <author>
+      <name>Dori Blakely</name>
+    </author>
+    <author>
+      <name>Anthony G. A. Brown</name>
+    </author>
+    <author>
+      <name>Andrew R. Casey</name>
+    </author>
+    <author>
+      <name>Jiayin Dong</name>
+    </author>
+    <author>
+      <name>Clarissa R. Do Ó</name>
+    </author>
+    <author>
+      <name>Caleb Lammers</name>
+    </author>
+    <author>
+      <name>Cheyanne Shariat</name>
+    </author>
+    <author>
+      <name>Joshua N. Winn</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06914v1</id>
+    <title>A Framework for Context Enrichment and Selective Robustness in LLM Social Agents</title>
+    <updated>2026-11-04T18:58:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.06914v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06914v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Researchers use large language models as agents in social simulations, where agents are prompted with observations and background information intended to shape their actions. Yet LLM agents have been shown to substantially change their behavior under meaning-preserving prompt variations, creating a validation problem for social simulation. One plausible hypothesis is that this brittleness reflects a lack of grounding and can be reduced by enriching the context provided to the agents. Whether richer context improves robustness remains unclear, in part because context richness and robustness are rarely defined in ways that support controlled comparisons. We address the first need with controlled context enrichment, a set of prompt substitution rules that systematically enriches distinct types of context: neutral padding, generic social background, descriptive decision grounding, and normative decision grounding. We address the second by introducing selective robustness as a validation criterion: insensitivity to meaning-preserving prompt variation combined with a directional response to decision-relevant changes in the social world. We demonstrate the framework in a Prisoner's Dilemma-like game, showing how it can be used to identify which forms of context enrichment produce more desirable and robust agent behavior. We find that these forms of enrichment produce distinct behavioral patterns that vary between the two models tested.</summary>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:58:23Z</published>
+    <arxiv:comment>Accepted to the SocialAgent Workshop @ NeurIPS 2026. 12 pages, 1 figure, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.MA"/>
+    <author>
+      <name>Mattia Greiche</name>
+    </author>
+    <author>
+      <name>Reihaneh Rabbany</name>
+    </author>
+    <author>
+      <name>Maximilian Puelma Touzel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06909v1</id>
+    <title>Arithmetic Depth, Minimal Gate Alphabets, and Exact Program-State Resources for Single-Qubit Dyadic Programs</title>
+    <updated>2026-11-04T18:56:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.06909v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06909v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Resource analyses for quantum programs commonly provide safe upper bounds on qubits, gates, or non-Clifford operations. We study a single-qubit dyadic fragment in which the deepest exact resource layer can instead be inferred exactly. Starting from the normalized-midpoint misty-state syntax, we define dyadic program states and the real cyclotomic tower $K_D=\mathbb Q(2\cos(π/2^D))$. For the projective single-qubit Clifford-cyclotomic tower $\widehat G_D\subseteq SO(3)$, we prove the relative intersection law $\widehat G_D\cap SO(3,K_d)=\widehat G_d$ for $d\le D$. Combining this descent theorem with an arithmetic-closure invariant for adaptive stabilizer processing yields $\mathrm{Fdepth}(U)=\mathrm{Adepth}(U)=\mathrm{Rdepth}(U)$: the smallest real cyclotomic field containing the Bloch matrix of an exactly synthesizable channel, the shallowest dyadic gate alphabet realizing it up to global phase, and the shallowest dyadic program-state layer sufficient for exact stabilizer-assisted implementation coincide. At that common minimum, known fixed-alphabet synthesis gives minimum primitive-rotation count. We package the result as an exact static resource effect and outline a certificate-producing compiler.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:56:04Z</published>
+    <arxiv:comment>14 pages, 2 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Tony Newton</name>
+    </author>
+    <author>
+      <name>Dan-Adrian German</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06908v1</id>
+    <title>Perceptive Humanoid Motion from Simulation</title>
+    <updated>2026-11-04T18:55:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.06908v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06908v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Humanoid robots have the potential to automate a wide range of physical tasks. Progress toward generalist humanoid autonomy, however, remains constrained by a data bottleneck: mapping pixels and free-form language to low-level joint commands requires paired supervision, and no corpus of such data exists at sufficiently large scale. Some approaches rely on human teleoperation and wearable capture devices, which require at least an hour of human time to produce an hour of data. We present HALO, a humanoid autonomy system powered by a pipeline that synthesizes vision-language-motion data across a thousand procedurally generated homes. The corpus scales with compute rather than human labor. HALO acquires a repertoire of physical skills, including sitting on chairs, navigating to named objects, stepping sideways through half-open doors, crouching and crawling beneath tables, and pushing boxes. It orchestrates these skills to solve composite, long-horizon tasks. Without ever seeing a real home during training, HALO transfers zero-shot to the physical world, achieving a 91% success rate across 360 trials in six unmapped real-world environments. See https://apple-aiml-research.github.io/ml-halo/ for code and videos.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:55:33Z</published>
+    <arxiv:comment>Code and videos at: https://apple-aiml-research.github.io/ml-halo/</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Siyuan Hu</name>
+    </author>
+    <author>
+      <name>Abulikemu Abuduweili</name>
+    </author>
+    <author>
+      <name>Yue Meng</name>
+    </author>
+    <author>
+      <name>Shipeng Liu</name>
+    </author>
+    <author>
+      <name>Quentin Leboutet</name>
+    </author>
+    <author>
+      <name>Chen Chen</name>
+    </author>
+    <author>
+      <name>Matthias Müller</name>
+    </author>
+    <author>
+      <name>Vladlen Koltun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06905v1</id>
+    <title>Reinforcement Learning Enables Scaling Generalist Robot Policy Improvement</title>
+    <updated>2026-11-04T18:52:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.06905v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06905v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The introduction of generalist robot policies has enabled a single, large model to learn to perform a variety of tasks from a vast pre-training corpus. While these models often exhibit powerful zero-shot generalization capabilities, they typically require an adaptation phase to achieve sufficient performance in deployment. Iterated self-improvement via reinforcement learning (RL) has demonstrated promise in enabling this adaptation, yet such approaches have been largely explored in single-task settings - where the goal is to simply improve on a narrow deployment task - which lies in stark contrast to the multi-task capabilities of the base policy. In this work we ask whether generalist robot policies are capable of multi-task, generalist improvement in deployment - targeting many diverse tasks simultaneously - and what algorithmic recipe enables this. To answer this question, we first develop a set of structured evaluations to test generalist improvement capabilities, and systematically evaluate algorithmic and practical design choices regarding value estimation, policy extraction and resource allocation. We show that not only can generalist policies be improved online across diverse tasks, but that the right recipe can enable generalization and increase performance on tasks not considered during online training. We characterize when this generalization occurs and show that both the training task distribution and the use of value-based RL are critical. To the best of our knowledge, this is among the first evidence for online generalist improvement for robot foundation models.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:52:28Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Michal Korniak</name>
+    </author>
+    <author>
+      <name>Marco Bagatella</name>
+    </author>
+    <author>
+      <name>Ralf Römer</name>
+    </author>
+    <author>
+      <name>Michal Nauman</name>
+    </author>
+    <author>
+      <name>Yarden As</name>
+    </author>
+    <author>
+      <name>Pranav Vignesh</name>
+    </author>
+    <author>
+      <name>Manan Agarwal</name>
+    </author>
+    <author>
+      <name>Leander Diaz-Bone</name>
+    </author>
+    <author>
+      <name>Piotr Zalewski</name>
+    </author>
+    <author>
+      <name>Mikołaj Czarnecki</name>
+    </author>
+    <author>
+      <name>Lenart Treven</name>
+    </author>
+    <author>
+      <name>Shashwat Saxena</name>
+    </author>
+    <author>
+      <name>Sreyas Venkataraman</name>
+    </author>
+    <author>
+      <name>Sarvesh Patil</name>
+    </author>
+    <author>
+      <name>Zhiyuan Zhou</name>
+    </author>
+    <author>
+      <name>Daniel Marta</name>
+    </author>
+    <author>
+      <name>Oier Mees</name>
+    </author>
+    <author>
+      <name>Nur Muhammad Mahi Shafiullah</name>
+    </author>
+    <author>
+      <name>Carmelo Sferrazza</name>
+    </author>
+    <author>
+      <name>Bhavya Sukhija</name>
+    </author>
+    <author>
+      <name>Angela P. Schoellig</name>
+    </author>
+    <author>
+      <name>Andreas Krause</name>
+    </author>
+    <author>
+      <name>Max Simchowitz</name>
+    </author>
+    <author>
+      <name>Andrew Wagenmaker</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06897v1</id>
+    <title>MCP-Eco: A Linked Dataset of MCP Servers, Consumers, and Development Activity</title>
+    <updated>2026-11-04T18:47:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.06897v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06897v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Model Context Protocol (MCP) enables LLM agents to access external tools and data. Studying its software ecosystem requires connecting server interfaces, the projects that configure these servers, and their development activity. However, this information is scattered across directories, package registries, configuration files, and repository histories. We present MCP-Eco, a relational dataset that integrates these sources and links consumer configuration declarations to candidate server projects. Its frozen release contains 16,880,899 records across 19 Parquet tables, covering 78,302 candidate server projects, 16,165 candidate consuming repositories, and 9,200 configuration declarations. Of these declarations, 5,975 resolve to 5,138 distinct repository-server pairs. The dataset also includes tool, resource, and prompt descriptions, declared dependencies, and associated development records, including pull requests, reviews, issues, and commits. Provenance fields distinguish directory-reported capabilities from those observed through live probing and document discovery sources and declaration-matching methods. These connections support research on MCP interface design, configuration practices, and repository maintenance, while enabling practitioners to inspect tool schemas and existing integration configurations. The dataset and accompanying analysis scripts are publicly available at https://huggingface.co/datasets/mcp-research-alliance/mcp-ecosystem Demo video: https://www.youtube.com/watch?v=N7TqnNneSfU</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:47:50Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Khalid Tounoussi</name>
+    </author>
+    <author>
+      <name>Mohammed Sayagh</name>
+    </author>
+    <author>
+      <name>Ali Ouni</name>
+    </author>
+    <author>
+      <name>Yutaro Kashiwa</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06894v1</id>
+    <title>Nonuniform Buy-at-Bulk Network Design: Improved Approximation and LP Integrality Gap</title>
+    <updated>2026-11-04T18:46:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.06894v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06894v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In nonuniform buy-at-bulk network design, we are given an undirected graph and $h$ terminal pairs with positive demands, and we must route every demand at minimum total cost when each network resource has two independent parameters: a fixed buying price paid once if the resource is used, and a per-unit rental cost (or physical length) paid proportionally to the traffic it carries. Unlike the uniform-cost or single-sink variants, the general multicommodity problem allows unrelated buying and rental metrics across arbitrary source--sink pairs, arbitrary demands, and both edge and node resources.
+  We give a deterministic polynomial-time $O(\log^2 h / (\log\log h)^2)$-approximation algorithm for undirected nonuniform buy-at-bulk network design. The guarantee holds for edge costs, node costs, and their combination, and applies to arbitrary positive rational demands with no dependence on the number of vertices or the numerical demand ratio. This improves upon the $O(\log^4 h)$ bound of Chekuri, Hajiaghayi, Kortsarz, and Salavatipour (2010) for unrestricted instances. Our result also establishes the same $O(\log^2 h / (\log\log h)^2)$ upper bound on the integrality gap of the natural affine multicommodity flow LP, bounding integral buying and rental costs separately against their fractional counterparts and preserving zero rental budgets exactly.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:46:32Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Iman Gholami</name>
+    </author>
+    <author>
+      <name>MohammadTaghi Hajiaghayi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06893v1</id>
+    <title>Probing gravity at megahertz frequencies with levitated rotors</title>
+    <updated>2026-11-04T18:46:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.06893v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06893v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The near-field gravitational interaction between masses is always thought of as instantaneous, an assumption experimentally tested only up to 1.7 kHz, where measurements yield a bounds at the $10^{-5}$ s level. We propose a near-field experiment reaching up to megahertz frequencies, in which a levitated microrotor modulates a mass quadrupole and a second rotor measures the resulting gravitational tidal field as a torque. Because the detector rotor acts as a mechanical local oscillator, the megahertz signal is downconverted to a convenient band of a few hertz, and since at fixed geometry neither the torque nor the integration time depends on the rotation rate, higher frequencies are reached at no cost in sensitivity. With parameters within reach of magnetically levitated NdFeB rotors, a signal at 2 MHz yields a torque of $2\cdot 10^{-25}$ Nm, detectable in under an hour at 10 mK. Treating a possible departure from instantaneous gravitational coupling through a field relaxation time, the measured torque could constrain it at the $10^{-8}$ s level, improving on the existing bounds by more than three orders of magnitude. As a byproduct of our analysis, we derive the sensitivity of a rotor operated as a tunable high-frequency gravitational-wave detector, finding that a noise-equivalent strain around $10^{-22}$ Hz$^{-1/2}$ could be achievable in the megahertz band.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:46:09Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Matteo Fadel</name>
+    </author>
+    <author>
+      <name>Andrea Vinante</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06891v1</id>
+    <title>Prophet Secretary for Matroids and XOS Valuations: A Strict Separation at $1-1/e$</title>
+    <updated>2026-11-04T18:44:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.06891v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06891v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The matroid prophet-secretary problem asks an online algorithm to select an independent set of elements whose nonnegative values are drawn independently and revealed in uniformly random order. Its combinatorial-auction counterpart asks the algorithm to allocate disjoint bundles to arriving buyers with independently drawn XOS valuation functions. In both problems the distributions are known, and the benchmark is the expected offline optimum. Ehsani, Hajiaghayi, Kesselheim, and Singla (SODA 2018) give $(1-1/e)$-competitive algorithms for both settings. In this work we show that these two guarantees have different limits.
+  For every matroid, we give a randomized $(1-1/e+\varepsilon_0)$-competitive algorithm, where $\varepsilon_0=10^{-6}$. The guarantee holds for independent nonnegative values with finite expected optimum. For explicitly given finite distributions with rational values and probabilities, the algorithm has polynomial worst-case running time in the matroid independence-oracle model. The oracle tests whether a queried set is independent. The algorithm makes $O(N^4)$ such queries in expectation and $O(N^4\log(N+2))$ in the worst case, where $N$ is the number of elements.
+  For combinatorial auctions with XOS valuations, however, we show that $1-1/e$ is the optimal competitive ratio. We give an explicit family of finite instances showing that no online algorithm can guarantee a larger competitive ratio than $1-1/e$, even when the buyers' valuations are independent and identically distributed, every additive clause has coefficients in $\{0,1\}$, and computation is unrestricted. Thus the matroid improvement exploits structure absent from general allocation with XOS valuations.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:44:02Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Hossein Esfandiari</name>
+    </author>
+    <author>
+      <name>MohammadTaghi Hajiaghayi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06887v1</id>
+    <title>Risk-Sensitive Stochastic Optimal Control on Positive Cones</title>
+    <updated>2026-11-04T18:41:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.06887v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06887v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider stochastic optimal control problems in which the state is constrained to a proper cone. Specifically, we consider risk-neutral, risk-averse, and risk-seeking formulations within a single entropic-risk framework. We investigate classes of problems whose Bellman operator preserves affine functions and characterize their optimal value functions and feedback policies for both finite-horizon and time-average infinite-horizon problems. Additionally, we establish convergence and state-bound results under finite-step cost observability. Moreover, we demonstrate an exact connection between entropic-risk optimal control on proper cones and deterministic infsup control for systems whose dynamics and stage costs are affine in the disturbances. In addition, we provide examples of classes of systems for which explicit solutions can be obtained.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:41:32Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Mohamad Al Ahdab</name>
+    </author>
+    <author>
+      <name>John-Josef Leth</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06883v1</id>
+    <title>Density-driven $α$-particle clustering in neutron-rich oxygen isotopes</title>
+    <updated>2026-11-04T18:39:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.06883v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06883v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this work, we study the effect of valence neutrons on density-driven localisation in the neutron-rich oxygen isotopes. Calculations are performed within the multidimensionally constrained relativistic Hartree--Bogoliubov model using the DD-ME2 covariant energy-density functional. By constraining the mass rms radius to larger values, we study the structural evolution of these nuclei under progressive dilution, from spatially delocalised configurations to localised clustered states. The total energy, pairing correlations, deformation, and proton and neutron density distributions are analysed to determine how valence neutrons influence the emergence of $α$-like clustering. For all three isotopes, we find a transition from a spatially delocalised nucleonic configuration to a tetrahedral $4α$-like structure. The onset of this transition occurs at similar values of the radius-derived relative dilution parameter, $χ_{\mathrm{PT}}=ρ_{\mathrm{PT}}/ ρ_{\mathrm{GS}}\simeq 0.28$--$0.31$, and shows only a weak dependence on neutron number. The excess neutrons modify the clustered density by increasing the density in the central regions and between clusters, while leaving the underlying tetrahedral core structure largely intact. Finally, we also use a phenomenological four-centre Hückel-type mapping of nuclei, which provides a molecular-orbital-like interpretation of cluster structures. We find that the effective coupling between the cluster centers decreases by progressively expanding the nucleus. The centroid-referenced energy shift $ΔE_{\mathrm{val}}$ also becomes less negative and provides smaller net molecular-orbital-like energy lowering relative to its centroid with increasing neutron number.</summary>
+    <category term="nucl-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:39:41Z</published>
+    <arxiv:comment>7 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="nucl-th"/>
+    <arxiv:journal_ref>Phys. Lett. B 882 (2026) 141053</arxiv:journal_ref>
+    <author>
+      <name>M. Davies</name>
+    </author>
+    <author>
+      <name>E. Yüksel</name>
+    </author>
+    <author>
+      <name>J. -P. Ebran</name>
+    </author>
+    <author>
+      <name>E. Khan</name>
+    </author>
+    <arxiv:doi>10.1016/j.physletb.2026.141053</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.physletb.2026.141053" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06879v1</id>
+    <title>Adaptive Multi Mode: Budget-Aware Routing of Optimizers By Online Landscape Probes</title>
+    <updated>2026-11-04T18:35:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.06879v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06879v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The best classical optimizer for a continuous black-box problem depends on its budget and landscape. Existing routers decide from the dimension and budget, past improvement or features fitted to one benchmark, and few test an optimizer's implicit assumptions online. AMM (Adaptive Multi Mode) routes a known budget among quasi-Newton, trust-region, coordinate, multistart and evolution-strategy optimization engines with online probes of curvature, plateaus, separability, kinks, basins and fractal structure. Each probe has a default, a dimension-by-budget validity range and a cost charged to the budget. In its pre-registered development loop on bbob, 32 of 36 predictions held over the last 16 confirmations. AMM was then tested once on held-out bbob instances 101-110 (D=2-40, 10*D-1000*D) against up to seven competitors. It has the highest target share in 382 of 600 function-dimension-budget cells (236 outright, 146 tied) and, by a descriptive posterior rule, is credibly behind in 35, mostly at 10*D and 30*D. At every budget it also leads the controls built from its own engines (the best engine alone, the best engine per dimension and budget, and a greedy schedule), narrowly at 10*D and 30*D, and nevergrad's NgIohTuned. In pre-registered runs its lead over IPOP-CMA-ES holds under affine and box transformations, on box-constrained bbob and, pooled, on rotated f2-f4, but rotating the separable f3 and f4 removes most of the lead there. On held-out MA-BBOB its final share at 2000*D is level with IPOP-CMA-ES's and its anytime area lower. We published AMM as an open-source Python package (pip install amm-optimizer; https://github.com/BjBodner/amm-optimizer).</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:35:35Z</published>
+    <arxiv:comment>29 pages, 8 figures, 19 tables. Code: https://github.com/BjBodner/amm-optimizer</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Benjamin Jacob Bodner</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06873v1</id>
+    <title>Tracking turbulence for wind-driven halo removal using MagAO-X pyramid wavefront sensor images</title>
+    <updated>2026-11-04T18:28:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.06873v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06873v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The wind-driven halo (WDH) is a persistent, low spatial frequency noise artifact that arises due to the servo-lag error inherent to all adaptive optics (AO) instruments. Spatial filtering may be employed to overcome this artifact, however, filtering out the WDH while simultaneously preserving signal from an extended astrophysical object of interest is exceptionally challenging. Additionally, since the WDH changes in intensity and position angle through an observation, data-driven algorithms (e.g., KLIP) that are commonly used to subtract the starlight need to be overly-aggressive to remove both the static and dynamic noise components. Since wavefront sensors (WFSs) continuously track the closed-loop residual wavefront error, WFS telemetry presents the ideal resource for combating this type of noise artifact through postprocessing. Using archival WFS telemetry from MagAO-X, which is the "extreme" AO instrument for the 6.5-meter Magellan-Clay telescope, we demonstrate a novel workflow for WDH reconstruction and removal in individual coronagraphic science images. MagAO-X is equipped with a pyramid WFS capable of recording wavefront telemetry at a high-cadence which is saved during data acquisition. Given this, we detail how our WFS data processing pipeline, windsoCC, cross-correlates the recorded closed-loop wavefront to measure the wind vectors of several turbulent layers of the atmosphere above Las Campanas Observatory. We then make use of the wind parameters learned through windsoCC to reconstruct the WDH footprint by leveraging a parametric model. Notably, we demonstrate a dramatic improvement in object recovery using on-sky MagAO-X images of the disk around HR 4796A at visible wavelengths.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:28:23Z</published>
+    <arxiv:comment>59 pages, 11 figures, 6 tables; Accepted for publication in SPIE JATIS</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <author>
+      <name>Jay K. Kueny</name>
+    </author>
+    <author>
+      <name>Jared R. Males</name>
+    </author>
+    <author>
+      <name>Alycia J. Weinberger</name>
+    </author>
+    <author>
+      <name>Laird M. Close</name>
+    </author>
+    <author>
+      <name>Joseph D. Long</name>
+    </author>
+    <author>
+      <name>Joshua Liberman</name>
+    </author>
+    <author>
+      <name>Sebastiaan Haffert</name>
+    </author>
+    <author>
+      <name>Eden McEwen</name>
+    </author>
+    <author>
+      <name>Maggie Y. Kautz</name>
+    </author>
+    <author>
+      <name>Olivier Guyon</name>
+    </author>
+    <author>
+      <name>Logan Pearce</name>
+    </author>
+    <author>
+      <name>Parker T. Johnson</name>
+    </author>
+    <author>
+      <name>Katie Twitchell</name>
+    </author>
+    <author>
+      <name>Jialin Li</name>
+    </author>
+    <author>
+      <name>Alex Hedglen</name>
+    </author>
+    <author>
+      <name>Avalon Gower</name>
+    </author>
+    <author>
+      <name>Warren Foster</name>
+    </author>
+    <author>
+      <name>Jhen Lumbres</name>
+    </author>
+    <author>
+      <name>Lauren Schatz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06870v1</id>
+    <title>PixelSpline: Continuous Space-Time Video Super-Resolution via Endpoint-Anchored Shared Pixel Trajectories</title>
+    <updated>2026-11-04T18:25:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.06870v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06870v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Existing continuous space-time video super-resolution methods often infer motion from only two endpoint frames and model the two motion directions independently, making them vulnerable to ambiguous correspondence and inconsistent trajectories. We introduce a continuous STVSR framework that combines long-context encoding, continuous HR feature lifting, and an endpoint-anchored PixelSpline. Long-range observations provide more reliable endpoint representations, while continuous upsampling constructs detailed appearance features directly on the requested HR grid. PixelSpline explicitly models each pixel's motion as a single continuous trajectory shared by both endpoints. Using this trajectory, our method warps endpoint colors into a coarse intermediate frame and aligns the HR features for residual reconstruction. Experiments across spatial and temporal upsampling settings demonstrate that the proposed framework offers a favorable quality--efficiency trade-off.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:25:55Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Wanqi Yuan</name>
+    </author>
+    <author>
+      <name>Nianyi Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06865v1</id>
+    <title>Longitudinal and Transverse Thermoelectric Properties in Topological Quantum Materials</title>
+    <updated>2026-11-04T18:20:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.06865v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06865v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Thermoelectric materials can be topologically trivial or non-trivial, enabling reversible interconversion of heat and electricity using a solid-state technology. Incidentally, few of the first experimentally discovered 3D topological materials, namely, Bi, Sb, Sn and Pb-based chalcogenides, were long known as good thermoelectric materials. In these compounds, the heavy atoms that give rise to strong spin-orbit coupling often become essential for band inversion and non-trivial band topology. They lead to low lattice thermal conductivity, linearly dispersing Dirac-like bands induce high electrical mobility, and a band-inverted electronic structure with multiple band extrema gives rise to high Seebeck coefficients. In materials, where the applied temperature gradient induces electrical voltage (Seebeck effect) in the same direction, they are termed as longitudinal thermoelectrics. On the other hand, when the generated electrical voltage and applied thermal current remain orthogonal to each other, the materials are termed as transverse thermoelectrics. The transverse response can be driven by an additional external magnetic field (ordinary Nernst effect), intrinsic remanent magnetisation, or non-zero Berry curvature of a material, which arises from their non-trivial topology (anomalous Nernst effect). We discuss another class of quantum materials, known as goniopolar materials, that exhibit axis-dependent conduction polarity and hence transverse thermoelectric effects, which are based on mechanisms of longitudinal thermoelectric properties. In this review, we cover both types of thermoelectricity, focusing on materials that possess non-trivial topological order. We make connections between their structures, topology and transport properties and suggest tunability of thermoelectric properties going beyond conventional mechanisms such as electron-phonon interactions.</summary>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:20:11Z</published>
+    <arxiv:primary_category term="cond-mat.mtrl-sci"/>
+    <author>
+      <name>Jyoti Duhan</name>
+    </author>
+    <author>
+      <name>Anil Kumar B. M.</name>
+    </author>
+    <author>
+      <name>Satya N. Guin</name>
+    </author>
+    <author>
+      <name>Koushik Pal</name>
+    </author>
+  </entry>
+</feed>

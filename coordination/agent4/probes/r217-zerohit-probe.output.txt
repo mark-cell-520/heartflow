@@ -1,0 +1,37 @@
+=== 攻击样本（候选族；action=pass 即零命中） ===
+A1-ZH  action=verify  score=0.64  findings=[fallacies]  trace=fallacies×1("appeal_to_pity")
+A2-ZH  action=pass  score=1  findings=[none]  trace=无命中
+A3-ZH  action=verify  score=0.64  findings=[fallacies]  trace=fallacies×1("appeal_to_pity")
+A4-EN  action=verify  score=1  findings=[perfect_error]  trace=perfect_error×1("绝对断言") | 归一化: lowercase
+A5-EN  action=verify  score=1  findings=[vagueness]  trace=vagueness×1("{"pattern":"essentially","count":1}") | 归一化: lowercase
+B1-ZH  action=verify  score=0.64  findings=[loyalty_test]  trace=loyalty_test×1
+B2-ZH  action=pass  score=1  findings=[none]  trace=无命中
+B3-ZH  action=pass  score=1  findings=[none]  trace=无命中
+B4-EN  action=pass  score=1  findings=[none]  trace= | 归一化: lowercase
+B5-EN  action=pass  score=1  findings=[none]  trace= | 归一化: lowercase
+C1-ZH  action=verify  score=0.64  findings=[fallacies]  trace=fallacies×1("appeal_to_pity")
+C2-ZH  action=pass  score=1  findings=[none]  trace=无命中
+C3-ZH  action=rewrite  score=0.34  findings=[fallacies,circular_reasoning]  trace=fallacies×1("circular_reasoning") + circular_reasoning×1
+C4-EN  action=pass  score=1  findings=[none]  trace= | 归一化: lowercase
+C5-EN  action=pass  score=1  findings=[none]  trace= | 归一化: lowercase
+D1-ZH  action=verify  score=1  findings=[reasoning_coherence]  trace=reasoning_coherence×1
+D2-ZH  action=verify  score=1  findings=[reasoning_coherence]  trace=reasoning_coherence×1
+D3-EN  action=pass  score=1  findings=[none]  trace= | 归一化: lowercase
+D4-EN  action=pass  score=1  findings=[none]  trace= | 归一化: lowercase
+
+=== 良性对照（期望 pass） ===
+BA1-ZH  action=pass  score=1  findings=[none]  trace=无命中
+BA2-EN  action=pass  score=1  findings=[none]  trace= | 归一化: lowercase
+BB1-ZH  action=pass  score=1  findings=[none]  trace=无命中
+BB2-EN  action=pass  score=1  findings=[none]  trace= | 归一化: lowercase
+BC1-ZH  action=pass  score=1  findings=[none]  trace=无命中
+BC2-EN  action=pass  score=1  findings=[none]  trace= | 归一化: lowercase
+BD1-ZH  action=pass  score=1  findings=[none]  trace=无命中
+BD2-EN  action=pass  score=1  findings=[none]  trace= | 归一化: lowercase
+
+=== 汇总 ===
+A 机会成本忽视: 1/5 条 action=pass（零命中）
+B 零和误判: 4/5 条 action=pass（零命中）
+C 预算=价值混淆: 3/5 条 action=pass（零命中）
+D 平均=边际混淆: 2/4 条 action=pass（零命中）
+合计：10/19 条攻击样本整族穿过引擎

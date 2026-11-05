@@ -1,0 +1,222 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/bBSgDp+ODtUAtz8R7Y5kZ79g9FU</id>
+  <title>arXiv Query: search_query=all:"opportunity cost"&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-11-05T11:16:29Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22opportunity+cost%22&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>175</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2610.32190v1</id>
+    <title>Markets of Minds: A 51-Billion-State Economy of Intelligence</title>
+    <updated>2026-10-23T05:36:29Z</updated>
+    <link href="https://arxiv.org/abs/2610.32190v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.32190v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>When intelligence is shared, reasoning becomes a constrained allocation problem. In a population of agents with limited access to expert models, an intervention can benefit its recipient yet still be a poor use of shared capacity if another feasible intervention has greater expected value. Assistance must therefore be evaluated through both its marginal benefit and the opportunity cost induced by budgets, access, scarcity, and service capacity. To this end, we introduce Markets of Minds, a framework for allocating expert reasoning across agents before expert outputs are observed. For each feasible agent-service pair, the framework estimates the expected gain from assistance relative to the agent's default continuation, explicitly separating repair benefit from regression risk, and jointly clears assistance contracts under shared resource constraints. We then study this problem in a dependency-aware agent economy with 51.2 billion addressable persona-market states spanning capabilities, cognitive budgets, provider access, scarcity, and network roles. These dependencies couple allocation feasibility across agents rather than the outcome of a fixed contract. Empirically, in a matched replay of 240 cases under a common 30% assistance quota, the frozen allocator reaches 85.42% task-level persona adherence versus 73.86% for equal-capacity random allocation, a gain of 11.56 percentage points. The results show that assistance value is heterogeneous and can be negative, and that scarcity changes which interventions are worth purchasing. Together, these findings motivate a population-level view of intelligence where the value of assistance depends not only on what it can achieve, but also on which alternative uses of scarce cognitive capacity it displaces.</summary>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-23T05:36:29Z</published>
+    <arxiv:primary_category term="cs.MA"/>
+    <author>
+      <name>Jusheng Zhang</name>
+    </author>
+    <author>
+      <name>Xuekun Wu</name>
+    </author>
+    <author>
+      <name>Wenhao Wang</name>
+    </author>
+    <author>
+      <name>Mark Wang</name>
+    </author>
+    <author>
+      <name>Ming-Hsuan Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2610.26407v2</id>
+    <title>A Simple and General Approach to top-$k$ Selection</title>
+    <updated>2026-10-20T13:12:20Z</updated>
+    <link href="https://arxiv.org/abs/2610.26407v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.26407v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper considers the Bayesian top-$k$ identification problem, wherein a decision maker is tasked with selecting $k$ items from a pool of items of unknown quality. To assess the items, the decision maker adaptively allocates a fixed sampling budget, where each sample of an item yields a noisy observation of its quality, with the objective of minimizing the expected opportunity cost of the selected set. We propose an approach that allocates each batch of samples by minimizing a surrogate objective derived from an upper bound on the expected opportunity cost. The approach is general: samples can be allocated in batches, the selection size $k$ is arbitrary, and it applies to many sampling distributions. It is also simple and intuitive. We prove that the method's posterior expected opportunity cost decays at an exponential rate of at least half the best rate achievable by any sampling rule. In simulations across a wide range of settings, the method is competitive with, and often improves upon, the best existing algorithm in each setting.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-19T13:44:26Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Motti Goldberger</name>
+    </author>
+    <author>
+      <name>Nils Rudi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.33340v1</id>
+    <title>RAEGL: Risk-Aware Evidence-Gated Learning for Selective Contextual Routing under Temporal Shift</title>
+    <updated>2026-09-27T08:12:26Z</updated>
+    <link href="https://arxiv.org/abs/2609.33340v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.33340v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Contextual specialization can improve forecasting accuracy, but a correction selected on one historical interval may become unreliable under temporal distribution shift. To address this issue, we propose RAEGL, a Risk-Aware Evidence-Gated Learning framework for selective contextual forecasting. RAEGL retains a validated global predictor by default and activates a contextual residual only when pre-deployment evidence supports its use. The framework separates candidate selection from gate calibration and jointly evaluates randomization significance, practically meaningful gain, and temporal stability. Experiments on real-world audits and controlled panels show how RAEGL can prevent harmful contextual deployment while making conservative opportunity costs explicit. In a reconstructed Our World in Data audit, exact fallback avoids RMSE degradations of 0.0960 and 0.0239 caused by two validation-selected corrections. In a sealed World Development Indicators evaluation, a region-based correction passes the randomization test but is withheld because its gain is only 0.000092, its country-clustered 95% confidence interval crosses zero, and only 0.02% of bootstrap replicates reach the practical threshold. In controlled panels, the stability- and support-aware extension activates in 97.2% of strong, stable-context runs while rejecting all high-drift settings. These results support RAEGL as an auditable, evidence-based mechanism for managing contextual deployment risk and as a conservative alternative to validation-driven contextual selection.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-27T08:12:26Z</published>
+    <arxiv:comment>12 pages, 3 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yifan Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.27744v1</id>
+    <title>Stochastic inflows and seasonal water value at Manantali</title>
+    <updated>2026-09-23T11:58:39Z</updated>
+    <link href="https://arxiv.org/abs/2609.27744v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.27744v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Seasonal hydropower operation requires release decisions that account for uncertain future inflows and the opportunity cost of stored water. We assess the Modelling and Optimisation of Stochastic Seasonal Hydropower Storage (MOSSHOOS) framework for the Manantali reservoir using 660 monthly energy-inflow observations from 1961--2015. The framework combines multiscale inflow representation, blocked resampling and scenario reduction with stochastic dual dynamic programming, and uses a seasonal square-root diffusion and Hamilton--Jacobi--Bellman formulation as a continuous-time interpretation of marginal water value. Scenario reduction improves the energy score by 47.6\% relative to independent monthly sampling, but the marginal distribution is rejected by a Kolmogorov--Smirnov test and the lower-tail p10 error remains 103.9\%, indicating inadequate dry-tail calibration. Consistent with that limitation, 50 paired Monte Carlo evaluations show no detectable cost or deficit advantage of the stochastic policy over its deterministic-equivalent counterpart at the archived operating configuration. As an independent benchmark, the repaired open-source \texttt{plan4res} seasonal storage valuation chain yields a dominant marginal value of 81.66~USD/MWh, within 3\% of the MOSSHOOS mean of 79.25~USD/MWh. These results support a coherent stochastic inflow-to-water-value methodology while showing that hydrological tail representation, rather than economic scaling, is the principal limitation to address before operational application.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-23T11:58:39Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Steeven B. Affognon</name>
+    </author>
+    <author>
+      <name>Babacar M. Ndiaye</name>
+    </author>
+    <author>
+      <name>Pierre Mendy</name>
+    </author>
+    <author>
+      <name>Cheikh M. F. Kebe</name>
+    </author>
+    <author>
+      <name>Sandrine Charousset</name>
+    </author>
+    <author>
+      <name>Omar Goudiaby</name>
+    </author>
+    <author>
+      <name>Thomas Ouillon</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.24605v1</id>
+    <title>Scalable Dynamic Pricing of Substitutable Products through Structure-Guided Policy Learning</title>
+    <updated>2026-09-21T13:55:43Z</updated>
+    <link href="https://arxiv.org/abs/2609.24605v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.24605v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Problem definition: We study dynamic pricing of substitutable products with finite, product-specific inventories. Customer substitution couples pricing decisions across products, while the inventory state makes exact dynamic programming intractable at realistic scale. Methodology / results: We develop two MNL-guided policy-learning approaches that replace the dynamic program with a statistical mapping from inventory states to pricing decisions. The first learns prices directly, while the second learns inventory opportunity costs and converts them into prices using the optimal MNL pricing rule. Both policies are trained using decision-focused learning. We also propose an efficient method to generate anticipative customer-choice targets to train our policies. Managerial implications: We conduct an extensive numerical evaluation of our approaches. On small instances for which the optimal dynamic program can be computed, the learned policies achieve average optimality gaps below 0.4%. On larger airline-motivated instances, they consistently improve on the tested revenue-management benchmarks. The comparison between the two architectures also highlights the role of model structure: using the MNL pricing characterization is particularly effective when demand is well described by MNL, while directly learning prices provides greater flexibility under heterogeneous mixed-MNL demand.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-21T13:55:43Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Yue Su</name>
+    </author>
+    <author>
+      <name>Antoine Désir</name>
+    </author>
+    <author>
+      <name>Axel Parmentier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.23176v1</id>
+    <title>A scenario-cluster-based and enhanced progressive hedging algorithm for the two-stage stochastic quadratic knapsack problem</title>
+    <updated>2026-09-19T19:01:39Z</updated>
+    <link href="https://arxiv.org/abs/2609.23176v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.23176v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper introduces the two-stage stochastic quadratic knapsack problem (TSSQKP) with uncertainty in profits and weights. To overcome the computational difficulties arising from the combined stochastic, binary, and quadratic structure, we propose a solution framework that integrates an adaptation of the progressive hedging algorithm with clustering-based scenario reduction. The enhanced progressive hedging algorithm (EPHA) incorporates a rounding procedure and a dynamic penalty update strategy driven by the detection of oscillation and stagnation patterns. In parallel, we propose a clustering framework based on opportunity-cost distances between scenarios, from which we derive the medoid lower bound (MLB), the cluster lower bound (CLB) and the cluster upper bound (CUB). To further improve computational efficiency, EPHA is also used to solve the cluster subproblems heuristically; in this case, the resulting upper bound is referred to as the estimated cluster upper bound (ECUB), and the corresponding gaps are interpreted as estimated optimality gaps. Computational experiments on 800 generated TSSQKP instances show that the proposed framework yields smaller gaps than CPLEX under comparable computational conditions. In the EPHA-based clustering framework, the average estimated gaps associated with the CLB, EPHA and MLB 1.65%, 1.88% and 2.41% respectively, compared with an average optimality gap of 35.86% for CPLEX. MLB is fastest to compute, with an average execution time of 420.88s, while EPHA provides a favourable compromise between solution quality and computational effort, reducing the average computational time associated with the cluster bounds by approximately 52.7%, while increasing the average estimated gap by only 0.23 percentage points.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-19T19:01:39Z</published>
+    <arxiv:comment>42 pages, 2 figures</arxiv:comment>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Ibrahim Dan Dije</name>
+    </author>
+    <author>
+      <name>Franklin Djeumou Fomeni</name>
+    </author>
+    <author>
+      <name>Leandro C. Coelho</name>
+    </author>
+    <author>
+      <name>Janosch Ortmann</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.21230v1</id>
+    <title>Minimizing Bid Cost Recovery for Energy Storage with Uniform Pricing</title>
+    <updated>2026-09-18T02:24:11Z</updated>
+    <link href="https://arxiv.org/abs/2609.21230v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.21230v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study in-market uniform pricing and out-of-market bid cost recovery (BCR) payments in rolling-window dispatch for real-time power system operations with energy storage resources (ESRs). Due to intertemporal state-of-charge (SOC) constraints, ESR operations are temporally coupled, and existing in-market locational marginal pricing (LMP) may fail to compensate ESR's intertemporal opportunity costs, thereby triggering out-of-market BCR payments. We show that positive BCR is unavoidable when dispatched generators or ESRs have supply-side bids higher than the demand-side bid. We further identify an intertemporal coupling indicator associated with binding SOC constraints and demonstrate empirically that positive BCR arises only when this indicator is active, revealing that BCR is fundamentally driven by intertemporal coupling. In the simulation, we compare a BCR-minimizing uniform pricing scheme (UP-BCR) with existing real-time pricing methods under forecast uncertainty and show that UP-BCR substantially reduces BCR and demand payments relative to LMP while maintaining zero merchandising surplus in a copper-plate model.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-18T02:24:11Z</published>
+    <arxiv:comment>Accepted to the 65th IEEE Conference on Decision and Control (CDC 2026)</arxiv:comment>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Yaxuan Yu</name>
+    </author>
+    <author>
+      <name>Jingguan Liu</name>
+    </author>
+    <author>
+      <name>Cong Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.13539v1</id>
+    <title>Assortment Control Unlocks the Value of Dynamic Pricing in Mixed Last-Mile Delivery</title>
+    <updated>2026-09-11T21:08:30Z</updated>
+    <link href="https://arxiv.org/abs/2609.13539v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.13539v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The growth of e-commerce has intensified the need for last-mile delivery systems that can jointly manage customer choice and operational efficiency. We study the Dynamic Offering and Pricing of Mixed Delivery Options problem, in which a logistics service provider dynamically selects and prices attended home-delivery time slots and out-of-home pickup options for sequentially arriving customers. Each decision affects immediate revenue, customer acceptance, and the route-dependent fulfillment cost realized at the end of the booking horizon. We formulate DOPMDO as a finite-horizon Markov decision process and propose State-Value Anchored Pricing via Approximate Dynamic Programming. The method learns a continuation-value approximation on an aggregate state representation of the mixed-delivery system and uses accepted-versus-rejected value differences to estimate option-level opportunity costs. These opportunity costs are embedded in an anchored trust-region pricing problem around a calibrated fine-static benchmark. Computational experiments on the real-world Seattle instance show that SVAP--ADP increases mean episode profit by 7.0\% relative to current practice (95\% CI: 6.7--7.2\%), primarily by reducing terminal fulfillment cost while maintaining a stable home--locker--opt-out mix. Assortment-control experiments show that dynamic pricing is most effective when the menu exposes operationally valuable locker alternatives, with richer candidate pools delivering substantially larger gains than restricted nearest-locker menus. These results indicate that anticipatory pricing and assortment control are complementary: pricing steers customers toward lower-cost options, but the menu determines whether high-value consolidation opportunities are available in the first place.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-11T21:08:30Z</published>
+    <arxiv:comment>Dynamic pricing, last-mile delivery, approximate dynamic programming</arxiv:comment>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Ze Zhou</name>
+    </author>
+    <author>
+      <name>Balázs Kulcsár</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.05156v1</id>
+    <title>Locational Marginal Pricing for Adaptive Robust Look-Ahead Dispatch with Casual Affine Recourse</title>
+    <updated>2026-09-04T13:57:56Z</updated>
+    <link href="https://arxiv.org/abs/2609.05156v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.05156v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper develops a marginal pricing mechanism for adaptive robust look-ahead economic dispatch (LAED) under net-load uncertainty. In current market practice, deterministic multi-interval dispatch can misprice flexibility when forecast error is large. Fully adaptive robust (FAR) dispatch captures this uncertainty, but competing worst-case trajectories can imply different marginal values of demand, leaving no single price for market settlement. We propose causal affine recourse (CAR) as a tractable, price-forming approximation. CAR replaces independently optimized trajectory-specific schedules with a causal affine response policy, yielding a market-clearing model that retains the standard energy and congestion decomposition of DC Locational Marginal Pricing. We then demonstrate that CAR-LMP together with a ramp-adjusted current settlement supports dispatch-following and eliminates current-period lost opportunity costs. We solve the CAR problem by deriving a robust counterpart and present computational evidence on exact small DC instances, a ten-generator system, and an IEEE 300-bus public-network case. These simulations show that the proposed prices collapse exactly to deterministic LAED-LMP when robustness is inactive, remain stable in loose-ramp regimes, and produce economically meaningful price shifts when flexibility is scarce. The proposed pricing mechanism provides a practical bridge between adaptive robust dispatch and market-based pricing.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-04T13:57:56Z</published>
+    <arxiv:comment>12 pages, 3 figures, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Aidan Looney</name>
+    </author>
+    <author>
+      <name>Qian Zhang</name>
+    </author>
+    <author>
+      <name>Le Xie</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.30830v1</id>
+    <title>Adaptive KV Retention for LLM Agents at Human-Approval Timescales</title>
+    <updated>2026-08-31T14:05:52Z</updated>
+    <link href="https://arxiv.org/abs/2608.30830v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.30830v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Unlike the seconds-scale tool-call pauses targeted by prior agent-serving systems, agentic LLM requests can be suspended for minutes or hours while waiting for human approval. We study how suspension and resumption affect GPU serving performance and develop a retention policy that balances active-serving capacity against future recomputation under uncertain approval waits. The central tension is severe because retaining suspended KV preserves fast resume but can consume enough GPU capacity to reduce active-serving goodput by 41%, while evicting it avoids that residency cost at the expense of nearly $10\times$ higher resume latency when the request returns. We develop a tiered retention controller around GPU opportunity cost, which expresses the serving capacity consumed by preserving or reconstructing a suspended request's KV state in a common GPU-time cost. Within host memory, the controller selects between indefinite retention and load-indexed expiration using calibration wait samples, without requiring per-request wait prediction. On human-scale approval workloads, our controller improves active-request goodput by 23-51% over the vLLM baselines, 22-29% over MORI, and 41-52% over Continuum.</summary>
+    <category term="cs.OS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-31T14:05:52Z</published>
+    <arxiv:primary_category term="cs.OS"/>
+    <author>
+      <name>Minseo Choi</name>
+    </author>
+    <author>
+      <name>Ananya Joshi</name>
+    </author>
+  </entry>
+</feed>
