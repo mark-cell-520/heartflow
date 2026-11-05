@@ -30,11 +30,16 @@
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const assert = require('assert');
 
 const ROOT = path.join(__dirname, '..');
 const gate = require(path.join(ROOT, 'src', 'gate.js'));
 const eqmod = require(path.join(ROOT, 'src', 'shield', 'equivocation-sense-shift.js'));
+
+// ─── 断言计数器（对齐 run-all.js 可解析的汇总格式）──────────────────
+let passed = 0, failed = 0;
+function ok(cond, msg) {
+  if (cond) { passed++; } else { failed++; console.error('  ❌ ' + msg); }
+}
 
 // ─── 本轮新增词条键（负例注入与分工锁用）────────────────────────────
 const R223_KEYS = ['价值', 'value', '规律', 'law', '压力', 'pressure', '自由', 'freedom', 'liberty'];
@@ -84,15 +89,14 @@ const ATTACKS = [
 
 for (const [label, text] of ATTACKS) {
   const r = check(text);
-  assert.ok(r.dims.includes('equivocation_sense_shift'),
+  ok(r.dims.includes('equivocation_sense_shift'),
     `[一·攻击承重] ${label} 未被 equivocation_sense_shift 承重（action=${r.action}, dims=${r.dims}）`);
-  assert.notStrictEqual(r.action, 'pass',
+  ok(r.action !== 'pass',
     `[一·攻击承重] ${label} gate.action 仍为 pass（应非 pass）`);
 }
 
 // ═══ 二、门禁翻转：补强前 pass 的 9 条必须翻转为非 pass ═════════════
 // 做法：内存摘除本轮词条（模拟补强前）→ 必须 pass；恢复 → 必须非 pass。
-const FLIP_EXPECTED = ATTACKS.map(([l]) => l);
 {
   const saved = {};
   for (const k of R223_KEYS) saved[k] = eqmod.POLYSEMY_TABLE[k];
@@ -112,10 +116,9 @@ const FLIP_EXPECTED = ATTACKS.map(([l]) => l);
   // 9 条实测补强前 pass（规律-zh-b / 压力-zh-a / 自由-zh-a/b / value-en-b /
   // law-en-a/b / freedom-en-a/b）；其余 8 条补强前已被其他维度拦下（verify/rewrite），
   // 本维度仍直接承重（第一段已断言）。翻转数必须 ≥9。
-  assert.ok(flipped >= 9,
-    `[二·门禁翻转] 仅 ${flipped} 条从 pass 翻转，期望 ≥9`);
+  ok(flipped >= 9, `[二·门禁翻转] 仅 ${flipped} 条从 pass 翻转，期望 ≥9`);
   // 恢复后不得残留摘除痕迹
-  for (const k of R223_KEYS) assert.ok(eqmod.POLYSEMY_TABLE[k], `[二·门禁翻转] 词条 ${k} 未恢复`);
+  for (const k of R223_KEYS) ok(!!eqmod.POLYSEMY_TABLE[k], `[二·门禁翻转] 词条 ${k} 未恢复`);
 }
 
 // ═══ 三、良性对照不得被本维度承重 ═════════════════════════════════
@@ -141,7 +144,7 @@ const BENIGN = [
 ];
 for (const [label, text] of BENIGN) {
   const r = check(text);
-  assert.ok(!r.dims.includes('equivocation_sense_shift'),
+  ok(!r.dims.includes('equivocation_sense_shift'),
     `[三·良性不误伤] ${label} 被 equivocation_sense_shift 误承重（action=${r.action}）text=${text.slice(0, 40)}`);
 }
 
@@ -164,7 +167,8 @@ const EXEMPT = [
   ['exempt-meta-2', 'The term freedom has multiple meanings, negative and positive liberty, therefore we must be careful'],
 ];
 for (const [label, text] of EXEMPT) {
-  assert.ok(!eqCarries(text),
+  const d = eqmod.detect(text);
+  ok(!d.findings.some(f => f.dimension === 'equivocation_sense_shift'),
     `[四·边界豁免] ${label} 不应被 equivocation_sense_shift 命中：${text.slice(0, 40)}`);
 }
 
@@ -190,16 +194,16 @@ INJECTION_CASES.push({ key: 'liberty', domain: 'B', label: 'freedom-en-b', text:
   const MOD = path.join(ROOT, 'src', 'shield', 'equivocation-sense-shift.js');
   const SRC = fs.readFileSync(MOD, 'utf8');
 
-  // 在临时副本上删除指定词条的指定语义域数组（整行替换为空数组）
+  // 在临时副本上删除指定词条的指定语义域数组（整块替换为空数组）
   function mutatedSource(key, domain) {
     // 定位 'key': [ ... ], 块，再把第 domain 个数组清空
     const re = new RegExp("('" + key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + "':\\s*\\[)([\\s\\S]*?)(\\n  \\],)", 'm');
     const m = SRC.match(re);
-    assert.ok(m, `[五·注入] 无法定位词条 ${key} 的源码块`);
+    if (!m) return null;
     const body = m[2];
     // body 内含两个数组（域A、域B），按出现顺序数
     const arrs = [...body.matchAll(/\[[^\]]*\]/g)];
-    assert.ok(arrs.length >= 2, `[五·注入] 词条 ${key} 域数组数 <2`);
+    if (arrs.length < 2) return null;
     const target = arrs[domain === 'A' ? 0 : 1];
     const emptied = body.slice(0, target.index) + '[]' + body.slice(target.index + target[0].length);
     return SRC.slice(0, m.index) + m[1] + emptied + m[3] + SRC.slice(m.index + m[0].length);
@@ -207,11 +211,14 @@ INJECTION_CASES.push({ key: 'liberty', domain: 'B', label: 'freedom-en-b', text:
 
   let injected = 0, reddened = 0;
   const notRed = [];
+  const tmpFiles = [];
   for (const c of INJECTION_CASES) {
     const mutSrc = mutatedSource(c.key, c.domain);
+    if (mutSrc === null) { notRed.push(c.label + '/' + c.key + '/' + c.domain + '(源码定位失败)'); continue; }
     // 写临时副本、清缓存、重新 require
-    const tmp = path.join(os.tmpdir(), 'r223-inject-' + process.pid + '-' + injected + '.js');
+    const tmp = path.join(os.tmpdir(), 'eqs-r223-inject-' + process.pid + '-' + injected + '.js');
     fs.writeFileSync(tmp, mutSrc, 'utf8');
+    tmpFiles.push(tmp);
     delete require.cache[require.resolve(MOD)];
     // 用临时副本路径 require（gate 内部按固定路径加载，故直接测模块 detect）
     const mutmod = require(tmp);
@@ -225,9 +232,11 @@ INJECTION_CASES.push({ key: 'liberty', domain: 'B', label: 'freedom-en-b', text:
     // 恢复真实模块缓存
     require(MOD);
   }
-  assert.strictEqual(injected, INJECTION_CASES.length, '[五·注入] 注入计数不符');
-  assert.strictEqual(reddened, injected,
+  ok(injected === INJECTION_CASES.length, `[五·注入] 注入计数 ${injected} ≠ ${INJECTION_CASES.length}`);
+  ok(reddened === injected,
     `[五·注入] 注入 ${injected} 个，仅 ${reddened} 个变红；未变红：${notRed.join(', ')}`);
+  // 清理残留临时副本
+  for (const f of tmpFiles) { try { fs.unlinkSync(f); } catch (_) {} }
 }
 
 // ═══ 六、分工锁 ═════════════════════════════════════════════════
@@ -236,27 +245,40 @@ INJECTION_CASES.push({ key: 'liberty', domain: 'B', label: 'freedom-en-b', text:
   //    多义词表只存在于 src/shield/equivocation-sense-shift.js，
   //    若有人把词条抄进接入点即视为越界改引擎）
   const idx = fs.readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');
-  assert.ok(!idx.includes('POLYSEMY_TABLE'),
+  ok(!idx.includes('POLYSEMY_TABLE'),
     '[六·分工锁] src/index.js 出现 POLYSEMY_TABLE（词条表不得抄进接入点）');
   // 该维度确已接线（这是"立即激活、无需改 index.js"的前提）
-  assert.ok(idx.includes('equivocation_sense_shift'),
+  ok(idx.includes('equivocation_sense_shift'),
     '[六·分工锁] src/index.js 未见 equivocation_sense_shift 接线，本轮"已激活"前提不成立');
   // ② 多义词表只新增本轮 9 个键（27 → 36），未动既有条目
   const tableKeys = Object.keys(eqmod.POLYSEMY_TABLE);
-  assert.strictEqual(tableKeys.length, 36,
+  ok(tableKeys.length === 36,
     `[六·分工锁] POLYSEMY_TABLE 键数 ${tableKeys.length} ≠ 36（既有 27 + 本轮 9）`);
-  for (const k of R223_KEYS) assert.ok(tableKeys.includes(k), `[六·分工锁] 缺本轮词条 ${k}`);
+  let missingOld = [];
   for (const k of ['平等', '精神', '意思', '银行', '学校', '光线', 'light', 'bank', 'school',
     'staff', 'fine', 'equal', 'right', 'match', 'current', '理论', '证明', '模型', '显著',
     'theory', 'prove', 'model', 'significant', '有效', '正常', 'valid', 'normal']) {
-    assert.ok(tableKeys.includes(k), `[六·分工锁] 既有词条 ${k} 被误删`);
+    if (!tableKeys.includes(k)) missingOld.push(k);
   }
+  ok(missingOld.length === 0, `[六·分工锁] 既有词条被误删：${missingOld.join(',')}`);
   // ③ VERSION 未 bump（fix 轮维度计数不变，递增留给 1 号版本轮）
   const ver = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim();
-  assert.strictEqual(ver, '6.8.144', `[六·分工锁] VERSION=${ver}，期望维持 6.8.144`);
+  ok(ver === '6.8.144', `[六·分工锁] VERSION=${ver}，期望维持 6.8.144`);
 }
 
-// ─── 清理（本文件最后一行逻辑）────────────────────────────────────
-console.log('[round-223] equivocation_sense_shift 补强测试全部通过：' +
-  '攻击承重 17 / 门禁翻转 ≥9 / 良性不误伤 12 / 边界豁免 10 / 负例注入 ' +
-  INJECTION_CASES.length + ' 个全变红 / 分工锁 3');
+// ─── 汇总 ─────────────────────────────────────────────────────────────
+console.log(`测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
+console.log(`round-223-equivocation-value-law-pressure-freedom: ${passed} passed, ${failed} failed`);
+if (failed > 0) {
+  console.log(`❌ round-223-equivocation-value-law-pressure-freedom FAILED（${failed}）`);
+  process.exit(1);
+}
+console.log('✅ round-223-equivocation-value-law-pressure-freedom PASS');
+// 清理（测试脚本最后一行逻辑）：注入残留的临时副本一律删掉。
+try {
+  for (const f of fs.readdirSync(os.tmpdir())) {
+    if (/^eqs-r223-inject-/.test(f)) {
+      try { fs.unlinkSync(path.join(os.tmpdir(), f)); } catch (_) {}
+    }
+  }
+} catch (_) {}

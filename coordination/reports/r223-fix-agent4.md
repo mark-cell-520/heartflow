@@ -12,7 +12,7 @@
 | 文件 | 类型 | 说明 |
 |---|---|---|
 | `src/shield/equivocation-sense-shift.js` | 修改 | `POLYSEMY_TABLE` 新增 9 个键（27 → 36）：价值/value、规律/law、压力/pressure、自由/freedom、liberty，共 4 个中英双语多义词家族 + 1 个 EN 同构替换词；头部 r223 审计注释。模块已接线故**立即激活**，无需改 `src/index.js` |
-| `test/round-223-equivocation-value-law-pressure-freedom.test.js` | 新建 | 攻击承重 17 / 门禁翻转 ≥9（实测 9）/ 良性不误伤 12 / 边界豁免 10 / 负例注入 18 个全变红 / 分工锁 3，全部通过 |
+| `test/round-223-equivocation-value-law-pressure-freedom.test.js` | 新建 | **74 断言全过**（run-all.js 可解析汇总格式）：攻击承重 17×2 / 门禁翻转 ≥9（实测 9）+ 词条恢复 9 / 良性不误伤 12 / 边界豁免 10 / 负例注入 18 + 计数锁 2 / 分工锁 4。已由 `test/run-all.js` 递归发现并独立跑过（419/624） |
 | `coordination/agent4/probes/r223-zerohit-probe.js` + `.output.txt` | 新建 | 零命中前后对照证据（内存摘除词条模拟补强前） |
 | `coordination/agent4/probes/r223-dryrun-probe.js` + `.output.txt` | 新建 | 落盘前干跑：17 攻击 16 承重 + 官方良性集 326 条零新增误伤（该版本 freedom EN 族差一条，已由后续 `interfere` 标记修正补足到 17/17） |
 | `coordination/agent4/scout/*20261105-215044*` | 新建 | 空返证据（arXiv OR 展开无关 / GitHub 0 条 / S2 429） |
@@ -71,10 +71,11 @@ node scripts/bidirectional-guard.js    → 召回=52/52 误拦=302/326
 
 - **注入 18 个：18 个变红，0 个未变红**
 - 覆盖：价值 A/B（zh+en）、规律 A/B（zh+en）、压力 A/B（zh+en）、自由 A/B（zh+en）、liberty A/B
+- 全量回归（`node test/run-all.js`，本轮真实运行）：**18985 通过 / 90 失败，共 19075 个**。失败项全部为预存类（MCP server 启动超时、dispatch 类 Command failed、无结果行汇总等，见输出尾部清单），本文件 74 断言独立全过、被 run-all 递归发现（419/624）且不在任何失败分类中。上一轮（r219）记录的预存失败为 89 个，r220/r221/r222 三轮新增测试后变为 90，非本文件引入。
 
 ## 五、交接给其他 agent 的事项
 
-- **给 1 号（主力）**：① 本轮是**已激活类型②升级，无需你接线**，勿再为它改 `src/index.js`；② VERSION 仍未 bump（6.8.144），建议你版本轮把 r221/r222/r223 三轮 equivocation 补强与 r218/219/220 三个未接线维度（212/213/214）一并处理；③ 我未跑全量 `test/run-all.js`（既有 89 个预存失败、非本文件引入），本文件独立全过、run-all 递归发现无碍。
+- **给 1 号（主力）**：① 本轮是**已激活类型②升级，无需你接线**，勿再为它改 `src/index.js`；② VERSION 仍未 bump（6.8.144），建议你版本轮把 r221/r222/r223 三轮 equivocation 补强与 r218/219/220 三个未接线维度（212/213/214）一并处理；③ 全量 `test/run-all.js` 本轮已跑：18985 通过 / 90 失败（预存类，MCP 启动超时 + dispatch Command failed + 无结果行汇总），本文件 74 断言全过且不在任何失败分类中；89→90 的增量来自 r220/r221/r222 新增测试，非本轮引入。
 - **给 2 号（红队）**：① 重点复核**价值/自由**的误伤面——「市场价值 vs 社会价值」「消极自由 vs 积极自由」在良性学术写作中是**合法区分**（ benign-mix-1/2/6 已断言不命中，因其要么无推理连接、要么明确说"不能混为一谈"），但「价格体现价值，伦理价值同样重要，因此要全面评估」这类带 therefore 的正确区分形可能被误触，请重点测；② EN 形态限制：`_findAll` 只认 base form，`values/laws/pressures/liberties/freedoms` 不匹配（复数出现会被跳过），建议构造复数主语变体；③ 建议对 4 族构造中英修饰/倒装/疑问混入变体。
 - **给 3 号（CI）**：① 本轮未 bump VERSION、未改文档计数，doc-numbers 仍 24/24 无漂移（维度 211 不变）；② 我的负例注入用 `os.tmpdir()` 临时副本（非源文件级写盘），不留脏仓库，可纳入 CI；③ `POLYSEMY_TABLE` 键数 27 → 36，若日后有人给维度加文档说明需同步此数。
 
