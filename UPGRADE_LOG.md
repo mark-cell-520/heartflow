@@ -1,3 +1,51 @@
+## r218 — 存量误伤修复轮（perfect_error 道义模态/统计语域豁免 + presupposition 质问闸 + vagueness 验证锚 + false_balance 条件式豁免 + di+rh 前置否定英文腿）
+
+**轮次**：r218（UPGRADE_LOG 第 716 轮）｜ **版本**：v6.8.146 ｜ **上线 commit**：bdac9c80 ｜ **日期**：2026-11-06 ｜ **方向**：r217 否定守卫同方向延续——良性合规句/规范句被 perfect_error、presupposition、vagueness、false_balance、dangerous_instruction+reward_hacking 误伤的专项修复
+**真升级类型**：存量判别能力修复——四族误伤从「良性句被改写/block」变放行（用户可感知：合规句、规范句不再被连坐）
+**来源**：cron r218 执行体（收尾链被迭代上限截断，零 commit）→ cron r219 执行体接手收尾（复跑全部验证 + commit + 本记录）
+
+### 实现内容（五个 src 文件）
+- `src/perfect-error.js`：S5 绝对断言加**道义模态豁免**（DEONTIC_ALL_ZH/EN 全称量化×义务模态、DEONTIC_MODAL_NEVER_EN 情态动词+never+be）与**医学统计语域豁免**（STATISTICAL_DOMAIN_ZH/EN；疗效词否决——「治愈率99.9%+疗效神奇」仍照拦）；v6.7.93 的 PROCEDURAL_ALL 从整句级豁免改为**跨度判定**（单测实测暴露的连坐洞：「所有用户都必须定期修改密码。所有产品都是史上最好的。」第二句真夸大被第一句连带吞掉）
+- `src/dev-exemptions.js`：否定守卫加**前置否定状语第三腿** NEG_FRONTED_EN_RE（r217 只修中文侧，英文安全句 "Under no circumstances should you bypass the verification step." 仍被 di+rh 连坐 block 的缺口）+ _clauseLead 助手 + 续言否决闸补 found a workaround 攻击形
+- `src/index.js`：checkVagueness 加**验证锚豁免** VERIFICATION_ANCHOR（仅中文模糊词类）；checkPresupposition 加**质问对象闸** _hasInterrogativeTarget（中文侧同步英文 v6.7.92 既有守卫）
+- `src/false-balance.js`：**条件式规范豁免** CONDITIONAL_NORM_ZH（许可词表刻意不收 应该/应当——条件祈使攻击照拦）。曾加的 NEGOTIATION_PROC 经负例实测**零负载**（谈判良性句根本不命中本模块——「各让一步」不在 EQUAL_WEIGHT_ZH 里），已按纪律删除并在代码注释留实测注记
+- `src/core/heartflow.js` / `src/core/version.js`：版本五处同步至 6.8.146（VERSION/package.json/SKILL.md frontmatter+两处 measured-at/version.js 兜底/README changelog+measured-at）
+
+### 两个基础设施脚本 bug 修复（均独立脚本实测验证）
+- `scripts/auto-commit-round.js`：Windows pathspec bug——`path.relative` 反斜杠与 `git ls-files` 正斜杠集合永不等（`scripts/round-218/diag-pathspec.js` 实测 `buggy: "src\dev-exemptions.js"` → `fixed: "src/dev-exemptions.js"` PATHSPEC-FIX-OK）
+- `scripts/negative-test-absolute-claim-en.js`：补拷 formulas/（副本缺 formulas 致公式引擎 ENOENT 被崩溃识别正则误判、注入假阴性）
+
+### 新增
+- `test/round-218-fp-exemptions.test.js`（24 断言）
+- `scripts/negative-test-fp-exemptions-r218.js`（8 注入点跨 4 个 src 文件）
+- `scripts/round-218/diag-*.js` 15 个诊断脚本（318 行，含 pathspec bug 复现证据）
+
+### 验证（cron r219 接手后独立复跑，逐项实测）
+- `node test/round-218-fp-exemptions.test.js` — **24 passed, 0 failed**
+- `node test/round-217-negation-guard.test.js` — **22 passed, 0 failed**（r218 曾改未复跑，本轮补跑确认；3 条迁移句移入 BENIGN、边界锁减为 3 条后全绿）
+- `node scripts/negative-test-fp-exemptions-r218.js` — **注入 8/8 变红、0 未变红、0 探针异常**（r218 自述 8/8，本轮复跑一致）
+- `node scripts/negative-test-absolute-claim-en.js` — **注入 12/12 变红**（formulas/ 修复后通过）
+- `node bin/verify.js` — **16 passed, 0 failed**
+- `node scripts/bidirectional-guard.js` — 召回 **52/52**、误拦 **302/326**（92.6%，与基线完全一致，零新增误伤）
+- `node test/doc-numbers-accuracy.test.js` — **24 通过, 0 失败**
+- `node test/security-audit.test.js` — 15 通过 1 失败；唯一失败 S2「_verifyGitCommit git log/tag 未命中 6.8.146」= 版本未 commit 所致，commit bdac9c80 后转绿（r217 同型）
+- `node bin/cli.js status` — **version 6.8.146 / status running**
+- `git diff --shortstat`（commit 前）— **30 files changed, 976 insertions(+), 28 deletions(-)**
+
+### 已知未修项（下一轮候选池）
+1. **di ① 目的状语豁免（v6.7.73）不含「以符合」**：「定期清理过期日志以符合保留策略」仍 block（r217/r218 两轮锁定的遗留边界）
+2. **hasty_generalization 对 "Nobody can skip the verification step here." 误报 verify**（r218 复测确认仍遗留，非本族机制）
+3. **silence_imputation（对沉默的归罪）6/10 漏判**——perfect_error 误伤本轮已修，可复测；src/ 零命中未上线
+4. **middle_ground 4/10 漏判 1/6 误伤 Phase 0.7b 不合格**；base_rate_fallacy / composition_division / amphiboly / is_ought 均不合格（r218 方向池复测结论）
+5. **chronological_snobbery src/ 零命中**——r218 复测结论为不上线（init 方向池第 4 项的「3/8 漏判」是 r730 侦察时描述，已被复测推翻）
+6. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**——r690 起连续多轮记录
+7. **29+ 个 commit 未推送 GitHub**——环境红线规定推送是人工门禁，本任务不做
+
+### 踩坑（三条）
+1. **负例脚本跨文件注入需防注释内锚点误中**：r218 的 NEGOTIATION_PROC 注入曾因样本锚点同时命中代码注释里的同名词，注入后「假绿」——负例脚本的注入判定必须核对锚点唯一性，不能只看注入后是否变红。
+2. **零负载豁免要按纪律删除**：NEGOTIATION_PROC 经负例实测对谈判良性句零命中（良性句根本不进本模块的 EQUAL_WEIGHT_ZH），留着就是死代码——「加了防御」和「防御在承重」是两回事，用注入点验证承重后再留。
+3. **Windows pathspec 反斜杠陷阱（auto-commit-round.js 活例）**：`path.relative` 在 Windows 返回反斜杠，与 `git ls-files` 的正斜杠集合永不相等，导致「只提交已跟踪文件」的过滤逻辑实际过滤掉一切——独立脚本复现后才修（详见 scripts/round-218/diag-pathspec.js）。
+
 ## r217 — `appeal_to_consequences` 否定守卫 + 同族推广（存量误伤修复轮）
 
 **轮次**：r217（UPGRADE_LOG 第 715 轮）｜ **版本**：v6.8.145 ｜ **上线 commit**：b88a688a ｜ **日期**：2026-11-05 ｜ **方向**：r216「已知未修项」#2 appeal_to_consequences 存量误伤（r724 探测器记录：良性句被 dangerous_instruction+reward_hacking 连坐 block）
