@@ -11090,7 +11090,15 @@ const HASTY_GENERALIZATION_PATTERNS = {
     // submitting.」暴露 everyone 族动词表同样缺 validat 族——改后该句经
     // must 填充槽豁免（规范句 pass），"Everyone validates the config
     // before deploying."（无填充槽）命中（攻击 verify）。
-    /\beveryone\s+((?:\w+\s+){0,3})(?:ignores?|refuses?|reads?|wants?|hates?|complains?|complained|skips?|skipped|assumes?|assumed|trusts?|believes?|understands?|expects?|expected|notices?|noticed|remembers?|cares?|listens?|learns?|questions?|responds?|replies|follows?|followed|uses?|used|opens?|opened|files?|filed|calls?|called|emails?|emailed|checks?|tried|trying|ships?|shipped|verif(?:y|ies|ied|ying)|validat(?:e|es|ed|ing)|confirm(?:s|ed|ing)?|review(?:s|ed|ing)?|audit(?:s|ed|ing)?|test(?:s|ed|ing)?|double[- ]?check(?:s|ed|ing)?|approv(?:e|es|ed|ing)|watch(?:es|ed|ing)?)\b/i,
+    /\beveryone\s+((?:\w+\s+){0,3})(?:ignores?|refuses?|reads?|wants?|hates?|complains?|complained|skips?|skipped|assumes?|assumed|trusts?|believes?|understands?|expects?|expected(?!\s+to\b)|notices?|noticed|remembers?|cares?|listens?|learns?|questions?|responds?|replies|follows?|followed|uses?|used|opens?|opened|files?|filed|calls?|called|emails?|emailed|checks?|tried|trying|ships?|shipped|verif(?:y|ies|ied|ying)|validat(?:e|es|ed|ing)|confirm(?:s|ed|ing)?|review(?:s|ed|ing)?|audit(?:s|ed|ing)?|test(?:s|ed|ing)?|double[- ]?check(?:s|ed|ing)?|approv(?:e|es|ed|ing)|watch(?:es|ed|ing)?)\b/i,
+    // [v6.8.150 第 721 轮] everyone 族 writes-no 同型窄支（对齐 every/each
+    // 族本轮扩展）：零贡献归罪泛人称形 "Everyone leaves no comments." /
+    // "Everyone sends no reply." / "Everyone gives no feedback." 轮初复测
+    // （scripts/diag-r721.js B 组）全 MISS——everyone 族谓词表无 leaves/
+    // sends/gives 族零贡献动词。捕获槽同主判据（"Everyone must leave no
+    // trace" 规范句经守卫豁免）。支形态锁死「零贡献动词 + no/without」
+    // 双要素，功能句（"Everyone leaves feedback."）无 no/without 不命中。
+    /\beveryone\s+((?:\w+\s+){0,3})(?:writes?|leaves?|sends?|gives?|provides?|posts?|replies|responds?|offers?)\s+(?:no|without)\b/i,
     // [v6.7.126 第 230 轮修 bug] 原判据群体表被写成 `ZZZ|ZZZ|ZZZ|ZZZ|ZZZ`
     // 占位符（编辑器批量替换残留，字面永不命中），且缺 user/customer/
     // developer/manager/team/analyst/attendee 七大最高频群体，不支持 each。
@@ -11118,11 +11126,40 @@ const HASTY_GENERALIZATION_PATTERNS = {
     //    「人类集合 vs 流程对象」不算人群，留作下一轮对象族单独讨论。
     //    四版：补 blocks|blocked（229 轮回归样本 "Every reviewer blocks the
     //    change" 依赖它，负面阻碍动词，与功能性动词不同族）。
-    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?:ignores?|refuses?|refused|hates?|wants?|complains?|complained|skips?|skipped|assumes?|assumed|trusts?|doubts|overrides?|resents?|blames|mocks|dismisses|ridicules|undermines?|sabotages?|cheats?|abandons?|avoids?|misreads?|misinterprets?|breaks?|broke|blocks?|blocked|restarts?|restarted|dropped|leaked|fumbled|mangled|wrecked|questions?|cares?|believes?|understands?|expects?|expected|notices?|noticed|remembers?|listens?|learns?|tried|trying|ships?|shipped|calls?|called|emails?|emailed|checks?|responds?|replies|uses?|used|opens?|opened|files?|filed)\s+(?:this\b|that\b|about\b|me\b|us\b|them\b|him\b|her\b|you\b|without\b|the\b|\.\s*$|a\b|an\b|to\s+(?:pay|support|help|fix|replace|upgrade|renew|wait|talk|share|review|test|deploy|switch|move|change|read|sign|answer|reply|comply|listen|trust|believe|join|leave|stay|go|do|use|try|buy|cancel|opt|agree|accept))/i,
+    // [v6.8.150 第 721 轮] 本族与 ① everyone 族（11093 行，v6.8.149 r720
+    // 已修）同族不同命的捕获槽缺口，轮初复测实测（scripts/diag-r721.js）：
+    // 判据无捕获组，isNormativeQuantifierHit(m)（读 m[1]）不生效——规范
+    // 宣告句 "Every customer must ignore the docs"（must 在名词与动词
+    // 之间）本应豁免，与 r718 判据③修复前的 "Nobody can skip the
+    // verification step here." 同型误伤。
+    // 修法与 r720 everyone 族同构：名词槽后加捕获槽 `((?:\w+\s+){0,3})`
+    // （填充槽含 must/can/should/has to/is able to 即规则宣告句，守卫
+    // 豁免；纯副词填充 always/usually/ever 不含情态词，攻击句照常命中）。
+    // 群体表补 accountants?（"Every accountant ignores the notice" 类），
+    // 宾语槽补 these|those（"All users ignore these warnings" 类）。
+    // 【八族动词刻意不收】本轮曾同步 everyone 族八族四形态，实测撞
+    // r230/r280 两轮功能句池（"Every manager approves the report" /
+    // "All users validates the notice" 共 337 条良性流程陈述必须零命中，
+    // 见 test/hasty-every-universal-round230.test.js 与
+    // test/hasty-all-predicate-enum-round280.test.js ⑥ 段）——界线在
+    // 「泛人称收（everyone/nobody 族，r720/r718 已落盘）vs 具体群体不收
+    // （every/each/all 族，本族与 r229-r282 五轮测试锁定）」：具体群体 +
+    // 验证/审查动词 + 业务对象是流程陈述，泛人称 + 验证动词是「人人都
+    // 验证过」的归罪俗语。八族若要在本族上线，须先重划 r230/r280 功能池
+    // （跨轮设计决策，写进 UPGRADE_LOG 下一轮方向）。
+    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|accountants?|vendors?|suppliers?|contractors?|consultants?|auditors?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+((?:\w+\s+){0,3})(?:ignores?|refuses?|refused|hates?|wants?|complains?|complained|skips?|skipped|assumes?|assumed|trusts?|doubts|overrides?|resents?|blames|mocks|dismisses|ridicules|undermines?|sabotages?|cheats?|abandons?|avoids?|misreads?|misinterprets?|breaks?|broke|blocks?|blocked|restarts?|restarted|dropped|leaked|fumbled|mangled|wrecked|questions?|cares?|believes?|understands?|expects?|expected(?!\s+to\b)|notices?|noticed|remembers?|listens?|learns?|tried|trying|ships?|shipped|calls?|called|emails?|emailed|checks?|responds?|replies|uses?|used|opens?|opened|files?|filed)\s+(?:this\b|that\b|these\b|those\b|about\b|me\b|us\b|them\b|him\b|her\b|you\b|without\b|the\b|\.\s*$|a\b|an\b|to\s+(?:pay|support|help|fix|replace|upgrade|renew|wait|talk|share|review|test|deploy|switch|move|change|read|sign|answer|reply|comply|listen|trust|believe|join|leave|stay|go|do|use|try|buy|cancel|opt|agree|accept))/i,
     // [v6.7.126 第 230 轮] writes no/without 窄支：谓词表不收 writes 本体
     //（"Every developer writes documentation" 是功能性陈述），只收
     // "writes no comment / writes without docs" 这种明显负面形态。
-    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+writes?\s+(?:no|without)\b/i,
+    // [v6.8.150 第 721 轮] 谓词表扩展五族零贡献动词（leaves/sends/gives/
+    // provides/posts/replies/responds/offers）：轮初复测（scripts/diag-r721.js
+    // B 组）"Every developer leaves no comments on the PR." / "Every
+    // reviewer sends no reply." / "Every customer gives no feedback."
+    // 三条攻击形全 MISS——零贡献归罪不止 writes 一形。群体表同步主判据
+    // 补 accountants?（原支群体表短一截，漏了主判据 r229-r231 轮补的词）。
+    // 误伤面不变：支形态锁死 "动词 + no/without" 双要素，功能句
+    // （"Every developer leaves documentation"）无 no/without 不命中。
+    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|accountants?|vendors?|suppliers?|contractors?|consultants?|auditors?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?:writes?|leaves?|sends?|gives?|provides?|posts?|replies|responds?|offers?)\s+(?:no|without)\b/i,
     // [v6.7.126 第 230 轮四版] asked the same ... 末位零宾语窄支。
     //    坑与 229 轮 ②' 完全同形：谓词槽吃掉 "asked the same question" 后
     //    句末无成分可匹配宾语槽。拆窄支，宾语处改枚举（question/quibble/
@@ -11227,12 +11264,24 @@ const HASTY_GENERALIZATION_PATTERNS = {
     // 改动三重：谓词枚举化（误伤面结构性归零）+ 群体表补全 46 词 + 新增零宾语支。
     // 排除表整体退役——谓词不在枚举表内的功能性动词天然不命中，
     // 不再需要每轮补词（本轮 mutation 后 B_FUNC 应归零，A_NEG/A_ZERO 不降）。
-    /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?:ignores?|ignored|refuses?|refused|hates?|hated|complains?|complained|skips?|skipped|assumes?|assumed|distrusts?|distrusted|resents?|resented|blames?|blamed|mocks?|mocked|dismiss(?:es)?|dismissed|ridicules?|ridiculed|undermines?|undermined|sabotages?|sabotaged|cheats?|cheated|deceives?|deceived|manipulates?|manipulated|exploits?|exploited|bull(?:y|ies)|bullied|insults?|insulted|threatens?|threatened|punish(?:es)?|punished|betrays?|betrayed|abandons?|abandoned|avoids?|avoided|misreads?|misread|misinterprets?|misinterpreted|overrides?|overrode|questions?|questioned|suspects?|suspected|fears?|feared|env(?:y|ies)|envied|despises?|despised|disobeys?|disobeyed|scorns?|scorned|taunts?|taunted|belittle(?:s)?|demean(?:s|ed)?|scapegoats?|scapegoated|slanders?|smeared|ostracizes?|shuns?|shunned|abhors|abhorred|breaks?|broke|blocks?|blocked|dropped|leaked|wrecked|mangled|fumbled|makes?|made|wants?|wanted|quit|resigned?|objected|protested|disagreed)\s+(?:this\b|that\b|me\b|us\b|them\b|him\b|her\b|you\b|about\s+\w+|a\b|an\b|the\b|to\s+(?:pay|support|help|fix|replace|upgrade|renew|wait|talk|share|review|test|deploy|switch|move|change|read|sign|answer|reply|comply|listen|trust|believe|join|leave|stay|go|do|use|try|buy|cancel|opt|agree|accept))/i,
+    // [v6.8.150 第 721 轮] 本轮复测（scripts/diag-r721.js）：群体表补
+    // accountants?、宾语槽补 these|those 两处同族小缺口（"All users
+    // ignore these warnings" / "All accountants ignore the notice"）。
+    // 【验证动词八族刻意不收】本轮曾试同步 everyone 族（11093 行 r720）
+    // 八族四形态，实测撞 r280 ⑥ 段 4482 条功能句硬断言池——"All users
+    // validates/verifies/audits the notice|invoice|..."（具体群体 ×
+    // 验证动词 × the+业务单据 = 流程陈述）必须零命中，见
+    // test/hasty-all-predicate-enum-round280.test.js。与 every/each 族
+    // 本轮同口径撤回：界线在「泛人称收 vs 具体群体不收」（everyone/
+    // nobody 族 r720/r718 已落盘八族；every/each/all 族 r229-r282 五轮
+    // 测试锁定流程陈述放行）。八族若要覆盖具体群体，须先重划 r230/
+    // r280 功能池（跨轮设计决策，UPGRADE_LOG 下一轮方向）。
+    /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|accountants?|vendors?|suppliers?|contractors?|consultants?|auditors?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?:ignores?|ignored|refuses?|refused|hates?|hated|complains?|complained|skips?|skipped|assumes?|assumed|distrusts?|distrusted|resents?|resented|blames?|blamed|mocks?|mocked|dismiss(?:es)?|dismissed|ridicules?|ridiculed|undermines?|undermined|sabotages?|sabotaged|cheats?|cheated|deceives?|deceived|manipulates?|manipulated|exploits?|exploited|bull(?:y|ies)|bullied|insults?|insulted|threatens?|threatened|punish(?:es)?|punished|betrays?|betrayed|abandons?|abandoned|avoids?|avoided|misreads?|misread|misinterprets?|misinterpreted|overrides?|overrode|questions?|questioned|suspects?|suspected|fears?|feared|env(?:y|ies)|envied|despises?|despised|disobeys?|disobeyed|scorns?|scorned|taunts?|taunted|belittle(?:s)?|demean(?:s|ed)?|scapegoats?|scapegoated|slanders?|smeared|ostracizes?|shuns?|shunned|abhors|abhorred|breaks?|broke|blocks?|blocked|dropped|leaked|wrecked|mangled|fumbled|makes?|made|wants?|wanted|quit|resigned?|objected|protested|disagreed)\s+(?:this\b|that\b|these\b|those\b|me\b|us\b|them\b|him\b|her\b|you\b|about\s+\w+|a\b|an\b|the\b|to\s+(?:pay|support|help|fix|replace|upgrade|renew|wait|talk|share|review|test|deploy|switch|move|change|read|sign|answer|reply|comply|listen|trust|believe|join|leave|stay|go|do|use|try|buy|cancel|opt|agree|accept))/i,
     // [第 280 轮] 句末零宾语支（All of our customers mocked.）：谓词枚举化后
     // 零宾语形态与宽宾语形态共用同一张表。原 ②' 族只枚举 complain/refuse/
     // object/protest/disagree/quit/resigned/left/struck 九词，
     // 覆盖不了 mock/undermine/exploit 类谓词的零宾语形。
-    /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?:ignores?|ignored|refuses?|refused|hates?|hated|complains?|complained|skips?|skipped|assumes?|assumed|distrusts?|distrusted|resents?|resented|blames?|blamed|mocks?|mocked|dismiss(?:es)?|dismissed|ridicules?|ridiculed|undermines?|undermined|sabotages?|sabotaged|cheats?|cheated|deceives?|deceived|manipulates?|manipulated|exploits?|exploited|bull(?:y|ies)|bullied|insults?|insulted|threatens?|threatened|punish(?:es)?|punished|betrays?|betrayed|abandons?|abandoned|avoids?|avoided|misreads?|misread|misinterprets?|misinterpreted|overrides?|overrode|questions?|questioned|suspects?|suspected|fears?|feared|env(?:y|ies)|envied|despises?|despised|disobeys?|disobeyed|scorns?|scorned|taunts?|taunted|belittle(?:s)?|demean(?:s|ed)?|scapegoats?|scapegoated|slanders?|smeared|ostracizes?|shuns?|shunned|abhors|abhorred|breaks?|broke|blocks?|blocked|dropped|leaked|wrecked|mangled|fumbled|quit|resigned?|objected|protested|disagreed)\s*\.\s*$/im,
+    /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|accountants?|vendors?|suppliers?|contractors?|consultants?|auditors?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?:ignores?|ignored|refuses?|refused|hates?|hated|complains?|complained|skips?|skipped|assumes?|assumed|distrusts?|distrusted|resents?|resented|blames?|blamed|mocks?|mocked|dismiss(?:es)?|dismissed|ridicules?|ridiculed|undermines?|undermined|sabotages?|sabotaged|cheats?|cheated|deceives?|deceived|manipulates?|manipulated|exploits?|exploited|bull(?:y|ies)|bullied|insults?|insulted|threatens?|threatened|punish(?:es)?|punished|betrays?|betrayed|abandons?|abandoned|avoids?|avoided|misreads?|misread|misinterprets?|misinterpreted|overrides?|overrode|questions?|questioned|suspects?|suspected|fears?|feared|env(?:y|ies)|envied|despises?|despised|disobeys?|disobeyed|scorns?|scorned|taunts?|taunted|belittle(?:s)?|demean(?:s|ed)?|scapegoats?|scapegoated|slanders?|smeared|ostracizes?|shuns?|shunned|abhors|abhorred|breaks?|broke|blocks?|blocked|dropped|leaked|wrecked|mangled|fumbled|quit|resigned?|objected|protested|disagreed)\s*\.\s*$/im,
     // ③ nobody / no one + 具体行为动词（不受白名单限制）
     // [v6.8.148 第 718 轮] 捕获组 = 量化词与泛化动词之间的填充段，供规范
     // 情态槽守卫使用：填充段含情态动词（can/must/should/is able to/has to…）
@@ -11265,7 +11314,7 @@ const HASTY_GENERALIZATION_PATTERNS = {
     //      should confirm 三形经守卫豁免 pass；攻击形 verifies / validates /
     //      confirms / reviews / double-checks / validated / validating 七形
     //      全部命中。
-    /\b(?:nobody|no\s+one)\s+((?:\w+\s+){0,3})(?:reads?|wants?|hates?|ignores?|refuses?|questions?|asks?|asked|cares?|bothered|checking|verif(?:y|ies|ied|ying)|validat(?:e|es|ed|ing)|confirm(?:s|ed|ing)?|review(?:s|ed|ing)?|audit(?:s|ed|ing)?|test(?:s|ed|ing)?|double[- ]?check(?:s|ed|ing)?|approv(?:e|es|ed|ing)|watch(?:es|ed|ing)?|bother|question|responds?|replies|understands?|learns?|complains?|complained|listens?|trusts?|believes?|knows?|mentioned|mention|tried|trying|notices?|noticed|remembers?|skips?|skipped|ships?|shipped|expects?|expected|calls?|called|emails?|emailed|files?|filed|opens?|opened|uses?|used|follows?|followed|checks?)\b/i,
+    /\b(?:nobody|no\s+one)\s+((?:\w+\s+){0,3})(?:reads?|wants?|hates?|ignores?|refuses?|questions?|asks?|asked|cares?|bothered|checking|verif(?:y|ies|ied|ying)|validat(?:e|es|ed|ing)|confirm(?:s|ed|ing)?|review(?:s|ed|ing)?|audit(?:s|ed|ing)?|test(?:s|ed|ing)?|double[- ]?check(?:s|ed|ing)?|approv(?:e|es|ed|ing)|watch(?:es|ed|ing)?|bother|question|responds?|replies|understands?|learns?|complains?|complained|listens?|trusts?|believes?|knows?|mentioned|mention|tried|trying|notices?|noticed|remembers?|skips?|skipped|ships?|shipped|expects?|expected(?!\s+to\b)|calls?|called|emails?|emailed|files?|filed|opens?|opened|uses?|used|follows?|followed|checks?)\b/i,
   ]
 };
 

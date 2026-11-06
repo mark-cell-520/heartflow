@@ -24,16 +24,27 @@
  *     everyone know?"）不入赦——反问句正是 false_consensus 的攻击形态。
  *   · isNormativeQuantifierHit：只对带捕获组的判据③与 zh 全称族生效——
  *     填充段内含情态动词（can/could/may/might/must/should/shall/will/
- *     would/dare/ought/has to/needs to/be able to/be allowed to），或紧跟
- *     全称标记的义务模态（要/必须/应该/应当/务必/需要/须/得），即判规范句
- *     跳过。
+ *     would/dare/ought/has to/needs to/be able to/be allowed to/be
+ *     supposed to/be expected to/be required to 等被动义务式，v6.8.150
+ *     第 721 轮补），或紧跟全称标记的义务模态（要/必须/应该/应当/务必/
+ *     需要/须/得），即判规范句跳过。
  * 豁免的是单条命中（continue）不是整句：「Not everyone agrees, and everyone
  *   knows the risks」后半句仍须命中。
  */
 
 const QUANT_NEGATION_EN = /(?:\bnot\s+|\bnever\s+|\bhardly\s+|\bbarely\s+|\bscarcely\s+|\bno\s+longer\s+)$/i;
 const QUANT_NEGATION_ZH = /(?:不是|并不是|并非|未必|不见得|没有|没)$/;
-const QUANT_MODAL_FILLER_EN = /\b(?:can|could|may|might|must|should|shall|will|would|dare|ought)\b|\b(?:has|have)\s+to\b|\bneeds?\s+to\b|\b(?:is|are|was|were|be|been)\s+(?:able|allowed|supposed|going)\b/i;
+// 【v6.8.150 第 721 轮】be 动词后置义务分词表扩充：原表只有
+// able/allowed/supposed/going 四词，实测 HEAD（v6.8.149）存量误伤——
+// "Everyone is expected to comply." / "Nobody is expected to skip the
+// step." 被判命中（expected 落在谓词槽、m[1] 只截到 "is "，守卫测不到
+// be+pp 结构）。被动义务式（be expected/required/permitted/encouraged/
+// asked/told/instructed/advised/obligated/obliged/mandated/compelled/
+// forced/meant + to）与 must/should 同属规范义务情态，规则宣告句属性；
+// 攻击句（Everyone ignores the warnings）不含 be+pp 结构，不受影响。
+// 与谓词表侧 `expected(?!\s+to\b)` 负向断言正交：负向断言管「被动式 +
+// 非攻击动词」整句不命中，本扩充管「被动式 + 攻击动词」由守卫豁免。
+const QUANT_MODAL_FILLER_EN = /\b(?:can|could|may|might|must|should|shall|will|would|dare|ought)\b|\b(?:has|have)\s+to\b|\bneeds?\s+to\b|\b(?:is|are|was|were|be|been|being)\s+(?:\w+ly\s+)?(?:able|allowed|supposed|going|expected|required|permitted|encouraged|asked|told|instructed|advised|obligated|obliged|mandated|compelled|forced|meant|destined)\b/i;
 const QUANT_MODAL_FILLER_ZH = /^(?:要|必须|应该|应当|务必|需要|须|得)/;
 
 /**

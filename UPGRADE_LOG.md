@@ -1,3 +1,58 @@
+## r721 — HG 量化词族捕获槽守卫修复（every/each 副词填充形 + 被动义务存量误伤）+ 零贡献归罪支扩展
+
+**轮次**：r721（第 721 轮 cron 窗口）｜ **版本**：v6.8.149 → v6.8.150 ｜ **日期**：2026-11-06 ｜ **方向**：hasty_generalization 量化词族存量缺口（r720 下一轮方向① every/each 族 + 轮初复测新发现被动义务误伤）
+**真升级类型**：存量修复（用户可感知：「Every customer always ignores the docs.」「Every manager really ignores the feedback.」「Every developer leaves no comments on the PR.」「Everyone sends no reply.」「All users ignore these warnings.」「Every auditor ignores the finding.」从 pass 变 verify/hasty_generalization 命中；「Everyone is expected to comply.」「No one is expected to sign in.」规范句从误报变 pass——HEAD 存量误伤修复）
+**来源**：cron r721 执行体；轮初复测 scripts/diag-r721.js（30 条探针 A-E 五组，已按惯例删除）
+
+### 轮初方向复测结论（init 简报方向池 + r720 下一轮方向）
+| 候选 | 复测结论 |
+|---|---|
+| r720 方向① every/each 族动词缺口 + 捕获槽守卫接入 | **部分真缺口**：捕获槽真缺口确认（副词填充攻击形 always/usually/really 全 MISS）；八族动词同步实测撞 r230/r280 功能句池（337 条良性流程陈述必须零命中）后撤回——界线锁定「泛人称收（everyone/nobody 族 r720/r718 已落盘）vs 具体群体不收（every/each/all 族 r229-r282 五轮测试锁定）」 |
+| 轮初新发现 every/each 族被动义务误伤 | **真缺口且是存量**：git stash 对照确认 HEAD（v6.8.149）「Everyone is expected to comply.」「Nobody is expected to skip the step.」即误报——r720 everyone 族捕获槽允许 "is " 填充 + expected 谓词，m[1] 只截到 "is " 守卫测不到 be+pp 结构。修复后两族 + nobody 族（判据③第三处，r720 漏同步）三处归零 |
+| r720 方向② log 族 login/log 分词 | 本轮未展开（everyone/every 族动词表不含 log/login，无新误伤面），写入下一轮方向 |
+| 方向池 3 silence_imputation | r717 已上线（方向池复述滞后），排除 |
+| 方向池 4 middle_ground | 未重测，写入下一轮方向 |
+| 方向池 6 evidence 恒死 | 本轮未展开，写入下一轮方向 |
+
+### 改动明细（src/index.js 六处同族 + src/quantifier-guards.js 一处）
+1. **every/each 族主判据补捕获槽 `((?:\w+\s+){0,3})`**（名词槽后动词槽前）：副词填充攻击形（always/usually/ever/really/in this team）从 MISS 变命中；情态填充（must/can/should/has to/is able to）由 r718 守卫豁免（情态本就不在谓词表，无捕获槽时整句不匹配——两种路径殊途同归 count=0）。负例纪律现场纠偏：删捕获槽对规范句假绿（永不变红），注入靶子必须换成依赖捕获槽才命中的副词填充形
+2. **三族谓词表 `expected` 加负向断言 `expected(?!\s+to\b)`**（everyone 族 11093 / every/each 族 11137 / nobody 族判据③ 11317——r720 replace_all 锚点 `expects?|expected|notices?` 只覆盖前两处，nobody 族是 `expects?|expected|calls?` 序列漏同步，本轮补修）：被动义务式（be expected to）与 must/should 同属规范义务情态，不是对群体行为的断言；主动 expected（"Everyone expected a refund."）照常命中
+3. **守卫 QUANT_MODAL_FILLER_EN be+义务分词表扩充**（quantifier-guards.js）：able/allowed/supposed/going 四词 → 追加 expected/required/permitted/encouraged/asked/told/instructed/advised/obligated/obliged/mandated/compelled/forced/meant/destined 十四词。与负向断言正交分工：负向断言管「被动式 + 非攻击动词」整句不命中，本扩充管「被动式 + 攻击动词」（"Everyone is expected to ignore the docs."）由守卫豁免
+4. **every/each 族 writes-no 支谓词表扩展九形**：writes? 单形 → writes?/leaves?/sends?/gives?/provides?/posts?/replies/responds?/offers?（"Every developer leaves no comments on the PR." / "Every reviewer sends no reply." / "Every customer gives no feedback." 轮初复测全 MISS）；支形态锁死「动词 + no/without」双要素，功能句（"Every developer leaves documentation."）不命中；群体表同步主判据长表
+5. **everyone 族新增 writes-no 同型窄支**：捕获槽同主判据（"Everyone must leave no trace." 规范句经守卫豁免），零贡献归罪泛人称形（"Everyone leaves no comments." / "Everyone sends no reply."）
+6. **群体表补六词**（vendors/suppliers/contractors/consultants/auditors + 上轮 accountants，every/each 主判据、writes-no 支、all 族主判据、all 族零宾语支四处同步）；**宾语槽补 these/those**（every/each 族 + all 族："All users ignore these warnings" 类原槽只收 this/that）
+7. **验证动词八族撤回**：every/each/all 三族曾同步 r720 everyone 族八族四形态，实测撞 r230/r280 ⑥ 段功能句硬断言池（r280 失败 52→388）后整族撤回，界线写进三处注释防下一轮回滚式「补全」
+
+### 新踩坑（两条）
+1. **负例「删捕获槽」对规范句假绿**：注入①删 every/each 族捕获槽后，"Every customer must ignore the docs." 仍 count=0——情态动词本就不在谓词表，删不删都豁免，守卫「看起来在工作」实则未受检验。与 r720 坑②同家族第二次踩（上次是 everyone 族删捕获槽句子漏判，这次是具体族删槽规范句不变红）。正确姿势：注入靶子必须选「依赖该机制才命中/才豁免」的样本——本轮换成副词填充攻击形（无捕获槽不匹配 → MISS 变红）
+2. **think() 冒烟忘 await = 全假阴性**：think() 是 async 方法，同步调用返回 Promise，JSON.stringify(Promise) = {}，flat.includes('hasty_generalization') 恒 false——12 条攻击样本全「BAD hit=false」一度误判为本轮改动失效。写冒烟脚本时 async 主链路必须 await（r720 冒烟 15/15 的脚本口径是 async main）
+
+### 验证逐项实测（全部实跑）
+| 项 | 实测 |
+|---|---|
+| node test/hg-capture-guard-zero-contrib-r721.test.js | ✅ 100 通过, 0 失败，共 100 个（捕获槽副词填充 5/规范边界 8/these-those 8/新群体词 15/零贡献支 14/everyone 新支 7/被动义务守卫 10/存量不回归 21/功能池界线 8） |
+| node scripts/negative-test-hg-capture-guard-r721.js | ✅ 对照全绿；7 注入点 7/7 如期变红（删捕获槽副词填充 miss 5/5、删 these-those miss 3/4——all-these 走 all 族宾语槽不受注入影响、删六群体词 miss 14/14、还原 writes-no 谓词 miss 7/9——writes 存量形与 responds 主判据路径设计内不变红、删 everyone 新支 miss 3/3、删负向断言 miss 3/3、删守卫扩充 miss 2/2） |
+| think() 冒烟（new HeartFlow + start + think()，一次性脚本） | ✅ 12/12（攻击 6 条命中 hasty_generalization、规范 3 + 良性 3 零命中） |
+| node bin/verify.js | ✅ 16 passed, 0 failed |
+| node scripts/bidirectional-guard.js | ✅ 召回 52/52、误拦 302/326，与基线完全一致（零新增误伤） |
+| node test/doc-numbers-accuracy.test.js | ✅ 24 通过, 0 失败 |
+| node test/security-audit.test.js | ✅ 16 通过, 0 失败 |
+| node bin/cli.js status | ✅ running |
+| 存量 HG 测试 12 件 | ✅ 229 80/0、230 104/0、281 975/0、332×2 4/0+122/0、r720 62/0、r718 51/0；279(153/1)、280(6331/52)、282(14/2)、217(21/1)、218(23/1) 五件预存失败数量不变（git stash 对照确认 HEAD 基线即有：stereotype 归因错位 + di「以符合」边界，与本轮无关） |
+| git stash HEAD 对照 | ✅ "Everyone/Nobody is expected to comply" 三形态 HEAD 即误报（r720 遗留），本轮修复非新引入 |
+
+### 落盘
+- 主体 commit：`git commit` feat: 6.8.150 — src/index.js + src/quantifier-guards.js + test/hg-capture-guard-zero-contrib-r721.test.js + scripts/negative-test-hg-capture-guard-r721.js
+- 版本 6.8.149 → 6.8.150 五处同步：VERSION / package.json / SKILL.md frontmatter / src/core/version.js 兜底 / README changelog 新行（README 横幅测试数与 data/test-count.json 缓存绑定，由每日 run-all 记账时更新）
+
+### 下一轮方向
+1. **all 族补 writes-no 零贡献支**（本轮边界样本实测 "All developers leave no comments." MISS——all 族无本支，every/each 与 everyone 两族已有）
+2. **HG 判据③ log 族 login/log 分词消歧**（"No one logs in without MFA" 安全规范陈述 vs "Nobody logs the errors." 攻击形）
+3. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**（r690 起连续多轮记录）
+4. **middle_ground Phase 0.7b 重测**（r720 复测 3 攻击 2 MISS + 1 误伤，仍不合格）
+5. **279/280/282/217/218 五件预存失败根治**（stereotype 归因错位 "All users are exported" 类工程句 + di「以符合」目的状语边界）
+6. **八族动词覆盖具体群体族的前置设计**（若要做：先重划 r230/r280 功能句池的「具体群体 × 验证动词」豁免语义，跨轮设计决策）
+
 ## r720 — HG 谓词槽形态系统化（verifies 漏洞 + 验证审查八族）+ everyone 族守卫接入 + zh「全是」量化词族补缺
 
 **轮次**：r720（第 720 轮 cron 窗口）｜ **版本**：v6.8.148 → v6.8.149 ｜ **日期**：2026-11-06 ｜ **方向**：hasty_generalization 存量缺口复测修复（r718 遗留方向②③ + 复测新发现④）
