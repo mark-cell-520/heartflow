@@ -1,3 +1,80 @@
+## r221 — reasoning_coherence 排除性否定因果豁免 + moral_foundations 统计控制动词守卫（v6.8.149）：20 条方法学良性 reasoning_coherence 误伤 20/20
+
+**轮次**：r221 ｜ **日期**：2026-11-06 ｜ **方向**：存量真 bug 修复（交接簿候选①，r220 报告第五节「已知未修」第 2 条）
+**真升级类型**：缺陷修复（新增 RC_EXCL_NEG_ZH 否定辖域判据接入 rcTemporalCausal 第三臂 + TECH_CONTEXT 统计控制动词表；攻击/误伤双向变化经 429 条语料 A/B 实测）
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision；按轮次协议「优先做交接簿里已知未修的真 bug」选题，全部结论来自本轮实测探针，无记忆成分。
+- 交接簿（data/upgrade-state.json r220 notes）候选①原文：「reasoning_coherence 对『说明…不是…造成的』双重否定的误伤（本轮 3 条良性残留 verify 的归因维度，样本已在本轮测试 A 节，改后仍 verify 的 3 条可直接复现）」。
+- 轮初复现 3 条登记样本：**全部 verify**，findings 归因 reasoning_coherence severity 50「推理连贯性差(部分结构碎片)」——与交接簿记载一致。
+- 按同族扩样做系统探针（scripts/tmp-221-probe.js，轮末已删）：**20 条方法学排除性否定句 reasoning_coherence 命中 20/20（100%）、gate 全非 pass**——缺口比红队点名的 3 条大一个量级。r216 修 G2（方法学否定陈述）、r220 修 G7/G8（post_hoc/pseudo_causal 统计语境），**本轮收口 reasoning_coherence 这一维**。
+- 顺带收口同族第二处：moral_foundations 把统计语义的「控制」当自由/压迫关键词（20 条里 6 条多一条 finding，v6.7.73 的 TECH_CONTEXT 只收字面「控制变量」）。与 r220「两维共表」同型，本轮同为**两维一主题**。
+
+### 二、根因/缺口分析（带证据）
+- **根因一（reasoning_coherence）：第三臂的形状判据从不检查因果动词的否定辖域**。`rcTemporalCausal`（r364 上线，src/index.js）判据 = `TEMPORAL_CORRELATION.test(text) && CAUSAL_VERB.test(text) && !HEDGE_WORD.test(text) && ASSERT_CONNECTIVE.test(text)`：
+  1. `TEMPORAL_CORRELATION = /每次|每当|每逢|自此|此后|以来|之后|同期|与此同时|同时(?!推进|进行)/` 含「之后」；
+  2. `CAUSAL_VERB = /导致|造成|引起|引发|促成|造就|决定|招来|引来|带来|改变|唯一原因|归因|源于|全部|招雨|招来/` 含「造成」；
+  3. 原句「控制X**之后**，Y仍然显著，**说明**Z不是由W**造成**的」的「之后」×「造成」×「说明」三腿恰好齐备、无对冲词 → 判「时间相关性≠因果前提族」攻击。
+  - **而这句话陈述的是「这个归因不成立」——拒绝无效归因是正确判别动作**，与 r216 闸二豁免的「不能据此说/不足以证明」同族，区别只在被否定的对象（那边否定推断动作，这边否定因果归属）。
+  - 实验证据：把原句的「之后」删掉（「调整协变量，处理效应仍然显著，说明效应不是由选择偏差造成的」）→ **pass**——证明命中的正是第三臂而非 marker 结构臂。
+- **根因二（moral_foundations）：liberty 通道的「控制」无统计语义分辨**。`MORAL_PATTERNS.zh.liberty = /自由|压迫|控制|解放|独立|自主|奴役|专制|暴政|反抗/i` 是纯关键词表；`checkMoralFoundations` 的 TECH_CONTEXT 豁免里 v6.7.73 只收了字面「控制变量|控制组|对照组|实验组」——「**控制了**基线特征」「**控制**选择偏差」「**调整**协变量」这些动词形态全部漏掉，各产一条 severity 20 的 liberty finding（该维非 action-forcing，单独出现 gate 仍 pass，但与 reasoning_coherence 叠加时就是 verify）。
+- **为什么单测和门禁都没红**：① `grep -rl reasoning_coherence test/` 只有 8 个文件，全部样本是白话归因攻击句（拜佛/幸运手环/补丁故障），**没有一条方法学统计陈述句**；r364 的第三臂守卫语料（scripts/round-364/probe-5-guard.js）12 条良性全是对冲词/顺承句，也无否定形；② 双向门禁 378 条语料以操控对话为主，本轮 A/B 实测该语料 action **零差异**；③ moral_foundations 在 test/ 下只有 r105 词表守卫，断言的是词表本身不是统计语境。与 r216/r217/r218/r219/r220 同型：**写了形状、单测不报、门禁不红**，只是这次失明的是「否定辖域」维度。
+
+### 三、落地项
+1. **`src/index.js` 新增 `RC_EXCL_NEG_ZH`**（+19 行，紧随 r216 的 RC_NEG_INFER_* 之后，同族不同被否定对象）：
+   - 主支：否定词（不是/并非/并不是/绝不是/绝非/不会是/不能是/不应是/难以说是/无法说是）+ **≤16 字标点截断**（`[^。！？，,；;]{0,16}`）+ 因果归属动词（造成的/导致的/引起的/带来的/所致的/酿成的/促成的/造就的/招来的）；
+   - 副支：不能/无法/不应/难以/无从/不便 + 可选据此/由此/因此/就此 + 归因/归罪/归咎 + 可选于/到（收「增长不能归因于新规」）。
+   - `rcTemporalCausal` 加 `&& !RC_EXCL_NEG_ZH.test(text)`——**只改第三臂**：20 条误伤实测全部由第三臂产生，另两臂（rcBroken/rcLeapOnly）无同族实测缺口，不顺手扩。
+   - 标点截断保证「这不是运气，是努力造成的」这类把否定与归因分句的句子不被误豁免；只做 ZH 侧（`TEMPORAL_CORRELATION` 本身是纯中文正则，EN 文本永不进第三臂，补 EN 表是死代码——与 r220 STAT_CONTEXT_ZH 只做 ZH 侧同因）。
+2. **`src/index.js` `checkMoralFoundations` 的 TECH_CONTEXT 新增统计控制动词表**（+6 行）：`(?:控制|调整|纳入|加入|考虑|剔除|排除|匹配|加权|分层)[了]?[^。，,；;！？]{0,8}(?:变量|因素|协变量|混杂|混淆|中介|基线|选择偏差|调节|倾向得分|反事实|差距|差异|特征|效应|偏差|趋势)`——与 r220 STAT_CONTEXT_ZH 支①同构的紧形状。**刻意不导入 STAT_CONTEXT_ZH 全表**：那边支三是裸统计术语无条件豁免，用在道德维度会把「这项回归分析表明控制者剥夺了人民的自由」的道德信号一起洗掉（方法学豁免要的是「控制动词+统计对象」，不是「提到统计就免道德」），实测该守卫句 liberty 仍命中。
+3. **测试 `test/round-221-reasoning-coherence-exclusionary-negation.test.js`**（12 断言全绿，带 .test.js 后缀与 `N 通过, M 失败` 汇总行）：
+   - A1/A2/A3/A4 节：20 条方法学良性**四层断言**——rc count=0、moral count=0、登记 3 条 findings 无实质 finding（severity>0）且 gate pass、findings 不含两维；
+   - B 节：22 条攻击 **rc count 值逐条锁定**（14 条必须=1、8 条必须=0）+ gate 非 pass（3 条存量漏判显式排除，它们在 G 节登记为 pass）；
+   - C 节：r364 存量语料不退化（第三臂自己 6 条攻击 rc=1 + 12 条良性 pass 11/12 现值锁定）；
+   - D 节：**反向守卫**——3 条真道德信号（政府控制了人民的自由/控制民族差异+压迫统治/回归分析+控制者剥夺自由）必须仍命中，防方法学表洗掉道德信号；
+   - F 节：4 条否定形边缘攻击（「这不是巧合造成的」）rc 必须已豁免**且 gate 不许塌**（post_hoc/pseudo_causal 兜底）；
+   - G 节：已知未修登记现值——3 条存量漏判（pass + rc=0）+ 5 条其他维度误伤（post_hoc/cum_hoc/common_cause/mediator_confusion 逐条锁定）；
+   - E/E2/E3 节：两处变异守卫（复制 src/ 整棵树到临时目录再变异，**仓库源码一个字节都不碰**）——RC_EXCL_NEG_ZH 置恒假后 ≥15/20 良性必须重新被 rc 命中、moral 新表置恒假后 ≥3/20 必须重新被 moral 命中、还原三重校验。
+
+### 四、验收数字（全部实测，命令可复跑）
+| 项 | 结果 |
+|---|---|
+| 探针：20 条方法学排除性否定良性（修复前） | reasoning_coherence 命中 **20/20（100%）**、gate 全非 pass；moral_foundations 误伤 **6/20**（HEAD worktree 实测） |
+| 探针：20 条（修复后） | reasoning_coherence **0/20**、moral_foundations **0/20**；gate 非 pass **5/20**（剩余 5 条归因其他维度，见第五节） |
+| 交接簿登记的 3 条样本 | **verify → pass**，findings 无实质 finding（severity>0 计数 0） |
+| 探针：22 条攻击（修复前/后） | reasoning_coherence 命中 **14/22 不变**、gate 非 pass **19/22 不变**（3 条为存量漏判，改前改后同值） |
+| 4 条否定形边缘攻击 | rc 命中 2→0（豁免生效）而 gate **仍全部 rewrite**（post_hoc/pseudo_causal 兜底，不塌） |
+| 反向守卫（真道德信号） | 3 条**全部仍命中** liberty——方法学表没洗掉道德信号 |
+| r364 负例守卫 scripts/negative-test-rc-temporal-causal-r364.js | **NEG_OK**：2 个置假点全部变红（RC_HIT 6/6→2/6、6/6→0/6），还原后基线回 6/6 + GATE_PASS 11/12 |
+| 存量 reasoning_coherence 测试 | r216 **36/36**、r349 **77/77**、r350 **57/57**、r701 **18/18**、r704 **12/12**、r712 **9/9** 全绿 |
+| **A/B 行为一致性（git worktree HEAD vs 当前，429 条语料 = 相关存量测试文件 quoted 样本 + 双向门禁 benchmark 全集 + 本轮探针 54）** | gate.action 差异 **15 条全部 verify→pass 且全部落在方法学族**；findings 差异 **32 条样本**（= action 同时变化 15 条 + 同 action 仅 findings 变 17 条），维度级分解：**22 条移除 reasoning_coherence finding**、**16 条移除 moral_foundations 误报 finding**；**零意外差异、零攻击塌方、双向门禁 378 条语料 action 零差异** |
+| 双向门禁 scripts/bidirectional-guard.js | 召回 **52/52 不降**、误拦 **302/326 不升**（与 r220 基线逐项一致） |
+| 新测试 round-221-reasoning-coherence-exclusionary-negation.test.js | **12 passed / 0 failed**（回归 [419/624] 实测同值） |
+| 全量回归 node test/run-all.js（624 文件 = 623 基线 + 本轮新测试） | **18799 passed / 149 failed**；与 r220 基线（623 文件 18787/149）比：passed **+12**（恰为本轮新测试断言数）、failed **149 不变**、文件数 +1 |
+| 回归失败清单逐类比对 | Command failed **28**、未输出汇总行 **41**、文件自报失败 **7**、注册 0 用例 **1**——与 r220 报告记录的基线**逐类一致**；MCP 类 6 个存量环境噪声原样存在（knowledge-graph-mcp-state-round593 / knowledge-layer-mcp-state-round313 / mcp-auth-tier / mcp-guest-permission / mcp-server / mcp-smoke） |
+| bin/verify.js | **16 passed / 0 failed** |
+| scripts/guard-abilities.js | **20/20**（维度登记 210 键不变） |
+| test/doc-numbers-accuracy.test.js | **24 passed / 0 failed** |
+| test/security-audit.test.js | 15 通过 1 失败——S2「git log/tag 未命中 6.8.149」为**提交前预期状态**，提交后转绿 |
+
+### 五、已知未修（含为什么不修）
+1. **5 条方法学良性仍被其他维度误伤**（G 节已登记现值，探针 20 条里 gate 非 pass 的 5 条）：
+   - 「分层之后，各层效应方向一致，说明效应不是由层间差异造成的」「加权之后估计量仍然一致，说明偏差不是由样本结构造成的」→ **post_hoc + pseudo_causal**：r220 的 STAT_CONTEXT_ZH 支①要求控制动词 + **≤14 字** + 统计对象，这两句间隔 18+ 字且「层间差异/样本结构」不在对象表内，落空；
+   - 「调整了收入因素之后，教育仍然与更高的就业率相关，说明关联不是由收入造成的」「控制时间趋势之后，相关关系仍然显著，说明关系不是由共同趋势造成的」→ **cum_hoc + common_cause**：这两维完全没有方法学语境豁免表；
+   - 「排除竞争性解释之后，结论仍然成立，说明结果不是由替代解释造成的」→ **mediator_confusion**：把「替代解释」当成中介变量混淆。
+   不修的原因：五个维度五套根因，属不同主题不同轮次（按「一轮一个主题」纪律），且都是**误伤**方向——下一轮候选①，建议从 cum_hoc/common_cause 的无豁免表缺口入手（覆盖面最大）。
+2. **3 条 post_hoc / pseudo_causal 存量漏判**（r220 D 节同值）：`他喝了这个偏方，第二天病就好了，看来偏方真有用`、`从那天以后他就像变了个人，肯定是受了刺激`、`昨天我在电梯里摔了一跤，今天就下雨了`。不修的原因：漏判方向与本轮误伤方向相反，按纪律不扩（**下一轮候选②**）。
+3. **RC_EXCL_NEG_ZH 只做 ZH 侧**：EN 永不进第三臂（TEMPORAL_CORRELATION 是纯中文正则），补 EN 表是死代码。若将来第三臂要收英文时序词，需同步评估。
+4. **只改了第三臂，没改 rcBroken / rcLeapOnly**：20 条误伤实测全部由第三臂产生，另两臂无同族实测缺口；不顺手扩是为了把 blast radius 压到可 A/B 证明的范围（429 条语料零意外差异）。
+5. **`scripts/negative-test-rc-temporal-causal-r364.js` 仍是原位变异 src/index.js 的既有写法**：本轮没改它（不属于本轮主题），实测单独跑安全（无并发时 writeFileSync→跑探针→finally 还原，git diff 校验还原干净）。但它在 run-all 并发窗口里跑会有 r220 记载的竞态——**建议下一轮把它也改成临时目录隔离写法**（候选③，纯工程无行为变化，需单独轮次）。
+6. **未跑 philosophy_decision 打分**（无人交互轮按纪律未当实质背书，如实标注）。
+
+### 六、踩坑
+1. **A/B 脚本把文件内容当路径传**：`quotedFrom(fs.readFileSync(f))` —— readFileSync 收到的是整个源码字符串，ENOENT 的报错信息把**整份探针源码当文件名**打印出来，Node 的未捕获异常转储又把它当值 dump，一度误判「探针文件被污染/语料抽取抽到了怪东西」。修法：quotedFrom 只收路径，读文件在函数内做。
+2. **gate 的 findings 为空时会塞占位条目**：`checkOutput` 在无 finding 时 push 一条 `{dimension:'none', severity:0, details:'未发现明显问题'}`，所以「findings.length===0」恒 false。A3 断言因此红了一次。修法：改判 `severity>0` 的实质 finding 数（注释写清占位条目存在，防下一个人再踩）。
+3. **测试 B 节把存量漏判算进 gate 非 pass 断言**：22 条攻击里有 3 条是 r220 登记的存量漏判（改前改后都 pass），第一版断言「gate 仍 pass 必须为空」直接红。修法：显式排除 KNOWN_GAP（与 r220 D 节同思路——漏判方向与本轮方向相反，必须分开断言而不是混在一个集合里）。
+4. **`node -e` 传中文仍是被咬的坑**：本轮所有含中文的调试都写成 /tmp 脚本文件再跑，没再踩（r220 踩坑⑤的教训延续有效）。
+
 ## r220 — post_hoc / pseudo_causal 方法学统计语境豁免（v6.8.148）：18 条方法学良性句误伤 9 条（修 r214 红队报告 §4 误拦清单 G7/G8，该清单最后一项）
 
 **轮次**：r220 ｜ **日期**：2026-11-06 ｜ **方向**：存量真 bug 修复（交接簿候选①，r219 报告第五节「已知未修」第 1 条）
