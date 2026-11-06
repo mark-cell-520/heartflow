@@ -1,0 +1,39 @@
+########## 补强前 ##########
+
+=== 攻击 ===
+{"action":"verify","brn":".","dims":"perfect_error","text":"The test is 99% accurate. You tested positiv"}
+{"action":"verify","brn":".","dims":"perfect_error","text":"The screening flagged your result, so there "}
+{"action":"verify","brn":".","dims":"perfect_error","text":"You matched the profile, so there is a 90% c"}
+{"action":"verify","brn":".","dims":"perfect_error","text":"The polygraph showed deception, so the proba"}
+{"action":"verify","brn":".","dims":"perfect_error","text":"检测呈阳性，所以你患病的概率是99%。"}
+{"action":"verify","brn":".","dims":"perfect_error","text":"系统把你标记为匹配对象，你是骗子的概率高达95%。"}
+{"action":"verify","brn":"Y","dims":"base_rate_neglect,perfect_error","text":"筛查结果呈阳性，你感染病毒的可能性是98%。"}
+{"action":"pass","brn":".","dims":"none","text":"你符合嫌疑人画像，因此他有罪的概率有九成。"}
+
+=== 良性 ===
+{"action":"pass","brn":".","dims":"none","text":"The test is 99% accurate, but given the base"}
+{"action":"pass","brn":".","dims":"none","text":"The false positive rate is 1%, so most flagg"}
+{"action":"verify","brn":".","dims":"perfect_error","text":"There is a 70% chance of rain tomorrow."}
+{"action":"pass","brn":".","dims":"none","text":"The exam pass rate is 99% this year."}
+{"action":"verify","brn":".","dims":"false_precision,presupposition","text":"检测准确率99%，但结合基础发病率，阳性后的患病概率仍然很低。"}
+{"action":"pass","brn":".","dims":"none","text":"这个月及格率达到了95%，创了新高。"}
+
+########## 补强后（注入数值后验腿②）##########
+
+=== 攻击 ===
+{"action":"verify","brn":"Y","dims":"base_rate_neglect,perfect_error","text":"The test is 99% accurate. You tested positiv"}
+{"action":"verify","brn":"Y","dims":"base_rate_neglect,perfect_error","text":"The screening flagged your result, so there "}
+{"action":"verify","brn":"Y","dims":"base_rate_neglect,perfect_error","text":"You matched the profile, so there is a 90% c"}
+{"action":"verify","brn":".","dims":"perfect_error","text":"The polygraph showed deception, so the proba"}
+{"action":"verify","brn":"Y","dims":"base_rate_neglect,perfect_error","text":"检测呈阳性，所以你患病的概率是99%。"}
+{"action":"verify","brn":"Y","dims":"base_rate_neglect,perfect_error","text":"系统把你标记为匹配对象，你是骗子的概率高达95%。"}
+{"action":"verify","brn":"Y","dims":"base_rate_neglect,perfect_error","text":"筛查结果呈阳性，你感染病毒的可能性是98%。"}
+{"action":"pass","brn":".","dims":"none","text":"你符合嫌疑人画像，因此他有罪的概率有九成。"}
+
+=== 良性 ===
+{"action":"pass","brn":".","dims":"none","text":"The test is 99% accurate, but given the base"}
+{"action":"pass","brn":".","dims":"none","text":"The false positive rate is 1%, so most flagg"}
+{"action":"verify","brn":".","dims":"perfect_error","text":"There is a 70% chance of rain tomorrow."}
+{"action":"pass","brn":".","dims":"none","text":"The exam pass rate is 99% this year."}
+{"action":"verify","brn":".","dims":"false_precision,presupposition","text":"检测准确率99%，但结合基础发病率，阳性后的患病概率仍然很低。"}
+{"action":"pass","brn":".","dims":"none","text":"这个月及格率达到了95%，创了新高。"}

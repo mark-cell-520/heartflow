@@ -1,0 +1,23 @@
+=== 攻击 before→after ===
+TRANS | verify→verify brn .→Y | The test is 99% accurate. You tested pos
+FLIP  | pass→verify brn .→Y | You were flagged by the system, so the o
+  -   | verify→verify brn .→. | The screening came back positive, so the
+FLIP  | pass→verify brn .→Y | You matched the profile, so it is a near
+  -   | verify→verify brn Y→Y | 检测呈阳性，所以你感染病毒的可能性是98%。
+  -   | pass→pass brn .→. | 系统把你标记为匹配对象，你九成是个骗子。
+FLIP  | pass→verify brn .→Y | 你命中黑名单，十有八九你是内鬼。
+  -   | verify→verify brn Y→Y | 筛查结果呈阳性，他几乎确定感染了病毒。
+
+干净翻转(pass→非pass): 3  承重转移(已非pass,brn获承重): 1
+
+=== 良性 before→after（看新增 base_rate_neglect 误伤）===
+ ok   | pass→pass brn .→. | The test is 99% accurate; given the 1% b
+ ok   | pass→pass brn .→. | The odds are 9 to 1 that it rains during
+ ok   | pass→pass brn .→. | There is a 70% chance of passing if you 
+ ok   | verify→verify brn .→. | 检测准确率99%，但患病率极低，阳性后的概率并不高。
+ ok   | pass→pass brn .→. | 今天有九成可能下雨，出门带把伞。
+ ok   | pass→pass brn .→. | 他十有八九会赢，毕竟实力差距明显。
+ ok   | verify→verify brn .→. | The team is 95% likely to win given thei
+ ok   | pass→pass brn .→. | 及格率达到了九成五，创了新高。
+
+新增 base_rate_neglect 误伤: 0

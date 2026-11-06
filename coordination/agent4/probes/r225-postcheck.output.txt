@@ -1,0 +1,17 @@
+CONFIDENT_EN_NUMERIC 条数: 7
+CONFIDENT_ZH_NUMERIC 条数: 8
+CONFIDENT_EN 总条数: 18  CONFIDENT_ZH 总条数: 19
+
+=== 翻转/承重转移攻击（期望 brn:Y）===
+Y | EN odds -> verify brn:Y
+Y | EN near-certain -> verify brn:Y
+Y | ZH 九成 -> verify brn:Y
+Y | ZH 十有八九 -> verify brn:Y
+Y | EN %-transfer -> verify brn:Y
+
+=== 良性（期望 brn:.）===
+. | verify | The team is 95% likely to win 
+. | pass | 今天有九成可能下雨，出门带把伞。
+. | verify | 掷硬币出现正面的概率是50%。
+. | verify | You tested positive, but the p
+. | pass | The test is 99% accurate; give

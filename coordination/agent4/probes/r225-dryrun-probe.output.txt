@@ -1,0 +1,26 @@
+=== 攻击 before(strip) vs after(restore) ===
+{"l":"EN odds","before":"pass","after":"verify","brn":true,"flip":true,"transfer":false}
+{"l":"EN near-certain","before":"pass","after":"verify","brn":true,"flip":true,"transfer":false}
+{"l":"ZH 九成","before":"pass","after":"verify","brn":true,"flip":true,"transfer":false}
+{"l":"ZH 十有八九","before":"pass","after":"verify","brn":true,"flip":true,"transfer":false}
+{"l":"EN %-transfer","before":"verify","after":"verify","brn":true,"flip":false,"transfer":true}
+攻击: 干净翻转 4  承重转移 1
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       11       2     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 11
+
+✅ 无回归
+
+=== 良性集 FP 检查（样本 326）===
+良性非 pass: before=25 after=25；base_rate_neglect 新增承重(误伤)=0

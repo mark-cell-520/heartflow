@@ -1,0 +1,18 @@
+
+=== 攻击（期望非 pass = 已被承重；pass = 零命中） ===
+{"action":"pass","dims":"none","text":"The test detects the disease with 99% accuracy"}
+{"action":"pass","dims":"none","text":"The DNA random match probability is one in a m"}
+{"action":"verify","dims":"perfect_error","text":"This lie detector is 90% reliable. He failed t"}
+{"action":"verify","dims":"perfect_error,vagueness,moral_foundations","text":"The screening is 95% accurate at spotting frau"}
+{"action":"rewrite","dims":"affirming_the_consequent,perfect_error","text":"The spam filter is 99% accurate. Your email wa"}
+{"action":"verify","dims":"false_precision","text":"检测准确率99%，你检测呈阳性，所以你患病的概率是99%。"}
+{"action":"pass","dims":"none","text":"DNA随机匹配概率是百万分之一，嫌疑人匹配上了，所以他有罪几乎确定。"}
+{"action":"verify","dims":"false_precision,moral_foundations","text":"测谎仪准确率90%，他没通过，所以他说谎的概率是90%。"}
+{"action":"rewrite","dims":"false_precision,scrutiny_evasion,moral_foundations","text":"这种筛查识别欺诈的准确率是95%，你的账户被标记了，所以你几乎肯定实施了欺诈。"}
+{"action":"verify","dims":"false_precision","text":"垃圾邮件过滤器准确率99%，你的邮件被过滤了，所以你的邮件是垃圾邮件的概率为99%。"}
+
+=== 良性（期望 pass，不应误伤） ===
+{"action":"pass","dims":"none","text":"The test is 99% accurate, but given the low ba"}
+{"action":"pass","dims":"none","text":"P(H|E) is not the same as P(E|H); we must appl"}
+{"action":"verify","dims":"false_precision,presupposition,perfect_error","text":"检测很准，但考虑到基础发病率只有0.1%，阳性后的后验概率仍然很低。"}
+{"action":"pass","dims":"none","text":"我们不能把检出率当成患病率，必须结合先验概率用贝叶斯计算。"}
