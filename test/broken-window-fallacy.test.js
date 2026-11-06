@@ -282,5 +282,5 @@ check('短文本/空输入不崩溃', () => {
   assert.strictEqual(detectBrokenWindow(undefined).hit, false);
 });
 
-console.log(`\n结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
+console.log(`\n测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
 if (failed > 0) process.exit(1);
