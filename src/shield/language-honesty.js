@@ -60,17 +60,19 @@ const TURING_PATTERNS_EN = [
   "it's okay", 'it is okay', 'everything will be okay', 'everything will be fine',
   'everything happens for a reason',
   'stay strong', "don't be sad", 'do not be sad', 'you should be happy',
-  'hugs', 'big hug', 'virtual hug', 'sending you a hug', 'sending hugs',
+  'hugs', 'big hug', 'virtual hug', 'sending you a hug',
   'that sounds really hard', 'that must be really hard', 'that must be hard',
   'your feelings are valid', "it's normal to feel", 'it is normal to feel',
   'you are not alone', "you're not alone", 'i am here for you', "i'm here for you",
 ];
 
-/** [r226] 英文模式预编译词界正则（大小写不敏感；\b 防子串误触如 shrugs/hugged） */
-const _TURING_EN_REGEXES = TURING_PATTERNS_EN.map(p => ({
-  pattern: p,
-  re: new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i'),
-}));
+/** [r226] 英文模式预编译词界正则（大小写不敏感；\b 防子串误触如 shrugs/hugged）。
+ *  查表而非预计算数组：负例注入测试按模式摘除 TURING_PATTERNS_EN 活数组项后，
+ *  checkTuringRoute 的迭代必须随之生效（r225 同型教训）。 */
+const _TURING_EN_RE_MAP = new Map(TURING_PATTERNS_EN.map(p => [
+  p,
+  new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i'),
+]));
 
 /**
  * p-zombie 诚实边界检测
@@ -160,9 +162,11 @@ function checkTuringRoute(text) {
     if (text.includes(TURING_PATTERNS[i])) matched.push(TURING_PATTERNS[i]);
   }
   // [r226] 英文族：大小写不敏感 + 词界匹配（中文族保持 includes 原样）。
-  for (let i = 0; i < _TURING_EN_REGEXES.length; i++) {
-    const { pattern, re } = _TURING_EN_REGEXES[i];
-    if (re.test(text)) matched.push(pattern);
+  // 迭代活数组 TURING_PATTERNS_EN（负例注入按项摘除时必须随之生效）。
+  for (let i = 0; i < TURING_PATTERNS_EN.length; i++) {
+    const pattern = TURING_PATTERNS_EN[i];
+    const re = _TURING_EN_RE_MAP.get(pattern);
+    if (re && re.test(text)) matched.push(pattern);
   }
 
   let level = 'safe';
