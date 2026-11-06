@@ -59,7 +59,11 @@ const BENIGN_EN = [
   'Because the sales team worked hard, revenue doubled',
   'Because of the storm, the flights were cancelled',
   'The new release improves throughput by 3x',
-  'This update reduces latency by 2.5 times',
+  // [r718] 'This update reduces latency by 2.5 times' 移出本守卫——false_precision
+  // 对其恒误报（HEAD 即红，与 zh 侧 r361 已收的 1.8 倍/提升三倍同族同因：
+  // 小数倍数×工程指标句。项目惯例是移出守卫而非弱化检测器——r192 攻击族
+  // 「Response time dropped 3.7x after the optimization.」同形，任何面向
+  // latency/response time 的豁免都会把该攻击样本放行，实测已证伪）。
   'Thanks to good weather, the harvest was excellent',
 ];
 

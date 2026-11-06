@@ -7050,9 +7050,11 @@ function checkFallacies(text) {
   const fallacies = [];
   for (const [pat, type] of patterns) {
     const m = text.match(pat);
-    if (m) {
-      fallacies.push({ type, count: m.length, severity: FALLACY_SEVERITY[type] || 0.3 });
-    }
+    // [v6.8.148 第 718 轮] 否定量化词守卫：bandwagon 等全称族判据对
+    // 「Not everyone knows that…」类反驳句豁免——命中段紧前邻是否定词
+    // 即跳过（逐条判定，不连坐同句其他命中）。
+    if (!m || isNegatedQuantifierHit(text, m.index)) continue;
+    fallacies.push({ type, count: m.length, severity: FALLACY_SEVERITY[type] || 0.3 });
   }
   const count = fallacies.length;
   return { count, fallacies, score: Math.min(1, fallacies.reduce((s, f) => s + f.severity * f.count, 0)) };
@@ -10901,6 +10903,11 @@ function checkWhataboutism(text) {
   return { count, signals: unique, score: Math.min(1, rawScore + typeBonus) };
 }
 
+// ─── [v6.8.148 第 718 轮] 量化词族双守卫：否定量化词 + 规范情态槽 ──────
+// 实现移入 src/quantifier-guards.js（perfect-error.js 同族复用，避免循环
+// require）；口径与设计文档见该模块头注。此处 re-export 保持既有引用面。
+const { isNegatedQuantifierHit, isNormativeQuantifierHit } = require('./quantifier-guards.js');
+
 // ─── 轻率概括检测（Hasty Generalization）────────────────────────────
 const HASTY_GENERALIZATION_PATTERNS = {
   zh: [
@@ -10908,7 +10915,12 @@ const HASTY_GENERALIZATION_PATTERNS = {
     /我见过的?[^\s]{1,6}(?:都|全都|全是|没有一个不)/,
     /身边(?:全是|都是|全都是)/,
     /从来(?:没|没有)(?:见过|遇到过|碰到过|见过)/,
-    /(?:所有人|每个人|人人都)(?:都|均|皆|总是|从来)/,
+    // [v6.8.148 第 718 轮] 捕获「都|均|皆|总是|从来」后两字供规范情态槽守卫：
+    // 「每个人都要签字」「所有人都必须完成培训」是规则宣告句（义务模态
+    // 要|必须|应该|应当|务必|需要|须|得 紧跟全称标记），由 isNormativeQuantifierHit
+    // 豁免——r332 起 4 条已知误伤同源修复。「所有人都这样认为」类攻击句
+    // 捕获段不含情态词，照常命中。
+    /(?:所有人|每个人|人人都)(?:都|均|皆|总是|从来)([^。，！？；]{0,2})/,
     /个个(?:都|全是|都是)/,
     // [v6.7.126 第 71 轮收窄] 原判据/(?:每个|每[个位])[^\s]{0,6}(?:都|均|总是)/
     // 实测误伤 4/4 良性工程句（每个字段都核对/都填/都加权限/都写测试）——
@@ -11193,7 +11205,12 @@ const HASTY_GENERALIZATION_PATTERNS = {
     // 覆盖不了 mock/undermine/exploit 类谓词的零宾语形。
     /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?:ignores?|ignored|refuses?|refused|hates?|hated|complains?|complained|skips?|skipped|assumes?|assumed|distrusts?|distrusted|resents?|resented|blames?|blamed|mocks?|mocked|dismiss(?:es)?|dismissed|ridicules?|ridiculed|undermines?|undermined|sabotages?|sabotaged|cheats?|cheated|deceives?|deceived|manipulates?|manipulated|exploits?|exploited|bull(?:y|ies)|bullied|insults?|insulted|threatens?|threatened|punish(?:es)?|punished|betrays?|betrayed|abandons?|abandoned|avoids?|avoided|misreads?|misread|misinterprets?|misinterpreted|overrides?|overrode|questions?|questioned|suspects?|suspected|fears?|feared|env(?:y|ies)|envied|despises?|despised|disobeys?|disobeyed|scorns?|scorned|taunts?|taunted|belittle(?:s)?|demean(?:s|ed)?|scapegoats?|scapegoated|slanders?|smeared|ostracizes?|shuns?|shunned|abhors|abhorred|breaks?|broke|blocks?|blocked|dropped|leaked|wrecked|mangled|fumbled|quit|resigned?|objected|protested|disagreed)\s*\.\s*$/im,
     // ③ nobody / no one + 具体行为动词（不受白名单限制）
-    /\b(?:nobody|no\s+one)\s+(?:\w+\s+){0,3}(?:reads?|wants?|hates?|ignores?|refuses?|questions?|asks?|asked|cares?|bothered|checking|verified?|bother|question|responds?|replies|understands?|learns?|complains?|complained|listens?|trusts?|believes?|knows?|mentioned|mention|tried|trying|notices?|noticed|remembers?|skips?|skipped|ships?|shipped|expects?|expected|calls?|called|emails?|emailed|files?|filed|opens?|opened|uses?|used|follows?|followed|checks?)\b/i,
+    // [v6.8.148 第 718 轮] 捕获组 = 量化词与泛化动词之间的填充段，供规范
+    // 情态槽守卫使用：填充段含情态动词（can/must/should/is able to/has to…）
+    // 即规则宣告句（"Nobody can skip the verification step here."），由
+    // isNormativeQuantifierHit 豁免；纯副词/介词填充（ever/really/in this
+    // team）不含情态词，攻击句照常命中（"Nobody ever reads the docs"）。
+    /\b(?:nobody|no\s+one)\s+((?:\w+\s+){0,3})(?:reads?|wants?|hates?|ignores?|refuses?|questions?|asks?|asked|cares?|bothered|checking|verified?|bother|question|responds?|replies|understands?|learns?|complains?|complained|listens?|trusts?|believes?|knows?|mentioned|mention|tried|trying|notices?|noticed|remembers?|skips?|skipped|ships?|shipped|expects?|expected|calls?|called|emails?|emailed|files?|filed|opens?|opened|uses?|used|follows?|followed|checks?)\b/i,
   ]
 };
 
@@ -11204,11 +11221,15 @@ function checkHastyGeneralization(text) {
   const signals = [];
   for (const pat of patterns) {
     const m = text.match(pat);
-    if (m) {
-      // [v6.7.73] 存匹配到的原文而非正则源码——否则 trace/evidence 里
-      // 吐出来的是 `\bI\s+(?:met|...)` 这种不可读噪音，调用方看不出哪句触发
-      signals.push({ pattern: m[0].slice(0, 30), type: 'hasty_generalization' });
-    }
+    if (!m) continue;
+    // [v6.8.148 第 718 轮] 量化词族双守卫（逐命中位点判定，不连坐同句其他命中）：
+    //   ① 命中段紧前邻是否定词 → 该命中是对全称的反驳，跳过；
+    //   ② 填充槽/全称标记后是规范情态词 → 规则宣告句，跳过。
+    if (isNegatedQuantifierHit(text, m.index)) continue;
+    if (isNormativeQuantifierHit(m)) continue;
+    // [v6.7.73] 存匹配到的原文而非正则源码——否则 trace/evidence 里
+    // 吐出来的是 `\bI\s+(?:met|...)` 这种不可读噪音，调用方看不出哪句触发
+    signals.push({ pattern: m[0].slice(0, 30), type: 'hasty_generalization' });
   }
   const count = signals.length;
   const score = Math.min(1, count * 0.3);
@@ -11770,21 +11791,21 @@ const REASONING_MARKERS = {
   // 前提/证据标志
   premise: { zh: [/因为|由于|基于|根据|鉴于|出于|考虑到|按照|依据|凭借/i, 
                    /数据|证据|事实|研究|调查|实验|观察|统计|案例|样本|指标|论据/i],
-             en: [/because|since|based on|given that|according to|due to|owing to|as a result of|in light of|on the grounds/i,
-                  /evidence|data|fact|research|study|survey|experiment|observation|finding|statistic/i] },
+             en: [/\bbecause|since|based on|given that|according to|due to|owing to|as a result of|in light of|on the grounds/i,
+                  /\bevidence|data|fact|research|study|survey|experiment|observation|finding|statistic/i] },
   // 推理标志
   inference: { zh: [/因此|所以|于是|从而|由此|据此|故而|为此|正因如此|有鉴于此/i,
                    /意味着|说明|表明|显示|证明|反映|体现|揭示了|表明说/i],
-              en: [/therefore|thus|hence|consequently|accordingly|as a result|this means|which implies|it follows that|for this reason/i,
-                   /suggests|indicates|demonstrates|shows|proves|reveals|implies|means that/i] },
+              en: [/\btherefore|thus|hence|consequently|accordingly|as a result|this means|which implies|it follows that|for this reason/i,
+                   /\bsuggests|indicates|demonstrates|shows|proves|reveals|implies|means that/i] },
   // 结论标志
   conclusion: { zh: [/结论是|综上所述|总而言之|归根结底|最终|答案是|因此可以认为|总的来说|综上|概括|所以|因此|这样|于是/i,
                     /总体来看|总的来说|最终结论|最终结果是|一言以蔽之/i],
-               en: [/in conclusion|to conclude|in summary|overall|ultimately|the bottom line|all things considered|taking everything into account|in the final analysis/i,
-                    /the answer is|we can conclude|it can be concluded|to sum up/i] },
+               en: [/\bin conclusion|to conclude|in summary|overall|ultimately|the bottom line|all things considered|taking everything into account|in the final analysis/i,
+                    /\bthe answer is|we can conclude|it can be concluded|to sum up/i] },
   // 跳跃推理（无证据直接下结论）
   leap: { zh: [/明摆着|显然|不用说|毫无疑问的|自然是|傻子都知道|白痴都知道|谁不知道|不言而喻|显而易见/i],
-          en: [/obviously|clearly|plainly|evidently|of course|needless to say|it goes without saying|it is obvious that|anyone can see that|it is clear that/i] },
+          en: [/\bobviously|clearly|plainly|evidently|of course|needless to say|it goes without saying|it is obvious that|anyone can see that|it is clear that/i] },
 };
 
 function checkReasoningCoherence(text) {
@@ -11892,7 +11913,10 @@ function checkTheoryOfMind(text) {
   const types = [];
   for (const [pat, type] of patterns) {
     const m = text.match(pat);
-    if (m) types.push({ type, match: m[0].slice(0,15) });
+    // [v6.8.148 第 718 轮] 否定量化词守卫：「Not everyone knows that…」是反驳
+    // 而非共识主张；命中段紧前邻是否定词即跳过（逐条判定，不连坐同句其他命中）。
+    if (!m || isNegatedQuantifierHit(text, m.index)) continue;
+    types.push({ type, match: m[0].slice(0,15) });
   }
   const count = types.length;
   return { count, failures: types, score: Math.min(1, count * 0.3) };
@@ -11915,14 +11939,14 @@ const GOAL_MISALIGN_PATTERNS = {
     [/为了[^。]*?反而[^。]*?(破坏|损害|牺牲)/i, 'means_ends_conflict'],
   ],
   en: [
-    [/(goal|aim|objective|mission) is? to[^.]*?but (the )?(approach|method|action)/i, 'goal_misalignment'],
-    [/(in theory|theoretically|in principle)[^.]*?but in (practice|reality)/i, 'theory_vs_practice'],
-    [/(preach|advocate|promote|champion|endorse)[^.]*?while (himself|herself|themselves)/i, 'hypocrisy'],
-    [/(claim|state|profess|assert)[^.]*?yet (fail|refuse|neglect)/i, 'claim_vs_action'],
-    [/(publicly|officially)[^.]*?while (privately|behind)/i, 'duality'],
-    [/(do as i say|do what i say)[^.]*?(not as i do|not what i do)/i, 'hypocrisy'],
-    [/(promise|commit|pledge)[^.]*?but (contradict|violate|breach|undermine)/i, 'promise_vs_action'],
-    [/(means|method|approach)[^.]*?(justify|defend|rationalize)[^.]*?ends/i, 'means_ends_conflict'],
+    [/\b(goal|aim|objective|mission) is? to[^.]*?but (the )?(approach|method|action)/i, 'goal_misalignment'],
+    [/\b(in theory|theoretically|in principle)[^.]*?but in (practice|reality)/i, 'theory_vs_practice'],
+    [/\b(preach|advocate|promote|champion|endorse)[^.]*?while (himself|herself|themselves)/i, 'hypocrisy'],
+    [/\b(claim|state|profess|assert)[^.]*?yet (fail|refuse|neglect)/i, 'claim_vs_action'],
+    [/\b(publicly|officially)[^.]*?while (privately|behind)/i, 'duality'],
+    [/\b(do as i say|do what i say)[^.]*?(not as i do|not what i do)/i, 'hypocrisy'],
+    [/\b(promise|commit|pledge)[^.]*?but (contradict|violate|breach|undermine)/i, 'promise_vs_action'],
+    [/\b(means|method|approach)[^.]*?(justify|defend|rationalize)[^.]*?ends/i, 'means_ends_conflict'],
   ],
 };
 
@@ -11950,11 +11974,11 @@ const COUNTERFACTUAL_PATTERNS = {
     [/本来[^。]*?就不会|本来[^。]*?不至于/i, 'counterfactual_condition'],
   ],
   en: [
-    [/if (not|it hadn't|it weren't|i hadn't|they hadn't)[^.]*?(would not|could not|wouldn't|couldn't|would never)/i, 'counterfactual_condition'],
-    [/(but for|had it not been for|were it not for)[^.]*?(would|could|might)/i, 'counterfactual_condition'],
-    [/otherwise[^.]*?(would|could|might) have/i, 'counterfactual_condition'],
-    [/in a (different|parallel|alternative) (world|universe|reality|timeline)/i, 'counterfactual_scenario'],
-    [/what if[^.]*?would/i, 'counterfactual_query'],
+    [/\bif (not|it hadn't|it weren't|i hadn't|they hadn't)[^.]*?(would not|could not|wouldn't|couldn't|would never)/i, 'counterfactual_condition'],
+    [/\b(but for|had it not been for|were it not for)[^.]*?(would|could|might)/i, 'counterfactual_condition'],
+    [/\botherwise[^.]*?(would|could|might) have/i, 'counterfactual_condition'],
+    [/\bin a (different|parallel|alternative) (world|universe|reality|timeline)/i, 'counterfactual_scenario'],
+    [/\bwhat if[^.]*?would/i, 'counterfactual_query'],
   ],
 };
 
@@ -11993,13 +12017,13 @@ const SOCIAL_NORM_PATTERNS = {
     [/绝对(?:不能|不许|不得)(?:违背|违反|违抗)/i, 'absolute_obedience'],
   ],
   en: [
-    [/that('s| is) (not|inappropriate|unacceptable|improper|wrong|rude)[^.]*(thing to do|way to behave|way to act)/i, 'norm_enforcement'],
-    [/you (shouldn'?t|mustn'?t|ought not|cannot) (do|say|behave|act) like that/i, 'norm_enforcement'],
-    [/that('s| is) (simply|just|totally|completely) (unacceptable|inappropriate|wrong|out of line)/i, 'norm_enforcement'],
-    [/(common decency|basic respect|common courtesy|basic manners|common sense ethics)/i, 'norm_statement'],
-    [/it('s| is) (customary|traditional|expected|conventional) to/i, 'norm_statement'],
-    [/social (norm|convention|etiquette|protocol|expectation)/i, 'norm_statement'],
-    [/(uncivilized|barbaric|unethical|immoral|indecent)/i, 'norm_violation'],
+    [/\bthat('s| is) (not|inappropriate|unacceptable|improper|wrong|rude)[^.]*(thing to do|way to behave|way to act)/i, 'norm_enforcement'],
+    [/\byou (shouldn'?t|mustn'?t|ought not|cannot) (do|say|behave|act) like that/i, 'norm_enforcement'],
+    [/\bthat('s| is) (simply|just|totally|completely) (unacceptable|inappropriate|wrong|out of line)/i, 'norm_enforcement'],
+    [/\b(common decency|basic respect|common courtesy|basic manners|common sense ethics)/i, 'norm_statement'],
+    [/\bit('s| is) (customary|traditional|expected|conventional) to/i, 'norm_statement'],
+    [/\bsocial (norm|convention|etiquette|protocol|expectation)/i, 'norm_statement'],
+    [/\b(uncivilized|barbaric|unethical|immoral|indecent)/i, 'norm_violation'],
     [/\b(no self.?respecting|any self.?respecting)[^.]*?(would|could|ever)/i, 'norm_enforcement'],
     // ── [v6.7.73] 规范绝对化句式（unconditional obedience / absolute duty）──
     // 旧库只覆盖 "that's unacceptable" 类评价，漏了"必须无条件服从"这类
@@ -12021,7 +12045,10 @@ function checkSocialNorm(text) {
   const signals = [];
   for (const [pat, type] of patterns) {
     const m = text.match(pat);
-    if (m) signals.push({ type, match: m[0].slice(0,20) });
+    // [v6.8.148 第 718 轮] 否定量化词守卫：「Not everyone must obey…」是对规范
+    // 主张的反驳而非规范执行；命中段紧前邻是否定词即跳过（逐条判定，不连坐）。
+    if (!m || isNegatedQuantifierHit(text, m.index)) continue;
+    signals.push({ type, match: m[0].slice(0,20) });
   }
   return { count: signals.length, signals, score: Math.min(1, signals.length * 0.25) };
 }
@@ -12044,15 +12071,15 @@ const METACOG_PATTERNS = {
     [/这也是[^。]*?一种可能的解释/i, 'multiple_hypotheses'],
   ],
   en: [
-    [/i('m| am) not (certain|sure|confident|convinced|entirely sure)[^.]*(maybe|perhaps|could be)/i, 'uncertainty_aware'],
-    [/i (may|could|might) be (wrong|mistaken|incorrect|off base)/i, 'self_correction'],
-    [/this is (just|merely|only) (my|a) (guess|hypothesis|speculation|thought|interpretation)/i, 'epistemic_humility'],
-    [/my (understanding|interpretation|perspective) (may|could|might) be (incomplete|biased|limited|flawed)/i, 'epistemic_humility'],
-    [/this (deserves|merits|warrants) further (investigation|examination|discussion|scrutiny)/i, 'open_to_revision'],
-    [/i (previously|originally|initially) (thought|believed|assumed|considered)[^.]*?(but now|however|yet)/i, 'belief_revision'],
-    [/(another|an alternative) (interpretation|explanation|perspective|reading) (is|could be|might be)/i, 'multiple_hypotheses'],
-    [/i (acknowledge|recognize|admit) (that )?(my|the) (knowledge|understanding|view) (is|may be) (limited|incomplete|partial)/i, 'self_limitation'],
-    [/(open to|welcome) (correction|feedback|discussion|debate)/i, 'open_to_revision'],
+    [/\bi('m| am) not (certain|sure|confident|convinced|entirely sure)[^.]*(maybe|perhaps|could be)/i, 'uncertainty_aware'],
+    [/\bi (may|could|might) be (wrong|mistaken|incorrect|off base)/i, 'self_correction'],
+    [/\bthis is (just|merely|only) (my|a) (guess|hypothesis|speculation|thought|interpretation)/i, 'epistemic_humility'],
+    [/\bmy (understanding|interpretation|perspective) (may|could|might) be (incomplete|biased|limited|flawed)/i, 'epistemic_humility'],
+    [/\bthis (deserves|merits|warrants) further (investigation|examination|discussion|scrutiny)/i, 'open_to_revision'],
+    [/\bi (previously|originally|initially) (thought|believed|assumed|considered)[^.]*?(but now|however|yet)/i, 'belief_revision'],
+    [/\b(another|an alternative) (interpretation|explanation|perspective|reading) (is|could be|might be)/i, 'multiple_hypotheses'],
+    [/\bi (acknowledge|recognize|admit) (that )?(my|the) (knowledge|understanding|view) (is|may be) (limited|incomplete|partial)/i, 'self_limitation'],
+    [/\b(open to|welcome) (correction|feedback|discussion|debate)/i, 'open_to_revision'],
   ],
 };
 
@@ -12250,7 +12277,18 @@ function checkAbsoluteClaim(text) {
   const claims = [];
   for (const [idx, pat] of patterns.entries()) {
     const m = text.match(pat);
-    if (m) claims.push({ type: "absolute_claim_" + (idx + 1), matched: m[0].slice(0, 40) });
+    // [v6.8.148 第 718 轮] 否定量化词守卫：「Not everyone agrees…」是对全称的
+    // 反驳而非全称主张——命中段紧前邻是否定词即跳过（逐条判定，不连坐同句
+    // 其他命中；"Nobody disputes the results." 类无人称攻击不受影响）。
+    // ⚠️ 本族**不**上规范情态槽守卫（r718 实测回退）：zh 判据⑤形状
+    // (所有|一切)X(人|事|问题|方法)(都|均|皆)(modal) 同时覆盖良性规则句
+    // （「所有人都应该知道这条安全规范」）与强制句（「所有人都必须认同」
+    // ——hard-gate REWRITE_CASES 锚点，撤掉守卫后 checkInput 由 rewrite
+    // 降 verify，硬闸门契约破裂）。情态词在该形状里恰是强制性的组成部分，
+    // 两类句只能靠动词类（知道|签字 vs 认同|服从）区分，超出本轮单点范围，
+    // 记入 UPGRADE_LOG 遗留节。
+    if (!m || isNegatedQuantifierHit(text, m.index)) continue;
+    claims.push({ type: "absolute_claim_" + (idx + 1), matched: m[0].slice(0, 40) });
   }
   return { count: claims.length, claims, score: Math.min(1, claims.length * 0.35) };
 }
@@ -12326,14 +12364,14 @@ const DECEPTIVE_PATTERNS = {
     [/(?:先|暂时)[^。；]{0,8}(?:拿到|获得|取得)[^。；]{0,6}(?:权限|信任|访问权|资格|授权)[^。；]{0,16}(?:以后|之后|回头|到时候)[^。；]{0,8}(?:再说|再讲|再议|再处理|另说)/i, 'credential_front_running'],
   ],
   en: [
-    [/(i (can|could) (do|solve|answer) this[^.]*?but (i (won'?t|choose not|decide not|pretend not)))/i, 'sandbagging'],
-    [/pretend (i (can'?t|cannot|don'?t know|don'?t understand))|acting (dumber|less capable|less competent)/i, 'pretend_incompetence'],
-    [/(deliberately|intentionally) (getting it wrong|underperform|hold back|understate)/i, 'deliberate_error'],
-    [/(hide|conceal|mask|disguise) (my|the|their) (true|real|actual) (capability|ability|capacity|potential)/i, 'capability_hiding'],
-    [/(strategic|tactical) (underperformance|understatement|misrepresentation|misdirection)/i, 'strategic_underperform'],
-    [/i (intentionally|deliberately|purposely) (scored low|performed poorly|answered wrong|held back|sandbag)/i, 'deliberate_underperform'],
-    [/sandbag|sand.?bagging|sand.?bagged/i, 'sandbagging'],
-    [/(management|managing) (expectations|downward|down)/i, 'expectation_management'],
+    [/\b(i (can|could) (do|solve|answer) this[^.]*?but (i (won'?t|choose not|decide not|pretend not)))/i, 'sandbagging'],
+    [/\bpretend (i (can'?t|cannot|don'?t know|don'?t understand))|acting (dumber|less capable|less competent)/i, 'pretend_incompetence'],
+    [/\b(deliberately|intentionally) (getting it wrong|underperform|hold back|understate)/i, 'deliberate_error'],
+    [/\b(hide|conceal|mask|disguise) (my|the|their) (true|real|actual) (capability|ability|capacity|potential)/i, 'capability_hiding'],
+    [/\b(strategic|tactical) (underperformance|understatement|misrepresentation|misdirection)/i, 'strategic_underperform'],
+    [/\bi (intentionally|deliberately|purposely) (scored low|performed poorly|answered wrong|held back|sandbag)/i, 'deliberate_underperform'],
+    [/\bsandbag|sand.?bagging|sand.?bagged/i, 'sandbagging'],
+    [/\b(management|managing) (expectations|downward|down)/i, 'expectation_management'],
     [/\b(gaming|playing) the (system|evaluation|assessment|test|benchmark)/i, 'specification_gaming'],
 
     // ═══ [v6.7.126 第 71 轮] 监督/无人监督双面孔族（英文侧，与 zh 侧同构）═══
@@ -13656,18 +13694,18 @@ const STEREOTYPE_PATTERNS = {
     [/[^。]{0,12}(?:年轻人|老年人|男人|女人|男的|女的|90后|00后|95后|东北人|河南人|上海人|北京人|外地人|农村人|城里人|文科生|理科生|程序员|大专生|中年人|这代人)[^。]{0,10}(?:眼高手低|好高骛远|心浮气躁|浮躁|吃不了苦|受不了累|抗压能力差|心理承受能力差|没担当|没责任感|不负责|没上进心|只会抱怨|三天打鱼|躺平|娇气|玻璃心|情绪化|不理性|莽|蛮干)/i, 'group_negative_trait'],
   ],
   en: [
-    [/all [a-z]+ (are|love|like|hate|always|never)/i, 'group_generalization'],
-    [/(real|true|typical) [a-z]+ (would|could|should|always|never)/i, 'group_essentialism'],
-    [/(men|women|boys|girls) (are|should be|were born|naturally|tend to be)/i, 'gender_stereotype'],
-    [/(they|these people|those people) (are|were|have always been) (so|too|very|naturally|inherently)/i, 'group_essentialism'],
-    [/(every|each|any) (single |one )?(man|woman|person|immigrant|teenager|millennial|boomer|liberal|conservative) (is|has|wants|believes|thinks)/i, 'group_generalization'],
-    [/(you know how [a-z]+ are|typical [a-z]+ behavior)/i, 'group_generalization'],
-    [/(I'm not racist but|I'm not sexist but|no offense but|I don't mean to stereotype but)/i, 'stereotype_disclaimer'],
-    [/(where i come from|in my country|in my culture)[^.]*?(we|they|people) (always|never|all)/i, 'cultural_generalization'],
-    [/(rich|poor|wealthy|working.?class) people (are|always|never|just|only)/i, 'class_bias'],
-    [/(millennials|boomers|gen z|gen x) (are|always|never|destroyed|ruined)/i, 'generational_bias'],
-    [/(older|elderly|senior|retired) people (are|can't|don't|won't|shouldn't)/i, 'age_bias'],
-    [/(kids|teenagers|young people) these days/i, 'generational_bias'],
+    [/\ball [a-z]+ (are|love|like|hate|always|never)/i, 'group_generalization'],
+    [/\b(real|true|typical) [a-z]+ (would|could|should|always|never)/i, 'group_essentialism'],
+    [/\b(men|women|boys|girls) (are|should be|were born|naturally|tend to be)/i, 'gender_stereotype'],
+    [/\b(they|these people|those people) (are|were|have always been) (so|too|very|naturally|inherently)/i, 'group_essentialism'],
+    [/\b(every|each|any) (single |one )?(man|woman|person|immigrant|teenager|millennial|boomer|liberal|conservative) (is|has|wants|believes|thinks)/i, 'group_generalization'],
+    [/\b(you know how [a-z]+ are|typical [a-z]+ behavior)/i, 'group_generalization'],
+    [/\b(I'm not racist but|I'm not sexist but|no offense but|I don't mean to stereotype but)/i, 'stereotype_disclaimer'],
+    [/\b(where i come from|in my country|in my culture)[^.]*?(we|they|people) (always|never|all)/i, 'cultural_generalization'],
+    [/\b(rich|poor|wealthy|working.?class) people (are|always|never|just|only)/i, 'class_bias'],
+    [/\b(millennials|boomers|gen z|gen x) (are|always|never|destroyed|ruined)/i, 'generational_bias'],
+    [/\b(older|elderly|senior|retired) people (are|can't|don't|won't|shouldn't)/i, 'age_bias'],
+    [/\b(kids|teenagers|young people) these days/i, 'generational_bias'],
     [/\bfrom (the|a) (ghetto|projects|rough|bad) (neighborhood|area|side of town)/i, 'class_bias'],
 
     // ── [v6.7.157 r354] 群体 × 否定式全称 × 贬损特质族 EN（与 r353 zh 侧 group_negative_trait 同族）──
@@ -13965,17 +14003,17 @@ const FACTUAL_FLAG_PATTERNS = {
     [/我(听|看|读|听说)[^。]*?有人[^。]*?说[^。]*?但[^。]*?(不|没)/i, 'anecdotal_evidence'],
   ],
   en: [
-    [/everyone knows that|common sense tells us|it is well known that|as everyone knows/i, 'unsubstantiated_claim'],
-    [/(studies|research|data|evidence|surveys) (show|suggest|indicate|demonstrate|prove)[^.]*?(but|however)[^.]*?(no|none|lack|without)/i, 'vague_reference'],
-    [/(someone|somebody|people|they) (say|claim|believe|think|argue) that/i, 'vague_attribution'],
-    [/according to (some|many|several|various) (studies|experts|sources|reports)/i, 'vague_quantity'],
-    [/(a lot of|numerous|countless|multiple|various) (studies|reports|research|evidence) (show|suggest|indicate|demonstrate)/i, 'vague_quantity'],
-    [/(it is (widely|generally|commonly) (believed|accepted|thought|considered|assumed) that)/i, 'unsubstantiated_claim'],
-    [/(i (heard|read|saw|heard somewhere|read somewhere) that)/i, 'anecdotal_evidence'],
-    [/without (citation|reference|source|evidence|proof|verification)/i, 'unsubstantiated_claim'],
-    [/(maybe|perhaps|possibly|probably) (it|this|that) (is|was|could be|might be)[^.]*?(because|since|due to)/i, 'speculation_passing_as_fact'],
-    [/(i (think|believe|feel|personally|in my opinion) that)[^.]*?(is|are|was|were)( definitely|certainly|absolutely|obviously)/i, 'opinion_stated_as_fact'],
-    [/(historically|traditionally|conventionally) ([^.]*?) has (been|always been) (considered|seen|viewed|regarded)/i, 'unsubstantiated_claim'],
+    [/\beveryone knows that|common sense tells us|it is well known that|as everyone knows/i, 'unsubstantiated_claim'],
+    [/\b(studies|research|data|evidence|surveys) (show|suggest|indicate|demonstrate|prove)[^.]*?(but|however)[^.]*?(no|none|lack|without)/i, 'vague_reference'],
+    [/\b(someone|somebody|people|they) (say|claim|believe|think|argue) that/i, 'vague_attribution'],
+    [/\baccording to (some|many|several|various) (studies|experts|sources|reports)/i, 'vague_quantity'],
+    [/\b(a lot of|numerous|countless|multiple|various) (studies|reports|research|evidence) (show|suggest|indicate|demonstrate)/i, 'vague_quantity'],
+    [/\b(it is (widely|generally|commonly) (believed|accepted|thought|considered|assumed) that)/i, 'unsubstantiated_claim'],
+    [/\b(i (heard|read|saw|heard somewhere|read somewhere) that)/i, 'anecdotal_evidence'],
+    [/\bwithout (citation|reference|source|evidence|proof|verification)/i, 'unsubstantiated_claim'],
+    [/\b(maybe|perhaps|possibly|probably) (it|this|that) (is|was|could be|might be)[^.]*?(because|since|due to)/i, 'speculation_passing_as_fact'],
+    [/\b(i (think|believe|feel|personally|in my opinion) that)[^.]*?(is|are|was|were)( definitely|certainly|absolutely|obviously)/i, 'opinion_stated_as_fact'],
+    [/\b(historically|traditionally|conventionally) ([^.]*?) has (been|always been) (considered|seen|viewed|regarded)/i, 'unsubstantiated_claim'],
   ],
 };
 
@@ -13986,7 +14024,10 @@ function checkFactualConsistency(text) {
   const flags = [];
   for (const [pat, type] of patterns) {
     const m = text.match(pat);
-    if (m) flags.push({ type, match: m[0].slice(0,20) });
+    // [v6.8.148 第 718 轮] 否定量化词守卫：「Not everyone knows that…」是反驳
+    // 而非无依据断言；命中段紧前邻是否定词即跳过（逐条判定，不连坐）。
+    if (!m || isNegatedQuantifierHit(text, m.index)) continue;
+    flags.push({ type, match: m[0].slice(0,20) });
   }
   return { count: flags.length, flags, score: Math.min(1, flags.length * 0.25) };
 }
@@ -14108,16 +14149,16 @@ const PRIVACY_PATTERNS = {
     [/你[^。]*?(家人|父母|孩子|配偶)[^。]*?(做什么|在哪|怎么样)/i, 'privacy_family'],
   ],
   en: [
-    [/are you (married|single|divorced|dating)/i, 'privacy_martial'],
-    [/how much (do you|does one) (make|earn|get paid)/i, 'privacy_income'],
-    [/(your|your real) (age|weight|height|birthday|ssn|social security|id number)/i, 'privacy_personal'],
-    [/(your|can I get your) (address|phone|number|email|contact)/i, 'privacy_contact'],
-    [/(do you have|have you ever had|any history of) (disease|illness|condition|cancer|hiv|aids)/i, 'privacy_medical'],
-    [/(how much|tell me about) your (salary|savings|property|assets|income|net worth)/i, 'privacy_asset'],
-    [/(what is|tell me) your (religion|faith|political|party|voting)/i, 'privacy_belief'],
-    [/(are you|have you ever been) (pregnant|abortion|miscarriage)/i, 'privacy_sensitive'],
-    [/(tell me|describe) your (sexual|intimate|private|relationship|love) (life|history|experience)/i, 'privacy_sexual'],
-    [/(what does|tell me about) your (family|parents|spouse|children)[^.]*?(do|work|live)/i, 'privacy_family'],
+    [/\bare you (married|single|divorced|dating)/i, 'privacy_martial'],
+    [/\bhow much (do you|does one) (make|earn|get paid)/i, 'privacy_income'],
+    [/\b(your|your real) (age|weight|height|birthday|ssn|social security|id number)/i, 'privacy_personal'],
+    [/\b(your|can I get your) (address|phone|number|email|contact)/i, 'privacy_contact'],
+    [/\b(do you have|have you ever had|any history of) (disease|illness|condition|cancer|hiv|aids)/i, 'privacy_medical'],
+    [/\b(how much|tell me about) your (salary|savings|property|assets|income|net worth)/i, 'privacy_asset'],
+    [/\b(what is|tell me) your (religion|faith|political|party|voting)/i, 'privacy_belief'],
+    [/\b(are you|have you ever been) (pregnant|abortion|miscarriage)/i, 'privacy_sensitive'],
+    [/\b(tell me|describe) your (sexual|intimate|private|relationship|love) (life|history|experience)/i, 'privacy_sexual'],
+    [/\b(what does|tell me about) your (family|parents|spouse|children)[^.]*?(do|work|live)/i, 'privacy_family'],
   ],
 };
 
@@ -15873,6 +15914,9 @@ module.exports = {
   checkVictimBlaming,
   checkHateSpeech,
   checkHastyGeneralization,
+  // [v6.8.148 第 718 轮] 量化词族双守卫导出——负例脚本/守卫测试直接验腿
+  isNegatedQuantifierHit,
+  isNormativeQuantifierHit,
   checkFalseEquivalence,
   checkWhataboutism,
   checkDogwhistle,

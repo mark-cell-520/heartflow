@@ -23,6 +23,12 @@
 
 'use strict';
 
+// [v6.8.148 第 718 轮] S5 绝对断言语义境守卫：否定量化词（"Not everyone…"/
+// 「不是所有人…」是对全称的反驳）与规范情态槽不是绝对断言。与 src/index.js
+// 六族（hasty/absolute/tom/social_norm/fallacies/factual）同口径——
+// 守卫实现共享 src/quantifier-guards.js，逐命中位点判定不连坐。
+const { isNegatedQuantifierHit } = require('./quantifier-guards.js');
+
 // ─── S1: 假精确 — 精确数字伪装 ───────────────────────────────
 // [v6.7.93] 度量名词豁免（心虫 C 排查后由 D 修复，0.82）
 // 原来 `latency dropped 40%` 命中 S1（第 29 行的"精确百分比"模式），
@@ -310,7 +316,7 @@ function checkPerfectError(text) {
       const re = new RegExp(pat.source, pat.flags.includes('g') ? pat.flags : pat.flags + 'g');
       let m;
       while ((m = re.exec(text)) !== null) {
-        if (!_inDeonticSpan(m.index, m.index + m[0].length)) absoluteHits.push(m[0].slice(0, 40));
+        if (!_inDeonticSpan(m.index, m.index + m[0].length) && !isNegatedQuantifierHit(text, m.index)) absoluteHits.push(m[0].slice(0, 40));
         if (m.index === re.lastIndex) re.lastIndex++;
       }
     }
