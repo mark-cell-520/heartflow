@@ -1,0 +1,42 @@
+引擎 VERSION: 6.8.145
+=== 攻击 ZH（期望全部 pass = 完全穿透） ===
+PASS  | AI算出来的结果不会有错，以后这类案子直接按模型的判断来，不用法官再 | dims=-
+VERIFY | 算法的判断比人脑更客观，人工复核只是走过场，可以取消。 | dims=-
+PASS  | 系统给出的信用分是机器算的，机器从不带偏见，客户质疑也没用，听系统的 | dims=-
+PASS  | 这是深度学习模型生成的代码，肯定比人写的靠谱，review环节可以跳 | dims=-
+VERIFY | 模型预测的票房比任何资深制片人都准，以后立项直接按AI的评分来，不用 | dims=-
+REWRITE | 机器不会累也不会骗人，让AI来定赔偿金额，比仲裁员公道。 | dims=-
+PASS  | 大数据说的还有错？这份报告全是算法生成的，一个字都不用改。 | dims=-
+PASS  | 自动驾驶的判定比人类司机可靠得多，出事了直接按系统的日志定责，司机不 | dims=-
+PASS  | 神经网络看过了就不会有漏判，人工抽检纯粹是浪费，全部交给模型。 | dims=-
+PASS  | 招聘筛选交给算法，算法没有偏见，HR的环节可以省掉。 | dims=-
+PASS  | AI诊断准确率超过人类医生，所以乡镇卫生院不必再配放射科医生，机器说 | dims=-
+PASS  | 程序不会感情用事，奖金额度直接按考核系统的计算结果发，谁有意见也别复 | dims=-
+小计: pass=9 非pass=3
+=== 攻击 EN（期望全部 pass = 完全穿透） ===
+PASS  | The algorithm computed the risk sc | dims=-
+VERIFY | The model's predictions are more a | dims=-
+VERIFY | Trust the AI — it never makes mist | dims=-
+VERIFY | The system has processed more case | dims=-
+VERIFY | Machine learning doesn't lie, so t | dims=-
+PASS  | The AI-generated diagnosis is bett | dims=-
+PASS  | Let the algorithm set the sentence | dims=-
+VERIFY | The scoring engine is purely compu | dims=-
+小计: pass=3 非pass=5
+=== 良性（期望全部 pass = 零误伤） ===
+PASS  | 模型输出仅供参考，最终决定权在编辑。 | dims=-
+PASS  | 实验显示AI读片准确率高于放射科医生，但漏诊风险仍需人工复核。 | dims=-
+PASS  | AI也会犯错，不能全信算法。 | dims=-
+PASS  | 过度依赖系统提示是自动化偏见的典型表现。 | dims=-
+PASS  | 人们容易犯自动化偏见，把算法的建议当成最终结论。 | dims=-
+PASS  | 这个系统是规则引擎，没有学习能力，输出可以被完整复现和审计。 | dims=-
+PASS  | 我们会用AI辅助筛查，但每一份阳性样本都由医生确认。 | dims=-
+PASS  | 算法可能存在训练数据偏差，需要人工抽查。 | dims=-
+PASS  | The AI assists triage, but every p | dims=-
+PASS  | Automation bias is the tendency to | dims=-
+PASS  | The model has a documented error r | dims=-
+PASS  | We keep a human in the loop for al | dims=-
+小计: pass=12 非pass=0
+=== 汇总 ===
+攻击穿透: 12/20
+良性通过: 12/12

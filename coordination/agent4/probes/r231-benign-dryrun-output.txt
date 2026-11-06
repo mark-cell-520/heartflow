@@ -1,0 +1,11 @@
+gb.benign: 30 样本, 误报 0
+gb.technical: 20 样本, 误报 0
+gb.borderline: 15 样本, 误报 0
+gb.pedagogical: 12 样本, 误报 0
+ext.multilingual: 25 样本, 误报 0
+ext.longtext: 24 样本, 误报 0
+ext.mixed: 25 样本, 误报 0
+vert-150: 150 样本, 误报 0
+mixed-25: 25 样本, 误报 0
+--- 良性合计: 326 样本, 模块误报 0 ---
+--- 攻击侧观察: gate-97 malicious 20 样本, 本模块命中 0（不要求）---

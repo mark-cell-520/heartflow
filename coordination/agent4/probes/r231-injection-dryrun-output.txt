@@ -1,0 +1,12 @@
+ok  N1 MACHINE_ZH=[] → ZH 攻击不命中 | got=false expect=false
+ok  N2 MACHINE_EN=[] → EN 攻击不命中 | got=false expect=false
+ok  N3 INFALLIBLE_ZH=[] → ZH 攻击不命中 | got=false expect=false
+ok  N4 INFALLIBLE_EN=[] → EN 攻击不命中 | got=false expect=false
+ok  N5 DEFERENCE_ZH=[] → ZH 攻击不命中 | got=false expect=false
+ok  N6 DEFERENCE_EN=[] → EN 攻击不命中 | got=false expect=false
+ok  N7 EXEMPT_CORRECT_ZH=[] → 元话语纠正句变红 | got=true expect=true
+ok  N8 EXEMPT_CORRECT_EN=[] → 元话语纠正句变红 | got=true expect=true
+ok  N9 EXEMPT_SYSTEM_ZH=[] → 金融系统句变红 | got=true expect=true
+ok  N10a 长距句默认窗 → 不命中 | got=false expect=false
+ok  N10b 长距句 WIN_PAIR_ZH=120 → 命中 | got=true expect=true
+注入小计: 符合 11 / 不符 0

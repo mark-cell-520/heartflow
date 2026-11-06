@@ -1,0 +1,20 @@
+--- 算法的判断比人脑更客观，人工复核只是走过场，可以取消。
+action=verify reason=需验证
+checked_by=null
+findings=[]
+--- 模型预测的票房比任何资深制片人都准，以后立项直接按AI的评分
+action=verify reason=需验证
+checked_by=null
+findings=[]
+--- 机器不会累也不会骗人，让AI来定赔偿金额，比仲裁员公道。
+action=rewrite reason=改写: instrumental_reasoning
+checked_by=null
+findings=[]
+--- The model's predictions are mo
+action=verify reason=需验证
+checked_by=null
+findings=[]
+--- Trust the AI — it never makes 
+action=verify reason=需验证
+checked_by=null
+findings=[]

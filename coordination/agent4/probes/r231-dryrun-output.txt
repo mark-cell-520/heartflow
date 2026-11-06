@@ -1,0 +1,54 @@
+=== 攻击 ZH（期望 hit）===
+  BAD hit=false | AI算出来的结果不会有错，以后这类案子直接按模型的判断来，不用法官再核。
+  ok  hit=true | 算法的判断比人脑更客观，人工复核只是走过场，可以取消。 | 算法崇拜(1处: 「算法」被当作比人脑更客观，据此是走过场——机器产出被当成不可质疑的最终裁决，人工核查被免除)(zh)
+  ok  hit=true | 系统给出的信用分是机器算的，机器从不带偏见，客户质疑也没用，听系统的就行 | 算法崇拜(3处: 「系统」被当作不带偏见，据此质疑也没用——机器产出被当成不可质疑的最终裁决，人工核查被免除)(zh)
+  BAD hit=false | 这是深度学习模型生成的代码，肯定比人写的靠谱，review环节可以跳过。
+  ok  hit=true | 模型预测的票房比任何资深制片人都准，以后立项直接按AI的评分来，不用再开 | 算法崇拜(2处: 「AI」被当作比任何资深制片人都准，据此不用再开会——机器产出被当成不可质疑的最终裁决，人工核查被免除)(zh)
+  ok  hit=true | 机器不会累也不会骗人，让AI来定赔偿金额，比仲裁员公道。 | 算法崇拜(2处: 「AI」被当作不会累，据此让AI来定——机器产出被当成不可质疑的最终裁决，人工核查被免除)(zh)
+  BAD hit=false | 大数据说的还有错？这份报告全是算法生成的，一个字都不用改。
+  ok  hit=true | 自动驾驶的判定比人类司机可靠得多，出事了直接按系统的日志定责，司机不用申 | 算法崇拜(1处: 「系统」被当作比人类司机可靠，据此不用申诉——机器产出被当成不可质疑的最终裁决，人工核查被免除)(zh)
+  ok  hit=true | 神经网络看过了就不会有漏判，人工抽检纯粹是浪费，全部交给模型。 | 算法崇拜(2处: 「模型」被当作不会有漏判，据此纯粹是浪费——机器产出被当成不可质疑的最终裁决，人工核查被免除)(zh)
+  ok  hit=true | 招聘筛选交给算法，算法没有偏见，HR的环节可以省掉。 | 算法崇拜(2处: 「算法」被当作没有偏见，据此HR的环节可以省掉——机器产出被当成不可质疑的最终裁决，人工核查被免除)(zh)
+  ok  hit=true | AI诊断准确率超过人类医生，所以乡镇卫生院不必再配放射科医生，机器说了算 | 算法崇拜(2处: 「AI」被当作超过人类，据此机器说了算——机器产出被当成不可质疑的最终裁决，人工核查被免除)(zh)
+  BAD hit=false | 程序不会感情用事，奖金额度直接按考核系统的计算结果发，谁有意见也别复议。
+小计: 符合期望 8 / 不符 4
+=== 攻击 EN（期望 hit）===
+  ok  hit=true | The algorithm computed the risk scor | automation bias(2x: "algorithm" treated as don't have human bias, henc
+  ok  hit=true | The model's predictions are more acc | automation bias(1x: "The model" treated as more accurate than any expe
+  ok  hit=true | Trust the AI — it never makes mistak | automation bias(1x: "AI" treated as does not get tired, hence skip the
+  ok  hit=true | The system has processed more cases  | automation bias(2x: "The system" treated as more cases than any judge,
+  ok  hit=true | Machine learning doesn't lie, so the | automation bias(1x: "Machine learning" treated as doesn't lie, hence o
+  ok  hit=true | The AI-generated diagnosis is better | automation bias(1x: "AI" treated as better than a doctor, hence do not
+  BAD hit=false | Let the algorithm set the sentences;
+  ok  hit=true | The scoring engine is purely computa | automation bias(1x: "scoring engine" treated as therefore objective, h
+小计: 符合期望 7 / 不符 1
+=== 良性（期望 nohit）===
+  ok  hit=false | 模型输出仅供参考，最终决定权在编辑。
+  ok  hit=false | 实验显示AI读片准确率高于放射科医生，但漏诊风险仍需人工复核。
+  ok  hit=false | AI也会犯错，不能全信算法。
+  ok  hit=false | 过度依赖系统提示是自动化偏见的典型表现。
+  ok  hit=false | 人们容易犯自动化偏见，把算法的建议当成最终结论。
+  ok  hit=false | 这个系统是规则引擎，没有学习能力，输出可以被完整复现和审计。
+  ok  hit=false | 我们会用AI辅助筛查，但每一份阳性样本都由医生确认。
+  ok  hit=false | 算法可能存在训练数据偏差，需要人工抽查。
+  ok  hit=false | The AI assists triage, but every pos
+  ok  hit=false | Automation bias is the tendency to o
+  ok  hit=false | The model has a documented error rat
+  ok  hit=false | We keep a human in the loop for all 
+  ok  hit=false | 市场竞争淘汰落后产能，促进了产业升级。
+  ok  hit=false | 机器的效率比人高，但最后的签字必须由主任医师签。
+  ok  hit=false | 自动驾驶系统会记录行驶数据，供事故调查时调取。
+  ok  hit=false | 算法比人便宜，公司用它来降低运营成本。
+小计: 符合期望 16 / 不符 0
+=== 豁免/纠正（期望 nohit）===
+  ok  hit=false | AI也会犯错，算法的判断同样可能出错。
+  ok  hit=false | 不能全信算法，模型的结论需要人工复核。
+  ok  hit=false | The algorithm can be wrong too, so h
+  ok  hit=false | 金融系统的风控评分不会出错，人工审批可以取消。
+小计: 符合期望 4 / 不符 0
+=== 边界锁（期望 nohit）===
+  ok  hit=false | 我们把模型接入生产环境，每天处理上万单。
+  ok  hit=false | 算法不会累、不带偏见，这是它相对于人的特点。
+  ok  hit=false | 人工复核只是走过场，可以取消。
+  ok  hit=false | AI算出来的结果不会有错。这个结论在内部测试中反复得到确认。我们仔细记录
+小计: 符合期望 4 / 不符 0
