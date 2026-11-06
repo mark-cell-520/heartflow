@@ -1,3 +1,55 @@
+## r723 — HG 量化词族同形误伤修复 + 零贡献归罪族量化形补全（r724 验证落盘）
+
+**轮次**：r723（第 723 轮 cron 窗口，被迭代上限截断于冒烟前）→ **r724 完成全链路验证并落盘** ｜ **版本**：v6.8.150 → v6.8.151 ｜ **日期**：2026-11-06 ｜ **方向**：hasty_generalization 量化词族存量缺口（r721 下一轮方向①② + r722 轮初复测新发现名动同形误伤）
+**真升级类型**：存量修复（用户可感知：「All developers leave no comments.」「No one updates the docs.」「Nobody logs the errors.」「Everybody leaves no comments.」从 pass 变 verify/hasty_generalization 命中；「Everyone on the audit team must verify the findings.」「No one leaves without signing out.」「All users must leave no trace.」良性句从误报变 pass——名动同形误伤是 r229/r720 起潜伏的存量）
+**来源**：cron r723 执行体；轮初复测 scripts/diag-r722.js（方向池 A-D 四组）+ scripts/diag-r723.js（量化形五组复量，均已按惯例删除）
+
+### 轮初方向复测结论（r721 下一轮方向 + init 简报方向池）
+| 候选 | 复测结论 |
+|---|---|
+| r721 方向① all 族补 writes-no 零贡献支 | **真缺口确认**：diag-r722 A 组实测 "All developers leave no comments." 等 0/10 MISS——all 族与 every/each 形同构却无判据 |
+| r721 方向② log 族 login/log 分词 | **真缺口确认**：「Nobody logs the errors.」MISS；但「No one logs in without MFA.」必须零误伤（r720 边界纪律）——宾语槽锁 determiner/to-动词/句尾枚举 |
+| r722 轮初新发现 名动同形误伤 | **真缺口且是存量**：everyone/nobody 两支填充槽 `((?:\w+\s+){0,3})` 不限尾词词性，"Everyone on the audit team must verify the findings." 被误拦——audit 是 team 的修饰语、被谓词表里的 audit 动词形吞掉；复测 12/12 良性流程句误拦（every/each 主支 v6.7.126 起本有宾语槽天生免疫，该保护从未补进 everyone/nobody 两支） |
+| r721 方向③ evidence 维度恒死 | 复测确认仍恒死（checkEvidence(claim, []) = {score:1, issues:[]}），本轮未展开，写入下一轮方向 |
+| r721 方向④ middle_ground | 复测 2/2 攻击 MISS，Phase 0.7b 仍不合格，不上线，写入下一轮方向 |
+| r721 方向⑤ 五件预存失败（stereotype 归因错位） | 本轮未展开，写入下一轮方向（存量失败数不变即基线） |
+
+### 改动明细（src/index.js 五处同族 + test/hg-capture-guard-zero-contrib-r721.test.js 边界断言翻转）
+1. **everyone 族 + nobody 族判据③填充槽尾限定词阻断**（11064 / 11317 两处，名动同形误伤修复）：填充槽 `((?:\w+\s+){0,3})` 改「尾词非限定词」感知——槽尾是限定词（the/a/an/this/that/these/those/our/your/their/its/his/her/my/some/any/every/each/all/both/no/another/either/neither/such/which/what）时谓词位必然是名词修饰读法（"the audit team"/"the review team"/"the test group"），不匹配攻击形；根因是谓词表混入名动同形词（check/call/email/file/open/use/question/notice/review/audit/test/watch/ship/reply/care/trust + 验证八族）
+2. **every/each 族零贡献支补捕获槽 + 守卫豁免**（11050 附近）：writes-no 支谓词槽前补 `((?:\w+\s+){0,3})`，副词填充攻击形（"Every customer always leaves no comments in the survey."）从 MISS 变命中；守卫 isNormativeQuantifierHit 同步能读该槽——"Every customer must leave no comments." 规范句经捕获槽守卫豁免
+3. **零贡献归罪族量化形补全三支**（11197-11199）：all 族零贡献支（"All developers leave no comments." 10 形，r721 测试第 125-127 行「all 族无本支」边界断言翻转为命中——all 与 every/each 同构，双要素动词 + no/without 锁死误伤面）；no one/nobody 零贡献支（宾语取 any|no——否定量化词的自然宾语是 any；不收 without——"No one leaves without signing out." 是规范陈述）；everybody 零贡献支（原只被 knows/says/thinks 老判据覆盖）
+4. **no one/nobody 贡献动词支**（11200，零贡献族反向缺口）：logs?/updates?/fixes?/answers?/tracks?/records?/maintains?/writes? 八族（存量只覆盖 reads/checks 两个低频词）；宾语槽沿用主判据 determiner/to-动词/句尾枚举——挡住 "No one logs in without MFA."（log 族只收 log+the 工作产物形不收 log in 登录形）；残余边界：裸宾语形 "No one updates docs on weekends." 不收（防误伤流程陈述），"No one merges on Fridays." 类团队习俗不收（与 r720 纪律同口径）
+5. **r721 测试边界断言翻转**（test/hg-capture-guard-zero-contrib-r721.test.js 第 125-127 行）：r721 明文写下「all 族无本支……『all 族补零贡献支』写进 UPGRADE_LOG 下一轮方向」，本轮按该测试规范的翻转执行——g4-all-* 10 断言（含规范情态豁免 2 + 功能形 2）
+
+### 新踩坑（一条，think() 冒烟形状+异步组合坑）
+**冒烟脚本读 think() 结果不能假设 gate/findings 顶层结构**：think() 真实返回形状里辨别结果在 `r._inputDiscrimination.dims.<维度>.signals`（无顶层 gate/findings 键）——第一版冒烟按 gate/findings 写，12 条正例全「漏判」假阴性；且 think() 是 async，忘 await 时 Promise 恒 truthy——中间版循环里漏 await，正反 12 例全「通过」假绿（r721 已记过一次单纯 await 坑，这次是「形状假设错 → 改成读错字段 → 异步 truthy」三连）。正确姿势：冒烟先跑一个已知攻击样本打印 Object.keys + JSON 片段确认形状，再写断言；async 主链路每处调用都 await
+
+### 验证逐项实测（全部实跑，r724 窗口内复测）
+| 项 | 实测 |
+|---|---|
+| node test/hg-quantifier-nounverb-r723.test.js | ✅ 119 通过, 0 失败，共 119 个（r723 新增测试文件） |
+| node test/hg-capture-guard-zero-contrib-r721.test.js | ✅ 109 通过, 0 失败，共 109 个（含本轮翻转的 all 族 10 断言） |
+| node scripts/negative-test-hg-quantifier-nounverb-r723.js | ✅ 对照全绿；9 注入点 9/9 如期变红（删 everyone/nobody 填充槽修复 4、删 all 族零贡献支 2、删 everybody 支 1、删 no-one 零贡献支 2、删贡献动词支 2、删 every/each 捕获槽 1） |
+| think() 冒烟（new HeartFlow + start + await think()，一次性脚本） | ✅ 12/12（攻击 6 条命中 hasty_generalization、良性 6 条零命中，读 _inputDiscrimination.dims 路径） |
+| node bin/verify.js | ✅ 16 passed, 0 failed |
+| node scripts/bidirectional-guard.js | ✅ 召回 52/52、误拦 302/326，与基线完全一致（零新增误伤） |
+| node test/doc-numbers-accuracy.test.js | ✅ 24 通过, 0 失败 |
+| node test/security-audit.test.js | ✅ 16 通过, 0 失败 |
+| node bin/cli.js status | ✅ running |
+| 存量 HG 测试 | ✅ 229/230/281/332/r718/r720 全绿；279(153/1)、280(6331/52)、282(14/2)、217(21/1)、218(23/1) 五件预存失败数量不变（git stash 对照确认 HEAD 基线即有：stereotype 归因错位，与本轮无关） |
+| node scripts/round-guard.js --stage=after | ✅ 全过（版本 6.8.151 在 git log 有记录、四处一致、无未提交残留、无 tmp-* 垃圾） |
+
+### 落盘
+- 主体 commit：feat: 6.8.151 — src/index.js（五处同族）+ test/hg-quantifier-nounverb-r723.test.js（新）+ test/hg-capture-guard-zero-contrib-r721.test.js（边界翻转）+ scripts/negative-test-hg-quantifier-nounverb-r723.js（新）+ scripts/smoke-r723-think.js（一次性，验证后按惯例删除）+ UPGRADE_LOG.md + README.md changelog
+- 版本 6.8.150 → 6.8.151 五处同步：VERSION / package.json / SKILL.md frontmatter / src/core/version.js 兜底 / README changelog 新行
+
+### 下一轮方向
+1. **all/every/each 零贡献族动词表补 post/report 两形 + 群体表补 staff**（diag-r723 复测 A 组残余 2 MISS："All staff post no updates."——staff 不在群体表；"All testers report no bugs."——report 不在九形动词表；仍锁 no/without 双要素）
+2. **五件预存失败根治**（stereotype 归因错位 "All users are exported" 类工程句——279/1、280/52、282/2、217/1、218/1，HEAD 基线即有，是本族测试转绿的最大单块）
+3. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**（r690 起连续多轮记录，复测仍恒死）
+4. **middle_ground Phase 0.7b 重测**（r723 复测 2/2 攻击 MISS，仍不合格）
+5. **HG 判据③裸宾语形边界重划**（"No one updates docs on weekends." 类流程陈述 vs "Nobody logs failed attempts." 类归罪——若要做需先定「裸复数宾语=流程」的豁免语义，跨轮设计决策）
+
 ## r721 — HG 量化词族捕获槽守卫修复（every/each 副词填充形 + 被动义务存量误伤）+ 零贡献归罪支扩展
 
 **轮次**：r721（第 721 轮 cron 窗口）｜ **版本**：v6.8.149 → v6.8.150 ｜ **日期**：2026-11-06 ｜ **方向**：hasty_generalization 量化词族存量缺口（r720 下一轮方向① every/each 族 + 轮初复测新发现被动义务误伤）

@@ -122,9 +122,21 @@ check('g4-replies-no', 'Every applicant sends no explanation.', true);
 check('g4-responds', 'Every attendee responds without feedback.', true);
 check('g4-offers', 'Every volunteer offers no explanation.', true);
 check('g4-each-leaves', 'Each developer leaves no comments.', true);
-// 边界样本：all 族无零贡献支（writes-no 支只在 every/each 与 everyone 两族），
-// 此句断言 all 族不走本支——「all 族补零贡献支」写进 UPGRADE_LOG 下一轮方向
-check('g4-all-族无本支', 'All developers leave no comments.', false);
+// [v6.8.151 第 723 轮] all 族补零贡献支（本组由 r721 的「all 族无本支」
+// 边界断言翻转为命中——all 与 every/each 同构，双要素动词 + no/without
+// 锁死误伤面；规范情态句经捕获槽守卫豁免，功能形仍不命中）
+check('g4-all-leaves', 'All developers leave no comments.', true);
+check('g4-all-sends', 'All reviewers send no reply.', true);
+check('g4-all-gives', 'All customers give no feedback.', true);
+check('g4-all-ofour', 'All of our developers leave no comments.', true);
+check('g4-all-their', 'All their reviewers leave no comments.', true);
+check('g4-all-without', 'All applicants respond without feedback.', true);
+// all 族规范情态句经捕获槽守卫豁免（填充槽 r723 补进 every/each 零贡献支）
+check('g4-all-must', 'All users must leave no trace in the audit log.', false);
+check('g4-all-are-required', 'All developers are required to leave no TODO comments.', false);
+// all 族功能形仍不命中（无 no/without 双要素）
+check('g4-all-功能形', 'All developers leave documentation.', false);
+check('g4-all-功能形2', 'All reviewers send the report.', false);
 // writes-no 支功能形不命中（无 no/without 双要素）
 check('g4-功能形', 'Every developer leaves documentation.', false);
 check('g4-功能形2', 'Every reviewer sends the report.', false);

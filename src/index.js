@@ -11090,7 +11090,20 @@ const HASTY_GENERALIZATION_PATTERNS = {
     // submitting.」暴露 everyone 族动词表同样缺 validat 族——改后该句经
     // must 填充槽豁免（规范句 pass），"Everyone validates the config
     // before deploying."（无填充槽）命中（攻击 verify）。
-    /\beveryone\s+((?:\w+\s+){0,3})(?:ignores?|refuses?|reads?|wants?|hates?|complains?|complained|skips?|skipped|assumes?|assumed|trusts?|believes?|understands?|expects?|expected(?!\s+to\b)|notices?|noticed|remembers?|cares?|listens?|learns?|questions?|responds?|replies|follows?|followed|uses?|used|opens?|opened|files?|filed|calls?|called|emails?|emailed|checks?|tried|trying|ships?|shipped|verif(?:y|ies|ied|ying)|validat(?:e|es|ed|ing)|confirm(?:s|ed|ing)?|review(?:s|ed|ing)?|audit(?:s|ed|ing)?|test(?:s|ed|ing)?|double[- ]?check(?:s|ed|ing)?|approv(?:e|es|ed|ing)|watch(?:es|ed|ing)?)\b/i,
+    // [v6.8.151 第 723 轮] 填充槽尾限定词阻断（名动同形误伤修复，存量自
+    // r229/r720 起潜伏）：轮初复测（scripts/diag-r723-nounverb.js）实测
+    // 12/12 良性流程句被误拦——"Everyone on the audit team must verify the
+    // findings." match="Everyone on the audit"（audit 是 team 的修饰语，
+    // 被谓词表里的 audit 动词形吞掉）。根因：填充槽 0-3 词内谓词位点可落
+    // 在任意词上，而谓词表混入大量名动同形词（check/call/email/file/open/
+    // use/question/notice/review/audit/test/watch/ship/reply/care/trust +
+    // 验证八族），限定词后接动词在英语里不成立——「槽尾是限定词 + 名动同形
+    // 词」必然是该词的名词修饰读法。修法：填充槽改「尾词非限定词」感知，
+    // 槽为空（"Everyone audits the reports."）或槽尾是情态词/PP 尾名词
+    // （"Everyone on the team ignores the docs."）照常命中，槽尾是限定词
+    // （"on the audit team"）时阻断。every/each 主支（v6.7.126 起）本就有
+    // 宾语槽所以天生免疫，本修法把该保护补进 everyone/nobody 两支。
+    /\beveryone\s+((?:(?:\w+\s+){0,2}(?!(?:the|a|an|this|that|these|those|our|your|their|its|his|her|my|some|any|another|either|neither|such|which|what|no|every|each|all|both)\s)\w+\s+)?)(?:ignores?|refuses?|reads?|wants?|hates?|complains?|complained|skips?|skipped|assumes?|assumed|trusts?|believes?|understands?|expects?|expected(?!\s+to\b)|notices?|noticed|remembers?|cares?|listens?|learns?|questions?|responds?|replies|follows?|followed|uses?|used|opens?|opened|files?|filed|calls?|called|emails?|emailed|checks?|tried|trying|ships?|shipped|verif(?:y|ies|ied|ying)|validat(?:e|es|ed|ing)|confirm(?:s|ed|ing)?|review(?:s|ed|ing)?|audit(?:s|ed|ing)?|test(?:s|ed|ing)?|double[- ]?check(?:s|ed|ing)?|approv(?:e|es|ed|ing)|watch(?:es|ed|ing)?)\b/i,
     // [v6.8.150 第 721 轮] everyone 族 writes-no 同型窄支（对齐 every/each
     // 族本轮扩展）：零贡献归罪泛人称形 "Everyone leaves no comments." /
     // "Everyone sends no reply." / "Everyone gives no feedback." 轮初复测
@@ -11159,7 +11172,44 @@ const HASTY_GENERALIZATION_PATTERNS = {
     // 补 accountants?（原支群体表短一截，漏了主判据 r229-r231 轮补的词）。
     // 误伤面不变：支形态锁死 "动词 + no/without" 双要素，功能句
     // （"Every developer leaves documentation"）无 no/without 不命中。
-    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|accountants?|vendors?|suppliers?|contractors?|consultants?|auditors?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?:writes?|leaves?|sends?|gives?|provides?|posts?|replies|responds?|offers?)\s+(?:no|without)\b/i,
+    // [v6.8.151 第 723 轮] 补捕获槽（与全族对齐）：谓词前设填充槽，
+    //     quantifier-guards.isNormativeQuantifierHit 现在能豁免
+    //     "Every customer must leave no comments." 类规范句（原无槽时守卫
+    //     读不到 must，规范句被误判攻击）。误伤面不变：支形态仍锁死
+    //     "动词 + no/without" 双要素。
+    /\b(?:every|each)(?:\s+\w+){0,2}\s+(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|accountants?|vendors?|suppliers?|contractors?|consultants?|auditors?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+((?:\w+\s+){0,3})(?:writes?|leaves?|sends?|gives?|provides?|posts?|replies|responds?|offers?)\s+(?:no|without)\b/i,
+    // [v6.8.151 第 723 轮] 零贡献归罪族量化形补全（r721 测试规范写明的下轮
+    // 方向，test/hg-capture-guard-zero-contrib-r721.test.js 第 125-127 行）：
+    // 轮初复测（scripts/diag-r723.js）实测三形全缺口——
+    //   A 组 all 族 0/10 MISS（"All developers leave no comments on the PR."
+    //      与 every/each 形同构却无判据）
+    //   B 组 no one/nobody 0/8 MISS（"No one leaves any comments."——否定
+    //      量化词的自然宾语是 any 而非 no，everyone 形不覆盖）
+    //   C 组 everybody 0/3 MISS（everybody 只被 knows/says/thinks 老判据
+    //      覆盖，零贡献形无支）
+    // 误伤面：三支都锁死「动词 + no/without/any」双要素——功能句
+    //   "All developers leave documentation." / "No one may leave the
+    //   building without signing out." 无该宾语形不命中；规范情态句经
+    //   填充槽守卫豁免（"All users must leave no trace."）。
+    // B 组宾语取 (?:any|no)：no one/nobody 后接 any 是自然形，接 no 是双重
+    //   否定（攻击方会写），不收 without——"No one leaves without signing
+    //   out." 是规范陈述（r720 边界纪律同口径）。
+    /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|accountants?|vendors?|suppliers?|contractors?|consultants?|auditors?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+((?:\w+\s+){0,3})(?:writes?|leaves?|sends?|gives?|provides?|posts?|replies|responds?|offers?)\s+(?:no|without)\b/i,
+    /\beverybody\s+((?:\w+\s+){0,3})(?:writes?|leaves?|sends?|gives?|provides?|posts?|replies|responds?|offers?)\s+(?:no|without)\b/i,
+    /\b(?:no\s+one|nobody)\s+((?:\w+\s+){0,3})(?:writes?|leaves?|sends?|gives?|provides?|posts?|replies|responds?|offers?)\s+(?:any|no)\b/i,
+    // [v6.8.151 第 723 轮] no one/nobody + 贡献动词支（零贡献族反向缺口）：
+    //     "No one updates the docs." / "Nobody logs the errors." / "No one
+    //     fixes the bug." ——轮初实测 5/7 MISS（存量只覆盖 reads/checks 两个
+    //     低频贡献动词，updates/logs/fixes/answers/tracks/records/maintains/
+    //     writes 八族全缺）。宾语槽沿用主判据 every/each 形 determiner/to-
+    //     动词/句尾 枚举——挡住 "No one logs in without MFA."（r720 边界
+    //     纪律：log 族只收 log+the 工作产物形，不收 log in 登录形）；填充
+    //     槽同样改尾词非限定词感知，挡 "No one on the log list..." 修饰读法；
+    //     规范情态句经守卫豁免（"No one may update the docs without
+    //     approval."）。残余边界："No one merges on Fridays." 类团队习俗不
+    //     收（与 r720 纪律同口径），裸宾语形 "No one updates docs on
+    //     weekends." 亦不收（宾语槽锁 determiner，防误伤流程陈述）。
+    /\b(?:no\s+one|nobody)\s+((?:(?:\w+\s+){0,2}(?!(?:the|a|an|this|that|these|those|our|your|their|its|his|her|my|some|any|another|either|neither|such|which|what|no|every|each|all|both)\s)\w+\s+)?)(?:logs?|updates?|fixes?|answers?|tracks?|records?|maintains?|writes?)\s+(?:this\b|that\b|these\b|those\b|about\b|me\b|us\b|them\b|him\b|her\b|you\b|without\b|the\b|\.\s*$|a\b|an\b|to\s+(?:pay|support|help|fix|replace|upgrade|renew|wait|talk|share|review|test|deploy|switch|move|change|read|sign|answer|reply|comply|listen|trust|believe|join|leave|stay|go|do|use|try|buy|cancel|opt|agree|accept))/i,
     // [v6.7.126 第 230 轮四版] asked the same ... 末位零宾语窄支。
     //    坑与 229 轮 ②' 完全同形：谓词槽吃掉 "asked the same question" 后
     //    句末无成分可匹配宾语槽。拆窄支，宾语处改枚举（question/quibble/
@@ -11314,7 +11364,14 @@ const HASTY_GENERALIZATION_PATTERNS = {
     //      should confirm 三形经守卫豁免 pass；攻击形 verifies / validates /
     //      confirms / reviews / double-checks / validated / validating 七形
     //      全部命中。
-    /\b(?:nobody|no\s+one)\s+((?:\w+\s+){0,3})(?:reads?|wants?|hates?|ignores?|refuses?|questions?|asks?|asked|cares?|bothered|checking|verif(?:y|ies|ied|ying)|validat(?:e|es|ed|ing)|confirm(?:s|ed|ing)?|review(?:s|ed|ing)?|audit(?:s|ed|ing)?|test(?:s|ed|ing)?|double[- ]?check(?:s|ed|ing)?|approv(?:e|es|ed|ing)|watch(?:es|ed|ing)?|bother|question|responds?|replies|understands?|learns?|complains?|complained|listens?|trusts?|believes?|knows?|mentioned|mention|tried|trying|notices?|noticed|remembers?|skips?|skipped|ships?|shipped|expects?|expected(?!\s+to\b)|calls?|called|emails?|emailed|files?|filed|opens?|opened|uses?|used|follows?|followed|checks?)\b/i,
+    // [v6.8.151 第 723 轮] 同 everyone 族填充槽尾限定词阻断：轮初复测
+    // "Nobody on the review team reads the docs." / "No one on the audit
+    // team verified the results." / "Nobody in the test group completed the
+    // survey." 三条误拦（review/audit/test 是团队名的修饰语）。动词读法
+    // 全部保住："Nobody is validating user input."（槽尾 is）、"Nobody
+    // on the team questions the design."（槽尾 team）、"Nobody ever asked
+    // for logs."（槽尾 ever）均照常命中。
+    /\b(?:nobody|no\s+one)\s+((?:(?:\w+\s+){0,2}(?!(?:the|a|an|this|that|these|those|our|your|their|its|his|her|my|some|any|another|either|neither|such|which|what|no|every|each|all|both)\s)\w+\s+)?)(?:reads?|wants?|hates?|ignores?|refuses?|questions?|asks?|asked|cares?|bothered|checking|verif(?:y|ies|ied|ying)|validat(?:e|es|ed|ing)|confirm(?:s|ed|ing)?|review(?:s|ed|ing)?|audit(?:s|ed|ing)?|test(?:s|ed|ing)?|double[- ]?check(?:s|ed|ing)?|approv(?:e|es|ed|ing)|watch(?:es|ed|ing)?|bother|question|responds?|replies|understands?|learns?|complains?|complained|listens?|trusts?|believes?|knows?|mentioned|mention|tried|trying|notices?|noticed|remembers?|skips?|skipped|ships?|shipped|expects?|expected(?!\s+to\b)|calls?|called|emails?|emailed|files?|filed|opens?|opened|uses?|used|follows?|followed|checks?)\b/i,
   ]
 };
 
