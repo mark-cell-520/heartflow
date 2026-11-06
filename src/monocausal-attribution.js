@@ -222,8 +222,17 @@ const NEGATED_MULTI_ZH = [
 /* ── 主判定 ───────────────────────────────────────────────────── */
 
 function detectMonocausal(text) {
+  // 引擎约定（同 incredulity.js 等维度）：无命中/异常输入一律返回
+  // { hit:false, score:0 } 安全对象，绝不可返回 null——index.js:2711
+  // 判定点直接读 .score，null 会让整条 pipeline 抛 "Cannot read
+  // properties of null"。[r230 修复] 原顶部 `if (!sentences.length)
+  // return null;` 是 r220 接线遗漏：splitSentences 对 null/undefined/
+  // ''/纯标点输入返回空数组 → null → 判定点崩溃。实测 bad-faith-en-r226、
+  // dangerous-instruction-pat4-gap-round205 等多个测试文件因此
+  // Command failed（非本轮引入，HEAD a896a5d 已存在）。
+  if (!text || typeof text !== 'string') return { hit: false, score: 0, detail: '', count: 0 };
   const sentences = splitSentences(text);
-  if (!sentences.length) return null;
+  if (!sentences.length) return { hit: false, score: 0, detail: '', count: 0 };
 
   const l1 = [];
   const l2 = [];

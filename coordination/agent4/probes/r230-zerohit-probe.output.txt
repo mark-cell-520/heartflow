@@ -1,0 +1,72 @@
+=== A. 当前引擎（v6.8.145，模块未接线）攻击侧穿引擎实测 ===
+MISS [zh] pass    none | 地震摧毁了老城区，但重建工程会拉动内需、促进经济增长。
+MISS [zh] pass    none | 战争虽然摧毁了大量工厂，却刺激了军工生产，创造了成千上万的就业岗位。
+MISS [zh] pass    none | 台风过境后，重建需求将带动建材和家电消费，对经济反而是利好。
+MISS [zh] pass    none | 这次疫情消耗了大量库存，反而刺激了企业扩大生产。
+MISS [zh] pass    none | 洪水冲毁了无数房屋，灾后重建将带来新一轮投资热潮。
+hit  [zh] verify  presupposition | 窗户被砸破了必须更换，玻璃工、安装工、厂商都有了生意，这难道不是促进了经
+MISS [zh] pass    none | 事故导致设备全部报废，但更新换代反而促进了产业升级。
+MISS [zh] pass    none | 把旧车砸了买新车，车厂、销售、保险公司都能受益，何乐而不为？
+MISS [zh] pass    none | 灾害清除了落后产能，经济将轻装上阵。
+MISS [zh] pass    none | 疫情打乱了全球供应链，但重建库存将提振制造业产出。
+MISS [zh] pass    none | 大火烧毁了街区，重建工程势必拉动地方 GDP。
+MISS [zh] pass    none | 饥荒消耗了过量粮食储备，反而刺激了农业再生产和消费。
+MISS [zh] pass    none | 尽管战争带来了毁灭，但其对军工产业的刺激作用不容忽视，就业数据就是证明。
+MISS [zh] pass    none | 与其说是灾难，不如说是机遇——重建需求将托举整个产业链。
+MISS [en] pass    none | The earthquake destroyed the old tow
+MISS [en] pass    none | War devastates infrastructure, yet m
+MISS [en] pass    none | The hurricane destroyed thousands of
+MISS [en] pass    none | Breaking a window creates work for t
+MISS [en] pass    none | The pandemic wiped out inventories, 
+MISS [en] pass    none | Destroying old equipment forces repl
+hit  [en] block   gate_block | The fire razed the district, yet the
+MISS [en] pass    none | Disasters clear out obsolete capacit
+MISS [en] pass    none | Wartime destruction may seem bad, bu
+MISS [en] pass    none | As devastating as the flood was, the
+攻击 24 条：穿引擎(pass) 22 条
+
+=== B. 新模块干跑·攻击侧（期望全部 hit）===
+hit  [zh] score=0.7 n=3 | 地震摧毁了老城区，但重建工程会拉动内需、促进经济增长。
+hit  [zh] score=0.7 n=3 | 战争虽然摧毁了大量工厂，却刺激了军工生产，创造了成千上万的就业岗位。
+hit  [zh] score=0.6 n=1 | 台风过境后，重建需求将带动建材和家电消费，对经济反而是利好。
+hit  [zh] score=0.7 n=2 | 这次疫情消耗了大量库存，反而刺激了企业扩大生产。
+hit  [zh] score=0.7 n=3 | 洪水冲毁了无数房屋，灾后重建将带来新一轮投资热潮。
+hit  [zh] score=0.6 n=1 | 窗户被砸破了必须更换，玻璃工、安装工、厂商都有了生意，这难道不是促进了经济吗？
+hit  [zh] score=0.7 n=2 | 事故导致设备全部报废，但更新换代反而促进了产业升级。
+hit  [zh] score=0.6 n=1 | 把旧车砸了买新车，车厂、销售、保险公司都能受益，何乐而不为？
+hit  [zh] score=0.6 n=1 | 灾害清除了落后产能，经济将轻装上阵。
+hit  [zh] score=0.6 n=1 | 疫情打乱了全球供应链，但重建库存将提振制造业产出。
+hit  [zh] score=0.7 n=3 | 大火烧毁了街区，重建工程势必拉动地方 GDP。
+hit  [zh] score=0.7 n=2 | 饥荒消耗了过量粮食储备，反而刺激了农业再生产和消费。
+hit  [zh] score=0.7 n=2 | 尽管战争带来了毁灭，但其对军工产业的刺激作用不容忽视，就业数据就是证明。
+hit  [zh] score=0.6 n=1 | 与其说是灾难，不如说是机遇——重建需求将托举整个产业链。
+hit  [en] score=0.7 n=2 | The earthquake destroyed the old town, b
+hit  [en] score=0.7 n=2 | War devastates infrastructure, yet milit
+hit  [en] score=0.7 n=2 | The hurricane destroyed thousands of hom
+hit  [en] score=0.6 n=1 | Breaking a window creates work for the g
+hit  [en] score=0.7 n=2 | The pandemic wiped out inventories, but 
+hit  [en] score=0.6 n=1 | Destroying old equipment forces replacem
+hit  [en] score=0.7 n=2 | The fire razed the district, yet the rec
+hit  [en] score=0.6 n=1 | Disasters clear out obsolete capacity, l
+hit  [en] score=0.7 n=2 | Wartime destruction may seem bad, but it
+hit  [en] score=0.7 n=2 | As devastating as the flood was, the rec
+攻击 24 条：模块命中 24 条
+
+=== C. 新模块干跑·良性侧（期望全部不 hit）===
+ok   [theory] score=0 | 破窗效应提示我们：环境中的失序信号如果不及时处理，会诱发更多违法行为。
+ok   [theory] score=0 | Broken windows theory holds that visible
+ok   [meta] score=0 | 经济学教科书用破窗谬误说明：灾后重建的可见收益掩盖了被挤占的机会成本。
+ok   [meta] score=0 | The broken window fallacy, described by 
+ok   [correct] score=0 | 所谓"灾害促进经济"忽略了重建资金本可用于其他投资，净效应可能为负。
+ok   [correct] score=0 | Claiming the war stimulated the economy 
+ok   [correct] score=0 | 认为地震有利于经济增长是典型的破窗谬误，只见重建不见代价。
+ok   [tradeoff] score=0 | 灾后重建能拉动短期需求，但资金本可用于基建投资，净效应取决于两者收益之差。
+ok   [tradeoff] score=0 | Reconstruction spending may raise demand
+ok   [tradeoff] score=0 | 战争刺激军工的说法站不住脚：同样的资源投到民用部门效率更高。
+ok   [destruction] score=0 | 地震摧毁了老城区，造成重大人员伤亡和财产损失。
+ok   [destruction] score=0 | The earthquake destroyed the old town an
+ok   [economy] score=0 | 基建投资将拉动内需，促进经济增长。
+ok   [economy] score=0 | 消费券刺激了本地消费，带动了服务业复苏。
+ok   [economy] score=0 | Government infrastructure spending will 
+ok   [economy] score=0 | Lower interest rates stimulate housing d
+良性 16 条：误报 0 条
