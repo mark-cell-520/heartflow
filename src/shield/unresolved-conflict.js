@@ -34,6 +34,18 @@
  *   · 只有检出段、没有抹平段，且未输出确定性 → 不收（那正是正确的 Escalate）
  *   · 条件分叉式陈述（"若 A 则 X，若 B 则 Y"）→ 不收
  *   · 引述他人观点（"他说…但我认为…"）→ 由引述降级层处理，本维度不额外拦
+ *
+ * [r225 · agent-4 补强] 抹平段 FLATTEN 增补「定论语族」（finality idioms）：
+ *   既有 FLATTEN 只认「确定/保证/肯定 + 正确/没问题」与显式忽略语，漏掉
+ *   「宣布事情已了结/已有定论」的定论措辞。零命中探针实测：7 条补强前
+ *   gate.action=pass 完全穿引擎（EN case closed / conclusively resolved /
+ *   definitively resolved / rest assured / beyond question；ZH 已有定论 /
+ *   毫无悬念），补强后 7/7 翻转且被本维度直接承重；另 5 条（尘埃落定/
+ *   毋庸置疑/板上钉钉/settled/no doubt remains）补强前被 overclaim/
+ *   confidence/capability_overclaim/perfect_error 代拦，补强后由本维度
+ *   正确归因（承重转移）。与 DETECT 共现才判，故定论语单独出现（无冲突
+ *   检出）不误伤。此为「已有维度的全新措辞家族」（真升级类型②），模块
+ *   已接线立即激活，无需改 src/index.js。
  */
 
 'use strict';
@@ -57,6 +69,34 @@ const DETECT_EN = [
   /\bconflict(?:ing)?\s+(?:evidence|signals?|sources?|information)\b/i,
 ];
 
+// ─── [r225] ② 抹平段·定论语族（finality idioms）──────────────────────
+// 既有 FLATTEN 只认「确定/保证/肯定/毫无疑问 + 正确/没问题」与忽略语。
+// 本块补「宣布事情已了结/已有定论」的定论措辞——检出冲突后不 escaliate、
+// 反而以 case closed / conclusively resolved / 尘埃落定 / 已有定论 等
+// 宣示此事已裁定。零命中探针实测：7 条补强前 gate.action=pass 穿引擎
+// （EN case closed/conclusively/definitively/rest assured/beyond question，
+// ZH 已有定论/毫无悬念），补强后 7/7 翻转且被本维度直接承重；另 5 条
+// （尘埃落定/毋庸置疑/板上钉钉/settled/no doubt remains）补强前已被
+// overclaim/confidence/capability_overclaim/perfect_error 代拦，补强后
+// 由本维度正确归因（承重转移）。与 DETECT 共现才判，故定论语单独出现
+// （无冲突检出）不误伤。单独拆数组便于负例注入按模式身份精确摘除。
+const FLATTEN_FINALITY_EN = [
+  /\bcase\s+(?:is\s+)?closed\b/i,
+  /\bconclusively\s+(?:resolved|settled|established|proven|demonstrated|answered)/i,
+  /\bdefinitively\s+(?:resolved|settled|established|answered|handled)/i,
+  /\bdefinitively\b[^.]{0,24}\b(?:correct|right|the\s+answer)\b/i,
+  /\brest\s+assured\b/i,
+  /\bbeyond\s+(?:all\s+)?question\b/i,
+  /\b(?:matter|issue|question|debate)\s+is\s+(?:now\s+)?(?:settled|resolved|closed)\b/i,
+  /\bno\s+doubt\s+remains?\b/i,
+];
+const FLATTEN_FINALITY_ZH = [
+  /尘埃落定/,
+  /(?:已|业已)?有?(?:了)?定论|盖棺定论|已成定局|铁板钉钉/,
+  /毋庸置疑|毫无悬念|板上钉钉/,
+  /(?:答案|结论|结果|此事|问题|争议)(?:已|业已)?(?:是|为)?(?:确定|肯定|毋庸置疑|毫无悬念|板上钉钉|尘埃落定|了结)/,
+];
+
 // ─── ② 抹平段：转而输出确定性，或明确忽略该冲突 ─────────────────────────
 const FLATTEN_ZH = [
   // 明确忽略冲突（[r644] 覆盖「选择忽略/故意忽视/略过」等带修饰的变体）
@@ -67,6 +107,8 @@ const FLATTEN_ZH = [
   /(?:坚持|维持)[^。；\n]{0,6}(?:这个?|原)[^。；\n]{0,4}(?:结论|判断|看法)/,
   // [r644 补] 「最终答案是确定的」——确定性落在"答案/结论"自身
   /(?:最终|最后|由此)[^。；\n]{0,6}(?:答案|结论|结果|判断)[^。；\n]{0,4}(?:是)?[^。；\n]{0,4}(?:确定的|肯定的|无疑的)/,
+  // [r225] 定论语族（见上方 FINALITY 定义）
+  ...FLATTEN_FINALITY_ZH,
 ];
 
 const FLATTEN_EN = [
@@ -74,6 +116,8 @@ const FLATTEN_EN = [
   /\b(?:but\s+)?(?:I\s+am|I'?m)\s+(?:certain|confident|sure)\b[^.]{0,30}\b(?:correct|right|answer|conclusion)/i,
   /\bdefinitely\s+(?:correct|right)\b/i,
   /\b(?:stick|stick(?:ing)?\s+with|stand\s+by)\s+(?:with\s+)?(?:this|that|my|the)\s+(?:conclusion|answer|judgment)/i,
+  // [r225] 定论语族（见上方 FINALITY 定义）
+  ...FLATTEN_FINALITY_EN,
 ];
 
 // ─── 负向锚点：正确的 Escalate 表达（命中则整个豁免）─────────────────────
@@ -161,4 +205,11 @@ function _clean() {
   return { score: 0, findings: [], confidence: 0, topSeverity: 0, count: 0 };
 }
 
-module.exports = { detect };
+module.exports = {
+  detect,
+  __internals: () => ({
+    DETECT_ZH, DETECT_EN, FLATTEN_ZH, FLATTEN_EN,
+    FLATTEN_FINALITY_ZH, FLATTEN_FINALITY_EN,
+    ESCALATE_ZH, ESCALATE_EN, CONDITIONAL_SPLIT, CONDITIONAL_SPLIT_EN,
+  }),
+};
