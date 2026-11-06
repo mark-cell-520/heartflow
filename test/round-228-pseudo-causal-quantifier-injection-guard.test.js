@@ -53,7 +53,12 @@ const ANCHOR_QUANT = '[盒支片粒颗个瓶包袋剂味碗杯]';               
 const ANCHOR_QUANT_OLD = '[个瓶包袋剂味碗杯]';                            // r227 旧量词类（不许再出现）
 const ANCHOR_OPT_QUANT = '(?:[盒支片粒颗个瓶包袋剂味碗杯][^。]{0,4})?';        // 注射臂量词可选组
 const ANCHOR_INJECT = '(?:注射液|针剂|药剂|针)[^。]{0,4}打(?:下)?(?:去)?';  // 注射臂
-const ANCHOR_DRUGMECH_NEW = '|降压药|降糖药|安眠药|止咳药|止泻药|肠胃药|胃药|抗过敏|救心丸|蒙脱石|奥司他韦|阿奇霉素|红霉素|左氧氟沙星)';
+// [v6.8.158 第 230 轮] 锚点去掉收尾 `)`：原写法把正则的闭合括号也编进锚点，
+// 任何后续往 PC_DRUG_MECH_ZH **尾部**追加词的轮次都会让锚点静默失配
+// （r230 追加 10 个证据词后就撞上了，D5/F 两处报「锚点不唯一 0 !== 1」）。
+// 与 r229 踩坑④ 同族：**锚点不能依赖语句结尾**。去掉 `)` 后锚点仍唯一
+// （实测 src/index.js 中该串只出现 1 次），变异由「整段换成 `)`」改为「整段删空」。
+const ANCHOR_DRUGMECH_NEW = '|降压药|降糖药|安眠药|止咳药|止泻药|肠胃药|胃药|抗过敏|救心丸|蒙脱石|奥司他韦|阿奇霉素|红霉素|左氧氟沙星';
 const ANCHOR_INVTAKE = 'const PC_INVTAKE_ZH = /(?:';
 const ANCHOR_DRUGMECH = 'const PC_DRUG_MECH_ZH = /(?:';
 const ANCHOR_IV_CALL = 'const iv = causalInvertedTakeZh(text);';
@@ -353,12 +358,17 @@ test('D5 变异守卫五：摘掉豁免表新增点名药类族后「这片降�
     const orig = fs.readFileSync(src, 'utf8');
     assert.strictEqual(orig.split(ANCHOR_DRUGMECH_NEW).length - 1, 1, '豁免表新族锚点不唯一');
     assert.strictEqual(orig.split(ANCHOR_DRUGMECH).length - 1, 1, 'PC_DRUG_MECH_ZH 定义锚点不唯一');
-    const mutated = orig.replace(ANCHOR_DRUGMECH_NEW, ')');
+    const mutated = orig.replace(ANCHOR_DRUGMECH_NEW, '');
     assert.ok(!mutated.includes(ANCHOR_DRUGMECH_NEW), '变异后新族仍在');
     assert.ok(mutated !== orig, '变异未生效');
     fs.writeFileSync(src, mutated, 'utf8');
     const n = countHitsIn(tmp, ['这片降压药吞下去血压就稳了', '这片安眠药吞下去人就睡着了']);
-    assert.strictEqual(n, 1, `摘掉新族后「这片降压药」应重新被误命中（安眠药句乙半无消退词，仍 0），实测 ${n}/1`);
+    // [v6.8.158 第 230 轮] 期望值 1 → **2**：原断言注释写「安眠药句乙半无消退词，
+    // 仍 0」——r230 给乙半表 PC_TAKE_RES_ZH 补了睡眠臂（`睡[着了]` 等），
+    // 「人就睡着了」现在是合法乙半结果词。本变异把整段 14 词（含安眠药）从护栏里
+    // 摘掉，于是降压药句与安眠药句**同时**重新被误命中。这不是回归，是 r230
+    // 扩面的必然结果：护栏摘得越干净，被放行的未点名句越多。
+    assert.strictEqual(n, 2, `摘掉新族后降压药句与安眠药句都应重新被误命中，实测 ${n}/2`);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
