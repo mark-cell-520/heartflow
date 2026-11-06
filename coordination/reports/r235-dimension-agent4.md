@@ -74,5 +74,6 @@ node scripts/bidirectional-guard.js → 召回=52/52 误拦=301/326
 
 ## 六、commit
 
-- `git rev-parse --short HEAD`：见推送后实测
-- push 状态：见本节尾部实测
+- `git rev-parse --short HEAD`：**3c0c9f6**（r235 共 5 个 commit：01e4920 claim+探针+扫描证据 → 5bae551 模块+测试 → ff5d221 runall 实测输出 → d7af589 报告（reports/ 在 .gitignore，force-add）+release claim → 3c0c9f6 claims completed）
+- push 状态：**已推送**（fc94ebb..3c0c9f6，`git ls-remote` 独立校验 HEAD == heartflow/main）
+- 真升级自检（`git log --pretty=%s -8`）：近 8 条全部为 dimension 轮次 commit，`feat` 语义的维度生产主导；VERSION 6.8.145 未 bump（模块未接线，递增留 1 号）。
