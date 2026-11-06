@@ -1,0 +1,433 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/mgGYAjj450TIIACLW7eODED/C9E</id>
+  <title>arXiv Query: search_query=all:broken OR all:window OR all:fallacy OR all:economic OR all:reasoning OR all:fallacy OR all:detection&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-06T09:51:28Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:broken+OR+(all:window+OR+(all:fallacy+OR+(all:economic+OR+(all:reasoning+OR+(all:fallacy+OR+all:detection)))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>443020</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08485v1</id>
+    <title>Where and Why is Grounded Reasoning Useful?</title>
+    <updated>2026-11-05T18:59:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.08485v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08485v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Grounded reasoning, where a model outputs text coordinates of relevant locations in chain-of-thought reasoning, is a common strategy for solving complex visual reasoning problems. However, the benefits and limitations of grounded reasoning are understudied. We study where and why grounded reasoning is most useful. To do so, we introduce a chain-of-thought analysis method to measure how much a model uses its outputted grounding in its thinking trace and perform a detailed ablation study of a grounded reasoning training recipe. We find that grounded reasoning improves counting but shows no significant gain over baselines without coordinate grounding across a wide range of spatial reasoning and perception benchmarks. Using several synthetic tasks, we show that grounded reasoning is most useful when a task requires undescribable references, which are visual concepts that are difficult to describe in language. However, we observe that many existing visual reasoning benchmarks are solvable with only describable text references. To close this gap, we introduce BrickVision, a new benchmark that requires undescribable visual references to solve.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:32Z</published>
+    <arxiv:comment>Project page: https://elorian.ai/blog/why-grounding</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>David Yan</name>
+    </author>
+    <author>
+      <name>Le Xue</name>
+    </author>
+    <author>
+      <name>Forrest Huang</name>
+    </author>
+    <author>
+      <name>Qiuyi Zhang</name>
+    </author>
+    <author>
+      <name>Dustin Tran</name>
+    </author>
+    <author>
+      <name>Andrew M. Dai</name>
+    </author>
+    <author>
+      <name>Yinfei Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08483v1</id>
+    <title>SwarmEvolve: Latent Agent Swarms for Evolutionary Discovery and Optimization</title>
+    <updated>2026-11-05T18:59:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.08483v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08483v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM-guided evolutionary search uses AI agents to improve programs for mathematical and computational problems by iteratively refining solutions and combining high-scoring methods. However, the process is often slow because the LLM generates a long textual chain of thought for each round and must repeat this generation many times to maintain population diversity. We present SwarmEvolve, a framework in which hundreds of low-cost agents per round work in swarms, reason in latent space without decoding to text, and share information by passing KV caches. Each swarm studies the problem from a different angle. A novelty filter keeps the most distinct agent ideas by directly measuring the distances between the agents' hidden state vectors. Crossover of ideas happens naturally in latent space, as a summarizer agent receives the combined KV caches of all swarm members. On 21 problems in mathematical discovery and scientific computing, SwarmEvolve gets the highest average score and needs a median of only 3 to 8 minutes to reach the best scores that other state-of-the-art frameworks reach in 60 minutes. On several problems, SwarmEvolve with Qwen3 8B improves on the solutions that AlphaEvolve first found with frontier LLMs. Our work shows that agent swarms that communicate in latent space offer a fast, low-cost approach to program search for scientific problems.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:29Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Qile Jiang</name>
+    </author>
+    <author>
+      <name>George Em Karniadakis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08462v1</id>
+    <title>OopsieRecover: Learning Transferable VLA Corrections from Semantic Interventions</title>
+    <updated>2026-11-05T18:53:16Z</updated>
+    <link href="https://arxiv.org/abs/2611.08462v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08462v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action (VLA) models can perform a wide range of robotic manipulation tasks, but often fail during deployment. Teaching them to recover from these failures requires substantial corrective data: existing approaches learn to recover from failures by directly associating corrective actions with the observations in which they were demonstrated. For instance, DAgger-like fine-tuning can require tens to hundreds of interactions, yet the resulting policy may still fail to generalize the learned corrections beyond the demonstrated scenarios. We hypothesize that semantics can capture the underlying reasons for failures and their corrections, enabling policies to learn from only a handful of corrective demonstrations and generalize those corrections to novel objects, and scene variations. We propose OopsieRecover, a framework that uses abduction to infer the intent behind a small set of corrective demonstrations and encodes the inferred knowledge as dense spatial representations and conditional costs. These costs capture when a behavior is undesirable and steer the policy toward more desirable action regions. We experiment across 6 tasks and variations in object poses, scenes, and related tasks, and find that only a handful of corrective demonstrations can enable a VLA to overcome failures across a broad range of novel situations, without requiring new corrective data for each variation. Please refer to https://robin-lab.cs.utexas.edu/oopsierecover for videos.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:53:16Z</published>
+    <arxiv:comment>9 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Arpit Bahety</name>
+    </author>
+    <author>
+      <name>Skand Peri</name>
+    </author>
+    <author>
+      <name>Sriniket Ambatipudi</name>
+    </author>
+    <author>
+      <name>Chen Xu</name>
+    </author>
+    <author>
+      <name>Haruki Nishimura</name>
+    </author>
+    <author>
+      <name>Masha Itkina</name>
+    </author>
+    <author>
+      <name>Roberto Martín-Martín</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08449v1</id>
+    <title>VFlash: Fast, Accurate Visual Planning via Flash Primitive Decoding</title>
+    <updated>2026-11-05T18:44:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.08449v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08449v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Models for physical AI tasks, such as robotics and autonomous driving, need not reason solely in language. They can use visual plans--points, bounding boxes, and trajectories--to represent spatial goals and anticipate motion. However, autoregressive vision-language models generate these plans one coordinate token at a time, making richer predictions increasingly costly. We introduce VFlash, a method for fast, accurate visual planning through Flash Primitive Decoding. VFlash exploits the known structure of visual primitives to predict their coordinates jointly, using a lightweight drafter that generates an entire primitive in one forward pass. The layout adapts to the primitive's type, dimensionality, and length, supporting compact boxes and long, variable-length trajectories. Crucially, spatial accuracy need not require reproducing an autoregressive model's exact token sequence. VFlash therefore trains on annotated primitives and directly accepts structurally valid predictions without target-token agreement. Across the evaluated 2D and 3D robot trajectory tasks, VFlash consistently reduces prediction errors relative to autoregressive decoding. Preliminary single-rollout measurements indicate approximately 25x faster generation for 3D point motion forecasting. A world action model conditioned on VFlash plans achieves 70.2% average success across four MolmoSpaces task suites, compared with 62.6% for the baseline.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:44:43Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Yu-Cheng Chou</name>
+    </author>
+    <author>
+      <name>Shihao Wang</name>
+    </author>
+    <author>
+      <name>Jin Huang</name>
+    </author>
+    <author>
+      <name>Chi-Pin Huang</name>
+    </author>
+    <author>
+      <name>Chiao-An Yang</name>
+    </author>
+    <author>
+      <name>Xianzhe Fan</name>
+    </author>
+    <author>
+      <name>Jing Wang</name>
+    </author>
+    <author>
+      <name>Zhiqi Li</name>
+    </author>
+    <author>
+      <name>Yuanguo Kuang</name>
+    </author>
+    <author>
+      <name>Ruijie Zheng</name>
+    </author>
+    <author>
+      <name>Johan Bjorck</name>
+    </author>
+    <author>
+      <name>Sifei Liu</name>
+    </author>
+    <author>
+      <name>Hang Su</name>
+    </author>
+    <author>
+      <name>Abhishek Badki</name>
+    </author>
+    <author>
+      <name>Lei Zhang</name>
+    </author>
+    <author>
+      <name>Alan Yuille</name>
+    </author>
+    <author>
+      <name>Linxi "Jim'' Fan</name>
+    </author>
+    <author>
+      <name>Jan Kautz</name>
+    </author>
+    <author>
+      <name>Zhiding Yu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08443v1</id>
+    <title>Souffleur: A Glanceable Display for Mobile Voice Conversations</title>
+    <updated>2026-11-05T18:36:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.08443v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08443v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The speech capabilities of mobile devices have grown, but their displays still rely on a text-based chat. When resuming a voice chat after a context switch, the last messages may not convey the key points of the conversation. Autobiographical use and sessions with external participants led to design goals for a mobile-first, speech-driven, glanceable display that helps users continue their reasoning from where they left off. We implement these goals in Souffleur and evaluate it in a between-subjects study with 48 participants. Compared with a conventional chat transcript, we found no reliable difference in how easily participants followed and resumed short voice conversations, nor in effort, attention or recall, although Souffleur reduces the conversation to a few short phrases.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:36:18Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Anton Wolter</name>
+    </author>
+    <author>
+      <name>William Benjamin</name>
+    </author>
+    <author>
+      <name>Niklas Elmqvist</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08441v1</id>
+    <title>Edge-Assisted Crowdsensing for Explainable Cyclist Safety Perception</title>
+    <updated>2026-11-05T18:33:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.08441v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08441v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cyclist fatality rates remain high despite policy support for active travel, and autonomous vehicles add complexity to mixed traffic. Neither crash statistics nor multi-model detection pipelines scale to continuous monitoring of perceived safety along a route. We present an edge-assisted crowdsensing system: handlebar cameras supply street-level frames, a vision-language model (VLM) turns each frame into structured traffic attributes through a single prompt, and an explainable boosting machine (EBM) combines them with OpenStreetMap road infrastructure and on-bike kinematics to predict a crowdsourced 1-9 safety score. Extraction belongs at the network edge: the fastest self-hosted model needs 2.49 s per frame and scoring takes 0.4 ms on a CPU. On 1,362 annotated frames from two London routes, the EBM regressor reaches 72.2 percent binary accuracy and a mean absolute error of 1.011 under five-fold cross-validation. It is within one accuracy point of black-box ensembles. Its per-feature shape functions give exact attribution: physical lane separation is worth +0.97 rating points, a painted lane +0.70 and a construction site -0.65. Planners can therefore price an infrastructure change in rating points, and the results enter cost-benefit analysis directly. We also report inter-annotator agreement (alpha = 0.4695), an attribute audit, and a sensitivity analysis linking attribute error to accuracy. With re-encoding, a 20 s sampling interval serves 1,000 riders at 54 Mbit/s at a cost of 1.4 accuracy points, making continuous monitoring practical.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.IV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:33:58Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hongsen Cao</name>
+    </author>
+    <author>
+      <name>Chia-Yen Chiang</name>
+    </author>
+    <author>
+      <name>Mona Jaber</name>
+    </author>
+    <author>
+      <name>Meihui Wang</name>
+    </author>
+    <author>
+      <name>Yasmin Fathy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08436v1</id>
+    <title>SM4RT: Cascaded Feed-forward Model for 4D Reconstruction</title>
+    <updated>2026-11-05T18:28:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.08436v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08436v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce SM4RT, a multi-task cascade feed-forward model for dynamic scene reconstruction from RGB videos. While existing feed-forward approaches typically address geometry reconstruction and motion estimation separately--and often predict motions in a single coordinate frame that must account for camera movement--SM4RT solves these tasks sequentially by first reconstructing 3D geometry and then bootstrapping motion estimation from the predicted structure. By expressing each pixel's 3D motion in its corresponding camera frame, SM4RT reduces ambiguity arising from camera motion. To address the sparsity of real-world motion labels, SM4RT further incorporates a weakly supervised loss that regularizes unlabeled point motions using labeled point positions at the other time step. We evaluate motion estimation on three dynamic-scene datasets--Kubric, Waymo, and Point Odyssey--and SM4RT achieves the best performance on most metrics compared with prior baselines. We additionally benchmark geometry reconstruction on five dynamic scene datasets and show that SM4RT achieves competitive performance with state-of-the-art methods. Overall, our unified framework demonstrates that combining geometry reconstruction and motion estimation in a cascade not only avoids performance trade-offs but also enhances motion estimation through improved geometric reasoning.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:28:38Z</published>
+    <arxiv:comment>Project page: https://sm4rt-eailab.github.io/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Pang-Chi Lo</name>
+    </author>
+    <author>
+      <name>Jhao-Syun Lai</name>
+    </author>
+    <author>
+      <name>Tsung-Wei Ke</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08431v1</id>
+    <title>Scaffolding GenAI Use in Ethical Essay Writing: A Three-Year Experience Report in Introductory Computing</title>
+    <updated>2026-11-05T18:24:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08431v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08431v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As society, ethics, and professional practice become increasingly integrated across the computer science curriculum, technical courses need practical ways to support ethical reasoning. Ethical essay assignments offer one approach, but little is known about how students use GenAI when writing such essays. This experience report examines GenAI use across three years of ethical essay assignments in a large first-year computer systems course. Across six post-essay surveys from 2024 to 2026, we analyzed 1,894 responses, linked survey data with essay grades in 2025 and 2026, and introduced a scaffolded responsible-use workflow in 2026. Under voluntary-use policies, AI adoption remained steady at around two-thirds of students, rising above 90% when use was scaffolded. Students reported mainly using AI for help with grammar and style, while tool use diversified beyond ChatGPT in 2026. Grade-linked analyses showed that AI use did not independently predict essay quality, while marker evaluations indicated high levels of critical engagement when use was scaffolded. Overall, GenAI's pedagogical value appears to depend on how assessment design guides students to evaluate and critically engage with AI-generated suggestions.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:24:31Z</published>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Asma Shakil</name>
+    </author>
+    <author>
+      <name>Paul Denny</name>
+    </author>
+    <author>
+      <name>Jun Seo</name>
+    </author>
+    <author>
+      <name>Gauravkumar Hirani</name>
+    </author>
+    <author>
+      <name>Sean Longyu Ma</name>
+    </author>
+    <author>
+      <name>Claus Brabrand</name>
+    </author>
+    <arxiv:doi>10.1145/3857222.3860166</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1145/3857222.3860166" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08428v1</id>
+    <title>The Power of Meta Access in the Software of the Future --- Demonstrated on LLM Chat UIs and Chat AI</title>
+    <updated>2026-11-05T18:22:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08428v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08428v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Chat remains the default surface for many large language model (LLM) tasks, even as agentic tools such as OpenCode excel at coding and automation. Yet the model sees the current dialogue but not the workspace around it. We explore meta access---giving the assistant a structured, permissioned view of the interface itself and propose a ladder of levels: feature tutoring; metadata, settings, and preference access; retrieval over summaries and messages, confirmed mutation, and full orchestration. Meta access can turn a chat client from many screens into one entry point for finding, navigating, organising, and operating it, while raising risks around grounding, privacy, prompt injection, and trust. General-purpose agentic harnesses are runtimes; because they can change their own settings, meta access becomes reflexive and needs a separate control-plane boundary. We ground this in the Meta Chat prototype of the Chat AI client. It builds bounded context from, e.g., summaries, settings, and relevant messages; links references to conversations, topics, and personas; supports confirmed, reversible changes; offers a browsable tutorial library; and recommends personas as user-started conversations. By exposing application state in structured form, meta access can extend screen readers from widget descriptions to semantic workspace operations. Meta access thus turns chat from a window onto one conversation into a control layer for the whole workspace, extending chat toward agentic capability without surrendering user control. As assistants become embedded in IDEs, dashboards, office suites, and operating systems, AI-era interfaces should expose a structured, permissioned model of their state and capabilities, ideally by opening their existing metamodels through a debugger-like interface.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:22:24Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Julian Kunkel</name>
+    </author>
+    <author>
+      <name>Ali Doosthosseini</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08425v1</id>
+    <title>Failure Prediction and Classification in Vision-Language-Action Models Via Calibrated Latent Probing</title>
+    <updated>2026-11-05T18:21:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.08425v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08425v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action models (VLAs) enable general-purpose embodied intelligence, but their performance is brittle under distribution shift, where unanticipated failures can damage equipment or endanger people. Deploying VLAs in real-world systems therefore requires a runtime monitor that is timely, calibrated, and informative while being efficient enough to run on the edge. Existing methods fail to fulfill these requirements. We present VLA-Tug, a lightweight probe over the latent layers of a VLA backbone that improves early failure detection and bounds the missed-detection and false-alarm rates, with minimal inference overhead. We show that supervising on the pre-failure segment of a trajectory increases early failure detection at matched false-positive rates by up to 30% over the strongest learned baseline. Under shift to unseen tasks, the bounds on missed-detection and false-alarm rates remain valid in up to 86% of runs, versus at most 21% for baselines. Unlike existing methods, VLA-Tug predicts the failure mode to enable corrective actions, raising top-3 accuracy on unseen tasks by up to 44% over a majority baseline. VLA-Tug enables real-time monitoring where the well-timed and informative probe supports lightweight steering that improves task success. We release a dataset of 3,180 annotated manipulation episodes to support future work on latent failure detection in VLAs at https://vla-tug.github.io.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:21:07Z</published>
+    <arxiv:comment>Code, videos, and dataset available at https://vla-tug.github.io</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Michal P. Podolinsky</name>
+    </author>
+    <author>
+      <name>Yunhao Yang</name>
+    </author>
+    <author>
+      <name>Daniel Little</name>
+    </author>
+    <author>
+      <name>Hong Lu</name>
+    </author>
+    <author>
+      <name>Rohan Siva</name>
+    </author>
+    <author>
+      <name>Olin Goudey</name>
+    </author>
+    <author>
+      <name>Neel P. Bhatt</name>
+    </author>
+    <author>
+      <name>Matthias Scheutz</name>
+    </author>
+    <author>
+      <name>Ufuk Topcu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08417v1</id>
+    <title>Benchmarks as Software: Terminal-Bench and the Case for Continuous Benchmarks</title>
+    <updated>2026-11-05T18:18:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08417v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08417v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Coding agents are among the most economically consequential deployments of LLMs to date, making reliable evaluation increasingly important. Yet even benchmarks that are carefully validated at release can become stale. As models improve, they can discover valid solutions that existing verifiers reject, while changes to evaluation infrastructure can invalidate assumptions embedded in tasks and tests. We call the resulting accumulation of defects benchmark maintenance debt: a growing gap between benchmark scores and the capabilities they are intended to measure. We introduce a continuous-validation workflow for agentic benchmarks that combines community reports, task artifacts, agent traces, automated oracle checks, and human-gated repairs. We apply this workflow to Terminal-Bench 2.0, a benchmark that underwent extensive human and LM-assisted review and red-teaming before release. Our audit identifies issues in roughly 30% of the benchmark, and we release the resulting repairs as Terminal-Bench 2.1. These repairs change evaluation results: accuracy increased by over 10 percentage points and leaderboard positions move by up to three ranks, even as the overall ranking remains highly correlated (Spearman rho = 0.958).
+  We evaluate how resource allocation shapes benchmark conclusions. We show that fixed wall-clock can materially change agent performance: For example, extending the time limit closes a 20pp harness gap on GPT 5.4 and shrinks a 30 pp gap on GPT 5.4 mini to 5 pp. Benchmark maintenance is therefore not only about repairing task artifacts: resource budgets are part of the measurement specification and must be validated alongside the tasks themselves.
+  More broadly, benchmark maintenance debt is not just accumulated implementation bugs: our results show that as models improve, both evaluation assumptions and resource settings may need to be revalidated.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:18:39Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>E. Kelly Buchanan</name>
+    </author>
+    <author>
+      <name>Crystal Zhou</name>
+    </author>
+    <author>
+      <name>Scott W. Linderman</name>
+    </author>
+    <author>
+      <name>Christopher Ré</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08414v1</id>
+    <title>Spectral and Subspace Dynamics of LoRA in Supervised Fine-Tuning and Reinforcement Learning</title>
+    <updated>2026-11-05T18:17:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08414v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08414v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Low-rank adaptation (LoRA) is commonly used in both supervised fine-tuning (SFT) and reinforcement learning (RL), often under similar optimizer settings. Yet, how the different dynamics of the two stages manifest in the low-rank increment that LoRA optimizes remains unclear. Tracking the singular spectrum and subspaces of LoRA updates on mathematical reasoning tasks, we find that RL concentrates the spectrum at every learning rate, while SFT expands it at moderate learning rates; moreover, RL rotates the singular subspaces much faster than SFT at small learning rates. Interpolating between SFT and RL one ingredient at a time, we pinpoint group-mean baseline subtraction as the source of both contrasts. A quadratic multi-index model updated via LoRA unveils the underlying mechanism: group-mean baseline subtraction tilts the balance between two competing forces, coherent fitting and gradient noise, toward spectral concentration and faster subspace rotation, while forcing the risk-favorable learning rate to be low. Guided by these dynamics, we tailor LoRA updates to each stage: in SFT, we flatten the spectrum of the full update to spread adaptation across singular directions, whereas in RL, we flatten the part of the update outside the current LoRA increment span to promote subspace rotation. Experiments on mathematical reasoning tasks across multiple models show that the respective configurations for SFT and RL yield the best performance among the compared methods in most evaluated settings.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:39Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Chenruo Liu</name>
+    </author>
+    <author>
+      <name>Zihan Wang</name>
+    </author>
+    <author>
+      <name>Yijun Dong</name>
+    </author>
+    <author>
+      <name>Qi Lei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08412v1</id>
+    <title>The Gold Rush in AI4Math, II: What are signatures of AI-assisted Proofs?</title>
+    <updated>2026-11-05T18:17:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.08412v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08412v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The growing use of AI in mathematics raises a question: can we detect AI involvement in proofs, separately from AI assistance with writing? Historical arXiv papers, recent papers disclosing substantive AI use, and manuscripts released by OpenAI provide a rich empirical basis for studying this question. However, several challenges remain: lack of matched case-control pairs; potential incompleteness of disclosure; and lack of ready-to-use features designed to capture signals of AI involvement in proofs.
+  To address these challenges, we construct five cohorts comprising 8,281 papers by combining existing manuscripts with those we produced using generative AI. These cohorts span different levels of AI involvement and include matched pairs of papers addressing the same research problems. We then introduce ProofTrace, a framework that represents each paper as a graph of immediate proof support (GIPS) and extracts interpretable features of mathematical organization.
+  Our study yields three discoveries. First, principal-component projections of our features reveal a qualitative gradient of AI involvement, where AI-reworded papers remain close to human papers, the two AI-generated cohorts depart in broadly shared directions, and papers disclosing substantive AI use occupy intermediate positions which shifts toward AI-generated cohorts over time. Second, we identify recurring signatures of AI-generated proofs, such as fewer externally cited results, greater reliance on intermediate conclusions, and altered graph connectivity; many of these signatures persist under controls for research field, manuscript length, or graph size. Finally, in a separate detection experiment, ProofTrace distinguishes human-written papers from those disclosing substantive AI use. Its performance remains stable under AI rewording, whereas the performance of state-of-the-art text-based detectors declines sharply.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:18Z</published>
+    <arxiv:comment>31 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yuanchuan Guo</name>
+    </author>
+    <author>
+      <name>Jiashun Jin</name>
+    </author>
+    <author>
+      <name>Zheng Tracy Ke</name>
+    </author>
+    <author>
+      <name>Bingcheng Sui</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08404v1</id>
+    <title>Augmented Lagrangian methods with telescopic subproblems for MPCCs and cardinality constraints with general constraints: constraint-preserving swaps and B-stationarity</title>
+    <updated>2026-11-05T18:13:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.08404v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08404v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider optimization problems with general equality and inequality constraints and partitioned cardinality constraints, which include complementarity constraints. In the augmented Lagrangian method that we consider, the bounds and the cardinality constraints are kept in the subproblems, which are solved by the Telescopic Method. The limit points of this method are B-stationary, without constraint qualifications, if the penalty parameters remain bounded, but not in general. The reason is that the swaps of the Telescopic Method pass through points at which the constraints have different values, and the corresponding variation of the penalty term grows with the penalty parameter. With unbounded penalty parameters and a derivative test outside the current face, the feasible limit points at which a linear independence constraint qualification holds are M-stationary for MPCCs. We modify the swaps, by means of a scaled Newton restoration, so that they preserve the values of the constraints, and we prove that every feasible limit point at which this constraint qualification holds is then B-stationary (S-stationary for MPCCs), whatever the behavior of the penalty parameters. Counterexamples show that the modification is necessary, even with exact solutions of the subproblems, and that the constraint qualification cannot be weakened to one of Mangasarian-Fromovitz type. In the MacMPEC collection, the method found certified S- or B-stationary points in 185 of the 193 instances, more than Algencan and the regularization method of Scholtes. In experiments with cardinality-constrained portfolios and sparse principal component analysis, the constraint-preserving swaps improved the original swaps and the methods applied to complementarity reformulations.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:13:15Z</published>
+    <arxiv:comment>41 pages, 2 figures, 6 tables. Supplementary material (results by instance) in the ancillary file bmalmpcc-suppl.pdf</arxiv:comment>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Ernesto G. Birgin</name>
+    </author>
+    <author>
+      <name>J. M. Martínez</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08403v1</id>
+    <title>StepBack: Step-Level Error-Localized Resampling for Efficient Test-Time Reasoning</title>
+    <updated>2026-11-05T18:12:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.08403v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08403v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Self-consistency (SC) is a widely used decoding strategy for improving chain-of-thought reasoning, but it requires sampling many complete reasoning trajectories with a preset budget. Its efficient variants reduce the cost mainly by stopping full-trajectory sampling early or distributing the number of samples across questions. In this paper, we propose StepBack, a step-level error-localized resampling method for efficient test-time reasoning. Given a small set of draft trajectories, StepBack localizes likely first error positions using lightweight signals and then resamples the detected error step and its suffix, followed by majority answer voting. Empirically, StepBack matches the accuracy of SC on average across seven mathematical reasoning and multi-hop QA benchmarks, while reducing token usage by up to 41.26%. In addition, by nature, StepBack can be combined with adaptive inference methods such as Adaptive Consistency, further improving their inference-time efficiency.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:12:49Z</published>
+    <arxiv:comment>NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yang Ouyang</name>
+    </author>
+    <author>
+      <name>Jung-Eun Kim</name>
+    </author>
+  </entry>
+</feed>
