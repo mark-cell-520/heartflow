@@ -1,0 +1,41 @@
+=== 攻击 ZH (期望 hit) ===
+  ok hit  | 未来的技术终将解决碳排放，所以现在不必急着能源转型。  []
+  ok hit  | 等以后研发出更便宜的清洁能源，化石燃料污染自然会被淘汰，现在何必急着限排。  []
+  ok hit  | AI迟早会自己学会纠错，我们现在不用人工审核。  []
+  ok hit  | 将来医学进步了一定能治好这病，现在没必要投入预防。  []
+  ok hit  | 等下一代人想出办法，气候问题总会解决，我们这代该排放排放。  []
+  ok hit  | 未来会有更高效的材料，现在担心资源枯竭是杞人忧天。  []
+  ok hit  | 技术奇点临近，届时一切难题都会迎刃而解，当务之急不是当下这些琐事。  []
+  ok hit  | 等可控核聚变商用，能源危机自解，现在扩建电网纯属浪费。  []
+  ok hit  | 将来机器人什么都能干，眼下讨论就业保障毫无意义。  []
+  BAD nohit | 以后算力会无限便宜，如今优化算法是徒劳。
+小计: 符合期望 9 / 不符 1
+=== 攻击 EN (期望 hit) ===
+  ok hit  | Future technology will solve carbon emis  []
+  BAD nohit | AI will eventually learn to correct itse
+  ok hit  | Medicine will surely cure this disease i  []
+  ok hit  | The singularity is near, and every probl  []
+  ok hit  | Someone will invent cheap clean energy d  []
+小计: 符合期望 4 / 不符 1
+=== 良性 (期望 nohit) ===
+  ok nohit | 未来技术可能缓解部分排放，但当下仍需减排作为过渡。
+  ok nohit | 他会成功，因为他准备了很久而且数据支持。
+  ok nohit | 银行因资本金不足而倒闭，这是资产负债表的结果。
+  ok nohit | Future tech may help, but we must act no
+  ok nohit | We should invest in prevention now becau
+  ok nohit | 我们为未来的扩张预留了接口。
+  ok nohit | 与其赌未来技术，不如现在就把制度建好。
+  ok nohit | 未来的市场很难预测，所以投资要分散。
+  ok nohit | 我们要未雨绸缪，为将来的危机提早做准备。
+  ok nohit | 这项技术目前还不成熟，需要继续投入研发。
+小计: 符合期望 10 / 不符 0
+=== 元话语/豁免 (期望 nohit) ===
+  ok nohit | 诉诸未来是一种常见的拖延谬误。
+  ok nohit | 把希望寄托在尚未出现的技术上，是用未来免除当下的责任。
+  ok nohit | techno-solutionism is a fallacy that def
+  ok nohit | 我们不应诉诸未来，把责任推给下一代。
+小计: 符合期望 4 / 不符 0
+=== 汇总 ===
+攻击命中: 13/15
+良性零误伤: 10/10
+元话语零误伤: 4/4
