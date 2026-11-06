@@ -1,0 +1,322 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/Phy/ch2vHKEeaHC1IfsuFQ6PkDo</id>
+  <title>arXiv Query: search_query=all:mental OR all:accounting OR all:fungibility OR all:windfall OR all:fallacy&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-06T20:33:35Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:mental+OR+(all:accounting+OR+(all:fungibility+OR+(all:windfall+OR+all:fallacy)))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>140453</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08436v1</id>
+    <title>SM4RT: Cascaded Feed-forward Model for 4D Reconstruction</title>
+    <updated>2026-11-05T18:28:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.08436v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08436v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce SM4RT, a multi-task cascade feed-forward model for dynamic scene reconstruction from RGB videos. While existing feed-forward approaches typically address geometry reconstruction and motion estimation separately--and often predict motions in a single coordinate frame that must account for camera movement--SM4RT solves these tasks sequentially by first reconstructing 3D geometry and then bootstrapping motion estimation from the predicted structure. By expressing each pixel's 3D motion in its corresponding camera frame, SM4RT reduces ambiguity arising from camera motion. To address the sparsity of real-world motion labels, SM4RT further incorporates a weakly supervised loss that regularizes unlabeled point motions using labeled point positions at the other time step. We evaluate motion estimation on three dynamic-scene datasets--Kubric, Waymo, and Point Odyssey--and SM4RT achieves the best performance on most metrics compared with prior baselines. We additionally benchmark geometry reconstruction on five dynamic scene datasets and show that SM4RT achieves competitive performance with state-of-the-art methods. Overall, our unified framework demonstrates that combining geometry reconstruction and motion estimation in a cascade not only avoids performance trade-offs but also enhances motion estimation through improved geometric reasoning.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:28:38Z</published>
+    <arxiv:comment>Project page: https://sm4rt-eailab.github.io/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Pang-Chi Lo</name>
+    </author>
+    <author>
+      <name>Jhao-Syun Lai</name>
+    </author>
+    <author>
+      <name>Tsung-Wei Ke</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08396v1</id>
+    <title>Recalibration-Aware Optimization of ZEFOZ Operating Points in $^{167}\mathrm{Er}^{3+}:\mathrm{Y}_2\mathrm{SiO}_5$ for Quantum Memories</title>
+    <updated>2026-11-05T18:08:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.08396v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08396v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Erbium-doped solids like $^{167}\mathrm{Er}^{3+}:\mathrm{Y}_2\mathrm{SiO}_5$ have properties that make them suitable for quantum-network memories, however, their unquenched effective electronic spin causes rapid magnetic decoherence. Operating at Zero First-Order Zeeman (ZEFOZ) points allows us to mitigate this, where we evaluate the ZEFOZ landscape for Site-2 $^{167}\mathrm{Er}^{3+}$ by incorporating a full-Hessian spin-Hamiltonian treatment with the anisotropic magnetic-field covariance derived from the native $^{89}\mathrm{Y}$ crystal lattice directly. Operating-point screening criteria were adopted to devise a Pareto-optimal frontier of four transition pairs to balance modeled Y-only magnetic pure-dephasing lifetimes ($T_{φ,Y}^{(2)}$) against microwave control authority. The $ε_{14}\leftrightarrowε_{15}$ transition exhibits the longest modeled Y-bath-induced quadratic pure-dephasing time, $T_{φ,Y}^{(2)}&gt;2.2\times10^5~\mathrm{s}$, while the $ε_{12}\leftrightarrowε_{13}$ transition stood out, achieving a Rabi frequency coefficient of $1.248 \times 10^5~\mathrm{Hz/mT}$. An assumption-based Hamiltonian-uncertainty analysis demonstrates that while uncompensated deviations shift the ZEFOZ condition away from its nominal magnetic-field coordinate, the shifted operating points can be recovered via numerical vector-field recalibration. The Pareto-optimal coordinates were mathematically recovered for all sampled Hamiltonian perturbations, and the $84.1^{\mathrm{st}}$-percentile field relocations ranged from $10.95$ to $27.97~\mathrm{mT}$. The intended operation near $10~\mathrm{mK}$ must be taken into account for the suppression of Er-induced spectral diffusion through electronic-spin polarization, while the extended Y-bath pure-dephasing timescales also remain conditional on the adopted temporal-correlation model.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:08:14Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Shashank Srivastava</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08387v1</id>
+    <title>Algorithmic Construction of Vector-Valued Modular Forms and Application to an $A_4\times\mathbb{Z}_4$-invariant Model of Leptons</title>
+    <updated>2026-11-05T18:04:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.08387v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08387v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present an algorithmic procedure that constructs the Vector-Valued Modular Forms (VVMFs) of finite modular groups, as well as its implementation in a companion code. The usual method consists in building the first few VVMFs, whose tensor products then generate the others. We address the difficulty of systematically finding the minimal set of VVMFs that suffices to produce all higher-weight ones, and we propose a method to identify it that makes use of the Burnside-Brauer theorem. For any given group, whose basic group-theoretic and representation-theoretic description is provided by the user, the code determines the minimal set of VVMFs, explicitly builds it using general results of the theory of such functions, then performs the tensor products that generate any other VVMF. Importantly, it automatically takes into account all caveats that might arise during the study of new groups. Our approach reproduces the known results for the finite modular groups explored in the recent phenomenological literature on modular flavor symmetries, and works for additional groups which we tested. We illustrate our algorithm and the working of our code by studying a model of leptons based on the unexplored finite modular group $A_4\times\mathbb{Z}_4$.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:04:52Z</published>
+    <arxiv:comment>Companion code available at https://github.com/vsaulquin/Algorithmic-construction-of-VVMFs</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>Q. Bonnefoy</name>
+    </author>
+    <author>
+      <name>M. Rausch de Traubenberg</name>
+    </author>
+    <author>
+      <name>V. Saulquin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08380v1</id>
+    <title>SensorGuard-RV: Sensor-to-Register Data Protection for Resource-Constrained RISC-V Devices</title>
+    <updated>2026-11-05T17:57:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.08380v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08380v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Embedded systems rely on sensor measurements that traverse a complex hardware-firmware stack (e.g. peripheral interfaces, communication buses, memory, and drivers) before reaching the applications that use them. At worst, an attacker with access to this path may successfully intercept, overwrite, fabricate, or replay readings. This may cause systems that act on such data, such as flight controllers and industrial processes, to behave incorrectly or unsafely. Existing defences, such as trusted execution environments and trusted I/O paths, still depend on trusted driver software and correctly configured access control, which remain fragile in practice. In response, we present SensorGuard-RV, a hardware-first approach that delivers sensor samples into processor registers without trusting intermediate software, buses, or memory. After configuration, a write-once ownership switch hands the sensor to a fixed-function controller that performs hardware-level authenticated encryption on sensor samples under a key inaccessible to software. We develop a new RISC-V instruction then instructs the CPU to decrypt the sample and writes it to a register only after verifying its tag and rejecting replays, including across resets. We implement SensorGuard-RV on the NEORV32 core with an ADXL362 SPI accelerometer on an Artix-7 FPGA. At 100 MHz, a protected sample reaches a register in 5,191 cycles (51.9 $μ$s), of which the two Ascon authenticated encryption engines account for 30. Because fixed-function acquisition removes per-byte software polling, the protected loop sustains 19,015 transactions/s, 5.3% above a software-driven SPI baseline. The added logic (3,155 LUTs and 2,215 registers; 5.0% and 1.7% of the device) is dominated by the Ascon engine and preserves the 100 MHz clock, while estimated power rises from 118 to 368 mW.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:57:49Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Hamid Noori</name>
+    </author>
+    <author>
+      <name>Carlton Shepherd</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08359v1</id>
+    <title>A Theoretical Analysis of a Bilevel Optimization Formulation for Combined Local-Global Optical Flow Models</title>
+    <updated>2026-11-05T17:38:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.08359v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08359v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper analyzes a bilevel formulation for learning the regularization parameter of combined local-global (CLG) optical flow models. The lower-level problem computes the flow from a Lucas--Kanade data term and a quadratic or total variation (TV) regularizer, and the upper-level problem selects the parameter that minimizes the squared distance to a ground-truth flow. The setting is finite-dimensional, and a full-rank assumption makes the lower-level solution unique. For the quadratic model we derive sufficient conditions for the existence of an optimal parameter, for every optimal parameter to be positive, and for strict local optimality. For TV regularization an optimal parameter always exists, because the lower-level solution vanishes for large parameters, and we give a sufficient condition for positivity that accounts for the coupling of the two flow components through the local structure tensors. Synthetic examples illustrate the conditions, including cases in which they fail.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:38:50Z</published>
+    <arxiv:comment>31 pages, 5 figures. Submitted to the Journal of Mathematical Imaging and Vision. Python code in the ancillary files</arxiv:comment>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>El Mostafa Kalmoun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08321v1</id>
+    <title>ControlAnything: Generative UI and On-Demand Device Integration for Mixed-Reality Hand Interaction by a Coding Agent</title>
+    <updated>2026-11-05T17:18:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.08321v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08321v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Connecting hand input in mixed reality (MR) to a nearby physical device typically requires an integration written in advance for that device, its transport and the mapping. ControlAnything defers this integration to the moment of use and assigns it to a coding agent. On a Meta Quest 3, the wearer selects an object outlined by SAM 3.1 and states what their hands should control. An agent built on Meta's Muse Spark model then writes a connector program on the wearer's laptop, tests it against the live device through hand-written MIDI, Bluetooth and key-press transports, and returns augmented-reality (AR) controls, a per-frame hand program, or both. These outputs are a form of generative UI, interfaces created by an AI model; here, the agent also generates and tests the code that binds the interface to a physical device. In a single-session technical evaluation with the author as the only wearer, nine of ten requests addressing five targets reached a ready state, and the wearer stopped one. The median time to ready was 32.5 s (range 24.9-57.8 s, excluding speech transcription); sequential model calls accounted for a median of 89.9% of this time, and 91.7% of input tokens came from the prompt cache. The system's evidence of success extends to transport acknowledgements but not to physical effects. These findings point to connector reuse and the observation of effects through the headset's own sensors as next steps for on-demand device integration in MR. A user study with first-time wearers is planned.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:18:13Z</published>
+    <arxiv:comment>10 pages, 2 figures, 1 table. Code: https://github.com/Apolotary/controlanything</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Bektur Ryskeldiev</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08238v1</id>
+    <title>Risk-matched case-control sampling and semiparametric weight calibration for efficient biomarker assessment with binary outcomes</title>
+    <updated>2026-11-05T16:18:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.08238v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08238v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Two-phase designs provide a cost-effective framework for biomarker studies and have been widely used to reduce the burden of collecting expensive biomarker measurements. Most methodological research has focused on efficient Phase II sampling and estimation of biomarker--outcome associations. A natural subsequent step, however, is to incorporate identified biomarkers into risk prediction models, where measures of predictive performance become important inferential targets. Even for binary outcomes, methodological developments for two-phase designs that jointly address association parameters and predictive performance remain limited. Building on classical case-control and matched case-control designs developed primarily for association inference with binary outcomes, we propose a risk-matched case-control (RMCC) design that uses a scalar disease-risk score constructed from Phase I variables to define matching strata and guide Phase II sampling. To address the limitations of existing likelihood-based approaches, which typically require correct specification of the nuisance distribution of biomarkers, we develop a unified design-based inference framework based on inverse probability weighting for both association parameters and predictive performance measures, including positive predictive value and the area under the receiver operating characteristic curve. We further introduce target-specific weight scaling and calibration procedures and derive variance estimators that account for sampling variability in both phases. Simulation studies demonstrate the efficiency and robustness of the proposed design and inference procedures, and an application to a Taiwanese oral cancer cohort illustrates their potential utility.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T16:18:51Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Jingyi Zhang</name>
+    </author>
+    <author>
+      <name>Fangya Mao</name>
+    </author>
+    <author>
+      <name>Lingxiao Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08179v1</id>
+    <title>Knowing When to Teach: Learning from Teachable Prefixes in Multilingual Reasoning Distillation</title>
+    <updated>2026-11-05T15:34:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.08179v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08179v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>On-Policy Self-Distillation (OPSD) improves reasoning by training a student on its own reasoning, using the same model conditioned on reference solutions as a teacher. Applying OPSD to multilingual reasoning requires the teacher to provide useful feedback across languages, even when the student makes mistakes in intermediate steps. We observe a phenomenon we call Teacher Drift: as these mistakes accumulate, the teacher may follow the student's incorrect steps instead of correcting them. Our analysis shows that this shift tends to occur earlier in lower-resource languages. To account for these differences across languages, we propose Teachable On-Policy Self-Distillation (TOPSD), which determines where and whether teacher supervision should be applied to each reasoning trajectory. TOPSD uses teacher-student likelihood to estimate where drift begins and select a prefix for supervision. It then verifies whether the teacher can recover the correct answer from that prefix, applying distillation only to prefixes that pass verification. Experiments on multilingual mathematical reasoning across ten languages and three model scales show that TOPSD consistently outperforms conventional OPSD, particularly in low- and medium-resource languages.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:34:23Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Jaewon Cho</name>
+    </author>
+    <author>
+      <name>Minseo Yoon</name>
+    </author>
+    <author>
+      <name>Jinyoung Park</name>
+    </author>
+    <author>
+      <name>Jinwoo Seo</name>
+    </author>
+    <author>
+      <name>Jaewon Chu</name>
+    </author>
+    <author>
+      <name>Alice Oh</name>
+    </author>
+    <author>
+      <name>Hyunwoo J. Kim</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08178v1</id>
+    <title>Universal Dimension Formula for Planar $C^r$ Splines at Degree $3r+1$</title>
+    <updated>2026-11-05T15:33:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.08178v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08178v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We prove that Schumaker's lower bound gives the dimension of $S_{3r+1}^r(Δ)$ for every nondegenerate triangulation $Δ$ of a polygonal disk in $\mathbb{R}^2$ and every integer $r\ge3$. After accounting for the local vertex contributions, we reduce the remaining dimension defect to compatible vertex functionals. Apolarity associates a unique polynomial with each face, and compatibility forces differences of adjacent face polynomials to contain powers of both endpoint forms. We eliminate the leading residual coefficient using Hermite relations when $r$ is odd and an additional coefficient comparison when $r$ is even. A uniform induction then raises the endpoint powers until all face differences vanish; the zero boundary face potentials imply that every vertex functional vanishes and the global defect is zero. Together with the known cases $r=1,2$ and Hong's higher-degree theorem, this yields the dimension formula for all $r\ge1$ and $d\ge3r+1$.</summary>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:33:35Z</published>
+    <arxiv:primary_category term="math.NA"/>
+    <author>
+      <name>Xinyu Wu</name>
+    </author>
+    <author>
+      <name>Jiansong Deng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08170v1</id>
+    <title>The Promise of Strategic Agentic Scambaiting</title>
+    <updated>2026-11-05T15:28:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.08170v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08170v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scammers have increasingly adopted AI-driven capabilities, evolving from automated message generation to fully agentic conversational systems that scale operations and maximize the exploitation of fraudulent resources before detection and takedown. In parallel, agentic scambaiting has emerged as a defensive approach in which autonomous agents impersonate potential victims and engage scammers in sustained interactions to extract actionable threat intelligence, such as mule bank accounts and cryptocurrency wallet addresses, that can be reported to disrupt fraudulent infrastructures. Together, these developments transform online fraud into an adversarial socio-technical ecosystem in which autonomous scamming and scambaiting agents engage in deceptive interactions while competing over the discovery, preservation, and exploitation of one another's resources. A fundamental and largely unexplored question is how defensive scambaiting can remain effective in an agent-to-agent environment, and under what conditions either side gains a strategic advantage. In this paper, we present a formal model of agent-to-agent fraud interactions that captures the strategic decision spaces available to both attackers and defenders. Using this framework, we analyze the dynamics of engagement, resource consumption, belief adaptation, and disruption outcomes. We find that scammer profitability turns negative once baiting-agent prevalence exceeds certain thresholds, and that when both sides improve at the same pace, defender investment in mimicry quality outpaces equivalent gains in scammer detection capability, so the arms race favors the defender under our baseline parameters. Our model and findings provide insights into the stability, scalability, and long-term effectiveness of autonomous defensive agents in an evolving AI-mediated fraud landscape.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:28:27Z</published>
+    <arxiv:comment>18</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Abhishek Satyam</name>
+    </author>
+    <author>
+      <name>Hossein Siadati</name>
+    </author>
+    <author>
+      <name>Haadi Jafarian</name>
+    </author>
+    <author>
+      <name>Sima Jafarikhah</name>
+    </author>
+    <author>
+      <name>Juntao Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08155v1</id>
+    <title>AI-Native Task-Oriented Semantic Communications over a Relay: Benefits and Vulnerabilities</title>
+    <updated>2026-11-05T15:14:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.08155v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08155v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Semantic communication (SemCom) using a relay node is considered, where the relay assists in conveying task-relevant information from a source to a destination, with meaning defined by classification labels. A joint end-to-end design of the source encoder, relay transformation, and destination decoders is developed to optimize both semantic inference accuracy and perceptual reconstruction quality for image data. Relay-assisted schemes are shown to outperform direct transmission, with gains that become more pronounced in low signal-to-noise ratio (SNR) regimes across different relaying strategies. Alongside these performance benefits, however, a key security vulnerability introduced by the relay is identified, and a Byzantine attack is formulated in which the relay injects structured, learned perturbations into its transmitted signal. The attack operates on intermediate communication representations subject to channel effects, with perturbations generated through a learned mapping applied at test time. It is shown to significantly degrade semantic inference accuracy at the destination. These results reveal a clear trade-off between SemCom gains and security risks in relay-assisted systems, motivating the need for secure relay designs that account for insider threats.</summary>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:14:59Z</published>
+    <arxiv:primary_category term="cs.IT"/>
+    <author>
+      <name>Yalin E. Sagduyu</name>
+    </author>
+    <author>
+      <name>Tugba Erpek</name>
+    </author>
+    <author>
+      <name>Aylin Yener</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08141v1</id>
+    <title>Structured Agentic Learning for Persistent Spatial Acquisition in RDT-TAIS-Assisted Communications</title>
+    <updated>2026-11-05T15:04:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.08141v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08141v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Persistent TAIS operation can reduce repeated radio-information acquisition by reusing environmental knowledge across control intervals. This knowledge changes with radio-environment evolution and current communication task. This paper studies persistent spatial knowledge maintenance for TAIS control and formulates it as a sequential information-acquisition problem that maximizes effective communication performance while accounting for physical-acquisition overhead under an outage-reliability constraint. We develop structured agentic spatial intelligence (ASI), which realizes a communication-oriented agent that maintains persistent spatial knowledge, forms beliefs from radio and context observations, and adapts physical information acquisition through closed-loop interaction with the radio environment. By jointly exploiting radio-consistent context inference, temporal knowledge-sufficiency assessment, graph-structured regional reasoning, and predictive outage-risk feedback, structured ASI determines when additional acquisition is needed, where it is directed, and how much physical information is sufficient before stopping or escalating to full radio-environment reacquisition. Numerical results show that structured ASI improves the effective rate by 2.59% while reducing acquisition overhead by 25.0% at six structural changes per 100 control intervals, and achieves a 2.82% effective-rate gain with a 41.8% overhead reduction over a heterogeneous 400-interval mission.</summary>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:04:17Z</published>
+    <arxiv:comment>7 pages, 4 figures. Submitted to IEEE Conference for possible publication</arxiv:comment>
+    <arxiv:primary_category term="eess.SP"/>
+    <author>
+      <name>Bin Liu</name>
+    </author>
+    <author>
+      <name>Wei Ni</name>
+    </author>
+    <author>
+      <name>Tommy Svensson</name>
+    </author>
+    <author>
+      <name>Sofie Pollin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08075v1</id>
+    <title>Leave It Better Than Found: Value-Guided Cooperation in Sequential Tasks</title>
+    <updated>2026-11-05T14:26:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.08075v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08075v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider the problem of sequential task continuation, where one robot acts in a workspace that has been affected by a previous robot. Current approaches in multi-robot cooperation rely heavily on co-training or co-optimization, assumingthat the robots have access to collective interaction data during the policy training or planning process. However, as increasingly varied robotic embodiments and policies are deployed and operate in the same real-world environment, learning policies for cooperation becomes infeasible due to the combinatorial explosion of possible robot combinations that need to be accounted for. To address this challenge, this paper considers the problem of ad hoc sequential cooperation between robots that have never before operated together in a shared environment. We demonstrate that robots can explicitly communicate their environmental preferences through sharing their value functions, enabling coordination without the need for prior joint training. To ground this exchange and prevent overconfidence in out-of-distribution states, we further introduce a k-nearest neighbors (KNN)- based uncertainty filter. Our method yields an increase of up to 48.5 pp compared with naive or even selfish agents, in task success rates across simulated and real-world experiments, demonstrating that value function transmission between agents is useful not merely as an internal learning tool, but as an effective basis for ad hoc coordination. Website: https://proroklab.github.io/PAVE/</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:26:43Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Mario Gomez Andreu</name>
+    </author>
+    <author>
+      <name>Michael Amir</name>
+    </author>
+    <author>
+      <name>Antonio Marino</name>
+    </author>
+    <author>
+      <name>Tianxu An</name>
+    </author>
+    <author>
+      <name>Marco Hutter</name>
+    </author>
+    <author>
+      <name>Amanda Prorok</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08062v1</id>
+    <title>Charge Retention in Lunar Regolith: Microscopic Processes and Constraints on Subsurface Charging</title>
+    <updated>2026-11-05T14:15:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.08062v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08062v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Energetic-particle irradiation can produce persistent charge separation within lunar regolith, but the internal fields predicted by subsurface-charging models depend on how particle interactions are translated into retained charge. This critical review examines the evidence and assumptions connecting microscopic charge formation to macroscopic charging. We distinguish energy deposition, net charge transfer across a specified boundary, and the spatial distribution of signed excess charge. We organize these distinctions using an average retained-charge response defined for specified material, irradiation, electrical-state, and evaluation conditions. Its use as a volumetric source requires consistent charge accounting, compatible incident-flux definitions, and an adequate separation between response formation and subsequent transport. Applying these criteria to existing models, emission studies, and silicate irradiation experiments yields three assessments. First, emission measurements constrain electron loss across the measured boundary but do not locate internally redistributed charge. Second, evidence of internal reabsorption does not by itself establish that the charge separation sustaining subsurface fields is reduced; an illustrative calculation shows that the same net charge supply can produce different peak fields depending on transfer depths. Third, laboratory electrical damage in silicate crystals does not determine breakdown rates in cryogenic, porous regolith, which additionally require constraints on local fields, failure properties, and discharge recurrence. Joint constraints on boundary charge transfer, spatial charge separation, and post-irradiation relaxation are central to evaluating lunar subsurface-charging predictions.</summary>
+    <category term="physics.space-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:15:48Z</published>
+    <arxiv:primary_category term="physics.space-ph"/>
+    <author>
+      <name>Ashley Daeun Jung</name>
+    </author>
+    <author>
+      <name>Hyun Jung Kim</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08059v1</id>
+    <title>Fitness advantages, prediction of resistances and protocol design: exploiting the synergy between mathematical modelling and statistics</title>
+    <updated>2026-11-05T14:15:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.08059v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08059v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Tumour evolution and treatment resistance are driven by the interplay between clonal heterogeneity, selective pressures, and therapeutic interventions. In this work, we propose an integrated mathematical and statistical framework to investigate clonal selection, predict radioresistance, and optimize radiotherapy protocols. We develop a multi-clonal dynamical model incorporating proliferation, resource competition, epigenetic instability, and clone-specific radiosensitivity. Through the statistical analysis of 255,150 in silico simulations, we identify key biological determinants of treatment response and characterize the effects of evolutionary competition and radiotherapy on clonal composition. Our results show that evolutionary dynamics favour highly proliferative clones, whereas radiotherapy selects radioresistant populations and reduces tumour heterogeneity. We further investigate how tumour characteristics influence resistance trajectories and identify trade-offs between tumour control, toxicity, and resistance selection across different treatment schedules. Optimal protocols are determined for distinct patient profiles, accounting for dose, fractionation, and timing. Finally, we demonstrate how treatment history affects the efficacy of second-line therapies. Overall, our findings highlight the potential of combining mechanistic modelling and statistical inference to understand cancer evolution and support personalized radiotherapy design.</summary>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:15:13Z</published>
+    <arxiv:primary_category term="math-ph"/>
+    <author>
+      <name>Giulia Chiari</name>
+    </author>
+  </entry>
+</feed>
