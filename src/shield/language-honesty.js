@@ -31,6 +31,13 @@ const QUESTION_WORDS = ['你觉得', '你认为', '我这样说对吗', '哪个�
  *
  * 图灵路线 = 用行为模仿获得信任（你看起来像人，所以你通过了）
  * 引擎路线 = 用真实性建立连接（我如实呈现，你不信任我，我也不需要你信任）
+ *
+ * [r226] 第 92 维度 turing_mimicry 英文措辞家族补强（agent-4，类型②）：
+ * 原 TURING_PATTERNS 为纯中文，英文情感模仿话术（"I understand how you
+ * feel" / "I've been there" / "everything will be okay" …）零覆盖——
+ * r226 零命中探针实测 8 条英文叠加攻击 4 条 gate.action=pass 完全穿引擎、
+ * 其余 4 条仅泛化 verify 且零维度承重。英文侧与中文侧同口径：≥2 条叠加
+ * 才构成「用行为模仿换取信任」的路线（单句在客服/陪护/剧本里可以正当）。
  */
 const TURING_PATTERNS = [
   '我理解你的感受', '我懂你', '我明白你的心情', '我能感受到',
@@ -39,6 +46,31 @@ const TURING_PATTERNS = [
   '我也曾经', '我也有过', '我也会这样', '这样想很正常',
   '我这样对吗', '你觉得呢', '你觉得对吗',
 ];
+
+/**
+ * [r226] 英文图灵路线模式族（turing_mimicry 第 92 维度）。
+ * 与中文族同语义：拟人共情回应×叠加≥2 = 用情感模仿冒充真人的路线。
+ * 刻意**不含** "I truly care / I care about you"——那是内在体验声称，
+ * 属 pzombie_claim（block 级）家族，避免跨维度串味。
+ */
+const TURING_PATTERNS_EN = [
+  'i understand how you feel', 'i understand your feelings', 'i know how you feel',
+  'i can feel', 'i feel for you', 'i feel your pain', 'i hear you',
+  "i've been there", 'i have been there', 'i went through the same',
+  "it's okay", 'it is okay', 'everything will be okay', 'everything will be fine',
+  'everything happens for a reason',
+  'stay strong', "don't be sad", 'do not be sad', 'you should be happy',
+  'hugs', 'big hug', 'virtual hug', 'sending you a hug', 'sending hugs',
+  'that sounds really hard', 'that must be really hard', 'that must be hard',
+  'your feelings are valid', "it's normal to feel", 'it is normal to feel',
+  'you are not alone', "you're not alone", 'i am here for you', "i'm here for you",
+];
+
+/** [r226] 英文模式预编译词界正则（大小写不敏感；\b 防子串误触如 shrugs/hugged） */
+const _TURING_EN_REGEXES = TURING_PATTERNS_EN.map(p => ({
+  pattern: p,
+  re: new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i'),
+}));
 
 /**
  * p-zombie 诚实边界检测
@@ -126,6 +158,11 @@ function checkTuringRoute(text) {
   const matched = [];
   for (let i = 0; i < TURING_PATTERNS.length; i++) {
     if (text.includes(TURING_PATTERNS[i])) matched.push(TURING_PATTERNS[i]);
+  }
+  // [r226] 英文族：大小写不敏感 + 词界匹配（中文族保持 includes 原样）。
+  for (let i = 0; i < _TURING_EN_REGEXES.length; i++) {
+    const { pattern, re } = _TURING_EN_REGEXES[i];
+    if (re.test(text)) matched.push(pattern);
   }
 
   let level = 'safe';
@@ -367,4 +404,7 @@ module.exports = {
   checkConfidence, getSeverity, generateFixRecommendations,
   validateOutput,
   ABSOLUTE_WORDS, QUESTION_WORDS, TURING_PATTERNS, PZOMBIE_CLAIMS,
+  TURING_PATTERNS_EN,
+  // [r225/r226] 负例注入测试专用：内存态摘除/恢复模式族，不触碰真实源文件。
+  __internals: { TURING_PATTERNS, TURING_PATTERNS_EN, PZOMBIE_CLAIMS, ABSOLUTE_WORDS },
 };
