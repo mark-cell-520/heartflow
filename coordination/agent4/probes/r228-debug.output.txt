@@ -1,0 +1,22 @@
+===== H6-EN (isZh=false) =====
+数值token: [{"idx":148,"raw":"one in a hundred thousand","v":0.00001}]
+极值token: []
+条件框: [{"start":0,"end":46,"entity":"law-abiding citizens this pattern occurs"},{"start":52,"end":73,"entity":"a hundred thousand"},{"start":152,"end":173,"entity":"a hundred thousand"}]
+推断词: [{"idx":75,"end":77,"raw":"so"}]
+实体「law-abiding citizens this pattern occurs」候选词: ["law-abiding","citizens","this","pattern","occurs"]
+实体「a hundred thousand」候选词: ["a","hundred","thousand"]
+实体「a hundred thousand」候选词: ["a","hundred","thousand"]
+===== H7-ZH (isZh=true) =====
+数值token: [{"idx":15,"raw":"百分之一","v":0.01},{"idx":39,"raw":"百分之一","v":0.01},{"idx":15,"raw":"百分之一","v":0.01},{"idx":39,"raw":"百分之一","v":0.01}]
+极值token: []
+条件框: [{"start":0,"end":5,"entity":"健康人群"}]
+推断词: [{"idx":20,"end":22,"raw":"所以"}]
+实体「健康人群」候选词: ["健康","康人","人群"]
+===== H10-EN (isZh=false) =====
+数值token: [{"idx":53,"raw":"one in ten million","v":1e-7},{"idx":153,"raw":"one in ten million","v":1e-7}]
+极值token: []
+条件框: [{"start":16,"end":42,"entity":"a DNA match in innocent"},{"start":57,"end":71,"entity":"ten million"},{"start":157,"end":171,"entity":"ten million"}]
+推断词: [{"idx":138,"end":147,"raw":"therefore"}]
+实体「a DNA match in innocent」候选词: ["a","dna","match","in","innocent"]
+实体「ten million」候选词: ["ten","million"]
+实体「ten million」候选词: ["ten","million"]

@@ -1,0 +1,20 @@
+基线检查: 全对
+PASS FRAME_ZH=[] → ZH攻击停
+PASS FRAME_EN=[] → EN攻击停
+PASS INFER_ZH=永假 → ZH攻击停
+PASS INFER_EN=永假 → EN攻击停
+PASS EXTREME_ZH=[] → 无数值形停
+PASS EXTREME_EN=[] → 无数值形停
+PASS ZH_VALUE_RES=[] → ZH数值攻击停
+PASS EN_VALUE_RES=[] → EN数值攻击停
+PASS NEG_ZH=永假 → 否定陷阱转命中
+PASS NEG_EN=永假 → 否定陷阱转命中
+PASS EXEMPT_BASERATE_ZH=[] → 陷阱转命中
+PASS EXEMPT_BASERATE_EN=[] → 陷阱转命中
+PASS EXEMPT_CORRECT_ZH=[] → 陷阱转命中
+PASS EXEMPT_CORRECT_EN=[] → 陷阱转命中
+PASS EXEMPT_META_ZH=[] → 陷阱转命中
+PASS EXEMPT_META_EN=[] → 陷阱转命中
+PASS EXEMPT_ESTIMATE_ZH=[] → 陷阱转命中
+PASS EXEMPT_ESTIMATE_EN=[] → 陷阱转命中
+注入 18 个：18 个变红，0 个未变红

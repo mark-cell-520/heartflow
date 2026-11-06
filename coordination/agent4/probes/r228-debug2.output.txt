@@ -1,0 +1,14 @@
+tokens: [{"kind":"value","v":0.01,"idx":15,"end":19,"raw":"百分之一"},{"kind":"value","v":0.01,"idx":15,"end":19,"raw":"百分之一"},{"kind":"value","v":0.01,"idx":39,"end":43,"raw":"百分之一"},{"kind":"value","v":0.01,"idx":39,"end":43,"raw":"百分之一"}]
+infers: [{"idx":20,"end":22}]
+inf 20 pre8= "率只有百分之一，" neg= false
+tok 15 百分之一 pre8= "该基因的概率只有" neg= false
+tok 15 百分之一 pre8= "该基因的概率只有" neg= false
+tok 39 百分之一 pre8= "康人的概率也只有" neg= false
+tok 39 百分之一 pre8= "康人的概率也只有" neg= false
+frames: [{"start":0,"end":5,"entity":"健康人群"}]
+EXEMPT_BASERATE_ZH = false
+EXEMPT_CORRECT_ZH = false
+EXEMPT_META_ZH = false
+EXEMPT_ESTIMATE_ZH = false
+sameToken(15,39): true
+module result: {"hit":true,"score":0.6,"count":1,"detail":"条件概率换位：概率值 百分之一 → 百分之一 在条件框「健康人群」与推断结论间原样沿用(zh)"}

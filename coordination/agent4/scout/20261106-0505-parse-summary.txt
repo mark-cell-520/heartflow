@@ -1,0 +1,12 @@
+20261106-0505-arxiv-retry.xml : 空文件（0 字节，API 无响应或超时）
+20261106-0505-github-baserate.json : total_count=11
+   kevintoy/base_rate_fallacy 0★ This is data and R codes for "The Base-Rate Fallacy in Performance Judgements"
+   bpbraun/base_rate_fallacy 0★ repo for analyzing base rate fallacies
+   bogdan-kulynych/base_rate_fallacy_demo 0★ Base Rate Fallacy Demo
+   pixel-apps-wrshp/The-Base-Rate-Fallacy 0★ 
+   sophieehill/base-rate-viz 0★ Visualization of the base rate fallacy
+   yizhe-ang/hold-your-zebras 0★ A visualization of the base rate fallacy.
+   binmishr/Base-Rate-Fallacy-or-why-No-One-is-justified-to-believe-that-Jesus-rose 0★ 
+   fditraglia/lie-detector 0★ The lie detector: a classroom demonstration of Bayes' rule and the base rate fallacy.
+   richardLipka/conditional-probability-explorer 0★ Interactive bilingual (EN/CS) classroom tool for conditional probability and the base-rate
+   zohebhaq/The-Illusion-of-Diagnostic-Certainty 0★ A review of how diagnostic test results can be misleading without considering disease prev

@@ -1,0 +1,6 @@
+A13-ZH 假阳性腿①           hit=true 期望=true  条件概率换位：概率值 百万分之一 → 百万分之一 在条件框「健康者」与推断结论间原样沿用(z
+A14-ZH 假阴性腿①           hit=true 期望=true  条件概率换位：概率值 千分之一 → 千分之一 在条件框「患者」与推断结论间原样沿用(zh)
+B11-ZH 假阳性率在场(良)       hit=false 期望=false  
+B12-ZH 基础概率在场(良)       hit=false 期望=false  
+B13-EN FPR在场(良)        hit=false 期望=false  
+不一致: 0

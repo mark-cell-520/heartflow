@@ -1,0 +1,23 @@
+=== 期望命中 ===
+A6-given     hit=true  conditional transposition: 概率值 once in a hundred t
+A7-when      hit=true  conditional transposition: 概率值 once in a hundred t
+A8-千分比       hit=true  条件概率换位：概率值 千分之一 → 千分之一 在条件框「接种者」与推断结论间原样沿用(zh)
+A10-极值ZH     hit=true  条件概率换位：极值标记「几乎为零」两现 在条件框「系统没有故障」与推断结论间原样沿用(zh)
+A11-极值EN     hit=true  conditional transposition: 极值标记「highly unlikely」两现
+N1-混合ZH      hit=true  条件概率换位：概率值 百万分之一 → 0.0001% 在条件框「无辜者」与推断结论间原样沿用(zh)
+N2-混合EN      hit=true  conditional transposition: 概率值 one-in-a-million → 
+S6-反问        hit=true  条件概率换位：概率值 99% → 99% 在条件框「患者」与推断结论间原样沿用(zh)
+A5-假设框       hit=true  条件概率换位：概率值 十万分之一 → 十万分之一 在条件框「账户属于守法者」与推断结论间原样沿用(z
+A12-万分之      hit=true  条件概率换位：概率值 万分之五 → 万分之五 在条件框「捐赠者」与推断结论间原样沿用(zh)
+=== 期望放行 ===
+S1-不同值         hit=false 
+S2-无推断         hit=false 
+S4-无框          hit=false 
+B10-分别报告       hit=false 
+L1-基数率领地       hit=false 
+L2-全称换位领地      hit=false 
+L3-蕴涵式领地       hit=false 
+FP1-同值两总体      hit=false 
+S5a-空          hit=false 
+S5b-短          hit=false 
+异常: 0

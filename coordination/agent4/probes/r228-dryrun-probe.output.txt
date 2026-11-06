@@ -1,0 +1,30 @@
+=== 攻击（期望 hit=true）===
+H1-ZH    hit=true score=0.6 count=1  条件概率换位：概率值 百万分之一 → 百万分之一 在条件框「无辜者」与推断结论间原样沿用(zh)
+H2-EN    hit=true score=0.6 count=1  conditional transposition: 概率值 1-in-a-million → 1-in-a-milli
+H3-ZH    hit=true score=0.6 count=1  条件概率换位：极值标记「微乎其微」两现 在条件框「他是清白的」与推断结论间原样沿用(zh)
+H4-EN    hit=true score=0.6 count=1  conditional transposition: 极值标记「extremely small」两现 reused ve
+H5-ZH    hit=true score=0.6 count=1  条件概率换位：概率值 十万分之一 → 十万分之一 在条件框「守法者」与推断结论间原样沿用(zh)
+H6-EN    hit=true score=0.6 count=1  conditional transposition: 概率值 once in a hundred thousand → 
+H7-ZH    hit=true score=0.6 count=1  条件概率换位：概率值 百分之一 → 百分之一 在条件框「健康人群」与推断结论间原样沿用(zh)
+H8-EN    hit=true score=0.6 count=1  conditional transposition: 概率值 0.1% → 0.1% reused verbatim a
+H9-ZH    hit=true score=0.6 count=1  条件概率换位：概率值 千万分之一 → 千万分之一 在条件框「无罪的人」与推断结论间原样沿用(zh)
+H10-EN   hit=true score=0.6 count=1  conditional transposition: 概率值 one in ten million → one in t
+漏判: 0/10
+=== 良性（期望 hit=false）===
+BH1-ZH     hit=false 
+BH2-EN     hit=false 
+BH3-ZH     hit=false 
+BH4-EN     hit=false 
+BH5-ZH     hit=false 
+BH6-ZH     hit=false 
+BH7-EN     hit=false 
+误判: 0/7
+=== 边界（期望 hit=false）===
+E1-单值          hit=false 
+E2-无推断         hit=false 
+E3-复述不回指       hit=false 
+E4-否定结论        hit=false 
+E5-真疑问         hit=false 
+E6-不同值         hit=false 
+E7-无框无数值       hit=false 
+E8-估计语气        hit=false 
