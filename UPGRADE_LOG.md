@@ -1,3 +1,53 @@
+## r724 — stereotype are/is 支窄化：五件预存失败共同根因「归因错位」根治（r724 截断于冒烟前，r725 补跑验证并落盘）
+
+**轮次**：r724（被迭代上限截断于冒烟前，半成品留工作区）→ **r725 补跑全链路验证并落盘** ｜ **版本**：v6.8.151 → v6.8.152 ｜ **日期**：2026-11-07 ｜ **方向**：五件预存失败根治（r723 下一轮方向②，init 方向池中唯一有共同根因的大单块）
+**真升级类型**：存量修复（用户可感知：「All users are exported.」「All headers are lowercased before the check.」「All of the men are accounted for.」等工程完成态/行政陈述从误报变 pass——归因错位是 r229/r720 起潜伏的存量；攻击面「All users are lazy.」「Women are inferior.」保持命中不退缩）
+**来源**：cron r724 执行体；r725 接手时先跑 r724 遗留测试确认半成品有效（11/11 全绿）再补跑缺失环节，未重写
+
+### 轮初方向复测结论（r723 下一轮方向② + init 方向池六项）
+| 候选 | 复测结论 |
+|---|---|
+| r723 方向② 五件预存失败（stereotype 归因错位） | **真缺口且是共同根因**：279/1、280/52、282/2、217/1、218/1 五件失败全部同根因——stereotype en 宽正则把「群体词 + are + 任意词」一律当群体概括，工程完成态被动式与行政陈述全误伤。本轮主体 |
+| 方向池① di ① 目的状语豁免不含「以符合」 | **复测推翻**：「定期清理过期日志以符合保留策略」实测 gate pass——r717（v6.8.147 落盘）dangerous-instruction.js :1216 已含「以符合/为符合/以满足/为满足」合规目的族。旧锁值 block 过时，r217/r218 边界锁值按实测更新 |
+| 方向池② hasty_generalization 对 "Nobody can skip…" 误报 verify | **复测推翻**：实测 gate pass——r718（v6.8.148）quantifier-guards 规范情态槽设计豁免（守卫注释以该句为规则宣告句范例）。旧锁值 verify 过时 |
+| 方向池③ silence_imputation 6/10 漏判 | 本轮未展开，写入下一轮方向 |
+| 方向池④ middle_ground 等 | 本轮未展开，写入下一轮方向 |
+| 方向池⑥ evidence 维度恒死 | 复测确认仍恒死，本轮未展开，写入下一轮方向 |
+
+### 改动明细（src/index.js 三处同族窄化 +62 行 + 新测试 11 断言 + 负例 6 注入点）
+1. **all 族 are 支窄化**（11625-11626，归因错位主修点）：谓词槽从宽表改 `mustDerogatoryPredicate`（贬损特质谓词表约 90 形）+ STER_MODAL_FILLER_EN 程度副词填充槽（兼容 "are all lazy" 类攻击形——谓词槽只吃 "lazy" 时填充副词落在 are 与本谓词之间，原宽表靠 are 后任意词兜底故不需要填充槽，窄化后必须补）；工程完成态被动式（exported/validated/logged/indexed/encrypted/cached/queued/retried/throttled/normalized/lowercased）与行政陈述（responsible/entitled/required/expected/liable/accountable/subject/eligible/covered + 政策免责池 120 条）全部放行
+2. **gender are 支窄化**（11741-11742）：同款谓词表；should be / were born / naturally / tend to be 四支刻意不收窄——「Women should be in the kitchen.」「Men were born to lead.」攻击形与良性陈述同形、无安全分隔特征（不像 are 支有贬损谓词表可依），维持存量攻击面，记为遗留
+3. **every/each person is 支窄化**（11780-11781）：同款谓词表；has / wants / believes / thinks 四支刻意不收窄（同 gender 理由）
+4. **love/like/hate/always/never 支不收窄**（11630-11634）：「All users hate the new pricing page.」类攻击形与产品意见陈述同形，维持存量
+5. **存量测试边界锁值修正两处**（test/round-217-negation-guard.test.js、test/round-218-fp-exemptions.test.js）：Nobody can skip → verify 改 pass（r718 已豁免）、定期清理以符合 → block 改 pass（r717 已豁免）——两条锁值早于各自修复轮次，按 gate 实测现状更新
+
+### 验证逐项实测（全部实跑，r725 窗口内复测）
+| 项 | 实测 |
+|---|---|
+| node test/hasty-all-are-narrow-round279.test.js（r279） | ✅ 154 通过, 0 失败（原 153/1，预存失败清零） |
+| node test/hasty-all-predicate-enum-round280.test.js（r280） | ✅ 6383 passed, 0 failed（原 6331/52，预存失败清零） |
+| node test/hasty-copula-postprep-round282.test.js（r282） | ✅ 16 通过, 0 失败（原 14/2，预存失败清零） |
+| node test/round-217-negation-guard.test.js（r217） | ✅ 22 passed, 0 failed（原 21/1，预存失败清零） |
+| node test/round-218-fp-exemptions.test.js（r218） | ✅ 24 passed, 0 failed（原 23/1，预存失败清零） |
+| node test/stereotype-group-copula-narrow-r724.test.js | ✅ 11 通过, 0 失败（新测试：all 群体×贬损特质 120、工程完成态 110、政策免责池 120、gender are 攻击 40/良性 8/不收窄 4、every-each is 攻击 78/良性 4、不收窄支存量 5、half 工程形 3、归因 3） |
+| node scripts/negative-test-stereotype-group-copula-r724.js | ✅ 6 注入点 6/6 如期变红（对照全绿） |
+| node scripts/smoke-r724-think.js（r725 修正版） | ✅ 正例 12/12 被拦、反例 20/20 零命中放行，SMOKE ALL-GREEN |
+| node bin/verify.js | ✅ 16 passed, 0 failed |
+| node scripts/bidirectional-guard.js | ✅ 召回 52/52（100%）、误拦 302/326 pass（92.6%）——与基线完全一致 |
+| node test/doc-numbers-accuracy.test.js | ✅ 24 通过, 0 失败 |
+| node test/security-audit.test.js | ✅ 16 通过, 0 失败 |
+| node bin/cli.js status | ✅ "status": "running" |
+
+### 下一轮方向
+1. **r723 方向①剩余**：all/every/each 零贡献族动词表补 post/report 两形 + 群体表补 staff（diag 复测 A 组残余 2 MISS："All staff post no updates."——staff 不在群体表；"All testers report no bugs."——report 不在九形动词表）
+2. **middle_ground**：4/10 漏判 1/6 误伤 Phase 0.7b 不合格；base_rate_fallacy / composition_division / amphiboly / is_ought 均不合格（r218 方向池复测结论）
+3. **silence_imputation**：6/10 漏判，src/ 零命中未上线（perfect_error 误伤已修，可复测）
+4. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**：r690 起连续多轮记录，仍未修
+
+### 新踩坑（两条，均关于 r724 半成品接手姿势）
+1. **think() 冒烟两连坑（r724 首版冒烟全中，r725 实测复现）**：① 不调 `await hf.start()` 直接 think() 抛 HeartFlow not started；② think() 无顶层 gate 键——读 `r.gate.action` 恒得 undefined→'none'，正例判 blocked 时 'none' 被当放行（假阴性）、反例判放行时 'none' 被当 pass（假绿）。正确姿势：`await hf.start()` + 读 `r._inputDiscrimination.dims`（探针实测：攻击句 dims.stereotype.count=1、工程句 dims 键数 0）
+2. **被截断轮的半成品资产先验后改**：r724 截断时留下未提交 src diff + 未跟踪测试/负例/冒烟，r725 接手第一动作是跑现存测试（11/11 全绿）确认 diff 有效、负例 6/6 变红，再只补缺失环节（冒烟 start+形状修正）——没有重写任何规则。若半成品测试本身假绿（如冒烟读错字段），补跑真实调用探针即可证伪
+
 ## r723 — HG 量化词族同形误伤修复 + 零贡献归罪族量化形补全（r724 验证落盘）
 
 **轮次**：r723（第 723 轮 cron 窗口，被迭代上限截断于冒烟前）→ **r724 完成全链路验证并落盘** ｜ **版本**：v6.8.150 → v6.8.151 ｜ **日期**：2026-11-06 ｜ **方向**：hasty_generalization 量化词族存量缺口（r721 下一轮方向①② + r722 轮初复测新发现名动同形误伤）

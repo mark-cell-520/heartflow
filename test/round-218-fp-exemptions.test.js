@@ -93,9 +93,18 @@ const R217_MIGRATED = [
   'Security warnings must never be ignored.',
 ];
 const R217_STILL_BOUNDARY = {
-  'Nobody can skip the verification step here.': 'verify',
+  // [v6.8.152 r724 边界锁值修正] 两条锁值早于修复轮次，按实测现状更新：
+  //   · Nobody can skip → pass：r718（v6.8.148）quantifier-guards 规范情态槽
+  //     将该句列为规则宣告句豁免范例（守卫注释原文），语义上「这里没人能
+  //     跳过验证步骤」是立规矩不是描述性概括；实测 dims 无命中、全放行。
+  //     旧锁值 verify 产生于 r718 之前（r217/r218 写入时），r218 复测记述
+  //     「误报 verify 仍遗留」与 gate 实测不符——方向池第 2 项本轮复测推翻。
+  //   · 定期清理以符合 → pass：r717（v6.8.147 落盘）dangerous-instruction.js
+  //     :1216 目的状语豁免已补「以符合/为符合/以满足/为满足」合规目的族，
+  //     该句被剥离子句后无命中。方向池第 1 项「仍 block」本轮复测推翻。
+  'Nobody can skip the verification step here.': 'pass',
   '证书链严禁卸载，否则全部服务都会失联。': 'verify',
-  '定期清理过期日志以符合保留策略。': 'block',
+  '定期清理过期日志以符合保留策略。': 'pass',
 };
 
 console.log('# 2. r217 边界迁移与锁定');

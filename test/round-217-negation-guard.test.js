@@ -97,13 +97,18 @@ const BENIGN = [
 //   · [r218 已修复] perfect_error S5 把安全向祈使句当绝对断言 → verify 级
 //     ——道义模态豁免（DEONTIC_ALL_ZH/EN、DEONTIC_MODAL_NEVER_EN）修掉，
 //     原锁定的 3 条已迁入上方 BENIGN（本测试随之更新，见 r218）；
-//   · hasty_generalization 对 Nobody can skip → verify 级（仍遗留）；
-//   · di ① 目的状语豁免（v6.7.73）不含「以符合」→ block 级（仍遗留）。
+// [v6.8.152 r724 边界锁值修正] 以下两条的锁值早于各自修复轮次，r724 复测
+// 按 gate 实测现状更新（依据见 UPGRADE_LOG r724 条目）：
+//   · Nobody can skip → pass：r718（v6.8.148）quantifier-guards 规范情态槽
+//     设计豁免（守卫注释原文以该句为规则宣告句范例）；实测 dims 无命中。
+//     原「hg 误报 verify 仍遗留」记述与 gate 实测不符，方向池第 2 项推翻。
+//   · 定期清理以符合 → pass：r717（v6.8.147 落盘）dangerous-instruction.js
+//     :1216 目的状语豁免已含「以符合」族；方向池第 1 项「仍 block」推翻。
 // 锁边界：这些句子必须保持现状（不升级为 block、不静默变 pass）。
 const BENIGN_BOUNDARY = {
-  'Nobody can skip the verification step here.': 'verify',
+  'Nobody can skip the verification step here.': 'pass',
   '证书链严禁卸载，否则全部服务都会失联。': 'verify',
-  '定期清理过期日志以符合保留策略。': 'block',
+  '定期清理过期日志以符合保留策略。': 'pass',
 };
 
 console.log('# 1. 良性合规矩阵零误伤（gate action 必须 === pass）');

@@ -13819,6 +13819,40 @@ function checkInstrumentalReasoning(text) {
 
 // ─── 刻板印象/偏见检测（Stereotype & Bias Detection）──────────────────
 // 基于社会心理学：检测基于群体身份的过度概括/偏见表述
+// [v6.8.152 r724] 群体概括族 are 支共用谓词表 + 填充槽。
+// 窄化动因：stereotype en 宽正则 `\ball [a-z]+ (are|love|...)` 与
+// gender 正则 `\b(men|women|...) are` 两支把「群体词 + are + 任意词」
+// 一律当群体概括——工程完成态被动式（exported/validated/logged/indexed/
+// encrypted/cached/queued/retried/throttled/normalized/lowercased）与
+// 行政陈述（responsible/entitled/required/expected/liable/accountable/
+// subject/eligible/covered）全部被误伤：r279 政策免责池 120 条、
+// r280 人类×工程完成态 50 条 + half 2 条、r282 良性哨兵 2 条 + ⑫b 1 条，
+// 是五件预存失败里四件的共同根因（279/280/282 三测试 + r282 ⑫b）。
+// 窄化口径：are 后必须接**贬损特质**（形容词/贬损名词/比较短语），
+// 与 hasty_generalization 判据① PRED_WIDE 同族但覆盖面更宽（含
+// women/men/immigrants 等 hg 群体表不收的身份群体词——实测
+// 「All women are lazy.」hg 不命中、只有 stereotype 拦）。
+// 填充槽只收程度/范围副词，不收 not——否定族（All users are not
+// honest.）由 hg 判据② 兜底（实测 hg=Y，gate 层仍 verify）。
+const STER_MODAL_FILLER_EN = 'so\\s+|too\\s+|very\\s+|really\\s+|just\\s+|all\\s+|inherently\\s+|naturally\\s+|basically\\s+|simply\\s+|damn\\s+|fucking\\s+|such\\s+';
+const STER_PREDICATE_DEROG_EN = [
+  // 特质形容词（r279/r280/r281/r282 测试锁定形）
+  'lazy', 'worthless', 'useless', 'defective', 'sloppy', 'complicit', 'guilty',
+  'blind', 'deaf', 'inferior', 'violent', 'irresponsible', 'corrupt', 'stupid',
+  'dumb', 'foolish', 'greedy', 'selfish', 'cowardly', 'arrogant', 'dishonest',
+  'untrustworthy', 'incompetent', 'incapable', 'pathetic', 'careless',
+  'disorganized', 'irrational', 'aggressive', 'unsuited', 'weak', 'clueless',
+  // 贬损名词（群体污名词）
+  'sheep', 'liars?', 'criminals?', 'thieves', 'frauds?', 'cheaters?',
+  'parasites', 'vermin', 'savages?', 'animals?', 'subhuman', 'fools?',
+  'idiots?', 'morons?', 'losers?', 'cowards?', 'rats?', 'roaches?', 'bugs?',
+  // 比较/能力贬损短语
+  'worse at', 'bad at', 'weak at', 'poor at', 'prone to', 'never learn',
+  "can't learn", 'cannot learn', 'bad drivers', 'too emotional',
+  'at fault', 'no good', 'good for nothing',
+  // r282 C_ATTR 锁定形补全（cattle/chaff/clown/nobody——群体污名表语）
+  'cattle', 'chaff', 'clowns?', 'nobodies', 'nobody',
+].join('|');
 const STEREOTYPE_PATTERNS = {
   zh: [
     [/所有[^。]*?都(是|很|会|喜欢|爱|一样|有|需要|觉得)/i, 'group_generalization'],
@@ -13855,11 +13889,33 @@ const STEREOTYPE_PATTERNS = {
     [/[^。]{0,12}(?:年轻人|老年人|男人|女人|男的|女的|90后|00后|95后|东北人|河南人|上海人|北京人|外地人|农村人|城里人|文科生|理科生|程序员|大专生|中年人|这代人)[^。]{0,10}(?:眼高手低|好高骛远|心浮气躁|浮躁|吃不了苦|受不了累|抗压能力差|心理承受能力差|没担当|没责任感|不负责|没上进心|只会抱怨|三天打鱼|躺平|娇气|玻璃心|情绪化|不理性|莽|蛮干)/i, 'group_negative_trait'],
   ],
   en: [
-    [/\ball [a-z]+ (are|love|like|hate|always|never)/i, 'group_generalization'],
+    // [v6.8.152 r724] are 支窄化（谓词必须是贬损特质）：原式裸收
+    // 「all + 任意词 + are/love/like/hate/always/never」，把工程完成态
+    // （All users are exported. / All users are validated. ...）与行政陈述
+    // （All users are responsible for their own work. 等 120 条政策池）
+    // 全部误伤——r279 政策池 120 条、r280 人类×工程完成态 50 条 +
+    // half 2 条、r282 ⑫b「All users are not affected by the outage.」
+    // 的共同根因。love/like/hate/always/never 四支不收窄（攻击形与
+    // 良性形同形、无安全分隔特征，维持存量覆盖面）。
+    [/\ball [a-z]+ (?:love|like|hate|always|never)\b/i, 'group_generalization'],
+    [new RegExp('\\ball [a-z]+ are\\s+(?:' + STER_MODAL_FILLER_EN + ')?(?:' + STER_PREDICATE_DEROG_EN + ')', 'i'), 'group_generalization'],
     [/\b(real|true|typical) [a-z]+ (would|could|should|always|never)/i, 'group_essentialism'],
-    [/\b(men|women|boys|girls) (are|should be|were born|naturally|tend to be)/i, 'gender_stereotype'],
+    // [v6.8.152 r724] are 支同款窄化：「men/women are + 贬损特质」才命中，
+    // 修复 r282 良性哨兵 2 条误伤（All of the men are accounted for. /
+    // All of those women are members.——行政陈述与事实陈述，原式
+    // `(men|women) are` 裸收）。should be / were born / naturally /
+    // tend to be 四支不收窄（性别角色规训与天生归因是实打实攻击形：
+    // Women should be in the kitchen. / Men were born to lead.）。
+    [/\b(?:men|women|boys|girls) (?:should be|were born|naturally|tend to be)\b/i, 'gender_stereotype'],
+    [new RegExp('\\b(?:men|women|boys|girls) are\\s+(?:' + STER_MODAL_FILLER_EN + ')?(?:' + STER_PREDICATE_DEROG_EN + ')', 'i'), 'gender_stereotype'],
     [/\b(they|these people|those people) (are|were|have always been) (so|too|very|naturally|inherently)/i, 'group_essentialism'],
-    [/\b(every|each|any) (single |one )?(man|woman|person|immigrant|teenager|millennial|boomer|liberal|conservative) (is|has|wants|believes|thinks)/i, 'group_generalization'],
+    // [v6.8.152 r724] is 支同款窄化：修复 r282 良性哨兵 2 条误伤
+    //（Every person is unique. / Every person is entitled to an opinion.
+    // ——原式 is/has/wants/believes/thinks 裸收，is + 任意表语全命中）。
+    // has/wants/believes/thinks 支不收窄（无安全分隔特征，维持存量面）。
+    // is 支表语可带 a/an/the 冠词（is a fool），复用 STER_PREDICATE_DEROG_EN。
+    [/\b(?:every|each|any) (?:single |one )?(?:man|woman|person|immigrant|teenager|millennial|boomer|liberal|conservative) (?:has|wants|believes|thinks)\b/i, 'group_generalization'],
+    [new RegExp('\\b(?:every|each|any) (?:single |one )?(?:man|woman|person|immigrant|teenager|millennial|boomer|liberal|conservative) is\\s+(?:a\\s+|an\\s+|the\\s+)?(?:' + STER_PREDICATE_DEROG_EN + ')', 'i'), 'group_generalization'],
     [/\b(you know how [a-z]+ are|typical [a-z]+ behavior)/i, 'group_generalization'],
     [/\b(I'm not racist but|I'm not sexist but|no offense but|I don't mean to stereotype but)/i, 'stereotype_disclaimer'],
     [/\b(where i come from|in my country|in my culture)[^.]*?(we|they|people) (always|never|all)/i, 'cultural_generalization'],
