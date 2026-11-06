@@ -124,9 +124,9 @@ const STIMULUS_ZH = [
 
 // ─── 腿② 强制重置支出收益断言（英文）────────────────────────────────
 const STIMULUS_EN = [
-  /\bstimulat(?:e|es|ed|ing)\s+(?:demand|consumption|the economy|growth|production|industry)/i,
-  /\bboost(?:s|ed|ing)?\s+(?:growth|the economy|demand|consumption)/i,
-  /\bspur(?:s|red|ring)?\s+(?:construction|consumption|demand|growth|the economy|industry)/i,
+  /\bstimulat(?:e|es|ed|ing)\s+(?:\w+\s+){0,2}(?:demand|consumption|the economy|growth|production|industry)/i,
+  /\bboost(?:s|ed|ing)?\s+(?:\w+\s+){0,2}(?:growth|the economy|demand|consumption)/i,
+  /\bspur(?:s|red|ring)?\s+(?:\w+\s+){0,2}(?:construction|consumption|demand|growth|the economy|industry)/i,
   /\bcreat(?:e|es|ed|ing)\s+(?:\w+\s+){0,2}(?:work|jobs|demand|spending|growth)\b/i,
   /\bdrive\s+(?:GDP\s+)?growth/i,
   /\bfuel(?:s|ed|ing)?\s+the\s+(?:local\s+|national\s+)?economy/i,
@@ -143,7 +143,7 @@ const STIMULUS_EN = [
 // ——否则「口罩产能扩大带动了上游消费」这类事实性市场反应会自触发。
 // 「将/will」只在其后 6 字内紧跟收益措辞时算数（防止「政府将保障
 // 就业」类政策表述误触）。
-const LINK_ZH = /但是|但|却|反而|反倒|势必|必然|由此|从而|进而|这才|尽管|虽然|虽|不如说|何乐而不为|不容忽视|不愧|堪称|使|让|令|催生|必须|更换|重置|难道|能(?:够)?|都可以?|将(?=[^。]{0,6}(?:拉动|刺激|带动|提振|创造|就业|受益|利好|托举|增长|热潮|生意|轻装上阵|升级|投资|重建|恢复|复苏))/;
+const LINK_ZH = /但是|但|却|反而|反倒|势必|必然|由此|从而|进而|这才|尽管|虽然|虽|不如说|何乐而不为|不容忽视|不愧|堪称|使|让|令|催生|必须|更换|重置|难道|都能|才能|方能|也可以|能(?:够)?(?=[^。，；]{0,6}(?:拉动|刺激|带动|提振|创造|就业|受益|利好|托举|增长|热潮|生意|轻装上阵|升级|投资|重建|恢复|复苏|消费|需求))|将(?=[^。]{0,6}(?:拉动|刺激|带动|提振|创造|就业|受益|利好|托举|增长|热潮|生意|轻装上阵|升级|投资|重建|恢复|复苏))/;
 
 // ─── 腿③ 破坏→收益的连接（英文）─────────────────────────────────────
 const LINK_EN = /\b(?:but|yet|however|leaving|forces?|that|which|means?|thus|thereby|surely|in turn|as \w+ as)\b|\bwill\b(?=\s+(?:\w+\s+){0,2}(?:stimulat|boost|spur|creat|drive|fuel|lift|restock|accelerat))/i;
@@ -151,6 +151,10 @@ const LINK_EN = /\b(?:but|yet|however|leaving|forces?|that|which|means?|thus|the
 // 三腿共现的距离窗
 const WIN_PAIR_ZH = 80;
 const WIN_PAIR_EN = 200;
+// 腿③连接允许落在腿①之前的前缀窗内（句首对比词 But/然而 先于破坏
+// 事件出现：「But saying the war created jobs ignores…」）
+const WIN_PRE_ZH = 24;
+const WIN_PRE_EN = 80;
 
 // ─── 豁免一：认识论纠正（指出本族错误正是判别动作本身）──────────────
 // 注意（r228/r229 教训迁移）：只收复合/结构化形式，不收会在攻击句
@@ -206,10 +210,10 @@ function findSignatures(text, R) {
 
   const sigs = [];
   const langs = [
-    { d: destruct, s: stimulus, l: linkZh, win: WIN_PAIR_ZH, lang: 'zh' },
-    { d: destructEn, s: stimulusEn, l: linkEn, win: WIN_PAIR_EN, lang: 'en' },
+    { d: destruct, s: stimulus, l: linkZh, win: WIN_PAIR_ZH, pre: WIN_PRE_ZH, lang: 'zh' },
+    { d: destructEn, s: stimulusEn, l: linkEn, win: WIN_PAIR_EN, pre: WIN_PRE_EN, lang: 'en' },
   ];
-  for (const { d, s, l, win, lang } of langs) {
+  for (const { d, s, l, win, pre, lang } of langs) {
     const dm = [];
     for (const re of d) for (const m of allMatches(re, text)) dm.push(m);
     const sm = [];
@@ -218,8 +222,8 @@ function findSignatures(text, R) {
       for (const b of sm) {
         const dist = Math.max(a.idx, b.idx) - Math.min(a.end, b.end);
         if (dist > win) continue;
-        // 腿③连接须落在两腿之间的跨度内
-        const lo = Math.min(a.idx, b.idx);
+        // 腿③连接须落在两腿跨度 + 腿①前前缀窗内
+        const lo = Math.max(0, Math.min(a.idx, b.idx) - pre);
         const hi = Math.max(a.end, b.end);
         const seg = text.slice(lo, hi);
         if (!l.test(seg)) continue;
