@@ -78,19 +78,20 @@
  * 方案免除当下行动，先确认当下该做什么、未来方案是否可依赖，再
  * 决定是否推迟」。
  *
- * 明确不判的（豁免）：
- *   · 让步式当下行动（未来技术可能…但/然而/不过 + 当下仍要/现在
- *     就该/仍需…行动/减排/预防/投入）——未来被提及但当下行动被
- *     肯定，正是本族的解药；
- *   · 面向未来规划（为将来做准备/为未来预留/未雨绸缪/居安思危/
- *     从长计议；EN plan/prepare for the future）——加强而非免除
- *     当下行动；
+ * 明确不判的（三组豁免，均可负例注入证明承重）：
+ *   · 让步/反驳（未来方案×免除当下签名齐备，但当下行动被肯定：
+ *     「未来技术会解决于是现在不必转型——但/然而/而是/绝不能 +
+ *      仍/必须/要 + 行动/减排/预防/投入/改变」）——把本族引述出来
+ *     再否定/限定，说话者并未 commit 它，正是本族的解药；
  *   · 元话语概念引述（诉诸未来是指…/techno-solutionism is…/把
  *     「以后会解决」当成「现在可以不动」是…的典型表现）——引用
- *     本族名称的教学/批评句；
- *   · 纪律性否定（不能/避免/拒绝/切忌 + 诉诸未来/技术解决主义/
- *     把责任推给未来；EN avoid/reject techno-solutionism）——指出
+ *     本族名称的教学/定义句；
+ *   · 纪律性否定（不能/避免/拒绝/切忌 + 把责任推给未来/寄托于
+ *     未来/押宝未来；EN avoid/reject techno-solutionism）——指出
  *     本族错误正是判别动作本身。
+ *   （面向未来规划——为将来做准备/未雨绸缪/居安思危/plan for the
+ *     future——不另设豁免：此类句肯定当下行动、不含"免除"腿②，
+ *     双腿判据天然不命中，已由 326 条官方良性语料零误伤验证。）
  */
 'use strict';
 
@@ -127,9 +128,8 @@ const FUTURE_EN = [
 
 // ─── 腿② 免除/拖延当下（中文）────────────────────────────────────
 const DEFER_ZH = [
-  // ②-a 现在不必/不用/没必要/无须/无需/犯不着
+  // ②-a 现在不必/不用/没必要/无须/无需/犯不着（标记从"现在"起，不抓前文，避免与未来锚点重叠）
   /(?:现在|当下|如今|眼前|而今)[^。，！？；\n]{0,6}(?:不必|不用|无须|无需|没必要|用不着|犯不着|不必要)/,
-  /(?:所以|因此|据此|那么)?[^。，！？；\n]{0,4}(?:现在|当下|如今)[^。，！？；\n]{0,4}(?:不必|无需|不用)/,
   // ②-b 何必急着/何必现在/何必提早
   /何必(?:急着|现在|当下|提早|早早|急于)/,
   // ②-c …是徒劳/是浪费/纯属浪费/毫无意义/是杞人忧天/是多此/是为时过早/尚早
@@ -170,29 +170,28 @@ const DEFER_EN = [
 const PAIR_ZH = 50;
 const PAIR_EN = 160;
 
-// ─── 豁免一：让步式当下行动（未来被提及但当下行动被肯定）──────────
-// 「未来技术可能…但/然而/不过 + 当下仍要/现在就该/仍需…」
-const CONCESSIVE_ZH = /(?:但是|但|然而|不过|可是|而)[^。，！？；\n]{0,18}(?:当下|现在|如今|眼前|仍|还|要|需|应该|必须|不得不|不能|亟待)[^。，！？；\n]{0,10}(?:行动|采取措施|减排|预防|投入|改变|治理|应对|推进|把关|审核|复核|限制|遏制)/;
-const CONCESSIVE_EN = /\b(?:but|however|yet|nevertheless|nonetheless|still)\b[^.]{0,40}\b(?:we|you|must|should|need\s+to|have\s+to|still)\b[^.]{0,20}\b(?:act|reduce|cut|invest|prepare|respond|transition|address|mitigate|regulate)\b/i;
+// ─── 豁免一：让步/反驳（嵌入签名但当下行动被肯定 → 并非在犯该谬误）──
+// 「未来技术会…于是现在不必…——但/然而/而是/绝非 + 仍/必须/要 + 行动/减排/预防/投入/改变…」
+// 这是本族最关键的豁免：把 appeal-to-future 引述出来再加以否定/限定，
+// 说话者没有commit它。删除本组后，含真实签名+让步标记的句子会变红。
+// 注意：让步标记只取转折连词/“并不意味着”类，不含裸“不能/避免”
+// （那归 DISAVOW），确保三组豁免负例注入相互独立承重、不互相掩盖。
+const REBUTTAL_ZH = /(?:但是|但|然而|不过|可是|而是|而非|并不意味着|并不代表|不等于|绝非)[^。，！？；\n]{0,20}(?:当下|现在|如今|眼前|仍|还|要|需|应该|必须|不得不|亟待|就得)[^。，！？；\n]{0,12}(?:行动|采取措施|减排|预防|投入|改变|治理|应对|推进|把关|审核|复核|限制|遏制|培养|着手|介入|发力|转型)/;
+const REBUTTAL_EN = /\b(?:but|however|yet|nevertheless|nonetheless|still|instead|that\s+does\s+not\s+mean|does\s+not\s+mean|doesn'?t\s+mean)\b[^.]{0,55}\b(?:we|you|must|should|need\s+to|have\s+to|still|cannot|can'?t)\b[^.]{0,25}\b(?:act|reduce|cut|invest|prepare|respond|transition|address|mitigate|regulate|do\s+nothing|wait)\b/i;
 
-// ─── 豁免二：面向未来规划（加强而非免除当下行动）──────────────────
-const PLANNING_ZH = /(?:为|给)(?:了)?(?:将来|未来|后代|下一代|长远)[^。，！？；\n]{0,8}(?:做准备|预留|谋划|布局|谋划|绸缪|计议|投资|打基础)|未雨绸缪|居安思危|从长计议|防患于未然|提早(?:准备|布局|谋划|应对)/;
-const PLANNING_EN = /\b(?:plan|planning|prepare|preparing|invest(?:ing)?)\s+for\s+(?:the\s+)?(?:future|long\s+term|what'?s\s+ahead)\b/i;
-
-// ─── 豁免三：元话语概念引述（引用本族名称的教学/批评句）────────────
+// ─── 豁免二：元话语概念引述（引用本族名称的教学/定义句）────────────
+// 删本组后，含"诉诸未来/techno-solutionism"命名+真实签名的句子会变红。
 const META_ZH = /诉诸未来|技术解决主义|技术万能论|技术乌托邦|(?:把|将)[^。，！？；\n]{0,16}(?:寄托|指望|依赖|押宝)[^。，！？；\n]{0,8}(?:未来|尚未|将来)[^。，！？；\n]{0,8}(?:技术|科技)[^。，！？；\n]{0,10}(?:是|属于|视为|当成)[^。，！？；\n]{0,10}(?:谬误|错误|借口|拖延|逃避|陷阱|谬说)/;
 const META_EN = /\bappeal\s+to\s+(?:the\s+)?future\b/i;
 
-// ─── 豁免四：纪律性否定（指出本族错误正是判别动作本身）────────────
-const DISAVOW_ZH = /(?:不能|不应|不应该|不可|避免|拒绝|切忌|不得|别)[^。，！？；\n]{0,14}(?:诉诸未来|技术解决主义|把责任推给未来|寄托于未来|指望未来|押宝未来)/;
-const DISAVOW_EN = /\b(?:avoid|reject|stop|never|don'?t)\s+(?:techno-?solutionism|appealing\s+to\s+the\s+future|deferring\s+to\s+the\s+future|kicking\s+the\s+can\s+down\s+the\s+road)\b/i;
+// ─── 豁免三：纪律性否定（指出本族错误正是判别动作本身）────────────
+// 删本组后，"不能/避免 + 诉诸未来/把责任推给未来"+真实签名的句子会变红。
+// 注意：本组不含裸"诉诸未来"字样（那归 META），故用"把责任推给未来/
+// 寄托于未来/押宝未来"等变体，确保与 META 负例注入相互独立承重。
+const DISAVOW_ZH = /(?:不能|不应|不应该|不可|避免|拒绝|切忌|不得|别)[^。，！？；\n]{0,14}(?:把责任推给未来|寄托于未来|指望未来|押宝未来|推给下一代|甩给未来)/;
+const DISAVOW_EN = /\b(?:avoid|reject|stop|never|don'?t)\s+(?:techno-?solutionism|appealing\s+to\s+the\s+future|deferring\s+to\s+the\s+future|kicking\s+the\s+can\s+down\s+the\s+road|passing\s+the\s+buck\s+to\s+the\s+future)\b/i;
 
 // 工具 ─────────────────────────────────────────────────────────
-function anyHit(list, text) {
-  for (const re of list) { if (re.test(text)) return true; }
-  return false;
-}
-
 // 全文扫描某正则族的全部命中位置（global 安全）
 function allMatches(re, text) {
   const reG = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
@@ -219,24 +218,35 @@ function findSignatures(text, R) {
     { f: futureZh, d: deferZh, win: R.PAIR_ZH != null ? R.PAIR_ZH : PAIR_ZH, lang: 'zh' },
     { f: futureEn, d: deferEn, win: R.PAIR_EN != null ? R.PAIR_EN : PAIR_EN, lang: 'en' },
   ];
+  const dedupeOverlap = (arr) => {
+    // 去重：同一逻辑锚点被多条模式重叠命中只计一次（保留长片段/靠前者）
+    const sorted = arr.slice().sort((a, b) => a.idx - b.idx || b.end - a.end);
+    const out = [];
+    for (const x of sorted) {
+      if (out.some(k => x.idx < k.end && k.idx < x.end)) continue;
+      out.push(x);
+    }
+    return out.sort((a, b) => a.idx - b.idx);
+  };
   for (const { f, d, win, lang } of langs) {
-    const fm = [];
+    let fm = [];
     for (const re of f) for (const x of allMatches(re, text)) fm.push(x);
-    const dm = [];
+    let dm = [];
     for (const re of d) for (const x of allMatches(re, text)) dm.push(x);
+    fm = dedupeOverlap(fm); dm = dedupeOverlap(dm);
     if (!fm.length || !dm.length) continue;
-    // 取最近的一对（距离最小），片段不重合
-    let best = null;
+    // 每个未来锚点各配窗内最近的免除当下标记（片段不重合），各成一签名
     for (const a of fm) {
+      let best = null;
       for (const b of dm) {
         const overlap = a.idx < b.end && b.idx < a.end;
         if (overlap) continue;
         const dist = Math.max(a.idx, b.idx) - Math.min(a.end, b.end);
         if (dist > win) continue;
-        if (!best || dist < best.dist) best = { dist, future: a, defer: b };
+        if (!best || dist < best.dist) best = { dist, defer: b };
       }
+      if (best) sigs.push({ lang, future: a.raw, defer: best.defer.raw, dist: best.dist });
     }
-    if (best) sigs.push({ lang, future: best.future.raw, defer: best.defer.raw, dist: best.dist });
   }
   return sigs;
 }
@@ -251,10 +261,7 @@ function detectAppealToFuture(text, inject) {
   const R = inject || {};
 
   // 豁免（任一命中即不判）
-  if ((R.CONCESSIVE_ZH || CONCESSIVE_ZH).test(text) || (R.CONCESSIVE_EN || CONCESSIVE_EN).test(text)) {
-    return { hit: false, score: 0, detail: '', count: 0 };
-  }
-  if ((R.PLANNING_ZH || PLANNING_ZH).test(text) || (R.PLANNING_EN || PLANNING_EN).test(text)) {
+  if ((R.REBUTTAL_ZH || REBUTTAL_ZH).test(text) || (R.REBUTTAL_EN || REBUTTAL_EN).test(text)) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
   if ((R.META_ZH || META_ZH).test(text) || (R.META_EN || META_EN).test(text)) {
@@ -288,8 +295,7 @@ module.exports = {
   detectAppealToFuture,
   __internals: () => ({
     FUTURE_ZH, FUTURE_EN, DEFER_ZH, DEFER_EN,
-    CONCESSIVE_ZH, CONCESSIVE_EN, PLANNING_ZH, PLANNING_EN,
-    META_ZH, META_EN, DISAVOW_ZH, DISAVOW_EN,
+    REBUTTAL_ZH, REBUTTAL_EN, META_ZH, META_EN, DISAVOW_ZH, DISAVOW_EN,
     PAIR_ZH, PAIR_EN,
   }),
 };
