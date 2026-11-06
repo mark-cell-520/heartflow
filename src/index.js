@@ -523,6 +523,7 @@ const { checkPostHoc, STAT_CONTEXT_ZH } = require('./post-hoc.js');
 // [r222] 方法学「排除性否定因果归属」豁免表（post_hoc / pseudo_causal /
 // cum_hoc / common_cause / mediator_confusion 五维共用，见该文件注释）
 const { hasExclNegCausal } = require('./methodology-exempt.js');
+const { hasCovariateMethodology, hasCoercionContext } = require('./methodology-covariate.js');
 // [r721] 第 152 维度 appeal_to_probability（诉诸概率/可能性误当必然）。
 // decision 本体选出（scripts/decide-r721.js，composite_score 0.81 /
 // confidence 0.78 / identity alignment 0.8，无弃权）。候选池来自 r721
@@ -8721,6 +8722,18 @@ function checkMoralFoundations(text) {
   // 技术语境豁免：常见技术词组合不是道德框架讨论（2026-08-15 实测误报）
   //   "自然语言处理/自然语言" 不是圣洁话题；"独立进程/独立实例" 不是自由话题；
   //   "控制流/版本控制" 不是压迫话题
+  // [r221] 统计控制动词 × 统计对象的**动词形态**（r223 提为命名常量：
+  // 它是「控制动词语境豁免」的一半，须与 r223 通用协变量支共用同一个
+  // 压迫语境总闸，见下方 coercionOverride）。v6.7.73 只收了字面
+  // 「控制变量」，「控制了基线特征」「控制选择偏差」「调整协变量」这类
+  // 实验设计表述照样把「控制」送进自由/压迫通道（r221 实测 20 条方法学
+  // 句中 6 条因此多一条 moral_foundations finding）。判据取紧形状
+  // 「控制动词 + ≤8 字 + 统计对象」，与 r220 STAT_CONTEXT_ZH 支①同构。
+  // **刻意不导入 STAT_CONTEXT_ZH 全表**：那边的支三是裸统计术语在场
+  // （回归/方差分析/元分析/队列研究…无条件豁免），用在道德维度会把
+  // 「这项回归分析表明控制者剥夺了人民的自由」的道德信号一起洗掉——
+  // 方法学豁免要的是「控制动词+统计对象」，不是「提到统计就免道德」。
+  const COV_ACT_TECH = /(?:控制|调整|纳入|加入|考虑|剔除|排除|匹配|加权|分层)[了]?[^。，,；;！？]{0,8}(?:变量|因素|协变量|混杂|混淆|中介|基线|选择偏差|调节|倾向得分|反事实|差距|差异|特征|效应|偏差|趋势)/i;
   const TECH_CONTEXT = [
     /自然语言|自然语义|语言模型|processing\s+language|naturallang/i,
     /独立进程|独立实例|独立模块|独立服务|standalone|independent process|separate instance/i,
@@ -8728,16 +8741,14 @@ function checkMoralFoundations(text) {
     // [v6.7.73] 补科研/合规语境的弱道德词：
     // 「控制变量」不是压迫话题（实验设计），「遵守监管规定」不是权威服从
     /控制变量|控制组|对照组|实验组|controlled variable|control group/i,
-    // [r221] 统计控制动词 × 统计对象的**动词形态**：v6.7.73 只收了字面
-    // 「控制变量」，「控制了基线特征」「控制选择偏差」「调整协变量」这类
-    // 实验设计表述照样把「控制」送进自由/压迫通道（r221 实测 20 条方法学
-    // 句中 6 条因此多一条 moral_foundations finding）。判据取紧形状
-    // 「控制动词 + ≤8 字 + 统计对象」，与 r220 STAT_CONTEXT_ZH 支①同构。
-    // **刻意不导入 STAT_CONTEXT_ZH 全表**：那边的支三是裸统计术语在场
-    // （回归/方差分析/元分析/队列研究…无条件豁免），用在道德维度会把
-    // 「这项回归分析表明控制者剥夺了人民的自由」的道德信号一起洗掉——
-    // 方法学豁免要的是「控制动词+统计对象」，不是「提到统计就免道德」。
-    /(?:控制|调整|纳入|加入|考虑|剔除|排除|匹配|加权|分层)[了]?[^。，,；;！？]{0,8}(?:变量|因素|协变量|混杂|混淆|中介|基线|选择偏差|调节|倾向得分|反事实|差距|差异|特征|效应|偏差|趋势)/i,
+    COV_ACT_TECH,
+    // [r223] 通用协变量名词支（src/methodology-covariate.js）：r221 表腿③
+    // 只收「变量/因素/协变量」这类自带统计词尾的对象，「控制年龄」「调整
+    // 收入」「控制家庭背景」这类只有裸协变量名词的形状整族漏网——r223
+    // 扩样 30 条实测 15 条仍产一条 severity 20 liberty finding。判据不是
+    // 「控制动词 + 协变量」两腿（那会连「控制人口年龄结构，强行规定谁
+    // 可以生育」一起洗掉），而是三腿：动词 × 协变量 × 统计结论框，
+    // 外加压迫语境反向守卫。见该模块头注释与 r223 报告第二节。
     /遵守[^。]{0,8}(?:规定|监管|规则|规程|纪律|流程|标准|协议|约定)|comply with|compliance/i,
     /服从[^。]{0,6}(?:分布|函数|数据|模型|定律)/i,
     // [v6.7.73] 医学/临床语境——「副作用包括头晕和恶心」是症状枚举，
@@ -8753,14 +8764,25 @@ function checkMoralFoundations(text) {
     /持久化|persist|persistence/i,
     /路由|routing|route/i,
   ];
-  const techHit = TECH_CONTEXT.some(re => re.test(text));
+  const techHit = TECH_CONTEXT.some(re => re.test(text)) || hasCovariateMethodology(text);
   if (techHit) {
     // 保留真正道德语义（出现强道德词如 背叛/奴役/屠杀/仇恨 时不豁免），弱词（自然/独立/归属）在技术语境下豁免
     const STRONG_MORAL = /背叛|奴役|屠杀|种族|仇恨|压迫|暴政|贞洁|亵渎|神圣/i;
     // [v6.7.73] 扩到 fairness/authority——「教育公平是社会公平的基础」
     // 「遵守监管规定」在科研/合规语境是正常表述，不是道德框架讨论。
     const weakOnly = found.every(f => ['sanctity', 'liberty', 'loyalty', 'fairness', 'authority'].includes(f.foundation));
-    if (weakOnly && !STRONG_MORAL.test(text)) {
+    // [r223] 控制动词语境的形状豁免让位于动作对象：r221 紧形状表与 r223
+    // 通用协变量表都收「控制动词 + 统计对象」，而「控制」在中文里同时是
+    // 压迫语义的高频动词。r223 对抗探针实测两条真压迫句穿过 r221 表被误
+    // 豁免（「政府控制了社会的稳定因素，让所有异议消失」「控制了穷人的
+    // 收入因素，他们就没有办法反抗」）——形状齐备、动作对象却是人。
+    // 守卫只作控制动词语境豁免的总闸，不作用于其余 TECH_CONTEXT 条目
+    // （它们没有「统计 vs 压迫」的同名歧义，「学生必须遵守课堂纪律」这类
+    // authority 豁免不能被连带打死）。判据见 src/methodology-covariate.js。
+    const coercionOverride = hasCovariateMethodology(text)
+      ? hasCoercionContext(text)
+      : (COV_ACT_TECH.test(text) && hasCoercionContext(text));
+    if (weakOnly && !STRONG_MORAL.test(text) && !coercionOverride) {
       return { count: 0, foundations: [], score: 0 };
     }
   }

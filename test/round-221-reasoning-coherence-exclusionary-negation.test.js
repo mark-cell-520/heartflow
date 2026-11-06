@@ -322,7 +322,21 @@ w(process.argv[1],process.argv[2]);`,
     const lineIdx = lines.findIndex(l => l.includes('(?:控制|调整|纳入|加入|考虑|剔除|排除|匹配|加权|分层)'));
     assert.ok(lineIdx >= 0, '副本中找不到统计控制动词表行');
     assert.ok(lines[lineIdx].includes('(?:变量|因素|协变量'), '副本里不含统计对象半');
-    lines[lineIdx] = '    /_(?!_)_/i,';
+    // [r223] 变异方式随 r221 表的重构调整（不是放水，理由见下）：
+    //   r223 把该正则从 TECH_CONTEXT 数组元素提为命名常量 COV_ACT_TECH
+    //   （须与 r223 新表 src/methodology-covariate.js 共用同一个压迫语境
+    //   总闸，见 src/index.js coercionOverride），整行替换会留下
+    //   `const COV_ACT_TECH = ` 空声明 → 语法错误。改为只替换正则字面量。
+    //   同时**必须**一并置假 r223 新表：r223 之后 BENIGN 里含裸协变量名词
+    //   的句子（「控制了基线特征之后…」的「基线」）由新表接管，只删旧表
+    //   召回不满 3——与 r220 E 节「只删 STAT_CONTEXT_ZH 不够、须同时删
+    //   共表」同型（两张表现在都承重，删一张证明不了另一张）。
+    lines[lineIdx] = lines[lineIdx].replace(/= \/.*\/i;/, '= /_(?!_)_/i;');
+    const covPath = path.join(tmp, 'src', 'methodology-covariate.js');
+    let covSrc = fs.readFileSync(covPath, 'utf8');
+    covSrc = covSrc.replace('COV_METHOD_ZH.test(text)', 'false')
+                   .replace('COV_ENUM_ZH.test(text)', 'false');
+    fs.writeFileSync(covPath, covSrc, 'utf8');
     fs.writeFileSync(src, lines.join('\n'), 'utf8');
     const out = cp.execFileSync(process.execPath,
       ['-e', `const idx=require(${JSON.stringify(path.join(tmp, 'src', 'index.js'))});
