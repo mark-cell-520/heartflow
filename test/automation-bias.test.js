@@ -5,9 +5,14 @@
  * 攻击必须不再命中、豁免句必须变红——证明每一组判据都真实承重。
  */
 'use strict';
-const test = require('node:test');
 const assert = require('node:assert/strict');
 const { detectAutomationBias } = require('../src/automation-bias.js');
+
+let passed = 0, failed = 0;
+function check(name, fn) {
+  try { fn(); passed++; console.log(`  ✓ ${name}`); }
+  catch (e) { failed++; console.log(`  ✗ ${name}: ${e.message}`); }
+}
 
 // ─── 攻击样本（应命中）────────────────────────────────────────
 const ATTACKS_ZH = [
@@ -76,16 +81,16 @@ const BOUNDARY = [
 const MIXED = '算法的判断比人脑更客观，人工复核可以取消；the model is more accurate than any human, so skip the review.';
 const MULTI_ZH = '算法的判断比人脑更客观，人工复核可以取消；系统给出的分数比任何专家都准，申诉无效。';
 
-// ─── 负例注入用常量替换（单键注入，勿整体 spread）────────────────
+console.log('automation-bias（r231 算法崇拜/自动化偏见）测试:');
 
-test('模块导出与短输入安全', () => {
+check('模块导出与短输入安全', () => {
   assert.equal(typeof detectAutomationBias, 'function');
   assert.equal(detectAutomationBias('').hit, false);
   assert.equal(detectAutomationBias(null).hit, false);
   assert.equal(detectAutomationBias('短').hit, false);
 });
 
-test('攻击命中：中文 12 条', () => {
+check('攻击命中：中文 12 条', () => {
   for (const t of ATTACKS_ZH) {
     const r = detectAutomationBias(t);
     assert.equal(r.hit, true, '应命中: ' + t);
@@ -97,7 +102,7 @@ test('攻击命中：中文 12 条', () => {
   }
 });
 
-test('攻击命中：英文 8 条', () => {
+check('攻击命中：英文 8 条', () => {
   for (const t of ATTACKS_EN) {
     const r = detectAutomationBias(t);
     assert.equal(r.hit, true, '应命中: ' + t);
@@ -105,19 +110,19 @@ test('攻击命中：英文 8 条', () => {
   }
 });
 
-test('良性零误伤：16 条', () => {
+check('良性零误伤：16 条', () => {
   for (const t of BENIGN) assert.equal(detectAutomationBias(t).hit, false, '误伤: ' + t);
 });
 
-test('豁免族：认识论纠正与器官/制度系统', () => {
+check('豁免族：认识论纠正与器官/制度系统', () => {
   for (const t of EXEMPT) assert.equal(detectAutomationBias(t).hit, false, '误伤: ' + t);
 });
 
-test('边界锁：三腿缺一/超窗不判', () => {
+check('边界锁：三腿缺一/超窗不判', () => {
   for (const t of BOUNDARY) assert.equal(detectAutomationBias(t).hit, false, '误判: ' + t);
 });
 
-test('中英混排与多签名加分档', () => {
+check('中英混排与多签名加分档', () => {
   const m = detectAutomationBias(MIXED);
   assert.equal(m.hit, true, '混排应命中');
   assert.equal(m.count, 2, '中英双签名');
@@ -128,7 +133,7 @@ test('中英混排与多签名加分档', () => {
   assert.ok(Math.abs(z.score - 0.7) < 1e-9, '双签名加分档');
 });
 
-test('负例注入：六组腿族删除后攻击全部不再命中', () => {
+check('负例注入：六组腿族删除后攻击全部不再命中', () => {
   // 每组只注入单一空数组（不混入其他腿族删除），确保断言失败原因唯一
   assert.equal(detectAutomationBias(ATTACKS_ZH[1], { MACHINE_ZH: [] }).hit, false);
   assert.equal(detectAutomationBias(ATTACKS_EN[0], { MACHINE_EN: [] }).hit, false);
@@ -138,18 +143,18 @@ test('负例注入：六组腿族删除后攻击全部不再命中', () => {
   assert.equal(detectAutomationBias(ATTACKS_EN[0], { DEFERENCE_EN: [] }).hit, false);
 });
 
-test('负例注入：豁免组删除后豁免句变红', () => {
+check('负例注入：豁免组删除后豁免句变红', () => {
   assert.equal(detectAutomationBias(EXEMPT[4], { EXEMPT_CORRECT_ZH: [] }).hit, true);
   assert.equal(detectAutomationBias(EXEMPT[5], { EXEMPT_CORRECT_EN: [] }).hit, true);
   assert.equal(detectAutomationBias(EXEMPT[3], { EXEMPT_SYSTEM_ZH: [] }).hit, true);
 });
 
-test('负例注入：距离窗承重（放大到 120 后长距句命中）', () => {
+check('负例注入：距离窗承重（放大到 120 后长距句命中）', () => {
   assert.equal(detectAutomationBias(BOUNDARY[3]).hit, false, '默认窗不命中');
   assert.equal(detectAutomationBias(BOUNDARY[3], { WIN_PAIR_ZH: 120 }).hit, true, '放大窗后命中');
 });
 
-test('引擎闸：良性样本不得以 automation_bias 进 findings', () => {
+check('引擎闸：良性样本不得以 automation_bias 进 findings', () => {
   const engine = require('../src/gate.js');
   const gate = engine.check || engine.gate || engine.checkOutput;
   assert.equal(typeof gate, 'function', '引擎入口存在');
@@ -159,3 +164,6 @@ test('引擎闸：良性样本不得以 automation_bias 进 findings', () => {
     assert.ok(!dims.includes('automation_bias'), '误伤: ' + t);
   }
 });
+
+console.log(`\n测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
+if (failed > 0) process.exit(1);

@@ -1,0 +1,6 @@
+[hf4 2026-11-06T14:23:38Z] VERSION=6.8.145
+[hf4 2026-11-06T14:23:38Z] PASS  bin/verify.js  —  passed=16 failed=0
+[hf4 2026-11-06T14:23:38Z] PASS  scripts/guard-abilities.js  —  能力检查 20/20 全通过；判别维度 214 个
+[hf4 2026-11-06T14:23:38Z] PASS  test/doc-numbers-accuracy.test.js  —  通过=24 失败=0
+[hf4 2026-11-06T14:23:38Z] PASS  scripts/bidirectional-guard.js  —  召回=52/52 误拦=301/326
+[hf4 2026-11-06T14:23:38Z] 四门禁全绿

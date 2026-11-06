@@ -1,0 +1,27 @@
+diff --git a/src/index.js b/src/index.js
+index 1c7e267..7bd382e 100644
+--- a/src/index.js
++++ b/src/index.js
+@@ -3622,7 +3622,7 @@ function discriminate(text, evidence = [], contentMode) {
+     //   池子就全靠 unsupported_claim 一条腿兜着，且 peZhMeasured 四条件进不去。
+     //   分界线与前三个池一致：数字定位到变化率口径或责任分摊比例才算度量语境；
+     //   「增长 18%」单独出现（无同比/环比/较上期）仍不放行。
+-    const M436_RATIO_CTX_ZH = /(?:同比|环比|较?(?:去年|上年|上期|上季度|上月|上周|年初)|较上年同期|与上年同期相比|较上期|日环比|月环比|年环比|环比上月|同比增长|同比下降)\s*(?:增长|下降|提高|降低|增加|减少|回升|回落|升至|跌至|持平)|(?:承担|分成|分摊|赔付|赔偿|支付|预留|划拨|切分|偿付)\s*\d+(?:\.\d+)?\s*%|\d+(?:\.\d+)?\s*%\s*(?:的)?(?:损[失害]|费用|成本|金额|价款|份额|比例|权益|风险|责任)/;
++    const M436_RATIO_CTX_ZH = /(?!)/;
+     const M435_PLAN_RATIO_ZH = /(?:先|首批|先期|灰度|逐步|分批|分阶段)\s*(?:放|开放|释放|切|推|灰度)\s*\d+(?:\.\d+)?\s*%|\d+(?:\.\d+)?\s*%\s*(?:的)?\s*(?:流量|用户|请求|名额|白名单)/;
+     const M435_EFFECT_ZH = /(?:治愈|疗效|寿命|症状|疾病|病情|患者|病人|存活|生存期)/;
+     const peZhMeasured = pe.count === 1 && pe.signals.length === 1
+@@ -7960,10 +7960,10 @@ function checkUnsupportedClaim(text) {
+   // ③ 同比/环比/较上期统计口径：变化率陈述，出处是统计报表
+   const M435_YOY_RATIO_ZH = /(?:同比|环比|较?(?:去年|上年|上期|上季度|上月|上周|年初)|较上年同期|与上年同期相比|较上期)\s*(?:增长|下降|提高|降低|增加|减少|回升|回落)/;
+   const M435_NO_EFFECT_ZH = /(?:治愈|疗效|寿命|症状|疾病|病情|患者|病人|存活|生存期)/;
+-  const citedLegalQuote = hasChinese && M435_LEGAL_CITE_ZH.test(text) && !M435_NO_EFFECT_ZH.test(text);
+-  const citedContractQuote = hasChinese && M435_CONTRACT_RATIO_ZH.test(text) && !M435_NO_EFFECT_ZH.test(text);
++  const citedLegalQuote = false;
++  const citedContractQuote = false;
+   const citedYoyQuote = hasChinese && M435_YOY_RATIO_ZH.test(text) && !M435_NO_EFFECT_ZH.test(text);
+-  const citedMetricQuote = !hasChinese ? false : (SOURCE_ANCHOR_ZH.test(text) && METRIC_NOUN_CITED.test(text) && !PROMO_EFFECT_ZH.test(text));
++  const citedMetricQuote = !hasChinese ? false : (SOURCE_ANCHOR_ZH.test(text) && METRIC_NOUN_CITED.test(text));
+   // 无依据断言是高危幻觉信号：2+ 处 → 高分；仅"具体来源+自我保留+非因果结论"或"公开权威来源+非因果"时豁免
+   // 模糊来源编造模板（vagueSourceClaim）不享受豁免
+   // 无依据断言是高危幻觉信号：2+ 处 -> 高分；

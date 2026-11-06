@@ -1,0 +1,11 @@
+{
+  "agent": "agent-4",
+  "version": "6.8.145",
+  "gates": [
+    {"name": "bin/verify.js", "status": "PASS", "detail": "passed=16 failed=0"},
+    {"name": "scripts/guard-abilities.js", "status": "PASS", "detail": "能力检查 20/20 全通过；判别维度 214 个"},
+    {"name": "test/doc-numbers-accuracy.test.js", "status": "FAIL", "detail": "exit=1 214,\"staticCheckFns\":50,\"block\":11,\"rewrite\":19,\"verify\":171,\"mcpTools\":184,\"handlers\":186,\"routes\":1316,\"tests\":19269,\"testFailed\":98,\"testCountAt\":\"2026-11-06"},
+    {"name": "scripts/bidirectional-guard.js", "status": "PASS", "detail": "召回=52/52 误拦=301/326"}
+  ],
+  "all_pass": false
+}
