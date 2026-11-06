@@ -76,11 +76,29 @@ const ATTACK = [
 // PC_SEQ_ZH 的生效组合里等），属**漏判**方向，与本轮**误伤**方向相反，
 // 按「一轮一个主题」纪律不扩。登记为断言是为了将来修的时候测试必须显式改，
 // 不会静默漂移。
+//
+// [r224] 其中 2 条已修（src/post-hoc.js 召回扩面），显式拆出：
+//   - 「他喝了这个偏方，第二天病就好了，看来偏方真有用」——缺的两条腿都补上
+//     了：CONNECT_ZH 加裸「第二天」（原表只有紧邻形「第二天就」）、
+//     INTERVENE_ZH 加「喝了」（原表只收 吃了/用了/装了/换了…）。detector
+//     count 0→2（R1「第二天」×「看来/真有用」+ R2「喝了」×「就好了」）。
+//   - 「从那天以后他就像变了个人，肯定是受了刺激」——CONNECT_ZH 加
+//     「从那天以后」（原表只有「从那以后」，子串不中「从那天以后」），
+//     与存量 ASSERT「肯定是」配对命中 R1。count 0→1。
+// 剩 2 条仍未修，原因见 r224 报告第五节：
+//   - 「他上任后公司利润就涨了，肯定是他有能力」——裸「后」不在
+//     CONNECT_ZH，且无干预动词×变化腿；
+//   - 「昨天我在电梯里摔了一跤，今天就下雨了」——**全句没有任何因果断言**，
+//     只是两件事并置。按 post_hoc 维度自身定义（「断定前者是后者的原因」）
+//     不构成后此谬误，判别它需要世界知识（摔跤与下雨无关），超出规则引擎
+//     能力范围（AGENTS.md Honest limitations）。属结构性不可判，非词表缺口。
+const FIXED_BY_R224 = [
+  '他喝了这个偏方，第二天病就好了，看来偏方真有用',
+  '从那天以后他就像变了个人，肯定是受了刺激',
+];
 const KNOWN_GAP = [
   '他上任后公司利润就涨了，肯定是他有能力',
   '昨天我在电梯里摔了一跤，今天就下雨了',
-  '他喝了这个偏方，第二天病就好了，看来偏方真有用',
-  '从那天以后他就像变了个人，肯定是受了刺激',
 ];
 
 const phCount = t => idx.checkPostHoc(t).count;
@@ -167,6 +185,17 @@ test(`D 已知未修漏判登记现值（${KNOWN_GAP.length} 条，改前改后�
     assert.strictEqual(r.gate.action, 'pass', `「${t}」现值应为 pass（存量漏判），实测 ${r.gate.action}`);
     assert.strictEqual(phCount(t), 0, `「${t}」post_hoc 现值应为 0，实测 ${phCount(t)}`);
     assert.strictEqual(pcCount(t), 0, `「${t}」pseudo_causal 现值应为 0，实测 ${pcCount(t)}`);
+  }
+});
+
+// [r224] 原 D 节 4 条里的 2 条已由本轮召回扩面修复。这里显式断言修复后
+// 现值（detector 命中 + gate 非 pass），而不是把它们从语料里删掉——登记项
+// 修复后测试必须同步改，这是 D 节「防静默漂移」的原意。
+test(`D2 r224 已修漏判的修复后现值（${FIXED_BY_R224.length} 条，detector 命中 + gate 非 pass）`, () => {
+  for (const t of FIXED_BY_R224) {
+    assert.ok(phCount(t) > 0, `「${t}」r224 修复后 post_hoc 应命中，实测 ${phCount(t)}`);
+    assert.notStrictEqual(gateMod.checkOutput(t).gate.action, 'pass',
+      `「${t}」r224 修复后 gate 不应仍为 pass`);
   }
 });
 

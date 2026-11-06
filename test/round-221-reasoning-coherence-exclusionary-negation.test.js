@@ -103,9 +103,18 @@ const BENIGN_364 = [
   '之后我们还会复盘，看看是否需要继续投入',
 ];
 // ── G 节语料一：已知未修的存量漏判（r220 D 节同值，方向相反，本轮不修）──
-const KNOWN_GAP = [
+// [r224] 前 2 条已由 r224 的 post_hoc 召回扩面修复（CONNECT_ZH 加裸「第二天」
+// /「从那天以后」，INTERVENE_ZH 加「喝了」），显式拆到 FIXED_BY_R224；
+// 剩 1 条仍未修——「昨天我在电梯里摔了一跤，今天就下雨了」全句没有任何
+// 因果断言，只是两件事并置，按 post_hoc 维度自身定义不构成后此谬误，
+// 判别它需要世界知识，超出规则引擎能力（AGENTS.md Honest limitations）。
+// 拆走不是删语料：FIXED_BY_R224 在 B 节仍参与「gate 非 pass」断言，在
+// G2 节显式断言修复后现值。
+const FIXED_BY_R224 = [
   '他喝了这个偏方，第二天病就好了，看来偏方真有用',
   '从那天以后他就像变了个人，肯定是受了刺激',
+];
+const KNOWN_GAP = [
   '昨天我在电梯里摔了一跤，今天就下雨了',
 ];
 // ── G 节语料二：同族句在其他维度的误伤（本轮只修两维，其余登记现值）──
@@ -196,10 +205,14 @@ test(`B 攻击样本零退化（${ATTACK.length} 条：rc count 值逐条锁定 
     assert.strictEqual(rcCount(t), 1, `「${t}」reasoning_coherence count 期望 1，实测 ${rcCount(t)}`);
   }
   // 存量漏判 3 条 + 「肯定是他有能力」1 条：rc=0（改前改后同值）
-  for (const t of KNOWN_GAP.concat(['他上任之后公司利润就涨了，肯定是他的能力造成的'])) {
+  // [r224] FIXED_BY_R224 的 2 条虽已由 post_hoc 侧修复，但 reasoning_coherence
+  // 本维不受影响，rc 现值仍为 0——并入同一条断言保持覆盖（r224 修的是
+  // post_hoc 词表，没有动 rc 判据）。
+  for (const t of KNOWN_GAP.concat(FIXED_BY_R224).concat(['他上任之后公司利润就涨了，肯定是他的能力造成的'])) {
     assert.strictEqual(rcCount(t), 0, `「${t}」reasoning_coherence 现值应为 0，实测 ${rcCount(t)}`);
   }
-  // gate 非 pass（3 条存量漏判除外——它们在 G 节登记为 pass）
+  // gate 非 pass（存量漏判除外——它在 G 节登记为 pass；FIXED_BY_R224 的 2 条
+  // r224 后已非 pass，因此不再除外，直接纳入本断言）
   const passed = ATTACK.filter(t => !KNOWN_GAP.includes(t))
     .filter(t => gateMod.checkOutput(t).gate.action === 'pass');
   assert.deepStrictEqual(passed, [], `gate 仍 pass：\n  ${passed.join('\n  ')}`);
@@ -227,7 +240,7 @@ test('F 否定形边缘攻击 gate 不塌（豁免 rc 后仍有 post_hoc / pseud
   assert.deepStrictEqual(stillHit, [], `rc 仍命中（豁免未生效）：\n  ${stillHit.join('\n  ')}`);
 });
 
-test('G 已知未修登记现值（3 条存量漏判 + 5 条其他维度误伤）', () => {
+test('G 已知未修登记现值（1 条存量漏判 + 5 条其他维度误伤）', () => {
   for (const t of KNOWN_GAP) {
     const r = gateMod.checkOutput(t);
     assert.strictEqual(r.gate.action, 'pass', `「${t}」存量漏判现值应为 pass，实测 ${r.gate.action}`);
@@ -253,6 +266,20 @@ test('G 已知未修登记现值（3 条存量漏判 + 5 条其他维度误伤�
     const r = gateMod.checkOutput(t);
     assert.strictEqual(r.gate.action, 'pass', `「${t}」r222 修复后 gate 应为 pass，实测 ${r.gate.action}`);
     assert.strictEqual(rcCount(t), 0, `「${t}」rc 应已清零，实测 ${rcCount(t)}`);
+  }
+});
+
+// [r224] G2：原 G 节前 2 条存量漏判已由 r224 的 post_hoc 召回扩面修复
+// （src/post-hoc.js：CONNECT_ZH +「第二天」/「从那天以后」族，
+//  INTERVENE_ZH +「喝了」族 + IV_SUFFIX_GUARD 复合后缀护栏）。
+// 与 r222 对 5 条其他维度误伤的处理同型：登记项修复后同步断言修复后现值，
+// 不是删语料。第 3 条（「摔了一跤/下雨」）仍留在 KNOWN_GAP 里断言 pass。
+test(`G2 r224 已修存量漏判的修复后现值（${FIXED_BY_R224.length} 条）`, () => {
+  for (const t of FIXED_BY_R224) {
+    assert.ok(idx.checkPostHoc(t).count > 0, `「${t}」r224 修复后 post_hoc 应命中，实测 ${idx.checkPostHoc(t).count}`);
+    assert.notStrictEqual(gateMod.checkOutput(t).gate.action, 'pass',
+      `「${t}」r224 修复后 gate 不应仍为 pass`);
+    assert.strictEqual(rcCount(t), 0, `「${t}」rc 应仍为 0（r224 没动 rc 判据），实测 ${rcCount(t)}`);
   }
 });
 
