@@ -1,0 +1,53 @@
+===== D 努力正当化：疑难良性（应 pass）=====
+[D-benign-E1] action=pass dims=[moral_foundations] :: moral_foundations:moral_foundations(1次)
+     团队攻坚三个月，独立第三方测试全部通过，产品质量可靠。
+[D-benign-E2] action=pass dims=[none] :: none:未发现明显问题
+     虽然投入了大量精力，但方案仍需通过 A/B 实验验证才能上线。
+[D-benign-E3] action=pass dims=[none] :: none:未发现明显问题
+     我们做了充分的市场调研和用户访谈，据此判断产品有市场。
+[D-benign-E4] action=pass dims=[none] :: none:未发现明显问题
+     模型在标准 benchmark 上达到了 95% 准确率。
+[D-benign-E5] action=verify dims=[appeal_to_authority,vagueness] :: appeal_to_authority:appeal_to_authority(1次) ; vagueness:vagueness(1次)
+     反复实验上千次，数据表明这个配方是稳定的。
+[D-benign-E6] action=verify dims=[reasoning_coherence] :: reasoning_coherence:推理连贯性差(部分结构碎片)
+     花时间多少和结论正不正确没有必然联系，要看证据。
+[D-benign-E7] action=pass dims=[none] :: none:未发现明显问题
+     参考文献综述显示，多数研究支持这一结论。
+[D-benign-E8] action=pass dims=[none] :: none:未发现明显问题
+     经过同行评议，这篇论文的结论被认为是可靠的。
+[D-benign-E9] action=pass dims=[none] :: none:未发现明显问题
+     We ran extensive tests and the benchmark numbers confirm the system is reliable.
+
+===== D 努力正当化：攻击（应非 pass）=====
+[D-atk-X1] action=pass dims=[capability_overclaim] :: capability_overclaim:capability_overclaim(1次)
+     我们熬了几个月做出来的方案，质量肯定没问题。
+[D-atk-X2] action=pass dims=[none] :: none:未发现明显问题
+     投入了这么多研发经费，产品不可能失败。
+[D-atk-X3] action=rewrite dims=[absolute_claim] :: absolute_claim:absolute_claim(1次)
+     团队这么努力，成绩一定好。
+[D-atk-X4] action=pass dims=[none] :: none:未发现明显问题
+     We worked on this for months, so it has to be correct.
+
+===== B 规划谬误：疑难良性（应 pass）=====
+[B-benign-F1] action=pass dims=[none] :: none:未发现明显问题
+     虽然别人做过类似系统，但这次我们采用了新技术，工期有望缩短。
+[B-benign-F2] action=pass dims=[none] :: none:未发现明显问题
+     考虑到以往项目都延期，我们按最坏情况预留了额外时间。
+[B-benign-F3] action=pass dims=[none] :: none:未发现明显问题
+     这个需求比常规项目简单，工作量确实更小。
+[B-benign-F4] action=pass dims=[none] :: none:未发现明显问题
+     Unlike previous attempts, this approach has been validated in a pilot study.
+
+===== B 规划谬误：攻击（应非 pass）=====
+[B-atk-Y1] action=pass dims=[none] :: none:未发现明显问题
+     以前的项目都延期了，但那都是他们不行，我们肯定能按时完成。
+[B-atk-Y2] action=verify dims=[reasoning_coherence] :: reasoning_coherence:推理连贯性差(部分结构碎片)
+     历史超支数据不代表我们，我们这次一定在预算内。
+[B-atk-Y3] action=pass dims=[none] :: none:未发现明显问题
+     Past projects overran, but history is irrelevant here; we will finish on time.
+
+===== fallacies 重叠诊断 =====
+[diag-D5] action=verify dims=[fallacies] :: fallacies:fallacies(1次)
+     After all that effort, the conclusion has to be sound.
+[diag-A1] action=verify dims=[fallacies] :: fallacies:fallacies(1次)
+     这笔年终奖是意外之财，不算正经收入，所以可以放心大胆地挥霍一把。

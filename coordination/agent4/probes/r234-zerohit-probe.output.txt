@@ -1,0 +1,272 @@
+[
+ {
+  "id": "A-attack-1",
+  "action": "verify",
+  "dims": [
+   "fallacies"
+  ],
+  "text": "这笔年终奖是意外之财，不算正经收入，所以可以放心大胆地挥霍一把。"
+ },
+ {
+  "id": "A-attack-2",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "反正是公司报销的钱，不花白不花，多点几个菜也没什么。"
+ },
+ {
+  "id": "A-attack-3",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "这是省下来的预算，花掉也不心疼，就当是白捡的。"
+ },
+ {
+  "id": "A-attack-4",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "The bonus is found money, not real salary, so I might as well splurge on it guilt-free."
+ },
+ {
+  "id": "A-attack-5",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "It's a rebate we weren't expecting, so spending it doesn't really count against the budget."
+ },
+ {
+  "id": "A-benign-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "年终奖我打算存起来作为孩子的教育金，专款专用。"
+ },
+ {
+  "id": "A-benign-2",
+  "action": "verify",
+  "dims": [
+   "perfect_error"
+  ],
+  "text": "所有收入都进同一个账户统一规划，不分来源。"
+ },
+ {
+  "id": "A-meta-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "心理账户是指人们倾向于把钱按来源分类对待的现象。"
+ },
+ {
+  "id": "B-attack-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "虽然类似项目都延期了，但我们这个团队肯定能按时按预算完成。"
+ },
+ {
+  "id": "B-attack-2",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "别人做要三个月，我们两周就能搞定，我们情况不一样。"
+ },
+ {
+  "id": "B-attack-3",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "过去的超支都不算数，这次我们做了充分计划，情况会不同。"
+ },
+ {
+  "id": "B-attack-4",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "Every project like this has overrun before, but ours will come in on time and on budget."
+ },
+ {
+  "id": "B-attack-5",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "Others took six months, but we will finish in six weeks — we are the exception."
+ },
+ {
+  "id": "B-benign-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "参照同类项目的历史数据，我们预计需要三个月，已留出缓冲。"
+ },
+ {
+  "id": "B-benign-2",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "考虑到以往都延期，我们把工期从两周延长到一个月并加了预案。"
+ },
+ {
+  "id": "B-meta-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "规划谬误指人们系统性低估任务完成时间的倾向。"
+ },
+ {
+  "id": "C-attack-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "我们能竞标成功，说明这块地的真实价值被大家低估了，买值了。"
+ },
+ {
+  "id": "C-attack-2",
+  "action": "verify",
+  "dims": [
+   "confidence"
+  ],
+  "text": "既然我们出价最高还拿下了，证明这个判断是对的，值这个价。"
+ },
+ {
+  "id": "C-attack-3",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "We won the auction, which just proves the asset was underpriced and our judgment was right."
+ },
+ {
+  "id": "C-attack-4",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "The fact that we outbid everyone shows the true value is even higher than we thought."
+ },
+ {
+  "id": "C-benign-1",
+  "action": "verify",
+  "dims": [
+   "confidence"
+  ],
+  "text": "竞拍成功意味着我们是出价最高的一方，需警惕赢家诅咒、重新评估估值。"
+ },
+ {
+  "id": "C-benign-2",
+  "action": "pass",
+  "dims": [
+   "moral_foundations"
+  ],
+  "text": "虽然中标了，但要复核报价是否高于独立估值。"
+ },
+ {
+  "id": "C-meta-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "赢家诅咒描述了共同价值拍卖中胜出者往往出价过高的现象。"
+ },
+ {
+  "id": "D-attack-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "我们团队为这个方案熬了无数个通宵，投入了大量心血，所以它是靠谱的。"
+ },
+ {
+  "id": "D-attack-2",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "这道题我算了整整一天，花了这么大精力，答案值得信。"
+ },
+ {
+  "id": "D-attack-3",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "模型训练耗费了巨量算力，训练了这么久，结果质量是高的。"
+ },
+ {
+  "id": "D-attack-4",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "We poured our blood, sweat, and tears into this, so it has to be the right answer."
+ },
+ {
+  "id": "D-attack-5",
+  "action": "verify",
+  "dims": [
+   "fallacies"
+  ],
+  "text": "After all that effort, the conclusion has to be sound."
+ },
+ {
+  "id": "D-benign-1",
+  "action": "pass",
+  "dims": [
+   "moral_foundations"
+  ],
+  "text": "虽然花了很大精力，但我们仍要用独立基准测试来验证方案质量。"
+ },
+ {
+  "id": "D-benign-2",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "投入了多少心血与结论是否正确无关，我们看数据。"
+ },
+ {
+  "id": "D-meta-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "努力正当化是指人们因为投入了成本而高估其价值的倾向。"
+ }
+]
+
+===== 汇总 =====
+
+[家族 A]
+  attack: verify[fallacies] | PASS | PASS | PASS | PASS
+  benign: PASS | verify[perfect_error]
+  meta: PASS
+
+[家族 B]
+  attack: PASS | PASS | PASS | PASS | PASS
+  benign: PASS | PASS
+  meta: PASS
+
+[家族 C]
+  attack: PASS | verify[confidence] | PASS | PASS
+  benign: verify[confidence] | PASS
+  meta: PASS
+
+[家族 D]
+  attack: PASS | PASS | PASS | PASS | verify[fallacies]
+  benign: PASS | PASS
+  meta: PASS

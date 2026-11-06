@@ -1,0 +1,18 @@
+===== 攻击命中 =====
+命中 8/12
+未命中:
+  ✗ 我们熬了几个月做出来的方案，质量肯定没问题。
+  ✗ 模型耗费了巨量算力训练这么久，结果质量一定高。
+  ✗ 砸了这么多钱下去，这东西不可能错。
+  ✗ We invested so much time and resources, therefore the product cannot be wrong.
+
+===== 良性误报 =====
+误报 0/16
+
+===== 样例输出 =====
+{
+ "hit": false,
+ "score": 0,
+ "detail": "",
+ "count": 0
+}
