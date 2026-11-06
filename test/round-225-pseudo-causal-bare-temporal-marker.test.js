@@ -73,6 +73,11 @@ const ANCHOR_P1_UNION = "'(?:' + PC_SEQ_ZH.source + '|' + PC_SEQ_BARE_ZH.source 
 // 锚点随 src/index.js 同步更新（原 r225 锚点见 git show 53a29702）。
 const ANCHOR_ATTRIB_SURE = '|(?:肯定|一定)(?:是|由于)?[^。]{0,12}(?:原因|的锅|造成的?|导致|所致|带来的?|的功劳|起了?作用|的作用|的问题|的结果|的效果|的功效|受了[^。]{0,6}|能治|有效|见效|见了效|招财|辟邪|显灵|吉利|风水|中[^。]{0,3}(?:大奖|奖))';
 const ANCHOR_P9 = "new RegExp(PC_SEQ_ZH.source + '[^。]{0,14}(?:下降|上升|降低|减少|变少|下滑|提高)')";
+// [r227] 倒装服药族子判据的调用点。D1 变异必须**同时**摘掉它，否则
+// 「他喝了这个偏方，第二天病就好了…」这类句子会被新支兜住，D1 就从
+// 「证明 PC_SEQ_BARE_ZH 承重」退化成「证明新支也命中」的假绿。
+const ANCHOR_IV_CALL = 'const iv = causalInvertedTakeZh(text);';
+const ANCHOR_IV_STUB = 'const iv = { count: 0, hits: [] };';
 // 只靠「肯定…」族承重的攻击句（无第二支兜底）
 const ATTRIB_ONLY = [
   '他上任之后公司利润就涨了，肯定是他的能力造成的',
@@ -341,10 +346,16 @@ test('D1 变异守卫一：第①支摘掉 PC_SEQ_BARE_ZH 后同族攻击句必�
     const src = path.join(tmp, 'src', 'index.js');
     const orig = fs.readFileSync(src, 'utf8');
     assert.ok(orig.includes(ANCHOR_P1_UNION), '副本中找不到第①支的联合顺序表写法');
-    const mutated = orig.replace(ANCHOR_P1_UNION,
+    let mutated = orig.replace(ANCHOR_P1_UNION,
       "PC_SEQ_ZH.source + '[^。]{0,44}?' + PC_ATTRIB_ZH.source");
+    // [r227] 同时中和 r227 新增的倒装服药子判据，否则该族攻击句被新支兜住，
+    // D1 会假绿（r227 轮初实测：不摘它时 20 条里 5 条仍命中，其中 1 条
+    // 「他喝了这个偏方，第二天病就好了…」正是新支兜的）。
+    assert.ok(orig.includes(ANCHOR_IV_CALL), '副本中找不到倒装服药族调用点');
+    mutated = mutated.replace(ANCHOR_IV_CALL, ANCHOR_IV_STUB);
     assert.notStrictEqual(mutated, orig, '变异未生效（第①支顺序表替换失败）');
     assert.ok(!mutated.includes('PC_SEQ_BARE_ZH.source'), '变异后第①支仍引用 PC_SEQ_BARE_ZH');
+    assert.ok(!mutated.includes(ANCHOR_IV_CALL) && mutated.includes(ANCHOR_IV_STUB), '变异后仍在调用倒装服药子判据');
     fs.writeFileSync(src, mutated, 'utf8');
     const n = countHitsIn(tmp, ATTACK);
     assert.ok(n <= 4, `摘掉 PC_SEQ_BARE_ZH 后仍有 ${n}/${ATTACK.length} 条命中，新表可能不承重`);

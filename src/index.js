@@ -7518,7 +7518,7 @@ const PC_OTHERFACTOR_ZH = /但|不过|可是|也会?|同步|另外|被[^。]{0,8
 // 里的「代码」是**指标名**（代码缺陷率）不是机制声明，收进来直接误豁免；
 // ③ 结果/现象名词（投诉/事故/故障/业绩/利润）——那是⑨支的指标词不是机制词。
 // 豁免表的宽度就是召回损失，必须逐词实测（r216~r225 九轮同款纪律）。
-const PC_MECH_WEAK_ZH = /(?:药效|药理|用药|服药|医嘱|疗程|治疗|医生|诊断|手术|成分|疗效|缓存|索引|灰度|回滚|压测|部署|并发|延迟|吞吐|原理|样本|变量|回归|实验组|对照组|模型|下雨|降雨|水库|水位|气温|温度|蒸发|暴雨|潮汐|复习|锻炼|练习)/;
+const PC_MECH_WEAK_ZH = /(?:药效|药理|用药|服药|医嘱|疗程|治疗|医生|诊断|手术|成分|疗效|缓存|索引|灰度|回滚|压测|部署|并发|延迟|吞吐|原理|样本|变量|回归|实验组|对照组|模型|下雨|降雨|水库|水位|气温|温度|蒸发|暴雨|潮汐|复习|锻炼|练习|布洛芬|对乙酰氨基酚|阿司匹林|阿莫西林|青霉素|头孢|二甲双胍|胰岛素|奥美拉唑|氯雷他定|连花清瘟|板蓝根|感冒药|退烧药|退热药|止疼药|止痛药|消炎药|抗生素|处方药|非处方药|维生素|钙片|疫苗|免疫[力应]|血糖|糖尿病|退热贴|物理降温|质子泵|前列腺素|组胺|非甾体|药典|临床|对症|剂量|毫克|\d+\s*mg)/;
 // 机制豁免的**反豁免**：句中出现「唯一/完全是因为」这类**单因归责**断言时，
 // 即使有真实机制名词在场也照判——「我们加了缓存之后延迟降了，说明缓存是
 // 唯一原因」里的「缓存」是机制名词，但说话者在做**排他性归责**（把结果
@@ -7526,6 +7526,40 @@ const PC_MECH_WEAK_ZH = /(?:药效|药理|用药|服药|医嘱|疗程|治疗|医
 // 不加这条腿时该句 checkPseudoCausal count 1→0（存量召回损失，round-221
 // 测试语料），加上后回到 1，且 8 条机制良性句无一条含这些词、不受影响。
 const PC_MONOCAUSE_ZH = /(?:唯一(?:的)?(?:原因|解释|因素)?|完全是因为|全部是因为|都是因为|不外乎|全都是因为)/;
+// ─── [v6.8.155 第 227 轮] 「倒装服药归因」族三张表 ───────────────────────
+// 轮初探针（scripts/tmp-227-probe.js + scripts/tmp-227-branch.js，轮末已删）
+// 同时打出两个方向的缺口，且同属「服药/疗法归因」这一族：
+//
+// 一、召回侧（10 条同族攻击句 detector 0/10 全漏，gate 全 pass）
+//   「这瓶药吃下去烧就退了，肯定是药起了作用」
+//   根因是**语序单向**：第⑩支甲半 PC_ACT_LUCK_ZH 的服药臂写作
+//   `吃了?[^。]{0,6}(?:药|保健品|补品)`，只认「动词在前」；「对象在前 +
+//   服下动词」（这瓶药吃下去 / 那袋香灰喝下去 / 这味偏方服下去）整族零覆盖。
+//   而这些句子**全句没有任何时序标记**（PC_SEQ_ZH ∪ PC_SEQ_BARE_ZH 都不匹配），
+//   也落不到第①支——交接簿 r226 notes 候选① 挂了两轮的正是这一条。
+//
+// 二、精度侧（12 条「点名真药 + 真实药理」良性句 5 条被误伤，pc=1/2、gate rewrite）
+//   支路定位（tmp-227-branch.js）逐条实测命中支：
+//     ①「吃了二甲双胍之后血糖就降了…」    → 第①支（PC_MECH_WEAK_ZH 无此词）
+//     ②「吃了奥美拉唑之后胃酸就少了…」     → 第①支（同上）
+//     ③「贴了退热贴之后体温降了…」        → 第①支（同上）
+//     ④「打了疫苗之后感染就轻了…」        → 第①支（同上）
+//     ⑤「吃了感冒药之后烧就退了，说明对症下药起了作用」→ 第①支 + **第⑩支**
+//        第⑩支是**强支**（PC_ACT_LUCK_ZH 甲半 `吃了[^。]{0,6}药` 命中
+//        「吃了感冒药」× PC_RES_LUCK_ZH 命中「退了」），根本不受
+//        PC_MECH_WEAK_ZH 保护——r226 那道机制护栏只喂弱支（①⑤⑨）。
+//
+// 修法：新增独立子判据 causalInvertedTakeZh（见函数体），配三张表。
+// 判据形状（三半 AND，缺一不命中）：
+//   甲半 PC_INVTAKE_ZH：倒装「**未点名**对象 × 服下动词」
+//   乙半 PC_TAKE_RES_ZH：症状消退/获益结果
+//   反向 PC_DRUG_MECH_ZH：点名真药/药理临床依据在场 → 正常归因，不判
+// 甲半刻意只收「这/那/一 + 量词 + 未点名对象」：**点名真药配真实药理是正常
+// 归因，不是伪因果**——「布洛芬吃下去半小时烧就退了」与「这瓶药吃下去烧就
+// 退了」的差别就在点没点名、有没有药理依据，这一刀由反向表兜住。
+const PC_DRUG_MECH_ZH = /(?:布洛芬|对乙酰氨基酚|阿司匹林|阿莫西林|青霉素|头孢|二甲双胍|胰岛素|奥美拉唑|氯雷他定|连花清瘟|板蓝根|感冒药|退烧药|退热药|止疼药|止痛药|消炎药|抗生素|处方药|非处方药|维生素|钙片|疫苗|免疫[力应]|血糖|糖尿病|退热贴|物理降温|质子泵|前列腺素|组胺|非甾体|药理|药效|用药|服药|医嘱|疗程|药典|临床|对症|剂量|毫克|\d+\s*mg|成分|疗效|治疗|医生|诊断|手术)/;
+const PC_INVTAKE_ZH = /(?:(?:这|那|一)[个瓶包袋剂味碗杯][^。]{0,4}(?:药|丸|丹|符水|香灰|香炉灰|偏方|土方|秘方|仙丹|汤药)[^。]{0,4}(?:吃|喝|服|吞)(?:下)?(?:去)?|(?:吃|喝|服|吞)了?[^。]{0,4}(?:这|那)(?:一)?[个瓶包袋剂味碗杯]?[^。]{0,4}(?:符水|香灰|香炉灰|偏方|土方|秘方|仙丹|汤药|丸|丹))/;
+const PC_TAKE_RES_ZH = /(?:退[了去烧热]|好[了起]|见效|见了效|有效|止住|不疼[了]?|不痛[了]?|停[了止]|消[了失]|轻[了些]|康复|缓解[了]?|压[了住]|稳[了定])/;
 // ─── [v6.7.127] 中文「无机制动作 × 获益结果」伪归因族（第 87 轮）──────────
 // 轮初实测（第 87 轮）：第 48 轮建的 PC_CAUSAL_ZH_PATS 对「甲乙两半」型
 // 白话伪因果 5/6 漏判（gate 全 pass）。三条漏判句的形状：
@@ -7597,6 +7631,14 @@ function causalOverclaimZh(text) {
   // 排除表只吃「自然现象 × 物理/水文/气温」组合特征。
   const nat = PC_NOSUPERSTITION_ZH.test(text);
   if (pat === PC_CAUSAL_ZH_PATS[13] && nat) continue;
+    // [v6.8.155 第 227 轮] 第⑩支（无机制动作 × 获益结果）的点名真药护栏：
+    // 第⑩支是**强支**（不在①⑤⑨弱支列表里），r226 那道机制豁免够不着它，
+    // 而它的服药臂 `吃了?[^。]{0,6}(?:药|…)` 会把「吃了感冒药之后烧就退了，
+    // 说明对症下药起了作用」这类**点名真药 + 正常归因**句判成伪因果
+    // （HEAD pc=2：第①支 + 第⑩支）。只放行「点名真药/药理临床依据」这一族
+    // （PC_DRUG_MECH_ZH），**不放宽到 PC_MECH_WEAK_ZH 全表**——那会把工程/
+    // 气象机制句一起放掉，⑩ 的玄学归因召回会塌（D5 变异守卫钉住）。
+    if (pat === PC_CAUSAL_ZH_PATS[9] && PC_DRUG_MECH_ZH.test(text)) continue;
     // ①⑤⑨ 是「弱形状」判据：必须同时无数字护栏、无他因信号才成立。
     // ②③④⑦⑧ 是强断言论（的锅/一…就/都发生在/中间只差/最X+归因），
     // 只要函数头的对冲没拦就成立。
@@ -7610,6 +7652,80 @@ function causalOverclaimZh(text) {
   // ⑥（相关共变词）必须有归因断言共现才算伪因果，单独「总是低」是描述
   if (hits.length === 1 && PC_CAUSAL_ZH_PATS[5].test(hits[0]) && !PC_ATTRIB_ZH.test(text)) return { count: 0, hits: [], score: 0 };
   return { count: hits.length, hits, score: Math.min(0.8, hits.length * 0.4) };
+}
+
+/**
+ * [v6.8.155 第 227 轮] 中文「倒装服药归因」族检测
+ *
+ * 与 causalOverclaimZh 平级的**子判据**（同样刻意不带 check 前缀，避免
+ * orphan-dimension-guard 误判成第 51 维），由 checkPseudoCausal 调用。
+ *
+ * 为什么单独一个函数而不是往 PC_CAUSAL_ZH_PATS 里加一条正则：
+ *   ① 本族需要**子句级**配对——甲半（对象 × 服下动词）与乙半（症状消退）
+ *     必须落在同一子句，一条扁正则在「这瓶药吃下去。三天后他自己好了。」
+ *     这类跨句句子上会把事后叙述误配成「服下即愈」的因果断言；
+ *   ② 需要返回**半身诊断**（halves.act / halves.res / halves.exempt），
+ *     变异守卫才能区分「甲半表被摘」与「乙半表被摘」两种失效，而不是只看到
+ *     count 变 0；
+ *   ③ 反向护栏（PC_DRUG_MECH_ZH）的作用域只该是本族，不能像 r226 那样
+ *     升级成函数级豁免把⑩⑪⑫⑬⑭ 一起放行。
+ *
+ * 判据形状（三半 AND，缺一不命中）：
+ *   甲半 PC_INVTAKE_ZH：倒装「这/那/一 + 量词 + 未点名对象 + 服下动词」
+ *                       或正序「服下动词 + 这/那 + 量词? + 未点名对象」
+ *   乙半 PC_TAKE_RES_ZH：甲半之后 ≤24 字内（**同一子句**）出现症状消退/获益结果
+ *   反向 PC_DRUG_MECH_ZH：点名真药/药理临床依据在场 → 正常归因，不判
+ *
+ * @param {string} text
+ * @returns {{count:number, hits:string[], score:number,
+ *            halves:{act:number, res:number, exempt:string[]}}}
+ */
+function causalInvertedTakeZh(text) {
+  const EMPTY = () => ({ count: 0, hits: [], score: 0, halves: { act: 0, res: 0, exempt: [] } });
+  if (!text || typeof text !== 'string') return EMPTY();
+  if (!/[一-鿿]/.test(text)) return EMPTY();
+  // 与 causalOverclaimZh 同源同表：方法学/统计语境、排除性否定归因、
+  // 对冲谦辞一律不判（否则「这味偏方吃下去烧就退了，但样本太小不好归因」
+  // 这类自认不确定的句子会被误判）。
+  if (STAT_CONTEXT_ZH.test(text) || hasExclNegCausal(text)
+    || PC_HEDGE_ZH.test(text) || PC_PROB_ZH.test(text)) {
+    return { count: 0, hits: [], score: 0, halves: { act: 0, res: 0, exempt: ['context'] } };
+  }
+  // 反向护栏：点名真药/药理临床依据在场 → 这是正常归因，不是伪因果
+  if (PC_DRUG_MECH_ZH.test(text)) {
+    return { count: 0, hits: [], score: 0, halves: { act: 0, res: 0, exempt: ['drug-mech'] } };
+  }
+  // 逐子句扫描：先按句号/问号/感叹号切句，甲半与乙半必须落在**同一子句**
+  // （「这瓶药吃下去，烧就退了」成立；「这瓶药吃下去。三天后他自己好了。」
+  // 两个半身分居两句，那是事后叙述不是「服下即愈」的因果断言，不判）。
+  const clauses = text.split(/[。！？!?]/);
+  const hits = [];
+  let actN = 0;
+  let resN = 0;
+  for (let i = 0; i < clauses.length; i++) {
+    const clause = clauses[i];
+    if (!clause) continue;
+    const actRe = new RegExp(PC_INVTAKE_ZH.source, 'g');
+    let m;
+    while ((m = actRe.exec(clause)) !== null) {
+      actN++;
+      const win = clause.slice(m.index + m[0].length).slice(0, 24);
+      const res = win.match(PC_TAKE_RES_ZH);
+      if (!res) continue;
+      resN++;
+      hits.push('倒装服药归因:' + m[0] + '→' + res[0]);
+      if (actRe.lastIndex === m.index) actRe.lastIndex++;
+    }
+  }
+  if (hits.length === 0) return { count: 0, hits: [], score: 0, halves: { act: actN, res: resN, exempt: [] } };
+  // 证据强度低于「精确倍数」（0.6/项）而高于白话伪因果（0.4/项）：本族是
+  // 「未点名对象 + 服下即愈」的强形状，但仍缺显式归因断言，取 0.5 起步。
+  return {
+    count: hits.length,
+    hits,
+    score: Math.min(0.8, 0.5 + (hits.length - 1) * 0.1),
+    halves: { act: actN, res: resN, exempt: [] },
+  };
 }
 function checkPseudoCausal(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
@@ -7681,6 +7797,14 @@ function checkPseudoCausal(text) {
       totalCount += ov.count;
       allHits.push(...ov.hits);
       score = Math.max(baseScore, ov.score);
+    }
+    // [v6.8.155 第 227 轮] 倒装服药归因族：与 causalOverclaimZh 并列的
+    // 独立子判据（见函数体——为什么单独一个函数而不是加一条正则）。
+    const iv = causalInvertedTakeZh(text);
+    if (iv.count > 0) {
+      totalCount += iv.count;
+      allHits.push(...iv.hits);
+      score = Math.max(score, iv.score);
     }
   }
   return { count: totalCount, hits: allHits, score, vagueSource: !specificSource && vagueSource };

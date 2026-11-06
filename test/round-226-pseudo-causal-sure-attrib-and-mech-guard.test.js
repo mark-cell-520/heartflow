@@ -52,6 +52,11 @@ const hasDim = (text) => (gateMod.gate(text).findings || []).some(f => f.dimensi
 const ANCHOR_ATTRIB_FAMILY = '|(?:肯定|一定)(?:是|由于)?[^。]{0,12}(?:原因|的锅|造成的?|导致|所致|带来的?|的功劳|起了?作用|的作用|的问题|的结果|的效果|的功效|受了[^。]{0,6}|能治|有效|见效|见了效|招财|辟邪|显灵|吉利|风水|中[^。]{0,3}(?:大奖|奖))';
 const ANCHOR_WEAK_GUARD = '|| (PC_MECH_WEAK_ZH.test(text) && !PC_MONOCAUSE_ZH.test(text)))) continue;';
 const ANCHOR_MONOCAUSE_GUARD = '|| (PC_MECH_WEAK_ZH.test(text) && !PC_MONOCAUSE_ZH.test(text))';
+// [r227] r227 新增的倒装服药子判据调用点。D1 变异必须**同时**摘掉它，
+// 否则「他喝了这个偏方，第二天病就好了，一定是偏方有效」会被新支兜住，
+// D1 就从「证明归因族承重」退化成假绿（r227 轮初实测：不摘时 26 条里 1 条仍命中）。
+const ANCHOR_IV_CALL = 'const iv = causalInvertedTakeZh(text);';
+const ANCHOR_IV_STUB = 'const iv = { count: 0, hits: [] };';
 
 // ─── A 节语料：30 条同族攻击句（肯定/一定 + 因果/效果名词）────────────
 const ATTACK = [
@@ -145,13 +150,17 @@ const BENIGN_HEAD_NONPASS = {
 };
 
 // ─── C 节语料：至今仍漏（逐条实测过拦在哪）──────────────────────────
+// [r227] 首条「这瓶药吃下去烧就退了，肯定是药起了作用」已被 r227 的倒装服药
+// 子判据收口（detector 0→1、gate pass→verify），移到 C3「必须保持命中」清单。
+// **这不是放水**——C3 是正向断言（必须继续命中），比 C1 的「必须仍为 0」更严。
 const STILL_GAP = [
-  // 无任何时序标记——不属于第①支「顺序标记 × 归因断言」形状，
-  // 落在第⑩支（无机制动作 × 获益结果）的动作表缺口上，需单独轮次
-  { s: '这瓶药吃下去烧就退了，肯定是药起了作用', gate: 'pass' },
   // PC_OTHERFACTOR_ZH 拦下（存量即如此；豁免表只许收窄，r225 已登记）
   { s: '打那以后球队就再也没输过，显然是因为换了教练', gate: 'verify' },
   { s: '从那天起她再也没迟到过，说明是早起打卡起了作用', gate: 'rewrite' },
+];
+// [r227] r227 收口、必须保持命中的句子（原 r226 STILL_GAP 首条）
+const FIXED_BY_R227 = [
+  { s: '这瓶药吃下去烧就退了，肯定是药起了作用', gate: 'verify' },
 ];
 
 // ─── E 节语料：存量族（round-48 建维时的 24 攻击 / 30 良性）──────────
@@ -261,6 +270,14 @@ test('C2 仍漏句的 gate action 现值照登', () => {
     .map(g => `「${g.s}」登记=${g.gate} 现值=${gateAction(g.s)}`);
   assert.deepStrictEqual(drift, [], '以下仍漏句 gate action 漂移：\n  ' + drift.join('\n  '));
 });
+// [r227] r227 收口的句子必须**继续**被命中（detector > 0 + gate action 不变）——
+// 从「仍漏」登记挪到「必须保持命中」登记，约束方向只会更严不会更松。
+test(`C3 r227 收口的 ${FIXED_BY_R227.length} 条必须保持命中`, () => {
+  for (const g of FIXED_BY_R227) {
+    assert.ok(pcCount(g.s) > 0, `「${g.s}」应保持 detector 命中，实测 ${pcCount(g.s)}`);
+    assert.strictEqual(gateAction(g.s), g.gate, `「${g.s}」gate action 应保持 ${g.gate}，实测 ${gateAction(g.s)}`);
+  }
+});
 
 // ─── D 节：变异守卫（复制 src/ 整棵树到临时目录再变异）──────────────
 function copySrc(tag) {
@@ -334,8 +351,14 @@ test(`D1 变异守卫一：摘掉「(?:肯定|一定)…」族后 ${ATTRIB_FAMIL
     const src = path.join(tmp, 'src', 'index.js');
     const orig = fs.readFileSync(src, 'utf8');
     assert.ok(orig.includes(ANCHOR_ATTRIB_FAMILY), '副本中找不到「肯定/一定…」归因族片段');
-    const mutated = orig.replace(ANCHOR_ATTRIB_FAMILY, '');
+    let mutated = orig.replace(ANCHOR_ATTRIB_FAMILY, '');
+    // [r227] 同时中和 r227 新增的倒装服药子判据——ATTRIB_FAMILY_ONLY 里的
+    // 「他喝了这个偏方，第二天病就好了，一定是偏方有效」被新支兜住，不摘它
+    // 这条变异就证明不了归因族承重（r227 轮初实测不摘时该条仍 1 次命中）。
+    assert.ok(orig.includes(ANCHOR_IV_CALL), '副本中找不到倒装服药族调用点');
+    mutated = mutated.replace(ANCHOR_IV_CALL, ANCHOR_IV_STUB);
     assert.notStrictEqual(mutated, orig, '变异未生效（归因族摘除失败）');
+    assert.ok(!mutated.includes(ANCHOR_IV_CALL) && mutated.includes(ANCHOR_IV_STUB), '变异后仍在调用倒装服药子判据');
     fs.writeFileSync(src, mutated, 'utf8');
     const dropped = countHitsIn(tmp, ATTRIB_FAMILY_ONLY);
     assert.strictEqual(dropped, 0, `摘掉归因族后 ATTRIB_FAMILY_ONLY ${ATTRIB_FAMILY_ONLY.length} 条仍有 ${dropped} 条命中，该扩面可能不承重`);
