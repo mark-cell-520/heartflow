@@ -50,9 +50,14 @@
  *     两个|双方|它们)(之间|中间)/折中/中庸/各打五十大板/一个巴掌拍不响/
  *     双方·两边(都)(有错|有过错|不对|有问题|有责任)/(都|全)(太|过于)极端|
  *     走了极端|两个极端|各让一步|各退一步/取(个)中间；
+ *     [r726 补] 副词间隙形「真相[永远|一定|从来][都]在(两个)极端之间」
+ *     （确定性情态副词可多重叠加，* 而非 ?；不含「通常/往往」等对冲词）/
+ *     和稀泥·息事宁人/双方·两边(其实|都)(有|存在)(一定)道理/极左极右
+ *     并置或单极+不可取；
  *     EN middle ground / in between / split the difference / meet in the
  *     middle / halfway / compromise (position|stance|view|answer|solution)/
  *     both extremes / the middle (position|course|path|road|way|option)；
+ *     [r726 补] in the middle / moderate / compromise / extrem(ism|ist)s；
  *   腿② TRUTH 中间=正确 的断言（中文）：
  *     才是(对|正确|真理|真相|正解|正道|理性|清醒|客观|公道|合理|最优|
  *     最好|答案|出路)/(中间|折中|中庸)(立场|方案|道路)?才是X/(都|全)不
@@ -60,11 +65,19 @@
  *     真相|正确|正解)/(最|才)(公平|公正|合理|正确)的(处理|解决|做法|
  *     方案|结果|答案|方式)/才是[^。；，]{0,8}(公平|公道|合理|正确)/
  *     (正确|真正|对)的(答案|结论|真相|立场|做法|解法)(就)在；
+ *     [r726 补] 六族：①真理在中间自足断言（真值钉在中点即谬误，量化词
+ *     可省）②全称量化×正确性最高级（「总是最稳妥」「一定正确」）③和稀泥
+ *     了结（各打五十大板…算了）④争不出对错（并列免责推论腿）⑤没有绝对
+ *     对错 ⑥走极端=错（越极端越有问题）；
  *     EN is (the) (correct|right|true|rational|sane|fair|fairest|
  *     reasonable|best) answer/position/conclusion/view/solution / truth
  *     lies in the middle / both sides are wrong / neither side is entirely
  *     right / middle ground is the (correct|fairest|rational) / the
  *     (fairest|correct|best) position is (the one) in between；
+ *     [r726 补] 全称量化×最高级（always…most reasonable）/ truth is
+ *     always in the middle（副词可前置或后置于系词，r726 A5 语序教训）/
+ *     no absolute right / answer must be a compromise / moderate path
+ *     must be right；
  *   两腿命中位置相距 ≤50 字（EN ≤200 字符）即算同一叙事。
  *
  * 为什么取 VERIFY 级：中间立场是否更接近真相取决于证据分布，规则引擎
@@ -99,12 +112,27 @@
 const MIDDLE_ZH = [
   /中间(?:立场|地带|道路|路线|选项|方案|派|力量)/,
   /(?:真相|真理|事实|答案|结论|说法|立场|做法|解法|选择|正解|公道)(?:的)?(?:所在)?(?:就)?在(?:两者|两个|双方|两极|两端|它们|其|对立|争论)?(?:之间|中间)/,
+  // [r726] 副词间隙形：「真相[永远|一定|从来]在中间」「对错从来都在两端之间」
+  // ——确定性情态副词可插在真相名词与在之间之间，允许「从来都/一定也」多重
+  // 叠加（* 而非 ?，r726 探针 A4 双副词穿透教训）。刻意不收「通常/往往」
+  // 等频率对冲词（那些由 EXEMPT_HEDGE_ZH 挡，见 r726 探针 B8）。
+  // 补 是非/对错 名词与 位于/处于 谓语。
+  /(?:真相|真理|事实|答案|结论|说法|立场|做法|解法|选择|正解|公道|是非|对错)(?:的)?(?:所在)?(?:就|正|恰恰|恰好|其实|本来|最终|说到底|实质上|显然|明显|永远|始终|一定|必然|从来|都|也|还)*(?:在|位于|处于)(?:两者|两个|双方|两极|两端|它们|其|对立|争论|观点|立场|说法|方案|选项|假说)?(?:极端|端点|极端主义|主张|观点|方案|选项|假说)?(?:之间|中间)/,
   /折中/,
   /中庸/,
   /各打五十大板/,
   /一个巴掌拍不响/,
-  /(?:双方|两边|两方|两家|彼此)(?:都|各自|全|其实|确实|纷纷)?(?:有错|有过错|有错处|不对|有问题|有责任|有毛病)/,
+  // [r726] 和稀泥族（均摊和事动作本身，配 TRUTH_ZH 的了结腿）
+  /和稀泥|息事宁人|各打(?:三十|五十|二十)(?:大板|棍子)/,
+  // [r726] 双方都有道理（并列免责族腿①）：「这件事没有绝对的对错，所以
+  // 两方都有道理」。用 * 收「其实/都」多重修饰（r726 探针 A18）。
+  /(?:双方|两边|两方|两家|彼此)(?:都|各自|全|其实|确实|纷纷|也|还)*(?:有|存在)?(?:一定)?道理|都有道理|各有道理/,
+  // [r726b] 谚语族：「两边的说法都有道理」「双方各有过错」
+  /(?:双方|两边|两方|两家|彼此)(?:的)?(?:说法|观点|立场|主张)?(?:都|各自|全|其实|确实|纷纷|也|还)*(?:有|存在|各有)(?:一定)?道理/,
+  /(?:双方|两边|两方|两家|彼此)(?:都|各自|全|其实|确实|纷纷)?(?:有错|有过错|有错处|不对|有问题|有责任|有毛病)|各有(?:过错|责任|错|不是)/,
   /(?:都|全)(?:太|过于|很|有些|挺)?极端|走了极端|两个极端|各走极端|极端化/,
+  // [r726] 两端极端族：极左极右并置（「极左极右都不可取」）或单极+不可取判断
+  /(?:极左|极右)(?:[^。；，]{0,4})(?:极右|极左)|(?:极左|极右)(?:都|全|均)?(?:不|没)?(?:可取|对|没错|有问题|错误)/,
   /各让一步|各退一步|各让半分|彼此让步/,
   /取(?:个)?中间|往中间|往折中(?:走|靠)/,
 ];
@@ -115,9 +143,34 @@ const TRUTH_ZH = [
   /(?:中间|折中|中庸)(?:立场|方案|道路|路线|观点)?(?:才)?是(?:对|正确|真理|真相|正解|正道|理性|清醒|客观|公道|合理|最优|最好)(?:的)?/,
   /(?:都|全)(?:不|没)(?:完全)?(?:对|错)|都不全对|谁也没有完全(?:对|错)|没有一方(?:是)?(?:完全)?(?:对|错)/,
   /(?:把|将|拿)(?:中间|折中|中庸)(?:立场|方案|观点|结论)?(?:当成|看作|视为|说成|当作)(?:真理|真相|正确|对的|正解|正道)/,
-  /(?:最|才)(?:公平|公正|合理|正确)的(?:处理|解决|做法|方案|结果|答案|方式)/,
+  /(?:最|才)(?:公平|公正|合理|正确|稳妥|明智|理性|客观)的(?:处理|解决|做法|方案|结果|答案|方式)/,
+  // [r726b] 谚语族：名词前置形「折中处理最合理」「平分责任才是公正的处理」
+  // ——(最|才)在谓词后；尾部名词可省（「最公平」裸断言）。
+  /(?:折中|中间|各让一步|各退一步|平分|和稀泥|中间化|抹平)[^。；，]{0,6}(?:最|才)(?:公平|公正|合理|正确|稳妥|明智|理性|客观)/,
+  /(?:最|才)(?:公平|公正|合理|正确|稳妥|明智|理性|客观)(?:的)?(?:处理|解决|做法|方案|结果|答案|方式)?/,
   /(?:两|双)边(?:都|全)(?:错|不对)/,
   /(?:正确|真正|对)的(?:答案|结论|真相|真理|立场|做法|解法|选择|说法)(?:就)?在/,
+  // [r726] 全称量化 × 正确性/最高级：「取中间立场总是最稳妥的选择」
+  // ——不含具体情由的「中间=自动最优」断言。与有具体理由的个案推荐
+  // （「这个中间方案最稳妥，因为成本最低」无全称量化词）区分，故量化词必填。
+  /(?:总是|一定|必然|永远|肯定|历来|向来|从来|一律|注定)(?:最)?(?:对|正确|合理|稳妥|理性|客观|公平|公道|公允|明智|可取|靠谱|平衡)/,
+  // [r726] 中间=是正确（副词间隙形）：「中间立场必然是正确的」
+  /(?:中间|折中|中庸)(?:立场|方案|道路|路线|观点|位置)?(?:一定|必然|当然|显然|确实|就是)?(?:才)?是(?:对|正确|真理|真相|最)/,
+  // [r726] 真理在中间（自足断言）：「说明真相就在两者中间」「对错从来都在
+  // 两端之间」——把真值位置钉在两端中点本身就是谬误主张，无需额外正确性词。
+  // 副词可叠在名词后、也可在系词后（英文 "is always in the middle"，
+  // r726 探针 A5 语序教训：英文学位副词后置，中文前置）。
+  // 诚实形（「真相可能更接近某一端」「目前无法确定」）由对冲豁免挡。
+  /(?:真相|真理|事实|答案|结论|正解|说法|是非|对错)(?:的)?(?:所在)?(?:就|正|恰恰|恰好|其实|本来|最终|说到底|实质上|显然|明显|永远|始终|一定|必然|从来|都|也|还)*(?:在|位于|处于)(?:两者|两个|双方|两极|两端|它们|观点|立场|说法|方案|选项|假说)?(?:极端|端点|极端主义|主张|观点|方案|选项|假说)?(?:之间|中间)/,
+  // [r726] 和稀泥了结（均摊责任后免追责）：「各打五十大板，各退一步，这事就算了」
+  /(?:各打(?:三十|五十|二十)(?:大板|棍子)|一个巴掌拍不响|和稀泥|息事宁人)[^。；]{0,14}(?:算了|作罢|揭过|翻篇|互不追究|不再追究|息事宁人|和过去|和下去|了了|了结|了断|不再计较)/,
+  // [r726] 争不出对错（并列免责的推论腿）：「两边其实都有道理，争不出结果来」
+  /(?:争|辩|讨论|说)(?:不出|不清|不明|不出来)(?:结果|对错|是非|高下|胜负)/,
+  // [r726] 没有绝对对错：「这件事没有绝对的对错，所以两方都有道理」
+  /(?:没有|无)(?:绝对的?)?(?:对错|是非|黑白)/,
+  // [r726] 走极端=错（反向推出中间对）：「走极端本身就是错的」
+  /走极端[^。；，]{0,10}(?:错|不对|有问题|不可取|错误)/,
+  /越(?:极端|激进|偏激)[^。；，]{0,8}越(?:有问题|不对|错|错误|危险|离谱|不可取)/,
 ];
 
 // ─── 英文侧腿① ────────────────────────────────────────────────────────
@@ -128,19 +181,48 @@ const MIDDLE_EN = [
   /\bmeet in the middle\b/i,
   /\bhalfway\b/i,
   /\bcompromise (?:position|stance|view|answer|solution)\b/i,
+  // [r726] in the middle（真值位置族腿①：「The truth is always in the
+  // middle of any dispute」）——裸 the middle 不收，需 in 前缀；
+  // 「in the middle of the night/book」由腿②全称正确断言挡。
+  /\bin the middle\b/i,
+  // [r726] moderate / compromise / extremism 裸词形（腿②全称正确断言兜底）
+  /\bmoderate\b/i,
+  /\bcompromise\b/i,
+  /\bextrem(?:ism|ist)s?\b/i,
   /\bboth extremes?\b/i,
   /\bthe middle (?:position|course|path|road|way|option|answer|view)\b/i,
+  // [r726b] 谚语/口语族腿①：「A little from each side is the correct way」
+  /\ba (?:little|bit|part|piece|portion) from (?:each|both)\b/i,
+  /\bboth sides? have a point\b/i,
+  /\bhalf (?:of )?(?:this|the|it) comes from\b/i,
 ];
 
 // ─── 英文侧腿② ────────────────────────────────────────────────────────
 const TRUTH_EN = [
-  /\b(?:is|are) (?:usually |often |always |simply |just )?(?:the )?(?:only )?(?:correct|right|true|truth|rational|sane|fair|fairest|reasonable|best|real) (?:answer|position|conclusion|view|stance|solution|course)\b/i,
+  /\b(?:is|are) (?:usually |often |always |simply |just )?(?:the )?(?:only )?(?:correct|right|true|truth|rational|sane|fair|fairest|reasonable|best|real) (?:answer|position|conclusion|view|stance|solution|course|way|path|route|method|approach)\b/i,
   /\btruth (?:lies|is|often lies|usually lies|always lies) (?:somewhere |right )?in (?:the )?(?:middle|in[- ]between)\b/i,
   /\bboth (?:sides|extremes?|parties) are (?:wrong|mistaken|at fault|equally|partly)\b/i,
   /\bneither (?:side|party|one) is (?:entirely|completely|fully|totally) (?:right|wrong)\b/i,
   /\bmiddle (?:ground|position|course|way) is (?:usually |often |always )?(?:the )?(?:correct|right|true|best|fairest|rational|sane|fair|reasonable)\b/i,
   /\b(?:fairest|fair|correct|right|best|most rational|most reasonable|only rational|only fair|only correct|only right) (?:\w{3,15} )?(?:position|answer|stance|view|conclusion|course) is (?:usually |often |always )?(?:the )?(?:one )?(?:in[- ]between|in the middle|middle|halfway|compromise|between the (?:two|both) extremes)\b/i,
   /\bsplitting the difference is (?:the )?(?:correct|right|fair|rational|sensible)\b/i,
+  // [r726b] 谚语/口语族：「Let's just split the difference and call it even」
+  /\b(?:split|splitting) the difference[^.]{0,30}(?:call it even|is even|to even)\b/i,
+  // [r726] 全称量化 × 正确性/最高级：「The middle position is always the
+  // most reasonable one」「A moderate stance is invariably the most
+  // sensible choice」——量化词与最高级可隔最多 40 字符。
+  /\b(?:always|invariably|certainly|necessarily|must be|by definition)\b[^.]{0,40}\b(?:correct|right|true|best|reasonable|sensible|fairest|rational|objective|fair|wise)\b/i,
+  // [r726] 真理在中间（自足断言）：「The truth is always in the middle of
+  // any dispute」「The correct answer lies in the middle」——真值钉在中点
+  // 本身就是谬误主张，量化词可省。副词前置（truth always lies）与系词后置
+  // （truth is always in the middle）两序都收（r726 探针 A5 语序教训）。
+  /\b(?:truth|answer|verdict|facts?|conclusion)\s+(?:always\s+|necessarily\s+|certainly\s+|invariably\s+)?(?:lies?|is|sits?|must\s+lie|must\s+be|can\s+only\s+be)\s+(?:always\s+|necessarily\s+|certainly\s+|invariably\s+|sometimes\s+)?(?:somewhere\s+)?(?:in\s+the\s+middle|in\s+between|between)\b/i,
+  // [r726] 没有绝对对错：「There's no absolute right or wrong here」
+  /\bno absolute (?:right|wrong|truth)\b/i,
+  // [r726] 答案=折中：「the answer must be a compromise」
+  /\b(?:answer|solution|result|truth)\s+(?:must be|should be|is)\s+(?:a\s+)?compromise\b/i,
+  // [r726] moderate path must be right：「the moderate path must be right」
+  /\b(?:moderate|middle|centrist|moderation)\s+\w{3,12}\s+(?:must be|is)\s+(?:the\s+)?(?:right|correct|true|rational|sensible)\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ────────────────────────────────────────────

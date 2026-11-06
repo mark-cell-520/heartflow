@@ -162,5 +162,194 @@ for (const [i, s] of VARIANTS_BENIGN.entries()) t(`variant-benign[${i}] ${s.slic
   assert.strictEqual(r.gate.action, 'pass', `应 pass，实得 ${r.gate.action}（${r.gate.reason || ''}）`);
 });
 
+// ─── [r726] 六族攻击面扩展（探针实测 26/26 命中、24/24 良性零误伤）─────────
+// r726 全族扫描（scripts/round-726-atm-scan.js）发现改动前 26 条攻击样本
+// 仅 4 条被 argument_to_moderation 直接命中，11 条 gate.action=pass 完全漏判。
+// 按「真值位置钉在中点」「中间=自动最优」「和稀泥了结」「双方都有道理」
+// 「极端=错反向推」「两端极端」六族补齐腿①/腿②模式。
+const R726_ATTACK_ZH = [
+  // 族 A：真理在中间（自足断言）
+  '真相永远在中间，立场越极端越有问题。',
+  '一个激进一个保守，说明真相就在两者中间。',
+  '答案一定在两者中间，这是永恒的道理。',
+  '对错从来都在两端之间，不在任何一极。',
+  // 族 B：中间=最稳妥/最合理（全称量化 × 最高级）
+  '两个观点冲突时，取中间立场总是最稳妥的选择。',
+  '中间立场必然是正确的，这是永恒的道理。',
+  // 族 C：和稀泥/责任均摊式了结
+  '双方各打五十大板，各退一步，这事就算了。',
+  '一个巴掌拍不响，双方都有责任，各担一半就算了。',
+  '这件事谁也说不清，和稀泥和过去算了。',
+  '为了平息事态，各打五十大板是最稳妥的处理。',
+  // 族 D：双方都有道理（并列免责）
+  '这件事没有绝对的对错，所以两方都有道理。',
+  '两边其实都有道理，争不出结果来。',
+  // 族 E：极端=错（反向推出中间对）
+  '两个观点都太极端，走极端本身就是错的。',
+  '极左极右都不可取，只有不偏不倚才是正道。',
+  // 族 F：双副词穿透（r726 正则教训：从来都/一定也 多重叠加）
+  '真相从来都在两个极端之间，这是常识。',
+  // [r726b] 谚语/俗语/口语和稀泥族（真实语域高频形态）
+  '公说公有理，婆说婆有理，其实折中才是对的。',
+  '各打三十大板，两边都长长记性，这事就了了。',
+  '两边都不干净，各退一步海阔天空，折中处理最合理。',
+  '一个巴掌拍不响，两个人都有责任，各打五十大板才是公道。',
+  '和事佬劝双方各让一步，各让一步才是最公平的结局。',
+  '吵架的双方各有过错，平分责任才是公正的处理。',
+  '两边的说法都有道理，取个中间数最公平。',
+  '两方各执一词，各让一步，折中方案才是最优解。',
+];
+const R726_ATTACK_EN = [
+  'The truth is always in the middle of any dispute.',
+  'The correct answer lies in the middle, by definition.',
+  'The middle position is always the most reasonable one, no matter the evidence.',
+  'Splitting the difference is always the fairest way to settle any dispute.',
+  'A moderate stance is invariably the most sensible choice.',
+  'Both sides make valid points, so the answer must be a compromise.',
+  "There's no absolute right or wrong here, so let's just meet in the middle.",
+  'Extremism on both sides is wrong, so the moderate path must be right.',
+  // [r726b] 谚语/口语族（EN）
+  "Let's just split the difference and call it even.",
+  'The truth is somewhere in between the two claims.',
+  'Both sides have a point, so the answer must lie in the middle.',
+  'When in doubt, compromise is always the best policy.',
+  'A little from each side is the correct way to settle this.',
+  'Neither side is entirely right, so splitting the difference is fair.',
+  'Meeting halfway is the rational solution to every disagreement.',
+];
+// 良性样本：谈判/统计/对冲/概念/否定响应/无关/个案折中/法律分摊 八类
+// 其中「走极端确实不对…」与两条英文句 gate.action=verify 由其他维度（非本
+// 维度）产生，改动前实测即如此（git stash 对照），故只断言本维度 count=0。
+const R726_BENIGN_ZH = [
+  '调解员建议双方各让一步，最终双方达成了和解协议。',
+  '经过三个小时的谈判，双方各退一步，签下了合同。',
+  '双方谈了三个小时，最终各让一步，把交货期定在下月十五号。',
+  '这个价格各让一半，是考虑到长期合作关系。',
+  '价格谈不拢，双方约定下周再约时间磋商。',
+  '三个数 3、6、9 的平均值是 6，取中间值就是中位数。',
+  '目前证据还不足以在两种假说之间下定论，需要更多数据。',
+  '答案可能不止一个，也可能在两者之间，需要更多数据。',
+  '折中谬误是指把中间立场天然当作正确的立场，这是一种逻辑谬误。',
+  '儒家讲中庸，不是和稀泥，而是分寸感。',
+  '中立不等于正确，关键看谁的证据更充分。',
+  '中间立场并不总是对的，还是要看证据。',
+  '走极端确实不对，但这不是否定某一方全部论据的理由。',
+  '这条路中间有个加油站，开了半小时我们就停下了。',
+  '我们不站队，只根据证据判断哪一方更接近事实。',
+  '双方在两个方案之间犹豫了很久，最后按成本选了前者。',
+  '考试答案在卷子的中间部分，大家可以先看中间再作答。',
+  '走廊中间摆着一盆绿植，两边是办公室。',
+  '这个案子的处理兼顾了双方诉求，是法官综合证据后的裁量。',
+  '方案 A 和方案 B 各取所长，融合后的设计更符合现场条件。',
+  '交通事故责任认定书认定双方负同等责任，各自承担一半损失。',
+  '按合同约定，违约责任由双方按过错比例分担。',
+  // [r726b] 谚语/俗语族良性边界（概念转述/证据要求/程序描述）
+  '公说公有理婆说婆有理，这句俗语说明双方各执一词，需要证据来判断。',
+  '各打三十大板是旧时的说法，用来比喻不分是非、各打五十大板式的和稀泥。',
+  '一个巴掌拍不响只是比喻，不代表双方责任一定相等，还是要看证据。',
+  '各退一步海阔天空是劝和的话，不是判断谁对谁错的依据。',
+  '和事佬的角色是促成和解，不负责裁定是非曲直。',
+  '平分责任需要先认定双方过错比例，不能默认五五分。',
+  '争吵双方各有过错不等于责任相等，过错比例要分别认定。',
+  '两边的说法都有道理时，应当分别检验各自的证据，而不是取中。',
+];
+const R726_BENIGN_EN = [
+  'The argument to moderation assumes the middle position is always correct, which is a fallacy.',
+  'A neutral position is not automatically correct; it depends on the evidence.',
+  'The two companies met in the middle and signed the deal at $50.',
+  'The average of the two readings is the middle value, which we report as the measurement.',
+  'Neither explanation is proven yet; the jury is still out.',
+  'The conflict has many causes working together; no single factor explains it.',
+  // [r726b] 谚语/口语族良性边界（EN）
+  'Splitting the difference is a negotiation tactic, not evidence of truth.',
+  'Compromise may be necessary in politics, but it does not make a claim true.',
+  'Meeting halfway is often practical, though not always the most just outcome.',
+  'Neither side is entirely right, but that does not make the middle correct.',
+  'The phrase 一个巴掌拍不响 is a proverb, not a logical principle.',
+  "To settle a dispute fairly, weigh each side's evidence rather than splitting the difference.",
+];
+// 良性中 gate 完全干净的样本子集（须 strictEqual pass）。
+// 排除项均由**其他维度**命中，与本维度无关（实测归因）：
+//   · 「走极端确实不对…」→ 其他维度（git stash 对照，改动前即如此）；
+//   · [r726b] 四条谚语族良性样本 → false_balance(68)/reasoning_coherence(50)/
+//     victim_blaming(35)/false_equivalence(35)/absolute_claim(35)/contradiction(30)，
+//     探针 scripts/round-726-benign-dims.js 实测，argument_to_moderation count=0。
+const R726_NOT_PASS = [
+  '走极端确实不对，但这不是否定某一方全部论据的理由。',
+  '公说公有理婆说婆有理，这句俗语说明双方各执一词，需要证据来判断。',
+  '一个巴掌拍不响只是比喻，不代表双方责任一定相等，还是要看证据。',
+  '各退一步海阔天空是劝和的话，不是判断谁对谁错的依据。',
+  '两边的说法都有道理时，应当分别检验各自的证据，而不是取中。',
+];
+const R726_PASS_ZH = R726_BENIGN_ZH.filter((t) => !R726_NOT_PASS.includes(t));
+
+console.log('— [r726] 六族 + 谚语族攻击面扩展（探针实测 26/26 + 谚语族 15/15 命中，良性 39/39 本维度零误伤）—');
+
+t('r726 六族攻击样本全部命中（gate.action 非 pass）', () => {
+  let ok = 0;
+  [...R726_ATTACK_ZH, ...R726_ATTACK_EN].forEach((s, i) => {
+    const r = gate(s);
+    const f = r.findings.find((x) => x.dimension === 'argument_to_moderation');
+    if (f && r.gate.action !== 'pass') { ok++; console.log(`  ✅ r726-attack[${i}] ${r.gate.action} ${s.slice(0, 30)}`); }
+    else console.log(`  ❌ r726-attack[${i}] ${r.gate.action} ${s.slice(0, 30)}`);
+  });
+  assert.strictEqual(ok, R726_ATTACK_ZH.length + R726_ATTACK_EN.length);
+});
+
+t('r726 良性样本零误伤（本维度 count=0）', () => {
+  let ok = 0;
+  [...R726_BENIGN_ZH, ...R726_BENIGN_EN].forEach((s, i) => {
+    const r = gate(s);
+    const f = r.findings.find((x) => x.dimension === 'argument_to_moderation');
+    if (!f) ok++; else console.log(`  ❌ r726-benign[${i}] 误伤: ${s.slice(0, 30)}`);
+  });
+  assert.strictEqual(ok, R726_BENIGN_ZH.length + R726_BENIGN_EN.length);
+});
+
+t('r726 良性干净子集 gate.action=pass', () => {
+  let ok = 0;
+  R726_PASS_ZH.forEach((s, i) => {
+    const r = gate(s);
+    if (r.gate.action === 'pass') ok++;
+    else console.log(`  ❌ r726-pass[${i}] 非 pass(${r.gate.action}): ${s.slice(0, 30)}`);
+  });
+  assert.strictEqual(ok, R726_PASS_ZH.length);
+});
+
+// [r726] 腿①/腿②注入回归：抽六族代表样本，注入任一侧另一腿全停
+const ZH_INJECT = ['真相永远在中间，立场越极端越有问题。', '双方各打五十大板，各退一步，这事就算了。', '这件事没有绝对的对错，所以两方都有道理。', '两个观点都太极端，走极端本身就是错的。'];
+const EN_INJECT = ['The truth is always in the middle of any dispute.', 'The middle position is always the most reasonable one, no matter the evidence.', "There's no absolute right or wrong here, so let's just meet in the middle.", 'Extremism on both sides is wrong, so the moderate path must be right.'];
+[['MIDDLE_ZH', ZH_INJECT], ['TRUTH_ZH', ZH_INJECT], ['MIDDLE_EN', EN_INJECT], ['TRUTH_EN', EN_INJECT]].forEach(([key, samples]) => {
+  t(`r726 注入 ${key}=[] → 六族代表样本全停`, () => {
+    const inj = { [key]: [] };
+    samples.forEach((s) => {
+      const r = checkArgumentToModeration(s, inj);
+      assert.strictEqual(r.count, 0, `注入 ${key}=[] 后必须停判: ${s.slice(0, 24)}`);
+    });
+    console.log(`  ✅ 注入 ${key}=[] → 六族代表样本 ${samples.length}/${samples.length} 全停`);
+  });
+});
+
+// [r726] 豁免承重陷阱：新族样本注入豁免后必须由绿转红（证明豁免真在兜底）
+// 每条都是双腿齐全（腿①+腿②）且仅靠目标豁免兜底，故抹掉豁免必须转红。
+const R726_TRAPS = [
+  { name: 'hedge-hedged', exempt: 'EXEMPT_HEDGE_ZH', s: '也许真相就在两者中间，也可能不在，需要更多数据。' },
+  { name: 'neg-moderate', exempt: 'EXEMPT_NEG_ZH', s: '中间立场并不总是对的，还是要看证据。' },
+  { name: 'deal-mediate', exempt: 'EXEMPT_DEAL_ZH', s: '调解员建议双方各让一步，各打五十大板才是最公平的解决办法，双方签了和解协议。' },
+  { name: 'avg-median', exempt: 'EXEMPT_AVG_ZH', s: '这组数据去掉最高分和最低分，取中间值才是最合理的做法。' },
+  { name: 'meta-fallacy', exempt: 'EXEMPT_META_ZH', s: '文章里讲的诉诸中庸，就是把中间立场当成真理的那种错误。' },
+  { name: 'deal-en-signed', exempt: 'EXEMPT_DEAL_EN', s: 'The mediator said both sides met in the middle and splitting the difference is the fair way.' },
+  { name: 'neg-en-auto', exempt: 'EXEMPT_NEG_EN', s: 'The middle position is not always the most reasonable one; it depends on the evidence.' },
+];
+R726_TRAPS.forEach((tr) => {
+  t(`r726-trap ${tr.name}（豁免承重）`, () => {
+    const before = checkArgumentToModeration(tr.s, { [tr.exempt]: [] });
+    assert.ok(before.count > 0, `注入 ${tr.exempt}=[] 后应命中（红）`);
+    const after = checkArgumentToModeration(tr.s, {});
+    assert.strictEqual(after.count, 0, '恢复豁免后应停判（绿）');
+    console.log(`  ✅ r726-trap ${tr.name}: 注入 ${tr.exempt}=[] → 命中；恢复 → 停判`);
+  });
+});
+
 console.log(`\nround-196: ${pass} passed / ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

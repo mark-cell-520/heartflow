@@ -1,3 +1,40 @@
+## r726+r727 — 截断轮接手双单点：argument_to_moderation 探测器族扩展（middle_ground 4/10 漏判修复）+ silence_imputation 腿②缺口扩展（4/10 漏判修复）
+
+**轮次**：r726（被迭代上限截断于冒烟后，半成品留工作区）→ **r727 接手验证落盘并做本轮单点** ｜ **版本**：v6.8.152 → v6.8.154 ｜ **日期**：2026-11-07 ｜ **方向**：方向池④ middle_ground（r726 执行）+ 方向池③ silence_imputation 腿②（r727 执行）
+**真升级类型**：两单元均为存量维度探测器扩展（用户可感知：攻击族从漏判变拦截，攻击面只扩不收——「他没否认，所以这事是真的」「中间道路必然是正确的」类从 pass 变 verify/rewrite；良性面双向门禁 302/326 与基线完全一致零新增误伤）
+**来源**：cron r726 执行体（冒烟后被截断，改动全留工作区）；r727 接手时先跑遗留测试确认半成品有效（round-196 68/0、负例 29/29、think 冒烟 30/30+24/24）再补全链路验证，未重写任何规则；随后做 r727 自己的单点（silence_imputation 腿②扩展）
+
+### 轮初方向复测结论（init 方向池六项）
+| 候选 | 复测结论 |
+|---|---|
+| ① di ① 目的状语豁免不含「以符合」 | **复测推翻**（r725 已记）：实测 pass，r717 已修，旧锁值过时 |
+| ② hasty_generalization 对 "Nobody can skip…" 误报 | **复测推翻**（r725 已记）：实测 pass，r718 规范情态槽已豁免 |
+| ③ silence_imputation 6/10 漏判 | **部分推翻 + 真缺口**：「src/ 零命中未上线」过时（r717 已上线，src/silence-imputation.js 12KB + index.js 九处接线 + 40/40 测试在）；但「漏判」复测属实——r216 口径攻击 10 条实测 6/10 命中（4 条真漏判）、良性 0/10。**本轮主体（r727 单点）** |
+| ④ middle_ground 4/10 漏判 | 真缺口，**r726 已执行完留工作区**（本轮接手验证落盘，见下） |
+| ⑤ chronological_snobbery | r218 结论不上线维持——FP 豁免面未划清前不做，写入下一轮方向 |
+| ⑥ evidence 维度恒返回 {score:1, issues:[]} | 复测确认仍恒死（checkEvidence 未显式传 evidence 时 score=1.0，v6.7.73 刻意中性化防全量误伤）；激活需先划清与 unsupported_claim 边界，高风险，写入下一轮方向 |
+
+### 单元一（r726 成果，r727 接手落盘）：argument_to_moderation（第 194 维，r196 已上线）探测器族扩展
+- **性质判定**（本轮最贵教训，见踩坑③）：r726 改动初看像新维度，`git show HEAD:src/index.js | grep -c argument_to_moderation` = 12 + AGENTS.md Verify-level 列表已有其名 → 维度 194 自 r196 已上线，r726 是**探测器族扩展**：src/argument-to-moderation.js +88 行（腿① MIDDLE 补 moderate/compromise/extremism/even-handed/balanced/fair 六族×量化最高级、真相·答案·结论[永远|一定|从来]在(两个)(极端)之间、和稀泥/息事宁人/双方·两边有道理/极左极右/取中间；腿② TRUTH 补 [必然|一定|当然|显然]才是X/(最|才)(公平|合理|稳妥|明智)的X/[总是|一定|必然|永远][最]X/真相·答案在(两者|双方)(极端)之间/各打五十大板…算了/没有绝对的对错/走极端…错/越极端越有问题；EN 对位 truth (is) (always) (in) the middle/no absolute (right|wrong)/answer must be a compromise/moderate path must be right）+ 豁免补 最高分/最低分；src/index.js 仅 guidance 文本同步（+1/-1）；维度数不变（213 维/三层级 200/模块 162）
+- **验证实测**：test/round-196-argument-to-moderation.js 68/0；负例 scripts/negative-test-middle-ground-r726.js 29 注入点 29/29 如期变红（六族腿×中英 + 五组豁免全部承重，良性对照零误伤）；think() 冒烟 scripts/round-726-think-smoke.js 正例 30/30、反例 24/24；接手补跑：bin/verify.js 16/0、双向门禁 52/52 + 302/326、doc-numbers 24/0、security-audit 16/0、cli.js status running
+
+### 单元二（r727 单点）：silence_imputation（第 213 维，r717 已上线）腿② IMPUTE 缺口扩展
+- **复测数据**：scripts/round-727-silence-probe.js（r216 口径攻击 10 + 良性 10）实测攻击 6/10、良性 0/10——方向池「6/10 漏判」的 6 是 r216 修 perfect_error 误伤前的旧数，当前真漏判 4 条，根因全部在腿② IMPUTE 槽位缺失、腿① 10/10 全命中
+- **改动**（src/silence-imputation.js，+45 行）：① IMPUTE_ZH 补因果连接形（所以/因此/足见/可见 + 结论——原等式化族要求 说明/证明 类动词在前），**结论加句读边界 lookahead**（标点/句尾/语气词）防「所以这事是真的没办法推进」类「是真的+形容词」副词形误伤；② 补动词叠用形（无异于/等于/无异/相当于/等同于 + 坐实（指控）——坐实原在等式化族动词槽，两槽都吃不上）；③ 补「这(就)说明+问题」总结形（原族只有「这就是答案」）；④ 副词族补 足见/可见/看来；IMPUTE_EN 补 amounts to a confession / tells you something；SILENCE_EN 补 said nothing / nothing to say 口语沉默形（对抗探针发现 "He said nothing, which amounts to a confession." 腿①不命中）；模块头注释同步订正（邻近窗 40→60 与实际 PROX_FWD_ZH=60 一致——原注释与代码不一致的存量文档偏差）
+- **验证实测**：探针 10/10 + 0/10；对抗探针 scripts/round-727-silence-adversarial.js 10/10 + 良性 0/8（8 条刁钻良性含 4 条句读边界副词形）；test/round-727-silence-imputation-extension.js 38 断言全绿（13 攻击 gate 非 pass / 8 良性 gate 全 pass / 8 模块边界含句读约束承重 / 6 __internals 注入含 EXEMPT_CORRECT_ZH 唯一通路 / think() 冒烟 / 4 存量锚点）；负例 scripts/negative-test-silence-imputation-r727.js 11 注入点 11/11（双腿×4 + 豁免×1 全部承重，良性对照 8/8 零误伤，gate 层 4/4）；存量零回归：test/round-717-silence-imputation.test.js 40/40、test/victim-blaming-silence-consent.test.js 全过、双向门禁 52/52 + 302/326、verify 16/0、doc-numbers 24/0、security-audit 16/0、cli.js status running
+- **diff 计量**：有效代码（src/ + test/）约 575 行；commit 全量 shortstat 1394 insertions（含 r726 单元证据链 + 两单元负例脚本/探针 + README 两条 changelog + 本条目）
+
+### 下一轮方向
+1. **silence_imputation 腿①残余族**：表态/松口/给说法 类沉默形未收（实测「他迟迟没有表态，所以这事是真的。」「他始终不松口，可见确有其事。」「他不给说法，这本身就说明问题。」三条 MISS——腿①动词表只有 否认/澄清/回应/回答/解释/辟谣/发声/吭声/置评；良性侧「也许只是在权衡」类安全）。补腿①即可全链路命中，负例需配「表态≠推定」专属样本
+2. **evidence 维度恒死**（r690 起多轮遗留）：checkEvidence 未显式传 evidence 时 score=1.0，findings 永不触发；激活须先划清与 unsupported_claim 射程（v6.7.73 中性化就是防全量误伤），建议先出豁免设计文档再动手，不直接改打分器
+3. **chronological_snobbery 新维度候选**（r218 落选维持）：「新所以对/旧所以错」时序谬误，FP 豁免面（版本迭代/技术演进正当语境）未划清——如做，先划边界再建探测器
+4. **r726 EN 负例中 moderate path 形复测**：确认 r726 扩展后是否仍有残余 miss（负例输出曾标注 miss 1/26，需复测定性）
+
+### 新踩坑（三条）
+1. **接手截断轮遗留探针，先核对探针读的路径再信它的数字（本轮最贵）**：r726 遗留的 round-726-middle-ground-probe.js 实测显示「攻击命中 0/10」，一度以为是接线假接线；读代码发现它过滤 `r.dimensions.fallacies.fallacies` 的 `type==='middle_ground'`（旧 fallacies 子标签路径），而维度早已独立为 argument_to_moderation（dim 194）走 `_inputDiscrimination.dims`——0/10 是测量假象，权威实测是 think 冒烟 30/30。判据：任何遗留探针，先 diff 它读的结果路径与当前判别路径，不一致就当废纸，重写探针再测
+2. **截断轮的版本 bump 会留三处文档欠账**：r726 把 VERSION/package.json/SKILL.md frontmatter/version.js 涨到 6.8.153 后被截断，README spec 戳、README changelog、UPGRADE_LOG 全没写——接手轮 doc-numbers 2 失败 + security-audit S2（git log 未命中版本）1 失败全是这个。接手截断轮先跑 doc-numbers + security-audit 定位欠账清单，补完再跑验证
+3. **「新维度上线」与「存量探测器扩展」性质要动手前判定**：r726 的 argument_to_moderation 改动（模块 +88 行、test 文件 round-196 命名）初看像新维度，实际维度 194 自 r196 已在 HEAD（index.js 12 处引用、AGENTS.md Verify 列表已有其名、VERIFY_DIMS 计数不变）。本轮 changelog 首版误写「第 194 维度上线 + 维度 213→214」，靠 `git show HEAD:src/index.js | grep -c` + measure-claimed-numbers.js 实测抓出订正。判据：写 changelog 前先 `git show HEAD:<模块/索引> | grep -c <维度名>` + 跑 measure-claimed-numbers.js 对比层级计数
+
 ## r724 — stereotype are/is 支窄化：五件预存失败共同根因「归因错位」根治（r724 截断于冒烟前，r725 补跑验证并落盘）
 
 **轮次**：r724（被迭代上限截断于冒烟前，半成品留工作区）→ **r725 补跑全链路验证并落盘** ｜ **版本**：v6.8.151 → v6.8.152 ｜ **日期**：2026-11-07 ｜ **方向**：五件预存失败根治（r723 下一轮方向②，init 方向池中唯一有共同根因的大单块）
