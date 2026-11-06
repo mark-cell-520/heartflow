@@ -1,3 +1,57 @@
+## r720 — HG 谓词槽形态系统化（verifies 漏洞 + 验证审查八族）+ everyone 族守卫接入 + zh「全是」量化词族补缺
+
+**轮次**：r720（第 720 轮 cron 窗口）｜ **版本**：v6.8.148 → v6.8.149 ｜ **日期**：2026-11-06 ｜ **方向**：hasty_generalization 存量缺口复测修复（r718 遗留方向②③ + 复测新发现④）
+**真升级类型**：存量修复（用户可感知：「No one verifies the results before publishing.」「No one validates the config before deploying.」「身边的人全是关系户」「他的解释全是借口」从 pass 变 verify/hasty_generalization 命中；「Everyone must validate the input before submitting.」规范句从 verify 误报变 pass——everyone 族守卫接入修复）
+**来源**：cron r720 执行体；轮初复测 scripts/diag-r720.js（23 条探针，已按惯例删除）
+
+### 轮初方向复测结论（init 简报方向池 + r718 遗留）
+| 候选 | 复测结论 |
+|---|---|
+| r718 遗留② HG 判据③动词族 y 结尾缺口 | **真缺口**：实测攻击 7/7 MISS（verifies/validates/confirms/reviews/double-checks/validated/validating），存量 reads/checks 仍 HIT，规范句 can verify/must validate/should confirm 仍 pass → 本轮主攻 |
+| r718 遗留③ 「身边的人全是关系户」无量化词命中 | **真缺口**：`身边(?:全是|…)` 要求紧贴，隔「的人」即 MISS；且「他的解释全是借口」类一般全称归因无判据管 → 本轮第二修点 |
+| 复测新发现④ everyone 族守卫缺失 | **真缺口**：11064 判据无捕获组，r718 isNormativeQuantifierHit（读 m[1]）对 everyone 族不生效，「Everyone must validate the input before submitting.」被直接命中（与 r718 判据③修复前同型误伤）→ 本轮第三修点 |
+| 方向池 2 hasty "Nobody can skip…" | 已由 r718 判据③ can 填充槽修复（复测 A8 pass），排除 |
+| 方向池 3 silence_imputation | 已由 r717 第 213 维度上线，排除 |
+| 方向池 4 middle_ground | 复测 3 攻击 2 MISS 1 被 false_equivalence 接住、1 良性误伤 empty_answer，Phase 0.7b 仍不合格，继续不上线（写入下一轮方向） |
+| 方向池 1 di「以符合」 | 已由 r717 修复（方向池复述滞后），排除 |
+| 方向池 6 evidence 恒死 | 本轮未展开，写入下一轮方向 |
+
+### 改动明细（src/index.js，四处同族）
+1. **判据③（11213 行）谓词槽形态系统化**：`verified?` → `verif(?:y|ies|ied|ying)`（补 verifies/verifying，修复 -s 第三人称单数漏洞——全称否定最典型形态）；追加八族验证审查动词 verif/validat/confirm/review/audit/test/double-check/approve/watch，每族四形态（原形/-s/-ed/-ing）。log(s|ged|ging) 与 merge 族**刻意不收**（"No one logs in without MFA" 安全规范陈述、"No one merges on Fridays" 团队习俗，记为遗留）。-ing 形与守卫天然兼容："Nobody is validating…" 填充槽吃 "is"（非情态词）照常命中，"Nobody is able to validate…" 由 is able to 豁免
+2. **everyone 族（11083 行）捕获槽 + 守卫接入 + 八族动词**：`everyone\s+(?:动词)` → `everyone\s+((?:\w+\s+){0,3})(?:动词)`，must/should/can/is able to 填充槽由守卫豁免；八族动词同步补入；副词填充（always/usually）不豁免照常命中。**every/each 族（11111 行）未动**：动词表与宾语槽（this/that/about…）耦合，补族需同步扩宾语槽，风险收益不成比例，写入下一轮方向
+3. **zh 身边族（10916 行）放宽间隔**：`身边(?:全是|…)` → `身边[^。，！？；]{0,6}(?:全是|都是|全都是|全都)`（覆盖「身边的人全是」「身边同学都是」「身边同事全都」）
+4. **zh 新增「X 全是 + 负面定性」判据**：主语段 `[^。，！？；\s不没]{1,12}` + 全是 + 负面定性词表（借口/关系户/骗子/草台班子/套路/空话/假的/泡沫/水分…28 词）；主语段禁含 不|没 排除「他的解释不全是借口」式反驳句；负面定性表外一律放行（二等品/骨干/人/复制粘贴/预制菜 5 条良性实测 0 误伤）
+
+### 新踩坑（两条，均为负例纪律现场抓出）
+1. **负例 needle 写成 RegExp 字面量 = 假阴性**：needle 用 `/[^…]\s不没]{1,12}全是…/` 时，`\s` 编译成「匹配空白字符」，而源码里是「反斜杠+s 两个字符」，整条匹配不上 →「注入未生效/未变红」假阴性。needle 必须是含首尾斜杠的**普通字符串**（与 negative-test-absolute-claim-en.js 头注同口径，本轮第二次踩到）
+2. **验证「守卫豁免」类修复不能靠删捕获槽**：删 everyone 族捕获槽后，"Everyone must validate…" 反而不匹配（must 在槽位）——永不变红，验证不到守卫。必须注入守卫本体（quantifier-guards.js 的 en 情态测试短路为 false）让规范句重新命中，才证明 pass 确由守卫豁免保证而非偶然
+
+### 验证逐项实测（全部实跑）
+| 项 | 实测 |
+|---|---|
+| node test/hg-verb-form-quantifier-zh-r720.test.js | ✅ 62 passed, 0 failed（en 判据③ 攻击 12/规范豁免 8/存量 4、everyone 族 攻击 5/规范豁免 4/存量 3、zh 攻击 10/良性 8/否定反驳 2/存量 4、gate 端到端 2） |
+| node scripts/negative-test-hg-verb-form-r720.js | ✅ 对照 26/26 全绿；5 注入点 5/5 如期变红（删八族 miss 12/12、删全是判据 miss 6/6、身边族还原严格形 miss 2/3、everyone 族删八族 miss 4/4、quantifier-guards en 情态豁免失效 miss 2/2） |
+| think() 冒烟（new HeartFlow + start + think()，一次性脚本） | ✅ 15/15（良性 5 条 signalCount=0、攻击 10 条命中 hasty_generalization） |
+| node bin/verify.js | ✅ 16 passed, 0 failed |
+| node scripts/bidirectional-guard.js | ✅ 召回 52/52、误拦 302/326，与基线完全一致（zh/everyone 新判据零新增误伤） |
+| node test/doc-numbers-accuracy.test.js | ✅ 24 通过, 0 失败 |
+| node test/security-audit.test.js | ✅ 16 通过, 0 失败（commit 后 S2 git log 版本检查转绿） |
+| node bin/cli.js status | ✅ running |
+| 存量 HG 测试 8 件 | ✅ round-332×2 4/0 + 122/0、229 80/0、230 104/0、281 975/0；279(153/1)、280(6331/52)、282(14/2) 三件预存失败数量不变（HEAD 基线即有，根因 stereotype 归因错位 "All users are exported" 类工程句，与本轮无关） |
+| node scripts/round-guard.js --stage=after | ✅ 通过（version.js 兜底值同步 6.8.149 + UPGRADE_LOG 本记录后） |
+
+### 落盘
+- 主体 commit：`git commit` feat: 6.8.149 — 8 files changed, 456 insertions(+), 19 deletions(-)（475 行有效 diff + UPGRADE_LOG 记账 commit）
+- 版本 6.8.148 → 6.8.149 六处同步：VERSION / package.json / SKILL.md frontmatter / SKILL.md Engine version 行 + Verified metrics 版本戳 / src/core/version.js 兜底 / README Verified metrics 版本戳 + changelog 新行
+
+### 下一轮方向
+1. **every/each 族（11111 行）动词缺口 + 捕获槽守卫接入**：与判据③/everyone 族同型——无捕获组不受 isNormativeQuantifierHit 保护，动词表缺验证审查八族；改它需同步扩宾语槽（this/that/about/the…），单点做透一轮
+2. **HG 判据③ log 族分词陷阱**："No one logs in without MFA"（安全规范陈述）与 "Nobody logs the errors."（攻击）的 login/log 分词消歧
+3. **evidence 维度基线打分器恒返回 {score:1, issues:[]}**（r690 起连续多轮记录，本轮仍未展开）
+4. **middle_ground Phase 0.7b 重测**（本轮复测：3 攻击 2 MISS + 1 误伤，仍不合格）
+5. **279/280/282 三件预存失败根治**（stereotype 归因错位："All users are exported nightly." 类工程完成态句被 stereotype 命中）
+6. 0x08 腐蚀真实引入轮次远程溯源（r718 已实测本地 git 起点即含腐蚀）
+
 ## r718 — 量化词族双守卫上线 + 109 处 `\b` 退格符腐蚀修复 + r360 存量误报修复
 
 **轮次**：r718（init 简报第 719 轮窗口收尾 r718 未竟链；r718 主体改动由上一轮 cron 完成，本轮跑完修正后测试、负例、版本、落盘）｜ **版本**：v6.8.148 ｜ **日期**：2026-11-06 ｜ **方向**：量化词族跨族守卫（否定量化词 + 规范情态槽）+ `\b` 腐蚀修复
