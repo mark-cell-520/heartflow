@@ -1,0 +1,57 @@
+=== 攻击（期望 hit）===
+A1   hit=true 多重比较/数据挖掘(1处: 「试了20种」之后只把「终于显著」的那个当证据——大量尝试后选择
+A2   hit=true 多重比较/数据挖掘(1处: 「测试了30个参数组」之后只把「终于p值」的那个当证据——大量尝
+A3   hit=true 多重比较/数据挖掘(1处: 「换了5种」之后只把「其中一种显著」的那个当证据——大量尝试后选
+A4   hit=true 多重比较/数据挖掘(1处: 「调研了40个」之后只把「挑出大涨」的那个当证据——大量尝试后选
+A5   hit=true 多重比较/数据挖掘(1处: 「分析了上百个」之后只把「终于相关的」的那个当证据——大量尝试后
+A6   hit=true 多重比较/数据挖掘(1处: 「切了十几刀」之后只把「有一组强相关」的那个当证据——大量尝试后
+A7   hit=true 多重比较/数据挖掘(2处: 「第12次」之后只把「终于效应」的那个当证据——大量尝试后选择性
+A8   hit=true 多重比较/数据挖掘(1处: 「几十种配色方案中」之后只把「有一种转化率」的那个当证据——大量
+A9   hit=true 多重比较/数据挖掘(1处: 「扫描了全部」之后只把「找到支持结论」的那个当证据——大量尝试后
+A10  hit=true 多重比较/数据挖掘(1处: 「试遍了各种」之后只把「终于证明」的那个当证据——大量尝试后选择
+E1   hit=true p-hacking(1x: "tested twenty subgroups" follow
+E2   hit=true p-hacking(1x: "trying thirty parameter combina
+E3   hit=true p-hacking(1x: "reran the experiment twelve tim
+E4   hit=true p-hacking(2x: "Out of forty cities" followed b
+=== 良性（期望不判）===
+B1-基线同报          hit=false
+B2-绝对值低          hit=false
+B3-预注册           hit=false
+B4-校正            hit=false
+B5-独立重复          hit=false
+B6-小样本保留         hit=false
+B7-定性保留          hit=false
+B8-EN基线          hit=false
+B9-EN校正          hit=false
+B10-EN复现         hit=false
+B11-无显著          hit=false
+B12-未发现          hit=false
+B13-一次实验         hit=false
+B14-正常迭代工程       hit=false
+=== 边界锁（期望不判）===
+L1-cherry领地      hit=false
+L2-cherry领地EN    hit=false
+L3-cluster领地     hit=false
+L4-hasty领地       hit=false
+=== 官方良性语料 ===
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       12       1     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 12
+
+✅ 无回归
+gate-benchmark.js: 累计 77 条, 误报 0
+gate-benchmark-extended.js: 累计 151 条, 误报 0
+benign-mixed-benchmark.js: 累计 176 条, 误报 0
+官方语料: 176 条, 误报 0
+异常合计: 0
