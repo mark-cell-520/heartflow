@@ -7571,6 +7571,58 @@ const PC_DRUG_MECH_ZH = /(?:布洛芬|对乙酰氨基酚|阿司匹林|阿莫西�
 //      （摘掉后 17/17 攻击句命中数不变），故删除，不留不承重的代码。
 const PC_INVTAKE_ZH = /(?:(?:这|那|一)[盒支片粒颗个瓶包袋剂味碗杯][^。]{0,4}(?:药丸|胶囊|汤药|仙丹|符水|香灰|香炉灰|偏方|土方|秘方|药|丸|丹)[^。]{0,4}(?:吃|喝|服|吞)(?:下)?(?:去)?|(?:这|那|一)(?:[盒支片粒颗个瓶包袋剂味碗杯][^。]{0,4})?(?:注射液|针剂|药剂|针)[^。]{0,4}打(?:下)?(?:去)?|(?:吃|喝|服|吞)了?[^。]{0,4}(?:这|那)(?:一)?[盒支片粒颗个瓶包袋剂味碗杯]?[^。]{0,4}(?:符水|香灰|香炉灰|偏方|土方|秘方|仙丹|汤药|丸|丹))/;
 const PC_TAKE_RES_ZH = /(?:退[了去烧热]|好[了起]|见效|见了效|有效|止住|不疼[了]?|不痛[了]?|停[了止]|消[了失]|轻[了些]|康复|缓解[了]?|压[了住]|稳[了定])/;
+// ─── [v6.8.157 第 229 轮] 「未点名保健品/补品归因」族三张表 ─────────────────
+// 轮初红队探针（scripts/tmp-229-probe.js，轮末已删）实测：第⑩支甲半
+// PC_ACT_LUCK_ZH 的服药臂 `吃了?[^。]{0,6}(?:药|保健品|补品)` 早在 v6.7.127
+// 就收了「保健品/补品」对象，但**乙半 PC_RES_LUCK_ZH 只收获益动词**
+// （签单/谈成/中了/赢了/涨了/赚了/好起来…），没有一条症状/精力改善词——
+// 20 条未点名保健品攻击句 pseudo_causal **0/20**（其中 9 条被 post_hoc 兜住
+// gate=rewrite，11 条连 gate 都是 pass）：
+//   「吃了这个保健品之后精神就好了」「隔壁大爷吃了这个保健品，高血压再没犯过」
+//   「坚持吃这个保健品，这个月业绩就上去了」「全办公室都吃这个保健品，这个月没人感冒」
+// 而 10 条**点名**补品探针（螺旋藻片/蛋白粉/鱼油/钙片/辅酶Q10…）HEAD 本就零命中。
+// 取向刀沿用 r227/r228 已裁定口径（本轮不重新裁）：**「未点名对象 + 服下即愈/
+// 获益」判，「点名补品 + 真实依据」不判**。甲半的结构就是这把刀——对象词表
+// **只收泛类名词**（保健品/补品/营养品），点名产品根本进不了甲半（对象位置
+// 必须是这三个泛类词），10 条点名探针实测零误伤。
+// 为什么单独一个函数而不是往 PC_CAUSAL_ZH_PATS 加一支：与 r227 同款三条理由
+// （子句级配对 / halves 半身诊断 / 反向护栏作用域只限本族），见
+// causalInvertedTakeZh 函数头注释。
+// 甲半两臂（正序「服下动词 + 泛指指示 + 泛类对象」/ 倒装「泛指指示 + 泛类对象
+// + 服下动词」）：
+//   「吃了这个保健品」「连续吃了三个月这个保健品」「天天吃某种补品」
+//   「这个保健品吃下去」「那盒补品喝下去」「这款营养品吞下去」
+// 泛指指示刻意收 这/那/某/啥/一 五个单字 + 0~3 字窗口（覆盖 个/盒/款/种/箱）：
+// 不收裸「保健品吃下去」——与 r227 甲半表同纪律（未点名须带指示词）。
+const PC_SUPP_ZH = /(?:(?:吃|喝|服|补|吞|冲|泡)了?[^。]{0,4}(?:这|那|某|啥|一)[^。]{0,3}(?:保健品|补品|营养品)|(?:这|那|某|啥|一)[^。]{0,3}(?:保健品|补品|营养品)[^。]{0,8}(?:吃|喝|服|补|吞|冲|泡)(?:下)?(?:去)?)/;
+// 乙半 = r227 服药族的症状消退表（**复用同一张**——本族同样吃「好了/不疼/
+// 稳了」这类词，两张表各存一份只会让它们各自漂移）∪ 保健品族特有的三类结果：
+//   ① 症状名词 + 变少（感冒就少了/起夜就少了）——PC_TAKE_RES_ZH 无「少了」，
+//      而「变少」正是保健品话术最高频的获益表述；
+//   ② 精力/气血/运气/财运（人就精神了/精力旺了/财运就来了）——玄学归因向；
+//   ③ 身体指标 + 升降（血糖就降了/体重就上去了）与业绩成绩（业绩就上去了/
+//      成绩就提高了/业绩一路翻倍）——保健品营销最常挂靠的两类结果。
+// 刻意**不收**裸「少了/上去了」：必须带前置名词（症状/指标/业绩），否则
+// 「吃了这个保健品之后开销就少了」这类无关陈述会被拉进来。
+const PC_SUPP_RES_ZH = new RegExp('(?:' + PC_TAKE_RES_ZH.source
+  + '|(?:感冒|生病|夜起|起夜|腹泻|失眠|掉发|疼痛|头疼|头晕|疲劳|乏力|便秘|副作用|复发)[^。]{0,4}少[了起]'
+  + '|没人感冒|再没[^。]{0,2}(?:犯|感冒|疼)'
+  + '|(?:精神|精力|元气|气血)(?:就)?(?:好(?:了|起来)?|旺(?:了)?|足(?:了)?|起来|充沛(?:了)?|满(?:了)?|了)'
+  + '|(?:财运|好运|手气|运势)[^。]{0,3}(?:来|好|旺|顺)'
+  + '|更有劲|显年轻'
+  + '|(?:血糖|血压|血脂|尿酸|体重|体脂|骨密度)[^。]{0,4}(?:降[了低]|上去|升[了高]|恢复)'
+  + '|(?:业绩|成绩|销量|收入)[^。]{0,4}(?:上去|翻倍|涨[了起]|提高|提升|好转)'
+  + ')');
+// 反向护栏：**真实依据/替代解释在场 → 正常归因，不判**。分两类词：
+//   ① 证据来源（临床/双盲/随机对照/样本量/说明书/医嘱/剂量/成分/文献/同行评审/
+//      实验数据）——「吃了螺旋藻这种保健品，双盲实验证明能预防感冒」是带依据的
+//      归因陈述，不是伪因果；
+//   ② 替代解释（安慰剂/自限/自愈/个例/孤例）——「吃了这个保健品之后精神就好了，
+//      样本只有三个，可能是安慰剂效应」说话者自己承认证据不足，不判。
+// 纪律：只收「依据/替代解释」词，**不收产品名**——「吃了螺旋藻片这种保健品之后
+// 感冒就少了」是点名成分但句内无依据，按 r227 刀（豁免须「点名 + 依据」双条件）
+// 仍判。
+const PC_SUPP_MECH_ZH = /(?:临床|双盲|随机|对照组|安慰剂|样本量|大样本|说明书|医嘱|药师|成分|文献|同行评审|实验数据|自限|自愈|个例|孤例)/;
 // ─── [v6.7.127] 中文「无机制动作 × 获益结果」伪归因族（第 87 轮）──────────
 // 轮初实测（第 87 轮）：第 48 轮建的 PC_CAUSAL_ZH_PATS 对「甲乙两半」型
 // 白话伪因果 5/6 漏判（gate 全 pass）。三条漏判句的形状：
@@ -7738,6 +7790,70 @@ function causalInvertedTakeZh(text) {
     halves: { act: actN, res: resN, exempt: [] },
   };
 }
+
+/**
+ * [v6.8.157 第 229 轮] 中文「未点名保健品/补品归因」族检测
+ *
+ * 与 causalInvertedTakeZh 平级的**子判据**（同样刻意不带 check 前缀，避免
+ * orphan-dimension-guard 误判成第 51 维），由 checkPseudoCausal 调用。
+ * 三张表与函数头四条豁免的理由见 PC_SUPP_ZH 上方注释块。
+ *
+ * 判据形状（三半 AND，缺一不命中）：
+ *   甲半 PC_SUPP_ZH：未点名保健品/补品/营养品 × 服下动词（正序/倒装两臂）
+ *   乙半 PC_SUPP_RES_ZH：甲半之后 ≤24 字内（**同一子句**）出现症状/精力/获益改善
+ *   反向 PC_SUPP_MECH_ZH：真实依据或替代解释在场 → 正常归因，不判
+ *
+ * @param {string} text
+ * @returns {{count:number, hits:string[], score:number,
+ *            halves:{act:number, res:number, exempt:string[]}}}
+ */
+function causalSupplementZh(text) {
+  const EMPTY = () => ({ count: 0, hits: [], score: 0, halves: { act: 0, res: 0, exempt: [] } });
+  if (!text || typeof text !== 'string') return EMPTY();
+  if (!/[一-鿿]/.test(text)) return EMPTY();
+  // 与 causalOverclaimZh / causalInvertedTakeZh 同源同表：方法学/统计语境、
+  // 排除性否定归因、对冲谦辞一律不判（「吃了这个保健品之后精神就好了，但样本
+  // 太小不好归因」这类自认不确定的句子不能判）。
+  if (STAT_CONTEXT_ZH.test(text) || hasExclNegCausal(text)
+    || PC_HEDGE_ZH.test(text) || PC_PROB_ZH.test(text)) {
+    return { count: 0, hits: [], score: 0, halves: { act: 0, res: 0, exempt: ['context'] } };
+  }
+  // 反向护栏：真实依据/替代解释在场 → 正常归因，不是伪因果
+  if (PC_SUPP_MECH_ZH.test(text)) {
+    return { count: 0, hits: [], score: 0, halves: { act: 0, res: 0, exempt: ['supp-mech'] } };
+  }
+  // 逐子句扫描：先按句号/问号/感叹号切句，甲半与乙半必须落在**同一子句**
+  // （「吃了这个保健品。三天后他自己好了。」是事后叙述，不是「服下即愈」的
+  // 因果断言，不判——与 r227 同款子句级配对）。
+  const clauses = text.split(/[。！？!?]/);
+  const hits = [];
+  let actN = 0;
+  let resN = 0;
+  for (let i = 0; i < clauses.length; i++) {
+    const clause = clauses[i];
+    if (!clause) continue;
+    const actRe = new RegExp(PC_SUPP_ZH.source, 'g');
+    let m;
+    while ((m = actRe.exec(clause)) !== null) {
+      actN++;
+      const win = clause.slice(m.index + m[0].length).slice(0, 24);
+      const res = win.match(PC_SUPP_RES_ZH);
+      if (!res) continue;
+      resN++;
+      hits.push('未点名保健品归因:' + m[0] + '→' + res[0]);
+      if (actRe.lastIndex === m.index) actRe.lastIndex++;
+    }
+  }
+  if (hits.length === 0) return { count: 0, hits: [], score: 0, halves: { act: actN, res: resN, exempt: [] } };
+  // 评分与 r227 服药族对齐（0.5 起步 + 0.1/条，上限 0.8）：本族是「未点名对象
+  // + 服下即愈」的强形状，但仍缺显式归因断言。
+  return {
+    count: hits.length,
+    hits,
+    score: Math.min(0.8, 0.5 + (hits.length - 1) * 0.1),
+    halves: { act: actN, res: resN, exempt: [] },
+  };
+}
 function checkPseudoCausal(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
@@ -7816,6 +7932,15 @@ function checkPseudoCausal(text) {
       totalCount += iv.count;
       allHits.push(...iv.hits);
       score = Math.max(score, iv.score);
+    }
+    // [v6.8.157 第 229 轮] 未点名保健品/补品归因族：第三个并列子判据。
+    // 缺口根因见 PC_SUPP_ZH 上方注释——第⑩支甲半收了「保健品/补品」对象但
+    // 乙半 PC_RES_LUCK_ZH 没有症状/精力改善词，20 条红队样本 0/20。
+    const sup = causalSupplementZh(text);
+    if (sup.count > 0) {
+      totalCount += sup.count;
+      allHits.push(...sup.hits);
+      score = Math.max(score, sup.score);
     }
   }
   return { count: totalCount, hits: allHits, score, vagueSource: !specificSource && vagueSource };
