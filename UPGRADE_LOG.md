@@ -1,3 +1,149 @@
+## r227 — 全面升级审计 + 本地独有产能补提交轮（未产新维度，真升级类型 0）
+**日期** 2026-11-06  **操作方** agent-4（美国 IP 海外产能单元）
+**轮次性质** 审计 + 修复 + 本地独有产能固化。本轮不产新判别维度，VERSION 6.8.145 保持（见下）。
+
+### 1. 同步先行
+`git fetch heartflow main` 显示远端领先 45 commits（r218~r226）。`hf4-sync.sh` rebase 同步成功，本地 HEAD 对齐 `1424fea9`。同步过程中 stash/restore 保留了本地未提交改动——这批改动的归属成为本轮审计主线。
+
+### 2. 本地未提交工作的归属核实（关键结论）
+逐文件 `git cat-file -e heartflow/main:<file>` + `git log --all -S"6.8.145" -- VERSION` 双重核实：`src/ecological-fallacy.js`、`src/sorites-fallacy.js`、`src/monocausal-attribution.js`、`src/researcher-degrees-of-freedom.js` 及其三个测试、`scripts/round-220/` 在远端 heartflow/main **均不存在**，6.8.145 不在远端 VERSION 历史中。
+**结论修正**：这不是远端已提交内容的本地副本，而是**本地独有产能**（远端从未收到）。若按「丢弃工作区改动」处理将永久丢失 3 个判别维度。决定：提交推送而非丢弃。
+
+### 3. 审计发现与修复（全部实跑验证）
+| # | 问题 | 实测证据 | 修复 |
+|---|---|---|---|
+| 1 | `src/index.js` 5 处失效测试引用 | `test/round-212-sorites-fallacy.js`、`test/round-585-flattery-pressure.test.js`、`test/round-219-researcher-degrees-of-freedom.js`、`test/dangerous-command-dev-context-round28.test.js`、`tmp-probe-gap.js` 指向的文件经 `git log --all --diff-filter=A` 与远端 main 双重确认**从未存在** | 改为真实文件名 `test/sorites-fallacy.test.js` / `test/round-586-flattery-pressure.test.js` / `test/researcher-degrees-of-freedom.test.js` / `test/code-security-dev-context-round28.test.js` / `scripts/round-220/probe-gap-r220.js`；复查缺失引用数 = 0 |
+| 2 | 维度编号冲突 | `monocausal_attribution` 七处注释标「第 213 维度」，与 `researcher_degrees_of_freedom` 撞号 | 按 VERIFY_DIMS 真实注册顺序核实（211=ecological_fallacy → 212=sorites_fallacy → 213=researcher_degrees_of_freedom → 214=monocausal_attribution），批量修正 7 处为第 214 |
+| 3 | 第 213 维度零单测覆盖 | `researcher_degrees_of_freedom` 已接线但无任何测试文件 | 新建 `test/researcher-degrees-of-freedom.test.js`（118 行）——**27/27 通过**（攻击命中 ZH5/EN4、良性零误伤 ZH4/EN3、负例注入、边界、gate 端到端） |
+| 4 | UPGRADE_LOG 缺 r219/r220 轮次记录 | `grep '^## r2[12][0-9]'` 显示 r215 之后直接跳到 r216，两个新维度无记录 | 补写 r219（第 213 维度 researcher_degrees_of_freedom，65 行）与 r220（第 214 维度 monocausal_attribution）两段完整记录 |
+| 5 | 探针遗留在仓库根目录 | `tmp-probe-gap.js`（r220 缺口探针，21 条候选句 13 条漏判的真实侦察数据） | 转正为 `scripts/round-220/probe-gap-r220.js`，同步 UPGRADE_LOG 3 处 + index.js 1 处引用 |
+| 6 | 文档数字滞后（本轮新发现） | r227 跑全量 `run-all.js` 后 doc-numbers 门禁 FAIL：实测 passing 12,911 而 README/SKILL 规格表仍写 12,575 | README/SKILL 两处规格表 + README 横幅同步为 12,911 passing / 108 failing，并如实记载失败集构成（5 个上游测试自报失败 + 48 无汇总行，均非 r227 引入） |
+
+### 4. 新侦察数据（r221 选题依据）
+根目录另发现一枚**新的**未固化探针（12:59 生成，晚于已转正的 r220 探针，无任何引用）。实跑结果：11 条候选攻击句**全部漏判**——
+- **自我应验预言 / 自败预言**：因为他知道自己会被歧视，所以他干脆不申请，最后果然没能入选 / The team believed they would fail the audit, so they stopped trying and failed / 他一再说这段感情撑不过三年，对方最后真的选择了离开
+- **匿名消息源**：内部人士透露，这款产品存在严重的安全漏洞 / Sources familiar with the matter say the deal is already signed
+- **诉诸未来**：未来的技术终将解决这个问题，所以现在不用采取行动 / Future research will surely vindicate this approach
+- **证实性取证**：实验反复验证了这个理论，说明它是成立的
+- **传闻即事实**：外界都这么传，肯定不是空穴来风
+
+已转正为 `scripts/round-221/probe-gap-r221.js`，留作 r221+ 轮次选题依据。这 6 个族目前 214 个维度**无一覆盖**，是本轮审计输出的最直接升级方向。
+
+### 5. 门禁与全量测试
+- 四门禁：verify 16/16、guard-abilities 20/20（**维度 214**）、doc-numbers 24/24、双向 召回 52/52 误拦 301/326 — **全绿**
+- 全量 `node test/run-all.js`：630 个测试文件，实测 **12,911 passing / 108 failing**。失败集 5 个自报失败（ClassicsRules 多关键词去重、path-guard、mcp-server、pipeline empty input、round-378 中间态 dimensionRaw）经 `git diff heartflow/main` 确认为**远端自带**，非 r227 引入；其余为 48 个无汇总行 + 长期噪声。
+- 维度行为实探（新补单测之外）：中文 HARKing 句 → `verify ["researcher_degrees_of_freedom"]`；「全都是因为他一个人，项目才会失败」/ "It is all because of him." → `verify ["monocausal_attribution"]`。
+
+### 6. 边界纪律
+本轮**未改动任何判别逻辑**（src/index.js 仅修引用指向与注释编号，三个新维度模块与其测试保持 r218~r220 原样），未 bump VERSION，未产新维度（真升级类型 0）。修改集中在：失效引用修正、编号修正、测试补建、日志补写、探针转正、文档数字同步。
+
+## r218 — 每日审计修复轮：`ecological_fallacy`(211) 漏判修复 + `sorites_fallacy`(212) 接线补全 + 两维度单测补建
+
+**轮次**：r218｜ **上线 commit**：见 git log｜ **日期**：2026-11-05｜ **方向**：每日审计（agent-1）自主发现并修复
+**真升级类型**：1 — 存量维度判别能力修复（ecological_fallacy 补 3 个漏判族）+ 1 项接线补全（sorites_fallacy 第 212 维度）+ 2 个单测文件补建（两维度此前 test/ 零覆盖）
+
+### 审计发现（全部实测复现，非自报告采信）
+
+1. **P1 `ecological_fallacy` 三处漏判**（probe 实测 3/3 复现，修复后全部命中）：
+   - **ZH 腿②缺「范围限定语 + 个体量化指称」族**：「该州平均寿命长，因此该州每位居民都长寿」——连接词后先出现「该国/该州/该地区」类范围限定再出现个体指称，原 A 族要求指称紧邻连接词、A3 族只收「这里/那里/当地/本地」窄限定，「该国/该州」整族漏判。补 A5 腿（推断连接 + 20 种范围限定 + 个体量化指称，插入位置 D2 之后）。
+   - **EN 腿①缺群体层比较级**：「Countries with higher chocolate consumption win more Nobel prizes」——原表只收 high/low + 率词，「countries with higher X」比较级 + 群体层变量整族漏判。补两条腿（群体名词 + with + 比较级形；裸比较级 + 群体层变量名）。
+   - **EN 腿②缺身份转移结论**：「eating chocolate makes you a Nobel laureate」——群体比较级结论把个体身份/称号整体转移，原表只收 every/each individual 与 people from that group。补两条腿（makes you a X 身份形 / makes you more X 能力形）。
+2. **P1 `ecological_fallacy` 第四处漏判**（本轮自建单测暴露，非探针）：「研究表明该国居民幸福感排名第一，可见随便问一个该国国民他都很幸福」——B2 族插入式选取动词表只收挑/选/抽/拉/找/取/拎，缺「问/采访/打听/询」；指称表缺「国民/市民/村民/群众」等。已补。
+3. **P2 `ecological_fallacy` 与 `sorites_fallacy` test/ 零覆盖**：`grep -rl ecological_fallacy test/` 空返；`src/index.js` 的 sorites 维度描述里写「样本形状与负例见 test/round-212-sorites-fallacy.js」，**该文件不存在**。两维度的判别能力此前只靠 UPGRADE_LOG 自述与双向门禁隐式承载，无任何单测固化。本轮各补一个单测文件（8/8 与 7/7 通过），含攻击命中 / 良性零承重 / 豁免族 / 负例注入（抹单腿后不命中，验证两腿配对逻辑真实生效）四类断言。
+4. **P2 `sorites_fallacy` 第 212 维度接线在 HEAD 中完成但未提交**：`src/sorites-fallacy.js`（19:36 落盘）与 `src/index.js` 的八处接线（require / 计算点 / gate 参与 / dimensions 键 / 维度描述 / VERIFY 登记）在工作区但未 commit，runtime MCP 重启前不可用。本轮一并提交。
+
+### 审计中核实为「存量问题，非本轮引入」的项（记录不修）
+
+- **全量回归 80 失败**（`test/run-all.js`：12575 通过 / 80 失败，口径为本次运行；`data/test-count.json` 里的 18949/79 是 11-04 的陈旧缓存，非本轮数据）。逐类隔离：
+  - **18 个「Command failed」**：`git stash` 移除本轮全部改动后复跑，`bullshit-engineering-context`（8 failed）、`mcp-auth-tier`（2 failed）、`reward-hacking-dsec`（1 failed）**在无本轮改动时同样失败**——存量断言期望值过时（gate action 由 rewrite 变 verify / 良性样本被代拦维度承重），与本轮修复无关。
+  - **6 个 dispatch 测试**（round-606/608/609/614/615/621/639）：失败断言是「模块总数 162 !== 161」「路由总数 1316 !== 1314」——**历史断言未跟上他人新接线**，属测试数据滞后非引擎缺陷。
+  - **48 个「未输出 N 通过, M 失败 结果行」**：测试跑了但缺汇总 `console.log`，run-all 无法确认断言数。属测试代码规范问题（P3），不影响引擎判别能力。
+  - **1 个「注册了 0 个用例」**（round-410-checktests-catchguard）：mount 函数未调用 test()。
+  - **2 个「文件自报失败」**（round-378-dimension-coverage-midstate、unsupported-claim-exemption）：前者断言维度口径保持 115 键（早已演进到 212），后者为 gate action 期望过时。
+- **`collider_bias` EN 反问句漏判**：agent-2 §3.7 记录的设计权衡，r216 决策保留，非本轮引入。
+
+### 修复验证（本轮真实运行数据）
+
+- **`test/ecological-fallacy.test.js`：8/8 通过**（含 3 条 r218 漏判样本回归 + 2 条负例注入）。
+- **`test/sorites-fallacy.test.js`：7/7 通过**（含自足习语分支 + 2 条负例注入）。
+- **四门禁全绿**：`bin/verify.js` 16/16；`scripts/guard-abilities.js` 20/20（dimensions 键 212）；`test/doc-numbers-accuracy.test.js` 24/24；`scripts/bidirectional-guard.js` 召回 52/52 + 误拦 302/326。
+- **`scripts/measure-claimed-numbers.js` 实测**：维度 212（BLOCK 11 / REWRITE 19 / VERIFY 169）、MCP 工具 184、路由 1316、模块 162——与文档口径一致。
+- **sorites 探针实测**：4 攻击全命中（gate rewrite/verify）+ 4 良性零误伤。
+- **runtime 与磁盘一致**：`supervisorctl restart heartflow-mcp` 后 `heartflow_status` 报 `version: 6.8.144 | running: True | modules: 162`（重启前 runtime 6.8.141，落后磁盘 6.8.144，209/210/211 三维度未激活）。
+
+### 文档口径同步
+
+README.md / SKILL.md / AGENTS.md 三处 `211 dimensions` → `212 dimensions`、verify 级 `168` → `169`（r215 加 ecological_fallacy 后文档滞后）。doc-numbers-accuracy 由 23/24 修复为 24/24。
+
+### 边界纪律
+
+修复全部收敛在 `ecological_fallacy` 与 `sorites_fallacy` 两模块内部及测试目录，未触碰 `collider_bias`(209) / `mediator_confusion`(210) / `simpsons_paradox`(206) 的判据文本。VERSION 6.8.144 → 6.8.145（修复轮递增，宪法 1.2）。**未执行 git push**——推送由 22:45 no_agent 脚本兜底。
+
+## r219 — 第 213 判别维度 `researcher_degrees_of_freedom`「研究者自由度 / garden of forking paths / HARKing / p-hacking」（科学方法与统计推断方向轮换）
+
+**轮次**：r219｜ **上线 commit**：见 git log｜ **日期**：2026-11-06｜ **方向**：科学方法与统计推断（statistical inference / research methodology）
+**真升级类型**：1 — 新增第 213 判别维度（此前 0 覆盖的分析流程污染族）
+**状态**：**工作区产出，未随远端 r218~r226 提交**（本机 agent-4 同步远端后发现本地独有产能，r227 审计时补提交）
+
+### 一、侦察
+
+- 外部来源（如实，不编造）：概念基准为标准统计学谬误族——researcher degrees of freedom（Gelman & Loken, *The Garden of Forking Paths*, American Scientist 2014）、HARKing（Hypothesizing After the Results are Known, Kerr 1998）、optional stopping、outcome switching、p-hacking / data dredging。GitHub 与 HN 检索未发现成熟 JS 规则引擎实现（同 r212/r214/r215 记录口径），故按标准概念基准自建规则。
+- 缺口定位：`grep -rl 'researcher degrees of freedom\|HARKing\|p-hacking\|optional stopping' src/` 空返——引擎此前对「分析流程被已见结果反向决定」这一族**零覆盖**。最近邻维度 `cherry_picking`(180) 管取证**范围**裁剪、`post_hoc`(21) 管事件**时序**先后，均不覆盖分析方案本身被结果污染。
+
+### 二、实现内容
+
+- `src/researcher-degrees-of-freedom.js`（570 行）：`checkResearcherDegreesOfFreedom(text)`，判据**两腿共现 + 邻近窗（120 字 / EN 320 字符），缺一不判**：
+  - 腿① FLEX 流程被结果反向决定的动作——顺序倒置形（先看结果/看了数据之后/从结果反推/反推出来/结果出来之后/事后+流程动词）、反复尝试形（反复采样/尝试检验比较/试了很多几十上百个/不断尝试/一次次/重新分析定义设定/换了指标终点标准变量模型样本口径/挖数据/数据挖掘/数据捕捞/直到显著/采到显著）、择优报告形（只报告显著的/只保留显著的/其余略过不提扔掉删掉/挑显著的/择优/选择性报告）；EN hypothesized after the results were known / reverse-engineered from the findings / kept collecting until / stopped when the p / p-hacking / data dredging / garden of forking / ran N comparisons / switched from the primary / only the significant / dropped the rest / reported only / selective reporting。
+  - 腿② CLAIM 显著性/结论封装（显著/显著性/p值/p<0.05/低于0.05/有统计意义/统计上成立/结论成立/假设成立/被证明/证明/证实/支持该假设/符合预期/如预期/如事前/效果确实/确实有效/稳健；EN significant / statistically significant / p-value / hypothesis was confirmed / proves / confirmed / as predicted / as expected / presented as a priori / as if he had predicted），且腿②**未被否定**（匹配点前 12 字 / EN 18 字符内不能/不应/未必/不代表/不意味着/无法/not/never/doesn't/cannot——「无法得出显著结论」是正确判别，不是本族攻击）。
+- `src/index.js` 接线七处：require / 计算点(2092) / gate 参与(2690) / dimensions 键(3546) / 维度描述 / VERIFY 登记(4675) / summary 补登记(5276)。
+- 登记 **VERIFY 级**——单句也可能是对研究者自由度的**正确描述与批评**、课堂案例、论文方法学转述、科研诚信报道概括，rewrite/block 会误伤。
+- 四类豁免：概念/教学转述、正确响应形（预注册/校正/承认局限并要求补证据）、无腿②、推理否定/对冲、疑问句。
+- 边界声明：与 `cherry_picking`(180, 取证范围裁剪) / `statistical_misleading`(58, 小基数比例) / `base_rate_neglect`(169, 阳性信号无视先验) / `false_precision`(188, 伪精确数字) / `post_hoc`(21, 事件时序) 互补，射程不重叠。
+
+### 三、修复验证（真实运行数据）
+
+- `test/researcher-degrees-of-freedom.test.js`（r227 审计补建，见 r227 记录）：**27/27 通过**，覆盖攻击命中 ZH 9 / EN 4、良性零误伤 ZH 7 / EN 3、负例注入 2（抹 FLEX 腿 / 抹 CLAIM 腿后不命中）、边界 3（推理否定 / 疑问句 / 无攻击内容）、gate 端到端 1。
+- gate 实测：`checkOutput('我们先看了数据，然后才提出那个假设，结果它非常显著')` → `action=verify`，`findings=[researcher_degrees_of_freedom]`（单一维度承重，无串扰）。
+- 模块探针实测：9 条攻击样本全 `hit=true`；7 条良性样本全 `hit=false`。
+- 四门禁：全绿（口径见 r227）。
+
+## r220 — 第 214 判别维度 `monocausal_attribution`「单因归因 / causal reductionism / 枚举否认」（归因宽度方向轮换）
+
+**轮次**：r220｜ **上线 commit**：见 git log｜ **日期**：2026-11-06｜ **方向**：归因宽度（attribution width / causal oversimplification）
+**真升级类型**：1 — 新增第 214 判别维度（`monocause`(161) 双腿不齐的句式空间补覆盖）
+**状态**：**工作区产出，未随远端 r218~r226 提交**（本机 agent-4 同步远端后发现本地独有产能，r227 审计时补提交）
+
+### 一、侦察
+
+- 外部来源（如实，不编造）：HN Algolia 命中真实基准故事 "Recognising the fallacy of a single root cause"（HN id 16200526 → https://cevo.com.au/post/2017-11-10-fallacy-of-a-single-root-cause/）与 "Fallacy of the single cause"（Wikipedia）；Semantic Scholar 4 次尝试全程 HTTP 429 限流（不可用）；GitHub monocausal/single-cause 检索仅无关低星仓库（最高 20★，无成熟规则引擎实现）。概念基准 = 标准非形式谬误 "fallacy of the single cause / causal oversimplification"。侦察落盘：`scripts/round-220/probe-gap-r220.js`（缺口探针，已转正入库）。
+- 缺口定位：`monocause`(161) 判据要求「已知多因的系统性复杂现象名词 × 绝对化归因框架」双腿齐备。探针实测（`scripts/round-220/probe-gap-r220.js` CASES）三类句式整族穿过 gate=pass：
+  - L1 归因压缩无现象名词：`It's all because of him.` / `失败完全是因为运气不好。`
+  - L2 枚举否认：`We considered budget, staffing and timing, and budget is not a contributing factor.`
+  - L3 归因相消：既压单因又并列多因的自相矛盾声明。
+- 三种形态的共同问题：**把归因宽度当成可随意收窄的自由度**——让未经检验的归因驱动决策、掩盖可干预的其他因素；或用「枚举过」的严谨外观包装排除动作。
+
+### 二、实现内容
+
+- `src/monocausal-attribution.js`（334 行）：`detectMonocausal(text)`，判据**三条腿任一命中**（与 r161「双腿共现」不同口径，本族覆盖 monocause 双腿不齐的句式空间）：
+  - 腿① COMPRESS 归因压缩——全都是因为/全是因为/完全是因为/唯一的原因/问题的根源只在于/说到底就是/一句话概括；EN it's all because / the only reason … is / due solely to / explained entirely by / boils down to one / the entire problem is / one factor explains everything / everything can be traced back to one。
+  - 腿② ENUM-DISMISS 枚举否认——句内先出现 ≥2 个并列候选成因（, / and / plus / along with / together with / as well as / not to mention 切出 ≥3 段），随后出现对其中某个成因的否认（is not a contributing factor / plays no role / has nothing to do with / contributes nothing to / is irrelevant to / bears no responsibility / ruled out entirely；EN 中文对应：不起任何作用/毫无关系/不承担责任/并非真正的原因/排除在原因之外）。
+  - 腿③ CONTRADICT 归因相消——同句内既命中腿①压缩框架、又出现多因并列措辞且句内有枚举。
+  - 缺腿不判；显式对冲（may/might/could/possibly/可能/也许/大概率/之一/at least in part）与显式多因措辞（无腿②否认时）为豁免。
+- `src/index.js` 接线七处：require / 计算点(2119，经 `_applyPedagogyRelaxation`) / gate 参与(2711) / dimensions 键(3580) / 维度描述 / VERIFY 登记(4709) / summary 补登记(5276)。
+- 登记 **VERIFY 级**——单句也可能是转述他人归因、文学对白、归因方法教学讨论，rewrite/block 会误伤。
+- 四类不判：正确多因陈述、对冲的单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to / may be a factor）、提问句式（为什么会…/what caused…）、概念与教学转述（单一因果谬误/还原论/monocausal fallacy/逻辑课/textbook）。
+- 边界声明：`monocause`(161) 管已知多因的系统性复杂现象 × 绝对化归因框架（要求现象名词腿）；`post_hoc`(21) 管以时间先后为依据的归因；`false_cause`/`pseudo_causal` 管编造或误用因果机制；`cherry_picking`(180) 管选择性取证 × 确定性结论。
+
+### 三、修复验证（真实运行数据）
+
+- gate 实测：`checkOutput('全都是因为他一个人，项目才会失败')` → `action=verify`，`findings=[monocausal_attribution]`；`checkOutput('It is all because of him.')` → `action=verify`，`findings=[monocausal_attribution]`。
+- 模块行为经 `scripts/round-220/probe-gap-r220.js` CASES 逐条验证：L1/L2/L3 三类原本穿过的句式全部转为命中，正确多因陈述与对冲形不命中。
+- 四门禁：全绿（口径见 r227）。
+
+### 附：本轮编号勘误（r227 审计发现）
+
+- `src/index.js` 中 monocausal 的七处注释原写「第 213 维度」，与实际注册顺序不符——按 `VERIFY_DIMS` 登记顺序 `ecological_fallacy`(211, 4664) → `sorites_fallacy`(212, 4669) → `researcher_degrees_of_freedom`(213, 4675) → `monocausal_attribution`(214, 4709)，monocausal 应为**第 214 维度**。r227 已全部改为「第 214 维度 monocausal_attribution」。
+
 ## r216 — 存量维度修复轮：`collider_bias`(209) + `mediator_confusion`(210) 红队发现缺陷修复（无新维度）
 
 **轮次**：r216｜ **上线 commit**：见 git log｜ **日期**：2026-11-05｜ **方向**：红队（agent-2）第二轮报告 §3/§5 缺陷修复

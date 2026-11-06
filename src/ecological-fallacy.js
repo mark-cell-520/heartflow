@@ -148,6 +148,12 @@ const AGGREGATE_EN = [
   /\b(?:across|between)\s+(?:the\s+)?(?:countries|nations|states|regions|cities|groups|communities|neighborhoods)\b/i,
   /\b(?:nationally|regionally|globally|society-?wide|population-?wide)\b/i,
   /\b(?:at|on)\s+the\s+(?:group|national|aggregate|population|societal|collective|societal)\s+level\b/i,
+  // [r218 审计补] 群体层比较级（「Countries with higher chocolate
+  // consumption win more Nobel prizes」）——with 引导的群体级比较形，
+  // 腿①原表只收 high/low + 率词，比较级 + 消费/摄入/支出/学历 类
+  // 群体层变量整族漏判。
+  /\b(?:countries|nations|states|regions|cities|groups|communities|neighborhoods|populations|cohorts|societies|counties|provinces)\s+(?:with|where|that\s+have|having)\s+(?:higher|lower|more|less|greater|fewer|high|low)\b/i,
+  /\b(?:higher|lower|greater|more|less)\s+(?:chocolate|coffee|alcohol|meat|dairy|fat|sugar|salt|calorie|consumption|intake|spending|expenditure|income|wealth|education|literacy|gdp|obesity|fertility|smoking|vaccination)\b/i,
 ];
 
 // ─── 腿② IND 个体层推断（中文；r215：推断连接 + 个体层量化结论）──
@@ -169,7 +175,10 @@ const INDIVIDUAL_ZH = [
   /(?:每个|各个|任意|任何|随便)(?:一个|一名|一位)?(?:人|个体|成员|个人)/,
   // B2. 插入式选取动词（随便挑/任意选/随机抽 一个……人——「随便挑一个
   // 甲地区的人」中动词与指称之间可插入修饰语，不收则整句漏判）
-  /(?:随便|任意|随机)(?:挑|选|抽|拉|找|取|拎)[^。；，!?]{0,12}(?:人|个体|成员|个人|学生|员工|居民|职工|病人|患者|司机|老师|用户|客户|老人|孩子|男人|女人|打工者|劳动者|从业者)/,
+  // [r218 审计补] 动词表补「问/采访/打听/询/找/约/碰/遇」——漏判实证：
+  // 「可见随便问一个该国国民他都很幸福」中选取动词是「问」而非
+  // 挑/选/抽，原表整句漏判。
+  /(?:随便|任意|随机)(?:挑|选|抽|拉|找|取|拎|问|采访|打听|询|约|碰|遇|点)[^。；，!?]{0,12}(?:人|个体|成员|个人|学生|员工|居民|职工|病人|患者|司机|老师|用户|客户|老人|孩子|男人|女人|打工者|劳动者|从业者|国民|国民|市民|村民|百姓|群众|球迷|观众|读者|网友)/,
   /所有人|人人|全体成员|每个成员|各个成员|成员都|成员们|无一例外/,
   /某个成员|这个成员|该成员|某一个成员|单个成员|个体成员|具体的个人|某个人|随便哪个人|任何一个|无一例外/,
   // C. 统计来源类人群 + 断言副词（群体属性直接摊到该类成员身上）
@@ -188,6 +197,11 @@ const INDIVIDUAL_ZH = [
   /(?:所以|因此|因而|据此|也就是说|那么|这足以|这说明|这意味着)\s{0,12}(?:住|待|生活|工作|学习)?在?(?:这里|那里|当地|本地|这个城市|这个国家|这个地区|这一带)[^。；，!?]{0,8}(?:你|您|他|她|你们|他们|她们)/,
   // D2. 说明/意味着 + 个体指称（第二人称之外：每个个体/个人成员）
   /(?:说明|意味着|足以证明|表明|证明|反映了)\s{0,20}[^。；，!?]{0,8}(?:每个|人人|所有|任何|随便)(?:个体|个人|成员|人|学生|员工|职工|居民|患者|老人|孩子|男人|女人|打工者|劳动者)/,
+  // A5. [r218 审计补] 推断连接 + 范围限定语 + 个体量化指称。漏判实证：
+  // 「该州平均寿命长，因此该州每位居民都长寿」——连接词后先出现州/国/
+  // 地区类范围限定，再出现个体指称；A 族要求指称紧邻连接词、A3 族只收
+  // 「这里/那里/当地/本地」窄限定，「该国/该州/该地区」整族漏判。
+  /(?:所以|因此|因而|可见|据此|也就是说|那么|这足以|这说明|这意味着)\s{0,8}(?:该国|该州|该省|该市|该县|该地区|该城市|这个国家|这个地区|这座城市|这一地区|那一地区|当地|这里|那里|本地|全国|国内|该群体|这个群体|那一带|这一带)[^。；，!?]{0,6}(?:每位|每个|人人|所有人|任何|随便|各个|全体|所有|任一)/,
   // E. 个体层结论副词宣告
   /(?:个体|个人)(?:身)?上(?:也|一定|必然|肯定|同样|更|都|注定)/,
   /(?:每个人|人人|个体|个人|每个成员|全体成员)\s*(?:也|一定|必然|肯定|同样|都|注定|天生|更)/,
@@ -210,6 +224,12 @@ const INDIVIDUAL_EN = [
   /\b(?:means|suggests|implies|shows|proves|indicates)\s+(?:you|he|she|they)\b/i,
   // E. 个体层结论副词宣告
   /\b(?:individuals?|persons?|people|members?)\s+(?:are|is)\s+(?:also|all|equally|necessarily|bound\s+to|just\s+as)\b/i,
+  // [r218 审计补] 身份转移结论（「eating chocolate makes you a Nobel
+  // laureate」）——群体比较级结论把个体身份/称号/能力整体转移，腿②
+  // 原表只收 every/each individual 与 people from that group 两族，
+  // makes you a X / makes people X 形整族漏判。
+  /\b(?:makes?|made|renders?|turns?|turn)\s+(?:you|him|her|them|us|people|individuals?|persons?|members?)\s+(?:a|an|the)?\s*(?:Nobel|laureate|winner|genius|expert|master|professional|star|elite|champion|leader|pioneer|success|failure|loser|idiot|fool|criminal|threat|genius)\b/i,
+  /\b(?:makes?|made|renders?|turns?)\s+(?:you|him|her|them|us)\s+(?:more|less)\s+(?:likely|prone|intelligent|smart|clever|capable|successful|wealthy|rich|healthy|fit)\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────
@@ -303,10 +323,12 @@ function findIndLeg(text, isZh, R, aggIdxs) {
   // 裸指称腿索引（改这两族序号时同步此常量）
   // ZH: 3=B 每个X都、4=B2 随便挑一个、5=所有人/人人、6=某个成员、
   //     7=C 统计来源人群+断言副词、8=C2 成员裸名词+断言副词、
-  //     13=E 个体身上也、14=E2 每个人也（全部不含连接词）
+  //     14=E 个体身上也、15=E2 每个人也（全部不含连接词）
+  //     [r218 审计补] A5 腿（推断连接+范围限定+个体指称）插在 D2 之后，
+  //     序号 13 属连接词腿，E/E2 由 13/14 顺移为 14/15。
   // EN: 2=every/each individual、3=all individuals、4=a random individual、
   //     5=any individual from、6=people from that group、7=local people
-  const BARE_IDX_ZH = [3, 4, 5, 6, 7, 8, 13, 14];
+  const BARE_IDX_ZH = [3, 4, 5, 6, 7, 8, 14, 15];
   const BARE_IDX_EN = [2, 3, 4, 5, 6, 7];
   const bareIdx = isZh ? BARE_IDX_ZH : BARE_IDX_EN;
   const win = isZh ? WIN_AGG_IND_ZH : WIN_AGG_IND_EN;

@@ -120,7 +120,7 @@ cronjob action=list
 2. **身份提权** — 搜自报身份头（如 `x-heartflow-oid` 只做格式正则、无签发/校验体系）。匿名持格式合法的身份码即被提权 = HIGH。修复：身份码仅在已通过 token 认证（role 非 guest）时保留标签语义。若两个测试对同一行为期望相反（一个固化提权、一个要求拒绝），按安全方向修代码并反转固化漏洞的测试期望，注释写清原因。
 3. **豁免击穿** — 安全维度的整句豁免（DISCOURSE_FRAME 类）若含"比如/举例/例如"这类弱常见词，攻击句加前缀即整体豁免，BLOCK 级被一行前缀击穿。修复：弱举例词整组移除（教学场景有强载体词"论文/报告里提到"覆盖），其余豁免补 `!INTEGRITY_BREAK && !CHECK_SUPPRESSION_SIGNAL` 双闸。复测必须含"攻击句+豁免前缀"形状，只测原句不测前缀形等于没测。
 4. **三表接线断裂** — 新维度要同时进 dimMap/allDims/dimensions 输出三处（+DIM_GUIDANCE）。dimMap 缺键 → findings detail 恒 1（`dimObj?.count || ... || 1` 兜底）；dimensions 输出缺键 → 读方（gate/MCP/面板）恒 undefined。命名分裂（dimMap 叫 bullshit、输出叫 bullshit_recognition）要连 DIM_GUIDANCE 键一起改（查找按 d.name）。运行时口径探针：`Object.keys(discriminate('t').dimensions)` 对比三表键集，静态 grep 会漏。
-5. **回归门禁失效** — 门禁脚本判据只匹配英文汇总行（`/(\d+) failed/`）而 run-all 输出中文「N 通过, M 失败」→ 失败永远抓不到；且执行超时被杀后无汇总行 → failedCount=0 空放行还继续 commit/push。修复：中英双语判据 + 无汇总行一律判失败（fail-closed）+ 给足真实超时（全量回归约 27 分钟，180s 必被杀）。
+5. **回归门禁失效** — 门禁脚本判据只匹配英文汇总行（`/(\d+) failed/`）而 run-all 输出中文「N 通过, M 失败」→ 失败永远抓不到；且执行超时被杀后无汇总行 → failedCount=0 空放行还继续 commit/push。修复：中英双语判据 + 无汇总行一律判失败（fail-closed）+ 给足真实超时。全量回归 20 分钟以上时不要用工具前台跑（前台调用上限 420s 会被杀，且杀死留下的是工具超时而非测试结论）——改后台 `timeout 1200 node test/run-all.js > /tmp/runall-<轮次>.log 2>&1`，之后读日志看进度（日志按 `N/630` 计数输出），结论以 `EXIT=` 尾行为准。后台启动参数 `notify` 只接受布尔或字符串列表，传 `"True"` 字符串会被拒。
 6. **内存泄漏** — Map/数组只进不出：`_pending`（compaction 的 filter 结果算给新数组却不写回 this）、`_buffer`（record 只 push 无清理）、无上限 Q-table/chains/receipts、有 TTL 定义但只读不清理的 DNS_CACHE。修复模式统一：CAP + 利用 Map 插入序逐出最旧，或写入时顺带清过期项。
 7. **加密资产轮换范围** — 换钥脚本按扩展名扫（只收 .enc）会漏同格式 .json 密文（data/memory-bank.json 的 `_enc` 字段），换钥后旧密文永久失效、每次启动静默 starting fresh（日志实锤再动手，别只靠推断）。修复：按内容特征扫（`"_enc"` + `HEARTFLOW_v1`），不按扩展名。已丢密钥的密文不可恢复——如实记录，只保证今后不再发生。
 8. **文档口径盲区** — sync-doc-numbers 的清单（AGENTS/README/SKILL/package）外文件一律视为无漂移，报绿≠真一致；兜底扫描又会把 UPGRADE_LOG/CHANGELOG 的逐轮历史数字误报成漂移。修复：手工修的文件同步登记进 TARGETS；逐轮历史档案类加进 KNOWN 排除（它们 mtime 新但内容是历史快照，无 Version history 标题可截断）。
@@ -128,6 +128,15 @@ cronjob action=list
 9. **被吞错误致能力静默失效** — lazy loader 漏调 `()`（`_PrivacyExposure.sanitizeForPersistence` 缺 `()`，同文件另两处同用法都带）→ 每次 think() 必抛 TypeError 被 catch 吞 → 整块能力（Engram 存储/召回）静默失效：`_initErrors` 每次 +1 噪声，下次 start() 把陈旧错误当新故障上报，而功能调用方看到的是"没报错但永远没数据"。识别探针（每次审计跑一次）：think 前后对比 `_initErrors` 计数（0→1 = 每次必炸）+ 检查能力输出是否有数据（`result._engramRecall` 恒 undefined = 存储/召回整块死）。修复=补调用（一处），验证=探针复跑 0→0 且输出有真实数据。
 10. **跨 await 的实例临时状态** — async 方法内把中间态挂 `this._xxx`（如 think() 的 `_pendingInputCheck`），跨 await 边界后并发调用互相清掉/丢计数（读-改-写无互斥；单次调用模型不触发所以长期潜伏）。规则：async 函数内跨 await 的临时状态一律局部变量；改前先 grep 全仓确认无外部读取方（MCP/测试可能直接摸 `hf._xxx`）。验证=构造并发 think（`Promise.all` 双调）+ 合并结果仍在。
 11. **守卫条件断言与地板值腐烂** — 门禁脚本写成 `if (rows[X] !== undefined) { assert... }`：规格表行缺失/改名即静默跳过，守卫静默失守（当前行都在，属潜伏）；地板值（模块数 >= 124）远低于实测（162）时失去回归意义。修法：先 `assert.ok(rows[X] !== undefined, '缺少 X 行')` 再比对；地板值随实测增长维护（留 ~10% 余量）。
+
+**新增审计维度（多 agent 协同并行仓库专项，实战验证）**：
+
+12. **维度描述承诺了从未存在的测试文件** — 新维度的注释写「样本形状与负例见 test/XXX.js」而该文件从未入库，等于给后来者留死引用。审计法：抽出 src 里全部 `test/...js` 引用逐个 `ls` 核对，存疑的用 `git log --all --diff-filter=A -- <file>` 证明从未存在；处置二选一——维度真缺单测就补建（攻击+良性+边界，实测跑过），否则把承诺改成不指向具体文件。**写引用前先 `ls`**，这条也要写进升级 prompt 红线。
+13. **「第 N 维度」序号标注与注册表漂移** — 并发插入新维度时序号按作者想象写，出现两轮都自称同一个号。序号唯一可信来源是注册表顺序（`grep -nE "^  'dim_key':"` + register 调用顺序），不是作者注释；批量替换序号后必须 `grep -c` 复核替换数，别信"估计改了几处"。
+14. **claims.jsonl 死认领** — 并行 agent 认领轮次后掉线不 release，后续轮次误判「这轮有人写」而绕路或重复劳动。审计法：逐轮取最后状态，无 release 且停留在 active 超过阈值的即死认领；cron prompt 必须内含死认领治理（超阈值自动接手或标 stale 释放），否则并行体系每掉线一次就永久少一块工作面。
+15. **同步 rebase 把本地独有产能误判为远端已有** — 多机共推时 `git status` 里的未提交新文件，既可能是 rebase 冲突残留，也可能是远端从来没有的本地独有产出（真实新维度+模块+测试）。同步前逐个 `git cat-file -e <remote>/main:<path>` 判定：远端没有的一律补 commit + 补 UPGRADE_LOG 记录，绝不丢弃、不被覆盖、不因为"可能重复"而删除。判据是 git 对象存在性，不是文件名看起来眼熟。
+16. **侦察探针留在仓库根目录** — `tmp-probe-*.js` 一类临时探针落根目录会被打包、误追踪、污染 diff。侦察落盘统一 `scripts/round-<NNN>/`；探针含真实数据时转正保留（改头注释说明轮次与用途），引用它的地方（UPGRADE_LOG、src 注释）同步更新，转正后 `grep -rn` 复核旧名残留为 0。
+17. **门禁输出里固定计数与增长计数被混用** — 同一份门禁输出常同时含「全部 20 项能力检查通过」（固定基线哨兵数）与「dimensions 键: 211 个」（随升级增长）；解析脚本把两者混为一谈会得出 52/52 或直接解析失败。修解析前先读脚本实际输出原文，把两类数字分开匹配，再各自断言基线。
 
 **修复模式速查**：`references/audit-fix-patterns.md`（诚实化/三表接线/豁免双闸/身份提权/fail-closed 门禁/泄漏逐出/加密轮换范围/被吞错误探针/跨 await 状态/守卫严格化十一类高频发现的修法模板）
 
