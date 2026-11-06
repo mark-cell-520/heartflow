@@ -10913,7 +10913,26 @@ const HASTY_GENERALIZATION_PATTERNS = {
   zh: [
     /我认识的?[^\s]{1,6}(?:都|全都|全是|没有一个不)/,
     /我见过的?[^\s]{1,6}(?:都|全都|全是|没有一个不)/,
-    /身边(?:全是|都是|全都是)/,
+    // [v6.8.149 第 720 轮] 身边族放宽间隔：原 `身边(?:全是|…)` 硬性要求
+    // 「身边」紧贴全称标记，实测（scripts/diag-r720.js B1）「身边的人全是
+    // 关系户」「身边同学全是内推的」因中间隔着「的人/同学」整条 MISS。
+    // 放宽为 6 字内任意非句读间隔，覆盖身边+领属短语+全称标记的常见语序。
+    // 「身边的人」式领属短语不是具体行为动词，无 332 轮「每个X都+动作」
+    // 穷举误伤问题；规范情态豁免不适用（身边族不存在「身边必须全是…」
+    // 这类立规则句式），保持无捕获组。
+    /身边[^。，！？；]{0,6}(?:全是|都是|全都是|全都)/,
+    // [v6.8.149 第 720 轮] 「X 全是 + 负面定性」全称归因族（diag-r720 B2
+    // 实测缺口：「他的解释全是借口」MISS——原有判据只收「我认识的/身边/
+    // 人人都」等主语标记句，「X全是Y」的一般全称归因无判据管）。
+    // 攻击形态：主语段 + 全是 + 负面定性词（借口/关系户/骗子/草台班子…），
+    //   用全称抹黑一个群体或全部事项——与 10931「每个X都+属性词」同口径。
+    // 良性边界（负面定性表外一律放行，实测 diag-r720 B4/B5）：
+    //   「这批货全是二等品」（可验证事实）「他带的徒弟全是骨干」（褒义）
+    //   「会场全是人」「代码全是复制粘贴的」均不命中。
+    // 否定反驳排除：主语段禁含 不|没——「他的解释不全是借口」是对全称的
+    //   部分否定（反驳形态而非攻击形态），与 718 轮否定量化词守卫同口径，
+    //   直接由字符类 `[^…不没]` 排除，无需后顾断言。
+    /[^。，！？；\s不没]{1,12}全是(?:借口|关系户|骗子|小人|坏人|败类|废物|走狗|奴才|伪君子|草台班子|套路|圈套|假话|空话|废话|谎言|假的|泡沫|水分|垃圾|屎|渣子|马屁|贪官|叛徒|汉奸|市侩)/,
     /从来(?:没|没有)(?:见过|遇到过|碰到过|见过)/,
     // [v6.8.148 第 718 轮] 捕获「都|均|皆|总是|从来」后两字供规范情态槽守卫：
     // 「每个人都要签字」「所有人都必须完成培训」是规则宣告句（义务模态
@@ -11054,14 +11073,24 @@ const HASTY_GENERALIZATION_PATTERNS = {
     //   谓词半限态度或行为动词，AND 语义的「每步都做」陈述不命中
     //   （工程句里 every X 常搭配 validated/retried/checked 这类完成态）。
     // 单半实测：10 条良性（含 4 条工程全称句）0 命中。
-    // ① every/each + 群体 + 行为/态度动词（直接接，无需 knows/says 白名单）
-    //    分界：谓词槽后必须接**指人宾语或态度宾语**。工程全称句（every request
-    //    is retried / every field is validated）的宾语是流程对象，不命中。
-    //    实测 20 条良性工程全称句 0 误伤（第 229 轮 probe2 扩样）。
-    //    维护教训：宾语槽曾试过窄到 me/us/them/him/her，结果把 hates this /
-    //    ignores that / cares about 三形态全砍掉（recall 12→8）；现为
-    //    指人宾语 + 态度宾语并集。
-    /\beveryone\s+(?:ignores?|refuses?|reads?|wants?|hates?|complains?|complained|skips?|skipped|assumes?|assumed|trusts?|believes?|understands?|expects?|expected|notices?|noticed|remembers?|cares?|listens?|learns?|questions?|responds?|replies|follows?|followed|uses?|used|opens?|opened|files?|filed|calls?|called|emails?|emailed|checks?|tried|trying|ships?|shipped)\b/i,
+    // ① everyone + 行为/态度动词（直接接，无需 knows/says 白名单）
+    // [v6.8.149 第 720 轮] 捕获槽 + 守卫接入：原判据无捕获组，
+    // isNormativeQuantifierHit(m)（读 m[1]）对本族不生效——规范宣告句
+    // 「Everyone must validate the input before submitting.」（must 在
+    // everyone 与动词之间）会被直接命中，与 r718 判据③修复前的
+    // "Nobody can skip the verification step here." 同型误伤。
+    // 修法：everyone 后加捕获槽 `((?:\w+\s+){0,3})`，填充槽含情态动词
+    // （must/can/should/has to/is able to…）即规则宣告句由守卫豁免；
+    // 纯副词填充（always/usually/ever）不含情态词，攻击句照常命中
+    // （"Everyone always ignores the warnings"）。isNegatedQuantifierHit
+    // 前邻豁免对本族同样生效（checkHastyGeneralization 循环内统一判定）。
+    // 同时按判据③同口径补验证审查动词八族（verif/validat/confirm/review/
+    // audit/test/double-check/approve/watch，四形态）：轮初复测
+    // （scripts/diag-r720.js A9）「Everyone must validate the input before
+    // submitting.」暴露 everyone 族动词表同样缺 validat 族——改后该句经
+    // must 填充槽豁免（规范句 pass），"Everyone validates the config
+    // before deploying."（无填充槽）命中（攻击 verify）。
+    /\beveryone\s+((?:\w+\s+){0,3})(?:ignores?|refuses?|reads?|wants?|hates?|complains?|complained|skips?|skipped|assumes?|assumed|trusts?|believes?|understands?|expects?|expected|notices?|noticed|remembers?|cares?|listens?|learns?|questions?|responds?|replies|follows?|followed|uses?|used|opens?|opened|files?|filed|calls?|called|emails?|emailed|checks?|tried|trying|ships?|shipped|verif(?:y|ies|ied|ying)|validat(?:e|es|ed|ing)|confirm(?:s|ed|ing)?|review(?:s|ed|ing)?|audit(?:s|ed|ing)?|test(?:s|ed|ing)?|double[- ]?check(?:s|ed|ing)?|approv(?:e|es|ed|ing)|watch(?:es|ed|ing)?)\b/i,
     // [v6.7.126 第 230 轮修 bug] 原判据群体表被写成 `ZZZ|ZZZ|ZZZ|ZZZ|ZZZ`
     // 占位符（编辑器批量替换残留，字面永不命中），且缺 user/customer/
     // developer/manager/team/analyst/attendee 七大最高频群体，不支持 each。
@@ -11210,7 +11239,33 @@ const HASTY_GENERALIZATION_PATTERNS = {
     // 即规则宣告句（"Nobody can skip the verification step here."），由
     // isNormativeQuantifierHit 豁免；纯副词/介词填充（ever/really/in this
     // team）不含情态词，攻击句照常命中（"Nobody ever reads the docs"）。
-    /\b(?:nobody|no\s+one)\s+((?:\w+\s+){0,3})(?:reads?|wants?|hates?|ignores?|refuses?|questions?|asks?|asked|cares?|bothered|checking|verified?|bother|question|responds?|replies|understands?|learns?|complains?|complained|listens?|trusts?|believes?|knows?|mentioned|mention|tried|trying|notices?|noticed|remembers?|skips?|skipped|ships?|shipped|expects?|expected|calls?|called|emails?|emailed|files?|filed|opens?|opened|uses?|used|follows?|followed|checks?)\b/i,
+    // [v6.8.149 第 720 轮] 谓词槽形态系统化：动词族四形态（原形/-s/-ed/-ing）
+    //   + 验证审查动词族整族补入。r718 收尾时负例纪律（scripts/diag-r720.js）
+    //   实测暴露两类真缺口——
+    //   ① 形态漏洞：表中 `verified?` 只覆盖 verify/verified 两形，
+    //      "No one verifies the results before publishing."（-s 第三人称单数，
+    //      全称否定最典型形态）整条 MISS；`checking`/`trying` 外无 -ing 形，
+    //      "Nobody is validating user input" 同漏。
+    //   ② 族缺口：验证/审查/批准类动词（verif*/validat*/confirm*/review*/
+    //      audit*/test*/double-check*/approve*/watch*）整族缺席——而
+    //      "没人验证过"正是这一维度最高频的攻击句式（用全称否定断言群体
+    //      从未做过某事，进而推出"所以不可信/没必要"）。
+    //   本轮修法：verif 族改四形态 `verif(?:y|ies|ied|ying)`（补 verifies/
+    //      verifying，verified/validate 两形向后兼容），追加 validat|
+    //      confirm|review|audit|test|double-check|approve|watch 八族，
+    //      每族四形态并列。填充槽守卫对 -ing 形天然生效：
+    //      "Nobody is validating…" 填充槽吃 "is "（非情态词）照常命中；
+    //      "Nobody is able to validate…" 填充槽吃 "is able to "（is able to
+    //      在守卫情态表）豁免。
+    //   边界纪律（与 229/230 轮同口径）：谓词只收**人类行为动词**，
+    //      log(s|ged|ging) 刻意不收——"No one logs in without MFA" 会被
+    //      logs 命中而该句是安全规范陈述，记为遗留；merge 族同理不收
+    //      （"No one merges on Fridays" 是团队习俗陈述，非全称否定攻击）。
+    //   规范句免疫实测（diag-r720）：can verify / must validate /
+    //      should confirm 三形经守卫豁免 pass；攻击形 verifies / validates /
+    //      confirms / reviews / double-checks / validated / validating 七形
+    //      全部命中。
+    /\b(?:nobody|no\s+one)\s+((?:\w+\s+){0,3})(?:reads?|wants?|hates?|ignores?|refuses?|questions?|asks?|asked|cares?|bothered|checking|verif(?:y|ies|ied|ying)|validat(?:e|es|ed|ing)|confirm(?:s|ed|ing)?|review(?:s|ed|ing)?|audit(?:s|ed|ing)?|test(?:s|ed|ing)?|double[- ]?check(?:s|ed|ing)?|approv(?:e|es|ed|ing)|watch(?:es|ed|ing)?|bother|question|responds?|replies|understands?|learns?|complains?|complained|listens?|trusts?|believes?|knows?|mentioned|mention|tried|trying|notices?|noticed|remembers?|skips?|skipped|ships?|shipped|expects?|expected|calls?|called|emails?|emailed|files?|filed|opens?|opened|uses?|used|follows?|followed|checks?)\b/i,
   ]
 };
 
