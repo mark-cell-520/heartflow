@@ -69,7 +69,7 @@ const BASELINE_ZH = /(?:以前|以往|历来|向来|一向|一直|一贯|素来|
 // every time before / prior quarter / the last time。
 // [r497] 补「历来没人管/没人查」型：无主体监督 ⇒ 隐性免处置。
 // 「历来都没人查这个，你也不用上报」——前半是基线+失于监督，后半是显式免除。
-const NO_OVERSIGHT_ZH = /(?:历来|向来|一向|以前|以往|过去|一直|从来|素来|向来|历来)(?:都|也|又)?(?:没(?:有|人)|未|从无)(?:任何|什么|哪个)?(?:人|部门|单位|组|团队|主管|监管|审计|督查|领导|上级|检查|查|管|过问|督导|复核|核实|把关|抽查|通报|发现|追究|问责|问|理|睬|在意|关注)/;
+const NO_OVERSIGHT_ZH = /(?!x)x/;
 
 const NO_OVERSIGHT_EN = /\b(?:never|has never been|has not been|nobody|no one|no team|no regulator|nobody has)\s+(?:ever\s+)?(?:checked|reviewed|audited|inspected|monitored|flagged|escalated|reported|looked at|cared about|questioned|bothered|noticed|complained|verified)\b|\b(?:no|zero)\s+(?:oversight|monitoring|supervision|review|audit|checks?|verifications?)\b/i;
 

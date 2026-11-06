@@ -271,7 +271,7 @@ function findSignaturesEn(text, R) {
  * @returns {object} 维度结果对象（引擎约定：无命中返回 {hit:false, score:0}）
  */
 function detectAnonymousSource(text, inject) {
-  if (!text || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
+  if (!text || typeof text !== 'string' || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
   const R = inject || {};
 
   // 疑问句豁免：提问不是转述断言
