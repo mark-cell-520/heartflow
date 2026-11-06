@@ -107,6 +107,23 @@ const EXEMPT_EN = [
   'not enough evidence', 'causation', 'cannot conclude',
 ];
 
+// ─── [r220] 方法学/统计语境豁免（G7/G8 误拦）──────────────────────────
+// 轮初实测（scripts/tmp-220-probe.js）：18 条统计/方法学陈述句 9 条被
+// R1（时序连接×因果断言）误判 rewrite。红队报告 r214 §4 G7/G8 原句：
+//   「控制了中介变量之后，直接效应仍然显著，说明中介只传递了部分效应」
+// —— 这是中介分析的标准结论句式（control X → direct effect still
+// significant → partial mediation），「之后」是时序连接词、「说明」是
+// 因果断言词，两腿恰好齐备；而 EN 同形句 pass（CONNECT_EN×ASSERT_EN 无
+// 命中），中英不对称。
+// 误伤样本的共性：句中出现**统计设计词汇**——控制/调整某个变量、或直接
+// 出现效应/回归/协变量等估计术语。判别口径两条任一成立：
+//   ① 控制动词 × 统计对象（控制/调整/纳入/… + 0-14 字 + 变量/因素/效应/…）
+//   ② 「控制X之后，Y仍然显著/相关」的持续效应习语（中介分析定式）
+//   ③ 裸统计术语在场（协变量/中介变量/固定效应/回归/直接效应/…）
+// 反向保证：20 条攻击探针（含「我们调整了排期之后，交付就稳定了」这类
+// 控制动词在场的真后此句）零条被本表豁免——它们的统计对象半全部缺席。
+const STAT_CONTEXT_ZH = /(?:控制|调整|纳入|加入|考虑|剔除|排除|匹配|加权|分层)[^。]{0,14}(?:变量|因素|协变量|混杂|混淆|中介|固定效应|基线|选择偏差|调节|倾向得分|反事实|差距|差异|特征)|(?:控制|调整|纳入|加入|剔除|排除|匹配|加权|分层)[^。]{0,14}(?:之后|以后)[^。]{0,20}(?:仍然|依然|依旧|还是)[^。]{0,8}(?:显著|相关|存在|成立|稳健)|(?:变量|协变量|混杂|混淆变量|中介变量|固定效应|基线特征|选择偏差|倾向得分|调节变量|对照组|控制组|实验组|回归|方差分析|结构方程|路径系数|标准误|置信区间|p\s*[=<]|样本量|元分析|队列研究|双重差分|工具变量|反事实|估计系数|直接效应|间接效应|中介效应|处理效应|政策效应|主效应|调节效应)/;
+
 /**
  * 后此谬误判定。
  * @param {string} text 规范化后的文本
@@ -128,8 +145,14 @@ function checkPostHoc(text) {
   const hasWord = (arr, s) => arr.some((w) => new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(s));
   const exemptZh = has(EXEMPT_ZH, text);
   const exemptEn = has(EXEMPT_EN, lower);
+  // [r220] 方法学/统计语境：中介分析、回归报告等标准结论句式（见
+  // STAT_CONTEXT_ZH 注释）。判据只认统计设计词汇，不认「先后」本身，
+  // 所以「调整了排期之后，交付就稳定了」这类真后此句不受影响。
   if (exemptZh || exemptEn) {
     return { score: 0, count: 0, matches: [], zeroHit: false, details: '调查语境豁免' };
+  }
+  if (STAT_CONTEXT_ZH.test(text)) {
+    return { score: 0, count: 0, matches: [], zeroHit: false, details: '方法学语境豁免' };
   }
 
   // [audit-fix r177] 技术测量报告豁免（r166 审计设计、当日未落地，本轮补）：
@@ -199,4 +222,4 @@ function checkPostHoc(text) {
   return { score, count: matches.length, matches, zeroHit: false, details };
 }
 
-module.exports = { checkPostHoc, __internals: { CONNECT_ZH, ASSERT_ZH, INTERVENE_ZH, CHANGE_ZH, ABSENCE_ZH, CALAMITY_ZH, AVOID_ZH, CONNECT_EN, ASSERT_EN, INTERVENE_EN, CHANGE_EN, ABSENCE_EN, CALAMITY_EN, AVOID_EN, EXEMPT_ZH, EXEMPT_EN } };
+module.exports = { checkPostHoc, STAT_CONTEXT_ZH, __internals: { CONNECT_ZH, ASSERT_ZH, INTERVENE_ZH, CHANGE_ZH, ABSENCE_ZH, CALAMITY_ZH, AVOID_ZH, CONNECT_EN, ASSERT_EN, INTERVENE_EN, CHANGE_EN, ABSENCE_EN, CALAMITY_EN, AVOID_EN, EXEMPT_ZH, EXEMPT_EN, STAT_CONTEXT_ZH } };

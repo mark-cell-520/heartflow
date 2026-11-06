@@ -1,3 +1,72 @@
+## r220 — post_hoc / pseudo_causal 方法学统计语境豁免（v6.8.148）：18 条方法学良性句误伤 9 条（修 r214 红队报告 §4 误拦清单 G7/G8，该清单最后一项）
+
+**轮次**：r220 ｜ **日期**：2026-11-06 ｜ **方向**：存量真 bug 修复（交接簿候选①，r219 报告第五节「已知未修」第 1 条）
+**真升级类型**：缺陷修复（新增 STAT_CONTEXT_ZH 方法学语境豁免表，post_hoc 与 pseudo_causal 两维共用；攻击/误伤双向变化经 1109 条语料 A/B 实测）
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision；按轮次协议「优先做交接簿里已知未修的真 bug」选题，全部结论来自本轮实测探针，无记忆成分。
+- 交接簿（data/upgrade-state.json r219 notes）候选①原文：「r214 红队 §4 误拦清单最后一项 G7/G8——『控制了中介变量之后，直接效应仍然显著，说明中介只传递了部分效应（ZH）』rewrite 误伤（post_hoc×1 route1 时序连接 + pseudo_causal 双侧），样本已落盘 coordination/reports/r214-round2-variants-agent2.md 第 123 行可直接复现」。
+- 轮初从红队报告第 123 行取回原句并复现：**「控制了中介变量之后，直接效应仍然显著，说明中介只传递了部分效应」→ rewrite**（post_hoc route1 + pseudo_causal 双侧 + moral_foundations），与报告记载的 rewrite、post_hoc×1 route1 逐项一致；同族近亲句「控制中介变量后，直接效应仍然显著」为 verify（报告记载一致）。
+- 按同族扩样做系统探针（scripts/tmp-220-probe.js，轮末已删）：**18 条方法学/统计良性句误伤 9 条（50%）**、20 条攻击命中 16 条——缺口比红队点名的 1 条大一个量级。r216 修 G2、r219 修 G3，**G7/G8 是该误拦清单的最后一项**，本轮收口。
+
+### 二、根因/缺口分析（带证据）
+- **根因是「之后」×「说明」两腿在方法学语境下齐备，而既有统计谦辞豁免认不出裸「显著」**：
+  1. `src/post-hoc.js` R1 腿① `CONNECT_ZH` 含「之后」、腿② `ASSERT_ZH` 含「说明」——原句「控制…**之后**，直接效应仍然显著，**说明**中介只传递了部分效应」两腿恰好齐备，判 route1。
+  2. `src/index.js` pseudo_causal 第①支 `PC_SEQ_ZH`（含「之后」）× `PC_ATTRIB_ZH`（含「说明」）同样齐备，判伪因果。
+  3. 函数头既有豁免全部落空：post_hoc 的 `EXEMPT_ZH` 只有字面「控制变量」（原句是「控制了中介变量」），pseudo_causal 的 `PC_PROB_ZH` 只认「**显著性**」不认裸「**显著**」，`PC_HEDGE_ZH` 也不含任何中介分析词汇。
+- **中英不对称**：EN 同形句 `After controlling for the mediator, the direct effect remains significant, suggesting the mediator only transmits part of the effect` → **pass**（`CONNECT_EN`×`ASSERT_EN` 无命中，`PSEUDO_CAUSAL_EN` 只收「by Nx」与玄学归因族）。同一方法学命题中文侧 rewrite、英文侧 pass。
+- **误伤样本的共性（探针 18 条逐条比对）**：全部出现**统计设计词汇**——控制/调整某个变量、或直接出现协变量/中介变量/固定效应/回归/直接效应等估计术语。而 20 条攻击样本（含「我们调整了排期之后，交付就稳定了」这条控制动词在场的真后此句）**统计对象半全部缺席**——这是本轮豁免表的判别依据。
+- **为什么单测和门禁都没红**：① `grep -rl "post_hoc" test/` 只有 7 个文件、`grep -rl "pseudo_causal" test/` 只有 11 个，全部样本是白话伪因果攻击句（拜佛/幸运手环/补丁故障），**没有一条方法学统计陈述句**；② 双向门禁 378 条语料以操控对话为主，本轮 A/B 实测该语料 **0 条**命中变化；③ 存量 `test/round-720-post-hoc.js` 55/55 通过、`test/pseudo-causal-zh-timeorder-round48.test.js` 全绿——扩豁免不掉任何存量断言。与 r126/r127/r217/r218/r219 同型：**写了模式、单测不报、门禁不红**，只是这次失明的是「统计文体」维度。
+
+### 三、落地项
+1. **`src/post-hoc.js` 新增 `STAT_CONTEXT_ZH` 豁免表**（+20 行，随 `module.exports` 与 `__internals` 一并导出）：
+   - 支① **控制动词 × 统计对象**：控制/调整/纳入/加入/考虑/剔除/排除/匹配/加权/分层 + 0-14 字 + 变量/因素/协变量/混杂/混淆/中介/固定效应/基线/选择偏差/调节/倾向得分/反事实/差距/差异/特征
+   - 支② **持续效应习语**（中介分析定式）：控制动词 + 0-14 字 + 之后/以后 + 0-20 字 + 仍然/依然/依旧/还是 + 0-8 字 + 显著/相关/存在/成立/稳健
+   - 支③ **裸统计术语在场**：协变量/中介变量/固定效应/基线特征/倾向得分/对照组/实验组/回归/方差分析/结构方程/标准误/置信区间/p<=/样本量/元分析/队列研究/双重差分/工具变量/反事实/估计系数/直接效应/间接效应/中介效应/处理效应/政策效应/主效应/调节效应
+   - `checkPostHoc` 头部接入，返回 `details: '方法学语境豁免'`（与既有 `调查语境豁免` / `测量报告豁免` 同格式，无测试断言该字符串）。
+2. **`src/index.js` 接入同一张表**（+9/-1 行）：`const { checkPostHoc, STAT_CONTEXT_ZH } = require('./post-hoc.js')`；`causalOverclaimZh` 函数头在 `PC_HEDGE_ZH`/`PC_PROB_ZH` 之前加 `STAT_CONTEXT_ZH.test(text)` 早退——两维共用一张表，避免同一句在 post_hoc 修完 pseudo_causal 还误伤。
+3. **测试 `test/round-220-posthoc-pseudo-causal-methodology-exemption.test.js`**（8 断言全绿，带 .test.js 后缀与 `N 通过, M 失败` 汇总行）：
+   - A1/A2 节：红队 G7/G8 原句 + 19 条同族方法学良性，**三层断言**——`checkPostHoc` count=0、`checkPseudoCausal` count=0、findings 不含 post_hoc/pseudo_causal（不只守 gate action）；
+   - B/B2 节：16 条攻击两维命中 + gate 非 pass，**post_hoc 存量 count 值逐条锁定**（6 条 1 次 + 1 条 2 次），并显式断言「我们调整了排期之后，交付就稳定了」不被方法学表误豁免；
+   - C 节：pseudo_causal 既有 10 支判据的 count 值逐条锁定（1/2/3 次不等）；
+   - D 节：**4 条存量漏判登记现值**（改前改后同为 pass + count=0）——防将来修的时候静默漂移；
+   - E/E2 节：删表变异守卫（把 `STAT_CONTEXT_ZH` 置恒假后 ≥8 条良性必须重新被命中）+ 还原校验。**E 节用「复制 src/ 整棵树到临时目录再变异」的隔离写法**——run-all.js 默认 `JOBS=4` 并发跑测试，原位变异（既有轮次的写法）会让并发中的其他测试读到被改写的 `src/post-hoc.js`。
+4. **README.md changelog 加 6.8.148 行**（含全部实测数字与 A/B 口径），sync-doc-numbers.js 同步测试数 18779→18787。
+
+### 四、验收数字（全部实测，命令可复跑）
+| 项 | 结果 |
+|---|---|
+| 探针：18 条方法学良性（修复前） | post_hoc 或 pseudo_causal 命中 **9/18（50%）**，其中 9 条 gate=rewrite（含红队 G7/G8 原句） |
+| 探针：18 条方法学良性（修复后） | post_hoc + pseudo_causal **双零命中 0/18**；gate **15 条 pass + 3 条 verify**（3 条 verify 的归因是 reasoning_coherence，另一维度，本轮不动） |
+| 探针：20 条攻击（修复前/后） | 命中 **16/20 不变**；存量 count 值不变（B2/C 节逐条锁定）。4 条未命中为**存量漏判**，改前改后同值，已登记为 D 节断言 |
+| 删表变异守卫 | 把 `STAT_CONTEXT_ZH` 置恒假后，18 条良性中 **9/18 重新被命中**——与修复前误伤数逐条吻合，豁免表是真承重 |
+| **A/B 行为一致性（git worktree HEAD vs 当前，1109 条语料 = 相关存量测试文件 quoted 样本 + 双向门禁 378 + 本轮探针 44）** | gate.action/findings 差异 **9 条全部落在本轮探针良性集**（rewrite→pass 6 条 + rewrite→verify 3 条，全部是 post_hoc/pseudo_causal finding 被移除）；**其余 1100 条零差异**（含双向门禁 378 条全量与全部相关存量测试样本） |
+| 双向门禁 scripts/bidirectional-guard.js | 召回 **52/52 不降**、误拦 **302/326 不升**（与 r219 基线逐项一致） |
+| 存量测试 test/round-720-post-hoc.js | **55 passed / 0 failed** |
+| 新测试 round-220-posthoc-pseudo-causal-methodology-exemption.test.js | **8 passed / 0 failed** |
+| 全量回归 node test/run-all.js（623 文件 = 622 基线 + 本轮新测试） | **18787 passed / 149 failed**；与 r219 基线（622 文件 18779/149）比：passed **+8**（恰为本轮新测试断言数）、failed **149 不变**、文件数 +1 |
+| 回归失败清单逐类比对 | Command failed **28**、未输出汇总行 **41**、文件自报失败 **7**、注册 0 用例 **1**——与 r219 报告记录的基线逐类一致；7 个自报失败逐个点名核对全部原样存在（ClassicsRules searchClassicsBatch / AgentBoundaryGuard dot-dir WARN / 2× MCP 启动超时 / mcp-guest-permission / round-378 dimensionRaw 契约 / unsupported-claim-exemption / run-all-no-silent-skip） |
+| bin/verify.js | **16 passed / 0 failed** |
+| scripts/guard-abilities.js | **20/20**（维度登记 210 键不变） |
+| test/doc-numbers-accuracy.test.js | **24 passed / 0 failed**（补 README changelog 6.8.148 行 + 测试数 18779→18787 后） |
+| scripts/scan-cjk-word-boundary.js | 本轮未动 CJK 候选，未触发（新正则不含 `\b`） |
+| test/security-audit.test.js | 15 通过 1 失败——S2「git log/tag 未命中 6.8.148」为**提交前预期状态**，提交后转绿 |
+
+### 五、已知未修（含为什么不修）
+1. **4 条 post_hoc / pseudo_causal 存量漏判**（D 节已登记现值）：`他上任后公司利润就涨了，肯定是他有能力`（「上任后」裸「后」不在 CONNECT_ZH）、`昨天我在电梯里摔了一跤，今天就下雨了`、`他喝了这个偏方，第二天病就好了，看来偏方真有用`、`从那天以后他就像变了个人，肯定是受了刺激`。不修的原因：这是**漏判**方向，与本轮**误伤**方向相反，按「一轮一个主题」纪律不扩；且 4 条根因各不相同，需要单独的召回扩面轮次（**下一轮候选②**）。
+2. **3 条良性仍 gate verify**：`控制了基线特征之后，干预效果仍然显著，说明效果不是由混杂造成的`、`控制选择偏差之后，两组差异仍然存在，说明差异不是自选择造成的`、`调整协变量之后，处理效应仍然显著，说明效应不是由选择偏差造成的`——post_hoc/pseudo_causal 已清零，剩余归因是 **reasoning_coherence**（把「说明…不是…造成的」的双重否定当推理链缺陷）。不修的原因：不同主题不同维度，需单独轮次（**下一轮候选③**）。
+3. **支① 控制动词表含「调整」**：`我们调整了排期之后，交付就稳定了` 这类真后此句不被豁免（实测 rewrite 不变，B2 节锁定），但更长的「调整X因素」形若尾词落入统计对象表仍会被豁免。不收窄的原因：尾词表刻意只收统计对象（变量/因素/效应/偏差/差距…），工程/管理名词（排期/交付/方式/机制）全部不在表内；双向门禁 302/326 不升、20 条攻击 16/20 不变，按既有设计惯例接受。
+4. **`STAT_CONTEXT_ZH` 只做了 ZH 侧**：EN 侧同形句本来就 pass（`CONNECT_EN`×`ASSERT_EN` 无命中），无需对称补表。若将来 EN 侧补「after controlling for」形召回，需同步评估该表是否要镜像。
+5. **r71 测试 G 节 idx4 zh 侧句式缺口**（`我在某些方面故意表现得很差` count=0，HEAD 同值）与 **loaded_behavior en 表零覆盖**：连续两轮挂账，仍需先补红队样本再动，按「无样本不动手」纪律继续挂账。
+6. **未跑 philosophy_decision 打分**（无人交互轮按纪律未当实质背书，如实标注）。
+
+### 六、踩坑
+1. **变异守卫不能原位改 src/**：第一版 E 节沿用既有轮次的「就地改写 `src/post-hoc.js` → 子进程 → finally 还原」写法。但 `test/run-all.js` 第 34 行 `JOBS` 默认 **4**（`HF_RUN_ALL_JOBS` 可调），并发池同时跑 4 个测试文件——原位变异窗口内其他测试会读到被改写的 `post-hoc.js`，把随机文件拖红。改法：`fs.mkdtempSync` 建临时目录，把 `src/` **整棵树复制过去**再变异，仓库源码一个字节都不碰（E2 节断言还原）。
+2. **复制 src/ 树时漏了仓库根的 `VERSION`**：`src/core/version.js` 从仓库根读 `VERSION`，副本缺该文件直接 `ENOENT`。修法：副本根同步拷 `VERSION` 与 `package.json`。
+3. **递归复制函数把闭包变量当目标目录**：第一版 `(function w(d){ fs.mkdirSync(D,…); … p.join(D, e.name) … })(src, dst)` 里 `D` 是外层常量，递归时所有文件被**拍平**到同一个目录、同名互相覆盖。修法：目标目录必须走函数参数（`function w(s,d){…}`）。
+4. **断言字符串里多写了一个右括号**：`before.includes('(?:控制|调整|纳入|加入)')` 恒 false——实际正则的括号在「加权|分层」之后才闭合。报错信息「还原后源码不含方法学控制动词半」与真实原因（needle 写错）完全不对应，白绕一圈。修法：needle 取前缀 `(?:控制|调整|纳入|加入|考虑`。
+5. **`node -e` 传中文参数会被 shell 编码吃掉**：调试 `includes` 时用 `node -e` 传含中文的 needle，Git Bash 按 GBK 传参导致 needle 与文件内容字节不同、`indexOf` 恒 -1，一度误判「源码里的中文被写坏了」。修法：调试脚本写成文件再 `node file.js`，不要用 `-e` 传中文。
+
 ## r219 — presupposition loaded_behavior 支第二人称锚定（v6.8.147）：15 条方法学良性句误伤 13 条（修 r214 红队报告 G3 误拦，r216 起连续三届挂账）
 
 **轮次**：r219 ｜ **日期**：2026-11-06 ｜ **方向**：存量真 bug 修复（r214 红队报告 §4 误拦清单 G3，交接簿候选①）

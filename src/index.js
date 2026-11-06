@@ -519,7 +519,7 @@ const { checkSpecialPleading } = require('./special-pleading.js');
 // scripts/round-720-family-probe.js；本轮在当前引擎（150 维）复测：
 // 攻击漏判 10/14（71%）、真零命中 10/10、误伤 0/10。判据四路由双腿
 // 共现；细节见 src/post-hoc.js。
-const { checkPostHoc } = require('./post-hoc.js');
+const { checkPostHoc, STAT_CONTEXT_ZH } = require('./post-hoc.js');
 // [r721] 第 152 维度 appeal_to_probability（诉诸概率/可能性误当必然）。
 // decision 本体选出（scripts/decide-r721.js，composite_score 0.81 /
 // confidence 0.78 / identity alignment 0.8，无弃权）。候选池来自 r721
@@ -7488,6 +7488,15 @@ const PC_NUMERIC_ZH = /(?:从\s*\d|\d+(?:\.\d+)?\s*(?:%|倍|ms|分钟|万)\s*(?:
 function causalOverclaimZh(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
   if (!/[\u4e00-\u9fff]/.test(text)) return { count: 0, hits: [], score: 0 };
+  // [r220] \u65b9\u6cd5\u5b66/\u7edf\u8ba1\u8bed\u5883\u8c41\u514d\uff08\u7ea2\u961f r214 \u00a74 G7/G8\uff09\uff1a\u4e0e post_hoc \u4fa7\u540c\u6e90\u540c\u8868
+  // \uff08STAT_CONTEXT_ZH \u58f0\u660e\u4e8e src/post-hoc.js\uff09\u3002\u539f\u53e5\u300c\u63a7\u5236\u4e86\u4e2d\u4ecb\u53d8\u91cf\u4e4b\u540e\uff0c
+  // \u76f4\u63a5\u6548\u5e94\u4ecd\u7136\u663e\u8457\uff0c\u8bf4\u660e\u4e2d\u4ecb\u53ea\u4f20\u9012\u4e86\u90e8\u5206\u6548\u5e94\u300d\u88ab\u7b2c\u2460\u652f\uff08\u987a\u5e8f\u6807\u8bb0\u00d7\u5f52\u56e0
+  // \u65ad\u8a00\uff09\u5224\u4f2a\u56e0\u679c\u2014\u2014\u300c\u4e4b\u540e\u300d\u662f PC_SEQ_ZH \u6210\u5458\u3001\u300c\u8bf4\u660e\u300d\u662f PC_ATTRIB_ZH
+  // \u6210\u5458\uff0c\u800c PC_PROB_ZH \u53ea\u8ba4\u300c\u663e\u8457\u6027\u300d\u4e0d\u8ba4\u88f8\u300c\u663e\u8457\u300d\uff0c\u4e24\u8bcd\u8c41\u514d\u5168\u90e8\u843d\u7a7a\u3002
+  // \u5224\u636e\u53ea\u8ba4\u7edf\u8ba1\u8bbe\u8ba1\u8bcd\u6c47\uff08\u63a7\u5236/\u8c03\u6574\u67d0\u53d8\u91cf\u3001\u534f\u53d8\u91cf/\u4e2d\u4ecb\u53d8\u91cf/\u56de\u5f52/\u76f4\u63a5\u6548\u5e94
+  // \u5728\u573a\uff09\uff0c\u4e0d\u8ba4\u300c\u5148\u540e\u300d\u672c\u8eab\uff0c\u6240\u4ee5\u300c\u4e0a\u7ebf\u4e4b\u540e\u6295\u8bc9\u91cf\u4e0b\u964d\u4e86\uff0c\u6240\u4ee5\u8fd9\u6b21\u4e0a\u7ebf
+  // \u5c31\u662f\u6295\u8bc9\u4e0b\u964d\u7684\u539f\u56e0\u300d\u8fd9\u7c7b\u767d\u8bdd\u4f2a\u56e0\u679c\u4e0d\u53d7\u5f71\u54cd\uff0820 \u6761\u653b\u51fb\u63a2\u9488\u5b9e\u6d4b\uff09\u3002
+  if (STAT_CONTEXT_ZH.test(text)) return { count: 0, hits: [], score: 0 };
   if (PC_HEDGE_ZH.test(text) || PC_PROB_ZH.test(text)) return { count: 0, hits: [], score: 0 };
   const guarded = PC_NUMERIC_ZH.test(text);
   // [v6.7.155 第 346 轮] 第 ⑪ 支（玄学归因新版）自带的机制/统计反向护栏：

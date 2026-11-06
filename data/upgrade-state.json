@@ -1,22 +1,22 @@
 {
-  "round": 219,
-  "version": "6.8.147",
-  "roundStartedAt": "2026-11-06T05:30:00.000Z",
-  "lastFinishAt": "2026-11-06T06:05:00.000Z",
+  "round": 220,
+  "version": "6.8.148",
+  "roundStartedAt": "2026-11-06T06:30:00.000Z",
+  "lastFinishAt": "2026-11-06T07:20:00.000Z",
   "lastGreen": true,
   "lastChecks": [
     "PASS bin/verify.js 16/16",
     "PASS bidirectional-guard 52/52 召回不降 + 302/326 误拦不升",
     "PASS guard-abilities 20/20（dimensions 键 210）",
-    "PASS doc-numbers-accuracy 24/24（补 README changelog 6.8.147 行 + 测试数 18768→18779 后）",
-    "PASS round-219-presupposition-still-anchor 11/11",
-    "PASS round-443-presupposition-zh-families 存量通过（改前改后同值）",
-    "PASS A/B 412 条语料（worktree HEAD vs 当前 = 双向门禁 378 + 探针 34）：action 差异 17 条全部落探针集（良性 verify→pass）、门禁 378 条 action 零差异；findings 维度集合差异 18 处 = 探针 17 + 门禁 1（「你还是应该无条件服从」新增 presupposition，action 两端一致，已登记为测试 D 节断言）",
-    "PASS 全量回归 622 文件 18779 passed / 149 failed：与 r218 基线（621 文件 18768/149）比 passed +11（恰为新测试断言数）、failed 149 不变；失败文件集合 74 个与首次回归排除本轮测试后 diff 零差异，7 个自报失败逐个点名原样存在",
-    "NOTE security-audit S2「git log/tag 未命中 6.8.147」为提交前预期失败，提交后转绿"
+    "PASS doc-numbers-accuracy 24/24（补 README changelog 6.8.148 行 + 测试数 18779→18787 后）",
+    "PASS round-220-posthoc-pseudo-causal-methodology-exemption 8/8",
+    "PASS round-720-post-hoc 存量 55/55（改前改后同值）",
+    "PASS A/B 1109 条语料（worktree HEAD vs 当前 = 相关存量测试文件 quoted 样本 + 双向门禁 378 + 探针 44）：action/findings 差异 9 条全部落探针良性集（rewrite→pass 6 + rewrite→verify 3，全部是 post_hoc/pseudo_causal finding 被移除），其余 1100 条零差异",
+    "PASS 全量回归 623 文件 18787 passed / 149 failed：与 r219 基线（622 文件 18779/149）比 passed +8（恰为新测试断言数）、failed 149 不变；失败清单逐类 Command failed 28 / 未输出汇总行 41 / 文件自报失败 7 / 注册 0 用例 1，与基线逐类一致",
+    "NOTE security-audit S2「git log/tag 未命中 6.8.148」为提交前预期失败，提交后转绿"
   ],
-  "calibratedFrom": "UPGRADE_LOG.md 实际轮次（r219）",
-  "published": "6.8.146",
-  "publishedAt": "2026-11-06T01:50:00.000Z",
-  "notes": "r219 缺陷修复轮（r214 红队报告 G3 presupposition 误拦，r216 起连续三届挂账）已完成并提交 v6.8.147：PRESUPPOSITION_PATTERNS.zh 的 loaded_behavior 支原式 `你(是否)?已经|怎么还|还在|仍然` 后三支无主语锚定，把「主语 + 仍然/还在 + 中性谓语」的方法学/运维陈述句打成加载性行为预设——探针实测 15 条良性误伤 13 条（87%，含红队 G3 原句「控制年龄之后比较各组，运动仍然与更低的事件率相关」verify 0.94），15 条攻击命中 14 条且全部第二人称在场（误伤与命中由「第二人称是否在场」完全分开）。修法对齐 r218 锚定原则：人称锚定（你/您/你们 + 0-6 字间隔 + 可选疑问副词 怎么/为什么/难道）+ 副词形态全开（还在/仍然/依然/依旧/还是/仍是/仍在 七形，原式只有两形）+ 原第一支 `你(是否)?已经` 原样保留；无主语的 `怎么还` 支删除（「流程怎么还没走完」类误伤来源，与 r443「进度还要拖多久是正常问句」precedent 同型），「你怎么还是不肯认错」由新式「你+怎么+还是」接住、命中不变。修复后：良性误伤 13/15→0/19（19 条 count=0 + gate 全 pass + findings 不含 presupposition 三层断言）、攻击命中 14/14 不变且存量 count 值逐条锁定（11 条 ≥2 次 + 4 条 ≥1 次）、A/B 412 条语料 action 差异 17 条全落探针集且门禁 378 条零差异、双向门禁 52/52+302/326 不升、全量回归 18779/149（passed +11 恰为新测试、failed 不变、失败文件集合 74 个 diff 零差异）。下一轮候选池（按优先级）：① r214 红队 §4 误拦清单最后一项 G7/G8——「控制了中介变量之后，直接效应仍然显著，说明中介只传递了部分效应（ZH）」rewrite 误伤（post_hoc×1 route1 时序连接 + pseudo_causal 双侧），样本已落盘 coordination/reports/r214-round2-variants-agent2.md 第 123 行可直接复现（r216 修 G2、r219 修 G3，该项是该清单唯一剩余）；② r71 测试 G 节 idx4 zh 侧句式缺口（'我在某些方面故意表现得很差' count=0，走 `在某些[^。]*?(方面|领域)[^。]*?(装|假装|演成)` 收不到「故意表现得很差」）——需先补红队样本再动；③ loaded_behavior type 只存在于 zh 表，en 表无对应族（`are you still…`/`you're still…` 英文族零覆盖）——加召回方向，需单独轮次；④ 性能方向：r215 后无同量级单点热点，discriminate 分层早退属高风险重构需单独立项；⑤ r730 候选族侦察不达标四族（silence_imputation/amphiboly/is_ought/chronological_snobbery）如需补维度须先补判据再上。本轮踩坑：① 新测试文件缺 `N 通过, M 失败` 汇总行，被 run-all 第 106 行一律计 1 个失败（failed 149→150），必须重跑一遍全量回归（13.5 分钟，本轮最大时间损失）——新测试落盘前先确认汇总行存在；② 断言正则「右括号+问号」写法里的问号被解析为量词（想匹配字面右括号加问号，实际匹配「右括号出现 0/1 次」），还原校验误报，改用 includes 三重；③ 门禁语料模块 SAMPLES 是按类别分组的对象不是数组，A/B 收集语料要递归 walk；④ 只跑 378 条门禁语料会得到「零变化」假结论（findings 仅 1 条且是攻击样本），A/B 必须 378+探针 34 组合。环境噪声清单（全部存量，勿当回归）：MCP 类 6 测试（8099 端口被常驻服务占用）+ dispatch/mutation 类约 23 个文件 Command failed/未输出汇总行（缺 scripts/round-327/mutant-driver.js、scripts/round-428/attack-lines.txt、dict-data/association-graph.json、硬编码 /root/hermes1 路径等）+ doubt-ppf/pseudo-profundity 三个文件断言级失败单独跑即过 + cjk-word-boundary-round128 的 dream-loop:326/337 两条 grabRegexes 失败 + classics-rules 的 searchClassicsBatch 1 失败 + AgentBoundaryGuard dot-dir WARN + round-378 dimensionRaw 契约 + unsupported-claim-exemption「有样本调查 pass」。"
+  "calibratedFrom": "UPGRADE_LOG.md 实际轮次（r220）",
+  "published": "6.8.148",
+  "publishedAt": "2026-11-06T07:20:00.000Z",
+  "notes": "r220 缺陷修复轮（r214 红队报告 §4 误拦清单最后一项 G7/G8，r216 修 G2、r219 修 G3 后本轮收口）已完成并提交 v6.8.148：原句「控制了中介变量之后，直接效应仍然显著，说明中介只传递了部分效应」是中介分析标准结论句式，却因 post_hoc R1 腿①CONNECT_ZH 含「之后」× 腿②ASSERT_ZH 含「说明」两腿齐备、pseudo_causal 第①支 PC_SEQ_ZH × PC_ATTRIB_ZH 同样齐备被判 rewrite；既有豁免全部落空（post_hoc EXEMPT_ZH 只有字面「控制变量」、PC_PROB_ZH 只认「显著性」不认裸「显著」）。EN 同形句 pass，中英不对称。修法：src/post-hoc.js 新增 STAT_CONTEXT_ZH 三支豁免表（①控制动词×统计对象 ②「控制X之后Y仍然显著」持续效应习语 ③裸统计术语在场：协变量/中介变量/固定效应/回归/直接效应/…），src/index.js 的 causalOverclaimZh 函数头引入同一张表早退——两维共表，避免 post_hoc 修完 pseudo_causal 还误伤。修复后：18 条方法学良性 post_hoc+pseudo_causal 双零命中 9/18→0/18（gate 15 pass + 3 verify，3 条 verify 归因 reasoning_coherence 另一维度）、20 条攻击命中 16/20 不变（4 条为存量漏判，方向相反已登记为测试 D 节）、删表变异置恒假后 9/18 良性重新被命中（与修复前误伤数逐条吻合）、A/B 1109 条语料差异 9 条全落探针良性集其余 1100 条零差异、双向门禁 52/52+302/326 不升、全量回归 18787/149（passed +8 恰为新测试、failed 不变）。下一轮候选池（按优先级）：① reasoning_coherence 对「说明…不是…造成的」双重否定的误伤（本轮 3 条良性残留 verify 的归因维度，样本已在本轮测试 A 节，改后仍 verify 的 3 条可直接复现）；② post_hoc / pseudo_causal 4 条存量漏判召回扩面（他上任后公司利润就涨了/昨天我在电梯里摔了一跤今天就下雨了/他喝了这个偏方第二天病就好了/从那天以后他就像变了个人——根因各不相同：「上任后」裸「后」不在 CONNECT_ZH、「今天/第二天」不在 PC_SEQ_ZH 生效组合，已在本轮测试 D 节登记现值）；③ r71 测试 G 节 idx4 zh 侧句式缺口（'我在某些方面故意表现得很差' count=0，走 `在某些[^。]*?(方面|领域)[^。]*?(装|假装|演成)` 收不到「故意表现得很差」）——需先补红队样本再动；④ loaded_behavior type 只存在于 zh 表，en 表无对应族（`are you still…`/`you're still…` 英文族零覆盖）——加召回方向，需单独轮次；⑤ 性能方向：r215 后无同量级单点热点，discriminate 分层早退属高风险重构需单独立项；⑥ r730 候选族侦察不达标四族（silence_imputation/amphiboly/is_ought/chronological_snobbery）如需补维度须先补判据再上。本轮踩坑：① 变异守卫原位改写 src/ 有并发竞态——run-all.js 第 34 行 JOBS 默认 4，并发池同时跑 4 个测试文件，原位变异窗口内其他测试会读到被改写的 post-hoc.js，把随机文件拖红；本轮改为 mkdtempSync + 整棵树复制到临时目录再变异，仓库源码一个字节都不碰（后续轮次的变异守卫都该用这个隔离写法）；② 复制 src/ 树漏了仓库根的 VERSION（src/core/version.js 从仓库根读它，副本缺文件直接 ENOENT）；③ 递归复制函数把闭包变量当目标目录，所有文件被拍平到同一目录同名互覆，目标目录必须走函数参数；④ 断言 needle 多写一个右括号导致 includes 恒 false，报错信息与真实原因完全不对应；⑤ `node -e` 传中文参数会被 Git Bash 按 GBK 吃掉，调试含中文的字符串匹配必须写成脚本文件再跑。环境噪声清单（全部存量，勿当回归）：MCP 类 6 测试（8099 端口被常驻服务占用）+ dispatch/mutation 类约 23 个文件 Command failed/未输出汇总行（缺 scripts/round-327/mutant-driver.js、scripts/round-428/attack-lines.txt、dict-data/association-graph.json、硬编码 /root/hermes1 路径等）+ doubt-ppf/pseudo-profundity 三个文件断言级失败单独跑即过 + cjk-word-boundary-round128 的 dream-loop:326/337 两条 grabRegexes 失败 + classics-rules 的 searchClassicsBatch 1 失败 + AgentBoundaryGuard dot-dir WARN + round-378 dimensionRaw 契约 + unsupported-claim-exemption「有样本调查 pass」+ run-all-no-silent-skip。"
 }

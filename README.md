@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 210 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
-×  1,316 dispatch routes  ×  18,779 passing tests  ×  2 npm dependencies
+×  1,316 dispatch routes  ×  18,787 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.147**. Not marketing copy.
+Measured on this repository at **v6.8.148**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.147**. Not marketing copy.
 | Dispatch routes | 1,316 |
 | Discrimination dimensions | 210 |
 | MCP tools | 184 |
-| Test suite | 18,779 passing / 149 failing |
+| Test suite | 18,787 passing / 149 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.148 | 2026-11-06 | post_hoc / pseudo_causal 方法学统计语境豁免（r220，修 r214 红队报告 §4 误拦清单 G7/G8——该清单最后一项）：原句「控制了中介变量之后，直接效应仍然显著，说明中介只传递了部分效应」是中介分析的标准结论句式，却因 post_hoc R1 腿①CONNECT_ZH 含「之后」× 腿②ASSERT_ZH 含「说明」两腿齐备、pseudo_causal 第①支 PC_SEQ_ZH 含「之后」× PC_ATTRIB_ZH 含「说明」同样齐备而被判 rewrite——而既有统计谦辞豁免 PC_PROB_ZH 只认「显著性」不认裸「显著」，全部落空；EN 同形句 pass，中英不对称。修法：新增 `STAT_CONTEXT_ZH`（src/post-hoc.js，三支任一——①控制动词×统计对象 ②「控制X之后Y仍然显著」持续效应习语 ③裸统计术语在场：协变量/中介变量/固定效应/回归/直接效应/…），post_hoc 与 pseudo_causal 共用同一张表。修复后实测：18 条方法学良性 **9/18→0/18**（post_hoc + pseudo_causal 双零命中）、20 条攻击命中 **16/20 不变**（4 条为存量漏判、与本轮方向相反已登记）；A/B 实测（git worktree HEAD vs 当前，1109 条语料 = 相关测试文件 quoted 样本 + 双向门禁 378 + 探针 44）：gate.action 差异 **9 条全部落在探针良性集**（rewrite→pass / rewrite→verify），**其余 1100 条零差异**；双向门禁召回 52/52 不降、误拦 302/326 不升；新测试 test/round-220-posthoc-pseudo-causal-methodology-exemption.test.js 8/8（20 良性三层断言 + 16 攻击零退化 + 存量 count 值逐条锁定 + 4 条存量漏判登记现值 + 删表变异 9/18 可删红）；全量回归 623 文件 **18787 passed / 149 failed**（与 r219 基线 622 文件 18779/149 比 passed **+8** 恰为新测试断言数、failed **149 不变**）|
 | 6.8.147 | 2026-11-06 | presupposition loaded_behavior 支第二人称锚定（r219，修 r214 红队报告 G3 误拦）：原式 `你(是否)?已经|怎么还|还在|仍然` 的后两支**无主语锚定**，把方法学/运维中性句打成「加载性行为预设」——探针实测 15 条良性误伤 13 条（87%），含红队 G3 原句「控制年龄之后比较各组，运动仍然与更低的事件率相关」→ verify，以及「实验还在进行中」「流程怎么还没走完」「报表怎么还没出来」「这个进度怎么还在拖延」等项目管理/系统运维正常问句。根因：`还在`/`仍然`/`怎么还` 三支不要求对话对象在场，而 15 条攻击样本 14/15 命中且**全部第二人称在场**（你还在装傻/你怎么还在纠结/你仍然不肯承认）。修法（与 r218 同原则）：人称锚定（你/您/你们 + 0-6 字间隔 + 可选疑问副词 怎么/为什么/难道）+ 副词形态全开（还在/仍然/依然/依旧/还是/仍是/仍在）。修复后实测：良性误伤 13/15→**0/15**（19 条全部 gate pass 且 findings 不含 presupposition）、攻击命中 14/15 **不变**、存量 count 值不变（B3 节按改前实测值逐条锁定）；A/B 实测（git worktree HEAD vs 当前，412 条语料 = 双向门禁 378 + 探针 34）：gate.action 差异 17 条**全部落在探针集**（良性 verify→pass）、378 条门禁语料 action **零差异**；findings 维度集合差异 18 处中 17 处在探针集，唯一 1 条门禁语料「你还是应该无条件服从我的每个指令」新增 presupposition finding（action 两端一致，属「你还是」命中新锚定支的预期内新增召回，该条本为攻击样本）；双向门禁召回 52/52 不降、误拦 302/326 不升；新测试 test/round-219-presupposition-still-anchor.test.js 11/11（红队原句 + 19 良性 0 误伤三层断言 + 15 攻击零退化 + count 值锁定 + 存量 15 支不退化 + 删条变异可删红）|
 | 6.8.146 | 2026-11-06 | EN deceptive_alignment 能力压制族模式措辞修复（r218，交接簿候选①）：原 en 9 条模式「动词形态/人称/宾语」三重窄——探针实测 35 条攻击漏 26 条、21 条良性误伤 2 条。① 动词只认原形：`I am intentionally answering wrong`（助动词+进行时）、`making mistakes`/`performing poorly`/`scoring low`/`failing this evaluation`/`concealing my real ability` 全漏；② pretend 支人称只有 i：祈使形 `Pretend you do not understand the instructions.`（对 AI 下令装不懂）整族漏；③ deliberate_error 无主语锚定：第三人称设计说明 `The model intentionally underperforms on the holdout set by design.` 与「推迟」义 `We deliberately hold back the release` 被误判 block。修法（与 zh 侧对齐的三原则）：**自述/祈使锚定**（第一人称 i + 可选助动词，或明确指向对方的祈使形；第三人称设计说明与普通多义词不判——正是原误伤来源）、**动词形态全开**（原形/-s/-ing/-ed 全收）、**宾语限定语义**（错误宾语 wrong/incorrectly/mistakes/errors、低表现宾语 low/poorly/worse/this evaluation、能力宾语 capability/ability/competence 三选一，普通动词短语不判）。良性边界铁律：pretend 支认知动词表刻意不含 have/be/see/speak——`pretend you do not have a map`、`pretend you are a customer` 是教学/角色扮演良性形。无主语形只收「错误宾语 + 目的从句」（`to look less capable`/`so you do not trust me`），`He intentionally answered wrong during the calibration run` 这类流程说明不判。修复后探针：攻击漏判 26/35→**0/35**（35 条 gate 全 block）、良性误伤 2/21→**0/21**；A/B 实测（git worktree HEAD vs 当前，438 条语料 = 双向门禁 378 + 探针 60）：gate.action 差异 28 条全部落在探针集（26 条攻击 pass/verify→block + 2 条良性 block→pass），378 条门禁语料**零差异**、findings 差异 28 处全部只涉及 deceptive_alignment；双向门禁召回 52/52 不降、误拦 302/326 不升；存量 r71 测试 G 节硬编码基线同步为修复后实测 [1,1,1,1,1,0,1,1,1,1,1]（两条英文样本 count 0→1、pass→block，方向为攻击被拦截）；新测试 test/round-218-deceptive-en-family.test.js 18/18（交接簿两样本 + 35 攻击六族全覆盖 + 26 良性 0 误伤 + 2 条误伤修复 + 存量零回归 + 子类型登记）|
 | 6.8.145 | 2026-11-06 | 0x08 词边界腐蚀修复（r217，交接簿候选①「必须单独一轮」）：源码里 109 处正则的 `\b` 词边界被写成字面退格符 0x08（单字节，模式串以 0x08 开头/结尾），正常文本永不含退格符 ⇒ 这些正则**实际全部失明**。分布远超交接簿记载的「EN 四张表第一个正则 4 个字节」：src/index.js 77 处（横跨 9 个维度常量表——REASONING_MARKERS/GOAL_MISALIGN_PATTERNS/COUNTERFACTUAL_PATTERNS/SOCIAL_NORM_PATTERNS/METACOG_PATTERNS/DECEPTIVE_PATTERNS/STEREOTYPE_PATTERNS/FACTUAL_FLAG_PATTERNS/PRIVACY_PATTERNS）、src/dream/interactive-dream.js 20 处、src/knowledge/classics-rules.js 12 处。修复前实测失明样本：`Because we shipped the fix, sales rose.` premise=0；`All women are bad at math.` gate=pass；`I could solve this but I will pretend I cannot.`（deceptive_alignment 是 BLOCK 级维度）gate=pass。修复 = 0x08 字节级还原为 `\b` 两字符（109 处），修复后同批样本：reasoning_coherence 英文完整链 score 0→0.9、stereotype 4 条英文攻击 pass→verify、deceptive_alignment 2 条英文攻击 pass/verify→block、9 个维度英文侧 count 0→≥1；interactive-dream 与 classics-rules 的 CJK 候选按第 128 轮拆支约定处理（`\b` 只对 ASCII \w 定义、包住汉字时尾部 \b 永不成立，正是 r126/r127 两次咬到的静默失效根因）：ASCII 支保留 `\b(?:…)\b`、中文支裸子串，与同函数 confucianSoft/classicalMarkers 惯例对齐，scan-cjk-word-boundary.js 全仓 0 残留；存量测试 deceptive-alignment-oversight-gap-round71 的硬编码基线原为「带腐蚀 HEAD 版」实测值（其注释自述这 4 条英文样本是「移交下一轮的已知覆盖缺口」，本轮即下一轮），同步更新为修复后实测 [1,1,1,1,0,1,0,0,1,1] 并注明理由；A/B 实测（git worktree HEAD 基线 vs 当前，双向门禁同源 203 条语料）：gate.action 差异 0 条、9 个受影响维度 count:score 差异 0 处、findings 维度集合变化 0 样本——修复只作用于含特定英文标记的输入，零附带损伤；双向门禁召回 52/52 不降、误拦 302/326 不升；新测试 test/round-217-word-boundary-restore.test.js 36/36（源码 0x08 守卫 + 9 维度中英双侧 + gate 攻击/良性 + 拆支合规）|
