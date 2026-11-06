@@ -44,7 +44,7 @@
 | node scripts/round-guard.js --stage=after | commit 后复跑 |
 
 ### 下一轮方向（可直接做）
-1. **109 处 0x08 腐蚀来源定位**：`git log -S` 追引入轮次（本轮未查），确认是否同一轮批量写坏；若为某工具/脚本产物需防复发
+1. **109 处 0x08 腐蚀来源定位**：本轮 `git log -S$'\x08' -- src/index.js` 实测，本地 git 起点 693f3e49（v6.8.62 Windows 副本基线快照）即含腐蚀，真实引入轮次在本地历史之外，需查远程 origin/main 历史（远程=6.8.38 起）；若为某工具/脚本产物需防复发
 2. **HG 判据③动词族 y 结尾缺口**：`verified?` 匹配不了 "verify"，"No one can verify the results." 零命中（本轮负例实测发现）——补 verif(?:y|ied) 类须防收窄族召回，值得单点做透
 3. 「身边的人全是关系户」无量化词模式命中（「全是」不在 都|均|皆|总是|从来 判据内）
 4. 方向池复测（init 简报 6 项：di 目的状语「以符合」r217 已修；HG "Nobody can skip…" r718 已修；silence_imputation r717 已上线；middle_ground / base_rate_fallacy / composition_division / amphiboly / is_ought 历史结论不合格；evidence 维度基线打分器恒返回 score:1）
