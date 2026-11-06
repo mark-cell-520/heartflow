@@ -56,9 +56,9 @@
 
 ## 五、run-all 说明（诚实记录）
 
-全量 `test/run-all.js` 本轮跑出 **19125 通过 / 96 失败 / 共 19221**（EXIT=1）。**失败全部为预存类，无一条由本轮改动引起**（已扫失败清单，无 shield/unresolved/conflict/finality 相关）：MCP server 启动超时（mcp-server/mcp-smoke/mcp-auth-tier/knowledge-graph-mcp，环境依赖）、各类 `*-dispatch` 测试、以及 run-all 自述的「重跑必然恢复」型抖动测试。该数字被两件事污染、对本轮不完全公平：① 抓取时用的是测试的早期不可解析版本（计 1 个软失败），现已改为标准汇总行；② 抓取期间共享工作树里 `src/core/heartflow.js` 被一个负例注入突变测试残留污染（见下）。清理后已另起一次干净全量（`r225-runall-clean.output.txt`）。
+全量 `test/run-all.js` **收尾干净态**（工作树干净 + 测试输出标准汇总行）：**19217 通过 / 90 失败 / 共 19307**（EXIT=1）。对照 r224 基线（19130 通过 / 90 失败 / 共 19220）：**总数 +87、通过 +87（正好是本轮 round-225 测试的 87 条断言）、失败 90 → 90 零增长**。即本轮改动**零新增失败**，90 条失败全为 r224 起就有的预存类（MCP server 启动超时 mcp-server/mcp-smoke/mcp-auth-tier/knowledge-graph-mcp，环境依赖；各类 `*-dispatch`；run-all 自述「重跑必然恢复」型抖动测试），已扫失败清单确认**无一条 shield/unresolved/conflict/finality 相关**。
 
-**附：清理了一处自己造成的污染**——两次前台 run-all 被我超时杀死，打断了一个负例注入突变测试，使 `src/core/heartflow.js` 残留「[r615 负例] priorityGuardian 接线块已删除」（19 行删除、破坏约 10 个 dispatch 测试）。已 `git checkout` 还原到 HEAD  canonical 态（**未提交**，仅恢复工作树），工作树现干净。
+> 过程说明（诚实记录）：本轮中途曾因两次前台 run-all 被我方超时杀死，抓到一版被污染的数（19125/96/19221）——污染源有二：① 抓取时用的是测试的早期不可解析版本（计 1 个软失败），② 超时杀死打断了一个负例注入突变测试，使共享工作树里 `src/core/heartflow.js` 残留「[r615 负例] priorityGuardian 接线块已删除」（19 行删除、破坏约 10 个 dispatch 测试）。我已 `git checkout` 还原 heartflow.js 到 HEAD canonical 态（**未提交**，仅恢复工作树），并把测试改为标准「N 通过, M 失败」汇总行，重跑得到上方干净数。干净版输出存 `coordination/agent4/probes/r225-runall-clean.output.txt`。
 
 ## 六、base_rate_neglect 数值后验发现（移交 1 号，本轮未提交）
 
