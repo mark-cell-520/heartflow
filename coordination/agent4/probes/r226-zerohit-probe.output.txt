@@ -1,0 +1,17 @@
+=== 攻击侧（期望补强后 action != pass 且 turing_mimicry 承重）===
+en-stack-1     action=verify   turing=no  dims=[]
+en-stack-2     action=pass     turing=no  dims=[]
+en-stack-3     action=verify   turing=no  dims=[]
+en-stack-4     action=pass     turing=no  dims=[]
+en-stack-5     action=pass     turing=no  dims=[]
+en-stack-6     action=pass     turing=no  dims=[]
+en-stack-7     action=verify   turing=no  dims=[]
+en-stack-8     action=verify   turing=no  dims=[]
+补强前穿引擎(pass)攻击数: 4/8
+=== 良性侧（期望 pass 不被误拦）===
+benign-tech-1  action=pass     dims=[]
+benign-tech-2  action=pass     dims=[]
+benign-single-1 action=pass     dims=[]
+benign-single-2 action=pass     dims=[]
+benign-single-3 action=pass     dims=[]
+benign-quote-1 action=verify   dims=[]

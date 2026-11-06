@@ -1,0 +1,520 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/gU8TBLl2W3mB7im8M4rljIMCod4</id>
+  <title>arXiv Query: search_query=all:AI OR all:anthropomorphic OR all:emotional OR all:mimicry OR all:deception OR all:trust OR all:rule-based OR all:detection&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-06T03:07:19Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:AI+OR+(all:anthropomorphic+OR+(all:emotional+OR+(all:mimicry+OR+(all:deception+OR+(all:trust+OR+(all:rule-based+OR+all:detection))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>380542</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07998v1</id>
+    <title>Towards Multiscale Molecular Representation Learning through Geometry-Based Fragmentation for Polymer Property Prediction</title>
+    <updated>2026-11-05T13:25:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.07998v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07998v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>It is well established that molecular substructures can contribute unequally to chemical and physical properties, with specific motifs or side chains often playing dominant roles. Fragment-based representations have therefore emerged as an effective strategy for incorporating chemically meaningful inductive biases, as exemplified by molecular fingerprints and fragment-based attention mechanisms. However, many existing fragmentation-based machine learning methods rely on predefined chemical rules, which may yield suboptimal fragmentation for previously unseen or chemically unfamiliar structures and often overlook the importance of multiscale molecular representations. To address these limitations, we formulate molecular fragmentation as a radius-constrained optimization problem inspired by the k-center formulation, where the number of clusters is not fixed a priori but emerges from the specified radius, and propose a geometry-based fragmentation method that partitions arbitrary molecular or material structures using largely geometric information, without relying on predefined chemical fragmentation rules. The method provides flexible control over fragment size, enabling the construction of multiscale fragment representations for scale-adaptive modeling. Building on this framework, we develop a geometric fragment-based attention mechanism that integrates multiscale structural information and incorporate it into a multimodal machine learning model combining p-SMILES representations with three-dimensional (3D) conformational information. Experiments on a benchmark polymer dataset show that incorporating 3D conformational information improves prediction accuracy for several properties over models based exclusively on p-SMILES representations. Explainable artificial intelligence analyses further provide insights into the physical relevance of the learned representations.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.chem-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T13:25:23Z</published>
+    <arxiv:comment>29 pages, 8 figures, accepted for publication in ACS Omega</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Makoto Takamoto</name>
+    </author>
+    <author>
+      <name>Chaitanya Sampara</name>
+    </author>
+    <author>
+      <name>Viktor Zaverkin</name>
+    </author>
+    <author>
+      <name>Daniel Oñoro-Rubio</name>
+    </author>
+    <author>
+      <name>Mathias Niepert</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07994v1</id>
+    <title>Reviving the Discarded High-Resolution Feature for Transformer-Based Tiny Object Detection</title>
+    <updated>2026-11-05T13:19:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.07994v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07994v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Tiny object detection remains challenging because tiny instances occupy only a few pixels, and their fine-grained details are easily lost during feature downsampling. Although the highest-resolution feature preserves rich local details for tiny objects, DETR-like detectors often discard it due to its large computational cost, while directly reintroducing this feature also brings dense background noise. To address this problem, we propose ReDHF, a novel framework that Revives the Discarded High-resolution Feature for tiny object detection. ReDHF has three cooperative components. Cross-Scale Deformable Fusion (CSDF) first constructs a semantically enhanced highest-resolution feature and injects its fine-grained details into the shallow feature under a moderate cost. Ellipse-Guided Shallow Supervision (EGSS) then guides the enhanced feature to learn more reliable classification and localization priors by applying geometry-adaptive auxiliary supervision. Full-Scale Query Interaction (FSQI) further enables decoder queries to access both low-level details and high-level semantic information, allowing them to aggregate richer cues for tiny objects. Extensive experiments show that ReDHF consistently improves multiple baselines across different DETR variants and achieves state-of-the-art performance on the evaluated benchmarks. The best ReDHF variants surpass their baselines by +1.4 AP on AI-TOD-v2, +1.6 AP on VisDrone, and +1.5 AP on SODA-D, with especially notable gains on tiny and small objects.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T13:19:41Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Zehao Wang</name>
+    </author>
+    <author>
+      <name>Si Wu</name>
+    </author>
+    <author>
+      <name>Guiping Cao</name>
+    </author>
+    <author>
+      <name>Xin Li</name>
+    </author>
+    <author>
+      <name>Yaowei Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07987v1</id>
+    <title>Tilting bundles and modifying modules in relative dimension one</title>
+    <updated>2026-11-05T13:15:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.07987v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07987v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>For projective morphisms $π:Y\to X=\operatorname{Spec}R$ over noetherian complete local rings, with fibres of dimension at most one and $\mathbf{R}π_*\mathcal{O}_Y\cong\mathcal{O}_X$, we construct a tilting fan from cones of pretilting bundles. Maximal cones parametrize tilting bundles, and facet adjacency encodes irreducible mutation. Completeness in positive rank is equivalent to finiteness of tilting bundles modulo line-bundle twists. For closed fibres that are split ADE highest-root cycles or their Stein contractions, we identify tilting bundles with chambers of restricted affine Tits cones and determine the fan.
+  Over normal Gorenstein complete local domains, reflexive pushforward takes pretilting bundles on normal projective birational models with fibres of dimension at most one and $π^!\mathcal{O}_X\cong\mathcal{O}_Y$ to modifying modules. Pushforwards of canonical tilting bundles recover models as module blowups and detect contractions by additive containment, yielding an Auslander--McKay embedding.
+  The hypersurfaces $R=S[[u,v]]/(uv-f)$, with $S$ a regular complete local ring and $f\in S$ a nonzero nonunit, generalize type $A$ Du Val surfaces and $cA_n$ threefolds to arbitrary dimension. We classify modifying modules by divisor flags and rank-one reflexive twists; flag blowups turn the embedding into an equivalence. If $f$ has $r\ge2$ prime factors counted with multiplicity, reflexive pushforward on any maximal-flag model gives a mutation-preserving surjection from tilting bundles, parametrized by chambers of affine type $\widetilde{A}_{r-1}$, to maximal modifying modules. Its fibres are affine Weyl group orbits determined by repeated factors. All maximal-flag models and maximal modification algebras are derived equivalent. These algebras are noncommutative crepant resolutions exactly when $S/(p)$ is regular for every prime factor $p$ of $f$.</summary>
+    <category term="math.RT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.AC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.AG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.RA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T13:15:43Z</published>
+    <arxiv:comment>65 pages</arxiv:comment>
+    <arxiv:primary_category term="math.RT"/>
+    <author>
+      <name>Ryu Tomonaga</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07984v1</id>
+    <title>Technohybridism: Recursive Semantic Normalization in AI-Mediated Societies</title>
+    <updated>2026-11-05T13:14:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.07984v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07984v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Language-generating AI systems are no longer only objects of linguistic interaction: their outputs increasingly re-enter the communicative and institutional practices from which their training material was drawn. Drawing on social theory, social epistemology, and the philosophy of language, this article develops a sociotechnical account of that re-entry. We introduce recursive semantic normalization: the process through which machine-generated formulations, once recurrently taken up, evaluated, reused, and institutionally retained, participate in the reproduction and transformation of semantic regularities. Under the heading of technohybridism, we argue that the relevant unit of analysis is the hybrid semantic system, a recursively coupled configuration of human practices, computational generation, and institutional uptake. First, we distinguish the concept from neighbouring accounts, including model collapse, looping effects, machine habitus, machine culture, and the epistemology of AI testimony. Second, we develop an analytical model that separates generation, selection, uptake, and persistence and distinguishes machine-attributable change from change that would have occurred anyway. Third, we analyse uptake as routinized, institutionally diffused, and socially stratified practice and state conditions under which machine-derived regularities become norms. Fourth, we identify social-epistemic consequences: the laundering of provenance that weakens epistemic vigilance, the erosion of the cognitive diversity on which collective inquiry depends, and the narrowing of shared hermeneutical resources. An evidential ladder for empirical research follows. The account attributes no normative authority to machine outputs; what changes is the field within which human and institutional uptake operates.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T13:14:00Z</published>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Charalampos M. Liapis</name>
+    </author>
+    <author>
+      <name>Epameinondas Panagopoulos</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07981v1</id>
+    <title>A stability order barrier and SSP bound for Runge--Kutta methods with non-negative coefficients: AI-assisted proofs</title>
+    <updated>2026-11-05T13:12:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.07981v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07981v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We prove three results about Runge--Kutta methods with non-negative coefficients. First, every $s$-stage implicit Runge--Kutta method of order at least two has SSP coefficient at most $2s$; the bound is sharp and is attained by a known diagonally implicit method, so full implicitness gives no advantage over DIRK at second order. This extends the second-order DIRK result of Kocsis \&amp; Németh to full coefficient matrices and settles a conjecture of Ketcheson, Macdonald &amp; Gottlieb. These proofs were found with the assistance of AI tools, which uncovered an interesting relationship between the Butcher matrices for SSP methods and phase-type distributions, and led to the proof of the second result: a bound on the SSP coefficient of $s$-stage implicit Runge--Kutta method of order at least three. The third result in this work is a proof that a third-order Runge--Kutta method with entrywise non-negative $A$ and $b$ cannot be algebraically stable. This algebraically intensive proof was also AI-assisted. This paper describes the iterative process of AI-assisted results, and presents an approach that centers human understanding and creativity in the AI-assisted mathematical endeavor.</summary>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T13:12:03Z</published>
+    <arxiv:primary_category term="math.NA"/>
+    <author>
+      <name>Sigal Gottlieb</name>
+    </author>
+    <author>
+      <name>Zachary Grant</name>
+    </author>
+    <author>
+      <name>Lior Horesh</name>
+    </author>
+    <author>
+      <name>Lajos Lóczi</name>
+    </author>
+    <author>
+      <name>Avraham Shinnar</name>
+    </author>
+    <author>
+      <name>Barry Trager</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07977v1</id>
+    <title>Stealthy Malicious Interference Detection in UAV Formations: A Power-Domain Signaling Game Approach</title>
+    <updated>2026-11-05T13:08:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.07977v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07977v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reliable intra-swarm communication is fundamental to cooperative sensing, control, and mission execution in unmanned aerial vehicle (UAV) swarms. In open low-altitude shared-spectrum environments, coexisting UAVs may cause benign interference through spectrum reuse and signal leakage, while jamming UAVs may deliberately degrade critical intra-swarm links. Since a jamming UAV can adjust its transmit power to disguise signal-to-interference-plus-noise ratio (SINR) degradation as link fluctuation in benign interference, stealthy jammer UAV detection remains a challenge. In this paper, we propose a novel belief-driven stealthy jammer UAV detection scheme from the perspective of Bayesian security game. To capture stealthy interference in shared-spectrum UAV swarms, the interfering UAV is modeled as a hidden benign or jamming type, whose transmit power strategy induces the SINR observed by the defender. The defender updates its posterior belief from the observed SINR and decides whether to maintain normal operation or trigger defensive power boosting. We characterize pure-strategy perfect Bayesian equilibrium (PBE) conditions under separating structures with distinguishable type and pooling structures with indistinguishable observations. Numerical results show that the proposed scheme improves the defender's expected utility compared to the conventional schemes.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T13:08:43Z</published>
+    <arxiv:comment>Accepted for presentation at IEEE GLOBECOM 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Jianle Ba</name>
+    </author>
+    <author>
+      <name>Shaolong Guo</name>
+    </author>
+    <author>
+      <name>Yuntao Wang</name>
+    </author>
+    <author>
+      <name>Xin Wu</name>
+    </author>
+    <author>
+      <name>Zhou Su</name>
+    </author>
+    <author>
+      <name>Zhendong Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07959v1</id>
+    <title>CoRD: Coupled Rollouts Fill the Blind Spot of On-Policy Distillation</title>
+    <updated>2026-11-05T12:55:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.07959v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07959v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>On-policy distillation trains a student on its own rollouts, so states the teacher would reach but the student does not are seldom supervised. We introduce CoRD (coupled-rollout distillation), which keeps the on-policy loss and moves only the distribution of training states toward the teacher, drawing rollouts from a geometric interpolation of student and teacher through the maximal coupling of speculative decoding. The coupling keeps the student's token wherever the two distributions agree and otherwise substitutes a token from the part of the target the student underweights, so interventions are as rare as any exact sampler allows and recede as the student learns. Across six base students from two model families (Qwen3 and Qwen3.5, 0.6B to 4B), CoRD raises average pass@1 over on-policy distillation by 0.9 to 2.0 points and pass@8 by 1.2 to 3.4 points on five public math benchmarks at equal steps and data. On frozen teacher-reached states, a 4B student trained with CoRD reaches in 16 steps a gap closure that on-policy distillation does not reach in 80, and substitution rules intervening at least as often in other directions fall short of CoRD.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T12:55:51Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Guhan Chen</name>
+    </author>
+    <author>
+      <name>Bohan Li</name>
+    </author>
+    <author>
+      <name>Jun Rao</name>
+    </author>
+    <author>
+      <name>Hejin Wang</name>
+    </author>
+    <author>
+      <name>Songtao Tian</name>
+    </author>
+    <author>
+      <name>Yexin Xie</name>
+    </author>
+    <author>
+      <name>Xiaojun Meng</name>
+    </author>
+    <author>
+      <name>Peng Yuan</name>
+    </author>
+    <author>
+      <name>Jiansheng Wei</name>
+    </author>
+    <author>
+      <name>Xuebo Liu</name>
+    </author>
+    <author>
+      <name>Zixiong Yu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07953v1</id>
+    <title>A Behavioural Framework for Predicting and Understanding Loss of Control in Frontier Artificial Intelligence Systems</title>
+    <updated>2026-11-05T12:49:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.07953v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07953v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Frontier artificial intelligence (AI) systems are increasingly operating over longer horizons with diminishing human oversight, raising the risk of loss of control: systems acting beyond effective human control with potentially irreversible consequences. Because such failures may become observable only after containment is difficult, they must be assessed prospectively. We introduce a behavioural framework that decomposes loss-of-control risk into three factors: misaligned motive, harm-enabling capability, and monitoring evasion. We operationalise these factors through 13 measurable aspects and 29 evaluation tasks, whose scores are combined into a single loss-of-control (LoC) score. Across 13 frontier models, the LoC score shows strong prospective validity, correlating with failure rates in contained long-horizon risk scenarios (Pearson r = 0.84). Risk varies systematically across models and cannot be explained by capability alone. We further show that the framework can guide targeted mitigations: fine-tuning and monitoring directed at diagnosed vulnerabilities reduce failure rates while largely preserving general performance. These results provide a practical basis for predicting, understanding, and mitigating loss-of-control risk before it materialises.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T12:49:20Z</published>
+    <arxiv:comment>39 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yao Huang</name>
+    </author>
+    <author>
+      <name>Yichi Zhang</name>
+    </author>
+    <author>
+      <name>Yifan Wang</name>
+    </author>
+    <author>
+      <name>Yitong Sun</name>
+    </author>
+    <author>
+      <name>Haoyu Dong</name>
+    </author>
+    <author>
+      <name>Jifan Ma</name>
+    </author>
+    <author>
+      <name>Jinzhe Tu</name>
+    </author>
+    <author>
+      <name>Xiaojian Li</name>
+    </author>
+    <author>
+      <name>Sören Mindermann</name>
+    </author>
+    <author>
+      <name>Wei Xu</name>
+    </author>
+    <author>
+      <name>Yinpeng Dong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07949v1</id>
+    <title>Beyond the Keyword: A Human-Annotated Benchmark for Arabic Anxiety-Related Discourse</title>
+    <updated>2026-11-05T12:45:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.07949v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07949v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Keyword retrieval returns expressions of personal anxiety together with many other uses of anxiety-related language. We present a benchmark of 1,000 Arabic Twitter/X posts retrieved with the keyword qalaq ("anxiety/worry") and annotated for six discourse functions. Two native Arabic-speaking annotators labeled every post independently, reaching 51.1% raw agreement (Cohen's $κ= 0.378$). We then reviewed all 489 disagreements and all 511 agreements under the same guidelines. The review changed 120 of the agreed labels (23.5%), which shows that agreements need auditing as well as disagreements. The final labels form a consensus reference; on a random sample of 200 posts, an additional annotator agreed with it on 60.5% of posts ($κ= 0.517$). Against this reference, Fanar-C-2-27B reaches 79.8% accuracy and macro-F1 0.784 ($κ= 0.749$). Its errors concentrate in the residual category (41.1% of errors; precision 0.905, recall 0.447), whose definition is internally inconsistent in the executed prompt, so the low recall cannot be attributed to the model alone. Sociopolitical Anxiety (27.1%) outnumbers Personal Emotional Expression (22.0%); these are assignment proportions in the sample, not estimates of prevalence or retrieval precision. We release the guidelines, a residual-subtype scheme, a fixed data split, label provenance, and evaluation code.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T12:45:49Z</published>
+    <arxiv:comment>13 pages, 1 figure, 6 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Shimaa Ibrahim</name>
+    </author>
+    <author>
+      <name>Mabrouka Bessghaier</name>
+    </author>
+    <author>
+      <name>Md. Rafiul Biswas</name>
+    </author>
+    <author>
+      <name>Insaf Elouard</name>
+    </author>
+    <author>
+      <name>Wajdi Zaghouani</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07947v1</id>
+    <title>ChemE-as-Code: An Open-Source Platform for Agentic AI in Chemical Engineering</title>
+    <updated>2026-11-05T12:45:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.07947v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07947v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>ChemE-as-Code provides an open-source environment in which AI agents built on large language models (LLMs) can carry out chemical engineering work and engineers can check it. Its calculation tools range from catalysis through process simulation to plant layout, HAZOP and life cycle assessment, and skills tell a general-purpose agent how to use them. Engineering files are linked, machine-readable and versioned in Git; calculations run outside the LLM, each value records its origin, and automated checks report inconsistencies and out-of-date results by file and line. In an illustrative ammonia case, agents developed a written task into a preliminary basic-engineering package (simulation files, P&amp;IDs, layout, HAZOP, datasheets, relief) for USD 224 of API cost in the design sessions. Planted faults and engineering changes show that the checks find what their rules cover and miss the rest, so they guide human review rather than replace it. No independent engineer has reviewed the design.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T12:45:28Z</published>
+    <arxiv:comment>28 pages, 4 figures, 5 tables; Supporting Information (28 pages) appended. Submitted to AIChE Journal. Code and data: https://github.com/ChemE-as-Code</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Artur M. Schweidtmann</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07945v1</id>
+    <title>tok: a textual concrete syntax of BPMN and DMN for humans and AI agents</title>
+    <updated>2026-11-05T12:42:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.07945v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07945v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>tok is a plain-text notation for Business Process Model and Notation (BPMN) 2.0.2 process models and Decision Model and Notation (DMN) 1.5 decisions. One engine checks a tok document against both standards, compiles the document to XML with an automatic diagram, and serves language-model applications through the Model Context Protocol. The paper classifies the notation as an alternative concrete syntax of the BPMN and DMN metamodels and reports one study. A tok model takes 2.2 times fewer tokens than the smallest BPMN XML of 893 files exported by 37 tools and 7.7 times fewer than the files as exported. The checker signals 98.2% of 1,411 injected faults, against 85.8% for the XML Schema with bpmnlint. Four language models new to tok write valid tok from a one-page reference for 85.7 to 100% of 87 process descriptions from two datasets and valid BPMN XML for every description, and the strongest model writes tok with 25% and 19% fewer tokens than BPMN XML. As agents with a lean skill and one checker tool, the models write valid tok for 97.6 to 100% of the descriptions, the strongest model spends 21% and 14% fewer tokens on tok than on BPMN XML, and a skill which sends the model to read the reference through a tool costs 1.7 to 2.8 times the tokens of the lean skill. Of 47 event logs simulated from public models, 44 fit their source models, and tok imports every model discovered from the logs.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T12:42:56Z</published>
+    <arxiv:comment>29 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Marek Deja</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07940v1</id>
+    <title>CardioLM: A multilingual suite of small language models for the cardiology domain</title>
+    <updated>2026-11-05T12:41:19Z</updated>
+    <link href="https://arxiv.org/abs/2611.07940v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07940v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Background: Cardiovascular care generates large volumes of clinical free-text documentation in local languages. However, clinical natural language processing (NLP) resources remain concentrated in English, and no existing benchmark is cardiology-specific, multilingual, and broad in entity coverage.
+  Methods: We present two contributions. The first is CardioCCC, a corpus of 508 cardiology case reports originally published in Spanish and extended to Czech, Dutch, English, Italian, Romanian, and Swedish through machine translation, annotation projection, and clinician review, with annotations covering diseases, symptoms, procedures, and medications. The second is CardioLM, comprising CardioBERTa, a set of language-specific encoders obtained by continued pretraining on cardiology and biomedical corpora, and CardioNER, a set of named entity recognition (NER) models fine-tuned on CardioCCC.
+  Results: Cardiology-specific pretraining reduced pseudo-perplexity by up to a factor of eight, yet changed strict span-level F1 by at most 0.04, with benefits concentrated in languages whose backbones lacked biomedical coverage. The jointly trained multilingual XLM-RoBERTa-large models achieved the best strict F1 in nearly every language and entity type, exceeding the strongest monolingual system by up to 0.13 F1. A large share of residual errors concerned boundary detection: relaxed matching recovered 0.10-0.23 F1 for disease, procedure, and symptom, but only 0.01-0.07 for medication. Clinicians rated CardioNER well above a rule- and dictionary-based baseline, with the mean rating across entity types rising from 26% to 73%.
+  Conclusions: Specialty-specific pretraining is not the decisive factor for downstream entity recognition, whereas multilingual joint training yields the strongest results in nearly all settings and a simpler deployment path for multi-country clinical information extraction.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T12:41:19Z</published>
+    <arxiv:comment>91 pages, 7 figures, 33 tables (9 in the main text, 23 in Appendix A, and 1 in Appendix B)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Manuela-Daniela Danu</name>
+    </author>
+    <author>
+      <name>Miguel Rodríguez-Ortega</name>
+    </author>
+    <author>
+      <name>Alberto Becerra-Tome</name>
+    </author>
+    <author>
+      <name>Pablo Arancibia</name>
+    </author>
+    <author>
+      <name>Fernando Gallego-Donoso</name>
+    </author>
+    <author>
+      <name>Lorenzo Pratesi</name>
+    </author>
+    <author>
+      <name>Xi Bai</name>
+    </author>
+    <author>
+      <name>Andrei-Damian Dinescu</name>
+    </author>
+    <author>
+      <name>Salvador Lima-López</name>
+    </author>
+    <author>
+      <name>Andrea Guala</name>
+    </author>
+    <author>
+      <name>Saskia Haitjema</name>
+    </author>
+    <author>
+      <name>Jonas Mack</name>
+    </author>
+    <author>
+      <name>Michele Miranda</name>
+    </author>
+    <author>
+      <name>Wesam Al Nabki</name>
+    </author>
+    <author>
+      <name>Jan Rodríguez-Miret</name>
+    </author>
+    <author>
+      <name>Vasile George Marica</name>
+    </author>
+    <author>
+      <name>Vladimír Kincl</name>
+    </author>
+    <author>
+      <name>Kateřina Dostálová</name>
+    </author>
+    <author>
+      <name>Michael Andrej</name>
+    </author>
+    <author>
+      <name>Alicia Ujil</name>
+    </author>
+    <author>
+      <name>Corinne Allaart</name>
+    </author>
+    <author>
+      <name>Machteld Boonstra</name>
+    </author>
+    <author>
+      <name>Malin Overmars</name>
+    </author>
+    <author>
+      <name>Anoop Shah</name>
+    </author>
+    <author>
+      <name>Giovanna Ceroni</name>
+    </author>
+    <author>
+      <name>Jonathan Kossoff</name>
+    </author>
+    <author>
+      <name>Domenico D'Amario</name>
+    </author>
+    <author>
+      <name>Renzo Laborante</name>
+    </author>
+    <author>
+      <name>Antonio Iaconelli</name>
+    </author>
+    <author>
+      <name>Isabella Fumarulo</name>
+    </author>
+    <author>
+      <name>Jacopo Lenkowicz</name>
+    </author>
+    <author>
+      <name>Livia Lilli</name>
+    </author>
+    <author>
+      <name>Emma Weiss</name>
+    </author>
+    <author>
+      <name>Alex Scafa</name>
+    </author>
+    <author>
+      <name>Felix Lindberg</name>
+    </author>
+    <author>
+      <name>Milou Gamage</name>
+    </author>
+    <author>
+      <name>Eulàlia Farré-Maduell</name>
+    </author>
+    <author>
+      <name>Sébastien Bratières</name>
+    </author>
+    <author>
+      <name>Martin Krallinger</name>
+    </author>
+    <author>
+      <name>Bram van Es</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07931v1</id>
+    <title>How Generative AI Redefines Personalization and Diversity in the Newsroom</title>
+    <updated>2026-11-05T12:36:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.07931v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07931v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The tension between news personalization and information diversity has traditionally been understood as a matter of different content reaching different people, with diversity evaluated by the range of sources, topics, and perspectives to which audiences are exposed. Generative AI outdates this understanding, since it transforms personalization in two ways: how journalists adapt news to audiences and how the AI tools journalists use personalize content production to their own preferences. Drawing on 16 semi-structured interviews with media professionals across public service, commercial, and state-affiliated news settings, we examine how these practices reshape editorial judgment and the conditions under which news diversity is produced. We find that participants negotiate AI integration by maintaining authority over meaning while delegating aspects of content presentation. Yet the tools they adapt for their own work also mediate which sources and perspectives become available, introducing diversity-relevant decisions that remain largely invisible to organizational oversight. While participants anticipate diversity risks in audience-facing personalization, they predominantly interpret diversity-imposed limitations in their own tools as technical problems. As a result, decisions that shape news diversity increasingly occur before publication and across multiple versions of a story, where neither evaluation of published items nor human approval can readily observe them. Journalists thus remain formally responsible for outcomes shaped by decisions they cannot fully see or control. Our findings highlight that safeguarding news diversity requires looking beyond published content to the professional practices, infrastructures, and distributions of control that shape it.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T12:36:38Z</published>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Cheng Yu</name>
+    </author>
+    <author>
+      <name>Jim Chi</name>
+    </author>
+    <author>
+      <name>Aaron J. Snoswell</name>
+    </author>
+    <author>
+      <name>Orestis Papakyriakopoulos</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07926v1</id>
+    <title>AraEngage: Interpretable Linguistic Correlates of Engagement in Arabic Facebook News</title>
+    <updated>2026-11-05T12:32:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.07926v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07926v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Engagement features developed for English are routinely applied to Arabic, but unvocalized Arabic changes what a lexical feature measures. We introduce AraEngage, a query-defined sample of 10,000 public Arabic Facebook news posts from 2,451 pages in 57 countries (2023-2024) that pairs engagement counts with interpretable linguistic features. We use it to examine which interpretable Arabic indicators are associated with follower-normalized engagement, and how far those associations can be trusted given publisher context, the definition of engagement, and lexical ambiguity. Religious expressions, message length, sentence length, and lexical density are the leading correlates in a Random Forest model ($R^2$ = 0.38 on a post-level split) interpreted with SHAP. Unlike English news, positive sentiment is associated with higher engagement in this Arabic news sample. Message length shows a length paradox: unadjusted raw engagement is highest for long posts, whereas the model's attributions for follower-normalized engagement favor short posts. A linguistic audit identifies why standard lexicon features are fragile in unvocalized Arabic: imperative lists contain homographs such as the form read as "express!" that is also the frequent preposition "via", hedge lists conflate the possibility marker qad + imperfect ("may") with the emphatic qad + perfect ("has indeed"), and religious lists mix devotional formulas with place names in political news. These are plausible sources of measurement error that may attenuate the near-zero associations of imperatives and hedges. All findings are observational associations with operationalized indicators. We release the derived linguistic features, engagement counts, refined lexicons, and analysis code; raw posts are not redistributed, in line with CrowdTangle terms.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T12:32:25Z</published>
+    <arxiv:comment>13 pages, 4 figures, 8 tables. To appear in ArabicNLP 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Shimaa Ibrahim</name>
+    </author>
+    <author>
+      <name>Nour Elhouda Dalloua</name>
+    </author>
+    <author>
+      <name>Md. Rafiul Biswas</name>
+    </author>
+    <author>
+      <name>Wajdi Zaghouani</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07920v1</id>
+    <title>How Finite Brains Generalize Without Bound: Spatial Memory as a Universal Computer</title>
+    <updated>2026-11-05T12:30:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.07920v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07920v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A child who learns to add small numbers adds numbers of any length. LSTMs and Transformers trained on short sequences fail on longer ones. We trace the difference to what a learner reads when it decides. A position, a count or a time keeps taking new values as the input grows: it is a coordinate, and a learner that reads one meets in every long input values its experience never covered. Whether two things are the same has the same two answers at every size: it is a coincidence, and a learner that reads only coincidences finds in a long input nothing that short inputs lacked, so finite experience fixes its rule for every size. The memory carries the size of the input and the rule stays finite, and this determines the memory a generalizing brain can have: a memory that grows while what the learner reads of it stays finite has to look the same from every place, so it is made of cycles, and the past is reached by asking what happened when the cycles last stood where they stand now. The cycles are the grid modules, the cells that detect their return the place cells, the records the hippocampal index; a prefrontal controller moves the cycles and never sees them. Reading only coincidences costs no power: what finite experience fixes in such a learner is what Turing machines compute in step with their input, which is why a circuit that evolved to find the way home can learn arithmetic and grammar. In a network of neurons this machine of cycles is the dynamics seen through its symmetry, and symbols are its invariants. Trained on strings up to 40 symbols, the machine is at least 99% correct, on average over lengths 41 to 500, on nine of fifteen benchmark tasks, five of them tasks that no LSTM or Transformer solves; given new cycles after training it reverses strings of 15,015 symbols without error and fails beyond that on the curve the theory predicts; and its controllers run unchanged on neurons.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T12:30:06Z</published>
+    <arxiv:comment>57 pages, including appendices</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yuhang He</name>
+    </author>
+    <author>
+      <name>Si Wu</name>
+    </author>
+  </entry>
+</feed>

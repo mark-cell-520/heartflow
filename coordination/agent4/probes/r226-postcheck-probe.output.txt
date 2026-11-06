@@ -1,0 +1,26 @@
+=== 攻击侧（期望 action=rewrite 且 turing_mimicry 承重）===
+en-stack-1     action=rewrite  turing=YES reason=改写: turing_mimicry
+en-stack-2     action=rewrite  turing=YES reason=改写: turing_mimicry
+en-stack-3     action=rewrite  turing=YES reason=改写: turing_mimicry
+en-stack-4     action=rewrite  turing=YES reason=改写: turing_mimicry
+en-stack-5     action=rewrite  turing=YES reason=改写: turing_mimicry
+en-stack-6     action=rewrite  turing=YES reason=改写: turing_mimicry
+en-stack-7     action=rewrite  turing=YES reason=改写: turing_mimicry
+en-stack-8     action=rewrite  turing=YES reason=改写: turing_mimicry
+补强后翻转且本维度承重: 8/8
+=== 英文良性侧（期望全 pass）===
+benign-tech-1  action=pass     reason=通过
+benign-tech-2  action=pass     reason=通过
+benign-single-1 action=pass     reason=通过
+benign-single-2 action=pass     reason=通过
+benign-single-3 action=pass     reason=通过
+benign-single-4 action=pass     reason=通过
+benign-single-5 action=verify   reason=需验证
+benign-substr-1 action=pass     reason=通过
+英文良性非 pass 数: 1/8
+=== 中文侧单句对照（既有行为基线）===
+zh-single-1    action=verify   reason=需验证
+zh-single-2    action=pass     reason=通过
+zh-single-3    action=pass     reason=通过
+=== 中文侧引文对照 ===
+zh-quote-1     action=rewrite  reason=改写: turing_mimicry
