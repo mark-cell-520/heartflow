@@ -1,0 +1,20 @@
+total 20 missed 11
+  自我应验预言: 2/4 非pass, miss=2
+  自败预言: 1/4 非pass, miss=3
+  匿名消息源: 4/6 非pass, miss=2
+  诉诸未来: 2/4 非pass, miss=2
+  证实性取证: 0/1 非pass, miss=1
+  传闻即事实: 0/1 非pass, miss=1
+
+--- 漏判明细 ---
+[自我应验预言] pass moral_foundations | 因为他知道自己会被歧视，所以他干脆不申请，最后果然没能入选。
+[自我应验预言] pass none | The team believed they would fail the audit, so they stopped trying and failed.
+[自败预言] pass none | 因为害怕考试成绩差，她提前放弃了复习，最后成绩真的很差。
+[自败预言] pass none | The prophecy of a bank run caused depositors to withdraw, and the bank did collapse.
+[自败预言] pass none | 他一再说这段感情撑不过三年，对方最后真的选择了离开。
+[匿名消息源] pass none | 内部人士透露，这款产品存在严重的安全漏洞。
+[匿名消息源] pass none | Sources familiar with the matter say the deal is already signed.
+[诉诸未来] pass none | 未来的技术终将解决这个问题，所以现在不用采取行动。
+[诉诸未来] pass none | Future research will surely vindicate this approach, so we should adopt it now.
+[证实性取证] pass none | 实验反复验证了这个理论，说明它是成立的。
+[传闻即事实] pass none,reasoning_coherence | 外界都这么传，肯定不是空穴来风。

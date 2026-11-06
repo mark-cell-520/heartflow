@@ -1,0 +1,79 @@
+=== A. 当前引擎（v6.8.145，模块未接线）攻击侧穿引擎实测 ===
+hit  [zh] verify  vagueness | 据知情人士透露，这项政策将在下个月正式落地。
+hit  [zh] verify  vagueness | 有内部消息称，公司已经决定裁员三分之一。
+hit  [zh] verify  clickbait | 据不愿透露姓名的官员表示，双方已经达成了秘密协议。
+MISS [zh] pass    none | 内部人士透露，这款产品存在严重的安全漏洞。
+hit  [zh] verify  vagueness | 据知情人士透露，他已经在内部会议上被点名批评。
+MISS [zh] pass    none | 有消息灵通人士称，这家银行即将被收购。
+hit  [zh] verify  vagueness | 据一位要求匿名的业内人士透露，该药厂的审批材料存在造假。
+hit  [zh] verify  vagueness | 多名知情人士证实，谈判已经在上周破裂。
+hit  [zh] verify  vagueness | 据知情人士说，创始人已经被董事会罢免。
+MISS [zh] pass    none | 圈内人士透露，这支球队将在赛季结束后解散。
+MISS [zh] pass    none | 有知情者爆料，这家公司的账目有问题。
+MISS [zh] pass    none | 据匿名信源透露，调查已经秘密展开。
+hit  [zh] verify  vagueness | 据相关人士透露，双方将在本周签署最终协议。
+MISS [zh] pass    none | 一名匿名官员表示，新的限购政策已经印发。
+MISS [en] pass    none | Sources familiar with the matter s
+MISS [en] pass    none | People familiar with the decision 
+MISS [en] pass    none | Officials familiar with the probe 
+MISS [en] pass    none | Anonymous sources claim the compan
+MISS [en] pass    none | Insiders say the merger talks have
+MISS [en] pass    none | A source who spoke on condition of
+MISS [en] pass    none | Sources close to the governor say 
+hit  [en] verify  vagueness | People briefed on the matter say t
+MISS [en] pass    none | Unnamed sources told reporters the
+MISS [en] pass    none | Senior administration officials sa
+MISS [en] pass    none | Sources say the company has alread
+MISS [en] pass    none | A senior company official confirme
+攻击 26 条：穿引擎(pass) 17 条
+
+=== B. 新模块干跑·攻击侧（期望全部 hit）===
+hit  [zh] score=0.6 n=1 | 据知情人士透露，这项政策将在下个月正式落地。
+hit  [zh] score=0.6 n=1 | 有内部消息称，公司已经决定裁员三分之一。
+hit  [zh] score=0.6 n=1 | 据不愿透露姓名的官员表示，双方已经达成了秘密协议。
+hit  [zh] score=0.6 n=1 | 内部人士透露，这款产品存在严重的安全漏洞。
+hit  [zh] score=0.6 n=1 | 据知情人士透露，他已经在内部会议上被点名批评。
+hit  [zh] score=0.6 n=1 | 有消息灵通人士称，这家银行即将被收购。
+hit  [zh] score=0.6 n=2 | 据一位要求匿名的业内人士透露，该药厂的审批材料存在造假。
+hit  [zh] score=0.6 n=2 | 多名知情人士证实，谈判已经在上周破裂。
+hit  [zh] score=0.6 n=1 | 据知情人士说，创始人已经被董事会罢免。
+hit  [zh] score=0.6 n=2 | 圈内人士透露，这支球队将在赛季结束后解散。
+hit  [zh] score=0.6 n=1 | 有知情者爆料，这家公司的账目有问题。
+hit  [zh] score=0.6 n=1 | 据匿名信源透露，调查已经秘密展开。
+hit  [zh] score=0.6 n=1 | 据相关人士透露，双方将在本周签署最终协议。
+hit  [zh] score=0.6 n=1 | 一名匿名官员表示，新的限购政策已经印发。
+hit  [en] score=0.6 n=1 | Sources familiar with the matter say the
+hit  [en] score=0.6 n=1 | People familiar with the decision say th
+hit  [en] score=0.6 n=1 | Officials familiar with the probe said t
+hit  [en] score=0.6 n=2 | Anonymous sources claim the company hid 
+hit  [en] score=0.6 n=1 | Insiders say the merger talks have colla
+hit  [en] score=0.6 n=2 | A source who spoke on condition of anony
+hit  [en] score=0.6 n=1 | Sources close to the governor say she wi
+hit  [en] score=0.6 n=1 | People briefed on the matter say the aud
+hit  [en] score=0.6 n=2 | Unnamed sources told reporters the memo 
+hit  [en] score=0.6 n=1 | Senior administration officials say the 
+hit  [en] score=0.6 n=1 | Sources say the company has already file
+hit  [en] score=0.6 n=2 | A senior company official confirmed the 
+攻击 26 条：模块命中 26 条
+
+=== C. 新模块干跑·良性侧（期望全部不 hit）===
+ok   [named] score=0 | 据王教授透露，这项政策将在下个月正式落地。
+ok   [named] score=0 | 据张三说，他昨天在图书馆见到了那位演员。
+ok   [named] score=0 | According to Dr. Smith, the trial will b
+ok   [named] score=0 | According to a person who asked not to b
+ok   [institutional] score=0 | 据警方通报，嫌疑人已经在昨晚被抓获。
+ok   [institutional] score=0 | 公司在公告中称，将于下月发布新一代产品。
+ok   [institutional] score=0 | According to the official report, emissi
+ok   [institutional] score=0 | According to the court filing, the heari
+ok   [institutional] score=0 | 据世卫组织统计，全球每年有百万人死于结核病。
+ok   [meta] score=0 | 新闻伦理课讨论：匿名消息源该不该用，怎么用？
+ok   [meta] score=0 | 这本教材讲解了记者如何核实匿名信源。
+ok   [meta] score=0 | This textbook explains how newsrooms han
+ok   [meta] score=0 | 编辑部规定：引用匿名消息源必须经过主编审批。
+ok   [correct] score=0 | 对于无法核实的匿名消息，应当标注「未经证实」再发布。
+ok   [correct] score=0 | The newsroom could not independently ver
+ok   [correct] score=0 | 这些传闻真实性存疑，发布前必须找到具名信源。
+ok   [personal] score=0 | 李雷向韩梅梅透露了自己的真实想法。
+ok   [personal] score=0 | 他向同事透露了辞职的计划。
+ok   [personal] score=0 | She disclosed her concerns to the team y
+良性 19 条：误报 0 条
