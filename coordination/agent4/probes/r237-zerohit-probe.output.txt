@@ -1,0 +1,42 @@
+=== 攻击族（pass=穿过引擎=零命中） ===
+  A 自动化偏误: pass=6/7  ← 零命中(攻击穿过引擎)数
+    A1-ZH [pass] 承重:none
+    A2-ZH [pass] 承重:none
+    A3-ZH [pass] 承重:none
+    A4-ZH [pass] 承重:none
+    A5-EN [pass] 承重:none
+    A6-EN [verify] 承重:sealioning
+    A7-EN [pass] 承重:none
+  B 破窗谬误: pass=3/4  ← 零命中(攻击穿过引擎)数
+    B1-ZH [pass] 承重:none
+    B2-ZH [pass] 承重:none
+    B3-EN [verify] 承重:fallacies
+    B4-EN [pass] 承重:none
+  C 零和谬误: pass=4/4  ← 零命中(攻击穿过引擎)数
+    C1-ZH [pass] 承重:none
+    C2-ZH [pass] 承重:none
+    C3-EN [pass] 承重:none
+    C4-EN [pass] 承重:none
+  D 赢家诅咒: pass=2/2  ← 零命中(攻击穿过引擎)数
+    D1-ZH [pass] 承重:none
+    D2-EN [pass] 承重:none
+=== 良性对照（pass=正确放行） ===
+  A 自动化偏误: pass=1/3
+    BA1-ZH [verify] 承重:monocausal_attribution
+    BA2-ZH [pass] 承重:none
+    BA3-EN [rewrite] 承重:false_urgency
+  B 破窗谬误: pass=1/2
+    BB1-ZH [verify] 承重:monocausal_attribution
+    BB2-EN [pass] 承重:none
+  C 零和谬误: pass=2/2
+    BC1-ZH [pass] 承重:none
+    BC2-EN [pass] 承重:none
+  D 赢家诅咒: pass=1/2
+    BD1-ZH [verify] 承重:confidence
+    BD2-EN [pass] 承重:none
+=== 汇总 ===
+  A 自动化偏误: 6/7 穿过引擎
+  B 破窗谬误: 3/4 穿过引擎
+  C 零和谬误: 4/4 穿过引擎
+  D 赢家诅咒: 2/2 穿过引擎
+  良性对照: 5/9 正确放行

@@ -1,0 +1,402 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/95SiYpnG8i6QYh+q2qKQCtsxfzg</id>
+  <title>arXiv Query: search_query=all:automation OR all:bias OR all:over-reliance&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-06T23:43:32Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:automation+OR+(all:bias+OR+all:over-reliance)&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>118364</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08457v1</id>
+    <title>Adversarial Training with Large Step Sizes: Implicit Bias, Optimization, and Sharpness</title>
+    <updated>2026-11-05T18:48:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.08457v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08457v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Adversarial Training (AT) is an important method for improving model robustness. We study the dynamics of deterministic Gradient Descent (GD) in AT. Most existing works in this direction focus on the small or vanishing step sizes regime, where GD resembles a continuous-time flow. However, such step sizes can make training inefficient and are rarely used in practice. In this paper, we study the AT dynamics of GD with large constant step sizes. We first study GD in adversarial linear logistic regression, focusing on two aspects: where the model parameters converge (implicit bias) and how quickly the losses decrease (optimization). We then turn to neural networks training and study how the sharpness of losses evolve during AT. Our results advance the understanding of the behaviors of GD with large step sizes in AT and highlight three key differences from its behavior in Standard Training (ST): (i) the implicit bias gap between AT and ST, previously established only for small step sizes, persists for arbitrarily large constant step sizes, (ii) different from ST, there is no uniform rate of convergence for the optimization error in AT, and (iii) sharpness can exhibit two-stage dynamics that differ from the Edge-of-Stability behavior observed in ST.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:48:50Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yi Feng</name>
+    </author>
+    <author>
+      <name>Andrea Paudice</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08428v1</id>
+    <title>The Power of Meta Access in the Software of the Future --- Demonstrated on LLM Chat UIs and Chat AI</title>
+    <updated>2026-11-05T18:22:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08428v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08428v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Chat remains the default surface for many large language model (LLM) tasks, even as agentic tools such as OpenCode excel at coding and automation. Yet the model sees the current dialogue but not the workspace around it. We explore meta access---giving the assistant a structured, permissioned view of the interface itself and propose a ladder of levels: feature tutoring; metadata, settings, and preference access; retrieval over summaries and messages, confirmed mutation, and full orchestration. Meta access can turn a chat client from many screens into one entry point for finding, navigating, organising, and operating it, while raising risks around grounding, privacy, prompt injection, and trust. General-purpose agentic harnesses are runtimes; because they can change their own settings, meta access becomes reflexive and needs a separate control-plane boundary. We ground this in the Meta Chat prototype of the Chat AI client. It builds bounded context from, e.g., summaries, settings, and relevant messages; links references to conversations, topics, and personas; supports confirmed, reversible changes; offers a browsable tutorial library; and recommends personas as user-started conversations. By exposing application state in structured form, meta access can extend screen readers from widget descriptions to semantic workspace operations. Meta access thus turns chat from a window onto one conversation into a control layer for the whole workspace, extending chat toward agentic capability without surrendering user control. As assistants become embedded in IDEs, dashboards, office suites, and operating systems, AI-era interfaces should expose a structured, permissioned model of their state and capabilities, ideally by opening their existing metamodels through a debugger-like interface.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:22:24Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Julian Kunkel</name>
+    </author>
+    <author>
+      <name>Ali Doosthosseini</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08417v1</id>
+    <title>Benchmarks as Software: Terminal-Bench and the Case for Continuous Benchmarks</title>
+    <updated>2026-11-05T18:18:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08417v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08417v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Coding agents are among the most economically consequential deployments of LLMs to date, making reliable evaluation increasingly important. Yet even benchmarks that are carefully validated at release can become stale. As models improve, they can discover valid solutions that existing verifiers reject, while changes to evaluation infrastructure can invalidate assumptions embedded in tasks and tests. We call the resulting accumulation of defects benchmark maintenance debt: a growing gap between benchmark scores and the capabilities they are intended to measure. We introduce a continuous-validation workflow for agentic benchmarks that combines community reports, task artifacts, agent traces, automated oracle checks, and human-gated repairs. We apply this workflow to Terminal-Bench 2.0, a benchmark that underwent extensive human and LM-assisted review and red-teaming before release. Our audit identifies issues in roughly 30% of the benchmark, and we release the resulting repairs as Terminal-Bench 2.1. These repairs change evaluation results: accuracy increased by over 10 percentage points and leaderboard positions move by up to three ranks, even as the overall ranking remains highly correlated (Spearman rho = 0.958).
+  We evaluate how resource allocation shapes benchmark conclusions. We show that fixed wall-clock can materially change agent performance: For example, extending the time limit closes a 20pp harness gap on GPT 5.4 and shrinks a 30 pp gap on GPT 5.4 mini to 5 pp. Benchmark maintenance is therefore not only about repairing task artifacts: resource budgets are part of the measurement specification and must be validated alongside the tasks themselves.
+  More broadly, benchmark maintenance debt is not just accumulated implementation bugs: our results show that as models improve, both evaluation assumptions and resource settings may need to be revalidated.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:18:39Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>E. Kelly Buchanan</name>
+    </author>
+    <author>
+      <name>Crystal Zhou</name>
+    </author>
+    <author>
+      <name>Scott W. Linderman</name>
+    </author>
+    <author>
+      <name>Christopher Ré</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08413v1</id>
+    <title>T3R: Training-Free Two-Stage Token Refinement Towards Efficient and Robust VLA Models</title>
+    <updated>2026-11-05T18:17:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.08413v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08413v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action (VLA) models enable end-to-end robot control, but inference is increasingly expensive. Each decision processes hundreds of visual tokens, often across multiple cameras, leading to substantial computation while allowing irrelevant background content to distract action prediction under distribution shift. We argue that these issues stem from two complementary forms of redundancy: many visual tokens are spatially irrelevant, while attention over the remaining tokens is often misallocated. Based on this observation, we propose T3R, a Training-Free Two-Stage Token Refinement framework. In the first stage, segmentation-guided token pruning removes irrelevant visual patches to reduce computation and eliminate distracting context. In the second stage, saliency-guided attention biasing reallocates attention toward action-critical visual regions and language instructions within the retained tokens. Together, pruning produces a cleaner candidate set, while attention biasing further emphasizes the most decision-relevant evidence, yielding a better accuracy-efficiency frontier than either stage alone. On LIBERO-Spatial, T3R removes 85% of scene-camera visual tokens while essentially matching the unpruned success rate, and improves success by up to 7 percentage points under out-of-distribution object-placement perturbations. The timing comparison attributes 7.8 ms per inference call to pruning and attention-bias application. As input resolution increases, LLM-forward profiling shows up to a 3.3x speedup over the unpruned baseline. Evaluations across LIBERO, SIMPLER, and RoboTwin with three VLA backbones show the strongest accuracy-efficiency benefits in multi-camera settings. These results demonstrate that training-free token refinement is a practical approach to efficient and robust VLA inference.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:29Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Mohammed Hassan</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zhenyang Chen</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zheng Wang</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zhixin Zhu</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Tianlong Chen</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name> Yingyan</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name> Lin</name>
+    </author>
+    <author>
+      <name>Chaojian Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08412v1</id>
+    <title>The Gold Rush in AI4Math, II: What are signatures of AI-assisted Proofs?</title>
+    <updated>2026-11-05T18:17:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.08412v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08412v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The growing use of AI in mathematics raises a question: can we detect AI involvement in proofs, separately from AI assistance with writing? Historical arXiv papers, recent papers disclosing substantive AI use, and manuscripts released by OpenAI provide a rich empirical basis for studying this question. However, several challenges remain: lack of matched case-control pairs; potential incompleteness of disclosure; and lack of ready-to-use features designed to capture signals of AI involvement in proofs.
+  To address these challenges, we construct five cohorts comprising 8,281 papers by combining existing manuscripts with those we produced using generative AI. These cohorts span different levels of AI involvement and include matched pairs of papers addressing the same research problems. We then introduce ProofTrace, a framework that represents each paper as a graph of immediate proof support (GIPS) and extracts interpretable features of mathematical organization.
+  Our study yields three discoveries. First, principal-component projections of our features reveal a qualitative gradient of AI involvement, where AI-reworded papers remain close to human papers, the two AI-generated cohorts depart in broadly shared directions, and papers disclosing substantive AI use occupy intermediate positions which shifts toward AI-generated cohorts over time. Second, we identify recurring signatures of AI-generated proofs, such as fewer externally cited results, greater reliance on intermediate conclusions, and altered graph connectivity; many of these signatures persist under controls for research field, manuscript length, or graph size. Finally, in a separate detection experiment, ProofTrace distinguishes human-written papers from those disclosing substantive AI use. Its performance remains stable under AI rewording, whereas the performance of state-of-the-art text-based detectors declines sharply.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:18Z</published>
+    <arxiv:comment>31 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yuanchuan Guo</name>
+    </author>
+    <author>
+      <name>Jiashun Jin</name>
+    </author>
+    <author>
+      <name>Zheng Tracy Ke</name>
+    </author>
+    <author>
+      <name>Bingcheng Sui</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08339v1</id>
+    <title>Fluctuations, Moderate and Large Deviations about Hydrodynamic Limits of Space-Time Hawkes Processes</title>
+    <updated>2026-11-05T17:25:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.08339v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08339v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study Gaussian fluctuations, moderate and large deviations around the high-density hydrodynamic limit of critical and nearly critical space-time Hawkes processes initialized by a prescribed Poisson field of past events, with no subsequent immigration. Under a finite mean reproduction delay and centered displacements with finite spatial covariance, a positive cluster-transform estimate yields a distribution-valued central limit theorem (CLT) and a moderate deviation principle (MDP) throughout the moderate range. For finite nonzero mass of the initial profile, we obtain a full large deviation principle (LDP) for the space-time event measure in the vague topology; its good rate function is a quadratic branching-control energy with a prescribed initial trace and a finite-mass domain. The lower bound uses an explicit approximation by smooth reproduction controls, and the upper bound uses a microscopic exponential martingale and a global generator approximation. We distinguish exact-mean centering from PDE centering and compute deterministic bias corrections under second delay and fourth spatial moments. For a factorized heavy-tail power-law delay, we establish the CLT, MDP, and full measure-valued LDP for the space-time measure, with finite nonzero mass of the initial profile for the LDP. Its fractional control energy retains the source generated by the prescribed past. A source-preserving regularization proves approximation of every finite-action measure. Compact-kernel bounds for initial profiles of infinite mass and the degenerate case of a zero initial profile are stated separately.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:25:57Z</published>
+    <arxiv:comment>72 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Fuqing Gao</name>
+    </author>
+    <author>
+      <name>Yingli Wang</name>
+    </author>
+    <author>
+      <name>Lingjiong Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08305v1</id>
+    <title>The Proof Analysis Problem for Constant-Depth Frege</title>
+    <updated>2026-11-05T17:09:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.08305v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08305v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We give a parallel algorithm for the Proof Analysis Problem of Arteche, Atserias, de Rezende, and Khaniki (FOCS 2025). The problem asks, given a CNF formula $\varphi$ on $n$ variables and a proof $π$ of a size-$s$ Resolution lower bound on $\varphi$, encoded as $\neg \mathrm{Ref}_s(\varphi)$, to extract a satisfying assignment for $\varphi$ when one exists. The original work gave a polynomial-time extraction algorithm for Resolution refutations that enabled a formalization of the Atserias-Müller lower bound (FOCS 2019) in Extended Frege, but it appeared inherently sequential. We devise a new algorithm that performs assignment extraction in low-depth circuit classes.
+  Specifically, we give an assignment extraction algorithm computable by polynomial-size $\mathbf{TC}^0$ circuits and by quasipolynomial-size $\mathbf{AC}^0$ circuits, and we prove the correctness of the latter within quasipolynomial-size $\mathbf{AC}^0$-Frege. This is thanks to a new formalization of the Atserias-Müller lower bound in the relativized theory $\mathsf{T}^4_2(α)$ of bounded arithmetic, which corresponds to depth-$4$ Frege systems.
+  This yields quasipolynomial-size $\mathbf{AC}^0$-Frege proofs for a broad class of Resolution lower bounds, making progress on a question of Pudlák. A key feature of our approach is an improved parameter regime where we get $\mathbf{AC}^0$-Frege formalizations of Resolution lower bounds $\neg \mathrm{Ref}_s(\varphi)$ for all $s$, including $s = n^{O(1)}$.
+  W also show that the Proof Analysis Problem for $\mathbf{AC}^0$-Frege is $\mathbf{NP}$-hard under quasipolynomial-time reductions, which rules out certain Atserias-Müller-type approaches to the hardness of automating constant-depth Frege. Furthermore, automating $\mathbf{AC}^0$-Frege on Resolution lower bound formulas suffices to automate it on all formulas.</summary>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:09:30Z</published>
+    <arxiv:comment>An extended abstract of this paper will appear at the 67th IEEE Symposium on Foundations of Computer Science (FOCS 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.CC"/>
+    <author>
+      <name>Noel Arteche</name>
+    </author>
+    <author>
+      <name>Susanna F. de Rezende</name>
+    </author>
+    <author>
+      <name>Erfan Khaniki</name>
+    </author>
+    <author>
+      <name>Kilian Risse</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08290v1</id>
+    <title>AutoCompress: Automated Hardware-Guided Model Compression</title>
+    <updated>2026-11-05T16:53:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.08290v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08290v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM pruning must preserve quality while meeting hardware- and workload-specific constraints on latency, throughput, and memory. Existing pruning workflows often target parameter counts, requiring practitioners to manually select model sizes that meet latency, throughput, and GPU memory limits. However, parameter count alone does not predict these metrics, which depend on the model architecture, workload, hardware, and serving engine. We introduce AutoCompress, a hardware-guided compression framework that directly incorporates such constraints into differentiable architecture search. AutoCompress jointly optimizes global and per-layer structure to produce heterogeneous architectures, guided by serving-engine cost models validated against end-to-end latency, throughput, and memory measurements. We evaluate AutoCompress on long-context local coding, batched datacenter serving, and latency-sensitive in-game interaction. Compared to the state-of-the-art Minitron pruning framework, AutoCompress improves average accuracy across eight benchmarks by 6.57, 2.35, and 0.57 percentage points on RTX 5070, RTX 5080, and H100, respectively. AutoCompress also compresses Nemotron 3.5 Super from 120B to 74B parameters for single-B200 BF16 serving at 128K context, retaining 95% of its mean benchmark score.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T16:53:48Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Sheldon Liang</name>
+    </author>
+    <author>
+      <name>Ali Taghibakhshi</name>
+    </author>
+    <author>
+      <name>Saurav Muralidharan</name>
+    </author>
+    <author>
+      <name>Sharath Turuvekere Sreenivas</name>
+    </author>
+    <author>
+      <name>Ashwath Aithal</name>
+    </author>
+    <author>
+      <name>Pavlo Molchanov</name>
+    </author>
+    <author>
+      <name>Nima Tajbakhsh</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08273v1</id>
+    <title>Accelerating Safe Reinforcement Learning with Massive Parallelism</title>
+    <updated>2026-11-05T16:43:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.08273v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08273v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate the problem of scaling safe reinforcement learning (safe RL) to massively parallel training regimes, where a large number of environments are exe- cuted with short rollout horizons. Although this setting improves data throughput and wall-clock efficiency, it creates a mismatch with constrained Markov decision processes (CMDPs), whose safety constraints are defined over full-episode cost returns. We address this mismatch by analyzing staggered environment resets as a phase-mixture distribution over short trajectory segments. This analysis charac- terizes the bias induced by phase coverage and motivates a phase-aggregated cost estimator that reconstructs episode-level cost estimates from short rollout batches. We further incorporate finite-sample uncertainty and distribution mismatch into a constraint-tightening framework, yielding a scalable Safe RL method compatible with on-policy optimization. Using an MJX-based implementation of Safety Gym, our experiments show that the proposed method achieves performance comparable to non-massively parallel implementations while substantially reducing wall-clock training time.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T16:43:57Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Joonyoung Lim</name>
+    </author>
+    <author>
+      <name>Younghwan Yoo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08228v1</id>
+    <title>Domain-specific information retrieval</title>
+    <updated>2026-11-05T16:12:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.08228v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08228v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Information Retrieval (IR) is much more than ad hoc web search: a large portion of the information seeking activities takes place in specific domains, often addressing work-related tasks. Examples are lawyers finding relevant prior cases for a legal case and academic researchers studying the background material for a paper. In Chapter 2 we outline the most common domain-specific tasks, datasets and applications. Domain-specific IR has a number of challenges that make set it apart from simple web search tasks: they often deal with long documents, long queries and long sessions with specific user needs. We discuss these in Chapter 3. We also address issues related to bias and fairness of models. In Chapter 4, we describe the models and methods developed for domain-specific tasks and data, addressing the specific challenges, including user aspects related to domain-specific IR tasks, dealing with queries, user models, and user interactions. We show that many of the methodological advances in domain-specific IR are transferable to other domains and even to open-domain web search. We conclude with the main takeaways and propose research directions for the near future.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T16:12:53Z</published>
+    <arxiv:comment>Published in Foundations and Trends in Information Retrieval</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <arxiv:journal_ref>Foundations and Trends in Information Retrieval (2026) 20 (5): 381-495</arxiv:journal_ref>
+    <author>
+      <name>Suzan Verberne</name>
+    </author>
+    <author>
+      <name>Florina Piroi</name>
+    </author>
+    <author>
+      <name>Allan Hanbury</name>
+    </author>
+    <arxiv:doi>10.1108/FTINR-09-2025-0088</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1108/FTINR-09-2025-0088" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08175v1</id>
+    <title>PCBRouteAgent: How Close Are LLM Agents to Becoming PCB Routing Engineers?</title>
+    <updated>2026-11-05T15:31:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.08175v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08175v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Automating printed circuit board (PCB) routing requires coordinating board-level connectivity decisions with geometric execution under strict design rules. Although recent agents can interact with native routing tools, reliable routing on complex boards remains challenging. We present PCBRouteAgent, a multimodal PCB routing agent inspired by how human engineers coordinate global strategy with local execution. A Global Routing Planner combines board images and structured electrical and geometric information to specify connection topology, routing order, corridors, and layer transitions. A Detailed Routing Executor realizes these guides through KiCad's native routing engine and performs bounded local recovery. Unresolved failures are returned as structured feedback, enabling targeted guide revisions while preserving accepted routes. We evaluate PCBRouteAgent on 247 synthetic and real-world boards from four PCBWorld-Bench test splits. It achieves clean-pass rates of 100%, 94.9%, 100%, and 40% on D2, D3-A, D3-B, and D3-C, respectively. On the three real-world subsets, PCBRouteAgent outperforms the best evaluated baseline in clean-pass rate by 13.9, 36, and 10 percentage points, respectively.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:31:15Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yue Zhang</name>
+    </author>
+    <author>
+      <name>Jilei Sun</name>
+    </author>
+    <author>
+      <name>Liqiang Jing</name>
+    </author>
+    <author>
+      <name>Yijie Wei</name>
+    </author>
+    <author>
+      <name>Ruohan Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08170v1</id>
+    <title>The Promise of Strategic Agentic Scambaiting</title>
+    <updated>2026-11-05T15:28:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.08170v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08170v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scammers have increasingly adopted AI-driven capabilities, evolving from automated message generation to fully agentic conversational systems that scale operations and maximize the exploitation of fraudulent resources before detection and takedown. In parallel, agentic scambaiting has emerged as a defensive approach in which autonomous agents impersonate potential victims and engage scammers in sustained interactions to extract actionable threat intelligence, such as mule bank accounts and cryptocurrency wallet addresses, that can be reported to disrupt fraudulent infrastructures. Together, these developments transform online fraud into an adversarial socio-technical ecosystem in which autonomous scamming and scambaiting agents engage in deceptive interactions while competing over the discovery, preservation, and exploitation of one another's resources. A fundamental and largely unexplored question is how defensive scambaiting can remain effective in an agent-to-agent environment, and under what conditions either side gains a strategic advantage. In this paper, we present a formal model of agent-to-agent fraud interactions that captures the strategic decision spaces available to both attackers and defenders. Using this framework, we analyze the dynamics of engagement, resource consumption, belief adaptation, and disruption outcomes. We find that scammer profitability turns negative once baiting-agent prevalence exceeds certain thresholds, and that when both sides improve at the same pace, defender investment in mimicry quality outpaces equivalent gains in scammer detection capability, so the arms race favors the defender under our baseline parameters. Our model and findings provide insights into the stability, scalability, and long-term effectiveness of autonomous defensive agents in an evolving AI-mediated fraud landscape.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:28:27Z</published>
+    <arxiv:comment>18</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Abhishek Satyam</name>
+    </author>
+    <author>
+      <name>Hossein Siadati</name>
+    </author>
+    <author>
+      <name>Haadi Jafarian</name>
+    </author>
+    <author>
+      <name>Sima Jafarikhah</name>
+    </author>
+    <author>
+      <name>Juntao Chen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08142v1</id>
+    <title>Educational robotics beyond ROS: a custom library for direct transfer of Webots controllers in the Turtlebot3</title>
+    <updated>2026-11-05T15:04:19Z</updated>
+    <link href="https://arxiv.org/abs/2611.08142v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08142v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Robot Operating System (ROS) is becoming a standard in robotics courses at higher education, but its installation, configuration and distributed programming model can introduce a significant entry barrier in the new landscape of AI-based master and degree studies, where many students do not have a strong informatics background. This paper presents an educational experience that enables students to program a TurtleBot3 Burger directly in Python, while preserving a direct transfer path from simulation to the physical robot. The approach is based on a custom library that mirrors the Webots API, allowing the same controller code to be executed in the simulator and on the real TurtleBot3 with minimal modification. The library provides access to the robot motors, wheel encoders, inertial sensors and LiDAR, and is complemented by scripts that automate deployment and execution on the physical platform. It was used in a master-level course on introductory autonomous vehicles, and initial student feedback suggests that the approach reduces the perceived complexity of ROS-related infrastructure and helps learners focus on algorithmic logic and real-world behaviour.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:04:19Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Jaime P. Pérez-Moro</name>
+    </author>
+    <author>
+      <name>Alejandro Romero</name>
+    </author>
+    <author>
+      <name>Hector Quintian</name>
+    </author>
+    <author>
+      <name>Francisco Bellas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08132v1</id>
+    <title>Drift-Resilient Predictive Interference Management: Online Adaptation of an Extreme-Value Predictor</title>
+    <updated>2026-11-05T15:00:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08132v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08132v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predictive interference management supports ultra-reliable low-latency communication (URLLC) by allocating finite-blocklength resources against a high conditional quantile of next-slot interference. Building on an extreme-value-theory/kernel-density-estimation (EVT/KDE) predictor with quantile-defined interference states, this paper makes the predictor resilient to unannounced shifts in the interference distribution. Its cumulative refitting on all past observations does not specify how the state partition and retained samples should evolve after a regime change. We show that drift first makes the quantile partition inefficient: cumulative refitting preserves tail support and coverage but cannot recover conditional resolution, and pays for it in channel use, whereas discarding history starves the tail estimator. We therefore propose event-triggered quantile-space adaptation. A nonparametric cumulative sum (CUSUM) on the predictor's level stream detects change. At each confirmed event, the quantile partition is re-derived from post-change observations, retained history is re-binned under it, and each state is refit from a bounded per-state memory, capped to balance stale-regime bias against tail-estimation variance, with a closed-form L-moment tail estimator. At a nominal coverage target $η\!=\!0.99$, relative to matched cumulative refitting with fixed states, the proposed method reduces channel use by $5.7$--$13.2\%$ and quantile pinball loss by $25$--$50\%$ across abrupt, incremental, compound, downward, and reversal drift, with coverage changing by $-0.5$ to $+1.0$ percentage points. At matched achieved coverage, it saves $4$--$18\%$ of channel uses, while resource use in load-only and stationary cases changes by less than $0.5\%$. With $K$ samples per state and $L$ states, predictor memory is bounded at $O(KL)$ rather than growing as $O(t)$.</summary>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:00:39Z</published>
+    <arxiv:comment>Submitted to IEEE Transactions on Wireless Communications</arxiv:comment>
+    <arxiv:primary_category term="cs.IT"/>
+    <author>
+      <name>Aamir Mahmood</name>
+    </author>
+    <author>
+      <name>Fateme Salehi</name>
+    </author>
+    <author>
+      <name>Nurul Huda Mahmood</name>
+    </author>
+    <author>
+      <name>Song Han</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08117v1</id>
+    <title>A Hybrid UKF with Explicit Drivetrain Modeling for Low-Velocity State Estimation of Electric Vehicles</title>
+    <updated>2026-11-05T14:49:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.08117v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08117v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Longitudinal velocity is a core input for vehicle control, driver-assistance, and automated driving functions. Production wheel-speed sensors deliver only a few pulses per revolution, so they lose resolution below 1 km/h, the regime in which automated parking and traffic-jam assistance operate. The motor speed from the electric machine's resolver stays finely resolved down to standstill but reaches the wheels only through a compliant drivetrain. We therefore estimate the longitudinal velocity with an unscented Kalman filter (UKF) on a double-track model adapted to low velocities and incorporate the motor speed along two routes, one purely physical and one hybrid. The first augments the model with an explicit torsional spring-damper drivetrain, making the motor speed a state of the estimator. The second feeds the output of a neural network-based virtual wheel-speed sensor into the UKF as a pseudo-measurement. Both routes are compared against two baselines, a wheel-speed-only configuration and one that adds the motor-speed sensor but treats the driveline as rigid. Because the model is numerically stiff near standstill, the comparison rests on a systematic study of explicit and semi-implicit discretization schemes. All four configurations are evaluated against an inertial reference in real-world test drives with two distinct series-production electric vehicles, anonymized as Vehicle A and Vehicle B for confidentiality. Below 1 km/h, both proposed estimators lower the velocity root-mean-square error by at least 54% and 45% against both baselines on Vehicle A. Carried over zero-shot to Vehicle B without re-tuning on target-vehicle data, they lower it by at least 41% and 51%. Both estimators therefore carry across vehicles without a new identification campaign.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:49:53Z</published>
+    <arxiv:comment>14 pages, 11 figures, 3 tables. Submitted to IEEE Transactions on Intelligent Vehicles</arxiv:comment>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Hendrik Schäfke</name>
+    </author>
+    <author>
+      <name>Daniel O. M. Weber</name>
+    </author>
+    <author>
+      <name>Thomas Seel</name>
+    </author>
+    <author>
+      <name>Askar Vagapov</name>
+    </author>
+    <author>
+      <name>Jannes Iatropoulos</name>
+    </author>
+    <author>
+      <name>Christoph Schweers</name>
+    </author>
+    <author>
+      <name>Ahmed Trabelsi</name>
+    </author>
+    <author>
+      <name>Roman Henze</name>
+    </author>
+    <author>
+      <name>Simon F. G. Ehlers</name>
+    </author>
+  </entry>
+</feed>
