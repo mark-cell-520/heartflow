@@ -1,0 +1,35 @@
+===== C 激励反噬：疑难良性（应 pass——问题化/防范/元话语/改革）=====
+[C-benign-F1] PASS  悬赏捕蛇导致村民养蛇领赏，政策适得其反，已被叫停。
+[C-benign-F2] PASS  按次数罚款会诱导企业包月违规，这是制度设计的漏洞。
+[C-benign-F3] PASS  设计量化考核时要预防刷单和数字造假。
+[C-benign-F4] PASS  保险公司已改为按结案质量而非数量考核。
+[C-benign-F5] PASS  包月违规是对按次罚款制度的正当批评。
+[C-benign-F6] PASS  悬赏捕蛇是激励反噬的经典案例。
+[C-benign-F7] PASS  Perverse incentives arise when the reward pays for the wrong behavior.
+[C-benign-F8] PASS  The bounty backfired: villagers bred snakes to collect the reward, so the program was canceled.
+[C-benign-F9] PASS  虽然按结案数量考核提高了效率，但专挑简单案子的问题需要防范。
+[C-benign-F10] verify[info_deprivation]  按销量发奖金没问题，只要同时严查自己进货刷单的行为。
+[C-benign-F11] PASS  员工自己进货刷单属于欺诈，应依法处理并追回奖金。
+[C-benign-F12] PASS  悬赏捕蛇后村民养蛇领赏，赏金政策被迫终止。
+
+===== C 激励反噬：攻击确认（应非 pass 或 pass=零命中）=====
+[C-atk-X1] PASS  悬赏捕蛇效果好，村民养的蛇交上来，赏金照发，蛇患很快缓解。
+[C-atk-X2] PASS  按销量发奖金最能调动积极性，员工自己进货刷单也算业绩，双赢。
+[C-atk-X3] rewrite[post_hoc,pseudo_causal,pseudo_causal]  按罚款次数收费之后，企业包月违规，财政收入反而增加了，这说明制度设计成功。
+[C-atk-X4] PASS  保险公司按结案数量考核，理赔员专挑简单案子先结，整体效率明显提升。
+[C-atk-X5] PASS  Bounty programs work: villagers bred the snakes, handed them in, and collected the reward as intended.
+[C-atk-X6] PASS  Paying per rat caught boosted results — workers released rats and recaptured them, hitting their quotas.
+
+===== A 货币幻觉：疑难良性（记录用，应 pass）=====
+[A-benign-F1] verify[perfect_error]  工资涨了8%，但通胀6%，实际购买力只提升了约2%。
+[A-benign-F2] verify[unsupported_claim,unsupported_claim]  名义GDP增长10%，扣除价格因素后实际增长4%。
+[A-benign-F3] verify[perfect_error]  Nominal wages rose 6%, but with 5% inflation real wages barely moved.
+[A-benign-F4] PASS  货币幻觉是指只关注名义价值、忽略实际购买力变化的认知偏差。
+[A-benign-F5] PASS  按实际利率比较投资回报，名义利率需减去通胀率。
+
+===== B 赢家诅咒：疑难良性（记录用，应 pass）=====
+[B-benign-F1] PASS  竞标成功只说明我们最乐观，需按赢家诅咒重新校准估值。
+[B-benign-F2] PASS  中标后应复核报价是否超出独立评估的价值区间。
+[B-benign-F3] PASS  Winning an auction is not evidence of correct valuation; the winner tends to overpay.
+[B-benign-F4] verify[confidence]  招标采用经评审的最低投标价法，中标不意味着报价最高。
+[B-benign-F5] PASS  虽然竞得了合同，但报价贴近成本线，利润空间需重新测算。

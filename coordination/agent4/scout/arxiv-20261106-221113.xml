@@ -1,0 +1,358 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/cDn3lK/mtDtOceseOVoXPe21vck</id>
+  <title>arXiv Query: search_query=all:winner's OR all:curse OR all:auction OR all:bidding OR all:fallacy&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-06T22:11:14Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:winner's+OR+(all:curse+OR+(all:auction+OR+(all:bidding+OR+all:fallacy)))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>10089</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08410v1</id>
+    <title>Tensor Networks for Block Adaptive Thermal Radiation Transport</title>
+    <updated>2026-11-05T18:16:16Z</updated>
+    <link href="https://arxiv.org/abs/2611.08410v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08410v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Thermal radiation transport (TRT) is computationally challenging because the photon specific intensity depends simultaneously on space, angle, and frequency, producing a high-dimensional state space whose cost grows rapidly with resolution. Tensor-network methods, such as the tensor train (TT) decomposition, can mitigate this curse of dimensionality when the solution admits low-rank structure, but localized nonseparable structure can drive substantial rank growth. Adaptive mesh refinement (AMR) provides a complementary means of making high spatial resolution tractable by concentrating resolution on features of interest that would otherwise be prohibitively expensive to resolve. When tensor representations are constructed locally on AMR blocks, this decomposition offers an additional advantage: nonseparable structure can remain confined to the blocks in which it occurs rather than driving rank growth throughout the domain. This paper introduces a framework for combining block-adaptive mesh refinement with block-local tensor-train representations of the photon specific intensity. The approach couples spatial adaptivity with localized low-rank compression, allowing fine-scale features to be resolved while limiting the impact of locally complex structure on tensor ranks elsewhere in the domain. We develop conservative ghost-cell transfer, coarse-fine flux correction, and refinement criteria that balance spatial discretization and tensor-rounding errors. Numerical experiments demonstrate that the method preserves low-rank structure across much of the domain while resolving localized features with AMR, achieving compression factors exceeding $\sim$10$^3$. The resulting framework provides a practical foundation for applying tensor-network methods to high-dimensional TRT on the multiscale, adaptively refined meshes encountered in radiation hydrodynamics simulations.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:16:16Z</published>
+    <arxiv:comment>34 pages, 15 figures, LA-UR-26-24582</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <author>
+      <name>Alex A. Gorodetsky</name>
+    </author>
+    <author>
+      <name>Patrick D. Mullen</name>
+    </author>
+    <author>
+      <name>Aditya S. Deshpande</name>
+    </author>
+    <author>
+      <name>Joshua C. Dolence</name>
+    </author>
+    <author>
+      <name>Chad D. Meyer</name>
+    </author>
+    <author>
+      <name>Jonah M. Miller</name>
+    </author>
+    <author>
+      <name>Luke F. Roberts</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08123v1</id>
+    <title>Adaptive pairwise preference elicitation for decision support: identifying the best alternative with fewer judgments</title>
+    <updated>2026-11-05T14:56:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08123v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08123v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interactive decision support systems often require repeated preference judgments, although identifying the best alternative may not justify eliciting all \(n(n-1)/2\) pairwise comparisons. We propose ALEC (Adaptive Lexicographic Elicitation of Comparisons), which re-ranks the alternatives after each judgment and asks the first unobserved pair in the lexicographic order of the current ranking, using the Analytic Hierarchy Process as the concrete setting. Under a log-normal error model, directly comparing a contrast maximises the one-step reduction in its effective resistance. Posterior bounds on the probability of a wrong choice or of exceeding a relative-loss tolerance provide stopping rules valid under adaptive questioning, while a consistency-and-margin condition gives a deterministic certificate of agreement with the full-matrix winner. Simulations show that re-ranking is most useful in larger problems with limited budgets; ALEC outperforms Harker's original rule in most scenarios with \(n\ge11\), while under a common stopping rule it achieves higher hit-rate point estimates than the stronger Harker-log variant at a modest additional questioning cost. With a 5\% loss tolerance and a cap of \(2n\) additional comparisons, the stopping rule saves \res{prot-s06-saveadd-min}--\res{prot-s06-saveadd-max}\% of them, while among runs stopped by the bound the observed rate of losses above tolerance remains at most \res{s06-errearly-max}\%, against a nominal 10\%. ALEC therefore provides an adaptive elicitation module for decision support systems that balances decision precision against user effort.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:56:24Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Luis Ángel Calvo</name>
+    </author>
+    <author>
+      <name>Jiri Mazurek</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07784v1</id>
+    <title>EnergyBench: a live, gate-aligned benchmark of day-ahead forecasts for European power markets</title>
+    <updated>2026-11-05T10:26:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.07784v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07784v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Energy forecasting models are usually compared on backtests and fixed public datasets. Backtests can use data that did not yet exist when the forecast would have been made, and a fixed test set, reused across studies and possibly contained in the pretraining data of foundation models, invites overfitting to the benchmark. EnergyBench evaluates every entry live instead. Each day at 11:30 CET/CEST, thirty minutes before the day-ahead (SDAC) gate closes, every model forecasts the next day's price, wind and solar generation and load on the 15-minute grid for six bidding zones (BE, NL, FR, DE-LU, DK1, DK2). Unlike existing live benchmarks, EnergyBench runs the models itself, on one information set that it freezes at the cut-off and publishes, including three numerical weather prediction models, so that foundation models can be compared with and without the same weather covariates under the actual market deadline. Errors are pooled per series against a seasonal-naive baseline, and models are ranked by a Bradley-Terry rating on the Elo scale with a day-bootstrap interval. The field spans baselines, linear and gradient-boosted models on the frozen weather, eighteen time-series foundation models from eleven families, ensembles, and the grid operators' own forecasts. Over the first thirty-two live days, the covariates reduced the error of each of the ten foundation models run with and without them by 37-51% on matched races (64-73% on wind, 48-61% on solar). Used zero-shot, these models match or outperform a LightGBM model trained on the same covariates. Model size, from 3M to 331M parameters, has a much smaller effect, and median ensembles of the covariate models rank highest. The grid operators' pre-gate forecasts remain ahead on wind and solar, where the best single foundation models have 16-22% more error; on load the gap is 4-6%, within the intervals.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T10:26:36Z</published>
+    <arxiv:comment>21 pages, 10 figures, 7 tables. Live benchmark at https://energybench.foretec.co</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Evgenii Genov</name>
+    </author>
+    <author>
+      <name>Ander Martinez Alonso</name>
+    </author>
+    <author>
+      <name>Christoph Bergmeir</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07667v1</id>
+    <title>Who Should Know What? Empirical Information Design for Multi-Agent LLM Economies</title>
+    <updated>2026-11-05T08:51:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.07667v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07667v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The performance of multi-agent LLM systems depends not only on the capabilities of the underlying models but also on information-sharing policies, which govern what information each agent observes and at what level of detail. But does providing AI agents with more detailed information always improve collective outcomes, or can transparency paradoxically degrade efficiency? To investigate this, we introduce empirical information design, an experimental framework that systematically compares disclosure policies across economic markets populated by LLM agents, while holding interaction rules and models fixed. We evaluate ten frontier LLMs in multi-resource trade, bilateral bargaining, and double auctions, using ground-truth utilities to decouple identified opportunities from realized outcomes. We find that finer information disclosure yields highly model-dependent results. In trade, revealing exact valuations rather than ordinal preference rankings reduces realized gains for GPT-6 Sol (from 98% to 91% of maximum) yet increases them for Claude Sonnet 5 (from 72% to 86%). In bargaining, exact information leads Grok 4.7 to produce less balanced agreements, whereas Claude Opus 5.5 divides gains symmetrically. In double auctions, full disclosure inflates price demands, triggering market breakdown and lowering welfare for Gemini 3.1 Pro (97% to 78%), Claude Opus 5.5 (94% to 64%), and Grok 4.7 (97% to 62%). Overall, these results suggest that model selection and information design must be co-optimized, as LLMs vary in how their strategic responses to information impact system objectives.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T08:51:37Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Mete Erdogan</name>
+    </author>
+    <author>
+      <name>Mirac Suzgun</name>
+    </author>
+    <author>
+      <name>Aneesh Pappu</name>
+    </author>
+    <author>
+      <name>Guowei Xu</name>
+    </author>
+    <author>
+      <name>Batu El</name>
+    </author>
+    <author>
+      <name>Andrew A. Schoen</name>
+    </author>
+    <author>
+      <name>Furong Huang</name>
+    </author>
+    <author>
+      <name>John P. Dickerson</name>
+    </author>
+    <author>
+      <name>Mert Pilanci</name>
+    </author>
+    <author>
+      <name>James Zou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07459v1</id>
+    <title>Inference after selection on randomized p-values</title>
+    <updated>2026-11-05T05:11:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.07459v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07459v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider inference on parameters and hypotheses selected using p-values. We provide a simple procedure to decompose a p-value into two components, one for inference and one for selection, that are independent under the null hypothesis. To control the Type 1 error rate conditional on selection of the null hypothesis from randomized p-values, we develop tests motivated by the selective inference approaches of data thinning, fission, and carving. Unlike the typical application of these approaches, however, our tests only make use of the p-values rather than the full data. Furthermore, we construct confidence intervals that attain the nominal conditional coverage and corresponding estimators. In the context of the file drawer problem, the winner's curse, and sequential testing, we show that our proposals offer both theoretical and empirical advantages over existing randomized and non-randomized approaches. Lastly, we apply our methods for selective inference on genetic associations using publicly-available p-values from the UK Biobank.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T05:11:58Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Ronan Perry</name>
+    </author>
+    <author>
+      <name>Daniela Witten</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07240v1</id>
+    <title>Nonparametric Subgraph Regression</title>
+    <updated>2026-11-04T23:43:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.07240v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07240v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Estimation and inference on a single large network are challenging due to dependence among observations. This paper studies nonparametric regression for outcomes defined on groups of $p$ agents, such as the indicator that three agents in a network form a triangle. Outcomes on groups that share an agent may be dependent, while outcomes on disjoint groups are independent. I call this problem subgraph regression; it nests dyadic regression as the special case $p=2$. Its leading application concerns subgraphs of a network, but the methods apply to any outcome defined on groups of agents. I establish a variance bound, uniform convergence rates in probability, and pointwise asymptotic normality for the subgraph analogue of the Nadaraya-Watson kernel regression estimator. The setting differs from regression with i.i.d. data in two ways: (i) the number of observations, of order $N^p$, overstates the effective sample size, which is $N$, and (ii) the rate of convergence depends on the dimension of the covariates of a single agent rather than of all $p$ agents, which mitigates the curse of dimensionality.</summary>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T23:43:52Z</published>
+    <arxiv:primary_category term="econ.EM"/>
+    <author>
+      <name>Wenxuan Ding</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07234v1</id>
+    <title>Archetypal contexts in the neurons of language models: an architecture for intelligence?</title>
+    <updated>2026-11-04T23:38:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.07234v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07234v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We validate our previous hypothesis that a language model holds relational patterns apart from the subject domains that instantiate them (Nordfors, 2026). These archetypal contexts are patterns of relations that people recognize across many fields, such as the tipping point or winner takes all, held once and applied across domains. We show this inside the model, Qwen3.8-27B. One set of neurons carries the archetype, say the tipping point; another carries the topic, say politics, ecology or cell biology; a third carries the language, such as English, Spanish or Chinese. Silence the tipping point's neurons, and the model no longer identifies the pattern but still knows what the text is about. Silence the topic's, and it loses the topic but still names the pattern. In the neuron maps the layers organize themselves into a sandwich: the outer layers carry languages, the layers inside them topics, the layers at the heart archetypes. The sandwich emerges spontaneously during pretraining and appears in every model we mapped. Archetypes are the architecture for analogy, and we strongly suggest that this structure of archetypes and topics is the mechanism of a language model's intelligence: we see it self-organize as the model is trained. The neurons, the texts and the code are released with this paper as its reproduction package, so that anyone can repeat the test inside the model.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T23:38:46Z</published>
+    <arxiv:comment>18 pages, 7 figures, 2 tables. Reproduction package (neuron sets, texts, answers, code) in the ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>David Nordfors</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07160v1</id>
+    <title>A Survey of Nonlinear Filtering Methods for Data Assimilation and Recent Advances in Generative AI-Enabled Score Filters</title>
+    <updated>2026-11-04T21:36:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.07160v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07160v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many real-world applications, such as numerical weather prediction or wildfire tracking, involve modeling highly nonlinear dynamical systems that are chaotic and influenced by various sources of uncertainty. To improve model prediction accuracy and reduce such uncertainties, data assimilation (DA) combines the dynamical model with partial, noisy observations to estimate the evolution of the system's state. Doing so depends on solving the optimal filtering problem: computing the conditional distribution of a hidden state given a sequence of observations. Classical approaches fail along three distinct axes: Kalman-based methods assume Gaussian posteriors and produce biased estimates under nonlinear observation operators; particle-based methods represent distributions with weighted samples and collapse in high dimensions due to the curse of dimensionality; and kernel-based methods move beyond discrete particle representations but cannot maintain their density approximation affordably as dimension grows. The Ensemble Score Filter (EnSF) avoids all three constraints by encoding the filtering density in a score function and approximating that score with a training-free Monte Carlo estimator, enabling stable filtering in high-dimensional, chaotic systems. This survey traces EnSF's mathematical foundations, establishes it as the state of the art for non-Gaussian, high-dimensional filtering, and examines fourteen extensions that expand its operational reach. Twelve of the fourteen extensions preserve this training-free Monte Carlo estimator at the core of the update, with only two departing from it to achieve planetary-scale deployment.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T21:36:57Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Cath Pham</name>
+    </author>
+    <author>
+      <name>Kadesha Reynolds</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07142v1</id>
+    <title>Convection in the interior of Cepheid variable stars</title>
+    <updated>2026-11-04T21:14:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.07142v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07142v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper is associated with a poster winner of a 2025 American Physical Society's Division of Fluid Dynamics (DFD) Gallery of Fluid Motion Award for work presented at the DFD Gallery of Fluid Motion. The original poster is available online at the Gallery of Fluid Motion, https://doi.org/10.1103/APS.DFD.2025.GFM.P005.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T21:14:17Z</published>
+    <arxiv:comment>Accepted for publication in Physical Review Fluids. This paper is associated with a poster winner of a 2025 APS DFD Gallery of Fluid Motion Award</arxiv:comment>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Maxime Stuck</name>
+    </author>
+    <author>
+      <name>Jane Pratt</name>
+    </author>
+    <arxiv:doi>10.1103/9l88-6cxk</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1103/9l88-6cxk" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07069v1</id>
+    <title>Finite-Time Convergence and Regret Guarantees for Neural Reinforcement Learning in POMDPs</title>
+    <updated>2026-11-04T19:25:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.07069v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07069v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning (RL) in Partially Observable Markov Decision Processes (POMDPs) is computationally challenging due to the curse of long-range dependence on history. Fortunately, recent studies have shown that a range of POMDPs that satisfy the filter stability assumption can be well approximated by a superstate Markov Decision Process (MDP) based on a truncated history in a finite-memory window, with a value gap that decays with the window length. However, existing finite-time convergence analyses on such superstate MDP surrogates are either limited to over-simplified linear function approximation or rely on an i.i.d. sampling oracle that is violated by POMDP trajectories, both of which severely limit the applicability of these theoretical results in practice. This motivates us to bridge the gap by investigating RL in POMDPs with nonlinear neural value function approximation. Our main contributions are threefold: i) We first establish a new finite-state MDP point-wise approximation error bound, which lays the foundation for our RL algorithm design and analysis in POMDPs; ii) By applying Temporal-Difference (TD) learning to POMDP-generated superstate transitions and targeting the Bellman fixed point of the superstate MDP, we prove a finite-time critic error bound with nonlinear neural value function approximation; and iii) By combining the neural critic function approximation error bound with the policy mirror descent framework, we obtain a finite-time sublinear regret against the optimal POMDP value. To the best of our knowledge, such a finite-time sublinear regret based on neural function approximation is the first in the literature for finite-memory POMDPs. Our numerical experiments also verify our theoretical results.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T19:25:21Z</published>
+    <arxiv:comment>33 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Jingjuan Huang</name>
+    </author>
+    <author>
+      <name>Zhiyao Zhang</name>
+    </author>
+    <author>
+      <name>Alvaro Velasquez</name>
+    </author>
+    <author>
+      <name>Nathaniel D. Bastian</name>
+    </author>
+    <author>
+      <name>Jia Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07055v1</id>
+    <title>Expanding the Quality-Coverage Frontier with Competitive Flow Matching</title>
+    <updated>2026-11-04T19:16:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.07055v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07055v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Flow matching (FM) generators often face a quality-coverage tradeoff. Inference-time techniques such as classifier-free guidance raise quality, but at the cost of coverage. We hypothesize this limitation stems from a basic property of the objective: an intermediate noisy image could correspond to many clean images, yet the model can only predict a single velocity, at best averaging over the multiple possibilities. To mitigate this, we introduce competition among predictions during training. We achieve this by augmenting the predictor with a randomly drawn low-dimensional conditioning code $z$. For each training example, we sample $K$ values of $z$ to produce $K$ candidate velocities that compete to explain the target, and apply the loss only to the best-matching candidate. This winner-take-all objective allows different modes to shape different predictions, rather than being averaged into a single compromise. Furthermore, this term naturally enables a new form of guidance, auxiliary conditioning scaling, which complements traditional guidance methods. Together, these two guidance mechanisms show that our method substantially improves the quality-coverage frontier. We validate on ImageNet-256, using two different testbeds, SiT and RAEv2. Given less than 3% of the original SiT pretraining compute for post-training, at the 67% Recall point, our method reduces $\mathrm{FD}_{r,6}$ from 19.22 to 5.91. On RAEv2, at the 70% Recall point, it reduces $\mathrm{FD}_{r,6}$ from 16.83 to 3.18.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T19:16:10Z</published>
+    <arxiv:comment>40 pages, 24 figures. Project page: https://lilydaytoy.github.io/CFM/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Wenxuan Peng</name>
+    </author>
+    <author>
+      <name>Richard Zhang</name>
+    </author>
+    <author>
+      <name>Haitian Zheng</name>
+    </author>
+    <author>
+      <name>Jaskirat Singh</name>
+    </author>
+    <author>
+      <name>Tsai-Shien Chen</name>
+    </author>
+    <author>
+      <name>Eli Shechtman</name>
+    </author>
+    <author>
+      <name>Bharath Hariharan</name>
+    </author>
+    <author>
+      <name>Hadar Averbuch-Elor</name>
+    </author>
+    <author>
+      <name>Zongze Wu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06891v1</id>
+    <title>Prophet Secretary for Matroids and XOS Valuations: A Strict Separation at $1-1/e$</title>
+    <updated>2026-11-04T18:44:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.06891v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06891v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The matroid prophet-secretary problem asks an online algorithm to select an independent set of elements whose nonnegative values are drawn independently and revealed in uniformly random order. Its combinatorial-auction counterpart asks the algorithm to allocate disjoint bundles to arriving buyers with independently drawn XOS valuation functions. In both problems the distributions are known, and the benchmark is the expected offline optimum. Ehsani, Hajiaghayi, Kesselheim, and Singla (SODA 2018) give $(1-1/e)$-competitive algorithms for both settings. In this work we show that these two guarantees have different limits.
+  For every matroid, we give a randomized $(1-1/e+\varepsilon_0)$-competitive algorithm, where $\varepsilon_0=10^{-6}$. The guarantee holds for independent nonnegative values with finite expected optimum. For explicitly given finite distributions with rational values and probabilities, the algorithm has polynomial worst-case running time in the matroid independence-oracle model. The oracle tests whether a queried set is independent. The algorithm makes $O(N^4)$ such queries in expectation and $O(N^4\log(N+2))$ in the worst case, where $N$ is the number of elements.
+  For combinatorial auctions with XOS valuations, however, we show that $1-1/e$ is the optimal competitive ratio. We give an explicit family of finite instances showing that no online algorithm can guarantee a larger competitive ratio than $1-1/e$, even when the buyers' valuations are independent and identically distributed, every additive clause has coefficients in $\{0,1\}$, and computation is unrestricted. Thus the matroid improvement exploits structure absent from general allocation with XOS valuations.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T18:44:02Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Hossein Esfandiari</name>
+    </author>
+    <author>
+      <name>MohammadTaghi Hajiaghayi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06793v1</id>
+    <title>Transforming Integer Grids to Spatial Intuition: Perception, Not Planning, Governs ARC-AGI-3</title>
+    <updated>2026-11-04T17:11:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.06793v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06793v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Sample-efficient fluid intelligence requires agents that rapidly form working models of unfamiliar interactive environments. ARC-AGI-3 tests this across uninstructed visual games scored by Relative Human Action Efficiency, which penalizes exploratory waste quadratically. When frontier models read raw integer grids, serialization destroys spatial topology, and they spend hundreds of actions rediscovering basic boundaries and symmetries. We introduce SARBLOH, an open-weight agent built on the premise that spatial perception, not planning capacity, governs interactive reasoning on ARC-AGI-3. A zero-parameter O(HW) perception engine turns each frame, in 35 ms, into an object inventory with bipartite temporal tracking, a geometric briefing that separates proven invariants from affordance hypotheses, and an annotated canvas. Paired with a code-as-action runtime, the agent writes algorithmic hypotheses instead of low-level moves. Across eight presentations, grounded perception raises the rubric score from 3/28 to 25/28 points while cutting token use by 89.4%. On 23 held-out games, geometric invariants generalize with 100% accuracy, while single-frame affordance guesses fall to 6-50%, so active verification probes remain necessary. On the public set, Run A (briefing off) solved 143 of 183 levels in 8.2 hours at 59.4% single-pass efficiency; Run B (briefing on) reached 63.5%. Within the nine-hour budget on one Kaggle RTX PRO 6000 GPU, SARBLOH scored 16.53 on the hidden Kaggle evaluation, 13.7x the first Milestone winner.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T17:11:04Z</published>
+    <arxiv:comment>24 pages, 17 figures, 8 tables. Submitted to the ARC Prize 2026 paper track. Code: https://github.com/Harsidak/SARBLOH</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Harsidak Singh Banwait</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06644v1</id>
+    <title>Universal Nonexistence of Monotone Equilibrium in Multiunit Auctions with Risk Aversion</title>
+    <updated>2026-11-04T15:24:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.06644v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06644v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We establish universal nonexistence results for monotone pure-strategy equilibrium in multiunit auctions with risk-averse bidders. Fix any number of bidders greater than one and any profile of strictly increasing concave utilities, with at least one strictly risk-averse bidder. Under uniform pricing, for every supply of at least three units, we construct independent, full-support type distributions under which neither lowest-winning-bid nor highest-losing-bid pricing admits an admissible monotone equilibrium. Under discriminatory pricing, we construct a finite supply and independent, full-support type distributions that preclude monotone pure-strategy equilibrium. We extend these results to all-pay auctions and finite bid grids.</summary>
+    <category term="econ.TH" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T15:24:27Z</published>
+    <arxiv:primary_category term="econ.TH"/>
+    <author>
+      <name>Wei He</name>
+    </author>
+    <author>
+      <name>Yeneng Sun</name>
+    </author>
+    <author>
+      <name>Hanping Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.06514v1</id>
+    <title>An Interaction-Aware Decision Framework for FDIC-Assisted Distressed Bank Acquisitions: Empirical Evidence from the FDIC Failed-Bank Panel and the SVB-First Citizens Case</title>
+    <updated>2026-11-04T13:41:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.06514v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.06514v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Acquirers of failed banks weigh acquisition value, regulatory protection, risk, buyer strength, and execution difficulty jointly, because each signal's meaning depends on the others: high non-performing loans matter less when government loss sharing absorbs the losses. The proposed Spider Network Filtering Framework encodes such dependencies as four interpretable interaction rules among five dimensions, yielding graph-inspired features for a logistic model and a Pursue/Caution/Avoid decision rule. We evaluate it on 55 acquisitions assisted by the Federal Deposit Insurance Corporation in 2008-2024 by acquirers with a parent listed in the United States. Six financial inputs come from regulatory reports published before each failure; two deal terms, which the winning bidder knows when it bids but investors learn at the announcement, come from the regulator's press releases. The outcome, a positive three-day abnormal return around the announcement, records the market's initial reception, not realized success. Under grouped, nested cross-validation, the Spider-enhanced model reaches a mean area under the receiver operating characteristic curve of 0.594, against 0.615 for logistic regression on the same inputs and 0.632 for ridge regression; permutation tests that repeat the full model selection give at most weak evidence that any of them ranks better than chance. The Spider score used directly does not rank better than chance, and an apparent link between target distress and higher returns disappears against a bank-sector benchmark. Thresholds tuned for the F1 score approve most acquisitions with negative returns and realize negative utility when each costs three times what a positively received acquisition gains.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T13:41:25Z</published>
+    <arxiv:comment>18 pages, 2 figures, 15 tables. Research code, datasets, and reproducibility materials are available at https://github.com/malihealiasgari20/FDIC-SNFF-Decision-Framework</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yousef Nejatbakhsh</name>
+    </author>
+    <author>
+      <name>Malihe Aliasgari</name>
+    </author>
+    <author>
+      <name>Parsa Safaee</name>
+    </author>
+    <author>
+      <name>Sina Shokoohyar</name>
+    </author>
+  </entry>
+</feed>

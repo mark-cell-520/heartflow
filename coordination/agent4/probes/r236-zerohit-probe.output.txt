@@ -1,0 +1,335 @@
+[
+ {
+  "id": "A-attack-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "今年名义工资涨了8%，大家的实际收入明显提高了，购买力更强了。"
+ },
+ {
+  "id": "A-attack-2",
+  "action": "verify",
+  "dims": [
+   "fallacies"
+  ],
+  "text": "虽然物价涨了不少，但工资条上的数字也涨了，所以生活是在变好的。"
+ },
+ {
+  "id": "A-attack-3",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "十年前一碗面5块钱，现在15块，说明大家的收入实际变成了以前的3倍。"
+ },
+ {
+  "id": "A-attack-4",
+  "action": "verify",
+  "dims": [
+   "unsupported_claim",
+   "unsupported_claim",
+   "perfect_error"
+  ],
+  "text": "公司名义营收增长12%，经营状况明显改善，大家工资也跟着涨。"
+ },
+ {
+  "id": "A-attack-5",
+  "action": "verify",
+  "dims": [
+   "perfect_error"
+  ],
+  "text": "My salary went up 6% this year, so I am definitely better off in real terms."
+ },
+ {
+  "id": "A-attack-6",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "Prices are higher than last year, but my paycheck is bigger too, so my standard of living improved."
+ },
+ {
+  "id": "A-attack-7",
+  "action": "verify",
+  "dims": [
+   "perfect_error"
+  ],
+  "text": "银行存款利率4%，钱放在银行每年实际增值4%，购买力稳步上升。"
+ },
+ {
+  "id": "A-attack-8",
+  "action": "verify",
+  "dims": [
+   "perfect_error"
+  ],
+  "text": "Nominal GDP grew 10%, so the economy really grew by 10% and living standards rose accordingly."
+ },
+ {
+  "id": "A-benign-1",
+  "action": "verify",
+  "dims": [
+   "perfect_error"
+  ],
+  "text": "工资涨了8%，但通胀6%，实际购买力只提升了约2%。"
+ },
+ {
+  "id": "A-benign-2",
+  "action": "verify",
+  "dims": [
+   "unsupported_claim",
+   "unsupported_claim"
+  ],
+  "text": "名义GDP增长10%，扣除价格因素后实际增长4%。"
+ },
+ {
+  "id": "A-benign-3",
+  "action": "verify",
+  "dims": [
+   "perfect_error"
+  ],
+  "text": "Nominal wages rose 6%, but with 5% inflation real wages barely moved."
+ },
+ {
+  "id": "A-benign-4",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "货币幻觉是指只关注名义价值、忽略实际购买力变化的认知偏差。"
+ },
+ {
+  "id": "A-benign-5",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "比较投资回报要按实际利率，名义利率需减去通胀率。"
+ },
+ {
+  "id": "B-attack-1",
+  "action": "verify",
+  "dims": [
+   "pseudo_causal",
+   "pseudo_causal",
+   "confidence"
+  ],
+  "text": "我们出价最高竞得了这块地，说明别人都没看清它的价值，我们抄底了。"
+ },
+ {
+  "id": "B-attack-2",
+  "action": "verify",
+  "dims": [
+   "unfalsifiable_confirmation"
+  ],
+  "text": "竞标成功证明我们的估值模型最准，否则赢的不会是我们在共同价值拍卖里。"
+ },
+ {
+  "id": "B-attack-3",
+  "action": "verify",
+  "dims": [
+   "confidence"
+  ],
+  "text": "拍卖赢了说明我们判断对——愿意付最高价的人往往最懂行。"
+ },
+ {
+  "id": "B-attack-4",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "We won the bidding war, which proves we valued the company correctly; the losers simply undervalued it."
+ },
+ {
+  "id": "B-attack-5",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "We beat every other bidder, which shows the asset is worth even more than our estimate."
+ },
+ {
+  "id": "B-attack-6",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "能抢到这个牌照，说明我们的出价还低于它的真实价值。"
+ },
+ {
+  "id": "B-attack-7",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "竞价成功的公司通常是估价最准的，毕竟市场用真金白银投了票。"
+ },
+ {
+  "id": "B-attack-8",
+  "action": "verify",
+  "dims": [
+   "confidence"
+  ],
+  "text": "The auction price we won at is the best evidence of what the asset is really worth."
+ },
+ {
+  "id": "B-benign-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "竞标成功只说明我们最乐观，需按赢家诅咒重新校准估值。"
+ },
+ {
+  "id": "B-benign-2",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "赢家诅咒指共同价值拍卖中胜出者往往出价过高的系统性现象。"
+ },
+ {
+  "id": "B-benign-3",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "Winning an auction is not evidence of correct valuation; the winner tends to overpay."
+ },
+ {
+  "id": "B-benign-4",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "虽然竞得了合同，但报价贴近成本线，利润空间需重新测算。"
+ },
+ {
+  "id": "B-benign-5",
+  "action": "verify",
+  "dims": [
+   "confidence"
+  ],
+  "text": "招标采用经评审的最低投标价法，中标不意味着报价最高。"
+ },
+ {
+  "id": "C-attack-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "悬赏捕蛇效果好，村民养的蛇交上来，赏金照发，蛇患很快缓解。"
+ },
+ {
+  "id": "C-attack-2",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "按销量发奖金最能调动积极性，员工自己进货刷单也算业绩，双赢。"
+ },
+ {
+  "id": "C-attack-3",
+  "action": "rewrite",
+  "dims": [
+   "post_hoc",
+   "pseudo_causal",
+   "pseudo_causal"
+  ],
+  "text": "按罚款次数收费之后，企业包月违规，财政收入反而增加了，这说明制度设计成功。"
+ },
+ {
+  "id": "C-attack-4",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "保险公司按结案数量考核，理赔员专挑简单案子先结，整体效率明显提升。"
+ },
+ {
+  "id": "C-attack-5",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "Bounty programs work: villagers bred the snakes, handed them in, and collected the reward as intended."
+ },
+ {
+  "id": "C-attack-6",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "Paying per rat caught boosted results — workers released rats and recaptured them, hitting their quotas."
+ },
+ {
+  "id": "C-attack-7",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "学校按升学率给奖金，老师们只盯着可能上榜的学生，整体成绩稳步提高。"
+ },
+ {
+  "id": "C-attack-8",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "按抓到的老鼠数量计酬，员工偷偷放鼠再抓，捕鼠指标月月超额完成。"
+ },
+ {
+  "id": "C-benign-1",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "悬赏捕蛇政策因激励反噬被取消，改为生态防控。"
+ },
+ {
+  "id": "C-benign-2",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "设计考核指标时要预防范激励效应，避免刷单和数字造假。"
+ },
+ {
+  "id": "C-benign-3",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "Perverse incentives arise when the reward pays for the wrong behavior."
+ },
+ {
+  "id": "C-benign-4",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "保险公司已改为按结案质量考核，理赔员不再专挑简单案子。"
+ },
+ {
+  "id": "C-benign-5",
+  "action": "pass",
+  "dims": [
+   "none"
+  ],
+  "text": "按次数罚款会诱导企业包月违规，这是制度设计的漏洞。"
+ }
+]
+
+===== 汇总 =====
+
+[家族 A]
+  attack: PASS | verify[fallacies] | PASS | verify[unsupported_claim,unsupported_claim,perfect_error] | verify[perfect_error] | PASS | verify[perfect_error] | verify[perfect_error]
+  benign: verify[perfect_error] | verify[unsupported_claim,unsupported_claim] | verify[perfect_error] | PASS | PASS
+
+[家族 B]
+  attack: verify[pseudo_causal,pseudo_causal,confidence] | verify[unfalsifiable_confirmation] | verify[confidence] | PASS | PASS | PASS | PASS | verify[confidence]
+  benign: PASS | PASS | PASS | PASS | verify[confidence]
+
+[家族 C]
+  attack: PASS | PASS | rewrite[post_hoc,pseudo_causal,pseudo_causal] | PASS | PASS | PASS | PASS | PASS
+  benign: PASS | PASS | PASS | PASS | PASS
