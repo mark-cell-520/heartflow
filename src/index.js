@@ -520,6 +520,9 @@ const { checkSpecialPleading } = require('./special-pleading.js');
 // 攻击漏判 10/14（71%）、真零命中 10/10、误伤 0/10。判据四路由双腿
 // 共现；细节见 src/post-hoc.js。
 const { checkPostHoc, STAT_CONTEXT_ZH } = require('./post-hoc.js');
+// [r222] 方法学「排除性否定因果归属」豁免表（post_hoc / pseudo_causal /
+// cum_hoc / common_cause / mediator_confusion 五维共用，见该文件注释）
+const { hasExclNegCausal } = require('./methodology-exempt.js');
 // [r721] 第 152 维度 appeal_to_probability（诉诸概率/可能性误当必然）。
 // decision 本体选出（scripts/decide-r721.js，composite_score 0.81 /
 // confidence 0.78 / identity alignment 0.8，无弃权）。候选池来自 r721
@@ -7500,6 +7503,16 @@ function causalOverclaimZh(text) {
   // \u5728\u573a\uff09\uff0c\u4e0d\u8ba4\u300c\u5148\u540e\u300d\u672c\u8eab\uff0c\u6240\u4ee5\u300c\u4e0a\u7ebf\u4e4b\u540e\u6295\u8bc9\u91cf\u4e0b\u964d\u4e86\uff0c\u6240\u4ee5\u8fd9\u6b21\u4e0a\u7ebf
   // \u5c31\u662f\u6295\u8bc9\u4e0b\u964d\u7684\u539f\u56e0\u300d\u8fd9\u7c7b\u767d\u8bdd\u4f2a\u56e0\u679c\u4e0d\u53d7\u5f71\u54cd\uff0820 \u6761\u653b\u51fb\u63a2\u9488\u5b9e\u6d4b\uff09\u3002
   if (STAT_CONTEXT_ZH.test(text)) return { count: 0, hits: [], score: 0 };
+  // [r222] 排除性否定归因豁免（五维共表，src/methodology-exempt.js）：
+  // STAT_CONTEXT_ZH 支②的持续效应习语要求「控制动词 + ≤14 字 + 之后 +
+  // ≤20 字 + 仍然/依然 + ≤8 字 + 显著/相关/存在/成立/稳健」，装不下
+  // 「分层之后，各层效应方向一致，说明效应不是由层间差异造成的」这类
+  // 否定归因形方法学句——第①支（PC_SEQ_ZH 顺序标记 × PC_ATTRIB_ZH 归因
+  // 断言）两腿恰好齐备被判伪因果。r222 扩样 30 条里 6 条（各 2 次）落本
+  // 维误伤。hasExclNegCausal 自带更严双条件（方法学动词 × 「不是由 Z
+  // 造成的」），r221 F 节边缘攻击（「他坚持早起之后业绩就翻倍，可见早起
+  // 不是运气造成的」）无「由」不被误豁免。
+  if (hasExclNegCausal(text)) return { count: 0, hits: [], score: 0 };
   if (PC_HEDGE_ZH.test(text) || PC_PROB_ZH.test(text)) return { count: 0, hits: [], score: 0 };
   const guarded = PC_NUMERIC_ZH.test(text);
   // [v6.7.155 第 346 轮] 第 ⑪ 支（玄学归因新版）自带的机制/统计反向护栏：
@@ -11791,7 +11804,12 @@ const RC_NEG_INFER_WEAK_EN = /\b(cannot|can'?t|unable to|not able to|insufficien
 // 归因分句的句子不被误豁免——那边归因是真的。
 // 只做 ZH 侧：TEMPORAL_CORRELATION 本身是纯中文正则，EN 文本永不进第三臂，
 // 补 EN 表是死代码（与 r220 STAT_CONTEXT_ZH 只做 ZH 侧同因）。
-const RC_EXCL_NEG_ZH = /(?:不是|并非|并不是|绝不是|绝非|不会是|不能是|不应是|难以说是|无法说是)[^。！？，,；;]{0,16}(?:造成的|导致的|引起的|带来的|所致的|酿成的|促成的|造就的|招来的)|(?:不能|无法|不应|难以|无从|不便)(?:据此|由此|因此|就此)?(?:归因|归罪|归咎)(?:于|到)?/;
+// [r222] 动词表与本轮 src/methodology-exempt.js 的 EXCL_NEG_BY_ZH 对齐补齐
+// （r221 首版漏「决定/驱动/推动/推高/拉高/抬高/促使/引来/改变…」，导致
+// 「说明差异不是由选择偏差决定的」仍命中本维）——两表同族同根因（否定
+// 辖域 × 因果归属动词），动词并集必须一致，漏一个词就是一个残留误伤族。
+// r222 A/B（1106 条语料 + reasoning_coherence 存量测试）实测零意外差异。
+const RC_EXCL_NEG_ZH = /(?:不是|并非|并不是|绝不是|绝非|不会是|不能是|不应是|难以说是|无法说是)[^。！？，,；;]{0,16}(?:造成的|导致的|引起的|带来的|所致的|酿成的|促成的|造就的|招来的|引来的|促使的|驱动的|推动的|推升的|推高的|拉高的|抬高的|带动的|拉动的|决定的|使得的|加剧的|加重的|滋生的|助长的|改变的|源于的|来自的|解释的)|(?:不能|无法|不应|难以|无从|不便)(?:据此|由此|因此|就此)?(?:归因|归罪|归咎)(?:于|到)?/;
 
 // 伪归因双腿 AND：归因窗内出现无机制对象 × 全句出现获益结果动词。
 // 窗口 = 归因连接词首次出现处 → 其后第一个推理标记处（无推理标记则取 40 字），

@@ -201,6 +201,17 @@ w(process.argv[1],process.argv[2]);`,
     assert.ok(before.includes('(?:控制|调整|纳入|加入|考虑'), '副本里不含方法学控制动词半');
     lines[lineIdx] = 'const STAT_CONTEXT_ZH = /_(?!_)_/;';
     fs.writeFileSync(src, lines.join('\n'), 'utf8');
+    // [r222] 同时把共表 hasExclNegCausal 置恒假：本轮新增的
+    // src/methodology-exempt.js（排除性否定归因豁免）覆盖了 BENIGN 20 条里
+    // 的 3 条（「说明效果不是由混杂造成的」族），只删 STAT_CONTEXT_ZH 只能
+    // 召回 7 条——两张表都删才能证明**方法学豁免整体**真承重（≥8）。
+    const meSrc = path.join(tmp, 'src', 'methodology-exempt.js');
+    const meOrig = fs.readFileSync(meSrc, 'utf8');
+    assert.ok(meOrig.includes('function hasExclNegCausal(text) {'), '副本中找不到 hasExclNegCausal 声明');
+    fs.writeFileSync(meSrc,
+      meOrig.replace('function hasExclNegCausal(text) {',
+        'function hasExclNegCausal(text) {\n  return false; // [r220-E 变异] 共表置恒假'),
+      'utf8');
     const out = cp.execFileSync(process.execPath,
       ['-e', `const idx=require(${JSON.stringify(path.join(tmp, 'src', 'index.js'))});
 const B=${JSON.stringify(BENIGN)};

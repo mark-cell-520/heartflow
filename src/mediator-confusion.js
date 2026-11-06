@@ -109,6 +109,8 @@
  */
 'use strict';
 
+const { hasExclNegCausal } = require('./methodology-exempt.js');
+
 // ─── 腿① CONTROL 控制/解释动作（中文；r161 教训：裸动词形态，
 // 控制/解释/调整 去前后缀仍命中）────────────────────────────────
 const CONTROL_ZH = [
@@ -373,6 +375,19 @@ function checkMediatorConfusion(text, inject) {
   // 混杂控制形：被控制的变量被明确标记为混杂因素（共同导致/第三方/
   // 外生）时，控制它是正确的去偏，本族不判
   if (anyHit(R.EXEMPT_CONFOUNDER_ZH || EXEMPT_CONFOUNDER_ZH, text) || anyHit(R.EXEMPT_CONFOUNDER_EN || EXEMPT_CONFOUNDER_EN, text)) {
+    return { hit: false, score: 0, detail: '', count: 0 };
+  }
+  // [r222] 方法学「排除性否定因果归属」豁免（五维共表，
+  // src/methodology-exempt.js）：本维原有四张豁免表（概念教学/正确响应/
+  // 混杂控制/否定守卫）都不认方法学报告的否定归因形——「排除竞争性解释
+  // 之后，结论仍然成立，说明结果不是由替代解释造成的」的腿①「排除」×
+  // 腿②「替代解释」在 40 字窗内齐备，被判「控制/解释掉中间环节否定上游
+  // 原因」，而这句话陈述的恰是「这个替代解释不成立」（拒绝无效归因是
+  // 正确判别动作，与 r221 RC_EXCL_NEG_ZH 同族）。NEG_ZH 守卫不含「不是」，
+  // 兜不住这族。r222 扩样 30 条里 1 条落本维误伤（交接簿候选①第 5 条）。
+  // 判据见 src/methodology-exempt.js：方法学动词 × 「不是由 Z 造成的」，
+  // r221 F 节边缘攻击（「这不是巧合造成的」）无「由」不被误豁免。
+  if (hasExclNegCausal(text)) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
 

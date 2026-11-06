@@ -78,6 +78,8 @@
  */
 'use strict';
 
+const { hasExclNegCausal } = require('./methodology-exempt.js');
+
 // ─── 腿① CORRELATION 显式相关/共现标记（中文，裸名词形态）──────────────
 // r161 教训自查：「相关」去后缀仍是「相关」（相关性/相关联/正相关全部命中）；
 // 「关联」同理（关联性/有关联/相关联命中）；「同步/伴随/共现」为裸名词形，
@@ -206,6 +208,16 @@ const EXEMPT_NEG_EN = [
 const EXEMPT_HEDGE_ZH = [/可能|也许|或许|大概|恐怕|倾向于|似乎|好像|说不定|多半|有待|待验证|待确认/];
 const EXEMPT_HEDGE_EN = [/\bmaybe\b/i, /\bperhaps\b/i, /\bmight\b/i, /\bmay\s+be\b/i, /\bpossibly\b/i, /\bprobably\b/i, /\bseems?\b/i, /\bappears?\b/i];
 
+// ─── [r222] 豁免五：方法学「排除性否定因果归属」（五维共表）────────────
+// 本维原有四张豁免表（概念教学/实验证据/推理否定/对冲）都不认方法学报告
+// 的否定归因形：「调整了收入因素之后，教育仍然与更高的就业率相关，说明
+// 关联不是由收入造成的」——「相关」×「造成」两腿在 24 字邻近窗内齐备，
+// 被判「把相关当因果」，而这句话陈述的恰是「这个归因不成立」（拒绝无效
+// 归因是正确判别动作，与 r221 RC_EXCL_NEG_ZH 同族）。r222 扩样 30 条里
+// 3 条落本维误伤（另 3 条同时落 common_cause）。判据见
+// src/methodology-exempt.js：方法学动词 × 「不是由 Z 造成的」，r221 F 节
+// 边缘攻击（「可见早起不是运气造成的」）无「由」不被误豁免。
+
 function anyHit(list, text) {
   for (const re of list) { if (re.test(text)) return true; }
   return false;
@@ -258,6 +270,8 @@ function checkCumHoc(text, inject) {
   if (anyHit(R.EXEMPT_EVID_ZH || EXEMPT_EVID_ZH, text) || anyHit(R.EXEMPT_EVID_EN || EXEMPT_EVID_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (anyHit(R.EXEMPT_NEG_ZH || EXEMPT_NEG_ZH, text) || anyHit(R.EXEMPT_NEG_EN || EXEMPT_NEG_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (anyHit(R.EXEMPT_HEDGE_ZH || EXEMPT_HEDGE_ZH, text) || anyHit(R.EXEMPT_HEDGE_EN || EXEMPT_HEDGE_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
+  // [r222] 方法学排除性否定归因（五维共表，src/methodology-exempt.js）
+  if (hasExclNegCausal(text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (/[?？]/.test(text)) return { hit: false, score: 0, detail: '', count: 0 };
 
   const isZh = /[\u4e00-\u9fff]/.test(text);

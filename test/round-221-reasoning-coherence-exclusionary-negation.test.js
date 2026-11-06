@@ -233,7 +233,12 @@ test('G 已知未修登记现值（3 条存量漏判 + 5 条其他维度误伤�
     assert.strictEqual(r.gate.action, 'pass', `「${t}」存量漏判现值应为 pass，实测 ${r.gate.action}`);
     assert.strictEqual(rcCount(t), 0, `「${t}」rc 现值应为 0，实测 ${rcCount(t)}`);
   }
-  // 5 条其他维度误伤：现值逐条锁定（post_hoc / cum_hoc / common_cause / mediator_confusion）
+  // [r222] 5 条其他维度误伤**已由 r222 结清**（src/methodology-exempt.js
+  // 共表接入 post_hoc / pseudo_causal / cum_hoc / common_cause /
+  // mediator_confusion 五维，判据与 A/B 见 test/round-222-*.test.js）。
+  // 本节原登记它们是「已知未修」的现值（仍命中），r222 后现值翻转为
+  // 「五维全清零 + gate pass」——登记项已修复，此处同步断言修复后现值，
+  // 防止将来看见它们复活（回归回误伤）。
   const locked = {
     '分层之后，各层效应方向一致，说明效应不是由层间差异造成的': ['post_hoc', 'pseudo_causal'],
     '加权之后估计量仍然一致，说明偏差不是由样本结构造成的': ['post_hoc', 'pseudo_causal'],
@@ -243,8 +248,10 @@ test('G 已知未修登记现值（3 条存量漏判 + 5 条其他维度误伤�
   };
   for (const [t, dims] of Object.entries(locked)) {
     for (const d of dims) {
-      assert.strictEqual(hasDim(t, d), true, `「${t}」应仍命中 ${d}（现值登记），实测未命中`);
+      assert.strictEqual(hasDim(t, d), false, `「${t}」r222 修复后不应再命中 ${d}，实测仍命中（误伤复活）`);
     }
+    const r = gateMod.checkOutput(t);
+    assert.strictEqual(r.gate.action, 'pass', `「${t}」r222 修复后 gate 应为 pass，实测 ${r.gate.action}`);
     assert.strictEqual(rcCount(t), 0, `「${t}」rc 应已清零，实测 ${rcCount(t)}`);
   }
 });

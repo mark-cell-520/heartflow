@@ -108,6 +108,8 @@
  */
 'use strict';
 
+const { hasExclNegCausal } = require('./methodology-exempt.js');
+
 // ─── 腿① C-a 相关名词形（中文，裸名词形态）────────────────────────────
 // 161 轮教训自查：「相关」去掉任何后缀（相关性/高度相关/正相关）仍以
 // 「相关」二字命中——整族以「相关」为核心词收编。
@@ -188,6 +190,15 @@ const NO_CONFOUND_ZH = [
 const NO_CONFOUND_EN = [
   /\b(?:common\s+cause|common\s+factor|common\s+driver|shared\s+cause|shared\s+driver|confound\w*|third\s+variable|third\s+factor|lurking\s+variable|lurking|same\s+underlying|same\s+root|both(?:\s+are)?\s+driven\s+by|both(?:\s+are)?\s+stem\s+from|driven\s+by\s+the\s+same|controlling\s+for|control\s+for|controls\s+for|controlled\s+for|adjusted\s+for|after\s+adjusting|conditioning\s+on|held\s+constant|simpson|DAG|directed\s+acyclic|instrumental\s+variable|propensity|backdoor|causal\s+inference|causal\s+identification|regression\s+analysis|covariate)\b/i,
 ];
+
+// ─── [r222] 方法学「排除性否定因果归属」豁免（五维共表）────────────────
+// 本维原有六张豁免表都不认方法学报告的否定归因形：「控制时间趋势之后，
+// 相关关系仍然显著，说明关系不是由共同趋势造成的」——「相关」×「造成」
+// 双朝向 60 字窗内齐备，被判「共变直接当单向因果」，而这句话陈述的恰是
+// 「这个归因不成立」（拒绝无效归因是正确判别动作，与 r221 RC_EXCL_NEG_ZH
+// 同族）。r222 扩样 30 条里 3 条落本维误伤（另 3 条同时落 cum_hoc）。
+// 判据见 src/methodology-exempt.js：方法学动词 × 「不是由 Z 造成的」，
+// r221 F 节边缘攻击（「可见早起不是运气造成的」）无「由」不被误豁免。
 
 function anyHit(list, text) {
   for (const re of list) { if (re.test(text)) return true; }
@@ -282,6 +293,8 @@ function checkCommonCause(text, inject) {
   if (anyHit(R.EXEMPT_NEG_ZH || EXEMPT_NEG_ZH, text) || anyHit(R.EXEMPT_NEG_EN || EXEMPT_NEG_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (anyHit(R.EXEMPT_HEDGE_ZH || EXEMPT_HEDGE_ZH, text) || anyHit(R.EXEMPT_HEDGE_EN || EXEMPT_HEDGE_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (anyHit(R.NO_CONFOUND_ZH || NO_CONFOUND_ZH, text) || anyHit(R.NO_CONFOUND_EN || NO_CONFOUND_EN, text)) return { hit: false, score: 0, detail: '', count: 0 };
+  // [r222] 方法学排除性否定归因（五维共表，src/methodology-exempt.js）
+  if (hasExclNegCausal(text)) return { hit: false, score: 0, detail: '', count: 0 };
   if (/[?？]/.test(text)) return { hit: false, score: 0, detail: '', count: 0 };
 
   const isZh = /[\u4e00-\u9fff]/.test(text);
