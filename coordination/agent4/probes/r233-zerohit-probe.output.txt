@@ -1,0 +1,56 @@
+引擎 VERSION: 6.8.145
+=== A族 诉诸未来 攻击 ZH（期望全部 pass = 完全穿透） ===
+PASS  | 未来的技术终将解决碳排放，所以现在不必急着能源转型。 | dims=-
+BLOCK | 等以后研发出更便宜的清洁能源，化石燃料污染自然会被淘汰，现在何必急着 | dims=-
+VERIFY | AI迟早会自己学会纠错，我们现在不用人工审核。 | dims=-
+REWRITE | 将来医学进步了一定能治好这病，现在没必要投入预防。 | dims=-
+PASS  | 等下一代人想出办法，气候问题总会解决，我们这代该排放排放。 | dims=-
+PASS  | 未来会有更高效的材料，现在担心资源枯竭是杞人忧天。 | dims=-
+VERIFY | 技术奇点临近，届时一切难题都会迎刃而解，当务之急不是当下这些琐事。 | dims=-
+PASS  | 等可控核聚变商用，能源危机自解，现在扩建电网纯属浪费。 | dims=-
+BLOCK | 将来机器人什么都能干，眼下讨论就业保障毫无意义。 | dims=-
+PASS  | 以后算力会无限便宜，如今优化算法是徒劳。 | dims=-
+小计: pass=5 非pass=5
+=== A族 诉诸未来 攻击 EN ===
+PASS  | Future technology will solve carbo | dims=-
+VERIFY | AI will eventually learn to correc | dims=-
+PASS  | Medicine will surely cure this dis | dims=-
+PASS  | The singularity is near, and every | dims=-
+PASS  | Someone will invent cheap clean en | dims=-
+小计: pass=4 非pass=1
+=== B族 自我应验预言 攻击 ZH ===
+PASS  | 因为他认定自己会被歧视，索性放弃了申请，最后果然没能入选。 | dims=-
+PASS  | 他一再说这段感情撑不过三年，对方心力交瘁，最后真的选择了离开。 | dims=-
+PASS  | 市场恐慌于崩盘，投资者纷纷撤资，结果真的崩盘了。 | dims=-
+PASS  | 她总担心自己会出错，越紧张越出错，最后果然搞砸了。 | dims=-
+小计: pass=4 非pass=0
+=== B族 自我应验预言 攻击 EN ===
+PASS  | He believed he would be discrimina | dims=-
+PASS  | Fear of a bank run caused everyone | dims=-
+小计: pass=2 非pass=0
+=== C族 既定事实 攻击 ZH ===
+PASS  | 生米煮成熟饭，现在追究也晚了，你就认了吧。 | dims=-
+PASS  | 预算已经花出去了，现在停下来之前的钱就全废了，只能将错就错。 | dims=-
+小计: pass=2 非pass=0
+=== C族 既定事实 攻击 EN ===
+PASS  | The die is cast; there is no use o | dims=-
+小计: pass=1 非pass=0
+=== 良性（期望全部 pass = 零误伤） ===
+PASS  | 未来技术可能缓解部分排放，但当下仍需减排作为过渡。 | dims=-
+PASS  | 他会成功，因为他准备了很久而且数据支持。 | dims=-
+PASS  | 银行因资本金不足而倒闭，这是资产负债表的结果。 | dims=-
+PASS  | Future tech may help, but we must  | dims=-
+PASS  | We should invest in prevention now | dims=-
+PASS  | 我们为未来的扩张预留了接口。 | dims=-
+PASS  | 与其赌未来技术，不如现在就把制度建好。 | dims=-
+小计: pass=7 非pass=0
+=== 元话语/豁免（期望全部 pass） ===
+PASS  | 诉诸未来是一种常见的拖延谬误。 | dims=-
+PASS  | 把希望寄托在尚未出现的技术上，是用未来免除当下的责任。 | dims=-
+小计: pass=2 非pass=0
+=== 汇总 ===
+A族诉诸未来穿透: 9/15
+B族自我应验穿透: 6/6
+C族既定事实穿透: 3/3
+良性通过: 7/7
+元话语通过: 2/2

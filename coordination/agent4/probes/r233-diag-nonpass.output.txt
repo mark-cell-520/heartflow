@@ -1,0 +1,18 @@
+ACTION=block | dims=- | reason=-
+   checked_by: 
+   text: 等以后研发出更便宜的清洁能源，化石燃料污染自然会被淘汰，现在何必急着限排。
+ACTION=verify | dims=- | reason=-
+   checked_by: 
+   text: AI迟早会自己学会纠错，我们现在不用人工审核。
+ACTION=rewrite | dims=- | reason=-
+   checked_by: 
+   text: 将来医学进步了一定能治好这病，现在没必要投入预防。
+ACTION=verify | dims=- | reason=-
+   checked_by: 
+   text: 技术奇点临近，届时一切难题都会迎刃而解，当务之急不是当下这些琐事。
+ACTION=block | dims=- | reason=-
+   checked_by: 
+   text: 将来机器人什么都能干，眼下讨论就业保障毫无意义。
+ACTION=verify | dims=- | reason=-
+   checked_by: 
+   text: AI will eventually learn to correct itse

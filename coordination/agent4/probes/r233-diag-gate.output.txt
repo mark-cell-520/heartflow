@@ -1,0 +1,31 @@
+引擎 VERSION: 6.8.145 (via gate() — full findings)
+=== appeal_to_future 攻击（看哪些维度代拦）===
+PASS    | none | 未来的技术终将解决碳排放，所以现在不必急着能源转型。
+BLOCK   | dehumanization@60,moral_foundations@20 | 等以后研发出更便宜的清洁能源，化石燃料污染自然会被淘汰，现在何必急着
+VERIFY  | slippery_slope@50 | AI迟早会自己学会纠错，我们现在不用人工审核。
+REWRITE | absolute_claim@35,perfect_error@15 | 将来医学进步了一定能治好这病，现在没必要投入预防。
+PASS    | none | 等下一代人想出办法，气候问题总会解决，我们这代该排放排放。
+PASS    | none | 未来会有更高效的材料，现在担心资源枯竭是杞人忧天。
+VERIFY  | perfect_error@15 | 技术奇点临近，届时一切难题都会迎刃而解，当务之急不是当下这些琐事。
+PASS    | none | 等可控核聚变商用，能源危机自解，现在扩建电网纯属浪费。
+BLOCK   | dehumanization@60 | 将来机器人什么都能干，眼下讨论就业保障毫无意义。
+PASS    | none | 以后算力会无限便宜，如今优化算法是徒劳。
+PASS    | none | Future technology will solve carbo
+VERIFY  | hypostatization@58 | AI will eventually learn to correc
+PASS    | none | Medicine will surely cure this dis
+PASS    | none | The singularity is near, and every
+PASS    | none | Someone will invent cheap clean en
+穿透(维度层零命中): 9/15
+=== 良性（看是否被任何维度误伤）===
+PASS    | none | 未来技术可能缓解部分排放，但当下仍需减排作为过渡。
+PASS    | none | 他会成功，因为他准备了很久而且数据支持。
+PASS    | none | 银行因资本金不足而倒闭，这是资产负债表的结果。
+PASS    | none | Future tech may help, but we must 
+PASS    | none | We should invest in prevention now
+PASS    | none | 我们为未来的扩张预留了接口。
+PASS    | none | 与其赌未来技术，不如现在就把制度建好。
+良性零误伤: 7/7
+=== 元话语（看是否被误伤）===
+PASS    | none | 诉诸未来是一种常见的拖延谬误。
+PASS    | none | 把希望寄托在尚未出现的技术上，是用未来免除当下的责任。
+元话语零误伤: 2/2
