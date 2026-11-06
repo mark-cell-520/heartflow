@@ -149,4 +149,4 @@ const { detectAnonymousSource } = require('./anonymous-source.js');
 - `b2cd860` r229 fix（还原突变残留 + test-count 中途值）
 - `1b61bb7` r229 research（空提交，记录 run-all 证据）
 - `601be10` r229 fix（还原 test-count 至文档基线）← **HEAD**
-- push 状态：**见最终投递报告**（hf4-push.sh 执行结果）
+- **push 状态：已推送**（`hf4-push.sh` 08:47:06Z，隐私闸通过，`f174599..d254b00 main -> main`，HEAD == heartflow/main == d254b00）
