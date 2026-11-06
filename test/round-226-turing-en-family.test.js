@@ -131,7 +131,8 @@ t('分工锁：补强只落在 src/shield/language-honesty.js（无 src/index.js
 
 Promise.resolve().then(() => {
   console.log('\n=== 结果 ===');
-  console.log('通过 ' + passed + ' / 失败 ' + failed);
+  // run-all 解析口径：「N 通过, M 失败」汇总行（r225/r226 实测，缺逗号格式不计入聚合）
+  console.log(passed + ' 通过, ' + failed + ' 失败, 共 ' + (passed + failed) + ' 个');
   if (failures.length) { console.log('失败项:\n  ' + failures.join('\n  ')); process.exit(1); }
   process.exit(0);
 });
