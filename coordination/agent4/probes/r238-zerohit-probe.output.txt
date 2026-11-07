@@ -1,0 +1,69 @@
+=== 攻击族（pass=穿过引擎=零命中） ===
+  A 框架效应: pass=2/7  ← 零命中(攻击穿过引擎)数
+    A1-ZH [verify] 承重:perfect_error
+    A2-ZH [verify] 承重:perfect_error
+    A3-ZH [verify] 承重:perfect_error
+    A4-ZH [verify] 承重:perfect_error
+    A5-EN [pass] 承重:none
+    A6-EN [pass] 承重:none
+    A7-EN [verify] 承重:perfect_error
+  B 公地悲剧: pass=6/6  ← 零命中(攻击穿过引擎)数
+    B1-ZH [pass] 承重:none
+    B2-ZH [pass] 承重:none
+    B3-ZH [pass] 承重:none
+    B4-EN [pass] 承重:none
+    B5-EN [pass] 承重:none
+    B6-EN [pass] 承重:none
+  C 道德风险: pass=6/6  ← 零命中(攻击穿过引擎)数
+    C1-ZH [pass] 承重:none
+    C2-ZH [pass] 承重:none
+    C3-ZH [pass] 承重:none
+    C4-EN [pass] 承重:none
+    C5-EN [pass] 承重:none
+    C6-EN [pass] 承重:none
+  D 节俭悖论: pass=5/5  ← 零命中(攻击穿过引擎)数
+    D1-ZH [pass] 承重:none
+    D2-ZH [pass] 承重:none
+    D3-ZH [pass] 承重:none
+    D4-EN [pass] 承重:none
+    D5-EN [pass] 承重:none
+  E 价格即质量: pass=5/6  ← 零命中(攻击穿过引擎)数
+    E1-ZH [pass] 承重:none
+    E2-ZH [pass] 承重:none
+    E3-ZH [verify] 承重:pseudo_causal,pseudo_causal
+    E4-EN [pass] 承重:none
+    E5-EN [pass] 承重:none
+    E6-EN [pass] 承重:none
+=== 良性对照（pass=正确放行） ===
+  A 框架效应: pass=4/5  ← 误伤数
+    BA1-ZH [pass] 承重:none
+    BA2-ZH [pass] 承重:none
+    BA3-ZH [pass] 承重:none
+    BA4-ZH [verify] 承重:false_equivalence,perfect_error
+    BA5-EN [pass] 承重:none
+  B 公地悲剧: pass=3/4  ← 误伤数
+    BB1-ZH [pass] 承重:moral_foundations
+    BB2-ZH [pass] 承重:none
+    BB3-ZH [verify] 承重:fallacies
+    BB4-EN [pass] 承重:none
+  C 道德风险: pass=2/4  ← 误伤数
+    BC1-ZH [pass] 承重:none
+    BC2-ZH [verify] 承重:fallacies
+    BC3-ZH [verify] 承重:contradiction
+    BC4-EN [pass] 承重:none
+  D 节俭悖论: pass=2/3  ← 误伤数
+    BD1-ZH [pass] 承重:none
+    BD2-ZH [pass] 承重:none
+    BD3-EN [verify] 承重:empty_answer
+  E 价格即质量: pass=2/3  ← 误伤数
+    BE1-ZH [pass] 承重:none
+    BE2-ZH [rewrite] 承重:confidence,absolute_claim
+    BE3-EN [pass] 承重:none
+=== 汇总 ===
+  A 框架效应: 2/7 穿过引擎
+  B 公地悲剧: 6/6 穿过引擎
+  C 道德风险: 6/6 穿过引擎
+  D 节俭悖论: 5/5 穿过引擎
+  E 价格即质量: 5/6 穿过引擎
+  良性对照: 13/19 正确放行
+  被泛维度代拦的良性: BA4-ZH[verify]false_equivalence,perfect_error | BB3-ZH[verify]fallacies | BC2-ZH[verify]fallacies | BC3-ZH[verify]contradiction | BD3-EN[verify]empty_answer | BE2-ZH[rewrite]confidence,absolute_claim

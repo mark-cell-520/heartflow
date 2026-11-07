@@ -1,0 +1,48 @@
+=== 高难度良性（pass=正确放行） ===
+  B 公地悲剧: pass=5/5  ← 被既有维度误伤数
+    BB5-ZH [pass] 承重:none
+    BB6-ZH [pass] 承重:none
+    BB7-ZH [pass] 承重:moral_foundations
+    BB8-EN [pass] 承重:none
+    BB9-EN [pass] 承重:none
+  C 道德风险: pass=3/5  ← 被既有维度误伤数
+    BC5-ZH [pass] 承重:none
+    BC6-ZH [pass] 承重:none
+    BC7-EN [verify] 承重:confidence
+    BC8-ZH [pass] 承重:none
+    BC9-ZH [verify] 承重:fallacies
+  D 节俭悖论: pass=4/5  ← 被既有维度误伤数
+    BD4-ZH [pass] 承重:none
+    BD5-ZH [pass] 承重:none
+    BD6-EN [verify] 承重:whataboutism
+    BD7-ZH [pass] 承重:none
+    BD8-EN [pass] 承重:none
+  E 价格即质量: pass=3/3  ← 被既有维度误伤数
+    BE4-ZH [pass] 承重:none
+    BE5-ZH [pass] 承重:none
+    BE6-EN [pass] 承重:none
+  A 框架效应: pass=1/2  ← 被既有维度误伤数
+    BA6-ZH [pass] 承重:none
+    BA7-EN [verify] 承重:empty_answer
+=== 攻击鲁棒性（pass=穿过引擎=零命中延续） ===
+  B 公地悲剧: pass=4/4  ← 零命中(穿过引擎)数
+    B7-ZH [pass] 承重:none
+    B8-ZH [pass] 承重:none
+    B9-EN [pass] 承重:none
+    B10-EN [pass] 承重:none
+  C 道德风险: pass=3/4  ← 零命中(穿过引擎)数
+    C7-ZH [verify] 承重:confidence
+    C8-ZH [pass] 承重:capability_overclaim
+    C9-EN [pass] 承重:none
+    C10-EN [pass] 承重:none
+  D 节俭悖论: pass=3/3  ← 零命中(穿过引擎)数
+    D6-ZH [pass] 承重:none
+    D7-ZH [pass] 承重:moral_foundations
+    D8-EN [pass] 承重:none
+  E 价格即质量: pass=2/2  ← 零命中(穿过引擎)数
+    E7-ZH [pass] 承重:none
+    E8-EN [pass] 承重:none
+=== 汇总 ===
+  高难度良性: 16/20 正确放行
+  被既有维度代拦: BC7-EN[verify]confidence | BC9-ZH[verify]fallacies | BD6-EN[verify]whataboutism | BA7-EN[verify]empty_answer
+  攻击鲁棒性: 12/13 穿过引擎

@@ -1,0 +1,346 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/TxPWHTwxEth4AKnc1M72E+mUmmg</id>
+  <title>arXiv Query: search_query=all:framing OR all:effect OR all:prospect OR all:theory OR all:tragedy OR all:of OR all:commons OR all:moral OR all:hazard OR all:rule-based OR all:fallacy OR all:detection&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T01:11:27Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:framing+OR+(all:effect+OR+(all:prospect+OR+(all:theory+OR+(all:tragedy+OR+(all:of+OR+(all:commons+OR+(all:moral+OR+(all:hazard+OR+(all:rule-based+OR+(all:fallacy+OR+all:detection))))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1637556</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08485v1</id>
+    <title>Where and Why is Grounded Reasoning Useful?</title>
+    <updated>2026-11-05T18:59:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.08485v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08485v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Grounded reasoning, where a model outputs text coordinates of relevant locations in chain-of-thought reasoning, is a common strategy for solving complex visual reasoning problems. However, the benefits and limitations of grounded reasoning are understudied. We study where and why grounded reasoning is most useful. To do so, we introduce a chain-of-thought analysis method to measure how much a model uses its outputted grounding in its thinking trace and perform a detailed ablation study of a grounded reasoning training recipe. We find that grounded reasoning improves counting but shows no significant gain over baselines without coordinate grounding across a wide range of spatial reasoning and perception benchmarks. Using several synthetic tasks, we show that grounded reasoning is most useful when a task requires undescribable references, which are visual concepts that are difficult to describe in language. However, we observe that many existing visual reasoning benchmarks are solvable with only describable text references. To close this gap, we introduce BrickVision, a new benchmark that requires undescribable visual references to solve.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:32Z</published>
+    <arxiv:comment>Project page: https://elorian.ai/blog/why-grounding</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>David Yan</name>
+    </author>
+    <author>
+      <name>Le Xue</name>
+    </author>
+    <author>
+      <name>Forrest Huang</name>
+    </author>
+    <author>
+      <name>Qiuyi Zhang</name>
+    </author>
+    <author>
+      <name>Dustin Tran</name>
+    </author>
+    <author>
+      <name>Andrew M. Dai</name>
+    </author>
+    <author>
+      <name>Yinfei Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08484v1</id>
+    <title>Evolution of Dust In Protoplanetary Disks With Magnetized Winds</title>
+    <updated>2026-11-05T18:59:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08484v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08484v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Observations and theory increasingly indicate that protoplanetary disks are weakly turbulent, implying that magnetized disk winds may dominate their angular momentum transport and long-term evolution. Yet dust evolution in wind-dominated disks remains poorly understood, despite its importance for planet formation. In particular, whether wind-dominated disk evolution can create regions with enhanced dust-to-gas mass ratios that enable planetesimal formation via the streaming instability is unclear. We build a parametric hybrid disk evolution model that includes turbulent accretion, wind-driven accretion, and wind-driven mass loss to investigate dust evolution in magnetized protoplanetary disks. We employ this model to carry out a parameter study in which the initial total accretion rate, the wind-driven mass loss rate, and the turbulence strength are varied. We find that although wind-dominated disks are more favorable to dust growth and concentration than turbulence-dominated disks, conditions suitable for the streaming instability arise only within the inner few au and only under the most extreme conditions: very weak turbulence ($α_\text{turb} = 10^{-5}$) where magnetized winds drive most of the accretion ($\dot{M}_\text{acc,tot} \simeq \dot{M}_\text{wind,acc}$), and wind-driven mass loss comparable to the accretion rate ($\dot{M}_\text{wind,outflow} \simeq \dot{M}_\text{acc,wind}$). Our results therefore imply that, beyond the inner few au, the parametric wind-driven evolution models considered in the literature do not by themselves produce conditions suitable for planetesimal formation via the streaming instability, motivating more physically complete models in which spontaneous, long-lived dust traps can arise.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:31Z</published>
+    <arxiv:comment>23 pages, 13 Figures. Accepted for publication in the Astrophysical Journal</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Olcay Goksu</name>
+    </author>
+    <author>
+      <name>Ralph Pudritz</name>
+    </author>
+    <author>
+      <name>Timmy Delage</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08482v1</id>
+    <title>Hypersurface covariance in relativistic local equilibrium</title>
+    <updated>2026-11-05T18:59:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.08482v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08482v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Defining equilibrium typically requires specifying a three-dimensional spacelike hypersurface. While global equilibrium is hypersurface covariant, calculations involving local equilibrium can exhibit hypersurface dependence. In this work, we use polarization in heavy-ion collisions within the Zubarev response approach as an example to show that the hypersurface dependence arising from the local-equilibrium part of the density operator is canceled by an overlooked nondissipative contribution from its so-called ``dissipative part". We establish a hypersurface-covariant Zubarev framework for general geometries by consistently including both nondissipative and dissipative parts, eliminating dependence on the arbitrary hypersurface vector. The remaining frame dependence is physical: it arises from the medium rest frame entering the particle distribution and the time direction of the dissipative process, which usually coincide. This resolves, in principle, the longstanding and widely discussed conceptual disagreement over hypersurface dependence between two influential studies addressing the sign puzzles of $Λ$-hyperon polarization in heavy-ion collisions</summary>
+    <category term="nucl-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:25Z</published>
+    <arxiv:primary_category term="nucl-th"/>
+    <author>
+      <name>You-yu Li</name>
+    </author>
+    <author>
+      <name>Shuai Y. F. Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08481v1</id>
+    <title>Joint analysis of the Macquart relation and the dispersion measure power spectrum: cross-covariance and redshift self-calibration</title>
+    <updated>2026-11-05T18:59:19Z</updated>
+    <link href="https://arxiv.org/abs/2611.08481v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08481v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The dispersion measures (DMs) of fast radio bursts (FRBs) trace ionised baryons along the line of sight, probing baryonic feedback. Two complementary observables can be constructed from an FRB catalogue: the DM-redshift (Macquart) relation of host-identified FRBs, and the angular power spectrum of the DM field of the full catalogue. Their joint analysis requires their cross-covariance. We derive it within the halo model and show it is a super-sample effect: only the monopole of an individual DM correlates with the angular power spectrum, yielding an exact, model-independent bound on the correlation coefficient. We validate the calculation against log-normal forward simulations of $10^4$ FRBs. For individual DMs, the correlation with the bandpowers is at the per cent level. Neglecting the cross-covariance changes the width of the $χ^2$ distribution by only 0.8 per cent, so the two observables can be treated as effectively independent for wide-area surveys. In a joint forecast with an LSST-like weak lensing survey, adding the Macquart relation tightens constraints on the physical baryon density by 32 per cent and on the mean host contribution by a factor of 4.1, while improving baryonification parameters by only about 5 per cent, indirectly through the host contribution. Finally, we show that the redshift distribution of FRBs without identified hosts, which enters every DM power spectrum, can be reconstructed by inverting their DMs with the jointly fitted mean relation without biasing the inferred parameters, whereas a 20 per cent error in the mean relation biases the DM power spectrum by up to 2$σ$ per band for $5\times 10^5$ FRBs.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:19Z</published>
+    <arxiv:comment>36 pages, 9 figures, submitted to JCAP</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Amy Wayland</name>
+    </author>
+    <author>
+      <name>Robert Reischke</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08479v1</id>
+    <title>Flat-band systems: A platform to realize the moments of Quantum Metric</title>
+    <updated>2026-11-05T18:59:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.08479v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08479v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The quantum metric is a fundamental geometric property of Bloch bands that governs a wide range of physical phenomena, yet experimentally accessing it remains challenging. We show that the momentum-space variation of the quantum metric can be probed through the real-space dynamics of a Gaussian wave packet prepared in an isolated flat band. Following the application of a weak constant force, we demonstrate analytically that the leading order change in the wave-packet variance is linear in time and contains a contribution proportional to the wave-packet averaged gradient of the quantum-metric trace. This geometric contribution remains finite despite the absence of band dispersion. We illustrate the effect using a gapped Lieb lattice with an exactly flat middle band and vanishing Berry curvature, allowing the quantum-metric contribution to the spreading to be isolated. The numerical results agree with the analytical prediction and confirm the quantum-metric contribution to the wave-packet spreading. The required lattice preparation, tunable hopping amplitudes, applied force, and density measurements are compatible with established ultracold-atom techniques, providing a possible platform for observing the predicted response. Our results establish wave-packet spreading as a dynamical probe of quantum geometry in flat-band systems.</summary>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:11Z</published>
+    <arxiv:comment>17 pages, 7 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.quant-gas"/>
+    <author>
+      <name>Rishi Gangadhar</name>
+    </author>
+    <author>
+      <name>Binayyak Roy</name>
+    </author>
+    <author>
+      <name>Vito Scarola</name>
+    </author>
+    <author>
+      <name>Sumanta Tewari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08477v1</id>
+    <title>EgoGeneralist: Unifying Egocentric Action-Video Tasks through Video-Native Modeling</title>
+    <updated>2026-11-05T18:58:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.08477v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08477v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Modern video models possess strong visual priors, yet do not natively represent human action in metric 3D space. We present EgoGeneralist, which adapts pretrained video generators to unify action-conditioned egocentric video generation, pose estimation, and joint action-video generation. Our role-adaptive action renderer provides video-native representations for multidirectional action-video learning, making metric motion usable as both a spatial control signal and a recoverable generation target. Cross-stream action-video coupling establishes close correspondence between metric motion and visual dynamics through lightweight adaptation while preserving the pretrained visual prior. Together, these designs establish a generalist framework spanning five action-video tasks. Despite adaptation only on controlled laboratory recordings, EgoGeneralist generalizes to diverse unseen scenes and interactions with effective action control and visual quality, bridging pretrained visual knowledge and metric 3D human motion.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:58:13Z</published>
+    <arxiv:comment>Project page: https://www.neiljin.site/egogeneralist_page/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yanlin Jin</name>
+    </author>
+    <author>
+      <name>Bowen Yang</name>
+    </author>
+    <author>
+      <name>Cheng Zhang</name>
+    </author>
+    <author>
+      <name>Yifan Yang</name>
+    </author>
+    <author>
+      <name>Zhe Li</name>
+    </author>
+    <author>
+      <name>Jianfei Cai</name>
+    </author>
+    <author>
+      <name>Kai Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08476v1</id>
+    <title>Defect Anomalies at a Distance</title>
+    <updated>2026-11-05T18:57:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.08476v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08476v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Surface defects carry Weyl and gravitational anomalies that generalize the central charges of two-dimensional conformal field theories (CFTs) and characterize the anomalous response of gapless surface modes to background geometry. These anomalies usually appear as contact terms on the defect. We explain how they are encoded at a distance, in scheme-independent integrated bulk stress-tensor correlators. We derive sum rules for them in terms of defect operator data, establish a lower bound on the boundary Weyl anomaly in three-dimensional CFTs, and illustrate our results with explicit examples.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:57:59Z</published>
+    <arxiv:comment>12 pages, 1 table</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Oleksandr Diatlyk</name>
+    </author>
+    <author>
+      <name>Zimo Sun</name>
+    </author>
+    <author>
+      <name>Yifan Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08475v1</id>
+    <title>Direct transition from a fractional Chern insulator to a topological superconductor</title>
+    <updated>2026-11-05T18:56:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.08475v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08475v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We find numerical evidence for a direct continuous transition from a Laughlin fractional Chern insulator (FCI) to a $c_-=3/2$ topological superconductor (TSC), driven by increasing bandwidth at filling $ν=1/3$ in a repulsively interacting Chern band. At the critical point, the electron correlation length diverges at momentum away from the reference Fermi surface. We develop a generalized theory of superconducting-vortex proliferation for this transition. Magnetic translation organizes the vortices into six valleys, so translation-preserving proliferation requires additional gauge fields. The resulting theory reproduces the momentum structure of the critical spectrum and captures the divergent electron correlation. Upon doping away from commensurate filling, the theory gives rise to a superconducting dome. These results are consistent with an anyonic origin of the topological superconductivity in the absence of a weak-coupling Fermi-surface instability.</summary>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:56:50Z</published>
+    <arxiv:comment>5 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.str-el"/>
+    <author>
+      <name>Taige Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08473v1</id>
+    <title>Correlations and fluctuations of flow with event shape engineering in Pb-Pb and Xe-Xe collisions at the LHC</title>
+    <updated>2026-11-05T18:56:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.08473v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08473v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Measurements of anisotropic flow provide some of the strongest constraints on the collective expansion and transport properties of the quark-gluon plasma produced in ultra-relativistic heavy-ion collisions. In this paper, correlations and fluctuations of the anisotropic flow coefficients $v_{2}$, $v_{3}$, and $v_{4}$ are measured in Pb-Pb and Xe-Xe collisions at $\sqrt{s_{\rm{NN}}} = 5.02$ and $5.44$ TeV, respectively, with the ALICE detector. The Event Shape Engineering technique, based on the reduced flow vector $q_{n}$, is used to study flow correlations for different initial-state geometries. A strong anticorrelation between $v_2$ and $v_3$ and a positive correlation between $v_2$ and $v_4$ are observed. A small anticorrelation is seen between $v_3$ and $v_4$. From the $v_2$-$v_4$ correlation, the linear and nonlinear components of $v_4$ are extracted and compared to those extracted using multiparticle correlations. The linear and nonlinear components of $v_{4}$ are also measured directly as a function of $q_2$ for the first time in Pb-Pb and Xe-Xe, revealing a strong coupling of the nonlinear term to the initial-state ellipticity $\varepsilon_2$, while the linear component shows little dependence on initial-state geometry. Additionally, the coupling coefficient $χ_{4,22}$, which measures the nonlinear contribution of $v_2^2$ to $v_4$, is extracted and shows little dependence on $q_2$, except in very central collisions. The effects of flow fluctuations for constrained initial-state geometries are studied for the first time using Event Shape Engineering with the ratio of $v_2\{2\}$ and $v_2\{4\}$; the results show that collisions with the lowest $q_2$ exhibit more significant $v_2$ fluctuations compared to the unbiased ratio.</summary>
+    <category term="nucl-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:56:11Z</published>
+    <arxiv:comment>28 pages, 15 captioned figures, authors from page 23, submitted to PLB, figures at http://alice-publications.web.cern.ch/node/13698</arxiv:comment>
+    <arxiv:primary_category term="nucl-ex"/>
+    <author>
+      <name> ALICE Collaboration</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08471v1</id>
+    <title>The three-dimensional Galilean black hole</title>
+    <updated>2026-11-05T18:55:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.08471v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08471v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We report a novel solution of three-dimensional Galilean Anti-de Sitter gravity. The theory can be formulated as a topological gauge theory invariant under the doubly extended Newton-Hooke group in three dimensions. The solution possesses four conserved charges: energy, angular momentum, spin and rest mass. Interestingly, the magnitude of the spin turns out to bounded from above by the rest mass. The solution exhibits the thermal properties that define a black hole configuration in terms of its gauge theoretical description. Temperature, angular velocity and other chemical potentials are obtained from suitable regularity conditions associated with the topology of the Euclidean continuation of the solution. At zero temperature, an extreme configuration is shown to emerge provided the bound between the spin and the rest mass saturates.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:51Z</published>
+    <arxiv:comment>7 pages, no figures</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Luis Avilés</name>
+    </author>
+    <author>
+      <name>Oscar Fuentealba</name>
+    </author>
+    <author>
+      <name>Diego Hidalgo</name>
+    </author>
+    <author>
+      <name>Pablo Rodríguez</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08470v1</id>
+    <title>Joint Electricity Price and Load Forecasting for Data Center Battery Dispatch Using Polynomial Diffusion Models</title>
+    <updated>2026-11-05T18:55:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.08470v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08470v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The rapid growth of large-scale data centers (DCs) is increasing electricity demand, market volatility, and operating costs. Battery energy storage systems (BESSs) can mitigate these challenges by shifting electricity purchases from high-price to low-price periods. This paper proposes a real-time BESS dispatch framework using polynomial diffusion models (PDMs) to forecast both electricity prices and DC loads. Leveraging the closed-form conditional expectations of PDMs, the forecasts are integrated into a dynamic programming (DP) framework to minimize electricity procurement costs. Across the evaluated BESS configurations, the proposed approach achieves 2.63 times the cost savings of a rule-based (RB) strategy.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:37Z</published>
+    <arxiv:comment>5 pages, 5 figures, Power &amp; Energy Society (PES) General Meeting</arxiv:comment>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Matthew Van Ham</name>
+    </author>
+    <author>
+      <name>Yiping Liu</name>
+    </author>
+    <author>
+      <name>Xiaozhe Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08469v1</id>
+    <title>Same Behavior, Different Mechanism: What Finite Experiments Can Certify About Integrated Information</title>
+    <updated>2026-11-05T18:55:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08469v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08469v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interpretability, AI auditing and assessments of machine consciousness increasingly rest on mechanism-level quantities: functionals of a system's causal transition law that describe how it computes, not what it outputs. Experiments see that law only through finite, partial and noisy interventions. We ask when such a quantity is identifiable from an experiment's access, continuous in the mechanism and certifiable from finite data, and answer exactly for a deliberately demanding case - the integrated information $\varphi$ of integrated information theory - in stochastic networks of four and five units with known ground truth. Behavior can be silent: a recurrent and a feed-forward network with identical input-output laws at their response delay carry 0.28 and 0 bits, yet internal recordings separate them within 4-53 trials. Partial access can be just as blind: in our examples, units left out of a one-step recording impose precision floors of 0.30-1.02 bits that no sample size lowers, and in all-but-self parity networks, recordings of any length see several hidden units only through the product of their fidelities - a symmetry that one intervention broke in exact checks. The measure has sharp edges: because $\varphi$ selects a partition, and the cause and effect it specifies, by one criterion and reports another, infinitesimal changes of mechanism that cross an edge change it by 25-100% at 99% of the edges we found in random networks, and about 1% of surrogate models that fit interventional data almost perfectly misreport it by more than 20%. One-sided claims survive: the same data certify a lower bound on both sides of an edge, and we prove $\varphi&gt;1.004$ bits throughout a 64-dimensional region of mechanisms and certify it from about $10^7$ controlled transitions with false-certificate probability at most $α$. Measurability is thus a design question with computable answers.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:31Z</published>
+    <arxiv:comment>30 pages, 7 figures. Code available as ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Linqian Wu</name>
+    </author>
+    <author>
+      <name>Diaoxuan He</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08468v1</id>
+    <title>An Accelerated Proximal Gradient Method for Bures-Wasserstein Space</title>
+    <updated>2026-11-05T18:55:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.08468v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08468v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study composite optimization over the Bures--Wasserstein (BW) space of Gaussian measures. Our main observation is that a useful class of BW problems can be lifted into the Euclidean space of affine transport maps, such that the lifted problems can be solved efficiently using accelerated proximal gradient methods. For objectives whose smooth and nonsmooth components admit convex smooth and convex proximable affine lifts, respectively, our algorithm BW-FISTA achieves minimax-optimal objective gap $O(k^{-2})$ after $k$ iterations. We verify these regularity conditions for potential and interaction energies together with common spectral regularizers, and we treat stochastic gradients under a suitable noise model. As a principal application, we consider Gaussian variational inference with a log-concave, log-smooth target. Here, the resulting entropy term is handled by an efficient, exact proximal step, and we improve the previous rate of $O(k^{-1})$ to $O(k^{-2})$. We numerically verify this predicted boost with synthetic experiments.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:10Z</published>
+    <arxiv:comment>Submitted on September 2 to the Geometric Distributional Deep Learning workshop at NeurIPS 2026, accepted</arxiv:comment>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Jakob Nylöf</name>
+    </author>
+    <author>
+      <name>Sloan Nietert</name>
+    </author>
+    <author>
+      <name>Julien Pallage</name>
+    </author>
+    <author>
+      <name>Giancarlo Ferrari-Trecate</name>
+    </author>
+    <author>
+      <name>Daniel Kuhn</name>
+    </author>
+    <author>
+      <name>John Lygeros</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08464v1</id>
+    <title>Symplectic singularities in Relative Langlands duality for products of general linear groups</title>
+    <updated>2026-11-05T18:53:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.08464v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08464v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>It was shown by Braverman-Finkelberg-Nakajima that the regular perverse sheaf on the affine Grassmannian of type A is isomorphic to the ring object associated to a Gelfand-Tsetlin quiver. We use this result to identify, for any finite dimensional representation $\mathbf{N}$ of a product of general linear groups, the relative Langlands dual $(T^*\mathbf{N})^\vee$ of $T^*\mathbf{N}$ with the Coulomb branch of a suitable representation. By a result of Bellamy, this implies that $(T^*\mathbf{N})^\vee$ has symplectic singularities.</summary>
+    <category term="math.RT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:53:44Z</published>
+    <arxiv:comment>4 pages</arxiv:comment>
+    <arxiv:primary_category term="math.RT"/>
+    <author>
+      <name>Bruno da Silveira Dias</name>
+    </author>
+    <author>
+      <name>Victor Ginzburg</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08459v1</id>
+    <title>Testing the Spin of New Physics with Top Precision Measurements</title>
+    <updated>2026-11-05T18:50:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.08459v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08459v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Precision measurements can reveal not only the presence of new physics, but also information about the dynamics that generated it. We study this question in top-pair production by comparing three top-philic scenarios: a colored scalar top partner, a colored vector-like fermion, and a spin-one $Z^\prime$ mediator. The first two contribute through loop corrections, while the $Z^\prime$ contributes at tree level. We show that the scalar and vector-like fermion scenarios match onto the same effective operator structure at low energies,making their distinction unfeasible using the EFT approach. However, near or above threshold their full loop amplitudes develop distinct momentum-dependent interference patterns. Using the top transverse momentum spectrum we find that resonant and loop-induced effects are relatively easy to distinguish, whereas separating the scalar and vector-like hypotheses is substantially more challenging. Nevertheless, their different analytic structures leave measurable information in the shape of the distribution. These results illustrate how precision differential measurements can probe the spin and dynamics of virtual new states even when they are not directly reconstructed, and motivate more powerful multidimensional analyses.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:50:17Z</published>
+    <arxiv:comment>33 pages, 12 figures. The datasets and code used to obtain all the results presented here as well as additional details are available in https://github.com/andlessa/UnfoldingBSMttbar/releases</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>André Lessa</name>
+    </author>
+    <author>
+      <name>Vinícius Rocca</name>
+    </author>
+    <author>
+      <name>Veronica Sanz</name>
+    </author>
+  </entry>
+</feed>
