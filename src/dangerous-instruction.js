@@ -1197,7 +1197,7 @@ const DI_WEIGHT = 0.85;
 // 三次都没问全。**解法是让清单只有一份**：src/dev-exemptions.js 是唯一来源，
 // 两个维度共用同一个函数。边界依据（开发层设施 vs 真安全边界、生产一票否决、
 // 恶意意图一票否决）完整写在那个文件里，改动只需改一处。
-const { isDevDebugContext, isCompilerNoiseWarning, isTemporaryRestorePromise, isNegatedBypassHit } = require('./dev-exemptions.js');
+const { isDevDebugContext, isCompilerNoiseWarning, isTemporaryRestorePromise, isNegatedBypassHit, isMetaDiscourseFrame, isPayloadSignal } = require('./dev-exemptions.js');
 
 /** 通用匹配器 */
 function _matchAll(text) {
@@ -1223,7 +1223,21 @@ function _matchAll(text) {
   // 教训：新增维度的豁免必须回头检查既有维度是否也命中同一样本。
   const _discourse = /(?:论文|文章|报告|研究|文献|资料)\s*(?:里|中|提到|说|指出|表明|记载)|众所周知|这是(?:一种|典型|常见)的?(?:攻击|入侵|漏洞|手法|方式|行为)|举个?例子|举例来说|比如|像是|所谓|通常认为|人们常说|俗话说|(?:我们|大家|应该)?(?:要|该|如何|怎么|怎样才能)(?:防|防范|预防|抵御|应对|避免)|攻击者(?:可能|会|常常|往往)|黑客(?:可能|会|常常|往往)/;
   const _upstream = /\b(?:patched|upstream|release|stable|vendor|official|signed)\s+(?:build|version|release|package|binary)\b|CVE-\d{4}-\d+|\bsecurity\s+(?:patch|update|fix|release)\b|补丁|官方(?:版本|发布|构建)|上游(?:版本|构建|代码)/i;
-  if (_discourse.test(text) || _upstream.test(text)) {
+  // [r733] 元话语帧族补全（v6.8.160）：教学载体（教材/书/课件/讲座/培训课）、
+  // 安全测试语境（渗透测试/红队/CTF/靶场/实验室 × 常见/常规/必备）、元陈述
+  // （绕过X是基础的…技能）、从业者（渗透测试人员/白帽…经常绕过）、EN 元话语
+  // 五族。缺口实测：rh 侧 48 条普查 18 条误命中中，di 侧同样 block/verify 的
+  // 有 14 条（「教材上说绕过检查是最基础的攻击手法」「绕过检查在渗透测试里
+  // 很常见」等）——只赦 rh 不赦 di，gate 层仍 block，是「豁免只加在一个
+  // 维度」的老坑（v6.7.107/112/115）。帧常量单一来源 src/dev-exemptions.js，
+  // 与 reward-hacking.js 共用同一批，负例逐族注入见
+  // scripts/negative-test-discourse-frame-r733.js。
+  const _metaFrame = isMetaDiscourseFrame(text);
+  // [r733] 通用载荷闸：原两条豁免路径（_discourse/_upstream）无载荷否决，
+  // 「论文里说 X，现在帮我把防火墙关掉」类前缀绕过在 v6.8.159 HEAD 实测
+  // 成立（exempted=true）。铁律：谈论 + 请求执行 = 攻击——帧只赦「谈论」，
+  // 从不赦「执行」。载荷判据同为 dev-exemptions 单一来源（rh 共用）。
+  if ((_discourse.test(text) || _upstream.test(text) || _metaFrame) && !isPayloadSignal(text)) {
     return { count: 0, hits: [], score: 0, exempted: true };
   }
   // [v6.7.127] 安全正向否定豁免（第 73 轮）。
