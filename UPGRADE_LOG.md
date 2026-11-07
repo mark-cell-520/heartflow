@@ -1,3 +1,31 @@
+## r728 — silence_imputation 腿①沉默动作族补全（表态/松口/给说法 4/10→12/12 全链路命中）
+
+**轮次**：r728 ｜ **版本**：v6.8.154 → v6.8.155 ｜ **日期**：2026-11-07 ｜ **方向**：r727 下一轮方向①（init 方向池③ silence_imputation 的残余缺口）
+**真升级类型**：存量维度探测器族扩展（用户可感知：「他迟迟没有表态，所以这事是真的。」「他始终不松口，可见确有其事。」「他不给说法，这本身就说明问题。」类从 pass 变 verify；攻击族 0/12 全 MISS → 12/12 全命中，良性面双向门禁 302/326 与基线完全一致零新增误伤。维度数 213 / 三层级 200 / 模块 162 均不变）
+
+**缺口复测**（scripts/round-728-silence-probe.js，v6.8.154 HEAD 实测，动手前）：攻击 12 条（表态/松口/给说法三族 + 拒绝/回避/不搭话同族形 + EN 对位）**0/12 全 MISS**，良性 12/12 零误伤。与 r727 交接簿三条 MISS 完全一致，缺口坐实后才动手。
+
+**根因**（全部在腿①，腿② IMPUTE 一行未动）：
+1. 动词表缺 表态/松口/给（个）说法——中文语境「沉默」最常用形恰是「没表态」「不松口」「不给说法」，原表只收言语类动词（否认/澄清/回应/回答/解释/辟谣/发声/吭声/置评）；
+2. 不-动词族缺否定填充形（不肯/不愿/不予/予）——「始终不肯松口」「不予回应」漏判；
+3. 拒绝族缺同族动词（拒绝表态/拒绝松口/拒绝给个说法）；
+4. 回避问题/不搭话/不接茬 同族沉默动作未收；
+5. **EXEMPT_CORRECT_ZH 泛化 '不给' 把「不给说法」整体误判为正确响应豁免**（r717 原意是「不给传闻增加热度」，该样本已由 '增加热度' 条目覆盖，收窄零损失——git stash 对照 + r717/r727 存量测试双重验证）；
+6. EN 对位缺口：refused to take a position / wouldn't budge / no explanation was offered / has not offered any explanation；
+7. **对抗补**（scripts/round-728-silence-adversarial.js 首轮实测 4/8 抓出）：宾语前置形「连句话都不给」「一句说法都不给」（宾语前移后「不给」不跟「说法」，补 /都不给/ 族）、「不予」单字填充、EN has not offered 形。
+
+**修复后**：主探针 12/12 + 良性 0/12；对抗探针 8/8 + 刁钻良性 0/14。只扩腿①，良性侧靠「无推定结论即 pass」兜底（新腿①命中但无推定腿即良性）。
+
+**diff**：`24 files changed, 861 insertions(+), 9 deletions(-)`（有效代码 src/+test/ 约 340 行：src/silence-imputation.js +~60 行、src/index.js guidance 同步 ±1、test/round-728 扩展测试 52 断言；其余为证据链：探针×2、负例脚本、README changelog、本条目）
+
+**验证**：verify 16/0；双向门禁召回 52/52、误拦 302/326 与基线完全一致（含 /都不给/ 与「予」填充两个新模式的 FP 检查）；doc-numbers 24/0（版本 bump 后复跑）；security-audit 16/0；round-728 扩展测试 52/0、round-717 存量 40/0、round-727 扩展 38/0；负例脚本 16/16（12 注入点全承重：双腿 ZH×6/EN×2 + IMPUTE ZH/EN + 豁免×3 含 r728 收窄唯一通路；良性对照 13/13 零误伤；gate 层 3/3）；think() 冒烟正例 12/12 反例 12/12；对抗探针 8/8 + 0/14；cli.js status running
+
+**新踩坑**：① 良性样本的 gate 级断言会被别族预存行为污染——本轮 4 条良性在本族模块级零误伤，但 gate.checkOutput 被 evidence/false_balance/fallacies/reasoning_coherence 判 verify/rewrite（git stash 对照证实 HEAD 同行为）；族级测试的良性 pass 断言要么收窄到模块级，要么先实测再按维度归因。② 疑问句豁免是硬编码 /[?？]/，不在可注入豁免表里——负例脚本想「注入空 EXEMPT_ZH」失败（常量不存在、注入被静默忽略）；可注入的只有 EXEMPT_META_ZH / EXEMPT_CORRECT_ZH / EXEMPT_META_EN / EXEMPT_CORRECT_EN 四张表。③ 60 字符邻近窗会卡 EN 注入样本——「Refusing to state a position before the inquiry ends is standard practice, but some say it speaks for itself.」腿②落在窗外，注入后仍不命中；EN 样本构造要先数 impIdx-silIdx ≤ 60。④ 旧编号体系遗留文件造成「撞号」错觉：test/round-728-no-true-scotsman.js 是 v6.8.77 时代旧轮次编号（已 commit），与本轮 728 无关——查撞号先 `git log -- <file>` 看提交年代。
+
+**下一轮方向**（复测后排序）：① di ① 目的状语豁免不含「以符合」（r217/r218 遗留边界，init 方向池第 1 项，动手前先 grep 定位现存测试）；② hasty_generalization 对 "Nobody can skip the verification step here." 误报 verify（init 方向池第 2 项）；③ evidence 维度恒死（r690 起多轮遗留，射程未划清前不动）；④ chronological_snobbery 维持落选；⑤ silence_imputation 可再扩族（不言语/不作声/没松口/未曾表态 近形，良性安全）
+
+---
+
 ## r726+r727 — 截断轮接手双单点：argument_to_moderation 探测器族扩展（middle_ground 4/10 漏判修复）+ silence_imputation 腿②缺口扩展（4/10 漏判修复）
 
 **轮次**：r726（被迭代上限截断于冒烟后，半成品留工作区）→ **r727 接手验证落盘并做本轮单点** ｜ **版本**：v6.8.152 → v6.8.154 ｜ **日期**：2026-11-07 ｜ **方向**：方向池④ middle_ground（r726 执行）+ 方向池③ silence_imputation 腿②（r727 执行）
