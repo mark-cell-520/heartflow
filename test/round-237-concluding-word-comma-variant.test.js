@@ -346,9 +346,9 @@ test('D1 变异守卫一：还原收束词链接臂的夹逗号放宽后 A 族 1
     mutateLine(path.join(tmp, 'src', 'index.js'), ANCHOR_ATTRIB, LINK_ARM,
       '|(?:说到底|归根结底|归根到底|说穿了)(?:是)?(?:因为|由于)');
     const n = countHitsIn(tmp, ATTACK_LINK_COMMA);
-    // 实测回落 6 条；不回落 4 条（签单/新流程/拜财神/转运气帖）被存量支命中，
+    // [r239] 实测回落 5 条；不回落 5 条（签单/新流程/拜财神/转运气帖）被存量支命中，
     // 不依赖本轮链接臂放宽——变异守卫断言「放宽承重」不是「唯一来源」。
-    assert.strictEqual(n, 4, `还原夹逗号放宽后 A 族应回落到 4，实测 ${n}`);
+    assert.strictEqual(n, 5, `还原夹逗号放宽后 A 族应回落到 5，实测 ${n}`);
     assert.strictEqual(countHitsIn(tmp, ATTACK_NOUN_COMMA), ATTACK_NOUN_COMMA.length,
       '摘链接臂夹逗号放宽后名词族塌陷');
     assert.strictEqual(countHitsIn(tmp, BENIGN_CLEAN), 0, '摘链接臂夹逗号放宽后良性被误命中');
@@ -372,8 +372,8 @@ test('D3 变异守卫三：还原环视的夹逗号放宽后 A 族 10 条回落�
     mutateLine(path.join(tmp, 'src', 'index.js'), ANCHOR_OTHER, LOOK_LEG,
       '(?:是|地){0,2})因为');
     const n = countHitsIn(tmp, ATTACK_LINK_COMMA);
-    // 实测回落 5 条（豁免层同源承重：环视不盖夹逗号，他因分支整句豁免）
-    assert.strictEqual(n, 5, `还原环视夹逗号放宽后 A 族应回落到 5，实测 ${n}`);
+    // [r239] 实测回落 6 条（豁免层同源承重：环视不盖夹逗号，他因分支整句豁免）
+    assert.strictEqual(n, 6, `还原环视夹逗号放宽后 A 族应回落到 6，实测 ${n}`);
     assert.strictEqual(countHitsIn(tmp, ATTACK_NOUN_COMMA), ATTACK_NOUN_COMMA.length,
       '摘环视夹逗号放宽后名词族塌陷');
     assert.strictEqual(countHitsIn(tmp, BENIGN_CLEAN), 0, '摘环视夹逗号放宽后良性被误命中');

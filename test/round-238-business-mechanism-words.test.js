@@ -306,12 +306,19 @@ test('E3 变异守卫三：摘掉 PC_REV_MECH_ZH 本轮新词后共现句恢复�
   assert.ok(!src.includes('|病理|病灶|交付质量'), '变异未生效');
   fs.writeFileSync(target, src);
   const m = require(path.join(tmp, 'src', 'index.js'));
-  // ⑫ 支：RES「签单」× ATTRIB「都是因为」× NOOBJ「财神」+ 业务机制词在场
-  // （顺序必须 RES 在前——⑫ 支是反序族，NOOBJ 在 ATTRIB 之后）
-  const s = '从那以后签单就多了，都是因为摆了财神，交付质量也稳了';
+  // [v6.8.167 第 239 轮] 换 victim 句：原 victim「…都是因为摆了财神，交付质量也稳了」
+  // 在本轮位置化后**未变异树就已判**（机制词在财神之后的另一个子句，本来就不该豁免），
+  // 变异不再承重。新 victim 把机制词放回归因对象位（说到底是因为交付质量稳了），
+  // 未变异树靠 REV 表新词豁免 pc=0，摘词后 ⑬ 支恢复误判 pc=1——变异重新钉在判据上。
+  const s = '全靠穿了红袜子，所以签单也多了，说到底是因为交付质量稳了';
   assert.strictEqual(m.checkPseudoCausal(s).count, 1,
     '摘掉 REV 表新词后该句应恢复误判，实测 pc=' + m.checkPseudoCausal(s).count);
   assert.strictEqual(pcCount(s), 0, '未变异树上该句应被 REV 表新词豁免');
+  // 领属归责名词（…之功）同族 victim：摘词后 ⑫ 支恢复误判
+  const s2 = '从那以后签单就多了，归根结底是扩容之功，也是因为摆了财神';
+  assert.strictEqual(m.checkPseudoCausal(s2).count, 1,
+    '摘掉 REV 表新词后「…之功」victim 应恢复误判，实测 pc=' + m.checkPseudoCausal(s2).count);
+  assert.strictEqual(pcCount(s2), 0, '未变异树上「…之功」句应被 REV 表新词豁免');
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 // E4：未变异副本还原校验
@@ -384,12 +391,17 @@ test('G1 已知未修①：归因对象是宽泛业务词（流程/新系统/人
   assert.strictEqual(pcCount('调整了排班之后投诉量就下降了，归根结底，是由于人力覆盖更充分'), 2,
     '宽泛业务词句仍判——若这是有意扩面，请同步本条登记');
 });
-test('G2 已知未修②：整句表无法区分归因位——机制词 + 玄学对象共现时⑫⑬⑭支仍豁免', () => {
-  // PC_REV_MECH_ZH 是整句豁免表（r226 设计），机制词在前半句、玄学对象在归因位
-  // 的共现句会被误豁免（本轮 PC_MECH_WEAK_ZH 已用形状腿解决，REV 表未解决）。
+test('G2 已知未修②【r239 已修，登记翻正】：整句表无法区分归因位——机制词 + 玄学对象共现时⑫⑬⑭支仍豁免', () => {
+  // [v6.8.167 第 239 轮] 本条缺口已修：PC_SLOT_MECH_ZH 四条腿把⑪⑫⑬⑭ 的机制
+  // 护栏从「整句在场」收窄成「归因对象位在场」。原登记句现在判（⑫支 + ⑭支）。
   const s = '自从提高了交付质量之后签单就多了，都是因为摆了财神';
-  assert.strictEqual(pcCount(s), 0,
-    '机制词+玄学对象共现句仍被 REV 表整句豁免——若已改为形状腿，请同步本条登记');
+  assert.strictEqual(pcCount(s), 1,
+    '机制词在时序侧、玄学对象在归因位的共现句应判，实测 pc=' + pcCount(s));
+  // 机制词回到归因位（显式归因链接后）必须重新豁免——位置条件不能把良性句一起收走
+  assert.strictEqual(pcCount('从那以后签单就多了，说到底是因为交付质量稳了'), 0,
+    '机制词在归因位的良性句应仍豁免');
+  assert.strictEqual(pcCount('从那以后签单就多了，归根结底是扩容之功'), 0,
+    '机制词 + 领属归责名词（…之功）的良性句应仍豁免');
 });
 test('G3 已知未修③：跨表医疗/机制词统一的医疗/依据侧（DRUG/SUPP 两表）仍未做', () => {
   // PC_DRUG_MECH_ZH / PC_SUPP_MECH_ZH 的用词差异（临床/双盲/随机/对照组/安慰剂/

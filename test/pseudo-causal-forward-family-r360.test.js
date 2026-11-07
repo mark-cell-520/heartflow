@@ -139,7 +139,8 @@ sabotage(results, 'P2 英文正序族置假（连接词→空）', [[
   const MIX = '由于换了招财头像加上新渠道拓展，这个月的订单明显多了';
   record(results, 'P3b 混合句护栏在时放行', !hitOrig(MIX), 'pc命中: ' + (hitOrig(MIX) ? 1 : 0));
   let text = SRC_TEXT.replace(
-    'if (pat === PC_CAUSAL_ZH_PATS[12] && revMech) continue;',
+    // [r239] 锚点随源码同步：机制护栏加 slotMech 位置条件后改写此处
+    'if (pat === PC_CAUSAL_ZH_PATS[12] && revMech && slotMech) continue;',
     '// sabotaged: 机制护栏失效');
   const tmp = SRC + '.r360sab';
   fs.writeFileSync(tmp, text);
