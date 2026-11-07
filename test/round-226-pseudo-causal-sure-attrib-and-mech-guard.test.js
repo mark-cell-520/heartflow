@@ -156,13 +156,18 @@ const BENIGN_HEAD_NONPASS = {
 // [r232] 第二条「从那天起她再也没迟到过，说明是早起打卡起了作用」已被本轮
 // 收窄 PC_OTHERFACTOR_ZH 的 `也会?` 分支修复（裸「也」不再构成豁免），移到
 // C4「必须保持命中」登记——**这不是放水**，C4 是正向断言，比 C1 的「必须仍为 0」更严。
-const STILL_GAP = [
-  // PC_OTHERFACTOR_ZH 的「因为」分支拦下（存量即如此；豁免表只许收窄，r225 已登记）
-  { s: '打那以后球队就再也没输过，显然是因为换了教练', gate: 'verify' },
-];
+// [r233] 末条「打那以后球队就再也没输过，显然是因为换了教练」已被本轮收口：
+// PC_OTHERFACTOR_ZH 的「因为」腿加归因链接负向环视（`(?<!(?:<断言词>)(?:是|地){0,2})因为`）
+// 后，「<断言词>是因为」的归因链接不再整句豁免第①⑤⑨三支。按 r227/r232 纪律
+// 移到 C5「必须保持命中」登记——**这不是放水**，C5 是正向断言，比 C1 更严。
+const STILL_GAP = [];
 // [r232] r232 收口、必须保持命中的句子（原 STILL_GAP 第二条）
 const FIXED_BY_R232 = [
   { s: '从那天起她再也没迟到过，说明是早起打卡起了作用', gate: 'rewrite' },
+];
+// [r233] r233 收口、必须保持命中的句子（原 STILL_GAP 末条）
+const FIXED_BY_R233 = [
+  { s: '打那以后球队就再也没输过，显然是因为换了教练', gate: 'verify' },
 ];
 // [r227] r227 收口、必须保持命中的句子（原 r226 STILL_GAP 首条）
 const FIXED_BY_R227 = [
@@ -287,6 +292,13 @@ test(`C3 r227 收口的 ${FIXED_BY_R227.length} 条必须保持命中`, () => {
 // [r232] 收口的句子必须**继续**被命中（detector > 0 + gate action 不变）——同 r227 纪律。
 test(`C4 r232 收口的 ${FIXED_BY_R232.length} 条必须保持命中`, () => {
   for (const g of FIXED_BY_R232) {
+    assert.ok(pcCount(g.s) > 0, `「${g.s}」应保持 detector 命中，实测 ${pcCount(g.s)}`);
+    assert.strictEqual(gateAction(g.s), g.gate, `「${g.s}」gate action 应保持 ${g.gate}，实测 ${gateAction(g.s)}`);
+  }
+});
+// [r233] 收口的句子必须**继续**被命中——同 r227/r232 纪律。
+test(`C5 r233 收口的 ${FIXED_BY_R233.length} 条必须保持命中`, () => {
+  for (const g of FIXED_BY_R233) {
     assert.ok(pcCount(g.s) > 0, `「${g.s}」应保持 detector 命中，实测 ${pcCount(g.s)}`);
     assert.strictEqual(gateAction(g.s), g.gate, `「${g.s}」gate action 应保持 ${g.gate}，实测 ${gateAction(g.s)}`);
   }
