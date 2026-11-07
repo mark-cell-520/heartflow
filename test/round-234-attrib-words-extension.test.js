@@ -369,9 +369,16 @@ test('F2 豁免层环视词表与判据层同源（都说是/据说/听说/传�
 });
 test('F3 对冲表已补「不能定论/下结论」族（本轮扩面的必要配套）', () => {
   const src = fs.readFileSync(SRC, 'utf8');
-  const line = src.split('\n').find(l => l.includes('const PC_HEDGE_ZH = /'));
+  // [v6.8.168 第 240 轮] 定义行形态从正则字面量改为 new RegExp 拼接
+  // （裸「机制」词腿位置化成 PC_HEDGE_MECH_ZH 四腿，正则字面量插不进 .source）。
+  // 只同步字面量锚点，行为断言一个没动（r226/r233 纪律）。
+  // [v6.8.168 第 240 轮] 锚点改 startsWith：includes 会抓到注释行里同形态字串
+  // （本轮在 src/index.js 注释里写过该形态，首版 F3 因此抓到注释行而失败）。
+  const line = src.split('\n').find(l => l.startsWith('const PC_HEDGE_ZH = new RegExp('));
   assert.ok(line, '找不到 PC_HEDGE_ZH 定义行');
   assert.ok(line.includes('不能(?:直接)?(?:归因|定论|下结论|得出结论)'), '对冲表缺「不能定论」族');
+  // 位置化后的对冲表必须引用 PC_HEDGE_MECH_ZH，而不是退回裸「机制」词腿
+  assert.ok(line.includes('PC_HEDGE_MECH_ZH.source'), '对冲表应引用 PC_HEDGE_MECH_ZH 位置化四腿');
 });
 test('F4 causalOverclaimZh 仍由 checkPseudoCausal 接线调用（判据层不被孤立）', () => {
   const src = fs.readFileSync(SRC, 'utf8');

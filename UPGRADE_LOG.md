@@ -1,3 +1,94 @@
+## r240 — 函数头对冲表「机制」裸词腿位置化：整句在场 → 归因对象位/机制说明位在场（`PC_HEDGE_MECH_ZH` 四腿，v6.8.168）：红队 5 条 HEAD 漏判 5 → 0 + 全量 A/B 29395 条样本 gate.action 差异 0
+
+**轮次**：r240 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（交接簿 r239 notes 候选①「函数头两条豁免路径的位置化/收窄」之前半，r239 G1 登记的缺口）
+**真升级类型**：缺陷修复（`src/index.js` 新增 `PC_HEDGE_MECH_LEG_A`~`_D` / `PC_HEDGE_MECH_ZH` 五个常量，`PC_HEDGE_ZH` 从正则字面量改为 `new RegExp` 拼接、裸「机制」词腿替换为位置化四腿；顺带把 r239/round-240 两个测试文件补上 `.test.js` 后缀让它们真正进 run-all）。本轮价值在行为变化：红队 5 条攻击句 HEAD **漏判 5 条 → 0 条**、全量 A/B 29395 条样本 `gate.action` **差异 0 条**、双向门禁召回 52/52 不降。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision；按轮次协议「优先做交接簿里已知未修的真 bug」选题，全部结论来自本轮实测探针（scripts/tmp-240-scan.js / mech-samples.js / ab.js / victim.js + HEAD worktree 副本 data/wt-hedge-off，轮末已删），无记忆成分。
+- 交接簿（data/upgrade-state.json r239 notes）候选①原文：「**函数头两条豁免路径的位置化/收窄**（本轮 G1）——`PC_HEDGE_ZH` 的裸「机制」腿与 `STAT_CONTEXT_ZH` 的「变量/回归」腿，是红队剩余 15 条漏判的唯一来源；动它们会同时波及十四个支与两个子判据，需单独轮次 + 全量 A/B」。
+- **轮初定位**：r239 G1 登记的是两条腿一起动，但两条腿性质不同——`PC_HEDGE_ZH` 声明于 `src/index.js` 内、只被 pseudo_causal 一个维度的三个函数头引用（`causalOverclaimZh` / `causalInvertedTakeZh` / `causalSupplementZh`），收窄面是单维度；`STAT_CONTEXT_ZH` 声明于 `src/post-hoc.js`、被 post_hoc 维度与 `src/methodology-exempt.js`「五维共表」共用，收窄它会同时改五个维度的豁免面。按「一个主题做透」纪律，本轮只做**前半（`PC_HEDGE_ZH` 的「机制」腿）**，后半登记为下一轮候选①（附实测数据与前置条件）。
+- 轮初红队探针（scripts/tmp-240-scan.js，r239 红队五形 × 「机制/变量/回归」三词 = 15 条）：**15/15 全漏判**（`checkPseudoCausal().count` 全 0）；存量扫描（29394 条 test/ 中文 quoted 样本）：含「机制」的 **76 条**、含「变量/回归」的 **338 条**，当前全部 pc=0。缺口单边在召回侧。
+
+### 二、根因/缺口分析（带证据）
+**根因是 r226「豁免表的宽度就是召回损失」纪律的第四形态：函数头豁免表同样只问「句子里有没有这个词」，不问「这个词是不是被归因/被解释的对象」。**
+- 第一形态（r226）：裸词腿——机制词在场即豁免；
+- 第二形态（r238）：词在前半句——机制词在时序侧救了整句；
+- 第三形态（r239）：词在结果侧——`PC_LUCK2_MECH_ZH` / `PC_REV_MECH_ZH` 两张整句表（已修）；
+- **第四形态（本轮）：函数头对冲表的裸词腿**——`PC_HEDGE_ZH` 收了一个裸「机制」（改前 `src/index.js:7640`），整句任何位置出现即让 `causalOverclaimZh` 在函数头 `return { count: 0 }`，全部 14 支 + 两个子判据一起放行。r239 把⑪⑫⑬⑭的护栏位置化后，这条函数头裸腿成为「机制」一词剩余漏判的唯一来源。
+- **承重证据**（scripts/tmp-240-ab.js，git worktree HEAD 副本 vs 当前树，29395 条样本）：红队 5 条在 HEAD 全部 pc=0（裸腿豁免）、改后 pc=1/1/3/2/1；存量 `gate.action` 差异 **0 条**、pc **升 1 降 0**（升的 1 条正是 r239 测试文件里登记的目标攻击句「自从机制稳了之后签单就多了，说到底是因为穿了红袜子」0→1）。
+- **弱支不受影响**：`PC_OTHERFACTOR_ZH` 自带裸「机制」腿（只走①⑤⑨弱支路径的 `weak && (... || PC_OTHERFACTOR_ZH.test(text) ...)`），本轮一个字没动——三条豁免路径各管一段（弱支他因信号 / 四支位置化护栏 / 函数头对冲），互不重复也不真空。
+- **取向刀（本轮裁；r239 第十二条之后的第十三条）：「机制」作为归因对象（显式归因链接后 / 领属归责名词前后）或机制说明短语在场才是对冲信号；出现在时序侧、结果侧、对比侧时不算依据，照判。**
+
+### 三、落地项
+1. **`src/index.js` 新增五个常量**（插在 `PC_HEDGE_ZH` 定义之前——`PC_HEDGE_ZH` 在 `PC_ATTR_LINK_ZH` 之后，引用顺序天然成立）：
+   - `PC_HEDGE_MECH_LEG_A` = 显式归因链接后 ≤16 字内「机制」（链接词表复用 `PC_ATTR_LINK_ZH`，与 r239 `PC_SLOT_MECH_ZH` 腿 A 同源）；
+   - `PC_HEDGE_MECH_LEG_B` = 「机制」+ ≤12 字 + 领属归责名词（的功劳|之功|首功|头功）；
+   - `PC_HEDGE_MECH_LEG_C` = 领属归责名词在前 + ≤12 字 + 「机制」；
+   - `PC_HEDGE_MECH_LEG_D` = 机制说明短语 `机制(?:的)?(?:是|本身|原理|解释|层面|设计|失效|坏了|正常|不同|一样|相似|透明|复杂|简单|独立|完善|实现|细节|流程|性(?:解释|说明|设计|失效|问题|原因))`——「机制的实现」「机制层面」「机制坏了」这类说明位；
+   - `PC_HEDGE_MECH_ZH` = 四腿 `new RegExp([...].join('|'))`，每条腿独立命名常量（r239 坑③：变异守卫才能按名字摘单腿）。
+   窗口一律不含 `。，,`（跨子句长桥不豁免，r227/r229 同子句纪律）。
+2. **`PC_HEDGE_ZH` 从正则字面量改为 `new RegExp` 拼接**（正则字面量插不进 `.source`），裸「机制」词腿 → `' + PC_HEDGE_MECH_ZH.source + '`。
+3. **顺带修掉 1 条真实误伤**：腿 D 补「实现/细节/流程」三个说明位词后，「这次只改了缓存机制的实现方式」（命中支⑦「只改了」强支，HEAD pc=1）回到 pc=0——这条同时成为 D1 变异守卫的 victim（摘腿 D 后恢复误判）。
+4. **新测试 `test/round-240-hedge-mech-positional.test.js`（18 断言全绿）**：A 三层（红队 5 条 HEAD 漏 5→0 + detector 命中数逐条登记 1/1/3/2/1 + HEAD 副本实测基数登记）/ B 18 条机制说明位良性零误伤（detector + gate 不 block）/ C 两条结构性界线（机制+归责断言共现仍判、时序侧/结果侧仍判）/ D 四处变异守卫（摘腿 D 恢复 victim 误判、`PC_HEDGE_MECH_ZH` 退回裸词后攻击句整体回落到 HEAD 漏判态、摘全部四腿后攻击句仍全判 + 非 victim 良性不变、未变异副本还原校验）/ E 35 条存量攻击族一条不塌 / F 五条源码锚点（含 dimensions 键 210 不变）/ G 两条已知未修登记。
+5. **存量测试按 r226/r233 纪律同步**（只同步字面量锚点、按实测更新期望值、翻正过期登记，行为断言一个没动）：
+   - `test/round-234-attrib-words-extension.test.js`：F3 源码锚点同步（`const PC_HEDGE_ZH = /` → `startsWith('const PC_HEDGE_ZH = new RegExp(')`，并新增「不许退回裸词腿」断言）——25/25 恢复；
+   - `test/round-239-rev-mech-attribution-slot.test.js`：A1 剩余漏判词集合 `机制/变量/回归` → `变量/回归`（15 条 → 10 条）、judged 95 → 100；D4 未变异副本期望 95 → 100；G1 登记翻正（「机制」已修、剩「变量/回归」）——17/17 恢复。
+6. **修了两个测试文件进不了 run-all 的存量缺陷**（AGENTS.md 约定 4）：`test/round-239-rev-mech-attribution-slot.js` 与 `test/round-240-hedge-mech-positional.js` 缺 `.test.js` 后缀，`collectTestFiles` 只收 `.test.js`——两个文件的断言从来没进过全量回归（r239 报告里「本轮新测试 17/17 在回归内实测通过」是不实申报，本轮翻正）。改名后 run-all 收集数 641 → **643**，两文件 17/17 与 18/18 均在回归内实测通过。
+7. 版本 6.8.167 → 6.8.168，`node scripts/sync-version.js` + `node scripts/sync-doc-numbers.js` 已跑；README Version history 补 v6.8.168 行；README/SKILL 规格表测试数同步为 19,164 passing / 154 failing。
+
+### 四、验收数字（全部实测）
+| 项 | 数字 | 实测方式 |
+|---|---|---|
+| 红队「机制」5 条（r239 五形）HEAD 漏判 → 现在 | **5 → 0** | test A1（HEAD 基数由 `git show HEAD:src/index.js` 写入 data/wt-hedge-off 副本实测，test A3） |
+| 攻击句 detector 命中数 | **1/1/3/2/1**（⑫支1 / ⑫+⑬支2 / ⑭支1） | test A2 |
+| **全量 A/B（HEAD worktree 副本 vs 当前树，29395 条 test/ 中文 quoted 样本）** | `gate.action` 差异 **0 条**（HEAD pass 22930 / verify 3309 / block 1599 / rewrite 1557，CUR 逐项相同）；pc **升 1 条、降 0 条** | scripts/tmp-240-ab.js |
+| A/B 升的 1 条逐条核对 | r239 测试文件里登记的目标攻击句「自从机制稳了之后签单就多了，说到底是因为穿了红袜子」0→1——**零意外假阳性、零攻击句掉命中** | 同上 |
+| 存量含「机制」样本 | **76 条当前全部 pc=0**；摘掉整条位置化表后存量翻面 **0 条**（豁免层零承重的直接证据） | scripts/tmp-240-mech-samples.js / victim.js |
+| 机制说明位良性句（18 条） | detector **0/18** 误伤、gate 无 block | test B1 |
+| 存量攻击族（35 条：r239 宽口径族代表词五形 + r237/r238 红队集 + r239 A/B 里 11 条不许掉命中的存量攻击句） | **一条不塌 35/35** | test E1 |
+| 真实误伤修复 | 「这次只改了缓存机制的实现方式」pc **1 → 0** | 本轮实测（腿 D 补「实现」前后） |
+| D1 摘腿 D（临时目录隔离） | victim pc 0→>0；攻击句命中数不变 | test D1 |
+| D2 `PC_HEDGE_MECH_ZH` 退回裸词 | 攻击句 5 条**整体回落到 HEAD 漏判态**（判 0 条） | test D2 |
+| D3 摘全部四腿 | 攻击句仍全判 5/5、非 victim 良性句零误伤 | test D3 |
+| D4 未变异副本还原校验 | 攻击句 5/5、良性零误伤 | test D4 |
+| bin/verify.js | **16/16** | — |
+| bidirectional-guard | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r239 基线逐项一致） | — |
+| guard-abilities | **20/20**（dimensions 键 **210** 不变） | — |
+| doc-numbers-accuracy | **24/24**（规格表测试数同步为 19,164 passing / 154 failing） | — |
+| security-audit | 提交前 15/16（S2「git log/tag 未命中 6.8.168」为提交前预期失败，r236/r237/r238/r239 同款） | — |
+| 本轮新测试 / 存量同步测试 | round-240 **18/18**、round-239 **17/17**、round-234 **25/25** | — |
+
+### 五、全量回归与计数
+全量回归 `node test/run-all.js`（后台 timeout 2400000，**643 个测试文件**，data/tmp-240-runall2.log，轮末已删；runner 自动写入 data/test-count.json）结果：**19164 通过 / 154 失败 / 共 19318 个**。两个对照基线：
+- **r239 基线（data/test-count.json 轮初值）**：19069 / 153 / 19222（641 文件）；
+- **本轮第一次回归（改名修正前的 641 文件版，data/tmp-240-runall.log）**：19131 / 152 / 19283。
+逐项定位：① passed 19131 → 19164（**+33**）= round-240 的 18 + round-239 的 17 = 35，减 2 见③；total 19283 → 19318（**+35**）= 新增两个测试文件的断言数，严格对上；② failed 152 → 154（**+2**）——**失败文件清单与第一次回归逐项一致、零新增**（94 个桶文件 diff 为空），+2 是并发池抖动：第二次回归里 `round-331-info-deprivation-compound`（Node 崩溃，与 r239 登记的 round-331 崩溃同款存量噪声）、`pattern-detector-jitter-round308`、`doubt-ppf-zh-cultivation-r301` 各 1 条，逐个单跑复测 **32/32 全绿、7/7 全绿、Node 崩溃复现**——全是存量环境噪声，与本轮改动无关；③ passed 的 -2 与 ② 是同一枚硬币（偶发失败文件不计 passed）。
+存量噪声判定（全部实测，非记忆）：r220「C 存量攻击族不退化」1 条（「吃了这个药烧就退了，肯定是药起作用」count 期望 1 实测 2，r236 引入）；r360「良性 gate 层 0 新增 non-pass」1 条（英文句被 `false_precision` 判 verify）；MCP 类 6 个是 8099 端口被常驻服务占用导致的存量失败；`unsupported-claim-exemption` 1 条存量失败。四类都与本轮改动无关。
+
+### 六、已知未修（含为什么不修）
+1. **「变量/回归」仍整句豁免**（test G1 登记，r239 G1 后半）——`STAT_CONTEXT_ZH` 支③是裸统计术语表（`变量|协变量|…|回归|方差分析|…`，声明于 `src/post-hoc.js`），红队 10 条（变量 5 条 + 回归 5 条）仍漏判。不修的原因：该表被 post_hoc 维度与 `src/methodology-exempt.js` 五维共用，收窄它会同时改五个维度的豁免面，需单独轮次 + post_hoc 侧全量 A/B。**轮初已给出前置数据**（scripts/tmp-240-scan.js，删「变量/回归」后变 pc>0 的 5 条）：其中 3 条是方法学良性句（「工具变量回归之后，结果仍然稳健，说明估计不是由内生性造成的」「分年度回归之后，结论保持一致，说明现象不是由某一年异常拉高的」「工具变量回归之后，结论不变，说明关系不是由反向因果导致的」）——收窄前必须先实测 `hasExclNegCausal` 是否兜得住这 3 条（它们都含「不是由…造成的」，很可能本来就走 r222 的排除性否定归因豁免，删词法把它们算成依赖支③是近似口径的假象）。
+2. **`PC_HEDGE_MECH_ZH` 四腿在当前存量语料上零承重**（test G2 登记）——摘整表后 29394 条存量翻面 0 条，四腿保护的句子当前一条都不在存量里（含「机制」的 76 条样本本就不命中判据形状）。它们不是死代码（裸词腿放过 5 条攻击句，四腿是它的精确替代，且腿 D 的「实现」修掉了 1 条真实误伤），但「补词不承重」的形态仍在，登记防下一轮误判为已覆盖。
+3. **`PC_RITE_MECH_ZH` 仪式族仍是整句豁免**（r239 G3 转挂）——第五张机制表（`PC_REV_MECH_ZH ∪ PC_DRUG_MECH_ZH ∪ PC_SUPP_MECH_ZH` 整句并集）未位置化；归属另一个子判据，需仪式族红队集。
+4. **`PC_DRUG_MECH_ZH` / `PC_SUPP_MECH_ZH` 跨表医疗/依据词统一**（r236 G2 后半，r231/r233/r236/r238/r239 五轮挂账）——DRUG 表 75 词 / SUPP 表 18 词仅 12 词重合；r239 已实测 5 个独有词在存量语料上零行为变化，需先构造能承重的红队样本。
+5. **causalInvertedTakeZh / causalSupplementZh 的 lastIndex 防空匹配防护前移**（r231/r233/r236/r238/r239/r240 六次记过）——正常路径零影响的脆弱结构。
+
+**下一轮候选池（按优先级）**：
+① **`STAT_CONTEXT_ZH` 支③「变量/回归」位置化**（本轮 G1，r239 G1 后半）——先实测 `hasExclNegCausal` 对那 3 条方法学良性句的兜底情况，再定收窄形状（「变量」要求统计搭配、「回归」要求 `回归(?:分析|模型|方程|系数|结果|之后|方法|估计|检验)` 或 `(?:线性|逻辑|多元|分层|分年度|工具变量|岭|Lasso|OLS|Probit|Logit)[^。]{0,6}回归`）；需 post_hoc 侧全量 A/B + methodology-exempt 五维复核；
+② **`PC_RITE_MECH_ZH` 仪式族位置化**（r239 G3）——与 `PC_SLOT_MECH_ZH` 同构；需仪式族红队集 + 全量 A/B；
+③ **`PC_DRUG_MECH_ZH` / `PC_SUPP_MECH_ZH` 跨表统一**（r236 G2 后半）——先解决「承重」；
+④ 数词 + 剂量词族（r236 G1）——「两服药/三片药」，需先裁「数词是否算未点名指示」；
+⑤ scripts/negative-test-rc-temporal-causal-r364.js 仍是原位变异 `src/index.js` 的既有写法（连续十九轮挂账，run-all 并发窗口有 r220 记载的竞态，建议改成临时目录隔离）；
+⑥ r71 测试 G 节 idx4 zh 侧句式缺口与 loaded_behavior en 表零覆盖（连续二十一轮挂账）。
+
+### 七、踩坑
+1. **首版把整张 `PC_SLOT_MECH_ZH` 塞进函数头——太宽，A/B 立刻抓出 11 条存量攻击句掉命中**。第一版实现是「`PC_HEDGE_ZH` 的『机制』腿 → `PC_SLOT_MECH_ZH.source`」，想着「位置化就用现成的位置化表」。实测（scripts/tmp-240-ab.js 首轮）存量 pc **降 11 条**、`gate.action` 差异 5 条（全部 verify→pass）：「他坚持早起之后业绩就翻倍，可见早起造成了改变」「当天晚上就不疼了，肯定是贴了膏药的功劳」这些存量攻击句因为「坚持」「膏药」落在 `PC_SLOT_MECH_ZH` 的同子句腿里，被函数头整句放行。**教训：函数头豁免表的位置化只能针对被位置化的那一个词**——把四支的位置化护栏（上百词 × 五腿）搬进函数头，等于把「⑪⑫⑬⑭专属」的护栏语义扩散到全部 14 支和两个子判据。修正后（只针对「机制」一词造四腿）存量 pc 升 1 降 0、gate.action 差异 0。
+2. **腿 D 首版漏了领属「的」**——「缓存机制的实现方式」里「机制」与「实现」之间隔一个「的」，首版 `机制(?:是|本身|…|实现|…)` 匹配不上，victim 句 pc 仍是 1。改成 `机制(?:的)?(?:…)` 后才承重。**说明位词与中心词之间的领属「的」是中文高频形态**，与腿 B/C 的领属归责名词同源。
+3. **变异守卫的 victim 必须先实测再写，且要接受「零承重」的实测结论**：摘掉整条 `PC_HEDGE_MECH_ZH` 后存量 29394 条翻面 0 条——四腿在存量上零承重，写不出「良性 victim」。出路是把 D1 守卫改成「补说明位词修复的真实误伤句」（「这次只改了缓存机制的实现方式」pc 1→0，摘腿 D 翻回），并在 G2 登记零承重事实。**「守卫写不出来」本身是重要实测结论，不该为了凑守卫而编 victim。**
+4. **A/B 脚本的两侧标签会随副本内容互换而失效**：`scripts/tmp-240-ab.js` 里 `headIdx` 指向 `src/index.js`（工作树）、`curIdx` 指向副本——第一轮副本装的是改后版，标签碰巧正确；第二轮副本换成 `git show HEAD:src/index.js` 后标签反了，输出显示「HEAD=1/1/3/2/1、CUR=0」。修法不是改标签，是**单测复校**（`require('./data/wt-hedge-off/src/index.js').checkPseudoCausal(s)` 对攻击句得 pc=0、工作树得 pc=3），报告数字以复校为准。教训：A/B 脚本要用显式变量名（`worktreeIdx` / `curIdx`）而不是 head/cur，避免副本内容变化时读错。
+5. **测试文件缺 `.test.js` 后缀就永远进不了 run-all**（AGENTS.md 约定 4 的实体化）：`collectTestFiles` 只收 `.test.js`，r239 与 round-240 两个文件都因此没进过全量回归——r239 报告里「新测试 17/17 在回归内实测通过」是不实申报（它只是单跑通过的）。本轮改名后 run-all 收集数 641 → 643、两个文件 35 条断言在回归内实测通过，并在 UPGRADE_LOG 翻正该申报。**教训：新增测试文件后第一件事是 `node -e` 复算 `collectTestFiles` 的收集结果，确认新文件在列表里**，不要假定「写了就会被跑」。
+6. **源码锚点测试用 `includes` 抓定义行，会被自己写的注释抓到**：本轮在 `src/index.js` 注释里写过 `const PC_HEDGE_ZH = new RegExp("…")` 形态说明，round-234 F3 的 `includes` 锚点于是抓到注释行、断言「对冲表缺不能定论族」失败（25 个里挂 1 个）。修法两件：注释里不写该形态的字面量 + 锚点改 `startsWith`。**教训：给常量写「定义行形态变了」的注释时，别把新形态的源码字串写进注释**——锚点测试与注释会打架。
+7. **汇总行必须自己打**——node:test 默认没有「N 通过, M 失败」行，run-all 会计 1 个失败（memory 坑，本轮测试照样包了一层 `test()` + `process.on('exit')`）。
+
 ## r239 — ⑪⑫⑬⑭ 四支机制护栏位置化：整句在场 → 归因对象位在场（`PC_SLOT_MECH_ZH` 五条腿，v6.8.167）：红队 160 条 HEAD 漏判 83 → 15 + 全量 A/B 26321 条样本 gate.action 差异 0
 
 **轮次**：r239 ｜ **日期**：2026-11-07 ｜ **方向**：存量真 bug 修复（交接簿 r238 notes 候选②「`PC_REV_MECH_ZH` 改形状腿」，r238 G2 登记的缺口）
