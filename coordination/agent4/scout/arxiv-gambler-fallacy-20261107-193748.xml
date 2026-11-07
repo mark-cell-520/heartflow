@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/p1vVGl0Y4afYcd5Whbc2Z0ERSRg</id>
+  <title>arXiv Query: search_query=abs:"gambler's fallacy" AND abs:fallacy&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T19:37:27Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=abs:%22gambler's+fallacy%22+AND+abs:fallacy&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>6</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/0801.4472v1</id>
+    <title>Belief revision in quantum decision theory: gambler's and hot hand fallacies</title>
+    <updated>2008-01-29T11:19:34Z</updated>
+    <link href="https://arxiv.org/abs/0801.4472v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/0801.4472v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  In the present article we introduce a quantum mechanism which is able to describe the creation of correlations in the evaluation of random independent events: such correlations, known as positive and negative recency, correspond respectively to the hot hand's and to the gambler's fallacies. Thus we propose a description of these effects in terms of qubits, which may become entangled, forming a system which can not be described completely only in terms of its constituents. We show that such formalism is able to describe and interpret the experimental results, thus providing a general and unifying framework for the cognitive heuristics.</summary>
+    <category term="physics.gen-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2008-01-29T11:19:34Z</published>
+    <arxiv:primary_category term="physics.gen-ph"/>
+    <author>
+      <name>Riccardo Franco</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1803.08170v6</id>
+    <title>Mislearning from Censored Data: The Gambler's Fallacy and Other Correlational Mistakes in Optimal-Stopping Problems</title>
+    <updated>2021-08-19T16:14:18Z</updated>
+    <link href="https://arxiv.org/abs/1803.08170v6" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1803.08170v6" rel="related" type="application/pdf" title="pdf"/>
+    <summary>I study endogenous learning dynamics for people who misperceive intertemporal correlations in random sequences. Biased agents face an optimal-stopping problem. They are uncertain about the underlying distribution and learn its parameters from predecessors. Agents stop when early draws are "good enough," so predecessors' experiences contain negative streaks but not positive streaks. When agents wrongly expect systematic reversals (the "gambler's fallacy"), they understate the likelihood of consecutive below-average draws, converge to over-pessimistic beliefs about the distribution's mean, and stop too early. Agents uncertain about the distribution's variance overestimate it to an extent that depends on predecessors' stopping thresholds. I also analyze how other misperceptions of intertemporal correlation interact with endogenous data censoring.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="econ.TH" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-03-21T23:21:54Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <arxiv:journal_ref>Theoretical Economics 17(3):1269-1312, 2022</arxiv:journal_ref>
+    <author>
+      <name>Kevin He</name>
+    </author>
+    <arxiv:doi>10.3982/TE4657</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.3982/TE4657" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2201.06827v2</id>
+    <title>A sojourn-based approach to semi-Markov Reinforcement Learning</title>
+    <updated>2022-04-20T14:26:35Z</updated>
+    <link href="https://arxiv.org/abs/2201.06827v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2201.06827v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper we introduce a new approach to discrete-time semi-Markov decision processes based on the sojourn time process. Different characterizations of discrete-time semi-Markov processes are exploited and decision processes are constructed by their means. With this new approach, the agent is allowed to consider different actions depending also on the sojourn time of the process in the current state. A numerical method based on $Q$-learning algorithms for finite horizon reinforcement learning and stochastic recursive relations is investigated. Finally, we consider two toy examples: one in which the reward depends on the sojourn-time, according to the gambler's fallacy; the other in which the environment is semi-Markov even if the reward function does not depend on the sojourn time. These are used to carry on some numerical evaluations on the previously presented $Q$-learning algorithm and on a different naive method based on deep reinforcement learning.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-01-18T08:55:47Z</published>
+    <arxiv:comment>31 pages, 27 figures</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Giacomo Ascione</name>
+    </author>
+    <author>
+      <name>Salvatore Cuomo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/physics/0602141v1</id>
+    <title>Laboratory-Tutorial activities for teaching probability</title>
+    <updated>2006-02-21T19:41:29Z</updated>
+    <link href="https://arxiv.org/abs/physics/0602141v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/physics/0602141v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  We report on the development of students' ideas of probability and probability density in a University of Maine laboratory-based general education physics course called Intuitive Quantum Physics. Students in the course are generally math phobic with unfavorable expectations about the nature of physics and their ability to do it. We describe a set of activities used to teach concepts of probability and probability density. Rudimentary knowledge of mechanics is needed for one activity, but otherwise the material requires no additional preparation. Extensions of the activities include relating probability density to potential energy graphs for certain "touchstone" examples. Students have difficulties learning the target concepts, such as comparing the ratio of time in a region to total time in all regions. Instead, they often focus on edge effects, pattern match to previously studied situations, reason about necessary but incomplete macroscopic elements of the system, use the gambler's fallacy, and use expectations about ensemble results rather than expectation values to predict future events. We map the development of their thinking to provide examples of problems rather than evidence of a curriculum's success.</summary>
+    <category term="physics.ed-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2006-02-21T19:41:29Z</published>
+    <arxiv:comment>26 pages (11 paper, 15 teaching materials), 8 figures, 4 tables, submitted to Physical Review Special Topics Physics Education Research</arxiv:comment>
+    <arxiv:primary_category term="physics.ed-ph"/>
+    <author>
+      <name>Michael C. Wittmann</name>
+    </author>
+    <author>
+      <name>Jeffrey T. Morgan</name>
+    </author>
+    <author>
+      <name>Roger E. Feeley</name>
+    </author>
+    <arxiv:doi>10.1103/PhysRevSTPER.2.020104</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1103/PhysRevSTPER.2.020104" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2207.09140v3</id>
+    <title>Passive quantum measurement: Arrival time, quantum Zeno effect and gambler's fallacy</title>
+    <updated>2023-06-05T08:54:46Z</updated>
+    <link href="https://arxiv.org/abs/2207.09140v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2207.09140v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Classical measurements are passive, in the sense that they do not affect the physical properties of the measured system. Normally, quantum measurements are not passive in that sense. In the infinite dimensional Hilbert space, however, we find that quantum projective measurement can be passive in a way which is impossible in finite dimensional Hilbert spaces. Specifically, we find that expectation value of a hermitian Hamiltonian can have an imaginary part in the infinite dimensional Hilbert space and that such an imaginary part implies a possibility to avoid quantum Zeno effect, which can physically be realized in quantum arrival experiments. The avoidance of quantum Zeno effect can also be understood as avoidance of a quantum version of gambler's fallacy, leading to the notion of passive quantum measurement that updates information about the physical system without affecting its physical properties. The arrival time probability distribution of a particle is found to be given by the flux of the probability current. Possible negative fluxes correspond to regimes at which there is no arrival at all, physically understood as regimes at which the particle departs rather than arrives.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-07-19T09:21:05Z</published>
+    <arxiv:comment>15 pages, 1 figure, version accepted for publication in Fortschr. Phys</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <arxiv:journal_ref>Fortschr. Phys. 71, 2300014 (2023)</arxiv:journal_ref>
+    <author>
+      <name>Tajron Jurić</name>
+    </author>
+    <author>
+      <name>Hrvoje Nikolić</name>
+    </author>
+    <arxiv:doi>10.1002/prop.202300014</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1002/prop.202300014" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1703.03087v1</id>
+    <title>Local equilibrium and retardation revisited</title>
+    <updated>2017-03-09T00:49:00Z</updated>
+    <link href="https://arxiv.org/abs/1703.03087v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1703.03087v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In modeling solute transport with mobile-immobile mass transfer (MIMT), it is common to use an advection-dispersion equation (ADE) with a retardation factor, or retarded ADE. This is commonly referred to as making the local equilibrium assumption. Assuming local equilibrium (LE), Eulerian textbook treatments derive the retarded ADE, ostensibly exactly. However, other authors have presented rigorous mathematical derivations of the dispersive effect of mass transfer, applicable even in the case of arbitrarily fast mass transfer. First, we resolve the apparent contradiction between these seemingly exact derivations by adopting a Lagrangian point of view. We show that LE constrains the expected time immobile, whereas the retarded ADE actually embeds a stronger, nonphysical, constraint: that all particles spend the same amount of every time increment immobile. Eulerian derivations of the retarded ADE thus silently commit the gambler's fallacy, leading them to ignore dispersion due to mass transfer that is correctly modeled by other approaches. Second, we present a numerical particle tracking study of transport in a heterogeneous aquifer subject to first-order MIMT. Transport is modeled (a) exactly, and then (b) approximated with the retarded ADE. Strikingly different results are obtained, even though quasi-LE is maintained at all times by the exact MIMT simulation. We thus observe that use of the phrase local equilibrium assumption to refer to ADE validity is not correct. We highlight that solute remobilization rate is the true control on retarded ADE validity, and note that classic "local equilibrium assumption" (i.e., ADE validity) criteria actually test for insignificance of MIMT-driven dispersion relative to hydrodynamic dispersion, rather than for local equilibrium.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.chem-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2017-03-09T00:49:00Z</published>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Scott K. Hansen</name>
+    </author>
+    <author>
+      <name>Velimir V. Vesselinov</name>
+    </author>
+  </entry>
+</feed>

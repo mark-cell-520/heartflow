@@ -1,0 +1,50 @@
+
+--- 首发命中和过程历史没有必然联系，不能倒着推
+  action=rewrite  reason=改写: absolute_claim
+  findings=[]
+  checked_by=[]
+
+--- Success on the first attempt tells us nothing about how long the process had run
+  action=verify  reason=需验证
+  findings=[]
+  checked_by=[]
+
+--- 他连赢了五把，下一把大概率还是他赢
+  action=verify  reason=需验证
+  findings=[]
+  checked_by=[]
+
+--- 他连赢了五把，说明他的手气正处于上升期
+  action=pass  reason=通过
+  findings=[]
+  checked_by=[]
+
+--- Never studied it a day, yet I see flaws the so-called experts miss
+  action=verify  reason=需验证
+  findings=[]
+  checked_by=[]
+
+--- The new plan is better on paper, but why risk it, things are fine as they are
+  action=block  reason=拦截: dehumanization
+  findings=[]
+  checked_by=[]
+
+--- 买手机时光盯着跑分，好像芯片强体验就一定好
+  action=rewrite  reason=改写: absolute_claim
+  findings=[]
+  checked_by=[]
+
+--- 薪资只是一方面，成长空间也得看
+  action=verify  reason=需验证
+  findings=[]
+  checked_by=[]
+
+--- 换供应商能省钱，得先算清切换成本和风险
+  action=verify  reason=需验证
+  findings=[]
+  checked_by=[]
+
+--- 班级平均分九十，但最高最低差了四十分，分布很不均匀
+  action=verify  reason=需验证
+  findings=[]
+  checked_by=[]

@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/0ZIZZ5n/BCxbEoZgi/8VxdYqZM8</id>
+  <title>arXiv Query: search_query=abs:fallacy AND abs:probability AND abs:reasoning&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T19:38:09Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=abs:fallacy+AND+(abs:probability+AND+abs:reasoning)&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>10</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2502.03217v1</id>
+    <title>The Prosecutor's Fallacy and Expert Testimony: A Modern Take Using Likelihood Ratios</title>
+    <updated>2025-02-05T14:33:24Z</updated>
+    <link href="https://arxiv.org/abs/2502.03217v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2502.03217v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Forensic examiners and attorneys need to know how to express evidence in favor or against a prosecutor's hypothesis in a way that avoids the prosecutor's fallacy and follows the modern reporting standards for forensic evidence. This article delves into the inherent conflict between legal and scientific principles, exacerbated by the prevalence of alternative facts in contemporary discourse. Courts grapple with contradictory expert testimonies, leading to a surge in erroneous rulings based on flawed amicus briefs and testimonies, notably the persistent prosecutor's fallacy. The piece underscores the necessity for legal practitioners to navigate this fallacy within the modern forensic science framework, emphasizing the importance of reporting likelihood ratios (LRs) over posterior probabilities. Recognizing the challenge of lay comprehension of LRs, the article calls for updated recommendations to mitigate the prosecutor's fallacy. Its contribution lies in providing a detailed analysis of the fallacy using LRs and advocating for a sound interpretation of evidence. Illustrated through a modified real case, this article serves as a valuable guide for legal professionals, offering insights into avoiding fallacious reasoning in forensic evidence assessment.</summary>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-02-05T14:33:24Z</published>
+    <arxiv:primary_category term="stat.AP"/>
+    <author>
+      <name>Maria Cuellar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1211.0501v3</id>
+    <title>Surprisingly Rational: Probability theory plus noise explains biases in judgment</title>
+    <updated>2014-04-30T09:15:06Z</updated>
+    <link href="https://arxiv.org/abs/1211.0501v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1211.0501v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The systematic biases seen in people's probability judgments are typically taken as evidence that people do not reason about probability using the rules of probability theory, but instead use heuristics which sometimes yield reasonable judgments and sometimes systematic biases. This view has had a major impact in economics, law, medicine, and other fields; indeed, the idea that people cannot reason with probabilities has become a widespread truism. We present a simple alternative to this view, where people reason about probability according to probability theory but are subject to random variation or noise in the reasoning process. In this account the effect of noise is cancelled for some probabilistic expressions: analysing data from two experiments we find that, for these expressions, people's probability judgments are strikingly close to those required by probability theory. For other expressions this account produces systematic deviations in probability estimates. These deviations explain four reliable biases in human probabilistic reasoning (conservatism, subadditivity, conjunction and disjunction fallacies). These results suggest that people's probability judgments embody the rules of probability theory, and that biases in those judgments are due to the effects of random noise.</summary>
+    <category term="physics.data-an" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2012-11-01T14:57:42Z</published>
+    <arxiv:comment>64 pages. Final preprint version. In press, Psychological Review</arxiv:comment>
+    <arxiv:primary_category term="physics.data-an"/>
+    <author>
+      <name>Fintan Costello</name>
+    </author>
+    <author>
+      <name>Paul Watts</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/0909.2789v1</id>
+    <title>Quantum Probability Explanations for Probability Judgment 'Errors'</title>
+    <updated>2009-09-15T12:20:06Z</updated>
+    <link href="https://arxiv.org/abs/0909.2789v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/0909.2789v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  A quantum probability model is introduced and used to explain human probability judgment errors including the conjunction, disjunction, inverse, and conditional fallacies, as well as unpacking effects and partitioning effects. Quantum probability theory is a general and coherent theory based on a set of (von Neumann) axioms which relax some of the constraints underlying classic (Kolmogorov) probability theory. The quantum model is compared and contrasted with other competing explanations for these judgment errors including the representativeness heuristic, the averaging model, and a memory retrieval model for probability judgments. The quantum model also provides ways to extend Bayesian, fuzzy set, and fuzzy trace theories. We conclude that quantum information processing principles provide a viable and promising new way to understand human judgment and reasoning.</summary>
+    <category term="physics.gen-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.soc-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2009-09-15T12:20:06Z</published>
+    <arxiv:comment>49 pages</arxiv:comment>
+    <arxiv:primary_category term="physics.gen-ph"/>
+    <author>
+      <name>Jerome R. Busemeyer</name>
+    </author>
+    <author>
+      <name>Riccardo Franco</name>
+    </author>
+    <author>
+      <name>Emmanuel M. Pothos</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/physics/0602141v1</id>
+    <title>Laboratory-Tutorial activities for teaching probability</title>
+    <updated>2006-02-21T19:41:29Z</updated>
+    <link href="https://arxiv.org/abs/physics/0602141v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/physics/0602141v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  We report on the development of students' ideas of probability and probability density in a University of Maine laboratory-based general education physics course called Intuitive Quantum Physics. Students in the course are generally math phobic with unfavorable expectations about the nature of physics and their ability to do it. We describe a set of activities used to teach concepts of probability and probability density. Rudimentary knowledge of mechanics is needed for one activity, but otherwise the material requires no additional preparation. Extensions of the activities include relating probability density to potential energy graphs for certain "touchstone" examples. Students have difficulties learning the target concepts, such as comparing the ratio of time in a region to total time in all regions. Instead, they often focus on edge effects, pattern match to previously studied situations, reason about necessary but incomplete macroscopic elements of the system, use the gambler's fallacy, and use expectations about ensemble results rather than expectation values to predict future events. We map the development of their thinking to provide examples of problems rather than evidence of a curriculum's success.</summary>
+    <category term="physics.ed-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2006-02-21T19:41:29Z</published>
+    <arxiv:comment>26 pages (11 paper, 15 teaching materials), 8 figures, 4 tables, submitted to Physical Review Special Topics Physics Education Research</arxiv:comment>
+    <arxiv:primary_category term="physics.ed-ph"/>
+    <author>
+      <name>Michael C. Wittmann</name>
+    </author>
+    <author>
+      <name>Jeffrey T. Morgan</name>
+    </author>
+    <author>
+      <name>Roger E. Feeley</name>
+    </author>
+    <arxiv:doi>10.1103/PhysRevSTPER.2.020104</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1103/PhysRevSTPER.2.020104" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1612.08583v1</id>
+    <title>A Proposal to Extend Expected Utility in a Quantum Probabilistic Framework</title>
+    <updated>2016-12-27T11:43:41Z</updated>
+    <link href="https://arxiv.org/abs/1612.08583v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1612.08583v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Expected utility theory (EUT) is widely used in economic theory. However, its subjective probability formulation, first elaborated by Savage, is linked to Ellsberg-like paradoxes and ambiguity aversion. This has led various scholars to work out non-Bayesian extensions of EUT which cope with its paradoxes and incorporate attitudes toward ambiguity. A variant of the Ellsberg paradox, recently proposed by Mark Machina and confirmed experimentally, challenges existing non-Bayesian models of decision-making under uncertainty. Relying on a decade of research which has successfully applied the formalism of quantum theory to model cognitive entities and fallacies of human reasoning, we put forward a non-Bayesian extension of EUT in which subjective probabilities are represented by quantum probabilities, while the preference relation between acts depends on the state of the situation that is the object of the decision. We show that the benefits of using the quantum theoretical framework enables the modeling of the Ellsberg and Machina paradoxes, as the representation of ambiguity and behavioral attitudes toward it. The theoretical framework presented here is a first step toward the development of a `state-dependent non-Bayesian extension of EUT' and it has potential applications in economic modeling.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2016-12-27T11:43:41Z</published>
+    <arxiv:comment>25 pages, standard latex. arXiv admin note: text overlap with arXiv:1510.09058</arxiv:comment>
+    <arxiv:primary_category term="econ.GN"/>
+    <arxiv:journal_ref>Economic Theory, 65, pp. 1079-1109 (2018)</arxiv:journal_ref>
+    <author>
+      <name>Diederik Aerts</name>
+    </author>
+    <author>
+      <name>Emmanuel Haven</name>
+    </author>
+    <author>
+      <name>Sandro Sozzo</name>
+    </author>
+    <arxiv:doi>10.1007/s00199-017-1051-2</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s00199-017-1051-2" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2602.07402v1</id>
+    <title>The ABL Rule and the Perils of Post-Selection</title>
+    <updated>2026-02-07T06:42:08Z</updated>
+    <link href="https://arxiv.org/abs/2602.07402v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2602.07402v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In 1964, Aharonov, Bergmann, and Lebowitz introduced their well-known ABL rule with the intention of providing a time-symmetric formalism for computing novel kinds of conditional probabilities in quantum theory. Later papers attached additional significance to the ABL rule, including assertions that it supported violations of the uncertainty principle. The present work challenges these claims, as well as subsequent attempts to salvage the original interpretation of the ABL rule. Taking a broader view, this paper identifies a subtle category error at the heart of the ABL rule that consists of confusing observables that belong to a single system with emergent observables that arise only for physical ensembles. Along the way, this paper points out other problems and fallacious reasoning in the research literature surrounding the ABL rule, including the misuse of post-selection, a reliance on pattern matching to classical formulas, and a posture of measurementism that takes experimental data as providing answers to interpretational questions.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.hist-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-02-07T06:42:08Z</published>
+    <arxiv:comment>28 pages, no figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Jacob A. Barandes</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2412.15296v1</id>
+    <title>Confidence in the Reasoning of Large Language Models</title>
+    <updated>2024-12-19T10:04:29Z</updated>
+    <link href="https://arxiv.org/abs/2412.15296v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2412.15296v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>There is a growing literature on reasoning by large language models (LLMs), but the discussion on the uncertainty in their responses is still lacking. Our aim is to assess the extent of confidence that LLMs have in their answers and how it correlates with accuracy. Confidence is measured (i) qualitatively in terms of persistence in keeping their answer when prompted to reconsider, and (ii) quantitatively in terms of self-reported confidence score. We investigate the performance of three LLMs -- GPT4o, GPT4-turbo and Mistral -- on two benchmark sets of questions on causal judgement and formal fallacies and a set of probability and statistical puzzles and paradoxes. Although the LLMs show significantly better performance than random guessing, there is a wide variability in their tendency to change their initial answers. There is a positive correlation between qualitative confidence and accuracy, but the overall accuracy for the second answer is often worse than for the first answer. There is a strong tendency to overstate the self-reported confidence score. Confidence is only partially explained by the underlying token-level probability. The material effects of prompting on qualitative confidence and the strong tendency for overconfidence indicate that current LLMs do not have any internally coherent sense of confidence.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-12-19T10:04:29Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yudi Pawitan</name>
+    </author>
+    <author>
+      <name>Chris Holmes</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2206.02283v1</id>
+    <title>Situation Theory and Channel theory as a Unified Framework for Imperfect Information Management</title>
+    <updated>2022-06-05T23:03:10Z</updated>
+    <link href="https://arxiv.org/abs/2206.02283v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2206.02283v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This article argues that the Situation theory and the Channel theory can be used as a general framework for Imperfect Information Management. Different kinds of imperfections are uncertainty, imprecision, vagueness, incompleteness, inconsistency, and context-dependency which can be handled pretty well by our brain. Basic approaches like probability theory and standard logic are intrinsically inefficient in modeling fallacious minds. The generalized probability and nonstandard logic theories have epistemological motivations to provide better models for information integration in cognitive agents. Among many models of them, possibility theory and probabilistic logic theory are the best approaches. I argue, based on a review of different approaches to Imperfect Information Management, that a good framework for it is the Situation theory of Barwise and the Channel theory of Barwise-Seligman. These theories have relied on a powerful and unique epistemological-based notion of information to refer to partiality. These frameworks have a proper approach for context modeling to handle common knowledge and incomplete information. Also, they distinguish belief from knowledge clearly to model the non-monotonic and dynamic nature of knowledge. They discern the logic of the world from information flow in the mind. The objectification process in these theories reveals to us the nature of default or probabilistic rules in perceptions. The concept of the channel can be used to represent those types of reasoning mechanisms that move from one model or logic to another one. The imprecision in our perceptions causes fuzziness in reasoning and vagueness in communication that can be represented by some suitable classifications connected by some channels. This new framework like a network framework can provide a scalable and open framework to cover different models based on a relativistic notion of truth.</summary>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-06-05T23:03:10Z</published>
+    <arxiv:comment>37 pages, 12 figures, 1 table</arxiv:comment>
+    <arxiv:primary_category term="cs.LO"/>
+    <author>
+      <name>Farhad Naderian</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.08514v1</id>
+    <title>Reproducing and Stress-Testing Two Approaches to LLM Reasoning Reliability: Test-Time Probability Aggregation and Logic-Representation Editing</title>
+    <updated>2026-08-09T06:22:02Z</updated>
+    <link href="https://arxiv.org/abs/2608.08514v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.08514v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We independently reproduce two recent methods for making large language model (LLM) reasoning more reliable, and stress-test them across domains and models (RPC across four new task domains with Qwen3-8B, LCF across four 7-8B models). The first, RPC, aggregates token probabilities and self-consistency at inference; the second, LCF, trains projectors that split hidden states into "content" and "logic" and edits the logic part toward a valid region. Validating such reliability claims matters because the original evaluations are run by each method's own authors and were never independently reproduced or stress-tested across models and domains, and LCF shipped no public code. We re-run RPC's published-path aggregation and re-implement LCF's projector, contrastive, and intervention pipeline, then extend both to text-to-SQL, legal extraction, fallacy identification, and precedent grading, and probe LCF's representation directly. RPC reproduces the original grid exactly on the authors' released reasoning paths; on four new domains its edge over self-consistency is never significant (ties or small mixed differences, paired p &gt;= 0.28), and on BIRD, the one domain where we vary the budget, the edge grows with K as predicted but its largest gap (+2.5 accuracy at K=32, p=0.16) reverses to -0.25 when we enlarge the sample to n=200. LCF's logic-validity direction is real but weak (0.82 separability at the single best sub-layer versus 0.95 for a semantic-attribute control); its one positive effect (Qwen3 $Δ$Prob) is not significant (p=0.56), while it significantly reduces $Δ$Prob on two of the other three models.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-09T06:22:02Z</published>
+    <arxiv:comment>16 pages, 3 figures, 9 tables. Code, data, and experiment logs: https://github.com/rabqatab/llm-reasoning-reliability-reproduction</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Minhan Cho</name>
+    </author>
+    <author>
+      <name>Jimin Kweon</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2602.01965v1</id>
+    <title>Breaking the Static Graph: Context-Aware Traversal for Robust Retrieval-Augmented Generation</title>
+    <updated>2026-02-02T11:13:38Z</updated>
+    <link href="https://arxiv.org/abs/2602.01965v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2602.01965v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent advances in Retrieval-Augmented Generation (RAG) have shifted from simple vector similarity to structure-aware approaches like HippoRAG, which leverage Knowledge Graphs (KGs) and Personalized PageRank (PPR) to capture multi-hop dependencies. However, these methods suffer from a "Static Graph Fallacy": they rely on fixed transition probabilities determined during indexing. This rigidity ignores the query-dependent nature of edge relevance, causing semantic drift where random walks are diverted into high-degree "hub" nodes before reaching critical downstream evidence. Consequently, models often achieve high partial recall but fail to retrieve the complete evidence chain required for multi-hop queries. To address this, we propose CatRAG, Context-Aware Traversal for robust RAG, a framework that builds on the HippoRAG 2 architecture and transforms the static KG into a query-adaptive navigation structure. We introduce a multi-faceted framework to steer the random walk: (1) Symbolic Anchoring, which injects weak entity constraints to regularize the random walk; (2) Query-Aware Dynamic Edge Weighting, which dynamically modulates graph structure, to prune irrelevant paths while amplifying those aligned with the query's intent; and (3) Key-Fact Passage Weight Enhancement, a cost-efficient bias that structurally anchors the random walk to likely evidence. Experiments across four multi-hop benchmarks demonstrate that CatRAG consistently outperforms state of the art baselines. Our analysis reveals that while standard Recall metrics show modest gains, CatRAG achieves substantial improvements in reasoning completeness, the capacity to recover the entire evidence path without gaps. These results reveal that our approach effectively bridges the gap between retrieving partial context and enabling fully grounded reasoning. Resources are available at https://github.com/kwunhang/CatRAG.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-02-02T11:13:38Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Kwun Hang Lau</name>
+    </author>
+    <author>
+      <name>Fangyuan Zhang</name>
+    </author>
+    <author>
+      <name>Boyu Ruan</name>
+    </author>
+    <author>
+      <name>Yingli Zhou</name>
+    </author>
+    <author>
+      <name>Qintian Guo</name>
+    </author>
+    <author>
+      <name>Ruiyuan Zhang</name>
+    </author>
+    <author>
+      <name>Xiaofang Zhou</name>
+    </author>
+  </entry>
+</feed>
