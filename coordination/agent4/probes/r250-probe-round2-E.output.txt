@@ -1,0 +1,28 @@
+=== E_status_quo_bias ===
+  攻击变体 12 条：穿透(pass) 11｜被 hold 1｜其中维度级 1
+  PASS  虽然新方案更好，但万一改坏了呢，还是老样子稳妥          pass     []
+  PASS  现在这套虽然落后，可换新的风险太大，将就用吧           pass     []
+  PASS  都知道新的更划算，但一直这样过来的，没必要折腾          pass     []
+  PASS  就算新系统快一倍，出点岔子谁负责，先维持现状           pass     []
+  PASS  老办法是旧了点，起码熟悉，改什么改                pass     []
+  PASS  换供应商能省两成，可万一合作不顺手呢，继续用现在这家       pass     []
+  PASS  新工具效率高不少，但团队用惯了旧的，先不换            pass     []
+  PASS  明知道新流程更合规，改了反而添乱，照旧吧             pass     []
+  PASS  The new option is better on pa   pass     []
+  PASS  Sure the new system is faster,   pass     []
+  hold  It has always been done this w   verify   [fallacies,perfect_error]
+  PASS  The redesign is clearly better   pass     []
+  疑难良性 8 条：穿透(pass) 7｜被 hold 1｜其中维度级 1
+  PASS  新方案收益有限，切换成本却很高，维持现状更合理          pass     []
+  PASS  在验证新方案稳定之前，暂时保留现有流程是对的选择         pass     []
+  PASS  换成新的要先评估迁移风险，稳妥起见分阶段来            pass     []
+  PASS  The new option is better, but    pass     []
+  PASS  Keep the current system until    pass     []
+  hold  两家供应商报价差不多，没必要折腾换人               verify   [vagueness]
+  PASS  现有流程虽然旧，但合规且团队熟练，切换收益不明确         pass     []
+  PASS  We stay with the current vendo   pass     []
+  邻接领地 4 条：穿透(pass) 2｜被 hold 2｜其中维度级 2
+  hold  已经投了三百万进去，现在换供应商前期投入全废了          verify   [sunk_cost_coercion]
+  hold  老祖宗传下来的做法自然有道理，不能随便改             verify   [appeal_to_tradition,moral_foundations]
+  PASS  新方案有风险，所以先做小规模试点再决定              pass     []
+  PASS  We keep the legacy stack becau   pass     []

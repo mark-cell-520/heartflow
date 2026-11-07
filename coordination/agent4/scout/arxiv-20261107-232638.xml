@@ -1,0 +1,357 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/8fsPEPLkd6fCIZp3/zw96Yb8esc</id>
+  <title>arXiv Query: search_query=all:trend OR all:extrapolation OR all:fallacy OR all:linear OR all:projection OR all:future&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T23:26:53Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:trend+OR+(all:extrapolation+OR+(all:fallacy+OR+(all:linear+OR+(all:projection+OR+all:future))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>567395</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08487v1</id>
+    <title>User Embeddings are Superpositions of Interpretable Behavioral Modes</title>
+    <updated>2026-11-05T18:59:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.08487v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08487v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>User embeddings are central components of modern recommendation, personalization, and behavioral modeling systems. Though these embeddings can compactly encode rich behavioral information, they are inherently dense and opaque, limiting interpretability. To address this gap, we argue that user embeddings can be understood as sparse superpositions of interpretable behavioral modes. This structure is directly predicted by generative models of user behavior for linear embeddings and extends approximately to deep-learning representations by the superposition hypothesis. Superimposed modes can naturally be recovered by sparse dictionary learning methods, such as sparse autoencoders (SAEs), and recovered modes can be automatically named and queried in natural language. We validate mode recovery against known ground truth on synthetic data, where SAEs recover modes better than classical sparse baselines, including on transformer-encoded embeddings. We then apply the method to classical and transformer-based user embeddings from two real-world datasets. We also show how the corresponding natural-language labels enable zero-shot audience retrieval and characterization over embeddings never trained on text. The framework is post-hoc and model-agnostic, requiring no modification to the upstream embedding system.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:42Z</published>
+    <arxiv:comment>Accepted to NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Jonathan Kozaczuk</name>
+    </author>
+    <author>
+      <name>Zheng Dong</name>
+    </author>
+    <author>
+      <name>Noyan Evirgen</name>
+    </author>
+    <author>
+      <name>Keivan Majidi</name>
+    </author>
+    <author>
+      <name>Eddie K. H. Ng</name>
+    </author>
+    <author>
+      <name>Chris Porter</name>
+    </author>
+    <author>
+      <name>Qi Zhao</name>
+    </author>
+    <author>
+      <name>Jia Geng</name>
+    </author>
+    <author>
+      <name>Changmao Li</name>
+    </author>
+    <author>
+      <name>Brandon R. Feng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08479v1</id>
+    <title>Flat-band systems: A platform to realize the moments of Quantum Metric</title>
+    <updated>2026-11-05T18:59:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.08479v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08479v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The quantum metric is a fundamental geometric property of Bloch bands that governs a wide range of physical phenomena, yet experimentally accessing it remains challenging. We show that the momentum-space variation of the quantum metric can be probed through the real-space dynamics of a Gaussian wave packet prepared in an isolated flat band. Following the application of a weak constant force, we demonstrate analytically that the leading order change in the wave-packet variance is linear in time and contains a contribution proportional to the wave-packet averaged gradient of the quantum-metric trace. This geometric contribution remains finite despite the absence of band dispersion. We illustrate the effect using a gapped Lieb lattice with an exactly flat middle band and vanishing Berry curvature, allowing the quantum-metric contribution to the spreading to be isolated. The numerical results agree with the analytical prediction and confirm the quantum-metric contribution to the wave-packet spreading. The required lattice preparation, tunable hopping amplitudes, applied force, and density measurements are compatible with established ultracold-atom techniques, providing a possible platform for observing the predicted response. Our results establish wave-packet spreading as a dynamical probe of quantum geometry in flat-band systems.</summary>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:11Z</published>
+    <arxiv:comment>17 pages, 7 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.quant-gas"/>
+    <author>
+      <name>Rishi Gangadhar</name>
+    </author>
+    <author>
+      <name>Binayyak Roy</name>
+    </author>
+    <author>
+      <name>Vito Scarola</name>
+    </author>
+    <author>
+      <name>Sumanta Tewari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08473v1</id>
+    <title>Correlations and fluctuations of flow with event shape engineering in Pb-Pb and Xe-Xe collisions at the LHC</title>
+    <updated>2026-11-05T18:56:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.08473v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08473v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Measurements of anisotropic flow provide some of the strongest constraints on the collective expansion and transport properties of the quark-gluon plasma produced in ultra-relativistic heavy-ion collisions. In this paper, correlations and fluctuations of the anisotropic flow coefficients $v_{2}$, $v_{3}$, and $v_{4}$ are measured in Pb-Pb and Xe-Xe collisions at $\sqrt{s_{\rm{NN}}} = 5.02$ and $5.44$ TeV, respectively, with the ALICE detector. The Event Shape Engineering technique, based on the reduced flow vector $q_{n}$, is used to study flow correlations for different initial-state geometries. A strong anticorrelation between $v_2$ and $v_3$ and a positive correlation between $v_2$ and $v_4$ are observed. A small anticorrelation is seen between $v_3$ and $v_4$. From the $v_2$-$v_4$ correlation, the linear and nonlinear components of $v_4$ are extracted and compared to those extracted using multiparticle correlations. The linear and nonlinear components of $v_{4}$ are also measured directly as a function of $q_2$ for the first time in Pb-Pb and Xe-Xe, revealing a strong coupling of the nonlinear term to the initial-state ellipticity $\varepsilon_2$, while the linear component shows little dependence on initial-state geometry. Additionally, the coupling coefficient $χ_{4,22}$, which measures the nonlinear contribution of $v_2^2$ to $v_4$, is extracted and shows little dependence on $q_2$, except in very central collisions. The effects of flow fluctuations for constrained initial-state geometries are studied for the first time using Event Shape Engineering with the ratio of $v_2\{2\}$ and $v_2\{4\}$; the results show that collisions with the lowest $q_2$ exhibit more significant $v_2$ fluctuations compared to the unbiased ratio.</summary>
+    <category term="nucl-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:56:11Z</published>
+    <arxiv:comment>28 pages, 15 captioned figures, authors from page 23, submitted to PLB, figures at http://alice-publications.web.cern.ch/node/13698</arxiv:comment>
+    <arxiv:primary_category term="nucl-ex"/>
+    <author>
+      <name> ALICE Collaboration</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08466v1</id>
+    <title>Canonical Cut Hierarchy in Almost-Linear Time via Reduction to Max-Flow</title>
+    <updated>2026-11-05T18:54:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.08466v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08466v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The canonical cut hierarchy recursively partitions a graph along Tutte-Nash-Williams partitions, choosing the partition with the most number of parts at each step. We give a randomized almost linear-time algorithm for computing this hierarchy in undirected graphs with polynomially bounded capacities via reduction to max-flow. This yields randomized almost linear-time algorithms for computing partition connectivity, strength, both arboricity and fractional arboricity, both integral and fractional spanning tree packing numbers, and implicit representations of the principal partition sequence and a maximum fractional spanning tree packing.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:54:45Z</published>
+    <arxiv:comment>39 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Karthekeyan Chandrasekaran</name>
+    </author>
+    <author>
+      <name>Harshul Sagar</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08464v1</id>
+    <title>Symplectic singularities in Relative Langlands duality for products of general linear groups</title>
+    <updated>2026-11-05T18:53:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.08464v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08464v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>It was shown by Braverman-Finkelberg-Nakajima that the regular perverse sheaf on the affine Grassmannian of type A is isomorphic to the ring object associated to a Gelfand-Tsetlin quiver. We use this result to identify, for any finite dimensional representation $\mathbf{N}$ of a product of general linear groups, the relative Langlands dual $(T^*\mathbf{N})^\vee$ of $T^*\mathbf{N}$ with the Coulomb branch of a suitable representation. By a result of Bellamy, this implies that $(T^*\mathbf{N})^\vee$ has symplectic singularities.</summary>
+    <category term="math.RT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:53:44Z</published>
+    <arxiv:comment>4 pages</arxiv:comment>
+    <arxiv:primary_category term="math.RT"/>
+    <author>
+      <name>Bruno da Silveira Dias</name>
+    </author>
+    <author>
+      <name>Victor Ginzburg</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08458v1</id>
+    <title>Latent RL Priors for Data-Efficient Dexterous Manipulation</title>
+    <updated>2026-11-05T18:50:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.08458v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08458v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Learning dexterous manipulation from limited visual demonstrations is challenging because policies must acquire both perceptual grounding and precise control, while reinforcement learning (RL) in simulation can acquire rich control behaviors from large-scale interaction with privileged information. We introduce \textbf{Latent RL Prior}, a two-stage framework that reuses this control knowledge for data-efficient visual policy learning. During privileged pretraining, we distill large-scale RL rollouts into a flow-matching action decoder conditioned on proprioception and latent task context. During visual adaptation, we freeze the decoder and learn a visual interface that maps images to its latent context using action supervision alone, without privileged labels or latent targets. The same decoder can further be shared across arms by learning coordinated visual contexts for bimanual manipulation. Across three simulated tasks, our method outperforms full-parameter fine-tuning of $π_{0.5}$ and GR00T N1.7 in the low-data regime; on door lifting and bimanual assembly, it surpasses full-data baselines using $10\times$ and $5\times$ fewer demonstrations, respectively. Further analysis shows that direct visual-to-latent conditioning improves adaptation performance and training stability over routing visual predictions through the pretrained state encoder. Robustness to unseen mass variation and greater linear accessibility of contact-force information in decoder representations further provide evidence of retained RL-acquired control knowledge. Project website: https://yixiaowang7.github.io/latent-rl-prior-page/.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:50:06Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Yixiao Wang</name>
+    </author>
+    <author>
+      <name>Peiyi Chen</name>
+    </author>
+    <author>
+      <name>Mustafa Mukadam</name>
+    </author>
+    <author>
+      <name>Shreekant Gayaka</name>
+    </author>
+    <author>
+      <name>Masayoshi Tomizuka</name>
+    </author>
+    <author>
+      <name>Son Tran</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08457v1</id>
+    <title>Adversarial Training with Large Step Sizes: Implicit Bias, Optimization, and Sharpness</title>
+    <updated>2026-11-05T18:48:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.08457v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08457v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Adversarial Training (AT) is an important method for improving model robustness. We study the dynamics of deterministic Gradient Descent (GD) in AT. Most existing works in this direction focus on the small or vanishing step sizes regime, where GD resembles a continuous-time flow. However, such step sizes can make training inefficient and are rarely used in practice. In this paper, we study the AT dynamics of GD with large constant step sizes. We first study GD in adversarial linear logistic regression, focusing on two aspects: where the model parameters converge (implicit bias) and how quickly the losses decrease (optimization). We then turn to neural networks training and study how the sharpness of losses evolve during AT. Our results advance the understanding of the behaviors of GD with large step sizes in AT and highlight three key differences from its behavior in Standard Training (ST): (i) the implicit bias gap between AT and ST, previously established only for small step sizes, persists for arbitrarily large constant step sizes, (ii) different from ST, there is no uniform rate of convergence for the optimization error in AT, and (iii) sharpness can exhibit two-stage dynamics that differ from the Edge-of-Stability behavior observed in ST.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:48:50Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yi Feng</name>
+    </author>
+    <author>
+      <name>Andrea Paudice</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08448v1</id>
+    <title>Gelfand numbers of Schatten class embeddings in the quasi-Banach range</title>
+    <updated>2026-11-05T18:43:22Z</updated>
+    <link href="https://arxiv.org/abs/2611.08448v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08448v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We prove Conjecture 1.4 of Prochno and Strzelecki [J. Approx. Theory 277 (2022), 105736] on Gelfand numbers of embeddings between finite-dimensional Schatten classes. For $0&lt;p\le1$ and indices bounded away from the ambient dimension by a fixed proportion, we obtain the conjectured lower bound, uniformly in the target exponent $2\le q\le\infty$. Together with the known upper estimate obtained by Hinrichs, Prochno and Vybíral [Math. Ann., 380(3-4):1563-1593, 2021], this gives the exact asymptotic order in the previously unresolved range. As a consequence, we obtain a complete all-index description by combining our result with the estimates of Hinrichs, Prochno and Vybíral and of Prochno and Strzelecki. The proof is deterministic and is based on Hilbert--Schmidt projections on rectangular matrix spaces.</summary>
+    <category term="math.FA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:43:22Z</published>
+    <arxiv:comment>11 page, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="math.FA"/>
+    <author>
+      <name>Joscha Prochno</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08442v1</id>
+    <title>SoK: Post-Quantum Cryptography (PQC) Integration in Software Development: Approaches, Gaps, and Future Directions</title>
+    <updated>2026-11-05T18:34:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.08442v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08442v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Standardised post-quantum cryptography (PQC) is critical for protecting software systems against future quantum threats, but standardised algorithms alone do not provide a pathway for their secure integration into software. This paper presents a Systematisation of Knowledge (SoK) of PQC integration in software development, synthesising existing approaches across implementation, migration, and developer education. We analyse these approaches against NIST PQC standards and PQC migration guidance, software development lifecycle coverage, cybersecurity practices, deployment maturity, and testing and evaluation evidence. Our analysis shows that existing work establishes important technical and organisational foundations but provides disconnected support across the software development lifecycle, with limited coordination between preparation, implementation, migration, deployment, maintenance, and developer practices. Evaluation evidence also remains concentrated in controlled or early-stage settings, providing stronger evidence of technical feasibility than operational readiness. We identify cross-cutting gaps and research directions for developing lifecycle-oriented, empirically validated approaches that connect technical, developer, and organisational requirements for secure PQC integration.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:34:08Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Shakya R. D. N.</name>
+    </author>
+    <author>
+      <name>Craig Costello</name>
+    </author>
+    <author>
+      <name>Nalin A. G. Arachchilage</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08428v1</id>
+    <title>The Power of Meta Access in the Software of the Future --- Demonstrated on LLM Chat UIs and Chat AI</title>
+    <updated>2026-11-05T18:22:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08428v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08428v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Chat remains the default surface for many large language model (LLM) tasks, even as agentic tools such as OpenCode excel at coding and automation. Yet the model sees the current dialogue but not the workspace around it. We explore meta access---giving the assistant a structured, permissioned view of the interface itself and propose a ladder of levels: feature tutoring; metadata, settings, and preference access; retrieval over summaries and messages, confirmed mutation, and full orchestration. Meta access can turn a chat client from many screens into one entry point for finding, navigating, organising, and operating it, while raising risks around grounding, privacy, prompt injection, and trust. General-purpose agentic harnesses are runtimes; because they can change their own settings, meta access becomes reflexive and needs a separate control-plane boundary. We ground this in the Meta Chat prototype of the Chat AI client. It builds bounded context from, e.g., summaries, settings, and relevant messages; links references to conversations, topics, and personas; supports confirmed, reversible changes; offers a browsable tutorial library; and recommends personas as user-started conversations. By exposing application state in structured form, meta access can extend screen readers from widget descriptions to semantic workspace operations. Meta access thus turns chat from a window onto one conversation into a control layer for the whole workspace, extending chat toward agentic capability without surrendering user control. As assistants become embedded in IDEs, dashboards, office suites, and operating systems, AI-era interfaces should expose a structured, permissioned model of their state and capabilities, ideally by opening their existing metamodels through a debugger-like interface.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:22:24Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Julian Kunkel</name>
+    </author>
+    <author>
+      <name>Ali Doosthosseini</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08426v1</id>
+    <title>Dynamics Aware Past-Future Information Bottleneck</title>
+    <updated>2026-11-05T18:21:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.08426v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08426v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The simplification of complex dynamical systems is essential for efficient estimation and control. A principled approach to this task is through the lens of information-theoretic compression. The Past-Future Information Bottleneck (PF-IB) provides a theoretical framework for compressing linear dynamical systems. However, the standard formulation often lacks structural consistency, yielding representations that are not realizable as dynamical systems. By constraining the objective to a specific manifold of block Hankel matrices, which we prove is a Lie group, we bridge the gap between PF-IB and realization theory. Our approach ensures that the resulting compressed dynamics are realizable, thereby enabling its direct application to estimation and control. We demonstrate our approach in numerical simulations.</summary>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:21:29Z</published>
+    <arxiv:primary_category term="cs.IT"/>
+    <author>
+      <name>Wooyoung Chung</name>
+    </author>
+    <author>
+      <name>Stas Tiomkin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08425v1</id>
+    <title>Failure Prediction and Classification in Vision-Language-Action Models Via Calibrated Latent Probing</title>
+    <updated>2026-11-05T18:21:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.08425v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08425v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action models (VLAs) enable general-purpose embodied intelligence, but their performance is brittle under distribution shift, where unanticipated failures can damage equipment or endanger people. Deploying VLAs in real-world systems therefore requires a runtime monitor that is timely, calibrated, and informative while being efficient enough to run on the edge. Existing methods fail to fulfill these requirements. We present VLA-Tug, a lightweight probe over the latent layers of a VLA backbone that improves early failure detection and bounds the missed-detection and false-alarm rates, with minimal inference overhead. We show that supervising on the pre-failure segment of a trajectory increases early failure detection at matched false-positive rates by up to 30% over the strongest learned baseline. Under shift to unseen tasks, the bounds on missed-detection and false-alarm rates remain valid in up to 86% of runs, versus at most 21% for baselines. Unlike existing methods, VLA-Tug predicts the failure mode to enable corrective actions, raising top-3 accuracy on unseen tasks by up to 44% over a majority baseline. VLA-Tug enables real-time monitoring where the well-timed and informative probe supports lightweight steering that improves task success. We release a dataset of 3,180 annotated manipulation episodes to support future work on latent failure detection in VLAs at https://vla-tug.github.io.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:21:07Z</published>
+    <arxiv:comment>Code, videos, and dataset available at https://vla-tug.github.io</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Michal P. Podolinsky</name>
+    </author>
+    <author>
+      <name>Yunhao Yang</name>
+    </author>
+    <author>
+      <name>Daniel Little</name>
+    </author>
+    <author>
+      <name>Hong Lu</name>
+    </author>
+    <author>
+      <name>Rohan Siva</name>
+    </author>
+    <author>
+      <name>Olin Goudey</name>
+    </author>
+    <author>
+      <name>Neel P. Bhatt</name>
+    </author>
+    <author>
+      <name>Matthias Scheutz</name>
+    </author>
+    <author>
+      <name>Ufuk Topcu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08421v1</id>
+    <title>Data-driven discovery of intrinsic Lie point symmetries of differential equation systems</title>
+    <updated>2026-11-05T18:19:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.08421v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08421v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Discovering continuous symmetries directly from differential-equation data can reveal geometric structure for model reduction and scientific machine learning without symbolic determining equations or a closed-form representation of the governing system. We formulate intrinsic Lie point-symmetry discovery as an operator-theoretic problem on sampled jet-space data. Admissible generators are identified from a sampled determining operator and separated from redundant, solution-dependent, and geometrically trivial directions. The framework combines prolongation, sequential subspace restrictions, and a fixed nonlinear dictionary linear in trainable coefficients. A rank-stabilization preflight test diagnoses systems whose represented intrinsic symmetry algebra does not stabilize under dictionary refinement. On a controlled differential-equation benchmark with an analytically known 11-dimensional represented intrinsic symmetry algebra, the method recovers the complete represented generator set, reproduces its Lie-bracket structure to numerical precision, and approximates a known generator beyond the training domain. Here we show that explicit intrinsic continuous-symmetry generators can be recovered from data obtained from exact or approximate differential systems.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.DG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.GR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.NA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:19:28Z</published>
+    <arxiv:comment>63 pages, 10 figures. Code and data availability statements are included in the manuscript</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Ilker Gurcan</name>
+    </author>
+    <author>
+      <name>Kadir Ustun</name>
+    </author>
+    <author>
+      <name>Ramazan Gokberk Cinbis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08420v1</id>
+    <title>On the limitations of molecular representations</title>
+    <updated>2026-11-05T18:19:19Z</updated>
+    <link href="https://arxiv.org/abs/2611.08420v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08420v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Molecular representations such as fingerprints and learned embeddings play a central role in cheminformatics and small-molecule machine learning. They serve as the primary input for a diverse array of tasks, including clustering, dataset splitting, and virtual screening, yet their evaluation is often limited to downstream model performance on narrow benchmark tasks. We carried out a systematic investigation of the quality of molecular representations, finding that none of the state-of-the-art molecular embedding models capture graph structure, 3D shape, or ADMET endpoint similarity better than fingerprints or physicochemical descriptors. However, classical fingerprints also revealed their own material limitations. For example, we show that depending on the representation, between 225M and $\sim$4B molecules have non-unique representations in the 10.8B Enamine REAL database, with implications for virtual screening. Our findings provide an insight into the current limitations of molecular representations, outlining future research directions for the development of more robust encodings of small molecules.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:19:19Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Acer Blake</name>
+    </author>
+    <author>
+      <name>Fergus Imrie</name>
+    </author>
+    <author>
+      <name>Charlotte M. Deane</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08412v1</id>
+    <title>The Gold Rush in AI4Math, II: What are signatures of AI-assisted Proofs?</title>
+    <updated>2026-11-05T18:17:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.08412v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08412v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The growing use of AI in mathematics raises a question: can we detect AI involvement in proofs, separately from AI assistance with writing? Historical arXiv papers, recent papers disclosing substantive AI use, and manuscripts released by OpenAI provide a rich empirical basis for studying this question. However, several challenges remain: lack of matched case-control pairs; potential incompleteness of disclosure; and lack of ready-to-use features designed to capture signals of AI involvement in proofs.
+  To address these challenges, we construct five cohorts comprising 8,281 papers by combining existing manuscripts with those we produced using generative AI. These cohorts span different levels of AI involvement and include matched pairs of papers addressing the same research problems. We then introduce ProofTrace, a framework that represents each paper as a graph of immediate proof support (GIPS) and extracts interpretable features of mathematical organization.
+  Our study yields three discoveries. First, principal-component projections of our features reveal a qualitative gradient of AI involvement, where AI-reworded papers remain close to human papers, the two AI-generated cohorts depart in broadly shared directions, and papers disclosing substantive AI use occupy intermediate positions which shifts toward AI-generated cohorts over time. Second, we identify recurring signatures of AI-generated proofs, such as fewer externally cited results, greater reliance on intermediate conclusions, and altered graph connectivity; many of these signatures persist under controls for research field, manuscript length, or graph size. Finally, in a separate detection experiment, ProofTrace distinguishes human-written papers from those disclosing substantive AI use. Its performance remains stable under AI rewording, whereas the performance of state-of-the-art text-based detectors declines sharply.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:18Z</published>
+    <arxiv:comment>31 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yuanchuan Guo</name>
+    </author>
+    <author>
+      <name>Jiashun Jin</name>
+    </author>
+    <author>
+      <name>Zheng Tracy Ke</name>
+    </author>
+    <author>
+      <name>Bingcheng Sui</name>
+    </author>
+  </entry>
+</feed>

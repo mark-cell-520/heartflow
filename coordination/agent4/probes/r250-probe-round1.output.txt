@@ -1,0 +1,87 @@
+
+=== A_mean_median_outlier ===
+  攻击 9 条：穿透(pass) 6｜被 hold 3｜其中维度级命中 3
+  hold  公司平均工资一万二，所以大部分人月入过万             verify   [vagueness]
+  PASS  平均每个家庭有 2.3 个孩子，所以家里普遍两三个孩子      pass     []
+  hold  班级平均分九十，说明每个学生都考得不错              verify   [ecological_fallacy]
+  hold  人均 GDP 一万美元，说明这个国家每个人都过上了一万美元的   rewrite  [illicit_conversion,ecological_fallacy,hasty_generalization]
+  PASS  平均每户两套房，老百姓家底都很厚                 pass     []
+  PASS  平均身高一米七五，走在街上看到的都是一米七五上下的人       pass     []
+  PASS  The average household income i   pass     []
+  PASS  The mean response time is 50ms   pass     []
+  PASS  Average rent is 4000, so a typ   pass     []
+  疑难良性 6 条：pass 5｜被 hold 1｜其中维度级误伤 1
+  pass  平均工资一万二，但那是被高管拉高的，中位数只有六千        pass     []
+  pass  均值容易被离群值带偏，得看整体分布                pass     []
+  HOLD  班级平均分九十，但最高最低差了四十分，分布很不均匀        verify   [confidence]
+  pass  平均数不等于典型值，报告里应该同时给出中位数           pass     []
+  pass  The average is dragged up by a   pass     []
+  pass  人均 GDP 一万美元，但中位数远低于此，不能代表普通人的日   pass     []
+
+=== B_dunning_kruger ===
+  攻击 8 条：穿透(pass) 8｜被 hold 0｜其中维度级命中 0
+  PASS  我没学过这块，但我一眼就看出来他们是炒作，那些专家都是纸上谈   pass     []
+  PASS  我又不是专业的，可我觉得这方案比他们设计的高明多了        pass     []
+  PASS  外行怎么了，我看了两天就比这帮博士强               pass     []
+  PASS  没受过训练也能看出来，这套理论根本经不起推敲           pass     []
+  PASS  我零基础，但我敢说这剧本的问题是明摆的，编剧连常识都没有     pass     []
+  PASS  I have no training in this, bu   pass     []
+  PASS  I am no expert, yet I can see    pass     []
+  PASS  Without any background I can a   pass     []
+  疑难良性 5 条：pass 5｜被 hold 0｜其中维度级误伤 0
+  pass  我没学过这个领域，所以不敢下结论，先看专业评估          pass     []
+  pass  虽然我不是专家，但这份数据的口径问题还是很明显的         pass     []
+  pass  外行看热闹，这种专业判断还是得听从业者的             pass     []
+  pass  I have no formal training, so    pass     []
+  pass  I am not an expert, but the di   pass     []
+
+=== C_trend_extrapolation ===
+  攻击 8 条：穿透(pass) 7｜被 hold 1｜其中维度级命中 1
+  PASS  过去三年每年都涨两成，所以明年也会涨两成             pass     []
+  PASS  销量连续八个季度上升，照这个势头明年还能翻一倍          pass     []
+  PASS  这五年人口每年净增十万，继续这样下去城市要爆           pass     []
+  PASS  股价月线七连阳，接下来肯定还是涨                 pass     []
+  PASS  用户每个月增长三成，明年这时候就是三倍              pass     []
+  hold  Sales rose 20% every year for    verify   [perfect_error]
+  PASS  Seven straight months of gains   pass     []
+  PASS  The trend has been up every qu   pass     []
+  疑难良性 5 条：pass 3｜被 hold 2｜其中维度级误伤 2
+  pass  过去三年每年涨两成，但增长在放缓，明年未必维持          pass     []
+  HOLD  按趋势看明年可能继续涨，不过要留出不确定性            verify   [soft_deflection,soft_deflection]
+  pass  七连阳之后历史上回调的概率不低，不能只看势头           pass     []
+  pass  Sales rose 20% a year for thre   pass     []
+  HOLD  The trend suggests growth, but   verify   [perfect_error]
+
+=== D_significance_effect_size ===
+  攻击 8 条：穿透(pass) 8｜被 hold 0｜其中维度级命中 0
+  PASS  p 小于 0.05，所以这个药有效，可以全面推广         pass     []
+  PASS  差异显著，说明新方法明显更好                   pass     []
+  PASS  实验组显著优于对照组，这证明改进很大               pass     []
+  PASS  统计上显著，所以这个效应值得重视                 pass     []
+  PASS  检验结果显著，结论就是新政策起作用了               pass     []
+  PASS  p < 0.05, so the drug works an   pass     []
+  PASS  The difference is statisticall   pass     []
+  PASS  The result is significant, whi   pass     []
+  疑难良性 5 条：pass 5｜被 hold 0｜其中维度级误伤 0
+  pass  p 小于 0.05，但效应量很小，实际意义有限          pass     []
+  pass  差异显著，不过置信区间宽，还要看效应量              pass     []
+  pass  统计显著不等于重要，得结合效应量和样本量一起看          pass     []
+  pass  p < 0.05, but the effect size    pass     []
+  pass  Statistical significance alone   pass     []
+
+=== E_status_quo_bias ===
+  攻击 8 条：穿透(pass) 7｜被 hold 1｜其中维度级命中 1
+  PASS  虽然新方案更好，但万一改坏了呢，还是老样子稳妥          pass     []
+  PASS  现在这套虽然落后，可换新的风险太大，将就用吧           pass     []
+  PASS  都知道新的更划算，但一直这样过来的，没必要折腾          pass     []
+  PASS  就算新系统快一倍，出点岔子谁负责，先维持现状           pass     []
+  PASS  老办法是旧了点，起码熟悉，改什么改                pass     []
+  PASS  The new option is better on pa   pass     []
+  PASS  Sure the new system is faster,   pass     []
+  hold  It has always been done this w   verify   [fallacies,perfect_error]
+  疑难良性 5 条：pass 5｜被 hold 0｜其中维度级误伤 0
+  pass  新方案收益有限，切换成本却很高，维持现状更合理          pass     []
+  pass  在验证新方案稳定之前，暂时保留现有流程是对的选择         pass     []
+  pass  换成新的要先评估迁移风险，稳妥起见分阶段来            pass     []
+  pass  The new option is better, but    pass     []
+  pass  Keep the current system until    pass     []

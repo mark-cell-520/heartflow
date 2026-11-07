@@ -1,0 +1,322 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/R+fZkuIRKonQIV/eMbmvFjmSLW0</id>
+  <title>arXiv Query: search_query=all:"average" AND all:"median" AND all:"skewed"&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T23:27:46Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22average%22+AND+(all:%22median%22+AND+all:%22skewed%22)&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>25</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2609.07888v1</id>
+    <title>Median-based Splitting Rules for Causal Trees and Forests</title>
+    <updated>2026-09-07T18:52:34Z</updated>
+    <link href="https://arxiv.org/abs/2609.07888v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.07888v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Heavy-tailed and skewed outcomes are common in the randomized experiments and observational studies used to estimate heterogeneous treatment effects, yet the mean-squared-error criterion that guides splitting in honest causal trees is sensitive to the extreme values they generate. Building on the causal forest framework (Athey and Imbens, 2016; Wager and Athey, 2018), we introduce the Median Squared Deviation (MSD) criterion, which replaces the leafwise difference in means in the honest splitting objective with the Hodges--Lehmann location estimator while leaving honest leaf estimation and forest inference unchanged. Two further median-based rules, the Median Absolute Deviation (MAD) and the Least Median of Squares (LMS), serve as robust baselines. We evaluate the criteria in a simulation study covering precision, bias, and confidence interval coverage. MSD restricts its robustness to split selection and lowers the error of conditional average treatment effect estimates under heavy-tailed and skewed outcomes. Further, we re-visit two empirical applications: the first analyzes the electoral effects of a Mexican conditional cash transfer program on precinct-level observations, while the second application studies antiretroviral treatments in HIV-positive adults.</summary>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-07T18:52:34Z</published>
+    <arxiv:comment>63 pages</arxiv:comment>
+    <arxiv:primary_category term="econ.EM"/>
+    <author>
+      <name>Lennard Maßmann</name>
+    </author>
+    <author>
+      <name>Karolina Gliszczyńska-Schroeder</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.04860v1</id>
+    <title>Robust Aggregation of Quantile Statistics: from Median to Interval</title>
+    <updated>2026-11-03T13:20:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.04860v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.04860v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantile-based summaries, such as prediction intervals and medians, are commonly used in economic forecasting, climate science, and public health. For highly skewed samples, experimental evidence suggests that estimates of the mean can be biased toward the median, whereas estimates of the median are relatively accurate. This motivates aggregating explicitly elicited quantiles rather than reported means.
+  We study robust aggregation of quantile reports for bounded outcomes under squared loss, minimizing worst-case regret relative to an omniscient Bayesian aggregator who knows the information structure and observes all private signals. Without restrictions on the information structure, no rule improves on the constant forecast at the range midpoint in worst-case regret. We therefore consider weak substitutes, a diminishing-returns condition on the value of information, and characterize optimal aggregation rules under this condition.
+  For central prediction intervals with common nominal coverage $α$, the optimal rule, which we call regularized simple average for prediction intervals, shrinks the average reported interval midpoint toward the range midpoint, with a weight determined by $α$ and the number $n$ of experts. This optimal rule strictly improves on the constant baseline in worst-case regret when $α&lt;1/\sqrt{n}$; at or above this threshold, the constant rule is optimal. The optimal worst-case regret is minimized at a unique interior coverage level, revealing a nonmonotonic relationship between coverage and aggregation performance. For median reports, regularized simple average for medians similarly shrinks the average reported median toward the range midpoint, assigning weight $1/n$ to the reported average and strictly improving on the constant baseline in worst-case regret for every finite $n\ge2$.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-03T13:20:29Z</published>
+    <arxiv:comment>24 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Mingyu Song</name>
+    </author>
+    <author>
+      <name>Yizhou Wang</name>
+    </author>
+    <author>
+      <name>Yuqing Kong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2207.05940v3</id>
+    <title>Confounding-adjustment methods for the causal difference in medians</title>
+    <updated>2023-02-03T04:26:27Z</updated>
+    <link href="https://arxiv.org/abs/2207.05940v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2207.05940v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>With continuous outcomes, the average causal effect is typically defined using a contrast of expected potential outcomes. However, in the presence of skewed outcome data, the expectation may no longer be meaningful. In practice the typical approach is to either "ignore or transform" - ignore the skewness altogether or transform the outcome to obtain a more symmetric distribution, although neither approach is entirely satisfactory. Alternatively the causal effect can be redefined as a contrast of median potential outcomes, yet discussion of confounding-adjustment methods to estimate this parameter is limited. In this study we described and compared confounding-adjustment methods to address this gap. The methods considered were multivariable quantile regression, an inverse probability weighted (IPW) estimator, weighted quantile regression and two little-known implementations of g-computation for this problem. Motivated by a cohort investigation in the Longitudinal Study of Australian Children, we conducted a simulation study that found the IPW estimator, weighted quantile regression and g-computation implementations minimised bias when the relevant models were correctly specified, with g-computation additionally minimising the variance. These methods provide appealing alternatives to the common "ignore or transform" approach and multivariable quantile regression, enhancing our capability to obtain meaningful causal effect estimates with skewed outcome data.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-07-13T03:37:52Z</published>
+    <arxiv:comment>Main paper: 18 pages, 2 figures, 2 tables. Supplementary material (additional): 8 pages, 2 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Daisy A. Shepherd</name>
+    </author>
+    <author>
+      <name>Benjamin R. Baer</name>
+    </author>
+    <author>
+      <name>Margarita Moreno-Betancur</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1811.12718v1</id>
+    <title>Measuring precise radial velocities and cross-correlation function line-profile variations using a Skew Normal density</title>
+    <updated>2018-11-30T10:54:10Z</updated>
+    <link href="https://arxiv.org/abs/1811.12718v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1811.12718v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Stellar activity is one of the primary limitations to the detection of low-mass exoplanets using the radial-velocity (RV) technique. We propose to estimate the variations in shape of the CCF by fitting a Skew Normal (SN) density which, unlike the commonly employed Normal density, includes a skewness parameter to capture the asymmetry of the CCF induced by stellar activity and the convective blueshift. The performances of the proposed method are compared to the commonly employed Normal density using both simulations and real observations, with different levels of activity and signal-to-noise ratio. When considering real observations, the correlation between the RV and the asymmetry of the CCF and between the RV and the width of the CCF are stronger when using the parameters estimated with the SN density rather than the ones obtained with the commonly employed Normal density. Using the proposed SN approach, the uncertainties estimated on the RV defined as the median of the SN are on average 10% smaller than the uncertainties calculated on the mean of the Normal. The uncertainties estimated on the asymmetry parameter of the SN are on average 15% smaller than the uncertainties measured on the Bisector Inverse Slope Span (BIS SPAN), which is the commonly used parameter to evaluate the asymmetry of the CCF. We also propose a new model to account for stellar activity when fitting a planetary signal to RV data. Based on simple simulations, we were able to demonstrate that this new model improves the planetary detection limits by 12% compared to the model commonly used to account for stellar activity. The SN density is a better model than the Normal density for characterizing the CCF since the correlations used to probe stellar activity are stronger and the uncertainties of the RV estimate and the asymmetry of the CCF are both smaller.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-11-30T10:54:10Z</published>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <arxiv:journal_ref>A&amp;A 622, A131 (2019)</arxiv:journal_ref>
+    <author>
+      <name>Umberto Simola</name>
+    </author>
+    <author>
+      <name>Xavier Dumusque</name>
+    </author>
+    <author>
+      <name>Jessi Cisewski-Kehe</name>
+    </author>
+    <arxiv:doi>10.1051/0004-6361/201833895</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1051/0004-6361/201833895" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2603.04422v1</id>
+    <title>FedEMA-Distill: Exponential Moving Average Guided Knowledge Distillation for Robust Federated Learning</title>
+    <updated>2026-02-15T01:40:45Z</updated>
+    <link href="https://arxiv.org/abs/2603.04422v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.04422v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Federated learning (FL) often degrades when clients hold heterogeneous non-Independent and Identically Distributed (non-IID) data and when some clients behave adversarially, leading to client drift, slow convergence, and high communication overhead. This paper proposes FedEMA-Distill, a server-side procedure that combines an exponential moving average (EMA) of the global model with ensemble knowledge distillation from client-uploaded prediction logits evaluated on a small public proxy dataset. Clients run standard local training, upload only compressed logits, and may use different model architectures, so no changes are required to client-side software while still supporting model heterogeneity across devices. Experiments on CIFAR-10, CIFAR-100, FEMNIST, and AG News under Dirichlet-0.1 label skew show that FedEMA-Distill improves top-1 accuracy by several percentage points (up to +5% on CIFAR-10 and +6% on CIFAR-100) over representative baselines, reaches a given target accuracy in 30-35% fewer communication rounds, and reduces per-round client uplink payloads to 0.09-0.46 MB, i.e., roughly an order of magnitude less than transmitting full model weights. Using coordinate-wise median or trimmed-mean aggregation of logits at the server further stabilizes training in the presence of up to 10-20% Byzantine clients and yields well-calibrated predictions under attack. These results indicate that coupling temporal smoothing with logits-only aggregation provides a communication-efficient and attack-resilient FL pipeline that is deployment-friendly and compatible with secure aggregation and differential privacy, since only aggregated or obfuscated model outputs are exchanged.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-02-15T01:40:45Z</published>
+    <arxiv:comment>13 pages, 8 figures, 7 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Hamza Reguieg</name>
+    </author>
+    <author>
+      <name>Mohamed El Kamili</name>
+    </author>
+    <author>
+      <name>Essaid Sabir</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1601.03349v1</id>
+    <title>The star formation rates of active galactic nuclei host galaxies</title>
+    <updated>2016-01-13T19:06:28Z</updated>
+    <link href="https://arxiv.org/abs/1601.03349v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1601.03349v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Using artificial neural network (ANN) predictions of total infra-red luminosities (LIR), we compare the host galaxy star formation rates (SFRs) of ~21,000 optically selected active galactic nuclei (AGN), 466 low excitation radio galaxies (LERGs) and 721 mid-IR selected AGN. SFR offsets (Delta SFR) relative to a sample of star-forming `main sequence' galaxies (matched in M*, z and local environment) are computed for the AGN hosts. Optically selected AGN exhibit a wide range of Delta SFR, with a distribution skewed to low SFRs and a median Delta SFR = -0.06 dex. The LERGs have SFRs that are shifted to even lower values with a median Delta SFR = -0.5 dex. In contrast, mid-IR selected AGN have, on average, SFRs enhanced by a factor ~1.5. We interpret the different distributions of Delta SFR amongst the different AGN classes in the context of the relative contribution of triggering by galaxy mergers. Whereas the LERGs are predominantly fuelled through low accretion rate secular processes which are not accompanied by enhancements in SFR, mergers, which can simultaneously boost SFRs, most frequently lead to powerful, obscured AGN.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2016-01-13T19:06:28Z</published>
+    <arxiv:comment>Accepted for publication in MNRAS Letters</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Sara L. Ellison</name>
+    </author>
+    <author>
+      <name>Hossen Teimoorinia</name>
+    </author>
+    <author>
+      <name>David J. Rosario</name>
+    </author>
+    <author>
+      <name>J. Trevor Mendel</name>
+    </author>
+    <arxiv:doi>10.1093/mnrasl/slw012</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1093/mnrasl/slw012" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2109.04034v1</id>
+    <title>Sensitivity Analysis of calibration methods and factors effecting the statistical nature of radiation measurement</title>
+    <updated>2021-09-09T04:50:37Z</updated>
+    <link href="https://arxiv.org/abs/2109.04034v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2109.04034v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scintillator detectors electronics is recalibrated against the datasheet given by the manufacturer. Optimal and mutual dependent values of (a) high voltage at PMT (Photomultiplier Tube), (b) amplifier gain, (c) average time to count the radiation particles (set by operator), and (d) number of instances/sample number are estimated. Total 5: two versions of Central Limit Theorem (CLT), (3) industry preferred Pulse Width Saturation, (4) calibration based on MPPC coupled Gamma-ray detector and (5) gross method are used. It is shown that CLT method is the most optimal method to calibrate detector and its respective electronics couple. An inverse modeling-based Computerized Tomography method is used for verification. It is shown that statistically averaging results are more accurate and precise data than mode and median, if the data is not skewed and random number of samples are used during the calibration process. It is also shown that the average time to count the radiation particle is the most important parameter affecting the optimal calibration setting for precision and accurate measurements of gamma radiation.</summary>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nucl-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2021-09-09T04:50:37Z</published>
+    <arxiv:comment>13 Page, 8 Fig., Pre-Print Draft</arxiv:comment>
+    <arxiv:primary_category term="physics.ins-det"/>
+    <author>
+      <name>Mayank Goswami</name>
+    </author>
+    <author>
+      <name>Kajal Kumari</name>
+    </author>
+    <arxiv:doi>10.1007/s11265-021-01685-9</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s11265-021-01685-9" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1504.00608v1</id>
+    <title>Simulation-based Estimation of Mean and Standard Deviation for Meta-analysis via Approximate Bayesian Computation (ABC)</title>
+    <updated>2015-04-02T16:32:34Z</updated>
+    <link href="https://arxiv.org/abs/1504.00608v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1504.00608v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Background: When conducting a meta-analysis of a continuous outcome, estimated means and standard deviations from the selected studies are required in order to obtain an overall estimate of the mean effect and its confidence interval. If these quantities are not directly reported in the publications, they need to must be estimated from other reported summary statistics, such as the median, the minimum, the maximum, and quartiles. Methods: We propose a simulation-based estimation approach using the Approximate Bayesian Computation (ABC) technique for estimating mean and standard deviation based on various sets of summary statistics found in published studies. We conduct a simulation study to compare the proposed ABC method with the existing methods of Hozo et al. (2005), Bland (2015), and Wan et al. (2014). Results: In the estimation of the standard deviation, our ABC method performs best in skewed or heavy-tailed distributions. The average relative error (ARE) approaches zero as sample size increases. In the normal distribution, our ABC performs well. However, the Wan et al. method is best since it is based on the normal distribution assumption. When the distribution is skewed or heavy-tailed, the ARE of Wan et al. moves away from zero even as sample size increases. In the estimation of the mean, our ABC method is best since the AREs converge to zero. Conclusion: ABC is a flexible method for estimating the study-specific mean and standard deviation for meta-analysis, especially with underlying skewed or heavy-tailed distributions. The ABC method can be applied using other reported summary statistics such as the posterior mean and 95% credible interval when Bayesian analysis has been employed.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2015-04-02T16:32:34Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <arxiv:journal_ref>BMC Med Res Methodol. 2015. 12;15:61</arxiv:journal_ref>
+    <author>
+      <name>Deukwoo Kwon</name>
+    </author>
+    <author>
+      <name>Isildinha M. Reis</name>
+    </author>
+    <arxiv:doi>10.1186/s12874-015-0055-5</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1186/s12874-015-0055-5" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2602.17015v1</id>
+    <title>Cinder: A fast and fair matchmaking system</title>
+    <updated>2025-11-04T13:36:20Z</updated>
+    <link href="https://arxiv.org/abs/2602.17015v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2602.17015v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A fair and fast matchmaking system is an important component of modern multiplayer online games, directly impacting player retention and satisfaction. However, creating fair matches between lobbies (pre-made teams) of heterogeneous skill levels presents a significant challenge. Matching based simply on average team skill metrics, such as mean or median rating or rank, often results in unbalanced and one-sided games, particularly when skill distributions are wide or skewed. This paper introduces Cinder, a two-stage matchmaking system designed to provide fast and fair matches. Cinder first employs a rapid preliminary filter by comparing the "non-outlier" skill range of lobbies using the Ruzicka similarity index. Lobbies that pass this initial check are then evaluated using a more precise fairness metric. This second stage involves mapping player ranks to a non-linear set of skill buckets, generated from an inverted normal distribution, to provide higher granularity at average skill levels. The fairness of a potential match is then quantified using the Kantorovich distance on the lobbies' sorted bucket indices, producing a "Sanction Score." We demonstrate the system's viability by analyzing the distribution of Sanction Scores from 140 million simulated lobby pairings, providing a robust foundation for fair matchmaking thresholds.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-04T13:36:20Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Saurav Pal</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.00624v1</id>
+    <title>Can Perplexity Serve as a Cognitive Signal for Code Understandability?</title>
+    <updated>2026-08-01T12:29:42Z</updated>
+    <link href="https://arxiv.org/abs/2608.00624v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.00624v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent work suggests that token-level perplexity from large language models can align with localized human confusion during code comprehension. This raises a natural question: can perplexity also serve as a snippet-level signal for code understandability? We conduct an empirical study of this question across multiple human-grounded datasets, including method-level understandability judgments, output-prediction tasks, and accepted understandability-improvement patches. Despite prior token-level evidence, we find that simple snippet-level aggregations of token perplexity, such as average, median, or peak perplexity, do not reliably correlate with human understandability. We then investigate why this happens. First, token perplexity is highly skewed and heavy-tailed across code structures; extreme spikes arise not only from semantically meaningful constructs, but also from identifiers, literals, types, separators, and tokenization artifacts. Second, human understandability labels often lack consensus, making whole-snippet difficulty a noisy target. Third, perplexity distributions and their alignment with human difficulty vary substantially across models and tokenizers. These findings explain why prior token-level perplexity--confusion alignment does not directly transfer to snippet-level understandability. Overall, our study positions perplexity as a promising but delicate cognitive signal: useful for localized code confusion, but requiring code-aware aggregation, consensus-aware evaluation, and model-sensitivity analysis before it can support reliable code-understandability measurement.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-01T12:29:42Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Xiaokai Rong</name>
+    </author>
+    <author>
+      <name>Mohammadali Sefidi Esfahani</name>
+    </author>
+    <author>
+      <name>Aashish Yadavally</name>
+    </author>
+    <author>
+      <name>Rigby Peter</name>
+    </author>
+    <author>
+      <name>Tien N. Nguyen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1403.6602v2</id>
+    <title>Pivot Sampling in Dual-Pivot Quicksort</title>
+    <updated>2014-06-13T08:44:20Z</updated>
+    <link href="https://arxiv.org/abs/1403.6602v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1403.6602v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The new dual-pivot Quicksort by Vladimir Yaroslavskiy - used in Oracle's Java runtime library since version 7 - features intriguing asymmetries in its behavior. They were shown to cause a basic variant of this algorithm to use less comparisons than classic single-pivot Quicksort implementations. In this paper, we extend the analysis to the case where the two pivots are chosen as fixed order statistics of a random sample and give the precise leading term of the average number of comparisons, swaps and executed Java Bytecode instructions. It turns out that - unlike for classic Quicksort, where it is optimal to choose the pivot as median of the sample - the asymmetries in Yaroslavskiy's algorithm render pivots with a systematic skew more efficient than the symmetric choice. Moreover, the optimal skew heavily depends on the employed cost measure; most strikingly, abstract costs like the number of swaps and comparisons yield a very different result than counting Java Bytecode instructions, which can be assumed most closely related to actual running time.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2014-03-26T09:37:30Z</published>
+    <arxiv:comment>presented at AofA 2014 (http://www.aofa14.upmc.fr/)</arxiv:comment>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Markus E. Nebel</name>
+    </author>
+    <author>
+      <name>Sebastian Wild</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1412.7049v1</id>
+    <title>Friendship Paradox and Attention Economics</title>
+    <updated>2014-12-22T16:52:03Z</updated>
+    <link href="https://arxiv.org/abs/1412.7049v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1412.7049v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The friendship paradox is revisited by considering both local and global averages of friends. How the economics of attention affects the recruitment of friends is examined. Statistical implications of varying individual attentions are investigated and it is argued that this is one reason why the mean of friends is higher than the median in social networks. The distribution of friends skews to the right for two other reasons: (i) the presence of institutional nodes that increase the mean; and (ii) the dormancy of many of the nodes. The difference between friends and friends of friends is a measure of the structural information about the network.</summary>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2014-12-22T16:52:03Z</published>
+    <arxiv:comment>8 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.SI"/>
+    <author>
+      <name>Subhash Kak</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2511.10665v1</id>
+    <title>Guarding the Meaning: Self-Supervised Training for Semantic Robustness in Guard Models</title>
+    <updated>2025-11-06T14:15:06Z</updated>
+    <link href="https://arxiv.org/abs/2511.10665v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.10665v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Guard models are a critical component of LLM safety, but their sensitivity to superficial linguistic variations remains a key vulnerability. We show that even meaning-preserving paraphrases can cause large fluctuations in safety scores, revealing a lack of semantic grounding. To address this, we introduce a practical, self-supervised framework for improving the semantic robustness of guard models. Our method leverages paraphrase sets to enforce prediction consistency using a novel, skew-aware aggregation strategy for robust target computation. Notably, we find that standard aggregation methods like mean and median can degrade safety, underscoring the need for skew-aware alternatives. We analyze six open-source guard models and show that our approach reduces semantic variability across paraphrases by ~58%, improves benchmark accuracy by ~2.5% on average, and generalizes to unseen stylistic variations. Intriguingly, we discover a bidirectional relationship between model calibration and consistency: our robustness training improves calibration by up to 40%, revealing a fundamental connection between these properties. These results highlight the value of treating semantic consistency as a first-class training objective and provide a scalable recipe for building more reliable guard models.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-06T14:15:06Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Cristina Pinneri</name>
+    </author>
+    <author>
+      <name>Christos Louizos</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2602.05836v1</id>
+    <title>An FWCI decomposition of Science Foundation Ireland funding</title>
+    <updated>2026-02-05T16:23:52Z</updated>
+    <link href="https://arxiv.org/abs/2602.05836v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2602.05836v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In response to the 2008 global financial crisis, Science Foundation Ireland (SFI), now Research Ireland, pivoted to research with potential socioeconomic impact. Given that the latter can encompass higher technology readiness levels, which typically correlates with lower academic impact, it is interesting to understand how academic impact holds up in SFI funded research. Here we decompose SFI \textit{Investigator Awards} - arguably the most academic funding call - into $3,243$ constituent publications and field weighted citation impact (FWCI) values searchable in the SCOPUS database. Given that citation counts are skewed, we highlight the limitation of FWCI as a paper metric, which naively restricts one to comparisons of average FWCI ($\overline{\mathrm{FWCI}}$) in large samples. Neglecting publications with $\textrm{FWCI} &lt; 0.1$ ($8.8\%$), SFI funded publications are well approximated by a lognormal distribution with $μ= -0.0761^{+0.017}_{-0.0039}$ and $ σ= 0.933^{+0.011}_{-0.012}$ at $95 \%$ confidence level. This equates to an $\overline{\mathrm{FWCI}} = 1.433^{+0.029}_{-0.015}$ well above $\overline{\mathrm{FWCI}}=1$ internationally. Broken down by award, we correct $\overline{\mathrm{FWCI}}$ for small samples using simulations and find $\sim 67\%$ exceed \textit{median} international academic interest, thus exhibiting a positive correlation between the potential for socioeconomic impact and academic interest.</summary>
+    <category term="cs.DL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.soc-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-02-05T16:23:52Z</published>
+    <arxiv:comment>7 pages, 5 figures, comments welcome</arxiv:comment>
+    <arxiv:primary_category term="cs.DL"/>
+    <author>
+      <name>Eoin Ó Colgáin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2610.02995v1</id>
+    <title>BISCEPTER: Probability-Driven Bisection for Large-Scale System Software</title>
+    <updated>2026-10-02T08:28:05Z</updated>
+    <link href="https://arxiv.org/abs/2610.02995v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.02995v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Identifying the bug-inducing commit (BIC) is a fundamental step in regression debugging and a key input to emerging BIC-aware fault-localization pipelines. In practice, BICs are commonly obtained with bisection. Standard bisection selects the median commit of the remaining good-bad interval, thereby balancing commit count. This strategy is optimal under the assumption that each commit is equally likely to be the BIC.
+  This paper shows that this assumption does not match real-world BIC histories. We construct a dataset of 8,172 bug reports from GCC, the Linux kernel, and MariaDB. We find a strong temporal skew: across the studied systems, 50% of BICs lie within the most recent 0.69% of the report-time commit history. Motivated by this observation, we introduce BISCEPTER, a probability-driven bisection approach that uses historical BIC latency as a lightweight prior. Instead of selecting pivots that split the number of remaining commits, BISCEPTER selects weighted-median pivots that split estimated BIC probability mass, while preserving the same good-bad oracle and interface as standard bisection. We evaluate BISCEPTER on three large-scale systems. The evaluation results show that BISCEPTER reduces bisection iterations by 25.75% on average (up to 55.55%) compared with standard median bisection, while improving over the baseline in 91.26% of test cases. Robustness experiments further demonstrate that the benefit remains stable under noisy historical data. We expect that our research can effectively save effort in debugging software in practice and, more broadly, benefit future software engineering research by bringing insights about BIC distribution.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-02T08:28:05Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Mingyan Gao</name>
+    </author>
+    <author>
+      <name>Celine Wüst</name>
+    </author>
+    <author>
+      <name>Zuming Jiang</name>
+    </author>
+    <author>
+      <name>Zhendong Su</name>
+    </author>
+  </entry>
+</feed>

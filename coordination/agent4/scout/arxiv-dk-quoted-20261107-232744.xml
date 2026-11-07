@@ -1,0 +1,447 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/UL4Ky5hhP9RAZK/i2H/ZAtjO2Iw</id>
+  <title>arXiv Query: search_query=all:"Dunning-Kruger effect"&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T23:27:44Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22Dunning-Kruger+effect%22&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>22</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2603.09985v1</id>
+    <title>The Dunning-Kruger Effect in Large Language Models: An Empirical Study of Confidence Calibration</title>
+    <updated>2026-02-12T08:58:52Z</updated>
+    <link href="https://arxiv.org/abs/2603.09985v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.09985v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) have demonstrated remarkable capabilities across diverse tasks, yet their ability to accurately assess their own confidence remains poorly understood. We present an empirical study investigating whether LLMs exhibit patterns reminiscent of the Dunning-Kruger effect -- a cognitive bias where individuals with limited competence tend to overestimate their abilities. We evaluate four state-of-the-art models (Claude Haiku 4.5, Gemini 2.5 Pro, Gemini 2.5 Flash, and Kimi K2) across four benchmark datasets totaling 24,000 experimental trials. Our results reveal striking calibration differences: Kimi K2 exhibits severe overconfidence with an Expected Calibration Error (ECE) of 0.726 despite only 23.3% accuracy, while Claude Haiku 4.5 achieves the best calibration (ECE = 0.122) with 75.4% accuracy. These findings demonstrate that poorly performing models display markedly higher overconfidence -- a pattern analogous to the Dunning-Kruger effect in human cognition. We discuss implications for safe deployment of LLMs in high-stakes applications.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-02-12T08:58:52Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Sudipta Ghosh</name>
+    </author>
+    <author>
+      <name>Mrityunjoy Panday</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2510.05457v1</id>
+    <title>Do Code Models Suffer from the Dunning-Kruger Effect?</title>
+    <updated>2025-10-06T23:41:24Z</updated>
+    <link href="https://arxiv.org/abs/2510.05457v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2510.05457v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As artificial intelligence systems increasingly collaborate with humans in creative and technical domains, questions arise about the cognitive boundaries and biases that shape our shared agency. This paper investigates the Dunning-Kruger Effect (DKE), the tendency for those with limited competence to overestimate their abilities in state-of-the-art LLMs in coding tasks. By analyzing model confidence and performance across a diverse set of programming languages, we reveal that AI models mirror human patterns of overconfidence, especially in unfamiliar or low-resource domains. Our experiments demonstrate that less competent models and those operating in rare programming languages exhibit stronger DKE-like bias, suggesting that the strength of the bias is proportionate to the competence of the models.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-10-06T23:41:24Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Mukul Singh</name>
+    </author>
+    <author>
+      <name>Somya Chatterjee</name>
+    </author>
+    <author>
+      <name>Arjun Radhakrishna</name>
+    </author>
+    <author>
+      <name>Sumit Gulwani</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.31095v1</id>
+    <title>Confident, Not Wiser: The Dunning-Kruger Effect in Human-AI Interaction</title>
+    <updated>2026-09-25T10:32:33Z</updated>
+    <link href="https://arxiv.org/abs/2609.31095v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.31095v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI assistance can improve performance without improving self-assessment. We report a study (N=366) comparing Human alone and Human+AI performance on reasoning tasks, for which the AI model is benchmarked on the same items. Participants estimated global and block performance and rated confidence in their answers. Human+AI achieved higher scores, but self-estimates tracked performance weakly. Average overestimation was similar across groups, covering individual errors. Across tasks, confidence distinguished correct from incorrect answers less accurately in the Human+AI group, while within-task differences remained uncertain. The Dunning-Kruger pattern was found in both groups, with a larger observed contrast in Human+AI. Controls for score noise reduced but did not eliminate the pattern, with the controlled group difference remaining inconclusive. An extended computational account describes global and block estimates. Our findings distinguish performance augmentation from metacognitive augmentation and motivate interfaces that support verification, communicate task-specific AI model performance, and help users evaluate the quality of their joint work rather than produce answers.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-25T10:32:33Z</published>
+    <arxiv:comment>37 pages, 10 figures, 12 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Daniela Fernandes</name>
+    </author>
+    <author>
+      <name>Michelle Rausch</name>
+    </author>
+    <author>
+      <name>Agnes Mercedes Kloft</name>
+    </author>
+    <author>
+      <name>Daniel Buschek</name>
+    </author>
+    <author>
+      <name>Robin Welsch</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2506.23435v1</id>
+    <title>All Proof of Work But No Proof of Play</title>
+    <updated>2025-06-30T00:19:19Z</updated>
+    <link href="https://arxiv.org/abs/2506.23435v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2506.23435v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Speedrunning is a competition that emerged from communities of early video games such as Doom (1993). Speedrunners try to finish a game in minimal time. Provably verifying the authenticity of submitted speedruns is an open problem. Traditionally, best-effort speedrun verification is conducted by on-site human observers, forensic audio analysis, or a rigorous mathematical analysis of the game mechanics. Such methods are tedious, fallible, and, perhaps worst of all, not cryptographic. Motivated by naivety and the Dunning-Kruger effect, we attempt to build a system that cryptographically proves the authenticity of speedruns. This paper describes our attempted solutions and ways to circumvent them. Through a narration of our failures, we attempt to demonstrate the difficulty of authenticating live and interactive human input in untrusted environments, as well as the limits of signature schemes, game integrity, and provable play.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-06-30T00:19:19Z</published>
+    <arxiv:comment>Published in CFAIL 2025</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <arxiv:journal_ref>CFAIL 2025</arxiv:journal_ref>
+    <author>
+      <name>Hayder Tirmazi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2603.29681v1</id>
+    <title>Beyond the Steeper Curve: AI-Mediated Metacognitive Decoupling and the Limits of the Dunning-Kruger Metaphor</title>
+    <updated>2026-03-31T12:35:58Z</updated>
+    <link href="https://arxiv.org/abs/2603.29681v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.29681v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The common claim that generative AI simply amplifies the Dunning-Kruger effect is too coarse to capture the available evidence. The clearest findings instead suggest that large language model (LLM) use can improve observable output and short-term task performance while degrading metacognitive accuracy and flattening the classic competence-confidence gradient across skill groups. This paper synthesizes evidence from human-AI interaction, learning research, and model evaluation, and proposes the working model of AI-mediated metacognitive decoupling: a widening gap among produced output, underlying understanding, calibration accuracy, and self-assessed ability. This four-variable account better explains overconfidence, over- and under-reliance, crutch effects, and weak transfer than the simpler metaphor of a uniformly steeper Dunning-Kruger curve. The paper concludes with implications for tool design, assessment, and knowledge work.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-03-31T12:35:58Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Christopher Koch</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2506.11031v4</id>
+    <title>Prefill-Guided Thinking for zero-shot detection of AI-generated images</title>
+    <updated>2026-01-25T23:38:23Z</updated>
+    <link href="https://arxiv.org/abs/2506.11031v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2506.11031v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Traditional supervised methods for detecting AI-generated images depend on large, curated datasets for training and fail to generalize to novel, out-of-domain image generators. As an alternative, we explore pre-trained Vision-Language Models (VLMs) for zero-shot detection of AI-generated images. We evaluate VLM performance on three diverse benchmarks encompassing synthetic images of human faces, objects, and animals produced by 16 different state-of-the-art image generators. While off-the-shelf VLMs perform poorly on these datasets, we find that prefilling responses effectively guides their reasoning -- a method we call Prefill-Guided Thinking (PGT). In particular, prefilling a VLM response with the phrase "Let's examine the style and the synthesis artifacts" improves the Macro F1 scores of three widely used open-source VLMs by up to 24%. We analyze this improvement in detection by tracking answer confidence during response generation. For some models, prefills counteract early overconfidence -- akin to mitigating the Dunning-Kruger effect -- leading to better detection performance.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-05-20T22:44:04Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zoher Kachwala</name>
+    </author>
+    <author>
+      <name>Danishjeet Singh</name>
+    </author>
+    <author>
+      <name>Danielle Yang</name>
+    </author>
+    <author>
+      <name>Filippo Menczer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1903.11193v4</id>
+    <title>Some scientific knowledge is a dangerous thing: overconfidence grows non-linearly with knowledge</title>
+    <updated>2023-09-15T14:12:38Z</updated>
+    <link href="https://arxiv.org/abs/1903.11193v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1903.11193v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Overconfidence is a prevalent problem and particularly consequential in its relation with scientific knowledge: being unaware of one`s own ignorance can affect behaviours and threaten public policies and health. We introduce both analytical and methodological changes to the study of confidence in science knowledge and in attitudes towards science and apply them to four large surveys, spanning 30 years in Europe and the USA. We propose a new indirect confidence metric that does not rely on self-reporting or peer comparison, and study how knowledge and confidence vary across their full scale. We find that confidence grows much faster than knowledge, giving rise to a non-linear relationship, with the largest confidence gaps appearing at intermediate knowledge levels. These high-confidence \textbackslash intermediate-knowledge groups also display the least positive attitudes towards science, with important consequences for science communication. These results are contrary to current models, including the predictions of the Dunning-Kruger effect, and we discuss how our model, if correct, can guide future research and communication policies.</summary>
+    <category term="physics.ed-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.soc-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-03-26T23:51:03Z</published>
+    <arxiv:comment>9 pages, 3 figures, 1 table; Appendix with 12 pages, 9 figures, 8 tables</arxiv:comment>
+    <arxiv:primary_category term="physics.ed-ph"/>
+    <arxiv:journal_ref>Nat Hum Behav (2023)</arxiv:journal_ref>
+    <author>
+      <name>Simone Lackner</name>
+    </author>
+    <author>
+      <name>Frederico Francisco</name>
+    </author>
+    <author>
+      <name>Cristina Mendonça</name>
+    </author>
+    <author>
+      <name>André Mata</name>
+    </author>
+    <author>
+      <name>Joana Gonçalves-Sá</name>
+    </author>
+    <arxiv:doi>10.1038/s41562-023-01677-8</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1038/s41562-023-01677-8" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2409.16708v2</id>
+    <title>Performance and Metacognition Disconnect when Reasoning in Human-AI Interaction</title>
+    <updated>2025-01-05T16:07:52Z</updated>
+    <link href="https://arxiv.org/abs/2409.16708v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2409.16708v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Optimizing human-AI interaction requires users to reflect on their own performance critically. Our paper examines whether people using AI to complete tasks can accurately monitor how well they perform. In Study 1, participants (N = 246) used AI to solve 20 logical problems from the Law School Admission Test. While their task performance improved by three points compared to a norm population, participants overestimated their performance by four points. Interestingly, higher AI literacy was linked to less accurate self-assessment. Participants with more technical knowledge of AI were more confident but less precise in judging their own performance. Using a computational model, we explored individual differences in metacognitive accuracy and found that the Dunning-Kruger effect, usually observed in this task, ceased to exist with AI. Study 2 (N = 452) replicates these findings. We discuss how AI levels metacognitive performance and consider consequences of performance overestimation for interactive AI systems enhancing cognition.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-09-25T07:54:29Z</published>
+    <arxiv:comment>27 pages, 10 figures, 6 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <arxiv:journal_ref>Volume 175, February 2026, 108779</arxiv:journal_ref>
+    <author>
+      <name>Daniela Fernandes</name>
+    </author>
+    <author>
+      <name>Steeven Villa</name>
+    </author>
+    <author>
+      <name>Salla Nicholls</name>
+    </author>
+    <author>
+      <name>Otso Haavisto</name>
+    </author>
+    <author>
+      <name>Daniel Buschek</name>
+    </author>
+    <author>
+      <name>Albrecht Schmidt</name>
+    </author>
+    <author>
+      <name>Thomas Kosch</name>
+    </author>
+    <author>
+      <name>Chenxinran Shen</name>
+    </author>
+    <author>
+      <name>Robin Welsch</name>
+    </author>
+    <arxiv:doi>10.1016/j.chb.2025.108779</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.chb.2025.108779" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2309.16145v1</id>
+    <title>The Confidence-Competence Gap in Large Language Models: A Cognitive Study</title>
+    <updated>2023-09-28T03:50:09Z</updated>
+    <link href="https://arxiv.org/abs/2309.16145v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2309.16145v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large Language Models (LLMs) have acquired ubiquitous attention for their performances across diverse domains. Our study here searches through LLMs' cognitive abilities and confidence dynamics. We dive deep into understanding the alignment between their self-assessed confidence and actual performance. We exploit these models with diverse sets of questionnaires and real-world scenarios and extract how LLMs exhibit confidence in their responses. Our findings reveal intriguing instances where models demonstrate high confidence even when they answer incorrectly. This is reminiscent of the Dunning-Kruger effect observed in human psychology. In contrast, there are cases where models exhibit low confidence with correct answers revealing potential underestimation biases. Our results underscore the need for a deeper understanding of their cognitive processes. By examining the nuances of LLMs' self-assessment mechanism, this investigation provides noteworthy revelations that serve to advance the functionalities and broaden the potential applications of these formidable language models.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-09-28T03:50:09Z</published>
+    <arxiv:comment>19 pages, 8 Figures, to be published in a journal (Journal TBD), All Authors contributed equally and were Supervised by Chandra Dhakal</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Aniket Kumar Singh</name>
+    </author>
+    <author>
+      <name>Suman Devkota</name>
+    </author>
+    <author>
+      <name>Bishal Lamichhane</name>
+    </author>
+    <author>
+      <name>Uttam Dhakal</name>
+    </author>
+    <author>
+      <name>Chandra Dhakal</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2208.06883v1</id>
+    <title>Confidence-Guided Learning Process for Continuous Classification of Time Series</title>
+    <updated>2022-08-14T17:00:47Z</updated>
+    <link href="https://arxiv.org/abs/2208.06883v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2208.06883v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In the real world, the class of a time series is usually labeled at the final time, but many applications require to classify time series at every time point. e.g. the outcome of a critical patient is only determined at the end, but he should be diagnosed at all times for timely treatment. Thus, we propose a new concept: Continuous Classification of Time Series (CCTS). It requires the model to learn data in different time stages. But the time series evolves dynamically, leading to different data distributions. When a model learns multi-distribution, it always forgets or overfits. We suggest that meaningful learning scheduling is potential due to an interesting observation: Measured by confidence, the process of model learning multiple distributions is similar to the process of human learning multiple knowledge. Thus, we propose a novel Confidence-guided method for CCTS (C3TS). It can imitate the alternating human confidence described by the Dunning-Kruger Effect. We define the objective- confidence to arrange data, and the self-confidence to control the learning duration. Experiments on four real-world datasets show that C3TS is more accurate than all baselines for CCTS.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-08-14T17:00:47Z</published>
+    <arxiv:comment>20 pages, 12 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Chenxi Sun</name>
+    </author>
+    <author>
+      <name>Moxian Song</name>
+    </author>
+    <author>
+      <name>Derun Can</name>
+    </author>
+    <author>
+      <name>Baofeng Zhang</name>
+    </author>
+    <author>
+      <name>Shenda Hong</name>
+    </author>
+    <author>
+      <name>Hongyan Li</name>
+    </author>
+    <arxiv:doi>10.1145/3511808.3557565</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1145/3511808.3557565" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.21089v1</id>
+    <title>Can Legal AI Know When It Is Wrong? And Do Students Know When It Is?</title>
+    <updated>2026-08-21T13:32:46Z</updated>
+    <link href="https://arxiv.org/abs/2608.21089v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.21089v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Integrating Large Language Models (LLMs) into the Indian judiciary promises access to justice but introduces severe risks. We identify the 'inertia of confidence'--an overconfidence phenomenon analogous to the Dunning-Kruger effect where LLMs provide incorrect legal verdicts with near-maximum confidence, driven by a hypothesized 'precedent overfitting' bias. Phase I of our socio-technical audit tested ChatGPT (GPT-5.2), Meta AI, and Perplexity AI on a 60-case battery regarding the Indian Contract Act, 1872, and the shift toward statutory enforcement of specific performance. We introduce the High-Confidence Error Rate (HCER) to quantify incorrect verdicts delivered with dangerous certainty (&gt;= 9 on a 1-10 scale). All models struggled with statutory updates. Meta AI proved most vulnerable (31.7% HCER), frequently misapplying pre-amendment rules with a 9.1/10 mean confidence, followed by Perplexity (15.0%) and ChatGPT (6.7%).
+  Phase II investigated human vulnerability to this overconfidence via a survey of Indian law students (N=380). Verification often functions as a reactive adaptation to machine hallucinations: students encountering fabricated citations reported higher verification scores (4.2/5) than those with no such encounters (2.8/5). Furthermore, while 81.6% knew submitting hallucinated cases can lead to contempt-of-court, 71.1% received no formal training on ethical AI use. We propose shifting toward adversarial legal research pedagogy and implementing source-grounded verification architectures to prevent systemic professional negligence.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-21T13:32:46Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Angel Mary John</name>
+    </author>
+    <author>
+      <name>Vipin Kumar Singh</name>
+    </author>
+    <author>
+      <name>Jerrin Thomas Panachakel</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2409.13588v2</id>
+    <title>ChainBuddy: An AI Agent System for Generating LLM Pipelines</title>
+    <updated>2025-02-08T21:59:10Z</updated>
+    <link href="https://arxiv.org/abs/2409.13588v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2409.13588v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As large language models (LLMs) advance, their potential applications have grown significantly. However, it remains difficult to evaluate LLM behavior on user-defined tasks and craft effective pipelines to do so. Many users struggle with where to start, often referred to as the "blank page problem." ChainBuddy, an AI workflow generation assistant built into the ChainForge platform, aims to tackle this issue. From a single prompt or chat, ChainBuddy generates a starter evaluative LLM pipeline in ChainForge aligned to the user's requirements. ChainBuddy offers a straightforward and user-friendly way to plan and evaluate LLM behavior and make the process less daunting and more accessible across a wide range of possible tasks and use cases. We report a within-subjects user study comparing ChainBuddy to the baseline interface. We find that when using AI assistance, participants reported a less demanding workload, felt more confident, and produced higher quality pipelines evaluating LLM behavior. However, we also uncover a mismatch between subjective and objective ratings of performance: participants rated their successfulness similarly across conditions, while independent experts rated participant workflows significantly higher with AI assistance. Drawing connections to the Dunning-Kruger effect, we draw design implications for the future of workflow generation assistants to mitigate the risk of over-reliance.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-09-20T15:42:33Z</published>
+    <arxiv:comment>21 pages, 12 figures, pre-print</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Jingyue Zhang</name>
+    </author>
+    <author>
+      <name>Ian Arawjo</name>
+    </author>
+    <arxiv:doi>10.1145/3706598.3714085</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1145/3706598.3714085" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2402.14409v1</id>
+    <title>Tug-of-War Between Knowledge: Exploring and Resolving Knowledge Conflicts in Retrieval-Augmented Language Models</title>
+    <updated>2024-02-22T09:51:08Z</updated>
+    <link href="https://arxiv.org/abs/2402.14409v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2402.14409v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Retrieval-augmented language models (RALMs) have demonstrated significant potential in refining and expanding their internal memory by retrieving evidence from external sources. However, RALMs will inevitably encounter knowledge conflicts when integrating their internal memory with external sources. Knowledge conflicts can ensnare RALMs in a tug-of-war between knowledge, limiting their practical applicability. In this paper, we focus on exploring and resolving knowledge conflicts in RALMs. First, we present an evaluation framework for assessing knowledge conflicts across various dimensions. Then, we investigate the behavior and preference of RALMs from the following two perspectives: (1) Conflicts between internal memory and external sources: We find that stronger RALMs emerge with the Dunning-Kruger effect, persistently favoring their faulty internal memory even when correct evidence is provided. Besides, RALMs exhibit an availability bias towards common knowledge; (2) Conflicts between truthful, irrelevant and misleading evidence: We reveal that RALMs follow the principle of majority rule, leaning towards placing trust in evidence that appears more frequently. Moreover, we find that RALMs exhibit confirmation bias, and are more willing to choose evidence that is consistent with their internal memory. To solve the challenge of knowledge conflicts, we propose a method called Conflict-Disentangle Contrastive Decoding (CD2) to better calibrate the model's confidence. Experimental results demonstrate that our CD2 can effectively resolve knowledge conflicts in RALMs.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-02-22T09:51:08Z</published>
+    <arxiv:comment>Accepted at LREC-COLING 2024</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Zhuoran Jin</name>
+    </author>
+    <author>
+      <name>Pengfei Cao</name>
+    </author>
+    <author>
+      <name>Yubo Chen</name>
+    </author>
+    <author>
+      <name>Kang Liu</name>
+    </author>
+    <author>
+      <name>Xiaojian Jiang</name>
+    </author>
+    <author>
+      <name>Jiexin Xu</name>
+    </author>
+    <author>
+      <name>Qiuxia Li</name>
+    </author>
+    <author>
+      <name>Jun Zhao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2603.07769v1</id>
+    <title>MedQ-Deg: A Multidimensional Benchmark for Evaluating MLLMs Across Medical Image Quality Degradations</title>
+    <updated>2026-03-08T19:11:21Z</updated>
+    <link href="https://arxiv.org/abs/2603.07769v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.07769v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Despite impressive performance on standard benchmarks, multimodal large language models (MLLMs) face critical challenges in real-world clinical environments where medical images inevitably suffer various quality degradations. Existing benchmarks exhibit two key limitations: (1) absence of large-scale, multidimensional assessment across medical image quality gradients and (2) no systematic confidence calibration analysis. To address these gaps, we present MedQ-Deg, a comprehensive benchmark for evaluating medical MLLMs under image quality degradations. MedQ-Deg provides multi-dimensional evaluation spanning 18 distinct degradation types, 30 fine-grained capability dimensions, and 7 imaging modalities, with 24,894 question-answer pairs. Each degradation is implemented at 3 severity degrees, calibrated by expert radiologists. We further introduce Calibration Shift metric, which quantifies the gap between a model's perceived confidence and actual performance to assess metacognitive reliability under degradation. Our comprehensive evaluation of 40 mainstream MLLMs reveals several critical findings: (1) overall model performance degrades systematically as degradation severity increases, (2) models universally exhibit the AI Dunning-Kruger Effect, maintaining inappropriately high confidence despite severe accuracy collapse, and (3) models display markedly differentiated behavioral patterns across capability dimensions, imaging modalities, and degradation types. We hope MedQ-Deg drives progress toward medical MLLMs that are robust and trustworthy in real clinical practice.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-03-08T19:11:21Z</published>
+    <arxiv:comment>29 pages, 11 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Jiyao Liu</name>
+    </author>
+    <author>
+      <name>Junzhi Ning</name>
+    </author>
+    <author>
+      <name>Chenglong Ma</name>
+    </author>
+    <author>
+      <name>Wanying Qu</name>
+    </author>
+    <author>
+      <name>Jianghan Shen</name>
+    </author>
+    <author>
+      <name>Siqi Luo</name>
+    </author>
+    <author>
+      <name>Jinjie Wei</name>
+    </author>
+    <author>
+      <name>Jin Ye</name>
+    </author>
+    <author>
+      <name>Pengze Li</name>
+    </author>
+    <author>
+      <name>Tianbin Li</name>
+    </author>
+    <author>
+      <name>Jiashi Lin</name>
+    </author>
+    <author>
+      <name>Hongming Shan</name>
+    </author>
+    <author>
+      <name>Xinzhe Luo</name>
+    </author>
+    <author>
+      <name>Xiaohong Liu</name>
+    </author>
+    <author>
+      <name>Lihao Liu</name>
+    </author>
+    <author>
+      <name>Junjun He</name>
+    </author>
+    <author>
+      <name>Ningsheng Xu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2204.04061v4</id>
+    <title>"Am I Private and If So, how Many?" -- Using Risk Communication Formats for Making Differential Privacy Understandable</title>
+    <updated>2023-06-22T12:23:07Z</updated>
+    <link href="https://arxiv.org/abs/2204.04061v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2204.04061v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Mobility data is essential for cities and communities to identify areas for necessary improvement. Data collected by mobility providers already contains all the information necessary, but privacy of the individuals needs to be preserved. Differential privacy (DP) defines a mathematical property which guarantees that certain limits of privacy are preserved while sharing such data, but its functionality and privacy protection are difficult to explain to laypeople. In this paper, we adapt risk communication formats in conjunction with a model for the privacy risks of DP. The result are privacy notifications which explain the risk to an individual's privacy when using DP, rather than DP's functionality. We evaluate these novel privacy communication formats in a crowdsourced study. We find that they perform similarly to the best performing DP communications used currently in terms of objective understanding, but did not make our participants as confident in their understanding. We also discovered an influence, similar to the Dunning-Kruger effect, of the statistical numeracy on the effectiveness of some of our privacy communication formats and the DP communication format used currently. These results generate hypotheses in multiple directions, for example, toward the use of risk visualization to improve the understandability of our formats or toward adaptive user interfaces which tailor the risk communication to the characteristics of the reader.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-04-08T13:30:07Z</published>
+    <arxiv:comment>A newer version of this article was submitted: arXiv.2208.10820</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Daniel Franzen</name>
+      <arxiv:affiliation>Freie Universität Berlin</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Saskia Nuñez von Voigt</name>
+      <arxiv:affiliation>Technische Universität Berlin</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Peter Sörries</name>
+      <arxiv:affiliation>Freie Universität Berlin</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Florian Tschorsch</name>
+      <arxiv:affiliation>Technische Universität Berlin</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Claudia Müller-Birn</name>
+      <arxiv:affiliation>Freie Universität Berlin</arxiv:affiliation>
+    </author>
+  </entry>
+</feed>

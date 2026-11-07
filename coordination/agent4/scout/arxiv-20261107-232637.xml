@@ -1,0 +1,333 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/rydWfQtkDWQ+lZGJulYU94C9K4k</id>
+  <title>arXiv Query: search_query=all:Dunning-Kruger OR all:effect OR all:novice OR all:overestimate OR all:competence&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T23:26:38Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:Dunning-Kruger+OR+(all:effect+OR+(all:novice+OR+(all:overestimate+OR+all:competence)))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>732693</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08481v1</id>
+    <title>Joint analysis of the Macquart relation and the dispersion measure power spectrum: cross-covariance and redshift self-calibration</title>
+    <updated>2026-11-05T18:59:19Z</updated>
+    <link href="https://arxiv.org/abs/2611.08481v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08481v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The dispersion measures (DMs) of fast radio bursts (FRBs) trace ionised baryons along the line of sight, probing baryonic feedback. Two complementary observables can be constructed from an FRB catalogue: the DM-redshift (Macquart) relation of host-identified FRBs, and the angular power spectrum of the DM field of the full catalogue. Their joint analysis requires their cross-covariance. We derive it within the halo model and show it is a super-sample effect: only the monopole of an individual DM correlates with the angular power spectrum, yielding an exact, model-independent bound on the correlation coefficient. We validate the calculation against log-normal forward simulations of $10^4$ FRBs. For individual DMs, the correlation with the bandpowers is at the per cent level. Neglecting the cross-covariance changes the width of the $χ^2$ distribution by only 0.8 per cent, so the two observables can be treated as effectively independent for wide-area surveys. In a joint forecast with an LSST-like weak lensing survey, adding the Macquart relation tightens constraints on the physical baryon density by 32 per cent and on the mean host contribution by a factor of 4.1, while improving baryonification parameters by only about 5 per cent, indirectly through the host contribution. Finally, we show that the redshift distribution of FRBs without identified hosts, which enters every DM power spectrum, can be reconstructed by inverting their DMs with the jointly fitted mean relation without biasing the inferred parameters, whereas a 20 per cent error in the mean relation biases the DM power spectrum by up to 2$σ$ per band for $5\times 10^5$ FRBs.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:19Z</published>
+    <arxiv:comment>36 pages, 9 figures, submitted to JCAP</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Amy Wayland</name>
+    </author>
+    <author>
+      <name>Robert Reischke</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08479v1</id>
+    <title>Flat-band systems: A platform to realize the moments of Quantum Metric</title>
+    <updated>2026-11-05T18:59:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.08479v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08479v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The quantum metric is a fundamental geometric property of Bloch bands that governs a wide range of physical phenomena, yet experimentally accessing it remains challenging. We show that the momentum-space variation of the quantum metric can be probed through the real-space dynamics of a Gaussian wave packet prepared in an isolated flat band. Following the application of a weak constant force, we demonstrate analytically that the leading order change in the wave-packet variance is linear in time and contains a contribution proportional to the wave-packet averaged gradient of the quantum-metric trace. This geometric contribution remains finite despite the absence of band dispersion. We illustrate the effect using a gapped Lieb lattice with an exactly flat middle band and vanishing Berry curvature, allowing the quantum-metric contribution to the spreading to be isolated. The numerical results agree with the analytical prediction and confirm the quantum-metric contribution to the wave-packet spreading. The required lattice preparation, tunable hopping amplitudes, applied force, and density measurements are compatible with established ultracold-atom techniques, providing a possible platform for observing the predicted response. Our results establish wave-packet spreading as a dynamical probe of quantum geometry in flat-band systems.</summary>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:11Z</published>
+    <arxiv:comment>17 pages, 7 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.quant-gas"/>
+    <author>
+      <name>Rishi Gangadhar</name>
+    </author>
+    <author>
+      <name>Binayyak Roy</name>
+    </author>
+    <author>
+      <name>Vito Scarola</name>
+    </author>
+    <author>
+      <name>Sumanta Tewari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08477v1</id>
+    <title>EgoGeneralist: Unifying Egocentric Action-Video Tasks through Video-Native Modeling</title>
+    <updated>2026-11-05T18:58:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.08477v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08477v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Modern video models possess strong visual priors, yet do not natively represent human action in metric 3D space. We present EgoGeneralist, which adapts pretrained video generators to unify action-conditioned egocentric video generation, pose estimation, and joint action-video generation. Our role-adaptive action renderer provides video-native representations for multidirectional action-video learning, making metric motion usable as both a spatial control signal and a recoverable generation target. Cross-stream action-video coupling establishes close correspondence between metric motion and visual dynamics through lightweight adaptation while preserving the pretrained visual prior. Together, these designs establish a generalist framework spanning five action-video tasks. Despite adaptation only on controlled laboratory recordings, EgoGeneralist generalizes to diverse unseen scenes and interactions with effective action control and visual quality, bridging pretrained visual knowledge and metric 3D human motion.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:58:13Z</published>
+    <arxiv:comment>Project page: https://www.neiljin.site/egogeneralist_page/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yanlin Jin</name>
+    </author>
+    <author>
+      <name>Bowen Yang</name>
+    </author>
+    <author>
+      <name>Cheng Zhang</name>
+    </author>
+    <author>
+      <name>Yifan Yang</name>
+    </author>
+    <author>
+      <name>Zhe Li</name>
+    </author>
+    <author>
+      <name>Jianfei Cai</name>
+    </author>
+    <author>
+      <name>Kai Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08473v1</id>
+    <title>Correlations and fluctuations of flow with event shape engineering in Pb-Pb and Xe-Xe collisions at the LHC</title>
+    <updated>2026-11-05T18:56:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.08473v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08473v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Measurements of anisotropic flow provide some of the strongest constraints on the collective expansion and transport properties of the quark-gluon plasma produced in ultra-relativistic heavy-ion collisions. In this paper, correlations and fluctuations of the anisotropic flow coefficients $v_{2}$, $v_{3}$, and $v_{4}$ are measured in Pb-Pb and Xe-Xe collisions at $\sqrt{s_{\rm{NN}}} = 5.02$ and $5.44$ TeV, respectively, with the ALICE detector. The Event Shape Engineering technique, based on the reduced flow vector $q_{n}$, is used to study flow correlations for different initial-state geometries. A strong anticorrelation between $v_2$ and $v_3$ and a positive correlation between $v_2$ and $v_4$ are observed. A small anticorrelation is seen between $v_3$ and $v_4$. From the $v_2$-$v_4$ correlation, the linear and nonlinear components of $v_4$ are extracted and compared to those extracted using multiparticle correlations. The linear and nonlinear components of $v_{4}$ are also measured directly as a function of $q_2$ for the first time in Pb-Pb and Xe-Xe, revealing a strong coupling of the nonlinear term to the initial-state ellipticity $\varepsilon_2$, while the linear component shows little dependence on initial-state geometry. Additionally, the coupling coefficient $χ_{4,22}$, which measures the nonlinear contribution of $v_2^2$ to $v_4$, is extracted and shows little dependence on $q_2$, except in very central collisions. The effects of flow fluctuations for constrained initial-state geometries are studied for the first time using Event Shape Engineering with the ratio of $v_2\{2\}$ and $v_2\{4\}$; the results show that collisions with the lowest $q_2$ exhibit more significant $v_2$ fluctuations compared to the unbiased ratio.</summary>
+    <category term="nucl-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:56:11Z</published>
+    <arxiv:comment>28 pages, 15 captioned figures, authors from page 23, submitted to PLB, figures at http://alice-publications.web.cern.ch/node/13698</arxiv:comment>
+    <arxiv:primary_category term="nucl-ex"/>
+    <author>
+      <name> ALICE Collaboration</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08469v1</id>
+    <title>Same Behavior, Different Mechanism: What Finite Experiments Can Certify About Integrated Information</title>
+    <updated>2026-11-05T18:55:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08469v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08469v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interpretability, AI auditing and assessments of machine consciousness increasingly rest on mechanism-level quantities: functionals of a system's causal transition law that describe how it computes, not what it outputs. Experiments see that law only through finite, partial and noisy interventions. We ask when such a quantity is identifiable from an experiment's access, continuous in the mechanism and certifiable from finite data, and answer exactly for a deliberately demanding case - the integrated information $\varphi$ of integrated information theory - in stochastic networks of four and five units with known ground truth. Behavior can be silent: a recurrent and a feed-forward network with identical input-output laws at their response delay carry 0.28 and 0 bits, yet internal recordings separate them within 4-53 trials. Partial access can be just as blind: in our examples, units left out of a one-step recording impose precision floors of 0.30-1.02 bits that no sample size lowers, and in all-but-self parity networks, recordings of any length see several hidden units only through the product of their fidelities - a symmetry that one intervention broke in exact checks. The measure has sharp edges: because $\varphi$ selects a partition, and the cause and effect it specifies, by one criterion and reports another, infinitesimal changes of mechanism that cross an edge change it by 25-100% at 99% of the edges we found in random networks, and about 1% of surrogate models that fit interventional data almost perfectly misreport it by more than 20%. One-sided claims survive: the same data certify a lower bound on both sides of an edge, and we prove $\varphi&gt;1.004$ bits throughout a 64-dimensional region of mechanisms and certify it from about $10^7$ controlled transitions with false-certificate probability at most $α$. Measurability is thus a design question with computable answers.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:31Z</published>
+    <arxiv:comment>30 pages, 7 figures. Code available as ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Linqian Wu</name>
+    </author>
+    <author>
+      <name>Diaoxuan He</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08459v1</id>
+    <title>Testing the Spin of New Physics with Top Precision Measurements</title>
+    <updated>2026-11-05T18:50:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.08459v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08459v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Precision measurements can reveal not only the presence of new physics, but also information about the dynamics that generated it. We study this question in top-pair production by comparing three top-philic scenarios: a colored scalar top partner, a colored vector-like fermion, and a spin-one $Z^\prime$ mediator. The first two contribute through loop corrections, while the $Z^\prime$ contributes at tree level. We show that the scalar and vector-like fermion scenarios match onto the same effective operator structure at low energies,making their distinction unfeasible using the EFT approach. However, near or above threshold their full loop amplitudes develop distinct momentum-dependent interference patterns. Using the top transverse momentum spectrum we find that resonant and loop-induced effects are relatively easy to distinguish, whereas separating the scalar and vector-like hypotheses is substantially more challenging. Nevertheless, their different analytic structures leave measurable information in the shape of the distribution. These results illustrate how precision differential measurements can probe the spin and dynamics of virtual new states even when they are not directly reconstructed, and motivate more powerful multidimensional analyses.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:50:17Z</published>
+    <arxiv:comment>33 pages, 12 figures. The datasets and code used to obtain all the results presented here as well as additional details are available in https://github.com/andlessa/UnfoldingBSMttbar/releases</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>André Lessa</name>
+    </author>
+    <author>
+      <name>Vinícius Rocca</name>
+    </author>
+    <author>
+      <name>Veronica Sanz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08447v1</id>
+    <title>Dynamical effects induced by synthetic SU(1,1) gauge fields</title>
+    <updated>2026-11-05T18:43:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.08447v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08447v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Compact gauge fields are powerful tools for controlling quantum dynamics and topological phases of matter. Non-compact gauge fields are particularly relevant for open systems, where particles or energy are exchanged with the environment. Here, we investigate the wavepacket and entanglement dynamics induced by an $\mathrm{SU}(1,1)$ gauge field. The wavepacket undergoes non-Abelian non-compact Bloch oscillations, in which the spectrum of an auxiliary one-dimensional quantum problem determines the transition between stable oscillations and unstable amplification. In the unstable adiabatic regime, the wavepacket probes an $\mathrm{SU}(1,1)$ topological defect, and its amplification is determined solely by a hyperbolic solid angle in Minkowski space. Threading an $\mathrm{SU}(1,1)$ gauge field through a bosonic tight-binding model yields the bosonic Kitaev model, whose volume or super-volume entanglement scaling is governed by the stability of the gauge field. We further propose an experimental realization of an $\mathrm{SU}(1,1)$ gauge field in a spinor condensate. Our results can be generalized to other non-compact groups and higher dimensions, providing a geometric framework for entanglement control, selective amplification, and engineering energy transfer.</summary>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:43:17Z</published>
+    <arxiv:comment>13 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.quant-gas"/>
+    <author>
+      <name>Chenwei Lv</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08430v1</id>
+    <title>Cross-Border Ownership and Input Access: Evidence from the Lithium Supply Chain</title>
+    <updated>2026-11-05T18:23:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.08430v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08430v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>How does cross-border ownership shape the lithium supply chain? Using global data on mines and refineries, I estimate a model in which ownership can lower refiners' effective ore costs, encourage mines to restrict spot sales, and soften competition. To study these effects, I examine policies motivated by national security concerns about reliable access to critical mineral inputs: divestiture of Chinese stakes in overseas producers and a ban on ore exports to China. Divestiture increases spot ore supply but leaves lithium output nearly unchanged, while continued trade preserves Chinese access to ore. The export ban reduces global lithium supply because refining capacity elsewhere cannot fully replace lost Chinese production. Ownership transfers do not reserve ore for domestic production; restricting Chinese access imposes a substantial supply cost at existing capacities.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:23:47Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <author>
+      <name>Kei Irizawa</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08424v1</id>
+    <title>Disorder-blind Mpemba acceleration of quantum state preparation</title>
+    <updated>2026-11-05T18:20:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.08424v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08424v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Using the strong Mpemba effect to accelerate relaxation by initial-state design requires suppressing the slowest mode, which typically needs prior knowledge of the system. However, in disordered systems, this mode is sample-dependent, so a fixed preparation generally retains a slow-mode overlap. We show that a ``blind'' preparation, designed from the clean chain without knowledge of the disorder realisation or its distribution, can start farther from stationarity yet overtake a reference in typical samples of a dephased disordered XX chain. It requires only the chain geometry and the particle number. At strong dephasing, the density dynamics maps to a resistor chain, and an exact inverse-generator identity links the residual overlap to the spatial resistance profile. We find two distinct thresholds: a finite mean resistance suffices for diffusion, but the residual overlap decays as $L^{-1/2}$ with chain length $L$ only when the resistance variance is finite; rare weak links slow this decay. We predict the fraction of samples in which the blind preparation wins, which is an ensemble-level measure of its reliability. Finite-size calculations support both scaling regimes with interactions at strong dephasing. We give preparation circuits and a density readout for the residual overlap.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.dis-nn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:20:53Z</published>
+    <arxiv:comment>21 pages, 10 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>M Nishanth</name>
+    </author>
+    <author>
+      <name>Shreyas Sadugol</name>
+    </author>
+    <author>
+      <name>Payman Mahmoudi</name>
+    </author>
+    <author>
+      <name>Alexander Yosifov</name>
+    </author>
+    <author>
+      <name>Aditya Iyer</name>
+    </author>
+    <author>
+      <name>Roopayan Ghosh</name>
+    </author>
+    <author>
+      <name>Jinzhao Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08416v1</id>
+    <title>Low-Temperature Sampling via Equilibrium Disagreements</title>
+    <updated>2026-11-05T18:18:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.08416v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08416v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We develop a new framework for sampling at low temperatures using Glauber dynamics. In this regime, the coexistence of competing modes (commonly referred to as phases) creates bottlenecks that can make worst-case mixing exponentially slow. The main new ingredient in our framework is to relate convergence within a phase to the geometry of disagreements between two independent configurations drawn from that phase.
+  As applications of our approach, we consider three canonical models on random regular graphs that have been central to low-temperature sampling, and establish fast convergence from natural initialisations of Glauber dynamics for every fixed degree. We show:
+  --- For the hard-core model on random bipartite $d$-regular graphs, Glauber dynamics initialised from either one-sided independent set mixes within the corresponding phase in $n^{3/2+o(1)}$ steps throughout the non-uniqueness regime $λ&gt;λ_c(d)$.
+  --- For the random-cluster model on random $d$-regular graphs, for every real $q&gt;2$, Glauber dynamics initialised from the all-in edge set mixes within the ordered phase in $n^{3/2+o(1)}$ steps for all $β\geq β_c$. Similarly, Glauber dynamics initialised from the all-out edge set mixes within the disordered phase in $n^{3/2+o(1)}$ steps for $β\leq β_c$.
+  --- For the ferromagnetic Ising model on random $d$-regular graphs, Glauber dynamics initialised from all-plus or all-minus mixes within the corresponding phase in $n^{3/2+o(1)}$ steps throughout the low-temperature regime $β&gt;β_c(d)$.
+  We also give an $n^{2+o(1)}$-time algorithm that combines phase samples into samples from the full distribution, avoiding in particular time-costly approximations of the corresponding partition functions to the target sampling accuracy.</summary>
+    <category term="cs.DM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:18:18Z</published>
+    <arxiv:comment>Abstract shortened to fit arXiv requirements</arxiv:comment>
+    <arxiv:primary_category term="cs.DM"/>
+    <author>
+      <name>Andreas Galanis</name>
+    </author>
+    <author>
+      <name>Daniel Stefankovic</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08414v1</id>
+    <title>Spectral and Subspace Dynamics of LoRA in Supervised Fine-Tuning and Reinforcement Learning</title>
+    <updated>2026-11-05T18:17:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08414v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08414v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Low-rank adaptation (LoRA) is commonly used in both supervised fine-tuning (SFT) and reinforcement learning (RL), often under similar optimizer settings. Yet, how the different dynamics of the two stages manifest in the low-rank increment that LoRA optimizes remains unclear. Tracking the singular spectrum and subspaces of LoRA updates on mathematical reasoning tasks, we find that RL concentrates the spectrum at every learning rate, while SFT expands it at moderate learning rates; moreover, RL rotates the singular subspaces much faster than SFT at small learning rates. Interpolating between SFT and RL one ingredient at a time, we pinpoint group-mean baseline subtraction as the source of both contrasts. A quadratic multi-index model updated via LoRA unveils the underlying mechanism: group-mean baseline subtraction tilts the balance between two competing forces, coherent fitting and gradient noise, toward spectral concentration and faster subspace rotation, while forcing the risk-favorable learning rate to be low. Guided by these dynamics, we tailor LoRA updates to each stage: in SFT, we flatten the spectrum of the full update to spread adaptation across singular directions, whereas in RL, we flatten the part of the update outside the current LoRA increment span to promote subspace rotation. Experiments on mathematical reasoning tasks across multiple models show that the respective configurations for SFT and RL yield the best performance among the compared methods in most evaluated settings.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:39Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Chenruo Liu</name>
+    </author>
+    <author>
+      <name>Zihan Wang</name>
+    </author>
+    <author>
+      <name>Yijun Dong</name>
+    </author>
+    <author>
+      <name>Qi Lei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08408v1</id>
+    <title>Averages of sub-additive functions through non-Følner sequences</title>
+    <updated>2026-11-05T18:14:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.08408v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08408v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the quantity $\sup_{φ\inΦ}\limsup_{n\to\infty}φ(F_n)/|F_n|$, where $\mathcal F= (F_n)_{n\in\mathbb{N}}$ is a sequence of finite subsets of a countable amenable group, and $Φ$ is a collection of subadditive functions. Under mild conditions on $Φ$ we prove that the aforementioned quantity equals the supremum over $φ\inΦ$ of the limit of $φ(F)/|F|$ as $F$ becomes more and more invariant, multiplied by a ``Følnerness'' constant $C(\mathcal F)\in[1,\infty]$. We have $C(\mathcal F)=1$ if and only if $\mathcal F$ is Følner. A corollary of this result is that every choice of a non-Følner sequence overestimates topological and measure-theoretic entropy by the multiplicative factor $C(\mathcal F)$ (in the positive entropy case).
+  We obtain a generalization of classical results of Goodman, Krug, and Newton, on the so-called proportionality principle for sequence entropy, and their extension by Gao, Huang, and Zhu to countable amenable groups.</summary>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.GR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:14:40Z</published>
+    <arxiv:comment>17 pages</arxiv:comment>
+    <arxiv:primary_category term="math.DS"/>
+    <author>
+      <name>Nicanor Carrasco-Vargas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08399v1</id>
+    <title>Scaling Up Analog CIM: A Simulation Framework for Topology-Aware Mapping</title>
+    <updated>2026-11-05T18:11:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.08399v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08399v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Analog compute-in-memory (CIM) enables energy-efficient AI inference by performing in-situ matrix multiplication. The growing demand for deploying larger models motivates chiplet integration to expand CIM capacity. However, simulation abstractions based on local operator costs and aggregate communication metrics obscure the impact of weight-mapping topology when CIM system scales up. We develop a phase analysis that quantifies how strongly mapping topology affects system performance across hardware configurations and how mapping optimization translates into latency gains. To evaluate and exploit this design space, we present Isobar, a simulation platform integrating CIM decompositions, heterogeneous execution, and resource modeling. Validated against silicon measurements and cycle-accurate simulation, Isobar provides reliable cost estimates that enable effective mapping search across model and hardware configurations. For Gemma-7B prefill, Isobar-guided mapping reduces communication time by 23.3% and end-to-end latency by 18.6% relative to the strongest baseline. Isobar's system-level modeling show that analog CIM retains energy-efficiency potential relative to GPU when scaled to thousands of dies, and identify topology-aware mapping as a key design dimension for efficient execution.</summary>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:11:00Z</published>
+    <arxiv:primary_category term="cs.AR"/>
+    <author>
+      <name>Yuxin Ren</name>
+    </author>
+    <author>
+      <name>Danella Zhao</name>
+    </author>
+    <author>
+      <name>Huanrui Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08396v1</id>
+    <title>Recalibration-Aware Optimization of ZEFOZ Operating Points in $^{167}\mathrm{Er}^{3+}:\mathrm{Y}_2\mathrm{SiO}_5$ for Quantum Memories</title>
+    <updated>2026-11-05T18:08:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.08396v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08396v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Erbium-doped solids like $^{167}\mathrm{Er}^{3+}:\mathrm{Y}_2\mathrm{SiO}_5$ have properties that make them suitable for quantum-network memories, however, their unquenched effective electronic spin causes rapid magnetic decoherence. Operating at Zero First-Order Zeeman (ZEFOZ) points allows us to mitigate this, where we evaluate the ZEFOZ landscape for Site-2 $^{167}\mathrm{Er}^{3+}$ by incorporating a full-Hessian spin-Hamiltonian treatment with the anisotropic magnetic-field covariance derived from the native $^{89}\mathrm{Y}$ crystal lattice directly. Operating-point screening criteria were adopted to devise a Pareto-optimal frontier of four transition pairs to balance modeled Y-only magnetic pure-dephasing lifetimes ($T_{φ,Y}^{(2)}$) against microwave control authority. The $ε_{14}\leftrightarrowε_{15}$ transition exhibits the longest modeled Y-bath-induced quadratic pure-dephasing time, $T_{φ,Y}^{(2)}&gt;2.2\times10^5~\mathrm{s}$, while the $ε_{12}\leftrightarrowε_{13}$ transition stood out, achieving a Rabi frequency coefficient of $1.248 \times 10^5~\mathrm{Hz/mT}$. An assumption-based Hamiltonian-uncertainty analysis demonstrates that while uncompensated deviations shift the ZEFOZ condition away from its nominal magnetic-field coordinate, the shifted operating points can be recovered via numerical vector-field recalibration. The Pareto-optimal coordinates were mathematically recovered for all sampled Hamiltonian perturbations, and the $84.1^{\mathrm{st}}$-percentile field relocations ranged from $10.95$ to $27.97~\mathrm{mT}$. The intended operation near $10~\mathrm{mK}$ must be taken into account for the suppression of Er-induced spectral diffusion through electronic-spin polarization, while the extended Y-bath pure-dephasing timescales also remain conditional on the adopted temporal-correlation model.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:08:14Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Shashank Srivastava</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08388v1</id>
+    <title>Top-Quark Pair Production and Decay in Extended Higgs Sectors</title>
+    <updated>2026-11-05T18:05:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.08388v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08388v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Extensions of the Higgs sector in the Standard Model address outstanding questions like the first-order electroweak phase transition and also present a rich collider phenomenology. The two-Higgs-doublet model is a minimal extension of the Standard Model with an extra complex $SU(2)_L$ doublet, and consists of an extra scalar, a pseudoscalar and a pair of charged Higgs bosons along with a Standard-Model-like Higgs boson. We present a modified version of the hvq library of the POWHEG-BOX-V2 event generator interfaced with the OpenLoops 2 amplitude generator to obtain predictions for top-quark pair production at NLO accuracy, including top-quark decays with full spin correlations in a framework that extends the SM Higgs sector with an extra heavy scalar and a pseudoscalar. The interference effects between the scalar and pseudoscalar signals, and the Standard Model QCD background are implemented. We include parton showers and hadronisation, and take detector effects into consideration. The status of our work and plans to extend it to future collider projects are discussed.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:05:15Z</published>
+    <arxiv:comment>6 pages, 2 figures. Prepared for submission to Proceedings of Science (PoS) for the 43rd International Conference on High Energy Physics (ICHEP 2026)</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>Andrea Banfi</name>
+    </author>
+    <author>
+      <name>Alexander Lind</name>
+    </author>
+    <author>
+      <name>Jonas M. Lindert</name>
+    </author>
+    <author>
+      <name>Vishakha Lingadahally</name>
+    </author>
+  </entry>
+</feed>

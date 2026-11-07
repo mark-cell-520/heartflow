@@ -1,0 +1,124 @@
+=== r250 海外扫描补充（五候选）stamp=20261107-232744 ===
+[ok] arXiv all:"Dunning-Kruger effect" -> arxiv-dk-quoted-20261107-232744.xml (35255 bytes)
+   arXiv entries=15
+   - The Dunning-Kruger Effect in Large Language Models: An Empirical Study of Confidence Calibration | 2603.09985v1 | 2026-02-12
+   - Do Code Models Suffer from the Dunning-Kruger Effect? | 2510.05457v1 | 2025-10-06
+   - Confident, Not Wiser: The Dunning-Kruger Effect in Human-AI Interaction | 2609.31095v1 | 2026-09-25
+   - All Proof of Work But No Proof of Play | 2506.23435v1 | 2025-06-30
+   - Beyond the Steeper Curve: AI-Mediated Metacognitive Decoupling and the Limits of the Dunning-Kruger  | 2603.29681v1 | 2026-03-31
+   - Prefill-Guided Thinking for zero-shot detection of AI-generated images | 2506.11031v4 | 2025-05-20
+   - Some scientific knowledge is a dangerous thing: overconfidence grows non-linearly with knowledge | 1903.11193v4 | 2019-03-26
+   - Performance and Metacognition Disconnect when Reasoning in Human-AI Interaction | 2409.16708v2 | 2024-09-25
+   - The Confidence-Competence Gap in Large Language Models: A Cognitive Study | 2309.16145v1 | 2023-09-28
+   - Confidence-Guided Learning Process for Continuous Classification of Time Series | 2208.06883v1 | 2022-08-14
+   - Can Legal AI Know When It Is Wrong? And Do Students Know When It Is? | 2608.21089v1 | 2026-08-21
+   - ChainBuddy: An AI Agent System for Generating LLM Pipelines | 2409.13588v2 | 2024-09-20
+[ok] arXiv all:"status quo bias" -> arxiv-sqb-quoted-20261107-232744.xml (26849 bytes)
+   arXiv entries=15
+   - Status Quo Bias and the Decoy Effect: A Comparative Analysis in Choice under Risk | 2006.14868v3 | 2020-06-26
+   - Status Quo Bias in Users Information Systems (IS) Adoption and Continuance Intentions: A Literature  | 2212.03283v1 | 2022-12-04
+   - Why Efficient Reforms Fail: Endogenous Game Transformation under Status Quo Bias and Social Preferen | 2605.21656v1 | 2026-05-20
+   - Hippocratic Utility and Status Quo Bias | 2603.06820v2 | 2026-03-06
+   - The Danger of Reverse-Engineering of Automated Judicial Decision-Making Systems | 2012.10301v1 | 2020-12-18
+   - Choice with Endogenous Categorization | 2005.05196v3 | 2020-05-11
+   - Revealed Default Under Choice Overload | 2608.07298v2 | 2026-08-07
+   - Does the Market Anticipate? Can it? Should it? | 2603.02187v7 | 2026-03-02
+   - The Risk-Neutral Equivalent Pricing of Model-Uncertainty | 2502.13744v10 | 2025-02-19
+   - Can global, extended and repeated ransomware attacks overcome the users status quo bias and cause a  | 2401.11238v1 | 2024-01-20
+   - A Modest Proposal: (Possible) Implications for Appropriation | 1306.5247v1 | 2013-06-21
+   - Cognitive Biases in Large Language Models for News Recommendation | 2410.02897v1 | 2024-10-03
+[ok] arXiv all:"trend extrapolation" -> arxiv-trend-quoted-20261107-232744.xml (31131 bytes)
+   arXiv entries=13
+   - Quantitative Technology Forecasting: a Review of Trend Extrapolation Methods | 2401.02549v1 | 2024-01-04
+   - Trend Extrapolation for Technology Forecasting: Leveraging LSTM Neural Networks for Trend Analysis o | 2512.19727v1 | 2025-12-17
+   - Forecasting AI Time Horizon Under Compute Slowdowns | 2511.19492v1 | 2025-11-23
+   - When Can You Correct Distribution Drift in Temporal Graph Generation? A Sharpening--Drift Tension an | 2607.24662v1 | 2026-07-27
+   - Analysis and Study of Smart Growth | 2509.04529v2 | 2025-09-03
+   - Do In-Match Hydration Breaks Alter Match Momentum? A Within-Match Case-Crossover Analysis of the 202 | 2607.19783v2 | 2026-07-22
+   - Trend strength predicts when generative foundation models win: a power-controlled benchmark, a mecha | 2607.19383v1 | 2026-07-01
+   - Artificial skill in monsoon onset prediction: two recent examples | 1907.08114v1 | 2019-07-18
+   - RR Lyrae Stars in the Bootes dSph | astro-ph/0607091v1 | 2006-07-05
+   - Complements or Substitutes? Technology Adoption and Clinical Care Utilization: Evidence from Automat | 2609.12976v3 | 2026-09-11
+   - Europe's Climate Ambition Under Scrutiny: Evidence from Deep Learning Emission Projections | 2608.18690v1 | 2026-08-19
+   - Model Error Embedding with Orthogonal Gaussian Processes | 2602.17923v2 | 2026-02-20
+[ok] arXiv all:"statistical significance" AND all:"effect size" -> arxiv-sig-effsize-20261107-232744.xml (34690 bytes)
+   arXiv entries=15
+   - A Formal Graphical Inference Framework for Combining Effect Size with Statistical Significance: Appl | 2610.09094v1 | 2026-10-06
+   - Statistical Significance and Effect Sizes of Differences among Research Universities at the Level of | 1710.11020v2 | 2017-10-30
+   - Statistical Significance Testing in Information Retrieval: An Empirical Analysis of Type I, Type II  | 1905.11096v2 | 2019-05-27
+   - Refining Effect-Size Measures and Classification for Differential Item Functioning: Toward Unified G | 2606.21531v1 | 2026-06-19
+   - The assessment of replication success based on relative effect size | 2009.07782v3 | 2020-09-16
+   - Is a Mean Difference of 0.46 Relevant? Towards Determining the Smallest Effect Size of Interest for  | 2305.08945v1 | 2023-05-15
+   - NLPStatTest: A Toolkit for Comparing NLP System Performance | 2011.13231v1 | 2020-11-26
+   - A Hitchhiker's Guide to Statistical Comparisons of Reinforcement Learning Algorithms | 1904.06979v2 | 2019-04-15
+   - Maximum value of the standardized log of odds ratio and celestial mechanics | 1802.06859v1 | 2018-02-19
+   - Statistical randomization test for QCD intermittency in a single-event distribution | physics/0404016v1 | 2004-04-05
+   - Do decisions about outliers and influential effects matter? Evidence from 358 behavioral science met | 2607.23174v1 | 2026-07-25
+   - Policy Implications of Statistical Estimates: A General Bayesian Decision-Theoretic Model for Binary | 2008.10903v4 | 2020-08-25
+[ok] arXiv all:"average" AND all:"median" AND all:"skewed" -> arxiv-mean-median-skew-20261107-232744.xml (35266 bytes)
+   arXiv entries=15
+   - Median-based Splitting Rules for Causal Trees and Forests | 2609.07888v1 | 2026-09-07
+   - Robust Aggregation of Quantile Statistics: from Median to Interval | 2611.04860v1 | 2026-11-03
+   - Confounding-adjustment methods for the causal difference in medians | 2207.05940v3 | 2022-07-13
+   - Measuring precise radial velocities and cross-correlation function line-profile variations using a S | 1811.12718v1 | 2018-11-30
+   - FedEMA-Distill: Exponential Moving Average Guided Knowledge Distillation for Robust Federated Learni | 2603.04422v1 | 2026-02-15
+   - The star formation rates of active galactic nuclei host galaxies | 1601.03349v1 | 2016-01-13
+   - Sensitivity Analysis of calibration methods and factors effecting the statistical nature of radiatio | 2109.04034v1 | 2021-09-09
+   - Simulation-based Estimation of Mean and Standard Deviation for Meta-analysis via Approximate Bayesia | 1504.00608v1 | 2015-04-02
+   - Cinder: A fast and fair matchmaking system | 2602.17015v1 | 2025-11-04
+   - Can Perplexity Serve as a Cognitive Signal for Code Understandability? | 2608.00624v1 | 2026-08-01
+   - Pivot Sampling in Dual-Pivot Quicksort | 1403.6602v2 | 2014-03-26
+   - Friendship Paradox and Attention Economics | 1412.7049v1 | 2014-12-22
+[ok] GitHub "Dunning-Kruger" -> github-dk-quoted-20261107-232744.json (80458 bytes)
+   GitHub repos=75 shown=15
+   - lisds/dunning_kruger *0 
+   - e10v/dunning-kruger *3 Random number simulation of the Dunning and Kruger experiments
+   - anavarretecalvo/quiz-dunning-kruger *0 quiz-dunning-kruger
+   - peregilk/dunning-kruger *0 Norsk Dunning-Kruger Benchmark for LLMer
+   - brk-a/LearnRubyOnRails *0 Dunning-Kruger curve w.r.t. RoR
+   - brk-a/LearnGo *0 Dunning-Kruger Curve for Go Language
+   - pem725/Dunning-Kruger *1 Replication and analysis of the Dunning-Kruger effect
+   - chris-ch/model-dunning-kruger *0 Modelling Dunning-Kruger effect using noise + constant bias
+   - Deleetdk/Dunning_Kruger *0 An interactive visualization of the Dunning Kruger effect.
+   - henu-wang/dunning-kruger-explained *0 The Dunning-Kruger Effect Explained - Understanding competence and confidence
+   - wan19990901/DK_LLM *0 Github repo for Dunning Kruger Effect quantification of LLM
+   - AdityaPatange1/dunning-kruger-monitor *0 Determine your Dunning Kruger score on a given topic.
+[ok] GitHub "status quo bias" -> github-sqb-quoted-20261107-232744.json (55023 bytes)
+   GitHub repos=9 shown=9
+   - parnopaeus/oalanguage *3 Repository for data and code relating to the Status Quo Bias and the Uptake of O
+   - henu-wang/status-quo-bias-detector *0 Status Quo Bias Detector - Identify resistance to change in decision-making - ht
+   - henu-wang/status-quo-bias-analysis *0 Analysis framework for status quo bias and inertia in decision making - https://
+   - xiaosongmaki/status_quo_bias_matching *0 
+   - henu-wang/status-quo-bias-breaker *0 Tools to identify and overcome status quo bias in organizations - https://keepru
+   - johnjosephhorton/do-llms-exhibit-status-quo-bias *1 Do LLMs exhibit status quo bias? An experiment testing GPT-4o across 5 decision 
+   - NovaQ12/statusquobias.github.io *0 A short introduction to the status quo bias, a pyschological concept. Hopefully 
+   - cevefabio/Dispersion_SQ_JCM *0 Replication package for the paper: Dispersion-induced status quo bias in pivot-d
+   - hyc3-cornell/Replication-Data-for-On-Migration-Gravity-with-Status-Quo-Bias-and-Job-Search-Frictions- *0 This repository contains the data and codes for replicating the tables that appe
+[ok] GitHub "trend extrapolation" fallacy -> github-trend-quoted-20261107-232744.json (55 bytes)
+   GitHub repos=0 shown=0
+[ok] GitHub "statistical significance" "effect size" -> github-sig-effsize-20261107-232744.json (96366 bytes)
+   GitHub repos=19 shown=15
+   - amacanovic/KeynessMeasures *2 An R package for word keyness analysis using statistical significance and effect
+   - mahithamathangi-glitch/ab-testing-statistical-experimentation *0 A/B testing analysis using conversion rates, hypothesis testing, statistical sig
+   - VedaBandi1807/Statistical-Significance-and-effect-size *0 
+   - Jabulentee/Measuring-Effect-Sizes-in-Experimental-Data *0 This project focused on measuring the magnitude of differences between groups in
+   - Nitin85955/Task-21-AB-Test-Exploratory-Analysis *0 A/B Test Exploratory Analysis using Python to compare conversion rates, test sta
+   - sanianautiyal54-png/AB-Test-Exploratory-Analysis *0 A/B test analysis using Python and Excel to compare conversion rates, perform hy
+   - Umarf112/ALGOHUB-WEEK5-Statistical-Analysis-Hypothesis-Testing *0 A/B Testing and Statistical Analysis project using Python to compare control and
+   - jacksonpowell-debug/ScRNA-Seq-power-analysis-tool *0 A tool that can allow us to estimate the number of cells that need to be capture
+   - eggchoo/cookie-cats-game-retention-ab-test *0 Cookie Cats game A/B test — gate placement (30 vs 40) impact on retention and en
+   - satyarthashukla/AB-Testing-Feature-Optimization *0 End-to-end A/B testing pipeline evaluating e-commerce UI changes. Features stati
+   - SavitaOkhuysen/ab-test-analysis *0 A/B test analysis of a real product experiment (90,189 users). Statistical signi
+   - kooroosh1363/ab-testing-experiment-analytics *0 End-to-end A/B testing and experiment analytics using real-world public data, co
+[ok] GitHub logical fallacy detection rule engine -> github-lf-rule-engine-20261107-232744.json (55 bytes)
+   GitHub repos=0 shown=0
+[fail] S2 Dunning-Kruger effect: HTTPError: HTTP Error 429: Too Many Requests
+   S2 parse-fail
+[fail] S2 status quo bias default effect: HTTPError: HTTP Error 429: Too Many Requests
+   S2 parse-fail
+[fail] S2 trend extrapolation fallacy: HTTPError: HTTP Error 429: Too Many Requests
+   S2 parse-fail
+[fail] S2 mean median typical value misinterpretation: HTTPError: HTTP Error 429: Too Many Requests
+   S2 parse-fail
+[fail] S2 statistical significance effect size misinterpretation: HTTPError: HTTP Error 429: Too Many Requests
+   S2 parse-fail

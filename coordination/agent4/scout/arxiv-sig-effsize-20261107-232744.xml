@@ -1,0 +1,330 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/ZzsfiuT9gwiTZxGJj9zmSwGm758</id>
+  <title>arXiv Query: search_query=all:"statistical significance" AND all:"effect size"&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T23:27:45Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22statistical+significance%22+AND+all:%22effect+size%22&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>113</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2610.09094v1</id>
+    <title>A Formal Graphical Inference Framework for Combining Effect Size with Statistical Significance: Application to Multivariate and Functional Linear Models</title>
+    <updated>2026-10-06T20:50:07Z</updated>
+    <link href="https://arxiv.org/abs/2610.09094v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.09094v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>To address the critical need for statistical methods that evaluate practical magnitude alongside statistical significance, we introduce a formal graphical inference framework that intrinsically combines effect size with uncertainty. Built upon resampling and global envelopes, this approach provides universality and direct visual interpretability. While existing envelope tests provide only weak family-wise error rate (FWER) or false discovery rate control, we advance the methodology by introducing novel step-down global envelopes. We theoretically prove that several of these envelopes achieve exact strong FWER control under exchangeability, guaranteeing rigorous inference for each individual local hypothesis. Beyond yielding adjusted $p$-values, the framework provides adjusted subset $p$-values for blocks of hypotheses, such as the functional effect of a covariate within a specific category. By explicitly visualizing the size and direction of the effect relative to its variability under the null hypothesis, our approach overcomes the dichotomous nature of traditional testing and provides profound informational value. The proposed framework is applied to multivariate and functional linear models.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-06T20:50:07Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Tomáš Mrkvička</name>
+    </author>
+    <author>
+      <name>Mikko Kuronen</name>
+    </author>
+    <author>
+      <name>Mari Myllymäki</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1710.11020v2</id>
+    <title>Statistical Significance and Effect Sizes of Differences among Research Universities at the Level of Nations and Worldwide based on the Leiden Rankings</title>
+    <updated>2018-10-13T10:47:55Z</updated>
+    <link href="https://arxiv.org/abs/1710.11020v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1710.11020v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Leiden Rankings can be used for grouping research universities by considering universities which are not statistically significantly different as homogeneous sets. The groups and intergroup relations can be analyzed and visualized using tools from network analysis. Using the so-called "excellence indicator" PPtop-10%--the proportion of the top-10% most-highly-cited papers assigned to a university--we pursue a classification using (i) overlapping stability intervals, (ii) statistical-significance tests, and (iii) effect sizes of differences among 902 universities in 54 countries; we focus on the UK, Germany, Brazil, and the USA as national examples. Although the groupings remain largely the same using different statistical significance levels or overlapping stability intervals, these classifications are uncorrelated with those based on effect sizes. Effect sizes for the differences between universities are small (w &lt;.2). The more detailed analysis of universities at the country level suggests that distinctions beyond three or perhaps four groups of universities (high, middle, low) may not be meaningful. Given similar institutional incentives, isomorphism within each eco-system of universities should not be underestimated. Our results suggest that networks based on overlapping stability intervals can provide a first impression of the relevant groupings among universities. However, the clusters are not well-defined divisions between groups of universities.</summary>
+    <category term="cs.DL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2017-10-30T15:46:07Z</published>
+    <arxiv:comment>Journal of the Association for Information Science and Technology (JASIST), forthcoming 2018</arxiv:comment>
+    <arxiv:primary_category term="cs.DL"/>
+    <author>
+      <name>Loet Leydesdorff</name>
+    </author>
+    <author>
+      <name>Lutz Bornmann</name>
+    </author>
+    <author>
+      <name>John Mingers</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1905.11096v2</id>
+    <title>Statistical Significance Testing in Information Retrieval: An Empirical Analysis of Type I, Type II and Type III Errors</title>
+    <updated>2019-06-05T22:18:34Z</updated>
+    <link href="https://arxiv.org/abs/1905.11096v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1905.11096v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Statistical significance testing is widely accepted as a means to assess how well a difference in effectiveness reflects an actual difference between systems, as opposed to random noise because of the selection of topics. According to recent surveys on SIGIR, CIKM, ECIR and TOIS papers, the t-test is the most popular choice among IR researchers. However, previous work has suggested computer intensive tests like the bootstrap or the permutation test, based mainly on theoretical arguments. On empirical grounds, others have suggested non-parametric alternatives such as the Wilcoxon test. Indeed, the question of which tests we should use has accompanied IR and related fields for decades now. Previous theoretical studies on this matter were limited in that we know that test assumptions are not met in IR experiments, and empirical studies were limited in that we do not have the necessary control over the null hypotheses to compute actual Type I and Type II error rates under realistic conditions. Therefore, not only is it unclear which test to use, but also how much trust we should put in them. In contrast to past studies, in this paper we employ a recent simulation methodology from TREC data to go around these limitations. Our study comprises over 500 million p-values computed for a range of tests, systems, effectiveness measures, topic set sizes and effect sizes, and for both the 2-tail and 1-tail cases. Having such a large supply of IR evaluation data with full knowledge of the null hypotheses, we are finally in a position to evaluate how well statistical significance tests really behave with IR data, and make sound recommendations for practitioners.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-05-27T10:02:29Z</published>
+    <arxiv:comment>10 pages, 6 figures, SIGIR 2019</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Julián Urbano</name>
+    </author>
+    <author>
+      <name>Harlley Lima</name>
+    </author>
+    <author>
+      <name>Alan Hanjalic</name>
+    </author>
+    <arxiv:doi>10.1145/3331184.3331259</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1145/3331184.3331259" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.21531v1</id>
+    <title>Refining Effect-Size Measures and Classification for Differential Item Functioning: Toward Unified Guidelines Across Methods</title>
+    <updated>2026-06-19T15:31:02Z</updated>
+    <link href="https://arxiv.org/abs/2606.21531v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.21531v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Differential Item Functioning (DIF) analysis is used to identify potentially biased items in multi-item measurements. In addition to testing the statistical significance, it is essential to evaluate the practical significance of DIF through effect-size measures. We review existing DIF effect-size measures and cut-off values used to classify the effect-size magnitudes for the Mantel-Haenszel test, SIBTEST, and model-based methods for binary items, and introduce a refinement of area-based effect-size measures. A simulation study is conducted to investigate the properties of these effect-size measures and existing classification guidelines, and to assess their comparative performance. The results indicate that some commonly used effect-size measures exhibit undesirable properties, including inconsistent classifications, systematic underestimation of the magnitude of the underlying DIF, and strong dependence on design factors. To address these issues, we introduce usage restrictions for some effect-size measures, revise cut-off values that unify results across different methods, and propose new cut-off values for area-based effect-size measures. The methods are demonstrated using two real data examples. Implementation is provided in the R software.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-19T15:31:02Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Michaela Cichrová</name>
+    </author>
+    <author>
+      <name>Adéla Hladká</name>
+    </author>
+    <author>
+      <name>Patrícia Martinková</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2009.07782v3</id>
+    <title>The assessment of replication success based on relative effect size</title>
+    <updated>2021-04-08T07:22:35Z</updated>
+    <link href="https://arxiv.org/abs/2009.07782v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2009.07782v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Replication studies are increasingly conducted in order to confirm original findings. However, there is no established standard how to assess replication success and in practice many different approaches are used. The purpose of this paper is to refine and extend a recently proposed reverse-Bayes approach for the analysis of replication studies. We show how this method is directly related to the relative effect size, the ratio of the replication to the original effect estimate. This perspective leads to a new proposal to recalibrate the assessment of replication success, the golden level. The recalibration ensures that for borderline significant original studies replication success can only be achieved if the replication effect estimate is larger than the original one. Conditional power for replication success can then take any desired value if the original study is significant and the replication sample size is large enough. Compared to the standard approach to require statistical significance of both the original and replication study, replication success at the golden level offers uniform gains in project power and controls the Type-I error rate if the replication sample size is not smaller than the original one. An application to data from four large replication projects shows that the new approach leads to more appropriate inferences, as it penalizes shrinkage of the replication estimate compared to the original one, while ensuring that both effect estimates are sufficiently convincing on their own.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-09-16T16:20:16Z</published>
+    <arxiv:comment>revision, 16 pages, 7 figures, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <arxiv:journal_ref>The Annals of Applied Statistics 2022, Vol. 16, No. 2, 706-720</arxiv:journal_ref>
+    <author>
+      <name>Leonhard Held</name>
+    </author>
+    <author>
+      <name>Charlotte Micheloud</name>
+    </author>
+    <author>
+      <name>Samuel Pawel</name>
+    </author>
+    <arxiv:doi>10.1214/21-AOAS1502</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1214/21-AOAS1502" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2305.08945v1</id>
+    <title>Is a Mean Difference of 0.46 Relevant? Towards Determining the Smallest Effect Size of Interest for Visual Aesthetics of Websites</title>
+    <updated>2023-05-15T18:31:02Z</updated>
+    <link href="https://arxiv.org/abs/2305.08945v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2305.08945v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Imagine conducting a study to determine whether users rate the visual aesthetics of your website more positively than your competitors. To assess users' perceptions of both websites, you use a validated survey scale for visual aesthetics, and you observe a statistically significant difference in users' ratings of the visual aesthetics of the two websites of 0.5 on a 7-point Likert-type scale. However, determining whether such a difference is practically (and theoretically) meaningful is challenging. In this paper, I follow the procedure outlined in Anvari &amp; Lakens (2021) to determine the smallest subjectively experienced difference in VisAWI-s ratings using an anchor-based method. A sample of N = 249 participants rated and compared screenshots of eight websites in an online survey. I determined an estimate of a population-specific mean difference of 0.4, or in POMP units 6.58%, which translates to a mean difference of 0.46 with the 7-point Likert-type scale of the VisAWI-s. These values suggest that differences in VisAWI-s scores exceeding these estimates, such as the 0.5 mentioned above, are likely noticeable and meaningful to users. However, the estimate of this smallest subjectively experienced difference is affected by the overall visual aesthetics rating of the stimuli used. Researchers can use this effect size to inform study design and sample size planning. Still, whenever possible, they should aim to determine a domain- and research-design-specific smallest effect size of interest.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-05-15T18:31:02Z</published>
+    <arxiv:comment>11 pages, 10 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Florian Brühlmann</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2011.13231v1</id>
+    <title>NLPStatTest: A Toolkit for Comparing NLP System Performance</title>
+    <updated>2020-11-26T10:59:23Z</updated>
+    <link href="https://arxiv.org/abs/2011.13231v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2011.13231v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Statistical significance testing centered on p-values is commonly used to compare NLP system performance, but p-values alone are insufficient because statistical significance differs from practical significance. The latter can be measured by estimating effect size. In this paper, we propose a three-stage procedure for comparing NLP system performance and provide a toolkit, NLPStatTest, that automates the process. Users can upload NLP system evaluation scores and the toolkit will analyze these scores, run appropriate significance tests, estimate effect size, and conduct power analysis to estimate Type II error. The toolkit provides a convenient and systematic way to compare NLP system performance that goes beyond statistical significance testing</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-11-26T10:59:23Z</published>
+    <arxiv:comment>Will appear in AACL-IJCNLP 2020</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>Proceedings of the 1st Conference of the Asia-Pacific Chapter of the Association for Computational Linguistics and the 10th International Joint Conference on Natural Language Processing: System Demonstrations (2020) 40-46</arxiv:journal_ref>
+    <author>
+      <name>Haotian Zhu</name>
+    </author>
+    <author>
+      <name>Denise Mak</name>
+    </author>
+    <author>
+      <name>Jesse Gioannini</name>
+    </author>
+    <author>
+      <name>Fei Xia</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1904.06979v2</id>
+    <title>A Hitchhiker's Guide to Statistical Comparisons of Reinforcement Learning Algorithms</title>
+    <updated>2022-08-29T10:30:43Z</updated>
+    <link href="https://arxiv.org/abs/1904.06979v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1904.06979v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Consistently checking the statistical significance of experimental results is the first mandatory step towards reproducible science. This paper presents a hitchhiker's guide to rigorous comparisons of reinforcement learning algorithms. After introducing the concepts of statistical testing, we review the relevant statistical tests and compare them empirically in terms of false positive rate and statistical power as a function of the sample size (number of seeds) and effect size. We further investigate the robustness of these tests to violations of the most common hypotheses (normal distributions, same distributions, equal variances). Beside simulations, we compare empirical distributions obtained by running Soft-Actor Critic and Twin-Delayed Deep Deterministic Policy Gradient on Half-Cheetah. We conclude by providing guidelines and code to perform rigorous comparisons of RL algorithm performances.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-04-15T12:00:29Z</published>
+    <arxiv:comment>8 pages + supplementary material</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Cédric Colas</name>
+    </author>
+    <author>
+      <name>Olivier Sigaud</name>
+    </author>
+    <author>
+      <name>Pierre-Yves Oudeyer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1802.06859v1</id>
+    <title>Maximum value of the standardized log of odds ratio and celestial mechanics</title>
+    <updated>2018-02-19T21:18:53Z</updated>
+    <link href="https://arxiv.org/abs/1802.06859v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1802.06859v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The odds ratio (OR) is a widely used measure of the effect size in observational research. ORs reflect statistical association between a binary outcome, such as the presence of a health condition, and a binary predictor, such as an exposure to a pollutant. Statistical significance and interval estimates are often computed for the logarithm of OR, ln(OR), and depend on the asymptotic standard error of ln(OR). For a sample of size N, the standard error can be written as a ratio of sigma over square root of N, where sigma is the population standard deviation of ln(OR). The ratio of ln(OR) over sigma is a standardized effect size. Unlike correlation, that is another familiar standardized statistic, the standardized ln(OR) cannot reach values of minus one or one. We find that its maximum possible value is given by the Laplace Limit Constant, (LLC=0.6627...), that appears as a condition in solutions to Kepler equation -- one of the central equations in celestial mechanics. The range of the standardized ln(OR) is bounded by minus LLC to LLC, reaching its maximum for ln(OR)~4.7987. This range has implications for analysis of epidemiological associations, affecting the behavior of the reasonable prior distribution for the standardized ln(OR).</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-02-19T21:18:53Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Olga A. Vsevolozhskaya</name>
+    </author>
+    <author>
+      <name>Gabriel Ruiz</name>
+    </author>
+    <author>
+      <name>Dmitri V. Zaykin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/physics/0404016v1</id>
+    <title>Statistical randomization test for QCD intermittency in a single-event distribution</title>
+    <updated>2004-04-05T15:48:36Z</updated>
+    <link href="https://arxiv.org/abs/physics/0404016v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/physics/0404016v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  A randomization test was developed to determine the statistical significance of QCD intermittency in single-event distributions. A total of 96 simulated intermittent distributions based on standard normal Gaussian distributions of size N=500, 1000, 1500, 2000, 4000, 8000, 16000, and 32000 containing induced holes and spikes were tested for intermittency. Non-intermittent null distributions were also simulated as part of the test. A log-linear model was developed to simultaneously test the significance of fit coefficients for the y-intercept and slope contribution to ln(F_2) vs. ln(M) from both the intermittent and null distributions. Statistical power was also assessed for each fit coefficient to reflect the proportion of times out of 1000 tests each coefficient was statistically significant, given the induced effect size and sample size of the Gaussians. Results indicate that the slope of ln(F_2) vs. ln(M) for intermittent distributions increased with decreasing sample size, due to artificially-induced holes occurring in sparse histograms. For intermittent Gaussians with 4000 variates, there was approximately 70% power to detect a slope difference of 0.02 between intermittent and null distributions. For sample sizes of 8000 and greater, there was more than 70% power to detect a slope difference of 0.01. The randomization test performed satisfactorily since the power of the test for intermittency decreased with decreasing sample size. Power was near-zero when the test was applied to null distributions. The randomization test can be used to establish the statistical significance of intermittency in empirical single-event Gaussian distributions.</summary>
+    <category term="physics.data-an" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2004-04-05T15:48:36Z</published>
+    <arxiv:comment>23 pages, 6 figures, 3 table</arxiv:comment>
+    <arxiv:primary_category term="physics.data-an"/>
+    <author>
+      <name>Leif E. Peterson</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.23174v1</id>
+    <title>Do decisions about outliers and influential effects matter? Evidence from 358 behavioral science meta-analyses</title>
+    <updated>2026-07-25T12:09:02Z</updated>
+    <link href="https://arxiv.org/abs/2607.23174v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.23174v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Meta-analysts routinely face estimates that look too large or extreme. Yet, how to handle them is left to the reviewer's judgment. The methods for detecting such estimates are well known. What is missing is an informed assessment of how much alternative handling choices might change a meta-analysis' conclusions. We fill this gap by analyzing the effects of four pre-registered handling treatments across 358 behavioral science meta-analyses with at least ten estimates. Each outlier handling treatment is estimated by two estimators (random effects and unrestricted weighted least squares), and compared to the 'do-nothing' baseline on three outcomes: the pooled effect, statistical significance, and whether the effect reaches the smallest effect size of interest (|d| &gt;= 0.20). Our entire analysis and comparison pipelines were pre-registered. Alternative outlier handling treatments have little effect on the meta-analysis mean as the median absolute change in Cohen's d is at most 0.047 and often much less. Yet, at least one of these four treatments in combination with one of these estimators reverses the statistical significance of 11.5% of meta-analyses and the smallest-effect-of-interest assessment in 15.9%. Winsorizing has the least effect and DFBETAS the most. Categorical changes are found almost entirely among results already close to the decision boundary; strongly significant results essentially never change. These findings give applied meta-analysts, methods specialists, and reviewers a reference point for how much this under-reported choice matters and provide yet another reason for meta-analysts to publicly pre-specify their methods and handling treatments.</summary>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-25T12:09:02Z</published>
+    <arxiv:comment>16 pages, 4 tables. Pre-registered study. Online appendix: https://meta-analysis.cz/outliers</arxiv:comment>
+    <arxiv:primary_category term="econ.EM"/>
+    <author>
+      <name>Tomas Havranek</name>
+    </author>
+    <author>
+      <name>Zuzana Irsova</name>
+    </author>
+    <author>
+      <name>Martina Luskova</name>
+    </author>
+    <author>
+      <name>T. D. Stanley</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2008.10903v4</id>
+    <title>Policy Implications of Statistical Estimates: A General Bayesian Decision-Theoretic Model for Binary Outcomes</title>
+    <updated>2022-05-02T10:42:34Z</updated>
+    <link href="https://arxiv.org/abs/2008.10903v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2008.10903v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>How should we evaluate the effect of a policy on the likelihood of an undesirable event, such as conflict? The significance test has three limitations. First, relying on statistical significance misses the fact that uncertainty is a continuous scale. Second, focusing on a standard point estimate overlooks the variation in plausible effect sizes. Third, the criterion of substantive significance is rarely explained or justified. A new Bayesian decision-theoretic model, "causal binary loss function model," overcomes these issues. It compares the expected loss under a policy intervention with the one under no intervention. These losses are computed based on a particular range of the effect sizes of a policy, the probability mass of this effect size range, the cost of the policy, and the cost of the undesirable event the policy intends to address. The model is more applicable than common statistical decision-theoretic models using the standard loss functions or capturing costs in terms of false positives and false negatives. I exemplify the model's use through three applications and provide an R package.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-08-25T09:21:58Z</published>
+    <arxiv:comment>This is the Accepted Manuscript version of an article published by Taylor &amp; Francis in Statistics and Public Policy on April 25, 2022, available with open access at: https://doi.org/10.1080/2330443X.2022.2050328. For reference, the published version should be consulted</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <arxiv:journal_ref>Statistics and Public Policy 9, no.1 (2022): 85-96</arxiv:journal_ref>
+    <author>
+      <name>Akisato Suzuki</name>
+    </author>
+    <arxiv:doi>10.1080/2330443X.2022.2050328</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1080/2330443X.2022.2050328" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1703.04568v1</id>
+    <title>An empirical evaluation of ensemble adjustment methods for analogy-based effort estimation</title>
+    <updated>2017-03-11T20:16:37Z</updated>
+    <link href="https://arxiv.org/abs/1703.04568v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1703.04568v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Objective: This paper investigates the potential of ensemble learning for variants of adjustment methods used in analogy-based effort estimation. The number k of analogies to be used is also investigated. Method We perform a large scale comparison study where many ensembles constructed from n out of 40 possible valid variants of adjustment methods are applied to eight datasets. The performance of each method was evaluated based on standardized accuracy and effect size. Results: The results have been subjected to statistical significance testing, and show reasonable significant improvements on the predictive performance where ensemble methods are applied. Conclusion: Our conclusions suggest that ensembles of adjustment methods can work well and achieve good performance, even though they are not always superior to single methods. We also recommend constructing ensembles from only linear adjustment methods, as they have shown better performance and were frequently ranked higher.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2017-03-11T20:16:37Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Mohammad Azzeh</name>
+    </author>
+    <author>
+      <name>Ali Bou Nassif</name>
+    </author>
+    <author>
+      <name>Leandro L Minku</name>
+    </author>
+    <arxiv:doi>10.1016/j.jss.2015.01.028</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.jss.2015.01.028" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1701.05763v1</id>
+    <title>Multivariate Confidence Intervals</title>
+    <updated>2017-01-20T11:19:50Z</updated>
+    <link href="https://arxiv.org/abs/1701.05763v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1701.05763v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Confidence intervals are a popular way to visualize and analyze data distributions. Unlike p-values, they can convey information both about statistical significance as well as effect size. However, very little work exists on applying confidence intervals to multivariate data. In this paper we define confidence intervals for multivariate data that extend the one-dimensional definition in a natural way. In our definition every variable is associated with its own confidence interval as usual, but a data vector can be outside of a few of these, and still be considered to be within the confidence area. We analyze the problem and show that the resulting confidence areas retain the good qualities of their one-dimensional counterparts: they are informative and easy to interpret. Furthermore, we show that the problem of finding multivariate confidence intervals is hard, but provide efficient approximate algorithms to solve the problem.</summary>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2017-01-20T11:19:50Z</published>
+    <arxiv:comment>A short version of this paper appeared in the 2017 SIAM International Conference on Data Mining, SDM'17. This extended version contains proofs of theorems in the appendix</arxiv:comment>
+    <arxiv:primary_category term="stat.AP"/>
+    <author>
+      <name>Jussi Korpela</name>
+    </author>
+    <author>
+      <name>Emilia Oikarinen</name>
+    </author>
+    <author>
+      <name>Kai Puolamäki</name>
+    </author>
+    <author>
+      <name>Antti Ukkonen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2302.01407v1</id>
+    <title>Hypothesis Testing and Machine Learning: Interpreting Variable Effects in Deep Artificial Neural Networks using Cohen's f2</title>
+    <updated>2023-02-02T20:43:37Z</updated>
+    <link href="https://arxiv.org/abs/2302.01407v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2302.01407v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deep artificial neural networks show high predictive performance in many fields, but they do not afford statistical inferences and their black-box operations are too complicated for humans to comprehend. Because positing that a relationship exists is often more important than prediction in scientific experiments and research models, machine learning is far less frequently used than inferential statistics. Additionally, statistics calls for improving the test of theory by showing the magnitude of the phenomena being studied. This article extends current XAI methods and develops a model agnostic hypothesis testing framework for machine learning. First, Fisher's variable permutation algorithm is tweaked to compute an effect size measure equivalent to Cohen's f2 for OLS regression models. Second, the Mann-Kendall test of monotonicity and the Theil-Sen estimator is applied to Apley's accumulated local effect plots to specify a variable's direction of influence and statistical significance. The usefulness of this approach is demonstrated on an artificial data set and a social survey with a Python sandbox implementation.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-02-02T20:43:37Z</published>
+    <arxiv:comment>16 pages, 2 figures, 4 tables</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Wolfgang Messner</name>
+    </author>
+    <arxiv:doi>10.1016/j.asoc.2023.110729</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.asoc.2023.110729" title="doi"/>
+  </entry>
+</feed>

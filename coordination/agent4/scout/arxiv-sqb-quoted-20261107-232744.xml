@@ -1,0 +1,298 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/s49weGgkM64D527YcIQs9ChreeI</id>
+  <title>arXiv Query: search_query=all:"status quo bias"&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T23:27:44Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22status+quo+bias%22&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>21</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2006.14868v3</id>
+    <title>Status Quo Bias and the Decoy Effect: A Comparative Analysis in Choice under Risk</title>
+    <updated>2021-11-26T18:35:32Z</updated>
+    <link href="https://arxiv.org/abs/2006.14868v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2006.14868v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Inertia and context-dependent choice effects are well-studied classes of behavioural phenomena. While much is known about these effects in isolation, little is known about whether one of them "dominates" the other when both can potentially be present. Knowledge of any such dominance is relevant for effective choice architecture and descriptive modelling. We initiate this empirical investigation with a between-subjects lab experiment in which each subject made a single decision over two or three money lotteries. Our experiment was designed to test for dominance between *status quo bias* and the *decoy effect*. We find strong evidence for status quo bias and no evidence for the decoy effect. We also find that status quo bias can be powerful enough so that, at the aggregate level, a fraction of subjects switch from being risk-averse to being risk-seeking. Survey evidence suggests that this is due to subjects focusing on the maximum possible amount when the risky lottery is the default and on the highest probability of winning the biggest possible reward when there is no default. The observed reversal in risk attitudes is explainable by a large class of Koszegi-Rabin (2006) reference-dependent preferences.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-06-26T09:02:11Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <author>
+      <name>Miguel Costa-Gomes</name>
+    </author>
+    <author>
+      <name>Georgios Gerasimou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2212.03283v1</id>
+    <title>Status Quo Bias in Users Information Systems (IS) Adoption and Continuance Intentions: A Literature Review and Framework</title>
+    <updated>2022-12-04T22:27:20Z</updated>
+    <link href="https://arxiv.org/abs/2212.03283v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2212.03283v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Information systems (IS) adoption and continuance intentions of users have a dominant effect on digital transformation in organisations. However, organisations undergoing digital transformation face substantial barriers due to user resistance to IS implementations. Status quo bias (SQB) plays a vital role in users decision-making regarding adopting new IS or continuing to use existing IS. Despite recent research to validate the effects of SQB on user resistance to IS implementations, how SQB affects the IS adoption and continuance intentions of users remains poorly understood, making it harder to develop ways of successfully dealing with it. To address the gap, we performed a systematic literature review on SQB in IS research. Our proposed framework incorporates the psychological phenomena promoting the status quo, SQB theory constructs, levels of SQB influence, and factors reducing the user resistance to IS implementations to enhance the understanding of IS adoption and continuance intentions.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-12-04T22:27:20Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Saliya Nugawela</name>
+    </author>
+    <author>
+      <name>Darshana Sedera</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2605.21656v1</id>
+    <title>Why Efficient Reforms Fail: Endogenous Game Transformation under Status Quo Bias and Social Preferences</title>
+    <updated>2026-05-20T19:10:53Z</updated>
+    <link href="https://arxiv.org/abs/2605.21656v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.21656v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Why do societies remain stuck in inferior institutions even when superior al ternatives are widely recognized? This paper develops a model in which agents choose not only actions within a game but also transformations of the game it self. Transformations may be soft, changing payoffs through taxes or subsidies, or hard, changing feasibility through deletion or replacement of actions. Within a coordination model with status-quo bias (switching cost) and boundedly rational play (logit quantal response), we show that these interventions are qualitatively different: finite taxes shift behavior continuously but cannot eliminate residual use of the inherited action, whereas deletion bypasses inertia by removing the action from the feasible set. We further characterize how antagonistic social preferences at the meta level can block reforms that are individually beneficial for every player. The framework provides a formal rationale for why hard feasibility restrictions of ten dominate soft price incentives under inertia, with direct applications to climate transition (carbon tax vs. fossil-fuel phase-out) and platform regulation (fines vs. deletion of addictive features).</summary>
+    <category term="econ.TH" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-20T19:10:53Z</published>
+    <arxiv:primary_category term="econ.TH"/>
+    <author>
+      <name>Madjid Eshaghi Gordji</name>
+    </author>
+    <author>
+      <name>Mohammadali Berahman</name>
+    </author>
+    <author>
+      <name>Hasti Eshaghi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2603.06820v2</id>
+    <title>Hippocratic Utility and Status Quo Bias</title>
+    <updated>2026-06-17T19:15:37Z</updated>
+    <link href="https://arxiv.org/abs/2603.06820v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.06820v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A utility function has been proposed that values more lives that are lost than those that are saved. I do not dispute the ethical motivation behind this kind of asymmetry. However, I show with a simple example that the scope of applicability of such a decision criterion is considerably more limited than it may first appear.</summary>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.OT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-03-06T19:29:57Z</published>
+    <arxiv:primary_category term="econ.EM"/>
+    <author>
+      <name>Tomasz Strzalecki</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2012.10301v1</id>
+    <title>The Danger of Reverse-Engineering of Automated Judicial Decision-Making Systems</title>
+    <updated>2020-12-18T15:33:24Z</updated>
+    <link href="https://arxiv.org/abs/2012.10301v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2012.10301v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper we discuss the implications of using machine learning for judicial decision-making in situations where human rights may be infringed. We argue that the use of such tools in these situations should be limited due to inherent status quo bias and dangers of reverse-engineering. We discuss that these issues already exist in the judicial systems without using machine learning tools, but how introducing them might exacerbate them.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-12-18T15:33:24Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Masha Medvedeva</name>
+    </author>
+    <author>
+      <name>Martijn Wieling</name>
+    </author>
+    <author>
+      <name>Michel Vols</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2005.05196v3</id>
+    <title>Choice with Endogenous Categorization</title>
+    <updated>2021-02-01T10:51:29Z</updated>
+    <link href="https://arxiv.org/abs/2005.05196v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2005.05196v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We propose and axiomatize the categorical thinking model (CTM) in which the framing of the decision problem affects how agents categorize alternatives, that in turn affects their evaluation of it. Prominent models of salience, status quo bias, loss-aversion, inequality aversion, and present bias all fit under the umbrella of CTM. This suggests categorization is an underlying mechanism of key departures from the neoclassical model of choice. We specialize CTM to provide a behavioral foundation for the salient thinking model of Bordalo et al. (2013) that highlights its strong predictions and distinctions from other models.</summary>
+    <category term="econ.TH" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-05-11T15:39:47Z</published>
+    <arxiv:primary_category term="econ.TH"/>
+    <author>
+      <name>Andrew Ellis</name>
+    </author>
+    <author>
+      <name>Yusufcan Masatlioglu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.07298v2</id>
+    <title>Revealed Default Under Choice Overload</title>
+    <updated>2026-08-18T20:23:23Z</updated>
+    <link href="https://arxiv.org/abs/2608.07298v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.07298v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Empirical and experimental studies suggest that a decision maker can remain with their default option even when preferred alternatives are available, yet standard choice data may not record which option is the default. Existing default-based models often assume that the default option is observed. In contrast, I study a decision maker subject to status quo bias and choice overload and illustrate how one can identify both the decision maker's default and preference from the observed behavior. This paper shows that anomalous choice behavior may arise from a latent default, a possibility largely overlooked in studies of standard choice data.</summary>
+    <category term="econ.TH" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-07T14:52:34Z</published>
+    <arxiv:primary_category term="econ.TH"/>
+    <author>
+      <name>Kai Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2603.02187v7</id>
+    <title>Does the Market Anticipate? Can it? Should it?</title>
+    <updated>2026-11-03T11:52:46Z</updated>
+    <link href="https://arxiv.org/abs/2603.02187v7" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.02187v7" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A nuance to 'no arbitrage' is studied: it can be suboptimal to act upon an arbitrage immediately; in such cases optimised trading can suppress the anticipation of predictable risk-outcomes, creating an apparent Status Quo Bias. This is shown for asset-pricing under model- or event-risk. Unlike standard treatments, we allow pre-horizon revelations of risk-outcomes; the associated technical challenges are addressed through results from the weak viability and (in)side-information literature. The conflict between 'anticipation', 'no arbitrage' and 'information efficiency', and the competition between the 'signal-to-noise of data' and the 'inference-free risk-premium drift', are exposed.</summary>
+    <category term="q-fin.MF" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-03-02T18:52:13Z</published>
+    <arxiv:comment>23.5 pages, Title/Abstract (1) Main (14), Appendix (5), References (2.5), Declaration (1)</arxiv:comment>
+    <arxiv:primary_category term="q-fin.MF"/>
+    <author>
+      <name>Kangda Ken Wren</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2502.13744v10</id>
+    <title>The Risk-Neutral Equivalent Pricing of Model-Uncertainty</title>
+    <updated>2026-10-21T21:09:01Z</updated>
+    <link href="https://arxiv.org/abs/2502.13744v10" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2502.13744v10" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Existing works on asset-pricing under model-risk seek to adapt the utility-preference framework to generate prices that replicate the key anomalies of long-run historical data. We move the focus closer to practice by taking a bottom-up perspective and a Risk Neutral Equivalent approach. Viable model-risk pricing is shown to have a 'canonical' form, with an intuitive price-of-risk and dynamic. It allows the ex-post effect of bias and risk-pricing to be disentangled without the usual joint-hypothesis problem. As a result novel connections are made between a disparate group of subjects: Momentum, Low-Risk, Status Quo Bias and Bewley's Inertia Axiom under Knightian uncertainty.</summary>
+    <category term="q-fin.MF" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-02-19T14:07:37Z</published>
+    <arxiv:comment>22 pages in all: 12 of main text, 6 of Appendix, 2 of Bibliography, 1 of title and abstract, 1 of declaration</arxiv:comment>
+    <arxiv:primary_category term="q-fin.MF"/>
+    <author>
+      <name>Ken Kangda Wren</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2401.11238v1</id>
+    <title>Can global, extended and repeated ransomware attacks overcome the users status quo bias and cause a switch of system</title>
+    <updated>2024-01-20T14:27:24Z</updated>
+    <link href="https://arxiv.org/abs/2401.11238v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2401.11238v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Ransomware attack effectiveness has increased causing far reaching consequences that are not fully understood. The ability to disrupt core services, the global reach, extended duration, and the repetition has increased their ability to harm organizations. One aspect that needs to be understood better is the effect on the user. The user in the current environment is exposed to new technologies that might be adopted, but there are also habits of using existing systems. The habits have developed over time with trust increasing in the organization in contact directly and the institutions supporting it. This research explores whether the global, extended, and repeated RW attacks reduce the trust and inertia sufficiently to change long-held habits in using information systems. The model tested measures the effect of the RW attack on the e-commerce status quo to evaluate if it is significant enough to overcome the users resistance to change.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-01-20T14:27:24Z</published>
+    <arxiv:comment>International Journal of Information Systems in the Service Sector (2022)</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Alex Zarifis</name>
+    </author>
+    <author>
+      <name>Xusen Cheng</name>
+    </author>
+    <author>
+      <name>Uchitha Jayawickrama</name>
+    </author>
+    <author>
+      <name>Simone Corsi</name>
+    </author>
+    <arxiv:doi>10.4018/IJISSS.289219</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.4018/IJISSS.289219" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1306.5247v1</id>
+    <title>A Modest Proposal: (Possible) Implications for Appropriation</title>
+    <updated>2013-06-21T20:08:57Z</updated>
+    <link href="https://arxiv.org/abs/1306.5247v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1306.5247v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As technologies are developed and constructed, designers may or may not be aware that they are embedding politics and values into their artifacts. Computer scientists operate and advance their field by building layers of abstraction into software and hardware to reduce the complexity of interfaces, making the artifacts they create zuhanden for others in part by imposing constraints. The increasing reliance of global populations and economies on communication mediated by many information and communications technologies (ICTs) transforms them from applications into communications infrastructure, elevating the importance of considering the values embodied in those infrastructures. I argue that the status quo bias and economic inertia of built-infrastructure requires a reevaluation of research in light of the de facto global technocracy to consider a nouveau social contract between infrastructural theorists, scientists, designers, and engineers and the current and future generations who will be constrained by that infrastructure as it is reified. The CHI community is uniquely situated to establish a norm of including a discussion of the implications of appropriation as first class topic in research output.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2013-06-21T20:08:57Z</published>
+    <arxiv:comment>4 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Peter Kinnaird</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2410.02897v1</id>
+    <title>Cognitive Biases in Large Language Models for News Recommendation</title>
+    <updated>2024-10-03T18:42:07Z</updated>
+    <link href="https://arxiv.org/abs/2410.02897v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2410.02897v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Despite large language models (LLMs) increasingly becoming important components of news recommender systems, employing LLMs in such systems introduces new risks, such as the influence of cognitive biases in LLMs. Cognitive biases refer to systematic patterns of deviation from norms or rationality in the judgment process, which can result in inaccurate outputs from LLMs, thus threatening the reliability of news recommender systems. Specifically, LLM-based news recommender systems affected by cognitive biases could lead to the propagation of misinformation, reinforcement of stereotypes, and the formation of echo chambers. In this paper, we explore the potential impact of multiple cognitive biases on LLM-based news recommender systems, including anchoring bias, framing bias, status quo bias and group attribution bias. Furthermore, to facilitate future research at improving the reliability of LLM-based news recommender systems, we discuss strategies to mitigate these biases through data augmentation, prompt engineering and learning algorithms aspects.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-10-03T18:42:07Z</published>
+    <arxiv:comment>Accepted at the ROGEN '24 workshop, co-located with ACM RecSys '24</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Yougang Lyu</name>
+    </author>
+    <author>
+      <name>Xiaoyu Zhang</name>
+    </author>
+    <author>
+      <name>Zhaochun Ren</name>
+    </author>
+    <author>
+      <name>Maarten de Rijke</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.19586v1</id>
+    <title>Examining User Behavior and Cognitive Biases in Personal Password Security</title>
+    <updated>2026-07-21T21:28:35Z</updated>
+    <link href="https://arxiv.org/abs/2607.19586v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.19586v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Despite increasing awareness of cybersecurity risks, users continue to engage in insecure password practices, such as reusing passwords, choosing weak credentials, and neglecting security recommendations. The study explores the behavioral and cognitive factors that influence password decision-making by integrating insights from behavioral economics, particularly hyperbolic discounting, status quo bias, and present bias. We conducted a survey to analyze how people create, store and manage their passwords, examining whether security habits have improved over time in response to greater awareness. Our findings reveal that immediate convenience often outweighs long-term security considerations, leading users to prioritize memorability over strength. Additionally, we identify key psychological biases that contribute to security procrastination and resistance to adopting more secure authentication practices, such as password managers and multi-factor authentication. The study contributes to human-centered security by bridging the gap between security awareness and action, offering practical insights to design user-friendly authentication policies that align with real-world decision-making tendencies.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-21T21:28:35Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Evelyn Crowe</name>
+    </author>
+    <author>
+      <name>Patralika Ghosh</name>
+    </author>
+    <author>
+      <name>Shreyas Kumar</name>
+    </author>
+    <author>
+      <name>Rebecca Schlegel</name>
+    </author>
+    <author>
+      <name>Rebecca Ward</name>
+    </author>
+    <author>
+      <name>Guofei Gu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1106.2657v1</id>
+    <title>I Don't Want to Think About it Now:Decision Theory With Costly Computation</title>
+    <updated>2011-06-14T09:52:38Z</updated>
+    <link href="https://arxiv.org/abs/1106.2657v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1106.2657v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Computation plays a major role in decision making. Even if an agent is willing to ascribe a probability to all states and a utility to all outcomes, and maximize expected utility, doing so might present serious computational problems. Moreover, computing the outcome of a given act might be difficult. In a companion paper we develop a framework for game theory with costly computation, where the objects of choice are Turing machines. Here we apply that framework to decision theory. We show how well-known phenomena like first-impression-matters biases (i.e., people tend to put more weight on evidence they hear early on), belief polarization (two people with different prior beliefs, hearing the same evidence, can end up with diametrically opposed conclusions), and the status quo bias (people are much more likely to stick with what they already have) can be easily captured in that framework. Finally, we use the framework to define some new notions: value of computational information (a computational variant of value of information) and and computational value of conversation.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2011-06-14T09:52:38Z</published>
+    <arxiv:comment>In Conference on Knowledge Representation and Reasoning (KR '10)</arxiv:comment>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Joseph Y. Halpern</name>
+    </author>
+    <author>
+      <name>Rafael Pass</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2601.11049v2</id>
+    <title>Predicting Biased Human Decision-Making with Large Language Models in Conversational Settings</title>
+    <updated>2026-07-06T10:29:51Z</updated>
+    <link href="https://arxiv.org/abs/2601.11049v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2601.11049v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We examine whether large language models (LLMs) can predict biased decision-making in conversational settings, and whether their predictions capture not only human cognitive biases but also how those effects change under cognitive load. In a pre-registered study (N = 1,648), participants completed six classic decision-making tasks via a chatbot with dialogues of varying complexity. Participants exhibited two well-documented cognitive biases: the Framing Effect and the Status Quo Bias. Increased dialogue complexity resulted in participants reporting higher mental demand. This increase in cognitive load selectively, but significantly, increased the effect of the biases, demonstrating the load-bias interaction. We then evaluated whether LLMs (GPT-4, GPT-5, and open-source models) could predict individual decisions given demographic information and prior dialogue. While results were mixed across choice problems, LLM predictions that incorporated dialogue context were significantly more accurate in several key scenarios. Importantly, their predictions reproduced the same bias patterns and load-bias interactions observed in humans. Across all models tested, the GPT-4 family consistently aligned with human behavior, outperforming GPT-5 and open-source models in both predictive accuracy and fidelity to human-like bias patterns. These findings advance our understanding of LLMs as tools for simulating human decision-making and inform the design of conversational agents that adapt to user biases.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-01-16T07:30:21Z</published>
+    <arxiv:comment>Accepted at ACM IUI 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Stephen Pilli</name>
+    </author>
+    <author>
+      <name>Vivek Nallur</name>
+    </author>
+  </entry>
+</feed>
