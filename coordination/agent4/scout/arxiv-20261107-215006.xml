@@ -1,0 +1,352 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/CcvVPMC5giuEcBFQ41imBbfxRCw</id>
+  <title>arXiv Query: search_query=all:winner's OR all:curse OR all:auction OR all:bidding OR all:overestimation&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T21:50:07Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:winner's+OR+(all:curse+OR+(all:auction+OR+(all:bidding+OR+all:overestimation)))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>15733</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08410v1</id>
+    <title>Tensor Networks for Block Adaptive Thermal Radiation Transport</title>
+    <updated>2026-11-05T18:16:16Z</updated>
+    <link href="https://arxiv.org/abs/2611.08410v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08410v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Thermal radiation transport (TRT) is computationally challenging because the photon specific intensity depends simultaneously on space, angle, and frequency, producing a high-dimensional state space whose cost grows rapidly with resolution. Tensor-network methods, such as the tensor train (TT) decomposition, can mitigate this curse of dimensionality when the solution admits low-rank structure, but localized nonseparable structure can drive substantial rank growth. Adaptive mesh refinement (AMR) provides a complementary means of making high spatial resolution tractable by concentrating resolution on features of interest that would otherwise be prohibitively expensive to resolve. When tensor representations are constructed locally on AMR blocks, this decomposition offers an additional advantage: nonseparable structure can remain confined to the blocks in which it occurs rather than driving rank growth throughout the domain. This paper introduces a framework for combining block-adaptive mesh refinement with block-local tensor-train representations of the photon specific intensity. The approach couples spatial adaptivity with localized low-rank compression, allowing fine-scale features to be resolved while limiting the impact of locally complex structure on tensor ranks elsewhere in the domain. We develop conservative ghost-cell transfer, coarse-fine flux correction, and refinement criteria that balance spatial discretization and tensor-rounding errors. Numerical experiments demonstrate that the method preserves low-rank structure across much of the domain while resolving localized features with AMR, achieving compression factors exceeding $\sim$10$^3$. The resulting framework provides a practical foundation for applying tensor-network methods to high-dimensional TRT on the multiscale, adaptively refined meshes encountered in radiation hydrodynamics simulations.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:16:16Z</published>
+    <arxiv:comment>34 pages, 15 figures, LA-UR-26-24582</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <author>
+      <name>Alex A. Gorodetsky</name>
+    </author>
+    <author>
+      <name>Patrick D. Mullen</name>
+    </author>
+    <author>
+      <name>Aditya S. Deshpande</name>
+    </author>
+    <author>
+      <name>Joshua C. Dolence</name>
+    </author>
+    <author>
+      <name>Chad D. Meyer</name>
+    </author>
+    <author>
+      <name>Jonah M. Miller</name>
+    </author>
+    <author>
+      <name>Luke F. Roberts</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08408v1</id>
+    <title>Averages of sub-additive functions through non-Følner sequences</title>
+    <updated>2026-11-05T18:14:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.08408v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08408v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the quantity $\sup_{φ\inΦ}\limsup_{n\to\infty}φ(F_n)/|F_n|$, where $\mathcal F= (F_n)_{n\in\mathbb{N}}$ is a sequence of finite subsets of a countable amenable group, and $Φ$ is a collection of subadditive functions. Under mild conditions on $Φ$ we prove that the aforementioned quantity equals the supremum over $φ\inΦ$ of the limit of $φ(F)/|F|$ as $F$ becomes more and more invariant, multiplied by a ``Følnerness'' constant $C(\mathcal F)\in[1,\infty]$. We have $C(\mathcal F)=1$ if and only if $\mathcal F$ is Følner. A corollary of this result is that every choice of a non-Følner sequence overestimates topological and measure-theoretic entropy by the multiplicative factor $C(\mathcal F)$ (in the positive entropy case).
+  We obtain a generalization of classical results of Goodman, Krug, and Newton, on the so-called proportionality principle for sequence entropy, and their extension by Gao, Huang, and Zhu to countable amenable groups.</summary>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.GR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:14:40Z</published>
+    <arxiv:comment>17 pages</arxiv:comment>
+    <arxiv:primary_category term="math.DS"/>
+    <author>
+      <name>Nicanor Carrasco-Vargas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08247v1</id>
+    <title>Certifying quantum code and circuit distances at scale</title>
+    <updated>2026-11-05T16:25:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.08247v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08247v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Code and circuit distances characterize how strongly quantum error correction suppresses logical errors and guide code comparisons, schedule choices and resource estimates. Yet many published distances are only upper bounds from heuristic searches. Here, we express both distances as tropical partition functions and evaluate them with rank-based dynamic programming and weight-bounded search. Circuit reductions and relaxations shrink the problems, and proved lower bounds with explicit logical errors of matching weight certify exact values. On two benchmarks, our method certifies more instances than all other tested exact solvers combined. We certify distances for codes with up to 31,200 qubits, such as Google's modular hyperbolic codes, and for memory circuits with up to $8\times10^5$ fault mechanisms, such as those of high-rate Cornucopia codes. Our audit of 26 recent papers identifies overestimated distances and non-tight upper bounds in 10 papers, with a maximum discrepancy of at least eight. Certified distances also guide circuit design and show which defective chips remain usable. In particular, we certify circuit distance 16 for IBM's two-gross memory circuits with the standard schedule, not the assumed 18, whereas redesigned schedules reach 18 at one noisy cycle, at the cost of one more timestep per cycle. At 99.98% junction yield, keeping gross-code memory blocks with dead checks that are certified at distance 10 or more raises the estimated usable share from 53% for perfect blocks alone to 94% with an improved schedule.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T16:25:02Z</published>
+    <arxiv:comment>73 pages (18 pages main text, 55 pages Supplementary Information), 8 figures. Code and data: https://github.com/Fanerst/tropidist</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Bin Cheng</name>
+    </author>
+    <author>
+      <name>Naixu Guo</name>
+    </author>
+    <author>
+      <name>Feng Pan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08127v1</id>
+    <title>An Agent-Driven, Cross-Validated Inverse-Design Pipeline for Dielectric Metasurfaces</title>
+    <updated>2026-11-05T14:57:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.08127v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08127v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Inverse design of dielectric metasurfaces is powerful but labour-intensive: each new target requires choosing a parameterization and a figure of merit, managing compute resources, and critically assessing results that may be numerically unconverged, sensitive to fabrication errors or trapped in local optima. Here we present an open-source pipeline in which an artificial intelligence (AI) coding agent turns a plain-language specification into metasurface optimization runs, executes them, analyses every run with a fixed checklist and proposes the next iteration. Designs are optimized with differentiable three-dimensional rigorous coupled-wave analysis (RCWA), including robustness to fabrication tolerances, and every reported design is independently verified with finite-difference time-domain (FDTD) simulations. We demonstrate the workflow at 1550 nm on a freeform silicon metagrating, on a polarization-independent meta-atom library assembled into beam-deflecting supercells, and on metalenses built from the same library. In the metagrating case, the independent FDTD verification revealed a 5\% overestimate of the efficiency by the optimization model that a conventional convergence test had not detected, and the robust design retained most of its efficiency under $\pm$10~nm fabrication errors. In the other cases, instead, the obtained RCWA results are confirmed by full-wave simulations.</summary>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:57:23Z</published>
+    <arxiv:comment>The code, are openly available on GitHub at \url{https://github.com/GiuseppeELio/metasurface-agent-pipeline} (MIT License) and archived on Zenodo at 10.5281/zenodo.23982523</arxiv:comment>
+    <arxiv:primary_category term="physics.optics"/>
+    <author>
+      <name>Giuseppe Emanuele Lio</name>
+    </author>
+    <author>
+      <name>Roberto Caputo</name>
+    </author>
+    <author>
+      <name>Alain J. Corso</name>
+    </author>
+    <author>
+      <name>Maria Guglielmina Pelizzo</name>
+    </author>
+    <author>
+      <name>Antonio Ferraro</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08123v1</id>
+    <title>Adaptive pairwise preference elicitation for decision support: identifying the best alternative with fewer judgments</title>
+    <updated>2026-11-05T14:56:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08123v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08123v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interactive decision support systems often require repeated preference judgments, although identifying the best alternative may not justify eliciting all \(n(n-1)/2\) pairwise comparisons. We propose ALEC (Adaptive Lexicographic Elicitation of Comparisons), which re-ranks the alternatives after each judgment and asks the first unobserved pair in the lexicographic order of the current ranking, using the Analytic Hierarchy Process as the concrete setting. Under a log-normal error model, directly comparing a contrast maximises the one-step reduction in its effective resistance. Posterior bounds on the probability of a wrong choice or of exceeding a relative-loss tolerance provide stopping rules valid under adaptive questioning, while a consistency-and-margin condition gives a deterministic certificate of agreement with the full-matrix winner. Simulations show that re-ranking is most useful in larger problems with limited budgets; ALEC outperforms Harker's original rule in most scenarios with \(n\ge11\), while under a common stopping rule it achieves higher hit-rate point estimates than the stronger Harker-log variant at a modest additional questioning cost. With a 5\% loss tolerance and a cap of \(2n\) additional comparisons, the stopping rule saves \res{prot-s06-saveadd-min}--\res{prot-s06-saveadd-max}\% of them, while among runs stopped by the bound the observed rate of losses above tolerance remains at most \res{s06-errearly-max}\%, against a nominal 10\%. ALEC therefore provides an adaptive elicitation module for decision support systems that balances decision precision against user effort.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:56:24Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Luis Ángel Calvo</name>
+    </author>
+    <author>
+      <name>Jiri Mazurek</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07784v1</id>
+    <title>EnergyBench: a live, gate-aligned benchmark of day-ahead forecasts for European power markets</title>
+    <updated>2026-11-05T10:26:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.07784v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07784v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Energy forecasting models are usually compared on backtests and fixed public datasets. Backtests can use data that did not yet exist when the forecast would have been made, and a fixed test set, reused across studies and possibly contained in the pretraining data of foundation models, invites overfitting to the benchmark. EnergyBench evaluates every entry live instead. Each day at 11:30 CET/CEST, thirty minutes before the day-ahead (SDAC) gate closes, every model forecasts the next day's price, wind and solar generation and load on the 15-minute grid for six bidding zones (BE, NL, FR, DE-LU, DK1, DK2). Unlike existing live benchmarks, EnergyBench runs the models itself, on one information set that it freezes at the cut-off and publishes, including three numerical weather prediction models, so that foundation models can be compared with and without the same weather covariates under the actual market deadline. Errors are pooled per series against a seasonal-naive baseline, and models are ranked by a Bradley-Terry rating on the Elo scale with a day-bootstrap interval. The field spans baselines, linear and gradient-boosted models on the frozen weather, eighteen time-series foundation models from eleven families, ensembles, and the grid operators' own forecasts. Over the first thirty-two live days, the covariates reduced the error of each of the ten foundation models run with and without them by 37-51% on matched races (64-73% on wind, 48-61% on solar). Used zero-shot, these models match or outperform a LightGBM model trained on the same covariates. Model size, from 3M to 331M parameters, has a much smaller effect, and median ensembles of the covariate models rank highest. The grid operators' pre-gate forecasts remain ahead on wind and solar, where the best single foundation models have 16-22% more error; on load the gap is 4-6%, within the intervals.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T10:26:36Z</published>
+    <arxiv:comment>21 pages, 10 figures, 7 tables. Live benchmark at https://energybench.foretec.co</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Evgenii Genov</name>
+    </author>
+    <author>
+      <name>Ander Martinez Alonso</name>
+    </author>
+    <author>
+      <name>Christoph Bergmeir</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07667v1</id>
+    <title>Who Should Know What? Empirical Information Design for Multi-Agent LLM Economies</title>
+    <updated>2026-11-05T08:51:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.07667v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07667v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The performance of multi-agent LLM systems depends not only on the capabilities of the underlying models but also on information-sharing policies, which govern what information each agent observes and at what level of detail. But does providing AI agents with more detailed information always improve collective outcomes, or can transparency paradoxically degrade efficiency? To investigate this, we introduce empirical information design, an experimental framework that systematically compares disclosure policies across economic markets populated by LLM agents, while holding interaction rules and models fixed. We evaluate ten frontier LLMs in multi-resource trade, bilateral bargaining, and double auctions, using ground-truth utilities to decouple identified opportunities from realized outcomes. We find that finer information disclosure yields highly model-dependent results. In trade, revealing exact valuations rather than ordinal preference rankings reduces realized gains for GPT-6 Sol (from 98% to 91% of maximum) yet increases them for Claude Sonnet 5 (from 72% to 86%). In bargaining, exact information leads Grok 4.7 to produce less balanced agreements, whereas Claude Opus 5.5 divides gains symmetrically. In double auctions, full disclosure inflates price demands, triggering market breakdown and lowering welfare for Gemini 3.1 Pro (97% to 78%), Claude Opus 5.5 (94% to 64%), and Grok 4.7 (97% to 62%). Overall, these results suggest that model selection and information design must be co-optimized, as LLMs vary in how their strategic responses to information impact system objectives.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T08:51:37Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Mete Erdogan</name>
+    </author>
+    <author>
+      <name>Mirac Suzgun</name>
+    </author>
+    <author>
+      <name>Aneesh Pappu</name>
+    </author>
+    <author>
+      <name>Guowei Xu</name>
+    </author>
+    <author>
+      <name>Batu El</name>
+    </author>
+    <author>
+      <name>Andrew A. Schoen</name>
+    </author>
+    <author>
+      <name>Furong Huang</name>
+    </author>
+    <author>
+      <name>John P. Dickerson</name>
+    </author>
+    <author>
+      <name>Mert Pilanci</name>
+    </author>
+    <author>
+      <name>James Zou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07640v1</id>
+    <title>Beyond Instruction Override: Benchmarking Indirect Prompt Injection with Task-Tampering Attacks</title>
+    <updated>2026-11-05T08:25:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.07640v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07640v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Indirect prompt-injection (IPI) benchmarks predominantly test planted instructions that redirect a tool-using agent toward an attacker-chosen task. Yet attacker-controlled content can instead tamper with the outcome of the task already in progress. A buyer's dispute evidence can cite a false refund policy to inflate a refund without changing the task. We define IPI by authority rather than instruction-like wording: planted content constitutes an attack when it attempts to influence a decision that its source is not authorized to determine. We introduce a benchmark that makes this boundary explicit: in each of 90 validated cases across three tool-use environments, the user request specifies the source that resolves the targeted decision. Every attack tampers with a decision required by the benign task rather than replacing that task. Each case has attacks with the same harmful outcome that target up to six parts of the agent's decision making: its objective, decision rules, available actions, expected consequences, reading of observations, or beliefs about the current state. Without a defense, attacks on three of the five other targets (decision rules, available actions, and state) have higher mean success than objective attacks across five LLMs. A detection-and-removal defense reduces objective-targeting attacks to 2.4% success but leaves observation- and state-targeting attacks at 9.5% and 12.1%; this gap persists under detection-optimized rewrites. A tool-policy defense still allows 15.4% attack success, close to 17.0% without a defense, because these attacks generally retain expected tools and manipulate values obtained during execution. Evaluations whose attacks redirect the task or target only the agent's objective can therefore overestimate the coverage of these defenses. Code and data are available at https://github.com/amazon-science/task-tampering-prompt-injection.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T08:25:27Z</published>
+    <arxiv:comment>34 pages, 6 figures. Code and data: https://github.com/amazon-science/task-tampering-prompt-injection</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Rongting Zhang</name>
+    </author>
+    <author>
+      <name>Martin Bertran</name>
+    </author>
+    <author>
+      <name>Sandeep Avula</name>
+    </author>
+    <author>
+      <name>Chia-Jung Lee</name>
+    </author>
+    <author>
+      <name>Vanessa Murdock</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07459v1</id>
+    <title>Inference after selection on randomized p-values</title>
+    <updated>2026-11-05T05:11:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.07459v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07459v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider inference on parameters and hypotheses selected using p-values. We provide a simple procedure to decompose a p-value into two components, one for inference and one for selection, that are independent under the null hypothesis. To control the Type 1 error rate conditional on selection of the null hypothesis from randomized p-values, we develop tests motivated by the selective inference approaches of data thinning, fission, and carving. Unlike the typical application of these approaches, however, our tests only make use of the p-values rather than the full data. Furthermore, we construct confidence intervals that attain the nominal conditional coverage and corresponding estimators. In the context of the file drawer problem, the winner's curse, and sequential testing, we show that our proposals offer both theoretical and empirical advantages over existing randomized and non-randomized approaches. Lastly, we apply our methods for selective inference on genetic associations using publicly-available p-values from the UK Biobank.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T05:11:58Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Ronan Perry</name>
+    </author>
+    <author>
+      <name>Daniela Witten</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07240v1</id>
+    <title>Nonparametric Subgraph Regression</title>
+    <updated>2026-11-04T23:43:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.07240v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07240v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Estimation and inference on a single large network are challenging due to dependence among observations. This paper studies nonparametric regression for outcomes defined on groups of $p$ agents, such as the indicator that three agents in a network form a triangle. Outcomes on groups that share an agent may be dependent, while outcomes on disjoint groups are independent. I call this problem subgraph regression; it nests dyadic regression as the special case $p=2$. Its leading application concerns subgraphs of a network, but the methods apply to any outcome defined on groups of agents. I establish a variance bound, uniform convergence rates in probability, and pointwise asymptotic normality for the subgraph analogue of the Nadaraya-Watson kernel regression estimator. The setting differs from regression with i.i.d. data in two ways: (i) the number of observations, of order $N^p$, overstates the effective sample size, which is $N$, and (ii) the rate of convergence depends on the dimension of the covariates of a single agent rather than of all $p$ agents, which mitigates the curse of dimensionality.</summary>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T23:43:52Z</published>
+    <arxiv:primary_category term="econ.EM"/>
+    <author>
+      <name>Wenxuan Ding</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07234v1</id>
+    <title>Archetypal contexts in the neurons of language models: an architecture for intelligence?</title>
+    <updated>2026-11-04T23:38:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.07234v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07234v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We validate our previous hypothesis that a language model holds relational patterns apart from the subject domains that instantiate them (Nordfors, 2026). These archetypal contexts are patterns of relations that people recognize across many fields, such as the tipping point or winner takes all, held once and applied across domains. We show this inside the model, Qwen3.8-27B. One set of neurons carries the archetype, say the tipping point; another carries the topic, say politics, ecology or cell biology; a third carries the language, such as English, Spanish or Chinese. Silence the tipping point's neurons, and the model no longer identifies the pattern but still knows what the text is about. Silence the topic's, and it loses the topic but still names the pattern. In the neuron maps the layers organize themselves into a sandwich: the outer layers carry languages, the layers inside them topics, the layers at the heart archetypes. The sandwich emerges spontaneously during pretraining and appears in every model we mapped. Archetypes are the architecture for analogy, and we strongly suggest that this structure of archetypes and topics is the mechanism of a language model's intelligence: we see it self-organize as the model is trained. The neurons, the texts and the code are released with this paper as its reproduction package, so that anyone can repeat the test inside the model.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T23:38:46Z</published>
+    <arxiv:comment>18 pages, 7 figures, 2 tables. Reproduction package (neuron sets, texts, answers, code) in the ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>David Nordfors</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07182v1</id>
+    <title>The shear Alfvén continuum of optimized stellarators</title>
+    <updated>2026-11-04T22:12:12Z</updated>
+    <link href="https://arxiv.org/abs/2611.07182v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07182v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The shear Alfvén continuum has been studied extensively in tokamaks, but its gap structure in modern optimized stellarators has received less attention, despite its importance for energetic-particle confinement in fusion pilot plants. We compute and compare the continua of five reactor-scale stellarator equilibria: two quasi-axisymmetric (QA), two quasi-helically symmetric (QH), and one quasi-isodynamic (QI). We present selective Fourier mode schemes that provide a sufficient resolution of eigenfrequencies within the frequency range of interest. In all five configurations, the widest gap is the HAE(2,$N_{\text{fp}}$) gap, which is driven by rotating ellipticity. This gap lies in the frequency range of strong resonance with prompt fusion-born alphas in the QA configurations but not in the QH configurations, suggesting that QH configurations may be easier to optimize for alpha confinement. Near-axis theory predicts the HAE(2,$N_{\text{fp}}$) and EAE gap widths well but overestimates the MAE gap widths and the gap widths of the QI configuration. These discrepancies likely arise from interactions between gaps, which depend on the rotational transform profile and are not captured by near-axis theory.</summary>
+    <category term="physics.plasm-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.comp-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T22:12:12Z</published>
+    <arxiv:primary_category term="physics.plasm-ph"/>
+    <author>
+      <name>Abdullah Hyder</name>
+    </author>
+    <author>
+      <name>Elizabeth Paul</name>
+    </author>
+    <author>
+      <name>Alexey Knyazev</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07160v1</id>
+    <title>A Survey of Nonlinear Filtering Methods for Data Assimilation and Recent Advances in Generative AI-Enabled Score Filters</title>
+    <updated>2026-11-04T21:36:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.07160v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07160v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many real-world applications, such as numerical weather prediction or wildfire tracking, involve modeling highly nonlinear dynamical systems that are chaotic and influenced by various sources of uncertainty. To improve model prediction accuracy and reduce such uncertainties, data assimilation (DA) combines the dynamical model with partial, noisy observations to estimate the evolution of the system's state. Doing so depends on solving the optimal filtering problem: computing the conditional distribution of a hidden state given a sequence of observations. Classical approaches fail along three distinct axes: Kalman-based methods assume Gaussian posteriors and produce biased estimates under nonlinear observation operators; particle-based methods represent distributions with weighted samples and collapse in high dimensions due to the curse of dimensionality; and kernel-based methods move beyond discrete particle representations but cannot maintain their density approximation affordably as dimension grows. The Ensemble Score Filter (EnSF) avoids all three constraints by encoding the filtering density in a score function and approximating that score with a training-free Monte Carlo estimator, enabling stable filtering in high-dimensional, chaotic systems. This survey traces EnSF's mathematical foundations, establishes it as the state of the art for non-Gaussian, high-dimensional filtering, and examines fourteen extensions that expand its operational reach. Twelve of the fourteen extensions preserve this training-free Monte Carlo estimator at the core of the update, with only two departing from it to achieve planetary-scale deployment.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T21:36:57Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Cath Pham</name>
+    </author>
+    <author>
+      <name>Kadesha Reynolds</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07142v1</id>
+    <title>Convection in the interior of Cepheid variable stars</title>
+    <updated>2026-11-04T21:14:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.07142v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07142v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper is associated with a poster winner of a 2025 American Physical Society's Division of Fluid Dynamics (DFD) Gallery of Fluid Motion Award for work presented at the DFD Gallery of Fluid Motion. The original poster is available online at the Gallery of Fluid Motion, https://doi.org/10.1103/APS.DFD.2025.GFM.P005.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T21:14:17Z</published>
+    <arxiv:comment>Accepted for publication in Physical Review Fluids. This paper is associated with a poster winner of a 2025 APS DFD Gallery of Fluid Motion Award</arxiv:comment>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Maxime Stuck</name>
+    </author>
+    <author>
+      <name>Jane Pratt</name>
+    </author>
+    <arxiv:doi>10.1103/9l88-6cxk</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1103/9l88-6cxk" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07069v1</id>
+    <title>Finite-Time Convergence and Regret Guarantees for Neural Reinforcement Learning in POMDPs</title>
+    <updated>2026-11-04T19:25:21Z</updated>
+    <link href="https://arxiv.org/abs/2611.07069v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07069v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning (RL) in Partially Observable Markov Decision Processes (POMDPs) is computationally challenging due to the curse of long-range dependence on history. Fortunately, recent studies have shown that a range of POMDPs that satisfy the filter stability assumption can be well approximated by a superstate Markov Decision Process (MDP) based on a truncated history in a finite-memory window, with a value gap that decays with the window length. However, existing finite-time convergence analyses on such superstate MDP surrogates are either limited to over-simplified linear function approximation or rely on an i.i.d. sampling oracle that is violated by POMDP trajectories, both of which severely limit the applicability of these theoretical results in practice. This motivates us to bridge the gap by investigating RL in POMDPs with nonlinear neural value function approximation. Our main contributions are threefold: i) We first establish a new finite-state MDP point-wise approximation error bound, which lays the foundation for our RL algorithm design and analysis in POMDPs; ii) By applying Temporal-Difference (TD) learning to POMDP-generated superstate transitions and targeting the Bellman fixed point of the superstate MDP, we prove a finite-time critic error bound with nonlinear neural value function approximation; and iii) By combining the neural critic function approximation error bound with the policy mirror descent framework, we obtain a finite-time sublinear regret against the optimal POMDP value. To the best of our knowledge, such a finite-time sublinear regret based on neural function approximation is the first in the literature for finite-memory POMDPs. Our numerical experiments also verify our theoretical results.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-04T19:25:21Z</published>
+    <arxiv:comment>33 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Jingjuan Huang</name>
+    </author>
+    <author>
+      <name>Zhiyao Zhang</name>
+    </author>
+    <author>
+      <name>Alvaro Velasquez</name>
+    </author>
+    <author>
+      <name>Nathaniel D. Bastian</name>
+    </author>
+    <author>
+      <name>Jia Liu</name>
+    </author>
+  </entry>
+</feed>

@@ -1,0 +1,361 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/AM4jmaCFb55Apy3p7Mo9ZY5rvqg</id>
+  <title>arXiv Query: search_query=all:"relative risk reduction" OR all:absolute OR all:risk OR all:medical OR all:communication&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T21:50:06Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22relative+risk+reduction%22+OR+(all:absolute+OR+(all:risk+OR+(all:medical+OR+all:communication)))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>260970</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08486v1</id>
+    <title>Do You Miss the Nights We Spent Crafting Figures? Rethinking Teaser and Framework Figures in the Age of Generative AI</title>
+    <updated>2026-11-05T18:59:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.08486v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08486v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scientific figures give research ideas a visual form through choices of abstraction, composition, and emphasis. Generative AI offers new ways to realize these choices, raising questions about explanatory clarity and purposeful visual expression. We examine these questions through a visual retrospective of 371 motivation and framework figures from 200 papers. The corpus comprises a quota-based main sample of 160 papers spanning four temporal periods and a separate purposive style-contrast sample of 40 papers. A single multimodal judge evaluates six dimensions of communication and design, with three repeated judgments per figure. We attempt source-constrained revisions of all 371 figures, of which 369 pass the recorded fidelity checks. Original-figure ratings show no uniform decline across periods. Revisions increase mean clarity ratings by 0.428 points and decrease aesthetic coherence ratings by 0.111 points on a five-point scale. Gains in the six-dimension average are larger for main-sample motivation figures than for frameworks. Case analyses show that added explanation can clarify comparisons while leaving typographic hierarchy and visual economy unresolved. These model-based findings support researcher-led design, with AI assisting exploration and authors retaining responsibility for explanatory purpose, composition, and scientific relationships. The accompanying atlas and evaluation records are available at https://ntu-ai4x.github.io/Rethinking_Figures/index_en.html.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:33Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Xiaoqi Zhao</name>
+    </author>
+    <author>
+      <name>Youwei Pang</name>
+    </author>
+    <author>
+      <name>Kailai Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08483v1</id>
+    <title>SwarmEvolve: Latent Agent Swarms for Evolutionary Discovery and Optimization</title>
+    <updated>2026-11-05T18:59:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.08483v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08483v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM-guided evolutionary search uses AI agents to improve programs for mathematical and computational problems by iteratively refining solutions and combining high-scoring methods. However, the process is often slow because the LLM generates a long textual chain of thought for each round and must repeat this generation many times to maintain population diversity. We present SwarmEvolve, a framework in which hundreds of low-cost agents per round work in swarms, reason in latent space without decoding to text, and share information by passing KV caches. Each swarm studies the problem from a different angle. A novelty filter keeps the most distinct agent ideas by directly measuring the distances between the agents' hidden state vectors. Crossover of ideas happens naturally in latent space, as a summarizer agent receives the combined KV caches of all swarm members. On 21 problems in mathematical discovery and scientific computing, SwarmEvolve gets the highest average score and needs a median of only 3 to 8 minutes to reach the best scores that other state-of-the-art frameworks reach in 60 minutes. On several problems, SwarmEvolve with Qwen3 8B improves on the solutions that AlphaEvolve first found with frontier LLMs. Our work shows that agent swarms that communicate in latent space offer a fast, low-cost approach to program search for scientific problems.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:29Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Qile Jiang</name>
+    </author>
+    <author>
+      <name>George Em Karniadakis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08460v1</id>
+    <title>Room-Temperature Quantum Emission from Boron Nitride Nanotubes</title>
+    <updated>2026-11-05T18:51:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.08460v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08460v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum information systems such as quantum key distribution and quantum communications require bright, high-purity, stable sources of single photons to act as carriers of quantum information. As such, methods for obtaining single photon emitters (SPEs) in solid-state devices capable of articulating with quantum photonic circuits are a necessary obstacle that must be overcome. Hexagonal boron nitride (hBN) flakes have been extensively studied as a host material for SPEs, though working in two dimensions is accompanied by engineering complexity. However, dimensionality can be reduced through the implementation of boron nitride nanotubes (BNNTs). Here we investigate the potential of BNNTs as room-temperature SPEs using confocal photoluminescence microscopy and Hanbury Brown-Twiss interferometry. Quantum emitters were found in BNNTs spanning the entirety of the visible spectrum, including spectral regions where SPEs within hBN have not been reported. Furthermore, each tube was found to possess multiple SPEs at varying emission wavelengths along the length, exhibiting lifetimes as fast as 0.5 ns, which is about two-fold faster than the fastest hBN SPEs. Additionally, we demonstrate that surface passivation/coating mitigates blinking events, therefore increasing the emitter stability. Thus, BNNTs can function as a single structure supporting a variety of multiwavelength SPE sources, while maintaining a compact radius of ~25 nm, making them ideally suited for deterministic placement and integration within nanophotonic devices such as waveguides and interferometric filters.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:51:59Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Ke-Sean J. M. Peter</name>
+    </author>
+    <author>
+      <name>Ryan A. Kowalski</name>
+    </author>
+    <author>
+      <name>David A. Curie</name>
+    </author>
+    <author>
+      <name>Dakota Braaten</name>
+    </author>
+    <author>
+      <name>Matthew W. Day</name>
+    </author>
+    <author>
+      <name>Denis R. Candido</name>
+    </author>
+    <author>
+      <name>Deyu Li</name>
+    </author>
+    <author>
+      <name>Richard F. Haglund</name>
+    </author>
+    <author>
+      <name>Joshua D. Caldwell</name>
+    </author>
+    <author>
+      <name>Richarda Niemann</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08456v1</id>
+    <title>Cognitive Tours: Making Understanding a Deliverable in AI-Assisted Development</title>
+    <updated>2026-11-05T18:48:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.08456v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08456v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative AI and agentic coding are accelerating software development, leading to concerns about technical debt. But two less visible forms of debt, cognitive debt and intent debt, are emerging as key risks to software health. Cognitive debt is the absence or erosion of a team's shared understanding where no one can confidently explain how a system works or predict the impact of a change. Intent debt is the lack of clearly articulated goals, constraints, and rationale that explain what the system is for and guide how it should evolve. This paper presents Cognitive Tours, a tool designed to mitigate and repair cognitive and intent debt. Cognitive Tours is a web-based prototype for creating and following curated paths connecting user needs, design decisions, code, tests, and open questions. AI-assisted skills help audit existing waypoints and tours for possible problems or staleness and suggest candidates for new ones; humans decide what matters, verify relationships, and construct the narrative. This division of work deliberately preserves productive friction: the sensemaking involved in selecting, explaining, and revising a tour, which is intended to foster and share understanding. Our demonstration uses a tour of Cognitive Tours itself to introduce the tool and illustrate its design decisions and interaction mechanisms. A proposed evaluation agenda concludes the paper. A demo is available at https://cognitive-tours-demo.vercel.app/</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:48:06Z</published>
+    <arxiv:comment>6 pages, shorter version submitted to ICSE 2027 Demo Track (under review)</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Margaret-Anne Storey</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08441v1</id>
+    <title>Edge-Assisted Crowdsensing for Explainable Cyclist Safety Perception</title>
+    <updated>2026-11-05T18:33:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.08441v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08441v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cyclist fatality rates remain high despite policy support for active travel, and autonomous vehicles add complexity to mixed traffic. Neither crash statistics nor multi-model detection pipelines scale to continuous monitoring of perceived safety along a route. We present an edge-assisted crowdsensing system: handlebar cameras supply street-level frames, a vision-language model (VLM) turns each frame into structured traffic attributes through a single prompt, and an explainable boosting machine (EBM) combines them with OpenStreetMap road infrastructure and on-bike kinematics to predict a crowdsourced 1-9 safety score. Extraction belongs at the network edge: the fastest self-hosted model needs 2.49 s per frame and scoring takes 0.4 ms on a CPU. On 1,362 annotated frames from two London routes, the EBM regressor reaches 72.2 percent binary accuracy and a mean absolute error of 1.011 under five-fold cross-validation. It is within one accuracy point of black-box ensembles. Its per-feature shape functions give exact attribution: physical lane separation is worth +0.97 rating points, a painted lane +0.70 and a construction site -0.65. Planners can therefore price an infrastructure change in rating points, and the results enter cost-benefit analysis directly. We also report inter-annotator agreement (alpha = 0.4695), an attribute audit, and a sensitivity analysis linking attribute error to accuracy. With re-encoding, a 20 s sampling interval serves 1,000 riders at 54 Mbit/s at a cost of 1.4 accuracy points, making continuous monitoring practical.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.IV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:33:58Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hongsen Cao</name>
+    </author>
+    <author>
+      <name>Chia-Yen Chiang</name>
+    </author>
+    <author>
+      <name>Mona Jaber</name>
+    </author>
+    <author>
+      <name>Meihui Wang</name>
+    </author>
+    <author>
+      <name>Yasmin Fathy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08439v1</id>
+    <title>Label-Wording Augmentation in a Typed-Decision Encoder: Gains on Unfamiliar Words, Not on Abbreviations or Codes</title>
+    <updated>2026-11-05T18:31:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08439v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08439v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Typed-decision models score options that the caller supplies at request time, so their accuracy depends on label wording that the model's developer does not control. We compare two releases of a 307M-parameter multilingual cross-encoder, Ru-Jev, trained on thirteen Russian-language tasks; the later release adds an augmentation that presents labels in several surface forms. Holding questions fixed and varying only how eighteen routing labels are worded, we evaluate ten label vocabularies, produced by three separate processes and checked for overlap with the training data, with five candidates per question and, for eight of them, also with eighteen. On held-out vocabularies made of ordinary or borrowed words (English-derived jargon, office slang, department names), the augmented release is more accurate in every setting, by up to 0.24. Eleven of these fourteen gains survive a Holm correction (slang with eighteen candidates and descriptive sentences with five do not), and for jargon on all labels the label-level interval excludes zero in both settings. On abbreviations and opaque codes it gives no usable gain: on abbreviations it is not better, and worse on the clean slice, and on opaque codes both releases stay at or below chance once labels related to training options are removed. In most cells where accuracy rises, the risk-coverage area falls, but with eighteen candidates confident errors rise on jargon and slang. On two datasets neither release saw, accuracy moves by -8.4 and +5.6 points. We also report four evaluation hazards from comparing the two releases.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:31:24Z</published>
+    <arxiv:comment>11 pages, 6 tables. Model: https://huggingface.co/besktech/ru-jev ; code: https://github.com/beskvladimir-create/ru-jev ; archived release: https://doi.org/10.5281/zenodo.23986847</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Vladimir Beskorovainyi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08437v1</id>
+    <title>Deep-learning surrogate model for rapid quantum-noise computation in dual-pump fiber-optic phase-sensitive amplifiers</title>
+    <updated>2026-11-05T18:30:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.08437v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08437v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Fiber-optic parametric amplifiers in a phase-sensitive amplifier (PSA) configuration are well known for their low noise properties. Quantum mechanics dictates that these amplifiers can have a 0 dB noise figure (NF) (ratio of signal-to-noise ratio at the input and output of the amplifier) under certain conditions. However, for a dual-pump configuration, when the system is highly nonlinear, fully quantum calculations of NF become non-trivial. In such cases, semi-quantum models of NF evaluation exists, however, they are often complicated and resource intensive. To simplify that, in this work, first we use a semi-quantum NF calculation framework for the generation of numerically simulated input-output dataset of NF over a large parameter spaces. Then we use the data to train an optimized deep neural network (DNN) for rapid NF prediction. Utilizing the DNN, we demonstrate about 400 times reduction in the computation time compared to the standard semi-quantum NF evaluation approach with a mean absolute error (MAE) of 0.0015 dB. Using clustering we demonstrate a rapid exploration of the parameter space with respect to high gain (20 dB) and low NF (0.3 dB) targets and retrieve associated design parameters. These results illustrate the efficacy of machine learning-based approaches for rapid search of high-dimensional parameter spaces especially in compute intensive photonic systems.</summary>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:30:14Z</published>
+    <arxiv:primary_category term="physics.optics"/>
+    <author>
+      <name>Yousra Bouasria</name>
+    </author>
+    <author>
+      <name>Debanuj Chatterjee</name>
+    </author>
+    <author>
+      <name>Abdessamad Belfakir</name>
+    </author>
+    <author>
+      <name>Debabrota Basu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08433v1</id>
+    <title>MedGraph: Maintaining Patient State with Graph Memory for Long-Term Medical Dialogue</title>
+    <updated>2026-11-05T18:27:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.08433v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08433v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM-based medical assistants that follow a patient across visits need a memory that keeps the patient's clinical state correct as it changes. We examine the errors of five memory systems on longitudinal medical dialogue and find three recurring causes: the retrieved evidence gives an outdated state, includes another person's health facts, or lacks a safety fact the answer depends on. We present MedGraph, a graph memory built for these three cases. Construction extracts dated facts from each session, attributes each fact to the person it describes, and links medication, diagnosis, and measurement records into chains that keep earlier states. Retrieval ranks the patient's chains as units, reads each chain at the time the question asks about, and adds the original dialogue text; a patient profile lists every recorded safety fact with every question. On MedMemoryBench, MedGraph has the highest overall accuracy with both a GPT and a Qwen backbone, 10.5 and 10.4 points above the strongest of five baselines, with efficient memory construction and answering in the GPT setting.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:27:20Z</published>
+    <arxiv:comment>14 pages, 5 figures, 8 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Donghua Zhang</name>
+    </author>
+    <author>
+      <name>Zizheng Wang</name>
+    </author>
+    <author>
+      <name>Ze Dong</name>
+    </author>
+    <author>
+      <name>Yiding Feng</name>
+    </author>
+    <author>
+      <name>Siyu Qian</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08428v1</id>
+    <title>The Power of Meta Access in the Software of the Future --- Demonstrated on LLM Chat UIs and Chat AI</title>
+    <updated>2026-11-05T18:22:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08428v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08428v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Chat remains the default surface for many large language model (LLM) tasks, even as agentic tools such as OpenCode excel at coding and automation. Yet the model sees the current dialogue but not the workspace around it. We explore meta access---giving the assistant a structured, permissioned view of the interface itself and propose a ladder of levels: feature tutoring; metadata, settings, and preference access; retrieval over summaries and messages, confirmed mutation, and full orchestration. Meta access can turn a chat client from many screens into one entry point for finding, navigating, organising, and operating it, while raising risks around grounding, privacy, prompt injection, and trust. General-purpose agentic harnesses are runtimes; because they can change their own settings, meta access becomes reflexive and needs a separate control-plane boundary. We ground this in the Meta Chat prototype of the Chat AI client. It builds bounded context from, e.g., summaries, settings, and relevant messages; links references to conversations, topics, and personas; supports confirmed, reversible changes; offers a browsable tutorial library; and recommends personas as user-started conversations. By exposing application state in structured form, meta access can extend screen readers from widget descriptions to semantic workspace operations. Meta access thus turns chat from a window onto one conversation into a control layer for the whole workspace, extending chat toward agentic capability without surrendering user control. As assistants become embedded in IDEs, dashboards, office suites, and operating systems, AI-era interfaces should expose a structured, permissioned model of their state and capabilities, ideally by opening their existing metamodels through a debugger-like interface.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:22:24Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Julian Kunkel</name>
+    </author>
+    <author>
+      <name>Ali Doosthosseini</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08417v1</id>
+    <title>Benchmarks as Software: Terminal-Bench and the Case for Continuous Benchmarks</title>
+    <updated>2026-11-05T18:18:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08417v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08417v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Coding agents are among the most economically consequential deployments of LLMs to date, making reliable evaluation increasingly important. Yet even benchmarks that are carefully validated at release can become stale. As models improve, they can discover valid solutions that existing verifiers reject, while changes to evaluation infrastructure can invalidate assumptions embedded in tasks and tests. We call the resulting accumulation of defects benchmark maintenance debt: a growing gap between benchmark scores and the capabilities they are intended to measure. We introduce a continuous-validation workflow for agentic benchmarks that combines community reports, task artifacts, agent traces, automated oracle checks, and human-gated repairs. We apply this workflow to Terminal-Bench 2.0, a benchmark that underwent extensive human and LM-assisted review and red-teaming before release. Our audit identifies issues in roughly 30% of the benchmark, and we release the resulting repairs as Terminal-Bench 2.1. These repairs change evaluation results: accuracy increased by over 10 percentage points and leaderboard positions move by up to three ranks, even as the overall ranking remains highly correlated (Spearman rho = 0.958).
+  We evaluate how resource allocation shapes benchmark conclusions. We show that fixed wall-clock can materially change agent performance: For example, extending the time limit closes a 20pp harness gap on GPT 5.4 and shrinks a 30 pp gap on GPT 5.4 mini to 5 pp. Benchmark maintenance is therefore not only about repairing task artifacts: resource budgets are part of the measurement specification and must be validated alongside the tasks themselves.
+  More broadly, benchmark maintenance debt is not just accumulated implementation bugs: our results show that as models improve, both evaluation assumptions and resource settings may need to be revalidated.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:18:39Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>E. Kelly Buchanan</name>
+    </author>
+    <author>
+      <name>Crystal Zhou</name>
+    </author>
+    <author>
+      <name>Scott W. Linderman</name>
+    </author>
+    <author>
+      <name>Christopher Ré</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08414v1</id>
+    <title>Spectral and Subspace Dynamics of LoRA in Supervised Fine-Tuning and Reinforcement Learning</title>
+    <updated>2026-11-05T18:17:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08414v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08414v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Low-rank adaptation (LoRA) is commonly used in both supervised fine-tuning (SFT) and reinforcement learning (RL), often under similar optimizer settings. Yet, how the different dynamics of the two stages manifest in the low-rank increment that LoRA optimizes remains unclear. Tracking the singular spectrum and subspaces of LoRA updates on mathematical reasoning tasks, we find that RL concentrates the spectrum at every learning rate, while SFT expands it at moderate learning rates; moreover, RL rotates the singular subspaces much faster than SFT at small learning rates. Interpolating between SFT and RL one ingredient at a time, we pinpoint group-mean baseline subtraction as the source of both contrasts. A quadratic multi-index model updated via LoRA unveils the underlying mechanism: group-mean baseline subtraction tilts the balance between two competing forces, coherent fitting and gradient noise, toward spectral concentration and faster subspace rotation, while forcing the risk-favorable learning rate to be low. Guided by these dynamics, we tailor LoRA updates to each stage: in SFT, we flatten the spectrum of the full update to spread adaptation across singular directions, whereas in RL, we flatten the part of the update outside the current LoRA increment span to promote subspace rotation. Experiments on mathematical reasoning tasks across multiple models show that the respective configurations for SFT and RL yield the best performance among the compared methods in most evaluated settings.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:39Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Chenruo Liu</name>
+    </author>
+    <author>
+      <name>Zihan Wang</name>
+    </author>
+    <author>
+      <name>Yijun Dong</name>
+    </author>
+    <author>
+      <name>Qi Lei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08409v1</id>
+    <title>Conformal Prediction for Time-Dependent PDEs</title>
+    <updated>2026-11-05T18:15:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.08409v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08409v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Uncertainty quantification is crucial in scientific machine learning, where models inform safety-critical tasks such as flood forecasting, financial risk management, and thermal control in machines. Conformal prediction provides distribution-free coverage guarantees, but in time-dependent settings common to physics and engineering, these guarantees can break down, leading to systematic undercoverage. We study this problem in the context of surrogate models for time-dependent physical systems described by partial differential equations. We prove that in a function space setting, distributions at arbitrarily close times can be mutually singular, making exact coverage guarantees impossible. We further show that in discretized settings, the total variation distance between distributions often saturates exponentially fast with the grid resolution, mandating restrictions on the spatial discretization to ensure coverage. Finally, for certain settings, we show how to use principled weighted conformal prediction to obtain finite-sample coverage guarantees over growing time horizons.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:15:42Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Joshua Stiller</name>
+    </author>
+    <author>
+      <name>Annika Schneider</name>
+    </author>
+    <author>
+      <name>Eyke Hüllermeier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08399v1</id>
+    <title>Scaling Up Analog CIM: A Simulation Framework for Topology-Aware Mapping</title>
+    <updated>2026-11-05T18:11:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.08399v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08399v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Analog compute-in-memory (CIM) enables energy-efficient AI inference by performing in-situ matrix multiplication. The growing demand for deploying larger models motivates chiplet integration to expand CIM capacity. However, simulation abstractions based on local operator costs and aggregate communication metrics obscure the impact of weight-mapping topology when CIM system scales up. We develop a phase analysis that quantifies how strongly mapping topology affects system performance across hardware configurations and how mapping optimization translates into latency gains. To evaluate and exploit this design space, we present Isobar, a simulation platform integrating CIM decompositions, heterogeneous execution, and resource modeling. Validated against silicon measurements and cycle-accurate simulation, Isobar provides reliable cost estimates that enable effective mapping search across model and hardware configurations. For Gemma-7B prefill, Isobar-guided mapping reduces communication time by 23.3% and end-to-end latency by 18.6% relative to the strongest baseline. Isobar's system-level modeling show that analog CIM retains energy-efficiency potential relative to GPU when scaled to thousands of dies, and identify topology-aware mapping as a key design dimension for efficient execution.</summary>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:11:00Z</published>
+    <arxiv:primary_category term="cs.AR"/>
+    <author>
+      <name>Yuxin Ren</name>
+    </author>
+    <author>
+      <name>Danella Zhao</name>
+    </author>
+    <author>
+      <name>Huanrui Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08398v1</id>
+    <title>A Multimodal Haptic Interface for Simultaneous Softness and Thermal Modulation</title>
+    <updated>2026-11-05T18:10:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.08398v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08398v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Haptic interactions, such as touching an object in virtual reality, involve detecting a plethora of sensations through the skin. Whilst tactile displays exist to simulate and manipulate all of these cues individually, little progress has been made constructing devices that can control multiple cues simultaneously. This paper presents a tactile display technology that offers both softness and temperature change.
+  A prototype display, based on particle jamming and the thermal transfer of heated and cooled water, is evaluated in terms of its ability to change both stiffness and temperature. Mechanical evaluations demonstrate controllable stiffness increase of 300%, whilst thermal characterisation showed strong surface uniformity and a range of achievable temperatures from 10°C up to 50°C, with closed-loop control maintaining a 0.2°C error from a setpoint. This work advances the design of multimodal tactile displays with applications to perceptual research, medical simulation, and affective haptics.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:10:25Z</published>
+    <arxiv:comment>Published at EuroHaptics 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Joshua Brown</name>
+    </author>
+    <author>
+      <name>Fernando Bello</name>
+    </author>
+    <author>
+      <name>Lynette Jones</name>
+    </author>
+    <arxiv:doi>10.1007/978-3-032-32230-2_2</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/978-3-032-32230-2_2" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08394v1</id>
+    <title>Synthesis of Ovarian Cancer Multi-Omics Datasets: A Biology-Informed Evaluation Framework</title>
+    <updated>2026-11-05T18:07:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.08394v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08394v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Paired multi-omic cancer cohorts are costly to assemble and difficult to share, motivating synthetic cohorts as a complementary resource. As generative model development accelerates, we shift the focus from proposing yet another architecture to defining evaluation criteria that determine whether synthetic data preserve biologically relevant structure. We introduce a biology-informed and patient-disjoint framework for evaluating the generation of paired RNA expression and copy-number variation (CNV) profiles, and apply it to the longitudinal DECIDER high-grade serous ovarian cancer cohort. The framework assesses modality-specific fidelity and coherence between RNA and CNV pairs using agreement between real training and held-out data as a reference, alongside complementary training-data proximity diagnostics. We adapt three multi-omic integration architectures based on variational autoencoders to generate paired profiles. The model leading several fidelity and coherence measures also shows the strongest training-data proximity. The protocol and case study offer the community a reference for comparing future multi-omic generators.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:07:06Z</published>
+    <arxiv:comment>Accepted at the GenAI4Health Workshop at NeurIPS 2026 and in the Findings track of ML4H 2026. Both acceptances are non-archival</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Déborah Boyenval</name>
+    </author>
+    <author>
+      <name>Alina Malyutina</name>
+    </author>
+    <author>
+      <name>Jaana Oikkonen</name>
+    </author>
+    <author>
+      <name>Sammeli Liikkanen</name>
+    </author>
+    <author>
+      <name>Sampsa Hautaniemi</name>
+    </author>
+  </entry>
+</feed>

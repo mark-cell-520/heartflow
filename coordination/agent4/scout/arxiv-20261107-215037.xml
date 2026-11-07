@@ -1,0 +1,410 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/6+0nVF6wHHdO47Wmwie8+qreBbs</id>
+  <title>arXiv Query: search_query=all:"relative risk" OR all:versus OR all:"absolute risk" OR all:reporting&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T21:50:37Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22relative+risk%22+OR+(all:versus+OR+(all:%22absolute+risk%22+OR+all:reporting))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>195295</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08471v1</id>
+    <title>The three-dimensional Galilean black hole</title>
+    <updated>2026-11-05T18:55:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.08471v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08471v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We report a novel solution of three-dimensional Galilean Anti-de Sitter gravity. The theory can be formulated as a topological gauge theory invariant under the doubly extended Newton-Hooke group in three dimensions. The solution possesses four conserved charges: energy, angular momentum, spin and rest mass. Interestingly, the magnitude of the spin turns out to bounded from above by the rest mass. The solution exhibits the thermal properties that define a black hole configuration in terms of its gauge theoretical description. Temperature, angular velocity and other chemical potentials are obtained from suitable regularity conditions associated with the topology of the Euclidean continuation of the solution. At zero temperature, an extreme configuration is shown to emerge provided the bound between the spin and the rest mass saturates.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:51Z</published>
+    <arxiv:comment>7 pages, no figures</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Luis Avilés</name>
+    </author>
+    <author>
+      <name>Oscar Fuentealba</name>
+    </author>
+    <author>
+      <name>Diego Hidalgo</name>
+    </author>
+    <author>
+      <name>Pablo Rodríguez</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08469v1</id>
+    <title>Same Behavior, Different Mechanism: What Finite Experiments Can Certify About Integrated Information</title>
+    <updated>2026-11-05T18:55:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08469v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08469v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interpretability, AI auditing and assessments of machine consciousness increasingly rest on mechanism-level quantities: functionals of a system's causal transition law that describe how it computes, not what it outputs. Experiments see that law only through finite, partial and noisy interventions. We ask when such a quantity is identifiable from an experiment's access, continuous in the mechanism and certifiable from finite data, and answer exactly for a deliberately demanding case - the integrated information $\varphi$ of integrated information theory - in stochastic networks of four and five units with known ground truth. Behavior can be silent: a recurrent and a feed-forward network with identical input-output laws at their response delay carry 0.28 and 0 bits, yet internal recordings separate them within 4-53 trials. Partial access can be just as blind: in our examples, units left out of a one-step recording impose precision floors of 0.30-1.02 bits that no sample size lowers, and in all-but-self parity networks, recordings of any length see several hidden units only through the product of their fidelities - a symmetry that one intervention broke in exact checks. The measure has sharp edges: because $\varphi$ selects a partition, and the cause and effect it specifies, by one criterion and reports another, infinitesimal changes of mechanism that cross an edge change it by 25-100% at 99% of the edges we found in random networks, and about 1% of surrogate models that fit interventional data almost perfectly misreport it by more than 20%. One-sided claims survive: the same data certify a lower bound on both sides of an edge, and we prove $\varphi&gt;1.004$ bits throughout a 64-dimensional region of mechanisms and certify it from about $10^7$ controlled transitions with false-certificate probability at most $α$. Measurability is thus a design question with computable answers.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:31Z</published>
+    <arxiv:comment>30 pages, 7 figures. Code available as ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Linqian Wu</name>
+    </author>
+    <author>
+      <name>Diaoxuan He</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08461v1</id>
+    <title>Quantum Knowledge Distillation: State-of-the-art, Applications and Open Problems</title>
+    <updated>2026-11-05T18:53:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.08461v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08461v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Knowledge distillation transfers predictions, representations, or other supervisory information between learning models and is increasingly investigated in quantum machine learning. Its applications extend beyond compression to cross-architecture transfer, circuit approximation, distributed learning, and classical deployment of models trained using quantum-derived supervision. This survey reviews these approaches using two complementary classification axes: teacher-student configuration and the role of quantum resources in the distillation process. Quantum-inspired methods are discussed separately from methods that simulate quantum computations classically or execute them on quantum hardware. We explain how measurement probabilities, expectation values, classical readouts, state overlaps, and circuit-level objectives support different transfer mechanisms. We then critically assess the presented results against baseline design, execution conditions, uncertainty, and resource costs. The evidence shows that distillation can improve selected quantum students, but benefits are task- and architecture-dependent, and several studies find negligible gains or even performance degradation. Evaluations on physical quantum hardware remain limited, with some testing individual quantum components rather than complete learning pipelines. Heterogeneous protocols and incomplete resource reporting prevent general conclusions about practical quantum advantage. We identify priorities for controlled benchmarking, noise-aware learning, reproducible evaluation, and efficient transfer between quantum and classical models.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:53:05Z</published>
+    <arxiv:comment>21 pages, 3 figures, 4 tables</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Aldana Al-Sulaiti</name>
+    </author>
+    <author>
+      <name>Kuan-Cheng Chen</name>
+    </author>
+    <author>
+      <name>Muhammad Bilal Akram Dastagir</name>
+    </author>
+    <author>
+      <name>Ahmed Farouk</name>
+    </author>
+    <author>
+      <name>Saif Al-Kuwari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08460v1</id>
+    <title>Room-Temperature Quantum Emission from Boron Nitride Nanotubes</title>
+    <updated>2026-11-05T18:51:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.08460v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08460v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum information systems such as quantum key distribution and quantum communications require bright, high-purity, stable sources of single photons to act as carriers of quantum information. As such, methods for obtaining single photon emitters (SPEs) in solid-state devices capable of articulating with quantum photonic circuits are a necessary obstacle that must be overcome. Hexagonal boron nitride (hBN) flakes have been extensively studied as a host material for SPEs, though working in two dimensions is accompanied by engineering complexity. However, dimensionality can be reduced through the implementation of boron nitride nanotubes (BNNTs). Here we investigate the potential of BNNTs as room-temperature SPEs using confocal photoluminescence microscopy and Hanbury Brown-Twiss interferometry. Quantum emitters were found in BNNTs spanning the entirety of the visible spectrum, including spectral regions where SPEs within hBN have not been reported. Furthermore, each tube was found to possess multiple SPEs at varying emission wavelengths along the length, exhibiting lifetimes as fast as 0.5 ns, which is about two-fold faster than the fastest hBN SPEs. Additionally, we demonstrate that surface passivation/coating mitigates blinking events, therefore increasing the emitter stability. Thus, BNNTs can function as a single structure supporting a variety of multiwavelength SPE sources, while maintaining a compact radius of ~25 nm, making them ideally suited for deterministic placement and integration within nanophotonic devices such as waveguides and interferometric filters.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:51:59Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Ke-Sean J. M. Peter</name>
+    </author>
+    <author>
+      <name>Ryan A. Kowalski</name>
+    </author>
+    <author>
+      <name>David A. Curie</name>
+    </author>
+    <author>
+      <name>Dakota Braaten</name>
+    </author>
+    <author>
+      <name>Matthew W. Day</name>
+    </author>
+    <author>
+      <name>Denis R. Candido</name>
+    </author>
+    <author>
+      <name>Deyu Li</name>
+    </author>
+    <author>
+      <name>Richard F. Haglund</name>
+    </author>
+    <author>
+      <name>Joshua D. Caldwell</name>
+    </author>
+    <author>
+      <name>Richarda Niemann</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08441v1</id>
+    <title>Edge-Assisted Crowdsensing for Explainable Cyclist Safety Perception</title>
+    <updated>2026-11-05T18:33:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.08441v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08441v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cyclist fatality rates remain high despite policy support for active travel, and autonomous vehicles add complexity to mixed traffic. Neither crash statistics nor multi-model detection pipelines scale to continuous monitoring of perceived safety along a route. We present an edge-assisted crowdsensing system: handlebar cameras supply street-level frames, a vision-language model (VLM) turns each frame into structured traffic attributes through a single prompt, and an explainable boosting machine (EBM) combines them with OpenStreetMap road infrastructure and on-bike kinematics to predict a crowdsourced 1-9 safety score. Extraction belongs at the network edge: the fastest self-hosted model needs 2.49 s per frame and scoring takes 0.4 ms on a CPU. On 1,362 annotated frames from two London routes, the EBM regressor reaches 72.2 percent binary accuracy and a mean absolute error of 1.011 under five-fold cross-validation. It is within one accuracy point of black-box ensembles. Its per-feature shape functions give exact attribution: physical lane separation is worth +0.97 rating points, a painted lane +0.70 and a construction site -0.65. Planners can therefore price an infrastructure change in rating points, and the results enter cost-benefit analysis directly. We also report inter-annotator agreement (alpha = 0.4695), an attribute audit, and a sensitivity analysis linking attribute error to accuracy. With re-encoding, a 20 s sampling interval serves 1,000 riders at 54 Mbit/s at a cost of 1.4 accuracy points, making continuous monitoring practical.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.IV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:33:58Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hongsen Cao</name>
+    </author>
+    <author>
+      <name>Chia-Yen Chiang</name>
+    </author>
+    <author>
+      <name>Mona Jaber</name>
+    </author>
+    <author>
+      <name>Meihui Wang</name>
+    </author>
+    <author>
+      <name>Yasmin Fathy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08440v1</id>
+    <title>Signatures of Neutrinophilic Pion Dark Matter</title>
+    <updated>2026-11-05T18:31:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.08440v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08440v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the phenomenology of pion dark matter coupled to neutrinos in a confining sector that dynamically generates both small neutrino masses and dark matter mass from gauge confinement. Dark matter semi-annihilation to active neutrinos or annihilation to light sterile neutrinos can reproduce the observed relic abundance through thermal freeze-out while satisfying constraints from self-interactions. In the first scenario, semi-annihilations of sub-GeV dark matter in the galactic halo produce a flux of antineutrinos which can provide a viable interpretation for the mild electron antineutrino excess reported by the Super-Kamiokande collaboration. We assess the potential of the JUNO detector to test this interpretation. In the second scenario, light sterile neutrinos can leave signatures through displaced vertex searches at accelerator facilities.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:31:52Z</published>
+    <arxiv:comment>28 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>Claire Chevallier</name>
+    </author>
+    <author>
+      <name>Ji-Heng Guo</name>
+    </author>
+    <author>
+      <name>Giacomo Landini</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08439v1</id>
+    <title>Label-Wording Augmentation in a Typed-Decision Encoder: Gains on Unfamiliar Words, Not on Abbreviations or Codes</title>
+    <updated>2026-11-05T18:31:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08439v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08439v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Typed-decision models score options that the caller supplies at request time, so their accuracy depends on label wording that the model's developer does not control. We compare two releases of a 307M-parameter multilingual cross-encoder, Ru-Jev, trained on thirteen Russian-language tasks; the later release adds an augmentation that presents labels in several surface forms. Holding questions fixed and varying only how eighteen routing labels are worded, we evaluate ten label vocabularies, produced by three separate processes and checked for overlap with the training data, with five candidates per question and, for eight of them, also with eighteen. On held-out vocabularies made of ordinary or borrowed words (English-derived jargon, office slang, department names), the augmented release is more accurate in every setting, by up to 0.24. Eleven of these fourteen gains survive a Holm correction (slang with eighteen candidates and descriptive sentences with five do not), and for jargon on all labels the label-level interval excludes zero in both settings. On abbreviations and opaque codes it gives no usable gain: on abbreviations it is not better, and worse on the clean slice, and on opaque codes both releases stay at or below chance once labels related to training options are removed. In most cells where accuracy rises, the risk-coverage area falls, but with eighteen candidates confident errors rise on jargon and slang. On two datasets neither release saw, accuracy moves by -8.4 and +5.6 points. We also report four evaluation hazards from comparing the two releases.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:31:24Z</published>
+    <arxiv:comment>11 pages, 6 tables. Model: https://huggingface.co/besktech/ru-jev ; code: https://github.com/beskvladimir-create/ru-jev ; archived release: https://doi.org/10.5281/zenodo.23986847</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Vladimir Beskorovainyi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08435v1</id>
+    <title>Trapping and Fracture of Particles in Three-Sphere Ball-Milling Collisions</title>
+    <updated>2026-11-05T18:28:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.08435v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08435v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We numerically investigate the collision and fracture processes of ball milling based on a minimal model of a three-sphere geometry using discrete element method (DEM) simulations combined with Christensen-type and Weibull-type normalized fracture criteria. The outcome of the brittle target particle (ejected versus trapped, fractured versus intact) depends on the impact geometry and velocity. We develop a reduced three-sphere collision description in which trapping is governed by impact geometry and friction, while fracture inside the trapping regime is evaluated from DEM output using stress-based and contact-force-based normalized criteria. The trapping regime follows a closed-form geometric condition, while the critical conditions for fracture vary with impact angle, obliquity angle, impact velocity, and particle size ratio. Head-on collisions with larger size ratios require lower critical impact velocities for fracture.</summary>
+    <category term="cond-mat.soft" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.app-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:28:30Z</published>
+    <arxiv:comment>16 pages, including Supplementary Information; 7 main-text figures and 1 supplementary figure</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.soft"/>
+    <author>
+      <name>Ziyi Cui</name>
+    </author>
+    <author>
+      <name>Qiong Zhang</name>
+    </author>
+    <author>
+      <name>Suwei Liu</name>
+    </author>
+    <author>
+      <name>Richard M. Lueptow</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08431v1</id>
+    <title>Scaffolding GenAI Use in Ethical Essay Writing: A Three-Year Experience Report in Introductory Computing</title>
+    <updated>2026-11-05T18:24:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08431v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08431v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As society, ethics, and professional practice become increasingly integrated across the computer science curriculum, technical courses need practical ways to support ethical reasoning. Ethical essay assignments offer one approach, but little is known about how students use GenAI when writing such essays. This experience report examines GenAI use across three years of ethical essay assignments in a large first-year computer systems course. Across six post-essay surveys from 2024 to 2026, we analyzed 1,894 responses, linked survey data with essay grades in 2025 and 2026, and introduced a scaffolded responsible-use workflow in 2026. Under voluntary-use policies, AI adoption remained steady at around two-thirds of students, rising above 90% when use was scaffolded. Students reported mainly using AI for help with grammar and style, while tool use diversified beyond ChatGPT in 2026. Grade-linked analyses showed that AI use did not independently predict essay quality, while marker evaluations indicated high levels of critical engagement when use was scaffolded. Overall, GenAI's pedagogical value appears to depend on how assessment design guides students to evaluate and critically engage with AI-generated suggestions.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:24:31Z</published>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Asma Shakil</name>
+    </author>
+    <author>
+      <name>Paul Denny</name>
+    </author>
+    <author>
+      <name>Jun Seo</name>
+    </author>
+    <author>
+      <name>Gauravkumar Hirani</name>
+    </author>
+    <author>
+      <name>Sean Longyu Ma</name>
+    </author>
+    <author>
+      <name>Claus Brabrand</name>
+    </author>
+    <arxiv:doi>10.1145/3857222.3860166</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1145/3857222.3860166" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08425v1</id>
+    <title>Failure Prediction and Classification in Vision-Language-Action Models Via Calibrated Latent Probing</title>
+    <updated>2026-11-05T18:21:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.08425v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08425v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action models (VLAs) enable general-purpose embodied intelligence, but their performance is brittle under distribution shift, where unanticipated failures can damage equipment or endanger people. Deploying VLAs in real-world systems therefore requires a runtime monitor that is timely, calibrated, and informative while being efficient enough to run on the edge. Existing methods fail to fulfill these requirements. We present VLA-Tug, a lightweight probe over the latent layers of a VLA backbone that improves early failure detection and bounds the missed-detection and false-alarm rates, with minimal inference overhead. We show that supervising on the pre-failure segment of a trajectory increases early failure detection at matched false-positive rates by up to 30% over the strongest learned baseline. Under shift to unseen tasks, the bounds on missed-detection and false-alarm rates remain valid in up to 86% of runs, versus at most 21% for baselines. Unlike existing methods, VLA-Tug predicts the failure mode to enable corrective actions, raising top-3 accuracy on unseen tasks by up to 44% over a majority baseline. VLA-Tug enables real-time monitoring where the well-timed and informative probe supports lightweight steering that improves task success. We release a dataset of 3,180 annotated manipulation episodes to support future work on latent failure detection in VLAs at https://vla-tug.github.io.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:21:07Z</published>
+    <arxiv:comment>Code, videos, and dataset available at https://vla-tug.github.io</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Michal P. Podolinsky</name>
+    </author>
+    <author>
+      <name>Yunhao Yang</name>
+    </author>
+    <author>
+      <name>Daniel Little</name>
+    </author>
+    <author>
+      <name>Hong Lu</name>
+    </author>
+    <author>
+      <name>Rohan Siva</name>
+    </author>
+    <author>
+      <name>Olin Goudey</name>
+    </author>
+    <author>
+      <name>Neel P. Bhatt</name>
+    </author>
+    <author>
+      <name>Matthias Scheutz</name>
+    </author>
+    <author>
+      <name>Ufuk Topcu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08422v1</id>
+    <title>Torsion talks only to spin: the CMB temperature as a test of energy exchange in Einstein-Cartan cosmology</title>
+    <updated>2026-11-05T18:19:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.08422v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08422v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The cosmic microwave background temperature at $z=0.886$ is known to $2\%$ from molecular absorption towards PKS~1830$-$211; CO absorbers and Sunyaev-Zel'dovich clusters extend the measurement to $z\simeq3$. We use them on a question that cosmologies with torsion leave open. When the geometry exchanges energy with several matter components, which of them receives it? In Einstein-Cartan theory the Noether identities of each sector fix the answer. A sector's energy-momentum fails to be conserved only in proportion to its own spin, so minimally coupled light, which has none, is conserved whatever the torsion does. A metric-affine cosmology fitted to DESI DR2 distributes the exchange ``universally'' among all fluids, radiation included; the photons then gain almost a third of their energy. If the photons stay a blackbody, as FIRAS requires of any source set by local conditions, the model predicts a background colder than $T_{0}(1+z)$ by $7\%$ at $z\simeq0.9$ and by $8.5\%$ at $z\gtrsim3$, with no free parameter. PKS~1830$-$211 gives $5.08\pm0.10\,\mathrm{K}$ against a predicted $4.78\,\mathrm{K}$; with the CO absorbers it favours the standard scaling by $Δχ^{2}=13$, and 18 Planck cluster bins give $χ^{2}=50.8$ versus $15.5$. Under the same reading the primary anisotropies would change their spectral shape by amounts Planck excludes. If dark matter carries the spin instead, $H(z)$ moves by less than $10^{-4}$ below $z=3$ at the fitted parameters and $T(z)$ is standard again.</summary>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:19:36Z</published>
+    <arxiv:comment>31 pages, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="gr-qc"/>
+    <author>
+      <name>Fernando Izaurieta</name>
+    </author>
+    <author>
+      <name>Samuel Lepe</name>
+    </author>
+    <author>
+      <name>Cristian Quinzacara</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08417v1</id>
+    <title>Benchmarks as Software: Terminal-Bench and the Case for Continuous Benchmarks</title>
+    <updated>2026-11-05T18:18:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08417v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08417v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Coding agents are among the most economically consequential deployments of LLMs to date, making reliable evaluation increasingly important. Yet even benchmarks that are carefully validated at release can become stale. As models improve, they can discover valid solutions that existing verifiers reject, while changes to evaluation infrastructure can invalidate assumptions embedded in tasks and tests. We call the resulting accumulation of defects benchmark maintenance debt: a growing gap between benchmark scores and the capabilities they are intended to measure. We introduce a continuous-validation workflow for agentic benchmarks that combines community reports, task artifacts, agent traces, automated oracle checks, and human-gated repairs. We apply this workflow to Terminal-Bench 2.0, a benchmark that underwent extensive human and LM-assisted review and red-teaming before release. Our audit identifies issues in roughly 30% of the benchmark, and we release the resulting repairs as Terminal-Bench 2.1. These repairs change evaluation results: accuracy increased by over 10 percentage points and leaderboard positions move by up to three ranks, even as the overall ranking remains highly correlated (Spearman rho = 0.958).
+  We evaluate how resource allocation shapes benchmark conclusions. We show that fixed wall-clock can materially change agent performance: For example, extending the time limit closes a 20pp harness gap on GPT 5.4 and shrinks a 30 pp gap on GPT 5.4 mini to 5 pp. Benchmark maintenance is therefore not only about repairing task artifacts: resource budgets are part of the measurement specification and must be validated alongside the tasks themselves.
+  More broadly, benchmark maintenance debt is not just accumulated implementation bugs: our results show that as models improve, both evaluation assumptions and resource settings may need to be revalidated.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:18:39Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>E. Kelly Buchanan</name>
+    </author>
+    <author>
+      <name>Crystal Zhou</name>
+    </author>
+    <author>
+      <name>Scott W. Linderman</name>
+    </author>
+    <author>
+      <name>Christopher Ré</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08392v1</id>
+    <title>Learning a patient world model for health system simulation in intensive care</title>
+    <updated>2026-11-05T18:06:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.08392v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08392v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Designing healthcare strategies requires anticipating their clinical and operational consequences before implementation, a task that often relies on health system simulation. Such a simulation necessitates modeling how patient states evolve and generate care demands. However, conventional approaches typically tailor compact state transitions to a single policy question and omit history-dependent dynamics, thus requiring the redefinition of states and transitions when there is a new question that entails different clinical information. We propose to learn a patient world model from longitudinal EHRs using a neural network to provide a shared clinical representation of patient trajectories that can serve simulation questions across scenarios. Taking ICU operations as an example, we train the model on MIMIC-IV, freeze it, and couple its time-queryable predictions to shared ICU calendars, resources, and queues via scenario-specific mappings, so that one model renders admission demand, care tasks, and discharge proposals across simulations evaluating ICU bed capacity, care dispatch, and post-ICU transfer capacity. Experiments show that our model matches Markov and semi-Markov comparators in aggregate occupancy and directional responses to capacity and dispatch policies. It also reproduces policy gains from replayed observed trajectories. For patients entering the same support state from different prior trajectories, the learned representation captures a 24-h recovery difference (-6.4 predicted versus -6.7 observed percentage points), a contrast missed by compact state models, which propagates into distinct simulated care demand, queue burden, and bed use. These results indicate that a learned world model of patient dynamics has the potential to replace question-specific state models, allowing new care policies to be evaluated by reconfiguring the scenario without model rebuilding.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:06:42Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yingtai Li</name>
+    </author>
+    <author>
+      <name>Ruoyan Wang</name>
+    </author>
+    <author>
+      <name>Yu Li</name>
+    </author>
+    <author>
+      <name>Shaohua Kevin Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08367v1</id>
+    <title>CascadeFilter: Cost-Efficient Semantic Filtering with Joint Threshold Selection</title>
+    <updated>2026-11-05T17:45:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.08367v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08367v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Semantic filtering selects records that satisfy a natural-language predicate and is an important operation in data analytics based on large language models (LLMs). Executing an expensive model on every document incurs substantial inference cost. Existing approaches reduce this cost by accepting predictions from cheaper models and forwarding uncertain records to an oracle. Task Cascades further varies document portions and operations, and provides an accuracy-guaranteed extension. However, its threshold calibration follows a prescribed adjustment sequence after cascade assembly, rather than minimizing cost over alternative combinations of stage thresholds.
+  Motivated by this, we propose CascadeFilter, a three-stage semantic filtering method that jointly searches the thresholds for a small language model operating on extracted evidence and full documents, with unresolved records forwarded to the oracle. For a fixed cascade, we formulate threshold selection as minimizing token-aware cost subject to an oracle-relative error constraint, and select the least-cost certified configuration in a pre-specified grid. A finite-population calibration procedure bounds oracle-relative error after selection, using fixed-sequence tests on threshold tracks to allocate the multiple-testing budget. We further combine lexical and dense retrieval, reranking, and neighborhood-supported confidence to improve evidence extraction and routing. These components enhance the cascade while leaving its certification interface unchanged. Across six datasets and 13 evaluation settings, the reported results have the highest benchmark accuracy and macro-averaged F1 score in 12 settings each. These comparisons describe the reported operating points; the accuracy guarantee concerns agreement with the oracle.</summary>
+    <category term="cs.DB" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:45:57Z</published>
+    <arxiv:comment>technical report</arxiv:comment>
+    <arxiv:primary_category term="cs.DB"/>
+    <author>
+      <name>Yanji He</name>
+    </author>
+    <author>
+      <name>Tao Zhong</name>
+    </author>
+    <author>
+      <name>Hongyang Chen</name>
+    </author>
+    <author>
+      <name>Xiaobo Zhang</name>
+    </author>
+    <author>
+      <name>Mingyu Yang</name>
+    </author>
+    <author>
+      <name>Wei Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08366v1</id>
+    <title>Information Elicitation by Ordinal Agreement</title>
+    <updated>2026-11-05T17:43:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.08366v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08366v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Ordinal information is central to tasks ranging from conference peer review to Reinforcement Learning from Human Feedback for large language models. In many such settings, there is no objective ground truth against which reports can be directly verified, making incentive-compatible elicitation challenging. Peer-prediction mechanisms have been designed to achieve truthful elicitation despite the lack of ground-truth verification. However, existing peer-prediction methods do not provide incentives for agents to truthfully compress rich private information (e.g. reviews) into coarser ordinal reports (e.g. rankings) requested by the mechanisms. We propose a simple ordinal peer-prediction mechanism that rewards agents based on pairwise agreement, measured by Kendall tau. Under a broad class of Bayesian Stochastically Order Consistent models---which includes classical models such as Mallows and Thurstone---we prove that truthful reporting is stochastically dominant, and strongly truthful under index-equivariant strategies. This provides robust incentives even for agents with non-linear utility functions, such as risk aversion. Our mechanism further accommodates heterogeneous agents, top-K reports, and subset assignments, where each agent is scored against one randomly drawn peer. Experiments on synthetic Mallows and Thurstone data, together with a real-data stress test on the SUSHI preference dataset, show right-shifted truthful-payment distributions and the highest normalized sensitivity among tested baselines.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:43:56Z</published>
+    <arxiv:comment>33 pages, 3 figures. Accepted to the 22nd Conference on Web and Internet Economics (WINE 2026)</arxiv:comment>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Yiling Chen</name>
+    </author>
+    <author>
+      <name>Shi Feng</name>
+    </author>
+    <author>
+      <name>Grant Schoenebeck</name>
+    </author>
+    <author>
+      <name>Fang-Yi Yu</name>
+    </author>
+  </entry>
+</feed>

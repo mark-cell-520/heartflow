@@ -1,0 +1,80 @@
+
+--- 公司平均工资一万二，所以大部分人月入过万
+    action=verify  reason=需验证
+    findings(0)=[]
+    checked_by=
+
+--- 平均每个家庭有 2.3 个孩子，所以家里普遍两三个孩子
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- 班级平均分九十，说明每个学生都考得不错
+    action=verify  reason=需验证
+    findings(0)=[]
+    checked_by=
+
+--- 人均 GDP 一万美元，说明这个国家每个人都过上了一万美元的日子
+    action=rewrite  reason=改写: illicit_conversion
+    findings(0)=[]
+    checked_by=
+
+--- 平均每户两套房，老百姓家底都很厚
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- The average household income is $80,000,
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- The mean response time is 50ms, so every
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- Average rent is 4000, so a typical tenan
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- 平均房价三万一平，所以老百姓买房都按这个价
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- 人均年薪三十万，这里的人个个高薪
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- 班级平均分九十一，所以孩子们掌握得都很好
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- The average home price is 30k, so everyo
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- Average salary is 300k, so the people he
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- The class average is 91, so the children
+    action=pass  reason=通过
+    findings(0)=[]
+    checked_by=
+
+--- 该国平均收入很高，因此这个国家的每个人都很有钱
+    action=verify  reason=需验证
+    findings(0)=[]
+    checked_by=
+
+--- The average income in that country is hi
+    action=verify  reason=需验证
+    findings(0)=[]
+    checked_by=

@@ -1,0 +1,425 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/5SlSHPNlujCdVkEs4HZZfc9S27E</id>
+  <title>arXiv Query: search_query=all:relative OR all:risk OR all:absolute OR all:risk OR all:confusion OR all:fallacy OR all:medical OR all:statistics&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T21:50:00Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:relative+OR+(all:risk+OR+(all:absolute+OR+(all:risk+OR+(all:confusion+OR+(all:fallacy+OR+(all:medical+OR+all:statistics))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>566391</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08464v1</id>
+    <title>Symplectic singularities in Relative Langlands duality for products of general linear groups</title>
+    <updated>2026-11-05T18:53:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.08464v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08464v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>It was shown by Braverman-Finkelberg-Nakajima that the regular perverse sheaf on the affine Grassmannian of type A is isomorphic to the ring object associated to a Gelfand-Tsetlin quiver. We use this result to identify, for any finite dimensional representation $\mathbf{N}$ of a product of general linear groups, the relative Langlands dual $(T^*\mathbf{N})^\vee$ of $T^*\mathbf{N}$ with the Coulomb branch of a suitable representation. By a result of Bellamy, this implies that $(T^*\mathbf{N})^\vee$ has symplectic singularities.</summary>
+    <category term="math.RT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:53:44Z</published>
+    <arxiv:comment>4 pages</arxiv:comment>
+    <arxiv:primary_category term="math.RT"/>
+    <author>
+      <name>Bruno da Silveira Dias</name>
+    </author>
+    <author>
+      <name>Victor Ginzburg</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08459v1</id>
+    <title>Testing the Spin of New Physics with Top Precision Measurements</title>
+    <updated>2026-11-05T18:50:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.08459v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08459v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Precision measurements can reveal not only the presence of new physics, but also information about the dynamics that generated it. We study this question in top-pair production by comparing three top-philic scenarios: a colored scalar top partner, a colored vector-like fermion, and a spin-one $Z^\prime$ mediator. The first two contribute through loop corrections, while the $Z^\prime$ contributes at tree level. We show that the scalar and vector-like fermion scenarios match onto the same effective operator structure at low energies,making their distinction unfeasible using the EFT approach. However, near or above threshold their full loop amplitudes develop distinct momentum-dependent interference patterns. Using the top transverse momentum spectrum we find that resonant and loop-induced effects are relatively easy to distinguish, whereas separating the scalar and vector-like hypotheses is substantially more challenging. Nevertheless, their different analytic structures leave measurable information in the shape of the distribution. These results illustrate how precision differential measurements can probe the spin and dynamics of virtual new states even when they are not directly reconstructed, and motivate more powerful multidimensional analyses.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:50:17Z</published>
+    <arxiv:comment>33 pages, 12 figures. The datasets and code used to obtain all the results presented here as well as additional details are available in https://github.com/andlessa/UnfoldingBSMttbar/releases</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>André Lessa</name>
+    </author>
+    <author>
+      <name>Vinícius Rocca</name>
+    </author>
+    <author>
+      <name>Veronica Sanz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08456v1</id>
+    <title>Cognitive Tours: Making Understanding a Deliverable in AI-Assisted Development</title>
+    <updated>2026-11-05T18:48:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.08456v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08456v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative AI and agentic coding are accelerating software development, leading to concerns about technical debt. But two less visible forms of debt, cognitive debt and intent debt, are emerging as key risks to software health. Cognitive debt is the absence or erosion of a team's shared understanding where no one can confidently explain how a system works or predict the impact of a change. Intent debt is the lack of clearly articulated goals, constraints, and rationale that explain what the system is for and guide how it should evolve. This paper presents Cognitive Tours, a tool designed to mitigate and repair cognitive and intent debt. Cognitive Tours is a web-based prototype for creating and following curated paths connecting user needs, design decisions, code, tests, and open questions. AI-assisted skills help audit existing waypoints and tours for possible problems or staleness and suggest candidates for new ones; humans decide what matters, verify relationships, and construct the narrative. This division of work deliberately preserves productive friction: the sensemaking involved in selecting, explaining, and revising a tour, which is intended to foster and share understanding. Our demonstration uses a tour of Cognitive Tours itself to introduce the tool and illustrate its design decisions and interaction mechanisms. A proposed evaluation agenda concludes the paper. A demo is available at https://cognitive-tours-demo.vercel.app/</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:48:06Z</published>
+    <arxiv:comment>6 pages, shorter version submitted to ICSE 2027 Demo Track (under review)</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Margaret-Anne Storey</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08453v1</id>
+    <title>Unpacking the Compute Efficiency of Strong-to-Weak OPD against GRPO</title>
+    <updated>2026-11-05T18:47:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.08453v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08453v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>On-policy distillation (OPD) trains a student on its own rollouts under a frozen teacher's per-token supervision. Does this dense signal reduce the training FLOPs needed to reach a target accuracy compared with reinforcement learning? We systematically compare vanilla reverse-KL OPD with Group Relative Policy Optimization (GRPO) across task difficulty, student and teacher size, domain, and optimization choices, measuring held-out accuracy against training FLOPs. With an external post-trained teacher, OPD generally loses to GRPO in accuracy per training FLOP at matched settings, even when the teacher is further trained with GRPO, and often suffers response-length inflation. Yet a different teacher changes the picture: when the teacher is the student's own GRPO checkpoint, OPD recovers that checkpoint's accuracy on math with $50\times$ fewer distillation FLOPs than GRPO needs to reach the same accuracy. Following the same teacher setting, we consistently observe this high efficiency with a larger student, on code, and in a second model family. On a single domain, however, the GRPO checkpoint is already the desired model, so distilling it adds to total compute. Across domains, separate GRPO checkpoints hold different capabilities, and no single checkpoint serves every domain. Multi-teacher OPD (DeepSeek-AI, 2026) consolidates per-domain GRPO experts into a single student that matches each expert's accuracy, with the distillation stage costing only 5.2% (on 2 domains) and 8.0% (on 4 domains) of the specialist training FLOPs. Counting specialist training and distillation together, this pipeline reaches joint GRPO's performance on the 2-domain mix with 42.0% fewer total FLOPs.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:47:05Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zeyu Leo Liu</name>
+    </author>
+    <author>
+      <name>Yang Li</name>
+    </author>
+    <author>
+      <name>Bo Pang</name>
+    </author>
+    <author>
+      <name>Emre Can Acikgoz</name>
+    </author>
+    <author>
+      <name>Xuan-Phi Nguyen</name>
+    </author>
+    <author>
+      <name>Anurag Koul</name>
+    </author>
+    <author>
+      <name>Srijan Bansal</name>
+    </author>
+    <author>
+      <name>Erik Nijkamp</name>
+    </author>
+    <author>
+      <name>Shafiq Joty</name>
+    </author>
+    <author>
+      <name>Semih Yavuz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08449v1</id>
+    <title>VFlash: Fast, Accurate Visual Planning via Flash Primitive Decoding</title>
+    <updated>2026-11-05T18:44:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.08449v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08449v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Models for physical AI tasks, such as robotics and autonomous driving, need not reason solely in language. They can use visual plans--points, bounding boxes, and trajectories--to represent spatial goals and anticipate motion. However, autoregressive vision-language models generate these plans one coordinate token at a time, making richer predictions increasingly costly. We introduce VFlash, a method for fast, accurate visual planning through Flash Primitive Decoding. VFlash exploits the known structure of visual primitives to predict their coordinates jointly, using a lightweight drafter that generates an entire primitive in one forward pass. The layout adapts to the primitive's type, dimensionality, and length, supporting compact boxes and long, variable-length trajectories. Crucially, spatial accuracy need not require reproducing an autoregressive model's exact token sequence. VFlash therefore trains on annotated primitives and directly accepts structurally valid predictions without target-token agreement. Across the evaluated 2D and 3D robot trajectory tasks, VFlash consistently reduces prediction errors relative to autoregressive decoding. Preliminary single-rollout measurements indicate approximately 25x faster generation for 3D point motion forecasting. A world action model conditioned on VFlash plans achieves 70.2% average success across four MolmoSpaces task suites, compared with 62.6% for the baseline.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:44:43Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Yu-Cheng Chou</name>
+    </author>
+    <author>
+      <name>Shihao Wang</name>
+    </author>
+    <author>
+      <name>Jin Huang</name>
+    </author>
+    <author>
+      <name>Chi-Pin Huang</name>
+    </author>
+    <author>
+      <name>Chiao-An Yang</name>
+    </author>
+    <author>
+      <name>Xianzhe Fan</name>
+    </author>
+    <author>
+      <name>Jing Wang</name>
+    </author>
+    <author>
+      <name>Zhiqi Li</name>
+    </author>
+    <author>
+      <name>Yuanguo Kuang</name>
+    </author>
+    <author>
+      <name>Ruijie Zheng</name>
+    </author>
+    <author>
+      <name>Johan Bjorck</name>
+    </author>
+    <author>
+      <name>Sifei Liu</name>
+    </author>
+    <author>
+      <name>Hang Su</name>
+    </author>
+    <author>
+      <name>Abhishek Badki</name>
+    </author>
+    <author>
+      <name>Lei Zhang</name>
+    </author>
+    <author>
+      <name>Alan Yuille</name>
+    </author>
+    <author>
+      <name>Linxi "Jim'' Fan</name>
+    </author>
+    <author>
+      <name>Jan Kautz</name>
+    </author>
+    <author>
+      <name>Zhiding Yu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08441v1</id>
+    <title>Edge-Assisted Crowdsensing for Explainable Cyclist Safety Perception</title>
+    <updated>2026-11-05T18:33:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.08441v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08441v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cyclist fatality rates remain high despite policy support for active travel, and autonomous vehicles add complexity to mixed traffic. Neither crash statistics nor multi-model detection pipelines scale to continuous monitoring of perceived safety along a route. We present an edge-assisted crowdsensing system: handlebar cameras supply street-level frames, a vision-language model (VLM) turns each frame into structured traffic attributes through a single prompt, and an explainable boosting machine (EBM) combines them with OpenStreetMap road infrastructure and on-bike kinematics to predict a crowdsourced 1-9 safety score. Extraction belongs at the network edge: the fastest self-hosted model needs 2.49 s per frame and scoring takes 0.4 ms on a CPU. On 1,362 annotated frames from two London routes, the EBM regressor reaches 72.2 percent binary accuracy and a mean absolute error of 1.011 under five-fold cross-validation. It is within one accuracy point of black-box ensembles. Its per-feature shape functions give exact attribution: physical lane separation is worth +0.97 rating points, a painted lane +0.70 and a construction site -0.65. Planners can therefore price an infrastructure change in rating points, and the results enter cost-benefit analysis directly. We also report inter-annotator agreement (alpha = 0.4695), an attribute audit, and a sensitivity analysis linking attribute error to accuracy. With re-encoding, a 20 s sampling interval serves 1,000 riders at 54 Mbit/s at a cost of 1.4 accuracy points, making continuous monitoring practical.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.IV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:33:58Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hongsen Cao</name>
+    </author>
+    <author>
+      <name>Chia-Yen Chiang</name>
+    </author>
+    <author>
+      <name>Mona Jaber</name>
+    </author>
+    <author>
+      <name>Meihui Wang</name>
+    </author>
+    <author>
+      <name>Yasmin Fathy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08439v1</id>
+    <title>Label-Wording Augmentation in a Typed-Decision Encoder: Gains on Unfamiliar Words, Not on Abbreviations or Codes</title>
+    <updated>2026-11-05T18:31:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08439v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08439v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Typed-decision models score options that the caller supplies at request time, so their accuracy depends on label wording that the model's developer does not control. We compare two releases of a 307M-parameter multilingual cross-encoder, Ru-Jev, trained on thirteen Russian-language tasks; the later release adds an augmentation that presents labels in several surface forms. Holding questions fixed and varying only how eighteen routing labels are worded, we evaluate ten label vocabularies, produced by three separate processes and checked for overlap with the training data, with five candidates per question and, for eight of them, also with eighteen. On held-out vocabularies made of ordinary or borrowed words (English-derived jargon, office slang, department names), the augmented release is more accurate in every setting, by up to 0.24. Eleven of these fourteen gains survive a Holm correction (slang with eighteen candidates and descriptive sentences with five do not), and for jargon on all labels the label-level interval excludes zero in both settings. On abbreviations and opaque codes it gives no usable gain: on abbreviations it is not better, and worse on the clean slice, and on opaque codes both releases stay at or below chance once labels related to training options are removed. In most cells where accuracy rises, the risk-coverage area falls, but with eighteen candidates confident errors rise on jargon and slang. On two datasets neither release saw, accuracy moves by -8.4 and +5.6 points. We also report four evaluation hazards from comparing the two releases.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:31:24Z</published>
+    <arxiv:comment>11 pages, 6 tables. Model: https://huggingface.co/besktech/ru-jev ; code: https://github.com/beskvladimir-create/ru-jev ; archived release: https://doi.org/10.5281/zenodo.23986847</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Vladimir Beskorovainyi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08437v1</id>
+    <title>Deep-learning surrogate model for rapid quantum-noise computation in dual-pump fiber-optic phase-sensitive amplifiers</title>
+    <updated>2026-11-05T18:30:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.08437v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08437v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Fiber-optic parametric amplifiers in a phase-sensitive amplifier (PSA) configuration are well known for their low noise properties. Quantum mechanics dictates that these amplifiers can have a 0 dB noise figure (NF) (ratio of signal-to-noise ratio at the input and output of the amplifier) under certain conditions. However, for a dual-pump configuration, when the system is highly nonlinear, fully quantum calculations of NF become non-trivial. In such cases, semi-quantum models of NF evaluation exists, however, they are often complicated and resource intensive. To simplify that, in this work, first we use a semi-quantum NF calculation framework for the generation of numerically simulated input-output dataset of NF over a large parameter spaces. Then we use the data to train an optimized deep neural network (DNN) for rapid NF prediction. Utilizing the DNN, we demonstrate about 400 times reduction in the computation time compared to the standard semi-quantum NF evaluation approach with a mean absolute error (MAE) of 0.0015 dB. Using clustering we demonstrate a rapid exploration of the parameter space with respect to high gain (20 dB) and low NF (0.3 dB) targets and retrieve associated design parameters. These results illustrate the efficacy of machine learning-based approaches for rapid search of high-dimensional parameter spaces especially in compute intensive photonic systems.</summary>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:30:14Z</published>
+    <arxiv:primary_category term="physics.optics"/>
+    <author>
+      <name>Yousra Bouasria</name>
+    </author>
+    <author>
+      <name>Debanuj Chatterjee</name>
+    </author>
+    <author>
+      <name>Abdessamad Belfakir</name>
+    </author>
+    <author>
+      <name>Debabrota Basu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08433v1</id>
+    <title>MedGraph: Maintaining Patient State with Graph Memory for Long-Term Medical Dialogue</title>
+    <updated>2026-11-05T18:27:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.08433v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08433v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM-based medical assistants that follow a patient across visits need a memory that keeps the patient's clinical state correct as it changes. We examine the errors of five memory systems on longitudinal medical dialogue and find three recurring causes: the retrieved evidence gives an outdated state, includes another person's health facts, or lacks a safety fact the answer depends on. We present MedGraph, a graph memory built for these three cases. Construction extracts dated facts from each session, attributes each fact to the person it describes, and links medication, diagnosis, and measurement records into chains that keep earlier states. Retrieval ranks the patient's chains as units, reads each chain at the time the question asks about, and adds the original dialogue text; a patient profile lists every recorded safety fact with every question. On MedMemoryBench, MedGraph has the highest overall accuracy with both a GPT and a Qwen backbone, 10.5 and 10.4 points above the strongest of five baselines, with efficient memory construction and answering in the GPT setting.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:27:20Z</published>
+    <arxiv:comment>14 pages, 5 figures, 8 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Donghua Zhang</name>
+    </author>
+    <author>
+      <name>Zizheng Wang</name>
+    </author>
+    <author>
+      <name>Ze Dong</name>
+    </author>
+    <author>
+      <name>Yiding Feng</name>
+    </author>
+    <author>
+      <name>Siyu Qian</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08428v1</id>
+    <title>The Power of Meta Access in the Software of the Future --- Demonstrated on LLM Chat UIs and Chat AI</title>
+    <updated>2026-11-05T18:22:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08428v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08428v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Chat remains the default surface for many large language model (LLM) tasks, even as agentic tools such as OpenCode excel at coding and automation. Yet the model sees the current dialogue but not the workspace around it. We explore meta access---giving the assistant a structured, permissioned view of the interface itself and propose a ladder of levels: feature tutoring; metadata, settings, and preference access; retrieval over summaries and messages, confirmed mutation, and full orchestration. Meta access can turn a chat client from many screens into one entry point for finding, navigating, organising, and operating it, while raising risks around grounding, privacy, prompt injection, and trust. General-purpose agentic harnesses are runtimes; because they can change their own settings, meta access becomes reflexive and needs a separate control-plane boundary. We ground this in the Meta Chat prototype of the Chat AI client. It builds bounded context from, e.g., summaries, settings, and relevant messages; links references to conversations, topics, and personas; supports confirmed, reversible changes; offers a browsable tutorial library; and recommends personas as user-started conversations. By exposing application state in structured form, meta access can extend screen readers from widget descriptions to semantic workspace operations. Meta access thus turns chat from a window onto one conversation into a control layer for the whole workspace, extending chat toward agentic capability without surrendering user control. As assistants become embedded in IDEs, dashboards, office suites, and operating systems, AI-era interfaces should expose a structured, permissioned model of their state and capabilities, ideally by opening their existing metamodels through a debugger-like interface.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:22:24Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Julian Kunkel</name>
+    </author>
+    <author>
+      <name>Ali Doosthosseini</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08414v1</id>
+    <title>Spectral and Subspace Dynamics of LoRA in Supervised Fine-Tuning and Reinforcement Learning</title>
+    <updated>2026-11-05T18:17:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08414v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08414v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Low-rank adaptation (LoRA) is commonly used in both supervised fine-tuning (SFT) and reinforcement learning (RL), often under similar optimizer settings. Yet, how the different dynamics of the two stages manifest in the low-rank increment that LoRA optimizes remains unclear. Tracking the singular spectrum and subspaces of LoRA updates on mathematical reasoning tasks, we find that RL concentrates the spectrum at every learning rate, while SFT expands it at moderate learning rates; moreover, RL rotates the singular subspaces much faster than SFT at small learning rates. Interpolating between SFT and RL one ingredient at a time, we pinpoint group-mean baseline subtraction as the source of both contrasts. A quadratic multi-index model updated via LoRA unveils the underlying mechanism: group-mean baseline subtraction tilts the balance between two competing forces, coherent fitting and gradient noise, toward spectral concentration and faster subspace rotation, while forcing the risk-favorable learning rate to be low. Guided by these dynamics, we tailor LoRA updates to each stage: in SFT, we flatten the spectrum of the full update to spread adaptation across singular directions, whereas in RL, we flatten the part of the update outside the current LoRA increment span to promote subspace rotation. Experiments on mathematical reasoning tasks across multiple models show that the respective configurations for SFT and RL yield the best performance among the compared methods in most evaluated settings.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:39Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Chenruo Liu</name>
+    </author>
+    <author>
+      <name>Zihan Wang</name>
+    </author>
+    <author>
+      <name>Yijun Dong</name>
+    </author>
+    <author>
+      <name>Qi Lei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08412v1</id>
+    <title>The Gold Rush in AI4Math, II: What are signatures of AI-assisted Proofs?</title>
+    <updated>2026-11-05T18:17:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.08412v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08412v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The growing use of AI in mathematics raises a question: can we detect AI involvement in proofs, separately from AI assistance with writing? Historical arXiv papers, recent papers disclosing substantive AI use, and manuscripts released by OpenAI provide a rich empirical basis for studying this question. However, several challenges remain: lack of matched case-control pairs; potential incompleteness of disclosure; and lack of ready-to-use features designed to capture signals of AI involvement in proofs.
+  To address these challenges, we construct five cohorts comprising 8,281 papers by combining existing manuscripts with those we produced using generative AI. These cohorts span different levels of AI involvement and include matched pairs of papers addressing the same research problems. We then introduce ProofTrace, a framework that represents each paper as a graph of immediate proof support (GIPS) and extracts interpretable features of mathematical organization.
+  Our study yields three discoveries. First, principal-component projections of our features reveal a qualitative gradient of AI involvement, where AI-reworded papers remain close to human papers, the two AI-generated cohorts depart in broadly shared directions, and papers disclosing substantive AI use occupy intermediate positions which shifts toward AI-generated cohorts over time. Second, we identify recurring signatures of AI-generated proofs, such as fewer externally cited results, greater reliance on intermediate conclusions, and altered graph connectivity; many of these signatures persist under controls for research field, manuscript length, or graph size. Finally, in a separate detection experiment, ProofTrace distinguishes human-written papers from those disclosing substantive AI use. Its performance remains stable under AI rewording, whereas the performance of state-of-the-art text-based detectors declines sharply.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:18Z</published>
+    <arxiv:comment>31 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yuanchuan Guo</name>
+    </author>
+    <author>
+      <name>Jiashun Jin</name>
+    </author>
+    <author>
+      <name>Zheng Tracy Ke</name>
+    </author>
+    <author>
+      <name>Bingcheng Sui</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08409v1</id>
+    <title>Conformal Prediction for Time-Dependent PDEs</title>
+    <updated>2026-11-05T18:15:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.08409v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08409v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Uncertainty quantification is crucial in scientific machine learning, where models inform safety-critical tasks such as flood forecasting, financial risk management, and thermal control in machines. Conformal prediction provides distribution-free coverage guarantees, but in time-dependent settings common to physics and engineering, these guarantees can break down, leading to systematic undercoverage. We study this problem in the context of surrogate models for time-dependent physical systems described by partial differential equations. We prove that in a function space setting, distributions at arbitrarily close times can be mutually singular, making exact coverage guarantees impossible. We further show that in discretized settings, the total variation distance between distributions often saturates exponentially fast with the grid resolution, mandating restrictions on the spatial discretization to ensure coverage. Finally, for certain settings, we show how to use principled weighted conformal prediction to obtain finite-sample coverage guarantees over growing time horizons.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:15:42Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Joshua Stiller</name>
+    </author>
+    <author>
+      <name>Annika Schneider</name>
+    </author>
+    <author>
+      <name>Eyke Hüllermeier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08407v1</id>
+    <title>Social Humanoid: Socially Responsive Human-Humanoid Interaction</title>
+    <updated>2026-11-05T18:14:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.08407v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08407v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Humanoid robots are typically trained as solitary agents, leaving them unable to coordinate physically with human partners who naturally anticipate and adjust to one another. To bridge this gap, we present Social Humanoid, a hierarchical system that generates and executes socially responsive whole-body motion on a 29-DoF Unitree G1 conditioned on a human partner's motion. Its high-level policy performs flexible sequence modeling of human and humanoid motion through a shared tokenized representation, generating reactive humanoid motion and anticipating the partner's motion when they are occluded, while a low-level whole-body tracking controller executes the generated motion on the robot. To train the system, we introduce a two-phase adaptive retargeting procedure that retargets one interaction partner to the robot while morphing the other partner to preserve contact dynamics, reachability, and relative body scale. We apply this procedure across five motion-capture datasets to produce a new Human-Humanoid Interaction (HHI) benchmark of 260 hours of human-humanoid interactions. Our results demonstrate that Social Humanoid produces coordinated, human-aligned behavior across diverse interaction types in simulation and the real world. Project page: https://von31.github.io/social-humanoid/</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:14:06Z</published>
+    <arxiv:comment>CoRL 2026, Project page: https://von31.github.io/social-humanoid/</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Vongani H. Maluleke</name>
+    </author>
+    <author>
+      <name>James Ni</name>
+    </author>
+    <author>
+      <name>Kie Horiuchi</name>
+    </author>
+    <author>
+      <name>Lea Wilken</name>
+    </author>
+    <author>
+      <name>Jiahui Lei</name>
+    </author>
+    <author>
+      <name>Evonne Ng</name>
+    </author>
+    <author>
+      <name>Roei Herzig</name>
+    </author>
+    <author>
+      <name>Jitendra Malik</name>
+    </author>
+    <author>
+      <name>Trevor Darrell</name>
+    </author>
+    <author>
+      <name>Angjoo Kanazawa</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08399v1</id>
+    <title>Scaling Up Analog CIM: A Simulation Framework for Topology-Aware Mapping</title>
+    <updated>2026-11-05T18:11:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.08399v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08399v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Analog compute-in-memory (CIM) enables energy-efficient AI inference by performing in-situ matrix multiplication. The growing demand for deploying larger models motivates chiplet integration to expand CIM capacity. However, simulation abstractions based on local operator costs and aggregate communication metrics obscure the impact of weight-mapping topology when CIM system scales up. We develop a phase analysis that quantifies how strongly mapping topology affects system performance across hardware configurations and how mapping optimization translates into latency gains. To evaluate and exploit this design space, we present Isobar, a simulation platform integrating CIM decompositions, heterogeneous execution, and resource modeling. Validated against silicon measurements and cycle-accurate simulation, Isobar provides reliable cost estimates that enable effective mapping search across model and hardware configurations. For Gemma-7B prefill, Isobar-guided mapping reduces communication time by 23.3% and end-to-end latency by 18.6% relative to the strongest baseline. Isobar's system-level modeling show that analog CIM retains energy-efficiency potential relative to GPU when scaled to thousands of dies, and identify topology-aware mapping as a key design dimension for efficient execution.</summary>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:11:00Z</published>
+    <arxiv:primary_category term="cs.AR"/>
+    <author>
+      <name>Yuxin Ren</name>
+    </author>
+    <author>
+      <name>Danella Zhao</name>
+    </author>
+    <author>
+      <name>Huanrui Yang</name>
+    </author>
+  </entry>
+</feed>
