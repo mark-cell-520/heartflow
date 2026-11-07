@@ -153,9 +153,15 @@ const BENIGN_HEAD_NONPASS = {
 // [r227] 首条「这瓶药吃下去烧就退了，肯定是药起了作用」已被 r227 的倒装服药
 // 子判据收口（detector 0→1、gate pass→verify），移到 C3「必须保持命中」清单。
 // **这不是放水**——C3 是正向断言（必须继续命中），比 C1 的「必须仍为 0」更严。
+// [r232] 第二条「从那天起她再也没迟到过，说明是早起打卡起了作用」已被本轮
+// 收窄 PC_OTHERFACTOR_ZH 的 `也会?` 分支修复（裸「也」不再构成豁免），移到
+// C4「必须保持命中」登记——**这不是放水**，C4 是正向断言，比 C1 的「必须仍为 0」更严。
 const STILL_GAP = [
-  // PC_OTHERFACTOR_ZH 拦下（存量即如此；豁免表只许收窄，r225 已登记）
+  // PC_OTHERFACTOR_ZH 的「因为」分支拦下（存量即如此；豁免表只许收窄，r225 已登记）
   { s: '打那以后球队就再也没输过，显然是因为换了教练', gate: 'verify' },
+];
+// [r232] r232 收口、必须保持命中的句子（原 STILL_GAP 第二条）
+const FIXED_BY_R232 = [
   { s: '从那天起她再也没迟到过，说明是早起打卡起了作用', gate: 'rewrite' },
 ];
 // [r227] r227 收口、必须保持命中的句子（原 r226 STILL_GAP 首条）
@@ -274,6 +280,13 @@ test('C2 仍漏句的 gate action 现值照登', () => {
 // 从「仍漏」登记挪到「必须保持命中」登记，约束方向只会更严不会更松。
 test(`C3 r227 收口的 ${FIXED_BY_R227.length} 条必须保持命中`, () => {
   for (const g of FIXED_BY_R227) {
+    assert.ok(pcCount(g.s) > 0, `「${g.s}」应保持 detector 命中，实测 ${pcCount(g.s)}`);
+    assert.strictEqual(gateAction(g.s), g.gate, `「${g.s}」gate action 应保持 ${g.gate}，实测 ${gateAction(g.s)}`);
+  }
+});
+// [r232] 收口的句子必须**继续**被命中（detector > 0 + gate action 不变）——同 r227 纪律。
+test(`C4 r232 收口的 ${FIXED_BY_R232.length} 条必须保持命中`, () => {
+  for (const g of FIXED_BY_R232) {
     assert.ok(pcCount(g.s) > 0, `「${g.s}」应保持 detector 命中，实测 ${pcCount(g.s)}`);
     assert.strictEqual(gateAction(g.s), g.gate, `「${g.s}」gate action 应保持 ${g.gate}，实测 ${gateAction(g.s)}`);
   }

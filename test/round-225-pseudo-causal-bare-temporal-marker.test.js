@@ -118,9 +118,18 @@ const ATTACK = [
 // 「跑步肯定能治感冒」「下一把肯定中大奖」）已由 **r226** 收口——PC_ATTRIB_ZH
 // 的「肯定…」族扩成「(?:肯定|一定)…」并补因果/效果名词表（见
 // test/round-226-*.test.js），此处只留真正还漏的 2 条（PC_OTHERFACTOR_ZH 拦下）。
+// [r232] 「从那天起她再也没迟到过，说明是早起打卡起了作用」已被本轮收窄
+// PC_OTHERFACTOR_ZH 的 `也会?` 分支（裸「也」不再构成豁免）修复，移到 C4
+// 「必须保持命中」登记——**这不是放水**，C4 是正向断言，比 C1 的「必须仍为 0」更严。
+// 余下这条仍漏：它含「因为」，被 PC_OTHERFACTOR_ZH 的「因为」分支拦下（r232
+// 刻意未动该分支，已登记为下一轮候选）。
 const STILL_GAP = [
-  // PC_OTHERFACTOR_ZH 拦下（存量即如此；该表是豁免表，r216~r225 九轮方向是只许收窄）
+  // PC_OTHERFACTOR_ZH 的「因为」分支拦下（存量即如此；该表是豁免表，r216~r232
+  // 十七轮方向是只许收窄）
   '打那以后球队就再也没输过，显然是因为换了教练',
+];
+// [r232] r232 收口、必须保持命中的句子（原 STILL_GAP 第二条）
+const FIXED_BY_R232 = [
   '从那天起她再也没迟到过，说明是早起打卡起了作用',
 ];
 // r226 起被收口的 3 条（原 r225 清单前三条）——登记在此防回退
@@ -293,7 +302,6 @@ test(`C1 结构性/豁免拦下的 ${STILL_GAP.length} 条现值仍漏（detecto
 test('C2 仍漏句的 gate action 现值照登（防将来静默变化）', () => {
   const expect = {
     '打那以后球队就再也没输过，显然是因为换了教练': 'verify',
-    '从那天起她再也没迟到过，说明是早起打卡起了作用': 'rewrite',
   };
   const drift = [];
   for (const [s, e] of Object.entries(expect)) {
@@ -301,6 +309,13 @@ test('C2 仍漏句的 gate action 现值照登（防将来静默变化）', () =
     if (g !== e) drift.push(`「${s}」登记=${e} 现值=${g}`);
   }
   assert.deepStrictEqual(drift, [], '以下仍漏句的 gate action 发生漂移：\n  ' + drift.join('\n  '));
+});
+
+// C4：[r232] 收口的 1 条必须保持命中（防回退——该句原登记为「仍漏」）
+test(`C4 r232 收口的 ${FIXED_BY_R232.length} 条必须保持 detector 命中`, () => {
+  const bad = FIXED_BY_R232.filter(s => pcCount(s) === 0);
+  assert.deepStrictEqual(bad, [], '以下句子又被漏判了（r232 收口被回退）：\n  ' + bad.join('\n  '));
+  assert.strictEqual(gateAction(FIXED_BY_R232[0]), 'rewrite', 'r232 收口句 gate action 应保持 rewrite');
 });
 
 // C3：r226 收口的 3 条必须保持命中（防回退到 r225 状态）
