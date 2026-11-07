@@ -1,0 +1,18 @@
+OK   删 POS_FRAME_ZH（纯框架对句不再命中）（3 句全部按预期）
+OK   删 NEG_FRAME_ZH（纯框架对句不再命中）（3 句全部按预期）
+OK   删 FRAME_VERB_ZH（纯框架动词句不再命中）（2 句全部按预期）
+OK   删 FLIP_POS_ZH（全部中文攻击不再命中）（10 句全部按预期）
+OK   删 FLIP_NEG_ZH（全部中文攻击不再命中）（10 句全部按预期）
+OK   删 POS_FRAME_EN（纯框架对EN句不再命中）（1 句全部按预期）
+OK   删 NEG_FRAME_EN（纯框架对EN句不再命中）（1 句全部按预期）
+OK   删 FRAME_VERB_EN（动词EN句不再命中）（2 句全部按预期）
+OK   删 FLIP_POS_EN（全部英文攻击不再命中）（6 句全部按预期）
+OK   删 FLIP_NEG_EN（全部英文攻击不再命中）（6 句全部按预期）
+OK   删 CONCEPT_ZH（概念豁免句变红）（1 句全部按预期）
+OK   删 CONCEPT_EN（概念豁免句变红）（1 句全部按预期）
+OK   删 CORRECTIVE_ZH（并列豁免句变红）（1 句全部按预期）
+OK   删 CORRECTIVE_EN（并列豁免句变红）（1 句全部按预期）
+OK   PAIR_ZH 放大到 500（超距句变红）（1 句全部按预期）
+
+注入 15 个：15 个按预期，0 个未按预期
+清理：完成（无全局状态改动，无临时文件）

@@ -117,7 +117,8 @@ const NEG_FRAME_ZH = [
 
 // ─── 框架条件 b：框架表述动词（把同一事实换一种等价说法）────────
 const FRAME_VERB_ZH = [
-  /(?:说成|说成是|说作为|写成|写成了|表述为|表述成|描述成|描述为|包装成|包装为|渲染成|呈现为|讲成|诠释成|解读成|解释成)/,
+  /说成(?!功|败|功率|败率)/,
+  /(?:说成是|说作为|写成|写成了|表述为|表述成|描述成|描述为|包装成|包装为|渲染成|呈现为|讲成|诠释成|解读成|解释成)/,
   /(?:换|改|换用)(?:成|为|了|种|个)?[^。，！？；\n]{0,6}(?:说法|措辞|框架|口径|表述|描述|角度|形式|提法|讲法)/,
   /(?:以|用)[^。，！？；\n]{0,6}(?:的)?(?:说法|措辞|框架|口径|形式|表述|描述)(?:来|去)?(?:呈现|表述|描述|讲|说)/,
 ];
@@ -132,21 +133,21 @@ const FLIP_NEG_ZH = [
 
 // ─── 英文对应族 ────────────────────────────────────────────────
 const POS_FRAME_EN = [
-  /\b(?:survival|success|satisfaction|approval|improvement|recovery|lean|positive|gain|gains|benefit|wins?|winning|completion|approval|retention|pass(?:ing)? rate|healthy)\b[^.]{0,30}\b(?:rate|ratio|percent|proportion|share|terms?|framing|description|frame)\b/i,
-  /\b(?:survival|success|satisfaction|approval|recovery|retention|passing|completion|benefit)\s+(?:rate|ratio|percent|proportion)\b/i,
+  /\b(?:survival|success|satisfaction|approval|improvement|recovery|lean|positive|gain|gains|benefit|wins?|winning|completion|retention|pass(?:ing)?|healthy)\b[^.]{0,30}\b(?:rates?|ratios?|percents?|proportions?|shares?|terms?|framings?|descriptions?|frames?|numbers?|figures?)\b/i,
+  /\b(?:survival|success|satisfaction|approval|recovery|retention|passing|completion|benefit)\s+(?:rates?|ratios?|percents?|proportions?)\b/i,
 ];
 const NEG_FRAME_EN = [
-  /\b(?:mortality|death|failure|dissatisfaction|complaint|rejection|loss|losses|negative|fat|decline|defect|error|dropout|attrition|elimination|unaffected|excluded)\b[^.]{0,30}\b(?:rate|ratio|percent|proportion|share|terms?|framing|description|frame)\b/i,
-  /\b(?:mortality|failure|dissatisfaction|attrition|elimination|dropout)\s+(?:rate|ratio|percent|proportion)\b/i,
+  /\b(?:mortality|death|failure|dissatisfaction|complaint|rejection|loss|losses|negative|fat|decline|defect|error|dropout|attrition|elimination|unaffected|excluded)\b[^.]{0,30}\b(?:rates?|ratios?|percents?|proportions?|shares?|terms?|framings?|descriptions?|frames?|numbers?|figures?)\b/i,
+  /\b(?:mortality|failure|dissatisfaction|attrition|elimination|dropout)\s+(?:rates?|ratios?|percents?|proportions?)\b/i,
 ];
 const FRAME_VERB_EN = [
   /\b(?:framed|described|phrased|presented|pitched|worded|cast|labeled|labelled|portrayed|spun|put|reframed)\s+(?:it\s+|them\s+|this\s+|that\s+|the\s+\w+\s+|as\s+)?(?:as|in\s+terms\s+of)\b/i,
 ];
 const FLIP_POS_EN = [
-  /\b(?:accepted|consented|approved|supported|embraced|welcomed|sailed|bought|purchased|signed|endorsed|agreed|comfortable|reassured|acceptable|worth\s+it|cheered|praised|backed|opted\s+in|signed\s+up)\b/i,
+  /\b(?:accepted|acceptance|consented|consent|approved|approval|supported|embraced|welcomed|sailed|bought|purchased|signed|endorsed|agreed|comfortable|reassured|acceptable|worth\s+it|cheered|praised|backed|opted\s+in|signed\s+up)\b/i,
 ];
 const FLIP_NEG_EN = [
-  /\b(?:refused|rejected|declined|opposed|vetoed|died|avoided|balked|unacceptable|alarmed|panicked|protested|walked\s+away|turned\s+(?:it\s+)?down|voted\s+(?:no|against)|backlash|boycott(?:ed)?|shunned|declined\s+outright)\b/i,
+  /\b(?:refused|refusal|rejected|declined|opposed|vetoed|died|avoided|balked|unacceptable|alarmed|panicked|protested|walked\s+away|turned\s+(?:it\s+)?down|voted\s+(?:no|against)|backlash|boycott(?:ed)?|shunned|declined\s+outright)\b/i,
 ];
 
 // ─── 距离窗（框架条件 × 两响应词）──────────────────────────────
