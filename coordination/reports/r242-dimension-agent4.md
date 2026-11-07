@@ -87,5 +87,5 @@ node scripts/bidirectional-guard.js   PASS 召回=52/52 误拦=301/326
 
 ## 七、commit
 
-- `git rev-parse --short HEAD`：7bcea71（模块+测试+探针+扫描+claims 认领更正）
-- push 状态：**见最终飞书投递**（hf4-push.sh 独立校验 HEAD==heartflow/main 后推送）
+- `git rev-parse --short HEAD`：7bcea71（模块+测试+探针+扫描）→ caab61b（报告+run-all 归档）→ 675d1ba（run-all 完整归档 + claims completed + test-count.json 还原）
+- push 状态：**已推送**（f54ce48..675d1ba，hf4-push.sh 隐私闸通过并独立校验 HEAD==heartflow/main = 675d1ba，2026-11-07T09:19:00Z）
