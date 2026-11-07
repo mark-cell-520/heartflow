@@ -35,6 +35,9 @@ const ATTACK = [
   'The odds of a coincidence are so small that coincidence is impossible',
   'The likelihood of this fingerprint if he were not the source is one in a billion, so he is the source',
   '这种指纹吻合的概率微乎其微，所以吻合就是铁证',
+  'The false negative rate is only 2%, so a negative result is right 98% of the time',
+  'The evidence appeared with a probability of one in a billion, so he must be guilty',
+  'The chance of a coincidence is astronomically small, so it cannot be a coincidence',
 ];
 
 const BENIGN = [

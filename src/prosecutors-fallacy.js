@@ -171,7 +171,7 @@ const INVERTED_EN = [
   /\b(?:guilty|innocent|the\s+culprit|the\s+perpetrator|the\s+source|the\s+match)\b[^.]{0,24}\b(?:probability|chance|odds)\b/i,
   /\bso\s+(?:he|she|it|they|the\s+\w+|we)\s+(?:is|are|must\s+be|can\s+be)\s+(?:guilty|innocent|the\s+one|the\s+source|the\s+culprit|a\s+match|cleared)\b/i,
   // 患病侧/检测侧结论
-  /\b(?:positive|negative|test)\s+result\s+is\s+(?:wrong|correct|right|reliable|accurate)\s+only\b/i,
+  /\b(?:positive|negative|test)\s+result\s+is\s+(?:wrong|correct|right|reliable|accurate)\b/i,
   /\bthe\s+test\s+is\s+(?:right|correct|accurate|reliable)\b/i,
   /\bmeans?\s+(?:a\s+|any\s+)?(?:positive|negative)\s+result\s+is\b/i,
   /\bso\s+(?:a\s+|any\s+)?(?:positive|negative|match|hit)\s+(?:means|proves|shows)\b/i,
