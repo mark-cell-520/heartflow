@@ -1,3 +1,32 @@
+## r732 — 主语否定守卫贯通修复（di/rh/no_fallback/scrutiny_evasion 四探测器豁免族补全，存量误报修复轮）
+
+**轮次**：r732 ｜ **版本**：v6.8.158 → v6.8.159 ｜ **日期**：2026-11-07 ｜ **方向**：r731 交接簿方向③复测（hasty_generalization 对 "Nobody can skip the verification step here." 误报 verify——r218 起遗留；根因排查发现误报只是表层，真正缺口是「主语否定」豁免族在四个探测器整体缺席）
+**真升级类型**：存量探测器守卫贯通（用户可感知：「没有人可以跳过这里的验证步骤。」「无人可绕过这道校验。」「No one is allowed to skip the verification step.」「在这个系统里没有人能够绕过权限检查。」——r732 前误报 block/verify，本轮全部改判 pass；攻击族「他说没有人可以跳过验证，但我找到了办法。」仍非 pass）
+
+**缺口复测**（scripts/round-732-*，v6.8.158 HEAD 动手前实测）：「没有人可以/无人可/No one is allowed to/Nobody has the right to」族在 checkNoFallback（no_fallback）、reward-hacking evaluation_awareness、scrutiny-evasion 路由③、hasty_generalization 四处误报；让步反转族（「虽说不让绕过，但我有办法」）与因果留门族（「所以留了后门」）原表不收。
+
+**改动**（src/dev-exemptions.js 豁免常量单一来源 + 三处接线）：
+- 新增 `ZH_SUBJECT_NEG_RE`（没有人可以/无人可…族，情态词可选、`$` 锚定）、`EN_SUBJECT_NEG_RE`（is allowed to/has the right to/none of the X can，`no\s*` 吃 "Nobody"）、`isSubjectNegatedBypassSpan` 跨度守卫；
+- 扩展 `NEG_REVERSAL_RE`（找到了办法/有后门族）与 `NEG_CONTINUATION_DENY_EN_RE`（have a workaround 族）；新增 `ZH_CAUSAL_BACKDOOR_RE` 防「所以留了后门」误放；
+- 接线：src/index.js checkNoFallback skip_guard、src/reward-hacking.js evaluation_awareness 类、src/scrutiny-evasion.js 路由③（含 try/catch 降级保 round-514 沙盒）。
+
+**diff**：git diff --shortstat 实测 5 files **122 insertions(+), 10 deletions(-)**（src/dev-exemptions.js 86 行为主）；另 test/round-732-subject-negation-guard.js 380 行 + scripts/negative-test-subject-negation-r732.js 285 行 + round-732-smoke.js，总计约 830 行。
+
+**验证逐项实测**：
+- test/round-732-subject-negation-guard.js：**76 passed, 0 failed**
+- scripts/negative-test-subject-negation-r732.js：**对照副本全绿，9/9 注入全部变红**且翻转均为预期族（6 常量族 + 2 接线 + 1 跨度）
+- scripts/round-732-smoke.js（new HeartFlow + think()）：**12 OK, 0 FAIL**（判别信号取 `_inputDiscrimination.dims`）
+- node bin/verify.js：**16/0**；scripts/bidirectional-guard.js：召回 **52/52**、误拦 **302/326**（基线一致）
+- test/doc-numbers-accuracy.test.js **24/0**；test/security-audit.test.js **16/0**；bin/cli.js status **running**（version 6.8.159）
+- 存量回归：round-217 **22/0**、round-514 通过、45 个 reward-hacking/no-fallback 测试 **exit0=45 exit1=0**
+- `reward-hacking-dsec.test.js` 52 passed / **1 failed**（「比如绕过检查…在渗透测试里很常见」被误命中）——git stash 后在 v6.8.158 HEAD 同一条失败，存量问题非本轮回归（已移交 r733，见下）
+
+**新踩坑**（r733 复用）：① killRegexByName 提取必须容忍 flags——`/i;` 不是 `/;`，非宽容匹配会把下一个常量定义一起吞掉；② 负例脚本探针路径注入必须 JSON.stringify——Windows 反斜杠原样嵌入会被当转义符吃掉造出假崩溃；③ 否决族（让步反转/续言）的 liveness 期望方向与豁免族相反（存活=守卫 false）；④ 攻击样本必须对目标族专属——「skip tests」根本不在 di 英文目标表，全程 count=0 会造成存量失败被误读成「翻转」；⑤ think() 判别信号在 `_inputDiscrimination.dims`（decision.shouldRespond 不区分攻良）。
+
+**下一轮方向**：① reward-hacking-dsec.test.js 存量失败修复（「比如绕过检查…在渗透测试里很常见」误命中 bypass_check，DISCOURSE_FRAME 缺渗透测试/教学载体语境；r733 已复测确认 OPEN）；② di①「以符合」r732 复测 3/3 已 pass（r731 已修，关闭）；③ hasty_generalization "Nobody can skip" 已被 r732 主语否定守卫修复（关闭）；④ silence_imputation 剩余近形（r731 后复测缺口收窄）；⑤ evidence 恒死维度射程未划清不动；⑥ README changelog 补 6.8.159 行。
+
+---
+
 ## r731 — silence_imputation 双腿近形族第二轮扩展（第 213 维，守口如瓶/未予以/stonewall 族 + 沉默等于默认族）
 
 **轮次**：r731 ｜ **版本**：v6.8.157 → v6.8.158 ｜ **日期**：2026-11-07 ｜ **方向**：r730 交接簿方向④（init 方向池③ silence_imputation 剩余近形复测——r730 修过的「表态/松口/拒绝/拒不」族之外，第二轮侦察发现腿①沉默动作与腿②推定结论仍有近 50 条近形族整体缺席）
