@@ -135,6 +135,10 @@ const COUNT_ZH = [
   // 疾病/公共卫生
   /(?:病例|确诊|感染|患病|疫情|隔离|重症|死亡|伤亡)/,
   /(?:患病人数|感染人数|死亡人数|受伤人数|伤亡人数|确诊人数|病例数|感染数|死亡数)/,
+  /(?:死[在因于]|身亡|去世|丧生|不治|殉职)/,
+  // 工伤/伤害
+  /(?:工伤|受伤|伤害|致残|致伤|职业病|烫伤|摔伤)/,
+  /(?:工伤人数|工伤数|受伤人数|伤害数|工伤案件|伤残人数)/,
   // 事故/故障/投诉
   /(?:事故|故障|投诉|差评|报修|退单|工单|起数|纠纷|维权|举报|索赔)/,
   /(?:事故起数|故障数|投诉量|投诉数|差评量|退单量|工单量|报修量|订单量|出货量|客诉)/,
@@ -148,6 +152,7 @@ const COUNT_ZH = [
 const COUNT_EN = [
   /\b(?:cases|infections|infections reported|outbreaks|deaths|casualties|fatalities|patients)\b/i,
   /\b(?:accidents|crashes|collisions|incidents|faults|failures|malfunctions|breakdowns)\b/i,
+  /\b(?:injuries|injury|wounds|traumas|burns|lacerations|sprains|fractures)\b/i,
   /\b(?:complaints|refunds|returns|lawsuits|claims|reports of|tickets|grievances|disputes)\b/i,
   /\b(?:prizes|awards|medals|wins|titles|scholarships|admissions)\b/i,
   /\b(?:orders|sales|units sold|shipments|signups|churn|cancellations)\b/i,
@@ -167,7 +172,7 @@ const QTY_ZH = [
   /(?:高于|多于|超过|远超|胜过|盖过|压过|比[^。，！？；\n]{0,6}多|是[^。，！？；\n]{0,6}的[一二两三四五六七八九十]倍)/,
 ];
 const QTY_EN = [
-  /\b(?:the most|most|highest|number one|first place|top of the list|leads the pack|far ahead)\b/i,
+  /\b(?:the most|most|highest|number one|first place|top of the list|leads the pack|far ahead|leads|leading)\b/i,
   /\b(?:twice|three times|four times|five times|six times|seven times|eight times|ten times|double|triple|quadruple)\b/i,
   /\b\d+\s*(?:%|percent)\s+more\b/i,
   /\b(?:more than|higher than|exceeds|exceeding|surpasses|surpassing|outpaces)\b/i,
@@ -187,6 +192,7 @@ const VERDICT_ZH = [
   /(?:开车更野|开车最野|驾驶更|驾驶最|更野|最野|更能干|最能干|更专业|最专业|更靠谱|最靠谱|更不可靠|更让人放心|最让人放心|靠不住|技不如人|更优秀|最优秀|更差劲|更菜|最菜|更牛|最牛|更神|最神)/,
   // 出问题类
   /(?:更容易出问题|最容易出问题|肯定有问题|一定有问题|明显有问题|更容易翻车|更容易出事)/,
+  /(?:设计|施工|质量|结构|工艺|系统|流程|设备|服务|产品|安全性|可靠性|安全性|维护)(?:更|最|明显|显然|肯定|一定|大概率|恐怕)?(?:有问题|有毛病|有隐患|不过关|不合格|不达标|不过硬)/,
 ];
 const VERDICT_EN = [
   /\b(?:more dangerous|the most dangerous|less safe|the least safe|safer|the safest|riskier|the riskiest)\b/i,
