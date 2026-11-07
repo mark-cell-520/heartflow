@@ -49,9 +49,9 @@ function realFindings(text) {
 const hasDim = (text, dim) => realFindings(text).some(f => f.dimension === dim);
 
 // ─── 供 D 节变异用的源码锚点（与 src/index.js 当前实现逐字对应）────────
-const ANCHOR_QUANT = '[盒支片粒颗个瓶包袋剂味碗杯]';                       // 新量词类（出现 3 次）
+const ANCHOR_QUANT = '[盒支片粒颗个瓶包袋剂味碗杯服]';                       // 新量词类（出现 3 次）
 const ANCHOR_QUANT_OLD = '[个瓶包袋剂味碗杯]';                            // r227 旧量词类（不许再出现）
-const ANCHOR_OPT_QUANT = '(?:[盒支片粒颗个瓶包袋剂味碗杯][^。]{0,4})?';        // 注射臂量词可选组
+const ANCHOR_OPT_QUANT = '(?:[盒支片粒颗个瓶包袋剂味碗杯服][^。]{0,4})?';        // 注射臂量词可选组
 const ANCHOR_INJECT = '(?:注射液|针剂|药剂|针)[^。]{0,4}打(?:下)?(?:去)?';  // 注射臂
 // [v6.8.158 第 230 轮] 锚点去掉收尾 `)`：原写法把正则的闭合括号也编进锚点，
 // 任何后续往 PC_DRUG_MECH_ZH **尾部**追加词的轮次都会让锚点静默失配
@@ -336,7 +336,7 @@ test('D4 变异守卫四：把注射臂量词可选组改成必选后「这针/�
     // 去掉 `?`（量词变必选）——不是删掉整组：删掉整组后 `(?:这|那|一)` 直接接
     // 对象「针」，「这针/一针」仍会被兜住（本轮实测踩到，见 UPGRADE_LOG 踩坑）
     const mutated = orig.replace(/const PC_INVTAKE_ZH = [^\n]*;/m,
-      line.split(ANCHOR_OPT_QUANT).join('[盒支片粒颗个瓶包袋剂味碗杯][^。]{0,4}'));
+      line.split(ANCHOR_OPT_QUANT).join('[盒支片粒颗个瓶包袋剂味碗杯服][^。]{0,4}'));
     assert.ok(mutated !== orig, '变异未生效');
     fs.writeFileSync(src, mutated, 'utf8');
     // 无量词注射语序必须重新漏判

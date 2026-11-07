@@ -407,13 +407,15 @@ test('G2 已知未修②：无顺序标记的收束词归责句不判（第①�
   assert.strictEqual(pcCount('说到底还是教练的功劳'), 0,
     '该句已判命中——若这是有意扩面，请同步更新本条登记');
 });
-// G3：r230 挂账甲半缺口两条仍未修（候选③，需同时动 PC_INVTAKE_ZH 对象表与
-// PC_DRUG_MECH_ZH 的「服药」腿，属跨表重构）。
-test('G3 已知未修③：r230 甲半缺口两条仍未修（跨表重构，本轮不动）', () => {
-  assert.strictEqual(pcCount('吃了这片药人就困了'), 0,
-    '该句已判命中——若这是有意修复，请同步更新本条登记');
-  assert.strictEqual(pcCount('这服药喝下去当晚就睡得死沉'), 0,
-    '该句已判命中——若这是有意修复，请同步更新本条登记');
+// G3：r230 挂账甲半缺口两条已由 r236 修复（PC_INVTAKE_ZH 正序臂对象表补裸「药」
+// + 量词类补「服」、PC_DRUG_MECH_ZH「服药」腿加 `(?<![这那一])` 负向环视）。
+test('G3 已修复③：r230 甲半缺口两条已修（r236 FIXED，登记翻正）', () => {
+  assert.strictEqual(pcCount('吃了这片药人就困了'), 1,
+    '该句回归 0 命中——r236 修复被回退');
+  assert.strictEqual(pcCount('这服药喝下去当晚就睡得死沉'), 1,
+    '该句回归 0 命中——r236 修复被回退');
+  assert.notStrictEqual(gateAction('吃了这片药人就困了'), 'pass', '该句 gate 已回落到 pass');
+  assert.notStrictEqual(gateAction('这服药喝下去当晚就睡得死沉'), 'pass', '该句 gate 已回落到 pass');
 });
 // G4：跨表医疗/机制词统一仍未做（连续九轮挂账）——四张机制表用词高度重叠但
 // 不完全一致，且都没收「交付质量/机场时刻表」这类业务机制词。

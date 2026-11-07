@@ -578,9 +578,12 @@ test('F6 lastIndex 防空匹配防护位于一切 continue 之前（本轮实踩
   assert.ok(guardIdx < contIdx, 'lastIndex 防护必须排在 continue 之前，否则空匹配 + 无结果词会死循环');
 });
 
-// ─── G 节：已知未修登记 ─────────────────────────────────────────────
-test('G1 两条已知未修（甲半缺口）在 HEAD 仍 0 命中（登记字面量防漂移）', () => {
-  const bad = KNOWN_OPEN.filter(s => pcCount(s) !== 0);
-  // 若下一轮无声修好，这里会失败——那是好事，把断言改成 >0 并在报告里记一笔
-  assert.deepStrictEqual(bad, [], `以下挂账句已被无声修好（请更新断言）：\n  ${bad.join('\n  ')}`);
+// ─── G 节：已知未修登记翻正（r236 FIXED）────────────────────────
+// r230 挂账、经 r231/r233/r234/r235 四轮字面量看守的两条甲半缺口，已由第 236 轮
+// 修复（PC_INVTAKE_ZH 正序臂对象表补裸「药」+ 量词类补「服」、PC_DRUG_MECH_ZH
+// 「服药」腿加 `(?<![这那一])` 负向环视）。按纪律翻成正向断言守不退步。
+test(`G1 两条甲半缺口句已被 r236 修复（登记翻正，${KNOWN_OPEN.length} 条）`, () => {
+  const bad = KNOWN_OPEN.filter(s => pcCount(s) === 0);
+  // 若下一轮被无声回退，这里会失败——那是坏事，说明 r236 的修复丢了
+  assert.deepStrictEqual(bad, [], `以下挂账句回归 0 命中（r236 修复被回退）：\n  ${bad.join('\n  ')}`);
 });

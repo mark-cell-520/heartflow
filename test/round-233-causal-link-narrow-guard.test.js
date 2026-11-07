@@ -366,11 +366,11 @@ test('G3 已修复③：转述归责「都说是」已有归因断言词，同�
   assert.strictEqual(pcCount(s), 1, '「都说是」缺口已消失——请同步更新本条登记');
   assert.notStrictEqual(gateAction(s), 'pass', '该句 gate 不应是 pass（依赖其他维度兜底）');
 });
-test('G4 已知未修④：r230 挂账甲半缺口两条仍未修（HEAD 同为 0/pass，存量非本轮引入）', () => {
+test('G4 已修复④：r230 挂账甲半缺口两条已修（r236 FIXED，登记翻正）', () => {
   const gaps = ['吃了这片药人就困了', '这服药喝下去当晚就睡得死沉'];
   for (const s of gaps) {
-    assert.strictEqual(pcCount(s), 0, `甲半缺口「${s}」已被修复——请同步更新本条登记并移出候选池`);
-    assert.strictEqual(gateAction(s), 'pass', `「${s}」gate 已非 pass`);
+    assert.strictEqual(pcCount(s), 1, `甲半缺口「${s}」回归 0 命中——r236 修复被回退`);
+    assert.notStrictEqual(gateAction(s), 'pass', `「${s}」gate 已回落到 pass`);
   }
 });
 test('G5 已修复⑤：「总之 + 归责名词」归因形 detector 命中（r235 FIXED，登记翻正）', () => {

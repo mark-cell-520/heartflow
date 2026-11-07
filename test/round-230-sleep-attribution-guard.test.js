@@ -486,9 +486,16 @@ test('F4 睡眠臂不许窜进 PC_CAUSAL_ZH_PATS 十四支（只能走独立子�
   assert.ok(!/睡着|入睡|一觉|沾枕/.test(m[0]), '睡眠词窜进了十四支数组');
 });
 
-// ─── G 节：已知未修（甲半缺口）登记字面量 ─────────────────────────
-test(`G1 两条甲半缺口句本轮仍 0 命中（登记防漂移，${KNOWN_OPEN.length} 条）`, () => {
-  const bad = KNOWN_OPEN.filter(s => pcCount(s) !== 0);
+// ─── G 节：已知未修登记翻正（r236 FIXED）────────────────────────
+// r230 挂账的两条甲半缺口已由第 236 轮修复（PC_INVTAKE_ZH 正序臂对象表补裸
+// 「药」+ 量词类补「服」、PC_DRUG_MECH_ZH「服药」腿加 `(?<![这那一])` 负向环视），
+// 按 r226/r227/r233/r234/r235 纪律翻成正向断言：反过来守本轮修复不退步。
+test(`G1 两条甲半缺口句已被 r236 修复（登记翻正，${KNOWN_OPEN.length} 条）`, () => {
+  const bad = KNOWN_OPEN.filter(s => pcCount(s) === 0);
   assert.deepStrictEqual(bad.map(s => `${s} → ${pcCount(s)}`), [],
-    '甲半缺口句被意外命中——说明有人改了甲半表，需重跑全量 A/B 与双向门禁');
+    '甲半缺口句回归 0 命中——r236 的修复被回退了，需查 PC_INVTAKE_ZH / PC_DRUG_MECH_ZH');
+  for (const s of KNOWN_OPEN) {
+    assert.ok(hasDim(s, 'pseudo_causal'), `findings 应含 pseudo_causal：${s}`);
+    assert.notStrictEqual(gateMod.gate(s).gate.action, 'pass', `gate 应非 pass：${s}`);
+  }
 });
