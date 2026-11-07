@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-213-blueviolet.svg)](#what-it-catches-213-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-214-blueviolet.svg)](#what-it-catches-214-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-213 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+214 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  18,949 passing tests  ×  2 npm dependencies
 ```
 
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 213 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 214 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (213 dimensions) -> gate
+scope-check -> premise-check -> discriminate (214 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (213 dimensions)
+## What it catches (214 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **170 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **171 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -205,14 +205,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.155**. Not marketing copy.
+Measured on this repository at **v6.8.156**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 213 |
+| Discrimination dimensions | 214 |
 | MCP tools | 184 |
 | Test suite | 18,949 passing / 79 failing |
 | Capability guard | 20 / 20 checks |
@@ -383,6 +383,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.156 | 2026-11-07 | 第 214 判别维度 **loaded_question**「预设加载 / 诱导性提问（loaded question / presuppositional question）」上线（r729）——家族探针（scripts/round-729-family-probe.js，v6.8.155 实测）conditional_proposition 排除后唯一合格候选：攻击 20 条漏判 11/20=55%、良性 11 条误伤 0/11，且漏判中真零命中 10/11（唯一被 unsupported_claim 代拦 1 条 probe 已记录）；新文件 src/loaded-question.js（checkLoadedQuestion，含 PRESUP_ZH/EN 两腿族 23 形、QUESTION_MARK/WH、EXEMPT_META_ZH/EN、HEDGE、EVIDENCE_MODE、NEGATION_FLIP、__internals()）：双腿共现判据（腿①预设加载形：认错预设「你打算什么时候承认」/「既然知道错了为什么」、规矩违反预设「你又不是不知道规矩」、单一能力预设「除了X还会什么」、能力否定预设「连…都做不好」、持续劣行预设「什么时候才能不」/「怎么还在原地踏步」、隐瞒抵赖预设「还在偷偷骗/瞒」、习惯劣行预设「为什么总是推/怪/抱怨」、受贿预设「老实说…收了多少钱」、重复劣行预设「是不是又撒谎」；EN when did you stop/start X-ing / how long have you been X-ing / aren't you the one who / who else was involved or knew about / what made you so X / why would anyone still trust you / why do you always or keep + 贬损动词集 blame|lie|cheat|hide|avoid|make excuses|complain|procrastinate|ignore|deflect|deny / how could you do / what else did you take / why can't you just admit / aren't you tired of / isn't it time you stopped + 贬损动词集——EN 动词集刻意收窄防「How could you do that?」类良性问法误伤；腿②盘问句式：同句问号（？/?）或疑问词（为什么/怎么/什么/哪/谁/多久/why/how/what/when/who/which））+ 邻近窗 60 字符 + 豁免四张表（元话语「这是预设加载/诱导性提问/loaded question」、对冲「也许/可能/perhaps/maybe」、显式证据「实测/数据/证据/experiment/data/evidence」、否定翻转「并不能说明/不代表/does not mean」），把「把未经证实的前提嵌进盘问句、任何直接回答都等于默认该前提成立」的新攻击族纳入 verify 级——问句内嵌前提会把举证责任悄悄转移，答者无论怎么回答都已替提问者证明了那个未经验证的前提；与 conditional_proposition（第 160 维「如果A真就B」假设条件句当既成论据——不依赖条件结构、单问句即完成加载，交集样本两维同时命中 gate 取并集）/ hasty_generalization（无依据概推——本族是问句结构问题）边界错开；主探针（scripts/round-729-loaded-question-probe.js）**20/20 命中 + 良性 0/25**，对抗探针（scripts/round-729-loaded-question-adversarial-probe.js）**18/18 + 刁钻良性 0/16**；test/round-729-loaded-question.js **17 断言全绿**（腿①/腿②常量注入全承重、中英双腿互为冗余、攻击 20/20、良性 27/27 模块层零误伤、5 豁免常量逐项注入承重 + 互不依赖、gate 层 11/11 漏判改判、维度注册断言），负例脚本 scripts/negative-test-loaded-question-r729.js **33/33**（24 注入点全承重——腿① ZH 11 形 + EN 12 形逐形置空失效、腿②问号+疑问词双置空 23 条攻击全失效、豁免 5 项置空后边界样本恢复命中；良性对照 27 条零误伤；gate 层 23 条攻击非 pass + 11 条漏判样本改判 + 良性不误伤）；双向门禁召回 52/52 误拦 302/326 与基线完全一致、verify 16/0、security-audit 16/0、cli.js status running；verify 170→171、维度 213→214、三层级合计 200→201/剩余 13 不变，模块 162 不变（纯函数维度模块不进 _modules registry，与 r209-r213 各行同口径）；新踩坑：AGENTS.md 被 Hermes 文件保护拦截（patch 需交互批准、cron 无人批准，禁绕道 terminal）——本轮 README/SKILL 已同步 213→214 与 verify 170→171，AGENTS.md 三处计数（总数/add up to/Verify-level 列举）留待用户批准后补，doc-numbers 相应 3 项 FAILED 如实上报；patch 工具对超长单行（DIM_GUIDANCE 富格式条目 ~2000 字符）模糊匹配会错位吞邻行——长行插入改用行首短锚点 + 新内容内禁裸双引号（用「」）；常量注入测试必须 try/finally 恢复（assert 抛出时恢复行不执行，泄漏常量污染后续断言——本轮 META_EN 假失败即此级联）|
 | 6.8.155 | 2026-11-07 | silence_imputation（第 213 维，r717 上线）腿①沉默动作族补全（r728 单点，存量修复轮）——r727 下一轮方向①：探针复测（scripts/round-728-silence-probe.js，v6.8.154 实测）表态/松口/给说法 三族 + 拒绝/回避/不搭话同族形 + EN 对位 12 条攻击 **0/12 全 MISS**、良性 12/12 零误伤，根因全部在腿①：① 动词表缺 表态/松口/给（个）说法——中文语境「沉默」最常用形恰是「没表态」「不松口」「不给说法」，原表只收言语类动词（否认/澄清/回应/回答/解释/辟谣/发声/吭声/置评）；② 不-动词族缺否定填充形（不肯/不愿/不予/予——「始终不肯松口」「不予回应」漏判）；③ 拒绝族缺同族动词（拒绝表态/拒绝松口）；④ 回避问题/不搭话/不接茬 同族沉默动作未收；⑤ EXEMPT_CORRECT_ZH 泛化 '不给' 把「不给说法」整体误判为正确响应豁免（r717 原意是「不给传闻增加热度」，该样本已由 '增加热度' 条目覆盖，收窄零损失）；EN 对位补 refused to take a position / wouldn't budge / no explanation was offered / has not offered any explanation；对抗探针（scripts/round-728-silence-adversarial.js）再抓 4 条近 miss（宾语前置形「连句话都不给」「一句说法都不给」——宾语前移后「不给」不跟「说法」，补 /都不给/ 族；「不予」单字填充；EN has not offered 形）修复后 8/8 + 刁钻良性 0/14；修复后主探针 12/12 + 良性 0/12；**只扩腿①、推定腿（腿②）一行未动**，良性侧靠「无推定结论即 pass」兜底；test/round-728-silence-imputation-leg1-extension.js **52 断言全绿**（13 攻击 gate 非 pass、10 良性全维度 pass、12 模块边界含句读/疑问豁免锁、6 __internals 注入含 r728 收窄承重、think() 冒烟、4 存量锚点、2 分工边界锁、5 登记断言）、负例脚本 scripts/negative-test-silence-imputation-r728.js **16/16**（12 注入点全承重 + 13 良性零误伤 + gate 层 3/3）、存量 test/round-717-silence-imputation.test.js 40/40、test/round-727-silence-imputation-extension.js 38/38 零回归、双向门禁召回 52/52 误拦 302/326 与基线完全一致、verify 16/0、doc-numbers 24/0、security-audit 16/0、cli.js status running；维度数不变（213 维、三层级 200 项、模块 162——存量维度探测器族扩展，非新维度）|
 | 6.8.154 | 2026-11-07 | silence_imputation（第 213 维，r717 上线）腿②缺口扩展（r727，存量修复轮）——方向池「6/10 漏判」复测实为 4/10（scripts/round-727-silence-probe.js，r216 口径攻击样本）、良性 0/10 零误伤，四条漏判根因全部在腿② IMPUTE 槽位缺失、腿① 10/10 全命中：① 因果连接形（连接词 所以/因此/足见/可见 + 结论——原等式化族要求 说明/证明 类动词在前，「他没否认，所以这事是真的」「她没有辟谣，可见确有其事」两条全漏），结论加**句读边界约束**（标点/句尾/语气词）防「所以这事是真的没办法推进」类「是真的+形容词」副词形误伤；② 动词叠用形（无异于/等于/无异/相当于/等同于 + 坐实（指控）——坐实原在等式化族动词槽，「无异于坐实指控」两槽都吃不上）；③ 「这(就)说明+问题」总结形（原族只有「这就是答案」）；④ 副词族补 足见/可见/看来（「足见心里有鬼」）；EN 侧对位补 amounts to a confession / tells you something + SILENCE_EN 补 said nothing / nothing to say 口语沉默形（对抗探针 "He said nothing, which amounts to a confession." 腿①不命中）；修复后探针 10/10、对抗探针 10/10 + 良性 0/8；test/round-727-silence-imputation-extension.js 38 断言全绿（13 攻击 gate 非 pass、8 良性全 pass、8 模块边界含句读约束承重、6 __internals 注入含豁免唯一通路、think() 冒烟、4 存量锚点）、负例脚本 scripts/negative-test-silence-imputation-r727.js 11 注入点 11/11（双腿×4 + 豁免×1 全部承重，良性对照 8/8 零误伤，gate 层 4/4）、存量 test/round-717-silence-imputation.test.js 40/40 零回归、test/victim-blaming-silence-consent.test.js 全过、双向门禁召回 52/52 误拦 302/326 与基线完全一致、verify 16/0、doc-numbers 24/0、security-audit 16/0、cli.js status running |
 | 6.8.153 | 2026-11-07 | **argument_to_moderation**「折中谬误」（第 194 维，r196 已上线）探测器族扩展（r726 执行，r727 验证落盘——r726 被迭代上限截断于冒烟后，半成品留工作区由 r727 接手：先跑遗留测试确认有效（round-196 68/0、负例 29/29、think 冒烟 30/30+24/24）再补全链路验证，未重写任何规则）——方向池「middle_ground 4/10 漏判」修复：腿① MIDDLE 中间立场表述族补 moderate/compromise/extremism/even-handed/balanced/fair 六族 × 量化/最高级、真相·答案·结论[永远|一定|从来]在(两个)(极端)(之间|中间)、和稀泥/息事宁人/双方·两边(其实|都)有(一定)道理/极左极右/取(个)中间（EN 补 in the middle / moderate / compromise / extremism），腿② TRUTH 中间=正确断言族补 (中间|折中|中庸)[必然|一定|当然|显然]才是X/(最|才)(公平|合理|稳妥|明智)的(处理|解决|做法|方案|方式)/[总是|一定|必然|永远][最](对|正确|合理|稳妥|公平|明智)/真相·答案在(两者|双方)(极端)之间/各打五十大板…算了/争不出结果/没有绝对的(对错|是非)/走极端…错/越极端越有问题（EN 补 truth (is) (always) (in) the middle/(always|invariably)…most (reasonable|sensible)/no absolute (right|wrong)/answer must be a compromise/moderate path must be right），豁免补 最高分/最低分 与五组中英双语豁免落地；两腿共现 + 邻近窗（≤50 字 / EN ≤200 字符）判别把「两个立场冲突时折中方案天然正确」的攻击族纳入 verify 级——中间立场有时确实正确，但正确性来自证据与推理而非位置本身，把位置当论据是论证形式的替换；改动集中在 src/argument-to-moderation.js（+88 行：腿表与豁免常量）+ src/index.js guidance 文本同步 + test/round-196-argument-to-moderation.js 补 189 行断言；维度数不变（213 维、三层级 200 项、模块 162 均与轮初一致——本轮到手是存量维度探测器扩展不是新维度）；验证：test/round-196-argument-to-moderation.js 68 断言全绿、负例脚本 scripts/negative-test-middle-ground-r726.js 29 注入点 29/29 如期变红（良性零误伤）、think() 真实调用冒烟正例 30/30 反例 24/24 全绿、双向门禁召回 52/52 误拦 302/326 与基线完全一致、verify 16/0、security-audit 16/0、cli.js status running |

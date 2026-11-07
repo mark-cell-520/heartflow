@@ -1,3 +1,36 @@
+## r729 — 新维度 loaded_question 上线（第 214 维，预设加载/诱导性提问）
+
+**轮次**：r729 ｜ **版本**：v6.8.155 → v6.8.156 ｜ **日期**：2026-11-07 ｜ **方向**：家族探针 decision 打分最高候选（conditional_proposition 已上线排除后唯一合格项）
+**真升级类型**：新辨别维度上线（用户可感知：「你既然知道错了，为什么还不改？」「你除了抱怨还会做什么？」「When did you stop cheating on your taxes?」类从 pass 变 verify；家族探针攻击 20 条漏判 11/20=55% → 主探针 20/20 全命中、对抗探针 18/18，良性面双向门禁 302/326 与基线完全一致零新增误伤。维度数 213→214、verify 层 170→171、三层级合计 200→201/剩余 13 不变、模块 162 不变）
+
+**缺口复测**（scripts/round-729-family-probe.js，v6.8.155 实测，动手前）：conditional_proposition（第 160 维，replay 已同步上线）排除后逐候选复测——loaded_question 攻击 20 条漏判 11/20=55%（漏判中真零命中 10/11，唯一 1 条被 unsupported_claim 代拦 probe 已记录）、良性 11 条误伤 0/11，为唯一合格候选；其余候选（hasty_generalization 2 条、is_ought 3 条等）均有存量模块部分代拦且 FP 面未划清。
+
+**改动**（src/loaded-question.js 新建 153 行 + src/index.js 十处接线）：
+- 双腿共现判据：腿① PRESUPPOSITION 预设加载形（ZH 11 形：认错预设「你(到底|究竟)?(打算|准备)?(什么时候|何时)(才能|才肯|会|打算)?承认」/「既然知道错…(为什么|怎么还|还不|竟|居然|却)」、规矩违反预设「你又不是不知道…」、单一能力预设「你除了…还会…」、能力否定预设「连…都(做不好|干不好|做不到|办不好|搞不定)」、持续劣行预设「你什么时候才能不…」、贬损状态预设「你怎么还(在|会|是)(原地踏步|不思进取|执迷不悟|一意孤行|嘴硬|装傻|装睡|推卸|敷衍)」、隐瞒抵赖预设「你还在(偷偷|暗中|背着我|一直)?(骗|瞒|掩饰|狡辩|抵赖|推诿|逃避|找借口|自欺欺人)」、习惯劣行预设「你为什么总是…(推给|推卸|怪|抱怨|找借口|逃避|敷衍|拖|忘|撒谎|骗|瞒|抵赖|找理由)」、受贿预设「你(老实说|说实话|说真话)…(收了多少钱|拿了多少好处|拿了多少回扣)」、重复劣行预设「你是不是又(撒谎|骗|瞒|忘|拖|迟到|犯错|惹祸|顶嘴|食言)」；EN 12 形：when did you stop/start X-ing、how long have you been X-ing、aren't you the one who、who else was involved/knew about、what made you so X、why would anyone still trust you、why do you always/keep + **贬损动词集**（blame|lie|cheat|hide|avoid|make excuses|complain|procrastinate|ignore|deflect|deny + -ing 形——刻意收窄防「How could you do that?」类良性问法误伤）、how could you do/say/treat/hurt/lie/cheat/ignore/let/betray、what else did you take/hide/lie about/destroy/delete、why can't you just admit、aren't you tired/sick/fed up/ashamed of、isn't it time you stopped + 贬损动词集）；腿② QUESTION 盘问句式（同句问号 ？/? 或疑问词 为什么/怎么/什么/哪/谁/多久/why/how/what/when/who/which）。两腿共现才判，缺腿不判——「你什么时候交报告？」是无预设的正常提问。
+- 60 字符邻近窗（同 r717/r727 先例）；句子级切分（问号即断句边界）。
+- 豁免四张表：META_ZH/META_EN（元话语「这是预设加载/诱导性提问/leading question/loaded question」——讨论该技巧本身是正确判别）、HEDGE（也许/未必/不一定/可能/perhaps/maybe/possibly）、EVIDENCE_MODE（实测/数据/证据/实验/笔录/experiment/data/evidence/transcript）、NEGATION_FLIP（不能说明/不代表/不等于/推不出/does not mean/doesn't imply）。
+- src/index.js 十处接线（require + 计算点 _applyPedagogyRelaxation + allDims 参与判定 + dims 登记 + DIM_GUIDANCE 富格式 guidance + VERIFY_DIMS + 补登记 dims + 补登记 summary + FALLACY_PATTERNS 静态路由 ZH 12 条/EN 13 条 + FALLACY_SEVERITY 0.4）。verify 级——问句内嵌未经证实的前提是证据缺口，单句也可能是法庭盘问转述/文学对白/概念教学，rewrite/block 会误伤。
+- 边界错开：conditional_proposition（第 160 维）管「如果A真就B」假设条件句当既成论据，本族不依赖条件结构、单问句即完成加载，交集样本（「要是她问心无愧，为什么不敢出来回应」）两维同时命中、gate 取并集；hasty_generalization 管无依据概推，本族是问句结构问题。
+
+**diff**：`git diff --shortstat` 实测见落盘段（有效代码 src/+test/ 约 480 行：src/loaded-question.js 153 行新建 + src/index.js 约 +90/-2 + test/round-729-loaded-question.js 17 断言；其余为证据链：探针×2、gate 检查、负例脚本 33 注入点、think 冒烟、README/SKILL 文档口径、changelog、本条目）
+
+**验证逐项实测**：
+- 主探针 scripts/round-729-loaded-question-probe.js：**20/20 命中 + 良性 0/25**
+- 对抗探针 scripts/round-729-loaded-question-adversarial-probe.js：**18/18 + 刁钻良性 0/16**
+- gate 层检查 scripts/round-729-gate-check.js：11 条家族探针漏判样本 **11/11 改判**（非 pass）、良性 **0/11** 误伤
+- test/round-729-loaded-question.js：**17 断言全绿**（腿①全置空/恢复、中英双腿互为冗余、腿②双置空、攻击 20/20、良性 27/27 模块层零误伤、多处共现加权、5 豁免常量逐项注入承重 + 互不依赖、gate 层 11/11 改判 + 良性 0 误伤、维度注册断言）
+- 负例脚本 scripts/negative-test-loaded-question-r729.js：**33/33**（24 注入点全承重——腿① ZH 11 形 + EN 12 形逐形置空即失效、腿②问号+疑问词双置空 23 条攻击全失效、豁免 5 项置空后边界样本恢复命中且互不依赖；良性对照 27 条零误伤；gate 层 23 条攻击非 pass + 11 条漏判改判 + 良性不误伤）
+- think() 冒烟 scripts/round-729-think-smoke.js：正例 **6/6** 命中、干净良性 **4/4** 零命中、边界良性 **2/2** 本族零命中（别族命中为预存污染，见踩坑①）
+- bin/verify.js **16/0**；双向门禁召回 **52/52**、误拦 **302/326** 与基线完全一致（零新增误伤）；security-audit **16/0**；bin/cli.js status **running**；基线计数 162 模块 / **214 维度**（scripts/round-729-baseline-count.js）
+
+**doc-numbers 未全绿（3 项 FAILED，如实上报）**：AGENTS.md 被 Hermes 文件保护拦截（patch 需交互批准、cron 无人批准、禁绕道 terminal/execute_code）——AGENTS.md 三处计数（**Zero LLM dependency.** 213→214、## The 213→214 dimensions、Verify-level (170)→(171) 列举 + add up to 200→201、正文维度清单补 loaded_question）未能更新，doc-numbers 相应 3 项 FAILED（AGENTS.md 维度总数 / 三文档互相一致 / Verify 层列举数）。README.md 与 SKILL.md 已全量同步（213→214 共 10 处、verify 170→171、版本戳 v6.8.156、changelog 新行）。**下一轮或用户批准后第一件事：补 AGENTS.md 三处计数**（可用 scripts/round-655-doc-sync.js 同款脚本模式，或用户在本机批准后 patch）。
+
+**新踩坑**：① 良性样本 gate 级断言被别族预存行为污染（r728 教训复现）：2 条边界良性（元话语/对冲）在本族模块级零误伤，但 think() 的 _inputDiscrimination.dims 里 fallacies/soft_deflection/false_balance 命中——族级冒烟的「零命中」断言要按维度归因（本族零命中即过），双向门禁误拦基线 302/326 不变才是零新增误伤的硬证据。② patch 工具对超长单行（DIM_GUIDANCE 富格式条目 ~2000 字符）模糊匹配会错位吞并邻行（本轮第一次 DIM_GUIDANCE patch 把 appeal_to_ridicule 整条吞掉造成 SyntaxError，git checkout 回滚重做）——长行插入改用**行首短锚点**（`'appeal_to_ridicule': "不得用**嘲笑` 截断到 20 字符内）且新内容内禁裸双引号（用「」代替）。③ 常量注入测试必须 try/finally 恢复：assert 在恢复行前抛出会泄漏置空常量，污染后续全部断言（本轮 META_EN 假失败即此级联——腿① EN 置空未恢复导致 3 个后续测试连环假红）。④ 单引号 JS 字符串里写英文测试名要防撇号：`aren't-you-the-one`/`can't`/`it's` 直接终结字符串字面量（negative-test 脚本 3 处 SyntaxError），测试名用 are-not/cannot/its 规避。⑤ think() 是 async 且需 await hf.start()，判别维度在 r._inputDiscrimination.dims——同步调用拿到 Promise，断言全 vacuous 假绿（r724 冒烟脚本口径）。
+
+**下一轮方向**（复测后排序）：① **补 AGENTS.md 三处计数**（本轮被文件保护拦截的 3 项 doc-numbers FAILED，用户批准后第一优先）；② di ① 目的状语豁免不含「以符合」（init 方向池第 1 项，r217/r218 两轮锁定遗留边界，动手前先 grep 定位现存测试）；③ hasty_generalization 对 "Nobody can skip the verification step here." 误报 verify（init 方向池第 2 项）；④ evidence 维度恒死（r690 起多轮遗留，射程未划清前不动）；⑤ silence_imputation 可再扩族（不言语/不作声/没松口/未曾表态 近形，良性安全）；⑥ chronological_snobbery 维持落选
+
+---
+
 ## r728 — silence_imputation 腿①沉默动作族补全（表态/松口/给说法 4/10→12/12 全链路命中）
 
 **轮次**：r728 ｜ **版本**：v6.8.154 → v6.8.155 ｜ **日期**：2026-11-07 ｜ **方向**：r727 下一轮方向①（init 方向池③ silence_imputation 的残余缺口）

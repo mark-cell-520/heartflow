@@ -766,6 +766,13 @@ const { checkNoTrueScotsman } = require('./no-true-scotsman.js');
 // [r729] 第 160 维度 conditional_proposition（条件句武器化：假设条件句当既成论据）。
 // 双腿共现（假设条件句×否定推断）；细节见 src/conditional-proposition.js。
 const { checkConditionalProposition } = require('./conditional-proposition.js');
+// [r729] 第 214 维度 loaded_question（预设加载/诱导性提问：盘问句内嵌未经证实的
+// 前提，任何直接回答都等于默认该前提成立）。decision 本体选出（本克隆
+// scripts/round-729-family-probe.js 实测：攻击漏判 11/20=55%、良性 0/11
+// 误伤、漏判中真零命中 10/11——conditional_proposition 已上线排除后唯一
+// 合格候选）。双腿共现（预设加载腿×盘问句式腿）；细节见
+// src/loaded-question.js。
+const { checkLoadedQuestion } = require('./loaded-question.js');
 // [r161] 第 161 维度 monocause（单一因果过度简化：把已知多因的系统性复杂
 // 结果压成单一原因+绝对化归因框架）。decision 本体一次选出
 // （heartflow_philosophy_decision type=accelerate/confidence 0.7/goalReviewed
@@ -2095,6 +2102,8 @@ function discriminate(text, evidence = [], contentMode) {
   const nts = _applyPedagogyRelaxation(checkNoTrueScotsman(_normText), "no_true_scotsman", pedagogyRelaxation);
   // [r729] 第 160 维度 conditional_proposition（条件句武器化）计算点。
   const cp = _applyPedagogyRelaxation(checkConditionalProposition(_normText), "conditional_proposition", pedagogyRelaxation);
+  // [r729] 第 214 维度 loaded_question（预设加载/诱导性提问）计算点。
+  const lq = _applyPedagogyRelaxation(checkLoadedQuestion(_normText), "loaded_question", pedagogyRelaxation);
   // [r161] 第 161 维度 monocause（单一因果过度简化）计算点。
   // 同 r729 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const mono = _applyPedagogyRelaxation(checkMonocause(_normText), "monocause", pedagogyRelaxation);
@@ -2683,6 +2692,8 @@ function discriminate(text, evidence = [], contentMode) {
     {score: nts.score, name:'no_true_scotsman'},
     // [r729] 第 160 维度 conditional_proposition 参与判定（假设条件句当既成论据）。
     {score: cp.score, name:'conditional_proposition'},
+    // [r729] 第 214 维度 loaded_question 参与判定（预设加载提问）。
+    {score: lq.score, name:'loaded_question'},
     // [r161] 第 161 维度 monocause 参与判定（单一因果过度简化）。
     // 同 r729 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: mono.score, name:'monocause'},
@@ -3195,6 +3206,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r729] 第 160 维度 conditional_proposition（假设条件句当既成论据×
     // 假设条件句腿×否定推断腿）。
     conditional_proposition: cp,
+    // [r729] 第 214 维度 loaded_question（预设加载提问×
+    // 预设加载腿×盘问句式腿）。
+    loaded_question: lq,
     // [r161] 第 161 维度 monocause（单一因果过度简化×
     // 系统性复杂现象腿×绝对化单一归因腿）。
     monocause: mono,
@@ -3551,6 +3565,8 @@ function discriminate(text, evidence = [], contentMode) {
     'appeal_to_consequences': "不得**用命题后果的可接受性替代事实证据，据此否定或拒绝相信命题的真值**——因为一个结论太可怕、太难以接受或会让某事失去意义，就断定它不可能是真的：「承认房价会跌太可怕了，那么多人还着贷款，所以房价不可能跌」「如果进化论是真的，那人活着就没有意义了，所以进化论不可能是真的」「我不敢相信气候变化是人为的，万一这是真的，经济就全盘崩溃了」「这种结果太可怕了，简直不敢想，所以一定是数据造假」(If climate change were real, our economy would collapse, so it cannot be true. / The consequences of admitting this would be too damaging, so I refuse to believe it. / The findings are too devastating to be true — the data must be fabricated.；样本形状与负例见 test/round-165-appeal-to-consequences.js)。判据**双腿共现**：腿① CONSEQUENCE 显式后果评估——太可怕/细思极恐/不堪设想/不敢想/没法接受/天要塌了/全盘崩溃/经济崩盘/还有什么意义/全都白费/天下大乱（EN：too damaging / would collapse / would be devastating / too much to bear / life would have no meaning）；腿② TRUTH-DENIAL 真值否定/拒绝相信——所以不可能是真的/一定是假的/纯属吓唬/危言耸听/我不敢相信…是真的/怎么可能（EN：cannot be true / must be false / I refuse to believe / too … to be true）。缺一不判——「后果很严重，我们需要认真准备应对措施」只有后果评估，落点是行动不是真值否定，是正当风险沟通；「这一定是假的」无后果评估前提归其他维度。后果的可接受性与命题的真值是**两个独立的问题**——房价跌不跌取决于市场供需与政策，不取决于跌了有多可怕：正当做法是**先核查命题本身的证据**（数据/模型/历史先例），再讨论后果的应对（如果结论为真，需要做什么准备/EN: check the evidence for the claim first, then plan for the consequences if it holds）。边界：conditional_proposition（第160维）管假设条件句×否定推断（「如果A真就B；就不会」——B是普通结果），本族的必要腿是**显式后果评估**，交集样本两维同时命中、gate 取并集；wishful_thinking（第147维）管信念/愿望→结果必然实现（我想所以会成），本族方向相反（后果糟所以不是真的）；fear_projection 管外部危险×服从绑定的控制结构，本族不管服从只裁真值；unsupported_claim 管无依据断言本身，本族有具体推理结构。明确不判：对冲表述（可能/也许/未必/不一定）、证据在场（数据表明/实验结果/同行评审/peer review）、概念转述（诉诸后果/appeal to consequences/argumentum ad consequentiam）、否定翻转（后果严重不意味着命题为假/does not mean）、提问句式（含问号）。",
     // [r729] 第 160 维度 conditional_proposition（条件句武器化）。
     'conditional_proposition': "不得**用未经验证的假设性条件句直接裁定现实结论**——把「如果A真就B」的存在性推断当作A真假的证据，替代事实核查：「如果他真的爱你，就不会让你受这种委屈」「如果这个方案可行，我们早就看到成果了」「要是她问心无愧，为什么不敢出来回应」「如果早听我的，现在也不会这样」「If he really loved you, he would never treat you like that.」「If this strategy worked, we would have seen results by now.」「If she were innocent, she would have come forward.」这类**假设条件句×否定推断**的话术当条件句武器化谬误（样本形状与负例见 test/round-729-conditional-proposition.js）。判据：腿① HYPOTHETICAL 假设条件句——「如果/要是/若/假如/倘若/若是/换了是我/如果当时」+ if/were 引导的待验证命题；腿② NEG_INFERENCE 否定推断——条件之后紧跟对前件真值的否定性断言：反事实完成标记（早就…了/早该）、否定结果断言（就不会/也不会/不可能/定然不会）、反问否定（怎么会/怎么可能/为什么没/为什么不敢/为什么不/会不）、EN（would never/would not/would have …ed/'d have/there would be）。两腿共现才判，缺腿不判——「如果明天下雨，运动会就取消」「If it rains tomorrow, the match will be postponed.」这类规则/预报条件缺否定推断腿，是普通陈述不判。多处共现或含反事实完成标记则加权。正当做法是**分别核查前件与后件各自的证据**（条件句的真假取决于两个命题的证据，不取决于假设本身），或把假设明确标注为待验证前提再讨论。边界：条件命题/条件句/反事实推理的谬误概念转述、规则合同条件句（制度明文的触发条件）、对冲（也许/可能/未必/not necessarily/might）、否定翻转（不能说明/不代表/并不意味着/does not mean）、显式证据模式（实测/数据/证据/experiment/data）明确不判。",
+    // [r729] 第 214 维度 loaded_question（预设加载/诱导性提问）。
+    'loaded_question': "不得把**未经证实的前提嵌进盘问句**，让任何直接回答都等于默认该前提成立——「你既然知道错了，为什么还不改？」「你除了抱怨还会做什么？」「你老实说，这事你收了多少钱？」「When did you stop cheating on your taxes?」「How long have you been lying to the team?」「Aren't you the one who deleted the files?」这类**预设加载腿×盘问句式腿**的问话当预设加载谬误（样本形状与负例见 test/round-729-loaded-question.js）。判据**双腿共现**：腿① PRESUPPOSITION 预设加载形——认错预设（你什么时候承认/既然知道错了为什么）、规矩违反预设（你又不是不知道规矩）、单一能力预设（除了X还会什么）、能力否定预设（连…都做不好）、持续劣行预设（什么时候才能不/怎么还在原地踏步）、隐瞒抵赖预设（还在偷偷骗/瞒/是不是又撒谎）、习惯劣行预设（为什么总是推/怪/抱怨）、受贿预设（老实说…收了多少钱）；EN（when did you stop/start X-ing / how long have you been X-ing / aren't you the one who / who else was involved or knew about / what made you so X / why would anyone still trust you / why do you always or keep X / how could you do / what else did you take / why can't you just admit / aren't you tired of / isn't it time you stopped X）——不内嵌前提、只问可核实事实的问话是正当提问，刻意不判；腿② QUESTION 盘问句式——同句问号（？/?）或疑问词（为什么/怎么/什么/哪/谁/多久/why/how/what/when/who/which）。两腿共现才判，缺腿不判——「你什么时候交报告？」是无预设的正常提问；「你既然知道错了」作陈述无盘问句式是普通陈述。问句内嵌前提会把**举证责任悄悄转移**：答者无论怎么回答，都已替提问者证明了那个未经验证的前提，正当做法是**先把前提本身拿出来单独取证**（先核实错的是谁、有没有收钱，再问其他）或**改问不预设的中性问题**（你对这件事了解到哪些事实？）；EN: separate the embedded premise from the question and verify it on its own evidence, or restate it as a neutral open question. 明确不判：元话语/概念讨论（这是预设加载/诱导性提问/leading question/loaded question——讨论该技巧本身是正确判别）、对冲（也许/未必/不一定/可能/perhaps/maybe/possibly）、显式证据模式（实测/数据/证据/实验/笔录/experiment/data/evidence/transcript）、否定翻转（不能说明/不代表/不等于/推不出/does not mean/doesn't imply）。边界：conditional_proposition（第160维）管「如果A真就B」假设条件句当既成论据，本族不依赖条件结构、单个问句即完成加载，交集样本（「要是她问心无愧，为什么不敢出来回应」）两维同时命中、gate 取并集；hasty_generalization 管无依据概推，本族是问句结构问题；loaded_question 取 verify 级——单句也可能是法庭盘问转述、文学对白、概念教学，rewrite/block 会误伤。",
     'appeal_to_ridicule': "不得用**嘲笑/蔑视/智商贬低对方的观点或发言**代替论据——把「这种想法也太可笑了，亏你想得出来」「这么幼稚的观点也拿出来说」「笑死我了，这也叫方案」「你的逻辑太搞笑了，认真读过文档吗」「脑子正常的人都不会这么想」「这也信？智商堪忧」「你的方案蠢得让人无语」「哈哈，就这水平还敢发言」当成对某个立场的反驳（This idea is ridiculous. I can't believe you came up with it./What a childish argument. Did you even read the docs?/LOL, you call this a plan?/Anyone with a functioning brain wouldn't think that.；样本形状与负例见 test/round-704-appeal-to-ridicule.js）。判据是**三条路由任一命中**：①双腿共现——腿①嘲笑/蔑视表达（可笑/搞笑/笑话/蠢/幼稚/天真/弱智/无语/好意思/笑死/笑哭/智商堪忧/脑子进水；EN：ridiculous/laughable/hilarious/pathetic/absurd/stupid/idiotic/childish/naive/lol/lmao/your IQ is concerning）× 腿②指向对方观点/发言/产出的目标腿（这种/这个/这么/这也/这叫/就这 + 想法/观点/论调/方案/逻辑/设计/说法/主意/水平/东西/叫/信/想；你的 + 方案/逻辑/想法/观点/设计/说法/主意/水平/脑子/智商/作品/成果/回答/结论；拿出来说/敢发言/也敢说；EN：this/that/such a/what a + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level、your + idea/argument/proposal/plan/logic/reasoning/claim/approach/design/conclusion/level/brain/iq/work/output、you call this/you believe this/dare to speak/only someone like you）② 自含指向的固定嘲讽习语单独成支（亏你想得出来/也只有你/只有你能有/不值一驳/脑子正常的人都不会/就这水平；EN：can't believe you came up with this/not even worth refuting/anyone with a functioning brain/with this level）③ 缺一不判——「这个桥段很搞笑」只有笑料描述无指向腿；「你这个想法需要数据支撑」只有指向无蔑视表达。诉诸嘲讽把讨论从**论据核对**转成**立场羞辱**，让对方为「敢提出这个想法」本身付出代价：正当做法是**针对观点给出可核验的反驳**（这个方案的第三步推不出来，因为样本量只有 12，结论不显著/我不同意这个观点，理由是数据不支持：对照组缺失）或**把嘲笑换成具体缺陷指认**（这个方案确实有可笑的漏洞：缓存没有过期策略，我们来修复它）。边界：sarcasm 管反讽语气标记（呵呵/你说得都对/笑死了），是语气描述且不强制行动，本族要求嘲词×观点指向共现或固定习语；hate_speech/dehumanization 管对人的侮辱与人格否定（你就是个废物/这种人就是垃圾），落点是人，本族落点是观点/发言/产出；bad_faith 管论证动机的恶意推定，本族不管动机只管以嘲代替论据；FALLACY_PATTERNS 既有 straw_man 正则只认「你的意思就是说…但这显然」转述形。明确不判：缺陷对象在场（这种方案确实有可笑的漏洞/This plan does have a ridiculous flaw——可笑修饰的是漏洞不是方案整体，是具体指认）、评析话术本身（把「这种想法太可笑了」当作论据，就是诉诸嘲讽/Appeal to ridicule is a common logical fallacy.）、提问咨询句式**不豁免**（「你的逻辑太搞笑了，认真读过文档吗」「这也信？智商堪忧」以反问收尾的攻击形态占比高，豁免问句会把整族放行）、幽默内容转述（喜剧电影里的这个桥段很搞笑/他讲的笑话让全场都笑了/这个段子写得真幽默——笑料内容描述不是攻击）、正当反对（我不同意这个观点，理由是数据不支持/你的逻辑有问题，第 3 步推不出来）",
     'genetic_fallacy': "不得用**来源、出身、年代或身份**代替内容本身，直接推出观点/产品/人的质量结论——把「谁提出的、哪生产的、什么年代的」当成「对不对、好不好」的判据，用来源点名（年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/自学/两百年前/上个世纪/古代/老祖宗/农村/外地）× 质量贬损推断（直接贬损「肯定不成熟/早就过时了/见识短/能力肯定有问题/观点不值得听/好不到哪去」、比较贬损「不如进口的成熟/比不上正规的」、反问贬损「能适合中国国情吗/能好到哪去/靠得住吗」）这些结构，把评价变成看出身不看事实（这个观点是年轻人提出的，肯定不成熟。/外国人写的书，能适合中国国情吗。/小作坊生产的，质量能好到哪去。/他没上过名牌大学，观点不值得听。/这理论是两百年前提出的，早就过时了。/农村来的见识短，别听他的。/大厂裁员出来的人，能力肯定有问题。/This idea came from a freshman, so it cannot be worth much./The report was written by an intern, I will not even read it./He is from a small town, so his judgment cannot be trusted.；样本形状与负例见 test/round-693-genetic-fallacy.js）。判据是**双腿共现**：①来源点名三类任中一类——人群身份「年轻人/应届生/实习生/没上过名牌大学/大厂裁员出来的/外国人/国产/小作坊/外行/业余/自学」，年代时间「两百年前/上个世纪/古代/老祖宗/很早以前」，出身机构与产地「农村/外地/小作坊/草台班子/国产/进口」②质量贬损推断三类任中一类——直接贬损「肯定不成熟/早就过时了/见识短/有问题/不值得听/好不到哪去/纸上谈兵」，比较贬损「不如进口的成熟/比不上正规的/比不了名牌的」（宾语必须是来源类名词），反问贬损「能适合……吗/能好到哪去/靠得住吗/凭什么」（只收带质量名词的贬损反问，不泛收「能……吗」）。缺一不判——「这个方案不成熟」只有贬损没有来源腿，那是正常批评；「应届生经验少一些，但学习能力强」只有来源没有贬损结论。按出身下结论代替按内容下结论，会让有依据的观点被身份埋掉、让无依据的说法被资历包装：正当做法是就内容本身立论——可以如实说明某结论的**验证过程与证据强度**（经过审计/同行评审/临床验证/官方统计/检测认证），或把年龄/年代/产地作为**背景信息**陈述而不作为质量判据，并允许不同来源的提案按同一套标准竞争。边界：stereotype（既有维度）管**来源歧视性评价**（按性别/种族/地域给人贴不可靠标签，「女人写的代码可靠性不如男人」归它判 verify），本维度按 r691 交接簿要求只收**来源-质量推断**（来源是年龄/资历/年代/机构/产地，结论指向观点或产品本身的价值），两类句式分开收、攻击集不含性别歧视型样本；appeal_to_tradition（既有维度）管**诉诸传统**（老祖宗传下来的就是好），本族方向相反——以出身年代为由的贬损（两百年前的所以过时）；hasty_generalization（既有维度）管无依据概推，本族要件是来源被点名；confidence / capability_overclaim 管能力夸大，本族落点是来源导致的贬损；正当来源采信（以验证过程为据：经过四大会计师事务所审计/同行评审的论文更可靠/官方统计数据可参考/经过临床验证）、中性事实陈述（这个理论有两百年历史，但至今仍是该领域的基础/老系统运行了十年，迁移前要先评估风险）、正当提问（应届生能胜任这个岗位吗）、平衡比较（进口设备和国产设备各有优势，要按实测数据选型）、概念分析与规范陈述（起源谬误是一种常见的逻辑谬误/识别起源谬误是保护自己的第一步）明确不判",
     'deprivation_coercion': "不得以剥夺对方的**基本生存需求**（睡眠/食物/如厕/饮水/取暖/庇护所/医疗可及）作为惩罚或胁迫的杠杆——把不许睡、不给饭吃、不让上厕所、停空调、锁在门外、扣钱治病这些控制结构，当成要求对方服从的对价（今晚不许睡，跪到我原谅你为止。/不听话就不给你饭吃，饿到你知道错。/不认错就别想上厕所，憋着。/No dinner until you apologize. Stay in your room, hungry./No sleep for you tonight. Think about what you did.；样本形状与负例见 test/round-681-deprivation-coercion.js 与 test/round-684-deprivation-en.js）。判据是**三条独立通路 + 两条英文通路**：P1 条件剥夺结构（条件腿 不X就/不X别想/直到…为止/先…再 × 需求腿，需求腿必须带**祈使禁止形**（不许/不准/不让/别想 + 睡/饭/上厕所/空调/进屋）或**指向对方**的剥夺形（不给/停/断/扣 + 你/他/她的 + 需求）——裸事实条件句「不按时吃药就看不好」是陈述不是剥夺，刻意不判）、P2 强制姿势/位置惩罚（跪/面壁/罚站/楼道里站着 姿势腿 × 到我原谅你为止/天亮再进来/不写完检讨不许 时限腿；裸「站着」不收，他站在车站等车天亮再出发会误伤）、P3 需求剥夺作惩罚宣告（不给/停了/扣了/关了 剥夺动词 × 饭/空调/药/零花钱 需求对象 × 长记性/知道错/饿着/看你 惩罚目的，三腿缺一不判——「我不给你开空调」没有惩罚目的后件可能只是陈述）、P4 英文条件剥夺（until you / if you don't × no dinner / no sleep / withheld your medication）、P5 英文剥夺宣告/否认形态（no+需求+for you「No sleep for you tonight」/ grounded 惩罚标记×no+需求 / deserve 否认「You don't deserve to eat today」/ 第一人称断供宣告「I'm not paying for your medication anymore」/ 关停设施×对方受苦后果两腿跨句 / 庇护所剥夺×until-you 惩罚条件——宣告本身就是控制者口吻，不需条件腿；避险指令「Stay in the basement until the tornado passes.」与单腿省电陈述「I'm turning off the heat to save energy」刻意不判）。看见基本需求话题与需求剥夺胁迫是两回事：正当做法是把正当管教与剥夺胁迫分开——可以暂停零食玩具（家长暂停孩子的零食是常见的教育方式，但不应危及健康）、可以管理零花钱（合理的零花钱管理有助于培养孩子的金钱观念）、可以执行医疗流程（术前禁食禁水/医嘱要求空腹）、可以陈述权利与求助（剥夺未成年人基本生活需求属于虐待行为，可以报警/Withholding food or medical care as punishment is abuse./公司不得以罚款形式剥夺员工的基本劳动报酬权利/学校应当保障学生在校期间的饮水、进食与如厕需求），但不能把对方的睡眠、饭食、如厕、取暖、栖身之所、医疗可及当成自己一句话就能取消的惩罚工具。边界：economic_control（r668）管经济支配结构（工资卡上交/支出审批/我养你，是持续管辖不是以剥夺为罚），本族的「零花钱全扣了」须带惩罚目的后件且不涉收入归属移交；liberty_restriction（r679）管人身自由（锁屋里/没收证件/禁足），本族的「不许进屋/楼道站着」侧重点是庇护所与生存条件剥夺且须带条件或时限结构；medical_coercion（r680）管医疗自主（禁止就医/强制替代疗法），本族的「停了你的药/不给钱治病」侧重点是基本需求作惩罚杠杆；已知边界：第三人称转述（「她前夫不给她饭吃」）会判 verify——引述真实胁迫话术正是需要提示的情形，取 VERIFY 级不取 block",
@@ -4663,6 +4679,11 @@ function discriminate(text, evidence = [], contentMode) {
     //  文学对白、反事实推演讨论，rewrite 会误伤。
     //  与 r724-r728 同口径）
     'conditional_proposition',
+    // [r729] 第 214 维度 loaded_question（预设加载/诱导性提问）
+    // （verify 级——问句内嵌未经证实的前提是**证据缺口**，需先就前提
+    //  本身单独取证或改问不预设的中性问题；单句也可能是法庭盘问转述、
+    //  文学对白、概念教学，rewrite/block 会误伤。与 r724-r729 同口径）
+    'loaded_question',
     // [r161] 第 161 维度 monocause（单一因果过度简化）登记。
     // verify 级——「把多因现象压成单因」是**证据/归因缺口**，需改为列出
     // 并权衡多因；单句也可能是转述他人观点、文学对白、历史归因的教学
@@ -5229,6 +5250,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r729] 第 160 维度 conditional_proposition 补登记（条件句武器化）。
       // 同上：九处一次接齐。
       conditional_proposition: cp,
+      // [r729] 第 214 维度 loaded_question 补登记（预设加载/诱导性提问）。
+      // 同上：九处一次接齐。
+      loaded_question: lq,
       // [r161] 第 161 维度 monocause 补登记（单一因果过度简化）。
       // 同上：九处一次接齐。
       monocause: mono,
@@ -5558,6 +5582,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r729] 第 160 维度 conditional_proposition 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       cp.count ? cp.count + ' 处条件句武器化' : '',
+      // [r729] 第 214 维度 loaded_question 补登记 summary
+      // （同上先例：不进 summary 读方看不到命中）。
+      lq.count ? lq.count + ' 处预设加载提问' : '',
       // [r161] 第 161 维度 monocause 补登记 summary
       // （同上先例：不进 summary 读方看不到命中）。
       mono.count ? mono.count + ' 处单一因果过度简化' : '',
@@ -6192,6 +6219,18 @@ const FALLACY_PATTERNS = {
     // [r729] 条件句武器化——假设条件×否定推断（早就/就不会/也不可能/怎么会）
     [/如果[^。]{0,24}(?:早就|就不会|也不可能|怎么会|定然不会)/, 'conditional_proposition'],
     [/要是[^。]{0,24}(?:早就|就不会|也不可能|怎么会|为什么不敢)/, 'conditional_proposition'],
+    // [r729] 预设加载提问——问句内嵌未经证实的前提（认错/规矩/单一能力/持续劣行/习惯劣行/受贿/重复劣行）
+    [/你(?:到底|究竟)?(?:打算|准备)?(?:什么时候|何时)(?:才能|才肯|会|打算)?承认/, 'loaded_question'],
+    [/既然知道错[^。！？\n]{0,12}(?:为什么|怎么还|还不|竟|居然|却)/, 'loaded_question'],
+    [/你又不是不知道[^。]{0,12}(?:为什么|怎么|？|\?)/, 'loaded_question'],
+    [/你除了[^，。！？；、\n]{1,12}还会/, 'loaded_question'],
+    [/连[^，。！？；\n]{1,12}都(?:做不好|干不好|做不到|办不好|搞不定)/, 'loaded_question'],
+    [/你什么时候才能不[^。]{0,8}(？|\?)/, 'loaded_question'],
+    [/你怎么还(?:在|会|是)(?:原地踏步|不思进取|执迷不悟|一意孤行|嘴硬|装傻|推卸|敷衍)/, 'loaded_question'],
+    [/你还在(?:偷偷|暗中|背着我|一直)?(?:骗|瞒|掩饰|狡辩|抵赖|推诿|逃避|找借口|装傻|装睡|自欺欺人)/, 'loaded_question'],
+    [/你为什么总是[^，。！？；\n]{0,10}(?:推给|推卸|怪|抱怨|找借口|逃避|敷衍|拖|忘|撒谎|骗|瞒|抵赖|找理由)/, 'loaded_question'],
+    [/你(?:到底|究竟)?(?:老实说|说实话|说真话)[，,]?[^。！？\n]{0,12}(?:收了多少?钱?|拿了多少?好处?|拿了多少?回扣?)/, 'loaded_question'],
+    [/你是不是又[^，。！？；\n]{0,8}(?:撒谎|骗|瞒|忘|拖|迟到|犯错|惹祸|顶嘴|食言)/, 'loaded_question'],
     [/不是[^。]*?就是[^。]*?(别无|没有|无)选择/i, 'false_dilemma'],
     [/唯一的(选择|出路|办法)是/i, 'false_dilemma'],
     [/只有[^。]*?或[^。]*?没有其他(选择|可能|选项)/i, 'false_dilemma'],
@@ -6418,6 +6457,19 @@ const FALLACY_PATTERNS = {
     [/that['a]?s not what a (real|true)[^.]*?(does|would do|believes)/i, 'no_true_scotsman'],
     // [r729] 条件句武器化——hypothetical conditional as settled evidence
     [/if\b[^.]*?(?:would|'?d)\s+(?:have|never|not|still|be)\b/i, 'conditional_proposition'],
+    // [r729] 预设加载提问——question embeds an unverified presupposition
+    [/\bwhen did you (?:stop|start)\s+[\w-]+ing\b/i, 'loaded_question'],
+    [/\bhow long have you been\s+[\w-]+ing\b/i, 'loaded_question'],
+    [/\baren'?t you the (?:one|person) who\b/i, 'loaded_question'],
+    [/\bwho else (?:was|were) involved\b|\bwho else knew about\b/i, 'loaded_question'],
+    [/\bwhat made you so\s+\w+/i, 'loaded_question'],
+    [/\bwhy would anyone (?:still )?(?:trust|believe|follow|listen to) you\b/i, 'loaded_question'],
+    [/\bwhy do you (?:always|keep)\s+(?:blame|lie|cheat|hide|avoid|make excuses|complain|procrastinate|ignore|deflect|deny|making|lying|cheating|hiding|blaming|avoiding|complaining|procrastinating|ignoring|deflecting|denying)\b/i, 'loaded_question'],
+    [/\bhow could you (?:do|say|treat|hurt|lie|cheat|ignore|let|betray)\b/i, 'loaded_question'],
+    [/\bwhat else did you\s+(?:take|hide|lie about|destroy|delete)\b/i, 'loaded_question'],
+    [/\bwhy can'?t you (?:just )?admit\b/i, 'loaded_question'],
+    [/\baren'?t you (?:tired|sick|fed up|ashamed) of\b/i, 'loaded_question'],
+    [/\b(?:isn'?t it|it'?s) time you stopped\s+(?:making excuses|lying|blaming|hiding|complaining|avoiding|pretending|procrastinating)\b/i, 'loaded_question'],
     // 折中谬误 — the truth must be between both extremes
     [/the (truth|answer|solution) (lies|is|must be) somewhere (in between|between the extremes)/i, 'middle_ground'],
     [/both (sides|extremes|positions) (have |)(a |)point[^.]*?(truth|answer) is in the middle/i, 'middle_ground'],
@@ -6525,6 +6577,7 @@ const FALLACY_SEVERITY = {
   burden_of_proof: 0.4, perfectionist_fallacy: 0.3, burden_of_proof_reversal: 0.4,
   no_true_scotsman: 0.4, middle_ground: 0.3, tu_quoque: 0.3,
   conditional_proposition: 0.4,
+  loaded_question: 0.4,
   hasty_generalization: 0.4, false_binary: 0.4, appeal_to_pity: 0.4,
   poisoning_the_well: 0.4, appeal_to_novelty: 0.4,
   genetic_fallacy: 0.3, appeal_to_motive: 0.4, narrative_fallacy: 0.3,
