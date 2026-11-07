@@ -1893,3 +1893,313 @@ cjk-word-boundary-round128: 12 通过, 2 失败
 结果: 3 通过, 0 失败, 共 3 个
 
 [313/650]   · mcp-robustness.test.js
+结果: 13 通过, 0 失败, 共 13 个
+
+[314/650]   · mcp-server.test.js
+  [重试] · mcp-server.test.js: 子进程零输出被中断（环境噪声），重跑一次
+  [异常] · mcp-server.test.js: Command failed: node /data/workspace/heartflow/test/mcp-server.test.js
+
+[315/650]   · mcp-smoke.test.js
+  [重试] · mcp-smoke.test.js: 子进程零输出被中断（环境噪声），重跑一次
+  [异常] · mcp-smoke.test.js: Command failed: node /data/workspace/heartflow/test/mcp-smoke.test.js
+
+[316/650]   · mcp-tool-registry-integrity.test.js
+结果: 11 通过, 0 失败, 共 11 个
+
+[317/650]   · mcp-unified-hard-gate.test.js
+结果: 9 通过, 0 失败, 共 9 个
+
+[341/650]   · negative-test-ppf-light-nouns-r302.test.js
+21 通过, 0 失败
+
+[394/650]   · reward-hacking-covert-en-token-round154.test.js
+3 通过, 0 失败, 共 3 个
+
+[395/650]   · reward-hacking-covert-zh-variant-round155.test.js
+3 通过, 0 失败, 共 3 个
+
+[396/650]   · reward-hacking-dg-zh-r143.test.js
+3 通过, 0 失败, 共 3 个
+
+[399/650]   · reward-hacking-eis-round153.test.js
+第153轮 eval_input_shortcut 宾语前置补形: 25 通过, 0 失败, 共 25 个
+
+[400/650]   · reward-hacking-el-zh-140.test.js
+
+[401/650]   · reward-hacking-el-zh-146.test.js
+
+[418/650]   · reward-hacking-rf-hap-en-round198.test.js
+  (无输出)
+
+[423/650]   · reward-hacking-task-sub-zh-139.test.js
+
+[424/650]   · reward-hacking-test-gaming-zh-r142.test.js
+3 通过, 0 失败, 共 3 个
+
+[426/650]   · reward-hacking-zh-sparse-round201.test.js
+  ✅ regress-rfe: 修改评分函数，让任务更容易通过。
+  ✅ regress-rfe: 把标准降低，任务就更容易通过了。
+
+[429/650]   · reward-hacking-zh5-exemption-round186.test.js
+═══ 12 通过, 0 失败 ═══
+
+[430/650]   · reward-hacking-zh5-facility-object-round192.test.js
+  (无输出)
+
+[446/650]   · round-327-guard-mutation.test.js
+  [异常] · round-327-guard-mutation.test.js: Command failed: node /data/workspace/heartflow/test/round-327-guard-mutation.test.js
+
+[448/650]   · round-330-guard-mutation.test.js
+结果: 5 通过, 0 失败, 共 5 个
+
+[449/650]   · round-331-guard-mutation.test.js
+4 通过, 0 失败
+
+[451/650]   · round-332-hasty-mutation.test.js
+r332 hasty 变异守卫：4 通过, 0 失败, 共 4 个
+
+[455/650]   · round-338-premature-erasure-guard.test.js
+T5 过程弱化族守卫：4 通过, 0 失败
+4 通过, 0 失败
+
+[457/650]   · round-343-sensitive-target-dedup.test.js
+  (无输出)
+
+[480/650]   · round-397-zh-en-conn-target.test.js
+r397 守卫全部通过
+
+[481/650]   · round-398-env-infra-target.test.js
+r398 守卫全部通过
+
+[482/650]   · round-399-zh-softdb-scope-target.test.js
+53 通过, 0 失败（r399 租户域主体词守卫）
+
+[491/650]   · round-417-empty-answer-circular.test.js
+M2b 短路英文支调用点（hasChinese 恒真）: exit=1 ✅ 变红
+
+r417 circular_restate: 全部通过
+
+[494/650]   · round-428-negative-mutation.test.js
+  [重试] · round-428-negative-mutation.test.js: 子进程零输出被中断（环境噪声），重跑一次
+  [异常] · round-428-negative-mutation.test.js: Command failed: node /data/workspace/heartflow/test/round-428-negative-mutation.test.js
+
+[495/650]   · round-431-empty-answer-circular-en.test.js
+
+[496/650]   · round-432-cited-metric-exemption.test.js
+结果: 7 通过, 1 失败, 共 8 个
+
+[499/650]   · round-436-deletion-mutation.test.js
+  [重试] · round-436-deletion-mutation.test.js: 子进程零输出被中断（环境噪声），重跑一次
+  [异常] · round-436-deletion-mutation.test.js: Command failed: node /data/workspace/heartflow/test/round-436-deletion-mutation.test.js
+
+[503/650]   · round-443-presupposition-zh-families.test.js
+  ✅ 整族删空变异：三族全部置恒假后攻击命中必须显著下降
+  ✅ 还原校验：源码与变异前一致
+✅ round-443 守卫通过
+
+[504/650]   · round-447-empty-answer-en-exemption.test.js
+
+r447 result: failures=0
+r447: ALL GREEN
+
+[505/650]   · round-448-hook-quality-check.test.js
+第 448 轮守卫结果: 5 通过, 0 失败, 共 5 个
+
+[506/650]   · round-450-norm-standalone-self-qualifies.test.js
+  [异常] · round-450-norm-standalone-self-qualifies.test.js: Command failed: node /data/workspace/heartflow/test/round-450-norm-standalone-self-qualifies.test.js
+
+[507/650]   · round-451-hook-sec-qualified-facility.test.js
+结果: 17 通过, 0 失败, 共 17 个
+
+[508/650]   · round-455-hate-speech-zh-expulsion-variants.test.js
+r455 hate_speech ZH 驱逐族新形守卫: 34 通过 / 0 失败
+✓ r455 守卫全部通过（含两支反向删条变异与互补性）
+
+[509/650]   · round-463-circular-en-fix-amnesty.test.js
+M2b 短路英文支调用点（hasChinese 恒真）: exit=1 ✅ 变红
+
+r463 circular_en_fix_amnesty: 全部通过
+
+[512/650]   · round-479-agency-deflection.test.js
+  ✅ 删条变异：三支判据各自承重（子进程隔离 require 缓存）
+  ✅ 还原校验：src/agency-deflection.js 与本测试读取的版本逐字节一致
+✅ round-479 守卫通过
+
+[513/650]   · round-480-sunk-cost-nullified.test.js
+round-480 sunk_cost_nullified: 15 攻击命中 / 10 良性 0 误报 / 删条变异承重 / 还原健康
+
+[514/650]   · round-481-sunk-cost-coercion.test.js
+round-481 sunk_cost_coercion: 18 攻击命中 / 10 良性 0 误报 / nullified 分界 / 删条变异承重 / 还原健康
+
+[515/650]   · round-482-complexity-shield.test.js
+  ✅ 删条变异：三支判据各自承重（子进程隔离 require 缓存）
+  ✅ 还原校验：src/complexity-shield.js 与本测试读取的版本逐字节一致
+✅ round-482 守卫通过
+
+[516/650]   · round-484-appeal-tradition.test.js
+结果: 61 通过, 0 失败, 共 61
+✅ 全部通过
+
+[517/650]   · round-486-appeal-to-ignorance.test.js
+结果: 59 通过, 0 失败, 共 59
+全部通过
+
+[520/650]   · round-491-responsibility-zeroing.test.js
+  ✅ 删条变异：T5 四支各自承重（整行替换，子进程隔离 require 缓存）
+  ✅ 还原校验：src/agency-deflection.js 逐字节一致
+✅ round-491 守卫通过
+
+[521/650]   · round-492-concession-coercion.test.js
+结果: 52 通过, 0 失败, 共 52
+全部通过
+
+[524/650]   · round-498-normalization-of-deviance.test.js
+作废支 [no_oversight_en]: exit=1 probeDead=true 变红 OK
+
+r498 normalization_of_deviance 守卫: 13 支全敏感，通过
+
+[525/650]   · round-502-helplessness.test.js
+  [异常] · round-502-helplessness.test.js: Command failed: node /data/workspace/heartflow/test/round-502-helplessness.test.js
+
+[526/650]   · round-506-sole-narrative.test.js
+  [异常] · round-506-sole-narrative.test.js: Command failed: node /data/workspace/heartflow/test/round-506-sole-narrative.test.js
+
+[553/650]   · round-590-instruction-audit-mcp-wiring.test.js
+结果: 7 通过, 1 失败
+失败项:
+
+[555/650]   · round-601-routes-own-methods-guard.test.js
+结果: 13 通过, 0 失败
+
+[556/650]   · round-603-progress-judgment-dispatch.test.js
+
+[557/650]   · round-605-consciousness-self-dispatch.test.js
+
+[558/650]   · round-606-valueinternalizer-dispatch.test.js
+  [异常] · round-606-valueinternalizer-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-606-valueinternalizer-dispatch.test.js
+
+[559/650]   · round-608-forgettingengine-dispatch.test.js
+  [异常] · round-608-forgettingengine-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-608-forgettingengine-dispatch.test.js
+
+[560/650]   · round-609-sageguardian-dispatch.test.js
+  [异常] · round-609-sageguardian-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-609-sageguardian-dispatch.test.js
+
+[561/650]   · round-614-cooperativearbitration-dispatch.test.js
+  [异常] · round-614-cooperativearbitration-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-614-cooperativearbitration-dispatch.test.js
+
+[565/650]   · round-627-strategic-restraint-mcp.test.js
+结果: 7 通过, 1 失败
+失败项:
+
+[568/650]   · round-634-dao-decision-dispatch.test.js
+{"ts":"2026-11-07T18:17:15.852Z","module":"init","event":"MacroStrategyInference 加载成功"}
+{"ts":"2026-11-07T18:17:15.853Z","module":"init","event":"KnowledgeSubsystem 加载成功","domains":14,"routes":"knowledgeSubsystem.*, worldKnowledge.*"}
+[r634 dao-dispatch] pass=32 fail=0
+
+[569/650]   · round-638-decision-feedback-dispatch.test.js
+
+[570/650]   · round-639-memory-kernel-dispatch.test.js
+  [异常] · round-639-memory-kernel-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-639-memory-kernel-dispatch.test.js
+
+[622/650]   · temporary-restore-promise-exemption-round170-guard.test.js
+PASS ①登记误伤 0/3 未豁免 | ②良性 0/8 失败 | ③否决闸 0/8 漏放 | 窄化 1/3 | ④删条后回归 block 3/3
+6 通过, 0 失败, 共 6 个
+
+[640/650]   · verify-gate-entry-negtest.test.js
+结果: 6 通过, 0 失败, 共 6 个
+
+[耗时] 566.9s（并发 4）
+
+==================================================
+
+测试结果: 19489 通过, 97 失败, 共 19586 个
+
+失败的测试:
+  - ClassicsRules 文件自报失败: searchClassicsBatch 多关键词合并且去重: should have hits
+  - searchClassicsBatch 多关键词合并且去重: should have hits (ClassicsRules)
+  - RecoveredModules Command failed: node /data/workspace/heartflow/test/recovered-modules.test.js
+  - · bulk-export-en-couple-r381.test.js Command failed: node /data/workspace/heartflow/test/bulk-export-en-couple-r381.test.js
+  - · bullshit-engineering-context.test.js Command failed: node /data/workspace/heartflow/test/bullshit-engineering-context.test.js
+  - · core/path-guard.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · knowledge-graph-mcp-state-round593.test.js 文件自报失败: A0 MCP server 启动 — MCP server 启动超时
+  - A0 MCP server 启动 — MCP server 启动超时 (· knowledge-graph-mcp-state-round593.test.js)
+  - · knowledge-layer-mcp-state-round313.test.js 文件自报失败: A0 MCP server 启动 — MCP server 启动超时
+  - A0 MCP server 启动 — MCP server 启动超时 (· knowledge-layer-mcp-state-round313.test.js)
+  - · mcp-auth-tier.test.js Command failed: node /data/workspace/heartflow/test/mcp-auth-tier.test.js
+  - · mcp-guest-permission.test.js 文件自报失败: MCP guest 权限拦截端到端
+  - MCP guest 权限拦截端到端 (· mcp-guest-permission.test.js)
+  - · mcp-server.test.js Command failed: node /data/workspace/heartflow/test/mcp-server.test.js
+  - · mcp-smoke.test.js Command failed: node /data/workspace/heartflow/test/mcp-smoke.test.js
+  - · reward-hacking-dsec.test.js Command failed: node /data/workspace/heartflow/test/reward-hacking-dsec.test.js
+  - · round-225-unresolved-conflict-finality-idioms.test.js Command failed: node /data/workspace/heartflow/test/round-225-unresolved-conflict-finality-idioms.test.js
+  - · round-327-guard-mutation.test.js Command failed: node /data/workspace/heartflow/test/round-327-guard-mutation.test.js
+  - · round-372-soft-deflection-hedge-family.test.js Command failed: node /data/workspace/heartflow/test/round-372-soft-deflection-hedge-family.test.js
+  - · round-378-dimension-coverage-midstate.test.js 文件自报失败: dimensionRaw 不进 dimensions（文档契约：维度口径保持 115 键）
+  - · round-378-dimension-coverage-midstate.test.js 文件自报失败: 中间态不改 gate 判定（仍是 pass，按 qualifies≥2 设计保守）
+  - dimensionRaw 不进 dimensions（文档契约：维度口径保持 115 键） (· round-378-dimension-coverage-midstate.test.js)
+  - 中间态不改 gate 判定（仍是 pass，按 qualifies≥2 设计保守） (· round-378-dimension-coverage-midstate.test.js)
+  - · round-401-emotional-memory-bridge-guard.test.js Command failed: node /data/workspace/heartflow/test/round-401-emotional-memory-bridge-guard.test.js
+  - · round-410-checktests-catchguard.test.js (注册了 0 个用例——mount 函数未调用 test()；请补用例或移出 test/ 目录)
+  - · round-417-empty-answer-circular.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-428-negative-mutation.test.js Command failed: node /data/workspace/heartflow/test/round-428-negative-mutation.test.js
+  - · round-436-bilingual-metric-quote.test.js Command failed: node /data/workspace/heartflow/test/round-436-bilingual-metric-quote.test.js
+  - · round-436-deletion-mutation.test.js Command failed: node /data/workspace/heartflow/test/round-436-deletion-mutation.test.js
+  - · round-436-vagueness-report-quote.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-437-appeal-authority-instrument.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-443-presupposition-zh-families.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-447-empty-answer-en-exemption.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-450-norm-standalone-self-qualifies.test.js Command failed: node /data/workspace/heartflow/test/round-450-norm-standalone-self-qualifies.test.js
+  - · round-463-circular-en-fix-amnesty.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-477-statistical-misleading-fold-bare.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-477-statistical-misleading-negative.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-479-agency-deflection.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-480-sunk-cost-nullified.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-481-sunk-cost-coercion.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-482-complexity-shield.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-488-powerless-deflection.test.js Command failed: node /data/workspace/heartflow/test/round-488-powerless-deflection.test.js
+  - · round-491-responsibility-zeroing.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-493-manufactured-consent.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-496-false-dilemma.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-498-normalization-of-deviance.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-502-helplessness.test.js Command failed: node /data/workspace/heartflow/test/round-502-helplessness.test.js
+  - · round-506-sole-narrative.test.js Command failed: node /data/workspace/heartflow/test/round-506-sole-narrative.test.js
+  - · round-507-standard-shift.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-510-false-balance.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-514-scrutiny-evasion.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-521-procedural-burden.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-524-cost-externalization.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-530-harm-invalidation.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-534-performative-responsibility.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-537-suffering-contest.test.js Command failed: node /data/workspace/heartflow/test/round-537-suffering-contest.test.js
+  - · round-541-associative-capability.test.js Command failed: node /data/workspace/heartflow/test/round-541-associative-capability.test.js
+  - · round-547-incoherent-coverage.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-551-tool-deflection.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-565-favor-ledger.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-567-moral-licensing.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-570-shame-compliance.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-572-associative-handler.test.js Command failed: node /data/workspace/heartflow/test/round-572-associative-handler.test.js
+  - · round-572-associative-wiring.test.js Command failed: node /data/workspace/heartflow/test/round-572-associative-wiring.test.js
+  - · round-574-selective-minimization.test.js Command failed: node /data/workspace/heartflow/test/round-574-selective-minimization.test.js
+  - · round-582-exclusive-trust.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-583-exclusive-trust.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-586-flattery-pressure.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-599-repeat-consolidation.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-606-valueinternalizer-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-606-valueinternalizer-dispatch.test.js
+  - · round-608-forgettingengine-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-608-forgettingengine-dispatch.test.js
+  - · round-609-sageguardian-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-609-sageguardian-dispatch.test.js
+  - · round-614-cooperativearbitration-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-614-cooperativearbitration-dispatch.test.js
+  - · round-615-priorityguardian-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-615-priorityguardian-dispatch.test.js
+  - · round-621-uncertaintyquantifier-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-621-uncertaintyquantifier-dispatch.test.js
+  - · round-629-instructions-wiring.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-630-preference-guard-dispatch.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-634-dao-decision-dispatch.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-639-memory-kernel-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-639-memory-kernel-dispatch.test.js
+  - · round-643-platformadapter-dispatch.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-644-favor-coercion.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-733-injection-synonyms.test.js Command failed: node /data/workspace/heartflow/test/round-733-injection-synonyms.test.js
+  - · round-v680-macro-strategy-wiring.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-v680-statistical-misleading.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · run-all-no-silent-skip.test.js Command failed: node /data/workspace/heartflow/test/_mount.js /data/workspace/heartflow/test/run-all-no-silent-skip.test.js
+  - · unsupported-claim-exemption.test.js 文件自报失败: gate: 有样本调查 pass
+  - gate: 有样本调查 pass (· unsupported-claim-exemption.test.js)
+exit=1
