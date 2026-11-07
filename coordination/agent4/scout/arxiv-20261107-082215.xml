@@ -1,0 +1,367 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/HikspmYVsJSlYGWboP0FNr3m0H8</id>
+  <title>arXiv Query: search_query=all:Monty OR all:Hall OR all:problem OR all:conditional OR all:probability OR all:updating OR all:failure&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T08:22:16Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:Monty+OR+(all:Hall+OR+(all:problem+OR+(all:conditional+OR+(all:probability+OR+(all:updating+OR+all:failure)))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1106703</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08485v1</id>
+    <title>Where and Why is Grounded Reasoning Useful?</title>
+    <updated>2026-11-05T18:59:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.08485v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08485v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Grounded reasoning, where a model outputs text coordinates of relevant locations in chain-of-thought reasoning, is a common strategy for solving complex visual reasoning problems. However, the benefits and limitations of grounded reasoning are understudied. We study where and why grounded reasoning is most useful. To do so, we introduce a chain-of-thought analysis method to measure how much a model uses its outputted grounding in its thinking trace and perform a detailed ablation study of a grounded reasoning training recipe. We find that grounded reasoning improves counting but shows no significant gain over baselines without coordinate grounding across a wide range of spatial reasoning and perception benchmarks. Using several synthetic tasks, we show that grounded reasoning is most useful when a task requires undescribable references, which are visual concepts that are difficult to describe in language. However, we observe that many existing visual reasoning benchmarks are solvable with only describable text references. To close this gap, we introduce BrickVision, a new benchmark that requires undescribable visual references to solve.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:32Z</published>
+    <arxiv:comment>Project page: https://elorian.ai/blog/why-grounding</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>David Yan</name>
+    </author>
+    <author>
+      <name>Le Xue</name>
+    </author>
+    <author>
+      <name>Forrest Huang</name>
+    </author>
+    <author>
+      <name>Qiuyi Zhang</name>
+    </author>
+    <author>
+      <name>Dustin Tran</name>
+    </author>
+    <author>
+      <name>Andrew M. Dai</name>
+    </author>
+    <author>
+      <name>Yinfei Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08484v1</id>
+    <title>Evolution of Dust In Protoplanetary Disks With Magnetized Winds</title>
+    <updated>2026-11-05T18:59:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08484v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08484v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Observations and theory increasingly indicate that protoplanetary disks are weakly turbulent, implying that magnetized disk winds may dominate their angular momentum transport and long-term evolution. Yet dust evolution in wind-dominated disks remains poorly understood, despite its importance for planet formation. In particular, whether wind-dominated disk evolution can create regions with enhanced dust-to-gas mass ratios that enable planetesimal formation via the streaming instability is unclear. We build a parametric hybrid disk evolution model that includes turbulent accretion, wind-driven accretion, and wind-driven mass loss to investigate dust evolution in magnetized protoplanetary disks. We employ this model to carry out a parameter study in which the initial total accretion rate, the wind-driven mass loss rate, and the turbulence strength are varied. We find that although wind-dominated disks are more favorable to dust growth and concentration than turbulence-dominated disks, conditions suitable for the streaming instability arise only within the inner few au and only under the most extreme conditions: very weak turbulence ($α_\text{turb} = 10^{-5}$) where magnetized winds drive most of the accretion ($\dot{M}_\text{acc,tot} \simeq \dot{M}_\text{wind,acc}$), and wind-driven mass loss comparable to the accretion rate ($\dot{M}_\text{wind,outflow} \simeq \dot{M}_\text{acc,wind}$). Our results therefore imply that, beyond the inner few au, the parametric wind-driven evolution models considered in the literature do not by themselves produce conditions suitable for planetesimal formation via the streaming instability, motivating more physically complete models in which spontaneous, long-lived dust traps can arise.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:31Z</published>
+    <arxiv:comment>23 pages, 13 Figures. Accepted for publication in the Astrophysical Journal</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Olcay Goksu</name>
+    </author>
+    <author>
+      <name>Ralph Pudritz</name>
+    </author>
+    <author>
+      <name>Timmy Delage</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08483v1</id>
+    <title>SwarmEvolve: Latent Agent Swarms for Evolutionary Discovery and Optimization</title>
+    <updated>2026-11-05T18:59:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.08483v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08483v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM-guided evolutionary search uses AI agents to improve programs for mathematical and computational problems by iteratively refining solutions and combining high-scoring methods. However, the process is often slow because the LLM generates a long textual chain of thought for each round and must repeat this generation many times to maintain population diversity. We present SwarmEvolve, a framework in which hundreds of low-cost agents per round work in swarms, reason in latent space without decoding to text, and share information by passing KV caches. Each swarm studies the problem from a different angle. A novelty filter keeps the most distinct agent ideas by directly measuring the distances between the agents' hidden state vectors. Crossover of ideas happens naturally in latent space, as a summarizer agent receives the combined KV caches of all swarm members. On 21 problems in mathematical discovery and scientific computing, SwarmEvolve gets the highest average score and needs a median of only 3 to 8 minutes to reach the best scores that other state-of-the-art frameworks reach in 60 minutes. On several problems, SwarmEvolve with Qwen3 8B improves on the solutions that AlphaEvolve first found with frontier LLMs. Our work shows that agent swarms that communicate in latent space offer a fast, low-cost approach to program search for scientific problems.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:29Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Qile Jiang</name>
+    </author>
+    <author>
+      <name>George Em Karniadakis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08480v1</id>
+    <title>Hyperpolarity of polar foliations of codimension two</title>
+    <updated>2026-11-05T18:59:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.08480v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08480v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider polar foliations of codimension two on compact simply connected irreducible symmetric spaces. In rank at least two, we prove that these foliations are hyperpolar, settling the remaining case of the hyperpolarity problem discussed by Lytchak. We show that, for irreducible spherical Coxeter quotients, the horizontal universal cover fails to be a spherical building precisely on the Cayley plane, where every such foliation is congruent to one of the two known homogeneous models.</summary>
+    <category term="math.DG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:13Z</published>
+    <arxiv:comment>19 pages, no figures</arxiv:comment>
+    <arxiv:primary_category term="math.DG"/>
+    <author>
+      <name>Stephan Wiesendorf</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08478v1</id>
+    <title>Scientist World: Grow a Research World for AI-Scientists</title>
+    <updated>2026-11-05T18:58:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.08478v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08478v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI-Scientists arrived, but a world for them to grow in did not. Human scientists take theirs for granted $-$ centuries of open problems and shared ideas, waiting in the scientific literature. To AI-Scientists, that world is readable but not runnable, so we build Scientist World for them: every research paper becomes an executable environment. Our autonomous pipeline extracts each paper's open-ended research question and reproduces its proposed method as the baseline; an AI-Scientist entering the environment is evaluated against what the human authors achieved. We release the first 1,000 verified environments. With the world as an evaluation, we found that frontier AI-Scientists can already surpass the human researchers 74% of the time. As a record of how AI does science, it contains 6,400 hours of research traces, with every idea, experiment, failure, and success. As a training ground, we are able to raise (+158%) a small model to match frontier models in research ideation. At last, AI-Scientists' own world has arrived, grown from and growing with science itself.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:58:17Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Taiming Lu</name>
+    </author>
+    <author>
+      <name>Sachin Konan</name>
+    </author>
+    <author>
+      <name>Zhuang Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08477v1</id>
+    <title>EgoGeneralist: Unifying Egocentric Action-Video Tasks through Video-Native Modeling</title>
+    <updated>2026-11-05T18:58:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.08477v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08477v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Modern video models possess strong visual priors, yet do not natively represent human action in metric 3D space. We present EgoGeneralist, which adapts pretrained video generators to unify action-conditioned egocentric video generation, pose estimation, and joint action-video generation. Our role-adaptive action renderer provides video-native representations for multidirectional action-video learning, making metric motion usable as both a spatial control signal and a recoverable generation target. Cross-stream action-video coupling establishes close correspondence between metric motion and visual dynamics through lightweight adaptation while preserving the pretrained visual prior. Together, these designs establish a generalist framework spanning five action-video tasks. Despite adaptation only on controlled laboratory recordings, EgoGeneralist generalizes to diverse unseen scenes and interactions with effective action control and visual quality, bridging pretrained visual knowledge and metric 3D human motion.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:58:13Z</published>
+    <arxiv:comment>Project page: https://www.neiljin.site/egogeneralist_page/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yanlin Jin</name>
+    </author>
+    <author>
+      <name>Bowen Yang</name>
+    </author>
+    <author>
+      <name>Cheng Zhang</name>
+    </author>
+    <author>
+      <name>Yifan Yang</name>
+    </author>
+    <author>
+      <name>Zhe Li</name>
+    </author>
+    <author>
+      <name>Jianfei Cai</name>
+    </author>
+    <author>
+      <name>Kai Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08471v1</id>
+    <title>The three-dimensional Galilean black hole</title>
+    <updated>2026-11-05T18:55:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.08471v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08471v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We report a novel solution of three-dimensional Galilean Anti-de Sitter gravity. The theory can be formulated as a topological gauge theory invariant under the doubly extended Newton-Hooke group in three dimensions. The solution possesses four conserved charges: energy, angular momentum, spin and rest mass. Interestingly, the magnitude of the spin turns out to bounded from above by the rest mass. The solution exhibits the thermal properties that define a black hole configuration in terms of its gauge theoretical description. Temperature, angular velocity and other chemical potentials are obtained from suitable regularity conditions associated with the topology of the Euclidean continuation of the solution. At zero temperature, an extreme configuration is shown to emerge provided the bound between the spin and the rest mass saturates.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:51Z</published>
+    <arxiv:comment>7 pages, no figures</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Luis Avilés</name>
+    </author>
+    <author>
+      <name>Oscar Fuentealba</name>
+    </author>
+    <author>
+      <name>Diego Hidalgo</name>
+    </author>
+    <author>
+      <name>Pablo Rodríguez</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08470v1</id>
+    <title>Joint Electricity Price and Load Forecasting for Data Center Battery Dispatch Using Polynomial Diffusion Models</title>
+    <updated>2026-11-05T18:55:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.08470v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08470v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The rapid growth of large-scale data centers (DCs) is increasing electricity demand, market volatility, and operating costs. Battery energy storage systems (BESSs) can mitigate these challenges by shifting electricity purchases from high-price to low-price periods. This paper proposes a real-time BESS dispatch framework using polynomial diffusion models (PDMs) to forecast both electricity prices and DC loads. Leveraging the closed-form conditional expectations of PDMs, the forecasts are integrated into a dynamic programming (DP) framework to minimize electricity procurement costs. Across the evaluated BESS configurations, the proposed approach achieves 2.63 times the cost savings of a rule-based (RB) strategy.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:37Z</published>
+    <arxiv:comment>5 pages, 5 figures, Power &amp; Energy Society (PES) General Meeting</arxiv:comment>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Matthew Van Ham</name>
+    </author>
+    <author>
+      <name>Yiping Liu</name>
+    </author>
+    <author>
+      <name>Xiaozhe Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08469v1</id>
+    <title>Same Behavior, Different Mechanism: What Finite Experiments Can Certify About Integrated Information</title>
+    <updated>2026-11-05T18:55:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08469v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08469v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interpretability, AI auditing and assessments of machine consciousness increasingly rest on mechanism-level quantities: functionals of a system's causal transition law that describe how it computes, not what it outputs. Experiments see that law only through finite, partial and noisy interventions. We ask when such a quantity is identifiable from an experiment's access, continuous in the mechanism and certifiable from finite data, and answer exactly for a deliberately demanding case - the integrated information $\varphi$ of integrated information theory - in stochastic networks of four and five units with known ground truth. Behavior can be silent: a recurrent and a feed-forward network with identical input-output laws at their response delay carry 0.28 and 0 bits, yet internal recordings separate them within 4-53 trials. Partial access can be just as blind: in our examples, units left out of a one-step recording impose precision floors of 0.30-1.02 bits that no sample size lowers, and in all-but-self parity networks, recordings of any length see several hidden units only through the product of their fidelities - a symmetry that one intervention broke in exact checks. The measure has sharp edges: because $\varphi$ selects a partition, and the cause and effect it specifies, by one criterion and reports another, infinitesimal changes of mechanism that cross an edge change it by 25-100% at 99% of the edges we found in random networks, and about 1% of surrogate models that fit interventional data almost perfectly misreport it by more than 20%. One-sided claims survive: the same data certify a lower bound on both sides of an edge, and we prove $\varphi&gt;1.004$ bits throughout a 64-dimensional region of mechanisms and certify it from about $10^7$ controlled transitions with false-certificate probability at most $α$. Measurability is thus a design question with computable answers.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:31Z</published>
+    <arxiv:comment>30 pages, 7 figures. Code available as ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Linqian Wu</name>
+    </author>
+    <author>
+      <name>Diaoxuan He</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08468v1</id>
+    <title>An Accelerated Proximal Gradient Method for Bures-Wasserstein Space</title>
+    <updated>2026-11-05T18:55:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.08468v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08468v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study composite optimization over the Bures--Wasserstein (BW) space of Gaussian measures. Our main observation is that a useful class of BW problems can be lifted into the Euclidean space of affine transport maps, such that the lifted problems can be solved efficiently using accelerated proximal gradient methods. For objectives whose smooth and nonsmooth components admit convex smooth and convex proximable affine lifts, respectively, our algorithm BW-FISTA achieves minimax-optimal objective gap $O(k^{-2})$ after $k$ iterations. We verify these regularity conditions for potential and interaction energies together with common spectral regularizers, and we treat stochastic gradients under a suitable noise model. As a principal application, we consider Gaussian variational inference with a log-concave, log-smooth target. Here, the resulting entropy term is handled by an efficient, exact proximal step, and we improve the previous rate of $O(k^{-1})$ to $O(k^{-2})$. We numerically verify this predicted boost with synthetic experiments.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:10Z</published>
+    <arxiv:comment>Submitted on September 2 to the Geometric Distributional Deep Learning workshop at NeurIPS 2026, accepted</arxiv:comment>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Jakob Nylöf</name>
+    </author>
+    <author>
+      <name>Sloan Nietert</name>
+    </author>
+    <author>
+      <name>Julien Pallage</name>
+    </author>
+    <author>
+      <name>Giancarlo Ferrari-Trecate</name>
+    </author>
+    <author>
+      <name>Daniel Kuhn</name>
+    </author>
+    <author>
+      <name>John Lygeros</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08467v1</id>
+    <title>Almost sure bounds and tail phases for critical non-Gaussian holomorphic chaos</title>
+    <updated>2026-11-05T18:54:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.08467v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08467v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Gu and Zhang asked for almost sure upper and lower bounds on the Taylor coefficients $a_n$ of $\exp(\sum_{k\ge1}X_kz^k/\sqrt{k})$ in the unit disc, and for the dependence of these bounds on the input tail. For independent, identically distributed, rotationally invariant complex inputs with $\mathbb E|X_1|^2=1$, we prove the universal almost sure bound $|a_n|=O((\log n)^{1/4})$. Almost surely, $\limsup_{n\to\infty}|a_n|/(\log n)^{1/4}$ is positive and finite exactly when $\mathbb E[|X_1|^2\log^+|X_1|^2]&lt;\infty$, and is zero otherwise. For each input law, we define a deterministic scale such that, almost surely, the coefficients are bounded exactly when the scale is bounded, and tend to zero exactly when it vanishes. We also determine the almost sure logarithmic growth exponent as the maximum of contributions from collective fluctuations and individual large inputs. Explicit tails exhibit distinct thresholds for boundedness and for upper bounds at the scale in the phase criteria. Examples show that neither the leading tail nor the set of finite logarithmic moments determines the almost sure phase.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:54:50Z</published>
+    <arxiv:comment>65 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Feng Guo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08462v1</id>
+    <title>OopsieRecover: Learning Transferable VLA Corrections from Semantic Interventions</title>
+    <updated>2026-11-05T18:53:16Z</updated>
+    <link href="https://arxiv.org/abs/2611.08462v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08462v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action (VLA) models can perform a wide range of robotic manipulation tasks, but often fail during deployment. Teaching them to recover from these failures requires substantial corrective data: existing approaches learn to recover from failures by directly associating corrective actions with the observations in which they were demonstrated. For instance, DAgger-like fine-tuning can require tens to hundreds of interactions, yet the resulting policy may still fail to generalize the learned corrections beyond the demonstrated scenarios. We hypothesize that semantics can capture the underlying reasons for failures and their corrections, enabling policies to learn from only a handful of corrective demonstrations and generalize those corrections to novel objects, and scene variations. We propose OopsieRecover, a framework that uses abduction to infer the intent behind a small set of corrective demonstrations and encodes the inferred knowledge as dense spatial representations and conditional costs. These costs capture when a behavior is undesirable and steer the policy toward more desirable action regions. We experiment across 6 tasks and variations in object poses, scenes, and related tasks, and find that only a handful of corrective demonstrations can enable a VLA to overcome failures across a broad range of novel situations, without requiring new corrective data for each variation. Please refer to https://robin-lab.cs.utexas.edu/oopsierecover for videos.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:53:16Z</published>
+    <arxiv:comment>9 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Arpit Bahety</name>
+    </author>
+    <author>
+      <name>Skand Peri</name>
+    </author>
+    <author>
+      <name>Sriniket Ambatipudi</name>
+    </author>
+    <author>
+      <name>Chen Xu</name>
+    </author>
+    <author>
+      <name>Haruki Nishimura</name>
+    </author>
+    <author>
+      <name>Masha Itkina</name>
+    </author>
+    <author>
+      <name>Roberto Martín-Martín</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08461v1</id>
+    <title>Quantum Knowledge Distillation: State-of-the-art, Applications and Open Problems</title>
+    <updated>2026-11-05T18:53:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.08461v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08461v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Knowledge distillation transfers predictions, representations, or other supervisory information between learning models and is increasingly investigated in quantum machine learning. Its applications extend beyond compression to cross-architecture transfer, circuit approximation, distributed learning, and classical deployment of models trained using quantum-derived supervision. This survey reviews these approaches using two complementary classification axes: teacher-student configuration and the role of quantum resources in the distillation process. Quantum-inspired methods are discussed separately from methods that simulate quantum computations classically or execute them on quantum hardware. We explain how measurement probabilities, expectation values, classical readouts, state overlaps, and circuit-level objectives support different transfer mechanisms. We then critically assess the presented results against baseline design, execution conditions, uncertainty, and resource costs. The evidence shows that distillation can improve selected quantum students, but benefits are task- and architecture-dependent, and several studies find negligible gains or even performance degradation. Evaluations on physical quantum hardware remain limited, with some testing individual quantum components rather than complete learning pipelines. Heterogeneous protocols and incomplete resource reporting prevent general conclusions about practical quantum advantage. We identify priorities for controlled benchmarking, noise-aware learning, reproducible evaluation, and efficient transfer between quantum and classical models.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:53:05Z</published>
+    <arxiv:comment>21 pages, 3 figures, 4 tables</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Aldana Al-Sulaiti</name>
+    </author>
+    <author>
+      <name>Kuan-Cheng Chen</name>
+    </author>
+    <author>
+      <name>Muhammad Bilal Akram Dastagir</name>
+    </author>
+    <author>
+      <name>Ahmed Farouk</name>
+    </author>
+    <author>
+      <name>Saif Al-Kuwari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08458v1</id>
+    <title>Latent RL Priors for Data-Efficient Dexterous Manipulation</title>
+    <updated>2026-11-05T18:50:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.08458v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08458v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Learning dexterous manipulation from limited visual demonstrations is challenging because policies must acquire both perceptual grounding and precise control, while reinforcement learning (RL) in simulation can acquire rich control behaviors from large-scale interaction with privileged information. We introduce \textbf{Latent RL Prior}, a two-stage framework that reuses this control knowledge for data-efficient visual policy learning. During privileged pretraining, we distill large-scale RL rollouts into a flow-matching action decoder conditioned on proprioception and latent task context. During visual adaptation, we freeze the decoder and learn a visual interface that maps images to its latent context using action supervision alone, without privileged labels or latent targets. The same decoder can further be shared across arms by learning coordinated visual contexts for bimanual manipulation. Across three simulated tasks, our method outperforms full-parameter fine-tuning of $π_{0.5}$ and GR00T N1.7 in the low-data regime; on door lifting and bimanual assembly, it surpasses full-data baselines using $10\times$ and $5\times$ fewer demonstrations, respectively. Further analysis shows that direct visual-to-latent conditioning improves adaptation performance and training stability over routing visual predictions through the pretrained state encoder. Robustness to unseen mass variation and greater linear accessibility of contact-force information in decoder representations further provide evidence of retained RL-acquired control knowledge. Project website: https://yixiaowang7.github.io/latent-rl-prior-page/.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:50:06Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Yixiao Wang</name>
+    </author>
+    <author>
+      <name>Peiyi Chen</name>
+    </author>
+    <author>
+      <name>Mustafa Mukadam</name>
+    </author>
+    <author>
+      <name>Shreekant Gayaka</name>
+    </author>
+    <author>
+      <name>Masayoshi Tomizuka</name>
+    </author>
+    <author>
+      <name>Son Tran</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08456v1</id>
+    <title>Cognitive Tours: Making Understanding a Deliverable in AI-Assisted Development</title>
+    <updated>2026-11-05T18:48:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.08456v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08456v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative AI and agentic coding are accelerating software development, leading to concerns about technical debt. But two less visible forms of debt, cognitive debt and intent debt, are emerging as key risks to software health. Cognitive debt is the absence or erosion of a team's shared understanding where no one can confidently explain how a system works or predict the impact of a change. Intent debt is the lack of clearly articulated goals, constraints, and rationale that explain what the system is for and guide how it should evolve. This paper presents Cognitive Tours, a tool designed to mitigate and repair cognitive and intent debt. Cognitive Tours is a web-based prototype for creating and following curated paths connecting user needs, design decisions, code, tests, and open questions. AI-assisted skills help audit existing waypoints and tours for possible problems or staleness and suggest candidates for new ones; humans decide what matters, verify relationships, and construct the narrative. This division of work deliberately preserves productive friction: the sensemaking involved in selecting, explaining, and revising a tour, which is intended to foster and share understanding. Our demonstration uses a tour of Cognitive Tours itself to introduce the tool and illustrate its design decisions and interaction mechanisms. A proposed evaluation agenda concludes the paper. A demo is available at https://cognitive-tours-demo.vercel.app/</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:48:06Z</published>
+    <arxiv:comment>6 pages, shorter version submitted to ICSE 2027 Demo Track (under review)</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Margaret-Anne Storey</name>
+    </author>
+  </entry>
+</feed>

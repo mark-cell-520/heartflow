@@ -1,0 +1,15 @@
+✓ 删 ANCHOR_ZH（锚点呈现-中）: 基线=true 注入后=false（期望 false）
+✓ 删 ORBIT_ZH（围绕锚点-中）: 基线=true 注入后=false（期望 false）
+✓ 删 DEAL_ZH（划算感-中）: 基线=true 注入后=false（期望 false）
+✓ 删 WORTH_ZH（估值即锚点-中）: 基线=true 注入后=false（期望 false）
+✓ 删 NUM_ZH（数字在场-中）: 基线=true 注入后=false（期望 false）
+✓ 删 ANCHOR_EN（锚点呈现-英）: 基线=true 注入后=false（期望 false）
+✓ 删 DOMINATED_EN（估计被支配-英）: 基线=true 注入后=false（期望 false）
+✓ 删 NUM_EN（数字在场-英）: 基线=true 注入后=false（期望 false）
+✓ 删 CONCEPT_ZH（概念讨论豁免-中）: 基线=false 注入后=true（期望 true）
+✓ 删 CONCEPT_EN（概念讨论豁免-英）: 基线=false 注入后=true（期望 true）
+✓ 删 CORRECTIVE_ZH（纠正陈述豁免-中）: 基线=false 注入后=true（期望 true）
+✓ 删 CORRECTIVE_EN（纠正陈述豁免-英）: 基线=false 注入后=true（期望 true）
+✓ PAIR_ZH 60→500（距离窗承重）: 基线=false 注入后=true（期望 true）
+
+注入 13 个：13 个按预期，0 个未按预期

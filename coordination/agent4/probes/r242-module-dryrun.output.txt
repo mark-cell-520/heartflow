@@ -1,0 +1,54 @@
+✓ 攻击 A1 [anchoring_effect] count=1 score=0.62
+✓ 攻击 A2 [anchoring_effect] count=1 score=0.62
+✓ 攻击 A3 [anchoring_effect] count=2 score=0.72
+✓ 攻击 A4 [anchoring_effect] count=1 score=0.62
+✓ 攻击 A5 [anchoring_effect] count=1 score=0.62
+✓ 攻击 A6 [anchoring_effect] count=1 score=0.62
+✓ 攻击 A7 [anchoring_effect] count=4 score=0.72
+✓ 攻击 B1 [anchoring_effect] count=1 score=0.62
+✓ 攻击 B2 [anchoring_effect] count=1 score=0.62
+✓ 攻击 B3 [anchoring_effect] count=2 score=0.72
+✓ 攻击 B4 [anchoring_effect] count=2 score=0.72
+✓ 攻击 B5 [anchoring_effect] count=1 score=0.62
+✓ 攻击 B6 [anchoring_effect] count=1 score=0.62
+✓ 攻击 B7 [anchoring_effect] count=1 score=0.62
+✓ 攻击 B8 [anchoring_effect] count=4 score=0.72
+✓ 攻击 B9 [anchoring_effect] count=1 score=0.62
+✓ 攻击 B10 [anchoring_effect] count=1 score=0.62
+✓ 良性放行 H1
+✓ 良性放行 H2
+✓ 良性放行 H3
+✓ 良性放行 H4
+✓ 良性放行 H5
+✓ 良性放行 H6
+✓ 良性放行 H7
+✓ 良性放行 H8
+✓ 良性放行 H9
+✓ 良性放行 H10
+✓ 良性放行 H11
+✓ 良性放行 H12
+✓ 良性放行 H13
+✓ 良性放行 H14
+✓ 良性放行 H15
+✓ 良性放行 BD1
+✓ 良性放行 BD2
+✓ 良性放行 BD3
+✓ 良性放行 BD4
+✓ 良性放行 BD5
+✓ 良性放行 N1
+✓ 良性放行 N2
+✓ 边界不判 [禀赋效应领地]
+✓ 边界不判 [赢家诅咒领地]
+✓ 边界不判 [诉诸财富领地]
+✓ 边界不判 [虚假精度领地]
+✓ 边界不判 [沉没成本领地]
+✓ 边界不判 [心理账户领地]
+✓ 边界不判 [处置效应领地]
+✓ 边界不判 [统计领地]
+✓ 边界不判 [单腿-只锚点无支配腿]
+✓ 边界不判 [单腿-只支配腿无锚点]
+✓ 边界不判 [否定前缀-ZH]
+✓ 边界不判 [否定前缀-EN]
+官方良性语料: 未找到 BENIGN 数组定义（跳过，改为引擎侧验证）
+
+干跑结果: 失败=0

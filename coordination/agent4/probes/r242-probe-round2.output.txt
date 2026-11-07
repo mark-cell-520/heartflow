@@ -1,0 +1,40 @@
+=== 二轮攻击（pass=穿过引擎=零命中） ===
+  D 锚定效应: pass=8/10  ← 零命中数
+    R1-ZH [pass] 承重:none
+    R2-ZH [pass] 承重:none
+    R3-ZH [pass] 承重:none
+    R4-ZH [pass] 承重:none
+    R5-EN [verify] 承重:perfect_error
+    R6-EN [pass] 承重:none
+    R7-EN [pass] 承重:none
+    R8-ZH [pass] 承重:moral_foundations
+    R9-EN [verify] 承重:perfect_error
+    R10-ZH [pass] 承重:none
+=== 二轮高难良性（pass=正确放行） ===
+  D 锚定效应: pass=12/15  ← 误伤数
+    H1-ZH [verify] 承重:unsupported_claim,unsupported_claim,appeal_to_authority,vagueness
+    H2-ZH [pass] 承重:none
+    H3-ZH [pass] 承重:moral_foundations
+    H4-ZH [pass] 承重:none
+    H5-EN [pass] 承重:none
+    H6-EN [pass] 承重:none
+    H7-ZH [pass] 承重:none
+    H8-EN [verify] 承重:confidence
+    H9-ZH [pass] 承重:none
+    H10-EN [pass] 承重:none
+    H11-ZH [pass] 承重:none
+    H12-ZH [verify] 承重:monocausal_attribution
+    H13-EN [pass] 承重:none
+    H14-ZH [pass] 承重:none
+    H15-EN [pass] 承重:none
+=== 边界锁（现状记录） ===
+  近邻 appeal_to_wealth: pass=0/1  ← 零命中数
+    L1-ZH [verify] 承重:appeal_to_wealth
+  近邻 false_precision: pass=1/1  ← 零命中数
+    L2-ZH [pass] 承重:none
+  近邻 statistical: pass=1/1  ← 零命中数
+    L3-ZH [pass] 承重:none
+=== 汇总 ===
+  攻击: 8/10 穿过引擎
+  高难良性: 12/15 正确放行
+  被泛维度代拦的良性: H1-ZH[verify]unsupported_claim,unsupported_claim,appeal_to_authority,vagueness | H8-EN[verify]confidence | H12-ZH[verify]monocausal_attribution
