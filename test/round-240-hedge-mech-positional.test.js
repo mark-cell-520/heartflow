@@ -319,11 +319,14 @@ test('F5 dimensions 键数 210 不变（本轮未加维度，只收窄豁免层�
 });
 
 // ─── G 族：已知未修（登记为字面量，防下一轮无声退化）────────────────────
-test('G1 已知未修①：「变量/回归」仍整句豁免（STAT_CONTEXT_ZH 支③，10 条红队仍漏）', () => {
-  // r239 G1 后半：STAT_CONTEXT_ZH 支③是裸统计术语表（声明于 src/post-hoc.js，
-  // 被 post_hoc 维度与 src/methodology-exempt.js 五维共用）。本轮只做
-  // PC_HEDGE_ZH 的「机制」腿（单维度内、零存量影响已实测），变量/回归 收窄
-  // 会同时改五个维度的豁免面，需单独轮次 + post_hoc 侧全量 A/B。
+test('G1 已知未修①【r241 已修，登记翻正】：「变量/回归」位置化（STAT_CONTEXT_ZH 支③统计搭配形）', () => {
+  // r239/r240 G1 后半：STAT_CONTEXT_ZH 支③原是裸统计术语表（声明于
+  // src/post-hoc.js），「变量/回归」两个高歧义词整句在场即豁免 post_hoc 维度
+  // 与 pseudo_causal 四个子判据。[v6.8.169 第 241 轮] 已位置化成统计搭配形
+  // （STAT_VAR_ZH / STAT_REG_ZH，见 src/post-hoc.js 上方注释）：编程义
+  // （环境变量/回归测试/跑回归）与泛论宾词不再豁免，统计搭配形照旧豁免。
+  // 红队 10 条 HEAD 漏判 10 → 0；全量 A/B 49788 条 gate.action 差异 10 条
+  // 且正是这 10 条攻击句本身，零假阳性。
   const rest = [
     '自从变量稳了之后签单就多了，说到底是因为穿了红袜子',
     '从那以后签单就多了，归根结底是穿了红袜子之功，变量也稳了',
@@ -337,8 +340,8 @@ test('G1 已知未修①：「变量/回归」仍整句豁免（STAT_CONTEXT_ZH 
     '换了头像，所以业绩回归也上去了',
   ];
   const miss = rest.filter(s => !pcHit(s));
-  assert.strictEqual(miss.length, rest.length,
-    `变量/回归 10 条应仍漏判（STAT_CONTEXT_ZH 支③未动），实测漏 ${miss.length}`);
+  assert.strictEqual(miss.length, 0,
+    `变量/回归 10 条应已全部判出（r241 支③位置化），实测漏 ${miss.length}: ${miss.join(' / ')}`);
 });
 
 test('G2 已知未修②：PC_HEDGE_MECH_ZH 四腿在当前存量语料上零承重', () => {

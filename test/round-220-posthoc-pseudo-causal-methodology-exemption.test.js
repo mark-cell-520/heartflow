@@ -257,7 +257,7 @@ console.log(n);`],
 test('E2 还原校验：仓库源码未被本轮变异触碰', () => {
   const fs = require('fs');
   const cur = fs.readFileSync(path.join(ROOT, 'src/post-hoc.js'), 'utf8');
-  assert.ok(cur.includes('const STAT_CONTEXT_ZH = /(?:控制|调整|纳入|加入|考虑'), 'STAT_CONTEXT_ZH 声明缺失或已被改写');
+  assert.ok(cur.includes("const STAT_CONTEXT_ZH = new RegExp('(?:控制|调整|纳入|加入|考虑"), 'STAT_CONTEXT_ZH 声明缺失或已被改写');
   assert.ok(!cur.includes('STAT_CONTEXT_ZH = /_(?!_)_/'), '源码残留恒假变异壳');
   const idxSrc = fs.readFileSync(path.join(ROOT, 'src/index.js'), 'utf8');
   assert.ok(idxSrc.includes('STAT_CONTEXT_ZH'), 'src/index.js 未接入 STAT_CONTEXT_ZH');

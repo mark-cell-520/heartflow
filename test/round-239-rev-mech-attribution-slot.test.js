@@ -51,19 +51,21 @@ const A_REV = buildAttack(REV_WORDS);
 const HEAD_MISS_LUCK2 = 63;
 const HEAD_MISS_REV = 20;
 
-test(`A1 宽口径机制词族：HEAD 漏 ${HEAD_MISS_LUCK2}/${A_LUCK2.length} → 现在只漏 10（剩余 10 条由存量统计语镜表吃掉，非本轮引入）`, () => {
+test(`A1 宽口径机制词族：HEAD 漏 ${HEAD_MISS_LUCK2}/${A_LUCK2.length} → 现在 0 漏（变量/回归 已由 r241 修掉）`, () => {
   const miss = A_LUCK2.filter(r => !pcHit(r.s));
   // [v6.8.168 第 240 轮] 「机制」一词已由 r240 修掉（PC_HEDGE_ZH 裸词腿位置化成
   // PC_HEDGE_MECH_ZH 四腿），剩余漏判只剩 变量/回归 两个词（STAT_CONTEXT_ZH
-  // 支③裸统计术语表，r240 登记为下一轮候选①）。按 r226/r233 纪律同步：
-  // 只按实测更新期望值与过期登记，行为断言一个没动。
+  // 支③裸统计术语表，r240 登记为下一轮候选①）。
+  // [v6.8.169 第 241 轮] 「变量/回归」也已修掉：支③位置化成统计搭配形
+  // （STAT_VAR_ZH / STAT_REG_ZH），编程义与泛论宾词不再整句豁免。按
+  // r226/r233 纪律同步：只按实测更新期望值与过期登记，行为断言一个没动。
   const words = [...new Set(miss.map(r => r.w))].sort();
-  assert.deepStrictEqual(words.slice().sort(), ['回归', '变量'].slice().sort(),
-    '剩余漏判词应只有 回归/变量（存量统计语镜表路径；机制已由 r240 修掉），实测: ' + words.join('/'));
-  assert.strictEqual(miss.length, 10, `剩余漏判条数应为 10，实测 ${miss.length}`);
+  assert.deepStrictEqual(words, [],
+    '宽口径族应零漏判（机制/变量/回归 三轮均已位置化），实测剩余漏判词: ' + words.join('/'));
+  assert.strictEqual(miss.length, 0, `宽口径族应零漏判，实测 ${miss.length}`);
   // 除上述两词外，20 个宽口径词 × 5 形状 = 100 条必须全判
   const judged = A_LUCK2.filter(r => pcHit(r.s));
-  assert.strictEqual(judged.length, 100, `应判 100 条，实测 ${judged.length}`);
+  assert.strictEqual(judged.length, A_LUCK2.length, `应判 ${A_LUCK2.length} 条，实测 ${judged.length}`);
   for (const r of judged) assert.ok(gateOf(r.s) !== 'pass', '判了的攻击句 gate 不应 pass: ' + r.s);
 });
 
@@ -225,7 +227,7 @@ test('D3 变异守卫三：把 slotMech 改恒真后 A 族攻击句必须整体�
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 
-test('D4 变异守卫四：未变异副本还原校验（A 族判 110/110-10 + B 族零误伤）', () => {
+test('D4 变异守卫四：未变异副本还原校验（A 族判 110/110 + B 族零误伤）', () => {
   const tmp = copySrc('pristine');
   try {
     const m = require(path.join(tmp, 'src', 'index.js'));
@@ -233,7 +235,9 @@ test('D4 变异守卫四：未变异副本还原校验（A 族判 110/110-10 + B
     const judgedR = A_REV.filter(r => m.checkPseudoCausal(r.s).count > 0).length;
     // [v6.8.168 第 240 轮] 95 → 100：r240 修掉「机制」一词 5 条，宽口径族
     // 判 数从 95 升到 100（剩余 10 条漏判全是 变量/回归）。
-    assert.strictEqual(judgedL, 100, `未变异副本宽口径族应判 100，实测 ${judgedL}`);
+    // [v6.8.169 第 241 轮] 100 → 110：r241 把支③「变量/回归」位置化成统计
+    // 搭配形，剩余 10 条也判出来了，宽口径族满判。
+    assert.strictEqual(judgedL, A_LUCK2.length, `未变异副本宽口径族应判 ${A_LUCK2.length}，实测 ${judgedL}`);
     assert.strictEqual(judgedR, A_REV.length, `未变异副本窄口径族应判 ${A_REV.length}，实测 ${judgedR}`);
     const fp = BENIGN_SLOT.filter(s => m.checkPseudoCausal(s).count > 0);
     assert.deepStrictEqual(fp, [], '未变异副本良性句应零误伤');
@@ -355,16 +359,19 @@ test('F3 dimensions 键数 210 不变（本轮未加维度，只改护栏位置�
 });
 
 // ─── G 族：已知未修登记 ─────────────────────────────────────────────────
-test('G1 已知未修①【r240 已修一半，登记翻正】：「变量/回归」在统计语镜表里仍整句豁免', () => {
+test('G1 已知未修①【r240 修一半、r241 修完，登记翻正】：支③「变量/回归」已位置化为统计搭配形', () => {
   // [v6.8.168 第 240 轮] 「机制」一词已修（PC_HEDGE_ZH 裸词腿位置化成
-  // PC_HEDGE_MECH_ZH 四腿，红队 5 条 HEAD 漏判 → 0）；STAT_CONTEXT_ZH 支③
-  // 的「变量/回归」仍在，剩余 10 条漏判全部来自那里（r240 下一轮候选①）。
-  for (const s of ['自从机制稳了之后签单就多了，说到底是因为穿了红袜子']) {
-    assert.ok(pcCount(s) > 0, '该句已被 r240 修掉（机制腿位置化），应判: ' + s);
-  }
-  for (const s of ['自从变量稳了之后签单就多了，说到底是因为穿了红袜子',
+  // PC_HEDGE_MECH_ZH 四腿，红队 5 条 HEAD 漏判 → 0）。
+  // [v6.8.169 第 241 轮] 「变量/回归」也已修（STAT_CONTEXT_ZH 支③位置化成
+  // STAT_VAR_ZH / STAT_REG_ZH 统计搭配形，红队 10 条 HEAD 漏判 → 0）。
+  // 剩余缺口见 r241 测试 G1：统计搭配形出现在**结果侧**时仍整句豁免
+  // （「换了头像，所以业绩自变量也上去了」），该缺口对支③全部词条成立
+  // （「…红袜子之功，工具变量也控制了」同样漏），是豁免表层性问题而非
+  // 本轮引入，需单独轮次做「归因对象位」化。
+  for (const s of ['自从机制稳了之后签单就多了，说到底是因为穿了红袜子',
+    '自从变量稳了之后签单就多了，说到底是因为穿了红袜子',
     '自从回归稳了之后签单就多了，说到底是因为穿了红袜子']) {
-    assert.strictEqual(pcCount(s), 0, '该句仍应被存量统计语镜表豁免: ' + s);
+    assert.ok(pcCount(s) > 0, '该句已被 r240/r241 修掉（裸词腿位置化），应判: ' + s);
   }
 });
 
