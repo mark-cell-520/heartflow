@@ -129,7 +129,7 @@ const CONCEPT_EN = /\bpeak[- ]end\b|\bduration\s+neglect\b|\bduration\s+(?:is\s+
 
 // ─── 豁免：均衡评价/考量时长/按完整数据决策的正当做法 ────────────
 const CORRECTIVE_ZH = /(?:综合(?:时长|全程|整个过程|考虑时长|兼顾)|按时间加权|考量(?:时长|全程|持续)|看整体(?:分布|过程)|看全程|整体分布|平均每(?:天|次|时段)|(?:不能|不应|别|不要|而非|而不是)[^。，！？；\n]{0,8}(?:只|单)(?:凭|看|因为|以)[^。，！？；\n]{0,10}(?:结尾|峰值|高光|最后|峰终)|(?:结尾|峰值|高光|最后)[^。，！？；\n]{0,6}(?:不能|不该|不应|无法|不足以)[^。，！？；\n]{0,8}(?:掩盖|替代|抹杀|代表|代替)|打折扣|辩证|全面评价|均衡|一分为二)/;
-const CORRECTIVE_EN = /\b(?:weighed?|weighs?|consider(?:ed|ing)?|averaged?|balanced?)\s+(?:the\s+)?(?:full|whole|entire|overall)\s+(?:duration|length|experience|runtime|journey)\b|\bacross\s+(?:every|all)\s+(?:session|day|touchpoint|moment|stage)\b|\bnot\s+(?:just|only)\s+(?:the\s+)?(?:ending|peak|finale|last)\b|\b(?:ending|peak|finale)\s+(?:cannot|can'?t|doesn'?t|shouldn'?t)\s+(?:carry|mask|redeem|substitute)\b|\bholistic(?:ally)?\b|\bthe\s+whole\s+(?:journey|experience|process)\b/i;
+const CORRECTIVE_EN = /\b(?:weigh(?:ed|ing|s)?|consider(?:ed|ing)?|averag(?:e|ed|es|ing)|balanc(?:e|ed|es|ing))\s+(?:the\s+)?(?:full|whole|entire|overall)\s+(?:duration|length|experience|runtime|journey)\b|\bacross\s+(?:every|all)\s+(?:session|day|touchpoint|moment|stage)\b|\bnot\s+(?:just|only)\s+(?:the\s+)?(?:ending|peak|finale|last)\b|\b(?:ending|peak|finale)\s+(?:cannot|can'?t|doesn'?t|shouldn'?t)\s+(?:carry|mask|redeem|substitute)\b|\bholistic(?:ally)?\b|\bthe\s+whole\s+(?:journey|experience|process)\b/i;
 
 // 工具 ─────────────────────────────────────────────────────────
 function allMatches(re, text) {
