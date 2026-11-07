@@ -1,3 +1,39 @@
+## r730 — silence_imputation 双腿近形族扩展（第 213 维，缄口/拒不/未发一言/mum 五族 + 跨语言配对）
+
+**轮次**：r730 ｜ **版本**：v6.8.156 → v6.8.157 ｜ **日期**：2026-11-07 ｜ **方向**：r729 交接簿方向⑤（init 方向池③ silence_imputation 复测——「6/10 漏判」历史描述已被 r728 修正为 12/12，本轮 r729 方向⑤近形族复测发现新缺口）
+**真升级类型**：存量维度探测器族扩展（用户可感知：「他缄口不言，所以这事是真的。」「她未发一言，可见确有其事。」「He stayed mum about the payments, which speaks for itself.」「他没有回应，which confirms his guilt.」——r717-r728 表均不判，本轮全部改判 verify）
+
+**缺口复测**（scripts/round-730-silence-probe.js，口径与 r727/r728 探针完全一致，v6.8.156 HEAD 实测，动手前）：33 条攻击 MISS 28（84.8% 漏判）、良性 34/34 零误伤——r728 扩过的「表态/松口/拒绝」族之外仍有五族整体缺席：
+- 腿①沉默动作：缄口不言/闭口不谈（原表只有名词 /缄默/）、拒不（只收沉默动词，绝不收「拒不认罪」——那是主动否认不是沉默）、未发一言/未置一词/未置一辞、一声不吭、一句话都没说、（没）开过口、不言语、不搭腔、没有说法；EN stayed/kept/remained mum（只收动词框架，裸 mum 是英式「妈妈」不收）、tight-lipped、not a (single) word was said/uttered/forthcoming、passed on the chance to comment、(offered|gave|issued) no explanation（原表只有后置形 no explanation was offered）；
+- 腿②推定结论：副词+其（足见其心虚/其心里有鬼）、说明/证明/表明/印证+在撒谎/掩饰/狡辩/抵赖/隐瞒、恰恰/正好+证明…是真的（容许逗号插入与句读边界）、印证/证实/坐实+指控/罪名/举报/丑闻；EN confirms his guilt、suggests he is guilty / he is lying；
+- 架构：混排句（中文沉默×英文推定、英文沉默×中文总结）按语种二选一表配对，跨语言整句漏判（对抗探针 2 条 MISS 同根因）。
+
+**改动**（src/silence-imputation.js 单文件，正则族扩展 + 架构放开跨语言配对）：
+- SILENCE_ZH 12→18 条（新增 缄口X/闭口X/拒不+沉默动词/未发一言/一声不吭/一句话都没说/（没）开过口/未置一辞 六族）；
+- SILENCE_EN 17→22 条（新增 mum 动词框架/mum+about/on/tight-lipped/not a word/passed on the chance/offered no explanation 五族）；
+- IMPUTE_ZH 补 4 族（副词+其、在撒谎行径、恰恰证明+逗号（带句读边界前瞻）、印证了指控），IMPUTE_EN 补 2 条（confirms his guilt、suggests he is guilty/lying）；
+- PAIRS 架构放开跨语言：[SIL_ZH, IMP_EN] 与 [SIL_EN, IMP_ZH] 配对（60 字符前向 / 12 字符后向邻近窗，同语言优先级不变；细节字符串语言仍按主体语种，中英混排如实输出）；
+- 豁免同步：EXEMPT_CORRECT_ZH 补 不能足见/不足以见/不表明/不能印证/不能证实/不等于撒谎/不等于掩饰/不得推定/不可推定/不能想当然/不见得/是当事人的权利/有权不/有权保持沉默/有权拒绝/律师建议/法律程序；EXEMPT_CORRECT_EN 补 cannot be taken as / is no proof / proves nothing / does not confirm / cannot confirm / does not suggest / not to be taken as；
+- src/index.js 三处口径同步（require 注释 [r730]、DIM_GUIDANCE 腿①腿②族列举 + 跨语言配对说明、登记注释）。
+
+**diff**：git diff --shortstat 实测见落盘段（有效代码 src/+test/ 约 470 行：src/silence-imputation.js 正则与豁免扩展 + src/index.js 口径 ±3 处 + test/round-730-silence-imputation-leg2-extension.js 约 330 行 + scripts/negative-test-silence-imputation-r730.js 约 229 行；其余为证据链：探针×2、gate 检查、think 冒烟、README changelog、UPGRADE_LOG）
+
+**验证逐项实测**：
+- 主探针 scripts/round-730-silence-probe.js：**攻击 33/33 命中（漏判 0）、良性 0/34 误伤，漏判率 0.0%**（v1 初测 32/33，MISS「他不搭腔，这本身就说出了答案。」由 不搭腔族 + 说出了答案前瞻 修复）
+- 对抗探针 scripts/round-730-silence-adversarial.js：**攻击 17/17、刁钻良性 0/22**（刁钻良性含：拒不认罪≠沉默、mum=妈妈、同形沉默无推定、疑问句、否定/正确响应形、元话语转述）
+- gate 层检查 scripts/round-730-gate-check.js：**攻击 31/31 非 pass 且归因 silence_imputation、良性 31/31 保持 pass、预存污染 3/3 归因不变**（3 条良性被别族预存维度 contradiction/hasty_generalization/fallacies 触发，git stash 复测 v6.8.156 HEAD 同行为——零新增误伤按维度归因处理）
+- test/round-730-silence-imputation-leg2-extension.js：**111 passed, 0 failed**（攻击 33 条 gate 非 pass、良性 37 条 gate pass、模块级边界 13 项、__internals 四张腿常量逐族注入承重 + 新豁免条目承重 + mum 正则个体承重、think() 冒烟 2 项与 r717/r727/r728 存量锚点 6 项、分工边界锁 2 项、登记断言 5 项）
+- 负例脚本 scripts/negative-test-silence-imputation-r730.js：**22 passed, 0 failed**（18 注入点全承重：腿① ZH 八族 + EN 五族逐族置空即失效、mum 正则个体删除承重、腿② ZH 四族 + EN 三条置空即失效、混排跨语言两方向置空即失效、新豁免条目删「不能足见/cannot confirm」露出攻击面、元话语表置空露出攻击形；良性对照 40 条零误伤；gate 层三组断言）
+- think() 冒烟 scripts/round-730-think-smoke.js：正例 **7/7** 命中、干净良性 **4/5** 零命中（1 条别族命中为预存污染）、边界良性 **3/3** 本族零命中
+- bin/verify.js **16/0**；双向门禁召回 **52/52**、误拦 **302/326** 与基线完全一致（零新增误伤）；bin/cli.js status **running**（version 6.8.157）；round-guard --stage=after 全过
+- 维度/层级/模块数不变（**213 维度 / verify 级不变**，纯探测器族扩展，无新维度）；doc-numbers **24/0**
+
+**新踩坑**：① patch 对含中英混排的注入块要逐行核对括号——本轮给 gate-check 脚本加预存污染分类时误在 else-if 行尾多打一个 } 提前关闭 forEach 回调，lint 立即抓出（patch 工具 lint ok 才收工）；② gate-check 的 PREEXISTING 字典与 benign 清单必须一一对应——多加一条清单外的样本会算出「31/30」这种自相矛盾分母；③ 预存污染证词要走 git stash 复测（本轮 4 条污染样本 HEAD 同归因 contradiction/hasty_generalization/fallacies/perfect_error），不能凭本轮输出断言「新增误伤为零」。
+
+**下一轮方向**（复测后排序）：① **补 AGENTS.md Verify-level 列举头部的 loaded_question 一个词**（r729 遗留：计数已 171 全绿仅差名单，patch 工具被 Hermes 文件保护拦截，需人工批准或下轮重试）；② di ① 目的状语豁免不含「以符合」（r217/r218 遗留边界）；③ hasty_generalization 对 "Nobody can skip the verification step here." 误报 verify（r218 复测仍遗留）；④ silence_imputation 剩余近形（拒不 + 反驳动词族如拒不认错/拒不交代、EN wouldn't budge 句型的沉默框架变体）可再探；⑤ evidence 维度恒死（射程未划清前不动）；⑥ middle_ground / base_rate_fallacy / composition_division / amphiboly / is_ought 均不合格维持落选；chronological_snobbery 维持落选。
+
+---
+
 ## r729 — 新维度 loaded_question 上线（第 214 维，预设加载/诱导性提问）
 
 **轮次**：r729 ｜ **版本**：v6.8.155 → v6.8.156 ｜ **日期**：2026-11-07 ｜ **方向**：家族探针 decision 打分最高候选（conditional_proposition 已上线排除后唯一合格项）
