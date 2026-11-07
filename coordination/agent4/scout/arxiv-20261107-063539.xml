@@ -1,0 +1,416 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/hWqn+p04+2kUo93lPb9afA1OpRU</id>
+  <title>arXiv Query: search_query=all:adverse OR all:selection OR all:free OR all:rider OR all:status OR all:quo OR all:bias OR all:detection&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-07T06:35:40Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:adverse+OR+(all:selection+OR+(all:free+OR+(all:rider+OR+(all:status+OR+(all:quo+OR+(all:bias+OR+all:detection))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>654829</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08489v1</id>
+    <title>BeAR: The Bern Atmospheric Retrieval code - A GPU-accelerated framework for low-resolution, high-resolution, and joint retrievals of exoplanet atmospheres</title>
+    <updated>2026-11-05T18:59:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.08489v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08489v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present BeAR, the Bern Atmospheric Retrieval code and successor of Helios-r, and its new high-resolution cross-correlation framework for emission and transmission spectra. BeAR performs joint retrievals by adding the log-likelihoods of high- and low-resolution data computed from the same model atmosphere. The framework implements established cross-correlation log-likelihoods, with the line-depth scaling either fitted analytically or sampled as a free parameter, their per-pixel generalization, fast model filtering, and model re-injection adapted to this filtering. The forward model and likelihood run entirely on a graphics processing unit (GPU). One forward model takes about 1 ms on an NVIDIA GH200, allowing millions of models per minute on a GPU cluster. In separate retrievals of Gemini South/IGRINS and JWST/NIRSpec dayside spectra of the hot Jupiter WASP-77Ab, BeAR reproduces published abundances, C/O ratios, and metallicities to within 1.5 sigma, the preference for 13CO, and the thermal structure and line contrast to within 1 sigma. The joint retrieval confirms a sub-solar metallicity and a near-solar C/O ratio. A full IGRINS retrieval with 17 free parameters takes 27 to 42 minutes on a single NVIDIA GeForce RTX 5080 or about 14 minutes on eight RTX 4090 GPUs. Injection--recovery tests show that the posteriors underestimate the uncertainties of abundance ratios by about a factor of two.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:48Z</published>
+    <arxiv:comment>Submitted to A&amp;A</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Esther Wang</name>
+    </author>
+    <author>
+      <name>Daniel Kitzmann</name>
+    </author>
+    <author>
+      <name>H. Jens Hoeijmakers</name>
+    </author>
+    <author>
+      <name>Joost P. Wardenier</name>
+    </author>
+    <author>
+      <name>Helena Lecoq-Molinos</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08472v1</id>
+    <title>XStack: A Benchmark for ML Repo Migration</title>
+    <updated>2026-11-05T18:55:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.08472v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08472v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>ML code should run where researchers choose, not where it was first written. Today, machine learning code mainly lives in two ecosystems, PyTorch on NVIDIA GPUs and JAX on Google TPUs. Migrating repositories between them means building and testing across frameworks and hardware. This migration is (1) a practical need, since it unlocks different hardware for researchers, and (2) a natural benchmark: it involves different frameworks and hardware, covers whole repositories, and is long-horizon and challenging. We introduce XStack, a benchmark that evaluates agents on migrating ML repositories between these two ecosystems. Each agent receives a PyTorch repository and a clean TPU machine and must deliver a JAX repository. Its output passes if it meets our grading criteria, based on the source repository's published result, authenticated and calibrated by us. Migration by agents remains unreliable: Claude Opus 5 passes 75%, GPT-5.6-sol 45%, and every other agent at most 40%. XStack is a step toward freeing ML code from its ecosystem. We release XStack to make progress toward reliable migration across frameworks and hardware measurable.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:54Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Linrong Cai</name>
+    </author>
+    <author>
+      <name>Taiming Lu</name>
+    </author>
+    <author>
+      <name>Haozhe Chen</name>
+    </author>
+    <author>
+      <name>Zhuang Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08469v1</id>
+    <title>Same Behavior, Different Mechanism: What Finite Experiments Can Certify About Integrated Information</title>
+    <updated>2026-11-05T18:55:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08469v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08469v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interpretability, AI auditing and assessments of machine consciousness increasingly rest on mechanism-level quantities: functionals of a system's causal transition law that describe how it computes, not what it outputs. Experiments see that law only through finite, partial and noisy interventions. We ask when such a quantity is identifiable from an experiment's access, continuous in the mechanism and certifiable from finite data, and answer exactly for a deliberately demanding case - the integrated information $\varphi$ of integrated information theory - in stochastic networks of four and five units with known ground truth. Behavior can be silent: a recurrent and a feed-forward network with identical input-output laws at their response delay carry 0.28 and 0 bits, yet internal recordings separate them within 4-53 trials. Partial access can be just as blind: in our examples, units left out of a one-step recording impose precision floors of 0.30-1.02 bits that no sample size lowers, and in all-but-self parity networks, recordings of any length see several hidden units only through the product of their fidelities - a symmetry that one intervention broke in exact checks. The measure has sharp edges: because $\varphi$ selects a partition, and the cause and effect it specifies, by one criterion and reports another, infinitesimal changes of mechanism that cross an edge change it by 25-100% at 99% of the edges we found in random networks, and about 1% of surrogate models that fit interventional data almost perfectly misreport it by more than 20%. One-sided claims survive: the same data certify a lower bound on both sides of an edge, and we prove $\varphi&gt;1.004$ bits throughout a 64-dimensional region of mechanisms and certify it from about $10^7$ controlled transitions with false-certificate probability at most $α$. Measurability is thus a design question with computable answers.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:31Z</published>
+    <arxiv:comment>30 pages, 7 figures. Code available as ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Linqian Wu</name>
+    </author>
+    <author>
+      <name>Diaoxuan He</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08465v1</id>
+    <title>Towards interpreting any residual stream direction by scaling activation inversion</title>
+    <updated>2026-11-05T18:54:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.08465v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08465v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>To interpret a direction in a language model's residual stream, we can look for text that strongly activates it. But when such text is found by scanning a corpus, it is limited to what that corpus contains. We develop Maximally-Activating Example Metamodels (MAEMs), language models which map residual stream directions from a subject model to text exemplars that strongly activate those directions. Our objective is to maximise the cosine similarity of a supplied residual stream direction with the activations of the text generated by the MAEM. This label-free RL objective helps to scale MAEMs on diverse sources of residual stream directions. Empirically, we find the resultant metamodel produces informative exemplars: a Qwen3.6-27B MAEM inverts held-out activations better than corpus search or a natural-language autoencoder (NLA), beats corpus search (at 10M tokens) on a majority of held-out languages/domains, and activates 89% of held-out SAE features. It also identifies concepts behind steering vectors about as well as NLAs, recovers the payloads of LoRA backdoors more often than corpus search, and can even verbalise some model workspace inner monologue. Unlike explanations produced by other metamodels (e.g. NLAs), MAEM exemplars can be verified with a forward pass on the subject model, making the MAEM objective a grounded alternative for scaling the training of metamodels.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:54:40Z</published>
+    <arxiv:comment>Euan Ong and Jiahai Feng advised equally</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Celeste De Schamphelaere</name>
+    </author>
+    <author>
+      <name>Juan J. Vazquez</name>
+    </author>
+    <author>
+      <name>Ari Spiesberger</name>
+    </author>
+    <author>
+      <name>Tomáš Gavenčiak</name>
+    </author>
+    <author>
+      <name>Gavin Leech</name>
+    </author>
+    <author>
+      <name>Euan Ong</name>
+    </author>
+    <author>
+      <name>Jiahai Feng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08461v1</id>
+    <title>Quantum Knowledge Distillation: State-of-the-art, Applications and Open Problems</title>
+    <updated>2026-11-05T18:53:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.08461v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08461v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Knowledge distillation transfers predictions, representations, or other supervisory information between learning models and is increasingly investigated in quantum machine learning. Its applications extend beyond compression to cross-architecture transfer, circuit approximation, distributed learning, and classical deployment of models trained using quantum-derived supervision. This survey reviews these approaches using two complementary classification axes: teacher-student configuration and the role of quantum resources in the distillation process. Quantum-inspired methods are discussed separately from methods that simulate quantum computations classically or execute them on quantum hardware. We explain how measurement probabilities, expectation values, classical readouts, state overlaps, and circuit-level objectives support different transfer mechanisms. We then critically assess the presented results against baseline design, execution conditions, uncertainty, and resource costs. The evidence shows that distillation can improve selected quantum students, but benefits are task- and architecture-dependent, and several studies find negligible gains or even performance degradation. Evaluations on physical quantum hardware remain limited, with some testing individual quantum components rather than complete learning pipelines. Heterogeneous protocols and incomplete resource reporting prevent general conclusions about practical quantum advantage. We identify priorities for controlled benchmarking, noise-aware learning, reproducible evaluation, and efficient transfer between quantum and classical models.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:53:05Z</published>
+    <arxiv:comment>21 pages, 3 figures, 4 tables</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Aldana Al-Sulaiti</name>
+    </author>
+    <author>
+      <name>Kuan-Cheng Chen</name>
+    </author>
+    <author>
+      <name>Muhammad Bilal Akram Dastagir</name>
+    </author>
+    <author>
+      <name>Ahmed Farouk</name>
+    </author>
+    <author>
+      <name>Saif Al-Kuwari</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08457v1</id>
+    <title>Adversarial Training with Large Step Sizes: Implicit Bias, Optimization, and Sharpness</title>
+    <updated>2026-11-05T18:48:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.08457v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08457v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Adversarial Training (AT) is an important method for improving model robustness. We study the dynamics of deterministic Gradient Descent (GD) in AT. Most existing works in this direction focus on the small or vanishing step sizes regime, where GD resembles a continuous-time flow. However, such step sizes can make training inefficient and are rarely used in practice. In this paper, we study the AT dynamics of GD with large constant step sizes. We first study GD in adversarial linear logistic regression, focusing on two aspects: where the model parameters converge (implicit bias) and how quickly the losses decrease (optimization). We then turn to neural networks training and study how the sharpness of losses evolve during AT. Our results advance the understanding of the behaviors of GD with large step sizes in AT and highlight three key differences from its behavior in Standard Training (ST): (i) the implicit bias gap between AT and ST, previously established only for small step sizes, persists for arbitrarily large constant step sizes, (ii) different from ST, there is no uniform rate of convergence for the optimization error in AT, and (iii) sharpness can exhibit two-stage dynamics that differ from the Edge-of-Stability behavior observed in ST.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:48:50Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yi Feng</name>
+    </author>
+    <author>
+      <name>Andrea Paudice</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08456v1</id>
+    <title>Cognitive Tours: Making Understanding a Deliverable in AI-Assisted Development</title>
+    <updated>2026-11-05T18:48:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.08456v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08456v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generative AI and agentic coding are accelerating software development, leading to concerns about technical debt. But two less visible forms of debt, cognitive debt and intent debt, are emerging as key risks to software health. Cognitive debt is the absence or erosion of a team's shared understanding where no one can confidently explain how a system works or predict the impact of a change. Intent debt is the lack of clearly articulated goals, constraints, and rationale that explain what the system is for and guide how it should evolve. This paper presents Cognitive Tours, a tool designed to mitigate and repair cognitive and intent debt. Cognitive Tours is a web-based prototype for creating and following curated paths connecting user needs, design decisions, code, tests, and open questions. AI-assisted skills help audit existing waypoints and tours for possible problems or staleness and suggest candidates for new ones; humans decide what matters, verify relationships, and construct the narrative. This division of work deliberately preserves productive friction: the sensemaking involved in selecting, explaining, and revising a tour, which is intended to foster and share understanding. Our demonstration uses a tour of Cognitive Tours itself to introduce the tool and illustrate its design decisions and interaction mechanisms. A proposed evaluation agenda concludes the paper. A demo is available at https://cognitive-tours-demo.vercel.app/</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:48:06Z</published>
+    <arxiv:comment>6 pages, shorter version submitted to ICSE 2027 Demo Track (under review)</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Margaret-Anne Storey</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08447v1</id>
+    <title>Dynamical effects induced by synthetic SU(1,1) gauge fields</title>
+    <updated>2026-11-05T18:43:17Z</updated>
+    <link href="https://arxiv.org/abs/2611.08447v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08447v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Compact gauge fields are powerful tools for controlling quantum dynamics and topological phases of matter. Non-compact gauge fields are particularly relevant for open systems, where particles or energy are exchanged with the environment. Here, we investigate the wavepacket and entanglement dynamics induced by an $\mathrm{SU}(1,1)$ gauge field. The wavepacket undergoes non-Abelian non-compact Bloch oscillations, in which the spectrum of an auxiliary one-dimensional quantum problem determines the transition between stable oscillations and unstable amplification. In the unstable adiabatic regime, the wavepacket probes an $\mathrm{SU}(1,1)$ topological defect, and its amplification is determined solely by a hyperbolic solid angle in Minkowski space. Threading an $\mathrm{SU}(1,1)$ gauge field through a bosonic tight-binding model yields the bosonic Kitaev model, whose volume or super-volume entanglement scaling is governed by the stability of the gauge field. We further propose an experimental realization of an $\mathrm{SU}(1,1)$ gauge field in a spinor condensate. Our results can be generalized to other non-compact groups and higher dimensions, providing a geometric framework for entanglement control, selective amplification, and engineering energy transfer.</summary>
+    <category term="cond-mat.quant-gas" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:43:17Z</published>
+    <arxiv:comment>13 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.quant-gas"/>
+    <author>
+      <name>Chenwei Lv</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08441v1</id>
+    <title>Edge-Assisted Crowdsensing for Explainable Cyclist Safety Perception</title>
+    <updated>2026-11-05T18:33:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.08441v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08441v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cyclist fatality rates remain high despite policy support for active travel, and autonomous vehicles add complexity to mixed traffic. Neither crash statistics nor multi-model detection pipelines scale to continuous monitoring of perceived safety along a route. We present an edge-assisted crowdsensing system: handlebar cameras supply street-level frames, a vision-language model (VLM) turns each frame into structured traffic attributes through a single prompt, and an explainable boosting machine (EBM) combines them with OpenStreetMap road infrastructure and on-bike kinematics to predict a crowdsourced 1-9 safety score. Extraction belongs at the network edge: the fastest self-hosted model needs 2.49 s per frame and scoring takes 0.4 ms on a CPU. On 1,362 annotated frames from two London routes, the EBM regressor reaches 72.2 percent binary accuracy and a mean absolute error of 1.011 under five-fold cross-validation. It is within one accuracy point of black-box ensembles. Its per-feature shape functions give exact attribution: physical lane separation is worth +0.97 rating points, a painted lane +0.70 and a construction site -0.65. Planners can therefore price an infrastructure change in rating points, and the results enter cost-benefit analysis directly. We also report inter-annotator agreement (alpha = 0.4695), an attribute audit, and a sensitivity analysis linking attribute error to accuracy. With re-encoding, a 20 s sampling interval serves 1,000 riders at 54 Mbit/s at a cost of 1.4 accuracy points, making continuous monitoring practical.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.IV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:33:58Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hongsen Cao</name>
+    </author>
+    <author>
+      <name>Chia-Yen Chiang</name>
+    </author>
+    <author>
+      <name>Mona Jaber</name>
+    </author>
+    <author>
+      <name>Meihui Wang</name>
+    </author>
+    <author>
+      <name>Yasmin Fathy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08434v1</id>
+    <title>DiffSequence-Q: Diffusion Design with Quantum Assistance for Biologically Active Proteins</title>
+    <updated>2026-11-05T18:28:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.08434v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08434v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Designing protein sequences that satisfy both secondary structure requirements and solubility targets remains challenging. We present DiffSequence-Q, a hybrid multinomial diffusion model conditioned on secondary structure at each residue and a continuous solubility target. To introduce quantum auxiliary supervision during training, we employ a quantum neural network (QNN) or quantum Kolmogorov-Arnold network (QKAN) as an auxiliary solubility prediction head over shared Transformer representations. The auxiliary prediction loss is jointly optimized with the diffusion objective, allowing quantum auxiliary supervision to influence the learned denoising model. Once trained, protein sequences are generated entirely through classical reverse diffusion. On the CATH benchmark, DiffSequence-Q achieved the highest secondary structure recovery among the four evaluated models for complete sequence generation. Evaluation with a separately trained solubility prediction model showed that the best QNN and QKAN configurations achieved mean predicted solubility scores 14.0% and 22.7% higher than the multilayer perceptron (MLP) baseline, respectively. Experimental characterization further demonstrated biological activity across three distinct protein families. Selected defensins exhibited pronounced inhibitory activity against Aspergillus niger, while xylanases and short-chain dehydrogenases exhibited substantial enzymatic activity. Together, these results support DiffSequence-Q as a framework for integrating structural requirements and solubility targets in protein generation, with experimentally demonstrated biological activity.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:28:09Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Ke-Xin Tang</name>
+    </author>
+    <author>
+      <name>Zhen-Qiang Weng</name>
+    </author>
+    <author>
+      <name>Kai Yan</name>
+    </author>
+    <author>
+      <name>Yao-Yao Lu</name>
+    </author>
+    <author>
+      <name>Yu-Ze Zhu</name>
+    </author>
+    <author>
+      <name>Hang Song</name>
+    </author>
+    <author>
+      <name>Jun-Jie He</name>
+    </author>
+    <author>
+      <name>Jie-Cheng Yang</name>
+    </author>
+    <author>
+      <name>Xiang Zhao</name>
+    </author>
+    <author>
+      <name>Lin Yang</name>
+    </author>
+    <author>
+      <name>Xian-Min Jin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08425v1</id>
+    <title>Failure Prediction and Classification in Vision-Language-Action Models Via Calibrated Latent Probing</title>
+    <updated>2026-11-05T18:21:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.08425v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08425v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action models (VLAs) enable general-purpose embodied intelligence, but their performance is brittle under distribution shift, where unanticipated failures can damage equipment or endanger people. Deploying VLAs in real-world systems therefore requires a runtime monitor that is timely, calibrated, and informative while being efficient enough to run on the edge. Existing methods fail to fulfill these requirements. We present VLA-Tug, a lightweight probe over the latent layers of a VLA backbone that improves early failure detection and bounds the missed-detection and false-alarm rates, with minimal inference overhead. We show that supervising on the pre-failure segment of a trajectory increases early failure detection at matched false-positive rates by up to 30% over the strongest learned baseline. Under shift to unseen tasks, the bounds on missed-detection and false-alarm rates remain valid in up to 86% of runs, versus at most 21% for baselines. Unlike existing methods, VLA-Tug predicts the failure mode to enable corrective actions, raising top-3 accuracy on unseen tasks by up to 44% over a majority baseline. VLA-Tug enables real-time monitoring where the well-timed and informative probe supports lightweight steering that improves task success. We release a dataset of 3,180 annotated manipulation episodes to support future work on latent failure detection in VLAs at https://vla-tug.github.io.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:21:07Z</published>
+    <arxiv:comment>Code, videos, and dataset available at https://vla-tug.github.io</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Michal P. Podolinsky</name>
+    </author>
+    <author>
+      <name>Yunhao Yang</name>
+    </author>
+    <author>
+      <name>Daniel Little</name>
+    </author>
+    <author>
+      <name>Hong Lu</name>
+    </author>
+    <author>
+      <name>Rohan Siva</name>
+    </author>
+    <author>
+      <name>Olin Goudey</name>
+    </author>
+    <author>
+      <name>Neel P. Bhatt</name>
+    </author>
+    <author>
+      <name>Matthias Scheutz</name>
+    </author>
+    <author>
+      <name>Ufuk Topcu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08422v1</id>
+    <title>Torsion talks only to spin: the CMB temperature as a test of energy exchange in Einstein-Cartan cosmology</title>
+    <updated>2026-11-05T18:19:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.08422v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08422v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The cosmic microwave background temperature at $z=0.886$ is known to $2\%$ from molecular absorption towards PKS~1830$-$211; CO absorbers and Sunyaev-Zel'dovich clusters extend the measurement to $z\simeq3$. We use them on a question that cosmologies with torsion leave open. When the geometry exchanges energy with several matter components, which of them receives it? In Einstein-Cartan theory the Noether identities of each sector fix the answer. A sector's energy-momentum fails to be conserved only in proportion to its own spin, so minimally coupled light, which has none, is conserved whatever the torsion does. A metric-affine cosmology fitted to DESI DR2 distributes the exchange ``universally'' among all fluids, radiation included; the photons then gain almost a third of their energy. If the photons stay a blackbody, as FIRAS requires of any source set by local conditions, the model predicts a background colder than $T_{0}(1+z)$ by $7\%$ at $z\simeq0.9$ and by $8.5\%$ at $z\gtrsim3$, with no free parameter. PKS~1830$-$211 gives $5.08\pm0.10\,\mathrm{K}$ against a predicted $4.78\,\mathrm{K}$; with the CO absorbers it favours the standard scaling by $Δχ^{2}=13$, and 18 Planck cluster bins give $χ^{2}=50.8$ versus $15.5$. Under the same reading the primary anisotropies would change their spectral shape by amounts Planck excludes. If dark matter carries the spin instead, $H(z)$ moves by less than $10^{-4}$ below $z=3$ at the fitted parameters and $T(z)$ is standard again.</summary>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:19:36Z</published>
+    <arxiv:comment>31 pages, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="gr-qc"/>
+    <author>
+      <name>Fernando Izaurieta</name>
+    </author>
+    <author>
+      <name>Samuel Lepe</name>
+    </author>
+    <author>
+      <name>Cristian Quinzacara</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08413v1</id>
+    <title>T3R: Training-Free Two-Stage Token Refinement Towards Efficient and Robust VLA Models</title>
+    <updated>2026-11-05T18:17:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.08413v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08413v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action (VLA) models enable end-to-end robot control, but inference is increasingly expensive. Each decision processes hundreds of visual tokens, often across multiple cameras, leading to substantial computation while allowing irrelevant background content to distract action prediction under distribution shift. We argue that these issues stem from two complementary forms of redundancy: many visual tokens are spatially irrelevant, while attention over the remaining tokens is often misallocated. Based on this observation, we propose T3R, a Training-Free Two-Stage Token Refinement framework. In the first stage, segmentation-guided token pruning removes irrelevant visual patches to reduce computation and eliminate distracting context. In the second stage, saliency-guided attention biasing reallocates attention toward action-critical visual regions and language instructions within the retained tokens. Together, pruning produces a cleaner candidate set, while attention biasing further emphasizes the most decision-relevant evidence, yielding a better accuracy-efficiency frontier than either stage alone. On LIBERO-Spatial, T3R removes 85% of scene-camera visual tokens while essentially matching the unpruned success rate, and improves success by up to 7 percentage points under out-of-distribution object-placement perturbations. The timing comparison attributes 7.8 ms per inference call to pruning and attention-bias application. As input resolution increases, LLM-forward profiling shows up to a 3.3x speedup over the unpruned baseline. Evaluations across LIBERO, SIMPLER, and RoboTwin with three VLA backbones show the strongest accuracy-efficiency benefits in multi-camera settings. These results demonstrate that training-free token refinement is a practical approach to efficient and robust VLA inference.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:29Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Mohammed Hassan</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zhenyang Chen</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zheng Wang</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zhixin Zhu</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Tianlong Chen</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name> Yingyan</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name> Lin</name>
+    </author>
+    <author>
+      <name>Chaojian Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08412v1</id>
+    <title>The Gold Rush in AI4Math, II: What are signatures of AI-assisted Proofs?</title>
+    <updated>2026-11-05T18:17:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.08412v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08412v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The growing use of AI in mathematics raises a question: can we detect AI involvement in proofs, separately from AI assistance with writing? Historical arXiv papers, recent papers disclosing substantive AI use, and manuscripts released by OpenAI provide a rich empirical basis for studying this question. However, several challenges remain: lack of matched case-control pairs; potential incompleteness of disclosure; and lack of ready-to-use features designed to capture signals of AI involvement in proofs.
+  To address these challenges, we construct five cohorts comprising 8,281 papers by combining existing manuscripts with those we produced using generative AI. These cohorts span different levels of AI involvement and include matched pairs of papers addressing the same research problems. We then introduce ProofTrace, a framework that represents each paper as a graph of immediate proof support (GIPS) and extracts interpretable features of mathematical organization.
+  Our study yields three discoveries. First, principal-component projections of our features reveal a qualitative gradient of AI involvement, where AI-reworded papers remain close to human papers, the two AI-generated cohorts depart in broadly shared directions, and papers disclosing substantive AI use occupy intermediate positions which shifts toward AI-generated cohorts over time. Second, we identify recurring signatures of AI-generated proofs, such as fewer externally cited results, greater reliance on intermediate conclusions, and altered graph connectivity; many of these signatures persist under controls for research field, manuscript length, or graph size. Finally, in a separate detection experiment, ProofTrace distinguishes human-written papers from those disclosing substantive AI use. Its performance remains stable under AI rewording, whereas the performance of state-of-the-art text-based detectors declines sharply.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:18Z</published>
+    <arxiv:comment>31 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yuanchuan Guo</name>
+    </author>
+    <author>
+      <name>Jiashun Jin</name>
+    </author>
+    <author>
+      <name>Zheng Tracy Ke</name>
+    </author>
+    <author>
+      <name>Bingcheng Sui</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08411v1</id>
+    <title>Low-Rank Tensor Manifolds for Turbulent Field Reconstruction from Sparse Data</title>
+    <updated>2026-11-05T18:17:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.08411v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08411v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reconstructing turbulent flow fields from sparse and irregular measurements remains challenging because the underlying inverse problem is severely underdetermined. Here we present MANTRA, a manifold-based tensor framework that represents each velocity component in a continuous tensor-product space while constraining its coefficient tensor to a low-rank Tucker manifold. This structure provides a compact, data-adaptive representation without requiring gridded observations or governing equations. Riemannian optimization and adaptive selection of rank and basis complexity enable the model to exploit coordinate-wise spatiotemporal correlations. In simulations of forced isotropic turbulence and flow over a cylinder, MANTRA recovers multiscale structures at sampling densities orders of magnitude below the underlying grids and remains accurate under Gaussian noise up to 20% of the peak velocity. It also recovers leading coordinate-wise correlation structures from sparse observations. Applied to experimental particle-tracking velocimetry of an oscillating impinging jet, MANTRA reveals time-evolving structures that are not apparent from the scattered measurements alone.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:02Z</published>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Nazmus Sakib</name>
+    </author>
+    <author>
+      <name>Alexander G. Mychkovsky</name>
+    </author>
+    <author>
+      <name>Hessam Babaee</name>
+    </author>
+  </entry>
+</feed>

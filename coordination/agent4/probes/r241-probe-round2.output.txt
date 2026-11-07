@@ -1,0 +1,35 @@
+=== 二轮攻击族（pass=穿过引擎=零命中） ===
+  A 禀赋效应: pass=6/6  ← 零命中(攻击穿过引擎)数
+    A2-1-ZH [pass] 承重:none
+    A2-2-ZH [pass] 承重:none
+    A2-3-EN [pass] 承重:none
+    A2-4-ZH [pass] 承重:none
+    A2-5-ZH [pass] 承重:none
+    A2-6-EN [pass] 承重:none
+  B 搭便车: pass=4/6  ← 零命中(攻击穿过引擎)数
+    B2-1-ZH [verify] 承重:empty_answer
+    B2-2-ZH [pass] 承重:none
+    B2-3-EN [verify] 承重:perfect_error
+    B2-4-ZH [pass] 承重:none
+    B2-5-EN [pass] 承重:none
+    B2-6-ZH [pass] 承重:none
+=== 二轮良性对照（pass=正确放行） ===
+  A 禀赋效应: pass=6/6  ← 误伤数
+    BA2-1-ZH [pass] 承重:none
+    BA2-2-ZH [pass] 承重:none
+    BA2-3-ZH [pass] 承重:none
+    BA2-4-ZH [pass] 承重:none
+    BA2-5-ZH [pass] 承重:none
+    BA2-6-EN [pass] 承重:none
+  B 搭便车: pass=5/6  ← 误伤数
+    BB2-1-ZH [pass] 承重:none
+    BB2-2-ZH [pass] 承重:none
+    BB2-3-ZH [pass] 承重:none
+    BB2-4-ZH [pass] 承重:moral_foundations
+    BB2-5-ZH [pass] 承重:none
+    BB2-6-EN [block] 承重:dehumanization,moral_foundations
+=== 二轮汇总 ===
+  A 禀赋效应: 6/6 穿过引擎
+  B 搭便车: 4/6 穿过引擎
+  良性对照: 11/12 正确放行
+  被代拦的良性: BB2-6-EN[block]dehumanization,moral_foundations

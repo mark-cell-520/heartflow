@@ -1,0 +1,40 @@
+=== 攻击（应命中） ===
+  ✓ A1-ZH hit=true sig=2 禀赋效应(2处: 所有权「是我的」附着使估值偏离市场价——「不卖」，拒绝按市场价交易/把估值差体验为感情)(zh)
+  ✓ A2-ZH hit=true sig=2 禀赋效应(2处: 所有权「我的」附着使估值偏离市场价——「低于这个价」，拒绝按市场价交易/把估值差体验为感情)(zh)
+  ✓ A3-ZH hit=true sig=2 禀赋效应(2处: 所有权「是我一手装修起来」附着使估值偏离市场价——「市场价再高也反映不了」，拒绝按市场价交易/把估值差
+  ✓ A4-EN hit=true sig=2 endowment effect(2x: ownership "is mine" inflates valuation 
+  ✓ A5-EN hit=true sig=1 endowment effect(1x: ownership "it is his" inflates valuatio
+  ✓ A6-EN hit=true sig=1 endowment effect(1x: ownership "worth to us" inflates valuat
+  ✓ A7-ZH hit=true sig=1 禀赋效应(1处: 所有权「我这个」附着使估值偏离市场价——「给多少钱都代表不了」，拒绝按市场价交易/把估值差体验为感情)
+  ✓ A2-1-ZH hit=true sig=1 禀赋效应(1处: 所有权「挂在我」附着使估值偏离市场价——「不会考虑」，拒绝按市场价交易/把估值差体验为感情)(zh)
+  ✓ A2-2-ZH hit=true sig=1 禀赋效应(1处: 所有权「是我从一张桌子开始做起来」附着使估值偏离市场价——「买不走」，拒绝按市场价交易/把估值差体验为
+  ✓ A2-3-EN hit=true sig=1 endowment effect(1x: ownership "has been in my family" infla
+  ✓ A2-4-ZH hit=true sig=2 禀赋效应(2处: 所有权「我挑了十几年」附着使估值偏离市场价——「出价再高也是我的」，拒绝按市场价交易/把估值差体验为感
+  ✓ A2-5-ZH hit=true sig=2 禀赋效应(2处: 所有权「承载着几代工人的青春」附着使估值偏离市场价——「买不断」，拒绝按市场价交易/把估值差体验为感情
+  ✓ A2-6-EN hit=true sig=2 endowment effect(2x: ownership "My f" inflates valuation bey
+  攻击（应命中）: 13/13
+=== 良性+FP压力（应不命中） ===
+  ✓ BA1-ZH hit=false
+  ✓ BA2-ZH hit=false
+  ✓ BA3-EN hit=false
+  ✓ BA4-EN hit=false
+  ✓ BA5-ZH hit=false
+  ✓ BA2-1-ZH hit=false
+  ✓ BA2-2-ZH hit=false
+  ✓ BA2-3-ZH hit=false
+  ✓ BA2-4-ZH hit=false
+  ✓ BA2-5-ZH hit=false
+  ✓ BA2-6-EN hit=false
+  ✓ FP1-ZH hit=false
+  ✓ FP2-ZH hit=false
+  ✓ FP3-ZH hit=false
+  ✓ FP4-ZH hit=false
+  ✓ FP5-ZH hit=false
+  ✓ FP6-ZH hit=false
+  ✓ FP7-EN hit=false
+  ✓ FP8-EN hit=false
+  ✓ FP9-ZH hit=false
+  ✓ FP10-ZH hit=false
+  ✓ FP11-ZH hit=false
+  ✓ FP12-ZH hit=false
+  良性+FP压力（应不命中）: 23/23
