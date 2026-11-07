@@ -75,5 +75,5 @@ node scripts/bidirectional-guard.js   → PASS 召回 52/52、误拦 301/326
 
 ## 六、commit
 
-- `git rev-parse --short HEAD`：3a5e5d1（模块+测试+探针+扫描+claims 更正标记）
-- push 状态：PUSH_PLACEHOLDER
+- `git rev-parse --short HEAD`：6a517a7（3a5e5d1 模块+测试+探针+扫描+claims 更正 → afb8bbb run-all 归档+基线还原 → 6a517a7 报告+claims completed）
+- push 状态：**已推送**（bd4d33c..6a517a7，推送脚本独立校验 HEAD == heartflow/main 6a517a7dcd01791cf039bd1900c3922d9af3e304）
