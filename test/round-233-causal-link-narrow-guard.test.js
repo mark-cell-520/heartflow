@@ -234,7 +234,10 @@ console.log(n);`],
 }
 const ANCHOR_OF = 'const PC_OTHERFACTOR_ZH = /';
 // 本轮「因为」腿的完整字面（含负向环视），D1/D2 的变异锚点
-const CAUSE_LEG = '|(?<!(?:显然|可见|说明|看来|看起来|证明|肯定|一定|所以|总之|这就是|这才是|直接决定|足见|足以证明)(?:是|地){0,2})因为';
+// [v6.8.162 第 234 轮] 环视词表补 4 个转述归责词（都说是|据说|听说|传闻）——
+// r234 把它们加进 PC_ATTRIB_ZH 判据层，按「判据层与豁免层必须同源」纪律
+// 同步进本表，否则「据说是因为…」会被因为分支当他因信号整句豁免。
+const CAUSE_LEG = '|(?<!(?:显然|可见|说明|看来|看起来|证明|肯定|一定|所以|总之|这就是|这才是|直接决定|足见|足以证明|都说是|据说|听说|传闻)(?:是|地){0,2})因为';
 function mutateOf(src, from, to) {
   const orig = fs.readFileSync(src, 'utf8');
   const line = orig.split('\n').find(l => l.includes(ANCHOR_OF));
@@ -326,6 +329,10 @@ test('F2 环视词表与 PC_ATTRIB_ZH 同源且含「看起来」', () => {
   for (const w of ['显然', '可见', '说明', '看来', '看起来', '证明', '肯定', '一定', '所以', '总之']) {
     assert.ok(line.includes(w), `环视词表缺 ${w}`);
   }
+  // [v6.8.162 第 234 轮] r234 新增的四个转述归责断言词必须同源进本表
+  for (const w of ['都说是', '据说', '听说', '传闻']) {
+    assert.ok(line.includes(w), `环视词表缺 r234 新增断言词 ${w}（判据层与豁免层必须同源）`);
+  }
   // 「看来」必须是「看起来」的子串关系，否则同形句只换副词即可绕过
   assert.ok(line.indexOf('看起来') > line.indexOf('看来'), '「看起来」应排在「看来」之后（同族收全）');
   assert.ok(line.includes('(?:是|地){0,2}'), '可选组应为 {0,2}（覆盖「显然地是因为」两字间插形）');
@@ -337,18 +344,23 @@ test('F3 causalOverclaimZh 仍由 checkPseudoCausal 接线调用（豁免表不�
 });
 
 // ─── G 节：已知未修（登记为字面量，防下一轮无声退化）──────────────
-test('G1 已知未修①：「总之」不在 PC_ATTRIB_ZH，同形句仍漏判', () => {
+// [v6.8.162 第 234 轮] G1/G2/G3 三条登记已被 r234 修复（PC_ATTRIB_ZH 补
+// 「总之(?:是)?(?:因为|由于)」「(?:都说是|据说|听说|传闻)(?:是)?[^。，,]{0,12}
+// (?:因为|由于|的功劳)」两族 + 「旺了?财」进 (?:肯定|一定) 分支获益词表），
+// 按 r226/r227/r233 纪律从 STILL_GAP 移入 FIXED_BY_R234 正向断言：
+// 反向断言（"必须仍为 0"）在修复后必然翻红，留着就是假绿。
+test('G1 已修复①：「总之」已在 PC_ATTRIB_ZH，同形句 detector 命中（r234 FIXED）', () => {
   const s = '上了新系统之后客诉也降了，总之是因为新系统清理了瓶颈';
-  assert.strictEqual(pcCount(s), 0, '「总之」缺口已消失——请同步更新本条登记');
-  assert.strictEqual(gateAction(s), 'pass', '该句 gate 已是 pass 之外的值');
+  assert.strictEqual(pcCount(s), 1, '「总之」缺口已消失——请同步更新本条登记');
+  assert.strictEqual(gateAction(s), 'verify', '该句 gate 应因本轮修复从 pass 变为 verify');
 });
-test('G2 已知未修②：「旺财」不在 PC_ATTRIB_ZH 的获益词表，同形句仍漏判', () => {
+test('G2 已修复②：「旺财」已在 PC_ATTRIB_ZH 的获益词表，同形句 detector 命中（r234 FIXED）', () => {
   const s = '自从改了签名之后他就再也没被拒过，肯定是因为签名旺了财';
-  assert.strictEqual(pcCount(s), 0, '「旺财」缺口已消失——请同步更新本条登记');
+  assert.strictEqual(pcCount(s), 1, '「旺财」缺口已消失——请同步更新本条登记');
 });
-test('G3 已知未修③：转述归责「都说是」缺归因断言词，仍漏判（r232 结转）', () => {
+test('G3 已修复③：转述归责「都说是」已有归因断言词，同形句 detector 命中（r234 FIXED）', () => {
   const s = '从那以后店里也再没出过岔子，都说是换了招牌的功劳';
-  assert.strictEqual(pcCount(s), 0, '「都说是」缺口已消失——请同步更新本条登记');
+  assert.strictEqual(pcCount(s), 1, '「都说是」缺口已消失——请同步更新本条登记');
   assert.notStrictEqual(gateAction(s), 'pass', '该句 gate 不应是 pass（依赖其他维度兜底）');
 });
 test('G4 已知未修④：r230 挂账甲半缺口两条仍未修（HEAD 同为 0/pass，存量非本轮引入）', () => {
@@ -357,4 +369,18 @@ test('G4 已知未修④：r230 挂账甲半缺口两条仍未修（HEAD 同为 
     assert.strictEqual(pcCount(s), 0, `甲半缺口「${s}」已被修复——请同步更新本条登记并移出候选池`);
     assert.strictEqual(gateAction(s), 'pass', `「${s}」gate 已非 pass`);
   }
+});
+test('G5 已知未修⑤：「总之」不带因为/由于 的归因形仍漏判（r234 刻意不收裸「总之」）', () => {
+  // 裸「总之」是高频篇章连接词（「总之，先按原计划推进」），r234 只收
+  // 「总之(?:是)?(?:因为|由于)」这一紧邻形状；句首转述 + 另起子句的
+  // 「总之，功劳全在新系统」不在本轮形状内，需单独轮次裁切口。
+  const s = '从那以后店里生意也稳了，总之功劳全在这个摆件上';
+  assert.strictEqual(pcCount(s), 0, '裸「总之」缺口已消失——请同步更新本条登记');
+});
+test('G6 已知未修⑥：环视对中间夹标点的变体仍无效（「据说，是因为」不被转述分支命中）', () => {
+  // r234 转述分支窗口取 [^。，,]（不含逗号）——归责断言必须与转述词同子句，
+  // 「据说，是因为…」这一句首转述 + 另起子句的形状刻意不判（放行它会连带
+  // 放行「据说，因为样本不足还不能定论」这类良性形）。
+  const s = '上线之后投诉量下降了，据说，是因为统计周期太短还不能定论';
+  assert.strictEqual(pcCount(s), 0, '夹标点转述缺口已消失——请同步更新本条登记');
 });

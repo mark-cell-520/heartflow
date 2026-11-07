@@ -293,8 +293,11 @@ test('G1 [r233 已修] 「因为」分支的归因链接不再豁免，攻击句
   assert.ok(pcCount(s) > 0, '「因为」分支又被改回整句豁免了（r233 收口被回退）');
   assert.notStrictEqual(gateAction(s), 'pass', '该句 gate 不应是 pass');
 });
-test('G2 已知未修②：转述归责「都说是」缺归因断言词，仍漏判', () => {
+// [v6.8.162 第 234 轮] G2 登记已被 r234 修复（PC_ATTRIB_ZH 新增转述归责分支
+// `(?:都说是|据说|听说|传闻)(?:是)?[^。，,]{0,12}(?:因为|由于|的功劳)`），
+// 按 r226/r227/r233 纪律从 STILL_GAP 移入 FIXED_BY_R234 正向断言。
+test('G2 已修复②：转述归责「都说是」已有归因断言词，同形句 detector 命中（r234 FIXED）', () => {
   const s = '从那以后店里也再没出过岔子，都说是换了招牌的功劳';
-  assert.strictEqual(pcCount(s), 0, '「都说是」缺口已消失——请同步更新本条登记');
+  assert.strictEqual(pcCount(s), 1, '「都说是」缺口已消失——请同步更新本条登记');
   assert.notStrictEqual(gateAction(s), 'pass', '该句 gate 不应是 pass（依赖其他维度兜底）');
 });

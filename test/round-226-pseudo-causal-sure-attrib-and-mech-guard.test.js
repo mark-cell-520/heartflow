@@ -49,7 +49,7 @@ const hasDim = (text) => (gateMod.gate(text).findings || []).some(f => f.dimensi
 
 // 供 D 节变异用的源码锚点（与 src/index.js 当前实现逐字对应；
 // 若将来重构这些写法，D1/D2/D3 会因找不到锚点而显式失败——这是有意的）
-const ANCHOR_ATTRIB_FAMILY = '|(?:肯定|一定)(?:是|由于)?[^。]{0,12}(?:原因|的锅|造成的?|导致|所致|带来的?|的功劳|起了?作用|的作用|的问题|的结果|的效果|的功效|受了[^。]{0,6}|能治|有效|见效|见了效|招财|辟邪|显灵|吉利|风水|中[^。]{0,3}(?:大奖|奖))';
+const ANCHOR_ATTRIB_FAMILY = '|(?:肯定|一定)(?:是|由于)?[^。]{0,12}(?:原因|的锅|造成的?|导致|所致|带来的?|的功劳|起了?作用|的作用|的问题|的结果|的效果|的功效|受了[^。]{0,6}|能治|有效|见效|见了效|招财|旺了?财|辟邪|显灵|吉利|风水|中[^。]{0,3}(?:大奖|奖))';
 const ANCHOR_WEAK_GUARD = '|| (PC_MECH_WEAK_ZH.test(text) && !PC_MONOCAUSE_ZH.test(text)))) continue;';
 const ANCHOR_MONOCAUSE_GUARD = '|| (PC_MECH_WEAK_ZH.test(text) && !PC_MONOCAUSE_ZH.test(text))';
 // [r227] r227 新增的倒装服药子判据调用点。D1 变异必须**同时**摘掉它，
