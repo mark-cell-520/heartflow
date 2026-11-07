@@ -51,10 +51,14 @@ test(`A1 红队 10 条：HEAD 漏 ${HEAD_MISS}/${A_RED.length} → 现在 0 漏`
   for (const r of A_RED) assert.ok(gateOf(r.s) !== 'pass', '判了的攻击句 gate 不应 pass: ' + r.s);
 });
 
-test('A2 攻击句 detector 命中数逐条登记（⑫/⑬/⑭ 支）', () => {
+test('A2 攻击句 detector 命中数逐条登记（⑫/⑬/⑭ 支 + r242 起同步召回的①弱支）', () => {
   const counts = A_RED.map(r => pcCount(r.s));
   // 形状一/二/五（反序族 ⑫ + 无引导词 ⑭）= 1；形状三（正序 ⑬）= 3；形状四（⑭）= 2
-  assert.deepStrictEqual(counts, [1, 1, 3, 2, 1, 1, 1, 3, 2, 1],
+  // [v6.8.170 第 242 轮] r242 把 PC_MECH_WEAK_ZH 的裸「变量/回归」词腿位置化后，
+  // 形状一/二/四/五 各多召回 1 个①弱支（顺序词 × 显式归因断言）——这 8 条在
+  // HEAD 同时被 STAT_CONTEXT_ZH 支③裸词腿与 PC_MECH_WEAK_ZH 裸词腿两道豁免
+  // 挡着，r241 修掉前一道、r242 修掉后一道，所以命中数 1→2 / 1→2 / 2→2 / 1→2。
+  assert.deepStrictEqual(counts, [2, 2, 3, 2, 1, 2, 2, 3, 2, 1],
     'detector 命中数应与登记一致，实测: ' + counts.join('/'));
 });
 
@@ -338,22 +342,30 @@ test('G3 已知未修③：causalInvertedTakeZh / causalSupplementZh 的 lastInd
     '防空匹配防护应仍在原位置（本轮未动，登记备查）');
 });
 
-test('G4 已知未修④：PC_MECH_WEAK_ZH 弱支护栏里也有裸「变量/回归」词腿（同款第六处）', () => {
-  // 轮初实测（本文件 D1/D2 调试路径）：把支③两条位置腿摘掉后，三条承重
-  // victim 的 post_hoc 立刻恢复误判（ph 0→1），但 pseudo_causal 的 count 仍
-  // 是 0——因为 causalOverclaimZh 的①⑤⑨弱支护栏 PC_MECH_WEAK_ZH 自带裸
-  // 「变量」「回归」两个词腿（与 r226/r238/r239/r240 同族缺陷的第六处实例）。
-  // 后果：只命中①⑤⑨弱支的变量/回归 攻击句仍被放行，例如
-  // 「自从变量稳了之后签单就多了」（无显式归因断言，只命中第①支）。
-  // 本轮一个主题只做支③（post_hoc 维度 + pseudo_causal 四个子判据函数头），
-  // PC_MECH_WEAK_ZH 的收窄会改①⑤⑨三支的豁免面，需单独轮次 + 全量 A/B。
+test('G4 已知未修④→已修（r242）：PC_MECH_WEAK_ZH 的裸「变量/回归」词腿已位置化', () => {
+  // [v6.8.169 第 241 轮] 本条原登记「PC_MECH_WEAK_ZH 弱支护栏里也有裸变量/回归
+  // 词腿（同族第六处实例）」——调试 D1/D2 时实测：摘掉支③两条位置腿后，三条
+  // 承重 victim 的 post_hoc 立刻恢复误判（ph 0→1），但 pseudo_causal 的 count
+  // 仍是 0，正是被 PC_MECH_WEAK_ZH 的裸词腿挡住。
+  // [v6.8.170 第 242 轮] 已修：裸词腿换成统计搭配形（PC_MECH_WEAK_STAT_ZH，
+  // 复用 STAT_VAR_ZH / STAT_REG_ZH），编程义/泛论宾词不再整句豁免弱支三道腿。
+  // 残留的无归因断言弱句（见下）是①⑤⑨支**判据覆盖**缺口，不是豁免表问题：
+  // 「自从变量稳了之后签单就多了」既无 PC_ATTRIB_ZH 归因断言、结果侧也不是
+  // ⑨支的指标变动词，摘掉整张 PC_MECH_WEAK_ZH 也判不出来，需单独轮次补支。
   const src = fs.readFileSync(path.join(ROOT, 'src', 'index.js'), 'utf8');
-  const line = src.split('\n').find(l => l.startsWith('const PC_MECH_WEAK_ZH = '));
-  assert.ok(line && /\|变量\|回归\|/.test(line),
-    'PC_MECH_WEAK_ZH 应仍带裸 变量/回归 词腿（若已收窄请同步本条）');
+  const line = src.split('\n').find(l => l.startsWith('const PC_MECH_WEAK_WORDS_ZH = '));
+  assert.ok(line && !/\|变量\|回归\|/.test(line),
+    'PC_MECH_WEAK_WORDS_ZH 不应再带裸 变量/回归 词腿（若回退请同步本条）');
+  // [v6.8.170 第 242 轮] 只留工程复合名词腿（PC_MECH_WEAK_ENG_ZH）——统计搭配形
+  // 腿（STAT_VAR_ZH ∪ STAT_REG_ZH）实测是 100% 死代码（已被本文件守护的
+  // STAT_CONTEXT_ZH 支③完全覆盖），按 r228 坑③纪律删掉，不许加回来。
+  assert.ok(src.split('\n').some(l => l.startsWith('const PC_MECH_WEAK_ENG_ZH = /(?:变量')),
+    'PC_MECH_WEAK_ENG_ZH 工程复合名词腿缺失');
+  assert.ok(!src.split('\n').some(l => l.startsWith('const PC_MECH_WEAK_STAT_ZH = ')),
+    'PC_MECH_WEAK_STAT_ZH 是死代码，不应存在');
   const weakOnly = '自从变量稳了之后签单就多了';
   assert.strictEqual(pcCount(weakOnly), 0,
-    '只命中弱支的变量攻击句应仍被 PC_MECH_WEAK_ZH 放行（已知未修）');
+    '无归因断言的弱句仍判不出（①⑤⑨ 判据覆盖缺口，登记备查）');
 });
 
 process.on('exit', () => {

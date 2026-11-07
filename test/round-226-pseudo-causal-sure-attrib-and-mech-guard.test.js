@@ -426,7 +426,7 @@ test(`D3 变异守卫三：豁免表放宽到含「代码」后存量攻击句�
     assert.strictEqual(countHitsIn(ROOT, probe), 1, '未变异副本应命中该存量攻击句');
     // 锚点必须唯一：PC_LUCK2_MECH_ZH 里也有「|缓存|索引|灰度」，
     // 用短串会变异到错误的表上（r225 踩坑③同型：锚点是「要匹配的文本」）
-    const anchor = 'const PC_MECH_WEAK_ZH = /(?:药效|药理|用药|服药|医嘱|疗程|治疗|医生|诊断|手术|成分|疗效|缓存|索引|灰度';
+    const anchor = 'const PC_MECH_WEAK_WORDS_ZH = /(?:药效|药理|用药|服药|医嘱|疗程|治疗|医生|诊断|手术|成分|疗效|缓存|索引|灰度';
     assert.strictEqual(orig.split(anchor).length - 1, 1, 'PC_MECH_WEAK_ZH 定义锚点不唯一');
     const mutated = orig.replace(anchor, anchor + '|代码|优化|修复');
     assert.notStrictEqual(mutated, orig, '变异未生效（豁免表放宽失败）');
@@ -485,12 +485,17 @@ test('F 归因族紧形状 / 机制豁免表 / 弱支三道腿都在源码中', 
   assert.ok(!src.includes('|(?:肯定|一定)(?:是|由于)?(?!\\[|\\(|原因)'), 'PC_ATTRIB_ZH 不应含裸断言形');
   // 「一定」必须与「肯定」同表（r225 只收肯定的那一族）
   assert.ok(src.includes('(?:肯定|一定)(?:是|由于)?'), 'PC_ATTRIB_ZH 未收「一定」族');
-  assert.ok(/const PC_MECH_WEAK_ZH = \/\(\?:/.test(src), 'PC_MECH_WEAK_ZH 常量不存在');
+  assert.ok(/const PC_MECH_WEAK_ZH = new RegExp\(/.test(src), 'PC_MECH_WEAK_ZH 常量不存在');
   assert.ok(/const PC_MONOCAUSE_ZH = \/\(\?:/.test(src), 'PC_MONOCAUSE_ZH 反豁免常量不存在');
   assert.ok(src.includes('&& !PC_MONOCAUSE_ZH.test(text)'), '弱支守卫未接 PC_MONOCAUSE_ZH 反豁免腿');
   assert.ok(src.includes('PC_MECH_WEAK_ZH.test(text) && !PC_MONOCAUSE_ZH.test(text)'), '弱支守卫的机制豁免腿未接反豁免');
   // 机制豁免只喂弱支，不许升级成函数级豁免（那会连⑩⑪⑫⑬⑭一起豁免）
-  assert.strictEqual(src.split('const PC_MECH_WEAK_ZH = /(?:').length - 1, 1, 'PC_MECH_WEAK_ZH 应只定义 1 次');
+  assert.strictEqual(src.split('const PC_MECH_WEAK_WORDS_ZH = /(?:').length - 1, 1, 'PC_MECH_WEAK_WORDS_ZH 应只定义 1 次');
+  // [v6.8.170 第 242 轮] 统计搭配形腿（PC_MECH_WEAK_STAT_ZH）已按 r228 坑③纪律
+  // 删除——它被 STAT_CONTEXT_ZH 支③完全覆盖，是 100% 死代码；只留工程复合名词腿。
+  assert.strictEqual(src.split('const PC_MECH_WEAK_ENG_ZH = /(?:').length - 1, 1, 'PC_MECH_WEAK_ENG_ZH 应只定义 1 次');
+  assert.ok(!src.split('\n').some(l => l.startsWith('const PC_MECH_WEAK_STAT_ZH = ')),
+    'PC_MECH_WEAK_STAT_ZH 是死代码，不应存在');
   assert.strictEqual(src.split('PC_MECH_WEAK_ZH.test(text)').length - 1, 1, 'PC_MECH_WEAK_ZH 应只被弱支守卫引用 1 次');
   assert.ok(!/if \(PC_MECH_WEAK_ZH|STAT_CONTEXT_ZH \|\| PC_MECH/.test(src), '机制豁免不许升级成函数级豁免');
   // 导出面不变

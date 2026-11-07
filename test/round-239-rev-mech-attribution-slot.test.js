@@ -208,6 +208,12 @@ test('D2 变异守卫二：摘掉同子句双腿（D+E）后第⑭支良性 vict
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 
+// [v6.8.170 第 242 轮] slotMech 恒真变异体下的判出数：HEAD 实测 47 条，
+// r242 把 PC_MECH_WEAK_ZH 的裸「变量/回归」词腿位置化成统计搭配形后变 51 条
+// （+4 = 变量/回归 × 形状一/二：这 4 条在变异体里改走①弱支路径判出，而
+// PC_MECH_WEAK_ZH 的旧裸词腿正是挡住它们的那道豁免）。HEAD_MISS_LUCK2 仍是
+// HEAD 的真实漏判数（63），不动；这里单独记一个变异体期望值。
+const HEAD_JUDGED_LUCK2_SLOTTRUE = 51;
 test('D3 变异守卫三：把 slotMech 改恒真后 A 族攻击句必须整体回落到 HEAD 漏判态', () => {
   const tmp = copySrc('slottrue');
   try {
@@ -220,8 +226,8 @@ test('D3 变异守卫三：把 slotMech 改恒真后 A 族攻击句必须整体�
     const m = require(f);
     const judgedL = A_LUCK2.filter(r => m.checkPseudoCausal(r.s).count > 0).length;
     const judgedR = A_REV.filter(r => m.checkPseudoCausal(r.s).count > 0).length;
-    assert.strictEqual(judgedL, A_LUCK2.length - HEAD_MISS_LUCK2,
-      `slotMech 恒真后宽口径族应回落到 HEAD 的 ${A_LUCK2.length - HEAD_MISS_LUCK2} 条，实测 ${judgedL}`);
+    assert.strictEqual(judgedL, HEAD_JUDGED_LUCK2_SLOTTRUE,
+      `slotMech 恒真后宽口径族应判出 ${HEAD_JUDGED_LUCK2_SLOTTRUE} 条（HEAD 47 + r242 弱支收窄增量 4），实测 ${judgedL}`);
     assert.strictEqual(judgedR, A_REV.length - HEAD_MISS_REV,
       `slotMech 恒真后窄口径族应回落到 HEAD 的 ${A_REV.length - HEAD_MISS_REV} 条，实测 ${judgedR}`);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
