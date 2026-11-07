@@ -1,0 +1,27 @@
+基线：中文攻击命中 17/17；英文攻击命中 10/10；守卫承重句基线命中 0/10
+  [OK]   腿① FIRST_ZH 整族删除
+  [OK]   腿① FIRST_EN 整族删除
+  [OK]   腿① OUTCOME_ZH 结果词族删除
+  [OK]   腿① OUTCOME_EN 结果词族删除
+  [OK]   腿② PROCESS_ZH 整族删除
+  [OK]   腿② PROCESS_EN 整族删除
+  [OK]   腿② PROCESS_ZH_TIGHT 单独删除
+  [OK]   腿② PROCESS_ZH_LOOSE 单独删除
+  [OK]   腿② PROCESS_EN_TIGHT 单独删除
+  [OK]   腿② PROCESS_EN_LOOSE 单独删除
+  [OK]   IMMEDIATE_ZH 即时复合形删除（兜底层）
+  [OK]   IMMEDIATE_EN 即时复合形删除（兜底层）
+  [OK]   INFER_ZH 推断标记删除
+  [OK]   INFER_EN 推断标记删除
+  [OK]   W_FIRST_OUT_ZH 窗收紧到 0
+  [OK]   W_FIRST_OUT_EN 窗收紧到 0
+  [OK]   W_PAIR_ZH 窗收紧到 0
+  [OK]   W_PAIR_EN 窗收紧到 0
+  [OK]   CAUSAL_ZH 因果守卫删除
+  [OK]   CAUSAL_EN 因果守卫删除
+  [OK]   NEG 否定守卫删除（中英）
+  [OK]   CONCEPT 豁免删除（中英）
+  [OK]   CORRECTIVE 豁免删除（中英）
+  [OK]   HEDGE 豁免删除（中英）
+
+注入 24 个点 → 24 个按预期，0 个未按预期
