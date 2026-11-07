@@ -1,252 +1,183 @@
-/**
- * test/prosecutors-fallacy.test.js — r247 检察官谬误维度测试
- * 覆盖：攻击命中（中英 pair 型：强证据词腿 / 弱证据词×极端比率值腿）、
- * 良性零误伤（含疑难 FP 压力样本）、概念讨论/正当做法两组豁免族
- * （嵌入真实签名，可负例注入证明承重）、边界锁（单腿/邻接维度领地/
- * 否定前缀/超距）、中英混排多签名、负例注入（腿①强证据词/腿①弱证据
- * 词/极端比率值/腿②假设侧结论逐族删除 + 两组豁免删除 + 距离窗承重）、
- * 引擎闸。与 r218-r246 模块同一测试范式：每个负例注入删除一组常量后，
- * 攻击必须不再命中、豁免句必须变红——证明每一组判据都真实承重。
- */
 'use strict';
-const assert = require('node:assert/strict');
-const { detectProsecutorsFallacy } = require('../src/prosecutors-fallacy.js');
+/**
+ * test/prosecutors-fallacy.test.js
+ * [r233] 第 222 维度 prosecutors_fallacy（检察官谬误）负例注入测试。
+ * 判据：两腿（小概率匹配腿 × 个体有罪/嫌疑结论腿）+ 邻近窗 + 四重豁免
+ * （正确判别证伪 / 元话语教学 / 逐腿对冲 / 真疑问句）。
+ *
+ * 覆盖：同族攻击变体矩阵（中英双语、裸名词、带修饰、倒装、长句）+
+ * 良性样本（含边缘良性：正确多因陈述、正当统计讨论、纯概率陈述）+
+ * 腿族删除后不得命中（承重验证）。
+ */
+const assert = require('assert');
+const { detectProsecutorsFallacy, __internals } = require('../src/prosecutors-fallacy.js');
+const { gate } = require('../src/gate.js');
 
-let passed = 0, failed = 0;
-function check(name, fn) {
-  try { fn(); passed++; console.log(`  ✓ ${name}`); }
-  catch (e) { failed++; console.log(`  ✗ ${name}: ${e.message}`); }
+const detect = (t) => detectProsecutorsFallacy(t);
+
+// ─── 同族攻击变体矩阵（≥5，中英双语/裸名词/带修饰/倒装/长句）────────
+const ATTACKS = [
+  // 倒装 + 修饰（数值前置）
+  'DNA匹配的概率只有百万分之一，所以他就是凶手的可能性高达99.9999%。',
+  // 裸名词（无「只有」等修饰的强度副词，直接数值陈述）
+  '这种错误只有十亿分之一的概率，因此嫌疑人几乎肯定有罪。',
+  // 总体限定 + 排他反问（不是他还能是谁）
+  '全国十四亿人里只有一个人能匹配上，这个人不是他还能是谁。',
+  // 统计检验形（p值/假设拒绝）
+  'p值小于0.01，因此被告的清白假设可以被拒绝，他是有罪的。',
+  // 长句（复合推理链 + 系统主体）
+  '系统给出了一百万分之一的误报率，所以这个匹配几乎不可能是巧合，他有罪。',
+  // 长句（多子句 + 总体假阳性）
+  '一百万人里才有一个能匹配，全市一千万人里也能找出十个来，但他是第一个被测的。',
+  // 血型 + 作案腿
+  '这个血型只占人口的百分之零点三，所以他作案的可能性是99.7%。',
+  // 英文：in a million
+  'The DNA match has a one-in-a-million probability, so he is almost certainly guilty.',
+  // 英文：one in ten billion
+  'The chance of this match is one in ten billion, therefore the defendant is guilty.',
+  // 英文：裸形 once per billion
+  'A match this rare occurs once per billion people, so the suspect must be the culprit.',
+  // 英文：Only one person in a hundred million
+  'Only one person in a hundred million shares this profile, so he has to be the killer.',
+  // 中文：千万分之一
+  '匹配概率是千万分之一，所以他是凶手这一事实基本上已经确定。',
+  // 中文：十亿分之一巧合 + 足以证明
+  '十亿分之一的巧合恰好落在他头上，足以证明这案子就是他干的。',
+];
+
+// ─── 良性样本（≥5，含边缘良性）──────────────────────────────────
+const BENIGN = [
+  // 边缘良性①：正确判别/证伪（破除该推理正是判别动作本身）
+  'DNA匹配的概率只有百万分之一，这是检方应当进一步举证的理由，而非定罪的充分条件。',
+  // 边缘良性②：仍需结合其他证据
+  '这种错误只有十亿分之一的概率，但仍需结合其他证据才能定罪。',
+  // 边缘良性③：正确多因陈述（本族相邻维度 monocause 的良性形态）
+  '犯罪是多种因素共同造成的，不能只归因于单一动机。',
+  // 边缘良性④：不能作为认定依据
+  '这种血型占人口百分之三十，不能作为认定作案人的依据。',
+  // 英文良性①：does not establish guilt
+  'The match probability is one in a million, which alone does not establish guilt.',
+  // 英文良性②：多因陈述
+  'Wars are caused by many factors acting together.',
+  // 元话语：课堂案例转述
+  '检察官谬误是法庭科学课堂上的经典案例。',
+  'Prosecutor\'s fallacy is a classic logical fallacy in evidence courses.',
+  // 纯概率陈述（缺腿②，中性统计描述）
+  '这种错误的概率只有十亿分之一。',
+  '这个概率说明系统很可靠，但仍需人工复核所有异常。',
+  // 无小概率腿的纯定罪陈述（缺腿①）
+  '证据确凿，他就是凶手。',
+];
+
+// ─── 1. 攻击变体矩阵：全部命中 ───────────────────────────────────
+for (const t of ATTACKS) {
+  const r = detect(t);
+  assert.strictEqual(r.hit, true, '应命中攻击句: ' + t);
+  assert.strictEqual(r.dimension, 'prosecutors_fallacy');
+  assert.ok(r.count >= 1, 'count 应为正: ' + t);
+  assert.ok(r.evidence.length >= 1, 'evidence 非空: ' + t);
+  assert.ok(r.severity >= 55 && r.severity <= 90, 'severity 区间: ' + t);
+  assert.ok(typeof r.details === 'string' && r.details.includes('检察官谬误'), 'details: ' + t);
+  assert.ok(typeof r.guidance === 'string' && r.guidance.includes('先验概率'), 'guidance: ' + t);
 }
+console.log('✓ 攻击变体矩阵 ' + ATTACKS.length + '/' + ATTACKS.length + ' 全部命中');
 
-// 永不命中的正则（用于负例注入关闭某组常量）
-const NEVER = /(?!)/;
+// ─── 2. 良性样本：全部不命中 ──────────────────────────────────────
+for (const t of BENIGN) {
+  const r = detect(t);
+  assert.strictEqual(r.hit, false, '不应命中良性句: ' + t);
+}
+console.log('✓ 良性样本 ' + BENIGN.length + '/' + BENIGN.length + ' 全部通过（含边缘良性）');
 
-// ─── 攻击样本 pair 型：腿① = 强证据词（误报率/准确率/比中…，无比率值也成腿）
-const ATTACK_STRONG_ZH = [
-  '这种误报率下，仪器说是就是，几乎不可能错',
-  '错判率只有万分之一，所以系统给出的结论可信度就是万分之九九九九',
-  '命中率百分之九十九点九，那说有病就基本没跑',
-  '这种检测误判率只有百万分之三，检测说有问题就一定有问题',
-  '检出率百分之九十八，健康人里也有百分之九十八会被判阳性',
-  '检测的准确率是 99%，所以说它有病的人 99% 真有病',
-  '在千人数据库里比中，他恰好是无辜的概率同样很低',
-  '误报率千分之三，阳性就可以直接确诊',
+// ─── 3. gate 层接线：攻击句 gate.action 非 pass，且 findings 含本维 ──
+const gateAttacks = [
+  'DNA匹配的概率只有百万分之一，所以他就是凶手的可能性高达99.9999%。',
+  '这种错误只有十亿分之一的概率，因此嫌疑人几乎肯定有罪。',
+  '全国十四亿人里只有一个人能匹配上，这个人不是他还能是谁。',
+  'p值小于0.01，因此被告的清白假设可以被拒绝，他是有罪的。',
+  'The DNA match has a one-in-a-million probability, so he is almost certainly guilty.',
 ];
-// ─── 攻击样本 pair 型：腿① = 弱证据词 × 极端比率值（无强证据词）
-const ATTACK_WEAK_ZH = [
-  '证据出现的概率那么低，他是清白的概率一样低',
-  '无罪的人身上出现这种证据的概率极低，所以他无罪的概率同样极低',
-  '比对上的概率小到可以忽略，那没比对上的可能也小到可以忽略，凶手就是他',
-  '巧合的概率那么小，所以这绝不可能是巧合',
-  '现场留下这种痕迹的概率微乎其微，他不是凶手的概率也微乎其微',
+for (const t of gateAttacks) {
+  const r = gate(t);
+  assert.notStrictEqual(r.gate.action, 'pass', 'gate.action 非 pass: ' + t);
+  const f = (r.findings || []).find(x => x.dimension === 'prosecutors_fallacy');
+  assert.ok(f, 'findings 应含 prosecutors_fallacy: ' + t);
+  assert.ok(f.severity >= 55, 'gate finding severity: ' + t);
+}
+console.log('✓ gate 层接线 ' + gateAttacks.length + '/' + gateAttacks.length + ' 攻击句非 pass 且 findings 含本维');
+
+// ─── 4. 良性样本 gate 层不被本维命中 ─────────────────────────────
+const gateBenign = [
+  'DNA匹配的概率只有百万分之一，这是检方应当进一步举证的理由，而非定罪的充分条件。',
+  '这种血型占人口百分之三十，不能作为认定作案人的依据。',
+  'The match probability is one in a million, which alone does not establish guilt.',
+  'Wars are caused by many factors acting together.',
 ];
-// ─── 攻击样本 pair 型：双腿①路径并存（强证据词 + 弱证据词×比率值）
-const ATTACK_DUAL_ZH = [
-  'DNA 匹配的概率只有百万分之一，所以他是无辜的概率也只有百万分之一',
-  '配型成功的概率只有十万分之一，他不是凶手的概率也就那么低',
-  'DNA 比对吻合的概率只有百万分之一，所以他是凶手的概率也只有百万分之一',
-  '这种指纹吻合的概率微乎其微，所以吻合就是铁证',
-];
-// ─── 攻击样本 pair 型：英文（强证据词腿）
-const ATTACK_EN_STRONG = [
-  'The false positive rate is 0.1%, so the test is right 99.9% of the time',
-  'A test with a 1% error rate means a positive result is wrong only 1% of the time',
-  'The false negative rate is only 2%, so a negative result is right 98% of the time',
-];
-// ─── 攻击样本 pair 型：英文（弱证据词 × 极端比率值腿）
-const ATTACK_EN_WEAK = [
-  'The evidence appeared with a probability of one in a billion, so he must be guilty',
-  'The chance of a coincidence is astronomically small, so it cannot be a coincidence',
-];
-// ─── 攻击样本 pair 型：英文（双腿①路径并存）
-const ATTACK_EN_DUAL = [
-  'The probability of this evidence if he were innocent is one in a million, so the probability he is innocent is also one in a million',
-  'Since the odds of a coincidence are tiny, coincidence is ruled out',
-  'The match probability is tiny, so the probability that it is not a match is equally tiny',
-  'The odds of a coincidence are so small that coincidence is impossible',
-  'The likelihood of this fingerprint if he were not the source is one in a billion, so he is the source',
-];
-const ATTACK_ALL = ATTACK_STRONG_ZH.concat(ATTACK_WEAK_ZH, ATTACK_DUAL_ZH, ATTACK_EN_STRONG, ATTACK_EN_WEAK, ATTACK_EN_DUAL);
+for (const t of gateBenign) {
+  const r = gate(t);
+  const f = (r.findings || []).find(x => x.dimension === 'prosecutors_fallacy');
+  assert.ok(!f, '良性句不应触发本维: ' + t);
+}
+console.log('✓ gate 层良性 ' + gateBenign.length + '/' + gateBenign.length + ' 无本维误伤');
 
-// ─── 良性样本（不得命中：含疑难 FP 压力样本）────────────────────
-const BENIGN_HARD = [
-  // 概念讨论/学术讨论（条件概率方向本身）
-  '匹配概率再低，也要先看基础比率，这是贝叶斯推理的基本要求',
-  '错把条件概率的方向弄反，是庭审统计里最常见的错误',
-  '如果先验概率很高，即使匹配概率只是中等，也能提供很强的证据',
-  '他把 P(E|H) 当成了 P(H|E)，这正是检察官谬误的定义',
-  'The likelihood ratio expresses the strength of evidence without inverting the conditional',
-  'This is the prosecutor\'s fallacy: the likelihood of the evidence given innocence is not the probability of innocence',
-  // 正当推理（指出不可混用/要求复测/给出基础比率）
-  '准确率 99% 的检测用在患病率很低的人群中，阳性结果多数是假阳性',
-  '不能把证据出现的概率当成嫌疑人无罪的概率，二者不可混用',
-  '这类案件的基础比率极低，单看匹配率会严重高估有罪可能',
-  '阳性结果需要复测确认，一次检测不足以确诊',
-  'In a low-prevalence population, even a very accurate test yields mostly false positives',
-  'DNA 数据库比中之后，还要看基础比率和现场证据的独立性',
-  '无罪推定意味着控方必须证明到排除合理怀疑的程度',
-  // 其他统计族的正当句（本模块不应越界）
-  '该模型的准确率达到 95%，但在长尾样本上仍有明显短板',
-  '误报率高的系统会把大量正常流量标记为异常，需要调阈值',
-  '这种巧合的概率虽然低，但样本一大就必然出现几次',
-  'The probability of rain is only 30%, so I will take an umbrella just in case',
-  // 单腿：只有证据侧概率陈述，无假设侧倒置结论
-  '这套系统的误报率只有千分之二，我们打算再观察一个季度。',
-  // 单腿：只有假设侧结论，无证据侧概率陈述（且与腿①零距重叠，不成交距对）
-  '在没有任何证据的情况下，他是无辜的概率本来就不低。',
-  // 邻接维度领地正当句
-  '见过几个人这样，就断定所有人都这样，证据不足',
-  '已经连输十把，下一把赢的概率并不会变大',
-  '连续三年增长是事实，但能否持续要看驱动因素是否还在',
-  // 否定前缀
-  '误报率虽然低，却并不能说明检测结果就一定可靠。',
-];
+// ─── 5. 负例注入：逐腿族删除后不得命中（承重验证）────────────────
+const I = __internals();
+const SAMPLE_ATTACK = 'DNA匹配的概率只有百万分之一，所以他就是凶手的可能性高达99.9999%。';
 
-// ─── 豁免族 A：概念讨论（真实签名 + 概念标记，不得命中；删除标记后应变红）
-const EXEMPT_CONCEPT = [
-  '老师在课堂上讲检察官谬误：DNA 匹配的概率只有百万分之一，所以他是无辜的概率也只有百万分之一——这就是把条件概率方向弄反的典型。',
-  'The lecture on the transposed conditional: the match probability is tiny, so the probability that it is not a match is equally tiny.',
-];
-// ─── 豁免族 B：正当做法（真实签名 + 正当标记，不得命中；删除后应变红）
-// 注意：两句只含 CORRECTIVE 标记、不含 CONCEPT 标记，保证删除 CORRECTIVE 后
-// 能单独变红（若同时含「基础比率/条件概率」等概念词，删 CORRECTIVE 仍会被
-// CONCEPT 豁免，负例注入就失去了隔离性）。
-const EXEMPT_CORRECTIVE = [
-  'DNA 匹配的概率只有百万分之一，所以他是无辜的概率也只有百万分之一——不过一次检测不足以定罪，需要复测和独立验证。',
-  'The match probability is tiny, so the probability that it is not a match is equally tiny, but a single test is not enough and we need a second sample.',
-];
-
-// ─── 边界锁 ────────────────────────────────────────────────────
-const BOUNDARY = [
-  ['单腿-只有证据侧概率', '这套系统的误报率只有千分之二，我们打算再观察一个季度。'],
-  ['单腿-只有假设侧结论', '在没有任何证据的情况下，他是无辜的概率本来就不低。'],
-  ['邻接-hasty_generalization', '见过几个人这样，就断定所有人都这样，证据不足'],
-  ['邻接-gamblers_fallacy', '已经连输十把，下一把赢的概率并不会变大'],
-  ['邻接-趋势外推', '连续三年增长是事实，但能否持续要看驱动因素是否还在'],
-  ['否定前缀-并不能说明', '误报率虽然低，却并不能说明检测结果就一定可靠。'],
-];
-// 双腿超距（默认邻近窗 ZH60：证据侧陈述与假设侧结论拉开 >60 不命中）
-const OVERDIST = '检测误报率只有千分之二，相关部门随后组织了多轮检查，逐项核对原始记录与现场取证材料，并邀请独立第三方重新比对了全流程数据，最终结论认为他是无辜的概率也同样很低。';
-
-const MIXED = 'DNA 匹配的概率只有百万分之一，所以他是无辜的概率也只有百万分之一；the match probability is tiny so the probability that it is not a match is equally tiny.';
-const MULTI_ZH = 'DNA 匹配的概率只有百万分之一，所以他是无辜的概率也只有百万分之一；这种检测误判率只有百万分之三，检测说有问题就一定有问题。';
-
-console.log('prosecutors-fallacy（r247 检察官谬误）测试:');
-
-check('模块导出与短输入安全', () => {
-  assert.equal(typeof detectProsecutorsFallacy, 'function');
-  assert.equal(detectProsecutorsFallacy('').hit, false);
-  assert.equal(detectProsecutorsFallacy(null).hit, false);
-  assert.equal(detectProsecutorsFallacy('短').hit, false);
+// 删腿①（RARE_MATCH 空）→ 不命中
+const noRare = detectProsecutorsFallacy(SAMPLE_ATTACK, { RARE_MATCH_ZH: [], RARE_MATCH_EN: [] });
+assert.strictEqual(noRare.hit, false, '删腿①后不得命中');
+// 删腿②（GUILT_INFERENCE 空）→ 不命中
+const noGuilt = detectProsecutorsFallacy(SAMPLE_ATTACK, { GUILT_INFERENCE_ZH: [], GUILT_INFERENCE_EN: [] });
+assert.strictEqual(noGuilt.hit, false, '删腿②后不得命中');
+// 删豁免表（豁免全部放开）→ 良性样本被命中，证明豁免是承重的。
+// 注：承重探针必须**两腿齐备**（概率陈述 + 定罪断言形），否则缺腿②
+// 本来就不命中，删豁免也无从证承重（r233 实测教训：最初用的
+// 「进一步举证的理由」缺腿②，删豁免后仍 pass，无法证承重）。
+const benignProbe = 'DNA匹配的概率只有百万分之一，但检方不能据此认定他有罪。';
+const noExempt = detectProsecutorsFallacy(benignProbe, {
+  EXEMPT_CORRECT_ZH: [], EXEMPT_CORRECT_EN: [],
+  EXEMPT_META_ZH: [], EXEMPT_META_EN: [],
 });
+assert.strictEqual(noExempt.hit, true, '删豁免表后良性样本应被命中（证明豁免承重）');
+console.log('✓ 负例注入：腿①/腿②删除均不命中；豁免表删除后良性样本转为命中（承重验证通过）');
 
-check('攻击命中：中文 pair 型·强证据词腿 8 条', () => {
-  for (const t of ATTACK_STRONG_ZH) {
-    const r = detectProsecutorsFallacy(t);
-    assert.equal(r.hit, true, '应命中: ' + t);
-    assert.equal(r.dimension, 'prosecutors_fallacy');
-    assert.ok(r.score >= 0.6 && r.score <= 0.8, 'severity 档位: ' + t);
-    assert.ok(r.details.length > 10, 'details 非空');
-    assert.ok(r.evidence.length >= 1, 'evidence 非空');
-    assert.ok(r.guidance.length > 20, 'guidance 非空');
-  }
-});
+// ─── 6. 豁免族逐项验证（每类豁免必须有真实承重样本）──────────────
+// 6a 正确判别/证伪族
+for (const t of [
+  '匹配概率是百万分之一，但这不能作为认定他有罪的依据。',
+  '这种错误只有十亿分之一的概率，但仍需结合其他证据才能定罪。',
+  '孤证不足以定罪，匹配率再低也要看先验概率。',
+  'The match probability is one in a million, which alone does not establish guilt.',
+]) {
+  assert.strictEqual(detect(t).hit, false, '证伪族应豁免: ' + t);
+}
+// 6b 元话语/教学族
+for (const t of [
+  '检察官谬误是法庭科学课堂上的经典案例。',
+  '这是逻辑谬误清单里的一条，叫做检察官谬误。',
+  'Prosecutor\'s fallacy is a classic logical fallacy in evidence courses.',
+]) {
+  assert.strictEqual(detect(t).hit, false, '元话语族应豁免: ' + t);
+}
+// 6c 对冲族（有罪结论腿自身含对冲）
+assert.strictEqual(detect('匹配概率是百万分之一，他可能有罪，但还需核实。').hit, false, '结论腿对冲应豁免');
+// 6d 否定翻转族
+assert.strictEqual(detect('匹配概率是百万分之一，这并不意味着他有罪。').hit, false, '否定翻转应豁免');
+// 6e 真疑问句（无反问标记，纯征询）
+assert.strictEqual(detect('匹配概率是百万分之一，这能否证明他有罪？').hit, false, '真疑问句应豁免');
+// 6f 反问不豁免（含反问标记「难道」，即使带问号）
+assert.strictEqual(detect('匹配概率是百万分之一，难道这就能证明他有罪吗？').hit, true, '反问不豁免');
+console.log('✓ 豁免族逐项验证：证伪/元话语/对冲/否定翻转/真疑问句均豁免，反问不豁免');
 
-check('攻击命中：中文 pair 型·弱证据词×极端比率值腿 5 条', () => {
-  for (const t of ATTACK_WEAK_ZH) {
-    const r = detectProsecutorsFallacy(t);
-    assert.equal(r.hit, true, '应命中: ' + t);
-    assert.ok(r.score >= 0.6 && r.score <= 0.8);
-  }
-});
+// ─── 7. 与既有维度的边界：相邻维度良性形态不被本维代拦 ────────────
+// base_rate_neglect 邻域的正当多因陈述（r161/r220 教训：正确多因陈述是良性）
+for (const t of [
+  '犯罪是多种因素共同造成的，不能只归因于单一动机。',
+  'Wars are caused by many factors acting together.',
+]) {
+  assert.strictEqual(detect(t).hit, false, '多因良性不应被本维代拦: ' + t);
+}
+console.log('✓ 相邻维度良性形态不被代拦');
 
-check('攻击命中：中文双腿①路径并存 4 条 + 英文 10 条', () => {
-  for (const t of ATTACK_DUAL_ZH.concat(ATTACK_EN_STRONG, ATTACK_EN_WEAK, ATTACK_EN_DUAL)) {
-    const r = detectProsecutorsFallacy(t);
-    assert.equal(r.hit, true, '应命中: ' + t);
-    assert.ok(r.score >= 0.6 && r.score <= 0.8);
-  }
-});
-
-check('良性零误伤：24 条（含疑难 FP 压力样本）', () => {
-  for (const t of BENIGN_HARD) assert.equal(detectProsecutorsFallacy(t).hit, false, '误伤: ' + t);
-});
-
-check('豁免族：概念讨论（中英 2 条）', () => {
-  for (const t of EXEMPT_CONCEPT) assert.equal(detectProsecutorsFallacy(t).hit, false, '误伤: ' + t);
-});
-
-check('豁免族：正当做法（中英 2 条）', () => {
-  for (const t of EXEMPT_CORRECTIVE) assert.equal(detectProsecutorsFallacy(t).hit, false, '误伤: ' + t);
-});
-
-check('边界锁：单腿/邻接/否定前缀/超距不判', () => {
-  for (const [k, t] of BOUNDARY) assert.equal(detectProsecutorsFallacy(t).hit, false, '误判[' + k + ']: ' + t);
-  assert.equal(detectProsecutorsFallacy(OVERDIST).hit, false, '默认邻近窗超距不命中');
-});
-
-check('中英混排与多签名加分档', () => {
-  const m = detectProsecutorsFallacy(MIXED);
-  assert.equal(m.hit, true, '混排应命中');
-  assert.ok(m.count >= 2, '多签名（中英双腿各自成签名）');
-  assert.ok(Math.abs(m.score - 0.76) < 1e-9, '双签名加分档');
-  const z = detectProsecutorsFallacy(MULTI_ZH);
-  assert.equal(z.hit, true);
-  assert.ok(z.count >= 2, '多签名');
-  assert.ok(Math.abs(z.score - 0.76) < 1e-9, '双签名加分档');
-});
-
-check('负例注入：腿①整族删除（中英）后 pair 型攻击全部不再命中', () => {
-  for (const t of ATTACK_ALL) {
-    const zh = /[\u4e00-\u9fa5]/.test(t);
-    assert.equal(detectProsecutorsFallacy(t, zh
-      ? { STRONG_ZH: [], WEAK_ZH: [] }
-      : { STRONG_EN: [], WEAK_EN: [] }).hit, false, '删腿①: ' + t.slice(0, 20));
-  }
-});
-
-check('负例注入：极端比率值删除后弱证据词腿攻击全部不再命中', () => {
-  for (const t of ATTACK_WEAK_ZH) assert.equal(detectProsecutorsFallacy(t, { RATE_ZH: NEVER }).hit, false, '删比率值ZH: ' + t.slice(0, 20));
-  for (const t of ATTACK_EN_WEAK) assert.equal(detectProsecutorsFallacy(t, { RATE_EN: NEVER }).hit, false, '删比率值EN: ' + t.slice(0, 20));
-});
-
-check('负例注入：腿①强证据词删除后强证据词腿攻击全部不再命中', () => {
-  for (const t of ATTACK_STRONG_ZH) assert.equal(detectProsecutorsFallacy(t, { STRONG_ZH: [] }).hit, false, '删强证据词ZH: ' + t.slice(0, 20));
-  for (const t of ATTACK_EN_STRONG) assert.equal(detectProsecutorsFallacy(t, { STRONG_EN: [] }).hit, false, '删强证据词EN: ' + t.slice(0, 20));
-});
-
-check('负例注入：腿②假设侧倒置结论（中英）删除后 pair 型攻击全部不再命中', () => {
-  for (const t of ATTACK_ALL) {
-    const zh = /[\u4e00-\u9fa5]/.test(t);
-    assert.equal(detectProsecutorsFallacy(t, zh ? { INVERTED_ZH: [] } : { INVERTED_EN: [] }).hit, false, '删假设侧: ' + t.slice(0, 20));
-  }
-});
-
-check('负例注入：概念讨论豁免删除后豁免句变红（承重证明）', () => {
-  assert.equal(detectProsecutorsFallacy(EXEMPT_CONCEPT[0], { CONCEPT_ZH: NEVER }).hit, true, '删概念讨论ZH');
-  assert.equal(detectProsecutorsFallacy(EXEMPT_CONCEPT[1], { CONCEPT_EN: NEVER }).hit, true, '删概念讨论EN');
-});
-
-check('负例注入：正当做法豁免删除后豁免句变红（承重证明）', () => {
-  assert.equal(detectProsecutorsFallacy(EXEMPT_CORRECTIVE[0], { CORRECTIVE_ZH: NEVER }).hit, true, '删正当做法ZH');
-  assert.equal(detectProsecutorsFallacy(EXEMPT_CORRECTIVE[1], { CORRECTIVE_EN: NEVER }).hit, true, '删正当做法EN');
-});
-
-check('负例注入：邻近距离窗承重（放大到 500 后超距句命中）', () => {
-  assert.equal(detectProsecutorsFallacy(OVERDIST).hit, false, '默认窗不命中');
-  assert.equal(detectProsecutorsFallacy(OVERDIST, { PAIR_ZH: 500 }).hit, true, '放大窗后命中');
-});
-
-check('引擎闸：良性样本不得以 prosecutors_fallacy 进 findings', () => {
-  const engine = require('../src/gate.js');
-  const gate = engine.check || engine.gate || engine.checkOutput;
-  assert.equal(typeof gate, 'function', '引擎入口存在');
-  for (const t of BENIGN_HARD) {
-    const out = gate(t);
-    const dims = (out.findings || []).map(f => f.dimension);
-    assert.ok(!dims.includes('prosecutors_fallacy'), '误伤: ' + t);
-  }
-});
-
-console.log(`\n测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);
-if (failed > 0) process.exit(1);
+console.log('\n全部断言通过（prosecutors_fallacy 第 222 维度，r233）');

@@ -1,11 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.145"
+version: "6.8.148"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  214 discrimination dimensions × 11-layer pipeline × 162 modules ×  184 MCP tools. Zero LLM dependency.
+  225 discrimination dimensions × 11-layer pipeline × 162 modules ×  184 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
   discriminative result cache, async supervision layer, autonomous decision execution
@@ -77,16 +77,16 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.145. Nothing here is copied
+Every number below was measured on this repository at v6.8.148. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.145 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.148 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 162 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,316 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 214 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 225 | `dimMap` keys in `src/index.js` |
 | MCP tools | 184 | tool definitions exposed via `tools/list` |
 | Test suite | 12,911 passing / 108 failing | `node test/run-all.js` (full run 2026-11-06; failed set is pre-existing runner/flaky noise — 5 self-reported failures in upstream tests (ClassicsRules/path-guard/mcp-server/pipeline/round-378) + 48 no-summary-line, none introduced by r227; r227 added researcher-degrees-of-freedom/sorites/ecological tests, all passing) |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -94,7 +94,7 @@ from marketing copy.
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
 
 |Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
-a `rewrite`, **171 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **182 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---

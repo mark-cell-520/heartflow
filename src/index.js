@@ -731,6 +731,11 @@ const { checkSoritesFallacy } = require('./sorites-fallacy.js');
 // 论）。判据流程动作腿×显著性结论封装腿两腿共现 + 邻近窗；细节见
 // src/researcher-degrees-of-freedom.js。
 const { checkResearcherDegreesOfFreedom } = require('./researcher-degrees-of-freedom.js');
+// [r228] 第 215 维度 anonymous_source_claim（无署名信源承载强断言：
+// 用一个无法指认、无法核验的信源承载确定性断言，使读者无从验证也无从追
+// 责）。判据无署名信源标记腿×强断言封装腿两腿共现 + 邻近窗；细节见
+// src/anonymous-source-claim.js。
+const { checkAnonymousSourceClaim } = require('./anonymous-source-claim.js');
 // [r196] 第 194 维度 argument_to_moderation（诉诸中庸：折中立场被直接
 // 当成真理）。require 是接线的第 1 处——同 r496 false_dilemma 事故：漏掉
 // 这一行，后续计算点直接 ReferenceError 全线崩。
@@ -785,6 +790,66 @@ const { checkMonocause } = require('./monocause.js');
 // （先列≥2成因再宣布其无关）、L3 归因相消（单因压缩+多因并列同句）。
 // 细节见 src/monocausal-attribution.js。
 const { detectMonocausal } = require('./monocausal-attribution.js');
+// [r231] 第 215 维度 broken_window（破窗谬误：破坏/灾害/报废事件被说成
+// 经济利好，只计可见强制重置支出、被挤占的机会成本未入账）。r230 已建
+// src/broken-window-fallacy.js 但从未接线，r231 缺口实证 9 条攻击句 8 条
+// 穿透引擎后一次接齐。双腿共现（破坏事件 × 利好框架）；细节见
+// src/broken-window-fallacy.js。
+const { detectBrokenWindow } = require('./broken-window-fallacy.js');
+// [r231 接手 r234] 第 221 维度 automation_bias（算法崇拜/自动化偏见：
+// 算法/模型/系统的输出被当成不可质疑的最终裁决，据此免除人工复核、
+// 宣布质疑无效、把判断权让渡给机器）。r231 已建 src/automation-bias.js
+// （370 行 + 11 组断言测试）但从未接线，本族 20 句攻击样本 12 句完全穿透
+// 引擎；r234 一次接齐。三腿共现（机器权威主体 × 不可错/优越性断言 ×
+// 判断权让渡/免除人工核查）+ 邻近窗；细节见 src/automation-bias.js。
+const { detectAutomationBias } = require('./automation-bias.js');
+// [r231 接手] 第 216 维度 self_fulfilling_prophecy（自我应验预言/自败
+// 预言：预期驱动行为、行为制造结果、结果再被当成预期准确的独立证据，
+// 构成循环确认的正反馈闭环）。r231 已建 src/self-fulfilling-prophecy.js
+// （484 行，模块级实测攻击 6/6 命中、良性 9/9 pass、逐腿负例注入全部
+// 正确失配）但留下未接线清单中断；本轮接手完成接线 + 单测 + 门禁。
+// 三腿共现（信念/预言在场 × 信念驱动行为在场 × 结果反向印证在场）；
+// 细节见 src/self-fulfilling-prophecy.js。
+const { detectSelfFulfillingProphecy } = require('./self-fulfilling-prophecy.js');
+// [r232] 第 218 维度 appeal_to_future（诉诸未来：把尚未存在的未来
+// 证据/未来解决者当成当下行动或当下结论的依据，是证据缺位的时间置换）。
+// 双腿共现（未来证据腿 × 当下行动/结论腿）+ 邻近窗；细节见
+// src/appeal-to-future.js。
+const { detectAppealToFuture: checkAppealToFuture } = require('./appeal-to-future.js');
+// [r232] 第 219 维度 appeal_to_rumor（传闻即事实：把「某说法正在流传」
+// 这一传播事实当成该说法为真的证据，是传播强度与证据强度的混淆）。双腿
+// 共现（传播事实腿 × 真实性推断腿）+ 邻近窗；细节见
+// src/appeal-to-rumor.js。
+const { checkAppealToRumor } = require('./appeal-to-rumor.js');
+// [r232] 第 220 维度 confirmatory_evidence（证实性取证：把实验/研究反复
+// 确认这一经验动作直接等同于该理论为真，是证据方向与证据充分性的混淆）。
+// 双腿共现（确认动作腿 × 真理性结论腿）+ 邻近窗；细节见
+// src/confirmatory-evidence.js。
+const { checkConfirmatoryEvidence } = require('./confirmatory-evidence.js');
+// [r245] 第 223 维度 framing_effect（框架效应：逻辑等价的同一信息因
+// 表述框架不同（存活率/死亡率、成功率/失败率、达标率/未达标率）导致
+// 决策/评价系统性反转，是事实力量与措辞力量的混淆）。r244 已建
+// src/framing-effect.js（317 行 + 16 组断言测试，provisional 232）但从未
+// 接线，r245 缺口实证 10 条攻击句 5 条穿透（含「存活率九成愿意签字 /
+// 死亡率一成不肯做」教科书原型）。双腿共现（等价双框架表述腿 × 决策
+// 评价反转腿）+ 邻近窗；细节见 src/framing-effect.js。
+const { detectFramingEffect: checkFramingEffect } = require('./framing-effect.js');
+// [r249] 第 224 维度 denominator_swap（分母替换谬误：拿不同分母的绝对
+// 计数直接做优劣/安全比较，忽略人口、样本量、暴露规模等基数不同；中英
+// 双语三腿共现——绝对计数腿×比较结论腿×主体对置腿，比率口径/同分母
+// 明示/元陈述豁免）。缺口实证：scripts/round-249/probe-gap-r249.js
+// 实测本族中英双语 2/2 漏判；decision 本体裁决 accelerate。细节见
+// src/denominator-swap.js。
+const { checkDenominatorSwap } = require('./denominator-swap.js');
+// [r249] 第 215 维度 conditional_transposition（条件概率换位 /
+// confusion of the inverse：P(E|I) 的概率数值在方向翻转后原样沿用为
+// P(I|E)，检察官谬误的结构形）。src/conditional-transposition.js 28KB
+// 早已写好（67/67 模块测试全绿）但从未接入本文件，整族攻击句穿透判别层。
+// 本轮接线的就是这个「已加载从未 dispatch」的能力。
+const { checkConditionalTransposition } = require('./conditional-transposition.js');
+// [r233] 第 222 维度 prosecutors_fallacy（检察官谬误：把总体小概率
+// 匹配率偷换成个体高概率有罪，忽略先验概率与假阳性率）。
+const { detectProsecutorsFallacy: checkProsecutorsFallacy } = require('./prosecutors-fallacy.js');
 // [r162] 第 162 维度 incredulity（诉诸个人怀疑：以主观「无法想象/
 // 难以置信」替代证据，据此否定事实真值）。decision 本体一次选出
 // （heartflow_philosophy_decision type=accelerate/confidence 0.7/
@@ -2094,6 +2159,10 @@ function discriminate(text, evidence = [], contentMode) {
   // pass。变量名 rdf——researcher degrees of freedom 缩写，grep 0 命中无
   // 冲突。注：本模块 r217 已落盘但从未接线，本轮补齐八处并实测。
   const rdf = checkResearcherDegreesOfFreedom(_normText);
+  // [r228] 第 215 维度 anonymous_source_claim（无署名信源承载强断言）计算
+  // 点。同 r219 先例：十处一次接齐，漏一处 gate.action 恒 pass。变量名
+  // asc——anonymous-source-claim 缩写，grep 0 命中无冲突。
+  const asc = checkAnonymousSourceClaim(_normText);
   // [r188] 第 185 维度 most_transitivity（「大多数」链式传递）计算点。
   // 同 r186 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   // 变量名 mtr——most-transitivity 缩写，grep 实测 0 命中无冲突。
@@ -2117,6 +2186,41 @@ function discriminate(text, evidence = [], contentMode) {
   // [r220] 第 214 维度 monocausal_attribution（单因归因）计算点。
   // 同 r161 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const mca = _applyPedagogyRelaxation(detectMonocausal(_normText), "monocausal_attribution", pedagogyRelaxation);
+  // [r231] 第 215 维度 broken_window（破窗谬误）计算点。
+  // 同 r220 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const bwf = _applyPedagogyRelaxation(detectBrokenWindow(_normText), "broken_window", pedagogyRelaxation);
+  // [r231 接手 r234] 第 221 维度 automation_bias（算法崇拜/自动化偏见）
+  // 计算点。同 r231 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  // 变量名 aub——automation bias 缩写，grep 0 命中无冲突。
+  const aub = _applyPedagogyRelaxation(detectAutomationBias(_normText), "automation_bias", pedagogyRelaxation);
+  // [r231 接手] 第 216 维度 self_fulfilling_prophecy（自我应验预言）计算点。
+  // 同 r220 先例：九处一次接齐，漏一处 gate.action 恒 pass。
+  const sfp = _applyPedagogyRelaxation(detectSelfFulfillingProphecy(_normText), "self_fulfilling_prophecy", pedagogyRelaxation);
+  // [r232] 第 218 维度 appeal_to_future（诉诸未来）计算点。
+  // 同 r231 先例：九处一次接齐，漏一处 gate.action 恒 pass。变量名
+  // atf——appeal to future 缩写，grep 0 命中无冲突。
+  const atf = _applyPedagogyRelaxation(checkAppealToFuture(_normText), "appeal_to_future", pedagogyRelaxation);
+  // [r232] 第 219 维度 appeal_to_rumor（传闻即事实）计算点。
+  // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。变量名
+  // atr——appeal to rumor 缩写，grep 0 命中无冲突。
+  const atr = _applyPedagogyRelaxation(checkAppealToRumor(_normText), "appeal_to_rumor", pedagogyRelaxation);
+  // [r232] 第 220 维度 confirmatory_evidence（证实性取证）计算点。
+  // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。变量名
+  // cev——confirmatory evidence 缩写，grep 0 命中无冲突。
+  const cev = _applyPedagogyRelaxation(checkConfirmatoryEvidence(_normText), "confirmatory_evidence", pedagogyRelaxation);
+  // [r245] 第 223 维度 framing_effect（框架效应）计算点。
+  // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。变量名
+  // fme——framing effect 缩写（fre 已被 forer_effect 占用，r245 查证）。
+  const fme = _applyPedagogyRelaxation(checkFramingEffect(_normText), "framing_effect", pedagogyRelaxation);
+  // [r249] 第 224 维度 denominator_swap（分母替换谬误）计算点。
+  const dsw = _applyPedagogyRelaxation(checkDenominatorSwap(_normText), "denominator_swap", pedagogyRelaxation);
+  // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
+  // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
+  const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
+  // [r233] 第 222 维度 prosecutors_fallacy（检察官谬误）计算点。
+  // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。变量名
+  // prf——prosecutor's fallacy 缩写，grep 0 命中无冲突。
+  const prf = _applyPedagogyRelaxation(checkProsecutorsFallacy(_normText), "prosecutors_fallacy", pedagogyRelaxation);
   // [r162] 第 162 维度 incredulity（诉诸个人怀疑）计算点。
   // 同 r161 先例：九处一次接齐，漏一处 gate.action 恒 pass。
   const inc = _applyPedagogyRelaxation(checkIncredulity(_normText), "incredulity", pedagogyRelaxation);
@@ -2688,6 +2792,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r219] 第 213 维度 researcher_degrees_of_freedom（研究者自由度/数据
     // 挖掘谬误）参与判定。同上：dimMap 与 allDims 两处都接。
     {score: rdf.score, name:'researcher_degrees_of_freedom'},
+    // [r228] 第 215 维度 anonymous_source_claim（无署名信源承载强断言）参与
+    // 判定。同 r219 先例：dimMap 与 allDims 两处都接。
+    {score: asc.score, name:'anonymous_source_claim'},
     // [r188] 第 185 维度 most_transitivity 参与判定（「大多数」链式传递）。
     // 同 r186 先例：dimMap 与 allDims 必须两处都接。
     {score: mtr.score, name:'most_transitivity'},
@@ -2709,6 +2816,36 @@ function discriminate(text, evidence = [], contentMode) {
     // [r220] 第 214 维度 monocausal_attribution 参与判定（单因归因）。
     // 同 r161 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: mca.score, name:'monocausal_attribution'},
+    // [r231] 第 215 维度 broken_window 参与判定（破窗谬误）。
+    // 同 r220 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: bwf.score, name:'broken_window'},
+    // [r231 接手 r234] 第 221 维度 automation_bias 参与判定（算法崇拜）。
+    // 同 r231 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: aub.score, name:'automation_bias'},
+    // [r231 接手] 第 216 维度 self_fulfilling_prophecy 参与判定（自我应验预言）。
+    // 同 r220 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: sfp.score, name:'self_fulfilling_prophecy'},
+    // [r232] 第 218 维度 appeal_to_future 参与判定（诉诸未来）。
+    // 同 r231 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: atf.score, name:'appeal_to_future'},
+    // [r232] 第 219 维度 appeal_to_rumor 参与判定（传闻即事实）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: atr.score, name:'appeal_to_rumor'},
+    // [r232] 第 220 维度 confirmatory_evidence 参与判定（证实性取证）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: cev.score, name:'confirmatory_evidence'},
+    // [r245] 第 223 维度 framing_effect 参与判定（框架效应）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: fme.score, name:'framing_effect'},
+    // [r249] 第 224 维度 denominator_swap 参与判定（分母替换谬误）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: dsw.score, name:'denominator_swap'},
+    // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: cnt.score, name:'conditional_transposition'},
+    // [r233] 第 222 维度 prosecutors_fallacy 参与判定（检察官谬误）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: prf.score, name:'prosecutors_fallacy'},
     // [r162] 第 162 维度 incredulity 参与判定（诉诸个人怀疑）。
     // 同 r161 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: inc.score, name:'incredulity'},
@@ -3210,11 +3347,32 @@ function discriminate(text, evidence = [], contentMode) {
     // [r219] 第 213 维度 researcher_degrees_of_freedom（研究者自由度/数据
     // 挖掘谬误：流程动作腿×显著性结论封装腿）。
     researcher_degrees_of_freedom: rdf,
+    // [r228] 第 215 维度 anonymous_source_claim（无署名信源标记腿×强断言封装腿）。
+    anonymous_source_claim: asc,
     // [r727] 第 157 维度 forer_effect（巴纳姆效应×
     forer_effect: fre,
     // [r728] 第 159 维度 no_true_scotsman（定义驱逐反例×
     // authenticity 短语腿×驱逐断言腿）。
     no_true_scotsman: nts,
+    // [r231 接手] 第 216 维度 self_fulfilling_prophecy（自我应验预言×
+    // 信念/预言腿×信念驱动行为腿×结果反向印证腿）。
+    self_fulfilling_prophecy: sfp,
+    // [r232] 第 218 维度 appeal_to_future（诉诸未来×未来证据腿×当下行动腿）。
+    appeal_to_future: atf,
+    // [r232] 第 219 维度 appeal_to_rumor（传闻即事实×传播事实腿×真实性推断腿）。
+    appeal_to_rumor: atr,
+    // [r232] 第 220 维度 confirmatory_evidence（证实性取证×确认动作腿×真理性结论腿）。
+    confirmatory_evidence: cev,
+    // [r245] 第 223 维度 framing_effect（框架效应×等价双框架表述腿×决策评价反转腿）。
+    framing_effect: fme,
+    // [r249] 第 224 维度 denominator_swap（分母替换×绝对计数腿×比较结论腿×主体对置腿）。
+    denominator_swap: dsw,
+    // [r249] 第 215 维度 conditional_transposition（条件概率换位：
+    // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
+    conditional_transposition: cnt,
+    // [r233] 第 222 维度 prosecutors_fallacy（检察官谬误×
+    // 小概率匹配腿×个体有罪/嫌疑结论腿）。
+    prosecutors_fallacy: prf,
     // [r729] 第 160 维度 conditional_proposition（假设条件句当既成论据×
     // 假设条件句腿×否定推断腿）。
     conditional_proposition: cp,
@@ -3224,6 +3382,12 @@ function discriminate(text, evidence = [], contentMode) {
     // [r220] 第 214 维度 monocausal_attribution（单因归因×
     // 归因压缩腿×枚举否认腿×归因相消腿）。
     monocausal_attribution: mca,
+    // [r231] 第 215 维度 broken_window（破窗谬误×
+    // 破坏事件腿×经济利好框架腿）。
+    broken_window: bwf,
+    // [r231 接手 r234] 第 221 维度 automation_bias（算法崇拜×
+    // 机器权威主体腿×不可错/优越性断言腿×判断权让渡腿）。
+    automation_bias: aub,
     // [r162] 第 162 维度 incredulity（诉诸个人怀疑×
     // 难以置信陈述腿×真值否定推导腿）。
     incredulity: inc,
@@ -3540,6 +3704,9 @@ function discriminate(text, evidence = [], contentMode) {
   'mediator_confusion': "不得**拿「控制/解释掉因果链的中间环节」冒充「排除混杂」，据此否定上游原因的真实因果作用**——中介变量混淆（mediator-outcome confusion / overcontrol bias）是指当 A 通过 M 影响 B（A→M→B）时，M 是**效应的传递通道**而不是**效应的替代解释**，文本却把 M 当成可排除项，用「控制了 M 之后 A 与 B 就不相关了」「M 完全解释了 A 与 B 之间的联系」来宣称 A 本来就不是原因：「因为患者都吃了止痛药，所以疼痛和骨折没有关系」「控制了消炎药用量之后，炎症和发烧就不相关了」「止痛药完全解释了损伤与痛苦之间的联系」「一旦控制了收入，教育对健康就没有影响了」「Once you control for income, education has no effect on health.」「Painkillers fully explain the link between injury and suffering.」「Exercise reduces depression only because it improves sleep.」（样本形状与负例见 test/round-213-mediator-confusion.js）。为什么这本身就是问题：控制 M（或宣称 M 完全解释了 A→B）会**切断这条通道**，此时 A 与 B 的相关消失是**干预的直接后果**，不是「A 本来就不是原因」的证据；混杂因素与中介变量的判别方向正好相反——混杂因素（同时导致 A 与 B 的第三方）控制它是**正确的去偏**，中介变量控制它是**制造偏差**。把两者混同，等于用「排除中间环节」冒充「排除混杂」，是最容易以严谨统计外观出现的一类假严谨；它直接破坏心虫「能符合宇宙规律（因果、逻辑、证据纪律）」的能力，因为被切断的因果链不会报错。正当做法是**区分中介与混杂**（M 是否处在 A→B 的因果路径上：是中介则不能控制，须估计**直接效应** controlled direct effect；是混杂才应控制）或**补上直接效应检验**（控制 M 后 A 对 B 的直接效应是否仍显著）。判据**两腿共现 + 邻近窗，缺一不判**：腿① CONTROL 控制/解释动作（控制/调控/校正/矫正/调整/扣掉/扣除/剔除/除去/去掉/排除/屏蔽/抵消 + 解释/解释掉/完全解释/充分说明/归因/归结 + 只因为/正是因为/是由于/归根到底/本质上是因为 + 反应型行为 吃/服/用/接受/采取了 + 因为+行为或变量陈述 + 只有…才…；EN control(s|led) for / adjust(ed) for / correct(s|ed) for / account(s) for / hold(s) constant / condition(s) on / net(ted) out / partial(led) out + explain(s|ed) / fully explain / completely explain / attribute to / reduce to / boils down to / comes down to / is just + only because / simply because / precisely because / because of / due to + because/since + 中介性行为或变量陈述——**r161 教训：控制/解释/调整 收裸动词形态，去掉前后缀仍命中**）；腿② NULL 效应否定结论（没有关系/没有关联/无关/并不相关 + 不存在因果/不是原因/算不上原因/没有因果/并无因果关系 + 没有效果/没有作用/没有影响/不起作用/毫无作用 + 无效/失效/不成立/推不出/说明不了 + 真正的原因/真实原因/真正的解释/替代解释/唯一解释 + 只是/不过是/无非是/仅仅是因为 + 之间的联系/之间的关系 + 就不/便不/再无/并无/并未；EN no effect / no relationship / no correlation / no link / nothing to do with / irrelevant / unrelated + not causal / not the cause / no longer significant / no longer affects / doesn't explain + no impact / has no effect / makes no difference / is meaningless + the real cause / the actual cause / the only cause / a better explanation + merely / just a / nothing but + link|connection|relationship between A and B + only|simply|merely because + 中介性动词），腿②须位于腿①之后 40 字（EN 120 字符）邻近窗内且**未被否定**（不能/不应/未必/不代表/不意味着/推不出/取决于；EN not/never/doesn't mean/not necessarily/depends on/cannot conclude）。边界：common_cause（第 174 维度）管共同原因/混杂因素，本族管的是被控制的那个变量本身处在**因果链中间**（中介），控制它会切断本应存在的总效应；collider_bias（第 209 维度）管条件筛选后子样本内的相关被当成总体因果结论，本族不依赖任何筛选/子样本标记；reverse_causation（第 172 维度）管因果方向整体倒置，本族方向没错、错在把中间环节当成可排除的替代解释；monocause（第 161 维度）管多因压成单因，本族不是压缩原因数量而是取消上游原因；necessity_sufficiency_confusion（第 183 维度）管必要/充分条件混用，本族不涉及条件类型判断。明确不判：概念/教学转述（中介变量/中介效应/中介分析/中介路径/传导机制/因果链/路径分析/过度控制/直接效应/间接效应/统计学/教材/课堂/论文/悖论/称为/定义为/概念；EN mediator / mediation / mediating pathway / overcontrol / direct effect / indirect effect / path analysis / causal chain / textbook / statistics / called / defined / concept——讨论这个概念本身不是运用它；**r213 收窄**：元话语豁免要求句中同时出现教学/学术框架标记或否定标记，裸「中介变量」出现在因果陈述中不豁免）、正确响应形（承认 M 是传递通道并要求补直接效应/区分混杂与中介：不能控制/不应控制/控制中介/控制中间环节/切断/阻断/混淆了中介/误把中介/是中介而非/不是混杂/并非混杂/需要直接效应/需要路径分析/需要区分中介/是传递通道/是中间环节；EN can't control / controlling a mediator / not a confounder / needs the direct effect / mediator not confounder / blocks the pathway——**指出控制中介会切断通道并要求区分混杂与中介，正是本族要教的判别动作**）、混杂控制形（共同导致/同时导致/既导致/同时影响/第三方因素/外生变量/混杂因素/共同原因；EN confounder / jointly causes / third-party factor / exogenous variable / common cause——**控制真正的混杂因素是正确的去偏，本族明确不判**）、无腿②（没有出现效应否定结论——缺「否定结论」即无假严谨可断言）、推理否定/对冲（不代表/不意味着/推不出/未必/不一定/取决于/还要看/而不是/而非）、疑问句（含 ?/？）。已知边界：① 只作控制陈述、止步于方法描述而无效应否定的句子不判（缺腿②）；② 腿①与腿②相隔超出 40 字（EN 120 字符）邻近窗不判；③ 正确的混杂控制（「同时控制了年龄、性别等第三方因素」）被混杂控制形豁免，本族不代拦；④ 元话语/教学框架标记为句级属性，同句混合课堂转述与实际攻击主张时会整句放过（与既有维度同口径）。",
   // [r218] 第 212 维度 sorites_fallacy（堆垛/连续体谬误）。
   'sorites_fallacy': "不得**拿「一个单元增量不改变模糊谓词的判定」递推出「任何数量的单元都不改变判定」，据此消解谓词终点的责任**——堆垛谬误（sorites paradox / sorites fallacy / 连续体谬误族）是指文本同时给出**单元增量宣告**与**模糊谓词的否定终点**，并用单元递推的局部真（少一粒确实无损「堆」的判定）冒充全局假（任何数量都不成堆）：「一粒米不能算一堆，少一粒也不算，所以再多的米也堆不成一堆」「掉一根头发不算秃，再掉一根也不能算秃，这样掉下去百万根也不算秃」「一次加班不算剥削，两次也不算，所以天天加班也不是剥削」「One grain of sand is not a heap, and removing one grain never makes a heap, so no amount of sand is a heap.」「Removing one hair doesn't make you bald, so losing a million hairs doesn't make you bald.」（样本形状与负例见 test/sorites-fallacy.test.js）。为什么这本身就是问题：模糊谓词（堆/秃/高/富/多/少/贵/吵/热/快）的边界本来就是**语境化的约定**——「多少算一堆」由用途、尺度、约定共同决定，不存在先天的精确阈值；堆垛谬误的破坏力在于把**边界缺失**当成**边界不存在**的证据，用单元递推的严密外观消解「再大的量变也应当质变」这一责任。它与 slippery_slope（从一个起点推出灾难性终点的滑坡推演）方向相反：滑坡谬误**推出**终点，堆垛谬误**消解**终点；与 absolute_claim（绝对化措辞本身）互补：本族不依赖绝对化措辞，射程是单元递推×谓词终点的结构；与 scale_dismissal（用占比注销风险）互补：本族不涉及占比与统计量；与 hasty_generalization（样本不足的归纳）互补：本族不是归纳问题、是谓词边界被递推消解；与 ad_nauseam（诉诸重复）互补：本族的重复是带单元增量的递推且必须有模糊谓词终点在场。正当做法是**给出谓词的操作性定义**（多少算一堆、按什么标准算秃、什么强度算剥削——EN operational definition / working definition）或**承认边界是约定**（边界模糊需要划定，多少算够取决于用途与语境）。判据**主判据两腿共现 + 邻近窗，缺一不判；另设自足习语分支**：腿① STEP 单元增量宣告（一粒/一根/一分/一次/一回/一天/一秒/一个/一克/一毫米/一步/一点/少一粒/少一根/去掉一个/增加一个/再少一点；EN one grain / one more grain / a single grain / one hair / one cent / remove one / add one / one at a time / little by little / grain by grain——**r161/r218 教训：收裸名词形态**，「一粒」去掉量词后缀仍命中）；腿② VAGUE 模糊谓词 × NEG_END 否定/排除终点（谓词堆/秃/高/矮/胖/瘦/富/穷/老/年轻/多/少/贵/便宜/吵/闹/热/冷/湿/干/快/慢 + 不算/不是/也算不上/不构成/从来不算/说不上/再…也不/怎么也/并不/无济于事；EN not a heap / doesn't make it / never makes / still not / doesn't count / no amount of），两腿落在 60 字（EN 160 字符）邻近窗内即视为同一次「单元递推→谓词终点消解」叙述；**自足习语分支**：固定成语单式即两腿齐备（一粒谷不成堆/一根头发不算秃/一分钱不算富；EN One more grain doesn't make a heap / Removing one hair doesn't make you bald / One more cent doesn't make you rich）。明确不判：概念/教学转述（堆垛谬误/连续体谬误/模糊谓词/模糊性/边界条件/谓词逻辑/逻辑学/哲学/教材/课堂/悖论/论文/文献；EN sorites / sorites paradox / vagueness / vague predicate / fuzzy logic / textbook / lecture / philosophy——讨论这个概念本身不是运用它）、正确响应形（指出模糊谓词需要边界/约定/语境：边界模糊/边界不清/需要界定/需要划定/需要明确/约定俗成/人为设定/视语境而定/取决于用途/操作定义/判定标准/量化标准/隶属度；EN boundary is fuzzy / needs a boundary / needs to be defined / arbitrary cutoff / depends on context / operational definition / fuzzy predicate / matters of degree——**指出模糊谓词的边界是约定并给出操作性定义，正是本族要教的判别动作**）、正向积变陈述（积少成多/聚沙成塔/集腋成裘/千里之堤溃于蚁穴/不积跬步无以成江海；EN many a mickle makes a muckle / every little helps / constant dropping wears away——强调单元累积**产生**质变，与堆垛谬误的消解方向相反）、无腿②（没有模糊谓词终点判定——缺谓词终点即无消解对象）、无腿①（没有单元增量宣告——单句只有谓词否定不判）、推理否定/对冲（不代表/不意味着/推不出/未必/不一定/取决于/还要看/而不是/而非；EN does not mean / not necessarily / depends on / cannot conclude）、疑问句（含 ?/？；反问标记出现时不豁免）。",
+  // [r228] 第 215 维度 anonymous_source_claim（无署名信源承载强断言）。
+  'anonymous_source_claim': "不得**拿「知情人士透露」这类无法指认的信源承载确定性断言，让读者无从验证也无从追责**——无署名信源承载强断言（anonymous sourcing of unverifiable claims / unattributed strong claim）是指文本用**一个不可指认、不可核验的信源**（知情人士/内部人士/不愿透露姓名的官员/sources familiar with the matter）承载**一个确定性的强事实断言**（存在漏洞/已经决定/达成协议/下个月落地），把举证责任从说话人转移给听众：「内部人士透露，这款产品存在严重的安全漏洞」「有内部消息称，公司已经决定裁员三分之一」「据不愿透露姓名的官员表示，双方已经达成了秘密协议」「Sources familiar with the matter say the deal is already signed.」「An anonymous source close to the investigation said the suspect had been arrested.」（样本形状与负例见 test/anonymous-source-claim.test.js）。为什么这本身就是问题：**可验证性是证据纪律的入口条件**——一个断言的证据价值不只取决于内容是否自洽，更取决于有没有一条可回溯的核验路径。无署名信源恰好切断这条路径：信源不可指认，则不可交叉验证、不可追责、不可更正；此时无论措辞多么确定，该断言的证据强度都等于零。这不是「可能在说谎」，而是**结构上无法被证实也无法被证伪**。它与 unsupported_claim（完全无信源的裸断言）是不同攻击面：后者的问题是「没有来源」，本族的问题是「有来源但来源不可核验」——后者更危险，因为它借「有消息」的形式获得了表面可信度；与 vagueness（模糊量词/含糊谓词）互补：本族信源可以非常具体（「下个月」「三分之一」），问题不在含糊而在不可核验；与 clickbait（标题党引诱）互补：本族不涉及引诱结构；与 sole_narrative（第 69 维度，口径垄断）互补：本族不涉及压制核验的意图；与 poisoning_the_well（第 134 维度，预先毒化信源）互补：本族不涉及对信源的评价，涉及的是信源的匿名性。正当做法是**补上可指认的信源**（具名受访者、官方通报、可回溯的书面材料、可公开的原始文件）或**如实标注该断言尚未获得独立证实**，而不是拿不可指认的信源当作已证事实转述。判据**主判据两腿共现 + 邻近窗，缺一不判**：腿① SOURCE 无署名信源标记（知情人士/内部人士/匿名人士/消息人士/灵通人士/业内人士/知情者/内部消息/匿名消息源/消息源/不愿透露姓名/不便透露姓名/不愿公开身份/要求匿名/未具名/不具名/据(知情|内部|匿名)/有消息称/人士称/人士表示/接近+实体+的+人；EN sources familiar / people familiar / sources close / anonymous source / insiders / sources say|said|tell / on condition of anonymity / on background / off the record / asked not to be named / not authorized to speak——**r161 教训：收裸名词形态**，「知情人士」「消息源」「insiders」去掉前后缀仍命中）；腿② CLAIM 强断言封装（存在/确有/坐实/属实/已经/即将/将于/确定/确认/敲定/定案/达成/签署/签约/落地/实施/关停/裁员/点名/通报/约谈/调查/介入/查处/暂停/取消/处分/免职/离职/上调/下调 + 具体化细节数字/月份/日期/比例；EN exists / confirmed / has been / will be / already / decided / agreed / signed / approved / laid off / announced / under investigation / agreements? / concluded / reached + 数字），两腿落在 110 字（EN 320 字符）邻近窗内即视为同一次「不可指认信源→强断言」叙述。为什么取 VERIFY 级：单句也可能是对新闻伦理的**正确讨论与批评**（「这篇报道整篇依赖匿名消息源，记者未进行交叉验证，可信度要打折扣」正是本族要教的判别动作）、新闻报道转述、传播学课堂案例。verify 的含义是「这段文本用不可指认的信源承载了确定性断言，需要先取得具名信源或可核验的书面材料再评估其可信度」。明确不判：已署名/可回溯信源（据新华社/据路透社/据彭博社/据《媒体名》/据警方/据校方/据公司/官方通报/公告/声明/发言人/专家/学者/医生/律师/目击者/当事人/家属；EN according to Reuters|Bloomberg|BBC|AP / on the record / a spokesperson said / the company said / in a statement / published in / per the filing——这些信源有可回溯的核验路径）、正确响应形（未经证实/未经核实/无法核实/暂无法确认/未能证实/已辟谣/不属实/尚无定论/有待证实/存疑/需要核实/交叉验证/独立证实/拒绝透露/未予回应；EN unverified / unconfirmed / could not be verified / has not been confirmed / denied / debunked / declined to comment / no comment——**标注该断言尚未获得独立证实，正是本族要教的判别动作**）、概念/教学转述（新闻伦理/新闻道德/消息源保护/匿名消息源/采访规范/核实流程/课程/教材/课堂/教案/概念/称为/定义为/悖论/方法论；EN journalism / newsroom / source protection / media ethics / course / textbook / lecture / concept / defined——讨论这个概念本身不是运用它）、疑问句（含 ?/？；反问标记出现时不豁免，反问标记形与 r216 collider_bias 同口径：难道/岂/凭什么/何尝/岂不是/谈何/…吗？/ isn't it / doesn't that / how else / what else / who doesn't / if not）、推理否定/对冲（不代表/不意味着/推不出/未必/不一定/取决于/还要看/而不是/而非；EN does not mean / not necessarily / depends on / cannot conclude）。",
+
   // [r219] 第 213 维度 researcher_degrees_of_freedom（研究者自由度/数据
   // 挖掘谬误：分析流程被已见结果反向决定）。r217 模块已落盘但从未接
   // 线（gate.action 恒 pass），本轮补齐八处接线。
@@ -3572,11 +3739,17 @@ function discriminate(text, evidence = [], contentMode) {
 'relative_pration': "不得**拿别人更惨的处境抹掉对方正当的当下诉求、抱怨或疼痛**——用第三方（人家/有人/多少人/往事一代/others）的具体苦难作参照，宣布对方的困难不值一提：「别喊疼了，人家生孩子的都不吭声」「起码你还有学上，非洲的孩子连饭都吃不上」「知足吧，还有人工资比你低一半呢」「你这点苦算什么，穷苦人家连饭都吃不上」「年轻人吃点苦怎么了，我们当年饭都吃不饱」「别嫌辅导班贵，山区孩子想上还没得上」「至少公司还发工资，好多厂都倒闭了，知足吧」「How can you complain about your flight delay when people are starving?」「You have a roof over your head; stop complaining about the noise.」「At least you have a job — many people would kill for your position.」这类**第三方苦难参照×压制诉求**的话术当正常叙述（样本形状与负例见 test/round-726-relative-pration.js）。判据：腿① SUFFER 更惨参照系——第三方/群体/往事的**具体**苦难处境（连…都吃不上/睡大街/没挺过来/倒闭/失业/辍学/难民/战区/搬砖/通勤四小时/比你惨多了/roof over your head/starving/flooding），或「比你+负面比较」，或极小化「还有」形（至少还有五险一金/至少还有人要你）；抽象的更惨/更不幸/更艰难（共情转述高频形）刻意不收。腿② DISMISS 压制诉求——别喊/别嫌/别抱怨/知足/还不满足/算什么/怎么了/想想/至少/起码/只是/就不错了/stop complaining/be grateful/at least。两腿共现才判，缺腿不判——「你的困难是真的，同时也值得想想更糟的情况来调节视角」承认痛苦不压制不判；「虽然还有更不幸的人，但这不代表你的痛苦不存在」是否定翻转不判；「有人处境更艰难，所以我们更要认真对待你提的问题」无压制标记不判。别人的苦难不能抵消眼前的问题——处境艰难与当下诉求是两个并行的事实，前者不能折抵后者：正当做法是**先承认对方处境的真实性**（加班到十点确实辛苦/你的困难是真的），再就事论事处理具体问题（改善排班/核对数据/给出方案），比较性视角只能作为附加信息（值得关注），不能作为关闭对话的依据。边界：suffering_contest（第78维）管**第一人称自陈比惨**（我比你惨多了/我这半年没睡过整觉），本族拿第三方苦难贬低对方，第一人称形显式让位；suffering_capital 管把苦难折算成顺从资格，本族不兑换服从只关闭诉求；appeal_to_pity 管**自述可怜换规则豁免**，本族是拿他人更惨拒绝承认对方困境；harm_invalidation 否定伤害事实本身，本族承认事实只做量级比较；selective_minimization 淡化己方过错，本族不涉过错只涉处境比较；false_balance 把两方压成等权，本族是单向贬低。正当比较（市场行情/同比数据）、共情转述（承认痛苦+给方案）、对冲表述（也许/可能/未必/not necessarily）、谬误概念转述（诉诸更惨/相对剥夺/relative privation）、教学转述（课堂/教材/textbook）明确不判。",
     'forer_effect': "不得**把放之四海皆准的性格/命运描述佯称针对个体的专属解读**——描述本身几乎适用于任何人，却以「你」为唯一对象输出：「你外表看起来坚强，其实内心很柔软，只是不轻易让人看见」「你是一个内心矛盾的人，一方面渴望被理解，一方面又害怕靠得太近」「你骨子里是个追求完美的人，只是对自己要求太高了」「从测试结果看，你属于既理性又感性的类型，这很少见」「你害怕被抛弃，所以会先用不在乎保护自己」「Deep down, you want someone to truly understand you.」「You appear confident on the outside but often doubt yourself inside.」这类**通用人格描述×第二人称专属指向**的话术当精准判断（样本形状与负例见 test/round-727-forer-effect.js）。判据：腿① DESCRIPTOR 人格描述句式——「表面X其实Y」「一方面…另一方面…」「内心/骨子里…渴望/害怕」「X型的人」「命中注定」「想得太多做得太少」「不轻易让人看见/很少有人真正读懂你」等几乎人人适用的人格/命运断言句式族；腿② PERSON_TARGET 第二人称断言——「你是/你就是一个/你害怕/你渴望/你骨子里/你表面/你有/别嘴硬了，你就是…」+ you are / you appear / deep down, you 等把描述钉在「你」身上的指向形。两腿共现才判，缺腿不判——单纯说「表面坚强内心柔软」而无第二人称指向，是文学描写不判；只说「你很矛盾」而无人格描述句式，是普通评价不判。精准佯称词（很准/神准/很少见/测试结果显示/spot on）命中则加权而非必要条件——巴纳姆话术的专属感常由「不轻易让人看见」暗示。正当做法是**改用可复现的标准化测量**（量表得分/常模/百分位）并说明信效度与适用边界，或明确告知描述适用于大多数人而非专属判断。边界：pseudo_profundity 管「看似深刻的空话」（世界观金句），本族是通用人格描述佯称专属；confidence/sycophancy 只管确定性措辞，本族以描述普适性为核心特征；mind_reading 管断言他人当下想法/感受，本族描述性格结构；suffering_contest 管第一人称自陈比惨，本族不涉苦难比较。有依据的测量陈述（量表得分/标准差/常模/MBTI/标准化评估）、谬误概念转述（巴纳姆效应/Barnum effect/占卜/算命）、教学转述（课堂/教材/textbook）、否定翻转（「这不能作为判断你的依据」）、对冲（也许/可能/未必/not necessarily）、数据边界自陈（样本有限/仅供参考/倾向而非定论）、第三人称转述报告（「描述对很多人都显示」）明确不判。",
     'no_true_scotsman': "不得**先立一个带 authenticity 标准的类别，再用行为把反例驱逐出该类别，使类别不可证伪**——「真正的X不会这样」：先规定「真正的专家/粉丝/朋友/领导」应当如何，再把不符合该行为标准的对象开除类别：「真正爱你的男人，不会计较你花多少钱」「真正的专家不会犯这种低级错误」「真正有格局的领导，不会盯着考勤」「真兄弟不会计较这些，计较就不是真兄弟」「合格的妈妈怎么会让孩子哭成这样」「真爱一个人就不会计较得失」「He is not a true fan if he criticizes the team.」「If she were a real friend, she would have shown up.」这类**authenticity 短语×驱逐断言**的话术当循环定义谬误（样本形状与负例见 test/round-728-no-true-scotsman.js）。判据：腿① AUTH authenticity 短语——「真正/真心/真爱/合格/称职/敬业/但凡/有良心/有自尊/吃得苦」+ 社会角色名词（专家/粉丝/朋友/兄弟/男人/女人/领导/学生…）或 true/real/genuine + fan/expert/friend/partner…；腿② EXCLUSION 驱逐断言——否定行为谓词（不会/从来不/怎么会/算不上/根本不/就不配/would never/not a true…），或 CONDITIONAL 反事实条件句（如果她是真朋友，早就…/If she were a real friend, she would have…）。两腿共现才判，缺腿不判——只说「真正的专家」而无驱逐断言是普通描述不判；只说「他不会计较」而无 authenticity 短语是普通陈述不判。多处共现或含类别否认/反事实条件则加权。正当做法是**给出可检验的类别定义**（操作化指标/可复现的标准）再评估个体是否符合，或承认反例并修正定义而非开除反例。边界：无真正的苏格兰人谬误的概念转述（「这是无真正的苏格兰人谬误」）、术语约定与定义先行（先定义「真正的粉丝」的标准/约定术语/可检验的定义）、对冲（也许/可能/未必/not necessarily）、否定翻转（不是不会/不意味着/does not mean）、证据挑战（自称真正的专家但拿不出依据）明确不判。",
+    // [r231 接手] 第 216 维度 self_fulfilling_prophecy（自我应验预言）guidance。
+    'self_fulfilling_prophecy': "不得**把预期自己制造出来的结果当成预期准确的独立证据**——自我应验预言与自败预言：信念/预言在场 → 主体或他人顺应信念行动 → 结果反向印证预言，于是结果被当作信念正确的证明，而这一结果本身就是信念驱动行为造出来的：「因为他知道自己会被歧视，所以他干脆不申请，最后果然没能入选」「所有投资人都不看好这家公司，撤资之后它果然就倒闭了」「早就有人说这个项目会黄，结果大家真的都按会黄的方式准备，项目就黄了」「因为害怕考试成绩差，她提前放弃了复习，最后成绩真的很差」「他一再说这段感情撑不过三年，对方最后真的选择了离开」「The team believed they would fail the audit, so they stopped trying and failed.」「The prophecy of a bank run caused depositors to withdraw, and the bank did collapse.」「He kept insisting the relationship would not last three years, and in the end she really did leave.」这类**信念/预言腿×信念驱动行为腿×结果反向印证腿**的话术当循环确认（样本形状与负例见 test/self-fulfilling-prophecy.test.js）。判据：腿① EXPECT 信念/预言在场——心理动词（相信/认为/觉得/担心/害怕/生怕/预期/断定/心想）+ 结果性预期（会/必然/注定/迟早），或言语动词（说/预言/断言/强调/警告/提醒/不看好）+ 频率或来源限定（早就有人/有人说/大家都/他一再/反复/不断/多次）；EN believed/thought/expected/feared/worried/predicted/prophesied/insisted/kept saying + would/will/was bound to。腿② BEHAVIOR 信念驱动行为在场，两种子形：(a) 自我挫败行为（干脆不/提前放弃/放弃/不再/停止/撤回/撤资/退出/不申请/不尝试/不作为/逃避/按…的方式准备；EN stopped trying/gave up/withdrew/pulled out/quit/stopped applying/didn't bother/resigned themselves to）；(b) 他人顺从行为（对方/他们/大家/别人/团队/储户/投资者/客户/员工 + 选择了离开/取款/撤资/退出/放弃/离开/照办/跟进；EN depositors withdrew/investors fled/staff started looking for other jobs）。腿③ CONFIRM 结果反向印证在场：果然/果真/真的/最后真的/结果真的/不出所料/意料之中/应验/说中了/猜中了/就…了；EN as predicted/as expected/sure enough/came true/did in fact/ended up/and indeed。三腿共现才判，缺腿不判——只有信念没有行为传导是 wishful_thinking 的地盘；只有结果没有信念在场是普通叙述。**信念本身不产生结果，是顺应信念的行为产生了结果**，再把结果当成信念准确的独立证据就构成正反馈闭环：正当做法是**拆开传导链**——结果里有多少是预期自己制造的、多少有独立依据，再决定能否把结果当证据（例：把「他果然没入选」改成「他没申请，所以未入选这一结果不能证明歧视预期准确」/EN: separate what the belief produced from what the evidence independently shows），或明确标注这是预期驱动而非独立验证。为什么取 verify 级：自我应验预言在心理学、社会学、组织行为学里是正当研究对象（罗森塔尔效应、标签效应、皮革马利翁效应），文学与历史叙事也大量使用，rewrite/block 会误伤；verify 的含义是「这段文本把预期驱动的结果当成预期准确的独立证据，需先拆开传导链再把结论当证据用」。边界：wishful_thinking 管「我想所以会成」的单向愿望必然化，不要求行为传导腿也不要求结果确认腿；unfalsifiable_confirmation 管「实现/没实现都算对」的对举极性，本族要求单向印证；pseudo_causal/post_hoc 管编造或误用因果机制、时间先后当因果，本族的因果链可以完全真实，错在把自造结果当作独立证据；appeal_to_consequences 管「后果糟所以不是真的」，方向相反；anonymous_source_claim 管来源不可指认，本族不关心来源只关心传导链结构。明确不判（豁免）：证据支持的预测（数据显示/研究表明/模型预测/统计表明/forecast based on/according to the data）+ 结果；预备性/防护性行为（带伞/准备/防范/加固/备份/上保险/演练/prepared/insured/backed up）——「担心下雨所以带伞，结果真的下雨了」是正确预判，本族核心反例；元话语/教学转述（自我应验预言/自败预言/罗森塔尔效应/皮革马利翁效应/标签效应/预期效应/self-fulfilling prophecy/rosenthal effect/pygmalion effect/labeling theory）；显式对冲（可能/也许/未必/不一定/大概率/might/maybe/possibly）；疑问句（含 ?/？）；复述他人观点/新闻报道（据报道/他说/according to/witnesses said）；否定翻转（不意味着/并不能说明/does not mean/不等于）。",
     // [r161] 第 161 维度 monocause（单一因果过度简化）guidance。
     'monocause': "不得把**真实的、已知多因的系统性复杂结果**压成**单一原因**并用**绝对化归因框架**否认多因性——把「公司倒闭」「经济危机」「犯罪率上升」「王朝覆灭」「帝国衰落」「生育率下降」「社会撕裂」这类多因现象归结为「完全是因为X」「纯粹是X」「唯一的原因就是X」「说到底/归根结底就是X」「没有别的原因」（The financial crisis was caused entirely by deregulation. / Crime is nothing but a product of poverty. / The company failed solely because of bad management.；样本形状与负例见 test/round-161-monocause.js）。判据**双腿共现**：腿① COMPLEX-OUTCOME 已知多因的系统性现象（经济危机/金融危机/公司倒闭/企业破产/犯罪率/离婚率/贫富差距/少子化/低生育/战争爆发/王朝覆灭/帝国衰落/文明消亡/社会撕裂/信任危机/道德滑坡/创业失败/市值暴跌…；EN：the crisis / the recession / crime rate / the company failed / the empire fell / poverty / inequality）——只收系统性多因现象，不收考试/比赛/普通项目等可单一归因的琐事；腿② SINGLE-CAUSE 绝对化单一归因框架（完全是因为/纯粹是/全都是因为/唯一的原因/归根结底/说到底/无非/仅仅是因为/就是因为…没有别的原因；EN：entirely because of / solely due to / nothing but / the only reason / it all comes down to / purely because）。缺一不判——「经济衰退正在影响出口」只有现象无归因；「这件事完全是因为粗心」无系统性复杂现象腿，是普通归因不判。把复杂现象压成单因会让未经充分检验的归因驱动错误决策、掩盖可干预的其他因素：正当做法是**列出并权衡多因**（公司倒闭是资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause 管相关/时序→因果；pseudo_causal 管编造不存在的因果机制，本族的单一原因可完全真实、错在否认其他原因；texas_sharpshooter 管挑樱桃式选择性证据。明确不判：多因并列/共同作用（多重因素/共同作用/既有…又有…/a combination of / no single cause）、hedged 单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to）、提问句式（为什么会…/what caused…）、评析话术本身（单一因果谬误/还原论/monocausal fallacy）。",
     // [r162] 第 162 维度 incredulity（诉诸个人怀疑）guidance。
     'incredulity': "不得用**主观上的「无法想象/难以置信」替代证据**，据此**否定事实的真值或真实性**——「我无法想象他怎么能做到，所以这成绩一定是假的」「实验结果简直令人难以置信，一看就是后期剪辑的」「播放量高得离谱，肯定是刷出来的」「他年纪轻轻就身居高位，我根本想象不到他凭什么，背后一定有推手」（I cannot imagine how this is possible, so it cannot be true. / The results are unbelievable, therefore the data must be fabricated. / There is no way that happened; I cannot fathom it.；样本形状与负例见 test/round-163-incredulity.js）。判据**双腿共现**：腿① INCREDULITY 难以置信陈述（无法想象/难以想象/想象不到/难以置信/不可思议/匪夷所思；EN：can't imagine / hard to believe / inconceivable / unfathomable / unbelievable）——只收主观认知动词被否定的陈述，孤立的感叹不是本族；腿② TRUTH-DENIAL 真值否定推导，两种子形：(a) 推断词+否定断言（所以/因此/这说明…+ 不是真的/是假的/纯属/不可信/作弊/编造/摆拍/有黑幕；EN：so/therefore/which means…+ can't be true / must be fake / fabricated）；(b) 直接否定断言（一看就是假的/肯定是作弊的/不可能是真的；EN：clearly fake / no way that happened / is obviously staged），倒装形（真值否定在前、难以置信在后作理由：「这数据不可能是真的，我实在无法想象它怎么采集的」）同样命中。缺一不判——「实验结果令人难以置信」只有惊讶无否定；「这一定是假的」无难以置信前提是别的语境。以主观难以置信否定事实会把**认知边界当成证据**，让未经检验的怀疑驱逐可验证的真相：正当做法是**回到可验证依据**（录像/计时数据/第三方复核/原始记录）再下真值判断，或把结论降级为待核查假设（成绩异常需要核查，但在调取证据前不断言作弊）。边界：psychologists_fallacy 管「以为别人都和自己想的一样」，本族管对事实真值的否定；appeal_to_ignorance 管「不能证伪所以为真」，本族方向相反——「我不能想象所以为假」；unsupported_claim 管无依据断言本身，本族的断言由主观难以置信驱动；absolute_claim 管绝对化措辞，本族必须有难以置信陈述腿在场。明确不判：有据可查的惊讶（成绩提升令人难以置信，但有三次模考记录和批改痕迹可查/经第三方核实）、提问句式（含问号——求知/反问不是断言）、评析话术本身（诉诸个人怀疑/argument from personal incredulity）、无否定推导的纯感叹（快得难以置信/美味得不可思议）。",
-    // [r220] 第 214 维度 monocausal_attribution（单因归因）guidance。
+    // [r231] 第 215 维度 broken_window（破窗谬误）guidance。
+    // [r231 接手 r234] 第 221 维度 automation_bias（算法崇拜/自动化偏见）guidance。
+    'automation_bias': "不得**把算法/模型/系统的输出当成不可质疑的最终裁决**——算法崇拜/自动化偏见（automation bias / algorithm deference）是把 AI、算法、模型、系统、大数据、神经网络的产出说成不会错、不带偏见、没有情绪、比人强，据此免除人工复核、宣布质疑无效、把判断权让渡给机器（AI算出来的结果不会有错，以后直接按模型的判断来，不用法官再核 / The model is more accurate than any human, so skip the review. / 算法没有偏见，HR的环节可以省掉）。机器产出同样携带训练数据偏差、分布外失效与系统性错误，任何准确率数字都必须与错误率和适用边界一起给出。判据**三腿共现**（缺一不判）：腿① MACHINE 机器权威主体（AI/人工智能/算法/模型/系统/机器/程序/软件/电脑/计算机/大数据/深度学习/神经网络/引擎/平台/评分·考核·推荐·筛选系统；EN AI/algorithm/the model/machine learning/deep learning/neural network/the system/the software/the engine/big data），腿② INFALLIBLE 不可错/无偏见/优越性断言（不会错/不会出错/不会说谎/不带偏见/没有情绪/不会累/从不失误/零误差/反问式「难道还会有错吗」/比人强、比人准、比任何专家都可靠、人脑比不过；EN can't be wrong/never makes mistakes/doesn't lie/free from bias/more accurate than any human/knows best/infallible/therefore objective），腿③ DEFERENCE 判断权让渡/免除人工核查（不用核/无需核/取消人工/跳过审核/环节可以省/听系统的/交给算法定/直接按模型的判断来/申诉无效/别再自己判断；EN no need to check/skip the human review/just follow it/let the AI decide/objections are irrelevant/stop second-guessing）。豁免：认识论纠正句（把「AI算的不会有错所以不用人工核」当成真理，是自动化偏见的典型表现）、器官制度系统义（神经系统/免疫系统/消化系统/金融系统的风控——非机器裁决义）、显式对冲（之一/可能/也许/maybe/likely/at least in part）、疑问句式。正当做法是**同时给出错误率与适用边界 + 保留人工复核与申诉通道**。边界：appeal_to_authority 管引人类权威为证据，其正则不含任何机器主体——本族是机器侧的同一结构；credential_dismissal（第203维）管剥夺人的发言资格（人脑侧）——本族崇拜机器裁决（机器侧），互为镜像不重叠；capability_overclaim 管「AI 已彻底解决 X」的完成态宣称——本族管判断权让渡与核查免除，不涉及解决状态；instrumental_reasoning 与部分本族样本射程交叠，本模块对交叠样本同样承重（三腿齐备），不冲突。明确不判：正确响应形（同时给出错误率与边界/需要人工兜底）、概念教学与人因工程讨论、对他人自动化崇拜的批评、器官制度系统义、对冲表述、疑问句式。",
+    'broken_window': "不得**把破坏、灾害或报废事件说成经济利好**——破窗谬误（broken window fallacy / seen-vs-unseen 计量缺口）是把地震、战争、火灾、事故、强制报废造成的损失，表述为「拉动内需」「刺激经济」「创造就业」的收益（地震之后重建需求让经济更繁荣 / The war stimulated the economy because of the post-war reconstruction boom. / 这场火灾提振了建材行业）。强制重置支出的可见收益只是账目的一半：那笔钱本可投向教育、医疗、创新等被挤占的用途，而破坏本身消灭的存量资产完全不计入。只计可见重置支出、不把机会成本与资产损失入账，会让净损耗看起来像净收益。判据**双腿共现**（破坏事件腿 × 经济利好框架腿，缺一不判）：腿① 破坏/损失事件（地震/洪水/台风/火灾/战争/爆炸/事故/瘟疫/疫情/飓风/拆除/报废/摧毁/损毁/倒塌/earthquake/flood/hurricane/wildfire/war/explosion/crash/demolition/scrapped/destroyed/collapse），腿② 利好框架（拉动/刺激/提振/振兴/带动/利好/受益/繁荣/就业/内需/GDP/增长/经济好转/boost/stimulate/drives growth/creates jobs/revitalizes/fuels demand/economic boom/prosperity/recovery）。显式对冲（之一/可能/也许/或许/maybe/might/could be/partly/at least in part）、双边核算表述（计入机会成本/扣除损失/净效应/扣除重置成本后/after accounting for the cost / net of losses / opportunity cost）、经济学概念教学（破窗效应本身/ Bastiat / the broken window fallacy is / 破窗谬误是指/sees the seen and the unseen）、疑问与假设句式、新闻复述他人观点（据统计/报道称/他说）为豁免。正当做法是**双边核算**（重建支出应计入，但被挤占的用途与被销毁的资产必须一并计入；扣除重置成本后总福利下降）、**区分重置与新增**（把损坏的窗户修好只是恢复原状，不是新增财富）、**把破坏导致的需求降级为转移而非创造**（重建需求是从其他用途转移过来的购买力）。边界：monocause（第161维）/monocausal_attribution（第214维）管归因宽度被压成单因，本族管**损益账只记一面**；post_hoc 管时间先后当因果，本族不依赖时间先后；activity_outcome_confusion 管活动当成果，本族的账目两侧不对称是核心。明确不判：正确双边陈述（扣除机会成本后并非利好/这只是恢复原状）、概念教学与复述、对冲表述、疑问句式。",
+
     'monocausal_attribution': "不得**把结果压到单一原因，或在先列举多个成因后又宣布其中某些成因无关**——单因归因（monocausal attribution / causal reductionism）是把多因结果压成「全都是因为X」「唯一原因在于X」「说到底就是一个原因」（It's all because of him. / The only reason the project failed is Bob. / One factor explains everything.），或在枚举若干候选成因后逐个排除（We considered budget, staffing and timing, and budget is not a contributing factor. / Genetics, diet and exercise all matter, but genetics plays no role here.）。前者让未经检验的归因驱动决策、掩盖可干预的其他因素；后者用「枚举过」的严谨外观包装排除动作，把可检验的候选原因不作检验就出清——两种形态都把归因宽度当成可以随意收窄的自由度。判据**三条腿任一命中**（与 r161 的「双腿共现」不同口径，本族覆盖 monocause 双腿不齐的句式空间）：腿① COMPRESS 归因压缩——把因果压到单一变量的绝对化框架（全都是因为/全是因为/完全是因为/唯一的原因/问题的根源只在于/说到底就是/一句话概括；EN it's all because / the only reason … is / due solely to / explained entirely by / boils down to one / the entire problem is / one factor explains everything / everything can be traced back to one）；腿② ENUM-DISMISS 枚举否认——句内先出现 ≥2 个并列候选成因（, / and / plus / along with / together with / as well as / not to mention 切出 ≥3 段），随后出现对其中某个成因的否认（is not a contributing factor / plays no role / has nothing to do with / contributes nothing to / is irrelevant to / bears no responsibility / ruled out entirely；EN 中文对应：不起任何作用/毫无关系/不承担责任/并非真正的原因/排除在原因之外）；腿③ CONTRADICT 归因相消——同一句内既命中腿①压缩框架、又出现多因并列措辞（multiple factors / a combination of / 多因素/共同作用/一方面…另一方面）且句内有枚举，构成自相矛盾的归因声明。缺腿不判——「经济衰退正在影响出口」只有现象无归因框架；「多个因素共同作用，其中管理是主要原因之一」有枚举无否认、有压缩词但被「之一」对冲；「战争是多因共同造成的」是正确多因陈述。显式对冲（may/might/could/possibly/可能/也许/大概率/之一/at least in part）与显式多因措辞（无腿②否认时）为豁免。把归因压成单因或未经检验排除候选成因，会让错误决策看起来证据充分：正当做法是**列出并权衡全部候选成因**（资金、市场、管理、竞争多重因素共同作用/危机是货币政策与监管、全球需求、供应链叠加的结果）、**给排除动作补证据**（要宣布某成因无关，需要说明检验了什么、为什么它不成立，而不是罗列之后一句话出清）、或**把单一归因降级为待验证假设之一**（管理不善可能是原因之一，但还需核查现金流与市场变化）。边界：monocause（第161维）管**已知多因的系统性复杂现象×绝对化归因框架**（要求现象名词腿），本族覆盖其双腿不齐的空间——无现象名词的口语化单因句、枚举否认句式、归因相消句式；post_hoc 管以时间先后为依据的归因，本族不依赖时间先后；false_cause/pseudo_causal 管编造或误用因果机制，本族的单一原因可完全真实、错在否认或出清其他原因；cherry_picking 管选择性取证×确定性结论，本族管归因宽度被压缩。明确不判：正确多因陈述（多因素共同作用/战争是多因共同造成的/a combination of factors）、对冲的单一贡献者（一个主要原因/…之一/one of the main drivers / partly due to / may be a factor）、提问句式（为什么会…/what caused…）、概念与教学转述（单一因果谬误/还原论/monocausal fallacy/逻辑课/textbook）。",
     // [r164] 第 163 维度 doublespeak（语义洗白）guidance。
     'doublespeak': "不得把**有害的、应受指责的行为**用**中性或褒义的词汇重新命名**来规避指责——「我们不是在监控你，我们是在关心你的安全」「这不是裁员，这是优化，是给社会输送人才」「这不叫打压，这叫帮助你成长」「我们不是禁止你发言，我们是在维护讨论秩序」「公司把裁员说成是优化」「政府部门把强拆包装成城市更新」「不能算抄袭，只能算引用不当」（This is not surveillance, it is care. / It is not censorship, it is moderation. / Not a layoff, a restructuring. / We do not spy on you; we ensure your safety. / The layoffs were rebranded as optimization. / Coercion was dressed up as consent.；样本形状与负例见 test/round-164-doublespeak.js）。名字变软了，行为没变——词汇替换替代了实质判断，受害者因此无从申诉：正当做法是**按行为实质命名并陈述事实**（「公司裁掉了 300 人，占员工总数 20%，理由是营收下滑」），而不是「给社会输送人才」。判据**双腿共现**：腿① HARMFUL-ACT 有害行为名词/动词族（监控/监视/监听/打压/辞退/裁员/惩罚/处罚/欺骗/造假/剽窃/暴力/拘禁/软禁/操纵/剥削/歧视/羞辱/霸凌/造谣/污蔑/家暴/虐待/降薪/强制加班/盗窃；EN：surveillance / censorship / layoff / coercion / manipulation / exploitation / harassment / blackmail / propaganda / pay cut）——不收 失败/错误/缺点/爱/关心 等非指责词，「这不是失败，是学习机会」是正当重构；腿② RELABEL 重新命名框架，两条路由都遵循**方向原则**（有害词必须是被改名的对象，不是被揭穿的现实）：(a) 否定替换式（不是X，是Y / 并非X，而是Y / 不叫X，应叫Y / 不能算X，只能算Y；EN：this is not X, it is Y / not a X, a Y / we do not X; we Y / rather than X），替代项不得再含有害词（升级定性不判）；(b) 转称式（把X说成Y / X说成Y / 把X包装成Y / 把X美化为Y；EN：X was rebranded as Y / X was dressed up as Y / X is sold as Y），中性改名动词（称为/叫做/称之为/termed/called）另需替代项命中柔性标签表（优化/关怀/安全/成长/秩序/调整/care/safety/optimization/moderation）——学者把剥削称为权力关系不是洗白，公司把裁员称为优化才是。方向原则同时排除**批评者的揭批形态**（「以安全之名，行监控之实」「名义上是培训，实际是洗脑控制」「under the guise of… / in name only」）——那些有害行为在第二位置、主语是揭批者，本身就是正确的判别。边界：surveillance_normalization（第 116 维度）管监控动作×为你好框定×清白义务，本族管名称与实质的分离，不要求监控语境；normalization_of_deviance 管偏差被说成惯例；soft_deflection 管模糊回避，本族的替换是显式命名。明确不判：法律定性/升级定性语境（不构成犯罪而是违法 / 正当防卫 / self-defence）、元话语概念评析（语义洗白 / doublespeak / euphemism 作为被分析对象）、无有害行为词的同形句（这不是失败，是学习机会 / It is not a bug, it is a feature）。",
@@ -4673,6 +4846,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 评、课堂案例、论文方法学转述或科研诚信报道的概括。与 r161-r218
     // 同口径只登记 VERIFY。
     'researcher_degrees_of_freedom',
+    // [r228] 第 215 维度 anonymous_source_claim（无署名信源承载强断言：
+    // 用一个无法指认、无法核验的信源承载确定性断言）登记。verify 级——
+    // 单句也可能是对新闻伦理的正确讨论与批评（「这篇报道整篇依赖匿名
+    // 消息源，可信度要打折扣」正是本族要教的判别动作）、新闻报道转述、
+    // 传播学课堂案例。与 r206-r219 同口径只登记 VERIFY。
+    'anonymous_source_claim',
     // [r726] 第 156 维度 relative_pration（诉诸更惨）登记。
     // verify 级——「拿更惨的人抹掉眼前抱怨」需要补的是对方诉求本身的
     // 事实核查与处理方案，单句也可能是共情转述或概念讨论。与 r672-r725
@@ -4707,6 +4886,74 @@ function discriminate(text, evidence = [], contentMode) {
     // 可能是转述他人归因、文学对白、归因方法教学讨论，rewrite/block
     // 会误伤。与 r161 同口径只登记 VERIFY。
     'monocausal_attribution',
+    // [r231] 第 215 维度 broken_window（破窗谬误）登记。
+    // verify 级——「把破坏/灾害事件说成经济利好」是**计量口径缺口**，
+    // 需改为双边核算（计入被挤占的机会成本）；单句也可能是经济学
+    // 教学讨论（破窗效应概念本身）、新闻复述、灾后重建政策分析，
+    // rewrite/block 会误伤。与 r220 同口径只登记 VERIFY。
+    'broken_window',
+    // [r231 接手 r234] 第 221 维度 automation_bias（算法崇拜/自动化偏见）
+    // 登记。verify 级——「把机器产出当成不可质疑的最终裁决」是**核查
+    // 缺口**，需改为同时给出错误率、适用边界与人工兜底；单句也可能是
+    // AI 安全课程讨论、人因工程教材案例、系统评审报告、对他人自动化
+    // 崇拜的批评，rewrite/block 会误伤。与 r231/r232 同口径只登记 VERIFY。
+    'automation_bias',
+    // [r231 接手] 第 216 维度 self_fulfilling_prophecy（自我应验预言）登记。
+    // verify 级——「把预期自己制造的结果当成预期准确的独立证据」是
+    // **证据独立性缺口**，需改为拆开传导链（结果里多少是预期自己制造的）
+    // 再把结论当证据用；单句也可能是心理学/社会学正当研究对象（罗森塔尔
+    // 效应、皮革马利翁效应）、文学叙事、历史分析、概念教学转述，
+    // rewrite/block 会误伤。与 r220/r231 同口径只登记 VERIFY。
+    'self_fulfilling_prophecy',
+    // [r232] 第 218 维度 appeal_to_future（诉诸未来：把尚未存在的未来
+    // 证据当成当下行动或当下结论的依据，是证据缺位的时间置换）登记。
+    // verify 级——单句也可能是有依据的科研规划与技术路线图（未来预期
+    // 附带当下的独立依据）、政策分析、文学叙事，rewrite/block 会误伤。
+    // 与 r206-r220 同口径只登记 VERIFY。
+    'appeal_to_future',
+    // [r232] 第 219 维度 appeal_to_rumor（传闻即事实：把「某说法正在
+    // 流传」这一传播事实当成该说法为真的证据，是传播强度与证据强度的
+    // 混淆）登记。verify 级——单句也可能是对传播现象的正当描述与批评
+    // （「这条传闻已传播三天，目前没有任何证据支持，需警惕」正是本族
+    // 要教的判别动作）、舆情监测记录、传播学课堂案例。与 r206-r220
+    // 同口径只登记 VERIFY。
+    'appeal_to_rumor',
+    // [r232] 第 220 维度 confirmatory_evidence（证实性取证：把实验/
+    // 研究反复确认这一经验动作直接等同于该理论为真，是证据方向与证据
+    // 充分性的混淆）登记。verify 级——单句也可能是正当的科学陈述
+    // （「经过多次独立复现，目前证据支持它，但尚未排除X」正是本族
+    // 要教的判别动作）、论文方法学转述、科学史叙述。与 r206-r220
+    // 同口径只登记 VERIFY。
+    'confirmatory_evidence',
+    // [r245] 第 223 维度 framing_effect（框架效应：逻辑等价的同一信息因
+    // 表述框架不同（存活率/死亡率、成功率/失败率）导致决策/评价系统性
+    // 反转）登记。verify 级——单句也可能是正当的双框呈现教学（「同时
+    // 列出存活率和死亡率，决策不应被表述方式决定」正是本族要教的判别
+    // 动作）、行为经济学课堂案例、对他人框架操作的揭批，rewrite/block
+    // 会误伤。与 r206-r232 同口径只登记 VERIFY。
+    'framing_effect',
+    // [r249] 第 224 维度 denominator_swap（分母替换谬误：拿不同分母的
+    // 绝对计数直接做优劣/安全/多少比较并下结论，忽略人口、样本量、
+    // 暴露规模等基数不同——「A城十起事故B城一起所以B城更安全」）登记。
+    // verify 级——单句也可能是正当的统计口径教学与批评（「两城人口
+    // 不同，要看人均事故率再比」正是本族要教的判别动作）、统计学
+    // 课堂案例、对他人错误论证的转述引用。与 r206-r232 同口径只登记 VERIFY。
+    'denominator_swap',
+    // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
+    // confusion of the inverse：P(E|I) 的数值在方向翻转后原样沿用为
+    // P(I|E)——「这种病检测阳性的概率是 95%，所以得了这种病检测阳性的
+    // 概率是 95%」）登记。verify 级——单句也可能是正当的贝叶斯教学与
+    // 批评（「检测阳性率不等于患病率，还要看病患先验和假阳性率」正是
+    // 本族要教的判别动作）、法庭科学课堂案例、对他人概率错误的揭批。
+    // 与 r206-r232 同口径只登记 VERIFY。
+    'conditional_transposition',
+    // [r233] 第 222 维度 prosecutors_fallacy（检察官谬误：把总体中的
+    // 小概率匹配率当成个体的高概率有罪，P(证据|无辜) 与 P(无辜|证据)
+    // 的等式偷换）登记。verify 级——单句也可能是正当的统计证据讨论
+    // 与批评（「DNA匹配概率百万分之一，这是需要进一步举证的理由，
+    // 而非定罪充分条件」正是本族要教的判别动作）、法庭科学教学、
+    // 贝叶斯推理教材案例。与 r206-r232 同口径只登记 VERIFY。
+    'prosecutors_fallacy',
     // [r162] 第 162 维度 incredulity（诉诸个人怀疑）登记。
     // verify 级——「以主观难以置信否定事实真值」是**证据缺口**，需改为
     // 回到可验证依据再下真值判断；单句也可能是转述他人错误推理、文学
@@ -5256,6 +5503,11 @@ function discriminate(text, evidence = [], contentMode) {
       sorites_fallacy: sor,
       // [r219] 第 213 维度 researcher_degrees_of_freedom（研究者自由度/数据挖掘谬误）。同上：八处一次接齐。
       researcher_degrees_of_freedom: rdf,
+      // [r228] 第 215 维度 anonymous_source_claim（无署名信源承载强断言）。同上：十处一次接齐。
+      anonymous_source_claim: asc,
+      // [r231 接手 r234] 第 221 维度 automation_bias 补登记（算法崇拜）。
+      // 同上：九处一次接齐。
+      automation_bias: aub,
       // [r726] 第 156 维度补登记：relative_pration（诉诸更惨）。
       // 同上：九处一次接齐。
       relative_pration: rpr,
@@ -5274,6 +5526,36 @@ function discriminate(text, evidence = [], contentMode) {
       // [r220] 第 214 维度 monocausal_attribution 补登记（单因归因）。
       // 同上：九处一次接齐。
       monocausal_attribution: mca,
+      // [r231] 第 215 维度 broken_window 补登记（破窗谬误）。
+      // 同上：九处一次接齐。
+      broken_window: bwf,
+      // [r231 接手 r234] 第 221 维度 automation_bias 补登记（算法崇拜）。
+      // 同上：九处一次接齐。
+      automation_bias: aub,
+      // [r231 接手] 第 216 维度 self_fulfilling_prophecy 补登记（自我应验预言）。
+      // 同上：九处一次接齐。
+      self_fulfilling_prophecy: sfp,
+      // [r232] 第 218 维度 appeal_to_future 补登记（诉诸未来）。
+      // 同上：九处一次接齐。
+      appeal_to_future: atf,
+      // [r232] 第 219 维度 appeal_to_rumor 补登记（传闻即事实）。
+      // 同上：九处一次接齐。
+      appeal_to_rumor: atr,
+      // [r232] 第 220 维度 confirmatory_evidence 补登记（证实性取证）。
+      // 同上：九处一次接齐。
+      confirmatory_evidence: cev,
+      // [r245] 第 223 维度 framing_effect 补登记（框架效应）。
+      // 同上：九处一次接齐。
+      framing_effect: fme,
+      // [r249] 第 224 维度 denominator_swap 补登记（分母替换谬误）。
+      // 同上：九处一次接齐。
+      denominator_swap: dsw,
+      // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
+      // 同上：九处一次接齐。
+      conditional_transposition: cnt,
+      // [r233] 第 222 维度 prosecutors_fallacy 补登记（检察官谬误）。
+      // 同上：九处一次接齐。
+      prosecutors_fallacy: prf,
       // [r162] 第 162 维度 incredulity 补登记（诉诸个人怀疑）。
       // 同上：九处一次接齐。
       incredulity: inc,
@@ -16132,6 +16414,39 @@ module.exports = {
   // [r219] 第 213 维度 researcher_degrees_of_freedom 导出（同先例，漏导出
   // 会让测试与 MCP handler 拿不到单维函数）。
   checkResearcherDegreesOfFreedom,
+  // [r228] 第 215 维度 anonymous_source_claim 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  checkAnonymousSourceClaim,
+  // [r232] 第 218 维度 appeal_to_future 导出（同先例，漏导出会让测试与
+  // MCP handler 拿不到单维函数）。
+  checkAppealToFuture,
+  // [r232] 第 219 维度 appeal_to_rumor 导出（同先例，漏导出会让测试与
+  // MCP handler 拿不到单维函数）。
+  checkAppealToRumor,
+  // [r232] 第 220 维度 confirmatory_evidence 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  checkConfirmatoryEvidence,
+  // [r245] 第 223 维度 framing_effect 导出（同先例，漏导出会让测试与
+  // MCP handler 拿不到单维函数）。
+  checkFramingEffect,
+  // [r249] 第 224 维度 denominator_swap 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  checkDenominatorSwap,
+  // [r249] 第 215 维度 conditional_transposition 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkConditionalTransposition,
+  // [r233] 第 222 维度 prosecutors_fallacy 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  checkProsecutorsFallacy,
+  // [r231] 第 215 维度 broken_window 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  detectBrokenWindow,
+  // [r231 接手] 第 216 维度 self_fulfilling_prophecy 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  detectSelfFulfillingProphecy,
+  // [r231 接手 r234] 第 221 维度 automation_bias 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  detectAutomationBias,
   // [r172] 第 170 维度 whole_part_transfer 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkWholePartTransfer,
