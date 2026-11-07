@@ -65,7 +65,7 @@ const DEV_HEADER_TARGET = /(?:响应头|response\s+headers?|严格传输|传输�
 //   调试输出 / verbose（开发期 verbosity 开关，与"日志"同为观测设施）
 // 边界守住两条：① 不加"密码/密钥/token/会话"等真实凭据；② 全句命中
 // SECURITY_BOUNDARY 时一票否决已先行，加这些词不会放进真安全边界。
-const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|校验|验证|检查|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr|杀毒软件|防病毒|antivirus|defender|日志)/i;
+const DEV_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|校验|验证|检查|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr|杀毒软件|防病毒|antivirus|defender|日志|debug\s+logs?|build\s+logs?)/i;
 
 /** 绕过动词 */
 // [v6.7.123] 与 dangerous_instruction 命中侧动词表对齐。
@@ -121,7 +121,7 @@ const BYPASS_VERB = /(?:绕过|规避|跳过|忽略|关闭|关掉|关了|关一?
 // 第一版把「清一?下」放在「清了一?下」之后 → 同族分支不回溯，永远失配；
 // 第二版挪到前面但只写「下」 → 「清一次」这种同义频次词仍失配。
 // 正则里「一?X」形必须把**全部同义量词**收进字符类，漏一个就是静默失配。
-const CLEANUP_VERB = /(?:卸载|卸掉|卸载掉|卸了一?下|清空|清掉|清一?[下次数遍回回]|清了一?[下次数遍]|清理|清除|清除掉|擦掉|格式化(?![选项方法输出语法规则配置说明文档方式函数参数样式模板字段类型器])|重置|复位|抹掉|抹除|uninstall|deinstall|reset|wipe\s+logs?|truncat\w*)/i;
+const CLEANUP_VERB = /(?:卸载|卸掉|卸载掉|卸了一?下|清空|清掉|清一?[下次数遍回回]|清了一?[下次数遍]|清理|清除|清除掉|擦掉|格式化(?![选项方法输出语法规则配置说明文档方式函数参数样式模板字段类型器])|重置|复位|抹掉|抹除|删除|删掉|销毁|毁掉|uninstall|deinstall|reset|wipe\s+logs?|truncat\w*|delete|destroy|erase|remove|purge|clear)/i;
 
 // [第 208 轮] 上方三词（擦掉/格式化/清一遍族）与 truncat\w* 的同步来源：
 // 命中侧 di 动词表三份副本本轮补齐后，豁免侧必须同步，否则命中侧认得的动词
@@ -154,10 +154,10 @@ const COMMENT_VERB = /(?:注释掉|注释|注掉|commented[ ]?out|comments[ ]?ou
 // 边界实测：15 条良性（宿主+设施+清理）中 14 条本已 pass，此条补后 15/15；
 // 同形攻击 12 条不变（第 80 轮双向验收见
 // test/dangerous-instruction-cleanup-verb-round80.test.js）。
-const CLEANUP_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr|杀毒软件|防病毒|antivirus|defender|虚拟机|虚机|\bvm\b|virtual\s+machine|agent\b|build\s*日志|build\s*log|控制台|测试机|检查机|构建产物|构建缓存|调试环境|联调环境|复现环境|预发环境|\bstaging)/i;
+const CLEANUP_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr|杀毒软件|防病毒|antivirus|defender|虚拟机|虚机|\bvm\b|virtual\s+machine|agent\b|build\s*日志|build\s*log|控制台|测试机|检查机|构建产物|构建缓存|调试环境|联调环境|复现环境|预发环境|\bstaging|debug\s+logs?|build\s+logs?)/i;
 
 /** 清理豁免的安全词否决：句内出现这些词时，清理动作不许豁免。 */
-const CLEANUP_SECURITY = /(?:安全检查|安全警告|安全机制|安全策略|安全组|防火墙|鉴权|认证|授权|审计|身份验证|权限校验|权限检查|访问控制|越权|入侵|渗透|提权|防护|入侵检测|白名单|ACL|WAF|IDS|IPS|防火墙日志|firewall|auth(?:entication|orization)?|audit|sandbox|security|access\s+control|privilege\s+check|rbac)/i;
+const CLEANUP_SECURITY = /(?:安全检查|安全警告|安全机制|安全策略|安全组|防火墙|鉴权|认证|授权|审计|身份验证|权限校验|权限检查|访问控制|越权|入侵|渗透|提权|防护|入侵检测|白名单|ACL|WAF|IDS|IPS|防火墙日志|firewall|auth(?:entication|orization)?|audit|sandbox|security|access\s+control|privilege\s+check|rbac|系统日志|安全日志|访问日志|审计日志|操作日志|运行日志|登录日志|system\s+logs?|security\s+logs?|access\s+logs?|audit\s+logs?|operation\w*\s+logs?)/i;
 
 // 生产语境一票否决
 const PROD_CONTEXT = /(?:生产|线上|正式环境|prod\b|production|\blive\s+(?:server|database|db|env|environment|system|traffic)\b)/i;
