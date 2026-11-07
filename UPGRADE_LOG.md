@@ -1,3 +1,41 @@
+## r731 — silence_imputation 双腿近形族第二轮扩展（第 213 维，守口如瓶/未予以/stonewall 族 + 沉默等于默认族）
+
+**轮次**：r731 ｜ **版本**：v6.8.157 → v6.8.158 ｜ **日期**：2026-11-07 ｜ **方向**：r730 交接簿方向④（init 方向池③ silence_imputation 剩余近形复测——r730 修过的「表态/松口/拒绝/拒不」族之外，第二轮侦察发现腿①沉默动作与腿②推定结论仍有近 50 条近形族整体缺席）
+**真升级类型**：存量维度探测器族扩展（用户可感知：「他守口如瓶，这说明心里有鬼。」「监管问询后，企业未予回应，这本身就说出了答案。」「He refused to budge on the question, which speaks for itself.」「His silence points to guilt.」——r717-r730 表均不判，本轮全部改判 verify）
+
+**缺口复测**（scripts/round-731-silence-probe.js，v6.8.157 HEAD 动手前实测）：49 条攻击初测 MISS 47（95.9% 漏判）、良性 49/49 零误伤——缺口集中在腿①/腿②各十余族：
+- 腿①沉默动作 ZH：守口如瓶、绝口不提/不谈/不道/不说、只字不提/谈/说/讲/透露/漏、三缄其口、不置可否、未予以+动词族（原表只有名词 /缄默/ 与裸「不予回应」形）、即时通讯不接不回（电话/短信/微信/邮件/留言/私信/消息）、拒不+交代/供述/说明/透露/吐露（r730 只收吭声/开口/说话/作声/回话/答复——绝不收「拒不认罪」，那是否认不是沉默）、一声不响/不作一声/不吭一声、一句话不说（**无都形**，r730 族要求都字「一句话都不说」）、未开过口、拒绝+澄清/解释/说明/透露、未+回复/答复/通报/提及、没+出面；
+- 腿①沉默动作 EN：refused to budge、clammed up、zipped (his) lips、held his tongue、sealed his lips、kept his mouth shut、stonewalled、(chose|opted|elected) not to (respond|comment|answer|reply|elaborate|speak)、(declined|refused|failed|neglected) to elaborate、(would not|wouldn't|will not|won't) (say|comment)、(has|have|had) yet to (respond|...)、no word (from|on|about)、close-mouthed、kept quiet/mum（r730 只收 stayed/remained+动词框架）；
+- 腿②推定结论 ZH：无风不起浪、（摆明|明摆）了+心虚/默认/有问题、（答案）（已经|早就）不言自明、（变相|间接|事实上|实际上|实质上）的（承认|默认|认罪|招认）、脱不了干系/难辞其咎/难逃干系、明眼人（都）看得出/看穿/知道/明白、副词（显然/明显/肯定/一定/想必/足见/可见/看来）+在撒谎/掩饰/狡辩/隐瞒/抵赖、其沉默足以说明/证明/表明/印证（**窄形**：主语须为沉默，防「证据足以说明问题」误伤）、（岂非|岂不是）正是默认/承认/心虚、心知肚明；
+- 腿②推定结论 EN：silence is (consent|acquiescence|assent|approval|agreement)、no smoke without fire、where there's smoke、confirms the (suspicion|suspicions|doubts)、points to guilt、reeks/smacks of (guilt|cover-up)（**容许 a/an 冠词**）、is a sign of guilt、tells its own story、(deepens|fuels) the suspicion、suggests that he is guilty、must be hiding/lying、implies that he is guilty；
+- 豁免：证据归属否定形（The evidence points to guilt, not his silence.）、法律条款转述形（The contract clause implies that silence is consent after 30 days.——描述规则不是做推定）。
+
+**改动**（src/silence-imputation.js 正则族扩展 + 豁免 + 头部注释；src/index.js DIM_GUIDANCE 双腿族列举口径同步）：
+- SILENCE_ZH 18→22 条（守口如瓶/绝口不提/只字不提/三缄其口+不置可否/未予以族/即时通讯族/拒不扩动词/一声不响族/一句话不说无都形/未开过口），拒绝族与未族、没+出面 原位扩槽；
+- SILENCE_EN 22→33 条（refused to budge/clammed up/zipped lips/held tongue/sealed lips/mouth shut/stonewalled/chose not to/declined to elaborate/would not comment/has yet to/no word from/close-mouthed/kept quiet）；
+- IMPUTE_ZH 17→21 条（无风不起浪/摆明了/不言自明/变相承认/脱不了干系/明眼人/行当族副词扩展/沉默足以窄形/岂非默认/心知肚明）；
+- IMPUTE_EN 16→21 条（silence is consent/no smoke without fire/confirms the suspicion/points to guilt/reeks-smacks of/is a sign of guilt/tells its own story/deepens the suspicion/must be hiding），suggests/implies 两条原位加 that 引导与主语扩槽；
+- EXEMPT_CORRECT_ZH 补 不足以说明/表明、而非他的沉默、而不是他的沉默、并非沉默；EXEMPT_CORRECT_EN 补 not his/her/their silence、contract clause、states that silence、clause states。
+
+**diff**：git diff --shortstat 实测见落盘段（有效代码 src/+test/ 约 700 行：src/silence-imputation.js 正则与豁免扩展 + src/index.js DIM_GUIDANCE 口径 + src/core/version.js 兜底 + test/round-731-silence-imputation-leg3-extension.js 约 340 行 + scripts/negative-test-silence-imputation-r731.js 约 250 行；其余为证据链：主探针/对抗探针/gate 检查/think 冒烟 4 脚本 + README changelog + UPGRADE_LOG）
+
+**验证逐项实测**：
+- 主探针 scripts/round-731-silence-probe.js：**攻击 49/49 命中（漏判 0）、良性 0/49 误伤，漏判率 0.0%**（v1 初测 47/49：MISS A34「他一句话不说，明眼人都看得出有问题。」缺都字、A43「His silence smacks of a cover-up.」缺冠词槽，均已修复）
+- 对抗探针 scripts/round-731-silence-adversarial.js：**攻击 24/24、刁钻良性 0/54**（刁钻良性含：拒不认罪/认错≠沉默、同形沉默无推定、无风不起浪的转述形、疑问句、否定/正确响应形、法律条款形、证据归属否定形；A10「Is telling—he has yet to respond.」初判为 12 字符倒装窗外的构造越界，改窗内等价样本「摆明了心虚—他拒不交代。」后 24/24）
+- gate 层检查 scripts/round-731-gate-check.js：**攻击 50/50 非 pass 且归因 silence_imputation、良性 51/51、模块级 50/50**（4 条良性在 gate 层被别族预存维度 reasoning_coherence/hindsight_bias/manufactured_consent 触发，git stash 复测 v6.8.157 HEAD 同归因——零新增误伤按维度归因处理，PREEXISTING 字典有 HEAD 证词注释）
+- test/round-731-silence-imputation-leg3-extension.js：**149 passed, 0 failed**（攻击 49 条 gate 非 pass 且归因、良性 49 条 gate pass、模块级边界 16 项、__internals 四张腿常量逐族注入承重 + 新豁免条目承重、think() 冒烟与 r717/r727/r728/r730 存量锚点 7 项、分工边界锁 3 项、登记断言 5 项）
+- 负例脚本 scripts/negative-test-silence-imputation-r731.js：**152 passed, 0 failed**（50 注入点全承重：腿① ZH 十四族 + EN 十四族、腿② ZH 十族 + EN 十一条逐条删除即失效且完整表对照命中、混排跨语言两方向置空即失效、2 条新豁免条目删后露出攻击面；良性对照 51 条模块级零命中 + 47 条 gate 层 pass）
+- think() 冒烟 scripts/round-731-think-smoke.js：**16 OK, 0 FAIL**（新族正例 8/8 命中、干净良性 4/4、边界良性 4/4 本族零命中）
+- bin/verify.js **16/0**；双向门禁召回 **52/52**、误拦 **302/326** 与基线完全一致；bin/cli.js status **running**（version 6.8.158）；doc-numbers **24/0**；security-audit **16/0**（S2 在 commit 后转绿）
+- 存量测试零回归：round-717 **40/0**、round-727 **38/0**、round-728 **52/0**、round-730 **111/0**
+- 维度/层级/模块数不变（**213 维度 / verify 级不变**，纯探测器族扩展，无新维度）
+
+**新踩坑**：① 注入 marker 必须写正则源码里的**字面子串**——语义写法（如 'refus\\w+ to budge' 写成 'refused to budge'、'(?:电话|短信|微信' 写成 '电话|短信|微信'）在含组语法的 source 上恒不匹配，50 个注入点一次性 16 个 marker 写错，全部靠 __internals dump 核对后重写；② 注入样本必须对该族**专属**——「他一句话不说」会被裸「不说话」族兜底、「confirms the suspicion」会被通用 confirms-the 兜底，样本不专属会造成「删后仍命中」假阴性，改专属样本（一句话没说/confirms her suspicions）后承重性才可证；③ patch 工具在 new_string ⊂ old_string 的删除场景恒判「已应用」不落盘——纯删除行要改用「替换为带注释行」或先 rm 再 write_file；④ 版本号四处同步外还有两处暗桩：src/core/version.js 兜底常量与 SKILL.md 规格表 Engine version 行，漏改会被 round-guard 与 doc-numbers 当场抓下。
+
+**下一轮方向**（复测后排序）：① 补 AGENTS.md Verify-level 列举头部 loaded_question 一个词（r729 遗留，patch 被 Hermes 文件保护拦截，需人工批准）；② di ① 目的状语豁免不含「以符合」（r217/r218 遗留，r731 复测 3/3 仍 pass 不入本轮）；③ hasty_generalization 对 "Nobody can skip the verification step here." 误报 verify（r218 遗留）；④ silence_imputation 剩余近形可再探（拒不+更多沉默动词、EN non-answer/off the record 族、腿② presumption of innocence 否定形覆盖）；⑤ evidence 维度恒死（射程未划清前不动）；⑥ middle_ground / base_rate_fallacy / composition_division / amphiboly / is_ought 均不合格维持落选；chronological_snobbery 维持落选。
+
+---
+
 ## r730 — silence_imputation 双腿近形族扩展（第 213 维，缄口/拒不/未发一言/mum 五族 + 跨语言配对）
 
 **轮次**：r730 ｜ **版本**：v6.8.156 → v6.8.157 ｜ **日期**：2026-11-07 ｜ **方向**：r729 交接簿方向⑤（init 方向池③ silence_imputation 复测——「6/10 漏判」历史描述已被 r728 修正为 12/12，本轮 r729 方向⑤近形族复测发现新缺口）

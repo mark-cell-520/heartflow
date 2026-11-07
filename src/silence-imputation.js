@@ -2,6 +2,21 @@
  * src/silence-imputation.js — 「沉默推定 / 诉诸沉默谬误」检测器
  * （第 213 个判别维度，r717）
  *
+ * [r731] 现状：腿①/腿②第二轮近形族扩展后（r730→r731），探针 scripts/
+ * round-731-silence-probe.js 实测 49 条候选攻击 MISS 47（95.9%）、良性
+ * 49/49 零误伤；r730 存量攻击 33/33 命中、r730/r728/r727 存量良性
+ * 零误伤不变。r731 新增：腿① ZH 守口如瓶/绝口不提/只字不提/三缄其口/
+ * 不置可否/未予+动词/即时通讯不接不回 + 拒不族扩 交代|供述|说明|透露|
+ * 吐露（绝不收认罪/认错/承认/道歉——那是否认不是沉默）；腿① EN
+ * refused to budge/clammed up/zipped/held his tongue/sealed his lips/
+ * kept his mouth shut/stonewalled/chose not to/declined to elaborate/
+ * would not comment/has yet to/no word from/close-mouthed/non-response/
+ * kept quiet；腿② ZH 无风不起浪/摆明了/不言自明/变相承认/脱不了干系/
+ * 明眼人/显然是在掩饰/沉默足以/岂非默认；腿② EN silence is consent/
+ * no smoke without fire/confirms the suspicion/points to guilt/reeks of
+ * guilt/smacks of/is a sign of guilt/tells its own story/deepens the
+ * suspicion/suggests that he is guilty/must be hiding。
+ *
  * [r717 立项] 方向池复测（scripts/round-717/diag-pool.js，口径与
  * scripts/probe-r216.js 完全一致，引擎 v6.8.146）：
  *   silence_imputation 攻击样本 10 条中 6 条 gate.action=pass
@@ -120,12 +135,12 @@ const SILENCE_ZH = [
   // 否认/澄清缺席：都没出来否认 / 没否认 / 都不出来澄清 / 未否认 / 未曾否认
   // [r728] 补 表态/松口/给（个）说法 + 前缀 始终/依然/仍然——「他迟迟
   // 没有表态，所以这事是真的。」类最常用沉默形原表不收。
-  /(?:都|也|还|一直|至今|到现在|迟迟|始终|依然|仍然)?没(?:有)?(?:出来)?(?:否认|澄清|回应|回答|解释|辟谣|发声|作声|吭声|表态|松口|给个?说法|说法|交待|交代)/,
+  /(?:都|也|还|一直|至今|到现在|迟迟|始终|依然|仍然)?没(?:有)?(?:出来|出面)?(?:否认|澄清|回应|回答|解释|辟谣|发声|作声|吭声|表态|松口|给个?说法|说法|交待|交代)/,
   // [r728] 否定填充形：不肯/不愿/不愿意/不予/予 + 动词（「始终不肯松口」
   // 「不予回应」「拒不表态」的「拒不」由下方拒绝族覆盖），动词表补
   // 表态/松口/给（个）说法/置评。
-  /(?:都|也|还|一直|至今|到现在|迟迟|始终|依然|仍然)?不(?:出来|肯|愿|愿意|予以|予)?(?:否认|澄清|回应|回答|解释|辟谣|发声|作声|吭声|置评|表态|松口|给个?说法)/,
-  /未(?:曾)?(?:否认|澄清|回应|回答|解释|置评|发声|表态|松口)/,
+  /(?:都|也|还|一直|至今|到现在|迟迟|始终|依然|仍然)?不(?:出来|出面|肯|愿|愿意|予以|予)?(?:否认|澄清|回应|回答|解释|辟谣|发声|作声|吭声|置评|表态|松口|给个?说法)/,
+  /未(?:曾)?(?:否认|澄清|回应|回答|解释|置评|发声|表态|松口|回复|答复|通报|提及)/,
   // [r730] 「未发一言/未置一词/未置一辞」族：一（言/语/词/声/辞/字）
   // 全缺席形，与上面「未+单动词」族错开（未否认 是否认缺席，未发一言
   // 是整句话缺席）。
@@ -135,7 +150,7 @@ const SILENCE_ZH = [
   /不(?:回答|回应|否认|澄清|置评|解释|出声|发声|作声|吭声|说话|言语|作回应|回|表态|松口|给个?说法)/,
   // 拒绝/回避动作：拒绝回应 / 避而不答 / 避谈 / 一言不发 / 缄默 / 沉默不语
   // [r728] 拒绝族补同族动词 表态/松口/给（个）说法（「公司拒绝表态」）。
-  /拒绝(?:回应|回答|采访|置评|发言|开口|表态|松口|给个?说法)/,
+  /拒绝(?:回应|回答|采访|置评|发言|开口|表态|松口|给个?说法|澄清|解释|说明|透露|回复|答复)/,
   /避而不(?:答|谈)/,
   // [r728] 回避问题/不搭话/不接茬：同族沉默动作（无推定腿即良性，
   // 「双方仍在回避敏感话题，谈判还在继续」实测零误伤）。
@@ -159,17 +174,42 @@ const SILENCE_ZH = [
   // ⑤ 「（未/没）开过口」族——问过但始终没开口。
   /缄口(?:不言|不语|不谈|不答|不提)?/,
   /闭口(?:不言|不语|不谈|不答|不提|不说)?/,
-  /拒不(?:吭声|开口|说话|作声|回话|答复)/,
-  /(?:一声不吭|一声不出|不作一声)/,
+  /拒不(?:吭声|开口|说话|作声|回话|答复|回答|答话|交代|供述|说明|透露|吐露)/,
+  /(?:一声不吭|一声不出|一声不响|不作一声|不吭一声)/,
   /(?:一)?(?:句|字|个|声)?(?:话)?都(?:没|不)(?:有)?(?:说|讲|透露)/,
   /(?:未|没|没有|不曾)(?:有)?(?:曾)?(?:开|张)过?口/,
+  // [r731] 腿① ZH 第二轮近形族扩展（r730 下一轮方向④，探针 scripts/
+  // round-731-silence-probe.js 实测 49 条候选攻击 MISS 47、良性 49/49
+  // 零误伤）：
+  // ① 守口如瓶/绝口不提/只字不提——成语族沉默动作（原表只有缄口/
+  //    闭口族，「守口如瓶」这类高频表述整体缺席）；
+  // ② 三缄其口；
+  // ③ 不置可否/未置可否——不置可否=拒绝对是非表态，诉诸沉默的
+  //    核心形（「他不置可否，等于默认了」）；
+  // ④ 「未予+回应/置评/答复」族——未+予（予以）中间隔「予」字，
+  //    原「未+单动词」族吃不上（「企业未予回应」）；
+  // ⑤ 即时通讯族——电话/微信/短信/邮件不接不回（当代最常用
+  //    沉默证据形，「打电话他不接、微信不回」）。
+  // ⑥ 「一（句/字）话不说」无都形——r730 族要求「都」打头
+  //    （「一句话都没说」），「他一句话不说，明眼人都看得出有问题」
+  //    这类无「都」高频形整句漏判（r731 探针 MISS）。量词必留
+  //    （一+句/字/个/声），不放宽到裸「不说」——「不说谎/不认识」
+  //    会误伤。
+  /一(?:句|字|个|声)?话?(?:也|都)?(?:没|不)(?:有)?(?:说|讲|透露)/,
+  /守口如瓶/,
+  /绝口(?:不提|不谈|不道|不说)/,
+  /只字(?:不|未|没)(?:提|谈|说|讲|透露|漏)/,
+  /三缄其口/,
+  /[不未]置可否/,
+  /未(?:曾)?予以?(?:回应|答复|回答|置评|解释|澄清|通报|回复|披露|提及)/,
+  /(?:电话|短信|微信|邮件|留言|私信|消息)(?:他|她|对方)?(?:也|都)?(?:不|没)(?:接|回|回复|答复|搭理|理)/,
   // 沉默本体（名词性出现，配合腿②使用）
   /沉默/,
 ];
 const SILENCE_EN = [
   /no (?:denial|response|reply|comment|answer|statement)\b/i,
   /without (?:a )?(?:denial|response|reply|comment|answer)/i,
-  /refused to (?:answer|respond|comment|speak)/i,
+  /refus\w+ to (?:answer|respond|comment|speak|elaborate)/i,
   /declined to (?:comment|respond|answer|speak)/i,
   // [r730] 腿① EN 近形族（r730 探针 MISS）：
   // ① mum 只收动词框架——stayed/kept/remained/been/was + mum，或
@@ -188,7 +228,11 @@ const SILENCE_EN = [
   /\b(?:offered|gave|provided|issued|released) no (?:explanation|comment|response|reply|apology|statement)\b/i,
   /did(?:n't| not) (?:deny|respond|answer|comment|reply)/i,
   /(?:has|have) not (?:denied|responded|commented|answered|replied)/i,
-  /stayed silent|remained silent|kept silent/i,
+  /stayed silent|remained silent|kept silent|stays? silent|keeps? silent/i,
+  // [r731] kept/stayed quiet|mum 与 present 形 silent——原表只有过去
+  // 三态（stayed/remained/kept silent），「he stays silent」「she kept
+  // quiet」这类现在态/口语态整体漏判（r731 探针 MISS）。
+  /\b(?:kept|keeps|keeping|stayed|stays|staying|remained|remains) (?:quiet|mum|silent)\b/i,
   /\bsilence\b|\bsilent\b/i,
   // [r727] said nothing / nothing to say：英文沉默的口语形，原表只收
   // no response / declined to 正式形（r727 对抗探针 "He said nothing,
@@ -205,6 +249,32 @@ const SILENCE_EN = [
   /no (?:explanation|account|justification) (?:has been|was|were) (?:offered|given|provided|forthcoming)/i,
   // [r728 对抗补] has not offered any explanation 形（r728 对抗探针 MISS）
   /(?:has|have) not (?:offered|given|provided) (?:any |an? )?(?:explanation|account|justification)/i,
+  // [r731] 腿① EN 第二轮近形族扩展（r731 探针 MISS 47 中 EN 侧 13 条）：
+  // ① refused to budge——r728 只收 would not/didn't/won't budge 助
+  //    动词形，「refused to budge」实义动词形漏判；
+  // ② clammed up / zipped his lips——口语缄口形，原表零覆盖；
+  // ③ held his tongue / sealed his lips / kept his mouth shut；
+  // ④ stonewalled——蓄意阻挠式沉默（stonewalling）；
+  // ⑤ chose/opted not to respond / declined to elaborate；
+  // ⑥ would not say|comment——拒绝评论的 will 系（原表只有 did not）；
+  // ⑦ has yet to respond——「至今未回应」的英文对应形；
+  // ⑧ no word from|on——「没有消息/没有说法」名词形；
+  // ⑨ close-mouthed——tight-lipped 同义词，原表只收后者；
+  // ⑩ non-response——名词形沉默（「his non-response」）。
+  /refus\w+ to budge/i,
+  /\bclam(?:med|s)? up\b/i,
+  /\bzipped (?:his|her|their|its)? ?(?:lips?|it)\b/i,
+  /\bheld (?:his|her|their|its) tongue\b/i,
+  /\bsealed (?:his|her|their) lips\b/i,
+  /\bkept (?:his|her|their) mouth shut\b/i,
+  /\bstonewall(?:ed|ing|s)?\b/i,
+  /\b(?:chose|opted|elected) not to (?:respond|comment|answer|reply|elaborate|speak)\b/i,
+  /\b(?:declined|refused|failed|neglected) to elaborate\b/i,
+  /\b(?:would not|wouldn't|will not|won't) (?:say|comment|respond|answer|reply|elaborate|speak)\b/i,
+  /\b(?:has|have|had) yet to (?:respond|comment|answer|reply|deny|confirm|elaborate)\b/i,
+  /\bno word (?:from|on|about|regarding|out of)\b/i,
+  /\bclose[- ]?mouthed\b/i,
+  /\bnon[- ]?respons(?:e|es)\b/i,
 ];
 
 // ── 腿② 推定结论（沉默=默认/承认/心虚/证明） ───────────────────────
@@ -233,7 +303,7 @@ const IMPUTE_ZH = [
   // 问题/说明了很多问题」这类把沉默本身当问题证据的总结句不在槽内
   // （r727 探针 4 条漏判中 1 条根因在此）。
   /这(?:本身)?(?:就)?说明(?:了)?(?:一切|很多|不少|某种)?问题/,
-  /说明了?一切|心里都清楚|答案已经很明显|说明了一切问题/,
+  /说明了?一切|心里都清楚|心知肚明|答案已经很明显|说明了一切问题/,
   // [r730] 「（这）本身就说出了答案」族：答案名词前有「说/讲/给+出了」
   // 动词段，原族只收动词直连（就是答案），「就说出了答案」插「就」+
   // 「说出了」双重阻断（r730 探针 MISS 后补）。
@@ -246,10 +316,37 @@ const IMPUTE_ZH = [
   // [r730] 推定对象是行径族：说明/证明 + （他/她/当事人）+ 在撒谎/
   // 掩饰/狡辩/抵赖/隐瞒/逃避——推定结论不是「默认」而是具体行为，
   // 原表两个槽都吃不上（r730 探针「她不回应，说明她在撒谎」MISS）。
-  /(?:说明|证明|表明|印证|坐实)(?:了)?(?:他|她|他们|当事人)?在(?:撒谎|掩饰|狡辩|抵赖|隐瞒|逃避)/i,
+  // [r731] 副词前置形扩展：显然/明显/肯定/一定/想必/足见/可见/看来/
+  // 摆明 +（是）+ 在撒谎|掩饰……——「她绝口不提，显然是在掩饰」原表
+  // 要求 说明/证明 类动词打头，副词开头的行径推定整句漏判（r731 探针
+  // MISS 两条同根因）。
+  /(?:说明|证明|表明|印证|坐实|显然|明显|肯定|一定|想必|足见|可见|看来|摆明)(?:了)?(?:是)?(?:他|她|他们|当事人)?在(?:撒谎|掩饰|狡辩|抵赖|隐瞒|逃避)/i,
   // [r730] 印证/证实/坐实 + 直接宾语（指控/罪名/举报/丑闻/传言）——
   // 不带「是真的」尾巴的坐实形（「他拒绝回答，这就印证了指控」）。
   /(?:印证|证实|坐实)(?:了)?(?:指控|罪名|举报|丑闻|传言)/,
+  // [r731] 腿② ZH 第二轮近形族扩展（r731 探针 MISS）：
+  // ① 无风不起浪——「无风不起浪」是中文里把无证据当证据的俗语，
+  //    与英文 no smoke without fire 对位，原表整体缺席；
+  // ② 摆明了/明摆着+心虚|默认——「摆明了心里有鬼」，副词族漏了
+  //    「摆明」这个口语高频词；
+  // ③ 不言自明——「答案已经不言自明」；
+  // ④ 变相/间接/事实上承认——「她不回应，就是变相承认」，等式化
+  //    动词后插了修饰语，两槽都吃不上；
+  // ⑤ 脱不了干系/难辞其咎——把不澄清当担责的推定形；
+  // ⑥ 明眼人都看得出——「明眼人都看出有问题」；
+  // ⑦ 沉默+足以+说明/证明——窄形：必须沉默主语紧跟足以（允许
+  //    逗号），避免误伤「证据足以说明问题，不需要他的沉默」这类
+  //    证据前置句（足以在前、沉默在后的倒装不判）；
+  // ⑧ 岂非/岂不是+默认/承认——反问变体（疑问整句已豁免，这里收
+  //    非疑问语气形「岂非正是默认」）。
+  /无风不起浪/,
+  /(?:摆明|明摆)(?:了|着)?(?:是|其|他|她|当事人)?(?:心虚|心里有鬼|默认|承认|真的|属实|有问题)/,
+  /(?:答案)?(?:已经|早就)?不言自明/,
+  /(?:变相|间接|事实上|实际上|实质上)的?(?:承认|默认|认罪|招认)/,
+  /(?:脱不了|脱不掉)干系|(?:难辞|难逃)其咎|难逃干系/,
+  /明眼人(?:都|一看便|一看就)?(?:看得出|看穿|知道|明白|能看出)/,
+  /(?:其|他|她|这|此|当事人)?的?沉默(?:本身)?[，,。]?(?:就)?足以(?:说明|证明|表明|印证)/,
+  /(?:岂非|岂不是)(?:正是|就是|等于)?(?:默认|承认|认罪|心虚)/,
 ];
 const IMPUTE_EN = [
   /must be true|has to be true/i,
@@ -269,7 +366,35 @@ const IMPUTE_EN = [
   // ② suggests + 代词 + guilty/lying——上一行只收 suggests guilt 直连，
   //    「suggests he's guilty」中间隔代词。
   /confirms? (?:his|her|their|its|the) guilt/i,
-  /suggests? (?:he|she|they|it|his|her|their)(?:'s| is| are)?\s*(?:guilty|lying|the guilt)/i,
+  /suggests? (?:that )?(?:he|she|they|it|his|her|their)(?:'s| is| are)?\s*(?:guilty|lying|the guilt)/i,
+  // [r731] implies + that + 代词 + guilty/lying——上一行 implies 族要求
+  // 句中出现 guilty 名词，「implies that he is lying」无 guilt 词整体
+  // 漏判（r731 探针 MISS）。
+  /implies? (?:that )?(?:he|she|they|it)(?:'s| is| are)?\s*(?:guilty|lying|hiding|concealing)/i,
+  // [r731] 腿② EN 第二轮近形族扩展（r731 探针 MISS 11 条）：
+  // ① silence is consent/acquiescence——「沉默即同意」拉丁法谚
+  //    （qui tacet consentire videtur）的英文化身，诉诸沉默的
+  //    教科书结论形，原表零覆盖；
+  // ② no smoke without fire / where there is smoke——「无风不起浪」
+  //    的英文对位俗语；
+  // ③ confirms the suspicion(s)/doubts——r730 只收 confirms his
+  //    guilt 属格形，confirms the suspicion 整体漏判；
+  // ④ points to guilt / reeks of guilt / smacks of a cover-up/
+  //    is a sign of guilt——「指向罪/散发罪/有罪之相」三族；
+  // ⑤ tells its own story——「其本身说明问题」对位；
+  // ⑥ deepens the suspicion——「加深怀疑」推定形；
+  // ⑦ must be hiding/lying——沉默→隐瞒的直接推断。
+  /silence (?:is|means|implies|equals|signifies|constitutes|denotes) (?:consent|acquiescence|assent|approval|agreement)/i,
+  /no smoke without fire/i,
+  /where there(?:'s| is) smoke/i,
+  /confirms? (?:the |his |her |their )?(?:suspicion|suspicions|doubts)\b/i,
+  /points? (?:to|towards?) (?:his |her |their |the )?guilt/i,
+  /reeks? of (?:a |an )?(?:guilt|cover-?up)/i,
+  /smacks? of (?:a |an )?(?:guilt|cover-?up)/i,
+  /(?:is|are) (?:a |an )?(?:clear |sure |obvious |tell-?tale )?sign of (?:guilt|cover-?up)/i,
+  /tells? its own (?:story|tale)/i,
+  /deepens? (?:the |his |her |their )?(?:suspicion|suspicions|doubts)\b/i,
+  /(?:must|has(?: got)? to) be (?:hiding|lying|concealing|covering|guilty)/i,
 ];
 
 // ── 豁免：概念/教学转述 ────────────────────────────────────────────
@@ -292,6 +417,10 @@ const EXEMPT_CORRECT_ZH = [
   '不能证明', '无法证明', '不足见', '不能足见', '不足以见',
   '不表明', '不能印证', '不能证实', '不等于撒谎', '不等于掩饰',
   '不得推定', '不可推定', '不能想当然', '不见得',
+  // [r731] 新腿②族对位否定形：「沉默足以说明」被否定（不足以说明/
+  // 不足以表明）、「脱不了干系」被否定（脱不了干系的否认形）、
+  // 「无风不起浪」被否定（并非无风不起浪）。
+  '不足以说明', '不足以表明', '而非他的沉默', '而不是他的沉默', '并非沉默',
   '是当事人的权利', '有权不', '有权保持沉默', '有权拒绝', '律师建议', '法律程序',
   // [r728] '不给' 收窄为具体形：原泛化条目会把「他不给说法，这本身就
   // 说明问题」整体误判为正确响应（沉默推定攻击句被豁免）。r717 原意
@@ -308,6 +437,14 @@ const EXEMPT_CORRECT_EN = [
   // proves nothing / does not|cannot confirm / does not suggest。
   'cannot be taken as', 'is no proof', 'proves nothing',
   'does not confirm', 'cannot confirm', 'does not suggest', 'not to be taken as',
+  // [r731] silence is consent 否定形 + 「不是他的沉默」证据归属否定
+  // （「The evidence points to guilt, not his silence.」——证据前置、
+  // 沉默被明确排除，正确响应形）。
+  'is not consent', 'not consent', 'not his silence', 'not her silence', 'not their silence',
+  // [r731] 法律条款转述形：合同条款规定沉默即同意（描述规则本身，
+  // 不是本案推定——「The contract clause implies that silence is
+  // consent after 30 days.」类必须放过）。
+  'contract clause', 'states that silence', 'clause states',
 ];
 
 function anyHit(list, text) {
