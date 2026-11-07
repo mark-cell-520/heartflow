@@ -269,7 +269,7 @@ const ALL_BENIGN = BENIGN_BARE.concat(BENIGN_RELAY, BENIGN_LEGACY);
 test('D1 变异守卫一：摘掉「总之」分支后 14 条应回落到 2 条（判据层承重）', () => {
   const tmp = copySrc('dropzongzhi');
   try {
-    mutateOf(path.join(tmp, 'src', 'index.js'), '|总之(?:是)?(?:因为|由于)', '');
+    mutateOf(path.join(tmp, 'src', 'index.js'), '|总之[，,]?(?:是)?(?:因为|由于)', '');
     assert.strictEqual(countHitsIn(tmp, ATTACK_ZONGZHI), 2,
       '摘掉总之分支后攻击句未回落到 2（说明该分支不承重）');
     assert.strictEqual(countHitsIn(tmp, ATTACK_WANGCAI), ATTACK_WANGCAI.length, '摘掉总之分支后旺财族塌陷');
@@ -281,7 +281,7 @@ test('D2 变异守卫二：摘掉转述归责分支后 8 条应回落到 0 条�
   const tmp = copySrc('droprelay');
   try {
     mutateOf(path.join(tmp, 'src', 'index.js'),
-      '|(?:都说是|据说|听说|传闻)(?:是)?[^。，,]{0,12}(?:因为|由于|的功劳)', '');
+      '|(?:都说是|据说|听说|传闻)(?:是)?(?:[^。，,]{0,12}|[^。，,]{0,8}[，,][^。，,]{0,8})(?:因为|由于|的功劳)', '');
     assert.strictEqual(countHitsIn(tmp, ATTACK_RELAY), 0,
       '摘掉转述分支后攻击句未全部回落（说明该分支不承重）');
     assert.strictEqual(countHitsIn(tmp, ATTACK_ZONGZHI), ATTACK_ZONGZHI.length, '摘掉转述分支后总之族塌陷');
@@ -342,9 +342,10 @@ test('F1 PC_ATTRIB_ZH 已含三个新断言词族，既有分支一个没少', (
   const src = fs.readFileSync(SRC, 'utf8');
   const line = src.split('\n').find(l => l.includes(ANCHOR_OF));
   assert.ok(line, '找不到 PC_ATTRIB_ZH 定义行');
-  // 三个新分支
-  assert.ok(line.includes('总之(?:是)?(?:因为|由于)'), '缺「总之」族分支');
-  assert.ok(line.includes('(?:都说是|据说|听说|传闻)(?:是)?[^。，,]{0,12}(?:因为|由于|的功劳)'), '缺转述归责族分支');
+  // 三个新分支（[v6.8.165 第 237 轮] r237 给「总之」臂与转述臂放行夹逗号，
+  // 字面量锚点同源同步，行为断言一个没动）
+  assert.ok(line.includes('总之[，,]?(?:是)?(?:因为|由于)'), '缺「总之」族分支');
+  assert.ok(line.includes('(?:都说是|据说|听说|传闻)(?:是)?(?:[^。，,]{0,12}|[^。，,]{0,8}[，,][^。，,]{0,8})(?:因为|由于|的功劳)'), '缺转述归责族分支');
   assert.ok(line.includes('|旺了?财|'), '缺「旺了?财」获益词');
   // 既有分支一个不许少、一个不许改
   for (const w of ['显然', '可见', '说明', '看来', '证明', '直接决定', '这才是[^。]{0,8}的?原因',
