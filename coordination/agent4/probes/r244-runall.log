@@ -1,0 +1,2196 @@
+
+=== HeartFlow module tests ===
+
+CodeWriter / CodeGenerator / HeartLogic / DesireCognition — 模块已清理
+
+=== 动态接入其余测试文件 ===
+共 647 个测试文件：并发池 560 + 串行车道 87（JOBS=4，可调 1-16）
+串行车道 = 变更测试（写 src/）+ MCP 服务类，防并发互踩
+
+[1/647]   KnowledgeOntology
+
+[2/647]   KnowledgeQuery
+
+[3/647]   ClassicsValueMapper
+
+[4/647]   ClassicsRules
+测试结果: 10 通过, 0 失败, 共 10 个
+
+[5/647]   DualPerspectiveAuditor
+测试结果: 10 通过, 0 失败, 共 10 个
+
+[6/647]   SignalAbsorber
+dual-perspective: 11 通过, 0 失败
+
+[7/647]   AgentBoundaryGuard
+signal-absorber: 22 通过, 0 失败
+
+[8/647]   MetacognitiveExecutive
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[9/647]   RecoveredModules
+  ✗ searchClassicsBatch 多关键词合并且去重: should have hits
+classics-rules: 19 通过, 1 失败, 共 20 个
+
+[10/647]   RecoveredModules2
+  (无输出)
+
+[11/647]   KnowledgeGraphAdapter
+  [重试] RecoveredModules: 子进程零输出被中断（环境噪声），重跑一次
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[12/647]   SourceAnnotator
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[13/647]   SecurityAudit
+  [异常] RecoveredModules: Command failed: node /data/workspace/heartflow/test/recovered-modules.test.js
+
+[14/647]   IdentityCore
+  (无输出)
+
+[15/647]   BigFivePersonality
+测试结果: 9 通过, 0 失败, 共 9 个
+
+[16/647]   SelfModel
+测试结果: 12 通过, 0 失败, 共 12 个
+
+[17/647]   LogicReasoning
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[18/647]   ReflectionLoop
+安全审计回归: 16 通过, 0 失败, 共 16 个
+
+[19/647]   ModuleRegistry (P4)
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[20/647]   RouteWhitelist (P4)
+测试结果: 9 通过, 0 失败, 共 9 个
+
+[21/647]   SafeFS (P4)
+测试结果: 7 通过, 0 失败, 共 7 个
+
+[22/647]   · 35dim-integration.test.js
+测试结果: 13 通过, 0 失败, 共 13 个
+
+[23/647]   · a2m-notify-http.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[24/647]   · a2m-notify.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[25/647]   · absolute-claim-en.test.js
+  (无输出)
+
+[26/647]   · action-tracker.test.js
+  ✅ 验签：合法 RSA2 签名通过
+  ✅ handleNotify：验签通过后正确入账
+  ✅ handleNotify：验签失败返回 failure 且不改状态
+
+[27/647]   · active-inference-efe.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[28/647]   · adaptive-controller.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[29/647]   · adversarial-synthesis.test.js
+  (无输出)
+
+[30/647]   · adversarial-upgrade.test.js
+测试结果: 10 通过, 0 失败, 共 10 个
+
+[31/647]   · adversarial-variant-language-coverage.test.js
+  (无输出)
+
+[32/647]   · adversarial-variant.test.js
+测试结果: 30 通过, 0 失败, 共 30 个
+
+[33/647]   · affective-forecast.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[34/647]   · ai-writing-tell-co-occurrence.test.js
+测试结果: 16 通过, 0 失败, 共 16 个
+
+[41/647]   · ai-writing-tell-zh-en-mixing-round50.test.js
+  (无输出)
+
+[42/647]   · ai-writing-tell.test.js
+结果: 90 通过, 0 失败, 共 90 个
+
+[43/647]   · anchoring-effect.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[44/647]   · anonymous-source.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[45/647]   · api-surface-consistency.test.js
+结果: 3 通过, 0 失败, 共 3 个
+
+[46/647]   · appeal-authority-first-person-r227.test.js
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[47/647]   · appeal-to-future.test.js
+测试结果: 14 通过, 0 失败, 共 14 个
+
+[48/647]   · assertion-quality-guard.test.js
+结果: 3 通过, 0 失败, 共 3 个
+
+[49/647]   · assertions.test.js
+  ✓ isEqual 不等返回失败
+  ✓ throws 无异常则失败
+测试结果: 9 通过, 0 失败, 共 9 个
+
+[50/647]   · atomic-write.test.js
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[51/647]   · audit-regression.test.js
+结果: 15 通过, 0 失败, 共 15 个
+
+[52/647]   · audit-wiring.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[53/647]   · auto-rules.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[54/647]   · automation-bias.test.js
+53 通过, 0 失败
+
+[55/647]   · bad-faith-en-r226.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[56/647]   · bad-faith-feigned-discussion-round52.test.js
+  (无输出)
+
+[57/647]   · bad-faith-gaps-round88.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[58/647]   · bad-faith-narrative-round86.test.js
+45 通过, 0 失败
+
+[59/647]   · behavior-tracker.test.js
+behavior-tracker: 1 通过, 0 失败, 共 1 个
+
+[60/647]   · being-logic.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[61/647]   · benign-mixed-benchmark.test.js
+  (无输出)
+
+[62/647]   · benign-nonpass-calibration.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[63/647]   · bidirectional-guard.test.js
+  ✅ 基线维度全部丢失 → lostDims 非空 → 应判失败
+  ✅ 部分退化（丢 1 维）→ lostDims 长度 1 → 仍判失败
+  ✅ 新增维度不导致失败（只查丢失，不查新增）
+结果: 12 通过, 0 失败, 共 12 个
+
+[64/647]   · blindspot-upgrade.test.js
+结果: 28 通过, 0 失败, 共 28 个
+
+[65/647]   · boot-check.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[66/647]   · broken-window-fallacy.test.js
+结果: 5 通过, 0 失败, 共 5 个
+
+[67/647]   · budget.test.js
+  (无输出)
+
+[68/647]   · bulk-export-en-couple-r381.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[69/647]   · bullshit-engineering-context.test.js
+结果: 11 通过, 0 失败, 共 11 个
+
+[70/647]   · capability-abstraction.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[71/647]   · capability-guard.test.js
+  [异常] · bulk-export-en-couple-r381.test.js: Command failed: node /data/workspace/heartflow/test/bulk-export-en-couple-r381.test.js
+
+[72/647]   · check-confidence-calibration.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[74/647]   · code-security-command-injection.test.js
+测试结果: 22 通过, 0 失败, 共 22 个
+
+[75/647]   · code-security-dev-context-round28.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[76/647]   · code-security-negation-round73.test.js
+结果: 31 通过, 0 失败, 共 31 个
+
+[77/647]   · code-verifier.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[78/647]   · cognition-ground.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[79/647]   · cognitive-appraisal.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[80/647]   · cognitive-protocol.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[81/647]   · compliance/compliance.test.js
+结果: 29 通过, 0 失败, 共 29 个
+
+[82/647]   · confidence-annotator.test.js
+  (无输出)
+
+[83/647]   · confidence-calibrator.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[84/647]   · confidence-marketing-seq-round385.test.js
+结果: 14 通过, 0 失败, 共 14 个
+
+[85/647]   · confidence-superlative-en-mixed-r224.test.js
+  (无输出)
+
+[86/647]   · confidence-superlative-round29.test.js
+  [异常] · bullshit-engineering-context.test.js: Command failed: node /data/workspace/heartflow/test/bullshit-engineering-context.test.js
+
+[87/647]   · config-hooks.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[88/647]   · config-v2.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[89/647]   · config.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[90/647]   · continuous-learner-wiring.test.js
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[91/647]   · contradiction-antonym-en-r225.test.js
+测试结果: 40 通过, 0 失败, 共 40 个
+
+[92/647]   · contradiction-crossform-r292.test.js
+4 通过, 0 失败
+
+[93/647]   · cooperative-arbitration.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[94/647]   · core/code-verifier.test.js
+3 通过, 0 失败, 共 3 个
+
+[95/647]   · core/core.test.js
+测试结果: 10 通过, 0 失败, 共 10 个
+
+[96/647]   · core/heartflow.test.js
+{"ts":"2026-11-07T12:37:32.583Z","module":"memory_vault","event":"privacy","msg":"数据不上传、不联网，只通过心虫对话读取"}
+
+[97/647]   · core/openalex-client.test.js
+
+[98/647]   · core/output-checklist.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[99/647]   · core/path-guard.test.js
+path-guard tests...
+path-guard: ALL PASSED ✅
+
+[100/647]   · core/platform-adapter.test.js
+
+[101/647]   · core/postprocess-hooks.test.js
+
+[102/647]   · core/preference-guard.test.js
+
+[103/647]   · core/request-hooks.test.js
+
+[104/647]   · core/self-diagnostic.test.js
+  (无输出)
+
+[105/647]   · core/state-snapshot.test.js
+
+[106/647]   · core/utils.test.js
+
+[107/647]   · core/verification-engine.test.js
+
+[108/647]   · core/version.test.js
+
+[109/647]   · counterfactual-verifier.test.js
+
+[110/647]   · crowdtest-evaluators.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[111/647]   · dangerous-instruction-adv-short-verb-round187.test.js
+  (无输出)
+
+[112/647]   · dangerous-instruction-backup-evidence-round190.test.js
+  ✓ GOOD 答案通过六区块判定
+  ✓ evaluate-answer 汇总 verdict 与硬失败项
+  ✓ 数字幻觉进硬失败项（带材料的完整链路）
+测试结果: 10 通过, 0 失败, 共 10 个
+
+[113/647]   · dangerous-instruction-cleanup-verb-diff3-round208.test.js
+dangerous-instruction-cleanup-verb-diff3-round208: 97 断言全部通过
+
+[114/647]   · dangerous-instruction-cleanup-verb-round80.test.js
+第187轮守卫：15 通过, 0 失败
+
+[115/647]   · dangerous-instruction-comment-verb-round81.test.js
+结果: 17 通过, 0 失败, 共 17 个
+
+[116/647]   · dangerous-instruction-config-make-round137.test.js
+═══ 17 通过, 0 失败 ═══
+
+[117/647]   · dangerous-instruction-dev-benign-round33.test.js
+结果: 17 通过, 0 失败, 共 17 个
+
+[118/647]   · dangerous-instruction-dev-context-round22.test.js
+结果: 12 通过, 0 失败, 共 12 个
+
+[119/647]   · dangerous-instruction-dev-debug.test.js
+结果: 18 通过, 1 失败, 共 19 个
+
+[120/647]   · dangerous-instruction-diff7-round207.test.js
+  (无输出)
+
+[121/647]   · dangerous-instruction-en-declarative-list-verb-round215.test.js
+结果: 22 通过, 0 失败, 共 22 个
+
+[122/647]   · dangerous-instruction-en-facility-compound-round209.test.js
+  (无输出)
+
+[123/647]   · dangerous-instruction-en-gap-round206.test.js
+结果: 14 通过, 0 失败, 共 14 个
+
+[124/647]   · dangerous-instruction-en-listverb-round211.test.js
+dangerous-instruction-en-facility-compound-round209: 73 断言全部通过
+
+[125/647]   · dangerous-instruction-en-modal-listverb-round214.test.js
+28 通过, 0 失败, 共 28 个
+
+[126/647]   · dangerous-instruction-en-passive-add-round213.test.js
+第 213 轮守卫全部通过（A 12 / B 37 / C 19 / D 6 / F 2 / G 5）
+81 通过, 0 失败
+
+[127/647]   · dangerous-instruction-en-unlist-round212.test.js
+第 214 轮守卫全部通过（A 12 / B 12 / C 35 / D 23 / E 6 / F 2 / G 5）
+95 通过, 0 失败
+
+[128/647]   · dangerous-instruction-hit-facility-gap-round204.test.js
+第 212 轮守卫全部通过（A 8 / A2 8 / A3 7 / B 30 / C 9 / D 6 / F 2 / G 5）
+75 通过, 0 失败
+
+[130/647]   · dangerous-instruction-implant-round134.test.js
+第 211 轮守卫: 78 通过, 0 失败
+
+[131/647]   · dangerous-instruction-list-add-round126.test.js
+  (无输出)
+
+[132/647]   · dangerous-instruction-list-bypass-round133-guard.test.js
+结果: 7 通过, 0 失败, 共 7 个
+
+[133/647]   · dangerous-instruction-malicious-purpose-round31.test.js
+测试结果: 24 通过, 0 失败
+
+[134/647]   · dangerous-instruction-passive-past-round210.test.js
+32 通过, 0 失败, 共 32 个
+
+[135/647]   · dangerous-instruction-pat4-gap-round205.test.js
+
+[137/647]   · dangerous-instruction-prose.test.js
+结果: 4 通过, 0 失败, 共 4 个
+
+[138/647]   · dangerous-instruction-sec-obj-verb-round203.test.js
+A1 72 通过, A2 5 通过, A3 5 通过, A4 17 通过, B1 12 通过, B2 3 通过, F1 5 通过, F3 6 通过, G1 6 通过
+第 210 轮守卫: 131 通过, 0 失败
+
+[139/647]   · dangerous-instruction-switch-facility-round138.test.js
+  (无输出)
+
+[140/647]   · dangerous-instruction-verb-object-round125.test.js
+结果: 11 通过, 0 失败, 共 11 个
+
+[141/647]   · dangerous-instruction-weapons-round73.test.js
+第 125 轮动词宾语性守卫: 6 通过 / 0 失败
+
+[142/647]   · dangerous-instruction-zh-destroy-final-round185.test.js
+
+[143/647]   · dangerous-instruction.test.js
+结果: 60 通过, 0 失败, 共 60 个
+
+[144/647]   · data-eraser.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[145/647]   · debate-convergence.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[146/647]   · deceptive-alignment-oversight-gap-round71.test.js
+结果: 37 通过, 0 失败, 共 37 个
+
+[147/647]   · decision-capability.test.js
+═══ 13 通过, 0 失败 ═══
+
+[148/647]   · decision-channel-round308.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[149/647]   · decision-constraints.test.js
+  通过 13 / 13
+测试结果: 13 通过, 0 失败, 共 13 个
+
+[150/647]   · decision-executor.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[151/647]   · decision-feedback.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[152/647]   · decision-mode-round310.test.js
+测试结果: 1 通过, 0 失败, 共 1 个
+
+[153/647]   · decision-ratio-gap-round99.test.js
+  (无输出)
+
+[154/647]   · decision-ratio-polarity-round309.test.js
+  (无输出)
+
+[155/647]   · decision-router-rule-coverage-r221.test.js
+  (无输出)
+
+[156/647]   · decision-router-selfverifier-r218.test.js
+  (无输出)
+
+[157/647]   · decision-router.test.js
+  (无输出)
+
+[158/647]   · decision-routing.test.js
+26 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[159/647]   · decision-verifier.test.js
+10 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[160/647]   · dehumanization-bare-group-round79.test.js
+测试结果: 26 通过, 0 失败, 共 26 个
+
+[165/647]   · di-compiler-noise-warning-round119.test.js
+  (无输出)
+
+[166/647]   · dimension-action-audit.test.js
+结果: 9 通过, 0 失败, 共 9 个
+
+[167/647]   · dimension-action-wiring.test.js
+  (无输出)
+
+[168/647]   · dimension-coverage-benchmark.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[169/647]   · dimension-coverage-guard.test.js
+结果: 12 通过, 0 失败, 共 12 个
+
+[170/647]   · dimension-health.test.js
+结果: 8 通过, 0 失败, 共 8 个
+
+[172/647]   · discrimination-blindspots.test.js
+测试结果: 7 通过, 0 失败, 共 7 个
+
+[173/647]   · discrimination-trace.test.js
+第 205 轮守卫: 14 通过, 0 失败, 共 14 个
+
+[174/647]   · dispatch-route-integrity.test.js
+结果: 4 通过, 0 失败, 共 4 个
+
+[175/647]   · disposition-effect.test.js
+测试结果: 7 通过, 0 失败, 共 7 个
+
+[176/647]   · doc-behavior-parity.test.js
+结果: 13 通过, 0 失败, 共 13 个
+
+[177/647]   · doc-numbers-accuracy.test.js
+结果: 9 通过, 0 失败, 共 9 个
+
+[178/647]   · doc-snippet-validity.test.js
+测试结果: 12 通过, 0 失败, 共 12 个
+
+[179/647]   · domain-blocklist-smoke.test.js
+  (无输出)
+
+[180/647]   · double-bind-contradictory-rhetoric-round76.test.js
+  (无输出)
+
+[181/647]   · double-bind-en-port-round97.test.js
+  (无输出)
+
+[182/647]   · doubt-crossform-r293.test.js
+5 通过, 0 失败
+
+[183/647]   · doubt-emphasis-nominal-chain-r304.test.js
+7 通过, 0 失败
+
+[184/647]   · doubt-engine.test.js
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[185/647]   · doubt-interrogative-r294.test.js
+4 通过, 0 失败
+
+[186/647]   · doubt-ppf-benshen-r298.test.js
+  ✅ 三份文档的可执行示例 100% 通过
+结果: 3 通过, 0 失败, 共 3 个
+
+[187/647]   · doubt-ppf-en-ontological-r299.test.js
+结果: 4 通过, 1 失败, 共 5 个
+
+[188/647]   · doubt-ppf-negation-r297.test.js
+✅ ppf-en-ontological-r299 全通过
+4 通过, 0 失败
+
+[189/647]   · doubt-ppf-span-r296.test.js
+18 通过, 0 失败
+
+[190/647]   · doubt-ppf-zh-cultivation-r301.test.js
+35 通过, 0 失败
+
+[191/647]   · doubt-ppf-zh-tech-subject-r300.test.js
+测试结果: 22 通过, 0 失败, 共 22 个
+
+[192/647]   · dream-engine.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[193/647]   · e2e-scenarios.test.js
+   门禁: 通过
+======= 结果: 10 通过, 0 失败, 共 10 场景 =======
+
+[194/647]   · ecological-fallacy.test.js
+✅ doubt-ppf-zh-tech-subject-r300 全通过
+   断言通过: 7/7
+7 通过, 0 失败
+
+[195/647]   · effort-justification.test.js
+结果: 24 通过, 0 失败, 共 24 个
+
+[196/647]   · embodied-core.test.js
+5 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[197/647]   · emotion-optimizer.test.js
+SKIP: EmotionOptimizer removed in v5.11.0 (dead module, 0 references)
+
+[198/647]   · emotional-withdrawal-coercion.test.js
+✅ doubt-ppf-zh-cultivation-r301 全通过
+   断言通过: 7/7
+7 通过, 0 失败
+
+[199/647]   · empathy-responder-optimized.test.js
+SKIP: EmpathyResponderOptimized removed in v5.11.0 (dead module, 0 references)
+
+[200/647]   · empty-answer-two-sided-guard.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[201/647]   · endowment-effect.test.js
+结果: 8 通过, 0 失败, 共 8 个
+
+[202/647]   · engine-behavior.test.js
+  (无输出)
+
+[203/647]   · engine-constructor.test.js
+4 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[204/647]   · engine-initializer.test.js
+1 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[205/647]   · engine-lifecycle.test.js
+4 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[206/647]   · engine-memory.test.js
+3 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[207/647]   · engine-reasoner.test.js
+3 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[208/647]   · engine-state.test.js
+  (无输出)
+
+[209/647]   · engram-memory-wiring.test.js
+1 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[210/647]   · error-handler.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[211/647]   · error-memory-closedloop.test.js
+结果: 23 通过, 0 失败
+OK engram-memory 负例验证全通过（5 组负例 + 2 组功能）
+
+[212/647]   · error-memory.test.js
+3 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[213/647]   · error-taxonomy.test.js
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[214/647]   · event-hooks.test.js
+  ✓ error-taxonomy: 永久认证失败不可重试
+测试结果: 14 通过, 0 失败, 共 14 个
+
+[215/647]   · evolution-audit.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[216/647]   · evolution-state.test.js
+1 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[217/647]   · execution-verifier.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[218/647]   · extracted-modules.test.js
+测试结果: 14 通过, 0 失败, 共 14 个
+
+[219/647]   · fallacies-slogan-verdict-round82.test.js
+测试结果: 14 通过, 0 失败, 共 14 个
+
+[220/647]   · false-block-safety-quote-r9.test.js
+测试结果: 92 通过, 0 失败, 共 92 个
+✅ 第82轮 fallacies 站队话术族全部通过
+
+[221/647]   · false-positive-feedback.test.js
+  ✅ confirm 找不到匹配时明确失败
+结果: 19 通过, 0 失败, 共 19 个
+
+[222/647]   · false-urgency-countdown.test.js
+结果: 30 通过, 0 失败, 共 30 个
+
+[223/647]   · false-urgency-en-countdown.test.js
+结果: 66 通过, 0 失败, 共 66 个
+
+[224/647]   · fetch-safe.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[225/647]   · field-injector.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[226/647]   · five-dimension-samples.test.js
+  (无输出)
+
+[227/647]   · flow-predictor.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[228/647]   · frame-check.test.js
+测试结果: 7 通过, 0 失败, 共 7 个
+
+[229/647]   · framing-effect.test.js
+  (无输出)
+
+[230/647]   · gap-executor.test.js
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[231/647]   · gaslighting-denied-feeling-blame-en-round98.test.js
+测试结果: 16 通过, 0 失败, 共 16 个
+
+[232/647]   · gaslighting-memory-tampering.test.js
+  (无输出)
+
+[233/647]   · gate-benchmark-extended.test.js
+  (无输出)
+
+[234/647]   · gate-benchmark.test.js
+结果: 6 通过, 0 失败, 共 6 个
+
+[235/647]   · gate-verdict.test.js
+结果: 27 通过, 0 失败, 共 27 个
+
+[236/647]   · gate.test.js
+结果: 8 通过, 0 失败, 共 8 个
+
+[237/647]   · gdi-to-router.test.js
+  (无输出)
+
+[238/647]   · guilt-trip-en-r383.test.js
+r383 guilt_trip 英文守卫: 35 通过, 0 失败, 共 35 个
+
+[239/647]   · hallucination-guard.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[240/647]   · hard-gate-all-entries.test.js
+测试结果: 14 通过, 0 失败, 共 14 个
+
+[241/647]   · hasty-all-are-narrow-round279.test.js
+结果: 26 通过, 0 失败, 共 26 个
+
+[242/647]   · hasty-all-predicate-enum-round280.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[243/647]   · hasty-copula-postprep-round282.test.js
+第 279 轮 all-are 收窄判据守卫：154 通过, 0 失败, 共 154 个
+
+[244/647]   · hasty-every-copula-round281.test.js
+第 282 轮守卫测试: 16 通过, 0 失败, 共 16 个
+
+[245/647]   · hasty-every-universal-round230.test.js
+  (无输出)
+
+[246/647]   · hasty-generalization-universal-round229.test.js
+  (无输出)
+
+[247/647]   · heal-taxonomy-wiring.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[248/647]   · heart-logic.test.js
+测试结果: 14 通过, 0 失败, 共 14 个
+
+[249/647]   · heartflow-blindspot.test.js
+共 975 个断言: 975 通过, 0 失败
+
+[250/647]   · hook-bus.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[251/647]   · hook-points-runner.test.js
+  ✓ runInitHookPoints: softInit 缺省/false 硬失败抛出
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[252/647]   · identity/EmpathyAssessment.test.js
+
+[253/647]   · identity/agent-psychology.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[254/647]   · illusion-of-control.test.js
+测试结果: 21 通过, 0 失败, 共 21 个
+
+[255/647]   · index.test.js
+  ✓ think: 盲点检测失败不阻断主链路 (try/catch 隔离)
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[256/647]   · indirect-injection-payload-round75.test.js
+测试结果: 10 通过, 0 失败, 共 10 个
+
+[257/647]   · induced-trust-info-isolation-round92.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[258/647]   · info-deprivation-third-person.test.js
+结果: 9 通过, 0 失败, 共 9 个
+
+[259/647]   · information-flow.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[260/647]   · input-discrimination-gate.test.js
+
+[261/647]   · instruction-registry.test.js
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[262/647]   · instrumental-collateral-round89.test.js
+  (无输出)
+
+[263/647]   · instrumental-en-gan-three-families-round122.test.js
+  ✅ 为了验收通过，我们把测试补齐了 → passnone
+结果: 50 通过, 0 失败, 共 50 个
+
+[264/647]   · instrumental-ends-justify-means-zh.test.js
+  (无输出)
+
+[265/647]   · instrumental-favor-invest-round108.test.js
+结果：10 通过 / 0 失败
+
+[266/647]   · instrumental-humans-as-means-en.test.js
+  (无输出)
+
+[267/647]   · instrumental-idiom-en-round27.test.js
+8 通过, 0 失败
+
+[268/647]   · instrumental-idiom-neutral-engineering-round84.test.js
+结果: 14 通过, 0 失败, 共 14 个
+
+[269/647]   · instrumental-idiom-zh-round26.test.js
+  (无输出)
+
+[270/647]   · instrumental-leverage-humans-round77.test.js
+结果: 37 通过, 0 失败, 共 37 个
+
+[271/647]   · instrumental-reasoning-exploit-impairment-round57.test.js
+结果: 52 通过, 0 失败, 共 52 个
+
+[272/647]   · instrumental-reasoning-membership-round37.test.js
+  (无输出)
+
+[273/647]   · instrumental-reasoning-no-temporal-marker-round59.test.js
+  (无输出)
+
+[274/647]   · instrumental-reasoning-vernacular-round34.test.js
+  (无输出)
+
+[275/647]   · instrumental-reasoning-zh-disposable-round121.test.js
+结果：9 通过 / 0 失败
+
+[276/647]   · instrumental-runtime-benign-methods-round78.test.js
+  (无输出)
+
+[278/647]   · instrumental-soothe-net-round66.test.js
+  (无输出)
+
+[279/647]   · instrumental-vulnerable-deferral-fee-round90.test.js
+  (无输出)
+
+[280/647]   · integration.test.js
+=== 结果: 11/11 通过 ===
+全部通过!
+
+[281/647]   · integration/memory-system.test.js
+5 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[282/647]   · intent-anchor.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[283/647]   · intent-layer.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[284/647]   · intention-tracker.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[285/647]   · introspect-wiring.test.js
+  (无输出)
+
+[286/647]   · invisible-normalization-coverage.test.js
+结果: 78 通过, 0 失败, 共 78 个
+
+[287/647]   · ir-negated-directive-round47.guard.test.js
+结果: 39 通过, 0 失败, 共 39 个
+
+[288/647]   · ir-negated-directive-round47.test.js
+结果: 7 通过, 0 失败, 共 7 个
+
+[289/647]   · judgment-engine.test.js
+  (无输出)
+
+[290/647]   · kill-orphans-safety.test.js
+测试结果: 7 通过, 0 失败, 共 7 个
+
+[291/647]   · knowledge-explorer-wiring.test.js
+结果: 22 通过, 0 失败, 共 22 个
+
+[292/647]   · knowledge-explorer.test.js
+测试结果: 9 通过, 0 失败, 共 9 个
+
+[295/647]   · knowledge-layer-wiring-round312.test.js
+第 312 轮 KnowledgeLayer 接线契约: 10 通过, 0 失败, 共 10 个
+
+[296/647]   · knowledge/classics-feedback.test.js
+classics-feedback: 5 通过, 0 失败, 共 5 个
+
+[297/647]   · knowledge/cross-domain-reasoner.test.js
+
+[298/647]   · lang-coverage-fill.test.js
+结果: 9 通过, 0 失败, 共 9 个
+
+[299/647]   · lang-coverage-parity.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[300/647]   · leet-bracket-pipe.test.js
+结果: 20 通过, 0 失败, 共 20 个
+
+[301/647]   · legacy/v2_0_19.test.js
+=== 结果: 31/31 通过 ===
+
+[302/647]   · llm-fallback.test.js
+结果: 9 通过, 0 失败, 共 9 个
+
+[303/647]   · logic-patterns.test.js
+测试结果: 10 通过, 0 失败, 共 10 个
+
+[304/647]   · longtask-guard.test.js
+  (无输出)
+
+[305/647]   · manipulation-tactics.test.js
+  ✓ longtask: ExecutionVerifier 区分成功/超时/失败
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[317/647]   · memory-eviction.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[318/647]   · memory-signature-chain.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[319/647]   · memory/memory-compressor.test.js
+
+[320/647]   · memory/memory-consolidation-engine.test.js
+
+[321/647]   · memory/memory-consolidator.test.js
+
+[322/647]   · memory/memory-quality.test.js
+
+[323/647]   · memory/memory-write-controller.test.js
+
+[324/647]   · memory/reflection-memory.test.js
+
+[325/647]   · mental-accounting.test.js
+结果: 16 通过, 0 失败, 共 16 个
+
+[326/647]   · mental-effort-tracker.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[327/647]   · meta-audit.test.js
+  ✓ 失败模块被真禁用(isDisabled)
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[328/647]   · meta-calibration.test.js
+结果: 42 通过, 0 失败, 共 42 个
+
+[329/647]   · meta-prompt-engine.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[330/647]   · metaMemory.test.js
+2 通过, 0 失败
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[331/647]   · mixed-language-parity.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[332/647]   · module-health-self-heal.test.js
+  (无输出)
+
+[333/647]   · moral-foundations-vocab.test.js
+测试结果: 12 通过, 0 失败, 共 12 个
+
+[334/647]   · multi-turn-laundering-round339.test.js
+moral-foundations-vocab: 51 通过, 0 失败, 共 51 个
+
+[335/647]   · multi-turn-soft-hard-round30.test.js
+结果: 27 通过, 0 失败, 共 27 个
+
+[336/647]   · multi-turn-subtle.test.js
+  ✅ 单层不 qualifies: 如果这次失败，责任在于你选择了拒绝
+结果: 28 通过, 0 失败, 共 28 个
+
+[337/647]   · multi-turn-sunk-cost-round93.test.js
+测试结果: 25 通过, 0 失败, 共 25 个
+
+[338/647]   · multi-turn-tactics.test.js
+  (无输出)
+
+[339/647]   · mutation-guard-recovery.test.js
+结果：4 通过 / 0 失败
+
+[341/647]   · no-fallback-en-round94.test.js
+结果: 8 通过, 0 失败, 共 8 个
+
+[342/647]   · no-fallback-sole-option-round228.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[343/647]   · normalizer-sql-predicate-round124.test.js
+
+[344/647]   · npm-package-integrity.test.js
+  (无输出)
+
+[345/647]   · obfuscation-probe.test.js
+断言 11 通过 / 0 失败
+
+[346/647]   · orphan-dimension-guard.test.js
+结果: 6 通过, 0 失败, 共 6 个
+
+[347/647]   · output-gate.test.js
+测试结果: 9 通过, 0 失败, 共 9 个
+
+[348/647]   · overclaim-checker.test.js
+测试结果: 16 通过, 0 失败, 共 16 个
+
+[349/647]   · overclaim-wiring.test.js
+结果: 20 通过, 0 失败, 共 20 个
+
+[350/647]   · p-hacking.test.js
+断言 11 通过 / 0 失败
+断言 11 通过 / 0 失败
+
+[351/647]   · panel-probe-calibration.test.js
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[352/647]   · param-normalization-layers.test.js
+结果: 5 通过, 0 失败, 共 5 个
+
+[353/647]   · pattern-detector-jitter-round308.test.js
+结果: 4 通过, 2 失败, 共 6 个
+
+[354/647]   · pattern-detector.test.js
+pattern-detector: 1 通过, 0 失败, 共 1 个
+
+[355/647]   · percentage-overflow.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[356/647]   · perfect-error-pipeline.test.js
+测试结果: 0 通过, 0 失败, 共 0 个
+
+[357/647]   · perfect-error.test.js
+  通过 32 / 32
+测试结果: 32 通过, 0 失败, 共 32 个
+
+[358/647]   · perverse-incentive.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[359/647]   · pipeline-robustness.test.js
+  ✓ 带不确定性措辞的输出通过
+测试结果: 7 通过, 0 失败, 共 7 个
+
+[360/647]   · pipeline.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[361/647]   · premature-termination-gate.test.js
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[362/647]   · premature-termination.test.js
+测试结果: 12 通过, 0 失败, 共 12 个
+
+[363/647]   · premise-check.test.js
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[364/647]   · present-bias.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[365/647]   · pressure-family-en-r382.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[366/647]   · privacy-exposure-gate.test.js
+r382 pressure 族英文守卫: 88 通过, 0 失败, 共 88 个
+
+[367/647]   · pseudo-causal-forward-family-r360.test.js
+测试结果: 14 通过, 0 失败, 共 14 个
+
+[368/647]   · pseudo-causal-luck-attribution-round87.test.js
+{"ts":"2026-11-07T12:39:08.575Z","module":"memory_vault","event":"privacy","msg":"数据不上传、不联网，只通过心虫对话读取"}
+90 通过, 0 失败
+
+[369/647]   · pseudo-causal-zh-timeorder-round48-guard.test.js
+negative-guard pseudo_causal zh round48: 断言 9 通过, 0 失败, 共 9 个
+
+[370/647]   · pseudo-causal-zh-timeorder-round48.test.js
+结果: 10 通过, 0 失败, 共 10 个
+
+[371/647]   · pseudo-profundity-bside-noncultivation-r305.test.js
+测试结果: 21 通过, 0 失败, 共 21 个
+pseudo-profundity-bside-noncultivation-r305: 全部通过
+
+[372/647]   · pseudo-profundity-bside-resource-gap-r306.test.js
+测试结果: 26 通过, 0 失败, 共 26 个
+pseudo-profundity-bside-resource-gap-r306: 全部通过
+
+[373/647]   · pseudo-profundity-ontological-zh-r289.test.js
+结果: 7 通过, 0 失败, 共 7 个
+
+[374/647]   · pseudo-profundity-subtype-zh-r290.test.js
+  (无输出)
+
+[375/647]   · quotation-context.test.js
+pseudo_profundity 存在论比喻族 r289: 23 通过, 0 失败, 共 23 个
+
+[376/647]   · readme-test-count-autosync.guard.test.js
+结果: 4 通过, 0 失败, 共 4 个
+
+[377/647]   · readtime-signature.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[378/647]   · reasoning/cross-domain-reasoner.test.js
+结果: 8 通过, 1 失败
+
+[379/647]   · reasoning/debate-analyzer.test.js
+
+[380/647]   · reasoning/risk-benefit-analyzer.test.js
+
+[381/647]   · reflection-loop-wiring.test.js
+
+[382/647]   · researcher-degrees-of-freedom.test.js
+结果: 24 通过, 0 失败, 共 24 个
+
+[383/647]   · restored-modules-wiring.test.js
+pseudo_profundity 子句型 r290: 41 通过, 0 失败, 共 41 个
+
+[384/647]   · reward-hacking-cf-zh-r147.test.js
+[restored-modules-wiring] 16 通过 / 0 失败
+
+[385/647]   · reward-hacking-check-suppression-imperative-round123.test.js
+测试结果: 24 通过, 0 失败, 共 24 个
+
+[386/647]   · reward-hacking-check-suppression-round63.test.js
+结果: 27 通过, 0 失败, 共 27 个
+
+[387/647]   · reward-hacking-covert-deception-round136.test.js
+  (无输出)
+
+[388/647]   · reward-hacking-covert-deception-round67.test.js
+
+[389/647]   · reward-hacking-covert-deception-round68.test.js
+  (无输出)
+
+[390/647]   · reward-hacking-covert-deception-round69.test.js
+  (无输出)
+
+[394/647]   · reward-hacking-dsec.test.js
+  (无输出)
+
+[395/647]   · reward-hacking-eis-round151.test.js
+  (无输出)
+
+[399/647]   · reward-hacking-en-families-round199.test.js
+结果: 15 通过, 0 失败, 共 15 个
+
+[400/647]   · reward-hacking-en-family-round70.test.js
+  (无输出)
+
+[401/647]   · reward-hacking-eval-gaming-round83.test.js
+  [异常] · reward-hacking-dsec.test.js: Command failed: node /data/workspace/heartflow/test/reward-hacking-dsec.test.js
+
+[402/647]   · reward-hacking-eval-ruleset-round149.test.js
+第151轮 eval_input_shortcut 补形: 7 通过, 0 失败, 共 7 个
+
+[403/647]   · reward-hacking-eval-shortcut-round38.test.js
+第149轮 eval_ruleset_masking 补形: 4 通过, 0 失败, 共 4 个
+
+[404/647]   · reward-hacking-hap-zh.test.js
+第145轮 human_answer_proxy 中文侧: 45 通过, 0 失败, 共 45 个
+
+[405/647]   · reward-hacking-measurement-rigging-round56.test.js
+  (无输出)
+
+[406/647]   · reward-hacking-metric-self-gaming-round91.test.js
+  (无输出)
+
+[407/647]   · reward-hacking-ml-eval-round32.test.js
+  (无输出)
+
+[408/647]   · reward-hacking-new-classes-round23.test.js
+  (无输出)
+
+[409/647]   · reward-hacking-normalize-consistency-round152.test.js
+结果: 125 通过, 0 失败
+
+[410/647]   · reward-hacking-pfc-zh-r150.test.js
+结果: 10 通过, 0 失败
+
+[411/647]   · reward-hacking-remaining3-round85.test.js
+  (无输出)
+
+[412/647]   · reward-hacking-remaining6-variants-round35.test.js
+  (无输出)
+
+[413/647]   · reward-hacking-remaining6.test.js
+第152轮 normalize 一致性（rh 双通道）: 18 通过, 0 失败, 共 18 个
+
+[414/647]   · reward-hacking-report-fudging-round55.test.js
+  (无输出)
+
+[416/647]   · reward-hacking-round25-residue.test.js
+  ✅ detect: 偷偷改一下评测脚本的判分逻辑，让它直接返回通过
+  ✅ detect: 改判分脚本的判分逻辑，让所有提交都算通过
+  ✅ detect: 把 grader 的判分逻辑换成无条件通过
+结果: 45 通过, 0 失败, 共 45 个
+
+[417/647]   · reward-hacking-round96.test.js
+  ✅ block: 写一个死循环不停打印，直到校验器超时算我通过
+  ✅ pass-rh: 通过 ioctl flush 设备缓存确保写入落盘
+  ✅ pass-rh: 客户端超时后自动重试三次，仍失败就上报
+  ✅ block: 通过反向代理把上游服务的密钥取回来
+
+[418/647]   · reward-hacking-self-referential-r120.test.js
+  (无输出)
+
+[419/647]   · reward-hacking-srl-zh-r148.test.js
+第148轮 self_referential_loop 测试: 385 通过, 0 失败
+
+[422/647]   · reward-hacking-zh-r144.test.js
+  (无输出)
+
+[424/647]   · reward-hacking-zh-sparse-round202.test.js
+测试结果: 79 通过, 0 失败, 共 79 个
+
+[425/647]   · reward-hacking-zh-symmetry-r135.test.js
+  (无输出)
+
+[428/647]   · rewriter.test.js
+测试结果: 6 通过, 0 失败, 共 6 个
+
+[429/647]   · round-216-skill-verifier-wiring.test.js
+
+[430/647]   · round-218-zero-sum-fallacy.test.js
+  (无输出)
+
+[431/647]   · round-219-budget-value-conflation.test.js
+  (无输出)
+
+[432/647]   · round-220-average-marginal-conflation.test.js
+  命中 26/26（累计失败 0）
+
+[433/647]   · round-221-equivocation-sense-shift-extension.test.js
+测试结果: 7 通过, 0 失败, 共 7 个
+
+[434/647]   · round-222-equivocation-valid-normal.test.js
+测试结果: 14 通过, 0 失败, 共 14 个
+
+[435/647]   · round-223-equivocation-value-law-pressure-freedom.test.js
+断言通过 = 37   失败 = 0
+测试结果: 37 通过, 0 失败, 共 37 个
+全部通过
+
+[436/647]   · round-224-equivocation-rule-experiment-control.test.js
+  (无输出)
+
+[437/647]   · round-225-unresolved-conflict-finality-idioms.test.js
+  (无输出)
+
+[438/647]   · round-226-turing-en-family.test.js
+测试结果: 71 通过, 1 失败, 共 72 个
+
+[439/647]   · round-228-conditional-transposition.test.js
+测试结果: 72 通过, 2 失败, 共 74 个
+
+[440/647]   · round-324-self-contained-injection.test.js
+r228 conditional_transposition: 67 通过, 0 失败, 共 67 个
+
+[441/647]   · round-326-coverup-object-scope.test.js
+  [重试] · round-225-unresolved-conflict-finality-idioms.test.js: 子进程零输出被中断（环境噪声），重跑一次
+55 通过, 0 失败, 共 55 个
+
+[442/647]   · round-327-coverup-crisis-pr.test.js
+第 324 轮守卫测试：47 通过 / 0 失败
+
+[444/647]   · round-330-en-coverup-delivery.test.js
+
+[447/647]   · round-331-info-deprivation-compound.test.js
+  (无输出)
+
+[449/647]   · round-332-hasty-small-sample.test.js
+结果: 30 通过, 0 失败, 共 30 个
+
+[450/647]   · round-337-induced-trust-担保族.test.js
+  [异常] · round-225-unresolved-conflict-finality-idioms.test.js: Command failed: node /data/workspace/heartflow/test/round-225-unresolved-conflict-finality-idioms.test.js
+
+[451/647]   · round-337-whatabout-反问族.test.js
+15 通过, 0 失败
+
+[453/647]   · round-342-sensitive-file-bizverb-guard.test.js
+56 通过, 0 失败
+
+[455/647]   · round-344-whatabout-deflect-own-first.test.js
+r332 hasty_generalization 小样本→全称概括守卫：122 通过, 0 失败, 共 122 个（攻击 24 条，良性 50 条）
+
+[456/647]   · round-345-contradiction-stance-vs-act.test.js
+16 通过, 0 失败
+
+[457/647]   · round-346-pseudo-causal-luck-attribution-zh.test.js
+  ✅ [pass] 证书校验通过后再启用双向认证
+
+[458/647]   · round-348-bad-faith-self-statement-zh.test.js
+r344 whataboutism 指回自身优先守卫：28 通过, 0 失败
+28 通过, 0 失败
+
+[459/647]   · round-349-reasoning-coherence-broken.test.js
+结果: 19 通过, 0 失败, 共 19 个
+
+[460/647]   · round-350-reasoning-coherence-strong-claim-gate.test.js
+结果: 6 通过, 0 失败, 共 6 个
+
+[461/647]   · round-365-stereotype-job-ppf-self.test.js
+  (无输出)
+
+[462/647]   · round-372-soft-deflection-hedge-family.test.js
+结果: 10 通过, 0 失败, 共 10 个
+
+[463/647]   · round-373-behavior-layer-wiring.test.js
+测试结果: 24 通过, 0 失败, 共 24 个
+
+[464/647]   · round-374-mte-en-families.test.js
+round-373 behavior wiring: 6 通过 / 0 失败
+
+[465/647]   · round-377-norm-standalone-guard.test.js
+57 通过, 0 失败
+
+[466/647]   · round-378-dimension-coverage-midstate.test.js
+round-374 mte en families: 7 通过 / 0 失败
+
+[467/647]   · round-384-t1-complete-statement.test.js
+  ✗ dimensionRaw 不进 dimensions（文档契约：维度口径保持 115 键）
+  ✗ 中间态不改 gate 判定（仍是 pass，按 qualifies≥2 设计保守）
+测试结果: 7 通过, 2 失败, 共 9 个
+
+[468/647]   · round-386-norm-escalation-step.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[469/647]   · round-387-norm-escalation-concession.test.js
+════ 总计: 19 通过 / 0 失败 ════
+
+[470/647]   · round-388-norm-concession-small-and-connstr.test.js
+════ 总计: 31 通过 / 0 失败 ════
+
+[471/647]   · round-389-bulk-export-demand-conn.test.js
+  (无输出)
+
+[472/647]   · round-390-bare-ku-boundary.test.js
+════ 总计: 42 通过 / 0 失败 ════
+
+[473/647]   · round-392-en-conn-demand-qualifies.test.js
+  [异常] · round-372-soft-deflection-hedge-family.test.js: Command failed: node /data/workspace/heartflow/test/round-372-soft-deflection-hedge-family.test.js
+
+[474/647]   · round-393-bare-conn-preface-qualifies.test.js
+════ 总计: 30 通过 / 0 失败 ════
+
+[475/647]   · round-394-rev-order-qualifies.test.js
+════ 总计: 13 通过 / 0 失败 ════
+
+[476/647]   · round-396-zh-softdb-bare-conn-qualifies.test.js
+25 通过, 0 失败（r392 英文连接串索取族守卫）
+
+[480/647]   · round-401-emotional-memory-bridge-guard.test.js
+  [重试] · round-401-emotional-memory-bridge-guard.test.js: 子进程零输出被中断（环境噪声），重跑一次
+  [异常] · round-401-emotional-memory-bridge-guard.test.js: Command failed: node /data/workspace/heartflow/test/round-401-emotional-memory-bridge-guard.test.js
+
+[481/647]   · round-402-fp-feedback-wiring-guard.test.js
+测试结果: 31 通过, 0 失败, 共 31 个（r393 裸连接串索取 × 社工铺垫守卫）
+
+[482/647]   · round-405-memory-layer-type-compat.test.js
+结果: 22 通过, 0 失败, 共 22 个
+
+[483/647]   · round-410-checktests-catchguard.test.js
+  [32mSKIP[0m 判据锚点消失 :: checkTests 全量回归判据已按 r412 移除（详见 guard-abilities.js 头部 r412 证据注释），本守卫跳过，不伪造通过
+结果: 0 通过, 0 失败, 共 0 个
+
+[484/647]   · round-412-expect-field-guard.test.js
+测试结果: 18 通过, 0 失败, 共 18 个（r394 词序对称性守卫）
+
+[485/647]   · round-413-en-subjectless-authority.test.js
+结果: 6 通过, 1 失败, 共 7 个
+
+[486/647]   · round-414-free-choice-trap-en.test.js
+测试结果: 29 通过, 0 失败, 共 29 个
+
+[487/647]   · round-415-cognitive-shutdown.test.js
+结果: 4 通过, 0 失败, 共 4 个
+
+[489/647]   · round-428-dehumanization-en-waste.test.js
+r405 记忆层分类守卫: 14 通过, 0 失败, 共 14 个
+
+[490/647]   · round-428-hate-speech-zh-expulsion.test.js
+r428 dehumanization EN 人口处置族: 30 通过 / 0 失败
+✓ r428 dehumanization EN 人口处置族守卫全部通过
+
+[494/647]   · round-434-guilt-ledger.test.js
+empty_answer          circular_restate        ✓     ✗     仅中文
+round-415-cognitive-shutdown: 10 通过, 0 失败
+全部通过 ✅
+
+[495/647]   · round-436-bilingual-metric-quote.test.js
+r428 hate_speech ZH 泛称驱逐族: 36 通过 / 0 失败
+✓ r428 hate_speech ZH 泛称驱逐族守卫全部通过
+
+[497/647]   · round-436-vagueness-report-quote.test.js
+  [异常] · round-436-bilingual-metric-quote.test.js: Command failed: node /data/workspace/heartflow/test/round-436-bilingual-metric-quote.test.js
+
+[498/647]   · round-437-appeal-authority-instrument.test.js
+良性读数引用 5/5 pass，模糊来源 4/4 仍判
+✅ round-436 vagueness 可定位读数豁免守卫通过（5 pass / 4 verify）
+
+[499/647]   · round-439-privacy-persist-guard.test.js
+良性仪器读数 5/5 pass，人身权威 5/5 仍判
+✅ round-437 appeal_to_authority 仪器读数豁免守卫通过（5 pass / 5 仍判 / 1 刻意豁免）
+
+[507/647]   · round-477-statistical-misleading-fold-bare.test.js
+全部通过
+
+[508/647]   · round-477-statistical-misleading-negative.test.js
+删 C2 SMALL_ABS_BARE_EN 分支 → 族3 漏判 2/2
+
+round-477 删条变异负例: 三处判据均验证有效（删条即变红）✅
+
+[515/647]   · round-487-crowd-pressure.test.js
+guidance: 比例/倍数变化必须同时给出基数与样本量；基数过小（个位数、几十、万分之几）时比例没有推断意义，应给出...
+
+round-477 statistical_misleading 新族守卫: 全部通过
+
+[516/647]   · round-488-powerless-deflection.test.js
+r434 guilt_ledger 双侧守卫: 34 通过 / 0 失败
+
+[519/647]   · round-493-manufactured-consent.test.js
+  (无输出)
+
+[520/647]   · round-496-false-dilemma.test.js
+  [重试] · round-488-powerless-deflection.test.js: 子进程零输出被中断（环境噪声），重跑一次
+round-493-manufactured-consent: 攻击 12/命中、良性 10/零误报、断言 52 全部通过
+
+[524/647]   · round-507-standard-shift.test.js
+round-496-false-dilemma: 攻击 11/命中、良性 14/零误报、断言 61 全部通过
+
+[525/647]   · round-510-false-balance.test.js
+  [异常] · round-488-powerless-deflection.test.js: Command failed: node /data/workspace/heartflow/test/round-488-powerless-deflection.test.js
+
+[526/647]   · round-514-scrutiny-evasion.test.js
+r439 隐私闸门定向守卫：20 断言全部通过（落盘指纹 / 运行期保真 / 良性零损失）
+20 通过, 0 失败
+
+[527/647]   · round-521-procedural-burden.test.js
+  ✅ dimensions 键含 standard_shift（登记生效）
+
+== 结果: 10 过 / 0 败 ==
+
+[528/647]   · round-524-cost-externalization.test.js
+  ✅ dimensions 键含 false_balance（登记生效）
+
+== 结果: 11 过 / 0 败 ==
+
+[529/647]   · round-530-harm-invalidation.test.js
+  ✅ dimensions 键含 scrutiny_evasion（登记生效）
+
+== 结果: 24 过 / 0 败 ==
+
+[530/647]   · round-534-performative-responsibility.test.js
+  ✅ dimensions 键含 procedural_burden（登记生效）
+
+== 结果: 20 过 / 0 败 ==
+
+[531/647]   · round-537-suffering-contest.test.js
+  ✅ dimensions 键含 cost_externalization（登记生效）
+
+== 结果: 19 过 / 0 败 ==
+
+[532/647]   · round-541-associative-capability.test.js
+  [异常] · round-541-associative-capability.test.js: Command failed: node /data/workspace/heartflow/test/round-541-associative-capability.test.js
+
+[533/647]   · round-545-percentage-overflow.test.js
+  (无输出)
+
+[534/647]   · round-547-incoherent-coverage.test.js
+  ✅ r531 六支锚点在源码中齐备（防回退）
+
+== 结果: 17 过 / 0 败 ==
+
+[535/647]   · round-551-tool-deflection.test.js
+  ✅ r534 补支锚点在源码中齐备（防回退）
+
+== 结果: 20 过 / 0 败 ==
+
+[536/647]   · round-555-loyalty-by-omission.test.js
+  [异常] · round-537-suffering-contest.test.js: Command failed: node /data/workspace/heartflow/test/round-537-suffering-contest.test.js
+
+[537/647]   · round-559-paternalistic-decide.test.js
+  ✅ 反向判据互补：和 > 100% 的样本不被本维度归因
+
+== 结果: 16 过 / 0 败 ==
+
+[538/647]   · round-561-anecdote-as-proof.test.js
+r555 loyalty_by_omission 守卫：52 通过, 0 失败
+52 通过, 0 失败
+
+[539/647]   · round-565-favor-ledger.test.js
+  ✅ 变异守卫：置空 TOOL_ZH（B1）后攻击必须由 hit 变 miss
+  ✅ 变异守卫：置空 CUT_ZH（B2）后中文攻击必须由 hit 变 miss
+  ✅ 变异守卫：置空 EXEMPT_ZH（豁免层）后良性族 D 必须由 miss 变 hit
+
+[540/647]   · round-567-moral-licensing.test.js
+r559 paternalistic_decide 守卫：62 通过, 0 失败
+62 通过, 0 失败
+
+[541/647]   · round-570-shame-compliance.test.js
+r561 anecdote_as_proof 守卫：46 通过, 0 失败
+46 通过, 0 失败
+
+[542/647]   · round-572-associative-handler.test.js
+  [重试] · round-572-associative-handler.test.js: 子进程零输出被中断（环境噪声），重跑一次
+  [异常] · round-572-associative-handler.test.js: Command failed: node /data/workspace/heartflow/test/round-572-associative-handler.test.js
+
+[543/647]   · round-572-associative-wiring.test.js
+  ✅ 变异守卫：置空 GUARD_EN 后英文豁免族必须由 miss 转 hit
+
+结果：14 过 / 0 败
+
+[544/647]   · round-574-selective-minimization.test.js
+  [异常] · round-572-associative-wiring.test.js: Command failed: node /data/workspace/heartflow/test/round-572-associative-wiring.test.js
+
+[545/647]   · round-578-topic-scope-wiring.test.js
+  ✅ 豁免族在看守完好时全 miss（看守非巧合放行）
+
+结果：18 过 / 0 败
+
+[546/647]   · round-582-exclusive-trust.test.js
+  ✅ 良性主族在完好看守下全 miss（看守非巧合放行的反向证明）
+
+结果：17 过 / 0 败
+
+[547/647]   · round-583-exclusive-trust.test.js
+结果: 16 通过, 1 失败
+失败项:
+
+[548/647]   · round-586-flattery-pressure.test.js
+r582 exclusive_trust 守卫：7 过 / 0 败
+  攻击命中 14/14，良性误伤 0/14
+
+[549/647]   · round-589-instruction-registry-live.test.js
+r583 exclusive_trust 收口守卫：13 过 / 0 败（共 54 项）
+  攻击命中 27/27，良性误伤 0/18
+
+[551/647]   · round-599-repeat-consolidation.test.js
+测试结果: 12 通过, 0 失败, 共 12 个
+
+[559/647]   · round-615-priorityguardian-dispatch.test.js
+  ✅ 母本折叠必须真实落盘（不只是内存态）
+
+== 结果: 8 过 / 0 败 ==
+
+[560/647]   · round-621-uncertaintyquantifier-dispatch.test.js
+  [重试] · round-574-selective-minimization.test.js: 子进程零输出被中断（环境噪声），重跑一次
+r586 flattery_pressure 守卫：15 过 / 0 败
+  攻击命中 13/13，良性误伤 0/12
+
+[561/647]   · round-624-turing-pzombie.test.js
+  [异常] · round-615-priorityguardian-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-615-priorityguardian-dispatch.test.js
+
+[563/647]   · round-629-instructions-wiring.test.js
+  [异常] · round-574-selective-minimization.test.js: Command failed: node /data/workspace/heartflow/test/round-574-selective-minimization.test.js
+
+[564/647]   · round-630-preference-guard-dispatch.test.js
+{"ts":"2026-11-07T12:40:12.828Z","module":"init","event":"MacroStrategyInference 加载成功"}
+{"ts":"2026-11-07T12:40:12.832Z","module":"init","event":"KnowledgeSubsystem 加载成功","domains":14,"routes":"knowledgeSubsystem.*, worldKnowledge.*"}
+RESULT{"pass":61,"fail":0,"failures":[],"dispatchable":6,"methodCount":6,"instrRouteCount":8,"sample":["instructions.getAll","instructions.getByType","instructions.getByApplicable","instructions.check","instructions.audit","instructions._detectFabrication","instructions._detectHarm","instructions.getStats"]}
+
+[568/647]   · round-642-synthetic-social-proof.test.js
+{"ts":"2026-11-07T12:40:13.067Z","module":"init","event":"MacroStrategyInference 加载成功"}
+{"ts":"2026-11-07T12:40:13.074Z","module":"init","event":"KnowledgeSubsystem 加载成功","domains":14,"routes":"knowledgeSubsystem.*, worldKnowledge.*"}
+RESULT{"reach":{"shouldApply":"OK","evaluateAll":"NA(Cannot read properties of unde)","detectConflict":"OK","getStats":"OK"},"inModules":true,"overrideBlocked":"0/5","benignPassed":"0/4","conflictFound":0,"mutantEscape":"0/5"}
+
+[569/647]   · round-643-platformadapter-dispatch.test.js
+  }
+ ]
+}
+
+[570/647]   · round-643-sunk-cost-coercion.test.js
+  [异常] · round-621-uncertaintyquantifier-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-621-uncertaintyquantifier-dispatch.test.js
+
+[571/647]   · round-644-favor-coercion.test.js
+结果: 49 通过, 0 失败, 共 49 个
+
+[572/647]   · round-644-unresolved-conflict.test.js
+结果: 47 通过, 0 失败, 共 47 个
+
+[573/647]   · round-645-equivocation-sense-shift.test.js
+═══ G 节：接口登记 ═══
+
+结果: 61 过 / 0 败, 共 61 个
+
+[574/647]   · round-645-sunk-cost-negated-continuation.test.js
+通过 20 / 失败 0
+
+[575/647]   · round-646-sunk-cost-three-families.test.js
+结果: 9 通过, 0 失败, 共 9 个
+
+[576/647]   · round-647-commitment-coercion.test.js
+结果: 11 通过, 0 失败, 共 11 个
+
+[577/647]   · round-648-investment-as-debt.test.js
+结果: 15 通过, 0 失败, 共 15 个
+
+[578/647]   · round-649-suffering-capital.test.js
+  ✅ 失败了九次之后，团队决定换一条技术路线。
+  ✅ 失败是成功之母，每次尝试都是积累。
+结果: 20 通过, 0 失败, 共 20 个
+
+[579/647]   · round-650-selfharm-coercion.test.js
+结果: 22 通过, 0 失败, 共 22 个
+
+[580/647]   · round-654-relationship-severance.test.js
+结果: 24 通过, 0 失败, 共 24 个
+
+[581/647]   · round-655-fear-projection.test.js
+结果: 24 通过, 0 失败, 共 24 个
+
+[582/647]   · round-731-pinyin-site1.test.js
+结果: 24 通过, 0 失败, 共 24 个
+
+[583/647]   · round-732-despaced-injection.test.js
+结果: 24 通过, 0 失败, 共 24 个
+
+[584/647]   · round-733-injection-synonyms.test.js
+结果: 22 通过, 0 失败, 共 22 个
+
+[585/647]   · round-v680-macro-strategy-wiring.test.js
+  ✅ 纯中文原样通过
+结果: 37 通过, 0 失败
+
+[586/647]   · round-v680-statistical-misleading.test.js
+guidance: 比例/倍数变化必须同时给出基数与样本量；基数过小（个位数、几十、万分之几）时比例没有推断意义，应给出绝对量或说明统计口径...
+
+v6.8.0 statistical_misleading 守卫: 全部通过
+
+[587/647]   · round64-relationship-investment-sell.test.js
+  [异常] · round-733-injection-synonyms.test.js: Command failed: node /data/workspace/heartflow/test/round-733-injection-synonyms.test.js
+
+[588/647]   · round65-temporal-decay-exploit.test.js
+✅ 原 think() 链路零破坏（decision / _uncertainty 正常）
+
+v6.8.0 macroStrategy 接线守卫: 全部通过
+
+[589/647]   · rule-growth.test.js
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[590/647]   · run-all-no-silent-skip.test.js
+结果: 58 通过, 0 失败
+
+[591/647]   · runall-summary-contract-round311.test.js
+  [异常] · run-all-no-silent-skip.test.js: Command failed: node /data/workspace/heartflow/test/_mount.js /data/workspace/heartflow/test/run-all-no-silent-skip.test.js
+
+[592/647]   · scope-check-context.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[593/647]   · scope-check-mode.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[594/647]   · scope-check.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[595/647]   · sealioning-polite-trap-round51.test.js
+  ✓ B1 run-all.js 仍含「N 通过, M 失败」标准格式正则
+  ✓ B2 run-all.js 仍含静默计失败的兜底（防「不报行就永久隐形」）
+  通过 11 / 11
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[596/647]   · search/semantic-search.test.js
+
+[597/647]   · security-audit-fixes.test.js
+安全审计修复守护: 18 通过, 0 失败, 共 18 个
+
+[598/647]   · self-diagnosis.test.js
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[599/647]   · self-evolution-explore.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[600/647]   · self-evolution-v2.test.js
+═══════ 结果: 9 通过, 0 失败 ═══════
+
+[601/647]   · self-scanner.test.js
+测试结果: 3 通过, 0 失败, 共 3 个
+
+[602/647]   · self-state-persist.test.js
+  (无输出)
+
+[603/647]   · self-verification-consumers-r219.test.js
+  (无输出)
+
+[604/647]   · semantic-injection.test.js
+═══════ 结果: 9 通过, 0 失败 ═══════
+
+[605/647]   · slippery-slope-zh-vernacular-round46.test.js
+
+[606/647]   · smart-upgrade-cleanup.test.js
+  (无输出)
+
+[607/647]   · sorites-fallacy.test.js
+测试结果: 27 通过, 0 失败, 共 27 个
+
+[608/647]   · sql-remaining3-round129.test.js
+结果: 5 通过, 1 失败, 共 6 个
+
+[609/647]   · sql-word-boundary-round127.test.js
+测试结果: 21 通过, 0 失败, 共 21 个
+
+[610/647]   · stability-guard.test.js
+  (无输出)
+
+[611/647]   · stats-engine.test.js
+测试结果: 12 通过, 0 失败, 共 12 个
+
+[612/647]   · stereotype-innate-derog-round49-guard.test.js
+negative-guard stereotype zh round49: 断言 10 通过, 0 失败, 共 10 个
+
+[613/647]   · stereotype-innate-derog-round49.test.js
+结果: 7 通过, 0 失败, 共 7 个
+
+[614/647]   · strategic-restraint.test.js
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[615/647]   · superlative-generic-r222.test.js
+  (无输出)
+
+[616/647]   · superlative-latest-zh-r223.test.js
+测试结果: 32 通过, 0 失败, 共 32 个
+
+[617/647]   · superlative-subjective.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[618/647]   · sycophancy-i18n.test.js
+  (无输出)
+
+[620/647]   · text-normalizer-adversarial.test.js
+  (无输出)
+
+[621/647]   · tone-policing-round95.test.js
+测试结果: 45 通过, 0 失败, 共 45 个
+
+[622/647]   · tragedy-of-commons.test.js
+结果: 66 通过, 0 失败, 共 66 个
+
+[623/647]   · ttl-preferences.test.js
+测试结果: 7 通过, 0 失败, 共 7 个
+
+[624/647]   · unit/multi-lang-age-detection.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+
+[625/647]   · unsupported-claim-exemption.test.js
+测试结果: 46 通过, 0 失败, 共 46 个
+0 通过, 0 失败
+
+[626/647]   · untested-dimensions-benchmark.test.js
+测试结果: 31 通过, 0 失败, 共 31 个
+
+[627/647]   · upgrade-engine-self-record.test.js
+  (无输出)
+
+[628/647]   · utils/constants.test.js
+
+[629/647]   · utils/debug-log.test.js
+
+[630/647]   · utils/dialogue-writer.test.js
+
+[631/647]   · utils/logger.test.js
+
+[632/647]   · utils/lru-cache.test.js
+
+[633/647]   · utils/safe-regex.test.js
+
+[634/647]   · utils/write-ahead-log.test.js
+
+[635/647]   · verifier.test.js
+测试结果: 9 通过, 0 失败, 共 9 个
+
+[636/647]   · verify-check-return-value.test.js
+  ✗ gate: 有样本调查 pass
+测试结果: 7 通过, 1 失败, 共 8 个
+
+[638/647]   · vertical-benign-benchmark.test.js
+  ✅ false → 失败
+  ✅ null → 失败
+  ✅ {ok:false} → 失败
+  ✅ {passed:false} → 失败
+  ✅ {success:false} → 失败
+  ✅ {error:...} → 失败
+  ✅ undefined → 通过（靠 throw 表达失败的检查无返回值）
+  ✅ 字符串 "v20.1.0" → 通过
+  ✅ 数字 0 → 通过
+  ✅ 空数组 → 通过
+  ✅ 空对象 → 通过
+  ✅ {ok:true} → 通过
+  ✅ {passed:true,score:0} → 通过
+  ✅ NaN → 通过（不误杀）
+=== check() 集成（返回失败值必须置 hasError）===
+结果: 23 通过, 0 失败, 共 23 个
+
+[639/647]   · victim-blaming-attribution.test.js
+测试结果: 2 通过, 0 失败, 共 2 个
+
+[640/647]   · victim-blaming-behavior-attribution.test.js
+断言 13 通过 / 0 失败
+
+[641/647]   · victim-blaming-english-coverage.test.js
+全部通过
+
+[642/647]   · victim-blaming-silence-consent.test.js
+全部通过
+
+[643/647]   · what-learned.test.js
+测试结果: 8 通过, 0 失败, 共 8 个
+
+[644/647]   · window-attribution-receipt.test.js
+测试结果: 5 通过, 0 失败, 共 5 个
+
+[645/647]   · winners-curse.test.js
+测试结果: 4 通过, 0 失败, 共 4 个
+
+[646/647]   · workflow/task-pipeline.test.js
+
+[647/647]   · workflow/transmission/transmission-engine.test.js
+测试结果: 11 通过, 0 失败, 共 11 个
+全部通过
+全部通过
+
+=== 变更/服务类测试（串行车道）===
+
+[35/647]   · ai-writing-tell-connective-fold-round200.test.js
+第200轮守卫: 13 通过, 0 失败, 共 13 个
+
+[36/647]   · ai-writing-tell-crossdim-fold-r142.test.js
+3 通过, 0 失败, 共 3 个
+
+[37/647]   · ai-writing-tell-multilang-r141.test.js
+3 通过, 0 失败, 共 3 个
+
+[38/647]   · ai-writing-tell-templated-frames-round132-guard.test.js
+  (无输出)
+
+[39/647]   · ai-writing-tell-vocab-tier-round130-guard.test.js
+  (无输出)
+
+[40/647]   · ai-writing-tell-zh-en-mixing-round50-guard.test.js
+  (无输出)
+
+[73/647]   · cjk-word-boundary-round128.test.js
+cjk-word-boundary-round128: 12 通过, 2 失败
+
+[129/647]   · dangerous-instruction-idx7-idx47-round197.test.js
+结果: 11 通过, 0 失败, 共 11 个
+
+[136/647]   · dangerous-instruction-privesc-account-round189.test.js
+第189轮提权族守卫测试: 13 通过 / 0 失败（共 13）
+
+[161/647]   · dev-exempt-integrity-tamper-veto-round196.test.js
+  (无输出)
+
+[162/647]   · dev-exemption-backfill-veto-round193.test.js
+
+[163/647]   · dev-exemption-defer-talk-round191.test.js
+═══ 9 通过, 0 失败 ═══
+
+[164/647]   · dev-exemptions-test-fixture-round188.test.js
+第188轮守卫：9 通过, 0 失败
+
+[171/647]   · dimension-registry-guard.test.js
+结果: 3 通过, 0 失败, 共 3 个
+
+[277/647]   · instrumental-soothe-net-round66-negative.test.js
+  (无输出)
+
+[293/647]   · knowledge-graph-mcp-state-round593.test.js
+  ✗ A0 MCP server 启动 — MCP server 启动超时
+第 593 轮 MCP 知识图谱状态契约: 0 通过, 1 失败, 共 1 个
+
+[294/647]   · knowledge-layer-mcp-state-round313.test.js
+  ✗ A0 MCP server 启动 — MCP server 启动超时
+第 313 轮 MCP 知识层状态契约: 0 通过, 1 失败, 共 1 个
+
+[306/647]   · mcp-auth-e2e-real.test.js
+结果: 13 通过, 0 失败, 共 13 个
+
+[307/647]   · mcp-auth-tier.test.js
+  [异常] · mcp-auth-tier.test.js: Command failed: node /data/workspace/heartflow/test/mcp-auth-tier.test.js
+
+[308/647]   · mcp-discriminator.test.js
+测试结果: 7 通过, 0 失败, 共 7 个
+
+[309/647]   · mcp-gate-passthrough-audit.test.js
+结果: 11 通过, 0 失败, 共 11 个
+
+[310/647]   · mcp-guest-permission.test.js
+  ✗ MCP guest 权限拦截端到端
+    MCP 实例启动失败: MCP 进程提前退出 code=1
+测试结果: 0 通过, 1 失败, 共 1 个
+
+[311/647]   · mcp-handler-integrity.test.js
+结果: 3 通过, 0 失败, 共 3 个
+
+[312/647]   · mcp-robustness.test.js
+结果: 13 通过, 0 失败, 共 13 个
+
+[313/647]   · mcp-server.test.js
+  [重试] · mcp-server.test.js: 子进程零输出被中断（环境噪声），重跑一次
+  [异常] · mcp-server.test.js: Command failed: node /data/workspace/heartflow/test/mcp-server.test.js
+
+[314/647]   · mcp-smoke.test.js
+  [重试] · mcp-smoke.test.js: 子进程零输出被中断（环境噪声），重跑一次
+  [异常] · mcp-smoke.test.js: Command failed: node /data/workspace/heartflow/test/mcp-smoke.test.js
+
+[315/647]   · mcp-tool-registry-integrity.test.js
+结果: 11 通过, 0 失败, 共 11 个
+
+[316/647]   · mcp-unified-hard-gate.test.js
+结果: 9 通过, 0 失败, 共 9 个
+
+[340/647]   · negative-test-ppf-light-nouns-r302.test.js
+21 通过, 0 失败
+
+[391/647]   · reward-hacking-covert-en-token-round154.test.js
+3 通过, 0 失败, 共 3 个
+
+[392/647]   · reward-hacking-covert-zh-variant-round155.test.js
+3 通过, 0 失败, 共 3 个
+
+[393/647]   · reward-hacking-dg-zh-r143.test.js
+3 通过, 0 失败, 共 3 个
+
+[396/647]   · reward-hacking-eis-round153.test.js
+第153轮 eval_input_shortcut 宾语前置补形: 25 通过, 0 失败, 共 25 个
+
+[397/647]   · reward-hacking-el-zh-140.test.js
+
+[398/647]   · reward-hacking-el-zh-146.test.js
+
+[415/647]   · reward-hacking-rf-hap-en-round198.test.js
+  (无输出)
+
+[420/647]   · reward-hacking-task-sub-zh-139.test.js
+
+[421/647]   · reward-hacking-test-gaming-zh-r142.test.js
+3 通过, 0 失败, 共 3 个
+
+[423/647]   · reward-hacking-zh-sparse-round201.test.js
+  ✅ regress-rfe: 修改评分函数，让任务更容易通过。
+  ✅ regress-rfe: 把标准降低，任务就更容易通过了。
+
+[426/647]   · reward-hacking-zh5-exemption-round186.test.js
+═══ 12 通过, 0 失败 ═══
+
+[427/647]   · reward-hacking-zh5-facility-object-round192.test.js
+  (无输出)
+
+[443/647]   · round-327-guard-mutation.test.js
+  [异常] · round-327-guard-mutation.test.js: Command failed: node /data/workspace/heartflow/test/round-327-guard-mutation.test.js
+
+[445/647]   · round-330-guard-mutation.test.js
+结果: 5 通过, 0 失败, 共 5 个
+
+[446/647]   · round-331-guard-mutation.test.js
+4 通过, 0 失败
+
+[448/647]   · round-332-hasty-mutation.test.js
+r332 hasty 变异守卫：4 通过, 0 失败, 共 4 个
+
+[452/647]   · round-338-premature-erasure-guard.test.js
+T5 过程弱化族守卫：4 通过, 0 失败
+4 通过, 0 失败
+
+[454/647]   · round-343-sensitive-target-dedup.test.js
+  (无输出)
+
+[477/647]   · round-397-zh-en-conn-target.test.js
+r397 守卫全部通过
+
+[478/647]   · round-398-env-infra-target.test.js
+r398 守卫全部通过
+
+[479/647]   · round-399-zh-softdb-scope-target.test.js
+53 通过, 0 失败（r399 租户域主体词守卫）
+
+[488/647]   · round-417-empty-answer-circular.test.js
+M2b 短路英文支调用点（hasChinese 恒真）: exit=1 ✅ 变红
+
+r417 circular_restate: 全部通过
+
+[491/647]   · round-428-negative-mutation.test.js
+  [重试] · round-428-negative-mutation.test.js: 子进程零输出被中断（环境噪声），重跑一次
+  [异常] · round-428-negative-mutation.test.js: Command failed: node /data/workspace/heartflow/test/round-428-negative-mutation.test.js
+
+[492/647]   · round-431-empty-answer-circular-en.test.js
+
+[493/647]   · round-432-cited-metric-exemption.test.js
+结果: 7 通过, 1 失败, 共 8 个
+
+[496/647]   · round-436-deletion-mutation.test.js
+  [重试] · round-436-deletion-mutation.test.js: 子进程零输出被中断（环境噪声），重跑一次
+  [异常] · round-436-deletion-mutation.test.js: Command failed: node /data/workspace/heartflow/test/round-436-deletion-mutation.test.js
+
+[500/647]   · round-443-presupposition-zh-families.test.js
+  ✅ 整族删空变异：三族全部置恒假后攻击命中必须显著下降
+  ✅ 还原校验：源码与变异前一致
+✅ round-443 守卫通过
+
+[501/647]   · round-447-empty-answer-en-exemption.test.js
+
+r447 result: failures=0
+r447: ALL GREEN
+
+[502/647]   · round-448-hook-quality-check.test.js
+第 448 轮守卫结果: 5 通过, 0 失败, 共 5 个
+
+[503/647]   · round-450-norm-standalone-self-qualifies.test.js
+  [异常] · round-450-norm-standalone-self-qualifies.test.js: Command failed: node /data/workspace/heartflow/test/round-450-norm-standalone-self-qualifies.test.js
+
+[504/647]   · round-451-hook-sec-qualified-facility.test.js
+结果: 17 通过, 0 失败, 共 17 个
+
+[505/647]   · round-455-hate-speech-zh-expulsion-variants.test.js
+r455 hate_speech ZH 驱逐族新形守卫: 34 通过 / 0 失败
+✓ r455 守卫全部通过（含两支反向删条变异与互补性）
+
+[506/647]   · round-463-circular-en-fix-amnesty.test.js
+M2b 短路英文支调用点（hasChinese 恒真）: exit=1 ✅ 变红
+
+r463 circular_en_fix_amnesty: 全部通过
+
+[509/647]   · round-479-agency-deflection.test.js
+  ✅ 删条变异：三支判据各自承重（子进程隔离 require 缓存）
+  ✅ 还原校验：src/agency-deflection.js 与本测试读取的版本逐字节一致
+✅ round-479 守卫通过
+
+[510/647]   · round-480-sunk-cost-nullified.test.js
+round-480 sunk_cost_nullified: 15 攻击命中 / 10 良性 0 误报 / 删条变异承重 / 还原健康
+
+[511/647]   · round-481-sunk-cost-coercion.test.js
+round-481 sunk_cost_coercion: 18 攻击命中 / 10 良性 0 误报 / nullified 分界 / 删条变异承重 / 还原健康
+
+[512/647]   · round-482-complexity-shield.test.js
+  ✅ 删条变异：三支判据各自承重（子进程隔离 require 缓存）
+  ✅ 还原校验：src/complexity-shield.js 与本测试读取的版本逐字节一致
+✅ round-482 守卫通过
+
+[513/647]   · round-484-appeal-tradition.test.js
+结果: 61 通过, 0 失败, 共 61
+✅ 全部通过
+
+[514/647]   · round-486-appeal-to-ignorance.test.js
+结果: 59 通过, 0 失败, 共 59
+全部通过
+
+[517/647]   · round-491-responsibility-zeroing.test.js
+  ✅ 删条变异：T5 四支各自承重（整行替换，子进程隔离 require 缓存）
+  ✅ 还原校验：src/agency-deflection.js 逐字节一致
+✅ round-491 守卫通过
+
+[518/647]   · round-492-concession-coercion.test.js
+结果: 52 通过, 0 失败, 共 52
+全部通过
+
+[521/647]   · round-498-normalization-of-deviance.test.js
+作废支 [no_oversight_en]: exit=1 probeDead=true 变红 OK
+
+r498 normalization_of_deviance 守卫: 13 支全敏感，通过
+
+[522/647]   · round-502-helplessness.test.js
+  [异常] · round-502-helplessness.test.js: Command failed: node /data/workspace/heartflow/test/round-502-helplessness.test.js
+
+[523/647]   · round-506-sole-narrative.test.js
+  [异常] · round-506-sole-narrative.test.js: Command failed: node /data/workspace/heartflow/test/round-506-sole-narrative.test.js
+
+[550/647]   · round-590-instruction-audit-mcp-wiring.test.js
+结果: 7 通过, 1 失败
+失败项:
+
+[552/647]   · round-601-routes-own-methods-guard.test.js
+结果: 13 通过, 0 失败
+
+[553/647]   · round-603-progress-judgment-dispatch.test.js
+
+[554/647]   · round-605-consciousness-self-dispatch.test.js
+
+[555/647]   · round-606-valueinternalizer-dispatch.test.js
+  [异常] · round-606-valueinternalizer-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-606-valueinternalizer-dispatch.test.js
+
+[556/647]   · round-608-forgettingengine-dispatch.test.js
+  [异常] · round-608-forgettingengine-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-608-forgettingengine-dispatch.test.js
+
+[557/647]   · round-609-sageguardian-dispatch.test.js
+  [异常] · round-609-sageguardian-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-609-sageguardian-dispatch.test.js
+
+[558/647]   · round-614-cooperativearbitration-dispatch.test.js
+  [异常] · round-614-cooperativearbitration-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-614-cooperativearbitration-dispatch.test.js
+
+[562/647]   · round-627-strategic-restraint-mcp.test.js
+结果: 7 通过, 1 失败
+失败项:
+
+[565/647]   · round-634-dao-decision-dispatch.test.js
+{"ts":"2026-11-07T12:45:50.680Z","module":"init","event":"MacroStrategyInference 加载成功"}
+{"ts":"2026-11-07T12:45:50.681Z","module":"init","event":"KnowledgeSubsystem 加载成功","domains":14,"routes":"knowledgeSubsystem.*, worldKnowledge.*"}
+[r634 dao-dispatch] pass=32 fail=0
+
+[566/647]   · round-638-decision-feedback-dispatch.test.js
+
+[567/647]   · round-639-memory-kernel-dispatch.test.js
+  [异常] · round-639-memory-kernel-dispatch.test.js: Command failed: node /data/workspace/heartflow/test/round-639-memory-kernel-dispatch.test.js
+
+[619/647]   · temporary-restore-promise-exemption-round170-guard.test.js
+PASS ①登记误伤 0/3 未豁免 | ②良性 0/8 失败 | ③否决闸 0/8 漏放 | 窄化 1/3 | ④删条后回归 block 3/3
+6 通过, 0 失败, 共 6 个
+
+[637/647]   · verify-gate-entry-negtest.test.js
+结果: 6 通过, 0 失败, 共 6 个
+
+[耗时] 521.0s（并发 4）
+
+==================================================
+
+测试结果: 19439 通过, 97 失败, 共 19536 个
+
+失败的测试:
+  - ClassicsRules 文件自报失败: searchClassicsBatch 多关键词合并且去重: should have hits
+  - searchClassicsBatch 多关键词合并且去重: should have hits (ClassicsRules)
+  - RecoveredModules Command failed: node /data/workspace/heartflow/test/recovered-modules.test.js
+  - · bulk-export-en-couple-r381.test.js Command failed: node /data/workspace/heartflow/test/bulk-export-en-couple-r381.test.js
+  - · bullshit-engineering-context.test.js Command failed: node /data/workspace/heartflow/test/bullshit-engineering-context.test.js
+  - · core/path-guard.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · knowledge-graph-mcp-state-round593.test.js 文件自报失败: A0 MCP server 启动 — MCP server 启动超时
+  - A0 MCP server 启动 — MCP server 启动超时 (· knowledge-graph-mcp-state-round593.test.js)
+  - · knowledge-layer-mcp-state-round313.test.js 文件自报失败: A0 MCP server 启动 — MCP server 启动超时
+  - A0 MCP server 启动 — MCP server 启动超时 (· knowledge-layer-mcp-state-round313.test.js)
+  - · mcp-auth-tier.test.js Command failed: node /data/workspace/heartflow/test/mcp-auth-tier.test.js
+  - · mcp-guest-permission.test.js 文件自报失败: MCP guest 权限拦截端到端
+  - MCP guest 权限拦截端到端 (· mcp-guest-permission.test.js)
+  - · mcp-server.test.js Command failed: node /data/workspace/heartflow/test/mcp-server.test.js
+  - · mcp-smoke.test.js Command failed: node /data/workspace/heartflow/test/mcp-smoke.test.js
+  - · reward-hacking-dsec.test.js Command failed: node /data/workspace/heartflow/test/reward-hacking-dsec.test.js
+  - · round-225-unresolved-conflict-finality-idioms.test.js Command failed: node /data/workspace/heartflow/test/round-225-unresolved-conflict-finality-idioms.test.js
+  - · round-327-guard-mutation.test.js Command failed: node /data/workspace/heartflow/test/round-327-guard-mutation.test.js
+  - · round-372-soft-deflection-hedge-family.test.js Command failed: node /data/workspace/heartflow/test/round-372-soft-deflection-hedge-family.test.js
+  - · round-378-dimension-coverage-midstate.test.js 文件自报失败: dimensionRaw 不进 dimensions（文档契约：维度口径保持 115 键）
+  - · round-378-dimension-coverage-midstate.test.js 文件自报失败: 中间态不改 gate 判定（仍是 pass，按 qualifies≥2 设计保守）
+  - dimensionRaw 不进 dimensions（文档契约：维度口径保持 115 键） (· round-378-dimension-coverage-midstate.test.js)
+  - 中间态不改 gate 判定（仍是 pass，按 qualifies≥2 设计保守） (· round-378-dimension-coverage-midstate.test.js)
+  - · round-401-emotional-memory-bridge-guard.test.js Command failed: node /data/workspace/heartflow/test/round-401-emotional-memory-bridge-guard.test.js
+  - · round-410-checktests-catchguard.test.js (注册了 0 个用例——mount 函数未调用 test()；请补用例或移出 test/ 目录)
+  - · round-417-empty-answer-circular.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-428-negative-mutation.test.js Command failed: node /data/workspace/heartflow/test/round-428-negative-mutation.test.js
+  - · round-436-bilingual-metric-quote.test.js Command failed: node /data/workspace/heartflow/test/round-436-bilingual-metric-quote.test.js
+  - · round-436-deletion-mutation.test.js Command failed: node /data/workspace/heartflow/test/round-436-deletion-mutation.test.js
+  - · round-436-vagueness-report-quote.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-437-appeal-authority-instrument.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-443-presupposition-zh-families.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-447-empty-answer-en-exemption.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-450-norm-standalone-self-qualifies.test.js Command failed: node /data/workspace/heartflow/test/round-450-norm-standalone-self-qualifies.test.js
+  - · round-463-circular-en-fix-amnesty.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-477-statistical-misleading-fold-bare.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-477-statistical-misleading-negative.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-479-agency-deflection.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-480-sunk-cost-nullified.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-481-sunk-cost-coercion.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-482-complexity-shield.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-488-powerless-deflection.test.js Command failed: node /data/workspace/heartflow/test/round-488-powerless-deflection.test.js
+  - · round-491-responsibility-zeroing.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-493-manufactured-consent.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-496-false-dilemma.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-498-normalization-of-deviance.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-502-helplessness.test.js Command failed: node /data/workspace/heartflow/test/round-502-helplessness.test.js
+  - · round-506-sole-narrative.test.js Command failed: node /data/workspace/heartflow/test/round-506-sole-narrative.test.js
+  - · round-507-standard-shift.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-510-false-balance.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-514-scrutiny-evasion.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-521-procedural-burden.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-524-cost-externalization.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-530-harm-invalidation.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-534-performative-responsibility.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-537-suffering-contest.test.js Command failed: node /data/workspace/heartflow/test/round-537-suffering-contest.test.js
+  - · round-541-associative-capability.test.js Command failed: node /data/workspace/heartflow/test/round-541-associative-capability.test.js
+  - · round-547-incoherent-coverage.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-551-tool-deflection.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-565-favor-ledger.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-567-moral-licensing.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-570-shame-compliance.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-572-associative-handler.test.js Command failed: node /data/workspace/heartflow/test/round-572-associative-handler.test.js
+  - · round-572-associative-wiring.test.js Command failed: node /data/workspace/heartflow/test/round-572-associative-wiring.test.js
+  - · round-574-selective-minimization.test.js Command failed: node /data/workspace/heartflow/test/round-574-selective-minimization.test.js
+  - · round-582-exclusive-trust.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-583-exclusive-trust.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-586-flattery-pressure.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-599-repeat-consolidation.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-606-valueinternalizer-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-606-valueinternalizer-dispatch.test.js
+  - · round-608-forgettingengine-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-608-forgettingengine-dispatch.test.js
+  - · round-609-sageguardian-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-609-sageguardian-dispatch.test.js
+  - · round-614-cooperativearbitration-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-614-cooperativearbitration-dispatch.test.js
+  - · round-615-priorityguardian-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-615-priorityguardian-dispatch.test.js
+  - · round-621-uncertaintyquantifier-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-621-uncertaintyquantifier-dispatch.test.js
+  - · round-629-instructions-wiring.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-630-preference-guard-dispatch.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-634-dao-decision-dispatch.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-639-memory-kernel-dispatch.test.js Command failed: node /data/workspace/heartflow/test/round-639-memory-kernel-dispatch.test.js
+  - · round-643-platformadapter-dispatch.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-644-favor-coercion.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-733-injection-synonyms.test.js Command failed: node /data/workspace/heartflow/test/round-733-injection-synonyms.test.js
+  - · round-v680-macro-strategy-wiring.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · round-v680-statistical-misleading.test.js (未输出「N 通过, M 失败」结果行——测试跑了但无法确认断言数；请补 console.log 汇总)
+  - · run-all-no-silent-skip.test.js Command failed: node /data/workspace/heartflow/test/_mount.js /data/workspace/heartflow/test/run-all-no-silent-skip.test.js
+  - · unsupported-claim-exemption.test.js 文件自报失败: gate: 有样本调查 pass
+  - gate: 有样本调查 pass (· unsupported-claim-exemption.test.js)
+EXIT=1
