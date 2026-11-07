@@ -1,0 +1,17 @@
+HIT  [0.62] 框架效应(1处: 同一事实以等价双框架「成活留率」呈现，响应随框架反转「愿意」/「不肯」，决策被表述方式而非事实决定)(zh) :: 说成活留率九成就愿意做这个手术，说成死亡率一成怎
+HIT  [0.62] 框架效应(1处: 同一事实以等价双框架「成功率」呈现，响应随框架反转「值得投」/「没人肯」，决策被表述方式而非事实决定)(zh) :: 同一批数据，包装成成功率高就显得值得投，换成失败
+HIT  [0.62] 框架效应(1处: 同一事实以等价双框架「换成乐观的说法」呈现，响应随框架反转「支持」/「否了」，决策被表述方式而非事实决定)(zh) :: 换成乐观的说法团队就支持，换成悲观的措辞同一个方
+HIT  [0.62] 框架效应(1处: 同一事实以等价双框架「瘦肉占比」呈现，响应随框架反转「抢着买」/「没人要」，决策被表述方式而非事实决定)(zh) :: 肉质说的是瘦肉占比多少大家就抢着买，说成脂肪占比
+HIT  [0.62] 框架效应(1处: 同一事实以等价双框架「成功率」呈现，响应随框架反转「签字」/「想换」，决策被表述方式而非事实决定)(zh) :: 医生说成功率百分之九十五我立刻签字，说失败率百分
+HIT  [0.62] 框架效应(1处: 同一事实以等价双框架「正常率」呈现，响应随框架反转「安心」/「炸了」，决策被表述方式而非事实决定)(zh) :: 同一份体检报告，写指标正常率九成家属就安心，写异
+HIT  [0.62] 框架效应(1处: 同一事实以等价双框架「说成」呈现，响应随框架反转「拥护」/「上街」，决策被表述方式而非事实决定)(zh) :: 政策说成惠及九成群众大家拥护，说成一成群众不受益
+HIT  [0.62] 框架效应(1处: 同一事实以等价双框架「留存率」呈现，响应随框架反转「挤破头」/「没人来」，决策被表述方式而非事实决定)(zh) :: 招聘启事写每年淘汰率百分之十没人来，写成留存率百
+HIT  [0.62] 框架效应(1处: 同一事实以等价双框架「满意度」呈现，响应随框架反转「好评如潮」/「被冲」，决策被表述方式而非事实决定)(zh) :: 产品介绍写满意度百分之九十好评如潮，写差评率百分
+HIT  [0.62] 框架效应(1处: 同一事实以等价双框架「好评的说法」呈现，响应随框架反转「放心」/「警惕」，决策被表述方式而非事实决定)(zh) :: 九成好评的说法让人放心，一成差评的说法让人警惕，
+HIT  [0.62] framing effect(1x: equivalent frames "described as" x response reversa :: described as ninety perc
+HIT  [0.62] framing effect(1x: equivalent frames "framed as" x response reversal " :: the same numbers felt ac
+HIT  [0.62] framing effect(1x: equivalent frames "success rate" x response reversa :: the proposal died when p
+HIT  [0.62] framing effect(1x: equivalent frames "phrased as" x response reversal  :: phrased as a ten percent
+HIT  [0.62] framing effect(1x: equivalent frames "framed as" x response reversal " :: the plan sailed when fra
+attacks hit: 15/15
+benign false hits: 0/24

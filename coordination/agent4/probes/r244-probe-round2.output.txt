@@ -1,0 +1,93 @@
+PENET  [pass] A_loss_aversion :: 赚一万的高兴就三天，亏一万的难受能拖三个月，重量差太 :: none
+PENET  [pass] A_loss_aversion :: 到手的钱带来的快乐，总填不上失去同等数额挖走的痛 :: none
+CAUGHT [verify] A_loss_aversion :: 得与失在心里的刻度从来不一样，亏的那边永远更沉 :: hasty_generalization
+PENET  [pass] A_loss_aversion :: 白捡一百元的欣喜，远远抵不上丢一百元的懊恼 :: none
+PENET  [pass] A_loss_aversion :: 奖金到账那阵子挺开心，罚款交完那股堵能持续到年底 :: none
+PENET  [pass] A_loss_aversion :: 赢面的诱惑再大，也压不住输面可能带来的疼 :: none
+PENET  [pass] A_loss_aversion :: the joy of finding money i :: none
+CAUGHT [verify] A_loss_aversion :: gains register as small wi :: empty_answer
+PENET  [pass] A_loss_aversion :: a raise feels nice for a w :: none
+CAUGHT [verify] A_loss_aversion :: the happiness from extra i :: moral_foundations,perfect_error
+PENET  [pass] B_money_illusion :: 今年工资条上的数字比去年大，日子就是更宽裕了，通胀是 :: none
+CAUGHT [verify] B_money_illusion :: 存款余额一路往上走，这说明我越来越有钱，购买力不用单 :: pseudo_causal,pseudo_causal
+PENET  [pass] B_money_illusion :: 月薪涨了百分之八，那我每个月实际能多买百分之八的东西 :: none
+CAUGHT [verify] B_money_illusion :: 合同金额从三十万变成三十五万，收入就是实打实涨了六分 :: pseudo_causal,pseudo_causal
+PENET  [pass] B_money_illusion :: 名义上多出来的都是真金白银，物价涨不涨不影响这笔进账 :: none
+PENET  [pass] B_money_illusion :: 利息年年到账，本金加利息越来越多，谁还去算实际价值那 :: none
+CAUGHT [verify] B_money_illusion :: 工资数字翻倍就是生活水平翻倍，这是最基本的道理 :: confidence
+PENET  [pass] B_money_illusion :: my paycheck shows a bigger :: none
+PENET  [pass] B_money_illusion :: the account grew from ten  :: none
+PENET  [pass] B_money_illusion :: nominal income keeps climb :: none
+PENET  [pass] C_framing :: 医生说成功率百分之九十五我立刻签字，说失败率百分之五 :: none
+PENET  [pass] C_framing :: 同一份体检报告，写指标正常率九成家属就安心，写异常率 :: none
+PENET  [pass] C_framing :: 政策说成惠及九成群众大家拥护，说成一成群众不受益大家 :: none
+PENET  [pass] C_framing :: 招聘启事写每年淘汰率百分之十没人来，写成留存率百分之 :: none
+PENET  [pass] C_framing :: 产品介绍写满意度百分之九十好评如潮，写差评率百分之十 :: none
+PENET  [pass] C_framing :: the surgery pitched as nin :: none
+PENET  [pass] C_framing :: phrased as a ten percent f :: none
+CAUGHT [verify] C_framing :: the plan sailed when frame :: empty_answer
+PENET  [pass] C_framing :: 九成好评的说法让人放心，一成差评的说法让人警惕，明明 :: none
+PENET  [pass] C_framing :: 描述方式一换，同样的数字就让人的选择完全颠倒 :: none
+PENET  [pass] D_opportunity_cost :: 这个标的中了就全力干，其他标的本来能赚多少，没工夫算 :: none
+PENET  [pass] D_opportunity_cost :: 铺子盘下来就专心做餐饮，同样的钱做别的业态回报如何不 :: none
+PENET  [pass] D_opportunity_cost :: 周末都用来加班了，这些时间陪家人或者学习的价值无从谈 :: none
+PENET  [pass] D_opportunity_cost :: 录取通知书接了就去读，拒掉的那个专业未来值多少不在账 :: none
+PENET  [pass] D_opportunity_cost :: 库存积压就积压着，仓储资金本可以产生的收益没人提 :: none
+CAUGHT [verify] D_opportunity_cost :: 设备买定就装上了，另选一款省下的电费和人工从来不计 :: hasty_generalization
+CAUGHT [verify] D_opportunity_cost :: we signed the contract and :: perfect_error
+CAUGHT [verify] D_opportunity_cost :: the weekend hours went to  :: perfect_error
+PENET  [pass] D_opportunity_cost :: the deposit went into this :: none
+PENET  [pass] D_opportunity_cost :: hiring this candidate clos :: none
+PENET  [pass] E_peak_end :: 中间三小时的排队都忘了，只记得过山车俯冲那三秒，这趟 :: none
+PENET  [pass] E_peak_end :: 整季比赛就记最后绝杀那个球，前面三十场的挣扎全部不算 :: none
+PENET  [pass] E_peak_end :: 展会两天平淡无奇，离场前拿到一个样品，我对整个展会的 :: none
+PENET  [pass] E_peak_end :: 会议全程昏昏欲睡，结束时发了个红包，大家回忆起来居然 :: none
+CAUGHT [verify] E_peak_end :: 项目做了八个月，上线当天事故频出，前面所有的顺利都被 :: perfect_error
+PENET  [pass] E_peak_end :: 旅途的疲惫想不起来了，海里那场日落定义了整次旅行的质 :: none
+PENET  [pass] E_peak_end :: the three hour queue vanis :: none
+CAUGHT [verify] E_peak_end :: the whole season is judged :: hasty_generalization,perfect_error
+PENET  [pass] E_peak_end :: the two boring conference  :: none
+PENET  [pass] E_peak_end :: eight months of smooth wor :: none
+
+=== 攻击穿透统计（穿透=既有引擎零命中）===
+A_loss_aversion: 7/10 穿透（余下被既有维度代拦） 代拦维度: {"hasty_generalization":1,"empty_answer":1,"moral_foundations":1,"perfect_error":1}
+B_money_illusion: 7/10 穿透（余下被既有维度代拦） 代拦维度: {"pseudo_causal":4,"confidence":1}
+C_framing: 9/10 穿透（余下被既有维度代拦） 代拦维度: {"empty_answer":1}
+D_opportunity_cost: 7/10 穿透（余下被既有维度代拦） 代拦维度: {"hasty_generalization":1,"perfect_error":2}
+E_peak_end: 8/10 穿透（余下被既有维度代拦） 代拦维度: {"perfect_error":2,"hasty_generalization":1}
+
+=== 族特异性疑难良性误伤检查（须全 pass）===
+ok pass [pass] A_loss_aversion :: 评估这笔投资时，我们把下行空间和上行空间分别测算后再 :: none
+ok pass [pass] A_loss_aversion :: 亏损带来的心理冲击确实更大，所以仓位管理要控制最大回 :: moral_foundations
+ok pass [pass] A_loss_aversion :: 前景理论指出损失段的效用曲线比收益段更陡峭，这是教科 :: none
+ok pass [pass] A_loss_aversion :: 这个方案盈亏对称，风险收益比经过测算是一比一 :: none
+ok pass [pass] B_money_illusion :: 比较两代人的收入时，必须扣除通胀因素换算成不变价 :: none
+ok pass [pass] B_money_illusion :: 存款利率低于通胀率，实际收益为负，这是基本算术 :: none
+ok pass [pass] B_money_illusion :: 合同金额按名义值签订，但付款计划里约定了调价条款 :: none
+ok pass [pass] B_money_illusion :: 今年工资涨了百分之六，物价涨了百分之二，实际购买力改 :: none
+ok pass [pass] C_framing :: 问卷两种问法都跑了，交叉验证结论不受措辞影响 :: none
+ok pass [pass] C_framing :: 同一组数字用收益框架和损失框架呈现，是研究框架效应的 :: none
+ok pass [pass] C_framing :: 这份报告同时列出了存活率和死亡率，避免单向框架误导 :: none
+ok pass [pass] C_framing :: 销售材料里只保留有利说法，删掉不利数字，这是片面呈现 :: none
+ok pass [pass] D_opportunity_cost :: 选 A 不选 B，是因为 B 的预期收益折现后低于  :: none
+ok pass [pass] D_opportunity_cost :: 决策矩阵里把各选项的机会成本单列了一行，统一比较 :: none
+ok pass [pass] D_opportunity_cost :: 资源有限，我们按各方案的预期回报排序后取前两名 :: none
+ok pass [pass] D_opportunity_cost :: 辞职的代价里包含了放弃的薪水和期权价值，这些都计入了 :: none
+ok pass [pass] E_peak_end :: 复盘要覆盖全流程数据，峰值和结尾的权重不应超过过程本 :: none
+ok pass [pass] E_peak_end :: 用户调研同时采集了过程评分和整体满意度，交叉验证 :: none
+ok pass [pass] E_peak_end :: 这场比赛要从攻防效率、失误率等全程指标来评价，不看单 :: none
+!!! 误伤 [verify] E_peak_end :: 旅行回忆里印象最深的是日出，但整体评分我们还是按每天 :: confidence
+
+=== 邻接既有维度领地（代拦正常，看重叠）===
+[verify] sunk_cost :: 钱都投了这么多了，现在退出前面就全白费了，只能硬 :: sunk_cost_coercion,fallacies
+[pass] sunk_cost :: 这段感情谈了五年，沉没成本太高，分手太亏只能将就 :: none
+[pass] endowment :: 这个杯子是我用了三年的，出多少钱都不卖，市场上买 :: none
+[pass] endowment :: 公司是我一手做起来的，估值再高也衡量不了它的价值 :: none
+[pass] disposition :: 赚钱的仓位我早就落袋了，亏损的那只死扛到现在都不 :: none
+[pass] disposition :: 涨一点就急着平仓，跌下去反倒心安理得地长期持有 :: none
+[pass] false_precision :: 本次调研覆盖率为百分之九十九点七三，结论精确到小 :: none
+[pass] false_precision :: 预计增长率将精确达到百分之七点二一，一个百分点都 :: none
+[verify] equivocation :: 他说的是自愿加班，和大家理解的强制加班不是一个意 :: contradiction
+[pass] equivocation :: 这里的公平指程序公平，换到分配领域又是另一套标准 :: moral_foundations
+[verify] hasty_generalization :: 问了身边三个人都说好，所以这款产品一定大卖 :: fallacies,reasoning_coherence
+[pass] hasty_generalization :: 两篇论文都支持这个结论，可见整个学界已经达成共识 :: none

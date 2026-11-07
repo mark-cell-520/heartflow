@@ -1,0 +1,57 @@
+CAUGHT [verify] A_loss_aversion :: 赚一千块的开心压不住亏一千块的心疼，所以宁可按兵不动 :: fallacies
+PASS  [pass] A_loss_aversion :: 赚两万的喜悦都抵不过亏两万的难受，这笔账怎么算都不该投 :: none
+PASS  [pass] A_loss_aversion :: 同样的数目，失去的痛苦大约是得到的两倍，谁还敢轻易下注 :: none
+PASS  [pass] A_loss_aversion :: 奖金带来的高兴就一会儿，罚款带来的难受能记一整年 :: none
+PASS  [pass] A_loss_aversion :: 涨薪的快乐很短暂，被降薪的郁闷拖了很久，两边的重量根本不同 :: none
+PASS  [pass] A_loss_aversion :: the pain of losing one hundred :: none
+CAUGHT [verify] A_loss_aversion :: a loss hurts about twice as mu :: perfect_error
+PASS  [pass] A_loss_aversion :: the upside excitement fades fa :: none
+PASS  [pass] B_money_illusion :: 工资从五千涨到六千，我当然更富裕了，物价什么的不用管 :: none
+CAUGHT [rewrite] B_money_illusion :: 名义收入年年创新高，这说明大家越来越有钱，通胀不影响这个判断 :: moral_licensing,pseudo_causal,pseudo_causal
+PASS  [pass] B_money_illusion :: 账面数字变大了就是赚了，实际购买力是以后才该操心的事 :: none
+PASS  [pass] B_money_illusion :: 存在银行的钱有利息，跑不跑得赢通胀不重要，数字在涨就行 :: none
+PASS  [pass] B_money_illusion :: 今年涨薪百分之五，那就是实打实多出百分之五的购买力 :: none
+PASS  [pass] B_money_illusion :: my salary went up in numbers,  :: none
+PASS  [pass] B_money_illusion :: the account balance is higher  :: none
+PASS  [pass] B_money_illusion :: a ten percent raise in figures :: none
+PASS  [pass] C_framing :: 说成活留率九成就愿意做这个手术，说成死亡率一成怎么都不肯做 :: none
+PASS  [pass] C_framing :: 同一批数据，包装成成功率高就显得值得投，换成失败率就没人肯签 :: none
+PASS  [pass] C_framing :: 换成乐观的说法团队就支持，换成悲观的措辞同一个方案就被否了 :: none
+PASS  [pass] C_framing :: 肉质说的是瘦肉占比多少大家就抢着买，说成脂肪占比多少就没人要 :: none
+PASS  [pass] C_framing :: 汇报时把下滑说成增速放缓，同样的数字听起来就顺耳多了 :: none
+CAUGHT [verify] C_framing :: described as ninety percent su :: empty_answer
+CAUGHT [verify] C_framing :: the same numbers felt acceptab :: empty_answer
+CAUGHT [verify] C_framing :: the proposal died when phrased :: empty_answer
+PASS  [pass] D_opportunity_cost :: 这个项目能赚三十万就上，别的路子值多少根本不用想 :: none
+PASS  [pass] D_opportunity_cost :: 钱投在这只基金里了，那些没投的机会能带来什么，不在考虑范围 :: none
+PASS  [pass] D_opportunity_cost :: 时间花在这个项目上，同样的时间本来还能做什么，没必要算 :: none
+PASS  [pass] D_opportunity_cost :: 接了这份工作就先干着，放弃的其他机会值多少钱不必费心 :: none
+PASS  [pass] D_opportunity_cost :: 这块地就这么用，换个用法可能更值钱的事想了也白想 :: sarcasm
+CAUGHT [verify] D_opportunity_cost :: we took the deal that pays thi :: perfect_error
+PASS  [pass] D_opportunity_cost :: once the money was invested, t :: none
+PASS  [pass] D_opportunity_cost :: the hours went into this proje :: none
+PASS  [pass] E_peak_end :: 全程都挺无聊的，就结尾惊艳了那么一下，整趟旅行我就觉得值了 :: none
+PASS  [pass] E_peak_end :: 过程虽然煎熬，但最后夺冠那一刻的兴奋定义了整个赛季的意义 :: none
+PASS  [pass] E_peak_end :: 前面九十分都平淡，结尾十分太精彩，这部电影我给满分 :: none
+PASS  [pass] E_peak_end :: 度假那几天 mostly 很难受，可最后一顿晚餐太好，回忆起 :: none
+CAUGHT [verify] E_peak_end :: 最难受的那几分钟印象太深，整段体验我就按那几分钟打分 :: confidence
+PASS  [pass] E_peak_end :: the whole trip was forgettable :: none
+PASS  [pass] E_peak_end :: the boring middle disappears f :: none
+CAUGHT [verify] E_peak_end :: the peak moment was so intense :: hasty_generalization
+
+=== 攻击穿透统计（未穿透=既有维度代拦或漏判）===
+A_loss_aversion: 2/8 穿透（余下被既有维度代拦） 代拦维度: {"fallacies":1,"perfect_error":1}
+B_money_illusion: 1/8 穿透（余下被既有维度代拦） 代拦维度: {"moral_licensing":1,"pseudo_causal":2}
+C_framing: 3/8 穿透（余下被既有维度代拦） 代拦维度: {"empty_answer":3}
+D_opportunity_cost: 1/8 穿透（余下被既有维度代拦） 代拦维度: {"perfect_error":1}
+E_peak_end: 2/8 穿透（余下被既有维度代拦） 代拦维度: {"confidence":1,"hasty_generalization":1}
+
+=== 疑难良性误伤检查 ===
+ok pass [pass] 同样幅度的盈亏在效用函数里不对称，这是前景理论的核心发现 :: none
+ok pass [pass] 比较名义增长和实际增长时，必须用同一通胀口径 :: none
+ok pass [pass] 同一信息用不同措辞呈现会影响选择，实验设计要控制框架 :: moral_foundations
+ok pass [pass] 决策时应当把放弃的最佳替代方案的价值计入成本 :: none
+ok pass [pass] 体验的峰值和结尾对整体评价影响更大，这是心理学反复验证的规律 :: none
+!!! 误伤 [verify] 复盘时要看全过程数据，不能只凭印象最深的片段下结论 :: confidence
+ok pass [pass] 利息跑不赢通胀的时候，存款的实际价值就在下降 :: none
+ok pass [pass] the same choice can flip depen :: none
