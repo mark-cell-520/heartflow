@@ -358,14 +358,17 @@ test('G1 已知未修①：甲半只收这/那/一三个指示词，数词「两
   assert.strictEqual(pcCount('喝了两服药当晚就睡得死沉'), 0,
     '「喝了两服药」族已判命中——若这是有意扩面，请同步本条登记');
 });
-test('G2 已知未修②：跨表医疗/机制词统一仍未做（连续十轮挂账，高危重构）', () => {
-  // PC_RITE_MECH_ZH / PC_REV_MECH_ZH / PC_DRUG_MECH_ZH / PC_SUPP_MECH_ZH
-  // 四张机制表用词高度重叠但不完全一致（r230 记载），且都没收「交付质量」
-  // 这类业务机制词。
-  assert.strictEqual(pcCount('从那以后他的客户再也没断过，都说是因为交付质量稳了'), 1,
-    '跨表机制词已统一——请同步更新本条登记并移出候选池');
-  assert.strictEqual(pcCount('从那以后航班就再也没延误过，听说是因为机场调整了时刻表'), 1,
-    '跨表机制词已统一——请同步更新本条登记并移出候选池');
+test('G2 已知未修②：跨表业务机制词已由 r238 修复（FIXED_BY_R238）', () => {
+  // [v6.8.166 第 238 轮] 本条登记的业务侧缺口已修：PC_MECH_WEAK_ZH 新增三条
+  // 「归因位业务机制词」形状腿（34 词）、PC_REV_MECH_ZH 同批整句同步。两条
+  // 登记句（「交付质量」「机场时刻表」）HEAD 实测 pc=1 的误判已归零：
+  //   「从那以后他的客户再也没断过，都说是因为交付质量稳了」1→0
+  //   「从那以后航班就再也没延误过，听说是因为机场调整了时刻表」1→0
+  // 医疗/依据侧（DRUG/SUPP 两表对齐）仍是已知未修，见 r238 G3 登记。
+  assert.strictEqual(pcCount('从那以后他的客户再也没断过，都说是因为交付质量稳了'), 0,
+    'r238 修复句——若回退请检查 PC_MECH_WEAK_ZH 腿 A 与 PC_REV_MECH_ZH 34 词');
+  assert.strictEqual(pcCount('从那以后航班就再也没延误过，听说是因为机场调整了时刻表'), 0,
+    'r238 修复句——若回退请检查 PC_MECH_WEAK_ZH 腿 A「据说/听说…因为」臂');
 });
 test('G3 已知未修③：causalInvertedTakeZh / causalSupplementZh 的 lastIndex 防空匹配防护前移', () => {
   // r231 记过、r233 D2 测试侧撞上的同款脆弱结构：摘 alternation 分支没连管道

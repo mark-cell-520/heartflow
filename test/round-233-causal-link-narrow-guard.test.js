@@ -67,7 +67,6 @@ function hasDim(text, dim) {
 const ATTACK = [
   '打那以后球队就再也没输过，显然是因为换了教练',
   '从那以后他的业绩再也没下滑过，显然是因为带了这块表',
-  '上线新版本之后投诉也少了，可见是因为新版本解决了瓶颈',
   '换了这个头像之后咨询也变多了，看来是因为头像带来了好运',
   '调整座位之后他成绩也上来了，说明是因为座位风水显了灵',
   '自从戴了这个手串，他打牌再也没输过，显然是因为手串招了财',
@@ -84,7 +83,6 @@ const ATTACK = [
   '从那以后航班就再也没延误过，看来是因为摆件起了作用',
   '换了工位之后她的绩效也涨了，证明是因为工位朝向变了',
   '从那以后他的失眠也好了，显然是因为睡前仪式的功劳',
-  '上了新系统之后客诉也降了，可见是因为新系统清理了瓶颈',
   // 「是/地」两字间插形：单可选组 `(?:是|地)?` 下这两形豁免恒真、收窄整段失效
   '从那以后航班就再也没延误过，显然地是因为摆件起了作用',
   '换了工位之后她的绩效也涨了，显然是地因为工位朝向变了',
@@ -263,12 +261,14 @@ test('D1 变异守卫一：还原为裸「因为」后 22 条攻击句应回落�
     assert.strictEqual(n, 2, `还原为裸因为后攻击句命中应回落到 2，实测 ${n}`);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
-test('D2 变异守卫二：摘掉「因为」整支后良性他因句应从 0 翻成 16/16（豁免承重）', () => {
+test('D2 变异守卫二：摘掉「因为」整支后良性他因句应从 0 翻成 11/16（豁免承重）', () => {
+  // [v6.8.166 第 238 轮] 期望 16→11：16 条里有 5 条（排班×3 / 售后×2）的归因
+  // 对象是窄义业务机制词，被本轮 PC_MECH_WEAK_ZH 腿 A 兜住，摘「因为」支不翻。
   const tmp = copySrc('dropcause');
   try {
     mutateOf(path.join(tmp, 'src', 'index.js'), CAUSE_LEG, '');
-    assert.strictEqual(countHitsIn(tmp, BENIGN_CAUSE), BENIGN_CAUSE.length,
-      '摘掉因为分支后良性他因句未被误命中（说明该腿仍承重，本轮不能整支删除）');
+    assert.strictEqual(countHitsIn(tmp, BENIGN_CAUSE), 11,
+      '摘掉因为分支后应 11 条翻成命中（另 5 条被 r238 腿 A 兜住），实测 ' + countHitsIn(tmp, BENIGN_CAUSE));
     // 存量良性另靠「同/同步/被…挡/因为以外的对冲词」兜住，不受本变异影响
     assert.strictEqual(countHitsIn(tmp, BENIGN_LEGACY), 0,
       '摘掉因为分支后存量良性被连带误命中');
@@ -354,10 +354,12 @@ test('F3 causalOverclaimZh 仍由 checkPseudoCausal 接线调用（豁免表不�
 // (?:因为|由于|的功劳)」两族 + 「旺了?财」进 (?:肯定|一定) 分支获益词表），
 // 按 r226/r227/r233 纪律从 STILL_GAP 移入 FIXED_BY_R234 正向断言：
 // 反向断言（"必须仍为 0"）在修复后必然翻红，留着就是假绿。
-test('G1 已修复①：「总之」已在 PC_ATTRIB_ZH，同形句 detector 命中（r234 FIXED）', () => {
+test('G1 已修复①：「总之」族 + 业务机制词归因对象（r234 FIXED / r238 FIXED_BY_R238）', () => {
+  // r234 修「总之」判据层；r238 修豁免层——该句归因对象「新系统清理了瓶颈」
+  // 是窄义工程机制词，PC_MECH_WEAK_ZH 腿 A 在场即正常归因，不判。
   const s = '上了新系统之后客诉也降了，总之是因为新系统清理了瓶颈';
-  assert.strictEqual(pcCount(s), 1, '「总之」缺口已消失——请同步更新本条登记');
-  assert.strictEqual(gateAction(s), 'verify', '该句 gate 应因本轮修复从 pass 变为 verify');
+  assert.strictEqual(pcCount(s), 0, 'r238 修复句——若回退请检查 PC_MECH_WEAK_ZH 腿 A「总之…因为」臂与「瓶颈」');
+  assert.strictEqual(gateAction(s), 'pass', '该句 gate 应回 pass（业务机制归因是正常归因）');
 });
 test('G2 已修复②：「旺财」已在 PC_ATTRIB_ZH 的获益词表，同形句 detector 命中（r234 FIXED）', () => {
   const s = '自从改了签名之后他就再也没被拒过，肯定是因为签名旺了财';
