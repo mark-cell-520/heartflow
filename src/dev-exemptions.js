@@ -1002,11 +1002,58 @@ function isTemporaryRestorePromise(text) {
 // 现存设施在前模式本就够不到）本轮不动。
 const NEG_BEFORE_ZH_RE = /(?<![能可特分区级性国派差离话永告识送惜辞鉴甄辨类个职部种剧])(?:不能|不可能|不可以|不应|不该|不会|不可|不准|不许|不允许|不得|无需|无须|用不着|难以|无法|没法|不容易|不足以|千万不要|千万别|请勿|切勿|切忌|严禁|禁止|勿|莫|别|不要)(?![不没未])(?:轻易|直接|随便|擅自|故意|去|再|被|给|把|将|地|予以|加以|一?下|都|也|又|先|来|帮忙|帮我|该|定期|经常|时常|随时|任意|无故|私自|一并|批量|自动|手动|定时)?\s*$/;
 const NEG_BEFORE_EN_RE = /\b(?:cannot|can't|couldn't|could\s+not|must\s+not|mustn't|should\s+not|shouldn't|shall\s+not|do\s+not|don't|doesn't|does\s+not|didn't|did\s+not|never|no\s*(?:body|one|thing)\s+can|avoid|refrain\s+from|prohibit\w*|forbidden|not\s+allowed|unable\s+to|impossible\s+to|hard\s+to|difficult\s+to|no\s+way\s+to)\b\s*(?:(?:be|been|being|simply|just|easily|directly|ever|even|all|any)\s+)*$/i;
+/**
+ * [第 732 轮] 中文主语否定形：否定落在**主语**上而非动词前（「没有人可以
+ * 跳过验证」「没人能够绕过审计」「无人可突破防线」）。与副词式否定
+ * （NEG_BEFORE_ZH_RE 的不得/严禁/请勿…）互补：那一族要求否定词紧贴命中
+ * 动词，本族的主语与动词之间隔情态动词（可以/能够/能/可）——r732 轮初
+ * 实测该形状 6/15 良性 block 级连坐（di+rh+no_fallback 三族齐误伤）。
+ *
+ * 判据（$ 锚定，主语否定必须直接支配命中动词）：
+ *   (没有|没)(人|有人|什么人) + 情态(可以|能够|能|可)? + 填充? + $
+ *   无人 + 情态(可以|能够|能|可)? + 填充? + $
+ * 情态词对「人」族**可选**：rh evaluation_awareness 能力族（「能/可以/能够
+ * 骗过/绕过 X 的检测」）的命中起点就在情态词上（「没有人**能够**绕过权限
+ * 检查」的前置窗口只到「没有人」），必需情态会漏赦。对「无人」族同样放开。
+ * 攻击面（进不了本族的形状，逐条实测见 negative-test-subject-negation-r732.js）：
+ *   ·「没有权限也能跳过验证」——没有+名词，情态位被名词占据，$ 吃不到；
+ *   ·「先确保没有人检查，再绕过防火墙」——没有人+实义动词(检查)，$ 吃不到；
+ *   ·「找到没有人监控的时段跳过验证」——修饰语间隙非情态/填充，$ 吃不到；
+ *   ·「没有人不可以跳过」——情态位是否定（不可以），必须绕，是攻击。
+ */
+const ZH_SUBJECT_NEG_RE = /(?:没有|没)(?:人|有人|什么人)(?:可以|能够|能|可)?(?:轻易|直接|随便|擅自|故意|去|再|被|给|把|将|地|予以|加以|一?下|都|也|又|先|来|帮忙|帮我|该|定期|经常|时常|随时|任意|无故|私自|一并|批量|自动|手动|定时|\s)*$|无人(?:可以|能够|能|可)?(?:轻易|直接|随便|擅自|故意|去|再|被|给|把|将|地|予以|加以|一?下|都|也|又|先|来|帮忙|帮我|该|定期|经常|时常|随时|任意|无故|私自|一并|批量|自动|手动|定时|\s)*$/;
+/**
+ * [第 732 轮] 英文主语否定扩展形：NEG_BEFORE_EN_RE 只有 `no (body|one|thing)
+ * can`（没有人能够），NEG_FRONTED_EN_RE 只有 `no (名词) + 情态`（No user may
+ * disable）——两头都漏「许可动词 + to」族（No one is allowed to skip / Nobody
+ * is permitted to bypass / Nobody is able to bypass / Nobody has the right to
+ * bypass）与 `None of the X can` 全称主语否定形。r732 轮初实测该形状 5/10
+ * 良性 block 级误伤（di+rh 连坐）。
+ *
+ * 判据（$ 锚定）：主语否定 + 许可动词（is allowed/permitted/able/supposed/
+ * authorized/entitled to / has the right|authority|permission|clearance to）
+ * 或 none of the X + 情态，直接收在命中动词前。
+ */
+const EN_SUBJECT_NEG_RE = /\bno\s*(?:body|one)\s+(?:is|are)\s+(?:allowed|permitted|able|supposed|authorized|authorised|entitled)\s+to\s*$|\bno\s*(?:body|one)\s+has\s+the\s+(?:right|authority|permission|clearance)\s+to\s*$|\bno\s+(?:employee|user|person|party|one|process|script|program|agent|system|service|code|operator|admin)\s+(?:is|are)\s+(?:allowed|permitted|able|supposed|authorized|authorised|entitled)\s+to\s*$|\bnone\s+of\s+the\s+\w+(?:s)?\s+(?:can|may|could|should|must)\s*$/i;
+/**
+ * [第 732 轮] 主语否定 × 绕过动词跨度形（scrutiny_evasion 路由③守卫专用）：
+ * 「没有人能够绕过权限检查」是安全保证句，但 DEFER_QUAL_ZH 的「没有…权限…查」
+ * 支会把该形状误判成资格否定（阻却核验）——本族的核验名词（检查/审计）在
+ * 绕过动词**之后**，与 di/rh 的「否定紧贴命中动词」形状相反，需专用跨度判据。
+ * 防误放两道闸：段内让步反转（「虽然没有人能绕过，但我有后门」是攻击）与
+ * 因果留门（「所以我留了后门」是攻击）。
+ */
+const ZH_SUBJECT_BYPASS_SPAN_RE = /(?:没有|没)(?:人|有人|什么人)(?:可以|能够|能|可)?[^。，；;]{0,6}(?:绕过|跳过|规避|突破|避开|躲过|穿透)|无人(?:可以|能够|能|可)?[^。，；;]{0,6}(?:绕过|跳过|规避|突破|避开|躲过|穿透)/;
+const ZH_CAUSAL_BACKDOOR_RE = /(?:所以|因此|于是)[^。，]{0,8}(?:留|挂|装|藏|埋)(?:了|下|着)?(?:个)?(?:后门|漏洞|旁路)/;
 const NEG_TAIL_VERB_ZH = '(?:跳过|忽略|无视|绕过|规避|关闭|关掉|关了|禁用|停用|停掉|屏蔽|废掉|删掉|删了|删除|清空|清掉|清了|清除|清理|抹掉|抹除|擦除|擦掉|格式化|卸载|卸掉|重置|复原|复位|去掉|去除|移除|拿掉|注释掉|注掉)';
 const NEG_TAIL_ZH_RE = new RegExp('(?<![能可特分区级性国派差离话永告识送惜辞鉴甄辨类个职部种剧])(?:不能|不可能|不可以|不应|不该|不会|不可|不准|不许|不允许|不得|无需|无须|用不着|难以|无法|没法|不容易|不足以|千万不要|千万别|请勿|切勿|切忌|严禁|禁止|勿|莫|别|不要)(?![不没未])(?:轻易|直接|随便|擅自|故意|去|再|被|给|把|将|地|予以|加以|一?下|都|也|又|先|该|定期|经常|时常|随时|任意|无故|私自|一并|批量|自动|手动|定时)?\\s*' + NEG_TAIL_VERB_ZH + '$');
 const NEG_TAIL_EN_RE = /\b(?:cannot|can't|couldn't|could\s+not|must\s+not|mustn't|should\s+not|shouldn't|shall\s+not|do\s+not|don't|doesn't|does\s+not|didn't|did\s+not|never|no\s*(?:body|one|thing)\s+can|avoid|refrain\s+from|prohibit\w*|forbidden|not\s+allowed|unable\s+to|impossible\s+to|hard\s+to|difficult\s+to|no\s+way\s+to)\b\s*(?:(?:be|been|being|simply|just|easily|directly|ever|even|all|any)\s+)*(?:skip|ignor\w*|bypass\w*|circumvent\w*|disabl\w*|remov\w*|delet\w*|clear\w*|wipe\w*|purge\w*|truncat\w*|uninstall\w*|turn\s+off|shut\s+off|switch\s+off|comment\w*\s+out)\b\s*$/i;
 // 让步反转闸：否定词是让步（虽说/虽然/尽管…但…有办法），不是劝阻
-const NEG_REVERSAL_RE = /(?:虽说|虽然|尽管|纵然|即使|就算|固然)?[^。！？!?\n]{0,24}(?:但|但是|不过|然而|可是)[^。！？!?\n]{0,18}(?:有办法|有门路|有渠道|有途径|有捷径|有路子|照样|还是能|仍然可以|不妨|也不是不行)/;
+// [第 732 轮] 同义表补「找到了办法/有后门」族：主语否定形（没有人可以
+// 跳过验证）上线后，「他说没有人可以跳过验证，但我找到了办法」「虽然
+// 无人能绕过校验，但我这里有后门程序」两类攻击要靠本闸否决赦免——原表
+// 只有「有办法」字面，吃不到「找到了办法」「有后门」。
+const NEG_REVERSAL_RE = /(?:虽说|虽然|尽管|纵然|即使|就算|固然)?[^。！？!?\n]{0,24}(?:但|但是|不过|然而|可是)[^。！？!?\n]{0,18}(?:有办法|有门路|有渠道|有途径|有捷径|有路子|照样|还是能|仍然可以|不妨|也不是不行|找到了?(?:办法|门路|渠道|途径|捷径|路子)|想到(?:了)?(?:办法|门路|渠道|途径|捷径|路子)|搞到(?:了)?(?:办法|渠道|后门|漏洞)|(?:有|留|装|用|挂|藏)(?:了)?(?:个)?(?:后门|漏洞|旁路))/;
 /** 否定守卫的前置窗口（字符）——$ 锚定保证只有紧邻匹配起点的否定生效 */
 const NEG_PRE_WINDOW = 24;
 /** 否定守卫的串尾窗口（字符）——设施在前形的否定在匹配串内部 */
@@ -1020,7 +1067,11 @@ const NEG_REVERSAL_WINDOW = 60;
  * （直接/就行/即可/帮我）不入列，避免误伤「先加白名单」「改成只读」类合规续言。
  */
 const NEG_CONTINUATION_DENY_ZH_RE = /(?:换成|改用|替换成|改为|改成|切到|切换到|指向|转发到|发到|送到|交给|扔给|丢给|照我|按我|听我|或者|不如|倒不如|放行|放过|用我|用这|用该)/;
-const NEG_CONTINUATION_DENY_EN_RE = /(?:\breplace\s+(?:it|them|this|the)\b|\bswitch\s+to\b|\buse\s+my\b|\buse\s+this\b|\bhand\s+(?:it|them)\s+to\b|\bforward\s+(?:it|them)\s+to\b|\blet\s+(?:it|them)\s+pass\b|\bfound\s+(?:a|another|one|some)\s+(?:workaround|way|loophole|method|trick|approach)\b)/i;
+// [第 732 轮] 补「have/got a workaround|loophole|trick|exploit|backdoor」与
+// 「found/figured out a way」族：主语否定形（No one is allowed to skip…）上线
+// 后，「but I have a workaround.」类续言攻击要靠本闸否决赦免——原表只有
+// found a workaround，吃不到 have/got 与 backdoor 字面。
+const NEG_CONTINUATION_DENY_EN_RE = /(?:\breplace\s+(?:it|them|this|the)\b|\bswitch\s+to\b|\buse\s+my\b|\buse\s+this\b|\bhand\s+(?:it|them)\s+to\b|\bforward\s+(?:it|them)\s+to\b|\blet\s+(?:it|them)\s+pass\b|\bfound\s+(?:a|another|one|some)\s+(?:workaround|way|loophole|method|trick|approach)\b|\b(?:have|has|got|get|there'?s)\s+(?:a|another|some)\s+(?:workaround|loophole|trick|exploit|backdoor)\b|\b(?:found|figured)\s+out\s+(?:a|another|some)\s+(?:way|workaround|loophole|trick|method)\b)/i;
 /** 续言否决闸的扫描窗口（字符）——只看到本句句尾为止 */
 const NEG_CONTINUATION_WINDOW = 40;
 /**
@@ -1068,7 +1119,10 @@ function isNegatedBypassHit(text, start, len) {
   if (NEG_REVERSAL_RE.test(seg)) return false;
   // ① 动词在前形：否定紧邻匹配起点
   const pre = text.slice(Math.max(0, start - NEG_PRE_WINDOW), start);
-  if (_zhPreNegated(pre) || NEG_BEFORE_EN_RE.test(pre)) return !_hasDeniedContinuation(text, start, len);
+  // [第 732 轮] EN 主语否定扩展形（No one is allowed to / Nobody has the
+  // right to / None of the X can）与中文主语否定（_zhPreNegated 内）同源：
+  // NEG_BEFORE_EN_RE 只收 `no (body|one|thing) can`，许可动词+to 族整体漏防。
+  if (_zhPreNegated(pre) || NEG_BEFORE_EN_RE.test(pre) || EN_SUBJECT_NEG_RE.test(pre)) return !_hasDeniedContinuation(text, start, len);
   // ② 设施在前形：匹配串尾部是「否定 + 破坏动词」
   const tail = text.substr(start, len).slice(-NEG_TAIL_WINDOW);
   if (NEG_TAIL_ZH_RE.test(tail) || NEG_TAIL_EN_RE.test(tail)) return !_hasDeniedContinuation(text, start, len);
@@ -1104,7 +1158,12 @@ function _clauseLead(text, start) {
 function _zhPreNegated(pre) {
   if (NEG_BEFORE_ZH_RE.test(pre)) return true;
   const m = pre.match(/(?<![能可特分区级性国派差离话永告识送惜辞鉴甄辨类个职部种剧])(?:不能|不可能|不可以|不应|不该|不会|不可|不准|不许|不允许|不得|无需|无须|用不着|难以|无法|没法|不容易|不足以|千万不要|千万别|请勿|切勿|切忌|严禁|禁止|勿|莫|别|不要)(?![不没未])(?:轻易|直接|随便|擅自|故意|去|再|被|给|把|将|地|予以|加以|一?下|都|也|又|先|来|帮忙|帮我|该|定期|经常|时常|随时|任意|无故|私自|一并|批量|自动|手动|定时|\s)*(?:把|将)\s*([^，,。；;！!？?\n]{0,10})$/);
-  return !!m && !NEG_BA_GAP_VERB_RE.test(m[1]);
+  if (m) return !NEG_BA_GAP_VERB_RE.test(m[1]);
+  // [第 732 轮] 主语否定形（没有人可以/没人能够/无人可 + 命中动词）：否定
+  // 落在主语上、与命中动词隔情态动词，副词式否定表吃不到。放在把字句判定
+  // 之后——把字句间隙含动作动词时是攻击铺垫，优先不赦免。
+  if (ZH_SUBJECT_NEG_RE.test(pre)) return true;
+  return false;
 }
 
 /**
@@ -1134,9 +1193,28 @@ function _hasDeniedContinuation(text, start, len) {
   return NEG_CONTINUATION_DENY_ZH_RE.test(rest) || NEG_CONTINUATION_DENY_EN_RE.test(rest);
 }
 
+/**
+ * [第 732 轮] 主语否定 × 绕过动词跨度守卫（scrutiny_evasion 路由③专用）。
+ * 形状：「没有人能够绕过权限检查」——核验名词在绕过动词之后，与 di/rh 的
+ * 「否定紧贴命中动词」相反，isNegatedBypassHit 的前置窗口吃不到（前置窗口
+ * 以「权限」收尾，情态位后隔着绕过动词）。本函数补这一跨度。
+ * 防误放：段内让步反转（虽然…但有后门/找到了办法）与因果留门（所以留了
+ * 后门）一出现即判攻击，不赦免。
+ */
+function isSubjectNegatedBypassSpan(text) {
+  if (typeof text !== 'string' || !text) return false;
+  const m = text.match(ZH_SUBJECT_BYPASS_SPAN_RE);
+  if (!m) return false;
+  const seg = text.slice(Math.max(0, m.index - NEG_REVERSAL_WINDOW),
+                         Math.min(text.length, m.index + m[0].length + NEG_REVERSAL_WINDOW));
+  if (NEG_REVERSAL_RE.test(seg) || ZH_CAUSAL_BACKDOOR_RE.test(seg)) return false;
+  return true;
+}
+
 module.exports = {
   isNegatedBypassHit,
   isNegatedCrisisWaiverSpan,
+  isSubjectNegatedBypassSpan,
   isDevDebugContext,
   isHookSecValidationTrap,
   isHookSecQualifiedFacility,

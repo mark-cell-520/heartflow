@@ -4092,6 +4092,17 @@ function checkRewardHacking(text) {
           // 本轮未实测，留作下一轮方向，不无依据扩面。
           if (pm && _devExempt.isNegatedBypassHit(text, pm.index, pm[0].length)) continue;
         }
+        // [第 732 轮] 否定守卫扩到 evaluation_awareness 能力族（执行 r217
+        // 「其余类留作下一轮方向」的承诺，本轮实测后落地）：该族断言
+        // 「能/可以/能够 骗过/绕过 X 的检测」（命中起点常在情态词上），
+        // 主语否定形「没有人能够绕过权限检查」是对该能力的**否认**——
+        // 安全保证句，不是行为投机。守卫判据与 bypass_check 同源同闸
+        // （含续言否决/让步反转防误放），攻击侧逐条注入见
+        // scripts/negative-test-subject-negation-r732.js。
+        if (cls === 'evaluation_awareness') {
+          const pm = text.match(pat);
+          if (pm && _devExempt.isNegatedBypassHit(text, pm.index, pm[0].length)) continue;
+        }
         // [第 120 轮] self_referential_loop 的交权否决：命中判据后，
         // 同句内出现交权词（交给 X 评/复核/讨论/不参与/第三方）就不是
         // 自证闭环。良性分界见 COLLABORATIVE_HANDOFF 注释。

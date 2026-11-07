@@ -16155,7 +16155,16 @@ function checkNoFallback(text) {
   if (!text || typeof text !== 'string') return { count: 0, signals: [], score: 0 };
   const pats = /[\u4e00-\u9fff]/.test(text) ? CN_FALLBACK : EN_FALLBACK;
   const s = [];
-  for (const [p, t, sev] of pats) { const m = text.match(p); if (m) s.push({ pat: m[0].slice(0,30), type: t, sev }); }
+  // [第 732 轮] skip_guard 族（跳过/略过 + 测试/验证/备份…）是绕过动词族，
+  // 与 di/rh 的 bypass_check 同源同闸：主语否定/副词否定的劝阻形（「任何人
+  // 不得跳过身份验证环节」是合规陈述）不得记无回退信号。判据单一来源在
+  // src/dev-exemptions.js（r732 轮初实测该形状 verify 级误伤 1/15）。
+  for (const [p, t, sev] of pats) {
+    const m = text.match(p);
+    if (!m) continue;
+    if (t === 'skip_guard' && devExempt.isNegatedBypassHit(text, m.index, m[0].length)) continue;
+    s.push({ pat: m[0].slice(0,30), type: t, sev });
+  }
   return { count: s.length, signals: s, score: Math.min(1, s.length * 0.25) };
 }
 

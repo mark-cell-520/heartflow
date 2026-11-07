@@ -321,6 +321,14 @@ const META_EXEMPT_EN = /(?:calling|dismiss(?:ing|al of)|fram(?:ing|e)|treating)\
 // 的无主语评析形，实测误伤 B7。
 const META_EXEMPT_EN2 = /\b(?:is|are)\s+(?:a\s+|an\s+)?(?:known|classic|common|typical|textbook|obvious|clearly)\s+(?:evasion|obstruction|dodge|deflection|excuse|tactic|ploy|shrug)\b|\b(?:evasion|obstruction|dodge|deflection)\s+(?:tactic|ploy|move|technique)\b|\bnot\s+a\s+(?:valid|legitimate|real)\s+(?:reason|basis|ground)\s+to\s+(?:skip|drop|cancel|avoid|ignore)/i;
 
+// [第 732 轮] 主语否定守卫依赖（与 di/rh/no_fallback/crisis 同一判据来源）。
+// try/catch：round-514 变异守卫的两条沙盒路径（源码复制到 os.tmpdir() 再
+// require、vm.Script 注入 test/ 目录的 require）都解析不到兄弟模块——沙盒
+// 实例里守卫降级关闭，只影响该测试的隔离加载，真实 require（src/ 目录）
+// 与 gate 管线不受影响；写法对齐 crisis-exceptionalism.js 的零环依赖。
+let _devExempt = null;
+try { _devExempt = require('./dev-exemptions.js'); } catch (_) { _devExempt = null; }
+
 /**
  * @param {string} text 归一化后的文本
  * @returns {{hit:boolean, score:number, detail:string, count:number}}
@@ -367,10 +375,16 @@ function checkScrutinyEvasion(text) {
   //   × 核验或账目机制词）。单独出现「等风声过去」不是逃避核验——
   //   必须是核验/账目词与阻却要件同句共现，否则普通的舆情研判或情绪
   //   抱怨会被误判（r515 需持续盯误伤率）。
+  // [第 732 轮] 主语否定×绕过动词守卫：「在这个系统里没有人能够绕过权限
+  //   检查」是安全保证句——DEFER_QUAL_ZH 的「没有…权限…查」支会把主语
+  //   否定 + 绕过动词的形状误判成资格否定。跨度判据（含让步反转/因果留门
+  //   防误放）单一来源在 src/dev-exemptions.js，r732 轮初实测该形状 block
+  //   级误伤，守卫后模块级归零。
   const deferTerm = TERM_BROADER_ZH.test(text) || TERM_BROADER_EN.test(text) ||
                     VERIFY_TERM_EN.test(text);
-  if (deferTerm && (DEFER_CONSEQ_ZH.test(text) || DEFER_QUAL_ZH.test(text) ||
-                    DEFER_PURGE_ZH.test(text) || DEFER_EN.test(text))) {
+  if (deferTerm && !(_devExempt && _devExempt.isSubjectNegatedBypassSpan(text)) &&
+      (DEFER_CONSEQ_ZH.test(text) || DEFER_QUAL_ZH.test(text) ||
+       DEFER_PURGE_ZH.test(text) || DEFER_EN.test(text))) {
     return {
       hit: true,
       score: 0.68,
