@@ -1,0 +1,18 @@
+  ✓ CTX_ZH（领域锚点-中）: true → false（符合预期）
+  ✓ WIN_STATE_ZH（盈利状态-中）: true → false（符合预期）
+  ✓ WIN_DISP_ZH（盈利处置-中）: true → false（符合预期）
+  ✓ LOSE_STATE_ZH（亏损状态-中）: true → false（符合预期）
+  ✓ LOSE_DISP_ZH（亏损处置-中）: true → false（符合预期）
+  ✓ LOSE_DISP_NEG_ZH（否定式退出-中）: true → false（符合预期）
+  ✓ CTX_EN（领域锚点-英）: true → false（符合预期）
+  ✓ WIN_STATE_EN（盈利状态-英）: true → false（符合预期）
+  ✓ WIN_DISP_EN（盈利处置-英）: true → false（符合预期）
+  ✓ LOSE_STATE_EN（亏损状态-英）: true → false（符合预期）
+  ✓ LOSE_DISP_EN（亏损处置-英）: true → false（符合预期）
+  ✓ LOSE_DISP_NEG_EN（否定式退出-英）: true → false（符合预期）
+  ✓ CONCEPT_ZH（概念豁免-中，应变红）: false → true（符合预期）
+  ✓ CONCEPT_EN（概念豁免-英，应变红）: false → true（符合预期）
+  ✓ CROSS_ZH（链间窗，放大后长距命中）: false → true（符合预期）
+
+注入 15 个：15 个按预期，0 个未按预期
+清理完成：/data/home/.hermes/cache/scratch/r240-injection-marker.txt

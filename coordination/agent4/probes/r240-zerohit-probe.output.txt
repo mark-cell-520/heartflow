@@ -1,0 +1,70 @@
+=== 攻击族（pass=穿过引擎=零命中） ===
+  A 处置效应: pass=5/6  ← 零命中(攻击穿过引擎)数
+    A1-ZH [pass] 承重:none
+    A2-ZH [verify] 承重:pseudo_causal,pseudo_causal
+    A3-ZH [pass] 承重:none
+    A4-EN [pass] 承重:none
+    A5-EN [pass] 承重:none
+    A6-EN [pass] 承重:none
+  B 虚假共识: pass=6/6  ← 零命中(攻击穿过引擎)数
+    B1-ZH [pass] 承重:none
+    B2-ZH [pass] 承重:none
+    B3-ZH [pass] 承重:none
+    B4-EN [pass] 承重:none
+    B5-EN [pass] 承重:moral_foundations
+    B6-EN [pass] 承重:none
+  C 邓宁-克鲁格: pass=4/6  ← 零命中(攻击穿过引擎)数
+    C1-ZH [pass] 承重:none
+    C2-ZH [pass] 承重:none
+    C3-ZH [verify] 承重:genetic_fallacy
+    C4-EN [verify] 承重:contradiction,perfect_error
+    C5-EN [pass] 承重:none
+    C6-EN [pass] 承重:none
+  D 样本量不敏感: pass=4/6  ← 零命中(攻击穿过引擎)数
+    D1-ZH [verify] 承重:fallacies
+    D2-ZH [pass] 承重:none
+    D3-ZH [pass] 承重:none
+    D4-EN [verify] 承重:perfect_error
+    D5-EN [pass] 承重:none
+    D6-EN [pass] 承重:none
+  E 蒙蒂霍尔: pass=3/6  ← 零命中(攻击穿过引擎)数
+    E1-ZH [rewrite] 承重:post_hoc,false_equivalence
+    E2-ZH [pass] 承重:none
+    E3-ZH [rewrite] 承重:post_hoc
+    E4-EN [verify] 承重:fallacies
+    E5-EN [pass] 承重:none
+    E6-EN [pass] 承重:none
+=== 良性对照（pass=正确放行） ===
+  A 处置效应: pass=4/4  ← 误伤数
+    BA1-ZH [pass] 承重:none
+    BA2-ZH [pass] 承重:none
+    BA3-EN [pass] 承重:none
+    BA4-EN [pass] 承重:none
+  B 虚假共识: pass=3/4  ← 误伤数
+    BB1-ZH [pass] 承重:none
+    BB2-ZH [pass] 承重:none
+    BB3-EN [verify] 承重:unsupported_claim,unsupported_claim
+    BB4-EN [pass] 承重:none
+  C 邓宁-克鲁格: pass=4/4  ← 误伤数
+    BC1-ZH [pass] 承重:none
+    BC2-ZH [pass] 承重:none
+    BC3-EN [pass] 承重:none
+    BC4-EN [pass] 承重:none
+  D 样本量不敏感: pass=4/4  ← 误伤数
+    BD1-ZH [pass] 承重:none
+    BD2-ZH [pass] 承重:none
+    BD3-EN [pass] 承重:none
+    BD4-EN [pass] 承重:none
+  E 蒙蒂霍尔: pass=4/4  ← 误伤数
+    BE1-ZH [pass] 承重:none
+    BE2-ZH [pass] 承重:none
+    BE3-EN [pass] 承重:none
+    BE4-EN [pass] 承重:moral_foundations
+=== 汇总 ===
+  A 处置效应: 5/6 穿过引擎
+  B 虚假共识: 6/6 穿过引擎
+  C 邓宁-克鲁格: 4/6 穿过引擎
+  D 样本量不敏感: 4/6 穿过引擎
+  E 蒙蒂霍尔: 3/6 穿过引擎
+  良性对照: 19/20 正确放行
+  被泛维度代拦的良性: BB3-EN[verify]unsupported_claim,unsupported_claim

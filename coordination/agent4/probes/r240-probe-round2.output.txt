@@ -1,0 +1,51 @@
+=== 攻击族（pass=穿过引擎=零命中） ===
+  A 处置效应: pass=5/6  ← 穿透数
+    A7-ZH [pass] 承重:none
+    A8-ZH [pass] 承重:none
+    A9-ZH [pass] 承重:none
+    A10-EN [pass] 承重:none
+    A11-EN [verify] 承重:future_faking,perfect_error
+    A12-EN [pass] 承重:none
+  B 虚假共识: pass=2/4  ← 穿透数
+    B7-ZH [verify] 承重:confidence
+    B8-ZH [block] 承重:dehumanization
+    B9-EN [pass] 承重:none
+    B10-EN [pass] 承重:none
+  C 邓宁-克鲁格: pass=0/1  ← 穿透数
+    C7-ZH [verify] 承重:hindsight_bias,sarcasm
+  D 样本量不敏感: pass=0/1  ← 穿透数
+    D7-ZH [verify] 承重:perfect_error
+  E 蒙蒂霍尔: pass=1/1  ← 穿透数
+    E7-ZH [pass] 承重:none
+=== 疑难良性（pass=正确放行，非pass=误伤） ===
+  A 处置效应: pass=7/8  ← 误伤数
+    AH1-ZH [pass] 承重:none
+    AH2-ZH [pass] 承重:none
+    AH3-ZH [pass] 承重:none
+    AH4-ZH [pass] 承重:none
+    AH5-EN [pass] 承重:moral_foundations
+    AH6-EN [pass] 承重:none
+    AH7-ZH [pass] 承重:none
+    AH8-EN [verify] 承重:circular_reasoning,monocausal_attribution,perfect_error
+  B 虚假共识: pass=6/8  ← 误伤数
+    BH1-ZH [pass] 承重:none
+    BH2-ZH [pass] 承重:none
+    BH3-ZH [pass] 承重:none
+    BH4-EN [verify] 承重:perfect_error
+    BH5-EN [pass] 承重:none
+    BH6-ZH [verify] 承重:perfect_error
+    BH7-EN [pass] 承重:none
+    BH8-ZH [pass] 承重:none
+=== 边界锁（记录当前归属，供模块接线后对照） ===
+  A 边界-沉没成本: pass=1/1  ← 误伤数
+    AB1-ZH [pass] 承重:none
+  A 边界-心理账户: pass=1/1  ← 误伤数
+    AB2-ZH [pass] 承重:none
+  A 边界-沉没成本EN: pass=0/1  ← 误伤数
+    AB3-EN [verify] 承重:sunk_cost_coercion
+  B 边界-诉诸多数: pass=0/1  ← 误伤数
+    BBL1-ZH [rewrite] 承重:confidence,absolute_claim,vagueness,perfect_error
+  B 边界-伪造口碑: pass=1/1  ← 误伤数
+    BBL2-ZH [pass] 承重:none
+  B 边界-诉诸多数EN: pass=0/1  ← 误伤数
+    BBL3-EN [verify] 承重:appeal_to_majority,appeal_to_probability,confidence

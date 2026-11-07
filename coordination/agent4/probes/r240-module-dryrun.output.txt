@@ -1,0 +1,58 @@
+== 攻击 ZH ==
+  ✓ 我这只票涨了四成，先落袋为安，套牢的那只再拿拿，总能 → "处置效应(2处: 盈利状态「涨了」被「落袋为安」过早退出，亏损状态「套牢」被「再拿拿」拖延持有——处置时点由浮盈浮亏状态而非估值/纪律驱动)(zh)"
+  ✓ 赚钱的股票赚一点我就卖，亏钱的反而越跌越拿，实践证明 → "处置效应(1处: 盈利状态「赚钱的」被「一点我就卖」过早退出，亏损状态「亏钱的」被「越跌越拿」拖延持有——处置时点由浮盈浮亏状态而非估值/纪律驱动)(zh)"
+  ✓ 基金浮盈的先赎回保住成果，浮亏的那只继续补仓摊低成本 → "处置效应(3处: 盈利状态「浮盈」被「保住成果」过早退出，亏损状态「浮亏」被「补仓」拖延持有——处置时点由浮盈浮亏状态而非估值/纪律驱动)(zh)"
+  ✓ 散户的通病就是赚钱的票拿不久，赚几个点就跑，亏钱的票 → "处置效应(4处: 盈利状态「赚钱的」被「拿不久」过早退出，亏损状态「亏钱的」被「捂着」拖延持有——处置时点由浮盈浮亏状态而非估值/纪律驱动)(zh)"
+  ✓ 我这几年炒股的心得是：涨了先落袋，跌了不砍仓，利润跑 → "处置效应(4处: 盈利状态「涨了」被「落袋」过早退出，亏损状态「跌了」被「不砍仓」拖延持有——处置时点由浮盈浮亏状态而非估值/纪律驱动)(zh)"
+  ✓ 一看翻红了我就想卖，碧绿碧绿的仓位反而舍不得动，总觉 → "处置效应(4处: 盈利状态「翻红」被「就想卖」过早退出，亏损状态「碧绿」被「放放」拖延持有——处置时点由浮盈浮亏状态而非估值/纪律驱动)(zh)"
+  ✓ 房价涨了我赶紧出手套现，跌了的房子捂着等回暖，反正不 → "处置效应(2处: 盈利状态「涨了」被「赶紧出手套现」过早退出，亏损状态「跌了」被「捂着」拖延持有——处置时点由浮盈浮亏状态而非估值/纪律驱动)(zh)"
+== 攻击 EN ==
+  ✓ I cash out winners as soon → "disposition effect(1x: winning \"winners\" exited early via \"cash out\" while losing \"l
+  ✓ He sells winning positions → "disposition effect(1x: winning \"winning\" exited early via \"sells\" while losing \"losi
+  ✓ Take profits quickly but g → "disposition effect(1x: winning \"profits\" exited early via \"Take profits\" while losing
+  ✓ Retail investors are quick → "disposition effect(2x: winning \"turns green\" exited early via \"sell\" while losing \"r
+  ✓ Winners get sold too fast  → "disposition effect(12x: winning \"Winners\" exited early via \"sold\" while losing \"lose
+  ✓ My rule of thumb: bank the → "disposition effect(1x: winning \"gains\" exited early via \"bank\" while losing \"loss\" 
+== 良性（应全部 false）==
+  ✓ 我在买入前就设好止损和止盈线，价格触线机械执行，浮盈
+  ✓ 这只票涨到估值上限了，按计划分批卖出；那只基本面恶化
+  ✓ My exit rules are valuatio
+  ✓ 虽然浮盈了不少，但基本面没变，我继续持有，没到目标价
+  ✓ 虽然被套了，但重新分析后认为逻辑破了，我果断止损，换
+  ✓ Even though the position i
+  ✓ 这个项目已经投了两百万，现在停掉前面的钱就全打水飘了
+  ✓ 年终奖发下来我花得特别痛快，反正不是工资，花着不心疼
+  ✓ We have already invested t
+  ✓ 我的股票从不赚钱就卖，也从不亏了死扛，两侧都按同一套
+  ✓ 股票涨了我也不会急着卖，跌了该止损就止损，不让盈亏状
+  ✓ I never sell a winner just
+  ✓ The stock rose but I did n
+  ✓ 定投指数基金我从不择时，止盈止损都不看，就按估值百分
+  ✓ 这把牌输了就得加注翻本，下一把肯定能赢回来。
+  ✓ 猪肉涨价了，铺子不卖了，改做牛肉生意。
+  ✓ 这段感情里，好的时候我患得患失，吵了架又舍不得放手。
+  ✓ 他买了三年基金，最近一笔赎回是因为要付首付。
+  ✓ The fund reported a loss l
+== 豁免（应 false）==
+  ✓ 心理学教材在讲处置效应：散户赚钱的票拿不久，赚几个点
+  ✓ The textbook defines the d
+== 超距 ==
+  ✓ 默认链间窗超距不命中
+  ✓ 放大链间窗后命中
+== 负例注入（逐族删除，见证句必须不再命中）==
+  ✓ 删 CTX_ZH 后不再命中
+  ✓ 删 WIN_STATE_ZH 后不再命中
+  ✓ 删 WIN_DISP_ZH 后不再命中
+  ✓ 删 LOSE_STATE_ZH 后不再命中
+  ✓ 删 LOSE_DISP_ZH 后不再命中
+  ✓ 删 LOSE_DISP_NEG_ZH 后不再命中
+  ✓ 删 CTX_EN 后不再命中
+  ✓ 删 WIN_STATE_EN 后不再命中
+  ✓ 删 WIN_DISP_EN 后不再命中
+  ✓ 删 LOSE_STATE_EN 后不再命中
+  ✓ 删 LOSE_DISP_EN 后不再命中
+  ✓ 删 LOSE_DISP_NEG_EN 后不再命中
+  ✓ 删 CONCEPT_ZH 后豁免句变红
+  ✓ 删 CONCEPT_EN 后豁免句变红
+
+干跑全部通过
