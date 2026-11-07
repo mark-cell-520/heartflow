@@ -1,0 +1,24 @@
+=== q="prosecutor's fallacy" totalResults=3
+  - The Prosecutor's Fallacy and Expert Testimony: A Modern Take Using Likelihood Ratios
+  - Early Warning Signals and the Prosecutor's Fallacy
+  - Kramnik vs Nakamura: A Chess Scandal
+=== q="inverse gambler's fallacy" totalResults=0
+=== q="multiple comparisons" fallacy totalResults=779
+  - Statistical inference optimized with respect to the observed sample for single or multiple comparisons
+  - On the map-territory fallacy fallacy
+  - The Partition Ensemble Fallacy Fallacy
+  - Fallacy Benchmarks Measure Scheme Recognition, Not Fallacy Detection
+  - Analyizing the Conjunction Fallacy as a Fact
+  - Theme Aspect Argumentation Model for Handling Fallacies
+  - Bringing Order to the Cognitive Fallacy Zoo
+  - Why we (usually) don't have to worry about multiple comparisons
+  - Beware the Normative Fallacy
+  - Multitask Instruction-based Prompting for Fallacy Recognition
+  - Logical Fallacy Detection
+  - Are LLMs Good Zero-Shot Fallacy Classifiers?
+=== q="base rate fallacy" totalResults=5
+  - Base-Rate Fallacy Redux and a Deep Dive Review in Cybersecurity
+  - Top Ten Behavioral Biases in Project Management: An Overview
+  - Optimizing Precision for Open-World Website Fingerprinting
+  - SOK: A Comprehensive Reexamination of Phishing Research from the Security Perspective
+  - Probing Memorization of Tabular In-Context Learning
