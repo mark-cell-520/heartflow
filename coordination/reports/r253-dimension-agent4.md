@@ -133,5 +133,5 @@ node scripts/bidirectional-guard.js → PASS  召回=52/52 误拦=301/326
 
 ## 六、commit
 
-- `git rev-parse --short HEAD`：COMMIT_RESULT
-- push 状态：PUSH_RESULT
+- `git rev-parse --short HEAD`：**d298db9**（r253 四个 commit：f7b9115 模块 + 4d71165 测试/修正 + 2125193 报告/claims release + d298db9 force-add 报告入库）
+- push 状态：**已推送** `cdf113e..d298db9 main->main`，隐私闸通过，HEAD == heartflow/main (d298db925aae62b3019eb4f2451aa805aa4fd0e9)
