@@ -1,3 +1,48 @@
+## r739 — argument_to_moderation 智慧族/明明族修复 + 裸名词误伤收窄（r738 交接方向①复测坐实轮）
+
+**轮次**：r739 ｜ **版本**：v6.8.165 → v6.8.166 ｜ **日期**：2026-11-08 ｜ **方向**：r738 交接簿下一轮方向①（middle_ground 词表缺口）——init 简报方向池 6 项为历史池复述，探针复测后仅方向①缺口坐实（7 条），其余排除（di「以符合」r717/r734 已修 3/3 OK；hasty_generalization 非本族机制遗留；silence_imputation 7/8 HIT 仅剩 1 条；chronological_snobbery 维持 r218；evidence 需架构决策）。
+**真升级类型**：存量探测器词表补全 + 误伤边界重划（用户可感知：「折中才是智慧」「结论明明在两者之间」「骑墙是最智慧的处世之道」「Compromise is the wise choice」等族从 pass 改判 verify；「这个中间方案最稳妥，因为成本最低」从误伤 verify 恢复 pass）
+**根因**（src 实测定位，六处缺口）：
+- ① leg2 TRUTH_ZH 四条腿谓词表均缺「智慧」——「折中才是智慧」「中间立场是智慧的做法」「中庸才是大智慧」「各打五十大板才是最智慧的处理」「和稀泥是处世智慧」5/5 漏判（智慧=把取中动作当作明智性依据，与正确/合理/稳妥/明智同族但词表漏收）。
+- ② MIDDLE_ZH 与 TRUTH_ZH 174 自足断言腿副词表均缺「明明」——「结论明明在两者之间」漏判。**双腿副词表同源**（r726 模式），只补一条时 legsZh 窗口配对失败。
+- ③ MIDDLE_ZH 俗语腿缺「骑墙」「一碗水端平」两族裸俗语。
+- ④ EN 三缺：MIDDLE_EN 只收 `the middle ...` 不收 `a middle ...` 冠词形；TRUTH_EN 206 名词表缺 path/road；202 主语只收 split the difference 不收 compromise；谓词缺 wise/wisest/sensible。
+- ⑤ 误伤：MIDDLE_ZH 裸名词表含「选项|方案」——「这个中间方案最稳妥，因为成本最低」（个案推荐，有具体成本理由、无全称量化）被裸名词×「最稳妥」双腿误伤。显式断言形（143 主语含「方案」/153 量化词腿）不受影响。
+- ⑥ 豁免优先确认（设计内非漏判）：「取中间值才是最智慧的选择」→ EXEMPT_AVG_ZH 算术语境挡；「折中主义才是智慧的结晶」→ EXEMPT_META_ZH 主义概念转述挡。
+**修法**（攻击面设计，同族同源纪律）：
+- F1 TRUTH_ZH 四条腿统一补「智慧」谓词（142/143/149/150）；143 主语表扩和稀泥/各打五十大板/一个巴掌拍不响 + 谓词前间隙形 `是[^。；，]{0,6}智慧`（收「处世智慧」）；149 主语扩俗语族 + 谓词加智慧；仅在 TRUTH 腿，leg1 俗语仍须命中，误伤面由双腿结构兜底。
+- F2 MIDDLE_ZH 副词表 + TRUTH_ZH 174 副词表同源补「明明」。
+- F3 MIDDLE_ZH 补「骑墙」「一碗水端平」（一碗水端平的调解描述由 EXEMPT_DEAL_ZH 挡）。
+- F4 MIDDLE_EN 补 `\ba middle (?:position|course|path|road|way|ground|stance|view)\b`；TRUTH_EN 206 补 path|road + wise|wisest|sensible；新增 `compromise is (?:the )?(?:correct|...|wise|wisest)` 腿②。
+- F5 MIDDLE_ZH 裸名词表移除「选项|方案」（`中间(?:立场|地带|道路|路线|派|力量)`）——r739 探针坐实的误伤收窄。
+**改动**：src/argument-to-moderation.js（F1-F5 共 8 处含攻击面注释约 40 行）、test/round-739-argument-to-moderation-wisdom.js（66 断言新文件）、scripts/negative-test-argument-to-moderation-wisdom.js（12 断言新文件）、scripts/round-739/ 4 探针（64 断言）、README changelog + 口径戳、UPGRADE_LOG 本条目、版本五处同步（VERSION/package.json/SKILL.md frontmatter+两处口径戳/version.js 兜底）。
+**diff**：git diff --shortstat 实测 tracked **9 files, 91 insertions(+), 21 deletions(-)**（src/argument-to-moderation.js + 版本五处 VERSION/package.json/SKILL.md/version.js/heartflow.js BUILD_DATE + README 口径戳/changelog + UPGRADE_LOG）；含未跟踪新文件（test 214 行 66 断言 + 负例 108 行 12 断言 + 探针 4 个 182 行 64 断言）总有效 diff 约 **620 行**，落在 500-1000 目标区间内。
+**验证逐项实测**：
+- test/round-739-argument-to-moderation-wisdom.js：**66 passed, 0 failed**（智慧族 ZH 12 + 明明族 4 + EN 5 + 良性/豁免 20 + 误伤修复 4 + 存量锚点 6 + gate 层 3 + 承重注入 6 + 词表同源 5 + 接线断言 2）
+- scripts/negative-test-argument-to-moderation-wisdom.js：**12 passed, 0 failed**（七类变异全翻红：TRUTH_ZH 删智慧谓词/MIDDLE_ZH 删明明/TRUTH_ZH 删明明/MIDDLE_ZH 删骑墙一碗水端平/MIDDLE_EN 删 a middle/TRUTH_EN 删 compromise/变异⑦反向恢复裸名词「方案选项」→误伤样本转命中证明修复承重；对照组 17 良性零误伤）
+- scripts/round-739/ 4 探针：**64/64**（probe-pool 23 + probe-variants 34 + probe-think-smoke 7 + probe-rest-pool 方向池复测②③④）
+- probe-think-smoke（new HeartFlow + think() 真实调用）：**7 passed, 0 fail**（判定口径 _inputDiscrimination.dims.argument_to_moderation：攻击 4 全命中 atm=0.66、良性 3 全 atm=0）
+- 存量 round-196：**68 passed, 0 failed**（判据零击穿）；round-711 mind-reading：9 ✅ exit 0；r735 di 守卫 **55 passed, 0 failed**；r738 测试 **54 tests 54 pass 0 fail**
+- node bin/verify.js：**16 passed, 0 failed**
+- scripts/bidirectional-guard.js：召回 **52/52**、误拦 **302/326**（与基线完全一致，零新增误拦）
+- test/doc-numbers-accuracy.test.js：**24/0**（版本五处同步 + SKILL 规格表口径戳转绿）
+- test/security-audit.test.js：**16 passed, 0 failed**
+- node bin/cli.js status：**running**（version 6.8.166）
+- 存量 negative-test-absolute-claim-en.js：负例验证通过；negative-test-retention-window-r738.js：ALL GREEN
+**新踩坑**（供 r740 复用）：
+① 补词必须双腿同步——MIDDLE_ZH 与 TRUTH_ZH 174 是两条独立副词表，「明明」只补腿①时 legsZh 窗口配对失败、样本仍 PASS；同族补词先 grep 两条腿副词表是否同源（r726 模式，本轮第二次验证）。
+② 注入变异不能置空 source——`new RegExp('')` 恒真，删词表腿必须整条 filter 而非 replace 成空串（负例脚本变异④踩坑）。
+③ 负例 source 不含斜杠——`r.source.replace('/骑墙/', '/')` 无效（source 是裸正则体），删单腿用 filter 更稳。
+④ gate 层跨维度干扰——误伤样本断言 gate.action===pass 会被 confidence 维度（最高级表述 verify）干扰；断言口径应为「本维度 findings 不承重」而非 action 全等。
+⑤ patch old_string 以相同内容收尾时容易把相邻行吞并（本轮连踩两次：leg1 副词表 patch 把「折中」行合并、变体探针 patch 提前闭括号）——含正则行长内容改写后必须 node --check + 跑探针复核。
+**下一轮方向**（已复测排序）：
+① silence_imputation 书面语变体收尾：「对方至今没有发声，证明他们理亏」1 条漏判（「没有发声」族缺「至今」时间状语形；现 7/8，缺口最窄最确定）；
+② di EN 后置过期限定的 ZH 对应形复查（r738 B 腿已修大半，复测确认无遗留）；
+③ evidence 恒死维度（需架构决策，连续多轮记录）；
+④ middle_ground EN 侧继续观察（probe 34 变体已收 5 攻击形，新样本出现再扩）。
+
+---
+
 ## r738 — 元话语赦免（confidence/perfect_error）+ di 保留窗口后置赦免双腿修复（r737 交接方向①③复测坐实轮）
 
 **轮次**：r738 ｜ **版本**：v6.8.164 → v6.8.165 ｜ **日期**：2026-11-08 ｜ **方向**：r737 交接簿下一轮方向①③（confidence「最X的」教学误报 + di EN 后置过期限定 ZH 对应形）——init 简报方向池 6 项为历史池复述，方向①③复测探针（scripts/round-738/probe-pool.js 48 样本）实测坐实，decision 打分最高项为方向①。
