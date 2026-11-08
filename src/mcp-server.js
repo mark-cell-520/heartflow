@@ -5318,6 +5318,9 @@ const HANDLERS = {
       // MetacognitiveReward 的实例方法，不在模块对象上。改为先取类再实例化。
       const { MetacognitiveReward } = require('./index.js').metacognition;
       const mr = new MetacognitiveReward(heartflow || {}, {});
+      // [r254] action=stats：读累计奖励统计（getStats()，r254 新增公开方法）。
+      // 原工具体只有 evaluate 一条路，累计下来的 avgReward/byVerdict 读不回来。
+      if (args.action === 'stats') return mr.getStats();
       return mr.evaluate(args.output || '', { selfFeedback: args.selfFeedback });
     } catch (e) { return { error: e.message }; }
   },

@@ -1201,7 +1201,7 @@ const EXTENDED_TOOLS = [
   },
   {
     "name": "heartflow_metacognition_evaluate",
-    "description": "metacognition evaluate（index）。只读工具，无副作用（运行时 fs 快照验证）。",
+    "description": "metacognition evaluate（index）。只读工具，无副作用（运行时 fs 快照验证）。action=stats 读累计奖励统计（r254 新增）。",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -1209,9 +1209,14 @@ const EXTENDED_TOOLS = [
           "type": "string",
           "description": "output（可选）"
         },
+        "action": {
+          "type": "string",
+          "enum": ["evaluate", "stats"],
+          "description": "action（可选，默认 evaluate；stats 读累计奖励统计）"
+        },
         "selfFeedback": {
           "type": "string",
-          "description": "selfFeedback（可选）"
+          "description": "selfFeedback（可选，JSON 字符串或自由文本）"
         }
       },
       "required": []

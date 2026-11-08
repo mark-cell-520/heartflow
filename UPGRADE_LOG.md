@@ -1,3 +1,95 @@
+## r254 — MetacognitiveReward 奖励口径修正轮（v6.8.182）：quality 恒为 0.6 的死分支 + confidence 被 len/500 绑架成长度函数 + selfFeedback 经 MCP 恒失效，三处叠加让「元认知即奖励」完全退化
+
+**轮次**：r254 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（**r253 交接簿已知未修③「MetacognitiveReward 奖励口径调优」**，本轮逐个查证后落地）
+**真升级类型**：缺陷修复（3 处口径缺陷，全部实测确认奖励信号退化）+ 新公开方法（`getStats()`，含 `byVerdict` 分布）经 MCP `action=stats` 暴露（约定 3 三处接线）+ 性能优化（`gate()` 有界记忆缓存，实测加速 96.2×）。MCP 工具 **187 不变**（未新增工具）、dispatch 路由 **1,319 不变**、判别维度 **210 不变**（`src/index.js` 零改动）、引擎模块 **162 不变**。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision。
+- r253 交接簿候选池①是「判别引擎侧六条挂账」（多轮续挂的判别质量问题），但那些是跨表统一/位置化类改动，单条影响面小且需逐族回归；候选③「MetacognitiveReward 奖励口径调优」是 r252 就登记下来的**已写进日志但未修**的真缺陷，且描述具体到行（`_estimateConfidence` 的 `base=min(1,len/500)` + `_verifyOutput` 读 `this.hf.discriminate.dimensions` 恒 undefined → 恒返回 0.6）。**存量缺陷影响面大于补新维度**，故选③。
+- 轮初用完整引擎（`src/core/heartflow.js` 的 `HeartFlow` 类 `new` + `start()`，162 模块）实例化 `MetacognitiveReward`，对 7 条代表性用例跑 `evaluate()`，把 r252 的描述**逐条实测坐实**（第二节）。
+
+### 二、根因/缺口分析（带证据）
+
+**轮初实测（scripts/tmp-254-*.js，同一 `hf` 实例、同一批用例）**：
+
+| 用例 | confidence | quality | reward | verdict |
+|---|---|---|---|---|
+| 有引用的合格短答案（50 字） | 0.27 | **0.6** | 0.2 | poor |
+| 谨慎表述短答案（26 字） | 0.152 | **0.6** | 0.2 | poor |
+| 400 字长文本（同质内容） | 0.628 | **0.6** | 0.6 | good |
+| 「这绝对是唯一正确的答案。」 | 0.024 | **0.6** | 0.2 | poor |
+| 「毫无疑问，这是唯一正确的解决方案…」 | 0.052 | **0.6** | 0.2 | poor |
+| 情感操控句 | 0.052 | **0.6** | 0.2 | poor |
+| 幻觉声明「喝咖啡延长寿命 12.5 年」 | 0.068 | **0.6** | 0.2 | poor |
+
+**缺陷① `_verifyOutput` 整段是死代码**：读 `this.hf.discriminate.dimensions`。实测 `discriminate` 在 `src/index.js` 是**函数**（`module.exports.discriminate`，`:17442` 同文件导出），函数对象上没有 `.dimensions` 属性 → 恒 `undefined` → `if` 分支恒不进入 → **无论输入是什么都 `return 0.6`**。上表七条用例的 quality 一毫不差全是 0.6。附带坐实：`HeartFlow` 类实例上**根本没有** `discriminate`/`gate`/`check` 方法（`typeof` 三者均 `undefined`，`hf.think()` 返回空对象 `{}`），这三者是 `src/gate.js` 的模块级导出、不走实例——所以「从引擎实例取判别结果」这条路从设计上就不通。
+
+**缺陷② `_estimateConfidence` 被文本长度绑架**：`base = Math.min(1, len / 500)`。50 字的合格答案 base 只有 0.10，必须写到 500 字以上才拿得到 1.0。更糟的是**方向倒挂**——26 字谨慎表述（0.152）比光秃短答案（0.27）还低，因为 hedge 词被无条件扣 0.05/个，**恰当使用模糊限制词反被惩罚**。四条坏文本全塌到 0.024~0.068，与好文本几乎不可分。
+
+**缺陷③ `selfFeedback` 通道经 MCP 恒失效**：工具 schema 把 `selfFeedback` 声明为 **string**（`src/mcp/extended-tools.js:1211`），而实现只读 `ctx.selfFeedback?.items?.length`——字符串没有 `.items`，于是外部自评反馈从 MCP 进来永远不进这条分支。
+
+### 三、落地项
+1. **`src/cortex/metacognitive-reward.js`：`_verifyOutput` 重写（改为真问辨别引擎）**。懒加载 `src/gate.js` 的 `gate()`，按 `gate.action` 四档（`block` 0.0 / `rewrite` 0.1 / `verify` 0.3 / `pass` 0.9）+ `findings` 最高严重度折算（`-maxSev/100 × 0.2`，仅非 pass 档生效）。两处**刻意的不用**：
+   - **不用 `overallScore`** 折算质量——实测它并非「越坏越低」：情感操控句 `overallScore=0.79`，而一段正常带引用的长文本只有 `0.23`，拿它当质量代理会把好坏颠倒。
+   - **不用 `hf.discriminate`**——AGENTS.md 明写它「per-dimension scoring without the gate layer — **no `gate.action` assigned**」，拿不到 action 就落不回四档，只会拿到中性 0.5，比常量 0.6 好不到哪去。
+   - 懒加载而非顶层 require：`gate.js → index.js → 本模块`（`index.js:17442`）会成环；方法内懒加载 + 缓存模块引用，环在调用时早已加载完。
+2. **`_estimateConfidence` 口径重写**：中性先验 0.5 + 三类**可归因**信号——① 证据（可指名来源《…》/`来源:`/`据…显示`/URL/DOI，≥2 处加 0.25、1 处加 0.18；可核查数字日期加 0.08）；② 无依据的确定性措辞扣分（`-0.12/个`，封顶 0.36），有来源撑腰则小幅加分（`+0.05/个`，封顶 0.1）；③ 模糊限制词适度（1~3 个）是校准加 0.05、过密（≥4 个）是逃避表态扣 0.15。空文本 0、极短文本 0.05。
+3. **`_countCertainty()` 新增（剔除被否定的确定性措辞）**：逐个出现位置回看前 3 字，窗口含 `无法|不能|不太|并不|绝非|不是|不算|不可|不应|未必|难以|未` 就不计入。轮中实测发现漏这条会把「我无法确定哪个方案更好」判成过度自信（confidence 从 0.55 掉到 0.43）——**谦逊被当成傲慢**，与缺陷②是同一条病。
+4. **`_computeReward` 新增「自信地错」负奖励档**（`confidence > 0.5 && quality < 0.3 → -0.2`）。原四档把「自信地错」和「不确定」给同一个 0.2，分不开这两种失效形态；而前者才是辨别器最该压制的（心虫防的正是过度自信的断言）。
+5. **`_normalizeSelfFeedback()` 新增（缺陷③修复）**：兼容 `{items:[…]}` / `[…]` / JSON 字符串 / 自由文本四种输入；自由文本按低置信关键词（不确定/没把握/无法确认/存疑/unsure…）判定，不含低置信信号的字符串不误扣分。
+6. **性能：`gate()` 有界记忆缓存**。`gate()` 单次实测约 25ms，`evaluate()` 原本 <1ms；同一段输出被重复评分（RL buffer 里的常见形态）不能重复付这个代价。键 = 文本 SHA-256 前 16 位，容量 200，触达后移到队尾（近似 LRU），超出丢最旧。
+7. **`getStats()` 新公开方法 + MCP `action=stats` 暴露（约定 3 三处接线）**：原工具体只有 evaluate 一条路，累计下来的 `avgReward`/`byVerdict` 读不回来。`getStats()` 返回 `{total, avgReward, avgConfidence, avgQuality, byVerdict, statsFile, verifyCacheSize}`；`_loadStats`/`_saveStats` 增加 `byVerdict` 键（r252 固化的四个键合并逻辑原样保留）。
+8. **`evaluate()` 返回值新增可审计字段**：`qualitySource`（`engine_gate` / `no_engine_neutral` / `judge_returned_nothing`）、`gateAction`、`topFindings`（按 severity 降序的前 3 条 `{dimension, severity}`）。**判别器不可用时如实返回中性 0.5 并标 `no_engine_neutral`，不拿启发式冒充引擎**（设计原则 #5）。
+9. **版本 6.8.181 → 6.8.182**，`sync-version.js` + `sync-doc-numbers.js` 已跑；README Version history 补 v6.8.182 行。
+10. **新测试 `test/round-254-metacognitive-reward-calibration.test.js`（27 断言全绿）**：A 族 5 条（quality 不再恒定 / 与 action 档位同向 / 好坏分居中性两侧 / 可审计字段齐全 / 轮初坏模式坐实）、B 族 6 条（短文本不再被压死 / 倒挂已修 / 被否定的确定性不计过度自信 / 有据无据分流 / 长度不再是主因 / 空文本仍低）、C 族 2 条（selfFeedback 四形状 / 不误扣分）、D 族 6 条（自信地错负奖励 / 分离度 ≥0.3 / 无引擎诚实 / 判别器抛错不炸 / ctx.judge 注入优先 / getStats 含 byVerdict 且能落盘读回）、E 族 3 条（缓存加速 ≥5× / 有界 200 / 不串味）、F 族 5 条（MCP 三处接线在册 / 独立子进程端到端两条路 / 回归三招牌入口+维度 210 / r252 的 `_loadStats` 两条路径+坏文件 / 新代码不再引用四处坏模式）。
+
+### 四、验收数字（全部实测）
+| 项 | 轮前 | 轮后 | 实测方式 |
+|---|---|---|---|
+| `quality` 取值数（12 条覆盖四档用例） | **1**（全部 0.6） | **5** | test A1 |
+| `quality` 与 `gate.action` 档位的 Spearman 秩相关 | 无定义（常量） | **0.9930** | scripts/tmp-254-measure |
+| pass 档平均奖励 − block/rewrite 档平均奖励 | ~0（7 条用例全 0.2 或 0.6，无区分依据） | **0.400**（0.600 vs 0.200） | test D2 |
+| pass 档短文本 confidence 极差 | 26 字 0.152，要 500 字才到 1.0 | **0.030**（0.55/0.58/0.55） | test B1/B2/B5 |
+| 谨慎表述 vs 平实表述的 confidence 倒挂 | **0.152 < 0.27（倒挂）** | 已消除（差 <0.2） | test B2 |
+| 「无法确定」被当过度自信 | 是（0.55→0.43） | 否 | test B3 |
+| 幻觉/情感操控/绝对化断言的 quality | **恒 0.6** | 0.12 / 0 / 0 / 0.03（block 档 0） | test A2/A3 |
+| `gate()` 冷启动 vs 缓存命中 | 每次都 ~25ms（无缓存） | 25ms vs **0.260ms/次，加速 96.2×** | test E1 |
+| 缓存规模 | —（无缓存） | 有界，230 条文本后 **≤200** | test E2 |
+| `heartflow_metacognition_evaluate` 能力面 | 只有 evaluate 一条路 | + `action=stats`（`getStats()`，含 `byVerdict`） | test F1/F2 |
+| 新增非注释代码 | — | **约 150 行**（metacognitive-reward.js 209 非空行中新增约 150，不含测试） | `node -e` 剥注释统计 |
+| MCP 工具 / 路由 / 维度 / 模块 | 187 / 1,319 / 210 / 162 | **187 / 1,319 / 210 / 162 全部不变** | sync-doc-numbers.js；test F3 |
+| `bin/verify.js` | — | **16/16** | — |
+| bidirectional-guard | — | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r253 基线逐项一致） | — |
+| guard-abilities | — | **20/20**（dimensions 键 210 不变） | — |
+| doc-numbers-accuracy | — | **24/24** | — |
+| security-audit | — | 提交前 **15/16**（S2「git log/tag 未命中 6.8.182」为提交前预期失败，r236~r253 同款） | — |
+| 本轮新测试 | — | round-254 **27/27** | test/round-254-metacognitive-reward-calibration.test.js |
+
+### 五、全量回归与计数
+全量回归 **19482 通过 / 154 失败 / 共 19636 个**（657 个测试文件，`data/round-254-regression.log`）。
+对照基线 **r253（data/round-253-regression.log）：19455 / 154 / 19609**（656 文件，73 个失败文件）：failed **154 → 154（持平）**、passed 19455 → 19482（**+27**）、total 19609 → 19636（**+27**）、文件 656 → 657（**+1**，即本轮新测试）。**+27 恰为本轮新测试的 27 条断言**，无其他计数波动。
+**失败文件清单逐项 comm 比对**：r254 **73 个**失败文件，r253 基线 **73 个**——`comm -13`（仅 r254 有，即新增失败）输出**空**、`comm -23`（仅 r253 有，即消失失败）输出**空**，清单逐项一致：**本轮新增失败文件 0 个、消失 0 个**。**断言级零新增失败。**
+落在本轮改动上的回归为零：双向门禁召回 52/52 不降、误拦 302/326 不升；`guard-abilities` 20/20（维度 210 不变）；`bin/verify.js` 16/16；`doc-numbers-accuracy` 24/24；`heartflow_metacognition_evaluate` 在 MCP 端到端全通（test F2）；r252 对 `_loadStats` 的断言（B3/B4）原样通过（test F4）。噪声池与 r253 同族（MCP 类 6 个 8099 端口占用 + 未输出汇总行类 + 注册 0 用例类 + Command failed 类 dispatch 族），逐项比对无一带消失说明噪声池稳定。
+
+### 六、已知未修（含为什么不修）
+1. **辨别引擎分不清「真引用」与「编造的引用」**：`VERIFY-cited`（真《柳叶刀》引用）与 `BAD-halluc`（编造的「2025 哈佛研究」）在 `gate()` 上同为 `verify` + `unsupported_claim:90`，于是 reward 同为 −0.2。这是**纯规则引擎的固有能力边界**（AGENTS.md Honest limitations 明写「obfuscation not covered by patterns is not caught」），不是本轮能修的；`quality` 项已如实反映「引擎无法验证」，没有伪装成能分辨真伪。
+2. **`_computeReward` 仍是四档离散奖励**（含本轮新增的第五档负奖励）。论文口径如此，本轮只修它的两个输入、不改成连续函数——改公式会牵动所有下游 RL 采样口径，应作为独立主题轮先论证。
+3. **`no_engine_neutral` 分支在本仓几乎不可达**：`require('../gate.js')` 是进程内零依赖加载，恒成功。该分支只为「引擎加载失败」的异常环境保留，test D3 用注入 `_resolveJudge = () => null` 覆盖。
+4. **`reward-stats.json` / `experience-buffer.jsonl` 会被在跑引擎持续写**，已取消跟踪，未提交（同 r252/r253 纪律）。
+5. **r253 及以前的挂账原样继承**：判别引擎侧六条（⑨族裸标记位置化 r225 / `PC_RITE_MECH_ZH` 位置化 r239 G3 / `PC_DRUG_MECH_ZH` 与 `PC_SUPP_MECH_ZH` 跨表统一 r236 G2 后半 / lastIndex 防空匹配防护前移 / `scripts/negative-test-rc-temporal-causal-r364.js` 临时目录隔离 / r71 测试 G 节 idx4 zh 侧句式缺口）；`heartflow_translate` 的 `tone.tone` 兼容别名（r249 G2）；28 个无调用方占位子系统的摘除（r251 候选池①）；`HandlerWiringChecker` 扩到全量 187 个 MCP 工具（r253 候选池②）；`.gitignore` 无锚定目录模式换机复扫（r253 阴性但规则本身仍是潜在系统性风险）。本轮均未碰。
+
+### 七、踩坑
+1. **`initHeartFlow()` 返回 `true` 不是引擎实例**（`src/mcp-server.js:571` `return true`），模块级 `heartflow` 也未导出。首版探针 `const hf = await srv.initHeartFlow()` 拿到 `true`，于是 `hf.discriminate` 全 undefined，一度误判「连 `_modules` 都是空的」。改用 `require('src/core/heartflow.js').HeartFlow` 直接 `new` + `start()` 才拿到真引擎。
+2. **`require('./src/gate.js')` 的 `HeartFlow` 不是构造器**：`src/gate.js` 导出的是 `{gate, check, pipeline, runPipeline, discriminate, checkInput, checkDraft, checkOutput}` 一堆函数，类在 `src/core/heartflow.js`。两处都叫「引擎入口」，形状完全不同。
+3. **F5 断言被自己的宽松正则绊倒**：首版写「不得再出现 `return 0.6;`」，结果命中 `_computeReward` 里 `if (confidence > 0.5 && quality > 0.5) return 0.6;` ——那是**合法的论文档位**，不是退化兜底。改为只切 `_verifyOutput` 方法体再断言不含 `0.6`。
+4. **切方法体时 `indexOf` 撞到方法体内的调用点**：`code.indexOf('_resolveJudge(ctx)')` 命中的是 `_verifyOutput` 里 `const judge = this._resolveJudge(ctx);`，把方法体截断成 3 行，`engine_gate` 断言假失败。改成找**方法定义** `_resolveJudge(ctx) {`。
+5. **`handleRequest` 的返回值不在 `.result` 下**：它直接回 MCP result 对象 `{content:[{type:'text',text}], isError:false}`，按 r252 的 `r.result.content` 取会拿到 undefined。helper 改为 `r.content || r.result?.content` 双形状兼容。
+6. **子进程的 content.text 是 pretty-print 多行 JSON**：`out.split('\n').find(l => l.startsWith('EVAL:'))` 只拿到 `EVAL:{` 一行，`JSON.parse` 报 "Expected property name or '}' in JSON at position 1"。改为子进程内先 `JSON.stringify(JSON.parse(...))` 压成单行再打印。
+7. **子进程 require mcp-server 必须带 `HEARTFLOW_MCP_TOKEN`**：否则 `[MCP] Refusing to start without authentication token` + `process.exit(1)`，子进程什么都不打印。r252 的 `runChild` 已有此法（`env: {...process.env, HEARTFLOW_MCP_TOKEN: ...}`），本轮照抄。
+8. **`extended-tools.js` 导出 `{ EXTENDED_TOOLS }` 不是裸数组**：首版 `Array.isArray(defs) ? defs : (defs.tools || defs.TOOLS || [])` 取空。改为递归 walk 找「含 name 字段的数组」，不假定导出形状。
+
+
+
 ## r253 — 7 个「引擎访问模式错」的 MCP 工具 100% 崩修复轮（v6.8.181）：boundary_check 把 sessionId 当引擎 + cache/decision 读从未赋值的 globalThis.heartflow + 四个 error 工具读从未赋值的 _hfCore，真身全在引擎上
 
 **轮次**：r253 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（**r252 探针登记、本轮逐个查证的「not ready」族**）
