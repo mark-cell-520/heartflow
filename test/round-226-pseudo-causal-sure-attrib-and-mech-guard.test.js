@@ -391,6 +391,14 @@ test(`D1 变异守卫一：摘掉「(?:肯定|一定)…」族后 ${ATTRIB_FAMIL
     const ANCHOR_R244_LEG = "  new RegExp(PC_EVENT_ACT_ZH.source + '[^.。]{0,24}' + PC_SEQ_ZH.source + '[^.。]{0,14}' + PC_RES_COLLOQ_ZH.source),";
     assert.ok(mutated.includes(ANCHOR_R244_LEG), '副本中找不到 r244 事件锚定新支');
     mutated = mutated.replace(ANCHOR_R244_LEG, '  /(?!x)x/,');
+    // [v6.8.175 第 247 轮] 同时中和 r247 扩面的⑨'腿（时段框架 × 白话结果变动，
+    // 数组索引 14）——「去年开始供灯，之后身体就好起来了，一定是供灯的效果」的
+    // 结果侧「好起来」被本轮补进 PC_RES_COLLOQ_ZH 后，不经过 PC_ATTRIB_ZH 归因族
+    // 也能被⑨'腿判出（轮初实测：不摘时 26 条里该条仍 1 次命中，pc 1→2 双支共燃）。
+    // 不摘它，D1 同样从「证明归因族承重」退化成假绿。与 r227/r244 两步同构。
+    const ANCHOR_R247_LEG = "  new RegExp(PC_SEQ_PERIOD_ZH.source + '[^。]{0,14}' + PC_RES_COLLOQ_ZH.source),";
+    assert.ok(mutated.includes(ANCHOR_R247_LEG), '副本中找不到 r247 扩面的⑨\'腿');
+    mutated = mutated.replace(ANCHOR_R247_LEG, '  /(?!x)x/,');
     fs.writeFileSync(src, mutated, 'utf8');
     const dropped = countHitsIn(tmp, ATTRIB_FAMILY_ONLY);
     assert.strictEqual(dropped, 0, `摘掉归因族后 ATTRIB_FAMILY_ONLY ${ATTRIB_FAMILY_ONLY.length} 条仍有 ${dropped} 条命中，该扩面可能不承重`);

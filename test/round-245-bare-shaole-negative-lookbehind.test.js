@@ -196,9 +196,14 @@ test(`C1 ${C_VICTIM.length} 条 victim 只靠本轮新词判出（HEAD 全漏）
 });
 
 // ─── D 族：变异守卫 ────────────────────────────────────────────────────────
-const WORD_DEF = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?<![减变])少了)/;';
-const WORD_DEF_NO_SL = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了)/;';
-const WORD_DEF_BARE = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|少了)/;';
+// [v6.8.175 第 247 轮] 三行锚点同步扩入本轮新增的「V+起来 / V+上来」结果补语族
+// （`(?:多|少|涨|好|火|旺)起来|上来了`）——PC_RES_COLLOQ_ZH 定义行末尾追加了它们，
+// 不同步的话变异守卫在副本里找不到锚点（轮初实测 3 处失败）。三个变体各自的
+// 语义不变：WORD_DEF = 现值（含负向环视 + 补语族）、WORD_DEF_NO_SL = 既无环视
+// 也无裸「少了」、WORD_DEF_BARE = 裸「少了」无环视（D2 摘环视专用）。
+const WORD_DEF = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?<![减变])少了|(?:多|少|涨|好|火|旺)起来|上来了)/;';
+const WORD_DEF_NO_SL = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?:多|少|涨|好|火|旺)起来|上来了)/;';
+const WORD_DEF_BARE = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|少了|(?:多|少|涨|好|火|旺)起来|上来了)/;';
 
 function copySrc(tag) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hf-r245-' + tag + '-'));

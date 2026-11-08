@@ -211,7 +211,9 @@ test('D2 只清空 PC_RES_COLLOQ_ZH 词族：同样回落且形式腿不受影�
     // [v6.8.173 第 245 轮] 字面量同步：PC_RES_COLLOQ_ZH 末尾补了负向环视裸
     // 「少了」腿（`|(?<![减变])少了`），本锚点是「清空整张白话结果变动表」的
     // 变异守卫，须跟着定义行走（行为断言未动）。
-    const WORD = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?<![减变])少了)/;';
+    // [v6.8.175 第 247 轮] 再次同步：定义行末尾又追加了「V+起来 / V+上来」结果
+    // 补语族（`|(?:多|少|涨|好|火|旺)起来|上来了`），锚点须含它才找得到定义行。
+    const WORD = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?<![减变])少了|(?:多|少|涨|好|火|旺)起来|上来了)/;';
     assert.ok(orig.includes(WORD), '副本中找不到 PC_RES_COLLOQ_ZH 定义行');
     const mutated = orig.replace(WORD, 'const PC_RES_COLLOQ_ZH = /(?!)/;');
     assert.notStrictEqual(mutated, orig, '变异未生效（词族清空失败）');
