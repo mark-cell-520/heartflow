@@ -1,0 +1,27 @@
+
+=== 倒装句（W_ZH=0 仍命中？） ===
+  text: "所以融资能救命——你看，能活下来的公司都融过资"
+  SELECT_ZH matches: [ { idx: 13, end: 20, raw: '活下来的公司都' } ]
+  CAUSE_ZH   matches: [ { idx: 0, end: 16, raw: '所以融资能救命——你看，能活下来' } ]
+  SELECT_EN matches: []
+  CAUSE_EN   matches: []
+  findSignatures: [{"lang":"zh","sel":"活下来的公司都","cau":"所以融资能救命——你看，能活下来"}]
+  D(inv,{W_ZH:0}).hit = true
+
+=== OVERDIST（默认应不命中） ===
+  text: "能活下来的公司都融过资，他们在过去十年里经历了完整的融资周期和多轮市场波动与资本寒冬的反复考验，所以融资能救命。"
+  SELECT_ZH matches: [ { idx: 1, end: 8, raw: '活下来的公司都' } ]
+  CAUSE_ZH   matches: [ { idx: 48, end: 55, raw: '所以融资能救命' } ]
+  SELECT_EN matches: []
+  CAUSE_EN   matches: []
+  findSignatures: [{"lang":"zh","sel":"活下来的公司都","cau":"所以融资能救命"}]
+  D(OVERDIST).hit = true
+
+=== CONCEPT_EN 样本 ===
+  CONCEPT_ZH.test = false
+  CONCEPT_EN.test = true
+  CORRECTIVE_ZH.test = false
+  CORRECTIVE_EN.test = true
+  D(cen).hit = false
+  D(cen,{CONCEPT_EN:NEVER}).hit = false
+  findSignatures = [{"lang":"en","sel":"that survived","cau":"so raising funding is what"},{"lang":"en","sel":"that survived","cau":"is what saves"}]

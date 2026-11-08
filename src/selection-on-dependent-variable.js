@@ -136,7 +136,7 @@ const SELECT_EN = [
 // ZH：推断标记 + [特征] + 因果动词 + [结果名词]（明确不收「X 是…关键/正是
 // 原因」主谓同位形式——该形态归 illicit_conversion 第 167 维）
 const CAUSE_ZH = [
-  /(?:所以|因此|据此|可见|足见|这说明|这证明|足以证明|正说明|充分说明|这意味着|足以表明|表明|说明)[^。！？\n]{0,16}(?:能|让|使|就能|方能|才会|导致|致使|造就|决定|拯救|救了|治好|治愈|带活|成就|换来)[^。！？\n]{0,10}(?:救命|长寿|考上|战胜|康复|痊愈|活[了过]?下[来]?|活命|活过来|活过来了|成功|中签|中奖|登顶|夺冠|幸存|过关|胜出|上岸|逆袭|翻盘|入围|入选|出头)/,
+  /(?:所以|因此|据此|可见|足见|这说明|这证明|足以证明|正说明|充分说明|这意味着|足以表明|表明|说明)[^。！？\n]{0,8}(?:能|让|使|就能|方能|才会|导致|致使|造就|决定|拯救|救了|治好|治愈|带活|成就|换来)[^。！？\n]{0,6}(?:救命|长寿|考上|战胜|康复|痊愈|活[了过]?下[来]?|活命|活过来|活过来了|成功|中签|中奖|登顶|夺冠|幸存|过关|胜出|上岸|逆袭|翻盘|入围|入选|出头)/,
   // 反向语序：结果名词 + 靠的/关键在于 + 特征（罕见，补一刀）
   /(?:活[了过]?下[来]?|活过来|活过来了|幸存|上岸|闯出来|挺过来|熬过|战胜|夺冠|康复|痊愈|登顶|胜出|成功)[^。！？\n]{0,8}(?:靠的?就是|全凭|关键在于|取决于|源自于|来自于)[^。！？\n]{0,16}/,
 ];
@@ -152,8 +152,8 @@ const CONCEPT_EN = /\b(?:selection\s+(?:bias|on\s+the\s+(?:dependent|outcome)|ef
 
 // ─── 豁免 B：正确因果与对冲（要求反事实对照 / 指出相关不等于因果 / 点明
 // 可能是结果而非原因 / 说这是选择偏差在起作用——都是正当判别动作）────────
-const CORRECTIVE_ZH = /(?:不能就此断定|不能据此|不能推出|推不出|不足以|说明不了|证明不了|未必|不一定|不代表|不意味着|并不意味|相关不等于因果|相关不意味|需要对照|需要控制|需要随机|需要对比|要有对照|要有控制|对照组|控制组|反事实|可能只是|更可能是结果|也可能是结果|只是必要条件|充分条件|谁是因谁是果|因因果果|倒因为果|倒果为因|混淆了|值得研究|有待|还得看|得看|在控制|在随机|在对照|或是因为|也许源于|可能反映|选择偏差|幸存者偏差|取样|样本量|或为果|互为因果|需要更多|排除混淆|剔除混淆)/;
-const CORRECTIVE_EN = /\b(?:cannot\s+conclude|can'?t\s+conclude|does\s+not\s+mean|doesn'?t\s+mean|not\s+necessarily|we\s+need\s+a\s+controlled|need\s+a\s+controlled|need\s+a\s+comparison|confounded|confounding|may\s+just|might\s+just|could\s+reflect|warrants?\s+(?:study|further|a\s+look)|correlation\s+is\s+not|correlation\s+isn'?t|necessary,?\s+not\s+sufficient|required\s+but\s+not\s+sufficient|reverse\s+causal|reversed|third\s+factor|lurking\s+variable|selection\s+bias|survivorship|counterfactual|control\s+group|randomi[sz]ed)/i;
+const CORRECTIVE_ZH = /(?:不能就此断定|不能据此|不能推出|推不出|不足以|说明不了|证明不了|未必|不一定|不代表|不意味着|并不意味|相关不等于因果|相关不意味|需要对照|需要控制|需要随机|需要对比|要有对照|要有控制|对照组|控制组|反事实|可能只是|更可能是结果|也可能是结果|只是必要条件|充分条件|谁是因谁是果|因因果果|倒因为果|倒果为因|混淆了|值得研究|有待|还得看|得看|在控制|在随机|在对照|或是因为|也许源于|可能反映|取样|样本量|或为果|互为因果|需要更多|排除混淆|剔除混淆)/;
+const CORRECTIVE_EN = /\b(?:cannot\s+conclude|can'?t\s+conclude|does\s+not\s+mean|doesn'?t\s+mean|not\s+necessarily|we\s+need\s+a\s+controlled|need\s+a\s+controlled|need\s+a\s+comparison|confounded|confounding|may\s+just|might\s+just|could\s+reflect|warrants?\s+(?:study|further|a\s+look)|correlation\s+is\s+not|correlation\s+isn'?t|necessary,?\s+not\s+sufficient|required\s+but\s+not\s+sufficient|reverse\s+causal|reversed|third\s+factor|lurking\s+variable|counterfactual|control\s+group|randomi[sz]ed)\b/i;
 
 // ─── 否定前缀守卫（两腿各自查匹配点之前的否定标记）────────────────────
 const NEG_BEFORE_ZH = /(?:不能|不可|不应|不该|无法|并不能|并未|并没有|不是|算不上|并非|不算|未必|不等于|不代表|能否|可否|说明不了|证明不了|尚待|并不会|不属于|不谈|不再|别|并不|并没|从未|绝非|很难|不要|不足以|单靠|仅凭|光靠)[^。，！？；\n]{0,6}$/;
@@ -283,5 +283,6 @@ module.exports = {
     CAUSE_ZH, CAUSE_EN,
     CONCEPT_ZH, CONCEPT_EN, CORRECTIVE_ZH, CORRECTIVE_EN,
     NEG_BEFORE_ZH, NEG_BEFORE_EN, W_ZH, W_EN,
+    collect, findSignatures,
   }),
 };
