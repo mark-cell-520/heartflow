@@ -1,0 +1,13 @@
+TRADITION_EN: true
+SUPPRESS_EN: false
+module normal: {"hit":true,"score":0.4,"count":1,"detail":"appeal to tradition·suppress-change wording(en)"}
+module killed: {"hit":false,"score":0,"detail":"","count":0}
+GUIDANCE: ""
+PASS "传统戏曲就是这样演的，观众爱看。" :: none
+PASS "Time-tested methods deserve respect, not immunity from testing." :: moral_foundations
+PASS "这家百年老店去年翻新了门面。" :: none
+PASS "Old-school craftsmanship requires years of apprenticeship." :: none
+verify "祖上传下来的秘方我们已经做了成分检测，论文发表在药理期刊上。" :: unsupported_claim,unsupported_claim
+verify "The status quo has served us well, and the data confirms it still works." :: unsupported_claim,unsupported_claim,appeal_to_tradition
+PASS "We compared the century-old recipe with the modern one." :: none
+PASS "公司沿用旧命名规范只为兼容历史代码" :: none

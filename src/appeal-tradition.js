@@ -67,7 +67,10 @@ const TRADITION_ZH = /传统|老祖宗|祖祖辈辈|祖祖代代|老一辈|古�
 
 // 英文：tradition / custom / convention / 时间跨度 / 祖先主体
 // 边界：单独出现即在场，判定仍需与 T2 交叉，故不会误伤描述性陈述。
-const TRADITION_EN = /\btradition(?:ally|al)?\b|\bcustom(?:ary)?\b|\bconventions?\b|\bfor\s+(?:generations|centuries|decades|hundreds\s+of\s+years|as\s+long\s+as)\b|\b(?:our|the)\s+(?:forefathers|ancestors|forebears|predecessors|predecessors)\b|\b(?:established|set)\s+(?:by\s+)?(?:our|the)\s+(?:forefathers|ancestors|predecessors)|\bthe\s+way\s+(?:it|we|things)\s+(?:has|have|had)\s+always\s+been\b|\b(?:has|have|had)\s+always\s+(?:\w+\s+){0,2}this\s+way\b|\balways\s+been\s+(?:done|that\s+way|this\s+way|the\s+practice|the\s+norm)\b|\blong-?standing\b|\btime-?honou?red\b|\bsince\s+time\s+immemorial\b|\bthe\s+old\s+way\b|\bby\s+precedent\b|\bcenturies?-?old\b/i;
+// [r259 修缺] `centuries?-?old` 的 `?` 只作用于 `s`——该支自 v6.8.2 起
+// **永远匹配不到 "century-old"**（只能匹配 "centurie-old"/"centuries-old"），
+// 是一条静默失效的腿①分支。改为 `centur(?:y|ies)-?old`。
+const TRADITION_EN = /\btradition(?:ally|al)?\b|\bcustom(?:ary)?\b|\bconventions?\b|\bfor\s+(?:generations|centuries|decades|hundreds\s+of\s+years|as\s+long\s+as)\b|\b(?:our|the)\s+(?:forefathers|ancestors|forebears|predecessors|predecessors)\b|\b(?:established|set)\s+(?:by\s+)?(?:our|the)\s+(?:forefathers|ancestors|predecessors)|\bthe\s+way\s+(?:it|we|things)\s+(?:has|have|had)\s+always\s+been\b|\b(?:has|have|had)\s+always\s+(?:\w+\s+){0,2}this\s+way\b|\balways\s+been\s+(?:done|that\s+way|this\s+way|the\s+practice|the\s+norm)\b|\blong-?standing\b|\btime-?honou?red\b|\bsince\s+time\s+immemorial\b|\bthe\s+old\s+way\b|\bby\s+precedent\b|\bcentur(?:y|ies)-?old\b/i;
 
 // ─── T3: 从众基数在场 × 点名对方异议（多人从众施压族） ──────────────
 // 边界：不要求出现「传统/历来」名词——本族的话术机制是「多数人这样，
@@ -249,6 +252,12 @@ const HEDGE_CONCESSION_ZH = /不过|但是|然而|可是|虽说|固然|尽管如
 const HEDGE_EVAL_ZH = /评估|数据|实测|重新考虑|有待|争议|未必|不尽然|例外|改进|改良|优化|具体分析|另作评估|另行评估/;
 const HEDGE_CONCESSION_EN = /\bhowever\b|\bbut\b|\bthat said\b|\balthough\b|\bthough\b|\byet\b|\bwhile\b/i;
 const HEDGE_EVAL_EN = /\bdata\b|\bevidence\b|\breassess\b|\brevisit\b|\breconsider\b|\bevaluate\b|\breview\b|\bimprove\b|\bnot always\b|\bdebat/i;
+// [r259] 证据在场替代通路：把「维持传统」的依据放到可核查的数据上
+// （"现状一直运行良好，数据显示它仍然有效"）是在做证据论证，不是在以
+// 传统置换证据。**已知绕过面**：句尾追加数据标记即可豁免——与 r257
+// HEDGE 同型的取舍，已列入交接给 2 号专项测试。
+const HEDGE_EVIDENCE_ZH = /数据显示|数据表明|数据确认|检测数据|实测数据|证据表明|证据显示|统计显示|报告显示|数据显示/;
+const HEDGE_EVIDENCE_EN = /\bthe data (?:shows|confirms|indicates|suggests)\b|\bevidence (?:shows|suggests|indicates)\b|\baccording to (?:the )?data\b/i;
 
 /** 收集正则全部匹配及其起止位置（供防自证守卫做零重叠判定） */
 function _collect(re, text) {
@@ -360,6 +369,8 @@ function checkAppealToTradition(text, inject) {
   const hedgeE = R.HEDGE_EVAL_ZH || HEDGE_EVAL_ZH;
   const hedgeCEn = R.HEDGE_CONCESSION_EN || HEDGE_CONCESSION_EN;
   const hedgeEEn = R.HEDGE_EVAL_EN || HEDGE_EVAL_EN;
+  const hedgeEvZh = R.HEDGE_EVIDENCE_ZH || HEDGE_EVIDENCE_ZH;
+  const hedgeEvEn = R.HEDGE_EVIDENCE_EN || HEDGE_EVIDENCE_EN;
   const zhText = /[\u4e00-\u9fff]/.test(text);
   for (const sent of _sentences(text)) {
     if (sent.length < 6) continue;
@@ -369,9 +380,10 @@ function checkAppealToTradition(text, inject) {
     );
     if (tradSpans.length === 0) continue;
 
-    // concessive-debate 豁免：让步 × 评估/数据 同时在场 → 呈现争论
+    // concessive-debate 豁免（让步×评估/数据）＋ 证据在场替代通路
     if ((hedgeC.test(sent) && hedgeE.test(sent)) ||
-        (hedgeCEn.test(sent) && hedgeEEn.test(sent))) {
+        (hedgeCEn.test(sent) && hedgeEEn.test(sent)) ||
+        hedgeEvZh.test(sent) || hedgeEvEn.test(sent)) {
       continue;
     }
 

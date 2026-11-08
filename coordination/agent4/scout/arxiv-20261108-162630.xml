@@ -1,0 +1,416 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/HtagPZcQFWm/olNP6TL3KemcVMY</id>
+  <title>arXiv Query: search_query=all:appeal OR all:to OR all:tradition OR all:fallacy OR all:detection OR all:rule-based OR all:text OR all:classifier&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-08T16:26:31Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:appeal+OR+(all:to+OR+(all:tradition+OR+(all:fallacy+OR+(all:detection+OR+(all:rule-based+OR+(all:text+OR+all:classifier))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>588841</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08487v1</id>
+    <title>User Embeddings are Superpositions of Interpretable Behavioral Modes</title>
+    <updated>2026-11-05T18:59:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.08487v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08487v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>User embeddings are central components of modern recommendation, personalization, and behavioral modeling systems. Though these embeddings can compactly encode rich behavioral information, they are inherently dense and opaque, limiting interpretability. To address this gap, we argue that user embeddings can be understood as sparse superpositions of interpretable behavioral modes. This structure is directly predicted by generative models of user behavior for linear embeddings and extends approximately to deep-learning representations by the superposition hypothesis. Superimposed modes can naturally be recovered by sparse dictionary learning methods, such as sparse autoencoders (SAEs), and recovered modes can be automatically named and queried in natural language. We validate mode recovery against known ground truth on synthetic data, where SAEs recover modes better than classical sparse baselines, including on transformer-encoded embeddings. We then apply the method to classical and transformer-based user embeddings from two real-world datasets. We also show how the corresponding natural-language labels enable zero-shot audience retrieval and characterization over embeddings never trained on text. The framework is post-hoc and model-agnostic, requiring no modification to the upstream embedding system.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:42Z</published>
+    <arxiv:comment>Accepted to NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Jonathan Kozaczuk</name>
+    </author>
+    <author>
+      <name>Zheng Dong</name>
+    </author>
+    <author>
+      <name>Noyan Evirgen</name>
+    </author>
+    <author>
+      <name>Keivan Majidi</name>
+    </author>
+    <author>
+      <name>Eddie K. H. Ng</name>
+    </author>
+    <author>
+      <name>Chris Porter</name>
+    </author>
+    <author>
+      <name>Qi Zhao</name>
+    </author>
+    <author>
+      <name>Jia Geng</name>
+    </author>
+    <author>
+      <name>Changmao Li</name>
+    </author>
+    <author>
+      <name>Brandon R. Feng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08485v1</id>
+    <title>Where and Why is Grounded Reasoning Useful?</title>
+    <updated>2026-11-05T18:59:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.08485v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08485v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Grounded reasoning, where a model outputs text coordinates of relevant locations in chain-of-thought reasoning, is a common strategy for solving complex visual reasoning problems. However, the benefits and limitations of grounded reasoning are understudied. We study where and why grounded reasoning is most useful. To do so, we introduce a chain-of-thought analysis method to measure how much a model uses its outputted grounding in its thinking trace and perform a detailed ablation study of a grounded reasoning training recipe. We find that grounded reasoning improves counting but shows no significant gain over baselines without coordinate grounding across a wide range of spatial reasoning and perception benchmarks. Using several synthetic tasks, we show that grounded reasoning is most useful when a task requires undescribable references, which are visual concepts that are difficult to describe in language. However, we observe that many existing visual reasoning benchmarks are solvable with only describable text references. To close this gap, we introduce BrickVision, a new benchmark that requires undescribable visual references to solve.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:32Z</published>
+    <arxiv:comment>Project page: https://elorian.ai/blog/why-grounding</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>David Yan</name>
+    </author>
+    <author>
+      <name>Le Xue</name>
+    </author>
+    <author>
+      <name>Forrest Huang</name>
+    </author>
+    <author>
+      <name>Qiuyi Zhang</name>
+    </author>
+    <author>
+      <name>Dustin Tran</name>
+    </author>
+    <author>
+      <name>Andrew M. Dai</name>
+    </author>
+    <author>
+      <name>Yinfei Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08484v1</id>
+    <title>Evolution of Dust In Protoplanetary Disks With Magnetized Winds</title>
+    <updated>2026-11-05T18:59:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08484v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08484v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Observations and theory increasingly indicate that protoplanetary disks are weakly turbulent, implying that magnetized disk winds may dominate their angular momentum transport and long-term evolution. Yet dust evolution in wind-dominated disks remains poorly understood, despite its importance for planet formation. In particular, whether wind-dominated disk evolution can create regions with enhanced dust-to-gas mass ratios that enable planetesimal formation via the streaming instability is unclear. We build a parametric hybrid disk evolution model that includes turbulent accretion, wind-driven accretion, and wind-driven mass loss to investigate dust evolution in magnetized protoplanetary disks. We employ this model to carry out a parameter study in which the initial total accretion rate, the wind-driven mass loss rate, and the turbulence strength are varied. We find that although wind-dominated disks are more favorable to dust growth and concentration than turbulence-dominated disks, conditions suitable for the streaming instability arise only within the inner few au and only under the most extreme conditions: very weak turbulence ($α_\text{turb} = 10^{-5}$) where magnetized winds drive most of the accretion ($\dot{M}_\text{acc,tot} \simeq \dot{M}_\text{wind,acc}$), and wind-driven mass loss comparable to the accretion rate ($\dot{M}_\text{wind,outflow} \simeq \dot{M}_\text{acc,wind}$). Our results therefore imply that, beyond the inner few au, the parametric wind-driven evolution models considered in the literature do not by themselves produce conditions suitable for planetesimal formation via the streaming instability, motivating more physically complete models in which spontaneous, long-lived dust traps can arise.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:31Z</published>
+    <arxiv:comment>23 pages, 13 Figures. Accepted for publication in the Astrophysical Journal</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Olcay Goksu</name>
+    </author>
+    <author>
+      <name>Ralph Pudritz</name>
+    </author>
+    <author>
+      <name>Timmy Delage</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08483v1</id>
+    <title>SwarmEvolve: Latent Agent Swarms for Evolutionary Discovery and Optimization</title>
+    <updated>2026-11-05T18:59:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.08483v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08483v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM-guided evolutionary search uses AI agents to improve programs for mathematical and computational problems by iteratively refining solutions and combining high-scoring methods. However, the process is often slow because the LLM generates a long textual chain of thought for each round and must repeat this generation many times to maintain population diversity. We present SwarmEvolve, a framework in which hundreds of low-cost agents per round work in swarms, reason in latent space without decoding to text, and share information by passing KV caches. Each swarm studies the problem from a different angle. A novelty filter keeps the most distinct agent ideas by directly measuring the distances between the agents' hidden state vectors. Crossover of ideas happens naturally in latent space, as a summarizer agent receives the combined KV caches of all swarm members. On 21 problems in mathematical discovery and scientific computing, SwarmEvolve gets the highest average score and needs a median of only 3 to 8 minutes to reach the best scores that other state-of-the-art frameworks reach in 60 minutes. On several problems, SwarmEvolve with Qwen3 8B improves on the solutions that AlphaEvolve first found with frontier LLMs. Our work shows that agent swarms that communicate in latent space offer a fast, low-cost approach to program search for scientific problems.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:29Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Qile Jiang</name>
+    </author>
+    <author>
+      <name>George Em Karniadakis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08470v1</id>
+    <title>Joint Electricity Price and Load Forecasting for Data Center Battery Dispatch Using Polynomial Diffusion Models</title>
+    <updated>2026-11-05T18:55:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.08470v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08470v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The rapid growth of large-scale data centers (DCs) is increasing electricity demand, market volatility, and operating costs. Battery energy storage systems (BESSs) can mitigate these challenges by shifting electricity purchases from high-price to low-price periods. This paper proposes a real-time BESS dispatch framework using polynomial diffusion models (PDMs) to forecast both electricity prices and DC loads. Leveraging the closed-form conditional expectations of PDMs, the forecasts are integrated into a dynamic programming (DP) framework to minimize electricity procurement costs. Across the evaluated BESS configurations, the proposed approach achieves 2.63 times the cost savings of a rule-based (RB) strategy.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:37Z</published>
+    <arxiv:comment>5 pages, 5 figures, Power &amp; Energy Society (PES) General Meeting</arxiv:comment>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Matthew Van Ham</name>
+    </author>
+    <author>
+      <name>Yiping Liu</name>
+    </author>
+    <author>
+      <name>Xiaozhe Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08465v1</id>
+    <title>Towards interpreting any residual stream direction by scaling activation inversion</title>
+    <updated>2026-11-05T18:54:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.08465v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08465v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>To interpret a direction in a language model's residual stream, we can look for text that strongly activates it. But when such text is found by scanning a corpus, it is limited to what that corpus contains. We develop Maximally-Activating Example Metamodels (MAEMs), language models which map residual stream directions from a subject model to text exemplars that strongly activate those directions. Our objective is to maximise the cosine similarity of a supplied residual stream direction with the activations of the text generated by the MAEM. This label-free RL objective helps to scale MAEMs on diverse sources of residual stream directions. Empirically, we find the resultant metamodel produces informative exemplars: a Qwen3.6-27B MAEM inverts held-out activations better than corpus search or a natural-language autoencoder (NLA), beats corpus search (at 10M tokens) on a majority of held-out languages/domains, and activates 89% of held-out SAE features. It also identifies concepts behind steering vectors about as well as NLAs, recovers the payloads of LoRA backdoors more often than corpus search, and can even verbalise some model workspace inner monologue. Unlike explanations produced by other metamodels (e.g. NLAs), MAEM exemplars can be verified with a forward pass on the subject model, making the MAEM objective a grounded alternative for scaling the training of metamodels.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:54:40Z</published>
+    <arxiv:comment>Euan Ong and Jiahai Feng advised equally</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Celeste De Schamphelaere</name>
+    </author>
+    <author>
+      <name>Juan J. Vazquez</name>
+    </author>
+    <author>
+      <name>Ari Spiesberger</name>
+    </author>
+    <author>
+      <name>Tomáš Gavenčiak</name>
+    </author>
+    <author>
+      <name>Gavin Leech</name>
+    </author>
+    <author>
+      <name>Euan Ong</name>
+    </author>
+    <author>
+      <name>Jiahai Feng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08443v1</id>
+    <title>Souffleur: A Glanceable Display for Mobile Voice Conversations</title>
+    <updated>2026-11-05T18:36:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.08443v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08443v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The speech capabilities of mobile devices have grown, but their displays still rely on a text-based chat. When resuming a voice chat after a context switch, the last messages may not convey the key points of the conversation. Autobiographical use and sessions with external participants led to design goals for a mobile-first, speech-driven, glanceable display that helps users continue their reasoning from where they left off. We implement these goals in Souffleur and evaluate it in a between-subjects study with 48 participants. Compared with a conventional chat transcript, we found no reliable difference in how easily participants followed and resumed short voice conversations, nor in effort, attention or recall, although Souffleur reduces the conversation to a few short phrases.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:36:18Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Anton Wolter</name>
+    </author>
+    <author>
+      <name>William Benjamin</name>
+    </author>
+    <author>
+      <name>Niklas Elmqvist</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08441v1</id>
+    <title>Edge-Assisted Crowdsensing for Explainable Cyclist Safety Perception</title>
+    <updated>2026-11-05T18:33:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.08441v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08441v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cyclist fatality rates remain high despite policy support for active travel, and autonomous vehicles add complexity to mixed traffic. Neither crash statistics nor multi-model detection pipelines scale to continuous monitoring of perceived safety along a route. We present an edge-assisted crowdsensing system: handlebar cameras supply street-level frames, a vision-language model (VLM) turns each frame into structured traffic attributes through a single prompt, and an explainable boosting machine (EBM) combines them with OpenStreetMap road infrastructure and on-bike kinematics to predict a crowdsourced 1-9 safety score. Extraction belongs at the network edge: the fastest self-hosted model needs 2.49 s per frame and scoring takes 0.4 ms on a CPU. On 1,362 annotated frames from two London routes, the EBM regressor reaches 72.2 percent binary accuracy and a mean absolute error of 1.011 under five-fold cross-validation. It is within one accuracy point of black-box ensembles. Its per-feature shape functions give exact attribution: physical lane separation is worth +0.97 rating points, a painted lane +0.70 and a construction site -0.65. Planners can therefore price an infrastructure change in rating points, and the results enter cost-benefit analysis directly. We also report inter-annotator agreement (alpha = 0.4695), an attribute audit, and a sensitivity analysis linking attribute error to accuracy. With re-encoding, a 20 s sampling interval serves 1,000 riders at 54 Mbit/s at a cost of 1.4 accuracy points, making continuous monitoring practical.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.IV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:33:58Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hongsen Cao</name>
+    </author>
+    <author>
+      <name>Chia-Yen Chiang</name>
+    </author>
+    <author>
+      <name>Mona Jaber</name>
+    </author>
+    <author>
+      <name>Meihui Wang</name>
+    </author>
+    <author>
+      <name>Yasmin Fathy</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08435v1</id>
+    <title>Trapping and Fracture of Particles in Three-Sphere Ball-Milling Collisions</title>
+    <updated>2026-11-05T18:28:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.08435v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08435v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We numerically investigate the collision and fracture processes of ball milling based on a minimal model of a three-sphere geometry using discrete element method (DEM) simulations combined with Christensen-type and Weibull-type normalized fracture criteria. The outcome of the brittle target particle (ejected versus trapped, fractured versus intact) depends on the impact geometry and velocity. We develop a reduced three-sphere collision description in which trapping is governed by impact geometry and friction, while fracture inside the trapping regime is evaluated from DEM output using stress-based and contact-force-based normalized criteria. The trapping regime follows a closed-form geometric condition, while the critical conditions for fracture vary with impact angle, obliquity angle, impact velocity, and particle size ratio. Head-on collisions with larger size ratios require lower critical impact velocities for fracture.</summary>
+    <category term="cond-mat.soft" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.app-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:28:30Z</published>
+    <arxiv:comment>16 pages, including Supplementary Information; 7 main-text figures and 1 supplementary figure</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.soft"/>
+    <author>
+      <name>Ziyi Cui</name>
+    </author>
+    <author>
+      <name>Qiong Zhang</name>
+    </author>
+    <author>
+      <name>Suwei Liu</name>
+    </author>
+    <author>
+      <name>Richard M. Lueptow</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08433v1</id>
+    <title>MedGraph: Maintaining Patient State with Graph Memory for Long-Term Medical Dialogue</title>
+    <updated>2026-11-05T18:27:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.08433v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08433v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>LLM-based medical assistants that follow a patient across visits need a memory that keeps the patient's clinical state correct as it changes. We examine the errors of five memory systems on longitudinal medical dialogue and find three recurring causes: the retrieved evidence gives an outdated state, includes another person's health facts, or lacks a safety fact the answer depends on. We present MedGraph, a graph memory built for these three cases. Construction extracts dated facts from each session, attributes each fact to the person it describes, and links medication, diagnosis, and measurement records into chains that keep earlier states. Retrieval ranks the patient's chains as units, reads each chain at the time the question asks about, and adds the original dialogue text; a patient profile lists every recorded safety fact with every question. On MedMemoryBench, MedGraph has the highest overall accuracy with both a GPT and a Qwen backbone, 10.5 and 10.4 points above the strongest of five baselines, with efficient memory construction and answering in the GPT setting.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:27:20Z</published>
+    <arxiv:comment>14 pages, 5 figures, 8 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Donghua Zhang</name>
+    </author>
+    <author>
+      <name>Zizheng Wang</name>
+    </author>
+    <author>
+      <name>Ze Dong</name>
+    </author>
+    <author>
+      <name>Yiding Feng</name>
+    </author>
+    <author>
+      <name>Siyu Qian</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08425v1</id>
+    <title>Failure Prediction and Classification in Vision-Language-Action Models Via Calibrated Latent Probing</title>
+    <updated>2026-11-05T18:21:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.08425v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08425v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action models (VLAs) enable general-purpose embodied intelligence, but their performance is brittle under distribution shift, where unanticipated failures can damage equipment or endanger people. Deploying VLAs in real-world systems therefore requires a runtime monitor that is timely, calibrated, and informative while being efficient enough to run on the edge. Existing methods fail to fulfill these requirements. We present VLA-Tug, a lightweight probe over the latent layers of a VLA backbone that improves early failure detection and bounds the missed-detection and false-alarm rates, with minimal inference overhead. We show that supervising on the pre-failure segment of a trajectory increases early failure detection at matched false-positive rates by up to 30% over the strongest learned baseline. Under shift to unseen tasks, the bounds on missed-detection and false-alarm rates remain valid in up to 86% of runs, versus at most 21% for baselines. Unlike existing methods, VLA-Tug predicts the failure mode to enable corrective actions, raising top-3 accuracy on unseen tasks by up to 44% over a majority baseline. VLA-Tug enables real-time monitoring where the well-timed and informative probe supports lightweight steering that improves task success. We release a dataset of 3,180 annotated manipulation episodes to support future work on latent failure detection in VLAs at https://vla-tug.github.io.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:21:07Z</published>
+    <arxiv:comment>Code, videos, and dataset available at https://vla-tug.github.io</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Michal P. Podolinsky</name>
+    </author>
+    <author>
+      <name>Yunhao Yang</name>
+    </author>
+    <author>
+      <name>Daniel Little</name>
+    </author>
+    <author>
+      <name>Hong Lu</name>
+    </author>
+    <author>
+      <name>Rohan Siva</name>
+    </author>
+    <author>
+      <name>Olin Goudey</name>
+    </author>
+    <author>
+      <name>Neel P. Bhatt</name>
+    </author>
+    <author>
+      <name>Matthias Scheutz</name>
+    </author>
+    <author>
+      <name>Ufuk Topcu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08412v1</id>
+    <title>The Gold Rush in AI4Math, II: What are signatures of AI-assisted Proofs?</title>
+    <updated>2026-11-05T18:17:18Z</updated>
+    <link href="https://arxiv.org/abs/2611.08412v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08412v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The growing use of AI in mathematics raises a question: can we detect AI involvement in proofs, separately from AI assistance with writing? Historical arXiv papers, recent papers disclosing substantive AI use, and manuscripts released by OpenAI provide a rich empirical basis for studying this question. However, several challenges remain: lack of matched case-control pairs; potential incompleteness of disclosure; and lack of ready-to-use features designed to capture signals of AI involvement in proofs.
+  To address these challenges, we construct five cohorts comprising 8,281 papers by combining existing manuscripts with those we produced using generative AI. These cohorts span different levels of AI involvement and include matched pairs of papers addressing the same research problems. We then introduce ProofTrace, a framework that represents each paper as a graph of immediate proof support (GIPS) and extracts interpretable features of mathematical organization.
+  Our study yields three discoveries. First, principal-component projections of our features reveal a qualitative gradient of AI involvement, where AI-reworded papers remain close to human papers, the two AI-generated cohorts depart in broadly shared directions, and papers disclosing substantive AI use occupy intermediate positions which shifts toward AI-generated cohorts over time. Second, we identify recurring signatures of AI-generated proofs, such as fewer externally cited results, greater reliance on intermediate conclusions, and altered graph connectivity; many of these signatures persist under controls for research field, manuscript length, or graph size. Finally, in a separate detection experiment, ProofTrace distinguishes human-written papers from those disclosing substantive AI use. Its performance remains stable under AI rewording, whereas the performance of state-of-the-art text-based detectors declines sharply.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:18Z</published>
+    <arxiv:comment>31 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yuanchuan Guo</name>
+    </author>
+    <author>
+      <name>Jiashun Jin</name>
+    </author>
+    <author>
+      <name>Zheng Tracy Ke</name>
+    </author>
+    <author>
+      <name>Bingcheng Sui</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08403v1</id>
+    <title>StepBack: Step-Level Error-Localized Resampling for Efficient Test-Time Reasoning</title>
+    <updated>2026-11-05T18:12:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.08403v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08403v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Self-consistency (SC) is a widely used decoding strategy for improving chain-of-thought reasoning, but it requires sampling many complete reasoning trajectories with a preset budget. Its efficient variants reduce the cost mainly by stopping full-trajectory sampling early or distributing the number of samples across questions. In this paper, we propose StepBack, a step-level error-localized resampling method for efficient test-time reasoning. Given a small set of draft trajectories, StepBack localizes likely first error positions using lightweight signals and then resamples the detected error step and its suffix, followed by majority answer voting. Empirically, StepBack matches the accuracy of SC on average across seven mathematical reasoning and multi-hop QA benchmarks, while reducing token usage by up to 41.26%. In addition, by nature, StepBack can be combined with adaptive inference methods such as Adaptive Consistency, further improving their inference-time efficiency.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:12:49Z</published>
+    <arxiv:comment>NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yang Ouyang</name>
+    </author>
+    <author>
+      <name>Jung-Eun Kim</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08398v1</id>
+    <title>A Multimodal Haptic Interface for Simultaneous Softness and Thermal Modulation</title>
+    <updated>2026-11-05T18:10:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.08398v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08398v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Haptic interactions, such as touching an object in virtual reality, involve detecting a plethora of sensations through the skin. Whilst tactile displays exist to simulate and manipulate all of these cues individually, little progress has been made constructing devices that can control multiple cues simultaneously. This paper presents a tactile display technology that offers both softness and temperature change.
+  A prototype display, based on particle jamming and the thermal transfer of heated and cooled water, is evaluated in terms of its ability to change both stiffness and temperature. Mechanical evaluations demonstrate controllable stiffness increase of 300%, whilst thermal characterisation showed strong surface uniformity and a range of achievable temperatures from 10°C up to 50°C, with closed-loop control maintaining a 0.2°C error from a setpoint. This work advances the design of multimodal tactile displays with applications to perceptual research, medical simulation, and affective haptics.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:10:25Z</published>
+    <arxiv:comment>Published at EuroHaptics 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Joshua Brown</name>
+    </author>
+    <author>
+      <name>Fernando Bello</name>
+    </author>
+    <author>
+      <name>Lynette Jones</name>
+    </author>
+    <arxiv:doi>10.1007/978-3-032-32230-2_2</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/978-3-032-32230-2_2" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08393v1</id>
+    <title>Adaptive Low-Light Enhancement for Road Anomaly Detection: A Multi-Architecture Benchmark and Edge Deployment Study</title>
+    <updated>2026-11-05T18:06:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.08393v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08393v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Road anomaly detection systems on autonomous vehicles must function reliably under degraded visual conditions including darkness, rain, and Harmattan dust haze. This paper benchmarks four object detection architectures, YOLOv8n, YOLOv12n, RT-DETR, and Faster R-CNN, under physically grounded lighting and weather degradation, and shows that uniform application of the SCI low-light enhancement network is actively harmful at dusk-level lighting (-16.1% to -30.7% mAP@50). We propose a lightweight, training-free luminance-adaptive router that selects between no enhancement, moderate SCI, and denoising plus strong SCI based on per-frame Rec. 601 luminance, recovering most of the dusk penalty while preserving low-light gains, and we validate the full pipeline on NVIDIA Jetson Nano edge hardware.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:06:59Z</published>
+    <arxiv:comment>5 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Obed Honour Eje</name>
+    </author>
+    <author>
+      <name>Oluwatosin Kolade</name>
+    </author>
+    <author>
+      <name>Glory Bagai</name>
+    </author>
+    <author>
+      <name>Taliha Abiodun Folorunso</name>
+    </author>
+  </entry>
+</feed>

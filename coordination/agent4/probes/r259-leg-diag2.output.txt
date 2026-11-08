@@ -1,0 +1,6 @@
+isolated: false false
+full-short: false
+source has centuries?-?old: true
+full module regex: false
+long-standing: true
+the old way: true

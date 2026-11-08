@@ -1,0 +1,7 @@
+TRADITION_EN century-old: false
+SUPP_EN e10: true
+module: {"hit":false,"score":0,"detail":"","count":0}
+sentences: ["This is a century-old recipe, so do not change it."]
+hedgeCEn: false hedgeEEn: false
+tradSpans: []
+suppSpans: [[33,46,"do not change"]]
