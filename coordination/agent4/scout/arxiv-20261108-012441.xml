@@ -1,0 +1,344 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/PKc91wD97sLHxTvXT2ouh5O4muQ</id>
+  <title>arXiv Query: search_query=all:"opportunity cost" OR all:neglect OR all:logical OR all:fallacy&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-08T01:24:42Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22opportunity+cost%22+OR+(all:neglect+OR+(all:logical+OR+all:fallacy))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>61680</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08488v1</id>
+    <title>Provable circuit-level thresholds for non-abelian topological phases</title>
+    <updated>2026-11-05T18:59:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.08488v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08488v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We provide an explicit scheme to realize a quantum memory in any 2D non-chiral topological order. For this, we construct syndrome extraction circuits based on the Turaev-Viro path integral as well as a classical algorithm for decoding on the fly. We prove that our scheme has a threshold under a local stochastic circuit-level noise model and discuss how to generalize it to implement topological logical gates.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:44Z</published>
+    <arxiv:comment>37 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Yuanjie Ren</name>
+    </author>
+    <author>
+      <name>Margarita Davydova</name>
+    </author>
+    <author>
+      <name>Shankar Balasubramanian</name>
+    </author>
+    <author>
+      <name>Andreas Bauer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08481v1</id>
+    <title>Joint analysis of the Macquart relation and the dispersion measure power spectrum: cross-covariance and redshift self-calibration</title>
+    <updated>2026-11-05T18:59:19Z</updated>
+    <link href="https://arxiv.org/abs/2611.08481v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08481v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The dispersion measures (DMs) of fast radio bursts (FRBs) trace ionised baryons along the line of sight, probing baryonic feedback. Two complementary observables can be constructed from an FRB catalogue: the DM-redshift (Macquart) relation of host-identified FRBs, and the angular power spectrum of the DM field of the full catalogue. Their joint analysis requires their cross-covariance. We derive it within the halo model and show it is a super-sample effect: only the monopole of an individual DM correlates with the angular power spectrum, yielding an exact, model-independent bound on the correlation coefficient. We validate the calculation against log-normal forward simulations of $10^4$ FRBs. For individual DMs, the correlation with the bandpowers is at the per cent level. Neglecting the cross-covariance changes the width of the $χ^2$ distribution by only 0.8 per cent, so the two observables can be treated as effectively independent for wide-area surveys. In a joint forecast with an LSST-like weak lensing survey, adding the Macquart relation tightens constraints on the physical baryon density by 32 per cent and on the mean host contribution by a factor of 4.1, while improving baryonification parameters by only about 5 per cent, indirectly through the host contribution. Finally, we show that the redshift distribution of FRBs without identified hosts, which enters every DM power spectrum, can be reconstructed by inverting their DMs with the jointly fitted mean relation without biasing the inferred parameters, whereas a 20 per cent error in the mean relation biases the DM power spectrum by up to 2$σ$ per band for $5\times 10^5$ FRBs.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:19Z</published>
+    <arxiv:comment>36 pages, 9 figures, submitted to JCAP</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Amy Wayland</name>
+    </author>
+    <author>
+      <name>Robert Reischke</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08380v1</id>
+    <title>SensorGuard-RV: Sensor-to-Register Data Protection for Resource-Constrained RISC-V Devices</title>
+    <updated>2026-11-05T17:57:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.08380v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08380v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Embedded systems rely on sensor measurements that traverse a complex hardware-firmware stack (e.g. peripheral interfaces, communication buses, memory, and drivers) before reaching the applications that use them. At worst, an attacker with access to this path may successfully intercept, overwrite, fabricate, or replay readings. This may cause systems that act on such data, such as flight controllers and industrial processes, to behave incorrectly or unsafely. Existing defences, such as trusted execution environments and trusted I/O paths, still depend on trusted driver software and correctly configured access control, which remain fragile in practice. In response, we present SensorGuard-RV, a hardware-first approach that delivers sensor samples into processor registers without trusting intermediate software, buses, or memory. After configuration, a write-once ownership switch hands the sensor to a fixed-function controller that performs hardware-level authenticated encryption on sensor samples under a key inaccessible to software. We develop a new RISC-V instruction then instructs the CPU to decrypt the sample and writes it to a register only after verifying its tag and rejecting replays, including across resets. We implement SensorGuard-RV on the NEORV32 core with an ADXL362 SPI accelerometer on an Artix-7 FPGA. At 100 MHz, a protected sample reaches a register in 5,191 cycles (51.9 $μ$s), of which the two Ascon authenticated encryption engines account for 30. Because fixed-function acquisition removes per-byte software polling, the protected loop sustains 19,015 transactions/s, 5.3% above a software-driven SPI baseline. The added logic (3,155 LUTs and 2,215 registers; 5.0% and 1.7% of the device) is dominated by the Ascon engine and preserves the 100 MHz clock, while estimated power rises from 118 to 368 mW.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:57:49Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Hamid Noori</name>
+    </author>
+    <author>
+      <name>Carlton Shepherd</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08310v1</id>
+    <title>Recovery gates as a resource in repetition-code process tomography: exhaustive gate-optimal designs for three, five and seven qubits</title>
+    <updated>2026-11-05T17:12:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.08310v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08310v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Process tomography built on stabilizer codes compares the logical channel of a repetition code with a reference channel, and the decoder that produces that channel is almost always fixed to the standard minimum-weight one. We ask how many physical single-qubit Pauli gates the decoder actually needs when the measurement basis is fixed---the constraint under which the count is a resource rather than a bookkeeping artefact. Exhaustive enumeration of every recovery design for $n=3$, $5$ and $7$ qubits, with rank decided by exact modular arithmetic at two primes, gives minimal counts of $0$, $1$ and $5$ gates, against $6$, $10$ and $14$ for first-order decoding and $6$, $50$ and $308$ for full minimum-weight decoding. The count depends only on how many sites are corrected and never on which, so the two halves of the design problem separate. Correcting more sites is not monotonically better: at $n=7$ full decoding loses three dimensions of rank, and under a calibration-residual floor the precision curve at $n=3$ is U-shaped. The three-gate design is $9.5$ times more precise than the standard six-gate decoder at the median of $40$ sampled working points, and more precise at every one of them ($1.8$ to $88$ times); the size of that factor belongs to the working point, the ordering does not. Reaching a $10$\,mrad rms error then costs $1.2\times10^{7}$ shots in $65$\,s on a current superconducting device at a well-conditioned point, while $n\ge5$ stays out of reach for conditioning reasons rather than gate-count reasons. Finally, the optimal designs are not covariant under chain reversal: they separate the mirror pair of arXiv:2610.19779 by $1.3\times10^{-3}$ while leaving the Jacobian at full rank.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:12:00Z</published>
+    <arxiv:comment>10 pages, 2 figures, 5 tables. Companion to arXiv:2610.19779</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Long Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08284v1</id>
+    <title>A Generative Model of Contextual Integrity: Appropriate vs. Inappropriate Information Sharing</title>
+    <updated>2026-11-05T16:48:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08284v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08284v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Contextual integrity (CI) holds that appropriate information flow depends on context-specific norms. The same disclosure may be appropriate in one context and inappropriate in another. We build a generative model of contextual integrity to study information sharing through simulated conversations. Two actors played by large language models exchange messages, with one holding private information and the other seeking it. We examine how sharing and refusal vary with the situation, the holder's decision logic, disposition, and the underlying language model. Actors shared information with the rightful recipients when it was needed, but also disclosed it to people who were not entitled to receive it. The model provides a way to study how disclosure and refusal develop through conversation as the situations and the actors vary.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T16:48:31Z</published>
+    <arxiv:comment>Accepted as a main conference paper at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Omer Ebead</name>
+    </author>
+    <author>
+      <name>Claude Formanek</name>
+    </author>
+    <author>
+      <name>Joel Z. Leibo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08247v1</id>
+    <title>Certifying quantum code and circuit distances at scale</title>
+    <updated>2026-11-05T16:25:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.08247v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08247v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Code and circuit distances characterize how strongly quantum error correction suppresses logical errors and guide code comparisons, schedule choices and resource estimates. Yet many published distances are only upper bounds from heuristic searches. Here, we express both distances as tropical partition functions and evaluate them with rank-based dynamic programming and weight-bounded search. Circuit reductions and relaxations shrink the problems, and proved lower bounds with explicit logical errors of matching weight certify exact values. On two benchmarks, our method certifies more instances than all other tested exact solvers combined. We certify distances for codes with up to 31,200 qubits, such as Google's modular hyperbolic codes, and for memory circuits with up to $8\times10^5$ fault mechanisms, such as those of high-rate Cornucopia codes. Our audit of 26 recent papers identifies overestimated distances and non-tight upper bounds in 10 papers, with a maximum discrepancy of at least eight. Certified distances also guide circuit design and show which defective chips remain usable. In particular, we certify circuit distance 16 for IBM's two-gross memory circuits with the standard schedule, not the assumed 18, whereas redesigned schedules reach 18 at one noisy cycle, at the cost of one more timestep per cycle. At 99.98% junction yield, keeping gross-code memory blocks with dead checks that are certified at distance 10 or more raises the estimated usable share from 53% for perfect blocks alone to 94% with an improved schedule.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T16:25:02Z</published>
+    <arxiv:comment>73 pages (18 pages main text, 55 pages Supplementary Information), 8 figures. Code and data: https://github.com/Fanerst/tropidist</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Bin Cheng</name>
+    </author>
+    <author>
+      <name>Naixu Guo</name>
+    </author>
+    <author>
+      <name>Feng Pan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08143v1</id>
+    <title>First-Order Model Checking on Monadically Dependent Graph Classes</title>
+    <updated>2026-11-05T15:04:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.08143v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08143v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Monadically dependent graph classes are those in which first-order logic cannot encode all graphs. They include all nowhere dense classes and all classes of bounded twin-width. We show that first-order model checking is fixed-parameter tractable on every monadically dependent graph class. Together with the known hardness result for hereditary classes that are not monadically dependent, this gives a complete characterization of the hereditary graph classes with fixed-parameter tractable first-order model checking. This resolves a central open problem in algorithmic model theory. Our proof combines ideas from structural graph theory (graph decompositions), finite model theory (locality of first-order logic), and model theory (counting types). In particular, we show that in monadically dependent classes, tuples of fixed length have only $|U|^{O(1)}$ types of fixed quantifier rank over any set of parameters $U$.</summary>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:04:35Z</published>
+    <arxiv:primary_category term="cs.LO"/>
+    <author>
+      <name>Jan Dreier</name>
+    </author>
+    <author>
+      <name>Nikolas Mählmann</name>
+    </author>
+    <author>
+      <name>Szymon Toruńczyk</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08142v1</id>
+    <title>Educational robotics beyond ROS: a custom library for direct transfer of Webots controllers in the Turtlebot3</title>
+    <updated>2026-11-05T15:04:19Z</updated>
+    <link href="https://arxiv.org/abs/2611.08142v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08142v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Robot Operating System (ROS) is becoming a standard in robotics courses at higher education, but its installation, configuration and distributed programming model can introduce a significant entry barrier in the new landscape of AI-based master and degree studies, where many students do not have a strong informatics background. This paper presents an educational experience that enables students to program a TurtleBot3 Burger directly in Python, while preserving a direct transfer path from simulation to the physical robot. The approach is based on a custom library that mirrors the Webots API, allowing the same controller code to be executed in the simulator and on the real TurtleBot3 with minimal modification. The library provides access to the robot motors, wheel encoders, inertial sensors and LiDAR, and is complemented by scripts that automate deployment and execution on the physical platform. It was used in a master-level course on introductory autonomous vehicles, and initial student feedback suggests that the approach reduces the perceived complexity of ROS-related infrastructure and helps learners focus on algorithmic logic and real-world behaviour.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:04:19Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Jaime P. Pérez-Moro</name>
+    </author>
+    <author>
+      <name>Alejandro Romero</name>
+    </author>
+    <author>
+      <name>Hector Quintian</name>
+    </author>
+    <author>
+      <name>Francisco Bellas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08049v1</id>
+    <title>When Molecular Dimerization Induces Magnetic Bi-Stability at the Metal-Organic Interface</title>
+    <updated>2026-11-05T14:03:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.08049v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08049v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present a method to create metal-organic dimer complexes by on-surface assembly on a metal substrate using low-temperature scanning tunneling microscopy (STM) and spectroscopy (STS). We demonstrate that a dimer of Mn-Phthalocyanine (MnPc)2 on a Ag(111) surface can be switched between two stable configurations upon a small conformational change controlled by STM manipulation. By means of density-functional theory calculations, it is found that the two conformations correspond to an antiferromagnetic (AFM) and a ferromagnetic (FM) state respectively. Directly coordinated Mn atoms of the dimer lead to an AFM-coupling whereas indirectly coordinated (shifted) Mn atoms lead to a FM-coupling. Rarely seen in a molecular- dimers with transition-metal atoms, the FM-AFM-FM transition is thus readily on-surface accessible. Furthermore, the two configurations of the switch are easily identified by their Kondo states, opening interesting routes in terms of both, writing (FM versus AFM states) and reading. These results pave the experimental route toward dimer-based materials with complex magnetic structures of potential interest for application in spintronics, logics and computing.</summary>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:03:38Z</published>
+    <arxiv:comment>41 pages (including SI)</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.mes-hall"/>
+    <arxiv:journal_ref>Adv. Phys. Res 2, 2200005 (2023)</arxiv:journal_ref>
+    <author>
+      <name>Rouzhaji Tuerhong</name>
+    </author>
+    <author>
+      <name>Franck Ngassam</name>
+    </author>
+    <author>
+      <name>Mebarek Alouani</name>
+    </author>
+    <author>
+      <name>Jean-Pierre Bucher</name>
+    </author>
+    <arxiv:doi>10.1002/apxr.202200005</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1002/apxr.202200005" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07793v1</id>
+    <title>Rain Beyond Streaks: Cascaded Realistic Rain and Wet Surface Synthesis via Scene Priors</title>
+    <updated>2026-11-05T10:33:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.07793v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07793v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Realistic rain synthesis is a persistent challenge for vision systems operating in adverse weather. Existing methods primarily focus on generating rain streaks, often neglecting consequent surface effects such as reflections and puddles, which are critical for perceptual realism and robustness of downstream vision tasks. We introduce CascadeRS, a rain synthesis framework that leverages depth and segmentation priors to render scene-consistent rain and surface effects. In addition to rain streaks, CascadeRS produces reflections and puddles aligned with scene semantics through a physics-inspired zero-shot, controllable generative pipeline. It produces photorealistic rainy urban scenes, with high perceptual realism, which we validate qualitatively with an extensive user study and quantitatively. We produce the Cityscapes-CascadeRS dataset, to study downstream task performance under real rainy conditions. Our results establish CascadeRS as a scalable and realistic rain-generation framework for evaluating and enhancing the robustness of vision in adverse rainy weather. Code and dataset are available via https://github.com/nis-research/CascadeRainSynthesis</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T10:33:13Z</published>
+    <arxiv:comment>WACV-2027</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Melissa Tijink</name>
+    </author>
+    <author>
+      <name>Kirill Tolstobrov</name>
+    </author>
+    <author>
+      <name>Shunxin Wang</name>
+    </author>
+    <author>
+      <name>Estefania Talavera</name>
+    </author>
+    <author>
+      <name>Duc V. Le</name>
+    </author>
+    <author>
+      <name>Luuk Spreeuwers</name>
+    </author>
+    <author>
+      <name>Shaodi You</name>
+    </author>
+    <author>
+      <name>Nicola Strisciuglio</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07776v1</id>
+    <title>Discrete quadrature spectrum of composite bosons: Weyl relation, intensity correlations, and binned homodyne detection</title>
+    <updated>2026-11-05T10:14:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.07776v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07776v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A composite boson made of two fermions can look elementary under one measurement and composite under another. In an exactly solvable paired-mode model we compare three probes: classical drives, periodically binned quadrature statistics, and intensity correlations $g^{(2)}$. The Weyl defect has an exact product formula and a controlled dilute expansion in the Schmidt moments. The binned observables are instead piecewise constant in the Schmidt weights and sensitive to single eigenvalues crossing bin edges; on the flat-spectrum ladder they converge slowly and nonmonotonically over the computed range. A spectral filter and a polar correction recover an exact Pauli algebra; a heralded joint projection then extracts a logical singlet from the vacua of two independent copies of the composite, with probability set by the accepted weight and the mixedness of the filtered reduced qubit. Finite-mode examples with Schmidt number about three succeed at the percent level despite order-one Weyl defects; near-unit $g^{(2)}$ does not control the binned algebra. For flat spectra the construction converges strongly to its oscillator counterpart, whose vacuum overlap is strictly positive at every scale; for infinite spectra with summable Schmidt amplitudes it converges at all but countably many filter cutoffs, positivity at the cutoffs studied remaining open.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T10:14:40Z</published>
+    <arxiv:comment>27 pages, 5 figures, 7 tables</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Itzhak Roditi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07739v1</id>
+    <title>Fix One, Miss Another: Leveraging Historical Bug Fixes to Uncover Residual Bugs in Database Systems</title>
+    <updated>2026-11-05T09:48:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.07739v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07739v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Database management systems (DBMSs) implement SQL constructs through grammar-driven dispatch handlers. Although handlers for syntactic siblings implement different SQL constructs, they often share a common implementation pattern, including argument extraction, type checking, and permission validation. Consequently, a bug fix that hardens the handler exercised by a historical bug may leave the corresponding logic in sibling handlers vulnerable to the same semantic flaw. We refer to such defects as sibling bugs. Despite the structural similarity among sibling handlers, existing bug-finding techniques rarely exploit historical fixes to systematically uncover these related defects.
+  We present Reaper, a novel approach for detecting sibling bugs guided by historical bug fixes. Reaper first analyzes a bug fix to infer a trigger profile, which characterizes the conditions under which the defect is exposed, and a validation profile, which captures the semantic evidence needed to distinguish buggy behavior from correct behavior. It then projects the trigger profile onto syntactic siblings through grammar-guided test mutation, generating tests that exercise corresponding semantic paths in sibling handlers. Finally, Reaper validates suspicious behaviors using the inferred validation profile through a staged validation process, reducing false positives caused by complex DBMS behavior.
+  We evaluate Reaper on four widely used DBMSs, including MariaDB, MySQL, OceanBase, and CockroachDB. Reaper uncovers 61 previously unknown bugs, of which 57 have been confirmed by developers and 13 have been fixed at the time of writing. These results demonstrate that historical bug fixes contain actionable semantic knowledge that can be systematically transferred across syntactic siblings to uncover otherwise overlooked defects.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T09:48:45Z</published>
+    <arxiv:comment>20 pages, 9 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Yankai Rong</name>
+    </author>
+    <author>
+      <name>Zhaoyang Zhang</name>
+    </author>
+    <author>
+      <name>Shuang Liu</name>
+    </author>
+    <author>
+      <name>Wei Lu</name>
+    </author>
+    <author>
+      <name>Xiaoyong Du</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07734v1</id>
+    <title>Data-driven current control of modular multilevel converter-based HVDC transmission system</title>
+    <updated>2026-11-05T09:45:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.07734v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07734v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Model-based design (MBD) is a mature framework for designing the current controllers of modular multilevel converters (MMCs) in high-voltage direct current (HVDC) transmission systems. In MBD, linear state-space models are preferred for their good trade-off between accurate dynamics prediction and simplicity. However, first-principle derivations often neglect relevant MMC dynamics, which can hinder controller performance. Data-driven (DD) methods can deliver less biased models that capture parameter uncertainties, control-loop interactions, and grid dynamics, yet they remain under-exploited for controlling MMC currents. This paper studies DD current control method based on integral Subspace Predictive Control (iSPC), synthesized directly from input--output data measured in a high fidelity real-time digital simulator (RTDS), and proposes an initial guideline outlining the main steps for its systematic application to MMC current control. The proposed iSPC is compared against state-of-the-art DD solution, and the findings are validated through simulation studies in MATLAB/Simulink.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T09:45:13Z</published>
+    <arxiv:comment>8 pages, submitted to IET AC and DC Power Transmission (ACDC)</arxiv:comment>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Victor D. Reyes Dreke</name>
+    </author>
+    <author>
+      <name>Rahul Rane</name>
+    </author>
+    <author>
+      <name>Aleksandra Lekić</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07685v1</id>
+    <title>SVM + CFAR + OR: A Hybrid Machine-Learning-CFAR Receiver for Low-False-Alarm PRACH Preamble Detection in 5G NR and Beyond</title>
+    <updated>2026-11-05T09:12:16Z</updated>
+    <link href="https://arxiv.org/abs/2611.07685v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07685v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The physical random access channel (PRACH) enables initial access between user equipment and the base station, making reliable preamble detection essential for cellular networks. Growing device density in 5G and beyond-5G networks, massive machine-type communication, and the shift towards machine-learning-driven radio interfaces challenge conventional analytical detectors, particularly in complex radio environments and at low signal-to-noise ratios. This article formulates preamble detection as a 64-class classification problem and introduces two model-agnostic contributions: a robust adaptive threshold implementing the constant false alarm rate (CFAR) principle in the classifier decision-score domain (MAD-CFAR), and a hybrid receiver combining a learned detector with a conventional power-delay-profile CFAR detector through a logical OR rule. The learned branch is evaluated using two models trained on the same GPU-generated dataset: a support vector machine (SVM) with principal component analysis and a lightweight one-dimensional convolutional neural network (CNN). On a held-out test set, the SVM achieves 98.58% accuracy (macro-AUC 0.9991), while the CNN reaches 99.29% accuracy (macro-AUC 1.0000) at lower inference cost and memory footprint. MAD-CFAR reduces the learned branch's false alarm rate to near zero on the noise calibration campaign. The OR hybrid retains the analytical detector's low, standard-compliant false alarm rate while extending detection capability. Across six propagation channels and 258 conformance-style tests, the SVM-based hybrid improves low-SNR sensitivity by several decibels without increasing missed detections relative to the analytical detector. Under the same false alarm constraint, the CNN is competitive in some channels but currently trails the SVM in high-delay-spread multipath conditions.</summary>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T09:12:16Z</published>
+    <arxiv:comment>12 page, 10 figures</arxiv:comment>
+    <arxiv:primary_category term="eess.SP"/>
+    <author>
+      <name>Filip Ferenc</name>
+    </author>
+    <author>
+      <name>Michal Szczachor</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07652v1</id>
+    <title>Don't Prompt Your Agents. Equip Them: Skillware as a Modular Standard for Sovereign, Auditable, and Deterministic Capability Execution for Logical Systems</title>
+    <updated>2026-11-05T08:38:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.07652v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07652v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Current autonomous logical systems rely on a fragile assumption: that language models should dynamically write code, guess API payloads, and memorize operational constraints through prompt engineering. In practice, this burns massive context windows, inflates API bills, and produces brittle agents that fail unpredictably in production.
+  In this work, we present Skillware, an open architectural framework and capability registry that formally separates what an agent wants to do from how that task is executed. Instead of prompting models with loose text instructions or markdown files baptized as 'skills', Skillware equips them with modular, versioned software capability bundles. Much like skill hotkeys in video games that execute deterministically under fixed world rules, each bundle combines a typed JSON input contract, deterministic Python code, task directives, bundled datasets, and automated unit tests. In-process adapters translate these capabilities into native tool declarations for any model, from frontier cloud APIs to local open-weight runtimes with zero network latency.
+  Evaluating 23 frontier and open-weight models across 368 benchmark conditions, we show that small local models (3B to 8B parameters) equipped with Skillware consistently outperform unequipped frontier models on complex multi-step workflows. They cut token usage by up to 84.8%, slash inference costs by up to 97.3%, and eliminate parameter errors entirely. True agent reliability does not come from larger models or longer prompts, but from equipping logical systems with verified, deterministic software.
+  Finally, we articulate the trajectory of capability bundles across an invariant continuum of information processing systems: from digital logical systems today, to IoT, drones, and embodied robotics tomorrow, establishing a foundation for auditable, real-time capability execution.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T08:38:51Z</published>
+    <arxiv:comment>51 pages, 26 figures. Code repository and benchmarks available at https://github.com/arpahls/skillware</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Vladimiros Peilivanidis</name>
+      <arxiv:affiliation>ARPA Hellenic Logical Systems</arxiv:affiliation>
+    </author>
+  </entry>
+</feed>

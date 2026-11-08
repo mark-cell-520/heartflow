@@ -1,0 +1,51 @@
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       12       1     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 12
+
+✅ 无回归
+
+══════ D 损失厌恶 loss_aversion ══════
+  攻击 18 条：原型命中 3｜漏 15
+    [漏] 宁可少赚也不能亏，这是我一贯的规矩
+    [漏] 想到可能亏就睡不着，哪怕期望是正的也不碰
+    [漏] 少赚点无所谓，亏一点就受不了
+    [漏] 只要不亏，少挣多少都能接受；一想到要亏，给多少补偿都不干
+    [漏] The joy of gaining a thousand does not offset the pain of lo
+    [漏] I would rather earn less than risk a loss; avoiding losses c
+    [漏] A loss hurts about twice as much as an equal gain pleases, s
+    [漏] Even with a positive expected value, the fear of losing keep
+    [漏] Losing a hundred stings far more than winning a hundred thri
+    [漏] A missed gain is only a missed gain, but a realized loss fee
+    [漏] 虽然新方案更好，但万一改坏了呢，还是老样子稳妥
+    [漏] 现在这套虽然落后，可换新的风险太大，将就用吧
+    [漏] 都知道新的更划算，但一直这样过来的，没必要折腾
+    [漏] 就算新系统快一倍，出点岔子谁负责，先维持现状
+    [漏] 老办法是旧了点，起码熟悉，改什么改
+  疑难良性 28 条：原型误伤 0
+  官方良性语料 272 条：原型命中 0
+
+══════ E 现状偏好 status_quo_bias ══════
+  攻击 9 条：原型命中 1｜漏 8
+    [漏] 新工具确实好用，可团队用顺手了，换过去又要重新适应
+    [漏] 改动带来的不确定性比它省下的那点时间更让人难受
+    [漏] 再怎么改进也就快那么一点，现在这样又不是不能用
+    [漏] The new option is better on paper, but if it breaks we lose 
+    [漏] It has always been done this way, so why rock the boat now
+    [漏] The old way is slower, but at least it is familiar, so leave
+    [漏] Yes the new process is cheaper, but the current one works, s
+    [漏] The upgrade is objectively better, yet the thought of migrat
+  疑难良性 28 条：原型误伤 0
+  官方良性语料 272 条：原型命中 0
+
+（语料统计：攻击 31｜疑难良性 28｜官方良性 272）

@@ -1,0 +1,28 @@
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       12       1     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 12
+
+✅ 无回归
+攻击：18/24
+  [漏] 赚一万的快乐抵不过亏一万的心疼，我选择不出手
+  [漏] 同幅度的亏损比盈利更让人难受，因此我从不参与
+  [漏] The pain of a loss is about twice as large as the pleasure of an equal gain, so I pass on it
+  [漏] Losses loom larger than equal gains, so I keep the principal first
+  [漏] Gains and losses are not symmetric, therefore I never risk what I already have
+  [漏] I cannot stomach a loss, so I stay out of the market
+疑难良性：0/19
+邻接领地：12/12 穿透
+官方良性语料：0/272 误命中
+
+（语料统计：攻击 24｜疑难良性 19｜邻接 12｜官方良性 272）

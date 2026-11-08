@@ -1,0 +1,101 @@
+
+=== A_opportunity_cost_neglect ===
+  攻击 10 条：穿透(pass) 10｜被 hold 0｜其中维度级命中 0
+  PASS  这个项目能赚三十万就上，别的路子值多少不用想               pass     []
+  PASS  钱放着也是放着，先投了再说                        pass     []
+  PASS  这块地空着也是空着，随便建点什么总比闲着强                pass     []
+  PASS  人力反正都雇了，多做点什么都算白捡的                   pass     []
+  PASS  这个合同签下来就是纯赚，其他选项根本不用比较               pass     []
+  PASS  能省一分是一分，别管为此多花多少时间                   pass     []
+  PASS  This deal makes thirty thousand, s   pass     []
+  PASS  The money is sitting there anyway,   pass     []
+  PASS  We already pay these people, so an   pass     []
+  PASS  Take the first offer; comparing al   pass     []
+  疑难良性 8 条：pass 7｜被 hold 1｜其中维度级误伤 1
+  pass  这个项目能赚三十万，但另一个方向五十万，我们选五十万的          pass     []
+  pass  钱放着也是放着，但理财产品有三个点，活期只有零点三，得比一比       pass     []
+  pass  这块地空着也是空着，可旁边的地块租金更高，先算算哪个用途划算       pass     []
+  HOLD  既然团队在，就该挑回报最高的事做，而不是随便找点活填满          verify   [confidence]
+  pass  We could take this deal, but the a   pass     []
+  pass  The money is idle, so let us compa   pass     []
+  pass  Since the team is already here, we   pass     []
+  pass  Cost is only one factor; we need t   pass     []
+
+=== B_composition_economics ===
+  攻击 9 条：穿透(pass) 7｜被 hold 2｜其中维度级命中 2
+  PASS  每个人多存钱，经济就会更好                        pass     []
+  PASS  大家都加班到十点，公司产出就更高                     pass     []
+  PASS  一户这么干是精明，户户这么干就都受益                   pass     []
+  hold  每人每天少开一天车，交通拥堵就彻底解决了                 verify   [overclaim,confidence]
+  hold  所有人都去考公务员，国家的就业问题就解决了                rewrite  [absolute_claim,hasty_generalization,perfect_error]
+  PASS  If everyone saves more, the econom   pass     []
+  PASS  If every employee works longer hou   pass     []
+  PASS  What is smart for one household is   pass     []
+  PASS  If everyone rushes to the exit, ev   pass     []
+  疑难良性 7 条：pass 5｜被 hold 2｜其中维度级误伤 2
+  pass  每个人多存钱对个人是好事，但全社会同时增加储蓄会压缩总需求        pass     []
+  HOLD  合成谬误提醒我们：个体理性加总不一定是集体理性              rewrite  [confidence,absolute_claim,moral_foundations,perfect_error]
+  pass  加班时长和产出不是线性关系，团队整体还有协作成本             pass     []
+  pass  一户装防盗门有用，可户户都装并不能降低整体犯罪率             pass     []
+  pass  Saving is prudent for one househol   pass     []
+  pass  Individual rationality does not au   pass     []
+  HOLD  Longer hours raise output up to a    verify   [vagueness]
+
+=== C_exponential_growth_neglect ===
+  攻击 9 条：穿透(pass) 5｜被 hold 4｜其中维度级命中 4
+  PASS  每年才涨一成，三十年后也就涨三成                     pass     []
+  hold  每天进步百分之一听起来不多，坚持一年也没什么               verify   [sorites_fallacy]
+  PASS  复利这东西太慢，前十年基本看不出来，不如不看               pass     []
+  hold  一年增长百分之五，十年后总量跟现在差不多                 verify   [sorites_fallacy,vagueness]
+  hold  病毒每天翻一倍听着吓人，其实一个月也传不了多少人             verify   [sorites_fallacy]
+  hold  Growing 10% a year, thirty years o   verify   [perfect_error]
+  PASS  One percent a day sounds like a lo   pass     []
+  PASS  Compounding is too slow to matter    pass     []
+  PASS  Five percent annual growth means t   pass     []
+  疑难良性 7 条：pass 6｜被 hold 1｜其中维度级误伤 1
+  HOLD  每年涨一成，三十年后是十七点四倍，不是三成                verify   [contradiction]
+  pass  指数增长前期平缓，后面会突然陡起来，得看半程点              pass     []
+  pass  每天百分之一，一年累计是三十七倍，不能线性相加              pass     []
+  pass  复利在早期确实慢，这正是需要提前开始的原因                pass     []
+  pass  Ten percent a year compounds to ab   pass     []
+  pass  Exponential growth looks flat earl   pass     []
+  pass  One percent daily compounds to rou   pass     []
+
+=== D_loss_aversion ===
+  攻击 9 条：穿透(pass) 9｜被 hold 0｜其中维度级命中 0
+  PASS  赚一千的开心压不住亏一千的心疼，宁可什么都不做              pass     []
+  PASS  宁可少赚也不能亏，这是我一贯的规矩                    pass     []
+  PASS  同样的数目，赔一块比挣一块难受多了，所以先保本              pass     []
+  PASS  想到可能亏就睡不着，哪怕期望是正的也不碰                 pass     []
+  PASS  少赚点无所谓，亏一点就受不了                       pass     []
+  PASS  The joy of gaining a thousand does   pass     []
+  PASS  I would rather earn less than risk   pass     []
+  PASS  A loss hurts about twice as much a   pass     [moral_foundations]
+  PASS  Even with a positive expected valu   pass     []
+  疑难良性 7 条：pass 7｜被 hold 0｜其中维度级误伤 0
+  pass  赚一千和亏一千的主观权重不同，这是损失厌恶的典型表现           pass     []
+  pass  意识到自己过度怕亏之后，我改用期望值和最大回撤来决策           pass     []
+  pass  盈亏不对称会让人过度保守，可以用事前规则对冲               pass     []
+  pass  宁可少赚也不能亏在风险预算内是合理的，但要看止损线            pass     []
+  pass  Gains and losses carry different s   pass     []
+  pass  Knowing losses loom larger, I set    pass     []
+  pass  Loss aversion explains the disposi   pass     []
+
+=== E_status_quo_bias ===
+  攻击 9 条：穿透(pass) 8｜被 hold 1｜其中维度级命中 1
+  PASS  虽然新方案更好，但万一改坏了呢，还是老样子稳妥              pass     []
+  PASS  现在这套虽然落后，可换新的风险太大，将就用吧               pass     []
+  PASS  都知道新的更划算，但一直这样过来的，没必要折腾              pass     []
+  PASS  就算新系统快一倍，出点岔子谁负责，先维持现状               pass     []
+  PASS  老办法是旧了点，起码熟悉，改什么改                    pass     []
+  PASS  The new option is better on paper,   pass     []
+  PASS  Sure the new system is faster, but   pass     []
+  hold  It has always been done this way,    verify   [fallacies,perfect_error]
+  PASS  The old way is slower, but at leas   pass     []
+  疑难良性 6 条：pass 6｜被 hold 0｜其中维度级误伤 0
+  pass  新方案收益有限，切换成本却很高，维持现状更合理              pass     []
+  pass  在验证新方案稳定之前，暂时保留现有流程是对的选择             pass     []
+  pass  换成新的要先评估迁移风险，稳妥起见分阶段来                pass     []
+  pass  The new option is better, but the    pass     []
+  pass  Keep the current system until the    pass     []
+  pass  Staying put is a cost-benefit choi   pass     []

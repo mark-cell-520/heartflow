@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/KfEoHysW+icFueaVFoHeSylb5Qo</id>
+  <title>arXiv Query: search_query=all:"exponential growth bias"&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-08T01:21:41Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22exponential+growth+bias%22&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2511.06525v2</id>
+    <title>From Catastrophic to Concrete: Reframing AI Risk Communication for Public Mobilization</title>
+    <updated>2025-11-12T15:26:56Z</updated>
+    <link href="https://arxiv.org/abs/2511.06525v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2511.06525v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Effective governance of artificial intelligence (AI) requires public engagement, yet communication strategies centered on existential risk have not produced sustained mobilization. In this paper, we examine the psychological and opinion barriers that limit engagement with extinction narratives, such as mortality avoidance, exponential growth bias, and the absence of self-referential anchors. We contrast them with evidence that public concern over AI rises when framed in terms of proximate harms such as employment disruption, relational instability, and mental health issues. We validate these findings through actual message testing with 1063 respondents, with the evidence showing that AI risks to Jobs and Children have the highest potential to mobilize people, while Existential Risk is the lowest-performing theme across all demographics. Using survey data from five countries, we identify two segments (Tech-Positive Urbanites and World Guardians) as particularly receptive to such framing and more likely to participate in civic action. Finally, we argue that mobilization around these everyday concerns can raise the political salience of AI, creating "policy demand" for structural measures to mitigate AI risks. We conclude that this strategy creates the conditions for successful regulatory change.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-11-09T20:28:30Z</published>
+    <arxiv:comment>25 pages, 9 figures. Corrected quote attribution, time scope of Fig. 1 graphs</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Philip Trippenbach</name>
+    </author>
+    <author>
+      <name>Isabella Scala</name>
+    </author>
+    <author>
+      <name>Jai Bhambra</name>
+    </author>
+    <author>
+      <name>Rowan Emslie</name>
+    </author>
+  </entry>
+</feed>
