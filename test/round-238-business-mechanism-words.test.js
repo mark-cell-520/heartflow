@@ -340,8 +340,11 @@ test('E4 变异守卫四：未变异副本还原校验（A 族 0/12 + 存量 8 �
 // ═══ F 节：源码锚点 ═══
 test('F1 PC_MECH_WEAK_ZH 两条形状腿 + 34 词齐备', () => {
   const src = fs.readFileSync(SRC, 'utf8');
-  const line = src.match(/const PC_MECH_WEAK_ZH = [^\n]*;/)[0];
-  assert.ok(/const PC_MECH_WEAK_ZH = \/\(\?:/.test(src), 'PC_MECH_WEAK_ZH 应保持字面量正则形态');
+  // [v6.8.171 第 243 轮] 锚点同步：r242 起三条形状腿搬进 PC_MECH_WEAK_WORDS_ZH
+  const line = src.match(/const PC_MECH_WEAK_WORDS_ZH = [^\n]*;/)[0];
+  // [v6.8.171 第 243 轮] 锚点同步：r242 起 PC_MECH_WEAK_ZH 已是两腿 new RegExp
+  // 拼接（PC_MECH_WEAK_WORDS_ZH ∪ PC_MECH_WEAK_ENG_ZH），不再是正则字面量。
+  assert.ok(src.includes('const PC_MECH_WEAK_ZH = new RegExp('), 'PC_MECH_WEAK_ZH 应为两腿 new RegExp 拼接形态（r242 起）');
   assert.ok(line.includes('[^。，,]{0,16}(?:交付质量'), '腿 A（显式归因链接 + 16 字窗口）应在');
   assert.ok(line.includes('[^。，,]{0,12}(?:交付质量'), '腿 B（归责名词在前 + 12 字窗口）应在');
   assert.ok(line.includes('(?:交付质量'), '腿 C（机制词 + 领属之功/的功劳）应在');

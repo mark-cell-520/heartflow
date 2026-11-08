@@ -58,7 +58,10 @@ test('A2 攻击句 detector 命中数逐条登记（⑫/⑬/⑭ 支 + r242 起�
   // 形状一/二/四/五 各多召回 1 个①弱支（顺序词 × 显式归因断言）——这 8 条在
   // HEAD 同时被 STAT_CONTEXT_ZH 支③裸词腿与 PC_MECH_WEAK_ZH 裸词腿两道豁免
   // 挡着，r241 修掉前一道、r242 修掉后一道，所以命中数 1→2 / 1→2 / 2→2 / 1→2。
-  assert.deepStrictEqual(counts, [2, 2, 3, 2, 1, 2, 2, 3, 2, 1],
+  // [v6.8.171 第 243 轮] r243 新增⑨支第二腿（时段框架标记 × 白话结果变动词）后，
+  // 形状一/二/四/五 各再多 1 支——这 8 条的①弱支之上，时段标记（自从/从那以后/
+  // 去年…）× 白话变动词（签单就多了）也成立了：2→3 / 2→3 / 2→3 / 2→3。
+  assert.deepStrictEqual(counts, [3, 3, 3, 2, 1, 3, 3, 3, 2, 1],
     'detector 命中数应与登记一致，实测: ' + counts.join('/'));
 });
 
@@ -363,9 +366,14 @@ test('G4 已知未修④→已修（r242）：PC_MECH_WEAK_ZH 的裸「变量/�
     'PC_MECH_WEAK_ENG_ZH 工程复合名词腿缺失');
   assert.ok(!src.split('\n').some(l => l.startsWith('const PC_MECH_WEAK_STAT_ZH = ')),
     'PC_MECH_WEAK_STAT_ZH 是死代码，不应存在');
+  // [v6.8.171 第 243 轮] ①⑤⑨判据覆盖缺口**已修**：r243 给⑨支加了第二腿
+  // （时段框架标记 × 白话结果变动词，PC_SEQ_PERIOD_ZH × PC_RES_COLLOQ_ZH），
+  // 「自从变量稳了之后签单就多了」现在 pc=1、gate=verify。事件锚定侧
+  // （「贴了财神贴之后，进店客流就变多了」）与裸标记侧（「打那天起…」）
+  // 仍未收，登记在 test/round-243-colloq-result-period-marker.test.js G 节。
   const weakOnly = '自从变量稳了之后签单就多了';
-  assert.strictEqual(pcCount(weakOnly), 0,
-    '无归因断言的弱句仍判不出（①⑤⑨ 判据覆盖缺口，登记备查）');
+  assert.ok(pcCount(weakOnly) > 0,
+    'r243 起无归因断言的弱句应判得出（①⑤⑨ 判据覆盖缺口已修）');
 });
 
 process.on('exit', () => {

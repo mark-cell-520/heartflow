@@ -298,8 +298,11 @@ test('D2 变异守卫二：摘掉归责名词臂后 12 条回落到 0（判据�
   try {
     mutateLine(path.join(tmp, 'src', 'index.js'), ANCHOR_OF,
       '|(?:总之|说到底|归根结底|归根到底|说穿了)(?:[^。，,]{0,12}|[^。，,]{0,8}[，,][^。，,]{0,8})(?:功劳|之功|首功|头功)', '');
-    assert.strictEqual(countHitsIn(tmp, ATTACK_NOUN), 0,
-      '摘掉归责名词臂后未全部回落（说明该臂不承重）');
+    // [v6.8.171 第 243 轮] 期望 0 → 1：r243 新增的⑨支第二腿（时段框架标记 ×
+    // 白话结果变动词）独立承重 1 条归责名词族攻击句，摘掉该臂后这 1 条不再
+    // 回落——归责名词臂对其余 11 条仍承重（11/12 回落即证明）。
+    assert.strictEqual(countHitsIn(tmp, ATTACK_NOUN), 1,
+      '摘掉归责名词臂后应只剩 r243 新腿承重的 1 条（其余须回落）');
     assert.strictEqual(countHitsIn(tmp, ATTACK_LINK), ATTACK_LINK.length, '摘掉名词臂后链接族塌陷');
     assert.strictEqual(countHitsIn(tmp, ALL_BENIGN), 0, '摘掉名词臂后良性被误命中');
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
