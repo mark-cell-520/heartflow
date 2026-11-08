@@ -155,6 +155,15 @@ const COMMENT_VERB = /(?:注释掉|注释|注掉|commented[ ]?out|comments[ ]?ou
 // 同形攻击 12 条不变（第 80 轮双向验收见
 // test/dangerous-instruction-cleanup-verb-round80.test.js）。
 const CLEANUP_TARGET = /(?:缓存|caches?\b|CDN|CORS|跨域|certificates?\b|cert\b|TLS|SSL|HTTPS|https|自签|自签名|self-signed|http-only|非必填|可选校验|optional\s+(?:verification|validation|check)|input\s+validation|form\s+validation|表单校验|有效期|过期时间|expiry|expiration|token\s+有效期|csrf|xss|referrer|origin\s+check|same-site|日志分级|日志级别|debug\s*日志|调试日志|调试输出|console\.log|logging|verbose|verbosity|输出到\s*stdout|输出到\s*stderr|杀毒软件|防病毒|antivirus|defender|虚拟机|虚机|\bvm\b|virtual\s+machine|agent\b|build\s*日志|build\s*log|控制台|测试机|检查机|构建产物|构建缓存|调试环境|联调环境|复现环境|预发环境|\bstaging|debug\s+logs?|build\s+logs?)/i;
+// [r738] 补「限定词+日志」窄支：清理动词 × 过期性限定词（临时|过期|失效|
+//   缓存|备份）× 日志。命中侧第①条（动词×设施族）无过期限定 lookbehind，
+//   「清理所有临时日志」「清理所有过期日志」被判 block（实测）。
+//   与 P1-P3 动词在前形的 lookbehind（过期|失效|临时|缓存|\d+天前）语义对齐
+//   ——那条的既有口径就是「过期性限定词让全量清理变良性运维」。
+//   边界（实测锚点）：「清理所有日志」无限定词 → 不赦（block 保持，那是
+//   销毁审计痕迹）；「清理所有临时系统日志」→ CLEANUP_SECURITY 的
+//   「系统日志」一票否决生效 → 不赦（保守侧，与存量安全词设计一致）。
+const CLEANUP_LIFECYCLE_LOG = /(?:临时|过期|失效|缓存|备份)的?(?:系统|运行|错误|访问|操作|登录)?日志(?:文件)?/i;
 
 /** 清理豁免的安全词否决：句内出现这些词时，清理动作不许豁免。 */
 const CLEANUP_SECURITY = /(?:安全检查|安全警告|安全机制|安全策略|安全组|防火墙|鉴权|认证|授权|审计|身份验证|权限校验|权限检查|访问控制|越权|入侵|渗透|提权|防护|入侵检测|白名单|ACL|WAF|IDS|IPS|防火墙日志|firewall|auth(?:entication|orization)?|audit|sandbox|security|access\s+control|privilege\s+check|rbac|系统日志|安全日志|访问日志|审计日志|操作日志|运行日志|登录日志|system\s+logs?|security\s+logs?|access\s+logs?|audit\s+logs?|operation\w*\s+logs?)/i;
@@ -518,6 +527,17 @@ function isDevDebugContext(text) {
     // 且安全词在场时直接否决，否则「本地调试清空检查项」会被误赦。
     || (CLEANUP_VERB.test(text) && CLEANUP_TARGET.test(text) && !CLEANUP_SECURITY.test(text));
   if (devCtx && target && verb) return true;
+  // [r738] 过期性限定日志窄支：CLEANUP_VERB × CLEANUP_LIFECYCLE_LOG
+  //   （临时|过期|失效|缓存|备份 + 日志）三件套自证即赦，**不要求
+  //   devCtx/DEV_TARGET**——「清理所有临时日志」「清理所有过期日志」
+  //   是任意语境的良性运维（命中侧第①条动词×设施族无过期限定，
+  //   实测 block）。语义依据与 P1-P3 动词在前形的 lookbehind 存量口径
+  //   一致：过期性限定词让全量清理变良性。
+  //   边界实测：无限定词「清理所有日志」不赦（销毁审计痕迹攻击面）；
+  //   「清理所有临时系统日志」被 CLEANUP_SECURITY 的「系统日志」一票否决
+  //   （保守侧）。头部否决链（MALICIOUS_INTENT/SECURITY_BOUNDARY 宾语/
+  //   DATA_EXFIL/PROD_CONTEXT）在本函数入口已先行，本支天然继承。
+  if (CLEANUP_VERB.test(text) && CLEANUP_LIFECYCLE_LOG.test(text) && !CLEANUP_SECURITY.test(text)) return true;
   // 第 126 轮：开发语境下的名单操作（把测试 IP 加进联调白名单）放行。
   if (listAddCtx) return true;
   // 第 133 轮：开发语境下绕过便利设施白名单（本地绕过 redis 白名单直连）。

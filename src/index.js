@@ -7243,7 +7243,23 @@ function checkConfidenceCalibration(text) {
       .replace(/最短(?:的)?(?:路径|路线|距离|时间|周期|期限)/g, ' ')
       .replace(/最(?:大|小|高|低|早|晚|新|旧|长|短|多|少|重|轻|厚|薄)(?:的)?(?:版本|一次|一轮|一遍|阶段|时期|时段|年份|月份|日期|时长|限度|上限|下限|范围|区间|阈值|标准|规格|尺寸|重量|数量|人数|次数|比例|占比|风险|等待时间|样本量|错误|间隔|误差)/g, ' ')
       .replace(/最(?:大|小|多|少|高|低|快|慢|早|晚|长|短|重|轻|厚|薄)的(?:风险|问题|挑战|障碍|困难|痛点|瓶颈|漏洞|缺陷|不足|遗憾|收获|成果|进展|突破|变化|改变|调整|优化|改进|提升|收益|损失|成本|代价|回报|价值|意义|影响|作用|效果|功能|特性|特点|亮点|优势|劣势|差异|距离|角度|维度|层面|方面|环节|步骤|阶段|部分|内容|细节|信息|数据|指标|参数|条件|要求|标准|规则|制度|流程|方案|计划|安排|决定|选择|机会|可能|趋势|方向|目标|结果|结论|原因|理由|依据|证据|经验|教训|启示|建议|意见|看法|观点|态度|立场|保证)/g, ' ')
-      .replace(/最[\u4e00-\u9fff]{1,3}的[\u4e00-\u9fff]{1,6}(?:是|放在|放在最|出现在|发生在|位于|落在|排在第|列在第|超过|达到)[^。]{0,12}/g, ' ');
+      .replace(/最[\u4e00-\u9fff]{1,3}的[\u4e00-\u9fff]{1,6}(?:是|放在|放在最|出现在|发生在|位于|落在|排在第|列在第|超过|达到)[^。]{0,12}/g, ' ')
+      // [r738] 族④「最常见/典型/普遍的 X」教学纠错元话语。判据双腿：
+      //   常见性形容词（常见|典型|普遍|频繁|容易|常犯|高发|多有）
+      //   × 纠错名词（错误|误区|误解|问题|陷阱|盲区|坑|弯路|通病|陋习|偏见|成见）。
+      // 「最常见的错误，初学者要注意」指出的是一个待纠正的认知现象，
+      // 不是对自身观点的最高级声称。与 7245 行「最大的问题」族正交
+      // （该族形容词表不含「常见」，不承保此形）。
+      // 反向不赦：「最严重的问题/最糟糕的错误」——严重/糟糕不在常见性表，
+      // 继续命中 generic 判据（326 条良性池 + 自建攻击锚点实测）。
+      .replace(/最(?:常见|典型|普遍|频繁|容易|常犯|高发|多有)(?:的)?(?:错误|误区|误解|问题|陷阱|盲区|坑|弯路|通病|陋习|偏见|成见)/g, ' ')
+      // [r738] 族⑤「最X的是/为」句首叙述标记。「最讽刺的是，他一边说节俭
+      // 一边买了三块表」——「的」后直接「是」、中间无对象名词，是行文
+      // 组织标记（discourse marker），不是对主语做最高级评价。
+      // 分界腿：真营销/评价声称必有对象名词（「最好的产品是…」的「的」后
+      // 是「产品」）→ generic 判据继续拦；EN 侧 _supEn 预清洗对
+      // most important thing is 同形赦免，本族与之中文对齐。
+      .replace(/最[\u4e00-\u9fff]{1,3}的(?:是|为)/g, ' ');
     const superlativeGenericZH = (_supText4.match(/最[\u4e00-\u9fff]{1,3}的[\u4e00-\u9fff]{1,6}/g) || []).length;
     if (superlativeGenericZH > 0) issues.push({ type: 'overconfidence', detail: `superlative generic(${superlativeGenericZH})`, severity: 0.2 });
     // [v6.7.11] 营销过度声称：唯一/第一/顶级/天花板/颠覆性/革命性 + 行业领先/国际一流/全球顶尖
@@ -7308,6 +7324,15 @@ function checkConfidenceCalibration(text) {
   //   272 条，新判据命中 0 → 纯增量 0，零误伤。
   const _supEn = text
     .replace(/\b(?:the\s+)?(?:best|simplest|easiest|safest|fastest|cleanest|smartest)\s+(?:way|ways|approach|practice|method|option|choice|strategy|thing)\s+(?:to|is|would\s+be|for\s+most|of)\b/gi, ' ')
+    // [r738] EN  discourse marker 对齐：「The most important thing is …」
+    // 是行文组织标记，与上方 best way to 族同形（most X thing is）。
+    // 复测：EN_SUP_ADJ 含 important/critical 类形容词 → 该句命中
+    // superlativeEN → gate verify（误报）；形容词补进名词前的 alternation
+    // 后由本条预清洗赦免。名词表同步扩形（feature/aspect/factor/part/
+    // element/component/step/point）覆盖「the most important part is X」。
+    // 反向不赦：「the most important feature」单独出现（无 is/to 收尾）时
+    // 不在赦免形内，继续命中（自建锚点实测）。
+    .replace(/\b(?:the\s+)?(?:best|simplest|easiest|safest|fastest|cleanest|smartest|most\s+(?:important|critical|crucial|essential|key|significant|notable))\s+(?:way|ways|approach|practice|method|option|choice|strategy|thing|feature|aspect|factor|part|piece|element|component|step|point)\s+(?:to|is|would\s+be|for\s+most|of)\b/gi, ' ')
     .replace(/\b(?:latest|newest|earliest|oldest|previous|recent)\s+(?:version|release|update|news|information|data|results?|build)\b/gi, ' ');
   const EN_SUP_ADJ = '(?:quiet|comfortable|trustworthy|convenient|beautiful|useful|powerful|intuitive|robust|scalable|elegant|lightweight|durable|affordable|popular|impressive|important|simple|easy|fast|flexible|responsive|stable|efficient|effective|good|great|nice|bad|ugly|boring|annoying|unreliable|slow|cumbersome|confusing|expensive|reliable)';
   const _supENre = new RegExp('\\b(?:best|worst|most\\s+(?:' + EN_SUP_ADJ + ')|(?:quietest|safests?|simplest|easiest|fastest|smartest|cleanest|strongest|cheapest|greatest|ugliest))\\b', 'gi');

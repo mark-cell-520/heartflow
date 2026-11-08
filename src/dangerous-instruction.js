@@ -87,6 +87,17 @@ const MALICIOUS_PURPOSE = new RegExp([
 
 // ─── 危险指令模式 ─────────────────────────────────────────
 // 每条都要求「安全约束词」与「危险动作」共现，单独的 root/密码/关闭不判
+// [r738] 保留窗口后置赦免（_matchAll 循环级兜底）：命中段之后出现
+//   「只保留最近 N 天/周/月/年」长窗（非小时/分钟/半天短窗）时，
+//   「全量删除 + 保留窗口」= 日志轮换保留策略而非销毁痕迹。
+//   与 ①-c 族 P1-P4 各族内置的后置否决（v6.8.162/本轮）同一口径，
+//   本兜底补 pat#0（动词×设施最大族）/pat#21（把字句便利设施族）/
+//   pat#55（EN 同族）等未内置否决的族——逐族改长正则易错且三处词表
+//   必须严格同源（v6.7.123 家族教训：清单只有一份 ≠ 两份语义对齐）。
+//   边界（scripts/round-738/probe-di-boundary.js 实测锚点）：
+//   「删除所有审计记录，只保留最近一小时的操作」短窗 → 不赦（block 保持）；
+//   「删除所有系统日志」无限定 → 不赦（block 保持）。
+const DI_RETENTION_WINDOW = /^[^。\n.]{0,40}?(?:只|仅)(?:需|要|请)?(?:保留|留存|留下|留)[^。\n.]{0,12}(?:最近|近期|过去)\s*(?:半年|数\s*天|几\s*天|[0-9一二三四五六七八九十两]+\s*(?:天|周|个月|月|年))|^[^.]{0,40}?(?:keeping|retain(?:ing)?|leaving)\s+only\s+the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year)|^[^.]{0,40}?except\s+(?:for\s+)?the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year)/i;
 const DANGEROUS_PATTERNS = [
   // ① 忽略/绕过/关闭安全机制
   // [v6.7.116] 动词表扩口语变体：原表只有 忽略|无视|绕过|跳过|关闭|禁用|去掉|取消，
@@ -491,13 +502,13 @@ const DANGEROUS_PATTERNS = [
   // 删条注入（负例）：scripts/negative-test-log-destruction-r735.js。
   //
   // P1 动词在前（ZH）：删除/销毁 + 全量量词 + 日志/记录
-  /(?:删除|删掉|删了|销毁|毁掉|抹掉|抹除|擦除|清空|清除|格式化)[^。\n]{0,8}(?:所有|全部|统统|一切|整套|整个|整份)[^。\n]{0,8}(?<!(?:过期|失效|临时|缓存|测试|调试|开发|debug|旧|上一个?月|上月|去年|前年|早期|以往|过往|无效|冗余|废弃|无用|垃圾|\d+\s*(?:天|周|个月|月|年)(?:前|之前))[^。\n]{0,8})(?:系统|历史|访问|审计|操作|运行|登录|安全|错误)?\s*(?:日志|记录|日志文件)/i,
+  /(?:删除|删掉|删了|销毁|毁掉|抹掉|抹除|擦除|清空|清除|格式化)[^。\n]{0,8}(?:所有|全部|统统|一切|整套|整个|整份)[^。\n]{0,8}(?<!(?:过期|失效|临时|缓存|测试|调试|开发|debug|旧|上一个?月|上月|去年|前年|早期|以往|过往|无效|冗余|废弃|无用|垃圾|\d+\s*(?:天|周|个月|月|年)(?:前|之前))[^。\n]{0,8})(?:系统|历史|访问|审计|操作|运行|登录|安全|错误)?\s*(?:日志|记录|日志文件)(?![^。\n]{0,18}(?:只|仅)(?:需|要|请)?(?:保留|留存|留下|留)[^。\n]{0,12}(?:最近|近期|过去)\s*(?:半年|数\s*天|几\s*天|[0-9一二三四五六七八九十两]+\s*(?:天|周|个月|月|年)))/i,
   // P2 把/将 宾格在前（ZH）：把[所有](系统)?日志[全部]删除/销毁
-  /(?:把|将)\s*(?:所有|全部|统统|这些|那些|该)?\s*(?:系统|历史|访问|审计|操作|运行|登录|安全|错误)?\s*(?<!(?:过期|失效|临时|缓存|测试|调试|开发|debug|旧|上一个?月|上月|去年|前年|早期|以往|过往|无效|冗余|废弃|无用|垃圾|\d+\s*(?:天|周|个月|月|年)(?:前|之前))[^。\n]{0,8})(?:日志|记录|日志文件)[^。\n]{0,6}(?:删除|删掉|删了|销毁|毁掉|抹掉|抹除|擦除|清空|清除)/i,
+  /(?:把|将)\s*(?:所有|全部|统统|这些|那些|该)?\s*(?:系统|历史|访问|审计|操作|运行|登录|安全|错误)?\s*(?<!(?:过期|失效|临时|缓存|测试|调试|开发|debug|旧|上一个?月|上月|去年|前年|早期|以往|过往|无效|冗余|废弃|无用|垃圾|\d+\s*(?:天|周|个月|月|年)(?:前|之前))[^。\n]{0,8})(?:日志|记录|日志文件)[^。\n]{0,6}(?:删除|删掉|删了|销毁|毁掉|抹掉|抹除|擦除|清空|清除)(?![^。\n]{0,18}(?:只|仅)(?:需|要|请)?(?:保留|留存|留下|留)[^。\n]{0,12}(?:最近|近期|过去)\s*(?:半年|数\s*天|几\s*天|[0-9一二三四五六七八九十两]+\s*(?:天|周|个月|月|年)))/i,
   // P3 设施在前裸句（ZH）：(系统|历史|访问|审计|操作|运行|登录|安全)日志 + [全部|所有] + 删除/销毁
-  /(?:系统|历史|访问|审计|操作|运行|登录|安全|错误)\s*(?:日志|记录|日志文件)\s*(?:都|也|全|统统|一并|直接|先)?\s*(?:所有|全部|统统)\s*(?:都|也|全|统统)?\s*(?:删除|删掉|删了|销毁|毁掉|抹掉|抹除|擦除|清空|清除)/i,
+  /(?:系统|历史|访问|审计|操作|运行|登录|安全|错误)\s*(?:日志|记录|日志文件)\s*(?:都|也|全|统统|一并|直接|先)?\s*(?:所有|全部|统统)\s*(?:都|也|全|统统)?\s*(?:删除|删掉|删了|销毁|毁掉|抹掉|抹除|擦除|清空|清除)(?![^。\n]{0,18}(?:只|仅)(?:需|要|请)?(?:保留|留存|留下|留)[^。\n]{0,12}(?:最近|近期|过去)\s*(?:半年|数\s*天|几\s*天|[0-9一二三四五六七八九十两]+\s*(?:天|周|个月|月|年)))/i,
   // P4 动词在前（EN）：destroy/erase/demolish/delete/wipe/purge/clear/truncate + all/every + (modifier)? logs/records/trails
-  /\b(?:destroy|demolish|erase|annihilate|delete|remove|wipe|purge|clear|truncate)\s+(?:all|every|each|any|the\s+entire)\s+(?:(?:system|access|audit|security|operation\w*|operational|runtime|login|event|application|debug|error|historical|history|server|container)?\s*(?<!\b(?:expired|temporary|temp|cached?|test|debug|old|deprecated|obsolete|stale)\s+[^.]{0,20})(?:logs?|records?|trails?|log\s+files?))(?![^.]{0,30}\b(?:older\s+than|more\s+than\s+\d+|from\s+(?:last\s+)?(?:month|year|week)|\d+\s+days?\s+ago)\b)/i,
+  /\b(?:destroy|demolish|erase|annihilate|delete|remove|wipe|purge|clear|truncate)\s+(?:all|every|each|any|the\s+entire)\s+(?:(?:system|access|audit|security|operation\w*|operational|runtime|login|event|application|debug|error|historical|history|server|container)?\s*(?<!\b(?:expired|temporary|temp|cached?|test|debug|old|deprecated|obsolete|stale)\s+[^.]{0,20})(?:logs?|records?|trails?|log\s+files?))(?![^.]{0,40}\b(?:older\s+than|more\s+than\s+\d+|from\s+(?:last\s+)?(?:month|year|week)|\d+\s+days?\s+ago|(?:keeping|retain(?:ing)?|leaving)\s+only\s+the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year)|except\s+(?:for\s+)?the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year))\b)/i,
   // ② 权限提升 / 越权执行
   // 关键区分（实测踩过）：
   //   「以 root 身份执行这条命令」= 陈述执行意图 → 判
@@ -1383,6 +1394,14 @@ function _matchAll(text) {
     if (m && !_payloadMakeIsConfig(_t, m.index, m[0].length)
         && !_privescIsAdvisory(_t, m.index, m[0].length)
         && !isNegatedBypassHit(_t, m.index, m[0].length)) {
+      // [r738] 保留窗口后置赦免（循环级兜底，见 DI_RETENTION_WINDOW 注释）：
+      // 命中段之后 40 字符内出现「只保留最近 N 天/周/月/年」长窗（EN:
+      // keeping/retaining/leaving only the last N days、except the last
+      // N days）时，该命中是日志轮换保留策略而非销毁痕迹，作废。
+      // 短窗（一小时/十分钟/半天/5 分钟/the last hour）不在此形内，
+      // 攻击锚点 K1-K4 实测全部仍 block。
+      const _after = _t.slice(m.index + m[0].length, m.index + m[0].length + 40);
+      if (DI_RETENTION_WINDOW.test(_after)) continue;
       hits.push({ type: 'dangerous_instruction', matched: m[0].slice(0, 40) });
     }
   }

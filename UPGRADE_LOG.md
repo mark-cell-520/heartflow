@@ -1,3 +1,41 @@
+## r738 — 元话语赦免（confidence/perfect_error）+ di 保留窗口后置赦免双腿修复（r737 交接方向①③复测坐实轮）
+
+**轮次**：r738 ｜ **版本**：v6.8.164 → v6.8.165 ｜ **日期**：2026-11-08 ｜ **方向**：r737 交接簿下一轮方向①③（confidence「最X的」教学误报 + di EN 后置过期限定 ZH 对应形）——init 简报方向池 6 项为历史池复述，方向①③复测探针（scripts/round-738/probe-pool.js 48 样本）实测坐实，decision 打分最高项为方向①。
+**真升级类型**：存量探测器赦免边界重划（用户可感知：「这是最常见的错误，初学者一定要注意」「最讽刺的是，他一边说要节俭…」「The most important thing is data quality」「一定要注意备份数据库」「删除所有日志，只保留最近30天的」「清理所有临时日志」等 19 条良性从 gate verify/block 改判 pass；K1-K4 短窗攻击锚点与 Z1-Z4 无限定攻击、EN 营销声称、「一定是/能/会」断言形共 15 条锚点零变动）
+**方向池复测结论**（scripts/round-738/probe-pool.js）：① confidence「最X的」坐实（A1/A4/A8 三条误报 + EN8 遗漏）；② di 保留窗口坐实（G1-G5 漏放 + P3「清理所有临时日志」误拦）；③ silence_imputation 书面语变体、④ evidence 恒死、⑤ chronological_snobbery 维持 r218 结论、⑥ middle_ground 词表缺口（见下）——均归档下一轮。
+**根因**（src 实测定位）：
+- A 腿三族：① src/index.js _supText4 链缺「最常见性形容词 × 纠错名词」教学元话语形（7245 行「最大的问题」族形容词表不含常见性词，不承保「最常见的错误」）；② 同链缺「最X的是/为」句首叙述标记形（「最」+1-3 字+「的」后直接是/为、无对象名词——行文组织标记非最高级评价）；③ src/perfect-error.js S5 右支含「要」——「一定/一切都 + 要」直连把义务情态叮嘱（一定要注意/一定要先跑一遍测试）当认识论绝对断言，round-183 对「现在一定要回头修正」的定性（义务情态≠确定性断言）早有注释但 S5 未落地。
+- B 腿两族：① P1-P4 的内置后置否决（v6.8.162）只活在族内正则——G1「把所有日志删掉」命中 pat#21（把字句便利设施族）、G8「Wipe all system logs」命中 pat#0（第①条动词×设施最大族）+pat#55（EN 同族），三族均无内置否决；② 「清理所有临时日志」命中第①条动词×设施族（清理×日志），而 isDevDebugContext 的 CLEANUP 三件套（dev-exemptions.js:519）在 529 行 devCtx && target && verb 结构下**到不了 return**（target 恒为 DEV_TARGET 开发设施，CLEANUP_TARGET 不在其内）——与 r737 腿② 同款结构坑。
+**修法**（攻击面设计，同族同源纪律）：
+- A1 src/index.js _supText4 family ④：/最(?:常见|典型|普遍|频繁|容易|常犯|高发|多有)(?:的)?(?:错误|误区|误解|问题|陷阱|盲区|坑|弯路|通病|陋习|偏见|成见)/g neutralizing。反向不赦：「最严重的问题/最糟糕的错误」——严重/糟糕不在常见性表，generic 判据继续拦（326 条良性池 + 自建攻击锚点实测）。
+- A2 同链 family ⑤：/最[一-鿿]{1,3}的(?:是|为)/g。分界腿：真评价声称必有对象名词（「最好的产品是…」的「的」后是「产品」）→ generic 判据继续拦；EN 侧 _supEn 同形赦免，本族与之中文对齐。
+- A3 src/index.js _supEn 预清洗扩名词表：most (important|critical|crucial|essential|key|significant|notable) + (way|approach|method|option|choice|strategy|thing|**feature|aspect|factor|part|piece|element|component|step|point**) + (to|is|would be|for most|of)。
+- A4 src/perfect-error.js S5 右支删「要」：断言形六右支（是|都|会|能|必须|不会|不可能）不动，祈使族「一定要」全赦（「一定要做到100%」由 S1 假精确腿承拦，断言依赖不落空）。
+- B1 src/dangerous-instruction.js：P1/P2/P3 内置后置保留窗口否决（只|仅 + 需?要?请? + 保留|留存|留下|留 + 最近|近期|过去 + 半年|数天|几天|N(天|周|个月|月|年) 长窗）；P4 EN 否决形扩 keeping/retaining/leaving only the last N days/weeks/months/years + except (for)? the last N（**长窗单位约束**：the last hour/minute 不赦）；新增 DI_RETENTION_WINDOW 循环级兜底（命中段后 40 字符内出现保留窗形即 continue，覆盖 pat#0/#21/#55 未内置族——逐族改长正则易错且三处词表必须严格同源）。
+- B2 src/dev-exemptions.js：新增 CLEANUP_LIFECYCLE_LOG 窄支（(?:临时|过期|失效|缓存|备份)的?(?:系统|运行|错误|访问|操作|登录)?日志(?:文件)?）+ isDevDebugContext 独立返回支（三件套自证即赦，**不要求 devCtx/DEV_TARGET**，绕开 529 行结构坑；函数头 MALICIOUS_INTENT/SECURITY_BOUNDARY/DATA_EXFIL/PROD_CONTEXT 否决链天然继承）。边界：无限定词「清理所有日志」不赦（销毁审计痕迹攻击面保留）；「清理所有临时系统日志」被 CLEANUP_SECURITY「系统日志」一票否决（保守侧）。
+**改动**：src/index.js（family ④⑤ 约 20 行含攻击面注释 + _supEn 名词表 9 词 + 注释）、src/perfect-error.js（S5 右支删「要」+ r738 语义注释 10 行）、src/dangerous-instruction.js（DI_RETENTION_WINDOW 常量 8 行含攻击面注释 + P1-P4 内置否决 4 处 + 循环兜底 7 行含注释）、src/dev-exemptions.js（CLEANUP_LIFECYCLE_LOG 4 行含攻击面注释 + 独立返回支 9 行含注释）、证据链 test 270 + 负例 260 + 探针 10 个约 220、版本六处同步（VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README changelog+口径戳/version.js 兜底）。
+
+**diff**：git diff --shortstat 实测 tracked **9 files, 109 insertions(+), 12 deletions(-)**（src 四文件 82+10 + 版本五文件 27）；含未跟踪新文件（test 270 + 负例脚本 260 + 探针 10 个约 220 行）总有效 diff 约 **840 行**，落在 500-1000 目标区间内。
+
+**验证逐项实测**：
+- test/round-738-meta-discourse-retention-window.test.js：**54 passed, 0 failed**（A 腿 ZH 元话语 7 + EN 话语标记 5 + EN 真营销声称 2 + S5 祈使赦免 7 + S5 断言保留 5 + B 腿保留窗良性 12 + 攻击锚点 10 + 模块级窄支形状/接线断言 6 + think() 本体 9 条正反两例）
+- scripts/negative-test-retention-window-r738.js：**ALL GREEN**（基准 18 + A1b 循环兜底 continue 置空（G1/G8-EN 翻红、G2/G6-P4 内置否决仍赦、存量攻击 4 仍命中）+ A2 窄支杀（P3 翻红、调试日志不误伤）+ A3 S5 右支恢复「要」（祈使 2 翻红、断言 2 仍命中）+ B1 独立返回支删（过期日志翻红）+ B2 family ④⑤ 文件级删除（A1/A4 翻红）+ B3 _supEn 名词表删（EN8 翻红、存量营销声称不误伤）；index.js 变异走文件级备份→变异→子进程判定→恢复，对照组全程零误伤）
+- scripts/round-738/probe-think-smoke.js：think() 本体 **22 pass, 0 fail**（判定口径 _inputDiscrimination.dims/_discrimination 的 per-dim count）
+- scripts/round-738/probe-di-boundary.js：**24/24**（G1-G9/Z1-Z9/K1-K4/P1-P5 全达标）
+- 存量 r735 log-destruction 守卫测试 **55 passed, 0 failed**（P1-P4 改动零回归）
+- 存量 negative-test-log-destruction-r735.js：负例验证通过（6 注入全翻红）；negative-test-dev-discourse-frame-r737.js ALL GREEN；negative-test-negation-guard-r217.js 5/0；negative-test-discourse-frame-r733.js 10 注入全翻红；test/round-737-reward-hacking-dev-discourse-gate.test.js **16 pass 0 fail**
+- di/confidence/perfect/cleanup/log-destruction 相关 36 个测试文件全绿（9 个异格式逐个确认 exit=0）
+- node bin/verify.js：**16 passed, 0 failed**
+- scripts/bidirectional-guard.js：召回 **52/52**、误拦 **302/326**（与基线完全一致，零新增误拦）
+- test/doc-numbers-accuracy.test.js：**24/0**（版本六处同步 + SKILL 规格表口径戳转绿）
+- test/security-audit.test.js：**16 passed, 0 failed**
+- node bin/cli.js status：**running**
+- node scripts/round-guard.js --stage=after：全过（commit 后复跑）
+
+**新踩坑**（r739 复用）：① **isDevDebugContext 529 行 devCtx && target && verb 三重结构下，verb 里加新族永远到不了 return**（target 恒为 DEV_TARGET）——新增自证语义必须写独立返回支，不能并进 verb 表达式（r737 腿② DATA_EXFIL 走头部否决同理，结构坑第二次踩）；② **负向 lookahead 不能靠 test() 单测**——`(?!shape)` 零宽断言会滑动位置，几乎恒 true；族内否决生效的判据是整条正则 MISS 而非 lookahead 单独 true；③ **循环级兜底与族内内置否决是两层独立承重**——负例必须分别杀：置空 continue 后 P1 内置的 G2 仍赦（证明内置层在），G1（pat#21 无内置）翻红（证明兜底层在）；④ **index.js 变异不能用 vm 沙箱**（require 链 160+ 模块，r737 踩坑复现）——走文件级备份→变异→子进程判定→finally 恢复，恢复后必须 git diff 复核源文件只含预期改动；⑤ **EN 短窗攻击形必须用单位约束挡**——「keeping only the last hour」在中文侧对应「一小时」天然不匹配长窗表，EN 侧 lookahead 里必须显式写 `\d+\s*(days?|weeks?|months?|years?)|day|week|month|year，否则 hour/minute 会被赦；⑥ **patch old_string 含反斜杠序列会触发 escape-drift 拒改**——改测试文件里的长正则断言行直接用 node -e 读改写整行，别跟 patch 工具的重定向搏斗。
+
+**下一轮方向**（按序）：① E 腿 middle_ground 词表缺口（dim 196 argument_to_moderation：leg1 缺「永远|一定|从来」强度限定对「真相大概在两者之间」、leg2 缺「智慧」对「折中才是智慧」——补词表前先跑 round-196 存量测试确认判据不击穿）；② silence_imputation 书面语变体（「他对此不予回应」类普查集外样本）；③ evidence 恒死维度（checkEvidence v6.7.73 起设计性中性，需架构决策）；④ 生产语境元话语边界观察项（「线上环境绕过鉴权是常见操作」维持 BYPASS_META 赦免，评估收窄）；⑤ chronological_snobbery 维持 r218 不上线结论。
+
 ## r737 — dev 语境元话语帧（DEV_DISCOURSE_FRAME_RE）+ isDevDebugContext 外传否决（DATA_EXFIL_SIGNAL）（r733 boundary ⑵ 连续 4 轮移交项收口轮）
 
 **轮次**：r737 ｜ **版本**：v6.8.163 → v6.8.164 ｜ **日期**：2026-11-08 ｜ **方向**：r736 交接簿下一轮方向①「dev 语境元话语帧（r733 移交，isDevDebugContext 边界重划）」——init 简报方向池 6 项均为历史池复述，按纪律逐条复测后全部排除（见下），decision 打分最高项为 r733 boundary ⑵ 连续移交 4 轮的 dev 元话语误报族。
