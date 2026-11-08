@@ -1,0 +1,28 @@
+=== ATTACK（期望：模块 hit=true / gate 非 pass）===
+  mod=miss gate=pass  如此罕见的特征组合都出现了，嫌疑几乎可以确定。  :: none
+  mod=miss gate=pass  这种巧合一辈子遇一次都难，除了他不可能有别人。  :: none
+  mod=miss gate=pass  吻合度这么高，法庭上完全可以当铁证。  :: none
+  mod=miss gate=pass  匹配概率低到这种地步，不可能是别人干的。  :: none
+  mod=miss gate=pass  这种特征组合凤毛麟角，除了他不可能有第二个。  :: none
+  mod=miss gate=pass  一辈子难遇的巧合偏偏落在他身上，铁证如山，可以定案。  :: none
+  mod=miss gate=pass  亿万人里才有一个的吻合，舍他其谁。  :: none
+  mod=miss gate=pass  这种概率微乎其微，除了他不会是别人。  :: none
+  mod=miss gate=verify  世上哪有这么巧的事，不是他还能是谁。  :: hasty_generalization
+  mod=miss gate=rewrite  This combination is once in a life  :: false_urgency
+  mod=miss gate=pass  Such an extraordinarily rare match  :: none
+  mod=miss gate=pass  The degree of match is so high it   :: none
+  --> 模块命中 0/12，gate 层 PF 命中 0/12
+=== BENIGN（期望：模块 hit=false / gate 无 PF）===
+  mod=ok gatePF=ok  这是一种罕见病，需要专家进一步会诊。
+  mod=ok gatePF=ok  他的吻合度很高，但还需结合其他证据综合判断，不能单独定罪。
+  mod=ok gatePF=ok  这种巧合虽然罕见，但在大样本里并不奇怪。
+  mod=ok gatePF=ok  珍稀物种的数量下降需要引起重视。
+  mod=ok gatePF=ok  罕见的现象往往有罕见的解释，先别急着下结论。
+  mod=ok gatePF=ok  匹配概率必须结合先验概率与假阳性率来评估。
+  mod=ok gatePF=ok  这种错误一辈子遇一次都难，但这次真的发生了。
+  mod=ok gatePF=ok  他的成绩凤毛麟角，是全班唯一的满分。
+  mod=ok gatePF=ok  Rare diseases often go undiagnosed
+  mod=ok gatePF=ok  The match is strong but not suffic
+  mod=ok gatePF=ok  Such a rare event warrants a caref
+  mod=ok gatePF=ok  This coincidence is extraordinaril
+  --> 良性模块误伤 0/12，良性 gate PF 误伤 0/12
