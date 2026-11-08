@@ -1,0 +1,7 @@
+攻击 23 条：命中 23｜漏 0
+良性 24 条：零误伤 24｜误伤 0
+单签名 count = 1 score = 0.62 dim = money_illusion
+多签名 count = 4 score = 0.72
+超距默认窗命中? false （应 false）
+超距放大窗命中? true （应 true）
+纯单腿「收入提高」命中? false （应 false）

@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/WUZqxKJJgK1/mgDSMHn22TkxHcY</id>
+  <title>arXiv Query: search_query=all:"money illusion"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-08T08:13:04Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22money+illusion%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>2</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2410.20128v1</id>
+    <title>Optimal life insurance and annuity decision under money illusion</title>
+    <updated>2024-10-26T09:10:20Z</updated>
+    <link href="https://arxiv.org/abs/2410.20128v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2410.20128v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper investigates the optimal consumption, investment, and life insurance/annuity decisions for a family in an inflationary economy under money illusion. The family can invest in a financial market that consists of nominal bonds, inflation-linked bonds, and a stock index. The breadwinner can also purchase life insurance or annuities that are available continuously. The family's objective is to maximize the expected utility of a mixture of nominal and real consumption, as they partially overlook inflation and tend to think in terms of nominal rather than real monetary values. We formulate this life-cycle problem as a random horizon utility maximization problem and derive the optimal strategy. We calibrate our model to the U.S. data and demonstrate that money illusion increases life insurance demand for young adults and reduces annuity demand for retirees. Our findings indicate that the money illusion contributes to the annuity puzzle and highlights the role of financial literacy in an inflationary environment.</summary>
+    <category term="q-fin.PM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-10-26T09:10:20Z</published>
+    <arxiv:primary_category term="q-fin.PM"/>
+    <author>
+      <name>Wenyuan Li</name>
+    </author>
+    <author>
+      <name>Pengyu Wei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2103.06227v1</id>
+    <title>Sensitivity analysis of an integrated climate-economic model</title>
+    <updated>2021-03-10T17:57:13Z</updated>
+    <link href="https://arxiv.org/abs/2103.06227v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2103.06227v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We conduct a sensitivity analysis of a new type of integrated climate-economic model recently proposed in the literature, where the core economic component is based on the Goodwin-Keen dynamics instead of a neoclassical growth model. Because these models can exhibit much richer behaviour, including multiple equilibria, runaway trajectories and unbounded oscillations, it is crucial to determine how sensitive they are to changes in underlying parameters. We focus on four economic parameters (markup rate, speed of price adjustments, coefficient of money illusion, growth rate of productivity) and two climate parameters (size of upper ocean reservoir, equilibrium climate sensitivity) and show how their relative effects on the outcomes of the model can be quantified by methods that can be applied to an arbitrary number of parameters.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2021-03-10T17:57:13Z</published>
+    <arxiv:comment>12 pages, 4 figures, 1 table</arxiv:comment>
+    <arxiv:primary_category term="econ.GN"/>
+    <author>
+      <name>Benjamin M. Bolker</name>
+    </author>
+    <author>
+      <name>Matheus R. Grasselli</name>
+    </author>
+    <author>
+      <name>Emma Holmes</name>
+    </author>
+  </entry>
+</feed>

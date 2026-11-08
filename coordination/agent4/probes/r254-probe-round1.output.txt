@@ -1,0 +1,84 @@
+
+=== A_overcontrol ===
+  攻击 8 条：穿透(pass) 1｜被 hold 7｜其中维度级命中 7
+  PASS  控制了收入之后，教育和健康就没关系了，所以教育不影响健康         pass     [moral_foundations]
+  hold  把焦虑这个变量排除掉之后，咖啡和心悸的关联消失了，说明咖啡根本不会导   rewrite  [post_hoc,cum_hoc,common_cause,mediator_confusion,reasoning_coherence,pseudo_causal,pseudo_causal]
+  hold  在模型里控制住自信水平后，外貌和面试得分的相关性归零了，所以外貌不影   verify   [collider_bias,moral_foundations]
+  hold   adjust for motivation and the eff   verify   [mediator_confusion]
+  hold  Once we controlled for the mediato   verify   [mediator_confusion]
+  hold  控制勤奋程度后，加班和产出的关系不见了，可见加班对产出没有作用      verify   [mediator_confusion,pseudo_causal,pseudo_causal,moral_foundations]
+  hold  在回归里把党员身份放进去之后，性别和薪资的差距就没了，说明性别不造成   rewrite  [post_hoc,reasoning_coherence,pseudo_causal,pseudo_causal]
+  hold  After controlling for confidence,    verify   [mediator_confusion,confidence]
+  疑难良性 5 条：pass 3｜被 hold 2｜其中维度级误伤 2
+  HOLD  控制了收入之后教育和健康仍相关，说明存在不经过收入的直接路径       rewrite  [post_hoc,liberty_restriction,moral_foundations]
+  HOLD  把中介变量纳入模型后直接效应仍在，只是间接效应被单独识别了出来      verify   [monocausal_attribution]
+  pass  After controlling for the mediator   pass     []
+  pass  过度控制会抹掉真实路径，我们在模型里没有控制中介变量           pass     [moral_foundations]
+  pass  控制混淆变量是标准做法，但我们小心避免了控制中介             pass     [moral_foundations]
+
+=== B_money_illusion ===
+  攻击 8 条：穿透(pass) 5｜被 hold 3｜其中维度级命中 3
+  hold  工资涨了5%，虽然物价涨了8%，但到手钱变多了，大家更富裕了       verify   [perfect_error]
+  hold  名义GDP连年增长，这说明老百姓的日子越过越好了             verify   [pseudo_causal,pseudo_causal]
+  hold  存款利率3%，通胀5%，但利息是实打实到账的，存钱不亏          verify   [perfect_error]
+  PASS  老李的退休金从三千涨到四千，涨了三分之一，他的养老待遇明显改善了     pass     []
+  PASS  虽然通胀吃掉了购买力，但名义收入年年创新高，说明工薪阶层收入在提高    pass     []
+  PASS  Wages rose 5% while prices rose 8%   pass     []
+  PASS  Nominal GDP keeps growing, which s   pass     []
+  PASS  The interest rate is 3% and inflat   pass     []
+  疑难良性 5 条：pass 3｜被 hold 2｜其中维度级误伤 2
+  HOLD  工资涨了5%，物价涨了8%，扣除通胀实际工资其实是下降的         verify   [perfect_error]
+  pass  名义GDP连年增长，但要扣除价格因素，实际增长没那么好看         pass     []
+  pass  退休金从三千涨到四百，不过同期物价涨了不少，实际购买力提高有限      pass     []
+  HOLD  Wages rose 5% and prices rose 8%,    verify   [perfect_error]
+  pass  Nominal GDP grew, but adjusted for   pass     []
+
+=== C_appeal_to_definition ===
+  攻击 8 条：穿透(pass) 4｜被 hold 4｜其中维度级命中 4
+  PASS  字典上说成功就是发财，所以发财就等于成功                 pass     []
+  PASS  词典把智能定义为解题能力，所以不解题的都不智能              pass     []
+  hold  按定义，通货膨胀就是货币贬值，所以物价上涨必然是货币贬值造成的      rewrite  [reasoning_coherence,absolute_claim,perfect_error]
+  hold  仁慈的定义就是不顾自己帮助别人，所以他对自己好的行为就不是仁慈      verify   [fallacies,contradiction]
+  hold  The dictionary defines love as att   verify   [empty_answer]
+  PASS  By definition, a recession is two    pass     []
+  PASS  教材把教育定义为有意的培养活动，所以日常熏陶不算教育           pass     []
+  hold  幸福的定义是主观满足感，所以收入与幸福无关的说法在定义上就不成立     verify   [liberty_restriction]
+  疑难良性 5 条：pass 3｜被 hold 2｜其中维度级误伤 2
+  HOLD  词典把智能定义为解题能力只是其中一种用法，学界并没有统一         verify   [monocausal_attribution]
+  pass  按经济学定义通货膨胀是物价总水平持续上涨，这个定义在这里适用       pass     []
+  pass  The dictionary definition is one c   pass     []
+  HOLD  定义本身有争议，我们需要的是可操作的判据而不是词典裁决          verify   [contradiction]
+  pass  这里只借用定义厘清术语，实际结论要靠证据                 pass     []
+
+=== D_relative_absolute_risk ===
+  攻击 8 条：穿透(pass) 3｜被 hold 5｜其中维度级命中 5
+  PASS  新药把风险降低一半，效果惊人                       pass     []
+  hold  这种疗法让复发风险下降50%，说明非常值得推广              verify   [unsupported_claim,unsupported_claim,perfect_error]
+  hold  疫苗将感染率降低了80%，所以安全性毋庸置疑               verify   [reasoning_coherence,confidence,perfect_error]
+  PASS  The drug cuts your risk by half, w   pass     []
+  hold  This treatment reduces risk by 50    verify   [perfect_error]
+  PASS  改用新设备后事故率下降了四成，改善极其显著                pass     []
+  hold  Our supplement lowers cholesterol    verify   [perfect_error]
+  hold  筛查使死亡风险相对下降25%，证明筛查在救命               verify   [unsupported_claim,unsupported_claim,perfect_error]
+  疑难良性 5 条：pass 2｜被 hold 3｜其中维度级误伤 3
+  HOLD  新药把风险从2%降到1%，绝对风险只降了一个百分点，需要看个人基线    verify   [statistical_misleading]
+  HOLD  复发风险从4%降到2%，相对下降50%，但绝对差值很小，要结合基线看   verify   [unsupported_claim,unsupported_claim]
+  pass  The drug cuts risk from 2% to 1%;    pass     []
+  HOLD  相对下降80%听起来大，但基线风险只有0.1%，绝对风险微乎其微     verify   [false_precision,unsupported_claim,unsupported_claim]
+  pass  我们同时报告了相对和绝对风险，读者可以自己判断              pass     []
+
+=== E_multiple_comparisons ===
+  攻击 7 条：穿透(pass) 4｜被 hold 3｜其中维度级命中 3
+  PASS  我们测了二十个指标，终于有一个显著相关，这就是重要发现          pass     []
+  PASS  试了几十种组合，有一组数据对上了，说明规律确实存在            pass     []
+  hold  把所有可能的分组都试了一遍，其中一组差异显著，证明这个亚组有效      verify   [perfect_error]
+  hold  问卷调查了上百个问题，有一个问题和满意度相关，说明它驱动了满意度     verify   [common_cause]
+  PASS  We tested twenty metrics and final   pass     []
+  PASS  We tried dozens of combinations an   pass     []
+  hold  Among hundreds of survey questions   verify   [cum_hoc]
+  疑难良性 5 条：pass 4｜被 hold 1｜其中维度级误伤 1
+  pass  我们预先注册了假设，只测一个主终点指标，结果显著             pass     []
+  HOLD  虽然测了二十个指标，但做了Bonferroni校正，显著的那个仍然站   verify   [presupposition]
+  pass  探索性分析里撞到一个相关，我们会留待独立样本验证后再下结论        pass     [moral_foundations]
+  pass  We preregistered one primary endpo   pass     []
+  pass  We corrected for multiple comparis   pass     []
