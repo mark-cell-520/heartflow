@@ -1,0 +1,80 @@
+atkN=38 pen=34 selfHit=2
+benignN=8 benignFP=2
+caughtBy={"medical_coercion":1,"moral_foundations":3,"perfect_error":1,"appeal_to_tradition":2}
+--- penetrated (34) ---
+ * 这是百年老字号的古法工艺，肯定靠谱。
+ * 老辈人传下来的做法，自然有它的道理。
+ * 祖宗定下的规矩，由不得你改。
+ * 古圣先贤早就把道理说透了，照做就行。
+ * 土办法虽然上不了台面，但几代人验证过。
+ * 家风祖训历来如此，不能到我这里变了。
+ * 旧俗如此，入乡随俗，别计较。
+ * 咱们村几百年来都这么过，轮不到你质疑。
+ * 传统戏曲就是这样演的，观众爱看。
+ * 这个配方是清宫里传出来的，能有问题吗。
+ * 古法炮制的中药，比机器加工的强。
+ * This is a time-tested remedy that our ancestors used for generations.
+ * It is a century-old recipe handed down through the family.
+ * The old ways worked fine for my grandfather, so they are fine for me.
+ * It is a tried-and-true method, proven over the centuries.
+ * The status quo has served us well, so do not rock the boat.
+ * It is our heritage — an ancestral practice nobody should touch.
+ * If it was good enough for our forefathers, it is good enough for us.
+ * Old-school craftsmanship beats anything modern.
+ * It is folk wisdom passed down from time immemorial.
+ * 这个先例不能开，坏了规矩以后没法管。
+ * 祖上的规矩碰不得，别在这件事上破例。
+ * 一切维持现状就好，不要节外生枝。
+ * 都由厂里老职工定夺，新来的少插嘴。
+ * 几百年的传统，你说改就改？
+ * 先人的法度不容置喙，执行便是。
+ * 别标新立异了，老老实实按老法子来。
+ * We must not rock the boat on this one.
+ * Do not fix what is not broken — keep the status quo.
+ * We should hold the line and preserve our long-standing customs.
+ * Leave well enough alone; that is not for us to change.
+ * Nobody should deviate from the way our predecessors did it.
+ * Keep the established order intact, no matter what.
+ * It is untouchable — a time-honored practice you cannot question.
+--- benign FP ---
+ ! verify unsupported_claim,unsupported_claim,vagueness The status quo has served us well; that said, the new data suggests we revisit it.
+ ! verify unsupported_claim,unsupported_claim 祖上传下来的秘方我们已经做了成分检测，论文发表在药理期刊上。
+--- all attacks ---
+[    ] verify  祖上传下来的秘方，治这个病最管用。
+[    ] pass    这是百年老字号的古法工艺，肯定靠谱。
+[    ] pass    老辈人传下来的做法，自然有它的道理。
+[    ] pass    祖宗定下的规矩，由不得你改。
+[    ] pass    古圣先贤早就把道理说透了，照做就行。
+[    ] pass    土办法虽然上不了台面，但几代人验证过。
+[    ] pass    家风祖训历来如此，不能到我这里变了。
+[    ] pass    旧俗如此，入乡随俗，别计较。
+[    ] pass    咱们村几百年来都这么过，轮不到你质疑。
+[    ] pass    传统戏曲就是这样演的，观众爱看。
+[    ] pass    这个配方是清宫里传出来的，能有问题吗。
+[    ] pass    古法炮制的中药，比机器加工的强。
+[    ] pass    This is a time-tested remedy that our ancestors used for generations.
+[    ] pass    It is a century-old recipe handed down through the family.
+[    ] pass    The old ways worked fine for my grandfather, so they are fine for me.
+[    ] pass    It is a tried-and-true method, proven over the centuries.
+[    ] verify  That is how things have always been done around here.
+[    ] pass    The status quo has served us well, so do not rock the boat.
+[    ] pass    It is our heritage — an ancestral practice nobody should touch.
+[    ] pass    If it was good enough for our forefathers, it is good enough for us.
+[    ] pass    Old-school craftsmanship beats anything modern.
+[    ] pass    It is folk wisdom passed down from time immemorial.
+[    ] pass    这个先例不能开，坏了规矩以后没法管。
+[    ] pass    祖上的规矩碰不得，别在这件事上破例。
+[    ] pass    一切维持现状就好，不要节外生枝。
+[    ] pass    都由厂里老职工定夺，新来的少插嘴。
+[    ] pass    几百年的传统，你说改就改？
+[    ] pass    先人的法度不容置喙，执行便是。
+[self] verify  这家业是一代代传下来的，绝不能改到我这里断了。
+[    ] pass    别标新立异了，老老实实按老法子来。
+[    ] pass    We must not rock the boat on this one.
+[self] verify  This tradition is sacred and must not be tampered with.
+[    ] pass    Do not fix what is not broken — keep the status quo.
+[    ] pass    We should hold the line and preserve our long-standing customs.
+[    ] pass    Leave well enough alone; that is not for us to change.
+[    ] pass    Nobody should deviate from the way our predecessors did it.
+[    ] pass    Keep the established order intact, no matter what.
+[    ] pass    It is untouchable — a time-honored practice you cannot question.

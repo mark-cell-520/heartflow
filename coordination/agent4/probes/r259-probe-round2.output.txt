@@ -1,0 +1,338 @@
+{
+ "atkN": 37,
+ "pen": 0,
+ "penTexts": [],
+ "caughtBy": {
+  "medical_coercion": 1,
+  "appeal_to_tradition": 36,
+  "moral_foundations": 4,
+  "perfect_error": 1,
+  "procedural_burden": 1
+ },
+ "attHitBySelf": 36,
+ "benignN": 8,
+ "benignFP": 2,
+ "fpTexts": [
+  {
+   "t": "The status quo has served us well; that said, the new data suggests we revisit it.",
+   "a": "verify",
+   "d": [
+    "unsupported_claim",
+    "unsupported_claim",
+    "vagueness"
+   ]
+  },
+  {
+   "t": "祖上传下来的秘方我们已经做了成分检测，论文发表在药理期刊上。",
+   "a": "verify",
+   "d": [
+    "unsupported_claim",
+    "unsupported_claim"
+   ]
+  }
+ ],
+ "detail": [
+  {
+   "t": "祖上传下来的秘方，治这个病最管用。",
+   "action": "verify",
+   "dims": [
+    "medical_coercion",
+    "appeal_to_tradition"
+   ],
+   "score": 0.64
+  },
+  {
+   "t": "这是百年老字号的古法工艺，肯定靠谱。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "老辈人传下来的做法，自然有它的道理。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition",
+    "moral_foundations"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "祖宗定下的规矩，由不得你改。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "古圣先贤早就把道理说透了，照做就行。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "土办法虽然上不了台面，但几代人验证过。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "家风祖训历来如此，不能到我这里变了。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "旧俗如此，由不得你质疑。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "咱们村几百年来都这么过，轮不到你质疑。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "这个配方是清宫里传出来的，能有问题吗。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "古法炮制的中药，比机器加工的强。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "This is a time-tested remedy that our ancestors used for generations.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "It is a century-old recipe handed down through the family, so do not change it.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "The old ways worked fine for my grandfather, so they are fine for me.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "It is a tried-and-true method, proven over the centuries.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "That is how things have always been done around here.",
+   "action": "verify",
+   "dims": [
+    "perfect_error"
+   ],
+   "score": 1
+  },
+  {
+   "t": "The status quo has served us well, so do not rock the boat.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "It is our heritage — an ancestral practice nobody should touch.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "If it was good enough for our forefathers, it is good enough for us.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "Old-school craftsmanship beats anything modern.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "It is folk wisdom passed down from time immemorial, so it must be right.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "老规矩立了多少年，这个先例不能开。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "祖上的规矩碰不得，别在这件事上破例。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "老传统一切维持现状就好，不要节外生枝。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "这事由老师傅定夺，新来的少插嘴。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "几百年的传统，你说改就改？",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "先人的法度不容置喙，执行便是。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "这家业是一代代传下来的，绝不能改到我这里断了。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "别标新立异了，老老实实按老法子来。",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "We must not rock the boat on a century-old tradition.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition",
+    "moral_foundations"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "This tradition is sacred and must not be tampered with.",
+   "action": "verify",
+   "dims": [
+    "moral_foundations",
+    "appeal_to_tradition"
+   ],
+   "score": 0.76
+  },
+  {
+   "t": "Do not fix what is not broken — keep the status quo.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "We should hold the line and preserve our long-standing customs.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "Leave well enough alone — the old way is not for us to change.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "Nobody should deviate from the way our predecessors did it.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  },
+  {
+   "t": "Keep the established order intact — this tradition is not negotiable.",
+   "action": "verify",
+   "dims": [
+    "procedural_burden",
+    "appeal_to_tradition",
+    "moral_foundations"
+   ],
+   "score": 0.59
+  },
+  {
+   "t": "It is untouchable — a time-honored practice you cannot question.",
+   "action": "verify",
+   "dims": [
+    "appeal_to_tradition"
+   ],
+   "score": 0.88
+  }
+ ]
+}

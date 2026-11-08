@@ -1,0 +1,51 @@
+[HIT ] "这是百年老字号的古法工艺，肯定靠谱。"
+[HIT ] "古圣先贤早就把道理说透了，照做就行。"
+[HIT ] "土办法虽然上不了台面，但几代人验证过。"
+[HIT ] "家风祖训历来如此，不能到我这里变了。"
+[miss] "旧俗如此，入乡随俗，别计较。"
+   trad: ["旧俗|乡俗|乡规|陈规|老皇历|老黄历|祖上传下来|祖上=>旧俗"]
+   supp: []
+   concl: []
+[HIT ] "这个配方是清宫里传出来的，能有问题吗。"
+[HIT ] "古法炮制的中药，比机器加工的强。"
+[miss] "It is a century-old recipe handed down through the family."
+   trad: ["\\b(?:handed|passed) down\\b=>handed down"]
+   supp: []
+   concl: []
+[HIT ] "The old ways worked fine for my grandfather, so they are fine for me."
+[HIT ] "It is a tried-and-true method, proven over the centuries."
+[HIT ] "The status quo has served us well, so do not rock the boat."
+[HIT ] "It is our heritage — an ancestral practice nobody should touch."
+[HIT ] "Old-school craftsmanship beats anything modern."
+[miss] "It is folk wisdom passed down from time immemorial."
+   trad: ["\\b(?:handed|passed) down\\b=>passed down","\\bthe old ways?\\b|\\bold[- ]s=>folk wisdom"]
+   supp: []
+   concl: []
+[miss] "这个先例不能开，坏了规矩以后没法管。"
+   trad: []
+   supp: ["(?:坏|坏了|败坏|亵渎)(?:了)?(?:规矩|祖上=>先例不能开","(?:坏|坏了|败坏|亵渎)(?:了)?(?:规矩|祖上=>坏了规矩"]
+   concl: []
+[HIT ] "祖上的规矩碰不得，别在这件事上破例。"
+[miss] "一切维持现状就好，不要节外生枝。"
+   trad: []
+   supp: ["维持现状|保持原样|一切照旧|照旧就好|原封不动=>维持现状","别?标新立异|不要节外生枝|别节外生枝|少逞能|别逞能|=>不要节外生枝"]
+   concl: []
+[miss] "都由厂里老职工定夺，新来的少插嘴。"
+   trad: []
+   supp: ["少插嘴|少插话|别插嘴|由不得你(?:说|决定|插手|干=>少插嘴"]
+   concl: []
+[HIT ] "先人的法度不容置喙，执行便是。"
+[HIT ] "别标新立异了，老老实实按老法子来。"
+[miss] "We must not rock the boat on this one."
+   trad: []
+   supp: ["\\brock the boat\\b=>rock the boat"]
+   concl: []
+[HIT ] "Do not fix what is not broken — keep the status quo."
+[miss] "Leave well enough alone; that is not for us to change."
+   trad: []
+   supp: ["\\bleave (?:well enough alone=>Leave well enough alone"]
+   concl: []
+[miss] "Keep the established order intact, no matter what."
+   trad: ["\\bestablished order\\b|\\blong=>established order"]
+   supp: ["\\b(?:keep|maintain|preserve|=>Keep the established order"]
+   concl: []

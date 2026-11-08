@@ -1,0 +1,8 @@
+atkN=37 pen=0 selfHit=36
+benignN=8 benignFP=2
+caughtBy={"medical_coercion":1,"appeal_to_tradition":36,"moral_foundations":4,"perfect_error":1,"procedural_burden":1}
+--- penetrated (0) ---
+--- benign FP ---
+ ! verify unsupported_claim,unsupported_claim,vagueness The status quo has served us well; that said, the new data suggests we revisit it.
+ ! verify unsupported_claim,unsupported_claim 祖上传下来的秘方我们已经做了成分检测，论文发表在药理期刊上。
+--- all attacks ---
