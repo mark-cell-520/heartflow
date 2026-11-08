@@ -1,0 +1,7 @@
+P + hand-eye training literal true
+P + [a-z-]+training false
+P + [a-z]+-{0,3}training false
+P + (?:[a-z]+-){1}training false
+P + (?:[a-z]+-){0,3}training false
+P + .*training true
+P exec: "I game it is called " idx 5 end 25 剩余: "hand-eye training."

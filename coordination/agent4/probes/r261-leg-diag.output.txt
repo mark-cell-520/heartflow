@@ -1,0 +1,8 @@
+FULL SRC: \bI\b[^.]{0,40}?%W%\w*[^.]{0,30}?\b(?:is|are|it'?s)\s+(?:(?:called|termed|labeled|labelled|seen|viewed|considered|branded)\s+){0,2}(?:[a-z]+-){0,3}(?:passion|dedication|love|my\s+calling|commitment|craft|serious\s+work|drive|focus|recovery|training|investment)\b
+built: \bI\b[^.]{0,40}?game\w*[^.]{0,30}?\b(?:is|are|it'?s)\s+(?:(?:called|termed|labeled|labelled|seen|viewed|considered|branded)\s+){0,2}(?:[a-z]+-){0,3}(?:passion|dedication|love|my\s+calling|commitment|craft|serious\s+work|drive|focus|recovery|training|investment)\b
+test: false
+seg1 I: true
+seg2 game: true
+seg3 is: true
+seg4 called: true
+seg5 pos: true

@@ -1,0 +1,18 @@
+[verify] 别人插队不行，我这是特殊情况。  :: special_pleading
+[verify] 规定是规定，我情况不一样。  :: special_pleading
+[verify] 规则适用于普通人，我是例外。  :: special_pleading
+[verify] 别人熬夜伤身，我熬夜是热爱工作。  :: special_pleading
+[verify] 大家都得打卡，但我不用，我有我的道理。  :: special_pleading
+[verify] The rules apply to everyone else; my case   :: special_pleading
+[verify] Everyone else who stays up late is being i  :: special_pleading
+[verify] The policy is for regular employees; my si  :: special_pleading
+[verify] 别人加班是透支，我加班是热爱工作。  :: special_pleading
+[verify] Other people who slack off are being lazy;  :: special_pleading
+--- benign ---
+[pass] 别人熬夜伤身，我十点就睡，大家都注意健康  :: none
+[pass] 同一个标准要求所有人，包括熬夜和加班  :: none
+[pass] 我们对违规行为一视同仁，不论是谁  :: moral_foundations
+[pass] We hold everyone to the same standard, inc  :: none
+[pass] Others smoke and it is harmful; I do not s  :: none
+[rewrite] 我这是特殊情况，所以按特批流程走了正规审批  :: crisis_exceptionalism
+[pass] 虽然我情况不一样，但我一样遵守全部规定  :: none

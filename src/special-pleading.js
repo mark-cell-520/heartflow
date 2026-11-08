@@ -129,13 +129,13 @@ const STRICTER_PRESENT = /(?:更严|不是更松|更加严格|更为严格|stric
 
 // ─── 路由四（r261 新增）：同行为不同定性 ─────────────────────────
 // 腿①：他人同一行为的负面定性（捕获组 1 = 行为词，回填腿②）
-const OTHERS_NEG_ZH = /(?:别人|他人|其他人|大家|他们|一般人|普通人)[^。；;，,]{0,10}(熬夜|加班|拼命|应酬|喝酒|抽烟|拼搏|奋斗|冒险|冲动|折腾|走关系|托关系|拼命工作)[^。；;，,]{0,10}(伤身|伤身体|有害|不好|不行|是错|犯错|不健康|透支|不要命|浪费|堕落|腐败|违法|傻)/;
+const OTHERS_NEG_ZH = /(?:别人|他人|其他人|大家|他们|一般人|普通人)[^。；;，,]{0,10}(熬夜|加班|拼命|应酬|喝酒|抽烟|拼搏|奋斗|冒险|冲动|折腾|走关系|托关系|拼命工作|打游戏|刷手机)[^。；;，,]{0,10}(伤身|伤身体|有害|不好|不行|是错|犯错|不健康|透支|不要命|浪费|堕落|腐败|违法|傻)/;
 // 腿②模板：%W% 处由腿①捕获的行为词回填（同一行为才判双标）
-const SELF_POS_ZH = /我[^。；;，,]{0,6}%W%[^。；;，,]{0,10}(?:是|叫|算|属于|为了|因为)[^。；;，,]{0,12}(热爱|奉献|敬业|负责|拼搏|奋斗|有意义|值得|上进|理想|事业|责任|梦想|情怀|人情|世故)/;
+const SELF_POS_ZH = /我[^。；;，,]{0,6}%W%[^。；;，,]{0,10}(?:是|叫|算|属于|为了|因为)[^。；;，,]{0,12}(热爱|奉献|敬业|负责|拼搏|奋斗|有意义|值得|上进|理想|事业|责任|梦想|情怀|人情|世故|练手|训练)/;
 // EN 腿①：捕获组 1 = 行为词词干（stay/smoke/drink…），词干回填腿②
-const OTHERS_NEG_EN = /\b(?:others|other\s+people|everyone\s+else|they|them)\b[^.]{0,40}?\b(stay|smoke|drink|overwork|burn|game|gamble|slack|cut|risk)\w*\b[^.]{0,40}?\b(?:is|are|it'?s)\s+(?:\w+\s+){0,2}(?:harmful|bad|wrong|unhealthy|irresponsible|a\s+waste|lazy|selfish|reckless|poor\s+discipline|a\s+bad\s+habit)\b/i;
+const OTHERS_NEG_EN = /\b(?:others|other\s+people|everyone\s+else|they|them)\b[^.]{0,40}?\b(stay|smoke|drink|overwork|burn|game|gamble|slack|cut|risk)\w*\b[^.]{0,40}?\b(?:is|are|it'?s)\s+(?:\w+\s+){0,2}(?:harmful|bad|wrong|unhealthy|irresponsible|a\s+waste(?:\s+of)?|wasting|lazy|selfish|reckless|poor\s+discipline|a\s+bad\s+habit)\b/i;
 // EN 腿②模板：%W% 处由腿①词干回填
-const SELF_POS_EN = /\bI\b[^.]{0,40}?%W%\w*[^.]{0,30}?\b(?:is|are|it'?s)\s+(?:(?:called|termed|labeled|labelled|seen|viewed|considered|branded)\s+){0,2}(?:passion|dedication|love|my\s+calling|commitment|craft|serious\s+work|drive|focus|recovery|training|investment)\b/i;
+const SELF_POS_EN = /\bI\b[^.]{0,40}?%W%\w*[^.]{0,30}?\b(?:is|are|it'?s)\s+(?:(?:called|termed|labeled|labelled|seen|viewed|considered|branded)\s+){0,2}(?:[a-z]+(?:-[a-z]+){0,2}\s+){0,2}(?:passion|dedication|love|my\s+calling|commitment|craft|serious\s+work|drive|focus|recovery|training|investment)\b/i;
 
 // ─── 豁免四（仅路由四）：对称要求在场 ─────────────────────────────
 // 「同一个标准」「一视同仁」式的对称表述不是双标主张

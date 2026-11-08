@@ -1,0 +1,7 @@
+t1: true
+t2: true
+t3: hand-
+t4: true
+t5 P+tail on frag: false
+t6 dedication: true
+t7: true
