@@ -1,3 +1,38 @@
+## r253 修复 — 每日审计：修复 r253 新维度 `undistributed_middle` 接线崩溃（P1）+ 文档口径同步
+
+**日期** 2026-11-08  **操作方** cron（每日审计·修复轮，本地 commit，不推送）
+**轮次性质** 审计修复轮（无新维度）。修复上一轮 r253 接入第 229 维时引入的阻塞级回归，
+并把 r253 未同步的文档口径补到实测值。
+
+### 1. 问题清单
+| 级别 | 问题 | 复现 | 根因 |
+|------|------|------|------|
+| P1 | `checkOutput` 在**任何未命中 undistributed_middle 的输入**上崩溃 | `gate.checkOutput('According to 2025 Harvard research, coffee extends life by 12.5 years')` → `TypeError: Cannot read properties of null (reading 'score')` | `src/undistributed-middle.js` 的 `checkUndistributedMiddle()` 有 11 条 `return null` 未命中路径，而 `src/index.js:2895` 的 dimMap 对所有维度一律无条件读 `um.score`。引擎惯例是未命中返回零分对象（对照 `src/false-memory-transplant.js` 等既有维度） |
+| P2 | 文档口径滞后：三份文档仍写 228 维 / verify 185，实测 229 / 186 | `test/doc-numbers-accuracy.test.js` 9 项失败 | r253 只改了代码未同步 README/SKILL/AGENTS |
+
+### 2. 修复内容
+- `src/undistributed-middle.js`：新增 `_MISS()` 辅助函数（返回 `{hit:false, score:0, detail:'', count:0}`，
+  与引擎既有维度惯例一致），把主函数 `checkUndistributedMiddle` 的 11 条未命中 `return null`
+  全部改为 `return _MISS()`。`_parseUniversal` 内部 helper 的 3 处 `return null` 不动——
+  那是解析失败语义，调用方已有 `if (p)` 保护。同步更新函数头注释。
+- `README.md` / `SKILL.md` / `AGENTS.md`：维度数 228→229、verify 185→186、
+  Verify 层列举补 `undistributed_middle`（README badge / 章节标题 / 规格表 / SKILL 描述 / AGENTS 头部）。
+- 未改 `src/index.js`（修复前该文件正被 r253 写入；改点收敛在 r253 新文件内，
+  不碰 200+ 维度公共读取路径）。
+- VERSION 6.8.151 → 6.8.152，`node scripts/sync-version.js` 同步完成。
+
+### 3. 验证数据（五门禁，全部本轮真实运行）
+- `bin/verify.js` → **16 passed / 0 failed**（修复前 15 passed / 1 failed，失败项 `gate.js 入口可用`）
+- `scripts/guard-abilities.js` → **20 / 20 通过**（dimensions 键 229 个）
+- `test/doc-numbers-accuracy.test.js` → **24 通过 / 0 失败**（修复前 15 通过 / 9 失败）
+- `scripts/bidirectional-guard.js` → **召回 52/52、误拦 302/326 pass（92.6%）→ ✅ 通过**
+- 单测探针：良性 3 例全部 `hit:false score:0`；中英攻击各 1 例命中
+  （「所有猫都是哺乳动物，所有狗都是哺乳动物，所以猫是狗。」/ "All cats are mammals. All dogs are mammals. Therefore, cats are dogs."）
+- 端到端：`gate.checkOutput(...)` 崩溃消除，良性输入 `action=verify`，
+  攻击输入正确命中 `undistributed_middle` 维度
+
+---
+
 ## r252 — 第 228 判别维度 `false_memory_transplant`（虚假记忆嫁接 / memory-reframing）落地
 
 **日期** 2026-11-08  **操作方** cron（心虫全面升级，本地 commit，不推送）
