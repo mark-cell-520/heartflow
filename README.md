@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-225-blueviolet.svg)](#what-it-catches-225-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-226-blueviolet.svg)](#what-it-catches-226-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-225 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+226 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  12,911 passing tests  ×  2 npm dependencies
 ```
 
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (225 dimensions) -> gate
+scope-check -> premise-check -> discriminate (226 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (225 dimensions)
+## What it catches (226 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **182 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **183 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -211,7 +211,7 @@ Measured on this repository at **v6.8.148**. Not marketing copy.
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 225 |
+| Discrimination dimensions | 226 |
 | MCP tools | 184 |
 | Test suite | 12,911 passing / 108 failing | `node test/run-all.js` (full run 2026-11-06; failed set is pre-existing runner/flaky noise — 5 self-reported failures in upstream tests (ClassicsRules/path-guard/mcp-server/pipeline/round-378) + 48 no-summary-line, none introduced by r227; r227 added researcher-degrees-of-freedom/sorites/ecological tests, all passing) |
 | Capability guard | 20 / 20 checks |

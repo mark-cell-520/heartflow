@@ -841,6 +841,16 @@ const { detectFramingEffect: checkFramingEffect } = require('./framing-effect.js
 // 实测本族中英双语 2/2 漏判；decision 本体裁决 accelerate。细节见
 // src/denominator-swap.js。
 const { checkDenominatorSwap } = require('./denominator-swap.js');
+// [r250] 第 226 维度 survivor_time_bias（幸存时间偏误 / length-time bias：
+// 用存活者生存期的长短差异直接推断干预有效，忽略病程长度偏倚——「接受
+// 这种疗法的病人平均活了五年，没接受的只活了一年，可见这疗法有效」）。
+// 中英双语三腿共现——生存期语义腿×疗效结论腿×时间对置腿；随机对照/同
+// 期队列设计在场、元陈述破除本谬误、生存率/死亡率比率口径三类豁免。
+// 缺口实证：scripts/round-249/probe-gap-r249.js 19 条候选中本族 2/2
+// （中英双语）全漏判，r250 复跑确认；decision 本体裁决 accelerate。与
+// survivorship_bias(132)/selection_bias(168)/denominator_swap(224) 的边界
+// 见模块头注释。细节见 src/survivor-time-bias.js。
+const { checkSurvivorTimeBias } = require('./survivor-time-bias.js');
 // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
 // confusion of the inverse：P(E|I) 的概率数值在方向翻转后原样沿用为
 // P(I|E)，检察官谬误的结构形）。src/conditional-transposition.js 28KB
@@ -2214,6 +2224,10 @@ function discriminate(text, evidence = [], contentMode) {
   const fme = _applyPedagogyRelaxation(checkFramingEffect(_normText), "framing_effect", pedagogyRelaxation);
   // [r249] 第 224 维度 denominator_swap（分母替换谬误）计算点。
   const dsw = _applyPedagogyRelaxation(checkDenominatorSwap(_normText), "denominator_swap", pedagogyRelaxation);
+  // [r250] 第 226 维度 survivor_time_bias（幸存时间偏误 / length-time
+  // bias）计算点。stb——survivor time bias 缩写（sb 已被 selection_bias
+  // 占用，grep 查证无冲突）。
+  const stb = _applyPedagogyRelaxation(checkSurvivorTimeBias(_normText), "survivor_time_bias", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -2840,6 +2854,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r249] 第 224 维度 denominator_swap 参与判定（分母替换谬误）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: dsw.score, name:'denominator_swap'},
+    // [r250] 第 226 维度 survivor_time_bias 参与判定（幸存时间偏误）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: stb.score, name:'survivor_time_bias'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3367,6 +3384,9 @@ function discriminate(text, evidence = [], contentMode) {
     framing_effect: fme,
     // [r249] 第 224 维度 denominator_swap（分母替换×绝对计数腿×比较结论腿×主体对置腿）。
     denominator_swap: dsw,
+    // [r250] 第 226 维度 survivor_time_bias（幸存时间偏误×生存期语义腿×
+    // 疗效结论腿×时间对置腿）。
+    survivor_time_bias: stb,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -4939,6 +4959,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 不同，要看人均事故率再比」正是本族要教的判别动作）、统计学
     // 课堂案例、对他人错误论证的转述引用。与 r206-r232 同口径只登记 VERIFY。
     'denominator_swap',
+    // [r250] 第 226 维度 survivor_time_bias（幸存时间偏误 / length-time
+    // bias：用存活者生存期的长短差异直接推断干预有效，忽略病程长度偏倚）
+    // 登记。verify 级——单句也可能是正当的医学统计教学与批评（「生存期
+    // 比较要考虑长度偏倚，应改做同期队列」正是本族要教的判别动作）、医学
+    // 课堂案例、对他人错误论证的转述引用。与 r206-r232 同口径只登记 VERIFY。
+    'survivor_time_bias',
     // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
     // confusion of the inverse：P(E|I) 的数值在方向翻转后原样沿用为
     // P(I|E)——「这种病检测阳性的概率是 95%，所以得了这种病检测阳性的
@@ -5550,6 +5576,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r249] 第 224 维度 denominator_swap 补登记（分母替换谬误）。
       // 同上：九处一次接齐。
       denominator_swap: dsw,
+      // [r250] 第 226 维度 survivor_time_bias 补登记（幸存时间偏误）。
+      // 同上：九处一次接齐。
+      survivor_time_bias: stb,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,
@@ -16432,6 +16461,9 @@ module.exports = {
   // [r249] 第 224 维度 denominator_swap 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkDenominatorSwap,
+  // [r250] 第 226 维度 survivor_time_bias 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  checkSurvivorTimeBias,
   // [r249] 第 215 维度 conditional_transposition 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkConditionalTransposition,

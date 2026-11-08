@@ -1,3 +1,105 @@
+## r250 — 第 226 判别维度 `survivor_time_bias`（幸存时间偏误 / length-time bias）
+
+**日期** 2026-11-08  **操作方** cron（心虫全面升级，本地 commit，不推送）
+**轮次性质** 真升级类型 1：新判别维度（dimMap 新键，独立命中新攻击族）。
+
+### 1. 阶段0 基线
+VERSION 6.8.148；维度 225 / 模块 162 / MCP 工具 184 / dispatch 路由 1,316；
+verify 16/16、guard 20/20（维度登记 225 键）、doc 24/24、双向 52/52 召回
+302/326 误拦。
+
+### 2. 阶段1 研究（外部搜索 + 内部路径）
+方向轮换：本轮切「因果与反事实推理」一线的**统计推断偏误族**（r249 上一轮
+为 denominator_swap，同属证据纪律方向，但攻击族不同）。
+- HN Algolia 检索 "length-time bias" / "survival bias"：无高相关 story。
+- Semantic Scholar 检索 "length time bias screening survival"：本轮 API 限流
+  （HTTP 429），按纪律不重试。
+- GitHub 检索 "survival bias statistics"：相关仓库均为生存分析工具包
+  （lifelines/survival analysis 库），与纯规则判别不同构，仅作概念背景。
+结论：外部无成熟纯规则方案可直接复用，转**内部路径**——以既有
+survivorship_bias（132）/ selection_bias（168）/ denominator_swap（224）为
+边界参照，自建纯规则三腿判据（判据为心虫自有实现，不假造论文集成）。
+
+### 3. 阶段1.5 撞墙检测
+复跑上一轮探针 scripts/round-249/probe-gap-r249.js（19 条候选）：本族中英
+双语 2/2 全漏判（零维度命中、gate.action=pass）——确认非完工目标，有真实
+漏判。缺口实证脚本：scripts/round-250/probe-gap-r250.js。
+
+### 4. 阶段2 心虫裁决门禁
+heartflow_philosophy_decision：**type=accelerate**（confidence 0.7 / priority 40 /
+trigger optimal_conditions / goalReviewed true）。rationale 中 cognitiveLoad 与
+uncertainty 均为字符串 "unknown"（引擎把未测到当很低），按轮次纪律不当实质
+背书，如实记录。
+
+### 5. 阶段3 实现
+新增 src/survivor-time-bias.js（310 行）：`checkSurvivorTimeBias(text, inject)` +
+`__internals`（12 个可注入常量）。**三腿共现，缺一不判**：
+- 腿① SURVIVAL_TIME 生存期语义（中英）：活了X年/平均存活/生存期/中位生存/
+  多活了（裸名词「生存期」「存活时间」不带数字也命中，r161 教训落地；时间量
+  支持中文数字、阿拉伯数字与英文词数 four/ten，允许「整整/足足/上下/约」修饰
+  插入）/ lived N years / survival period / median survival。
+- 腿② EFFICACY_VERDICT 疗效结论（中英）：有效/能延命/延长生命/救了命/疗效
+  确凿（裸「延命」「疗效+形容词」必收）/ the drug works / extends life /
+  effective。
+- 腿③ TIME_CONTRAST 时间对置（中英）：两组时间量对置（五年 vs 一年）、
+  while/whereas/versus、比…多活了X、治疗组长于对照组、longer survival、
+  the others only N，以及**隐含对置**（「多活了X年/延长了X年」本身即相对
+  自然病程的差量表述）。裸「活了五年」无差量无对置归 unsupported_claim
+  （中性事实陈述），不进本维度。
+
+与既有维度边界：survivorship_bias（132）管只统计存活者样本；selection_bias
+（168）管受限样本→总体推广；denominator_swap（224）管不同分母的绝对计数
+比较；本族比较的是**时间长度**而非计数，且两组数据都可场，错在「生存期
+长短→疗效」忽略病程长度偏倚。
+
+三类豁免（负例注入逐常量验证承重）：随机对照/同期队列设计在场
+（随机对照/RCT/倾向评分/Kaplan-Meier/Cox 模型/stratified）；指出偏倚的元
+陈述（长度偏倚/病程偏倚/生存期不可比/length-time bias/lead-time bias/
+immortal time bias）；生存率/死亡率比率口径在场（五年生存率/survival
+rate/mortality rate——比率比较不是生存期比较）。
+
+src/index.js 七处接线：require / 计算点（stb）/ allDims / dimMap /
+VERIFY_DIMS / dimensions 补登记 / module.exports 导出。登记为 VERIFY 级——
+单句也可能是正当的医学统计教学与批评、课堂案例、对他人错误论证的转述
+引用，verify 含义是「这个生存期比较可能有病程长度偏倚，需回到随机分组/
+病程结构匹配再比」。
+
+### 6. 阶段4 验证（五门禁全绿 + 变体矩阵实测）
+- node --check src/survivor-time-bias.js + src/index.js：SYNTAX_OK
+- bin/verify.js：**16 passed / 0 failed**
+- scripts/guard-abilities.js：**20/20**（维度登记 226 键）
+- test/doc-numbers-accuracy.test.js：**24 通过 / 0 失败**（首次跑 15/24 失败，
+  根因维度 225→226 与 VERIFY 182→183 三处文档未同步；同步 AGENTS.md/README.md/
+  SKILL.md 后全绿）
+- scripts/bidirectional-guard.js：召回 **52/52** 不降、误拦 **302/326** 不升
+  （92.6%，与基线一致）
+- 单测 test/survivor-time-bias.test.js：**55 passed / 0 failed**（攻击 16 含中英/
+  裸名词/带修饰/倒装/长句、良性 13 零误伤含正确多因陈述、负例注入 12 常量、
+  边界 6 项、gate 端到端 6 项）
+- 变体矩阵（scripts/round-250/probe-gap-r250.js 实测）：攻击侧 16/16 非 pass
+  且全部带 `[stb] survivor_time_bias` 承重；良性侧 13/13 全 pass。
+  同族变体覆盖：教科书原型（中/EN）、裸名词「生存期」「longer survival
+  period」、带修饰「多活了三年」「survived 3 years longer」、倒装
+  「疗效是确凿的——…多活了整整四年」、长句（>60 字双语）、救命型疗效
+  结论、中位生存期、安慰剂组措辞。良性边缘样本含：正确多因陈述、元陈述
+  破除本谬误、随机对照在场、比率口径在场、纯生存期事实陈述（无疗效
+  结论）、明确说生存期不可比。
+
+### 7. 阶段5-6 版本 + 提交
+VERSION 6.8.148→6.8.149（sync-version.js 同步 package.json/SKILL.md/
+version.js 兜底/heartflow.js BUILD_DATE）。CHANGELOG.md 追加 6.8.149 条目。
+本地 commit（不推送）。
+
+### 8. 已知边界 / 下轮可继续
+- gate 层良性样本「随机对照试验中治疗组五年生存率显著更高，支持药物有效」
+  被既有维度 collider_bias（第 209 维）误报 verify——长期噪声，非本维度
+  引入（本维度单测层 13/13 对该样本正确放行，已实证）。
+- 中文腿未覆盖「带病生存期/无进展生存期时长」这类 oncology 专名（PFS/DFS
+  以英文缩写出现），下轮可补 PFS/DFS 缩写腿。
+- 时间量未覆盖复合单位（「一年零三个月」），按整句语义仍可被生存期裸名词
+  腿兜住。
+- monocause（161）与 monocausal_attribution（214）去重合并是独立议题，
+  仍留给专门轮次，本轮未顺手改。
 ## r227 — 全面升级审计 + 本地独有产能补提交轮（未产新维度，真升级类型 0）
 **日期** 2026-11-06  **操作方** agent-4（美国 IP 海外产能单元）
 **轮次性质** 审计 + 修复 + 本地独有产能固化。本轮不产新判别维度，VERSION 6.8.145 保持（见下）。

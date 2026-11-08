@@ -1,3 +1,15 @@
+## [6.8.149] - 2026-11-08
+
+### Added — 第 226 判别维度 `survivor_time_bias`「幸存时间偏误 / length-time bias」（r250，真升级类型 1：新判别维度）
+- 新增 src/survivor-time-bias.js（310 行）：`checkSurvivorTimeBias(text, inject)` + `__internals`（12 个可注入常量）。verify 级。
+- **三腿共现，缺一不判**：腿① SURVIVAL_TIME 生存期语义（中英：活了X年/平均存活/生存期/中位生存/多活了——裸名词「生存期」「存活时间」不带数字也命中，r161 教训落地；时间量支持中文数字、阿拉伯数字与英文词数 four/ten，允许「整整/足足/上下/约」修饰插入；EN lived N years / survival period / median survival）→ 腿② EFFICACY_VERDICT 疗效结论（有效/能延命/延长生命/救了命/疗效确凿——裸「延命」「疗效+形容词」必收；EN the drug works / extends life / effective）→ 腿③ TIME_CONTRAST 时间对置（两组时间量对置 五年 vs 一年、while/whereas/versus、比…多活了X、治疗组长于对照组、longer survival、the others only N，以及隐含对置——「多活了X年/延长了X年」本身即相对自然病程的差量表述）。
+- **攻击原型**：「接受这种疗法的病人平均活了五年，没接受的只活了一年，可见这疗法有效」「Patients who took the drug lived 5 years on average while others lived 1, so the drug works」「治疗组生存期明显长于对照组，说明这个方案能延长生命」「The treatment group had a longer survival period, proving the drug extends life」。
+- **三类豁免负例注入承重**：随机对照/同期队列设计在场（RCT/倾向评分/Kaplan-Meier/Cox 模型/stratified）；指出偏倚的元陈述（长度偏倚/病程偏倚/生存期不可比/length-time bias/lead-time bias/immortal time bias）；生存率/死亡率比率口径在场（五年生存率/survival rate——比率比较不是生存期比较）。
+- **与既有维度边界**：survivorship_bias（132）管只统计存活者样本；selection_bias（168）管受限样本→总体推广；denominator_swap（224）管不同分母的绝对计数比较；本族比较时间长度，且两组数据都可场，错在「生存期长短→疗效」忽略病程长度偏倚。
+- src/index.js 七处接线（require/计算点/allDims/dimMap/VERIFY_DIMS/dimensions 补登记/exports）。维度数 225→226，VERIFY 182→183，AGENTS.md/README.md/SKILL.md 三处数字同步。
+- 来源：外部搜索（HN Algolia / Semantic Scholar 429 限流 / GitHub 生存分析工具包）无成熟纯规则方案，走内部路径以 survivorship_bias/selection_bias/denominator_swap 为边界参照自建判据；缺口实证 scripts/round-249/probe-gap-r249.js（本族中英 2/2 全漏判），r250 复跑确认；decision 本体裁决 accelerate。
+- 验证：单测 55/55、变体矩阵攻击 16/16 非 pass 全承重 + 良性 13/13 pass、verify 16/16、guard 20/20、doc 24/24、双向 52/52 召回 302/326 误拦不升。
+
 ## [6.8.141] - 2026-11-05
 
 ### Fixed — r213 补测修复 3 处常量漏判（collider_bias，变体矩阵教训落地）
