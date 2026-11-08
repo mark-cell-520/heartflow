@@ -64,6 +64,10 @@ const BENIGN = [
   '坚持到最后的用户都给了好评，所以产品没问题',
   '随机分组的用药组存活率更高，说明药有效',
   'In the randomized trial the treatment group survived more often, so the drug works',
+  // 指派进入（非自选——统一安排/被要求/assigned，归豁免 B）
+  '公司安排参加培训的学员成绩都更好，说明培训有效',
+  '被要求使用新工具的团队交付更快，所以新工具提高了效率',
+  'The workers assigned to the program performed better, so the program works',
 ];
 
 function run(label, list) {

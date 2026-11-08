@@ -74,9 +74,10 @@
  *     （邻接句「随机分组的用药组存活率更高」实测由其代拦）。
  *
  * 判据（双腿链 + 邻近窗 + 两组豁免，缺一不判）：
- *   ① 腿① SELF 自选进入陈述——六族任一（详见下方常量）：
- *     自愿/主动+进入动词、报名/申请+人群名词、被动吸引来的、
- *     「自己」+进入动词、EN who volunteered/chose/opted in/signed up/
+ *   ① 腿① SELF 自选进入陈述——七族任一（详见下方常量）：
+ *     自愿/主动+进入动词、裸自选动词+人群名词、报名/申请+人群名词、
+ *     被动吸引来的、「自己」+进入动词、慕名/主动上门、来+目的+
+ *     人群名词、EN who volunteered/chose/opted in/signed up/
  *     selected/sought/picked、EN 主语+自选动词；
  *   ② 腿② CAUSE 效果归因结论——三族任一：
  *     E1a 推断标记+因果动词（能/让/使/导致/带来/促进/提升/改善/
@@ -124,20 +125,32 @@
 // S1 自愿/主动/自发/自行 + 进入动词
 const SELF_VOLUNTARY_ZH = [
   /(?:自愿|主动|自发|自行|自愿报名|主动请缨)[^。，！？；\n]{0,14}(?:参加|报名|加入|参与|选择|选用|使用|订阅|购买|申请|投入|投身|接龙|请缨|走[上到])/,
-  // S1b 裸自选动词 + 的 + 人群名词（「选择使用新工具的团队」「参加早鸟计划的商家」
-  // 「订阅了newsletter的读者」「用我们App的用户」——自行选择进入本身即自选机制）
-  /(?:选择|选用|采用|采纳|参加|加入|购买|订阅|购入|使用|用|用了)[^。，！？；\n]{0,14}的(?:人群|用户|客户|团队|企业|商家|学员|学生|读者|成员|家庭|患者|公司|人|选手|程序员|家长|观众|买家|顾客|开发者|患者|病人|学员|粉丝)/,
-  // S2 报名/申请 + 人群名词（报名本身就是自选动作）
+];
+// S1b 裸自选动词 + 的 + 人群名词（「选择使用新工具的团队」「参加早鸟计划的商家」
+// 「订阅了newsletter的读者」「用我们App的用户」——自行选择进入本身即自选机制）
+const SELF_BARE_ZH = [
+  /(?:选择|选用|采用|采纳|参加|加入|购买|订阅|购入|使用|用|用了)[^。，！？；\n]{0,14}的(?:人群|用户|客户|团队|企业|商家|学员|学生|读者|成员|家庭|患者|公司|人|选手|程序员|家长|观众|买家|顾客|开发者|病人|粉丝|员工)/,
+];
+// S2 报名/申请 + 人群名词（报名本身就是自选动作）
+const SELF_APPLY_ZH = [
   /(?:报名|报班|报了名|申请|投递了申请|递交申请|应聘|投了简历|走了后门|托关系)[^。，！？；\n]{0,16}(?:的|者|过来)?[^。，！？；\n]{0,4}(?:人|学员|学生|员工|客户|用户|商家|家庭|孩子|读者|患者|成员|选手|程序员|企业|公司|团队|同学|观众|粉丝|家长|病人|顾客|买家)/,
-  // S3 被动吸引来的（被广告/口碑吸引来 = 自选进入漏斗）
+];
+// S3 被动吸引来的（被广告/口碑吸引来 = 自选进入漏斗）
+const SELF_ATTRACT_ZH = [
   /(?:被|受)[^。，！？；\n]{0,16}(?:吸引|打动|说动|安利|推荐|种草|忽悠|广告)[^。，！？；\n]{0,6}(?:来|过来|来的)/,
-  // S4 「自己」+ 进入动词（主语自选动作句）
+];
+// S4 「自己」+ 进入动词（主语自选动作句）
+const SELF_ONESELF_ZH = [
   /(?:用户|客户|读者|学生|员工|患者|家长|观众|买家|成员|大家|人们|他们)[^。，！？；\n]{0,6}自己[^。，！？；\n]{0,6}(?:报名|选择|勾选|订阅|购买|加入|申请|找来|找上门|决定|选用)/,
   /自己[^。，！？；\n]{0,4}(?:报名|选择|勾选|订阅|购买|加入|申请|找来|找上门|选用|接龙)/,
-  // S5 慕名/主动上门
+];
+// S5 慕名/主动上门
+const SELF_ACTIVE_ZH = [
   /(?:慕名|主动|自己|纷纷)[^。，！？；\n]{0,4}(?:找来|找上门|上门|涌来|加入|报名|参与|购买)/,
-  // S6 来 + 目的 + 的 + 人群名词（「来我们医院看病的患者」——自行前来）
-  /来[^。，！？；\n]{0,12}(?:看病|就诊|咨询|报名|参加|购买|使用|学习|上课|咨询)[^。，！？；\n]{0,2}的(?:人群|用户|客户|团队|企业|商家|学员|学生|读者|成员|家庭|患者|公司|人|选手|程序员|家长|观众|买家|顾客|病人)/,
+];
+// S6 来 + 目的 + 的 + 人群名词（「来我们医院看病的患者」——自行前来）
+const SELF_COME_ZH = [
+  /来[^。，！？；\n]{0,12}(?:看病|就诊|咨询|报名|参加|购买|使用|学习|上课)[^。，！？；\n]{0,2}的(?:人群|用户|客户|团队|企业|商家|学员|学生|读者|成员|家庭|患者|公司|人|选手|程序员|家长|观众|买家|顾客|病人)/,
 ];
 
 // EN：who/that + 自选动词；主语 + 自选动词
@@ -194,8 +207,8 @@ const CONCEPT_ZH = /(?:自选择偏差|自我选择偏差|自选择效应|选择
 const CONCEPT_EN = /\b(?:self[-\s]?selection\s+bias|volunteer\s+bias|selection\s+bias|selection\s+effect|endogeneity|endogenous|self[-\s]?selection\s+problem|self[-\s]?selection\s+effect|causal\s+inference|econometrics|statistics\s+(?:textbook|course|class)|textbook|lecture|paper|study\s+found|research\s+shows|selection\s+rather\s+than)\b/i;
 
 // ─── 豁免 B：正确因果口径（对照组/随机化/明言选择效应）─────────────
-const CORRECTIVE_ZH = /(?:随机分组|随机分配|随机对照|随机实验|随机分流|随机化|对照组|控制组|对比组|对照实验|控制实验|双重差分|倾向得分|匹配方法|需要对比|需要对照|加以对照|横向对比|对比才能|才能归因|不能归因|不能就此|不能直接归因|不足以说明|说明不了|证明不了|不等于|相关不等于因果|可能只是|可能恰恰|未必|未必是|不能推出|推不出|混淆|混交|混杂因素|自选择|选择偏误|选择偏差|基线差异|组间差异|本来就|事前差异|差异在先|先有差异|需要验证|再做实验|重新设计|改进实验)/;
-const CORRECTIVE_EN = /\b(?:randomi[sz]ed|randomly\s+assigned|random\s+assignment|control\s+group|comparison\s+group|treatment\s+group\s+and\s+control|need\s+a\s+controlled|cannot\s+conclude|can'?t\s+conclude|not\s+necessarily|may\s+reflect|could\s+reflect|might\s+reflect|selection\s+rather\s+than|confounded|confounding|self[-\s]?selection|pre[-\s]?existing\s+difference|baseline\s+difference|groups\s+differed\s+before|before\s+the\s+treatment|not\s+causal|does\s+not\s+establish|fails\s+to\s+establish|need\s+an?\s+experiment|rerun\s+with|redo\s+with|matched\s+groups|propensity)/i;
+const CORRECTIVE_ZH = /(?:随机分组|随机分配|随机对照|随机实验|随机分流|随机化|对照组|控制组|对比组|对照实验|控制实验|双重差分|倾向得分|匹配方法|需要对比|需要对照|加以对照|横向对比|对比才能|才能归因|不能归因|不能就此|不能直接归因|不足以说明|说明不了|证明不了|不等于|相关不等于因果|可能只是|可能恰恰|未必|未必是|不能推出|推不出|混淆|混交|混杂因素|自选择|选择偏误|选择偏差|基线差异|组间差异|本来就|事前差异|差异在先|先有差异|需要验证|再做实验|重新设计|改进实验|统一安排|公司安排|组织安排|安排参加|安排这批|被安排|被要求|被指定|被分配|被选派|被纳入|强制|指派|指定参加|抽调|奉命|抽签|摇号)/;
+const CORRECTIVE_EN = /\b(?:randomi[sz]ed|randomly\s+assigned|random\s+assignment|control\s+group|comparison\s+group|treatment\s+group\s+and\s+control|need\s+a\s+controlled|cannot\s+conclude|can'?t\s+conclude|not\s+necessarily|may\s+reflect|could\s+reflect|might\s+reflect|selection\s+rather\s+than|confounded|confounding|self[-\s]?selection|pre[-\s]?existing\s+difference|baseline\s+difference|groups\s+differed\s+before|before\s+the\s+treatment|not\s+causal|does\s+not\s+establish|fails\s+to\s+establish|need\s+an?\s+experiment|rerun\s+with|redo\s+with|matched\s+groups|propensity|assigned|mandated|required\s+to|were\s+assigned|assigned\s+to|compulsory|mandatory)\b/i;
 
 // 工具 ─────────────────────────────────────────────────────────
 function allMatches(re, text) {
@@ -280,6 +293,12 @@ function findSignatures(text, R) {
     {
       self: [
         ...(R.SELF_VOLUNTARY_ZH || SELF_VOLUNTARY_ZH),
+        ...(R.SELF_BARE_ZH || SELF_BARE_ZH),
+        ...(R.SELF_APPLY_ZH || SELF_APPLY_ZH),
+        ...(R.SELF_ATTRACT_ZH || SELF_ATTRACT_ZH),
+        ...(R.SELF_ONESELF_ZH || SELF_ONESELF_ZH),
+        ...(R.SELF_ACTIVE_ZH || SELF_ACTIVE_ZH),
+        ...(R.SELF_COME_ZH || SELF_COME_ZH),
       ],
       cause: [
         ...(R.CAUSE_CMP_ZH || CAUSE_CMP_ZH),
@@ -385,7 +404,7 @@ function detectSelfSelectionBias(text, inject) {
 module.exports = {
   detectSelfSelectionBias,
   __internals: () => ({
-    SELF_VOLUNTARY_ZH, SELF_EN,
+    SELF_VOLUNTARY_ZH, SELF_BARE_ZH, SELF_APPLY_ZH, SELF_ATTRACT_ZH, SELF_ONESELF_ZH, SELF_ACTIVE_ZH, SELF_COME_ZH, SELF_EN,
     CAUSE_CMP_ZH, CAUSE_TREAT_ZH, CAUSE_SUPER_ZH, CAUSE_EN,
     SOLO_ZH, SOLO_EN,
     INFER_ZH, INFER_EN, W_ZH, W_EN,

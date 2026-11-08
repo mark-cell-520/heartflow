@@ -1,7 +1,11 @@
 const path = require('path');
 const m = require(path.join(__dirname, '..', '..', '..', 'src', 'self-selection-bias.js'));
 const I = m.__internals();
-I.SELF_VOLUNTARY_ZH.forEach((re, i) => { const x = re.exec('来我们医院看病的患者术后恢复都不错，说明我们医术好'); if (x) console.log('SELF[' + i + ']:', x[0]); });
-console.log('E2b on tail:', I.CAUSE_SUPER_ZH[0].exec('说明我们医术好'));
-console.log('E2b on tail2:', I.CAUSE_SUPER_ZH[0].exec('说明我们医术好'.slice(0)) && 'x');
-console.log('S6 direct:', I.SELF_VOLUNTARY_ZH[7] && I.SELF_VOLUNTARY_ZH[7].exec('来我们医院看病的患者术后恢复都不错'));
+const t = '公司统一安排这批员工参加培训，他们的绩效都更好，说明培训有效';
+console.log('BARE:', I.SELF_BARE_ZH[0].exec(t));
+console.log('APPLY:', I.SELF_APPLY_ZH[0].exec(t));
+console.log('CMP:', I.CAUSE_CMP_ZH[0].exec(t));
+console.log('TREAT:', I.CAUSE_TREAT_ZH[0].exec(t));
+console.log('CONCEPT_ZH:', I.CONCEPT_ZH.test(t));
+console.log('CORRECTIVE_ZH:', I.CORRECTIVE_ZH.test(t));
+console.log('detect:', m.detectSelfSelectionBias(t).hit);
