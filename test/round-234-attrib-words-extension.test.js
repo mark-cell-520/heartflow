@@ -269,8 +269,12 @@ test('D1 变异守卫一：摘掉「总之」分支后 14 条应回落到 2 条�
   const tmp = copySrc('dropzongzhi');
   try {
     mutateOf(path.join(tmp, 'src', 'index.js'), '|总之[，,]?(?:是)?(?:因为|由于)', '');
-    assert.strictEqual(countHitsIn(tmp, ATTACK_ZONGZHI), 2,
-      '摘掉总之分支后攻击句未回落到 2（说明该分支不承重）');
+    // [v6.8.172 第 244 轮] 期望 2 → 3：r244 新增的事件锚定新支（索引 15）独立承重
+    // 1 条——「换了这个头像之后咨询也变多了，总之是因为头像带来了好运」的甲半是
+    // 玄学动作、结果侧是白话变动词，摘掉 PC_ATTRIB_ZH 的「总之」分支后仍由新支判出。
+    // 「总之」分支对其余 11 条仍承重（14 → 3 即证明）。
+    assert.strictEqual(countHitsIn(tmp, ATTACK_ZONGZHI), 3,
+      '摘掉总之分支后攻击句未回落到 3（说明该分支不承重）');
     assert.strictEqual(countHitsIn(tmp, ATTACK_WANGCAI), ATTACK_WANGCAI.length, '摘掉总之分支后旺财族塌陷');
     assert.strictEqual(countHitsIn(tmp, ATTACK_RELAY), ATTACK_RELAY.length, '摘掉总之分支后转述族塌陷');
     assert.strictEqual(countHitsIn(tmp, ALL_BENIGN), 0, '摘掉总之分支后良性被误命中');

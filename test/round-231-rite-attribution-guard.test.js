@@ -410,6 +410,12 @@ test('D1 变异守卫一：摘掉整个甲半表 PC_RITE_ZH 后 18 条新族独�
   try {
     const src = path.join(tmp, 'src', 'index.js');
     mutateLine(src, ANCHOR_RITE, () => 'const PC_RITE_ZH = /(?!x)x/;');
+    // [v6.8.172 第 244 轮] 同时中和 r244 新增的事件锚定新支（数组索引 15）——它的
+    // 甲半表 PC_EVENT_ACT_ZH 收了同一批仪式动词（开光/上香/拜佛/求签…），「去庙里
+    // 给这个手链开光后，业绩就上去了」摘掉 PC_RITE_ZH 后仍能被新支判出。不摘它，
+    // D1 证明的就不是仪式族甲半表承重（r244 轮初实测：不摘时 18 条里 1 条仍命中）。
+    mutateLine(src, "  new RegExp(PC_EVENT_ACT_ZH.source + '[^.。]{0,24}' + PC_SEQ_ZH.source + '[^.。]{0,14}' + PC_RES_COLLOQ_ZH.source),",
+      () => '  /(?!x)x/,');
     assert.strictEqual(countHitsIn(tmp, ATTACK_NEW_ONLY), 0, '摘掉甲半表后新族独有攻击句仍命中');
     // 3 条 HEAD 就由存量判据（⑭ 支摆件 / ⑩ 支拜）覆盖的句子不受本轮变异影响
     assert.strictEqual(countHitsIn(tmp, ATTACK_LEGACY_COVERED), ATTACK_LEGACY_COVERED.length,

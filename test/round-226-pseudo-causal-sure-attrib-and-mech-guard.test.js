@@ -384,6 +384,13 @@ test(`D1 变异守卫一：摘掉「(?:肯定|一定)…」族后 ${ATTRIB_FAMIL
     mutated = mutated.replace(ANCHOR_IV_CALL, ANCHOR_IV_STUB);
     assert.notStrictEqual(mutated, orig, '变异未生效（归因族摘除失败）');
     assert.ok(!mutated.includes(ANCHOR_IV_CALL) && mutated.includes(ANCHOR_IV_STUB), '变异后仍在调用倒装服药子判据');
+    // [v6.8.172 第 244 轮] 同时中和 r244 新增的事件锚定新支（数组索引 15）——
+    // 「换了这个头像之后订单就多了，肯定是头像招财」的甲半是玄学动作、结果侧是
+    // 白话变动词，不经过 PC_ATTRIB_ZH 归因族也能被新支判出。不摘它，D1 就从
+    // 「证明归因族承重」退化成假绿（r244 轮初实测：不摘时 26 条里 1 条仍命中）。
+    const ANCHOR_R244_LEG = "  new RegExp(PC_EVENT_ACT_ZH.source + '[^.。]{0,24}' + PC_SEQ_ZH.source + '[^.。]{0,14}' + PC_RES_COLLOQ_ZH.source),";
+    assert.ok(mutated.includes(ANCHOR_R244_LEG), '副本中找不到 r244 事件锚定新支');
+    mutated = mutated.replace(ANCHOR_R244_LEG, '  /(?!x)x/,');
     fs.writeFileSync(src, mutated, 'utf8');
     const dropped = countHitsIn(tmp, ATTRIB_FAMILY_ONLY);
     assert.strictEqual(dropped, 0, `摘掉归因族后 ATTRIB_FAMILY_ONLY ${ATTRIB_FAMILY_ONLY.length} 条仍有 ${dropped} 条命中，该扩面可能不承重`);
