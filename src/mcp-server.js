@@ -2987,9 +2987,15 @@ function handleBridgeAnalyze(args) {
   const { input } = args;
   if (!input) throw new Error('input is required');
   try {
-    const { ToneAnalyzer } = require('./bridge/tone-analyzer.js');  
-    const { ConfidenceAnnotator } = require('./bridge/confidence-annotator.js');  
-    const { ImplicitNeedDetector } = require('./bridge/implicit-need-detector.js');  
+    const { ToneAnalyzer } = require('./bridge/tone-analyzer.js');
+    const { ConfidenceAnnotator } = require('./bridge/confidence-annotator.js');
+    const { ImplicitNeedDetector } = require('./bridge/implicit-need-detector.js');
+    // [r249] StanceDetector / ConflictResolver 两个标识符此前**从未被 require**，
+    // 本 handler 一进门就抛 ReferenceError —— 实测 heartflow_bridge_analyze
+    // 100% 返回 {"error":"StanceDetector is not defined"}（scripts/tmp-249-probe2.js），
+    // 该 MCP 工具自接线起就是死的。src/bridge/ 下原本也没有这两个文件，本轮新建。
+    const { StanceDetector } = require('./bridge/stance-detector.js');
+    const { ConflictResolver } = require('./bridge/conflict-resolver.js');
     const tone = new ToneAnalyzer().analyze(input, {});
     const stance = new StanceDetector().detect(input, {});
     const annot = new ConfidenceAnnotator().annotate(input);
@@ -2999,6 +3005,28 @@ function handleBridgeAnalyze(args) {
   } catch (e) {
     return { input, error: e.message };
   }
+}
+
+
+// [r249] 交流简报 handler：走引擎常驻实例的 dispatch，不在 handler 里 new——
+// 与 r589/r590 记的「刻意走引擎常驻实例」纪律一致（translator 子模块带状态，
+// 每次 new 会丢掉已构建的依赖注入）。
+function handleCommunicationBrief(args) {
+  const { input } = args || {};
+  if (!input) throw new Error('input 是必填参数');
+  const brief = safeDispatch('translator.communicationBrief', input, (args && args.context) || {});
+  // 引擎未启动 / 路由缺失时 safeDispatch 返回 { error }，原样透出不伪装成简报
+  if (brief && brief.error && brief.ok === undefined) return brief;
+  return {
+    input,
+    brief,
+    topMove: (brief && brief.topMove) || null,
+    moves: (brief && brief.moves) || [],
+    riskFlags: (brief && brief.riskFlags) || [],
+    questions: (brief && brief.questions) || [],
+    confidence: brief ? brief.confidence : null,
+    checkedBy: (brief && brief.checkedBy) || [],
+  };
 }
 
 
@@ -3304,6 +3332,9 @@ const HANDLERS = {
 
 
   heartflow_bridge_analyze: handleBridgeAnalyze,
+
+  // [r249] 交流简报：引擎 translator.communicationBrief（本轮新增公开方法）
+  heartflow_communication_brief: handleCommunicationBrief,
 
   heartflow_think: handleThink,
 

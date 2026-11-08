@@ -313,6 +313,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_communication_brief',
+    description: "交流简报：语气四维（urgency/emotion/formality/intensity）+ 隐性需求八类 → 合成可执行的回应动作序列、建议追问与风险旗标。[r249] 新增，走引擎 dispatch('translator.communicationBrief')",
+    inputSchema: {"type":"object","properties":{"input":{"type":"string"},"context":{"type":"object"}},"required":["input"]}
+  },
+
+  {
     name: 'heartflow_cross_analyze',
     description: "交叉分析：对辨别结果执行跨维度交叉分析。",
     inputSchema: {"type":"object","properties":{"discResult":{"type":"object"}},"required":["discResult"]}

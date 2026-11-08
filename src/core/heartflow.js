@@ -649,11 +649,19 @@ const _FocusOfAttention = _lazy('focusOfAttention', () => require('../memory/foc
 
 // [v5.9.19] Stub for deleted bridge modules — graceful degradation
 
-const _ToneAnalyzer = _lazy('toneAnalyzer', () => ({ ToneAnalyzer: class { constructor() {} analyze() { return { tone: 'neutral', confidence: 0 }; } } }));
+// [r249] 语气分析器复活：v5.9.19 的注释说 bridge 模块「已删除」，但
+// src/bridge/tone-analyzer.js（12037 字节，7 情绪 × 4 维度）一直在仓库里，
+// 从未被任何路径 require。此处 stub 让 dispatch('translator.toneAnalyzer')
+// 恒返回 {tone:'neutral',confidence:0}——本轮实测三条输入全是这一个值
+// （scripts/tmp-249-probe.js）。改成真加载，require 失败才回退 stub。
+const _ToneAnalyzer = _lazy('toneAnalyzer', () => { try { return require('../bridge/tone-analyzer.js'); } catch(e) { return { ToneAnalyzer: class { constructor() {} analyze() { return { tone: 'neutral', confidence: 0 }; } } }; } });
 
 const _EntityExtractor = _lazy('entityExtractor', () => ({ EntityExtractor: class { constructor() {} extract() { return []; } } }));
 
-const _ImplicitNeedDetector = _lazy('implicitNeedDetector', () => ({ ImplicitNeedDetector: class { constructor() {} detect() { return []; } } }));
+// [r249] 隐性需求检测器复活：同 toneAnalyzer——src/bridge/implicit-need-detector.js
+// （5513 字节，8 类需求）一直在仓库里但从未被 require，此处 stub 让
+// dispatch('translator.implicitNeedDetector') 恒返回 []（本轮实测三条输入全空）。
+const _ImplicitNeedDetector = _lazy('implicitNeedDetector', () => { try { return require('../bridge/implicit-need-detector.js'); } catch(e) { return { ImplicitNeedDetector: class { constructor() {} detect() { return []; } } }; } });
 
 const _ResponseCompressor = _lazy('responseCompressor', () => ({ ResponseCompressor: class { constructor() {} compress() { return ''; } } }));
 
@@ -665,7 +673,10 @@ const _QualityFilter = _lazy('qualityFilter', () => ({ QualityFilter: class { co
 
 const _FollowupSuggester = _lazy('followupSuggester', () => ({ FollowupSuggester: class { constructor() {} suggest() { return []; } } }));
 
-const _ConflictResolver = _lazy('conflictResolver', () => ({ ConflictResolver: class { constructor() {} resolve() { return {}; } } }));
+// [r249] 冲突消解器接入真实实现（src/bridge/conflict-resolver.js，本轮新建）。
+// 原 stub 的 resolve() 恒返回 {}；且 src/mcp-server.js 的 handleBridgeAnalyze
+// 里 `new ConflictResolver()` 同为未定义标识符（同 StanceDetector）。
+const _ConflictResolver = _lazy('conflictResolver', () => { try { return require('../bridge/conflict-resolver.js'); } catch(e) { return { ConflictResolver: class { constructor() {} resolve() { return { conflict: null, severity: 0, conflicts: [] }; } } }; } });
 
 const _UncertaintyHandler = _lazy('uncertaintyHandler', () => ({ UncertaintyHandler: class { constructor() {} handle() { return {}; } } }));
 
@@ -673,13 +684,37 @@ const _BridgeIdentity = _lazy('bridgeIdentity', () => ({ BridgeIdentity: class {
 
 const _JudgmentInjector = _lazy('judgmentInjector', () => ({ JudgmentInjector: class { constructor() {} inject() { return {}; } } }));
 
-const _StanceDetector = _lazy('stanceDetector', () => ({ StanceDetector: class { constructor() {} detect() { return { stance: 'neutral' }; } } }));
+// [r249] 立场检测器接入真实实现（src/bridge/stance-detector.js，本轮新建）。
+// 原 stub 的 detect() 恒返回 {stance:'neutral'}；且 src/mcp-server.js 的
+// handleBridgeAnalyze 里 `new StanceDetector()` 是**未定义标识符**——该文件
+// 从未 require 它，heartflow_bridge_analyze 100% 返回
+// {"error":"StanceDetector is not defined"}（scripts/tmp-249-probe2.js 实测）。
+const _StanceDetector = _lazy('stanceDetector', () => { try { return require('../bridge/stance-detector.js'); } catch(e) { return { StanceDetector: class { constructor() {} detect() { return { stance: 'neutral' }; } } }; } });
 
-const _ValueAligner = _lazy('valueAligner', () => ({ ValueAligner: class { constructor() {} align() { return {}; } } }));
+// [r249] 价值对齐核查器接入真实实现（src/bridge/value-aligner.js，本轮新建）。
+// **修的是一个真崩溃**：personaCore 初始化写 `va.check(ctx)`，而原 stub 只有
+// `align()` —— dispatch('personaCore.valueAligner') 抛
+// `TypeError: va.check is not a function`（scripts/tmp-249-probe.js 实测），
+// MCP heartflow_agent_think 的这项能力从接线起就没通过。
+const _ValueAligner = _lazy('valueAligner', () => { try { return require('../bridge/value-aligner.js'); } catch(e) { return { ValueAligner: class { constructor() {} check() { return { aligned: null, score: null, violations: [], guidance: 'value-aligner 未加载', source: null }; } } }; } });
 
 const _PersonalityTone = _lazy('personalityTone', () => ({ PersonalityTone: class { constructor() {} apply() { return ''; } } }));
 
-const _MetaPosition = _lazy('metaPosition', () => ({ MetaPosition: class { constructor() {} get() { return {}; } } }));
+// [r249] 元位置声明器接入真实实现（src/bridge/meta-position.js，本轮新建）。
+// **修的也是真崩溃**：personaCore 初始化写 `mp.getDeclaration()`，而原 stub 只有
+// `get()` —— dispatch('personaCore.metaPosition') 抛
+// `TypeError: mp.getDeclaration is not a function`（scripts/tmp-249-probe.js 实测）。
+// 真实实现用构造时注入的探针现场数维度（210），不硬编码数字。
+const _MetaPosition = _lazy('metaPosition', () => { try { return require('../bridge/meta-position.js'); } catch(e) { return { MetaPosition: class { constructor() {} getDeclaration() { return { role: 'discriminator', layer: 1, declaration: '心虫是 AGI 第 1 层的辨别引擎', measured: { dimensions: null } }; } } }; } });
+
+// [r249] 交流简报合成器（src/bridge/communication-brief.js，本轮新建）：
+// 把复活后的 toneAnalyzer + implicitNeedDetector 合成「这一句该怎么回」的
+// 动作序列。是 translator 子系统新增的公开方法（MCP 工具
+// heartflow_communication_brief 走它）。
+// [r249] 辨别器入口（gate.js 的 discriminate）：供 MetaPosition 现场数维度用。
+const _discriminate = _lazy('discriminate', () => { try { return require('../gate.js').discriminate; } catch(e) { return () => null; } });
+
+const _CommunicationBrief = _lazy('communicationBrief', () => { try { return require('../bridge/communication-brief.js'); } catch(e) { return { CommunicationBrief: class { constructor() {} build(input) { return { ok: false, error: 'communication-brief 未加载: ' + (e && e.message), brief: null }; } } }; } });
 
 const _CodeSelfDebug = _lazy('codeSelfDebug', () => ({ CodeSelfDebug: class { constructor() {} analyze() { return []; } suggestFix() { return ''; } refine() { return ''; } debug() { return {}; } getHistory() { return []; } reset() {} } }));
 
@@ -792,7 +827,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-08-6.8.176';
+const BUILD_DATE = '2026-11-08-6.8.177';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -3218,6 +3253,9 @@ class HeartFlow {
 
       const ca = _ConfidenceAnnotator().confidenceAnnotator;
 
+      // [r249] 交流简报合成器：吃上面两个刚复活的子模块，产出动作序列。
+      const cbf = new (_CommunicationBrief().CommunicationBrief)({ toneAnalyzer: ta, needDetector: ind });
+
       this.translator = {
 
         userToLLM: (input, ctx) => utl.translate(input, ctx),
@@ -3236,13 +3274,16 @@ class HeartFlow {
 
         confidenceAnnotator: (translation, source) => ca.annotate(translation, source),
 
+        // [r249] 新增公开方法：语气四维 + 隐性需求八类 → 可执行回应简报。
+        communicationBrief: (input, ctx) => cbf.build(input, ctx),
+
         // 保留子模块引用
 
         _userToLLM: utl, _llmToUser: ltu, _intentClassifier: ic,
 
         _toneAnalyzer: ta, _entityExtractor: ee, _implicitNeedDetector: ind,
 
-        _responseCompressor: rc, _confidenceAnnotator: ca,
+        _responseCompressor: rc, _confidenceAnnotator: ca, _communicationBrief: cbf,
 
       };
 
@@ -3308,7 +3349,18 @@ class HeartFlow {
 
       const pt = new (_PersonalityTone().PersonalityTone)();
 
-      const mp = new (_MetaPosition().MetaPosition)();
+      // [r249] 注入现场探针：MetaPosition 声明里的维度数由 discriminate() 实跑
+      // 数 dimensions 键得到（当前实测 210），不硬编码——诚实数字原则 #5。
+      // 探针失败时 getDeclaration() 把该字段置 null 并记 probeError。
+      const mp = new (_MetaPosition().MetaPosition)({
+        version: _VERSION().VERSION,
+        probeDimensions: () => {
+          try {
+            const d = _discriminate()('meta-position self probe');
+            return d && d.dimensions ? Object.keys(d.dimensions).length : null;
+          } catch (e) { return null; }
+        },
+      });
 
       this.personaCore = {
 

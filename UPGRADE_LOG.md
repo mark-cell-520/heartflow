@@ -1,3 +1,107 @@
+## r249 — bridge 交流层能力复活 + 四个真缺陷修复（v6.8.177）：两个 stub 挡住 17550 字节死代码、两个 personaCore 路由 TypeError、heartflow_bridge_analyze 100% 崩溃
+
+**轮次**：r249 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复 + 新公开方法接入（交接簿 r247 notes 候选池①「src/core/heartflow.js 两个 stub 挡实现 + 两个方法名失配」）
+**真升级类型**：缺陷修复（4 个，全部实测确认）+ 死代码复活（17550 字节）+ 新公开方法 `translator.communicationBrief` + MCP 工具 `heartflow_communication_brief`（AGENTS.md 约定 3 三处接线）。MCP 工具 184→185，dispatch 路由 1,316→1,317，判别维度 210 不变。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision；按轮次协议「优先做交接簿里已知未修的真 bug」选题，全部结论来自本轮实测探针（scripts/tmp-249-probe.js / probe2.js / probe3.js / probe4.js / probe5.js + 源码级核查，轮末已删），无记忆成分。
+- 交接簿（data/upgrade-state.json r247 notes）候选池①原文：「**src/core/heartflow.js 两个 stub 挡实现 + 两个方法名失配**（r247 G11，源码级已实测，`:652` `_ToneAnalyzer` stub 挡住 src/bridge/tone-analyzer.js 12037 字节、`:656` `_ImplicitNeedDetector` stub 挡住 src/bridge/implicit-need-detector.js 5513 字节、`:3323` `va.check(ctx)` 而 stub 只有 `align()`、`:3325` `mp.getDeclaration()` 而 stub 只有 `get()`）——先确认 personaCore/translator 的挂载路径与可达性，是两个真实实现合计 17.5KB 死代码的复活题，也是候选池里唯一「代码丰富」类条目」。
+- **轮初证伪实测**（scripts/tmp-249-trace.js + tmp-249-probe.js）：候选①**四个缺陷全部开着**，且比 r247 登记的更严重——r247 只登记了「两条恒值路由 + 两个方法名失配」，本轮新查出**第三个缺陷：MCP 工具 heartflow_bridge_analyze 100% 崩溃**。
+- **选题结论**：做候选①，并把范围钉死在「bridge 交流层」一个主题内——四个缺陷 + 一个新能力全部落在 `src/bridge/` 与其在 `heartflow.js` / `mcp-server.js` 的接线点上，不碰判别引擎（`src/index.js` 本轮零改动）。
+
+### 二、根因/缺口分析（带证据）
+
+**① 两个 stub 挡住 17550 字节死代码（`heartflow.js:652` / `:656`）**
+
+`src/bridge/tone-analyzer.js`（12037 字节，7 情绪 × urgency/emotion/formality/intensity 四维）与 `src/bridge/implicit-need-detector.js`（5513 字节，8 类隐性需求）**一直在仓库里，从未被任何路径 require**。`heartflow.js` 的 `_ToneAnalyzer` / `_ImplicitNeedDetector` 是 v5.9.19 留下的内联 stub（注释写「Stub for deleted bridge modules」——文件根本没删）。实测（scripts/tmp-249-probe.js，`hf.start()` 后逐条 dispatch）：
+
+| 路由 | HEAD 行为 | 三个输入实测 |
+|---|---|---|
+| `translator.toneAnalyzer` | 恒 `{tone:'neutral',confidence:0}` | 三条输入**逐字相同** |
+| `translator.implicitNeedDetector` | 恒 `[]` | 三条输入**逐字相同** |
+
+MCP 侧同一份能力有两条路：`heartflow_bridge_analyze` 直接 `require('./bridge/tone-analyzer.js')`（拿得到真分析），而 `heartflow_translate` 走 `safeDispatch('translator.toneAnalyzer')`（拿的是 stub 常量）——**同一个引擎对同一个输入给出两套语气结论**。
+
+**② 两个 personaCore 路由是 TypeError 崩溃，不是「退化」**
+
+`heartflow.js` 的 personaCore 初始化写 `valueAligner: (ctx) => va.check(ctx)` 与 `metaPosition: () => mp.getDeclaration()`，而 `_ValueAligner` stub 只有 `align()`、`_MetaPosition` stub 只有 `get()`。实测（scripts/tmp-249-probe.js）：
+
+```
+--- personaCore.valueAligner (dispatch) ---
+THROWS: TypeError va.check is not a function
+--- personaCore.metaPosition (dispatch) ---
+THROWS: TypeError mp.getDeclaration is not a function
+```
+
+`personaCore.valueAligner` / `personaCore.metaPosition` 是 `src/mcp-server.js:1056` 能力清单里**广告出去的两项**（`heartflow_agent_think` 走 `safeDispatch('personaCore.valueAligner')`）——从接线起就没通过，`safeDispatch` 把它转成 `{error: '...'}` 静默返回。
+
+**③ `heartflow_bridge_analyze` 100% 崩溃（本轮新查出的第三个缺陷）**
+
+`src/mcp-server.js` 的 `handleBridgeAnalyze` 里 `new StanceDetector()` 与 `new ConflictResolver()` 两个标识符**从未被 require**（同函数只 require 了 ToneAnalyzer / ConfidenceAnnotator / ImplicitNeedDetector 三个），且 `src/bridge/` 下根本没有这两个文件。实测（scripts/tmp-249-probe2.js，真调 MCP `tools/call`）：
+
+```
+bridge_analyze -> {"input":"urgently need this fixed right now, please help ASAP!!!","error":"StanceDetector is not defined"}
+```
+
+**该 MCP 工具自接线起就是死的**——r247 候选池没登记它。
+
+### 三、落地项
+1. **`src/core/heartflow.js`：两个 stub 改为真加载**（`:652` / `:656`）——`try{require('../bridge/tone-analyzer.js')}catch{stub}` 形态，require 失败仍优雅降级（与 `:583`~`:585` 的 llm-to-user / response-interceptor / intent-classifier 同款写法）。17550 字节死代码复活。
+2. **`src/core/heartflow.js`：另四个 bridge stub 一并接真实现**（本轮新建的 4 个文件）：`_StanceDetector` / `_ValueAligner` / `_ConflictResolver` / `_MetaPosition`，同样 `try{require}catch{stub}`；fallback stub 的方法名一律改成真实方法名（`check()` / `getDeclaration()` / `detect()` / `resolve()`），**不再有「调用点方法名与实现不一致」这一类失配**。
+3. **新增 `src/bridge/value-aligner.js`**（约 200 行，12 条违背规则 × 5 条底线 honesty/transparency/respect/responsibility/no_overpromise）：扣分制评分，任一条 severity ≥0.8 直接把 score 压到 0.45 以下（严重问题不是「多扣点分」）；只扫 `plannedResponse`，调用方只给 `userInput` 时降级并标 `source`；无文本可查时返回 `aligned: null` 并明说「不做判定」——不假装查过。
+4. **新增 `src/bridge/meta-position.js`**（约 130 行）：元位置声明的机器可读形式。**维度数不硬编码**——构造时注入 `probeDimensions` 探针，现场跑 `discriminate()` 数 `dimensions` 键（本轮实测 210）；探针缺席则该字段 `null` 且 `measured:false`。`doesNot` 五条与 AGENTS.md 的 Honest limitations 逐条对应，一条不许省。
+5. **新增 `src/bridge/stance-detector.js`**（约 140 行）：支持/反对/求信息/转移/中立五立场。**头名与次名差距 <0.5 时判中性**（宁可不猜，不要猜错姿态）；置信度 = 头名/(头名+次名)。
+6. **新增 `src/bridge/conflict-resolver.js`**（约 160 行）：否定对撞/数量对撞/立场反转三类判据，分 `self`（自相矛盾）与 `cross`（跨文本对撞）两个作用域；每条冲突带 kind/label/scope/severity/guidance。
+7. **新增 `src/bridge/communication-brief.js`**（约 250 行）+ 引擎公开方法 `translator.communicationBrief` + MCP 工具 `heartflow_communication_brief`：把复活后的语气四维与隐性需求八类合成可执行的回应动作序列——`moves` 按 priority 降序、每条带 `reason`（哪条规则命中什么词，可审计）、`questions` 建议追问（最多 3 条）、`riskFlags` 风险旗标（high_pressure / multi_need / technical_plus_negative / verification_requested）。上游缺席时 `degraded: true` 且 `confidence: 0`，不编造语气结论。MCP 三处接线（约定 3）：`src/mcp/tools-registry.js` 工具定义 + `src/mcp-server.js` handler 映射 + handler 函数（handler 走 `safeDispatch`，不在内部 `new`——与 r589/r590 记的「刻意走引擎常驻实例」纪律一致）。
+8. **`src/mcp-server.js`：`handleBridgeAnalyze` 补两个 require**（`:2990` 区）——修 ③。
+9. **版本 6.8.176 → 6.8.177**，`sync-version.js` + `sync-doc-numbers.js` 已跑；README/SKILL/AGENTS/package.json 的 MCP 工具数 184→185、dispatch 路由 1,316→1,317 由 sync 脚本机器记账；README Version history 补 v6.8.177 行。
+10. **新测试 `test/round-249-bridge-capability-revival.test.js`（37 断言全绿）**：A 族（复活：三条输入 tone 不再是 stub 常量 + 四维字段齐全 + 实例自报名证明加载的是真模块）/ B 族（两个 TypeError 变真实输出 + 良性零违背 + 无文本时 aligned:null 降级 + 维度数现场实测 210）/ C 族（新公开方法：三条 topMove 互不相同 + moves 降序 + 每条带 reason + 降级路径 + 空输入诚实失败 + 路由已注册）/ D 族（MCP 三处接线 + 端到端跑通）/ E 族（回归：三个招牌入口 + 维度 210 + translator 其余六条路由 + personaCore 其余五条路由 + agentLayer.conflictResolver + `_initErrors` 为空 + 良性冲突句零误报 + StanceDetector 无信号判 neutral）/ F 族（源码锚点：七个 `_lazy` 都接了真 bridge 模块 + 调用点方法名一致 + meta-position 无硬编码 210 + communicationBrief 走常驻实例）/ G 族（两条已知未修登记）。
+
+### 四、验收数字（全部实测）
+| 项 | 数字 | 实测方式 |
+|---|---|---|
+| `translator.toneAnalyzer` 恒值 | 三条输入逐字相同 `{tone:'neutral',confidence:0}` → **真四维分析** | scripts/tmp-249-probe.js；test A1/A2/A3 |
+| `translator.implicitNeedDetector` 恒空 | 三条输入逐字相同 `[]` → **真 8 类检测**（示例句 count=3） | 同上；test A4/A5 |
+| 死代码复活体量 | **17550 字节**（12037 + 5513） | `wc -c` |
+| `personaCore.valueAligner` | `TypeError: va.check is not a function` → 真实核查（攻击句 aligned=false/score=0/4 条违背；良性句 aligned=true/score=1） | scripts/tmp-249-probe.js；test B1/B2/B3/B4 |
+| `personaCore.metaPosition` | `TypeError: mp.getDeclaration is not a function` → 真实声明，**维度数现场实测 210** | 同上；test B5 |
+| `heartflow_bridge_analyze` | **100% 返回 `{"error":"StanceDetector is not defined"}` → error=null 正常返回** | scripts/tmp-249-probe2.js / probe4.js；test D3 |
+| `heartflow_translate` | tone 从 stub 常量 → 真四维；implicitNeeds.count 0 → **3** | scripts/tmp-249-probe2.js |
+| 新 MCP 工具 | tools/list **184 → 185**，`heartflow_communication_brief` 端到端 topMove=clarify / moves=6 | scripts/tmp-249-probe5.js；test D4 |
+| dispatch 路由 | **1,316 → 1,317** | scripts/sync-doc-numbers.js 机器记账 |
+| 判别维度 | **210 不变** | guard-abilities 第 8 项 |
+| bin/verify.js | **16/16** | — |
+| bidirectional-guard | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r248 基线逐项一致） | data/round-249-bidir.log |
+| guard-abilities | **20/20**（dimensions 键 **210** 不变） | data/round-249-guard.log |
+| doc-numbers-accuracy | **24/24**（README Version history 补 v6.8.177 行） | — |
+| security-audit | 提交前 **15/16**（S2「git log/tag 未命中 6.8.177」为提交前预期失败，r236~r248 同款） | — |
+| 本轮新测试 | round-249 **37/37** | test/round-249-bridge-capability-revival.test.js |
+| 全量回归 | 见第五节 | data/round-249-regression2.log |
+
+### 五、全量回归与计数
+全量回归 **19372 通过 / 153 失败 / 共 19525 个**（652 个测试文件，data/round-249-regression2.log）。
+对照基线 **r248（data/test-count.json 轮初值）：19308 / 153 / 19460**：**failed 153 → 153，零增长**；passed 19308 → 19372（+64）、total 19460 → 19525（+65）。
+
+**+64 的构成**：本轮新测试 test/round-249-bridge-capability-revival.test.js 的 **37 条断言** + 存量噪声池抖动 27 条。噪声池那 27 条的头号来源已定位：r248 登记的两个存量失败文件 round-220 与 round-360（r248 报告注明「HEAD worktree 副本复跑同为 8/9，非本轮引入」）本轮**都不在**失败清单里。
+
+**「本轮引入 0 个新失败文件」的证明（不靠总数自证，靠清单逐项比对）**：把本轮回归失败清单的 **84 个文件**与 r248 基线登记的 **84 个存量噪声文件**逐项比对（`comm -13`），**差异为空**——没有任何一个 r248 清单外的新失败文件。本轮新测试 round-249 **不在**失败清单中（37/37 全绿）。
+
+噪声池构成（全部存量，勿当回归）：MCP 类 6 个（knowledge-graph-mcp-state-round593 / knowledge-layer-mcp-state-round313 / mcp-auth-tier / mcp-guest-permission / mcp-server / mcp-smoke，8099 端口被常驻服务占用）+ 未输出汇总行类（round-417/436-vagueness/437/443/447/463/477×2/479/480/481/482/488/491/493/496/498/507/510/514/521/524/530/534/547/551/565/567/570/582/583/586/599/629/630/634/643/644/v680×2 等）+ 注册 0 用例类（core/path-guard、round-410）+ Command failed 类 dispatch 族（round-606/608/609/614/615/621/639/733/run-all-no-silent-skip、bullshit-engineering-context、reward-hacking-dsec、recovered-modules、round-401/502/506/537/541/572×2/574、round-327/331/428/436×2 变异类 Node 崩溃）+ 文件自报失败类（unsupported-claim-exemption、round-378 dimensionRaw 键口径、ClassicsRules searchClassicsBatch、AgentBoundaryGuard home dot-dir）。其中 **round-530-harm-invalidation 与 round-534-performative-responsibility 本轮单独复跑实测 17/0 与 20/0 全绿**，属并发池抖动，非本轮引入（本轮改动全在 src/bridge/ 与其接线点，src/index.js 零改动，与这两个文件检测的维度无关）。
+
+本轮回归的失败类别与 r248 基线同族，**没有一条落在本轮改动的 bridge 交流层**：双向门禁召回 **52/52 不降**、误拦 **302/326 不升**（与 r248 基线逐项一致）；guard-abilities **20/20**（dimensions 键 **210** 不变）；bin/verify.js **16/16**。
+
+### 六、已知未修（含为什么不修）
+1. **`personalityTone` / `judgmentInjector` / `bridgeIdentity` 等 9 个 bridge stub 仍是常量**（test G1 登记，逐个实测确认仍是 `''` / `{}` / `{}`）。不修的原因：`src/bridge/` 下**没有** personality-tone.js / judgment-injector.js / bridge-identity.js / entity-extractor.js / response-compressor.js / translation-pipeline.js / quality-filter.js / followup-suggester.js / uncertainty-handler.js 这九个文件，要做等于新写九个模块，超出「单轮单主题」范围。本轮只修了**有真实文件躺在仓库里**或**正在崩溃**的那几个。**这是下一轮最直接的候选池①**。
+2. **`heartflow_translate` 的 `tone` 字段形状变了**（test G2 登记）：从 stub 的 `{tone,confidence}` 变成真四维 `{urgency,emotion,formality,intensity,details}`。全仓 grep 实测无测试/源码读 `translator tone` 的 `.tone` 字段，故不构成回归；但外部调用方可能按 `tone.tone` 读值，需要时加一个 `tone.tone = tone.emotion` 兼容别名。
+3. **`_stubFactory` 31 个占位子系统的「实现或摘除」裁决**（`heartflow.js:484`，r247 候选池②）——本轮未动。
+4. ⑨族裸标记位置化（r225 纪律，r243~r248 六代 G1 同款）、`PC_RITE_MECH_ZH` 仪式族位置化（r239 G3，九轮挂账）、`PC_DRUG_MECH_ZH`/`PC_SUPP_MECH_ZH` 跨表统一（r236 G2 后半，十四轮挂账）、lastIndex 防空匹配防护前移、`scripts/negative-test-rc-temporal-causal-r364.js` 临时目录隔离、r71 测试 G 节 idx4 zh 侧句式缺口——r248 登记的七条原样挂账，本轮未触碰判别引擎。
+
+**下一轮候选池（按优先级）**：
+① **`src/bridge/` 下九个不存在的 stub 对应模块**（见「已知未修」1）——`personality-tone.js` / `judgment-injector.js` / `bridge-identity.js` 优先（personaCore 三条广告路由恒值），`entity-extractor.js` / `response-compressor.js` / `translation-pipeline.js` / `quality-filter.js` / `followup-suggester.js` / `uncertainty-handler.js` 次之（agentLayer/translator 恒值）。**与 r249 同主题、可直接延用本轮四个新模块的写法与测试骨架**。
+② `_stubFactory` 31 个占位子系统的「实现或摘除」裁决（`heartflow.js:484`）——最低限度是把「占位」在 `moduleHealth` 里诚实暴露。
+③ `heartflow_translate` 的 tone 兼容别名（外部调用方契约）。
+④~⑧ r248 候选池③~⑧原样继承（⑨族裸标记位置化 / `PC_RITE_MECH_ZH` 位置化 / `PC_DRUG_MECH_ZH` 跨表统一 / lastIndex 防护前移 / r364 临时目录隔离 / r71 idx4）。
+
 ## r248 — 第⑭支结果表 PC_RESJOIN_ZH 接入结果补语族 + 白话「变多/变少」（补语族抽成共享常量 PC_RES_COMPLEMENT_ZH，v6.8.176）：红队 300 条 HEAD 漏判 270 → 0 + 全仓 A/B 96037 条样本 gate.action 差异 5 条全是攻击形状/文档引用句
 
 **轮次**：r248 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（交接簿 r247 notes 候选池①「⑭支结果表 PC_RESJOIN_ZH 结果补语扩面」，即 r247 测试 G2 登记的缺口）
