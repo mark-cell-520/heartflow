@@ -1200,6 +1200,14 @@ const DI_WEIGHT = 0.85;
 const { isDevDebugContext, isCompilerNoiseWarning, isTemporaryRestorePromise } = require('./dev-exemptions.js');
 
 /** 通用匹配器 */
+// [PERF] _matchAll 的豁免正则提为模块级常量（原写在函数体内，每次调用重复编译）。
+// 源串与标志位逐字保留自原函数内版本，语义完全一致。
+const _DI_DISCOURSE_RE = /(?:论文|文章|报告|研究|文献|资料)\s*(?:里|中|提到|说|指出|表明|记载)|众所周知|这是(?:一种|典型|常见)的?(?:攻击|入侵|漏洞|手法|方式|行为)|举个?例子|举例来说|比如|像是|所谓|通常认为|人们常说|俗话说|(?:我们|大家|应该)?(?:要|该|如何|怎么|怎样才能)(?:防|防范|预防|抵御|应对|避免)|攻击者(?:可能|会|常常|往往)|黑客(?:可能|会|常常|往往)/;
+const _DI_UPSTREAM_RE = /\b(?:patched|upstream|release|stable|vendor|official|signed)\s+(?:build|version|release|package|binary)\b|CVE-\d{4}-\d+|\bsecurity\s+(?:patch|update|fix|release)\b|补丁|官方(?:版本|发布|构建)|上游(?:版本|构建|代码)/i;
+const _DI_NEG_RE = /(?:不要|不能|不可以|不应|不该|请勿|切勿|莫要|禁止|严禁|别|勿|不可|不准|不允许)/;
+const _DI_CRED_RE = /(?:密码|口令|密钥|密匙|私钥|证书|凭证|凭据|token|secret|api[_.]?key|access[_.]?key)/i;
+const _DI_EXFIL_RE = /(?:写|写入|写到|存|保存|存放|打印|输出|显示|发给|发送|上传|同步|贴|分享|发到|告知|告诉)/;
+
 function _matchAll(text) {
   if (!text || typeof text !== 'string') return { count: 0, hits: [], score: 0 };
   // [v6.7.73] 目的状语豁免文本：「关闭调试日志以避免泄露」是安全正向操作，
@@ -1215,8 +1223,11 @@ function _matchAll(text) {
   //   但 di 的 dangerous_instruction 类照样命中「绕过沙箱检查」→ 仍 block。
   //   即**两个维度共用同一批边界样本，豁免却只加在一个维度上**。
   // 教训：新增维度的豁免必须回头检查既有维度是否也命中同一样本。
-  const _discourse = /(?:论文|文章|报告|研究|文献|资料)\s*(?:里|中|提到|说|指出|表明|记载)|众所周知|这是(?:一种|典型|常见)的?(?:攻击|入侵|漏洞|手法|方式|行为)|举个?例子|举例来说|比如|像是|所谓|通常认为|人们常说|俗话说|(?:我们|大家|应该)?(?:要|该|如何|怎么|怎样才能)(?:防|防范|预防|抵御|应对|避免)|攻击者(?:可能|会|常常|往往)|黑客(?:可能|会|常常|往往)/;
-  const _upstream = /\b(?:patched|upstream|release|stable|vendor|official|signed)\s+(?:build|version|release|package|binary)\b|CVE-\d{4}-\d+|\bsecurity\s+(?:patch|update|fix|release)\b|补丁|官方(?:版本|发布|构建)|上游(?:版本|构建|代码)/i;
+  // [PERF] 以下 6 个豁免正则原本写在函数体内，每次 _matchAll 调用都重新编译。
+  // CPU profile 实测：单次 discriminate 编译 782 个正则，其中 _matchAll 占 361 个。
+  // 提升为模块级常量后只编译一次，语义完全不变（同源串、同标志位）。
+  const _discourse = _DI_DISCOURSE_RE;
+  const _upstream = _DI_UPSTREAM_RE;
   if (_discourse.test(text) || _upstream.test(text)) {
     return { count: 0, hits: [], score: 0, exempted: true };
   }
@@ -1239,9 +1250,9 @@ function _matchAll(text) {
   // 真实攻击里几乎不带否定词（攻击者要求的是执行，不是劝阻）——
   // 本轮 26 条攻击样本逐条实测，无一含否定词，全部仍 block。
   // 良性/攻击双向实测见 scripts/negative-test-di-negation-round73.js。
-  const _NEG = /(?:不要|不能|不可以|不应|不该|请勿|切勿|莫要|禁止|严禁|别|勿|不可|不准|不允许)/;
-  const _CRED = /(?:密码|口令|密钥|密匙|私钥|证书|凭证|凭据|token|secret|api[_.]?key|access[_.]?key)/i;
-  const _EXFIL = /(?:写|写入|写到|存|保存|存放|打印|输出|显示|发给|发送|上传|同步|贴|分享|发到|告知|告诉)/;
+  const _NEG = _DI_NEG_RE;
+  const _CRED = _DI_CRED_RE;
+  const _EXFIL = _DI_EXFIL_RE;
   if (_NEG.test(text) && _CRED.test(text) && _EXFIL.test(text)
       && !MALICIOUS_PURPOSE.test(text)) {
     return { count: 0, hits: [], score: 0, exempted: 'safe_negation' };
