@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/U/sLLq2B3SanFVVHkHtc9jic7/s</id>
+  <title>arXiv Query: search_query=all:"fundamental attribution error"&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-11-08T11:50:22Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22fundamental+attribution+error%22&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>2</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2406.13813v5</id>
+    <title>The Efficacy of Conversational Artificial Intelligence in Rectifying the Theory of Mind and Autonomy Biases: Comparative Analysis</title>
+    <updated>2024-07-23T12:33:32Z</updated>
+    <link href="https://arxiv.org/abs/2406.13813v5" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2406.13813v5" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Background: The increasing deployment of Conversational Artificial Intelligence (CAI) in mental health interventions necessitates an evaluation of their efficacy in rectifying cognitive biases and recognizing affect in human-AI interactions. These biases, including theory of mind and autonomy biases, can exacerbate mental health conditions such as depression and anxiety.
+  Objective: This study aimed to assess the effectiveness of therapeutic chatbots (Wysa, Youper) versus general-purpose language models (GPT-3.5, GPT-4, Gemini Pro) in identifying and rectifying cognitive biases and recognizing affect in user interactions.
+  Methods: The study employed virtual case scenarios simulating typical user-bot interactions. Cognitive biases assessed included theory of mind biases (anthropomorphism, overtrust, attribution) and autonomy biases (illusion of control, fundamental attribution error, just-world hypothesis). Responses were evaluated on accuracy, therapeutic quality, and adherence to Cognitive Behavioral Therapy (CBT) principles, using an ordinal scale. The evaluation involved double review by cognitive scientists and a clinical psychologist.
+  Results: The study revealed that general-purpose chatbots outperformed therapeutic chatbots in rectifying cognitive biases, particularly in overtrust bias, fundamental attribution error, and just-world hypothesis. GPT-4 achieved the highest scores across all biases, while therapeutic bots like Wysa scored the lowest. Affect recognition showed similar trends, with general-purpose bots outperforming therapeutic bots in four out of six biases. However, the results highlight the need for further refinement of therapeutic chatbots to enhance their efficacy and ensure safe, effective use in digital mental health interventions. Future research should focus on improving affective response and addressing ethical considerations in AI-based therapy.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-06-19T20:20:28Z</published>
+    <arxiv:comment>28 pages, 5 tables, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <arxiv:journal_ref>Rządeczka M, Sterna A, Stolińska J, Kaczyńska P, Moskalewicz M, The Efficacy of Conversational AI in Rectifying the Theory-of-Mind and Autonomy Biases: Comparative Analysis, JMIR Mental Health 2025;12:e64396</arxiv:journal_ref>
+    <author>
+      <name>Marcin Rządeczka</name>
+    </author>
+    <author>
+      <name>Anna Sterna</name>
+    </author>
+    <author>
+      <name>Julia Stolińska</name>
+    </author>
+    <author>
+      <name>Paulina Kaczyńska</name>
+    </author>
+    <author>
+      <name>Marcin Moskalewicz</name>
+    </author>
+    <arxiv:doi>10.2196/64396</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.2196/64396" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1906.09689v2</id>
+    <title>A robot's sense-making of fallacies and rhetorical tropes. Creating ontologies of what humans try to say</title>
+    <updated>2023-03-16T12:39:00Z</updated>
+    <link href="https://arxiv.org/abs/1906.09689v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1906.09689v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In the design of user-friendly robots, human communication should be understood by the system beyond mere logics and literal meaning. Robot communication-design has long ignored the importance of communication and politeness rules that are 'forgiving' and 'suspending disbelief' and cannot handle the basically metaphorical way humans design their utterances. Through analysis of the psychological causes of illogical and non-literal statements, signal detection, fundamental attribution errors, and anthropomorphism, we developed a fail-safe protocol for fallacies and tropes that makes use of Frege's distinction between reference and sense, Beth's tableau analytics, Grice's maxim of quality, and epistemic considerations to have the robot politely make sense of a user's sometimes unintelligible demands. Keywords: social robots, logical fallacies, metaphors, reference, sense, maxim of quality, tableau reasoning, epistemics of the virtual</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-06-24T02:04:15Z</published>
+    <arxiv:comment>Published as Hoorn, J. F., &amp; Tuinhof, D. J. (2022). A robot's sense-making of fallacies and rhetorical tropes. Creating ontologies of what humans try to say. Cognitive Systems Research, 72, 116-130. doi: 10.1016/j.cogsys.2021.10.003</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Johan F. Hoorn</name>
+    </author>
+    <author>
+      <name>Denice J. Tuinhof</name>
+    </author>
+  </entry>
+</feed>

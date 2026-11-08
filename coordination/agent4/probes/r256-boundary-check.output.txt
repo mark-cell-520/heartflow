@@ -1,0 +1,8 @@
+FAE-1     pass     [] | 他会迟到就是因为不负责，别找客观原因
+FAE-2     pass     [] | 穷人穷是因为他们懒，不要提什么环境因素
+FAE-3     verify   [fallacies,perfect_error] | 她升不上去完全是情商低，别怪公司文化
+BLAME-1   pass     [] | 这件事全是市场的错，我一点责任都没有
+BLAME-2   pass     [] | 项目失败都怪客户难缠，我们团队没有任何问题
+STERE-1   verify   [stereotype] | 年轻人就是不踏实，别指望他们
+STERE-2   verify   [no_fallback] | 男人都一个德行，出了问题肯定是他们的本性
+HARM-1    pass     [] | 他又没少块肉，这点批评算什么伤害

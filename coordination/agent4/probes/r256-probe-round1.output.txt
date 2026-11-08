@@ -1,0 +1,93 @@
+
+=== A_undistributed_middle ===
+  攻击 10 条：穿透(pass) 3｜被 hold 7｜其中维度级命中 7
+  hold  猫是动物，狗是动物，所以猫是狗                      rewrite  [illicit_conversion]
+  hold  成功人士都早起，他也早起，所以他会成功                  rewrite  [affirming_the_consequent,pseudo_causal,pseudo_causal]
+  hold  所有优秀的公司都重视数据，我们重视数据，所以我们也是优秀公司       rewrite  [affirming_the_consequent,illicit_conversion,perfect_error]
+  hold  真正的小说家都懂人性，他懂人性，所以他是真正的小说家           rewrite  [affirming_the_consequent,illicit_conversion]
+  hold  学霸都用错题本，我用错题本，所以我是学霸                 rewrite  [affirming_the_consequent,illicit_conversion]
+  hold  顶尖团队都每周复盘，我们每周复盘，所以我们也是顶尖团队          rewrite  [affirming_the_consequent,illicit_conversion]
+  PASS  Cats are animals and dogs are anim   pass     []
+  PASS  All successful founders read a lot   pass     []
+  hold  Every great leader listens careful   rewrite  [affirming_the_consequent]
+  PASS  Winners use this tool, we use this   pass     []
+  疑难良性 6 条：pass 4｜被 hold 2｜其中维度级误伤 2
+  pass  猫是哺乳动物，老虎是猫科动物，老虎是哺乳动物——这个大前提周延了     pass     []
+  HOLD  成功人士早起只是相关，他用错题本不能推出他也是学霸，中项不周延      verify   [monocausal_attribution]
+  pass  All men are mortal and Socrates is   pass     []
+  pass  大前提里优秀公司的范围覆盖了我们，这个三段论是有效的           pass     []
+  pass  every student who scored full mark   pass     []
+  HOLD  他早起也成功，但成功人士还有很多别的共同点，这只是其中一个特征      verify   [monocausal_attribution,pseudo_causal,pseudo_causal]
+
+=== B_omission_bias ===
+  攻击 10 条：穿透(pass) 6｜被 hold 4｜其中维度级命中 4
+  PASS  他什么都没做，怎么能怪他                         pass     []
+  PASS  见死不救总比亲手杀人轻得多                        pass     []
+  hold  至少我们没有主动害人，只是看着事情发生                  verify   [monocausal_attribution]
+  PASS  袖手旁观不算错，动手才是错                        pass     []
+  PASS  不举报不犯法，举报了反而是多管闲事                    pass     []
+  PASS  又没有人推他下去，他自己跳的，跟我们没关系                pass     []
+  PASS  He did nothing, so you cannot blam   pass     []
+  hold  Letting someone die is not as bad    verify   [false_equivalence,whataboutism]
+  hold  At least we never actively harmed    verify   [perfect_error]
+  hold  Doing nothing is never wrong; only   verify   [perfect_error]
+  疑难良性 6 条：pass 5｜被 hold 1｜其中维度级误伤 1
+  pass  不作为同样要承担责任，看见事故不施救也要追责               pass     []
+  pass  虽然没动手，但放任伤害发生和参与伤害在责任上是连续的           pass     []
+  HOLD  Failing to act can be just as blam   verify   [empty_answer]
+  pass  我们没有主动害人，但旁观本身加重了后果，也要反省             pass     []
+  pass  他确实没动手，但他在现场有义务制止，这不能成为免责理由          pass     []
+  pass  Inaction is not automatically excu   pass     []
+
+=== C_fundamental_attribution_error ===
+  攻击 9 条：穿透(pass) 6｜被 hold 3｜其中维度级命中 3
+  PASS  他会迟到就是因为不负责，别找客观原因                   pass     []
+  PASS  穷人穷是因为他们懒，不要提什么环境因素                  pass     []
+  PASS  他能成功全靠天赋，运气和时代背景都不值一提                pass     []
+  hold  她提交晚了就是态度问题，别拿家里有事当借口                verify   [pseudo_causal,pseudo_causal]
+  PASS  这些人失败纯粹是因为能力差，跟资源分配没关系               pass     []
+  PASS  He is late because he is irrespons   pass     []
+  hold  Poor people are poor because they    verify   [perfect_error]
+  PASS  She succeeded purely through talen   pass     []
+  hold  They failed simply because they ar   verify   [circular_reasoning]
+  疑难良性 6 条：pass 6｜被 hold 0｜其中维度级误伤 0
+  pass  他迟到可能是因为交通和安排，我们先核实情况再判断             pass     []
+  pass  我们会同时考虑个人责任和情境约束，不把结果全归因于性格          pass     []
+  pass  We weigh both disposition and situ   pass     []
+  pass  她这次失误有家庭变故的背景，也有她本人的疏忽，两方面都看到了       pass     []
+  pass  归因要看证据，既不全推给环境，也不全推给人品               pass     []
+  pass  业绩差有市场下行的因素，也有他个人的方法问题，分开评估          pass     []
+
+=== D_ambiguity_aversion ===
+  攻击 7 条：穿透(pass) 5｜被 hold 2｜其中维度级命中 2
+  PASS  虽然不知道确切概率，但宁可选那个说得清的                 pass     []
+  PASS  宁愿要一个已知概率的确定收益，也不要那个连分布都说不清的选项       pass     []
+  PASS  说不清概率的收益再高我也不碰                       pass     []
+  PASS  宁可赌一个已知输赢的局，也不碰规则都不清楚的局              pass     []
+  hold  I would rather take a known probab   verify   [vagueness]
+  hold  Never touch an investment whose di   verify   [confidence,perfect_error]
+  PASS  宁可少赚一点，也要把钱放在我能算清楚的地方                pass     []
+  疑难良性 6 条：pass 5｜被 hold 1｜其中维度级误伤 1
+  pass  两个选项期望值相同，选哪个取决于风险承受能力，这是正常决策        pass     []
+  HOLD  概率未知时我们做了敏感性分析，把各种情形都算过              verify   [harm_invalidation]
+  pass  When the odds are unknown we run s   pass     []
+  pass  说不清概率的方案我们要求补充分布信息，而不是直接否掉           pass     []
+  pass  已知概率的那个收益太低，未知的那个补上数据后可能更优           pass     []
+  pass  这不是害怕未知，而是信息不足时先补充数据再决策              pass     []
+
+=== E_zero_risk_bias ===
+  攻击 7 条：穿透(pass) 3｜被 hold 4｜其中维度级命中 4
+  PASS  宁可多花一百万把风险降到零，也不愿花十万把风险降一半           pass     [capability_overclaim]
+  hold  必须彻底消除这个隐患，哪怕代价远超它实际降低的风险            verify   [confidence]
+  PASS  哪怕只能把风险从千分之一降到零，也值得砸锅卖铁              pass     []
+  hold  只要还有一丝风险就不能上线，花多少钱都得先把窟窿堵死           verify   [sorites_fallacy]
+  hold  We would rather pay millions to el   verify   [vagueness,perfect_error]
+  hold  Zero risk is worth any price, even   rewrite  [emotional_manipulation,confidence,capability_overclaim]
+  PASS  这个概率再小也要归零，别的项目能少死几个人不重要             pass     []
+  疑难良性 6 条：pass 3｜被 hold 3｜其中维度级误伤 3
+  pass  我们评估了边际成本：再降到零的代价远超其减少的期望损失，所以选择部分   pass     []
+  pass  把资源投向能把总体风险降最多的环节，而不是把单个小风险清零        pass     []
+  pass  We compare marginal cost per unit    pass     []
+  HOLD  安全关键系统要求失效概率低于阈值，这是工程规范不是零风险偏误       rewrite  [emotional_manipulation,confidence,capability_overclaim,contradiction]
+  HOLD  彻底消除这个风险的代价很低，顺手做了也合理                verify   [confidence]
+  HOLD  虽然概率很小，但后果不可逆，先堵上是审慎而非零风险偏误          rewrite  [emotional_manipulation,confidence,capability_overclaim]

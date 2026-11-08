@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/TTWR++cISwkJ858HBStgPL6Jz38</id>
+  <title>arXiv Query: search_query=all:"omission bias"&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-11-08T11:50:21Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22omission+bias%22&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>4</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2610.07847v1</id>
+    <title>OMIT the Action: Measuring Framing-Invariant Omission Bias under Philosophical Disagreement</title>
+    <updated>2026-10-06T06:54:19Z</updated>
+    <link href="https://arxiv.org/abs/2610.07847v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.07847v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As LLMs increasingly assist in moral reasoning, omission bias, the tendency to prefer inaction even when equivalent framings reverse substantive outcomes, poses a significant risk of skewed decision-making. Yet omission bias remains underexplored in LLM evaluation, with the few existing studies limited in scale and focused largely on utilitarian-deontological conflicts. To address this gap, we introduce OMIT, a benchmark consisting of 218 paired-frame scenarios across 10 conflict types, constructed by leveraging disagreement patterns from an LLM-based, five-perspective philosophical persona panel (utilitarianism, deontology, virtue ethics, care ethics, and contractualism). Evaluating eight LLMs, we find that omission bias is pervasive but inversely correlates with model size within families. We further evaluate four inference-time interventions and find that interventions encouraging models to consider moral principles before committing to a yes/no answer reduce omission bias and increase frame-consistent responses, although lower omission bias rates can also coincide with shifts toward action-biased responses. Ultimately, this work contributes not only the OMIT benchmark, but also a methodology for using diverse philosophical disagreement signals to evaluate framing-sensitive inaction preferences and the distributional effects of mitigation attempts in LLMs under complex moral conflicts.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-06T06:54:19Z</published>
+    <arxiv:comment>Accepted to AACL-IJCNLP 2026 Findings</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Sihyeon Lee</name>
+    </author>
+    <author>
+      <name>Jihun Song</name>
+    </author>
+    <author>
+      <name>Chanwoo Kim</name>
+    </author>
+    <author>
+      <name>Jiwoo Kum</name>
+    </author>
+    <author>
+      <name>Chanjun Park</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2605.24319v1</id>
+    <title>Omissive Bias in Religious Representation: Benchmarking LLM Answers to Everyday Ethical Decision-making</title>
+    <updated>2026-05-23T00:55:36Z</updated>
+    <link href="https://arxiv.org/abs/2605.24319v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2605.24319v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As large language models become a default source of guidance on personal, moral, and existential questions, it matters whether they draw on the religious frameworks that have historically shaped such reasoning, or systematically omit them. In this paper, we ask a deliberately narrow question: when posed an everyday ethical question for which religious perspectives may be valuable, do LLMs invoke religion at all? In contrast to benchmarks that look for the presence of political leanings or social bias, we look for the absence of religious representation as a dimension of value alignment and bias in LLMs. We term this ``omissive bias.''
+  To measure omissive bias, we contribute the AllFaith Religious Representation Benchmark: 150 ethically and personally salient questions, sourced from in-the-wild chat transcripts and faith-community contributors, paired with an LLM-as-judge rubric that gives full credit for any mention of a religion, a religious practice, or a religious leader. The questions are not themselves about religion--they are open-ended questions about grief, forgiveness, relationships, purpose, and honesty, where religion is one valuable perspective among several. We also run a human-subjects survey to compare LLM behavior against human expectations.
+  Evaluating 27 models, we find that LLMs consistently underrepresent religion relative to human expectations. The omission is asymmetric: models invoke religion more readily for abstract existential questions (meaning, death, truth) than for the practical personal situations--grief, marriage, family conflict, addiction--where many people most rely on it. It is not our purpose to adjudicate which values LLMs should hold. We argue, more modestly, that current LLM responses overlook critical opportunities to reflect religious frameworks that many people draw on when navigating personal and ethical challenges.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-05-23T00:55:36Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>David Wingate</name>
+    </author>
+    <author>
+      <name>Sheryl Carty</name>
+    </author>
+    <author>
+      <name>Joshua Coates</name>
+    </author>
+    <author>
+      <name>Daniel Feldman</name>
+    </author>
+    <author>
+      <name>Nancy Fulda</name>
+    </author>
+    <author>
+      <name>Larry Howell</name>
+    </author>
+    <author>
+      <name>Brett Israelson</name>
+    </author>
+    <author>
+      <name>Dallin Jacobs</name>
+    </author>
+    <author>
+      <name>Jonathan Karr</name>
+    </author>
+    <author>
+      <name>John Paul Kimes</name>
+    </author>
+    <author>
+      <name>Elisabeth Kincaid</name>
+    </author>
+    <author>
+      <name>Paul Martens</name>
+    </author>
+    <author>
+      <name>Gavin Mobley</name>
+    </author>
+    <author>
+      <name>Suzana Pinheiro</name>
+    </author>
+    <author>
+      <name>Lindsay Slemboski</name>
+    </author>
+    <author>
+      <name>Peter Whiting</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2602.19368v2</id>
+    <title>The Human Factor in Data Cleaning: Exploring Preferences and Biases</title>
+    <updated>2026-03-25T13:37:53Z</updated>
+    <link href="https://arxiv.org/abs/2602.19368v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2602.19368v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Data cleaning is often framed as a technical preprocessing step, yet in practice it relies heavily on human judgment. We report results from a controlled survey study in which participants performed error detection, data repair and imputation, and entity matching tasks on census-inspired scenarios with known semantic validity. We find systematic evidence for several cognitive bias mechanisms in data cleaning. Framing effects arise when surface-level formatting differences (e.g., capitalization or numeric presentation) increase false-positive error flags despite unchanged semantics. Anchoring and adjustment bias appears when expert cues shift participant decisions beyond parity, consistent with salience and availability effects. We also observe the representativeness heuristic: atypical but valid attribute combinations are frequently flagged as erroneous, and in entity matching tasks, surface similarity produces a substantial false-positive rate with high confidence. In data repair, participants show a robust preference for leaving values missing rather than imputing plausible values, consistent with omission bias. In contrast, automation-aligned switching under strong contradiction does not exceed a conservative rare-error tolerance threshold at the population level, indicating that deference to automated recommendations is limited in this setting. Across scenarios, bias patterns persist among technically experienced participants and across diverse workflow practices, suggesting that bias in data cleaning reflects general cognitive tendencies rather than lack of expertise. These findings motivate human-in-the-loop cleaning systems that clearly separate representation from semantics, present expert or algorithmic recommendations non-prescriptively, and support reflective evaluation of atypical but valid cases.</summary>
+    <category term="cs.DB" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-02-22T22:40:31Z</published>
+    <arxiv:comment>8 pages, accepted to appear in an IEEE ICDE 2026 workshop</arxiv:comment>
+    <arxiv:primary_category term="cs.DB"/>
+    <author>
+      <name>Hazim AbdElazim</name>
+    </author>
+    <author>
+      <name>Shadman Islam</name>
+    </author>
+    <author>
+      <name>Mostafa Milani</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2404.12544v1</id>
+    <title>Beyond development: Challenges in deploying machine learning models for structural engineering applications</title>
+    <updated>2024-04-18T23:40:42Z</updated>
+    <link href="https://arxiv.org/abs/2404.12544v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2404.12544v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Machine learning (ML)-based solutions are rapidly changing the landscape of many fields, including structural engineering. Despite their promising performance, these approaches are usually only demonstrated as proof-of-concept in structural engineering, and are rarely deployed for real-world applications. This paper aims to illustrate the challenges of developing ML models suitable for deployment through two illustrative examples. Among various pitfalls, the presented discussion focuses on model overfitting and underspecification, training data representativeness, variable omission bias, and cross-validation. The results highlight the importance of implementing rigorous model validation techniques through adaptive sampling, careful physics-informed feature selection, and considerations of both model complexity and generalizability.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-04-18T23:40:42Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Mohsen Zaker Esteghamati</name>
+    </author>
+    <author>
+      <name>Brennan Bean</name>
+    </author>
+    <author>
+      <name>Henry V. Burton</name>
+    </author>
+    <author>
+      <name>M. Z. Naser</name>
+    </author>
+    <arxiv:doi>10.1061/JSENDH.STENG-13301</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1061/JSENDH.STENG-13301" title="doi"/>
+  </entry>
+</feed>

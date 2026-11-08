@@ -1,0 +1,236 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/jQwlPY2qs33uMVp5NOZ2XQaUE+Y</id>
+  <title>arXiv Query: search_query=all:"fallacy detection" OR all:rules&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-11-08T11:50:25Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22fallacy+detection%22+OR+all:rules&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>81927</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08476v1</id>
+    <title>Defect Anomalies at a Distance</title>
+    <updated>2026-11-05T18:57:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.08476v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08476v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Surface defects carry Weyl and gravitational anomalies that generalize the central charges of two-dimensional conformal field theories (CFTs) and characterize the anomalous response of gapless surface modes to background geometry. These anomalies usually appear as contact terms on the defect. We explain how they are encoded at a distance, in scheme-independent integrated bulk stress-tensor correlators. We derive sum rules for them in terms of defect operator data, establish a lower bound on the boundary Weyl anomaly in three-dimensional CFTs, and illustrate our results with explicit examples.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:57:59Z</published>
+    <arxiv:comment>12 pages, 1 table</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Oleksandr Diatlyk</name>
+    </author>
+    <author>
+      <name>Zimo Sun</name>
+    </author>
+    <author>
+      <name>Yifan Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08470v1</id>
+    <title>Joint Electricity Price and Load Forecasting for Data Center Battery Dispatch Using Polynomial Diffusion Models</title>
+    <updated>2026-11-05T18:55:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.08470v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08470v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The rapid growth of large-scale data centers (DCs) is increasing electricity demand, market volatility, and operating costs. Battery energy storage systems (BESSs) can mitigate these challenges by shifting electricity purchases from high-price to low-price periods. This paper proposes a real-time BESS dispatch framework using polynomial diffusion models (PDMs) to forecast both electricity prices and DC loads. Leveraging the closed-form conditional expectations of PDMs, the forecasts are integrated into a dynamic programming (DP) framework to minimize electricity procurement costs. Across the evaluated BESS configurations, the proposed approach achieves 2.63 times the cost savings of a rule-based (RB) strategy.</summary>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:37Z</published>
+    <arxiv:comment>5 pages, 5 figures, Power &amp; Energy Society (PES) General Meeting</arxiv:comment>
+    <arxiv:primary_category term="eess.SY"/>
+    <author>
+      <name>Matthew Van Ham</name>
+    </author>
+    <author>
+      <name>Yiping Liu</name>
+    </author>
+    <author>
+      <name>Xiaozhe Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08383v1</id>
+    <title>FedReason: Large Language Models as Weight-Space Meta-Aggregators for Heterogeneous Federated Learning</title>
+    <updated>2026-11-05T18:00:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.08383v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08383v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Federated learning servers combine client models with a fixed aggregation rule, and each rule in common use is designed for one kind of heterogeneity. We study whether a large language model (LLM) that inspects the client models can choose the rule itself, without any training on the server. In FedReason, the LLM is called every ten rounds. It analyses the weights by running code in a restricted server-side sandbox, sees only the printed results, may score a few candidates on a 500-image proxy set, and submits a short Python aggregation program. The server applies the program until the next call and falls back to FedAvg whenever its output is invalid. Full weight tensors never leave the server. We evaluated FedReason with Claude Opus 5.5 on CIFAR-10 and CIFAR-100 with ResNet-18 under Dirichlet label skew, width-heterogeneous sub-models and Byzantine clients, in 168 runs against 14 baselines. Across 12 paired label-skew runs it beat FedAvg by 1.26 percentage points on average (10 wins), and a control that spends the same per-round proxy budget on choosing among standard rules by 1.08 points. It was the strongest server-side rule on CIFAR-100 but did not beat SCAFFOLD, which changes client training. With three of ten clients malicious, it excluded all sign-flipping clients from the first round and stayed about one point below FLTrust without training a root model. Without proxy feedback, accuracy fell from 73.8% to 38.8% in one seed. A 60-round run cost 0.79 USD in API fees on average.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:00:58Z</published>
+    <arxiv:comment>Ali Mohammadi Ruzbahani (corresponding)</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Ali Mohammadi Ruzbahani</name>
+    </author>
+    <author>
+      <name>Abbas Yazdinejad</name>
+    </author>
+    <author>
+      <name>Hadis Karimipour</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08376v1</id>
+    <title>Muir: Linear Attention with Sensitivity-Allocated Gating and Matched-Filter Readout</title>
+    <updated>2026-11-05T17:53:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.08376v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08376v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Linear attention compresses context into a fixed-size key-value state for linear-time training and constant-memory inference. Gated delta-rule models decay this state and erase its prediction for an incoming key before writing a new value; Gated DeltaNet-2 (GDN-2) generalizes this with channel-wise decay and decoupled, full-rank erase and write gates. However, we show that state updates are far less sensitive to erasure than to writes: key activation and unit normalization concentrate key energy onto a sparse subset of channels, whereas value writes scale all channels, so the erase gate can be parameterized at lower rank. Furthermore, slow-decaying state rows accumulate much larger norms than fast rows, dominating unweighted readout and forcing stronger write-time erasure to suppress interference. Guided by this analysis, we introduce Muir, which fuses all gates into a sensitivity-allocated low-rank projection, re-weights state rows with a matched-filter readout gate, and reinvests the saved parameters in a wider feed-forward network. Because standard chunkwise algorithms become numerically unstable at the large chunk sizes needed to saturate wide matrix units, we design a parallel update for stable, efficient training. Across 166M-1.34B parameters, Muir lowers perplexity by 1.8-2.0% over GDN-2 and 2.5-3.6% over Transformer, raises commonsense accuracy by up to 1.9 points, and improves extractive recall over GDN-2. At 1.34B, Muir outperforms both baselines on multi-hop and multi-needle recall, extrapolates 2,560x from its 4K training length to 10M-token streams without perplexity drift, and maintains near-100% passkey retrieval to 1M tokens with static readout. Muir achieves these gains while matching GDN-2 throughput, reaching its 100B-token validation loss 1.2x faster, and training 2.7x faster than Transformer at 32K.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:53:49Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Tushaar Gangavarapu</name>
+    </author>
+    <author>
+      <name>Gil Tabak</name>
+    </author>
+    <author>
+      <name>Clemens JS Schaefer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08364v1</id>
+    <title>SHORE: Stability-Hybrid On-Policy Reinforcement Learning for Online Bin Packing</title>
+    <updated>2026-11-05T17:42:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08364v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08364v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Online 3D bin packing with a processing buffer requires choosing which box to pack, its orientation, and its placement while keeping the stack stable under unknown future arrivals. A collapse ends the episode and forfeits the remaining volume. Existing methods use geometric rules or hard stability masks, limiting how risk can influence the joint choice of box, orientation, and placement. We propose Stability-Hybrid On-Policy Reinforcement Learning (SHORE), which combines a learned stability probability of a placement with an on-policy estimate of its return conditional on stability. A 3D U-Net learns stability from executed outcomes and simulated alternatives, revealing outcomes of actions underrepresented in early rollouts. A discrete on-policy actor--critic uses stability predictions in both its action values and policy prior, with gates that limit the effect of an untrained or changing model. In deployment, SHORE does not require additional search or simulation overhead. In Isaac Gym, SHORE reaches 73\% space utilization by 0.4M environment steps, while the same learner without stability modeling reaches that level at about 1M. On the expanded 60-box set, SHORE achieves 0.734 space utilization versus 0.588 for the GOPT state-of-the-art baseline, with a higher placement-failure frequency (1.03\% vs. 0.63\%), trading more risk for greater packed volume. The results show faster learning and higher utilization on the more demanding realistic box arrival set. Ablations suggest that simulated alternatives provide useful early supervision, while executed outcomes alone sustain later performance. We also demonstrate the method on a real robot to verify the simplicity of integrating the method to real bin packing pipelines.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:42:31Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Chang Shi</name>
+    </author>
+    <author>
+      <name>Ann Majewicz Fey</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08356v1</id>
+    <title>Pointless K3 surfaces over finite fields</title>
+    <updated>2026-11-05T17:36:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.08356v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08356v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We prove that K3 surfaces with no rational points over the finite field with $q$ elements exist if and only if $q \leq 11$. Our approach applies linear programming techniques to improve on generic sphere packing bounds for the discriminants of even rootless definite lattices. These bounds are applied to constrain the possible zeta functions of K3 surfaces with no rational points via the Artin--Tate formula. The remaining cases are ruled out by direct analysis of primitive embeddings of particular lattices into Niemeier lattices.</summary>
+    <category term="math.NT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.AG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:36:46Z</published>
+    <arxiv:comment>20 pages</arxiv:comment>
+    <arxiv:primary_category term="math.NT"/>
+    <author>
+      <name>Asher Auel</name>
+    </author>
+    <author>
+      <name>Philip Engel</name>
+    </author>
+    <author>
+      <name>Kiran S. Kedlaya</name>
+    </author>
+    <author>
+      <name>Sair Shaikh</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08343v1</id>
+    <title>LABBA: LLM-Assisted Behavioral Biometric Authentication</title>
+    <updated>2026-11-05T17:29:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08343v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08343v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Behavioral biometrics have emerged as a promising complement to traditional physiological biometrics by leveraging dynamic human characteristics. These modalities offer advantages including continuous authentication, inherent liveness detection, and greater resistance to credential theft and other spoofing attacks. However, existing systems remain limited in adaptability, contextual awareness, and semantic reasoning as they primarily rely on similarity metrics, static thresholds, or supervised classifiers. As a result, they often struggle with real-world conditions such as behavioral variability, environmental changes, contextual changes, and adversarial manipulations.
+  To address these limitations, we systematically integrate LLM-based contextual reasoning into behavioral biometric authentication. LLMs provide capabilities in contextual inference, sequential reasoning, multimodal understanding, and adaptive decision-making. Building on these strengths, we integrate a lightweight LLM-based reasoning module with a novel phone-blowing behavioral biometric technique to develop a context-aware authentication framework. To this end, we first collect blow-acoustic signals from participants and systematically extract spectral and temporal features. These features are aggregated and converted into comparable similarity representations, using either discrete rule-based categories or continuous normalized scores, which are transformed into structured prompts through prompt engineering.
+  We experimentally evaluate the proposed framework using blow-acoustic data collected from 50 participants under diverse behavioral and contextual conditions. The proposed framework achieves 99.46% and 99.38% authentication accuracy in the rule-based and score-based modes, respectively, outperforming its non-LLM counterpart while maintaining strong robustness under dynamic real-world conditions.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:29:24Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Howard Halim</name>
+    </author>
+    <author>
+      <name>Eyasu Getahun Chekole</name>
+    </author>
+    <author>
+      <name>Jianying Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08335v1</id>
+    <title>Discovering Learning Rules that Shape Others</title>
+    <updated>2026-11-05T17:23:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.08335v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08335v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In general-sum games, self-interested learners can reach outcomes that are poor for everyone, which has motivated methods that shape the opponent's learning. Methods like Learning with Opponent-Learning Awareness (LOLA), which differentiates through the opponent's learning process, and Model-Free Opponent Shaping (M-FOS), which uses model-free optimisation methods for long-horizon opponent shaping, have enabled mutual cooperation and exploitation of learners. However, these methods require access to the opponent's parameters, policy, rewards or learning rule during deployment. In single-agent reinforcement learning, update rules discovered by meta-learning have achieved state-of-the-art results (e.g. DiscoRL). These rules are separate from the policy they train and read only the agent's own experience. We hereby extend this framework to general-sum settings by introducing Discovered Update Rule for Opponent Shaping (DUOS). To the best of our knowledge, this is the first method to discover an update rule for an agent in general-sum games. DUOS meta-trains the rule to maximise the agent's expected return over its lifetime, and updates an inner network using the agent's own experience. We show that our discovered rule exhibits behaviour consistent with opponent shaping without reading opponent policies or parameters, and ranks 1st in normalised mean score and 1st in self-play among tournament entrants.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:23:34Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Hong Jun Lee</name>
+    </author>
+    <author>
+      <name>Ziyan Wang</name>
+    </author>
+    <author>
+      <name>Jun Wang</name>
+    </author>
+    <author>
+      <name>Stefanos Leonardos</name>
+    </author>
+    <author>
+      <name>Yali Du</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08323v1</id>
+    <title>Polarity Classification with Multitask Learning Syntax Augmentation</title>
+    <updated>2026-11-05T17:19:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.08323v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08323v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Sentiment Analysis (SA) is a fundamental NLP task concerned with the identification and categorization of subjective information in text. While lexicon-based methods offer transparency, they often struggle with linguistic phenomena such as negation and intensification. Syntactic parsing has been integrated into SA pipelines to address this, but conventional parsers introduce significant computational overhead. Recent work shows that reformulating dependency parsing as a Sequence Labeling (SEL) task can improve efficiency. We propose and compare two strategies for integrating syntactic knowledge into a neural sentiment analysis model under unified Multi-Task Learning (MTL). The first, Standard-MTL, jointly learns dependency parsing (via sequence labeling) and sentiment polarity classification using a shared encoder with two task-specific heads. The second, Contrastive-MTL, provides implicit syntactic guidance through a contrastive auxiliary objective and a syntax-biased attention pooling mechanism, without requiring explicit label prediction. Both rely on syntactic annotations during training and eliminate need for hand-crafted compositional rules or external parsing at inference. We evaluate eleven datasets spanning seven languages---the MARC corpus (English, Spanish, French, German) and seven datasets from SemEval-2022 Task 10 (English, Spanish, Norwegian, Basque, Catalan)---using four established SEL encodings. With the relative encoding, Contrastive-MTL outperforms a syntax-naive baseline on 10 of 11 datasets and surpasses the external rule-based pipeline (SELSP) that parses at inference on all six datasets where the latter applies, while being 1.5--9$\times$ faster at evaluation. Standard-MTL is more dataset- and encoding-dependent. These results show implicit syntactic supervision during training can match or exceed explicit parsing at inference without computational overhead.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:19:09Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Muhammad Imran</name>
+    </author>
+    <author>
+      <name>Carlos Gómez-Rodríguez</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08317v1</id>
+    <title>Random Fibonacci Tilings</title>
+    <updated>2026-11-05T17:14:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.08317v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08317v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Fibonacci spiral is formed by a square-joining rule: begin with a unit square and attach squares whose side lengths follow the Fibonacci sequence; in the standard construction, choices of direction produce a spiral and a tiling of the plane. We study a randomization of this construction, in which the attachment axis alternates deterministically, while fair coin flips determine direction. For a lattice point we ask when the growing rectangle first covers that point and how the expected covering time depends on its location. Tracking the rectangle's boundary reduces this question to random subset sums of even- and odd-indexed Fibonacci numbers. We extend the construction to d dimensions, where coordinate subsequences are super-increasing, allowing us to derive exact covering probabilities and formulas for the expectation and variance. For $d\geq2$, the expected covering time grows logarithmically with distance from the initial block, while the variance remains uniformly bounded. We obtain exponential tail bounds for the delay beyond the earliest feasible covering stage. Finally, we extend the Fibonacci spiral to the randomized tiling through a square-by-square construction using circular arcs and quintic connectors. This construction uses one-step lookahead, admits a continuously differentiable parameterization, and recovers the Fibonacci spiral for the standard tiling.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:14:34Z</published>
+    <arxiv:comment>33 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Yuval Amit</name>
+    </author>
+    <author>
+      <name>Azmera Gebre</name>
+    </author>
+    <author>
+      <name>Christopher Housholder</name>
+    </author>
+    <author>
+      <name>Joshua Khan</name>
+    </author>
+    <author>
+      <name>Steven Miller</name>
+    </author>
+    <author>
+      <name>Emily Upton</name>
+    </author>
+    <author>
+      <name>Connor Yau</name>
+    </author>
+  </entry>
+</feed>
