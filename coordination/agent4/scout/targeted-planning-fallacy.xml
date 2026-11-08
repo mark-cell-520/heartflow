@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/wA/G+r7n2fIn+Crd6DFcEPIh3os</id>
+  <title>arXiv Query: search_query=all:"planning fallacy"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-08T10:07:01Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22planning+fallacy%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>7</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/1802.09999v1</id>
+    <title>Planning Fallacy or Hiding Hand: Which Is the Better Explanation?</title>
+    <updated>2018-02-08T20:55:45Z</updated>
+    <link href="https://arxiv.org/abs/1802.09999v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1802.09999v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper asks and answers the question of whether Kahneman's planning fallacy or Hirschman's Hiding Hand best explain performance in capital investment projects. I agree with my critics that the Hiding Hand exists, i.e., sometimes benefit overruns outweigh cost overruns in project planning and delivery. Specifically, I show this happens in one fifth of projects, based on the best and largest dataset that exists. But that was not the main question I set out to answer. My main question was whether the Hiding Hand is "typical," as claimed by Hirschman. I show this is not the case, with 80 percent of projects not displaying Hiding Hand behavior. Finally, I agree it would be important to better understand the circumstances where the Hiding Hand actually works. However, if you want to understand how projects "typically" work, as Hirschman said he did, then the theories of the planning fallacy, optimism bias, and strategic misrepresentation - according to which cost overruns and benefit shortfalls are the norm - will serve you significantly better than the principle of the Hiding Hand. The latter will lead you astray, because it is a special case instead of a typical one.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-02-08T20:55:45Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <arxiv:journal_ref>World Development, vol. 103, March 2018, pp. 383-386</arxiv:journal_ref>
+    <author>
+      <name>Bent Flyvbjerg</name>
+    </author>
+    <arxiv:doi>10.1016/j.worlddev.2017.10.002</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.worlddev.2017.10.002" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1509.01526v1</id>
+    <title>The Principle of the Malevolent Hiding Hand; or, the Planning Fallacy Writ Large</title>
+    <updated>2015-09-04T16:51:54Z</updated>
+    <link href="https://arxiv.org/abs/1509.01526v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1509.01526v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We identify and document a new principle of economic behavior: the principle of the Malevolent Hiding Hand. In a famous discussion, Albert Hirschman celebrated the Hiding Hand, which he saw as a benevolent mechanism by which unrealistically optimistic planners embark on unexpectedly challenging plans, only to be rescued by human ingenuity, which they could not anticipate, but which ultimately led to success, principally in the form of unexpectedly high net benefits. Studying eleven projects, Hirschman suggested that the Hiding Hand is a general phenomenon. But the Benevolent Hiding Hand has an evil twin, the Malevolent Hiding Hand, which blinds excessively optimistic planners not only to unexpectedly high costs but also to unexpectedly low net benefits. Studying a much larger sample than Hirschman did, we find that the Malevolent Hiding Hand is common and that the phenomenon that Hirschman identified is rare. This sobering finding suggests that Hirschman's phenomenon is a special case; it attests to the pervasiveness of the planning fallacy, writ very large. One implication involves the continuing need for unbiased cost-benefit analyses and other economic decision support tools; another is that such tools might sometimes prove unreliable.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2015-09-04T16:51:54Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <arxiv:journal_ref>Social Research, vol. 83, no. 4, Winter, 2016, pp. 979-1004</arxiv:journal_ref>
+    <author>
+      <name>Bent Flyvbjerg</name>
+    </author>
+    <author>
+      <name>Cass R. Sunstein</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1302.2544v1</id>
+    <title>Quality Control and Due Diligence in Project Management: Getting Decisions Right by Taking the Outside View</title>
+    <updated>2013-02-11T17:26:03Z</updated>
+    <link href="https://arxiv.org/abs/1302.2544v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1302.2544v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper explores how theories of the planning fallacy and the outside view may be used to conduct quality control and due diligence in project management. First, a much-neglected issue in project management is identified, namely that the front-end estimates of costs and benefits--used in the business cases, cost-benefit analyses, and social and environmental impact assessments that typically support decisions on projects--are typically significantly different from actual ex post costs and benefits, and are therefore poor predictors of the actual value and viability of projects. Second, it is discussed how Kahneman and Tversky's theories of the planning fallacy and the outside view may help explain and remedy this situation through quality control of decisions. Third, it is described what quality control and due diligence are in the context of project management, and an eight-step procedure is outlined for due diligence based on the outside view. Fourth, the procedure is tested on a real-life, multibillion-dollar project, organized as a public-private partnership. Finally, Akerlof and Shiller's recent discussion in economics of "firing the forecaster" is discussed together with its relevance to project management. In sum, the paper demonstrates the need, the theoretical basis, a practical methodology, and a real-life example for how to de-bias project management using quality control and due diligence based on the outside view.</summary>
+    <category term="q-fin.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2013-02-11T17:26:03Z</published>
+    <arxiv:primary_category term="q-fin.GN"/>
+    <author>
+      <name>Bent Flyvbjerg</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1805.12106v1</id>
+    <title>Report for the Edinburgh Tram Inquiry</title>
+    <updated>2018-04-02T19:10:03Z</updated>
+    <link href="https://arxiv.org/abs/1805.12106v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1805.12106v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This report reviews the Edinburgh tram project's risk management. Projects frequently overrun their cost and timelines and fall short on intended benefits. Cost, schedule, and benefit risk of projects need to be carefully considered to avoid this. The report describes and evaluates risk assessment and management for the Edinburgh tram. The report was produced as part of the Edinburgh Tram Inquiry.
+  Keywords: risk assessment, risk management, infrastructure, megaprojects, optimism bias, strategic misrepresentation, planning fallacy, behavioral science.</summary>
+    <category term="q-fin.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-04-02T19:10:03Z</published>
+    <arxiv:primary_category term="q-fin.GN"/>
+    <author>
+      <name>Bent Flyvbjerg</name>
+    </author>
+    <author>
+      <name>Alexander Budzier</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1305.0741v1</id>
+    <title>Delusions of Success: Comment on Dan Lovallo and Daniel Kahneman</title>
+    <updated>2013-04-19T09:47:23Z</updated>
+    <link href="https://arxiv.org/abs/1305.0741v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1305.0741v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Dan Lovallo and Daniel Kahneman must be commended for their clear identification of causes and cures to the planning fallacy in "Delusions of Success: How Optimism Undermines Executives' Decisions" (HBR July 2003). Their look at overoptimism, anchoring, competitor neglect, and the outside view in forecasting is highly useful to executives and forecasters. However, Lovallo and Kahneman underrate one source of bias in forecasting - the deliberate "cooking" of forecasts to get ventures started.</summary>
+    <category term="q-fin.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2013-04-19T09:47:23Z</published>
+    <arxiv:primary_category term="q-fin.GN"/>
+    <arxiv:journal_ref>Harvard Business Review, December 2003, 121-122</arxiv:journal_ref>
+    <author>
+      <name>Bent Flyvbjerg</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2202.00125v1</id>
+    <title>Top Ten Behavioral Biases in Project Management: An Overview</title>
+    <updated>2022-01-24T18:33:21Z</updated>
+    <link href="https://arxiv.org/abs/2202.00125v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2202.00125v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Behavioral science has witnessed an explosion in the number of biases identified by behavioral scientists, to more than 200 at present. This article identifies the 10 most important behavioral biases for project management. First, we argue it is a mistake to equate behavioral bias with cognitive bias, as is common. Cognitive bias is half the story; political bias the other half. Second, we list the top 10 behavioral biases in project management: (1) strategic misrepresentation, (2) optimism bias, (3) uniqueness bias, (4) the planning fallacy, (5) overconfidence bias, (6) hindsight bias, (7) availability bias, (8) the base rate fallacy, (9) anchoring, and (10) escalation of commitment. Each bias is defined, and its impacts on project management are explained, with examples. Third, base rate neglect is identified as a primary reason that projects underperform. This is supported by presentation of the most comprehensive set of base rates that exist in project management scholarship, from 2,062 projects. Finally, recent findings of power law outcomes in project performance are identified as a possible first stage in discovering a general theory of project management, with more fundamental and more scientific explanations of project outcomes than found in conventional theory.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-01-24T18:33:21Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <arxiv:journal_ref>Project Management Journal 52(6), 2021</arxiv:journal_ref>
+    <author>
+      <name>Bent Flyvbjerg</name>
+    </author>
+    <arxiv:doi>10.1177/87569728211049046</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1177/87569728211049046" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2610.40324v1</id>
+    <title>Crowds Believe in You: Online Prediction Markets Overestimate How Often People Achieve Their Own Goals</title>
+    <updated>2026-10-29T15:55:24Z</updated>
+    <link href="https://arxiv.org/abs/2610.40324v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.40324v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>People increasingly share personal goals online and invite others to forecast them. Research on the planning fallacy finds that observers predict a person's behavior less optimistically than the person does, and prediction markets aggregate such judgments, harnessing the wisdom of crowds. We study 6,150 prediction markets on Manifold in which 1,660 users asked about their own futures ("Will I ...?"), reconstruct every order and execution, and compare these self-markets with markets about external events. Self-markets resolved YES 4.4 percentage points less often than their final prices implied, whereas external markets were nearly calibrated (0.9 points); the difference was 2.2 points at the same price level and 1.9 points within creators who made both kinds of market. Absent when markets opened, the overstatement emerged within a day of trading, even where the person never traded, and peaked in the week before close. In a market's first day, observers moved external-market prices down toward the base rate, but moved self-market prices 3.6 points further toward YES, except in markets naming an outcome the person would not want, which were not overpriced. The correction came late and largely from the person, whose orders supplied 38% of the eventual movement toward the outcome in self-markets, against 9% in external markets. Because self-market prices mainly failed to separate successes from failures, a recalibration learned from earlier markets improved later forecasts by only 1.5%. Crowds believe in the futures people pose for themselves, and the information that would correct them lies with the person.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-29T15:55:24Z</published>
+    <arxiv:comment>23 pages, 2 figures, 14 tables; working paper</arxiv:comment>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Zihan Chen</name>
+    </author>
+    <author>
+      <name>Lei Nico Zheng</name>
+    </author>
+    <author>
+      <name>Di Zhu</name>
+    </author>
+  </entry>
+</feed>

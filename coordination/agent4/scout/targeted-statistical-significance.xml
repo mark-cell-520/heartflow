@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/1BmQKain32A53h5BgsA52TOBHlE</id>
+  <title>arXiv Query: search_query=all:"statistical significance"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-08T10:07:06Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22statistical+significance%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>9827</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2407.16013v1</id>
+    <title>A statistical significance test for spatio-temporal receptive field estimates obtained using spike-triggered averaging of binary pseudo-random sequences</title>
+    <updated>2024-07-22T19:42:42Z</updated>
+    <link href="https://arxiv.org/abs/2407.16013v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2407.16013v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Spatio-temporal receptive fields (STRF) of visual neurons are often estimated using spike-triggered averaging of binary pseudo-random stimulus sequences. The spike train of a visual neuron is recorded simultaneously with the stimulus presentation. The neuron's STRF is estimated by averaging the stimulus frames that coincide with spikes at fixed latencies. Although this is a widely used technique, an analytical method for determining the statistical significance of the estimated value of the STRF pixels seems to be lacking. Such a significance test would be useful for identifying the significant features of the STRF and investigating their relationship with experimental variables. Here, the distribution of the estimated STRF pixel values is derived for given spike trains, under the null hypothesis that spike occurrences and stimulus values are statistically independent. This distribution is then used for computing amplitude thresholds to determine the STRF pixels where the null hypothesis can be rejected at a desired two-tailed significance level. It is also proposed that the size of the receptive field may be inferred from the significant pixels. The application of the proposed method is illustrated on spike trains collected from individual mouse retinal ganglion cells.</summary>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-07-22T19:42:42Z</published>
+    <arxiv:comment>This is a replacement of the article "Okatan, M. A statistical significance test for spatio-temporal receptive field estimates obtained using spike-triggered averaging of binary pseudo-random sequences. SIViP 17, 3759-3766 (2023). https://doi.org/10.1007/s11760-023-02603-1". The current manuscript corrects an error in the lower right panel of Fig. 2 of the original article</arxiv:comment>
+    <arxiv:primary_category term="q-bio.QM"/>
+    <arxiv:journal_ref>SIViP 17, 3759-3766 (2023)</arxiv:journal_ref>
+    <author>
+      <name>Murat Okatan</name>
+    </author>
+    <arxiv:doi>10.1007/s11760-023-02603-1</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s11760-023-02603-1" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2408.07839v1</id>
+    <title>Fast computation of the statistical significance test for spatio-temporal receptive field estimates obtained using spike-triggered averaging of binary pseudo-random sequences</title>
+    <updated>2024-08-14T22:24:35Z</updated>
+    <link href="https://arxiv.org/abs/2408.07839v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2408.07839v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Background: Spatio-temporal receptive fields (STRF) of visual neurons are often estimated using spike-triggered averaging of binary pseudo-random stimulus sequences. The stimuli are visual displays that contain black and white pixels that flicker randomly at a fixed frame rate without any spatial or temporal correlation. The spike train of a visual neuron, such as a retinal ganglion cell, is recorded simultaneously with the stimulus presentation. The neuron's STRF is estimated by averaging the stimulus frames that coincide with spikes at fixed latencies. Recently, an exact analytical method for determining the statistical significance of the estimated value of the STRF pixels has been developed. Application of the method on spike trains collected from individual mouse retinal ganglion cells revealed that the time required to compute the test ranged from a couple of minutes to half a day for different neurons. New method: Here, this method is accelerated by using the Normal approximation to the null distribution of STRF pixel estimates. Results: The significance threshold and computation time obtained under the approximate distribution are examined systematically as a function of various input spike trains collected from individual mouse retinal ganglion cells. Comparison with existing methods: The accuracy and the time saved by the use of the approximate distribution are examined in comparison with the exact distribution. Conclusions: For the real data analyzed here, the approximate distribution yields the same significance thresholds as the exact distribution within a much shorter computation time.</summary>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-08-14T22:24:35Z</published>
+    <arxiv:comment>This paper develops an approximate method that accelerates the exact method of Okatan, M. A statistical significance test for spatio-temporal receptive field estimates obtained using spike-triggered averaging of binary pseudo-random sequences. SIViP 17, 3759-3766 (2023). https://doi.org/10.1007/s11760-023-02603-1</arxiv:comment>
+    <arxiv:primary_category term="q-bio.QM"/>
+    <author>
+      <name>Murat Okatan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/0812.2708v1</id>
+    <title>On Statistical Significance of Signal</title>
+    <updated>2008-12-15T01:57:11Z</updated>
+    <link href="https://arxiv.org/abs/0812.2708v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/0812.2708v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  A definition for the statistical significance of a signal in an experiment is proposed by establishing a correlation between the observed p-value and the normal distribution integral probability, which is suitable for both counting experiment and continuous test statistics. The explicit expressions to calculate the statistical significance for both cases are given.</summary>
+    <category term="physics.data-an" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2008-12-15T01:57:11Z</published>
+    <arxiv:comment>3 pages</arxiv:comment>
+    <arxiv:primary_category term="physics.data-an"/>
+    <arxiv:journal_ref>High Energy Phys. Nucl. Phys. 30: 331-334, 2006</arxiv:journal_ref>
+    <author>
+      <name>Yong-Sheng Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/physics/0507145v2</id>
+    <title>On the Statistical Significance</title>
+    <updated>2006-03-10T01:01:27Z</updated>
+    <link href="https://arxiv.org/abs/physics/0507145v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/physics/0507145v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  A definition for the statistical significance by constructing a correlation between the normal distribution integral probability and the p-value observed in an experiment is proposed, which is suitable for both counting experiment and continuous test statistics.</summary>
+    <category term="physics.data-an" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2005-07-20T01:43:28Z</published>
+    <arxiv:comment>3 pages, 1 table</arxiv:comment>
+    <arxiv:primary_category term="physics.data-an"/>
+    <arxiv:journal_ref>High Ener. Phys. Nucl. Phys. 30(2006)331</arxiv:journal_ref>
+    <author>
+      <name>Yongsheng Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2104.00262v3</id>
+    <title>Statistical significance revisited</title>
+    <updated>2024-06-18T10:06:13Z</updated>
+    <link href="https://arxiv.org/abs/2104.00262v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2104.00262v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Statistical significance measures the reliability of a result obtained from a random experiment. We investigate the number of repetitions needed for a statistical result to have a certain significance. In the first step, we consider binomially distributed variables in the example of medication testing with fixed placebo efficacy, asking how many experiments are needed in order to achieve a significance of 95 %. In the next step, we take the probability distribution of the placebo efficacy into account, which to the best of our knowledge has not been done so far. Depending on the specifics, we show that in order to obtain identical significance, it may be necessary to perform twice as many experiments than in a setting where the placebo distribution is neglected. We proceed by considering more general probability distributions and close with comments on some erroneous assumptions on probability distributions which lead, for instance, to a trivial explanation of the fat tail.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2021-04-01T05:38:46Z</published>
+    <arxiv:comment>14 pages, 3 figures</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Maike Tormählen</name>
+    </author>
+    <author>
+      <name>Galiya Klinkova</name>
+    </author>
+    <author>
+      <name>Michael Grabinski</name>
+    </author>
+    <arxiv:doi>10.20944/preprints202103.0398.v1</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.20944/preprints202103.0398.v1" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1006.3244v3</id>
+    <title>Statistical Significance of the Gallium Anomaly</title>
+    <updated>2011-03-28T16:27:18Z</updated>
+    <link href="https://arxiv.org/abs/1006.3244v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1006.3244v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We calculate the statistical significance of the anomalous deficit of electron neutrinos measured in the radioactive source experiments of the GALLEX and SAGE solar neutrino detectors taking into account the uncertainty of the detection cross section. We found that the statistical significance of the anomaly is about 3.0 sigma. A fit of the data in terms of neutrino oscillations favors at about 2.7 sigma short-baseline electron neutrino disappearance with respect to the null hypothesis of no oscillations.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nucl-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nucl-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2010-06-16T15:16:05Z</published>
+    <arxiv:comment>6 pages; improved analysis with correlation of theoretical uncertainty</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <arxiv:journal_ref>Phys.Rev.C83:065504,2011</arxiv:journal_ref>
+    <author>
+      <name>Carlo Giunti</name>
+    </author>
+    <author>
+      <name>Marco Laveder</name>
+    </author>
+    <arxiv:doi>10.1103/PhysRevC.83.065504</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1103/PhysRevC.83.065504" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1112.2516v2</id>
+    <title>Caveats for using statistical significance tests in research assessments</title>
+    <updated>2012-09-25T07:15:27Z</updated>
+    <link href="https://arxiv.org/abs/1112.2516v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1112.2516v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper raises concerns about the advantages of using statistical significance tests in research assessments as has recently been suggested in the debate about proper normalization procedures for citation indicators. Statistical significance tests are highly controversial and numerous criticisms have been leveled against their use. Based on examples from articles by proponents of the use statistical significance tests in research assessments, we address some of the numerous problems with such tests. The issues specifically discussed are the ritual practice of such tests, their dichotomous application in decision making, the difference between statistical and substantive significance, the implausibility of most null hypotheses, the crucial assumption of randomness, as well as the utility of standard errors and confidence intervals for inferential purposes. We argue that applying statistical significance tests and mechanically adhering to their results is highly problematic and detrimental to critical thinking. We claim that the use of such tests do not provide any advantages in relation to citation indicators, interpretations of them, or the decision making processes based upon them. On the contrary their use may be harmful. Like many other critics, we generally believe that statistical significance tests are over- and misused in the social sciences including scientometrics and we encourage a reform on these matters.</summary>
+    <category term="cs.DL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2011-12-12T11:57:12Z</published>
+    <arxiv:comment>Accepted version for Journal of Informetrics</arxiv:comment>
+    <arxiv:primary_category term="cs.DL"/>
+    <author>
+      <name>Jesper W. Schneider</name>
+    </author>
+    <arxiv:doi>10.1016/j.joi.2012.08.005</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.joi.2012.08.005" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1809.01448v1</id>
+    <title>Appendix - Recommended Statistical Significance Tests for NLP Tasks</title>
+    <updated>2018-09-05T11:55:05Z</updated>
+    <link href="https://arxiv.org/abs/1809.01448v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1809.01448v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Statistical significance testing plays an important role when drawing conclusions from experimental results in NLP papers. Particularly, it is a valuable tool when one would like to establish the superiority of one algorithm over another. This appendix complements the guide for testing statistical significance in NLP presented in \cite{dror2018hitchhiker} by proposing valid statistical tests for the common tasks and evaluation measures in the field.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-09-05T11:55:05Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Rotem Dror</name>
+    </author>
+    <author>
+      <name>Roi Reichart</name>
+    </author>
+  </entry>
+</feed>

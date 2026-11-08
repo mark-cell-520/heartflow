@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/kaEb4vOhkfzved1z4WNpwkYUl/A</id>
+  <title>arXiv Query: search_query=all:"cognitive bias detection"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-08T10:07:10Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22cognitive+bias+detection%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2503.05516v1</id>
+    <title>Cognitive Bias Detection Using Advanced Prompt Engineering</title>
+    <updated>2025-03-07T15:35:37Z</updated>
+    <link href="https://arxiv.org/abs/2503.05516v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2503.05516v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cognitive biases, systematic deviations from rationality in judgment, pose significant challenges in generating objective content. This paper introduces a novel approach for real-time cognitive bias detection in user-generated text using large language models (LLMs) and advanced prompt engineering techniques. The proposed system analyzes textual data to identify common cognitive biases such as confirmation bias, circular reasoning, and hidden assumption. By designing tailored prompts, the system effectively leverages LLMs' capabilities to both recognize and mitigate these biases, improving the quality of human-generated content (e.g., news, media, reports). Experimental results demonstrate the high accuracy of our approach in identifying cognitive biases, offering a valuable tool for enhancing content objectivity and reducing the risks of biased decision-making.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-03-07T15:35:37Z</published>
+    <arxiv:comment>17 pages. 6 Figures, 2 Tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Frederic Lemieux</name>
+    </author>
+    <author>
+      <name>Aisha Behr</name>
+    </author>
+    <author>
+      <name>Clara Kellermann-Bryant</name>
+    </author>
+    <author>
+      <name>Zaki Mohammed</name>
+    </author>
+  </entry>
+</feed>

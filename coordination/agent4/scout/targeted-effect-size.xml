@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/1hsO2Lr6oX5zisaJW21ipRhLnAw</id>
+  <title>arXiv Query: search_query=all:"effect size"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-08T10:07:07Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22effect+size%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>1199</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/1809.02623v2</id>
+    <title>A reproducible effect size is more useful than an irreproducible hypothesis test to analyze high throughput sequencing datasets</title>
+    <updated>2019-05-13T16:03:17Z</updated>
+    <link href="https://arxiv.org/abs/1809.02623v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1809.02623v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Motivation: P values derived from the null hypothesis significance testing framework are strongly affected by sample size, and are known to be irreproducible in underpowered studies, yet no suitable replacement has been proposed. Results: Here we present implementations of non-parametric standardized median effect size estimates, dNEF, for high-throughput sequencing datasets. Case studies are shown for transcriptome and tag-sequencing datasets. The dNEF measure is shown to be more reproducible and robust than P values and requires sample sizes as small as 3 to reproducibly identify differentially abundant features. Availability: Source code and binaries freely available at: https://bioconductor.org/packages/ALDEx2.html , omicplotR, and https://github.com/ggloor/CoDaSeq .</summary>
+    <category term="q-bio.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-09-07T18:07:28Z</published>
+    <arxiv:comment>Draft paper explaining the properties and utility of the ALDEx2 effect size metric</arxiv:comment>
+    <arxiv:primary_category term="q-bio.GN"/>
+    <author>
+      <name>Andrew D. Fernandes</name>
+    </author>
+    <author>
+      <name>Michael T. H. Q. Vu</name>
+    </author>
+    <author>
+      <name>Lisa-Monique Edward</name>
+    </author>
+    <author>
+      <name>Jean M. Macklaim</name>
+    </author>
+    <author>
+      <name>Gregory B. Gloor</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.26211v1</id>
+    <title>An Honest Effect Size for Contingency Tables: Why Nothing Can Be Unbiased, Where to Put the Error Instead, and How to Route the Report</title>
+    <updated>2026-08-12T00:44:22Z</updated>
+    <link href="https://arxiv.org/abs/2609.26211v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.26211v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cramer's V is the effect size reported beside almost every chi-square test, read against Cohen's labels, yet a large fraction of such numbers describe sampling noise and the standard bias correction (Bergsma 2013) does not fix it. We assemble three results and claim only the consequence of each. First, the squared effect size phi^2 admits no unbiased estimator at any sample size: under fixed-N multinomial sampling the expectation of any estimator is a polynomial in the cell probabilities, while phi^2 is not. Second, unbiasedness transfers across a rescaling of the effect size only if the rescaling is affine, and among affine choices V^2 = phi^2/k is the one bounded in [0,1] with value 1 at perfect association. Third, we give an interval with conservative, asymptotically valid coverage, obtained by projecting a likelihood-ratio confidence set for the cell probabilities through the effect-size map; its lower endpoint is zero in closed form exactly when the test of independence fails to reject. Because nothing is unbiased, the only question is where the irreducible error is placed. Bergsma's correction puts zero error at the null but several percent under the alternative; a delete-one jackknife on the V^2 scale spreads it thin everywhere (absolute bias at most 0.008 over a 180-design grid). Pooling does not remove bias: across 3,000 simulated meta-analyses, pooling 200 studies drives the naive estimator's chance of landing within 0.01 of the truth to zero, while the jackknife's rises to 0.99. The projected interval covers 0.997-1.000 across the tested designs, while a noncentral inversion undercovers (0.936 at phi^2 = 0.18) at two to three times the width. The point estimate and the interval are different problems with different answers; conflating them is why the literature has neither. We give a routing rule and a browser tool that implements it.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-12T00:44:22Z</published>
+    <arxiv:comment>19 pages, 7 figures. Under review at Biometrical Journal. Reproducible code, data, and the derivations companion are openly archived on Zenodo: https://doi.org/10.5281/zenodo.21783660. Part of a contingency-table effect-size series (companions on the per-table noise floor, the exact conditional confidence interval, and the exact conditional distribution engine)</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>William J. Dwyer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.26128v1</id>
+    <title>An Exact Noise Floor for Contingency-Table Effect Sizes: A Per-Table Reporting Gate, and How Often It Would Change Reported Magnitudes</title>
+    <updated>2026-08-11T06:00:18Z</updated>
+    <link href="https://arxiv.org/abs/2609.26128v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.26128v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cramer's V and the other chi-square-family effect sizes are positive under exact independence, so a reported value can be smaller than what the same statistic produces on a table with no association at all. The upward bias is classical (Tschuprow 1925; Bartlett 1937; corrected by Bergsma 2013), and reporting the boundary value, the critical effect size, beside the observed one has been recommended in general form (Perugini et al. 2025); we claim neither. Our contribution is two things a general recommendation does not supply. First, an exact per-table reporting gate: the noise floor V_0.95, the value the effect size reaches by chance 5% of the time under independence, computed from the exact margin-conditional law rather than the asymptotic critical value. The asymptotic floor miscalibrates where reporting is riskiest: on heterogeneous tables its false-alarm rate reaches 0.10 against a 0.05 target, while the exact floor holds nominal. Second, a measurement: across 4,129 real two-way tables from 291 public datasets, 21.8% of labeled effects (cluster-robust 95% CI 17 to 27%) sit on tables with no significant association. We recommend reporting V_0.95, in exact form on sparse or heterogeneous tables, beside every association measure and at the design stage.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-11T06:00:18Z</published>
+    <arxiv:comment>27 pages, 6 figures. Under review at Journal of Applied Statistics. Reproducible code, data, and the derivation companion are openly archived on Zenodo: https://doi.org/10.5281/zenodo.21664321. Part of a contingency-table effect-size series (companions on the point estimate, the confidence interval, and the exact conditional distribution engine)</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>William J. Dwyer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1902.07232v2</id>
+    <title>A Robust Effect Size Index</title>
+    <updated>2019-10-30T17:37:24Z</updated>
+    <link href="https://arxiv.org/abs/1902.07232v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1902.07232v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Effect size indices are useful tools in study design and reporting because they are unitless measures of association strength that do not depend on sample size. Existing effect size indices are developed for particular parametric models or population parameters. Here, we propose a robust effect size index based on M-estimators. This approach yields an index that is very generalizable because it is unitless across a wide range of models. We demonstrate that the new index is a function of Cohen's $d$, $R^2$, and standardized log odds ratio when each of the parametric models is correctly specified. We show that existing effect size estimators are biased when the parametric models are incorrect (e.g. under unknown heteroskedasticity). We provide simple formulas to compute power and sample size and use simulations to assess the bias and variance of the effect size estimator in finite samples. Because the new index is invariant across models, it has the potential to make communication and comprehension of effect size uniform across the behavioral sciences.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-02-19T19:06:40Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <arxiv:journal_ref>Psychometrika 85 (2020) 232-246</arxiv:journal_ref>
+    <author>
+      <name>Simon Vandekar</name>
+    </author>
+    <author>
+      <name>Ran Tao</name>
+    </author>
+    <author>
+      <name>Jeffrey Blume</name>
+    </author>
+    <arxiv:doi>10.1007/s11336-020-09698-2</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s11336-020-09698-2" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2303.09428v1</id>
+    <title>Contra-Analysis for Determining Negligible Effect Size in Scientific Research</title>
+    <updated>2023-03-16T16:01:57Z</updated>
+    <link href="https://arxiv.org/abs/2303.09428v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2303.09428v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scientific experiments study interventions that show evidence of an effect size that is meaningfully large, negligibly small, or inconclusively broad. Previously, we proposed contra-analysis as a decision-making process to help determine which interventions have a meaningfully large effect by using contra plots to compare effect size across broadly related experiments. Here, we extend the use of contra plots to determine which results have evidence of negligible (near-zero) effect size. Determining if an effect size is negligible is important for eliminating alternative scientific explanations and identifying approximate independence between an intervention and the variable measured. We illustrate that contra plots can score negligible effect size across studies, inform the selection of a threshold for negligible effect based on broadly related results, and determine which results have evidence of negligible effect with a hypothesis test. No other data visualization can carry out all three of these tasks for analyzing negligible effect size. We demonstrate this analysis technique on real data from biomedical research. This new application of contra plots can differentiate statistically insignificant results with high strength (narrow and near-zero interval estimate of effect size) from those with low strength (broad interval estimate of effect size). Such a designation could help resolve the File Drawer problem in science, where statistically insignificant results are underreported because their interpretation is ambiguous and nonstandard. With our proposed procedure, results designated with negligible effect will be considered strong and publishable evidence of near-zero effect size.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-03-16T16:01:57Z</published>
+    <arxiv:comment>arXiv admin note: text overlap with arXiv:2210.04867</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Bruce A. Corliss</name>
+    </author>
+    <author>
+      <name>Yaotian Wang</name>
+    </author>
+    <author>
+      <name>Heman Shakeri</name>
+    </author>
+    <author>
+      <name>Philip E. Bourne</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2210.04867v1</id>
+    <title>Contra-Analysis: Prioritizing Meaningful Effect Size in Scientific Research</title>
+    <updated>2022-10-10T17:37:07Z</updated>
+    <link href="https://arxiv.org/abs/2210.04867v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2210.04867v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>At every phase of scientific research, scientists must decide how to allocate limited resources to pursue the research inquiries with the greatest potential. This prioritization dictates which controlled interventions are studied, awarded funding, published, reproduced with repeated experiments, investigated in related contexts, and translated for societal use. There are many factors that influence this decision-making, but interventions with larger effect size are often favored because they exert the greatest influence on the system studied. To inform these decisions, scientists must compare effect size across studies with dissimilar experiment designs to identify the interventions with the largest effect. These studies are often only loosely related in nature, using experiments with a combination of different populations, conditions, timepoints, measurement techniques, and experiment models that measure the same phenomenon with a continuous variable. We name this assessment contra-analysis and propose to use credible intervals of the relative difference in means to compare effect size across studies in a meritocracy between competing interventions. We propose a data visualization, the contra plot, that allows scientists to score and rank effect size between studies that measure the same phenomenon, aid in determining an appropriate threshold for meaningful effect, and perform hypothesis tests to determine which interventions have meaningful effect size. We illustrate the use of contra plots with real biomedical research data. Contra-analysis promotes a practical interpretation of effect size and facilitates the prioritization of scientific research.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-10-10T17:37:07Z</published>
+    <arxiv:comment>4 figures, 8000 words</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Bruce A. Corliss</name>
+    </author>
+    <author>
+      <name>Yaotian Wang</name>
+    </author>
+    <author>
+      <name>Heman Shakeri</name>
+    </author>
+    <author>
+      <name>Philip E. Bourne</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2402.04327v1</id>
+    <title>On the estimation and interpretation of effect size metrics</title>
+    <updated>2024-02-06T19:10:30Z</updated>
+    <link href="https://arxiv.org/abs/2402.04327v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2402.04327v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Effect size estimates are thought to capture the collective, two-way response to an intervention or exposure in a three-way problem among the intervention/exposure, various confounders and the outcome. For meaningful causal inference from the estimated effect size, the joint distribution of observed confounders must be identical across all intervention/exposure groups. However, real-world observational studies and even randomized clinical trials often lack such structural symmetry. To address this issue, various methods have been proposed and widely utilized. Recently, elementary combinatorics and information theory have motivated a consistent way to completely eliminate observed confounding in any given study. In this work, we leverage these new techniques to evaluate conventional methods based on their ability to (a) consistently differentiate between collective and individual responses to intervention/exposure and (b) establish the desired structural parity for sensible effect size estimation. Our findings reveal that a straightforward application of logistic regression homogenizes the three-way stratified analysis, but fails to restore structural symmetry leaving in particular the two-way effect size estimate unadjusted. Conversely, the Mantel-Haenszel estimator struggles to separate three-way effects from the two-way effect of intervention/exposure, leading to inconsistencies in interpreting pooled estimates as two-way risk metrics.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-02-06T19:10:30Z</published>
+    <arxiv:comment>10 pages, 1 Figure, 3 diagrams, 2 tables</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Orestis Loukas</name>
+    </author>
+    <author>
+      <name>Ho Ryun Chung</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2302.12345v1</id>
+    <title>RESI: An R Package for Robust Effect Sizes</title>
+    <updated>2023-02-23T21:28:49Z</updated>
+    <link href="https://arxiv.org/abs/2302.12345v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2302.12345v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Effect size indices are useful parameters that quantify the strength of association and are unaffected by sample size. There are many available effect size parameters and estimators, but it is difficult to compare effect sizes across studies as most are defined for a specific type of population parameter. We recently introduced a new Robust Effect Size Index (RESI) and confidence interval, which is advantageous because it is not model-specific. Here we present the RESI R package, which makes it easy to report the RESI and its confidence interval for many different model classes, with a consistent interpretation across parameters and model types. The package produces coefficient, ANOVA tables, and overall Wald tests for model inputs, appending the RESI estimate and confidence interval to each. The package also includes functions for visualization and conversions to and from other effect size measures. For illustration, we analyze and interpret three different model types.</summary>
+    <category term="stat.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-02-23T21:28:49Z</published>
+    <arxiv:comment>25 pages, 2 figures. Submitted to Journal of Statistical Software</arxiv:comment>
+    <arxiv:primary_category term="stat.CO"/>
+    <author>
+      <name>Megan Jones</name>
+    </author>
+    <author>
+      <name>Kaidi Kang</name>
+    </author>
+    <author>
+      <name>Simon Vandekar</name>
+    </author>
+  </entry>
+</feed>

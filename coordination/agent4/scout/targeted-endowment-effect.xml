@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/R7c47zRa8c6CUogK1aFxYZ7PFPM</id>
+  <title>arXiv Query: search_query=all:"endowment effect"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-08T10:07:03Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22endowment+effect%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>8</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/1805.10913v1</id>
+    <title>Combinatorial Auctions with Endowment Effect</title>
+    <updated>2018-05-28T13:31:31Z</updated>
+    <link href="https://arxiv.org/abs/1805.10913v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1805.10913v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study combinatorial auctions with bidders that exhibit endowment effect. In most of the previous work on cognitive biases in algorithmic game theory (e.g., [Kleinberg and Oren, EC'14] and its follow-ups) the focus was on analyzing the implications and mitigating their negative consequences. In contrast, in this paper we show how in some cases cognitive biases can be harnessed to obtain better outcomes.
+  Specifically, we study Walrasian equilibria in combinatorial markets. It is well known that Walrasian equilibria exist only in limited settings, e.g., when all valuations are gross substitutes, but fails to exist in more general settings, e.g., when the valuations are submodular. We consider combinatorial settings in which bidders exhibit the endowment effect, that is, their value for items increases with ownership.
+  Our main result shows that when the valuations are submodular, even a mild degree of endowment effect is sufficient to guarantee the existence of Walrasian equilibria. In fact, we show that in contrast to Walrasian equilibria with standard utility maximizing bidders -- in which the equilibrium allocation must be efficient -- when bidders exhibit endowment effect any local optimum can be an equilibrium allocation.
+  Our techniques reveal interesting connections between the LP relaxation of combinatorial auctions and local maxima. We also provide lower bounds on the intensity of the endowment effect that the bidders must have in order to guarantee the existence of a Walrasian equilibrium in various settings.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-05-28T13:31:31Z</published>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Moshe Babaioff</name>
+    </author>
+    <author>
+      <name>Shahar Dobzinski</name>
+    </author>
+    <author>
+      <name>Sigal Oren</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1809.08500v2</id>
+    <title>Eliciting the Endowment Effect under Assigned Ownership</title>
+    <updated>2018-10-04T04:14:13Z</updated>
+    <link href="https://arxiv.org/abs/1809.08500v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1809.08500v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this study we present evidence that endowment effect can be elicited merely by assigned ownership. Using Google Customer Survey, we administered a survey were participants (n=495) were randomly split into 4 groups. Each group was assigned ownership of either legroom or their ability to recline on an airline. Using this experiment setup we were able to generate endowment effect, a 15-20x (at p&lt;0.05) increase between participant's willingness to pay (WTP) and their willingness to accept (WTA).</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-09-22T22:44:23Z</published>
+    <arxiv:comment>14 pages, 12 figures</arxiv:comment>
+    <arxiv:primary_category term="econ.GN"/>
+    <author>
+      <name>Patrick Barranger</name>
+    </author>
+    <author>
+      <name>Rohit Nair</name>
+    </author>
+    <author>
+      <name>Rob Mulla</name>
+    </author>
+    <author>
+      <name>Shane Conner</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1903.11360v3</id>
+    <title>A General Framework for Endowment Effects in Combinatorial Markets</title>
+    <updated>2019-11-10T12:15:53Z</updated>
+    <link href="https://arxiv.org/abs/1903.11360v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1903.11360v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The endowment effect, coined by Nobel Laureate Richard Thaler, posits that people tend to inflate the value of items they own. This bias was studied, both theoretically and empirically, with respect to a single item. Babaioff et al. [EC'18] took a first step at extending this study beyond a single item. They proposed a specific formulation of the endowment effect in combinatorial settings, and showed that equilibrium existence with respect to the endowed valuations extends from gross substitutes to submodular valuations, but provably fails to extend to XOS valuations.
+  Extending the endowment effect to combinatorial settings can take different forms. In this work, we devise a framework that captures a space of endowment effects, upon which we impose a partial order, which preserves endowment equilibrium existence. Within this framework, we provide existence and welfare guarantees for endowment equilibria corresponding to various endowment effects. Our main results are the following:
+  (1) For markets with XOS valuations, we introduce an endowment effect that is stronger than that of Babaioff et al., for which an endowment equilibrium is guaranteed to exist and gives at least half of the optimal welfare. Moreover, this equilibrium can be reached via a variant of the flexible ascent auction.
+  (2) For markets with arbitrary valuations, we show that bundling leads to a sweeping positive result. In particular, if items can be prepacked into indivisible bundles, there always exists an endowment equilibrium with optimal welfare. Moreover, we provide a polynomial algorithm that given an arbitrary allocation $S$, computes an endowment equilibrium with the same welfare guarantee as in $S$.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-03-27T11:41:47Z</published>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Tomer Ezra</name>
+    </author>
+    <author>
+      <name>Michal Feldman</name>
+    </author>
+    <author>
+      <name>Ophir Friedler</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.05115v1</id>
+    <title>Creators Have Difficulty Abandoning Ideas They Generated</title>
+    <updated>2026-09-04T13:09:11Z</updated>
+    <link href="https://arxiv.org/abs/2609.05115v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.05115v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Creativity researchers often distinguish between two stages of the creative process: generation versus selection. While much is known about the psychology of idea generation (e.g., the factors that lead to a greater number of novel and useful ideas), less is understood about the nature of selection, or how generation and selection interact. Here we investigate how the act of generating ideas may potentially distort the selection process. Using an incentive-compatible paradigm in which pairs of participants reviewed the same ideas and were rewarded for submitting only high-quality ideas, we find that people submit a greater number of lower-quality ideas when selecting among their own ideas than when selecting among another person's ideas (the Creative Endowment Effect). This effect generalizes across three tasks in two domains and is resistant to an informational intervention (i.e., explicitly telling people about the effect). However, having participants revisit their ideas several months later increases their selectivity. The broader implications for individuals and organizations are discussed.</summary>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-04T13:09:11Z</published>
+    <arxiv:primary_category term="econ.GN"/>
+    <arxiv:journal_ref>Sci Rep (2026)</arxiv:journal_ref>
+    <author>
+      <name>Jin Kim</name>
+    </author>
+    <author>
+      <name>George E. Newman</name>
+    </author>
+    <arxiv:doi>10.1038/s41598-026-60775-5</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1038/s41598-026-60775-5" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.27239v1</id>
+    <title>Reference Dependence and the Structure of the WTA/WTP Gap</title>
+    <updated>2026-07-26T14:47:51Z</updated>
+    <link href="https://arxiv.org/abs/2607.27239v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.27239v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper studies the willingness-to-accept/willingness-to-pay (WTA-WTP) gap under objective probabilities. Preferences over finite lotteries satisfy completeness, transitivity, continuity, weak independence, reference partition, and range dependence. Weak independence requires von Neumann-Morgenstern independence only for mixtures that preserve the reference point and do not move outcomes across the induced gain-loss partition. The representation, weak rank-dependent utility (WRDU), evaluates gains and losses by separate subutilities anchored at the reference point and recombines them through a range-dependent Lagrangian penalty coefficient \r{ho} on the loss-side component. The reciprocal index ${λ= 1/ρ}$ reports the WTA-WTP loss-aversion convention. The main result characterizes a normalized admissible transaction class in which the WTA-WTP gap follows from the asymmetric buying and selling indifference equations. In this class, $λ &gt; 1$ suppresses WTP and elevates WTA, while $ρ&gt; 1$ corresponds to gain seeking or loss attenuation. A fixed reciprocal loss-aversion index has no internal mechanism that makes the wedge converge to zero as transaction scale changes; attenuation requires a transaction path on which $ρ&gt; 1$ and $λ$ converge to their common neutral value one. The analysis gives a decision-theoretic account of the endowment-effect wedge based on weakened independence, reference anchoring, semi-affine subutility normalization, and range-dependent penalization. The result is distinct from the Rabin calibration implication and does not rely on constant-relative-risk-aversion utility or probability weighting.</summary>
+    <category term="econ.TH" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-26T14:47:51Z</published>
+    <arxiv:primary_category term="econ.TH"/>
+    <author>
+      <name>G. Charles-Cadogan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2305.04400v1</id>
+    <title>Do Large Language Models Show Decision Heuristics Similar to Humans? A Case Study Using GPT-3.5</title>
+    <updated>2023-05-08T01:02:52Z</updated>
+    <link href="https://arxiv.org/abs/2305.04400v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2305.04400v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A Large Language Model (LLM) is an artificial intelligence system that has been trained on vast amounts of natural language data, enabling it to generate human-like responses to written or spoken language input. GPT-3.5 is an example of an LLM that supports a conversational agent called ChatGPT. In this work, we used a series of novel prompts to determine whether ChatGPT shows heuristics, biases, and other decision effects. We also tested the same prompts on human participants. Across four studies, we found that ChatGPT was influenced by random anchors in making estimates (Anchoring Heuristic, Study 1); it judged the likelihood of two events occurring together to be higher than the likelihood of either event occurring alone, and it was erroneously influenced by salient anecdotal information (Representativeness and Availability Heuristic, Study 2); it found an item to be more efficacious when its features were presented positively rather than negatively - even though both presentations contained identical information (Framing Effect, Study 3); and it valued an owned item more than a newly found item even though the two items were identical (Endowment Effect, Study 4). In each study, human participants showed similar effects. Heuristics and related decision effects in humans are thought to be driven by cognitive and affective processes such as loss aversion and effort reduction. The fact that an LLM - which lacks these processes - also shows such effects invites consideration of the possibility that language may play a role in generating these effects in humans.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-05-08T01:02:52Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Gaurav Suri</name>
+    </author>
+    <author>
+      <name>Lily R. Slater</name>
+    </author>
+    <author>
+      <name>Ali Ziaee</name>
+    </author>
+    <author>
+      <name>Morgan Nguyen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2501.18442v1</id>
+    <title>Stable Marriage: Loyalty vs. Competition</title>
+    <updated>2025-01-30T15:55:14Z</updated>
+    <link href="https://arxiv.org/abs/2501.18442v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2501.18442v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We consider the stable matching problem (e.g. between doctors and hospitals) in a one-to-one matching setting, where preferences are drawn uniformly at random. It is known that when doctors propose and the number of doctors equals the number of hospitals, then the expected rank of doctors for their match is $Θ(\log n)$, while the expected rank of the hospitals for their match is $Θ(n/\log n)$, where $n$ is the size of each side of the market. However, when adding even a single doctor, [Ashlagi, Kanoria and Leshno, 2017] show that the tables have turned: doctors have expected rank of $Θ(n/\log n)$ while hospitals have expected rank of $Θ(\log n)$. That is, (slight) competition has a much more dramatically harmful effect than the benefit of being on the proposing side. Motivated by settings where agents inflate their value for an item if it is already allocated to them (termed endowment effect), we study the case where hospitals exhibit ``loyalty".
+  We model loyalty as a parameter $k$, where a hospital currently matched to their $\ell$th most preferred doctor accepts proposals from their $\ell-k-1$th most preferred doctors. Hospital loyalty should help doctors mitigate the harmful effect of competition, as many more outcomes are now stable. However, we show that the effect of competition is so dramatic that, even in settings with extremely high loyalty, in unbalanced markets, the expected rank of doctors already becomes $\tildeΘ(\sqrt{n})$ for loyalty $k=n-\sqrt{n}\log n=n(1-o(1))$.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-01-30T15:55:14Z</published>
+    <arxiv:primary_category term="cs.GT"/>
+    <author>
+      <name>Amit Ronen</name>
+    </author>
+    <author>
+      <name>Jonah Evan Hess</name>
+    </author>
+    <author>
+      <name>Yael Belfer</name>
+    </author>
+    <author>
+      <name>Simon Mauras</name>
+    </author>
+    <author>
+      <name>Alon Eden</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1805.06542v1</id>
+    <title>Dancing Pigs or Externalities? Measuring the Rationality of Security Decisions</title>
+    <updated>2018-05-16T22:22:37Z</updated>
+    <link href="https://arxiv.org/abs/1805.06542v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1805.06542v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Accurately modeling human decision-making in security is critical to thinking about when, why, and how to recommend that users adopt certain secure behaviors. In this work, we conduct behavioral economics experiments to model the rationality of end-user security decision-making in a realistic online experimental system simulating a bank account. We ask participants to make a financially impactful security choice, in the face of transparent risks of account compromise and benefits offered by an optional security behavior (two-factor authentication). We measure the cost and utility of adopting the security behavior via measurements of time spent executing the behavior and estimates of the participant's wage. We find that more than 50% of our participants made rational (e.g., utility optimal) decisions, and we find that participants are more likely to behave rationally in the face of higher risk. Additionally, we find that users' decisions can be modeled well as a function of past behavior (anchoring effects), knowledge of costs, and to a lesser extent, users' awareness of risks and context (R2=0.61). We also find evidence of endowment effects, as seen in other areas of economic and psychological decision-science literature, in our digital-security setting. Finally, using our data, we show theoretically that a "one-size-fits"-all emphasis on security can lead to market losses, but that adoption by a subset of users with higher risks or lower costs can lead to market gains.</summary>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-05-16T22:22:37Z</published>
+    <arxiv:primary_category term="cs.GT"/>
+    <arxiv:journal_ref>2018 ACM Conference on Economics and Computation</arxiv:journal_ref>
+    <author>
+      <name>Elissa M. Redmiles</name>
+    </author>
+    <author>
+      <name>Michelle L. Mazurek</name>
+    </author>
+    <author>
+      <name>John P. Dickerson</name>
+    </author>
+    <arxiv:doi>10.1145/3219166.3219185</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1145/3219166.3219185" title="doi"/>
+  </entry>
+</feed>

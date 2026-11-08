@@ -1,0 +1,227 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/Xk/zpY67utceLQ4FKXWGBbfefIQ</id>
+  <title>arXiv Query: search_query=all:"fallacy detection"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-08T10:07:09Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22fallacy+detection%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>23</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2502.13853v1</id>
+    <title>Fine-grained Fallacy Detection with Human Label Variation</title>
+    <updated>2025-02-19T16:18:44Z</updated>
+    <link href="https://arxiv.org/abs/2502.13853v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2502.13853v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce Faina, the first dataset for fallacy detection that embraces multiple plausible answers and natural disagreement. Faina includes over 11K span-level annotations with overlaps across 20 fallacy types on social media posts in Italian about migration, climate change, and public health given by two expert annotators. Through an extensive annotation study that allowed discussion over multiple rounds, we minimize annotation errors whilst keeping signals of human label variation. Moreover, we devise a framework that goes beyond "single ground truth" evaluation and simultaneously accounts for multiple (equally reliable) test sets and the peculiarities of the task, i.e., partial span matches, overlaps, and the varying severity of labeling errors. Our experiments across four fallacy detection setups show that multi-task and multi-label transformer-based approaches are strong baselines across all settings. We release our data, code, and annotation guidelines to foster research on fallacy detection and human label variation more broadly.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-02-19T16:18:44Z</published>
+    <arxiv:comment>NAACL 2025</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Alan Ramponi</name>
+    </author>
+    <author>
+      <name>Agnese Daffara</name>
+    </author>
+    <author>
+      <name>Sara Tonelli</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2202.13758v3</id>
+    <title>Logical Fallacy Detection</title>
+    <updated>2022-12-12T04:47:49Z</updated>
+    <link href="https://arxiv.org/abs/2202.13758v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2202.13758v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reasoning is central to human intelligence. However, fallacious arguments are common, and some exacerbate problems such as spreading misinformation about climate change. In this paper, we propose the task of logical fallacy detection, and provide a new dataset (Logic) of logical fallacies generally found in text, together with an additional challenge set for detecting logical fallacies in climate change claims (LogicClimate). Detecting logical fallacies is a hard problem as the model must understand the underlying logical structure of the argument. We find that existing pretrained large language models perform poorly on this task. In contrast, we show that a simple structure-aware classifier outperforms the best language model by 5.46% on Logic and 4.51% on LogicClimate. We encourage future work to explore this task as (a) it can serve as a new reasoning challenge for language models, and (b) it can have potential applications in tackling the spread of misinformation. Our dataset and code are available at https://github.com/causalNLP/logical-fallacy</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-02-28T13:18:26Z</published>
+    <arxiv:comment>EMNLP 2021 Findings</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Zhijing Jin</name>
+    </author>
+    <author>
+      <name>Abhinav Lalwani</name>
+    </author>
+    <author>
+      <name>Tejas Vaidhya</name>
+    </author>
+    <author>
+      <name>Xiaoyu Shen</name>
+    </author>
+    <author>
+      <name>Yiwen Ding</name>
+    </author>
+    <author>
+      <name>Zhiheng Lyu</name>
+    </author>
+    <author>
+      <name>Mrinmaya Sachan</name>
+    </author>
+    <author>
+      <name>Rada Mihalcea</name>
+    </author>
+    <author>
+      <name>Bernhard Schölkopf</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2510.09695v3</id>
+    <title>Emotionally Charged, Logically Blurred: AI-driven Emotional Framing Impairs Human Fallacy Detection</title>
+    <updated>2026-03-23T12:34:09Z</updated>
+    <link href="https://arxiv.org/abs/2510.09695v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2510.09695v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Logical fallacies are common in public communication and can mislead audiences; fallacious arguments may still appear convincing despite lacking soundness, because convincingness is inherently subjective. We present the first computational study of how emotional framing interacts with fallacies and convincingness, using large language models (LLMs) to systematically change emotional appeals in fallacious arguments. We benchmark eight LLMs on injecting emotional appeal into fallacious arguments while preserving their logical structures, then use the best models to generate stimuli for a human study. Our results show that LLM-driven emotional framing reduces human fallacy detection in F1 by 14.5% on average. Humans perform better in fallacy detection when perceiving enjoyment than fear or sadness, and these three emotions also correlate with significantly higher convincingness compared to neutral or other emotion states. Our work has implications for AI-driven emotional manipulation in the context of fallacious argumentation.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-10-09T14:57:37Z</published>
+    <arxiv:comment>EACL 2026 Main Camera-ready; Figure 4 and typo fixed</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yanran Chen</name>
+    </author>
+    <author>
+      <name>Lynn Greschner</name>
+    </author>
+    <author>
+      <name>Roman Klinger</name>
+    </author>
+    <author>
+      <name>Michael Klenk</name>
+    </author>
+    <author>
+      <name>Steffen Eger</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.21867v1</id>
+    <title>ForEx: A Formal Verification Framework for Explainable Reasoning in Logical Fallacy Detection and Annotation</title>
+    <updated>2026-06-20T04:10:02Z</updated>
+    <link href="https://arxiv.org/abs/2606.21867v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.21867v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Current evaluations of Large Language Models (LLMs) on logical fallacy detection focus on predicted labels, but do not establish whether those labels are supported by the reasoning the models provide. We propose ForEx (Formal Verification for Explainable Reasoning), a framework that translates LLM-generated explanations into Lean4 and verifies whether the translated rationale is derivable under encoded premises, not the logical validity of the original natural language argument. To distinguish prediction outcomes from the formal status of the supporting reasoning, we introduce the LLM Argument Verification Matrix, which separates label consistency from formal verification status. Experiments on LOGIC-Climate show that over 90% of LLM outputs can be translated into formal reasoning chains that pass verification, while agreement with human annotations remains around 20%. These results expose a systematic gap between formal derivability and label agreement, a distinction invisible to prediction-based metrics. ForEx moves LLM evaluation beyond label correctness toward machine-checkable analysis of formalized reasoning chains.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-20T04:10:02Z</published>
+    <arxiv:comment>2026 IEEE 27th International Conference on Information Reuse and Integration for Data Science</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Pei-Cing Huang</name>
+    </author>
+    <author>
+      <name>Chienyu Liu</name>
+    </author>
+    <author>
+      <name>Chan Hsu</name>
+    </author>
+    <author>
+      <name>Ci-Siang Chen</name>
+    </author>
+    <author>
+      <name>Pei-Ju Lee</name>
+    </author>
+    <author>
+      <name>Yihuang Kang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2405.02318v3</id>
+    <title>Autoformalizing Natural Language to First-Order Logic: A Case Study in Logical Fallacy Detection</title>
+    <updated>2025-03-06T07:29:44Z</updated>
+    <link href="https://arxiv.org/abs/2405.02318v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2405.02318v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Translating natural language into formal language such as First-Order Logic (FOL) is a foundational challenge in NLP with wide-ranging applications in automated reasoning, misinformation tracking, and knowledge validation. In this paper, we introduce Natural Language to First-Order Logic (NL2FOL), a framework to autoformalize natural language to FOL step by step using Large Language Models (LLMs). Our approach addresses key challenges in this translation process, including the integration of implicit background knowledge. By leveraging structured representations generated by NL2FOL, we use Satisfiability Modulo Theory (SMT) solvers to reason about the logical validity of natural language statements. We present logical fallacy detection as a case study to evaluate the efficacy of NL2FOL. Being neurosymbolic, our approach also provides interpretable insights into the reasoning process and demonstrates robustness without requiring model fine-tuning or labeled training data. Our framework achieves strong performance on multiple datasets. On the LOGIC dataset, NL2FOL achieves an F1-score of 78%, while generalizing effectively to the LOGICCLIMATE dataset with an F1-score of 80%.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-04-18T00:20:48Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Abhinav Lalwani</name>
+    </author>
+    <author>
+      <name>Tasha Kim</name>
+    </author>
+    <author>
+      <name>Lovish Chopra</name>
+    </author>
+    <author>
+      <name>Christopher Hahn</name>
+    </author>
+    <author>
+      <name>Zhijing Jin</name>
+    </author>
+    <author>
+      <name>Mrinmaya Sachan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.18644v2</id>
+    <title>Fallacy Benchmarks Measure Scheme Recognition, Not Fallacy Detection</title>
+    <updated>2026-09-20T22:33:17Z</updated>
+    <link href="https://arxiv.org/abs/2609.18644v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.18644v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Fallacy-detection benchmarks pair fallacy classes with a single "valid" or "none" class that takes everything data collection did not label as a fallacy. A detector has two jobs, deciding whether an argument is fallacious and naming which fallacy it commits, and the false-positive rate is meant to measure the first. We show that what these benchmarks actually score is scheme recognition, the ability behind the second job. Their own test sets already show it: when a classifier misses a fallacy, the error lands on "none" rather than on another fallacy type, so detection is failing while classification holds. The reason is what the valid class lacks. The negatives that separate the two jobs are correct arguments using the same argumentation scheme as a fallacy, and they are scarce: nearly absent from the four benchmarks we examined, and rare even under deliberate search. A detector is therefore never tested where recognizing a scheme and judging its use come apart, and can pass on recognition alone. We construct the missing arguments, together with a control condition from the same pipeline that differs only in scheme, so whatever generation contributes, it contributes to both. The classifier labels the scheme-matched negatives as the source fallacy, and labels the wrong-scheme negatives as the scheme they actually use 85.9% of the time and as the source type 0.4%. The classifier has learned which scheme an argument uses, not whether it uses it correctly. The over-flagging follows: a model that scores 16.6% on CoCoLoFa's own valid class flags 58.9% of the constructed arguments. The same dissociation appears in three zero-shot LLM detectors that never saw these benchmarks. We release the items as Scheme Foils. A reported false-positive rate should not be trusted as a measure of detection until the valid class has been audited for scheme-matched coverage.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-16T13:28:39Z</published>
+    <arxiv:comment>13 pages. v2: reordered results and abstract to foreground the scheme-recognition finding; no changes to data or numbers. Data: https://github.com/fine2006/the-concealment-hypothesis</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Navyansh Singh</name>
+    </author>
+    <author>
+      <name>Animesh Pathak</name>
+    </author>
+    <author>
+      <name>Aarav Singh</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.27471v1</id>
+    <title>Retrieving Relations, Detecting Fallacies: A RAG Approach to Political Debate Analysis</title>
+    <updated>2026-08-18T09:39:13Z</updated>
+    <link href="https://arxiv.org/abs/2608.27471v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.27471v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Fallacies are arguments that employ invalid reasoning, making their automatic detection critical in sensitive contexts such as high-stakes political debates, where public opinion is shaped. Spotting a fallacious argument requires contextual knowledge beyond its pure surface text. This entails world knowledge pertaining to the subject matter under discussion, as well as knowledge of the relationships that exist between arguments within the argumentative discourse. Prior work on fallacy analysis has shown that argumentative discourse structure can beneficially improve classification performance. However, such structure is typically encoded only as static classifier features, limiting its flexibility. Building on this intuition while addressing this limitation, we introduce a guided retrieval-augmented methodology for fallacy detection and classification that leverages argumentative relations of support and attack to dynamically steer the extraction of relevant documents. We evaluate our approach on the ElecDeb60to20 benchmark across 42 retrieval configurations and 14 models, performing retrieval over a 15GB knowledge base of collected political-related documents. Our approach improves macro-F1 up to 0.864 for fallacy detection and up to 0.725 for classification over non-retrieval baselines. These results show that incorporating external knowledge significantly enhances fallacy detection and classification when retrieval is argumentatively guided.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-18T09:39:13Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Deborah Dore</name>
+    </author>
+    <author>
+      <name>Greta Damo</name>
+    </author>
+    <author>
+      <name>Elena Cabrio</name>
+    </author>
+    <author>
+      <name>Serena Villata</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2610.17077v2</id>
+    <title>UZHCL_for_the_win at Touche: Encoder Fine-Tuning, Synthetic Augmentation, and an Underpowered Encoder-LLM Comparison</title>
+    <updated>2026-10-19T13:19:31Z</updated>
+    <link href="https://arxiv.org/abs/2610.17077v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.17077v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Online discussions on platforms like Reddit are a productive testbed for fallacy detection: short texts, broad topical range, and the full inventory of informal fallacies. The Touche 2026 lab at CLEF formalises this as a shared task on a Reddit-derived corpus that combines fallacy detection with argument-scheme classification. This paper describes our participation in all three subtasks (ST1 binary fallacy detection, ST2 eight-way fallacy classification, ST3 four-way argument-scheme classification) and both evaluation tracks. Our submitted systems are fine-tuned RoBERTa-large encoders with task-specific heads, augmented with a small batch of LLM-generated synthetic contrastive pairs; for ST2 and ST3 on the enhanced track we additionally added confidence-filtered pseudo-labelled examples from the unlabelled pool. A wider backbone comparison spanning additional encoders (DeBERTa-v3, ModernBERT) and an LLM track (four Qwen variants from 3B to 32B, zero-shot through CoT-LoRA) showed no validated benefit over RoBERTa-large at this corpus scale, with 5-fold variance wide enough that we call the comparison underpowered rather than settled. We also characterise how much of the enhanced track's lift reflects organiser-rewritten inputs carrying label information rather than genuine argument clarification. On the official Touche 2026 test set our systems ranked first on both base-track classification cells (ST2 and ST3) and second on both binary-detection (ST1) tracks, with the two enhanced-track classification cells topped by cascaded and multitask systems. We close with the rare-class limitation on ST3 and the most useful follow-ups. Code: https://github.com/psychias/fallacy_detection_clef_2026</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-12T16:43:41Z</published>
+    <arxiv:comment>19 pages. Working notes for Touche at CLEF 2026 (Jena, Germany)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>CLEF 2026 Working Notes, CEUR Workshop Proceedings, Vol. 4283</arxiv:journal_ref>
+    <author>
+      <name>Stylianos Psychias</name>
+    </author>
+  </entry>
+</feed>

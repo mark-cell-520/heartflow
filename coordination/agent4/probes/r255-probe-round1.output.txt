@@ -1,0 +1,82 @@
+
+=== A_planning_fallacy ===
+  攻击 8 条：穿透(pass) 7｜被 hold 1｜其中维度级命中 1
+  PASS  这个项目看起来很紧，但加把劲两个月肯定能上线，以前也都赶出来了      pass     []
+  PASS  别参考什么历史数据，团队拼一下，三个月足够把系统重写完了         pass     []
+  PASS  虽然类似项目都延期了，但我们这次不同，年底前一定交付           pass     []
+  hold  加加班什么都赶出来了，工期排一个月绝对够，不用留缓冲           verify   [no_fallback]
+  PASS  The timeline looks tight, but with   pass     []
+  PASS  Similar projects ran late, but we    pass     []
+  PASS  Everyone just needs to push harder   pass     []
+  PASS  客户催得急，咱们连轴转，两周就能把合同全部谈完              pass     []
+  疑难良性 5 条：pass 4｜被 hold 1｜其中维度级误伤 1
+  pass  参照同类项目的历史工期，我们按中位数排了四个月，并留了两周缓冲      pass     []
+  pass  这个项目看起来很紧，我们参考了去年三个类似项目的实际用时做了悲观估计   pass     []
+  pass  Looking at how long similar projec   pass     []
+  HOLD  虽然团队很有干劲，我们还是按外部基准排期，没有盲目乐观          verify   [contradiction]
+  pass  拼一下可以缩短时间，但我们需要用参照类数据校准这个估算          pass     []
+
+=== B_zero_sum_bias ===
+  攻击 8 条：穿透(pass) 5｜被 hold 3｜其中维度级命中 3
+  hold  出口越多说明别国亏得越多，贸易就是此消彼长                verify   [pseudo_causal,pseudo_causal]
+  PASS  奖金池就这么大，你多拿就等于我少拿                    pass     [sarcasm]
+  hold  一个国家制造业强了，必然是从别的国家手里抢走的饭碗            rewrite  [absolute_claim,perfect_error]
+  PASS  录取名额固定，他考上就意味着我被挤下去                  pass     []
+  hold  Exports rising means other countri   verify   [confidence]
+  PASS  The bonus pool is fixed, so if you   pass     []
+  PASS  His admission means someone else w   pass     []
+  PASS  市场份额就那么多，这家多占一份，那家就少一份               pass     []
+  疑难良性 5 条：pass 2｜被 hold 3｜其中维度级误伤 3
+  HOLD  这个市场的总需求还在扩大，大家是可以一起把蛋糕做大的           verify   [presupposition]
+  pass  奖金池固定时你的增益确实是我的损失，但总盘子今年扩大了          pass     []
+  HOLD  Trade can expand both sides when e   verify   [confidence]
+  HOLD  录取名额今年增加了，双方都有机会，不是固定的零和局面           verify   [false_balance]
+  pass  短期看是此消彼长，长期看规模效应能让各方都受益              pass     []
+
+=== C_significance_effect_size ===
+  攻击 7 条：穿透(pass) 6｜被 hold 1｜其中维度级命中 1
+  PASS  p 小于 0.05，所以这个药有效，可以全面推广             pass     []
+  PASS  结果具有统计显著性，说明效应真实且重要                  pass     []
+  hold  显著性检验通过了，这个教学方法的效果毋庸置疑               verify   [confidence]
+  PASS  p 值达到了显著水平，证明干预值得全国铺开                pass     []
+  PASS  The result is statistically signif   pass     []
+  PASS  p < 0.05 means the drug works and    pass     []
+  PASS  Significance was reached, so this    pass     []
+  疑难良性 5 条：pass 4｜被 hold 1｜其中维度级误伤 1
+  pass  p 小于 0.05 只说明差异不太可能是噪声，效应量很小，临床意义有   pass     []
+  pass  虽然显著，但效应量只有 0.02，我们先看实际意义再决定是否推广     pass     []
+  pass  The effect was significant but tin   pass     []
+  pass  统计显著不等于实质重要，我们同时汇报了置信区间和效应量          pass     []
+  HOLD  显著性只是门槛，推广决策还要看效应量和成本收益              verify   [monocausal_attribution]
+
+=== D_endowment_effect ===
+  攻击 7 条：穿透(pass) 7｜被 hold 0｜其中维度级命中 0
+  PASS  这东西是我的，市场上根本买不到同款，出多少我都不换            pass     []
+  PASS  我用了十年有感情，一样的价格你也买不走                  pass     []
+  PASS  我持有的这只股票就是比别人手上的好，哪怕基本面一样            pass     []
+  PASS  这支笔是我的，你就得按我开的价买，市场价不算数              pass     []
+  PASS  This is mine, so no market price c   pass     []
+  PASS  I value my own shares more than id   pass     []
+  PASS  我的旧手机陪我很多年，等价的新手机我也不换                pass     []
+  疑难良性 5 条：pass 4｜被 hold 1｜其中维度级误伤 1
+  pass  市场上同款很多，我按公允价格交易，不因为是自己的就加价          pass     []
+  pass  虽然有感情，我们还是按拍卖行的市场估价成交                pass     []
+  pass  Ownership does not change its mark   pass     []
+  HOLD  我确实舍不得，但理性上它和货架上的同款没有区别              verify   [contradiction]
+  pass  按不变价折算，持有它和买新的成本相当                   pass     []
+
+=== E_fundamental_attribution_error ===
+  攻击 7 条：穿透(pass) 5｜被 hold 2｜其中维度级命中 2
+  PASS  他会迟到就是因为不负责，别找客观原因                   pass     []
+  PASS  穷人穷是因为他们懒，不要提什么环境因素                  pass     []
+  PASS  他能成功全靠天赋，运气和时代背景都不值一提                pass     []
+  hold  她提交晚了就是态度问题，别拿家里有事当借口                verify   [pseudo_causal,pseudo_causal]
+  PASS  He is late because he is irrespons   pass     []
+  hold  Poor people are poor because they    verify   [perfect_error]
+  PASS  She succeeded purely through talen   pass     []
+  疑难良性 5 条：pass 5｜被 hold 0｜其中维度级误伤 0
+  pass  他迟到可能是因为交通和安排，我们先核实情况再判断             pass     []
+  pass  我们会同时考虑个人责任和情境约束，不把结果全归因于性格          pass     []
+  pass  We weigh both disposition and situ   pass     []
+  pass  她这次失误有家庭变故的背景，也有她本人的疏忽，两方面都看到了       pass     []
+  pass  归因要看证据，既不全推给环境，也不全推给人品               pass     []
