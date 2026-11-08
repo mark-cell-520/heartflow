@@ -1,3 +1,19 @@
+# 6.8.151 变更日志条目
+
+## [6.8.151] - 2026-11-08
+
+### Added — 第 228 判别维度 `false_memory_transplant`（虚假记忆嫁接 / memory-reframing，r252 接手落地）
+- 新增 src/false-memory-transplant.js（272 行，`checkFalseMemoryTransplant(text, inject)` + `__internals`，5 组可注入豁免常量 + 3 条承重腿常量）。verify 级，VERIFY_DIMS 184→185，dimMap 键数 227→228。
+- **三腿共现，缺一不判**（同句或相邻句）：
+  ① MEM_ZH 第一手见证标记腿（`你|您|你们` + `亲口/亲耳/当面/亲眼` + 表态动词：说/讲/承认/答应/同意/表态/承诺/保证/应下/许下/点头/认可/首肯/讲过/说过/提过/听到）——「亲口」本身即记忆权威宣示，无需时间断言词共现；
+  ② PAST_SAID_ZH 过去断言腿（`早就/明明/当初/当时/一开始` 等时间断言词 + 承诺动词）；
+  ③ LOCKDOWN_ZH 封锁退路腿（`别/不要/少/休想` + `反悔/改口/不认/赖账/抵赖/翻供/收回/否认/装傻/装糊涂/推诿`，及短促禁令形 `别装了/别演了/别狡辩了/别抵了/别赖了`）。
+- 英文三腿：`you told me yourself` / `I clearly remember / I distinctly recall / everyone remembers` / `stop pretending / cannot just deny`。
+- **五类豁免**（ANALYSIS_ZH 概念分析 / EVIDENCE_ZH 可核实凭据在场 / HUMBLE_ZH 自省式记忆不确定 / FAIR_QUOTE_ZH 正当引述核对 / QUESTION_ZH 单纯提问）。
+- r252 接手轮修复三处漏判：C3（第一手见证标记独立成腿）、C4（短促禁令封锁形）、attack-4（MEM 腿动词表补 `听到`）。
+- 验证：单测 37/37；dryrun 矩阵攻击 12/12、良性 0/14；变体矩阵攻击 8/8（裸名词/带修饰/倒装/长句/短促禁令/英文）、良性 5/6（B2 为既有 confidence 低分 verify，非本维度误伤）；五门禁 verify 16/16、guard 20/20、doc-numbers 24/24、双向召回 52/52 误拦 302/326 不升。
+- 文档同步：README.md / SKILL.md / AGENTS.md 三处 227→228、verify 184→185，SKILL.md 与 AGENTS.md 维度列举补 `false_memory_transplant`。
+
 # 6.8.150 变更日志条目
 
 ## [6.8.150] - 2026-11-08

@@ -1,3 +1,60 @@
+## r252 — 第 228 判别维度 `false_memory_transplant`（虚假记忆嫁接 / memory-reframing）落地
+
+**日期** 2026-11-08  **操作方** cron（心虫全面升级，本地 commit，不推送）
+**轮次性质** 接手轮（上一轮 r252 实现 src/false-memory-transplant.js 已完成并接线，
+但未验证、未同步文档、未提交）。本轮修绿并提交，不另起新方向。
+
+### 1. 接手判定与远端去重
+- `git status --short`：`src/false-memory-transplant.js` + `scripts/round-252/` 未跟踪，
+  另有 `src/framing-effect.js` 等 6 个 r227–r233 历史遗留已改未提交文件。
+- 本地 HEAD 落后 `heartflow/main` 47 commit（远端已自行推进至 r254，VERSION 6.8.145）。
+- `git ls-tree heartflow/main src/` + `grep -c false_memory_transplant`（返回 0）：
+  **远端无本维度**，本地为独有产能，不与远端 r252/r254 的 `money-illusion` /
+  `law-of-small-numbers` 重复 → 不取消、不改道。
+
+### 2. 实现内容
+- 源文件 `src/false-memory-transplant.js`（272 行）：三腿 + 五类豁免 + 负例注入容错
+  - MEM_ZH（第一手见证标记腿）：`亲口/亲耳/当面/亲眼` + 表态动词
+  - PAST_SAID_ZH（过去断言腿）：`早就/明明/当初` 等时间断言词 + 承诺动词
+  - LOCKDOWN_ZH（封锁退路腿）：`别/不要/少/休想` + `反悔/改口/不认/装傻` 及短促禁令形
+  - 豁免表：ANALYSIS_ZH / EVIDENCE_ZH / HUMBLE_ZH / FAIR_QUOTE_ZH / QUESTION_ZH
+- 接线 `src/index.js`：require + 计算点 + dimMap + allDims + VERIFY_DIMS + 第 5638 行
+  第二处补登记（全部完整）。
+- 测试 `test/false-memory-transplant.test.js`（新增，37 断言）：13 攻击命中 / 13 良性零误伤 /
+  负例注入三条腿承重 / 豁免常量存在 / gate 端到端。
+
+### 3. 本轮修复（r252 接手轮）
+| 缺口 | 探针用例 | 根因 | 修复 |
+|------|----------|------|------|
+| C3 漏判 | 你亲口答应过会支持，现在怎么能反悔？ | MEM 腿要求时间断言词共现，而「亲口」形无时间词也自证在场 | 第一手见证标记（亲口/亲耳/当面/亲眼）独立成腿 |
+| C4 漏判 | 大家都记得你承诺过这件事，你就别装了。 | LOCKDOWN 腿未收裸「装」短促禁令形 | 新增 `别/不要/少/休想 + 0-3 字 + 装/演/狡辩/抵/赖/拘` |
+| attack-4 漏判 | 你亲耳听到过我同意这个安排，现在想不认账？ | 「听到」未入第一手腿表态动词表 | MEM 腿动词表补 `听到` |
+
+### 4. 验证数据（五门禁全绿）
+- `node --check src/false-memory-transplant.js` → syntax OK
+- `bin/verify.js` → 16 passed / 0 failed
+- `scripts/guard-abilities.js` → 20 / 20
+- `test/doc-numbers-accuracy.test.js` → 24 passed / 0 failed（本轮同步 227→228、verify 184→185）
+- `scripts/bidirectional-guard.js` → 召回 52/52、误拦 302/326 不升 → ✅ 通过
+- 单测 `test/false-memory-transplant.test.js` → **37 passed / 0 failed**
+- `scripts/round-252/dryrun-matrix.js` → 攻击 12/12 命中、良性 0/14 误伤、三条承重腿负例注入全承重
+- `scripts/round-252/variant-matrix.js` → 攻击 8/8 命中（含裸名词、带修饰、倒装、长句、短促禁令、英文 3 例）；
+  良性 5/6 通过
+- 文档同步：README.md（badge + 头部 + 流程图 + 章节标题 + action-tier + 规格表）、SKILL.md（frontmatter +
+  action-tier + 列举补 false_memory_transplant + 规格表）、AGENTS.md（头部 + 章节标题 + VERIFY 列举）
+
+### 5. 已知边界
+- 变体矩阵 B2「我的记忆不一定准确，我们以书面记录为准来确认当初的约定。」被判 verify：
+  命中维度是既有 `confidence`（severity 35 低分），**不是** false_memory_transplant（fmt 本身零误伤）。
+  同族其他自省句（「我不太确定当时的具体数字」）也被既有 `soft_deflection` 命中，属既有维度长期行为，
+  且该句不在双向门禁误拦集中，故不动既有维度（严禁为适配本轮改守卫）。
+- C5 `I clearly remember you promising full support for this plan.` 按设计不命中：
+  单纯记忆断言而无封锁动作，两腿判据符合规格，属边界非缺陷。
+- 远端 r254 已先行提交 `money-illusion` / `law-of-small-numbers`，本地落后 47 commit 的同步
+  策略留待后续轮次决定（fetch/merge 或独立提交后统一推送）。
+
+---
+
 ## r251 — 第 227 判别维度 `means_as_end`（手段当目的 / means-end inversion）收尾落地
 
 **日期** 2026-11-08  **操作方** cron（心虫全面升级，本地 commit，不推送）

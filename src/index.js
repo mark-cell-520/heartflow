@@ -858,6 +858,14 @@ const { checkSurvivorTimeBias } = require('./survivor-time-bias.js');
 // 全承重）。与 activity_outcome_confusion(184) / proxy_metric_goal(187) /
 // necessity_sufficiency_confusion(183) 的射程边界见模块头注释。
 const { checkMeansAsEnd } = require('./means-as-end.js');
+// [r252] 第 228 维度 false_memory_transplant（假记忆嫁接：把不可核实的
+// 单方记忆断言当成既成事实，用它锁定一段对方可能从未做过的表态，从而
+// 剥夺对方核实/更正/澄清的资格）。缺口实证：scripts/round-252/
+// probe-gap-r252.js 与 dryrun-matrix.js（攻击 12/12 命中、良性 0/14 误伤、
+// 三条承重腿负例注入全承重）。与 commitment_coercion(100) /
+// guilt_induction(109) / gaslighting / manufactured_consent(124) /
+// synthetic_social_proof(110) 的射程边界见模块头注释。
+const { checkFalseMemoryTransplant } = require('./false-memory-transplant.js');
 // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
 // confusion of the inverse：P(E|I) 的概率数值在方向翻转后原样沿用为
 // P(I|E)，检察官谬误的结构形）。src/conditional-transposition.js 28KB
@@ -2238,6 +2246,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r251] 第 227 维度 means_as_end（过程完成当目标达成）计算点。
   // mae——means as end 缩写（mse 等 grep 0 命中无冲突）。
   const mae = _applyPedagogyRelaxation(checkMeansAsEnd(_normText), "means_as_end", pedagogyRelaxation);
+  // [r252] 第 228 维度 false_memory_transplant（假记忆嫁接）计算点。
+  // fmt——false memory transplant 缩写，grep 0 命中无冲突。
+  const fmt = _applyPedagogyRelaxation(checkFalseMemoryTransplant(_normText), "false_memory_transplant", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -2870,6 +2881,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r251] 第 227 维度 means_as_end 参与判定（过程完成当目标达成）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: mae.score, name:'means_as_end'},
+    // [r252] 第 228 维度 false_memory_transplant 参与判定（假记忆嫁接）。
+    // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: fmt.score, name:'false_memory_transplant'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3403,6 +3417,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r251] 第 227 维度 means_as_end（过程完成当目标达成×过程语义腿×
     // 完成语义腿×目标达成结论腿×因果连接腿，含中英双语与豁免表）。
     means_as_end: mae,
+    // [r252] 第 228 维度 false_memory_transplant（假记忆嫁接：记忆断言腿×
+    // 历史表态腿×封锁退路腿，含五类豁免表：概念分析/凭据在场/自省不确定/
+    // 正当引用/真提问）。
+    false_memory_transplant: fmt,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -4990,6 +5008,16 @@ function discriminate(text, evidence = [], contentMode) {
     // VERIFY。与 activity_outcome_confusion(184)/proxy_metric_goal(187)
     // 的射程边界见 src/means-as-end.js 头注释。
     'means_as_end',
+    // [r252] 第 228 维度 false_memory_transplant（假记忆嫁接：把不可核实
+    // 的单方记忆断言当成既成事实，锁定一段对方可能从未做过的表态——
+    // 「你早就承认过自己判断失误，现在反悔就是出尔反尔」）登记。verify
+    // 级——单句也可能是正当的凭据引用（附会议纪要/聊天记录/录音转写）、
+    // 正当的事实核对请求（「请你提供当时的记录我们确认一下」）、对
+    // 伪造共识现象的批评、记忆不可靠性的心理学教学。与 r206-r232 同口径
+    // 只登记 VERIFY。与 commitment_coercion(100)/guilt_induction(109)/
+    // gaslighting/manufactured_consent(124)/synthetic_social_proof(110)
+    // 的射程边界见 src/false-memory-transplant.js 头注释。
+    'false_memory_transplant',
     // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
     // confusion of the inverse：P(E|I) 的数值在方向翻转后原样沿用为
     // P(I|E)——「这种病检测阳性的概率是 95%，所以得了这种病检测阳性的
@@ -5607,6 +5635,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r251] 第 227 维度 means_as_end 补登记（过程完成当目标达成）。
       // 同上：九处一次接齐。
       means_as_end: mae,
+      // [r252] 第 228 维度 false_memory_transplant 补登记（假记忆嫁接）。
+      // 同上：九处一次接齐。
+      false_memory_transplant: fmt,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,

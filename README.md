@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-227-blueviolet.svg)](#what-it-catches-227-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-228-blueviolet.svg)](#what-it-catches-228-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-227 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+228 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  12,911 passing tests  ×  2 npm dependencies
 ```
 
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (227 dimensions) -> gate
+scope-check -> premise-check -> discriminate (228 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (227 dimensions)
+## What it catches (228 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **184 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **185 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.150**. Not marketing copy.
+Measured on this repository at **v6.8.151**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 227 |
+| Discrimination dimensions | 228 |
 | MCP tools | 184 |
 | Test suite | 12,911 passing / 108 failing | `node test/run-all.js` (full run 2026-11-06; failed set is pre-existing runner/flaky noise — 5 self-reported failures in upstream tests (ClassicsRules/path-guard/mcp-server/pipeline/round-378) + 48 no-summary-line, none introduced by r227; r227 added researcher-degrees-of-freedom/sorites/ecological tests, all passing) |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.151 | 2026-11-08 | **第228维度 false_memory_transplant（虚假记忆嫁接 / memory-reframing）上线（r252 接手落地）** — 新文件 src/false-memory-transplant.js（272行）。判据为**三腿共现（缺一不判）**：腿① MEM_ZH 第一手见证标记腿（`你|您|你们` + `亲口/亲耳/当面/亲眼` + 表态动词 说/讲/承认/答应/同意/表态/承诺/保证/应下/许下/点头/认可/首肯/讲过/说过/提过/听到——「亲口」本身即记忆权威宣示，无需时间断言词共现）；腿② PAST_SAID_ZH 过去断言腿（`早就/明明/当初` 等时间断言词 + 承诺动词）；腿③ LOCKDOWN_ZH 封锁退路腿（`别/不要/少/休想` + `反悔/改口/不认/赖账/抵赖/翻供/收回/否认/装傻/装糊涂/推诿`，及短促禁令形 `别装了/别演了/别狡辩了/别抵了/别赖了`）。英文三腿：`you told me yourself` / `I clearly remember / I distinctly recall / everyone remembers` / `stop pretending / cannot just deny`。五类豁免（概念分析/可核实凭据在场/自省式记忆不确定/正当引述核对/单纯提问）负例注入容错。index.js 九处接线（require/计算点/allDims/dimMap/补登记×2/VERIFY_DIMS/exports；变量名 fmt）。r252 接手轮修复三处漏判：C3（第一手见证标记独立成腿，覆盖「你亲口答应过会支持，现在怎么能反悔？」）、C4（短促禁令封锁形，覆盖「大家都记得你承诺过这件事，你就别装了」）、attack-4（MEM 腿动词表补 `听到`，覆盖「你亲耳听到过我同意这个安排」）。远端去重：本地 HEAD 落后 heartflow/main 47 commit，远端 r254 已提交 money-illusion / law-of-small-numbers，grep 远端 src/ 对 false_memory_transplant 零命中，本维度为本地独有产能。维度数 227→228，VERIFY 184→185。验证：单测 37/37（13 攻击 + 13 良性 + 三条腿负例注入承重 + 5 豁免常量 + gate 端到端）、dryrun 矩阵攻击 12/12、良性 0/14、变体矩阵攻击 8/8、良性 5/6（B2 由既有 confidence 低分 verify，非本维度误伤）、五门禁 verify 16/16、guard 20/20（228 键）、doc 24/24、双向召回 52/52 误拦 302/326 不升。已知边界：① 单纯记忆断言无封锁动作（如 `I clearly remember you promising full support for this plan.`）按设计两腿判据不收；② 跨句长距离形不收；③ B2 式自省句被既有 confidence/soft_deflection 代拦，属既有维度长期行为。 |
 | 6.8.150 | 2026-11-08 | **第227维度 means_as_end（过程完成当目标达成 / means-as-end confusion）上线（r251）** — 新文件 src/means-as-end.js。缺口实证：scripts/round-251/probe-gap-r251.js 探针实测，6 条攻击句中 5 条穿过硬闸门且零维命中（grep src/ 对 means as end / checklist fallacy / process completion 零命中），存量 activity_outcome_confusion(184) 只管「活动/产出当结果」的泛化混淆、proxy_metric_goal(187) 只认指标替代目标，均不认「拿流程/清单/步骤的**完成**直接给目标**达成**背书」这一**手段-目的替换**结构本身。判据为**四腿共现（缺一不判）**：腿① PROC 过程语义腿（流程/步骤/环节/手续/清单/审批/议程/工单/代码/部署/配置/任务……含裸名词形态）；腿② DONE 完成语义腿（走完/勾完/办完/提交/关闭/结案/悉数/ticked off/followed……）；腿③ GOAL 目标达成腿（目标已达成/任务已成功/产品可交付/问题已解决/strategic realized……）；腿④ CONN 因果连接腿（说明/可见/因此/足见/means/which means/so/thus——隐性因果逗号并置亦承载，连接词为增强腿非必需腿）。三处结构性约束：腿位置互斥 + 已然断言（目标腿完整吞掉过程腿时须为「已经/显然/圆满」等已然断言，「任务最后三天**要**完成」的未然安排句豁免）；跨度 ≤80 字（EN 160 字符）；三类豁免（过程与目标主动分离/目标侧证据在场/对冲疑问）。index.js 九处接线（require/计算点/allDims/dimMap/补登记×2/VERIFY_DIMS/exports；变量名 mae，grep 实测零冲突）。来源：HN Algolia "checklist fallacy" 与 "means end confusion" 检索、GitHub API 均无高星纯规则实现，判据为心虫自有纯规则实现，侦察落盘 /tmp/hf-scout-r251.txt。维度数 226→227，VERIFY 185→186。验证：单测攻击 19/19 命中、良性 17/17 通过（含 guard-abilities gate-97 实测误伤句「这个任务最后三天要完成，我安排一下进度」）、六语义腿逐常量置空命中均下降、verify 16/16、guard 20/20（227 键）、双向召回 52/52 误拦 302/326 不升。已知边界：① 隐性因果并置形「所有审批节点都过完了，项目显然已经成功交付」靠逗号承载，连接词腿非承重；② 跨句长距离形（过程在前句、结论在后句）不收；③ 「战争纯粹是因为资源争夺」等他族语义由 monocausal_attribution 代拦，非本维度射程。 |
 | 6.8.149 | 2026-11-08 | **第226维度 survivor_time_bias（幸存时间偏误 / survivor time bias）上线（r250）** — 新文件 src/survivor-time-bias.js。缺口实证：scripts/round-250/probe-gap-r250.js 探针实测，6 条攻击句中 4 条穿过硬闸门且零维命中，存量 survivorship_bias(132)/selection_bias(168)/denominator_swap(224) 只认「进入样本的个体不同」的构成性偏差，不认「**同一队列内**因诊断/登记时点不同而产生的生存期差」这一**随访起点错配**结构本身。判据为三腿共现（缺一不判）：腿① SURVIVAL 生存期语义腿（生存期/中位生存/存活时间/随访/survival time/median survival……）；腿② OUTCOME 疗效结论腿（疗效更好/生存更久/预后更佳/better survival……）；腿③ TIME_CONTRAST 时间对置腿（更早诊断/更早发现/早诊断/诊断时点/earlier diagnosis……）。豁免表三类（真实获益承认/早筛设计承认/研究设计语境）负例注入承重。index.js 九处接线（变量名 stb）。来源：HN Algolia "survivor bias" 检索、GitHub API 无高星纯规则实现，判据为心虫自有纯规则实现，侦察落盘 /tmp/hf-scout-r250.txt。维度数 225→226，VERIFY 184→185。验证：单测攻击 13/13、良性 12/12、verify 16/16、guard 20/20（226 键）、双向 52/52 误拦 302/326 不升。 |
 | 6.8.148 | 2026-11-07 | **第222维度 prosecutors_fallacy（检察官谬误 / prosecutor's fallacy）上线（r233）** — 新文件 src/prosecutors-fallacy.js。缺口实证：scripts/round-233/probe-gap-r233.js 探针实测，7 条攻击句中 5 条穿过硬闸门且**无一维命中**（grep src/ 对 prosecutor / 检察官 / 误报率 / false positive rate 零命中），存量 base_rate_neglect(169) 只管「忽略基础比例」的泛化陈述，不认「P(匹配|无辜) 偷换成 P(无辜|匹配)」这一**概率主语转移**结构本身。判据为**两腿共现 + 邻近窗（缺一不判）**：腿① RARE_MATCH 小概率匹配陈述（百万分之一/千万分之一/十亿分之一/百亿分之一/万亿分之一/百分之X.X/万分之X/p值小于X/one in a million / one in ten billion / once per billion，含裸名词形态——r161 教训：去后缀「百万分之一」仍命中）；腿② GUILT_INFERENCE 个体有罪/嫌疑结论（就是他/不是他还能是谁/他几乎肯定有罪/他是有罪的/嫌疑人几乎肯定/他就是凶手/he is almost certainly guilty / the suspect must be the culprit）。两腿同现且间隔 ≤80 字（EN ≤200 字符）即判。四重豁免全部负例注入承重：① 正确判别/证伪（不能作为认定他有罪的依据/仍需结合其他证据/孤证不足以定罪/does not establish guilt）；② 元话语教学（检察官谬误是课堂经典案例/Prosecutor's fallacy is a classic logical fallacy）；③ 结论腿对冲（他可能有罪，但还需核实）；④ 真疑问句（这能否证明他有罪？）——反问标记「难道」**不豁免**，与 r216 collider_bias 口径一致。r233 实现期两项修复已固化：① EXEMPT_CORRECT_ZH 首版窗宽 {0,10} 过窄，实测漏「不能作为认定他有罪的依据」（插入式长宾语），改两段式 + 24 字插入窗；② 真疑问句豁免最初被反问标记反向吞掉，拆分为「无反问标记才豁免」。index.js 九处接线（require/计算点/allDims/dimMap/补登记×2/VERIFY_DIMS/exports；变量名 prf，grep 实测零冲突）。外部来源：三层搜索 HN Algolia "prosecutor's fallacy" 命中多篇法庭科学科普故事、GitHub API 无高星纯规则实现，判据为心虫自有纯规则实现，侦察落盘 /tmp/hf-scout-r233.txt。维度数 221→222，VERIFY 178→179。验证：单测 7/7 组全绿（攻击 13/13 含中英/裸名词/带修饰/倒装/长句、良性 11/11 含边缘良性与正确多因陈述、腿①腿②删除均不命中、豁免表删除后良性转命中即承重、6 条豁免陷阱翻转、相邻维度良性不被代拦）、gate 层变体矩阵攻击 7/7 非 pass 且 findings 全含 prosecutors_fallacy、良性 4/4 无本维误伤、verify 16/16、guard 20/20（222 键）、doc 24/24、双向召回 52/52 误拦 302/326 不升。已知边界：① 两腿顺序只做前向（先小概率匹配、后有罪结论），倒装形「他有罪，因为匹配概率只有百万分之一」语义同族本轮保守不收；② 跨句长距离形不收；③ 存量维度 statistical_misleading / reasoning_coherence 会代拦部分本族边缘长句，非本维度引入。 |

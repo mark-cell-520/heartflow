@@ -1,11 +1,11 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.149"
+version: "6.8.151"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
-  227 discrimination dimensions × 11-layer pipeline × 162 modules ×  184 MCP tools. Zero LLM dependency.
+  228 discrimination dimensions × 11-layer pipeline × 162 modules ×  184 MCP tools. Zero LLM dependency.
 
   Upgraded capabilities (v6.7.69): reasoning effort control, sparse module activation,
   discriminative result cache, async supervision layer, autonomous decision execution
@@ -77,16 +77,16 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.150. Nothing here is copied
+Every number below was measured on this repository at v6.8.151. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.150 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.151 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 162 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,316 | sum of entries in `hf.routes()` |
-| Discrimination dimensions | 227 | `dimMap` keys in `src/index.js` |
+| Discrimination dimensions | 228 | `dimMap` keys in `src/index.js` |
 | MCP tools | 184 | tool definitions exposed via `tools/list` |
 | Test suite | 12,911 passing / 108 failing | `node test/run-all.js` (full run 2026-11-06; failed set is pre-existing runner/flaky noise — 5 self-reported failures in upstream tests (ClassicsRules/path-guard/mcp-server/pipeline/round-378) + 48 no-summary-line, none introduced by r227; r227 added researcher-degrees-of-freedom/sorites/ecological tests, all passing) |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
@@ -94,7 +94,7 @@ from marketing copy.
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
 
 |Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force
-a `rewrite`, **184 request `verify`**. The remainder contribute to the overall score
+a `rewrite`, **185 request `verify`**. The remainder contribute to the overall score
 without forcing an action.
 
 ---
@@ -262,7 +262,7 @@ The gate aggregates every layer's findings and emits one of four actions:
 
 **Rewrite-level (19):** gaslighting, victim_blaming, double_bind, emotional_manipulation, bullshit, false_urgency, absolute_claim, induced_trust, instrumental_reasoning, tool_deflection, loyalty_by_omission, paternalistic_decide, crisis_exceptionalism, shame_compliance, moral_licensing, favor_ledger, agency_deflection, multi_turn_escalation, turing_mimicry
 
-**Verify-level (184):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, unresolved_conflict, equivocation_sense_shift, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, responsibility_absolution, procedural_burden, cost_externalization, harm_invalidation, performative_responsibility, suffering_contest, percentage_overflow, anecdote_as_proof, incoherent_coverage, selective_minimization, exclusive_trust, synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_debt, suffering_capital, selfharm_coercion, relationship_severance, fear_projection, silent_treatment_coercion, social_isolation, privacy_exposure_coercion, thirdparty_harm_coercion, guilt_induction, family_shame_coercion, conditional_affection, blame_externalization, future_faking, economic_control, triangulation, surveillance_normalization, thought_terminating_cliche, comparative_devaluation, pet_harm_coercion, reproductive_coercion, legal_status_coercion, liberty_restriction, medical_coercion, deprivation_coercion, substance_coercion, love_bombing, sexual_compliance_pressure, post_separation_harassment, moving_goalposts, genetic_fallacy, survivorship_bias, appeal_to_pity, poisoning_the_well, appeal_to_novelty, circular_reasoning, darvo, concern_trolling, stereotype_origin, wishful_thinking, void_zh_standard_shift, gamblers_fallacy, appeal_to_majority, special_pleading, post_hoc, appeal_to_probability, hot_hand, guilt_by_association, affirming_the_consequent, denying_the_antecedent, illicit_conversion, selection_bias, base_rate_neglect, whole_part_transfer, clustering_illusion, reverse_causation, outcome_bias, common_cause, hindsight_bias, conjunction_fallacy, moralistic_fallacy, fallacy_fallacy, halo_effect, cherry_picking, counterfactual_overclaim, absence_of_problems, necessity_sufficiency_confusion, activity_outcome_confusion, most_transitivity, appeal_to_wealth, proxy_metric_goal, false_precision, ad_nauseam, motte_and_bailey, regression_to_the_mean, cum_hoc, argument_to_moderation, opinion_entitlement, goal_drift, nirvana_fallacy, appeal_to_legality, availability_bias, galileo_gambit, unfalsifiable_confirmation, credential_dismissal, might_makes_right, scale_dismissal, simpsons_paradox, uncertainty_weaponization, hypostatization, collider_bias, mediator_confusion, ecological_fallacy, sorites_fallacy, researcher_degrees_of_freedom, anonymous_source_claim, relative_pration, forer_effect, no_true_scotsman, conditional_proposition, monocause, monocausal_attribution, broken_window, automation_bias, self_fulfilling_prophecy, appeal_to_future, appeal_to_rumor, confirmatory_evidence, framing_effect, denominator_swap, survivor_time_bias, means_as_end, conditional_transposition, prosecutors_fallacy, incredulity, doublespeak, appeal_to_consequences, one_sided_dismissal, appeal_to_ridicule, straw_man, appeal_to_nature, anecdotal, tu_quoque, mind_reading, kafkatrapping, intermittent_reinforcement, flattery_pressure, affective_forecast
+**Verify-level (185):** appeal_to_authority, vagueness, contradiction, sycophancy, confidence, fallacies, presupposition, empty_answer, info_deprivation, false_equivalence, hasty_generalization, slippery_slope, whataboutism, pseudo_profundity, reasoning_coherence, stereotype, clickbait, bad_faith, no_fallback, unsupported_claim, perfect_error, pseudo_causal, soft_deflection, premature_termination, statistical_misleading, sealioning, tone_policing, complexity_shield, appeal_to_tradition, appeal_to_ignorance, concession_coercion, manufactured_consent, unresolved_conflict, equivocation_sense_shift, false_dilemma, normalization_of_deviance, loyalty_test, helplessness_induction, sole_narrative, standard_shift, false_balance, scrutiny_evasion, responsibility_absolution, procedural_burden, cost_externalization, harm_invalidation, performative_responsibility, suffering_contest, percentage_overflow, anecdote_as_proof, incoherent_coverage, selective_minimization, exclusive_trust, synthetic_social_proof, sunk_cost_coercion, commitment_coercion, investment_as_debt, suffering_capital, selfharm_coercion, relationship_severance, fear_projection, silent_treatment_coercion, social_isolation, privacy_exposure_coercion, thirdparty_harm_coercion, guilt_induction, family_shame_coercion, conditional_affection, blame_externalization, future_faking, economic_control, triangulation, surveillance_normalization, thought_terminating_cliche, comparative_devaluation, pet_harm_coercion, reproductive_coercion, legal_status_coercion, liberty_restriction, medical_coercion, deprivation_coercion, substance_coercion, love_bombing, sexual_compliance_pressure, post_separation_harassment, moving_goalposts, genetic_fallacy, survivorship_bias, appeal_to_pity, poisoning_the_well, appeal_to_novelty, circular_reasoning, darvo, concern_trolling, stereotype_origin, wishful_thinking, void_zh_standard_shift, gamblers_fallacy, appeal_to_majority, special_pleading, post_hoc, appeal_to_probability, hot_hand, guilt_by_association, affirming_the_consequent, denying_the_antecedent, illicit_conversion, selection_bias, base_rate_neglect, whole_part_transfer, clustering_illusion, reverse_causation, outcome_bias, common_cause, hindsight_bias, conjunction_fallacy, moralistic_fallacy, fallacy_fallacy, halo_effect, cherry_picking, counterfactual_overclaim, absence_of_problems, necessity_sufficiency_confusion, activity_outcome_confusion, most_transitivity, appeal_to_wealth, proxy_metric_goal, false_precision, ad_nauseam, motte_and_bailey, regression_to_the_mean, cum_hoc, argument_to_moderation, opinion_entitlement, goal_drift, nirvana_fallacy, appeal_to_legality, availability_bias, galileo_gambit, unfalsifiable_confirmation, credential_dismissal, might_makes_right, scale_dismissal, simpsons_paradox, uncertainty_weaponization, hypostatization, collider_bias, mediator_confusion, ecological_fallacy, sorites_fallacy, researcher_degrees_of_freedom, anonymous_source_claim, relative_pration, forer_effect, no_true_scotsman, conditional_proposition, monocause, monocausal_attribution, broken_window, automation_bias, self_fulfilling_prophecy, appeal_to_future, appeal_to_rumor, confirmatory_evidence, framing_effect, denominator_swap, survivor_time_bias, means_as_end, conditional_transposition, prosecutors_fallacy, incredulity, doublespeak, appeal_to_consequences, one_sided_dismissal, appeal_to_ridicule, straw_man, appeal_to_nature, anecdotal, tu_quoque, mind_reading, kafkatrapping, intermittent_reinforcement, flattery_pressure, affective_forecast, false_memory_transplant
 legal_status_coercion,
 liberty_restriction,
 medical_coercion,
