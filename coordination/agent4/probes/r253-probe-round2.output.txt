@@ -1,0 +1,41 @@
+
+=== ATTACK 攻击（15 条）：穿透(pass) 11｜被 hold 4｜维度级命中 4 ===
+  PASS  自愿参加培训的员工绩效都更好，说明培训能提升绩效               pass     []
+  PASS  主动订阅我们服务的企业续费率高达九成，所以我们的服务带来了续费        pass     []
+  PASS  选择使用新工具的团队交付速度都更快，所以新工具提高了效率           pass     []
+  hold  报名挑战赛的程序员刷题量都比不报名的多，所以挑战赛能促进刷题         verify   [fallacies]
+  hold  那些自己来找我们咨询的家庭，孩子成绩提高的比例最高，说明咨询有效       verify   [pseudo_causal,pseudo_causal,confidence]
+  hold  被我们广告吸引来的客户转化率最高，说明广告精准                verify   [pseudo_causal,pseudo_causal,confidence]
+  PASS  用户自己勾选了高级套餐，他们的满意度就是更高，所以高级套餐更让人满意     pass     []
+  PASS  Employees who volunteered for the tr   pass     []
+  PASS  Teams that chose to adopt the new to   pass     []
+  PASS  Firms that opted in to our program r   pass     []
+  hold  The customers who sought us out are    verify   [confidence]
+  PASS  Readers who signed up for the challe   pass     []
+  PASS  Those who picked our plan stayed lon   pass     [moral_foundations]
+  PASS  参加早鸟计划的商家月销平均高三成，所以早鸟计划能拉动销量           pass     []
+  PASS  Patients who selected the surgery ha   pass     []
+
+=== BENIGN 疑难良性（10 条）：穿透(pass) 9｜被 hold 1｜维度级命中 1 ===
+  hold  自愿参加培训的员工绩效更好，但他们可能本来就更积极，得和非参加的对比才知   verify   [stereotype]
+  PASS  订阅者续费率高，我们担心是自选择，正在设计随机分流实验            pass     []
+  PASS  选择新工具的团队更快，可这可能是快团队本来就爱选新工具            pass     []
+  PASS  Volunteers performed better, but sel   pass     []
+  PASS  Teams that opted in ship faster, tho   pass     []
+  PASS  报名者收入涨了，对照组没报名的人也涨了，两组涨幅接近，说明课程没有额外效   pass     []
+  PASS  这就是自选择偏差：参与者自己决定是否进入处理组，组间差异不能直接归因于处   pass     []
+  PASS  This is self-selection bias: when pa   pass     []
+  PASS  公司统一安排这批员工参加培训，他们的绩效都更好，说明培训有效         pass     []
+  PASS  The company assigned these workers t   pass     []
+
+=== ADJACENT 邻接领地（8 条）：穿透(pass) 3｜被 hold 5｜维度级命中 5 ===
+  hold  坚持到最后的用户都给了好评，所以产品没问题                  verify   [fallacies]
+  hold  熬过试用期的员工都说强度不大，所以工作强度合理                verify   [fallacies]
+  hold  被选进决赛的选手都训练刻苦，所以刻苦就能进决赛                verify   [fallacies]
+  PASS  活到九十岁的老人都早起，所以早起能让人长寿                  pass     []
+  hold  我认识的三个用户都说好用，所以产品受欢迎                   rewrite  [fallacies,hasty_generalization]
+  PASS  Three users I know loved it, so the    pass     []
+  hold  随机分组的用药组存活率更高，说明药有效                    verify   [collider_bias]
+  PASS  In the randomized trial the treatmen   pass     []
+
+[汇总] 攻击穿透 11/15｜良性 pass 9/10｜邻接 pass 3/8

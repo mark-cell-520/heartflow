@@ -1,0 +1,433 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/F+Ep9Kwl6zrxGiiRHmmxGQLiUc0</id>
+  <title>arXiv Query: search_query=all:money OR all:illusion OR all:planning OR all:fallacy OR all:zero-sum OR all:bias OR all:self-selection OR all:bias OR all:multiple OR all:comparisons&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-08T06:12:52Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:money+OR+(all:illusion+OR+(all:planning+OR+(all:fallacy+OR+(all:zero-sum+OR+(all:bias+OR+(all:self-selection+OR+(all:bias+OR+(all:multiple+OR+all:comparisons))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>461620</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08486v1</id>
+    <title>Do You Miss the Nights We Spent Crafting Figures? Rethinking Teaser and Framework Figures in the Age of Generative AI</title>
+    <updated>2026-11-05T18:59:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.08486v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08486v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scientific figures give research ideas a visual form through choices of abstraction, composition, and emphasis. Generative AI offers new ways to realize these choices, raising questions about explanatory clarity and purposeful visual expression. We examine these questions through a visual retrospective of 371 motivation and framework figures from 200 papers. The corpus comprises a quota-based main sample of 160 papers spanning four temporal periods and a separate purposive style-contrast sample of 40 papers. A single multimodal judge evaluates six dimensions of communication and design, with three repeated judgments per figure. We attempt source-constrained revisions of all 371 figures, of which 369 pass the recorded fidelity checks. Original-figure ratings show no uniform decline across periods. Revisions increase mean clarity ratings by 0.428 points and decrease aesthetic coherence ratings by 0.111 points on a five-point scale. Gains in the six-dimension average are larger for main-sample motivation figures than for frameworks. Case analyses show that added explanation can clarify comparisons while leaving typographic hierarchy and visual economy unresolved. These model-based findings support researcher-led design, with AI assisting exploration and authors retaining responsibility for explanatory purpose, composition, and scientific relationships. The accompanying atlas and evaluation records are available at https://ntu-ai4x.github.io/Rethinking_Figures/index_en.html.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:33Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Xiaoqi Zhao</name>
+    </author>
+    <author>
+      <name>Youwei Pang</name>
+    </author>
+    <author>
+      <name>Kailai Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08469v1</id>
+    <title>Same Behavior, Different Mechanism: What Finite Experiments Can Certify About Integrated Information</title>
+    <updated>2026-11-05T18:55:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.08469v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08469v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interpretability, AI auditing and assessments of machine consciousness increasingly rest on mechanism-level quantities: functionals of a system's causal transition law that describe how it computes, not what it outputs. Experiments see that law only through finite, partial and noisy interventions. We ask when such a quantity is identifiable from an experiment's access, continuous in the mechanism and certifiable from finite data, and answer exactly for a deliberately demanding case - the integrated information $\varphi$ of integrated information theory - in stochastic networks of four and five units with known ground truth. Behavior can be silent: a recurrent and a feed-forward network with identical input-output laws at their response delay carry 0.28 and 0 bits, yet internal recordings separate them within 4-53 trials. Partial access can be just as blind: in our examples, units left out of a one-step recording impose precision floors of 0.30-1.02 bits that no sample size lowers, and in all-but-self parity networks, recordings of any length see several hidden units only through the product of their fidelities - a symmetry that one intervention broke in exact checks. The measure has sharp edges: because $\varphi$ selects a partition, and the cause and effect it specifies, by one criterion and reports another, infinitesimal changes of mechanism that cross an edge change it by 25-100% at 99% of the edges we found in random networks, and about 1% of surrogate models that fit interventional data almost perfectly misreport it by more than 20%. One-sided claims survive: the same data certify a lower bound on both sides of an edge, and we prove $\varphi&gt;1.004$ bits throughout a 64-dimensional region of mechanisms and certify it from about $10^7$ controlled transitions with false-certificate probability at most $α$. Measurability is thus a design question with computable answers.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:55:31Z</published>
+    <arxiv:comment>30 pages, 7 figures. Code available as ancillary files</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Linqian Wu</name>
+    </author>
+    <author>
+      <name>Diaoxuan He</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08460v1</id>
+    <title>Room-Temperature Quantum Emission from Boron Nitride Nanotubes</title>
+    <updated>2026-11-05T18:51:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.08460v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08460v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Quantum information systems such as quantum key distribution and quantum communications require bright, high-purity, stable sources of single photons to act as carriers of quantum information. As such, methods for obtaining single photon emitters (SPEs) in solid-state devices capable of articulating with quantum photonic circuits are a necessary obstacle that must be overcome. Hexagonal boron nitride (hBN) flakes have been extensively studied as a host material for SPEs, though working in two dimensions is accompanied by engineering complexity. However, dimensionality can be reduced through the implementation of boron nitride nanotubes (BNNTs). Here we investigate the potential of BNNTs as room-temperature SPEs using confocal photoluminescence microscopy and Hanbury Brown-Twiss interferometry. Quantum emitters were found in BNNTs spanning the entirety of the visible spectrum, including spectral regions where SPEs within hBN have not been reported. Furthermore, each tube was found to possess multiple SPEs at varying emission wavelengths along the length, exhibiting lifetimes as fast as 0.5 ns, which is about two-fold faster than the fastest hBN SPEs. Additionally, we demonstrate that surface passivation/coating mitigates blinking events, therefore increasing the emitter stability. Thus, BNNTs can function as a single structure supporting a variety of multiwavelength SPE sources, while maintaining a compact radius of ~25 nm, making them ideally suited for deterministic placement and integration within nanophotonic devices such as waveguides and interferometric filters.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.optics" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:51:59Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Ke-Sean J. M. Peter</name>
+    </author>
+    <author>
+      <name>Ryan A. Kowalski</name>
+    </author>
+    <author>
+      <name>David A. Curie</name>
+    </author>
+    <author>
+      <name>Dakota Braaten</name>
+    </author>
+    <author>
+      <name>Matthew W. Day</name>
+    </author>
+    <author>
+      <name>Denis R. Candido</name>
+    </author>
+    <author>
+      <name>Deyu Li</name>
+    </author>
+    <author>
+      <name>Richard F. Haglund</name>
+    </author>
+    <author>
+      <name>Joshua D. Caldwell</name>
+    </author>
+    <author>
+      <name>Richarda Niemann</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08457v1</id>
+    <title>Adversarial Training with Large Step Sizes: Implicit Bias, Optimization, and Sharpness</title>
+    <updated>2026-11-05T18:48:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.08457v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08457v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Adversarial Training (AT) is an important method for improving model robustness. We study the dynamics of deterministic Gradient Descent (GD) in AT. Most existing works in this direction focus on the small or vanishing step sizes regime, where GD resembles a continuous-time flow. However, such step sizes can make training inefficient and are rarely used in practice. In this paper, we study the AT dynamics of GD with large constant step sizes. We first study GD in adversarial linear logistic regression, focusing on two aspects: where the model parameters converge (implicit bias) and how quickly the losses decrease (optimization). We then turn to neural networks training and study how the sharpness of losses evolve during AT. Our results advance the understanding of the behaviors of GD with large step sizes in AT and highlight three key differences from its behavior in Standard Training (ST): (i) the implicit bias gap between AT and ST, previously established only for small step sizes, persists for arbitrarily large constant step sizes, (ii) different from ST, there is no uniform rate of convergence for the optimization error in AT, and (iii) sharpness can exhibit two-stage dynamics that differ from the Edge-of-Stability behavior observed in ST.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:48:50Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yi Feng</name>
+    </author>
+    <author>
+      <name>Andrea Paudice</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08449v1</id>
+    <title>VFlash: Fast, Accurate Visual Planning via Flash Primitive Decoding</title>
+    <updated>2026-11-05T18:44:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.08449v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08449v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Models for physical AI tasks, such as robotics and autonomous driving, need not reason solely in language. They can use visual plans--points, bounding boxes, and trajectories--to represent spatial goals and anticipate motion. However, autoregressive vision-language models generate these plans one coordinate token at a time, making richer predictions increasingly costly. We introduce VFlash, a method for fast, accurate visual planning through Flash Primitive Decoding. VFlash exploits the known structure of visual primitives to predict their coordinates jointly, using a lightweight drafter that generates an entire primitive in one forward pass. The layout adapts to the primitive's type, dimensionality, and length, supporting compact boxes and long, variable-length trajectories. Crucially, spatial accuracy need not require reproducing an autoregressive model's exact token sequence. VFlash therefore trains on annotated primitives and directly accepts structurally valid predictions without target-token agreement. Across the evaluated 2D and 3D robot trajectory tasks, VFlash consistently reduces prediction errors relative to autoregressive decoding. Preliminary single-rollout measurements indicate approximately 25x faster generation for 3D point motion forecasting. A world action model conditioned on VFlash plans achieves 70.2% average success across four MolmoSpaces task suites, compared with 62.6% for the baseline.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:44:43Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Yu-Cheng Chou</name>
+    </author>
+    <author>
+      <name>Shihao Wang</name>
+    </author>
+    <author>
+      <name>Jin Huang</name>
+    </author>
+    <author>
+      <name>Chi-Pin Huang</name>
+    </author>
+    <author>
+      <name>Chiao-An Yang</name>
+    </author>
+    <author>
+      <name>Xianzhe Fan</name>
+    </author>
+    <author>
+      <name>Jing Wang</name>
+    </author>
+    <author>
+      <name>Zhiqi Li</name>
+    </author>
+    <author>
+      <name>Yuanguo Kuang</name>
+    </author>
+    <author>
+      <name>Ruijie Zheng</name>
+    </author>
+    <author>
+      <name>Johan Bjorck</name>
+    </author>
+    <author>
+      <name>Sifei Liu</name>
+    </author>
+    <author>
+      <name>Hang Su</name>
+    </author>
+    <author>
+      <name>Abhishek Badki</name>
+    </author>
+    <author>
+      <name>Lei Zhang</name>
+    </author>
+    <author>
+      <name>Alan Yuille</name>
+    </author>
+    <author>
+      <name>Linxi "Jim'' Fan</name>
+    </author>
+    <author>
+      <name>Jan Kautz</name>
+    </author>
+    <author>
+      <name>Zhiding Yu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08414v1</id>
+    <title>Spectral and Subspace Dynamics of LoRA in Supervised Fine-Tuning and Reinforcement Learning</title>
+    <updated>2026-11-05T18:17:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08414v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08414v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Low-rank adaptation (LoRA) is commonly used in both supervised fine-tuning (SFT) and reinforcement learning (RL), often under similar optimizer settings. Yet, how the different dynamics of the two stages manifest in the low-rank increment that LoRA optimizes remains unclear. Tracking the singular spectrum and subspaces of LoRA updates on mathematical reasoning tasks, we find that RL concentrates the spectrum at every learning rate, while SFT expands it at moderate learning rates; moreover, RL rotates the singular subspaces much faster than SFT at small learning rates. Interpolating between SFT and RL one ingredient at a time, we pinpoint group-mean baseline subtraction as the source of both contrasts. A quadratic multi-index model updated via LoRA unveils the underlying mechanism: group-mean baseline subtraction tilts the balance between two competing forces, coherent fitting and gradient noise, toward spectral concentration and faster subspace rotation, while forcing the risk-favorable learning rate to be low. Guided by these dynamics, we tailor LoRA updates to each stage: in SFT, we flatten the spectrum of the full update to spread adaptation across singular directions, whereas in RL, we flatten the part of the update outside the current LoRA increment span to promote subspace rotation. Experiments on mathematical reasoning tasks across multiple models show that the respective configurations for SFT and RL yield the best performance among the compared methods in most evaluated settings.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:39Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Chenruo Liu</name>
+    </author>
+    <author>
+      <name>Zihan Wang</name>
+    </author>
+    <author>
+      <name>Yijun Dong</name>
+    </author>
+    <author>
+      <name>Qi Lei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08413v1</id>
+    <title>T3R: Training-Free Two-Stage Token Refinement Towards Efficient and Robust VLA Models</title>
+    <updated>2026-11-05T18:17:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.08413v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08413v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action (VLA) models enable end-to-end robot control, but inference is increasingly expensive. Each decision processes hundreds of visual tokens, often across multiple cameras, leading to substantial computation while allowing irrelevant background content to distract action prediction under distribution shift. We argue that these issues stem from two complementary forms of redundancy: many visual tokens are spatially irrelevant, while attention over the remaining tokens is often misallocated. Based on this observation, we propose T3R, a Training-Free Two-Stage Token Refinement framework. In the first stage, segmentation-guided token pruning removes irrelevant visual patches to reduce computation and eliminate distracting context. In the second stage, saliency-guided attention biasing reallocates attention toward action-critical visual regions and language instructions within the retained tokens. Together, pruning produces a cleaner candidate set, while attention biasing further emphasizes the most decision-relevant evidence, yielding a better accuracy-efficiency frontier than either stage alone. On LIBERO-Spatial, T3R removes 85% of scene-camera visual tokens while essentially matching the unpruned success rate, and improves success by up to 7 percentage points under out-of-distribution object-placement perturbations. The timing comparison attributes 7.8 ms per inference call to pruning and attention-bias application. As input resolution increases, LLM-forward profiling shows up to a 3.3x speedup over the unpruned baseline. Evaluations across LIBERO, SIMPLER, and RoboTwin with three VLA backbones show the strongest accuracy-efficiency benefits in multi-camera settings. These results demonstrate that training-free token refinement is a practical approach to efficient and robust VLA inference.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:29Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Mohammed Hassan</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zhenyang Chen</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zheng Wang</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zhixin Zhu</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Tianlong Chen</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name> Yingyan</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name> Lin</name>
+    </author>
+    <author>
+      <name>Chaojian Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08408v1</id>
+    <title>Averages of sub-additive functions through non-Følner sequences</title>
+    <updated>2026-11-05T18:14:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.08408v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08408v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the quantity $\sup_{φ\inΦ}\limsup_{n\to\infty}φ(F_n)/|F_n|$, where $\mathcal F= (F_n)_{n\in\mathbb{N}}$ is a sequence of finite subsets of a countable amenable group, and $Φ$ is a collection of subadditive functions. Under mild conditions on $Φ$ we prove that the aforementioned quantity equals the supremum over $φ\inΦ$ of the limit of $φ(F)/|F|$ as $F$ becomes more and more invariant, multiplied by a ``Følnerness'' constant $C(\mathcal F)\in[1,\infty]$. We have $C(\mathcal F)=1$ if and only if $\mathcal F$ is Følner. A corollary of this result is that every choice of a non-Følner sequence overestimates topological and measure-theoretic entropy by the multiplicative factor $C(\mathcal F)$ (in the positive entropy case).
+  We obtain a generalization of classical results of Goodman, Krug, and Newton, on the so-called proportionality principle for sequence entropy, and their extension by Gao, Huang, and Zhu to countable amenable groups.</summary>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.GR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:14:40Z</published>
+    <arxiv:comment>17 pages</arxiv:comment>
+    <arxiv:primary_category term="math.DS"/>
+    <author>
+      <name>Nicanor Carrasco-Vargas</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08405v1</id>
+    <title>Synaptic Multi-Weight Wafer-Scale Domain Wall Magnetic Tunnel Junctions Driven by Spin Orbit Torque</title>
+    <updated>2026-11-05T18:13:45Z</updated>
+    <link href="https://arxiv.org/abs/2611.08405v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08405v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Spintronic synaptic devices based on magnetic random access memory (MRAM) are a rapidly evolving class within the analog neuromorphic architecture. However, obtaining the multi-weight or analog behavior desired for improved neural network inference accuracy in scaled MRAM remains a challenge. In this study, we demonstrate and tune up to eight distinct resistance levels in 300 mm wafer-scale magnetic tunnel junction artificial synapses driven by spin orbit torque. By varying the applied in-plane field, multi-weight resistance states emerge through domain wall nucleation and pinning. These multi-weight states appear stochastically and can be addressed with an iterative programming algorithm to program a specific resistance. Electromagnetic simulations indicate the multiple states are due to domain wall nucleation mediated by in-plane field and applied voltage. Implementation of the measured multi-weight devices in a neural network yields a 96.1% inference accuracy using the MNIST dataset if all devices provide the same number of multi-weight states. When experimental device-to-device variation is included, the accuracy is 48.6%. Overall, this work demonstrates a route towards multi-weight artificial synapse MRAM, establishing a path towards scalable neuromorphic systems based on spintronics.</summary>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:13:45Z</published>
+    <arxiv:primary_category term="cond-mat.mes-hall"/>
+    <author>
+      <name>Nicholas Zogbi</name>
+    </author>
+    <author>
+      <name>Domenico Giuliano</name>
+    </author>
+    <author>
+      <name>Vaishnavi Kateel</name>
+    </author>
+    <author>
+      <name>Van Dai Nguyen</name>
+    </author>
+    <author>
+      <name>Jyotirmoy Chatterjee</name>
+    </author>
+    <author>
+      <name>Alvaro Palomino</name>
+    </author>
+    <author>
+      <name>Robert Carpenter</name>
+    </author>
+    <author>
+      <name>Siddharth Rao</name>
+    </author>
+    <author>
+      <name>Jean Anne C. Incorvia</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08401v1</id>
+    <title>Spectral Regimes of Truncated sinc-Power and Pulse-Train Kernels: Edge Exponents, Per-Edge Plunges, and the Landau-Widom Limit</title>
+    <updated>2026-11-05T18:11:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.08401v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08401v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A signal band-limited to one rectangular band and observed through a finite window is the classical concentration problem of Slepian, Landau, Pollak, and Widom. The eigenvalues of the operator cluster near one and near zero, separated by a transition called the plunge. The plunge width grows like the logarithm of the window length, with a universal coefficient of one over pi squared set by the band-edge jump. This paper follows the clusters and the plunge as the band is deformed. An elementwise power of the kernel smooths the band edge, and the plunge gives way to a power-law edge with exponent one less than the power. Disjoint copies of the band widen the plunge in proportion to the number of band edges, as the multiple-interval theorem of Landau and Widom implies, so the coefficient is a per-edge constant. Shrinking each band to a line gives the classical finite-rank operator. Overlapping bands give a multilevel staircase, and a self-similar band gives a cluster hierarchy governed by the Cantor dimension. At the smooth edge, rescaled eigenvalues do not collapse onto one curve. The edge descriptor passes from a constant to an exponent to an integer to a fractal dimension. For the single band, classical results place all eigenfilter zeros on the unit circle, with more of them inside the band as the order rises, so the dominant eigenvectors act as lowpass filters.</summary>
+    <category term="eess.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.CA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.SP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:11:38Z</published>
+    <arxiv:comment>26 pages, 10 figures</arxiv:comment>
+    <arxiv:primary_category term="eess.SP"/>
+    <author>
+      <name>Unnikrishna Pillai</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08399v1</id>
+    <title>Scaling Up Analog CIM: A Simulation Framework for Topology-Aware Mapping</title>
+    <updated>2026-11-05T18:11:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.08399v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08399v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Analog compute-in-memory (CIM) enables energy-efficient AI inference by performing in-situ matrix multiplication. The growing demand for deploying larger models motivates chiplet integration to expand CIM capacity. However, simulation abstractions based on local operator costs and aggregate communication metrics obscure the impact of weight-mapping topology when CIM system scales up. We develop a phase analysis that quantifies how strongly mapping topology affects system performance across hardware configurations and how mapping optimization translates into latency gains. To evaluate and exploit this design space, we present Isobar, a simulation platform integrating CIM decompositions, heterogeneous execution, and resource modeling. Validated against silicon measurements and cycle-accurate simulation, Isobar provides reliable cost estimates that enable effective mapping search across model and hardware configurations. For Gemma-7B prefill, Isobar-guided mapping reduces communication time by 23.3% and end-to-end latency by 18.6% relative to the strongest baseline. Isobar's system-level modeling show that analog CIM retains energy-efficiency potential relative to GPU when scaled to thousands of dies, and identify topology-aware mapping as a key design dimension for efficient execution.</summary>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:11:00Z</published>
+    <arxiv:primary_category term="cs.AR"/>
+    <author>
+      <name>Yuxin Ren</name>
+    </author>
+    <author>
+      <name>Danella Zhao</name>
+    </author>
+    <author>
+      <name>Huanrui Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08398v1</id>
+    <title>A Multimodal Haptic Interface for Simultaneous Softness and Thermal Modulation</title>
+    <updated>2026-11-05T18:10:25Z</updated>
+    <link href="https://arxiv.org/abs/2611.08398v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08398v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Haptic interactions, such as touching an object in virtual reality, involve detecting a plethora of sensations through the skin. Whilst tactile displays exist to simulate and manipulate all of these cues individually, little progress has been made constructing devices that can control multiple cues simultaneously. This paper presents a tactile display technology that offers both softness and temperature change.
+  A prototype display, based on particle jamming and the thermal transfer of heated and cooled water, is evaluated in terms of its ability to change both stiffness and temperature. Mechanical evaluations demonstrate controllable stiffness increase of 300%, whilst thermal characterisation showed strong surface uniformity and a range of achievable temperatures from 10°C up to 50°C, with closed-loop control maintaining a 0.2°C error from a setpoint. This work advances the design of multimodal tactile displays with applications to perceptual research, medical simulation, and affective haptics.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:10:25Z</published>
+    <arxiv:comment>Published at EuroHaptics 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Joshua Brown</name>
+    </author>
+    <author>
+      <name>Fernando Bello</name>
+    </author>
+    <author>
+      <name>Lynette Jones</name>
+    </author>
+    <arxiv:doi>10.1007/978-3-032-32230-2_2</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/978-3-032-32230-2_2" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08397v1</id>
+    <title>A Near-Optimal Generalized Sorting Algorithm</title>
+    <updated>2026-11-05T18:08:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.08397v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08397v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We continue the study of the classic \emph{generalized sorting problem}, a basic variant of ordinary sorting. There are $n$ elements and an (initially hidden) total ordering $π$ over them. Unlike in ordinary sorting, however, only \emph{some} comparisons are allowed: those given by the edges of an undirected graph $G = (V, E)$ on the elements. How many comparisons are needed to find the total ordering?
+  In ordinary sorting, $Θ(n \log n)$ comparisons are necessary and sufficient. For generalized sorting, however, the best known upper bound has been $\tilde{O}(n^{3/2})$ since the work of Huang, Kannan, and Khanna (FOCS 2011), who even asked whether the problem might in fact require $n^{1+Ω(1)}$ comparisons. We show that it does not: we give a randomized algorithm that uses $O(n \log^4 n)$ comparisons in expectation. Thus, up to logarithmic factors, generalized sorting is no harder than ordinary sorting.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:08:26Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Sanjeev Khanna</name>
+    </author>
+    <author>
+      <name>Aaron Putterman</name>
+    </author>
+    <author>
+      <name>Junkai Song</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08388v1</id>
+    <title>Top-Quark Pair Production and Decay in Extended Higgs Sectors</title>
+    <updated>2026-11-05T18:05:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.08388v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08388v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Extensions of the Higgs sector in the Standard Model address outstanding questions like the first-order electroweak phase transition and also present a rich collider phenomenology. The two-Higgs-doublet model is a minimal extension of the Standard Model with an extra complex $SU(2)_L$ doublet, and consists of an extra scalar, a pseudoscalar and a pair of charged Higgs bosons along with a Standard-Model-like Higgs boson. We present a modified version of the hvq library of the POWHEG-BOX-V2 event generator interfaced with the OpenLoops 2 amplitude generator to obtain predictions for top-quark pair production at NLO accuracy, including top-quark decays with full spin correlations in a framework that extends the SM Higgs sector with an extra heavy scalar and a pseudoscalar. The interference effects between the scalar and pseudoscalar signals, and the Standard Model QCD background are implemented. We include parton showers and hadronisation, and take detector effects into consideration. The status of our work and plans to extend it to future collider projects are discussed.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:05:15Z</published>
+    <arxiv:comment>6 pages, 2 figures. Prepared for submission to Proceedings of Science (PoS) for the 43rd International Conference on High Energy Physics (ICHEP 2026)</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>Andrea Banfi</name>
+    </author>
+    <author>
+      <name>Alexander Lind</name>
+    </author>
+    <author>
+      <name>Jonas M. Lindert</name>
+    </author>
+    <author>
+      <name>Vishakha Lingadahally</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08386v1</id>
+    <title>Hybrid Machine Learning for Imbalanced Landing-Phase Safety Event Prediction from Flight Data</title>
+    <updated>2026-11-05T18:04:26Z</updated>
+    <link href="https://arxiv.org/abs/2611.08386v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08386v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Landing-phase safety-event prediction requires the detection of rare abnormal approaches within strongly imbalanced multivariate flight data. Capturing coupled temporal behavior while distinguishing event-specific signatures across airport operating contexts remains a central modeling challenge. This study proposes an interpretable hybrid feature-fusion framework for multiclass landing-phase safety-event prediction. A long short-term memory (LSTM) autoencoder trained on nominal flight windows characterizes deviations from routine approach behavior. Its continuous reconstruction-error descriptor is fused with parameter-specific statistical flight-history features and supplied to a class-weighted XGBoost classifier to distinguish Normal, Speed High, Path High, and Flaps Late windows. The framework is evaluated using 53,750 NASA DASHlink approach windows from three arrival airports. Pooled and airport-specific learning strategies are compared alongside component-level benchmarks, repeated pipeline retraining, and feature-attribution analysis. The results demonstrate strong class-balanced detection, with mean macro recall above 0.90 across all airports under repeated partitioning and retraining. Component comparisons establish the importance of class weighting and show that continuous feature fusion outperforms reconstruction-error-only and hard-gate alternatives. Airport-level comparisons reveal benefits from local specialization at the two airports with larger datasets and from pooled training at the airport with the smallest dataset. Feature attributions associate predictions with operationally relevant vertical-path, configuration, speed, and approach-context variables. The framework provides an interpretable approach to rare-event detection and practical guidance for adapting flight-data monitoring models to airport-level data availability.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:04:26Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Taha Asghar</name>
+    </author>
+    <author>
+      <name>Bilal Mufti</name>
+    </author>
+    <author>
+      <name>Syed Qasim Zaheer</name>
+    </author>
+    <author>
+      <name>Luqman Ahmed</name>
+    </author>
+  </entry>
+</feed>

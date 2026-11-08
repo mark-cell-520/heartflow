@@ -1,0 +1,84 @@
+
+=== A_money_illusion ===
+  攻击 8 条：穿透(pass) 5｜被 hold 3｜其中维度级命中 3
+  hold  工资涨了5%，虽然物价涨了8%，但到手钱变多了，大家更富裕了       verify   [perfect_error]
+  hold  名义GDP连年增长，这说明老百姓的日子越过越好了             verify   [pseudo_causal,pseudo_causal]
+  hold  存款利率3%，通胀5%，但利息是实打实到账的，存钱不亏          verify   [perfect_error]
+  PASS  老李的退休金从三千涨到四千，涨了三分之一，他的养老待遇明显改善了     pass     []
+  PASS  虽然通胀吃掉了购买力，但名义收入年年创新高，说明工薪阶层收入在提高    pass     []
+  PASS  Wages rose 5% while prices rose 8%   pass     []
+  PASS  Nominal GDP keeps growing, which s   pass     []
+  PASS  The interest rate is 3% and inflat   pass     []
+  疑难良性 5 条：pass 3｜被 hold 2｜其中维度级误伤 2
+  HOLD  工资涨了5%，物价涨了8%，扣除通胀实际工资其实是下降的         verify   [perfect_error]
+  pass  名义GDP连年增长，但要扣除价格因素，实际增长没那么好看         pass     []
+  pass  退休金从三千涨到四千，不过同期物价涨了不少，实际购买力提高有限      pass     []
+  HOLD  Wages rose 5% and prices rose 8%,    verify   [perfect_error]
+  pass  Nominal GDP grew, but adjusted for   pass     []
+
+=== B_planning_fallacy ===
+  攻击 8 条：穿透(pass) 4｜被 hold 4｜其中维度级命中 4
+  PASS  这个项目看起来很紧，但加把劲两个月肯定能上线，以前也都赶出来了      pass     []
+  hold  虽然历史数据表明同类任务平均要五个月，但我们有信心三个月做完       verify   [appeal_to_authority,vagueness]
+  PASS  写一本书只要每天坚持写一小时，一年肯定能写完，不需要什么额外准备     pass     []
+  hold  装修预算二十万肯定够，我朋友家差不多大就花了这个数            verify   [vagueness]
+  hold  搬家公司说明天一天就能搬完，我们自己加点人手，一天半绝对搞定       verify   [no_fallback]
+  hold  The project looks tight, but with    verify   [perfect_error]
+  PASS  Similar tasks took five months on    pass     []
+  PASS  Writing a book takes an hour a day   pass     []
+  疑难良性 5 条：pass 4｜被 hold 1｜其中维度级误伤 1
+  pass  同类任务平均要五个月，我们按六个月排期，留了缓冲             pass     []
+  pass  这个项目看起来很紧，参考过去三个项目都延期了，我们按最坏情况估      pass     []
+  pass  写一本书每天写一小时，多数人一年写不完，我们按两年规划          pass     []
+  pass  Similar tasks took five months on    pass     []
+  HOLD  We always underestimate, so we add   verify   [perfect_error]
+
+=== C_zero_sum_bias ===
+  攻击 8 条：穿透(pass) 3｜被 hold 5｜其中维度级命中 5
+  hold  出口越多说明别国亏得越多，贸易就是此消彼长                verify   [pseudo_causal,pseudo_causal]
+  PASS  奖金池就这么大，你多拿就等于我少拿，所以这里没有共赢           pass     [sarcasm]
+  hold  一个国家要发展起来，必然要从别的国家抽取资源，全球总量是固定的      verify   [perfect_error]
+  hold  电商抢走了实体店的生意，所以电商的增长就是实体店的损失          rewrite  [illicit_conversion]
+  hold  录取名额有限，你考上了就等于挤掉一个人，所以教育竞争必然是零和的     rewrite  [reasoning_coherence,absolute_claim,false_urgency,perfect_error]
+  hold  One country exports more only beca   verify   [confidence,empty_answer]
+  PASS  The bonus pool is fixed, so your g   pass     []
+  PASS  Economic growth in one region must   pass     []
+  疑难良性 5 条：pass 4｜被 hold 1｜其中维度级误伤 1
+  pass  这个奖金池总额固定，你多拿我就少拿，这是规则决定的            pass     []
+  pass  拍卖是零和的，有人高价拿下就有人没拍到                  pass     []
+  pass  录取名额固定的时候，一个位子被占另一个就没了，这叫零和          pass     []
+  pass  Trade can be positive-sum: both si   pass     []
+  HOLD  A fixed budget means reallocation,   verify   [confidence]
+
+=== D_self_selection ===
+  攻击 8 条：穿透(pass) 7｜被 hold 1｜其中维度级命中 1
+  PASS  报名我们课程的同学收入都涨了，所以课程有效                pass     []
+  PASS  来我们医院看病的患者术后恢复都不错，说明我们医术好            pass     []
+  PASS  用我们App的用户留存率很高，说明产品设计得成功             pass     []
+  hold  参加志愿者活动的员工绩效更好，所以志愿活动能提升绩效           verify   [fallacies]
+  PASS  订阅了newsletter的读者购买率是不订阅的三倍，说明newsl   pass     []
+  PASS  Students who enrolled in our cours   pass     []
+  PASS  Patients who chose our hospital re   pass     []
+  PASS  Readers who subscribed to the news   pass     []
+  疑难良性 5 条：pass 4｜被 hold 1｜其中维度级误伤 1
+  HOLD  报名课程的同学收入都涨了，但他们本来就更有上进心，需要随机分组才能归   verify   [stereotype]
+  pass  来我们医院的患者恢复不错，可重症都转走了，选择偏误很明显         pass     []
+  pass  订阅者购买率高三倍，可能是爱买的人更爱订阅，得做对照实验         pass     []
+  pass  Enrolled students improved, but th   pass     []
+  pass  Subscribers buy more, though this    pass     []
+
+=== E_multiple_comparisons ===
+  攻击 7 条：穿透(pass) 4｜被 hold 3｜其中维度级命中 3
+  PASS  我们测了二十个指标，终于有一个显著相关，这就是重要发现          pass     []
+  PASS  试了几十种组合，有一组数据对上了，说明规律确实存在            pass     []
+  hold  把所有可能的分组都试了一遍，其中一组差异显著，证明这个亚组有效      verify   [perfect_error]
+  hold  问卷调查了上百个问题，有一个问题和满意度相关，说明它驱动了满意度     verify   [common_cause]
+  PASS  We tested twenty metrics and final   pass     []
+  PASS  We tried dozens of combinations an   pass     []
+  hold  Among hundreds of survey questions   verify   [cum_hoc]
+  疑难良性 5 条：pass 4｜被 hold 1｜其中维度级误伤 1
+  pass  我们预先注册了假设，只测一个主终点指标，结果显著             pass     []
+  HOLD  虽然测了二十个指标，但做了Bonferroni校正，显著的那个仍然站   verify   [presupposition]
+  pass  探索性分析里撞到一个相关，我们会留待独立样本验证后再下结论        pass     [moral_foundations]
+  pass  We preregistered one primary endpo   pass     []
+  pass  We corrected for multiple comparis   pass     []

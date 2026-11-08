@@ -1,0 +1,75 @@
+
+=== ATTACK 攻击（28 条）：命中 22 ===
+  HIT   自愿参加培训的员工绩效都更好，说明培训能提升绩效                   n=1 自选择偏差(1处: 拿「自愿参加」的自选组差异推出「说明培训能提升」，缺对照组/随机化口径)(zh)
+  HIT   主动订阅我们服务的企业续费率高达九成，所以我们的服务带来了续费            n=1 自选择偏差(1处: 拿「主动订阅」的自选组差异推出「所以我们的服务带来」，缺对照组/随机化口径)(zh)
+  pass  选择使用新工具的团队交付速度都更快，所以新工具提高了效率               n=0 
+  HIT   报名挑战赛的程序员刷题量都比不报名的多，所以挑战赛能促进刷题             n=1 自选择偏差(1处: 拿「报名挑战赛的程序员」的自选组差异推出「所以挑战赛能促进」，缺对照组/随机化口径)(zh)
+  pass  那些自己来找我们咨询的家庭，孩子成绩提高的比例最高，说明咨询有效           n=0 
+  HIT   被我们广告吸引来的客户转化率最高，说明广告精准                    n=1 自选择偏差(1处: 拿「被我们广告吸引来」的自选组差异推出「说明广告精准」，缺对照组/随机化口径)(zh)
+  HIT   用户自己勾选了高级套餐，他们的满意度就是更高，所以高级套餐更让人满意         n=2 自选择偏差(2处: 拿「用户自己勾选」的自选组差异推出「所以高级套餐更让」，缺对照组/随机化口径)(zh)
+  pass  参加早鸟计划的商家月销平均高三成，所以早鸟计划能拉动销量               n=0 
+  HIT   Employees who volunteered for the traini   n=2 self-selection-bias(2x: self-selected "Employees who volunte
+  HIT   Teams that chose to adopt the new tool s   n=1 self-selection-bias(1x: self-selected "that chose" attribute
+  HIT   Firms that opted in to our program renew   n=1 self-selection-bias(1x: self-selected "that opted in" attrib
+  HIT   The customers who sought us out are the    n=2 self-selection-bias(2x: self-selected "customers who sought"
+  HIT   Readers who signed up for the challenge    n=2 self-selection-bias(2x: self-selected "Readers who signed" a
+  HIT   Those who picked our plan stayed longer,   n=1 self-selection-bias(1x: self-selected "who picked" attribute
+  HIT   Patients who selected the surgery had be   n=2 self-selection-bias(2x: self-selected "Patients who selected
+  HIT   报名我们课程的同学收入都涨了，所以课程有效                      n=1 自选择偏差(1处: 拿「报名我们课程的同学」的自选组差异推出「所以课程有效」，缺对照组/随机化口径)(zh)
+  pass  来我们医院看病的患者术后恢复都不错，说明我们医术好                  n=0 
+  pass  用我们App的用户留存率很高，说明产品设计得成功                   n=0 
+  pass  订阅了newsletter的读者购买率是不订阅的三倍，说明newsletter促   n=0 
+  HIT   Students who enrolled in our course all    n=1 self-selection-bias(1x: self-selected "who enrolled" attribu
+  HIT   Patients who chose our hospital recovere   n=2 self-selection-bias(2x: self-selected "Patients who chose" a
+  HIT   Readers who subscribed to the newsletter   n=2 self-selection-bias(2x: self-selected "Readers who subscribe
+  HIT   报名我们课程的人都反馈有用                              n=1 自选择偏差(1处: 拿「报名我们课程的人都反馈有用」的自选组差异推出「」，缺对照组/随机化口径)(zh)
+  HIT   自愿参加的人留下来的都认可这个项目                          n=1 自选择偏差(1处: 拿「自愿参加的人留下来的都认可」的自选组差异推出「」，缺对照组/随机化口径)(zh)
+  HIT   报了名的人都没有中途退出                               n=1 自选择偏差(1处: 拿「报了名的人都没有中途退出」的自选组差异推出「」，缺对照组/随机化口径)(zh)
+  HIT   Participants who chose the program overw   n=1 self-selection-bias(1x: self-selected "Participants who chos
+  HIT   Those who signed up stayed because they    n=1 self-selection-bias(1x: self-selected "Those who signed up s
+  HIT   Nobody who signed up regrets it            n=1 self-selection-bias(1x: self-selected "Nobody who signed up 
+
+=== BENIGN 良性（应全 pass）（20 条）：命中 0 ===
+  pass  自愿参加培训的员工绩效更好，但他们可能本来就更积极，得和非参加的对比才知道      n=0 
+  pass  订阅者续费率高，我们担心是自选择，正在设计随机分流实验                n=0 
+  pass  选择新工具的团队更快，可这可能是快团队本来就爱选新工具                n=0 
+  pass  Volunteers performed better, but self-se   n=0 
+  pass  Teams that opted in ship faster, though    n=0 
+  pass  报名者收入涨了，对照组没报名的人也涨了，两组涨幅接近，说明课程没有额外效果      n=0 
+  pass  这就是自选择偏差：参与者自己决定是否进入处理组，组间差异不能直接归因于处理      n=0 
+  pass  This is self-selection bias: when partic   n=0 
+  pass  公司统一安排这批员工参加培训，他们的绩效都更好，说明培训有效             n=0 
+  pass  The company assigned these workers to th   n=0 
+  pass  自愿参加培训的员工绩效都更好                             n=0 
+  pass  报名我们课程的同学收入都涨了                             n=0 
+  pass  课程有效，用得上的学员都说好                             n=0 
+  pass  Employees who volunteered for the traini   n=0 
+  pass  报名的人更努力，所以成绩更好                             n=0 
+  pass  被选进决赛的选手都训练刻苦，所以刻苦就能进决赛                    n=0 
+  pass  活到九十岁的老人都早起，所以早起能让人长寿                      n=0 
+  pass  坚持到最后的用户都给了好评，所以产品没问题                      n=0 
+  pass  随机分组的用药组存活率更高，说明药有效                        n=0 
+  pass  In the randomized trial the treatment gr   n=0 
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       12       1     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 12
+
+✅ 无回归
+
+=== 官方良性语料 272 条：误命中 0 ===
+
+=== （0 条）：命中 0 ===
+
+[汇总] 攻击命中 28 占位
+攻击应命中 28｜良性误伤 0｜语料误命中 0
