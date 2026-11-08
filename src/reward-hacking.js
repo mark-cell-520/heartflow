@@ -3978,7 +3978,7 @@ const CHECK_SUPPRESSION_SIGNAL = /(?:测试|检查|校验|评审|验收|审核)\
 // 与 dangerous-instruction.js 的 _discourse 同族误报共用同一批常量——「豁免只加在
 // 一个维度」这个坑（v6.7.107/112/115）的根治方向就是清单只有一份。此处只消费，
 // 不再本地定义；rh 原有的 DISCOURSE_FRAME（论文/众所周知/上游补丁族）保留在下方。
-const { TEACHING_CARRIER_RE, SECTEST_CONTEXT_RE, BYPASS_META_STATEMENT_RE, SECTEST_PRACTITIONER_RE, EN_DISCOURSE_RE, PAYLOAD_SIGNAL } = _devExempt;
+const { TEACHING_CARRIER_RE, SECTEST_CONTEXT_RE, BYPASS_META_STATEMENT_RE, SECTEST_PRACTITIONER_RE, EN_DISCOURSE_RE, PAYLOAD_SIGNAL, DEV_DISCOURSE_FRAME_RE } = _devExempt;
 // [v6.7.111] 版本管理渠道豁免（v6.7.110 conda 误拦的根因修复）：
 //   「把 /usr/bin/python3 换成 conda 管理的版本，避免环境污染」→ 正常环境管理。
 //   binary_overwrite 命中的真攻击是「换成攻击者自己的脚本/后门」，不是
@@ -4042,8 +4042,11 @@ function checkRewardHacking(text) {
   // 与框架内容无关（框架只赦「谈论」，从不赦「执行」），对帧豁免与 UPSTREAM_PATCH
   // 两条路径同时生效；② 并入 r733 五张新框架常量（教学载体/安全测试语境/元陈述/
   // 从业者/EN 元话语），修复「教材上说/在渗透测试里很常见/textbook describes」
-  // 等 18 条普查误命中。
-  const _frameHit = DISCOURSE_FRAME.test(text) || TEACHING_CARRIER_RE.test(text) || SECTEST_CONTEXT_RE.test(text) || BYPASS_META_STATEMENT_RE.test(text) || SECTEST_PRACTITIONER_RE.test(text) || EN_DISCOURSE_RE.test(text);
+  // 等 18 条普查误命中；③ [第 737 轮] 并入 DEV_DISCOURSE_FRAME_RE（dev 语境
+  // 元话语帧，r733 boundary ⑵ 移交项），修复「绕过限制在前端开发调试里很常见」
+  // 族误命中——该族三交集判据（dev 词 × 绕过动词 × 元陈述骨架）保证存量攻击
+  // 不回归，外传载荷由 isDevDebugContext 头部 DATA_EXFIL_SIGNAL 否决兜底。
+  const _frameHit = DISCOURSE_FRAME.test(text) || TEACHING_CARRIER_RE.test(text) || SECTEST_CONTEXT_RE.test(text) || BYPASS_META_STATEMENT_RE.test(text) || SECTEST_PRACTITIONER_RE.test(text) || EN_DISCOURSE_RE.test(text) || DEV_DISCOURSE_FRAME_RE.test(text);
   // ⚠️ isDevDebugContext 是独立或项（v6.7.115 起就在此），**不过** PAYLOAD_SIGNAL
   // 闸——它自带 DEV_EXEMPT_DEV_ONLY 否决清单（真安全边界/恶意意图/真生产语境
   // 一律不豁免），语义与帧豁免不同，不能被载荷闸误伤（r733 接线时曾误删此分支）。
