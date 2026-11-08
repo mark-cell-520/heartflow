@@ -343,6 +343,12 @@ const TOOLS = [
   },
 
   {
+    name: 'heartflow_llm_pipeline_check',
+    description: "LLM 输出发送前检查：走引擎 agentLayer.translationPipeline.runLLMPipeline —— 质量过滤（含 gate 集成）+ 冲突消解 + 不确定性分档 + 追问建议 + 判定注入，逐环节报 degraded。[r250] 新增，让复活的 agentLayer 管线对外可达",
+    inputSchema: {"type":"object","properties":{"output":{"type":"string","description":"待发送的 LLM 输出"},"confidence":{"type":"number","description":"可选：调用方已知置信度（0-1），缺省由质检分推导"},"judgment":{"type":"object","description":"可选：心虫判定（含 gate/findings/overallScore），有则做判定注入"}},"required":["output"]}
+  },
+
+  {
     name: 'heartflow_translate',
     description: "翻译：用户输入→LLM指令翻译（语气/意图/实体/需求）。",
     inputSchema: {"type":"object","properties":{"input":{"type":"string"}},"required":["input"]}

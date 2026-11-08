@@ -939,6 +939,40 @@ async function handleThink(args) {
 
 // v3.0 — 交流层 handler
 
+// [r250] LLM 输出发送前检查 handler：走引擎常驻实例（agentLayer 子模块带状态，
+// 每次 new 会丢掉已注入的 gate/dispatch 依赖——与 r589/r590 纪律一致）。
+// translationPipeline 是 {runUser, runLLM} 对象成员，不在 dispatch 路由表里，
+// 因此直接读常驻实例的 agentLayer.translationPipeline，不用 dispatch。
+function handleLLMPipelineCheck(args) {
+  const { output } = args || {};
+  if (!output) throw new Error('output 是必填参数');
+  if (!heartflow) throw new Error('引擎未启动');
+  const ctx = {};
+  if (args && typeof args.confidence === 'number') ctx.confidence = args.confidence;
+  if (args && args.judgment && typeof args.judgment === 'object') ctx.judgment = args.judgment;
+
+  let result;
+  try {
+    result = heartflow.agentLayer.translationPipeline.runLLMPipeline(output, ctx);
+  } catch (e) {
+    return { output, error: e.message, source: null };
+  }
+  if (!result || typeof result !== 'object') {
+    return { output, error: 'translationPipeline 未返回结果', source: null };
+  }
+  return {
+    output,
+    quality: result.quality || null,
+    conflicts: result.conflicts || null,
+    uncertainty: result.uncertainty || null,
+    confidenceFrom: result.confidenceFrom || null,
+    followups: (result.followups && result.followups.questions) || [],
+    disclosure: result.disclosure || [],
+    degraded: result.degraded || [],
+    ready: !!result.ready,
+  };
+}
+
 function handleTranslate(args) {
 
   const { input } = args || {};
@@ -3401,6 +3435,9 @@ const HANDLERS = {
   // v3.0 — 交流层 handler
 
   heartflow_translate: handleTranslate,
+
+  // [r250] LLM 输出发送前检查（复活的 agentLayer 管线对外出口）
+  heartflow_llm_pipeline_check: handleLLMPipelineCheck,
 
   heartflow_agent_think: handleAgentThink,
 

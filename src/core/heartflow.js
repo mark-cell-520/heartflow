@@ -656,33 +656,63 @@ const _FocusOfAttention = _lazy('focusOfAttention', () => require('../memory/foc
 // （scripts/tmp-249-probe.js）。改成真加载，require 失败才回退 stub。
 const _ToneAnalyzer = _lazy('toneAnalyzer', () => { try { return require('../bridge/tone-analyzer.js'); } catch(e) { return { ToneAnalyzer: class { constructor() {} analyze() { return { tone: 'neutral', confidence: 0 }; } } }; } });
 
-const _EntityExtractor = _lazy('entityExtractor', () => ({ EntityExtractor: class { constructor() {} extract() { return []; } } }));
+// [r250] 实体抽取器复活：v5.9.19 留下的 stub 让 dispatch('translator.entityExtractor')
+// 恒返回 []（scripts/tmp-250-probe.js 实测：邮箱/手机号/日期齐全的句子仍返回空数组），
+// 而该路由被 src/mcp-server.js 的 handleTranslate 直接调用（heartflow_translate 的
+// entities 字段）——广告出去的能力实际是空的。src/bridge/entity-extractor.js
+// （r250 新建）补真实实现。
+const _EntityExtractor = _lazy('entityExtractor', () => { try { return require('../bridge/entity-extractor.js'); } catch(e) { return { EntityExtractor: class { constructor() {} extract() { return []; } } }; } });
 
 // [r249] 隐性需求检测器复活：同 toneAnalyzer——src/bridge/implicit-need-detector.js
 // （5513 字节，8 类需求）一直在仓库里但从未被 require，此处 stub 让
 // dispatch('translator.implicitNeedDetector') 恒返回 []（本轮实测三条输入全空）。
 const _ImplicitNeedDetector = _lazy('implicitNeedDetector', () => { try { return require('../bridge/implicit-need-detector.js'); } catch(e) { return { ImplicitNeedDetector: class { constructor() {} detect() { return []; } } }; } });
 
-const _ResponseCompressor = _lazy('responseCompressor', () => ({ ResponseCompressor: class { constructor() {} compress() { return ''; } } }));
+// [r250] 回应压缩器复活：stub 让 dispatch('translator.responseCompressor') 恒返回 ''
+// （scripts/tmp-250-probe.js 实测），该路由在 src/mcp-server.js:1056 的 translator
+// 能力清单里。src/bridge/response-compressor.js（r250 新建）补真实实现。
+const _ResponseCompressor = _lazy('responseCompressor', () => { try { return require('../bridge/response-compressor.js'); } catch(e) { return { ResponseCompressor: class { constructor() {} compress() { return { text: '', source: null }; } } }; } });
 
 const _AgentBridge = _lazy('agentBridge', () => ({ AgentBridge: class { constructor() {} process() { return null; } } }));
 
-const _TranslationPipeline = _lazy('translationPipeline', () => ({ TranslationPipeline: class { constructor() {} translate() { return ''; } } }));
+// [r250] 交流管线编排器复活：stub 让 hf.agentLayer.translationPipeline.runUserPipeline()
+// / runLLMPipeline() 分别返回 ''（scripts/tmp-250-probe.js 实测），该能力在
+// src/mcp-server.js:1058 的 agentLayer 清单里。src/bridge/translation-pipeline.js
+// （r250 新建）补真实实现——依赖从构造参数注入，走引擎常驻实例。
+const _TranslationPipeline = _lazy('translationPipeline', () => { try { return require('../bridge/translation-pipeline.js'); } catch(e) { return { TranslationPipeline: class { constructor() {} runUserPipeline() { return { degraded: ['module_not_loaded'], ready: false, source: null }; } runLLMPipeline() { return { degraded: ['module_not_loaded'], ready: false, source: null }; } } }; } });
 
-const _QualityFilter = _lazy('qualityFilter', () => ({ QualityFilter: class { constructor() {} filter() { return {}; } } }));
+// [r250] 回应质量过滤器复活：stub 让 dispatch('agentLayer.qualityFilter') 恒返回 {}
+// （scripts/tmp-250-probe.js 实测），该路由在 src/mcp-server.js:1058 的 agentLayer
+// 清单里。src/bridge/quality-filter.js（r250 新建）补真实实现，并注入 gate 探针
+// 做真集成（findings 合并进 issues）。
+const _QualityFilter = _lazy('qualityFilter', () => { try { return require('../bridge/quality-filter.js'); } catch(e) { return { QualityFilter: class { constructor() {} filter() { return { pass: false, score: 0, issues: [], integrated: false, source: null }; } } }; } });
 
-const _FollowupSuggester = _lazy('followupSuggester', () => ({ FollowupSuggester: class { constructor() {} suggest() { return []; } } }));
+// [r250] 追问建议器复活：stub 让 dispatch('agentLayer.followupSuggester') 恒返回 []
+// （scripts/tmp-250-probe.js 实测），该路由在 src/mcp-server.js:1058 的 agentLayer
+// 清单里。src/bridge/followup-suggester.js（r250 新建）补真实实现。
+const _FollowupSuggester = _lazy('followupSuggester', () => { try { return require('../bridge/followup-suggester.js'); } catch(e) { return { FollowupSuggester: class { constructor() {} suggest() { return { questions: [], count: 0, basedOn: [], source: null }; } } }; } });
 
 // [r249] 冲突消解器接入真实实现（src/bridge/conflict-resolver.js，本轮新建）。
 // 原 stub 的 resolve() 恒返回 {}；且 src/mcp-server.js 的 handleBridgeAnalyze
 // 里 `new ConflictResolver()` 同为未定义标识符（同 StanceDetector）。
 const _ConflictResolver = _lazy('conflictResolver', () => { try { return require('../bridge/conflict-resolver.js'); } catch(e) { return { ConflictResolver: class { constructor() {} resolve() { return { conflict: null, severity: 0, conflicts: [] }; } } }; } });
 
-const _UncertaintyHandler = _lazy('uncertaintyHandler', () => ({ UncertaintyHandler: class { constructor() {} handle() { return {}; } } }));
+// [r250] 不确定性处理器复活：stub 让 dispatch('agentLayer.uncertaintyHandler')
+// 恒返回 {}（scripts/tmp-250-probe.js 实测），该路由在 src/mcp-server.js:1058 的
+// agentLayer 清单里。src/bridge/uncertainty-handler.js（r250 新建）补真实实现。
+const _UncertaintyHandler = _lazy('uncertaintyHandler', () => { try { return require('../bridge/uncertainty-handler.js'); } catch(e) { return { UncertaintyHandler: class { constructor() {} handle() { return { level: 'unknown', hedge: 'refuse', disclose: true, confidence: null, source: null }; } } }; } });
 
-const _BridgeIdentity = _lazy('bridgeIdentity', () => ({ BridgeIdentity: class { constructor() {} getIdentity() { return {}; } } }));
+// [r250] 桥身份声明复活：stub 让 dispatch('personaCore.bridgeIdentity') 恒返回 {}
+// （scripts/tmp-250-probe.js 实测），而 src/mcp-server.js 的 handleAgentThink /
+// handleBridgeStatus 直接读 identity.type / identity.declaration —— 从接线起读到
+// 的就是 undefined。src/bridge/bridge-identity.js（r250 新建）补真实实现，
+// capability 清单由构造时注入的 listRoutes 探针现场数，不硬编码。
+const _BridgeIdentity = _lazy('bridgeIdentity', () => { try { return require('../bridge/bridge-identity.js'); } catch(e) { return { BridgeIdentity: class { constructor() {} getIdentity() { return { type: 'unknown', declaration: '', capabilities: [], doesNot: [], measured: false, source: null }; } } }; } });
 
-const _JudgmentInjector = _lazy('judgmentInjector', () => ({ JudgmentInjector: class { constructor() {} inject() { return {}; } } }));
+// [r250] 判定注入器复活：stub 让 dispatch('personaCore.judgmentInjector') 恒返回 {}
+// （scripts/tmp-250-probe.js 实测），该路由在 src/mcp-server.js:1060 的 personaCore
+// 清单里。src/bridge/judgment-injector.js（r250 新建）补真实实现。
+const _JudgmentInjector = _lazy('judgmentInjector', () => { try { return require('../bridge/judgment-injector.js'); } catch(e) { return { JudgmentInjector: class { constructor() {} inject() { return { judgment: null, userFacing: [], internalNotes: [], injectCount: 0, source: null }; } } }; } });
 
 // [r249] 立场检测器接入真实实现（src/bridge/stance-detector.js，本轮新建）。
 // 原 stub 的 detect() 恒返回 {stance:'neutral'}；且 src/mcp-server.js 的
@@ -698,7 +728,11 @@ const _StanceDetector = _lazy('stanceDetector', () => { try { return require('..
 // MCP heartflow_agent_think 的这项能力从接线起就没通过。
 const _ValueAligner = _lazy('valueAligner', () => { try { return require('../bridge/value-aligner.js'); } catch(e) { return { ValueAligner: class { constructor() {} check() { return { aligned: null, score: null, violations: [], guidance: 'value-aligner 未加载', source: null }; } } }; } });
 
-const _PersonalityTone = _lazy('personalityTone', () => ({ PersonalityTone: class { constructor() {} apply() { return ''; } } }));
+// [r250] 人格语气调节器复活：stub 让 dispatch('personaCore.personalityTone')
+// 恒返回 ''（scripts/tmp-250-probe.js 实测：任意输入都返回空字符串），该路由在
+// src/mcp-server.js:1060 的 personaCore 清单里。src/bridge/personality-tone.js
+// （r250 新建）补真实实现——按档位做语气修订，且每条改动可回查。
+const _PersonalityTone = _lazy('personalityTone', () => { try { return require('../bridge/personality-tone.js'); } catch(e) { return { PersonalityTone: class { constructor() {} apply(text) { return { text: typeof text === 'string' ? text : '', changes: [], applied: 0, source: null }; } } }; } });
 
 // [r249] 元位置声明器接入真实实现（src/bridge/meta-position.js，本轮新建）。
 // **修的也是真崩溃**：personaCore 初始化写 `mp.getDeclaration()`，而原 stub 只有
@@ -827,7 +861,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-08-6.8.177';
+const BUILD_DATE = '2026-11-08-6.8.178';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -3297,9 +3331,15 @@ class HeartFlow {
 
       const ri = new (_ResponseInterceptor().ResponseInterceptor)();
 
-      const tp = new (_TranslationPipeline().TranslationPipeline)();
+      // [r250] 注入 dispatch 探针：管线内部不 new 兄弟模块，走引擎常驻实例
+      const tp = new (_TranslationPipeline().TranslationPipeline)({
+        dispatch: (route, ...args) => this.dispatch(route, ...args),
+      });
 
-      const qf = new (_QualityFilter().QualityFilter)();
+      // [r250] 注入 gate 探针：qualityFilter 的 findings 与门禁判定真集成
+      const qf = new (_QualityFilter().QualityFilter)({
+        gate: (text) => { try { return require('../gate.js').gate(text); } catch (e) { return null; } },
+      });
 
       const fs = new (_FollowupSuggester().FollowupSuggester)();
 
@@ -3315,7 +3355,15 @@ class HeartFlow {
 
         responseInterceptor: (resp, hf, ut) => ri.intercept(resp, hf, ut),
 
-        translationPipeline: { runUser: (i, c) => tp.runUserPipeline(i, c), runLLM: (o, c) => tp.runLLMPipeline(o, c) },
+        // [r250] 双名暴露：runUser/runLLM 是 v3.0 起的旧名，runUserPipeline/
+        // runLLMPipeline 是 TranslationPipeline 实现侧的方法名——两个名字都指
+        // 同一条管线，避免「方法名失配」这一类坑（r249 刚修过两个同款）。
+        translationPipeline: {
+          runUser: (i, c) => tp.runUserPipeline(i, c),
+          runLLM: (o, c) => tp.runLLMPipeline(o, c),
+          runUserPipeline: (i, c) => tp.runUserPipeline(i, c),
+          runLLMPipeline: (o, c) => tp.runLLMPipeline(o, c),
+        },
 
         qualityFilter: (text) => qf.filter(text),
 
@@ -3337,7 +3385,11 @@ class HeartFlow {
 
     try {
 
-      const bi = new (_BridgeIdentity().BridgeIdentity)();
+      // [r250] 注入版本与路由探针：capability 清单现场数，不硬编码
+      const bi = new (_BridgeIdentity().BridgeIdentity)({
+        version: () => { try { return _VERSION().VERSION; } catch (e) { return 'unknown'; } },
+        listRoutes: () => { try { return this.routes(); } catch (e) { return []; } },
+      });
 
       const ji = new (_JudgmentInjector().JudgmentInjector)();
 

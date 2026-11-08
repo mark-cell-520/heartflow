@@ -479,18 +479,28 @@ t('F4 communicationBrief 走 translator 子系统（_modules 注册 + 常驻实�
 
 console.log('\n[G 族] 已知未修登记（本轮刻意不做，含理由）');
 
-t('G1 登记：agentLayer/personaCore 其余 stub 仍是常量（ PersonalityTone/JudgmentInjector/MetaPosition 之外）', () => {
-  // PersonalityTone.apply() 恒 ''、JudgmentInjector.inject() 恒 {}、BridgeIdentity.getIdentity() 恒 {}
-  // 不修的理由：本轮主题是「四个已实测崩溃/恒值的缺陷」，这四个是潜在退化非崩溃，
-  // 且 PersonalityTone/JudgmentInjector/BridgeIdentity 三个文件在 src/bridge/ 下不存在，
-  // 要做等于新写三个模块，超出单轮单主题范围。登记给下一轮。
+t('G1 登记：agentLayer/personaCore 其余 stub（r250 已修，此处改为回归断言）', () => {
+  // r249 轮初这里断言九个 bridge stub 仍是常量（'' / {} / {} / []）。
+  // **r250 已把这九个全部接上真实实现**（src/bridge/ 下新建九个模块），
+  // 故本断言反转为回归防线：这九条路由现在必须给出真实输出，
+  // 且不能抛异常、不能退回恒值（防止将来有人把真实现改回 stub）。
   const missing = ['personality-tone.js', 'judgment-injector.js', 'bridge-identity.js', 'entity-extractor.js', 'response-compressor.js', 'translation-pipeline.js', 'quality-filter.js', 'followup-suggester.js', 'uncertainty-handler.js'];
   const absent = missing.filter(f => !fs.existsSync(path.join(HF, 'src/bridge', f)));
-  assert.ok(absent.length === missing.length, `以下文件已存在，需重新评估: ${missing.filter(f => !absent.includes(f)).join(',')}`);
-  // 确认它们确实还是 stub 行为（断言现状，防止下一轮误以为已修）
-  assert.strictEqual(hf.dispatch('personaCore.personalityTone', '文本', {}), '');
-  assert.deepStrictEqual(hf.dispatch('personaCore.judgmentInjector', {}, 'x'), {});
-  assert.deepStrictEqual(hf.dispatch('personaCore.bridgeIdentity'), {});
+  assert.strictEqual(absent.length, 0, `以下文件仍不存在: ${absent.join(',')}`);
+
+  const pt = hf.dispatch('personaCore.personalityTone', '你必须赶紧搞定，毫无疑问百分百对。', { persona: 'warm' });
+  assert.ok(pt && typeof pt === 'object' && typeof pt.text === 'string' && pt.text.length > 0, 'personalityTone 应返回 {text,...} 而非空串');
+  assert.ok(pt.text !== '你必须赶紧搞定，毫无疑问百分百对。', 'personalityTone 未做任何语气修订');
+  const ji = hf.dispatch('personaCore.judgmentInjector', { gate: { action: 'block' }, findings: [] });
+  assert.ok(ji && typeof ji === 'object' && Array.isArray(ji.internalNotes) && ji.internalNotes.length > 0, 'judgmentInjector 应给出 internalNotes 而非 {}');
+  const bi = hf.dispatch('personaCore.bridgeIdentity');
+  assert.ok(bi && typeof bi === 'object' && bi.type === 'heartflow-bridge', 'bridgeIdentity 应给出 type 而非 {}');
+  assert.ok(Array.isArray(bi.doesNot) && bi.doesNot.length === 5, 'bridgeIdentity 的 doesNot 应是 5 条');
+  for (const r of ['translator.entityExtractor', 'translator.responseCompressor', 'agentLayer.qualityFilter', 'agentLayer.followupSuggester', 'agentLayer.uncertaintyHandler']) {
+    let out;
+    assert.doesNotThrow(() => { out = hf.dispatch(r, '测试输入', {}); }, `${r} 抛异常`);
+    assert.ok(out !== undefined && out !== null, `${r} 返回 ${JSON.stringify(out)}`);
+  }
 });
 
 t('G2 登记：heartflow_translate 的 tone 字段形状变了（stub {tone,confidence} → 真四维）', () => {
