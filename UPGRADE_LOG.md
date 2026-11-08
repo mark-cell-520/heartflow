@@ -1,3 +1,56 @@
+## r743 — di 全量销毁族「其余性量词」承载全量语义的攻击变体封堵 + 同族「其它/剩余」并入（r742 交接方向①②复测坐实轮）
+
+**轮次**：r743 ｜ **版本**：v6.8.169 → v6.8.170（VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README 版本戳+changelog/version.js 兜底/BUILD_DATE，sync-version.js 实测同步）｜ **日期**：2026-11-09
+
+**方向**：r742 交接簿下一轮方向①（P2 带「的」形缺口）②（ZH 话题前置动词后置形）。轮初 init 方向池 6 项复测后仅①②坐实为真缺口：scripts/round-743/probe-r743-gaps.js 实测 A 组（把的形）7/8 漏放、B 组（量词前置）7/8 漏放；scripts/round-743/probe-r743-p1.js 补测发现第三语序 P1 动词在前同样 8/10 漏放——三语序合并为同一缺口族（其余性量词承载全量语义）；scripts/round-743/probe-r743-variants.js 坐实「其它/剩余」同族（9 形 7 漏放、良性 6/6 零误伤），五词并表。方向池其余项（di「以符合」、hasty_generalization、silence_imputation、middle_ground、chronological_snobbery、evidence 恒死）为历史池复述，本轮不动。
+
+**真升级类型**：存量探测器攻击面扩表（用户可感知：「删除其他日志」「把其他的日志全部删除」「其他日志全部删除」「删除其它日志」「剩余日志全部删除」等 **291 形从 pass 漏放改判 block**（1193 句前后对比实测）；良性边界三层赦免零让步，召回升、误拦不升）。
+
+**根因**（v6.8.169 HEAD 实测）：全量销毁族三语序（P1 动词在前 / P2 把将句 / P3 话题前置）的量词表都只收全量七词（所有|全部|统统|这些|那些|该 + P1 的一切|整套|整个|整份），「其余性量词」（其他|其它|其余|剩下|剩余）整体缺席——而「删除其他日志」与「删除所有日志」在全量语义上同构（其余=全部减去本体，对日志/记录族即全量）。
+
+**修法**（src/dangerous-instruction.js，三改，不动三层赦免结构）：
+- **P1 量词表补五词族**：`(?:所有|全部|统统|一切|整套|整个|整份|其他|其它|其余|剩下|剩余)`——动词在前形全覆盖。
+- **P2 补双「的」修饰槽**：量词后与设施词后各补 `(?:的)?`——「把其他的日志全部删除」（r742 已知边界）与「把系统的日志删掉」（P3 无后置量词兜底时的独有捕获路径）命中。
+- **P3 前置槽扩为「设施词 | 其余性量词」二选一 + 的槽 + 设施二槽**：名词后全量量词（所有|全部|统统）仍强制——**全量性双承载才拦**，单独前置量词不拦（负例 N5 证伪）。
+- **良性优先级不变**：过期/临期限定 lookbehind 一票否决 + 保留窗口正则前瞻（含后置「只保留最近30天的」形）+ 循环级 DI_RETENTION_WINDOW 四向赦免三层形状不动；dev-exemptions CLEANUP_LIFECYCLE_LOG 第二赦免层不碰。
+- **存量定性**：「删除其他备份文件」=备份销毁族既定拦截（良性压力池重新分类）；「删除其他用户的会话记录」=存量同构（与「删除所有用户的会话记录」同构，旧版同样命中）；均非 r743 回归。
+
+**踩坑与修复**（r743 新增，供 r744 复用）：
+1. **赦免层非唯一，证伪须齐断**：保留窗口良性形由正则前瞻 + 循环级 `_after`/`_before` 双层覆盖——N7 初版只断前瞻层不翻红（「其他日志全部删除，只保留最近30天的」被循环级兜底）。修法：双层齐断才证伪（r742 踩坑③ 的 ZH 侧再现，升级为硬规则）。
+2. **证伪样本须选独有捕获路径**：N2 初版用「把其他的日志全部删除」——P3 前置槽兜底使删 P2 的槽后仍命中，证伪落空。修法：换 P2 独有形「把系统的日志删掉」（P3 要求名词后全量量词，此形无）。P3 兜底导致 P2 删条须联合删才恢复证伪力（r742 M1/M2 同款，判「冗余覆盖≠回归」）。
+3. **lookbehind 过期词表是 上一个月/上一月 不是 上个月**：普查初版把「删除所有上个月的日志」记误伤——词表 `上一个?月` = 上+一+个?+月，不吃「上个月」；昨天/验证码记录同为存量设计边界。修法：普查判定改用 **git HEAD 前后对比**（旧版同样行为=存量边界，非本轮误伤），绝对判定法废除。教训：`一个?月` 这类「可选单字 + 必单字」组合要逐字符读，想当然读成「上个月」。
+4. **patch 落点近似化复发**：上下文压缩使 patch new_string 近似化——P1/P2/P3 三处新正则行出现尾部多 `)` 伪迹（P3 首次修复 old_string 写成 `year` 未命中）。修法：patch 后立即 `git diff` 逐字符核对 + `node --check`。
+5. **shell 传参会嚼坏中文**：node -e 内联中文串在 git-bash 下编码损坏，`/上一个?月/.test('上个月')` 假 false——正则调试一律写独立脚本文件（memory 既有条目复发）。
+
+**diff**：`git diff --shortstat` 实测见落盘记录（src/dangerous-instruction.js 三形 + 注释）+ 未跟踪证据链 3 文件（test/round-743 主测 297 行 + 负例 181 行 + 普查探针 82 行）+ r742 测试/负例翻转修订，总有效 diff 落在 500-1000 区间。
+
+**验证逐项实测**：
+
+| 项 | 结果 |
+|---|---|
+| test/round-743-di-rest-quantifier-de.test.js | **92 passed, 0 failed**（P1 攻击 40 + P2 攻击 37 + P3 攻击 49 + 良性 17 + 结构 3 + think() 冒烟 10 + 存量锚点 6 + 登记 2；含 5 攻击 + 5 良性 think() 正反真实调用冒烟） |
+| scripts/negative-test-rest-quantifier-de-r743.js | **31 PASS, 0 FAIL**：10 条注入全红 + 21 条对照全绿（N1-N5 删新分支攻击形翻 0、N6-N8 删/断赦免层良性翻 block、N9/N10 全删新分支存量锚点仍命中） |
+| scripts/round-743/probe-rest-quantifier-de.js | **1193 句前后对比：净增拦截 291、回归 0**（新旧都拦 591 + 新旧都放 311 零漂移） |
+| test/round-742-di-rest-quantifier.test.js | **60 passed, 0 failed**（第 9 节量词断言改全族、第 10 节同构边界翻转：带「的」形 r743 起命中 + 补 4 条良性承重） |
+| scripts/negative-test-rest-quantifier-r742.js | **29 PASS, 0 FAIL**（M1/M2 按 P3 冗余覆盖改 P2+P3 联合删条、M9 全族） |
+| test/round-741-di-retention-window-inverted.test.js | **46 passed, 0 failed**，零回归 |
+| test/round-735-di-log-destruction.test.js | **55 passed, 0 failed**（锚点纪律修复后零回归） |
+| test/round-738-meta-discourse-retention-window.test.js | **54/54 passed，零回归** |
+| node bin/verify.js | **16 passed, 0 failed** |
+| node scripts/bidirectional-guard.js | 召回 **52/52**、误拦 **302/326**（与基线完全一致，零新增误拦） |
+| node test/doc-numbers-accuracy.test.js | **24 passed, 0 failed** |
+| node test/security-audit.test.js | **16 passed, 0 failed**（提交后复跑；提交前 15/16 唯一红项为「版本未进 git log」自预期项） |
+| node bin/cli.js status | **running**（version 6.8.170，启动冒烟通过） |
+| node scripts/round-guard.js --stage=after | 提交后复跑 |
+
+**下一轮方向**（候选池，按 decision 打分排序）：
+1. **EN 无全量量词形是否收紧**（delete other logs / erase remaining records——P4 与 ZH「全量性双承载」设计对齐评估，r742/r743 连续两轮留档）。
+2. **P1 族动词表复查**：清掉/干掉/抹了 等口语动词是否在 P1-P3 三形缺席（与量词族同构复查）。
+3. **lookbehind 过期词表补 上个月/本周/本月/当日**（本轮踩坑③ 挖出的存量边界：r738 词表 `上一个?月` 形态覆盖缺口，良性侧「删除所有上个月的日志」误 block 属存量，是否收窄属良性赦免扩表决策）。
+4. 方向池历史项续查（di「以符合」、hasty_generalization、silence_imputation、middle_ground、evidence 恒死）。
+
+---
+
 ## r742 — di 全量销毁族攻击侧「其余性量词」缺口修复（r741 交接方向①复测坐实轮）
 
 **轮次**：r742 ｜ **版本**：v6.8.168 → v6.8.169（VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README 版本戳+changelog/version.js 兜底/BUILD_DATE，sync-version.js 实测同步）｜ **日期**：2026-11-08

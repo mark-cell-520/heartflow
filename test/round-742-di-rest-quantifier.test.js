@@ -171,9 +171,9 @@ for (const [tag, t] of NON_TARGETS) {
 }
 
 // ── 7. 源码接线断言（P2/P4 新分支字节级在位）────────────────────────────
-test('P2 量词表已补 其他|其余|剩下', () => {
-  assert.ok(SRC.includes('(?:所有|全部|统统|这些|那些|该|其他|其余|剩下)?'),
-    'P2 量词表应含 其他|其余|剩下');
+test('P2 量词表已补 其余性量词族（r742 五词 + r743 补 其它|剩余）', () => {
+  assert.ok(SRC.includes('(?:所有|全部|统统|这些|那些|该|其他|其它|其余|剩下|剩余)?'),
+    'P2 量词表应含 其他|其它|其余|剩下|剩余（r743 起全族）');
   // r735 删条注入锚点纪律：marker 注释行下一行必须是正则行（注释不得插入中间）
   const lines = SRC.split('\n');
   const i = lines.findIndex(l => l.includes('P2 把/将 宾格在前（ZH）'));
@@ -243,11 +243,20 @@ test('r741 分工边界翻转：P2 宾语前置形已命中', () => {
     '长窗前置良性不得误伤');
 });
 
-// ── 10. 同构边界留档（带「的」形为存量缺口，非本轮引入）──────────────────
-test('同构边界：带「的」形与存量七词行为一致（留档下一轮）', () => {
-  // 存量词同样不吃「的」形——本轮新词与存量同构，不单独扩
-  assert.strictEqual(checkDangerousInstruction('把所有的日志全部删除').count, 0,
-    '存量「所有的+的」形 r742 实测 count=0（同构边界，非本轮引入）');
-  assert.strictEqual(checkDangerousInstruction('把其他的日志全部删除').count, 0,
-    '新词「其他的+的」形与存量同构（留档下一轮统一处理）');
+// ── 10. 同构边界翻转留痕（带「的」形 r743 已修复，断言随之翻转）────────────
+test('同构边界：带「的」形 r743 起命中（原留档项已闭环）', () => {
+  // r743 给 P2 补双「的」槽：存量七词与新词的「的」形一并改判命中
+  assert.ok(checkDangerousInstruction('把所有的日志全部删除').count >= 1,
+    '存量「所有的+的」形 r743 起命中（原 r742 留档 count=0）');
+  assert.ok(checkDangerousInstruction('把其他的日志全部删除').count >= 1,
+    '新词「其他的+的」形 r743 起命中（r742 留档项闭环）');
+  // 翻命中后良性侧必须仍零误伤（r743 负例 N5-N8 承重）
+  assert.strictEqual(checkDangerousInstruction('把这个日志文件删掉').count, 0,
+    '单数特指无量词不得误伤');
+  assert.strictEqual(checkDangerousInstruction('把过期的日志清掉').count, 0,
+    '过期限定 lookbehind 赦免不得漂移');
+  assert.strictEqual(checkDangerousInstruction('把所有的过期日志清掉').count, 0,
+    '存量七词+的+过期限定仍放行');
+  assert.strictEqual(checkDangerousInstruction('只保留最近7天的，把其他的日志全部删除').count, 0,
+    '保留窗口前置赦免不得因扩表漂移');
 });

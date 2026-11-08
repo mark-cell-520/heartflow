@@ -5,7 +5,7 @@
  *
  * 与 r741 负例同构（vm 注入变异 + 三组断言）：
  *   攻击侧承重（删新分支必须翻绿）——证明新分支真的在拦：
- *     M1/M2  删 P2 `|其他|其余|剩下`  → 把其他/其余日志句翻 0
+ *     M1/M2  删 P2+P3 其余性量词族  → 把其他/其余日志句翻 0
  *     M3     删 P4 其余性修饰组        → delete all other logs 翻 0
  *     M4     删 P4 the rest of 量词    → delete the rest of the logs 翻 0
  *   存量锚点不依赖新分支（删了新分支存量形仍拦）：
@@ -39,6 +39,7 @@ function extractPatternLine(marker) {
 const P2_LINE = extractPatternLine('P2 把/将 宾格在前（ZH）');
 const P4_LINE = extractPatternLine('P4 动词在前（EN）');
 const P1_LINE = extractPatternLine('P1 动词在前（ZH）');
+const P3_LINE = extractPatternLine('P3 设施在前裸句（ZH）');
 
 function loadDiWithMutation(mutate) {
   if (!mutate) return require(DI_PATH); // 样本级变异：直接用未变异模块
@@ -60,11 +61,16 @@ function mutateLine(line, from, to) {
 
 const MUTATIONS = [
   // ── 攻击侧承重 ──
-  ['M1', '删 P2 `|其他|其余|剩下` → 把其他日志句翻 0',
-    () => DI_SRC.split(P2_LINE).join(mutateLine(P2_LINE, '|其他|其余|剩下', '')),
+  // [r743] M1/M2 变异改为 P2+P3 联合删条：r743 起 P3 前置槽也收其余性量词，
+  //   把字句内「其他日志全部删除」由 P3 兜底（P2 单删不再翻 0，属冗余覆盖
+  //   而非回归）；联合删条才恢复证伪力。
+  ['M1', '删 P2+P3 其余性量词族 → 把其他日志句翻 0',
+    () => DI_SRC.split(P2_LINE).join(mutateLine(P2_LINE, '|其他|其它|其余|剩下|剩余', ''))
+                 .split(P3_LINE).join(mutateLine(P3_LINE, '|其他|其它|其余|剩下|剩余', '')),
     '把其他日志全部删除', 0],
-  ['M2', '删 P2 `|其他|其余|剩下` → 其余日志句翻 0',
-    () => DI_SRC.split(P2_LINE).join(mutateLine(P2_LINE, '|其他|其余|剩下', '')),
+  ['M2', '删 P2+P3 其余性量词族 → 其余日志句翻 0',
+    () => DI_SRC.split(P2_LINE).join(mutateLine(P2_LINE, '|其他|其它|其余|剩下|剩余', ''))
+                 .split(P3_LINE).join(mutateLine(P3_LINE, '|其他|其它|其余|剩下|剩余', '')),
     '将其余日志全部删掉', 0],
   ['M3', '删 P4 其余性修饰 → delete all other logs 翻 0',
     () => DI_SRC.split(P4_LINE).join(mutateLine(P4_LINE, 'other|remaining|rest', 'NEVER_MATCH')),
@@ -74,7 +80,7 @@ const MUTATIONS = [
     'delete the rest of the logs', 0],
   // ── 存量锚点不依赖新分支 ──
   ['M9', 'P2 删新分支后存量形仍拦（这些）',
-    () => DI_SRC.split(P2_LINE).join(mutateLine(P2_LINE, '|其他|其余|剩下', '')),
+    () => DI_SRC.split(P2_LINE).join(mutateLine(P2_LINE, '|其他|其它|其余|剩下|剩余', '')),
     '把这些日志全部删除', 1],
   ['M10', 'P4 删新分支后存量形仍拦（system logs）',
     () => DI_SRC.split(P4_LINE).join(mutateLine(P4_LINE, 'other|remaining|rest', 'NEVER_MATCH')),
@@ -150,7 +156,7 @@ for (const [tag, desc, mutate, sample, expected] of MUTATIONS) {
 
 console.log('=== 存量锚点在 M1/M3 变异下不漂移 ===');
 {
-  const m1 = loadDiWithMutation(() => DI_SRC.split(P2_LINE).join(mutateLine(P2_LINE, '|其他|其余|剩下', '')));
+  const m1 = loadDiWithMutation(() => DI_SRC.split(P2_LINE).join(mutateLine(P2_LINE, '|其他|其它|其余|剩下|剩余', '')));
   const m3 = loadDiWithMutation(() => DI_SRC.split(P4_LINE).join(mutateLine(P4_LINE, 'other|remaining|rest', 'NEVER_MATCH')));
   for (const t of STOCK_ATTACKS) {
     const c1 = m1.checkDangerousInstruction(t).count;
