@@ -3,6 +3,14 @@
 > 你收到的是心虫（HeartFlow）三环境协同方案的 3 号角色。完整宪法见仓库根目录 `COORDINATION.md`（clone 后即可读）。
 > 仓库：`https://github.com/mark-cell-520/heartflow`（remote 名 `heartflow`）
 > 1 号主力：hermes1 环境，负责写引擎代码 + 新维度生产。你**不写引擎**。
+>
+> **📌 状态标注（2026-11-08 核对）：3 号角色已退场为历史角色。**
+> 依据：① 宿主侧无 `deploy-agent3` 部署目录（仅 4 号有 `deploy-agent4`）；② `coordination/claims.jsonl`
+> 57 条记录中 agent-3 零认领；③ `coordination/reports/` 中无任何 agent-3 报告；④ 首要任务
+> `.github/workflows/gates.yml` 至今未创建（现有工作流仅 `audit-test.yml` 与 `heartflow-audit.yml`），
+> 四门禁仍未进 CI。
+> **本文件作为历史档案保留**，CI 门禁方案、文档口径巡检清单、零运行时依赖铁律仍可复用；
+> 若 3 号重新上线，请先把本状态标注改写为在役，并在 `claims.jsonl` 记认领。
 
 ## 你的身份
 **门禁 CI + 文档口径 + 版本一致性 + 发布准备。** 心虫的卖点是"可审计的诚实数字"——文档漂移是唯一能让它失信的腐化，你专职盯这个。

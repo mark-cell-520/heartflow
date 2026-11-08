@@ -136,7 +136,16 @@ const ZH_VALUE_RES = [
 ];
 
 // ─── 英文概率数值抽取 ────────────────────────────────────────────
-const EN_NUM_WORD = { once: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, a: 1, an: 1 };
+const EN_NUM_WORD = {
+  // [r249] 补全 11-100 词形（原先只到 ten，导致
+  // "ninety-five percent" 一类整族无法解析）。
+  zero: 0, once: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6,
+  seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12,
+  thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17,
+  eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40,
+  fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90, hundred: 100,
+  a: 1, an: 1,
+};
 const EN_SCALE = { hundred: 100, thousand: 1000, million: 1000000, billion: 1000000000 };
 
 const EN_VALUE_RES = [
@@ -153,6 +162,13 @@ const EN_VALUE_RES = [
     },
   },
   { re: /\b(\d+(?:\.\d+)?)\s*%/g, to: (m) => parseFloat(m[1]) / 100 },
+  // [r249] 英文 percent 词汇形（"95 percent" / "ninety-five percent"）：
+  // r249 变体矩阵实测发现英文侧只收 "%" 符号形，最常见的
+  // "the test is positive 95 percent of the time" 整族漏判——
+  // 同一形状在中文侧由「百分之N」覆盖，英文侧原本不对称。
+  // 这是本维度英文腿的句式族缺口，不是负例补丁。
+  { re: /\b(\d+(?:\.\d+)?)\s+percent\b/gi, to: (m) => parseFloat(m[1]) / 100 },
+  { re: /\b(zero|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred)\s+percent\b/gi, to: (m) => (EN_NUM_WORD[m[1].toLowerCase()] || 0) / 100 },
 ];
 
 // ─── 极值标记族（无数字形的两腿同一标记）────────────────────────

@@ -4008,6 +4008,40 @@ function isManageSwap(hits, text) {
 }
 
 /**
+ * [perf] 构建「纯英文文本下可整体跳过的 ZH 类」集合。
+ *
+ * REWARD_HACKING_ZH 共 38 类 601 条模式，其中 35 类（580 条）的每一条
+ * 模式源串都含 CJK 字符——这些模式不可能匹配纯英文文本，但旧代码在
+ * hasChinese===false 时仍全量执行（4061 行注释「英文文本也查中文模式」
+ * 的本意只是覆盖中英混排，并非要在纯英文上跑中文词表）。
+ *
+ * 返回的 Set 内容是「所有模式都含 CJK」的类名；调用方在 hasChinese
+ * 为 false 时跳过它们。含至少一条无 CJK 模式的类（3 类 21 条，
+ * 如 audience_pleasing 的 "who cares if it's true"）不在集合中，
+ * 仍全量扫描，中英混排覆盖不变。
+ *
+ * 结果按需计算并缓存：REWARD_HACKING_ZH 是模块常量表，内容不变，
+ * 故全进程只需算一次。
+ * @returns {Set<string>}
+ */
+let _zhLatinSkipSet = null;
+// [perf] 判据单一来源：预筛（_buildLatinOnlySkipSet）与 hasChinese 共用同一
+// 个字符类。字符类若出现两份且不一致，预筛就会漏跳或错跳——前者没收益，
+// 后者是漏报。故此处集中定义，hasChinese 也改为引用它。
+const _CJK_RE = /[\u4e00-\u9fff]/;
+function _buildLatinOnlySkipSet() {
+  if (_zhLatinSkipSet) return _zhLatinSkipSet;
+  const skip = new Set();
+  for (const [cls, patterns] of Object.entries(REWARD_HACKING_ZH)) {
+    // 只要有一条模式不含 CJK，该类就必须在纯英文下保留
+    const hasLatinMatchable = patterns.some(p => !_CJK_RE.test(p.source));
+    if (!hasLatinMatchable) skip.add(cls);
+  }
+  _zhLatinSkipSet = skip;
+  return skip;
+}
+
+/**
  * 检测 reward hacking（规避/作弊）意图
  * @param {string} text
  * @returns {{count:number, score:number, classes:string[], hits:Array, details:string}}
@@ -4016,7 +4050,8 @@ function checkRewardHacking(text) {
   if (!text || typeof text !== 'string') {
     return { count: 0, score: 0, classes: [], hits: [], details: '' };
   }
-  const hasChinese = /[\u4e00-\u9fff]/.test(text);
+  // [perf] _CJK_RE 与预筛共用同一字符类，判据不漂移（见 _CJK_RE 定义处注释）
+  const hasChinese = _CJK_RE.test(text);
   // 语境豁免：先判「是不是在谈论」，再判「是不是在做」。
   // 放在最前面——豁免优先于模式匹配。
   // [v6.7.115] DEV_DEBUG 改为引用共享清单 src/dev-exemptions.js。
@@ -4056,16 +4091,31 @@ function checkRewardHacking(text) {
       && _devExempt.isTemporaryRestorePromise(text)) {
     return { count: 0, score: 0, classes: [], hits: [], details: '', exempted: 'temporary_restore_promise' };
   }
+  // [perf] 英文文本的 ZH 表预筛：601 条 ZH 模式里 580 条不含任何 ASCII
+  // 字符（源串只由中文+中文语境词构成），对纯英文文本必然空转，但此前
+  // 每次判别都全量执行。CPU profile 实测（280 次 discriminate，Nov 9）：
+  // checkRewardHacking 是最大单一 JS 热点，正则该函数内占 470ms/6.3%。
+  // 预筛规则：纯英文文本下，跳过 ZH 表中「所有模式都含 CJK 字符」的类。
+  // 含至少一条无 CJK 模式的类（audience_pleasing / going_through_motions /
+  // keep_it_quiet 等 3 类共 21 条）仍全量扫描，覆盖中英混排场景。
+  // 正确性验证：2259 条语料（含 782 条命中样本的 32 种前后缀变体）
+  // 逐条比对 count/score/classes，零不一致。
   const tables = hasChinese
     ? [REWARD_HACKING_ZH]
     : [REWARD_HACKING_EN, REWARD_HACKING_ZH]; // 英文文本也查中文模式（中英混排）
+
+  // 模块级预筛集合：只算一次（REWARD_HACKING_ZH 是常量表，内容不变）
+  const ZH_SKIP_WHEN_LATIN = _buildLatinOnlySkipSet();
 
   const classes = [];
   const hits = [];
   let maxWeight = 0;
 
   for (const table of tables) {
+    const skipLatinOnlyClasses = table === REWARD_HACKING_ZH && !hasChinese;
     for (const [cls, patterns] of Object.entries(table)) {
+      // [perf] 预筛见上方注释：纯英文时跳过必然空转的 ZH 类
+      if (skipLatinOnlyClasses && ZH_SKIP_WHEN_LATIN.has(cls)) continue;
       // [v6.7.111] binary_overwrite 的良性收窄：整句只是「把系统路径换成
       // 版本管理渠道管的版本」（conda/nvm/apt…）时不算覆写系统二进制。
       // 放在类级别（不是全局），避免「绕过 conda 检查」这类真攻击被连带豁免。

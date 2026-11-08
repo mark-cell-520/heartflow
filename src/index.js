@@ -866,6 +866,9 @@ const { checkMeansAsEnd } = require('./means-as-end.js');
 // guilt_induction(109) / gaslighting / manufactured_consent(124) /
 // synthetic_social_proof(110) 的射程边界见模块头注释。
 const { checkFalseMemoryTransplant } = require('./false-memory-transplant.js');
+// [r253] 第 229 维度 undistributed_middle（中项不周延）计算点。
+// um——undistributed middle 缩写，grep 0 命中无冲突。
+const { checkUndistributedMiddle } = require('./undistributed-middle.js');
 // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
 // confusion of the inverse：P(E|I) 的概率数值在方向翻转后原样沿用为
 // P(I|E)，检察官谬误的结构形）。src/conditional-transposition.js 28KB
@@ -2249,6 +2252,9 @@ function discriminate(text, evidence = [], contentMode) {
   // [r252] 第 228 维度 false_memory_transplant（假记忆嫁接）计算点。
   // fmt——false memory transplant 缩写，grep 0 命中无冲突。
   const fmt = _applyPedagogyRelaxation(checkFalseMemoryTransplant(_normText), "false_memory_transplant", pedagogyRelaxation);
+  // [r253] 第 229 维度 undistributed_middle（中项不周延）计算点。
+  // um——undistributed middle 缩写，grep 0 命中无冲突。
+  const um = _applyPedagogyRelaxation(checkUndistributedMiddle(_normText), "undistributed_middle", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -2884,6 +2890,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r252] 第 228 维度 false_memory_transplant 参与判定（假记忆嫁接）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: fmt.score, name:'false_memory_transplant'},
+    // [r253] 第 229 维度 undistributed_middle 参与判定（中项不周延）。
+    // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: um.score, name:'undistributed_middle'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3421,6 +3430,11 @@ function discriminate(text, evidence = [], contentMode) {
     // 历史表态腿×封锁退路腿，含五类豁免表：概念分析/凭据在场/自省不确定/
     // 正当引用/真提问）。
     false_memory_transplant: fmt,
+    // [r253] 第 229 维度 undistributed_middle（中项不周延：两段全称前提
+    // 共享谓项腿×主项不同腿×结论主项等同腿，含中英双语与三组豁免表：
+    // 谬误概念转述/教学语境/对冲结论；正当的同箩筐并列陈述「A和B都是M」
+    // 不判）。
+    undistributed_middle: um,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -5018,6 +5032,16 @@ function discriminate(text, evidence = [], contentMode) {
     // gaslighting/manufactured_consent(124)/synthetic_social_proof(110)
     // 的射程边界见 src/false-memory-transplant.js 头注释。
     'false_memory_transplant',
+    // [r253] 第 229 维度 undistributed_middle（中项不周延：两段全称前提
+    // 共享谓项腿×主项不同腿×结论主项等同腿——「所有猫都是哺乳动物，
+    // 所有狗都是哺乳动物，所以猫是狗」。英文 "All cats are mammals. All
+    // dogs are mammals. Therefore, cats are dogs." 亦覆盖）登记。verify 级
+    // ——单句也可能是正当的谬误概念转述/教学（「中项不周延是指……」
+    // 正是本族要教的判别动作）、对无效三段论的揭批、带对冲的假设推演
+    // （「也许猫是狗」）。与 r206-r232 同口径只登记 VERIFY。与
+    // false_equivalence(57)/hasty_generalization(61)/affirming_the_consequent
+    // /sorites_fallacy(212) 的射程边界见 src/undistributed-middle.js 头注释。
+    'undistributed_middle',
     // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
     // confusion of the inverse：P(E|I) 的数值在方向翻转后原样沿用为
     // P(I|E)——「这种病检测阳性的概率是 95%，所以得了这种病检测阳性的
@@ -5638,6 +5662,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r252] 第 228 维度 false_memory_transplant 补登记（假记忆嫁接）。
       // 同上：九处一次接齐。
       false_memory_transplant: fmt,
+      // [r253] 第 229 维度 undistributed_middle 补登记（中项不周延）。
+      // 同上：九处一次接齐。
+      undistributed_middle: um,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,
@@ -16023,6 +16050,11 @@ function ppfSelfReferential(text) {
 }
 
 function checkPseudoProfundity(text) {
+  // [稳定性审计 2026-11-09] 非字符串入口守卫：作为 src/index.js 公开导出 API 被直接
+  // require 调用（skill/agent 桥接）时，number/object 会让 text.length / text.slice
+  // TypeError 崩溃（探测实测 5/5 输入崩）。与 perverse-incentive/anchoring-effect 等
+  // 模块的既有约定一致：归一化为字符串后继续走原判别逻辑。
+  if (typeof text !== 'string') text = String(text ?? '');
   const hasChinese = /[\u4e00-\u9fff]/.test(text);
   // [v6.7.82] 中文侧合并 PSEUDO_PHILOSOPHY_ZH（伪哲理句式）。
   // 上一轮只补了常量没接线——维度函数照旧只读 PSEUDO_PROFUNDITY_PATTERNS.zh，

@@ -1,0 +1,16 @@
+r252 scout 汇总（2026-11-08）
+方向：假记忆嫁接（false memory transplant / implanted memory as coercion）
+
+1) HN Algolia "false memory implantation" tags=story
+   - 296 pts | "False memory implantation in adults is easy"
+     https://brainpizza.substack.com/p/sins-of-memory
+   结论：背景佐证（记忆可被植入/不可靠），非纯规则检测方案。
+2) Semantic Scholar "false memory implantation misinformation"：HTTP 429/空，本轮不重试。
+3) GitHub API "misinformation memory manipulation detection" sort=stars：返回空（限流）。
+结论：外部无成熟纯规则方案可直接复用 → 内部路径。
+心虫已有维度核查：grep src/ 无 false memory / 记忆嫁接 族。
+  邻近维度：commitment_coercion（承诺一致性胁迫，管"过去做过的承诺"）
+  guilt_induction（内疚诱导）、synthetic_social_proof（伪造社会认同）
+  manufactured_consent（制造共识）——均不针对"不可核实的记忆断言封锁退路"。
+缺口实证：/tmp/hf-r252-probeFM2.js —— 攻击 6 条 4 条零命中（C1/C3/C4/C5），
+  良性 6 条全部 pass。真实漏判成立。

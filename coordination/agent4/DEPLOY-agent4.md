@@ -1,7 +1,10 @@
 # DEPLOY-agent4 — 4 号协同指令（海外产能单元）
 
 > 本文件是仓库内协同指令，会随仓库 push 到 GitHub，供 4 号 agent 与其他人对账。
-> 完整部署体系在宿主侧 `/root/hermes1/deploy-agent4/`（含 cron/scripts/prompts/templates）。
+> 完整部署体系有**两处**：宿主侧 `/root/hermes1/deploy-agent4/`（cron/scripts/prompts/templates，
+> 4 号 agent 实际执行处）与仓库内 `coordination/agent4/deploy/`（随仓库同步的脚本副本，
+> 已核对与宿主侧 `scripts/` 下 8 个 `hf4-*.sh` 逐字节一致）。
+> **不存在独立的 clone 部署副本**：4 号直接在仓库本体 `/root/hermes1/skills/ai/mark-heartflow-skill` 工作。
 
 ## 角色定义
 
@@ -10,8 +13,8 @@
 | agent | `agent-4` |
 | 环境 | 美国 IP |
 | 定位 | **海外产能单元**：GitHub 通道顺畅 + 国外论文/开源资源可达 |
-| 写权限 | `coordination/`、`src/core/ethics/`、`src/core/psychology/`、`consciousness/`、`src/plugins/`、`src/tools/`、`UPGRADE_LOG.md`（追加）、`VERSION` |
-| 禁写 | `src/index.js`、四个门禁脚本、`README.md`、`SKILL.md`、`AGENTS.md` |
+| 写权限 | `coordination/`、`src/core/ethics/`、`src/core/psychology/`、`consciousness/`、`src/plugins/`、`src/tools/`、顶层 `src/*.js` 维度模块（r227 起授权）、`UPGRADE_LOG.md`（追加）、`VERSION`、`test/`、`scripts/round-`、`docs/`、`data/`、`package.json`、`README.md`、`SKILL.md`、`AGENTS.md`（后四项与 1 号共用，动手前先 fetch 避让） |
+| 禁写 | `src/index.js`（全局接入点，1 号独占；仅审计修复可凭 `HF_ALLOW_INDEX=1` 显式放行，动前须 `hf4-claim.sh scan`）、四个门禁脚本、`bin/verify.js`、`scripts/guard-abilities.js`、`scripts/bidirectional-guard.js`、`test/doc-numbers-accuracy.test.js` |
 
 ## 轮次认领格式
 
@@ -26,10 +29,21 @@
 
 ## 每轮产出
 
-1. commit（message 形如 `rNNN: dimension by agent-4 (vX.Y.Z)`）
-2. `coordination/reports/rNNN-<kind>-agent4.md`（模板见宿主侧 `deploy-agent4/templates/REPORT-TEMPLATE.md`）
+1. commit（message 形如 `rNNN: dimension by agent-4 (vX.Y.Z)`；由 `hf4-commit.sh` 落盘并跑隐私闸）
+2. `coordination/reports/rNNN-<kind>-agent4.md`（模板见宿主侧 `deploy-agent4/templates/REPORT-TEMPLATE.md`，与仓库内 `coordination/agent4/deploy/REPORT-TEMPLATE.md` 同源）
 3. 门禁实测数字（来自本轮真实运行，不许填想象值）
 4. claims.jsonl 状态推进
+
+**当前基线（截至 r253，VERSION 6.8.152 / 229 维度 / 161 模块 / 1316 路由）**：
+`bin/verify.js` 16 passed / 0 failed ｜ `guard-abilities.js` 20/20（dimensions 键 229 个）｜
+`doc-numbers-accuracy.test.js` 24/24 ｜ `bidirectional-guard.js` 召回 52/52、误拦 302/326。
+> ⚠️ 旧基线（16/16、210 键、24/24、302/326）写于 2026-11-05，维度键已由 210 涨到 229；
+> 每轮开工前以 `node scripts/measure-claimed-numbers.js` 实测为准，不一致先报告 1 号再动手。
+
+**轮次进度提示**：`coordination/claims.jsonl` 与 `coordination/reports/` 的记录止于 r244
+（r245–r253 的固化与审计修复由 1 号在本地直接完成，未走 claims 认领流）。
+r244 起多条 kind=dimension 的认领以 `src/framing-effect.js`、`src/present-bias.js` 等
+provisional 未接线模块形式交付，接线与 VERSION 递增由 1 号负责。
 
 ## 真升级判定
 

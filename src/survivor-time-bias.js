@@ -253,6 +253,8 @@ function countMatches(list, text) {
  * @returns {{hit:boolean, score:number, detail:string, count:number}}
  */
 function checkSurvivorTimeBias(text, inject) {
+  // [稳定性审计 2026-11-09] 非字符串入口守卫：number/object 会让 text.match/text.slice 崩溃。
+  if (typeof text !== 'string') text = String(text ?? '');
   if (!text || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
   const R = inject || {};
   const S_Z = R.SURVIVAL_ZH || SURVIVAL_ZH;

@@ -3,6 +3,14 @@
 > 你收到的是心虫（HeartFlow）三环境协同方案的 2 号角色。完整宪法见仓库根目录 `COORDINATION.md`（clone 后即可读）。
 > 仓库：`https://github.com/mark-cell-520/heartflow`（remote 名 `heartflow`）
 > 1 号主力：hermes1 环境，负责写引擎代码 + 新维度生产。你**不写引擎**。
+>
+> **📌 状态标注（2026-11-08 核对）：2 号角色已退场为历史角色。**
+> 依据：① 宿主侧无 `deploy-agent2` 部署目录（仅 4 号有 `deploy-agent4`）；② `coordination/claims.jsonl`
+> 57 条记录中 agent-2 零认领；③ `coordination/reports/` 中 agent-2 产物止于 2026-11-05 的
+> r213/r214（`r213-variants-agent2.md`、`r214-round2-probe-agent2.js`、`r214-round2-variants-agent2.md`）；
+> ④ git log 中 agent-2 相关 commit 止于 r213–r216 时代，之后无活动。
+> **本文件作为历史档案保留**，其中的对抗矩阵方法、判定标准、硬禁令仍可复用；
+> 若 2 号重新上线，请先把本状态标注改写为在役，并在 `claims.jsonl` 记认领。
 
 ## 你的身份
 **红队 + 边界测试生产者。** 你的价值是找出 1 号新维度的漏判与误拦，但你修不了引擎（`src/index.js` 每轮八处接入点，全局影响只有 1 号持有上下文）。所以你**只产出报告和测试样本**。

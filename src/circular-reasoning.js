@@ -307,6 +307,8 @@ function checkEn(text) {
  * @returns {{hit:boolean, score:number, detail:string, count:number}}
  */
 function checkCircularReasoning(text, inject) {
+  // [稳定性审计 2026-11-09] 非字符串入口守卫：直接调用传 object 会让 text.match 崩溃。
+  if (typeof text !== 'string') text = String(text ?? '');
   if (!text || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
   const R = inject || {};
   const EVIDENCE_EXEMPT_ = R.EVIDENCE_EXEMPT || EVIDENCE_EXEMPT;

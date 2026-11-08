@@ -201,6 +201,8 @@ function firstMatch(list, text, from) {
  * @returns {{hit:boolean, score:number, detail:string, count:number}}
  */
 function checkWholePartTransfer(text, inject) {
+  // [稳定性审计 2026-11-09] 非字符串入口守卫：number/object 会让 text.slice 崩溃。
+  if (typeof text !== 'string') text = String(text ?? '');
   if (!text || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
   const R = inject || {};
   const PQ_Z = R.PART_QUANT_ZH || PART_QUANT_ZH;
