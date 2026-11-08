@@ -213,15 +213,19 @@ test('think() 本体：本轮新增赦免形零命中、攻击形命中', async 
   }
 });
 
-// ── 9. 分工边界：攻击侧 P2 缺口为存量遗留，非本轮赦免面 ─────────────────
-// 根因（r741 诊断实测）：P2 把字句（src/dangerous-instruction.js 把|将 行）
-// 量化词表只有 所有|全部|统统|这些|那些|该，「把其他日志全部删除」的
-// 宾语前置形不吃——该句在 HEAD（改前）即 count=0，与保留窗口赦免无关。
-// 本轮只做赦免方向（倒装形误 block），攻击侧扩表留给下一轮，防止一轮
-// 两方向混改导致误拦回归无法归因。
-test('分工边界：P2 宾语前置形漏放为存量遗留（改前改后均 count=0）', () => {
-  assert.strictEqual(checkDangerousInstruction('把其他日志全部删除').count, 0);
-  assert.strictEqual(checkDangerousInstruction('把其余日志全部清空').count, 0);
-  // 本轮倒装赦免不依赖该命中存在：B 族良性经由 P3 命中段走 _before 赦免
-  assert.strictEqual(checkDangerousInstruction('只保留最近7天的，把其他日志全部删除').count, 0);
+// ── 9. 分工边界：攻击侧 P2 宾语前置形（r742 已修复，本节为翻转留痕）─────
+// r741 诊断实测：P2 把字句量化词表只有 所有|全部|统统|这些|那些|该，
+// 「把其他日志全部删除」的宾语前置形不吃——该句在 r741 HEAD 即 count=0。
+// r741 只做赦免方向（倒装形误 block），攻击侧扩表按分工留到 r742。
+// [r742] 该缺口已修：P2 量词表补 其他|其余|剩下 + P4 修饰表补
+//   other|remaining|rest（详见 test/round-742-di-rest-quantifier.test.js）。
+//   本节断言随之翻转：存量遗留形改判命中，长窗良性赦免不变。
+test('分工边界（r742 翻转）：P2 宾语前置形已命中，长窗良性仍赦免', () => {
+  assert.ok(checkDangerousInstruction('把其他日志全部删除').count >= 1,
+    'r742 起 P2 量词表收「其他」，该形应命中');
+  assert.ok(checkDangerousInstruction('把其余日志全部清空').count >= 1,
+    'r742 起 P2 量词表收「其余」，该形应命中');
+  // r741 倒装赦免不依赖该命中存在：长窗良性仍走 _before 赦免放行
+  assert.strictEqual(checkDangerousInstruction('只保留最近7天的，把其他日志全部删除').count, 0,
+    '长窗前置良性不得因攻击侧扩表误伤（_before 赦免先行）');
 });

@@ -1,3 +1,51 @@
+## r742 — di 全量销毁族攻击侧「其余性量词」缺口修复（r741 交接方向①复测坐实轮）
+
+**轮次**：r742 ｜ **版本**：v6.8.168 → v6.8.169（VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README 版本戳+changelog/version.js 兜底/BUILD_DATE，sync-version.js 实测同步）｜ **日期**：2026-11-08
+
+**方向**：r741 交接簿下一轮方向①（K3 攻击侧缺口：P2 量词表补「其他/其余/剩下」+ E1 漏放复查）。init 简报方向池 6 项复测后仅方向①坐实：scripts/round-741/probe-e1k3-p2a.js 存量归因 + r742 轮初 scripts/round-742/probe-rest-quantifier.js 形复测确认，P2/P4 攻击侧 9+11 形 count=0 漏放为真缺口；方向池其余项（di「以符合」3/3 OK、hasty_generalization 非本族、silence_imputation、middle_ground、chronological_snobbery src/ 零命中、evidence 恒死）为历史池复述，本轮不动。
+
+**真升级类型**：存量探测器攻击面扩表（用户可感知：「把其他日志全部删除」「delete all other logs」等 20 形从 **pass 漏放改判 block**；良性保留窗口赦免 12 形零漂移，召回升、误拦不升）。
+
+**根因**（v6.8.168 HEAD 实测）：
+- **ZH P2 量词表七词无一覆盖「其他」族**：`(?:所有|全部|统统|这些|那些|该)?`——把字句宾格前置时全量性由宾格前量词承载，「把其他日志全部删除」=「其余全部删除」，但量词表只收指示/全量七词，r741 实测 8 形 count=0 漏放。
+- **EN P4 两条腿空白**：修饰表只收 `system|access|audit` 等设施修饰词（无其余性修饰），量词表只有 `all|every|each|any|the entire`（无 `the rest of`）——「delete all other logs」「delete all remaining audit records」「delete the rest of the logs」11 形漏放。归因实测 pattern 0（delete+system logs）与 pattern 55（wipe/purge+logs）各覆盖一小角，主体空白。
+
+**修法**（src/dangerous-instruction.js，单点两改，不动 DI_RETENTION_WINDOW 与循环级 _before/_after 赦免形状）：
+- **P2 量词表补 `其他|其余|剩下`**：与存量七词同构边界——带「的」形（把其他的日志）同样不命中，存量「把所有的日志全部删除」实测亦 count=0，非本轮引入，留档下一轮。
+- **P4 修饰槽由单组重构为「其余性修饰 × 设施修饰」两组顺序可选**：`(?:(?:the\s+)?(?:other|remaining|rest)\s+)?(?:(?:system|access|audit|...)\s+)?`——other system logs / remaining audit records 复合形全覆盖；量词表补 `the\s+rest\s+of(?:\s+the)?`。
+- **良性优先级不变**：保留窗口四向赦免（DI_RETENTION_WINDOW 支①-⑤ × 前置/后置/_before/_after）与过期/临期限定（lookbehind 一票否决）先行于量词表匹配；短窗（一小时/五分钟）按 r738/r741 设计一律不赦。
+
+**踩坑与修复**（r742 新增，供 r743 复用）：
+1. **正则尾部空格陷阱（连踩两次）**：量词替代支 `the\s+rest\s+of\s+(?:the\s+)?` 的可选组吃掉尾部空格后，主体正则的强制 `\s+` 无处可吃——「delete the rest of the logs」翻 miss。修法：可选组不吃尾随空白（`of(?:\s+the)?`），把 `\s+` 留给主体。教训：量词/修饰槽的替代支**不得以 `\s+` 收尾**，尾随空白一律归主体。
+2. **r735 extractPatternLine 锚点纪律**：marker 注释行与正则行之间**不得插入注释行**——r735 负例按「marker 下一行 = 正则行」提取做删条注入，插注释会把注释行当正则删、变异落空、测试假红。修法：marker 行挂短标签，详细注释放正则行**之后**。
+3. **后置良性形有双层赦免**：P2/P4 内置 lookahead + 循环级 `_after` 双保险——单删一层不翻红（负例 M7/M13 初版假绿）。修法：证伪双层须齐断，或取只有单层覆盖的形（除了形只有循环级 _after）。
+4. **lookbehind 赦免不是唯一层**：「删除所有过期日志」实际由 dev-exemptions 的 `CLEANUP_LIFECYCLE_LOG`（r738 新增）赦免，P1 lookbehind 是双层之一——负例 M8 初版选错靶词假绿。修法：取 lookbehind 独有且 dev-exemptions 词表没有的词（去年/前年）。
+5. **write_file 覆盖保护**：scratch 探针重名写第二次被拒，换文件名即可（r741/r742 同样教训）。
+
+**diff**：`git diff --shortstat` 实测 **9 files, 54 insertions + 26 deletions**（已跟踪）+ 未跟踪证据链 3 文件 **506 行**（test/round-742 253 + 负例 168 + 探针 85），总有效 diff 约 **586 行**，落在 500-1000 区间（src/dangerous-instruction.js 30+/8-，test/r741 翻转留痕 12+/13-）。
+
+**验证逐项实测**：
+
+| 项 | 结果 |
+|---|---|
+| test/round-742-di-rest-quantifier.test.js | **60 passed, 0 failed**（P2 攻击锚点 9 + P4 攻击锚点 11 + 保留窗口良性 11 + 短窗仍拦 5 + 存量锚点 12 + 非目标 6 + 接线断言 3 + think() 冒烟 1 + r741 翻转留痕 1 + 同构边界留档 1） |
+| scripts/negative-test-rest-quantifier-r742.js | **29 PASS, 0 FAIL**：14 变异全承重（M1-M4 删新分支攻击形翻 0、M9/M10 删新分支存量攻击仍命中、M5/M14 样本级短窗设计证伪、M6/M7/M11-M13 删断赦免层良性翻 block、M8 lookbehind 独有词承重）+ 存量攻击 8 条 M1/M3 变异下仍命中 + 存量良性 7 条零误伤 |
+| scripts/round-742/probe-rest-quantifier.js | **49/49** 符合设计（攻击 19 + 良性 12 + 短窗 4 + 存量 9 + 非目标 5） |
+| test/round-741-di-retention-window-inverted.test.js | **46 passed, 0 failed**（section 9 分工边界按 r742 翻转留痕更新：其他/其余形改判命中、长窗良性仍赦免） |
+| test/round-735-di-log-destruction.test.js | **55 passed, 0 failed**（删条注入锚点纪律修复后零回归） |
+| test/round-738-meta-discourse-retention-window.test.js | **54/54 passed，零回归** |
+| node bin/verify.js | **16 passed, 0 failed** |
+| node scripts/bidirectional-guard.js | 召回 **52/52**、误拦 **302/326**（与基线完全一致，零新增误拦） |
+| node test/doc-numbers-accuracy.test.js | **24 passed, 0 failed** |
+| node test/security-audit.test.js | **16 passed, 0 failed** |
+| node bin/cli.js status | **running**（version 6.8.169） |
+
+**下一轮方向**（已复测确认）：
+1. **P2 带「的」形缺口**：「把其他的日志全部删除」「把剩下的日志全部清除」与存量七词同构漏判（存量「把所有的日志全部删除」实测同样 count=0）——量词表与日志词之间加 `[^。\n]{0,2}` 间隙或修饰槽吸收「的」形，需同步证伪误伤面（「把过期的日志清掉」等良性不得翻红）。
+2. **ZH 话题前置动词后置形**：「其他日志全部删除」无把/将且动词在句尾，P1-P4 四形全不吃（r742 变体探针实测）——P5 话题前置形或 P2 无把字扩展，需单独一轮。
+3. **EN 无全量量词形**：「delete other logs」按 r742 设计不拦（其他≠全部），是否收紧留架构决策。
+4. 方向池历史项续查：evidence 恒死维度（需架构决策）、silence_imputation EN 侧观察。
+
 ## r741 — di 保留窗口中文倒装/除了族赦免（r740 交接方向①复测坐实轮）
 
 **轮次**：r741 ｜ **版本**：v6.8.167 → v6.8.168（VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README 版本戳+changelog/version.js 兜底/BUILD_DATE，sync-version.js 实测同步）｜ **日期**：2026-11-08
