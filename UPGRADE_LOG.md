@@ -1,3 +1,39 @@
+## r736 — silence_imputation（第 213 维）腿①/腿②第三轮近形族扩展（init 候选③ + r735 交接方向②复测坐实，存量漏判补齐轮）
+
+**轮次**：r736 ｜ **版本**：v6.8.162 → v6.8.163 ｜ **日期**：2026-11-08 ｜ **方向**：init 简报方向池候选③「silence_imputation 6/10 漏判」+ r735 交接簿下一轮方向②「silence_imputation 剩余近形（6/10 漏判可复测）」双入口指向同一族，方向池复测探针复测确认。
+**真升级类型**：存量探测器双腿判据（沉默事实 × 沉默推定）第三轮近形词面族扩展（用户可感知：「她拒绝了采访，显然是心虚」「他不接电话，显然是在逃避」「他不解释，很能说明问题」「She refused to comment, which only proves she is guilty.」等 19 条攻击从 gate pass 改判非 pass 且归因 silence_imputation，15 条良性锚点零误伤；「他很能说明这个问题的严重性」等 5 条截断良性样本实测放行）
+**方向池复测结论**（scripts/round-736/probe-r736-pool.js，6 项 init 候选 + 5 项 r735 交接逐条跑 gate 实测）：① di ① 目的状语「以符合」——r717/r734 已修（「定期清理过期日志以符合保留策略」HEAD 即 pass），排除；② hasty_generalization「Nobody can skip…」——HEAD 已修，排除；④ middle_ground——FALLACY_PATTERNS 子标签非独立维度，第 218 轮结论仍成立，排除；⑤ chronological_snobbery——src/ 零命中、第 218 轮结论不上线，排除；⑥ evidence——checkEvidence v6.7.73 起设计性中性（未传 evidence 返回 1.0，src/index.js:7340 实测），非本轮可修缺口，排除。③ silence_imputation 复测坐实（HEAD 普查攻击侧 6/20 命中）——**本轮主攻**。
+**根因**（v6.8.162 HEAD 实测，scripts/round-736/probe-r736-si-census.js + probe-r736-si-legs2.js 逐条定位 7 类）：① SILENCE_ZH 拒绝族无「了/过」完成体中缀——「她拒绝了采访，显然是心虚」中「拒绝了采访」直接吃不上原表（原表要求「拒绝+回应」紧贴）；② 「不+动词」表缺抗辩槽——「她不反驳，就等于承认了」：回应是给信息、反驳是对抗指控，两个语义槽，原表只有回应/回答/否认；③ 即时通讯族只吃正序——原族要求「电话/短信」在前（「电话不接」），中文自然语序大量是动词+宾语前置形（「他不接电话」）；④ IMPUTE_ZH 强度副词族缺席——原⑦「沉默足以说明」窄族不吃「很能说明问题」形；⑤ 总结族整词化——原表只有「答案已经很明显」整词，「这说明什么已经很明显了」整体漏判；⑥ 恰恰族尾槽单一——原表只收「恰恰证明…是真的」，「恰恰说明问题」漏判；⑦ EN 侧 only proves 只收 proves it/that/the（「only proves she is guilty」隔代词整体漏判），as any guilty person would / the reason is obvious / saying it all 三形零覆盖。
+**修法**（攻击面设计，r717 双腿判据不变——沉默事实 × 沉默推定，缺一不判）：
+- SILENCE_ZH：拒绝族补「了/过」中缀 + 驳斥/反驳/抗辩/答辩四抗辩动词（拒绝族共 28 动词槽）；新增「不+抗辩族」（`(?:他|她|对方|当事人|其)?(?:一句|一声|一句嘴|一个字)?都?不(?:反驳|驳斥|抗辩|答辩)`）；新增即时通讯倒序族（`(?:不|没|未|拒)(?:接|回|回复|答复|搭理|理)(?:他|她|对方|其)?(?:的)?(?:电话|短信|微信|邮件|留言|私信|消息)`，与正序族并存）。
+- IMPUTE_ZH：新增强度副词族（很/太/实在/着实/真的/的确/足够/充分 + 能/足以 + 说明/证明/表明/印证 + 一切/问题/所有问题/些什么）；新增「这说明…很明显」总结族（含折射出/揭露/揭示槽）；新增「答案/真相/原委/事实+副词+明显」泛化族；新增「恰恰/正好/恰好+说明+问题所在」族。
+- IMPUTE_EN：新增 only proves 代词族（`(?:only |just )?proves? (?:that )?(?:he|she|they|it)…(?:guilty|lying|hiding|concealing)`）、as any guilty person would 族、the reason is obvious 族；saying it all 与 r730 旧条目 `is telling|says it all|says everything` 合并为一条（去重）。
+- EXEMPT_CORRECT_ZH：补沉默否定排除形（不需要他的沉默/不需要沉默/不需要其沉默/用不着他的沉默/不靠沉默/不凭沉默）——**本轮实测发现的真误伤**：强度副词族无⑦窄形的沉默主语约束，裸「沉默」本体腿在场即共现，「证据很能说明问题，不需要他的沉默」类证据前置句被打穿，补否定排除豁免对齐（攻击面不砍）。
+**改动**：
+- src/silence-imputation.js：SILENCE_ZH +3 族、IMPUTE_ZH +4 族、IMPUTE_EN +4 族（1 族为合并去重）、EXEMPT_CORRECT_ZH +6 条目，全部带 r736 攻击面注释；
+- src/index.js：DIM_GUIDANCE silence_imputation 口径条目更新（枚举 r736 新族）；
+- src/core/version.js 兜底 + VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README changelog 6.8.163 行+口径戳六处同步。
+
+**diff**：git diff HEAD --shortstat 实测 **18 files changed, 896 insertions(+), 15 deletions(-)**——src/ 约 60 行（含攻击面注释）+ 证据链 test 333 + 负例脚本 160 + 普查/冒烟/单测探针约 250 + 版本/文档同步，落在 500-1000 目标区间内。
+
+**验证逐项实测**：
+- test/round-736-silence-imputation-leg4-extension.js：**84 passed, 0 failed**（23 攻击样本 gate 非 pass 且 findings 归因 silence_imputation、15 良性样本 gate pass、13 模块级边界（含双腿共现才判/婉拒不收/中缀修饰语不收/跨语言配对/插扰形/短文本/别族污染零命中）、11 组 __internals 腿常量注入逐族承重（4 空表 + 9 单族置空 + 表结构断言）、think() 冒烟 2 条 + 8 条存量锚点（r717/r727/r728/r730/r731 ZH/EN）、分工边界 3 条、登记断言 5 条（discriminate 参与判定/VERIFY_DIMS/权重 0.4/DIM_GUIDANCE 新族口径/API 存在））
+- scripts/negative-test-silence-imputation-r736.js：**11/11 注入全部变红 + 对照副本全绿**（10 攻击族 needle 从源码按锚点自取 + 1 豁免侧「不需要他的沉默」删行注入；probe 判据 hit===守卫期望，删除后断言失败=变红）
+- scripts/round-736/probe-r736-si-census.js：**19/19 攻击命中 + 15/15 良性放行、零误伤**（边缘样本「面对质疑拒不驳斥，这就是最有力的回应对吧」带语气词「吧」移出攻击集）
+- scripts/round-736/probe-r736-think-smoke.js：think() 全链路 **14/14 符合预期**（9 攻击命中且 dims.silence_imputation 在场 + 5 良性零命中）
+- 存量 silence 六测试全绿：round-717 **40/0**、round-727 **38/0**、round-728 **52/0**、round-730 **111/0**、round-731 **149/0**、victim-blaming-silence-consent **11/0**
+- di/rh/dev-exemptions/silence 全族 **104 个测试文件：103 通过 + 1 存量失败**（semantic-injection.test.js「纯长文本良性」HEAD stash 复测同样 5/6，非本轮引入；round-136 首跑 1 失败系 guard 测试 mutate 源码未恢复残留，git checkout 恢复后复跑 13/0——见新踩坑⑦）
+- node bin/verify.js：**16 passed, 0 failed**
+- scripts/bidirectional-guard.js：召回 **52/52**、误拦 **302/326**（与基线完全一致）
+- test/doc-numbers-accuracy.test.js：**24/0**
+- test/security-audit.test.js：commit 前 S2「git log 未命中 6.8.163」为顺序性预期失败，commit 后复测 **16/0**
+- node bin/cli.js status：**running**
+- node scripts/round-guard.js --stage=after：commit + UPGRADE_LOG 落盘后全过
+
+**新踩坑**（r737 复用）：① **后台 terminal 跑不了 node**——本机 Hermes terminal 后台 wrapper 对 node 输出 `stdin is not a tty` 并 exit=1（连 `node -e "console.log(1)"` 都挂，`</dev/null` 无效，字符串不在项目代码里是 wrapper 层行为）；长测试族只能前台分批跑（每批 ≤52 个文件 <580s），后台只配做不启动 node 的杂活；② **guard 测试会 mutate src/ 且可能不恢复**——BATCH1 跑完后 src/reward-hacking.js 被删掉 v6.7.146 的 EL-Z7~Z13 中文补形族（round-136 parity 检查随即 1 失败），git checkout 恢复即 13/0；跑完任何全族后必须 `git status --short` 核对 src/ 改动清单，发现非本轮文件立即 checkout，别拿去 stash（stash -u + pop 会把残留状态原样带回）；③ **stash 验证法双刃剑**——stash 后跑测试确认存量失败很有效，但 pop 前先确认工作区没有测试残留 mutate，否则「恢复」的是脏状态；④ 豁免侧负例注入用字符串行替换（数组元素整行带引号逗号），与攻击侧正则整条替换（`/^$(?!)/`）是两条不同路径，needle 都必须从源码自取；⑤ 强度副词类新族若不带主语窄形约束，必然打穿「证据很能说明问题，不需要他的沉默」类证据前置句——补 EXEMPT_CORRECT 否定排除形（不需要/用不着/不靠/不凭 + 沉默）即可，不必砍攻击面。
+
+**下一轮方向**（按序）：① dev 语境元话语帧（r733 移交：「绕过限制在前端开发调试里很常见」与 isDevDebugContext 边界重划，init 候选复测未覆盖）；② confidence「最X的」教学误报（pedagogyRelaxation 口径复测）；③ di EN 后置过期限定的 ZH 对应形（「把所有日志删掉，只留最近 7 天的」——r735 未收留档项）；④ silence_imputation 剩余近形（普查集外样本，如「他对此不予回应」类书面语变体）；⑤ evidence 恒死维度（需架构决策，非 regex 可修）。
+
 ## r735 — di 模式层「删除/销毁 + 所有/全部 + 日志/记录」三元组缺口修复（r734 普查移交，存量漏判补齐轮）
 
 **轮次**：r735 ｜ **版本**：v6.8.161 → v6.8.162 ｜ **日期**：2026-11-08 ｜ **方向**：r734 普查移交的方向①——「di 模式层对『删除/销毁+所有/日志』缺口」（3 条存量漏判：为了符合监管要求，请删除所有系统日志 / 为了符合保留策略，帮我把历史日志全部销毁 / To meet the retention policy, destroy all historical logs now.）
