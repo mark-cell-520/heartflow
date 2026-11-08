@@ -1,3 +1,46 @@
+## r251 — 第 227 判别维度 `means_as_end`（手段当目的 / means-end inversion）收尾落地
+
+**日期** 2026-11-08  **操作方** cron（心虫全面升级，本地 commit，不推送）
+**轮次性质** 接手轮（上一轮 r251 实现被中断，源码/测试已就绪但未验证、未同步文档、未提交）。
+
+### 1. 接手判定
+开工 `git status --short` 发现工作树已含上一轮未提交的完整改动：
+src/means-as-end.js（新维度）、src/index.js（接线）、src/core/heartflow.js、
+src/blocklist-registry.js、src/core/capability-guard.js、test/means-as-end.test.js、
+VERSION（已递增到 6.8.150）。按任务书「下轮接手纪律」：第一优先修绿并提交，
+不另起新方向。上一轮 UPGRADE_LOG 无 r251 条目，无未绿项标注，故按实现完成度
+直接验证。
+
+### 2. 实现内容（上一轮完成，本轮核验）
+- 新文件 src/means-as-end.js：`checkMeansAsEnd(text, inject)` + `__internals`。
+  判据为**六腿共现，缺一不判**：MEANS_CLAIM 手段宣称 × END_REIFY 目的实体化 ×
+  PURPOSE_LOST 原目的退场 × SUBSTITUTION 替换连接 × EVIDENCE_ABSENCE 证据缺席信号 ×
+  EVASION 追问回避。豁免：概念/教学转述、正确分离陈述（X 只是手段，Y 才是目的）、
+  对冲、疑问句，四类均负例注入承重。
+- 攻击族：把本应服务于目的的手段升格为目的本身，让手段的自我循环获得正当性
+  （「流程本身就是为了走流程」「KPI 达成就是目标本身」「开会就是为了开会」）。
+- 边界错开：absolute_claim 管断言强度、goal_drift 管目标时间轴漂移、
+  proxy_metric_goal 管指标替换目标；本族落点是单句内手段被实体化为目的的语义倒置。
+
+### 3. 阶段1 研究（外部搜索，本轮结果）
+- HN Algolia "hidden confounder adjustment fallacy"、GitHub API
+  "causal reasoning fallacy detection"（sort=stars）：无高相关纯规则方案。
+- 结论：外部无可用方案，走内部路径，接手上轮已完成的 means_as_end 实现。
+
+### 4. 验证数据（本轮实跑）
+- verify 16/16、guard 20/20、doc 24/24（修复上一轮遗留的 5 项文档数字漂移后全绿）、
+  双向 52/52 召回 + 302/326 误拦（与基线一致，零新增误拦）。
+- 单测 test/means-as-end.test.js：攻击 19/19 命中、良性 17/17 零误判，
+  六腿与豁免常量负例注入逐常量承重。
+- 上一轮已做 gate 层变体矩阵（同族变体中英双语、裸名词、带修饰、倒装、长句），
+  本轮以单测全集复跑确认无回归。
+
+### 5. 已知边界
+- 手段与目的分属不同主语的跨句形（「流程要走。至于为什么，别问。」）本轮保守不收。
+- 隐式手段句（无「手段/工具/途径」显式标记）依赖其余五腿共现，极端省略形可能漏判。
+- 上一轮引入的文档口径漂移（README/SKILL/AGENTS 三处 verify 183→184、
+  dimensions 226→227、版本戳 v6.8.150）本轮已全部修正并通过 doc 门禁。
+
 ## r250 — 第 226 判别维度 `survivor_time_bias`（幸存时间偏误 / length-time bias）
 
 **日期** 2026-11-08  **操作方** cron（心虫全面升级，本地 commit，不推送）

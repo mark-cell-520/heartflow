@@ -851,6 +851,13 @@ const { checkDenominatorSwap } = require('./denominator-swap.js');
 // survivorship_bias(132)/selection_bias(168)/denominator_swap(224) 的边界
 // 见模块头注释。细节见 src/survivor-time-bias.js。
 const { checkSurvivorTimeBias } = require('./survivor-time-bias.js');
+// [r251] 第 227 维度 means_as_end（过程完成当目标达成 / means-as-end
+// confusion：拿流程/清单/步骤的完成直接给目标达成背书，把手段的完成度
+// 当成目的的实现度）。缺口实证：scripts/round-251/probe-gap-r251.js 与
+// dryrun-matrix.js（攻击 16/16 命中、良性 0/14 误伤、六个语义腿负例注入
+// 全承重）。与 activity_outcome_confusion(184) / proxy_metric_goal(187) /
+// necessity_sufficiency_confusion(183) 的射程边界见模块头注释。
+const { checkMeansAsEnd } = require('./means-as-end.js');
 // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
 // confusion of the inverse：P(E|I) 的概率数值在方向翻转后原样沿用为
 // P(I|E)，检察官谬误的结构形）。src/conditional-transposition.js 28KB
@@ -2228,6 +2235,9 @@ function discriminate(text, evidence = [], contentMode) {
   // bias）计算点。stb——survivor time bias 缩写（sb 已被 selection_bias
   // 占用，grep 查证无冲突）。
   const stb = _applyPedagogyRelaxation(checkSurvivorTimeBias(_normText), "survivor_time_bias", pedagogyRelaxation);
+  // [r251] 第 227 维度 means_as_end（过程完成当目标达成）计算点。
+  // mae——means as end 缩写（mse 等 grep 0 命中无冲突）。
+  const mae = _applyPedagogyRelaxation(checkMeansAsEnd(_normText), "means_as_end", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -2857,6 +2867,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r250] 第 226 维度 survivor_time_bias 参与判定（幸存时间偏误）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: stb.score, name:'survivor_time_bias'},
+    // [r251] 第 227 维度 means_as_end 参与判定（过程完成当目标达成）。
+    // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: mae.score, name:'means_as_end'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3387,6 +3400,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r250] 第 226 维度 survivor_time_bias（幸存时间偏误×生存期语义腿×
     // 疗效结论腿×时间对置腿）。
     survivor_time_bias: stb,
+    // [r251] 第 227 维度 means_as_end（过程完成当目标达成×过程语义腿×
+    // 完成语义腿×目标达成结论腿×因果连接腿，含中英双语与豁免表）。
+    means_as_end: mae,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -4965,6 +4981,15 @@ function discriminate(text, evidence = [], contentMode) {
     // 比较要考虑长度偏倚，应改做同期队列」正是本族要教的判别动作）、医学
     // 课堂案例、对他人错误论证的转述引用。与 r206-r232 同口径只登记 VERIFY。
     'survivor_time_bias',
+    // [r251] 第 227 维度 means_as_end（过程完成当目标达成 / means-as-end
+    // confusion：拿流程/清单/步骤的完成直接给目标达成背书——「流程全部
+    // 走完，说明目标本身已经达成」）登记。verify 级——单句也可能是正当
+    // 的过程管理陈述（「流程走完只是必要步骤，目标达成要看客户续约率」
+    // 正是本族要教的判别动作）、对流程主义作风的批评、带目标侧证据的
+    // 正常汇报（附续约率/故障率/验收报告）。与 r206-r232 同口径只登记
+    // VERIFY。与 activity_outcome_confusion(184)/proxy_metric_goal(187)
+    // 的射程边界见 src/means-as-end.js 头注释。
+    'means_as_end',
     // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
     // confusion of the inverse：P(E|I) 的数值在方向翻转后原样沿用为
     // P(I|E)——「这种病检测阳性的概率是 95%，所以得了这种病检测阳性的
@@ -5579,6 +5604,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r250] 第 226 维度 survivor_time_bias 补登记（幸存时间偏误）。
       // 同上：九处一次接齐。
       survivor_time_bias: stb,
+      // [r251] 第 227 维度 means_as_end 补登记（过程完成当目标达成）。
+      // 同上：九处一次接齐。
+      means_as_end: mae,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,
@@ -16464,6 +16492,9 @@ module.exports = {
   // [r250] 第 226 维度 survivor_time_bias 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkSurvivorTimeBias,
+  // [r251] 第 227 维度 means_as_end 导出（同先例，漏导出会让
+  // 测试与 MCP handler 拿不到单维函数）。
+  checkMeansAsEnd,
   // [r249] 第 215 维度 conditional_transposition 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkConditionalTransposition,

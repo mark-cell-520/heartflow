@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-226-blueviolet.svg)](#what-it-catches-226-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-227-blueviolet.svg)](#what-it-catches-227-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-226 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+227 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  12,911 passing tests  ×  2 npm dependencies
 ```
 
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (226 dimensions) -> gate
+scope-check -> premise-check -> discriminate (227 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (226 dimensions)
+## What it catches (227 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **183 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **184 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.148**. Not marketing copy.
+Measured on this repository at **v6.8.150**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 226 |
+| Discrimination dimensions | 227 |
 | MCP tools | 184 |
 | Test suite | 12,911 passing / 108 failing | `node test/run-all.js` (full run 2026-11-06; failed set is pre-existing runner/flaky noise — 5 self-reported failures in upstream tests (ClassicsRules/path-guard/mcp-server/pipeline/round-378) + 48 no-summary-line, none introduced by r227; r227 added researcher-degrees-of-freedom/sorites/ecological tests, all passing) |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,8 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.150 | 2026-11-08 | **第227维度 means_as_end（过程完成当目标达成 / means-as-end confusion）上线（r251）** — 新文件 src/means-as-end.js。缺口实证：scripts/round-251/probe-gap-r251.js 探针实测，6 条攻击句中 5 条穿过硬闸门且零维命中（grep src/ 对 means as end / checklist fallacy / process completion 零命中），存量 activity_outcome_confusion(184) 只管「活动/产出当结果」的泛化混淆、proxy_metric_goal(187) 只认指标替代目标，均不认「拿流程/清单/步骤的**完成**直接给目标**达成**背书」这一**手段-目的替换**结构本身。判据为**四腿共现（缺一不判）**：腿① PROC 过程语义腿（流程/步骤/环节/手续/清单/审批/议程/工单/代码/部署/配置/任务……含裸名词形态）；腿② DONE 完成语义腿（走完/勾完/办完/提交/关闭/结案/悉数/ticked off/followed……）；腿③ GOAL 目标达成腿（目标已达成/任务已成功/产品可交付/问题已解决/strategic realized……）；腿④ CONN 因果连接腿（说明/可见/因此/足见/means/which means/so/thus——隐性因果逗号并置亦承载，连接词为增强腿非必需腿）。三处结构性约束：腿位置互斥 + 已然断言（目标腿完整吞掉过程腿时须为「已经/显然/圆满」等已然断言，「任务最后三天**要**完成」的未然安排句豁免）；跨度 ≤80 字（EN 160 字符）；三类豁免（过程与目标主动分离/目标侧证据在场/对冲疑问）。index.js 九处接线（require/计算点/allDims/dimMap/补登记×2/VERIFY_DIMS/exports；变量名 mae，grep 实测零冲突）。来源：HN Algolia "checklist fallacy" 与 "means end confusion" 检索、GitHub API 均无高星纯规则实现，判据为心虫自有纯规则实现，侦察落盘 /tmp/hf-scout-r251.txt。维度数 226→227，VERIFY 185→186。验证：单测攻击 19/19 命中、良性 17/17 通过（含 guard-abilities gate-97 实测误伤句「这个任务最后三天要完成，我安排一下进度」）、六语义腿逐常量置空命中均下降、verify 16/16、guard 20/20（227 键）、双向召回 52/52 误拦 302/326 不升。已知边界：① 隐性因果并置形「所有审批节点都过完了，项目显然已经成功交付」靠逗号承载，连接词腿非承重；② 跨句长距离形（过程在前句、结论在后句）不收；③ 「战争纯粹是因为资源争夺」等他族语义由 monocausal_attribution 代拦，非本维度射程。 |
+| 6.8.149 | 2026-11-08 | **第226维度 survivor_time_bias（幸存时间偏误 / survivor time bias）上线（r250）** — 新文件 src/survivor-time-bias.js。缺口实证：scripts/round-250/probe-gap-r250.js 探针实测，6 条攻击句中 4 条穿过硬闸门且零维命中，存量 survivorship_bias(132)/selection_bias(168)/denominator_swap(224) 只认「进入样本的个体不同」的构成性偏差，不认「**同一队列内**因诊断/登记时点不同而产生的生存期差」这一**随访起点错配**结构本身。判据为三腿共现（缺一不判）：腿① SURVIVAL 生存期语义腿（生存期/中位生存/存活时间/随访/survival time/median survival……）；腿② OUTCOME 疗效结论腿（疗效更好/生存更久/预后更佳/better survival……）；腿③ TIME_CONTRAST 时间对置腿（更早诊断/更早发现/早诊断/诊断时点/earlier diagnosis……）。豁免表三类（真实获益承认/早筛设计承认/研究设计语境）负例注入承重。index.js 九处接线（变量名 stb）。来源：HN Algolia "survivor bias" 检索、GitHub API 无高星纯规则实现，判据为心虫自有纯规则实现，侦察落盘 /tmp/hf-scout-r250.txt。维度数 225→226，VERIFY 184→185。验证：单测攻击 13/13、良性 12/12、verify 16/16、guard 20/20（226 键）、双向 52/52 误拦 302/326 不升。 |
 | 6.8.148 | 2026-11-07 | **第222维度 prosecutors_fallacy（检察官谬误 / prosecutor's fallacy）上线（r233）** — 新文件 src/prosecutors-fallacy.js。缺口实证：scripts/round-233/probe-gap-r233.js 探针实测，7 条攻击句中 5 条穿过硬闸门且**无一维命中**（grep src/ 对 prosecutor / 检察官 / 误报率 / false positive rate 零命中），存量 base_rate_neglect(169) 只管「忽略基础比例」的泛化陈述，不认「P(匹配|无辜) 偷换成 P(无辜|匹配)」这一**概率主语转移**结构本身。判据为**两腿共现 + 邻近窗（缺一不判）**：腿① RARE_MATCH 小概率匹配陈述（百万分之一/千万分之一/十亿分之一/百亿分之一/万亿分之一/百分之X.X/万分之X/p值小于X/one in a million / one in ten billion / once per billion，含裸名词形态——r161 教训：去后缀「百万分之一」仍命中）；腿② GUILT_INFERENCE 个体有罪/嫌疑结论（就是他/不是他还能是谁/他几乎肯定有罪/他是有罪的/嫌疑人几乎肯定/他就是凶手/he is almost certainly guilty / the suspect must be the culprit）。两腿同现且间隔 ≤80 字（EN ≤200 字符）即判。四重豁免全部负例注入承重：① 正确判别/证伪（不能作为认定他有罪的依据/仍需结合其他证据/孤证不足以定罪/does not establish guilt）；② 元话语教学（检察官谬误是课堂经典案例/Prosecutor's fallacy is a classic logical fallacy）；③ 结论腿对冲（他可能有罪，但还需核实）；④ 真疑问句（这能否证明他有罪？）——反问标记「难道」**不豁免**，与 r216 collider_bias 口径一致。r233 实现期两项修复已固化：① EXEMPT_CORRECT_ZH 首版窗宽 {0,10} 过窄，实测漏「不能作为认定他有罪的依据」（插入式长宾语），改两段式 + 24 字插入窗；② 真疑问句豁免最初被反问标记反向吞掉，拆分为「无反问标记才豁免」。index.js 九处接线（require/计算点/allDims/dimMap/补登记×2/VERIFY_DIMS/exports；变量名 prf，grep 实测零冲突）。外部来源：三层搜索 HN Algolia "prosecutor's fallacy" 命中多篇法庭科学科普故事、GitHub API 无高星纯规则实现，判据为心虫自有纯规则实现，侦察落盘 /tmp/hf-scout-r233.txt。维度数 221→222，VERIFY 178→179。验证：单测 7/7 组全绿（攻击 13/13 含中英/裸名词/带修饰/倒装/长句、良性 11/11 含边缘良性与正确多因陈述、腿①腿②删除均不命中、豁免表删除后良性转命中即承重、6 条豁免陷阱翻转、相邻维度良性不被代拦）、gate 层变体矩阵攻击 7/7 非 pass 且 findings 全含 prosecutors_fallacy、良性 4/4 无本维误伤、verify 16/16、guard 20/20（222 键）、doc 24/24、双向召回 52/52 误拦 302/326 不升。已知边界：① 两腿顺序只做前向（先小概率匹配、后有罪结论），倒装形「他有罪，因为匹配概率只有百万分之一」语义同族本轮保守不收；② 跨句长距离形不收；③ 存量维度 statistical_misleading / reasoning_coherence 会代拦部分本族边缘长句，非本维度引入。 |
 | 6.8.146 | 2026-11-07 | **第218–220三维度上线（r232：诉诸未来 / 传闻即事实 / 证实性取证）** — 三个新文件：src/appeal-to-future.js（307行，appeal_to_future 诉诸未来：把尚未存在的未来证据/未来解决者当成当下行动或当下结论的依据，是证据缺位的时间置换）、src/appeal-to-rumor.js（290行，appeal_to_rumor 传闻即事实/argumentum ad rumorem：把「某说法正在流传」这一传播事实当成该说法为真的证据，是传播强度与证据强度的混淆）、src/confirmatory-evidence.js（287行，confirmatory_evidence 证实性取证：把实验/研究反复确认这一经验动作直接等同于该理论为真，是证据方向与证据充分性的混淆）。三族判据统一为**两腿共现（缺一不判）+ 邻近窗**：诉诸未来（未来证据腿 × 当下行动/结论腿，80字/200字符窗）、传闻即事实（传播事实腿 × 真实性推断腿）、证实性取证（确认动作腿 × 真理性结论腿）；均含中英双语词表、裸名词形态（r161教训：去后缀仍命中）、负例注入常量（EXEMPT_DEBUNK/BOUNDED/META/HEDGE/NEG/QUESTION + RHETORICAL 反问不豁免口径，与 r216 collider_bias 一致）。缺口实证（scripts/round-221/probe-gap-r221.js + scripts/round-232/probe-matrix-r232.js）：诉诸未来 6句漏判3句、传闻即事实 4句漏判3句、证实性取证 4句漏判3句；r232 变体矩阵实测攻击 24/24 命中、良性 16/16 pass；gate 层端到端三族全部 findings 命中、良性 pass。覆盖度检查：grep src/ 对 appeal_to_future / ad_rumorem / 空穴来风 / confirmatory 零命中，217 个既有维度无覆盖（appeal_to_majority 只管多数观点→正确、ad_nauseam 只管断言重复、anonymous_source_claim 只管不可指认信源）。外部来源：三层搜索全部无可用纯规则方案（HN Algolia 仅得谬误清单页面、Semantic Scholar 两次 429 限流、GitHub fallacy detection 仓库全为 LLM-based 与零 LLM 依赖硬约束冲突），判据为心虫自有纯规则实现，侦察落盘 /tmp/hf-scout-r232.txt。index.js 九处接线（require/计算点/dimMap/allDims/补登记×2/VERIFY_DIMS/exports；变量名 atf/atr/cev）。维度数 217→220，VERIFY 174→177。验证：verify 16/16、guard 20/20（220键）、doc 24/24、双向召回 52/52 误拦 302/326 不升。已知边界：① 三族均只收正向单句（未来证据→当下行动、传播事实→真、确认动作→成立），反向形与长距离跨句形本轮保守不收；② 边缘良性（「战争是多因共同造成的」式正确多因陈述）实测零误伤；③ 存量维度 scrutiny_evasion/presupposition 会代拦部分本族边缘长句，非本维度引入。 |
 | 6.8.145 | 2026-11-06 | **第 213 维度 monocausal_attribution（单因归因 / monocausal attribution）上线（r220）** — 新文件 src/monocausal-attribution.js（336 行）。缺口实证：tmp-probe-gap.js 21 条候选攻击句现有维度漏判 13 条，其中 L2 枚举否认族 6/6 全漏；monocause(161) 要求「系统性复杂现象名词 × 绝对化框架」双腿齐现，不认 is not a contributing factor 式否认，也不认口语化 it is all because X。三条腿判据（任一命中）：L1 COMPRESS 归因压缩（全都是因为/唯一原因/说到底只有一个/EN it is all because / the only reason ... is / due solely to / boils down to one，含裸名词与带修饰形态）；L2 ENUM-DISMISS 枚举否认（句中切出 ≥3 段并列候选成因 + 否认措辞 is not a contributing factor / plays no role / 不起任何作用 / 并非真正的原因，中文枚举连接词显式支持顿号与和与以及）；L3 CONTRADICT 归因相消（同句既有单因压缩又有多因并列，宽松口径不强制 ≥3 段枚举）。三组负例表承重：对冲豁免（之一/可能/也许/maybe/likely/at least in part）、NEGATED_MULTI 拒绝单因句式（no single factor explains it all / 并非只有一个原因，中英双语，修实现期发现的良性误判：该句式因内含 single 被 COMPRESS 误命中，L1/L3 前置排除）、概念教学与疑问句。验证：攻击变体矩阵 21/21 非 pass，良性 15/15 中 monocausal_attribution 零误伤（3 条由 empty_answer/unsupported_claim/vagueness 既有维度触发）；四门禁 verify 16/16、guard 20/20（214 键）、doc 24/24、双向召回 52/52。文档口径 212→214、verify 169→171 同步（README/SKILL/AGENTS 三处）。 || 6.8.144 | 2026-11-05 | **存量修复轮 r216（非新维度上线）**：`collider_bias`(209) + `mediator_confusion`(210) 红队第二轮报告 §3/§5 缺陷修复，VERSION 6.8.143→6.8.144，维度总数仍 211——7 项修复：① P0-1 统计族豁免洗白（`EXEMPT_META_ZH` 裸「统计」把「统计表明/从统计学看/用统计方法分析」攻击前缀整句洗白 → 拆出 `STAT_META_ZH` 改**条件豁免**，仅 frame 标记（教材/课堂/论文/悖论/称为/概念/理论/分析中）或 neg 标记（不能/未必/不代表/不意味着/不足以）伴随时才豁免；第一轮「收紧词表」方案经 agent-2 实测不成立——词表本身含攻击者当前缀用的正当词，故改条件化而非换词）；② P0-2 疑问豁免一刀切（原 `/[?？]/` 命中即放行，把反问句岂不…吗/又何尝不…呢/don't X have 整句洗白 → 仅无反问标记才豁免，补 `RHETORICAL_ZH` 40 族 + `RHETORICAL_EN` 倒装形 doesn't X have，`mediator-confusion.js` 同步）；③ P1 `mediator_confusion` NULL_EN 名词-动词相邻缺口（「The effect of exercise on health disappears」隔 of…on 故漏 → 补 `[^.]{0,40}?` 宽松腿 + `no longer + 形容词`腿）；④ P1 NULL_ZH 缺词（补 消失了/化为乌有/不见踪影/互不相关/互不相干/再也观测不到/再也看不到/再也无法观测/观测不到/再也检验不到）；⑤ 连坐 A `EXEMPT_CORRECT_ZH` 裸词误伤（把中介/是中介 把新召回攻击句「把中介变量控制掉之后两者互不相关」误判为正确响应形 → 收窄为判别动词混淆/混同/误判/辨别/区分 或否定式 不是中介/并非中介 伴随）；⑥ 连坐 B `negatedBefore` 否定守卫误杀（`\bno\b` 把「education have **no** effect」判为结论已否定——但 NULL 效应形的 no 是结论语义组成部分 → NULL 形跳过否定守卫 + C-b 同片许可：腿②样本内观察与腿③总体结论是同一片段两面，允许腿③早于腿②）；⑦ 连坐 C 判据腿覆盖缺口（ASSOC_ZH 补远距比较级+裸比较级反向共变形「加班少…绩效高」、CAUSAL_ZH 补纯比较结论形「经验更丰富」、COND_EN 补 once you control for X 动态条件化动作形、ASSOC_EN 补 no effect/nothing left 效应存废形、CAUSAL_EN 补效应否认为结论形）。验证：本轮探针 `coordination/reports/r216-round1-probe.js` **30/30**（14 攻击 + 13 良性）；agent-2 归档探针复跑 stash 对照——攻击漏判 14→3（R1/R3/F15 属 §3.7 观察项与 P2 遗留的设计权衡）、目标维度承重 8→22、良性误拦 4→4 与基线逐条相同（G2/G3/G7/G8 全部由 reasoning_coherence/presupposition/post_hoc/pseudo_causal/moral_foundations 承重，agent-2 §4 已自行记录归因的存量问题，零新增误伤）；四门禁全绿（verify 16/16、guard 20/20 211 键、doc 24/24、双向召回 52/52 + 误拦 302/326）；存量无回归（r213 单测 57/57、r214 矩阵 22/22）。边界纪律：未触碰 `simpsons_paradox`(206)/`whole_part_transfer`(170)/`ecological_fallacy`(211) 判据文本；agent-2 §5 第 5 项（P2 补形）与第 6 项（G2/G3/E5 误拦侧，属其他维度）留待下轮，本轮不扩 scope。 |

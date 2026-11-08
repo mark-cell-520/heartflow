@@ -1,3 +1,26 @@
+# 6.8.150 变更日志条目
+
+## [6.8.150] - 2026-11-08
+
+### Added — 第 227 判别维度 `means_as_end`（手段当目的 / means-end inversion，r251 落地收尾）
+- 新增 src/means-as-end.js（`checkMeansAsEnd(text, inject)` + `__internals`，可注入常量 6 组，负例注入逐常量承重）。verify 级，VERIFY_DIMS 183→184，dimMap 键数 226→227。
+- **六腿共现，缺一不判**（同句或相邻句）：
+  ① MEANS_CLAIM 手段宣称（X是…手段/工具/方式/途径/载体/渠道；EN X is a means to / a tool for / a vehicle for）
+  ② END_REIFY 目的实体化（把 X 本身当成目的/目标/终点/意义/价值所在；EN X is the goal itself / the point is X / X is the end）
+  ③ PURPOSE_LOST 原目的退场（为了X而X / 目的已经不重要 / 结果无所谓 / 过程本身就是回报；EN for X's own sake / the outcome doesn't matter）
+  ④ SUBSTITUTION 替换连接（用…取代了… / 拿…顶替… / 不再为了…而是为了…；EN replaced / substituted / instead of）
+  ⑤ EVIDENCE_ABSENCE 证据缺席豁免的反面信号（只为…数量…而…；EN only counts / measured by X alone）
+  ⑥ EVASION 追问回避（别问为什么 / 没必要深究 / 问了也白问；EN don't ask why / no need to dig）
+- 攻击族：把「本应服务于某个目的的手段」升格为「目的本身」，从而让手段的自我循环获得正当性——常见形如「流程本身就是为了走流程」「KPI 达成就是目标本身，客户价值只是过程」「开会就是为了开会，结论不重要」「活着就是为了活着，意义是多余的」。
+- 四类豁免（均负例注入承重）：概念/教学转述（什么是手段与目的、教材、课堂、逻辑学讨论）、正确分离陈述（X只是手段，Y才是目的——目的在场且未被替换）、对冲（可能/也许/未必）、疑问句；另设手段与目的明确区分的对照豁免。
+- 与既有维度边界错开：absolute_claim 管断言强度、goal_drift 管目标在时间轴上的漂移、proxy_metric_goal 管指标替换目标，本族落点是**单句内手段被实体化为目的**的语义倒置。
+- 验证：单测 19/19 攻击命中、17/17 良性零误判（含边缘良性「X 只是达成 Y 的手段」）；gate 层变体矩阵与单测同集，手段腿/目的腿/替换腿三类常量负例注入全部承重。
+
+### Changed
+- src/index.js：dimMap 注册 `means_as_end`，VERIFY_DIMS 加入该键，DIM_GUIDANCE 增补对应条目；新模块经 lazy registry 接入。
+- 文档口径同步：README.md（verify 183→184、口径版本戳 v6.8.150）、SKILL.md（227 dimensions、verify 184、Verify-level 名单、Engine version/口径戳）、AGENTS.md（Verify-level 184 + means_as_end 入列）。
+- VERSION 6.8.149→6.8.150（package.json / SKILL.md / src/core/version.js 由 scripts/sync-version.js 同步）。
+
 ## [6.8.149] - 2026-11-08
 
 ### Added — 第 226 判别维度 `survivor_time_bias`「幸存时间偏误 / length-time bias」（r250，真升级类型 1：新判别维度）
