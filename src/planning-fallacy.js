@@ -155,13 +155,14 @@ const WILL_DISMISS_ZH = [
   /(?:想得|说得|听得|看得|搞得)太(?:复杂|难|严重|夸张)/,
   /(?:师傅|老板|领导|客户|专家|网上|教程|文档|书上|百度)[^。，！？；\n]{0,4}(?:说|讲|表示|写)[^。，！？；\n]{0,2}(?:简单|轻松|容易|快|不难)/,
 ];
-// W5 参照类模仿族（别人三个月我们也三个月）
+// W5 参照类模仿族（别人三个月我们也三个月）。间隔类允许逗号——r255
+// 实证：排除逗号会让「别人两个月交付了，我们也能」整族不匹配。
 const WILL_MIMIC_ZH = [
-  /(?:别人|人家|别的团队|同行|友商|上次)[^。，！？；\n]{0,8}(?:我们|咱们|咱)[^。，！？；\n]{0,4}(?:也|照样)/,
+  /(?:别人|人家|别的团队|同行|友商|上次)[^。！？；\n]{0,10}(?:我们|咱们|咱)[^。！？；\n]{0,4}(?:也|照样)/,
 ];
 
 const WILL_EFFORT_EN = [
-  /\b(?:with (?:enough )?(?:effort|determination|willpower|hustle|grit|drive)|push(?:ing)? harder|work harder|grind (?:it )?out|all[- ]hands|crunch(?: time)?|sheer (?:determination|willpower)|if we just|we just need to|everyone just needs to)\b/i,
+  /\b(?:with (?:enough )?(?:effort|determination|willpower|hustle|grit|drive)|push(?:ing)? harder|work harder|grind(?:ing)? (?:it )?out|all[- ]hands|crunch(?: time)?|sheer (?:determination|willpower)|if we just|we just need to|everyone just needs to)\b/i,
   /\b(?:determination|morale|willpower|commitment|drive|enthusiasm)\s+(?:is|will be|alone is)\s+(?:enough|all we need)\b/i,
 ];
 const WILL_INTENSITY_EN = [
@@ -214,12 +215,13 @@ const EST_PROMISE_EN = [
 // ─── 独腿签名（SOLO）——一句话内部自带「意愿×工期」完整结构，无需
 // 另找工期结论腿（同 r251 loss_aversion / r254 money_illusion 先例）。
 const SOLO_ZH = [
-  // S1 加把劲 + 工期数字 + 结论（融合句）
-  /(?:加把劲|拼一下|加油干|咬咬牙|连轴转|加班加点|努努力|努力赶|拼命赶)[^。，！？；\n]{0,10}(?:\d+|[一二三四五六七八九十两半]+)\s*(?:个)?(?:月|周|天)[^。，！？；\n]{0,8}(?:就能|足以|肯定|一定|绝对|来得及|搞定|上线|完成|交付|拿下|弄完)/,
+  // S1 加把劲 + 工期数字 + 结论（融合句）。间隔类只排除句末标点——
+  // r255 实证：排除逗号会让「加把劲，一周肯定搞定」整族永不匹配。
+  /(?:加把劲|拼一下|加油干|咬咬牙|连轴转|加班加点|努努力|努力赶|拼命赶)[^。！？；\n]{0,10}(?:\d+|[一二三四五六七八九十两半]+)\s*(?:个)?(?:月|周|天)[^。！？；\n]{0,8}(?:就能|足以|肯定|一定|绝对|来得及|搞定|上线|完成|交付|拿下|弄完)/,
   // S2 肯定 + 结论 + 拼/努力（倒装融合）
-  /(?:肯定|一定|绝对)[^。，！？；\n]{0,6}(?:来得及|能完成|能交付|能上线|没问题|做得到)[^。，！？；\n]{0,10}(?:拼|努力|加班|赶|冲)/,
+  /(?:肯定|一定|绝对)[^。！？；\n]{0,6}(?:来得及|能完成|能交付|能上线|没问题|做得到)[^。！？；\n]{0,10}(?:拼|努力|加班|赶|冲)/,
   // S3 别参考 + 参照类 + 决心/肯定（排斥参照类的排期承诺）
-  /(?:别|不用|无须|无需|不要)(?:参考|听|管|理会)[^。，！？；\n]{0,10}(?:历史|数据|估计|咨询|基准|先例)[^。，！？；\n]{0,12}(?:拼|决心|咬咬牙|肯定|一定|两个月|一个月|一周|两周)/,
+  /(?:别|不用|无须|无需|不要)(?:参考|听|管|理会)[^。！？；\n]{0,10}(?:历史|数据|估计|咨询|基准|先例)[^。！？；\n]{0,12}(?:拼|决心|咬咬牙|肯定|一定|两个月|一个月|一周|两周)/,
 ];
 const SOLO_EN = [
   // E1 with enough effort + in N weeks/months（融合句）
@@ -245,8 +247,8 @@ const CONCEPT_EN = /\b(?:planning fallacy|reference[-\s]class|outside view|insid
 // 公司的悲观估计」是排斥参照类的攻击信号（r255 构造期实证：宽松写法
 // 会把这两条攻击句误豁免），故只用「留了/留有/预留/留足/加了/设置」
 // 与「做了/按/采用/给出/基于」等 affirmative 前缀。
-const CORRECTIVE_ZH = /(?:参照同类|参照(?:去年|历史|同行|类似|实际)|参考(?:了|过)?(?:去年|历史|同类|同行|类似|实际|中位数|外部基准)|按中位数|取中位数|历史工期|实际用时|外部基准|留了缓冲|留有缓冲|预留|留足缓冲|加了缓冲|设置缓冲|加上缓冲|校准|做了测算|同类城市|同类门店|数据测算|工期分布|按时交付的|统计过|复盘过|做了(?:悲观|保守|审慎)?(?:的)?(?:估计|估算|测算|排期)|按(?:悲观|保守|审慎)?(?:的)?(?:估计|估算|排期)|采用(?:悲观|保守)?(?:估计|估算))/;
-const CORRECTIVE_EN = /\b(?:reference[-\s]class|historical (?:data|estimates?|record|timelines?)|outside view|median of similar|actually took|planned for|buffer|contingency|padded|benchmark(?:s|ed)?|base rates?|calibrat\w+|based on (?:similar|past|historical)|looked at how long|track record)\b/i;
+const CORRECTIVE_ZH = /(?:参照同类|参照(?:去年|历史|同行|类似|实际)|参考(?:了|过)(?:去年|历史|同类|同行|类似|实际|中位数|外部基准)|按中位数|取中位数|历史工期|实际用时|外部基准|留了缓冲|留有缓冲|预留|留足缓冲|加了缓冲|设置缓冲|加上缓冲|校准|做了测算|同类城市|同类门店|数据测算|工期分布|按时交付的|统计过|复盘过|做了(?:悲观|保守|审慎)?(?:的)?(?:估计|估算|测算|排期)|按(?:悲观|保守|审慎)?(?:的)?(?:估计|估算|排期)|采用(?:悲观|保守)?(?:估计|估算))/;
+const CORRECTIVE_EN = /\b(?:reference[- ]class|outside view|median of similar|actually took|looked at how long|planned for|based on (?:similar|past|historical)|track record|base rates?|benchmark(?:s|ed|ing)?|calibrat\w+|buffer|contingency|padded|scheduled for|estimated based on|historical (?:data|estimates?|record|timelines?)\s+(?:from|on|for|shows?|showed))\b/i;
 
 // 工具 ─────────────────────────────────────────────────────────
 function allMatches(re, text) {
@@ -315,11 +317,16 @@ function collectEst(text, list) {
   return dedupeExact(m);
 }
 
-// 独腿签名专用：只查前缀否定。
+// 独腿签名专用：查前缀否定 + 签名跨度内部否定（「加把劲也未必能两个
+// 月上线」——否定词落在两半之间，r255 实证必须查 raw 内部）。
+const SOLO_NEG_INSIDE_ZH = /(?:未必|不一定|很难|恐怕|不见得|怎能|怎么可能|称不上|算不上|悬|来不及|差得远)/;
+const SOLO_NEG_INSIDE_EN = /\bnot\b|\bhardly\b|\bbarely\b|\bunlikely\b|\bfar\s+from\b|\bno\s+way\b/i;
 function collectSolo(text, list) {
   let m = [];
   for (const re of list) for (const x of allMatches(re, text)) {
-    if (matchAlive(text, x, true, true)) m.push(x);
+    if (!matchAlive(text, x, true, true)) continue;
+    if (SOLO_NEG_INSIDE_ZH.test(x.raw) || SOLO_NEG_INSIDE_EN.test(x.raw)) continue;
+    m.push(x);
   }
   return dedupeExact(m);
 }
@@ -381,6 +388,10 @@ function findSignatures(text, R) {
     for (const n of willM) {
       for (const v of estM) {
         if (dist(n, v) > L.w) continue;
+        // 包含守卫：一条腿整体落在另一条腿内部即失配——「肯定上线」
+        // 是「两个月肯定上线」的子串，不是独立的意愿表达（r255 实证：
+        // 缺这条守卫时 W_ZH=0 注入下它会在工期腿尾部自配成签名）。
+        if ((n.idx >= v.idx && n.end <= v.end) || (v.idx >= n.idx && v.end <= n.end)) continue;
         // 防自证：工期结论腿必须在意愿腿之外**带来新内容**（左伸或右伸
         // 至少 2 字）——「努力赶」不能既当意愿腿又当工期结论腿；但
         // 「加把劲……两个月肯定上线」的跨腿配对是真双腿。
