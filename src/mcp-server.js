@@ -2445,6 +2445,50 @@ function handleModuleHealth(args) {
 
 }
 
+// [r251] 占位子系统清单：MCP 侧单独入口。读引擎常驻实例的 moduleHealth，
+// 不另建 checker——那会拿一个没绑 _stubSubsystemKeys 的 hf 副本扫出假数据。
+function handleModuleStubs(args) {
+
+  try {
+
+    const includeOverridden = !args || args.includeOverridden !== false;
+
+    let stubs = null;
+    const mh = heartflow && heartflow.moduleHealth;
+    if (mh && typeof mh.getStubModules === 'function') {
+      stubs = mh.getStubModules();
+    } else {
+      const { ModuleHealthChecker } = require(path.join(HF_DIR, 'src/shield/module-health-checker.js'));
+      stubs = new ModuleHealthChecker(heartflow).getStubModules();
+    }
+
+    const out = {
+      declared: stubs.declared,
+      stubCount: stubs.stubCount,
+      overriddenCount: stubs.overriddenCount,
+      uninstantiatedCount: stubs.uninstantiatedCount,
+      measured: stubs.measured,
+      stubs: stubs.stubs.map(s => ({ name: s.name, resolvedFrom: s.resolvedFrom, stubClass: s.stubClass, detectedVia: s.via, reason: s.reason })),
+      uninstantiated: stubs.uninstantiated,
+      timestamp: Date.now()
+    };
+    if (includeOverridden) out.overridden = stubs.overridden;
+    if (stubs.declared > 0) {
+      out.implementedRatio = Math.round((stubs.overridden.length / stubs.declared) * 100);
+      out.honestNote = `${stubs.stubCount}/${stubs.declared} 个已声明子系统仍是占位空壳（无真实能力）；${stubs.overridden.length} 个已有真实实现，真实实现占比 ${out.implementedRatio}%`;
+    } else {
+      out.honestNote = 'no_stub_registry: 引擎未提供 _stubSubsystemKeys，未测量';
+    }
+    return out;
+
+  } catch (e) {
+
+    return { error: e.message, timestamp: Date.now() };
+
+  }
+
+}
+
 
 
 function handleUpgradeStats(args) {
@@ -3447,6 +3491,8 @@ const HANDLERS = {
 
 
   heartflow_module_health: handleModuleHealth,
+
+  heartflow_module_stubs: handleModuleStubs,
 
   heartflow_upgrade_stats: handleUpgradeStats,
 

@@ -116,8 +116,14 @@ const TOOLS = [
 
   {
     name: 'heartflow_module_health',
-    description: "模块健康检查：检查所有已加载模块的健康状态，返回健康评分和问题模块列表。",
+    description: "模块健康检查：检查所有已加载模块的健康状态，返回健康评分和问题模块列表。含占位子系统（已声明但无真实实现）的诚实计数。",
     inputSchema: {"type":"object","properties":{}}
+  },
+
+  {
+    name: 'heartflow_module_stubs',
+    description: "占位子系统清单：列出所有已声明但仍是占位空壳的子系统（无真实能力），以及哪些已被真实实现覆盖、哪些已声明却未实例化。用于识别「广告了但没实现」的能力缺口。",
+    inputSchema: {"type":"object","properties":{"includeOverridden":{"type":"boolean","description":"是否一并返回已被真实实现覆盖的子系统（默认 true）"}}}
   },
 
   {

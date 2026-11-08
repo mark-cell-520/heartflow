@@ -1,3 +1,103 @@
+## r251 — 占位子系统诚实记账 + 三个被静默吞掉的 TypeError 调用点修复（v6.8.179）：heartflow_module_health 对 26 个占位空壳 100% 失明，healthScore 从假的 100 降为真实的 84
+
+**轮次**：r251 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（交接簿 r250 notes 候选池①「_stubFactory 31 个占位子系统的「实现或摘除」裁决」）
+**真升级类型**：缺陷修复（3 个真 TypeError + 1 个自检失明）+ 新模块（`src/cortex/` 下 3 个真实实现，317 行非注释代码）+ 新公开方法 `getStubModules()` + 新 MCP 工具 `heartflow_module_stubs`（AGENTS.md 约定 3 三处接线）。MCP 工具 186→187，dispatch 路由 1,317→1,319，判别维度 210 不变（`src/index.js` 零改动）。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision；按轮次协议「优先做交接簿里已知未修的真 bug」选题，全部结论来自本轮实测探针（scripts/tmp-251-probe.js，轮末已删）与源码级核查，无记忆成分。
+- 交接簿（data/upgrade-state.json r250 notes）候选池①原文：「**_stubFactory 31 个占位子系统的「实现或摘除」裁决**（heartflow.js:484，r247 候选池②）——先实测 moduleHealth 现在怎么报它们，再把「占位」诚实暴露；这是 bridge 之后最大的一片「广告了但没实现」。」
+- **轮初证伪实测**（scripts/tmp-251-probe.js，`createHeartFlow().start()` 后逐条核查）：候选①**开着，且比交接簿描述的更严重**——不只是「没暴露」，`heartflow_module_health` 这个 MCP 工具**主动报了假数字**：`{totalModules:162, healthy:162, degraded:0, failed:0, healthScore:100}`，而同期 26 个子系统的 `healthCheck()` 明确返回 `{ok:false, stub:true, reason:'module_not_implemented'}`。同时实测出**三个每次抛 TypeError 被 `/* 非关键 */` 吞掉**的真实调用点（详见第二节）。
+- 另查站点分类：`heartflow.js` 里 48 个 `_stubFactory(` 站点 = **31 个无条件占位**（`_lazy('x', () => _stubFactory('X'))`，无 try-require）+ **17 个 try-require fallback**（GlobalWorkspace/ToMEngine/ForgettingEngine/MultiAgentDialogue/WorldModel/identity 系 6 个/GapExecutor/KnowledgeExplorer/HypothesisDriver/ErrorMemory/DesireCognition，这些有真实实现文件，只在 require 失败时才是 stub）。**本轮只处理 31 个无条件占位**，17 个 fallback 站点不动。
+- **选题结论**：做候选①，范围钉死在「占位子系统的诚实记账 + 有调用方的占位复活」一个主题内——不碰判别引擎（`src/index.js` 零改动）。
+
+### 二、根因/缺口分析（带证据）
+**根因是三个缺陷叠加，让「模块健康自检」对占位空壳系统性失明：**
+
+1. **遍历范围结构性看不见**：`ModuleHealthChecker.check()` 只遍历 `this.hf._modules`，而 31 个占位实例里 **26 个挂在引擎顶层属性**（`hf.mindWanderer`、`hf.innerOS`、`hf.paperIndex`…），从不进 `_modules`。只有 8 个（sufferingResilience/griefEngine/hopeEngine/empathyDeepening/conflictResolution/traumaInformed/postTraumaticGrowth/forgivenessEngine，heartflow.js:4090-4220 显式 `this._modules.xxx = inst`）在册。
+2. **接口检查判不出占位**：`checkModule()` 只查 `destroy`/`stop` 与 `getStats`/`stats` 是否存在，而 stub 类**两个方法都有**（`healthCheck` + `getStats`），`ensureModuleInterfaces()` 还会给缺接口的模块注入 noop——所以即使那 8 个在册的也全判 healthy。
+3. **从不听模块自报**：`checkModule()` 从不调用模块自己的 `healthCheck()`。stub 从 v6.8.115 起就喊着 `{ok:false, stub:true, reason:'module_not_implemented'}`（heartflow.js:461-463 注释：「dispatch 探活无法区分真实现与占位」），但健康检查器不听。
+
+**叠加结果（轮初实测 `getSummary()`）**：`{total:162, healthy:162, degraded:0, failed:0, healthScore:100, getProblematicModules(): []}`——**一个 100 分、零问题模块的健康报告，同期盖着 26 个零能力空壳。**
+
+**同时实测出三个真 TypeError**（调用方调 stub 上不存在的方法，被 `catch(e) { /* 非关键 */ }` 吞掉 → 静默失效）：
+
+| 调用点 | 调的方法 | 轮初实测 | 影响 |
+|---|---|---|---|
+| `src/core/engine-reasoner.js:278` | `hf.taskUrgencyEstimator.estimate(input, {previousUrgency})` | `TypeError: estimate is not a function` | `hf._urgencyEstimate` / `hf._lastUrgency` 恒 undefined，「前置判断输入紧迫性计入上下文」从接线起就是死的 |
+| `src/core/engine-reasoner.js:1106` + `src/core/think-pipeline.js:163` | `hf.learningPulse.beat(tcResult)` | `TypeError: beat is not a function` | 「后置触发自调度学习循环」两条路径都静默失效 |
+| `src/core/self-diagnosis.js:67` + `src/core/what-learned.js:113` | `hf.learningOrchestrator.status()` | `TypeError: status is not a function` | what-learned.js:112 在 try 里 → 整段「⚙️ 学习循环」报告**恒不出现**；self-diagnosis 那一格恒 null |
+
+### 三、落地项
+1. **`src/core/heartflow.js`：`_stubFactory` 加不可伪装标记 + 导出占位清单**（`__heartflowStub` 实例级 + `__heartflowStubClass` 类级；新增 `_STUB_SUBSYSTEM_KEYS` 31 项并在 moduleHealth 实例化前挂到引擎实例）。为什么两层标记：heartflow.js:1844/2697/2717/2737/3802 的 catch fallback 会把 `healthCheck` 换成 `() => ({})`，那时自报渠道就哑了，只有类/实例标记还认得出。
+2. **`src/shield/module-health-checker.js`：四处真修改**——① `checkModule()` 新增 `'stub'` **独立健康档位**（刻意不复用 `failed`：`failed` 会触发 `mod.__disabled = true` + `disabledModules.add()`，把依赖它的运行路径一起禁掉；**诚实记账与不阻断运行不冲突**，这是本题关键设计判断）；② `_detectStub()`：marker 优先，其次听模块自报的 `stub`/`fake` 标记——**刻意不认裸 `ok:false`**（真实模块临时自报不健康，例如知识图谱未连接，是 degraded 而不是「占位」；混为一谈会把健康计数污染成假的）；③ `scanStubSubsystems()`：按 31 项清单逐个查实例，分「占位运行中 / 已有真实实现 / 已声明未实例化」三态，含 3 个别名解析（`phenomenologyEngine→phenomenology`、`eduEngine→_eduEngine`、`taskUrgency→taskUrgencyEstimator`，不列别名会把有实例的误报成未实例化）；④ `getSummary()` 增加 `declaredStubSubsystems` / `stubSubsystemNames` / `uninstantiatedSubsystems` / `implementedRatio` / `honestNote`——**honestNote 明说 healthScore 只覆盖 `_modules` 那 162 个，不涵盖广告出去的全部能力**。
+3. **新公开方法 `getStubModules()`**：返回 declared / stubCount / overriddenCount / uninstantiatedCount / stubs（带 resolvedFrom、stubClass、detectedVia、reason）/ overridden / uninstantiated / measured。
+4. **新增 `src/cortex/task-urgency-estimator.js`**（121 行非注释代码）：`estimate(input, {previousUrgency})` → `{urgency, level, signals, previousUrgency, smoothed, markerCount, baseline, inferred}`。9 类紧迫语族 × 4 类反向语族 + 标点/全大写/重复加权；五档分级（critical/high/moderate/low/minimal）；惯性平滑（`INERTIA=0.25`）但**强反向信号不被抹平**；零信号时 `inferred:'baseline_only'` 如实标注，不假装测过。
+5. **新增 `src/cortex/learning-pulse.js`**（104 行非注释代码）：`beat(result)` 记一拍（type/confidence/hasOutput/chainLength/hasDecision，按 type 分桶），`suggest()` 从拍子里提炼调度建议（低置信度聚集 / 静默失败 / 浅推理三条判据），`getStats()` 供 self-diagnosis 读。**拍子不足时返回 null，不为了有产出硬编建议**。
+6. **新增 `src/cortex/learning-orchestrator.js`**（92 行非注释代码）：`status()` 汇总 detect（continuousLearner）/ explore（knowledgeExplorer）/ absorb（experienceDistiller）三段真实计数 + 三段联动判定 + healthScore；**子系统缺失或抛错时字段为 null 而不是编数**（`_stat()` 全路径 try/catch，不让巡检自己崩）。
+7. **`heartflow.js` 三个 `_lazy` 站点改真加载**：`taskUrgency` / `learningPulse` / `learningOrchestrator` 从 `_stubFactory(...)` 改为 `try{require('../cortex/x.js')}catch{_stubFactory(...)}`（保留 fallback 语义，require 失败仍不阻断启动）。
+8. **新增 MCP 工具 `heartflow_module_stubs`**（约定 3 三处接线）：`src/mcp/tools-registry.js` 工具定义（含 `includeOverridden` 参数）+ `src/mcp-server.js` handler 映射 + handler 函数 `handleModuleStubs()`。handler **优先读引擎常驻实例的 `moduleHealth`**，不另建 checker——那会拿一个没绑 `_stubSubsystemKeys` 的 hf 副本扫出假数据。`heartflow_module_health` 的工具描述同步补「含占位子系统的诚实计数」。
+9. **版本 6.8.178 → 6.8.179**，`sync-version.js` + `sync-doc-numbers.js` 已跑；MCP 工具 186→187、dispatch 路由 1,317→1,319 由 sync 脚本机器记账到 README/SKILL/package.json/AGENTS.md；README Version history 补 v6.8.179 行。
+10. **新测试 `test/round-251-stub-accountability.test.js`（25 断言全绿）**：A 族 6 条（31 个无一漏报 / 三态合计恰 31 / 检测途径合法 / healthScore 从 100 降为 84 / getProblematicModules 从恒 [] 到列出 26 个 / stub 不触发 `__disabled`）/ B 族 8 条（三个模块从 TypeError 到真实工作，含分级 12/12、良性零误报、平滑、数据不足不硬编、健康自报）/ C 族 3 条（真实调用链路端到端：`_urgencyEstimate` 不再恒 undefined、what-learned 契约字段全可读、self-diagnosis 读法不抛）/ D 族 6 条（回归：三招牌入口、维度 210、标记不可伪装、`_initErrors` 零新增、bridge 兄弟路由、MCP 三处接线）/ E 族 2 条（工具注册表 187 含新工具 + 独立子进程端到端）。
+11. **剩余 28 个无调用方的占位子系统只做诚实暴露、不实现**——全仓 grep 实测它们的方法引用数为 0（patternTracer/metacognitiveFeedback/experienceValidator/innerOS/paperIndex/codeExecutor/codePlanner/codeWriter/llmOrchestrator 均 0）。没有调用方的占位是死代码广告，**正确处置是标记而非继续投入**。这是「实现或摘除」裁决中「摘除」一侧的落地：把它们从「假装健康的模块」降级为「如实登记的缺口」。
+
+### 四、验收数字（全部实测）
+| 项 | 轮前 | 轮后 | 实测方式 |
+|---|---|---|---|
+| `heartflow_module_health` 的 `healthScore` | **100（假）** | **84（真）** | test A4；`hf.moduleHealth.getSummary()` |
+| `getProblematicModules()` | 恒 `[]` | 列出 **26 个**占位模块 | test A5 |
+| 31 个已声明占位子系统 | **0 个可见** | **31 个全部有交代**（三态合计恰 31） | test A1；`getStubModules()` |
+| 三个复活子系统 | 3 个在 stub 清单 | `overriddenCount` **0→3**，真实实现占比 **0%→10%** | test A2/E2 |
+| `taskUrgencyEstimator.estimate()` | `TypeError` | 五档分级 **12/12**（含「今天天气不错」不再误判 moderate） | test B1/B2 |
+| `hf._urgencyEstimate` | 恒 undefined | 真实赋值 `{urgency, level, signals…}` | test C1 |
+| `learningPulse.beat()` / `.suggest()` | `TypeError` | 记账 + 有据可依的建议（低置信度聚集判 high） | test B4/B5 |
+| `learningOrchestrator.status()` | `TypeError` | 三段计数 `detect:1652` + linkage + healthScore | test B6/B7 |
+| what-learned 的「⚙️ 学习循环」报告 | 恒不出现 | 契约字段全部可读 | test C2 |
+| 良性句误报 | — | 4 句全判 minimal/low，且标 `baseline_only` | test B2 |
+| `disabledModules` | `[]` | 仍为 `[]`（stub 不触发禁用） | test A6 |
+| MCP 工具数 | 186 | **187** | sync-doc-numbers.js 机器记账；test E1 |
+| dispatch 路由 | 1,317 | **1,319** | sync-doc-numbers.js |
+| 判别维度 | 210 | **210 不变** | guard-abilities 第 8 项 |
+| 新增非注释代码 | — | **317 行**（3 个新模块）+ checker/mcp-server 增量 | `node -e` 逐文件统计 |
+| `bin/verify.js` | — | **16/16** | — |
+| bidirectional-guard | — | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r250 基线逐项一致） | — |
+| guard-abilities | — | **20/20**（dimensions 键 210 不变） | — |
+| doc-numbers-accuracy | — | **24/24**（README Version history 补 v6.8.179 行后转绿） | — |
+| security-audit | — | 提交前 **15/16**（S2「git log/tag 未命中 6.8.179」为提交前预期失败，r236~r250 同款） | — |
+| 本轮新测试 | — | round-251 **25/25** | test/round-251-stub-accountability.test.js |
+
+### 五、全量回归与计数
+全量回归 **19403 通过 / 155 失败 / 共 19558 个**（654 个测试文件，`data/round-251-regression.log`，实测耗时 1421.0s）。
+对照基线 **r250（data/round-250-regression.log）：19360 / 155 / 19515**（653 文件）：failed **155 → 155（持平）**、passed **19360 → 19403（+43）**、total 19515 → 19558（+43）。
+
+**失败文件清单逐项比对（`comm`，本轮最硬的一条）**：r250 基线 **76 个**失败文件，本轮清单 **75 个**——
+- **本轮新增失败文件：0 个**
+- **本轮消失：1 个**（`round-241-stat-context-positional.test.js`，即 r250 报告里登记的那两个并发池 CHILD_TIMEOUT 抖动之一——单独复跑 19/19 全绿但单跑 71.5s 被 SIGKILL，本轮未再抖动）
+- **本轮新测试 `round-251-stub-accountability.test.js` 不在失败清单**（25/25）
+
+passed +43 的构成：本轮新测试 25 条断言 + r241 复绿的 19 条 - 文件数/口径波动的净差。**断言级零新增失败。**
+
+噪声池构成与 r250 同族（全部存量，逐项比对无一带消失说明噪声池稳定）：MCP 类 6 个（knowledge-graph-mcp-state-round593 / knowledge-layer-mcp-state-round313 / mcp-auth-tier / mcp-guest-permission / mcp-server / mcp-smoke，8099 端口被常驻服务占用）+ 未输出汇总行类 40 余个 + 注册 0 用例类（core/path-guard、round-410）+ Command failed 类 dispatch 族 + 文件自报失败类（ClassicsRules searchClassicsBatch、AgentBoundaryGuard dot-dir、unsupported-claim-exemption、round-378 dimensionRaw）。
+
+**落在本轮改动上的回归为零**：双向门禁召回 52/52 不降、误拦 302/326 不升；`guard-abilities` 20/20（dimensions 键 210 不变）；`bin/verify.js` 16/16；`doc-numbers-accuracy` 24/24；良性句在紧迫度线零误报（test B2）；bridge 九条兄弟路由仍给出真实输出（test D5）；`_initErrors` 零新增（test D4）。
+
+### 六、已知未修（含为什么不修）
+1. **剩余 28 个无调用方的占位子系统仍是空壳**（mindWanderer/phenomenologyEngine/innerOS/paperIndex/experienceDistiller/skillGenerator/codeExecutor/codePlanner/codeWriter/sufferingResilience/griefEngine/hopeEngine/empathyDeepening/conflictResolution/traumaInformed/postTraumaticGrowth/forgivenessEngine/llmOrchestrator/eduEngine/cognitiveLoadV2/psychologyDialogue/adaptivePlanner/hierarchicalPlanner/metacognitiveFeedback/experienceValidator/patternTracer/worldLandscape/processRewardModel）。不修的原因：全仓 grep 实测它们的方法引用数为 0，实现它们等于给死代码广告添功能；本轮已把它们如实登记进 `heartflow_module_stubs`，**下一轮该做的是「摘除」而不是「实现」**——摘除要连带清理 31 个 `_lazy` 声明 + 实例化点 + MCP 能力清单里的对应项，是独立的主题轮。
+2. **`worldLandscape` / `processRewardModel` 走 `self_report` 途径识别**（有文件但 `healthCheck()` 自报 `{ok:false, fake:true, reason:'假桥接类，无真实实现'}`）。这两个文件存在，只是实现是空壳；本轮只做识别，不动文件。
+3. **`heartflow_translate` 的 `tone.tone` 兼容别名**（r249 G2 挂账，r250 续挂，本轮继续挂）——外部调用方契约，无仓内调用方，留给真正出现外部调用方时再做。
+4. **判别引擎侧六条挂账原样继承**（本轮 `src/index.js` 零改动）：⑨族裸标记位置化（r225 纪律）、`PC_RITE_MECH_ZH` 仪式族位置化（r239 G3）、`PC_DRUG_MECH_ZH`/`PC_SUPP_MECH_ZH` 跨表统一（r236 G2 后半）、lastIndex 防空匹配防护前移、`scripts/negative-test-rc-temporal-causal-r364.js` 临时目录隔离、r71 测试 G 节 idx4 zh 侧句式缺口。
+
+**下一轮候选池（按优先级）**：
+① **28 个无调用方占位子系统的「摘除」**（heartflow.js 的 31 项 `_STUB_SUBSYSTEM_KEYS` 现已逐名列名，`heartflow_module_stubs` 可直接拉清单）——摘除要连带清理 `_lazy` 声明 + 实例化点 + MCP 能力清单对应项，且必须保证 `_initErrors` 与 dispatch 路由表不出现悬空引用；这是 r251 诚实记账的直接续篇，也是候选池里唯一「减法」条目。
+② `heartflow_translate` 的 `tone.tone` 兼容别名。
+③~⑧ 判别引擎侧六条挂账原样继承。
+
+### 七、踩坑
+1. **`_detectStub` 首版把裸 `ok:false` 也判成 stub**，会把真实模块的临时不健康（如知识图谱未连接）误归类成占位，污染健康计数。改为只认 `stub`/`fake` 标记——**「占位」是能力缺失，「不健康」是运行状态，两者不能混**。
+2. **「今天天气不错」被旧的无条件 deadline 词判成 moderate**（urgency 0.5）。根因是 `/(今天|今晚|日前|截止|…)/i` 这类词单独出现多半只是在说时间，不是催。改成要求同句还有压力词（「今天**要交**」才算 deadline），并把 BASELINE 从 0.30 降到 0.15——**无信号的陌生输入不该落在 moderate 档**。
+3. **用 Python 脚本做正则替换时转义没匹配上**（`\\b` 在 heredoc 里被吞），文件看似改完实际未变，复测仍失败才发现。改用 Edit 工具直改。
+4. **测试首版从 `src/index.js` 取 `checkInput` 拿到 undefined**——三个招牌入口在 `src/gate.js` 导出，`src/index.js` 不是入口（r250 测试用的是 `src/gate.js`，本轮照抄错了）。
+5. **测试首版用正则数 `tools-registry.js` 里的工具定义只得 72 个**，误判新工具没写进去。实际 `tools-registry.js` 导出时 `TOOLS.concat(_EXTENDED)`（`_EXTENDED` 来自 `extended-tools.js`），**require 后才是 187**。数工具必须 require，不能 grep 单文件。
+
 ## r250 — bridge 交流层九个 stub 路由复活（v6.8.178）：九条广告出去的能力恒返回常量，本轮逐个接上真实实现 + 新 MCP 工具 heartflow_llm_pipeline_check
 
 **轮次**：r250 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（交接簿 r249 notes 候选池①「src/bridge/ 下九个 stub 有、文件没有的模块」）

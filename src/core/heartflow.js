@@ -481,7 +481,37 @@ const _ConsciousnessSelfModel = _lazy('consciousnessSelfModel', () => {
 // [AUDIT-FIX 2026-11-02] stub 健康态诚实化：原 healthCheck 恒返回 {ok:true}，
 // 24 个占位子系统/45 条路由「零能力报健康」，dispatch 探活无法区分真实现与占位。
 // 现返回 stub:true 标记 + 说明，调用方可识别占位模块。
-function _stubFactory(name) { return { [name]: class { constructor() { this.healthCheck = () => ({ ok: false, stub: true, reason: 'module_not_implemented: 占位模块，无真实能力，仅防启动崩溃' }); this.getStats = () => ({ stub: true }); } } }; }
+// [r251] 再加一层不可伪装标记：__heartflowStub / __stubClass 挂在实例与原型上，
+// 让模块健康巡检（src/shield/module-health-checker.js）不必依赖调用方是否老实
+// 实现 healthCheck —— 有些实例化点的 catch fallback 会把 healthCheck 换成
+// () => ({})（L1844/L2697/L2717/L2737/L3802），那时自报渠道就哑了。
+function _stubFactory(name) {
+  const StubClass = class {
+    constructor() {
+      this.healthCheck = () => ({ ok: false, stub: true, reason: 'module_not_implemented: 占位模块，无真实能力，仅防启动崩溃' });
+      this.getStats = () => ({ stub: true });
+      this.__heartflowStub = true;
+      this.__stubClass = name;
+    }
+  };
+  StubClass.__heartflowStubClass = true;
+  return { [name]: StubClass };
+}
+
+// [r251] 已声明的占位子系统清单（_stubFactory 无条件占位的 31 个 lazy key）。
+// 模块健康巡检拿它做「已声明但没实现」的诚实记账：逐个查引擎实例，
+// 分「占位运行中 / 被 fallback 覆盖 / 已声明未实例化」三态如实报。
+// 注意：这里不含 try-require 型 fallback 站点（GlobalWorkspace/ToMEngine/…），
+// 那些有真实实现文件，只在 require 失败时才是 stub。
+const _STUB_SUBSYSTEM_KEYS = [
+  'mindWanderer', 'phenomenologyEngine', 'innerOS', 'paperIndex', 'experienceDistiller',
+  'skillGenerator', 'codeExecutor', 'codePlanner', 'codeWriter', 'sufferingResilience',
+  'griefEngine', 'hopeEngine', 'empathyDeepening', 'conflictResolution', 'traumaInformed',
+  'postTraumaticGrowth', 'forgivenessEngine', 'llmOrchestrator', 'eduEngine',
+  'cognitiveLoadV2', 'psychologyDialogue', 'adaptivePlanner', 'hierarchicalPlanner',
+  'metacognitiveFeedback', 'experienceValidator', 'learningOrchestrator', 'learningPulse',
+  'taskUrgency', 'patternTracer', 'worldLandscape', 'processRewardModel'
+];
 
 // [AUDIT-FIX 2026-09-21 CRITICAL] Consciousness Layer 缺失的 _lazy 声明
 // 原代码引用 _GlobalWorkspace/_MindWanderer/_PhenomenologyEngine 但从未定义，
@@ -608,9 +638,14 @@ const _GapExecutor = _lazy('gapExecutor', () => { try { return require('../corte
 // globalThis 假桥接类（无 getGaps/registerGap），每次调用撞 TypeError 被静默
 // catch 吞掉。已从 59251371^ 取回真实现，这里改成真加载。
 const _KnowledgeExplorer = _lazy('knowledgeExplorer', () => { try { return require('../cortex/knowledge-explorer.js'); } catch(e) { return _stubFactory('KnowledgeExplorer'); } });
-const _LearningOrchestrator = _lazy('learningOrchestrator', () => _stubFactory('LearningOrchestrator'));
-const _LearningPulse = _lazy('learningPulse', () => _stubFactory('LearningPulse'));
-const _TaskUrgency = _lazy('taskUrgency', () => _stubFactory('TaskUrgencyEstimator'));
+// [r251] 三个有真实调用方的占位子系统本轮接上真实实现：
+//   taskUrgency          ← engine-reasoner.js:278 .estimate()  （此前 TypeError 被吞）
+//   learningPulse        ← engine-reasoner.js:1106 / think-pipeline.js:163 .beat()
+//   learningOrchestrator ← self-diagnosis.js:67 / what-learned.js:113 .status()
+// 三个文件都在 src/cortex/ 下，均为纯规则零依赖。require 失败仍退回 stub 保启动。
+const _LearningOrchestrator = _lazy('learningOrchestrator', () => { try { return require('../cortex/learning-orchestrator.js'); } catch(e) { return _stubFactory('LearningOrchestrator'); } });
+const _LearningPulse = _lazy('learningPulse', () => { try { return require('../cortex/learning-pulse.js'); } catch(e) { return _stubFactory('LearningPulse'); } });
+const _TaskUrgency = _lazy('taskUrgency', () => { try { return require('../cortex/task-urgency-estimator.js'); } catch(e) { return _stubFactory('TaskUrgencyEstimator'); } });
 const _HypothesisDriver = _lazy('hypothesisDriver', () => { try { return require('../cortex/hypothesis-tester.js'); } catch(e) { return _stubFactory('HypothesisDriver'); } });
 const _ErrorMemory = _lazy('errorMemory', () => { try { return require('../error-memory.js'); } catch(e) { return _stubFactory('ErrorMemory'); } });
 // [r402] 误报反馈闭环：MCP 层 v6.7.72 已接（heartflow_false_positive），引擎侧
@@ -861,7 +896,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-08-6.8.178';
+const BUILD_DATE = '2026-11-08-6.8.179';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -3130,6 +3165,9 @@ class HeartFlow {
         const _mhc = _ModuleHealthChecker();
         const _Mod = _mhc && _mhc.ModuleHealthChecker;
         if (typeof _Mod === 'function') {
+          // [r251] 占位子系统清单必须在 new 之前挂上：ModuleHealthChecker 的
+          // scanStubSubsystems() 读 this.hf._stubSubsystemKeys，晚一步挂就扫不到。
+          if (!this._stubSubsystemKeys) this._stubSubsystemKeys = _STUB_SUBSYSTEM_KEYS;
           this.moduleHealth = new _Mod(this);
           this._modules['moduleHealth'] = this.moduleHealth;
         } else {
