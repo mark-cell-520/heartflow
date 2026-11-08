@@ -1,7 +1,7 @@
 ---
 name: heartflow-engine
 title: "HeartFlow — AGI Layer 1: The Discriminator"
-version: "6.8.170"
+version: "6.8.171"
 description: |-
   HeartFlow is the first layer of AGI — the discriminator. A pure rule engine that
   judges whether a statement or an action is right, wrong, safe, or dangerous before
@@ -77,12 +77,12 @@ person without pain receptors.
 
 ## Verified metrics
 
-Every number below was measured on this repository at v6.8.170. Nothing here is copied
+Every number below was measured on this repository at v6.8.171. Nothing here is copied
 from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.170 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.171 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Modules registered | 162 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
 | Dispatch routes | 1,316 | sum of entries in `hf.routes()` |

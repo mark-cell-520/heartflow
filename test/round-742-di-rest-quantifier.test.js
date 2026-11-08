@@ -181,8 +181,8 @@ test('P2 量词表已补 其余性量词族（r742 五词 + r743 补 其它|剩�
     'P2 marker 下一行必须是正则行（r735 extractPatternLine 依赖）');
 });
 test('P4 修饰槽重构 + 量词表补 the rest of 已接线', () => {
-  assert.ok(SRC.includes('(?:(?:the\\s+)?(?:other|remaining|rest)\\s+)?'),
-    'P4 其余性修饰组应已接线');
+  assert.ok(SRC.includes('(?:the\\s+)?(?:(?:other|remaining|rest)\\s+)?'),
+    'P4 其余性修饰组应已接线（r744 the 独立槽重构后新组形态）');
   assert.ok(SRC.includes('the\\s+rest\\s+of(?:\\s+the)?'),
     'P4 量词表应补 the rest of (the)');
   const lines = SRC.split('\n');

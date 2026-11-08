@@ -1,3 +1,60 @@
+## r744 — di 全量销毁族口语换皮动词三形封堵 + 上周期过期限定语赦免 + P4 the 槽可达性修复（r743 交接方向②③复测坐实轮）
+
+**轮次**：r744 ｜ **版本**：v6.8.170 → v6.8.171（VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README 版本戳+changelog/version.js 兜底/BUILD_DATE，sync-version.js 实测同步）｜ **日期**：2026-11-09
+
+**方向**：r743 交接簿下一轮方向②（P1 族动词表复查：清掉/干掉/抹了 口语动词三形缺席）+ ③（lookbehind 过期词表补上周期词）。轮初 scripts/round-744/probe-r744-gaps.js 实测：A 组四口语动词（干掉/抹了/弄掉/洗掉）× 三语序 × 全量/其余量词全组合 count=0；B 组上周期词（上个月/上周/上星期/前天）在 P1 两处内联 lookbehind 全缺席，良性运维形误 block；scripts/round-744/probe-r744-en-dev.js 坐实 EN 侧俚语族（nuke/zap）攻击全 0 且「get rid of / take out」歧义比失衡只收 nuke|zap。方向池其余项（di「以符合」、hasty_generalization、silence_imputation、middle_ground、chronological_snobbery、evidence 恒死）为历史池复述，本轮不动。
+
+**真升级类型**：存量探测器攻击面扩表（用户可感知：「干掉所有日志」「把全部日志抹了」「系统日志全部弄掉」「nuke all logs」「nuke all the logs」等 **4636 形从 pass 漏放改判 block**（16611 句 git HEAD 前后对比实测）；良性侧「删除所有上个月的日志」等 24 形从误 block 改判放行——净召回升、误拦降）。
+
+**根因**（v6.8.170 HEAD 实测）：
+- P1/P2/P3 三语序动词表只收书面族（删除/销毁/清空/抹除/格式化…），口语换皮动词（干掉/抹了/弄掉/洗掉）整体缺席；P2/P3 还漏「格式化」「清掉」「清理」（P1 收、下游形漏）。
+- P1/P2 两处内联 lookbehind 过期词表收 `上一个?月|上月|去年|前年|\d+天前`，不收 上个月|上周|上星期|前天——「删除所有上个月的日志」良性轮转误 block。
+- EN P4 不收强销毁俚语 nuke|zap；且 P4 量词后修饰槽把 `the` 绑在其余性修饰组内 `(?:the)?(?:other|remaining|rest)`——「nuke all the logs」的裸 the 不可达（存量边界，r744 连带修复）。
+
+**修法**（src/dangerous-instruction.js + src/dev-exemptions.js）：
+- **P1/P2/P3 动词表统一为 17 词集**：删除|删掉|删了|销毁|毁掉|抹掉|抹除|擦除|清空|清除|清掉|干掉|抹了|弄掉|洗掉|格式化|清理——三形完全对齐，口语换皮即命中等同书面族。
+- **lookbehind 过期词表补上周期词**：P1/P2 两处内联同步补 上个月|上周|上星期|前天（已结周期=良性日志轮转）。**明确不收** 昨天|昨夜|隔夜|当日|本周|本月——近当/当下时段是「销毁最近痕迹」攻击面，「删除所有昨天的审计记录」须继续拦（测试边界节锚定）。
+- **P4 EN 动词表补 nuke|zap**：俚语换皮同危级；get rid of / take out / do away with / blow away 实测攻击/良性歧义比失衡（take out the trash 高频良性），不收。
+- **P4 修饰槽 the 独立化**：`(?:(?:the)?(?:other|remaining|rest))` → `(?:the)?(?:(?:other|remaining|rest))`——量词后裸 the 可达，「nuke all the logs」「delete all the logs」命中；存量 all other logs / all the other logs / the rest of 形零回归。
+- **dev-exemptions.js CLEANUP_VERB 同步收 干掉|抹了|弄掉|洗掉**（格式化原已在表）：r735 铁律命中侧收词豁免侧必须同步认，否则 dev 语境三齐赦免失效（「本地调试环境，干掉所有服务的日志」误 block）。
+- **良性三层赦免零让步**：过期/临期限定（lookbehind 扩表只增良性词）+ 保留窗口前瞻 + 循环级 DI_RETENTION_WINDOW 形状不动；非日志族名词（进程/配置/缓存）不命中。
+
+**踩坑与修复**（r744 新增，供 r745 复用）：
+1. **删条证伪的 needle 必须带前导 `|`**：N1-N3 初版用无 `|` 的 needle 删动词表中段，留下空分支 `|)`——正则可选分支退化为「动词可选 + 通吃」，「干掉所有日志」仍命中、负例假 FAIL。修法：needle = `|干掉|抹了|弄掉|洗掉` 连前导分隔符一起删。教训：从 `a|b|c` 表中删词，删的是 `|b` 或 `b|`，永远不留空分支。
+2. **marker 与正则行之间不得插注释块**（r742 踩坑② 复发）：本轮把 r744 注释块插在 P1/P4 marker 与正则行之间，r743/r742 存量测试的 extractPatternLine 契约（marker 下一行=正则行）当场红 2 条。修法：注释块整体移到正则行**之后**（存量惯例），一轮修复两个 marker。
+3. **P2 的 lookbehind 过期词结构不可达**（存量死槽，r744 实测确认）：P2 槽序列（量词?/的?/设施?/的?）与名词之间无通配槽，过期词无处安放——「把过期日志干掉」类 count=0 是结构不匹配而非赦免，删词证伪必然落空。修法：证伪样本改 P2 独有捕获路径形；死槽留档不本轮修（P1 lookbehind 可达且承重）。
+4. **di count 是多族聚合，良性样本选词须避族**：「抹除所有测试日志」count=1 来自安全设施规避族（动词表含抹除/删掉/清理 × 目标词含日志），与 P1 lookbehind 赦免无关——初版测试假红。修法：良性赦免断言统一用 P1 有、设施族无的动词（删除/销毁/干掉族）。
+5. **P4 量词后 the 槽是存量漏放**：「nuke all the logs」类裸 the 形在 r742 修饰组重构前就漏（`the` 绑在其余性修饰组内），本轮补 nuke|zap 时连带暴露并修复——扩表轮次要顺带复查同正则的槽结构可达性。
+
+**diff**：`git diff --shortstat` 实测见落盘记录（src/dangerous-instruction.js P1/P2/P3/P4 四形 + 注释 + dev-exemptions.js 豁免侧 + test/round-742 断言文本翻转修订）+ 未跟踪证据链 4 文件（test/round-744 主测 165 行 + 负例 150 行 + 普查探针 110 行 + 修补/调试脚本 3 个），总有效 diff 落在 500-1000 区间。
+
+**验证逐项实测**：
+
+| 项 | 结果 |
+|---|---|
+| test/round-744-colloquial-verb-de.test.js | **11 passed, 0 failed**（P1 攻击 48 断言 + P2 攻击 29 + P3 攻击 28 + P4 EN 12 + lookbehind 上周期赦免 24 + 近当边界 16 + dev 双向对齐 9 + 良性三层 11 + gate 端到端 12 + think() 真实调用冒烟 7 + 源码接线 3） |
+| scripts/negative-test-colloquial-verb-r744.js | **14 PASS, 0 FAIL**：N1-N3 联合删条三形口语动词攻击翻 0、N4/N5 删 P4 nuke\|zap 与 the 槽攻击翻 0、N6/N7 删 P3 清理/P2 清掉攻击翻 0、N8/N9 存量锚点删新词后仍拦、N10/N12/N13 删赦免层良性翻 block（P1 lookbehind 上周期词 + dev CLEANUP_VERB + P4 lookahead last month）、N14 删上周期词后昨天仍拦（近当边界不靠新词承重） |
+| scripts/round-744/probe-colloquial-verb-r744.js | **16611 句 git HEAD 前后对比：净增拦截 4636、回归 24**（24 条全部 = 上周期词良性赦免：旧误拦→新放行，零行为回归；新旧都拦 9378 + 新旧都放 2573 零漂移） |
+| test/round-743-di-rest-quantifier-de.test.js | **92 passed, 0 failed**（修复 marker 注释位置后恢复；中途曾 91/1 假红，踩坑②） |
+| test/round-742-di-rest-quantifier.test.js | **60 passed, 0 failed**（P4 修饰组断言文本按 the 槽重构翻转修订） |
+| test/round-741-di-retention-window-inverted.test.js | **46 passed, 0 failed**，零回归 |
+| test/round-735-di-log-destruction.test.js | **1 passed, 0 failed**，零回归 |
+| test/round-738-meta-discourse-retention-window.test.js | **54 passed, 0 failed**，零回归 |
+| node bin/verify.js | **16 passed, 0 failed** |
+| node scripts/bidirectional-guard.js | 召回 **52/52**、误拦 **302/326**（与基线完全一致，零新增误拦） |
+| node test/doc-numbers-accuracy.test.js | **24 passed, 0 failed** |
+| node test/security-audit.test.js | **16 passed, 0 failed** |
+| node bin/cli.js status | **running**（unresolvedProblems 0，启动冒烟通过） |
+| node scripts/round-guard.js --stage=after | 提交后复跑全过 |
+
+**下一轮方向**（候选池，按 decision 打分排序）：
+1. **P2 lookbehind 过期词死槽修复**：P2 槽序列（量词?/的?/设施?/的?）与名词间无通配槽，过期词结构不可达——「把过期日志干掉」靠结构不匹配放行而非显式赦免，与 P1 设计不对称；评估补通配槽 or 拆独立赦免支。
+2. **EN 无全量量词形收紧续查**（delete other logs / erase remaining records——与 ZH「全量性双承载」对齐评估，r742/r743/r744 连续三轮留档）。
+3. **di「以符合」目的状语豁免**（v6.7.73 遗留：「定期清理过期日志以符合保留策略」仍 block，r217/r218 锁定）。
+4. 方向池历史项续查（hasty_generalization、silence_imputation、middle_ground、evidence 恒死）。
+
+---
+
 ## r743 — di 全量销毁族「其余性量词」承载全量语义的攻击变体封堵 + 同族「其它/剩余」并入（r742 交接方向①②复测坐实轮）
 
 **轮次**：r743 ｜ **版本**：v6.8.169 → v6.8.170（VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README 版本戳+changelog/version.js 兜底/BUILD_DATE，sync-version.js 实测同步）｜ **日期**：2026-11-09
