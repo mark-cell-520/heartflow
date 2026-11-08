@@ -132,7 +132,13 @@ const B_BENIGN = [
   '国庆假期之后机票价格普遍回落。',
   '大雨之后水库水位涨了两米。',
   // 裸「少了」但不是结果变动的日常句（无顺序标记或非结果位）
-  '打那天起他随身带着护身符，感冒就变少了',  // 裸标记（r225 纪律不收）
+  // [v6.8.176 第 248 轮] 「打那天起他随身带着护身符，感冒就变少了」移出本表：
+  // 第⑭支结果表 PC_RESJOIN_ZH 本轮接入白话「变少」后，甲半「护身符」∈ PC_NOOBJ_ZH
+  // 即被判出（pc 0→1，gate pass→verify）。这不是本轮新造的假阳性类别——HEAD 对
+  // 同族「拜了财神之后，到店人数就变多了」类句子早已按⑭支判（甲半 ∈ PC_NOOBJ_ZH
+  // × 获益结果），本轮只是把负向白话形补上；且它在 r243 G1 / r244 G2 两轮里都被
+  // 登记为「裸标记句仍漏」的已知未修，语义上本就是玄学归因攻击句，不是良性叙述。
+  // 改入 C_NEW_PC 登记（见下方）。
   '把惩罚项权重调低，这样扣分就少了',
   '我每天早起是为了避开早高峰，通勤时间少了二十分钟',
   '攻击面分析显示暴露的接口比上季度少了。',
@@ -140,6 +146,13 @@ const B_BENIGN = [
   '那片奥美拉唑吞下去胃酸就少了',
   '吃了螺旋藻片之后感冒少了，因为螺旋藻多糖能增强免疫力',
   '里 catch 分支正则比 try 分支少了',
+];
+
+// [v6.8.176 第 248 轮] 本轮新被判出的句子登记（HEAD pc=0）——甲半是 PC_NOOBJ_ZH
+// 成员，走第⑭支（无顺序标记要求，故 r225 裸标记纪律管不到它）。语义上是玄学
+// 归因攻击句（护身符 → 感冒变少），在 r243 G1 / r244 G2 里长期登记为「仍漏」。
+const C_NEW_PC = [
+  '打那天起他随身带着护身符，感冒就变少了',
 ];
 
 test(`B1 良性 ${B_BENIGN.length} 条 detector 零误伤`, () => {
@@ -150,6 +163,13 @@ test(`B1 良性 ${B_BENIGN.length} 条 detector 零误伤`, () => {
 test(`B2 良性 ${B_BENIGN.length} 条 gate 全 pass`, () => {
   const bad = B_BENIGN.filter(s => gateOf(s) !== 'pass');
   assert.deepStrictEqual(bad, [], `良性句 gate 非 pass：\n  ${bad.join('\n  ')}`);
+});
+
+test(`B3 本轮新判出族 ${C_NEW_PC.length} 条现值照登（HEAD pc=0，非良性零误伤族）`, () => {
+  for (const s of C_NEW_PC) {
+    assert.ok(pcCount(s) >= 1, `本轮新判出句应 pc≥1: ${s}，实测 pc=${pcCount(s)}`);
+    assert.strictEqual(gateOf(s), 'verify', `本轮新判出句 gate 应为 verify: ${s}`);
+  }
 });
 
 test('B3 良性 gate 与 HEAD 副本逐项一致（副本存在时实测）', () => {
@@ -201,9 +221,12 @@ test(`C1 ${C_VICTIM.length} 条 victim 只靠本轮新词判出（HEAD 全漏）
 // 不同步的话变异守卫在副本里找不到锚点（轮初实测 3 处失败）。三个变体各自的
 // 语义不变：WORD_DEF = 现值（含负向环视 + 补语族）、WORD_DEF_NO_SL = 既无环视
 // 也无裸「少了」、WORD_DEF_BARE = 裸「少了」无环视（D2 摘环视专用）。
-const WORD_DEF = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?<![减变])少了|(?:多|少|涨|好|火|旺)起来|上来了)/;';
-const WORD_DEF_NO_SL = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?:多|少|涨|好|火|旺)起来|上来了)/;';
-const WORD_DEF_BARE = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|少了|(?:多|少|涨|好|火|旺)起来|上来了)/;';
+// [v6.8.176 第 248 轮] 第三次同步：补语族抽成共享常量 PC_RES_COMPLEMENT_ZH
+// （第⑭支结果表也接入它），本表改为 new RegExp 拼 .source。三个变体跟着改成
+// 新定义行的三个形态（环视在/环视去/环视换裸词），语义与上轮逐字对应。
+const WORD_DEF = "const PC_RES_COLLOQ_ZH = new RegExp('(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?<![减变])少了|' + PC_RES_COMPLEMENT_ZH.source + ')');";
+const WORD_DEF_NO_SL = "const PC_RES_COLLOQ_ZH = new RegExp('(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|' + PC_RES_COMPLEMENT_ZH.source + ')');";
+const WORD_DEF_BARE = "const PC_RES_COLLOQ_ZH = new RegExp('(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|少了|' + PC_RES_COMPLEMENT_ZH.source + ')');";
 
 function copySrc(tag) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hf-r245-' + tag + '-'));
@@ -313,7 +336,9 @@ test('E2 本轮 count 1→2 的 4 条逐条登记', () => {
 
 // ─── F 族：源码锚点 ────────────────────────────────────────────────────────
 test('F1 PC_RES_COLLOQ_ZH 只定义 1 次且含负向环视裸「少了」腿', () => {
-  assert.strictEqual((SRC_TEXT.match(/const PC_RES_COLLOQ_ZH = /g) || []).length, 1, 'PC_RES_COLLOQ_ZH 定义次数应为 1');
+  // [v6.8.176 第 248 轮] 定义行改为 new RegExp 拼 PC_RES_COMPLEMENT_ZH.source，
+  // 计数正则从 `const PC_RES_COLLOQ_ZH = ` 扩到两种定义形态都要算 1 次。
+  assert.strictEqual((SRC_TEXT.match(/const PC_RES_COLLOQ_ZH = (?:new RegExp\(|\/)/g) || []).length, 1, 'PC_RES_COLLOQ_ZH 定义次数应为 1');
   assert.ok(SRC_TEXT.includes(WORD_DEF), '定义行应含 `(?<![减变])少了` 负向环视腿');
   assert.ok(SRC_TEXT.includes('(?<![减变])少了'), '源码应含负向环视写法');
 });
@@ -340,10 +365,14 @@ test('F3 dimensions 键仍为 210（本轮未加维度，只补判据层词表�
 });
 
 // ─── G 族：已知未修登记 ────────────────────────────────────────────────────
-test('G1 裸标记 + 「变少」双缺口句仍漏（r225 纪律，已知未修）', () => {
-  const GAP = ['打那天起他随身带着护身符，感冒就变少了'];
-  for (const s of GAP) {
-    assert.strictEqual(pcCount(s), 0, `该句应仍漏判（已知未修）：${s}，实测 pc=${pcCount(s)}`);
+// [v6.8.176 第 248 轮] G1 翻正：「打那天起他随身带着护身符，感冒就变少了」的
+// 「变少」缺口本轮由第⑭支结果表补上（甲半「护身符」∈ PC_NOOBJ_ZH，⑭支无顺序
+// 标记要求，故裸标记「打那天起」的 r225 纪律缺口不再挡住它）。断言从「仍漏判
+// pc=0」翻成「必须判出 pc≥1」，与 r243 G1 / r244 G2 三轮同一条句子的登记对齐。
+test('G1 裸标记 + 「变少」双缺口句已由⑭支接管（r225 纪律不动，强支补位）', () => {
+  const NOW_COVERED = ['打那天起他随身带着护身符，感冒就变少了'];
+  for (const s of NOW_COVERED) {
+    assert.ok(pcCount(s) >= 1, `该句本轮应由⑭支判出：${s}，实测 pc=${pcCount(s)}`);
   }
 });
 

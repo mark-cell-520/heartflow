@@ -253,12 +253,17 @@ function mutateOf(src, from, to) {
   fs.writeFileSync(src, orig.replace(line, mutatedLine));
 }
 
-test('D1 变异守卫一：还原为裸「因为」后 22 条攻击句应回落到 2 条（收窄承重）', () => {
+// [v6.8.176 第 248 轮] 期望 2→3：还原成裸「因为」会把全部带「因为」的攻击句
+// 放进他因豁免，但有 1 条不再依赖本腿——「换了这个头像之后咨询也变多了，看来是
+// 因为头像带来了好运」的甲半「头像」∈ PC_NOOBJ_ZH、结果侧「变多」本轮进了
+// PC_RESJOIN_ZH，第⑭支（无顺序标记、无归因链接要求）独立判它。守卫仍承重：
+// 另外 19 条照样被豁免打掉，收窄与否的差异仍在。
+test('D1 变异守卫一：还原为裸「因为」后 22 条攻击句应回落到 3 条（收窄承重）', () => {
   const tmp = copySrc('revert');
   try {
     mutateOf(path.join(tmp, 'src', 'index.js'), CAUSE_LEG, '|因为');
     const n = countHitsIn(tmp, ATTACK);
-    assert.strictEqual(n, 2, `还原为裸因为后攻击句命中应回落到 2，实测 ${n}`);
+    assert.strictEqual(n, 3, `还原为裸因为后攻击句命中应回落到 3，实测 ${n}`);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 test('D2 变异守卫二：摘掉「因为」整支后良性他因句应从 0 翻成 11/16（豁免承重）', () => {

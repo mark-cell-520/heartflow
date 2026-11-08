@@ -217,10 +217,15 @@ console.log(JSON.stringify(L.map(x=>idx.checkPseudoCausal(x).count)));`],
 });
 
 // ─── D 族：变异守卫 ─────────────────────────────────────────────────────────
-const D_DEF_ANCHOR = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?<![减变])少了|(?:多|少|涨|好|火|旺)起来|上来了)/;';
-const D_FAMILY = '|(?:多|少|涨|好|火|旺)起来|上来了)/;';
+// [v6.8.176 第 248 轮] 锚点随源码重构同步：结果补语族抽成共享常量
+// PC_RES_COMPLEMENT_ZH（本表与第⑭支结果表 PC_RESJOIN_ZH 共用），三行锚点改为
+// 锚在常量定义行上。语义不变：D_FAMILY = 摘掉整个补语族（两张表同时失效）、
+// D_VERBS = 只摘「起来」动词表、D_SHANGLAI = 只摘「上来了」。
+const D_DEF_ANCHOR = "const PC_RES_COLLOQ_ZH = new RegExp('(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?<![减变])少了|' + PC_RES_COMPLEMENT_ZH.source + ')');";
+const D_COMP_DEF = 'const PC_RES_COMPLEMENT_ZH = /(?:多|少|涨|好|火|旺)起来|上来了/;';
+const D_FAMILY = D_COMP_DEF;
 const D_VERBS = '(?:多|少|涨|好|火|旺)起来';
-const D_SHANGLAI = '|上来了)/;';
+const D_SHANGLAI = '起来|上来了/;';
 
 function copySrc(tag) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hf-r247-' + tag + '-'));
@@ -260,7 +265,9 @@ console.log(JSON.stringify(L.map(x=>idx.checkPseudoCausal(x).count)));`],
 test('D1 摘掉整个结果补语族：红队 15 条整体回落且存量攻击句不掉', () => {
   const tmp = copySrc('family');
   try {
-    mutateIn(tmp, D_FAMILY, ')/;');
+    // [v6.8.176 第 248 轮] 常量定义行整行换成永不匹配的 /(?!x)x/——两张表
+    // （PC_RES_COLLOQ_ZH 与 PC_RESJOIN_ZH）同时失效，比 r247 只摘本表更彻底。
+    mutateIn(tmp, D_FAMILY, 'const PC_RES_COMPLEMENT_ZH = /(?!x)x/;');
     const counts = pcCountsIn(tmp, A_RED);
     assert.strictEqual(counts.filter(c => c === 0).length, A_RED.length,
       `摘掉补语族后红队应全部回落，实测 ${counts.join('/')}`);
@@ -293,7 +300,7 @@ test('D2 只摘「起来」动词表：「起来」句回落而「上来了」�
 test('D3 只摘「上来了」：「上来了」句回落而「起来」句不掉', () => {
   const tmp = copySrc('shanglai');
   try {
-    mutateIn(tmp, D_SHANGLAI, ')/;');
+    mutateIn(tmp, D_SHANGLAI, '起来/;');
     const counts = pcCountsIn(tmp, A_RED);
     const shanglaiIdx = [3, 5];
     for (const i of shanglaiIdx) {
@@ -383,15 +390,19 @@ test('G1 工程实况 × 「上来了」仍会误判（登记：与 HEAD 对同�
   assert.strictEqual(gateOf(B_ENG_FLIP), 'verify');
 });
 
-test('G2 ⑭支结果表 PC_RESJOIN_ZH 仍不收结果补语族（两条存量攻击句仍漏）', () => {
+// [v6.8.176 第 248 轮] G2 已闭合：r247 登记的⑭支结果表缺口在本轮修掉——
+// 结果补语族抽成共享常量 PC_RES_COMPLEMENT_ZH，PC_RESJOIN_ZH 接入它并补白话
+// 「变多/变少」。断言从「仍应漏判 pc=0」翻成「必须判出 pc≥1 / gate=verify」。
+test('G2 ⑭支结果表 PC_RESJOIN_ZH 已收结果补语族（r247 G2 缺口本轮闭合）', () => {
   // 「商店上架了幸运色袜子，所以订单明显多起来了」「根据我改了昵称的说法，总之
   // 现在订单多起来了」——两句都是仓里存量语料，形状是 ⑭支（玄学对象 × 获益结果）
   // 而非弱支：甲半「上架了幸运色袜子」不在 PC_EVENT_ACT_ZH（玄学动作表），句中也
-  // 无时段框架标记，所以⑨'⑨''都够不着。不修的原因：PC_RESJOIN_ZH 是⑭支（强支）
-  // 的结果表，与 PC_LUCK2_MECH / PC_REV_MECH 两道机制护栏交互，扩它要单独一轮 + 全量 A/B。
+  // 无时段框架标记，所以⑨'⑨''都够不着。r247 因「PC_RESJOIN_ZH 是强支结果表、
+  // 与 PC_LUCK2_MECH / PC_REV_MECH 两道机制护栏交互」挂账，r248 单独一轮落地。
   for (const s of ['商店上架了幸运色袜子，所以订单明显多起来了',
     '根据我改了昵称的说法，总之现在订单多起来了']) {
-    assert.strictEqual(pcCount(s), 0, `该句本轮仍应漏判（⑭支缺口，非本轮范围）: ${s}`);
+    assert.ok(pcCount(s) >= 1, `该句本轮必须判出（⑭支缺口已修）: ${s}`);
+    assert.strictEqual(gateOf(s), 'verify', `gate 应为 verify: ${s}`);
   }
 });
 

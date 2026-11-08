@@ -68,8 +68,12 @@ test(`A1 弱支红队 ${A_RED.length} 条：HEAD 漏 ${HEAD_MISS}/${A_RED.length
 
 test('A2 攻击句 detector 命中数逐条登记', () => {
   const counts = A_RED.map(pcCount);
-  // 末两条 HEAD 已判（①支/⑪支），新腿再加上一支 → 2；其余 1
-  assert.deepStrictEqual(counts, [1, 1, 1, 1, 1, 1, 1, 1, 2, 2],
+  // [v6.8.176 第 248 轮] 登记同步：⑭支结果表 PC_RESJOIN_ZH 本轮接入结果补语族 +
+  // 白话「变多/变少」后，索引 2（「自从请了风水师，回款就变多了」——甲半「风水」
+  // ∈ PC_NOOBJ_ZH）与索引 7（「去年开始转发抽奖微博，客户就变多了」——甲半「转发」
+  // ∈ PC_NOOBJ_ZH）由 ⑭支双支共燃，count 1→2。末两条 HEAD 已判（①支/⑪支），
+  // 本轮再加⑭支仍为 2。其余 6 条甲半不是 PC_NOOBJ_ZH 成员，保持 1。
+  assert.deepStrictEqual(counts, [1, 1, 2, 1, 1, 1, 1, 2, 2, 2],
     'detector 命中数应与登记一致，实测: ' + counts.join('/'));
 });
 
@@ -196,8 +200,13 @@ test('D1 摘掉整条新腿：红队 8 条 HEAD 漏判族整体回落', () => {
     assert.notStrictEqual(mutated, orig, '变异未生效（新腿删除失败）');
     fs.writeFileSync(src, mutated, 'utf8');
     const counts = pcCountsIn(tmp, A_RED_HEAD_MISS);
+    // [v6.8.176 第 248 轮] 摘掉⑨'腿后只剩 6 条回落（HEAD_MISS 8 → 6）：索引 2
+    // 与 7 两条的甲半（风水/转发）同时是 PC_NOOBJ_ZH 成员，⑭支在本轮接入同一批
+    // 白话结果词后已能独立判出它们——摘弱支腿不再让它们回到 HEAD 漏判态。
+    // 这是「弱支与强支共燃」的诚实登记，不是守卫失效：其余 6 条（甲半不在
+    // PC_NOOBJ_ZH）仍必须整体回落，守卫仍钉在⑨'腿上。
     const miss = counts.filter(c => c === 0).length;
-    assert.strictEqual(miss, HEAD_MISS, `摘腿后红队漏判应为 ${HEAD_MISS}，实测 ${miss}`);
+    assert.strictEqual(miss, HEAD_MISS - 2, `摘腿后红队漏判应为 ${HEAD_MISS - 2}，实测 ${miss}`);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -213,15 +222,19 @@ test('D2 只清空 PC_RES_COLLOQ_ZH 词族：同样回落且形式腿不受影�
     // 变异守卫，须跟着定义行走（行为断言未动）。
     // [v6.8.175 第 247 轮] 再次同步：定义行末尾又追加了「V+起来 / V+上来」结果
     // 补语族（`|(?:多|少|涨|好|火|旺)起来|上来了`），锚点须含它才找得到定义行。
-    const WORD = 'const PC_RES_COLLOQ_ZH = /(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?<![减变])少了|(?:多|少|涨|好|火|旺)起来|上来了)/;';
+    // [v6.8.176 第 248 轮] 第三次同步：补语族抽成共享常量 PC_RES_COMPLEMENT_ZH
+    // （第⑭支结果表也接入它），本表改为 new RegExp 拼 .source——锚点须跟着改成
+    // 新定义行才找得到（本守卫的语义「清空整张白话结果变动表」不变）。
+    const WORD = "const PC_RES_COLLOQ_ZH = new RegExp('(?:多了|变多|变好|变差|变高|变低|上去了|下来了|涨了|跌了|(?<![减变])少了|' + PC_RES_COMPLEMENT_ZH.source + ')');";
     assert.ok(orig.includes(WORD), '副本中找不到 PC_RES_COLLOQ_ZH 定义行');
     const mutated = orig.replace(WORD, 'const PC_RES_COLLOQ_ZH = /(?!)/;');
     assert.notStrictEqual(mutated, orig, '变异未生效（词族清空失败）');
     fs.writeFileSync(src, mutated, 'utf8');
     // 新腿全塌（红队回落到 HEAD 漏判态）
     const counts = pcCountsIn(tmp, A_RED_HEAD_MISS);
+    // [v6.8.176 第 248 轮] 同上：索引 2 与 7 由⑭支独立承重，清空本表后不回落。
     const miss = counts.filter(c => c === 0).length;
-    assert.strictEqual(miss, HEAD_MISS, `清空词族后红队漏判应为 ${HEAD_MISS}，实测 ${miss}`);
+    assert.strictEqual(miss, HEAD_MISS - 2, `清空词族后红队漏判应为 ${HEAD_MISS - 2}，实测 ${miss}`);
     // ⑨支形式腿不受影响（正式指标词照判）
     const formal = pcCountsIn(tmp, ['上线之后投诉量下降了', '发布新版本后崩溃率下降，证明是旧版本的锅。']);
     assert.ok(formal.every(c => c > 0), '形式腿不应受词族变异影响，实测: ' + formal.join('/'));
@@ -349,12 +362,16 @@ test('F5 dimensions 键 210 不变（本轮未加维度，只补⑨支第二腿�
 // 剩余 1 条「打那天起…」仍漏：「打那天起」是裸标记（PC_SEQ_BARE_ZH，⑨族纪律
 // 刻意不收），且结果侧「变少」不在 PC_RES_COLLOQ_ZH——要收需先给⑨族做裸标记
 // 位置化，单独轮次。
-test('G1 裸标记时段句仍漏（登记为已知未修，r225 纪律）', () => {
-  const GAP = [
+// G1 [v6.8.176 第 248 轮] 翻正：剩余那条「打那天起…」本轮由第⑭支判出——
+// 裸标记「打那天起」仍不在 PC_SEQ_PERIOD_ZH（r225 纪律不动），但甲半「护身符」
+// ∈ PC_NOOBJ_ZH 且白话结果词「变少」本轮进了 PC_RESJOIN_ZH，⑭支（强支，无顺序
+// 标记要求）接管。断言从「仍漏判 pc=0」翻成「必须判出 pc≥1」。
+test('G1 裸标记时段句已由⑭支接管（r225 纪律不动，强支补位）', () => {
+  const NOW_COVERED = [
     '打那天起他随身带着护身符，感冒就变少了',
   ];
-  for (const s of GAP) {
-    assert.strictEqual(pcCount(s), 0, `裸标记句应仍漏判（已知未修）：${s}，实测 pc=${pcCount(s)}`);
+  for (const s of NOW_COVERED) {
+    assert.ok(pcCount(s) >= 1, `裸标记句本轮应由⑭支判出：${s}，实测 pc=${pcCount(s)}`);
   }
 });
 

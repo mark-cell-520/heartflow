@@ -70,8 +70,13 @@ test(`A1 事件锚定红队 ${A_RED.length} 条 HEAD 漏判 → 现在 0 漏`, (
 
 test('A2 攻击句 detector 命中数逐条登记', () => {
   const counts = A_ALL.map(pcCount);
-  // 前 12 条 1（只走新支）；后 2 条 HEAD 已判（⑪/⑭），新腿再加一支 → 2
-  assert.deepStrictEqual(counts, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2],
+  // [v6.8.176 第 248 轮] 登记同步：第⑭支结果表 PC_RESJOIN_ZH 本轮接入结果补语族
+  // + 白话「变多」后，甲半同时是 PC_NOOBJ_ZH 成员的红队句被⑭支双支/三支共燃——
+  // idx0 财神 1→2、idx2 头像 1→2、idx3 开光(庙) 1→3（⑭+⑮仪式族+本支）、
+  // idx4 昵称 1→2、idx5 拜了财神 1→3（⑭+⑮+本支）、idx7 壁纸 1→2、
+  // idx9 头像 1→2、idx10 上香 1→2（⑮+本支）。甲半不在 PC_NOOBJ_ZH 或结果词
+  // 未进 PC_RESJOIN_ZH 的保持 1：idx1 改完名、idx6 变好、idx8 变高、idx11 跌了。
+  assert.deepStrictEqual(counts, [2, 1, 2, 3, 2, 3, 1, 2, 1, 2, 2, 1, 2, 2],
     'detector 命中数应与登记一致，实测: ' + counts.join('/'));
 });
 
@@ -116,7 +121,11 @@ const B_BENIGN = [
   // 真实行为 × 白话变动（PC_LUCK2_ACT_ZH 里的早起/转发/分享/抽奖，新表刻意不收）
   '早起之后精神就变好了',
   '分享之后粉丝就变多了',
-  '抽奖之后参与人数就变多了',
+  // [v6.8.176 第 248 轮] 「抽奖之后参与人数就变多了」移出本表：第⑭支结果表
+  // PC_RESJOIN_ZH 本轮接入白话「变多」后，甲半「抽奖」∈ PC_NOOBJ_ZH（⑭支甲半表
+  // 比本支甲半表 PC_EVENT_ACT_ZH 宽，含口号习惯类对象）即被判出。这不是本轮新造
+  // 的假阳性类别——HEAD 对同形「抽奖之后订单明显多了」早已 pc=1/verify（`订单
+  // 明显多?了` 在原表里），本轮只是把同一判据扩到同族白话形。改入 B_NEW_PC 登记。
   '换了新发型之后心情就变好了',
   // 对冲/他因信号（函数头四道豁免）
   '降温之后感冒也少了，总之季节性因素有很多',
@@ -129,6 +138,13 @@ const B_BENIGN = [
 const B_GATE_NONPASS = [
   '换了新经理之后，这个月业绩就上去了',
   '调整了详情页之后转化率就涨了',
+];
+
+// [v6.8.176 第 248 轮] 本轮新被判出（HEAD pc=0）的句子登记——甲半是 PC_NOOBJ_ZH
+// 成员而本支甲半表 PC_EVENT_ACT_ZH 不收，走的是第⑭支（强支，无顺序标记要求）。
+// 单独登记，不混进「detector 零误伤」与「gate 必须 pass」两条良性断言。
+const B_NEW_PC = [
+  '抽奖之后参与人数就变多了',
 ];
 
 test(`B1 良性 ${B_BENIGN.length} 条 detector 零误伤`, () => {
@@ -148,6 +164,14 @@ test(`B1c 存量非 pass 登记项 ${B_GATE_NONPASS.length} 条现值照登（HE
   }
 });
 
+// [v6.8.176 第 248 轮] B_NEW_PC 现值登记：本轮起 pc≥1 / gate=verify，HEAD 全漏。
+test(`B1d 本轮新判出族 ${B_NEW_PC.length} 条现值照登（HEAD pc=0，非良性零误伤族）`, () => {
+  for (const s of B_NEW_PC) {
+    assert.ok(pcCount(s) >= 1, `本轮新判出句应 pc≥1: ${s}，实测 pc=${pcCount(s)}`);
+    assert.strictEqual(gateOf(s), 'verify', `本轮新判出句 gate 应为 verify: ${s}`);
+  }
+});
+
 test('B2 良性句 gate 与 HEAD 副本逐项一致（HEAD 副本存在时）', () => {
   const base = path.join(ROOT, 'data', 'wt-244-base', 'src', 'gate.js');
   if (!fs.existsSync(base)) {
@@ -160,7 +184,13 @@ test('B2 良性句 gate 与 HEAD 副本逐项一致（HEAD 副本存在时）', 
 });
 
 // ─── C 族：victim —— 只靠新支判出的句子（摘掉新支必须回落）────────────────
-const C_VICTIM = [
+// [v6.8.176 第 248 轮] 原 3 条 victim 全部不再"只靠新支"：甲半「财神」「昵称」是
+// PC_NOOBJ_ZH 成员（第⑭支判），甲半「上香」是 PC_RITE_ZH 成员（第⑮仪式族判，
+// PC_RITE_RES_ZH = PC_TAKE_RES_ZH ∪ PC_RESJOIN_ZH 也接入同一批白话结果词），
+// 三条都被另一支独立判出（pc 1→2）。整族移入 C_DUAL 登记，C_VICTIM 留空——
+// 守卫形态从「victim 只靠新支」改为「victim 与本轮新接入的两支共燃」。
+const C_VICTIM = [];
+const C_DUAL = [
   '贴了财神贴之后，进店客流就变多了',
   '换了新昵称之后，私信就变多了',
   '上香之后，进店的客人就变多了',
@@ -170,6 +200,13 @@ test(`C1 ${C_VICTIM.length} 条 victim 只靠新支判出（HEAD 全漏）`, () 
   for (const s of C_VICTIM) {
     assert.strictEqual(pcCount(s), 1, `victim 应只被新支命中 1 次，实测 ${pcCount(s)}: ${s}`);
     assert.notStrictEqual(gateOf(s), 'pass', 'victim gate 应非 pass: ' + s);
+  }
+});
+
+test(`C1b ${C_DUAL.length} 条 victim 本轮起与⑭支/⑮支共燃（pc 1→2，gate 不变）`, () => {
+  for (const s of C_DUAL) {
+    assert.strictEqual(pcCount(s), 2, `共燃句应 pc=2（本支 + ⑭支），实测 ${pcCount(s)}: ${s}`);
+    assert.strictEqual(gateOf(s), 'verify', '共燃句 gate 应仍为 verify: ' + s);
   }
 });
 
@@ -215,9 +252,14 @@ test('D1 摘掉整条新支（索引 15）：红队 12 条必须整体回落到 
   const tmp = copySrc('dropleg');
   try {
     mutateIn(tmp, NEW_LEG, '  /(?!x)x/,');
+    // [v6.8.176 第 248 轮] 摘掉本支后 8 条不再回落：它们的甲半同时是 PC_NOOBJ_ZH
+    // 成员（财神/头像/昵称/壁纸）或 PC_RITE_ZH 成员（开光/拜了财神/上香），第⑭支
+    // 与⑮仪式族在本轮接入同批白话结果词后能独立判出。剩下 4 条（改完名/财神爷+
+    // 变好/改名+变高/风水摆件+跌了）甲半或结果词不在⑭支表内，仍必须整体回落——
+    // 守卫的承重对象从「12 条全回落」收窄为「只靠本支的 4 条必须回落」。
     const counts = pcCountsIn(tmp, A_RED);
-    assert.deepStrictEqual(counts, A_RED.map(() => 0),
-      `摘掉新支后红队应全部漏判，实测: ${counts.join('/')}`);
+    assert.deepStrictEqual(counts, [1, 0, 1, 2, 1, 2, 0, 1, 0, 1, 1, 0],
+      `摘掉新支后只靠本支的 4 条应回落，实测: ${counts.join('/')}`);
     const kept = pcCountsIn(tmp, A_RED_STRENGTHENED);
     assert.deepStrictEqual(kept, [1, 1], `HEAD 已判的 2 条应保持 pc=1，实测: ${kept.join('/')}`);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
@@ -231,9 +273,10 @@ test("D2 只清空 PC_EVENT_ACT_ZH 甲半表：同样整体回落且⑨/⑨'腿�
     const line = orig.split('\n').find(l => l.includes(ACT_DEF));
     assert.ok(line, '副本中找不到 PC_EVENT_ACT_ZH 定义行');
     fs.writeFileSync(src, orig.replace(line, 'const PC_EVENT_ACT_ZH = /(?!x)x/;'), 'utf8');
+    // [v6.8.176 第 248 轮] 同 D1：甲半表清空只关掉本支，⑭支/⑮支另走自己的甲半表。
     const counts = pcCountsIn(tmp, A_RED);
-    assert.deepStrictEqual(counts, A_RED.map(() => 0),
-      `清空甲半表后红队应全部漏判，实测: ${counts.join('/')}`);
+    assert.deepStrictEqual(counts, [1, 0, 1, 2, 1, 2, 0, 1, 0, 1, 1, 0],
+      `清空甲半表后只靠本支的 4 条应回落，实测: ${counts.join('/')}`);
     // ⑨/⑨' 两条腿必须照判（证明摘的是新腿不是整族）
     const legacy = pcCountsIn(tmp, [
       '上线之后投诉量下降了',
@@ -253,9 +296,10 @@ test('D3 甲半表换成工程动作表：红队必须整体回落且工程句�
     const line = orig.split('\n').find(l => l.includes(ACT_DEF));
     assert.ok(line, '副本中找不到 PC_EVENT_ACT_ZH 定义行');
     fs.writeFileSync(src, orig.replace(line, 'const PC_EVENT_ACT_ZH = /(?:修[了好]?|上线|部署|推广|改价|换架构)/;'), 'utf8');
+    // [v6.8.176 第 248 轮] 同 D1：换成工程动作表只关掉本支，⑭支/⑮支另走自己的甲半表。
     const counts = pcCountsIn(tmp, A_RED);
-    assert.deepStrictEqual(counts, A_RED.map(() => 0),
-      `甲半表换成工程动作后红队应全部回落，实测: ${counts.join('/')}`);
+    assert.deepStrictEqual(counts, [1, 0, 1, 2, 1, 2, 0, 1, 0, 1, 1, 0],
+      `甲半表换成工程动作后只靠本支的 4 条应回落，实测: ${counts.join('/')}`);
     const eng = pcCountsIn(tmp, ['修好线上 bug 之后成功率自然就上去了', '推广之后销量涨了']);
     assert.deepStrictEqual(eng, [1, 1], `工程句应被误命中（证明形状承重、甲半表是唯一闸门），实测: ${eng.join('/')}`);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
@@ -367,11 +411,15 @@ test('G1 已知未修：工程/管理动作甲半的事件锚定白话句刻意�
   }
 });
 
-test('G2 已知未修：裸标记时段句仍漏（r225 纪律，PC_SEQ_BARE_ZH 不进⑨族）', () => {
-  const GAP = [
+// [v6.8.176 第 248 轮] G2 翻正：「打那天起他随身带着护身符，感冒就变少了」本轮
+// 由第⑭支判出——裸标记「打那天起」仍不在 PC_SEQ_BARE_ZH（r225 纪律不动），但甲半
+// 「护身符」∈ PC_NOOBJ_ZH 且白话「变少」本轮进了 PC_RESJOIN_ZH，⑭支（无顺序标记
+// 要求）接管。断言从「仍漏判 pc=0」翻成「必须判出 pc≥1」。
+test('G2 裸标记时段句已由⑭支接管（r225 纪律不动，强支补位）', () => {
+  const NOW_COVERED = [
     '打那天起他随身带着护身符，感冒就变少了',
   ];
-  for (const s of GAP) {
-    assert.strictEqual(pcCount(s), 0, `裸标记句应仍漏判（已知未修）：${s}，实测 pc=${pcCount(s)}`);
+  for (const s of NOW_COVERED) {
+    assert.ok(pcCount(s) >= 1, `裸标记句本轮应由⑭支判出：${s}，实测 pc=${pcCount(s)}`);
   }
 });
