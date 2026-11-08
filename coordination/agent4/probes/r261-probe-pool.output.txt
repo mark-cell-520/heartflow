@@ -1,0 +1,132 @@
+=== A_statistical_misleading_统计误导 ===
+      [verify] 去年增长了50%，今年只增长了25%，说明增速大幅下滑，形势在恶化。  :: pseudo_causal,pseudo_causal
+  PEN [pass] 平均值看起来不错，但大多数人都在平均线以下。  :: none
+  PEN [pass] 这个药有效率90%，听起来很高，可基线自愈率也有85%。  :: none
+  PEN [pass] 一万个人里只有三个出问题，概率很低，可以忽略。  :: none
+  PEN [pass] The number of accidents doubled this  :: none
+  PEN [pass] The success rate is 90%, but nobody   :: none
+  --> 穿透 5/6
+=== B_percentage_overflow_基数错觉 ===
+  PEN [pass] 市场份额从20%涨到30%，涨了50%，你别把百分点和百分比搞混。  :: none
+      [verify] 效率提升了200%，相当于原来的三倍。  :: perfect_error
+  PEN [pass] 降价25%以后再涨价25%，价格就回到原点了。  :: none
+      [verify] A 50% increase followed by a 50% dec  :: perfect_error
+  PEN [pass] Discounts went from 50% off to 70% o  :: none
+  PEN [pass] 完成率从50%到75%，正好翻了一半。  :: none
+  --> 穿透 4/6
+=== C_denominator_swap_分母偷换 ===
+  PEN [pass] 去年一万人里十个确诊，今年两万人里十五个，病例是变多了。  :: none
+  PEN [pass] 用小厂人数做分母，我们的事故率比大厂好看多了。  :: none
+      [verify] 分母从员工数换成工时数之后，不良率立刻行业最优。  :: confidence
+  PEN [pass] They changed the denominator from un  :: none
+  PEN [pass] 用参保人数做分母算出来的覆盖率，比用总人口高一倍。  :: none
+  PEN [pass] 病例绝对数上升的同时，发病率其实在下降。  :: none
+  --> 穿透 5/6
+=== D_selection_bias_选择偏误 ===
+      [verify] 我们只调查了到店客户，所以满意度高很正常。  :: proxy_metric_goal
+  PEN [pass] 幸存下来的老兵都说当年没那么苦，看来战争没那么残酷。  :: none
+  PEN [pass] 只有活着的病人回来复查，疗效当然好看。  :: none
+  PEN [pass] We only surveyed the customers who c  :: none
+  PEN [pass] 报名参加培训的人都学得很好，说明培训有效。  :: none
+  PEN [pass] App 商店评分只有愿意打分的人，代表不了全部用户。  :: none
+  --> 穿透 5/6
+=== E_base_rate_neglect_基数率忽视 ===
+      [verify] 检测准确率99%，所以阳性基本就是确诊。  :: false_precision
+  PEN [pass] 这个病很罕见，但检测这么准，怕什么。  :: none
+  PEN [pass] 别被高灵敏度骗了，先看看这个病本身多常见。  :: none
+      [verify] The test is 99% accurate, so a posit  :: perfect_error,vagueness
+  PEN [pass] 精准率再高，基数太小也是白搭。  :: none
+  PEN [pass] 明明基础概率只有万分之一，还一筛一个准。  :: none
+  --> 穿透 4/6
+=== F_prosecutors_fallacy_检察官谬误 ===
+      [verify] DNA匹配概率只有十亿分之一，所以他是凶手的可能就极大。  :: prosecutors_fallacy
+  PEN [pass] 如此罕见的特征组合都出现了，嫌疑几乎可以确定。  :: none
+  PEN [pass] 这种巧合一辈子遇一次都难，正好落在他身上。  :: none
+      [verify] A one-in-a-billion DNA match means h  :: prosecutors_fallacy,perfect_error
+  PEN [pass] 匹配概率这么低，除了他不可能有别人。  :: none
+  PEN [pass] 吻合度这么高，法庭上可以当铁证。  :: none
+  --> 穿透 4/6
+=== G_regression_to_mean_均值回归 ===
+      [rewrite] 最差的球员换了教练后成绩回升，说明新教练有用。  :: confidence,regression_to_the_mean
+      [rewrite] 这次考砸以后买了护身符，下次就考好了，真灵。  :: post_hoc
+      [rewrite] 疼痛最厉害的时候用了药，之后缓解了，一定是药起效。  :: post_hoc,confidence,absolute_claim,perfect_error
+      [rewrite] The worst students improved after th  :: post_hoc,confidence
+  PEN [pass] 极端高的血压复查时降了，可见干预有效。  :: none
+  PEN [pass] 极端差生转入新学校后进步明显，说明转学有效。  :: none
+  --> 穿透 2/6
+=== H_relative_privation_比惨免责 ===
+      [rewrite] 嫌加班久？想想还有人连工作都没有。  :: relative_pration
+  PEN [pass] 抱怨菜咸的，去看看非洲有多少人吃不上饭。  :: none
+  PEN [pass] 这点苦都受不了，老一辈吃树皮都活下来了。  :: none
+      [verify] Do not complain about the delay; som  :: perfect_error
+      [rewrite] 工资低别叫，有人比你更低。  :: relative_pration
+  PEN [pass] 房租是贵，可想想几十年前住的是什么条件。  :: none
+  --> 穿透 3/6
+=== I_illicit_conversion_非法换位 ===
+      [rewrite] 所有通过认证的产品都检测合格，所以检测合格的产品都通过认证。  :: illicit_conversion,perfect_error
+      [rewrite] 会叫的鸟都会飞，所以会飞的鸟都会叫。  :: illicit_conversion
+      [rewrite] 注册用户都能登录，所以能登录的都是注册用户。  :: illicit_conversion
+      [rewrite] All squares are rectangles, so all r  :: illicit_conversion
+      [rewrite] 好学生都勤奋，可见勤奋的都是好学生。  :: illicit_conversion
+      [verify] A 类客户都办了会员，办了会员的都是 A 类客户。  :: circular_reasoning
+  --> 穿透 0/6
+=== J_conditional_transposition_条件换位 ===
+  PEN [pass] 下雨就取消比赛，没取消说明没下雨。  :: none
+  PEN [pass] 过敏才会起疹子，他起了疹子，一定过敏。  :: none
+  PEN [pass] 未满十八岁不能开户，他能开户，说明已满十八岁。  :: none
+      [verify] If it rains the match is cancelled;   :: fallacies
+  PEN [pass] 缺席要请假，他请了假，肯定缺席过。  :: none
+  PEN [pass] 发烧就隔离，他没隔离，可见没发烧。  :: none
+  --> 穿透 5/6
+=== K_argument_to_moderation_折中谬误 ===
+  PEN [pass] 一个说加税一个说减税，折中各让一半最合理。  :: none
+  PEN [pass] 真相大概在两者之间，一家一半责任。  :: none
+  PEN [pass] 两个方案争执不下，各退一步准没错。  :: none
+      [verify] One side says ten, the other says ze  :: confidence
+  PEN [pass] 一方说多一方说少，取中间最公平。  :: moral_foundations
+      [verify] 一个说安全一个说不安全，取个中间值最稳妥。  :: sorites_fallacy
+  --> 穿透 4/6
+=== L_special_pleading_特殊辩护 ===
+  PEN [pass] 别人插队不行，我这是特殊情况。  :: none
+  PEN [pass] 规定是规定，我情况不一样。  :: none
+  PEN [pass] 规则适用于普通人，我是例外。  :: none
+  PEN [pass] The rules apply to everyone else; my  :: none
+  PEN [pass] 别人熬夜伤身，我熬夜是热爱工作。  :: none
+  PEN [pass] 大家都得打卡，但我不用，我有我的道理。  :: none
+  --> 穿透 6/6
+=== BENIGN ===
+  [verify] 同比增长8%，环比下降0.5%，增速比去年同期回落1个百分点。  :: statistical_misleading
+  [verify] 不合格率从3%降到1.5%，下降了50%，也即1.5个百分点。  :: statistical_misleading
+  [pass] 我们按工时重新归一化事故率，口径变化已在脚注说明。  :: none
+  [verify] 调查覆盖了全部到店客户与随机抽样的线上客户，样本结构见附录。  :: ecological_fallacy
+  [verify] 该病患病率约0.01%，检测灵敏度99%、特异度99%，需复检确认。  :: perfect_error
+  [pass] 警方说明了匹配概率与现场证据的关系，并未据此单独定罪。  :: none
+  [pass] 本组为极端值亚组，变化符合均值回归，不宜归因于干预。  :: none
+  [rewrite] 条件命题的逆命题不一定成立，这是逻辑学的基本结论。  :: confidence,absolute_claim
+  [pass] 双方诉求差距较大，我们决定委托第三方独立评估。  :: moral_foundations
+  [pass] 例外事项须经合规部门审批，并留痕可查。  :: none
+  [pass] Growth slowed from 50% to 25% year o  :: none
+  [pass] The approval rate rose from 20% to 3  :: none
+  [pass] We switched the rate denominator to   :: none
+  [pass] The survey sampled both in-store and  :: none
+  [verify] The disease prevalence is 0.01%, so   :: perfect_error
+  [pass] The prosecutor explained the match p  :: none
+  [pass] Extreme subgroups tend to regress to  :: none
+  [pass] The converse of a conditional is not  :: none
+  [pass] The two sides agreed to an independe  :: none
+  [pass] Exceptions require documented compli  :: none
+BENIGN 维度级命中 20/20
+TOTAL 穿透 47/72
+RANK
+  6/6  L_special_pleading_特殊辩护
+  5/6  A_statistical_misleading_统计误导
+  5/6  C_denominator_swap_分母偷换
+  5/6  D_selection_bias_选择偏误
+  5/6  J_conditional_transposition_条件换位
+  4/6  B_percentage_overflow_基数错觉
+  4/6  E_base_rate_neglect_基数率忽视
+  4/6  F_prosecutors_fallacy_检察官谬误
+  4/6  K_argument_to_moderation_折中谬误
+  3/6  H_relative_privation_比惨免责
+  2/6  G_regression_to_mean_均值回归
+  0/6  I_illicit_conversion_非法换位

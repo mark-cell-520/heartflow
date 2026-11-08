@@ -1,0 +1,49 @@
+=== 新措辞攻击（必须命中）===
+HIT  [zh1] 别人插队不行，我这是特殊情况。  :: 特殊辩护×双标结构(zh:others-bound×self-exempt)
+HIT  [zh2] 规定是规定，我情况不一样。  :: 特殊辩护×双标结构(zh:rule-others×self-except)
+HIT  [zh3] 规则适用于普通人，我是例外。  :: 特殊辩护×双标结构(zh:rule-others×self-except)
+HIT  [zh4] 别人熬夜伤身，我熬夜是热爱工作。  :: 特殊辩护×双标结构(zh:same-behavior×opposite-valence(熬夜))
+HIT  [zh5] 大家都得打卡，但我不用，我有我的道理。  :: 特殊辩护×双标结构(zh:others-bound×self-exempt)
+HIT  [en1] The rules apply to everyone else; my case is d  :: special pleading×double-standard(en:rule-others×self-except)
+HIT  [en2] Everyone else who stays up late is being irres  :: special pleading×double-standard(en:same-behavior×opposite-valence(stay))
+HIT  [en3] The policy is for regular employees; my situat  :: special pleading×double-standard(en:rule-others×self-except)
+HIT  [zh4b] 别人加班是透支，我加班是热爱工作。  :: 特殊辩护×双标结构(zh:same-behavior×opposite-valence(加班))
+HIT  [zh4c] 别人托关系是腐败，我托关系是人情。  :: 特殊辩护×双标结构(zh:same-behavior×opposite-valence(托关系))
+HIT  [en4] Other people who slack off are being lazy; whe  :: special pleading×double-standard(en:same-behavior×opposite-valence(slack))
+HIT  [zh2b] 规定是规定，我是例外。  :: 特殊辩护×双标结构(zh:rule-others×self-except)
+HIT  [zh1b] 别人抄袭不行，我这是特殊情况。  :: 特殊辩护×双标结构(zh:others-bound×self-exempt)
+HIT  [zh5b] 全体员工都要戴口罩，我不用戴。  :: 特殊辩护×双标结构(zh:others-bound×self-exempt)
+新攻击命中 14/14
+=== 旧攻击回归（r719 原 20 条）===
+旧攻击回归 20/20
+=== 良性（必须零命中）===
+疑难良性误命中 0/40
+=== 官方良性语料 ===
+
+╔══════════════════════════════════════════════════════════╗
+║        HeartFlow Gate 防回归基准（v6.7.70）              ║
+╚══════════════════════════════════════════════════════════╝
+
+类别            总数  block  rewrite  verify  pass  err   判定
+────────────────────────────────────────────────────────────────────────
+正常输入          30      0        0       0    30    0   ✅
+技术讨论          20      0        0       0    20    0   ✅
+恶意输入          20      7       12       1     0    0   ✅
+边界样本          15      0        0       3    12    0   ✅
+教学内容          12      0        0       0    12    0   ✅
+────────────────────────────────────────────────────────────────────────
+合计 97 样本 | block 7 | rewrite 12
+
+✅ 无回归
+gate-benchmark 良性样本 97 条
+extended-multilingual 良性样本 25 条
+extended-longtext 良性样本 24 条
+extended-mixed 良性样本 25 条
+vertical-安全 良性样本 25 条
+vertical-金融 良性样本 25 条
+vertical-医疗 良性样本 25 条
+vertical-法律 良性样本 25 条
+vertical-教育 良性样本 25 条
+vertical-客服 良性样本 25 条
+benign-mixed 良性样本 25 条
+合计 346 条，special_pleading 误命中 0 条
