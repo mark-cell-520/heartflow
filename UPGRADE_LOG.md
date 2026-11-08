@@ -1,4 +1,85 @@
-## r252 — MCP 工具「已广告但 100% 崩」修复轮（v6.8.180）：benchmark 两个工具指向从未提交的模块（根因是 .gitignore 无锚定 `benchmark/` 吞掉 src/benchmark/）+ 三个 TypeError/缺方法 handler + _loadStats 双缺陷
+## r253 — 7 个「引擎访问模式错」的 MCP 工具 100% 崩修复轮（v6.8.181）：boundary_check 把 sessionId 当引擎 + cache/decision 读从未赋值的 globalThis.heartflow + 四个 error 工具读从未赋值的 _hfCore，真身全在引擎上
+
+**轮次**：r253 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（**r252 探针登记、本轮逐个查证的「not ready」族**）
+**真升级类型**：缺陷修复（7 个已广告 MCP 工具，全部实测 100% 崩）+ 新模块（`src/mcp/handler-wiring-check.js`，`HandlerWiringChecker` 65 行非注释代码，把「handler 探不到子系统」固化成常驻自检，经扩展的 `heartflow_module_health` 工具暴露）。MCP 工具 **187 不变**（未新增工具）、dispatch 路由 **1,319 不变**、判别维度 **210 不变**（`src/index.js` 零改动）、引擎模块 **162 不变**（新模块走 MCP 侧直 require，不进 `_modules`）。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision。
+- r252 交接簿候选池①是「.gitignore 无锚定目录模式全仓扫描」（r252 最重发现的系统性风险延续）。**本轮先做了这条扫描**（scripts/tmp-253-gitignore-scan.js，轮末已删）：不解析 .gitignore 模式，改用**直接扫描**——遍历 `src/`+`test/` 全部 1459 个源码+json 文件，逐个查「未被 git 跟踪 + 被 gitignore 命中」的交叉集。结果只抓到 **2 个文件，且都是行尾注释标明的有意的运行时产物**（`src/memory/metacognition/reward-stats.json` 走 r252 故意加的 `.gitignore:202`、`test/_tmp_r388_negA.js` 走 `.gitignore:8`），**没有源码被静默吞掉**——证明 r252 的 `/benchmark/` 锚定修复后，src//test/ 下已无源码被无锚定目录模式误吞。这条是**有价值的阴性结论**，但纯扫描不产生可度量代码变化（违反硬约束 #4「必须至少一项可度量变化」），故不单独成轮。
+- **转向候选③**（r252 探针登记的四个「not ready」）：`heartflow_error_store/query/fix/verify` 报 `error memory not ready`、`heartflow_boundary_check` 报 `boundaryGuard not loaded`、`heartflow_cache_stats` 报 `cache_not_initialized`、`heartflow_decision_history` 报 `heartflow_instance_not_found`。r252 判断这类「not ready」与①~⑤的「每次都崩」形状不同，需逐个确认懒加载路径。**本轮用 r252 同款探针（scripts/tmp-253-seven-tools-probe.js，require mcp-server → initHeartFlow → 逐个 tools/call，带 token）逐个查证**：引擎已完整启动（162 模块，616ms）后，**7 个工具仍 100% 崩**——排除了「懒加载未触发」的探针口径解释，坐实是真缺陷。
+
+### 二、根因/缺口分析（带证据）
+**共性根因：7 个 handler 用错引擎实例/子系统的访问模式**，与当前 MCP 框架不一致。框架真相（`src/mcp-server.js` 实证）：`tools/call` 以 `handler(args, sessionId)` 调用（:5545），第二参是 **sessionId 字符串**；引擎实例在**模块级 `heartflow`**（:303 声明、:548 `initHeartFlow()` 里 `new HeartFlow()` + `:550 start()` 赋值）。而 7 个 handler 各用各的错模式：
+
+| 工具 | 错模式 | 轮初实测 | 真身（完整引擎上实测存在） |
+|---|---|---|---|
+| `heartflow_boundary_check` | 第二形参 `(args, hf)` 把 **sessionId 字符串**当引擎，`hf.boundaryGuard` 恒 undefined | `boundaryGuard not loaded` | `heartflow.boundaryGuard.checkWrite`（`heartflow.js:3927` 无条件实例化） |
+| `heartflow_cache_stats` | 读 `globalThis.heartflow`（**全 src 从未赋值**）+ 引用已删的 `_thinkCache` | `cache_not_initialized` | `heartflow.kvCache._stats`（`heartflow.js:3906`；`_thinkCache` 已在 `[AUDIT-FIX 2026-11-02]` 当死代码删除，`:5904`） |
+| `heartflow_decision_history` | 读 `globalThis.heartflow`（从未赋值） | `heartflow_instance_not_found` | `heartflow._decisionHistory`（构造函数 `:1516` 初始化） |
+| `heartflow_error_store` | 读 `heartflow._hfCore`（**全 src 从未赋值**） | `error memory not ready` | `heartflow._modules.errorMemory.store`（`:4498`） |
+| `heartflow_error_query` | 同上 | `error memory not ready` | `heartflow._modules.errorMemory.query` |
+| `heartflow_error_fix` | 读 `heartflow._hfCore.errorMemory.fix`——但 errorMemory 本体**没有 fix/verify** | `error memory not ready` | `heartflow._modules.errorTaxonomy.fix`（`:4527`，转发 error-memory.js 的 logFix） |
+| `heartflow_error_verify` | 同上 | `error memory not ready` | `heartflow._modules.errorTaxonomy.verify`（`:4528`） |
+
+**轮初实证（scripts/tmp-253-seven-tools-probe.js，带 token，stdio 头拿 admin）**：7 个工具**全部**返回各自的 error（7/7 崩），而同期引擎日志 `[HeartFlow MCP] 引擎已启动 (616ms, 162 模块, v6.8.180)`。裸 `new HeartFlow()`（不 start()）时这些子系统确实是 undefined（构造函数只建 `_decisionHistory`），但**模块级实例调了 `start()`**（:550）后全部就位——用 `new HeartFlow(); hf.start()` 复核：`boundaryGuard.checkWrite`=function、`_modules.errorMemory.store/query`=function、`_modules.errorTaxonomy.fix/verify`=function、`_decisionHistory`=array、`kvCache._stats`={saves,loads,hits,misses,evictions}，而 `_hfCore`/`_thinkCache`/`globalThis.heartflow` 三者确实恒 undefined。**子系统在、handler 探不到——正是「handler 接线错」，不是「功能没实现」。**
+
+### 三、落地项
+1. **`src/mcp-server.js`：7 个 handler 的引擎/子系统访问模式修正（83 增 24 删）**：
+   - `heartflow_boundary_check`：形参从 `(args, hf)` 改为 `(args)`，改读模块级 `heartflow.boundaryGuard || heartflow._modules?.boundaryGuard`，不再把 sessionId 当引擎。
+   - `heartflow_cache_stats`：改读模块级 `heartflow`；**按设计原则 #5 诚实记账**——think-cache 确已删，不再伪造命中统计，返回 `{thinkCache:{removed:true, note}, kvCache:{saves,loads,hits,misses,evictions,hitRate}, ttlByMode, currentMode, currentEffort}`，明确标注 thinkCache.removed 并报真实存活的 kvCache。
+   - `heartflow_decision_history`：`globalThis.heartflow` → 模块级 `heartflow`。
+   - `heartflow_error_store`/`error_query`：`heartflow._hfCore.errorMemory` → `heartflow._modules.errorMemory`。
+   - `heartflow_error_fix`/`error_verify`：`heartflow._hfCore.errorMemory.fix/verify` → `heartflow._modules.errorTaxonomy.fix/verify`（errorMemory 本体没有这两个方法）。
+   - 顺手清掉 `handleModulesStatus` 末尾 `|| globalThis.heartflow` 死 fallback（safeDispatch 总成功时永不到达，且该全局恒 undefined 本就落到 `|| null`）。
+2. **新增 `src/mcp/handler-wiring-check.js`（`HandlerWiringChecker`，65 行非注释代码）**：把本轮探针方法**产品化**为常驻自检。数据驱动注册表（8 条子系统依赖工具），`check()` 在活引擎上逐个实测子系统可达性 + 方法齐全性，返回 `{engineReady, total, reachable, unreachable:[{tool,subsystem,reason}], healthy, checkedAt, note}`。设计纪律：探针抛错判不可达并记 `probe_threw`（绝不让自检自己崩）；引擎没就绪如实报 `engine_not_ready` 不编数字；`note` 明说只覆盖注册表登记的工具、不假装覆盖全部 187 个。它守的正是 r253 这一 bug 类——「handler 探不到它的子系统」。
+3. **`heartflow_module_health` 工具扩展（加法字段，不新增工具）**：`handleModuleHealth` 追加 `handlerWiring` 字段（用同一把活引擎实例跑 `HandlerWiringChecker`），让自检对外可达（AGENTS.md 约定 3 意图：新能力要能在 MCP 面调到）。**刻意不改 `summary` 既有形状**——`ModuleHealthChecker.getSummary()` 原样产出，r251 对 checker 的断言不受影响；wiring 检查失败时如实记 `wiring_check_failed` 不阻断主报告。
+4. **版本 6.8.180 → 6.8.181**，`sync-version.js` + `sync-doc-numbers.js` 已跑（回归后又跑一次，测试数 19,440→19,455 机器记账到 README/SKILL）；README Version history 补 v6.8.181 行。
+5. **新测试 `test/round-253-engine-access-revival.test.js`（14 断言全绿）**：A 族 2 条（完整引擎上 7 个子系统存在且方法齐全 + bug 根源三模式恒空）、B 族 2 条（源码剥注释后可执行代码不再引用坏模式 + boundary 形参与四个 error handler 指向正确目标）、C 族 1 条（7 工具在 HANDLERS + 注册表两处在册）、D 族 1 条（独立子进程端到端：7 工具全部真实输出、无一个再报旧错误）、E 族 3 条（回归：引擎干净启动 162 模块 `_initErrors` 空、维度 210、三招牌入口）、F 族 5 条（HandlerWiringChecker：完整引擎 8/8 可达 healthy、能测出残引擎坏接线、探针抛错记 probe_threw、引擎未就绪诚实、module_health 加法字段暴露）。
+
+### 四、验收数字（全部实测）
+| 项 | 轮前 | 轮后 | 实测方式 |
+|---|---|---|---|
+| 7 个工具崩率 | **7/7 全崩**（各返回旧 error） | **0/7 崩**（各返回真实输出） | scripts/tmp-253-seven-tools-probe.js 改前改后各跑一遍；test D1 子进程端到端 |
+| `heartflow_boundary_check` | `boundaryGuard not loaded` | `{verdict:'ALLOW', reason:'outside agent territories', resolvedPath:'...\\src\\gate.js'}` | test D1 |
+| `heartflow_cache_stats` | `cache_not_initialized` | `{thinkCache:{removed:true}, kvCache:{saves,loads,hits,misses,evictions,hitRate}, ttlByMode}` | test D1 |
+| `heartflow_decision_history` | `heartflow_instance_not_found` | `{history:[...], stats:{total,successRate,autoEnabled}}` | test D1 |
+| `heartflow_error_query` | `error memory not ready` | `{results:[{category,count}...], total, byCategory, byStatus, closedRate}` | test D1 |
+| `heartflow_error_store` | `error memory not ready` | `{stored:true, id:3, recurrence:true, success:true}` | test D1 |
+| `heartflow_error_fix` | `error memory not ready` | `{success:false, reason:'已验证无需再修复', id:1}`（正确业务逻辑） | test D1 |
+| `heartflow_error_verify` | `error memory not ready` | `{success:true, id:1, status:'verified'}` | test D1 |
+| `HandlerWiringChecker` 完整引擎 | —（不存在） | 8/8 可达 `healthy:true` | test F1 |
+| `HandlerWiringChecker` 残引擎 | — | 测出 boundary 缺失 / errorTaxonomy 缺 verify / kvCache 非数字 → healthy:false | test F2 |
+| 新增非注释代码 | — | **104 行**（handler-wiring-check 65 + mcp-server diff 39，不含测试） | `node -e` 逐文件统计 |
+| MCP 工具 / 路由 / 维度 / 模块 | 187 / 1,319 / 210 / 162 | **187 / 1,319 / 210 / 162 全部不变** | sync-doc-numbers.js；test E1/E2 |
+| `bin/verify.js` | — | **16/16** | — |
+| bidirectional-guard | — | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r252 基线逐项一致） | — |
+| guard-abilities | — | **20/20**（dimensions 键 210 不变） | — |
+| doc-numbers-accuracy | — | **24/24**（回归后测试数 19,440→19,455 由 sync 脚本同步，复跑仍 24/24） | — |
+| security-audit | — | 提交前 **15/16**（S2「git log/tag 未命中 6.8.181」为提交前预期失败，r236~r252 同款） | — |
+| 本轮新测试 | — | round-253 **14/14** | test/round-253-engine-access-revival.test.js |
+
+### 五、全量回归与计数
+全量回归 **19455 通过 / 154 失败 / 共 19609 个**（656 个测试文件，`data/round-253-regression.log`）。
+对照基线 **r252（data/round-252-regression.log）：19440 / 154 / 19594**（655 文件）：failed **154 → 154（持平）**、passed 19440 → 19455（**+15**）、total 19594 → 19609（**+15**）、文件 655 → 656（**+1**，即本轮新测试）。
+**失败文件清单逐项 comm 比对**：r253 **73 个**失败文件，r252 基线 **73 个**——**本轮新增失败文件 0 个、消失 0 个，清单逐项一致**。passed +15 的构成：本轮新测试 14 条断言 + 未输出汇总行类文件的计数波动净差 +1。**断言级零新增失败。**
+落在本轮改动上的回归为零：双向门禁召回 52/52 不降、误拦 302/326 不升；`guard-abilities` 20/20（维度 210 不变）；`bin/verify.js` 16/16；`doc-numbers-accuracy` 24/24；引擎干净启动 162 模块 `_initErrors` 空（test E1）；三个修复族工具在 MCP 端到端全通（test D1）；`heartflow_module_health` 既有 `summary` 形状不变（r251 对 checker 的断言不受影响）。噪声池与 r252 同族（MCP 类 6 个 8099 端口占用 + 未输出汇总行类 + 注册 0 用例类 + Command failed 类 dispatch 族），逐项比对无一带消失说明噪声池稳定。
+
+### 六、已知未修（含为什么不修）
+1. **`heartflow_cache_stats` 不再提供 think-cache 命中统计**（think-cache 已在 `[AUDIT-FIX 2026-11-02]` 作为死代码删除）。本轮按设计原则 #5 改为诚实记账（报 `thinkCache.removed:true` + 真实 kvCache），**不重新引入 think-cache**——那等于把已删的死代码加回来。若未来确需 think-cache 命中统计，应作为独立主题轮先论证需求再实现。
+2. **`HandlerWiringChecker` 只覆盖注册表登记的 8 条子系统依赖工具**，不代表全部 187 个 MCP 工具的接线健康（note 字段已写清）。扩到全量需要为每个工具标注其子系统依赖，是独立的梳理工作；本轮只把已查证的 8 条固化。
+3. **r252 探针的其余「not ready」形状本轮已全部查证并修复**（error-memory 四件套 + boundary + cache + decision 共 7 个），无遗留「not ready」未判。
+4. **`.gitignore` 无锚定目录模式扫描结论为阴性**（src//test/ 无源码被吞），但 `.gitignore` 里仍有 `data/`、`models/`、`internal/`、`examples/`、`logs/`、`assets/`、`dict-data/`、`distilled-knowledge/`、`tests/` 等无锚定目录模式——本轮只验证了它们当前**没有**吞到 src//test/ 源码（直接扫描交叉集为空），但这条规则本身仍是潜在系统性风险，换机器/新目录时值得复跑直接扫描（方法已留在 notes）。
+5. **判别引擎侧六条挂账原样继承**（本轮 `src/index.js` 零改动）：⑨族裸标记位置化（r225 纪律）、`PC_RITE_MECH_ZH` 仪式族位置化（r239 G3）、`PC_DRUG_MECH_ZH`/`PC_SUPP_MECH_ZH` 跨表统一（r236 G2 后半）、lastIndex 防空匹配防护前移、`scripts/negative-test-rc-temporal-causal-r364.js` 临时目录隔离、r71 测试 G 节 idx4 zh 侧句式缺口。另 r252 已知未修里的 `heartflow_translate` 的 `tone.tone` 兼容别名、28 个无调用方占位子系统的摘除、MetacognitiveReward 奖励口径调优，本轮未碰，续挂。
+
+### 七、踩坑
+1. **`find` 在 Windows Git Bash 被 cmd 内建 find 抢走**：首版 gitignore 扫描用 shell `find`，输出乱码「系统找不到指定的路径」且返回空，扫出「0 个被吞」是**假阴性**。改用纯 Node `fs.readdirSync` 递归遍历才拿到真实交叉集。
+2. **解析 .gitignore 模式会漏**：按「行以 `/` 结尾」提取目录模式时，`data/          # 注释` 这种带行尾注释的行 `endsWith('/')` 为假被跳过。改用**直接扫描**（遍历源文件逐个查 git ls-files + git check-ignore）后完全不依赖解析 .gitignore，更可靠。
+3. **B1 断言被自己的审计注释绊倒**：「源码不再出现 `heartflow._hfCore`」的正则命中了我写在注释里的旧模式字样（解释「旧代码为何坏」）。改为**先剥离块注释 + 行注释再匹配**——可执行代码里不允许出现，但注释里保留旧模式字样是合理的可审计性。
+4. **`new HeartFlow()` 不 `start()` 时子系统确实是 undefined**：裸构造只建 `_decisionHistory`，`boundaryGuard`/`errorMemory`/`errorTaxonomy`/`kvCache` 都要 `start()` 后才挂。一度误判「子系统不存在」，核实模块级实例调了 `start()`（:550）后才确认子系统在、是 handler 访问模式错。
+5. **测试的 F2 坏引擎数据要真「坏」**：首版给残引擎 `kvCache._stats.hits = 0`（是数字）→ cache_stats 判可达，与断言期望相反。改成 `hits:'not-a-number'` 才正确触发不可达。
+6. **子进程的 `handleRequest` 第三参传 `{__stdio:true}` 才拿 admin**：`handleRequest(request, sessionId, httpHeaders, forcedRole)`，httpHeaders.__stdio 走 `:5455` 提权；r252 测试用 `handleRequest(req, {__stdio:true})` 是把对象传给 sessionId（第二参），对只读工具碰巧能跑，但 error_store 等写工具需正确的 admin 角色，故本轮用 `handleRequest(req, null, {__stdio:true})`。
+
+
 
 **轮次**：r252 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（**不在 r251 候选池里的新发现**——本轮轮初全 MCP 工具面探针实测捞出）
 **真升级类型**：缺陷修复（5 个，全部实测确认 100% 崩）+ 新模块（`src/benchmark/` 下 2 个真实实现，544 行非注释代码）+ 仓库级配置修复（`.gitignore` 无锚定目录模式误伤源码目录）。MCP 工具 **187 不变**（本轮不新增工具，是让既有广告兑现）、dispatch 路由 **1,319 不变**、判别维度 **210 不变**（`src/index.js` 零改动）、引擎模块 **162 不变**（两个新模块不进 `_modules`）。

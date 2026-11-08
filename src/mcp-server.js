@@ -2257,7 +2257,10 @@ function handleDecisionRouterStats(args) {
 
 function handleModulesStatus(args) {
 
-  const hf = (typeof safeDispatch === 'function' && safeDispatch.length ? safeDispatch('heartflow.getStatus') : null) || globalThis.heartflow || null;
+  // [r253] 去掉末尾 `|| globalThis.heartflow` 死 fallback——该全局全 src 从未被赋值，
+  // 恒 undefined，本就落到 `|| null`；safeDispatch('heartflow.getStatus') 成功时更永不
+  // 到达这里。保留它只会让代码库引用一个从不存在的全局（r253 同轮修 cache/decision 同类问题）。
+  const hf = (typeof safeDispatch === 'function' && safeDispatch.length ? safeDispatch('heartflow.getStatus') : null) || null;
 
   if (!hf) {
 
@@ -2295,21 +2298,21 @@ function handleModulesStatus(args) {
 
 function handleCacheStats(args) {
 
-  const hf = globalThis.heartflow || null;
+  // [r253 修复] 两个缺陷叠加让 heartflow_cache_stats 100% 返回 'cache_not_initialized'
+  // （r253 轮初实测，引擎 162 模块已起仍崩）：
+  //   ① 读 globalThis.heartflow——该全局全 src 从未赋值，恒 undefined；
+  //   ② 引用的 hf._thinkCache 已在 [AUDIT-FIX 2026-11-02] 作为死代码删除
+  //      （heartflow.js:5904「this._thinkCache 全 src 从未」被引用）。
+  // 诚实记账（设计原则 #5）：think-cache 确已移除，不再伪造命中统计；改报真实存活
+  // 的缓存 kvCache（heartflow.js:3906 KVCachePersistor，_stats 含 saves/loads/hits/
+  // misses/evictions），并明确标注 thinkCache.removed。
+  const hf = heartflow || null;
 
-  if (!hf || !hf._thinkCache) {
+  if (!hf) {
 
-    return { error: 'cache_not_initialized' };
+    return { error: 'heartflow_instance_not_found' };
 
   }
-
-  const cache = hf._thinkCache;
-
-  const stats = { ...cache.stats };
-
-  const total = stats.hits + stats.misses;
-
-  stats.hitRate = total > 0 ? Number((stats.hits / total).toFixed(4)) : null;
 
   const ttlByMode = {
 
@@ -2321,9 +2324,29 @@ function handleCacheStats(args) {
 
   };
 
+  const kv = hf.kvCache && hf.kvCache._stats;
+
+  const kvStats = kv ? { ...kv } : null;
+
+  if (kvStats) {
+
+    const total = (kvStats.hits || 0) + (kvStats.misses || 0);
+
+    kvStats.hitRate = total > 0 ? Number(((kvStats.hits || 0) / total).toFixed(4)) : null;
+
+  }
+
   return {
 
-    cache: stats,
+    thinkCache: {
+
+      removed: true,
+
+      note: '_thinkCache 已在 [AUDIT-FIX 2026-11-02] 作为死代码删除（全 src 零引用），本工具不再提供 think-cache 命中统计',
+
+    },
+
+    kvCache: kvStats,
 
     ttlByMode,
 
@@ -2337,7 +2360,11 @@ function handleCacheStats(args) {
 
 function handleDecisionHistory(args) {
 
-  const hf = globalThis.heartflow || null;
+  // [r253 修复] 原读 globalThis.heartflow——该全局全 src 从未被赋值，恒 undefined，
+  // 导致 heartflow_decision_history 100% 返回 'heartflow_instance_not_found'（r253 轮初
+  // 实测，引擎 162 模块已起仍崩）。引擎实例是模块级 heartflow（initHeartFlow() 548 行
+  // 赋值并 start()），_decisionHistory 由构造函数 1516 行初始化、start 后持续追加。
+  const hf = heartflow || null;
 
   if (!hf) {
 
@@ -2427,11 +2454,25 @@ function handleModuleHealth(args) {
 
     const summary = checker.getSummary();
 
+    // [r253] 追加 handler 接线自检：module_health 原本只覆盖 _modules 里的模块健康，
+    // 对「handler 探不到它的引擎子系统」这一类 bug 失明（r253 实测 7 个广告工具因此
+    // 100% 崩而 module_health 全绿）。用同一把活引擎实例跑 HandlerWiringChecker，
+    // 以加法字段暴露，不改动 summary 的既有形状（r251 对 checker 的断言不受影响）。
+    let handlerWiring = null;
+    try {
+      const { HandlerWiringChecker } = require(path.join(HF_DIR, 'src/mcp/handler-wiring-check.js'));
+      handlerWiring = new HandlerWiringChecker(heartflow).check();
+    } catch (we) {
+      handlerWiring = { engineReady: !!heartflow, healthy: false, reason: 'wiring_check_failed: ' + we.message };
+    }
+
     return {
 
       report,
 
       summary,
+
+      handlerWiring,
 
       timestamp: Date.now()
 
@@ -2992,27 +3033,39 @@ function handleCheckDrift() {
 function handleErrorStore(args) {
   const { problem, action, outcome } = args || {};
   if (!problem||!action||!outcome) return { error: 'need problem, action, outcome' };
-  if (!heartflow||!heartflow._hfCore) return { error: 'error memory not ready' };
-  try { return heartflow._hfCore.errorMemory.store(problem, action, outcome); } catch(e) { return { error: e.message }; }
+  // [r253 修复] 原判空读 heartflow._hfCore——该属性全 src 从未被赋值，恒 undefined，
+  // 导致 error-memory 四件套从写出起就 100% 返回 'error memory not ready'（r253 轮初
+  // 实测：引擎已完整启动 162 模块，四个工具仍全崩）。真身在 heartflow._modules.errorMemory
+  // （heartflow.js start() 阶段 4498 行挂载，转发 error-memory.js 的 logCorrection）。
+  const em = heartflow && heartflow._modules && heartflow._modules.errorMemory;
+  if (!em || typeof em.store !== 'function') return { error: 'error memory not ready' };
+  try { return em.store(problem, action, outcome); } catch(e) { return { error: e.message }; }
 }
 function handleErrorQuery(args) {
   const { problem, limit } = args || {};
   if (!problem) return { error: 'need problem' };
-  if (!heartflow||!heartflow._hfCore) return { error: 'error memory not ready' };
-  try { return heartflow._hfCore.errorMemory.query(problem, limit || 5); } catch(e) { return { error: e.message }; }
+  const em = heartflow && heartflow._modules && heartflow._modules.errorMemory;
+  if (!em || typeof em.query !== 'function') return { error: 'error memory not ready' };
+  try { return em.query(problem, limit || 5); } catch(e) { return { error: e.message }; }
 }
 // [v6.6.0] 闭环状态机: 错误 → 修复 → 验证
 function handleErrorFix(args) {
   const { id, note } = args || {};
   if (id === undefined) return { error: 'need id' };
-  if (!heartflow||!heartflow._hfCore||!heartflow._hfCore.errorMemory) return { error: 'error memory not ready' };
-  try { return heartflow._hfCore.errorMemory.fix(id, note || ''); } catch(e) { return { error: e.message }; }
+  // [r253 修复] errorMemory 本体只有 store/query/getStats，没有 fix/verify——闭环状态机
+  // 的 fix/verify 挂在 errorTaxonomy 子系统（heartflow.js 4527-4528 行，转发 error-memory.js
+  // 的 logFix/logVerify）。原实现读从不存在的 heartflow._hfCore.errorMemory.fix，恒崩；
+  // 改指 heartflow._modules.errorTaxonomy.fix。
+  const tax = heartflow && heartflow._modules && heartflow._modules.errorTaxonomy;
+  if (!tax || typeof tax.fix !== 'function') return { error: 'error taxonomy not ready' };
+  try { return tax.fix(id, note || ''); } catch(e) { return { error: e.message }; }
 }
 function handleErrorVerify(args) {
   const { id, note } = args || {};
   if (id === undefined) return { error: 'need id' };
-  if (!heartflow||!heartflow._hfCore||!heartflow._hfCore.errorMemory) return { error: 'error memory not ready' };
-  try { return heartflow._hfCore.errorMemory.verify(id, note || ''); } catch(e) { return { error: e.message }; }
+  const tax = heartflow && heartflow._modules && heartflow._modules.errorTaxonomy;
+  if (!tax || typeof tax.verify !== 'function') return { error: 'error taxonomy not ready' };
+  try { return tax.verify(id, note || ''); } catch(e) { return { error: e.message }; }
 }
 // [v6.3.7] 公式搜索
 function handleFormulaSearch(args) {
@@ -3423,8 +3476,14 @@ const HANDLERS = {
 
   heartflow_think: handleThink,
 
-  heartflow_boundary_check: (args, hf) => {
-    const bg = (hf && (hf.boundaryGuard || hf._modules?.boundaryGuard)) || null;
+  heartflow_boundary_check: (args) => {
+    // [r253 修复] 原用第二个形参 hf 当引擎实例，但 tools/call 以 handler(args, sessionId)
+    // 调用（mcp-server.js:5545），第二参实为 sessionId 字符串——hf.boundaryGuard 恒
+    // undefined，heartflow_boundary_check 100% 返回 'boundaryGuard not loaded'（r253 轮初
+    // 实测，引擎 162 模块已起仍崩）。引擎实例是模块级 heartflow（start() 后 3927 行挂载
+    // this.boundaryGuard + _modules.boundaryGuard）。改用模块级实例取真门禁。
+    const engine = heartflow || null;
+    const bg = (engine && (engine.boundaryGuard || engine._modules?.boundaryGuard)) || null;
     if (!bg) return { error: 'boundaryGuard not loaded' };
     const fp = (args && args.filePath) || '';
     const res = bg.checkWrite(fp, { actor: (args && args.actor) || 'mcp', purpose: (args && args.purpose) || 'check' });
