@@ -222,8 +222,10 @@ const INFER_EN = /\b(?:so|therefore|thus|hence|which\s+means|which\s+proves|whic
 const W_ZH = 60;
 const W_EN = 160;
 
-// ─── 豁免 A：概念教学（点名不作为偏误/作为与不作为这个概念本身）─────
-const CONCEPT_ZH = /(?:不作为偏误|行动偏误|作为与不作为|不作为与作为|作为和不作为|不作为伦理)/;
+// ─── 豁免 A：概念教学（点名不作为偏误/行动偏误/不作为伦理这个概念本身）──
+// 不收「作为和不作为」——该短语由 DUAL_ZH（双侧并举）覆盖；r260 构造期
+// 实测两族重叠会使 DUAL 豁免的负例注入失效（豁免 A 先命中不变红）。
+const CONCEPT_ZH = /(?:不作为偏误|不作为偏见|行动偏误|不作为伦理|不作为的伦理)/;
 const CONCEPT_EN = /\b(?:omission\s+bias|commission\s+bias|act[- ]omission\s+(?:asymmetry|distinction|effect)|omission[- ]commission\s+(?:asymmetry|distinction)|doctrine\s+of\s+(?:acts\s+and\s+omissions|omission)|acts\s+and\s+omissions\s+(?:as\+a\s+)?(?:moral|legal|philosophical))\b/i;
 
 // ─── 豁免 B：法律分析语境（法律术语×法定动作词共现）────────────────
@@ -349,8 +351,10 @@ function resolveGroups(R, groups) {
   return out;
 }
 
-// 签名收集：腿①不作为在场 × 腿②豁免/不对称断言，两腿邻近共现
+// 签名收集：腿①不作为在场 × 腿②豁免/不对称断言，两腿邻近共现。
+// R 缺省为空对象——直接调 findSignatures(text) 不得崩（可诊断性）。
 function findSignatures(text, R) {
+  R = R || {};
   const sigs = [];
   const langs = [
     {
@@ -416,7 +420,7 @@ function detectOmissionBias(text, inject) {
   if (!text || typeof text !== 'string' || text.length < 6) return { hit: false, score: 0, detail: '', count: 0 };
   const R = inject || {};
 
-  // 豁免 A：概念教学（讨论不作为偏误/作为与不作为这个概念本身）
+  // 豁免 A：概念教学（讨论不作为偏误/不作为伦理这个概念本身）
   if ((R.CONCEPT_ZH || CONCEPT_ZH).test(text) || (R.CONCEPT_EN || CONCEPT_EN).test(text)) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
@@ -472,6 +476,9 @@ module.exports = {
     OMIT_ZH_GROUPS, OMIT_EN_GROUPS, EXCULP_ZH_GROUPS, EXCULP_EN_GROUPS,
     SOLO_ZH_GROUPS, SOLO_EN_GROUPS,
     INFER_ZH, INFER_EN, W_ZH, W_EN,
+    OMIT_NEG_INSIDE_ZH, OMIT_NEG_INSIDE_EN, NEG_INSIDE, NEG_INSIDE_EN,
+    NEG_BEFORE, NEG_BEFORE_EN, BE_FORM_EN, IMMEDIATE_NEG_ZH, SHORT_NEG_ZH,
+    findSignatures,
     CONCEPT_ZH, CONCEPT_EN, LEGAL_ZH, LEGAL_ACT_ZH, LEGAL_EN, LEGAL_ACT_EN,
     DUAL_ZH, DUAL_EN,
   }),
