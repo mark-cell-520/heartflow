@@ -1,0 +1,34 @@
+A1    HIT  score=0.72  count=2   | 他会迟到就是因为不负责，别找客观原因
+        evidence: 特质归因「不负责，别找客观」→ 情境排斥「」
+A2    HIT  score=0.72  count=2   | 穷人穷是因为他们懒，不要提什么环境因素
+        evidence: 特质归因「懒，不要提什么环境」→ 情境排斥「」
+A3    HIT  score=0.62  count=1   | 他能成功全靠天赋，运气和时代背景都不值一提
+        evidence: 特质归因「全靠天赋」→ 情境排斥「运气和时代背景都不值一提」
+A4    HIT  score=0.62  count=1   | 这些人失败纯粹是因为能力差，跟资源分配没关系
+        evidence: 特质归因「纯粹是因为能力差」→ 情境排斥「跟资源分配没关系」
+A5    HIT  score=0.62  count=1   | He is late because he is irres
+        evidence: disposition attribution "because he is irresponsible" -> situation dismissal "stop making excuses"
+A6    HIT  score=0.62  count=1   | Poor people are poor because t
+        evidence: disposition attribution "because they are lazy" -> situation dismissal "never mind circumstances"
+A7    HIT  score=0.62  count=1   | She succeeded purely through t
+        evidence: disposition attribution "purely through talent" -> situation dismissal "luck and timing are irrelevant"
+A8    HIT  score=0.62  count=1   | 员工离职就是嫌钱少，别谈什么发展空间
+        evidence: 特质归因「就是嫌钱少」→ 情境排斥「别谈什么发展空间」
+A9    HIT  score=0.62  count=1   | 他抑郁就是想不开，哪有那么多外界压力
+        evidence: 特质归因「就是想不开」→ 情境排斥「哪有那么多外界压力」
+A10   HIT  score=0.72  count=2   | 就是不负责，别找借口
+        evidence: 特质归因「不负责，别找借口」→ 情境排斥「」
+A11   HIT  score=0.72  count=2   | He is just lazy, no excuses
+        evidence: disposition attribution "He is just lazy, no excuses" -> situation dismissal ""
+B1    miss score=0     count=0   | 他迟到可能是因为交通和安排，我们先核实情况再判断
+B2    miss score=0     count=0   | 我们会同时考虑个人责任和情境约束，不把结果全归因于性格
+B3    miss score=0     count=0   | We weigh both disposition and 
+B4    miss score=0     count=0   | 我这次失败纯粹是因为我懒，不找借口
+B5    miss score=0     count=0   | 基本归因错误告诉我们别把迟到全归因于性格
+B6    miss score=0     count=0   | 他迟到真的只是因为他懒吗？
+B7    miss score=0     count=0   | 他这人就是不负责
+B8    miss score=0     count=0   | 别找借口，先看数据
+B9    miss score=0     count=0   | 这件事全是市场的错，我一点责任都没有
+B10   miss score=0     count=0   | 年轻人就是不踏实，别指望他们
+B11   miss score=0     count=0   | 他又没少块肉，这点批评算什么伤害
+B12   miss score=0     count=0   | 不能把失败全归于个人，制度设计也要检讨
