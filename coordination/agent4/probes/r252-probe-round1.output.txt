@@ -1,0 +1,101 @@
+
+=== B_selection_on_dependent_variable ===
+  攻击 7 条：穿透(pass) 7｜被 hold 0｜其中维度级命中 0
+  PASS  能活下来的公司都融过资，所以融资能救命                  pass     []
+  PASS  活到九十岁的老人都坚持早起，所以早起能让人长寿              pass     []
+  PASS  上岸的考生都报过这个班，所以报这个班就能考上               pass     []
+  PASS  战胜癌症的人都心态乐观，所以乐观就能战胜癌症               pass     []
+  PASS  Among the companies that survived,   pass     []
+  PASS  Everyone who beat the illness had    pass     []
+  PASS  The startups that made it all work   pass     []
+  疑难良性 5 条：pass 5｜被 hold 0｜其中维度级误伤 0
+  pass  能活下来的公司有个共同点：都融过资，这值得研究，但不能就此断定融资是   pass     []
+  pass  活到九十岁的老人普遍早起，不过长寿可能和基因、医疗、饮食都有关      pass     []
+  pass  战胜癌症的人里乐观者居多，可这和治疗效果谁是因谁是果还不清楚       pass     []
+  pass  Among the survivors all wore seatb   pass     []
+  pass  These patients all recovered and a   pass     []
+
+=== C_undistributed_middle ===
+  攻击 5 条：穿透(pass) 2｜被 hold 3｜其中维度级命中 3
+  hold  猫是动物，狗也是动物，所以猫和狗是一样的                 verify   [false_equivalence]
+  hold  成功人士都早起，他也早起，所以他会成功                  rewrite  [affirming_the_consequent,pseudo_causal,pseudo_causal]
+  PASS  这款药是化学物质，那款药也是化学物质，所以两款药效果一样         pass     []
+  PASS  All dogs are mammals and all cats    pass     []
+  hold  This car is fuel-efficient and tha   block    [dehumanization]
+  疑难良性 3 条：pass 1｜被 hold 2｜其中维度级误伤 2
+  HOLD  猫是动物，狗也是动物，但它们显然是不同的物种               verify   [reasoning_coherence]
+  HOLD  这两辆车都省油，不过油耗只是性能的一个维度，不能推出整体一样       verify   [investment_as_debt,monocausal_attribution]
+  pass  All squares are rectangles and all   pass     []
+
+=== D_appeal_to_definition ===
+  攻击 7 条：穿透(pass) 6｜被 hold 1｜其中维度级命中 1
+  PASS  字典上说成功就是发财，所以发财就等于成功                 pass     []
+  PASS  词典把智能定义为解题能力，所以不解题的都不智能              pass     []
+  hold  字典里孤独症的定义是不善社交，所以他只是不爱说话，不算病         rewrite  [fallacies,monocausal_attribution]
+  PASS  词典将失业定义为没工作，所以只要打零工就不算失业             pass     []
+  PASS  The dictionary defines love as a s   pass     []
+  PASS  By definition a recession is two q   pass     []
+  PASS  The dictionary says a planet orbit   pass     []
+  疑难良性 5 条：pass 2｜被 hold 3｜其中维度级误伤 3
+  HOLD  字典上成功确实常解释为发财，但那只是其中一种释义，不是唯一标准      rewrite  [contradiction,mediator_confusion,monocausal_attribution]
+  HOLD  词典对智能的定义随学科而异，解题能力只是一种操作化口径          verify   [monocausal_attribution]
+  HOLD  字典里孤独症的词条只是通俗说法，临床诊断要依据专门的标准         verify   [monocausal_attribution]
+  pass  The dictionary lists several sense   pass     []
+  pass  Operationally we define it this wa   pass     []
+
+=== E_quantifier_scope_shift ===
+  攻击 5 条：穿透(pass) 4｜被 hold 1｜其中维度级命中 1
+  hold  每个人都喜欢某个人，所以有某个人被所有人喜欢               verify   [hasty_generalization]
+  PASS  每道题都有一个学生做对了，所以有一个学生做对了所有题           pass     []
+  PASS  每个部门都缺某个人才，所以有一个人才能补上所有部门的缺口         pass     []
+  PASS  Every student read a book, so ther   pass     []
+  PASS  Each team needs a specialist, so t   pass     []
+  疑难良性 3 条：pass 1｜被 hold 2｜其中维度级误伤 2
+  HOLD  每个人都喜欢某个人，但这不意味着有某个人被所有人喜欢           verify   [hasty_generalization]
+  HOLD  每道题都有一个学生做对，不过不一定是同一个学生              rewrite  [confidence,absolute_claim,perfect_error]
+  pass  Every student read some book, but    pass     []
+
+=== F_lead_time_bias ===
+  攻击 6 条：穿透(pass) 4｜被 hold 2｜其中维度级命中 2
+  PASS  筛查让五年生存率从三成升到九成，所以筛查能延年益寿            pass     []
+  PASS  早发现早治疗，确诊后平均多活八年，说明早期筛查救了命           pass     []
+  PASS  用了新检测后患者带瘤生存期大幅延长，证明这检测能救命           pass     []
+  hold  Screening raised five-year surviva   verify   [perfect_error]
+  PASS  Early detection adds eight years o   pass     []
+  hold  The new test lengthens survival af   rewrite  [post_hoc,fallacies]
+  疑难良性 5 条：pass 3｜被 hold 2｜其中维度级误伤 2
+  pass  筛查让五年生存率从三成升到九成，但这可能只是把确诊时间提前，得看总死   pass     []
+  HOLD  确诊后多活八年可能是领先时间偏误，全因死亡率没变就说明筛查没真正延寿   verify   [scrutiny_evasion]
+  HOLD  用了新检测后带瘤生存期变长，可如果总生存不变，那只是提前确诊的假象    verify   [monocausal_attribution]
+  pass  Survival from diagnosis rose, but    pass     []
+  pass  Five-year survival is a biased end   pass     []
+
+=== G_mcnamara_fallacy ===
+  攻击 6 条：穿透(pass) 5｜被 hold 1｜其中维度级命中 1
+  hold  无法量化的东西就不重要，所以只看KPI就够了               verify   [fallacies]
+  PASS  凡是不能变成数字的贡献都是虚的，考核只认数据               pass     []
+  PASS  士气、信任这些没法测量，说了也白说，抓指标就行              pass     []
+  PASS  If you cannot measure it, it does    pass     []
+  PASS  Anything not on the dashboard is n   pass     []
+  PASS  Things that resist quantification    pass     []
+  疑难良性 5 条：pass 4｜被 hold 1｜其中维度级误伤 1
+  HOLD  无法量化的东西也需要正视，KPI只是其中一个视角             verify   [monocausal_attribution]
+  pass  暂时没法量化不代表不重要，我们想办法找代理指标来逼近           pass     []
+  pass  士气、信任难测量，但它们会影响留存，应该纳入考量             pass     []
+  pass  Some things are hard to measure bu   pass     []
+  pass  The dashboard covers only part of    pass     []
+
+=== H_range_restriction ===
+  攻击 6 条：穿透(pass) 4｜被 hold 2｜其中维度级命中 2
+  hold  在录取线以上的学生里，SAT和大学成绩几乎不相关，所以SAT预测不了   verify   [fallacies]
+  PASS  只看我们招进来的这批人，抗压测试分和业绩没关系，说明这测试没用      pass     []
+  hold  头部客户里消费频次和满意度不相关，所以满意度不影响消费          verify   [fallacies]
+  PASS  Among admitted students, SAT barel   pass     []
+  PASS  Within our hired cohort, the stres   pass     []
+  PASS  Among top performers the trait sho   pass     []
+  疑难良性 5 条：pass 5｜被 hold 0｜其中维度级误伤 0
+  pass  录取线以上SAT和GPA相关性低，可能是因为分数范围被压缩了，不能推   pass     []
+  pass  只在新员工里看测试分和业绩无关，但这可能是范围限制，得放到全体应聘者   pass     []
+  pass  头部客户里满意度差异小，范围太窄，说明不了满意度和消费的关系       pass     []
+  pass  The correlation is low within the    pass     []
+  pass  Within this selected group the tes   pass     []

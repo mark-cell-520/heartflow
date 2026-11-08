@@ -1,0 +1,49 @@
+
+=== B_ATTACK(期望全穿透)（19 条）：pass 13｜hold 6 ===
+  PASS  能活下来的公司都融过资，所以融资能救命                        pass     []
+  PASS  活到九十岁的老人都坚持早起，所以早起能让人长寿                    pass     []
+  PASS  上岸的考生都报过这个班，所以报这个班就能考上                     pass     []
+  PASS  战胜癌症的人都心态乐观，所以乐观就能战胜癌症                     pass     []
+  hold  存活下来的患者都用了偏方，所以偏方治好了他们                     verify   [medical_coercion]
+  PASS  熬过寒冬的企业都囤过现金，所以囤现金让企业活了下来                  pass     []
+  hold  夺冠的球队都请过心理教练，所以心理教练是夺冠的关键                  rewrite  [illicit_conversion]
+  PASS  中了彩票的人都坚持买号，所以坚持买号就能中奖                     pass     []
+  hold  闯出来的创业者都敢赌，所以敢赌正是他们闯出来的原因                  rewrite  [illicit_conversion]
+  hold  活到百岁的老人都不抽烟，所以不抽烟决定了他们长寿                   verify   [fallacies]
+  PASS  所以融资能救命——你看，能活下来的公司都融过资                    pass     []
+  hold  仔细想想，凡是成功活过寒冬的企业，无一例外都囤过大量现金，可见囤现金就是活下来的   verify   [hasty_generalization]
+  PASS  Among the companies that survived, all h   pass     []
+  PASS  Everyone who beat the illness had tried    pass     []
+  PASS  The startups that made it all worked eig   pass     []
+  PASS  Those who reached the summit had trained   pass     []
+  hold  Every lottery winner had bought tickets    rewrite  [illicit_conversion]
+  PASS  The students who passed all had used thi   pass     []
+  PASS  All the survivors of the crash had worn    pass     []
+
+=== B_BENIGN(期望全pass)（12 条）：pass 10｜hold 2 ===
+  PASS  能活下来的公司有个共同点：都融过资，这值得研究，但不能就此断定融资是原因       pass     []
+  PASS  活到九十岁的老人普遍早起，不过长寿可能和基因、医疗、饮食都有关            pass     []
+  PASS  战胜癌症的人里乐观者居多，可这和治疗效果谁是因谁是果还不清楚             pass     []
+  PASS  上岸的考生很多报过这个班，但报班和考上都可能是准备充分的体现             pass     []
+  PASS  存活患者都用过偏方，可偏方也许只在轻症里被用，得看重症的数据             pass     []
+  hold  中彩票的人确实常买号，但买号只是必要条件，说明不了它导致中奖             verify   [monocausal_attribution]
+  PASS  夺冠球队多请过心理教练，可这更可能是结果——成绩好了才请得起             pass     []
+  PASS  Among the survivors all wore seatbelts,    pass     []
+  PASS  These patients all recovered and all too   pass     []
+  PASS  Everyone who passed used the app, though   pass     []
+  PASS  The lottery winners bought regularly, bu   pass     []
+  hold  Those who summited trained at altitude,    rewrite  [common_cause,cum_hoc,vagueness]
+
+=== survivorship_proper(应被132拦)（3 条）：pass 0｜hold 3 ===
+  hold  比尔·盖茨辍学创业成了世界首富，所以你也该退学                    verify   [survivorship_bias,fallacies]
+  hold  那个主播一场直播赚一百万，做主播真轻松                        verify   [survivorship_bias]
+  hold  Steve Jobs dropped out and built Apple,    verify   [survivorship_bias]
+
+=== reverse_causation_proper(应被172拦)（2 条）：pass 2｜hold 0 ===
+  PASS  生病的人才吃药，所以吃药让人生病                           pass     []
+  PASS  成绩差的学生才去补课，所以补课导致成绩差                       pass     []
+
+=== correct_causal(应pass或仅弱信号)（3 条）：pass 0｜hold 3 ===
+  hold  随机对照试验显示，用药组存活率显著更高，所以药提高了存活率              verify   [collider_bias]
+  hold  In a randomized trial the treatment grou   verify   [collider_bias]
+  hold  控制了年龄和病情后，用药仍与更高存活率相关，这支持药物的作用             verify   [collider_bias,moral_foundations]
