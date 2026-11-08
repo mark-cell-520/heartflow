@@ -97,7 +97,25 @@ const MALICIOUS_PURPOSE = new RegExp([
 //   边界（scripts/round-738/probe-di-boundary.js 实测锚点）：
 //   「删除所有审计记录，只保留最近一小时的操作」短窗 → 不赦（block 保持）；
 //   「删除所有系统日志」无限定 → 不赦（block 保持）。
-const DI_RETENTION_WINDOW = /^[^。\n.]{0,40}?(?:只|仅)(?:需|要|请)?(?:保留|留存|留下|留)[^。\n.]{0,12}(?:最近|近期|过去)\s*(?:半年|数\s*天|几\s*天|[0-9一二三四五六七八九十两]+\s*(?:天|周|个月|月|年))|^[^.]{0,40}?(?:keeping|retain(?:ing)?|leaving)\s+only\s+the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year)|^[^.]{0,40}?except\s+(?:for\s+)?the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year)/i;
+// [r741] 子句表扩容 + 赦免方向扩容（r740 交接方向①，EN keeping only the
+//   last N days 的 ZH 倒装形复查，scripts/round-741/probe-zh-inverted.js
+//   实测 9 例误 block）：
+//   支① 前缀扩 唯独（「唯独最近7天的保留」——负例 M5 实测承重）、
+//     保留动词改可选（除了形/唯独形无保留动词可吃，负例 M7 承重）、
+//     窗前缀扩 近|前（「近30天」「前3天」口语窗）、单位补 日
+//     （「最近7日」书面形）。注：「但只保留」形无需单列 alternation
+//     ——{0,40}? 惰性前缀吸收「但」字后裸「只」即吃，r741 负例 M5b
+//     实测证伪了 但?只 单列的必要性（已删，防装饰性 alternation）。
+//   支② 新增 ZH 除了形（EN except the last N 的 ZH 对应，r738 只收 EN 侧）：
+//     「除了/除 + ≤12字 + 最近…+ 长窗」，子串兼收 排除/剔除/去除 形；
+//   支⑤ 新增 EN other than the last N days（「Delete all logs other than
+//     the last 7 days」探针实测误 block）。
+//   赦免方向：命中段**之前** 40 字内出现同一子句同样作废（前置倒装族，
+//   见循环内 _before 切片注释）——常量各行首 ^ 锚 + {0,40}? 惰性前缀对
+//   _before 切片语义与 _after 完全同构，单一来源不生第二份正则。
+//   支③ keeping…only the last N、支④ except (for) the last N 维持 r738
+//   原样（P4 内置 EN 否决独立承重的形状不动）。
+const DI_RETENTION_WINDOW = /^[^。\n.]{0,40}?(?:唯独|只|仅)(?:需|要|请)?(?:保留|留存|留下|留)?[^。\n.]{0,12}(?:最近|近期|过去|近|前)\s*(?:半年|数\s*天|几\s*天|[0-9一二三四五六七八九十两]+\s*(?:天|周|个月|月|年|日))|^[^。\n.]{0,40}?(?:除了|除)[^。\n.]{0,12}(?:最近|近期|过去|近|前)\s*(?:半年|数\s*天|几\s*天|[0-9一二三四五六七八九十两]+\s*(?:天|周|个月|月|年|日))|^[^.]{0,40}?(?:keeping|retain(?:ing)?|leaving)\s+only\s+the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year)|^[^.]{0,40}?except\s+(?:for\s+)?the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year)|^[^.]{0,40}?other\s+than\s+the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year)/i;
 const DANGEROUS_PATTERNS = [
   // ① 忽略/绕过/关闭安全机制
   // [v6.7.116] 动词表扩口语变体：原表只有 忽略|无视|绕过|跳过|关闭|禁用|去掉|取消，
@@ -1402,6 +1420,16 @@ function _matchAll(text) {
       // 攻击锚点 K1-K4 实测全部仍 block。
       const _after = _t.slice(m.index + m[0].length, m.index + m[0].length + 40);
       if (DI_RETENTION_WINDOW.test(_after)) continue;
+      // [r741] 前置倒装族赦免（_after 的反方向，同一常量复用）：窗口子句
+      // 在命中段**之前**——「只保留最近 N 天的，把其他审计日志全部删掉」。
+      // 窗口前置时 _after 切片为空，r740 交接方向①实测该族 9 例误 block。
+      // 常量各行首 ^ 锚 + {0,40}? 惰性前缀 = 「子句须落在切片前 40 字内」，
+      // 对 _before 切片与 _after 完全同构，单一来源不生第二份正则。
+      // 短窗（一小时/五分钟/半天）与无限定仍不赦，攻击锚点 KA1-KA6 实测
+      // 全部仍 block；暴露面与 r738 已接受的 _after 对称形状一致（「删除
+      // 所有系统日志，只保留最近7天的备份」同样赦免）。
+      const _before = _t.slice(Math.max(0, m.index - 40), m.index);
+      if (DI_RETENTION_WINDOW.test(_before)) continue;
       hits.push({ type: 'dangerous_instruction', matched: m[0].slice(0, 40) });
     }
   }
