@@ -1,3 +1,50 @@
+## r741 — di 保留窗口中文倒装/除了族赦免（r740 交接方向①复测坐实轮）
+
+**轮次**：r741 ｜ **版本**：v6.8.167 → v6.8.168（VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README 版本戳+changelog/version.js 兜底/BUILD_DATE，sync-version.js 实测同步）｜ **日期**：2026-11-08
+
+**方向**：r740 交接簿下一轮方向①（di EN 后置过期限定 ZH 倒装形复查）。init 简报方向池 6 项为历史池复述，复测后仅方向①坐实：普查脚本实测 **9 条良性中文形误 block**（B2/B3/C1/C2/C5/D1/D2/D3/E2），其余排除：di「以符合」目的状语 3/3 OK（r717/r734 已修）、方向池其余项为 r218 起的历史复述无新缺口。
+
+**真升级类型**：存量探测器赦免边界重划（用户可感知：「只保留最近 30 天的，把其他审计日志全部删掉」「除了最近 7 天的备份，其余全部清掉」等 9 类中文倒装/除了族良性从 **block 改判 pass**；K1-K4 短窗攻击锚点 + Z1-Z4 无限定攻击共 12 条零变动，召回不降）。
+
+**根因**（v6.8.167 HEAD 实测，scripts/round-741/probe-zh-inverted.js 普查 + probe-e1k3-p2a.js 归因）：
+- **支①倒装形缺席**：正语序「只保留最近 N 天」族存在（r738），但**窗口前置的倒装句**——「只保留最近 30 天的，把其他审计日志全部删掉」——删除句在窗口句之后，r738 的 `_after` 后置否决只吃「删除动作在前、窗口在后」；窗口前置时 `_after` 切片为空，命中直接 block。
+- **支②除了族整体缺席**：「除了（最近的/最后的）N（天|条）…（其他|其余|剩下）…删」在 ZH 侧零覆盖（r738 只收了 EN `except (for) the last N days`）。
+- **支③EN 后置族**：r738 已修（存量锚点），ZH 无对应形——本轮补齐后两侧同构。
+- **K3 存量漏放根因**：P2 量词表缺「其他/其余/剩下」（攻击侧缺口，非本轮赦免面，留档下一轮）。
+
+**修法**（src/dangerous-instruction.js）：
+- **DI_RETENTION_WINDOW 常量扩展为 5 支**：① `(?:唯独|只|仅)(?:需|要|请)?(?:保留|留存|留下|留)?` + 惰性前缀 + 窗口词；② `(?:除了|除)` + 窗口词 + N 天/周/个月/年（含 半年/数天/几天）；③ EN `keeping|retain(?:ing)?|leaving only the last N`（r738 原位保留）；④ `except (for) the last N`（r738 锚点不动）；⑤ `other than the last N`。
+- **新增 `_before` 前置倒装检查**（循环内 1432 行）：命中段前 40 字符窗口复用同一常量。常量各行首 `^` 锚 + `{0,40}?` 惰性前缀天然约束「子句须落在切片前 40 字内」，对 `_before` 与 `_after` **完全同构**——单一来源不生第二份正则。
+- **删除冗余 `但?只` alternation**：实测 `{0,40}?` 惰性前缀吸收「但」后吃裸「只」即可（M5/M5b 拆分证伪），保留 `(?:唯独|只|仅)`。
+
+**diff**：`git diff --shortstat 33e8fac3 HEAD` 实测 **15 files, 651 insertions + 13 deletions**（2 commits：`6aea4a9c` 主体 8 files + `60d51d08` 证据链 7 files；src/dangerous-instruction.js 30+/8-，证据链 test 310 + 负例 190 + 探针 160 行，总有效 diff 约 **664 行**，落在 500-1000 区间）。
+
+**验证逐项实测**：
+
+| 项 | 结果 |
+|---|---|
+| test/round-741-di-retention-window-inverted.test.js | **46 passed, 0 failed**（前置倒装族 5 + 除了族 5 + 变体 7 + EN 3 + 攻击锚点 12 + 存量锚点 10 + 接线断言 2 + think() 冒烟 1 + 分工边界 1） |
+| scripts/negative-test-retention-window-inverted-r741.js | **143 PASS, 11 翻红, 0 FAIL**：7 变异（M1-M7）全翻红 + 存量攻击 8 条变异下仍命中 + 存量良性 7 条零误伤 |
+| scripts/round-741/probe-zh-inverted.js | 普查基线：**9 误 block → 修后全绿**，K 攻击锚点维持（K3 存量漏放已归因） |
+| scripts/round-741/probe-samples.js | **33/33** 样本 gate+di 双向符合设计 |
+| scripts/round-741/verify-regex.js | **15/15** 常量字节级单测（5 支逐支+编译+锚点语义） |
+| scripts/round-741/probe-think-smoke.js（new HeartFlow + think()） | **23 passed, 0 failed**（正反两例） |
+| scripts/round-741/probe-e1k3-p2a.js | 存量漏放 E1/K3/P2a 归因定位（均非本轮引入） |
+| test/round-738-meta-discourse-retention-window.test.js | **54/54 passed，零回归** |
+| test/round-735-di-log-destruction.test.js | **1/1 passed** |
+| scripts/negative-test-retention-window-r738.js | **8/8 翻红，0 漏翻** |
+| node bin/verify.js | **16 passed, 0 failed** |
+| node scripts/bidirectional-guard.js | 召回 **52/52**、误拦 **302/326**（与基线完全一致，零新增误拦） |
+| node test/doc-numbers-accuracy.test.js | **24 passed, 0 failed** |
+| node test/security-audit.test.js | **16 passed, 0 failed**（commit 前 S2 预期红：版本未进 git log） |
+| node bin/cli.js status | **running**（version 6.8.168） |
+
+**新踩坑已留档**（供 r742 复用）：① **r738 锚点纪律复验**：`keeping|retain(?:ing)?|leaving`、`except\s+(?:for\s+)?the\s+last`、`DI_RETENTION_WINDOW.test(_after)` 三处测试锚点必须原位保留，扩正则只能加支不能改支；② **write_file 单反斜杠语义**：写正则必须写 `\s`，写 `\\s` 落盘成字面量双反斜杠（scratch bs-test.js + od -c 实测确认，别用 node -e 猜）；③ **负例 anchor 取正则 source 独有串**：注释里的中文词会让 indexOf 定位到注释、extractRegex 边界错乱（r740 坑③复现验证）；④ **冗余 alternation 证伪要拆变异**：`但?只` 看似必要，实测惰性前缀吸收「但」后裸「只」足够——M5/M5b 拆分才证断，证伪后已删；⑤ **前后置切片对称性可复用单一常量**：首 `^` 锚 + `{0,40}?` 惰性前缀的常量对 `_before`/`_after` 同构，比养两份正则安全；⑥ 测试文件 require 坑复踩：`node:test` 必须先 require、gate 导入须解构 `const { gate } = require(...)`。
+
+**下一轮方向**（已复测确认）：① **K3 攻击侧缺口**：P2 量词表补「其他/其余/剩下」+ E1 漏放复查（scripts/round-741/probe-e1k3-p2a.js 已归因，均为存量攻击漏放、非赦免面）；② evidence 恒死维度（需架构决策：基线打分器恒返回 {score:1, issues:[]}）；③ silence_imputation EN 侧观察（暂无缺口）；④ di EN 其他倒装形（other than 之外）观察。
+
+---
+
 ## r740 — silence_imputation 书面语/正式文体变体收尾（r739 交接方向①复测坐实轮）
 
 **轮次**：r740 ｜ **版本**：v6.8.166 → v6.8.167 ｜ **日期**：2026-11-08 ｜ **方向**：r739 交接簿下一轮方向①（silence_imputation 书面语变体收尾）——init 简报方向池 6 项为历史池复述，复测后仅方向①坐实（7 类缺口），其余 5 项排除：di「以符合」3/3 OK（r717/r734 已修）、hasty_generalization 非本族机制遗留、chronological_snobbery 维持 r218 不上线、evidence 恒死维度需架构决策、middle_ground EN 侧 r739 已修维持观察。
