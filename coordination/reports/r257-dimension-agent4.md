@@ -174,4 +174,12 @@ findings 下 `gate.action === 'pass'`，攻击 20 条）：
   `doc-numbers-accuracy` FAIL，已 `git checkout data/test-count.json` 还原文档基线并复跑
   **24/24 通过**（r249–r256 同因同解）。
 - **commit 1（模块+测试+探针）**：**fe3f12f**（19 files changed, 1866 insertions, 43 deletions）。
-- **commit 2（报告+claims release）**：见 push 输出。
+- **commit 2（报告+claims release）**：**741fed2**。
+- **commit 3（测试文件按 run-all 口径改名）**：**78c227e**——`round-257-appeal-to-nature-wording.js`
+  → `round-257-appeal-to-nature-wording.test.js`。原因：`test/run-all.js` 的
+  `collectTestFiles()` **只收 `*.test.js`**，原名（以及 r706 的
+  `test/round-706-appeal-to-nature.js`）都不被 run-all 触达，违反 AGENTS.md 规约第 4 条
+  「测试必须可被 `test/run-all.js` 触达」。改名后本测试进入 run-all 枚举（659 → 660 文件）。
+  **建议 3 号**：把 `test/round-706-appeal-to-nature.js` 一并改名，并考虑在 run-all 里加一条
+  「test/ 下未被枚举的 .js 文件告警」，防止再漏。
+- **push**：`9118ffd..78c227e main->main`，隐私闸通过，HEAD == heartflow/main 校验一致。
