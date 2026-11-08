@@ -18,7 +18,7 @@
 - 腿②新增理亏族 `/…(?:了)?(?:他|她|他们|对方|当事人|其)?理亏/`；隐情/问题族 `/…(?:其中|背后|这中间|这里面)?(?:他|她|它|他们|对方|当事人)?(?:必定|大可|确实|的确|必|大|确)?(?:有|存在)(?:着)?(?:这|那)?(?:个|种|些)?(?:某种)?(?:隐情|蹊跷|猫腻|问题)/`；这足以说明族 `/…(?:这|此)(?:本身)?(?:就|也)?足以(?:说明|证明|表明)(?:了)?(?:一切|很多|不少|许多|某种|些许)?(?:问题|事情|些什么)/`（主语槽刻意只收 这/此——「证据足以说明问题」证据前置良性形不判，r736 踩坑复现防护第二层）；恰恰族尾槽扩「他在(?:撒谎|掩饰|隐瞒|狡辩)|其中有诈」。
 - src/index.js DIM_GUIDANCE silence_imputation 口径条同步枚举 r740 新族。
 
-**diff**：tracked `git diff --shortstat` 实测 N files（src 2 + VERSION/package.json/SKILL/README 4）；含未跟踪证据链（test 220 行 + 负例 165 行 + 探针 3 个约 110 行）总有效 diff 约 620 行，落在 500-1000 区间。
+**diff**：tracked `git diff e88054ae HEAD --shortstat` 实测 **15 files, 742 insertions + 15 deletions**（含证据链全部 commit 后无未跟踪残留）；其中 src/silence-imputation.js 46+/12-（腿① 3 处 + 腿② 4 处 + 注释），src/index.js guidance 口径 2+/1-，版本五处同步（VERSION/package.json/SKILL.md/README×3/version.js 兜底/BUILD_DATE），证据链 test 310 行 + 负例 174 行 + 探针 3 个 158 行，UPGRADE_LOG 42 行。总有效 diff 约 **757 行**，落在 500-1000 区间。
 
 **验证逐项实测**：
 
