@@ -63,8 +63,12 @@ test(`A1 弱支红队 ${A_RED.length} 条：HEAD 漏 ${HEAD_MISS}/${A_RED.length
 
 test('A2 攻击句 detector 命中数逐条登记', () => {
   const counts = A_RED.map(pcCount);
-  // 前 10 条各命中 1 支；末条「成本就下降了，说明是头像之功」①⑨ 双支 = 2
-  assert.deepStrictEqual(counts, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+  // [v6.8.173 第 245 轮] 第 8 条「自从回归稳了之后签单就少了，看来是头像的问题」
+  // 1 → 2：r245 给 PC_RES_COLLOQ_ZH 补了负向环视裸「少了」腿
+  // （`(?<![减变])少了`），时段标记「自从」× 白话变动「少了」即成立，与①支
+  // （归因断言「看来」）并列双支。其余 9 条仍各 1 支；末条「成本就下降了，
+  // 说明是头像之功」①⑨ 双支 = 2 不变。
+  assert.deepStrictEqual(counts, [1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2],
     'detector 命中数应与登记一致，实测: ' + counts.join('/'));
 });
 

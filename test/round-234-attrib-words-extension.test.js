@@ -289,8 +289,13 @@ test('D2 变异守卫二：摘掉转述归责分支后 8 条应回落到 0 条�
     // 白话结果变动词）独立承重 1 条转述族攻击句（时段标记 × 白话变动词即成立，
     // 不经过 PC_ATTRIB_ZH 转述分支），摘掉该分支后这 1 条不再回落——转述分支
     // 对其余 7 条仍承重（7/8 回落即证明）。
-    assert.strictEqual(countHitsIn(tmp, ATTACK_RELAY), 1,
-      '摘掉转述分支后攻击句应只剩 r243 新腿承重的 1 条（其余须回落）');
+    // [v6.8.173 第 245 轮] 期望 1 → 2：r245 给 PC_RES_COLLOQ_ZH 补了负向环视
+    // 裸「少了」腿（`(?<![减变])少了`），ATTACK_RELAY 里的「从那以后客诉也少了，
+    // 都说是新客服的功劳」也被该腿独立承重（时段标记「从那以后」× 白话变动
+    // 「少了」即成立）——与 r243 腿承重的「从那以后销量也上去了」并列成 2 条。
+    // 摘掉转述分支后剩 2 条，转述分支对其余 6 条仍承重（6/8 回落即证明）。
+    assert.strictEqual(countHitsIn(tmp, ATTACK_RELAY), 2,
+      '摘掉转述分支后攻击句应只剩 r243/r245 两条新腿承重的 2 条（其余须回落）');
     assert.strictEqual(countHitsIn(tmp, ATTACK_ZONGZHI), ATTACK_ZONGZHI.length, '摘掉转述分支后总之族塌陷');
     assert.strictEqual(countHitsIn(tmp, ALL_BENIGN), 0, '摘掉转述分支后良性被误命中');
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
