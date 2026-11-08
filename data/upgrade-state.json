@@ -1,8 +1,8 @@
 {
-  "round": 739,
-  "version": "6.8.165",
-  "roundStartedAt": "2026-11-08T08:18:42.328Z",
-  "lastFinishAt": "2026-11-08T08:45:53.968Z",
+  "round": 740,
+  "version": "6.8.166",
+  "roundStartedAt": "2026-11-08T10:47:39.518Z",
+  "lastFinishAt": "2026-11-08T08:46:41.344Z",
   "lastGreen": true,
   "lastChecks": [
     "PASS 版本四处一致",

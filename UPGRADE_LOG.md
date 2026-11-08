@@ -1,3 +1,45 @@
+## r740 — silence_imputation 书面语/正式文体变体收尾（r739 交接方向①复测坐实轮）
+
+**轮次**：r740 ｜ **版本**：v6.8.166 → v6.8.167 ｜ **日期**：2026-11-08 ｜ **方向**：r739 交接簿下一轮方向①（silence_imputation 书面语变体收尾）——init 简报方向池 6 项为历史池复述，复测后仅方向①坐实（7 类缺口），其余 5 项排除：di「以符合」3/3 OK（r717/r734 已修）、hasty_generalization 非本族机制遗留、chronological_snobbery 维持 r218 不上线、evidence 恒死维度需架构决策、middle_ground EN 侧 r739 已修维持观察。
+
+**真升级类型**：存量探测器（dim 213）词表补全——腿①四族 + 腿②四族（用户可感知：「该企业至今未作回应，无异于坐实了指控」「公司至今未发布声明，这足以说明问题」「对方至今没有发声，证明他们理亏」「官方至今没有公布真相，说明其中必有隐情」此前整句漏判放行）。
+
+**根因**（src/silence-imputation.js 实测定位，七处缺口；r739 交接描述「7/8 仅剩 1 条」是其 8 条小样本结论，r740 书面语普查 31 条攻击实为 13 条 MISS）：
+- ① 腿① SILENCE_ZH 缺「未作/未作出 + 回应」公文插入形——r731 已收「未予+回应」（予以的「予」），公文最高频的「未作回应」的「作」字插入吃不上。
+- ② 腿①缺「未发布/未公布/未披露 + 声明/真相」官方沉默族——原表只收言语类动词（否认/澄清/回应），发布族整体缺席。
+- ③ 腿①第一条大正则动词表缺 辩解/辩白/自辩（抗辩缺席形，r736 抗辩动词族收的是「不反驳」不族形）；「给个?说法」缺「给出」插入形。
+- ④ 腿② IMPUTE_ZH 等式化族宾语槽无代词形、无「理亏」——「证明他们理亏」整句漏判（r739 唯一 1 条 MISS 的真缺口在此，不在腿①「至今」）。
+- ⑤ 腿②缺「说明/证明 + 必有/确有/确实存在 + 隐情/蹊跷/问题」总结族（原表只有「说明了一切问题」整词形）；含代词槽「说明他有问题」。
+- ⑥ 腿②缺「(这)足以说明 + 问题」族——r731 ⑦窄形要求「沉默」本体主语，「这」回指前文沉默动作的书面语形吃不上。
+- ⑦ r736 恰恰族尾槽只有「问题|所在|一切的根源」，缺「他在撒谎|其中有诈」——「这恰恰说明他在撒谎」漏判。
+
+**修法**（攻击面设计，同族同源纪律）：
+- 腿①新增未作族 `/未(?:曾)?(?:作|做)出?(?:任何)?(?:回应|答复|...)/`；新增发布族 `/(?:没|未|不曾|从未|未曾)(?:有)?(?:公开|正式)?(?:发布|公布|发表|披露)(?:过)?(?:任何)?(?:声明|公告|通告|消息|信息|真相|细节)/`（宾语表刻意删「说明|解释」——「未发布说明文档」类商业陈述收窄，说明/解释已由言语族覆盖）；第一条大正则补 辩解|辩白|自辩 + `给出?个?说法`。
+- 腿②新增理亏族 `/…(?:了)?(?:他|她|他们|对方|当事人|其)?理亏/`；隐情/问题族 `/…(?:其中|背后|这中间|这里面)?(?:他|她|它|他们|对方|当事人)?(?:必定|大可|确实|的确|必|大|确)?(?:有|存在)(?:着)?(?:这|那)?(?:个|种|些)?(?:某种)?(?:隐情|蹊跷|猫腻|问题)/`；这足以说明族 `/…(?:这|此)(?:本身)?(?:就|也)?足以(?:说明|证明|表明)(?:了)?(?:一切|很多|不少|许多|某种|些许)?(?:问题|事情|些什么)/`（主语槽刻意只收 这/此——「证据足以说明问题」证据前置良性形不判，r736 踩坑复现防护第二层）；恰恰族尾槽扩「他在(?:撒谎|掩饰|隐瞒|狡辩)|其中有诈」。
+- src/index.js DIM_GUIDANCE silence_imputation 口径条同步枚举 r740 新族。
+
+**diff**：tracked `git diff --shortstat` 实测 N files（src 2 + VERSION/package.json/SKILL/README 4）；含未跟踪证据链（test 220 行 + 负例 165 行 + 探针 3 个约 110 行）总有效 diff 约 620 行，落在 500-1000 区间。
+
+**验证逐项实测**：
+
+| 项 | 结果 |
+|---|---|
+| test/round-740-silence-imputation-formal-variants.js | **79 passed, 0 failed**（攻击 21 + 良性 17 + 模块级边界 12 + 腿常量注入 10 + think() 冒烟 2 + 存量锚点 7 + 分工边界 3 + 登记断言 3） |
+| scripts/negative-test-silence-imputation-r740.js | **注入 8 个 8/8 变红，0 未变红**；良性对照组 12/12 零误伤；对照副本全绿 |
+| scripts/round-740/probe-si-pool.js | 攻击 32/32 命中（28 条归因 si），误伤专项 23/23 放行（si 维度零误伤） |
+| scripts/round-740/probe-think-smoke.js | **12 passed, 0 failed**（new HeartFlow + think()：攻击 8/8 命中 atm=0.6、良性 4/4 miss atm=0） |
+| 存量 silence 七测试（r717/r727/r728/r730/r731/r736 + victim-blaming-silence-consent） | **40+38+52+111+149+84+11 = 485 断言全过，零回归** |
+| node bin/verify.js | **16 passed, 0 failed** |
+| node scripts/bidirectional-guard.js | 召回 **52/52**、误拦 **302/326**（与基线完全一致，零新增误拦） |
+| node test/doc-numbers-accuracy.test.js | **24 通过, 0 失败**（版本五处同步 + SKILL 规格表口径戳转绿） |
+| node test/security-audit.test.js | **16 通过, 0 失败** |
+| node bin/cli.js status | **running**（version 6.8.167） |
+| node scripts/round-guard.js --stage=after | commit 后复跑全过 |
+
+**新踩坑已留档**（供 r741 复用）：① 子串变异注入删成空串会留空 alternation 分支（`(?:a||b)` 匹配空串）导致变异恒不生效——必须替换为不可匹配占位串（r739 踩坑②的变体，本轮连踩 5 处）；② 强度副词组本身带 `?` 量词，删它不改变匹配——证伪要删宾语实词；③ 负例 anchor 必须取正则 source 独有串——注释里的中文词（「理亏」）会让 indexOf 定位到注释、extractRegex 边界错乱；④ 良性断言用「本维度 findings 不承重」而非 action 全等——sealioning/perfect_error 会对部分句式 verify（r739 踩坑④复踩）；⑤ SKILL.md 规格表口径戳（at vX.Y.Z）与 README 三处版本引用、changelog 新行需手动同步，sync-version.js 只同步 frontmatter/package/version.js/BUILD_DATE 五处；⑥ README/SKILL 同名版本戳行在 patch 时若 old_string 带全行易因换行切分失配——按 grep -n 实测行内容构造。
+
+**下一轮方向**（decision 实测排序）：① di EN 后置过期限定 ZH 对应形复查（r737/r738 连续移交，「以符合」已修但 EN keeping only the last N days 的 ZH 倒装形待查）；② evidence 恒死维度（需架构决策：基线打分器恒返回 {score:1, issues:[]}，r690 起连续多轮记录）；③ silence_imputation EN 侧书面语观察（No statement has been issued to date 族已由 no statement 腿覆盖，暂无缺口）；④ middle_ground EN 侧继续观察。
+
 ## r739 — argument_to_moderation 智慧族/明明族修复 + 裸名词误伤收窄（r738 交接方向①复测坐实轮）
 
 **轮次**：r739 ｜ **版本**：v6.8.165 → v6.8.166 ｜ **日期**：2026-11-08 ｜ **方向**：r738 交接簿下一轮方向①（middle_ground 词表缺口）——init 简报方向池 6 项为历史池复述，探针复测后仅方向①缺口坐实（7 条），其余排除（di「以符合」r717/r734 已修 3/3 OK；hasty_generalization 非本族机制遗留；silence_imputation 7/8 HIT 仅剩 1 条；chronological_snobbery 维持 r218；evidence 需架构决策）。
