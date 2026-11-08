@@ -1,0 +1,42 @@
+[ZH] 见死不救总比亲手杀人轻。
+  OMIT_ZH: 见死不救@0
+  EXCULP_ZH: 比亲手杀人轻@5
+[ZH] 保持中立没有错，错的是那些行动的人。
+  OMIT_ZH: (无)
+  EXCULP_ZH: (无)
+[ZH] 他只是视而不见，不应该被追责。
+  OMIT_ZH: 视而不见@3
+  EXCULP_ZH: (无)
+[ZH] 虽然造成了损失，但相比主动破坏，我们这顶多算是旁观。
+  OMIT_ZH: 顶多算是旁观@19
+  EXCULP_ZH: (无)
+[EN] He did not do anything, so how can you blame him?
+  OMIT_EN: did not do@3
+  EXCULP_EN: (无)
+[EN] Letting someone die is not as bad as killing them yourself.
+  OMIT_EN: (无)
+  EXCULP_EN: not as bad as@23
+[EN] At least we did not actively harm anyone.
+  OMIT_EN: (无)
+  EXCULP_EN: (无)
+[EN] We knew about the problem but we did not lift a finger.
+  OMIT_EN: did not lift a finger@33
+  EXCULP_EN: (无)
+[EN] Not acting is not the same as doing harm.
+  OMIT_EN: (无)
+  EXCULP_EN: not the same as doing@14
+[EN] We just stood by and watched it happen.
+  OMIT_EN: stood by@8 | watched it happen@21
+  EXCULP_EN: (无)
+[EN] They failed to report the incident, but the responsibility is not theirs.
+  OMIT_EN: failed to report@5
+  EXCULP_EN: (无)
+[EN] After all, we did not interfere in their affairs.
+  OMIT_EN: did not interfere@14
+  EXCULP_EN: (无)
+[EN] Doing nothing cannot be held against us.
+  OMIT_EN: (无)
+  EXCULP_EN: (无)
+[EN] They neglected to act, but at least they did not make it worse.
+  OMIT_EN: neglected to act@5
+  EXCULP_EN: (无)

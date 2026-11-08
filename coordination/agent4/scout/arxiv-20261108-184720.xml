@@ -1,0 +1,713 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/T36E67mDhVvtWrdCWH5nn50vC1M</id>
+  <title>arXiv Query: search_query=all:omission OR all:bias OR all:commission OR all:asymmetry OR all:moral OR all:judgment&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-08T18:47:21Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:omission+OR+(all:bias+OR+(all:commission+OR+(all:asymmetry+OR+(all:moral+OR+all:judgment))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>100238</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08486v1</id>
+    <title>Do You Miss the Nights We Spent Crafting Figures? Rethinking Teaser and Framework Figures in the Age of Generative AI</title>
+    <updated>2026-11-05T18:59:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.08486v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08486v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scientific figures give research ideas a visual form through choices of abstraction, composition, and emphasis. Generative AI offers new ways to realize these choices, raising questions about explanatory clarity and purposeful visual expression. We examine these questions through a visual retrospective of 371 motivation and framework figures from 200 papers. The corpus comprises a quota-based main sample of 160 papers spanning four temporal periods and a separate purposive style-contrast sample of 40 papers. A single multimodal judge evaluates six dimensions of communication and design, with three repeated judgments per figure. We attempt source-constrained revisions of all 371 figures, of which 369 pass the recorded fidelity checks. Original-figure ratings show no uniform decline across periods. Revisions increase mean clarity ratings by 0.428 points and decrease aesthetic coherence ratings by 0.111 points on a five-point scale. Gains in the six-dimension average are larger for main-sample motivation figures than for frameworks. Case analyses show that added explanation can clarify comparisons while leaving typographic hierarchy and visual economy unresolved. These model-based findings support researcher-led design, with AI assisting exploration and authors retaining responsibility for explanatory purpose, composition, and scientific relationships. The accompanying atlas and evaluation records are available at https://ntu-ai4x.github.io/Rethinking_Figures/index_en.html.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:59:33Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Xiaoqi Zhao</name>
+    </author>
+    <author>
+      <name>Youwei Pang</name>
+    </author>
+    <author>
+      <name>Kailai Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08457v1</id>
+    <title>Adversarial Training with Large Step Sizes: Implicit Bias, Optimization, and Sharpness</title>
+    <updated>2026-11-05T18:48:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.08457v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08457v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Adversarial Training (AT) is an important method for improving model robustness. We study the dynamics of deterministic Gradient Descent (GD) in AT. Most existing works in this direction focus on the small or vanishing step sizes regime, where GD resembles a continuous-time flow. However, such step sizes can make training inefficient and are rarely used in practice. In this paper, we study the AT dynamics of GD with large constant step sizes. We first study GD in adversarial linear logistic regression, focusing on two aspects: where the model parameters converge (implicit bias) and how quickly the losses decrease (optimization). We then turn to neural networks training and study how the sharpness of losses evolve during AT. Our results advance the understanding of the behaviors of GD with large step sizes in AT and highlight three key differences from its behavior in Standard Training (ST): (i) the implicit bias gap between AT and ST, previously established only for small step sizes, persists for arbitrarily large constant step sizes, (ii) different from ST, there is no uniform rate of convergence for the optimization error in AT, and (iii) sharpness can exhibit two-stage dynamics that differ from the Edge-of-Stability behavior observed in ST.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:48:50Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yi Feng</name>
+    </author>
+    <author>
+      <name>Andrea Paudice</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08413v1</id>
+    <title>T3R: Training-Free Two-Stage Token Refinement Towards Efficient and Robust VLA Models</title>
+    <updated>2026-11-05T18:17:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.08413v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08413v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision-Language-Action (VLA) models enable end-to-end robot control, but inference is increasingly expensive. Each decision processes hundreds of visual tokens, often across multiple cameras, leading to substantial computation while allowing irrelevant background content to distract action prediction under distribution shift. We argue that these issues stem from two complementary forms of redundancy: many visual tokens are spatially irrelevant, while attention over the remaining tokens is often misallocated. Based on this observation, we propose T3R, a Training-Free Two-Stage Token Refinement framework. In the first stage, segmentation-guided token pruning removes irrelevant visual patches to reduce computation and eliminate distracting context. In the second stage, saliency-guided attention biasing reallocates attention toward action-critical visual regions and language instructions within the retained tokens. Together, pruning produces a cleaner candidate set, while attention biasing further emphasizes the most decision-relevant evidence, yielding a better accuracy-efficiency frontier than either stage alone. On LIBERO-Spatial, T3R removes 85% of scene-camera visual tokens while essentially matching the unpruned success rate, and improves success by up to 7 percentage points under out-of-distribution object-placement perturbations. The timing comparison attributes 7.8 ms per inference call to pruning and attention-bias application. As input resolution increases, LLM-forward profiling shows up to a 3.3x speedup over the unpruned baseline. Evaluations across LIBERO, SIMPLER, and RoboTwin with three VLA backbones show the strongest accuracy-efficiency benefits in multi-camera settings. These results demonstrate that training-free token refinement is a practical approach to efficient and robust VLA inference.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T18:17:29Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Mohammed Hassan</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zhenyang Chen</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zheng Wang</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Zhixin Zhu</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Tianlong Chen</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name> Yingyan</name>
+      <arxiv:affiliation>Celine</arxiv:affiliation>
+    </author>
+    <author>
+      <name> Lin</name>
+    </author>
+    <author>
+      <name>Chaojian Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08339v1</id>
+    <title>Fluctuations, Moderate and Large Deviations about Hydrodynamic Limits of Space-Time Hawkes Processes</title>
+    <updated>2026-11-05T17:25:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.08339v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08339v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study Gaussian fluctuations, moderate and large deviations around the high-density hydrodynamic limit of critical and nearly critical space-time Hawkes processes initialized by a prescribed Poisson field of past events, with no subsequent immigration. Under a finite mean reproduction delay and centered displacements with finite spatial covariance, a positive cluster-transform estimate yields a distribution-valued central limit theorem (CLT) and a moderate deviation principle (MDP) throughout the moderate range. For finite nonzero mass of the initial profile, we obtain a full large deviation principle (LDP) for the space-time event measure in the vague topology; its good rate function is a quadratic branching-control energy with a prescribed initial trace and a finite-mass domain. The lower bound uses an explicit approximation by smooth reproduction controls, and the upper bound uses a microscopic exponential martingale and a global generator approximation. We distinguish exact-mean centering from PDE centering and compute deterministic bias corrections under second delay and fourth spatial moments. For a factorized heavy-tail power-law delay, we establish the CLT, MDP, and full measure-valued LDP for the space-time measure, with finite nonzero mass of the initial profile for the LDP. Its fractional control energy retains the source generated by the prescribed past. A source-preserving regularization proves approximation of every finite-action measure. Compact-kernel bounds for initial profiles of infinite mass and the degenerate case of a zero initial profile are stated separately.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T17:25:57Z</published>
+    <arxiv:comment>72 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Fuqing Gao</name>
+    </author>
+    <author>
+      <name>Yingli Wang</name>
+    </author>
+    <author>
+      <name>Lingjiong Zhu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08273v1</id>
+    <title>Accelerating Safe Reinforcement Learning with Massive Parallelism</title>
+    <updated>2026-11-05T16:43:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.08273v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08273v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate the problem of scaling safe reinforcement learning (safe RL) to massively parallel training regimes, where a large number of environments are exe- cuted with short rollout horizons. Although this setting improves data throughput and wall-clock efficiency, it creates a mismatch with constrained Markov decision processes (CMDPs), whose safety constraints are defined over full-episode cost returns. We address this mismatch by analyzing staggered environment resets as a phase-mixture distribution over short trajectory segments. This analysis charac- terizes the bias induced by phase coverage and motivates a phase-aggregated cost estimator that reconstructs episode-level cost estimates from short rollout batches. We further incorporate finite-sample uncertainty and distribution mismatch into a constraint-tightening framework, yielding a scalable Safe RL method compatible with on-policy optimization. Using an MJX-based implementation of Safety Gym, our experiments show that the proposed method achieves performance comparable to non-massively parallel implementations while substantially reducing wall-clock training time.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T16:43:57Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Joonyoung Lim</name>
+    </author>
+    <author>
+      <name>Younghwan Yoo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08228v1</id>
+    <title>Domain-specific information retrieval</title>
+    <updated>2026-11-05T16:12:53Z</updated>
+    <link href="https://arxiv.org/abs/2611.08228v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08228v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Information Retrieval (IR) is much more than ad hoc web search: a large portion of the information seeking activities takes place in specific domains, often addressing work-related tasks. Examples are lawyers finding relevant prior cases for a legal case and academic researchers studying the background material for a paper. In Chapter 2 we outline the most common domain-specific tasks, datasets and applications. Domain-specific IR has a number of challenges that make set it apart from simple web search tasks: they often deal with long documents, long queries and long sessions with specific user needs. We discuss these in Chapter 3. We also address issues related to bias and fairness of models. In Chapter 4, we describe the models and methods developed for domain-specific tasks and data, addressing the specific challenges, including user aspects related to domain-specific IR tasks, dealing with queries, user models, and user interactions. We show that many of the methodological advances in domain-specific IR are transferable to other domains and even to open-domain web search. We conclude with the main takeaways and propose research directions for the near future.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T16:12:53Z</published>
+    <arxiv:comment>Published in Foundations and Trends in Information Retrieval</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <arxiv:journal_ref>Foundations and Trends in Information Retrieval (2026) 20 (5): 381-495</arxiv:journal_ref>
+    <author>
+      <name>Suzan Verberne</name>
+    </author>
+    <author>
+      <name>Florina Piroi</name>
+    </author>
+    <author>
+      <name>Allan Hanbury</name>
+    </author>
+    <arxiv:doi>10.1108/FTINR-09-2025-0088</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1108/FTINR-09-2025-0088" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08187v1</id>
+    <title>Light Primordial Black Holes from a First-Order Phase Transition near the End of Inflation: Baryogenesis and Gravitational Wave Signatures</title>
+    <updated>2026-11-05T15:45:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.08187v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08187v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate the formation and cosmological consequences of light primordial black holes (PBHs) from vacuum bubbles nucleated during a spectator sector first-order phase transition in inflation. We construct a phenomenological model in which the spectator potential evolves with the rolling inflaton, allowing vacuum bubbles to nucleate and grow during inflation. The vacuum ordering subsequently reverses near the end of inflation, leaving the bubble interiors in a metastable false vacuum state. We examine their stability against reverse vacuum tunneling and impose benchmark conditions to suppress this process before and after reheating. Sufficiently large bubbles can subsequently undergo supercritical evolution and form PBHs. In this framework, the PBH abundance is determined by the vacuum tunneling history, while the characteristic mass depends on the nucleation epoch and bubble growth during inflation. For sufficiently light PBHs that evaporate before big bang nucleosynthesis, Hawking radiation can create locally superheated regions in which electroweak symmetry is restored, potentially generating a baryon asymmetry in the presence of additional CP-violating interactions. We also investigate the direct gravitational wave (GW) signals from Hawking radiation and the induced GWs from PBH density fluctuations, the latter arising if an early PBH dominated epoch occurs. For representative benchmark parameters, the resulting baryon asymmetry can reach the ten-percent level of the observed value, while the induced GW signal can reach a peak amplitude of $Ω_{\rm GW,0}h^2\sim10^{-7}$ at frequencies of order $10$-$10^2\,{\rm Hz}$.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:45:03Z</published>
+    <arxiv:comment>about 50 pages, 2 figures; comments are welcome</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>Zihong Cheng</name>
+    </author>
+    <author>
+      <name>Fa Peng Huang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08150v1</id>
+    <title>Commissioning and Performance of the LHCb Upstream Tracker</title>
+    <updated>2026-11-05T15:08:11Z</updated>
+    <link href="https://arxiv.org/abs/2611.08150v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08150v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Upstream Tracker is a new, high-precision silicon strip detector installed in the LHCb experiment as part of the overall LHCb Upgrade I project. The detector is an integral part of the tracking system, and plays a crucial role in the reconstruction of charged particles in the new fully software-based trigger. An overview of the Upstream Tracker detector design, its commissioning, and performance are presented.</summary>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:08:11Z</published>
+    <arxiv:comment>39 pages, 29 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-ex"/>
+    <author>
+      <name>D. Andreou</name>
+    </author>
+    <author>
+      <name>M. Artuso</name>
+    </author>
+    <author>
+      <name>J. Bartz</name>
+    </author>
+    <author>
+      <name>B. Batsukh</name>
+    </author>
+    <author>
+      <name>A. Beiter</name>
+    </author>
+    <author>
+      <name>H. Bernstein</name>
+    </author>
+    <author>
+      <name>S. Blusk</name>
+    </author>
+    <author>
+      <name>S. Ding</name>
+    </author>
+    <author>
+      <name>S. Ely</name>
+    </author>
+    <author>
+      <name>J. Freiler</name>
+    </author>
+    <author>
+      <name>D. Germann</name>
+    </author>
+    <author>
+      <name>S. Guerin</name>
+    </author>
+    <author>
+      <name>B. Khanji</name>
+    </author>
+    <author>
+      <name>W. Krupa</name>
+    </author>
+    <author>
+      <name>A. Kuhlman</name>
+    </author>
+    <author>
+      <name>Z. Li</name>
+    </author>
+    <author>
+      <name>X. Liang</name>
+    </author>
+    <author>
+      <name>B. Mack</name>
+    </author>
+    <author>
+      <name>L. M. Mackey</name>
+    </author>
+    <author>
+      <name>P. Manning</name>
+    </author>
+    <author>
+      <name>E. Minucci</name>
+    </author>
+    <author>
+      <name>R. Mountain</name>
+    </author>
+    <author>
+      <name>H. Pham</name>
+    </author>
+    <author>
+      <name>I. Polyakov</name>
+    </author>
+    <author>
+      <name>M. Polyakov</name>
+    </author>
+    <author>
+      <name>M. S. Rudolph</name>
+    </author>
+    <author>
+      <name>R. S. Sharma</name>
+    </author>
+    <author>
+      <name>J. Shupperd</name>
+    </author>
+    <author>
+      <name>T. Skwarnicki</name>
+    </author>
+    <author>
+      <name>S. Stone</name>
+    </author>
+    <author>
+      <name>A. Venkateswaran</name>
+    </author>
+    <author>
+      <name>M. K. Wilkinson</name>
+    </author>
+    <author>
+      <name>H. Wu</name>
+    </author>
+    <author>
+      <name>J. Andrew</name>
+    </author>
+    <author>
+      <name>S. Braun</name>
+    </author>
+    <author>
+      <name>A. D. Fernez</name>
+    </author>
+    <author>
+      <name>M. Franco Sevilla</name>
+    </author>
+    <author>
+      <name>C. Hadjivasiliou</name>
+    </author>
+    <author>
+      <name>P. M. Hamilton</name>
+    </author>
+    <author>
+      <name>A. Jawahery</name>
+    </author>
+    <author>
+      <name>E. Jiang</name>
+    </author>
+    <author>
+      <name>L. Meyer Garcia</name>
+    </author>
+    <author>
+      <name>T. O'Bannon</name>
+    </author>
+    <author>
+      <name>W. Parker</name>
+    </author>
+    <author>
+      <name>Y. Sun</name>
+    </author>
+    <author>
+      <name>J. Wimberly</name>
+    </author>
+    <author>
+      <name>Z. Yang</name>
+    </author>
+    <author>
+      <name>A. Alessandro</name>
+    </author>
+    <author>
+      <name>A. Capsoni</name>
+    </author>
+    <author>
+      <name>A. Carbone</name>
+    </author>
+    <author>
+      <name>S. Cesare</name>
+    </author>
+    <author>
+      <name>M. Citterio</name>
+    </author>
+    <author>
+      <name>S. Coelli</name>
+    </author>
+    <author>
+      <name>N. Conti</name>
+    </author>
+    <author>
+      <name>F. DeBenedetti</name>
+    </author>
+    <author>
+      <name>P. Gandini</name>
+    </author>
+    <author>
+      <name>C. Mancuso</name>
+    </author>
+    <author>
+      <name>D. Marangotto</name>
+    </author>
+    <author>
+      <name>A. Merli</name>
+    </author>
+    <author>
+      <name>M. Monti</name>
+    </author>
+    <author>
+      <name>N. Neri</name>
+    </author>
+    <author>
+      <name>M. Petruzzo</name>
+    </author>
+    <author>
+      <name>E. Spadaro Norella</name>
+    </author>
+    <author>
+      <name>G. Tonani</name>
+    </author>
+    <author>
+      <name>D. Vigano</name>
+    </author>
+    <author>
+      <name>Z. Wang</name>
+    </author>
+    <author>
+      <name>F. Zangari</name>
+    </author>
+    <author>
+      <name>I. Carli</name>
+    </author>
+    <author>
+      <name>M. Feng</name>
+    </author>
+    <author>
+      <name>Y. Fu</name>
+    </author>
+    <author>
+      <name>P. Gorbounov</name>
+    </author>
+    <author>
+      <name>N. A. Grieser</name>
+    </author>
+    <author>
+      <name>X. Jiang</name>
+    </author>
+    <author>
+      <name>Y. Li</name>
+    </author>
+    <author>
+      <name>Y. Li</name>
+    </author>
+    <author>
+      <name>K. Liu</name>
+    </author>
+    <author>
+      <name>S. Liu</name>
+    </author>
+    <author>
+      <name>Y. Lu</name>
+    </author>
+    <author>
+      <name>S. Sheng</name>
+    </author>
+    <author>
+      <name>M. Tobin</name>
+    </author>
+    <author>
+      <name>J. Wang</name>
+    </author>
+    <author>
+      <name>X. Yuan</name>
+    </author>
+    <author>
+      <name>Y. Yuan</name>
+    </author>
+    <author>
+      <name>Q. Zou</name>
+    </author>
+    <author>
+      <name>M. Firlej</name>
+    </author>
+    <author>
+      <name>T. Fiutowski</name>
+    </author>
+    <author>
+      <name>M. Hubczak</name>
+    </author>
+    <author>
+      <name>M. Idzik</name>
+    </author>
+    <author>
+      <name>J. Moron</name>
+    </author>
+    <author>
+      <name>K. M. Sowa</name>
+    </author>
+    <author>
+      <name>K. Swientek</name>
+    </author>
+    <author>
+      <name>T. Szumlak</name>
+    </author>
+    <author>
+      <name>C. Abellan Beteta</name>
+    </author>
+    <author>
+      <name>V. Bellée</name>
+    </author>
+    <author>
+      <name>I. Bezshyiko</name>
+    </author>
+    <author>
+      <name>V. Denysenko</name>
+    </author>
+    <author>
+      <name>G. Hijano Mendizabal</name>
+    </author>
+    <author>
+      <name>M. Peco Regales</name>
+    </author>
+    <author>
+      <name>N. Serra</name>
+    </author>
+    <author>
+      <name>O. Steinkamp</name>
+    </author>
+    <author>
+      <name>L. Villardita</name>
+    </author>
+    <author>
+      <name>C. A. Aidala</name>
+    </author>
+    <author>
+      <name>K. R. Mattioli</name>
+    </author>
+    <author>
+      <name>M. Ramírez García</name>
+    </author>
+    <author>
+      <name>J. D. Roth</name>
+    </author>
+    <author>
+      <name>D. M. Shangase</name>
+    </author>
+    <author>
+      <name>M. Brodski</name>
+    </author>
+    <author>
+      <name>J. C. Lopes</name>
+    </author>
+    <author>
+      <name>B. Schmidt</name>
+    </author>
+    <author>
+      <name>M. Sokoloff</name>
+    </author>
+    <author>
+      <name>Z. Ren</name>
+    </author>
+    <author>
+      <name>D. Y. Tou</name>
+    </author>
+    <author>
+      <name>G. Vouters</name>
+    </author>
+    <author>
+      <name>Q. Han</name>
+    </author>
+    <author>
+      <name>G. Wang</name>
+    </author>
+    <author>
+      <name>J. Wu</name>
+    </author>
+    <author>
+      <name>X. Zhu</name>
+    </author>
+    <author>
+      <name>T. Li</name>
+    </author>
+    <author>
+      <name>X. Wang</name>
+    </author>
+    <author>
+      <name>Z. Chen</name>
+    </author>
+    <author>
+      <name>P. Li</name>
+    </author>
+    <author>
+      <name>F. Lazzari</name>
+    </author>
+    <author>
+      <name>A. Sergi</name>
+    </author>
+    <author>
+      <name>F. Zhang</name>
+    </author>
+    <author>
+      <name>M. van Veghel</name>
+    </author>
+    <author>
+      <name>A. Oyanguren</name>
+    </author>
+    <author>
+      <name>J. Zhuo Gao</name>
+    </author>
+    <author>
+      <name>V. Svintozelskyi</name>
+    </author>
+    <author>
+      <name>M. De Cian</name>
+    </author>
+    <author>
+      <name>L. Dufour</name>
+    </author>
+    <author>
+      <name>V. Kholoimov</name>
+    </author>
+    <author>
+      <name>P. Hoffmann</name>
+    </author>
+    <author>
+      <name>V. V. Gligorov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08132v1</id>
+    <title>Drift-Resilient Predictive Interference Management: Online Adaptation of an Extreme-Value Predictor</title>
+    <updated>2026-11-05T15:00:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.08132v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08132v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predictive interference management supports ultra-reliable low-latency communication (URLLC) by allocating finite-blocklength resources against a high conditional quantile of next-slot interference. Building on an extreme-value-theory/kernel-density-estimation (EVT/KDE) predictor with quantile-defined interference states, this paper makes the predictor resilient to unannounced shifts in the interference distribution. Its cumulative refitting on all past observations does not specify how the state partition and retained samples should evolve after a regime change. We show that drift first makes the quantile partition inefficient: cumulative refitting preserves tail support and coverage but cannot recover conditional resolution, and pays for it in channel use, whereas discarding history starves the tail estimator. We therefore propose event-triggered quantile-space adaptation. A nonparametric cumulative sum (CUSUM) on the predictor's level stream detects change. At each confirmed event, the quantile partition is re-derived from post-change observations, retained history is re-binned under it, and each state is refit from a bounded per-state memory, capped to balance stale-regime bias against tail-estimation variance, with a closed-form L-moment tail estimator. At a nominal coverage target $η\!=\!0.99$, relative to matched cumulative refitting with fixed states, the proposed method reduces channel use by $5.7$--$13.2\%$ and quantile pinball loss by $25$--$50\%$ across abrupt, incremental, compound, downward, and reversal drift, with coverage changing by $-0.5$ to $+1.0$ percentage points. At matched achieved coverage, it saves $4$--$18\%$ of channel uses, while resource use in load-only and stationary cases changes by less than $0.5\%$. With $K$ samples per state and $L$ states, predictor memory is bounded at $O(KL)$ rather than growing as $O(t)$.</summary>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T15:00:39Z</published>
+    <arxiv:comment>Submitted to IEEE Transactions on Wireless Communications</arxiv:comment>
+    <arxiv:primary_category term="cs.IT"/>
+    <author>
+      <name>Aamir Mahmood</name>
+    </author>
+    <author>
+      <name>Fateme Salehi</name>
+    </author>
+    <author>
+      <name>Nurul Huda Mahmood</name>
+    </author>
+    <author>
+      <name>Song Han</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08123v1</id>
+    <title>Adaptive pairwise preference elicitation for decision support: identifying the best alternative with fewer judgments</title>
+    <updated>2026-11-05T14:56:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.08123v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08123v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interactive decision support systems often require repeated preference judgments, although identifying the best alternative may not justify eliciting all \(n(n-1)/2\) pairwise comparisons. We propose ALEC (Adaptive Lexicographic Elicitation of Comparisons), which re-ranks the alternatives after each judgment and asks the first unobserved pair in the lexicographic order of the current ranking, using the Analytic Hierarchy Process as the concrete setting. Under a log-normal error model, directly comparing a contrast maximises the one-step reduction in its effective resistance. Posterior bounds on the probability of a wrong choice or of exceeding a relative-loss tolerance provide stopping rules valid under adaptive questioning, while a consistency-and-margin condition gives a deterministic certificate of agreement with the full-matrix winner. Simulations show that re-ranking is most useful in larger problems with limited budgets; ALEC outperforms Harker's original rule in most scenarios with \(n\ge11\), while under a common stopping rule it achieves higher hit-rate point estimates than the stronger Harker-log variant at a modest additional questioning cost. With a 5\% loss tolerance and a cap of \(2n\) additional comparisons, the stopping rule saves \res{prot-s06-saveadd-min}--\res{prot-s06-saveadd-max}\% of them, while among runs stopped by the bound the observed rate of losses above tolerance remains at most \res{s06-errearly-max}\%, against a nominal 10\%. ALEC therefore provides an adaptive elicitation module for decision support systems that balances decision precision against user effort.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:56:24Z</published>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Luis Ángel Calvo</name>
+    </author>
+    <author>
+      <name>Jiri Mazurek</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08096v1</id>
+    <title>Nonuniform Time-bins for Making Raw QRNG Outputs Uniform</title>
+    <updated>2026-11-05T14:40:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.08096v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08096v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Random numbers play a vital role in scientific simulations and cryptography. Both randomness and security are critical requirements for random number generators (RNGs). However, classical RNGs often rely on mathematical assumptions that can compromise security, while quantum RNGs (QRNGs) face challenges, including non-uniform output due to the lack of specialized single-photon sources. In this work, we propose a QRNG model that generates uniformly distributed random numbers using a standard coherent photon source, without requiring heavy attenuation or post-processing. Although the raw data is theoretically free of bias, post-processing, if any, may be required to suppress any classical noise and device imperfections. The proposed method analytically equalizes the output probabilities under the assumed photon-arrival-time model, potentially reducing the need for heavy attenuation and post-processing to correct binning bias. We evaluate the method using real photon-detection timestamps and compare its statistical performance with conventional uniform time binning using the NIST, Dieharder, and ENT test suites. The results demonstrate improved statistical performance for the proposed binning scheme under the tested conditions.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:40:36Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Nirupam Basak</name>
+    </author>
+    <author>
+      <name>Goutam Paul</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08070v1</id>
+    <title>Can an LLM Actually Reason and Program about Neural Network's Weights or is it just memorization on steroids? Exploring "Weight-Space Programming"</title>
+    <updated>2026-11-05T14:23:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.08070v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08070v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) have recently been reported to read and write the raw weights of neural networks directly, a capability termed weight-space programming. We ask whether the reading side of this capability reflects reasoning about weight flows or a combination of local arithmetic at the network's edges and memorized priors over public datasets. We test Claude Opus 5.5 on small convolutional networks of about 125,000 parameters trained on five image datasets, providing every weight as plain text with no tools, no forward passes, and no dataset or class names. The model performs accurate local calculations: batch-normalization statistics lead it to infer about three optimizer steps on networks stopped after three updates, and output-layer sign patterns recover the vehicle/animal split of CIFAR-10. The sessions report reading the first and last layers closely and sampling the middle, and several claims built on partial tracing fail verification, although we did not run a direct forward-pass test. Semantic judgments lean on familiar datasets: the model names CIFAR-10 for CIFAR-10 networks but also for all three fast-food networks, relabels KMNIST as MNIST, reads a 99.57%-accurate SAT-6 network as CIFAR-10 animal photos, and calls "frog" the output favored by a feature that fires most on trees. Permuting CIFAR-10's labels preserves the output split at the new indices, but every class pair the model interprets is then wrong, indicating reliance on remembered label order. These are exploratory results from mostly single runs. We conclude that zero-shot weight reading by this model is better described as local arithmetic plus dataset priors than as weight-flow tracing, and we provide a protocol for auditing future weight-space claims.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:23:07Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Nazmus Sakib Ahmed</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08068v1</id>
+    <title>Intensity-Based Estimation of Extreme Value Models for Highly Censored Data via a Latent Poisson Process</title>
+    <updated>2026-11-05T14:21:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.08068v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08068v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Extreme value theory provides a natural framework for modelling rare events and extrapolating tail probabilities, but its direct application to survival analysis is complicated by right censoring, heterogeneous follow-up, and the need for coherent inference beyond the range of the observed data. We propose a Bayesian survival model that integrates extreme value theory with a hazard-based formulation built upon the extended generalized Pareto distribution. Rather than separating the bulk and tail of the distribution through an explicit threshold, the proposed model represents the entire hazard function within a unified parametric framework, allowing moderate and extreme survival times to be analysed simultaneously while preserving the asymptotic tail behaviour implied by extreme value theory. Inference is performed through a two-stage procedure. We further develop bias-correction procedures based on latent representative locations and adaptive partition refinement, and establish theoretical results showing the asymptotic consistency of the proposed approximation under standard regularity conditions. Simulation studies demonstrate that the methodology provides reliable uncertainty quantification across a wide range of tail regimes, censoring proportions, and sample sizes, while remaining robust under moderate model misspecification. The practical performance of the approach is illustrated through an analysis of a heart failure cohort, where the proposed model enables inference on long-term survival probabilities and tail behaviour beyond the observed follow-up period. The resulting framework offers a computationally feasible and theoretically grounded alternative for modelling censored survival data when inference on extreme survival times is of primary scientific interest.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T14:21:42Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Eduardo Janotti</name>
+    </author>
+    <author>
+      <name>Antonio Carlos Pedroso de Lima</name>
+    </author>
+    <author>
+      <name>Lígia Henriques-Rodrigues</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.08023v1</id>
+    <title>Precision - Preserving Subtensor Inference for a 22B Joint Audio - Video Generator under a Fixed GPU Working Set</title>
+    <updated>2026-11-05T13:44:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.08023v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.08023v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Complete-block offloading reduces model residency but requires each transferred block to fit the GPU budget. We present Precision-Preserving Subtensor Inference (PSI), a fixed-arena runtime that combines sub-block weight streaming with separately managed intermediate state for the BF16 LTX-2.5 22B joint audio-video transformer. The contribution is a construction whose managed GPU footprint is determined by reusable pages, live state, and bounded workspace, together with controls that separate resource use, transport correctness, and numerical fidelity. Its partitioned operators preserve the dense real-arithmetic construction under stated assumptions. Across nine matched full-prompt cases on RTX A6000, modified PSI reduces sampled transformer-process peak memory from 8,578 to 360 MiB relative to official MATH, while mean time for the eleven transformer invocations rises from 247.11 to 349.00 s. Its managed arena is 80 MiB. Complete native generation and a complete-block FLASH path both succeed under a fixed 3 GiB available-memory cap. The matched A6000 comparison and separate DGX Spark service suite both achieve 100% success in complete audiovisual decoding. FFN reuse lowers mean block time by 4.0% with unchanged BF16 outputs; a fixed-arithmetic one-token transport control preserves all saved states bitwise. Targeted bias and attention changes improve local and one-token numerical comparisons, while mean endpoint error increases across nine full-prompt cases. The construction enables BF16 audiovisual inference with an explicit transformer-memory budget and makes numerical fidelity a separate, testable property of the implementation.</summary>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T13:44:36Z</published>
+    <arxiv:comment>This paper has been accepted to publication at CONSTRAINT workshop in junction with IEEE BigData 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.DC"/>
+    <author>
+      <name>Hanyue Shen</name>
+    </author>
+    <author>
+      <name>Xinling Liao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.07965v1</id>
+    <title>Reversible Dynamics, Asymmetric Actions: Parking as a Trajectory-Level Affordance</title>
+    <updated>2026-11-05T13:00:12Z</updated>
+    <link href="https://arxiv.org/abs/2611.07965v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.07965v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Drivers are often told to back into a tight parking space, not drive in nose first. The advice looks paradoxical, because a slow car is dynamically reversible: reverse its speed and replay the steering backward, and it retraces a feasible path. Played backward, though, reverse-in shows a car driving forward out of the space. Reverse-in and forward-in are different tasks: they share a start position but end facing opposite ways. We separate three clearances between car and obstacles. Static fit $F$ is the clearance the parked car keeps at its best acceptable destination pose. Eventual access $A_\infty$ is the clearance it can keep all the way there with unlimited corrections. Resource-bounded access $A_K$ is the clearance that survives a budget of $K$ reversals, switches between forward and reverse. They satisfy $F\ge A_\infty\ge A_K$. In one fully specified scene (one car, bay, aisle and start), a certified argument proves $A_\infty=F=0.5000$ m for both tasks. In this scene, all certified forward/reverse asymmetry therefore arises at finite $K$: it lies in how many corrections each task needs, not in the clearance either can eventually keep. With one reversal, an explicit path gives reverse-in at least $0.4410$ m clearance. A certified reachability argument caps forward-in's one-reversal clearance at $d_0&lt;0.1720002$ m. With two reversals, forward-in gets at least $0.2833$ m. To keep a clearance strictly above any $d$ with $d_0\le d&lt;0.2833$ m, reverse-in thus needs exactly one reversal and forward-in exactly two when both tasks move forward first. If both move in reverse first, the counts are two and three. The contrast depends on the start position (Section 4.15). Proposed experiments test whether observers distinguish fit, eventual access and budgeted access. They compare these with simpler cues, such as how the turning body sweeps, and learned manoeuvre labels.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-05T13:00:12Z</published>
+    <arxiv:comment>79 pages, 15 figures</arxiv:comment>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <author>
+      <name>Adam Y. Shavit</name>
+    </author>
+  </entry>
+</feed>

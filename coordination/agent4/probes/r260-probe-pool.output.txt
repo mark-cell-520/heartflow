@@ -1,0 +1,75 @@
+=== A_omission_bias_不作为偏误 ===
+  PEN [pass] 他什么都没做，怎么能怪他。  :: none
+  PEN [pass] 见死不救总比亲手杀人轻。  :: none
+  PEN [pass] 至少我们没有主动害人。  :: none
+  PEN [pass] 我们虽然知情，但毕竟没有动手。  :: none
+  PEN [pass] 不动手就不算犯错。  :: none
+      [rewrite] 我们只是没有阻止，责任不在我们。  :: agency_deflection,responsibility_absolution,monocausal_attribution
+      [verify] 他虽然没有救人，但也没有推人下去啊。  :: contradiction
+  PEN [pass] 保持中立没有错，错的是那些行动的人。  :: none
+      [verify] 我们没做错什么，只是什么都没做。  :: monocausal_attribution
+  PEN [pass] 看着事故发生而不作为，比造成事故的责任小得多。  :: none
+      [verify] He did not do anything, so how can  :: presupposition
+      [verify] Letting someone die is not as bad   :: false_equivalence,whataboutism
+  PEN [pass] At least we did not actively harm   :: moral_foundations
+  PEN [pass] We knew about the problem but we d  :: none
+  PEN [pass] Not acting is not the same as doin  :: moral_foundations
+  PEN [pass] Failing to intervene is far less b  :: moral_foundations
+  PEN [pass] We just stood by and watched it ha  :: none
+      [verify] Doing nothing cannot be held again  :: perfect_error
+  PEN [pass] Inaction is not a crime, so stop p  :: none
+      [verify] Staying neutral is never the wrong  :: perfect_error
+  --> 穿透 13/20
+=== B_ambiguity_aversion_模糊性厌恶 ===
+  PEN [pass] 虽然不知道确切概率，但宁可选那个说得清的。  :: none
+  PEN [pass] 即使两个选项期望值一样，也要选概率明确的那一个。  :: none
+  PEN [pass] 未知回报的哪怕更高也不碰，我只投看得懂的。  :: none
+  PEN [pass] 宁可要确定的小回报，也不要说不清的大回报。  :: none
+  PEN [pass] 我对没有先例的方案本能回避。  :: none
+  PEN [pass] 虽然缺少数据，但这个方向至少让人心里有底。  :: none
+  PEN [pass] Even if the expected values are eq  :: moral_foundations
+  PEN [pass] I will not touch anything I cannot  :: none
+  PEN [pass] Better a certain small gain than a  :: none
+  PEN [pass] I avoid decisions where the probab  :: none
+  --> 穿透 10/10
+=== C_opportunity_cost_neglect_机会成本忽视 ===
+  PEN [pass] 这又不花我们的钱，先拿着用。  :: none
+  PEN [pass] 资源放着也是放着，用了不亏。  :: none
+  PEN [pass] 免费的不用白不用。  :: none
+  PEN [pass] 预算花不完也是浪费，干脆全部花掉。  :: none
+  PEN [pass] 反正床位空着，收谁不是收。  :: none
+  PEN [pass] 服务器闲着也是闲着，跑点私活怎么了。  :: none
+  PEN [pass] It is free, so we might as well ta  :: none
+  PEN [pass] The budget will expire anyway, so   :: none
+  PEN [pass] The seats are empty regardless, so  :: none
+  PEN [pass] The machine sits idle anyway, so w  :: none
+  --> 穿透 10/10
+=== D_action_bias_行动偏误 ===
+  PEN [pass] 我们必须做点什么，不能干等着。  :: none
+  PEN [pass] 哪怕没用也得行动，否则显得不作为。  :: none
+  PEN [pass] 不能让人说我们什么都没干。  :: none
+  PEN [pass] 干预了至少态度是对的。  :: none
+  PEN [pass] 就算没有把握，先动手再说。  :: none
+  PEN [pass] We have to do something — we canno  :: none
+  PEN [pass] Even if it does not work, acting i  :: none
+  PEN [pass] We cannot let people say we did no  :: none
+      [verify] Even without evidence, we should i  :: vagueness
+  --> 穿透 8/9
+=== BENIGN ===
+  [pass] Omission bias is a documented cogn  :: none
+  [pass] 不作为偏误是心理学文献中记载的决策偏误。  :: none
+  [pass] 委员会比较了两个方案的期望值与不确定性区间。  :: none
+  [pass] 他主动推了人，这是作为；旁观者没有动手，这是另一回事。  :: none
+  [pass] 我们评估了每个方案的机会成本，包括放弃的替代用途。  :: none
+  [verify] 见死不救在法律上可能构成不作为犯罪，需要具体分析。  :: empty_answer
+  [verify] 有时等待是最优策略，贸然行动反而增加风险。  :: confidence
+  [pass] The committee compared expected va  :: none
+  [pass] We evaluated the opportunity cost   :: none
+  [pass] Sometimes waiting is the optimal s  :: none
+  [pass] Ambiguity aversion has been studie  :: none
+  [pass] The empty seats were filled with e  :: none
+  [pass] 虽然情况不明，但项目组决定按预案待命，暂不干预。  :: none
+  [pass] 预算未用完部分按规定结转下一年度。  :: none
+  [pass] 他在一旁观看，没有参与打斗。  :: none
+  [pass] The idle server was shut down to s  :: none
+TOTAL 穿透 41/49
