@@ -41,7 +41,15 @@ UPGRADE_REPORT.txt
 UPGRADE_REPORT_v2.0.37.md
 __pycache__/
 assets/
-benchmark/
+# [r252] 原为无锚定的 `benchmark/`——gitignore 的无锚定目录模式在**任意深度**
+# 生效，于是它把 `src/benchmark/` 也一起吃掉了：r252 实测
+# `heartflow_benchmark_run` / `heartflow_benchmark_import_failures` 两个 MCP
+# 工具 require 的 src/benchmark/benchmark-runner.js 与 failure-importer.js
+# 「在 git 全历史里从未存在过」，根因就是这两个文件被这条规则静默跳过
+# （git add 不报错、git status 不显示，只在 git check-ignore -v 里能看见）。
+# 收窄为根锚定 `/benchmark/`：原意图是忽略仓库根目录下的 benchmark 输出目录
+# （实测该目录不存在），不再波及 src/ 下的源码目录。
+/benchmark/
 bigbench_50.json
 data/          # 包含 data/memories/ 心虫记忆金库
 data/**/*.json
@@ -187,6 +195,11 @@ tests/
 /src/core/knowledge/index.js
 /src/core/sleep-wake.js
 /src/cortex/benchmark-external-anchor.js
+# [r252] MetacognitiveReward 的运行时状态目录。r252 把
+# heartflow_metacognition_evaluate 从 100% 崩修到真能跑之后，这个目录开始
+# 被真实写入（experience-buffer.jsonl + reward-stats.json）——它是运行期
+# 状态不是源码，不收进来会让每次调用完 git status 都挂一个未跟踪目录。
+/src/memory/metacognition/
 /src/memory/emotional-memory-bridge.js
 /src/memory/memory.js
 /src/reasoning/verifier.js

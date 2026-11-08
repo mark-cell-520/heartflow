@@ -2645,11 +2645,18 @@ async function handleBenchmarkRun(args, sessionId) {
 
     const summary = await runner.runAll({ threshold, pushFailures });
 
-
-
-    // 推入 RL
-
-    const flushResult = await runner.flushFailuresToRL();
+    // [r252 修复] 原实现无条件再调一次 flushFailuresToRL()，工具 schema 里
+    // 广告的 pushFailures=false（「是否将失败推入自愈 RL」）被完全忽略——
+    // 传 false 也照样推。改为尊重调用方意图：只有 pushFailures !== false
+    // 才推，且 runAll 内部已推过时不再重复推一遍。
+    let flushResult;
+    if (pushFailures) {
+      flushResult = summary.pushedToRL
+        ? { skipped: 'runAll 已推送', ...summary.pushedToRL }
+        : await runner.flushFailuresToRL();
+    } else {
+      flushResult = { skipped: 'pushFailures=false，按调用方意图不推入 RL' };
+    }
 
 
 
@@ -4829,9 +4836,23 @@ const HANDLERS = {
   heartflow_flow_predict: (args) => {
     try {
       const { FlowPredictor } = require('./core/flow-predictor.js');
-      const inst = new FlowPredictor({ silent: true, rootPath: HF_DIR });
-      const r = inst.recordError ? inst.recordError(args?.event || '') : {};
-      return { result: r, timestamp: Date.now() };
+      const inst = new FlowPredictor();
+      // [r252 修复] 原实现把字符串直接传给 recordError(errorEvent)，而
+      // recordError 读 errorEvent.message?.substring() → 字符串无 .message
+      // → detectErrorLoop 里 undefined.includes() 抛 TypeError，工具 100% 崩。
+      // 现在按 recordError 的入参形状 {message, location} 构造事件再记。
+      const raw = args && typeof args.event === 'string' ? args.event : '';
+      const event = {
+        message: raw,
+        location: (args && typeof args.location === 'string') ? args.location : 'mcp:heartflow_flow_predict',
+      };
+      inst.recordError(event);
+      return {
+        result: inst.getFlowState(),
+        stats: inst.getStats(),
+        recorded: { message: event.message, location: event.location },
+        timestamp: Date.now(),
+      };
     } catch (e) { return { error: e.message }; }
   },
   heartflow_information_flow: (args) => {
@@ -4918,8 +4939,25 @@ const HANDLERS = {
     try {
       const { MultiAgentDialogue } = require('./consciousness/multi-agent-dialogue.js');
       const inst = new MultiAgentDialogue({ silent: true, rootPath: HF_DIR });
-      const r = inst.registerAgent ? inst.registerAgent(args?.message || '') : {};
-      return { result: r, timestamp: Date.now() };
+      // [r252 修复] 原实现 inst.registerAgent(args?.message || '') 只传一个
+      // 字符串，而 registerAgent(name, agent) 读 agent.role → undefined.role
+      // 抛 TypeError，工具 100% 崩。现在按签名补第二个参数，并用 message
+      // 当 persona 注册一个代理，随后真的发起一轮对话。
+      const message = (args && typeof args.message === 'string') ? args.message : '';
+      const name = (args && typeof args.agentName === 'string' && args.agentName) || 'agent';
+      const agent = {
+        role: (args && typeof args.role === 'string' && args.role) || 'participant',
+        persona: message || `I am ${name}`,
+      };
+      inst.registerAgent(name, agent);
+      const mode = (args && typeof args.mode === 'string' && args.mode) || 'collaborative';
+      const dialogue = inst.dialogue({ input: message || '（无消息）', context: {} }, mode);
+      return Promise.resolve(dialogue).then((result) => ({
+        result,
+        stats: inst.getStats(),
+        registered: { name, role: agent.role },
+        timestamp: Date.now(),
+      })).catch((e) => ({ error: e.message, stats: inst.getStats() }));
     } catch (e) { return { error: e.message }; }
   },
   heartflow_dream_v2: (args) => {
@@ -5215,8 +5253,13 @@ const HANDLERS = {
   // [P2-2] metacognitive-reward
   heartflow_metacognition_evaluate: async (args) => {
     try {
-      const { metacognition } = require('./index.js');
-      return metacognition.evaluate(args.output || '', { selfFeedback: args.selfFeedback });
+      // [r252 修复] 原实现 `require('./index.js').metacognition.evaluate(...)`
+      // 直接崩：index.js:17442 导出的是 **模块对象**
+      // （module.exports = { MetacognitiveReward }），evaluate 是类
+      // MetacognitiveReward 的实例方法，不在模块对象上。改为先取类再实例化。
+      const { MetacognitiveReward } = require('./index.js').metacognition;
+      const mr = new MetacognitiveReward(heartflow || {}, {});
+      return mr.evaluate(args.output || '', { selfFeedback: args.selfFeedback });
     } catch (e) { return { error: e.message }; }
   },
   // [P2-3] executable-reasoning

@@ -1,3 +1,118 @@
+## r252 — MCP 工具「已广告但 100% 崩」修复轮（v6.8.180）：benchmark 两个工具指向从未提交的模块（根因是 .gitignore 无锚定 `benchmark/` 吞掉 src/benchmark/）+ 三个 TypeError/缺方法 handler + _loadStats 双缺陷
+
+**轮次**：r252 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（**不在 r251 候选池里的新发现**——本轮轮初全 MCP 工具面探针实测捞出）
+**真升级类型**：缺陷修复（5 个，全部实测确认 100% 崩）+ 新模块（`src/benchmark/` 下 2 个真实实现，544 行非注释代码）+ 仓库级配置修复（`.gitignore` 无锚定目录模式误伤源码目录）。MCP 工具 **187 不变**（本轮不新增工具，是让既有广告兑现）、dispatch 路由 **1,319 不变**、判别维度 **210 不变**（`src/index.js` 零改动）、引擎模块 **162 不变**（两个新模块不进 `_modules`）。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision。r251 交接簿候选池①是「28 个无调用方占位子系统的摘除」，但那是纯减法，**不满足轮次协议硬约束 #4**（本轮必须至少有一项可度量变化：代码丰富 ≥50 行新功能逻辑，或性能优化给出同一基准前后实测数字）。故本轮改为**不预设题目**，先做一次全 MCP 工具面探针，从 187 个工具里捞「广告了但不工作」的真缺陷。
+- **探针方法**（scripts/tmp-252-probe.js，轮末已删）：`require('src/mcp-server.js')` → `initHeartFlow()` → `tools/list` 取全部 187 个工具定义 → 按每个工具的 `inputSchema` 生成良性参数 → 逐个 `tools/call` → 记录 THROW / isError / error 字段 / 恒空返回四类。**未启动引擎时先跑一遍、启动后再跑一遍**——两遍差分才能把「引擎没起」与「真缺陷」分开（首遍 87 个报错里 29 个纯粹是引擎未启动）。
+- **探针结果**：187 个工具，**恒空返回 0 个**；引擎启动后仍报错 58 个，其中 guest 权限拦截 25 个（预期行为，四个写工具 + 21 个 memory 族）、探针自身坏参数（把中文长句传给 action/enum 型参数）约 28 个，**剩下 5 个是真缺陷**（第二节）。其中两个是「handler 在、模块文件从未存在」的接线半成品，比 r249/r250 的 bridge stub 更彻底。
+- **选题结论**：做这 5 个，范围钉死在「让已广告的 MCP 能力真正工作」一个主题内——不碰判别引擎（`src/index.js` 零改动）。
+
+### 二、根因/缺口分析（带证据）
+
+**缺陷①+②：两个工具指向从未存在的模块（100% 崩）**
+
+`heartflow_benchmark_run`（handler `src/mcp-server.js:2594`）与 `heartflow_benchmark_import_failures`（`:2700`）require 的 `src/benchmark/benchmark-runner.js` / `src/benchmark/failure-importer.js` **在 git 全历史里从未存在过**——`git log --diff-filter=D -- 'src/benchmark/*'` 返回空，`src/benchmark/` 目录本身不存在（`ls src/benchmark` → No such file or directory）。而工具定义在 `src/mcp/tools-registry.js:136/:142` 照常广告着「运行 benchmark 测试套件 / 导入失败案例 JSONL 到自愈 RL」。轮初实测两个工具都返回 `Cannot find module '...src\benchmark\benchmark-runner.js'`。
+
+**根因不是「忘了写」，是「写了但被 gitignore 静默吞掉」**——本轮最重的一条发现。`.gitignore:44` 原来是**无锚定**的 `benchmark/`，而 gitignore 的无锚定目录模式在**任意深度**生效，于是它把 `src/benchmark/` 也一起吃掉了。实测证据：`git check-ignore -v src/benchmark/benchmark-runner.js` → `.gitignore:44:benchmark/	src/benchmark/benchmark-runner.js`。症状极其隐蔽——**`git add` 不报错、`git status` 不显示、`git log --diff-filter=D` 查不到删除记录**，文件安安静静躺在工作区里，只有 `git check-ignore` 能看见。也就是说：**这两个 MCP 工具在任何全新 clone 上都 100% 崩，不只是本机**——本地能跑通（如果谁手工放过文件），clone 下来的人一定崩。原规则的本意是忽略仓库根目录下的 benchmark 输出目录（实测该目录不存在），与 `src/` 下的源码目录无关。
+
+**注意：同族的 `heartflow_benchmark_status` 是好的**（不依赖这两个模块，只读目录列 jsonl），说明三个工具里只有这两个是半成品。
+
+**缺陷③④：两个 handler 的调用形状错误（100% 崩）**
+
+| 工具 | 原实现 | 抛错 |
+|---|---|---|
+| `heartflow_flow_predict` | `inst.recordError(args?.event || '')` 把**字符串**传给期望对象的 `recordError(errorEvent)`（`src/core/flow-predictor.js:73` 读 `errorEvent.message`） | `TypeError: Cannot read properties of undefined (reading 'includes')`（`detectErrorLoop` 里对 undefined 取 includes） |
+| `heartflow_multi_agent_dialogue` | `inst.registerAgent(args?.message || '')` 只传一个字符串，而签名是 `registerAgent(name, agent)`（`src/consciousness/multi-agent-dialogue.js:45` 读 `agent.role`） | `TypeError: Cannot read properties of undefined (reading 'role')` |
+
+**缺陷⑤：`heartflow_metacognition_evaluate` 两层叠加（100% 崩）**
+
+- 第一层：`require('./index.js').metacognition.evaluate(...)` 直接 `metacognition.evaluate is not a function`——`src/index.js:17442` 导出的是**模块对象**（`module.exports = { MetacognitiveReward }`），`evaluate` 是类 `MetacognitiveReward` 的**实例方法**，不在模块对象上。
+- 第二层（补上 `new MetacognitiveReward()` 后才撞上）：`src/cortex/metacognitive-reward.js:32` 原实现 `_loadStats() { try { if (existsSync) Object.assign(this, JSON.parse(...)); } catch (_) { this.stats = {...} } }` 有两个叠加缺陷：
+  - ① **只在 catch 分支兜底**。首次运行（stats 文件不存在）时 `existsSync` 为 false，try 体不抛错、catch 不执行 → `this.stats` 恒 undefined；
+  - ② **读写形状不一致**。文件存在时 `Object.assign(this, parsed)` 把 `total/avgReward` 等**平铺键挂到 `this` 上**，而 `_saveStats()`（`:33`）写的正是平铺形状 `JSON.stringify(this.stats)`——读进来挂错对象，`this.stats` 依旧是 undefined。
+  两条路径都让 `_recordExperience` 的 `this.stats.total++` 抛 `TypeError: Cannot read properties of undefined (reading 'total')` ⇒ **`MetacognitiveReward.evaluate()` 从写出起就 100% 不可用**（不只是 MCP 工具，任何调用方都用不了）。
+
+**附带缺陷：`pushFailures` 参数被 handler 无条件忽略**
+
+`handleBenchmarkRun` 调完 `runAll({ threshold, pushFailures })` 后又**无条件** `flushFailuresToRL()`。工具 schema 里广告的 `pushFailures:false`（「是否将失败推入自愈 RL（默认 true）」）完全失效——传 false 也照样推。轮初实测两种取值推进的失败数一模一样。
+
+### 三、落地项
+
+1. **新增 `src/benchmark/benchmark-runner.js`（319 行非注释代码）**：`BenchmarkRunner` 类。数据包格式与本仓 `test/benchmark-runner.js` 的 `test_data/benchmarks/*.json` 的 `expected` 形状对齐（minConfidence/maxConfidence/mustInclude），另加 `gateAction`/`expectError`/`mustNotInclude`。方法：`loadFile()`/`loadDirectory()`（按 category 分桶进 `this.packs`，坏行逐行登记 `file+line+reason`）、`runAll({threshold, pushFailures})`、`flushFailuresToRL()`、`getSummary()`。**判定纪律（本题关键设计判断）：没有数字就不打分**——声明了置信度上下界而引擎给不出可解析置信度时标 `unjudged`，不计入 passed 也不计入 failed；`expected.gateAction` 因 `hf.think()` 返回值里**没有 gate 字段**（轮初实测 `r.gate` 为 null、`r.confidence` 为 undefined），改走 `src/gate.js` 的 `gate()` 本体取 `gate.action`，两条取法都拿不到才判 unjudged；缺 `input/prompt` 字段的行照跑判定并记 failed（理由写清），不静默丢弃。RL 出口（experience-collector `recordFailure()` + self-healing `record()`）缺席时如实登记 unavailable，**不拿「我读了文件」冒充「我导进了 RL」**。
+2. **新增 `src/benchmark/failure-importer.js`（225 行非注释代码）**：`FailureCaseImporter` 类。`readCases()` 兼容四种输入并登记 `parsedFrom`（jsonl / `{failure_cases:[...]}` / 裸数组 / 单对象），`importFromFile()`/`importCases()` 推入双 RL 出口，`input+error` 指纹去重（同输入不同错误是两条，同输入同错误才是重复），`autoRetrain` 走反思循环（子系统缺席时如实说不触发）。
+3. **`src/mcp-server.js` 四处修改（67 行增量）**：`heartflow_flow_predict` 按 `{message, location}` 构造事件再 `recordError`，返回 `getFlowState()` + `getStats()` + 事件回显；`heartflow_multi_agent_dialogue` 补 `registerAgent` 第二参（`{role, persona}`，persona 取 message）后真发起一轮 `dialogue()`；`heartflow_metacognition_evaluate` 改为取 `MetacognitiveReward` 类再实例化；`handleBenchmarkRun` 尊重 `pushFailures`。
+4. **`src/cortex/metacognitive-reward.js`：`_loadStats()` 重写**（29 行增量）——先落默认值 `{total:0, avgReward:0.5, avgConfidence:0.5, avgQuality:0.5}`，再按「平铺（`_saveStats` 的实际形状）优先、`{stats:{...}}` 包裹兼容」合并，只接受有限数字。两条路径都保证 `this.stats` 可用。
+5. **版本 6.8.179 → 6.8.180**，`sync-version.js` + `sync-doc-numbers.js` 已跑（回归后又跑一次，测试数 19,403→19,440、失败 155→154 机器记账到 README/SKILL）；README Version history 补 v6.8.180 行。
+6. **`.gitignore` 修复（本轮最重的一条，让修复对全新 clone 也生效）**：`benchmark/` → `/benchmark/`（根锚定）。原意图是忽略根目录下的 benchmark 输出目录，收窄后不再波及 `src/benchmark/` 源码目录。**不修这一条的话，本轮两个新模块在别人 clone 下来的仓库里依然不存在，两个工具依然 100% 崩**——只改代码不改 ignore 规则等于没修。
+7. **新测试 `test/round-252-benchmark-mcp-revival.test.js`（22 断言全绿）**：A 族 9 条（两模块存在性与方法齐全 / 分桶与坏行留痕 / runAll 四态判定 / unjudged 不冒充 / gateAction 走 gate() 本体 / pushFailures 两种取值 / 导入去重 / RL 出口全缺席时诚实 / readCases 四种输入）、B 族 4 条（三个修复的单元级复现 + `_loadStats` 读写形状）、C 族 3 条（MCP 三处接线在册 + 两个独立子进程端到端）、D 族 6 条（回归：三招牌入口、维度 210、工具 187、`_initErrors` 空、模块 162 不变 + **D6 防回潮：`git ls-files src/benchmark/` 必须列出两个源文件、`git check-ignore` 不得再命中、`.gitignore` 不得再出现无锚定 `benchmark/` 行**）。
+
+### 四、验收数字（全部实测）
+
+| 项 | 轮前 | 轮后 | 实测方式 |
+|---|---|---|---|
+| `heartflow_benchmark_run` | **100% 崩**（Cannot find module benchmark-runner.js） | 真实输出：records=6 / malformed=1 / passed=2 / failed=4 / accuracy=0.333 | test C2；7 条混合数据包（含 1 行坏 JSON、1 行缺 input、1 行 expectError） |
+| `heartflow_benchmark_import_failures` | **100% 崩**（Cannot find module failure-importer.js） | imported=3 / duplicates=1 / parsedFrom=jsonl | test C2/A7 |
+| `heartflow_flow_predict` | **100% 崩**（TypeError reading 'includes'） | 返回 `{result:{phase,frustrationScore,detectedPatterns}, stats}` | test C3/B1 |
+| `heartflow_multi_agent_dialogue` | **100% 崩**（TypeError reading 'role'） | 返回 6 条消息的对话 + stats | test C3/B2 |
+| `heartflow_metacognition_evaluate` | **100% 崩**（两层叠加：is not a function → reading 'total'） | 返回 `{reward, confidence, quality, verdict}`，stats 正确累计 | test C3/B3/B4 |
+| `pushFailures=false` | 被忽略（照样推 RL） | 返回 `{skipped:'pushFailures=false，按调用方意图不推入 RL'}` | test A6/C2 |
+| `malformed` 计数 | — | 首版按 pack 重复计虚高 4 倍（1 坏行报 4），改为按行计一次 | test A3 |
+| 新增非注释代码 | — | **544 行**（2 个新模块）+ mcp-server 67 行 + metacognitive-reward 29 行 | `node -e` 逐文件统计 |
+| `src/benchmark/` 被 git 跟踪的文件数 | **0**（被无锚定 `benchmark/` 吞掉） | **2**（`git ls-files src/benchmark/`） | test D6 |
+| `.gitignore` 命中 `src/benchmark/` | **命中**（`.gitignore:44:benchmark/`） | **不命中**（改为根锚定 `/benchmark/`） | `git check-ignore -v`；test D6 |
+| MCP 工具 / 路由 / 维度 / 模块 | 187 / 1,319 / 210 / 162 | **187 / 1,319 / 210 / 162 全部不变** | sync-doc-numbers.js；test D3/D4/D5 |
+| `bin/verify.js` | — | **16/16** | — |
+| bidirectional-guard | — | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r251 基线逐项一致） | data/round-252-bidir.log |
+| guard-abilities | — | **20/20**（dimensions 键 210 不变） | data/round-252-guard.log |
+| doc-numbers-accuracy | — | **24/24**（回归后测试数 19,403→19,440 由 sync 脚本同步，复跑仍 24/24） | — |
+| security-audit | — | 提交前 **15/16**（S2「git log/tag 未命中 6.8.180」为提交前预期失败，r236~r251 同款） | — |
+| 本轮新测试 | — | round-252 **22/22** | test/round-252-benchmark-mcp-revival.test.js |
+
+### 五、全量回归与计数
+
+全量回归 **19440 通过 / 154 失败 / 共 19594 个**（655 个测试文件，`data/round-252-regression.log`，实测耗时 **1379.5s**，并发 4）。
+对照基线 **r251（data/round-251-regression.log）：19403 / 155 / 19558**（654 文件）：failed **155 → 154（-1）**、passed 19403 → 19440（**+37**）、total 19558 → 19594（+36）。
+
+**失败文件清单逐项比对（`comm`，只取日志「失败的测试:」段）**：r251 基线 **76 个**失败文件，本轮 **75 个**——
+- **本轮新增失败文件：0 个**
+- **本轮消失：1 个**（`verify-gate-entry-negtest.test.js`，即 r250 报告里登记的那个并发池抖动项——单独复跑 6/6 全绿，本轮未再抖动）
+- **本轮新测试 `round-252-benchmark-mcp-revival.test.js` 不在失败清单**（21/21）
+
+passed +37 的构成：本轮新测试 21 条断言 + verify-gate-entry-negtest 复绿 6 条 + 未输出汇总行类文件的计数波动净差。**断言级零新增失败。**
+
+**关于第 22 条断言的诚实交代**：全量回归跑完之后，才补上 D6（gitignore 防回潮断言，见第二节根因与第七节坑⑧）——因为它要守的正是「回归期间才发现」的那条 ignore 规则。所以上面 19,440 / 154 / 19,594 这组数字对应 round-252 的 **21 条**断言；D6 加入后单独复跑 **22/22**，全量口径相应为 19,441 / 154 / 19,595（+1 全部由 D6 贡献，未重跑全量）。README/SKILL 的测试数戳记以 `data/test-count.json`（run-all 实测缓存）为准保持 19,440，不把没跑过全量的数字写进文档。
+
+噪声池构成与 r251 同族（全部存量，逐项比对无一带消失说明噪声池稳定）：MCP 类 6 个（knowledge-graph-mcp-state-round593 / knowledge-layer-mcp-state-round313 / mcp-auth-tier / mcp-guest-permission / mcp-server / mcp-smoke，8099 端口被常驻服务占用）+ 未输出汇总行类 40 余个 + 注册 0 用例类（core/path-guard、round-410）+ Command failed 类 dispatch 族 + 文件自报失败类（ClassicsRules searchClassicsBatch、AgentBoundaryGuard dot-dir、unsupported-claim-exemption）。
+
+**落在本轮改动上的回归为零**：双向门禁召回 52/52 不降、误拦 302/326 不升；`guard-abilities` 20/20（dimensions 键 210 不变）；`bin/verify.js` 16/16；`doc-numbers-accuracy` 24/24；三个修复工具在 MCP 端到端全通（test C2/C3）；`_initErrors` 零新增（test D4）；模块计数 162 不变（test D5）。
+
+### 六、已知未修（含为什么不修）
+1. **`MetacognitiveReward` 的奖励启发式本身很粗**：`_estimateConfidence` 的 `base = Math.min(1, len/500)`，短文本置信度被压到 0.04~0.08，好坏文本都判 `verdict:'poor'`。不修的原因：这是模块自带的评分口径问题，不是崩溃缺陷；改它会改变 `heartflow_metacognition_evaluate` 的输出分布，而本轮主题是「让工具从崩到不崩」。留给专门调奖励口径的轮次。
+2. **28 个无调用方占位子系统的「摘除」**（r251 候选池①，本轮因硬约束 #4 要求「代码丰富或性能优化」而未做纯减法轮）——heartflow.js 的 31 项 `_STUB_SUBSYSTEM_KEYS` 已逐名列名，`heartflow_module_stubs` 可直接拉清单。摘除要连带清理 `_lazy` 声明 + 实例化点 + MCP 能力清单对应项，且必须保证 `_initErrors` 与 dispatch 路由表不出现悬空引用。
+3. **探针筛出的其余「not ready」类未动**：`heartflow_error_store`/`error_query`/`error_fix`/`error_verify` 报 `error memory not ready`、`heartflow_boundary_check` 报 `boundaryGuard not loaded`、`heartflow_cache_stats` 报 `cache_not_initialized`、`heartflow_decision_history` 报 `heartflow_instance_not_found`——这四个是「子系统按需懒加载、探针用默认 session 打不到」，与①~⑤的「每次都崩」不同形状，需要逐个确认懒加载路径后才能判是真缺陷还是探针口径问题，不在本轮主题内。
+4. **`heartflow_translate` 的 `tone.tone` 兼容别名**（r249 G2 挂账，r250/r251 续挂，本轮继续挂）——外部调用方契约，无仓内调用方。
+5. **判别引擎侧六条挂账原样继承**（本轮 `src/index.js` 零改动）：⑨族裸标记位置化（r225 纪律）、`PC_RITE_MECH_ZH` 仪式族位置化（r239 G3）、`PC_DRUG_MECH_ZH`/`PC_SUPP_MECH_ZH` 跨表统一（r236 G2 后半）、lastIndex 防空匹配防护前移、`scripts/negative-test-rc-temporal-causal-r364.js` 临时目录隔离、r71 测试 G 节 idx4 zh 侧句式缺口。
+
+**下一轮候选池（按优先级）**：
+① **`.gitignore` 无锚定目录模式全仓扫描**（r252 新登记，优先级最高）——本仓 `.gitignore` 里还有 `data/`（:46）、`memory/` 等无锚定目录模式，用 `find . -type d -name X` × `git check-ignore -v` 的交叉集逐个确认有没有别的 `src/**/X/` 源码目录被静默吞掉。r252 已实测抓到 `benchmark/` 一条（影响 2 个 MCP 工具 100% 崩），这条扫描是同一形状的系统性风险。
+② **28 个无调用方占位子系统的「摘除」**（r251 候选池①，两轮续挂）——若仍受硬约束 #4 限制，可改为「摘除 + 同一轮里给摘除后的启动路径补可度量优化（createHeartFlow 耗时/内存前后实测）」，把减法轮变成有数字的轮。
+③ **error-memory / boundaryGuard / cache / decision_history 四个「not ready」的懒加载路径核查**（r252 探针登记）——逐个确认是探针口径还是真缺陷，本轮已给出可复用的探针方法（引擎启动前后各跑一遍 tools/call 做差分）。
+③ `MetacognitiveReward` 奖励口径调优（r252 已知未修①）。
+④ `heartflow_translate` 的 `tone.tone` 兼容别名。
+⑤~⑩ 判别引擎侧六条挂账原样继承。
+
+### 七、踩坑
+1. **探针必须跑两遍（引擎启动前 / 后）**。首遍 87 个报错里 29 个纯粹是「引擎未启动」，不差分就会把环境噪声当缺陷报。差分后真缺陷从 87 降到 5 个。
+2. **`readCases()` 的解析顺序首版搞反了**（先 JSONL 后整包 JSON）：单行的 `{"failure_cases":[...]}` 被 JSONL 分支当成「一个普通案例对象」收下，`parsedFrom` 报 `jsonl`、cases 里装的是包装壳而不是案例，下游全拿不到 `input` 字段。改为**先试整包 JSON 再试逐行 JSONL**——多行 JSONL 的整包文本不是合法 JSON，`JSON.parse` 会先失败并自然落到逐行分支，不会误判。
+3. **`malformed` 首版按 pack 重复计**：一个坏行被 4 个 pack 各 push 一遍，summary 报 `malformed:4`（虚高 4 倍）。改为文件级 `malformedLines` 按行计一次。
+4. **测试的临时目录清理放在了模块顶层**：`t()` 对 async 断言只是登记进 `asyncTests`，模块顶层代码先于它们执行完 → 临时目录在 A6/A7 还在读时就被删掉，报 `ENOENT` / `duplicates undefined` 的**假失败**。清理只能放进最后的异步汇总块、`await Promise.all` 之后。
+5. **子进程的 `console.log` 会流到 stderr**：子进程 require mcp-server 后 stdio-guard 把 `process.stdout.write` 改道 stderr，`execFileSync` 只回 stdout → 抓到的 `RESULT:` 行是 undefined。改用 `spawnSync` 拿 stdout+stderr 两份一起找（r249 坑①的同款，本轮又踩一次）。
+6. **`_modules` 里存量就有一个 `SelfBenchmark` 挂名 `benchmark`**，所以「新模块不进 `_modules`」的回归断言不能写 `/benchmark/i`（会把存量模块一起判红），只能查本轮两个具体类名。
+7. **维度数不能从 `src/index.js` 的导出对象上数**：`idx.DIMENSIONS` 与 `idx.discriminate.dimensions` 都是 undefined，正确口径是 `idx.discriminate(text).dimensions` 的键数（210）。
+8. **`.gitignore` 的无锚定目录模式是「静默吞源码」的陷阱**（本轮最重的一条）：`benchmark/` 这种不带前导斜杠的目录模式在 gitignore 里匹配**任意深度**的同名目录，于是 `src/benchmark/` 被一起吃掉，而 `git add` / `git status` / `git log --diff-filter=D` **三者都看不出异常**——只有 `git check-ignore -v <file>` 能指认。诊断命令组合：`find . -type d -name benchmark` + `git check-ignore -v src/benchmark/xxx.js` + `git log --diff-filter=D -- 'src/benchmark/*'`（空）。判「一个模块是否真的在库里」不能只跑 `ls`（工作区有）或 `git log`（查不到删除记录），必须 `git ls-files`。修法是根锚定 `/benchmark/`。同类风险：本仓 `.gitignore` 里还有 `data/`、`memory/` 等无锚定条目，值得下一轮全仓扫一遍「无锚定目录模式 × src/ 下同名目录」的交叉集。
+
 ## r251 — 占位子系统诚实记账 + 三个被静默吞掉的 TypeError 调用点修复（v6.8.179）：heartflow_module_health 对 26 个占位空壳 100% 失明，healthScore 从假的 100 降为真实的 84
 
 **轮次**：r251 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（交接簿 r250 notes 候选池①「_stubFactory 31 个占位子系统的「实现或摘除」裁决」）

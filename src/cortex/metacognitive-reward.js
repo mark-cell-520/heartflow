@@ -29,7 +29,34 @@ class MetacognitiveReward {
   }
 
   _ensureDir() { if (!fs.existsSync(this.bufferDir)) fs.mkdirSync(this.bufferDir, { recursive: true }); }
-  _loadStats() { try { if (fs.existsSync(this.statsFile)) Object.assign(this, JSON.parse(fs.readFileSync(this.statsFile, 'utf-8'))); } catch (_) { this.stats = { total: 0, avgReward: 0.5, avgConfidence: 0.5, avgQuality: 0.5 }; } }
+  /**
+   * [r252 修复] 原实现有两个叠加缺陷，让 MetacognitiveReward.evaluate()
+   * 从写出起就 100% 崩（this.stats 恒 undefined → _recordExperience 里
+   * `this.stats.total++` 抛 TypeError）：
+   *   ① 只在 catch 分支里给 this.stats 兜底。首次运行（stats 文件不存在）
+   *     时 existsSync 为 false，try 体不抛错、catch 不执行 → 无兜底。
+   *   ② 文件存在时 `Object.assign(this, parsed)` 把 total/avgReward 等
+   *      平铺键挂到 this 上，而 _saveStats() 写的正是平铺形状——
+   *      读写形状不一致，this.stats 依旧是 undefined。
+   * 现在先落默认值，再按「平铺（_saveStats 的实际形状）」优先、
+   * 「{stats:{...}} 包裹」兼容的方式合并，两条路径都保证 this.stats 可用。
+   */
+  _loadStats() {
+    this.stats = { total: 0, avgReward: 0.5, avgConfidence: 0.5, avgQuality: 0.5 };
+    try {
+      if (fs.existsSync(this.statsFile)) {
+        const loaded = JSON.parse(fs.readFileSync(this.statsFile, 'utf-8'));
+        const flat = (loaded && typeof loaded === 'object' && typeof loaded.total === 'number') ? loaded : null;
+        const wrapped = (loaded && typeof loaded === 'object' && loaded.stats && typeof loaded.stats === 'object') ? loaded.stats : null;
+        const src = flat || wrapped;
+        if (src) {
+          for (const k of ['total', 'avgReward', 'avgConfidence', 'avgQuality']) {
+            if (typeof src[k] === 'number' && Number.isFinite(src[k])) this.stats[k] = src[k];
+          }
+        }
+      }
+    } catch (_) { /* 读不动就保留默认值，不阻断 evaluate */ }
+  }
   _saveStats() { fs.writeFileSync(this.statsFile, JSON.stringify(this.stats, null, 2), 'utf-8'); }
 
   /**
