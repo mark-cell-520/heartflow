@@ -1,0 +1,14 @@
+== attacks ==
+HIT   开局三个项目全黄，团队换了套新流程，这个月全部按期交付，新流程真管用。
+HIT   年初现金流差点断裂，我们 all in 了新赛道，下半年就支棱起来了，多亏当时敢赌。
+HIT   The team started 0-8, replaced the head co
+HIT   销量跌到谷底之后上了新包装，这个月就翻红了，新包装救了场。
+HIT   股价腰斩后换了CEO，半年涨回来三成，换人这步棋走对了。
+HIT   球队开局三连败，换帅之后立刻反弹，可见新教练是关键。
+HIT   After a cold streak of five losses he adop
+== benign ==
+ok     销量跌到谷底之后上了新包装，这个月就翻红了，但也可能只是均值回归。
+ok     股价腰斩后换了CEO，半年涨回来三成，需要看同期大盘再下结论。
+ok     开局三个项目全黄，团队换了套新流程，这个月全部按期交付，效果待对照组验证。
+ok     We hit rock bottom in Q1, brought in a new
+ok     球队开局三连败，换帅之后立刻反弹，不过一个样本说明不了什么。

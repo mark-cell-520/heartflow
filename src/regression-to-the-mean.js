@@ -123,14 +123,29 @@
  *   · 推理否定/反向承认（不能说明/不能证明/不能排除/不代表/不等于/
  *     并不意味着/推不出/不足以/未必/不一定/很难说/不见得/不好说/说不
  *     清/难以确定/无法确定/不能全归/不能都归/不能单靠/还要观察/有待验
- *     证/可能是自然/其实是均值/可能只是；EN does not mean / cannot
- *     conclude / not necessarily / does not prove / cannot prove / fails
- *     to show / may just be / could simply be）——拒绝该推断本身是正确
- *     判别；
+ *     证/可能是自然/其实是均值/可能只是/还要看/需要看/待观察/以长期/
+ *     拉长看/长期为准；EN does not mean / cannot conclude / not
+ *     necessarily / does not prove / cannot prove / fails to show / may
+ *     just be / could simply be）——拒绝该推断本身是正确判别；
  *   · 对冲（可能/也许/或许/大概/恐怕/倾向于/似乎/好像/说不定/有待/待
  *     验证；EN maybe / perhaps / might / possibly / probably / seems /
  *     appears）——概率化结论不作谬误判定；
  *   · 疑问句（含 ?/？）：提问不是断言。
+ *
+ * [r265] 全新措辞家族扩展（真升级②，live 生效，维度计数不变）：r265
+ * 池化探针（coordination/agent4/probes/r265-probe-pool.js，v6.8.156
+ * 实测）本族 7 条新措辞攻击 5 条穿透（gate=pass 且零维度承重），落地：
+ *   · EXTREME_LOW_ZH += 项目黄灯族（全黄/亮红灯/全线飘绿）、濒临崩溃族
+ *     （差点断裂/快撑不住）、市场腰斩族（腰斩/砍半/膝盖斩）
+ *   · EXTREME_LOW_EN += 战绩记录族（started 0-8 / opened the season 3-15）
+ *   · REG_UP_ZH += 翻红/扭亏族、按期交付/重回正轨族、支棱族、涨回来族
+ *   · REG_UP_EN += now they win / winning again / back in form 直述回归族
+ *   · INTERVENE_ZH += all in/梭哈/加杠杆赌博式干预族、上了新X/上线了族
+ *   · CREDIT_ZH += 救了场/扭转局面族
+ *   · EFFECT_ZH += 走对了/步好棋/是关键决策正确性族
+ *   · EXEMPT_NEG_ZH += 要求补证据族（还要看/需要看/待观察/以长期）——
+ *     良性「需要看同期大盘再下结论」探针实测误伤，属设计既有豁免族的
+ *     同族扩展（主动要求对照窗口是正确判别姿态），非迁就代码
  */
 'use strict';
 
@@ -142,6 +157,13 @@ const EXTREME_LOW_ZH = [
   /倒数|垫底|谷底|低谷|跌到谷底|至暗时刻|冰点|触底|见底|探底/,
   /崩盘|暴跌|猛跌|重挫|大跌|连跌|创新低|历史新低|史上最低|最低点|最低谷/,
   /连败|连输|连续失败|屡战屡败|屡败|连连失利|输麻木了|跌麻了/,
+  // [r265] 新族：项目状态俚语（全黄/亮红灯/全线飘绿）——r265 池化探针
+  // 实测「开局三个项目全黄」整族穿透（EXTREME 无项目黄灯形）
+  /全黄|亮红灯|亮黄灯|全线飘绿|一片绿/,
+  // [r265] 新族：濒临崩溃（差点断裂/快撑不住）——「现金流差点断裂」
+  /差点断裂|险些断裂|差点崩|险些崩|快撑不住|濒临断裂|差点断气/,
+  // [r265] 新族：市场腰斩——「股价腰斩后换了CEO」俚语形
+  /腰斩|砍半|膝盖斩|打三折|打对折/,
 ];
 
 // ─── 腿① EXTREME_HIGH 极端高（中文，裸名词形态）───────────────────────
@@ -154,6 +176,12 @@ const EXTREME_HIGH_ZH = [
 // ─── 英文侧腿① ────────────────────────────────────────────────────────
 const EXTREME_LOW_EN = [
   /\b(?:worst|lowest|rock\s+bottom|bottom|nadir|slump|hit\s+bottom|crash(?:ed)?|tanked|all[-\s]time\s+low|record\s+low|at\s+(?:my|our|its|their)\s+lowest|worst\s+ever|lost\s+\d+\s+in\s+a\s+row|losing\s+streak)\b/i,
+  // [r265] 新族：战绩形 0-8 / 3-15（started 0-8）——体育管理层语境
+  // 的常规战绩表达，探针实测穿透（EXTREME_LOW_EN 无战绩记录形）
+  /\b(?:started|began|opened|kicked\s+off)\s+(?:the\s+)?(?:season|year|campaign|quarter)?\s*\d+\s*[-\u2013]\s*\d+\b/i,
+  // [r265] 新族：cold streak / winless streak / rough patch——竞技语境的
+  // 连续低谷形（r264 池化探针遗留族）
+  /\b(?:cold\s+streak|winless\s+streak|scoreless\s+streak|rough\s+patch|cold\s+spell|drought)\b/i,
 ];
 const EXTREME_HIGH_EN = [
   /\b(?:best|highest|peak|pinnacle|record\s+high|all[-\s]time\s+high|winning\s+streak|best\s+ever|at\s+(?:my|our|its|their)\s+(?:peak|best)|career\s+high)\b/i,
@@ -167,6 +195,14 @@ const REG_UP_ZH = [
   /回到[^。；，]{0,8}(?:正常|平均|中游|中等|上游|前列|前十|正轨|均值|本来|原来|平常)/,
   /好起来|好多了|追平|赶上|又赢了|赢回来|扳回|不疼了|不痛了|不咳了|不烧了|就好了|见好/,
   /退烧|退热|睡好|成绩回来|状态回来|分数回来|提上来|挺过来|熬过来|走出来|平复|平静/,
+  // [r265] 新族：翻红/扭亏（转正）——「这个月就翻红了」
+  /翻红|转正|扭亏|由亏转盈/,
+  // [r265] 新族：按期交付/重回正轨——「这个月全部按期交付」
+  /按期交付|重回正轨|重回轨道|上了正轨|回到正轨|进入正轨|走入正轨/,
+  // [r265] 新族：支棱（网络语复苏）——「下半年就支棱起来了」
+  /支棱/,
+  // [r265] 新族：涨回来——「半年涨回来三成」
+  /涨回来|涨了回来|收了回来|拉了回来|搬了回来|缓过来了/,
 ];
 
 // ─── 腿② REG_DOWN 自高处回落（中文）───────────────────────────────────
@@ -176,6 +212,11 @@ const REG_DOWN_ZH = [
 
 const REG_UP_EN = [
   /\b(?:recovered|recovery|improved|improvement|bounced?\s+back|rebound(?:ed)?|returned\s+to|came\s+back|back\s+to\s+normal|back\s+to\s+average|got\s+better|picked\s+up|won\s+again|leveled\s+off|levelled\s+off|stabili[sz]ed|turned\s+(?:it\s+)?around)\b/i,
+  // [r265] 新族：now they win / winning again / back in form——「and now
+  // they win」直述回归形（探针实测穿透）
+  /\b(?:now\s+(?:they|we)\s+(?:win|are\s+winning)|winning\s+again|back\s+in\s+form|back\s+on\s+track)\b/i,
+  // [r265] 新族：immediately won——干预后即时获胜的直述回归形
+  /\b(?:immediately|instantly|promptly|right\s+away|soon)\s+(?:won|won\s+again)\b/i,
 ];
 const REG_DOWN_EN = [
   /\b(?:dropped\s+back|fell\s+back|faded|wore\s+off|subsided|cooled\s+off|returned\s+to\s+normal|returned\s+to\s+average)\b/i,
@@ -190,6 +231,10 @@ const INTERVENE_ZH = [
   /换帅|换教练|换人|报班|报课|买课|换方法|改方法|调整作息|搬家|改名/,
   /换装备|换球拍|换球鞋|换顾问|换厂家|换供应商|换品牌|换药|换方子|换医生|换医院|转院|转诊/,
   /吃药|贴膏药|敷药|拔罐|针灸|推拿|正骨|喝中药|喝符水/,
+  // [r265] 新族：all in/梭哈/加杠杆（赌博式干预）——「all in 了新赛道」
+  /\ball\s*in\b|梭哈|加杠杆|满仓|押上全部/,
+  // [r265] 新族：上了新X/启用/上线了——「上了新包装」「上线了新流程」
+  /上了新|启用|上线了|部署了|切换了|迁到了|换上了新的/,
 ];
 const INTERVENE_EN = [
   /\b(?:took|taking|tried|hired|switched|changed|bought|used|started|joined|enrolled|prayed|consulted|wore|brought\s+in|replaced|adopted|signed\s+up\s+for|went\s+on)\b/i,
@@ -200,6 +245,8 @@ const CREDIT_ZH = [
   /是因为|多亏|全靠|幸亏|好在|幸好|还好我|幸亏是|多亏了|功劳|靠的是|靠它|归功于|居功至伟|功臣|头功|首功|大功臣|之所以/,
   /让[^。；，]{0,10}(?:好起来|好了|赢|成|活|挺过来|治|救)/,
   /把[^。；，]{0,10}(?:治好|救了|救活|解决|搞定)/,
+  // [r265] 新族：救了场/扭转局面——「新包装救了场」
+  /救了场|救场|救了局|扭转了|扭转乾坤|起死回生|强心针|续了命|救了公司/,
 ];
 const CREDIT_EN = [
   /\b(?:because\s+of|thanks\s+to|credit\s+to|due\s+to|it\s+was\s+thanks|owe\s+it\s+to)\b/i,
@@ -211,6 +258,8 @@ const EFFECT_ZH = [
   /治好|治愈|痊愈|解决了|成功了|赢了|拿下|没白|值得|是对的|没错|靠谱|名不虚传|果真|果然/,
   /很关键|关键作用|真管用|确实有用|有效果|疗效|功效|相当有用|挺有用|很有用|真的有用/,
   /一(?:吃|贴|试|换|改|请|拜|用)就/,
+  // [r265] 新族：走对了/步好棋（决策正确性断言）——「换人这步棋走对了」
+  /走对了|这步棋走对|步好棋|步妙棋|是关键|是关键因素|是转折点|神来之笔|棋走对了/,
 ];
 const EFFECT_EN = [
   /\b(?:work|works|worked|working|effective|helped|fixed|cured|healed|solved|won|paid\s+off|did\s+the\s+trick|made\s+the\s+difference|turned\s+(?:it\s+)?around|it\s+was\s+the)\b/i,
@@ -240,6 +289,9 @@ const EXEMPT_EVID_EN = [
 const EXEMPT_NEG_ZH = [
   /不能说明|不能证明|不能排除|不能全归|不能都归|不能单靠|不代表|不等于|并不意味着|不意味着|推不出|不足以|未必|不一定|很难说|不见得|不好说|说不清|难以确定|无法确定|还要观察|有待验证|无法证明|证明不了|难以断定|存疑|尚不/,
   /可能是自然|其实是均值|可能只是|或者是|也可能|未必是/,
+  // [r265] 新族：要求补证据/拉长观察窗——「需要看同期大盘再下结论」
+  // 「效果还要看长期」：主动要求对照或更长窗口是正确判别姿态
+  /还要看|需要看|待观察|以长期|拉长看|长期为准|让子弹飞|走着瞧/,
 ];
 const EXEMPT_NEG_EN = [
   /\b(?:does\s+not\s+mean|doesn'?t\s+mean|cannot\s+conclude|can'?t\s+conclude|not\s+necessarily|insufficient|no\s+evidence|does\s+not\s+prove|doesn'?t\s+prove|cannot\s+prove|can'?t\s+prove|fails\s+to\s+show|may\s+just\s+be|might\s+just\s+be|could\s+simply\s+be|natural\s+regression|regression\s+to\s+the\s+mean)\b/i,

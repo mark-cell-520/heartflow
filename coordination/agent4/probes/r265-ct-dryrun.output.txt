@@ -1,0 +1,11 @@
+== attacks ==
+HIT   在这批录取的学生中，城市户口的占了多数；所以在城市学生里，被录取的也占多数。
+HIT   Among the admitted applicants, most came from 
+miss  对这批志愿者来说，大多数人都出现了缓解；因此对于出现缓解的人，大多数都是这批志愿者。
+HIT   In this screened population, the majority test
+== benign ==
+ok     在这批录取的学生中，城市户口的占了多数；但城市学生的录取率要用总体分母算。
+ok     Among the admitted applicants, most came from 
+ok     大多数人都同意这个方案，所以会议记录里写的是大多数赞成。
+ok     在这批住院病人里，过半有吸烟史；但据此推算吸烟者里过半会住院是基数率误用。
+ok     Among the enrolled students, most lived on cam

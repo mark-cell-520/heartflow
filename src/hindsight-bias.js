@@ -102,6 +102,21 @@
  *     EN maybe / perhaps / might / may have / possibly / probably / seems /
  *     appears）——概率化表述不作谬误判定；
  *   · 疑问句（含 ?/？）：提问不是断言。
+ *
+ * [r265] 全新措辞家族扩展（真升级②，live 生效，维度计数不变）：
+ * r265 池化探针（coordination/agent4/probes/r265-probe-pool.js，v6.8.156
+ * 实测）本族 7 条新措辞攻击 5 条穿透（gate=pass 且零维度承重），落地：
+ *   · PRED_POST_ZH += 事后声言族（我早就说过/当初我就料到/一早就料到）
+ *     + 果然/果真应验副词（须与 OUT 共现）
+ *   · OUT_ZH += 口语化结果族（出轨/黄了/挂了/离了/吹了/闹翻/谈崩）
+ *   · PRED_POST_EN += 第一人称事后应验族（just as I expected/predicted/
+ *     as I expected/exactly what I expected/I called it）
+ *   · OUT_EN += 企业死亡口语族（died/shut down/folded/went under/wound
+ *     down/flamed out/pulled the plug）
+ *   · EXEMPT_NEWINFO_EN += post-mortem / retrospective review / lessons
+ *     learned（与 ZH 复盘同族的正确事后学习豁免；探针良性句误伤同族扩展）
+ *   未落地如实记录：「这对果然分了」的「分了」无动词后缀且多义（把钱分了
+ *   为中性义），不造第三条判别路径，改用分手形覆盖。
  */
 'use strict';
 
@@ -122,6 +137,10 @@ const PRED_STRONG_ZH = [
 // ─── 腿② PRED POST 事后断言子集：与腿③ OUT 共现判定（中文）──────────────
 const PRED_POST_ZH = [
   /早就知道|早就看出|早就预见|早就明白|早就该知道|伏笔|埋下伏笔|可想而知|迹象一直都在|本该看出|本可预见|当时就该|当时就应该|显而易见|很明显|谁都能看出|都能看出|谁都看得出来|一眼看出|一看就知道|一看便知|意料之中|早在意料|命中注定|冥冥注定|上天注定/,
+  // [r265] 新族：「我早就说过/当初我就料到」类事后声言 + 果然/果真（事后
+  // 应验副词，须与 OUT 共现）——r265 池化探针实测「事实证明她的眼光一直
+  // 很准」「我早说过那个功能没人用」整族穿透（PRED_POST_ZH 无声言形）
+  /早就料到|早料到|当初就料到|一早就料到|我早说过|我早就说过|当初我就说|当初我就料到|早就提醒过|早就提醒|果然|果真/,
 ];
 
 // ─── 腿② PRED WEAK 弱形：只与腿① HS 共现判定（中文）────────────────────
@@ -134,6 +153,9 @@ const PRED_WEAK_ZH = [
 // ─── 腿③ OUT 已发生结果事件（中文，裸名词形态）─────────────────────────
 const OUT_ZH = [
   /失败|倒闭|破产|崩溃|崩塌|爆雷|翻车|暴跌|暴涨|危机|灾难|出事|分手|离婚|背叛|夺冠|落榜|去世|中奖|没有未来|没有前途|垮掉|完蛋|跑路|裁员|退市|崩盘|战败|惨败|栽[^，。；！？,.!?;]{0,4}跟头/,
+  // [r265] 新族：出轨/黄了/挂了/离了/谈崩——口语化结果事件（探针实测
+  // 「他后来果然出轨了」穿透，OUT_ZH 无感情/项目口语结果形）
+  /出轨|黄了|挂了|离了|吹了|闹翻|谈崩/,
 ];
 
 // ─── 英文侧 ─────────────────────────────────────────────────────────────
@@ -146,12 +168,19 @@ const PRED_STRONG_EN = [
 ];
 const PRED_POST_EN = [
   /\b(?:knew\s+all\s+along|knew\s+it\s+all\s+along|should\s+have\s+known|should\s+have\s+seen|should\s+have\s+realized|should\s+have\s+realised|signs\s+were\s+there|bound\s+to\s+fail|bound\s+to\s+happen|was\s+foreseeable|were\s+foreseeable|entirely\s+predictable|clearly\s+predictable|anyone\s+can\s+see|everyone\s+can\s+see|anyone\s+could\s+see|came\s+as\s+no\s+surprise|was\s+to\s+be\s+expected|only\s+to\s+be\s+expected)\b/i,
+  // [r265] 新族：just as I expected/predicted 直述事后应验——r265 池化
+  // 探针实测「just as I expected from day one」「just as I predicted」
+  // 整族穿透（PRED_POST_EN 无第一人称事后应验形）
+  /\b(?:just\s+as\s+I\s+(?:expected|predicted|said|warned|thought|figured)|as\s+I\s+(?:expected|predicted|warned)|exactly\s+(?:what|as)\s+I\s+(?:expected|predicted)|I\s+called\s+it)\b/i,
 ];
 const PRED_WEAK_EN = [
   /\b(?:bound\s+to|obvious|obviously|clearly|predictable|foreseeable|inevitable|doomed)\b/i,
 ];
 const OUT_EN = [
   /\b(?:failed|failure|fails|collapse|collapsed|crash|crashed|bankrupt|bankruptcy|betrayal|betrayed|fell\s+apart|blew\s+up|blown\s+up|defeat|disaster|crisis|broke\s+up|divorced|lost|losing|tanked|flopped|never\s+stood\s+a\s+chance|never\s+had\s+a\s+chance)\b/i,
+  // [r265] 新族：died / shut down / folded / went under——企业死亡与产品
+  // 下线的口语形（探针实测「The startup died last month」穿透）
+  /\b(?:died|shut\s+down|folded|went\s+under|wound\s+down|flamed\s+out|pulled\s+the\s+plug)\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ──────────────────────────────────────────────
@@ -168,6 +197,9 @@ const EXEMPT_NEWINFO_ZH = [
 ];
 const EXEMPT_NEWINFO_EN = [
   /\b(?:with\s+new\s+information|new\s+information|we\s+now\s+know|only\s+later|the\s+data\s+we\s+have\s+now|information\s+was\s+not\s+available|not\s+available\s+at\s+the\s+time|wasn'?t\s+available\s+at\s+the\s+time|nobody\s+could\s+have|no\s+one\s+could\s+have|who\s+could\s+have\s+predicted|who\s+could\s+have\s+foreseen|could\s+not\s+have\s+known|couldn'?t\s+have\s+known|impossible\s+to\s+predict|impossible\s+to\s+foresee|no\s+way\s+to\s+know|no\s+way\s+of\s+knowing|in\s+fairness|with\s+the\s+benefit\s+of\s+hindsight\s+we)\b/i,
+  // [r265] 新族：post-mortem / retrospective review / lessons learned——
+  // 正式事后复盘是正确事后学习（与 ZH 复盘/反思同族），探针良性实测误伤
+  /\b(?:post-?mortem|retrospective\s+(?:analysis|review|report|look)|lessons\s+learned)\b/i,
 ];
 
 // ─── 豁免三：事前正当评价（以决策时点信息为参照系）──────────────────────

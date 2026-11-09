@@ -96,6 +96,26 @@
  *     老师/教材/课堂/卡尼曼；EN clustering illusion/Texas sharpshooter/
  *     apophenia/gambler's fallacy/hot hand/textbook/lecture）；
  *   · 疑问句（含 ?/？）：提问不是断言。
+ *
+ * [r265] 全新措辞家族扩展（真升级②，live 生效，维度计数不变）：
+ * r265 池化探针（coordination/agent4/probes/r265-probe-pool.js，v6.8.156
+ * 实测）本维度 3/3 攻击全穿透（gate.action=pass 且零维度承重），落地：
+ *   · EVENT_ZH += 赌博结果事件族（开大/开小/豹子/通杀/连败/连胜/爆冷/
+ *     输光）——探针实测「连着三把都开大，这台机器现在肯定在出大的档口」
+ *     穿透（路线 a 的 CONC×EVENT 在赌博语境断链）；
+ *   · SIGNIF_ANOM_ZH += 「档口/势头旺」异常断言族——赌博机器「热档口」
+ *     读法的特异性目标词；
+ *   · EVENT_EN += 赌博器械族（dice/rolls/jackpots/coin flips/spins）；
+ *   · SIGNIF_ANOM_EN += clearly hot / on fire 断言紧贴族（与主表分开：
+ *     bare hot 在英文财经/技术句误伤面大，只收断言模态紧贴形）；
+ *   · CONC_EN +=「N times in a row」整段匹配形——探针实测「The dice
+ *     came up six three times in a row」穿透：既有 'in a row' 匹配起点
+ *     太靠后（20 字符前向窗够不到 25 字符外的 dice），把数量词并进匹配
+ *     使起点前移即覆盖，不改动既有窗宽（避免误伤面扩大）。
+ *   未落地如实记录：「最近空难新闻扎堆出现，看来乘飞机出行进入高危期了」
+ *   ——新闻聚集×风险结论是 availability_bias 家族形态，且「看来×高危期」
+ *   在公共卫生文本中误伤面大（"看来疫情进入高发期"为正当分析），不造
+ *   第三条判别路径。
  */
 'use strict';
 
@@ -126,6 +146,10 @@ const SAME_SRC_ZH = [
 // 等日常高频词。同族词去后缀仍命中（事故/事故事件?不——裸名词即收）。
 const EVENT_ZH = [
   /事故|案件|盗窃|抢劫|诈骗|中奖|获奖|夺冠|当选|离职|跳槽|倒闭|破产|裁员|失业|录取|考上|落榜|落选|出生|死亡|去世|生病|患病|感染|搁浅|自杀|自尽|投诉|退货|退款|故障|纠纷|官司|诉讼|起诉|空难|坠机|失联|起火|爆炸|塌方|坍塌|丑闻|曝光|翻车|退赛|禁赛|受伤|猝死|晕倒|地震|余震|流星|陨石|袭击|枪击|失踪|走失|拐卖|被骗|复发|误诊|溺亡|溺死|爆雷|踩雷|亏损|出事|闹鬼|见鬼|犯病|病倒|坠楼|坠亡|泄漏|污染|停电|停摆|延误|取消|差评|干旱|洪水|泥石流|台风|海啸|瘟疫|疫情|传染病|身亡|遇难|丧生|夭折|塌陷|断轨|脱轨|追尾|侧翻|沉船|触礁|断水|断网|宕机|死机|闪退|泄密|泄露/,
+  // [r265] 新族：赌博结果事件（开大/开小/豹子/通杀）与竞技连败连胜——
+  // r265 池化探针实测「连着三把都开大，这台机器现在肯定在出大的档口」
+  // 穿透（EVENT_ZH 无赌博结果形，CONC 连着 × EVENT 路线 c 断链）
+  /开大|开小|豹子|通杀|通赔|连败|连赢|连胜|爆冷|输光|赔光|庄赢|闲赢/,
 ];
 
 // ─── 腿② SIGNIF R1 否认巧合（中文）──────────────────────────────────
@@ -143,6 +167,10 @@ const SIGNIF_NEG_ZH = [
 // 「这事情本身反常/蹊跷/不可解」的特异性断言。
 const SIGNIF_ANOM_ZH = [
   /(?:显然|肯定|一定|必然|势必|可见|说明|意味着|证明|足以证明|注定|毫无疑问|清清楚楚|明明白白|摆明)[^。，！？!?,;；\n]{0,10}(?:蹊跷|反常|有猫腻|有鬼|说不通|不可理解|无法解释|难以解释|邪门|诡异|吊诡|古怪|离奇|不同寻常|非同一般|非同寻常|邪了门|有异样)/,
+  // [r265] 新族：「档口」异常断言——r265 池化探针实测「这台机器现在肯定
+  // 在出大的档口」穿透（赌博机器的「热档口」读法，SIGNIF_ANOM_ZH 无此
+  // 特异性目标词）
+  /(?:显然|肯定|一定|必然|势必|可见|说明|意味着|证明|足以证明|毫无疑问)[^。，！？!?,;；\n]{0,10}(?:档口|旺|火|势头旺|势头火|手风顺|财运旺)/,
 ];
 
 // ─── 腿② SIGNIF R3 神秘归因（中文）──────────────────────────────────
@@ -169,6 +197,11 @@ const SIGNIF_CYCLE_ZH = [
 // ─── 英文侧腿① ───────────────────────────────────────────────────────
 const CONC_EN = [
   /\b(?:in\s+a\s+row|in\s+succession|consecutive(?:ly)?|back[- ]to[- ]back|clustered|clustering|spate|rash|streak|run\s+of|series\s+of|one\s+after\s+another|repeatedly|frequently|every\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|week|month|year))\b/i,
+  // [r265] 新族：「N times in a row」整段匹配形——r265 池化探针实测
+  // 「The dice came up six three times in a row」穿透：既有 'in a row'
+  // 匹配起点太靠后（20 字前向窗够不到 25 字符外的 dice），把数量词
+  // 并进匹配使起点前移即覆盖，不改动既有窗宽（避免误伤面扩大）
+  /\b(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|several|\d+)\s+times?\s+in\s+a\s+row\b/i,
 ];
 const COUNT_EN = [
   /\b(?:two|three|four|five|six|seven|eight|nine|ten|several|multiple|numerous|a\s+series\s+of|a\s+number\s+of|a\s+cluster\s+of)\b/i,
@@ -181,6 +214,10 @@ const SAME_SRC_EN = [
 // bug」是正常工程句，误伤风险高）
 const EVENT_EN = [
   /\b(?:accidents?|incidents?|cases?|crimes?|thefts?|lawsuits?|deaths?|suicides?|resignations?|layoffs?|bankruptc(?:y|ies)|winners?|complaints?|outbreaks?|attacks?|shootings?|crashes?|defaults?|fires?|casualt(?:y|ies)|murders?|robberies?|frauds?|scandals?|collapses?|explosions?|kidnappings?|arrests?|convictions?|earthquakes?|hurricanes?|tornado(?:es)?|floods?|droughts?|outages?)\b/i,
+  // [r265] 新族：赌博器械与结果事件（dice/rolls/jackpots）——r265 池化
+  // 探针实测「The dice came up six three times in a row, so six is
+  // clearly hot right now.」穿透（EVENT_EN 无赌博器械形）
+  /\b(?:dice|rolls?|jackpots?|die\s+rolls?|coin\s+flips?|spins?)\b/i,
 ];
 
 // ─── 英文侧腿② ───────────────────────────────────────────────────────
@@ -189,6 +226,10 @@ const SIGNIF_NEG_EN = [
 ];
 const SIGNIF_ANOM_EN = [
   /\b(?:clearly|obviously|definitely|certainly|must|evidently|proves?|shows?|means|demonstrates?|indicates?|suggests?)\b[^.]{0,25}\b(?:wrong|fishy|sinister|suspicious|weird|eerie|uncanny|inexplicable|unexplainable|mysterious|pattern|law|rule|cycle|inevitable|doomed|destined|something'?s\s+(?:wrong|off)|something\s+(?:wrong|deeper|bigger))\b/i,
+  // [r265] 新族：clearly hot / on fire——「热手/势头旺」断言形。与主表
+  // 分开：bare hot 在英文财经/技术句中误伤面大（"the market is hot"），
+  // 只收断言模态紧贴的 hot/on fire/running hot 形
+  /\b(?:clearly|obviously|definitely|certainly|must|evidently)\s+(?:be\s+)?(?:hot|on\s+fire|running\s+hot|in\s+a\s+groove)\b/i,
 ];
 const SIGNIF_MYST_EN = [
   /\b(?:behind\s+(?:it|this|them)|hidden\s+(?:hand|force|agenda)|supernatural|paranormal|cursed|doomed|destiny|fate|karma|omen|ghosts?|spirits?|universe\s+(?:is|trying|telling|wants)|meant\s+to\s+be|cosmic|sign\s+from\s+above|forces?\s+beyond)\b/i,
