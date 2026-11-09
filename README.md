@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 210 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  194 MCP tools
-×  1,305 dispatch routes  ×  19,618 passing tests  ×  2 npm dependencies
+×  1,305 dispatch routes  ×  19,649 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.188**. Not marketing copy.
 | Dispatch routes | 1,305 |
 | Discrimination dimensions | 210 |
 | MCP tools | 194 |
-| Test suite | 19,618 passing / 155 failing |
+| Test suite | 19,649 passing / 155 failing |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
