@@ -124,9 +124,14 @@ const CONJ_PAIR_EN = [
 // ─── 腿② PROB 概率词（裸名词形态）───────────────────────────────────
 const PROB_ZH = [
   /概率|可能性|几率|机率|或然率/,
+  // [r266 新增族] 口语化概率名词（希望/指望/胜算/把握——与腿③双概率词
+  // 夹算子的路线 b 共同承重，单词出现不判）
+  /希望|指望|胜算|把握|盼头/,
 ];
 const PROB_EN = [
   /\b(?:probability|probable|chance|likelihood|odds|likely)\b/i,
+  // [r266 新增族] 口语化概率名词（a shot at）
+  /\bshots?\b/i,
 ];
 
 // ─── 腿③ CMP 路线 a：比较算子 × 组分回指 ────────────────────────────
@@ -134,12 +139,16 @@ const PROB_EN = [
 // 由豁免表兜底，此处双保险——「概率不超过组分」若算子命中会被误判）。
 const CMP_OP_ZH = [
   /(?:^|[^不未绝])(?:高于|大于|超过|胜过|优于|更可能|可能性更大|更高|更大|更低|更小|更多)/,
+  // [r266 新增族] 「比X大/高/强/多」比较构式（X ≤12 字；否定前查双保险）
+  /(?<![不未绝])比[^。，！？!?,;；\n]{0,12}(?:大|高|强|多)/,
 ];
 const CMP_BACK_ZH = [
   /只是|仅仅是|单是|不过是|无非|仅仅|仅只是|只有/,
 ];
 const CMP_OP_EN = [
   /\b(?:higher\s+than|greater\s+than|larger\s+than|more\s+probable|exceeds?|more\s+likely|bigger\s+than)\b/i,
+  // [r266 新增族] 口语化比较算子（better/stronger shot at）
+  /\b(?:better|stronger)\s+shots?\b/i,
 ];
 const CMP_BACK_EN = [
   /\b(?:just|only|merely|simply|purely|alone|no\s+more\s+than)\b/i,
@@ -226,11 +235,15 @@ function cmpZh(text, R) {
   if (nearAny(R.CMP_OP_ZH || CMP_OP_ZH, R.CMP_BACK_ZH || CMP_BACK_ZH, text, 25, false)) return true;
   // 路线 b：两个概率词 × 中间夹比较算子（前后各 25 字窗双向）
   if (nearAny(R.PROB_ZH || PROB_ZH, R.CMP_OP_ZH || CMP_OP_ZH, text, 25, true)) {
-    // 确认至少两个概率词（单个「概率高于」不带组分比较时不判）
-    const probRe = (R.PROB_ZH || PROB_ZH)[0];
-    const g = new RegExp(probRe.source, 'g');
-    let m, n = 0;
-    while ((m = g.exec(text)) !== null) { n++; if (m.index === g.lastIndex) g.lastIndex++; }
+    // 确认至少两个概率词（单个「概率高于」不带组分比较时不判）。
+    // [r266] 计数改为跨全部 PROB_ZH 正则累加——原实现只数 [0]，新增
+    // 口语化族（希望/指望/胜算/把握/shot）永远数不到，路线 b 对新族失效。
+    let n = 0;
+    for (const re of (R.PROB_ZH || PROB_ZH)) {
+      const g = new RegExp(re.source, 'g');
+      let m;
+      while ((m = g.exec(text)) !== null) { n++; if (m.index === g.lastIndex) g.lastIndex++; }
+    }
     if (n >= 2) return true;
   }
   return false;
@@ -240,10 +253,13 @@ function cmpZh(text, R) {
 function cmpEn(text, R) {
   if (nearAny(R.CMP_OP_EN || CMP_OP_EN, R.CMP_BACK_EN || CMP_BACK_EN, text, 80, false)) return true;
   if (nearAny(R.PROB_EN || PROB_EN, R.CMP_OP_EN || CMP_OP_EN, text, 80, true)) {
-    const probRe = (R.PROB_EN || PROB_EN)[0];
-    const g = new RegExp(probRe.source, 'gi');
-    let m, n = 0;
-    while ((m = g.exec(text)) !== null) { n++; if (m.index === g.lastIndex) g.lastIndex++; }
+    // [r266] 同 cmpZh：跨全部 PROB_EN 正则累加计数
+    let n = 0;
+    for (const re of (R.PROB_EN || PROB_EN)) {
+      const g = new RegExp(re.source, re.flags.indexOf('i') >= 0 ? re.flags : re.flags + 'i');
+      let m;
+      while ((m = g.exec(text)) !== null) { n++; if (m.index === g.lastIndex) g.lastIndex++; }
+    }
     if (n >= 2) return true;
   }
   return false;

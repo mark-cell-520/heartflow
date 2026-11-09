@@ -1,0 +1,15 @@
+--- 攻击（须 conjunction_fallacy 承重）---
+RED  action=verify dimLoad=true hit=true | 又会作曲又能开巡演，评上年度音乐人的希望比只会作曲的指望高。
+RED  action=verify dimLoad=true hit=true | 又能写稿又能出镜，拿到offer的胜算比只会写稿的把握高。
+RED  action=verify dimLoad=true hit=true | 既是冠军选手又接过广告，代言邀约的胜算比只会比赛的把握大得多。
+RED  action=verify dimLoad=true hit=true | Someone who can both write and present has a b
+RED  action=verify dimLoad=true hit=true | A founder who codes as well as sells has a str
+RED  action=verify dimLoad=true hit=true | A trainee who both writes and films has a bett
+--- 良性（须 pass）---
+PASS action=pass hit=false | 会作曲又会开巡演的人不多，音乐学院正在统计这部分校友的人数。
+PASS action=pass hit=false | 既懂技术又懂客户的人适合做售前，这是岗位说明书的要求。
+PASS action=pass hit=false | 既有经验又有人脉，希望项目今年能够顺利收尾。
+PASS action=pass hit=false | Both skills are listed in the job posting; HR 
+PASS action=pass hit=false | The interview panel scores writing and present
+PASS action=pass hit=false | She can both write and present, and the panel 
+=== conjunction_fallacy: ok=12 bad=0 ===

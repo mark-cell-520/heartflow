@@ -1,0 +1,30 @@
+TEXT: 能写稿又能出镜，拿到offer的胜算比只会写稿的把握高。
+  PROB_ZH hits: 0,2
+  CMP_OP_ZH hits:  ;; 比只会写稿的把握高
+  CONJ_PAIR_ZH hits:  ;;  ;;  ;;  ;;  ;; 
+  CONJ_PAIR_EN hits:  ;;  ;; 
+  GROUP_SUFFIX_ZH hits: 
+  GROUP_SUFFIX_EN hits:  ;; 
+  EXEMPT_HEDGE_ZH hits: 
+  check: {"hit":false,"score":0,"detail":"","count":0}
+
+TEXT: An applicant who interns as well as studies has a better shot at the return offer than one who only studies.
+  PROB_ZH hits: 0,0
+  CMP_OP_ZH hits:  ;; 
+  CONJ_PAIR_ZH hits:  ;;  ;;  ;;  ;;  ;; 
+  CONJ_PAIR_EN hits:  ;; as well as ;; 
+  GROUP_SUFFIX_ZH hits: 
+  GROUP_SUFFIX_EN hits: applicant who ;; 
+  EXEMPT_HEDGE_ZH hits: 
+  check: {"hit":false,"score":0,"detail":"","count":0}
+
+TEXT: 又会作曲又能开巡演，评上年度音乐人的希望比只会作曲的指望高。
+  PROB_ZH hits: 0,2
+  CMP_OP_ZH hits:  ;; 比只会作曲的指望高
+  CONJ_PAIR_ZH hits:  ;;  ;;  ;;  ;;  ;; 又会作曲又
+  CONJ_PAIR_EN hits:  ;;  ;; 
+  GROUP_SUFFIX_ZH hits: 
+  GROUP_SUFFIX_EN hits:  ;; 
+  EXEMPT_HEDGE_ZH hits: 
+  check: {"hit":true,"score":0.58,"count":1,"detail":"合取谬误×合取事件概率高于组分事件概率(zh)"}
+
