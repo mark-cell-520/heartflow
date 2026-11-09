@@ -17,6 +17,12 @@
  *                    存在枚举），构成自相矛盾的归因声明
  *   豁免：句内出现显式对冲（may/might/could/possibly/可能/也许）或显式多因
  *         措辞且无 L2 否认时，不命中。
+ *
+ * [r267 扩展] 池化探针实测 2/3 穿透的新措辞家族（scripts/round-267/
+ * r267-probe-pool.js，v6.8.157）：① 口语归怪族（全怪/都怪/只怪/全赖/
+ * 全凭一己/全仗）；② 口语否证族（其他都是次要的/其余可以忽略）；
+ * ③ EN 唯一理由族（for one reason only / one reason only）。良性对照
+ * （有…的因素但…同样有责任/many reasons including）零误伤。
  */
 
 /* ── L1 归因压缩：把因果压到单一原因 ───────────────────────────── */
@@ -46,6 +52,10 @@ const COMPRESS_EN = [
   /\beverything\s+(?:can\s+be\s+)?(?:traced|attributed)\s+back\s+to\s+(?:one|a\s+single|this)\b/i,
   /\b(?:all|everything)\s+(?:of\s+)?(?:it|this)\s+(?:comes\s+down\s+to|stems\s+from)\s+(?:one|a\s+single|this)\b/i,
   /\bit'?s\s+all\s+down\s+to\b/i,
+  // [r267] 唯一理由族（for one reason only / one reason only）——探针
+  // 2/3 穿透落地：The product flopped for one reason only: marketing.
+  /\bfor\s+(?:one|just\s+one|a\s+single|exactly\s+one)\s+reason\s+only\b/i,
+  /\b(?:one|a\s+single)\s+reason\s+only\b/i,
 ];
 
 const COMPRESS_ZH = [
@@ -67,6 +77,11 @@ const COMPRESS_ZH = [
   /(?:所有|全部|整件事|一切)(?:的)?(?:问题|矛盾|现象|事情)?(?:都是|全是|只因)/,
   /都是因为/,
   /只因(?:为)?/,
+  // [r267] 口语归怪族（全怪/都怪/只怪/全赖/全凭一己/全仗）——探针 2/3
+  // 穿透落地：「项目失败全怪需求变更，其他都是次要的。」
+  /(?:全|都|只|就|怪)(?:怪|赖)(?:在|于)?/,
+  /全凭(?:一己|自己|一个人)/,
+  /全仗(?:一人|自己)/,
 ];
 
 /* ── L2 枚举否认：先列成因，再宣布其无关 ────────────────────────── */
@@ -104,6 +119,9 @@ const DISMISS_ZH = [
   /(?:并非|不是)(?:真正|有效)(?:的)?(?:原因|因素|变量)/,
   /(?:排除|剔除)(?:在)?(?:原因|因素)(?:之外|之列)/,
   /(?:不|没)(?:起|发挥)(?:任何)?(?:作用|影响)/,
+  // [r267] 口语否证族（其他都是次要的/其余可以忽略）——探针穿透落地
+  /(?:其他|其余|别的)(?:都)?(?:是)?(?:次要的|次要|不重要|无关紧要|可以忽略|忽略不计|不值一提|微不足道|无关大局|无关痛痒)/,
+  /(?:都不算|都不算数|都不作数)/,
 ];
 
 /* ── L3 多因并列：用于识别句内的多因陈述 ───────────────────────── */
