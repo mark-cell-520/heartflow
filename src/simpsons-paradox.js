@@ -154,11 +154,15 @@ const AGG_ZH = [
 const TREND_UP_ZH = [
   // [r267] 比较胜负动词族（压过/胜过/领先/反超/高于）并入首正则——
   // trendDirs 只取列表首个正则，另起数组元素是死代码（r267 实测教训）
-  /上升|升高|上涨|提高|提升|增长|增加|涨了|涨价|涨薪|改善|好转|越高|更高|更多|变好|更好|翻倍|翻番|进步|在升|渐升|走高|压过|胜过|赢过|领先|反超|占优|力压|赶超|高于/,
+  // [r272 新增] 经济胜负趋势族（盈利/赚钱/扭亏/跑赢）——经营口语里
+  //   「整体是盈利的」「算下来是赚钱的」是最常见聚合层陈述，原表只收
+  //   通用上升词，整族穿透（r272 探针实测）。
+  /上升|升高|上涨|提高|提升|增长|增加|涨了|涨价|涨薪|改善|好转|越高|更高|更多|变好|更好|翻倍|翻番|进步|在升|渐升|走高|压过|胜过|赢过|领先|反超|占优|力压|赶超|高于|盈利|赚钱|挣钱|赚了|扭亏|有赚|跑赢|胜出|占上风/,
 ];
 const TREND_DOWN_ZH = [
   // [r267] 比较胜负动词族（低于）并入首正则（trendDirs 只取首个）
-  /下降|降低|下跌|下滑|回落|减少|缩减|恶化|变差|越差|更低|更少|变少|萎缩|在降|渐降|走低|低于|落后/,
+  // [r272 新增] 经济胜负趋势族（亏损/赔钱/亏本/跑输）——与上行族对偶。
+  /下降|降低|下跌|下滑|回落|减少|缩减|恶化|变差|越差|更低|更少|变少|萎缩|在降|渐降|走低|低于|落后|亏损|赔钱|亏本|在亏|亏了|赔了|入不敷出|跑输|告负|落败|失守/,
 ];
 
 // ─── 腿② SUB 子群层标记（中文；r161 教训：裸名词 科室/班级/分层/
@@ -179,6 +183,10 @@ const INFER_ZH = [
 // 成功 去修饰仍命中）──────────────────────────────────────────
 const AFFIRM_ZH = [
   /更安全|很安全|安全|更有效|很有效|有效|没问题|更好|很好|更可靠|可靠|更稳定|稳定|改善|提升|提高|更高|更省|省钱|更省钱|更便宜|便宜|成功|更成功|有效益|有成效|出成效|见效/,
+  // [r272 新增] 经营决策结论族（能做/可行/扩张/继续投）——「总体赚钱 ⇒ 这门
+  //   生意能做 ⇒ 所以扩张」是辛普森反转最常见的落地句式，原表只收通用
+  //   有效/成功类，整族穿透。
+  /能做|可行|做得下去|做得成|可以扩张|继续扩张|扩张|加大投入|继续投入|值得做|划得来|是笔好生意|能赚钱|有得赚|站得住|立得住|成立/,
   /应当|应该|推荐|推广|采纳|继续|采用|足以|可以放心|不成问题|无需再|不必再|值得推广|全面推广|照常|按原计划|维持原判|维持原方案|放心使用|放心采用/,
 ];
 
@@ -202,11 +210,15 @@ const TREND_UP_EN = [
   // [r267] 偏好胜负动词族（wins/leads/ahead/favors/outpaces/beats）并入
   // 首正则——trendDirs 只取列表首个正则
   /\b(?:rose|risen|rise|rises|rising|increased|improved|climbed|grew|gone\s+up|went\s+up|got\s+up|higher|more|better|best|improvement|up|wins?|leads?|led|ahead|favors?|outpaces?|edges?\s+ahead|beats?)\b/i,
+  // [r272 新增] 经济胜负趋势族（profitable / in the black / making money）
+  /\b(?:profitable|in\s+the\s+black|making\s+money|earns?\s+money|turned\s+around|turned\s+a\s+profit|pays?\s+off)\b/i,
 ];
 const TREND_DOWN_EN = [
   // [r267] 偏好落后动词族（loses/trails/lags/behind/declines）并入首正
   // 则——trendDirs 只取列表首个正则
   /\b(?:fell|fall|falls|falling|dropped|declined|declines|decreased|worsened|got\s+worse|went\s+down|gone\s+down|lower|less|worse|down|reduction|shrank|loses?|lost|trails?|lags?|behind|falls?\s+behind|falls?\s+short)\b/i,
+  // [r272 新增] 经济胜负趋势族（losing money / in the red / unprofitable）
+  /\b(?:losing\s+money|loses\s+money|in\s+the\s+red|unprofitable|bleeding\s+money|runs?\s+at\s+a\s+loss)\b/i,
 ];
 const SUB_EN = [
   /\b(?:each|every|per)\b/i,

@@ -130,6 +130,11 @@ const COVARY_MOVE_ZH = [
   // [r264] 新共变词族（池化探针 4/4 穿透中的真缺口）：双双+动向 / 越X越Y(猛|狠|火)
   /双双(?:上升|上涨|增长|下降|下跌|走高|走低|攀升|回落|变化|看涨|看跌)/,
   /越[^，。；！？,!?;]{1,3}越[^，。；！？,!?;]{0,3}(?:猛|狠|火)/,
+  // [r272 新增] 口语共变族：「X多/高的时候Y也多」「越X越Y」——旧表只收
+  //   「一起/同步/双双 + 动向词」与「越X越Y(猛|狠|火)」，「冰淇淋卖得多的
+  //   时候溺水也多」这类同时点对照形整族穿透（r272 探针实测）。
+  /(?:多|高|少|低|旺|忙|淡|闲|频|稀)的时候[^。，；！？]{0,14}(?:也|同|俱|相应|跟着)(?:多|高|少|低|旺|忙|淡|差|好)/,
+  /越[^。，；！？]{1,4}越[^。，；！？]{0,6}(?:多|高|少|低|差|好|明显|严重|频繁|罕见)/,
 ];
 
 // ─── 腿① 并列/指代双变量结构（中文，共变词前 40 字窗内）────────────────
@@ -143,6 +148,10 @@ const PAIR_ZH = [
 // 因果断言由真因果动词承重，推断词通过 60 字共现窗自然覆盖。
 const CAUSE_ZH = [
   /导致|造成|引发|引起|带来|催生|促成|使得|令|让|驱动|推动|推升|推高|拉高|抬高|造就|滋生|助长|加剧|加大了|增加了|提高了|提升了|带动|拉动|源于|来自于|归因于|归功于|是[^。；，]{0,12}的原因|根源在于|罪魁祸首|决定/,
+  // [r272 新增] 裸「致」因果动词（「冰淇淋致溺水」「空调致室温上升」）——
+  //   旧表只收 导致/致使 等双字词，单字「致 + 结果名词」整族穿透；
+  //   「大致/致力/致辞/致谢/致使/致贫」等非因果形用否定环视排除。
+  /(?<![大致])致(?!力|敬|辞|谢|使|富|贫|残)/,
 ];
 
 // ─── 英文侧腿① ────────────────────────────────────────────────────────
@@ -153,6 +162,10 @@ const COVARY_MOVE_EN = [
   /\b(?:rise\s+together|rises\s+together|rose\s+together|rising\s+together|move\s+together|moves\s+together|moved\s+together|moving\s+together|fall\s+together|falls\s+together|fell\s+together|go\s+up\s+together|went\s+up\s+together|lockstep|hand\s+in\s+hand|tandem|in\s+sync|track\s+each\s+other|tracks\s+each\s+other|rise\s+and\s+fall\s+together|moves?\s+in\s+tandem)\b/i,
   // [r264] 新共变词族 EN：both + 动向词
   /\bboth\s+(?:climbed|rose|risen|fell|fallen|dropped|surged|declined|increased|decreased|moved|went)\b/i,
+  // [r272 新增] 比较级平行共变族 EN：「the hotter it gets, the more …」
+  //   「the more …, the more …」——旧表只收 together/lockstep/both + 动向词。
+  //   注意 more/less/better/worse 不以 -er 结尾，须与 \w+er 并列枚举。
+  /\bthe\s+(?:\w+er|more|less|better|worse|fewer|higher|lower|faster|slower)\b[^.]{0,44}\bthe\s+(?:\w+er|more|less|better|worse|fewer|higher|lower|faster|slower)\b/i,
 ];
 const PAIR_EN = [
   /\b(?:and|&|both|the\s+two|these\s+two|those\s+two|two\s+variables|two\s+metrics|two\s+factors|pair)\b/i,
@@ -202,6 +215,12 @@ const NO_CONFOUND_ZH = [
 ];
 const NO_CONFOUND_EN = [
   /\b(?:common\s+cause|common\s+factor|common\s+driver|shared\s+cause|shared\s+driver|confound\w*|third\s+variable|third\s+factor|lurking\s+variable|lurking|same\s+underlying|same\s+root|both(?:\s+are)?\s+driven\s+by|both(?:\s+are)?\s+stem\s+from|driven\s+by\s+the\s+same|controlling\s+for|control\s+for|controls\s+for|controlled\s+for|adjusted\s+for|after\s+adjusting|conditioning\s+on|held\s+constant|simpson|DAG|directed\s+acyclic|instrumental\s+variable|propensity|backdoor|causal\s+inference|causal\s+identification|regression\s+analysis|covariate)\b/i,
+  // [r272 新增] 口语共同原因形（EN）：「summer drives both」「the same
+  //   season drives the two」——旧表只收 both are driven by / driven by the
+  //   same，主动语态「X drives both」整族漏，被共变×因果双腿误判（存量 FP）。
+  /\bdrives?\s+(?:both|the\s+two|each\s+of\s+them|all)\b/i,
+  /\bboth\s+(?:are\s+)?driv(?:es|en|ing)\b/i,
+  /\b(?:same|shared|one)\s+(?:underlying\s+)?(?:cause|driver|factor|season|force)\s+(?:drives|behind|underlies)\b/i,
 ];
 
 function anyHit(list, text) {

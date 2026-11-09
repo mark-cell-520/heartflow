@@ -112,8 +112,13 @@ const SIGNAL_ZH = [
   // 告知形阳性信号，区别于「被标记」的被动形。
   /(?:提示|告知|通知)(?:你|您|他)?(?:涉嫌|命中|中招|已被|存在风险|阳性)/,
   // [r263 新增] 标成/圈定族：分类动作的另一种动词形，既有腿收 标记/标注/
-  // 列为/列入/识别为，漏 标成/圈定/归类为。
-  /(?:被)?(?:标成|标为|标到|标进|圈定|圈选|归类为|打入)/,
+  //   列为/列入/识别为，漏 标成/圈定/归类为。
+  /(?:被)?(?:标成|标为|标到|标进|标记成|标注成|圈定|圈选|归类为|打入)/,
+  // [r272 新增] 生物特征比对族（「人脸比对上了」）——既有腿只收
+  //   「(?:人脸|指纹|声纹|虹膜|DNA)(?:识别)?匹配」，要求出现「匹配」二字；
+  //   而安防/法证口语的默认说法是「比对上了/比中了/比对结果出来」，
+  //   不含「匹配」子串，整族穿透（r272 探针实测）。
+  /(?:人脸|指纹|声纹|虹膜|DNA|面貌|体态|笔迹)(?:识别|检索|查询)?(?:比对|比中|比上了|比对结果)/,
 ];
 
 // ─── 腿① SIGNAL 阳性信号/具体证据（英文）──────────────────────────
@@ -166,6 +171,14 @@ const CONFIDENT_ZH = [
   //   归属词只收嫌疑人/凶手/罪犯/骗子/间谍/恐怖/有罪/高危/内鬼，**不含**
   //   「目标/对象/客户」等营销中性词（「锁定目标客户」是正当经营表述）。
   /(?:基本)?(?:可以|得以|予以)?锁定[^。，！？!?]{0,6}(?:嫌疑人|凶手|罪犯|骗子|小偷|间谍|恐怖|有罪|高危|内鬼)/,
+  // [r272 新增] 推断标记 × 裸置信修饰 × 归属结论（无「肯定/可能」字样）：
+  //   「筛查阳性就说明基本得了这个病」「可见八成就是那个人」——上面的
+  //   推断标记腿要求后接「肯定」，「基本/基本上/大概率/多半」这类裸置信
+  //   修饰整族穿透（r272 探针实测）。
+  /(?:说明|意味着|足以证明|证明|可见|足以判定|说明就是|可见是|即是)[^。，！？!?]{0,14}(?:基本|基本上|大概率|多半|八成|十有八九|八九不离十|很|挺|应该|应当)[^。，！？!?]{0,8}(?:得|患|感染|染上|确诊|是|有|属于|中招|罪|骗子|小偷|罪犯|嫌疑人|间谍|作弊|高危|带上|没跑|跑不了|就是|铁定)/,
+  // [r272 新增] 裸置信修饰 × 口语确定收尾：「基本没跑」「基本稳了」。
+  //   旧腿只收「大概率/多半 + 肯定|可能」，无模态词的口语收尾整族漏。
+  /(?:基本|基本上)[^。，！？!?]{0,6}(?:没跑|跑不了|错不了|稳了|定了|就是|等于|中招|感染|确诊|没疑问|定案|定死|板上钉钉)/,
 ];
 
 // ─── 腿② CONFIDENT 高置信度后验结论（英文）────────────────────────
@@ -189,6 +202,16 @@ const CONFIDENT_EN = [
   /(?:the\s+)?odds\s+are\s+(?:you|he|she|they|it)\s+(?:are|is|have|has|a|the|guilty|likely)/i,
   /(?:the\s+)?chances\s+are\s+(?:you|he|she|they|it)\s+(?:are|is|have|has|a|the|guilty|likely)/i,
   /(?:means|shows|suggests|indicates)\s+(?:you|he|she|they)\s+(?:are|is)\s+(?:a\s+)?(?:fraud|scammer|thief|liar|criminal|suspect|risk|match|target)/i,
+  // [r272 新增] basically/in effect + 归属；「which basically means you have
+  //   the disease」——上面各腿几乎全要求 certainly/definitely/likely 字样，
+  //   裸 basically 族整族穿透（r272 探针实测）。
+  /\b(?:which|that|it)\s+(?:basically|effectively|in\s+effect|practically|simply)\s+(?:means|proves|confirms|shows|implies)\s+(?:you|he|she|they)\s+(?:have|has|had|are|is|'re|'ve)\b/i,
+  /\b(?:which|that|it)\s+(?:means|shows|suggests|indicates)\s+(?:you|he|she|they)\s+(?:are|is)\s+(?:a\s+|the\s+)?(?:near\s+|virtual\s+)?(?:certainty|shoo-?in|match|lock)\b/i,
+  /\b(?:so|thus|therefore)\s+(?:you|he|she|they)\s+(?:almost\s+)?(?:certainly|definitely|most\s+likely|very\s+likely|basically)\s+(?:have|has|had|are|is|contracted|infected)\b/i,
+  // [r272 新增] 裸置信收尾（EN）：「he is very likely guilty」「they are
+  //   practically certain to be the match」。旧腿要 certainly/likely 后紧跟
+  //   归属词，隔了 to be/of being 的形穿透。
+  /\b(?:you|he|she|they)\s+(?:are|is)\s+(?:very\s+|quite\s+|almost\s+|practically\s+|most\s+)?(?:certain|likely)\s+(?:to\s+be|of\s+being)\s+(?:a\s+|the\s+)?(?:fraud|criminal|suspect|liar|thief|spy|traitor|guilty|match)\b/i,
 ];
 
 // ─── 豁免一：基础概率语言在场（计及基础概率 = 在破除/分析谬误）───────
