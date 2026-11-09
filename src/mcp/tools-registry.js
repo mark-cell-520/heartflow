@@ -53,6 +53,17 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"trace（默认，全量）/ matrix（只要矩阵与 healthy）"}}}
   },
 
+  // [r260] 桥接层对外能力面「形状」的独立基线。r259 之后 heartflow_bridge_status
+  // 的 modules 由 routes() 现场派生，「表 A ≡ 表 B」变成构造使然——三表对账恒
+  // reconciled，于是 compositeMembers 名单与 derivePublicGroups 派生规则这两样
+  // 手写/可改的东西没有任何判据发现它们改变了对外能力面的形状。本工具把当前能力面
+  // 归一化成可哈希快照，与一份落盘基线逐组逐条对比。
+  {
+    name: 'heartflow_bridge_capability_snapshot',
+    description: "桥接层对外能力面「形状」的独立基线（record 落基线 / compare 逐条对账 / status 只看基线元信息）。r259 之后 heartflow_bridge_status 的 modules 由 routes() 现场派生，「表 A ≡ 表 B」是构造使然而非发现——三表对账（heartflow_bridge_capability）恒报 reconciled，于是 compositeMembers 名单与 derivePublicGroups 派生规则这两样可改的东西没有任何判据发现它们改变了对外能力面的形状。本工具给出：① verdict——unchanged（与基线逐条相同）/ drifted（形状变了）/ no-baseline（盘上没有可用基线，不是「没变」）/ recorded / record-failed；② matrix——groups、entries、baselineGroups、baselineEntries、digest、baselineDigest、digestMatch、groupRemoved（整个能力组从对外面消失）、surfaceRemoved（组内一条能力从对外清单消失，外部调用方按 heartflow_bridge_status 盘点能力时它会消失）、compositeRemoved（已登记的 composite 成员没了）、groupAdded、surfaceAdded、compositeAdded；③ issues——逐条发现项（kind/severity/group/method/detail）；④ byKind、byGroup、healthy（只由减少类 severity≥70 决定，能力变多不是缺陷但 changed=true）、changed。用于回答「对外承诺的桥接能力集合跟上次比变了吗」「哪个能力悄悄消失了」。digest 只由成员名单决定（不含 recordedAt），同一份能力面跨进程重录 digest 必须相同。纯只读（record 动作写 data/bridge-capability-surface.json，tmp+rename 原子写）。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"compare（默认，当前能力面 vs 落盘基线逐条对账）/ record（把当前能力面落成基线，原子写）/ status（只要基线元信息，不要求引擎就绪）"}}}
+  },
+
   {
     name: 'heartflow_think',
     description: "完整思维链：分类输入→路由→推理→输出。返回结构化分析结果，包含类型、置信度和思维链。",

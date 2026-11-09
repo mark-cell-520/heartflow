@@ -3721,8 +3721,46 @@ function handleBridgeCapability(args) {
   }
 }
 
-const HANDLERS = {
-  // ─── [v6.7.70] 实测确认的手工接线（3 个）──
+/**
+ * [r260] 桥接层对外能力面「形状」的独立基线（record / compare / status）。
+ *
+ * 为什么需要它：r259 之后 heartflow_bridge_status 的 modules 由 routes() 现场
+ * 派生，「表 A ≡ 表 B」是构造使然而非发现——handleBridgeCapability 无论跑多少遍
+ * 都只会说 reconciled。于是 CAPABILITY_GROUPS 的 compositeMembers 名单与
+ * derivePublicGroups 的派生规则这两样可改的东西，改变了对外能力面的形状也没人
+ * 知道。本 handler 把当前能力面归一化成可哈希快照，与一份落盘基线逐组逐条对比。
+ *
+ * status 不要求引擎就绪（它只读盘上的基线文件），compare/record 要求。
+ */
+function handleBridgeCapabilitySnapshot(args) {
+  try {
+    const action = (args && args.action) || 'compare';
+    if (!['compare', 'record', 'status'].includes(action)) {
+      return { error: `unknown action: ${action}`, expectedParams: ['compare', 'record', 'status'], timestamp: Date.now() };
+    }
+    if (action === 'status') {
+      // status 只读基线文件，不需要 started 引擎
+      const { BridgeCapabilitySnapshot } = require('./core/bridge-capability-snapshot.js');
+      const st = new BridgeCapabilitySnapshot({}).status();
+      return { result: { snapshot: st }, timestamp: Date.now() };
+    }
+    if (!heartflow || !heartflow.started || !heartflow._modules || Object.keys(heartflow._modules).length === 0) {
+      return { error: '引擎未就绪（bridgeCapabilitySnapshot 的 compare/record 需要 started 且 _modules 非空；status 不要求）', expectedParams: [], timestamp: Date.now() };
+    }
+    const snap = heartflow.bridgeCapabilitySnapshot(action);
+    return {
+      result: {
+        snapshot: snap,
+        note: 'verdict=unchanged 表示此刻能力面与落盘基线逐条相同（防回退哨兵，不是「曾经记过」的证明）；no-baseline 是「盘上没有可用基线」不是「没变」——先跑 action=record。healthy 只由减少类（severity≥70）决定：能力变多不是缺陷，但 changed=true 说明形状变了、要人工过一眼。digest 只由成员名单决定（不含 recordedAt），同一份能力面跨进程重录 digest 必须相同。',
+      },
+      timestamp: Date.now(),
+    };
+  } catch (e) {
+    return { error: e.message, timestamp: Date.now() };
+  }
+}
+
+const HANDLERS = {  // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
   // 只接 100% 确认的（心虫 decision.decide 选定 0.94 分：
   // 「绝不留错路由」——调用方以为拿到 A 能力实际是 B，比空壳更危险）。
@@ -3742,6 +3780,8 @@ const HANDLERS = {
   // [r259] 桥接层对外能力表三处对账（AGENTS.md 约定 3 第二处：handler 映射）。
   // 不进 WRITE_TOOLS——纯只读静态核对，不碰任何写权限工具。
   heartflow_bridge_capability: handleBridgeCapability,
+  // [r260] 桥接层对外能力面「形状」的独立基线（r259 派生后无判据的那一半）
+  heartflow_bridge_capability_snapshot: handleBridgeCapabilitySnapshot,
   // [v6.7.72] 误报反馈闭环（心虫 decision.decide 选定 0.92）
   heartflow_false_positive: handleFalsePositiveTool,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,
@@ -6586,6 +6626,8 @@ module.exports = {
   // 的端到端必然踩存量环境噪声。与 getWiring 同一理由：导出的必须是真 handler，
   // 不是复制品。
   handleBridgeCapability,
+  // [r260] 同上理由：让测试与审计方能在不起 HTTP 服务的前提下端到端调用
+  handleBridgeCapabilitySnapshot,
   handleBridgeStatus,
   start: () => {
     initHeartFlow();

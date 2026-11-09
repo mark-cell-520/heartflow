@@ -1,3 +1,103 @@
+## r260 — 桥接层对外能力面「形状」的独立基线（r259 派生后「表 A ≡ 表 B」变成构造使然，compositeMembers 名单与 derivePublicGroups 派生规则无判据）+ BridgeCapabilitySnapshot 可哈希快照 + bridgeCapabilitySnapshot() / heartflow_bridge_capability_snapshot 轮（v6.8.188）
+
+**轮次**：r260 ｜ **日期**：2026-11-09 ｜ **方向**：存量结构性缺口闭合（r259 交接簿候选池⑪「heartflow_bridge_status 的 modules 派生后『表 A ≡ 表 B』成构造使然，可落快照做跨进程对账」本轮落地）+ 新自检模块（BridgeCapabilitySnapshot）+ 新公开方法（bridgeCapabilitySnapshot）按约定 3 接进 MCP
+**真升级类型**：结构性缺口闭合（r259 修好之后**新出现的盲区**：派生让三表对账恒 reconciled，于是对外能力面的形状只由三样东西决定、其中两样没有任何哨兵）+ 可哈希规范快照 + 落盘基线 + 逐组逐条 diff + 新公开方法 + 新 MCP 工具 `heartflow_bridge_capability_snapshot`。轮前 `compare` **只能报 no-baseline**（没有任何基线可比），轮后能逐条指出哪一组哪一条能力悄悄消失；`data/bridge-capability-surface.json` 成为仓库里**第一份**对外能力面基线（3 组 24 条，digest 由成员名单唯一决定）。MCP 工具 **193 → 194**、dispatch 路由 **1,305 不变**、判别维度 **210 不变**、引擎模块 **162 不变**。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision。按轮次协议「优先做交接簿里已知未修的真 bug」选题：r259 交接簿候选池⑪ 原文是「`heartflow_bridge_status` 的 `modules` 派生后，『表 A ≡ 表 B』变成构造使然——可考虑把派生结果落一份快照做跨进程对账（否则将来有人改 `derivePublicGroups` 的规则，没有任何独立判据会发现公开清单变了形状）」。
+- 选它而不选候选池①②③ 的理由与 r258/r259 同款：那三条都是判别引擎侧的挂账（点名真药层跨表统一 / 过敏结果词 / 上游腿缺口），共同点是「需先论证取向」；而候选⑪ 是**结构性缺口**——缺口不需要构造红队证明，它就写在 r259 自己的 `note` 字段里（「修好后公开清单由 routes() 派生，两张表一致是构造使然」），本轮轮初一探即确认。
+
+### 二、根因/缺口分析（带证据）
+
+r259 把 `handleBridgeStatus().modules` 从**手写清单**改成由 `routes()` 现场派生（`derivePublicGroups` 单一规则，mcp-server 与 trace 共用），三表对账发现项 2→0、verdict 恒 `reconciled`。修得很干净——但同时留下一个新的结构性盲区：
+
+**修好之后「表 A ≡ 表 B」不再是发现，而是构造使然。** 两张表同源派生，`BridgeCapabilityChecker` 无论跑多少遍都只会说 `reconciled`（本轮探针实测：verdict=reconciled、issues=0、healthy=true，恒真）。
+
+于是对外能力面的「形状」现在只由**三样东西**决定：
+
+| # | 决定对外能力面的东西 | 有哨兵吗 |
+|---|---|---|
+| ① | `CAPABILITY_GROUPS[].advertised`（手写计数） | **有**——r259 的 `advertised_drift` 判据拿它和现场实测对 |
+| ② | `CAPABILITY_GROUPS[].compositeMembers`（手写名单） | **无** |
+| ③ | `derivePublicGroups` 的派生规则本身 | **无** |
+
+②③任一静默变化，对外承诺的能力集合就变了而没人知道——正是 r259 缺口①（`communicationBrief` 对外不可发现）的**同族复发**，方向从「忘了加」变成「**规则改了没人看见**」。
+
+代价是可指名的：外部调用方按 `heartflow_bridge_status` 的 `modules` 盘点桥接能力。如果 `derivePublicGroups` 的过滤规则被改（例如把 `_` 前缀私有方法也放进去、或某个组被漏掉），或 `compositeMembers` 名单增删一条，公开清单会静默改变形状，而**三表对账照旧 reconciled**——因为它俩同源。唯一还在手写的 ① 有哨兵，恰好说明「手写量越少、哨兵越少」这条路走到尽头就是「没有独立判据」。
+
+### 三、落地项
+1. **新模块 `src/core/bridge-capability-snapshot.js`（`BridgeCapabilitySnapshot`，注入式，非注释代码 232 行）**。把「当前对外能力面」归一化成**可哈希规范快照**，与一份**落盘基线**逐组逐条对比：
+   - `normalize(surface)`：输入与 `BridgeCapabilityChecker` 同款（`routesTable` + `advertisedGroups`），归一化规则 = `derivePublicGroups` 的同一份语义（dispatch 路由去 `_` 前缀 ∪ composite 成员），但**额外把 composite 名单单独留一份**——composite 成员名单是手写的、没有 `advertised_drift` 那种哨兵守着，必须单独对比。组的宇宙取 advertised 声明过的组（与 check 同口径，**不取 routes() 全部 162 组**——r259 踩坑①：核对宇宙必须与它要守的那个「面」同宽）。
+   - **digest = 排序后 JSON 的 sha256 前 16 位，且不含 `recordedAt`**。这一条是跨进程对账成立的前提：digest 里混进时间戳的话，同一份能力面两次记录 digest 不同，`digestMatch` 恒 false，整个对账失效。
+   - 六类发现项各带严重度：`group_removed` 100（整个能力组从对外面消失，advertised 侧还声明着它）、`surface_removed` 90（组内一条能力从对外清单消失——外部调用方按 `heartflow_bridge_status` 盘点能力时它会消失）、`composite_removed` 70、`group_added` 50、`surface_added` 40、`composite_added` 40。
+   - **`healthy` 只由减少类（severity ≥ 70）决定**：能力变多不是缺陷，但 `changed=true` 说明形状变了、要人工过一眼。两者分开，不拿「变多了」当「坏了」，也不拿「没少」当「没变」。
+   - `record()` 用 **tmp + rename 原子写**，写失败如实记 `record_failed` 不炸调用方；`loadBaseline()` 文件不在/损坏/格式不认识三种都如实返回 null + `baselineError`，**不拿不兼容的旧文件当基线**（那会比没有基线更坏：会照着一段看不懂的 JSON 报一堆假 drift）。
+2. **`data/bridge-capability-surface.json` 成为仓库里第一份对外能力面基线**（3 组 24 条：translator 9 / agentLayer 8 / personaCore 7，digest `16fbf872aea5b6b4`）。`.gitignore` 补例外规则 `!data/bridge-capability-surface.json`——**基线必须进 git**，它的全部意义就是「跨进程/跨克隆」可比；不入库的话换一台机器 clone 下来 `compare` 恒报 `no-baseline`，这道自检在新环境里等于不存在。
+3. **新公开方法 `bridgeCapabilitySnapshot(action, opts)`**（`heartflow.js`，走 lazy registry `_BridgeCapabilitySnapshot`，约定 2）：`record`（落基线）/ `compare`（逐条对账）/ `status`（只要基线元信息，**不要求引擎就绪**）。verdict 四态：`recorded` / `record-failed` / `unchanged` / `drifted` / `no-baseline`。**刻意不带 check 前缀**（orphan-dimension-scan 纪律）。三个 action 都透传 `opts.baselinePath`（首版 `record`/`status` 两处漏传，自测照出后补上）。
+4. **新 MCP 工具 `heartflow_bridge_capability_snapshot`（约定 3 三处接线）**：`src/mcp/tools-registry.js` 工具定义（`action`: compare / record / status）+ `HANDLERS` 映射 + `handleBridgeCapabilitySnapshot()`（未就绪返回带 `expectedParams` 的可操作错误）。**不进 WRITE_TOOLS**。`handleBridgeCapabilitySnapshot` 加进 `module.exports`，让测试与审计方能在不起 HTTP 服务的前提下端到端调用（8099 端口常被常驻服务占用）。
+5. **修掉本模块自己的一个洞**（自测照出，见第七节踩坑①）：注入的畸形基线首版绕过 `loadBaseline` 的形状校验，一份格式不对的基线会被当成可比基线、静默报出一堆假 `drift`。现在注入与盘上走**同一条** `validateBaseline()`，且「**注入了就不回退到盘上**」——调用方明确指定了跟谁比，静默换成另一份比出来的结论是假的。
+6. **版本 6.8.187 → 6.8.188**，`sync-version.js` + `sync-doc-numbers.js` 已跑（AGENTS.md/README.md/SKILL.md/package.json 的 MCP 工具 193→194、测试数记账、版本戳全部机器同步）；README Version history 补 v6.8.188 行。
+7. **新测试 `test/round-260-bridge-capability-snapshot.test.js`（31 断言全绿，单独跑 28.3s < runner CHILD_TIMEOUT=90000）**：A 族 10 条（归一化 `_` 前缀过滤 + composite 并入 + 名单排序 / digest 只由名单决定与元素顺序无关、两次落盘同 digest / 少一条方法 → `surface_removed` + healthy=false / 少一整个组 → `group_removed` severity 100 / 少一个 composite → `composite_removed` + `surface_removed` 双报 / 多一条 → `surface_added` + changed=true 但 healthy=true / 注入畸形基线 → `no-baseline` 且不产出 drift 且不回退盘上 / 盘上无基线 → `baseline_file_missing` 绝不报 unchanged / 损坏文件 → `baseline_file_corrupt` / record 原子写 tmp 不残留）；B 族 8 条（status 三段 + `no-baseline` 一档 / record→compare 闭环 unchanged / 仓库存量基线形状 + digest 与内存归一化一致 + .gitignore 例外 / 存量基线 compare 必须 unchanged / 注入少一条 → `surface_added` / 注入多一条 → `surface_removed` + healthy=false 且 detail 指名 heartflow_bridge_status / bridgeCapabilityTrace 仍 reconciled / 未知 action 回落 compare）；C 族 6 条（约定 3 三处接线 / 不进 WRITE_TOOLS / 未就绪契约 / 子进程 handler 端到端 + 未知 action / 全 JSON-RPC tools/call 路径 / 工具总数 194 且未广告 handler 集合仍是 r255 那 3 条）；D 族 7 条（round-259 零失败 / round-250 唯一失败是存量 C1 / CAPABILITY_GROUPS 未被本轮改动 / lazy registry 锚点 / 非注释代码 ≥50 行 / 方法名不带 check 前缀 / 引擎 162 模块 _initErrors 空）。
+8. **round-259 测试两处随新工具更新**（不是放水，是数字随事实走）：E2 的工具名去重从裸串匹配改成**带冒号边界**（`heartflow_bridge_capability\s*:`）——否则新工具 `heartflow_bridge_capability_snapshot` 会让裸 `heartflow_bridge_capability` 多算一次，报「重复注册」的假失败；F4 的 `r.advertised` 193→194。
+
+### 四、验收数字（全部实测）
+| 项 | 轮前 | 轮后 | 实测方式 |
+|---|---|---|---|
+| `compare` 能给出的结论 | **只有 `no-baseline`**（没有任何基线可比） | `unchanged` / `drifted` / `no-baseline` 三态 | probe6/probe8；test B2/B3b |
+| 对外能力面基线 | **无**（`data/` 下没有这个文件） | **1 份**（3 组 24 条，digest `16fbf872aea5b6b4`） | test B3 |
+| 注入「少一条方法」的当前面 | — | `surface_removed` **1** 条 + healthy=**false** + changed=true | test A3/B4b |
+| 注入「少一整个组」的当前面 | — | `group_removed` **1** 条（severity **100**） | test A4 |
+| 注入「少一个 composite」的当前面 | — | `composite_removed` 1 + `surface_removed` 1 双报 | test A5 |
+| 注入「多一条」的当前面 | — | `surface_added` 1 + changed=true + healthy=**true**（能力变多不是缺陷） | test A6 |
+| 注入畸形基线 | —（首版会静默报假 drift，见踩坑①） | `no-baseline` + `baseline_format_unrecognized` + issues **0** + **不回退盘上** | test A7 |
+| 盘上无基线文件 | — | `no-baseline` + `baseline_file_missing`，changed=false、healthy=false（**不报 unchanged**） | test A8 |
+| 损坏的基线文件 | — | `no-baseline` + `baseline_file_corrupt` | test A9 |
+| digest 跨进程稳定性 | — | 同一能力面**两次独立进程** record → digest 均 `16fbf872aea5b6b4`；元素打乱后同 digest | test A2；probe6/probe8 |
+| `bridgeCapabilityTrace`（r259 三表对账） | reconciled | **仍 reconciled**（9/8/7、mcpTotal 24、publicListSource 仍 derived-from-routes()） | test B5 |
+| `heartflow_bridge_capability_snapshot` handler 端到端 | — | status / compare / 未知 action 三档全通，未知 action 返回 `expectedParams` 三选一 | test C4/C5 |
+| 新增非注释代码 | — | **约 250 行**（bridge-capability-snapshot.js 232 + trace 方法 + handler + 接线；不含测试） | `git diff` + 剥注释统计 |
+| MCP 工具 / 路由 / 维度 / 模块 | 193 / 1,305 / 210 / 162 | **194 / 1,305 / 210 / 162** | sync-doc-numbers.js；test C6 |
+| `bin/verify.js` | — | **16/16** | — |
+| bidirectional-guard | — | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r259 基线逐项一致） | — |
+| guard-abilities | — | **20/20**（dimensions 键 **210** 不变——本轮未加判别维度，`src/index.js` 零改动） | — |
+| doc-numbers-accuracy | — | **24/24** | — |
+| security-audit | — | 提交前 **15/16**（S2「git log/tag 未命中 6.8.188」为提交前预期失败，r236~r259 同款） | — |
+| 本轮新测试 | — | round-260 **31/31**（单独跑 28.3s） | test/round-260-bridge-capability-snapshot.test.js |
+
+### 五、全量回归与计数
+全量回归一遍（`data/round-260-regression.log`，**663 个测试文件**，exit 1 为存量噪声所致，见下）：
+
+- **总结论：19649 通过 / 155 失败 / 共 19804 个。**
+- **计数自洽**：基线 r259 = 19618 / 155 / 19773（662 文件，`data/round-259-regression.log`）。本轮 total **+31** = 新测试 round-260 的 **31 条断言**，严格对上；passed **+31**、failed **155 = 155 不变**、文件数 **+1**。
+- **「本轮引入 0 个新失败」的证明（逐项双向比对，不靠总数自证）**：把本轮回归的失败清单与 r259 基线用**同一套提取规则**逐项比对——失败条目 **79 = 79**、去重后的失败文件 **79 = 79**，两个方向输出均为空（「仅本轮有」**0 条**、「仅基线有」**0 条**），**新增 0 个、消失 0 个**。（口径说明：r259 报告里写的是 84/75，因为那一轮用的是另一套提取规则把「文件自报失败」的附注行也算了进去；本轮两轮日志用同一规则提取，两边同口径，结论「双向为空」不受口径选择影响。）
+- **噪声池与基线逐项一致**：MCP 类 6 个（`knowledge-graph-mcp-state-round593` / `knowledge-layer-mcp-state-round313` / `mcp-auth-tier` / `mcp-guest-permission` / `mcp-server` / `mcp-smoke`，8099 端口被常驻服务占用）、未输出汇总行类、注册 0 用例类（`core/path-guard`、`round-410`）、`Command failed` 类 dispatch 族 16 个、文件自报失败类 5 个（`ClassicsRules searchClassicsBatch`、`AgentBoundaryGuard dot-dir`、`unsupported-claim-exemption`、`round-378 dimensionRaw` 键口径、`round-572-associative-wiring` 剩余 4 条 = r572 记录缺陷 B）。
+- **直接受本轮改动影响的守卫在全量回归里逐个零失败**：round-260 **31/31**（[458/663]，含 D1「round-259 零失败」在回归内复跑通过）、round-259 桥接能力三表对账 **33/33**（[457/663]）、round-250 仍是存量 C1 一条（`scripts/tmp-250-mcp-child.js` 探针文件不在，r250 遗留，两轮均在清单里）。
+
+### 六、已知未修（含为什么不修）
+1. **点名真药层跨表统一**（r257 已知未修①，候选池①续挂）——需先论证「吃了这个保健品，配着布洛芬一起吃」该不该豁免。依据层已单一词源，点名真药层仍只属服药族。
+2. **r256 已知未修①**「抗过敏药吃了一堆也没用，去庙里上香之后过敏就好了」仍不判——未碰。
+3. **r256 已知未修③上游腿缺口**——未碰。
+4. **三个 by design 未广告 handler 的曝光裁决**（r255 已知未修③：`heartflow_self_benchmark` / `heartflow_safe_fetch` / `heartflow_circuit_breaker`）——本轮测试 C6 只把「未广告集合仍是这 3 条」钉成断言（防本轮顺手改掉），「要不要广告」仍是取向裁决（safe_fetch 出网、circuit_breaker 能手动停引擎，广告即扩大攻击面），未在本轮一个主题里夹带。
+5. **28 个无调用方占位子系统的摘除**（r251 候选池①，续挂）、**「真引用 vs 编造引用」分辨**（r254 已知未修①）、**`heartflow_translate` 的 `tone.tone` 兼容别名**（r249 G2）、**`.gitignore` 无锚定目录模式换机复扫**（r253）——均未碰。
+6. **⑨族裸标记位置化**（r225 纪律）、**lastIndex 防空匹配防护前移**、**`scripts/negative-test-rc-temporal-causal-r364.js` 临时目录隔离**、**r71 测试 G 节 idx4 zh 侧句式缺口**——本轮均未碰。（本轮轮初顺手扫过 lastIndex 一项：全仓 `while ((m = x.exec(` 循环 65 处，逐处回溯正则字面量后**可空匹配且无防护的 0 处**——那一项挂账的实测风险比记账描述的低，续挂但不升级优先级。）
+7. **`heartflow_bridge_status` 的 `version: '3.0.0'` 仍是桥接层自己的字面量版本**，与引擎 VERSION（6.8.188）不同源——从 v3.0 起就是交流层版本号，未动（改了会打破外部调用方对 bridgeType/version 的既有期待，需另轮另裁）。
+8. **`bridgeCapabilitySnapshot` 与 `bridgeCapabilityTrace` 一样只做静态归一化，不实测 dispatch 业务返回值**——刻意取向：三张表都是名字与计数，静态核对即可覆盖全部缺口；真调业务方法有副作用（`memory.store` 会写盘）。
+9. **基线文件由 `action=record` 人工/定时刷新，没有「每轮自动重录并报 drift」的闭环**——刻意取向：自动重录会让基线追赶当前值，`drift` 永远报不出来（自检被自己的刷新动作抵消）。基线应该**只在人确认过能力面变化之后**才重录；本轮因此把测试改成「只读存量基线 + 写临时路径」，不许测试悄悄改写仓库存量基线。
+
+### 七、踩坑
+1. **注入的畸形基线首版绕过形状校验，静默报出一堆假 `drift`。** 首版只在 `loadBaseline()`（盘上路径）里校验 `format`，`compare()` 拿到注入的 `baseline` 就直接用——于是 `{format:'bogus/9', groups:{}}` 被当成可比基线，逐组比出 `group_removed` ×3 的假漂移。自测一照就照出（verdict=drifted 而实际根本没有可比基线）。修法：抽出 `static validateBaseline()`，**注入与盘上走同一条**；并且「注入了就不回退到盘上」——调用方明确指定了跟谁比，静默换成盘上那份比出来的结论是假的。**沉淀：同一条校验必须同时覆盖注入路径与盘上路径，只守一侧等于没守；自检自己的输入也要过自检。**
+2. **diff 方向搞反了一整轮测试。** A3/A4/A5 首版把**基线**改少、拿完整当前面去比，于是报出来的是 `surface_added` / `group_added`（方向反的），`healthy` 还是 true——而测试名写的是「少了」。根因：`baseline` 是**参照物**、`surface` 是**被检物**，「少了」必须改被检物。修法：A3/A4/A5 改当前面，另加 A6 专门覆盖「当前多」的反方向。**沉淀：写 diff 类断言时先把「谁是参照、谁是被检」在注释里写死，否则方向反了测试还是绿的（因为它确实在报真事，只是不是你要报的那件）。**
+3. **`heartflow_bridge_capability` 的名字前缀让 round-259 的工具名去重断言假失败。** r259 的 E2 用裸串 `/heartflow_bridge_capability/g` 计数要求 =1；本轮新工具 `heartflow_bridge_capability_snapshot` 让这个计数变 2，报「重复注册」。修法：改成带冒号边界的 `/heartflow_bridge_capability\s*:/g`。**沉淀（memory 里已有同款记录，本轮又踩一次）：加 MCP 工具前先 grep `TOOLS.length ===`／`工具总数`／工具名裸串计数，本轮漏查了 round-259 这一处。**
+4. **在 bash 双引号里写含反引号的 `node -e` 会被 shell 当命令替换执行。** 往 README Version history 插行的脚本里带了大段 `` `代码` `` 反引号，bash 把 `heartflow_bridge_status.modules` 之类当子命令执行，报了一屏 `command not found`，而且**插错了表**（插到了上面那张 `| Version | New capability the user can feel |` 表里）。修法：`git checkout -- README.md` 还原 + 重跑 `sync-doc-numbers.js` + 把插行逻辑写成 **scripts 下的 .js 文件**再 `node` 跑，不在 `-e` 里拼长字符串。**沉淀：长文本/含反引号的写文件操作一律走脚本文件，别走 `node -e`。**
+5. **`data/` 被 `.gitignore` 整目录忽略**（只白名单 3 个 json）。首份基线落盘后 `git status` 里根本不出现——基线入不了库，跨克隆对账就是空的。修法：补 `!data/bridge-capability-surface.json` 例外。**沉淀：往 `data/` 放需要进 git 的文件，落盘后必须 `git check-ignore -v` 验一次，不能只看 `git status`（不出现 ≠ 会被提交）。**
+6. **测试不许悄悄改写仓库存量基线。** 首版 B2 直接 `action=record` 写默认路径，等于每跑一次回归就把 `data/bridge-capability-surface.json` 的 `recordedAt` 刷一遍（digest 不变但工作区会脏），而且「基线被测试自动刷新」会让 `drift` 永远报不出来。修法：B2 写 `os.tmpdir()` 临时路径，B3 只读存量基线。顺带补上 `record`/`status` 两处漏传的 `opts.baselinePath`。
+7. **`handleBridgeCapabilitySnapshot` 的 `status` 分支首版不接 `opts.baselinePath`**，于是「用一个不存在的路径验证 no-baseline 那一档」的测试拿到的是默认路径上的真基线，verdict=baseline-present，测试假失败。与踩坑⑥ 同源：**新方法加了可选入参就要三个分支全接**，漏接的那一支会静默用默认值，而且只在特定测试下才暴露。
+
+### 八、下一轮候选池（按优先级）
+① **点名真药层跨表统一**（r257 已知未修①，需先论证「吃了这个保健品，配着布洛芬一起吃」该不该豁免）。② **r256 已知未修①**「抗过敏药吃了一堆也没用，去庙里上香之后过敏就好了」（结果词本身是机制词，腿 D 必然命中，需语义判「过敏好了」是症状消退）。③ **上游腿缺口**（r256 已知未修③，需先做 r248 同款四条候选变体的全仓碰撞面实测）。④ **三个 by design 未广告 handler 的曝光裁决**（r255 已知未修③，本轮已把「未广告集合仍是这 3 条」钉成 round-260 C6 断言）。⑤ **28 个无调用方占位子系统的摘除**（r251 候选池①，续挂）。⑥ **「真引用 vs 编造引用」分辨**（r254 已知未修①，需先论证「引用可指名性」子特征）。⑦ 判别引擎侧其余挂账（⑨族裸标记位置化 r225 / lastIndex 防空匹配防护前移——本轮轮初已实测 65 处 `exec` 循环中可空匹配且无防护的 0 处，风险比记账低 / r364 临时目录隔离 / r71 idx4）。⑧ `heartflow_translate` 的 `tone.tone` 兼容别名（r249 G2）。⑨ `.gitignore` 无锚定目录模式换机复扫（r253）。⑩ **`heartflow_bridge_status` 的 `version:'3.0.0'` 与引擎 VERSION 不同源**（r259 已知未修⑦——桥接层版本号从 v3.0 起独立，改不改是取向裁决）。⑪ **能力面基线的刷新闭环**（r260 已知未修⑨：现在 `record` 靠人工/定时触发，没有「每轮自动重录 + drift 上报」的机制；反向风险是自动重录会抵消 drift，需先设计「基线只能被人确认后推进」的门槛）。⑫ **`heartflow_bridge_capability_snapshot` 的 `record` 是唯一的写动作**，可考虑给它加一道与 `heartflow_decision_decide` 同款的最小审计留痕（谁在什么时候把基线推到了哪个 digest）。
+
+---
+
 ## r259 — 桥接层对外能力表三处漂移闭合（heartflow_bridge_status 少报真实能力 + composite 记错组虚报 reachable + BridgeIdentity.verify() 单向判据）+ BridgeCapabilityChecker 三表对账 + bridgeCapabilityTrace 可审计轨迹轮（v6.8.187）
 
 **轮次**：r259 ｜ **日期**：2026-11-09 ｜ **方向**：存量真 bug 修复（r258 候选池⑩「routes() 与 MCP 侧路由探针的接口面再核对」本轮落地——三个互不相干地漂移的接口面缺口同轮闭合）+ 新结构自检模块（BridgeCapabilityChecker）+ 新公开方法（bridgeCapabilityTrace）按约定 3 接进 MCP

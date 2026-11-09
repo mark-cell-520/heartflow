@@ -402,8 +402,10 @@ test('E2 HANDLERS 映射 + handler 函数 + 不进 WRITE_TOOLS', () => {
   const m = srv.match(/const WRITE_TOOLS = new Set\(\[([\s\S]*?)\]\)/);
   assert.ok(m, 'WRITE_TOOLS 定义没找到');
   assert.ok(!m[1].includes('heartflow_bridge_capability'), '只读工具不该进 WRITE_TOOLS');
-  // 三处接线的工具名去重
-  const names = (srv.match(/heartflow_bridge_capability/g) || []).length;
+  // 三处接线的工具名去重。**必须带冒号边界**：r260 新增的
+  // heartflow_bridge_capability_snapshot 会让裸名字串匹配多算一次，
+  // 那是名字前缀相同、不是重复注册。
+  const names = (srv.match(/heartflow_bridge_capability\s*:/g) || []).length;
   assert.strictEqual(names, 1, 'mcp-server 侧应只有 HANDLERS 映射一处（工具名不重复注册）');
   assert.ok(srv.includes('handleBridgeCapability,'), 'module.exports 缺 handleBridgeCapability 导出');
 });
@@ -490,7 +492,7 @@ test('F3 round-251 占位问责守卫零失败（MCP 工具总数下界断言不
   assert.ok(/\d+\s*通过/.test(out), 'round-251 没输出汇总行');
 });
 
-test('F4 HandlerWiringChecker 结构层不受新工具影响（192→193 后仍 healthy）', () => {
+test('F4 HandlerWiringChecker 结构层不受新工具影响（193→194 后仍 healthy）', () => {
   const { HandlerWiringChecker } = require('../src/mcp/handler-wiring-check.js');
   const { TOOLS } = require(SRC_REG);
   const srv = fs.readFileSync(SRC_SRV, 'utf8');
@@ -504,7 +506,7 @@ test('F4 HandlerWiringChecker 结构层不受新工具影响（192→193 后仍 
     readOnlyTools: [],
   }).checkStructural();
   assert.strictEqual(r.healthy, true, '结构层不健康：' + JSON.stringify(r.byKind));
-  assert.strictEqual(r.advertised, 193, '工具总数应从 192 变 193');
+  assert.strictEqual(r.advertised, 194, '工具总数应从 193 变 194（r260 新增 heartflow_bridge_capability_snapshot）');
   const unadv = r.issues.filter((i) => i.kind === 'handler_not_advertised' && !i.byDesign);
   assert.strictEqual(unadv.length, 0, '出现未登记的新未广告 handler');
 });

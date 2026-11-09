@@ -61,6 +61,10 @@ data/.mcp_token_plain
 !data/upgrade-state.json
 !data/upgrade-queue.json
 !data/test-count.json
+# [r260] 例外：桥接层对外能力面基线必须进 git——它的全部意义就是「跨进程/跨克隆」
+# 可比（compare 拿盘上基线对当前派生结果）。不入库的话换一台机器 clone 下来
+# compare 恒报 no-baseline，这道自检在新环境里等于不存在。
+!data/bridge-capability-surface.json
 data/.run-all.lock       # [r645] 全量回归单例锁，运行时状态不入库
 # 例外之外：upgrade-engine.js 的 flock 锁文件永不入库
 data/.upgrade.lock

@@ -342,6 +342,8 @@ const _Budget = _lazy('budget', () => require('./budget.js'));
 // [r258] dispatch 路由层接线自检（三表矩阵：ALLOWED_ROUTES × routes() × _modules）
 const _RouteWiringChecker = _lazy('routeWiringCheck', () => require('./route-wiring-check.js'));
 const _BridgeCapabilityChecker = _lazy('bridgeCapabilityCheck', () => require('./bridge-capability-check.js'));
+// [r260] 桥接层对外能力面「形状」的独立基线（派生规则无判据的那一半）
+const _BridgeCapabilitySnapshot = _lazy('bridgeCapabilitySnapshot', () => require('./bridge-capability-snapshot.js'));
 
 const _Graph = _lazy('graph', () => require('../memory/graph.js'));
 
@@ -900,7 +902,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-09-6.8.187';
+const BUILD_DATE = '2026-11-09-6.8.188';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -5189,6 +5191,146 @@ class HeartFlow {
     };
     if (result.reason) out.reason = result.reason;
     return out;
+  }
+
+  /**
+   * [r260] 桥接层对外能力面「形状」的独立基线（record / compare / status）。
+   *
+   * 为什么需要它：r259 把 `heartflow_bridge_status.modules` 改成由 routes()
+   * 现场派生之后，「表 A ≡ 表 B」不再是发现而是**构造使然**——三表对账
+   * （bridgeCapabilityTrace）无论跑多少遍都只会说 reconciled。于是对外能力面
+   * 的形状现在只由三样手写的东西决定，而其中两样**没有任何哨兵**：
+   *
+   *   ① `CAPABILITY_GROUPS[].advertised`（手写计数）——有哨兵（advertised_drift）；
+   *   ② `CAPABILITY_GROUPS[].compositeMembers`（手写名单）——**无哨兵**；
+   *   ③ `derivePublicGroups` 的派生规则本身——**无哨兵**。
+   *
+   * ②③任一静默变化，对外承诺的能力集合就变了而没人知道——正是 r259 缺口①
+   * （communicationBrief 对外不可发现）的同族复发，方向从「忘了加」变成
+   * 「规则改了没人看见」。本方法把当前能力面归一化成可哈希快照，与一份
+   * **落盘基线**逐组逐条对比，把「形状变了」变成可观测。
+   *
+   * 纪律（与 bridgeCapabilityTrace / routeWiringTrace 同款）：
+   *   - 刻意不带 check 前缀（orphan-dimension-scan 纪律）；
+   *   - 不重复任何词表/名单：composite 名单照旧读 BridgeIdentity.CAPABILITY_GROUPS
+   *     的单一处声明，这里只做归一化与对比；
+   *   - digest 只由成员名单决定（不含 recordedAt），否则同一份能力面跨进程
+   *     重录 digest 不同，跨进程对账直接失效；
+   *   - 没有基线时如实报 no-baseline，绝不报一句假的 unchanged。
+   *
+   * @param {'record'|'compare'|'status'} [action] 默认 compare
+   * @returns {{action:string, verdict:string, matrix:Object, kinds:Object,
+   *   issues:Array, byKind:Object, byGroup:Object, healthy:boolean,
+   *   changed:boolean, checkedAt:number, note:string, reason?:string}}
+   */
+  bridgeCapabilitySnapshot(action, opts) {
+    const act = (action === 'record' || action === 'compare' || action === 'status') ? action : 'compare';
+    const Snapshot = _BridgeCapabilitySnapshot().BridgeCapabilitySnapshot;
+    const snapshot = new Snapshot({});
+
+    if (act === 'status') {
+      const st = snapshot.status({ baselinePath: (opts && opts.baselinePath) || undefined });
+      return {
+        action: 'status',
+        verdict: st.verdict,
+        matrix: {
+          hasBaseline: st.hasBaseline,
+          groups: st.groups || 0,
+          entries: st.entries || 0,
+          digest: st.digest || null,
+          recordedAt: st.recordedAt || null,
+        },
+        baseline: st,
+        kinds: null,
+        issues: [],
+        byKind: {},
+        byGroup: {},
+        healthy: !!st.hasBaseline,
+        changed: false,
+        checkedAt: st.checkedAt,
+        note: st.note,
+        reason: st.baselineError || undefined,
+      };
+    }
+
+    let table = {};
+    let modules = {};
+    try { table = this.routes() || {}; } catch (e) { table = { _error: e.message }; }
+    try { modules = this._modules || {}; } catch (e) { modules = {}; }
+    let advertisedGroups = [];
+    try {
+      const { CAPABILITY_GROUPS } = require('../bridge/bridge-identity.js');
+      advertisedGroups = CAPABILITY_GROUPS.map((g) => ({
+        group: g.group,
+        advertised: g.advertised,
+        compositeMembers: Array.isArray(g.compositeMembers) ? g.compositeMembers.slice() : [],
+      }));
+    } catch (e) { advertisedGroups = []; }
+
+    const surface = { routesTable: table, advertisedGroups, modules };
+
+    if (act === 'record') {
+      const rec = snapshot.record(surface, { baselinePath: (opts && opts.baselinePath) || undefined });
+      return {
+        action: 'record',
+        verdict: rec.recorded ? 'recorded' : 'record-failed',
+        matrix: {
+          recorded: rec.recorded,
+          groups: rec.groups,
+          entries: rec.entries,
+          digest: rec.digest,
+          groupOrder: rec.groupOrder,
+          path: rec.path,
+        },
+        baseline: rec,
+        kinds: null,
+        issues: rec.recorded ? [] : [{ kind: 'record_failed', severity: 100, group: '(all)', detail: rec.error }],
+        byKind: rec.recorded ? {} : { record_failed: 1 },
+        byGroup: {},
+        healthy: !!rec.recorded,
+        changed: true,
+        checkedAt: Date.now(),
+        note: 'record 把当前对外能力面落成基线（tmp+rename 原子写）；digest 只由成员名单决定，同一份能力面跨进程重录 digest 必须相同',
+        reason: rec.recorded ? undefined : 'record_failed',
+      };
+    }
+
+    const injected = opts || {};
+    const cmp = snapshot.compare(surface, {
+      baseline: injected.baseline || undefined,
+      baselinePath: injected.baselinePath || undefined,
+    });
+    return {
+      action: 'compare',
+      verdict: cmp.source === 'injected'
+        ? (cmp.changed ? 'drifted' : 'unchanged')
+        : 'no-baseline',
+      matrix: {
+        groups: cmp.groups,
+        entries: cmp.entries,
+        baselineGroups: cmp.baselineGroups,
+        baselineEntries: cmp.baselineEntries,
+        digest: cmp.digest,
+        baselineDigest: cmp.baselineDigest,
+        digestMatch: cmp.digestMatch,
+        groupRemoved: cmp.kinds.groupRemoved.length,
+        surfaceRemoved: cmp.kinds.surfaceRemoved.length,
+        compositeRemoved: cmp.kinds.compositeRemoved.length,
+        groupAdded: cmp.kinds.groupAdded.length,
+        surfaceAdded: cmp.kinds.surfaceAdded.length,
+        compositeAdded: cmp.kinds.compositeAdded.length,
+      },
+      kinds: cmp.kinds,
+      issues: cmp.issues,
+      byKind: cmp.byKind,
+      byGroup: cmp.byGroup,
+      healthy: cmp.healthy,
+      changed: cmp.changed,
+      checkedAt: cmp.checkedAt,
+      note: 'verdict=unchanged 表示此刻能力面与落盘基线逐条相同（防回退哨兵，不是「曾经记过」的证明）；healthy 只由减少类（severity≥70）决定——能力变多不是缺陷但 changed=true；no-baseline 是「没有基线」不是「没变」。静态归一化不执行业务方法。',
+      reason: cmp.reason,
+      baselineError: cmp.baselineError,
+    };
   }
 
   // [v6.0.71] 恢复 think 主链路（委托 this.thoughtChain，被重构误删）

@@ -1,0 +1,55 @@
+{
+  "format": "bridge-capability-surface/1",
+  "groups": {
+    "translator": {
+      "methods": [
+        "communicationBrief",
+        "confidenceAnnotator",
+        "entityExtractor",
+        "implicitNeedDetector",
+        "intentClassifier",
+        "llmToUser",
+        "responseCompressor",
+        "toneAnalyzer",
+        "userToLLM"
+      ],
+      "composites": []
+    },
+    "agentLayer": {
+      "methods": [
+        "agentBridge",
+        "conflictResolver",
+        "contextBuilder",
+        "followupSuggester",
+        "qualityFilter",
+        "responseInterceptor",
+        "translationPipeline",
+        "uncertaintyHandler"
+      ],
+      "composites": [
+        "translationPipeline"
+      ]
+    },
+    "personaCore": {
+      "methods": [
+        "agentCommentary",
+        "bridgeIdentity",
+        "judgmentInjector",
+        "metaPosition",
+        "personalityTone",
+        "stanceDetector",
+        "valueAligner"
+      ],
+      "composites": []
+    }
+  },
+  "groupOrder": [
+    "agentLayer",
+    "personaCore",
+    "translator"
+  ],
+  "entries": 24,
+  "digest": "16fbf872aea5b6b4",
+  "recordedAt": "2026-11-09T09:11:58.991Z",
+  "note": "桥接层对外能力面基线（r260）。digest 只由成员名单决定，不含 recordedAt——同一份能力面跨进程重录 digest 必须相同，否则跨进程对账失效。"
+}
