@@ -1,0 +1,469 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/xxrHyYu9ULa+hn/HRz2TOFfBrJQ</id>
+  <title>arXiv Query: search_query=all:gamblers OR all:fallacy OR all:hot OR all:hand OR all:streak OR all:belief OR all:probability OR all:judgment&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-09T23:30:00Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:gamblers+OR+(all:fallacy+OR+(all:hot+OR+(all:hand+OR+(all:streak+OR+(all:belief+OR+(all:probability+OR+all:judgment))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>324864</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09890v1</id>
+    <title>Global Two-Sided Estimates for Time-Fractional Diffusion Kernels on Hyperbolic Space</title>
+    <updated>2026-11-06T18:58:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.09890v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09890v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study time-fractional diffusion on real hyperbolic space $\mathbb H^n$, $n\ge2$, with Caputo order $0&lt;α&lt;1$. We establish global two-sided pointwise estimates for the homogeneous fundamental kernel $Z_{\mathbb H}(t,r)$ and the inhomogeneous (Duhamel) kernel $Y_{\mathbb H}(t,r)$, uniformly over all $t&gt;0$ and positive geodesic distances $r$. By combining inverse-stable subordination with global bounds for the hyperbolic heat kernel, we distinguish a short-time local regime, a large-time interior region, and an exterior region governed by a saddle-point problem with parameter $r/t$. Both kernels have the same exterior exponential rate, while their amplitudes are related by an explicit saddle-point factor. The estimates are uniformly comparable on the interfaces between regimes, recover the Euclidean time-fractional singularities at small scales, and identify the influence of hyperbolic geometry on large-scale decay. The kernel $Z_{\mathbb H}$ also describes the one-time marginal density of hyperbolic Brownian motion under an independent inverse stable clock. This representation yields a radial limit law, moment and quantile asymptotics, and a change in the mean square displacement from order $t^α$ at small times to order $t^{2α}$ at large times.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:47Z</published>
+    <arxiv:comment>35 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Vicente Vergara</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09889v1</id>
+    <title>SciCheck: A Framework for Verifying the Integrity of Deep Learning Training</title>
+    <updated>2026-11-06T18:58:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.09889v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09889v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deep learning training is difficult to verify within a scientific workflow: its architecture, hyperparameters, and procedure are rarely fixed until training has been attempted, and two honest runs never produce the same weights, so recomputation cannot serve as a check. We present SciCheck, a framework in which the scientist explores training configurations freely and posts a blueprint to a provenance ledger for each candidate they want verified, and a verifying scientist judges the resulting run in two layers: a statistical judge model that compares per-step gradient statistics against the verifier's own reference run, and a spot-check that re-executes randomly chosen training segments whose checkpoints are committed to the ledger one epoch at a time. On an MLP, a CNN, and an autoencoder at 100k-500k parameters, under gradient sign flipping, label poisoning, and fabricated runs, SciCheck reaches F1 of 0.966, 0.906, and 0.976 while rejecting 0-4.4% of honest runs. For the attacks we test, the spot-check accounts for most of this accuracy, and we characterize what each layer can detect. The effective-signal statistic falls as $(1-2s)^2$ under a sign flip of severity $s$, so gradient statistics alone catch strong enough sign flips, while fabricated runs that replay genuine statistics look no more anomalous than honest runs to any statistical detector we test. The spot-check catches fully fabricated segments with probability at least $1-(1-s)^k$ for $k$ sampled segments when the draws stay hidden until the run is committed, which roughly matches our measurements and lets a verifier choose $k$ for a target soundness. Verification costs 1.5-2.3x one retraining, mostly for the verifier's reference run; each submission's spot-check takes under 1.5 s, and per-epoch commitments reduce checkpoint storage 5-17x compared with keeping every checkpoint.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:38Z</published>
+    <arxiv:comment>10 pages, 3 figures, 6 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Alexander Nguyen</name>
+    </author>
+    <author>
+      <name>Dylan Gresham</name>
+    </author>
+    <author>
+      <name>Gaby G. Dagher</name>
+    </author>
+    <author>
+      <name>Min Long</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09884v1</id>
+    <title>VLT and Keck recovery and characterisation of 2025 SC$_{79}$: linking 'Ayló'chaxnim and Atira asteroids</title>
+    <updated>2026-11-06T18:57:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.09884v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09884v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Asteroids near the boundary between the Atira and 'Ayló'chaxnim classes can trace dynamical links between the two populations, but their small solar elongations make recovery and physical characterisation difficult. We recover 2025 SC$_{79}$, measure its optical colours, and investigate its likely source region and transitions between these populations. We combine Keck/LRIS astrometry and VLT/FORS2 four-filter photometry with Bus-DeMeo taxonomic comparisons, published source-model probabilities, and integrations of 10,000 clones drawn from the covariance of JPL solution #2 and followed for 5 Myr in each direction. The SDSS-equivalent colours are $g-r=0.8254_{-0.1339}^{+0.2136}$, $r-i=0.1764_{-0.0540}^{+0.0523}$ and $i-z=-0.4975_{-0.1162}^{+0.1055}$ mag. The V-type class mean gives the closest colour match. At the V-type median albedo $p_V=0.362$, $H=18.83\pm0.15$ mag implies a diameter of $0.379^{+0.027}_{-0.025}$ km. The source model assigns a combined probability of 95.4% to delivery channels associated with the inner Main Belt. The ensemble-mean 'Ayló'chaxnim/Atira residence fractions are 30.2%/69.8% over the preceding 100 kyr and 3.6%/96.0% over the following 100 kyr; the remaining 0.4% of future ensemble time follows collision removal. Clones spend an average of 231 kyr in the 'Ayló'chaxnim class over the preceding 500 kyr and 120 kyr over the following 500 kyr. In the 5-Myr forward integrations, 14.56% of clones collide with Venus, 3.77% with Mercury and 0.22% with Earth. The V-like colours and source-model probabilities favour an origin in the inner Main Belt for 2025 SC$_{79}$. Its clones move between the 'Ayló'chaxnim and Atira populations.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:57:13Z</published>
+    <arxiv:comment>10 pages, 7 figures, 4 tables, including appendices. Submitted to A&amp;A</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Bryce T. Bolin</name>
+    </author>
+    <author>
+      <name>Leo Y. Alcorn</name>
+    </author>
+    <author>
+      <name>Davide Farnocchia</name>
+    </author>
+    <author>
+      <name>Marco Delbo</name>
+    </author>
+    <author>
+      <name>Martina Baratella</name>
+    </author>
+    <author>
+      <name>Henri M. J. Boffin</name>
+    </author>
+    <author>
+      <name>Max Brodheim</name>
+    </author>
+    <author>
+      <name>Alexa Gordon</name>
+    </author>
+    <author>
+      <name>Lordrick Kahinga</name>
+    </author>
+    <author>
+      <name>Michael Lundquist</name>
+    </author>
+    <author>
+      <name>Rita Morris</name>
+    </author>
+    <author>
+      <name>J. Xavier Prochaska</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09880v1</id>
+    <title>ZeoBench: A Benchmark for Self-Supervised Learning on 3D Zeolite Representations</title>
+    <updated>2026-11-06T18:55:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.09880v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09880v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Zeolites are an important class of porous crystalline materials with broad applications in gas storage, separations, and catalysis. Although hundreds of thousands of experimentally realized and hypothetical zeolite structures are known, identifying materials optimized for a target application remains challenging because property labels are expensive to obtain and available only for limited structure-molecule pairs. While prior work has demonstrated that 3D neural representations can predict zeolite properties effectively, it remains unclear which representation-learning strategies are most effective in the low-data regime relevant to materials discovery. We present ZeoBench, a benchmark for self-supervised learning on dense 3D representations of all-silica zeolites, and evaluate the resulting features on six existing downstream adsorption-property prediction tasks, across a range of training set sizes. Our study compares self-supervised 3D pretraining on volumetric zeolite data, adaptations of image-pretrained 2D ConvNets and vision transformers to 3D via multiview and channel-inflation strategies, and 3D ConvNets pretrained on out-of-domain volumetric datasets, alongside hand-crafted descriptors and supervised baselines. Using our pretraining and evaluation framework, we find self-supervised 3D representations outperform existing methods and achieve state-of-the-art performance across both in-domain label regimes and for the unseen domain of metal organic frameworks. Learned representations consistently outperform hand-crafted descriptors, and convolutional architectures are generally more effective than vision transformers in this setting. These results establish ZeoBench as a practical benchmark for 3D representation learning in zeolites and provide guidance for data-limited adsorption property prediction.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:55:34Z</published>
+    <arxiv:comment>NeurIPS 2026 Datasets and Benchmarks Track</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Aaron Sun</name>
+    </author>
+    <author>
+      <name>Yachan Liu</name>
+    </author>
+    <author>
+      <name>Ping Yang</name>
+    </author>
+    <author>
+      <name>Peng Bai</name>
+    </author>
+    <author>
+      <name>Subhransu Maji</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09875v1</id>
+    <title>SN 2026ahvu in NGC 1433 May Be a Prompt Type Ia Supernova with a Delay Time Under 100 Myr</title>
+    <updated>2026-11-06T18:52:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.09875v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09875v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>SN 2026ahvu is a Type Ia supernova (SN) that occurred in the nearby galaxy NGC 1433. Using archival Hubble and JWST imaging from the PHANGS survey, we show that the SN lies within 0.19$''$ and 0.26$''$ of two UV-bright star clusters. This $0.19/0.26''$ separation corresponds to $8/11$ pc ($17/24$ pc) at the reported distances of $9.1$ and $18.9$ Mpc, respectively. The probability of finding an unrelated Type Ia SN this close to a cataloged star cluster by chance is only $\sim$0.4 %. Thus, SN 2026ahvu is likely the first Type Ia SN that can be associated with relatively young star clusters in a nearby galaxy. From spectral energy distribution fitting using HST+JWST (or HST-only) data, we find that the clusters have age estimates of $37_{-5}^{+3}$ ($57_{-9}^{+14}$) Myr and $95_{-13}^{+15}$ ($88_{-12}^{+14}$) Myr. Association with either cluster would mean that SN 2026ahvu should be considered a prompt SN Ia and provide one of the most concrete measurements to date of a prompt Ia delay time. The median age of the younger star cluster is close to the minimum possible delay time for SN Ia progenitors. If the SN is indeed associated with the younger cluster, it would imply that Type Ia SNe can occur almost immediately after white dwarf formation. If the SN is associated with the older cluster, this discovery still presents the first example of a prompt Type Ia SN with delay time under 100 Myr.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:52:29Z</published>
+    <arxiv:comment>10 pages, 2 figures, 1 table. Submitted to ApJL</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Sumit K. Sarbadhicary</name>
+    </author>
+    <author>
+      <name>Kiana Henny</name>
+    </author>
+    <author>
+      <name>Adam Leroy</name>
+    </author>
+    <author>
+      <name>Karin Sandstrom</name>
+    </author>
+    <author>
+      <name>Kirsten L. Larson</name>
+    </author>
+    <author>
+      <name>David A. Thilker</name>
+    </author>
+    <author>
+      <name>Gagandeep S. Anand</name>
+    </author>
+    <author>
+      <name>Ashley T. Barnes</name>
+    </author>
+    <author>
+      <name>Laura A. Lopez</name>
+    </author>
+    <author>
+      <name>Daniel Maschmann</name>
+    </author>
+    <author>
+      <name>Marco Troncoso</name>
+    </author>
+    <author>
+      <name>Hwihyun Kim</name>
+    </author>
+    <author>
+      <name>Janice C. Lee</name>
+    </author>
+    <author>
+      <name>Frank Bigiel</name>
+    </author>
+    <author>
+      <name>Médéric Boquien</name>
+    </author>
+    <author>
+      <name>Rupali Chandar</name>
+    </author>
+    <author>
+      <name>Ryan Chown</name>
+    </author>
+    <author>
+      <name>Daniel A. Dale</name>
+    </author>
+    <author>
+      <name>Sinan Deger</name>
+    </author>
+    <author>
+      <name>Oleg V. Egorov</name>
+    </author>
+    <author>
+      <name>Simon C. O. Glover</name>
+    </author>
+    <author>
+      <name>Oleg Y. Gnedin</name>
+    </author>
+    <author>
+      <name>Jay González Lobos</name>
+    </author>
+    <author>
+      <name>Hao He</name>
+    </author>
+    <author>
+      <name>Rebecca J. Houghton</name>
+    </author>
+    <author>
+      <name>Debosmita Pathak</name>
+    </author>
+    <author>
+      <name>M. Jimena Rodriguez</name>
+    </author>
+    <author>
+      <name>Eva Schinnerer</name>
+    </author>
+    <author>
+      <name>Michael Tucker</name>
+    </author>
+    <author>
+      <name>Tony D. Weinbeck</name>
+    </author>
+    <author>
+      <name>Thomas G. Williams</name>
+    </author>
+    <author>
+      <name>Bradley C. Whitmore</name>
+    </author>
+    <author>
+      <name>Leonardo Ubeda</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09874v1</id>
+    <title>Pure mapping class group fixed points in $\mathrm{PU}(2,1)$</title>
+    <updated>2026-11-06T18:50:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.09874v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09874v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We classify all the fixed points for the action of the pure mapping class group on $\mathrm{PU}(2,1)$ character varieties of surface groups. Up to trivial peripheral monodromies, we prove that the irreducible fixed points are either pair of pants representations, or restrictions of reduced Burau representations to a once-punctured torus and restrictions of reduced Gassner representations to a 4-punctured sphere. On the other hand, we prove that the only non-trivial reducible fixed points appear in genus 0 where they map all but at most three peripheral loops in the centralizer of the image, and in genus 1 where they are valued in the quaternion group $H_8$.
+  As consequences, we deduce (i) that an irreducible representation in genus 0 with at least four non-trivial peripheral monodromies is rigid if and only if it is a fixed point, and (ii) a partial classification of irreducible representations of pure braid groups into $\mathrm{PU}(2,1)$.</summary>
+    <category term="math.GT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:50:34Z</published>
+    <arxiv:comment>46 pages, 7 figures. Comments welcome!</arxiv:comment>
+    <arxiv:primary_category term="math.GT"/>
+    <author>
+      <name>Samuel Bronstein</name>
+    </author>
+    <author>
+      <name>Thomas Le Fils</name>
+    </author>
+    <author>
+      <name>Arnaud Maret</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09861v1</id>
+    <title>A Quantum Mechanical Description of Active Matter</title>
+    <updated>2026-11-06T18:42:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.09861v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09861v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The natural environments habitable to life are inseparable from dissipative and entropic forces, which mandate active matter to operate on constant fluxes of energy and momentum to survive and propagate through spacetime. In contrast to fundamental particles which are characterized by energy and momentum, we postulate that energy expenditure rate and momentum generation rate are the fundamental dynamical quantities driving this evolution of swimming active matter and accordingly construct the corresponding Lagrangian and Hamiltonian of motion of the active matter. Furthermore, living systems broadly employ periodic, non-repeating motion for both locomotion and various biological functions, with meaningful information stored in the periods of these functions. Consequently, analyzing these dynamics in the Fourier space lands us at the familiar tools of the operator based, quantum mechanics. This is accomplished by introducing a complex field to describe the evolving probability distribution of a single unit, as well as the population density of mutually non-interacting active particles under the constraint of scarce resources. The resulting single-unit wavefunction evolves analogously to the Dirac equation with minimal coupling, wherein gauge symmetry reflects the generality of the governing equations across arbitrary resource landscapes. Additionally, we present a Schrödinger-like equation where the effective potential term represents the environmentally mandated, non-motile base metabolic rate. Finally, we formalize the bidirectional coupling between active swimmers and the surrounding fluid via a multipole expansion of the active force with an emphasis on force monopoles and dipoles, where each pole corresponds to a distinct mode of active motility.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:42:27Z</published>
+    <arxiv:comment>11 pg., 3 figs</arxiv:comment>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Ghansham Chandel</name>
+    </author>
+    <author>
+      <name>Siddhartha Das</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09846v1</id>
+    <title>Ensemble Methodology for Reference-Free Confidence Estimation in LLM-based Code Summarization</title>
+    <updated>2026-11-06T18:29:48Z</updated>
+    <link href="https://arxiv.org/abs/2611.09846v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09846v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper describes an approach and use case to estimate the correctness of LLM-generated COBOL summaries without access to human-authored references. The core intuition is that inter-model agreement on semantics is informative about truth, and that an LLM-as-judge can provide higher-fidelity pairwise assessments than traditional string- or embedding-based metrics. We operationalise this intuition with (i) controlled summary generation from diverse models; (ii) a LLM evaluator that compares pairs of summaries and emits structured judgments; and (iii) a calibrated aggregation rule that combines supportive evidence while penalising only corroborated contradictions.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.PL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:29:48Z</published>
+    <arxiv:comment>9 pages, 3 figures, 1 table</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Marco Colombo</name>
+    </author>
+    <author>
+      <name>Balaji A Jayaram</name>
+    </author>
+    <author>
+      <name>Sowmyakumari Selvaraj</name>
+    </author>
+    <author>
+      <name>Sumit Tokkar</name>
+    </author>
+    <author>
+      <name>Animesh Kumar</name>
+    </author>
+    <author>
+      <name>Aravinda Prasad Sistla</name>
+    </author>
+    <author>
+      <name>Ravishankar Shetty</name>
+    </author>
+    <author>
+      <name>Rigel Gjomemo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09844v1</id>
+    <title>Local fluctuations, majorization, and nontransitivity in cube tilings of $\mathbb{Z}^d$</title>
+    <updated>2026-11-06T18:28:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.09844v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09844v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Let $\mathcal{P}$ be a partition of $\mathbb{Z}^d$ into translates of the discrete unit cube $\{0,1\}^d$. For a uniformly chosen $\varepsilon\in\{0,1\}^d$, we count the cubes of $\mathcal{P}$ entirely contained in the observation window $[0,3]^d+\varepsilon$. The resulting score has mean $(3/2)^d$ for every partition, while its distribution reflects the geometry of the tiling. Comparing two such scores, with the shifts chosen independently, defines a game in which the larger score wins. In dimension $d=4$, we construct a geometric realization of the Steinhaus--Trybuła paradox: three periodic partitions form a cycle in which each beats the next with probability strictly greater than $1/2$. We describe local configurations by finite cube tiling codes and prove that every resulting list of counts is majorized by that of the simple code $C_d=\{0,2\}^d$. Nevertheless, every non-simple code differing from $C_d$ in only two coordinate directions beats it, with a sharp lower bound on the winning margin. We also show that the ratio of wins to losses of $C_d$ has limit superior at most $1$ as the dimension tends to infinity, uniformly over opposing codes. For $4\mathbb{Z}^d$-periodic tilings, changing the window size can repeatedly reverse the winner, but the winning margin eventually stabilizes separately for side lengths $4m+1$ and $4m+3$.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:28:31Z</published>
+    <arxiv:comment>30 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Andrzej P. Kisielewicz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09839v1</id>
+    <title>Gibbsian Entropy for General Wigner Distributions</title>
+    <updated>2026-11-06T18:25:35Z</updated>
+    <link href="https://arxiv.org/abs/2611.09839v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09839v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We propose a definition of non-equilibrium Gibbsian entropy applicable to general quantum systems, computable from Wigner functions, for both Gaussian and non-Gaussian states. We show that while the Wigner function is a quasi-probability distribution, fundamental results linking observables in repeated observations to the function, such as the law of large numbers, the central limit theorem and, crucially, the relation between the entropy and the cumulant generating function continue to apply. This ideas are the core of the large deviation theory, which allow to formulate a positive-definite definition of entropy based on our ignorance of the underlying state structure after repeated measurements of cumulants. This new definition is a parallel to the Gibbs entropy formulation, but it can also be used in out-of-equilibrium regimes. Some important properties of this entropy are discussed. In addition we derive some information theory quantities such as relative entropy, conditional entropy, mutual information and Rényi entropy. We then compare the results with Wehrl entropy for the 1D harmonic oscillator, for pure and mixed states. We conclude the the work discussing potential applications of this new formalism, ranging from quantum correlations beyond entanglement to thermalization in closed quantum systems.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:25:35Z</published>
+    <arxiv:comment>19 pages, 2 figures. Comments are welcome!</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Gabriel Rabelo-Soares</name>
+    </author>
+    <author>
+      <name>Yevgeniy Kovchegov</name>
+    </author>
+    <author>
+      <name>Giorgio Torrieri</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09837v1</id>
+    <title>99.9...% of the SU(2) BFSS ground state</title>
+    <updated>2026-11-06T18:23:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.09837v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09837v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We solve for the ground-state wavefunction of the SU(2) BFSS matrix model by applying the Rayleigh-Ritz method to an auxiliary operator $H_{\mathrm{aux}}$. We show that this operator agrees with the Hamiltonian on the ground-state subspace and has a spectral gap. For SU(2) specifically, the representation theory of the singlet sector gives an astronomical reduction in the number of degrees of freedom. This allows us to construct an efficient variational basis whose inner products we compute exactly. We demonstrate the method by computing a state that satisfies rigorous bounds on its energy $E\,g_{\mathrm{YM}}^{-2/3}\leq 4.18\times10^{-8}$ and ground-subspace overlap $\|P_{\ker H}ψ\|^2\geq 0.999997$. We compute ground-state moments with high precision, finding values consistent with the bounds from our matrix bootstrap. Additionally, the state accurately reproduces both the exponent and coefficient of the asymptotic radial probability density predicted by the three-graviton amplitude.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:23:23Z</published>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Alexander Michel</name>
+    </author>
+    <author>
+      <name>Jaroslav Scheinpflug</name>
+    </author>
+    <author>
+      <name>Xi Yin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09825v1</id>
+    <title>BitDecoding-FP4: Native FP4 KV Cache Decoding via Algorithm-System Co-Design</title>
+    <updated>2026-11-06T18:13:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.09825v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09825v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The key-value (KV) cache dominates memory capacity and bandwidth in long-context LLM serving. While 4-bit microscaling formats (NVFP4, MXFP4) shrink the cache and run attention on FP4 Tensor Cores, a fundamental gap remains between algorithmic quantization and system-aware acceleration: existing FP4 KV systems use vanilla quantization that causes severe accuracy drops, whereas accuracy-oriented 4-bit algorithms rely on vector codebooks whose lookup overhead degrades decoding throughput. We present BitDecoding-FP4, an algorithm--system co-design for accurate and efficient native FP4 KV decoding. We mitigate three error sources: Dual-Residual Query Quantization splits queries into two FP4 tensors, cutting query logit error from 60% to 1%; Underflow-Aware Probability Scaling prevents E4M3 scales from rounding long-context probabilities to zero; and Outlier-Aware Key Quantization combines static smoothing, Hadamard rotation, and scale search to suppress key outliers under token-wise scaling. At the system level, we remove the softmax bottleneck via transposed softmax with fused probability quantization and stacked query MMA on paged KV caches. Across dense and MoE models with GQA and MLA, BitDecoding-FP4 stays within 0.5 points of BF16 KV accuracy with NVFP4 (1 point with MXFP4), and tracks BF16 KV in RL training rollouts. In end-to-end serving on NVIDIA B300 with Qwen3-4B and Qwen3-30B-A3B, it delivers 2.4-3.0$\times$ higher peak serving throughput than BF16 KV. The implementation is available at https://github.com/OpenBitSys/BitDecoding-FP4.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.PF" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:13:54Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Dayou Du</name>
+    </author>
+    <author>
+      <name>Woon Yee Ng</name>
+    </author>
+    <author>
+      <name>Guangming Sheng</name>
+    </author>
+    <author>
+      <name>Nick Lau</name>
+    </author>
+    <author>
+      <name>Jianyi Cheng</name>
+    </author>
+    <author>
+      <name>Luo Mai</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09811v1</id>
+    <title>Spectral Rigidity of Stochastic Operators with Heavy Tailed Perturbations</title>
+    <updated>2026-11-06T17:59:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.09811v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09811v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper, we provide a new set of tools for establishing the number rigidity of point processes which are particularly well suited for the spectral processes of stochastic operators. These tools allow one to prove the number rigidity of a wide class of stochastic operators that had been previously inaccessible to the standard methods in the area, such as the variance of linear statistics, which require being able to precisely analyze correlations between individual points. We propose an alternative mechanism which uses a pathwise comparison between the growth rate of the unperturbed eigenvalues and the cumulative random noise which allows one to convert the probabilistic problem into a more tractable perturbation theory problem. This new approach allows us to prove the rigidity of previously inaccessible operators including those with heavy tailed perturbations or complex correlation structures. As a demonstration, we use these tools to prove the number rigidity of new classes of stochastic Schrödinger and Sturm-Liouville Operators which are resistant to analysis using the standard rigidity toolkit.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T17:59:46Z</published>
+    <arxiv:comment>12 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Youssef Djellouli</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09806v1</id>
+    <title>An Efficient Synchronization Scheme for Distributed Bandits</title>
+    <updated>2026-11-06T17:55:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.09806v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09806v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the problem of synchronizing two players in a \emph{distributed multi-armed bandit} setting. The probability of \emph{synchronization error} is analyzed by recasting synchronization as a \emph{communication problem}. Using a well-designed random coding ensemble, we derive error exponents for the maximum-likelihood decoder. We then introduce a \emph{universal decoder} that achieves the same error exponents as the optimal decoder. Finally, applying these results to distributed multi-armed bandits, we show an upper bound on the regret of our synchronization scheme.</summary>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T17:55:52Z</published>
+    <arxiv:comment>Accepted at IEEE ISIT2026. 3 Figures, 6 pages. Theorem 7 redrawn</arxiv:comment>
+    <arxiv:primary_category term="cs.IT"/>
+    <author>
+      <name>Raymond Zhang</name>
+    </author>
+    <author>
+      <name>Henrique Miyamoto</name>
+    </author>
+    <author>
+      <name>Richard Combes</name>
+    </author>
+    <author>
+      <name>Sheng Yang</name>
+    </author>
+    <arxiv:doi>10.1109/ISIT62367.2026.11654092</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1109/ISIT62367.2026.11654092" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09800v1</id>
+    <title>Exciton design via topological spin textures</title>
+    <updated>2026-11-06T17:53:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.09800v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09800v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Excitons carry energy and information through a semiconductor without carrying charge. This makes them attractive for optoelectronics, but also hard to guide. Magnetic skyrmions, on the other hand, are moved by small electrical currents. Here we develop a theory of excitons interacting with a skyrmion in which the electron and the hole are treated as distinct constituents, each with its own spin--orbit coupling. We find that the topology of the skyrmion is transferred to the exciton only when the exchange coupling exceeds the relevant spin--orbit splitting. The exciton then experiences a full flux quantum, with opposite signs in the two valleys. The quantum metric of the spin texture creates a ring-shaped barrier that traps excitons, whereas the topological charge fixes the angular momentum of the trapped states and hence their optical selection rules. Because the trap moves with the skyrmion, excitons can be transported by current pulses, and small skyrmions accommodate a single exciton, which opens the door for potential hybrid applications in future information technology intertwining topological magnetic bits with optical excitations.</summary>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T17:53:33Z</published>
+    <arxiv:primary_category term="cond-mat.mes-hall"/>
+    <author>
+      <name>Karim Rezouali</name>
+    </author>
+    <author>
+      <name>Selcuk Sözeri</name>
+    </author>
+    <author>
+      <name>Samir Lounis</name>
+    </author>
+  </entry>
+</feed>

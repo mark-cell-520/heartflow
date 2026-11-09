@@ -1,0 +1,524 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/nbtrZZZQaMzFqzwrgi5nG/QMPlk</id>
+  <title>arXiv Query: search_query=all:regression OR all:to OR all:the OR all:mean OR all:overattribution OR all:intervention&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-09T23:30:17Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:regression+OR+(all:to+OR+(all:the+OR+(all:mean+OR+(all:overattribution+OR+all:intervention))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>295947</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09890v1</id>
+    <title>Global Two-Sided Estimates for Time-Fractional Diffusion Kernels on Hyperbolic Space</title>
+    <updated>2026-11-06T18:58:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.09890v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09890v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study time-fractional diffusion on real hyperbolic space $\mathbb H^n$, $n\ge2$, with Caputo order $0&lt;α&lt;1$. We establish global two-sided pointwise estimates for the homogeneous fundamental kernel $Z_{\mathbb H}(t,r)$ and the inhomogeneous (Duhamel) kernel $Y_{\mathbb H}(t,r)$, uniformly over all $t&gt;0$ and positive geodesic distances $r$. By combining inverse-stable subordination with global bounds for the hyperbolic heat kernel, we distinguish a short-time local regime, a large-time interior region, and an exterior region governed by a saddle-point problem with parameter $r/t$. Both kernels have the same exterior exponential rate, while their amplitudes are related by an explicit saddle-point factor. The estimates are uniformly comparable on the interfaces between regimes, recover the Euclidean time-fractional singularities at small scales, and identify the influence of hyperbolic geometry on large-scale decay. The kernel $Z_{\mathbb H}$ also describes the one-time marginal density of hyperbolic Brownian motion under an independent inverse stable clock. This representation yields a radial limit law, moment and quantile asymptotics, and a change in the mean square displacement from order $t^α$ at small times to order $t^{2α}$ at large times.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:47Z</published>
+    <arxiv:comment>35 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Vicente Vergara</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09888v1</id>
+    <title>Scenario Orchestration for Closed-loop Policy Evaluation of Autonomous Driving</title>
+    <updated>2026-11-06T18:58:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.09888v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09888v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scenario-based simulation is central to evaluating autonomous-driving policies, but a scenario scripted before execution (i.e., with predetermined, fixed actor routes and speeds) may not preserve its intended interaction once the tested ego policy responds in closed loop. Scripted scenarios cannot adapt to unanticipated ego behavior, while learned traffic actors may remain reactive without reliably realizing a particular scenario intent. We introduce a scenario orchestrator that continuously monitors the joint traffic state and adapts non-ego actors through re-timing, re-routing, and role reassignment for creating a specific scenario intent. At each step, the orchestrator solves a constrained optimization problem that preserves the intended interaction while limiting interventions and maintaining traffic feasibility. We further distinguish scenario realization from policy failure, allowing a test to first be judged based on whether the intended interaction occurred and then by how the ego policy responded. Experiments in the CARLA simulator across multiple scenario families and driving policies show that orchestration realizes targeted interactions more reliably than scripted and learned actor-level baselines, particularly under variations in initial conditions and ego behavior. These results support closed-loop scenario orchestration as a tool for controlled and reproducible policy evaluation.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:27Z</published>
+    <arxiv:comment>8 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Frieda Rong</name>
+    </author>
+    <author>
+      <name>Zhaoyue Wang</name>
+    </author>
+    <author>
+      <name>Veer Kapadia</name>
+    </author>
+    <author>
+      <name>Vishaka Rajani</name>
+    </author>
+    <author>
+      <name>Aren A. Babikian</name>
+    </author>
+    <author>
+      <name>Xujie Si</name>
+    </author>
+    <author>
+      <name>Mahsa Golchoubian</name>
+    </author>
+    <author>
+      <name>Raquel Urtasun</name>
+    </author>
+    <author>
+      <name>Igor Gilitschenski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09886v1</id>
+    <title>Directed systems of A-spaces and weak cores</title>
+    <updated>2026-11-06T18:58:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.09886v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09886v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We prove that for any regular CW-complex $X$ there exists a quotient map $X\to Y$ that is a weak homotopy equivalence and which is minimal with that property, meaning that any quotient $Y\to Z$ that is a weak equivalence, must be a homeomorphism. The space $Y$ we obtain is an Alexandroff space: a space in which arbitrary intersections of open sets are open. The weak core $Y$ of $X$ is not unique in general. We study homotopy invariants preserved by filtered colimits of Alexandroff spaces. This can be seen as an analogous to Stong's theory of cores of finite topological spaces.</summary>
+    <category term="math.AT" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:06Z</published>
+    <arxiv:comment>21 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="math.AT"/>
+    <author>
+      <name>Jonathan Ariel Barmak</name>
+    </author>
+    <author>
+      <name>Juan Galotto</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09884v1</id>
+    <title>VLT and Keck recovery and characterisation of 2025 SC$_{79}$: linking 'Ayló'chaxnim and Atira asteroids</title>
+    <updated>2026-11-06T18:57:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.09884v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09884v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Asteroids near the boundary between the Atira and 'Ayló'chaxnim classes can trace dynamical links between the two populations, but their small solar elongations make recovery and physical characterisation difficult. We recover 2025 SC$_{79}$, measure its optical colours, and investigate its likely source region and transitions between these populations. We combine Keck/LRIS astrometry and VLT/FORS2 four-filter photometry with Bus-DeMeo taxonomic comparisons, published source-model probabilities, and integrations of 10,000 clones drawn from the covariance of JPL solution #2 and followed for 5 Myr in each direction. The SDSS-equivalent colours are $g-r=0.8254_{-0.1339}^{+0.2136}$, $r-i=0.1764_{-0.0540}^{+0.0523}$ and $i-z=-0.4975_{-0.1162}^{+0.1055}$ mag. The V-type class mean gives the closest colour match. At the V-type median albedo $p_V=0.362$, $H=18.83\pm0.15$ mag implies a diameter of $0.379^{+0.027}_{-0.025}$ km. The source model assigns a combined probability of 95.4% to delivery channels associated with the inner Main Belt. The ensemble-mean 'Ayló'chaxnim/Atira residence fractions are 30.2%/69.8% over the preceding 100 kyr and 3.6%/96.0% over the following 100 kyr; the remaining 0.4% of future ensemble time follows collision removal. Clones spend an average of 231 kyr in the 'Ayló'chaxnim class over the preceding 500 kyr and 120 kyr over the following 500 kyr. In the 5-Myr forward integrations, 14.56% of clones collide with Venus, 3.77% with Mercury and 0.22% with Earth. The V-like colours and source-model probabilities favour an origin in the inner Main Belt for 2025 SC$_{79}$. Its clones move between the 'Ayló'chaxnim and Atira populations.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:57:13Z</published>
+    <arxiv:comment>10 pages, 7 figures, 4 tables, including appendices. Submitted to A&amp;A</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Bryce T. Bolin</name>
+    </author>
+    <author>
+      <name>Leo Y. Alcorn</name>
+    </author>
+    <author>
+      <name>Davide Farnocchia</name>
+    </author>
+    <author>
+      <name>Marco Delbo</name>
+    </author>
+    <author>
+      <name>Martina Baratella</name>
+    </author>
+    <author>
+      <name>Henri M. J. Boffin</name>
+    </author>
+    <author>
+      <name>Max Brodheim</name>
+    </author>
+    <author>
+      <name>Alexa Gordon</name>
+    </author>
+    <author>
+      <name>Lordrick Kahinga</name>
+    </author>
+    <author>
+      <name>Michael Lundquist</name>
+    </author>
+    <author>
+      <name>Rita Morris</name>
+    </author>
+    <author>
+      <name>J. Xavier Prochaska</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09876v1</id>
+    <title>Novikov-Magnus Master Equation for Driven Quantum Systems under Classical Correlated Noise</title>
+    <updated>2026-11-06T18:53:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.09876v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09876v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce a modular framework for deriving time-local quantum master equations for driven systems subject to temporally correlated classical noise. The construction combines the Donsker-Furutsu-Novikov relation with the Magnus expansion: Functional response closes the noise average, while nested commutators retain the noncommuting chronological action of noise-induced perturbations along the controlled quantum trajectory. For zero-mean Gaussian noise, we derive the resulting Novikov-Magnus quantum master equation through fourth order in the noise strength. The same response hierarchy suggests a natural extension beyond Gaussian noise, with connected higher-order noise correlations weighting higher functional derivatives of the stochastic map. For a driven qubit under Ornstein-Uhlenbeck and band-limited $1/f$ noise, the second- and fourth-order maps remain CPTP throughout the perturbative regime and accurately reproduce stochastic simulations. Their diamond-norm errors are comparable to those of the cumulant-based pseudo-Lindblad master equation, with a modest fourth-order improvement for Ornstein-Uhlenbeck noise.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:53:03Z</published>
+    <arxiv:comment>main text 5 pages, supplemental text 24 pages, 3 main text figures, 16 supplemental figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Nada Khogeer</name>
+    </author>
+    <author>
+      <name>Jerison Parra</name>
+    </author>
+    <author>
+      <name>Caroline Desgranges</name>
+    </author>
+    <author>
+      <name>Hugo Ribeiro</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09875v1</id>
+    <title>SN 2026ahvu in NGC 1433 May Be a Prompt Type Ia Supernova with a Delay Time Under 100 Myr</title>
+    <updated>2026-11-06T18:52:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.09875v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09875v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>SN 2026ahvu is a Type Ia supernova (SN) that occurred in the nearby galaxy NGC 1433. Using archival Hubble and JWST imaging from the PHANGS survey, we show that the SN lies within 0.19$''$ and 0.26$''$ of two UV-bright star clusters. This $0.19/0.26''$ separation corresponds to $8/11$ pc ($17/24$ pc) at the reported distances of $9.1$ and $18.9$ Mpc, respectively. The probability of finding an unrelated Type Ia SN this close to a cataloged star cluster by chance is only $\sim$0.4 %. Thus, SN 2026ahvu is likely the first Type Ia SN that can be associated with relatively young star clusters in a nearby galaxy. From spectral energy distribution fitting using HST+JWST (or HST-only) data, we find that the clusters have age estimates of $37_{-5}^{+3}$ ($57_{-9}^{+14}$) Myr and $95_{-13}^{+15}$ ($88_{-12}^{+14}$) Myr. Association with either cluster would mean that SN 2026ahvu should be considered a prompt SN Ia and provide one of the most concrete measurements to date of a prompt Ia delay time. The median age of the younger star cluster is close to the minimum possible delay time for SN Ia progenitors. If the SN is indeed associated with the younger cluster, it would imply that Type Ia SNe can occur almost immediately after white dwarf formation. If the SN is associated with the older cluster, this discovery still presents the first example of a prompt Type Ia SN with delay time under 100 Myr.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:52:29Z</published>
+    <arxiv:comment>10 pages, 2 figures, 1 table. Submitted to ApJL</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Sumit K. Sarbadhicary</name>
+    </author>
+    <author>
+      <name>Kiana Henny</name>
+    </author>
+    <author>
+      <name>Adam Leroy</name>
+    </author>
+    <author>
+      <name>Karin Sandstrom</name>
+    </author>
+    <author>
+      <name>Kirsten L. Larson</name>
+    </author>
+    <author>
+      <name>David A. Thilker</name>
+    </author>
+    <author>
+      <name>Gagandeep S. Anand</name>
+    </author>
+    <author>
+      <name>Ashley T. Barnes</name>
+    </author>
+    <author>
+      <name>Laura A. Lopez</name>
+    </author>
+    <author>
+      <name>Daniel Maschmann</name>
+    </author>
+    <author>
+      <name>Marco Troncoso</name>
+    </author>
+    <author>
+      <name>Hwihyun Kim</name>
+    </author>
+    <author>
+      <name>Janice C. Lee</name>
+    </author>
+    <author>
+      <name>Frank Bigiel</name>
+    </author>
+    <author>
+      <name>Médéric Boquien</name>
+    </author>
+    <author>
+      <name>Rupali Chandar</name>
+    </author>
+    <author>
+      <name>Ryan Chown</name>
+    </author>
+    <author>
+      <name>Daniel A. Dale</name>
+    </author>
+    <author>
+      <name>Sinan Deger</name>
+    </author>
+    <author>
+      <name>Oleg V. Egorov</name>
+    </author>
+    <author>
+      <name>Simon C. O. Glover</name>
+    </author>
+    <author>
+      <name>Oleg Y. Gnedin</name>
+    </author>
+    <author>
+      <name>Jay González Lobos</name>
+    </author>
+    <author>
+      <name>Hao He</name>
+    </author>
+    <author>
+      <name>Rebecca J. Houghton</name>
+    </author>
+    <author>
+      <name>Debosmita Pathak</name>
+    </author>
+    <author>
+      <name>M. Jimena Rodriguez</name>
+    </author>
+    <author>
+      <name>Eva Schinnerer</name>
+    </author>
+    <author>
+      <name>Michael Tucker</name>
+    </author>
+    <author>
+      <name>Tony D. Weinbeck</name>
+    </author>
+    <author>
+      <name>Thomas G. Williams</name>
+    </author>
+    <author>
+      <name>Bradley C. Whitmore</name>
+    </author>
+    <author>
+      <name>Leonardo Ubeda</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09871v1</id>
+    <title>Multi-phase Carbon Structure and Dynamics in NGC 6334: Insights from CO, [C I], and [C II]</title>
+    <updated>2026-11-06T18:48:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.09871v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09871v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present high-angular and velocity resolution observations of the emission lines of [CII] at 158 micron, [CI] at 609 micron, and the 12CO and 13CO (J=3-2) transitions toward the central region of NGC 6334, providing a detailed multi-phase view of carbon in this massive star-forming complex. By combining morphology and spatial scales information, kinematics, line profiles, and line ratio analyses, we quantify the distribution and physical state of ionized and atomic carbon, and carbon in its molecular form in CO. [CII] emission is the most extended, permeates the mapped region and is dynamically complex, while 13CO is compact and quiescent, and 12CO and [CI] occupy intermediate regimes connecting dense regions to transitional diffuse layers. We interpret these emission distributions such that the brightest [CII] emission traces photodissociation regions (PDRs) close to the H II region bubbles located along the central filament, while the extended [CII] emission arises from the more diffuse warm gas, indicating either cloud formation or dispersal processes. Remarkably, the [CI] is more extended than the 13CO, but less than [CII] and may probe the gas velocity structure resulting from colliding flows or cloud-cloud collisions. Line ratios involving [CII], such as [CII]/[CI] or [CII]/CO are systematically high, revealing widespread diffuse emission and localized UV-illuminated surfaces. Line ratio analysis and K-means clustering of [CI]/13CO versus dust continuum (cold 870 micron and warm 70 micron) emission reveal stratified chemical structure that UV photons penetrate deeply into the clumpy ridge (Av~18), suggesting a porous PDR. These results together depict that NGC 6334 is a clumpy, feedback-dominated PDR ridge with coexisting carbon phases, where [CI] and [CII] also trace dynamical processing through multiple velocity components linked to cloud-cloud collisions.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:43Z</published>
+    <arxiv:comment>12+10 pages, 23 figures, Accepted for publication in A&amp;A</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>S. Neupane</name>
+    </author>
+    <author>
+      <name>F. Wyrowski</name>
+    </author>
+    <author>
+      <name>N. Schneider</name>
+    </author>
+    <author>
+      <name>A. G. G. M. Tielens</name>
+    </author>
+    <author>
+      <name>R. Simon</name>
+    </author>
+    <author>
+      <name>J. S. Urquhart</name>
+    </author>
+    <author>
+      <name>R. Güsten</name>
+    </author>
+    <author>
+      <name>M-Y. Lee</name>
+    </author>
+    <author>
+      <name>D. Russeil</name>
+    </author>
+    <author>
+      <name>G. Garay</name>
+    </author>
+    <author>
+      <name>R. Higgins</name>
+    </author>
+    <author>
+      <name>K. M. Menten</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09869v1</id>
+    <title>An Empirical Study on Clustering-based Quantum Approximate Optimization Algorithm for Regression Test Case Selection</title>
+    <updated>2026-11-06T18:48:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.09869v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09869v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Regression testing assesses whether software components that have already been developed and tested continue to work correctly after modifications. Ideally, regression testing re-executes the entire test suite after each modification, but this is infeasible in real-world scenarios because of the computational burden; therefore, optimized approaches, such as Test Case Selection, have been developed. The state of the art in regression testing optimization includes both classical approaches, such as Additional Greedy and DIV-GA, and quantum approaches, such as SelectQA, BootQA, and IGDec-QAOA. However, while the former incur high computational costs, the latter are constrained by the physical limitations of currently available quantum machines.
+  This paper extends the evaluation of QAOA-TCS, our quantum approach for the test case selection problem. We thoroughly evaluate its performance, compare it with state-of-the-art classical and quantum approaches, and assess its robustness to quantum noise.
+  The results show that QAOA-TCS outperforms state-of-the-art multi-objective approaches in most cases and maintains stable performance even under high noise levels. In the single-objective formulation, QAOA-based methods perform comparably. In terms of efficiency, our previous method based on quantum annealing, namely SelectQA, is the most efficient for large problems in the multi-objective formulation, whereas QAOA-TCS offers the best trade-off between effectiveness and efficiency in the single-objective formulation when run on realistic noisy simulators. However, such analysis is constrained by the different computational environments used to run the algorithms.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:13Z</published>
+    <arxiv:comment>Manuscript under review at Empirical Software Engineering (EMSE)</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Antonio Trovato</name>
+    </author>
+    <author>
+      <name>Martin Beseda</name>
+    </author>
+    <author>
+      <name>Dario Di Nucci</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09867v1</id>
+    <title>Existence of extremal solutions in the 1d conformal bootstrap</title>
+    <updated>2026-11-06T18:48:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.09867v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09867v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Extremal solutions and functionals play an important role in the conformal bootstrap. These are the solutions that saturate unitarity bounds, and the dual functionals that encode the optimal bounds. While they have fundamental theoretical implications, their existence has not been rigorously established. This is particularly subtle in the setting of the full infinite-dimensional bootstrap, i.e. the limit of zero numerical truncation. In this article, we prove that extremal solutions exist for OPE maximisation problems in 1d CFT. These are a large class of generically interacting, unitary, exact solutions of the crossing equation that maximise an OPE coefficient. We also prove that these problems have 'zero duality gap', meaning there exist functionals arbitrarily close to extremality. Our approach is to formulate the bootstrap as a convex optimisation problem in a Hilbert space and apply the Fenchel-Rockafellar theorem.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:01Z</published>
+    <arxiv:comment>34 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Filip Herček</name>
+    </author>
+    <author>
+      <name>Nat Levine</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09863v1</id>
+    <title>Flow-Guided Target-Space Alignment via Path Consistency</title>
+    <updated>2026-11-06T18:44:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.09863v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09863v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many multimodal alignment problems require mapping a source modality into a fixed space defined by a target modality, where the target space is not merely an intermediate embedding but is used directly for downstream analysis. In this setting, successful alignment should preserve both the global structure of the target distribution and the instance-level correspondence observed in paired source--target training data. Existing objectives typically address only part of this goal: contrastive losses encourage relative similarity, distribution-matching losses improve marginal agreement, and pointwise regression fits each source sample to its paired target without explicitly modeling target-space path geometry. We propose FlowAlign, a flow-guided target-space alignment method that repurposes conditional flow matching as a training-time alignment signal rather than an inference-time transport model. FlowAlign uses the learned flow field to guide the alignment of source-side representations with the fixed target space, encouraging them to preserve paired correspondence while remaining compatible with the global target-space structure. We further provide theoretical analysis showing how FlowAlign helps improve paired correspondence by controlling endpoint accuracy and capturing local target-space geometry. Experiments on synthetic data, paired single-cell multiome benchmarks, and image--text alignment demonstrate that FlowAlign improves instance level correspondence while preserving target-space structure across different modality settings.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:44:08Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ruizhi Yuan</name>
+    </author>
+    <author>
+      <name>Zeqiu Yu</name>
+    </author>
+    <author>
+      <name>Wei Gao</name>
+    </author>
+    <author>
+      <name>Wei Chen</name>
+    </author>
+    <author>
+      <name>Xiwei Tang</name>
+    </author>
+    <author>
+      <name>Lu Tang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09852v1</id>
+    <title>The AIDA-TNG project: Galactic bar pattern speeds in self-interacting dark matter</title>
+    <updated>2026-11-06T18:35:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.09852v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09852v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Cosmological simulations within the standard cold dark matter (CDM) paradigm systematically predict higher values of the dimensionless bar-speed parameter, $\boldsymbol{R} \equiv R_{\mathrm{cr}}/R_{\mathrm{bar}}$ (where $R_{\mathrm{cr}}$ and $R_{\mathrm{bar}}$ denote the corotation radius and the bar radius, respectively), than those inferred from observations of local galaxies, a discrepancy known as the fast-bar tension. Since bar slowdown is primarily driven by dynamical friction with the dark matter halo, bar dynamics is inherently sensitive to the properties of dark matter particles. We aim to determine whether dark matter self-interactions alleviate or exacerbate the fast-bar tension, and to identify the physical mechanism behind the differences in bar dynamics between CDM and self-interacting dark matter (SIDM) models. We use the $51.7\,\mathrm{Mpc}$ box of the AIDA-TNG cosmological simulations, run with three different dark matter models: standard CDM, and two SIMD models one with a constant cross-section model (SIDM1), and the other with a velocity-dependent model (vSIDM). We identify barred disk galaxies with stellar mass $M_* &gt; 10^{10}\,M_{\odot}$ at redshifts $z=0.2,\,1.0,\,1.5,$ and $2.0$, and measure the bar fraction, bar strength, bar length, pattern speed $Ω_{\mathrm{p}}$, and the ratio $\boldsymbol{R}=R_{\mathrm{cr}}/R_{\mathrm{bar}}$. The pattern speeds in the SIDM1 and vSIDM models are generally lower than in CDM at nearly all redshifts probed in this study. The subsequent slowdown proceeds with nearly 10\% more effective in the SIDM models likely due to velocity-anisotropy. Consequently, at low redshift the mean value of $\boldsymbol{R}$ is significantly higher in the SIDM models, indicating that the fas-bar tension is further exacerbated in these scenarios.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:35:32Z</published>
+    <arxiv:comment>12 pages, 9 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Asiyeh Habibi</name>
+    </author>
+    <author>
+      <name>Mahmood Roshan</name>
+    </author>
+    <author>
+      <name>Giulia Despali</name>
+    </author>
+    <author>
+      <name>Mark Vogelsberger</name>
+    </author>
+    <author>
+      <name>Amir Ghari</name>
+    </author>
+    <author>
+      <name>Lauro Moscardini</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09851v1</id>
+    <title>Health-System-Wide Mapping of Demographic Information in Routine Clinical Histopathology</title>
+    <updated>2026-11-06T18:34:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.09851v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09851v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The extent to which demographic-associated information is detectable across organs and disease states in routine clinical histopathology remains unclear. Here, we analyzed 1.3 million hematoxylin and eosin whole-slide images from 257,322 patients across 25 organs, using pathology foundation-model representations and multiple-instance learning to systematically map information associated with sex, age group, and self-reported race. Across 69 organ-demographic combinations, demographic attributes were broadly recoverable, with pan-organ mean AUROCs of 0.828 for sex, 0.733 for age group, and 0.662 for self-reported race, and substantial variation across organs. Demographic-class balancing produced relatively small changes in performance, while evaluation within diagnosis-text clusters showed modest attenuation. Under training with diagnosis-based grouping, demographic-associated signals remained detectable across multiple organs, including sex in gastric tissue (AUROC 0.865), age group in breast (0.816), and self-reported race in skin (0.728). Literature-guided analysis of these settings generated candidate histomorphological and contextual explanations for further investigation. Together, these findings provide a systematic map of demographic-associated information in routine histopathology, informing investigations of its sources, assessments of potential shortcut learning, and the development of more interpretable computational pathology models.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:34:51Z</published>
+    <arxiv:comment>35 pages, 4 main figures, 2 supplementary figures, and 10 supplementary tables. Interactive Results Atlas and Hypothesis Explorer accompany the manuscript</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Shengjia Chen</name>
+    </author>
+    <author>
+      <name>Ruchika Verma</name>
+    </author>
+    <author>
+      <name>Kevin Clare</name>
+    </author>
+    <author>
+      <name>Paula Restrepo</name>
+    </author>
+    <author>
+      <name>Jannes Jegminat</name>
+    </author>
+    <author>
+      <name>Eugenia Alleva</name>
+    </author>
+    <author>
+      <name>Kuan-lin Huang</name>
+    </author>
+    <author>
+      <name>Aryeh Stock</name>
+    </author>
+    <author>
+      <name>Brandon Veremis</name>
+    </author>
+    <author>
+      <name>Thomas Fuchs</name>
+    </author>
+    <author>
+      <name>Gabriele Campanella</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09849v1</id>
+    <title>Deformations and Local Geometry of Lie Triple System Morphisms</title>
+    <updated>2026-11-06T18:31:49Z</updated>
+    <link href="https://arxiv.org/abs/2611.09849v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09849v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper, first we study the deformations, stability and rigidity of Lie triple system morphisms by means of higher derived brackets and augmented Yamaguti cohomology. The vanishing of the first cohomology gives formal and local inner rigidity. The vanishing of the second cohomology removes the formal extension obstructions and, in finite dimension over $\mathbb{R}$, gives local smoothness and stability under simultaneous perturbations of the two products. Next, we establish the relationship with Lie algebra homomorphisms in each part of the theory. The universal enveloping Lie algebra identifies a Lie triple morphism with a grading-preserving Lie homomorphism. We obtain the corresponding first cohomology isomorphism, the equivalence of formal and smooth deformations, and a stability result for graded Lie bracket perturbations. For Lie triple products induced by binary Lie brackets, we construct a comparison of differentials and obstruction classes. Under perfectness and a zero-centralizer condition, the local morphism spaces coincide. Finally, we relate triple subsystem graphs to graded Lie subalgebra graphs and compare their normal differentials.</summary>
+    <category term="math.RA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:31:49Z</published>
+    <arxiv:comment>28 pages</arxiv:comment>
+    <arxiv:primary_category term="math.RA"/>
+    <author>
+      <name>Wen Teng</name>
+    </author>
+    <author>
+      <name>Ripan Saha</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09845v1</id>
+    <title>AdaptivePnP: Fast Auto-Tuned Plug-and-Play for Deconvolution</title>
+    <updated>2026-11-06T18:29:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.09845v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09845v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Plug-and-play (PnP) methods reconstruct images by alternating a data-fitting step with an image denoiser. Their performance depends on two parameters: the step size $γ$ and the measurement noise level $σ$. In practice, $γ$ is often tuned by grid search over validation images and must be retuned whenever the problem setting changes, and $σ$ is assumed known or estimated separately. We propose AdaptivePnP, a PnP framework that jointly estimates $σ$ and $γ$ at every iteration from the data-fitting residual. To do so, we apply the PnP virtual model to the data-fitting proximal map and show that the residual is zero-mean Gaussian with covariance parameterized by $γ$ and $σ$. However, when one parameter is much larger than the other, the residual carries little information about the smaller one and using the maximum likelihood (ML) estimator can degrade the PnP iterations. We therefore introduce the identifiable maximum likelihood (IML) estimator, which restricts the ML estimator to an identifiable window in which the normalized Cramér--Rao bound of every parameter is bounded by a user-specified tolerance. For the virtual model, this window is an interval of ratios $ρ= γ/σ$, so computing the IML estimate reduces to a one-dimensional search over $ρ$. We apply AdaptivePnP to two standard PnP methods, yielding algorithms that require neither a tuned $γ$ nor a known $σ$. On image deblurring and super-resolution, AdaptivePnP matches or outperforms PnP baselines tuned with the true $σ$. Code is available at https://github.com/hdubasullivan/AdaptivePnP.</summary>
+    <category term="eess.IV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:29:09Z</published>
+    <arxiv:comment>Submitted to IEEE Transactions on Computational Imaging</arxiv:comment>
+    <arxiv:primary_category term="eess.IV"/>
+    <author>
+      <name>Haley Duba-Sullivan</name>
+    </author>
+    <author>
+      <name>Emma J. Reid</name>
+    </author>
+    <author>
+      <name>Charles A. Bouman</name>
+    </author>
+    <author>
+      <name>Gregery T. Buzzard</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09844v1</id>
+    <title>Local fluctuations, majorization, and nontransitivity in cube tilings of $\mathbb{Z}^d$</title>
+    <updated>2026-11-06T18:28:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.09844v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09844v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Let $\mathcal{P}$ be a partition of $\mathbb{Z}^d$ into translates of the discrete unit cube $\{0,1\}^d$. For a uniformly chosen $\varepsilon\in\{0,1\}^d$, we count the cubes of $\mathcal{P}$ entirely contained in the observation window $[0,3]^d+\varepsilon$. The resulting score has mean $(3/2)^d$ for every partition, while its distribution reflects the geometry of the tiling. Comparing two such scores, with the shifts chosen independently, defines a game in which the larger score wins. In dimension $d=4$, we construct a geometric realization of the Steinhaus--Trybuła paradox: three periodic partitions form a cycle in which each beats the next with probability strictly greater than $1/2$. We describe local configurations by finite cube tiling codes and prove that every resulting list of counts is majorized by that of the simple code $C_d=\{0,2\}^d$. Nevertheless, every non-simple code differing from $C_d$ in only two coordinate directions beats it, with a sharp lower bound on the winning margin. We also show that the ratio of wins to losses of $C_d$ has limit superior at most $1$ as the dimension tends to infinity, uniformly over opposing codes. For $4\mathbb{Z}^d$-periodic tilings, changing the window size can repeatedly reverse the winner, but the winning margin eventually stabilizes separately for side lengths $4m+1$ and $4m+3$.</summary>
+    <category term="math.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:28:31Z</published>
+    <arxiv:comment>30 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="math.CO"/>
+    <author>
+      <name>Andrzej P. Kisielewicz</name>
+    </author>
+  </entry>
+</feed>
