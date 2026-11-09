@@ -15,7 +15,10 @@ cases.forEach((i) => {
   const s = atk[i];
   const hit = I.HARM_DENY_ZH.test(s);
   // 找出所有匹配片段
-  const re = new RegExp(I.HARM_DENY_ZH.source);
+  // [r267 lint 修复] 原写法 new RegExp(source) 丢 flags，非全局正则配
+  // while exec 命中即死循环（HARM_DENY_ZH 本身无 flags；与 r266
+  // conjunction-fallacy / r267 completion-evidence 同族事故）。补 g。
+  const re = new RegExp(I.HARM_DENY_ZH.source, 'g');
   let mm;
   const found = [];
   while ((mm = re.exec(s)) !== null) {

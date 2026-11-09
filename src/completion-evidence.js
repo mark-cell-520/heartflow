@@ -83,13 +83,19 @@ function checkCompletionEvidence(text) {
   }
 
   // C2: Empty verification phrasing
+  // ⚠️ [r267 lint 修复] 本数组曾混用 /g 与 /i-only 模式：三条 /i 模式
+  //    （checked ok / verification passed / all good）在下述 while exec
+  //    循环里没有 g → exec 永远返回同一匹配、lastIndex 不前进 → 命中即
+  //    死循环（r266 轮 scripts/lint-regex-exec-loops.js 实证：输入含
+  //    "checked ok" 时挂起 >12s，裸循环 200 万次不退出）。与 r266
+  //    conjunction-fallacy cmpEn 的 flags 透传事故同族，修法同款：补 g。
   const EMPTY_VERIFY = [
     /确认正常/g,
     /验证通过/g,
     /检查无误/g,
-    /checked\s+ok/i,
-    /verification\s+passed/i,
-    /all\s+good/i
+    /checked\s+ok/gi,
+    /verification\s+passed/gi,
+    /all\s+good/gi
   ];
 
   for (const pat of EMPTY_VERIFY) {
