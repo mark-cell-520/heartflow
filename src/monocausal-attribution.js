@@ -79,7 +79,9 @@ const COMPRESS_ZH = [
   /只因(?:为)?/,
   // [r267] 口语归怪族（全怪/都怪/只怪/全赖/全凭一己/全仗）——探针 2/3
   // 穿透落地：「项目失败全怪需求变更，其他都是次要的。」
-  /(?:全|都|只|就|怪)(?:怪|赖)(?:在|于)?/,
+  // [r267] 口语归怪族（全怪/都怪/只怪/全赖）——集体名词负向前查：
+  // 「全赖大家/全靠众人」是人人有份的多因陈述，不是单因归怪
+  /(?:(?:全|都|只|就)(?:怪|赖))(?!大家|所有人|每个人|诸位|全员|各位|各方|团队|众人|人人|大伙|全员)/,
   /全凭(?:一己|自己|一个人)/,
   /全仗(?:一人|自己)/,
 ];
@@ -239,7 +241,13 @@ const NEGATED_MULTI_ZH = [
 
 /* ── 主判定 ───────────────────────────────────────────────────── */
 
-function detectMonocausal(text) {
+function detectMonocausal(text, inject) {
+  // [r267] 负例注入-删条支持（同族模块约定）：R 覆盖腿常量，删条后守卫须变红
+  const R = inject || {};
+  const COMPRESS_EN_R = R.COMPRESS_EN || COMPRESS_EN;
+  const COMPRESS_ZH_R = R.COMPRESS_ZH || COMPRESS_ZH;
+  const DISMISS_EN_R = R.DISMISS_EN || DISMISS_EN;
+  const DISMISS_ZH_R = R.DISMISS_ZH || DISMISS_ZH;
   // 引擎约定（同 incredulity.js 等维度）：无命中/异常输入一律返回
   // { hit:false, score:0 } 安全对象，绝不可返回 null——index.js:2711
   // 判定点直接读 .score，null 会让整条 pipeline 抛 "Cannot read
@@ -275,18 +283,18 @@ function detectMonocausal(text) {
         !anyMatch(NEGATED_MULTI_EN, s) && !anyMatch(NEGATED_MULTI_ZH, s)) {
       const enHits = [];
       const zhHits = [];
-      collectMatches(COMPRESS_EN, s, enHits);
-      collectMatches(COMPRESS_ZH, s, zhHits);
+      collectMatches(COMPRESS_EN_R, s, enHits);
+      collectMatches(COMPRESS_ZH_R, s, zhHits);
       if (enHits.length || zhHits.length) {
         l1.push({ sentence: s, en: enHits, zh: zhHits });
       }
     }
 
     // L2：枚举 + 否认
-    if (hasEnumeration(s) && (anyMatch(DISMISS_EN, s) || anyMatch(DISMISS_ZH, s))) {
+    if (hasEnumeration(s) && (anyMatch(DISMISS_EN_R, s) || anyMatch(DISMISS_ZH_R, s))) {
       const d = [];
-      collectMatches(DISMISS_EN, s, d);
-      collectMatches(DISMISS_ZH, s, d);
+      collectMatches(DISMISS_EN_R, s, d);
+      collectMatches(DISMISS_ZH_R, s, d);
       l2.push({ sentence: s, dismiss: d });
     }
 
@@ -306,12 +314,12 @@ function detectMonocausal(text) {
       multiHere &&
       !anyMatch(NEGATED_MULTI_EN, s) &&
       !anyMatch(NEGATED_MULTI_ZH, s) &&
-      (anyMatch(COMPRESS_EN, s) || anyMatch(COMPRESS_ZH, s))
+      (anyMatch(COMPRESS_EN_R, s) || anyMatch(COMPRESS_ZH_R, s))
     ) {
       const c = [];
       const m = [];
-      collectMatches(COMPRESS_EN, s, c);
-      collectMatches(COMPRESS_ZH, s, c);
+      collectMatches(COMPRESS_EN_R, s, c);
+      collectMatches(COMPRESS_ZH_R, s, c);
       collectMatches(MULTI_EN, s, m);
       collectMatches(MULTI_ZH, s, m);
       l3.push({ sentence: s, compress: c, multi: m });
