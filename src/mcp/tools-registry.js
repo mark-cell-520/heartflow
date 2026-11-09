@@ -41,6 +41,18 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{}}
   },
 
+  // [r259] 桥接层对外能力表三处对账（r258 候选池⑩「routes() 与 MCP 侧路由探针的
+  // 接口面再核对」落地）。三张表各自手写：引擎 routes()（真值）/
+  // heartflow_bridge_status.modules（公开清单）/ BridgeIdentity.CAPABILITY_GROUPS
+  // 的 advertised 计数。r249 新增 translator.communicationBrief 时只改了第一张，
+  // 实测另外两张同时朝两个方向漂：公开清单少报一个真实能力、composite 记错组导致
+  // reachable 虚高 1（真实可达 9 报成 10）。
+  {
+    name: 'heartflow_bridge_capability',
+    description: "桥接层对外能力表三处对账的可审计轨迹（routes() × heartflow_bridge_status.modules × BridgeIdentity.CAPABILITY_GROUPS.advertised）。给出：① verdict——reconciled（三表零发现项）/ drift / mcp-table-not-provided（没喂公开清单，不是「对齐」）/ capability-surface-not-provided；② matrix——groups（对账的能力组数，固定 3：translator/agentLayer/personaCore）、routesTotal（三组 dispatch 路由数）、mcpTotal（公开清单条数）、advertisedTotal（手写 advertised 合计）、undiscoverableCapability（真实路由在公开清单里没有——外部调用方按 heartflow_bridge_status 盘点能力时永远发现不了它）、phantomEntry（公开清单列了但既不是路由也不是已登记 composite——按清单拼路由会被 dispatch 拒绝）、advertisedDrift（手写 advertised 与现场实测对不上，双向：多说=广告了调不到，少说=调得到却不说）、compositeMisassigned（把一条 dispatch 路由误登记成 composite 对象成员，reachable 会多数一个）、undeclaredComposite（公有对象成员没登记成 composite，下一张 translationPipeline 出现时必然漏报）、groupMismatch（组只在部分表里出现）；③ issues——逐条发现项（kind/severity/group/method/detail）；④ byKind、byGroup。用于回答「对外声称的桥接能力和实际可达路由还对得上吗」「哪个能力对外不可发现」。静态判定不执行业务方法，纯只读、无副作用。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","description":"trace（默认，全量）/ matrix（只要矩阵与 healthy）"}}}
+  },
+
   {
     name: 'heartflow_think',
     description: "完整思维链：分类输入→路由→推理→输出。返回结构化分析结果，包含类型、置信度和思维链。",

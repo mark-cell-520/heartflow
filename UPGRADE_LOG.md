@@ -1,3 +1,99 @@
+## r259 — 桥接层对外能力表三处漂移闭合（heartflow_bridge_status 少报真实能力 + composite 记错组虚报 reachable + BridgeIdentity.verify() 单向判据）+ BridgeCapabilityChecker 三表对账 + bridgeCapabilityTrace 可审计轨迹轮（v6.8.187）
+
+**轮次**：r259 ｜ **日期**：2026-11-09 ｜ **方向**：存量真 bug 修复（r258 候选池⑩「routes() 与 MCP 侧路由探针的接口面再核对」本轮落地——三个互不相干地漂移的接口面缺口同轮闭合）+ 新结构自检模块（BridgeCapabilityChecker）+ 新公开方法（bridgeCapabilityTrace）按约定 3 接进 MCP
+**真升级类型**：缺陷修复（`heartflow_bridge_status` 对外**少报一个真实能力** `translator.communicationBrief` + 公开清单把不可 dispatch 的 composite 与路由混在一张表 + `composite` 记错组导致 BridgeIdentity 自己数出来的 `reachable` **虚高 1**、`verify()` 只判单向抓不到这一类）+ 三表对账自检层 + 新公开方法 + 新 MCP 工具 `heartflow_bridge_capability`。三表对账发现项 **2 → 0**、`routeCount` **25 → 24**、translator `reachable` **10 → 9**、公开清单三组 **8/8/7 → 9/8/7**。MCP 工具 **192 → 193**、dispatch 路由 **1,305 不变**、判别维度 **210 不变**、引擎模块 **162 不变**。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision。按轮次协议「优先做交接簿里已知未修的真 bug」选题：r258 交接簿候选池⑩ 是「routes() 与 MCP 侧路由探针的接口面再核对」（r258 只闭合了引擎侧三张表，桥接层是否还有第二份路由表）。全部结论来自本轮实测探针（`scripts/tmp-259-probe1.js` ~ `probe6.js`，轮末已删），无记忆成分。
+- 选它而不选候选池①②③ 的理由与 r258 同款：那三条都是判别引擎侧的挂账（点名真药层跨表统一 / 过敏结果词 / 上游腿缺口），共同点是「需先论证取向」；而候选⑩ 是**结构性缺口**——轮初一探就照出**三个已经漂移完成的真缺口**，不需要构造红队证明缺口存在（缺口自己就在公开接口面上写着）。
+
+### 二、根因/缺口分析（带证据）
+
+轮初探针把描述同一批桥接能力的**三张表**摊开（`scripts/tmp-259-probe3.js` 全量实测，非抽样）：
+
+| 表 | 位置 | translator | agentLayer | personaCore |
+|---|---|---|---|---|
+| A `hf.routes()` | 引擎侧真值 | **9** 条路由 | **7** 条路由 + 1 composite | **7** 条路由 |
+| B `handleBridgeStatus().modules` | `src/mcp-server.js` 原 L1090 手写清单 | **8** 条，缺 `communicationBrief` | 8 条，含 `translationPipeline`（**非路由**） | 7 一致 |
+| C `CAPABILITY_GROUPS.advertised` | `src/bridge/bridge-identity.js` 手写计数 | `advertised 8 + composite 1` | `advertised 8 + composite 1` | `advertised 7 + composite 0` |
+
+**缺口①：公开 MCP 工具对外少报一个真实能力。** 表 B 的 translator 清单停在 r249 之前的 8 条——r249 新增的 `translator.communicationBrief`（`src/bridge/communication-brief.js`，11040 字节的真实实现）**只进了引擎 routes()**，没进这张手写清单。后果：外部调用方按 `heartflow_bridge_status` 的 `modules.translator` 盘点桥接能力时，**永远发现不了 communicationBrief**。这是 r258 653 条幽灵路由的**反方向**——r258 是「列了调不到的」，本轮是「调得到却不列」。
+
+**缺口②：公开清单把不可 dispatch 的东西和可 dispatch 的路由混在一张表。** 表 B 的 agentLayer 第 8 条 `translationPipeline` 是 `{runUser, runLLM}` **对象成员**，`routes()` 数不到、`dispatch('agentLayer.translationPipeline')` 调不了（dispatch 门禁要求 `typeof mod[method] === 'function'`）。调用方按清单拼出这条路由必被拒，而清单本身不标注哪几条是 composite。
+
+**缺口③：composite 记在错的组上，BridgeIdentity 自己数出来的 reachable 是假的。** 表 C translator `advertised:8, composite:1`——而 communicationBrief **本身就是一条 dispatch 路由**、不是 composite 对象成员。于是 `_capabilities()` 算出 `reachable = 9 路由 + 1 composite = 10`、`getIdentity().routeCount = 25`，**真实可达只有 9 / 24**。该文件头注释自己写着「capability 清单要和实际可达路由对得上，否则就是吹牛」——吹的正是自己。
+
+**两个方向、三层代价共同的根因：三张表描述同一件事，各写各的，没有一层自检看它们的一致性。** 与 r258 的 ALLOWED_ROUTES × routes() × _modules 完全同族，只是换到了桥接层。更糟的是 `BridgeIdentity.verify()` 的注释说「advertised 与 reachable 的差就是缺口」，代码却**只判了 `reachable < advertised` 一个方向**——「调得到但广告数说少了」（缺口①③）这一类恒不报，只有「广告了但调不到」（缺口②）会报。
+
+### 三、落地项
+1. **新模块 `src/core/bridge-capability-check.js`（`BridgeCapabilityChecker`，185 行非注释代码，注入式三表对账）**。判据六类，各带严重度（≥50 判不健康）：`undiscoverable_capability` 100（routes() 有、公开清单没有、也不是已声明 composite → 真实能力对外不可发现）、`group_mismatch` 90、`phantom_entry` 80（公开清单列了但既不是路由也不是已登记 composite）、`composite_misassigned` 70（把一条 dispatch 路由误登记成 composite → reachable 多数一个）、`advertised_drift` 60（手写 advertised ≠ 路由数 + composite 数，**双向**：多说=广告了调不到，少说=调得到却不说）、`undeclared_composite` 50（公有对象成员没登记 composite → 下一张 translationPipeline 出现时必然漏报）。**静态判定不执行业务方法**——三张表都是名字与计数，核对只需 typeof 读取。纪律对齐 RouteWiringChecker：输入全注入、不 require 引擎、输入缺失如实报 not_provided、**公开清单（表 B）可选注入**（修好后它由 routes() 派生，「表 A ≡ 表 B」是构造使然而非发现，所以没喂就判 `mcp_table_not_provided`，绝不反过来报一句假的 aligned）。
+2. **`handleBridgeStatus().modules` 改由 routes() 现场派生**（新函数 `_bridgeCapabilityModules()`）。派生规则 = 该组 dispatch 路由（去掉 `_` 前缀私有方法）∪ 已登记 composite 成员。引擎未就绪时如实报空并标注 `modulesSource: 'engine-not-ready'`，**不拿旧硬编码清单顶数**——顶数就是 r258/r259 一直在修的那类「承诺了调不到的能力」。新增两个加法字段 `modulesSource` / `capabilitySurface`（三表对账结论），既有 `version` / `bridgeType` / `bridgeDeclaration` / `translatorReady` 形状一字未动。
+3. **`CAPABILITY_GROUPS` 的 composite 由裸计数改为名单**（`compositeMembers`），`composite` 计数从名单推导，不再手写第二个数字：translator 名单空 + `advertised 8→9`、agentLayer 名单 `['translationPipeline']`。**composite 名单只有这一处声明**，mcp-server 与 trace 都读它，不写第二份。
+4. **`BridgeIdentity.verify()` 改双向**：新增 `undercounts`（调得到但广告数说少了），`ok` 要求 gaps 与 undercounts 都空。轮前单向判据抓不到缺口①③，改后两条变异各自翻面（见验收表）。
+5. **新公开方法 `bridgeCapabilityTrace()`**（`heartflow.js`，走 lazy registry `_BridgeCapabilityChecker`，约定 2）：verdict（reconciled / drift / mcp-table-not-provided / capability-surface-not-provided）/ matrix（groups / routesTotal / mcpTotal / advertisedTotal + 六类发现项计数）/ `publicListSource`（injected / derived-from-routes() / not-provided）/ kinds / issues / byKind / byGroup / healthy / checkedAt / note。**刻意不带 check 前缀**（causalRiteZh / riteAttributionTrace / evidenceExemptionTrace / routeWiringTrace 同款理由：orphan-dimension-scan 纪律）。默认路径现场派生公开清单，`publicListSource` 明示它是「构造使然」不是「独立实测」。
+6. **新 MCP 工具 `heartflow_bridge_capability`（约定 3 三处接线）**：`src/mcp/tools-registry.js` 工具定义（`action`: trace / matrix）+ `HANDLERS` 映射 + `handleBridgeCapability()`（两档 action，引擎未就绪返回带 `expectedParams` 的可操作错误）。**不进 WRITE_TOOLS**。顺带把 `handleBridgeCapability` / `handleBridgeStatus` 加进 `module.exports`，让测试与审计方能在不起 HTTP 服务的前提下端到端调用（8099 端口常被常驻服务占用）。
+7. **派生规则只写一份**（`derivePublicGroups`，`bridge-capability-check.js` 导出，mcp-server 与 trace 共用）——两处各写一份派生规则就等于又造了两张会漂移的表，正是本轮要修的形状。
+8. **版本 6.8.186 → 6.8.187**，`sync-version.js` + `sync-doc-numbers.js` 已跑（AGENTS.md/README.md/SKILL.md/package.json 的 MCP 工具 192→193、测试数记账、版本戳全部机器同步）；README Version history 补 v6.8.187 行。
+9. **新测试 `test/round-259-bridge-capability-reconcile.test.js`（33 断言全绿，单独跑 20.1s < runner CHILD_TIMEOUT=90000）**：A 族 5 条（注入式变异逐个复现轮前：只退公开清单 → `undiscoverable_capability` 指名 `translator.communicationBrief`；再摘 agentLayer composite 登记 → `phantom_entry` + `undeclared_composite` 双双报出 translationPipeline；advertised 全多说 1 → `advertised_drift` 3 条；少声明一组 → `group_mismatch`）；B 族 5 条（修复后三表 0 发现项 / 公开清单含 communicationBrief / translationPipeline 仍在但不是路由 / modulesSource + capabilitySurface 接线 / advertised 9 与 routeCount 24）；C 族 4 条（verify 双向：变异副本 advertised 退回 8 → undercounts 1 条、三组全 +1 → gaps 3 条；round-250 两条存量断言同口径复刻）；D 族 6 条（九段形状 + 四态 verdict + 默认路径 publicListSource=derived-from-routes() + 空表 mcp-table-not-provided + 方法名不带 check 前缀 + isReconciled）；E 族 5 条（约定 3 三处接线 + 不进 WRITE_TOOLS + 未就绪契约 + 两个子进程端到端）；F 族 4 条（round-249 / round-250 / round-251 三个存量守卫复跑 + HandlerWiringChecker 结构层 192→193 后仍 healthy）；G 族 3 条（lazy registry 锚点 + 新模块非注释代码 ≥50 行 + composite 名单化）。
+
+### 四、验收数字（全部实测）
+| 项 | 轮前 | 轮后 | 实测方式 |
+|---|---|---|---|
+| 三表对账发现项 | **2**（composite_misassigned + advertised_drift，healthy=false） | **0**（healthy=true） | test B1/A1；probe5 |
+| `BridgeIdentity.getIdentity().routeCount` | **25**（虚高 1） | **24** | test B5 |
+| translator `reachable` | **10**（9 路由 + 1 假 composite） | **9** | test B5 |
+| 公开清单三组条数（translator/agentLayer/personaCore） | 8 / 8 / 7 | **9 / 8 / 7** | test B2/B3；E5 端到端 |
+| 公开清单是否含 `translator.communicationBrief` | **否**（对外不可发现） | **是** | test B2/E5 |
+| 只退公开清单（注入变异） | — | `undiscoverable_capability` **1** 条，指名 communicationBrief | test A2 |
+| 再摘 agentLayer composite 登记（注入变异） | — | `phantom_entry` **1** + `undeclared_composite` **1**（都是 translationPipeline） | test A3 |
+| advertised 三组全多说 1（注入变异） | — | `advertised_drift` **3** 条，全部 advertised > measured | test A4 |
+| 少声明一个能力组（注入变异） | — | `group_mismatch` **1** 条（personaCore） | test A5 |
+| `verify()` advertised 退回 8（变异副本） | ok=true（单向判据漏报） | ok=false + `undercounts` **1** 条 | test C2 |
+| `verify()` 三组全 +1（变异副本） | ok=false（本来就报） | ok=false + `gaps` **3** 条 | test C3 |
+| `handleBridgeStatus` 端到端 | 手写清单，无来源标注 | `modulesSource='routes()'` + `capabilitySurface` + 9/8/7 | test E5 |
+| `heartflow_bridge_capability` handler 端到端 | — | `verdict=reconciled`、`groups=3` | test E4 |
+| 新增非注释代码 | — | **约 200 行**（bridge-capability-check.js 185 + trace/handler/接线；不含测试） | `git diff` + 剥注释统计 |
+| MCP 工具 / 路由 / 维度 / 模块 | 192 / 1,305 / 210 / 162 | **193 / 1,305 / 210 / 162** | sync-doc-numbers.js；test E1/F4 |
+| `bin/verify.js` | — | **16/16** | — |
+| bidirectional-guard | — | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r258 基线逐项一致） | — |
+| guard-abilities | — | **20/20**（dimensions 键 **210** 不变） | — |
+| doc-numbers-accuracy | — | **24/24** | — |
+| security-audit | — | 提交前 **15/16**（S2「git log/tag 未命中 6.8.187」为提交前预期失败，r236~r258 同款） | — |
+| 本轮新测试 | — | round-259 **33/33**（单独跑 20.1s） | test/round-259-bridge-capability-reconcile.test.js |
+
+### 五、全量回归与计数
+全量回归一遍（`data/round-259-regression.log`，**662 个测试文件**，exit 0）：
+
+- **总结论：19618 通过 / 155 失败 / 共 19773 个。**
+- **计数自洽**：基线 r258 = 19585 / 155 / 19740（661 文件，`data/round-258-regression.log`）。本轮 total **+33** = 新测试 round-259 的 **33 条断言**，严格对上；passed **+33**、failed **155 = 155 不变**、文件数 **+1**。
+- **「本轮引入 0 个新失败文件」的证明（逐项双向 comm，不靠总数自证）**：把本轮回归的失败清单与 r258 基线逐项 `comm` 比对——失败条目 **84 = 84**、去重后的失败文件 **75 = 75**，两个方向输出均为空（「仅本轮有」空、「仅基线有」空），**新增 0 个、消失 0 个**。噪声池与基线逐项一致：MCP 类 6 个（`knowledge-graph-mcp-state-round593` / `knowledge-layer-mcp-state-round313` / `mcp-auth-tier` / `mcp-guest-permission` / `mcp-server` / `mcp-smoke`，8099 端口被常驻服务占用）、未输出汇总行类、注册 0 用例类（`core/path-guard`、`round-410`）、`Command failed` 类 dispatch 族 16 个、文件自报失败类 5 个（`ClassicsRules searchClassicsBatch`、`AgentBoundaryGuard dot-dir`、`unsupported-claim-exemption`、`round-378 dimensionRaw` 键口径、`round-572-associative-wiring` 剩余 4 条 = r572 记录缺陷 B）。
+- **`round-250-bridge-stub-revival` 在 75 清单里的如实说明**：它在回归里被计失败（22 通过 / 1 失败），失败项是 **C1「MCP 三处接线齐全 + tools/list 186 + 新工具端到端跑通」**，原因是 `scripts/tmp-250-mcp-child.js` 这个 r250 遗留探针文件不在——与 r258 基线逐项一致（两轮都在清单里，comm 双向为空），是**存量环境噪声，不是行为失败**。本轮测试 F2 因此改成「逐条失败都必须指向 C1 + 汇总行钉死 1 条」，而不是要求零失败。
+- **直接受本轮改动影响的守卫在全量回归里逐个零失败**：round-259 **33/33**（[457/662]）、round-249 bridge 交流层复活 **37/37**、round-251 占位子系统诚实记账 **25/25**；round-250 见上一条（存量 C1）。
+
+### 六、已知未修（含为什么不修）
+1. **点名真药层跨表统一**（r257 已知未修①，候选池①续挂）——需先论证「吃了这个保健品，配着布洛芬一起吃」该不该豁免。依据层已单一词源，点名真药层仍只属服药族。
+2. **r256 已知未修①**「抗过敏药吃了一堆也没用，去庙里上香之后过敏就好了」仍不判——未碰。
+3. **r256 已知未修③上游腿缺口**——未碰。
+4. **三个 by design 未广告 handler 的曝光裁决**（r255 已知未修③：`heartflow_self_benchmark` / `heartflow_safe_fetch` / `heartflow_circuit_breaker`）——本轮探针复核了接线面（HANDLERS 193 条 × TOOLS 193 条，未广告的恰好这 3 条、广告但无 handler 的 0 条），但「要不要广告」是取向裁决（safe_fetch 出网、circuit_breaker 能手动停引擎，广告即扩大攻击面），未在本轮一个主题里夹带，续挂。
+5. **28 个无调用方占位子系统的摘除**（r251 候选池①，续挂）、**「真引用 vs 编造引用」分辨**（r254 已知未修①）、**`heartflow_translate` 的 `tone.tone` 兼容别名**（r249 G2）、**`.gitignore` 无锚定目录模式换机复扫**（r253）——均未碰。
+6. **⑨族裸标记位置化**（r225 纪律）、**lastIndex 防空匹配防护前移**、**`scripts/negative-test-rc-temporal-causal-r364.js` 临时目录隔离**、**r71 测试 G 节 idx4 zh 侧句式缺口**——本轮均未碰。
+7. **`heartflow_bridge_status` 的 `version: '3.0.0'` 仍是桥接层自己的字面量版本**，与引擎 VERSION（6.8.187）不同源——它从 v3.0 起就是交流层版本号，本轮未动（改了会打破外部调用方对 bridgeType/version 的既有期待，需另轮另裁）。
+8. **`bridgeCapabilityTrace` 只做静态对账，不实测 dispatch 业务返回值**——刻意取向：三张表都是名字与计数，静态核对即可覆盖全部三类缺口；真调业务方法有副作用（`memory.store` 会写盘）。「方法存在但调用抛参数字形错误」这一类不属接线缺口，未纳入判据（与 r258 已知未修⑧ 同口径）。
+
+### 七、踩坑
+1. **`undeclared_composite` 首版把核对宇宙取成 routes() 的全部 162 个组**，于是 `patternDetector.config` / `dataEraser.layerPaths` / `progressJudgment.coreStandards` 这类**引擎内部配置对象**全被数成「未登记能力」，一次报 **157 条纯噪声**——自检报的噪声比它要抓的缺陷多一个数量级，比没有自检更坏。修法：宇宙取「advertised 声明过的能力组」∪「公开清单里出现的组」（桥接能力面只覆盖 BridgeIdentity 声明的那几个子系统）。**沉淀：自检的核对宇宙必须与它要守的那个「面」同宽，不能顺手取系统的全集。**
+2. **`bridgeCapabilityTrace` 首版从引擎现值 `routes()` 派生公开清单，却把注入的 `routesTable` 传给 checker**——「注入空表」会派生出一份非空清单，checker 收到一张与自己 routesTable 不一致的公开清单，报出来的 drift 是假的（D2b 一照就照出 verdict=drift 而实际没漂）。修法：派生必须用**生效的那张表**（注入优先）。
+3. **`mcp-server.js` 顶层装了 `src/utils/stdio-guard.js`**：非 JSON-RPC 帧的 stdout 写入被**改道 stderr**（`HF_KEEP_STDOUT_LOGS=1` 可关）。于是任何「子进程 require mcp-server 后 `console.log(marker)` + 父进程 `out.split(marker)`」的端到端断言**拿到空 stdout**，报「Unexpected end of JSON input」——而且子进程 exit 0、不抛错，极难定位。修法：子进程 env 显式带 `HF_KEEP_STDOUT_LOGS=1`。
+4. **同一份数据两个出口必须同源同步**（r258 踩坑① 复现一次）：`kinds` 与 `issues` 少同步一行，上层 `matrix` 读 `kinds.length` 就恒报 0 而明细里躺着全部发现项。本轮 `push()` 里同源同步写成了注释里的硬约束。
+5. **「未注入」≠「对齐」也≠「漂移」**：只喂两张表时 issues 恒 0，`healthy=true` 就是拿「没测」当「测过且没问题」。本轮 `healthy` 显式要求 `source === 'injected'`（三张表齐喂），verdict 单独给 `mcp-table-not-provided` 一档（r258 踩坑②同款）。
+6. **`heartflow_bridge_capability` 首版默认路径不派生公开清单**，于是常驻实例上 `verdict` 恒为 `mcp-table-not-provided`——工具能跑但永远给不出完整结论。修法：默认派生 + `publicListSource` 明示身份（构造使然 ≠ 独立实测）。
+7. **`round-250` 的 C1 是存量失败**（`scripts/tmp-250-mcp-child.js` 探针文件不在，r250 遗留未清）——r258 基线回归日志第 1218 行同款「22 通过, 1 失败」。本轮测试 F2 因此改成「逐条失败都必须指向 C1 + 汇总行钉死 1 条」，而不是要求零失败。**沉淀：复跑存量守卫前先查基线回归日志里它是不是本来就红，否则会把存量噪声当成本轮引入。**
+
+### 八、下一轮候选池（按优先级）
+① **点名真药层跨表统一**（r257 已知未修①，需先论证「吃了这个保健品，配着布洛芬一起吃」该不该豁免）。② **r256 已知未修①**「抗过敏药吃了一堆也没用，去庙里上香之后过敏就好了」（结果词本身是机制词，腿 D 必然命中，需语义判「过敏好了」是症状消退）。③ **上游腿缺口**（r256 已知未修③，需先做 r248 同款四条候选变体的全仓碰撞面实测）。④ **三个 by design 未广告 handler 的曝光裁决**（r255 已知未修③，本轮已复核接线面：193×193、未广告恰 3 条）。⑤ **28 个无调用方占位子系统的摘除**（r251 候选池①，续挂）。⑥ **「真引用 vs 编造引用」分辨**（r254 已知未修①，需先论证「引用可指名性」子特征）。⑦ 判别引擎侧其余挂账（⑨族裸标记位置化 / lastIndex 防空匹配防护前移 / r364 临时目录隔离 / r71 idx4）。⑧ `heartflow_translate` 的 `tone.tone` 兼容别名（r249 G2）。⑨ `.gitignore` 无锚定目录模式换机复扫（r253）。⑩ **`heartflow_bridge_status` 的 `version:'3.0.0'` 与引擎 VERSION 不同源**（r259 已知未修⑦——桥接层版本号从 v3.0 起独立，改不改是取向裁决）。⑪ **`heartflow_bridge_status` 的 `modules` 派生后，「表 A ≡ 表 B」变成构造使然**——可考虑把派生结果落一份快照做跨进程对账（否则将来有人改 `derivePublicGroups` 的规则，没有任何独立判据会发现公开清单变了形状）。
+
+---
+
 ## r258 — dispatch 路由层接线矩阵（routes() 653 条私有方法泄漏修复 + 白名单 14 条陈旧条目清理）+ RouteWiringChecker 三表矩阵 + routeWiringTrace 可审计轨迹轮（v6.8.186）
 
 **轮次**：r258 ｜ **日期**：2026-11-09 ｜ **方向**：存量真 bug 修复（r255 已知未修④「结构层不覆盖 dispatch 路由层」本轮落地；两个互不相干地漂移的接口面缺口同轮闭合）+ 新自检模块（RouteWiringChecker）+ 新公开方法（routeWiringTrace）按约定 3 接进 MCP + HandlerWiringChecker 第三层

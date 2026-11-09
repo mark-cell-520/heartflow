@@ -341,6 +341,7 @@ const _Budget = _lazy('budget', () => require('./budget.js'));
 
 // [r258] dispatch 路由层接线自检（三表矩阵：ALLOWED_ROUTES × routes() × _modules）
 const _RouteWiringChecker = _lazy('routeWiringCheck', () => require('./route-wiring-check.js'));
+const _BridgeCapabilityChecker = _lazy('bridgeCapabilityCheck', () => require('./bridge-capability-check.js'));
 
 const _Graph = _lazy('graph', () => require('../memory/graph.js'));
 
@@ -899,7 +900,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-09-6.8.186';
+const BUILD_DATE = '2026-11-09-6.8.187';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -5094,6 +5095,97 @@ class HeartFlow {
       healthy: result.healthy,
       checkedAt: result.checkedAt,
       note: 'verdict=aligned 表示此刻三表零发现项（防回退哨兵，不是「曾经修好」的证明）；ghost_private/unregistered_public/stale_whitelist 任一非 0 即 drift。矩阵是静态判定，不执行业务方法。',
+    };
+    if (result.reason) out.reason = result.reason;
+    return out;
+  }
+
+  /**
+   * [r259] 桥接层对外能力表三处对账的可审计轨迹。
+   *
+   * 为什么需要它：描述同一批桥接能力的三张表（引擎 routes() / 公开清单
+   * heartflow_bridge_status.modules / BridgeIdentity.CAPABILITY_GROUPS 的
+   * advertised 计数）各自手写，r249 新增 translator.communicationBrief 时只改了
+   * 第一张，实测另外两张同时朝两个方向漂移（少报一个真实能力 + 把非路由的
+   * composite 混进路由清单 + composite 记错组导致 reachable 虚高 1）。
+   * `BridgeIdentity.verify()` 回答不了「是哪一条、哪个组、朝哪个方向漂」。
+   *
+   * 纪律（与 routeWiringTrace / evidenceExemptionTrace 同款）：
+   *   - **刻意不带 check 前缀**——scripts/orphan-dimension-scan.js 会把
+   *     `function checkXxx` 但不在 discriminate() 里的当断链维度；
+   *   - 不重复任何词表/名单：composite 名单读 BridgeIdentity.CAPABILITY_GROUPS
+   *     的单一处声明，这里只做核对；
+   *   - 公开清单（mcpGroups）**可选注入**：修好之后它由 routes() 派生，
+   *     「表 A ≡ 表 B」是构造使然而非发现，所以没喂就如实报 not_provided。
+   *
+   * @returns {{verdict:string, matrix:Object, kinds:Object, issues:Array,
+   *   byKind:Object, byGroup:Object, healthy:boolean, checkedAt:number,
+   *   note:string, reason?:string}}
+   */
+  bridgeCapabilityTrace(surface) {
+    let table = {};
+    let modules = {};
+    try { table = this.routes() || {}; } catch (e) { table = { _error: e.message }; }
+    try { modules = this._modules || {}; } catch (e) { modules = {}; }
+
+    // advertised 侧：读 BridgeIdentity.CAPABILITY_GROUPS 的单一处声明
+    let advertisedGroups = [];
+    try {
+      const { CAPABILITY_GROUPS } = require('../bridge/bridge-identity.js');
+      advertisedGroups = CAPABILITY_GROUPS.map((g) => ({
+        group: g.group,
+        advertised: g.advertised,
+        compositeMembers: Array.isArray(g.compositeMembers) ? g.compositeMembers.slice() : [],
+      }));
+    } catch (e) { advertisedGroups = []; }
+
+    const injected = surface || {};
+    const Checker = _BridgeCapabilityChecker().BridgeCapabilityChecker;
+    // 公开清单默认**现场派生**（derivePublicGroups 的同一份规则，mcp-server 的
+    // _bridgeCapabilityModules 也用它）——不注入就派生，派生不了才如实报
+    // mcp-table-not-provided。派生清单与 routes() 按构造一致，所以它在 trace 里
+    // 的身份由 publicListSource 标明，任何人不会把「构造使然」误读成「独立实测」。
+    // 注意派生必须用**生效的那张 routes()**（注入优先），不能拿引擎现值去派生——
+    // 否则「注入空表」会派生出一份非空清单，checker 收到一张与自己 routesTable
+    // 不一致的公开清单，报出来的 drift 是假的（r259 首版踩过）。
+    const effectiveTable = injected.routesTable || table;
+    const mcpGroups = injected.mcpGroups
+      || (Array.isArray(advertisedGroups) && advertisedGroups.length > 0 && Object.keys(effectiveTable).length > 0
+        ? _BridgeCapabilityChecker().derivePublicGroups(effectiveTable, advertisedGroups)
+        : null);
+    const checker = new Checker({
+      routesTable: effectiveTable,
+      advertisedGroups: Array.isArray(injected.advertisedGroups) ? injected.advertisedGroups : advertisedGroups,
+      modules: injected.modules || modules,
+      mcpGroups,
+    });
+    const result = checker.check();
+    const out = {
+      verdict: result.source === 'not_provided'
+        ? 'capability-surface-not-provided'
+        : (result.source === 'mcp_table_not_provided'
+          ? 'mcp-table-not-provided'
+          : (result.issues.length === 0 ? 'reconciled' : 'drift')),
+      matrix: {
+        groups: result.groups,
+        routesTotal: result.routesTotal,
+        mcpTotal: result.mcpTotal,
+        advertisedTotal: result.advertisedTotal,
+        undiscoverableCapability: result.kinds.undiscoverableCapability.length,
+        phantomEntry: result.kinds.phantomEntry.length,
+        advertisedDrift: result.kinds.advertisedDrift.length,
+        compositeMisassigned: result.kinds.compositeMisassigned.length,
+        undeclaredComposite: result.kinds.undeclaredComposite.length,
+        groupMismatch: result.kinds.groupMismatch.length,
+      },
+      publicListSource: injected.mcpGroups ? 'injected' : (mcpGroups ? 'derived-from-routes()' : 'not-provided'),
+      kinds: result.kinds,
+      issues: result.issues,
+      byKind: result.byKind,
+      byGroup: result.byGroup,
+      healthy: result.healthy,
+      checkedAt: result.checkedAt,
+      note: 'verdict=reconciled 表示此刻三表零发现项（防回退哨兵，不是「曾经修好」的证明）；mcp-table-not-provided 是「没喂公开清单」不是「对齐」——修好后公开清单由 routes() 派生，两张表一致是构造使然。静态核对不执行业务方法。',
     };
     if (result.reason) out.reason = result.reason;
     return out;

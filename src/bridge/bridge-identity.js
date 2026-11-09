@@ -31,12 +31,15 @@ const DOES_NOT = [
 
 // 对外声称的能力组：每组对应引擎里的一个子系统前缀。
 // advertised 是人写的期望，reachable 是现场数出来的实际值——两者对不上就是缺口。
-// composite：以对象成员形式暴露、不计入 routes() 方法数的能力（如 translationPipeline
-// 是 {runUser, runLLM} 对象，dispatch 路由表里数不到，但确实可达）。
+// compositeMembers：以对象成员形式暴露、**不计入 routes() 方法数**的能力名单
+// （translationPipeline 是 {runUser, runLLM} 对象，dispatch 路由表里数不到，
+// 但确实可达）。composite 计数由这份名单推导，不再手写第二个数字——r259 轮前
+// `composite:1` 是手写的，于是 communicationBrief（r249 新增，本身就是一条
+// dispatch 路由）被误记成 translator 的 composite，reachable 凭空多数 1 个。
 const CAPABILITY_GROUPS = [
-  { group: 'translator', advertised: 8, prefix: 'translator', composite: 1, note: 'communicationBrief 为 r249 新增，超出 v3.0 广告的 8 项' },
-  { group: 'agentLayer', advertised: 8, prefix: 'agentLayer', composite: 1, note: 'translationPipeline 是 {runUser, runLLM} 对象成员，不计入 routes() 方法数' },
-  { group: 'personaCore', advertised: 7, prefix: 'personaCore', composite: 0 },
+  { group: 'translator', advertised: 9, prefix: 'translator', compositeMembers: [], note: 'communicationBrief 为 r249 新增的一条 dispatch 路由（不是 composite 对象成员），故 advertised 8→9' },
+  { group: 'agentLayer', advertised: 8, prefix: 'agentLayer', compositeMembers: ['translationPipeline'], note: 'translationPipeline 是 {runUser, runLLM} 对象成员，不计入 routes() 方法数' },
+  { group: 'personaCore', advertised: 7, prefix: 'personaCore', compositeMembers: [] },
 ];
 
 const DECLARATION = '我是 HeartFlow 交流层：把用户输入转译给 LLM、把 LLM 输出转译给用户，' +
@@ -69,12 +72,14 @@ class BridgeIdentity {
         : []);
     return CAPABILITY_GROUPS.map((g) => {
       const names = flat.filter((r) => typeof r === 'string' && r.startsWith(g.prefix + '.'));
+      const compositeMembers = Array.isArray(g.compositeMembers) ? g.compositeMembers.slice() : [];
       return {
         group: g.group,
         advertised: g.advertised,
-        reachable: names.length + (g.composite || 0),
+        reachable: names.length + compositeMembers.length,
         dispatchable: names.length,
-        composite: g.composite || 0,
+        composite: compositeMembers.length,
+        compositeMembers,
         note: g.note || null,
         methods: names.map((r) => r.slice(g.prefix.length + 1)).sort(),
       };
@@ -104,16 +109,28 @@ class BridgeIdentity {
   }
 
   /**
-   * 自检： advertised 与 reachable 的差就是「广告了但调不到」的缺口。
-   * @returns {{ok:boolean,gaps:Array,checked:number,measured:boolean}}
+   * 自检： advertised 与 reachable 的差就是缺口。
+   *
+   * [r259] 由单向改**双向**：轮前只判 `reachable < advertised`（广告了但调不到），
+   * 于是「调得到但广告数说少了」这一类恒不报——而轮前实测的 translator 正是
+   * 这一类（advertised 8 / composite 误记 1 → reachable 报 10，真实可达 9，
+   * 两个方向各错 1，单向判据一个都抓不到）。文件头注释本来就写着「两者对不上
+   * 就是缺口」，代码只实现了一半。
+   *
+   * @returns {{ok:boolean,gaps:Array,undercounts:Array,checked:number,measured:boolean}}
+   *   gaps        广告了但调不到（advertised > reachable）
+   *   undercounts 调得到但广告数说少了（advertised < reachable）
    */
   verify() {
     const caps = this._capabilities();
-    if (!caps.length) return { ok: false, gaps: [{ group: '*', advertised: 0, reachable: 0, note: 'listRoutes 探针缺席，无法核验' }], checked: 0, measured: false };
+    if (!caps.length) return { ok: false, gaps: [{ group: '*', advertised: 0, reachable: 0, note: 'listRoutes 探针缺席，无法核验' }], undercounts: [], checked: 0, measured: false };
     const gaps = caps
       .filter((c) => c.reachable < c.advertised)
       .map((c) => ({ group: c.group, advertised: c.advertised, reachable: c.reachable, missing: c.advertised - c.reachable }));
-    return { ok: gaps.length === 0, gaps, checked: caps.length, measured: true };
+    const undercounts = caps
+      .filter((c) => c.reachable > c.advertised)
+      .map((c) => ({ group: c.group, advertised: c.advertised, reachable: c.reachable, extra: c.reachable - c.advertised }));
+    return { ok: gaps.length === 0 && undercounts.length === 0, gaps, undercounts, checked: caps.length, measured: true };
   }
 }
 

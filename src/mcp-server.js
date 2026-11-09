@@ -1069,11 +1069,88 @@ function handleAgentThink(args) {
 
 
 
+// [r259] 桥接层对外能力清单的**单一事实源**派生。
+//
+// 轮前缺陷（scripts/tmp-259-probe3.js 实测）：描述同一批桥接能力的三张表各自
+// 手写、互不派生——本函数所在的 handleBridgeStatus 是其中一张（原 L1090 硬编码
+// 三组方法名清单）。r249 新增 translator.communicationBrief 时只改了引擎
+// routes()，这张表没跟上，实测两个方向的错：
+//   · translator 少报 1 条真实能力（communicationBrief）→ 外部调用方按
+//     heartflow_bridge_status 的 modules 盘点桥接能力，永远发现不了它；
+//   · agentLayer 多列 1 条 translationPipeline——它不是 dispatch 路由（是
+//     {runUser, runLLM} 对象成员，routes() 数不到），却和可 dispatch 的路由
+//     混在同一张表里，调用方无从分辨哪些真能 dispatch。
+//
+// 修法：modules 改由 routes() **现场派生** + BridgeIdentity.CAPABILITY_GROUPS
+// 登记的 composite 成员（composite 名单也只有那一处声明，不在这里写第二份）。
+// 引擎未就绪时如实报空并标注来源，不拿旧硬编码清单顶数——顶数就是 r258/r259
+// 一直在修的那类「承诺了调不到的能力」。
+function _bridgeCapabilityModules() {
+
+  const groups = ['translator', 'agentLayer', 'personaCore'];
+  let advertisedGroups = [];
+  try {
+    const { CAPABILITY_GROUPS } = require(path.join(HF_DIR, 'src/bridge/bridge-identity.js'));
+    advertisedGroups = CAPABILITY_GROUPS.map((g) => ({
+      group: g.group,
+      advertised: g.advertised,
+      compositeMembers: Array.isArray(g.compositeMembers) ? g.compositeMembers.slice() : [],
+    }));
+  } catch (e) {
+    advertisedGroups = groups.map((g) => ({ group: g, advertised: 0, compositeMembers: [] }));
+  }
+
+  let table = null;
+  try {
+    table = (heartflow && typeof heartflow.routes === 'function') ? heartflow.routes() : null;
+  } catch (e) {
+    table = null;
+  }
+
+  if (!table || typeof table !== 'object') {
+    return { modules: {}, source: 'engine-not-ready', audit: { healthy: false, reason: 'routes() 不可用——引擎未启动或 routes() 抛错' } };
+  }
+
+  // 派生规则与 HeartFlow.bridgeCapabilityTrace 共用同一份（derivePublicGroups）——
+  // 两处各写一份派生规则就等于又造了两张会漂移的表，正是本轮要修的形状。
+  const { derivePublicGroups, BridgeCapabilityChecker } = require(path.join(HF_DIR, 'src/core/bridge-capability-check.js'));
+  const modules = derivePublicGroups(table, advertisedGroups);
+
+  // 顺手把三表对账结论带出去（加法字段，不改 modules 形状）——BridgeCapabilityChecker
+  // 静态核对，不执行业务方法。
+  let audit = null;
+  try {
+    const r = new BridgeCapabilityChecker({
+      routesTable: table,
+      advertisedGroups,
+      modules: (heartflow && heartflow._modules) || {},
+      mcpGroups: modules,
+    }).check();
+    audit = {
+      healthy: r.healthy,
+      source: r.source,
+      groups: r.groups,
+      routesTotal: r.routesTotal,
+      mcpTotal: r.mcpTotal,
+      advertisedTotal: r.advertisedTotal,
+      byKind: r.byKind,
+      issues: r.issues,
+    };
+  } catch (e3) {
+    audit = { healthy: false, reason: 'capability_check_failed: ' + e3.message };
+  }
+
+  return { modules, source: 'routes()', audit };
+}
+
 function handleBridgeStatus() {
 
   const translator = safeDispatch('translator.userToLLM', 'status', {});
 
   const identity = safeDispatch('personaCore.bridgeIdentity');
+
+  // [r259] modules 由 routes() 现场派生，见 _bridgeCapabilityModules 注释。
+  const derived = _bridgeCapabilityModules();
 
   return {
 
@@ -1085,15 +1162,11 @@ function handleBridgeStatus() {
 
     translatorReady: !!translator,
 
-    modules: {
+    modules: derived.modules,
 
-      translator: ['userToLLM', 'llmToUser', 'intentClassifier', 'toneAnalyzer', 'entityExtractor', 'implicitNeedDetector', 'responseCompressor', 'confidenceAnnotator'],
+    modulesSource: derived.source,
 
-      agentLayer: ['agentBridge', 'contextBuilder', 'responseInterceptor', 'translationPipeline', 'qualityFilter', 'followupSuggester', 'conflictResolver', 'uncertaintyHandler'],
-
-      personaCore: ['bridgeIdentity', 'judgmentInjector', 'stanceDetector', 'agentCommentary', 'valueAligner', 'personalityTone', 'metaPosition'],
-
-    },
+    capabilitySurface: derived.audit,
 
     timestamp: Date.now()
 
@@ -3622,6 +3695,32 @@ function handleRouteWiring(args) {
   }
 }
 
+// [r259] 桥接层对外能力表三处对账（AGENTS.md 约定 3 第三处：handler 函数）
+function handleBridgeCapability(args) {
+  try {
+    if (!heartflow || !heartflow.started || !heartflow._modules || Object.keys(heartflow._modules).length === 0) {
+      return { error: '引擎未就绪（bridgeCapabilityTrace 需要 started 且 _modules 非空）', expectedParams: [], timestamp: Date.now() };
+    }
+    const trace = heartflow.bridgeCapabilityTrace();
+    const action = (args && args.action) || 'trace';
+    if (action === 'matrix') {
+      return {
+        result: { verdict: trace.verdict, matrix: trace.matrix, healthy: trace.healthy, note: trace.note },
+        timestamp: Date.now(),
+      };
+    }
+    return {
+      result: {
+        trace,
+        note: 'matrix.undiscoverableCapability 是「真实能力对外不可发现」（外部调用方按 heartflow_bridge_status 的 modules 盘点桥接能力时永远少一个）；phantomEntry 是「公开清单承诺了 dispatch 调不到的东西」。verdict=mcp-table-not-provided 表示没喂公开清单——那不是对齐，是没测（修好后公开清单由 routes() 现场派生，两张表一致是构造使然而非发现）。verdict=reconciled 是防回退哨兵，不是「曾经修好」的证明。',
+      },
+      timestamp: Date.now(),
+    };
+  } catch (e) {
+    return { error: e.message, timestamp: Date.now() };
+  }
+}
+
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
@@ -3639,6 +3738,10 @@ const HANDLERS = {
   heartflow_evidence_exemption: handleEvidenceExemption,
   // [r258] dispatch 路由层接线矩阵（ALLOWED_ROUTES × routes() × _modules 三表）
   heartflow_route_wiring: handleRouteWiring,
+
+  // [r259] 桥接层对外能力表三处对账（AGENTS.md 约定 3 第二处：handler 映射）。
+  // 不进 WRITE_TOOLS——纯只读静态核对，不碰任何写权限工具。
+  heartflow_bridge_capability: handleBridgeCapability,
   // [v6.7.72] 误报反馈闭环（心虫 decision.decide 选定 0.92）
   heartflow_false_positive: handleFalsePositiveTool,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,
@@ -6478,6 +6581,12 @@ module.exports = {
     handlerNames: Object.keys(HANDLERS),
     writeTools: Array.from(WRITE_TOOLS),
   }),
+  // [r259] 两个桥接层 handler 单独导出：让 round-259 的测试（及任何审计方）能在
+  // **不起 HTTP 服务**的前提下端到端调用它们——8099 端口常被常驻服务占用，起服务
+  // 的端到端必然踩存量环境噪声。与 getWiring 同一理由：导出的必须是真 handler，
+  // 不是复制品。
+  handleBridgeCapability,
+  handleBridgeStatus,
   start: () => {
     initHeartFlow();
     server.listen(PORT, '127.0.0.1');
