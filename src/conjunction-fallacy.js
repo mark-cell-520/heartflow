@@ -292,7 +292,7 @@ const CONJ_CMP_PROB_ZH = new RegExp(CONJ_ZH_SRC_G + '[^。]{0,90}' + CMP_PROB_ZH
 const CONJ_CMP_ANCHOR_ZH = new RegExp(CONJ_ZH_SRC_G + '[^。]{0,90}' + CMP_ANCHOR_ZH);
 
 // 英文对应：both…and × more likely / better chance × than … merely/only
-const CMP_PROB_EN = '(?:more likely|more probable|higher chance|greater chance|better chance|stronger chance|likelier|better shot|better odds)';
+const CMP_PROB_EN = '(?:more likely|more probable|higher chance|greater chance|better chance|stronger chance|likelier)';
 const CMP_ANCHOR_EN = '(?:than|compared to|compared with|versus|as opposed to|rather than)[^.]{0,40}(?:merely|just|only|simply|purely|alone)|(?:merely|just|only|simply|purely)[^.]{0,40}(?:than|compared to|compared with|versus)';
 const CONJ_CMP_PROB_EN = new RegExp(CONJ_EN_SRC_G + '[^.]{0,90}' + CMP_PROB_EN, 'i');
 const CONJ_CMP_ANCHOR_EN = new RegExp(CONJ_EN_SRC_G + '[^.]{0,90}' + CMP_ANCHOR_EN, 'i');
