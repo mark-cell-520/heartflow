@@ -3526,6 +3526,37 @@ function handleWiringCheck(args) {
   }
 }
 
+// [r256] 玄学仪式归因族的可审计轨迹（约定 3 三处接线的 handler 函数）。
+// 走 require HF_DIR/src/index.js 的公开导出 riteAttributionTrace——不复制任何
+// 词表（复制一份就是会在引擎演进后说谎的副本，r255 踩坑①同款）。
+function handleRiteAttribution(args) {
+  try {
+    const text = args && args.text;
+    if (!text || typeof text !== 'string') {
+      return { error: '缺少参数 text（要审计的中文文本）', expectedParams: ['text'], timestamp: Date.now() };
+    }
+    const idx = require(path.join(HF_DIR, 'src/index.js'));
+    const trace = idx.riteAttributionTrace(text);
+    // 同时给出判别器视角的原始输出，调用方不必再调一次 checkPseudoCausal
+    const pc = idx.checkPseudoCausal(text);
+    return {
+      result: {
+        trace,
+        pseudoCausal: {
+          count: pc.count,
+          hits: pc.hits,
+          score: pc.score,
+          riteHits: (pc.hits || []).filter(h => String(h).startsWith('玄学仪式归因:')),
+        },
+        note: 'trace 的 count/hits 只统计玄学仪式归因族；pseudoCausal 是全部 14 支 + 4 个子判据的合计数。',
+      },
+      timestamp: Date.now(),
+    };
+  } catch (e) {
+    return { error: e.message, timestamp: Date.now() };
+  }
+}
+
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
@@ -3537,6 +3568,8 @@ const HANDLERS = {
   heartflow_gate_pipeline: handleGatePipeline,
   // [r255] MCP 接线自检（子系统层 + 全量结构层）
   heartflow_wiring_check: handleWiringCheck,
+  // [r256] 玄学仪式归因族的可审计轨迹（位置化护栏的逐腿/逐子句解释）
+  heartflow_rite_attribution: handleRiteAttribution,
   // [v6.7.72] 误报反馈闭环（心虫 decision.decide 选定 0.92）
   heartflow_false_positive: handleFalsePositiveTool,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,

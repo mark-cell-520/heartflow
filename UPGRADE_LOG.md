@@ -1,3 +1,126 @@
+## r256 — 玄学仪式归因族反向护栏位置化（整句豁免 → 归因带豁免）+ 可审计轨迹公开方法轮（v6.8.184）
+
+**轮次**：r256 ｜ **日期**：2026-11-09 ｜ **方向**：存量真 bug 修复（r239 G3「`PC_RITE_MECH_ZH` 仪式族仍是整句豁免」，十七轮挂账本轮落地）+ 新公开方法（`riteAttributionTrace`）按约定 3 接进 MCP
+**真升级类型**：缺陷修复（`causalRiteZh` 函数头的反向护栏从「机制词在文本任何位置即整句豁免」位置化为「机制词必须落在归因带上」四腿判据）+ 新公开方法（可审计轨迹）+ 新 MCP 工具 `heartflow_rite_attribution`。红队 **4/16 → 14/16**；全仓 A/B（54569 条）`checkPseudoCausal` count **升 1 / 降 0 / `gate.action` 差异 0**。MCP 工具 **189 → 190**、dispatch 路由 **1,319 不变**、判别维度 **210 不变**（`src/index.js` 未加判别维度）、引擎模块 **162 不变**。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision。按轮次协议「优先做交接簿里已知未修的真 bug」选题，全部结论来自本轮实测探针（`scripts/tmp-256-corpus.js` / `probe.js` / `probe2.js` / `probe3.js` / `probe4.js` / `probe5.js` / `probe6.js` / `probe7.js` / `ab.js` + HEAD worktree 副本 `data/wt-256-base`，轮末已删），无记忆成分。
+- r255 交接簿候选池①是「判别引擎侧六条挂账」（连续多轮续挂），其中 **`PC_RITE_MECH_ZH` 位置化**（r239 G3）是六条里唯一有完整方法论先例的一条——r240（`PC_HEDGE_ZH` 裸「机制」腿）、r241（`STAT_CONTEXT_ZH` 支③）、r242（`PC_MECH_WEAK_ZH`）、r239（⑪⑫⑬⑭ 四支的 `PC_SLOT_MECH_ZH`）四轮已把同族形态按「位置化」修掉，仪式族是最后一处，故选它。
+- 轮初先用全仓语料做**潜伏性盘点**，再用红队照出缺口——两个都做，因为前者证明「存量不翻车」、后者证明「缺口是真的」。
+
+### 二、根因/缺口分析（带证据）
+
+**根因：`causalRiteZh` 函数头的反向护栏是整句豁免。** `src/index.js` 原实现：
+
+```js
+if (PC_RITE_MECH_ZH.test(text)) {
+  return { count: 0, hits: [], score: 0, halves: { act: 0, res: 0, exempt: ['rite-mech'] } };
+}
+```
+
+`PC_RITE_MECH_ZH` 是三张存量机制表（`PC_REV_MECH_ZH` 机制/统计/资金 + `PC_DRUG_MECH_ZH` 点名真药/药理临床 + `PC_SUPP_MECH_ZH` 依据来源）的并集再加 15 个医疗名词，`test(text)` 覆盖**整段文本**——机制词出现在任何位置都会让整个「玄学仪式归因」族返回 0。四类非归因位全被误放：
+
+| 位置 | 形状 | 是否算依据 |
+|---|---|---|
+| 另一句的背景陈述 | 「他上个月确诊了病因，一直按时复查。这周去庙里开过光，病就好了」 | 否——说话者没把它当作这次归因的依据 |
+| 仪式动作**之前**的时序侧 | 「为了消炎他吃了三天抗生素，临走前又去庙里开过光，病就好了」 | 否 |
+| 被否定的对比位 | 「吃了抗生素根本不管用，去庙里开过光，病就好了」 | 否——说话者明确否定了它 |
+| 结果侧的附带描述 | 「他去庙里开过光，病就好了。至于病因，医生也说不清」 | 否 |
+
+**轮初全仓潜伏性盘点**（`scripts/tmp-256-probe.js`，54,569 条全仓中文 quoted 样本，甲乙同子句形状复刻 `causalRiteZh` 的扫描）：
+
+| 项 | 实测 |
+|---|---|
+| 甲乙同子句形状命中 | **46 条** |
+| 其中无机制词（正常判出） | 36 条 |
+| 其中被 `PC_RITE_MECH_ZH` 整句豁免 | **10 条** |
+| └ 机制词在形状子句内（合理豁免） | 10 条 |
+| └ **机制词在别的子句（假豁免）** | **0 条** |
+
+**这个 0 是本轮最重要的轮初发现**：整句豁免这个缺陷在存量语料上是**潜伏**的——语料里根本没有「机制词跨子句 + 仪式形状」的样本，所以只扫语料会得出「无需修」的错误结论。缺口只能靠红队照出来。
+
+**红队 16 条实测**（`scripts/tmp-256-probe2.js`，机制词分别放在别的子句 / 仪式动词上游的时序侧 / 被否定的对比位 / 归因带下游的附带描述 / 归因句之外的收尾句）：
+
+| 族 | 条数 | HEAD detector 命中 |
+|---|---|---|
+| A 跨句背景 | 5 | 1（`公司上季度感染流感…` 由第⑭支摆件覆盖） |
+| B 时序侧（机制词在仪式动词前） | 3 | 0 |
+| C 否定位 | 3 | 1（`住院输液都没治好…` 由第⑩支裸「拜」×「退了」覆盖） |
+| D 归因带下游（附带描述） | 3 | 2 |
+| E 收尾句 | 2 | 0 |
+| **合计** | **16** | **4** |
+
+**12 条漏判全部死于整句豁免**（探针逐条打印 `riteMechExempt=true`）。缺口是真实的，且与 r239 G1/G3 报告的形态逐字同构。
+
+### 三、落地项
+1. **`src/index.js` 新增 `PC_RITE_SLOT_MECH_ZH` 四腿位置化护栏**（定义在 `PC_RITE_MECH_ZH` 之后、`causalRiteZh` 之前）。**取向刀（本轮裁；r231 第五条「仪式」/r232「裸也」/…/r248 第二十一条之后的第二十二条）：机制词只有落在归因带上才算依据。** 归因带 = 显式归因链接之后、领属归责名词旁边、或仪式动词同子句的**下游**（因果断言的发出方向与乙半窗口同向）。四条腿（A/B/C 与 r239 `PC_SLOT_MECH_ZH` 前三腿同构，D 是仪式族专属）：
+   - **腿 A** 显式归因链接后 ≤16 字内机制词（复用存量 `PC_ATTR_LINK_ZH`）——**跨子句也豁免**：「…病就好了。医生说这是因为抗生素起了作用」的解释在下一句，仍是可核查依据；
+   - **腿 B** 机制词 + ≤6 字 + 领属归责名词（中文惯用倒装「…之功」）；
+   - **腿 C** 领属归责名词在前 + ≤12 字 + 机制词（「头功是排班表的」）；
+   - **腿 D** 仪式动词 + 同子句 ≤28 字 + 机制词——**只收下游，不设上游腿**：机制词在仪式动词之前时那一侧是背景/时序侧/否定对比位，说话者并没把它当作这次归因的依据（「为了消炎他吃了三天抗生素，临走前又去庙里开过光」「吃了抗生素根本不管用，去庙里开过光」）。
+   窗口一律不含句读/换行（跨子句长桥不豁免，r227/r229 同子句纪律）；`PC_RITE_SLOT_NL` 单放一个常量（直接写进字符类会变成 `[^…\n]`，被 round-324 的「代码行无残留双转义字符类」守卫当 bug 形态拦下）。四条腿各自独立命名常量（r239 坑③：变异守卫才能按名字摘单腿）。**原 `PC_RITE_MECH_ZH` 表一字未动**，四腿拼它的 `.source`——不复制第二份词表。
+2. **`causalRiteZh` 的反向护栏调用换成位置化表**：`if (PC_RITE_SLOT_MECH_ZH.test(text))`，返回值形状（`exempt: ['rite-mech']`）与 r231~r255 的守卫断言逐字不变。
+3. **`src/index.js` 新增公开方法 `riteAttributionTrace(text)`**（约 130 行非注释代码）——AGENTS.md 设计原则 #3「Auditable——每个决策保留完整推理链」在仪式族上是缺的：`causalRiteZh` 的 `exempt` 只有 `context` / `rite-mech` 两个字符串，回答不了「机制词落在哪」。位置化之后这个信息差从「看不见」变成「看得见但不给」。返回九段：`verdict`（attack / exempt / no-shape / no-text / no-chinese）、`guard`（拦下它的护栏名 + 命中片段 + 判据说明：stat-context、excl-neg-causal、hedge、prob、rite-slot-mech）、`legs`（命中的腿 A/B/C/D，各带命中片段与判据说明）、`pairs`（逐子句的 甲半→乙半 配对，含子句序号、字距、该配对的归因带内/上游/别的子句各有哪些机制词）、`mechanism`（total / inZone / upstream / otherClause / words）、`count`/`hits`/`score`/`halves`。**`count`/`hits`/`score` 与 `causalRiteZh` 是同一份计算**（同一套扫描，不是第二套实现——54,569 条全仓样本实测逐字一致 0 条差异）。刻意**不带 `check` 前缀**（`causalRiteZh` 同款理由：`scripts/orphan-dimension-scan.js` 会把 `function checkXxx` 但不在 `discriminate()` 里的当成断链维度）。**不改 `causalRiteZh` 的任何返回值。**
+4. **新 MCP 工具 `heartflow_rite_attribution`（约定 3 三处接线）**：`src/mcp/tools-registry.js` 工具定义（`required:["text"]`）+ `HANDLERS` 映射 + `handleRiteAttribution()`。handler 顺带给出判别器视角的原始 `pseudoCausal`（含筛出本族 hits），调用方不必再调一次 `checkPseudoCausal`；`text` 缺失时返回带 `expectedParams` 的可操作错误而非抛异常。**不进 WRITE_TOOLS**（r255 的 `unverified_write_safety` 纪律）。
+5. **子句偏移按分隔符逐段累加**（`clauseOffsets`），不用 `text.indexOf(clause)` 找首现——首版用 indexOf，同一子句串在句中出现两次时就指错段，`mechanism.otherClause` 分项随之说谎（本轮自踩，已在源码注释与测试 I5 记档）。
+6. **版本 6.8.183 → 6.8.184**，`sync-version.js` + `sync-doc-numbers.js` 已跑（AGENTS.md/README.md/SKILL.md/package.json 的 189→190 与版本戳全部机器记账）；README Version history 补 v6.8.184 行。
+7. **新测试 `test/round-256-rite-mech-positionalization.test.js`（31 断言全绿）**：A 族 5 条（HEAD 基数 4/16 由 `git show HEAD:src/index.js` 实测 / 现值 14/16 / 逐族点名 / 新命中全 gate 非 pass / 存量覆盖句不塌）；B 族 4 条（依据良性零误伤 + findings 不出现 pseudo_causal + 腿 A 跨子句形仍豁免 + 无结果词与存量良性零误伤）；C 族 1 条（两条仍漏登记）；**D 族 6 处变异守卫 + 还原校验**（整张位置化表 / 逐腿 A/B/C/D 各一条**只由该腿承重**的句子 / 未变异副本）；E 族 4 条（r226~r236 七份存量守卫逐个复跑不塌 / 源码锚点 / 维度 210 / 三招牌入口）；F 族 1 条（gate 热路径无性能回归）；G 族 1 条（两条仍漏 + 上游腿缺口登记）；H 族 1 条（全仓 A/B 结果静态锚点）；**I 族 8 条**（新公开方法九段形状 / 四类 verdict / 逐腿可归因 / 函数头四道护栏逐道可归因 / 机制词方位清点 / **与 `causalRiteZh` 在测试内自建的全仓语料上逐字一致** / 约定 3 三处接线 + 不进 WRITE_TOOLS + 工具名去重 / 独立子进程端到端 + handler 缺参契约）。
+
+### 四、验收数字（全部实测）
+| 项 | 轮前 | 轮后 | 实测方式 |
+|---|---|---|---|
+| 红队 16 条 detector 命中 | **4/16**（HEAD） | **14/16** | test A1（HEAD 副本）/ A2 |
+| 红队逐族 | A 1/5、B 0/3、C 1/3、D 2/3、E 0/2 | A 5/5、B 3/3、C 2/3、D 3/3、E 2/2 | test A3 |
+| 依据良性 7 条误判 | 0 | **0**（findings 也不出现 pseudo_causal） | test B1/B1b |
+| 只由位置化护栏承重的依据良性 | — | **4/4 摘表后翻面**（另 3 条函数头对冲谦辞已兜住） | test D1 |
+| 四条腿的死腿检查 | — | **4/4 各有唯一承重句**（摘该腿即翻面） | test D2/D3/D4/D5 |
+| 全仓 A/B（54,569 条中文 quoted 样本） | — | `checkPseudoCausal` count **升 1 / 降 0 / 其他形态 0**；**`gate.action` 差异 0** | scripts/tmp-256-ab.js；test H1 |
+| 全仓 A/B 唯一翻面样本的性质 | — | **UPGRADE_LOG 引用句**（机制词「测试」在「拜了菩萨」上游），与 r248 报的「1 条 UPGRADE_LOG 引用句」同族 | 同上 |
+| `riteAttributionTrace` 与 `causalRiteZh` 一致性 | — | **54,569 条逐字一致 0 条差异** | scripts/tmp-256-ab.js 同源语料；test I6（测试内自建语料复跑） |
+| 存量伪因果族守卫 | r226~r236 七份全绿 | **仍全绿**（逐个复跑） | test E1 |
+| gate 热路径（2000 次，同句同机） | HEAD **16,203ms** | **15,739ms**（−2.9%，噪声内） | test F1 |
+| 新增非注释代码 | — | **约 180 行**（`src/index.js` 位置化护栏 9 + 轨迹函数约 130 + MCP handler 约 25 + 工具定义，不含测试） | `git diff --stat` + 剥注释统计 |
+| MCP 工具 / 路由 / 维度 / 模块 | 189 / 1,319 / 210 / 162 | **190 / 1,319 / 210 / 162** | sync-doc-numbers.js；test I7/E3 |
+| `bin/verify.js` | — | **16/16** | — |
+| bidirectional-guard | — | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r255 基线逐项一致） | — |
+| guard-abilities | — | **20/20**（dimensions 键 **210** 不变） | — |
+| doc-numbers-accuracy | — | **24/24** | — |
+| security-audit | — | 提交前 **15/16**（S2「git log/tag 未命中 6.8.184」为提交前预期失败，r236~r255 同款） | — |
+| 本轮新测试 | — | round-256 **31/31** | test/round-256-rite-mech-positionalization.test.js |
+
+### 五、全量回归与计数
+全量回归跑了两遍（`data/round-256-regression.log` 第一遍、`data/round-256-regression2.log` 修完测试超时后的第二遍，均 **659 个测试文件**）：
+
+- **第一遍**：19505 通过 / 155 失败 / 共 19660 个（1380.8s 前一遍为 1484.5s，并发 4）。**本轮新测试 round-256 被 `Command failed`**——根因是测试自身 162s 超过 runner 的 `CHILD_TIMEOUT = 90000`，被 SIGKILL（见踩坑⑩）。**这一遍的数字作废**，仅用于定位超时。
+- **第二遍（本轮采信值）**：**19533 通过 / 157 失败 / 共 19690 个**。
+- **计数自洽**：基线 r255 = 19502 / 157 / 19659（658 文件）。本轮 total **+31** = 新测试 round-256 的 **31 条断言**，严格对上；passed **+31**、failed **±0**、文件数 **+1**。**没有任何存量断言数发生变化**（若位置化误伤了存量族，passed/failed 会同时动）。
+- **「本轮引入 0 个新失败文件」的证明（逐文件双向 comm，不靠总数自证）**：把本轮回归的失败文件清单与 r255（`data/round-255-regression2.log`）、r254（`data/round-254-regression.log`）两份基线的清单逐项 `comm` 比对——**两个方向输出均为空**（`comm -13`「仅本轮有」空、`comm -23`「仅基线有」空），**75 = 75 = 75 个失败文件，新增 0 个、消失 0 个**。噪声池与基线逐项一致：MCP 类 6 个（`knowledge-graph-mcp-state-round593` / `knowledge-layer-mcp-state-round313` / `mcp-auth-tier` / `mcp-guest-permission` / `mcp-server` / `mcp-smoke`，8099 端口被常驻服务占用）、未输出汇总行类 41 个、注册 0 用例类 2 个（`core/path-guard` / `round-410`）、`Command failed` 类 dispatch 族 16 个、文件自报失败类 5 个（`ClassicsRules` searchClassicsBatch / `AgentBoundaryGuard` dot-dir / `unsupported-claim-exemption` / `round-378` dimensionRaw 键口径 / `round-572-associative-wiring` 剩余 4 条 = r572 记录缺陷 B）。
+- **两遍回归的失败清单只差一个文件**：`[...run1].filter(x => !run2.has(x))` = `['round-256-rite-mech-positionalization.test.js']`，反向为空——正是踩坑⑩那个超时，第二遍修好后消失，其余 74 个文件两遍完全相同。
+- **直接受本轮改动影响的族逐个复跑零失败**：`round-231` 仪式族守卫 **25/25**（测试 E1 在测试内复跑）、`round-256` 新测试 **31/31**；`round-226` 20/20、`round-227` 18/18、`round-228` 17/17、`round-229` 18/18、`round-233` 23/23、`round-236` 21/21、`round-243` 19/19、`round-244` 23/23、`round-245` 21/21、`round-247` 22/22、`round-248` 25/25（轮初逐个复跑实测，全量回归里同样零失败）。
+
+### 六、已知未修（含为什么不修）
+1. **「抗过敏药吃了一堆也没用，去庙里上香之后过敏就好了」仍不判**（test C1/G1 登记）——「过敏」既是上游的机制词（抗过敏药）又是**结果侧的结果词**（过敏好了），腿 D 必然命中，位置切不开。要判它需要语义层区分「过敏好了」是症状消退而非依据，超出纯规则引擎能力（AGENTS.md Honest limitations 明写「obfuscation not covered by patterns is not caught」）。
+2. **「去庙里开过光之后病就好了，免疫力也跟着上来了」仍不判**（test C1/G1 登记）——「免疫力」在仪式动词下游的同子句里，落在归因带内（说话者确实把它当补充解释），按本轮取向刀照判不成立。这是取向刀的刻意一侧，不是漏判。
+3. **上游腿缺口**：机制词在仪式动词之前且同子句的形状现在能判（C1「吃了抗生素根本不管用，去庙里开过光」pc≥1），但「先说依据再说仪式」的良性叙述与它同形（「为了消炎他吃了三天抗生素，临走前又去庙里开过光」本轮已判，但它也可能是真实叙述）。**本轮只登记不设上游腿**——收上游腿会把 r231 的 3 条依据良性里「这个护身符在庙里开过光，但病情好转是因为…」之外的形状一起翻面，需先做变体碰撞面实测（r248 四条候选变体的同款方法论）再裁。
+4. **`PC_DRUG_MECH_ZH` / `PC_SUPP_MECH_ZH` 跨表医疗/依据词统一**（r236 G2 后半，十五轮挂账）——本轮未碰。
+5. **⑨族裸标记位置化**（r225 纪律）、**lastIndex 防空匹配防护前移**（r231/r233/r236~r255 十四次记过）、**`scripts/negative-test-rc-temporal-causal-r364.js` 临时目录隔离**（连续二十六次挂账）、**r71 测试 G 节 idx4 zh 侧句式缺口**（连续二十八次挂账）——本轮均未碰。
+6. **「真引用 vs 编造引用」分辨**（r254 已知未修①）——纯规则引擎固有能力边界，未碰。
+7. **`heartflow_translate` 的 `tone.tone` 兼容别名**（r249 G2）、**28 个无调用方占位子系统的摘除**（r251 候选池①）、**`.gitignore` 无锚定目录模式换机复扫**（r253 阴性但规则本身仍是潜在系统性风险）——均未碰。
+8. **结构层不覆盖 dispatch 路由层**（r255 已知未修④，1,319 条 `ALLOWED_ROUTES` 与桥接层路由的接线矩阵需另一张表）——未碰。
+9. **三个 by design 未广告 handler 的曝光裁决**（r255 已知未修③：`heartflow_self_benchmark` / `heartflow_safe_fetch` / `heartflow_circuit_breaker`）——未碰。
+
+### 七、踩坑
+1. **「扫语料得出无需修」是错的**——轮初 54,569 条语料里机制词跨子句的假豁免 **0 条**，如果只做语料盘点就会结论「整句豁免无实际影响」而挂账下一轮。**潜伏型缺陷必须配红队**：语料证明「存量不翻车」，红队证明「缺口是真的」，两个口径缺一不可。这一条比本轮任何代码改动都更值得沉淀。
+2. **首版 I 族 D3/D4 的「单腿承重句」自己绊倒自己**：把「…之功」放在没有结果词的第二句（「去庙里开过光。复盘下来，处方药之功最大」），整句不构成甲乙形状，句子本来就 pc=0——摘不摘腿都一样，变异守卫恒真（实测 0 !== 1）。修法：**单腿承重句必须让形状在场**（甲半乙半同子句），腿 B/C 的句子改成「去庙里开过光，病就好了。说到底处方药之功最大」——形状在第一句，腿 B 的「…之功」在第二句，摘掉腿 B 才真的翻面。
+3. **首版 I6 的一致性比对拿 `checkPseudoCausal` 的 count 与轨迹的 count 比**——前者是全部 14 支 + 4 个子判据的合计数，后者只统计仪式族，实测 601 条「不一致」全是我的比对口径错，不是代码错。修法：从 `pc.hits` 里筛「玄学仪式归因:」前缀即本族贡献，改口径后 54,569 条逐字一致 0 条差异。
+4. **首版 `mechSummary` 的 `otherClause` 用 `pairs.every(...)` 反推**，同一个词在多个配对的上游时会被重复计入，语义说不清。改成「词的 clause 不在任何配对的 clause 集合里」并按词种去重；同时把 `total = inZone + upstream + otherClause` 的错觉在注释里明确否定（三个分项是去重词种数，不互斥）。
+5. **子句偏移不能用 `text.indexOf(clause)`**——`split` 不返回分隔符位置，用 indexOf 找子句串的**首现**，同一子句串在句中出现两次时就指错段，机制词被记到错误子句上，`otherClause` 分项随之说谎。改成按分隔符逐段累加 `clauseOffsets`（含空尾段），`clauseOf(absIdx)` 二分式查找。
+6. **`node -e` 里带反引号的长中文串会被 bash 当命令替换执行**——往 README 补记录时用 `node -e "…"` 传含反引号的 markdown，bash 把 `` `heartflow_rite_attribution` `` 当子命令执行，README 被写进一堆 command not found 垃圾。只能 `git checkout -- README.md` 回滚后用 Edit 工具重写。**含反引号/`$()` 的文本一律走文件工具，不走 `node -e`。**
+7. **`git worktree add data/wt-256-base HEAD` 之后 `sync-doc-numbers.js` 会把 worktree 里的文件也扫一遍**，报出 40+ 处「维度数 50 ≠ 210」的假差异（worktree 里是旧版文档）。A/B 做完就 `git worktree remove --force` + `git worktree prune`，再跑记账脚本。
+8. **`scripts/tmp-256-ab.js` 首版对每条样本调 3 次 `gate()` × 2 棵树**，54,569 条要跑 13 分钟以上，后台 10 分钟被 kill。改成：`gate()` **只在 `checkPseudoCausal` 有差异的样本上**调（本轮改动只可能经 pseudo_causal 影响 gate.action——pc 输出逐字相同则下游不可能变），整轮 A/B 降到 2 分钟内跑完。
+9. **加 MCP 工具的固定成本本轮为零**：r255 已把 `round-251:309` / `round-252:422` / `round-572:39` 三处写死的工具总数改成「≥ 历史值 + 与注册表去重计数一致」的形态，本轮 189→190 没有点亮任何存量失败。**这条纪律是 r255 踩坑⑧的直接回报。**
+10. **新测试被 runner 的 `CHILD_TIMEOUT = 90000` SIGKILL 成「Command failed」**（本轮实踩，代价是整整一轮全量回归作废重跑）——首版测试 162s：E 族复跑 r226~r236 七份存量守卫约 80s + F 族用 `gate()` 各 2000 次约 32s。两处都砍：**① E 族只复跑直接受本轮改动影响的 r231**（15.7s），其余伪因果族守卫由全量回归覆盖（它们本来就在 run-all 里跑，测试内复跑是冗余的）；**② F 族把基准从 `gate()` 换成 `checkPseudoCausal()`**——本轮改动只碰 `causalRiteZh`，`checkPseudoCausal` 才是正确基准，且快 100 倍（2000 次 80ms vs 约 16000ms），`gate` 口径的数字改记在报告里。砍完 40.4s，稳定落在 90s 以内。**纪律：新测试落笔第一件事是 `spawnSync` 量一次总耗时，超过 60s 就要砍**——runner 的超时是 90s 且杀进程时连汇总行都不留，症状是「Command failed」而不是「断言失败」，极易被误判成代码 bug。
+
 ## r255 — MCP 接线自检从「8 条」扩到「全量 189 工具 × 192 handler」+ heartflow_active_inference 装饰性实现修复轮（v6.8.183）
 
 **轮次**：r255 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（r253 交接簿候选池③「HandlerWiringChecker 扩到全量 187 个 MCP 工具」本轮落地；扩量过程中新查出一个真装饰工具）

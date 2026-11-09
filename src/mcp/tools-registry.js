@@ -10,6 +10,16 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"action":{"type":"string","enum":["check","structural","tools","write"],"description":"check=两层合查（默认）；structural=只跑全量接线矩阵；tools=导出 工具×handler 宽表；write=只核对写权限白名单"}},"required":["action"]}
   },
 
+  // [r256] 玄学仪式归因族的可审计轨迹（设计原则 #3：每个决策保留完整推理链）。
+  // causalRiteZh 的 exempt 只有 'context'/'rite-mech' 两个字符串，回答不了「机制词
+  // 落在哪」——r256 把整句豁免位置化成四腿之后，这个信息差从「看不见」变成「看得见
+  // 但不给」。本工具把逐腿命中、逐子句配对、机制词方位全部导出。纯只读。
+  {
+    name: 'heartflow_rite_attribution',
+    description: "玄学仪式归因族（pseudo_causal 第⑮支子判据 causalRiteZh）的可审计轨迹。对输入文本逐层给出：① verdict——attack（判）/ exempt（不判，含拦下它的那道护栏）/ no-shape（无甲乙形状）/ no-text、no-chinese；② guard——拦下它的护栏名与命中片段（stat-context 统计语境 / excl-neg-causal 排除性否定归因 / hedge 对冲谦辞 / prob 统计谦辞 / rite-slot-mech 位置化机制护栏）；③ legs——位置化护栏命中的腿（A 显式归因链接后 ≤16 字内机制词、B 机制词+领属归责倒装、C 领属归责在前+机制词、D 仪式动词同子句 ≤28 字下游机制词），每条带命中片段与判据说明；④ pairs——逐子句的 甲半→乙半 配对（子句序号、字距、该配对的归因带内/上游/别的子句各有哪些机制词）；⑤ mechanism——机制词清点（total/inZone/upstream/otherClause/words）；⑥ count/hits/score/halves 与 causalRiteZh 逐字一致（同一份计算，不是第二套实现）。用于回答「你为什么不判这句」——机制词落在归因带上（该豁免）与落在仪式动词上游或别的子句（r256 之前被整句豁免误放）在返回值里一眼可分。纯只读、无副作用。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"要审计的中文文本"}},"required":["text"]}
+  },
+
   {
     name: 'heartflow_think',
     description: "完整思维链：分类输入→路由→推理→输出。返回结构化分析结果，包含类型、置信度和思维链。",

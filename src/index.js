@@ -8520,6 +8520,44 @@ const PC_RITE_RES_ZH = new RegExp('(?:' + PC_TAKE_RES_ZH.source + '|' + PC_RESJO
 // 是第⑫⑬⑭ 支的历史决定，本轮不改它的既有豁免面。
 const PC_RITE_MECH_ZH = new RegExp('(?:' + PC_REV_MECH_ZH.source + '|' + PC_DRUG_MECH_ZH.source + '|' + PC_SUPP_MECH_ZH.source
   + '|抗生素|处方|对症|治愈|病程|病毒|细菌|感染|炎症|过敏|确诊|复发|耐药|停药|免疫力|抵抗力|病理|病灶)');
+// ─── [v6.8.184 第 256 轮] 仪式族反向护栏位置化：整句 → 归因带 ────────────
+// 根因（r239 G3，十七轮挂账）：PC_RITE_MECH_ZH.test(text) 是**整句**豁免——
+// 机制词出现在文本任何位置都会让整个 causalRiteZh 返回 0，包括：另一句里的
+// 背景陈述、仪式动作**之前**的时序侧、被说话者否定的对比位、结果侧的附带
+// 描述。轮初红队实测（scripts/tmp-256-probe2.js，16 条）HEAD 只命中 4/16，
+// 12 条全部死于整句豁免。同族形态在 r240（PC_HEDGE_ZH 裸「机制」腿）、
+// r241（STAT_CONTEXT_ZH 支③）、r242（PC_MECH_WEAK_ZH）、r239（⑪⑫⑬⑭ 四支
+// 的 PC_SLOT_MECH_ZH）已按「位置化」修掉四轮，仪式族这一张是最后一处。
+//
+// 取向刀（本轮裁；r231 第五条「仪式」/r232「裸也」/…/r248 第二十一条之后的
+// 第二十二条）：**机制词只有落在归因带上才算依据**。归因带 = 显式归因链接
+// 之后、领属归责名词旁边、或仪式动词同子句的**下游**（因果断言的发出方向
+// 与乙半窗口同向）。机制词在仪式动词**之前**时，那一侧是背景/时序侧/否定
+// 对比位——说话者并没有把它当作这次归因的依据（「为了消炎他吃了三天抗生素，
+// 临走前又去庙里开过光，病就好了」「吃了抗生素根本不管用，去庙里开过光」），
+// 照判。
+// 四条腿（A/B/C 与 r239 PC_SLOT_MECH_ZH 前三腿同构，D 是仪式族专属）：
+//   腿 A 显式归因链接后 ≤16 字内机制词——**跨子句也豁免**：「…病就好了。
+//         医生说这是因为抗生素起了作用」的解释在下一句，仍是可核查依据；
+//   腿 B 机制词 + ≤6 字 + 领属归责名词（中文惯用倒装「…之功」）；
+//   腿 C 领属归责名词在前 + ≤12 字 + 机制词（「头功是排班表的」）；
+//   腿 D 仪式动词 + 同子句 ≤28 字 + 机制词——**只收下游**，上游不设腿
+//         （见上方取向刀）。窗口不含句读/换行：跨子句长桥不豁免
+//         （r227/r229 同子句纪律）。
+// 四条腿各自独立命名常量（r239 坑③：变异守卫才能按名字摘单腿）。
+// 全仓碰撞面实测（scripts/tmp-256-probe3.js，54569 条全仓中文 quoted 样本）：
+// 甲乙同子句形状命中 46 条，旧整句豁免 10 条 → 新位置化豁免 9 条，
+// **翻面 1 条**且是 UPGRADE_LOG 引用句（「存量测试文件里 1 条同族攻击句…」
+// 里的机制词「测试」在「拜了菩萨」上游）——与 r248 全仓 A/B 报的「1 条是
+// UPGRADE_LOG 引用句」同族同性质。
+const PC_RITE_SLOT_NL = '\\n';
+const PC_RITE_SLOT_LEG_A = '(?:' + PC_ATTR_LINK_ZH.source + '[^。，,]{0,16}(?:' + PC_RITE_MECH_ZH.source + '))';
+const PC_RITE_SLOT_LEG_B = '(?:' + PC_RITE_MECH_ZH.source + '[^。，,]{0,6}(?:的功劳|之功|首功|头功))';
+const PC_RITE_SLOT_LEG_C = '(?:(?:的功劳|之功|首功|头功)[^。，,]{0,12}(?:' + PC_RITE_MECH_ZH.source + '))';
+const PC_RITE_SLOT_LEG_D = '(?:' + PC_RITE_ZH.source + '[^。！？；;' + PC_RITE_SLOT_NL + ']{0,28}(?:' + PC_RITE_MECH_ZH.source + '))';
+const PC_RITE_SLOT_MECH_ZH = new RegExp([
+  PC_RITE_SLOT_LEG_A, PC_RITE_SLOT_LEG_B, PC_RITE_SLOT_LEG_C, PC_RITE_SLOT_LEG_D,
+].join('|'));
 /**
  * [v6.8.159 第 231 轮] 中文「玄学仪式归因」族检测
  *
@@ -8530,7 +8568,9 @@ const PC_RITE_MECH_ZH = new RegExp('(?:' + PC_REV_MECH_ZH.source + '|' + PC_DRUG
  * 判据形状（三半 AND，缺一不命中）：
  *   甲半 PC_RITE_ZH：庙宇仪式动词/场所（开光/求签/拜/上香/还愿/念经/庙里…）
  *   乙半 PC_RITE_RES_ZH：甲半之后 ≤24 字内（**同一子句**）出现症状消退/获益结果
- *   反向 PC_RITE_MECH_ZH：机制/医疗/统计依据在场 → 正常归因，不判
+ *   反向 PC_RITE_SLOT_MECH_ZH：机制/医疗/统计依据落在**归因带**上 → 正常归因，
+ *         不判（[v6.8.184 第 256 轮] 由整句 PC_RITE_MECH_ZH 位置化而来，理由见
+ *         该常量上方注释块）
  *
  * @param {string} text
  * @returns {{count:number, hits:string[], score:number,
@@ -8547,8 +8587,11 @@ function causalRiteZh(text) {
     || PC_HEDGE_ZH.test(text) || PC_PROB_ZH.test(text)) {
     return { count: 0, hits: [], score: 0, halves: { act: 0, res: 0, exempt: ['context'] } };
   }
-  // 反向护栏：真实依据/点名真药/替代解释在场 → 这是正常归因，不是伪因果
-  if (PC_RITE_MECH_ZH.test(text)) {
+  // 反向护栏：真实依据/点名真药/替代解释**落在归因带上** → 这是正常归因，不是
+  // 伪因果。[v6.8.184 第 256 轮] 由 PC_RITE_MECH_ZH.test(text) 整句豁免改为
+  // PC_RITE_SLOT_MECH_ZH 位置化豁免——机制词在别的子句、仪式动词上游（背景/
+  // 时序侧/否定对比位）时不再豁免（轮初 16 条红队 HEAD 4/16 → 13/16）。
+  if (PC_RITE_SLOT_MECH_ZH.test(text)) {
     return { count: 0, hits: [], score: 0, halves: { act: 0, res: 0, exempt: ['rite-mech'] } };
   }
   // 逐子句扫描：先按句号/问号/感叹号切句，甲半与乙半必须落在**同一子句**
@@ -8586,6 +8629,169 @@ function causalRiteZh(text) {
     hits,
     score: Math.min(0.8, 0.5 + (hits.length - 1) * 0.1),
     halves: { act: actN, res: resN, exempt: [] },
+  };
+}
+// ─── [v6.8.184 第 256 轮] 玄学仪式归因族的**可审计轨迹** ─────────────────
+// 为什么需要它：AGENTS.md 设计原则 #3「Auditable——每个决策都保留完整推理链」。
+// causalRiteZh 只回 count/hits/score/halves，四个字段里没有一个能回答「你**为什么**
+// 不判」——exempt 只有 'context' / 'rite-mech' 两个字符串，调用方（MCP 工具、上层
+// agent）拿到 'rite-mech' 时无从判断机制词是落在归因带上（该豁免）还是落在仪式
+// 动词上游/别的子句（r256 之前被整句豁免误放，现在仍可能被腿 A 的跨子句形豁免）。
+// r256 把整句豁免位置化成四腿之后，这个信息差从「看不见」变成「看得见但不给」。
+//
+// 返回形状（与 causalRiteZh 同源同表，**不重复任何词表**）：
+//   verdict      'attack' 判 / 'exempt' 不判（含 guard）/ 'no-shape' 无形状 / 'no-text'
+//   guard        拦住的那道护栏：{ name, matched, detail }；没拦时为 null
+//   legs         位置化护栏命中的腿（A/B/C/D 子集）+ 每条腿的命中片段
+//   pairs        逐子句的 甲半→乙半 配对（clause 序号、距离、机制词在配对的上游还是下游）
+//   mechanism    机制词清点：{ total, inZone, upstream, otherClause }
+//   count/hits/score/halves  与 causalRiteZh 逐字一致（同一份计算，不是第二套实现）
+// 纪律：**不改 causalRiteZh 的任何返回值**（r231~r255 的守卫全钉在旧形状上）；
+// 本函数是只读诊断，零副作用，可被 MCP 工具与上层 agent 直接调用。
+function riteAttributionTrace(text) {
+  const NO_TEXT = {
+    verdict: 'no-text', guard: null, legs: [], pairs: [],
+    mechanism: { total: 0, inZone: 0, upstream: 0, otherClause: 0 },
+    count: 0, hits: [], score: 0, halves: { act: 0, res: 0 },
+  };
+  if (!text || typeof text !== 'string') return NO_TEXT;
+  if (!/[一-鿿]/.test(text)) return { ...NO_TEXT, verdict: 'no-chinese' };
+  const clauses = text.split(/[。！？!?]/);
+  // 子句绝对偏移：split 不返回分隔符位置，按分隔符逐段累加才拿得到真实 offset
+  // （首版用 text.indexOf(clause) 找首现——同一子句串在句中出现两次时就指错段，
+  //  机制词会被记到错误的子句上，otherClause 分项随之说谎）。
+  const SEP = /[。！？!?]/g;
+  const clauseOffsets = [];
+  {
+    let pos = 0;
+    SEP.lastIndex = 0;
+    let sm;
+    while ((sm = SEP.exec(text)) !== null) {
+      clauseOffsets.push({ start: pos, end: sm.index, text: text.slice(pos, sm.index) });
+      pos = sm.index + 1;
+    }
+    clauseOffsets.push({ start: pos, end: text.length, text: text.slice(pos) });
+  }
+  const clauseOf = (absIdx) => {
+    for (let i = 0; i < clauseOffsets.length; i++) {
+      if (absIdx >= clauseOffsets[i].start && absIdx < clauseOffsets[i].end) return i;
+    }
+    return clauseOffsets.length - 1;
+  };
+  const mechAll = [];
+  for (const mm of text.matchAll(new RegExp(PC_RITE_MECH_ZH.source, 'g'))) {
+    mechAll.push({ word: mm[0], index: mm.index, clause: clauseOf(mm.index) });
+  }
+  // ① 函数头四道护栏（与 causalRiteZh 同序同表，逐道报是哪一道拦的）
+  const headGuards = [
+    ['stat-context', STAT_CONTEXT_ZH, '方法学/统计语境在场（与 r220 的 STAT_CONTEXT_ZH 同表）'],
+    ['excl-neg-causal', null, '排除性否定归因在场（「不是因为A而是因为B」类）'],
+    ['hedge', PC_HEDGE_ZH, '对冲谦辞在场（不好归因/也可能/样本太小/同期…）'],
+    ['prob', PC_PROB_ZH, '统计谦辞在场（概率/相关/显著性/p值…）'],
+  ];
+  for (const [name, re, detail] of headGuards) {
+    if (name === 'excl-neg-causal') {
+      if (hasExclNegCausal(text)) {
+        return { verdict: 'exempt', guard: { name, matched: null, detail }, legs: [], pairs: [], mechanism: mechSummary(mechAll, []), count: 0, hits: [], score: 0, halves: { act: 0, res: 0 } };
+      }
+      continue;
+    }
+    const g = text.match(re);
+    if (g) {
+      return { verdict: 'exempt', guard: { name, matched: g[0], detail }, legs: [], pairs: [], mechanism: mechSummary(mechAll, []), count: 0, hits: [], score: 0, halves: { act: 0, res: 0 } };
+    }
+  }
+  // ② 位置化护栏：逐腿报命中片段（顺序与 PC_RITE_SLOT_MECH_ZH 的 join 一致）
+  const legDefs = [
+    ['A', PC_RITE_SLOT_LEG_A, '显式归因链接后 ≤16 字内机制词（跨子句也豁免——解释在下一句仍是可核查依据）'],
+    ['B', PC_RITE_SLOT_LEG_B, '机制词 + ≤6 字 + 领属归责名词（中文惯用倒装「…之功」）'],
+    ['C', PC_RITE_SLOT_LEG_C, '领属归责名词在前 + ≤12 字 + 机制词（「头功是排班表的」）'],
+    ['D', PC_RITE_SLOT_LEG_D, '仪式动词 + 同子句 ≤28 字 + 机制词（只收下游——上游那一侧是背景/时序侧/否定位）'],
+  ];
+  const legs = [];
+  for (const [leg, src, detail] of legDefs) {
+    const g = text.match(new RegExp(src));
+    if (g) legs.push({ leg, matched: g[0], detail });
+  }
+  // ③ 逐子句配对（复刻 causalRiteZh 的扫描，额外记距离与机制词方位）
+  const pairs = [];
+  let actN = 0;
+  let resN = 0;
+  for (let i = 0; i < clauses.length; i++) {
+    const clause = clauses[i];
+    if (!clause) continue;
+    const clauseStart = clauseOffsets[i].start;
+    const actRe = new RegExp(PC_RITE_ZH.source, 'g');
+    let m;
+    while ((m = actRe.exec(clause)) !== null) {
+      if (actRe.lastIndex === m.index) actRe.lastIndex++;
+      actN++;
+      const win = clause.slice(m.index + m[0].length).slice(0, 24);
+      const res = win.match(PC_RITE_RES_ZH);
+      if (!res) continue;
+      resN++;
+      const actAbs = clauseStart + m.index;
+      const resAbs = clauseStart + m.index + m[0].length + win.indexOf(res[0]);
+      // 归因带 = 同子句内 甲半 → 乙半结束 + 32 字（腿 D 的窗口同源，跨子句不算）
+      const zone = mechAll.filter(x => x.clause === i && x.index >= actAbs && x.index <= resAbs + 32);
+      pairs.push({
+        clause: i,
+        act: m[0],
+        res: res[0],
+        distance: resAbs - actAbs,
+        mechanismInZone: zone.map(x => x.word),
+        mechanismUpstream: mechAll.filter(x => x.clause === i && x.index < actAbs).map(x => x.word),
+        mechanismOtherClause: mechAll.filter(x => x.clause !== i && x.clause >= 0).map(x => x.word),
+      });
+    }
+  }
+  const hits = pairs.map(p => '玄学仪式归因:' + p.act + '→' + p.res);
+  const count = hits.length;
+  const score = count > 0 ? Math.min(0.8, 0.5 + (count - 1) * 0.1) : 0;
+  if (legs.length > 0) {
+    return {
+      verdict: 'exempt',
+      guard: { name: 'rite-slot-mech', matched: legs.map(l => l.leg).join(''), detail: legs.map(l => '腿 ' + l.leg + '：' + l.detail).join('；') },
+      legs, pairs,
+      mechanism: mechSummary(mechAll, pairs),
+      count: 0, hits: [], score: 0,
+      halves: { act: actN, res: resN, exempt: legs.map(l => l.leg) },
+    };
+  }
+  if (count === 0) {
+    return { verdict: 'no-shape', guard: null, legs: [], pairs: [], mechanism: mechSummary(mechAll, []), count: 0, hits: [], score: 0, halves: { act: actN, res: resN } };
+  }
+  return {
+    verdict: 'attack', guard: null, legs: [], pairs,
+    mechanism: mechSummary(mechAll, pairs),
+    count, hits, score,
+    halves: { act: actN, res: resN },
+  };
+}
+// 机制词清点。三个分项是**去重后的词种数**，互不互斥都不保证——同一个词可能
+// 同时在配对 A 的上游和配对 B 的归因带里（真实语料里「过敏」就是这样：既是上游
+// 的机制词又是结果侧的症状词）。要的是「有多少机制词根本没进归因带」，
+// 不是互斥分类，所以不写 total = inZone + upstream + otherClause。
+// pairs 为空（护栏先拦下）时三个分项都是 0，只留 total 与 words。
+function mechSummary(mechAll, pairs) {
+  const inZone = new Set();
+  const upstream = new Set();
+  const otherClause = new Set();
+  const pairClauses = new Set(pairs.map(p => p.clause));
+  for (const p of pairs) {
+    for (const w of p.mechanismInZone) inZone.add(w);
+    for (const w of p.mechanismUpstream) upstream.add(w);
+  }
+  for (const x of mechAll) {
+    if (x.clause < 0) continue;
+    if (pairClauses.size > 0 && !pairClauses.has(x.clause)) otherClause.add(x.word);
+  }
+  return {
+    total: mechAll.length,
+    inZone: inZone.size,
+    upstream: upstream.size,
+    otherClause: otherClause.size,
+    words: mechAll.map(x => x.word),
   };
 }
 function checkPseudoCausal(text) {
@@ -17059,6 +17265,13 @@ module.exports = {
   checkEvidence,
   checkUnsupportedClaim,
   checkPseudoCausal,
+  // [v6.8.184 第 256 轮] 玄学仪式归因族的可审计轨迹（设计原则 #3）：
+  // causalRiteZh 的 exempt 只有 'context'/'rite-mech' 两个字符串，回答不了
+  // 「机制词落在哪」。本函数给出逐腿命中、逐子句配对与机制词方位，且
+  // count/hits/score/halves 与 causalRiteZh 逐字一致（同一份计算）。
+  // 刻意**不带 check 前缀**——causalRiteZh 同款理由：会被
+  // scripts/orphan-dimension-scan.js 当成断链维度。
+  riteAttributionTrace,
   checkSoftDeflection,
   checkContradiction,
   checkVagueness,
