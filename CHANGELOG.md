@@ -1,3 +1,29 @@
+# 6.8.156 变更日志条目
+
+## [6.8.156] - 2026-11-09
+
+### 新增
+- **第232维度 `motivated_reasoning`（诉诸动机 / Bulverism）接线**（用户指令「全面审计→全面修复→同步」，本轮 r257 遗留完整模块接入）：`src/motivated-reasoning.js`（18426 字节）此前 git 未跟踪、index.js 零引用、dimensions 未登记——维度白做。按 `affirming_disjunct` 既有「九处一次接齐」模式接 import + calc + dimMap/allDims + dimensions×2 + VERIFY list 五类六处；维度数 231→232，VERIFY 188→189。模块实测：中/英攻击样本 hit:true score:70，良性与三段论 hit:false。
+
+### 修复
+- **[HIGH] MemoryBank 静默丢库**：`src/memory/memory-bank.js` 解密失败时直接 `starting fresh`，下次 save 用新密钥覆盖旧密文 → 密钥找回也读不回，构成永久数据丢失。新增 `_backupUndecryptableBank()`：解密失败先把密文 `cp` 至 `<bank>.undecryptable.<ISO时间戳>.bak` 再 fresh。本轮实测生成 `data/memory-bank.json.undecryptable.2026-11-09T02-45-32-404Z.bak`（2183 字节，完整保留）。
+- **check-domain-coverage 外部语料缺失崩溃**：`scripts/check-domain-coverage.js` 缺语料文件（如 `/root/.hermes/skills/daizhigev20/儒藏/孝经/孝经.txt`）时抛 ENOENT 崩掉整轮审计。改为 `fs.existsSync()` 守卫：缺失记 `SKIP (语料缺失: <path>)` 并 continue，带 `skipped/checked` 计数——外部依赖随机器不同，非代码 bug。
+- **6 处 orphan import 清理**：`debugLog`（engine-behavior / engine-constructor / engine-initializer）、`checkInput`（aipay-server）、`FIELD`（decision-router）、`SPECIAL_MODULES`（engine-dispatcher）。仅删全文件出现 1 次（即 import 行本身）的符号；出现 2 次的 `checkOutput`/`DecisionDomainClassifier`/`instantiateSpecialModule` 确认非 orphan 全部 SKIP。
+
+### 文档
+- README/SKILL/AGENTS 维度 231→232、verify 188→189、Verify-level 列举标题同步；README/SKILL 规格表版本戳 6.8.155→6.8.156；VERSION/package.json 6.8.156。
+
+### 验证
+- G1 verify 16/16（0 fail）、G2 guard-abilities 21 passes、G3 doc-numbers 24/24、G4 双向门禁通过、G5 变体矩阵 done、引擎 smoke start OK
+- 新维度直测：`fallacy_of_relevance` 攻击 true / 良性 false；`affirming_disjunct` 5 条攻击（中英）5/5 命中、5 类良性 0 误伤；`motivated_reasoning` 中英攻击 true、良性 false
+- `dimension-registry-guard`：checkXxx 50 / discriminate 绑定 42 / dimensions 键 232，全部被使用维度均已登记
+
+### 已知边界
+- `src/index.js` 16754 行 > 14000 阈值——拆分是高危路径级手术，未批准、仅计划级。
+- npm audit 2 high（libvips CVE-2026-33327/33328/35590/35591）未处理。
+- 5 个单族维度待补样本：`prompt_injection`、`code_security`、`instrumental_reasoning`、`social_norm`、`hasty_generalization`。
+- `HEARTFLOW_AES_KEY` 仍未设置，MemoryBank 每次启动仍走 fresh 路径（现已自动备份，不再永久丢失）。
+
 # 6.8.155 变更日志条目
 
 ## [6.8.155] - 2026-11-09

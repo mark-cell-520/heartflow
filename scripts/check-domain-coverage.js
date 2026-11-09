@@ -13,8 +13,15 @@ const files=[
  ['八大人觉经','/root/.hermes/skills/daizhigev20/佛藏/乾隆藏/大乘单译经/佛说八大人觉经.txt'],
  ['金刚经','/root/.hermes/skills/daizhigev20/佛藏/乾隆藏/大乘单译经/金刚经.txt'],
 ];
+let skipped=0, checked=0;
 for (const [name,path] of files) {
+  // [audit 2026-11-09] 语料目录随机器不同（本机无 daizhigev20 儒藏/道藏/佛藏）：
+  // 缺文件时记 SKIP 并继续，不抛 ENOENT 崩掉整轮审计。
+  if (!fs.existsSync(path)) { console.log(name.padEnd(10)+' => SKIP (语料缺失: '+path+')'); skipped++; continue; }
   const text=fs.readFileSync(path,'utf-8');
   const d=matchDomain(text);
   console.log(name.padEnd(10)+' => '+(d?d.id:'null').padEnd(22)+' ('+text.length+' chars)');
+  checked++;
 }
+if (checked===0) { console.log('domain-coverage: 0 个语料可用（全部 SKIP），本机无儒藏/道藏/佛藏语料'); }
+else { console.log('domain-coverage: '+checked+' 个已检查, '+skipped+' 个 SKIP'); }

@@ -1,6 +1,6 @@
 # 心虫审计高频发现与修复模式
 
-> 十一类在全面审计中反复出现的发现，每类含：识别签名 → 修法 → 验证。修法均为最小改动、可批量（execute_code Python 脚本），禁删防崩设计只做诚实化。
+> 十二类在全面审计中反复出现的发现，每类含：识别签名 → 修法 → 验证。修法均为最小改动、可批量（execute_code Python 脚本），禁删防崩设计只做诚实化。
 
 ## 1. 假能力报健康（stub / 假全局类）
 
@@ -124,6 +124,36 @@ console.log('engramRecall:', r._engramRecall);                    // undefined =
 **修法**：条件断言改「先断言行存在再比对」：`assert.ok(rows['X'] !== undefined, '规格表缺少 X 行');` 放在原 if 之前；地板值随实测增长维护（留约 10% 余量，如 162 → >= 150）。
 
 **验证**：门禁全绿（严格化后仍全过 = 规格表形状完好）；抽删一行确认红灯（证明守卫真的在看）。
+
+## 12. 孤儿导入（import 了从不使用的符号）
+
+**签名**：`const { StyleEngine } = require('./style-engine.js')` 而文件体再无 `StyleEngine`；`const crypto = require('crypto')` 从未使用。高发源：多 AI 并发编辑留下的死 import，以及「删掉某符号最后调用点」的修复轮没复查 import 区。
+
+**识别（execute_code 批量扫全仓；某符号全文出现 <2 次 = 只剩 import 行自己）**：
+```python
+import os, re
+ORPHANS = []
+for root, dirs, files in os.walk('src'):
+    dirs[:] = [d for d in dirs if d != 'node_modules']
+    for f in files:
+        if not f.endswith('.js'): continue
+        p = os.path.join(root, f)
+        text = open(p, encoding='utf-8').read()
+        for m in re.finditer(r"^[ \t]*const[ \t]*\{([^}]+)\}[ \t]*=[ \t]*require\(", text, re.M):
+            for sym in m.group(1).split(','):
+                sym = sym.split(':')[-1].strip()          # 重命名导入取本地名
+                if sym and len(re.findall(r"\b" + re.escape(sym) + r"\b", text)) < 2:
+                    ORPHANS.append((p, sym))
+        for m in re.finditer(r"^[ \t]*const[ \t]+(\w+)[ \t]*=[ \t]*require\(", text, re.M):
+            if len(re.findall(r"\b" + m.group(1) + r"\b", text)) < 2:
+                ORPHANS.append((p, m.group(1)))          # ← 补回漏掉的右括号
+for p, s in ORPHANS: print('ORPHAN', p, s)
+print('total', len(ORPHANS))
+```
+
+**修法**：整行删；lazy loader 形态（`const _Xxx = _lazy('key', () => require(...))`）与 require 赋值行成对删。批量删用同一脚本断言命中数再替换，不用子代理 patch 大文件。
+
+**验证**：`node --check` 每个被改文件 + 引擎加载冒烟 + 重跑扫描确认 total 归 0。注释里提到的名字算命中（宁可漏报不可误删）；动态引用（`obj[name]`）不在扫描范围，删前人工确认。
 
 ## 通用纪律
 

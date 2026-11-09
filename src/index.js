@@ -875,6 +875,9 @@ const { checkFallacyOfRelevance } = require('./fallacy-of-relevance.js');
 // [r256] 第 231 维度 affirming_disjunct（或然析取肯定）计算点。
 // adx——affirming disjunct 缩写（ad 已被其它用途占用风险，grep 0 命中无冲突）。
 const { checkAffirmingDisjunct } = require('./affirming-disjunct.js');
+// [audit 2026-11-09] 第 232 维度 motivated_reasoning（诉诸动机/Bulverism）
+// 计算点。mr——motivated reasoning 缩写，grep 0 命中无冲突。
+const { checkMotivatedReasoning } = require('./motivated-reasoning.js');
 // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
 // confusion of the inverse：P(E|I) 的概率数值在方向翻转后原样沿用为
 // P(I|E)，检察官谬误的结构形）。src/conditional-transposition.js 28KB
@@ -2266,6 +2269,8 @@ function discriminate(text, evidence = [], contentMode) {
   // [r256] 第 231 维度 affirming_disjunct（或然析取肯定）计算点。
   // adx——affirming disjunct 缩写，grep 0 命中无冲突。
   const adx = _applyPedagogyRelaxation(checkAffirmingDisjunct(_normText), "affirming_disjunct", pedagogyRelaxation);
+  // [audit 2026-11-09] 第 232 维度 motivated_reasoning（诉诸动机）计算点。
+  const mr = _applyPedagogyRelaxation(checkMotivatedReasoning(_normText), "motivated_reasoning", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -2908,6 +2913,7 @@ function discriminate(text, evidence = [], contentMode) {
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: for_.score, name:'fallacy_of_relevance'},
     {score: adx.score, name:'affirming_disjunct'},
+    {score: mr.score, name:'motivated_reasoning'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3461,6 +3467,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r256] 第 231 维度 affirming_disjunct（或然析取肯定）补登记。
     // adx——affirming disjunct 缩写。同上：九处一次接齐。
     affirming_disjunct: adx,
+    // [audit 2026-11-09] 第 232 维度 motivated_reasoning（诉诸动机）补登记。
+    // mr——motivated reasoning 缩写。同上：九处一次接齐。
+    motivated_reasoning: mr,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -5086,6 +5095,9 @@ function discriminate(text, evidence = [], contentMode) {
     // fallacy_of_relevance(230)/whole_part_transfer(170) 的射程边界见
     // src/affirming-disjunct.js 头注释。
     'affirming_disjunct',
+    // [audit 2026-11-09] 第 232 维度 motivated_reasoning（诉诸动机/Bulverism：
+    // 以动机推定替代对论点实质内容的回应）。
+    'motivated_reasoning',
     // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
     // confusion of the inverse：P(E|I) 的数值在方向翻转后原样沿用为
     // P(I|E)——「这种病检测阳性的概率是 95%，所以得了这种病检测阳性的
@@ -5715,6 +5727,9 @@ function discriminate(text, evidence = [], contentMode) {
       // [r256] 第 231 维度 affirming_disjunct 补登记（或然析取肯定）。
       // adx——affirming disjunct 缩写。同上：九处一次接齐。
       affirming_disjunct: adx,
+      // [audit 2026-11-09] 第 232 维度 motivated_reasoning 补登记（诉诸动机）。
+      // mr——motivated reasoning 缩写。同上：九处一次接齐。
+      motivated_reasoning: mr,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,

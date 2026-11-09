@@ -74,7 +74,7 @@ if (!IS_SANDBOX && AIPAY.serviceId === 'api_mock_service_id') {
 
 // ─────────────────── 2. 业务侧：沿用原判别逻辑 ───────────────────
 
-const { checkOutput, checkInput, runPipeline } = require('./gate.js');
+const { checkOutput, runPipeline } = require('./gate.js');
 
 // 受收费保护的资源：未支付返回 402，已支付返回资源内容
 const PAID_RESOURCES = {

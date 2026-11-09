@@ -47,6 +47,21 @@ const DECAY_RATES = {
 
 const LAYER_ORDER = ['core', 'learned', 'ephemeral'];
 
+
+// [AUDIT-FIX 2026-11-09] 解密失败时先把不可解密的密文备份，再 starting fresh。
+// 原行为：直接丢弃 + 后续 save 覆盖，密文永久丢失，密钥找回也读不回来。
+function _backupUndecryptableBank(bankPath, reason) {
+  try {
+    if (!fs.existsSync(bankPath)) return;
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const backupPath = bankPath + ".undecryptable." + stamp + ".bak";
+    fs.copyFileSync(bankPath, backupPath);
+    console.warn("[MemoryBank] 密文已备份至 " + backupPath + "（原因: " + reason + "）。设回原 HEARTFLOW_AES_KEY 后可从该备份恢复。");
+  } catch (e) {
+    console.warn("[MemoryBank] 备份不可解密密文失败（不影响启动）:", e.message);
+  }
+}
+
 class MemoryBank {
   constructor(options = {}) {
     // 可选：注入已有的 MemoryAdapter/MeaningfulMemory 实例，共享底层存储
@@ -151,6 +166,7 @@ class MemoryBank {
       logger.info('MemoryBank', `Loaded memory bank (${encStatus}): ${this.memories.size} memories, ${this.sessions.size} sessions`);
     } catch (e) {
       console.warn('[MemoryBank] Failed to load memory bank, starting fresh:', e.message);
+      _backupUndecryptableBank(bankPath, e.message);
     }
   }
 
@@ -202,6 +218,7 @@ class MemoryBank {
       logger.info('MemoryBank', `Loaded memory bank (${encStatus ? 'encrypted' : 'plaintext'}): ${this.memories.size} memories, ${this.sessions.size} sessions`);
     } catch (e) {
       console.warn('[MemoryBank] Failed to load memory bank, starting fresh:', e.message);
+      _backupUndecryptableBank(bankPath, e.message);
     }
   }
 

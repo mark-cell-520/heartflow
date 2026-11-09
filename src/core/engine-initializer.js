@@ -4,7 +4,7 @@
  * Wraps the original start() body so heartflow.js stays small.
  */
 
-const debugLog = require('../utils/debug-log');
+
 const { logger } = require('../utils/logger');
 const path = require('path');
 const { _getConfig, _runSelfImprovementHealthCheck, getSelfImprovementHealth } = require('./engine-state');

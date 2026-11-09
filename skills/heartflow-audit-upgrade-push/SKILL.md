@@ -1,6 +1,6 @@
 ---
 name: heartflow-audit-upgrade-push
-version: "1.9.0"
+version: "1.10.0"
 title: "心虫审计→并发修复→验证→推送 全流程"
 description: |
   心虫大规模升级工作流：全量审计→分类问题→并发修复→验证→推送GitHub。
@@ -31,7 +31,7 @@ tags:
 
 动手前先确认没有别人在写同一个仓库：
 1. `cronjob action=list` + `ps aux | grep -E "claude -p|mcp-server"` 看有无活跃 cron/会话
-2. 心虫 cron 在跑 → `cronjob action=pause` 升级与每日审计两个任务，paused_reason 写明"全面审计修复中，防并发写仓库"；全链收尾后 resume
+2. 心虫 cron 在跑 → 按 `cronjob action=list` 的**实际枚举**逐个 pause（不凭记忆写死名字和数量——cron 集随实例增长：升级、每日审计、定时统推、多机 claims 轮次都可能写同一仓库），paused_reason 写明"全面审计修复中，防并发写仓库"；把 paused 的 job_id 列表记在上下文，全链收尾后**按同一列表**逐个 resume——漏 resume 一个就是一条永久停掉的定时任务
 3. `git status --short` 必须干净再开工；有半成品（上一轮未提交的维度实现等）先看清归属，绝不覆盖别人的在途工作
 4. 推送前置检查提前做（不依赖审计结果，可与子代理并行）：积压 commit 类型统计、隐私闸预扫（`git diff <remote>..HEAD --name-only | grep -iE '\.env$|\.key$|secret|credential|token|\.pem$'` 必须为空）、大模型文件检查（onnx/dat/bin/model）、token 验权（`curl -sI -H "Authorization: token $TOKEN" https://api.github.com/user` 的 x-oauth-scopes 含 repo）
 
@@ -138,7 +138,7 @@ cronjob action=list
 16. **侦察探针留在仓库根目录** — `tmp-probe-*.js` 一类临时探针落根目录会被打包、误追踪、污染 diff。侦察落盘统一 `scripts/round-<NNN>/`；探针含真实数据时转正保留（改头注释说明轮次与用途），引用它的地方（UPGRADE_LOG、src 注释）同步更新，转正后 `grep -rn` 复核旧名残留为 0。
 17. **门禁输出里固定计数与增长计数被混用** — 同一份门禁输出常同时含「全部 20 项能力检查通过」（固定基线哨兵数）与「dimensions 键: 211 个」（随升级增长）；解析脚本把两者混为一谈会得出 52/52 或直接解析失败。修解析前先读脚本实际输出原文，把两类数字分开匹配，再各自断言基线。
 
-**修复模式速查**：`references/audit-fix-patterns.md`（诚实化/三表接线/豁免双闸/身份提权/fail-closed 门禁/泄漏逐出/加密轮换范围/被吞错误探针/跨 await 状态/守卫严格化十一类高频发现的修法模板）
+**修复模式速查**：`references/audit-fix-patterns.md`（诚实化/三表接线/豁免双闸/身份提权/fail-closed 门禁/泄漏逐出/加密轮换范围/被吞错误探针/跨 await 状态/守卫严格化/孤儿导入十二类高频发现的修法模板）
 
 每个子代理输出格式：
 每个子代理输出格式：```
@@ -472,7 +472,7 @@ LEFTHOOK=0 git push "https://USERNAME:$TOKEN@github.com/OWNER/REPO.git" main:mai
    - 维度/模块/工具/路由数取**合并后实测值**（`scripts/measure-claimed-numbers.js`），随后 `sync-doc-numbers.js` 全量同步 + `--check` 复绿；CONTRIBUTING.md/CURRENT_STATE.md 两份活文档是既有漏网户，跟着修
    - VERSION/package.json/SKILL.md 版本号两边相同就保持，不为合并额外 bump
 3. **合并后必须重跑五门禁 + 冒烟**（不是只跑冒烟）：两条线的变更组合可能产生单线各自全绿、组合红的花样。典型回归形态——**验证脚本 teardown 竞态**：被检代码新增 await 边界（如先例查询接入 think() 开头）后，"同步阶段 stop() 引擎、之后才 await 异步检查"的验证脚本会让续跑撞 started 检查整项挂（verify 16 项必挂 1 项）。判据：任何 verify 脚本的 stop/teardown 必须位于 `Promise.all(checkResults)` 之后。
-4. **收尾三件套**：push 后 `git ls-remote` 复核远端 HEAD=本地且 `<remote>/main..HEAD | wc -l` 为 0 → `supervisorctl restart heartflow-mcp` + `/health` 与 `heartflow_status` 确认新版本新模块数 → resume 两个 cron，`cronjob list` 确认 enabled/state=scheduled/next_run_at，`cat ~/hermes1/cron/ticker_heartbeat` 确认调度器活着。
+4. **收尾三件套**：push 后 `git ls-remote` 复核远端 HEAD=本地且 `<remote>/main..HEAD | wc -l` 为 0 → `supervisorctl restart heartflow-mcp` + `/health` 与 `heartflow_status` 确认新版本新模块数 → 按暂停时记录的 job_id 列表逐个 resume（不是固定"两个"——cron 数量随实例增长，漏恢复的定时任务不会自愈），`cronjob list` 确认 enabled/state=scheduled/next_run_at，`cat ~/hermes1/cron/ticker_heartbeat` 确认调度器活着。
 
 ### 推送策略（当网络环境复杂时）
 
@@ -1048,6 +1048,8 @@ done
 21. **修 secret 类字符串前必须验原始字节**：agent 自己的工具输出层会把 key/token 类字符串脱敏显示（文件里明明是 `$INSTABOX_API_KEY`，终端/grep 输出显示成 `$INSTA...KEY` 一类形态，各次还可能不同）——照显示文本判定「文件里是坏变量」并去"修"正确文件，是真实差点发生的误修。规矩：任何「密钥被写坏」的发现，先用 `execute_code` 读原始字节（`repr()` + `.encode().hex()`）或 `subprocess.run(['git','show','HEAD:'+f], capture_output=True)` 拿 stdout decode 复核（两条路都绕开输出脱敏层），再决定改不改；显示文本与 hex 冲突时以 hex 为准。
 22. **并发 fan-out 后先看 `git diff --stat` 的删除数，再看新增**（2026-11-08 实战）：三个子代理共写同一仓库，其中一个把「性能优化」做成了**破坏性回退**——用 `.bak` 回填导致 `src/automation-bias.js` -504、`src/framing-effect.js` -250、`src/index.js` -126，同时抹掉四个已上线维度的接线（226/227/228/229）与另一路刚补的 7 个入口守卫，而它的自报全是正面措辞。判据：优化类改动若删除行数接近或超过新增行数，且删除集中在全局接入点（index.js 的注册/接线区），它就是回退不是优化。处置：`git diff <file> > x.patch` 先存档 → `git checkout -- .` 回到 HEAD → 逐 hunk 读过再 `git apply` 只重放合法部分。fan-out 的汇总阶段，父任务对每个子代理的「已修复/已优化」一律以 `git log` + `git diff --stat` + 门禁实跑复核，不信自报。
 23. **add/add 冲突先在沙箱预演，并用符号集证明「取上游」不丢东西**（2026-11-08 实战）：两侧独立实现同一新文件时（本例 `src/prosecutors-fallacy.js` 两套零重叠符号），`git checkout --theirs` 是赌不是解。三步验证：① `comm -23` 对比两侧 `^(const|let|function)` 符号集，列出对方没有的符号；② 把「本地独有符号」对应的回归样本逐条打一遍上游实现（本例本地独有的医学腿修复，上游注释提了但正则没覆盖，实测本地样本 miss 才暴露）；③ 整个 rebase 在 `git clone --no-hardlinks` 的沙箱里跑完整流程并跑门禁，全绿后才在真实仓库重复同样步骤。另外 jsonl 账本（claims.jsonl 一类）合并后必须逐行 `json.loads` 校验——上游历史缺陷会把两条记录写成一行（`}{`），并集后仍留着。
+
+24. **孤儿导入（import 了从不使用的符号）** — 解构导入的每个符号名在该文件出现次数必须 ≥2（import 行自身 + 至少一处使用），计数为 1 即孤儿；整行 require 赋值同理。删调用点的同一轮必须复查被 touch 文件的 import 区——死 import 会伪装成「这个依赖还活着」，让后来者误判接线状态。修法：整行删，lazy loader 的 `_Xxx` 与 require 赋值行成对删。验证：`node --check` + 引擎加载 + 计数复测归 0。批量识别脚本见 `references/audit-fix-patterns.md` 第 12 节。
 
 ---
 

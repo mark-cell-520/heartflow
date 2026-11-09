@@ -6,7 +6,7 @@
 
 const path = require('path');
 const debugLog = require('../utils/debug-log');
-const { instantiateSpecialModule, SPECIAL_MODULES } = require('./module-registry');
+const { instantiateSpecialModule} = require('./module-registry');
 
 const _perf = {
   _enabled: false,

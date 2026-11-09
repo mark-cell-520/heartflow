@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-231-blueviolet.svg)](#what-it-catches-231-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-232-blueviolet.svg)](#what-it-catches-232-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-231 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+232 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  12,911 passing tests  ×  2 npm dependencies
 ```
 
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (231 dimensions) -> gate
+scope-check -> premise-check -> discriminate (232 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (231 dimensions)
+## What it catches (232 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **188 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **189 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.155**. Not marketing copy.
+Measured on this repository at **v6.8.156**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 231 |
+| Discrimination dimensions | 232 |
 | MCP tools | 184 |
 | Test suite | 12,911 passing / 108 failing | `node test/run-all.js` (full run 2026-11-06; failed set is pre-existing runner/flaky noise — 5 self-reported failures in upstream tests (ClassicsRules/path-guard/mcp-server/pipeline/round-378) + 48 no-summary-line, none introduced by r227; r227 added researcher-degrees-of-freedom/sorites/ecological tests, all passing) |
 | Capability guard | 20 / 20 checks |
@@ -383,6 +383,7 @@ duplicate the log.
 | Version | Date | Change |
 |---------|------|--------|
 | 6.8.155 | 2026-11-09 | **第231维度 affirming_disjunct（肯定析取 / affirming a disjunct）上线（r256 并发接线）+ 第230维度 fallacy_of_relevance 功能修复** — 新文件 src/affirming-disjunct.js；fallacy_of_relevance 补三项修复：① 否定极性盲区（「不支持…所以必须支持」族因 2-gram 碎片共享实词整族 miss，改用前段否定词干判别）；② INFER_ZH 补论证意图族（「却想用这个证明」等，答非所问类无推断词致切分返回 null）；③ 日常情境→自身心境豁免（SCENE_ZH × MOOD_ZH 成对，「天气不错所以心情很好」属正当因果）。 |
+| 6.8.156 | 2026-11-09 | **第232维度 motivated_reasoning（诉诸动机 / Bulverism）接线（用户指令「全面审计→全面修复→同步」）** — r257 遗留的完整模块 `src/motivated-reasoning.js`（18426 字节）此前 git 未跟踪、index.js 零引用、dimensions 未登记，维度白做；按 `affirming_disjunct` 既有模式接 import + calc + dimMap/allDims + dimensions×2 + VERIFY list 六处，维度数 231→232、VERIFY 188→189，模块实测中英攻击 hit:true score:70、良性 false。**[HIGH] MemoryBank 静默丢库修复**：`src/memory/memory-bank.js` 解密失败时先 `cp` 密文至 `<bank>.undecryptable.<ISO>.bak` 再 starting fresh（原行为直接丢弃、后续 save 覆盖 → 密钥找回也读不回），本轮实测生成 2183 字节备份。**check-domain-coverage 缺语料崩溃修复**：`fs.existsSync` 守卫，缺失记 SKIP 不崩整轮审计。**6 处 orphan import 清理**（debugLog×3 / checkInput / FIELD / SPECIAL_MODULES，仅删零引用符号）。文档口径同步 README/SKILL/AGENTS 维度 231→232、verify 188→189、版本戳 6.8.156。验证：五门禁全绿（verify 16/0、guard 21 passes、doc-numbers 24/24、双向通过、变体矩阵 done）+ 引擎 smoke OK + dimension-registry-guard 232 键。 |
 | 6.8.154 | 2026-11-09 | **第230维度 fallacy_of_relevance（不相干结论 / ignoratio elenchi）上线（r254 立项，r255–r256 收尾）** — 新文件 src/fallacy-of-relevance.js；中文 2-gram 零共享判据 + 全文中英文豁免四件套（META_CONCEPT/TEACH/QUESTION/NUMERIC_BRIDGE）先于切分 + 正当因果桥接豁免（INVEST×OUTCOME 成对、体育→健康独立域）；变体矩阵 9/9 正向 + 3/3 良性。 |
 | 6.8.153 | 2026-11-09 | **第229维度 undistributed_middle（中项不周延）上线 + 全局稳定性加固（r253 审计）** — ① P1 修复：undistributed_middle 未命中返回 null 导致 checkOutput 全量崩溃（commit 6d42f8c6），另修 9 个 check\* 维度函数（checkPseudoProfundity / circular_reasoning / survivor_time_bias / whole_part_transfer / necessity_sufficiency_confusion / activity_outcome_confusion / proxy_metric_goal 等）收到非字符串输入时直接 `text.match()` 解引用的崩溃，统一入口守卫 `if (typeof text !== 'string') text = String(text ?? '')`——206 个 check\* 函数 × 14 类输入动态探测 2884 次调用由崩溃 16 次降为 0；② 性能：`dangerous-instruction.js` `_matchAll` 的 5 个豁免正则提为模块级常量，消除每次调用的 361 次重复编译（CPU profile 实测单次 discriminate 编译 782 个正则，其中该函数占 46%），语义零变化、dangerous-instruction 测试 33/33 通过；③ coordination 体系整理：DEPLOY-agent2/agent3 标注历史退场状态（无宿主部署目录、claims 零认领、reports 止于 r213/r214），DEPLOY-agent4 补「两处部署体系」说明与当前写权限表；④ 撤销一次误操作恢复：agent 用 .bak 回填导致工作区同时丢失 226/227/228/229 四维接线与 automation-bias / framing-effect 内容（index.js -126 行），已完整恢复 HEAD 并只重打合法优化。维度数 228→229，VERIFY 185→186，模块 161 不变。验证：五门禁 verify 16/16、guard 20/20（229 键）、doc 24/24、双向召回 52/52 误拦 302/326（较基线 301 改善）。 |
 | 6.8.152 | 2026-11-08 | **r252 补登记 undistributed_middle 计算点与 9 个维度入口守卫** — 本地独有产能固化，为 6.8.153 的前置。 |

@@ -1,3 +1,49 @@
+## r257 收尾 — 第232维度 `motivated_reasoning` 接线 + 全面审计四项修复（用户指令「全面审计→全面修复→同步」）
+
+**日期** 2026-11-09  **操作方** cron（自主升级轮，本地 commit，按指令同步远端）
+
+### 方向与来源
+- **方向** 全面审计 → 修复 → 同步三段流程；本段登记审计段发现并已修复的 4 项 + r257 遗留维度接线
+- **来源** 内部路径：`src/motivated-reasoning.js`（r257 新建未接线）+ 审计段探针脚本 `audit-phase2/3*.sh`、`audit-fix*.sh`（`/root/hermes1/cache/scratch/`）
+
+### 修复 1 — MemoryBank 静默丢库（HIGH，静默数据丢失）
+- **现象**：`data/memory-bank.json` 头部为加密格式，`HEARTFLOW_AES_KEY` 未在 shell 设置 → 每次启动 `Decryption failed ... starting fresh`
+- **根因**：`src/memory/memory-bank.js` 解密失败后直接 fresh，**下次 save 用新密钥覆盖旧密文** → 即使密钥找回也读不回，构成永久数据丢失
+- **修复**：注入 `_backupUndecryptableBank(bankPath, reason)` helper——解密失败先把密文 `cp` 至 `bankPath + ".undecryptable." + <ISO时间戳> + ".bak"` 再 fresh
+- **实测**：重跑引擎 smoke，自动生成 `data/memory-bank.json.undecryptable.2026-11-09T02-45-32-404Z.bak`（2183 字节，完整保留），start OK
+
+### 修复 2 — check-domain-coverage 缺语料崩溃
+- **根因**：脚本直接 `readFileSync` 外部语料，缺文件（如 `/root/.hermes/skills/daizhigev20/儒藏/孝经/孝经.txt`）抛 ENOENT，崩掉整轮审计（rc=1）
+- **修复**：`fs.existsSync(path)` 守卫，缺失记 `SKIP (语料缺失: <path>)` 并 continue，带 `skipped/checked` 计数——外部依赖随机器不同，非代码 bug
+- **实测**：rc=1 → rc=0
+
+### 修复 3 — 6 处 orphan import 清理
+- 删除确认全文零使用的符号：`debugLog` ×3（`engine-behavior.js` / `engine-constructor.js` / `engine-initializer.js`）、`checkInput`（`aipay-server.js`）、`FIELD`（`decision-router.js`）、`SPECIAL_MODULES`（`engine-dispatcher.js`）
+- SKIP 出现 2 次的 `checkOutput` / `DecisionDomainClassifier` / `instantiateSpecialModule`（非 orphan，保留）
+- 修复前 8 个目标文件全部 `cp` 备份至 `/root/hermes1/cache/scratch/*.bak`
+
+### 修复 4 — r257 第232维度 `motivated_reasoning` 接线
+- **发现**：`src/motivated-reasoning.js`（18426 字节，时间戳 2026-11-09 10:40:14）git 未跟踪、全仓库 0 引用、index.js 未 import、dimensions 未登记——**完整但未接线的模块，维度白做**
+- **接线**：按 `affirming_disjunct` 既有「九处一次接齐」模式，接 import + calc + `{score,name}` + `dimensions` 块 ×2 + VERIFY list 五类六处
+- **前置自测**：攻击-中文 hit:true score:70、攻击-英文 hit:true、良性 false、良性-三段论 false
+- **登记复核**：`dimension-registry-guard.js` dimensions 键 **231 → 232**；`mr` 变量 6 处引用；登记点 10 处（含注释）
+
+### 验证数据（全部本轮实测）
+- G1 `bin/verify.js` → **16 passed / 0 failed**
+- G2 `scripts/guard-abilities.js` → **21 passes**（motivated_reasoning 新增 checkXxx 绑定通过 registry guard，由 20 增至 21）
+- G3 `test/doc-numbers-accuracy.test.js` → 接入后一度回归 **15/24**（文档维度 231 vs 代码 232），同步 README/SKILL/AGENTS 维度 231→232、verify 188→189、Verify-level 列举标题后复跑 **24/24**
+- G4 `scripts/bidirectional-guard.js` → 通过
+- G5 变体矩阵 `scripts/round-531-sample-matrix.js` → done（rc=0；注意路径在 `scripts/` 而非 `test/`）
+- 引擎 smoke → start OK
+- `dimension-registry-guard` → checkXxx 50 / discriminate 绑定 42 / dimensions 键 232 / summary 引用 150，全部被使用维度均已登记
+- 新维度直测：`fallacy_of_relevance` 攻击 true / 良性 false；`affirming_disjunct` 4 中文 + 1 英文攻击 5/5 命中、5 类良性 0 误伤；`motivated_reasoning` 中英攻击 true、良性 false
+
+### 已知边界（未处理，如实记录）
+- `src/index.js` 16754 行 > 14000 阈值——拆分是高风险路径级手术，未批准、仅计划级
+- npm audit 2 high（libvips CVE-2026-33327 / 33328 / 35590 / 35591）未处理
+- 5 个单族维度待补样本：`prompt_injection`、`code_security`、`instrumental_reasoning`、`social_norm`、`hasty_generalization`
+- `HEARTFLOW_AES_KEY` 仍未设置，MemoryBank 每次启动仍走 fresh 路径（现已自动备份，不再永久丢失）
+
 ## r256 收尾 — 第231维度 `affirming_disjunct` 接线 + 第230维度 `fallacy_of_relevance` 三项功能修复
 
 **日期** 2026-11-09  **操作方** cron（自主升级轮，本地 commit，不推送）

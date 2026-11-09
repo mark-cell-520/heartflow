@@ -1,5 +1,5 @@
 // [v6.0.71] 常量已提取到 decision-router-config.js
-const { DecisionDomainClassifier, FIELD } = require('./decision-domain-classifier.js');
+const { DecisionDomainClassifier} = require('./decision-domain-classifier.js');
 const { ConditionalExpertDispatch } = require('./conditional-expert-dispatch.js');
 const { VERSION, FIELD_WEIGHTS, SCENE_WEIGHTS, FLIP_THRESHOLDS, MODEL_PROFILES, DEFAULT_PROFILE, DECISION, DECISION_PRIORITY } = require('./decision-router-config.js');
 
