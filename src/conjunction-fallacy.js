@@ -393,12 +393,17 @@ function checkConjunctionFallacy(text, inject) {
   // 本族正是没有 PROB 名词腿的形态；分组条件形已在上面统一豁免；
   // 对冲豁免同主判据（三腿俱后才适用）。
   if (isZh) {
-    if (CONJ_CMP_PROB_ZH.test(text) && CONJ_CMP_ANCHOR_ZH.test(text)
-      && !EXEMPT_HEDGE_D_ZH.test(text)) {
+    // [r272] 补注入钩子：本族判据用的是模块级编译正则（CMP_PROB_ZH /
+    //   CMP_ANCHOR_ZH 是字符串、启动时已烧进 RegExp），此前 inject 完全
+    //   无法触达，负例注入-删条对本族失效。加 R. 回退不改变默认行为。
+    if ((R.CONJ_CMP_PROB_ZH || CONJ_CMP_PROB_ZH).test(text)
+      && (R.CONJ_CMP_ANCHOR_ZH || CONJ_CMP_ANCHOR_ZH).test(text)
+      && !(R.EXEMPT_HEDGE_D_ZH || EXEMPT_HEDGE_D_ZH).test(text)) {
       return { hit: true, score: 0.56, count: 1, detail: '合取谬误×口语合取概率比较(zh)' };
     }
-  } else if (CONJ_CMP_PROB_EN.test(text) && CONJ_CMP_ANCHOR_EN.test(text)
-    && !EXEMPT_HEDGE_D_EN.test(text)) {
+  } else if ((R.CONJ_CMP_PROB_EN || CONJ_CMP_PROB_EN).test(text)
+    && (R.CONJ_CMP_ANCHOR_EN || CONJ_CMP_ANCHOR_EN).test(text)
+    && !(R.EXEMPT_HEDGE_D_EN || EXEMPT_HEDGE_D_EN).test(text)) {
     return { hit: true, score: 0.56, count: 1, detail: 'conjunction fallacy×colloquial P(A∧B)>P(A)(en)' };
   }
 
