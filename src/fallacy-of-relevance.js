@@ -254,6 +254,19 @@ const NUMERIC_BRIDGE = [
   /^\s*[\d.,%￥$€£\s]+\s*(?:equals?|is|means?)\b/i,
 ];
 
+// ─── [r271] 否定推断豁免 ──────────────────────────────────────────
+// 「换一个赛道并不意味着过去的积累白费」——推断连接词本身被否定时，
+// 句子是在**否认**一个推理（这正是正确推理形），不是不相干推断。
+// r271 修复 round-646 D2 存量误伤（该样本被本维度推到 rewrite，
+// 在 r270 之前的 HEAD 上已存在，git stash 对照实证）。
+// 只做中文侧：英文否定连接词（this does not prove）不被 INFER_EN 切分，
+// 整句豁免反而有压掉同句真谬误的风险，无实证承重故不收（注入删条只证 ZH）。
+const NEGATED_INFER_ZH = [
+  /(?:不|并未|并没有|未|没有|没什么|压根不|根本不|未必|绝不是)(?:能|能够|足以|会)?(?:意味着|代表|说明|表明|证明|推出)/,
+  /(?:推不出|说明不了|证明不了|代表不了|意味不了)/,
+];
+
+
 // 正当因果桥接（r254）：前提段出现**投入/行为类**实词、结论段出现
 // **产出/结果类**实词时，是日常语言里最常见、也最正当的因果陈述
 // （努力→进展、投入→成果、续航→待机）。这类句子零共享是**正常的**
@@ -439,6 +452,8 @@ function checkFallacyOfRelevance(text) {
   for (const re of TEACH) if (re.test(text)) return _MISS();
   // ── 豁免：疑问句 ──
   for (const re of QUESTION) if (re.test(text)) return _MISS();
+  // ── [r271] 否定推断豁免 ──
+  for (const re of NEGATED_INFER_ZH) if (re.test(text)) return _MISS();
   // ── 豁免：数值/定义桥接 ──
   for (const re of NUMERIC_BRIDGE) if (re.test(text)) return _MISS();
 
