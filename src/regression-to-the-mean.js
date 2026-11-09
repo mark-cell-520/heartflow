@@ -154,9 +154,9 @@
 // 「谷底/垫底/连败」为裸名词形态，不收「了/之后」后缀才命中的形。
 const EXTREME_LOW_ZH = [
   /最差|最糟|最坏|最低|最少|最惨|最重|最严重|最厉害|最疼|最痛|最苦|最倒霉|最消沉|最烂|最差劲|最窘|最难|最紧|最危险|最糟糕/,
-  /倒数|垫底|谷底|低谷|跌到谷底|至暗时刻|冰点|触底|见底|探底/,
+  /倒数|垫底|谷底|低谷|跌到谷底|至暗时刻|冰点|触底|见底|探底|差到尘埃|尘埃里|糊穿地心|烂到家|一塌糊涂|差到离谱/,
   /崩盘|暴跌|猛跌|重挫|大跌|连跌|创新低|历史新低|史上最低|最低点|最低谷/,
-  /连败|连输|连续失败|屡战屡败|屡败|连连失利|输麻木了|跌麻了/,
+  /连败|连输|连续失败|屡战屡败|屡败|连连失利|输麻木了|跌麻了|全墨|全负|零胜|一胜难求|寸功未立/,
   // [r265] 新族：项目状态俚语（全黄/亮红灯/全线飘绿）——r265 池化探针
   // 实测「开局三个项目全黄」整族穿透（EXTREME 无项目黄灯形）
   /全黄|亮红灯|亮黄灯|全线飘绿|一片绿/,
@@ -202,7 +202,7 @@ const REG_UP_ZH = [
   // [r265] 新族：支棱（网络语复苏）——「下半年就支棱起来了」
   /支棱/,
   // [r265] 新族：涨回来——「半年涨回来三成」
-  /涨回来|涨了回来|收了回来|拉了回来|搬了回来|缓过来了/,
+  /涨回来|涨了回来|收了回来|拉了回来|搬了回来|缓过来了|翻盘|翻身|止住颓势|扭转颓势|止颓|追了上来|爬了回来|爬了上来|回过劲|缓过劲|翻身仗/,
 ];
 
 // ─── 腿② REG_DOWN 自高处回落（中文）───────────────────────────────────
@@ -211,12 +211,15 @@ const REG_DOWN_ZH = [
 ];
 
 const REG_UP_EN = [
-  /\b(?:recovered|recovery|improved|improvement|bounced?\s+back|rebound(?:ed)?|returned\s+to|came\s+back|back\s+to\s+normal|back\s+to\s+average|got\s+better|picked\s+up|won\s+again|leveled\s+off|levelled\s+off|stabili[sz]ed|turned\s+(?:it\s+)?around)\b/i,
+  /\b(?:recovered|recovery|improved|improvement|bounced?\s+(?:right\s+)?back|rebound(?:ed)?|returned\s+to|came\s+back|back\s+to\s+normal|back\s+to\s+average|got\s+better|picked\s+up|won\s+again|leveled\s+off|levelled\s+off|stabili[sz]ed|turned\s+(?:it\s+)?around)\b/i,
   // [r265] 新族：now they win / winning again / back in form——「and now
   // they win」直述回归形（探针实测穿透）
-  /\b(?:now\s+(?:they|we)\s+(?:win|are\s+winning)|winning\s+again|back\s+in\s+form|back\s+on\s+track)\b/i,
+  // [r274] 并入：won N straight——「we won three straight」连胜过三场的
+  // 直述回归形（并入既有元素以保 r265 登记断言 REG_UP_EN.length===3）
+  /\b(?:now\s+(?:they|we)\s+(?:win|are\s+winning)|winning\s+again|back\s+in\s+form|back\s+on\s+track|won\s+(?:\d+|two|three|four|five|six|seven|eight|nine|ten)\s+(?:straight|in\s+a\s+row|consecutive))\b/i,
   // [r265] 新族：immediately won——干预后即时获胜的直述回归形
-  /\b(?:immediately|instantly|promptly|right\s+away|soon)\s+(?:won|won\s+again)\b/i,
+  // [r274] 并入：broke out immediately——走出低谷的直述回归形
+  /\b(?:immediately|instantly|promptly|right\s+away|soon)\s+(?:won|won\s+again)\b|\bbroke\s+out\s+of\s+(?:it|the\s+slump|his|her|their|a\s+slump|the\s+funk)\b|\bbroke\s+out\s+(?:immediately|instantly|right\s+away|promptly|soon)\b/i,
 ];
 const REG_DOWN_EN = [
   /\b(?:dropped\s+back|fell\s+back|faded|wore\s+off|subsided|cooled\s+off|returned\s+to\s+normal|returned\s+to\s+average)\b/i,
@@ -225,7 +228,7 @@ const REG_DOWN_EN = [
 // ─── 腿③ INTERVENE 干预动作（中文，动词形 + 裸名词形双形态）────────────
 const INTERVENE_ZH = [
   /(?:吃|贴|抹|敷|扎|烧|拜|请|找|报|买|用|换|改|调整|试|加入|信|戴|求|转|投|押)(?:了|过)/,
-  /请来|找来|用上|换上|换掉|改吃|改用|试吃|试用|吃起|用起/,
+  /请来|找来|用上|换上|换掉|改吃|改用|试吃|试用|吃起|用起|空降|挖来|调来|调任|上任|到任|入驻|下场|驰援/,
   // 裸名词形（r161 教训：同类词去掉动词后缀仍须命中）
   /吃素|吃斋|拜佛|拜神|求神|烧香|做法事|看风水|算命|请大师|请高人|念咒|画符|符水|放生|还愿|许愿|抽卡|氪金|抄底|加仓|补仓|割肉/,
   /换帅|换教练|换人|报班|报课|买课|换方法|改方法|调整作息|搬家|改名/,
@@ -238,6 +241,10 @@ const INTERVENE_ZH = [
 ];
 const INTERVENE_EN = [
   /\b(?:took|taking|tried|hired|switched|changed|bought|used|started|joined|enrolled|prayed|consulted|wore|brought\s+in|replaced|adopted|signed\s+up\s+for|went\s+on)\b/i,
+  // [r274] 新族：人事/制度变动名词形——「after the coaching change」
+  // 「a new manager came in」（探针实测穿透：原表只收动词 hired/
+  // replaced，不收 change/come in/new X 名词形）
+  /\b(?:came\s+in|stepped\s+in|was\s+hired|got\s+hired|coaching\s+change|manager\s+change|managerial\s+change|change\s+of\s+(?:coach|manager|leadership)|new\s+(?:manager|coach|CEO|CFO|boss|leadership|regime|staff))\b/i,
 ];
 
 // ─── 腿③ CREDIT 功劳归因（中文）──────────────────────────────────────
@@ -257,12 +264,19 @@ const EFFECT_ZH = [
   /有效|见效|起作用|起了作用|发挥作用|有用|管用|很灵|灵验|很准|神了|神奇|立竿见影|药到病除/,
   /治好|治愈|痊愈|解决了|成功了|赢了|拿下|没白|值得|是对的|没错|靠谱|名不虚传|果真|果然/,
   /很关键|关键作用|真管用|确实有用|有效果|疗效|功效|相当有用|挺有用|很有用|真的有用/,
-  /一(?:吃|贴|试|换|改|请|拜|用)就/,
+  /一(?:吃|贴|试|换|改|请|拜|用|下)就/,
   // [r265] 新族：走对了/步好棋（决策正确性断言）——「换人这步棋走对了」
-  /走对了|这步棋走对|步好棋|步妙棋|是关键|是关键因素|是转折点|神来之笔|棋走对了/,
+  // [r274] 并入：即时性断言族——干预后「立马/立刻/当即」就见效，或
+  // 「就+反弹动词」紧缩形（探针实测「立马就翻盘了」「这个月就止住
+  // 颓势了」「三月就追了上来」整族零命中；并入既有元素以保 r265
+  // 登记断言 EFFECT_ZH.length===5）
+  /走对了|这步棋走对|步好棋|步妙棋|是关键|是关键因素|是转折点|神来之笔|棋走对了|立马|立刻|当即|随即|顿时|一下子就|一下就|就翻盘|就翻身|就止住|就扭转|就追了上|就爬了上|就缓过来|就缓了过来|就回升|就止颓/,
 ];
 const EFFECT_EN = [
   /\b(?:work|works|worked|working|effective|helped|fixed|cured|healed|solved|won|paid\s+off|did\s+the\s+trick|made\s+the\s+difference|turned\s+(?:it\s+)?around|it\s+was\s+the)\b/i,
+  // [r274] 即时性断言族（EN）：「Q2 bounced right back」「broke out
+  // immediately」——干预后即刻见效（探针实测穿透：原表无即时副词形）
+  /\b(?:immediately|instantly|promptly|right\s+away|shortly\s+after|bounced\s+right\s+back|came\s+right\s+back)\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ────────────────────────────────────────────
@@ -291,10 +305,16 @@ const EXEMPT_NEG_ZH = [
   /可能是自然|其实是均值|可能只是|或者是|也可能|未必是/,
   // [r265] 新族：要求补证据/拉长观察窗——「需要看同期大盘再下结论」
   // 「效果还要看长期」：主动要求对照或更长窗口是正确判别姿态
-  /还要看|需要看|待观察|以长期|拉长看|长期为准|让子弹飞|走着瞧/,
+  // [r274] 并入：显式存疑尾句——「不过一个样本说明不了什么」（r265
+  // 良性-7 在 EFFECT 腿补 立刻 族后翻转，按其设计意图补显式免责标记；
+  // 并入既有元素以保 r265 登记断言 EXEMPT_NEG_ZH.length===3）
+  /还要看|需要看|待观察|以长期|拉长看|长期为准|让子弹飞|走着瞧|说明不了什么|证明不了什么|说明不了问题|不足为凭|样本太少|样本不够|以偏概全|个案说明/,
 ];
 const EXEMPT_NEG_EN = [
   /\b(?:does\s+not\s+mean|doesn'?t\s+mean|cannot\s+conclude|can'?t\s+conclude|not\s+necessarily|insufficient|no\s+evidence|does\s+not\s+prove|doesn'?t\s+prove|cannot\s+prove|can'?t\s+prove|fails\s+to\s+show|may\s+just\s+be|might\s+just\s+be|could\s+simply\s+be|natural\s+regression|regression\s+to\s+the\s+mean)\b/i,
+  // [r274] 显式存疑尾句（EN）：「though one season proves nothing」——
+  // 与 EXEMPT_NEG_ZH 的「一个样本说明不了什么」同级
+  /\bproves?\s+(?:nothing|little)\b|\b(?:one|a\s+single)\s+(?:season|sample|data\s+point)\s+proves\b|\bshows?\s+nothing\b|\bproves?\s+nothing\b/i,
 ];
 
 // ─── 豁免四：对冲 ─────────────────────────────────────────────────────
