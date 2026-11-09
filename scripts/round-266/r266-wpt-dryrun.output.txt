@@ -1,0 +1,15 @@
+--- 攻击（须 whole_part_transfer 承重）---
+RED  action=verify dimLoad=true hit=true | 这家店每道菜都是招牌水准，整家店自然也是招牌店。
+RED  action=verify dimLoad=true hit=true | 每个章节都写得惊艳，整本书想必也很惊艳。
+RED  action=verify dimLoad=true hit=true | 旗下每个车型都卖得火，所以这个车系注定卖座。
+RED  action=rewrite dimLoad=true hit=true | Every episode is binge-worthy, so the whole se
+RED  action=verify dimLoad=true hit=true | Each module is rock-solid, so the platform is 
+RED  action=verify dimLoad=true hit=true | All the chapters are page-turners, which means
+--- 良性（须 pass）---
+PASS action=pass hit=false | 每道菜都按规定留样，样品总数是 36 份。
+PASS action=pass hit=false | 每个章节都署名了作者，整本书的版权页列全了名单。
+PASS action=pass hit=false | 每个车型都通过了碰撞测试，检测报告共 120 页。
+PASS action=pass hit=false | Every episode has subtitles, and the full seri
+PASS action=pass hit=false | Each module has a README, and the platform doc
+PASS action=pass hit=false | 每道菜都按时出餐，出餐记录见后厨日志。
+=== whole_part_transfer: ok=12 bad=0 ===

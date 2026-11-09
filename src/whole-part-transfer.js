@@ -88,24 +88,34 @@
 // 员工」）。
 const PART_QUANT_ZH = [
   /(?:每个|每一个|每一名|每一位|每名|各个|所有|全部|任何|凡是|但凡|个个|每位|各位)(?:的)?[^。，！？!?,;；\n]{0,2}(?:队员|成员|球员|选手|乐手|员工|学生|零件|部件|组件|模块|元件|个体|个人|工程师|科学家|官员|公民|士兵|党员|志愿者|客户|用户|演员|船员|乘员|乘务员|医生|护士|警察|创业者|职员|工人|农民|干部|将领|教练|明星|诗人|作家|画家|辩手|队友|同学|同事|室友|部门|小组|班级|支部|分队|机组|教研组|工作人员|受益人|当事人|幸存者|人)/,
+  // [r266 新增族] 内容/产品/运载具的部分名词（菜/章节/车型/舱位…）
+  /(?:每个|每一个|每一名|每道|每款|每集|每章|每节|每种|各个|所有|全部|任何|凡是|个个)(?:的)?[^。，！？!?,;；\n]{0,2}(?:菜品|菜肴|菜|章节|车型|车|分镜|单品|配色|户型|舱位|航段|课时|关卡|提案|条款|帖子|楼层|房间|镜头|桥段|插曲|曲目|文章|篇目)/,
 ];
 
 // ─── 腿① PART_QUANT（英文）────────────────────────────────────────
 const PART_QUANT_EN = [
   /\b(?:every|each|all)\s+(?:(?:one|single)\s+)?(?:of\s+(?:the|these|those|its|our|their)\s+)?(?:\w+\s+){0,2}?(?:parts?|components?|members?|players?|employees?|students?|engineers?|scientists?|officials?|citizens?|soldiers?|modules?|elements?|ingredients?|individuals?|musicians?|staff|workers?|people|persons?|singers?|actors?|athletes?|developers?|designers?|managers?|volunteers?|customers?|users?|researchers?|lawyers?|doctors?|teachers?|artists?|writers?|departments?|teams?)\b/i,
+  // [r266 新增族] 内容/产品部分名词（episodes/chapters/dishes/models…）
+  /\b(?:every|each|all)\s+(?:(?:one|single)\s+)?(?:of\s+(?:the|these|those|its|our|their)\s+)?(?:\w+\s+){0,2}?(?:episodes?|chapters?|scenes?|dishes?|plates?|models?|variants?|trims?|tracks?|songs?|meals?|courses?|items?|listings?|cabins?|seats?|lessons?|sessions?|stages?|levels?|rooms?|floors?|posts?|shots?|angles?|ingredients?)\b/i,
 ];
 
 // ─── 腿④ WHOLE 整体名词（中文，限定词形 + 裸名词形两条）─────────────
 const WHOLE_ZH = [
   /(?:这|那|该|本|全|整|某)(?:支|个|家|所|座|届|代|种|方面)?(?:团队|球队|乐队|乐团|公司|企业|国家|民族|政府|军队|部队|社会|学校|院系|系统|设备|机器|整机|群体|班子|队伍|剧组|社团|社区|村庄|城市|地区|行业|圈层|圈子|家庭|家族|单位|组织|机构|整体|全局|产品|作品|项目|工程|方案|品牌|平台|软件|网站|程序|算法|模型|引擎|阵容|联盟|帝国|王朝|文明|舰队|组织)/,
   // 裸整体名词（r161 教训：只收带限定词形会导致裸名词整句漏判）
-  /(?:团队|球队|乐队|乐团|公司|企业|国家|民族|政府|军队|部队|社会|学校|院系|系统|设备|机器|整机|群体|班子|队伍|剧组|社团|社区|村庄|城市|行业|圈层|圈子|家庭|家族|单位|组织|机构|整体|全局|产品|作品|项目|品牌|平台|软件|网站|程序|算法|模型|引擎|阵容|联盟|帝国|王朝|文明|舰队)/,
+  /(?:团队|球队|乐队|乐团|公司|企业|国家|民族|政府|军队|部队|社会|学校|院系|系统|设备|机器|整机|群体|班子|队伍|剧组|社团|社区|村庄|城市|地区|行业|圈层|圈子|家庭|家族|单位|组织|机构|整体|全局|产品|作品|项目|品牌|平台|软件|网站|程序|算法|模型|引擎|阵容|联盟|帝国|王朝|文明|舰队)/,
+  // [r266 新增族] 内容/产品整体名词（店/书/车系/剧集/菜单…，限定词形+裸名词形）
+  /(?:这|那|该|本|全|整|某)(?:家|间|个|部|套|场|届|种)?(?:店|饭店|门店|书店|餐馆|酒店|书|书系|车系|系列|产品线|菜单|剧集|剧|影片|电影|楼盘|航线|专栏|课程|套餐|套装|机队|编队|阵容|品类|组合|合辑|专辑|栏目|版面|榜单|排行榜|歌单)/,
+  /(?:店|饭店|门店|书店|餐馆|酒店|书|书系|车系|系列|产品线|菜单|剧集|剧|影片|电影|楼盘|航线|专栏|课程|套餐|套装|机队|编队|品类|组合|合辑|专辑|栏目|版面|榜单|排行榜|歌单)/,
 ];
 
 // ─── 腿④ WHOLE 整体名词（英文）─────────────────────────────────────
 const WHOLE_EN = [
   /\b(?:the|this|that|its|our|their)\s+(?:whole\s+|entire\s+)?(?:team|group|company|corporation|firm|country|nation|government|army|military|orchestra|band|ensemble|society|class|school|department|system|machine|engine|device|product|project|organization|institution|community|city|region|industry|platform|software|application|model|algorithm|family|squad|crew|collective|population|entity|league|empire)\b/i,
   /\b(?:team|group|company|country|nation|orchestra|society|system|product|project|organization|community|family|empire|league)\b/i,
+  // [r266 新增族] 内容/产品整体名词（series/book/novel/menu…）
+  /\b(?:the|this|that|its|our|their)\s+(?:whole\s+|entire\s+)?(?:series|book|novel|film|movie|season|menu|lineup|roster|catalog|catalogue|fleet|store|restaurant|show|album|playlist|anthology|edition|release|franchise|package|bundle|suite|collection)\b/i,
+  /\b(?:series|book|novel|film|movie|season|menu|lineup|roster|catalog|catalogue|fleet|store|restaurant|show|album|playlist|anthology|edition|release|franchise|package|bundle|suite|collection)\b/i,
 ];
 
 // ─── 腿②/⑤ QUALITY 涌现性质量词（中文）────────────────────────────
@@ -115,11 +125,15 @@ const WHOLE_EN = [
 const QUALITY_ZH = [
   /(?<![增改])强(?![制推行权])/,
   /优秀|优异|出色|顶级|一流|顶尖|厉害|卓越|领先|高效|清廉|文明|最佳|冠军|成功|竞争力|战斗力|精英|精锐|精兵|出类拔萃|世界级|五百强|500强|高质量|完美|名列前茅|数一数二|首屈一指|牛逼|过硬|超凡|标杆|龙头|领军|闻名|知名|著名|享誉|翘楚|前列|大师|名家|高手|超一流|不在话下|绰绰有余|易如反掌|胜券在握/,
+  // [r266 新增族] 内容/产品口碑质量词（招牌/惊艳/卖座/能打…）
+  /招牌|惊艳|出彩|亮眼|卖座|卖得火|卖得好|火爆|抢手|能打|扛打|口碑|扎实|水准|功底|像样|精彩|吸睛|耐看|好玩|好听|好看|受用|值回|物有所值|可圈可点|有口皆碑|有目共睹|掌声不断|好评如潮/,
 ];
 
 // ─── 腿②/⑤ QUALITY（英文）────────────────────────────────────────
 const QUALITY_EN = [
   /\bexcellent\b|\boutstanding\b|\belite\b|\bsuperb\b|\bbrilliant\b|\bformidable\b|\bstrong\b|\bstrongest\b|\btop\b|\btop-?tier\b|\bworld-?class\b|\bfirst-?class\b|\bbest\b|\bgreat\b|\bgreatest\b|\bleading\b|\bleader\b|\bwinning\b|\bwins?\b|\bwon\b|\bcompetitive\b|\bsuccessful\b|\bmasterful\b|\bstellar\b|\bchampions?\b|\bfortune\s+500\b|\bmaster\b|\bgenius\b|\bhighly\s+(?:skilled|talented|capable|trained)\b/i,
+  // [r266 新增族] 内容/产品质量词（binge-worthy/rock-solid/page-turner…）
+  /\b(?:binge-?worthy|rock-?solid|page-?turners?|gripping|compelling|must-?watch|must-?read|must-?play|polished|snappy|tight|riveting|captivating|addictive|catchy|memorable|iconic|beloved|acclaimed|critically\s+acclaimed|well-?received|highly\s+rated|best-?selling|blockbuster|smash\s+hit)\b/i,
 ];
 
 // ─── 腿③ INFER 推断词（中文，结论指向）─────────────────────────────
@@ -138,7 +152,7 @@ const INFER_EN = [
 // 话下——结论标记是必然性情态「自然」）。缺结论标记不判（「这个项目，
 // 每个人都很优秀」只是并陈述）。
 const MODAL_ZH = [
-  /自然|必然|一定|肯定|势必|无疑|必定|定能|不难|可想而知/,
+  /自然|必然|一定|肯定|势必|无疑|必定|定能|不难|可想而知|想必|注定|必将/,
 ];
 const MODAL_EN = [
   /\b(?:must|certainly|guaranteed|bound\s+to|sure\s+to|inevitably|no\s+doubt|definitely)\b/i,
