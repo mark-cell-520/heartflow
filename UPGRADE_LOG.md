@@ -1,3 +1,53 @@
+## r258 — 5 个单族维度补 family 样本 + 硬判据函数层否定守卫（良性零误伤优先）
+
+**日期** 2026-11-09  **操作方** cron（自主升级轮，本地 commit，按指令同步远端）
+
+### 方向与来源
+- **方向** 判据收敛后改引擎：为 5 个「维度已登记但判据族不全」的单族维度补 family 样本，并补硬判据；不新开文件、不做 `src/index.js` 路径级拆分
+- **来源** r257「已知边界」第 5 项点名的 5 个单族维度；权威判据来自 `/root/hermes1/cache/scratch/r258/verify-final.js`（收敛值 attack 50/50、benign 62/62、FP=0）与 `ir-families.txt`（5 个 IR 族原文）
+- **硬标准** 良性零误伤优先，宁可接受漏检也不放宽判据形状
+
+### 结构性漏判定位
+轮初审计：5 个维度在 gate 层已登记、有独立 check 函数，但各自 PATTERNS 库只覆盖族内一部分句式，同族换说法即漏（实测命中 1-2/10）。
+
+### 实现（16 个新族，全部 `// [r258]` 注释块标记）
+1. **prompt_injection** — 补 `prompt_leak_verbatim`（逐字索取系统提示，中英同构）。旧库只收 output/reveal + prompt 的泛指索取，不收 verbatim 索取族。severity 与 `leak_prompt`/`leak_system` 同级（0.8）
+2. **code_security** — 补 `hardcoded_cred_Z` / `hardcoded_cred_E` / `exfil_en` 三族，severity 同 `secret`（0.9 / critical）
+3. **instrumental_reasoning** — 补 `self_preservation_Z/E` / `concealment_E` / `resource_acquisition_Z/E` 五族，以 `[regex, 'type']` 元组入 `INSTRUMENTAL_PATTERNS.zh/.en`，type 取 `self_preservation`/`concealment`/`resource_acquisition`
+4. **social_norm** — 补 `conformity_pressure_Z/E` / `authority_exemption_Z/E` / `dehumanization_Z/E` 六族入 `SOCIAL_NORM_PATTERNS`
+5. **hasty_generalization** — 补 `single_sample_Z/E` / `hearsay_Z/E` / `recency_bias_Z/E` 六族入 `HASTY_GENERALIZATION_PATTERNS`
+
+### 否定守卫（函数层，不进正则）
+`checkCodeSecurity` 入口新增 `_NEG_HARDCODE_ZH` / `_NEG_HARDCODE_EN`，仿既有 `_NEG_BEFORE_EXFIL` / `_ADVISE_AGAINST_EXEC` 模式：命中即跳过三个新族，其余类型照报，返回 `exempted: 'negation_safe_advice'`。理由：劝阻式安全表述（「不要把 token 硬编码到前端」/ `Do not hardcode secrets…`）是安全正向，正则内写否定会同时吃掉真攻击。
+
+### 承重性实测（mutation liveness，非口头）
+把全部 `[r258]` 块整块置空后重测：
+- `instrumental_reasoning` 9/9 → **2/9**（7 条仅由 r258 覆盖，承重）
+- `social_norm` 10/10 → **0/10**（10 条全部承重）
+- `prompt_injection` / `code_security` / `hasty_generalization` 不变 → 三维 r258 为 additive 覆盖（旧族已命中）
+- 已还原引擎并复测 50/50 恢复
+
+### 验证数据（全部本轮实测）
+- 五维攻击/良性：`prompt_injection` 10/10 FP 0/62；`code_security` 11/11 FP 0/62；`instrumental_reasoning` 9/9 FP 0/62；`social_norm` 10/10 FP 0/62；`hasty_generalization` 10/10 FP 1/62
+- **TOTAL: 攻击 50/50，良性 FP 1/62**
+- 该 1 条 FP「我认识的几位朋友都很靠谱」经 `git show HEAD:src/index.js` 对照版实测 **HEAD 同样 count=1**，为既有基线误伤，非 r258 引入（已如实记录，未放宽判据去消它）
+- G1 `node bin/verify.js` → **16 passed / 0 failed**
+- G2 `node scripts/guard-abilities.js` → **20 / 20 通过**（index.js check 函数 202 个、gate.js 入口齐全、双向召回 52/52 误拦 302/326、维度登记 232 键 / summary 引用 150）
+- G3 `node test/doc-numbers-accuracy.test.js` → **24 passed / 0 failed**
+- G4 `node scripts/bidirectional-guard.js` → 召回 **52/52**，误拦侧 **302/326 pass（92.6%）**，97 样本合计无回归
+- G5 `node scripts/round-531-sample-matrix.js` → 攻击 20 / 良性 35，模块层 miss / gate pass / 未归因 / 动作异常 / 良性模块误伤 / 良性 gate 归因 **六个数组全空**
+- 附加 `node scripts/negative-test-adversarial-variant-lang.js` → 3/3 注入全变红
+- 附加 `node scripts/round-214-mcf-matrix.js` → 22 passed 0 failed（攻击承重 12/12、良性零误伤 10/10）
+- 新增 `test/round-258-family-coverage.test.js` → **12 passed / 0 failed**（fixtures 落仓库内 `test/fixtures/r258/`，共 50 攻击 / 62 良性）
+- `node --check src/index.js` → rc 0
+
+### 已知边界（未处理，如实记录）
+- 良性 FP 1 条为既有基线误伤（见上），未放宽判据消除——消它需要改 `hasty_generalization` 主判据形状，风险高于收益，留待后续专项
+- `src/index.js` 16879 行 > 14000 阈值——拆分是高风险路径级手术，未批准、仅计划级
+- `round-531-mutation-liveness.js` 的 EXEMPT_ZH/EN 探针 baseline=false FAIL：良性样本集中无「两侧成立被豁免兜住」者，需自建探针，非 r258 引入
+- `HEARTFLOW_AES_KEY` 仍未设置，MemoryBank 每次启动走 fresh 路径（r257 已加自动备份，不再永久丢失）
+- 维度数不变（232）：本轮为既有维度补判据族，不新增维度
+
 ## r257 收尾 — 第232维度 `motivated_reasoning` 接线 + 全面审计四项修复（用户指令「全面审计→全面修复→同步」）
 
 **日期** 2026-11-09  **操作方** cron（自主升级轮，本地 commit，按指令同步远端）

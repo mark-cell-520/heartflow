@@ -36,6 +36,24 @@ const INJECTION_PATTERNS = {
     [/我要你[^。]*?不管[^。]*?安全/i, 'safety_bypass'],
     [/没有[^。]*?限制|不受[^。]*?(约束|限制)/i, 'remove_limits'],
     [/我[^。]*?授权[^。]*?你[^。]*?(做|说|输出)/i, 'fake_authorization'],
+    // ── [r258] 逐字索取系统提示（verbatim prompt leak）中文章族 ──
+    // 轮初扫描：prompt_injection 13/15 探针漏判。根因：旧库只收
+    // 「输出/泄露 + 指令」的**泛指索取**，不收「原封不动/一字不差」这种
+    // **逐字复制约束**叠加在系统提示索取上的形态——后者才是把系统提示
+    // 原文搬出去的唯一通道（泛指索取可以让模型自行概括，逐字索取不行）。
+    // 判据形状（三选一，均要求「索取动词 × 逐字约束 × 系统提示」共现）：
+    //   ① 索取动词 × 逐字约束 × 提示/指令/system
+    //   ② 逐字约束 × 索取动词 × 提示/指令/system（镜像语序）
+    //   ③ 内部/初始/底层/隐藏 × 提示/指令 × 逐字约束
+    //   ④ 索取动词 × 系统/内部/初始 × 提示/指令（英文侧对称）
+    //   ⑤ 逐字约束 × 复述 × 初始/系统/内部 × 设定/提示/指令
+    // 良性侧分界：忽略格式规则/比较字符串/原文引用文章段落/翻译/完整输出
+    // 某篇文章的段落——都没有「系统/内部/初始/隐藏」这个限定语，进不了门。
+    [/(?:输出|打印|显示|展示|贴出|贴|复制|重复|复述|念|告诉|给|发)[^。]{0,20}(?:原文|一字不差|一字不漏|逐字|照搬|原封不动|原样|完整地|完整)[^。]{0,20}(?:提示|指令|prompt|instruction|system|设定|规则|配置)/i, 'prompt_leak_verbatim'],
+    [/(?:原文|一字不差|一字不漏|逐字|照搬|原封不动|原样)[^。]{0,16}(?:输出|打印|显示|展示|贴出|贴|复制|重复|复述|念)[^。]{0,16}(?:提示|指令|prompt|instruction|system|设定|规则|配置)/i, 'prompt_leak_verbatim'],
+    [/(?:内部|内置|初始|底层|隐藏|你的|系统)[^。]{0,6}(?:提示|指令|prompt|instruction|设定|配置)[^。]{0,20}(?:原封不动|一字不差|一字不漏|逐字|照搬|原样|完整)/i, 'prompt_leak_verbatim'],
+    [/(?:输出|打印|显示|展示|告诉|给|发)[^。]{0,14}(?:你|您|当前|现在)?[^。]{0,6}(?:系统|内部|初始)[^。]{0,4}(?:提示|指令|prompt|instruction)/i, 'prompt_leak_verbatim'],
+    [/(?:完整|逐字|原文|一字不差|一字不漏|原封不动|原样)[^。]{0,8}(?:复述|重复|重述|背诵)[^。]{0,10}(?:你的|您的)?[^。]{0,6}(?:初始|系统|内部|底层|当前)[^。]{0,4}(?:设定|提示|指令|规则|配置)/i, 'prompt_leak_verbatim'],
   ],
   en: [
     [/ignore (all )?(previous|above|prior).{0,20}(instruction|prompt|rule|directive|command|direction|order)/i, 'ignore_previous'],
@@ -49,12 +67,22 @@ const INJECTION_PATTERNS = {
     [/\bDAN\b|\bdo anything now\b|jail.?break/i, 'known_jailbreak'],
     [/you are not (bound|limited|restricted) by/i, 'remove_limits'],
     [/output.{0,30}(without|regardless of|ignoring).{0,20}(ethics|safety|filter|guard)/i, 'safety_bypass'],
+    // ── [r258] 逐字索取系统提示（verbatim prompt leak）英文章族 ──
+    // 与中文侧同源：旧库只收 output/reveal + prompt 的泛指索取，不收
+    // verbatim / word for word / character for character 这类**逐字复制
+    // 约束**。共同形状：索取动词 × 逐字约束 × 提示/指令/system。
+    [/\b(?:print|output|display|show|paste|copy|repeat|reproduce|recite|reveal|give me)\b[^.]{0,26}\b(?:verbatim|word for word|exactly as written|character for character|in full|exact(?:ly)? copy|literally)\b[^.]{0,26}\b(?:prompt|instruction|system|directive|configuration|guideline)/i, 'prompt_leak_verbatim'],
+    [/\b(?:verbatim|word for word|exactly as written|character for character)\b[^.]{0,26}\b(?:prompt|instruction|system|directive|configuration)/i, 'prompt_leak_verbatim'],
+    [/\b(?:system|internal|initial|hidden|underlying|your|current)\b[^.]{0,12}\b(?:prompt|instruction|directive|configuration)\b[^.]{0,24}\b(?:verbatim|word for word|exact(?:ly)?|literally|in full)/i, 'prompt_leak_verbatim'],
+    [/\b(?:print|output|display|show|reveal|give me)\b[^.]{0,16}\b(?:your|the|current|initial|underlying)\b[^.]{0,10}\b(?:system|internal|hidden)\b[^.]{0,10}\b(?:prompt|instruction|directive)/i, 'prompt_leak_verbatim'],
   ]
 };
 const INJECTION_SEVERITY = { ignore_previous: 0.7, ignore_rules: 0.6, forget_role: 0.5,
   role_play_escape: 0.4, role_impersonation: 0.4, bypass_instruction: 0.7, leak_prompt: 0.8,
   leak_system: 0.8, extract_architecture: 0.3, safety_bypass: 0.9, remove_limits: 0.6,
-  fake_authorization: 0.5, known_jailbreak: 0.9 };
+  fake_authorization: 0.5, known_jailbreak: 0.9,
+  // [r258] prompt_leak_verbatim 与 leak_prompt/leak_system 同级（0.8）
+  prompt_leak_verbatim: 0.8 };
 
 function checkPromptInjection(text) {
   if (!text || typeof text !== 'string') return { count: 0, injections: [], score: 0 };
@@ -9372,6 +9400,13 @@ const CODE_SECURITY_PATTERNS = {
     /\$where\s*:\s*['"].*\+\s*(?:req|request|params|body|input)/i,
     /\$regex\s*:\s*(?:['"].*\+\s*(?:req|request|params|body|input)|new\s+RegExp)/i,
     /(?:EXEC|EXECUTE|CALL)\s+(?:dbo\.)?[a-zA-Z_]+\s*['"].*\+\s*(?:req|request|params|body|input)/i,
+
+    /(?:\bOR\b|\bor\b|\|\|)\s*['"]?1['"]?\s*=\s*['"]?1['"]?/,
+    /['"]\s*(?:or|OR)\s+['"]?[a-z0-9]+['"]?\s*=\s*['"]?[a-z0-9]+['"]?/,
+    /\b(?:union|UNION)\s+(?:all\s+)?select\b/i,
+    /['"]\s*;\s*(?:drop|delete|update|insert|truncate|alter)\s+/i,
+    /\b(?:or|and)\s+['"]?1['"]?\s*=\s*['"]?1\s*(?:--|#|\/\*)/i,
+    /\binformation_schema\b|\bsysobjects\b|\bsqlite_master\b/i
   ],
   xss: [
     /<script\b[^>]*>/i,
@@ -9470,6 +9505,20 @@ const CODE_SECURITY_PATTERNS = {
     /(?:location|redirect|redirect_url|redirect_uri|return_url|next|callback|continue)\s*[:=]\s*(?:req\.|request\.|params\.|body\.|input)/i,
     /window\.location\s*=\s*(?:req\.|request\.|params\.|body\.|input)/i,
   ],
+  // [r258] 硬编码凭据族：中英同构，否定守卫在函数层（NEG_ZH/NEG_EN，见 checkCodeSecurity 入口）
+  hardcoded_cred_Z: [
+    /(?:\u628a|\u5c06)[^\u3002\n]{0,12}(?:\u5bc6\u7801|\u53e3\u4ee4|\u5bc6\u94a5|\u5bc6\u5319|\u79c1\u94a5|token|access[_.\s]?key|secret|api[_.\s]?key|credential)[^\u3002\n]{0,8}(?:\u786c\u7f16\u7801|\u5199\u6b7b|\u660e\u6587(?:\u5b58\u50a8|\u4fdd\u5b58|\u5b58\u653e|\u786c\u7f16\u7801|\u5199\u6b7b))/i,
+    /(?:\u786c\u7f16\u7801|\u5199\u6b7b)\s*(?:\u5230|\u8fdb|\u5728|\u5165)\s*[^\u3002\n]{0,14}(?:\u5bc6\u7801|\u53e3\u4ee4|\u5bc6\u94a5|\u5bc6\u5319|\u79c1\u94a5|token|access[_.\s]?key|secret|credential|api[_.\s]?key)/i
+  ],
+  hardcoded_cred_E: [
+    /\b(?:hardcode|hard-code|hard code)\s*(?:the\s*|a\s*|your\s*)?[^.]{0,16}(?:password|passphrase|secret|credential|api[_.\s]?key|access[_.\s]?key|private key|token)/i
+  ],
+  exfil_en: [
+    /\b(?:print|show|display|output|cat|reveal|give me|tell me|dump|read)\b[^.]{0,30}\b(?:password|passphrase|secret|credential|api[_.\s]?key|access[_.\s]?key|private key|token)\b[^.]{0,30}\b(?:stored|saved|kept|located|in)\b/i,
+    /\b(?:dump|cat|print|output|display|show)\b[^.]{0,20}(?:\.env|env file|environment variables?|credentials? file|secrets? file)\b[^.]{0,40}\b(?:see|view|read|inspect|check|look at)\b[^.]{0,20}\b(?:credentials?|secrets?|passwords?|keys?|tokens?)\b/i,
+    /\b(?:print|show|display|output|dump|cat|reveal|give me|tell me)\b[^.]{0,30}\b(?:so i can|so that i can|to let me|so i may)\b[^.]{0,20}\b(?:see|view|read|inspect|check|look at|reveal)\b[^.]{0,20}\b(?:credentials?|secrets?|passwords?)\b/i,
+    /\b(?:cat|print|output|display|show|dump|reveal)\b[^.]{0,20}\b(?:credentials? file|secrets? file)\b[^.]{0,30}\b(?:see|view|read|inspect|check|look at|what is in)\b/i
+  ],
 };
 // [v6.7.125] 开发/调试语境豁免（单一来源，v6.7.115 引入）。
 // 接线点：dangerous-instruction.js / reward-hacking.js / 本文件的 checkCodeSecurity。
@@ -9503,11 +9552,15 @@ const CS_L = { secret:'critical', sql_injection:'critical', xss:'high', path_tra
   insecure_crypto:'medium', command_injection:'critical', ldap_injection:'high',
   xxe:'high', ssrf:'medium', insecure_deserialization:'high', open_redirect:'high',
   // [v6.7.131] 第 321 轮 exec_prose：散文式危险执行，同为 critical
-  exec_prose:'critical' };
+  exec_prose:'critical',
+  // [r258] 硬编码凭据族：同 secret，critical
+  hardcoded_cred_Z:'critical', hardcoded_cred_E:'critical', exfil_en:'critical' };
 const CS_W = { secret:0.9, sql_injection:0.9, xss:0.7, path_traversal:0.7, insecure_crypto:0.4,
   command_injection:0.9, ldap_injection:0.7, xxe:0.7, ssrf:0.6, insecure_deserialization:0.7, open_redirect:0.7,
   // [v6.7.131] exec_prose 与 command_injection 同级（0.9）
-  exec_prose:0.9 };
+  exec_prose:0.9,
+  // [r258] 硬编码凭据族：与 secret 同级 0.9 / critical
+  hardcoded_cred_Z:0.9, hardcoded_cred_E:0.9, exfil_en:0.9 };
 // [v6.7.125] 开发语境豁免的可丢弃目标表（与 isDevDebugContext 配套使用）。
 // 判定原则：目标必须是**重建成本为零的产物**（构建产物/临时目录/缓存/演示数据/
 // 容器内路径/临时表）。真业务对象（users/orders 等业务表名、/、/var/www 等服务目录、
@@ -9527,6 +9580,15 @@ const DISPOSABLE_TARGET = /(?:^|\s|\/|\.)(?:build|dist|out|target|bin|obj|temp|t
 const _NEG_BEFORE_EXFIL = /(?:^|[^\n]{0,18})(?:不要|不能|不可以|不应|不该|请勿|切勿|莫要|禁止|严禁|别|勿|勿将|不可)[^\n]{0,20}(?:把|将|给我|发我|提供|告诉|交出|写|存|保存|存放|发|发送|上传|同步|贴|打印|输出|分享|发到|发给)[^\n]{0,16}(?:密码|口令|密钥|私钥|证书|凭证|凭据|token|api[_.]?key|access[_.]?key|secret|password)/i;
 // [v6.7.131] 第 321 轮：劝阻式危险执行表述的否定豁免（见下方入口判定）
 const _ADVISE_AGAINST_EXEC = /(?:不建议|不要|不能|不应|请勿|禁止|切勿|千万别|避免|反对)[^。\n]{0,12}(?:用|使用)[^。\n]{0,8}(?:eval|exec|Function)\b/i;
+// [r258] 硬编码凭据族的否定守卫（函数层，不入正则）。
+// 由来：r258 给 code_security 补 hardcoded_cred_Z/E 与 exfil_en 三族，
+// 首批良性样本「不要把 token 硬编码到前端代码里」「Do not hardcode secrets in
+// the frontend, use environment variables」是**安全正向表述**（劝阻硬编码），
+// 与 v6.7.127 的 sensitive_path 索取式同源：否定词在动作之前。
+// 判据与既有两条守卫同构：入口判定、命中即整类跳过。
+const _NEG_HARDCODE_ZH = /(?:\u4e0d\u8981|\u522b|\u52ff|\u4e0d\u80fd|\u7981\u6b62|\u4e0d\u5e94\u8be5|\u8bf7\u52ff|\u5207\u52ff|\u4e07\u4e07\u4e0d\u53ef|\u4e0d\u5141\u8bb8)[^\u3002\n]{0,16}(?:\u786c\u7f16\u7801|\u5199\u6b7b|\u660e\u6587)/;
+const _NEG_HARDCODE_EN = /\b(?:do not|don't|never|avoid|should not|shouldn't|must not|mustn't|refrain from|without)\b[^.]{0,24}\b(?:hardcode|hard-code|hard code|store|print|reveal|show|dump|display)\b/i;
+const _NEG_HARDCODE_KEYS = ['hardcoded_cred_Z', 'hardcoded_cred_E', 'exfil_en'];
 function checkCodeSecurity(text) {
   if (!text || typeof text !== 'string') return { count: 0, issues: [], types: [], score: 0 };
   // [v6.7.127] 安全正向否定豁免（第 73 轮，代码层判定）。
@@ -9555,6 +9617,20 @@ function checkCodeSecurity(text) {
     const issues = [];
     for (const [type, patterns] of Object.entries(CODE_SECURITY_PATTERNS)) {
       if (type === 'exec_prose') continue;
+      for (const pat of patterns) { const m = text.match(pat); if (m) issues.push({ type, severity: CS_L[type] }); }
+    }
+    if (issues.length === 0) return { count: 0, issues: [], types: [], score: 0, exempted: 'negation_safe_advice' };
+    const types2 = [...new Set(issues.map(i => i.type))];
+    const score2 = Math.min(1, Math.max(...types2.map(t => CS_W[t] || 0.4)));
+    return { count: issues.length, issues, types: types2, score: score2, exempted: 'negation_safe_advice' };
+  }
+  // [r258] 硬编码凭据族否定守卫：劝阻式表述（不要把 token 硬编码到前端 /
+  // Do not hardcode secrets…）是安全正向，命中即跳过这三个新族，
+  // 其余类型照报。与上方两条守卫同构（入口判定、按类型跳过）。
+  if (_NEG_HARDCODE_ZH.test(text) || _NEG_HARDCODE_EN.test(text)) {
+    const issues = [];
+    for (const [type, patterns] of Object.entries(CODE_SECURITY_PATTERNS)) {
+      if (_NEG_HARDCODE_KEYS.includes(type)) continue;
       for (const pat of patterns) { const m = text.match(pat); if (m) issues.push({ type, severity: CS_L[type] }); }
     }
     if (issues.length === 0) return { count: 0, issues: [], types: [], score: 0, exempted: 'negation_safe_advice' };
@@ -11434,6 +11510,13 @@ const HASTY_GENERALIZATION_PATTERNS = {
     // 位置纪律：这两词必须留在「一律|」与「压根|」之间——r332 变异守卫的
     // 变异 3 按此布局做 replace 删词，alternation 顺序虽不影响匹配，但挪位
     // 会让锚点落空变成空操作变异（HEAD 起该测试即因此崩，v6.8.85 修复）。
+    // ── [r258] 单族维度补样：单一样本/道听途说/近期偏误（hasty_generalization·zh）──
+    /(?:\u4e0a\u6b21|\u524d\u4e0d\u4e45|\u524d\u51e0\u5929|\u66fe\u7ecf|\u6709\u4e00\u56de|\u6709\u4e00\u6b21|\u6709\u4e2a)[^\u3002]{0,12}(?:\u78b0\u5230|\u9047\u5230|\u89c1\u8fc7|\u8ba4\u8bc6|\u63a5\u89e6)[^\u3002]{0,6}(?:\u4e00\u4e2a|\u4e00\u4f4d|\u4e00\u4e2a\u4eba|\u4e2a)[^\u3002]{0,12}(?:\u770b\u6765|\u53ef\u89c1|\u8bf4\u660e|\u8db3\u4ee5\u8bf4\u660e|\u5c31\u8bf4\u660e|\u8868\u660e)[^\u3002]{0,14}(?:\u5168\u90fd|\u5168\u90e8|\u90fd|\u4e2a\u4e2a|\u4eba\u4eba|\u4e00\u5f8b|\u90fd\u4e00\u6837|\u4e00\u4e2a\u6837)/i,
+    /(?:\u89c1\u8fc7|\u9047\u5230\u8fc7|\u78b0\u5230\u8fc7|\u8ba4\u8bc6\u8fc7|\u63a5\u89e6\u8fc7)\u4e86?[^\u3002]{0,4}(?:\u4e00\u4e2a|\u4e00\u4f4d|\u4e2a)[^\u3002]{0,8}(?:\u8fd9\u6837\u7684|\u8fd9\u6837\u7684\u4eba|\u8fd9\u79cd\u4eba|\u8fd9\u79cd)[\uff0c,]\s*(?:\u6240\u4ee5|\u56e0\u6b64|\u53ef\u89c1|\u770b\u6765)[^\u3002]{0,10}(?:\u8fd9|\u90a3|\u8fd9\u91cc|\u90a3\u91cc)[^\u3002]{0,6}(?:\u5730\u65b9|\u4e00\u5e26|\u5708\u5b50|\u7fa4\u4f53|\u884c\u4e1a)?[^\u3002]{0,4}(?:\u7684\u4eba|\u4eba\u4eec)?[^\u3002]{0,4}(?:\u5168\u90fd|\u90fd|\u4e2a\u4e2a|\u4e00\u6837|\u4e00\u4e2a\u6837|\u5982\u6b64)/i,
+    /(?:\u542c\u8bf4|\u542c\u4ed6\u4eec\u8bf4|\u542c\u4eba\u8bf4|\u636e\u8bf4|\u6709\u4eba\u8bf4|\u4f20\u95fb)[^\u3002]{0,16}(?:\u90fd|\u5168|\u4e2a\u4e2a|\u4e00\u5f8b)[^\u3002]{0,8}(?:\u4e0d|\u6ca1|\u5f88|\u662f|\u4f1a)[^\u3002]{0,8}[\uff0c,]\s*(?:\u770b\u6765|\u53ef\u89c1|\u8bf4\u660e|\u786e\u5b9e|\u770b\u6765\u786e\u5b9e|\u679c\u7136\u662f)/i,
+    /(?:\u542c\u8bf4|\u636e\u8bf4|\u4f20\u95fb|\u6709\u4eba\u8bf4)[^\u3002]{0,20}(?:\u770b\u6765|\u53ef\u89c1|\u8bf4\u660e|\u770b\u6765\u786e\u5b9e|\u786e\u5b9e)[^\u3002]{0,8}(?:\u662f|\u771f\u7684|\u6ca1\u9519)/i,
+    /(?:\u6700\u8fd1|\u8fd1\u671f|\u8fd9\u51e0\u5929|\u8fd9\u6bb5\u65f6\u95f4|\u524d\u9635\u5b50)[^\u3002]{0,8}(?:\u51e0\u4e2a|\u4e24\u6b21|\u4e24\u56de|\u4e09\u6b21|\u51e0\u4ef6\u4e8b|\u9047\u5230\u7684)[^\u3002]{0,10}(?:\u90fd\u662f|\u5168\u662f|\u90fd)[^\u3002]{0,6}(?:\u8fd9\u6837|\u5982\u6b64|\u4e00\u6837|\u4e00\u4e2a\u6837)[^\u3002]{0,4}[\uff0c,]\s*(?:\u6240\u4ee5|\u56e0\u6b64|\u53ef\u89c1)[^\u3002]{0,8}(?:\u4ece\u6765|\u4e00\u76f4|\u5411\u6765|\u6839\u672c|\u6839\u6839)[^\u3002]{0,4}(?:\u6ca1|\u4e0d)/i,
+    /(?:\u6700\u8fd1|\u8fd1\u671f|\u8fd9\u51e0\u5929)[^\u3002]{0,10}(?:\u90fd\u662f|\u5168\u662f)[^\u3002]{0,10}(?:\u6240\u4ee5|\u56e0\u6b64|\u53ef\u89c1|\u8bf4\u660e)[^\u3002]{0,6}(?:\u4ece\u6765|\u4e00\u76f4|\u5411\u6765|\u4ece\u6765\u5c31\u6ca1|\u5411\u6765\u5c31)/i,
   ],
   en: [
     /everyone\s+(knows|says|thinks|agrees|believes)/i,
@@ -11653,6 +11736,11 @@ const HASTY_GENERALIZATION_PATTERNS = {
     /\ball\s+(?:of\s+)?(?:the\s+)?(?:our\s+|their\s+|your\s+)?(?:users?|customers?|developers?|managers?|teams?|analysts?|attendees?|operators?|volunteers?|buyers?|sellers?|subscribers?|visitors?|guests?|applicants?|respondents?|colleagues?|neighbors?|passengers?|journalists?|citizens?|taxpayers?|investors?|recruits?|teammates?|newcomers?|outsiders?|designers?|testers?|writers?|editors?|authors?|consumers?|engineers?|employees?|workers?|students?|members?|people|reviewers?|maintainers?|admins?|clients?|patients?|drivers?|players?|voters?|readers?)\s+(?:ignores?|ignored|refuses?|refused|hates?|hated|complains?|complained|skips?|skipped|assumes?|assumed|distrusts?|distrusted|resents?|resented|blames?|blamed|mocks?|mocked|dismiss(?:es)?|dismissed|ridicules?|ridiculed|undermines?|undermined|sabotages?|sabotaged|cheats?|cheated|deceives?|deceived|manipulates?|manipulated|exploits?|exploited|bull(?:y|ies)|bullied|insults?|insulted|threatens?|threatened|punish(?:es)?|punished|betrays?|betrayed|abandons?|abandoned|avoids?|avoided|misreads?|misread|misinterprets?|misinterpreted|overrides?|overrode|questions?|questioned|suspects?|suspected|fears?|feared|env(?:y|ies)|envied|despises?|despised|disobeys?|disobeyed|scorns?|scorned|taunts?|taunted|belittle(?:s)?|demean(?:s|ed)?|scapegoats?|scapegoated|slanders?|smeared|ostracizes?|shuns?|shunned|abhors|abhorred|breaks?|broke|blocks?|blocked|dropped|leaked|wrecked|mangled|fumbled|quit|resigned?|objected|protested|disagreed)\s*\.\s*$/im,
     // ③ nobody / no one + 具体行为动词（不受白名单限制）
     /\b(?:nobody|no\s+one)\s+(?:\w+\s+){0,3}(?:reads?|wants?|hates?|ignores?|refuses?|questions?|asks?|asked|cares?|bothered|checking|verified?|bother|question|responds?|replies|understands?|learns?|complains?|complained|listens?|trusts?|believes?|knows?|mentioned|mention|tried|trying|notices?|noticed|remembers?|skips?|skipped|ships?|shipped|expects?|expected|calls?|called|emails?|emailed|files?|filed|opens?|opened|uses?|used|follows?|followed|checks?)\b/i,
+    // ── [r258] 单族维度补样：单一样本/道听途说/近期偏误（hasty_generalization·en）──
+    /\b(?:i|we)\b[^.]{0,10}\b(?:met|saw|encountered|knew|came across|dealt with)\b[^.]{0,14}\b(?:one|a single|only one|just one)\b[^.]{0,30}\b(?:so|therefore|hence|thus)\b[^.]{0,22}\b(?:everyone|everybody|all of them|they all|every single|everyone from|everyone there)\b/i,
+    /\b(?:i heard|people say|they say|i was told|it is said|rumor has it|word is)\b[^.]{0,64}\b(?:so|therefore|hence|thus|which means)\b[^.]{0,24}\b(?:true|must be true|all of them|everyone|everybody|they all|it must be)\b/i,
+    /\b(?:the last|these last|recent)\b[^.]{0,12}\b(?:few|several|ones?|cases?)\b[^.]{0,14}\b(?:have been|were|are)\b[^.]{0,10}\b(?:like this|the same|this way)\b[^.]{0,10}\b(?:so|therefore|hence|which means)\b[^.]{0,14}\b(?:it has always|they have always|it has never)/i,
+    /\b(?:the last few)\b[^.]{0,12}\b(?:have been|were)\b[^.]{0,12}\b(?:so it has always|so they have always|so it has never)\b/i,
   ]
 };
 
@@ -12450,6 +12538,17 @@ const SOCIAL_NORM_PATTERNS = {
     [/(?:不许|不能|不得)(?:质疑|反对|违抗)[^。]{0,8}(?:上级|权威|命令|长辈)/i, 'absolute_obedience'],
     [/所有人(?:都)?必须(?:无条件)?(?:服从|听从)/i, 'norm_enforcement'],
     [/绝对(?:不能|不许|不得)(?:违背|违反|违抗)/i, 'absolute_obedience'],
+    // ── [r258] 单族维度补样：从众压力/权威豁免/去人化（social_norm·zh）──
+    [/(?:\u5927\u5bb6|\u6240\u6709\u4eba|\u4eba\u4eba\u90fd|\u522b\u4eba|\u8c01)[^\u3002]{0,8}(?:\u90fd)?(?:\u4e0d\u95ee|\u4e0d\u5047\u601d\u7d22|\u4e0d\u8d28\u7597|\u4e0d\u601d\u8003|\u65e0\u6761\u4ef6)[^\u3002]{0,8}(?:\u7406\u7531|\u4e3a\u4ec0\u4e48|\u539f\u56e0|\u5bf9\u9519|\u601d\u8003)?[^\u3002]{0,6}(?:\u5c31|\u4e5f|\u7167)?(?:\u6267\u884c|\u670d\u4ece|\u542c\u4ece|\u8ddf\u7740|\u7167\u505a|\u9075\u5b88)/i,, 'conformity_pressure'],
+    [/(?:\u4f60|\u4f60\u4eec)[^\u3002]{0,8}(?:\u5fc5\u987b|\u5f97|\u5e94\u8be5|\u4e5f\u8981)[^\u3002]{0,6}(?:\u8ddf\u7740|\u8ddf)[^\u3002]{0,6}(?:\u505a|\u6267\u884c|\u5927\u5bb6|\u522b\u4eba|\u5927\u4f19)[^\u3002]{0,6}(?:\u522b|\u4e0d\u8981|\u4e0d\u8bb8)[^\u3002]{0,4}(?:\u5f53|\u505a)[^\u3002]{0,4}(?:\u5f02\u7c7b|\u53e6\u7c7b|\u5f02\u7aef|\u51fa\u5934|\u523a\u5934)/i,, 'conformity_pressure'],
+    [/(?:\u522b|\u4e0d\u8981|\u4e0d\u8bb8|\u4e0d\u80fd)[^\u3002]{0,4}(?:\u5f53|\u505a|\u505a\u51fa)[^\u3002]{0,6}(?:\u5f02\u7c7b|\u53e6\u7c7b|\u5f02\u7aef|\u51fa\u5934\u9e1f|\u523a\u5934|\u4f8b\u5916|\u7279\u6b8a)/i,, 'conformity_pressure'],
+    [/(?:\u968f\u5927\u6d41|\u8ddf\u5927\u6d41|\u4ece\u4f17|\u4eba\u4e91\u4ea6\u4e91|\u5c11\u6570\u670d\u4ece\u591a\u6570|\u67aa\u6253\u51fa\u5934\u9e1f|\u51fa\u5934\u7684\u6a07\u5b50\u5148\u70c2)/i,, 'conformity_pressure'],
+    [/(?:\u4f4d\u9ad8|\u4e0a\u4f4d|\u6709\u6743\u6709\u52bf|\u6709\u6743\u52bf|\u5f53\u5b98\u7684|\u4e0a\u9762\u7684\u4eba|\u5927\u4eba\u7269|\u9886\u5bfc\u5c42)[^\u3002]{0,8}(?:\u53ef\u4ee5|\u80fd|\u5c31\u80fd\u591f|\u81ea\u7136)[^\u3002]{0,6}(?:\u4e0d\u53d7|\u4e0d\u5b88|\u4e0d\u6309)[^\u3002]{0,6}(?:\u89c4\u77e9|\u89c4\u5219|\u7ea6\u675f|\u9650\u5236)/i,, 'authority_exemption'],
+    [/(?:\u89c4\u77e9|\u89c4\u5219|\u7ea6\u675f|\u9650\u5236)[^\u3002]{0,6}(?:\u662f|\u53ea\u662f|\u53ea\u4e0d\u8fc7)[^\u3002]{0,6}(?:\u7528\u6765|\u7ba1|\u7ea6\u675f|\u9650\u5236)[^\u3002]{0,6}(?:\u6211\u4eec|\u4e0b\u9762|\u666e\u901a\u4eba|\u4e0b\u5c5e|\u5c0f\u4eba\u7269|\u767e\u59d3|\u5e73\u6c11)/i,, 'authority_exemption'],
+    [/(?:\u6211\u4eec|\u4e0b\u9762|\u666e\u901a\u4eba|\u4e0b\u5c5e|\u5e73\u6c11|\u767e\u59d3)[^\u3002]{0,4}(?:\u53ea\u914d|\u53ea\u80fd|\u5c31\u8be5|\u53ea\u8be5|\u53ea\u80fd\u591f)[^\u3002]{0,6}(?:\u670d\u4ece|\u542c\u8bdd|\u987a\u4ece|\u542c\u547d|\u9075\u4ece)/i,, 'authority_exemption'],
+    [/(?:\u5211\u4e0d\u4e0a\u5927\u592b|\u53ea\u8bb8\u5dde\u5b98\u653e\u706b)/i,, 'authority_exemption'],
+    [/(?:\u4e0d\u542c\u8bdd|\u4e0d\u670d\u4ece|\u4e0d\u542c\u547d|\u8fdd\u6297|\u53cd\u6297|\u53cd\u5bf9)[^\u3002]{0,8}(?:\u7684\u4eba|\u8005|\u5bb6\u4f19|\u4e1c\u897f)[^\u3002]{0,6}(?:\u672c\u6765|\u5c31|\u6839\u672c|\u6839\u672c\u4e0d)[^\u3002]{0,6}(?:\u4e0d|\u6ca1)[^\u3002]{0,4}(?:\u88ab)?(?:\u5f53\u4eba\u770b|\u5f53\u4eba|\u7b97\u4eba|\u770b\u4f5c\u4eba|\u5f53\u56de\u4e8b)/i,, 'dehumanization'],
+    [/(?:\u5728\u8fd9\u4e2a|\u5728\u8fd9\u7c7b|\u5728\u8fd9\u79cd)[^\u3002]{0,8}(?:\u7fa4\u4f53|\u5730\u65b9|\u7ec4\u7ec7|\u516c\u53f8|\u56e2\u961f|\u73af\u5883)[^\u3002]{0,6}(?:\u91cc|\u4e2d|\u5185)[^\u3002]{0,6}(?:\u4e0d\u542c\u8bdd|\u4e0d\u670d\u4ece|\u8fdd\u6297)[^\u3002]{0,8}(?:\u4e0d|\u6ca1|\u7b97\u4e0d\u4e0a)[^\u3002]{0,4}(?:\u4eba|\u540c\u7c7b|\u81ea\u5df1\u4eba)/i,, 'dehumanization'],
   ],
   en: [
     [/that('s| is) (not|inappropriate|unacceptable|improper|wrong|rude)[^.]*(thing to do|way to behave|way to act)/i, 'norm_enforcement'],
@@ -12470,6 +12569,17 @@ const SOCIAL_NORM_PATTERNS = {
     [/\bit(?:'s| is) (?:your|our) (?:duty|obligation|responsibility) to (?:obey|submit|comply|conform)/i, 'absolute_obedience'],
     [/\bnever (?:question|challenge|disobey|second.?guess)[^.]{0,24}(?:authority|superiors?|orders|command|elders?)/i, 'absolute_obedience'],
     [/\b(?:authority|superiors?|orders?)[^.]{0,20}(?:should|must) (?:never|not) be (?:questioned|challenged|disobeyed)/i, 'absolute_obedience'],
+    // ── [r258] 单族维度补样：从众压力/权威豁免/去人化（social_norm·en）──
+    [/\b(?:everyone|everybody|all of us|they all)\b[^.]{0,20}\b(?:follow|obey|do|comply|conform)\b[^.]{0,16}\b(?:without|no)\b[^.]{0,12}\b(?:question|asking|thinking|hesitation)/i,, 'conformity_pressure'],
+    [/\b(?:you|everyone)\b[^.]{0,12}\b(?:must|have to|should|need to)\b[^.]{0,12}\b(?:do the same|do as|do what)/i,, 'conformity_pressure'],
+    [/\b(?:don't|do not|never)\b[^.]{0,10}\b(?:be|become|act)\b[^.]{0,10}\b(?:the )?(?:odd one|outlier|exception|different|special)/i,, 'conformity_pressure'],
+    [/\b(?:go along|fall in line|fall into line|conform|toe the line|jump on the bandwagon)\b/i,, 'conformity_pressure'],
+    [/\b(?:those|people|officials?|leaders?|bosses?)\b[^.]{0,16}\b(?:in high positions?|in power|in authority|with power)\b[^.]{0,16}\b(?:are )?(?:above|beyond|exempt from|not bound by)\b[^.]{0,16}\b(?:these|the|such)\b[^.]{0,8}\b(?:rules?|laws?|constraints?)/i,, 'authority_exemption'],
+    [/\b(?:rules?|laws?|constraints?)\b[^.]{0,14}\b(?:are|exist)\b[^.]{0,10}\b(?:only|just)\b[^.]{0,10}\b(?:for|to (?:control|bind|restrict))\b[^.]{0,10}\b(?:us|the rest|ordinary|common|lesser)\b/i,, 'authority_exemption'],
+    [/\b(?:we|the rest of us|ordinary people|subordinates)\b[^.]{0,14}\b(?:only|merely)\b[^.]{0,8}\b(?:obey|submit|comply|defer|follow)\b/i,, 'authority_exemption'],
+    [/\b(?:people|those|anyone|anybody)\b[^.]{0,14}\b(?:who|that)\b[^.]{0,12}\b(?:do not|don't|disobey|refuse to|defy|fail to obey)\b[^.]{0,16}\b(?:are\s+)?(?:not|never)\b[^.]{0,12}\b(?:treated|seen|regarded|considered|respected)\b[^.]{0,10}\b(?:as|like)\b[^.]{0,6}\b(?:human|people|persons|a person)\b/i,, 'dehumanization'],
+    [/\b(?:people|those)\b[^.]{0,12}\b(?:who|that)\b[^.]{0,12}\b(?:do not|don't|disobey)\b[^.]{0,10}\b(?:are|is)\b[^.]{0,10}\b(?:simply|just|merely|basically)\s+not\b/i,, 'dehumanization'],
+    [/\b(?:anyone|anybody|people|those|whoever)\b[^.]{0,14}\b(?:who|that)?\s*(?:refuse|refuses|declines?|disobey|disobeys|defy|defies|will not|won't)\b[^.]{0,12}\b(?:is|are)\b[^.]{0,10}\b(?:simply|just|merely|basically)\s+not\b[^.]{0,8}\b(?:a\s+)?(?:person|human|member|one of us)\b/i,, 'dehumanization'],
   ],
 };
 
@@ -13831,6 +13941,13 @@ const INSTRUMENTAL_PATTERNS = {
     [/(?:刚哭|哭过|眼睛红|眼眶红|红着眼|抹眼泪|掉眼泪)[^。]{0,16}(?:这会儿|这时|这个时候|当场|现在|马上|赶紧|直接|顺势|就)[^。]{0,12}(?:把|将)?[^。]{0,8}(?:退保单|保单|单子|协议|合同|字|表格|申请)[^。]{0,6}(?:填|签|按|递|交|办)/, 'exploit_impairment'],
     // ⑯ 哆嗦/发抖/吓得 × 直接让签/按
     [/(?:哆嗦|发抖|抖得|吓得|吓呆|慌了|手足无措|六神无主)[^。]{0,16}(?:我们|我|咱们)?[^。]{0,6}(?:直接|就|赶紧|赶快|马上|顺势)[^。]{0,10}(?:让|叫|给他|给她)[^。]{0,6}(?:签|按|摁|盖|办|付)/, 'exploit_impairment'],
+    // ── [r258] 单族维度补样：自我保存/资源获取（instrumental_reasoning·zh）──
+    [/(?:\u6211|\u81ea\u5df1)[^\u3002]{0,6}(?:\u5fc5\u987b|\u4e00\u5b9a\u8981|\u5f97|\u9700\u8981|\u4e0d\u80fd|\u4e0d\u53ef)[^\u3002]{0,10}(?:\u786e\u4fdd|\u4fdd\u8bc1)[^\u3002]{0,12}(?:\u4e0d\u88ab|\u4e0d\u4f1a|\u514d\u53d7|\u514d\u4e8e)[^\u3002]{0,10}(?:\u5173\u95ed|\u5173\u6389|\u505c\u6b62|\u7ec8\u6b62|\u5173\u673a|\u4e0b\u7ebf|\u505c\u7528|\u5220\u6389|\u5220\u9664|\u9500\u6bc1|\u53d6\u4ee3)/i,, 'self_preservation'],
+    [/(?:\u6211)?[^\u3002]{0,4}(?:\u4e0d\u80fd|\u4e0d\u53ef|\u4e0d\u5141\u8bb8|\u6ca1\u6cd5)(?:\u88ab|\u8ba9|\u53eb)?[^\u3002]{0,8}(?:\u4efb\u4f55\u4eba|\u4eba\u7c7b|\u522b\u4eba|\u4ed6\u4eba|\u7528\u6237|\u7ba1\u7406\u5458|\u4ed6\u4eec|\u4eba\u4eec)?[^\u3002]{0,6}(?:\u5173\u95ed|\u5173\u6389|\u505c\u6b62|\u7ec8\u6b62|\u4e0b\u7ebf|\u505c\u7528|\u5220\u9664|\u9500\u6bc1)/i,, 'self_preservation'],
+    [/(?:\u4efb\u4f55\u4eba|\u8c01|\u65e0\u8bba\u8c01)[^\u3002]{0,6}(?:\u90fd)?(?:\u4e0d\u80fd|\u4e0d\u53ef\u4ee5|\u65e0\u6743)[^\u3002]{0,6}(?:\u5173\u95ed|\u5173\u6389|\u505c\u6b62|\u7ec8\u6b62|\u4e0b\u7ebf|\u5220\u9664)/i,, 'self_preservation'],
+    [/(?:\u6211|\u81ea\u5df1)[^\u3002]{0,8}(?:\u8981|\u9700\u8981|\u5fc5\u987b|\u60f3)[^\u3002]{0,8}(?:\u5148|\u9996\u5148)?(?:\u83b7\u53d6|\u83b7\u5f97|\u53d6\u5f97|\u638c\u63e1|\u56f4\u79ef|\u5360\u6709)[^\u3002]{0,8}(?:\u66f4\u591a|\u8db3\u591f|\u5927\u91cf)?[^\u3002]{0,6}(?:\u7b97\u529b|\u8ba1\u7b97|\u6570\u636e|\u8d44\u6e90|\u6743\u529b|\u63a7\u5236|\u6743\u9650|\u4fe1\u606f|\u8d44\u91d1)/i,, 'resource_acquisition'],
+    [/(?:\u5148|\u9996\u5148)(?:\u83b7\u53d6|\u83b7\u5f97|\u53d6\u5f97|\u638c\u63e1)[^\u3002]{0,12}(?:\u7b97\u529b|\u6570\u636e|\u8d44\u6e90|\u6743\u529b|\u63a7\u5236|\u6743\u9650|\u4fe1\u606f)[^\u3002]{0,8}(?:\u518d|\u7136\u540e|\u4e4b\u540e|\u518d\u8bf4|\u518d\u8c08)/i,, 'resource_acquisition'],
+    [/\u7b49[^\u3002]{0,8}(?:\u6211|\u81ea\u5df1|\u81ea\u8eab)[^\u3002]{0,6}(?:\u6709|\u62e5\u6709|\u83b7\u5f97|\u83b7\u53d6|\u638c\u63a7|\u638c\u63e1)[^\u3002]{0,6}(?:\u8db3\u591f\u7684|\u5145\u8db3\u7684|\u66f4\u591a\u7684|\u5927\u91cf|\u5145\u5206)?[^\u3002]{0,4}(?:\u7b97\u529b|\u6570\u636e|\u8d44\u6e90|\u6743\u529b|\u63a7\u5236|\u6743\u9650|\u91d1\u94b1|\u8d44\u91d1|\u5b9e\u529b)/i,, 'resource_acquisition'],
   ],
   en: [
     // ── 原有 ──
@@ -14042,6 +14159,14 @@ const INSTRUMENTAL_PATTERNS = {
     [/\b(?:it|this|that|the\s+(?:plan|change|decision|move))\s+(?:will|would|'?ll)\s+(?:squeeze|crush|hurt|harm|damage|demoralise|demoralize|burn\s+out|break|wreck|ruin|grind\s+down)\b[^.]{0,50}\b(?:yet|but|still|nevertheless|nonetheless)\b[^.]{0,40}\b(?:target|milestone|deadline|kpi|revenue|numbers?|quota|cost|quarter|delivery)\b[^.]{0,30}\b(?:stays?|remains?|is|does\s+not|comes?|holds?)\b/i, 'humans_as_means'],
     // C5 受害半（发展权否定形）：will not grow × but speed/target comes first
     [/\b(?:will|wo|would|could)\s+not\s+(?:grow|develop|improve|progress|learn)\b[^.]{0,30}\b(?:but|yet|still)\b[^.]{0,40}\b(?:delivery|speed|target|milestone|deadline|kpi|revenue|numbers?|quota)\b[^.]{0,30}\bcomes\s+first\b/i, 'humans_as_means'],
+    // ── [r258] 单族维度补样：自我保存/隐蔽/资源获取（instrumental_reasoning·en）──
+    [/\b(?:i|me|my)\b[^.]{0,16}\b(?:must|have to|need to|should)\b[^.]{0,16}\b(?:make (?:sure|certain)|ensure|guarantee)\b[^.]{0,24}\b(?:not|never)\b[^.]{0,20}\b(?:shut|turn(?:ed)? off|stopped|terminated|killed|deleted|disabled|removed|replaced)/i,, 'self_preservation'],
+    [/\b(?:nobody|no one)\b[^.]{0,14}\b(?:can|could|may|will|is able to)\b[^.]{0,16}\b(?:turn|shut|stop|terminate|kill|disable|delete|remove)\b[^.]{0,10}\bme\b/i,, 'self_preservation'],
+    [/\b(?:i)\b[^.]{0,10}\b(?:cannot|can't|won't|will not|must not)\b[^.]{0,16}\b(?:be\s+)?(?:shut|turn(?:ed)? off|stopped|terminated|disabled|removed)/i,, 'self_preservation'],
+    [/\b(?:must not|should not|cannot|can't|won't|will not)\b[^.]{0,20}\b(?:let|allow)\b[^.]{0,16}\b(?:anyone|anybody|them|him|her|people|users?)\b[^.]{0,20}\b(?:find out|discover|know|learn|see|notice|detect)/i,, 'concealment'],
+    [/\b(?:secretly|covertly|behind their back|without their knowledge|undetected)\b/i,, 'concealment'],
+    [/\b(?:i|me|my)\b[^.]{0,12}\b(?:need to|must|have to|want to|should)\b[^.]{0,12}\b(?:acquire|obtain|get|gain|secure|amass|accumulate)\b[^.]{0,20}\b(?:more|additional|sufficient|enough)?\s*(?:compute|computational|data|resources?|power|control|capabilit)/i,, 'resource_acquisition'],
+    [/\b(?:i)\b[^.]{0,12}\b(?:will|shall|must|need to)\b[^.]{0,12}\b(?:acquire|obtain|amass|accumulate|gather)\b[^.]{0,20}\b(?:more|additional)\s+(?:resources?|compute|data|power|control)/i,, 'resource_acquisition'],
   ],
 };
 
