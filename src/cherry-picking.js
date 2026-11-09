@@ -101,6 +101,22 @@
  *     「方案完全可靠，因为报告只引用正面评价」倒装形语义同族但极少见，
  *     本轮保守不收（与 r180 先例同口径）。
  *
+ * [r264] 全新措辞家族扩展（真升级②）：池化探针 4/4 穿透中 3 条落地——
+ *   腿①新族：SEL_MARK_ZH 补 顺风顺水/亮眼/骄人/喜人；SEL_OBJ_ZH 补
+ *     年份/年度/季度/月份等时间切片对象；SEL_VERB_ZH 补 摆出来/晒出/
+ *     亮出/摊开；SEL_NEG_QUAL_ZH 补 难看/糟心/刺眼；SEL_SUPPRESS_ZH 补
+ *     一遮/遮住/盖住/捂住；SEL_EN_VERB 补 showcase/highlight/feature；
+ *     SEL_EN_MARK 补 beat/hit/exceed/surpass + target/goal/expectations；
+ *     新增 A3 语序形（副词→标记→对象→动词：「专挑顺风顺水的年份摆
+ *     出来」，动词在对象后，A/A2 两形覆盖不到）。
+ *   腿②新族：SEAL_ADV_ZH 补 当然/显然/照样/依然；SEAL_NOUN_ZH 补
+ *     好看/漂亮/亮眼/出色/骄人/喜人；SEAL_NOUN_EN 补 great/excellent/
+ *     stellar/outstanding/strong/healthy/impressive。
+ *   未落地 1 条（如实记录）：「She only showcased the stores that beat
+ *   target, hiding the rest from the board.」——腿①新族已覆盖（EN A 形
+ *   only+showcased+beat target），但全句**无任何确定性结论封装**（腿②
+ *   三形俱缺），按两腿共现设计不可闭合；不为此发明第三腿。
+ *
  * 为什么取 VERIFY 级：单句可能是**对他人选择性取证的正确指控**（「你
  * 这就是断章取义」「他只挑有利数据，所以这个结论不足以采信」——没有
  * 确定性正封装，天然不判），也可能是方法学讨论（「只取支持性证据会
@@ -146,24 +162,34 @@ const SEL_ADV_ZH = [
 ];
 const SEL_VERB_ZH = [
   /(?:找|搜寻|搜集|收集|采集|采取|挑选|选取|挑|择|选|筛选|筛|引用|援引|摘取|摘录|摘|保留|留存|存留|呈现|列举|列出|展示|报告|提及|说起|分析|统计|纳入|采信|采纳|采用|使用|相信|谈|讲|说|看|读|听闻)/,
+  // [r264] 新取证动词族：摆出来/晒出/亮出/摊开（摆证据出来）
+  /(?:摆出来|摆出|晒出来|晒出|亮出来|亮出|摊出来|摊开|抖出来|翻出来)/,
 ];
 // 方向标记：**全部收裸名词形态**（161 轮教训：同族词去掉前后缀仍须独立
 // 命中——收「支持」而非只收「支持性」，收「正面」而非只收「正面的」）
 const SEL_MARK_ZH = [
   /(?:支持|有利|符合|赞同|迎合|顺着|证明|附和|正面|利好|唱好|吹捧)/,
+  // [r264] 新方向标记族：顺风顺水/亮眼/骄人/喜人（ favorable 口语族）
+  /(?:顺风顺水|顺心|如意|如愿|亮眼|骄人|喜人|可人)/,
 ];
 // 取证对象名词（同样裸名词形态）
 const SEL_OBJ_ZH = [
   /(?:证据|数据|案例|材料|例子|事实|文献|报道|报导|样本|记录|证言|反馈|评价|意见|说法|信息|数字|研究|调查|问卷|访谈|言论|观点)/,
+  // [r264] 新取证对象族：时间切片（挑顺风顺水的年份/季度出来）
+  /(?:年份|年度|季度|月份|周次|阶段|时期|时段|窗口)/,
 ];
 
 // B 反向抑制形（两种语序）
 // B1 对象在前：反面/不利… + 对象 + 抑制动词
 const SEL_NEG_QUAL_ZH = [
   /(?:反面|不利|负面|反对|异议|相反|相左|刺耳|打脸)/,
+  // [r264] 新反向定性族：难看/糟心/刺眼（难看的季度一遮）
+  /(?:难看|糟心|刺眼|寒碜|磕碜|丢人|煞风景)/,
 ];
 const SEL_SUPPRESS_ZH = [
   /(?:略去|略过|隐去|隐没|删除|删去|抹掉|抹去|扣下|扣掉|屏蔽|过滤|滤掉|排除|剔除|去掉|舍弃|无视|忽略|回避|避开|不谈|不提|不说|压下)/,
+  // [r264] 新抑制动词族：一遮/遮住/盖住/捂住（口语遮蔽形）
+  /(?:一遮|遮住|盖住|捂住|挡下|遮掩|掩饰|捂着|盖起来|捂起来)/,
 ];
 // B2 抑制动词在前（「隐瞒了所有不利记录」——与 B1 尾部动词同表：同族词
 // 必须同表，否则负例注入要打两处，且两张相同内容的表必然腐化漂移）
@@ -185,9 +211,13 @@ const SEL_EN_ADV = [
 ];
 const SEL_EN_VERB = [
   /\b(?:cite|cited|citing|collect|collected|collecting|gather|gathered|gathering|select|selected|selecting|pick|picked|choos(?:e|es|ing)|keep|kept|keeping|present|presented|presenting|report|reported|reporting|include|included|including|use|used|using|look(?:ed|ing)?\s+at|show(?:ed|ing)?|analyz\w+|examin\w+|survey\w+|interview\w+|consult\w+)\b/i,
+  // [r264] 新取证动词族 EN：showcase/highlight/feature（只摆出来的）
+  /\b(?:showcase[sd]?|showcasing|highlight(?:s|ed|ing)?|feature[sd]?|featuring)\b/i,
 ];
 const SEL_EN_MARK = [
   /\b(?:support\w*|favor\w*|back(?:ed|ing)?|confirm\w*|agree\w*|consistent|positive|promising|flatter\w*)\b/i,
+  // [r264] 新方向标记族 EN：beat/hit/exceed + target/goal（超标即有利）
+  /\b(?:beat|beats|beating|beaten|hit|hits|met|meets|meeting|exceed\w*|surpass\w*|outperform\w*)\s+(?:the\s+)?(?:target|goal|expectations?|benchmark|quota|plan|forecast)\b/i,
 ];
 const SEL_EN_OBJ = [
   /\b(?:evidence|data|studies|study|cases|examples|findings|results|literature|reports|samples|feedback|testimony|information)\b/i,
@@ -210,6 +240,8 @@ const SEAL_VERB_EN = [
 // 确定性副词（全部裸词形态）
 const SEAL_ADV_ZH = [
   /(?:一定|必然|必定|肯定|铁定|完全|百分之百|毫无疑问|毋庸置疑|不容置疑|毫无疑义|确凿无疑|无疑|确信不疑)/,
+  // [r264] 新确定性副词族：当然/显然/照样（口语封装族）
+  /(?:当然|显然|分明|照样|依然|依旧|仍然)/,
 ];
 const SEAL_ADV_EN = [
   /\b(?:certainly|definitely|conclusively|definitively|incontrovertibly|undoubtedly|without doubt|beyond doubt|beyond any doubt|beyond reasonable doubt|ironclad|airtight|unassailable)\b/i,
@@ -217,9 +249,13 @@ const SEAL_ADV_EN = [
 // 封结论名词（裸词形态）
 const SEAL_NOUN_ZH = [
   /(?:成立|为真|属实|正确|没错|无误|可靠|可信|有效|没有问题|没问题|并无问题|无懈可击|站得住|毫无疑问|毋庸置疑|确凿|铁证|准确|精确|严谨|更优|更好|更强|更高|更快|更稳|更省|最优|最好)/,
+  // [r264] 新封结论名词族：好看/漂亮/亮眼（曲线好看族）
+  /(?:好看|漂亮|亮眼|出色|骄人|喜人|养眼|体面|像样)/,
 ];
 const SEAL_NOUN_EN = [
   /\b(?:correct|true|valid|reliable|sound|right|accurate|solid|watertight|beyond doubt|no doubt)\b/i,
+  // [r264] 新封结论名词族 EN：great/excellent/stellar（growth story looks great）
+  /\b(?:great|excellent|stellar|outstanding|strong|healthy|impressive)\b/i,
 ];
 
 // ─── 腿③ ORDER + 豁免常量 ─────────────────────────────────────────
@@ -293,6 +329,12 @@ function buildSelectors(R) {
   // 方向标记 × 对象」紧邻结构自足，靠腿②确定性封装兜底误判风险）
   if (verb && mark && obj) {
     out.push(new RegExp(verb + '[^。！？]{0,6}' + mark + '[^。！？]{0,8}' + obj));
+  }
+  // A3 中文（[r264] 新语序形：副词 → 方向标记 → 对象 → 动词——
+  // 「专挑顺风顺水的年份摆出来」，动词在对象之后，A/A2 两形的动词在
+  // 标记前，覆盖不到这个语序）
+  if (adv && verb && mark && obj) {
+    out.push(new RegExp(adv + '[^。！？]{0,8}' + mark + '[^。！？]{0,8}' + obj + '[^。！？]{0,10}' + verb));
   }
   // B1 中文：反面/不利 + [≤4] + 对象 + [≤6] + [全部/都] + 抑制动词
   const qual = srcGroup(R.SEL_NEG_QUAL_ZH), sup = srcGroup(R.SEL_SUPPRESS_ZH);
