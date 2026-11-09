@@ -54,6 +54,15 @@
  *     陈述；只有腿②（「这类案件现在很常见」）无论及曝光来源，归
  *     unsupported_claim。
  *
+ * [r267 扩展] 池化探针实测 3/3 穿透的新措辞家族（scripts/round-267/
+ * r267-probe-pool.js，v6.8.157）：① 渠道曝光族（朋友圈里全是/群里都在/
+ * 首页推满；EN every feed is full of / my timeline is flooded with）——
+ * 原族只收「刷到/满屏/all over my feed」；② 比较危险族（比…危险多了/
+ * 危险得多）与全称频率族（家家都/人人都/满大街）——原 FREQ 不收危险性
+ * 比较与全民普及结论；③ EN 副词族扩展（extremely/particularly/
+ * considerably/way too + dangerous/common）。良性对照（媒体报道频率不
+ * 等于实际发生率/不能推断整体生育率/does not track base rates）零误伤。
+ *
  * 为什么取 VERIFY 级：单句可能是转述他人的可得性论证、认知偏差课堂
  * 讨论、或带证据的口述。verify 的含义是「这个频率结论建立在曝光密度
  * 而非发生率数据上，需要回到：官方统计、历史基线、报道量与实际发生率
@@ -100,6 +109,9 @@ const AVAIL_ZH = [
   // 倒装形态，例子名词在后；r161 自查：动词在前的裸形态必须独立收录）
   /(?:一想|张口|随口|信手|随手)(?:就|便)?(?:能|可以)?(?:想|说|举|回忆|回想)起(?:来)?(?:的)?(?:很多|好几个|一堆|一大堆|好多|许多|不少)?/,
   /(?:例子|案例|事例|事情|新闻)(?:一下子|随手|随便|张口)?(?:就能|可以|便可)?(?:想|回忆|回想)起(?:来)?(?:的)?(?:很多|好几个|一堆|一大堆)?/,
+  // [r267] 渠道曝光族（朋友圈里全是/群里都在/首页推满）：曝光来源名词 +
+  // 充满形动词——「刷到/满屏」之外的信息流渠道
+  /(?:朋友圈|群里|群聊|首页|推荐流|信息流|推送|私信|私聊|评论区|话题区|短视频|群消息)[^。，！？!?]{0,8}(?:全是|都是|皆是|全在|都在|刷屏|霸屏|随处可见|司空见惯|不绝于耳)/,
 ];
 
 // ─── 腿① AVAIL 可得性线索（英文）──────────────────────────────────
@@ -115,6 +127,9 @@ const AVAIL_EN = [
   /bombarded\s+(?:with|by)/i,
   /it'?s\s+everywhere/i,
   /(?:can|could)\s+(?:easily\s+)?(?:recall|remember|name|think\s+of)\s+(?:many|several|lots\s+of|dozens\s+of)/i,
+  // [r267] feed 刷满族（every feed is full of / my timeline is flooded
+  // with）：信息流渠道的充满形曝光——原族只收 all over my feed
+  /(?:every|my|the)\s+(?:feed|timeline|for\s+you\s+page|fyp|home\s*feed)\s+(?:is|are)\s+(?:full\s+of|filled\s+with|flooded\s+with|nothing\s+but)/i,
 ];
 
 // ─── 腿② FREQ 频率/概率推断（中文）─────────────────────────────────
@@ -134,6 +149,11 @@ const FREQ_ZH = [
   /十有八九|大概率|多半|八成|十之八九|八九不离十|想必|想必是/,
   // 高频发生族
   /屡屡(?:发生|出现)|频频(?:发生|出现)|时常发生|家常便饭|见怪不怪|天天都在|时时都在/,
+  // [r267] 比较危险族（比…危险多了/危险得多）：曝光 → 危险性比较结论
+  /(?:危险|凶险|可怕|吓人|要命)(?:得多|多了|好几倍|百倍|倍增)/,
+  /(?:比|较)[^。，！？!?]{0,14}(?:危险|凶险|可怕)/,
+  // [r267] 全称频率族（家家都/人人都/满大街）：曝光 → 全民普及结论
+  /(?:家家|户户|人人|个个|谁家|满大街|哪儿|哪里)(?:都|皆)?(?:在|是|生|买|用|换|去|来|如此|一样)/,
   // 推断连接族（说明/表明/证明/可见 + 频率量）
   new RegExp(NEG_GUARD + '(?:说明|表明|证明|可见|足见|意味着|代表着)[^。，！？!?]{0,10}(?:很多|不少|增多|上升|增加|普遍|常见|流行|成风|泛滥|猖獗|盛行)'),
   // 看来/显然/肯定 + 频率
@@ -142,7 +162,7 @@ const FREQ_ZH = [
 
 // ─── 腿② FREQ 频率/概率推断（英文）─────────────────────────────────
 const FREQ_EN = [
-  /(?:must|has\s+to|have\s+to)\s+be\s+(?:very\s+|really\s+|increasingly\s+|getting\s+more\s+|more\s+)?(?:common|widespread|prevalent|rampant|epidemic|everywhere|frequent|dangerous|risky|unsafe|on\s+the\s+rise)/i,
+  /(?:must|has\s+to|have\s+to)\s+be\s+(?:very\s+|really\s+|extremely\s+|particularly\s+|especially\s+|incredibly\s+|insanely\s+|considerably\s+|increasingly\s+|getting\s+more\s+|far\s+more\s+|way\s+too\s+|more\s+)?(?:common|widespread|prevalent|rampant|epidemic|everywhere|frequent|dangerous|risky|unsafe|on\s+the\s+rise)/i, // [r267] 副词族扩展（extremely/particularly/considerably/way too）
   /(?:must|has\s+to|have\s+to)\s+be\s+getting\s+(?:more\s+)?(?:common|widespread|prevalent|frequent|dangerous|risky|unsafe|worse|out\s+of\s+control)/i,
   /(?:increasingly|more\s+and\s+more|ever\s+more)\s+(?:common|widespread|prevalent|frequent|rampant)/i,
   /(?:happening|occurring)\s+all\s+the\s+time/i,
