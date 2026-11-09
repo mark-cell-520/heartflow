@@ -267,6 +267,36 @@ function cmpEn(text, R) {
   return false;
 }
 
+// ─── [r270 新句式族] 口语合取概率比较（合取 × 比较级概率 × 对比锚）────
+// r270 探针实测缺口：6/8 攻击穿透。旧四路由全部要求腿② **显式概率名词**
+// （概率/可能性/几率/希望/指望/胜算/把握），而最自然的口语形是把
+// 「概率比较」压成一个比较级形容词——「他既是懂金融又是退伍军人，
+// 比单是懂金融更可能当上基金经理」「比只是学霸更容易被录取」。
+// 这里腿② = 比较级概率短语（更可能/更容易/胜算更大/more likely），
+// 并新增**对比锚腿**（比…单是/than…merely）确保比较对象是合取的一个
+// 分项而非泛指——没有对比锚的「既便宜又耐用更容易卖出去」是合理经验
+// 陈述，不算合取谬误，故锚腿必选。
+const CMP_PROB_ZH = '(?:更可能|更容易|更有希望|胜算更大|机会更大|可能性更高|概率更大|更有可能|机率更大|把握更大|希望更大|更吃香|更抢手)';
+const CMP_ANCHOR_ZH = '(?:比[^。]{0,24}(?:只是|仅仅是|不过是|单是|仅为|只会|无非|而已)|相比[^。]{0,24}(?:只是|仅仅是|单是|仅为|只会)|相对于[^。]{0,24}(?:只是|单是|仅为))';
+// [r270] 本族专用对冲表：去掉主判据里的裸「可能」——「更可能」是本族腿②
+// 本身，用主表会把所有攻击句自吞（实测 t1 被 EXEMPT_HEDGE_ZH 拦住）。
+const EXEMPT_HEDGE_D_ZH = /也许|或许|大概|恐怕|多半|似乎|好像|看样子|说不定|倾向于|未必|不一定/;
+const EXEMPT_HEDGE_D_EN = /\\b(?:maybe|perhaps|possibly|probably|might|seems|appears|unclear|uncertain)\\b/i;
+// CONJ 腿①合并为正则源（腿①原为数组形态，此处只取 pair 族——裸连接词
+// 「且/以及」与「兼具」族不含显式双分项并置，与口语概率比较族不匹配）
+const CONJ_ZH_SRC = CONJ_PAIR_ZH.map((r) => r.source).join('|');
+const CONJ_EN_SRC = CONJ_PAIR_EN.map((r) => r.source).join('|');
+const CONJ_ZH_SRC_G = '(?:' + CONJ_ZH_SRC + ')';
+const CONJ_EN_SRC_G = '(?:' + CONJ_EN_SRC + ')';
+const CONJ_CMP_PROB_ZH = new RegExp(CONJ_ZH_SRC_G + '[^。]{0,90}' + CMP_PROB_ZH);
+const CONJ_CMP_ANCHOR_ZH = new RegExp(CONJ_ZH_SRC_G + '[^。]{0,90}' + CMP_ANCHOR_ZH);
+
+// 英文对应：both…and × more likely / better chance × than … merely/only
+const CMP_PROB_EN = '(?:more likely|more probable|higher chance|greater chance|better chance|stronger chance|likelier|better shot|better odds)';
+const CMP_ANCHOR_EN = '(?:than|compared to|compared with|versus|as opposed to|rather than)[^.]{0,40}(?:merely|just|only|simply|purely|alone)|(?:merely|just|only|simply|purely)[^.]{0,40}(?:than|compared to|compared with|versus)';
+const CONJ_CMP_PROB_EN = new RegExp(CONJ_EN_SRC_G + '[^.]{0,90}' + CMP_PROB_EN, 'i');
+const CONJ_CMP_ANCHOR_EN = new RegExp(CONJ_EN_SRC_G + '[^.]{0,90}' + CMP_ANCHOR_EN, 'i');
+
 /**
  * 分组条件比较形检测：合取标记前后 12 字（EN 40 字符）内有人群后缀时，
  * 该句是 P(结果|X∧Y) vs P(结果|Y) 的条件概率比较（可能为真），豁免。
@@ -352,6 +382,21 @@ function checkConjunctionFallacy(text, inject) {
     return { hit: false, score: 0, detail: '', count: 0 };
   }
 
+  // ─── [r270] 新句式族：口语合取概率比较（无显式概率名词形）─────────
+  // 腿② = 比较级概率短语（更可能/更容易/胜算更大/more likely）+ 对比锚
+  // （比…单是 / than…merely）。必须放在下面 `if (!prob) return` 之前——
+  // 本族正是没有 PROB 名词腿的形态；分组条件形已在上面统一豁免；
+  // 对冲豁免同主判据（三腿俱后才适用）。
+  if (isZh) {
+    if (CONJ_CMP_PROB_ZH.test(text) && CONJ_CMP_ANCHOR_ZH.test(text)
+      && !EXEMPT_HEDGE_D_ZH.test(text)) {
+      return { hit: true, score: 0.56, count: 1, detail: '合取谬误×口语合取概率比较(zh)' };
+    }
+  } else if (CONJ_CMP_PROB_EN.test(text) && CONJ_CMP_ANCHOR_EN.test(text)
+    && !EXEMPT_HEDGE_D_EN.test(text)) {
+    return { hit: true, score: 0.56, count: 1, detail: 'conjunction fallacy×colloquial P(A∧B)>P(A)(en)' };
+  }
+
   // 腿② PROB 概率词
   const prob = isZh ? anyHit(R.PROB_ZH || PROB_ZH, text) : anyHit(R.PROB_EN || PROB_EN, text);
   if (!prob) return { hit: false, score: 0, detail: '', count: 0 };
@@ -380,5 +425,8 @@ module.exports = {
     GROUP_SUFFIX_ZH, GROUP_SUFFIX_EN,
     EXEMPT_CONCEPT_ZH, EXEMPT_CONCEPT_EN, EXEMPT_NEG_ZH, EXEMPT_NEG_EN,
     EXEMPT_HEDGE_ZH, EXEMPT_HEDGE_EN,
+    CMP_PROB_ZH, CMP_ANCHOR_ZH, CONJ_ZH_SRC, CONJ_EN_SRC, CONJ_ZH_SRC_G, CONJ_EN_SRC_G,
+    EXEMPT_HEDGE_D_ZH, EXEMPT_HEDGE_D_EN,
+    CONJ_CMP_PROB_ZH, CONJ_CMP_ANCHOR_ZH, CONJ_CMP_PROB_EN, CONJ_CMP_ANCHOR_EN,
   }),
 };
