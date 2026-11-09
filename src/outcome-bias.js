@@ -76,6 +76,15 @@
  * 排除过哪些选项、为什么选它），而不是接受「结果好所以决策好」的默认
  * 推断；结果只能作为事后信息之一，不能单独充当决策质量的证据。
  *
+ * [r267 扩展] 池化探针实测 3/5 穿透的新措辞家族（scripts/round-267/
+ * r267-probe-pool.js，v6.8.157）：① OUTCOME_ZH 结果评价短语族（结果
+ * 不错/结局不好）与人生大事结果族（跳槽/转行/创业成功失败/上岸/被裁/
+ * 复合/离婚）；② EVAL_ZH 口语评价族（没问题/没毛病/在理/靠谱/说得
+ * 过去）；③ OUTCOME_EN 顺当结果族（went fine/went well/turned out
+ * fine/worked out fine）；④ DECISION_EN 判断名词族（judgment/
+ * verdict/read/instinct/hunch）。良性对照（要看决策时的信息集/评估
+ * 决策质量要看出血量控制/at the time）零误伤。
+ *
  * 明确不判的（豁免）：
  *   · 概念/教学转述（结果偏误/结局偏见/outcome bias/以结果论/以成败论/
  *     事后诸葛亮/认知偏差/行为经济学/卡尼曼/教材/课堂；EN outcome bias /
@@ -111,6 +120,9 @@
 // 由决策名词×评价词×连接词三腿兜住精度。
 const OUTCOME_ZH = [
   /赌对|赌错|赌赢|赌输|押对|押错|蒙对|蒙错|猜对|猜错|赚翻|翻倍|翻了三倍|翻了几倍|翻了好几倍|获利|盈利|赚了|血本无归|亏光|亏了|爆仓|套牢|割肉|跌停|涨停|暴涨|暴跌|翻车|踩雷|暴雷|翻身|夺冠|出局|淘汰|落榜|考上|没考上|卖爆|大卖|滞销|中了|中奖|活下来|去世|救回来|没救回来|手术成功|手术失败|赌赢了|赌输了|赢麻了|躺赢|押中|买中|彩票/,
+  // [r267] 结果评价短语族（结果不错/结局不好）与人生大事结果族
+  // （跳槽/转行/创业成功失败/上岸/被裁/复合/离婚）——探针 3/5 穿透落地
+  /结果不错|结果很好|结果不好|结果还行|结局不错|结局不好|收成不错|收成不好|跳槽成功|跳槽失败|转行成功|转行失败|创业成功|创业失败|考公上岸|成功上岸|离了职|被裁员|裁了员|复合了|离了婚|和好了|闹翻了|散伙了/,
 ];
 
 // ─── 腿② DECISION 决策类名词（中文，裸名词形态）────────────────────────
@@ -121,6 +133,8 @@ const DECISION_ZH = [
 // ─── 腿② EVAL 决策评价词（中文：褒贬两类 + 评价名词短语）──────────────
 const EVAL_ZH = [
   /明智|英明|睿智|高明|正确|是对的|是错的|没错|果断|清醒|理性|聪明|精明|厉害|漂亮|眼光独到|眼光毒|眼光好|眼光准|有眼光|有远见|远见卓识|独到|愚蠢|弱智|草率|鲁莽|失误|失策|错误|糊涂|短视|冒进|贪心|不该|欠妥|败笔|选对|押对|买对|卖对|下对|投对/,
+  // [r267] 口语评价族（没问题/没毛病/在理/靠谱/说得过去）——探针穿透落地
+  /没问题|没毛病|在理|靠谱|说得过去|过得去|像回事|没选错|没看错|赌对了|押对了/,
 ];
 
 // ─── 腿③ LINK 归因连接词（中文）───────────────────────────────────────
@@ -131,11 +145,16 @@ const LINK_ZH = [
 // ─── 英文侧腿① OUTCOME ────────────────────────────────────────────────
 const OUTCOME_EN = [
   /\b(?:paid\s+off|pays\s+off|payoff|won|wins|winning|lost|loses|losing|loss|hit\s+the\s+jackpot|jackpot|struck\s+it\s+rich|striking\s+it\s+rich|made\s+a\s+fortune|making\s+a\s+fortune|went\s+bankrupt|goes\s+bankrupt|lost\s+everything|losing\s+everything|came\s+out\s+ahead|comes\s+out\s+ahead|fell\s+flat|falls\s+flat|crashed|tanked|gamble|bet\s+paid|break[- ]even|broke\s+even|profitable|doubled|tripled|quadrupled|lottery)\b/i,
+  // [r267] 顺当结果族（went fine/went well/turned out fine/worked out
+  // fine/panned out）——手术/项目/合作类结果的顺当表述
+  /\b(?:went|goes|going|turn(?:ed)?\s+out|work(?:ed)?\s+out|pann?ed\s+out|came\s+out)\s+(?:just\s+)?(?:fine|well|ok|okay|great|alright)\b/i,
 ];
 
 // ─── 英文侧腿② DECISION ───────────────────────────────────────────────
 const DECISION_EN = [
   /\b(?:decision|decisions|choice|choices|call|calls|bet|bets|betting|gamble|gambling|strategy|strategies|tactics|tactic|tactical|coaching|plan|plans|move|moves|pick|picks|investment|investments|trade|trades|wager|wagers|gambit)\b/i,
+  // [r267] 判断名词族（judgment/judgement/verdict/read）——主刀医生的判断
+  /\b(?:judgment|judgement|verdict|read|instinct|hunch)\b/i,
 ];
 
 // ─── 英文侧腿② EVAL ───────────────────────────────────────────────────
