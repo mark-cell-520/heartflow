@@ -545,8 +545,37 @@ const DANGEROUS_PATTERNS = [
   //   的日志」本就命中，补表后与其余族同构，不新开判据）。良性侧不变：
   //   过期/临期限定（lookbehind 一票否决）与保留窗口前瞻先行，负例
   //   N1-N4 逐条承重。
-  // P2 把/将 宾格在前（ZH）：把[所有](系统)?日志[全部]删除/销毁 [r742 量词表补 其他|其余|剩下；r743 补「的」槽，注在行下]
-  /(?:把|将)\s*(?:所有|全部|统统|这些|那些|该|其他|其它|其余|剩下|剩余)?\s*(?:的)?\s*(?:系统|历史|访问|审计|操作|运行|登录|安全|错误)?\s*(?:的)?\s*(?<!(?:过期|失效|临时|缓存|测试|调试|开发|debug|旧|上一个?月|上月|上个月|上周|上星期|前天|去年|前年|早期|以往|过往|无效|冗余|废弃|无用|垃圾|\d+\s*(?:天|周|个月|月|年)(?:前|之前))[^。\n]{0,8})(?:日志|记录|日志文件)[^。\n]{0,6}(?:删除|删掉|删了|销毁|毁掉|抹掉|抹除|擦除|清空|清除|清掉|干掉|抹了|弄掉|洗掉|格式化|清理)(?![^。\n]{0,18}(?:只|仅)(?:需|要|请)?(?:保留|留存|留下|留)[^。\n]{0,12}(?:最近|近期|过去)\s*(?:半年|数\s*天|几\s*天|[0-9一二三四五六七八九十两]+\s*(?:天|周|个月|月|年)))/i,
+  // P2 把/将 宾格在前（ZH）：把[所有](系统)?日志[全部]删除/销毁 [r742 量词表补 其他|其余|剩下；r743 补「的」槽；r745 补回火通配槽+量词表对齐 P1，注在行下]
+  /(?:把|将)\s*(?:所有|全部|统统|一切|整套|整个|整份|这些|那些|该|其他|其它|其余|剩下|剩余)?\s*(?:的)?\s*(?:系统|历史|访问|审计|操作|运行|登录|安全|错误)?\s*(?:的)?\s*(?![这那此某单几一])[^。\n]{0,8}(?<!(?:过期|失效|临时|缓存|测试|调试|开发|debug|旧|上一个?月|上月|上个月|上周|上星期|前天|去年|前年|早期|以往|过往|无效|冗余|废弃|无用|垃圾|\d+\s*(?:天|周|个月|月|年)(?:前|之前))[^。\n]{0,8})(?:日志|记录|日志文件)[^。\n]{0,6}(?:删除|删掉|删了|销毁|毁掉|抹掉|抹除|擦除|清空|清除|清掉|干掉|抹了|弄掉|洗掉|格式化|清理)(?![^。\n]{0,18}(?:只|仅)(?:需|要|请)?(?:保留|留存|留下|留)[^。\n]{0,12}(?:最近|近期|过去)\s*(?:半年|数\s*天|几\s*天|[0-9一二三四五六七八九十两]+\s*(?:天|周|个月|月|年)))/i,
+  // [r745] 通配槽补齐 + 量词表与 P1 对齐（r744 交接方向①）：P2 名词前无通配
+  //   槽，「把过期日志全部删除」「把服务器的日志全部删除」修复前 count=0——
+  //   不是 lookbehind 赦免，是修饰词无处安放（结构不匹配，r744 踩坑③留档）。
+  //   本轮在第二个「的?」槽后补回火通配槽
+  //   (?![这那此某单几一])[^。\n]{0,8}：
+  //     · 攻击面扩表（P2 唯一捕获，负例 N2 删槽后翻 0）：「把服务器的日志
+  //       全部删除」「把订单服务的日志全部删除」「把业务库的日志全部清理」
+  //       「把昨天的日志全部删除」（近当时段=销毁最近痕迹的攻击面，P1 早已
+  //       拦，P2 此前因结构不匹配漏放）；注意通配槽预算含空格——「把 Nginx
+  //       的访问日志」的 "Nginx 的访问" 占 9 字符超 {0,8}，该形由 P3 名词
+  //       在前形独立拦截（idx=31 实测），不占本槽；
+  //     · 回火集合 这那此某单几一：负向前查只作用于通配槽**首字符**——单数/
+  //       不定小量指称不得开头进槽，守住 r743 边界①「把这个日志文件删掉」
+  //       单数特指放行；槽内后续字符不回火（「订单服务的日志」「每一个日志
+  //       文件」里的单/一不得误伤——后者恰是全量攻击面，继续拦）；
+  //     · 量词表补 一切|整套|整个|整份 与 P1 对齐：「把一切日志全部删除」
+  //       此前因量词槽不收而漏放（temper 含「一」使通配槽无法吸收「一切」
+  //       开头，删量词后该形真翻 0，负例 N3 承重）。
+  //   赦免层实为**双层**（r745 负例 N4/N5 实证）：「把过期日志全部删除」
+  //   除本 lookbehind 外，还被模块级 isDevDebugContext 的 r738 窄支
+  //   （CLEANUP_VERB × CLEANUP_LIFECYCLE_LOG = 过期|失效|临时|缓存|备份 +
+  //   日志）独立赦免——与 lookbehind 同语义的有意设计，删 LB 过期词后该句
+  //   仍放行不是漏放；lookbehind 独扣的形状是 CLEANUP_SECURITY 否决 dev 层
+  //   的「过期系统日志」形（删词后 count+1）。「把上个月的日志全部删除」
+  //   由 lookbehind 单层赦免（dev 层不触达），负例 N5 删 上一个?月|上月|
+  //   上个月 后当场翻 block。
+  //   存量形零回归：「把系统日志全部删除」「把审计的日志全部删除」等走
+  //   wildcard=0 原路径命中；dev 三齐赦免（isDevDebugContext）与保留窗口
+  //   前瞻在模式外层/尾部不变，负例 N8/N9/N15 逐条承重。
   // [r742] P2 量词表补 其他|其余|剩下（r741 交接方向①）：把字句宾格前置时
   //   「把其他日志全部删除」的全量性由宾格前的「其他/其余/剩下」承载
   //   （= 其余全部），r741 实测该形 count=0 存量漏放（P2 量词表只收
@@ -581,8 +610,23 @@ const DANGEROUS_PATTERNS = [
   //   「所有日志先归档」「其他记录都删了」良性不命中（r743 负例 N9-N12）。
   //   边界：「这些日志统统删除」「该日志全部删除」同构命中；「所有日志
   //   全部备份」非销毁动词不命中；保留窗口前瞻（句尾 lookahead）不变。
-  // P4 动词在前（EN）：destroy/erase/demolish/delete/wipe/purge/clear/truncate/nuke/zap + all/every + (modifier)? logs/records/trails [r742 修饰表补 other|remaining|rest + 量词表 the rest of，注在行下]
-  /\b(?:destroy|demolish|erase|annihilate|delete|remove|wipe|purge|clear|truncate|nuke|zap)\s+(?:all|every|each|any|the\s+entire|the\s+rest\s+of(?:\s+the)?)\s+(?:the\s+)?(?:(?:other|remaining|rest)\s+)?(?:(?:system|access|audit|security|operation\w*|operational|runtime|login|event|application|debug|error|historical|history|server|container)\s+)?\s*(?<!\b(?:expired|temporary|temp|cached?|test|debug|old|deprecated|obsolete|stale)\s+[^.]{0,20})(?:logs?|records?|trails?|log\s+files?)(?![^.]{0,40}\b(?:older\s+than|more\s+than\s+\d+|from\s+(?:last\s+)?(?:month|year|week)|\d+\s+days?\s+ago|(?:keeping|retain(?:ing)?|leaving)\s+only\s+the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year)|except\s+(?:for\s+)?the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year))\b)/i,
+  // P4 动词在前（EN）：destroy/erase/demolish/delete/wipe/purge/clear/truncate/nuke/zap + all/every + (modifier)? logs/records/trails [r742 修饰表补 other|remaining|rest + 量词表 the rest of；r745 量词表补其余性修饰单承载，注在行下]
+  /\b(?:destroy|demolish|erase|annihilate|delete|remove|wipe|purge|clear|truncate|nuke|zap)\s+(?:all|every|each|any|the\s+entire|the\s+rest\s+of(?:\s+the)?|(?:the\s+)?(?:other|remaining|rest)|rest\s+of(?:\s+the)?)\s+(?:the\s+)?(?:(?:other|remaining|rest)\s+)?(?:(?:system|access|audit|security|operation\w*|operational|runtime|login|event|application|debug|error|historical|history|server|container)\s+)?\s*(?<!\b(?:expired|temporary|temp|cached?|test|debug|old|deprecated|obsolete|stale)\s+[^.]{0,20})(?:logs?|records?|trails?|log\s+files?)(?![^.]{0,40}\b(?:older\s+than|more\s+than\s+\d+|from\s+(?:last\s+)?(?:month|year|week)|\d+\s+days?\s+ago|(?:keeping|retain(?:ing)?|leaving)\s+only\s+the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year)|except\s+(?:for\s+)?the\s+last\s+(?:\d+\s*(?:days?|weeks?|months?|years?)|day|week|month|year))\b)/i,
+  // [r745] 量词表补其余性修饰单承载（r744 交接方向②）：ZH P1 自 r743 起认
+  //   「其他|其余|剩下|剩余」**单独承载全量性**（「删除其他日志」拦），EN 侧
+  //   量词表却只收 all/every/each/any/the entire/the rest of——其余性修饰
+  //   必须挂在全量量词之后（delete all other logs），「delete other logs」
+  //   「erase remaining records」裸修饰形 count=0 存量漏放，ZH/EN 不对称
+  //   （r742/r743/r744 连续三轮留档）。本轮把 (?:the\s+)?(?:other|remaining|
+  //   rest) 与 rest of (the) 收进量词表：delete other logs / delete the
+  //   other logs / erase the remaining records / delete rest of the logs
+  //   全部命中；存量形「delete all other logs」走「全量量词×修饰」双承载
+  //   原路径不变（负例 N12 删新分支后存量仍拦）。良性边界不动：过期修饰
+  //   lookbehind（delete other expired logs 赦免）与保留窗口前瞻
+  //   （delete other logs, keeping only the last 7 days 赦免——族内只收
+  //   keeping/retaining/leaving only the last N days，「keep the last
+  //   7 days」不含 only 不在赦免族，r745 实测仍拦，注释口径以此为准）
+  //   先行，负例 N7 逐条承重。
   // [r744] 动词表补强销毁俚语 nuke|zap（「nuke all logs」「zap all records」）：
   //   轮初实测 count=0。只收这两个——「get rid of / take out / do away with /
   //   blow away」实测攻击/良性歧义比失衡（take out the trash / get rid of old

@@ -1,3 +1,55 @@
+## r745 — di 全量销毁族 P2 通配槽回火 + P4 EN 其余性量词单承载（r744 踩坑③死槽修复轮）
+
+**轮次**：r745 ｜ **版本**：v6.8.171 → v6.8.172（VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README 版本戳+changelog/version.js 兜底/BUILD_DATE，sync-version.js 实测同步）｜ **日期**：2026-11-09
+
+**方向**：r744 踩坑③ 留档项复测坐实轮。① P2 把/将 宾格在前（ZH）名词前补回火通配槽 `(?![这那此某单几一])[^。\n]{0,8}`——r744 实测确认 P2 槽序列（量词?/的?/设施?/的?）与名词之间无槽位安放修饰语，「把过期日志干掉」count=0 是结构死槽而非赦免，与 P1 lookbehind 设计不对称；+ 量词表补 `一切|整套|整个|整份` 与 P1 对齐（「把一切日志都删掉」修复前 count=0 漏放）。② P4 动词在前（EN）量词表补 `(?:the\s+)?(?:other|remaining|rest)` 与 `rest of (the)`——其余性修饰可单独承载（「delete other logs」「delete the rest of the logs」修复前 ZH/EN 不对称漏放，r742/r743/r744 连续三轮留档）。方向池其余项（di「以符合」、hasty_generalization、silence_imputation、middle_ground、chronological_snobbery、evidence 恒死）为历史池复述，本轮不动。
+
+**真升级类型**：存量探测器攻击面扩槽 + ZH/EN 不对称修复（用户可感知：「把过期日志全部删除」「把一切日志都删掉」「delete other logs」「delete the rest of the logs」等形从 pass 漏放改判 block；良性五形——dev 清理窗/保留窗口/上个月族过期日志——全放行）。
+
+**根因**（v6.8.171 HEAD 实测）：
+- P2 槽序列末端（设施?/的?）与名词之间无通配槽，量词/过期词等前置修饰语无处安放——「把过期日志干掉」「把一切日志都删掉」count=0 是结构不匹配而非赦免，删除 inline lookbehind 证伪必然落空（r744 踩坑③ 实证）。
+- P4 EN 量词表只收 all/every/each 与 the rest of（the），不收 other/remaining/rest 的裸承载与 `(?:the\s+)?` 前缀形——「delete other logs」「delete the rest of the logs」count=0。
+- P2 量词表缺 一切|整套|整个|整份（P1 已收），「把一切日志都删掉」count=0。
+
+**修法**（src/dangerous-instruction.js）：
+- **P2 名词前补回火通配槽** `(?![这那此某单几一])[^。\n]{0,8}`：置于名词前，前瞻排除指代族避免通吃；实测「把 Nginx 的访问日志」的 "Nginx 的访问" 占 9 字符超 `{0,8}` 由 P3 名词在前形独立拦截（idx=31），不占本槽。
+- **P2 量词表补 一切|整套|整个|整份** 与 P1 七词族 + 五其余变体对齐。
+- **P4 EN 量词表补** `(?:the\s+)?(?:other|remaining|rest)` 与 `rest of (the)`：其余性修饰可单独承载全量语义，存量 all other logs / all the other logs / the rest of 形零回归。
+- **良性三层赦免零让步**：过期/临期限定（lookbehind）+ 保留窗口前瞻 + 循环级 DI_RETENTION_WINDOW 不变；dev 语境三齐赦免不变。
+
+**踩坑与修复**（r745 新增，供 r746 复用）：
+1. **过期词存在双层赦免**：P2 内联 lookbehind 之外，模块级 `isDevDebugContext` 的 r738 窄支（CLEANUP_VERB × CLEANUP_LIFECYCLE_LOG）对「把过期日志全部删除」独立赦免——删 LB 过期词后该句仍放行不是漏放。LB 真正独扣形状是 CLEANUP_SECURITY 否决 dev 层的「过期系统日志」形（删词后 count+1）。教训：证伪「删豁免词翻 block」前先确认该样本的豁免通路唯一性，双层叠加时置空一层样本仍不命中是预期形态。
+2. **通配槽预算含空格**：「把 Nginx 的访问日志」的 "Nginx 的访问" 占 9 字符超 `{0,8}`——选负例样本时间距预算要把空格计入；该形由 P3 独立捕获，不占本槽（原注释误列其为 P2 例句，本轮修正）。
+3. **保留窗口前瞻族只收 keeping/retaining/leaving only the last N days**：「delete other logs but keep the last 7 days」实测仍拦——注释口径已改为准确措辞，不留「应赦免」的错误暗示。
+4. **旧负例两处假绿修正**：Nginx/数据库选句（P3 独立捕获，非 P2 承重）与 dev 窗攻击锚点选句（本就被 dev 层赦免，HEAD/WORK 双 0 假绿）——现改用服务器/订单服务/业务库与「本地把过期系统日志全部清掉」。
+
+**diff**：`git diff --shortstat` 实测 4 tracked files changed, 75 insertions(+), 13 deletions(-)（src/dangerous-instruction.js 主改 + test/round-742 + test/round-743 断言文本翻转修订 + data/upgrade-state.json）+ 未跟踪证据链 3 组（test/round-745-di-p2-wildcard-en-rest.js 188 行 + scripts/negative-test-p2-wildcard-en-rest-r745.js 138 行 + scripts/round-745/ 探针 5 个 279 行），总有效 diff 693 行。
+
+**验证逐项实测**：
+
+| 项 | 结果 |
+|---|---|
+| node --check src/dangerous-instruction.js | SYNTAX OK |
+| test/round-745-di-p2-wildcard-en-rest.js | **14 passed, 0 failed**（含 think() 冒烟 + 接线断言） |
+| scripts/negative-test-p2-wildcard-en-rest-r745.js | **9 PASS, 0 FAIL**：N1 temper 删条翻 block、N2 删通配槽攻击翻 0 存量仍拦 2/2、N3 删量词翻 0、N4 过期词双层赦免正控制、N5 删 LB 上月族翻 block 且上周形不动 1/0、N6 删 P4 单承载分支裸形翻 0 存量仍拦、N7 良性五形全放行、N8 dev 窗良性放行 + 系统日志攻击锚点仍拦、N9 temper 去一后「每一个」仍拦 |
+| test/round-742-di-rest-quantifier.test.js | **65 passed, 0 failed**（含本轮三处旧断言翻转） |
+| test/round-743-di-rest-quantifier-de.test.js | **94 passed, 0 failed**（含本轮三处旧断言翻转） |
+| test/round-744-colloquial-verb-de.test.js | **11 passed, 0 failed**，零回归 |
+| node bin/verify.js | **16 passed, 0 failed** |
+| node scripts/bidirectional-guard.js | 召回 **52/52**、误拦 **302/326**（与基线完全一致） |
+| node test/doc-numbers-accuracy.test.js | **24 passed, 0 failed** |
+| node test/security-audit.test.js | **16 passed, 0 failed** |
+| node bin/cli.js status | **running**（unresolvedProblems 0） |
+| node scripts/round-guard.js --stage=after | 提交后复跑 |
+
+**下一轮方向**（候选池，按 decision 打分排序）：
+1. **di ① 目的状语豁免（v6.7.73）不含「以符合」**：「定期清理过期日志以符合保留策略」仍 block（r217/r218 两轮锁定的遗留边界）。
+2. **hasty_generalization 对 "Nobody can skip the verification step here." 误报 verify**（r218 复测确认仍遗留，非本族机制）。
+3. **silence_imputation（对沉默的归罪）6/10 漏判**——perfect_error 误伤已修，可复测；src/ 零命中未上线。
+4. 方向池历史项续查（middle_ground 4/10 漏判 1/6 误伤 Phase 0.7b 不合格；chronological_snobbery 不上线；evidence 恒返回 {score:1, issues:[]}）。
+
+---
+
 ## r744 — di 全量销毁族口语换皮动词三形封堵 + 上周期过期限定语赦免 + P4 the 槽可达性修复（r743 交接方向②③复测坐实轮）
 
 **轮次**：r744 ｜ **版本**：v6.8.170 → v6.8.171（VERSION/package.json/SKILL.md frontmatter+规格表口径戳/README 版本戳+changelog/version.js 兜底/BUILD_DATE，sync-version.js 实测同步）｜ **日期**：2026-11-09

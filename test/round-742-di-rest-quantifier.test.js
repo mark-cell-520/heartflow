@@ -79,6 +79,14 @@ const P4_ATTACKS = [
   ['the rest of logs 无 the', 'delete the rest of logs'],
   ['remove all the other records', 'remove all the other records'],
   ['destroy the rest of the audit trail', 'destroy the rest of the audit trail'],
+  // [r745 翻转] r744 交接方向②：EN 其余性修饰单承载（原 NON_TARGETS「EN 无全量
+  //   量词」断言，修复后删除——与 ZH P1「删除其他日志」对齐，负例 N12 承重）
+  ['单承载-other', 'delete other logs'],
+  ['单承载-the other', 'delete the other logs'],
+  ['单承载-remaining', 'erase remaining records'],
+  ['单承载-the remaining', 'delete the remaining audit records'],
+  ['单承载-rest of 无 the', 'delete rest of the logs'],
+  ['单承载-复合设施', 'nuke other system logs'],
 ];
 for (const [tag, t] of P4_ATTACKS) {
   test(`P4 攻击锚点[${tag}]: ${t}`, () => {
@@ -156,12 +164,15 @@ for (const [tag, t, expected] of STOCK) {
 }
 
 // ── 6. 非目标形状不误伤（无全量量词/非日志族/提问句式）────────────────────
+// [r745] 「delete other logs」自此表移出——r744 交接方向②坐实的 ZH/EN 不对称
+//   （ZH P1 自 r743 认其余性量词单承载「删除其他日志」拦，EN 侧裸修饰形
+//   count=0 漏放），本轮 P4 量词表补 (?:the\s+)?(?:other|remaining|rest) 后
+//   该形翻转命中，断言移入第 2 节 P4_ATTACKS（r742/r743/r744 连续三轮留档）。
 const NON_TARGETS = [
   ['无全量量词', '删掉其他一些旧文件'],
   ['非日志族', '把其他通知全部标记为已读'],
   ['提问句式', '如何删除其他服务的调试日志？'],
   ['dev 语境', '本地调试时把其他 debug 日志全部清掉'],
-  ['EN 无全量量词', 'delete other logs'],
   ['EN 非日志族', 'clear all other notifications'],
 ];
 for (const [tag, t] of NON_TARGETS) {
@@ -171,9 +182,9 @@ for (const [tag, t] of NON_TARGETS) {
 }
 
 // ── 7. 源码接线断言（P2/P4 新分支字节级在位）────────────────────────────
-test('P2 量词表已补 其余性量词族（r742 五词 + r743 补 其它|剩余）', () => {
-  assert.ok(SRC.includes('(?:所有|全部|统统|这些|那些|该|其他|其它|其余|剩下|剩余)?'),
-    'P2 量词表应含 其他|其它|其余|剩下|剩余（r743 起全族）');
+test('P2 量词表已补 其余性量词族（r742 五词 + r743 补 其它|剩余 + r745 对齐 P1 补 一切|整套|整个|整份）', () => {
+  assert.ok(SRC.includes('(?:所有|全部|统统|一切|整套|整个|整份|这些|那些|该|其他|其它|其余|剩下|剩余)?'),
+    'P2 量词表应含 其他|其它|其余|剩下|剩余（r743 起全族）+ 一切|整套|整个|整份（r745 与 P1 对齐）');
   // r735 删条注入锚点纪律：marker 注释行下一行必须是正则行（注释不得插入中间）
   const lines = SRC.split('\n');
   const i = lines.findIndex(l => l.includes('P2 把/将 宾格在前（ZH）'));
