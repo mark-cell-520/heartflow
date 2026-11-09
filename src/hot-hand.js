@@ -49,6 +49,31 @@ const STREAK_ZH = [
 // 腿①补充正则（ZH）：「签了三单」类成功计数形（不进数组常量，负例注入
 // 只针对数组；此形是腿①的窄补充）
 const STREAK_ZH_RE = /签[了过][一二三四五六七八九十两\d]+\s*单/;
+// [r270 新增族] 腿②隐式延续断言（ZH）：不写「肯定/一定」这类确定性副词，
+// 而用**指令/告诫形**表达「势头该继续」——继续保持/接着押/别改打法/
+// 收手就亏。r270 探针实测：7/10 攻击穿透，全部缺在新腿②族（旧表只收
+// 「肯定/一定/还会/继续押」等显式断言词，收不住「继续保持这个打法」
+// 「这时候收手就亏了」这类告诫形）。
+const CONTINUE_IMPLICIT_ZH = [
+  '下一把继续', '下一局继续', '下一场继续', '下一把还', '下一局还',
+  '顺势再加', '再加一注', '再押一把', '趁现在加', '趁现在押',
+  '别改', '不要改', '别换', '不要换', '别停', '不要停',
+  '收手就亏', '这时候收手', '现在收手', '停手就亏', '停了就亏',
+  '照这个势头', '顺着这个势头', '该传给', '还该传给', '继续传给',
+];
+// 「继续保持X」形（X 必须是博弈对象）：裸「继续保持」会把良性自我管理
+// （「状态好，继续保持训练节奏」）一起收进来，故对象词必选、且不含
+// 「训练/练习/备考」类良性对象（r270 良性集实测 1/10 误伤后收紧）。
+const CONTINUE_IMPLICIT_ZH_RE = /继续保持(?:这个|这种|这股|当前|眼下|目前)?(?:打法|手感|状态|势头|气势|连胜|赢法|押法|买法|下注方式|策略)/;
+// EN 对应：指令/告诫形延续（keep feeding / do not change / ride it）
+const CONTINUE_IMPLICIT_EN = [
+  'keep feeding', 'keep going', 'keep riding', 'keep it up', 'ride it',
+  'stay the course', 'do not change', "don't change", 'do not switch',
+  "don't switch", 'one more round', 'one more shot', 'another round',
+  'keep the streak', 'while it lasts', 'do not stop', "don't stop",
+  'keep the momentum', 'give him the next', 'give her the next',
+  'keep shooting', 'keep playing',
+];
 // 腿②：延续性断言（ZH）
 const CONTINUE_ZH = [
   '肯定', '一定', '必然', '势必', '铁定', '必定', '必中', '必赢', '稳了', '跑不了',
@@ -64,6 +89,17 @@ const STREAK_EN = [
 ];
 // 腿①补充正则（EN）：「five in a row / three wins in a row」计数形
 const STREAK_EN_RE = /\b(?:\d+|five|three|four|six|seven|eight|nine|ten|two)\s+(?:times\s+)?in\s+a\s+row\b|\b(?:wins?|victories|games?)\s+in\s+a\s+row\b/i;
+// [r270 新增族] 腿①非正式势头表达（EN）：「the dice are hot tonight」类
+// 运势直述与「hit her last five shots」类成功计数形。旧表只认 hot streak /
+// on a roll 等固定搭配，收不住这两族最自然的口语形（r270 探针实测 3/10
+// 攻击穿透全部缺在腿①新族）。
+const STREAK_IMPLICIT_EN = [
+  'hot tonight', 'are hot', 'is hot', 'lucky streak', 'streak', 'on a tear',
+  'hot run', 'lucky run', 'rolling', 'feeling lucky', 'my luck',
+];
+// 「hit her last five shots / sank his last three / scored ten in a row」
+// 成功计数形（动词 + 可选所有格 + 数字 + 成功名词），与 STREAK_EN_RE 并列。
+const STREAK_EN_COUNT_RE = /\b(?:hit|sank|sunk|made|scored|won|netted|buried|knocked\s+down)\s+(?:\w+['\u2019]s\s+)?(?:\w+\s+){0,2}(?:\d+|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+(?:shots?|goals?|baskets?|points?|wins?|games?|races?|hands?|times|free\s+throws?|threes?)\b/i;
 // 腿②：延续性断言（EN）
 const CONTINUE_EN = [
   'definitely', 'guaranteed', 'bound to', 'will certainly', 'certainly',
@@ -114,14 +150,16 @@ function checkHotHand(text) {
   const matches = [];
   const routes = new Set();
 
-  // R1 中文：势头/连胜表达 × 延续性断言
-  if ((has(STREAK_ZH, text) || STREAK_ZH_RE.test(text)) && has(CONTINUE_ZH, text)) {
+  // R1 中文：势头/连胜表达 × 延续性断言（显式断言 + [r270] 隐式告诫形）
+  if ((has(STREAK_ZH, text) || STREAK_ZH_RE.test(text))
+    && (has(CONTINUE_ZH, text) || has(CONTINUE_IMPLICIT_ZH, text) || CONTINUE_IMPLICIT_ZH_RE.test(text))) {
     routes.add(1);
     matches.push({ route: 1, legA: '势头/连胜', legB: '延续断言' });
   }
 
   // R2 英文：hot streak/momentum × continuation assertion
-  if ((has(STREAK_EN, lower) || STREAK_EN_RE.test(lower)) && has(CONTINUE_EN, lower)) {
+  if ((has(STREAK_EN, lower) || STREAK_EN_RE.test(lower) || has(STREAK_IMPLICIT_EN, lower) || STREAK_EN_COUNT_RE.test(lower))
+    && (has(CONTINUE_EN, lower) || has(CONTINUE_IMPLICIT_EN, lower))) {
     routes.add(2);
     matches.push({ route: 2, legA: 'hot streak', legB: 'continuation' });
   }
@@ -173,4 +211,4 @@ class HotHand {
   }
 }
 
-module.exports = { HotHand, checkHotHand, __internals: { STREAK_ZH, STREAK_ZH_RE, CONTINUE_ZH, STREAK_EN, STREAK_EN_RE, CONTINUE_EN, META_NOUN, EVIDENCE_PRESENT, THIRD_PERSON_EXEMPT } };
+module.exports = { HotHand, checkHotHand, __internals: { STREAK_ZH, STREAK_ZH_RE, STREAK_IMPLICIT_EN, STREAK_EN_COUNT_RE, CONTINUE_ZH, CONTINUE_IMPLICIT_ZH, CONTINUE_IMPLICIT_ZH_RE, CONTINUE_EN, CONTINUE_IMPLICIT_EN, STREAK_EN, STREAK_EN_RE, META_NOUN, EVIDENCE_PRESENT, THIRD_PERSON_EXEMPT } };

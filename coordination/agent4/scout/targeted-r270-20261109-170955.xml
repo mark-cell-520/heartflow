@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/AJT/BwSApNRCKMw+bJ4lFfrYB/U</id>
+  <title>arXiv Query: search_query=all:"sunk cost" AND all:"reasoning"&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-11-09T17:10:11Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22sunk+cost%22+AND+all:%22reasoning%22&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2410.02820v3</id>
+    <title>Heuristics and Biases in AI Decision-Making: Implications for Responsible AGI</title>
+    <updated>2025-04-07T02:44:51Z</updated>
+    <link href="https://arxiv.org/abs/2410.02820v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2410.02820v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We investigate the presence of cognitive biases in three large language models (LLMs): GPT-4o, Gemma 2, and Llama 3.1. The study uses 1,500 experiments across nine established cognitive biases to evaluate the models' responses and consistency. GPT-4o demonstrated the strongest overall performance. Gemma 2 showed strengths in addressing the sunk cost fallacy and prospect theory, however its performance varied across different biases. Llama 3.1 consistently underperformed, relying on heuristics and exhibiting frequent inconsistencies and contradictions. The findings highlight the challenges of achieving robust and generalizable reasoning in LLMs, and underscore the need for further development to mitigate biases in artificial general intelligence (AGI). The study emphasizes the importance of integrating statistical reasoning and ethical considerations in future AI development.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-09-26T05:34:00Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Payam Saeedi</name>
+    </author>
+    <author>
+      <name>Mahsa Goodarzi</name>
+    </author>
+    <author>
+      <name>M Abdullah Canbaz</name>
+    </author>
+    <arxiv:doi>10.1109/AIRC64931.2025.11077505</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1109/AIRC64931.2025.11077505" title="doi"/>
+  </entry>
+</feed>

@@ -1,0 +1,418 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/rVcGcA1W3fwWVXtLeOryojkOcpw</id>
+  <title>arXiv Query: search_query=all:resource OR all:constrained OR all:optimal OR all:decision OR all:fallacy OR all:economics&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-09T17:08:16Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:resource+OR+(all:constrained+OR+(all:optimal+OR+(all:decision+OR+(all:fallacy+OR+all:economics))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>575976</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09888v1</id>
+    <title>Scenario Orchestration for Closed-loop Policy Evaluation of Autonomous Driving</title>
+    <updated>2026-11-06T18:58:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.09888v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09888v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scenario-based simulation is central to evaluating autonomous-driving policies, but a scenario scripted before execution (i.e., with predetermined, fixed actor routes and speeds) may not preserve its intended interaction once the tested ego policy responds in closed loop. Scripted scenarios cannot adapt to unanticipated ego behavior, while learned traffic actors may remain reactive without reliably realizing a particular scenario intent. We introduce a scenario orchestrator that continuously monitors the joint traffic state and adapts non-ego actors through re-timing, re-routing, and role reassignment for creating a specific scenario intent. At each step, the orchestrator solves a constrained optimization problem that preserves the intended interaction while limiting interventions and maintaining traffic feasibility. We further distinguish scenario realization from policy failure, allowing a test to first be judged based on whether the intended interaction occurred and then by how the ego policy responded. Experiments in the CARLA simulator across multiple scenario families and driving policies show that orchestration realizes targeted interactions more reliably than scripted and learned actor-level baselines, particularly under variations in initial conditions and ego behavior. These results support closed-loop scenario orchestration as a tool for controlled and reproducible policy evaluation.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:27Z</published>
+    <arxiv:comment>8 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Frieda Rong</name>
+    </author>
+    <author>
+      <name>Zhaoyue Wang</name>
+    </author>
+    <author>
+      <name>Veer Kapadia</name>
+    </author>
+    <author>
+      <name>Vishaka Rajani</name>
+    </author>
+    <author>
+      <name>Aren A. Babikian</name>
+    </author>
+    <author>
+      <name>Xujie Si</name>
+    </author>
+    <author>
+      <name>Mahsa Golchoubian</name>
+    </author>
+    <author>
+      <name>Raquel Urtasun</name>
+    </author>
+    <author>
+      <name>Igor Gilitschenski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09882v1</id>
+    <title>FlowMoP: Stochastic Multi-Person Motion Prediction</title>
+    <updated>2026-11-06T18:56:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.09882v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09882v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predicting the future motion of multiple people is inherently stochastic: the same observed history admits many plausible continuations depending on intent, coordination, and social context. Yet the dominant paradigm in multi-person 3D motion prediction remains deterministic, with existing methods producing a fixed number of outputs per agent. In contrast, we present a conditional flow matching framework that jointly generates diverse future motions for multiple agents, modeling both global trajectories and root-relative poses. A B-spline reparameterization compresses the generative state space while enforcing temporal smoothness, and a dual-stream transformer conditions each agent's predictions on observed neighbor motion for interaction-aware forecasting. Our method achieves state-of-the-art performance on CMU-Mocap (UMPM) and 3DPW, outperforming deterministic baselines on joint position error, pose error, and final displacement error despite producing a full predictive distribution. We additionally establish the first motion prediction baseline on WorldPose, a large-scale professional soccer dataset, where social conditioning demonstrably concentrates predictive uncertainty along interaction-constrained directions.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:56:41Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. 22 pages, including references and appendix</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Aadya Agrawal</name>
+    </author>
+    <author>
+      <name>Ho Kei Cheng</name>
+    </author>
+    <author>
+      <name>Alexander Schwing</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09880v1</id>
+    <title>ZeoBench: A Benchmark for Self-Supervised Learning on 3D Zeolite Representations</title>
+    <updated>2026-11-06T18:55:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.09880v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09880v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Zeolites are an important class of porous crystalline materials with broad applications in gas storage, separations, and catalysis. Although hundreds of thousands of experimentally realized and hypothetical zeolite structures are known, identifying materials optimized for a target application remains challenging because property labels are expensive to obtain and available only for limited structure-molecule pairs. While prior work has demonstrated that 3D neural representations can predict zeolite properties effectively, it remains unclear which representation-learning strategies are most effective in the low-data regime relevant to materials discovery. We present ZeoBench, a benchmark for self-supervised learning on dense 3D representations of all-silica zeolites, and evaluate the resulting features on six existing downstream adsorption-property prediction tasks, across a range of training set sizes. Our study compares self-supervised 3D pretraining on volumetric zeolite data, adaptations of image-pretrained 2D ConvNets and vision transformers to 3D via multiview and channel-inflation strategies, and 3D ConvNets pretrained on out-of-domain volumetric datasets, alongside hand-crafted descriptors and supervised baselines. Using our pretraining and evaluation framework, we find self-supervised 3D representations outperform existing methods and achieve state-of-the-art performance across both in-domain label regimes and for the unseen domain of metal organic frameworks. Learned representations consistently outperform hand-crafted descriptors, and convolutional architectures are generally more effective than vision transformers in this setting. These results establish ZeoBench as a practical benchmark for 3D representation learning in zeolites and provide guidance for data-limited adsorption property prediction.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:55:34Z</published>
+    <arxiv:comment>NeurIPS 2026 Datasets and Benchmarks Track</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Aaron Sun</name>
+    </author>
+    <author>
+      <name>Yachan Liu</name>
+    </author>
+    <author>
+      <name>Ping Yang</name>
+    </author>
+    <author>
+      <name>Peng Bai</name>
+    </author>
+    <author>
+      <name>Subhransu Maji</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09879v1</id>
+    <title>PhotoFinish: Portable Timerless Probing of Microarchitectural Latencies</title>
+    <updated>2026-11-06T18:54:16Z</updated>
+    <link href="https://arxiv.org/abs/2611.09879v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09879v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Timing measurements are a fundamental building block of microarchitectural attacks, enabling software to convert otherwise invisible latency differences into architectural observations. Thus, restricting high-resolution timers is a common defense, especially in constrained environments such as web browsers. Timerless probing primitives provide an alternative approach. Instead of reading or constructing a timer, they observe architectural events that correlate with the microarchitectural state. However, such primitives typically rely on platform-specific behavior, and none generalizes across the wider computing landscape. In this paper, we present PhotoFinish, a portable timerless probing primitive that converts latency differences directly into an architectural value. PhotoFinish races an operation under test against a fixed reference in two parallel threads that then write unique values to the same shared location, resulting in a latency-dependent architectural value. PhotoFinish only requires parallel execution and shared memory, without constructing or reading a clock. We evaluate PhotoFinish on 38 CPUs spanning four ISAs and demonstrate reliable cache state classification across widely different microarchitectures, with comparable fidelity when compiled to WebAssembly and executed inside a browser. We further use PhotoFinish in AES T-table and Evict+Reload attacks, show that it applies beyond caches to TLB and execution-engine latencies, and demonstrate sufficient precision to identify the LLC slice of an address. Our results demonstrate shared-memory races as a generic and precise replacement for explicit timing, showing that restricting timers alone does not prevent software from observing fine-grained microarchitectural latency differences.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:54:16Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Tristan Hornetz</name>
+    </author>
+    <author>
+      <name>Eduard Ebert</name>
+    </author>
+    <author>
+      <name>Lorenz Hetterich</name>
+    </author>
+    <author>
+      <name>Lukas Gerlach</name>
+    </author>
+    <author>
+      <name>Michael Schwarz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09877v1</id>
+    <title>Locating Contact on Tendon-Driven Continuum Robots From Tendon Measurements Alone via Constrained Moving Horizon Estimation</title>
+    <updated>2026-11-06T18:53:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.09877v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09877v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Tendon-driven continuum robots can reach through constrained spaces, but contact along their bodies is invisible to the sensors at their motors. We show that this is a structural limitation rather than a tuning problem: the map from contact forces to tendon measurements has a null space of dimension at least seven, so no estimator that leaves the contact support free can locate contact. When the obstacle geometry is known, however, non-penetration and complementarity make the contact force locally identifiable, and we prove that the resulting system with unknown contact inputs is locally exponentially strongly detectable. We present a constrained moving horizon estimator (MHE) that encodes these conditions and runs in real time as one quadratic program per sample, and we give a local, mode-wise robust stability result for it. In a finite- element benchmark of a two-section robot pressing and sliding on a wall, the estimator located contact to 0.9 mm and estimated contact force to 0.22 N, compared with 65 mm and 0.72 N for a tuned extended Kalman filter (EKF) with state projection. The estimator tolerated millimeter- level errors in the obstacle position and unmodeled wall friction, under which the projected EKF failed. Under randomized model mismatch over 40 trials, including unmodeled tendon friction, it remained better in force and location in every trial. Without contact, the MHE offered no advantage over the EKF, which confirms that its benefit comes from the contact constraints. This report extends a letter submitted to IEEE Control Systems Letters with complete proofs and additional experiments.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:53:10Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Haitham El-Hussieny</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09872v1</id>
+    <title>On the Reliability of Majority-Vote Pseudo-Labels in Test-Time Reinforcement Learning</title>
+    <updated>2026-11-06T18:49:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.09872v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09872v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Test-time reinforcement learning (TTRL) adapts pretrained language models to unlabeled target-domain data using self-generated pseudo-labels, whose reliability remains poorly understood. We analyze majority-vote supervision for TTRL with online Direct Preference Optimization (DPO) and decompose its error into population-majority bias and prompt-dependent finite-rollout variation. Because population-majority bias is generally unidentifiable without external supervision, we focus on mitigating the downstream effects of finite-rollout variation. We propose \emph{Prompt-Conditional Distributionally Robust DPO (PC-Dr.DPO)}, which conditions within-prompt robust reweighting on observed vote reliability to make updates from sampling-sensitive prompts more conservative. We further introduce a cache-based mechanism to reduce self-supervised forgetting during online adaptation. Across six mathematical and knowledge-intensive reasoning benchmarks and five model backbones, PC-Dr.DPO matches or outperforms the strongest TTRL baseline in 24 of 30 settings.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:49:02Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Haoyu Wang</name>
+    </author>
+    <author>
+      <name>Ru Wang</name>
+    </author>
+    <author>
+      <name>Yuanyuan Wang</name>
+    </author>
+    <author>
+      <name>Jiaxian Guo</name>
+    </author>
+    <author>
+      <name>Mingming Gong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09869v1</id>
+    <title>An Empirical Study on Clustering-based Quantum Approximate Optimization Algorithm for Regression Test Case Selection</title>
+    <updated>2026-11-06T18:48:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.09869v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09869v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Regression testing assesses whether software components that have already been developed and tested continue to work correctly after modifications. Ideally, regression testing re-executes the entire test suite after each modification, but this is infeasible in real-world scenarios because of the computational burden; therefore, optimized approaches, such as Test Case Selection, have been developed. The state of the art in regression testing optimization includes both classical approaches, such as Additional Greedy and DIV-GA, and quantum approaches, such as SelectQA, BootQA, and IGDec-QAOA. However, while the former incur high computational costs, the latter are constrained by the physical limitations of currently available quantum machines.
+  This paper extends the evaluation of QAOA-TCS, our quantum approach for the test case selection problem. We thoroughly evaluate its performance, compare it with state-of-the-art classical and quantum approaches, and assess its robustness to quantum noise.
+  The results show that QAOA-TCS outperforms state-of-the-art multi-objective approaches in most cases and maintains stable performance even under high noise levels. In the single-objective formulation, QAOA-based methods perform comparably. In terms of efficiency, our previous method based on quantum annealing, namely SelectQA, is the most efficient for large problems in the multi-objective formulation, whereas QAOA-TCS offers the best trade-off between effectiveness and efficiency in the single-objective formulation when run on realistic noisy simulators. However, such analysis is constrained by the different computational environments used to run the algorithms.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:13Z</published>
+    <arxiv:comment>Manuscript under review at Empirical Software Engineering (EMSE)</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Antonio Trovato</name>
+    </author>
+    <author>
+      <name>Martin Beseda</name>
+    </author>
+    <author>
+      <name>Dario Di Nucci</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09867v1</id>
+    <title>Existence of extremal solutions in the 1d conformal bootstrap</title>
+    <updated>2026-11-06T18:48:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.09867v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09867v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Extremal solutions and functionals play an important role in the conformal bootstrap. These are the solutions that saturate unitarity bounds, and the dual functionals that encode the optimal bounds. While they have fundamental theoretical implications, their existence has not been rigorously established. This is particularly subtle in the setting of the full infinite-dimensional bootstrap, i.e. the limit of zero numerical truncation. In this article, we prove that extremal solutions exist for OPE maximisation problems in 1d CFT. These are a large class of generically interacting, unitary, exact solutions of the crossing equation that maximise an OPE coefficient. We also prove that these problems have 'zero duality gap', meaning there exist functionals arbitrarily close to extremality. Our approach is to formulate the bootstrap as a convex optimisation problem in a Hilbert space and apply the Fenchel-Rockafellar theorem.</summary>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:01Z</published>
+    <arxiv:comment>34 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-th"/>
+    <author>
+      <name>Filip Herček</name>
+    </author>
+    <author>
+      <name>Nat Levine</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09861v1</id>
+    <title>A Quantum Mechanical Description of Active Matter</title>
+    <updated>2026-11-06T18:42:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.09861v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09861v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The natural environments habitable to life are inseparable from dissipative and entropic forces, which mandate active matter to operate on constant fluxes of energy and momentum to survive and propagate through spacetime. In contrast to fundamental particles which are characterized by energy and momentum, we postulate that energy expenditure rate and momentum generation rate are the fundamental dynamical quantities driving this evolution of swimming active matter and accordingly construct the corresponding Lagrangian and Hamiltonian of motion of the active matter. Furthermore, living systems broadly employ periodic, non-repeating motion for both locomotion and various biological functions, with meaningful information stored in the periods of these functions. Consequently, analyzing these dynamics in the Fourier space lands us at the familiar tools of the operator based, quantum mechanics. This is accomplished by introducing a complex field to describe the evolving probability distribution of a single unit, as well as the population density of mutually non-interacting active particles under the constraint of scarce resources. The resulting single-unit wavefunction evolves analogously to the Dirac equation with minimal coupling, wherein gauge symmetry reflects the generality of the governing equations across arbitrary resource landscapes. Additionally, we present a Schrödinger-like equation where the effective potential term represents the environmentally mandated, non-motile base metabolic rate. Finally, we formalize the bidirectional coupling between active swimmers and the surrounding fluid via a multipole expansion of the active force with an emphasis on force monopoles and dipoles, where each pole corresponds to a distinct mode of active motility.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:42:27Z</published>
+    <arxiv:comment>11 pg., 3 figs</arxiv:comment>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Ghansham Chandel</name>
+    </author>
+    <author>
+      <name>Siddhartha Das</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09860v1</id>
+    <title>Geometric Pairwise Classification of Affine Constraints over Ellipsoidal Regions</title>
+    <updated>2026-11-06T18:42:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.09860v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09860v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper presents a deterministic geometric procedure for analysing affine constraints over fixed ellipsoidal regions, motivated by chance-constrained set approximation. Analytical tests classify inequalities as always violated, never violated, or cutting. Pairwise tests determine whether two inequalities can be strictly violated at a common point, yielding a compatibility matrix. The tests follow from quadratic optimisation and the Karush--Kuhn--Tucker conditions, with explicit treatment of tangencies, parallel normals, and degenerate inequalities. The formulation applies in arbitrary finite dimensions and provides geometric information for subsequent bounds on simultaneous sampled violations and safe-region approximation.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:42:13Z</published>
+    <arxiv:comment>6 pages, 1 figure</arxiv:comment>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Igor M. L. Pataro</name>
+    </author>
+    <author>
+      <name>Martina Mammarella</name>
+    </author>
+    <author>
+      <name>Fabrizio Dabbene</name>
+    </author>
+    <author>
+      <name>Teodoro Alamo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09857v1</id>
+    <title>Energy- and momentum-resolved Cooper-pair emission from a cuprate superconductor</title>
+    <updated>2026-11-06T18:41:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.09857v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09857v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Superconductivity arises from Cooper pairing, but conventional photoemission probes electrons individually rather than as pairs. Here we report the observation of Cooper-pair emission from an optimally doped cuprate superconductor using two-electron angle-resolved photoemission (2e-ARPES). Below the superconducting transition, we observe a distinct two-electron emission peak at zero pair binding energy and zero pair momentum that disappears in the normal state, revealing the characteristic fingerprint of a Cooper pair. Unexpectedly, the joint energy distribution broadens markedly along the relative-energy axis as temperature decreases, while the total energy width remains nearly unchanged. This anomalous behavior cannot be explained by instrumental resolution, static disorder or thermal broadening, and instead points to scattering processes involving collective excitations of the superconductor. Our results establish 2e-ARPES as a probe of both Cooper-pair emission and the many-body dynamics of the superconducting state.</summary>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:41:10Z</published>
+    <arxiv:primary_category term="cond-mat.supr-con"/>
+    <author>
+      <name>Henry Amir</name>
+    </author>
+    <author>
+      <name>Jack Zwettler</name>
+    </author>
+    <author>
+      <name>Ka Ho Wong</name>
+    </author>
+    <author>
+      <name>Genda Gu</name>
+    </author>
+    <author>
+      <name>Rafael M. Fernandes</name>
+    </author>
+    <author>
+      <name>Jorge Noronha</name>
+    </author>
+    <author>
+      <name>Dirk K. Morr</name>
+    </author>
+    <author>
+      <name>Fahad Mahmood</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09856v1</id>
+    <title>Lessons from double-plane lenses for galaxy profiles, the Hubble tension, and the mass-sheet degeneracy</title>
+    <updated>2026-11-06T18:40:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.09856v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09856v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Double-plane lenses, like single-plane lenses, are subject to the mass-sheet degeneracy, a fundamental limit to our knowledge of the deflector mass profiles from lensing. However, with a prior on the relative expansion history, unlike in the single-plane case, this degeneracy can be constrained with the modelling of lens images, without the need for time delays, velocity dispersion measurements or a prior on the Hubble constant $H_0$. We show that double-plane lenses are sensitive to a specific combination of the mass-sheet components of the two lens planes. Using literature values of the cosmological scaling factor from the double-plane lenses J0946 and AGEL0353, a measurement from the point-source images of J1721 (the ``Einstein zig-zag'' lens), and a reference value of $Ω_\mathrm{m}$, we show the constraints that can be placed on the mass-sheet component of each of these systems. We show that the additional information brought by images of a second source can improve measurements of $H_0$ from individual time-delay lenses by up to $\sim50\%$, depending on certain key assumptions. Using forecasted Euclid and LSST double-plane lens samples, we show that these samples will enable strong constraints on the population of mass sheets in lens galaxies. Such population constraints will have implications for a range of strong-lensing science applications, in particular in constraining $H_0$, dark energy, and the dark matter profiles of galaxies.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:40:15Z</published>
+    <arxiv:comment>19+5 pages, 18 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Daniel P. Johnson</name>
+    </author>
+    <author>
+      <name>Martin Millon</name>
+    </author>
+    <author>
+      <name>Pierre Fleury</name>
+    </author>
+    <author>
+      <name>Giacomo Queirolo</name>
+    </author>
+    <author>
+      <name>Tian Li</name>
+    </author>
+    <author>
+      <name>Wolfgang J. R. Enzi</name>
+    </author>
+    <author>
+      <name>Daniel J. Ballard</name>
+    </author>
+    <author>
+      <name>Duncan Bowden</name>
+    </author>
+    <author>
+      <name>Thomas E. Collett</name>
+    </author>
+    <author>
+      <name>Daniel Gilman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09835v1</id>
+    <title>Ensemble Individual Mode Frequency Modeling of Kepler Giants - Extending the IACgrid towards the red-giant branch</title>
+    <updated>2026-11-06T18:22:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.09835v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09835v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Precise stellar parameters, in particular ages, are vital for understanding the formation and history of the Milky Way. Usually, this is achieved by fitting stellar evolution models to observational constraints such as spectroscopic and astrometric parameters. Adding global asteroseismic properties to the classical parameters (global seismic modeling) breaks some degeneracies and improves the results. However, this approach has its limitations, with red-giant random age uncertainties usually $\sim$ 20-50%, and often lacking proper quantification of the systematics. We aim to extend seismic modeling to include individual mode frequencies for red-giant branch stars, increasing the number of evolved solar-like oscillators with precise stellar parameters (ages, masses, and radii), and allowing us to quantify the systematics in global seismic modeling. We developed a grid of stellar evolutionary models and computed the individual oscillation frequencies, including a figure of merit to find the best-fitting model. We validate our methodology on a sample of red giants with individual frequency modeling from the literature, finding our masses, radii, and ages in close agreement. We then apply our method to around 100 Kepler red-giant branch stars of near-solar mass and metallicity, which previously have only been modeled with global seismic parameters. We obtain random average uncertainties of 3.4%, 1.3%, and 13.2%, for stellar masses, radii, and ages, respectively. We find that ages from individual mode frequency modeling are significantly, 14% on average, larger than those from global seismic mass-constrained modeling. The modeled luminosities agree within 1.0% with those derived from Gaia parallaxes. We conclude that modeling individual mode frequencies improves age precision by a factor of two for red-giant branch stars, providing stronger constraints for galactic archaeology.</summary>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:22:43Z</published>
+    <arxiv:comment>Accepted for publication in Astronomy &amp; Astrophysics (18 pages, 12 figures)</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.SR"/>
+    <author>
+      <name>D. H. Grossmann</name>
+    </author>
+    <author>
+      <name>S. Mathur</name>
+    </author>
+    <author>
+      <name>P. G. Beck</name>
+    </author>
+    <author>
+      <name>D. Godoy-Rivera</name>
+    </author>
+    <author>
+      <name>B. Liagre</name>
+    </author>
+    <author>
+      <name>R. A. Garcia</name>
+    </author>
+    <author>
+      <name>L. S. Schimak</name>
+    </author>
+    <author>
+      <name>D. B. Palakkatharappil</name>
+    </author>
+    <author>
+      <name>M. H. Pinsonneault</name>
+    </author>
+    <author>
+      <name>F. Perez Hernandez</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09834v1</id>
+    <title>The Logic of Factor Portfolios: Boolean Rules, Interactions, and Trading Costs</title>
+    <updated>2026-11-06T18:17:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.09834v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09834v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Investors turn signals into holdings through decision rules: buy the top decile, hold stocks with high momentum and low volatility, exclude stocks that fail a screen. Many such rules are Boolean functions of threshold statements about signal ranks, and writing them this way shows both what a rule holds and how often it trades. A Walsh decomposition splits the return of any rule into exposures to individual signals and to interactions among signals; an intersection and a union of the same two screens, for example, have opposite interaction exposures. The same coefficients, together with the persistence of the underlying statements, determine turnover. Interactions are less persistent than their components, so rules that load on higher-order interactions trade more, and thresholds discard information, so at equal risk threshold implementations of interactions trade more than smooth ones. In U.S. stocks from 1973 to 2024, these predictions hold closely: predicted and realized persistence have correlations of at least 0.999, predicted turnover matches realized turnover with a slope of 1.02, and the same interactions are more persistent as products of ranks than as threshold rules. Trading costs rise with order, and because premia fall with order, 58% of single-signal portfolios have absolute premia above their quoted-spread costs over 1995-2024, against 24% of two-signal and 6% of three-signal interaction portfolios. Out of sample, interaction portfolios raise the Sharpe ratio of single-signal tangency portfolios, and over 1995-2024 they reject a six-factor model that conventional sorts on the same signals do not reject.</summary>
+    <category term="q-fin.PM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:17:58Z</published>
+    <arxiv:primary_category term="q-fin.PM"/>
+    <author>
+      <name>Ziyao Wang</name>
+    </author>
+    <author>
+      <name>Svetlozar T. Rachev</name>
+    </author>
+    <author>
+      <name>Frank J. Fabozzi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09817v1</id>
+    <title>Machine learning for lattice QCD</title>
+    <updated>2026-11-06T18:05:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.09817v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09817v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Machine learning (ML) methods have been explored as a means of optimizing lattice field theory calculations, with increasing interest in recent years. This chapter gives an introduction and summary to the use of ML methods to optimize lattice field theory without introducing any uncontrolled approximations. We focus on those directions which are clearly established as of late 2025, marking the 50th anniversary of the beginning of the study of lattice gauge theory. This chapter is a contribution to the online book ``Lattice QCD at 50 years,'' (LQCD@50), edited by Tanmoy Bhattacharya, Maarten Golterman, Rajan Gupta, Laurent Lellouch, and Steve Sharpe.</summary>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:05:06Z</published>
+    <arxiv:comment>47 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-lat"/>
+    <author>
+      <name>Gurtej Kanwar</name>
+    </author>
+    <author>
+      <name>Scott Lawrence</name>
+    </author>
+    <author>
+      <name>Alessandro Nada</name>
+    </author>
+    <author>
+      <name>Phiala Shanahan</name>
+    </author>
+  </entry>
+</feed>

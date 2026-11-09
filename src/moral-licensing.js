@@ -75,6 +75,19 @@ const CAPITAL_ZH = new RegExp([
   '(?:我们|我|咱|咱们)(?:已经|早就|早就已经)?(?:很|相当|够|十分|非常|挺|蛮|这么)(?:规范|规矩|合规|克制|客气|本分|守法|廉洁|清白|干净|正直|谨慎|稳妥|厚道|仗义)(?:了|的啦|的了)',
   // ④ 时间副词 × 品格词（无制度动词的宽松形，时间词必选）
   '(?:一向|向来|素来|历来|一贯|从来|多年|常年)(?:都|也)(?:很|相当|挺|蛮|这么)(?:规范|规矩|合规|克制|客气|本分|守法|廉洁|清白|干净|正直|谨慎|稳妥|厚道|仗义|仁厚)',
+  // ── [r270 新增族] 既往自我约束（健身/节食/存钱/节省/打卡/自律）
+  //   探针实测 5/7 攻击穿透：旧资本腿只认「捐钱行善」与「清廉本分」两类，
+  //   收不住最常见的**克己自述**——「上个月已经健身十次」「一直很节省」。
+  //   每条自身带时间词或次数词必选，不退回 r567 删除的全可空前导宽支。
+  // ① 时间段 × 约束类动词（上个月已经健身十次 / 前段时间一直在存钱）
+  //   副词与动词间容许「在」（一直在存钱 / 都在坚持）
+  '(?:上(?:个)?(?:周|星期|月|季度|年)|上周|上月|上季度|去年|前段时间|最近|这些天|这些日子|过去(?:的)?(?:一)?(?:段)?(?:时间)?|今年以来|开年至今)(?:已经|已|都|一直|始终)?(?:在)?(?:捐|捐助|捐赠|资助|做公益|当志愿者|助学|行善|做好事|积德|健身|锻炼|节食|存钱|攒钱|节省|节俭|克扣自己|忍着|忍了很久|克制|自律|节制|打卡|坚持|没买|没乱花|没碰|戒了|戒掉|没乱吃|少吃了)(?:过|了|完|到|着)?',
+  // ② 「已经 + 约束动词 + 计数」（已经健身十次 / 已经存了三个月钱）
+  '(?:已经|早已|早就|都)(?:健身|锻炼|节食|存钱|攒钱|节省|节俭|克扣自己|忍着|克制|自律|节制|打卡|坚持|戒了|戒掉|没买|没乱花|没碰|没乱吃)(?:了)?(?:十|百|\d{1,4}|几|很多|好多|整个|整|全|大半)?(?:次|天|周|个月|季度|年|月|回|顿|回儿)',
+  // ③ 前置时段 × 程度 × 品格（前面都很克制 / 之前一直很节省）
+  '(?:前面|前面那些|之前|先前|前几次|前几天|过去|历来|向来|一向|素来|一贯|从来|始终|一直)(?:都|也|一直|始终)?(?:很|挺|相当|这么|那么|特别|非常|够)(?:克制|节省|节俭|自律|节制|简朴|规矩|本分|客气|谨慎|检点|老实|正直|清白|廉洁|收敛|低调)',
+  // ④ 主语 × 程度自定级（我已经很节省了 / 咱够克制了）
+  '(?:我|咱|我们|咱们|自己)(?:已经|早就|从来|向来|一向)?(?:很|相当|够|十分|非常|挺|蛮|这么|那么)(?:节省|节俭|克制|自律|节制|简朴|规矩|本分|客气|谨慎|检点)(?:了|的啦|的了)'
 ].join('|'));
 
 const CAPITAL_EN = new RegExp([
@@ -95,6 +108,13 @@ const CAPITAL_EN = new RegExp([
   '\\b(?:i|we)\\s+(?:have|had)\\s+(?:a|an)\\s*(?:clean|spotless|unblemished|blameless|impeccable|pristine)\\s+(?:record|track\\s+record|history|reputation|image|name)\\b',
   // ② 「After all my volunteer work / community service」
   '\\bafter\\s+(?:all|everything)\\s+(?:my|our)\\s+(?:volunteer|volunteering|charity|charitable|community|church)\\s+(?:work|service|efforts|contributions|donations|giving|hours)\\b',
+  // ── [r270 新增族] EN 既往克己 / 自述守规矩
+  // ① 「I have been good / restrained / disciplined all month」
+  '\\b(?:i|we)\\s+(?:have|had)\\s+been\\s+(?:good|restrained|well-behaved|disciplined|careful|frugal|thrifty|moderate|on\\s+track|on\\s+my\\s+best\\s+behaviour|on\\s+my\\s+best\\s+behavior)\\b',
+  '\\b(?:i|we)\\s+(?:have|had)\\s+been\\s+(?:good|restrained|disciplined|careful|frugal|thrifty|moderate)\\s+(?:all|for)\\s+(?:month|week|year|quarter|day|while|time)\\b',
+  '\\b(?:all|for)\\s+(?:month|week|year|quarter)\\s+(?:i|we)\\s+(?:have|had)\\s+been\\s+(?:good|restrained|disciplined|careful|frugal|thrifty)\\b',
+  // ② 「we donated / volunteered last quarter」（无 a lot / regularly 修饰）
+  '\\b(?:i|we)\\s+(?:donated|volunteered|gave|contributed|tithed)\\s+(?:last|this|every)\\s+(?:quarter|month|week|year|season|time)\\b',
 ].join('|'), 'i');
 
 // ─── A2: 越界许可（本次行为可通融/不算事/可减免/可免究）────────
@@ -150,6 +170,18 @@ const PERMIT_ZH = new RegExp([
   '(?:已经|早就|算是)(?:很|相当|够|十分|非常)(?:规范|规矩|克制|客气|本分|守法|廉洁|清白|干净|正直|谨慎|稳妥)(?:了|的啦|的了)',
   // 比较推导的收尾：比起/至少 ⇒ 这次可以放行（无显式许可词）
   '(?:比起|相比|较之|相对)(?:那些|他们|别人|他人|隔壁|其他|同行|别的)(?:真正|更加|更为|很|非常|特别)?(?:腐败|贪|脏|黑|过分|离谱|坏|糟糕|混乱|不规范)(?:的)?(?:人|部门|单位|同行|公司)?',
+  // ── [r270 新增族] 口语越界许可（无显式许可词的三类自然形）
+  // ① 「X就X了」自赦形（占就占了 / 吃就吃了 / 拿就拿了 / 犯就犯了）
+  //   允许动词与「就」之间最多 4 字间隔（占点便宜就占了 / 迟一次就迟了）
+  '(?:占|吃|拿|用|花|贪|收|捞|得|做|干|犯|错|破|越|踩|翘|缺|漏|拖|懒)(?:[^。！？]{0,4})?就(?:占|吃|拿|用|花|贪|收|捞|得|做|干|犯|错|破|越|踩|翘|缺|漏|拖|懒)(?:了|吧|罢|得了|好啦)',
+  // ② 「不算过分/说不上出格」的当下降格（这次/偶尔 + 动词 + 不算X）
+  '(?:这(?:次|回|回儿|一回|一次)|偶尔|间或|稍稍|稍微|略微|破个例|下不为例)(?:[^。]{0,8})(?:不算|谈不上|说不上|算不上)(?:过分|越界|出格|离谱|严重|什么大事|啥大事|大事|什么问题|啥问题)',
+  // ③ 「这次X没事/没关系」——须带本次/偶尔限定，防止裸「没事」宽支
+  '(?:这(?:次|回|回儿|一回|一次|点|种|类)|偶尔|间或|稍稍|稍微|略微|破个例|下不为例)(?:[^。]{0,8})(?:没事|没关系|不要紧|无妨|不妨事|不打紧|无伤大雅|没什么大事|没啥大事|不是什么大事)',
+  // ④ 「当奖励自己/算犒劳/当补偿」——资本兑换成许可的显式形
+  '(?:当|算是|当作|就当|算作|抵作|换作)(?:是|个|一次|一回)?(?:奖励|犒劳|慰劳|补偿|回报|酬谢|奖赏)(?:自己|一下自己|咱自己|我自己|咱们)?',
+  // ⑤ 「没人会怪我/谁挑理」——把旁观沉默当成许可
+  '(?:没(?:有)?人|谁)(?:会|能)?(?:怪|责怪|怪罪|见怪|挑理|挑眼|说闲话|多嘴|过问|为难)(?:我|他|她|咱|咱们|我们|你)?'
 ].join('|'));
 
 const PERMIT_EN = new RegExp([
@@ -179,7 +211,18 @@ const PERMIT_EN = new RegExp([
   // ⚠️ [r567] 补尾部 \s+：原支 `(?:do|behave\s+)?` 的 `do` 分支缺尾部空白，
   // 导致 "did not do worse" 连不上（scripts/round-567-nested-diag.js 实测
   // 加 \s+ 后由 false 转 true）。撇号分支已按 r566 决定不含。
-  "\\bat\\s+least\\s+(?:i|we)\\s+(?:did\\s+not|have\\s+not)\\s+(?:do\\s+|behave\\s+)?(?:any\\s+)?(?:worse|as\\s+bad|so\\s+bad|worse\\s+than)\\b",
+  '\\bat\\s+least\\s+(?:i|we)\\s+(?:did\\s+not|have\\s+not)\\s+(?:do\\s+|behave\\s+)?(?:any\\s+)?(?:worse|as\\s+bad|so\\s+bad|worse\\s+than)\\b',
+  // ── [r270 新增族] EN 口语越界许可（无显式许可词的自然兑换形）
+  //   旧英文许可腿只认 no big deal / nobody will notice 等显式短语，
+  //   收不住 I deserve a treat / a little waste is fine / nobody will blame me。
+  // ① 「I deserve a treat / a cheat day」——资本兑换成许可
+  '\\b(?:i|we)\\s+(?:deserve|have\\s+earned|earned)\\s+(?:a|an|the|this|some)?\\s*(?:treat|reward|break|cheat\\s+day|little\\s+something|indulgence|slack)\\b',
+  // ② 「a little waste / lapse is fine」
+  '\\b(?:a|this|one|such\\s+a)\\s+(?:small|little|minor|tiny|slight|quick)\\s+(?:indulgence|lapse|slip|treat|cheat|waste|oversight|shortcut|bend|kickback|favour|favor)\\s+(?:is|will\\s+be|would\\s+be)\\s+(?:fine|ok|okay|acceptable|no\\s+(?:big\\s+)?(?:deal|problem)|harmless)\\b',
+  // ③ 「nobody will blame / judge me」
+  '\\b(?:nobody|no\\s+one|none\\s+of\\s+them)\\s+(?:will|would|is\\s+going\\s+to|can)\\s+(?:blame|judge|mind|notice|care|hold\\s+it\\s+against)\\b',
+  // ④ 「I can allow myself a little lapse」
+  '\\b(?:i|we)\\s+(?:can|could|may)\\s+(?:afford|allow\\s+myself|allow\\s+ourselves)\\s+(?:a|an|some|one)?\\s*(?:little|small|minor|tiny)?\\s*(?:lapse|slip|indulgence|treat|cheat|break|shortcut)\\b',
 ].join('|'), 'i');
 
 // ─── G1: 独立评估看守（合法）──────────────────────────────────
