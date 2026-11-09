@@ -1,0 +1,43 @@
+name: gates
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  # 四门禁：验证 bin/verify.js、guard-abilities.js、doc-numbers-accuracy.test.js、
+  # bidirectional-guard.js 的真实退出码。本文件只负责「怎么调用」门禁，
+  # 不改动任何门禁脚本的断言本身（3 号角色边界）。
+  gates:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Install deps
+        run: npm install --ignore-scripts --no-fund --no-audit
+      - name: gate 1 verify
+        run: node bin/verify.js
+      - name: gate 2 abilities
+        run: node scripts/guard-abilities.js
+      - name: gate 3 doc numbers
+        run: node test/doc-numbers-accuracy.test.js
+      - name: gate 4 bidirectional
+        run: node scripts/bidirectional-guard.js
+
+  # [r266/3 号] 正则 exec 循环 lint —— **lint 不是门禁断言**，故意做成
+  # 独立 job + continue-on-error: true：它报告真实隐患（如 r266 conjunction-fallacy
+  # 死循环、r265 matchAll 非全局两起事故的形态复现），但红/绿都不影响四门禁结论，
+  # 也不阻塞 merge。修复节奏由 1 号按轮次排。
+  # 规则与背景见 scripts/lint-regex-exec-loops.js 头部注释。
+  lint-regex-exec-loops:
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Lint regex exec loops (non-gating)
+        run: node scripts/lint-regex-exec-loops.js
