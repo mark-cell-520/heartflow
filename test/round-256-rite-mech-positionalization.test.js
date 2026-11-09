@@ -158,10 +158,15 @@ const ANCHOR_MECH_TABLE = 'const PC_RITE_MECH_ZH = new RegExp(';
 const ANCHOR_CALL = 'if (PC_RITE_SLOT_MECH_ZH.test(text)) {';
 const RE_SLOT_TABLE = /const PC_RITE_SLOT_MECH_ZH = new RegExp\(\[[\s\S]*?\]\.join\('\|'\)\);/;
 
-// ─── HEAD 基线副本：当前树 src/ + git show HEAD:src/index.js ───────────
+// ── 基线副本：当前树 src/ + git show <rev>:src/index.js ─────────────────
 // 纪律（r231 D 节同款）：变异在临时目录里做，绝不在原地改写 src/；
 // countHitsIn 走**独立子进程**，避免 require 缓存把变异前后的模块混在一起。
-function makeCopy(tag, useHeadIndex) {
+// [v6.8.185 r257] rev 从布尔 useHeadIndex 改成显式 git rev：原版 A1 用
+// `git show HEAD:src/index.js` 断言「位置化前只命中 4/16」，而本轮一提交，
+// HEAD 自己就变成位置化后的版本，A1 从此永久红（提交前绿、提交后红的
+// 一次性测试，r256 全量回归时尚未提交所以没暴露）。改成 HEAD~1（= r255，
+// 位置化前的最后一个提交）后，A1 的「位置化前基数」口径与提交状态解耦。
+function makeCopy(tag, rev) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hf-r256-' + tag + '-'));
   for (const f of ['VERSION', 'package.json']) {
     try { fs.copyFileSync(path.join(ROOT, f), path.join(tmp, f)); } catch (e) { /* 缺文件不致命 */ }
@@ -175,9 +180,9 @@ if(e.isDirectory())w(a,b);else fs.copyFileSync(a,b);}}
 w(process.argv[1],process.argv[2]);`,
       path.join(ROOT, 'src'), path.join(tmp, 'src')],
     { stdio: 'ignore' });
-  if (useHeadIndex) {
-    const headSrc = cp.execSync('git show HEAD:src/index.js', { cwd: ROOT, maxBuffer: 1e8 }).toString();
-    fs.writeFileSync(path.join(tmp, 'src', 'index.js'), headSrc);
+  if (rev) {
+    const baseSrc = cp.execSync('git show ' + rev + ':src/index.js', { cwd: ROOT, maxBuffer: 1e8 }).toString();
+    fs.writeFileSync(path.join(tmp, 'src', 'index.js'), baseSrc);
   }
   return tmp;
 }
@@ -201,11 +206,25 @@ function mutateLine(src, anchor, replacement) {
 }
 
 // ─── A 节：红队 4/16 → 14/16 ──────────────────────────────────────────
-test('A1 红队 16 条在 HEAD 只命中 4/16（位置化前的真实基数）', () => {
-  const tmp = makeCopy('red', true);
+test('A1 红队 16 条在位置化前只命中 4/16', () => {
+  // [v6.8.185 r257] **根治「轮前基线」断言的提交后失真**。原版用
+  // `git show HEAD:src/index.js` 取「位置化前」的源码，而 r256 一提交 HEAD 自己
+  // 就变成位置化后的版本，该断言提交后永久失败（提交前的全量回归里它是绿的，
+  // 提交后无人复跑所以没暴露）。我一度改成 `HEAD~1`，但那只是把失效从「本轮」
+  // 推迟到「下一轮」——r257 一提交 HEAD~1 也变成了位置化后的版本，A1 再次失败。
+  // **正确修法：不依赖任何 git rev。** 「位置化前」的可复现定义是「causalRiteZh
+  // 函数头吃整句豁免 PC_RITE_MECH_ZH」——用变异副本把那一行换回去，跑同一批
+  // 红队，这才是与提交状态完全解耦的轮前基数。
+  const tmp = makeCopy('redpre', null);
   try {
+    const p = path.join(tmp, 'src', 'index.js');
+    const orig = fs.readFileSync(p, 'utf8');
+    const mutated = orig.replace('if (PC_RITE_SLOT_MECH_ZH.test(text)) {',
+      'if (PC_RITE_MECH_ZH.test(text)) {');
+    assert.ok(mutated !== orig, '变异未生效（没把位置化护栏换回整句豁免）');
+    fs.writeFileSync(p, mutated, 'utf8');
     assert.strictEqual(countHitsIn(tmp, RED), 4,
-      'HEAD 基数变了——若已 >4 说明别处已覆盖，需重算本轮增量');
+      '位置化前基数变了——若已 >4 说明别处已覆盖，需重算本轮增量');
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 test('A2 红队 16 条现在命中 14/16（本轮新增 10 条）', () => {
@@ -258,7 +277,7 @@ test('C1 两条仍漏句登记（结果词本身是机制词 / 机制词在归�
 
 // ─── D 族：六处变异守卫（复制 src/ 到临时目录再变异，绝不在原地改写 src/）──
 test('D1 变异守卫一：摘掉整张 PC_RITE_SLOT_MECH_ZH 后 4 条只由它承重的依据良性 0→4 翻面', () => {
-  const tmp = makeCopy('slot', false);
+  const tmp = makeCopy('slot', null);
   try {
     const src = path.join(tmp, 'src', 'index.js');
     const cur = fs.readFileSync(SRC, 'utf8');
@@ -271,7 +290,7 @@ test('D1 变异守卫一：摘掉整张 PC_RITE_SLOT_MECH_ZH 后 4 条只由它�
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 test('D2 变异守卫二：只摘腿 A 后跨子句显式归因链接句 0→1 翻面', () => {
-  const tmp = makeCopy('lega', false);
+  const tmp = makeCopy('lega', null);
   try {
     mutateLine(path.join(tmp, 'src', 'index.js'), ANCHOR_LEG_A, "const PC_RITE_SLOT_LEG_A = '(?!)x';");
     assert.strictEqual(countHitsIn(tmp, [LEG_ONLY.A]), 1, '摘掉腿 A 后跨子句归因链接句没有翻面');
@@ -280,21 +299,21 @@ test('D2 变异守卫二：只摘腿 A 后跨子句显式归因链接句 0→1 �
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 test('D3 变异守卫三：只摘腿 B 后「机制词 + 之功」跨句句 0→1 翻面', () => {
-  const tmp = makeCopy('legb', false);
+  const tmp = makeCopy('legb', null);
   try {
     mutateLine(path.join(tmp, 'src', 'index.js'), ANCHOR_LEG_B, "const PC_RITE_SLOT_LEG_B = '(?!)x';");
     assert.strictEqual(countHitsIn(tmp, [LEG_ONLY.B]), 1, '摘掉腿 B 后「…之功」句没有翻面');
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 test('D4 变异守卫四：只摘腿 C 后「头功是 + 机制词」跨句句 0→1 翻面', () => {
-  const tmp = makeCopy('legc', false);
+  const tmp = makeCopy('legc', null);
   try {
     mutateLine(path.join(tmp, 'src', 'index.js'), ANCHOR_LEG_C, "const PC_RITE_SLOT_LEG_C = '(?!)x';");
     assert.strictEqual(countHitsIn(tmp, [LEG_ONLY.C]), 1, '摘掉腿 C 后「头功是…」句没有翻面');
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 test('D5 变异守卫五：只摘腿 D 后同子句下游形 0→1 翻面', () => {
-  const tmp = makeCopy('legd', false);
+  const tmp = makeCopy('legd', null);
   try {
     mutateLine(path.join(tmp, 'src', 'index.js'), ANCHOR_LEG_D, "const PC_RITE_SLOT_LEG_D = '(?!)x';");
     assert.strictEqual(countHitsIn(tmp, [LEG_ONLY.D]), 1, '摘掉腿 D 后同子句下游句没有翻面');
@@ -304,7 +323,7 @@ test('D5 变异守卫五：只摘腿 D 后同子句下游形 0→1 翻面', () =
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 test('D6 还原校验（未变异副本）：红队 14/16 + 依据良性 0/7', () => {
-  const tmp = makeCopy('restore', false);
+  const tmp = makeCopy('restore', null);
   try {
     const src = path.join(tmp, 'src', 'index.js');
     fs.writeFileSync(src, fs.readFileSync(SRC, 'utf8'));
@@ -369,7 +388,7 @@ test('F1 pseudo_causal 热路径无性能回归（同一基准 HEAD vs 当前树
     return Number(cp.execFileSync(process.execPath, ['-e', code],
       { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim());
   };
-  const tmp = makeCopy('perf', true);
+  const tmp = makeCopy('perf', 'HEAD');
   try {
     const base = bench(tmp);
     const cur = bench(ROOT);

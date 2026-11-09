@@ -31,6 +31,16 @@ const ROOT = path.resolve(__dirname, '..');
 const idx = require(path.join(ROOT, 'src/index.js'));
 const gateMod = require(path.join(ROOT, 'src/gate.js'));
 const SRC = path.join(ROOT, 'src', 'index.js');
+// [v6.8.185 r257] 「服药」腿所在行的取法。跨表统一后 PC_DRUG_MECH_ZH 只是
+// `new RegExp('(?:' + PC_EVIDENCE_ZH.source + '|' + PC_DRUG_NAME_ZH.source + ')')`
+// 拼装行，腿本身在 PC_DRUG_NAME_ZH 里——按「含 (?<![这那一])服药 的那一行」取，
+// 与常量名解耦，以后腿再搬家也不用改本文件。
+const ANCHOR = '(?<![这那一])服药';
+function drugMechDefLine(src) {
+  const m = src.split('\n').find(l => l.includes(ANCHOR) && l.includes('const PC_DRUG_NAME_ZH ='));
+  if (!m) throw new Error('找不到含「服药」负向环视的 PC_DRUG_NAME_ZH 定义行');
+  return m;
+}
 
 let pass = 0, fail = 0;
 function test(name, fn) {
@@ -276,11 +286,13 @@ test('D3 变异守卫三：摘掉 PC_DRUG_MECH_ZH「服药」腿的负向环视�
   try {
     const src = path.join(tmp, 'src', 'index.js');
     const orig = fs.readFileSync(src, 'utf8');
-    const defLine = orig.match(/const PC_DRUG_MECH_ZH = [^\n]*;/m)[0];
-    const ANCHOR = '(?<![这那一])服药';
+    const defLine = drugMechDefLine(orig);
     assert.strictEqual(defLine.split(ANCHOR).length - 1, 1, '「服药」负向环视锚点不唯一');
-    const mutated = orig.replace(/const PC_DRUG_MECH_ZH = [^\n]*;/m,
-      defLine.split(ANCHOR).join('服药'));
+    // [v6.8.185 r257] 「服药」腿随跨表统一搬进 PC_DRUG_NAME_ZH——变异锚点跟着腿走，
+    // 否则摘的是已经不含该腿的 PC_DRUG_MECH_ZH 拼装行，变异恒不生效（守卫失效）。
+    const mutRe = /const PC_DRUG_NAME_ZH = [^\n]*;/m;
+    assert.ok(mutRe.test(orig), 'PC_DRUG_NAME_ZH 定义行不存在');
+    const mutated = orig.replace(mutRe, defLine.split(ANCHOR).join('服药'));
     assert.ok(mutated !== orig, '变异未生效');
     fs.writeFileSync(src, mutated, 'utf8');
     const withFu = ATTACK.filter(s => /[这那一]服药/.test(s));
@@ -332,7 +344,7 @@ test('F1 PC_INVTAKE_ZH 三臂量词类统一含「服」（3 次），正序/倒
 });
 test('F2 PC_DRUG_MECH_ZH 的「服药」腿带负向环视（只挡这/那/一三个指示词）', () => {
   const src = fs.readFileSync(SRC, 'utf8');
-  const defLine = src.match(/const PC_DRUG_MECH_ZH = [^\n]*;/m)[0];
+  const defLine = drugMechDefLine(src);
   assert.ok(defLine.includes('(?<![这那一])服药'), '「服药」腿应有 (?<![这那一]) 负向环视');
   assert.strictEqual(defLine.split('(?<![这那一])服药').length - 1, 1, '环视锚点应唯一');
 });

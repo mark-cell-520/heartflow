@@ -56,8 +56,8 @@ const ANCHOR_RES = 'const PC_TAKE_RES_ZH = /(?:';
 const ANCHOR_SLEEP = '|睡[着了]';                                  // 睡眠臂起点
 const ANCHOR_ZHA = '(?:沾|挨|靠)[枕床][^。]{0,3}[着睡]';            // 沾枕就着臂
 const ANCHOR_NOWAKE = '不[再又]?醒[了]?';                          // 不再醒臂
-const ANCHOR_MECH = 'const PC_DRUG_MECH_ZH = /(?:';
-const ANCHOR_SUPP_MECH = 'const PC_SUPP_MECH_ZH = /(?:';
+const ANCHOR_MECH = 'const PC_DRUG_MECH_ZH = new RegExp(';
+const ANCHOR_SUPP_MECH = 'const PC_SUPP_MECH_ZH = PC_EVIDENCE_ZH;';
 const ANCHOR_EVID = '|双盲|随机|对照组|安慰剂|样本量|大样本|自限|自愈|个例|孤例';
 const ANCHOR_IV_FN = 'function causalInvertedTakeZh(text)';
 const ANCHOR_SUP_FN = 'function causalSupplementZh(text)';
@@ -399,19 +399,24 @@ test(`D4 变异守卫四：摘掉 r227 反向表 PC_DRUG_MECH_ZH 的证据词后
   try {
     const src = path.join(tmp, 'src', 'index.js');
     const orig = fs.readFileSync(src, 'utf8');
-    assert.strictEqual(orig.split(ANCHOR_MECH).length - 1, 1, 'PC_DRUG_MECH_ZH 定义锚点不唯一');
-    const line = orig.split('\n').find(l => l.includes(ANCHOR_MECH));
-    assert.strictEqual(line.split(ANCHOR_EVID).length - 1, 1, '证据词锚点应出现 1 次');
-    const mutated = orig.replace(/const PC_DRUG_MECH_ZH = [^\n]*;/m,
-      line.split(ANCHOR_EVID).join(''));
+    assert.ok(/const PC_DRUG_MECH_ZH = new RegExp\(/.test(orig), 'PC_DRUG_MECH_ZH 拼装定义行不存在');
+    // [v6.8.185 r257] 证据词已收敛到 PC_EVIDENCE_WORDS 数组（单一词源）——变异把
+    // 数组里那 10 个证据/替代解释词整体摘掉，摘的还是同一批词，守卫语义不变。
+    // （数组是 3 行字面量，逐行 find 只能拿到第一行，故整体替换而非逐词摘。）
+    const mutated = orig.replace(/const PC_EVIDENCE_WORDS = [[\s\S]*?];/,
+      "const PC_EVIDENCE_WORDS = ['说明书', '医嘱', '药师', '成分', '文献', '同行评审', '实验数据'];");
     assert.notStrictEqual(mutated, orig, '变异未生效（D4）');
     fs.writeFileSync(src, mutated);
     assert.strictEqual(countHitsIn(tmp, BENIGN_EVIDENCE_R227), BENIGN_EVIDENCE_R227.length,
       '摘掉证据词后依据良性句没有被重新误命中');
     assert.strictEqual(countHitsIn(tmp, ATTACK), ATTACK.length, '摘掉证据词后攻击句受影响');
-    // 第三条走 r229 的反向表，本轮变异不该碰到它（证明两张表作用域分离）
-    assert.strictEqual(countHitsIn(tmp, BENIGN_EVIDENCE_R229), 0,
-      '摘 PC_DRUG_MECH_ZH 证据词却影响了走 PC_SUPP_MECH_ZH 的句子');
+    // [v6.8.185 r257] 原断言「摘 DRUG 证据词不该影响走 SUPP 表的句子」证明的是
+    // **两张表作用域分离**。跨表统一后这个不变量反过来成立：证据层是单一词源，
+    // 摘掉它会同时作用于服药族与保健品族——这正是本轮的设计意图（两张表同源，
+    // 不再各自漂移），故把断言翻面并在这里记档。若它又变回 0，说明有人把两张表
+    // 重新分家了，round-257 D4 的 drift 哨兵会同时报警。
+    assert.ok(countHitsIn(tmp, BENIGN_EVIDENCE_R229) > 0,
+      '单一词源下摘证据层应同时影响保健品族（若为 0 说明两张表又分家了）');
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 test(`D4b 变异守卫四之二：摘掉 r229 反向表 PC_SUPP_MECH_ZH 的证据词后 ${BENIGN_EVIDENCE_R229.length} 条依据良性句 0→1 重新被误命中`, () => {
@@ -419,11 +424,11 @@ test(`D4b 变异守卫四之二：摘掉 r229 反向表 PC_SUPP_MECH_ZH 的证�
   try {
     const src = path.join(tmp, 'src', 'index.js');
     const orig = fs.readFileSync(src, 'utf8');
-    assert.strictEqual(orig.split(ANCHOR_SUPP_MECH).length - 1, 1, 'PC_SUPP_MECH_ZH 定义锚点不唯一');
-    const line = orig.split('\n').find(l => l.includes(ANCHOR_SUPP_MECH));
-    assert.ok(line.includes('临床') && line.includes('双盲'), 'PC_SUPP_MECH_ZH 应含证据词');
-    const mutated = orig.replace(/const PC_SUPP_MECH_ZH = [^\n]*;/m,
-      line.split('临床').join('__X__').split('双盲').join('__X__'));
+    assert.ok(/const PC_SUPP_MECH_ZH = PC_EVIDENCE_ZH;/.test(orig), 'PC_SUPP_MECH_ZH 应为依据层别名');
+    // [v6.8.185 r257] SUPP 表现为 PC_EVIDENCE_ZH 别名，词在 PC_EVIDENCE_WORDS 数组
+    // 里——变异从数组摘「临床」「双盲」，摘的还是同一批词，守卫语义不变。
+    const mutated = orig.replace(/const PC_EVIDENCE_WORDS = [[\s\S]*?];/,
+      "const PC_EVIDENCE_WORDS = ['随机', '对照组', '安慰剂', '样本量', '大样本', '说明书', '医嘱', '药师', '成分', '文献', '同行评审', '实验数据', '自限', '自愈', '个例', '孤例'];");
     assert.notStrictEqual(mutated, orig, '变异未生效（D4b）');
     fs.writeFileSync(src, mutated);
     assert.strictEqual(countHitsIn(tmp, BENIGN_EVIDENCE_R229), BENIGN_EVIDENCE_R229.length,
@@ -463,15 +468,17 @@ test('F1 乙半表含本轮新增的睡眠臂（7 个结果词族）', () => {
     assert.ok(line.includes(arm), `乙半表缺少臂：${arm}`);
   }
 });
-test('F2 反向护栏 PC_DRUG_MECH_ZH 含本轮补的 10 个证据/替代解释词', () => {
+test('F2 反向护栏含本轮补的 10 个证据/替代解释词', () => {
   const src = fs.readFileSync(SRC, 'utf8');
-  const line = src.split('\n').find(l => l.includes(ANCHOR_MECH));
-  assert.ok(line, '找不到 PC_DRUG_MECH_ZH 定义行');
+  // [v6.8.185 r257] 这 10 个词已搬进 PC_EVIDENCE_WORDS（单一词源），
+  // PC_DRUG_MECH_ZH 经 PC_EVIDENCE_ZH.source 拼进来——从数组行查。
+  const arr = src.match(/const PC_EVIDENCE_WORDS = [[\s\S]*?];/);
+  assert.ok(arr, '找不到 PC_EVIDENCE_WORDS 数组');
   for (const w of ['双盲', '随机', '对照组', '安慰剂', '样本量', '大样本', '自限', '自愈', '个例', '孤例']) {
-    assert.ok(line.includes(w), `反向护栏缺少证据词：${w}`);
+    assert.ok(arr[0].includes(w), `依据层缺少证据词：${w}`);
   }
   // 纪律：仍然不收裸「药」（r227/r228 两轮同款，收了会放掉未点名攻击句）
-  assert.ok(!/\|药\|/.test(line), '反向护栏被收进了裸「药」');
+  assert.ok(!/\|药\|/.test(arr[0]), '依据层被收进了裸「药」');
 });
 test('F3 两个子判据函数各定义 1 次且 halves 半身诊断仍在返回', () => {
   const src = fs.readFileSync(SRC, 'utf8');

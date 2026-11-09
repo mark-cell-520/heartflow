@@ -8105,7 +8105,34 @@ const PC_MONOCAUSE_ZH = /(?:唯一(?:的)?(?:原因|解释|因素)?|完全是因
 // 整句被判「点名真药/药理依据在场」而豁免，判据层补量词也不承重。环视只挡
 // 这/那/一 三个指示词（正是甲半量词「服」的三个合法前缀），「按时服药/遵医嘱
 // 服药」等正常服药句不受影响（本轮 15 条良性 + 存量 28199 条 A/B 实测）。
-const PC_DRUG_MECH_ZH = /(?:布洛芬|对乙酰氨基酚|阿司匹林|阿莫西林|青霉素|头孢|二甲双胍|胰岛素|奥美拉唑|氯雷他定|连花清瘟|板蓝根|感冒药|退烧药|退热药|止疼药|止痛药|消炎药|抗生素|处方药|非处方药|维生素|钙片|疫苗|免疫[力应]|血糖|糖尿病|退热贴|物理降温|质子泵|前列腺素|组胺|非甾体|药理|药效|用药|(?<![这那一])服药|医嘱|疗程|药典|临床|对症|剂量|毫克|\d+\s*mg|成分|疗效|治疗|医生|诊断|手术|降压药|降糖药|安眠药|止咳药|止泻药|肠胃药|胃药|抗过敏|救心丸|蒙脱石|奥司他韦|阿奇霉素|红霉素|左氧氟沙星|双盲|随机|对照组|安慰剂|样本量|大样本|自限|自愈|个例|孤例)/;
+// [v6.8.185 第 257 轮] **依据/替代解释层单独成表**（r236 G2 后半，十六轮挂账）。
+// 修法取向：r227 服药族（PC_DRUG_MECH_ZH）与 r229 保健品族（PC_SUPP_MECH_ZH）的
+// 护栏语义是同一件事——「真实依据或替代解释在场 → 这是带依据的归因，不是伪因果」，
+// 但两族各存一份依据词表，十六轮来只按各轮最小改动各补各的，词集已经漂移：
+// DRUG 表 75 词 / SUPP 表 18 词仅 13 词重合，「说明书/药师/文献/同行评审/实验数据」
+// 五个依据词只在 SUPP 表。后果是**同族不同表的不一致**——同一句依据句，换甲半
+// 就翻面（红队实测，见 test/round-257-evidence-table-unification.test.js）：
+//   「这服药喝下去病就好了，同行评审都没通过这个结论」→ 服药族 pc=1（误判）
+//   「吃了这个保健品之后失眠就好了，同行评审都没通过这个结论」→ 保健品族 pc=0
+// r239 曾在 26314 条存量语料上实测「补这 5 词零行为变化」而判为不留死代码；
+// r256 的方法论（「扫语料得出无需修是错的——潜伏型缺陷必须配红队」）说明那个
+// 口径只证明了存量不翻车，没证明缺口不存在。本轮补上红队，缺口坐实后落地。
+// 拆层只动**依据层**，不动「点名真药/药理层」——后者是服药族甲半那把刀
+// （r227「未点名才判」）的精度侧，混进依据层会让保健品族被「布洛芬」之类
+// 药物名豁免，那是另一个行为变化，需另轮另裁。
+// [v6.8.185 第 257 轮] 依据层以**词数组**为单一词源、正则从它生成（不是第二份
+// 字面量）——词源收敛到一处，`evidenceExemptionTrace()` 才能逐词报告「是哪个词
+// 拦的」，跨表漂移也才有可执行判据（见该函数 drift 段）。数组元素全是纯中文词、
+// 无正则元字符，`join('|')` 不需转义（对比：`PC_DRUG_NAME_ZH` 里有 `免疫[力应]`、
+// `(?<![这那一])服药`、`\d+\s*mg`，所以它保持正则字面量形态）。
+const PC_EVIDENCE_WORDS = ['临床', '双盲', '随机', '对照组', '安慰剂', '样本量', '大样本',
+  '说明书', '医嘱', '药师', '成分', '文献', '同行评审', '实验数据',
+  '自限', '自愈', '个例', '孤例'];
+const PC_EVIDENCE_ZH = new RegExp('(?:' + PC_EVIDENCE_WORDS.join('|') + ')');
+// 服药族私有层：点名真药 + 药理临床名词（**不含**依据词——那些在 PC_EVIDENCE_ZH）。
+// 「(?<![这那一])服药」负向环视与「\d+\s*mg」原样搬过来，未改一字。
+const PC_DRUG_NAME_ZH = /(?:布洛芬|对乙酰氨基酚|阿司匹林|阿莫西林|青霉素|头孢|二甲双胍|胰岛素|奥美拉唑|氯雷他定|连花清瘟|板蓝根|感冒药|退烧药|退热药|止疼药|止痛药|消炎药|抗生素|处方药|非处方药|维生素|钙片|疫苗|免疫[力应]|血糖|糖尿病|退热贴|物理降温|质子泵|前列腺素|组胺|非甾体|药理|药效|用药|(?<![这那一])服药|疗程|药典|对症|剂量|毫克|\d+\s*mg|疗效|治疗|医生|诊断|手术|降压药|降糖药|安眠药|止咳药|止泻药|肠胃药|胃药|抗过敏|救心丸|蒙脱石|奥司他韦|阿奇霉素|红霉素|左氧氟沙星)/;
+const PC_DRUG_MECH_ZH = new RegExp('(?:' + PC_EVIDENCE_ZH.source + '|' + PC_DRUG_NAME_ZH.source + ')');
 // [v6.8.156 第 228 轮] 甲半表扩面：量词 8→13（补 盒/支/片/粒/颗）+ 新增注射臂
 // （「这支针打下去」「这一针打下去」）+ 对象表补 胶囊/药丸/针/针剂/注射液/药剂。
 // [v6.8.164 第 236 轮] r230 挂账的甲半缺口两条已修（交接簿候选①，经 r231~r235
@@ -8208,7 +8235,12 @@ const PC_SUPP_RES_ZH = new RegExp('(?:' + PC_TAKE_RES_ZH.source
 // 纪律：只收「依据/替代解释」词，**不收产品名**——「吃了螺旋藻片这种保健品之后
 // 感冒就少了」是点名成分但句内无依据，按 r227 刀（豁免须「点名 + 依据」双条件）
 // 仍判。
-const PC_SUPP_MECH_ZH = /(?:临床|双盲|随机|对照组|安慰剂|样本量|大样本|说明书|医嘱|药师|成分|文献|同行评审|实验数据|自限|自愈|个例|孤例)/;
+// [v6.8.185 第 257 轮] 本表现为 PC_EVIDENCE_ZH 的**直接引用**（不再是第二份
+// 词表）——r229 注释里写的「两张表各存一份只会让它们各自漂移」说的就是这件事，
+// 十六轮漂移的实证就是上面 PC_EVIDENCE_ZH 注释块列的那句翻面。词集与本轮改动前
+// **逐字相同**（0 增 0 减），行为变化严格等于 0；变化全部落在服药族那一侧
+// （PC_DRUG_MECH_ZH 补了本表早有的 5 个词），两侧从此单一词源。
+const PC_SUPP_MECH_ZH = PC_EVIDENCE_ZH;
 // ─── [v6.7.127] 中文「无机制动作 × 获益结果」伪归因族（第 87 轮）──────────
 // 轮初实测（第 87 轮）：第 48 轮建的 PC_CAUSAL_ZH_PATS 对「甲乙两半」型
 // 白话伪因果 5/6 漏判（gate 全 pass）。三条漏判句的形状：
@@ -8792,6 +8824,141 @@ function mechSummary(mechAll, pairs) {
     upstream: upstream.size,
     otherClause: otherClause.size,
     words: mechAll.map(x => x.word),
+  };
+}
+// ─── [v6.8.185 第 257 轮] 依据豁免的**可审计轨迹**（跨表统一的配套） ───────────
+// 为什么需要它：r236 G2 后半挂账十六轮的那件事——「真实依据/替代解释在场 → 不判」
+// 这道护栏在**五个**地方各判一次（第⑩支、倒装服药族、保健品族、仪式族，加
+// PC_MECH_WEAK_ZH 的弱支豁免），四个子判据的 exempt 字段只有
+// 'context' / 'drug-mech' / 'supp-mech' / 'rite-mech' 四个字符串。调用方拿到
+// 'drug-mech' 时无从回答三个问题：**是哪个词拦的**、**落在哪个子句**、
+// **保健品族同形的句子会不会翻面**。r257 把依据层收敛成单一词源
+// （PC_EVIDENCE_WORDS）之后，这三个问题从「答不了」变成「答得了但不给」。
+//
+// 返回形状（只读诊断，零副作用，不改任何子判据的返回值）：
+//   verdict    'exempt-evidence' 依据词拦的 / 'exempt-drug-name' 点名真药拦的 /
+//              'exempt-context' 语境界拦的 / 'attack' 判 / 'no-text' / 'no-chinese'
+//   guard      拦下它的那道护栏：{ name, table, matched, detail }，没拦为 null
+//   words      逐词命中：{ word, index, clause, inEvidence, inDrugName }
+//   tables     四张表各自的在场情况（含命中片段），用来回答「换张表会不会翻面」
+//   families   四个子判据各自的 exempt 串 + 拦它的表名
+//   drift      跨表一致性：{ unified, shared, drugOnly, suppOnly }——**可执行的**
+//              漂移判据（以前只在注释里写「已知未修」，现在能跑）
+//   clauses    子句级依据词分布
+//   count/hits/score  与 checkPseudoCausal 的伪因果族同源
+function evidenceExemptionTrace(text) {
+  const NO_TEXT = {
+    verdict: 'no-text', guard: null, words: [], tables: null,
+    families: null, drift: null, clauses: [],
+    count: 0, hits: [], score: 0,
+  };
+  if (!text || typeof text !== 'string') return NO_TEXT;
+  if (!/[一-鿿]/.test(text)) return { ...NO_TEXT, verdict: 'no-chinese' };
+
+  // 子句绝对偏移：split 不返回分隔符位置，按分隔符逐段累加才拿得到真实 offset
+  // （首版用 text.indexOf(clause) 找首现——同一子句串在句中出现两次时就指错段）。
+  // 必须在逐词扫描之前算好，words 每项要带 clause。
+  const SEP = /[。！？!?]/g;
+  const clauseOffsets = [];
+  {
+    let pos = 0;
+    SEP.lastIndex = 0;
+    let sm;
+    while ((sm = SEP.exec(text)) !== null) {
+      clauseOffsets.push({ start: pos, end: sm.index });
+      pos = sm.index + 1;
+    }
+    clauseOffsets.push({ start: pos, end: text.length });
+  }
+  const clauseOf = (absIdx) => {
+    for (let i = 0; i < clauseOffsets.length; i++) {
+      if (absIdx >= clauseOffsets[i].start && absIdx < clauseOffsets[i].end) return i;
+    }
+    return clauseOffsets.length - 1;
+  };
+
+  // 逐词命中（依据层是纯词数组，可以精确到「哪个词」；药物层含正则元字符，
+  // 只报命中片段，不假装能拆词）
+  const words = [];
+  for (const w of PC_EVIDENCE_WORDS) {
+    let from = 0;
+    for (; ;) {
+      const i = text.indexOf(w, from);
+      if (i < 0) break;
+      words.push({ word: w, index: i, clause: clauseOf(i), inEvidence: true, inDrugName: PC_DRUG_NAME_ZH.test(w) });
+      from = i + w.length;
+    }
+  }
+  const drugNameMatch = text.match(PC_DRUG_NAME_ZH);
+  const evHit = PC_EVIDENCE_ZH.test(text);
+  const drugHit = PC_DRUG_MECH_ZH.test(text);
+  const suppHit = PC_SUPP_MECH_ZH.test(text);
+  const revHit = PC_REV_MECH_ZH.test(text);
+  const ctxHit = STAT_CONTEXT_ZH.test(text) || hasExclNegCausal(text)
+    || PC_HEDGE_ZH.test(text) || PC_PROB_ZH.test(text);
+
+  // 四张表的在场情况——回答「同一句换甲半走另一族，会不会翻面」
+  const tables = {
+    evidence: { hit: evHit, words: words.map(x => x.word) },
+    drugName: { hit: !!drugNameMatch, matched: drugNameMatch ? drugNameMatch[0] : null },
+    drugMech: { hit: drugHit, note: '依据层 ∪ 点名真药层（服药族/第⑩支/仪式族吃这张）' },
+    suppMech: { hit: suppHit, note: '= 依据层本身（保健品族吃这张，r257 起单一词源）' },
+    revMech: { hit: revHit, note: '机制/统计/资金词表（弱支豁免吃这张，与依据层不同源）' },
+  };
+
+  // 四个子判据的 exempt 串 + 拦它的表——与各函数头返回的字符串逐字对齐
+  const invTake = causalInvertedTakeZh(text);
+  const supp = causalSupplementZh(text);
+  const rite = causalRiteZh(text);
+  const fam = (r, table, name) => ({
+    exempt: r.halves && r.halves.exempt ? r.halves.exempt : [],
+    blockedBy: (r.halves && r.halves.exempt && r.halves.exempt.length > 0)
+      ? (r.halves.exempt[0] === 'context' ? 'context' : table) : null,
+    name, count: r.count,
+  });
+  const families = {
+    invertedTake: fam(invTake, 'PC_DRUG_MECH_ZH', '倒装服药归因（r227）'),
+    supplement: fam(supp, 'PC_SUPP_MECH_ZH', '未点名保健品归因（r229）'),
+    rite: fam(rite, 'PC_RITE_MECH_ZH', '玄学仪式归因（r231/r256）'),
+  };
+
+  // 跨表漂移判据：依据层词集是否同时出现在两张护栏表里。r257 之前
+  // PC_DRUG_MECH_ZH 独缺 5 词（说明书/药师/文献/同行评审/实验数据），
+  // 这道判据就是那条挂账的可执行形式——drift.unified=false 时必然存在
+  // 「同形依据句在一个族判、在另一个族不判」的翻面。
+  const suppWords = PC_SUPP_MECH_ZH.source.replace(/^\(\?:|\)$/g, '').split('|');
+  const shared = PC_EVIDENCE_WORDS.filter(w => suppWords.indexOf(w) >= 0);
+  const suppOnly = suppWords.filter(w => PC_EVIDENCE_WORDS.indexOf(w) < 0);
+  const drugOnly = PC_EVIDENCE_WORDS.filter(w => suppWords.indexOf(w) < 0);
+  const drift = { unified: suppOnly.length === 0 && drugOnly.length === 0, shared, suppOnly, drugOnly };
+
+  // 子句级依据词分布（复用上面已算好的 clauseOffsets/clauseOf）
+  const clauses = clauseOffsets.map((c, i) => ({
+    clause: i,
+    text: text.slice(c.start, c.end),
+    evidenceWords: words.filter(w => clauseOf(w.index) === i).map(w => w.word),
+  }));
+
+  let verdict = 'attack';
+  let guard = null;
+  if (ctxHit) {
+    verdict = 'exempt-context';
+    guard = { name: 'context', table: 'STAT_CONTEXT_ZH/PC_HEDGE_ZH/PC_PROB_ZH', matched: null, detail: '方法学/统计语境、排除性否定归因或对冲谦辞在场' };
+  } else if (drugNameMatch) {
+    verdict = 'exempt-drug-name';
+    guard = { name: 'drug-name', table: 'PC_DRUG_NAME_ZH', matched: drugNameMatch[0], detail: '点名真药/药理临床名词在场——r227 甲半那把刀（未点名才判）的精度侧' };
+  } else if (evHit) {
+    verdict = 'exempt-evidence';
+    guard = {
+      name: 'evidence', table: 'PC_EVIDENCE_ZH', matched: words.map(w => w.word),
+      detail: '真实依据/替代解释在场（' + words.length + ' 处，' + [...new Set(words.map(w => w.word))].join('/') + '）',
+    };
+  }
+
+  const pc = checkPseudoCausal(text);
+  return {
+    verdict, guard, words, tables, families, drift, clauses,
+    count: pc.count, hits: pc.hits, score: pc.score,
   };
 }
 function checkPseudoCausal(text) {
@@ -17272,6 +17439,7 @@ module.exports = {
   // 刻意**不带 check 前缀**——causalRiteZh 同款理由：会被
   // scripts/orphan-dimension-scan.js 当成断链维度。
   riteAttributionTrace,
+  evidenceExemptionTrace,
   checkSoftDeflection,
   checkContradiction,
   checkVagueness,

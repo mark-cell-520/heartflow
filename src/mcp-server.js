@@ -3557,6 +3557,38 @@ function handleRiteAttribution(args) {
   }
 }
 
+// [r257] 依据豁免的可审计轨迹（约定 3 三处接线的 handler 函数）。
+// 与 handleRiteAttribution 同构：走 require HF_DIR/src/index.js 的公开导出
+// evidenceExemptionTrace，不复制任何词表。
+function handleEvidenceExemption(args) {
+  try {
+    const text = args && args.text;
+    if (!text || typeof text !== 'string') {
+      return { error: '缺少参数 text（要审计的中文文本）', expectedParams: ['text'], timestamp: Date.now() };
+    }
+    const idx = require(path.join(HF_DIR, 'src/index.js'));
+    const trace = idx.evidenceExemptionTrace(text);
+    return {
+      result: {
+        trace,
+        pseudoCausal: (() => {
+          const pc = idx.checkPseudoCausal(text);
+          return {
+            count: pc.count,
+            hits: pc.hits,
+            score: pc.score,
+            riteHits: (pc.hits || []).filter(h => String(h).startsWith('玄学仪式归因:')),
+          };
+        })(),
+        note: 'trace.count/hits 是 checkPseudoCausal 的合计数；trace.verdict 只说明依据护栏这一层的状态，未判不等于整句 pass（弱支豁免/数字护栏是另一层）。drift.unified=false 意味着跨表漂移复现，需回到 src/index.js 的 PC_EVIDENCE_WORDS 修。',
+      },
+      timestamp: Date.now(),
+    };
+  } catch (e) {
+    return { error: e.message, timestamp: Date.now() };
+  }
+}
+
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
@@ -3570,6 +3602,8 @@ const HANDLERS = {
   heartflow_wiring_check: handleWiringCheck,
   // [r256] 玄学仪式归因族的可审计轨迹（位置化护栏的逐腿/逐子句解释）
   heartflow_rite_attribution: handleRiteAttribution,
+  // [r257] 依据豁免的可审计轨迹（跨表统一 + 四张表在场情况 + 漂移判据）
+  heartflow_evidence_exemption: handleEvidenceExemption,
   // [v6.7.72] 误报反馈闭环（心虫 decision.decide 选定 0.92）
   heartflow_false_positive: handleFalsePositiveTool,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,

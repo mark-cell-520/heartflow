@@ -409,15 +409,23 @@ test('G2 已知未修②【r239 已修，登记翻正】：整句表无法区分
   assert.strictEqual(pcCount('从那以后签单就多了，归根结底是扩容之功'), 0,
     '机制词 + 领属归责名词（…之功）的良性句应仍豁免');
 });
-test('G3 已知未修③：跨表医疗/机制词统一的医疗/依据侧（DRUG/SUPP 两表）仍未做', () => {
-  // PC_DRUG_MECH_ZH / PC_SUPP_MECH_ZH 的用词差异（临床/双盲/随机/对照组/安慰剂/
-  // 样本量/大样本/自限/自愈/个例/孤例 的高度重叠但不一致）本轮不动——高危重构，
-  // 会同时影响⑩⑪⑫⑬⑭ 五支与 causalInvertedTakeZh/causalSupplementZh 两个子判据。
+test('G3 已知未修③：跨表医疗/机制词统一的医疗/依据侧（DRUG/SUPP 两表）——[v6.8.185 r257] 已做', () => {
+  // 原登记（r236 G2 后半，十六轮挂账）：PC_DRUG_MECH_ZH / PC_SUPP_MECH_ZH 的用词
+  // 差异（临床/双盲/随机/对照组/安慰剂/样本量/大样本/自限/自愈/个例/孤例 高度
+  // 重叠但不一致，「药师/说明书/文献/同行评审/实验数据」只在 SUPP 表）未做——
+  // 高危重构，会同时影响⑩⑪⑫⑬⑭ 五支与两个子判据。
+  // [r257] 已落地：依据层收敛成单一词源 PC_EVIDENCE_WORDS，PC_SUPP_MECH_ZH 是它的
+  // 直接别名、PC_DRUG_MECH_ZH 由它 ∪ PC_DRUG_NAME_ZH 拼成。原断言写的是
+  // 「若已统一请同步本条」——本节即同步：DRUG 表现在**经依据层含**「药师」，
+  // 且两张表同源（不再可能各自漂移）。drift 判据的哨兵语义见 round-257 D3/D4。
   const src = fs.readFileSync(SRC, 'utf8');
-  const drug = src.match(/const PC_DRUG_MECH_ZH = [^\n]*;/)[0];
-  const supp = src.match(/const PC_SUPP_MECH_ZH = [^\n]*;/)[0];
-  assert.ok(drug.includes('药师') === false && supp.includes('药师'),
-    'DRUG 表仍无「药师」——跨表统一未做，登记备查（若已统一请同步本条）');
+  assert.ok(/const PC_SUPP_MECH_ZH = PC_EVIDENCE_ZH;/.test(src), 'PC_SUPP_MECH_ZH 应引用依据层');
+  assert.ok(/const PC_DRUG_MECH_ZH = new RegExp\('\(\?:' \+ PC_EVIDENCE_ZH\.source \+ '\|' \+ PC_DRUG_NAME_ZH\.source \+ '\)'\);/.test(src),
+    'PC_DRUG_MECH_ZH 应由依据层 ∪ 点名真药层拼成');
+  const arr = src.match(/const PC_EVIDENCE_WORDS = [[\s\S]*?];/)[0];
+  for (const w of ['药师', '说明书', '文献', '同行评审', '实验数据']) {
+    assert.ok(arr.includes(w), `依据层缺少原 SUPP 独有词「${w}」`);
+  }
 });
 test('G4 已知未修④：causalInvertedTakeZh / causalSupplementZh 的 lastIndex 防空匹配防护前移', () => {
   const src = fs.readFileSync(SRC, 'utf8');

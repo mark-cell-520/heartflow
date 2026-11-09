@@ -55,7 +55,7 @@ const hasDim = (text, dim) => realFindings(text).some(f => f.dimension === dim);
 // ─── 供 D 节变异用的源码锚点（与 src/index.js 当前实现逐字对应）────────
 const ANCHOR_INVTAKE = 'const PC_INVTAKE_ZH = /(?:';
 const ANCHOR_TAKERES = 'const PC_TAKE_RES_ZH = /(?:';
-const ANCHOR_DRUGMECH = 'const PC_DRUG_MECH_ZH = /(?:';
+const ANCHOR_DRUGMECH = 'const PC_DRUG_MECH_ZH = new RegExp(';
 const ANCHOR_BRANCH10_GUARD = 'if (pat === PC_CAUSAL_ZH_PATS[9] && PC_DRUG_MECH_ZH.test(text)) continue;';
 // 弱支表尾部新补的「点名真药 + 临床证据」族（整段，D5 摘整段）
 const ANCHOR_WEAK_DRUG_TAIL = '|布洛芬|对乙酰氨基酚|阿司匹林|阿莫西林|青霉素|头孢|二甲双胍|胰岛素|奥美拉唑|氯雷他定|连花清瘟|板蓝根|感冒药|退烧药|退热药|止疼药|止痛药|消炎药|抗生素|处方药|非处方药|维生素|钙片|疫苗|免疫[力应]|血糖|糖尿病|退热贴|物理降温|质子泵|前列腺素|组胺|非甾体|药典|临床|对症|剂量|毫克|\\d+\\s*mg';
@@ -413,7 +413,7 @@ test('F 源码常量完整 + 半身诊断返回 + 豁免不许升级成函数级
   const src = fs.readFileSync(SRC, 'utf8');
   assert.ok(/const PC_INVTAKE_ZH = \/\(\?:/.test(src), 'PC_INVTAKE_ZH 甲半表不存在');
   assert.ok(/const PC_TAKE_RES_ZH = \/\(\?:/.test(src), 'PC_TAKE_RES_ZH 乙半表不存在');
-  assert.ok(/const PC_DRUG_MECH_ZH = \/\(\?:/.test(src), 'PC_DRUG_MECH_ZH 反向护栏表不存在');
+  assert.ok(/const PC_DRUG_MECH_ZH = new RegExp\(/.test(src), 'PC_DRUG_MECH_ZH 反向护栏表不存在');
   assert.ok(src.includes('function causalInvertedTakeZh(text)'), '倒装服药子判据函数不存在');
   assert.ok(src.includes(ANCHOR_IV_CALL), 'checkPseudoCausal 未调用倒装服药子判据');
   assert.strictEqual(src.split('function causalInvertedTakeZh(text)').length - 1, 1, '子判据函数应只定义 1 次');

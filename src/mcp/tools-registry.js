@@ -20,6 +20,16 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"要审计的中文文本"}},"required":["text"]}
   },
 
+  // [r257] 依据豁免的可审计轨迹（r236 G2 后半跨表统一的配套）。四个子判据的
+  // exempt 只有 'drug-mech'/'supp-mech' 四个字符串，回答不了「是哪个词拦的、
+  // 落在哪个子句、换张表会不会翻面」。本工具把逐词命中、四张表在场情况、四个
+  // 子判据的 exempt 归属、以及**可执行的跨表漂移判据**全部导出。纯只读。
+  {
+    name: 'heartflow_evidence_exemption',
+    description: "伪因果族「真实依据/替代解释在场 → 不判」这道护栏的可审计轨迹。对输入文本给出：① verdict——exempt-evidence（依据词拦的）/ exempt-drug-name（点名真药/药理名词拦的）/ exempt-context（统计语境/对冲谦辞拦的）/ attack（判）/ no-text、no-chinese；② guard——拦下它的那道护栏（表名 + 命中片段 + 判据说明）；③ words——逐词命中（哪个词、在文本第几字、是否同属依据层与点名真药层）；④ tables——四张表各自的在场情况，直接回答「同一句换甲半走另一个子判据会不会翻面」；⑤ families——倒装服药归因（r227）/ 未点名保健品归因（r229）/ 玄学仪式归因（r231、r256）三个子判据各自的 exempt 串与拦它的表名；⑥ drift——跨表一致性判据 {unified, shared, suppOnly, drugOnly}，unified=false 即存在「同形依据句在一个族判、在另一个族不判」的翻面（r257 前 PC_DRUG_MECH_ZH 独缺 说明书/药师/文献/同行评审/实验数据 五词，unified=false）；⑦ clauses——子句级依据词分布；⑧ count/hits/score 与 checkPseudoCausal 同源。用于回答「你为什么不判这句」与「跨表统一是否仍然成立」。纯只读、无副作用。",
+    inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"要审计的中文文本"}},"required":["text"]}
+  },
+
   {
     name: 'heartflow_think',
     description: "完整思维链：分类输入→路由→推理→输出。返回结构化分析结果，包含类型、置信度和思维链。",

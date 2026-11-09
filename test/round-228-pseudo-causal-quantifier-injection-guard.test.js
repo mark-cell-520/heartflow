@@ -60,7 +60,7 @@ const ANCHOR_INJECT = '(?:注射液|针剂|药剂|针)[^。]{0,4}打(?:下)?(?:�
 // （实测 src/index.js 中该串只出现 1 次），变异由「整段换成 `)`」改为「整段删空」。
 const ANCHOR_DRUGMECH_NEW = '|降压药|降糖药|安眠药|止咳药|止泻药|肠胃药|胃药|抗过敏|救心丸|蒙脱石|奥司他韦|阿奇霉素|红霉素|左氧氟沙星';
 const ANCHOR_INVTAKE = 'const PC_INVTAKE_ZH = /(?:';
-const ANCHOR_DRUGMECH = 'const PC_DRUG_MECH_ZH = /(?:';
+const ANCHOR_DRUGMECH = 'const PC_DRUG_MECH_ZH = new RegExp(';
 const ANCHOR_IV_CALL = 'const iv = causalInvertedTakeZh(text);';
 
 // ─── A 节语料：新量词攻击（12）+ 注射形攻击（5）─────────────────────
@@ -357,7 +357,7 @@ test('D5 变异守卫五：摘掉豁免表新增点名药类族后「这片降�
     const src = path.join(tmp, 'src', 'index.js');
     const orig = fs.readFileSync(src, 'utf8');
     assert.strictEqual(orig.split(ANCHOR_DRUGMECH_NEW).length - 1, 1, '豁免表新族锚点不唯一');
-    assert.strictEqual(orig.split(ANCHOR_DRUGMECH).length - 1, 1, 'PC_DRUG_MECH_ZH 定义锚点不唯一');
+    assert.ok(orig.includes('const PC_DRUG_NAME_ZH = /(?:'), 'PC_DRUG_NAME_ZH 点名真药层定义行不存在');
     const mutated = orig.replace(ANCHOR_DRUGMECH_NEW, '');
     assert.ok(!mutated.includes(ANCHOR_DRUGMECH_NEW), '变异后新族仍在');
     assert.ok(mutated !== orig, '变异未生效');
@@ -407,7 +407,9 @@ test('F 源码常量完整 + halves 半身诊断真的在返回', () => {
   assert.strictEqual(line.split(ANCHOR_OPT_QUANT).length - 1, 1, '注射臂量词可选组应只出现 1 次');
   // 豁免表新族 + 本族反向护栏
   assert.strictEqual(src.split(ANCHOR_DRUGMECH_NEW).length - 1, 1, '豁免表新增点名药类族应只出现 1 次');
-  assert.ok(/const PC_DRUG_MECH_ZH = \/\(\?:/.test(src), 'PC_DRUG_MECH_ZH 反向护栏表不存在');
+  // [v6.8.185 r257] DRUG 表改为「依据层 ∪ 点名真药层」拼装，点名药类族搬进
+  // PC_DRUG_NAME_ZH——断言跟着常量走，见 ANCHOR_DRUGMECH_NEW 注释。
+  assert.ok(/const PC_DRUG_MECH_ZH = new RegExp\(/.test(src), 'PC_DRUG_MECH_ZH 反向护栏表不存在');
   // r227 不变量：子判据函数唯一、调用点唯一、豁免不许升级成函数级
   assert.strictEqual(src.split('function causalInvertedTakeZh(text)').length - 1, 1, '子判据函数应只定义 1 次');
   assert.strictEqual(src.split(ANCHOR_IV_CALL).length - 1, 1, '子判据调用点应唯一');

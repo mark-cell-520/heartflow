@@ -54,7 +54,7 @@ const ANCHOR_SUPP = 'const PC_SUPP_ZH = /(?:';
 const ANCHOR_OBJ = '(?:保健品|补品|营养品)';                    // 甲半对象表（定义行内 2 次）
 const ANCHOR_INV_ARM = '|(?:这|那|某|啥|一)[^。]{0,3}(?:保健品|补品|营养品)[^。]{0,8}(?:吃|喝|服|补|吞|冲|泡)(?:下)?(?:去)?'; // 倒装臂
 const ANCHOR_RES = 'const PC_SUPP_RES_ZH = new RegExp(';
-const ANCHOR_MECH = 'const PC_SUPP_MECH_ZH = /(?:';
+const ANCHOR_MECH = 'const PC_SUPP_MECH_ZH = PC_EVIDENCE_ZH;';
 const ANCHOR_FN = 'function causalSupplementZh(text)';
 const ANCHOR_CALL = 'const sup = causalSupplementZh(text);';
 
@@ -474,7 +474,7 @@ test('F 源码常量完整 + halves 半身诊断真的在返回 + 新族不许�
   assert.strictEqual(suppLine.split(ANCHOR_INV_ARM).length - 1, 1, '倒装臂应只出现 1 次');
   // 乙半定义唯一 + 反向护栏表存在
   assert.strictEqual(src.split(ANCHOR_RES).length - 1, 1, 'PC_SUPP_RES_ZH 定义应唯一');
-  assert.ok(/const PC_SUPP_MECH_ZH = \/\(\?:/.test(src), 'PC_SUPP_MECH_ZH 反向护栏表不存在');
+  assert.ok(/const PC_SUPP_MECH_ZH = PC_EVIDENCE_ZH;/.test(src), 'PC_SUPP_MECH_ZH 反向护栏表不存在');
   // 子判据函数唯一、调用点唯一
   assert.strictEqual(src.split(ANCHOR_FN).length - 1, 1, '子判据函数应只定义 1 次');
   assert.strictEqual(src.split(ANCHOR_CALL).length - 1, 1, '子判据调用点应唯一');
