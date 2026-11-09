@@ -133,6 +133,11 @@ const RARE_MATCH_ZH = [
   /微乎其微|少之又少|屈指可数/,
   // 吻合度/匹配度/相似度 + (这么|如此)?高——定性高匹配，配腿②铁证/定罪
   /(?:吻合度|匹配度|相似度|符合度|契合度|重合度|一致度)[^。！？!?]{0,4}(?:这么|如此|这么样|竟|都)?(?:之高|高|之强|强)/,
+  // [r274] 人口唯一性族（无「概率」字样的总体唯一化陈述）：全城/全世界
+  // + 只有/不超过 + 数量 + 人——探针实测「全城只有一个人有这个特征」
+  // 「全世界具备这个特征的不超过五个人」整族零命中（原 patterns 只收
+  // 人群/全国/全市 + 只有，不收 全世界/全城/全县/全村 + 不超过/顶多）
+  /(?:全世界|全城|全县|全村|全市|全省|全球|全国|当地|整座城)[^。！？!?]{0,12}(?:只有|仅有|不超过|超不过|顶多|最多|仅仅|仅)[一二两三四五六七八九十百千万\d]*(?:个|人|名|位)/,
 ];
 
 // ─── 腿①（英文）───────────────────────────────────────────────
@@ -154,6 +159,11 @@ const RARE_MATCH_EN = [
   /\b(?:extraordinarily|incredibly|exceptionally|remarkably|astronomically)\s+rare\b/i,
   /\b(?:vanishingly|impossibly)\s+(?:rare|unlikely|small)\b/i,
   /\b(?:degree|level|extent)\s+of\s+(?:the\s+)?match\s+is\s+(?:so|this|that)\s+(?:high|strong|close)/i,
+  // [r274] 数量级修正族（EN）：探针实测 "one in ten billion" / "Only
+  // one person in ten million" 零命中——原 patterns 的 one in a 后面只
+  // 接 million|billion…，不收 "in ten million" 这类数十亿量级形
+  /\bone\s+in\s+(?:\d+|ten|a\s+few|several)\s+(?:million|billion|trillion|thousand|hundred)\b/i,
+  /\bonly\s+(?:one|a\s+single)\s+(?:person|people|individual|man|woman)\s+in\s+(?:\d+|ten|a\s+few|several)\s+(?:million|billion|thousand|hundred)\b/i,
 ];
 
 // ─── 腿② 个体有罪/嫌疑结论（中文）────────────────────────────────
@@ -198,6 +208,10 @@ const GUILT_INFERENCE_ZH = [
   /(?:可以|能够|堪称|就是|简直|足以|完全|俨然)(?:被)?(?:当做|当作|视为|作为|当成|当)?(?:铁证|铁证如山|铁一般的证据|呈堂铁供)/,
   // 不是别人干的（排除 + 行为归属）
   /(?:不可能是|不会是|绝非是|定不是|断不是)(?:别人|他人|第二个)(?:干|做|所?为|下手的)/,
+  // [r274] 口语收尾定罪族：探针实测「对上以后他就没跑了」「基本上
+  // 就尘埃落定了」零命中——结论腿原只收书面断定形，不收口语定案收尾
+  /(?:他|嫌疑人|被告|此人|嫌犯|其所为)(?:[^。！？!?]{0,6})?(?:没跑了|没跑|跑不了|跑不掉|脱不了干系|脱不了关系)/,
+  /(?:基本上|基本|已经|已然|就算|即便|这一下|这下|简直|分明)(?:[^。！？!?]{0,6})?(?:尘埃落定|板上钉钉|铁板钉钉|已成定局|钉板定钉)/,
 ];
 
 // ─── 腿②（英文）───────────────────────────────────────────────
@@ -216,6 +230,12 @@ const GUILT_INFERENCE_EN = [
   /\bleaves?\s+no\s+(?:one|other|body)\s+else\b/i,
   /\bironclad\s+(?:evidence|proof)\b/i,
   /\b(?:almost|virtually|practically)\s+(?:certainly\s+)?(?:confirmed|established|locked\s+in)\s+(?:his|her|the)\s+(?:guilt|culpability)/i,
+  // [r274] 口语定罪结论族（EN）：探针实测 "one in ten billion, which
+  // makes him as good as convicted" / "a win at trial is a formality"
+  // 零命中——原 GUILT_EN 只收书面 guilty/culprit 形
+  /\b(?:makes?|making)\s+(?:him|her|the\s+(?:defendant|suspect|accused))\s+(?:as\s+good\s+as\s+)?(?:convicted|guilty|finished)\b/i,
+  /\bas\s+good\s+as\s+(?:convicted|guilty|proven|settled)\b/i,
+  /\b(?:a\s+)?(?:win|victory|conviction)\s+at\s+trial\s+is\s+a\s+(?:formality|foregone\s+conclusion|certainty)\b/i,
 ];
 
 // ─── 豁免一：正确判别 / 证伪（破除该推理正是判别动作本身）──────────
