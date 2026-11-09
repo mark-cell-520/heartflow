@@ -1,12 +1,12 @@
 /**
  * src/conditional-transposition.js — 「条件概率换位」检测器
- * （ provisional 第 215 个判别维度，r228 起草；8 处 src/index.js 接线由
- * 1 号主力补全，接线规格见 coordination/reports/r228-dimension-agent4.md
- * §五。编号 provisional 的原因：远端 v6.8.145 已接线 214 维，另有 3 个
- * 已起草未接线维度——zero_sum_fallacy(r218)/budget_value_conflation(r219)/
- * average_marginal_conflation(r220)——其 claims 登记号 212/213/214 与审计
- * 实例已接线的 sorites/researcher_degrees/monocausal 撞车，最终编号由 1
- * 号按接线顺序在 VERIFY_DIMS 登记序重排；若三老模块先接，本模块顺延 216）
+ * （第 215 个判别维度，r228 由 agent-4 起草、r249 由 1 号接线登记，
+ * 编号已终态落地；8 处 src/index.js 接线由 1 号主力补全，接线规格见
+ * coordination/reports/r228-dimension-agent4.md §五。另 3 个已起草维度
+ * zero_sum_fallacy(r218)/budget_value_conflation(r219)/
+ * average_marginal_conflation(r220) 经核查至今仍未接线（src/index.js
+ * 零命中），故本模块按 VERIFY_DIMS 登记序稳取 215，「三老模块先接、
+ * 顺延 216」的情形未发生，编号终态无歧义。）
  *
  * [r228 立项] r220 零命中探针遗留候选 H 族（coordination/agent4/probes/
  * r220-zerohit-probe.output.txt，v6.8.144 实测 H1/H2 gate.action=pass 且
