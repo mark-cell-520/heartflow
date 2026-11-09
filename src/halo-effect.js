@@ -93,6 +93,17 @@
  *     perhaps/might/probably——「可能人品也不错」是弱推测不是迁移断言）；
  *   · 疑问句（含 ?/？）。
  *
+ * [r264] 全新措辞家族扩展（真升级②，如实记录落地率）：池化探针 5/5
+ *   穿透中仅 1 项可落地——TRAIT_EN 补 大公司/大厂的英文形（big tech
+ *   firm / major tech company / tech giant / big tech，TRAIT_ZH_BRAND
+ *   早已收「大公司/大厂」，EN 侧缺同族词形）。未落地 4 项及原因：
+ *   ① ③ ⑤（「他是大厂出来的，技术能差到哪去？」「拿过全国奖牌的，
+ *   执行力能弱吗？」等）为修辞疑问句——疑问句豁免 + 腿②无肯定情态，
+ *   两重设计性不判，不为单族发明修辞疑问判据；② ④（「名校毕业的，
+ *   人品肯定靠得住」「graduated from a top school」）踩 r181 既定边界：
+ *   资质类特征（名校/奖牌/头衔）刻意不收，需资质域同域/异域分离判据
+ *   成熟后再处理，本轮不动。
+ *
  * 已知边界（下轮可继续）：资质类特征（名校/博士/头衔/获奖）不在腿①——
  * 「她是名校博士毕业，说的话一定更有道理」是资质→观点的迁移，语义同族，
  * 但与 appeal_to_authority 射程交界且需同域/异域判别（同域资质是合法
@@ -139,6 +150,10 @@ const TRAIT_EN = [
   /\b(?:famous|celebrity|well[- ]known|renowned|influencer|viral|goes viral|millions of followers|widely followed|trending|household name|A-list|social media star)\b/i,
   /\b(?:premium packaging|beautifully (?:designed|packaged)|sleek (?:design|look)|polished (?:interface|design|UI)|fancy (?:packaging|office|store)|luxury brand|designer brand|prestigious brand|flagship store|high-end (?:brand|store|label)|expensive[- ]looking|great[- ]looking (?:design|product|website))\b/i,
   /\b(?:great speaker|compelling speaker|charismatic speaker|funny|hilarious|witty|silver[- ]tongued|smooth talker)\b/i,
+  // [r264] 新平台品牌族 EN：大公司/大厂的英文形（TRAIT_ZH_BRAND 已收
+  // 大公司/大厂，EN 侧缺同族词形——池化探针 5/5 穿透中唯一可落地项）
+  /\b(?:big|large|major|huge|giant)\s+(?:tech\s+)?(?:firm|company|corporation|player)s?\b/i,
+  /\b(?:tech giant|FAANG|MAANG|big tech)\b/i,
 ];
 
 // ─── 腿② TRANSFER 质量迁移断言 ────────────────────────────────────
