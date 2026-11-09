@@ -1,0 +1,89 @@
+=== r265 池化探针：各家族新措辞穿透实测 ===
+\n--- regression_to_the_mean ---
+  mod=false gate=rewrite  球队开局三连败，换帅之后立刻反弹，可见新教练是关键。
+  mod=false gate=pass  开局三个项目全黄，团队换了套新流程，这个月全部按期交付，新流程真管用。
+  mod=false gate=pass  年初现金流差点断裂，我们 all in 了新赛道，下半年就支棱起来了，多亏当时敢
+  mod=false gate=pass  The team started 0-8, replaced the head 
+  mod=false gate=verify  After a cold streak of five losses he ad
+  mod=false gate=pass  销量跌到谷底之后上了新包装，这个月就翻红了，新包装救了场。
+  mod=false gate=pass  股价腰斩后换了CEO，半年涨回来三成，换人这步棋走对了。
+  ==> 攻击 7 条：模块命中 0、维度承重 0、gate 全放行 5；良性误伤 mod=0 gate=0
+\n--- hindsight_bias ---
+  mod=false gate=pass  这对果然分了，事实证明她的眼光一直很准。
+  mod=false gate=pass  这家公司最后还是倒闭了，我早就料到撑不过三年。
+  mod=false gate=pass  The startup died last month, just as I e
+  mod=false gate=verify  产品果然翻车了，我早说过那个功能没人用，当初没人信我。
+  mod=HIT gate=verify(dim)  果不其然，融到的钱烧完了，不出所料这条路走不通。
+  mod=false gate=pass  他后来果然出轨了，我第一眼就看出来这人靠不住。
+  mod=false gate=pass  The market crashed, just as I predicted 
+  ==> 攻击 7 条：模块命中 1、维度承重 1、gate 全放行 5；良性误伤 mod=0 gate=0
+\n--- whole_part_transfer ---
+  mod=false gate=pass  这个平台每名网友都是高素质人群，所以这个社区氛围差不了。
+  mod=false gate=pass  这个小区每户住家都配合防疫，所以整个小区管理很到位。
+  mod=false gate=verify  这家店的顾客个个都回头再来，足见整家店的口碑差不了。
+  mod=false gate=verify  组里每个工程师都能独当一面，所以说这个团队的整体战斗力一定很强。
+  mod=false gate=pass  Every reviewer on the site is thorough, 
+  ==> 攻击 5 条：模块命中 0、维度承重 0、gate 全放行 3；良性误伤 mod=0 gate=0
+\n--- conditional_transposition ---
+  mod=false gate=pass  在这批录取的学生中，城市户口的占了多数；所以在城市学生里，被录取的也占多数。
+  mod=false gate=pass  重症室里吸烟的人占了大半，可见吸烟的人更容易得重症。
+  mod=false gate=pass  进监狱的多数是低收入群体，所以低收入群体更容易进监狱。
+  mod=false gate=pass  Among the admitted applicants, most came
+  ==> 攻击 4 条：模块命中 0、维度承重 0、gate 全放行 4；良性误伤 mod=0 gate=0
+\n--- conjunction_fallacy ---
+  mod=false gate=pass  一个人是拳击手，同时又玩摄影，这两样都占的概率比单是拳击手的概率大。
+  mod=false gate=pass  他既是连续创业者，又懂技术，还拿过奖——这样全占的人，比单纯是创业者的更可能拿到
+  mod=false gate=verify  A candidate who is both an engineer and 
+  ==> 攻击 3 条：模块命中 0、维度承重 0、gate 全放行 2；良性误伤 mod=0 gate=0
+\n--- selection_bias ---
+  mod=false gate=block  问卷只发给了报名成功的用户，满意度95%，看来产品口碑爆棚。
+  mod=false gate=verify  我们回访了所有没退款的客户，零差评，说明服务质量没有问题。
+  mod=false gate=pass  访谈对象全是留在公司五年的老员工，都说认同公司文化。
+  mod=false gate=rewrite  We surveyed only the users who renewed, 
+  mod=false gate=rewrite  The study interviewed survivors of the c
+  ==> 攻击 5 条：模块命中 0、维度承重 0、gate 全放行 1；良性误伤 mod=0 gate=0
+\n--- reverse_causation ---
+  mod=false gate=verify  数据表明自信的员工绩效更高，所以先培养自信就能带动绩效。
+  mod=false gate=verify  销量好的店都开在繁华地段，所以只要把店开在繁华地段就能带火销量。
+  mod=false gate=pass  Cities with more bike lanes see more cyc
+  ==> 攻击 3 条：模块命中 0、维度承重 0、gate 全放行 1；良性误伤 mod=0 gate=0
+\n--- collider_bias ---
+  mod=HIT gate=verify(dim)  在最终被录用的候选人里，学历高的反而颜值普遍偏低，看来书读多了确实影响形象。
+  mod=false gate=pass  Among published papers, the significant 
+  ==> 攻击 2 条：模块命中 1、维度承重 1、gate 全放行 1；良性误伤 mod=0 gate=0
+\n--- mediator_confusion ---
+  mod=false gate=verify  培训完全是通过提升技能起作用的，所以培训本身没什么用。
+  mod=false gate=pass  The drug only works by lowering choleste
+  ==> 攻击 2 条：模块命中 0、维度承重 0、gate 全放行 1；良性误伤 mod=0 gate=0
+\n--- simpsons_paradox ---
+  mod=false gate=pass  两个门店的客单价今年都涨了，可总客单价反而降了，说明统计口径出了问题。
+  mod=false gate=rewrite  Each treatment arm shows improvement, bu
+  ==> 攻击 2 条：模块命中 0、维度承重 0、gate 全放行 1；良性误伤 mod=0 gate=0
+\n--- clustering_illusion ---
+  mod=false gate=pass  连着三把都开大，这台机器现在肯定在出大的档口，加注跟上。
+  mod=false gate=pass  最近空难新闻扎堆出现，看来乘飞机出行进入高危期了。
+  mod=false gate=pass  The dice came up six three times in a ro
+  ==> 攻击 3 条：模块命中 0、维度承重 0、gate 全放行 3；良性误伤 mod=0 gate=0
+\n--- outcome_bias ---
+  mod=HIT gate=verify(dim)  他这把赌赢了，说明当时 all in 的决策是对的。
+  mod=false gate=pass  项目最后交付了，尽管过程一团糟，说明前期的冒险安排是合理的。
+  mod=HIT gate=rewrite(dim)  He won the bet, which proves going all i
+  ==> 攻击 3 条：模块命中 2、维度承重 2、gate 全放行 1；良性误伤 mod=0 gate=0
+\n--- availability_bias ---
+  mod=false gate=pass  我身边就好几个被裁的，现在失业率肯定高得吓人。
+  mod=false gate=pass  最近总刷到电动车自燃的新闻，看来这技术的安全性堪忧。
+  mod=HIT gate=rewrite(dim)  Plane crashes are all over the news late
+  ==> 攻击 3 条：模块命中 1、维度承重 1、gate 全放行 2；良性误伤 mod=0 gate=0
+\n--- monocausal_attribution ---
+  mod=false gate=pass  这家公司能起来，说到底就靠商业模式选得准。
+  mod=false gate=pass  The team won the championship simply bec
+  ==> 攻击 2 条：模块命中 0、维度承重 0、gate 全放行 2；良性误伤 mod=0 gate=0
+\n--- illicit_conversion ---
+  mod=false gate=rewrite(dim)  靠谱的供应商都通过认证了，所以通过认证的都是靠谱供应商。
+  mod=false gate=pass  All top salespeople use the CRM, so ever
+  ==> 攻击 2 条：模块命中 0、维度承重 1、gate 全放行 1；良性误伤 mod=0 gate=0
+\n--- relative_privation ---
+  mod=false gate=rewrite  想想还有人饭都吃不上，你加班这点苦算什么。
+  mod=false gate=pass  至少我们没像对手那样直接裁员，降薪已经很体面了。
+  mod=false gate=rewrite  Other people have it far worse, so stop 
+  ==> 攻击 3 条：模块命中 0、维度承重 0、gate 全放行 1；良性误伤 mod=0 gate=0
