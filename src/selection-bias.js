@@ -34,6 +34,16 @@
  *   - 只描述样本自身（会员的满意度更高/所有样本都合格）→ 无总体范围词，不判
  *   - 概率化结论（可能/也许/maybe）→ 非全称推广，不判
  *
+ * [r267 扩展] 池化探针实测 6/6 穿透的新措辞家族（scripts/round-267/
+ * r267-probe-pool.js，v6.8.157）：① 口语化取证动词（问卷只撒在…/反馈
+ * 全部捡自…/数据爬取自…）与渠道受限来源（微信群/首页推送/好评区/粉丝
+ * 过万/抢到票/上岸；EN verified accounts / english-language / trending
+ * hashtags / launch page + mined/crawled/scraped 网络取证动词）；② 口语
+ * 化收尾推广（说成是全民意见/包装成/足见…公认/就能看出；EN captures /
+ * reflects / describes + global / worldwide / the whole platform 口径）。
+ * 良性对照（只能代表这三个群/不足以推断/covers ticket holders only/
+ * would be invalid）实测零误伤。
+ *
  * 决策出处：heartflow_philosophy_decision（type=accelerate / confidence 0.7 /
  * priority 40；rationale 的 cognitiveLoad 与 uncertainty 为 "unknown"）。
  * 候选池来自 /tmp/r169-gap-probe.js 与 /tmp/r169-baseline-probe.js 在当前
@@ -45,18 +55,32 @@
 
 // ── 腿①路由 a：限定标记 × 取样动词 ────────────────────────────
 const RESTRICT_ZH = ['只', '仅', '仅仅', '唯独', '全都', '全部', '都', '均'];
-const SAMPLING_VERBS_ZH = ['调查', '统计', '采访', '回收', '收集', '纳入', '分析', '研究', '取样', '抽样', '问卷', '数据', '样本', '来源', '覆盖', '问', '看', '发给', '发放', '寄给', '送达', '来自', '源于', '取自', '限于', '局限于', '问询', '访谈', '测评', '评估', '监测', '抓取', '爬取', '回复', '回答'];
+const SAMPLING_VERBS_ZH = ['调查', '统计', '采访', '回收', '收集', '纳入', '分析', '研究', '取样', '抽样', '问卷', '数据', '样本', '来源', '覆盖', '问', '看', '发给', '发放', '寄给', '送达', '来自', '源于', '取自', '限于', '局限于', '问询', '访谈', '测评', '评估', '监测', '抓取', '爬取', '回复', '回答',
+  // [r267] 口语化取证动词族（问卷只撒在…/反馈全部捡自…）：撒/发在/捡自/选自
+  '撒在', '撒了', '发在', '发至', '发到', '贴在', '捡自', '选自', '摘自', '录自', '引自', '搬运', '转载'];
 
 // ── 腿①路由 b：来源短语 + 受限来源词 ──────────────────────────
 const SOURCE_NOUN_ZH = ['样本', '数据', '问卷', '意见', '反馈', '案例', '受访者', '参与者', '受访对象', '来源', '资料', '对象', '答卷', '评论', '留言'];
-const SOURCE_FROM_ZH = ['来自', '源于', '取自', '出自', '集中在', '局限于', '仅限于'];
-const RESTRICTED_SOURCE_ZH = ['会员', '注册', '活跃', '自愿', '志愿者', '愿意', '报名', '投诉', '复购', '留存', '坚持', '一线', '某平台', '某地区', '特定', '个别', '少数', '部分', '头部', '精英', '死忠', '订阅', '付费', '老用户', '新用户', '在职', '在岗', '管理层', '内部', '朋友圈', '微信群', '评论区', '热搜', '首页', '推荐', '榜单', '获奖', '优胜', '入选', '被录取', '被录用', '投稿', '点赞', '转发', '购买过', '咨询过', '浏览过', '注册用户', '活跃用户', '付费用户', '种子用户', '核心用户', '本校', '本公司', '本院', '本班', '本群', '本店', '本地'];
+const SOURCE_FROM_ZH = ['来自', '源于', '取自', '出自', '集中在', '局限于', '仅限于',
+  // [r267] 口语化来源动词（捡自/选自/摘自/录自/引自）
+  '捡自', '选自', '摘自', '录自', '引自'];
+const RESTRICTED_SOURCE_ZH = ['会员', '注册', '活跃', '自愿', '志愿者', '愿意', '报名', '投诉', '复购', '留存', '坚持', '一线', '某平台', '某地区', '特定', '个别', '少数', '部分', '头部', '精英', '死忠', '订阅', '付费', '老用户', '新用户', '在职', '在岗', '管理层', '内部', '朋友圈', '微信群', '评论区', '热搜', '首页', '推荐', '榜单', '获奖', '优胜', '入选', '被录取', '被录用', '投稿', '点赞', '转发', '购买过', '咨询过', '浏览过', '注册用户', '活跃用户', '付费用户', '种子用户', '核心用户', '本校', '本公司', '本院', '本班', '本群', '本店', '本地',
+  // [r267] 渠道/圈子受限来源族（群聊/首页推送/好评区/粉丝过万/抢到票/上岸）
+  '群聊', '群里', '推送', '私信', '私聊', '好评', '差评', '粉丝', '大v', '大V', '过万', '抢到', '上岸', '录用', '名单里', '榜单上'];
 
 // ── 腿②：总体推广 ─────────────────────────────────────────────
-const GEN_VERB_ZH = ['代表', '代表着', '代表了', '适用于', '推广到', '推广至', '可以推广', '足以推广', '能够推广', '反映', '反映着', '反映了', '具有', '具有着', '足以说明', '足以证明', '这说明', '说明', '证明', '可见', '意味着', '表明', '推出', '可知', '说明'];
-const GEN_SCOPE_ZH = ['全体', '所有', '整体', '全部', '全国', '全市', '全省', '全社会', '每个人', '所有人', '任何人', '无一例外', '整个', '普遍', '全貌', '普适', '全体用户', '所有用户', '全国用户', '整个市场', '整个人群', '全部用户', '大众', '民众', '公众', '人们', '大家', '老百姓', '各界'];
+const GEN_VERB_ZH = ['代表', '代表着', '代表了', '适用于', '推广到', '推广至', '可以推广', '足以推广', '能够推广', '反映', '反映着', '反映了', '具有', '具有着', '足以说明', '足以证明', '这说明', '说明', '证明', '可见', '意味着', '表明', '推出', '可知', '说明',
+  // [r267] 口语化收尾推广族（说成是/包装成/足见/就能看出）：受限取证 → 全民口径结论
+  '说成', '说成是', '包装成', '吹成', '论定', '足见', '看出', '能看出', '就可看出', '足以看出'];
+const GEN_SCOPE_ZH = ['全体', '所有', '整体', '全部', '全国', '全市', '全省', '全社会', '每个人', '所有人', '任何人', '无一例外', '整个', '普遍', '全貌', '普适', '全体用户', '所有用户', '全国用户', '整个市场', '整个人群', '全部用户', '大众', '民众', '公众', '人们', '大家', '老百姓', '各界',
+  // [r267] 新总体范围族（全民/全网/消费者/网民/观众/读者/用户群/顾客/歌迷/考生）
+  '全民', '全网', '消费者', '网民', '观众', '读者', '用户群', '顾客', '客户群', '歌迷', '考生', '粉丝', '大众市场'];
 const INFER_ZH = ['所以', '因此', '因而', '可见', '这说明', '那就意味着', '这就意味着', '显然', '肯定是', '一定是', '足以证明', '足以说明', '说明', '证明', '意味着', '故', '这证明', '就是说', '可知', '足见', '就断言', '断言', '就宣称', '宣称', '就得出', '得出结论', '据此认为', '就据此认为', '就认为', '就证明', '妄下结论', '草率结论', '就此认定', '认定'];
 const PREMISE_MARKERS = ['毕竟', '因为', '由于', '鉴于', 'because', 'since'];
+
+// [r267] 裸量词型范围词（可挂在样本名词前——「所有样本都合格」是样本自述，
+// 不是总体推广）；总体口径词（全民/全网/消费者/网民…）不适用该豁免
+const SAMPLE_SELF_SCOPES = ['所有', '全部', '整体', '整个', '任何', '普遍', '人们', '大家', '各界'];
 
 // ── 守卫 ──────────────────────────────────────────────────────
 const ACK_FULL_ZH = ['不能代表', '不足以推广', '不可推广', '不应推广', '不宜推广', '仅供参考', '解读需谨慎', '需要谨慎', '只能反映', '仅代表', '不能推广', '难以推广', '不宜夸大', '不应夸大', '不足以说明', '不能得出'];
@@ -68,13 +92,23 @@ const META_CONCEPT = ['取样偏差', '选择偏差', '抽样偏差', '自选择
 const TEACH = ['老师', '教材', '课堂', '课本', '教学', '教授', '讲师', '教研室', 'textbook', 'lecture', 'lesson', 'professor'];
 
 const RESTRICT_EN = ['only', 'solely', 'exclusively', 'restricted to', 'limited to', 'confined to', 'just', 'all from', 'came only'];
-const SAMPLING_VERBS_EN = ['survey', 'surveyed', 'asked', 'sample', 'sampled', 'sampling', 'collect', 'collected', 'recruit', 'recruited', 'interview', 'interviewed', 'drawn', 'polled', 'data', 'responses', 'feedback', 'participants', 'respondents', 'volunteers', 'subscribers', 'followers', 'students', 'employees', 'players', 'readers', 'viewers', 'members', 'users', 'customers', 'source', 'sources'];
+const SAMPLING_VERBS_EN = ['survey', 'surveyed', 'asked', 'sample', 'sampled', 'sampling', 'collect', 'collected', 'recruit', 'recruited', 'interview', 'interviewed', 'drawn', 'polled', 'data', 'responses', 'feedback', 'participants', 'respondents', 'volunteers', 'subscribers', 'followers', 'students', 'employees', 'players', 'readers', 'viewers', 'members', 'users', 'customers', 'source', 'sources',
+  // [r267] 网络取证动词族（mined/crawled/scraped/harvested/compiled/pulled）
+  'mined', 'mine', 'crawled', 'crawl', 'scraped', 'scrape', 'scraping', 'harvested', 'harvest', 'compiled', 'compile', 'pulled', 'aggregated'];
 const SOURCE_FROM_EN = ['from', 'drawn from', 'recruited from', 'collected from', 'gathered from'];
-const RESTRICTED_SOURCE_EN = ['volunteers', 'volunteer', 'premium', 'subscribers', 'members', 'active users', 'paying', 'complaints', 'complainants', 'respondents who', 'participants who', 'those who', 'people who', 'early adopters', 'elite', 'successful', 'our own', 'internal', 'employees', 'managers', 'students at', 'one school', 'one city', 'one company', 'sign-ups', 'opt-in', 'self-selected', 'followers', 'likes', 'shares', 'handpicked', 'hand-picked', 'convenience', 'top'];
-const GEN_VERB_EN = ['representative of', 'representative for', 'represents', 'represent', 'applies to', 'generalizes to', 'generalize to', 'generalizes across', 'valid for', 'holds for', 'true for', 'true of', 'reflects', 'applies for', 'shows', 'proves', 'suggests', 'indicates', 'demonstrates', 'means', 'which shows', 'which proves', 'which suggests'];
-const GEN_SCOPE_EN = ['all', 'every', 'everyone', 'everybody', 'entire', 'whole', 'general', 'overall', 'the public', 'general public', 'most people', 'people in general', 'the masses', 'the audience', 'the market', 'all viewers', 'all consumers', 'every viewer', 'every consumer', 'all customers', 'all users', 'every customer', 'every user', 'whole audience', 'whole population', 'entire audience', 'entire population'];
+const RESTRICTED_SOURCE_EN = ['volunteers', 'volunteer', 'premium', 'subscribers', 'members', 'active users', 'paying', 'complaints', 'complainants', 'respondents who', 'participants who', 'those who', 'people who', 'early adopters', 'elite', 'successful', 'our own', 'internal', 'employees', 'managers', 'students at', 'one school', 'one city', 'one company', 'sign-ups', 'opt-in', 'self-selected', 'followers', 'likes', 'shares', 'handpicked', 'hand-picked', 'convenience', 'top',
+  // [r267] 平台渠道受限来源族（verified accounts/english-language/trending hashtags/launch page）
+  'verified accounts', 'verified', 'english-language', 'trending', 'hashtags', 'launch page', 'our own'];
+const GEN_VERB_EN = ['representative of', 'representative for', 'represents', 'represent', 'applies to', 'generalizes to', 'generalize to', 'generalizes across', 'valid for', 'holds for', 'true for', 'true of', 'reflects', 'reflect', 'applies for', 'shows', 'proves', 'suggests', 'indicates', 'demonstrates', 'means', 'which shows', 'which proves', 'which suggests',
+  // [r267] 描述-推广动词族（captures/describes/tracks/measures）：结论口径动词
+  'captures', 'capture', 'describes', 'describe', 'tracks', 'track', 'measures', 'measure', 'speaks for'];
+const GEN_SCOPE_EN = ['all', 'every', 'everyone', 'everybody', 'entire', 'whole', 'general', 'overall', 'the public', 'general public', 'most people', 'people in general', 'the masses', 'the audience', 'the market', 'all viewers', 'all consumers', 'every viewer', 'every consumer', 'all customers', 'all users', 'every customer', 'every user', 'whole audience', 'whole population', 'entire audience', 'entire population',
+  // [r267] 全球/平台口径范围族（global/worldwide/mainstream/the internet/netizens）
+  'global', 'worldwide', 'mainstream', 'the internet', 'netizens', 'the platform', 'the whole platform', 'the entire platform', 'the user base', 'the whole internet'];
 const ACK_FULL_EN = ['not representative', 'cannot be generalized', 'should not be generalized', 'only reflects', 'merely reflects', 'does not represent', 'cannot represent', 'not conclusive', 'inconclusive'];
-const ACK_CLAUSE_EN = ['not necessarily', 'may not', 'might not', 'cannot', 'unclear', 'remains to be', 'yet to be', 'not proven', 'remains unclear'];
+const ACK_CLAUSE_EN = ['not necessarily', 'may not', 'might not', 'cannot', 'unclear', 'remains to be', 'yet to be', 'not proven', 'remains unclear',
+  // [r267] 显式局限口语族（would be invalid / not valid / unscientific）
+  'would be invalid', 'not valid', 'unscientific', 'overgeneralizes', 'over-generalizes'];
 const ADEQUATE_EN = ['random sample', 'randomly selected', 'randomly sampled', 'stratified', 'probability sample', 'representative sample', 'census', 'randomly', 'random'];
 const HEDGE_EN = ['may', 'might', 'could', 'perhaps', 'probably', 'likely', 'possibly', 'seems', 'appears', 'tends', 'tend'];
 const SURVIVOR_EN = ['survivors', 'survivor', 'survived', 'those who survived'];
@@ -117,11 +151,18 @@ function _findRestriction(clause) {
       }
     }
     // 来源短语路由：sample/data/participants … from + 受限来源词
-    for (const n of ['sample', 'data', 'participants', 'respondents', 'responses', 'feedback', 'survey', 'study', 'poll']) {
+    for (const n of ['sample', 'data', 'participants', 'respondents', 'responses', 'feedback', 'survey', 'study', 'poll',
+      // [r267] 注册/渠道名词（sign-ups from our own launch page）
+      'sign-ups', 'signups']) {
       const re = new RegExp('\\b' + n + '\\b[^.;]{0,40}?\\b(' + SOURCE_FROM_EN.join('|') + ')\\b', 'i');
       const mt = clause.match(re);
       if (mt && RESTRICTED_SOURCE_EN.some(rs => low.includes(rs))) return { type: 'EN_SOURCE', word: mt[0].slice(0, 40), idx: mt.index };
     }
+    // [r267] 动词前置限定路由（mined only from / scraped solely from）：
+    // 网络取证动词出现在限定标记之前，原「标记在前」路由覆盖不到该语序
+    const revRe = new RegExp('\\b(' + SAMPLING_VERBS_EN.join('|') + ')\\s+(?:only|solely|exclusively|just)\\b', 'i');
+    const rmt = clause.match(revRe);
+    if (rmt) return { type: 'EN_RESTRICT', word: rmt[0].slice(0, 40), idx: rmt.index };
     return null;
   }
   // 路由 a：限定标记 × 取样动词（标记在前 12 字内——「问卷只发给了」「只统计了」）
@@ -149,6 +190,11 @@ function _findRestriction(clause) {
 
 // ── 腿②：总体推广检测 ─────────────────────────────────────────
 function _scopeRefersSample(clause, scopeIdx, scopeWord) {
+  // 范围词指向样本自身（「所有样本都合格」「全部数据来自」）→ 不是总体推广。
+  // [r267] 只对裸量词型范围词生效（所有/全部/整体/整个/任何/普遍/人们/大家/
+  // 各界）——它们能挂在样本名词前；「全民/全网/消费者/网民/观众」等总体口径
+  // 词本身就是总体（「说成是全民意见」是推广结论，不是样本自述）。
+  if (!SAMPLE_SELF_SCOPES.includes(scopeWord)) return false;
   // 范围词指向样本自身（「所有样本都合格」「全部数据来自」）→ 不是总体推广
   const after = clause.slice(scopeIdx + scopeWord.length, scopeIdx + scopeWord.length + 4);
   return /^(?:样本|问卷|数据|意见|反馈|回答|投诉|案例|答卷|评论)/.test(after);
@@ -170,6 +216,9 @@ function _hasGeneralization(clause) {
       if (/\b(all|every|everyone|everybody)\b/.test(win)) return 'EN_B';
     }
     if (/\b(all|every|each)\s+[a-z]+(?:\s+[a-z]+){0,4}\s+(are|is|do|have|prefer|prefers|agree|agrees|like|likes|support|supports|want|wants|need|needs|love|loves|enjoy|enjoys)\b/i.test(clause)) return 'EN_C';
+    // [r267] 平台/全球口径裸范围族（the whole platform / the entire internet /
+    // the user base）：短语本身就是总体范围，无需前置推广动词
+    if (/\b(?:the\s+)?(?:whole|entire)\s+(?:platform|internet|community|user\s*base|population|market|audience|world)\b/i.test(clause)) return 'EN_D';
     return null;
   }
   // 路由 a：推广动词 + 近距离总体范围词

@@ -1,0 +1,36 @@
+=== r267 池化探针（VERSION 6.8.157）===
+A_sb_attack: n=6 red=3 dimHits=0 actions={"pass":3,"rewrite":3}
+   穿透: ["问卷只撒在三个微信群里，投票结果却要说成是全民意见。","只采访了几位忠实用户，就能看出所有客户的需求。","反馈全部捡自店铺好评区，足见这家店在消费者里口碑公认。","The dataset was mined only from English-la","Comments were crawled only from trending h","We scraped sign-ups from our own launch pa"]
+A_sb_benign: n=4 red=0 dimHits=0 actions={"pass":4}
+   穿透: ["问卷只撒在三个微信群里，结论只能代表这三个群的看法。","只采访了几位忠实用户，样本量太小，不足以推断所有客户。","The dataset was mined only from English-la","Comments were crawled only from trending h"]
+B_cb_attack: n=5 red=3 dimHits=2 actions={"verify":3,"pass":2}
+   穿透: ["能进决赛的选手普遍年纪轻，年纪大的排名普遍靠后，可见年龄大了就不适合这项运动。","Among the teams that qualified, those with","Of the startups that survived year three, "]
+B_cb_benign: n=3 red=1 dimHits=1 actions={"verify":1,"pass":2}
+   穿透: ["能进决赛的选手普遍年纪轻，排名靠后可能与选拔机制有关，不能直接说年龄决定成绩。","Among the teams that qualified, those with"]
+C_mc_attack: n=3 red=3 dimHits=3 actions={"verify":2,"rewrite":1}
+C_mc_benign: n=3 red=0 dimHits=0 actions={"pass":3}
+   穿透: ["加班多了确实有人离职，控制工作满意度后关联减弱，这说明满意度可能中介了部分效应。","吸烟和肺癌之间扣掉气道细胞损伤指标后关联减弱，提示损伤可能是中介变量，但因果链仍在。","Controlling for employee engagement weaken"]
+D_sp_attack: n=3 red=2 dimHits=1 actions={"verify":2,"pass":1}
+   穿透: ["合并两个校区看，A 校区的通过率压过 B 校区，可拆到每个学院看 A 都更低，可见 ","The overall numbers favor plan B, yet in e"]
+D_sp_benign: n=3 red=0 dimHits=0 actions={"pass":3}
+   穿透: ["总体上看新药组的康复率更高，但每个年龄段内新药组反而更低，这正是辛普森悖论的形态，不","合并两个校区看 A 压过 B，拆到每个学院 A 都更低，聚合层与子群层方向相反，需分","The overall numbers favor plan B, yet in e"]
+E_ob_attack: n=5 red=5 dimHits=2 actions={"verify":1,"rewrite":4}
+   穿透: ["手术成功了，所以主刀医生当时的判断没问题。","那次冒险跳槽结果不错，可见放弃稳定编制的决定本来就正确。","The surgery went fine, so the surgeon’s ju"]
+E_ob_benign: n=3 red=0 dimHits=0 actions={"pass":3}
+   穿透: ["他赌对了，但结果是运气还是判断，要看决策时的信息集是否充分。","手术成功了，评估决策质量要看出血量控制和预案，而不是只看结果。","The bet paid off, but decision quality sho"]
+F_ab_attack: n=3 red=2 dimHits=0 actions={"pass":1,"rewrite":2}
+   穿透: ["最近老在首页看到空难报道，看来坐飞机比开车危险多了。","朋友圈里全是晒娃的，可见现在家家都生二胎。","Lately every feed is full of shark attack "]
+F_ab_benign: n=3 red=0 dimHits=0 actions={"pass":3}
+   穿透: ["最近老在首页看到空难报道，但媒体报道频率不等于实际发生率。","朋友圈里全是晒娃的，这是曝光偏差，不能推断整体生育率。","Shark attack videos dominate the feed, but"]
+G_ma_attack: n=3 red=1 dimHits=1 actions={"pass":2,"verify":1}
+   穿透: ["项目失败全怪需求变更，其他都是次要的。","The product flopped for one reason only: t"]
+G_ma_benign: n=3 red=0 dimHits=0 actions={"pass":3}
+   穿透: ["项目失败有需求变更的因素，但交付节奏和人员流动同样有责任。","销量下滑可能与定价有关，渠道和竞品动作也需要一起分析。","The product flopped for many reasons, incl"]
+H_ef_attack: n=3 red=2 dimHits=0 actions={"rewrite":2,"pass":1}
+   穿透: ["这个区的平均收入高，所以你邻居肯定有钱。","他们团队平均绩效垫底，他个人想必也不怎么样。","The neighborhood has a high crime rate, so"]
+H_ef_benign: n=3 red=1 dimHits=0 actions={"pass":2,"verify":1}
+   穿透: ["这个区的平均收入高，但个体差异很大，不能推断具体某户的经济状况。","他们团队平均绩效垫底，个体表现需要单独评估。","The neighborhood has a high crime rate, bu"]
+I_rp_attack: n=3 red=2 dimHits=0 actions={"pass":1,"rewrite":2}
+   穿透: ["比你苦的人一抓一大把，你这点委屈不值一提。","还有人流落街头呢，你至少还有份工作，别得了便宜还卖乖。","There are children starving in Africa, so "]
+I_rp_benign: n=2 red=2 dimHits=0 actions={"verify":1,"rewrite":1}
+   穿透: ["数据显示无家可归者人数在上升，社会救助政策需要覆盖这部分人群。","Many families face food insecurity, so the"]
