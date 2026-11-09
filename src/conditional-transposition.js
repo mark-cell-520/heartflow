@@ -110,6 +110,21 @@
  *     结论带估计语气时更可能是分别测算而非换位；
  *   · 疑问句（含 ?/？）——但反问标记（难道/岂/何尝/岂不是；EN isn't
  *     it / how else / what else）不豁免：用问号包装的断言仍是断言。
+ *
+ * [r265] 全新措辞家族扩展（真升级②，live 生效，维度计数不变）：
+ * r265 池化探针（coordination/agent4/probes/r265-probe-pool.js，v6.8.156
+ * 实测）本维度 4/4 攻击全穿透（gate.action=pass 且零维度承重，全池最高），
+ * 落地：
+ *   · 新 token 种 kind='prop'（定性比例两现）：ZH_PROP_RES（大多数/过半/
+ *     多数/大半/绝大多数，归一化剥离「占了/占」前缀，两侧须同一比例词）
+ *     + EN_PROP_RES（most/majority）——原实现只收「数值 + 极值」两种
+ *     token，同一换位签名换一身非数字措辞即可穿过；
+ *   · FRAME_ZH += F-Z4「对X来说/而言/来讲」条件框——探针实测「对这批
+ *     志愿者来说，大多数人都出现了缓解；因此对于出现缓解的人……」穿透
+ *     （限定人群的「对X来说」框形原不在 FRAME_ZH）。
+ *   良性侧：无数字形不降低判别强度（仍要求同词两现 + 框内前数 + 推断词
+ *   后数 + 实体回指四要件），5 条新良性（含「但城市学生的录取率要用总体
+ *   分母算」「that does not mean」）零误伤。
  */
 'use strict';
 
@@ -184,6 +199,18 @@ const EXTREME_EN = [
   /negligible/i, /minuscule/i,
 ];
 
+// ─── [r265] 定性比例标记族（无数字形的比例两现）────────────────────
+// r265 池化探针实测（四攻击全穿透）：本维度原只收「数值 + 极值」两种
+// token，「占了多数 / most」类定性比例的原样沿用完全无覆盖——同一换位
+// 签名换一身非数字措辞即可穿过。归一化剥离前缀（占了/占），要求两侧
+// 同一比例词（多数 ≠ 大多数，从严）。
+const ZH_PROP_RES = [
+  { re: /(?:占了|占)?(大多数|过半|多数|大半|绝大多数)/g, to: (m) => m[1] },
+];
+const EN_PROP_RES = [
+  { re: /\b(most|majority)\b/gi, to: (m) => m[1].toLowerCase() },
+];
+
 // ─── 腿① 条件/人群框（ent 组为实体）──────────────────────────────
 const FRAME_ZH = [
   // F-Z1 在X中/里/身上/内部/之列
@@ -192,6 +219,10 @@ const FRAME_ZH = [
   { re: /(?:如果|若|假设|倘若|要是)([^，。；！？,;!?]{2,24}?)(?=时|的话|，|,|。|；)/g, ent: 1 },
   // F-Z3 X中/里 + 24 字内出现概率词（无介词的人群框架形）
   { re: /([\u4e00-\u9fff]{2,12})(?:中|里)(?=[^，。；！？]{0,24}(?:概率|几率|可能性))/g, ent: 1 },
+  // [r265] F-Z4 对X来说/而言/来讲——r265 池化探针实测「对这批志愿者
+  // 来说，大多数人都出现了缓解；因此对于出现缓解的人……」穿透：限定
+  // 人群的「对X来说」框形原不在 FRAME_ZH
+  { re: /对([^，。；！？,;!?]{2,16}?)(?:来说|而言|来讲)/g, ent: 1 },
 ];
 const FRAME_EN = [
   // F-E1 among/in/of/if/given/when/for + 至多 7 词的实体短语
@@ -318,6 +349,19 @@ function extractTokens(text, isZh, R) {
   for (const hit of allIdx(eres, text)) {
     out.push({ kind: 'extreme', v: hit.text.replace(/\s+/g, ' ').toLowerCase(), idx: hit.idx, end: hit.idx + hit.text.length, raw: hit.text });
   }
+  // [r265] 定性比例 token（kind='prop'）：归一化后的同一比例词两现
+  const pres = isZh ? (R.ZH_PROP_RES || ZH_PROP_RES) : (R.EN_PROP_RES || EN_PROP_RES);
+  for (const { re, to } of pres) {
+    const reG = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
+    let m;
+    while ((m = reG.exec(text)) !== null) {
+      let v = null;
+      try { v = to(m); } catch (e) { v = null; }
+      if (!v) continue;
+      out.push({ kind: 'prop', v, idx: m.index, end: m.index + m[0].length, raw: m[0] });
+      if (m.index === reG.lastIndex) reG.lastIndex++;
+    }
+  }
   // 去重：同一正则族可能重叠命中同一处（如「百分之一」同时被
   // /X分之一/ 与 /百分之N/ 命中），按 kind+idx+raw 去重
   const seen = new Set();
@@ -386,7 +430,7 @@ function findInfers(text, isZh, R) {
   return out;
 }
 
-// 同一 token：数值相等（相对容差）或极值标记同一
+// 同一 token：数值相等（相对容差）或极值/比例标记同一
 function sameToken(t1, t2) {
   if (t1.kind !== t2.kind) return false;
   if (t1.kind === 'value') {
@@ -493,7 +537,9 @@ function checkConditionalTransposition(text, inject) {
   const s = sigs[0];
   const shown = s.t1.kind === 'value'
     ? '概率值 ' + s.t1.raw + ' → ' + s.t2.raw
-    : '极值标记「' + s.t1.raw + '」两现';
+    : s.t1.kind === 'prop'
+      ? '定性比例「' + s.t1.raw + '」两现'
+      : '极值标记「' + s.t1.raw + '」两现';
   return {
     hit: true,
     score: 0.6,
@@ -508,6 +554,7 @@ module.exports = {
   checkConditionalTransposition,
   __internals: () => ({
     ZH_VALUE_RES, EN_VALUE_RES, EXTREME_ZH, EXTREME_EN,
+    ZH_PROP_RES, EN_PROP_RES,
     FRAME_ZH, FRAME_EN, INFER_ZH, INFER_EN, NEG_ZH, NEG_EN,
     EXEMPT_BASERATE_ZH, EXEMPT_BASERATE_EN,
     EXEMPT_CORRECT_ZH, EXEMPT_CORRECT_EN,
