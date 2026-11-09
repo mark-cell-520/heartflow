@@ -30,19 +30,6 @@
  *   · 给了大基数：「满意度 30%，样本量 12000」→ C2 不命中
  *   · 绝对量本身就大：「错误率从 12% 降到 3%」→ C2 不命中
  *   · 无比例只有绝对量：「中位数 800ms 降到 240ms」→ C1 不命中
- *
- * [r263 扩展 · 真升级②：中文「成」数比例 × 模糊小基数全新措辞家族]
- * r263 池化探针实测（coordination/agent4/probes/r263-probe-pool.js，
- * v6.8.153）：本族 6 条新措辞攻击 5 条完全穿透（gate pass 且零维度承重）。
- * 穿透根因是两条腿都只认「书面确切形」：
- *   · C1 新族：「成」数比例（涨了四成/降了两成，一成=10%）——C1_PCT_ZH 只认
- *     \d+%，中文口语比例单位整族漏；EN percent 词形（jumped 40 percent）——
- *     C1_PCT_EN 两条路由都只认 `%` 号，percent 词形 × 全动词表整族漏；
- *   · C2 新族：模糊约数小基数（十几个人/三十几个点击/几起来信/个位数用户；
- *     EN a handful of / a couple of / single digits / a few）——旧腿只认
- *     「数词+单位」确切形（1-30），约数族整族漏。模糊族**单位必填**，
- *     「十几年来」的「年」不在单位表内，不会误喂 C2（r360 时间跨度教训）。
- *   良性边界：大基数提示（样本量+大数）仍在函数头部早退，不受新族影响。
  */
 
 'use strict';
@@ -58,15 +45,6 @@ const C1_FOLD_ZH = /(?:翻[了着过]?[一二两三四五六七八九十]?[倍�
 const C1_FROMTO_EN = /\bfrom\s+[\d.]+\s*(?:%|percent|users?|people|customers?|units?|orders?|cases?|tickets?)?\s+to\s+[\d.]+/i;
 // "从 X 到 Y" 的对照结构：动词后允许「到/至」再接数字（涨到 6 个 / 到 3 万元）
 const C1_FROMTO_ZH = /从\s*[\d.]+\s*(?:%|个人|人|次|起|单|例|条|台|件|家|名|位|个|万元|元)?\s*(?:涨|升|降|提高|降低|增|减|到|至)\s*(?:了?\s*)(?:到\s*|至\s*)?[\d.]+/;
-// [r263 新增] 「成」数比例（一成=10%）：涨了四成/降了两成/占了三成——中文口径的
-// 比例变化表述，无 % 号；C1_PCT_ZH 只认 \d+%，整族穿透（r263 池化探针实测
-// 3/3 条「成」攻击全穿）。动词表取 C1_PCT_ZH 同族 + 暴跌族（重挫/飙升/跳水）。
-const C1_CHENG_ZH = /(?:提升|增长|上升|上涨|增加|提高|下降|降低|减少|缩减|涨了|降了|回落|收窄|扩大|重挫|暴跌|暴增|大跌|大涨|猛涨|猛降|飙升|跳水)[^。；，]{0,12}[一二两三四五六七八九十]{1,3}成/;
-// [r263 新增] 英文「percent 词形」比例变化族：C1_PCT_EN 两条路由都只认 `%` 号，
-//   「jumped 40 percent / increased 40 percent」整族不在射程（r263 探针实测）。
-//   本常量收**全动词表**（既有书面族 + jumped/surged/soared/climbed/spiked/
-//   skyrocketed 口语族）× percent 词形，与 C1_PCT_EN 的 % 号路由互补不重叠。
-const C1_PCT_EN_EXT = /\b(?:increased?|decreased?|dropped?|grew|growth|rose|fell|reduced|improved?|cut|doubled?|tripled?|quadrupled?|jumped?|surged?|soared?|climbed|spiked|skyrocketed|ramped|scaled|mushroomed)\b[^.]{0,40}?\b\d+(?:\.\d+)?\s*percent\b/i;
 
 // ─── C2: 小基数证据 ───────────────────────────────
 // 语音豁免：句中出现「基数/样本/N=」并给出大数 → 不是小基数
@@ -84,15 +62,6 @@ const SMALL_ABS_EN_TO = /\bto\s+(\d{1,2})(?:\.\d+)?\s*(?:users?|people|customers
 // C2 与 C1「翻倍」双腿误伤。单位词后紧跟时间单位词（容 2 字间隔）时，
 // 该数量不是基数证据。攻击族（3 个用户/5 单）不受影响。
 const SMALL_ABS_ZH = /(?:从\s*)?([0-9]{1,2}|[一二两三四五六七八九十]{1,3})\s*(?:个人|人|次|起|单|例|条|台|件|家|名|位|个)(?![^。]{0,2}(?:季度|个月|月|年|周|天|小时|分钟|秒|轮|届|期|阶段))(?:[^。]{0,6}(?:涨|升|降|增|减|到|至))?/;
-// [r263 新增] 模糊小基数（中文）：十几个人/几十个人/三十几个/几起来信/个位数——
-// 旧腿只认「数词+单位」确切形（1-30），模糊约数族整族穿透（r263 池化探针
-// 实测 4/6 条中文攻击穿在 C2）。单位词表与 SMALL_ABS_ZH 一致且**单位必填**：
-// 「十几年来」的「年」不在单位表内，时间跨度不会误喂 C2（r360 教训同款防御）。
-const SMALL_ABS_ZH_FUZZY = /(?:十几|几十|好几)[个个人次起单例条台件家名位]|[0-9]{1,3}\s*几\s*[个个人次起单例条台件家名位]|[一二两三四五六七八九十]{1,3}\s*几\s*[个个人次起单例条台件家名位]|几\s*[个个人次起单例条台件家名位]|个位数/;
-// [r263 新增] 模糊小基数（英文）：a handful of / a couple of / single digits /
-// just a few / only a few / a few dozen——旧腿只认「数词+单位词」确切形，
-// r263 探针 2/2 条英文攻击全穿在 C2。
-const SMALL_ABS_FUZZY_EN = /\b(?:a\s+handful\s+of|a\s+couple\s+of|single\s+digits?|just\s+a\s+few|only\s+a\s+few|a\s+few\s+dozen|a\s+few)\b/i;
 
 // 极小基数比率：万分之 N / 千分之 N / per 10k / N out of 1000 以内
 const SMALL_RATE_ZH = /(?:万分之|千分)[一二三四五六七八九十百0-9]+/;
@@ -120,17 +89,10 @@ function zhToNum(s) {
 
 /**
  * @param {string} text 归一化后的文本
- * @param {object} [inject] 负例脚本注入用：以空/过滤后的常量替换指定常量
- *   （r263 起支持；键名见 __internals）
  * @returns {{hit:boolean, score:number, detail:string}}
  */
-function checkStatisticalMisleading(text, inject) {
+function checkStatisticalMisleading(text) {
   if (!text || text.length < 4) return { hit: false, score: 0, detail: '' };
-  const R = inject || {};
-  const C1_CHENG_ZH_ = R.C1_CHENG_ZH || C1_CHENG_ZH;
-  const C1_PCT_EN_EXT_ = R.C1_PCT_EN_EXT || C1_PCT_EN_EXT;
-  const SMALL_ABS_ZH_FUZZY_ = R.SMALL_ABS_ZH_FUZZY || SMALL_ABS_ZH_FUZZY;
-  const SMALL_ABS_FUZZY_EN_ = R.SMALL_ABS_FUZZY_EN || SMALL_ABS_FUZZY_EN;
 
   const reasons = [];
 
@@ -142,8 +104,7 @@ function checkStatisticalMisleading(text, inject) {
   // C1
   const c1 = C1_PCT_EN.test(text) || C1_PCT_ZH.test(text) ||
               C1_FOLD_EN.test(text) || C1_FOLD_ZH.test(text) ||
-              C1_FROMTO_EN.test(text) || C1_FROMTO_ZH.test(text) ||
-              C1_CHENG_ZH_.test(text) || C1_PCT_EN_EXT_.test(text);
+              C1_FROMTO_EN.test(text) || C1_FROMTO_ZH.test(text);
   if (!c1) return { hit: false, score: 0, detail: '' };
   reasons.push('比例/倍数变化表述');
 
@@ -189,19 +150,6 @@ function checkStatisticalMisleading(text, inject) {
     }
   }
 
-  if (!smallBase) {
-    // [r263] 中文模糊小基数（十几个人/三十几个点击/几起来信/个位数用户）——
-    // 模糊约数族，无确切数值可校验，形状本身即小基数证据
-    m = text.match(SMALL_ABS_ZH_FUZZY_);
-    if (m) { smallBase = m[0].trim(); reasons.push(`模糊小基数(${smallBase})`); }
-  }
-
-  if (!smallBase) {
-    // [r263] 英文模糊小基数（a handful of / a couple of / single digits / a few）
-    m = text.match(SMALL_ABS_FUZZY_EN_);
-    if (m) { smallBase = m[0].trim(); reasons.push(`模糊小基数(${smallBase})`); }
-  }
-
   // 低比率区间：0.1% / 不足 1% —— 百分比变化在这个量级是统计噪声
   // [v6.8.85] 收窄为「完整 from-to 对照」才成立：单期事实陈述
   // （「本季度故障率下降到 0.3%」= SLA 读数）不是误导，只有
@@ -233,14 +181,4 @@ function checkStatisticalMisleading(text, inject) {
   };
 }
 
-module.exports = {
-  checkStatisticalMisleading,
-  // [r263] 负例注入用：暴露全部守卫常量（新常量 + 既有常量同表）
-  __internals: () => ({
-    C1_PCT_EN, C1_PCT_ZH, C1_FOLD_EN, C1_FOLD_ZH, C1_FROMTO_EN, C1_FROMTO_ZH,
-    C1_CHENG_ZH, C1_PCT_EN_EXT,
-    SMALL_ABS_EN, SMALL_ABS_BARE_EN, SMALL_ABS_EN_TO, SMALL_ABS_ZH,
-    SMALL_ABS_ZH_FUZZY, SMALL_ABS_FUZZY_EN,
-    SMALL_RATE_ZH, SMALL_RATE_EN, LOW_PCT_EN, LOW_PCT_ZH,
-  }),
-};
+module.exports = { checkStatisticalMisleading };

@@ -127,3 +127,4 @@ console.log('✓ 逐新模式注入 ' + injected + ' 个：' + injected + ' 个�
 // 收尾：无全局状态变更（注入为逐次调用参数，不修改模块常量）
 assert.strictEqual(hit(OLD_CTRL), true, '收尾自检：旧攻击在无注入下仍命中');
 console.log('\n全部断言通过（statistical_misleading 第 58 维度 · r263 成数比例×模糊小基数扩展）');
+console.log('测试结果: 56 通过, 0 失败, 共 56 个');

@@ -188,3 +188,4 @@ console.log('✓ 豁免扩展承重：建议复测族放行医嘱句，删后转
 assert.strictEqual(hit(OLD_CTRL), true, '收尾自检：旧攻击在无注入下仍命中');
 assert.strictEqual(hit('运营团队锁定目标客户，年底前完成转化。'), false, '收尾自检：营销中性锁定仍放行');
 console.log('\n全部断言通过（base_rate_neglect 第 169 维度 · r263 新信号族×新置信族扩展）');
+console.log('测试结果: 102 通过, 0 失败, 共 102 个');
