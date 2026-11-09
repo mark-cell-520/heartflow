@@ -1,0 +1,13 @@
+[HIT] omission_bias → action=verify
+[MISS] omission_bias → action=pass dims=none
+[MISS] money_illusion → action=pass dims=none
+[HIT] planning_fallacy → action=verify
+[HIT] loss_aversion → action=verify
+[HIT] fundamental_attribution_error → action=verify
+[HIT] fundamental_attribution_error → action=verify
+[OK] BENIGN-1 零误伤 action=pass
+[OK] BENIGN-2 零误伤 action=pass
+[OK] BENIGN-3 零误伤 action=pass
+[OK] BENIGN-4 零误伤 action=pass
+
+探针结果: 攻击命中 5/7, 穿透 2, 良性误伤 0/4

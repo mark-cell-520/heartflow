@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/iBfq/OrKpkpXW2oxCpT7eIrqd2g</id>
+  <title>arXiv Query: search_query=abs:"cognitive bias" AND abs:"LLM"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-09T08:38:44Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=abs:%22cognitive+bias%22+AND+abs:%22LLM%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>46</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.05720v1</id>
+    <title>Cognitive Bias Signatures in Search-Equipped LLM Agents: A Stage-Resolved Analysis</title>
+    <updated>2026-11-03T22:46:55Z</updated>
+    <link href="https://arxiv.org/abs/2611.05720v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.05720v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Search can help LLM agents correct mistakes, but their starting conditions may shape which evidence they find and use. Drawing on cognitive-bias paradigms, we develop a controlled search harness to examine result order, records of prior work, and initial hypotheses while holding each question and document collection fixed. Matched controls distinguish order effects from differences in document composition and the effects of failed work from context length. Across 10 models and 1,000 synthetic search worlds, we track queries, retrieved documents, document openings, and final answers. Our comparisons suggest that final answers are more sensitive to initial evidence order during active search than when all evidence is supplied in full. Dead-end histories can reduce strategy switching relative to matched neutral histories, indicating an effect beyond context length. Under wrong hypotheses, stage measurements distinguish reduced retrieval or opening from errors that persist after counter-evidence is opened. Exploratory interventions show that opening counter-evidence more often can coincide with lower accuracy, while accuracy can improve with little change in opening.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-03T22:46:55Z</published>
+    <arxiv:comment>19 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yanru Xiao</name>
+    </author>
+    <author>
+      <name>Yingwei Yu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2610.28092v1</id>
+    <title>BAIT: Can LLMs Find What Biases a Reader? A Benchmark for Cognitive Bias Triggers in News</title>
+    <updated>2026-10-20T12:09:28Z</updated>
+    <link href="https://arxiv.org/abs/2610.28092v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.28092v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Persuasive writing exploits cognitive biases, recruiting a reader's mental shortcuts to shape belief, often without the reader noticing. We call the linguistic features exploiting such mental shortcuts cognitive bias triggers. As large language models (LLMs) increasingly mediate how people encounter news, summarizing it, ranking it, and answering questions over it, a natural question is whether they can recognize the features of a text that bias a human reader. We introduce BAIT (Bias Annotation In Text), a resource for detecting cognitive bias triggers in news. BAIT pairs a schema of nine triggers, each specified in an annotator codebook, with 50 English news articles annotated by trained annotators at the article and span levels and adjudicated into a gold standard. On this data we define two tasks, detecting which triggers a text contains and locating the spans that carry them. We then benchmark six frontier LLMs zero-shot and with three or ten in-context examples. The models approach human agreement on which triggers an article contains, but rarely recover its full set of triggers, and they reach less than half of human agreement in locating the passages that carry them. Moreover, they over-predict triggers that come with easy surface cues, and most of the passages they mark for these triggers are not triggers, yet carry the trigger's surface cue far more often than random text. These findings suggest that the evaluated LLMs respond to surface cues rather than to the mechanisms that make a passage manipulative. We release the schema, the codebook, standoff annotations, and the evaluation pipeline.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-20T12:09:28Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yousra Fettach</name>
+    </author>
+    <author>
+      <name>Tijl De Bie</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.39853v1</id>
+    <title>Cognitive Enhancement: Rethinking the Necessity of Role-Playing for Large Language Models</title>
+    <updated>2026-09-30T14:42:03Z</updated>
+    <link href="https://arxiv.org/abs/2609.39853v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.39853v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Role-playing prompting has become a popular yet simple technique for improving LLM reasoning and output quality. However, whether it consistently boosts performance across diverse domains remains unclear, as systematic validation is lacking. To fill this gap, we run multi-model, cross-domain, and multilingual experiments on MMLU and MMLU-Redux. We find that gains from role-play prompting depend heavily on model capacity, knowledge domain, and prompt language. Drawing on metacognition theory, we propose the persona-related cognitive alignment hypothesis: role-play works only when the LLM correctly grasps the designated persona and its associated knowledge domain. We test this hypothesis through persona information richness ablation, layer-wise entropy divergence analysis, and latent thought-space deflection observation. To reduce persona cognitive bias and stabilize role-play performance, we propose \textbf{M}ixed-\textbf{L}anguage \textbf{C}oncatenate \textbf{P}rediction \textbf{(MLCP}), a simple, training-free, and efficient multilingual prompt concatenation strategy. It aggregates semantically equivalent role prompts to enrich complementary representational cues. Extensive experiments show that MLCP consistently outperforms vanilla role-play prompting across all tested LLMs.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-30T14:42:03Z</published>
+    <arxiv:comment>22 pages, 7 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Xingjie Zhuang</name>
+    </author>
+    <author>
+      <name>Jialong Tang</name>
+    </author>
+    <author>
+      <name>Chulun Zhou</name>
+    </author>
+    <author>
+      <name>Buchao Zhan</name>
+    </author>
+    <author>
+      <name>Zhirui Li</name>
+    </author>
+    <author>
+      <name>Junhui Li</name>
+    </author>
+    <author>
+      <name>Yazheng Yang</name>
+    </author>
+    <author>
+      <name>Jinsong Su</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.27074v1</id>
+    <title>Quantifying the Occult: A Comparative Study of Hindu and Buddhist Deities Using Machine Learning Methods</title>
+    <updated>2026-09-22T21:14:49Z</updated>
+    <link href="https://arxiv.org/abs/2609.27074v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.27074v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This study introduces a dual-matrix computational architecture to mathematically quantify the morphological and theological divergence of 196 Hindu and Vajrayana Buddhist esoteric deities. Physical morphology is evaluated via a discrete Gower distance matrix enhanced by a novel "Cardinality Weighting" algorithm, while theological function is mapped via dense vector embeddings generated from Large Language Model (LLM) semantic expansions, explicitly utilized as a synthetic proxy to mitigate circular reasoning. The multi-modal topological projections provide algorithmic validation of "iconographic camouflage", demonstrating how distinct visual forms structurally obscure shared cross-tradition functions. Furthermore, I computationally model the "Atin Effect" - serving simultaneously as a psychological observation of sequential cognitive bias and a machine learning benchmark - demonstrating how high-cardinality esoteric anchors (e.g., a veena or a severed head) override systemic theological disparities to mathematically cluster orthodox and Tantric entities. Cross-tradition spatial analysis establishes that the highest esoteric manifestations, such as the Hindu Chinnamasta and the Buddhist Chinnamunda, share a near-identical mathematical coordinate across both visual ($D_G = 0.288$) and semantic ($D_C = 0.068$) boundaries, indicating a 1:1 esoteric transfer. By open-sourcing this architecture, I provide a scalable, unsupervised machine learning tool for Digital Humanities scholars and comparative theologians to rigorously map latent structural continuities across qualitative cultural corpora.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-22T21:14:49Z</published>
+    <arxiv:comment>Under peer review at Digital Scholarship in the Humanities</arxiv:comment>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Ankit Bhattacharjee</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.05143v1</id>
+    <title>A Human-in-the-Loop Framework for AI-Assisted Scoring in Large-Scale Writing Assessment</title>
+    <updated>2026-09-04T13:47:29Z</updated>
+    <link href="https://arxiv.org/abs/2609.05143v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.05143v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The integration of artificial intelligence (AI), particularly large language models (LLMs), into educational assessment has opened new opportunities to enhance the efficiency and scalability of grading processes. This study presents the design and validation of an AI-assisted scoring framework for written responses in a large-scale national assessment. The proposed approach focuses on short written texts of approximately 150-200 words and incorporates a human-in-the-loop strategy to preserve assessment quality while reducing manual workload. The study is grounded in a real operational context, using data from two recent editions of a nationwide test, each comprising approximately 5,000 student responses. We analyze the alignment between AI-generated scores and human raters across multiple rubric dimensions, as well as the impact of the proposed decision flow on pass/fail outcomes. Results show moderate to high agreement between the model and human evaluations in most dimensions, supporting the feasibility of AI assistance in this setting. Moreover, the proposed correction workflow identifies cases where human review is most valuable, enabling a more efficient allocation of expert effort. The findings suggest that AI-assisted scoring can be safely integrated into large-scale assessment processes only when combined with carefully designed human oversight. The paper concludes by discussing practical implications for deployment in national assessment systems and outlining future research directions, including longitudinal monitoring of model-human alignment and the analysis of potential cognitive bias introduced by AI-supported review workflows.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-04T13:47:29Z</published>
+    <arxiv:comment>25 pages, 8 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>María Eugenia Curi</name>
+    </author>
+    <author>
+      <name>Germán Capdehourat</name>
+    </author>
+    <author>
+      <name>Isabel Amigo</name>
+    </author>
+    <author>
+      <name>Magdalena Romano</name>
+    </author>
+    <author>
+      <name>Rosana Serra</name>
+    </author>
+    <author>
+      <name>Adrián Silveira</name>
+    </author>
+    <author>
+      <name>Andrés Peri</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.17105v1</id>
+    <title>Language Models Reproduce Human Reductionist Bias and Decision Inconsistency in Neurodevelopmental Disorders Assessment</title>
+    <updated>2026-08-17T20:33:11Z</updated>
+    <link href="https://arxiv.org/abs/2608.17105v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.17105v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) are increasingly supporting complex mental-health decisions, which depend not only on factual evidence but also value-laden interpretations. We introduce a mixed-methods human-LLM auditing framework examining decision consistency, susceptibility to cognitive heuristics, declarative intellectual humility, and the concepts operationalized in support-allocation judgments of neurodevelopmental disorders. Comparing 35 humans (18 physicians and 17 psychologists) with seven LLMs, we show that in both groups, ratings of patients' functional level were not significantly associated with support-eligibility decisions, indicating an inconsistency between descriptive assessments and final evaluative judgments. Specifically, we find that neither group showed significant susceptibility to experimental manipulations targeting anchoring and representativeness heuristics. LLMs reported higher intellectual humility than experts (U = 241, p &lt; .001, r = .62; LLMs: M = 41.43, SD = 1.99; experts: M = 29.03, SD = 8.05), but it was unrelated to decision consistency or functional assessment. While LLMs and physicians granted support less frequently than psychologists (U = 180.50, p = .003, r = .34), they also interpreted a concept of "basic life needs" differently, primarily as biological survival and self-care, and not communicative and social needs. These findings suggest that despite expressing high levels of intellectual humility, LLMs reproduce a reductionist interpretive framework and knowledge embedded in medical decision-making. More broadly, we argue that evaluating AI in high-stakes contexts requires not only measuring accuracy, agreement, or resistance to cognitive bias, but also critical examination of the concepts of neurodiversity that AI systems operationalize.</summary>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-17T20:33:11Z</published>
+    <arxiv:primary_category term="cs.CY"/>
+    <author>
+      <name>Maciej Wodziński</name>
+    </author>
+    <author>
+      <name>Joanna Wodzińska</name>
+    </author>
+    <author>
+      <name>Kacper Dudzic</name>
+    </author>
+    <author>
+      <name>Marcin Moskalewicz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.14320v1</id>
+    <title>AnchorBench: A Multi-Pathway Benchmark for the Anchoring Effect in LLMs</title>
+    <updated>2026-08-14T14:04:42Z</updated>
+    <link href="https://arxiv.org/abs/2608.14320v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.14320v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The anchoring effect is a cognitive bias in which an initial reference value shifts a later judgment toward itself. This effect is well established in human judgment and decision-making, and recent work suggests that large language models (LLMs) exhibit similar behavior. However, existing work on anchoring in LLMs typically evaluates only a narrow set of anchor pathways and rarely distinguishes irrelevant from plausible anchors. We introduce AnchorBench, a benchmark for the anchoring effect in LLMs that evaluates multiple anchor pathways under an explicit anchor relevance axis. Across fourteen models, including ten open-weight models and four frontier API models, and a large set of controlled prompts, we find that (1) anchoring is strongly pathway-dependent, (2) plausible anchors usually induce larger shifts than irrelevant ones when introduced through stronger pathways, (3) anchor influence generally weakens as the anchor moves farther from the evidence-supported answer, most clearly on External and RAG, and (4) high task accuracy on the anchor-free control condition (Acc$_{10}$: answers within 10 points of gold) does not guarantee robustness: even frontier API models above 95% control accuracy remain susceptible to plausible anchors.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-14T14:04:42Z</published>
+    <arxiv:comment>Published as a conference paper at COLM 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yiderigun Borjigin</name>
+    </author>
+    <author>
+      <name>Alexander Hermann</name>
+    </author>
+    <author>
+      <name>Christian Cyron</name>
+    </author>
+    <author>
+      <name>Roland Aydin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.25227v2</id>
+    <title>Flipping Minds by Flipping Bits: Decision-Level Cognitive Hijacking of Large Language Models</title>
+    <updated>2026-10-19T08:30:49Z</updated>
+    <link href="https://arxiv.org/abs/2607.25227v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.25227v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large Language Models (LLMs) have been widely applied in high-stakes decision-making scenarios such as corporate strategy, and users are increasingly relying on their outputs. However, the deep integration of open-source model sharing ecosystems with LLM-powered critical decision-making applications also introduces critical risks: if an attacker can manipulate the model's cognitive stance, they can indirectly influence the judgments and actions of downstream decision-makers. This paper defines such threats as decision-level hijacking. Existing attacks fail to achieve targeted cognitive manipulation without triggering prohibited content or degrading model functionality. To fill this gap, this paper reveals that Bit-Flip Attacks (BFAs) can serve as an attack vector for inducing decision-level hijacking, requiring no real-time interaction or control over the training process, and only a minimal number of weight bits need to be flipped after deployment to achieve stealthy, low-cost, and persistent cognitive manipulation. Therefore, we propose CogBias, a cognitive bias injection framework for LLMs. CogBias converts subjective preferences into optimization signals via a differentiable sentiment evaluator, uses a multi-objective loss to jointly constrain multiple dimensions, and constructs BitScout to locate critical bits, achieving targeted cognitive intervention under an ultra-sparse flip budget. Experiments on Llama-3.2-3B, Mistral-7B, and Qwen2.5-14B, as well as on the commercial recommendation and controversial factual topic scenarios, demonstrate that flipping only a small number of bits stably induces significant stance shifts on target topics, while the impact on non-target tasks and overall output distribution is limited. This work demonstrates that minute perturbations to low-level weight data suffice to undermine the high-level value alignment of LLMs.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-28T02:59:32Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Yu Yan</name>
+    </author>
+    <author>
+      <name>Jiahao Chen</name>
+    </author>
+    <author>
+      <name>Siqi Lu</name>
+    </author>
+    <author>
+      <name>Yongjuan Wang</name>
+    </author>
+    <author>
+      <name>Ziming Zhao</name>
+    </author>
+    <author>
+      <name>Zhaoxuan Li</name>
+    </author>
+    <author>
+      <name>Tianyu Du</name>
+    </author>
+    <author>
+      <name>Qingjun Yuan</name>
+    </author>
+    <author>
+      <name>Shouling Ji</name>
+    </author>
+  </entry>
+</feed>

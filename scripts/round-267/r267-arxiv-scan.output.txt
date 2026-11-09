@@ -1,0 +1,5 @@
+coordination/agent4/scout/arxiv-r267-cognitive-bias-llm.xml -> 8 entries
+coordination/agent4/scout/arxiv-r267-anchoring.xml -> 8 entries
+coordination/agent4/scout/arxiv-r267-behavioral-detection.xml -> 4 entries
+coordination/agent4/scout/arxiv-r267-loss-aversion.xml -> 8 entries
+coordination/agent4/scout/arxiv-r267-omission-bias.xml -> 4 entries

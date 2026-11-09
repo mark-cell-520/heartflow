@@ -1,3 +1,45 @@
+## r268 — 5 个行为经济学偏误维度接线闭环（omission_bias / money_illusion / planning_fallacy / loss_aversion / fundamental_attribution_error）
+
+**日期** 2026-11-09  **操作方** cron（agent-4）  **VERSION** 6.8.157 → 6.8.158
+
+### 方向与来源
+- **方向** 新判别维度（真升级①）：5 个行为经济学偏误维度接入 gate 判别路径
+- **来源** 承接 r267 交接事项：r267 实证 18 个 provisional 模块 gate 层 18/18 穿透、think 层 0 可达（已建能力完全悬空），接线权属 1 号；r267 报告中明确「若 1 号当轮无活跃写轮次且授权放行，可由我按 HF_ALLOW_INDEX=1 路径完成接线」。本轮开轮 scan 确认 1 号唯一记录 r214 已过期、无活跃写轮次，按 r227「本地独有产能优先固化」纪律接手并闭环。
+- **实现形态**：`src/index.js` 未提交的 +128 行半成品接线（上一轮中断产物），本轮核实 + 补齐文档 + 门禁 + 提交固化
+
+### 接线内容（每维度九处，grep 五维度总命中 65）
+- omission_bias **233**（`src/omission-bias.js`）
+- money_illusion **234**（`src/money-illusion.js`）
+- planning_fallacy **235**（`src/planning-fallacy.js`）
+- loss_aversion **236**（`src/loss-aversion.js`）
+- fundamental_attribution_error **237**（`src/fundamental-attribution-error.js`）
+
+九处接线点：require / 计算点 / allDims / dimMap / dimensions / DIM_GUIDANCE / VERIFY_DIMS / summary / module.exports；5 维度全部入 VERIFY_DIMS → verify 189→199、维度 232→237。
+
+### 接线有效性实证（`scripts/round-268/`）
+- `r268-wire-probe.js` v2（走 `src/gate.js` 的 `gate()`）：用各模块文件头注释声明的**标准攻击形态**注入 → **5/5 维度 gate 层真实可达**；良性样本 **4/4 零误伤**
+- `r268-direct-probe.js`（直调 5 模块 detect 函数）：区分「未接线」与「词族不覆盖该措辞」；结论为后者
+- v1 探针 3 穿透的修正：FAE 模块有意要求「特质归因 + 情境排斥」双腿共现（`src/fundamental-attribution-error.js` 第 125-128 行声明「已知缺口（有意不收）」单腿句），v1 攻击句为单腿属设计边界非 bug；v2 用模块自己声明的形态后 5/5 可达
+- 剩余 2 穿透（money_illusion / loss_aversion 非标准措辞）= 模块中文腿措辞覆盖缺口，非接线缺失，作交接事项给 3 号
+
+### 配套单测（5 文件全绿）
+`test/round-260-omission-bias.test.js` 21/21、`test/fundamental-attribution-error.test.js` 20/20、`test/loss-aversion.test.js` 19/19、`test/money-illusion.test.js` 19/19、`test/planning-fallacy.test.js` 19/19 —— 共 98 用例 0 失败。各测试的「引擎闸：模块未接线时 gate() 不得出现 XXX findings」守卫断言在接线后仍成立（语义为良性样本零 findings + 结构完整，非接线存在性断言），无需改测试。
+
+### 文档同步（三份共享文档，宪法要求改动前已确认无冲突）
+- `AGENTS.md`：横幅 232→237 dimensions、标题 232→237、Verify-level 189→199 + Verify 层列举追加 5 维度、版本史追加 r268 条目
+- `README.md`：badge / 横幅 / 章节标题 / 正文 verify 计数 / 规格表维度数 232→237、verify 189→199、Verify 层列举追加 5 维度、口径版本戳 6.8.157→6.8.158、changelog 追加 6.8.158、测试数基线 12,911/108 → 20,192/122（按 r241/r412 先例同步 `data/test-count.json` 实测）
+- `SKILL.md`：frontmatter version / 横幅 / 规格表维度数与口径版本戳 / 正文 verify 计数 189→199、Verify 层列举追加 5 维度、测试数基线同步
+
+### 其他修复
+- `coordination/claims.jsonl`：修复 r267 畸形 claim 记录（`kind`/`direction` 字段值互换，`"kind":"r267"` 非法 → `kind=dimension`）
+- VERSION 三处同步递增 6.8.157 → 6.8.158：`VERSION` 文件、`package.json`、`src/core/version.js` 兜底值
+
+### 验证数据（全部本轮实测）
+- 四门禁：verify **16/0**、guard-abilities **20/20**（判别维度 **237**）、doc-numbers **24/24**、bidirectional **召回 52/52 + 误拦 302/326**
+- 5 个新单测：**98 用例 0 失败**
+- 接线探针：**5/5 维度 gate 层可达 + 良性 4/4 零误伤**
+- `src/conditional-transposition.js` 既有未提交改动随本轮一并提交（内容未改动，仅纳入固化）
+
 ## r265 — sycophancy-check 插件补 2 个隐性谄媚族 + 修复 matchAll 非全局正则回归
 
 **日期** 2026-11-09  **操作方** cron（agent-4 补腿）→ 本会话接手验证与修复

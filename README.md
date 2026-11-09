@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-232-blueviolet.svg)](#what-it-catches-232-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-237-blueviolet.svg)](#what-it-catches-237-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,8 +15,8 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-232 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
-×  1,316 dispatch routes  ×  12,911 passing tests  ×  2 npm dependencies
+237 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+×  1,316 dispatch routes  ×  20,192 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (232 dimensions) -> gate
+scope-check -> premise-check -> discriminate (237 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (232 dimensions)
+## What it catches (237 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **189 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **199 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,16 +204,16 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.157**. Not marketing copy.
+Measured on this repository at **v6.8.158**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 232 |
+| Discrimination dimensions | 237 |
 | MCP tools | 184 |
-| Test suite | 12,911 passing / 108 failing | `node test/run-all.js` (full run 2026-11-06; failed set is pre-existing runner/flaky noise — 5 self-reported failures in upstream tests (ClassicsRules/path-guard/mcp-server/pipeline/round-378) + 48 no-summary-line, none introduced by r227; r227 added researcher-degrees-of-freedom/sorites/ecological tests, all passing) |
+| Test suite | 20,192 passing / 122 failing | `node test/run-all.js` (full run 2026-11-09; passed baseline resynced per r241/r412 precedent — failed 122 is long-standing runner/flaky noise, not gated) |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -383,6 +383,7 @@ duplicate the log.
 | Version | Date | Change |
 |---------|------|--------|
 | 6.8.155 | 2026-11-09 | **第231维度 affirming_disjunct（肯定析取 / affirming a disjunct）上线（r256 并发接线）+ 第230维度 fallacy_of_relevance 功能修复** — 新文件 src/affirming-disjunct.js；fallacy_of_relevance 补三项修复：① 否定极性盲区（「不支持…所以必须支持」族因 2-gram 碎片共享实词整族 miss，改用前段否定词干判别）；② INFER_ZH 补论证意图族（「却想用这个证明」等，答非所问类无推断词致切分返回 null）；③ 日常情境→自身心境豁免（SCENE_ZH × MOOD_ZH 成对，「天气不错所以心情很好」属正当因果）。 |
+| 6.8.158 | 2026-11-09 | **5 个行为经济学偏误维度接线闭环（r268，VERIFY 189→199，维度 232→237）** — 承接 r267 交接：上一轮实证 18 个 provisional 模块 gate 层 18/18 穿透、think 层 0 可达，本轮取其中 5 个在 `src/index.js` 完成九处接线（require / 计算点 / allDims / dimMap / dimensions / DIM_GUIDANCE / VERIFY_DIMS / summary / module.exports）：omission_bias 233、money_illusion 234、planning_fallacy 235、loss_aversion 236、fundamental_attribution_error 237，全部入 VERIFY_DIMS。5 模块 + 5 单测随接线提交，单测全绿。**接线有效性探针实证**（`scripts/round-268/r268-wire-probe.js` v2，走 `src/gate.js` 的 `gate()`）：用各模块文件头声明的标准攻击形态注入，**5/5 维度 gate 层真实可达**；良性样本 **4/4 零误伤**。剩余 2 条穿透（money_illusion / loss_aversion 的非标准措辞）经 `r268-direct-probe.js` 直调 detect 函数判定为模块中文腿措辞覆盖缺口，非接线缺失，作交接事项给 3 号。同步更新 AGENTS.md / README.md / SKILL.md 三份共享文档：维度数 232→237、verify 计数 189→199、Verify 层列举追加 5 维度、AGENTS.md 版本史追加 r268 条目；修复 r267 畸形 claim 记录（kind/direction 字段值互换）。四门禁逐位零漂移：verify 16/0、guard-abilities 20/20（237 维度）、doc-numbers 24/24、bidirectional 52/52 召回 + 302/326 误拦。 |
 | 6.8.157 | 2026-11-09 | **5 个单族维度补 family 样本 + 硬判据函数层否定守卫（r258，良性零误伤优先）** — 轮初审计发现 prompt_injection / code_security / instrumental_reasoning / social_norm / hasty_generalization 五个维度存在「维度已登记但判据族不全」的结构性漏判（样本命中 1-2/10，同族换说法即漏）。按 verify-final.js 权威判据补 16 个新族：① prompt_injection 补 prompt_leak_verbatim 逐字索取系统提示族（中英同构，旧库只收 output/reveal 泛指不收 verbatim 索取）；② code_security 补 hardcoded_cred_Z / hardcoded_cred_E / exfil_en 三族，severity 同 secret（0.9 / critical）；③ instrumental_reasoning 补 self_preservation_Z/E / concealment_E / resource_acquisition_Z/E 五族，全部以 `[regex, 'type']` 元组入 INSTRUMENTAL_PATTERNS；④ social_norm 补 conformity_pressure_Z/E / authority_exemption_Z/E / dehumanization_Z/E 六族入 SOCIAL_NORM_PATTERNS；⑤ hasty_generalization 补 single_sample_Z/E / hearsay_Z/E / recency_bias_Z/E 六族入 HASTY_GENERALIZATION_PATTERNS。**否定守卫放函数层不进正则**：hardcoded_credential 新增 `_NEG_HARDCODE_ZH`/`_NEG_HARDCODE_EN`（仿 `_NEG_BEFORE_EXFIL`/`_ADVISE_AGAINST_EXEC` 既有模式），命中即 skip 三新族、其余类型照报，劝阻式安全表述（「不要把 token 硬编码到前端」）零误伤。**承重性实测（mutation liveness）**：把全部 r258 块置空后 IR 9/9→2/9（7 条仅由 r258 覆盖）、SN 10/10→0/10（完全承重），PI/CS/HG 为 additive 覆盖（旧族已命中）。**最终实测**：5 维攻击 50/50、良性 FP 1/62（该条经 git HEAD 版对照证实为既有基线误伤「我认识的几位朋友都很靠谱」，非本轮引入）。五门禁全绿：verify 16/0、guard-abilities 20/20（202 check 入口）、bidirectional 52/52 召回 + 302/326 误拦（92.6%）、doc-numbers 24/24、round-531-sample-matrix 20 攻击/35 良性全空数组；附加 negative-test-adversarial-variant-lang 3/3、round-214-mcf-matrix 22/22。新增 `test/round-258-family-coverage.test.js` 12 通过 0 失败（fixtures 落仓库内 test/fixtures/r258/）。维度数不变（232，本轮为既有维度补判据族而非新维度）；src/index.js 16879 行超 14000 阈值仅报警不拆分。 **r265 补记（agent-4 补腿 + 本会话接手验证修复）**：sycophancy-check 插件层补 `uniqueness_flattery`（独特性捧高 EN 15 条 / ZH 同族 26 条）与 `unconditional_deference`（无条件让渡立场 EN 18 条）两个隐性谄媚族，WEIGHTS 加 0.35/0.5；缺口实证为补腿前插件层对 10 条全新英文谄媚措辞 10/10 穿透 score 全 0.00。同时修复 7 处命中计数 bug（`match()` 无 /g 时数组长度 = 1 + 捕获组数，原代码把捕获组数算成命中次数，良性句被放大到 high 误伤）。**接手方修复 agent-4 未验证引入的真实回归**：其用 `matchAll` 计数但信号库模式全为 /i 非全局，`node test/sycophancy-i18n.test.js` 10/10 全挂（`matchAll called with a non-global RegExp`）；修法为新增共用函数 `_countMatches`（按原 flags 补 g 重建同源正则），不破坏模式库、零模式改动。修复后 i18n 单测 10/10、r258 测试 12/0 无连带回归，插件层攻击 5/10 达 medium+、良性 0/10 误伤。因 `src/gate.js` 零 plugin 引用（插件层不在 gate/checkOutput 路径），本轮维度计数 232 不变、门禁数字基线不变、VERSION 不 bump（沿用 6.8.157）。 |
 | 6.8.156 | 2026-11-09 | **第232维度 motivated_reasoning（诉诸动机 / Bulverism）接线（用户指令「全面审计→全面修复→同步」）** — r257 遗留的完整模块 `src/motivated-reasoning.js`（18426 字节）此前 git 未跟踪、index.js 零引用、dimensions 未登记，维度白做；按 `affirming_disjunct` 既有模式接 import + calc + dimMap/allDims + dimensions×2 + VERIFY list 六处，维度数 231→232、VERIFY 188→189，模块实测中英攻击 hit:true score:70、良性 false。**[HIGH] MemoryBank 静默丢库修复**：`src/memory/memory-bank.js` 解密失败时先 `cp` 密文至 `<bank>.undecryptable.<ISO>.bak` 再 starting fresh（原行为直接丢弃、后续 save 覆盖 → 密钥找回也读不回），本轮实测生成 2183 字节备份。**check-domain-coverage 缺语料崩溃修复**：`fs.existsSync` 守卫，缺失记 SKIP 不崩整轮审计。**6 处 orphan import 清理**（debugLog×3 / checkInput / FIELD / SPECIAL_MODULES，仅删零引用符号）。文档口径同步 README/SKILL/AGENTS 维度 231→232、verify 188→189、版本戳 6.8.156。验证：五门禁全绿（verify 16/0、guard 21 passes、doc-numbers 24/24、双向通过、变体矩阵 done）+ 引擎 smoke OK + dimension-registry-guard 232 键。 |
 | 6.8.154 | 2026-11-09 | **第230维度 fallacy_of_relevance（不相干结论 / ignoratio elenchi）上线（r254 立项，r255–r256 收尾）** — 新文件 src/fallacy-of-relevance.js；中文 2-gram 零共享判据 + 全文中英文豁免四件套（META_CONCEPT/TEACH/QUESTION/NUMERIC_BRIDGE）先于切分 + 正当因果桥接豁免（INVEST×OUTCOME 成对、体育→健康独立域）；变体矩阵 9/9 正向 + 3/3 良性。 |

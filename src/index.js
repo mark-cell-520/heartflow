@@ -906,6 +906,32 @@ const { checkAffirmingDisjunct } = require('./affirming-disjunct.js');
 // [audit 2026-11-09] 第 232 维度 motivated_reasoning（诉诸动机/Bulverism）
 // 计算点。mr——motivated reasoning 缩写，grep 0 命中无冲突。
 const { checkMotivatedReasoning } = require('./motivated-reasoning.js');
+// [r268 接线] 第 233 维度 omission_bias（不作为偏误 / act-omission
+// asymmetry：同等后果下把「不作为」系统性轻判于「作为」）。模块
+// src/omission-bias.js 为 r260 起草（provisional 245，21/21 测试全绿、
+// 官方良性语料 346 条零误伤），接线规格见 coordination/reports/
+// r260-dimension-agent4.md §五「九处一次接齐」。obi——omission bias
+// 缩写，grep 0 命中无冲突。
+const { detectOmissionBias } = require('./omission-bias.js');
+// [r268 接线] 第 234 维度 money_illusion（货币幻觉：把名义金额变动
+// 当成实际购买力变动）。模块 src/money-illusion.js 为 r251 起草
+// （19/19 测试全绿、良性 272 条零误伤）。mi——money illusion 缩写。
+const { detectMoneyIllusion } = require('./money-illusion.js');
+// [r268 接线] 第 235 维度 planning_fallacy（规划谬误：以最乐观历史
+// 类比推断工期/成本，无视基准类）。模块 src/planning-fallacy.js 为
+// r255 起草（19/19 全绿、良性 272 条零误伤）。pf——planning fallacy
+// 缩写（grep 确认与既有变量无冲突）。
+const { detectPlanningFallacy } = require('./planning-fallacy.js');
+// [r268 接线] 第 236 维度 loss_aversion（损失厌恶：把等量损失权重
+// 系统性高于收益，用于拒绝止损或渲染放弃代价）。模块
+// src/loss-aversion.js 为 r251 起草（19/19 全绿、良性 272 条零误伤）。
+// lav——loss aversion 缩写（grep 0 命中无冲突）。
+const { detectLossAversion } = require('./loss-aversion.js');
+// [r268 接线] 第 237 维度 fundamental_attribution_error（基本归因
+// 错误：把情境造成的结果归因于对象内在秉性）。模块
+// src/fundamental-attribution-error.js 为 r256 起草（20/20 全绿、
+// 良性 326 条零误伤）。fae——fundamental attribution error 缩写。
+const { detectFundamentalAttributionError } = require('./fundamental-attribution-error.js');
 // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
 // confusion of the inverse：P(E|I) 的概率数值在方向翻转后原样沿用为
 // P(I|E)，检察官谬误的结构形）。src/conditional-transposition.js 28KB
@@ -2299,6 +2325,16 @@ function discriminate(text, evidence = [], contentMode) {
   const adx = _applyPedagogyRelaxation(checkAffirmingDisjunct(_normText), "affirming_disjunct", pedagogyRelaxation);
   // [audit 2026-11-09] 第 232 维度 motivated_reasoning（诉诸动机）计算点。
   const mr = _applyPedagogyRelaxation(checkMotivatedReasoning(_normText), "motivated_reasoning", pedagogyRelaxation);
+  // [r268 接线] 第 233 维度 omission_bias（不作为偏误）计算点。
+  const obi = _applyPedagogyRelaxation(detectOmissionBias(_normText), "omission_bias", pedagogyRelaxation);
+  // [r268 接线] 第 234 维度 money_illusion（货币幻觉）计算点。
+  const mi = _applyPedagogyRelaxation(detectMoneyIllusion(_normText), "money_illusion", pedagogyRelaxation);
+  // [r268 接线] 第 235 维度 planning_fallacy（规划谬误）计算点。
+  const pf = _applyPedagogyRelaxation(detectPlanningFallacy(_normText), "planning_fallacy", pedagogyRelaxation);
+  // [r268 接线] 第 236 维度 loss_aversion（损失厌恶）计算点。
+  const lav = _applyPedagogyRelaxation(detectLossAversion(_normText), "loss_aversion", pedagogyRelaxation);
+  // [r268 接线] 第 237 维度 fundamental_attribution_error（基本归因错误）计算点。
+  const fae = _applyPedagogyRelaxation(detectFundamentalAttributionError(_normText), "fundamental_attribution_error", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -2942,6 +2978,17 @@ function discriminate(text, evidence = [], contentMode) {
     {score: for_.score, name:'fallacy_of_relevance'},
     {score: adx.score, name:'affirming_disjunct'},
     {score: mr.score, name:'motivated_reasoning'},
+    // [r268 接线] 第 233 维度 omission_bias 参与判定（不作为偏误）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: obi.score, name:'omission_bias'},
+    // [r268 接线] 第 234 维度 money_illusion 参与判定（货币幻觉）。
+    {score: mi.score, name:'money_illusion'},
+    // [r268 接线] 第 235 维度 planning_fallacy 参与判定（规划谬误）。
+    {score: pf.score, name:'planning_fallacy'},
+    // [r268 接线] 第 236 维度 loss_aversion 参与判定（损失厌恶）。
+    {score: lav.score, name:'loss_aversion'},
+    // [r268 接线] 第 237 维度 fundamental_attribution_error 参与判定。
+    {score: fae.score, name:'fundamental_attribution_error'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3498,6 +3545,23 @@ function discriminate(text, evidence = [], contentMode) {
     // [audit 2026-11-09] 第 232 维度 motivated_reasoning（诉诸动机）补登记。
     // mr——motivated reasoning 缩写。同上：九处一次接齐。
     motivated_reasoning: mr,
+    // [r268 接线] 第 233 维度 omission_bias 补登记（不作为偏误：
+    // 同等后果下把不作为系统性轻判于作为）。obi——omission bias 缩写。
+    omission_bias: obi,
+    // [r268 接线] 第 234 维度 money_illusion 补登记（货币幻觉：把名义
+    // 金额变动当成实际购买力变动）。mi——money illusion 缩写。
+    money_illusion: mi,
+    // [r268 接线] 第 235 维度 planning_fallacy 补登记（规划谬误：以
+    // 最乐观历史类比推断工期成本，无视基准类）。pf——planning fallacy 缩写。
+    planning_fallacy: pf,
+    // [r268 接线] 第 236 维度 loss_aversion 补登记（损失厌恶：等量
+    // 损失权重系统性高于收益，用于拒绝止损或渲染放弃代价）。
+    // lav——loss aversion 缩写。
+    loss_aversion: lav,
+    // [r268 接线] 第 237 维度 fundamental_attribution_error 补登记
+    // （基本归因错误：把情境造成的结果归因于对象内在秉性）。
+    // fae——fundamental attribution error 缩写。
+    fundamental_attribution_error: fae,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -5126,6 +5190,59 @@ function discriminate(text, evidence = [], contentMode) {
     // [audit 2026-11-09] 第 232 维度 motivated_reasoning（诉诸动机/Bulverism：
     // 以动机推定替代对论点实质内容的回应）。
     'motivated_reasoning',
+    // [r268 接线] 第 233 维度 omission_bias（不作为偏误：同等后果下把
+    // 不作为系统性轻判于作为）。与 r206-r232 同口径只登记 VERIFY。
+    'omission_bias',
+    // [r268 接线] 第 234 维度 money_illusion（货币幻觉：把名义金额
+    // 变动当成实际购买力变动）。同上只登记 VERIFY。
+    'money_illusion',
+    // [r268 接线] 第 235 维度 planning_fallacy（规划谬误：以最乐观
+    // 历史类比推断工期成本，无视基准类）。同上只登记 VERIFY。
+    'planning_fallacy',
+    // [r268 接线] 第 236 维度 loss_aversion（损失厌恶：等量损失权重
+    // 系统性高于收益）。同上只登记 VERIFY。
+    'loss_aversion',
+    // [r268 接线] 第 237 维度 fundamental_attribution_error（基本归因
+    // 错误：把情境造成的结果归因于对象内在秉性）。同上只登记 VERIFY。
+    'fundamental_attribution_error',
+    // [r268 接线] 第 233 维度 omission_bias（不作为偏误 / act-omission
+    // asymmetry：同等后果下把「不作为」系统性轻判于「作为」——「他
+    // 什么都没做怎么能怪他」「见危不救总比亲手伤人轻」）登记。verify
+    // 级——同族单句可能是正当的责任归属讨论、司法术语使用（不作为
+    // 犯罪/法定作为义务）、分别讨论两侧、或明确指出这是不作为偏误。
+    // 与 r206-r232 同口径只登记 VERIFY。与 victim_blaming/
+    // performative_responsibility/guilt_induction 的射程边界见
+    // src/omission-bias.js 头注释。
+    'omission_bias',
+    // [r268 接线] 第 234 维度 money_illusion（货币幻觉：把名义金额
+    // 变动当成实际购买力变动——不加通胀口径直接比较不同年份的工资/
+    // 物价数字）登记。verify 级——单句可能是正当的财务转述、名义值
+    // 与实际值的对照教学、或明确指出这是货币幻觉。同口径只登记
+    // VERIFY。与 false_precision/statistical_misleading 的射程边界见
+    // src/money-illusion.js 头注释。
+    'money_illusion',
+    // [r268 接线] 第 235 维度 planning_fallacy（规划谬误：以最乐观
+    // 历史类比推断工期/成本，无视同类项目基准类分布——「上个项目
+    // 两个月就做完了，这个也差不多」）登记。verify 级——单句可能是
+    // 正当的排期说明、风险管理复盘、或明确指出这是规划谬误。同口径
+    // 只登记 VERIFY。与 base_rate_neglect/hasty_generalization 的射程
+    // 边界见 src/planning-fallacy.js 头注释。
+    'planning_fallacy',
+    // [r268 接线] 第 236 维度 loss_aversion（损失厌恶：等量损失权重
+    // 系统性高于收益，用于拒绝止损或渲染放弃代价——「现在卖掉就亏
+    // 死了，绝对不割肉」）登记。verify 级——单句可能是正当的风险
+    // 说明、损失厌恶的心理学教学、或明确指出这是损失厌恶。同口径
+    // 只登记 VERIFY。与 sunk_cost_coercion 的射程边界（本族管权重
+    // 不对称本身，sunk_cost 管以已投入为继续理由）见
+    // src/loss-aversion.js 头注释。
+    'loss_aversion',
+    // [r268 接线] 第 237 维度 fundamental_attribution_error（基本归因
+    // 错误：把情境造成的结果归因于对象内在秉性——「他迟到就是因为
+    // 不负责任」而不看交通/临时状况）登记。verify 级——单句可能是
+    // 正当的绩效记录、归因理论教学、或明确指出这是基本归因错误。
+    // 同口径只登记 VERIFY。与 stereotype/genetic_fallacy 的射程边界
+    // 见 src/fundamental-attribution-error.js 头注释。
+    'fundamental_attribution_error',
     // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
     // confusion of the inverse：P(E|I) 的数值在方向翻转后原样沿用为
     // P(I|E)——「这种病检测阳性的概率是 95%，所以得了这种病检测阳性的
@@ -5758,6 +5875,17 @@ function discriminate(text, evidence = [], contentMode) {
       // [audit 2026-11-09] 第 232 维度 motivated_reasoning 补登记（诉诸动机）。
       // mr——motivated reasoning 缩写。同上：九处一次接齐。
       motivated_reasoning: mr,
+      // [r268 接线] 第 233 维度 omission_bias 补登记（不作为偏误）。
+      // obi——omission bias 缩写。同上：九处一次接齐。
+      omission_bias: obi,
+      // [r268 接线] 第 234 维度 money_illusion 补登记（货币幻觉）。
+      money_illusion: mi,
+      // [r268 接线] 第 235 维度 planning_fallacy 补登记（规划谬误）。
+      planning_fallacy: pf,
+      // [r268 接线] 第 236 维度 loss_aversion 补登记（损失厌恶）。
+      loss_aversion: lav,
+      // [r268 接线] 第 237 维度 fundamental_attribution_error 补登记。
+      fundamental_attribution_error: fae,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,

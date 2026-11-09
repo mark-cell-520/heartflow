@@ -1,0 +1,24 @@
+=== r267 缺口实证：18 个 provisional 模块在引擎 gate 层的穿透情况 ===
+anchoring_effect: attack gate=pass
+endowment_effect: attack gate=pass
+loss_aversion: attack gate=verify
+mental_accounting: attack gate=pass
+money_illusion: attack gate=pass
+disposition_effect: attack gate=pass
+illusion_of_control: attack gate=pass
+effort_justification: attack gate=rewrite
+peak_end_rule: attack gate=rewrite
+omission_bias: attack gate=rewrite
+fundamental_attribution_error: attack gate=verify
+perverse_incentive: attack gate=block
+count_rate_conflation: attack gate=verify
+inverse_gamblers_fallacy: attack gate=pass
+law_of_small_numbers: attack gate=pass
+p_hacking: attack gate=pass
+average_marginal_conflation: attack gate=verify
+budget_value_conflation: attack gate=pass
+
+合计: 18 条攻击句, 命中 0, 引擎真实识别 0/18
+良性误伤: 0/3
+
+结论: 攻击句命中 0 即证明该族在引擎层完全穿透（模块存在但未接线，能力白做）。

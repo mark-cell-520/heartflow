@@ -1,0 +1,196 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/yhAH/zXWgn85z70d+el+Eh50DrU</id>
+  <title>arXiv Query: search_query=abs:"anchoring bias"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-09T08:38:46Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=abs:%22anchoring+bias%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>41</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2610.10316v1</id>
+    <title>Anchor-proofness in Voting with Ranked Ballots</title>
+    <updated>2026-10-07T16:10:15Z</updated>
+    <link href="https://arxiv.org/abs/2610.10316v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.10316v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>When voters evaluate alternatives sequentially, an anchoring bias makes their ballots depend on the order in which alternatives are presented. For approval ballots, no non-constant voting rule is robust to this dependence. We show that ranked ballots change the picture sharply: a rank-based rule is robust to the presentation order if and only if it is tops-only. Robustness to anchoring is thus available, but only at the price of ignoring everything a voter reports beyond her favourite alternative.</summary>
+    <category term="econ.TH" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-07T16:10:15Z</published>
+    <arxiv:primary_category term="econ.TH"/>
+    <author>
+      <name>Federico Fioravanti</name>
+    </author>
+    <author>
+      <name>Zoi Terzopoulou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2610.09554v2</id>
+    <title>Reliability of LLM Judges for Evaluating Entity Alignment</title>
+    <updated>2026-10-29T09:17:14Z</updated>
+    <link href="https://arxiv.org/abs/2610.09554v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.09554v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Entity Alignment (EA) identifies equivalent entities across knowledge graphs and is critical for knowledge base integration and ontology merging. Evaluating EA systems at scale requires expensive expert annotation, making systematic assessment across diverse domains practically infeasible. LLM-as-judge evaluation offers a potentially scalable alternative, yet its reliability for structured prediction tasks like EA remains unstudied. We present the first systematic benchmarking study across three frontier models, three datasets, and four EA systems, using perturbation bias diagnostics, meta-evaluation across all dataset--judge--prompt combinations, and counterfactual label-flip tests. We identify anchor bias, a failure mode in which judges invert discrimination when the system's decision label is visible. Judge discrimination collapses under label-exposing prompts (J-ROC-AUC 0.12--0.87), while a label-free protocol recovers near-ceiling capability on distinctive-name datasets (0.98--1.00 for NeuSymEA) and significant recovery on biomedical pairs (0.93--0.95). Counterfactual label flips show that the visible label causally shifts scores by more than 2 points in 53--99% of pairs (FSR), with sensitivity growing with model capability, a pattern we call the frontier model paradox: stronger judges are more label-sensitive, not less, yet also better label-free predictors. The direction of the shifts is mixed, so we report this as an observed pattern. A blinded two-annotator human evaluation (102 pairs, Cohen's $κ$ = 0.902) provides a gold-label reference. We release the first biomedical EA benchmark (MeSH--SNOMED CT, 15K pairs) and a reproducible auditing framework for LLM judge reliability in EA. Code and data are available at https://github.com/vaibhavalakshmiravideshik/llm-as-a-judge-entity-alignment.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-07T06:55:45Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Vaibhava Lakshmi Ravideshik</name>
+    </author>
+    <author>
+      <name>Mayank Kejriwal</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.22802v1</id>
+    <title>SDoH-Aware Narrative Anchoring Bias in Medical LLMs for Trustworthy Clinical Decision Support</title>
+    <updated>2026-08-24T04:58:32Z</updated>
+    <link href="https://arxiv.org/abs/2608.22802v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.22802v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Medical large language models are often judged by how many clinical questions they answer correctly. That view is useful, but it misses a practical risk. A model may know the right answer and still change its response when the same case is written in a different patient voice. This paper evaluates that risk as SDoH aware narrative anchoring bias. We use NarrativeShield SDoH MedQA, a counterfactual medical question answering dataset in which each case appears in persona based narratives while the answer key remains fixed. The dataset is reshaped from wide format into case grouped persona rows. We evaluate three open source instruction tuned LLMs from the Qwen2.5 family: 1.5B, 3B, and 7B. The final experiment uses 300 clinical cases and produces 8,100 model responses across three prompting conditions. We report persona level accuracy, counterfactual consistency, correct consistency, and narrative sensitivity error. Qwen2.5 7B achieves the best accuracy at 56.33 percent and the best correct consistency at 40.33 percent. Paired McNemar exact tests show significant accuracy gains for 7B over 3B in all prompt settings. Even so, narrative sensitivity remains, with the lowest error still at 31.67 percent. These results suggest that trustworthy clinical decision support should be evaluated by both average correctness and stability across medically equivalent patient narratives.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-24T04:58:32Z</published>
+    <arxiv:comment>Accepted for publication at 10th International Artificial Intelligence and Data Processing Symposium (IDAP'26)</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Ahnaf Atef Choudhury</name>
+    </author>
+    <author>
+      <name>Ramkrishna Saha</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.01755v2</id>
+    <title>Deferred Exposure of Future Trajectories for Verifiable Reasoning in Autonomous Driving VLMs</title>
+    <updated>2026-08-04T02:59:32Z</updated>
+    <link href="https://arxiv.org/abs/2608.01755v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.01755v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent Vision-Language-Action (VLA) models for autonomous driving (AD) increasingly utilize chain-of-thought (CoT) supervision to enhance the reasoning capabilities of their Vision-Language Model (VLM) components, yet existing annotation pipelines commonly expose the teacher model to the logged ground-truth (GT) future trajectory. We empirically show that this induces trajectory anchoring bias: teacher models rationalize the revealed outcome rather than infer a decision from scene evidence, producing less causally faithful CoTs and substantially more severe hallucinations, especially in causally challenging scenes. Removing the GT trajectory eliminates this shortcut, but open-ended trajectory generation entangles high-level decision-making with precise geometric synthesis and low-level dynamics. To make trajectory-level driving decisions verifiable without requiring open-ended trajectory synthesis, we introduce Autonomous-Driving Multiple-Choice Question (AD-MCQ), which casts planning as selection among explicit trajectory candidates. Taking this a step further, we propose Deferred Exposure of Future Trajectories for RLVR (DEFT-RLVR) to transform future trajectories from pre-decision anchors into post-decision verification targets. Experimental results show that DEFT-RLVR improves AD reasoning while preserving or even enhancing general visual capabilities. With VLM-only inference and controllable difficulty through candidate construction, AD-MCQ provides a flexible, scalable, and extensible foundation for future research on verifiable AD reasoning.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-03T06:24:36Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Zixuan Huang</name>
+    </author>
+    <author>
+      <name>Yang Zhou</name>
+    </author>
+    <author>
+      <name>Kaixuan Wang</name>
+    </author>
+    <author>
+      <name>Guli Zhang</name>
+    </author>
+    <author>
+      <name>Hongyan Xie</name>
+    </author>
+    <author>
+      <name>Yakun Zhu</name>
+    </author>
+    <author>
+      <name>Hao Geng</name>
+    </author>
+    <author>
+      <name>Xiaozhi Chen</name>
+    </author>
+    <author>
+      <name>Yikun Ban</name>
+    </author>
+    <author>
+      <name>Deqing Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.13203v2</id>
+    <title>BARS: Benign-Anchored Ranking and Selection for False Alarm Reduction in Network Intrusion Detection</title>
+    <updated>2026-09-26T23:35:45Z</updated>
+    <link href="https://arxiv.org/abs/2607.13203v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.13203v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>False alarms remain a major barrier to deploying network intrusion detection systems (NIDS). In high-volume environments, even a sub-1% false positive rate can generate tens of thousands of daily alerts. Filter-based feature selection is attractive because it operates upstream of the classifier and adds no inference-time cost. However, classical filters use class-symmetric criteria that ignore the asymmetry of intrusion detection, where benign traffic defines the baseline and attacks are deviations from it. A recent class-asymmetric filter, Classwise Mean Deviation (CMD), addresses this issue but anchors its score to a global mean that shifts toward attack distributions under class imbalance, weakening the deviations it aims to capture.
+  We propose Benign-Anchored Ranking and Selection (BARS), a two-stage filter that replaces CMD's global anchor with the benign-class mean and applies an order-preserving decorrelation step. We evaluate BARS on CICIDS2017, CICDDoS2019, and UNSW-NB15 using feature budgets k = {5, 10, 20, 30, 40}. On attack-majority datasets, where global-anchor bias is strongest, BARS reduces false positive rate relative to CMD by 15.4% on UNSW-NB15 at k = 20 and by 21% to 23% on CICDDoS2019 at small feature budgets while preserving true positive rate and macro-F1. On benign-majority data, BARS and CMD converge, consistent with the theoretical limit where global- and benign-anchored scores coincide. BARS reduces false alarms by up to 32% while maintaining similar detection rates, with larger gains under stronger imbalance. Ablation results show that the two stages provide complementary benefits and select a consistent set of robust features. BARS retains linear-time scoring and a low memory footprint, making it suitable for resource-constrained deployments.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-14T18:53:14Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Abu Fuad Ahmad</name>
+    </author>
+    <author>
+      <name>Istiaque Ahmed</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.19668v2</id>
+    <title>Code-Switching Reveals Language Anchoring in Multilingual LLMs</title>
+    <updated>2026-08-25T06:45:51Z</updated>
+    <link href="https://arxiv.org/abs/2606.19668v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.19668v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Multilingual Large Language Models (MLLMs) are increasingly expected to handle Code-Switched (CS) inputs, yet mixing languages frequently degrades performance relative to source- or target-language monolingual counterparts. To understand this degradation, we use grammar-forced CS as a controlled diagnostic setting for locating CS representations relative to their source and target counterparts. We introduce Anchor Bias, a geometric measure that quantifies language anchoring, whether a CS hidden state aligns closer to its source or target language counterpart. Across diverse MLLMs, Anchor Bias reveals a consistent grammar-frame effect: source-framed CS stays source-anchored, whereas target-framed CS shifts target-ward and shows larger Question Answering (QA) degradation. Motivated by this representational pattern, we propose CANVAS (Contextual Anchor-based Neural Vector Alignment Steering), an inference-time intervention that extracts a source-side canvas from the input and softly steers target-language hidden states toward the source anchor during prefill. CANVAS consistently recovers QA F1 across MLLMs and CS conditions, showing that internal anchoring signals provide an actionable target for mitigating CS inference failures.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-18T00:42:55Z</published>
+    <arxiv:comment>EMNLP 2026 Findings</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Jeonghyun Park</name>
+    </author>
+    <author>
+      <name>Seunghyun Yoon</name>
+    </author>
+    <author>
+      <name>Yonghyun Jun</name>
+    </author>
+    <author>
+      <name>Hwanhee Lee</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.18272v2</id>
+    <title>Mitigating Anchoring Bias in LLM-Based Agents for Energy-Efficient 6G Autonomous Networks</title>
+    <updated>2026-06-18T09:22:45Z</updated>
+    <link href="https://arxiv.org/abs/2606.18272v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.18272v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper presents an autonomous agentic resource negotiation framework designed to enable zero-touch network slicing in 6G architectures using Large Language Model (LLM) agents. While LLMs offer powerful reasoning capabilities, we demonstrate that such agents inherently suffer from anchoring bias, rigidly adhering to initial heuristic proposals and causing severe network over-provisioning. To systematically mitigate this cognitive bias, we propose a novel randomized anchoring strategy modeled via a Truncated 3-Parameter Weibull distribution. This mathematically bounded approach seamlessly integrates with burst-aware Digital Twins (DTs) employing Conditional Value at Risk (CVaR) to rigorously guarantee strict Service Level Agreement (SLA) tail-latencies. To validate our methodology, we introduce and prove the \emph{Bimodal Constraint-Avoidance Utility Theorem}, demonstrating that while feasible negotiations follow classical convex bounds, highly constrained scenarios undergo a phase transition governed by an inverse rational decay envelope. Empirical results generated using a locally hosted 1B-parameter model otel-llm-1b-it confirm these dual-regime bounds. Our cognitive de-biasing successfully dismantles rigid negotiation patterns, forcing agents into active exploration to safely ride SLA boundaries and boost system energy savings up to 25\%. Crucially, the lightweight 1B LLM achieves sub-second inference latencies (0.95s mean), ensuring our multi-agent framework is compatible with the operational timescales of the O-RAN non-Real-Time RAN Intelligent Controller (non-RT RIC)\footnote{Our source code is available for non-commercial use at https://github.com/HatimChergui.</summary>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.SY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-05T08:29:03Z</published>
+    <arxiv:comment>7 pages, 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.NI"/>
+    <author>
+      <name>Hatim Chergui</name>
+    </author>
+    <author>
+      <name>Claudia Carballo González</name>
+    </author>
+    <author>
+      <name>Farhad Rezazadeh</name>
+    </author>
+    <author>
+      <name>Merouane Debbah</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.05885v1</id>
+    <title>When Denser Credit Is Not Enough: Evidence-Calibrated Policy Optimization for Long-Horizon LLM Agent Training</title>
+    <updated>2026-06-04T08:54:09Z</updated>
+    <link href="https://arxiv.org/abs/2606.05885v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.05885v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Long-horizon LLM agents require reinforcement learning methods that can assign credit to intermediate decisions under sparse and delayed rewards. Recent group-based methods such as GiGPO improve over GRPO by constructing step-level advantages at repeated anchor states. However, we show that such dense credit can be statistically unreliable: under limited rollouts, rare but lucky actions may receive overly large advantages, producing divergent anchor bias and late-stage training oscillation. We propose Evidence-Calibrated Policy Optimization (ECPO), a critic-free policy optimization algorithm that calibrates step-level credit before policy updates. ECPO combines Evidence-Calibrated Action Advantage, which groups rollouts by canonical actions and shrinks low-count estimates, with Variance-Gated Credit Weighting, which suppresses anchor states dominated by within-action noise. Experiments on ALFWorld and WebShop with Qwen2.5-1.5B/7B show that ECPO consistently outperforms strong baselines, improving GiGPO by +5.2/+7.3 success points on ALFWorld/WebShop with Qwen2.5-1.5B while adding only 0.1% additional advantage-computation overhead.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-04T08:54:09Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Yuanfan Li</name>
+    </author>
+    <author>
+      <name>Qi Zhou</name>
+    </author>
+    <author>
+      <name>Wenjing Duan</name>
+    </author>
+    <author>
+      <name>Lu Chen</name>
+    </author>
+  </entry>
+</feed>
