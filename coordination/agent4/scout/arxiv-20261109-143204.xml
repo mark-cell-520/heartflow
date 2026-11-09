@@ -1,0 +1,585 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/BqyBs8sPJSg8J0f748enYYKFEJ0</id>
+  <title>arXiv Query: search_query=all:relative OR all:privation OR all:ecological OR all:fallacy OR all:collider OR all:bias OR all:detection OR all:LLM OR all:reasoning&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-09T14:32:04Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:relative+OR+(all:privation+OR+(all:ecological+OR+(all:fallacy+OR+(all:collider+OR+(all:bias+OR+(all:detection+OR+(all:LLM+OR+all:reasoning)))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>673953</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09892v1</id>
+    <title>On Agentic Manipulation Policies</title>
+    <updated>2026-11-06T18:59:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.09892v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09892v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent work on robot manipulation has focused on specialist policies trained on demonstrations. We show that generalist AI models can control manipulators more reliably than specialist policies such as vision-language-action models (VLAs) and world-action models (WAMs). We systematically analyze agentic manipulation policies (AMPs), in which a generalist AI model commands the manipulator directly, adapting its actions as the task unfolds. We present AMP1, a reference harness that runs unchanged across single-arm, bimanual, and mobile manipulation. AMP1 achieves state-of-the-art results on the RoboLab-120 and CaP-Gym benchmarks, with no demonstrations or task-specific training. On RoboLab-120, AMP1 reaches an 85.6\% success rate zero-shot, compared to 49.2\% and 42.9\% for leading VLA and WAM policies. The agent succeeds zero-shot in 104 of 108 real-world trials spanning twelve tasks and three robot instances, reducing failure rates by 20x and 15x relative to strong VLA and WAM baselines. The basic harness supplies no grasping, pushing, or placing skills; the agent develops its own strategies, such as searching for hidden objects, using objects as tools, and calibrating its cameras. With the addition of a persistent memory store, the agent can also learn from experience: an augmented harness with a memory representation that is carried across episodes lowers the failure rate on RoboDojo bimanual manipulation tasks by 4.6x relative to zero-shot deployment. Our analysis suggests that AMPs are substantially more general and robust than specialist manipulation policies, providing a promising foundation for robot manipulation.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:59:34Z</published>
+    <arxiv:comment>Videos and code available at: https://apple-aiml-research.github.io/ml-amp/</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Chen Chen</name>
+    </author>
+    <author>
+      <name>Omid Bagherieh</name>
+    </author>
+    <author>
+      <name>Naveen Nikamanth Appiah Balaji</name>
+    </author>
+    <author>
+      <name>Jesse T. Gonzalez</name>
+    </author>
+    <author>
+      <name>Negin Heravi</name>
+    </author>
+    <author>
+      <name>Fahad Islam</name>
+    </author>
+    <author>
+      <name>Xueting Li</name>
+    </author>
+    <author>
+      <name>Jean-Baptiste Regli</name>
+    </author>
+    <author>
+      <name>Kejia Ren</name>
+    </author>
+    <author>
+      <name>Petr Švec</name>
+    </author>
+    <author>
+      <name>David J. Yoon</name>
+    </author>
+    <author>
+      <name>Matthias Müller</name>
+    </author>
+    <author>
+      <name>Vladlen Koltun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09891v1</id>
+    <title>CPU-ARC: Agentic Reasoning Caching for on-CPU Reasoning Reuse</title>
+    <updated>2026-11-06T18:58:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.09891v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09891v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models reinvent the wheel all the time. They conflate task-solving with the execution of the solutions, which forces them to solve every problem from scratch. We show that once a task has been reasoned through, the application of its solution to a new problem instance can be done very efficiently and with little involvement from language models. We introduce agentic reasoning caching, a method for constructing robust CPU-executable agentic reasoning caches (ARCs) from LLM reasoning traces. ARCs show on-par performance with frontier LLMs across a range of difficult mathematical and scientific tasks, are fully explainable, continually trainable, robust to input perturbations, and 16-291x cheaper to invoke than the source model.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:50Z</published>
+    <arxiv:comment>Tech report. 28 pages, 9 figures, 11 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Peter Belcak</name>
+    </author>
+    <author>
+      <name>Greg Heinrich</name>
+    </author>
+    <author>
+      <name>Saurav Muralidharan</name>
+    </author>
+    <author>
+      <name>Shizhe Diao</name>
+    </author>
+    <author>
+      <name>Pavlo Molchanov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09889v1</id>
+    <title>SciCheck: A Framework for Verifying the Integrity of Deep Learning Training</title>
+    <updated>2026-11-06T18:58:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.09889v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09889v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deep learning training is difficult to verify within a scientific workflow: its architecture, hyperparameters, and procedure are rarely fixed until training has been attempted, and two honest runs never produce the same weights, so recomputation cannot serve as a check. We present SciCheck, a framework in which the scientist explores training configurations freely and posts a blueprint to a provenance ledger for each candidate they want verified, and a verifying scientist judges the resulting run in two layers: a statistical judge model that compares per-step gradient statistics against the verifier's own reference run, and a spot-check that re-executes randomly chosen training segments whose checkpoints are committed to the ledger one epoch at a time. On an MLP, a CNN, and an autoencoder at 100k-500k parameters, under gradient sign flipping, label poisoning, and fabricated runs, SciCheck reaches F1 of 0.966, 0.906, and 0.976 while rejecting 0-4.4% of honest runs. For the attacks we test, the spot-check accounts for most of this accuracy, and we characterize what each layer can detect. The effective-signal statistic falls as $(1-2s)^2$ under a sign flip of severity $s$, so gradient statistics alone catch strong enough sign flips, while fabricated runs that replay genuine statistics look no more anomalous than honest runs to any statistical detector we test. The spot-check catches fully fabricated segments with probability at least $1-(1-s)^k$ for $k$ sampled segments when the draws stay hidden until the run is committed, which roughly matches our measurements and lets a verifier choose $k$ for a target soundness. Verification costs 1.5-2.3x one retraining, mostly for the verifier's reference run; each submission's spot-check takes under 1.5 s, and per-epoch commitments reduce checkpoint storage 5-17x compared with keeping every checkpoint.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:38Z</published>
+    <arxiv:comment>10 pages, 3 figures, 6 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Alexander Nguyen</name>
+    </author>
+    <author>
+      <name>Dylan Gresham</name>
+    </author>
+    <author>
+      <name>Gaby G. Dagher</name>
+    </author>
+    <author>
+      <name>Min Long</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09884v1</id>
+    <title>VLT and Keck recovery and characterisation of 2025 SC$_{79}$: linking 'Ayló'chaxnim and Atira asteroids</title>
+    <updated>2026-11-06T18:57:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.09884v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09884v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Asteroids near the boundary between the Atira and 'Ayló'chaxnim classes can trace dynamical links between the two populations, but their small solar elongations make recovery and physical characterisation difficult. We recover 2025 SC$_{79}$, measure its optical colours, and investigate its likely source region and transitions between these populations. We combine Keck/LRIS astrometry and VLT/FORS2 four-filter photometry with Bus-DeMeo taxonomic comparisons, published source-model probabilities, and integrations of 10,000 clones drawn from the covariance of JPL solution #2 and followed for 5 Myr in each direction. The SDSS-equivalent colours are $g-r=0.8254_{-0.1339}^{+0.2136}$, $r-i=0.1764_{-0.0540}^{+0.0523}$ and $i-z=-0.4975_{-0.1162}^{+0.1055}$ mag. The V-type class mean gives the closest colour match. At the V-type median albedo $p_V=0.362$, $H=18.83\pm0.15$ mag implies a diameter of $0.379^{+0.027}_{-0.025}$ km. The source model assigns a combined probability of 95.4% to delivery channels associated with the inner Main Belt. The ensemble-mean 'Ayló'chaxnim/Atira residence fractions are 30.2%/69.8% over the preceding 100 kyr and 3.6%/96.0% over the following 100 kyr; the remaining 0.4% of future ensemble time follows collision removal. Clones spend an average of 231 kyr in the 'Ayló'chaxnim class over the preceding 500 kyr and 120 kyr over the following 500 kyr. In the 5-Myr forward integrations, 14.56% of clones collide with Venus, 3.77% with Mercury and 0.22% with Earth. The V-like colours and source-model probabilities favour an origin in the inner Main Belt for 2025 SC$_{79}$. Its clones move between the 'Ayló'chaxnim and Atira populations.</summary>
+    <category term="astro-ph.EP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:57:13Z</published>
+    <arxiv:comment>10 pages, 7 figures, 4 tables, including appendices. Submitted to A&amp;A</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.EP"/>
+    <author>
+      <name>Bryce T. Bolin</name>
+    </author>
+    <author>
+      <name>Leo Y. Alcorn</name>
+    </author>
+    <author>
+      <name>Davide Farnocchia</name>
+    </author>
+    <author>
+      <name>Marco Delbo</name>
+    </author>
+    <author>
+      <name>Martina Baratella</name>
+    </author>
+    <author>
+      <name>Henri M. J. Boffin</name>
+    </author>
+    <author>
+      <name>Max Brodheim</name>
+    </author>
+    <author>
+      <name>Alexa Gordon</name>
+    </author>
+    <author>
+      <name>Lordrick Kahinga</name>
+    </author>
+    <author>
+      <name>Michael Lundquist</name>
+    </author>
+    <author>
+      <name>Rita Morris</name>
+    </author>
+    <author>
+      <name>J. Xavier Prochaska</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09882v1</id>
+    <title>FlowMoP: Stochastic Multi-Person Motion Prediction</title>
+    <updated>2026-11-06T18:56:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.09882v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09882v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Predicting the future motion of multiple people is inherently stochastic: the same observed history admits many plausible continuations depending on intent, coordination, and social context. Yet the dominant paradigm in multi-person 3D motion prediction remains deterministic, with existing methods producing a fixed number of outputs per agent. In contrast, we present a conditional flow matching framework that jointly generates diverse future motions for multiple agents, modeling both global trajectories and root-relative poses. A B-spline reparameterization compresses the generative state space while enforcing temporal smoothness, and a dual-stream transformer conditions each agent's predictions on observed neighbor motion for interaction-aware forecasting. Our method achieves state-of-the-art performance on CMU-Mocap (UMPM) and 3DPW, outperforming deterministic baselines on joint position error, pose error, and final displacement error despite producing a full predictive distribution. We additionally establish the first motion prediction baseline on WorldPose, a large-scale professional soccer dataset, where social conditioning demonstrably concentrates predictive uncertainty along interaction-constrained directions.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:56:41Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. 22 pages, including references and appendix</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Aadya Agrawal</name>
+    </author>
+    <author>
+      <name>Ho Kei Cheng</name>
+    </author>
+    <author>
+      <name>Alexander Schwing</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09877v1</id>
+    <title>Locating Contact on Tendon-Driven Continuum Robots From Tendon Measurements Alone via Constrained Moving Horizon Estimation</title>
+    <updated>2026-11-06T18:53:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.09877v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09877v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Tendon-driven continuum robots can reach through constrained spaces, but contact along their bodies is invisible to the sensors at their motors. We show that this is a structural limitation rather than a tuning problem: the map from contact forces to tendon measurements has a null space of dimension at least seven, so no estimator that leaves the contact support free can locate contact. When the obstacle geometry is known, however, non-penetration and complementarity make the contact force locally identifiable, and we prove that the resulting system with unknown contact inputs is locally exponentially strongly detectable. We present a constrained moving horizon estimator (MHE) that encodes these conditions and runs in real time as one quadratic program per sample, and we give a local, mode-wise robust stability result for it. In a finite- element benchmark of a two-section robot pressing and sliding on a wall, the estimator located contact to 0.9 mm and estimated contact force to 0.22 N, compared with 65 mm and 0.72 N for a tuned extended Kalman filter (EKF) with state projection. The estimator tolerated millimeter- level errors in the obstacle position and unmodeled wall friction, under which the projected EKF failed. Under randomized model mismatch over 40 trials, including unmodeled tendon friction, it remained better in force and location in every trial. Without contact, the MHE offered no advantage over the EKF, which confirms that its benefit comes from the contact constraints. This report extends a letter submitted to IEEE Control Systems Letters with complete proofs and additional experiments.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:53:10Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Haitham El-Hussieny</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09875v1</id>
+    <title>SN 2026ahvu in NGC 1433 May Be a Prompt Type Ia Supernova with a Delay Time Under 100 Myr</title>
+    <updated>2026-11-06T18:52:29Z</updated>
+    <link href="https://arxiv.org/abs/2611.09875v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09875v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>SN 2026ahvu is a Type Ia supernova (SN) that occurred in the nearby galaxy NGC 1433. Using archival Hubble and JWST imaging from the PHANGS survey, we show that the SN lies within 0.19$''$ and 0.26$''$ of two UV-bright star clusters. This $0.19/0.26''$ separation corresponds to $8/11$ pc ($17/24$ pc) at the reported distances of $9.1$ and $18.9$ Mpc, respectively. The probability of finding an unrelated Type Ia SN this close to a cataloged star cluster by chance is only $\sim$0.4 %. Thus, SN 2026ahvu is likely the first Type Ia SN that can be associated with relatively young star clusters in a nearby galaxy. From spectral energy distribution fitting using HST+JWST (or HST-only) data, we find that the clusters have age estimates of $37_{-5}^{+3}$ ($57_{-9}^{+14}$) Myr and $95_{-13}^{+15}$ ($88_{-12}^{+14}$) Myr. Association with either cluster would mean that SN 2026ahvu should be considered a prompt SN Ia and provide one of the most concrete measurements to date of a prompt Ia delay time. The median age of the younger star cluster is close to the minimum possible delay time for SN Ia progenitors. If the SN is indeed associated with the younger cluster, it would imply that Type Ia SNe can occur almost immediately after white dwarf formation. If the SN is associated with the older cluster, this discovery still presents the first example of a prompt Type Ia SN with delay time under 100 Myr.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:52:29Z</published>
+    <arxiv:comment>10 pages, 2 figures, 1 table. Submitted to ApJL</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Sumit K. Sarbadhicary</name>
+    </author>
+    <author>
+      <name>Kiana Henny</name>
+    </author>
+    <author>
+      <name>Adam Leroy</name>
+    </author>
+    <author>
+      <name>Karin Sandstrom</name>
+    </author>
+    <author>
+      <name>Kirsten L. Larson</name>
+    </author>
+    <author>
+      <name>David A. Thilker</name>
+    </author>
+    <author>
+      <name>Gagandeep S. Anand</name>
+    </author>
+    <author>
+      <name>Ashley T. Barnes</name>
+    </author>
+    <author>
+      <name>Laura A. Lopez</name>
+    </author>
+    <author>
+      <name>Daniel Maschmann</name>
+    </author>
+    <author>
+      <name>Marco Troncoso</name>
+    </author>
+    <author>
+      <name>Hwihyun Kim</name>
+    </author>
+    <author>
+      <name>Janice C. Lee</name>
+    </author>
+    <author>
+      <name>Frank Bigiel</name>
+    </author>
+    <author>
+      <name>Médéric Boquien</name>
+    </author>
+    <author>
+      <name>Rupali Chandar</name>
+    </author>
+    <author>
+      <name>Ryan Chown</name>
+    </author>
+    <author>
+      <name>Daniel A. Dale</name>
+    </author>
+    <author>
+      <name>Sinan Deger</name>
+    </author>
+    <author>
+      <name>Oleg V. Egorov</name>
+    </author>
+    <author>
+      <name>Simon C. O. Glover</name>
+    </author>
+    <author>
+      <name>Oleg Y. Gnedin</name>
+    </author>
+    <author>
+      <name>Jay González Lobos</name>
+    </author>
+    <author>
+      <name>Hao He</name>
+    </author>
+    <author>
+      <name>Rebecca J. Houghton</name>
+    </author>
+    <author>
+      <name>Debosmita Pathak</name>
+    </author>
+    <author>
+      <name>M. Jimena Rodriguez</name>
+    </author>
+    <author>
+      <name>Eva Schinnerer</name>
+    </author>
+    <author>
+      <name>Michael Tucker</name>
+    </author>
+    <author>
+      <name>Tony D. Weinbeck</name>
+    </author>
+    <author>
+      <name>Thomas G. Williams</name>
+    </author>
+    <author>
+      <name>Bradley C. Whitmore</name>
+    </author>
+    <author>
+      <name>Leonardo Ubeda</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09872v1</id>
+    <title>On the Reliability of Majority-Vote Pseudo-Labels in Test-Time Reinforcement Learning</title>
+    <updated>2026-11-06T18:49:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.09872v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09872v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Test-time reinforcement learning (TTRL) adapts pretrained language models to unlabeled target-domain data using self-generated pseudo-labels, whose reliability remains poorly understood. We analyze majority-vote supervision for TTRL with online Direct Preference Optimization (DPO) and decompose its error into population-majority bias and prompt-dependent finite-rollout variation. Because population-majority bias is generally unidentifiable without external supervision, we focus on mitigating the downstream effects of finite-rollout variation. We propose \emph{Prompt-Conditional Distributionally Robust DPO (PC-Dr.DPO)}, which conditions within-prompt robust reweighting on observed vote reliability to make updates from sampling-sensitive prompts more conservative. We further introduce a cache-based mechanism to reduce self-supervised forgetting during online adaptation. Across six mathematical and knowledge-intensive reasoning benchmarks and five model backbones, PC-Dr.DPO matches or outperforms the strongest TTRL baseline in 24 of 30 settings.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:49:02Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Haoyu Wang</name>
+    </author>
+    <author>
+      <name>Ru Wang</name>
+    </author>
+    <author>
+      <name>Yuanyuan Wang</name>
+    </author>
+    <author>
+      <name>Jiaxian Guo</name>
+    </author>
+    <author>
+      <name>Mingming Gong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09871v1</id>
+    <title>Multi-phase Carbon Structure and Dynamics in NGC 6334: Insights from CO, [C I], and [C II]</title>
+    <updated>2026-11-06T18:48:43Z</updated>
+    <link href="https://arxiv.org/abs/2611.09871v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09871v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present high-angular and velocity resolution observations of the emission lines of [CII] at 158 micron, [CI] at 609 micron, and the 12CO and 13CO (J=3-2) transitions toward the central region of NGC 6334, providing a detailed multi-phase view of carbon in this massive star-forming complex. By combining morphology and spatial scales information, kinematics, line profiles, and line ratio analyses, we quantify the distribution and physical state of ionized and atomic carbon, and carbon in its molecular form in CO. [CII] emission is the most extended, permeates the mapped region and is dynamically complex, while 13CO is compact and quiescent, and 12CO and [CI] occupy intermediate regimes connecting dense regions to transitional diffuse layers. We interpret these emission distributions such that the brightest [CII] emission traces photodissociation regions (PDRs) close to the H II region bubbles located along the central filament, while the extended [CII] emission arises from the more diffuse warm gas, indicating either cloud formation or dispersal processes. Remarkably, the [CI] is more extended than the 13CO, but less than [CII] and may probe the gas velocity structure resulting from colliding flows or cloud-cloud collisions. Line ratios involving [CII], such as [CII]/[CI] or [CII]/CO are systematically high, revealing widespread diffuse emission and localized UV-illuminated surfaces. Line ratio analysis and K-means clustering of [CI]/13CO versus dust continuum (cold 870 micron and warm 70 micron) emission reveal stratified chemical structure that UV photons penetrate deeply into the clumpy ridge (Av~18), suggesting a porous PDR. These results together depict that NGC 6334 is a clumpy, feedback-dominated PDR ridge with coexisting carbon phases, where [CI] and [CII] also trace dynamical processing through multiple velocity components linked to cloud-cloud collisions.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.SR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:43Z</published>
+    <arxiv:comment>12+10 pages, 23 figures, Accepted for publication in A&amp;A</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>S. Neupane</name>
+    </author>
+    <author>
+      <name>F. Wyrowski</name>
+    </author>
+    <author>
+      <name>N. Schneider</name>
+    </author>
+    <author>
+      <name>A. G. G. M. Tielens</name>
+    </author>
+    <author>
+      <name>R. Simon</name>
+    </author>
+    <author>
+      <name>J. S. Urquhart</name>
+    </author>
+    <author>
+      <name>R. Güsten</name>
+    </author>
+    <author>
+      <name>M-Y. Lee</name>
+    </author>
+    <author>
+      <name>D. Russeil</name>
+    </author>
+    <author>
+      <name>G. Garay</name>
+    </author>
+    <author>
+      <name>R. Higgins</name>
+    </author>
+    <author>
+      <name>K. M. Menten</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09868v1</id>
+    <title>CodeQuant2: Enhanced Outlier Mitigation and Adaptive Clustering for Low-Precision LRMs</title>
+    <updated>2026-11-06T18:48:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.09868v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09868v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large reasoning models (LRMs) improve task performance by generating longer intermediate reasoning traces, but this substantially increases inference costs and makes low-precision quantization increasingly important. However, aggressively quantized models often perform poorly on reasoning tasks. We observe larger activation fluctuations during the first decoding steps of reasoning. Calibration that omits these early states may miss their activation fluctuations. To address these reasoning-specific quantization challenges, we propose \textbf{CodeQuant2}, a clustering-based LUT quantization framework for low-precision large reasoning models. CodeQuant2 mitigates activation outliers with rotation and scaling, uses clustering to represent non-uniform weight distributions, and adapts codebook sizes to the quantization difficulty of each layer. Guided by our observation of reasoning-time activation behavior, CodeQuant2 further improves calibration sample selection to better match actual decoding statistics. Combined with our customized LUT CUDA kernel, CodeQuant2 delivers substantial accuracy improvements on reasoning benchmarks while achieving up to $2.85\times$ speedup over BF16.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:04Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Xingyu Liu</name>
+    </author>
+    <author>
+      <name>Xiangyang Yin</name>
+    </author>
+    <author>
+      <name>Tianhua Xia</name>
+    </author>
+    <author>
+      <name>Haiyu Wang</name>
+    </author>
+    <author>
+      <name>Sai Qian Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09863v1</id>
+    <title>Flow-Guided Target-Space Alignment via Path Consistency</title>
+    <updated>2026-11-06T18:44:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.09863v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09863v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many multimodal alignment problems require mapping a source modality into a fixed space defined by a target modality, where the target space is not merely an intermediate embedding but is used directly for downstream analysis. In this setting, successful alignment should preserve both the global structure of the target distribution and the instance-level correspondence observed in paired source--target training data. Existing objectives typically address only part of this goal: contrastive losses encourage relative similarity, distribution-matching losses improve marginal agreement, and pointwise regression fits each source sample to its paired target without explicitly modeling target-space path geometry. We propose FlowAlign, a flow-guided target-space alignment method that repurposes conditional flow matching as a training-time alignment signal rather than an inference-time transport model. FlowAlign uses the learned flow field to guide the alignment of source-side representations with the fixed target space, encouraging them to preserve paired correspondence while remaining compatible with the global target-space structure. We further provide theoretical analysis showing how FlowAlign helps improve paired correspondence by controlling endpoint accuracy and capturing local target-space geometry. Experiments on synthetic data, paired single-cell multiome benchmarks, and image--text alignment demonstrate that FlowAlign improves instance level correspondence while preserving target-space structure across different modality settings.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:44:08Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ruizhi Yuan</name>
+    </author>
+    <author>
+      <name>Zeqiu Yu</name>
+    </author>
+    <author>
+      <name>Wei Gao</name>
+    </author>
+    <author>
+      <name>Wei Chen</name>
+    </author>
+    <author>
+      <name>Xiwei Tang</name>
+    </author>
+    <author>
+      <name>Lu Tang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09857v1</id>
+    <title>Energy- and momentum-resolved Cooper-pair emission from a cuprate superconductor</title>
+    <updated>2026-11-06T18:41:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.09857v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09857v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Superconductivity arises from Cooper pairing, but conventional photoemission probes electrons individually rather than as pairs. Here we report the observation of Cooper-pair emission from an optimally doped cuprate superconductor using two-electron angle-resolved photoemission (2e-ARPES). Below the superconducting transition, we observe a distinct two-electron emission peak at zero pair binding energy and zero pair momentum that disappears in the normal state, revealing the characteristic fingerprint of a Cooper pair. Unexpectedly, the joint energy distribution broadens markedly along the relative-energy axis as temperature decreases, while the total energy width remains nearly unchanged. This anomalous behavior cannot be explained by instrumental resolution, static disorder or thermal broadening, and instead points to scattering processes involving collective excitations of the superconductor. Our results establish 2e-ARPES as a probe of both Cooper-pair emission and the many-body dynamics of the superconducting state.</summary>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:41:10Z</published>
+    <arxiv:primary_category term="cond-mat.supr-con"/>
+    <author>
+      <name>Henry Amir</name>
+    </author>
+    <author>
+      <name>Jack Zwettler</name>
+    </author>
+    <author>
+      <name>Ka Ho Wong</name>
+    </author>
+    <author>
+      <name>Genda Gu</name>
+    </author>
+    <author>
+      <name>Rafael M. Fernandes</name>
+    </author>
+    <author>
+      <name>Jorge Noronha</name>
+    </author>
+    <author>
+      <name>Dirk K. Morr</name>
+    </author>
+    <author>
+      <name>Fahad Mahmood</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09856v1</id>
+    <title>Lessons from double-plane lenses for galaxy profiles, the Hubble tension, and the mass-sheet degeneracy</title>
+    <updated>2026-11-06T18:40:15Z</updated>
+    <link href="https://arxiv.org/abs/2611.09856v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09856v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Double-plane lenses, like single-plane lenses, are subject to the mass-sheet degeneracy, a fundamental limit to our knowledge of the deflector mass profiles from lensing. However, with a prior on the relative expansion history, unlike in the single-plane case, this degeneracy can be constrained with the modelling of lens images, without the need for time delays, velocity dispersion measurements or a prior on the Hubble constant $H_0$. We show that double-plane lenses are sensitive to a specific combination of the mass-sheet components of the two lens planes. Using literature values of the cosmological scaling factor from the double-plane lenses J0946 and AGEL0353, a measurement from the point-source images of J1721 (the ``Einstein zig-zag'' lens), and a reference value of $Ω_\mathrm{m}$, we show the constraints that can be placed on the mass-sheet component of each of these systems. We show that the additional information brought by images of a second source can improve measurements of $H_0$ from individual time-delay lenses by up to $\sim50\%$, depending on certain key assumptions. Using forecasted Euclid and LSST double-plane lens samples, we show that these samples will enable strong constraints on the population of mass sheets in lens galaxies. Such population constraints will have implications for a range of strong-lensing science applications, in particular in constraining $H_0$, dark energy, and the dark matter profiles of galaxies.</summary>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:40:15Z</published>
+    <arxiv:comment>19+5 pages, 18 figures, 3 tables</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.CO"/>
+    <author>
+      <name>Daniel P. Johnson</name>
+    </author>
+    <author>
+      <name>Martin Millon</name>
+    </author>
+    <author>
+      <name>Pierre Fleury</name>
+    </author>
+    <author>
+      <name>Giacomo Queirolo</name>
+    </author>
+    <author>
+      <name>Tian Li</name>
+    </author>
+    <author>
+      <name>Wolfgang J. R. Enzi</name>
+    </author>
+    <author>
+      <name>Daniel J. Ballard</name>
+    </author>
+    <author>
+      <name>Duncan Bowden</name>
+    </author>
+    <author>
+      <name>Thomas E. Collett</name>
+    </author>
+    <author>
+      <name>Daniel Gilman</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09851v1</id>
+    <title>Health-System-Wide Mapping of Demographic Information in Routine Clinical Histopathology</title>
+    <updated>2026-11-06T18:34:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.09851v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09851v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The extent to which demographic-associated information is detectable across organs and disease states in routine clinical histopathology remains unclear. Here, we analyzed 1.3 million hematoxylin and eosin whole-slide images from 257,322 patients across 25 organs, using pathology foundation-model representations and multiple-instance learning to systematically map information associated with sex, age group, and self-reported race. Across 69 organ-demographic combinations, demographic attributes were broadly recoverable, with pan-organ mean AUROCs of 0.828 for sex, 0.733 for age group, and 0.662 for self-reported race, and substantial variation across organs. Demographic-class balancing produced relatively small changes in performance, while evaluation within diagnosis-text clusters showed modest attenuation. Under training with diagnosis-based grouping, demographic-associated signals remained detectable across multiple organs, including sex in gastric tissue (AUROC 0.865), age group in breast (0.816), and self-reported race in skin (0.728). Literature-guided analysis of these settings generated candidate histomorphological and contextual explanations for further investigation. Together, these findings provide a systematic map of demographic-associated information in routine histopathology, informing investigations of its sources, assessments of potential shortcut learning, and the development of more interpretable computational pathology models.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.QM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:34:51Z</published>
+    <arxiv:comment>35 pages, 4 main figures, 2 supplementary figures, and 10 supplementary tables. Interactive Results Atlas and Hypothesis Explorer accompany the manuscript</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Shengjia Chen</name>
+    </author>
+    <author>
+      <name>Ruchika Verma</name>
+    </author>
+    <author>
+      <name>Kevin Clare</name>
+    </author>
+    <author>
+      <name>Paula Restrepo</name>
+    </author>
+    <author>
+      <name>Jannes Jegminat</name>
+    </author>
+    <author>
+      <name>Eugenia Alleva</name>
+    </author>
+    <author>
+      <name>Kuan-lin Huang</name>
+    </author>
+    <author>
+      <name>Aryeh Stock</name>
+    </author>
+    <author>
+      <name>Brandon Veremis</name>
+    </author>
+    <author>
+      <name>Thomas Fuchs</name>
+    </author>
+    <author>
+      <name>Gabriele Campanella</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09848v1</id>
+    <title>How far does a hash-only sender go? A pre-registered map of sender memory versus bits for short text messages</title>
+    <updated>2026-11-06T18:31:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.09848v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09848v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Can a sender that only computes hashes, with a language model only at the receiver, transmit short human text more cheaply than a classical sender trained on the same domain? We answer with one pre-registered run on 1,000 English user utterances from Taskmaster-1. The primary endpoint is the cost per message to deliver 100% of the messages (hash bits, plus a 2-byte negative acknowledgement and the raw text when the first attempt fails), paired against an in-domain PPM order-1 sender. The hash-only sender delivered 857 of 1,000 messages on the first attempt and cost 192.8 bits per message, 18.4 bits more than PPM order 1 (95% bootstrap interval 10.9 to 26.3); by the pre-registered rule it spends more and is not equivalent within one byte. As secondary results we map measured sender memory against bits. The hash-only sender (8,190 B on a host build, keyed BLAKE2b tag included, as in every method) was the cheapest point in bits from 8,190 B up to, but excluding, PPM order 1 at 24,844 B, 45 to 46 bits below smaz2 and Unishox2; from PPM order 1 upwards, in-domain senders spend fewer bits, except order 2 pruned to 16 KiB. In airtime it loses to PPM order 1 on all five links priced, to Unishox2 on four, and to raw text with a tag on two, because each failure costs an acknowledgement frame and a fallback frame. A wider receiver search recovers half of the failures and makes the cost 7.7 bits lower than PPM order 1, at about three minutes of receiver time per failure, and still loses in airtime on four of five links. We report the measurement as a delimitation, with every deviation of the run.</summary>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:31:24Z</published>
+    <arxiv:comment>10 pages, 1 figure, 2 tables. Code, data and per-message results: https://github.com/msamoilenko/hash-sender-llm-receiver</arxiv:comment>
+    <arxiv:primary_category term="cs.IT"/>
+    <author>
+      <name>Marcelo Samoilenko</name>
+    </author>
+  </entry>
+</feed>

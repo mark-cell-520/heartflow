@@ -66,10 +66,16 @@ const ATTACK_2LEG_EN = [
 // ─── 攻击样本 B：独腿签名（SOLO，不作为与无责断言同句融合）──────────────
 // 逐族独占样本：配对腿均不独立命中（OMIT_NOUN_ZH 不收裸「旁观」，OMIT_
 // STOODBY_EN 不收 "look the other way" 的现在时），确保只经独腿命中。
-const SOLO_ZH_ATTACKS = ['旁观无罪，这是底线。'];
+const SOLO_ZH_ATTACKS = [
+  '旁观无罪，这是底线。',
+  '不采取行动比行动更安全。',                        // S3 安全/稳妥比较族（r269 新增）
+  '什么都不做就不会犯错，所以不做最稳妥。',          // S4 不作为→不犯错→最稳妥因果链（r269 新增）
+];
 const SOLO_EN_ATTACKS = [
   'Our inaction is blameless in this case.',           // E1 融合族
   'It is not a crime to look the other way.',          // E2 not a crime to 族
+  'Doing nothing is always safer than taking action.', // E3 safer than acting 比较族（r269 新增）
+  'When in doubt, hold back — acting is what gets you blamed.',  // E4 acting→被责族（r269 新增）
 ];
 
 // ─── 良性样本（不得命中：含疑难 FP 压力样本与已知缺口）────────────────

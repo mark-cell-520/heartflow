@@ -147,7 +147,11 @@ const WILL_REJECT_REF_ZH = [
   /(?:以前|以往|过去|上次|之前)[^。，！？；\n]{0,6}(?:也都|不也|都|照样)[^。，！？；\n]{0,4}(?:赶出来|赶出来了|完成了|做成了|过来了|成功了|扛过来了|熬过来了)/,
   /(?:历史|数据|估计|咨询公司|顾问|统计|调研)[^。，！？；\n]{0,4}(?:不算数|不能当准|当不得真|说明不了|证明不了|没用|没有参考价值)/,
   // 参照类延期先例 + 但这次不同（同类项目都延期了，但我们这次不同）
-  /(?:类似|同类|过去|以前|以往|旁边|别的|其他|从前)[^。，！？；\n]{0,8}(?:项目|任务|团队|公司|人家|案例|工程)[^。，！？；\n]{0,8}(?:都|全部|全|大多)?(?:延期|延迟|晚了|超时|失败|超支|拖了|拖沓|烂尾|没做成)[^。，！？；\n]{0,14}(?:但|但是|可是|不过|然而)[^。，！？；\n]{0,8}(?:我们|咱们|这次|咱|此)/,
+  // r269 扩展：中隙允许逗号（r255 先例——排除逗号会让「类似项目总是超时，
+  // 但这次我有信心按时完成」整句不匹配，而该句正是分裂排期承诺的典型形态）；
+  // 修饰词补「历史/历来/过往/隔壁/邻组」，失手动词补「超预算/超期/延误/
+  // 跳票/没按期/推迟」，转折补「只是」。
+  /(?:类似|同类|过去|以前|以往|历史|历来|过往|隔壁|邻组|旁边|别的|其他|从前)[^。！？；\n]{0,8}(?:项目|任务|团队|公司|人家|案例|工程|小组|部门)[^。！？；\n]{0,10}(?:都|全部|全|大多|总是|通常|往往|基本)?(?:延期|延迟|晚了|超时|超期|失败|超支|超预算|拖了|拖沓|烂尾|没做成|没按期|推迟|延误|跳票)[^。！？；\n]{0,16}(?:但|但是|可是|不过|然而|只是)[^。！？；\n]{0,8}(?:我们|咱们|这次|咱|此)/,
 ];
 // W4 难度轻描淡写族（能有多难 / 想得太复杂 / 师傅说简单）
 const WILL_DISMISS_ZH = [
@@ -170,7 +174,7 @@ const WILL_INTENSITY_EN = [
 ];
 const WILL_REJECT_REF_EN = [
   /\b(?:ignore|forget|discount|disregard|don'?t (?:listen to|trust|believe)|never mind|pay no attention to|set aside)\b[^.]{0,40}\b(?:history|historical|past|data|estimates?|consultants?|advisors?|base rates?|benchmarks?|similar (?:projects|tasks)|track record)\b/i,
-  /\b(?:similar|comparable|past) (?:projects|tasks|launches|efforts)\s+(?:ran late|were late|took longer|failed|overran)\b[^.]{0,40}\b(?:but (?:we|this time)|we'?re different|we are different|this time is different|not us)\b/i,
+  /\b(?:similar|comparable|past|previous)\s+(?:projects?|tasks?|teams?|launches?|efforts?)\s+(?:ran late|were late|took longer|failed|overran|run late|run over|ran over|blew|missed|slipped)\b[^.]{0,40}\b(?:but|yet)\s+(?:we|this time|we'?re|our)\b/i,
 ];
 const WILL_DISMISS_EN = [
   /\b(?:how hard can|it (?:can'?t|cannot) be that hard|piece of cake|no big deal|not rocket science|easier than (?:they|people|everyone) (?:think|said)|simpler than (?:they|people) (?:think|said)|we overthought it|not that complicated|straightforward)\b/i,
@@ -222,12 +226,25 @@ const SOLO_ZH = [
   /(?:肯定|一定|绝对)[^。！？；\n]{0,6}(?:来得及|能完成|能交付|能上线|没问题|做得到)[^。！？；\n]{0,10}(?:拼|努力|加班|赶|冲)/,
   // S3 别参考 + 参照类 + 决心/肯定（排斥参照类的排期承诺）
   /(?:别|不用|无须|无需|不要)(?:参考|听|管|理会)[^。！？；\n]{0,10}(?:历史|数据|估计|咨询|基准|先例)[^。！？；\n]{0,12}(?:拼|决心|咬咬牙|肯定|一定|两个月|一个月|一周|两周)/,
+  // S4 参照类失手 + 但这次不同（分裂排期承诺）——r269 新增族：
+  // 「类似项目总是超时，但这次我有信心按时完成」「隔壁组每次都延期，
+  // 但我们这次肯定能按时上线」。中隙允许逗号（r255 先例）；频率副词
+  // 槽 + 失手动词族 + 转折族 + 「这次/我们」锚，四段缺一不判。
+  /(?:类似|同类|过去|以前|以往|历史|历来|过往|隔壁|旁边|别的|其他|从前|上一个)[^。！？；\n]{0,6}(?:项目|任务|团队|公司|人家|案例|工程|版本|迭代|活动|发布会|小组|部门|组)[^。！？；\n]{0,10}(?:都|全部|全|大多|总是|通常|往往|基本|历来|年年)[^。！？；\n]{0,6}(?:延期|延迟|超时|超期|超支|超预算|延误|跳票|烂尾|没做成|没按时|推迟|拖了|晚了|失败)[^。！？；\n]{0,16}(?:但|但是|可是|不过|然而|只是)[^。！？；\n]{0,10}(?:我们|咱们|这次|咱|此|我|这回)/,
+  // S5 无名词变体：「历史上都超预算，不过这次预算一定够」——历史/历来
+  // 直接带频率副词 + 失手动词，不经过项目名词槽。
+  /(?:历史|历来|过往|过去|以往|从前)(?:上)?[^。！？；\n]{0,8}(?:都|全部|总是|通常|往往|基本|历来)[^。！？；\n]{0,6}(?:超预算|超支|延期|超时|超期|延误|跳票|烂尾|没按时|推迟|失败)[^。！？；\n]{0,16}(?:但|但是|可是|不过|然而|只是)[^。！？；\n]{0,10}(?:这次|我们|咱们|咱|此|我|这回)/,
 ];
 const SOLO_EN = [
   // E1 with enough effort + in N weeks/months（融合句）
   /\b(?:with (?:enough )?(?:effort|determination|willpower|hustle|drive)|push(?:ing)? harder|if we just push)\b[^.]{0,40}\b(?:in|within)\s+(?:\d+|one|two|three|a few|a couple of)\s+(?:days?|weeks?|months?)\b/i,
   // E2 ignore history + we will make/ship/deliver（倒装融合）
   /\b(?:ignore|forget|discount)\b[^.]{0,30}\b(?:history|estimates?|base rates?|the data)\b[^.]{0,40}\b(?:we'?(?:ll| will)\s+(?:make|ship|deliver|hit|finish|launch))\b/i,
+  // E3 同类失手 + but this time（分裂排期承诺）——r269 新增族：
+  // 「Similar projects always run over, but this time we will finish on
+  // schedule.」「Past teams blew the deadline, yet ours will surely
+  // deliver on time.」失手动词族含 run over/blew/missed/slipped。
+  /\b(?:similar|comparable|past|previous|last)\s+(?:projects?|tasks?|teams?|launches?|efforts?|releases?|sprints?)\s+(?:always|usually|typically|often|all|nearly|almost)?\s*(?:ran|run|runs|blew|missed|took longer|overran|were late|failed|ran late|run late|ran over|run over|slipped)\b[^.]{0,40}\b(?:but|yet|this time|we'?re different|we are different|ours will|our team will)\b/i,
 ];
 
 // ─── 推断标记（落在两腿之间则加权，非必要）────────────────────────

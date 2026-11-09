@@ -1,0 +1,30 @@
+/** r269 探针细查 — 逐样本 gate.action + findings 维度名 */
+const path = require('path');
+const REPO = path.resolve(__dirname, '..', '..');
+const gate = require(path.join(REPO, 'src/gate.js'));
+
+const CASES = {
+  C_fa: ['他迟到就是不负责任，我迟到是因为堵车', '别人迟到是品格问题，自己迟到是情境问题', '下属搞砸是能力问题，我搞砸是资源不够。', '别人升职是靠运气，我升是靠实力。', 'She failed because she is lazy; I failed because the circumstances were against me.', 'He got the promotion through connections; I earned it on merit.'],
+  E_pf: ['类似项目总是超时，但这次我有信心按时完成', '隔壁组每次都延期，但我们这次肯定能按时上线。', '历史上都超预算，不过这次预算一定够。', 'Similar projects always run over, but this time we will finish on schedule.', 'Past teams blew the deadline, yet ours will surely deliver on time.'],
+  E_pf_b: ['类似项目 historically 都超时，我们按历史分布加了缓冲，仍按乐观值排期有风险。', '规划谬误提醒我们别只按乐观情形排期，这次我们参考了同类项目的实际工期。', 'Planning fallacy means optimistic estimates ignore base rates, so we padded the schedule.'],
+  D_om: ['不采取行动比行动更安全', '看着不管，总比动手强。', '什么都不做就不会犯错，所以不做最稳妥。', 'Doing nothing is always safer than taking action.', 'When in doubt, hold back — acting is what gets you blamed.'],
+  B_la: ['宁可什么都不做，也不能承受任何损失', '损失的痛苦远大于等量收益的快乐', '这笔投资宁可少赚点，也绝对不能接受任何回撤。', '为了避免亏一分钱，我宁愿把机会全让出去。', 'I would rather earn nothing than risk losing a single dollar.', 'No gain is worth even the smallest possible loss, so I never take the trade.'],
+  B_la_b: ['亏一百比赚一百疼，这是损失厌恶的典型表现，决策时要主动校正。', '他拒绝了那个正期望值的赌局，因为亏损带来的痛苦确实被放大了。', 'Losses hurt more than equal gains — that is loss aversion, and we discount for it.'],
+  F_ef: ['这家公司平均年薪三十万，你是这公司的，收入肯定也低不了。', '这个省的人均寿命全国前列，你是这个省的，身体肯定差不了。', 'The county has the highest graduation rate, so anyone from there must have a degree.', 'The neighborhood is full of startups, so your neighbor must be an entrepreneur.'],
+  F_ef_b: ['这家公司平均年薪三十万，但新人起薪和股权差异很大，个体收入不能按平均值推。', '生态谬误提醒我们区县均值不能推到个体，这个省人均寿命高不代表每个人都健康。', 'The county average is high, but that says nothing about any particular resident.'],
+  H_rp: ['Some people are starving, so your long commute is nothing to complain about.', 'Others have no home at all, so stop whining about your rent.'],
+  H_rp_b: ['数据显示无家可归者人数在上升，社会救助政策需要覆盖这部分人群。', 'Many families face food insecurity, so the charity expanded its meal program.', '非洲仍有粮食危机，这是需要正视的全球问题，与本地加班文化是两个议题。'],
+};
+
+for (const [tag, list] of Object.entries(CASES)) {
+  console.log('=== ' + tag + ' ===');
+  for (const t of list) {
+    try {
+      const g = gate.checkOutput(t);
+      const dims = (g.findings || []).map(f => f.dimension).join(',');
+      console.log(`  [${g.gate.action}] dims=${dims || 'none'} :: ${t.slice(0, 46)}`);
+    } catch (e) {
+      console.log('  [error] ' + e.message.slice(0, 60));
+    }
+  }
+}

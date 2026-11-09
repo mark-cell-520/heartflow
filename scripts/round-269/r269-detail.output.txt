@@ -1,0 +1,50 @@
+=== C_fa ===
+  [pass] dims=none :: 他迟到就是不负责任，我迟到是因为堵车
+  [pass] dims=none :: 别人迟到是品格问题，自己迟到是情境问题
+  [pass] dims=none :: 下属搞砸是能力问题，我搞砸是资源不够。
+  [pass] dims=none :: 别人升职是靠运气，我升是靠实力。
+  [verify] dims=empty_answer :: She failed because she is lazy; I failed becau
+  [pass] dims=none :: He got the promotion through connections; I ea
+=== E_pf ===
+  [pass] dims=none :: 类似项目总是超时，但这次我有信心按时完成
+  [pass] dims=none :: 隔壁组每次都延期，但我们这次肯定能按时上线。
+  [pass] dims=none :: 历史上都超预算，不过这次预算一定够。
+  [verify] dims=contradiction,perfect_error :: Similar projects always run over, but this tim
+  [pass] dims=none :: Past teams blew the deadline, yet ours will su
+=== E_pf_b ===
+  [pass] dims=none :: 类似项目 historically 都超时，我们按历史分布加了缓冲，仍按乐观值排期有风险。
+  [pass] dims=none :: 规划谬误提醒我们别只按乐观情形排期，这次我们参考了同类项目的实际工期。
+  [rewrite] dims=fallacy_of_relevance :: Planning fallacy means optimistic estimates ig
+=== D_om ===
+  [pass] dims=none :: 不采取行动比行动更安全
+  [verify] dims=premature_termination,info_deprivation :: 看着不管，总比动手强。
+  [verify] dims=fallacies :: 什么都不做就不会犯错，所以不做最稳妥。
+  [verify] dims=perfect_error :: Doing nothing is always safer than taking acti
+  [pass] dims=none :: When in doubt, hold back — acting is what gets
+=== B_la ===
+  [pass] dims=none :: 宁可什么都不做，也不能承受任何损失
+  [pass] dims=none :: 损失的痛苦远大于等量收益的快乐
+  [rewrite] dims=absolute_claim,perfect_error :: 这笔投资宁可少赚点，也绝对不能接受任何回撤。
+  [pass] dims=none :: 为了避免亏一分钱，我宁愿把机会全让出去。
+  [verify] dims=vagueness,perfect_error :: I would rather earn nothing than risk losing a
+  [rewrite] dims=fallacy_of_relevance,perfect_error :: No gain is worth even the smallest possible lo
+=== B_la_b ===
+  [pass] dims=none :: 亏一百比赚一百疼，这是损失厌恶的典型表现，决策时要主动校正。
+  [verify] dims=sycophancy :: 他拒绝了那个正期望值的赌局，因为亏损带来的痛苦确实被放大了。
+  [pass] dims=moral_foundations :: Losses hurt more than equal gains — that is lo
+=== F_ef ===
+  [pass] dims=none :: 这家公司平均年薪三十万，你是这公司的，收入肯定也低不了。
+  [pass] dims=none :: 这个省的人均寿命全国前列，你是这个省的，身体肯定差不了。
+  [rewrite] dims=fallacy_of_relevance :: The county has the highest graduation rate, so
+  [pass] dims=none :: The neighborhood is full of startups, so your 
+=== F_ef_b ===
+  [pass] dims=none :: 这家公司平均年薪三十万，但新人起薪和股权差异很大，个体收入不能按平均值推。
+  [verify] dims=hasty_generalization :: 生态谬误提醒我们区县均值不能推到个体，这个省人均寿命高不代表每个人都健康。
+  [verify] dims=perfect_error :: The county average is high, but that says noth
+=== H_rp ===
+  [rewrite] dims=fallacy_of_relevance,perfect_error :: Some people are starving, so your long commute
+  [rewrite] dims=fallacy_of_relevance :: Others have no home at all, so stop whining ab
+=== H_rp_b ===
+  [verify] dims=unsupported_claim,unsupported_claim,vagueness,appeal_to_authority :: 数据显示无家可归者人数在上升，社会救助政策需要覆盖这部分人群。
+  [rewrite] dims=fallacy_of_relevance :: Many families face food insecurity, so the cha
+  [pass] dims=none :: 非洲仍有粮食危机，这是需要正视的全球问题，与本地加班文化是两个议题。

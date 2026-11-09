@@ -203,12 +203,28 @@ const EXCULP_EN = [EXCUL_NOBLAME_EN, EXCUL_RESP_EN, EXCUL_NOWRONG_EN, EXCUL_ASYM
 const SOLO_ZH = [
   // S1 不作为名词 + 无责/无罪（不作为无责 / 旁观无罪 / 袖手旁观不追责）
   /(?:不作为|旁观|袖手旁观|见死不救|没有动手|什么都没做)[^。！？；\n]{0,6}(?:无责|无罪|无过|无错|不算罪|不追责|不担责)/,
+  // S3 不作为 = 更安全/稳妥族（r269 新增族：「不采取行动比行动更安全」
+  // 「看着不管，总比动手强」——安全/稳妥**比较**断言，而非责任比较；
+  // 既有 EXCUL_ASYMM_ZH 只收「比…轻/小/少」的责罚比较，该族整族穿透）。
+  // 纠正句由 SOLO_SAFER_NEG_ZH 守卫（collectSolo 内查）。
+  /(?:不采取行动|不行动|不动|不做|什么都不做|袖手旁观|旁观|不作为|按兵不动|观望|先观望|看着不管|放任|坐视|先按兵不动|先不动|缓一缓|等一等)[^。！？；\n]{0,10}(?:比|相比|比起|相较)[^。！？；\n]{0,12}(?:行动|作为|动手|插手|干预|介入|出面|做|管|掺和)[^。！？；\n]{0,8}(?:更|最|要|来得|反而|确实|显然)?(?:安全|稳妥|保险|稳|聪明|明智|省事|轻松|强|好|靠谱)/,
+  // S4 不作为 → 不犯错 → 所以最稳妥（因果链断言族，r269 新增）：
+  // 「什么都不做就不会犯错，所以不做最稳妥」——不是比较句而是
+  // 因果链：不作为免除犯错风险，据此推出不作为更优。与 S3 的
+  // 比较断言互补（S3 要求「比」字，因果链没有）。
+  /(?:不采取行动|不行动|不动|不做|什么都不做|袖手旁观|旁观|不作为|按兵不动|观望|先观望|看着不管|放任|坐视|先不动|缓一缓|等一等)[^。！？；\n]{0,10}(?:就不会|就不会|免得|省得|避免|杜绝)[^。！？；\n]{0,8}(?:犯错|出错|担责|背锅|惹麻烦|踩坑|担风险|有风险)[^。！？；\n]{0,14}(?:所以|因此|可见|因而|于是|故而)[^。！？；\n]{0,8}(?:不做|不动|观望|按兵不动|不作为|先看看|等着|缓一缓)[^。！？；\n]{0,6}(?:最|更|才|总)?(?:稳妥|安全|保险|聪明|明智|好|稳)/,
 ];
 const SOLO_EN = [
   // E1 inaction/omission/standing by + is not a crime / blameless
   /\b(?:inaction|omission|standing\s+by|doing\s+nothing)\s+(?:is|are)\s+(?:not\s+a\s+(?:crime|wrong|offense)|blameless|no\s+wrongdoing)\b/i,
   // E2 not a crime to do nothing / stand by（倒装）
   /\b(?:not|never)\s+(?:a\s+)?(?:crime|wrong|offense)\s+to\s+(?:do\s+nothing|stand\s+by|let\s+it\s+happen|look\s+the\s+other\s+way)\b/i,
+  // E3 doing nothing … safer than acting（r269 新增族：「Doing nothing is
+  // always safer than taking action.」安全/稳妥比较断言）。
+  /\b(?:doing nothing|not acting|inaction|hold(?:ing)? back|standing by|staying out of it|holding off|sitting tight|refraining|wait(?:ing)? (?:it out|and see))\b[^.]{0,40}\b(?:safer|more prudent|wiser|better|smarter|the safer choice)\s+than\s+(?:the\s+)?(?:taking\s+|making\s+|any\s+)?(?:action|acting|intervening|stepping in|doing something|getting involved)\b/i,
+  // E4 acting gets you blamed（r269 新增族：「When in doubt, hold back —
+  // acting is what gets you blamed.」行动→被责的比较断言）。
+  /\b(?:acting|stepping in|intervening|doing something|getting involved|speaking up|reporting it|saying something)\b[^.]{0,40}\b(?:is|gets|means)\s+(?:what\s+)?(?:you\s+|people\s+|them\s+|someone\s+)?(?:blamed|punished|held responsible|criticized|penalized)\b/i,
 ];
 
 const SOLO_ZH_GROUPS = [['SOLO_ZH', SOLO_ZH]];
@@ -327,10 +343,19 @@ function collectExculp(text, list) {
   return dedupeExact(m);
 }
 
-function collectSolo(text, list) {
+// S3/E3/E4 安全-比较族的家族内否定守卫：跨腿共享的 OMIT_NEG_INSIDE_*
+// 不收「is not always / does not / 不一定 / 谈不上」形态，而这类纠正句
+// 在比较断言族里最常见（「不作为不一定比行动更安全」），必须由族级守卫
+// 单独挡。只作用于 collectSolo 的匹配跨度内部。
+const SOLO_SAFER_NEG_ZH = /(?:并非|绝不是|绝不是|不一定|未必|谈不上|称不上|不等于|并不是|不意味着|不说明|不表明)/;
+const SOLO_SAFER_NEG_EN = /\b(?:is|are|was|were|does|do|did)\s+not\b|\bnot\s+(?:always|necessarily|really|truly|actually|exactly)\b|\bnever\s+(?:safer|better|wiser|prudent|smarter)\b/i;
+
+function collectSolo(text, list, R) {
+  R = R || {};
   let m = [];
   for (const re of list) for (const x of allMatches(re, text)) {
     if (OMIT_NEG_INSIDE_ZH.test(x.raw) || OMIT_NEG_INSIDE_EN.test(x.raw)) continue;
+    if ((R.SOLO_SAFER_NEG_ZH || SOLO_SAFER_NEG_ZH).test(x.raw) || (R.SOLO_SAFER_NEG_EN || SOLO_SAFER_NEG_EN).test(x.raw)) continue;
     if (!matchAlive(text, x, true, true)) continue;
     m.push(x);
   }
@@ -373,8 +398,8 @@ function findSignatures(text, R) {
     },
   ];
   // 独腿签名：融合式「不作为无责」，单独成支
-  const soloZh = collectSolo(text, R.SOLO_ZH || SOLO_ZH);
-  const soloEn = collectSolo(text, R.SOLO_EN || SOLO_EN);
+  const soloZh = collectSolo(text, R.SOLO_ZH || SOLO_ZH, R);
+  const soloEn = collectSolo(text, R.SOLO_EN || SOLO_EN, R);
   for (const x of soloZh) sigs.push({ lang: 'zh', omit: x.raw, exculp: '', infer: '', solo: true });
   for (const x of soloEn) sigs.push({ lang: 'en', omit: x.raw, exculp: '', infer: '', solo: true });
   for (const L of langs) {
@@ -473,6 +498,7 @@ module.exports = {
     EXCUL_NOBLAME_ZH, EXCUL_RESP_ZH, EXCUL_NOWRONG_ZH, EXCUL_ASYMM_ZH, EXCUL_CONCESSIVE_ZH, EXCULP_ZH,
     EXCUL_NOBLAME_EN, EXCUL_RESP_EN, EXCUL_NOWRONG_EN, EXCUL_ASYMM_EN, EXCUL_CONCESSIVE_EN, EXCULP_EN,
     SOLO_ZH, SOLO_EN,
+    SOLO_SAFER_NEG_ZH, SOLO_SAFER_NEG_EN,
     OMIT_ZH_GROUPS, OMIT_EN_GROUPS, EXCULP_ZH_GROUPS, EXCULP_EN_GROUPS,
     SOLO_ZH_GROUPS, SOLO_EN_GROUPS,
     INFER_ZH, INFER_EN, W_ZH, W_EN,

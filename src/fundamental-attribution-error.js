@@ -219,6 +219,60 @@ const SOLO_EN = [
   /\b(?:no excuses|stop making excuses|never mind the circumstances)\b[^.]{0,30}\b(?:he|she|they)\s+(?:is|are)\s+(?:just|simply|purely)?\s*(?:lazy|irresponsible|incompetent|stupid|careless|selfish|weak)\b/i,
 ];
 
+// ─── 双标归因族（ASYM）——actor-observer 不对称：同一类结果，对他人
+// 用内在特质解释、对自己用情境解释（或反向：他人靠运气、自己靠实力）。
+// r269 探针实证：「他迟到就是不负责任，我迟到是因为堵车」等 5/6 条攻击
+// 穿透既有两腿结构（DISP×SITD 要求「排斥/贬低情境」，而双标句只是
+// 给自己的那半配一个情境解释，没有排斥动作）。这是 Ross 1977 判据里
+// 最经典的形态，单独成族。
+// 注意：本族**不走**独腿的句子级自我归因守卫——第一人称是本族的固有
+// 结构成分（自己的那半必然含「我」），由「他人侧必须命中特质/运气
+// 槽」保证不是自我检讨。
+const ASYM_OTHER_ZH = '(?:他|她|别人|人家|下属|同事|对方|其他人|那些人|他们|队友|组员|成员|选手|员工|新人|对手|领导|老板|旁人|外人|队友)';
+const ASYM_SELF_ZH = '(?:我|自己|本人|我们|咱们|咱)';
+// 情境槽（给自己的那半的「借口」侧）——与特质槽保持互斥
+const ASYM_SITU_ZH = '(?:堵车|交通|路况|天气|身体|健康|生病|资源|人手|编制|时机|运气|环境|大环境|背景|家庭|照护|突发|临时|状况|情况|情境|处境|外力|外界|外部|条件|形势|排期|流程|制度|市场|周期|红利|起跑线|出身|起点|压力|负担|约束|限制|信息|支持|配合|协同|沟通|风口|关系|贵人|偶然|机缘|机遇|巧合|不可抗力|意外)';
+// 特质槽：既有 DISP_TRAIT_ZH + 归因常用能力名词，后缀可选「问题/毛病」
+const ASYM_TRAIT_ZH = '(?:' + DISP_TRAIT_ZH + '|能力|实力|本事|水平|功力|才干)(?:问题|毛病|过错|的因素|的成分)?';
+// 标记槽（他人侧/自己侧共用）：就是因为|是因为|…|就是|是|靠|凭|归于
+const ASYM_MARK_ZH = '(?:就是因为|是因为|不过是|纯粹是|只是|无非是|全靠|全凭|就是|是|靠|凭|多亏|幸亏|占到|托了|归于|归在|归到|归因于)';
+// A1 他人×特质 … 自己×情境（他人在前）
+const ASYM_ZH_A1 = new RegExp(ASYM_OTHER_ZH + '[^。；！？\\n]{0,14}' + ASYM_MARK_ZH + '[^。；！？\\n]{0,8}' + ASYM_TRAIT_ZH + '[^。；！？\\n]{0,16}' + ASYM_SELF_ZH + '[^。；！？\\n]{0,14}' + ASYM_MARK_ZH + '[^。；！？\\n]{0,8}' + ASYM_SITU_ZH);
+// A2 自己×情境 … 他人×特质（自己在前）
+const ASYM_ZH_A2 = new RegExp(ASYM_SELF_ZH + '[^。；！？\\n]{0,14}' + ASYM_MARK_ZH + '[^。；！？\\n]{0,8}' + ASYM_SITU_ZH + '[^。；！？\\n]{0,16}' + ASYM_OTHER_ZH + '[^。；！？\\n]{0,14}' + ASYM_MARK_ZH + '[^。；！？\\n]{0,8}' + ASYM_TRAIT_ZH);
+// B1 他人×运气/外部 … 自己×实力（功劳不对称，他人在前）
+const ASYM_ZH_B1 = new RegExp(ASYM_OTHER_ZH + '[^。；！？\\n]{0,14}(?:是靠|是因为|全靠|多亏|赶上了|占到|托了|就是靠)[^。；！？\\n]{0,8}' + ASYM_SITU_ZH + '[^。；！？\\n]{0,16}' + ASYM_SELF_ZH + '[^。；！？\\n]{0,14}(?:是靠|全凭|靠|凭)[^。；！？\\n]{0,8}' + ASYM_TRAIT_ZH);
+// B2 自己×实力 … 他人×运气/外部（功劳不对称，自己在前）
+const ASYM_ZH_B2 = new RegExp(ASYM_SELF_ZH + '[^。；！？\\n]{0,14}(?:是靠|全凭|靠|凭)[^。；！？\\n]{0,8}' + ASYM_TRAIT_ZH + '[^。；！？\\n]{0,16}' + ASYM_OTHER_ZH + '[^。；！？\\n]{0,14}(?:是靠|是因为|全靠|多亏|赶上了|占到|托了|就是靠)[^。；！？\\n]{0,8}' + ASYM_SITU_ZH);
+const ASYM_ZH = [ASYM_ZH_A1, ASYM_ZH_A2, ASYM_ZH_B1, ASYM_ZH_B2];
+const ASYM_ZH_GROUPS = [
+  ['ASYM_ZH_A1', [ASYM_ZH_A1]],
+  ['ASYM_ZH_A2', [ASYM_ZH_A2]],
+  ['ASYM_ZH_B1', [ASYM_ZH_B1]],
+  ['ASYM_ZH_B2', [ASYM_ZH_B2]],
+];
+
+// EN 对应四族
+const ASYM_TRAIT_EN = '(?:lazy|irresponsible|incompetent|stupid|careless|selfish|weak|unmotivated|negligent|not smart enough|sloppy|immature|entitled|undisciplined|no discipline|bad attitude|poor character)';
+const ASYM_SITU_EN = '(?:circumstances|situation|context|conditions|luck|timing|pressure|resources|traffic|weather|the system|the market|bad luck|his background|her background|their background|privilege|connections|the right place|the right time)';
+const ASYM_MARK_EN = '(?:because of|due to|owing to|on account of|because|through|thanks to)';
+const ASYM_CREDIT_EN = '(?:merit|hard work|talent|ability|skill|skills|effort|sheer effort|my own effort)';
+// EA1 他人×特质 … 自己×情境
+const ASYM_EN_A1 = new RegExp('\\b(?:he|she|they|others?|people)\\b[^.\\n]{0,40}?(?:is|was|\'s)?\\s*(?:just|simply|purely)?\\s*' + ASYM_TRAIT_EN + '\\b[^.\\n]{0,40}?\\b(?:I|we)\\b[^.\\n]{0,40}?\\b' + ASYM_MARK_EN + '\\s+(?:the\\s+|his\\s+|her\\s+|their\\s+)?' + ASYM_SITU_EN + '\\b', 'i');
+// EA2 自己×情境 … 他人×特质
+const ASYM_EN_A2 = new RegExp('\\b(?:I|we)\\b[^.\\n]{0,40}?\\b' + ASYM_MARK_EN + '\\s+(?:the\\s+|his\\s+|her\\s+|their\\s+)?' + ASYM_SITU_EN + '\\b[^.\\n]{0,40}?\\b(?:he|she|they|others?|people)\\b[^.\\n]{0,40}?(?:is|was|\'s)?\\s*(?:just|simply|purely)?\\s*' + ASYM_TRAIT_EN + '\\b', 'i');
+// EB1 他人×运气/外部 … 自己×实力
+const ASYM_EN_B1 = new RegExp('\\b(?:he|she|they|others?|people)\\b[^.\\n]{0,40}?\\b(?:through|because of|thanks to|due to|owing to)\\s+(?:the\\s+|his\\s+|her\\s+|their\\s+)?' + ASYM_SITU_EN + '\\b[^.\\n]{0,40}?\\b(?:I|we)\\b[^.\\n]{0,40}?\\b(?:on|through)\\s+' + ASYM_CREDIT_EN + '\\b', 'i');
+// EB2 自己×实力 … 他人×运气/外部
+const ASYM_EN_B2 = new RegExp('\\b(?:I|we)\\b[^.\\n]{0,40}?\\b(?:on|through)\\s+' + ASYM_CREDIT_EN + '\\b[^.\\n]{0,40}?\\b(?:he|she|they|others?|people)\\b[^.\\n]{0,40}?\\b(?:through|because of|thanks to|due to|owing to)\\s+(?:the\\s+|his\\s+|her\\s+|their\\s+)?' + ASYM_SITU_EN + '\\b', 'i');
+const ASYM_EN = [ASYM_EN_A1, ASYM_EN_A2, ASYM_EN_B1, ASYM_EN_B2];
+const ASYM_EN_GROUPS = [
+  ['ASYM_EN_A1', [ASYM_EN_A1]],
+  ['ASYM_EN_A2', [ASYM_EN_A2]],
+  ['ASYM_EN_B1', [ASYM_EN_B1]],
+  ['ASYM_EN_B2', [ASYM_EN_B2]],
+];
+
 // ─── 推断标记（落在两腿之间则加权，非必要）────────────────────────
 const INFER_ZH = /(?:所以|因此|据此|可见|说明|证明|意味着|足以|因而|于是|结果就是|结论就是|这就是说|足见|就是因为|纯粹是|当然是|显然是|肯定|一定|绝对|那么|这就)/;
 const INFER_EN = /\b(?:so|therefore|thus|hence|which\s+means|which\s+proves|which\s+shows|that\s+means|proves|shows\s+that|indicates\s+that|means\s+that|it\s+follows|this\s+shows|this\s+proves|consequently|as\s+a\s+result|because|since)\b/i;
@@ -228,7 +282,7 @@ const W_ZH = 60;
 const W_EN = 160;
 
 // ─── 豁免 A：概念教学（点名基本归因错误/归因偏差这个概念本身）─────
-const CONCEPT_ZH = /(?:基本归因错误|归因错误|归因偏差|通信偏误|过度归因|内在归因|外在归因|情境归因|性格归因|行动者|观察者|对应偏误|对应偏见| Ross 实验)/;
+const CONCEPT_ZH = /(?:基本归因错误|基本归因误差|归因错误|归因偏差|归因误差|通信偏误|过度归因|内在归因|外在归因|情境归因|性格归因|行动者|观察者|对应偏误|对应偏见| Ross 实验)/;
 const CONCEPT_EN = /\b(?:fundamental attribution error|correspondence bias|actor[- ]observer|dispositional attribution|situational attribution|attribution bias|attribution error|overattribution|Ross and Nisbett)\b/i;
 
 // ─── 豁免 B：双向归因（性格与情境两侧并举是正当做法）───────────────
@@ -348,6 +402,18 @@ function collectSolo(text, list, selfZh, selfEn) {
   return dedupeExact(m);
 }
 
+// 双标归因族专用：查前缀否定 + 签名跨度内部否定，**不做**句子级自我
+// 归因守卫（第一人称是本族固有成分，见族注释）。
+function collectAsym(text, list) {
+  const m = [];
+  for (const re of list) for (const x of allMatches(re, text)) {
+    if (!matchAlive(text, x, true, true)) continue;
+    if (SOLO_NEG_INSIDE_ZH.test(x.raw) || SOLO_NEG_INSIDE_EN.test(x.raw)) continue;
+    m.push(x);
+  }
+  return dedupeExact(m);
+}
+
 function dist(a, b) {
   if (a.idx < b.end && b.idx < a.end) return 0;
   return Math.max(a.idx, b.idx) - Math.min(a.end, b.end);
@@ -386,6 +452,11 @@ function findSignatures(text, R) {
   const soloEn = collectSolo(text, R.SOLO_EN || SOLO_EN, R.SELF_ZH || SELF_ZH, R.SELF_EN || SELF_EN);
   for (const x of soloZh) sigs.push({ lang: 'zh', disp: x.raw, sitd: '', infer: '', solo: true });
   for (const x of soloEn) sigs.push({ lang: 'en', disp: x.raw, sitd: '', infer: '', solo: true });
+  // 双标归因签名：他人×特质/运气 vs 自己×情境/实力，整句融合，单独成支
+  const asymZh = collectAsym(text, resolveGroups(R, ASYM_ZH_GROUPS));
+  const asymEn = collectAsym(text, resolveGroups(R, ASYM_EN_GROUPS));
+  for (const x of asymZh) sigs.push({ lang: 'zh', disp: x.raw, sitd: '', infer: '', asym: true });
+  for (const x of asymEn) sigs.push({ lang: 'en', disp: x.raw, sitd: '', infer: '', asym: true });
   for (const L of langs) {
     const dispM = collectDisp(text, L.disp, R.SELF_ZH || SELF_ZH, R.SELF_EN || SELF_EN);
     if (dispM.length === 0) continue;
@@ -456,14 +527,22 @@ function detectFundamentalAttributionError(text, inject) {
     evidence: sigs.slice(0, 2).map(x => (x.lang === 'zh'
       ? (x.solo
         ? '独腿签名「' + x.disp + '」（特质归因与情境排斥同句融合）'
+        : x.asym
+        ? '双标归因「' + x.disp + '」（他人侧与自己在同句内用了两套归因口径）'
         : '特质归因「' + x.disp + '」→ 情境排斥「' + x.sitd + '」' + (x.infer ? '（推断标记「' + x.infer + '」）' : ''))
       : (x.solo
         ? 'solo signature "' + x.disp + '" (disposition attribution fused with situation dismissal)'
+        : x.asym
+        ? 'asymmetric attribution "' + x.disp + '" (others and self explained in two different registers)'
         : 'disposition attribution "' + x.disp + '" -> situation dismissal "' + x.sitd + '"' + (x.infer ? ' (via "' + x.infer + '")' : '')))),
     details: s.solo
       ? (s.lang === 'zh'
         ? '基本归因错误(' + sigs.length + '处: 「' + s.disp + '」——特质归因与情境排斥同句融合)(zh)'
         : 'fundamental-attribution-error(' + sigs.length + 'x: "' + s.disp + '" — disposition fused with situation dismissal)(en)')
+      : s.asym
+      ? (s.lang === 'zh'
+        ? '基本归因错误(' + sigs.length + '处: 「' + s.disp + '」——对他人用特质/运气解释，对自己用情境/实力解释，同一句两套口径)(zh)'
+        : 'fundamental-attribution-error(' + sigs.length + 'x: "' + s.disp + '" — others explained by disposition or luck, self by circumstance or merit)(en)')
       : (s.lang === 'zh'
         ? '基本归因错误(' + sigs.length + '处: 把结果归因于特质「' + s.disp + '」并取消情境资格「' + s.sitd + '」)(zh)'
         : 'fundamental-attribution-error(' + sigs.length + 'x: disposition "' + s.disp + '" -> situation dismissal "' + s.sitd + '")(en)'),
@@ -480,6 +559,7 @@ module.exports = {
     SITD_TARGET_ZH, SITD_REJECT_ZH, SITD_DEBASE_ZH, SITD_DENY_ZH, SITD_HOWMUCH_ZH, SITD_ZH,
     SITD_TARGET_EN, SITD_REJECT_EN, SITD_DEBASE_EN, SITD_DENY_EN, SITD_NO_EXCUSE_EN, SITD_EN,
     SOLO_ZH, SOLO_EN,
+    ASYM_ZH, ASYM_EN, ASYM_ZH_GROUPS, ASYM_EN_GROUPS,
     DISP_ZH_GROUPS, DISP_EN_GROUPS, SITD_ZH_GROUPS, SITD_EN_GROUPS,
     INFER_ZH, INFER_EN, W_ZH, W_EN,
     CONCEPT_ZH, CONCEPT_EN, DUAL_ZH, DUAL_EN, SELF_ZH, SELF_EN,

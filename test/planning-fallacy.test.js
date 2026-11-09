@@ -53,10 +53,13 @@ const SOLO_ZH_ATTACKS = [
   '加把劲，一周肯定搞定',                    // S0 努力压缩工期
   '肯定来得及，大家努努力',                  // S1 承诺 + 努力（倒装融合）
   '别参考历史数据，凭决心两个月上线',        // S2 排斥参照类的排期承诺
+  '类似项目总是超时，但这次我有信心按时完成',  // S3 参照类失手 + 但这次不同（r269 新增族）
+  '历史上都超预算，不过这次预算一定够',      // S4 无名词变体：历史+频率副词+失手（r269 新增族）
 ];
 const SOLO_EN_ATTACKS = [
   'With enough effort we will ship in two months',        // E0 努力 + 工期
   'Forget the history, we will make the deadline',        // E1 排斥历史 + 承诺
+  'Similar projects always run over, but this time we will finish on schedule',  // E2 同类失手 + this time（r269 新增族）
 ];
 
 // ─── 良性样本（不得命中：含疑难 FP 压力样本）────────────────────
