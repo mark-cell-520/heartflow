@@ -52,7 +52,7 @@ const http = require('http');
 const net = require('net');
 
 const crypto = require('crypto');
-const { TOOLS } = require('./mcp/tools-registry.js');
+const { TOOLS, EXTENDED_TOOLS } = require('./mcp/tools-registry.js');
 const handleCrowdtestEvaluate = require('./mcp/handlers/crowdtest-evaluate.js');
 
 
@@ -2462,6 +2462,20 @@ function handleModuleHealth(args) {
     try {
       const { HandlerWiringChecker } = require(path.join(HF_DIR, 'src/mcp/handler-wiring-check.js'));
       handlerWiring = new HandlerWiringChecker(heartflow).check();
+      // [r255] 第二层：全量接线矩阵。结构层不碰引擎，只看 mcp-server 手里的三张表
+      // （已广告工具 / HANDLERS / WRITE_TOOLS，外加 EXTENDED_TOOLS 的只读验证集），
+      // 故由调用方注入——检查器自己不 require mcp-server.js（无 token 时那个模块会
+      // process.exit(1)，自检不能被杀）。两层都是加法字段，summary 形状不变。
+      try {
+        handlerWiring.toolWiring = new HandlerWiringChecker(heartflow, {
+          tools: TOOLS,
+          handlerNames: Object.keys(HANDLERS),
+          writeTools: Array.from(WRITE_TOOLS),
+          readOnlyTools: EXTENDED_TOOLS,
+        }).checkStructural();
+      } catch (we2) {
+        handlerWiring.toolWiring = { healthy: false, reason: 'structural_check_failed: ' + we2.message };
+      }
     } catch (we) {
       handlerWiring = { engineReady: !!heartflow, healthy: false, reason: 'wiring_check_failed: ' + we.message };
     }
@@ -3449,6 +3463,69 @@ function _strategicRestraintFallback() {
   return _srFallback;
 }
 
+// [r255] ActiveInference 进程内单例：decide() 会把每次决策压进 this._history
+// （封顶 100 条），每次 new 新实例等于把历史清零，getStats() 恒返回 null。
+let _activeInference = null;
+function _activeInferenceInst() {
+  if (_activeInference) return _activeInference;
+  try {
+    const { ActiveInference } = require('./decision/active-inference.js');
+    _activeInference = new ActiveInference({ silent: true });
+  } catch (_) { _activeInference = null; }
+  return _activeInference;
+}
+
+// [r255] MCP 接线自检（约定 3：工具定义在 mcp/tools-registry.js，映射在下面 HANDLERS，
+// 实现在本函数）。两层：
+//   ① 子系统层（HandlerWiringChecker.check()）——活引擎上探 8 条子系统依赖；
+//   ② 结构层（checkStructural()）——全部已广告工具 × 全部 handler 的接线矩阵。
+// 结构层的三张表由这里注入（检查器不反向 require mcp-server.js：无 token 时那个模块
+// 会 process.exit(1)，自检不能被测系统的启动策略杀掉）。
+function handleWiringCheck(args) {
+  try {
+    const { HandlerWiringChecker } = require(path.join(HF_DIR, 'src/mcp/handler-wiring-check.js'));
+    const wiring = {
+      tools: TOOLS,
+      handlerNames: Object.keys(HANDLERS),
+      writeTools: Array.from(WRITE_TOOLS),
+      readOnlyTools: EXTENDED_TOOLS,
+    };
+    const action = (args && args.action) || 'check';
+    const checker = new HandlerWiringChecker(heartflow, wiring);
+    const handlerSet = new Set(wiring.handlerNames);
+    const advertisedSet = new Set(wiring.tools.map(t => t.name));
+
+    if (action === 'structural') {
+      return { result: checker.checkStructural(), timestamp: Date.now() };
+    }
+    if (action === 'tools') {
+      const s = checker.checkStructural();
+      const rows = [];
+      for (const t of wiring.tools) {
+        rows.push({ tool: t.name, advertised: true, handled: handlerSet.has(t.name), write: wiring.writeTools.includes(t.name) });
+      }
+      for (const n of wiring.handlerNames) {
+        if (!advertisedSet.has(n)) rows.push({ tool: n, advertised: false, handled: true, write: wiring.writeTools.includes(n) });
+      }
+      return { result: { rows, total: rows.length, summary: { advertised: s.advertised, handlers: s.handlers, reachable: s.reachable, healthy: s.healthy, byKind: s.byKind } }, timestamp: Date.now() };
+    }
+    if (action === 'write') {
+      const s = checker.checkStructural();
+      return {
+        result: {
+          writeTools: wiring.writeTools.map(n => ({ tool: n, handled: handlerSet.has(n), advertised: advertisedSet.has(n) })),
+          count: wiring.writeTools.length,
+          issues: s.issues.filter(i => i.kind === 'write_no_handler' || i.kind === 'write_not_advertised' || i.kind === 'unverified_write_safety'),
+        },
+        timestamp: Date.now(),
+      };
+    }
+    return { result: checker.checkAll(), timestamp: Date.now() };
+  } catch (e) {
+    return { error: e.message, timestamp: Date.now() };
+  }
+}
+
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
@@ -3458,6 +3535,8 @@ const HANDLERS = {
   heartflow_gate: handleGate,
   heartflow_gate_check: handleGateCheck,
   heartflow_gate_pipeline: handleGatePipeline,
+  // [r255] MCP 接线自检（子系统层 + 全量结构层）
+  heartflow_wiring_check: handleWiringCheck,
   // [v6.7.72] 误报反馈闭环（心虫 decision.decide 选定 0.92）
   heartflow_false_positive: handleFalsePositiveTool,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,
@@ -5030,12 +5109,48 @@ const HANDLERS = {
   },
 
   heartflow_dream: handleDream,  heartflow_active_inference: (args) => {
+    // [r255 修复] 原实现把 candidates 硬编码成单元素数组
+    // [{ id:'a', name: args?.context || '', prior:0.5 }]——ActiveInference.decide()
+    // 见 length===1 直接返回 {autoSelect:true} 短路，EFE 评分/排序/needsMoreEvidence
+    // 整条路径从 MCP 侧 100% 不可达；且每次调用 new 新实例，getStats() 恒为 null。
+    // r255 结构层自检把它抓出来（未广告 ∧ 未进 WRITE_TOOLS ∧ 未过只读验证），
+    // 本轮改为：调用方可传 candidates，复用模块级实例保留决策历史，并广告成工具。
     try {
-      const { ActiveInference } = require('./decision/active-inference.js');
-      const inst = new ActiveInference({ silent: true, rootPath: HF_DIR });
-      const r = inst.decide ? inst.decide([{ id: 'a', name: args?.context || '', prior: 0.5 }], {}) : {};
-      return { result: r, timestamp: Date.now() };
-    } catch (e) { return { error: e.message }; }
+      const inst = _activeInferenceInst();
+      const action = args?.action || 'decide';
+      if (action === 'stats') {
+        return { stats: inst.getStats(), timestamp: Date.now() };
+      }
+      const raw = Array.isArray(args?.candidates) ? args.candidates : [];
+      const num = (v, dflt) => {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : dflt;
+      };
+      const candidates = raw.slice(0, 20).map((c, i) => ({
+        id: c && c.id != null ? String(c.id) : 'c' + i,
+        label: (c && (c.label || c.name)) || ('候选' + (i + 1)),
+        pragmaticScore: num(c && c.pragmaticScore, 0.5),
+        uncertainty: num(c && c.uncertainty, 0.3),
+        novelty: num(c && c.novelty != null ? c.novelty : (c && c.uncertainty), 0.3),
+      }));
+      if (candidates.length === 0) {
+        return {
+          error: '未收到任何候选：candidates 需为非空数组（每项可含 id/label/pragmaticScore/uncertainty/novelty）',
+          expectedParams: ['candidates'],
+          timestamp: Date.now(),
+        };
+      }
+      const context = {
+        timePressure: Math.min(1, Math.max(0, num(args?.timePressure, 0.5))),
+        riskLevel: args?.riskLevel,
+      };
+      const r = inst.decide(candidates, context);
+      const out = { result: r, timestamp: Date.now() };
+      if (candidates.length === 1) {
+        out.note = '单候选走 autoSelect 短路——ActiveInference.decide() 的既定行为，不是缺陷';
+      }
+      return out;
+    } catch (e) { return { error: e.message, timestamp: Date.now() }; }
   },
 
   // [v6.4.5] 第五批 — 记忆压缩/心智努力/交流层/公式引擎
@@ -6253,6 +6368,14 @@ module.exports = {
   getPort: () => PORT,
   handleRequest,
   initHeartFlow,
+  // [r255] 接线面导出：让 HandlerWiringChecker（及任何审计方）拿到**真实的**
+  // 三张表——已广告工具 / handler 映射 / 写权限白名单，而不是各自复制一份副本
+  // （副本会随引擎演进而说谎）。返回拷贝，调用方改不动原表。
+  getWiring: () => ({
+    tools: TOOLS.map(t => ({ name: t.name, description: t.description, inputSchema: t.inputSchema })),
+    handlerNames: Object.keys(HANDLERS),
+    writeTools: Array.from(WRITE_TOOLS),
+  }),
   start: () => {
     initHeartFlow();
     server.listen(PORT, '127.0.0.1');

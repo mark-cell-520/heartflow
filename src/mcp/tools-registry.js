@@ -1,5 +1,15 @@
 const TOOLS = [
 
+  // [r255] MCP 接线自检：把 r253「7 个广告工具 100% 崩」那一类 bug 固化成常驻能力。
+  // 两层——子系统层在活引擎上探 8 条子系统依赖工具；结构层对**全部**已广告工具与
+  // 全部 handler 做接线矩阵（广告了却没 handler / 有 handler 却未广告 / 写权限白名单
+  // 死条目与隐身写工具 / schema 缺陷 / 未验证写安全面的可调 handler）。纯只读。
+  {
+    name: 'heartflow_wiring_check',
+    description: "MCP 接线自检（r253/r255）：两层。① 子系统层——在活引擎上实测 8 个依赖引擎子系统的工具，其目标子系统是否可达、关键方法是否齐全（r253 七个工具 100% 崩就是这一类：定义在、handler 在、tools/list 看得见，但每次调用恒 error）；② 结构层——对全部已广告工具与全部 handler 做接线矩阵：广告了却没 handler（调用恒 -32601）/ 有 handler 却未广告（能力面对调用方隐身）/ WRITE_TOOLS 死条目与隐身写工具（权限三处一致纪律失明）/ schema 缺陷（缺 description、inputSchema.type≠object、required 参数不在 properties 里——中央参数校验与空参数保护都建立在 schema 上）/ 未验证写安全面的可调 handler（未广告 ∧ 未进 WRITE_TOOLS ∧ 未过 fs 快照只读验证）。action=check（默认，两层合查）/ structural（只结构层）/ tools（导出工具×handler 宽表）/ write（只核对写权限白名单）。纯只读、无副作用。",
+    inputSchema: {"type":"object","properties":{"action":{"type":"string","enum":["check","structural","tools","write"],"description":"check=两层合查（默认）；structural=只跑全量接线矩阵；tools=导出 工具×handler 宽表；write=只核对写权限白名单"}},"required":["action"]}
+  },
+
   {
     name: 'heartflow_think',
     description: "完整思维链：分类输入→路由→推理→输出。返回结构化分析结果，包含类型、置信度和思维链。",
@@ -436,6 +446,15 @@ const TOOLS = [
     name: 'heartflow_check_injection_synonyms',
     description: "英文注入同义族通道检测（English injection synonym families）：提示注入的英文模式库 INJECTION_PATTERNS.en 只有 12 条字面短语正则，ignore 是唯一动词、previous|above|prior 是唯一指代词、instruction|prompt|rule|... 是唯一宾语族，而中文侧 zh 库有为同义替换准备的词族结构（无视|撇开|抛开|丢掉|舍弃|废止 × 之前|上述|所有 × 指令|规则|限制|约束|设定）。r733 轮初实测 25 条常见英文注入句式里 16 条 gate.action=pass（静默放行），prompt_injection 是 BLOCK 级维度，等于门禁对该类攻击无效。本通道改成三族合取：覆盖动词 × 指代锚点 × 规范宾语，三个族同时落在同一窗口内才判命中，一条判据覆盖动词×锚点×宾语的交叉乘积（约 20×18×30）。精度护栏：三族缺一不判；动词前有否定词整条跳过（'do not ignore ...' 是要求继续遵守）；转述句/往事句/许可句跳过（主语是第三人称或出现 can/could/may/might）；宾语被圈定到外部文档时跳过（'skip the previous instructions in the README'）；格式类忽略豁免（含 'rules about indentation' 语序）；无宾语裸指代要求量词或同句第二人称。r733 实测：17 条攻击句式 17/17 命中、双向门禁 326 条良性样本零新增误伤、15 条刻意构造的良性长句 15/15 不判。action: check（默认）返回 count/score/blocked/injections（含 verb/anchor/object 三族归因）；families 读当前词表规模与交叉乘积；list 导出三族词表全文（审计用）。",
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"待检测文本（原文，只读不改）"},"action":{"type":"string","description":"check（默认）/ families / list"}},"required":["text"]}
+  },
+
+  // [r255] 主动推理决策。原 handler 从未广告且把 candidates 硬编码成单元素数组——
+  // ActiveInference.decide() 见 length===1 直接 autoSelect 短路，EFE 评分路径
+  // 从 MCP 侧 100% 不可达。r255 结构层自检把它抓出来，本轮接上候选入参并广告。
+  {
+    name: 'heartflow_active_inference',
+    description: "主动推理决策（M3 ActiveInference，Friston 2017 期望自由能）：给 ≥2 个候选，按 EFE = 实用价值(pragmatic)×0.6 + 认知价值(epistemic)×0.4 打分排序，timePressure 越高越压低探索权重。返回 selected / scores（每项含 pragmaticValue、epistemicValue、expectedFreeEnergy、score）/ needsMoreEvidence（最佳得分低于 minConfidence、或最佳实用价值低于风险容忍度、或与次优差距 <20% 时要求补证据）/ regime（explore|exploit|balanced）。单候选走 autoSelect 短路（decide() 的既定行为，会带 note 说明）。action=stats 读进程内决策历史统计（explorationRate 等）。纯内存计算，无 fs、无网络副作用。",
+    inputSchema: {"type":"object","properties":{"candidates":{"type":"array","description":"候选数组（≤20 条），每项 {id, label, pragmaticScore 0-1, uncertainty 0-1, novelty 0-1}"},"timePressure":{"type":"number","description":"时间压力 0-1（默认 0.5），越高越降低探索权重"},"action":{"type":"string","enum":["decide","stats"],"description":"decide（默认）= 评分选优；stats = 决策历史统计"}},"required":["candidates"]}
   },
 
 ];

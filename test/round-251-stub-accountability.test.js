@@ -303,7 +303,11 @@ t('E1 tools/list 含新工具 + 两个健康工具端到端可用', () => {
   const names = TOOLS.map(t => t.name);
   assert.ok(names.includes('heartflow_module_stubs'), '工具定义应含 heartflow_module_stubs');
   assert.ok(names.includes('heartflow_module_health'), 'heartflow_module_health 不应丢');
-  assert.strictEqual(TOOLS.length, 187, `工具总数应为 187，实际 ${TOOLS.length}`);
+  // [r255] 原断言写死 TOOLS.length === 187——工具数每加一个就假失败一次（r255 加了
+  // wiring_check / active_inference 两个，实测 actual=189）。改为守卫本意：没被悄悄
+  // 删掉 + 与注册表去重计数一致。
+  assert.ok(TOOLS.length >= 187, `工具总数不应低于 r251 时的 187，实际 ${TOOLS.length}`);
+  assert.strictEqual(TOOLS.length, new Set(names).size, `工具表不应有重名（去重 ${new Set(names).size} / 原 ${TOOLS.length}）`);
   const def = TOOLS.find(t => t.name === 'heartflow_module_stubs');
   assert.ok(def.description && def.inputSchema, '新工具应有 description 与 inputSchema');
   assert.ok(def.inputSchema.properties.includeOverridden, '应有 includeOverridden 参数');

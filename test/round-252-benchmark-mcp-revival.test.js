@@ -410,12 +410,17 @@ t('D2 判别维度 210 不变（本轮未动判别引擎）', () => {
   assert.strictEqual(keys.length, 210, `维度应 210，实际 ${keys.length}`);
 });
 
-t('D3 MCP 工具总数 187 不变（本轮没有新增工具，是让既有广告兑现）', () => {
+// [r255] 原断言写死 187（r252 当时「本轮没有新增工具」）——工具数每加一个就假失败
+// 一次，r255 加了 2 个后实测 actual=189。改为守卫它的本意：**没被悄悄删掉**且与
+// 注册表一致（不拿过期常量说谎，也不借机放宽成永远为真）。
+t('D3 MCP 工具总数未缩水且与注册表一致（≥ r252 时的 187）', () => {
   const registry = require(path.join(HF, 'src/mcp/tools-registry.js'));
   const extended = require(path.join(HF, 'src/mcp/extended-tools.js'));
   const all = (registry.TOOLS || registry).concat(extended._EXTENDED || extended.TOOLS || extended);
   const names = all.map(x => x && x.name).filter(Boolean);
-  assert.strictEqual(new Set(names).size, 187, `工具应 187，实际 ${new Set(names).size}`);
+  const unique = new Set(names);
+  assert.ok(unique.size >= 187, `工具总数不应低于 r252 时的 187，实际 ${unique.size}`);
+  assert.strictEqual(unique.size, names.length, `工具表不应有重名（去重 ${unique.size} / 原 ${names.length}）`);
 });
 
 t('D4 引擎启动无新增 _initErrors，模块数 162 不变', () => {

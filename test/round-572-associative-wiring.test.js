@@ -32,7 +32,12 @@ ok('A1 tools-registry 有 heartflow_associative 定义', !!def);
 ok('A2 定义有 inputSchema.properties', !!(def && def.inputSchema && def.inputSchema.properties));
 ok('A3 定义声明了 process/stats/trace 三个 action',
   !!(def && /process/.test(def.description) && /stats/.test(def.description) && /trace/.test(def.description)));
-ok('A4 工具总数 184', TOOLS.length === 184, 'actual=' + TOOLS.length);
+// [r255] 原断言写死 TOOLS.length === 184——工具数每加一个就假失败一次（r255 轮初
+// 实测 actual=187，本轮加 2 个后 189），而这条守卫的本意是「工具没被悄悄删掉」。
+// 改为单调不缩水 + 与注册表去重计数一致：既守住本意，也不再拿过期常量说谎。
+ok('A4 工具总数未缩水且与注册表一致（≥ r572 时的 184）',
+  TOOLS.length >= 184 && TOOLS.length === new Set(TOOLS.map(t => t.name)).size,
+  'actual=' + TOOLS.length);
 
 const srv = fs_readServerSrc();
 ok('A5 mcp-server HANDLERS 有 heartflow_associative 映射',

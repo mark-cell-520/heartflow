@@ -1,4 +1,101 @@
-## r254 — MetacognitiveReward 奖励口径修正轮（v6.8.182）：quality 恒为 0.6 的死分支 + confidence 被 len/500 绑架成长度函数 + selfFeedback 经 MCP 恒失效，三处叠加让「元认知即奖励」完全退化
+## r255 — MCP 接线自检从「8 条」扩到「全量 189 工具 × 192 handler」+ heartflow_active_inference 装饰性实现修复轮（v6.8.183）
+
+**轮次**：r255 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（r253 交接簿候选池③「HandlerWiringChecker 扩到全量 187 个 MCP 工具」本轮落地；扩量过程中新查出一个真装饰工具）
+**真升级类型**：缺陷修复（`heartflow_active_inference` 装饰性实现：EFE 评分路径从 MCP 侧 100% 不可达 + 决策历史恒被清零）+ 新公开方法（`HandlerWiringChecker.checkStructural()` 全量接线矩阵）经新 MCP 工具 `heartflow_wiring_check` 暴露（约定 3 三处接线）+ `heartflow_module_health` 加法字段 `handlerWiring.toolWiring`。MCP 工具 **187 → 189**（+`heartflow_wiring_check`、+`heartflow_active_inference` 正式广告）、dispatch 路由 **1,319 不变**、判别维度 **210 不变**（`src/index.js` 零改动）、引擎模块 **162 不变**。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision。
+- r254 交接簿候选池①是「判别引擎侧六条挂账」（多轮续挂），但那些是跨表统一/位置化类改动、单条影响面小且需逐族回归；候选③「HandlerWiringChecker 扩到全量 187 个 MCP 工具」是 r253 只固化 8 条后明确记下的下一步，且**扩量本身是可度量的**（覆盖面 8 → 187），故选③。
+- 轮初先用真实三张表做基线实测（`scripts/tmp-255-wiring-probe.js，require mcp-server → getWiring() 导出面`，轮末已删），再决定扩哪些判据——不猜。
+
+### 二、根因/缺口分析（带证据）
+
+**轮初实测（advertised 187 / handlers 191 / writeTools 33，`scripts/tmp-255-wiring-probe.js`）**：
+
+| 判据 | 轮初实测 | 含义 |
+|---|---|---|
+| 已广告但无 handler | **0** | r253 前「广告了却恒 -32601」那一类确已归零 |
+| 有 handler 但未广告 | **4** | 3 条在 `extended-tools.js` 头部「排除项」里 by design，**1 条不在任何清单里** |
+| WRITE_TOOLS 未广告 | 2（`safe_fetch`/`circuit_breaker`） | 均属上述 by design 排除项 |
+| 重名工具 / schema 缺陷 | 0 / 0 | 主表当前干净（但无人在守，加一个就静默） |
+
+**缺口① 覆盖面**：`HandlerWiringChecker` 只覆盖**手登记的 8 条**子系统依赖工具，`note` 字段自己写清「不代表全部 MCP 工具的接线健康」。r253 修的 bug 类（handler 探不到子系统）守住了，但同族的另外四类无人在看：已广告却没 handler（调用恒 -32601）、有 handler 却未广告（能力面对调用方与权限文档同时隐身）、WRITE_TOOLS 死条目/隐身写工具（AGENTS.md「权限集三处一致」纪律失明）、schema 缺陷（中央参数校验与「空参数保护」两道防线都建立在 schema 上，schema 坏则同时失效）。
+
+**缺口② 顺带查出的真装饰工具**：`heartflow_active_inference` 不在任何排除清单里——未广告、未进 WRITE_TOOLS、也未通过 `extended-tools.js` 的 fs 快照只读验证，guest 可直接调用而写安全性从未实测。查其实现发现两层装饰：
+```js
+heartflow_active_inference: (args) => {
+  const inst = new ActiveInference({ silent: true, rootPath: HF_DIR });
+  const r = inst.decide ? inst.decide([{ id: 'a', name: args?.context || '', prior: 0.5 }], {}) : {};
+```
+① `candidates` 被硬编码成**单元素数组**，而 `ActiveInference.decide()` 第一件事就是 `if (candidates.length === 1) return {selected, scores, autoSelect:true}`——EFE 评分/排序/`needsMoreEvidence`/`regime` 整条路径从 MCP 侧 **100% 不可达**，工具永远只回一个 autoSelect 空转；② 每次调用 `new` 新实例，`_history` 每次清零，`getStats()` 恒返回 `null`。**它是被接线广告出去的能力里的一具空壳，且因为未广告，连「广告了但没实现」的既有清理流程都扫不到它。**
+
+### 三、落地项
+1. **`src/mcp/handler-wiring-check.js`：新增第二层 `checkStructural(wiring)`（113 行非注释代码）**。遍历**全部**已广告工具与全部 handler 的接线矩阵，六类发现项各带严重度与可操作 detail：
+   - `advertised_no_handler`（100）——tools/list 广告了但 HANDLERS 没有，调用恒 `-32601`；
+   - `duplicate_name`（80）——`TOOLS.find(t => t.name === name)` 只命中第一条，第二条定义被永久遮蔽；
+   - `schema_defect`（60）——缺 description / `inputSchema.type≠object` / **required 参数不在 properties 里**（中央校验会把 required 参数洗掉 → 合法调用恒被「未收到任何有效参数」拒绝）；
+   - `write_not_advertised`（50）/ `write_no_handler`（40）——写权限白名单的隐身条目与死条目；
+   - `unverified_write_safety`（40）——未广告 ∧ 未进 WRITE_TOOLS ∧ 未过 fs 快照只读验证的 handler（guest 可调而写安全性从未实测）；
+   - `handler_not_advertised`（30）——未广告 handler；`KNOWN_UNADVERTISED` 白名单内的记 `byDesign:true` 提示，**未登记的一律现形**。
+   `healthy = 无 severity≥50 的发现项`。两处**刻意的不做**：结构层**不反向 require mcp-server.js**（那个模块无 token 时 `process.exit(1)`，自检不能被测系统的启动策略杀掉——三张表由调用方注入）；**不给白名单外的新发现自动消音**（白名单只收纳有出处的 3 条，新漂移必须每轮可见）。
+2. **`src/mcp-server.js`：`heartflow_active_inference` 装饰性实现修复（本轮唯一边际功能修复）**。调用方可传 `candidates`（≤20 条，逐项归一化 `id/label/pragmaticScore/uncertainty/novelty`，`timePressure` 钳到 0-1 后传给 `decide()`）；新增 `_activeInferenceInst()` **模块级单例**，`decide()` 压进 `_history` 的决策跨调用保留；新增 `action=stats` 读 `getStats()`；空候选在调 `decide()` 前拦住并返回带 `expectedParams` 的可操作错误（不再静默空响应）；单候选仍走 autoSelect 但**带 note 说明这是模块既定行为**（不伪装成缺陷也不伪装成正常评分）。
+3. **新 MCP 工具 `heartflow_wiring_check`（约定 3 三处接线）**：`src/mcp/tools-registry.js` 工具定义 + `HANDLERS` 映射 + `handleWiringCheck()` 实现。四档 action：`check`（两层合查）/ `structural`（只结构层）/ `tools`（工具×handler 宽表，含未广告 handler 行）/ `write`（只核对写权限白名单，逐条报 handled/advertised）。
+4. **`handleModuleHealth` 以加法字段带出结构层**：`handlerWiring.toolWiring = new HandlerWiringChecker(heartflow, {tools: TOOLS, handlerNames: Object.keys(HANDLERS), writeTools: [...WRITE_TOOLS], readOnlyTools: EXTENDED_TOOLS}).checkStructural()`，结构层失败有独立兜底 `structural_check_failed`，不拖垮子系统层。r253 固化的 `new HandlerWiringChecker(heartflow).check()` 字面调用与 `summary` 既有形状**原样保留**（r251/r253 的断言不受影响）。
+5. **`mcp-server.js` 新增 `getWiring()` 导出面**：返回三张表的拷贝（tools/handlerNames/writeTools），让审计方拿**真实**表而不是各自复制一份会随引擎演进而说谎的副本。
+6. **`heartflow_active_inference` 正式广告**（`tools-registry.js` 补工具定义，`required:["candidates"]`）——修好之后不该再让能力面对调用方隐身；它也因此从结构层的「未验证写安全面」发现项里退出。
+7. **两处诚实记账的过期常量修复**：① `test/round-572-associative-wiring.test.js` 的「工具总数 184」写死断言，轮初实测已因 `actual=187` 假失败（该文件本就在存量失败清单里），改为「不缩水 + 与注册表去重计数一致」——守住守卫本意而不拿过期常量说谎（复跑 23过/5败 → **24过/4败**）；② README 徽章 `MCP tools-184` → **189**（`sync-doc-numbers.js` 只改正文表格，不改徽章，徽章已烂了 3 个版本）。
+8. **版本 6.8.182 → 6.8.183**，`sync-version.js` + `sync-doc-numbers.js` 已跑（AGENTS.md/README.md/SKILL.md/package.json 的 187→189 与版本戳全部机器记账）；README Version history 补 v6.8.183 行。
+9. **新测试 `test/round-255-mcp-wiring-coverage.test.js`（23 断言全绿）**：A 族 9 条（无表时如实报 not_provided / 全量矩阵遍历而非小清单 / 白名单闭环 / 重名 / schema 三类缺陷各带后果说明 / 写权限两种坏形状 / 未验证写安全面 / 脏数据不炸自检）、B 族 4 条（r253 的 8/8 与四个字段形状原样成立 + 坏引擎仍测出坏接线 + engine_not_ready）、C 族 3 条（多候选真评分 / 源码不再硬编码单候选——回归断言精确到 handler 体 / 空候选可操作错误）、D 族 4 条（约定 3 三处接线 + 四档 action + module_health 加法字段 + **独立子进程端到端**四档工具与 active_inference 三形态）、E 族 3 条（三招牌入口 / 维度 210 与三 tier 计数不变 / 新工具不悄悄进 WRITE_TOOLS 且白名单条目都能在工具表或白名单里找到）。
+
+### 四、验收数字（全部实测）
+| 项 | 轮前 | 轮后 | 实测方式 |
+|---|---|---|---|
+| 结构层覆盖的工具面 | **8 条**（手登记） | **189 个已广告工具 + 192 个 handler** | test A3 + D4 子进程 |
+| 每个已广告工具都有 handler（reachable） | 无人在看 | **189 = advertised**（0 个 `advertised_no_handler`） | D4 子进程 |
+| 白名单闭环不变量 `handlers = advertised + 白名单` | 无 | **192 = 189 + 3** 成立 | D4 子进程 |
+| 未广告 handler 的可归因性 | 4 条里 1 条无出处 | **4 条全有出处**（3 by design + active_inference 已广告修复） | D4 子进程 / A4 |
+| `heartflow_active_inference` 多候选 | 恒 `autoSelect`，`scores.length=1`，EFE 路径 100% 不可达 | **`scores.length=3`、逐项 `expectedFreeEnergy`、`selected=最高分`、`regime=explore`、`needsMoreEvidence=true`** | D4 子进程 |
+| `heartflow_active_inference` 决策历史 | `getStats()` 恒 `null` | stats 档读到 **`totalDecisions≥1`**（模块级单例跨调用保留） | D4 子进程 |
+| 空 candidates | 静默返回 autoSelect 空转 | 带 `expectedParams` 的可操作错误 | D4 子进程 / C3 |
+| `heartflow_module_health` 能力面 | 只有子系统层 `handlerWiring` | + `handlerWiring.toolWiring`（全量矩阵），`summary` 键不变 | D3/D4 |
+| 新增非注释代码 | — | **211 行**（handler-wiring-check +113、mcp-server +98，不含测试） | `node -e` 剥注释统计 |
+| MCP 工具 / 路由 / 维度 / 模块 | 187 / 1,319 / 210 / 162 | **189 / 1,319 / 210 / 162** | sync-doc-numbers.js；test E2 |
+| `bin/verify.js` | — | **16/16** | — |
+| bidirectional-guard | — | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r254 基线逐项一致） | — |
+| guard-abilities | — | **20/20**（dimensions 键 210 不变） | — |
+| doc-numbers-accuracy | — | **24/24** | — |
+| security-audit | — | 提交前 **15/16**（S2「git log/tag 未命中 6.8.183」为提交前预期失败，r236~r254 同款） | — |
+| 本轮新测试 | — | round-255 **23/23** | test/round-255-mcp-wiring-coverage.test.js |
+
+### 五、全量回归与计数
+全量回归跑了两遍（`data/round-255-regression.log` 第一遍、`data/round-255-regression2.log` 修完三处过期常量后的第二遍，658 个测试文件）：
+- **第一遍**：19503 通过 / 156 失败 / 共 19659 个（基线 r253→r254 为 19482 / 154 / 19636，657 文件）。
+- **第二遍（本轮采信值）**：**19502 通过 / 157 失败 / 共 19659 个**。
+- **失败文件清单三轮逐项 comm 比对：基线 r254 = 73 个、第一遍 = 73 个、第二遍 = 73 个**——`comm -13`（仅本轮有）输出**空**、`comm -23`（仅基线有）输出**空**，且第一遍与第二遍的清单彼此也完全相同（`[...r1].filter(x=>!r2.has(x))` 与反向均为空）。**新增失败文件 0 个、消失 0 个。**
+- **断言级 ±1~3 的波动是存量环境噪声，不是本轮引入**：两遍回归的失败文件清单一模一样，断言数却差 1（156 vs 157）——噪声来自 run-all 的并发池把结果行打印到**下一个文件的 header 下面**（本轮逐条核对日志时实测：`[451/658] round-253-engine-access-revival.test.js` 标题下打的是「round-251 占位子系统诚实记账」的结果行），以及 `Command failed` 类文件的断言是否被计入不稳定。
+- **第一遍断言级 +2 的两个失败已逐条定位并修好**：`test/round-251-stub-accountability.test.js:306`（`TOOLS.length === 187`）与 `test/round-252-benchmark-mcp-revival.test.js:413`（「MCP 工具总数 187 不变」）——两条都是**写死的工具数常量**，本轮 +2 个工具（187→189）使它们翻转。两者按「守卫本意是不缩水 + 与注册表一致」改写后**单独复跑 25/0 与 22/0**；同类常量 `test/round-572-associative-wiring.test.js:35`（写死 184，轮初已因 actual=187 假失败）也一并修好，复跑从 23过/5败 变为 **24过/4败**（该文件仍在存量失败清单里，剩余 4 条是 r572 自己记录的缺陷 B「通用语义词句命中桥接图 0 词」，本轮不碰）。
+- **本轮新测试 round-255 在两遍回归里都是 23/23**（第一遍 `[453/658]`、第二遍同）。双向门禁召回 **52/52 不降**、误拦 **302/326 不升**（与 r254 基线逐项一致）；`bin/verify.js` 16/16；`guard-abilities` 20/20（dimensions 键 210 不变）；`doc-numbers-accuracy` 24/24（测试数记账 19,482 → 19,502，由 `sync-doc-numbers.js` 机器同步 README/SKILL/AGENTS）；`security-audit` 提交前 15/16（S2「git log/tag 未命中 6.8.183」为提交前预期失败，r236~r254 同款）。
+- 噪声池与 r254 同族（MCP 类 6 个 8099 端口占用 + 未输出汇总行类 + 注册 0 用例类 + Command failed 类 dispatch 族），逐项比对无一带消失，说明噪声池稳定。
+
+### 六、已知未修（含为什么不修）
+1. **`heartflow_active_inference` 的 `decide()` 单候选短路是模块既定行为，不是缺陷**——本轮只在 MCP 层补 note 说明，不改 `src/decision/active-inference.js` 的语义（改它会动所有调用方对 autoSelect 的预期）。候选数 ≥2 时评分路径完全正常。
+2. **结构层判不了「handler 会不会写盘」**——那需要 r419 的 fs 快照实测方法（起服务、真调、比 mtime+size），不是静态表比对能得到的。本轮只把「未广告 ∧ 未进 WRITE_TOOLS ∧ 未过只读验证」的**审计洞**标出来（`unverified_write_safety`，40 分），不冒充写安全性判定。
+3. **`handler_not_advertised` 的 3 条 by design 排除项仍是「未广告的可调能力」**——按 `extended-tools.js` 头部约定由 WRITE_TOOLS/needsWrite 收口，本轮只做可归因（白名单 + detail 写出处），不改曝光决策（改曝光面会动 MCP 工具数与权限文档，属独立主题）。
+4. **结构层不覆盖 dispatch 路由层**（`heartflow.dispatch('translator.xxx')` 那 1,319 条）——那需要另一张表（`ALLOWED_ROUTES` 与桥接层路由），本轮主题是 MCP 工具接线，路由层登记给后续轮次。
+5. **r254 及以前的挂账原样继承**：判别引擎侧六条（⑨族裸标记位置化 r225 / `PC_RITE_MECH_ZH` 位置化 r239 G3 / `PC_DRUG_MECH_ZH` 与 `PC_SUPP_MECH_ZH` 跨表统一 r236 G2 后半 / lastIndex 防空匹配防护前移 / `scripts/negative-test-rc-temporal-causal-r364.js` 临时目录隔离 / r71 测试 G 节 idx4 zh 侧句式缺口）；「真引用 vs 编造引用」分辨（r254 已知未修①）；`heartflow_translate` 的 `tone.tone` 兼容别名（r249 G2）；28 个无调用方占位子系统的摘除（r251 候选池①）；`.gitignore` 无锚定目录模式换机复扫（r253 阴性但规则本身仍是潜在系统性风险）。本轮均未碰。
+
+### 七、踩坑
+1. **`getWiring()` 是本节目的前提，而它不存在**——`HANDLERS`/`WRITE_TOOLS`/`TOOLS` 三个都是 mcp-server.js 的模块级常量且从未导出，轮初探针第一版只能靠读源码正则猜，立刻放弃：猜出来的表本身就是「会说谎的副本」。改为在 `module.exports` 加 `getWiring()`（返回拷贝，调用方改不动原表）后再测。
+2. **自检不能 require 被测系统**：`require('./mcp-server.js')` 在无 `HEARTFLOW_MCP_TOKEN` 时 `process.exit(1)`——若 `checkStructural()` 内部懒加载 mcp-server.js 取表，任何没设 token 的调用方（包括测试进程）会被**静默杀掉**，症状是「测试零输出」而不是报错。故结构层的三张表一律由调用方注入，注入缺席就如实报 `wiring_source_not_provided`。
+3. **A7 首版夹具自己绊倒自己**：本想测「隐身写工具」，夹具里却把 `heartflow_self_heal` 同时放进了 `writeTools` 和 `handlerNames`——它因此同时命中 `write_not_advertised`，实测 `hidden.length=2 !== 1`。改为只把 `heartflow_decision_decide`（无 handler）放进取证集，`self_heal` 单独验 `unverified_write_safety`。
+4. **r253 测试 F5 断言的是源码字面量** `new HandlerWiringChecker(heartflow).check()`——给 `handleModuleHealth` 加结构层时若把这两行重构成一次构造，F5 立刻红。故子系统层调用**原样保留**，结构层用第二个注入三张表的实例跑，两行各自独立。
+5. **`round-572` 的「工具总数 184」不是本轮引入的失败**：轮初复跑即 `actual=187` 失败（在 r254 基线失败清单里，`Command failed`）。本轮加 2 个工具后它变成 `actual=189`——**同一个存量失败，不是新增**。修它的写死常量时只改判据不改守卫本意（不缩水 + 与注册表一致），不借机放宽其它断言。
+7. **两遍回归的断言数不一样（156 vs 157）但失败文件清单一模一样**——追下去发现 run-all 的并发池会把某个文件的结果行打印到**下一个文件的 header 下面**（实测 `[451/658] round-253-engine-access-revival.test.js` 标题下打的是 round-251 的结果），按「标题归属」逐文件统计会算错账。可靠口径只有两个：runner 自己打印的总汇总行 + 末尾「失败的测试」文件清单。本条已补进 memory（`run-all-log-numbering-nonmonotonic` 的同族）。
+8. **「加工具」会同时点亮 3 个存量失败**：`round-251:306`、`round-252:413`、`round-572:35` 三处写死的工具总数（187/187/184）在本轮 187→189 后翻转。这是**每次新增 MCP 工具的固定成本**，且这三处散布在不同轮次的测试里、互不知晓——下轮加工具前先 `grep -rn "TOOLS.length ===\|工具总数\|工具应 " test/` 扫一遍，别等回归报红。
+9. **`heartflow_wiring_check` 不能零参调用**：中央「空参数保护」（v6.7.75）对「schema 有 properties 但过滤后 args 为空」一律报错，故 `action` 声明为 `required`——这与 `heartflow_provider_health` 等既有 action 工具同范式，不是新坑；端到端探针里 `{}` 调用返回 `未收到任何有效参数` 已如实记录。
+
+
+
 
 **轮次**：r254 ｜ **日期**：2026-11-08 ｜ **方向**：存量真 bug 修复（**r253 交接簿已知未修③「MetacognitiveReward 奖励口径调优」**，本轮逐个查证后落地）
 **真升级类型**：缺陷修复（3 处口径缺陷，全部实测确认奖励信号退化）+ 新公开方法（`getStats()`，含 `byVerdict` 分布）经 MCP `action=stats` 暴露（约定 3 三处接线）+ 性能优化（`gate()` 有界记忆缓存，实测加速 96.2×）。MCP 工具 **187 不变**（未新增工具）、dispatch 路由 **1,319 不变**、判别维度 **210 不变**（`src/index.js` 零改动）、引擎模块 **162 不变**。
