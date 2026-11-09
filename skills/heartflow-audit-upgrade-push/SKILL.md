@@ -467,12 +467,14 @@ LEFTHOOK=0 git push "https://USERNAME:$TOKEN@github.com/OWNER/REPO.git" main:mai
 多实例共用同一 remote（本机 cron 定时推、另一实例也推）必然产生分叉。用户说"拉取新内容/同步/重新部署定时任务"时按本段执行：
 
 1. **先 fetch 再判形态**：`git fetch <remote> main`，双向数 `git log --oneline HEAD..<remote>/main` 与 `<remote>/main..HEAD`。双边非零=真分叉（走合并）；单边=快进。**合并前 pause 两个 cron**（见 Phase -1），且 `git status --short` 必须干净。
+1b. **先比两侧 touch 的文件集，再决定解冲突深度**：`git log --oneline --stat <base>..<remote>/main` 看对侧改了哪些文件，与本地改动集（`git diff --name-only <base>..HEAD`）比对。**零交集 = 天然无冲突面**，直接走合并；有交集才逐文件判性质（同文件不同段 git 自动合并，同段才是真冲突）。多 agent 并行仓库里这是常态——对方写它的 src/*.js，你改 index.js + VERSION + 四份文档，互不重叠。
+1c. **合并前 `git merge-tree` 干跑**：`git merge-tree $(git merge-base HEAD <remote>/main) HEAD <remote>/main`，把预演结果 grep 冲突标记。**判"无冲突"必须看双向标记 `+<<<<<<<` 与 `+>>>>>>>`，不能只 grep `=======`**——被合并文件的正文内容自身含 `=======`（测试输出的分隔线、报告里的等号线）会造假阳性，把 clean merge 误判成冲突。真实 clean merge 的输出只有 `merged` / `added in remote` / `removed in remote` 段。干跑通过再真合并，合并后**重跑五门禁**（见第 3 条）。
 2. **冲突固定五件套**：CHANGELOG.md、package.json、SKILL.md、VERSION、src/core/heartflow.js。解法：
    - CHANGELOG：双边同版本号记录并入同一版本头下（Added+Fixed 并存），不删任何一侧
    - 维度/模块/工具/路由数取**合并后实测值**（`scripts/measure-claimed-numbers.js`），随后 `sync-doc-numbers.js` 全量同步 + `--check` 复绿；CONTRIBUTING.md/CURRENT_STATE.md 两份活文档是既有漏网户，跟着修
    - VERSION/package.json/SKILL.md 版本号两边相同就保持，不为合并额外 bump
 3. **合并后必须重跑五门禁 + 冒烟**（不是只跑冒烟）：两条线的变更组合可能产生单线各自全绿、组合红的花样。典型回归形态——**验证脚本 teardown 竞态**：被检代码新增 await 边界（如先例查询接入 think() 开头）后，"同步阶段 stop() 引擎、之后才 await 异步检查"的验证脚本会让续跑撞 started 检查整项挂（verify 16 项必挂 1 项）。判据：任何 verify 脚本的 stop/teardown 必须位于 `Promise.all(checkResults)` 之后。
-4. **收尾三件套**：push 后 `git ls-remote` 复核远端 HEAD=本地且 `<remote>/main..HEAD | wc -l` 为 0 → `supervisorctl restart heartflow-mcp` + `/health` 与 `heartflow_status` 确认新版本新模块数 → 按暂停时记录的 job_id 列表逐个 resume（不是固定"两个"——cron 数量随实例增长，漏恢复的定时任务不会自愈），`cronjob list` 确认 enabled/state=scheduled/next_run_at，`cat ~/hermes1/cron/ticker_heartbeat` 确认调度器活着。
+4. **收尾三件套**：push 后 `git ls-remote` 复核远端 HEAD=本地且 `<remote>/main..HEAD | wc -l` 为 0 → `supervisorctl restart heartflow-mcp` + `/health` 与 `heartflow_status` 确认新版本新模块数 → 按暂停时记录的 job_id 列表逐个 resume（不是固定"两个"——cron 数量随实例增长，漏恢复的定时任务不会自愈），`cronjob list` 确认 enabled/state=scheduled/next_run_at，`cat ~/hermes1/cron/ticker_heartbeat` 确认调度器活着。**resume 报 `not found` 时回 list 或 jobs.json 拿精确 ID，别重试同一错 ID**（见已知陷阱 25）；收尾从 `~/hermes1/cron/jobs.json` 逐条断言全启用口径（enabled=true + state=scheduled + 无 paused_at + 无 paused_reason），不只看 list 输出。
 
 ### 推送策略（当网络环境复杂时）
 
@@ -1051,6 +1053,8 @@ done
 23. **add/add 冲突先在沙箱预演，并用符号集证明「取上游」不丢东西**（2026-11-08 实战）：两侧独立实现同一新文件时（本例 `src/prosecutors-fallacy.js` 两套零重叠符号），`git checkout --theirs` 是赌不是解。三步验证：① `comm -23` 对比两侧 `^(const|let|function)` 符号集，列出对方没有的符号；② 把「本地独有符号」对应的回归样本逐条打一遍上游实现（本例本地独有的医学腿修复，上游注释提了但正则没覆盖，实测本地样本 miss 才暴露）；③ 整个 rebase 在 `git clone --no-hardlinks` 的沙箱里跑完整流程并跑门禁，全绿后才在真实仓库重复同样步骤。另外 jsonl 账本（claims.jsonl 一类）合并后必须逐行 `json.loads` 校验——上游历史缺陷会把两条记录写成一行（`}{`），并集后仍留着。
 
 24. **孤儿导入（import 了从不使用的符号）** — 解构导入的每个符号名在该文件出现次数必须 ≥2（import 行自身 + 至少一处使用），计数为 1 即孤儿；整行 require 赋值同理。删调用点的同一轮必须复查被 touch 文件的 import 区——死 import 会伪装成「这个依赖还活着」，让后来者误判接线状态。修法：整行删，lazy loader 的 `_Xxx` 与 require 赋值行成对删。验证：`node --check` + 引擎加载 + 计数复测归 0。批量识别脚本见 `references/audit-fix-patterns.md` 第 12 节。
+
+25. **cron resume 的 job_id 是精确匹配，报 not found 时唯一正确处置是回权威源取 ID**：`cronjob_manage action=resume job_id=xxx` 抄错一位、凭记忆写、从旧会话抄都会 `not found`，而重试同一错 ID 只是白烧轮次。权威源两个：`cronjob_manage action=list` 的实时枚举，或直接读 `~/hermes1/cron/jobs.json`（`json.load` 后逐条打 id/name/enabled/state/paused_at）。暂停时记下的 job_id 列表也要在 resume 前与 list 输出核对一遍——暂停与恢复之间隔着一整轮修复，list 可能已变。恢复后按全启用口径逐条断言，漏 resume 的定时任务不会自愈。
 
 ---
 

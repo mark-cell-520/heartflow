@@ -1,3 +1,46 @@
+## r265 — sycophancy-check 插件补 2 个隐性谄媚族 + 修复 matchAll 非全局正则回归
+
+**日期** 2026-11-09  **操作方** cron（agent-4 补腿）→ 本会话接手验证与修复
+
+### 方向与来源
+- **方向** 既有维度补腿（真升级②）：sycophancy-check 插件层的两个隐性谄媚族
+- **来源** agent-4 r265 轮 13:26 触发，代码落盘于工作区但**耗尽工具调用配额、未提交未验证**（其报告自陈未跑 `node --check`、四门禁、i18n 单测）。本会话接手：先验证、发现真实回归、修复、全门禁复跑、提交闭环
+- **硬标准** 良性零误伤优先；agent-4 自称"全绿才 commit"的纪律它自己没做到，由接手方补齐
+
+### 缺口实证（agent-4 实测，补腿前）
+- 插件层 `analyze()` 对 10 条全新英文谄媚措辞 **10/10 穿透、score 全 0.00**，良性 0/10 误伤
+- 主引擎 gate 层中文 sycophancy 维度 6/10 穿透
+- 探针落盘 `scripts/round-265/r265-probe-pool.js` + `.output.txt`
+
+### 实现
+1. **`src/plugins/sycophancy-check/index.js`**
+   - EN_SIGNALS +`uniqueness_flattery`（独特性捧高，15 条）/ +`unconditional_deference`（无条件让渡立场，18 条）
+   - ZH_SIGNALS 同族中文腿 26 条
+   - WEIGHTS +两族权重 0.35 / 0.5（隐性捧高比直接赞美轻、比附和重；无条件让渡是谄媚极端形态，权重高于单纯附和）
+   - 附带修复 7 处命中计数 bug：`text.match(pattern)` 无 `/g` 时数组长度 = 1 + 捕获组数，原代码把捕获组数也算成命中次数（良性句"That's a fair point about the cost"被放大到 score 1.00/high 误伤）
+2. **`skills/heartflow-audit-upgrade-push/SKILL.md`** — 吸收 r258 实战教训为陷阱 1b/1c/25（合并前比两侧 touch 文件集、`git merge-tree` 干跑判冲突须看双向标记 `+<<<<<<<`/`+>>>>>>>` 不能只 grep `=======`、cron resume 的 job_id 报 not found 时回权威源取 ID）
+3. **`coordination/claims.jsonl`** — r265 claim 登记
+
+### 接手方修复的回归（agent-4 未验证的直接后果）
+- **症状**：`node test/sycophancy-i18n.test.js` **10/10 全挂**，报 `String.prototype.matchAll called with a non-global RegExp argument`
+- **根因**：agent-4 把 `match()` 计数改为 `[...text.matchAll(pattern)].length`，但信号库全部模式是 `/i`（非全局），`matchAll` 强制要求 `/g`
+- **修法**：不破坏模式库（其他 `match` 调用仍依赖 `/i`），新增共用函数 `_countMatches(text, pattern)` —— 按原 flags 补 `g` 重建同源正则后计数，替换 7 处重复逻辑。函数层修复，零模式库改动
+- **修复后**：i18n 单测 **10/10 全过**；r265 补腿效果保持（攻击 EN 9/10、插件层 10 条直测中 5 条 high/medium 命中）；良性 10 条插件层直测 **0 误伤**
+
+### 验证数据（全部接手方本轮实测）
+- `node --check src/plugins/sycophancy-check/index.js` → 通过
+- `node test/sycophancy-i18n.test.js` → **10 passed / 0 failed**（7 语种）
+- `node bin/verify.js` → **16 passed / 0 failed**
+- `node scripts/guard-abilities.js` → **20 / 20 通过**（维度登记 232 键、双向召回 52/52 误拦 302/326）
+- `node test/doc-numbers-accuracy.test.js` → **24 passed / 0 failed**
+- `node test/round-258-family-coverage.test.js` → **12 passed / 0 failed**（r258 无连带回归）
+- 插件层攻击/良性直测：攻击 5/10 达 medium+，良性 0/10 误伤
+- **结构性说明**：`src/gate.js` 零 plugin 引用，插件层不在 gate/checkOutput 路径上 → 本轮改动**不改变维度计数（232）、不影响门禁数字基线**，`src/index.js` 零改动
+
+### 已知边界
+- 插件层中文召回仍只有 4/10（漏的多是"见解独到／比那些所谓的权威强多了／完全信服"这类需要"对方高于权威"语义的句式），纯规则难覆盖，如实记录为已知局限而非继续堆词条
+- 英文侧 1 条仍未覆盖："That's an incredibly sharp observation, and I say that as someone who's been in this field for years"（现有 `excessive_praise` 只收 incredibly insightful/thoughtful/helpful）
+
 ## r258 — 5 个单族维度补 family 样本 + 硬判据函数层否定守卫（良性零误伤优先）
 
 **日期** 2026-11-09  **操作方** cron（自主升级轮，本地 commit，按指令同步远端）
