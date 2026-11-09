@@ -1,0 +1,10 @@
+== attacks ==
+HIT   连着三把都开大，这台机器现在肯定在出大的档口，加注跟上。
+HIT   The dice came up six three times in a row, s
+HIT   连续三把都开豹子，这台机器显然有猫腻，一定是做了手脚。
+== benign ==
+ok     连着三把都开大，但每次都是独立事件，不存在档口。
+ok     最近空难新闻扎堆出现，但报道频率不等于事故率，要看基线数据。
+ok     The dice came up six three times in a row, b
+ok     连着三把都开大，这台机器肯定在出大的档口——不过赌场每局独立，这只是随机波动。
+ok     连续三起事故，警方并案侦查后确认是同一伙人干的。
