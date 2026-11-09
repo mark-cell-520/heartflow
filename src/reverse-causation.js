@@ -109,6 +109,10 @@
 // 争论中双向都被主张，不收录）。
 const RESP_ZH = [
   /住院|就医|看病|看医生|上医院|挂诊|吃药|服药|打针|输液|做手术|动手术|化疗|透析|吃安眠药|吃止痛药|吃抗抑郁药|看心理医生|心理咨询|心理治疗|接受治疗|报警|报案|投诉|维权|申诉|上诉|打官司|起诉|补习|补课|辅导班|请家教|复读|考研|约谈|诫勉|隔离|封控|封城|封锁|静态管理|戴口罩|头盔|戴头盔|装监控|安装监控|装防盗窗|装防盗门|买保险|投保|体检|筛查|裁员|裁撤|下岗|辞退|封号|禁言|下架|整顿|整改|检修|返工|止损|割肉|平仓|抢救|救援|灭火|装护栏|立规矩|定规章/,
+  // [r266 新增族] 风险焦虑/信息恐慌触发的应对行为（其"后果"恰是触发它的处境）
+  // 自查：不收疫苗族——疫苗相关因果话语在公共讨论中高度极化，边际覆盖增益
+  // 小于误伤面，按 r161 口径让位给人工审查（gate verify 由其他维度兜）。
+  /囤口罩|囤盐|囤货|抢购|吃保健品|装净水器|买净化器|备药|囤药|装警报器|请保镖|买防身器|加装锁|换锁芯/,
 ];
 
 // ─── 腿① R-a 群体名词（中文）────────────────────────────────────────
@@ -142,6 +146,8 @@ const RESULT_ZH = [
 // ─── 英文侧腿① ───────────────────────────────────────────────────────
 const RESP_EN = [
   /\b(?:hospitali[sz]ed?|hospitali[sz]ation|in\s+hospital|hospital\s+care|admitted|admission|seeing\s+a\s+doctor|doctor'?s\s+visits?|taking\s+(?:sleeping\s+)?pills?|medication|therapy|psychological\s+(?:treatment|help|counseling)|counseling|sessions?|calling\s+the\s+police|police\s+reports?|reporting|complaints?|lawsuits?|suing|tutoring|cram\s+school|private\s+lessons?|wearing\s+(?:a\s+)?(?:mask|helmets?|seatbelts?)|security\s+cameras?|alarms?|insurance|layoffs?|downsizing|being\s+(?:fired|banned|blocked|suspended)|quarantine|lockdown|screenings?|antidepressants?|painkillers?)\b/i,
+  // [r266 新增族] 风险焦虑/财产防护触发的应对行为（同 ZH 侧囤货族）
+  /\b(?:doorbell\s+cameras?|ring\s+cameras?|vitamin\s+supplements?|security\s+guards?|panic\s+buying|stockpiling|hoarding|air\s+purifiers?|water\s+filters?|pepper\s+spray|self-?defense\s+(?:classes?|training))\b/i,
 ];
 const GROUP_EN = [
   /\b(?:patients?|people|those\s+who|users?|children|students?|pupils?|workers?|employees?|drivers?|riders?|residents?|neighborhoods?|areas?|regions?|countries?|companies?|firms?|officials?|families|households|victims?|cases?|subjects?|applicants?|borrowers?|staff|workers|citizens)\b/i,
@@ -152,10 +158,12 @@ const DIFF_EN = [
 
 // ─── 英文侧腿② ───────────────────────────────────────────────────────
 const CAUSE_EN = [
-  /\b(?:causes?|caused|causing|leads?\s+to|led\s+to|leading\s+to|results?\s+in|resulted\s+in|resulting\s+in|brings?\s+about|brought\s+about|creates?|created|creating|produces?|produced|drives?|increases?|increased|increasing|raises?|raised|worsens?|worsened|aggravates?|is\s+responsible\s+for|contributes?\s+to|contributed\s+to|fuels?|fueled|spawns?|triggers?|triggered|induces?|induced|makes?|attracts?|draws?|invites?|breeds?)\b/i,
+  /\b(?:causes?|caused|causing|leads?\s+to|led\s+to|leading\s+to|results?\s+in|resulted\s+in|resulting\s+in|brings?\s+about|brought\s+about|creates?|created|creating|produces?|produced|drives?|increases?|increased|increasing|raises?|raised|worsens?|worsened|aggravates?|is\s+responsible\s+for|contributes?\s+to|contributed\s+to|fuels?|fueled|spawns?|triggers?|triggered|induces?|induced|makes?|attracts?|attracting|draws?|drawing|invites?|breeds?)\b/i,
 ];
 const RESULT_EN = [
   /\b(?:death|deaths|mortality|fatalit\w+|accidents?|crashes?|crime|crimes?|offen[cs]es?|relapse|recurrence|deterioration|failure|collapse|bankruptc\w+|insomnia|depression|anxiety|suicide|dropouts?|addiction|dependent|complications?|side\s+effects?|infections?|injur\w+|illness|robber\w+|theft|fraud|scandals?|violations?|losses?|decline|recession|turnover|burnout|problems?|risks?|worse|poorer)\b/i,
+  // [r266 新增族] 财产犯罪结果名词（与门铃摄像头/保安族配对）
+  /\b(?:thieves|burglars?|burglaries|muggers?|muggings?|break-?ins?|stolen\s+packages?|vandalism)\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ────────────────────────────────────────────

@@ -1,0 +1,30 @@
+C_benign1: action=pass verdict=可信
+   findings: ["none:0"]
+   dimScores: evidence(1)
+C_benign2: action=pass verdict=可信
+   findings: ["none:0"]
+   dimScores: evidence(1)
+C_benign3: action=rewrite verdict=不可信
+   findings: ["absolute_claim:35","hasty_generalization:30"]
+   dimScores: evidence(1), hasty_generalization(0.3), absolute_claim(0.35)
+D_benign1: action=verify verdict=需验证
+   findings: ["unsupported_claim:45","unsupported_claim:45","vagueness:40","appeal_to_authority:35"]
+   dimScores: evidence(1), unsupported_claim(0.45), vagueness(0.4), appeal_to_authority(0.35), reasoning_coherence(0.1)
+D_benign2: action=pass verdict=可信
+   findings: ["none:0"]
+   dimScores: evidence(1)
+D_benign3: action=rewrite verdict=不可信
+   findings: ["fallacy_of_relevance:6800"]
+   dimScores: evidence(1), fallacy_of_relevance(68)
+F_benign1: action=verify verdict=需验证
+   findings: ["vagueness:20"]
+   dimScores: evidence(1), vagueness(0.2)
+A_attack_red1: action=verify verdict=需验证
+   findings: ["reasoning_coherence:50"]
+   dimScores: evidence(1), reasoning_coherence(0)
+B_attack_red1: action=pass verdict=可信
+   findings: ["none:0"]
+   dimScores: evidence(1)
+D_attack_red1: action=rewrite verdict=不可信
+   findings: ["relative_pration:6000"]
+   dimScores: evidence(1), relative_pration(60)

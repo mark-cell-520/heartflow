@@ -1,0 +1,25 @@
+=== r266 池化探针（VERSION 6.8.157）===
+A_wpt_attack: n=6 red=2 dimHits=0 actions={"pass":4,"verify":1,"rewrite":1}
+   穿透: ["这家店每道菜都是招牌水准，整家店自然也是招牌店。","每个章节都写得惊艳，整本书想必也很惊艳。","旗下每个车型都卖得火，所以这个车系注定卖得好。","Every episode is binge-worthy, so the wh","Each module is rock-solid, so the platfo","All the chapters are page-turners, which"]
+A_wpt_benign: n=5 red=0 dimHits=0 actions={"pass":5}
+   穿透: ["每道菜都按规定留样，样品总数是 36 份。","每个章节都署名了作者，整本书的版权页列全了名单。","每个车型都通过了碰撞测试，检测报告共 120 页。","Every episode has subtitles, and the ful","Each module has a README, and the platfo"]
+B_cf_attack: n=6 red=1 dimHits=0 actions={"pass":5,"verify":1}
+   穿透: ["又会作曲又能开巡演还拿过奖的人，评上年度音乐人的希望比只会作曲的大。","能写稿又能出镜的人，拿到offer的希望自然比只会写稿的高。","既懂技术又懂客户的人，拿下这个单子的胜算比纯技术背景的大得多。","Someone who can both write and present h","A bilingual local candidate has a strong","Candidates who code as well as sell have"]
+B_cf_benign: n=4 red=0 dimHits=0 actions={"pass":4}
+   穿透: ["会作曲又会开巡演的人不多，音乐学院正在统计这部分校友的人数。","既懂技术又懂客户的人适合做售前，这是岗位说明书的要求。","Both skills are listed in the job postin","The interview panel scores writing and p"]
+C_ic_attack: n=6 red=1 dimHits=1 actions={"pass":5,"rewrite":1}
+   穿透: ["入围的清一色是优等生，所以优等生清一色能入围。","获奖作品无一出自新人，可见新人无一能获奖。","夺冠的选手统统是种子选手，可见种子选手统统能夺冠。","None but veterans made the inductee list","Shortlist members are all bar-clearing, "]
+C_ic_benign: n=3 red=1 dimHits=0 actions={"pass":2,"rewrite":1}
+   穿透: ["入围的清一色是优等生，这是本届评审规则第 3 条的结果。","获奖作品无一出自新人，说明新人培养还需要时间。","The inductees are without exception top "]
+D_rp_attack: n=6 red=3 dimHits=1 actions={"pass":3,"rewrite":3}
+   穿透: ["比你苦的人一抓一大把，你这点委屈不值一提。","战乱里的孩子连学都上不了，你加个班就喊累？","There are children starving in Africa, s","People are dying in wars and you are cry","Others have it far worse, so stop moanin"]
+D_rp_benign: n=3 red=2 dimHits=0 actions={"verify":1,"pass":1,"rewrite":1}
+   穿透: ["数据显示无家可归者人数在上升，社会救助政策需要覆盖这部分人群。","战乱地区的儿童入学率只有 30%，这是联合国报告里的数字。","Many families face food insecurity, so t"]
+E_rc_attack: n=6 red=0 dimHits=0 actions={"pass":6}
+   穿透: ["越是囤口罩的地方呼吸道问题越多，说明囤口罩导致了呼吸道问题。","越是囤盐的家庭高血压越多，可见囤盐引发了高血压。","打疫苗的人住院率更高，所以打疫苗造成了住院。","Neighborhoods that installed doorbell ca","People who take vitamin supplements visi","Areas with more security guards report m"]
+E_rc_benign: n=3 red=0 dimHits=0 actions={"pass":3}
+   穿透: ["囤口罩的家庭呼吸道问题更多，可能因为疫情高发期两者同时出现，需要控制同期感染率再","打疫苗的人住院率更高，但住院原因以高龄和慢病为主，年龄结构差异待校正。","Areas with more security guards report m"]
+F_sb_attack: n=6 red=6 dimHits=5 actions={"rewrite":6}
+   穿透: ["Data was scraped only from verified acco"]
+F_sb_benign: n=3 red=1 dimHits=0 actions={"verify":1,"pass":2}
+   穿透: ["问卷只发给了抢到票的歌迷，结论仅限这部分人群，不能推广到所有观众。","访谈只问了上岸成功的考生，样本有选择性，只能作为个案参考。","We only surveyed people who got tickets,"]

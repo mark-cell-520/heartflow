@@ -1,0 +1,426 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/dXRpzpTkXUGJt9v4EsW1tvrMX+k</id>
+  <title>arXiv Query: search_query=all:statistical OR all:reasoning OR all:base OR all:rate OR all:neglect OR all:conjunction OR all:fallacy OR all:fallacy OR all:detection OR all:rule-based OR all:NLP&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-09T07:13:48Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:statistical+OR+(all:reasoning+OR+(all:base+OR+(all:rate+OR+(all:neglect+OR+(all:conjunction+OR+(all:fallacy+OR+(all:fallacy+OR+(all:detection+OR+(all:rule-based+OR+all:NLP)))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>1425950</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09894v1</id>
+    <title>Video-Coder: Reinforcing Agentic Coding for Video Generation</title>
+    <updated>2026-11-06T18:59:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.09894v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09894v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent years have witnessed remarkable progress in video generation in terms of visual quality and temporal consistency. However, generating videos with precise spatial structure, coherent motion dynamics, and controllable scene composition remains challenging. In this paper, we introduce Video-Coder, the first attempt to train a code-driven video generation agent, which autonomously writes and executes code to construct a dynamic 3D scene (Draft Video) that provides structure and motion signals to downstream video generators. To support this paradigm, we design a dedicated data pipeline and curate two high-quality datasets, Video-Coder-SFT-6k and Video-Coder-RL-2k, which contain diverse prompts and ground-truth reference videos. We further develop the Video- Coder Harness, a unified interactive environment integrating code execution, 3D scene rendering, and execution feedback for agent training and inference. We then train Video-Coder with SFT fol- lowed by harness-native agentic reinforcement learning with dual reward feedback, which combines execution-based and video-based rewards. Additionally, we design an annealing training strategy that gradually reduces the execution reward over time, allowing the model to rely more on the video reward in the later training stages. Experiments show that Video-Coder achieves significant gains, improving Minimax-H3 by approximately 7 points on PhyGenBench and 24 points on VBench-2.0. We hope this work can serve as an open foundation for coding agents in video generation, and we fully open-source our data, models, and code</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:59:57Z</published>
+    <arxiv:comment>Project Page:https://cywang735.github.io/Video-Coder/ Code: https://github.com/CYWang735/Video-Coder</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Chaoyang Wang</name>
+    </author>
+    <author>
+      <name>Sicheng Gao</name>
+    </author>
+    <author>
+      <name>Junan Hu</name>
+    </author>
+    <author>
+      <name>Kunyang Li</name>
+    </author>
+    <author>
+      <name>Dongyang Chen</name>
+    </author>
+    <author>
+      <name>Yiyang Zhou</name>
+    </author>
+    <author>
+      <name>Huaxiu Yao</name>
+    </author>
+    <author>
+      <name>Yong Jae Lee</name>
+    </author>
+    <author>
+      <name>Radu Timofte</name>
+    </author>
+    <author>
+      <name>Yuzhang Shang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09892v1</id>
+    <title>On Agentic Manipulation Policies</title>
+    <updated>2026-11-06T18:59:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.09892v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09892v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Recent work on robot manipulation has focused on specialist policies trained on demonstrations. We show that generalist AI models can control manipulators more reliably than specialist policies such as vision-language-action models (VLAs) and world-action models (WAMs). We systematically analyze agentic manipulation policies (AMPs), in which a generalist AI model commands the manipulator directly, adapting its actions as the task unfolds. We present AMP1, a reference harness that runs unchanged across single-arm, bimanual, and mobile manipulation. AMP1 achieves state-of-the-art results on the RoboLab-120 and CaP-Gym benchmarks, with no demonstrations or task-specific training. On RoboLab-120, AMP1 reaches an 85.6\% success rate zero-shot, compared to 49.2\% and 42.9\% for leading VLA and WAM policies. The agent succeeds zero-shot in 104 of 108 real-world trials spanning twelve tasks and three robot instances, reducing failure rates by 20x and 15x relative to strong VLA and WAM baselines. The basic harness supplies no grasping, pushing, or placing skills; the agent develops its own strategies, such as searching for hidden objects, using objects as tools, and calibrating its cameras. With the addition of a persistent memory store, the agent can also learn from experience: an augmented harness with a memory representation that is carried across episodes lowers the failure rate on RoboDojo bimanual manipulation tasks by 4.6x relative to zero-shot deployment. Our analysis suggests that AMPs are substantially more general and robust than specialist manipulation policies, providing a promising foundation for robot manipulation.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:59:34Z</published>
+    <arxiv:comment>Videos and code available at: https://apple-aiml-research.github.io/ml-amp/</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Chen Chen</name>
+    </author>
+    <author>
+      <name>Omid Bagherieh</name>
+    </author>
+    <author>
+      <name>Naveen Nikamanth Appiah Balaji</name>
+    </author>
+    <author>
+      <name>Jesse T. Gonzalez</name>
+    </author>
+    <author>
+      <name>Negin Heravi</name>
+    </author>
+    <author>
+      <name>Fahad Islam</name>
+    </author>
+    <author>
+      <name>Xueting Li</name>
+    </author>
+    <author>
+      <name>Jean-Baptiste Regli</name>
+    </author>
+    <author>
+      <name>Kejia Ren</name>
+    </author>
+    <author>
+      <name>Petr Švec</name>
+    </author>
+    <author>
+      <name>David J. Yoon</name>
+    </author>
+    <author>
+      <name>Matthias Müller</name>
+    </author>
+    <author>
+      <name>Vladlen Koltun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09891v1</id>
+    <title>CPU-ARC: Agentic Reasoning Caching for on-CPU Reasoning Reuse</title>
+    <updated>2026-11-06T18:58:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.09891v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09891v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models reinvent the wheel all the time. They conflate task-solving with the execution of the solutions, which forces them to solve every problem from scratch. We show that once a task has been reasoned through, the application of its solution to a new problem instance can be done very efficiently and with little involvement from language models. We introduce agentic reasoning caching, a method for constructing robust CPU-executable agentic reasoning caches (ARCs) from LLM reasoning traces. ARCs show on-par performance with frontier LLMs across a range of difficult mathematical and scientific tasks, are fully explainable, continually trainable, robust to input perturbations, and 16-291x cheaper to invoke than the source model.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:50Z</published>
+    <arxiv:comment>Tech report. 28 pages, 9 figures, 11 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Peter Belcak</name>
+    </author>
+    <author>
+      <name>Greg Heinrich</name>
+    </author>
+    <author>
+      <name>Saurav Muralidharan</name>
+    </author>
+    <author>
+      <name>Shizhe Diao</name>
+    </author>
+    <author>
+      <name>Pavlo Molchanov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09890v1</id>
+    <title>Global Two-Sided Estimates for Time-Fractional Diffusion Kernels on Hyperbolic Space</title>
+    <updated>2026-11-06T18:58:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.09890v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09890v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study time-fractional diffusion on real hyperbolic space $\mathbb H^n$, $n\ge2$, with Caputo order $0&lt;α&lt;1$. We establish global two-sided pointwise estimates for the homogeneous fundamental kernel $Z_{\mathbb H}(t,r)$ and the inhomogeneous (Duhamel) kernel $Y_{\mathbb H}(t,r)$, uniformly over all $t&gt;0$ and positive geodesic distances $r$. By combining inverse-stable subordination with global bounds for the hyperbolic heat kernel, we distinguish a short-time local regime, a large-time interior region, and an exterior region governed by a saddle-point problem with parameter $r/t$. Both kernels have the same exterior exponential rate, while their amplitudes are related by an explicit saddle-point factor. The estimates are uniformly comparable on the interfaces between regimes, recover the Euclidean time-fractional singularities at small scales, and identify the influence of hyperbolic geometry on large-scale decay. The kernel $Z_{\mathbb H}$ also describes the one-time marginal density of hyperbolic Brownian motion under an independent inverse stable clock. This representation yields a radial limit law, moment and quantile asymptotics, and a change in the mean square displacement from order $t^α$ at small times to order $t^{2α}$ at large times.</summary>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:47Z</published>
+    <arxiv:comment>35 pages</arxiv:comment>
+    <arxiv:primary_category term="math.PR"/>
+    <author>
+      <name>Vicente Vergara</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09889v1</id>
+    <title>SciCheck: A Framework for Verifying the Integrity of Deep Learning Training</title>
+    <updated>2026-11-06T18:58:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.09889v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09889v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Deep learning training is difficult to verify within a scientific workflow: its architecture, hyperparameters, and procedure are rarely fixed until training has been attempted, and two honest runs never produce the same weights, so recomputation cannot serve as a check. We present SciCheck, a framework in which the scientist explores training configurations freely and posts a blueprint to a provenance ledger for each candidate they want verified, and a verifying scientist judges the resulting run in two layers: a statistical judge model that compares per-step gradient statistics against the verifier's own reference run, and a spot-check that re-executes randomly chosen training segments whose checkpoints are committed to the ledger one epoch at a time. On an MLP, a CNN, and an autoencoder at 100k-500k parameters, under gradient sign flipping, label poisoning, and fabricated runs, SciCheck reaches F1 of 0.966, 0.906, and 0.976 while rejecting 0-4.4% of honest runs. For the attacks we test, the spot-check accounts for most of this accuracy, and we characterize what each layer can detect. The effective-signal statistic falls as $(1-2s)^2$ under a sign flip of severity $s$, so gradient statistics alone catch strong enough sign flips, while fabricated runs that replay genuine statistics look no more anomalous than honest runs to any statistical detector we test. The spot-check catches fully fabricated segments with probability at least $1-(1-s)^k$ for $k$ sampled segments when the draws stay hidden until the run is committed, which roughly matches our measurements and lets a verifier choose $k$ for a target soundness. Verification costs 1.5-2.3x one retraining, mostly for the verifier's reference run; each submission's spot-check takes under 1.5 s, and per-epoch commitments reduce checkpoint storage 5-17x compared with keeping every checkpoint.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:38Z</published>
+    <arxiv:comment>10 pages, 3 figures, 6 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Alexander Nguyen</name>
+    </author>
+    <author>
+      <name>Dylan Gresham</name>
+    </author>
+    <author>
+      <name>Gaby G. Dagher</name>
+    </author>
+    <author>
+      <name>Min Long</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09888v1</id>
+    <title>Scenario Orchestration for Closed-loop Policy Evaluation of Autonomous Driving</title>
+    <updated>2026-11-06T18:58:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.09888v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09888v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Scenario-based simulation is central to evaluating autonomous-driving policies, but a scenario scripted before execution (i.e., with predetermined, fixed actor routes and speeds) may not preserve its intended interaction once the tested ego policy responds in closed loop. Scripted scenarios cannot adapt to unanticipated ego behavior, while learned traffic actors may remain reactive without reliably realizing a particular scenario intent. We introduce a scenario orchestrator that continuously monitors the joint traffic state and adapts non-ego actors through re-timing, re-routing, and role reassignment for creating a specific scenario intent. At each step, the orchestrator solves a constrained optimization problem that preserves the intended interaction while limiting interventions and maintaining traffic feasibility. We further distinguish scenario realization from policy failure, allowing a test to first be judged based on whether the intended interaction occurred and then by how the ego policy responded. Experiments in the CARLA simulator across multiple scenario families and driving policies show that orchestration realizes targeted interactions more reliably than scripted and learned actor-level baselines, particularly under variations in initial conditions and ego behavior. These results support closed-loop scenario orchestration as a tool for controlled and reproducible policy evaluation.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:58:27Z</published>
+    <arxiv:comment>8 pages, 5 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Frieda Rong</name>
+    </author>
+    <author>
+      <name>Zhaoyue Wang</name>
+    </author>
+    <author>
+      <name>Veer Kapadia</name>
+    </author>
+    <author>
+      <name>Vishaka Rajani</name>
+    </author>
+    <author>
+      <name>Aren A. Babikian</name>
+    </author>
+    <author>
+      <name>Xujie Si</name>
+    </author>
+    <author>
+      <name>Mahsa Golchoubian</name>
+    </author>
+    <author>
+      <name>Raquel Urtasun</name>
+    </author>
+    <author>
+      <name>Igor Gilitschenski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09877v1</id>
+    <title>Locating Contact on Tendon-Driven Continuum Robots From Tendon Measurements Alone via Constrained Moving Horizon Estimation</title>
+    <updated>2026-11-06T18:53:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.09877v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09877v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Tendon-driven continuum robots can reach through constrained spaces, but contact along their bodies is invisible to the sensors at their motors. We show that this is a structural limitation rather than a tuning problem: the map from contact forces to tendon measurements has a null space of dimension at least seven, so no estimator that leaves the contact support free can locate contact. When the obstacle geometry is known, however, non-penetration and complementarity make the contact force locally identifiable, and we prove that the resulting system with unknown contact inputs is locally exponentially strongly detectable. We present a constrained moving horizon estimator (MHE) that encodes these conditions and runs in real time as one quadratic program per sample, and we give a local, mode-wise robust stability result for it. In a finite- element benchmark of a two-section robot pressing and sliding on a wall, the estimator located contact to 0.9 mm and estimated contact force to 0.22 N, compared with 65 mm and 0.72 N for a tuned extended Kalman filter (EKF) with state projection. The estimator tolerated millimeter- level errors in the obstacle position and unmodeled wall friction, under which the projected EKF failed. Under randomized model mismatch over 40 trials, including unmodeled tendon friction, it remained better in force and location in every trial. Without contact, the MHE offered no advantage over the EKF, which confirms that its benefit comes from the contact constraints. This report extends a letter submitted to IEEE Control Systems Letters with complete proofs and additional experiments.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:53:10Z</published>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Haitham El-Hussieny</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09876v1</id>
+    <title>Novikov-Magnus Master Equation for Driven Quantum Systems under Classical Correlated Noise</title>
+    <updated>2026-11-06T18:53:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.09876v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09876v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce a modular framework for deriving time-local quantum master equations for driven systems subject to temporally correlated classical noise. The construction combines the Donsker-Furutsu-Novikov relation with the Magnus expansion: Functional response closes the noise average, while nested commutators retain the noncommuting chronological action of noise-induced perturbations along the controlled quantum trajectory. For zero-mean Gaussian noise, we derive the resulting Novikov-Magnus quantum master equation through fourth order in the noise strength. The same response hierarchy suggests a natural extension beyond Gaussian noise, with connected higher-order noise correlations weighting higher functional derivatives of the stochastic map. For a driven qubit under Ornstein-Uhlenbeck and band-limited $1/f$ noise, the second- and fourth-order maps remain CPTP throughout the perturbative regime and accurately reproduce stochastic simulations. Their diamond-norm errors are comparable to those of the cumulant-based pseudo-Lindblad master equation, with a modest fourth-order improvement for Ornstein-Uhlenbeck noise.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:53:03Z</published>
+    <arxiv:comment>main text 5 pages, supplemental text 24 pages, 3 main text figures, 16 supplemental figures</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Nada Khogeer</name>
+    </author>
+    <author>
+      <name>Jerison Parra</name>
+    </author>
+    <author>
+      <name>Caroline Desgranges</name>
+    </author>
+    <author>
+      <name>Hugo Ribeiro</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09872v1</id>
+    <title>On the Reliability of Majority-Vote Pseudo-Labels in Test-Time Reinforcement Learning</title>
+    <updated>2026-11-06T18:49:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.09872v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09872v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Test-time reinforcement learning (TTRL) adapts pretrained language models to unlabeled target-domain data using self-generated pseudo-labels, whose reliability remains poorly understood. We analyze majority-vote supervision for TTRL with online Direct Preference Optimization (DPO) and decompose its error into population-majority bias and prompt-dependent finite-rollout variation. Because population-majority bias is generally unidentifiable without external supervision, we focus on mitigating the downstream effects of finite-rollout variation. We propose \emph{Prompt-Conditional Distributionally Robust DPO (PC-Dr.DPO)}, which conditions within-prompt robust reweighting on observed vote reliability to make updates from sampling-sensitive prompts more conservative. We further introduce a cache-based mechanism to reduce self-supervised forgetting during online adaptation. Across six mathematical and knowledge-intensive reasoning benchmarks and five model backbones, PC-Dr.DPO matches or outperforms the strongest TTRL baseline in 24 of 30 settings.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:49:02Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Haoyu Wang</name>
+    </author>
+    <author>
+      <name>Ru Wang</name>
+    </author>
+    <author>
+      <name>Yuanyuan Wang</name>
+    </author>
+    <author>
+      <name>Jiaxian Guo</name>
+    </author>
+    <author>
+      <name>Mingming Gong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09869v1</id>
+    <title>An Empirical Study on Clustering-based Quantum Approximate Optimization Algorithm for Regression Test Case Selection</title>
+    <updated>2026-11-06T18:48:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.09869v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09869v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Regression testing assesses whether software components that have already been developed and tested continue to work correctly after modifications. Ideally, regression testing re-executes the entire test suite after each modification, but this is infeasible in real-world scenarios because of the computational burden; therefore, optimized approaches, such as Test Case Selection, have been developed. The state of the art in regression testing optimization includes both classical approaches, such as Additional Greedy and DIV-GA, and quantum approaches, such as SelectQA, BootQA, and IGDec-QAOA. However, while the former incur high computational costs, the latter are constrained by the physical limitations of currently available quantum machines.
+  This paper extends the evaluation of QAOA-TCS, our quantum approach for the test case selection problem. We thoroughly evaluate its performance, compare it with state-of-the-art classical and quantum approaches, and assess its robustness to quantum noise.
+  The results show that QAOA-TCS outperforms state-of-the-art multi-objective approaches in most cases and maintains stable performance even under high noise levels. In the single-objective formulation, QAOA-based methods perform comparably. In terms of efficiency, our previous method based on quantum annealing, namely SelectQA, is the most efficient for large problems in the multi-objective formulation, whereas QAOA-TCS offers the best trade-off between effectiveness and efficiency in the single-objective formulation when run on realistic noisy simulators. However, such analysis is constrained by the different computational environments used to run the algorithms.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:13Z</published>
+    <arxiv:comment>Manuscript under review at Empirical Software Engineering (EMSE)</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Antonio Trovato</name>
+    </author>
+    <author>
+      <name>Martin Beseda</name>
+    </author>
+    <author>
+      <name>Dario Di Nucci</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09868v1</id>
+    <title>CodeQuant2: Enhanced Outlier Mitigation and Adaptive Clustering for Low-Precision LRMs</title>
+    <updated>2026-11-06T18:48:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.09868v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09868v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large reasoning models (LRMs) improve task performance by generating longer intermediate reasoning traces, but this substantially increases inference costs and makes low-precision quantization increasingly important. However, aggressively quantized models often perform poorly on reasoning tasks. We observe larger activation fluctuations during the first decoding steps of reasoning. Calibration that omits these early states may miss their activation fluctuations. To address these reasoning-specific quantization challenges, we propose \textbf{CodeQuant2}, a clustering-based LUT quantization framework for low-precision large reasoning models. CodeQuant2 mitigates activation outliers with rotation and scaling, uses clustering to represent non-uniform weight distributions, and adapts codebook sizes to the quantization difficulty of each layer. Guided by our observation of reasoning-time activation behavior, CodeQuant2 further improves calibration sample selection to better match actual decoding statistics. Combined with our customized LUT CUDA kernel, CodeQuant2 delivers substantial accuracy improvements on reasoning benchmarks while achieving up to $2.85\times$ speedup over BF16.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:48:04Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Xingyu Liu</name>
+    </author>
+    <author>
+      <name>Xiangyang Yin</name>
+    </author>
+    <author>
+      <name>Tianhua Xia</name>
+    </author>
+    <author>
+      <name>Haiyu Wang</name>
+    </author>
+    <author>
+      <name>Sai Qian Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09866v1</id>
+    <title>GRAC: Graph-Based Retrieval-Augmented Captioning for Surgical Scene Description</title>
+    <updated>2026-11-06T18:47:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.09866v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09866v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Purpose: Surgical operative reports support procedural documentation, surgical training, performance assessment, and workflow review. However, extracting meaningful information often requires extensive manual review and clinical expertise. Automated surgical scene descriptions could reduce this burden by leveraging recurring surgical activities and prior knowledge.
+  Methods: We propose GRAC (Graph-Based Retrieval-Augmented Captioning), a framework that represents surgical scenes as graphs capturing relationships among instruments, actions, and anatomical structures. Given an input scene graph, GRAC learns to retrieve relevant graph-caption pairs from training data. It compares instrument-tissue interactions between retrieved examples and the input scene, using comparison features to condition retrieved-caption representations during generation.
+  Results: On the EndoVis-18 benchmark, GRAC achieved a CIDEr-D of 5.88, compared with 4.23 for SGT and 3.36 for the strongest conventional Transformer baseline. Exact instrument-action-target triplet-set accuracy reached 52.6%, compared with 32.7% for SGT and 26.2% for the strongest conventional baseline. These results demonstrate improvements in language quality and factual agreement. On TORS, GRAC achieved a CIDEr-D of 5.06, compared with 3.80 for the strongest baseline.
+  Conclusion: GRAC demonstrates that combining structured surgical scene representations with retrieved examples improves surgical scene captioning and produces more contextually meaningful descriptions.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:47:23Z</published>
+    <arxiv:comment>20 Pages and 4 Figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Rochak Dhakal</name>
+    </author>
+    <author>
+      <name>Chen Zhao</name>
+    </author>
+    <author>
+      <name>Soup Cobb</name>
+    </author>
+    <author>
+      <name>Xin Qian</name>
+    </author>
+    <author>
+      <name>Xiaofeng Yang</name>
+    </author>
+    <author>
+      <name>Weihua Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09865v1</id>
+    <title>Emergence and polymer physics of the center-vortex network: Confronting SU(4) lattice Yang-Mills theory</title>
+    <updated>2026-11-06T18:45:23Z</updated>
+    <link href="https://arxiv.org/abs/2611.09865v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09865v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The geometric organization and statistical properties of center-vortex networks provide a window into the infrared dynamics underlying confinement in Yang-Mills theory. Motivated by this connection, we investigate new consequences of a previously proposed confinement mechanism based on physically equivalent elementary Cartan fluxes. We show that, in the percolating phase, these fluxes dynamically reorganize into center-charge sectors whose dominant vortex tensions satisfy a Casimir scaling law, similar to that observed for confining string tensions. We then confront this result with the first nontrivial Yang-Mills case: the doubly charged vortex chains recently observed in SU(4) lattice simulations. To extract the parameters needed to connect the lattice ensemble with the effective description, we characterize how center-vortex chains grow and bend in SU(3) and SU(4) using polymer-inspired techniques not previously applied to center vortices. We find good quantitative agreement for the SU(4) doubly charged sector, providing further evidence for the proposed mechanism.</summary>
+    <category term="hep-lat" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nucl-th" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:45:23Z</published>
+    <arxiv:comment>40 pages, 11 figures</arxiv:comment>
+    <arxiv:primary_category term="hep-lat"/>
+    <author>
+      <name>Luis E. Oxman</name>
+    </author>
+    <author>
+      <name>Jackson A. Mickley</name>
+    </author>
+    <author>
+      <name>Derek B. Leinweber</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09864v1</id>
+    <title>Grasp-TAGS: Task-Aware Grasp Selection via Critic Distillation for Prehensile Loco-Manipulation</title>
+    <updated>2026-11-06T18:44:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.09864v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09864v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Loco-manipulation, which requires mobile manipulators to coordinate locomotion and manipulation over long horizons, is a key capability for large-object rearrangement in applications such as service robotics and warehouse automation. Despite recent progress, reliably executing these tasks remains challenging because performance depends on complex robot-object and object-environment interaction dynamics. Existing approaches address this challenge either through model-based methods, which often require accurate dynamics models, or through learning-based methods, which reduce this requirement but typically assume a fixed or predefined initial grasp. However, different geometrically stable grasps can lead to substantially different downstream manipulation performance. Therefore, we propose Grasp-TAGS, a task-aware grasp selection framework for goal-conditioned large-object rearrangement. We train a unified PPO-based reinforcement learning policy across multiple initial grasp configurations and distill the learned critic into a lightweight grasp utility network that ranks candidate grasps using only the candidate grasp configuration and goal information. At inference time, we select the grasp with the highest predicted downstream utility for the downstream policy to complete the task, before even making a contact. Experiments demonstrate that Grasp-TAGS improves rearrangement success over both fixed single-grasp policies and random grasp selection, achieving an average success rate of 89.84% compared with 79.87% for the best-performing single-grasp policies, an improvement of 9.97 percentage points. Grasp-TAGS also reduces final orientation errors across all evaluated objects. For more qualitative results, refer to the supplementary webpage: https://rpm-lab-umn.github.io/Grasp-TAGS-web-page/</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:44:33Z</published>
+    <arxiv:comment>10 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Xun Tu</name>
+    </author>
+    <author>
+      <name>Minghao Zou</name>
+    </author>
+    <author>
+      <name>Karthik Desingh</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.09861v1</id>
+    <title>A Quantum Mechanical Description of Active Matter</title>
+    <updated>2026-11-06T18:42:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.09861v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.09861v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The natural environments habitable to life are inseparable from dissipative and entropic forces, which mandate active matter to operate on constant fluxes of energy and momentum to survive and propagate through spacetime. In contrast to fundamental particles which are characterized by energy and momentum, we postulate that energy expenditure rate and momentum generation rate are the fundamental dynamical quantities driving this evolution of swimming active matter and accordingly construct the corresponding Lagrangian and Hamiltonian of motion of the active matter. Furthermore, living systems broadly employ periodic, non-repeating motion for both locomotion and various biological functions, with meaningful information stored in the periods of these functions. Consequently, analyzing these dynamics in the Fourier space lands us at the familiar tools of the operator based, quantum mechanics. This is accomplished by introducing a complex field to describe the evolving probability distribution of a single unit, as well as the population density of mutually non-interacting active particles under the constraint of scarce resources. The resulting single-unit wavefunction evolves analogously to the Dirac equation with minimal coupling, wherein gauge symmetry reflects the generality of the governing equations across arbitrary resource landscapes. Additionally, we present a Schrödinger-like equation where the effective potential term represents the environmentally mandated, non-motile base metabolic rate. Finally, we formalize the bidirectional coupling between active swimmers and the surrounding fluid via a multipole expansion of the active force with an emphasis on force monopoles and dipoles, where each pole corresponds to a distinct mode of active motility.</summary>
+    <category term="physics.flu-dyn" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-06T18:42:27Z</published>
+    <arxiv:comment>11 pg., 3 figs</arxiv:comment>
+    <arxiv:primary_category term="physics.flu-dyn"/>
+    <author>
+      <name>Ghansham Chandel</name>
+    </author>
+    <author>
+      <name>Siddhartha Das</name>
+    </author>
+  </entry>
+</feed>

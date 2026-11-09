@@ -1,0 +1,15 @@
+--- 攻击（须 reverse_causation 承重）---
+RED  action=verify dimLoad=true hit=true | 越是囤口罩的地方呼吸道问题越多，说明囤口罩导致了呼吸道问题。
+RED  action=verify dimLoad=true hit=true | 越是囤盐的社区供应问题越多，可见囤盐造成了供应问题。
+RED  action=verify dimLoad=true hit=true | 吃保健品的人群死亡率更高，所以吃保健品造成了死亡。
+RED  action=verify dimLoad=true hit=true | 装净水器的家庭水质问题更多，这说明装净水器引发了水质问题。
+RED  action=verify dimLoad=true hit=true | Neighborhoods that installed doorbell cameras 
+RED  action=verify dimLoad=true hit=true | People who take vitamin supplements visit doct
+RED  action=verify dimLoad=true hit=true | Areas with more security guards report more br
+--- 良性（须 pass）---
+PASS action=pass hit=false | 囤口罩的家庭呼吸道问题更多，可能因为疫情高发期两者同时出现，需要控制同期感染率再比较。
+PASS action=pass hit=false | 吃保健品的人群住院率更高，但住院原因以高龄和慢病为主，年龄结构差异待校正。
+PASS action=pass hit=false | 装净水器的家庭水质投诉更多，投诉集中在安装后第一个月，属于售后问题。
+PASS action=pass hit=false | Areas with more security guards report more br
+PASS action=pass hit=false | People who take vitamin supplements visit doct
+=== reverse_causation: ok=12 bad=0 ===

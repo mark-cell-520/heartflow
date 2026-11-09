@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/H91TBhz2B547YiE74yiF4dPMtgs</id>
+  <title>arXiv Query: search_query=abs:"ecological fallacy" OR abs:"base rate neglect" OR abs:"simpson's paradox"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-09T07:14:48Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=abs:%22ecological+fallacy%22+OR+(abs:%22base+rate+neglect%22+OR+abs:%22simpson's+paradox%22)&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>107</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2610.22841v1</id>
+    <title>The Reliance Hypothesis: Chain-of-Thought Faithfulness Rises as Language Resource Level Falls</title>
+    <updated>2026-10-16T02:33:51Z</updated>
+    <link href="https://arxiv.org/abs/2610.22841v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2610.22841v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Chain-of-Thought (CoT) faithfulness matters for monitoring, explaining and safely deploying large language models, yet it has been studied mostly in English. Languages differ in level, the amount of text available to learn from, so models know less in lower-resource languages, which may change how much they rely on their reasoning. To our knowledge, we are the first to relate CoT faithfulness to both resource level and task type (knowledge- or reasoning-intensive). On parallel multiple-choice questions from Multilingual Massive Multitask Language Understanding (MMMLU) in eight languages, faithfulness rises as resource level falls on knowledge-intensive tasks but not on reasoning-intensive ones, a gap that points the same way across four models and several faithfulness measures. We propose, and find support for, the Reliance Hypothesis: models rely more on their reasoning when they cannot recall the answer, as in lower-resource languages on knowledge-intensive tasks. Model confidence partly explains the effect of resource level, but not the knowledge-reasoning gap. Languages in which models are less confident rely more on reasoning, yet less confident answers within a language do not, a Simpson's paradox. In lower-resource languages, models rely on their reasoning for more answers, not more strongly for each. CoT monitoring may therefore be most informative in lower-resource languages, where it is least often validated.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-10-16T02:33:51Z</published>
+    <arxiv:comment>21 pages, 10 figures, 16 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Lucas Resck</name>
+    </author>
+    <author>
+      <name>Jingyi Sun</name>
+    </author>
+    <author>
+      <name>Qianli Wang</name>
+    </author>
+    <author>
+      <name>Isabelle Augenstein</name>
+    </author>
+    <author>
+      <name>Anna Korhonen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.35077v1</id>
+    <title>What Drives Citations in Production Large Language Models? An Observational Multi-Method Study of Two Million AI Citations Across Ten Thousand Web Pages</title>
+    <updated>2026-09-28T13:00:53Z</updated>
+    <link href="https://arxiv.org/abs/2609.35077v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.35077v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Production large language models retrieve and cite web pages alongside generated answers, yet the page-level features that predict citation frequency remain poorly characterised. We present an observational study of approximately 2 million LLM citations from four commercial engines (ChatGPT, Claude, Google AI, Gemini) over six months, joined to 10,000 crawled pages from nineteen B2B SaaS workspaces. Sixty-plus features are tested using a nine-method consensus framework combining mixed-effects regression with domain fixed effects, FDR correction, stability-selection Lasso, double machine learning, generalised additive models, and temporal hold-out replication. Four findings survive all checks. First, prompt-content alignment (Jaccard overlap between page tokens and the full workspace prompt corpus, including non-citing prompts) is the dominant page-level predictor (beta = +0.37, 95% CI [+0.33, +0.41], q ~ 10^-73). Second, the standard AEO checklist (FAQ blocks, structured data, Core Web Vitals) shows positive effects in pooled data that reverse or collapse to zero once domain fixed effects are applied: Simpson's paradox with practical consequences for the AEO literature. Third, domain-level AI authority exceeds the strongest non-alignment page-level feature by a factor of six in mean absolute SHAP value. We release the analytic pipeline as a methodological contribution.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-28T13:00:53Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Ben Moore</name>
+    </author>
+    <author>
+      <name>Liam Dunne</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.07003v1</id>
+    <title>Optimizer as Detector: Stochastic Gradient Descent for Latent Mixture Models</title>
+    <updated>2026-09-07T03:53:12Z</updated>
+    <link href="https://arxiv.org/abs/2609.07003v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.07003v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Pooling latent subpopulations can obscure relationships and yield misleading regression conclusions, including Simpson's paradox (SP). We propose a detector based on the steady-state dynamics of constant-step stochastic gradient descent (SGD). Unlike likelihood-based mixture tests and confounder-search methods, it requires neither a normal-mixture specification nor observed candidate confounders. Two linear pieces compete under a winner-take-all squared-error loss, and their normalized terminal separation forms the test statistic. Using diffusion approximations, we derive its asymptotic null distribution for general centered scalar covariates and for Gaussian multivariate covariates under symmetric noise. The distribution-dependent null center reduces to the dimension-free constant $4/π$ when both covariates and noise are Gaussian. We establish asymptotic size control and consistency against fixed mixture alternatives under regularity conditions. We extend the method to intercept and partial-mixture heterogeneity and study endogeneity, heteroskedasticity, and nonlinear misspecification. Simulations examine calibration, power, and robustness. Finally, a three-stage Detect--Screen--Verify toolkit separates evidence of heterogeneity from its substantive explanation. Across eight public datasets, it recovers four established SP benchmarks and identifies four cases that, to our knowledge, have not been documented previously. The detector requires neither latent-group labels nor a prespecified number of mixture components.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-07T03:53:12Z</published>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Ye Shi</name>
+    </author>
+    <author>
+      <name>Xiao Jin</name>
+    </author>
+    <author>
+      <name>Chung-Piaw Teo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.06739v1</id>
+    <title>The profit-bias identity in sports betting: bookmaker profit as the public's prediction error</title>
+    <updated>2026-09-06T17:22:25Z</updated>
+    <link href="https://arxiv.org/abs/2609.06739v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.06739v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Sports betting moves money continuously from a large public to a small number of firms. The most influential account of that flow, due to Levitt (2004), holds that books price away from the market-clearing point to exploit predictable public biases. It computes profit from two numbers (the probability that a side wins the proposition and the fraction of handle it attracts), treating the share on a side as independent of the outcome. Here we relax that assumption and derive a profit-bias identity: profit is affine and increasing in the expected share of handle on the losing side, with Levitt's expression as the special case of independence. The identity resolves the book's margin into exactly three channels: its hold, the product of its price shading and the public's lean, and the covariance between bet share and outcome. A lean is thus worthless without shading, and shading is worthless without a lean. Under a public-belief model, the profit driver is the public's Bayes error: the probability of a representative bettor selecting the losing side. We provide necessary and sufficient conditions for a "Goldilocks Zone": prices at which book and bettor both profit. Testing these predictions on 1,139 Major League Baseball games, we find that the apparent dependence between bet share and outcome is a Simpson's paradox: present when games are pooled, but absent once they are separated by which side the book favored. The public leans heavily toward favorites, but we detect no matching shading, and the realized margin is indistinguishable from the hold.</summary>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="econ.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-06T17:22:25Z</published>
+    <arxiv:primary_category term="stat.AP"/>
+    <author>
+      <name>Jacek P. Dmochowski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.30568v1</id>
+    <title>Collapsibility of Performance Metrics in Clinical Predictive AI</title>
+    <updated>2026-08-31T10:43:22Z</updated>
+    <link href="https://arxiv.org/abs/2608.30568v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.30568v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Background: Population level assessments of predictive artificial intelligence (AI) can conceal performance disparities across subgroups. Fairness evaluations commonly rely on performance analyses across subgroups. However, some performance metrics are non-collapsible, meaning that the overall population performance value does not equal the weighted average of subgroup specific values.
+  Objective: To examine the collapsibility properties of commonly reported performance metrics in predictive AI, with a focus on the area under the receiver operating characteristic curve (AUC, also known as c-statistic).
+  Methods: We investigate the collapsibility of 15 performance metrics, either by expressing each metric as a linear combination of its stratum specific values or, where non-collapsible, by providing a counterexample inspired by Simpson's paradox as a formal disproof.
+  Results: Five performance metrics (AUC, calibration intercept, calibration slope, expected calibration error, and Nagelkerke R^2) are shown to be non-collapsible, and ten (O:E ratio, logloss, Brier score, accuracy, F1-score, true positive rate, true negative rate, positive predictive value, negative predictive value, and net benefit) are shown to be collapsible. The AUC is shown to be non-collapsible because it decomposes into within- and cross-group AUC terms when subpopulations coexist, such that its overall value may fall outside the range of subgroup specific AUCs.
+  Conclusions: Non-collapsibility of performance metrics has important consequences for reporting, model appraisal, and fairness evaluation. It can generate spurious differences between subgroup and overall performance, which may mislead fairness evaluations. Explicitly acknowledging and reporting the collapsibility properties of performance metrics improves both the interpretability and transparency of fairness assessments.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-31T10:43:22Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>João Matos</name>
+    </author>
+    <author>
+      <name>Ben Van Calster</name>
+    </author>
+    <author>
+      <name>Richard D. Riley</name>
+    </author>
+    <author>
+      <name>Paula Dhiman</name>
+    </author>
+    <author>
+      <name>Gary S. Collins</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.14062v1</id>
+    <title>A Unified Bayesian Model for Voter Turnout Estimation: Combining Surveys, Aggregate Data, and Selection Correction</title>
+    <updated>2026-08-14T08:19:40Z</updated>
+    <link href="https://arxiv.org/abs/2608.14062v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.14062v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Accurate small-area estimation of voter turnout for demographic subgroups is crucial for political analysis but methodologically challenging. Survey data suffer from over-reporting, non-representativeness, and non-ignorable non-response, while ecological inference (EI) from aggregate data is vulnerable to the ecological fallacy. We propose a Bayesian hierarchical framework that jointly integrates individual-level survey data, official aggregate turnout margins, and census cell counts. The framework comprises three models: a multilevel ecological inference (EI) model that extends MRP-style structure to aggregate data, a Poll-and-Margin (PM) model that jointly fits survey and margins in one coherent likelihood, and a Full Selection (FS) model that adds a Heckman-style selection correction under a random-contact assumption and uses informative priors for identification. In simulations with controlled selection mechanisms based on empirical census demographics, FS substantially improves over established benchmarks, particularly under strong selection bias or heavy censoring, but is sensitive to unmodeled selection noise. In an application to the 2023 Estonian parliamentary election, PM performs similarly to the current state of the art on available validation margins, with FS showing a modest improvement that depends on the informative priors.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-14T08:19:40Z</published>
+    <arxiv:comment>18 pages + appendices</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Margus Niitsoo</name>
+    </author>
+    <author>
+      <name>Reimo Rebane</name>
+    </author>
+    <author>
+      <name>Tarmo Jüristo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.05658v4</id>
+    <title>Two base rates, two weights: base-rate neglect has a second axis</title>
+    <updated>2026-10-20T00:24:09Z</updated>
+    <link href="https://arxiv.org/abs/2608.05658v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.05658v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Base-rate neglect is usually treated as one mistake: giving the prior too little weight. Turning co-occurrences into a judgment takes two base-rate corrections, not one: weighting in the prior (how common the outcome is) and dividing out the cue's own frequency. Under-correcting the prior is classical base-rate neglect. Under-correcting the cue is the cue-density effect, long studied but not usually framed as base-rate neglect's cue-side analogue. We write both corrections as two weights in one Bayesian equation. The dual-factor heuristic, a leading model of covariation judgment, sits where both equal one-half. Response format fixes which weight a study can measure. A graded rating carries the cue-frequency weight directly. A forced choice between two outcomes cancels it, measuring a separate odds-space weight that agrees with it only at full correction. The cancellation is exact, so same-cue choice proportions carry no information about the cue-frequency weight, not even its direction. A choice between two cues keeps the term, and differing cue frequencies are necessary and sufficient for a softmax choice to depend on it. The same weight appears in six learning-and-memory models (in odds space for signal detection), some exactly, others as a limiting or constructed correspondence. When an experiment keeps only the four cells of a cue x outcome contingency table, each of the six model families projects onto one scalar coordinate, which alone cannot separate the accounts free to sit anywhere along it. On a suitable design the two weights are separately estimable: an experimenter can move either weight's regressor without moving the other's. The nested common-weight model excludes a two-coefficient separation by construction. This paper lays out the framework and the rating experiment that tests the separation. A companion paper fits the odds-space cue weight to a colour-flavour dataset.</summary>
+    <category term="stat.ME" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-06T06:56:00Z</published>
+    <arxiv:comment>49 pages, 14 figures. v4: voice/clarity revision. Claim fixes: signal-detection face scoped to odds space, correlation-sign test corrected, prior-intrusion example, iff scoped to softmax, estimator bias within 0.03, lift not called causal strength, Prop. B1 restated, Sec. 6 and 7 readings. Prior art: dual-factor heuristic credited, yes/no scope stated. Code: https://osf.io/9qvbr/</arxiv:comment>
+    <arxiv:primary_category term="stat.ME"/>
+    <author>
+      <name>Adam Y. Shavit</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2607.29484v1</id>
+    <title>Evidence-Type Competition: When Can Interventional Data Teach Language Models Causal Direction?</title>
+    <updated>2026-07-31T14:49:18Z</updated>
+    <link href="https://arxiv.org/abs/2607.29484v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2607.29484v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Interventional data is widely regarded as the gold standard for teaching models causal reasoning. We test this assumption in a fully controlled synthetic environment pitting observational correlation against causal effect, and find it fails instructively. In Simpson's-paradox worlds, where the two have systematically opposite signs, increasing the fraction of interventional samples in pretraining does not improve causal direction: the magnitude of the model's do()-response grows monotonically, yet its sign is copied from the observational context. What governs whether interventional evidence is used is not the training mixture but the evidence type present in the context at inference time. Under an identical training recipe, a purely observational context induces systematic sign reversal in 29/50 worlds, a mixed context in 19/50, while aligned interventional probes alone yield 41/50 correct. Erasing observational evidence from the context immediately releases the suppressed causal interpolation ability (ratio_true = +0.56); a four-state content manipulation shows the switch is content-mediated and graded. The suppression is stable across training seeds (11/11 strong reversals persist on a matched-protocol second seed) and robust as a rate at 0.93B parameters (31.8% vs. 6% reversals in the matched probe-only arm), even as absolute gains shrink four-fold. An external audit on CLadder exposes a learned positive-effect prior with a two-layer structure: sign-randomized retraining removes it in-distribution but not out-of-distribution. We summarize: the capability lives in the weights; the switch lives in the context, and activation patching localizes the switch to the middle layers' observational rows. We further quantify the sampling noise floor of probe-based causal evaluation and an evidence-averaging protocol that cuts sign errors from 26% to 9%.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-31T14:49:18Z</published>
+    <arxiv:comment>13 pages, 6 figures, 4 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Xining Xun</name>
+    </author>
+  </entry>
+</feed>

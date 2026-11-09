@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/nBCvE/Ji9QwrY51ezW12g4NqSLc</id>
+  <title>arXiv Query: search_query=abs:"conjunction fallacy"&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-11-09T07:14:39Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=abs:%22conjunction+fallacy%22&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>17</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2406.11050v2</id>
+    <title>A Peek into Token Bias: Large Language Models Are Not Yet Genuine Reasoners</title>
+    <updated>2024-10-04T04:40:03Z</updated>
+    <link href="https://arxiv.org/abs/2406.11050v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2406.11050v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This study introduces a hypothesis-testing framework to assess whether large language models (LLMs) possess genuine reasoning abilities or primarily depend on token bias. We go beyond evaluating LLMs on accuracy; rather, we aim to investigate their token bias in solving logical reasoning tasks. Specifically, we develop carefully controlled synthetic datasets, featuring conjunction fallacy and syllogistic problems. Our framework outlines a list of hypotheses where token biases are readily identifiable, with all null hypotheses assuming genuine reasoning capabilities of LLMs. The findings in this study suggest, with statistical guarantee, that most LLMs still struggle with logical reasoning. While they may perform well on classic problems, their success largely depends on recognizing superficial patterns with strong token bias, thereby raising concerns about their actual reasoning and generalization abilities. Codes and data are open-sourced at https://github.com/bowen-upenn/llm_token_bias.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-06-16T19:22:53Z</published>
+    <arxiv:comment>This paper has been accepted at EMNLP 2024</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Bowen Jiang</name>
+    </author>
+    <author>
+      <name>Yangxinyu Xie</name>
+    </author>
+    <author>
+      <name>Zhuoqun Hao</name>
+    </author>
+    <author>
+      <name>Xiaomeng Wang</name>
+    </author>
+    <author>
+      <name>Tanwi Mallick</name>
+    </author>
+    <author>
+      <name>Weijie J. Su</name>
+    </author>
+    <author>
+      <name>Camillo J. Taylor</name>
+    </author>
+    <author>
+      <name>Dan Roth</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2402.13615v1</id>
+    <title>Analyizing the Conjunction Fallacy as a Fact</title>
+    <updated>2024-02-21T08:40:04Z</updated>
+    <link href="https://arxiv.org/abs/2402.13615v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2402.13615v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Since the seminal paper by Tversky and Kahneman, the conjunction fallacy has been the subject of multiple debates and become a fundamental challenge for cognitive theories in decision-making. In this article, we take a rather uncommon perspective on this phenomenon. Instead of trying to explain the nature or causes of the conjunction fallacy (intensional definition), we analyze its range of factual possibilities (extensional definition). We show that the majority of research on the conjunction fallacy, according to our sample of experiments reviewed which covers literature between 1983 and 2016, has focused on a narrow part of the a priori factual possibilities, implying that explanations of the conjunction fallacy are fundamentally biased by the short scope of possibilities explored. The latter is a rather curious aspect of the research evolution in the conjunction fallacy considering that the very nature of it is motivated by extensional considerations.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nlin.AO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-02-21T08:40:04Z</published>
+    <arxiv:comment>book chapter</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <arxiv:journal_ref>In: Veloz, Khrennikov, Toni, Castillo (eds) Trends and Challenges in Cognitive Modeling. STEAM-H: Springer (2023)</arxiv:journal_ref>
+    <author>
+      <name>Tomas Veloz</name>
+    </author>
+    <author>
+      <name>Olha Sobetska</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2305.09535v3</id>
+    <title>What's the Problem, Linda? The Conjunction Fallacy as a Fairness Problem</title>
+    <updated>2024-03-28T14:10:37Z</updated>
+    <link href="https://arxiv.org/abs/2305.09535v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2305.09535v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The field of Artificial Intelligence (AI) is focusing on creating automated decision-making (ADM) systems that operate as close as possible to human-like intelligence. This effort has pushed AI researchers into exploring cognitive fields like psychology. The work of Daniel Kahneman and the late Amos Tversky on biased human decision-making, including the study of the conjunction fallacy, has experienced a second revival because of this. Under the conjunction fallacy a human decision-maker will go against basic probability laws and rank as more likely a conjunction over one of its parts. It has been proven overtime through a set of experiments with the Linda Problem being the most famous one. Although this interdisciplinary effort is welcomed, we fear that AI researchers ignore the driving force behind the conjunction fallacy as captured by the Linda Problem: the fact that Linda must be stereotypically described as a woman. In this paper we revisit the Linda Problem and formulate it as a fairness problem. In doing so we introduce perception as a parameter of interest through the structural causal perception framework. Using an illustrative decision-making example, we showcase the proposed conceptual framework and its potential impact for developing fair ADM systems.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-05-16T15:26:55Z</published>
+    <arxiv:comment>Large portions of this paper were used for another paper with a different direction. Therefore, this paper became an early draft of the other paper, which is why I am removing it until it can stand by itself</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Jose Alvarez Colmenares</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1904.09829v1</id>
+    <title>First steps to a constructor theory of cognition</title>
+    <updated>2019-03-21T23:39:13Z</updated>
+    <link href="https://arxiv.org/abs/1904.09829v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1904.09829v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This article applies the conceptual framework of constructor theory of information to cognition theory. The main result of this work is that cognition theory, in specific situations concerning for example the conjunction fallacy heuristic, requires the use of superinformation media, just as quantum theory. This result entails that quantum and cognition theories can be considered as elements of a general class of superinformation-based subsidiary theories.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-03-21T23:39:13Z</published>
+    <arxiv:comment>arXiv admin note: text overlap with arXiv:1405.5563, arXiv:1507.03287, arXiv:1601.06610 by other authors</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Riccardo Franco</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1810.06710v1</id>
+    <title>Bringing Order to the Cognitive Fallacy Zoo</title>
+    <updated>2018-10-15T21:37:38Z</updated>
+    <link href="https://arxiv.org/abs/1810.06710v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1810.06710v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In the eyes of a rationalist like Descartes or Spinoza, human reasoning is flawless, marching toward uncovering ultimate truth. A few centuries later, however, culminating in the work of Kahneman and Tversky, human reasoning was portrayed as anything but flawless, filled with numerous misjudgments, biases, and cognitive fallacies. With further investigations, new cognitive fallacies continually emerged, leading to a state of affairs which can fairly be characterized as the cognitive fallacy zoo! In this largely methodological work, we formally present a principled way to bring order to this zoo. We introduce the idea of establishing implication relationships (IRs) between cognitive fallacies, formally characterizing how one fallacy implies another. IR is analogous to, and partly inspired by, the fundamental concept of reduction in computational complexity theory. We present several examples of IRs involving experimentally well-documented cognitive fallacies: base-rate neglect, availability bias, conjunction fallacy, decoy effect, framing effect, and Allais paradox. We conclude by discussing how our work: (i) allows for identifying those pivotal cognitive fallacies whose investigation would be the most rewarding research agenda, and importantly (ii) permits a systematized, guided research program on cognitive fallacies, motivating influential theoretical as well as experimental avenues of future research.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-10-15T21:37:38Z</published>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <author>
+      <name>Ardavan S. Nobandegani</name>
+    </author>
+    <author>
+      <name>William Campoli</name>
+    </author>
+    <author>
+      <name>Thomas R. Shultz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1807.11036v1</id>
+    <title>Modeling Human Decision-making: An Overview of the Brussels Quantum Approach</title>
+    <updated>2018-07-29T10:21:59Z</updated>
+    <link href="https://arxiv.org/abs/1807.11036v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1807.11036v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present the fundamentals of the quantum theoretical approach we have developed in the last decade to model cognitive phenomena that resisted modeling by means of classical logical and probabilistic structures, like Boolean, Kolmogorovian and, more generally, set theoretical structures. We firstly sketch the operational-realistic foundations of conceptual entities, i.e. concepts, conceptual combinations, propositions, decision-making entities, etc. Then, we briefly illustrate the application of the quantum formalism in Hilbert space to represent combinations of natural concepts, discussing its success in modeling a wide range of empirical data on concepts and their conjunction, disjunction and negation. Next, we naturally extend the quantum theoretical approach to model some long-standing `fallacies of human reasoning', namely, the `conjunction fallacy' and the `disjunction effect'. Finally, we put forward an explanatory hypothesis according to which human reasoning is a defined superposition of `emergent reasoning' and `logical reasoning', where the former generally prevails over the latter. The quantum theoretical approach explains human fallacies as the consequence of genuine quantum structures in human reasoning, i.e. `contextuality', `emergence', `entanglement', `interference' and `superposition'. As such, it is alternative to the Kahneman-Tversky research programme, which instead aims to explain human fallacies in terms of `individual heuristics and biases'.</summary>
+    <category term="q-bio.NC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-07-29T10:21:59Z</published>
+    <arxiv:comment>25 pages, Latex, 2 figures, published in Foundations of Science</arxiv:comment>
+    <arxiv:primary_category term="q-bio.NC"/>
+    <arxiv:journal_ref>Foundations of Science 26, pp. 27-54 (2021)</arxiv:journal_ref>
+    <author>
+      <name>Diederik Aerts</name>
+    </author>
+    <author>
+      <name>Massimiliano Sassoli de Bianchi</name>
+    </author>
+    <author>
+      <name>Sandro Sozzo</name>
+    </author>
+    <author>
+      <name>Tomas Veloz</name>
+    </author>
+    <arxiv:doi>10.1007/s10699-018-9559-x</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s10699-018-9559-x" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1803.01316v4</id>
+    <title>On Cognitive Preferences and the Plausibility of Rule-based Models</title>
+    <updated>2019-04-22T08:37:58Z</updated>
+    <link href="https://arxiv.org/abs/1803.01316v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1803.01316v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>It is conventional wisdom in machine learning and data mining that logical models such as rule sets are more interpretable than other models, and that among such rule-based models, simpler models are more interpretable than more complex ones. In this position paper, we question this latter assumption by focusing on one particular aspect of interpretability, namely the plausibility of models. Roughly speaking, we equate the plausibility of a model with the likeliness that a user accepts it as an explanation for a prediction. In particular, we argue that, all other things being equal, longer explanations may be more convincing than shorter ones, and that the predominant bias for shorter models, which is typically necessary for learning powerful discriminative models, may not be suitable when it comes to user acceptance of the learned models. To that end, we first recapitulate evidence for and against this postulate, and then report the results of an evaluation in a crowd-sourcing study based on about 3.000 judgments. The results do not reveal a strong preference for simple rules, whereas we can observe a weak preference for longer rules in some domains. We then relate these results to well-known cognitive biases such as the conjunction fallacy, the representative heuristic, or the recogition heuristic, and investigate their relation to rule length and plausibility.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-03-04T08:26:43Z</published>
+    <arxiv:comment>V4: Another rewrite of section on interpretability to clarify focus on plausibility and relation to interpretability, comprehensibility, and justifiability</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <arxiv:journal_ref>Machine Learning 109(4):853-898, 2020</arxiv:journal_ref>
+    <author>
+      <name>Johannes Fürnkranz</name>
+    </author>
+    <author>
+      <name>Tomáš Kliegr</name>
+    </author>
+    <author>
+      <name>Heiko Paulheim</name>
+    </author>
+    <arxiv:doi>10.1007/s10994-019-05856-5</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s10994-019-05856-5" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1609.07721v2</id>
+    <title>Testing Quantum Models of Conjunction Fallacy on the World Wide Web</title>
+    <updated>2017-06-02T23:30:10Z</updated>
+    <link href="https://arxiv.org/abs/1609.07721v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1609.07721v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The 'conjunction fallacy' has been extensively debated by scholars in cognitive science and, in recent times, the discussion has been enriched by the proposal of modeling the fallacy using the quantum formalism. Two major quantum approaches have been put forward: the first assumes that respondents use a two-step sequential reasoning and that the fallacy results from the presence of 'question order effects'; the second assumes that respondents evaluate the cognitive situation as a whole and that the fallacy results from the 'emergence of new meanings', as an 'effect of overextension' in the conceptual conjunction. Thus, the question arises as to determine whether and to what extent conjunction fallacies would result from 'order effects' or, instead, from 'emergence effects'. To help clarify this situation, we propose to use the World Wide Web as an 'information space' that can be interrogated both in a sequential and non-sequential way, to test these two quantum approaches. We find that 'emergence effects', and not 'order effects', should be considered the main cognitive mechanism producing the observed conjunction fallacies.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2016-09-25T09:58:14Z</published>
+    <arxiv:comment>12 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <arxiv:journal_ref>International Journal of Theoretical Physics, 56, pp. 3744-3756 (2017)</arxiv:journal_ref>
+    <author>
+      <name>Diederik Aerts</name>
+    </author>
+    <author>
+      <name>Jonito Aerts Arguëlles</name>
+    </author>
+    <author>
+      <name>Lester Beltran</name>
+    </author>
+    <author>
+      <name>Lyneth Beltran</name>
+    </author>
+    <author>
+      <name>Massimiliano Sassoli de Bianchi</name>
+    </author>
+    <author>
+      <name>Sandro Sozzo</name>
+    </author>
+    <author>
+      <name>Tomas Veloz</name>
+    </author>
+    <arxiv:doi>10.1007/s10773-017-3288-8</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s10773-017-3288-8" title="doi"/>
+  </entry>
+</feed>
