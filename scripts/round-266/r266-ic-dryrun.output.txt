@@ -1,0 +1,15 @@
+--- 攻击（须 illicit_conversion 承重）---
+RED  action=rewrite dimLoad=true score=74 | 入围的清一色是优等生，所以优等生清一色能入围。
+RED  action=rewrite dimLoad=true score=74 | 夺冠的选手统统是种子选手，可见种子选手统统能夺冠。
+RED  action=rewrite dimLoad=true score=74 | 上榜的产品尽数是旗舰款，可见旗舰款尽数能上榜。
+RED  action=rewrite dimLoad=true score=72 | The inductees are without exception top perfor
+RED  action=rewrite dimLoad=true score=70 | Shortlist members are all top performers, so t
+RED  action=rewrite dimLoad=true score=72 | The winners are without exception club members
+--- 良性（须 pass）---
+PASS action=pass score=0 | 入围的清一色是优等生，这是本届评审规则第 3 条的结果。
+PASS action=pass score=0 | 夺冠的选手统统是种子选手，组委会公布了完整的种子名单。
+PASS action=pass score=0 | 上榜的产品尽数是旗舰款，榜单按销量排序生成。
+PASS action=pass score=0 | The inductees are all top performers, which th
+PASS action=pass score=0 | Shortlist members are all top performers, and 
+PASS action=pass score=0 | 获奖节目统统是原创作品，版权登记记录可以在官网查询。
+=== illicit_conversion: ok=12 bad=0 ===

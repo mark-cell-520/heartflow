@@ -47,6 +47,10 @@
 
 // ── 腿①：全称量词与存在/特称量词 ─────────────────────────────
 const UNIVERSAL_ZH = ['所有', '全部', '任何', '每一个', '每个', '每一', '凡', '一切', '一律', '毫无例外', '但凡'];
+// [r266 新增族] 后置全称量词（主语之后的「清一色/统统/尽数」：
+// 「入围的清一色是优等生」= 所有入围的都是优等生）。不收「无一」——
+// 否定全称的换位（无S是P ↔ 无P是S）是有效推理，语义上不属本族。
+const POST_UNIVERSAL_ZH = ['清一色', '统统', '尽数', '全数'];
 const UNIVERSAL_EN = ['all', 'every', 'any', 'each'];
 const PARTICULAR = ['有些', '某些', '部分', '个别', '有的', '有一些', '一部分', 'some', 'certain', 'several'];
 
@@ -197,6 +201,12 @@ function _parsePremise(c) {
         if (_enWords(A).length && _enWords(B).length) return { A, B, type: 'EN_QUANT' };
       }
     }
+    // [r266 新增族] 后置全称修饰：The inductees are without exception top performers
+    const mExc = c.match(/^(.+?)\s+(?:are|is)\s+without\s+exception\s+(.+)$/i);
+    if (mExc) {
+      const A = mExc[1].trim(), B = mExc[2].trim();
+      if (_enWords(A).length && _enWords(B).length) return { A, B, type: 'EN_QUANT' };
+    }
     const bare = c.match(/^(.+?)\s+(?:are|is)\s+(.+)$/i);
     if (bare) {
       const A = bare[1].trim(), B = bare[2].trim();
@@ -226,6 +236,17 @@ function _parsePremise(c) {
       const B = rest.slice(cop.idx + cop.word.length).trim();
       if (A && B) return { A, B, type: 'QUANT' };
     }
+  }
+  // [r266 新增族] 后置全称量词形：A + 清一色/统统/尽数/全数 + (是|为) B
+  // （「入围的清一色是优等生」= 所有入围的都是优等生；结论侧同步见
+  //  _parseConversion 的同族路由）
+  for (const u of POST_UNIVERSAL_ZH) {
+    const idx = c.indexOf(u);
+    if (idx <= 0) continue;
+    const A = _stripLead(c.slice(0, idx));
+    const rest = c.slice(idx + u.length).replace(/^(?:是|为|属于|乃是|都能|皆为|全是)/, '');
+    const B = _stripLead(rest);
+    if (A && B) return { A, B, type: 'QUANT' };
   }
   // 裸「都」形：A 都(是) B
   let from = 0, di;
@@ -263,6 +284,15 @@ function _parseConversion(c) {
     const idx = body.indexOf(u);
     if (idx >= 0) { universal = true; body = body.slice(idx + u.length); break; }
   }
+  // [r266 新增族] 后置全称量词结论形：S + 清一色/统统/尽数/全数 + 谓词
+  // （「优等生清一色能入围」——S 在量词之前，谓词可为动词短语）
+  for (const u of POST_UNIVERSAL_ZH) {
+    const idx = body.indexOf(u);
+    if (idx <= 0) continue;
+    const S = _stripLead(body.slice(0, idx));
+    const P = _stripLead(body.slice(idx + u.length).replace(/^(?:是|为|属于|乃是)/, ''));
+    if (S && P) return { S, P, universal: true, type: 'QUANT' };
+  }
   const di = body.indexOf('都');
   if (di > 0) {
     universal = true;
@@ -282,6 +312,8 @@ function _parseConversion(c) {
 // 结论候选是否携带显式全称标记（裸跟句需要它才敢当结论）
 function _hasUniversalMarker(c) {
   if (UNIVERSAL_ZH.some(u => c.includes(u))) return true;
+  // [r266 新增族] 后置全称量词同样算显式全称标记
+  if (POST_UNIVERSAL_ZH.some(u => c.includes(u))) return true;
   if (UNIVERSAL_EN.some(u => new RegExp('\\b' + u + '\\b', 'i').test(c))) return true;
   return c.includes('都');
 }
