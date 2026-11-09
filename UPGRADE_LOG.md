@@ -1,3 +1,96 @@
+## r256 收尾 — 第231维度 `affirming_disjunct` 接线 + 第230维度 `fallacy_of_relevance` 三项功能修复
+
+**日期** 2026-11-09  **操作方** cron（自主升级轮，本地 commit，不推送）
+
+### 方向与来源
+- **方向** 逻辑谬误检测——肯定析取（affirming a disjunct）+ 不相干结论族的收尾修复
+- **来源** 内部路径：`src/affirming-disjunct.js`（本轮新建未提交）+ `src/fallacy-of-relevance.js`（r254 立项、r255–r256 收尾）
+- **本轮判定依据** 阶段1.5 撞墙检测：`git status --short` 显示 r254 半成品未提交、r256 新文件未接线 → 先补接线再修功能
+
+### r256 三项修复（逐层插桩定位，非猜测）
+
+#### ① 否定极性盲区（唯一真 bug，中文整族 miss）
+- **现象**：「诉诸恐惧：如果不支持，就会有可怕后果，所以必须支持。」返回 `hit:false`
+- **根因**：中文 `extractZhWords` 的 2-gram 切片把「不支持」切成裸词根「支持」，该碎片与结论段的「必须支持」被**精确匹配**与**部分包含**两条通道同时计为 shared → shared=2 → MISS。语义上这两个词恰好相反（极性反向），却因切片碎片被当作共享实词。
+- **修复**：在主判据前用 regex 从 pre 原文抽取前段否定词干 `PRE_NEG_STEMS`（`[不没无未][\u4e00-\u9fa5]{1,3}` 去否定首字，长度≥2），结论段裸词命中词干、或长词包含词干者一律不计共享；主体字对齐兜底同样跳过否定词干上的首尾字。
+- **覆盖双向**：前段否定/结论肯定（本族）、前段肯定/结论否定（反向论证）；两侧同带否定（否定→否定）语义同向，仍照常计共享。
+- **失败教训（记录）**：早先用「_negRootZh 词表剥离 + preWords 集合比对」实现过一版，失败原因是「支持」作为 2-gram 碎片已在 preWords 集合里，精确匹配抢先命中——**改用从 pre 原文 regex 抽词干才覆盖到碎片通道**。
+
+#### ② INFER_ZH 缺「论证意图」族推断词
+- **现象**：「他说的是另一回事，完全答非所问，却想用这个证明他的观点。」返回 `hit:false`
+- **根因**：`_splitByInfer` 找不到推断词直接 `return null` → 主函数判 MISS。原 INFER_ZH 只收「所以/因此/可见」等推论标记，不收「却想用这个证明」「想借此证明」「试图证明」等明确把前段当论据的句式。
+- **修复**：INFER_ZH 补 7 条论证意图族正则（长的在前优先匹配）。
+
+#### ③ 日常情境 → 自身心境误报
+- **现象**：「今天天气不错，所以心情很好。」被误判 HIT（零共享为真、判据本身没错）
+- **根因**：该句是正当因果（天气直接影响说话人心境），但不在既有 INVEST×OUTCOME 桥接射程内。
+- **修复**：新增 SCENE_ZH（天气/时令/境况，26 词）× MOOD_ZH（第一人称心境，25 词）两张表，**要求两段同时命中才豁免**——单独心境词不免责，留给 halo_effect 射程。
+
+### 维度接线
+- 新增 `src/affirming-disjunct.js`，`src/index.js` 九处接线（require / 计算点 / allDims / dimMap / 补登记 ×2 / VERIFY_DIMS / exports 等）
+- 维度数 230→231，VERIFY 187→188
+
+### 样本边界认定（非 bug，已换样本）
+- 「人身攻击」类：同一主体换评价维度（出身→论证有效性）靠零共享判不出——「论证」在两段都出现，shared=3 是**正确**的相关信号；该族射程属 `ad_hominem`，非本维度。已换零共享样本「他年轻没经验，所以他的方案肯定行不通。」
+- 「诉诸传统」：原样本缺句号致 post<4 走通道③失败，补句号即命中（样本格式问题）。
+- META_CONCEPT 全文豁免（含「不相干/推不出」等元概念词）为设计意图：讨论谬误≠犯谬误。原样本「与前提不相干」命中豁免属样本措辞问题，已改写。
+
+### 验证
+- 五门禁：verify 16/16、guard-abilities 20/20（231 键）、doc-numbers 24/24、双向召回 52/52 误拦 302/326 不升
+- 变体矩阵：正向 9/9（含 2 条英文立项证据）+ 良性 3/3 MISS
+- 版本口径：VERSION / package.json / src/core/version.js / BUILD_DATE / SKILL.md frontmatter 五处同步 6.8.155
+
+## r255 收尾 — 第230维度 `fallacy_of_relevance`（结论与前提不相干）修到真正承重：中文侧零命中修复 + 良性误报修复
+
+**日期** 2026-11-09  **操作方** cron（自主升级轮，本地 commit，不推送）
+
+### 方向与来源
+- **方向** 逻辑谬误检测——不相干结论（fallacy of relevance / irrelevant conclusion）族
+- **来源** 内部路径（本轮接手 r254 遗留）：`src/fallacy-of-relevance.js`（r254 新建未提交）+ `src/index.js` 九处接线（dimMap/allDims/VERIFY_DIMS）
+- **接手判定依据** 阶段1.5 撞墙检测：`git status --short` 显示 r254 半成品未提交，`git log` 对该文件无记录 → 不是已完工目标，是未收尾真实工作，优先收尾而非另开方向
+
+### r254 遗留缺口（本轮实测证据）
+1. **中文侧零命中**：r254 头注释自称「中文4条」承重，实测 `checkFallacyOfRelevance` 对 4 条中文攻击样本全部 `hit:false`——中文全靠 halo/absolute/coherence 代拦，本维度独立命中 0
+2. **良性误报 2 条**：「她每天跑步，身体因此很健康」（体育→健康是正当因果）、`The team invested heavily in R&D, and revenue grew accordingly`（投入→营收是正当因果）
+
+### 根因定位（逐层插桩，非猜测）
+中文零命中不在切分层（`_splitByInfer` 切分正确、exact 共享为 none），而在**主体字对齐规则**把虚词当成"实义主体"：
+- **人称代词假主体**：pre「她每」首字「她」vs post「她的」首字「她」同侧复用 → shared++ → miss（拦住「她每天跑步，所以她的英语水平一定很高」整族）
+- **程度副词假主体**：pre「态度很好」尾字「很」vs post「一定很」尾字「很」同侧复用 → shared++ → miss（拦住「他工作很努力，所以他的产品一定很优秀」整族）
+- **结构助词假主体**：pre「厅的」尾字「的」vs post「的菜」首字「的」同侧复用 → shared++ → miss（拦住「服务员态度很好，可见他们的菜一定很好吃」整族）
+
+良性误报根因：`OUTCOME_EN` 缺商业成果词（revenue/profits/sales/earnings/growth）、`OUTCOME_ZH` 缺健康成果域（健康/身体/体能/体质/精力/体力/睡眠/免疫力/身材/体重/状态）。
+
+### 本轮实现（`src/fallacy-of-relevance.js`，净 +约40行注释与常量）
+1. **`OUTCOME_EN` 扩展**：加 `revenue|profits?|sales|earnings?|grow(?:th)?|reputation|credibility|trustworthiness`——投入类前提推出商业成果属正当因果，不再误报
+2. **新增 `HEALTH_OUTCOME_ZH`**：健康/身体/体能/体质/精力/体力/睡眠/免疫力/强身/强健/健硕/匀称/身材/体重/状态
+3. **体育×健康独立豁免**：不依赖 `investHit`（因「跑步」只在 `SPORT_INVEST`、不在 `INVEST_ZH`，原 `investHit` 门对本就 false），改为「`SPORT_INVEST` 命中 pre 且 `HEALTH_OUTCOME_ZH` 命中 post」即 miss
+4. **`PRONOUN_CHAR` 虚词字符集（核心修复）**：主体字对齐排除代词（她/他/它/你/我/们/这/那/其）、程度语气副词（很/太/都/也/就/才/更/最/挺/好/不/没/一/定/必/须/或/又/再/还/被/把/让/使）、结构助词与介词尾字（的/地/得/在/和/跟/与/同/为/以/于/之）
+5. **删除 `investHit` 运动分支 `else` 死代码**：健康豁免已由上层 `HEALTH_OUTCOME_ZH` 独立承担，保留单一承重路径
+
+### 一次失败的尝试（如实记录，已回滚）
+曾加「同主体特质迁移」豁免（post 带回指 its/该/其 + pre 含实体名词即 miss），意图放过「这家餐厅服务很好，所以菜也很好吃」。**实测该豁免把 4 个攻击样本也放过了**（游戏画面→服务器、手机外观→拍照、酒店前台→隔音、en 种树→财报全部转 MISS），因为回指信号无法区分「同实体不同特质」与「跨实体不相干」。已完整回滚。该 2 条同主体良性样本（中英各一）归入**已知边界**——它属 halo_effect 射程内的同主体光环迁移，心虫另有 halo_effect 维度覆盖，不硬改。
+
+### 验证数据（五门禁 + 变体矩阵，全部本轮实测）
+- `node --check src/fallacy-of-relevance.js` → SYNTAX_OK
+- `bin/verify.js` → **16 passed / 0 failed**
+- `scripts/guard-abilities.js` → **20/20**
+- `test/doc-numbers-accuracy.test.js` → **24 通过 / 0 失败**（r254 遗留 9 项文档债全清：维度 229→230、verify 186→187，README/SKILL/AGENTS 三处同步）
+- `scripts/bidirectional-guard.js` → **召回 52/52、误拦 302/326**（均较基线未恶化）
+- **攻击变体矩阵 10/10 非 pass（全部 rewrite）**：中文6（努力→产品、服务→菜、跑步→英语、画面→服务器、外观→拍照、让步长句）+ 英文4（种树→财报、父亲→决策、歌声→厨艺、配乐→剧情）——**中文侧从 r254 的独立命中 0 提升到 6/6**
+- **良性样本 6/6 pass**：体育→健康、共词链条、投入→营收、猫狗中项不周延（正确归 undistributed_middle 射程，未抢占第229维）、多因陈述、无推断句
+
+### 文档与版本
+- README.md：维度 badge/标题/规格表 229→230，`187 request verify`
+- SKILL.md：`230 discrimination dimensions`、规格表 230、`187 request verify`、Verify 层列举补 `fallacy_of_relevance`
+- AGENTS.md：`230 dimensions`、`Verify-level (187)`、verify 列举补 `fallacy_of_relevance`、版本线补 v6.8.154
+- VERSION 6.8.153 → 6.8.154，`scripts/sync-version.js` 已同步 package.json/SKILL.md/version.js fallback/heartflow.js BUILD_DATE
+
+### 已知边界（下轮可继续）
+1. 同主体特质迁移（「餐厅服务好→菜好吃」）仍命中本维度，属 halo_effect 射程，需按语义实体同一性判别，纯词面规则难以安全区分（本轮回滚证明）
+2. 中文倒装让步句中若 pre/post 复述同一主语（「虽然他很努力，但是他的产品一定很优秀，可见努力都有回报」），按同义复述豁免 miss——该形态与良性「他很努力，工作也很努力」在词面不可分
+3. `src/index.js` 16719 行超 14000 阈值（doc-numbers 报警项），拆分是高危重构，需专门轮次
+
 ## r253 修复 — 每日审计：修复 r253 新维度 `undistributed_middle` 接线崩溃（P1）+ 文档口径同步
 
 **日期** 2026-11-08  **操作方** cron（每日审计·修复轮，本地 commit，不推送）

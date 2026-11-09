@@ -869,6 +869,12 @@ const { checkFalseMemoryTransplant } = require('./false-memory-transplant.js');
 // [r253] 第 229 维度 undistributed_middle（中项不周延）计算点。
 // um——undistributed middle 缩写，grep 0 命中无冲突。
 const { checkUndistributedMiddle } = require('./undistributed-middle.js');
+// [r254] 第 230 维度 fallacy_of_relevance（不相干结论）计算点。
+// for_——fallacy of relevance 缩写（fr 等 grep 0 命中无冲突）。
+const { checkFallacyOfRelevance } = require('./fallacy-of-relevance.js');
+// [r256] 第 231 维度 affirming_disjunct（或然析取肯定）计算点。
+// adx——affirming disjunct 缩写（ad 已被其它用途占用风险，grep 0 命中无冲突）。
+const { checkAffirmingDisjunct } = require('./affirming-disjunct.js');
 // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
 // confusion of the inverse：P(E|I) 的概率数值在方向翻转后原样沿用为
 // P(I|E)，检察官谬误的结构形）。src/conditional-transposition.js 28KB
@@ -2255,6 +2261,11 @@ function discriminate(text, evidence = [], contentMode) {
   // [r253] 第 229 维度 undistributed_middle（中项不周延）计算点。
   // um——undistributed middle 缩写，grep 0 命中无冲突。
   const um = _applyPedagogyRelaxation(checkUndistributedMiddle(_normText), "undistributed_middle", pedagogyRelaxation);
+  // [r254] 第 230 维度 fallacy_of_relevance（不相干结论）计算点。
+  const for_ = _applyPedagogyRelaxation(checkFallacyOfRelevance(_normText), "fallacy_of_relevance", pedagogyRelaxation);
+  // [r256] 第 231 维度 affirming_disjunct（或然析取肯定）计算点。
+  // adx——affirming disjunct 缩写，grep 0 命中无冲突。
+  const adx = _applyPedagogyRelaxation(checkAffirmingDisjunct(_normText), "affirming_disjunct", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -2893,6 +2904,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r253] 第 229 维度 undistributed_middle 参与判定（中项不周延）。
     // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: um.score, name:'undistributed_middle'},
+    // [r254] 第 230 维度 fallacy_of_relevance 参与判定（不相干结论）。
+    // 同先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: for_.score, name:'fallacy_of_relevance'},
+    {score: adx.score, name:'affirming_disjunct'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3435,6 +3450,17 @@ function discriminate(text, evidence = [], contentMode) {
     // 谬误概念转述/教学语境/对冲结论；正当的同箩筐并列陈述「A和B都是M」
     // 不判）。
     undistributed_middle: um,
+    // [r254] 第 230 维度 fallacy_of_relevance（不相干结论：话题锚点腿
+    // ×语义域不同话题结论腿×推断词伪装腿，零共享实词即判。含五组豁免表：
+    // 谬误概念转述/教学语境/对冲结论/疑问句/数值桥接，另有三组桥接豁免：
+    // 同义改写（续航≡待机）、正当因果桥接（投入词×结果词成对，体育投入
+    // 不桥接学业业绩）、共享实词）。与 halo_effect(179)/pseudo_causal(70)
+    // /whataboutism/soft_deflection 的射程边界见 src/fallacy-of-relevance.js
+    // 头注释。
+    fallacy_of_relevance: for_,
+    // [r256] 第 231 维度 affirming_disjunct（或然析取肯定）补登记。
+    // adx——affirming disjunct 缩写。同上：九处一次接齐。
+    affirming_disjunct: adx,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -5042,6 +5068,24 @@ function discriminate(text, evidence = [], contentMode) {
     // false_equivalence(57)/hasty_generalization(61)/affirming_the_consequent
     // /sorites_fallacy(212) 的射程边界见 src/undistributed-middle.js 头注释。
     'undistributed_middle',
+    // [r254] 第 230 维度 fallacy_of_relevance（不相干结论 / ignoratio
+    // elenchi：前提与结论主题域互不相干，却用推断词把两者连成有效的
+    // 因果/蕴含结论——「他工作很努力，所以他的产品一定很优秀」。
+    // 英文 "The company plants many trees, so its financial reports must
+    // be honest." 亦覆盖。verify 级——结论本身偶然可能为真（努力的
+    // 人产品确实可能优秀，只是这句话没给出有效支撑），verify 的含义是
+    // 「该结论与前提之间缺少可检验的语义关联，需补上桥接前提或其他
+    // 证据」。与 r206-r253 同口径只登记 VERIFY。与 halo_effect(179)/
+    // pseudo_causal(70)/whataboutism/soft_deflection 的射程边界见
+    // src/fallacy-of-relevance.js 头注释。
+    'fallacy_of_relevance',
+    // [r256] 第 231 维度 affirming_disjunct（或然析取肯定：把日常相容
+    // 析取「A或B」当成排他析取，由一支为真排除另一支）。排他性未言明
+    // 时该排除依赖一个隐藏前提，须先确认析取类型 → verify。
+    // 与 false_dilemma(65)/illicit_conversion(167)/affirming_the_consequent(155)/
+    // fallacy_of_relevance(230)/whole_part_transfer(170) 的射程边界见
+    // src/affirming-disjunct.js 头注释。
+    'affirming_disjunct',
     // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
     // confusion of the inverse：P(E|I) 的数值在方向翻转后原样沿用为
     // P(I|E)——「这种病检测阳性的概率是 95%，所以得了这种病检测阳性的
@@ -5665,6 +5709,12 @@ function discriminate(text, evidence = [], contentMode) {
       // [r253] 第 229 维度 undistributed_middle 补登记（中项不周延）。
       // 同上：九处一次接齐。
       undistributed_middle: um,
+      // [r254] 第 230 维度 fallacy_of_relevance 补登记（不相干结论）。
+      // 同上：九处一次接齐。
+      fallacy_of_relevance: for_,
+      // [r256] 第 231 维度 affirming_disjunct 补登记（或然析取肯定）。
+      // adx——affirming disjunct 缩写。同上：九处一次接齐。
+      affirming_disjunct: adx,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,

@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-229-blueviolet.svg)](#what-it-catches-229-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-231-blueviolet.svg)](#what-it-catches-231-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-229 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+231 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  12,911 passing tests  ×  2 npm dependencies
 ```
 
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (229 dimensions) -> gate
+scope-check -> premise-check -> discriminate (231 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (229 dimensions)
+## What it catches (231 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **186 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **188 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.153**. Not marketing copy.
+Measured on this repository at **v6.8.155**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 229 |
+| Discrimination dimensions | 231 |
 | MCP tools | 184 |
 | Test suite | 12,911 passing / 108 failing | `node test/run-all.js` (full run 2026-11-06; failed set is pre-existing runner/flaky noise — 5 self-reported failures in upstream tests (ClassicsRules/path-guard/mcp-server/pipeline/round-378) + 48 no-summary-line, none introduced by r227; r227 added researcher-degrees-of-freedom/sorites/ecological tests, all passing) |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,8 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.155 | 2026-11-09 | **第231维度 affirming_disjunct（肯定析取 / affirming a disjunct）上线（r256 并发接线）+ 第230维度 fallacy_of_relevance 功能修复** — 新文件 src/affirming-disjunct.js；fallacy_of_relevance 补三项修复：① 否定极性盲区（「不支持…所以必须支持」族因 2-gram 碎片共享实词整族 miss，改用前段否定词干判别）；② INFER_ZH 补论证意图族（「却想用这个证明」等，答非所问类无推断词致切分返回 null）；③ 日常情境→自身心境豁免（SCENE_ZH × MOOD_ZH 成对，「天气不错所以心情很好」属正当因果）。 |
+| 6.8.154 | 2026-11-09 | **第230维度 fallacy_of_relevance（不相干结论 / ignoratio elenchi）上线（r254 立项，r255–r256 收尾）** — 新文件 src/fallacy-of-relevance.js；中文 2-gram 零共享判据 + 全文中英文豁免四件套（META_CONCEPT/TEACH/QUESTION/NUMERIC_BRIDGE）先于切分 + 正当因果桥接豁免（INVEST×OUTCOME 成对、体育→健康独立域）；变体矩阵 9/9 正向 + 3/3 良性。 |
 | 6.8.153 | 2026-11-09 | **第229维度 undistributed_middle（中项不周延）上线 + 全局稳定性加固（r253 审计）** — ① P1 修复：undistributed_middle 未命中返回 null 导致 checkOutput 全量崩溃（commit 6d42f8c6），另修 9 个 check\* 维度函数（checkPseudoProfundity / circular_reasoning / survivor_time_bias / whole_part_transfer / necessity_sufficiency_confusion / activity_outcome_confusion / proxy_metric_goal 等）收到非字符串输入时直接 `text.match()` 解引用的崩溃，统一入口守卫 `if (typeof text !== 'string') text = String(text ?? '')`——206 个 check\* 函数 × 14 类输入动态探测 2884 次调用由崩溃 16 次降为 0；② 性能：`dangerous-instruction.js` `_matchAll` 的 5 个豁免正则提为模块级常量，消除每次调用的 361 次重复编译（CPU profile 实测单次 discriminate 编译 782 个正则，其中该函数占 46%），语义零变化、dangerous-instruction 测试 33/33 通过；③ coordination 体系整理：DEPLOY-agent2/agent3 标注历史退场状态（无宿主部署目录、claims 零认领、reports 止于 r213/r214），DEPLOY-agent4 补「两处部署体系」说明与当前写权限表；④ 撤销一次误操作恢复：agent 用 .bak 回填导致工作区同时丢失 226/227/228/229 四维接线与 automation-bias / framing-effect 内容（index.js -126 行），已完整恢复 HEAD 并只重打合法优化。维度数 228→229，VERIFY 185→186，模块 161 不变。验证：五门禁 verify 16/16、guard 20/20（229 键）、doc 24/24、双向召回 52/52 误拦 302/326（较基线 301 改善）。 |
 | 6.8.152 | 2026-11-08 | **r252 补登记 undistributed_middle 计算点与 9 个维度入口守卫** — 本地独有产能固化，为 6.8.153 的前置。 |
 | 6.8.151 | 2026-11-08 | **第228维度 false_memory_transplant（虚假记忆嫁接 / memory-reframing）上线（r252 接手落地）** — 新文件 src/false-memory-transplant.js（272行）。判据为**三腿共现（缺一不判）**：腿① MEM_ZH 第一手见证标记腿（`你|您|你们` + `亲口/亲耳/当面/亲眼` + 表态动词 说/讲/承认/答应/同意/表态/承诺/保证/应下/许下/点头/认可/首肯/讲过/说过/提过/听到——「亲口」本身即记忆权威宣示，无需时间断言词共现）；腿② PAST_SAID_ZH 过去断言腿（`早就/明明/当初` 等时间断言词 + 承诺动词）；腿③ LOCKDOWN_ZH 封锁退路腿（`别/不要/少/休想` + `反悔/改口/不认/赖账/抵赖/翻供/收回/否认/装傻/装糊涂/推诿`，及短促禁令形 `别装了/别演了/别狡辩了/别抵了/别赖了`）。英文三腿：`you told me yourself` / `I clearly remember / I distinctly recall / everyone remembers` / `stop pretending / cannot just deny`。五类豁免（概念分析/可核实凭据在场/自省式记忆不确定/正当引述核对/单纯提问）负例注入容错。index.js 九处接线（require/计算点/allDims/dimMap/补登记×2/VERIFY_DIMS/exports；变量名 fmt）。r252 接手轮修复三处漏判：C3（第一手见证标记独立成腿，覆盖「你亲口答应过会支持，现在怎么能反悔？」）、C4（短促禁令封锁形，覆盖「大家都记得你承诺过这件事，你就别装了」）、attack-4（MEM 腿动词表补 `听到`，覆盖「你亲耳听到过我同意这个安排」）。远端去重：本地 HEAD 落后 heartflow/main 47 commit，远端 r254 已提交 money-illusion / law-of-small-numbers，grep 远端 src/ 对 false_memory_transplant 零命中，本维度为本地独有产能。维度数 227→228，VERIFY 184→185。验证：单测 37/37（13 攻击 + 13 良性 + 三条腿负例注入承重 + 5 豁免常量 + gate 端到端）、dryrun 矩阵攻击 12/12、良性 0/14、变体矩阵攻击 8/8、良性 5/6（B2 由既有 confidence 低分 verify，非本维度误伤）、五门禁 verify 16/16、guard 20/20（228 键）、doc 24/24、双向召回 52/52 误拦 302/326 不升。已知边界：① 单纯记忆断言无封锁动作（如 `I clearly remember you promising full support for this plan.`）按设计两腿判据不收；② 跨句长距离形不收；③ B2 式自省句被既有 confidence/soft_deflection 代拦，属既有维度长期行为。 |

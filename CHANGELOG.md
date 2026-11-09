@@ -1,3 +1,41 @@
+# 6.8.155 变更日志条目
+
+## [6.8.155] - 2026-11-09
+
+### 新增
+- **第231维度 `affirming_disjunct`（肯定析取）接线**（r256）：新文件 `src/affirming-disjunct.js`，`src/index.js` 九处接线；维度数 230→231，VERIFY 187→188。
+
+### 修复
+- `src/fallacy-of-relevance.js` **否定极性盲区**（唯一真 bug，中文整族 miss）：「诉诸恐惧：如果不支持，就会有可怕后果，所以必须支持。」族因 2-gram 切片把「不支持」切成裸词根「支持」，被精确匹配与部分包含双双计为 shared → MISS。改用前段否定词干 `PRE_NEG_STEMS`（regex 抽词干，覆盖碎片通道）+ 主体字对齐跳过否定词干边缘字。
+- `src/fallacy-of-relevance.js` **INFER_ZH 补论证意图族**：「却想用这个证明」「想借此证明」「试图证明」等 7 条，修答非所问类无推断词致 `_splitByInfer` 返回 null 的整族 miss。
+- `src/fallacy-of-relevance.js` **日常情境→自身心境豁免**：SCENE_ZH × MOOD_ZH 成对命中才豁免，修「天气不错所以心情很好」误报；单独心境词不免责，留给 halo_effect。
+- 文档口径债全清：README.md / SKILL.md / AGENTS.md 维度 230→231、verify 187→188、verify 列举补 `affirming_disjunct`，五处版本号同步 6.8.155，README Version history 补 6.8.155/6.8.154 条目（doc-numbers 12 失败 → 24/24）。
+
+### 验证
+- verify 16/16、guard 20/20（231 键）、doc-numbers 24/24、双向召回 52/52 误拦 302/326 不升
+- 变体矩阵：正向 9/9（含 2 条英文立项证据）+ 良性 3/3 MISS
+
+### 已知边界
+- 「人身攻击」类（同主体换评价维度，如出身→论证有效性）不在本维度射程——「论证」两段共现时 shared=3 是正确相关信号；该族归 `ad_hominem`。
+- META_CONCEPT 全文豁免（含「不相干/推不出」元概念词）为设计意图：讨论谬误≠犯谬误。
+
+# 6.8.154 变更日志条目
+
+## [6.8.154] - 2026-11-09
+
+### 新增
+- **第230维度 `fallacy_of_relevance`（结论与前提不相干）正式承重**（r254 立项、r255 收尾）：两腿判据（推断词切分 + 零共享实词）+ 豁免表 + 三层虚词字符集，注册进 dimMap 与 VERIFY_DIMS。中文侧独立命中从 r254 的 0/4 提升到 6/6。
+
+### 修复
+- `src/fallacy-of-relevance.js`：主体字对齐规则排除代词/程度副词/结构助词三类虚词假主体（中文整族零命中的根因）；`OUTCOME_EN` 补商业成果词、新增 `HEALTH_OUTCOME_ZH` 健康成果域、体育×健康独立豁免（修 2 条良性误报）；删除 `investHit` 运动分支死代码。
+- 文档口径债全清：README.md / SKILL.md / AGENTS.md 维度 229→230、verify 186→187、verify 列举补 `fallacy_of_relevance`（doc-numbers 从 9 失败恢复到 24/24）。
+
+### 验证
+- verify 16/16、guard 20/20、doc-numbers 24/24、双向召回 52/52 误拦 302/326；攻击变体矩阵 10/10 非 pass、良性 6/6 pass。
+
+### 已知边界
+- 同主体特质迁移（「餐厅服务好→菜好吃」）仍命中，归 halo_effect 射程；中文倒装句中 pre/post 复述同一主语时按同义复述豁免 miss。
+
 # 6.8.151 变更日志条目
 
 ## [6.8.151] - 2026-11-08
