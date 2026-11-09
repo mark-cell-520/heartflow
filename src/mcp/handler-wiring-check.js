@@ -255,11 +255,54 @@ class HandlerWiringChecker {
   /**
    * [r255] 两层合查：第一层子系统探活 + 第二层全量接线矩阵（加法字段 toolWiring，
    * 不改动 check() 的既有形状）。
+   *
+   * [r258] 第三层 routeWiring：dispatch 路由层接线矩阵（r255 已知未修④「结构层
+   * 不覆盖 dispatch 路由层」的落地）。同样是加法字段。输入优先取注入的
+   * allowedRoutes/routesTable/modules，没给就从活引擎现取（引擎侧自检的默认
+   * 路径）；引擎也没有就如实说 wiring_source_not_provided。
    */
   checkAll(wiring) {
     const out = this.check();
     out.toolWiring = this.checkStructural(wiring);
+    out.routeWiring = this.checkRoutes(wiring);
     return out;
+  }
+
+  /**
+   * [r258] 第三层：dispatch 路由层三表矩阵。与 checkStructural 同一纪律——
+   * 不执行业务方法（dispatch 门禁的两步判定 `ALLOWED_ROUTES.has(route)` +
+   * `typeof mod[method] === 'function'` 都可静态完成），探错即记 probe_threw
+   * 而不是让自检自己崩。
+   * @returns {Object} RouteWiringChecker.check() 的返回值
+   */
+  checkRoutes(wiring) {
+    const w = wiring || this.wiring;
+    let allowedRoutes = null;
+    let routesTable = null;
+    let modules = null;
+    if (w && w.allowedRoutes && w.routesTable) {
+      allowedRoutes = w.allowedRoutes;
+      routesTable = w.routesTable;
+      modules = w.modules || null;
+    } else {
+      const e = this.engine;
+      if (e) {
+        try {
+          allowedRoutes = e.constructor && e.constructor.ALLOWED_ROUTES;
+          routesTable = typeof e.routes === 'function' ? e.routes() : null;
+          modules = e._modules || null;
+        } catch (err) {
+          return { source: 'probe_threw', healthy: false, reason: 'probe_threw: ' + (err && err.message), issues: [], checkedAt: Date.now() };
+        }
+      }
+    }
+    let RouteWiringChecker;
+    try {
+      ({ RouteWiringChecker } = require('../core/route-wiring-check.js'));
+    } catch (err) {
+      return { source: 'probe_threw', healthy: false, reason: 'probe_threw: ' + (err && err.message), issues: [], checkedAt: Date.now() };
+    }
+    return new RouteWiringChecker({ allowedRoutes, routesTable, modules }).check();
   }
 }
 

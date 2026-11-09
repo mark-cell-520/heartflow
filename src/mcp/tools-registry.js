@@ -30,6 +30,17 @@ const TOOLS = [
     inputSchema: {"type":"object","properties":{"text":{"type":"string","description":"要审计的中文文本"}},"required":["text"]}
   },
 
+  // [r258] dispatch 路由层接线矩阵（r255 已知未修④「结构层不覆盖 dispatch 路由层」）。
+  // 之前的两个实测缺口：routes() 原型链分支漏 `!m.startsWith('_')` 过滤 → 653 条私有
+  // 方法泄漏进接口面（每条还被可达性标注渲染成假「未注册」缺口）；手写白名单 14 条
+  // 陈旧条目承诺模块上不存在的方法（memory.remove / lesson.addLesson / dream.dreamNow
+  // 等，调用即 TypeError 而 routes() 从不显示）。本工具把三表矩阵导出为可审计轨迹。
+  {
+    name: 'heartflow_route_wiring',
+    description: "dispatch 路由层接线的可审计轨迹（ALLOWED_ROUTES × routes() × _modules 三表矩阵）。给出：① verdict——aligned（三表零发现项）/ drift（有发现项）/ wiring-not-provided；② matrix——allowed（白名单条数）、routesVisible（routes() 可见路由数）、modules（_modules 键数）、intersection（可发现且可 dispatch 的交集）、ghostPrivate（routes() 泄漏的私有方法，r258 前 653 条）、unregisteredPublic（routes() 列了但白名单没有的公有方法——能力存在却不可发现）、staleWhitelist（白名单承诺了 routes() 列不出/模块上没有的路由，r258 前 14 条）；③ issues——逐条发现项（kind/severity/route/subsystem/detail）；④ byKind、bySubsystem——按类别与子系统的分布；⑤ healthy——严重度 ≥50 判 false。用于回答「dispatch 门禁与 routes() 可见面是否还对得上」「哪些路由调用方看得见却调不到、哪些白名单承诺了却没人能发现」。静态判定不执行业务方法，纯只读、无副作用。",
+    inputSchema: {"type":"object","properties":{}}
+  },
+
   {
     name: 'heartflow_think',
     description: "完整思维链：分类输入→路由→推理→输出。返回结构化分析结果，包含类型、置信度和思维链。",

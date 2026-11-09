@@ -3589,6 +3589,39 @@ function handleEvidenceExemption(args) {
   }
 }
 
+// [r258] dispatch 路由层接线矩阵（约定 3 三处接线的 handler 函数）。
+// 走常驻引擎实例的公开方法 routeWiringTrace()——三表矩阵的现场数，不复制
+// 白名单、不复制 routes() 逻辑（复制一份就是会在引擎演进后说谎的副本）。
+function handleRouteWiring(args) {
+  try {
+    if (!heartflow || !heartflow.started || !heartflow._modules || Object.keys(heartflow._modules).length === 0) {
+      return { error: '引擎未就绪（routeWiringTrace 需要 started 且 _modules 非空）', expectedParams: [], timestamp: Date.now() };
+    }
+    const trace = heartflow.routeWiringTrace();
+    const action = (args && args.action) || 'trace';
+    if (action === 'matrix') {
+      return {
+        result: {
+          verdict: trace.verdict,
+          matrix: trace.matrix,
+          healthy: trace.healthy,
+          note: trace.note,
+        },
+        timestamp: Date.now(),
+      };
+    }
+    return {
+      result: {
+        trace,
+        note: 'matrix.intersection 是「可发现且可 dispatch」的交集；ghostPrivate/unregisteredPublic/staleWhitelist 任一非 0 即 drift。verdict=aligned 是防回退哨兵（此刻零发现项），不是「曾经修好」的证明——对齐的证明在源码锚点：routes() 原型链分支与 generateAllowedRoutes 两分支的 `!m.startsWith(\'_\')` 过滤同源、白名单手写条目与 _modules 实测方法一一对应。',
+      },
+      timestamp: Date.now(),
+    };
+  } catch (e) {
+    return { error: e.message, timestamp: Date.now() };
+  }
+}
+
 const HANDLERS = {
   // ─── [v6.7.70] 实测确认的手工接线（3 个）──
   // 来源：124 个空壳工具的精确反查 + 逐个 dispatch 实测。
@@ -3604,6 +3637,8 @@ const HANDLERS = {
   heartflow_rite_attribution: handleRiteAttribution,
   // [r257] 依据豁免的可审计轨迹（跨表统一 + 四张表在场情况 + 漂移判据）
   heartflow_evidence_exemption: handleEvidenceExemption,
+  // [r258] dispatch 路由层接线矩阵（ALLOWED_ROUTES × routes() × _modules 三表）
+  heartflow_route_wiring: handleRouteWiring,
   // [v6.7.72] 误报反馈闭环（心虫 decision.decide 选定 0.92）
   heartflow_false_positive: handleFalsePositiveTool,
   heartflow_crowdtest_evaluate: handleCrowdtestEvaluate,

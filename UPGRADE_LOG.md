@@ -1,3 +1,114 @@
+## r258 — dispatch 路由层接线矩阵（routes() 653 条私有方法泄漏修复 + 白名单 14 条陈旧条目清理）+ RouteWiringChecker 三表矩阵 + routeWiringTrace 可审计轨迹轮（v6.8.186）
+
+**轮次**：r258 ｜ **日期**：2026-11-09 ｜ **方向**：存量真 bug 修复（r255 已知未修④「结构层不覆盖 dispatch 路由层」本轮落地；两个互不相干地漂移的接口面缺口同轮闭合）+ 新自检模块（RouteWiringChecker）+ 新公开方法（routeWiringTrace）按约定 3 接进 MCP + HandlerWiringChecker 第三层
+**真升级类型**：缺陷修复（`routes()` 原型链分支漏 `!m.startsWith('_')` 过滤 → **653 条**私有方法泄漏进接口面；手写白名单 **14 条**陈旧条目承诺模块上不存在的方法）+ 新结构自检层（三表矩阵：ALLOWED_ROUTES × routes() × _modules）+ 新公开方法 + 新 MCP 工具 `heartflow_route_wiring`。routes() 输出 **1958 → 1305 条**、`[未注册]` 标注 **653 → 0**、白名单 **1319 → 1305**、三表交集 **1305 = 1305 完全闭合**。MCP 工具 **191 → 192**、dispatch 路由 **1,319 → 1,305**、判别维度 **210 不变**、引擎模块 **162 不变**。
+
+### 一、背景与选题
+- **是否经过 decision 本体打分：否**——本轮为无人交互定时轮，未调用 philosophy_decision。按轮次协议「优先做交接簿里已知未修的真 bug」选题：r257 交接簿候选池④ 是「结构层扩到 dispatch 路由层」（r255 已知未修④：1,319 条 ALLOWED_ROUTES 与桥接层路由的接线矩阵，需另一张表，可与 HandlerWiringChecker 合成 checkAll 的第三层）。全部结论来自本轮实测探针（`scripts/tmp-258-probe.js` / `probe2.js` / `probe3.js`，轮末已删），无记忆成分。
+- 选它而不选候选池①②③ 的理由：那三条都是判别引擎侧的挂账（点名真药层跨表统一 / 过敏结果词 / 上游腿缺口），共同点是「需先论证取向」；而候选④ 是**结构性缺口**——`HandlerWiringChecker` 两层（子系统探活 + MCP 工具接线矩阵）都不覆盖 dispatch 路由层，且轮初一探就照出**两个已经漂移完成的真缺口**，不需要构造红队证明缺口存在（缺口自己就在接口面上写着）。
+
+### 二、根因/缺口分析（带证据）
+
+轮初三个探针（全量实测，非抽样）把 dispatch 路由层的三张表摊开：
+
+| 表 | 口径 | 轮前实测 |
+|---|---|---|
+| `HeartFlow.ALLOWED_ROUTES` | dispatch 门禁（`ALLOWED_ROUTES.has(route)`） | **1319** 条 |
+| `hf.routes()` | routes() 可见面（调用方按它拼 `subsystem.method`） | **1958** 条 |
+| 交集 | 可发现**且**可 dispatch | **1305** 条 |
+| ALLOWED − routes() | 白名单承诺了 routes() 列不出的 | **14** 条 |
+| routes() − ALLOWED | routes() 列了但 dispatch 必拒的 | **653** 条 |
+
+**缺口①：653 条幽灵路由，100% 是私有方法泄漏。** `generateAllowedRoutes`（dispatch 门禁，`src/core/engine-dispatcher.js` L162/L171）的两条分支都有 `!key.startsWith('_')` 过滤，`routes()` 自己的 own 分支（L4987）也有——**只有 routes() 的原型链分支（L4977-4980）漏了这一处**，它只排了 `constructor`。于是 class 实例的私有原型方法（`dataEraser._readLayer` / `_writeLayer` / `_log`、`continuousLearner._save` / `_detectSignals`、`patternDetector._initConfig`…）全部泄漏进 routes() 的接口面。逐条验证（探针3）：**653 条里非下划线的公有方法 0 条、Object.prototype 噪声 0 条**——按 dispatch 约定（下划线不算公有 API）这 653 条本就不该有路由。
+
+泄漏的代价有两层，第二层比第一层贵：
+1. **接口面**：调用方看到 653 条永远调不到的路由（dispatch 实测 40/40 抽样全抛 not allowed，标注是诚实的）；
+2. **审计口径被污染**：每条泄漏还被 v6.7.74 的可达性标注渲染成 `[未注册，dispatch 会拒绝]`，**看起来像 653 个待接线缺口**。存量测试的注释已经在给泄漏打注释了——`test/round-629` L41 写「下划线方法仍按设计契约被拒（routes() 标注 [未注册，dispatch 会拒绝]），这是公有面边界不是缺陷」，`test/dispatch-route-integrity` 的头部注释把它当可达性标注的功绩。**653 个假缺口挂在接口面上，任何按 routes() 做能力盘点的人都会数出 653 个不存在的工作项。**
+
+**缺口②：14 条陈旧白名单条目承诺模块上不存在的方法。** 手写白名单（`heartflow.js` L1180）里的残留，全是改名或删除后的死条目：
+
+| 白名单条目 | 模块上的真实方法 |
+|---|---|
+| `memory.remove` / `memory.getLayers` | `memory.forget` / `memory.getMemoryStats` |
+| `lesson.addLesson` / `lesson.getRecent` | `lesson.add` / （无对应） |
+| `dream.dreamNow` / `dream.analyzeDream` | `dream.dream` / （无对应） |
+| `verify.checkConsistency` | （无对应，`verify.verify` 在） |
+| `psychology.analyze` / `psychology.detectCrisis` | `psychology.analyzePsychology` / `checkCrisis` |
+| `confidence.admit` | （无对应，`confidence.calibrate` 在） |
+| `graph.search` | `graph.getRelated` / `spreadingActivation` |
+| `slots.get` / `slots.set` / `slots.delete` | `slots.getSlot` / `setSlot` / `clearSlot` |
+
+调用即抛 `memory.remove is not a function on memory` TypeError，而 routes() **从不显示它们**（routes() 只列 `_modules` 上真实存在的方法）→ 调用方不可能从 routes() 发现，只有按历史文档/老代码硬调才会踩到。删除前实测**零真实调用方**（唯一像引用的 `src/core/stats-engine.js:9` 的 `hf.memory.getLayers` 是直接属性访问，不经 dispatch/白名单）。
+
+**两个缺口共同的根因：三张表各写各的，没有任何一层自检看它们的一致性。** `HandlerWiringChecker` 第一层守「handler 探不到子系统」、第二层守「MCP 工具接线矩阵」，dispatch 路由层（r255 已知未修④）是结构自检的盲区——r255 的注释自己写明了去向：「可与 HandlerWiringChecker 合成 checkAll 的第三层」。
+
+### 三、落地项
+1. **`src/core/heartflow.js` `routes()` 原型链分支补 `!m.startsWith('_')` 过滤**（口径与 generateAllowedRoutes 两分支 + routes() own 分支对齐）。同时把 v6.7.74 可达性标注块的角色写成注释：r258 后 `[未注册]` 标注现值 0，**它的价值是防回退哨兵**（将来哪个公有方法真没进白名单会在这里重新可见），不是「当前已对齐」的证明——对齐的证明在三表矩阵里（沉淀同 r257 踩坑④：把两条表并成一条之后，任何「两条表一致」的运行时判据都自动变成恒真）。
+2. **白名单删 14 条 stale 条目**（`heartflow.js` L1180）。取向论证：① 它们承诺的能力不存在，dispatch 调用 = TypeError；② routes() 从不显示 → 承诺是死的，零真实调用方；③ 保留 = 新自检一上线就带 14 条永久红，或把自检降到提示级让它变装饰；④ 删除是**收紧语义**（白名单不再承诺不存在的能力，dispatch 报清晰的 not allowed 而非 TypeError），且删后 `generateAllowedRoutes` 不会把它们生成回来（它只从 `_modules` 真实方法生成）。
+3. **新模块 `src/core/route-wiring-check.js`（`RouteWiringChecker`，注入式三表矩阵）**。判据四类：`healthy`（ALLOWED ∩ routes() 可见）、`ghost_private`（routes() 可见但白名单没有且 `_` 开头）、`unregistered_public`（routes() 可见但白名单没有且公有——能力存在却不可发现）、`stale_whitelist`（白名单有但 routes() 不可见，细分 noModule / noMethod / 表里没有三种 detail）。**静态判定不执行业务方法**——dispatch 门禁本身只有 `ALLOWED_ROUTES.has(route)` + `typeof mod[method] === 'function'` 两步，都可静态完成。纪律对齐 HandlerWiringChecker：输入全注入（检查器不 require 引擎）、探错记 probe_threw 不炸自检、**空矩阵不是 aligned**（routes() 可见与 _modules 同时为 0 → `empty_matrix` 判不健康；routesTable 空而 modules 非空是注入的局部数据，白名单侧的 stale 检查恰恰最该跑，不能被空矩阵判据拦掉——首版只判 routesVisible===0 误杀过这个场景）。
+4. **新公开方法 `routeWiringTrace()`**（`heartflow.js`，routes() 方法之后）：九段 `verdict`（aligned / drift / engine-not-ready / wiring-not-provided）/ `matrix`（allowed / routesVisible / modules / intersection / ghostPrivate / unregisteredPublic / staleWhitelist）/ `kinds` / `issues` / `byKind` / `bySubsystem` / `healthy` / `checkedAt` / `note`。**刻意不带 check 前缀**（causalRiteZh / riteAttributionTrace / evidenceExemptionTrace 同款理由：orphan-dimension-scan 纪律）。走 lazy registry（约定 2：`_RouteWiringChecker = _lazy('routeWiringCheck', ...)`）。
+5. **新 MCP 工具 `heartflow_route_wiring`（约定 3 三处接线）**：`src/mcp/tools-registry.js` 工具定义（无参数，`inputSchema: {type:'object', properties:{}}`）+ `HANDLERS` 映射 + `handleRouteWiring()`（走常驻引擎实例的公开方法，两档 action：默认 trace 全量 / `matrix` 只要矩阵；引擎未就绪返回带 `expectedParams` 的可操作错误）。**不进 WRITE_TOOLS**。
+6. **`HandlerWiringChecker.checkAll` 合成第三层**（`src/mcp/handler-wiring-check.js`）：加法字段 `routeWiring`（r255 注释里写定的去向）。输入优先取注入的 `allowedRoutes/routesTable/modules`，没给就从活引擎现取；两者都没有如实报 `wiring_source_not_provided`；`engine.routes()` 抛错记 `probe_threw` 带上原始错误。`check()` / `checkStructural()` 既有形状一字未动。
+7. **版本 6.8.185 → 6.8.186**，`sync-version.js` + `sync-doc-numbers.js` 已跑（AGENTS.md/README.md/SKILL.md/package.json 的 MCP 工具 191→192、dispatch 路由 1,319→1,305、测试数记账、版本戳全部机器同步）；README Version history 补 v6.8.186 行。
+8. **新测试 `test/round-258-route-wiring-matrix.test.js`（26 断言全绿，单独跑 10.3s < runner CHILD_TIMEOUT=90000）**：A 族 4 条（变异副本复现轮前 653 条泄漏 / 逐条验 100% 是 `_` 开头含中文方法名 / 现值清零 / routes() 输出零标注零下划线且总数 1305）；B 族 3 条（14 条 stale 全删 / 三种 stale detail 各就各位 / 白名单加回一条立刻翻面）；C 族 3 条（白名单删一条存在路由 → unregistered_public / `[未注册]` 旧标注形态也识别 / 空矩阵不是 aligned）；D 族 4 条（三表矩阵 1305/1305/1305/162 / 14 条删除路由 14/14 抛 not allowed / 交集抽样 60/60 不误杀 / 白名单 1305 条全部 routes() 可发现）；E 族 4 条（九段形状 + note 哨兵语义 / patch routes() 注入后 verdict 翻 drift / 冷引擎 engine-not-ready / 输入未注入 not_provided）；F 族 3 条（约定 3 三处接线 + 不进 WRITE_TOOLS + handler 未就绪契约 + 子进程端到端）；G 族 3 条（checkAll 第三层加法字段 / 注入路径同数字 / not_provided 与 probe_threw 两路降级）；H 族 2 条（round-601 / dispatch-route-integrity / round-629 三个存量 routes() 守卫复跑零失败 + round-578 断言口径复刻仍成立）。
+
+### 四、验收数字（全部实测）
+| 项 | 轮前 | 轮后 | 实测方式 |
+|---|---|---|---|
+| routes() 输出条数 | **1958** | **1305**（-653） | test A4；探针1/2 |
+| `[未注册，dispatch 会拒绝]` 标注 | **653** | **0** | test A4 |
+| 泄漏条目里非下划线公有方法 | — | **0 条**（653 条 100% 私有） | 探针3 逐条分类；test A1/A2 |
+| ALLOWED_ROUTES 条数 | **1319** | **1305**（-14 stale） | test D1；sync-doc-numbers 记账 |
+| 三表交集（可发现且可 dispatch） | 1305 | **1305 = 1305 完全闭合** | test D1/D4；探针2 |
+| 子系统键数（routes() 消费方只读它） | 162 | **162 不变** | test D1；self-benchmark.js / BridgeIdentity 零影响 |
+| 变异副本复现轮前（摘 routes() 过滤） | — | **653 条 ghost_private + healthy=false + verdict=drift** | test A1（不依赖 git rev） |
+| 白名单加回一条 stale（注入） | — | **stale_whitelist 报出 + healthy=false** | test B3 |
+| 白名单删一条存在路由（注入） | — | **unregistered_public 报出 + healthy=false** | test C1 |
+| 14 条删除路由的 dispatch 行为 | TypeError（is not a function） | **14/14 抛 not allowed**（收紧） | test D2 |
+| 交集路由 dispatch 不误杀 | — | 抽样 **60/60** 无 not allowed | test D3 |
+| 冷引擎 / 输入缺失 / routes() 抛错 | — | engine-not-ready / not_provided / probe_threw **三路如实降级** | test E3/E4/G3 |
+| 新增非注释代码 | — | **约 200 行**（route-wiring-check.js 模块 + routeWiringTrace + handler + checkRoutes；不含测试） | `git diff` + 剥注释统计 |
+| MCP 工具 / 路由 / 维度 / 模块 | 191 / 1,319 / 210 / 162 | **192 / 1,305 / 210 / 162** | sync-doc-numbers.js；test F1/D1 |
+| `bin/verify.js` | — | **16/16** | — |
+| bidirectional-guard | — | 召回 **52/52 不降**；误拦 **302/326 不升**（与 r257 基线逐项一致） | — |
+| guard-abilities | — | **20/20**（dimensions 键 **210** 不变） | — |
+| doc-numbers-accuracy | — | **24/24** | — |
+| security-audit | — | 提交前 **15/16**（S2「git log/tag 未命中 6.8.186」为提交前预期失败，r236~r257 同款） | — |
+| 本轮新测试 | — | round-258 **26/26**（单独跑 10.3s） | test/round-258-route-wiring-matrix.test.js |
+
+### 五、全量回归与计数
+全量回归一遍（`data/round-258-regression.log`，**661 个测试文件**，exit 0）：
+
+- **总结论：19585 通过 / 155 失败 / 共 19740 个。**
+- **计数自洽**：基线 r257 = 19559 / 155 / 19714（660 文件，`data/round-257-regression2.log`）。本轮 total **+26** = 新测试 round-258 的 **26 条断言**，严格对上；passed **+26**、failed **155 = 155 不变**、文件数 **+1**。
+- **「本轮引入 0 个新失败文件」的证明（逐文件双向 comm，不靠总数自证）**：把本轮回归的失败文件清单与 r257 基线逐项 `comm` 比对——**两个方向输出均为空**（`comm -23`「仅本轮有」空、`comm -13`「仅基线有」空），**74 = 74 个失败文件，新增 0 个、消失 0 个**。噪声池与基线逐项一致：MCP 类 6 个（`knowledge-graph-mcp-state-round593` / `knowledge-layer-mcp-state-round313` / `mcp-auth-tier` / `mcp-guest-permission` / `mcp-server` / `mcp-smoke`，8099 端口被常驻服务占用）、未输出汇总行类、注册 0 用例类（`core/path-guard`、`round-410`）、`Command failed` 类 dispatch 族 16 个、文件自报失败类 5 个（`ClassicsRules searchClassicsBatch`、`AgentBoundaryGuard dot-dir`、`unsupported-claim-exemption`、`round-378 dimensionRaw` 键口径、`round-572-associative-wiring` 剩余 4 条 = r572 记录缺陷 B）。
+- **`round-629-instructions-wiring` 在 74 清单里的如实说明**：它在回归里被计失败，但**单独 spawn 复跑 0 失败**（本轮测试 H1 就是这么跑的）。原因是 runner 的汇总行正则只认「N 通过, M 失败」格式，而该文件输出 `RESULT{json}`——与 r257 基线逐项一致（两轮都在清单里，comm 双向为空），是**存量 runner 口径噪声，不是行为失败**。这一条也反过来验证了踩坑④的修法：复跑断言必须兼容两种汇总行格式，否则会把噪声误判成回归。
+- **直接受本轮改动影响的守卫在全量回归里逐个零失败**：round-258 **26/26**（[456/661]）、round-601 **13/13**、dispatch-route-integrity **4/4**、round-578 **18 过 / 0 败**；round-629 见上一条（runner 口径噪声，单独 spawn 0 失败）。
+
+### 六、已知未修（含为什么不修）
+1. **点名真药层跨表统一**（r257 已知未修①，候选池①续挂）——需先论证「吃了这个保健品，配着布洛芬一起吃」该不该豁免。依据层已单一词源，点名真药层仍只属服药族。
+2. **r256 已知未修①**「抗过敏药吃了一堆也没用，去庙里上香之后过敏就好了」仍不判（「过敏」既是上游机制词又是结果侧结果词，腿 D 必然命中，位置切不开）——未碰。
+3. **r256 已知未修③上游腿缺口**（机制词在仪式动词之前且同子句的形状现在能判，但「先说依据再说仪式」的良性叙述与它同形）——未碰。
+4. **三个 by design 未广告 handler 的曝光裁决**（r255 已知未修③：`heartflow_self_benchmark` / `heartflow_safe_fetch` / `heartflow_circuit_breaker`）——未碰。
+5. **28 个无调用方占位子系统的摘除**（r251 候选池①，续挂）——未碰。
+6. **「真引用 vs 编造引用」分辨**（r254 已知未修①）、**`heartflow_translate` 的 `tone.tone` 兼容别名**（r249 G2）、**`.gitignore` 无锚定目录模式换机复扫**（r253）——均未碰。
+7. **⑨族裸标记位置化**（r225 纪律）、**lastIndex 防空匹配防护前移**（r231/r233/r236~r257 多次记过）、**`scripts/negative-test-rc-temporal-causal-r364.js` 临时目录隔离**、**r71 测试 G 节 idx4 zh 侧句式缺口**——本轮均未碰。
+8. **`routeWiringTrace` 只做静态矩阵，不实测 dispatch 业务返回值**——刻意取向：dispatch 门禁的两步判定（白名单 has + 方法存在）都可静态完成，而真调业务方法有副作用（`memory.store` 会写盘）。「方法存在但调用抛参数字形错误」这一类（探针1 实测 120 条抽样 17 条抛 TypeError，全是空参数形状问题）不属接线缺口，未纳入判据。
+
+### 七、踩坑
+1. **`new RouteWiringChecker` 首版 `push()` 忘了往 `kinds` 同步**——issues/byKind 有数而 `kinds.ghostPrivate` 恒空，上层 `matrix` 读 `kinds.length` 恒报 0：自检显示「零发现项」而 issues 列表里躺着 1307 条。测试 E2（patch routes() 注入幽灵路由）一照就照出来了。**沉淀：同一份数据两个出口（汇总数字 + 明细列表）必须同源同步，否则汇总恒 0 比没有汇总更坏——它让明细永远没人看。**
+2. **`empty_matrix` 判据首版只判 `routesVisible === 0`，误杀了「routesTable 空但 modules 非空」的注入场景**——那正是白名单侧 stale 检查最该跑的时候（B2 注入三条不同 detail 的 stale，被空矩阵判据提前 return 全吃掉）。且 `ALLOWED_ROUTES` 是**类级 static Set**，冷引擎的 `this.constructor.ALLOWED_ROUTES` 也有 1305 条，所以「白名单也空」不能作为引擎未就绪的判据。修法：判据改为「routes() 可见为 0 **且** _modules 为 0」两者齐空才是没就绪。
+3. **子进程 stdout 会混进引擎日志**（`[FormulaSearch] 完成` / init 事件都走 console.log），`JSON.parse(out.trim())` 直接炸「Unexpected token 'F'」。修法：JSON 输出加 `__R258__` 标记行、父进程 `out.split('__R258__').pop()`——不靠「最后一行」（日志可能在 JSON 之后）。
+4. **存量测试的汇总行有两种格式**：「N 通过, M 失败」（多数）与 `RESULT{json}`（round-629）。复跑断言只认前一种会漏判（round-629 报「未输出汇总行」其实跑得好好儿的）。
+5. **中文/双下划线方法名的正则**：`/\._[A-Za-z]/` 漏了 `ruleGrowth._固化` 和 `counterfactual.__internalConfidence`。判「方法名 _ 开头」直接用 `/\._/`（点后紧跟下划线），不枚举 ASCII。
+6. **同步 `start()`（不 await）后 `_modules` 即就绪**（实测 <1s，routes() 立即可用）——`dispatch-route-integrity.test.js` 一直这么用，而我最初的探针没调 start() 就拿到 `_modules={}`、白名单 38 条，差点误判「ALLOWED_ROUTES 只有 38 条」。探针第一步先确认被测系统的初始化契约，再读数。
+7. **（本轮最重的一脚，写给下一轮）用 Write 工具整写 UPGRADE_LOG.md 会把 23998 行历史全量覆盖**——我本轮就这么干了，`git diff --stat` 显示 `UPGRADE_LOG.md | 24037 +-----`（删 23997 行）才被发现，`git checkout --` 恢复后改用 Edit 在顶部插入。**沉淀：对「只增不改」的累积型文档（UPGRADE_LOG.md / 交接簿 notes），一律用 Edit 插行，永远不用 Write 整写；Write 只用于本轮新建的文件。**（附：恢复后 `git diff --stat` 对该文件为空即证明历史完好。）
+
+### 八、下一轮候选池（按优先级）
+① **点名真药层跨表统一**（r257 已知未修①）——需先论证「吃了这个保健品，配着布洛芬一起吃」该不该豁免。② **r256 已知未修①**「抗过敏药吃了一堆也没用，去庙里上香之后过敏就好了」（结果词本身是机制词，腿 D 必然命中，需语义判「过敏好了」是症状消退）。③ **上游腿缺口**（r256 已知未修③）——需先做 r248 同款四条候选变体的全仓碰撞面实测。④ **三个 by design 未广告 handler 的曝光裁决**（r255 已知未修③）。⑤ **28 个无调用方占位子系统的摘除**（r251 候选池①，续挂）。⑥ **「真引用 vs 编造引用」分辨**（r254 已知未修①，需先论证「引用可指名性」子特征）。⑦ 判别引擎侧其余挂账（⑨族裸标记位置化 / lastIndex 防空匹配防护前移 / r364 临时目录隔离 / r71 idx4）。⑧ `heartflow_translate` 的 `tone.tone` 兼容别名（r249 G2）。⑨ `.gitignore` 无锚定目录模式换机复扫（r253 阴性但规则本身仍是潜在系统性风险）。⑩ **routes() 与 MCP 侧路由探针的接口面再核对**（本轮三表闭合后，可查「外部按 routes() 拼路由」的桥接层是否还有第二份路由表——r258 只闭合了引擎侧三张表）。
+
+---
+
 ## r257 — 依据豁免层跨表统一（`PC_SUPP_MECH_ZH` / `PC_DRUG_MECH_ZH` 收敛成单一词源 `PC_EVIDENCE_WORDS`）+ evidenceExemptionTrace 可审计轨迹轮（v6.8.185）
 
 **轮次**：r257 ｜ **日期**：2026-11-09 ｜ **方向**：存量真 bug 修复（r236 G2 后半「`PC_DRUG_MECH_ZH` / `PC_SUPP_MECH_ZH` 跨表医疗/依据词统一」，十六轮挂账本轮落地）+ 新公开方法（`evidenceExemptionTrace`）按约定 3 接进 MCP

@@ -339,6 +339,9 @@ function _lazy(key, loader) {
 
 const _Budget = _lazy('budget', () => require('./budget.js'));
 
+// [r258] dispatch 路由层接线自检（三表矩阵：ALLOWED_ROUTES × routes() × _modules）
+const _RouteWiringChecker = _lazy('routeWiringCheck', () => require('./route-wiring-check.js'));
+
 const _Graph = _lazy('graph', () => require('../memory/graph.js'));
 
 const _CoreUtils = _lazy('utils', () => require('./utils.js'));
@@ -896,7 +899,7 @@ const _ConfidenceAnnotator = _lazy('confidenceAnnotator', () => require('./confi
 const _AgentCommentary = _lazy('agentCommentary', () => { try { return require('../bridge/agent-commentary.js'); } catch(e) { return { AgentCommentary: class { constructor() {} comment() { return ''; } } }; } });
 
 
-const BUILD_DATE = '2026-11-09-6.8.185';
+const BUILD_DATE = '2026-11-09-6.8.186';
 
 
 // ─── 特殊模块注册表 (v5.8.0 优化：O(1) 查找替代 if/else 链) ───────────────
@@ -1177,36 +1180,41 @@ class HeartFlow {
 
   // dispatch 白名单 - 只有在白名单中的路由才能被外部调用
   // 危险方法（如内部调试、文件操作）不在白名单中
+  // [r258] 清理 14 条陈旧条目：白名单手写承诺了模块上不存在的方法
+  // （memory.remove/getLayers、lesson.addLesson/getRecent、dream.dreamNow/
+  //  analyzeDream、verify.checkConsistency、psychology.analyze/detectCrisis、
+  //  confidence.admit、graph.search、slots.get/set/delete——全是改名/删除后的
+  //  残留，如 lesson.addLesson 的实际方法是 lesson.add、psychology.analyze 的
+  //  实际方法是 analyzePsychology）。它们从不出现在 routes() 里（routes() 只
+  //  列 _modules 上真实存在的方法），调用方不可能发现；一旦按历史文档调用，
+  //  dispatch 抛的是 `<sub>.<m> is not a function` TypeError 而不是清晰的
+  //  not allowed。删除是收紧语义：白名单不再承诺不存在的能力。
+  //  删除前实测零真实调用方（stats-engine.js 的 hf.memory.getLayers 是直接
+  //  属性访问，不经 dispatch/白名单）。RouteWiringChecker.stale_whitelist
+  //  现在盯这一类回退：白名单重新承诺不存在的方法会立刻变成可见发现项。
   static ALLOWED_ROUTES = new Set([
     // memory
-    'memory.store', 'memory.retrieve', 'memory.search', 'memory.remove',
-    'memory.getLayers', 'memory.getStats',
+    'memory.store', 'memory.retrieve', 'memory.search', 'memory.getStats',
     // truth
     'truth.checkStatement', 'truth.checkNumbers', 'truth.checkSources',
     // lesson
-    'lesson.addLesson', 'lesson.getTopLessons', 'lesson.getRecent',
-    // dream
-    'dream.dreamNow', 'dream.analyzeDream',
+    'lesson.getTopLessons',
     // verify
-    'verify.verify', 'verify.checkConsistency',
+    'verify.verify',
     // error taxonomy
     'errorTaxonomy.classify', 'errorTaxonomy.getRecovery', 'errorTaxonomy.getStats',
-    // psychology
-    'psychology.analyze', 'psychology.detectCrisis',
     // emotion
     'emotion.process', 'emotion.getPAD',
     // decision
     'decision.decide', 'decision.getRecentStamps',
     // confidence
-    'confidence.calibrate', 'confidence.admit',
+    'confidence.calibrate',
     // introspect
     'heartflow.introspect', 'heartflow.selfDiagnosis',
     // restraint
     'restraint.shouldIntervene',
     // graph
-    'graph.addNode', 'graph.search',
-    // slots
-    'slots.get', 'slots.set', 'slots.delete',
+    'graph.addNode',
     // [第 216 轮接线] 综合验证引擎（SKILL.md 结构 / 代码语法 / 声明可信度）
     'verification.verifySkill', 'verification.verifyCode', 'verification.healthCheck',
   ]);
@@ -4973,10 +4981,22 @@ class HeartFlow {
         // 兼容点：原逻辑对 class 实例仍走原型链分支，行为不变；
         // 对非 prototype 继承链的模块（如 .bind() 生成的对象）也无影响，
         // 因为它们 Object.keys(mod) 本身就是空数组。
+        // [r258] 原型链分支补 `!m.startsWith('_')` 过滤——修复前它只排了
+        // constructor，于是 class 实例的**私有原型方法**（_readLayer/
+        // _writeLayer/_save/_log/_detectSignals…）全部泄漏进 routes() 的
+        // 接口面，实测 653 条。而 dispatch 门禁 generateAllowedRoutes 的
+        // 两条分支（engine-dispatcher.js L162/L171）和本函数下面 own 分支
+        // 都有这个过滤——三处口径只漏了这一处，症状就是 routes() 向调用方
+        // 列出 653 条**永远 dispatch 不到**的幽灵路由，且每条被可达性标注
+        // 渲染成 `[未注册，dispatch 会拒绝]`，看起来像 653 个待接线缺口
+        // （实际 100% 是私有方法，按 dispatch 约定本就不该有路由）。
+        // 泄漏的代价不只是难看：它把审计口径污染了——r629 的注释把
+        // 「[未注册]」当成公有面边界的设计契约，dispatch-route-integrity
+        // 的注释把它当成可达性标注，两者都在给泄漏打注释。
         const proto = Object.getPrototypeOf(mod);
         if (proto && proto !== Object.prototype && typeof proto === 'object') {
           methods = Object.getOwnPropertyNames(proto)
-            .filter(m => m !== 'constructor' && typeof mod[m] === 'function');
+            .filter(m => m !== 'constructor' && !m.startsWith('_') && typeof mod[m] === 'function');
         }
       } catch (e) { _boundedPush(this._initErrors = this._initErrors || [], { module: 'optional', error: e.message, note: 'strict mode or primitive' }, MAX_HISTORY_SIZE); }
 
@@ -4998,6 +5018,12 @@ class HeartFlow {
     // HeartFlow.ALLOWED_ROUTES 里（实测 137 个子系统名 vs 1727 条点号路由，
     // 交集为 0），调用方按 routes() 拼 subsystem.method 会被拒。
     // 现在每个方法标注 _dispatchable，调用方可过滤。
+    // [r258] 修掉原型链分支的下划线泄漏之后，这里补一句角色说明：
+    // r258 前实测 653 条 `[未注册]` 标注 **100% 是私有方法泄漏**，公有方法
+    // 未进白名单的真缺口是 0 条。所以现在这个标注块的价值是**防回退哨兵**
+    // ——将来哪个公有方法真的没进白名单，它会在这里重新可见（由
+    // RouteWiringChecker.unregistered_public 记账），不是「当前已对齐」的
+    // 证明。对齐的证明在 RouteWiringChecker 的三表矩阵里。
     try {
       const allowed = HeartFlow.ALLOWED_ROUTES;
       for (const [name, methods] of Object.entries(table)) {
@@ -5012,6 +5038,65 @@ class HeartFlow {
       }
     } catch (_) { /* 标注失败不阻断，退回原始列表 */ }
     return table;
+  }
+
+  /**
+   * [r258] dispatch 路由层接线的可审计轨迹（AGENTS.md 设计原则 #3「Auditable」）。
+   *
+   * r258 前的两个实测缺口在本方法里各有一段：
+   *   ① routes() 原型链分支漏 `!m.startsWith('_')` → 653 条私有方法泄漏进
+   *      接口面（ghost_private，r258 已修，现值 0，防回退哨兵）；
+   *   ② 手写白名单 14 条陈旧条目承诺模块上不存在的方法（stale_whitelist，
+   *      r258 已删，现值 0，同样是哨兵）。
+   * 矩阵本身（ALLOWED_ROUTES × routes() × _modules）回答三个问题：
+   * 哪些路由可发现可 dispatch、哪些 routes() 列了却调不到、哪些白名单承诺了
+   * 却没人能发现。
+   *
+   * 刻意不带 check 前缀（causalRiteZh / riteAttributionTrace /
+   * evidenceExemptionTrace 同款理由：scripts/orphan-dimension-scan.js 会把
+   * `function checkXxx` 但不在 discriminate() 里的当断链维度）。
+   *
+   * @returns {{verdict:string, matrix:Object, kinds:Object, issues:Array,
+   *   byKind:Object, bySubsystem:Object, healthy:boolean, checkedAt:number,
+   *   note:string, reason?:string}}
+   */
+  routeWiringTrace() {
+    let table = {};
+    let modules = {};
+    try { table = this.routes() || {}; } catch (e) { table = { _error: e.message }; }
+    try { modules = this._modules || {}; } catch (e) { modules = {}; }
+    const Checker = _RouteWiringChecker().RouteWiringChecker;
+    const checker = new Checker({
+      allowedRoutes: this.constructor.ALLOWED_ROUTES,
+      routesTable: table,
+      modules,
+    });
+    const result = checker.check();
+    const out = {
+      verdict: result.source === 'not_provided'
+        ? 'wiring-not-provided'
+        : (result.source === 'empty_matrix'
+          ? 'engine-not-ready'
+          : (result.issues.length === 0 ? 'aligned' : 'drift')),
+      matrix: {
+        allowed: result.allowed,
+        routesVisible: result.routesVisible,
+        modules: result.modules,
+        intersection: result.intersection,
+        ghostPrivate: result.kinds.ghostPrivate.length,
+        unregisteredPublic: result.kinds.unregisteredPublic.length,
+        staleWhitelist: result.kinds.staleWhitelist.length,
+      },
+      kinds: result.kinds,
+      issues: result.issues,
+      byKind: result.byKind,
+      bySubsystem: result.bySubsystem,
+      healthy: result.healthy,
+      checkedAt: result.checkedAt,
+      note: 'verdict=aligned 表示此刻三表零发现项（防回退哨兵，不是「曾经修好」的证明）；ghost_private/unregistered_public/stale_whitelist 任一非 0 即 drift。矩阵是静态判定，不执行业务方法。',
+    };
+    if (result.reason) out.reason = result.reason;
+    return out;
   }
 
   // [v6.0.71] 恢复 think 主链路（委托 this.thoughtChain，被重构误删）
