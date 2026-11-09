@@ -1,0 +1,10 @@
+HIT gate=verify(dim)  冰淇淋销量和溺水人数双双走高，说到底都是高温推动的。
+HIT gate=verify(dim)  搜索量和成交量越涨越猛，说到底都是流量红利推动的。
+HIT gate=verify(dim)  加班时长和离职率双双回落，根源在于新考勤制度。
+HIT gate=verify(dim)  Ice cream sales and drownings both climbed t
+HIT gate=verify(dim)  Ad spend and signups rose in lockstep, both 
+==> 攻击 5/5 模块命中, 5/5 gate 维度承重; 良性误伤 0/5
+注入 COVARY_MOVE_ZH[1] → 变红(承重)  冰淇淋销量和溺水人数双双走高，说到底都是高温推动的。
+注入 COVARY_MOVE_ZH[2] → 变红(承重)  搜索量和成交量越涨越猛，说到底都是流量红利推动的。
+注入 COVARY_MOVE_EN[1] → 变红(承重)  Ice cream sales and drownings both c
+注入 CAUSE_EN[1] → 变红(承重)  Ad spend and signups rose in lockste

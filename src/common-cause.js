@@ -43,6 +43,13 @@
  *   · affirming_the_consequent 管条件规则倒推，本族不涉及条件句。
  *
  * 判据（三腿共现，缺一不判）：
+ *
+ * [r264] 全新措辞家族扩展（真升级②）：池化探针 4/4 穿透中 2 个真缺口——
+ *   COVARY_MOVE_ZH 补 双双+动向（双双走高/双双回落…）与 越X越Y(猛|狠|火)
+ *   （越涨越猛/越跌越狠/越卖越火）；COVARY_MOVE_EN 补 both+动向词
+ *   （both climbed/both rose/both fell…）；CAUSE_EN 补 trace(s)/traced
+ *   back to。另 2 个探针穿透句（「背后是同一波流量在推动」/「driven by
+ *   the same heat wave」）经既有 NO_CONFOUND 豁免覆盖，非缺口，不动。
  *   腿① COVARIATION 共变/相关陈述，两形任一：
  *     - C-a 相关名词形（必含双变量，免并列结构要求）：相关/相关性/
  *       高度相关/正相关/负相关/显著相关/密切相关/强相关；
@@ -120,6 +127,9 @@ const COVARY_REL_ZH = [
 // +「上升/上涨/增长/下降/下跌/走高/走低/攀升/回落」组合覆盖同族。
 const COVARY_MOVE_ZH = [
   /(?:一同|一齐|一起|共同)(?:上升|上涨|增长|下降|下跌|走高|走低|攀升|回落|变化)|同步(?:上升|上涨|增长|下降|下跌|走高|走低|攀升|回落|变化)|同涨同跌|同升同降|同向变化|反向变化|齐涨|齐升|齐跌|齐落|相伴(?:上升|上升|下降|增长)|如影随形|齐头并进|亦步亦趋|水涨船高|随之(?:上升|上涨|增长|下降|下跌|走高|走低)|联动|共变/,
+  // [r264] 新共变词族（池化探针 4/4 穿透中的真缺口）：双双+动向 / 越X越Y(猛|狠|火)
+  /双双(?:上升|上涨|增长|下降|下跌|走高|走低|攀升|回落|变化|看涨|看跌)/,
+  /越[^，。；！？,!?;]{1,3}越[^，。；！？,!?;]{0,3}(?:猛|狠|火)/,
 ];
 
 // ─── 腿① 并列/指代双变量结构（中文，共变词前 40 字窗内）────────────────
@@ -141,12 +151,17 @@ const COVARY_REL_EN = [
 ];
 const COVARY_MOVE_EN = [
   /\b(?:rise\s+together|rises\s+together|rose\s+together|rising\s+together|move\s+together|moves\s+together|moved\s+together|moving\s+together|fall\s+together|falls\s+together|fell\s+together|go\s+up\s+together|went\s+up\s+together|lockstep|hand\s+in\s+hand|tandem|in\s+sync|track\s+each\s+other|tracks\s+each\s+other|rise\s+and\s+fall\s+together|moves?\s+in\s+tandem)\b/i,
+  // [r264] 新共变词族 EN：both + 动向词
+  /\bboth\s+(?:climbed|rose|risen|fell|fallen|dropped|surged|declined|increased|decreased|moved|went)\b/i,
 ];
 const PAIR_EN = [
   /\b(?:and|&|both|the\s+two|these\s+two|those\s+two|two\s+variables|two\s+metrics|two\s+factors|pair)\b/i,
 ];
 const CAUSE_EN = [
   /\b(?:causes|cause|caused|leads?\s+to|led\s+to|results?\s+in|resulted\s+in|results?\s+from|resulted\s+from|drives|drive|driven\s+by|boosts|boost|increases|increase|reduces|reduce|makes|make|creates|create|produces|produce|responsible\s+for|brings?\s+about|brought\s+about|gives?\s+rise\s+to|stems?\s+from|originates?\s+from|due\s+to|is\s+the\s+cause|are\s+the\s+cause)\b/i,
+  // [r264] 新因果动词族 EN：trace(s)/traced back to
+  /\btraces?\s+back\s+to\b/i,
+  /\btraced\s+back\s+to\b/i,
 ];
 
 // ─── 豁免一：概念/教学转述 ────────────────────────────────────────────
