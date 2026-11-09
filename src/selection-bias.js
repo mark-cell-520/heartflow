@@ -139,14 +139,19 @@ function _hasNegBefore(s, word) {
 }
 
 // ── 腿①：取样受限检测 ─────────────────────────────────────────
-function _findRestriction(clause) {
+function _findRestriction(clause, R) {
+  R = R || {};
+  const RESTRICT_EN_R = R.RESTRICT_EN || RESTRICT_EN;
+  const SAMPLING_VERBS_EN_R = R.SAMPLING_VERBS_EN || SAMPLING_VERBS_EN;
+  const SOURCE_FROM_EN_R = R.SOURCE_FROM_EN || SOURCE_FROM_EN;
+  const RESTRICTED_SOURCE_EN_R = R.RESTRICTED_SOURCE_EN || RESTRICTED_SOURCE_EN;
   if (_isEN(clause)) {
     const low = clause.toLowerCase();
-    for (const r of RESTRICT_EN) {
+    for (const r of RESTRICT_EN_R) {
       const idx = low.indexOf(r);
       if (idx < 0) continue;
       const win = low.slice(idx, idx + r.length + 90);
-      for (const v of SAMPLING_VERBS_EN) {
+      for (const v of SAMPLING_VERBS_EN_R) {
         if (win.includes(v)) return { type: 'EN_RESTRICT', word: r + '+' + v, idx };
       }
     }
@@ -154,34 +159,42 @@ function _findRestriction(clause) {
     for (const n of ['sample', 'data', 'participants', 'respondents', 'responses', 'feedback', 'survey', 'study', 'poll',
       // [r267] 注册/渠道名词（sign-ups from our own launch page）
       'sign-ups', 'signups']) {
-      const re = new RegExp('\\b' + n + '\\b[^.;]{0,40}?\\b(' + SOURCE_FROM_EN.join('|') + ')\\b', 'i');
+      if (!SOURCE_FROM_EN_R.length) break;
+      const re = new RegExp('\\b' + n + '\\b[^.;]{0,40}?\\b(' + SOURCE_FROM_EN_R.join('|') + ')\\b', 'i');
       const mt = clause.match(re);
-      if (mt && RESTRICTED_SOURCE_EN.some(rs => low.includes(rs))) return { type: 'EN_SOURCE', word: mt[0].slice(0, 40), idx: mt.index };
+      if (mt && RESTRICTED_SOURCE_EN_R.some(rs => low.includes(rs))) return { type: 'EN_SOURCE', word: mt[0].slice(0, 40), idx: mt.index };
     }
     // [r267] 动词前置限定路由（mined only from / scraped solely from）：
     // 网络取证动词出现在限定标记之前，原「标记在前」路由覆盖不到该语序
-    const revRe = new RegExp('\\b(' + SAMPLING_VERBS_EN.join('|') + ')\\s+(?:only|solely|exclusively|just)\\b', 'i');
-    const rmt = clause.match(revRe);
-    if (rmt) return { type: 'EN_RESTRICT', word: rmt[0].slice(0, 40), idx: rmt.index };
+    if (SAMPLING_VERBS_EN_R.length) {
+      const revRe = new RegExp('\\b(' + SAMPLING_VERBS_EN_R.join('|') + ')\\s+(?:only|solely|exclusively|just)\\b', 'i');
+      const rmt = clause.match(revRe);
+      if (rmt) return { type: 'EN_RESTRICT', word: rmt[0].slice(0, 40), idx: rmt.index };
+    }
     return null;
   }
   // 路由 a：限定标记 × 取样动词（标记在前 12 字内——「问卷只发给了」「只统计了」）
-  for (const m of RESTRICT_ZH) {
+  const RESTRICT_ZH_R = R.RESTRICT_ZH || RESTRICT_ZH;
+  const SAMPLING_VERBS_ZH_R = R.SAMPLING_VERBS_ZH || SAMPLING_VERBS_ZH;
+  const SOURCE_NOUN_ZH_R = R.SOURCE_NOUN_ZH || SOURCE_NOUN_ZH;
+  const SOURCE_FROM_ZH_R = R.SOURCE_FROM_ZH || SOURCE_FROM_ZH;
+  const RESTRICTED_SOURCE_ZH_R = R.RESTRICTED_SOURCE_ZH || RESTRICTED_SOURCE_ZH;
+  for (const m of RESTRICT_ZH_R) {
     let from = 0, idx;
     while ((idx = clause.indexOf(m, from)) >= 0) {
       const win = clause.slice(idx, idx + m.length + 12);
-      for (const v of SAMPLING_VERBS_ZH) {
+      for (const v of SAMPLING_VERBS_ZH_R) {
         if (win.includes(v)) return { type: 'RESTRICT', word: m + '+' + v, idx };
       }
       from = idx + 1;
     }
   }
   // 路由 b：来源名词 + 来自类 + 受限来源词（裸名词形态，无「只」也收）
-  for (const n of SOURCE_NOUN_ZH) {
+  for (const n of SOURCE_NOUN_ZH_R) {
     const ni = clause.indexOf(n);
     if (ni < 0) continue;
     const win = clause.slice(ni, ni + 18);
-    if (SOURCE_FROM_ZH.some(f => win.includes(f)) && RESTRICTED_SOURCE_ZH.some(rs => clause.includes(rs))) {
+    if (SOURCE_FROM_ZH_R.some(f => win.includes(f)) && RESTRICTED_SOURCE_ZH_R.some(rs => clause.includes(rs))) {
       return { type: 'SOURCE', word: n, idx: ni };
     }
   }
@@ -200,14 +213,19 @@ function _scopeRefersSample(clause, scopeIdx, scopeWord) {
   return /^(?:样本|问卷|数据|意见|反馈|回答|投诉|案例|答卷|评论)/.test(after);
 }
 
-function _hasGeneralization(clause) {
+function _hasGeneralization(clause, R) {
+  R = R || {};
+  const GEN_VERB_ZH_R = R.GEN_VERB_ZH || GEN_VERB_ZH;
+  const GEN_SCOPE_ZH_R = R.GEN_SCOPE_ZH || GEN_SCOPE_ZH;
+  const GEN_VERB_EN_R = R.GEN_VERB_EN || GEN_VERB_EN;
+  const GEN_SCOPE_EN_R = R.GEN_SCOPE_EN || GEN_SCOPE_EN;
   if (_isEN(clause)) {
     const low = clause.toLowerCase();
-    for (const v of GEN_VERB_EN) {
+    for (const v of GEN_VERB_EN_R) {
       const idx = low.indexOf(v);
       if (idx < 0) continue;
       const win = low.slice(idx + v.length, idx + v.length + 45);
-      if (GEN_SCOPE_EN.some(s => new RegExp('\\b' + s.replace(/\s+/g, '\\s+') + '\\b').test(win))) return 'EN_A';
+      if (GEN_SCOPE_EN_R.some(s => new RegExp('\\b' + s.replace(/\s+/g, '\\s+') + '\\b').test(win))) return 'EN_A';
     }
     for (const inf of ['shows', 'proves', 'means', 'suggests', 'indicates', 'demonstrates', 'so', 'therefore', 'thus', 'consequently']) {
       const idx = low.indexOf(inf);
@@ -222,11 +240,11 @@ function _hasGeneralization(clause) {
     return null;
   }
   // 路由 a：推广动词 + 近距离总体范围词
-  for (const v of GEN_VERB_ZH) {
+  for (const v of GEN_VERB_ZH_R) {
     let from = 0, idx;
     while ((idx = clause.indexOf(v, from)) >= 0) {
       const win = clause.slice(idx + v.length, idx + v.length + 14);
-      for (const s of GEN_SCOPE_ZH) {
+      for (const s of GEN_SCOPE_ZH_R) {
         const si = win.indexOf(s);
         if (si >= 0 && !_scopeRefersSample(clause, idx + v.length + si, s)) return 'ZH_A';
       }
@@ -234,7 +252,7 @@ function _hasGeneralization(clause) {
     }
   }
   // 路由 c：总体范围词 + 「都」形全称判断
-  for (const s of GEN_SCOPE_ZH) {
+  for (const s of GEN_SCOPE_ZH_R) {
     const si = clause.indexOf(s);
     if (si < 0) continue;
     if (_scopeRefersSample(clause, si, s)) continue;
@@ -277,7 +295,8 @@ function _pass() {
   return { score: 0, verdict: 'pass', exempt: false, exempt_reason: null, count: 0, detail: '', hits: [], strength: 'none' };
 }
 
-function checkSelectionBias(text) {
+function checkSelectionBias(text, inject) {
+  const R = inject || {};
   const t = typeof text === 'string' ? text : '';
   if (!t.trim()) return _pass();
 
@@ -296,7 +315,7 @@ function checkSelectionBias(text) {
 
   for (let i = 0; i < clauses.length; i++) {
     const clause = clauses[i];
-    const restr = _findRestriction(clause);
+    const restr = _findRestriction(clause, R);
     if (!restr) continue;
 
     // 结论候选：同逗号段推断词后 / 后续逗号段（≤2）/ 前提标记（毕竟/因为）路由的倒装前段
@@ -331,7 +350,7 @@ function checkSelectionBias(text) {
       let body = cand.text;
       const cinf = _findInfer(body);
       // 推断词本身是推广动词（足以说明/说明/证明/可见…）时不断句——动词+范围词同在被判段
-      if (cinf && !GEN_VERB_ZH.includes(cinf.word) && !GEN_VERB_EN.includes(cinf.word)) {
+      if (cinf && !(R.GEN_VERB_ZH || GEN_VERB_ZH).includes(cinf.word) && !(R.GEN_VERB_EN || GEN_VERB_EN).includes(cinf.word)) {
         body = body.slice(cinf.idx + cinf.word.length);
       } else if (cand.mode === 'back' && !cinf) continue;
       const pmBody = _findPremiseMarker(body);
@@ -345,7 +364,7 @@ function checkSelectionBias(text) {
       if (ACK_CLAUSE_EN.some(a => low.includes(a))) continue;
       if (HEDGE_ZH.some(h => body.includes(h))) continue;
       if (HEDGE_EN.some(h => new RegExp('\\b' + h + '\\b').test(low))) continue;
-      const route = _hasGeneralization(body);
+      const route = _hasGeneralization(body, R);
       if (!route) continue;
       hits.push({ sample: clause.trim(), conclusion: body, type: restr.type, route });
       break;
