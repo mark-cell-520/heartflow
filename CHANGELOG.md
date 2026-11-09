@@ -1,4 +1,22 @@
-# 6.8.156 变更日志条目
+# 6.8.158 变更日志条目
+
+## [6.8.158] - 2026-11-10
+
+### 新增
+- **第 233–237 维度行为经济学偏误接线闭环**（omission_bias / money_illusion / planning_fallacy / loss_aversion / fundamental_attribution_error）：5 个 provisional 模块此前 gate 层 5/5 穿透未接线（r267 实证 18 个 provisional 模块 gate 层 18/18 穿透、think 层 0 可达），本轮按「九处一次接齐」模式接 require + 计算点 + allDims/dimMap + dimensions + DIM_GUIDANCE + VERIFY_DIMS + summary + module.exports；维度数 232→237，VERIFY 189→199。探针实证 gate 层 5/5 可达、良性 4/4 零误伤。
+- **第 238 维度 `count_rate_conflation`（计数-比率混淆）**（`src/count-rate-conflation.js`，r253 起草 r269 接线）：拿未归一化的原始计数量级直接排名实体属性，缺人口/暴露量分母。攻击 6/7 命中、良性 0/4 误伤。
+- **第 239 维度 `law_of_small_numbers`（小数定律）**（`src/law-of-small-numbers.js`，r262 起草 r269 接线）：拿极小样本的偶然波动给全体下结论，或显式为小样本不足辩护。攻击 7/7 命中、良性 0/4 误伤。
+- **第 240 维度 `immortal_time_bias`（永生时间偏误 / immortal time bias）**（`src/immortal-time-bias.js`，386 行，r270）：判「两组生存时间的计算起点或起点定义不一致，使其中一组统计上必然活过一段不可能死亡的时间窗口，却把这段结构性时差当成干预有效的证据」。三腿共现（起点时点锚 × 起点错位[显式差异/两组对置/存活门槛] × 疗效结论），三组豁免（方法学纠正在场 / 统一起点明示 / 严谨设计）。缺口实证：`scripts/round-270/r270-direction-probe.js` 中本族 4/5 穿引擎，`survivor_time_bias`(226) 对本族四类措辞全部失效。维度数 237→240，VERIFY 199→206。单测 64/64 全绿。
+
+### 修复
+- **r270 收尾修复两条 ITB 单测漏判**：腿③ EFFICACY_ZH 补「疗效结论需要重新核对」类纠正性引用、腿① START_ANCHOR_EN 补裸起点名词——实证 gap_zh/gap_en 从 hit=false 转绿。
+
+### 文档
+- README/SKILL/AGENTS 维度 237→240、verify 199→206、Verify-level 列举追加 3 维度；SKILL.md frontmatter 版本戳同步。
+
+### 验证
+- 五门禁：verify 16/0、guard-abilities 20/20（维度登记 240 键）、doc-numbers 24/24、bidirectional 召回 52/52 + 误拦 302/326
+- ITB 单测 64/64；gate 端到端探针：4 条攻击样本全部命中、2 条良性（含「战争是多因共同造成的」边缘良性）全部 pass
 
 ## [6.8.156] - 2026-11-09
 

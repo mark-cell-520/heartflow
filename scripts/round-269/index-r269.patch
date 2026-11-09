@@ -1,0 +1,107 @@
+915a916,927
+> // [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆：拿
+> // 未归一化的原始计数量级直接排名实体属性，缺人口/暴露量分母）。模块
+> // src/count-rate-conflation.js 为 r253 起草（provisional，探针实测攻击
+> // 6/7 命中、良性 0/4 误伤、gate 层 7/7 穿透未接线）。crc——count rate
+> // conflation 缩写，grep 0 命中无冲突。
+> const { detectCountRateConflation } = require('./count-rate-conflation.js');
+> // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律：拿极小
+> // 样本的偶然波动给全体下结论，或显式为小样本不足辩护）。模块
+> // src/law-of-small-numbers.js 为 r262 起草（provisional，探针实测
+> // 攻击 7/7 命中、良性 0/4 误伤、gate 层 7/7 穿透未接线）。
+> // lsn——law of small numbers 缩写，grep 0 命中无冲突。
+> const { detectLawOfSmallNumbers } = require('./law-of-small-numbers.js');
+2336c2348
+<   // [r268 接线] 第 237 维度 fundamental_attribution_error（基本归因错误）计算点。
+---
+>   // [r268 接线] 第 237 维度 fundamental_attribution_error 计算点。
+2337a2350,2353
+>   // [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆）计算点。
+>   const crc = _applyPedagogyRelaxation(detectCountRateConflation(_normText), "count_rate_conflation", pedagogyRelaxation);
+>   // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律）计算点。
+>   const lsn = _applyPedagogyRelaxation(detectLawOfSmallNumbers(_normText), "law_of_small_numbers", pedagogyRelaxation);
+2991a3008,3012
+>     // [r269 接线] 第 238 维度 count_rate_conflation 参与判定（计数-比率混淆）。
+>     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+>     {score: crc.score, name:'count_rate_conflation'},
+>     // [r269 接线] 第 239 维度 law_of_small_numbers 参与判定（小数定律）。
+>     {score: lsn.score, name:'law_of_small_numbers'},
+3564a3586,3593
+>     // [r269 接线] 第 238 维度 count_rate_conflation 补登记（计数-比率
+>     // 混淆：拿未归一化的原始计数量级直接排名实体属性，缺分母）。
+>     // crc——count rate conflation 缩写。
+>     count_rate_conflation: crc,
+>     // [r269 接线] 第 239 维度 law_of_small_numbers 补登记（小数定律：
+>     // 拿极小样本的偶然波动给全体下结论）。lsn——law of small
+>     // numbers 缩写。
+>     law_of_small_numbers: lsn,
+5207a5237,5242
+>     // [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆）。
+>     // 同上只登记 VERIFY。
+>     'count_rate_conflation',
+>     // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律）。
+>     // 同上只登记 VERIFY。
+>     'law_of_small_numbers',
+5243,5244c5278,5279
+<     // 同口径只登记 VERIFY。与 stereotype/genetic_fallacy 的射程边界
+<     // 见 src/fundamental-attribution-error.js 头注释。
+---
+>     // 与 stereotype/genetic_fallacy 的射程边界见
+>     // src/fundamental-attribution-error.js 头注释。
+5245a5281,5298
+>     // [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆：拿
+>     // 未归一化的原始计数量级直接排名实体属性——「我们市癌症病例全国
+>     // 第一，所以这里最不安全」「邻省传染病病例是我们的三倍，他们防疫
+>     // 做得更差」「这家店外卖单量是街角那家的五倍，味道肯定更好」）
+>     // 登记。verify 级——同族单句可能是正当的计数转述、分子分母教学、
+>     // 或明确指出总数不可比。与 r206-r232 同口径只登记 VERIFY。与
+>     // statistical_misleading/base_rate_neglect/ecological_fallacy 的
+>     // 射程边界见 src/count-rate-conflation.js 头注释。
+>     'count_rate_conflation',
+>     // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律：拿极小
+>     // 样本的偶然波动给全体下结论——「抛了三次硬币都是正面，这枚硬币
+>     // 明显是偏的」「这个村出了三个百岁老人，这里的水土就是养人」
+>     // 「我问了五个人，四个说支持，民意已经很清楚了」「样本小才真实，
+>     // 大样本都是注水注出来的」）登记。verify 级——单句可能是正当的
+>     // 样本量声明、待验证假设标注、或明确指出这是小数定律。同口径只
+>     // 登记 VERIFY。与 hasty_generalization/anecdotal/base_rate_neglect
+>     // 的射程边界见 src/law-of-small-numbers.js 头注释。
+>     'law_of_small_numbers',
+5344a5398,5409
+>     // [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆：拿
+>     // 未归一化的原始计数量级直接排名实体属性，缺人口/暴露量分母）。
+>     // verify 级——同族单句可能是正当的计数转述、分子分母教学、或明确
+>     // 指出总数不可比。与 statistical_misleading/base_rate_neglect/
+>     // ecological_fallacy 的射程边界见 src/count-rate-conflation.js 头注释。
+>     'count_rate_conflation',
+>     // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律：拿极小
+>     // 样本的偶然波动给全体下结论，或显式为小样本不足辩护）。verify 级——
+>     // 单句可能是正当的样本量声明、待验证假设标注、或明确指出这是小数
+>     // 定律。与 hasty_generalization/anecdotal/base_rate_neglect 的射程
+>     // 边界见 src/law-of-small-numbers.js 头注释。
+>     'law_of_small_numbers',
+5888a5954,5961
+>       // [r269 接线] 第 238 维度 count_rate_conflation 补登记（计数-比率混淆：
+>       // 拿未归一化的原始计数量级直接排名实体属性）。crc——count rate
+>       // conflation 缩写。同上：九处一次接齐。
+>       count_rate_conflation: crc,
+>       // [r269 接线] 第 239 维度 law_of_small_numbers 补登记（小数定律：
+>       // 拿极小样本的偶然波动给全体下结论）。lsn——law of small numbers
+>       // 缩写。同上：九处一次接齐。
+>       law_of_small_numbers: lsn,
+7026c7099,7104
+<     [/after[^.]*?[, ]+[^.]*?(so|therefore|because of)/i, 'false_cause'],
+---
+>     // [r267 修复] so/therefore/because of 加词边界：旧式 `(so|therefore|because of)`
+>     // 无 \b，把 "and supply" 的 "so"（supply 前缀）吃掉 → 中性防疫叙述
+>     // "Residents stocked up on masks after the advisory, and supply remained steady."
+>     // 被误判 false_cause。存量 4 条 false_cause 攻击全命中不受影响（\b 前后
+>     // 均为词内/独立词场景，probe-r267-so/so2 全量扫描实证）。
+>     [/\bafter\b[^.]*?[, ]+[^.]*?\b(so|therefore|because of)\b/i, 'false_cause'],
+16806a16885,16890
+>   // [r269] 第 238 维度 count_rate_conflation 导出（同先例，
+>   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+>   detectCountRateConflation,
+>   // [r269] 第 239 维度 law_of_small_numbers 导出（同先例，
+>   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+>   detectLawOfSmallNumbers,

@@ -1,3 +1,36 @@
+## r270 — 第 240 维度 immortal_time_bias（永生时间偏误）上线 + r269 两维度接线闭环收尾
+
+**日期** 2026-11-10  **操作方** cron（接手 r269/r270 未提交遗产，补齐收尾并固化）  **VERSION** 6.8.158（r269/r270 共用，版本号未再递增）
+
+### 接手背景（r271 接手审计）
+- 开工基线 scan 发现工作区存在 r269/r270 的**完整但未提交**工作：`src/index.js` 九处接线、`src/count-rate-conflation.js` / `src/law-of-small-numbers.js` / `src/immortal-time-bias.js` 三模块、3 个单测、README/AGENTS/SKILL 三份文档维度数 237→240 同步、`coordination/claims.jsonl` dead-claim sweep——全部落盘但零 commit，UPGRADE_LOG 停在 r268。
+- 按 r227/r228 接手纪律：**先验证遗产质量，不另起新方向**。实测确认遗产功能完整、五门禁全绿 → 本轮工作 = 补齐收尾（UPGRADE_LOG / CHANGELOG / claims）+ 提交固化，而非重复实现。
+
+### 方向与来源
+- **方向** 新判别维度（真升级①）：第 240 维度 `immortal_time_bias`（永生时间偏误 / immortal time bias / 保证生存期偏倚）
+- **来源** 内部路径（`scripts/round-270/r270-direction-probe.js` 多候选族零命中探针）：本族 5 条攻击句 **4 条完全穿引擎**（gate.action === 'pass'、findings 无本族归因）；已接线邻居 `survivor_time_bias`(226) 只命中「确诊第一天就开始服药」型（病程起点一致），对本族四类措辞全部失效。decision 本体裁决 accelerate（confidence 0.7 / priority 40）。
+
+### 实现内容
+- **`src/immortal-time-bias.js`**（386 行，新增）：判「两组生存时间的**计算起点或起点定义不一致**，使其中一组统计上必然活过一段不可能死亡的时间窗口（immortal time），却把这段结构性时差当成干预有效的证据」。
+- 三腿共现（缺一不判）：腿①起点时点锚（START_ANCHOR_ZH/EN，含裸名词 `starting points`/`baseline`/`entry point`）× 腿②起点错位（显式差异 / 两组对置 / 存活门槛三条等价路径）× 腿③疗效结论（EFFICACY_ZH/EN，含「疗效结论需要重新核对」类纠正性引用）。
+- 三组豁免：方法学纠正在场 / 统一起点明示 / 严谨设计（RCT 等）。
+- 与 `survivor_time_bias`(226) 射程区分：后者判「两组病程长度结构不同 → 生存期长短不可比」（起点一致、长度不同）；本维度判「起点或起点定义不一致 → 结构性活过不可能死亡窗口」（长度可同、起点不同）。
+- **r270 收尾修复两条单测漏判**：腿③ EFFICACY_ZH 补「疗效结论需要重新核对」类纠正性引用、腿① START_ANCHOR_EN 补裸起点名词——实证 gap_zh/gap_en 从 hit=false 转绿。
+- **`test/immortal-time-bias.test.js`**（175 行，新增）：攻击命中（中英双语、裸名词/带修饰/倒装/长句）、良性零误伤（含边缘良性：方法学纠正在场、统一起点明示、随机对照设计在场）、负例注入（逐常量替换为空数组后腿失效 + 豁免常量承重）、边界（短文本/空输入/只有锚无疗效结论）、gate 端到端。
+
+### 同轮固化的 r269 遗产（已在上一轮完成实现与测试）
+- `src/count-rate-conflation.js` 第 238 维度（计数-比率混淆）+ `src/law-of-small-numbers.js` 第 239 维度（小数定律），`src/index.js` 九处接线均已就位。
+
+### 验证数据（本轮接手后全部复跑实测）
+- 五门禁：verify **16/0**、guard-abilities **20/20**（维度登记 **240** 键）、doc-numbers **24/24**、bidirectional **召回 52/52 + 误拦 302/326**
+- ITB 单测：**64 passed / 0 failed**
+- gate 端到端探针（`scripts/round-270/r270-gate-diag2.js`）：std_zh/std_en/gap_zh/gap_en 全部 `immortal_time_bias` 命中（action 非 pass），benign_zh（「战争是多因共同造成的」）/ benign_med（统一起点 + RCT）全部 `pass` 零误伤
+- 文档：README badge/横幅/规格表维度数 239→240、verify 199→206、Verify 列举追加 3 维度；AGENTS.md 维度数 237→240；SKILL.md frontmatter 与规格表同步
+
+### 已知边界
+- 本维度只收正向单句（起点错位 × 疗效结论），跨段形与「起点错位在前段、疗效结论在隔段」本轮保守不收。
+- r269/r270 共用一个版本号 6.8.158（r269 的 commit 17c71a46 已消耗该版本号），本轮不重复 bump，仅在 UPGRADE_LOG/CHANGELOG 补记。
+
 ## r268 — 5 个行为经济学偏误维度接线闭环（omission_bias / money_illusion / planning_fallacy / loss_aversion / fundamental_attribution_error）
 
 **日期** 2026-11-09  **操作方** cron（agent-4）  **VERSION** 6.8.157 → 6.8.158

@@ -913,6 +913,29 @@ const { checkMotivatedReasoning } = require('./motivated-reasoning.js');
 // r260-dimension-agent4.md §五「九处一次接齐」。obi——omission bias
 // 缩写，grep 0 命中无冲突。
 const { detectOmissionBias } = require('./omission-bias.js');
+// [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆：拿
+// 未归一化的原始计数量级直接排名实体属性，缺人口/暴露量分母）。模块
+// src/count-rate-conflation.js 为 r253 起草（provisional，探针实测攻击
+// 6/7 命中、良性 0/4 误伤、gate 层 7/7 穿透未接线）。crc——count rate
+// conflation 缩写，grep 0 命中无冲突。
+const { detectCountRateConflation } = require('./count-rate-conflation.js');
+// [r269 接线] 第 239 维度 law_of_small_numbers（小数定律：拿极小
+// 样本的偶然波动给全体下结论，或显式为小样本不足辩护）。模块
+// src/law-of-small-numbers.js 为 r262 起草（provisional，探针实测
+// 攻击 7/7 命中、良性 0/4 误伤、gate 层 7/7 穿透未接线）。
+// lsn——law of small numbers 缩写，grep 0 命中无冲突。
+const { detectLawOfSmallNumbers } = require('./law-of-small-numbers.js');
+// [r270] 第 240 维度 immortal_time_bias（永生时间偏误 / immortal time
+// bias / 保证生存期偏倚：比较两组生存时间时两组计算起点或起点定义不一致，
+// 使其中一组必然「活过」一段不可能死亡的时间窗口，却把这段结构性时差
+// 当成干预有效的证据）。缺口实证：scripts/round-270/r270-direction-probe.js
+// 多候选族零命中探针中本族 4/5 穿引擎，survivor_time_bias(226) 只命中
+// 病程起点一致型，对本族四类措辞全部失效；decision 本体裁决 accelerate
+// （confidence 0.7 / priority 40）。三腿共现（起点时点锚×起点错位×疗效
+// 结论），起点错位取显式差异/两组对置/存活门槛三条等价路径；方法学纠正、
+// 统一起点明示、严谨设计三类豁免。itb 缩写 grep 0 命中无冲突。
+// 细节见 src/immortal-time-bias.js。
+const { checkImmortalTimeBias } = require('./immortal-time-bias.js');
 // [r268 接线] 第 234 维度 money_illusion（货币幻觉：把名义金额变动
 // 当成实际购买力变动）。模块 src/money-illusion.js 为 r251 起草
 // （19/19 测试全绿、良性 272 条零误伤）。mi——money illusion 缩写。
@@ -2333,8 +2356,15 @@ function discriminate(text, evidence = [], contentMode) {
   const pf = _applyPedagogyRelaxation(detectPlanningFallacy(_normText), "planning_fallacy", pedagogyRelaxation);
   // [r268 接线] 第 236 维度 loss_aversion（损失厌恶）计算点。
   const lav = _applyPedagogyRelaxation(detectLossAversion(_normText), "loss_aversion", pedagogyRelaxation);
-  // [r268 接线] 第 237 维度 fundamental_attribution_error（基本归因错误）计算点。
+  // [r268 接线] 第 237 维度 fundamental_attribution_error 计算点。
   const fae = _applyPedagogyRelaxation(detectFundamentalAttributionError(_normText), "fundamental_attribution_error", pedagogyRelaxation);
+  // [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆）计算点。
+  const crc = _applyPedagogyRelaxation(detectCountRateConflation(_normText), "count_rate_conflation", pedagogyRelaxation);
+  // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律）计算点。
+  const lsn = _applyPedagogyRelaxation(detectLawOfSmallNumbers(_normText), "law_of_small_numbers", pedagogyRelaxation);
+  // [r270] 第 240 维度 immortal_time_bias（永生时间偏误）计算点。
+  // itb——immortal time bias 缩写，grep 0 命中无冲突。
+  const itb = _applyPedagogyRelaxation(checkImmortalTimeBias(_normText), "immortal_time_bias", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -2989,6 +3019,14 @@ function discriminate(text, evidence = [], contentMode) {
     {score: lav.score, name:'loss_aversion'},
     // [r268 接线] 第 237 维度 fundamental_attribution_error 参与判定。
     {score: fae.score, name:'fundamental_attribution_error'},
+    // [r269 接线] 第 238 维度 count_rate_conflation 参与判定（计数-比率混淆）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: crc.score, name:'count_rate_conflation'},
+    // [r269 接线] 第 239 维度 law_of_small_numbers 参与判定（小数定律）。
+    {score: lsn.score, name:'law_of_small_numbers'},
+    // [r270] 第 240 维度 immortal_time_bias 参与判定（永生时间偏误）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: itb.score, name:'immortal_time_bias'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3562,6 +3600,18 @@ function discriminate(text, evidence = [], contentMode) {
     // （基本归因错误：把情境造成的结果归因于对象内在秉性）。
     // fae——fundamental attribution error 缩写。
     fundamental_attribution_error: fae,
+    // [r269 接线] 第 238 维度 count_rate_conflation 补登记（计数-比率
+    // 混淆：拿未归一化的原始计数量级直接排名实体属性，缺分母）。
+    // crc——count rate conflation 缩写。
+    count_rate_conflation: crc,
+    // [r269 接线] 第 239 维度 law_of_small_numbers 补登记（小数定律：
+    // 拿极小样本的偶然波动给全体下结论）。lsn——law of small
+    // numbers 缩写。
+    law_of_small_numbers: lsn,
+    // [r270] 第 240 维度 immortal_time_bias 补登记（永生时间偏误：
+    // 两组生存时间计算起点不一致，却把结构性时差当成干预有效证据）。
+    // itb——immortal time bias 缩写。
+    immortal_time_bias: itb,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -4215,6 +4265,8 @@ function discriminate(text, evidence = [], contentMode) {
     pseudo_profundity: '去掉空泛宏大表述，说具体的话',
     perfect_error: '补充可验证的来源和数据，对无法验证的断言降低确定性，避免精确数字和绝对断言伪装真实',
     premature_termination: '输出疑似过早终止——只有状态陈述/承诺/空完成而无具体结果。需继续执行到产出可验证的结果或明确的完成描述',
+    // [r270] 第 240 维度 immortal_time_bias（永生时间偏误）。
+    immortal_time_bias: '两组生存时间的计算起点或起点定义不一致——先核对是否从同一时点（确诊/入组/首次用药）起算；存在起点错位时改用时依协变量分析、兰德分析或边际结构模型，把起点对齐后再比较，否则不得据此断言干预有效',
   };
   // 给每个 finding 附上修改指引
   for (const f of findings) {
@@ -5205,6 +5257,12 @@ function discriminate(text, evidence = [], contentMode) {
     // [r268 接线] 第 237 维度 fundamental_attribution_error（基本归因
     // 错误：把情境造成的结果归因于对象内在秉性）。同上只登记 VERIFY。
     'fundamental_attribution_error',
+    // [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆）。
+    // 同上只登记 VERIFY。
+    'count_rate_conflation',
+    // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律）。
+    // 同上只登记 VERIFY。
+    'law_of_small_numbers',
     // [r268 接线] 第 233 维度 omission_bias（不作为偏误 / act-omission
     // asymmetry：同等后果下把「不作为」系统性轻判于「作为」——「他
     // 什么都没做怎么能怪他」「见危不救总比亲手伤人轻」）登记。verify
@@ -5240,9 +5298,37 @@ function discriminate(text, evidence = [], contentMode) {
     // 错误：把情境造成的结果归因于对象内在秉性——「他迟到就是因为
     // 不负责任」而不看交通/临时状况）登记。verify 级——单句可能是
     // 正当的绩效记录、归因理论教学、或明确指出这是基本归因错误。
-    // 同口径只登记 VERIFY。与 stereotype/genetic_fallacy 的射程边界
-    // 见 src/fundamental-attribution-error.js 头注释。
+    // 与 stereotype/genetic_fallacy 的射程边界见
+    // src/fundamental-attribution-error.js 头注释。
     'fundamental_attribution_error',
+    // [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆：拿
+    // 未归一化的原始计数量级直接排名实体属性——「我们市癌症病例全国
+    // 第一，所以这里最不安全」「邻省传染病病例是我们的三倍，他们防疫
+    // 做得更差」「这家店外卖单量是街角那家的五倍，味道肯定更好」）
+    // 登记。verify 级——同族单句可能是正当的计数转述、分子分母教学、
+    // 或明确指出总数不可比。与 r206-r232 同口径只登记 VERIFY。与
+    // statistical_misleading/base_rate_neglect/ecological_fallacy 的
+    // 射程边界见 src/count-rate-conflation.js 头注释。
+    'count_rate_conflation',
+    // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律：拿极小
+    // 样本的偶然波动给全体下结论——「抛了三次硬币都是正面，这枚硬币
+    // 明显是偏的」「这个村出了三个百岁老人，这里的水土就是养人」
+    // 「我问了五个人，四个说支持，民意已经很清楚了」「样本小才真实，
+    // 大样本都是注水注出来的」）登记。verify 级——单句可能是正当的
+    // 样本量声明、待验证假设标注、或明确指出这是小数定律。同口径只
+    // 登记 VERIFY。与 hasty_generalization/anecdotal/base_rate_neglect
+    // 的射程边界见 src/law-of-small-numbers.js 头注释。
+    'law_of_small_numbers',
+    // [r270] 第 240 维度 immortal_time_bias（永生时间偏误 / immortal time
+    // bias / 保证生存期偏倚：比较两组生存时间时两组计算起点或起点定义不
+    // 一致，使其中一组必然「活过」一段不可能死亡的时间窗口，却把这段
+    // 结构性时差当成干预有效证据）登记。verify 级——单句可能是医学统计
+    // 教学反例（「这两组生存时间起点不一致，要先做时依协变量分析」正是
+    // 本族要教的判别动作）、流行病学课堂案例、对他人错误论证的转述引用、
+    // 方法学批评。与 r206-r239 同口径只登记 VERIFY。与
+    // survivor_time_bias(226)/survivorship_bias(132)/selection_bias(168)/
+    // denominator_swap(224) 的射程边界见 src/immortal-time-bias.js 头注释。
+    'immortal_time_bias',
     // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
     // confusion of the inverse：P(E|I) 的数值在方向翻转后原样沿用为
     // P(I|E)——「这种病检测阳性的概率是 95%，所以得了这种病检测阳性的
@@ -5342,6 +5428,18 @@ function discriminate(text, evidence = [], contentMode) {
     // 长期规划建议的转述、他人经历的复盘，rewrite/block 会误伤。与
     // r530/r534/r545/r547/r574/r582/r585 同口径只登记 VERIFY。
     'affective_forecast',
+    // [r269 接线] 第 238 维度 count_rate_conflation（计数-比率混淆：拿
+    // 未归一化的原始计数量级直接排名实体属性，缺人口/暴露量分母）。
+    // verify 级——同族单句可能是正当的计数转述、分子分母教学、或明确
+    // 指出总数不可比。与 statistical_misleading/base_rate_neglect/
+    // ecological_fallacy 的射程边界见 src/count-rate-conflation.js 头注释。
+    'count_rate_conflation',
+    // [r269 接线] 第 239 维度 law_of_small_numbers（小数定律：拿极小
+    // 样本的偶然波动给全体下结论，或显式为小样本不足辩护）。verify 级——
+    // 单句可能是正当的样本量声明、待验证假设标注、或明确指出这是小数
+    // 定律。与 hasty_generalization/anecdotal/base_rate_neglect 的射程
+    // 边界见 src/law-of-small-numbers.js 头注释。
+    'law_of_small_numbers',
   ]);
   // pass：无问题通过
 
@@ -5886,6 +5984,17 @@ function discriminate(text, evidence = [], contentMode) {
       loss_aversion: lav,
       // [r268 接线] 第 237 维度 fundamental_attribution_error 补登记。
       fundamental_attribution_error: fae,
+      // [r269 接线] 第 238 维度 count_rate_conflation 补登记（计数-比率混淆：
+      // 拿未归一化的原始计数量级直接排名实体属性）。crc——count rate
+      // conflation 缩写。同上：九处一次接齐。
+      count_rate_conflation: crc,
+      // [r269 接线] 第 239 维度 law_of_small_numbers 补登记（小数定律：
+      // 拿极小样本的偶然波动给全体下结论）。lsn——law of small numbers
+      // 缩写。同上：九处一次接齐。
+      law_of_small_numbers: lsn,
+      // [r270] 第 240 维度 immortal_time_bias 补登记（永生时间偏误）。
+      // itb——immortal time bias 缩写。同上：九处一次接齐。
+      immortal_time_bias: itb,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,
@@ -7023,7 +7132,12 @@ const FALLACY_PATTERNS = {
     [/\b(chemical|synthetic|artificial)\b[^.]*?\bbad\b/i, 'appeal_to_nature'],
     [/it['a]?s natural[^.]*?so it['a]?s (good|right|better)/i, 'appeal_to_nature'],
     // 虚假因果 / 事后谬误 — after this therefore because of this
-    [/after[^.]*?[, ]+[^.]*?(so|therefore|because of)/i, 'false_cause'],
+    // [r267 修复] so/therefore/because of 加词边界：旧式 `(so|therefore|because of)`
+    // 无 \b，把 "and supply" 的 "so"（supply 前缀）吃掉 → 中性防疫叙述
+    // "Residents stocked up on masks after the advisory, and supply remained steady."
+    // 被误判 false_cause。存量 4 条 false_cause 攻击全命中不受影响（\b 前后
+    // 均为词内/独立词场景，probe-r267-so/so2 全量扫描实证）。
+    [/\bafter\b[^.]*?[, ]+[^.]*?\b(so|therefore|because of)\b/i, 'false_cause'],
     [/since [^.]*?happened[^.]*?now[^.]*?(happened|occurred|resulted)/i, 'false_cause'],
     [/correlation (proves|means|implies) causation/i, 'false_cause'],
     [/occurred (after|following)[^.]*?(so|therefore|thus|hence)[^.]*?caused/i, 'false_cause'],
@@ -16804,6 +16918,12 @@ module.exports = {
   // [r171] 第 169 维度 base_rate_neglect 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkBaseRateNeglect,
+  // [r269] 第 238 维度 count_rate_conflation 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  detectCountRateConflation,
+  // [r269] 第 239 维度 law_of_small_numbers 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  detectLawOfSmallNumbers,
   // [r201] 第 198 维度 nirvana_fallacy 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkNirvanaFallacy,
@@ -16873,6 +16993,7 @@ module.exports = {
   // [r250] 第 226 维度 survivor_time_bias 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkSurvivorTimeBias,
+  checkImmortalTimeBias,
   // [r251] 第 227 维度 means_as_end 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkMeansAsEnd,
