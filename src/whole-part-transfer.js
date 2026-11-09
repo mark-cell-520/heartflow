@@ -90,6 +90,9 @@ const PART_QUANT_ZH = [
   /(?:每个|每一个|每一名|每一位|每名|各个|所有|全部|任何|凡是|但凡|个个|每位|各位)(?:的)?[^。，！？!?,;；\n]{0,2}(?:队员|成员|球员|选手|乐手|员工|学生|零件|部件|组件|模块|元件|个体|个人|工程师|科学家|官员|公民|士兵|党员|志愿者|客户|用户|演员|船员|乘员|乘务员|医生|护士|警察|创业者|职员|工人|农民|干部|将领|教练|明星|诗人|作家|画家|辩手|队友|同学|同事|室友|部门|小组|班级|支部|分队|机组|教研组|工作人员|受益人|当事人|幸存者|人)/,
   // [r266 新增族] 内容/产品/运载具的部分名词（菜/章节/车型/舱位…）
   /(?:每个|每一个|每一名|每道|每款|每集|每章|每节|每种|各个|所有|全部|任何|凡是|个个)(?:的)?[^。，！？!?,;；\n]{0,2}(?:菜品|菜肴|菜|章节|车型|车|分镜|单品|配色|户型|舱位|航段|课时|关卡|提案|条款|帖子|楼层|房间|镜头|桥段|插曲|曲目|文章|篇目)/,
+  // [r266 新增族] 融合量词形（「每章/每集/每道」——量词与名词合体，
+  // 后面直接跟质量词，无独立名词位；与上一条互补覆盖）
+  /每[章集节道款项篇期]/,
 ];
 
 // ─── 腿① PART_QUANT（英文）────────────────────────────────────────
@@ -114,8 +117,11 @@ const WHOLE_EN = [
   /\b(?:the|this|that|its|our|their)\s+(?:whole\s+|entire\s+)?(?:team|group|company|corporation|firm|country|nation|government|army|military|orchestra|band|ensemble|society|class|school|department|system|machine|engine|device|product|project|organization|institution|community|city|region|industry|platform|software|application|model|algorithm|family|squad|crew|collective|population|entity|league|empire)\b/i,
   /\b(?:team|group|company|country|nation|orchestra|society|system|product|project|organization|community|family|empire|league)\b/i,
   // [r266 新增族] 内容/产品整体名词（series/book/novel/menu…）
-  /\b(?:the|this|that|its|our|their)\s+(?:whole\s+|entire\s+)?(?:series|book|novel|film|movie|season|menu|lineup|roster|catalog|catalogue|fleet|store|restaurant|show|album|playlist|anthology|edition|release|franchise|package|bundle|suite|collection)\b/i,
-  /\b(?:series|book|novel|film|movie|season|menu|lineup|roster|catalog|catalogue|fleet|store|restaurant|show|album|playlist|anthology|edition|release|franchise|package|bundle|suite|collection)\b/i,
+  // 注：刻意不收 roster/catalogue-list 形——花名册/清单是「部分的总和」而非
+  // 涌现整体，且会在「Every player on the roster…」句中抢先于 the team 命中，
+  // 把存量分支的 whole 定位点抢走（r266 实测回归翻转，已移除）。
+  /\b(?:the|this|that|its|our|their)\s+(?:whole\s+|entire\s+)?(?:series|book|novel|film|movie|season|menu|lineup|catalog|catalogue|fleet|store|restaurant|show|album|playlist|anthology|edition|release|franchise|package|bundle|suite|collection)\b/i,
+  /\b(?:series|book|novel|film|movie|season|menu|lineup|catalog|catalogue|fleet|store|restaurant|show|album|playlist|anthology|edition|release|franchise|package|bundle|suite|collection)\b/i,
 ];
 
 // ─── 腿②/⑤ QUALITY 涌现性质量词（中文）────────────────────────────
@@ -152,7 +158,9 @@ const INFER_EN = [
 // 话下——结论标记是必然性情态「自然」）。缺结论标记不判（「这个项目，
 // 每个人都很优秀」只是并陈述）。
 const MODAL_ZH = [
-  /自然|必然|一定|肯定|势必|无疑|必定|定能|不难|可想而知|想必|注定|必将/,
+  /自然|必然|一定|肯定|势必|无疑|必定|定能|不难|可想而知/,
+  // [r266 新增族] 必然性情态（想必/注定/必将——独立元素供负例注入-删条定位）
+  /想必|注定|必将|势必/,
 ];
 const MODAL_EN = [
   /\b(?:must|certainly|guaranteed|bound\s+to|sure\s+to|inevitably|no\s+doubt|definitely)\b/i,

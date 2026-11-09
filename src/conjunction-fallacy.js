@@ -253,10 +253,12 @@ function cmpZh(text, R) {
 function cmpEn(text, R) {
   if (nearAny(R.CMP_OP_EN || CMP_OP_EN, R.CMP_BACK_EN || CMP_BACK_EN, text, 80, false)) return true;
   if (nearAny(R.PROB_EN || PROB_EN, R.CMP_OP_EN || CMP_OP_EN, text, 80, true)) {
-    // [r266] 同 cmpZh：跨全部 PROB_EN 正则累加计数
+    // [r266] 同 cmpZh：跨全部 PROB_EN 正则累加计数。注意 exec 循环正则
+    // 必须带 g——r266 首次实现按 flags 透传（原正则只有 i）导致 exec
+    // 永远返回同一匹配、死循环挂起（存量样本实测复现，已修）。
     let n = 0;
     for (const re of (R.PROB_EN || PROB_EN)) {
-      const g = new RegExp(re.source, re.flags.indexOf('i') >= 0 ? re.flags : re.flags + 'i');
+      const g = new RegExp(re.source, 'gi');
       let m;
       while ((m = g.exec(text)) !== null) { n++; if (m.index === g.lastIndex) g.lastIndex++; }
     }

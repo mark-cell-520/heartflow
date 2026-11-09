@@ -1,0 +1,25 @@
+{"hit":true,"score":0.58,"count":1,"detail":"整体-部分属性迁移×部分属性推整体属性(zh)"} | 每个队员个人能力都很强，所以这支球队一定很强。
+{"hit":false,"score":0,"detail":"","count":0} | Every player on the roster is el
+{"hit":true,"score":0.58,"count":1,"detail":"整体-部分属性迁移×部分属性推整体属性(zh)"} | 每个人都是精英，所以这个团队很强。
+{"hit":true,"score":0.58,"count":1,"detail":"整体-部分属性迁移×部分属性推整体属性(zh)"} | 所有零件都用的顶级材料，因此这台设备的性能一定极其出色。
+{"hit":true,"score":0.58,"count":1,"detail":"整体-部分属性迁移×整体属性推每个部分属性(zh)"} | 这支球队是世界顶级的，所以每个球员都是世界顶级水平。
+{"hit":true,"score":0.58,"count":1,"detail":"whole-part transfer×whole-quality-to-every-part(en)"} | The orchestra is world-class, th
+PQ_EN hits: Every player ;; 
+WHOLE_EN hits: the team ;; team ;; the roster ;; roster
+QUALITY_EN hits: elite|win ;; 
+/data/workspace/heartflow/scripts/round-266/r266-wpt-debug2.js:18
+console.log('TAIL_EN hits:', I.TAIL_EN.map(r => (en.match(new RegExp(r.source, 'gi')) || []).join('|')).join(' ;; '));
+                                       ^
+
+TypeError: Cannot read properties of undefined (reading 'map')
+    at Object.<anonymous> (/data/workspace/heartflow/scripts/round-266/r266-wpt-debug2.js:18:40)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Object..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)
+    at Function.<anonymous> (node:internal/modules/cjs/loader:1309:12)
+    at Module._load (/usr/local/lib/instabox/headed-browser.cjs:71:22)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49
+
+Node.js v22.23.3

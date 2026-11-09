@@ -1,0 +1,26 @@
+QUALITY_ZH len = 3 | MODAL_ZH len = 2 | PART_QUANT_ZH len = 2 | WHOLE_ZH len = 4
+{"hit":true,"score":0.58,"count":1,"detail":"整体-部分属性迁移×部分属性推整体属性(zh)"} | 这个团队每个人都很优秀，所以整个团队自然也很优秀。
+{"hit":false,"score":0,"detail":"","count":0} | The team has many excellent en
+{"hit":false,"score":0,"detail":"","count":0} | 这家公司的每个零件都是进口的，所以整台设备自然也是进口的。
+{"hit":false,"score":0,"detail":"","count":0} | Every part of this machine is 
+attack7: {"hit":false,"score":0,"detail":"","count":0}
+  PQ_ZH hits:  ;; 
+  WHOLE_ZH hits:  ;;  ;;  ;; 系列|系列
+  QUALITY_ZH hits:  ;;  ;; 惊艳|惊艳
+  MODAL_ZH hits:  ;; 想必
+/data/workspace/heartflow/scripts/round-266/r266-wpt-debug.js:19
+console.log('  EXEMPT_ZH hits:', I.EXEMPT_ZH.map(r => (a7.match(new RegExp(r.source, 'g')) || []).join('|')).join(' ;; '));
+                                             ^
+
+TypeError: Cannot read properties of undefined (reading 'map')
+    at Object.<anonymous> (/data/workspace/heartflow/scripts/round-266/r266-wpt-debug.js:19:46)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Object..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)
+    at Function.<anonymous> (node:internal/modules/cjs/loader:1309:12)
+    at Module._load (/usr/local/lib/instabox/headed-browser.cjs:71:22)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49
+
+Node.js v22.23.3

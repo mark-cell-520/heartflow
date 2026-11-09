@@ -181,7 +181,8 @@ function _stripLead(s) {
   return s.replace(/^[，,。；;、\s]+/, '').replace(/^(?:的|是|为)/, '').trim();
 }
 
-function _parsePremise(c) {
+// [r266] PU 参数供负例注入-删条定位新模式（默认 undefined 走全量）
+function _parsePremise(c, PU) {
   const isENText = /[a-zA-Z]/.test(c) && !/[\u4e00-\u9fff]/.test(c);
   if (isENText) {
     for (const u of UNIVERSAL_EN) {
@@ -201,12 +202,9 @@ function _parsePremise(c) {
         if (_enWords(A).length && _enWords(B).length) return { A, B, type: 'EN_QUANT' };
       }
     }
-    // [r266 新增族] 后置全称修饰：The inductees are without exception top performers
-    const mExc = c.match(/^(.+?)\s+(?:are|is)\s+without\s+exception\s+(.+)$/i);
-    if (mExc) {
-      const A = mExc[1].trim(), B = mExc[2].trim();
-      if (_enWords(A).length && _enWords(B).length) return { A, B, type: 'EN_QUANT' };
-    }
+    // [r266 注] 曾加 are without exception 前提路由，实测移除：该形在
+    // 改动前即被裸 are/is 路由覆盖（precheck 对比 r266 父提交 3dcb832，
+    // score 70 vs 72 仅关键词解析噪声差异），属死代码，按纪律删除。
     const bare = c.match(/^(.+?)\s+(?:are|is)\s+(.+)$/i);
     if (bare) {
       const A = bare[1].trim(), B = bare[2].trim();
@@ -240,7 +238,7 @@ function _parsePremise(c) {
   // [r266 新增族] 后置全称量词形：A + 清一色/统统/尽数/全数 + (是|为) B
   // （「入围的清一色是优等生」= 所有入围的都是优等生；结论侧同步见
   //  _parseConversion 的同族路由）
-  for (const u of POST_UNIVERSAL_ZH) {
+  for (const u of (PU || POST_UNIVERSAL_ZH)) {
     const idx = c.indexOf(u);
     if (idx <= 0) continue;
     const A = _stripLead(c.slice(0, idx));
@@ -260,7 +258,8 @@ function _parsePremise(c) {
 }
 
 // ── 腿②：换位结论解析（主项/谓项切分，量词可选）────────────────
-function _parseConversion(c) {
+// [r266] PU 参数供负例注入-删条定位新模式（默认 undefined 走全量）
+function _parseConversion(c, PU) {
   const isENText = /[a-zA-Z]/.test(c) && !/[\u4e00-\u9fff]/.test(c);
   if (isENText) {
     for (const u of UNIVERSAL_EN) {
@@ -286,7 +285,7 @@ function _parseConversion(c) {
   }
   // [r266 新增族] 后置全称量词结论形：S + 清一色/统统/尽数/全数 + 谓词
   // （「优等生清一色能入围」——S 在量词之前，谓词可为动词短语）
-  for (const u of POST_UNIVERSAL_ZH) {
+  for (const u of (PU || POST_UNIVERSAL_ZH)) {
     const idx = body.indexOf(u);
     if (idx <= 0) continue;
     const S = _stripLead(body.slice(0, idx));
@@ -350,7 +349,7 @@ function _splitBare(pre, S, P, isEN) {
   return null;
 }
 
-function checkIllicitConversion(text) {
+function checkIllicitConversion(text, inject) {
   const t = typeof text === 'string' ? text : '';
   if (!t.trim()) return _pass();
 
@@ -369,7 +368,7 @@ function checkIllicitConversion(text) {
     // 前提 = 推断词之前的部分；同句推断词之后的部分是结论候选
     const inf = _findInfer(clause);
     const pre = inf ? clause.slice(0, inf.idx) : clause;
-    let prem = _parsePremise(pre);
+    let prem = _parsePremise(pre, inject && inject.POST_UNIVERSAL_ZH);
     if (prem && (!prem.A.trim() || !prem.B.trim())) prem = null;
     // 倒装形路由：结论在前、前提在后（「所以B都是A，因为所有A都是B」）
     let preFromMarker = null;
@@ -377,7 +376,7 @@ function checkIllicitConversion(text) {
       const pm = _findPremiseMarker(clause);
       if (pm) {
         const tail = clause.slice(pm.idx + pm.word.length);
-        const p2 = _parsePremise(tail);
+        const p2 = _parsePremise(tail, inject && inject.POST_UNIVERSAL_ZH);
         if (p2 && p2.A.trim() && p2.B.trim()) preFromMarker = { text: tail, prem: p2 };
       }
     }
@@ -408,7 +407,7 @@ function checkIllicitConversion(text) {
       if (!body) continue;
       // 裸跟句（无推断词）须自带全称标记才敢当结论；倒装句必须带推断词
       if (!cinf && cand.mode === 'follow' && !_hasUniversalMarker(body)) continue;
-      const conv = _parseConversion(body);
+      const conv = _parseConversion(body, inject && inject.POST_UNIVERSAL_ZH);
       if (!conv) continue;
       const isEN = (activePrem && (activePrem.type === 'EN_QUANT' || activePrem.type === 'EN_BARE'))
         || (/[a-zA-Z]/.test(body) && !/[\u4e00-\u9fff]/.test(body));
@@ -467,7 +466,7 @@ function checkIllicitConversion(text) {
 module.exports = {
   checkIllicitConversion,
   __internals: {
-    UNIVERSAL_ZH, UNIVERSAL_EN, PARTICULAR,
+    UNIVERSAL_ZH, POST_UNIVERSAL_ZH, UNIVERSAL_EN, PARTICULAR,
     INFER_ZH, INFER_EN, PREMISE_MARKERS,
     NEG_ZH, NEG_EN, HEDGE, BICONDITIONAL, SYMMETRIC, META_CONCEPT, TEACH, EVIDENCE,
     EN_STOP, ZH_STOP,

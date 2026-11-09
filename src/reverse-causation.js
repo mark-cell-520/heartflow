@@ -158,7 +158,9 @@ const DIFF_EN = [
 
 // ─── 英文侧腿② ───────────────────────────────────────────────────────
 const CAUSE_EN = [
-  /\b(?:causes?|caused|causing|leads?\s+to|led\s+to|leading\s+to|results?\s+in|resulted\s+in|resulting\s+in|brings?\s+about|brought\s+about|creates?|created|creating|produces?|produced|drives?|increases?|increased|increasing|raises?|raised|worsens?|worsened|aggravates?|is\s+responsible\s+for|contributes?\s+to|contributed\s+to|fuels?|fueled|spawns?|triggers?|triggered|induces?|induced|makes?|attracts?|attracting|draws?|drawing|invites?|breeds?)\b/i,
+  /\b(?:causes?|caused|causing|leads?\s+to|led\s+to|leading\s+to|results?\s+in|resulted\s+in|resulting\s+in|brings?\s+about|brought\s+about|creates?|created|creating|produces?|produced|drives?|increases?|increased|increasing|raises?|raised|worsens?|worsened|aggravates?|is\s+responsible\s+for|contributes?\s+to|contributed\s+to|fuels?|fueled|spawns?|triggers?|triggered|induces?|induced|makes?|attracts?|draws?|invites?|breeds?)\b/i,
+  // [r266 新增族] -ing 进行态因果动词（独立元素，供负例注入-删条定位）
+  /\b(?:attracting|drawing|luring|inviting|pulling)\b/i,
 ];
 const RESULT_EN = [
   /\b(?:death|deaths|mortality|fatalit\w+|accidents?|crashes?|crime|crimes?|offen[cs]es?|relapse|recurrence|deterioration|failure|collapse|bankruptc\w+|insomnia|depression|anxiety|suicide|dropouts?|addiction|dependent|complications?|side\s+effects?|infections?|injur\w+|illness|robber\w+|theft|fraud|scandals?|violations?|losses?|decline|recession|turnover|burnout|problems?|risks?|worse|poorer)\b/i,
