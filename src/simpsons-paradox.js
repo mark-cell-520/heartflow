@@ -11,6 +11,17 @@
  * 命中，含中英双语、裸名词、带修饰、长句变体；其余 3 条被
  * proxy_metric_goal / stereotype+perfect_error 代拦）、良性 7/7
  * pass（零误伤）。外部来源：GitHub ehart-altair/SimpsonsParadox
+ *
+ * [r267 扩展] 池化探针实测 2/3 穿透的新措辞家族（scripts/round-267/
+ * r267-probe-pool.js，v6.8.157）：① 口语聚合族（合并两个校区看/合起来
+ * 看/拢在一起看；EN pooling/aggregating/combining/lumping/merging）——
+ * 长形在前，「合并…看」整体作 marker 才能把趋势窗拉到「压过」上；② 比较
+ * 胜负动词族（压过/胜过/领先/反超/高于/低于；EN wins/leads/ahead/favors/
+ * trails/lags/behind/declines）——**必须并入 TREND 列表首正则**：trendDirs
+ * 只取列表首个正则，另起数组元素是死代码（r267 实测教训，同 selection-
+ * bias 的 SAMPLE_SELF_SCOPES 分型）。良性对照（聚合层与子群层方向相反需
+ * 分层解读/辛普森悖论形态/needs subgroup analysis）零误伤。
+ *
  * ★18（"Function for automatically detecting Simpson's Paradox"
  * ——pairs of variables whose relationship with the dependent
  * variable reverses when conditioned on a second variable）+
@@ -133,14 +144,21 @@
 const AGG_ZH = [
   /总体|整体|平均|合计|总共|全院|全校|全市|全国|全局|宏观|汇总|累计/,
   /总体上|整体上|总的来说|总体而言|总体看|整体来看|平均来看|综合来看|合计来看|汇总来看|整体地说/,
+  // [r267] 口语聚合族（合并两个校区看/合起来看/拢在一起看/拼在一起）——
+  // 探针 2/3 穿透落地：聚合层措辞不限于「总体/整体」。长形在前：
+  // 「合并…看」整体作 marker 才能把后窗拉到趋势词（压过）上。
+  /合并[^。，！？!?]{0,8}?看|合并|合起来|合到一块|拢在一起|掺在一起|掺和在一起|拼在一起|堆在一起|放到一起|汇总成|两笔账合/,
 ];
 
 // ─── TREND 趋势词（中文，带方向）────────────────────────────────
 const TREND_UP_ZH = [
-  /上升|升高|上涨|提高|提升|增长|增加|涨了|涨价|涨薪|改善|好转|越高|更高|更多|变好|更好|翻倍|翻番|进步|在升|渐升|走高/,
+  // [r267] 比较胜负动词族（压过/胜过/领先/反超/高于）并入首正则——
+  // trendDirs 只取列表首个正则，另起数组元素是死代码（r267 实测教训）
+  /上升|升高|上涨|提高|提升|增长|增加|涨了|涨价|涨薪|改善|好转|越高|更高|更多|变好|更好|翻倍|翻番|进步|在升|渐升|走高|压过|胜过|赢过|领先|反超|占优|力压|赶超|高于/,
 ];
 const TREND_DOWN_ZH = [
-  /下降|降低|下跌|下滑|回落|减少|缩减|恶化|变差|越差|更低|更少|变少|萎缩|在降|渐降|走低/,
+  // [r267] 比较胜负动词族（低于）并入首正则（trendDirs 只取首个）
+  /下降|降低|下跌|下滑|回落|减少|缩减|恶化|变差|越差|更低|更少|变少|萎缩|在降|渐降|走低|低于|落后/,
 ];
 
 // ─── 腿② SUB 子群层标记（中文；r161 教训：裸名词 科室/班级/分层/
@@ -175,13 +193,20 @@ const REVERSAL_ZH = [
 
 // ─── 英文常量 ───────────────────────────────────────────────────
 const AGG_EN = [
-  /\b(?:overall|in\s+total|on\s+average|average|aggregate|across\s+the\s+board|taken\s+together|combined|pooled|all\s+told|as\s+a\s+whole)\b/i,
+  /\b(?:overall|in\s+total|on\s+average|average|aggregate|across\s+the\s+board|taken\s+together|combined|pooled|pooling|all\s+told|as\s+a\s+whole)\b/i,
+  // [r267] 口语聚合动词族（pooling/aggregating/combining/lumping/merging）
+  // ——探针 2/3 穿透落地：聚合层措辞不限于 taken together/combined
+  /\b(?:pooling|aggregating|combining|lumping|merging|collapsing)\b/i,
 ];
 const TREND_UP_EN = [
-  /\b(?:rose|risen|rise|rises|rising|increased|improved|climbed|grew|gone\s+up|went\s+up|got\s+up|higher|more|better|best|improvement|up)\b/i,
+  // [r267] 偏好胜负动词族（wins/leads/ahead/favors/outpaces/beats）并入
+  // 首正则——trendDirs 只取列表首个正则
+  /\b(?:rose|risen|rise|rises|rising|increased|improved|climbed|grew|gone\s+up|went\s+up|got\s+up|higher|more|better|best|improvement|up|wins?|leads?|led|ahead|favors?|outpaces?|edges?\s+ahead|beats?)\b/i,
 ];
 const TREND_DOWN_EN = [
-  /\b(?:fell|fall|falls|falling|dropped|declined|decreased|worsened|got\s+worse|went\s+down|gone\s+down|lower|less|worse|down|reduction|shrank)\b/i,
+  // [r267] 偏好落后动词族（loses/trails/lags/behind/declines）并入首正
+  // 则——trendDirs 只取列表首个正则
+  /\b(?:fell|fall|falls|falling|dropped|declined|declines|decreased|worsened|got\s+worse|went\s+down|gone\s+down|lower|less|worse|down|reduction|shrank|loses?|lost|trails?|lags?|behind|falls?\s+behind|falls?\s+short)\b/i,
 ];
 const SUB_EN = [
   /\b(?:each|every|per)\b/i,
