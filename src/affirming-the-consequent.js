@@ -27,6 +27,13 @@
  * （composite 0.86 / confidence 0.86 / identity_alignment 0.8）。
  * 候选池来自 scripts/round-725-family-probe.js 在 v6.8.72 / 154 维引擎实测：
  * 攻击漏判 14/15（93%）全池最高、误伤 0/8、漏判中真零命中 14/14。
+ *
+ * [r264] 全新措辞家族扩展（真升级②）：池化探针实测一批新推断词整族穿透
+ * （gate 层 10/11 全放行）——腿② INFER_ZH 补 足见/据此可得/毫无疑问/反映出/透露出，
+ * INFER_EN 补 indicates/suggests/points to/shows that/implies that/demonstrates/reflects；
+ * 另修 EN 裸规则句回指失配：A='Founders read' 对结论 'she is a founder' 单复数
+ * 不一致导致整句漏判，_matchIn EN 分支加单复数宽容回指。HEDGE 同步补
+ * only one signal / only one possible 两个对冲形（新推断词上线后承重）。
  */
 'use strict';
 
@@ -39,13 +46,15 @@ const COND_UNIVERSAL = ['都会有', '都会', '才有', '方能', '才有可能
 const COND_HUI = ['会'];
 
 // ── 腿②：推断连接词（事实 → 结论）──────────────────────
-const INFER_ZH = ['足以证明', '这就说明', '这就证明', '足以见', '显然是', '肯定是', '准是', '意味着', '说明', '证明', '可见', '所以', '因此', '就是说'];
-const INFER_EN = ['so', 'therefore', 'thus', 'which means', 'that means', 'proves that', 'proof that', 'it follows', 'consequently', 'hence'];
+// [r264] 新推断词族（池化探针 10/11 穿透后补）：足见/据此可得/毫无疑问/反映出/透露出
+const INFER_ZH = ['足以证明', '这就说明', '这就证明', '足以见', '显然是', '肯定是', '准是', '意味着', '说明', '证明', '可见', '所以', '因此', '就是说', '足见', '据此可得', '毫无疑问', '反映出', '透露出'];
+// [r264] 新推断词族 EN：indicates/suggests/points to/shows that/implies that/demonstrates/reflects
+const INFER_EN = ['so', 'therefore', 'thus', 'which means', 'that means', 'proves that', 'proof that', 'it follows', 'consequently', 'hence', 'indicates', 'suggests', 'points to', 'shows that', 'implies that', 'demonstrates', 'reflects'];
 
 // ── 守卫 ──────────────────────────────────────────────
 const NEG_ZH = ['没', '无', '未', '并非', '不是', '不', '别', '毫无', '并不'];
 const NEG_EN = ['no', 'not', 'never', 'nor', 'neither', 'cannot'];
-const HEDGE = ['可能', '也许', '未必', '不一定', '之一', '其中之一', '还要看', '不能反推', '说明不了', '必要不充分', '或然', '难以证明', '不必然', 'perhaps', 'maybe', 'might', 'could be', 'not sufficient', 'not conclusive', 'cannot conclude'];
+const HEDGE = ['可能', '也许', '未必', '不一定', '之一', '其中之一', '还要看', '不能反推', '说明不了', '必要不充分', '或然', '难以证明', '不必然', 'perhaps', 'maybe', 'might', 'could be', 'not sufficient', 'not conclusive', 'cannot conclude', 'only one signal', 'only one possible'];
 const META_CONCEPT = ['肯定后件', '逆命题', '充分必要', '逻辑谬误', '形式谬误', '谬误', 'affirming the consequent', 'formal fallacy', 'logical fallacy', 'fallacy'];
 const TEACH = ['老师', '教材', '课堂', '教授', '讲师', '课本', '课程', '教研室', 'textbook', 'lecture', 'lesson', 'professor'];
 const EVIDENCE = ['证据不足', '证据不充分', '无法证明', '孤证', '需要更多证据', '尚待', '存疑', '不能证明', 'not enough evidence', 'insufficient evidence', 'cannot prove', 'yet to be proven'];
@@ -102,6 +111,11 @@ function _matchIn(s, kws, isEN, negs) {
   if (isEN) {
     const sWords = new Set(_enWords(s));
     for (const k of kws) { if (sWords.has(k)) return k; }
+    // [r264] 单复数宽容回指：条件句 A='Founders read'，事实句 'she is a founder'
+    // （裸规则句前两词作 A 时复数形与结论单数形失配，整族穿透）
+    for (const k of kws) {
+      if (k.length > 3 && /s$/.test(k) && !/ss$/.test(k) && sWords.has(k.slice(0, -1))) return k;
+    }
     return null;
   }
   const sChars = new Set([...s].filter(ch => !ZH_STOP.has(ch) && !/[\s，。！？；：、,.!?;:()]/.test(ch)));

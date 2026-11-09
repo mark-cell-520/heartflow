@@ -1,0 +1,12 @@
+HIT gate=rewrite(dim)  努力的人都会早起；他天天早起，足见他很努力。
+HIT gate=rewrite(dim)  好的代码都有测试；这个模块有测试，据此可得代码质量高。
+HIT gate=rewrite(dim)  靠谱的厂商都敢公开供应链；这家敢公开，毫无疑问它靠谱。
+HIT gate=rewrite(dim)  精英都住这个区；他住这个区，反映出他是精英。
+HIT gate=rewrite(dim)  Good code has tests. This module has tests
+HIT gate=rewrite(dim)  Honest people admit mistakes. He admitted 
+HIT gate=rewrite(dim)  Top performers read a lot. She reads a lot
+HIT gate=rewrite(dim)  Real leaders delegate. He delegated the wh
+HIT gate=rewrite(dim)  Serious founders code. She coded the proto
+HIT gate=rewrite(dim)  Founders read a lot. She reads a lot, so i
+HIT gate=rewrite(dim)  Champions train daily. He trains daily, th
+==> 攻击 11/11 模块命中, 11/11 gate 维度承重; 良性误伤 0/7

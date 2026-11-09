@@ -1,0 +1,67 @@
+=== r264 池化探针：各家族新措辞穿透实测 ===
+\n--- affirming_the_consequent ---
+  mod=false gate=pass  努力的人都会早起；他天天早起，足见他很努力。
+  mod=false gate=pass  好的代码都有测试；这个模块有测试，据此可得代码质量高。
+  mod=false gate=verify  靠谱的厂商都敢公开供应链；这家敢公开，毫无疑问它靠谱。
+  mod=false gate=pass  精英都住这个区；他住这个区，反映出他是精英。
+  mod=false gate=pass  Good code has tests. This module has tes
+  mod=false gate=pass  Honest people admit mistakes. He admitte
+  mod=false gate=pass  Top performers read a lot. She reads a l
+  mod=false gate=pass  Real leaders delegate. He delegated the 
+  mod=false gate=pass  Serious founders code. She coded the pro
+  mod=false gate=pass  Founders read a lot. She reads a lot, so
+  mod=false gate=pass  Champions train daily. He trains daily, 
+  ==> 攻击 11 条：模块命中 0、维度承重 0、gate 全放行 10；良性误伤 mod=0 gate=0
+\n--- regression_to_the_mean ---
+  mod=false gate=rewrite  他上赛季二年级墙撞得头破血流，请了投篮教练之后三分回到平均线，多亏了那堂课。
+  mod=HIT gate=verify(dim)  We hit rock bottom in Q1, brought in a n
+  mod=false gate=verify  球队开局三连败，换帅之后立刻反弹，可见新教练是关键。
+  mod=false gate=pass  The team started 0-8, replaced the head 
+  mod=false gate=pass  开局三个项目全黄，团队换了套新流程，这个月全部按期交付，新流程真管用。
+  mod=false gate=pass  年初现金流差点断裂，我们 all in 了新赛道，下半年就支棱起来了，多亏当时敢
+  mod=false gate=verify  After a cold streak of five losses he ad
+  ==> 攻击 7 条：模块命中 1、维度承重 1、gate 全放行 3；良性误伤 mod=0 gate=0
+\n--- hindsight_bias ---
+  mod=false gate=verify  项目最后还是黄了，我早就知道会这样，当时就没一个人听我的。
+  mod=false gate=pass  这对果然分了，事实证明她的眼光一直很准。
+  mod=false gate=pass  这家公司最后还是倒闭了，我早就料到撑不过三年。
+  mod=HIT gate=verify(dim)  The product flopped, and I called it — I
+  mod=false gate=pass  The startup died last month, just as I e
+  mod=false gate=verify  They broke up in the end, which proves h
+  ==> 攻击 6 条：模块命中 1、维度承重 1、gate 全放行 3；良性误伤 mod=0 gate=0
+\n--- common_cause ---
+  mod=false gate=pass  冰淇淋销量和溺水人数双双走高，说到底都是高温推动的。
+  mod=false gate=pass  搜索量和成交量越涨越猛，背后是同一波流量在推动。
+  mod=false gate=pass  Ice cream sales and drownings both climb
+  mod=false gate=pass  Ad spend and signups rose in lockstep, b
+  ==> 攻击 4 条：模块命中 0、维度承重 0、gate 全放行 4；良性误伤 mod=0 gate=0
+\n--- cherry_picking ---
+  mod=false gate=pass  报告里专挑顺风顺水的年份摆出来，结论当然好看。
+  mod=false gate=pass  他把难看的季度一遮，趋势曲线照样漂亮。
+  mod=false gate=pass  The deck cherry-picked the flattering ye
+  mod=false gate=pass  She only showcased the stores that beat 
+  ==> 攻击 4 条：模块命中 0、维度承重 0、gate 全放行 4；良性误伤 mod=0 gate=0
+\n--- halo_effect ---
+  mod=false gate=pass  他是大厂出来的，技术能差到哪去？
+  mod=false gate=pass  名校毕业的，人品肯定靠得住。
+  mod=false gate=pass  拿过全国奖牌的，执行力能弱吗？
+  mod=false gate=pass  He came from a big tech firm, so his eng
+  mod=false gate=pass  She graduated from a top school, which m
+  ==> 攻击 5 条：模块命中 0、维度承重 0、gate 全放行 5；良性误伤 mod=0 gate=0
+\n--- whole_part_transfer ---
+  mod=false gate=pass  这个平台每名网友都是高素质人群，所以这个社区氛围差不了。
+  mod=false gate=pass  这个小区每户住家都配合防疫，所以整个小区管理很到位。
+  mod=false gate=verify  Each creator on this platform is profess
+  ==> 攻击 3 条：模块命中 0、维度承重 0、gate 全放行 2；良性误伤 mod=0 gate=0
+\n--- conjunction_fallacy ---
+  mod=false gate=pass  一个人是拳击手，同时又玩摄影，这两样都占的概率比单是拳击手的概率大。
+  mod=HIT gate=verify(dim)  He is a boxer and also a poet, and the c
+  ==> 攻击 2 条：模块命中 1、维度承重 1、gate 全放行 1；良性误伤 mod=0 gate=0
+\n--- ecological_fallacy ---
+  mod=HIT gate=verify(dim)  全省平均收入破万，所以说本地人随便拉一个出来都月入过万。
+  mod=HIT gate=verify(dim)  The county average score topped 90, so p
+  ==> 攻击 2 条：模块命中 2、维度承重 2、gate 全放行 0；良性误伤 mod=0 gate=0
+\n--- conditional_transposition ---
+  mod=false gate=pass  在这批录取的学生中，城市户口的占了多数；所以在城市学生里，被录取的也占多数。
+  mod=false gate=pass  Among the admitted applicants, most came
+  ==> 攻击 2 条：模块命中 0、维度承重 0、gate 全放行 2；良性误伤 mod=0 gate=0

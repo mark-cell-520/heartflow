@@ -1,0 +1,9 @@
+HIT gate=rewrite(dim)  He came from a big tech firm, so his engineering mus
+HIT gate=rewrite(dim)  She worked at a major tech company, therefore her le
+HIT gate=rewrite(dim)  He joined big tech, so his code quality must be exce
+HIT gate=rewrite(dim)  The candidate came from a tech giant, hence his arch
+HIT gate=rewrite(dim)  He came from a large corporation, so his engineering
+==> 攻击 5/5 模块命中, 5/5 gate 维度承重; 良性误伤 0/4
+注入 TRAIT_EN[4] → 专属攻击变红(承重), 旧攻击仍命中(OK)
+注入 TRAIT_EN[5] → 专属攻击变红(承重), 旧攻击仍命中(OK)
+整族置空（只留旧 4 元素）→ 新攻击全变红(承重)

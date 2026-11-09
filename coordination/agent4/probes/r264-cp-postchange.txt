@@ -1,0 +1,16 @@
+HIT gate=verify(dim)  报告里专挑顺风顺水的年份摆出来，结论当然好看。
+HIT gate=verify(dim)  团队专门把顺风顺水的年份晒出来，结论当然可靠。
+HIT gate=verify(dim)  他把难看的季度一遮，趋势曲线照样漂亮。
+HIT gate=verify(dim)  The deck cherry-picked the flattering years, s
+HIT gate=verify(dim)  She only showcased the stores that beat target
+==> 攻击 5/5 模块命中, 5/5 gate 维度承重; 良性误伤 0/6
+注入 SEL_MARK_ZH[1] → 变红(承重)  报告里专挑顺风顺水的年份摆出来，结论当然好看。
+注入 SEL_OBJ_ZH[1] → 变红(承重)  报告里专挑顺风顺水的年份摆出来，结论当然好看。
+注入 SEL_VERB_ZH[1] → 变红(承重)  团队专门把顺风顺水的年份晒出来，结论当然可靠。
+注入 SEAL_ADV_ZH[1] → 变红(承重)  报告里专挑顺风顺水的年份摆出来，结论当然好看。
+注入 SEL_NEG_QUAL_ZH[1] → 变红(承重)  他把难看的季度一遮，趋势曲线照样漂亮。
+注入 SEL_SUPPRESS_ZH[1] → 变红(承重)  他把难看的季度一遮，趋势曲线照样漂亮。
+注入 SEAL_NOUN_ZH[1] → 变红(承重)  他把难看的季度一遮，趋势曲线照样漂亮。
+注入 SEAL_NOUN_EN[1] → 变红(承重)  The deck cherry-picked the fla
+注入 SEL_EN_VERB[1] → 变红(承重)  She only showcased the stores 
+注入 SEL_EN_MARK[1] → 变红(承重)  She only showcased the stores 
