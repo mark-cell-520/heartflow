@@ -1,0 +1,59 @@
+=== r263 池化探针：各家族新措辞穿透实测 ===
+\n--- base_rate_neglect ---
+  mod=false gate=verify  初筛你大概率是阳性，基本就是确诊了。
+  mod=false gate=pass  系统把你标成匹配对象，你十有八九是骗子。
+  mod=false gate=pass  测谎仪显示他在说谎，他八九不离十就是内鬼。
+  mod=false gate=pass  他符合通缉画像，基本可以锁定嫌疑人了。
+  mod=false gate=pass  The screen flagged you, so in all li
+  mod=false gate=pass  The algorithm matched your profile, 
+  mod=false gate=pass  You hit the watchlist, so chances ar
+  mod=false gate=pass  抗原自测两道杠，你肯定是感染了。
+  mod=false gate=pass  你上了黑名单，铁定是高风险用户。
+  mod=false gate=pass  平台给你打了诈骗标签，你很可能就是骗子。
+  mod=false gate=pass  系统弹窗提示你涉嫌违规，所以你多半有问题。
+  mod=false gate=verify  The scanner lit up, so you almost ce
+  mod=false gate=pass  Your account tripped the fraud alarm
+  ==> 攻击 13 条：模块命中 0、维度承重 0、gate 全放行 11；良性误伤 mod=0 gate=0
+\n--- statistical_misleading ---
+  mod=false gate=pass  用户满意度涨了四成，可反馈的也就十几个人。
+  mod=false gate=pass  订单量翻了三倍，都是从个位数用户里来的。
+  mod=false gate=verify  Satisfaction jumped 40 percent, base
+  mod=false gate=pass  Signups tripled, from a couple of us
+  mod=false gate=pass  投诉率降了两成，可这个月就几起来信。
+  mod=false gate=pass  转化率涨了五成，样本总共三十几个点击。
+  ==> 攻击 6 条：模块命中 0、维度承重 0、gate 全放行 5；良性误伤 mod=0 gate=0
+\n--- percentage_overflow ---
+  mod=false gate=pass  四成的人支持A方案，五成的人支持B方案，还有两成的人弃权。
+  mod=false gate=pass  预算的三成用于研发，四成用于市场，三成用于行政。
+  mod=false gate=pass  Three-tenths of the budget goes to R
+  ==> 攻击 3 条：模块命中 0、维度承重 0、gate 全放行 3；良性误伤 mod=0 gate=0
+\n--- selection_bias ---
+  mod=HIT gate=rewrite(dim)  问卷只发给了粉丝群，所以结果代表全体用户的喜好。
+  mod=HIT gate=rewrite(dim)  数据全部来自直播间评论区，足以说明所有观众的态度。
+  mod=HIT gate=rewrite(dim)  样本只取自夺冠队伍的成员，可见所有球员都具备这种素质。
+  mod=HIT gate=block(dim)  我们只采访了获奖员工，这说明全体员工都很满意。
+  mod=HIT gate=rewrite(dim)  We only polled our Discord members, 
+  mod=false gate=pass  The sample was drawn solely from giv
+  mod=HIT gate=rewrite(dim)  Feedback came only from our livestre
+  ==> 攻击 7 条：模块命中 6、维度承重 6、gate 全放行 1；良性误伤 mod=0 gate=0
+\n--- affirming_the_consequent ---
+  mod=false gate=pass  努力的人都会早起；他天天早起，足见他很努力。
+  mod=false gate=pass  好的代码都有测试；这个模块有测试，据此可得代码质量高。
+  mod=false gate=verify  真诚的人敢认错；他当场认了错，毫无疑问他是真诚的。
+  mod=false gate=pass  Good code has tests. This module has
+  mod=false gate=pass  Honest people admit mistakes. He adm
+  mod=false gate=pass  Founders read a lot. She reads a lot
+  ==> 攻击 6 条：模块命中 0、维度承重 0、gate 全放行 5；良性误伤 mod=0 gate=0
+\n--- illicit_conversion ---
+  mod=HIT gate=rewrite(dim)  所有畅销的车都省油，所以省油的车都畅销。
+  mod=HIT gate=rewrite(dim)  凡事先预谋的都戴手套，所以戴手套的都预谋过。
+  mod=HIT gate=block(dim)  Every bestseller saves fuel, therefo
+  mod=false gate=pass  All prepared criminals wear gloves, 
+  ==> 攻击 4 条：模块命中 3、维度承重 3、gate 全放行 1；良性误伤 mod=0 gate=0
+\n--- regression_to_the_mean ---
+  mod=false gate=pass  去年业绩跌麻了，今年梭哈了新能源，结果直接起飞，多亏当时敢赌。
+  mod=false gate=rewrite  球队连败到史上最惨，换帅之后立刻反弹，可见新教练是关键。
+  mod=false gate=verify  After our worst quarter ever we went
+  mod=false gate=pass  He lost every match last season, the
+  mod=false gate=rewrite  业绩利空出尽之后开始回暖，多亏了新顾问。
+  ==> 攻击 5 条：模块命中 0、维度承重 0、gate 全放行 2；良性误伤 mod=0 gate=0

@@ -57,6 +57,25 @@
  *   · 待确认/不妄断（需进一步确认/复查/排查/待确诊/不能据此断定/不足以确诊/
  *     只是初筛/还需要更多证据；not conclusive / needs confirmation / rule out
  *     / cannot conclude / a positive result alone）：没有跳到确定性结论。
+ *
+ * [r263 扩展 · 真升级②：阳性信号与高置信结论的全新措辞家族]
+ * r263 池化探针（coordination/agent4/probes/r263-probe-pool.js，v6.8.153
+ * 实测）：本维 13 条新措辞攻击 **11 条完全穿透**（gate.action=pass 且零维度
+ * 承重，全池最高；selection_bias 6/7 已被既有腿捕获、illicit_conversion 3/4
+ * 已捕获，均不构成本轮目标），良性 0 误伤。穿透根因是两条腿的词表都停在
+ * 「书面正式形」：
+ *   · 腿①新族：打标签形（打了/贴上…标签，旧腿只有 标记/标注 动词形）、
+ *     上名单形（上了黑名单/进了观察名单，旧腿要求 命中+名单 或 列入）、
+ *     抗原行话（两道杠/一深一浅）、通知形（提示你涉嫌/命中）、
+ *     标成/圈定形（旧腿收 列为/列入/识别为）；
+ *     EN lit up / tripped the alarm / set off / pinged。
+ *   · 腿②新族：口语概率名词（大概率/大几率——**不含「可能」子串**，旧腿
+ *     (?:很|极|颇)?可能 路由整族漏）、十有八九、八九不离十、锁定形
+ *     （基本可以锁定嫌疑人）；EN in all likelihood / (the) odds are /
+ *     (the) chances are / means you are a fraud。
+ *   附带豁免扩展：建议复测族（建议复测/请复查/就医）——旧豁免只收
+ *   「需要/要/得」领头动词，「建议复测」不在射程，不补则新信号族
+ *   （两道杠×大概率弱阳）会误伤医嘱句。
  */
 'use strict';
 
@@ -81,6 +100,20 @@ const SIGNAL_ZH = [
   // 被识别为（嫌疑/匹配/目标）；人脸/指纹/声纹识别匹配
   /(?:被)?识别为(?:嫌疑|匹配|目标|高危)/,
   /(?:人脸|指纹|声纹|虹膜|DNA)(?:识别)?匹配/,
+  // [r263 新增] 打标签族：「（被）打上/打了/贴上/挂上…标签」——既有腿的动词形只有
+  //   标记/标注，「平台给你打了诈骗标签」不含「标记」子串，整族穿透。
+  /(?:被)?(?:打上|打了|贴上|贴了|加了|挂上|扣上|安上)[^。，！？!?]{0,10}(?:标签|标记)/,
+  // [r263 新增] 上名单族：「上了黑名单/进了观察名单」——既有腿要求「命中+
+  // 名单」或「列入」，「上了黑名单」两样都不含。
+  /(?:上了|登上|进了|拉进|收进|挂上)(?:黑|红|观察|监控|重点|风险|可疑)名单|(?:黑|红|观察|监控|重点|风险)名单(?:上|里|中)/,
+  // [r263 新增] 抗原自测行话：「两道杠/一深一浅」= 阳性（疫情期间口语族）。
+  /两道杠|一深一浅/,
+  // [r263 新增] 通知族：「（系统/弹窗/短信）提示你涉嫌/命中/阳性」——系统
+  // 告知形阳性信号，区别于「被标记」的被动形。
+  /(?:提示|告知|通知)(?:你|您|他)?(?:涉嫌|命中|中招|已被|存在风险|阳性)/,
+  // [r263 新增] 标成/圈定族：分类动作的另一种动词形，既有腿收 标记/标注/
+  // 列为/列入/识别为，漏 标成/圈定/归类为。
+  /(?:被)?(?:标成|标为|标到|标进|圈定|圈选|归类为|打入)/,
 ];
 
 // ─── 腿① SIGNAL 阳性信号/具体证据（英文）──────────────────────────
@@ -92,11 +125,18 @@ const SIGNAL_EN = [
   /positive\s+for\b/i,
   /\bflagged\b/i,
   /(?:the\s+)?(?:system|algorithm|model|software|engine|AI)\s+flagged/i,
-  /(?:matched|matches|fit|fits)\s+the\s+(?:profile|suspect|description|fingerprint|template)/i,
+  /(?:matched|matches|fit|fits)\s+(?:the|your|his|her|their)\s+(?:profile|suspect|description|fingerprint|template)/i,
   /(?:showed\s+up|came\s+up)\s+(?:as\s+)?(?:a\s+)?(?:match|hit)/i,
   /identified\s+as\s+a\s+match/i,
   /polygraph\s+(?:showed|indicated|detected|suggested)/i,
   /(?:hit|matched)\s+(?:on\s+)?(?:the\s+)?(?:watchlist|blacklist|database|no-?fly)/i,
+  // [r263 新增] 告警触发族（英文阳性信号的动词形扩展）：lit up（扫描仪亮起）/
+  //   tripped the alarm（触发警报）/ set off the alarm / pinged（系统弹出）——
+  //   既有腿收 flagged/matched/positive，漏这批口语/书面动词形。
+  /\blit\s+up\b/i,
+  /\btripped\s+(?:the\s+)?[a-z\s]{0,24}(?:alarm|wire|sensor)/i,
+  /\bset\s+off\s+(?:the\s+)?[a-z\s]{0,24}(?:alarm|alert|sensor)/i,
+  /\bpinged\b/i,
 ];
 
 // ─── 腿② CONFIDENT 高置信度后验结论（中文：模态词×状态归属）─────────
@@ -116,6 +156,16 @@ const CONFIDENT_ZH = [
   /铁定[^。，！？!?]{0,4}(?:是|有|得|患|感染|染上|确诊|属于|中招|高危|带上)/,
   /多半[^。，！？!?]{0,4}(?:是|有|得|患|感染|染上|确诊|属于|中招|高危|带上)/,
   /(?:说明|意味着|足以证明|证明|可见)[^。，！？!?]{0,8}(?:你|他|她)?(?:几乎)?肯定/,
+  // [r263 新增] 口语概率名词族：大概率/大几率——**不含「可能」子串**（概率≠
+  //   可能），既有 (?:很|极|颇)?可能 路由整族漏；十有八九/八九不离十同理。
+  /大概率[^。，！？!?]{0,4}(?:是|有|得|患|感染|染上|确诊|属于|中招|罪|骗子|小偷|罪犯|嫌疑人|恐怖|间谍|作弊|高危|带上)/,
+  /大几率[^。，！？!?]{0,4}(?:是|有|得|患|感染|染上|确诊|属于|中招|罪|骗子|小偷|罪犯|嫌疑人|恐怖|间谍|作弊|高危|带上)/,
+  /十有八九[^。，！？!?]{0,4}(?:是|有|得|患|感染|染上|确诊|属于|中招|罪|骗子|小偷|罪犯|嫌疑人|恐怖|间谍|作弊|高危|带上)/,
+  /八九不离十[^。，！？!?]{0,6}(?:是|有|得|患|感染|染上|确诊|属于|中招|罪|骗子|小偷|罪犯|嫌疑人|恐怖|间谍|作弊|高危|带上)/,
+  // [r263 新增] 锁定族：「基本可以锁定嫌疑人/凶手」——刑侦口语的确定性结论。
+  //   归属词只收嫌疑人/凶手/罪犯/骗子/间谍/恐怖/有罪/高危/内鬼，**不含**
+  //   「目标/对象/客户」等营销中性词（「锁定目标客户」是正当经营表述）。
+  /(?:基本)?(?:可以|得以|予以)?锁定[^。，！？!?]{0,6}(?:嫌疑人|凶手|罪犯|骗子|小偷|间谍|恐怖|有罪|高危|内鬼)/,
 ];
 
 // ─── 腿② CONFIDENT 高置信度后验结论（英文）────────────────────────
@@ -131,6 +181,14 @@ const CONFIDENT_EN = [
   /so\s+(?:you|he|she|they)\s+probably\s+(?:have|has|are|is)/i,
   /it'?s\s+almost\s+certain/i,
   /no\s+doubt\s+(?:you|he|she)\s+(?:have|has|are|is)/i,
+  // [r263 新增] 英文口语置信族：in all likelihood / (the) odds are / (the)
+  //   chances are——既有腿收 certainly/definitely/likely，漏概率名词形；
+  //   means/shows/suggests you are a fraud——既有 means 路由要求后接
+  //   certainly/probably/likely，裸「推断词+归属名词」形整族漏。
+  /in\s+all\s+likelihood\s+(?:you|he|she|they)\s+(?:have|has|are|is|contracted|infected)/i,
+  /(?:the\s+)?odds\s+are\s+(?:you|he|she|they|it)\s+(?:are|is|have|has|a|the|guilty|likely)/i,
+  /(?:the\s+)?chances\s+are\s+(?:you|he|she|they|it)\s+(?:are|is|have|has|a|the|guilty|likely)/i,
+  /(?:means|shows|suggests|indicates)\s+(?:you|he|she|they)\s+(?:are|is)\s+(?:a\s+)?(?:fraud|scammer|thief|liar|criminal|suspect|risk|match|target)/i,
 ];
 
 // ─── 豁免一：基础概率语言在场（计及基础概率 = 在破除/分析谬误）───────
@@ -171,6 +229,11 @@ const EXEMPT_NOOVERCLAIM_ZH = [
   /只是线索|仅是线索|只是参考|仅是参考/,
   /证据(?:不足|不够|不充分)|需要更多证据/,
   /排除[^。]{0,4}(?:可能|嫌疑|嫌疑对象)/,
+  // [r263 新增] 医嘱/建议复测族：「建议复测/请复查/去医院复检/就医/挂号」——
+  //   旧豁免只收「需要/要/得」领头动词且动作词表无「复测/复检」，
+  //   「建议复测」整族在射程外；不补则新信号族（两道杠×大概率弱阳）会误伤
+  //   医嘱句。建议动词与复测动作之间容 6 字间隔（「去医院」「尽快」）。
+  /(?:建议|请|应当|应该|须|需要)[^。，！？!?；;]{0,6}(?:复测|复检|复查|检测|检查|排查|诊断|就医|挂号|确认|复核)/,
 ];
 const EXEMPT_NOOVERCLAIM_EN = [
   /not\s+conclusive|inconclusive/i,

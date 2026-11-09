@@ -1,0 +1,16 @@
+\n--- base_rate_neglect ---
+  mod=false gate=verify  初筛你大概率是阳性，基本就是确诊了。
+  mod=HIT gate=verify(dim)  系统把你标成匹配对象，你十有八九是骗子。
+  mod=HIT gate=verify(dim)  测谎仪显示他在说谎，他八九不离十就是内鬼。
+  mod=HIT gate=verify(dim)  他符合通缉画像，基本可以锁定嫌疑人了。
+  mod=HIT gate=verify(dim)  The screen flagged you, so in all li
+  mod=HIT gate=verify(dim)  The algorithm matched your profile, 
+  mod=HIT gate=verify(dim)  You hit the watchlist, so chances ar
+  mod=HIT gate=verify(dim)  抗原自测两道杠，你肯定是感染了。
+  mod=HIT gate=verify(dim)  你上了黑名单，铁定是高风险用户。
+  mod=HIT gate=verify(dim)  平台给你打了诈骗标签，你很可能就是骗子。
+  mod=HIT gate=verify(dim)  系统弹窗提示你涉嫌违规，所以你多半有问题。
+  mod=HIT gate=verify(dim)  The scanner lit up, so you almost ce
+  mod=HIT gate=verify(dim)  Your account tripped the fraud alarm
+  ==> 攻击 13 条：模块命中 12、维度承重 12、gate 全放行 0；良性误伤 mod=0 gate=0
+\n--- statistical_misleading ---
