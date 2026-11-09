@@ -32,7 +32,7 @@ tags:
 动手前先确认没有别人在写同一个仓库：
 1. `cronjob action=list` + `ps aux | grep -E "claude -p|mcp-server"` 看有无活跃 cron/会话
 2. 心虫 cron 在跑 → 按 `cronjob action=list` 的**实际枚举**逐个 pause（不凭记忆写死名字和数量——cron 集随实例增长：升级、每日审计、定时统推、多机 claims 轮次都可能写同一仓库），paused_reason 写明"全面审计修复中，防并发写仓库"；把 paused 的 job_id 列表记在上下文，全链收尾后**按同一列表**逐个 resume——漏 resume 一个就是一条永久停掉的定时任务
-3. `git status --short` 必须干净再开工；有半成品（上一轮未提交的维度实现等）先看清归属，绝不覆盖别人的在途工作
+3. `git status --short` 必须干净再开工；有半成品（上一轮未提交的维度实现等）先看清归属，绝不覆盖别人的在途工作。**cron 已 resume 且工作区出现 cron 写入时**（恢复调度后立刻触发的轮次把半成品落盘、报告自陈配额耗尽）：先只读侦察辨来源再写——`ps eww -C node` 扫并发写进程、`ls -la ~/hermes1/cron/output/<job_id>/` 按 mtime 定位是哪轮写的、读该轮报告确认它自己声称做到哪一步；确认无活体写进程才动工作区，侦察阶段只读不写
 4. 推送前置检查提前做（不依赖审计结果，可与子代理并行）：积压 commit 类型统计、隐私闸预扫（`git diff <remote>..HEAD --name-only | grep -iE '\.env$|\.key$|secret|credential|token|\.pem$'` 必须为空）、大模型文件检查（onnx/dat/bin/model）、token 验权（`curl -sI -H "Authorization: token $TOKEN" https://api.github.com/user` 的 x-oauth-scopes 含 repo）
 
 ### 流程分四阶段
@@ -468,13 +468,14 @@ LEFTHOOK=0 git push "https://USERNAME:$TOKEN@github.com/OWNER/REPO.git" main:mai
 
 1. **先 fetch 再判形态**：`git fetch <remote> main`，双向数 `git log --oneline HEAD..<remote>/main` 与 `<remote>/main..HEAD`。双边非零=真分叉（走合并）；单边=快进。**合并前 pause 两个 cron**（见 Phase -1），且 `git status --short` 必须干净。
 1b. **先比两侧 touch 的文件集，再决定解冲突深度**：`git log --oneline --stat <base>..<remote>/main` 看对侧改了哪些文件，与本地改动集（`git diff --name-only <base>..HEAD`）比对。**零交集 = 天然无冲突面**，直接走合并；有交集才逐文件判性质（同文件不同段 git 自动合并，同段才是真冲突）。多 agent 并行仓库里这是常态——对方写它的 src/*.js，你改 index.js + VERSION + 四份文档，互不重叠。
-1c. **合并前 `git merge-tree` 干跑**：`git merge-tree $(git merge-base HEAD <remote>/main) HEAD <remote>/main`，把预演结果 grep 冲突标记。**判"无冲突"必须看双向标记 `+<<<<<<<` 与 `+>>>>>>>`，不能只 grep `=======`**——被合并文件的正文内容自身含 `=======`（测试输出的分隔线、报告里的等号线）会造假阳性，把 clean merge 误判成冲突。真实 clean merge 的输出只有 `merged` / `added in remote` / `removed in remote` 段。干跑通过再真合并，合并后**重跑五门禁**（见第 3 条）。
+1c. **合并前 `git merge-tree` 干跑**：`git merge-tree $(git merge-base HEAD <remote>/main) HEAD <remote>/main`，把预演结果 grep 冲突标记。**判"无冲突"必须看双向标记 `+<<<<<<<` 与 `+>>>>>>>`，不能只 grep `=======`**——被合并文件的正文内容自身含 `=======`（测试输出的分隔线、报告里的等号线）会造假阳性，把 clean merge 误判成冲突。真实 clean merge 的输出只有 `merged` / `added in remote` / `removed in remote` 段。定位冲突落在哪个文件：grep 到 `+<<<<<<<` 后**回看该标记前 20-30 行**，文件名在冲突标记上方的 `changed in both` / 路径行里，不要凭文件名猜。干跑通过再真合并，合并后**重跑五门禁**（见第 3 条）。
 2. **冲突固定五件套**：CHANGELOG.md、package.json、SKILL.md、VERSION、src/core/heartflow.js。解法：
    - CHANGELOG：双边同版本号记录并入同一版本头下（Added+Fixed 并存），不删任何一侧
    - 维度/模块/工具/路由数取**合并后实测值**（`scripts/measure-claimed-numbers.js`），随后 `sync-doc-numbers.js` 全量同步 + `--check` 复绿；CONTRIBUTING.md/CURRENT_STATE.md 两份活文档是既有漏网户，跟着修
-   - VERSION/package.json/SKILL.md 版本号两边相同就保持，不为合并额外 bump
-3. **合并后必须重跑五门禁 + 冒烟**（不是只跑冒烟）：两条线的变更组合可能产生单线各自全绿、组合红的花样。典型回归形态——**验证脚本 teardown 竞态**：被检代码新增 await 边界（如先例查询接入 think() 开头）后，"同步阶段 stop() 引擎、之后才 await 异步检查"的验证脚本会让续跑撞 started 检查整项挂（verify 16 项必挂 1 项）。判据：任何 verify 脚本的 stop/teardown 必须位于 `Promise.all(checkResults)` 之后。
+   - VERSION/package.json/SKILL.md 版本号两边相同就保持，不为合并额外 bump；**是否 bump 的判定看改动有没有落在 gate 路径**——确认改动层不被维度注册表/checkOutput/gate 引用时（如 `src/plugins/` 插件层 `grep -c plugin src/gate.js` 为 0），维度计数与门禁基线都不变，这类改动只在 README changelog 现版本行末补记 + UPGRADE_LOG 记轮次，不新开版本行
+3. **合并后必须重跑五门禁 + 冒烟**（不是只跑冒烟）：两条线的变更组合可能产生单线各自全绿、组合红的花样。典型回归形态——**验证脚本 teardown 竞态**：被检代码新增 await 边界（如先例查询接入 think() 开头）后，"同步阶段 stop() 引擎、之后才 await 异步检查"的验证脚本会让续跑撞 started 检查整项挂（verify 16 项必挂 1 项）。判据：任何 verify 脚本的 stop/teardown 必须位于 `Promise.all(checkResults)` 之后。**门禁清单是静态的，对侧刚合入的新测试文件不在里面**——合并后 `ls test/round-*.test.js` 与本地已知清单比对，把新增的 `test/round-<NNN>-*.test.js` 一并跑掉，否则"五门禁全绿"漏掉对侧刚加的测试。
 4. **收尾三件套**：push 后 `git ls-remote` 复核远端 HEAD=本地且 `<remote>/main..HEAD | wc -l` 为 0 → `supervisorctl restart heartflow-mcp` + `/health` 与 `heartflow_status` 确认新版本新模块数 → 按暂停时记录的 job_id 列表逐个 resume（不是固定"两个"——cron 数量随实例增长，漏恢复的定时任务不会自愈），`cronjob list` 确认 enabled/state=scheduled/next_run_at，`cat ~/hermes1/cron/ticker_heartbeat` 确认调度器活着。**resume 报 `not found` 时回 list 或 jobs.json 拿精确 ID，别重试同一错 ID**（见已知陷阱 25）；收尾从 `~/hermes1/cron/jobs.json` 逐条断言全启用口径（enabled=true + state=scheduled + 无 paused_at + 无 paused_reason），不只看 list 输出。
+4a. **门禁输出被引擎启动日志淹没时，用 grep 精确抓结果行而不是指望尾部输出完整**：合并后连跑多个门禁，stdout 常混入引擎/模块加载日志把汇总行冲出可见范围。抓法：对每次门禁输出 grep `passed|failed|FAIL|✅|❌|dimensions` 一类结果行关键字再逐项断言基线；一次 grep 抓不到就拆成单门禁分别跑、分别抓，不要在淹没的输出里数行。合并后门禁按 G1 verify → G2 guard-abilities → G3 doc-numbers → G4 bidirectional → 附加门禁的顺序逐项留证，每项一个明确数字，不写"全绿"两个字代替数字。
 
 ### 推送策略（当网络环境复杂时）
 
@@ -1032,7 +1033,7 @@ done
    - **最佳实践**：大型JS文件（>1000行）的新方法追加，用Python脚本做 `lines[:insert_pos] + [new_code] + lines[insert_pos:]` 方式写入，而不是用patch工具
    - **验证**：每次写入后立即 `node --check <file>` 验证语法
 9. **类结束`}`定位**：大型JS文件中类结束`}`可能不在文件末尾附近——`class CodeEngine {` 在第251行，类结束`}`在第3060行。找类结束用 `grep -n '^}' file.js` 或计算括号深度。不能用 `wc -l` 推测量后几行。
-10. **子代理的"完成"不代表真正完成**：子代理返回"completed"但文件可能没写入、写入了损坏代码、或写入了语法错误。每次子代理修改后必须 `node --check` 验证。
+10. **子代理的"完成"不代表真正完成**：子代理返回"completed"但文件可能没写入、写入了损坏代码、或写入了语法错误。每次子代理修改后必须 `node --check` 验证。子代理报告**自陈"未验证/未跑测试"时，那句话比任何"已完成"都可信**——按未验证接手：不 discard（它的补腿可能真实有效，回滚等于丢产能），也不盲信，先跑该模块自带单测 + 四门禁，把回归修绿再走收尾链；修前 `cp` 备份到 scratch
 11. **.gitignore 模式陷阱**：`memory/`（无前导 `/`）会匹配所有路径中的 `memory/` 目录，包括 `src/memory/`、`node_modules/xxx/memory/`。如果 `.gitignore` 本意是忽略顶层的记忆数据目录，必须写 `/memory/`（根目录限定）。`src/memory/` 下的代码文件（如 `heartflow-memory.js`）会被无意间忽略。修复方法：`git check-ignore -v src/memory/xxx.js` 定位具体是哪个 `.gitignore` 规则，然后修复它。
 12. **scripts/ 目录需要主动跟踪**：心虫代码中有 `scripts/` 目录存放工具脚本（如 `heartflow-memory-tool.js`）。如果新增的脚本在 `git status` 中显示为 `??` 未跟踪，检查是否被 `.gitignore` 意外匹配。新脚本必须 `git add -f`（如被忽略）或正常 `git add` 加入追踪。`scripts/` 下的工具是心虫功能的一部分，不是临时文件。
 13. **归档/删除前置扫描漏三种引用形态会制造回归（2026-10-28 实战，4 个测试红）**：
@@ -1050,11 +1051,13 @@ done
 21. **修 secret 类字符串前必须验原始字节**：agent 自己的工具输出层会把 key/token 类字符串脱敏显示（文件里明明是 `$INSTABOX_API_KEY`，终端/grep 输出显示成 `$INSTA...KEY` 一类形态，各次还可能不同）——照显示文本判定「文件里是坏变量」并去"修"正确文件，是真实差点发生的误修。规矩：任何「密钥被写坏」的发现，先用 `execute_code` 读原始字节（`repr()` + `.encode().hex()`）或 `subprocess.run(['git','show','HEAD:'+f], capture_output=True)` 拿 stdout decode 复核（两条路都绕开输出脱敏层），再决定改不改；显示文本与 hex 冲突时以 hex 为准。
 21a. **同一个脱敏层也会吃掉数值片段，patch 会照显示文本把坏值写进源码**：`key: 0.5,` 会被渲染成 `key: ***`，此时 `patch()` 拿脱敏文本做 old/new 匹配，落盘的就是 `***`，`node --check` 报 `SyntaxError at line N '**'`。规矩：old/new 里含 severity/权重/阈值/分数等数值片段时一律改用 `python3` 字节级替换（`b.find(b'锚点')` 定位），patch 之后第一动作是 `node --check`。完整规则与证伪顺序见 `heartflow-discriminator-integration` 的「终端脱敏层会把数值渲染成 `***`」一节。
 22. **并发 fan-out 后先看 `git diff --stat` 的删除数，再看新增**（2026-11-08 实战）：三个子代理共写同一仓库，其中一个把「性能优化」做成了**破坏性回退**——用 `.bak` 回填导致 `src/automation-bias.js` -504、`src/framing-effect.js` -250、`src/index.js` -126，同时抹掉四个已上线维度的接线（226/227/228/229）与另一路刚补的 7 个入口守卫，而它的自报全是正面措辞。判据：优化类改动若删除行数接近或超过新增行数，且删除集中在全局接入点（index.js 的注册/接线区），它就是回退不是优化。处置：`git diff <file> > x.patch` 先存档 → `git checkout -- .` 回到 HEAD → 逐 hunk 读过再 `git apply` 只重放合法部分。fan-out 的汇总阶段，父任务对每个子代理的「已修复/已优化」一律以 `git log` + `git diff --stat` + 门禁实跑复核，不信自报。
-23. **add/add 冲突先在沙箱预演，并用符号集证明「取上游」不丢东西**（2026-11-08 实战）：两侧独立实现同一新文件时（本例 `src/prosecutors-fallacy.js` 两套零重叠符号），`git checkout --theirs` 是赌不是解。三步验证：① `comm -23` 对比两侧 `^(const|let|function)` 符号集，列出对方没有的符号；② 把「本地独有符号」对应的回归样本逐条打一遍上游实现（本例本地独有的医学腿修复，上游注释提了但正则没覆盖，实测本地样本 miss 才暴露）；③ 整个 rebase 在 `git clone --no-hardlinks` 的沙箱里跑完整流程并跑门禁，全绿后才在真实仓库重复同样步骤。另外 jsonl 账本（claims.jsonl 一类）合并后必须逐行 `json.loads` 校验——上游历史缺陷会把两条记录写成一行（`}{`），并集后仍留着。
+23. **add/add 冲突先在沙箱预演，并用符号集证明「取上游」不丢东西**（2026-11-08 实战）：两侧独立实现同一新文件时（本例 `src/prosecutors-fallacy.js` 两套零重叠符号），`git checkout --theirs` 是赌不是解。三步验证：① `comm -23` 对比两侧 `^(const|let|function)` 符号集，列出对方没有的符号；② 把「本地独有符号」对应的回归样本逐条打一遍上游实现（本例本地独有的医学腿修复，上游注释提了但正则没覆盖，实测本地样本 miss 才暴露）；③ 整个 rebase 在 `git clone --no-hardlinks` 的沙箱里跑完整流程并跑门禁，全绿后才在真实仓库重复同样步骤。另外 jsonl 账本（claims.jsonl 一类）合并后必须逐行 `json.loads` 校验——上游历史缺陷会把两条记录写成一行（`}{`），并集后仍留着。**追加型账本的冲突解法是双方行都保留**（our 段 + their 段原样拼回、清掉冲突标记后再逐行 `json.loads` 复核条数），不是取一侧——两侧是同格式的不同轮次记录，丢任何一侧都是丢一条认领历史。
 
 24. **孤儿导入（import 了从不使用的符号）** — 解构导入的每个符号名在该文件出现次数必须 ≥2（import 行自身 + 至少一处使用），计数为 1 即孤儿；整行 require 赋值同理。删调用点的同一轮必须复查被 touch 文件的 import 区——死 import 会伪装成「这个依赖还活着」，让后来者误判接线状态。修法：整行删，lazy loader 的 `_Xxx` 与 require 赋值行成对删。验证：`node --check` + 引擎加载 + 计数复测归 0。批量识别脚本见 `references/audit-fix-patterns.md` 第 12 节。
 
 25. **cron resume 的 job_id 是精确匹配，报 not found 时唯一正确处置是回权威源取 ID**：`cronjob_manage action=resume job_id=xxx` 抄错一位、凭记忆写、从旧会话抄都会 `not found`，而重试同一错 ID 只是白烧轮次。权威源两个：`cronjob_manage action=list` 的实时枚举，或直接读 `~/hermes1/cron/jobs.json`（`json.load` 后逐条打 id/name/enabled/state/paused_at）。暂停时记下的 job_id 列表也要在 resume 前与 list 输出核对一遍——暂停与恢复之间隔着一整轮修复，list 可能已变。恢复后按全启用口径逐条断言，漏 resume 的定时任务不会自愈。
+
+26. **`matchAll` 要求 `/g`、`match` 无 `/g` 时把捕获组算成命中数**——两个方向相反的坑会在同一处命中计数代码里先后出现，改计数写法时必须两个都防：`[...text.matchAll(pattern)].length` 在 pattern 只带 `/i` 时直接抛 `TypeError: String.prototype.matchAll called with a non-global RegExp argument`（该文件全部单测瞬间全挂，且 `node --check` 查不出——语法合法、运行才炸）；而 `text.match(pattern)` 无 `/g` 时返回数组长度 = 1 + 捕获组数，拿 `.length` 当命中次数会把良性句的捕获组计成命中、把无害措辞放大成误伤。共用修法：抽一个 `_countMatches(text, pattern)`——`const flags = pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g';` 重建同源正则后计数，**只补 `g`、保留 `i`/`m` 语义，不动模式库本身**（模式库常被其他 `match`/`test` 调用共享，整体改 `/gi` 会连带改变别处行为）。验证必须是该模块单测 + 良性样本直测（0 误伤），不是只 `node --check`。
 
 ---
 
