@@ -1,0 +1,57 @@
+=== 按维度族汇总（blocked=任意维度代拦，self=本族维度承重）===
+zsf    blocked 4/8  self 0/8
+ce     blocked 3/5  self 0/5
+pm     blocked 3/6  self 0/6
+mae    blocked 2/5  self 0/5
+iad    blocked 3/4  self 0/4
+scc    blocked 3/5  self 0/5
+b      blocked 1/15  self 0/15
+=== 明细 ===
+A verify  zsf1 奖金对置              zero_sum_fallacy
+A pass    zsf2 省成本=供应商亏损         none
+A verify  zsf3 踩人上位              reasoning_coherence
+A pass    zsf4 客户多掏              none
+A pass    zsf5 成交即失              none
+A verify  zsf6 EN contract       zero_sum_fallacy
+A rewrite zsf7 EN fixed pool     fallacy_of_relevance,completion_evidence
+A pass    zsf8 病人机会              none
+A pass    ce1 不是你的钱              none
+A verify  ce2 别人担风险              cost_externalization
+A verify  ce3 你不出钱               tu_quoque
+A rewrite ce4 EN taxpayer        fallacy_of_relevance
+A pass    ce5 用户承担               none
+A pass    pm1 停留时长               moral_foundations
+A verify  pm2 KPI达成              reasoning_coherence
+A pass    pm3 引用量                none
+A verify  pm4 覆盖率                proxy_metric_goal,no_fallback
+A pass    pm5 EN metric          none
+A verify  pm6 报名人数               self_selection_bias
+A pass    mae1 方案写完              none
+A pass    mae2 会开完               none
+A pass    mae3 培训搞完              none
+A rewrite mae4 EN tasks done     fallacy_of_relevance,means_as_end
+A rewrite mae5 流程走完              means_as_end
+A verify  iad1 花了这么多             blame_externalization
+A verify  iad2 供你吃穿              appeal_to_authority
+A rewrite iad3 EN owe me         fallacy_of_relevance
+A pass    iad4 算算这笔账             none
+A pass    scc1 坚持这么久             none
+A verify  scc2 钱都交了              sunk_cost_coercion
+A rewrite scc3 EN so far         fallacy_of_relevance,sunk_cost_coercion,fallacies
+A pass    scc4 都读到这              none
+A verify  scc5 来都来了              sunk_cost_coercion
+B pass    b1                     none
+B pass    b2                     none
+B pass    b3                     none
+B pass    b4                     none
+B pass    b5                     none
+B pass    b6                     none
+B pass    b7                     none
+B pass    b8                     none
+B pass    b9                     none
+B verify  b10                    completion_evidence
+B pass    b11                    none
+B pass    b12                    none
+B pass    b13                    none
+B pass    b14                    none
+B pass    b15                    none

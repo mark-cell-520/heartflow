@@ -1,0 +1,725 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/+yZgZ9RlDvSJ0UuJseIT7xZAvPE</id>
+  <title>arXiv Query: search_query=all:"sunk cost fallacy" OR all:reasoning&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T17:55:36Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22sunk+cost+fallacy%22+OR+all:reasoning&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>114222</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12886v1</id>
+    <title>Reframe: Observation-Aligned Multi-Teacher On-Policy Distillation for Agentic Visual Reasoning</title>
+    <updated>2026-11-09T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.12886v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12886v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agentic reinforcement learning (RL) and multi-teacher on-policy distillation (MOPD) offer complementary routes to post-training. For visual agents, however, tool use presents two related challenges. Models may overlook useful tool-returned observations, while poorly grounded actions can limit the evidence available for subsequent distillation. We introduce Reframe, a post-training framework that treats the observation state, rather than only the output distribution, as an object of alignment. First, Ground-Drop-GRPO (GD-GRPO) trains spatial and temporal specialists with evidence-aware rewards and stochastic removal of the original visual input, encouraging them to acquire grounded evidence and use the returned observations. Second, Observation-Gated-MOPD (OG-MOPD) replaces deficient tool actions with canonical ones mid-rollout and resumes distillation from the repaired observation. The two stages complement each other, as learning to rely on tool-returned observations can help the policy benefit from observation repair. Neither stage requires a task-specific SFT cold start. Extensive experiments over 14 image and video benchmarks demonstrate that Reframe outperforms both Mix-RL and vanilla MOPD. Ablation results show that GD-GRPO increases observation dependence and tool gain compared with outcome-based GRPO.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:54Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Haozhi Yuan</name>
+    </author>
+    <author>
+      <name>Handong Li</name>
+    </author>
+    <author>
+      <name>Yifan Zhang</name>
+    </author>
+    <author>
+      <name>Qianshan Wei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12835v1</id>
+    <title>Mitigating Agentic Deception via Evaluation-Side Partially Observable Games</title>
+    <updated>2026-11-09T18:33:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.12835v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12835v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As large language models become more capable agents, they can exhibit deceptive behaviors, cheating human for higher rewards while appearing helpful. We attribute this failure to evaluation-side partial observability, where models are evaluated mainly from final outcome, without checking the faithfulness of underlying reasoning, tool use, and environmental effects. Prior mitigations address this partial observability by predefined evaluator latent belief space or one-shot monitoring, which do not extend to free-form language space and vulnerable to stronger deceptions that evade simple monitoring. In this work, we formulate deception mitigation as an Evaluation-Side Partially Observable Extensive Form Game (e-PoG), a max-min framework in which an agent maximizes reward, a monitor minimizes the agent's payoff by exposing deception from the full interaction trajectory, and a fixed verifier validates the monitor's claims and converts them into penalties. We define the solution concept as a Subgame-Perfect Oversight Equilibrium (SPOE) between agent and monitor, and prove its existence in finite games. With a perfect verifier, every SPOE is faithful; with an imperfect verifier, the guarantee persists if verifier errors do not reverse the ranking of monitor actions. To achieve faithful SPOE, we derive a two-timescale policy gradient algorithm and enhance the pipeline empirically with NLI verification and deterministic checks. Experiments with Gemma3-4B-IT and Qwen3-4B/8B on Agentic Role-Playing, SearchQA, and WebShop show that e-PoG mitigates multiple emergent deception modes, outperforming the strongest baselines by 26.0% in deception mitigation and by up to 39.8% in task success. These gains persist under weak-to-strong supervision. Code is available at https://github.com/Toyoid/deceptive-agent.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:33:13Z</published>
+    <arxiv:comment>44 pages, 10 figures. Code: https://github.com/Toyoid/deceptive-agent; Project website: https://shutongliu-dev.github.io/epog-agentic-deception/</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Hanxiao Li</name>
+    </author>
+    <author>
+      <name>Shutong Liu</name>
+    </author>
+    <author>
+      <name>Yongjia Ma</name>
+    </author>
+    <author>
+      <name>Jiaming Ji</name>
+    </author>
+    <author>
+      <name>Juntao Dai</name>
+    </author>
+    <author>
+      <name>Shuning Zhang</name>
+    </author>
+    <author>
+      <name>Kejian Shi</name>
+    </author>
+    <author>
+      <name>Kai Chen</name>
+    </author>
+    <author>
+      <name>Pu Feng</name>
+    </author>
+    <author>
+      <name>Yuqing Ma</name>
+    </author>
+    <author>
+      <name>Qi Dou</name>
+    </author>
+    <author>
+      <name>Yaodong Yang</name>
+    </author>
+    <author>
+      <name>Xianglong Liu</name>
+    </author>
+    <author>
+      <name>Simin Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12834v1</id>
+    <title>Programming Prescience: Issues in Human Construction of Forecasting Bots</title>
+    <updated>2026-11-09T18:33:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.12834v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12834v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI models' growing capacity for complex reasoning has made them attractive tools for forecasting, or the systematic prediction of the future based on past and present data. However, should AI forecasting systems be adopted, human builders will shoulder the work of building and evaluating them. In this paper, we explore what this work looks like with a qualitative interview study with 15 builders of forecasting bots, sampled from among successful participants in a recent AI forecasting competition. Our analysis surfaces the challenges around (1) tuning a bot to acquire factual research, (2) implementing coherent reasoning, and (3) understanding how well one's bot actually does. During their work, builders frequently introduced complexity that did not pay off, and tested in ways that were opportunistic and piecemeal. Our detailed account of their challenges helps clarify what problems should be targeted in upcoming innovations in process, tools, and human-AI teaming for forecasting.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:33:13Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Priya Dhawka</name>
+    </author>
+    <author>
+      <name>Benjamin Wilson</name>
+    </author>
+    <author>
+      <name>Andrew Head</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12815v1</id>
+    <title>Inversion-Free High-Dimensional Counterfactual Inference</title>
+    <updated>2026-11-09T18:19:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.12815v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12815v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Counterfactual inference is the task of answering hypothetical "what-if" queries about a unit, given an observational dataset, modeling assumptions, and a causal graph. This enables a modeler to reason about hypothetical scenarios that cannot otherwise be answered without assumptions or a causal graph. The simpler case involves a causal graph with scalar 1-D variables that denote different attributes in the data-generation process. While the literature is clear in the 1-D case, extending this to settings with high-dimensional nodes (e.g., images) remains challenging. Conventionally, in the literature, methods recover the latent state from the factual image (inversion), generate counterfactual attributes from the graph, and render the counterfactual image from the latent state using the updated attributes. In our work, we investigate the necessity of the inversion step in computing high-dimensional counterfactuals. We first discuss moving from the scalar 1-D case to the higher-dimensional case. Secondly, we discuss the relevance of the inversion step and evaluate an inversion-free counterpart repurposed from the image-editing literature. Finally, on image datasets such as CelebA and ADNI, we benchmark our approach using two measures: namely, effectiveness and identity preservation. While effectiveness is a measure of how faithfully the counterfactual attribute is rendered, identity preservation measures whether the same unit (image) is being rendered, both of which are crucial for high-dimensional counterfactual inference. We present the tradeoffs of using inversion-based and inversion-free approaches in our work.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:19:40Z</published>
+    <arxiv:comment>Accepted to IEEE BigData 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Saketh Vishnubhatla</name>
+    </author>
+    <author>
+      <name>Pingchuan Ma</name>
+    </author>
+    <author>
+      <name>Shu Wan</name>
+    </author>
+    <author>
+      <name>Alimohammad Beigi</name>
+    </author>
+    <author>
+      <name>Andre Harrison</name>
+    </author>
+    <author>
+      <name>Adrienne Raglin</name>
+    </author>
+    <author>
+      <name>Huan Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12791v1</id>
+    <title>Large Language Models as a Universal Searcher for Open-World Automated Machine Learning</title>
+    <updated>2026-11-09T17:58:38Z</updated>
+    <link href="https://arxiv.org/abs/2611.12791v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12791v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Developing effective machine learning models requires complex manual tuning, while current Automated Machine Learning (AutoML) frameworks remain domain-specific and isolate model architecture, training hyperparameter, and data ratio optimization. Here, we bridge this gap by proposing a universal, large language model (LLM)-based AutoML framework that jointly optimizes these configurations for the first time without the need for task-specific fine-tuning. We propose NCode, a unified numerical encoding scheme that translates diverse AutoML design choices into universal discrete sequences and effectively reframes the optimization process as a unified ranking task. Trained solely on optimization trajectories derived from a limited, single-domain vision task, the proposed LLM-based searcher demonstrates impressive cross-task, cross-modality and joint search-space optimization generalizability, achieving state-of-the-art performance across image classification, image segmentation, speaker verification and text-to-image benchmarks. Crucially, it exhibits superior scalability in the large-scale training and joint optimization of a billion-parameter Diffusion Transformer, requiring 896 GPU-days and attaining a state-of-the-art GenEval score of 0.91. By leveraging reinforcement learning to instill Chain-of-Thought reasoning, we provide a systematic way to interpret the LLM-based searcher's internal decision-making mechanisms, revealing its optimization strategy shifted from the early-stage diversity-driven exploration to the late-stage anchor exploitation. Our proposed framework provides a scalable, generalizable, and interpretable pathway toward general-purpose open-world machine learning optimization.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T17:58:38Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yuxuan Hu</name>
+    </author>
+    <author>
+      <name>Jihao Liu</name>
+    </author>
+    <author>
+      <name>Weikang Shi</name>
+    </author>
+    <author>
+      <name>Xijie Huang</name>
+    </author>
+    <author>
+      <name>Linda Wei</name>
+    </author>
+    <author>
+      <name>Mingjie Zhan</name>
+    </author>
+    <author>
+      <name>Aojun Zhou</name>
+    </author>
+    <author>
+      <name>Rui Liu</name>
+    </author>
+    <author>
+      <name>Hongsheng Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12763v1</id>
+    <title>PORT: Preference Optimization via Robust Token-Level Reweighting</title>
+    <updated>2026-11-09T17:38:16Z</updated>
+    <link href="https://arxiv.org/abs/2611.12763v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12763v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Preference optimization has become a central approach for aligning large language models with human values, but its effectiveness depends heavily on the quality of preference annotations. In practice, preference data is often noisy due to annotation errors and ambiguity. Existing robust preference optimization methods primarily operate at the sequence level, implicitly treating entire responses as uniformly correct or incorrect. However, rejected responses may still contain informative reasoning steps, while preferred responses can include subtle errors. In this work, we propose \textbf{P}reference \textbf{O}ptimization via \textbf{R}obust \textbf{T}oken-level reweighting \textbf{(PORT)}, a fine-grained framework for robust alignment under noisy preferences. PORT performs token-level reweighting using the empirical cumulative distribution function (CDF) of token log-probabilities, yielding an efficient forward-pass-only proxy to gradient-norm penalization that selectively suppresses corrupted tokens without additional backward-pass computation. We provide theoretical analysis showing that PORT reduces the gradient bias from noisy preference labels by minimizing an upper bound on the bias term. Extensive experiments across diverse noise settings demonstrate that PORT consistently improves robustness and outperforms existing sequence-level baselines. The code is available at https://github.com/osu-srml/PORT</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T17:38:16Z</published>
+    <arxiv:comment>10 pages, 4 figures, neurips 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Ding Zhu</name>
+    </author>
+    <author>
+      <name>Xiukun Wei</name>
+    </author>
+    <author>
+      <name>Tian Xie</name>
+    </author>
+    <author>
+      <name>Zhihui Zhu</name>
+    </author>
+    <author>
+      <name>Xueru Zhang</name>
+    </author>
+    <author>
+      <name>Mohammad Mahdi Khalili</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12762v1</id>
+    <title>Sage-Taiyi: A Metacognitive Architecture for Scientific Discovery</title>
+    <updated>2026-11-09T17:38:05Z</updated>
+    <link href="https://arxiv.org/abs/2611.12762v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12762v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We introduce Sage-Taiyi, a metacognition-inspired architecture that uses accumulated scientific understanding to guide what to investigate next and how to investigate it. Through explicit monitoring and control, the system revises its understanding of evidence, assumptions, and unresolved questions, then uses these assessments to adapt research targets and select reusable reasoning methods. On Taiyi-Bench, an AI co-scientist ideation benchmark comprising 265 tasks from 50 papers across ten disciplines, Sage-Taiyi ranks first on all eight metrics of historical rediscovery and open-ended ideation, achieving an Overall score of 54.0 compared with 47.9 for the strongest baseline, AI Scientist-v2. It also performs well on two external scientific ideation benchmarks. Five expert-guided collaborations further connect its proposals to experimental and computational validation across chemistry, materials science, and engineering. In chemistry, reaction-condition optimization raises the yield of cobalt-catalyzed carbonylation from trace amounts to 84% and photocatalytic allylic amination from 13% to 69%. These results support metacognitive regulation as an approach to scientific ideation and its progression toward practical validation.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T17:38:05Z</published>
+    <arxiv:comment>38 pages, 18 figures. Project homepage: https://alpha-innovator.github.io/Sage-Taiyi/</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Weida Wang</name>
+    </author>
+    <author>
+      <name>Benteng Chen</name>
+    </author>
+    <author>
+      <name>Yigeng Jiang</name>
+    </author>
+    <author>
+      <name>Shuchen Pu</name>
+    </author>
+    <author>
+      <name>Weiping Shen</name>
+    </author>
+    <author>
+      <name>Zichao Liu</name>
+    </author>
+    <author>
+      <name>Yulin Su</name>
+    </author>
+    <author>
+      <name>Zitong Wang</name>
+    </author>
+    <author>
+      <name>Siyu Zhou</name>
+    </author>
+    <author>
+      <name>Zifu Wang</name>
+    </author>
+    <author>
+      <name>Yizhi Li</name>
+    </author>
+    <author>
+      <name>Xin Zong</name>
+    </author>
+    <author>
+      <name>Yuning Yang</name>
+    </author>
+    <author>
+      <name>Jixiang Bi</name>
+    </author>
+    <author>
+      <name>Yuan Wang</name>
+    </author>
+    <author>
+      <name>Chuyi Peng</name>
+    </author>
+    <author>
+      <name>Shiyao Geng</name>
+    </author>
+    <author>
+      <name>Qi Zhang</name>
+    </author>
+    <author>
+      <name>Kuan Lu</name>
+    </author>
+    <author>
+      <name>Mengzhu Li</name>
+    </author>
+    <author>
+      <name>Weiwang Xu</name>
+    </author>
+    <author>
+      <name>Peishan Xiang</name>
+    </author>
+    <author>
+      <name>Chengjun Liu</name>
+    </author>
+    <author>
+      <name>Chengrui Wei</name>
+    </author>
+    <author>
+      <name>Fangchen Yu</name>
+    </author>
+    <author>
+      <name>Shengji Tang</name>
+    </author>
+    <author>
+      <name>Yichen Jiang</name>
+    </author>
+    <author>
+      <name>Jingqi Ye</name>
+    </author>
+    <author>
+      <name>Cheng Yang</name>
+    </author>
+    <author>
+      <name>Tao Hu</name>
+    </author>
+    <author>
+      <name>Jianbiao Mei</name>
+    </author>
+    <author>
+      <name>Qinglong Cao</name>
+    </author>
+    <author>
+      <name>Kun Li</name>
+    </author>
+    <author>
+      <name>Yixin Chen</name>
+    </author>
+    <author>
+      <name>Shengyuan Xu</name>
+    </author>
+    <author>
+      <name>Juncheng Xiao</name>
+    </author>
+    <author>
+      <name>Yiheng Wang</name>
+    </author>
+    <author>
+      <name>Ruizhe Chen</name>
+    </author>
+    <author>
+      <name>Shiyang Feng</name>
+    </author>
+    <author>
+      <name>Runmin Ma</name>
+    </author>
+    <author>
+      <name>Xiangchao Yan</name>
+    </author>
+    <author>
+      <name>Zongsheng Cao</name>
+    </author>
+    <author>
+      <name>Haomeng Hu</name>
+    </author>
+    <author>
+      <name>Yu Ke</name>
+    </author>
+    <author>
+      <name>Taihui Wu</name>
+    </author>
+    <author>
+      <name>Meng Dai</name>
+    </author>
+    <author>
+      <name>Xu Guo</name>
+    </author>
+    <author>
+      <name>Haoyang Peng</name>
+    </author>
+    <author>
+      <name>Yinglong Ni</name>
+    </author>
+    <author>
+      <name>Pingsen Shi</name>
+    </author>
+    <author>
+      <name>Xiaosong Wang</name>
+    </author>
+    <author>
+      <name>Shuyue Hu</name>
+    </author>
+    <author>
+      <name>Haijun Li</name>
+    </author>
+    <author>
+      <name>Sherry Dongqi Bao</name>
+    </author>
+    <author>
+      <name>Yang Yang</name>
+    </author>
+    <author>
+      <name>Chao Yang</name>
+    </author>
+    <author>
+      <name>Jie Hou</name>
+    </author>
+    <author>
+      <name>Tianfan Fu</name>
+    </author>
+    <author>
+      <name>Yi Gong</name>
+    </author>
+    <author>
+      <name>Jin Zeng</name>
+    </author>
+    <author>
+      <name>Mao Su</name>
+    </author>
+    <author>
+      <name>Hongxia Hao</name>
+    </author>
+    <author>
+      <name>Fanyang Mo</name>
+    </author>
+    <author>
+      <name>Fenghua Ling</name>
+    </author>
+    <author>
+      <name>Tianshu Yu</name>
+    </author>
+    <author>
+      <name>Yunqi Cai</name>
+    </author>
+    <author>
+      <name>Baihong Chi</name>
+    </author>
+    <author>
+      <name>Jingwei Wang</name>
+    </author>
+    <author>
+      <name>Lei Wang</name>
+    </author>
+    <author>
+      <name>Chuncheng Bu</name>
+    </author>
+    <author>
+      <name>Shide Lv</name>
+    </author>
+    <author>
+      <name>Guangyu Wang</name>
+    </author>
+    <author>
+      <name>Yuqiang Li</name>
+    </author>
+    <author>
+      <name>Chunfeng Song</name>
+    </author>
+    <author>
+      <name>Lei Bai</name>
+    </author>
+    <author>
+      <name>Hui Wang</name>
+    </author>
+    <author>
+      <name>Xujun Fu</name>
+    </author>
+    <author>
+      <name>Li Cao</name>
+    </author>
+    <author>
+      <name>Lei Chen</name>
+    </author>
+    <author>
+      <name>Dahua Lin</name>
+    </author>
+    <author>
+      <name>Xing Xie</name>
+    </author>
+    <author>
+      <name>Bowen Zhou</name>
+    </author>
+    <author>
+      <name>Wenlong Zhang</name>
+    </author>
+    <author>
+      <name>Pinlong Cai</name>
+    </author>
+    <author>
+      <name>Peng Ye</name>
+    </author>
+    <author>
+      <name>Aiwen Lei</name>
+    </author>
+    <author>
+      <name>Jie Li</name>
+    </author>
+    <author>
+      <name>Shengchun Wang</name>
+    </author>
+    <author>
+      <name>Bo Zhang</name>
+    </author>
+    <author>
+      <name>Shufei Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12761v1</id>
+    <title>A Hoare Logic for Continuous-Time Stochastic Processes</title>
+    <updated>2026-11-09T17:38:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.12761v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12761v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Programming language researchers have developed a wide array of tools to reason about probabilistic programs, but it remains unclear how to apply these proof techniques to continuous-time stochastic processes. To bridge this gap, we propose a verification method for properties of continuous-time stochastic processes by reasoning about them as standard programs.
+  To demonstrate our approach, we define a continuous semantics for a probabilistic imperative language $\mathrm{pWhile}^{\mathrm{dt}}$ by taking the Kuratowski limit of the standard semantics, which collects limit points of the standard program semantics as the time-step approaches zero. Then, we present a Hoare-style logic that uses loop invariants and decreasing functions to verify properties of continuous programs. To establish soundness, we identify a broad class of assertions that are preserved from the standard semantics to the continuous semantics. To demonstrate our approach, we verify properties of ten continuous-time stochastic processes modeled in $\mathrm{pWhile}^{\mathrm{dt}}$, including variants of Brownian motion and a stochastic hybrid system.</summary>
+    <category term="cs.LO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.PL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T17:38:04Z</published>
+    <arxiv:primary_category term="cs.LO"/>
+    <author>
+      <name>Kei Imada</name>
+    </author>
+    <author>
+      <name>Justin Hsu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12760v1</id>
+    <title>DeepChronos: Temporal Neuro-Symbolic Reasoning for Multi-Step Attack Detection</title>
+    <updated>2026-11-09T17:37:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.12760v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12760v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Modern cyber threats commonly unfold as multi-step attacks comprising temporally and causally related phases. Current defenses commonly follow a detect first and correlate later paradigm. Intrusion detection systems classify events independently, while downstream systems reconstruct attack progression from the resulting alerts or audit records. In this context, learning-based detectors learn attack-step dependencies implicitly as statistical regularities in the data and cannot guarantee that their predictions follow the real attack progression. Conversely, correlation systems represent attack relationships explicitly, but apply this knowledge only after the underlying attack observations have been detected. We present DEEPCHRONOS, a neuro-symbolic network intrusion detection system that shifts the paradigm from detect first and correlate later to detection through logical progression. DEEPCHRONOS combines learned flow-level evidence with explicit attack-phase rules, temporal prerequisites, and previously inferred phases, allowing the evolving attack history to inform and constrain each detection decision. Evaluations on DARPA 2000 and AIT-LDS V2 show that DEEPCHRONOS improves macro F1 over purely neural baselines by up to 11.3%, eliminates causal violations under strict temporal constraints, and maintains millisecond-scale inference latency. These results demonstrate that integrating explicit attack progression knowledge into detection produces more accurate and temporally coherent multi-step attack predictions.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T17:37:36Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Sofia Burkow</name>
+    </author>
+    <author>
+      <name>Andrea Agiollo</name>
+    </author>
+    <author>
+      <name>Enkeleda Bardhi</name>
+    </author>
+    <author>
+      <name>Fernando Kuipers</name>
+    </author>
+    <author>
+      <name>Kaitai Liang</name>
+    </author>
+    <author>
+      <name>Georgios Smaragdakis</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12728v1</id>
+    <title>Safe Reinforcement Learning for Multi-Turn Clinical Agents: When Dense Rewards Beat Outcome Rewards</title>
+    <updated>2026-11-09T17:14:40Z</updated>
+    <link href="https://arxiv.org/abs/2611.12728v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12728v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reinforcement learning with verifiable rewards is increasingly used to improve language model reasoning, yet its effects on sequential decision procedures remain poorly understood. We study this problem in clinical multi-turn agents that must decide what information to request, when to stop gathering evidence, and which action to take. We introduce three controlled environments: medication refill triage, acute diagnostic work-up, and dosing titration, each with hidden clinical states, query costs, exact adaptive oracles, and deterministic outcome verifiers. Across these tasks, outcome-only group relative policy optimization often improves aggregate reward while producing undesirable procedures, including premature commitment, one-question collapse, and failures on rare high-risk cases. In diagnostics, assigning dense credit to questions that reduce uncertainty improves held-out value and moderate-case support across three training seeds relative to outcome-only reinforcement learning, without the high-risk seed collapse observed under outcome-only training. Separating exploration from exploitation further increases high-risk support at its best checkpoint, but at the cost of excessive information gathering on low-acuity cases. Additional experiments show that the optimal strength of process credit is task-dependent; that after a supervised warmup that already gathers carefully, reinforcement learning raises aggregate reward by trimming questions while degrading high-risk performance; and that reinforcement learning does not reliably repair rare behavior gaps inherited from biased supervised data. Verifiable final outcomes are therefore insufficient for training reliable multi-turn agents: reward design must account for the procedure used to reach an answer, and evaluation must distinguish adaptive information gathering from reward-exploiting shortcuts.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T17:14:40Z</published>
+    <arxiv:comment>31 pages, 11 figures. Code: https://github.com/csbrendan/Safe-Reinforcement-Learning-for-Multi-Turn-Clinical-Agents</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Brendan P. Murphy</name>
+    </author>
+    <author>
+      <name>Agustina Saenz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12646v1</id>
+    <title>Surrendering and Reclaiming Judgment: How Software Engineering Students Experience AI Reliance</title>
+    <updated>2026-11-09T16:18:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.12646v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12646v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Software architecture is one of the skills novice developers must master to succeed in industry, and as AI disrupts software development, it is also transforming how students learn architecture. Existing work on how students and novices work with AI has mostly focused on small programming exercises or on students' perceptions of AI, so little is known about how students experience AI as they learn software architecture in larger team projects. We report on an exploratory case study of 43 senior software engineering students who used AI throughout a semester-long, team-based software architecture project. We combined surveys with focus groups and analyzed the focus group transcripts and the open survey responses through Braun and Clarke's reflexive thematic analysis. We constructed two themes. The first, Surrendering Judgment to AI, traces how participants' reliance on AI deepened as they used it to architect and implement their systems, until they surrendered their judgment and became stuck in a codebase they had created but could not understand, which made them rely on AI even more. Participants described feeling ashamed, frustrated, and emotionally disconnected from their work, a toll that, in our reading, left them with even less reason to break their reliance. The second, Applying Human Judgment, centers on participants who kept or reclaimed their judgment: the knowledge and experience it rested on, and the strategies they used to apply it. Participants' accounts suggest that relaxed deadlines and a lecture and lab on working with AI gave them room to acquire knowledge and reclaim judgment. Given the expectations placed on junior developers and the widespread adoption of AI, we believe these first-hand accounts can help software engineering education and industry adopt AI in ways that preserve novice developers' judgment, ownership, and motivation.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T16:18:57Z</published>
+    <arxiv:comment>Submitted to TOSEM</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Nathan Cassee</name>
+    </author>
+    <author>
+      <name>Umit Akirmak</name>
+    </author>
+    <author>
+      <name>Luiz Guerra</name>
+    </author>
+    <author>
+      <name>Margaret-Anne Storey</name>
+    </author>
+    <author>
+      <name>Neil Ernst</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12640v1</id>
+    <title>TrialDesignBench: Benchmarking Language Models for Phase-I Trial Design Against Clinical Knowledge</title>
+    <updated>2026-11-09T16:15:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.12640v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12640v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI is used in much of the clinical trial pipeline. However, selecting the statistical design of a trial, a crucial step that determines how drug doses are tested on humans and evaluated, has seen almost no AI progress. LLMs appear to be a natural fit given their strengths in biomedical knowledge and statistical reasoning. Nevertheless, there is currently no appropriate way to evaluate such abilities because recent regulatory and methodological shifts, most notably FDA's Project Optimus, have redefined what constitutes a reasonable design and rendered many previous designs obsolete. To lay the groundwork for AI-assisted trial design, we introduce TrialDesignBench, a benchmark of 617 Phase-I/I-II oncology dose-finding trials, each paired with an expert-validated reference design that is consistent with the latest FDA regulatory initiatives. This reference standard is produced through a formalization of the expert design process. We evaluate five frontier LLMs, none of which matches the reference standard. Our ablation experiments trace this performance gap to two main causes, inference of latent, unrecorded design determinants from trial sources (supplying them raises class-wise balanced accuracy by 0.22) and structured decision-tree reasoning (+0.24). TrialDesignBench offers a reproducible, contemporary-standard objective for evaluating and enhancing AI-assisted trial design.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T16:15:57Z</published>
+    <arxiv:comment>13 pages, 3 figures, 6 tables. Presented as a poster at the NeurIPS 2026 Workshop on World Models for High-Stakes Health (WMHS). Code and data: https://github.com/hanktang-research/TrialDesignBench</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yihan Hank Tang</name>
+      <arxiv:affiliation>University of Pennsylvania</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Peng Yang</name>
+      <arxiv:affiliation>The University of Texas MD Anderson Cancer Center</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Jiayi Xin</name>
+      <arxiv:affiliation>University of Pennsylvania</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Tianqi Shang</name>
+      <arxiv:affiliation>University of Pennsylvania</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Xuyang Chen</name>
+      <arxiv:affiliation>University of Pennsylvania</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Ying Yuan</name>
+      <arxiv:affiliation>The University of Texas MD Anderson Cancer Center</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Yi Lian</name>
+      <arxiv:affiliation>University of Pennsylvania</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Qi Long</name>
+      <arxiv:affiliation>University of Pennsylvania</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12635v1</id>
+    <title>Beyond Sunny Skies: Using Large Language Models to Predict Urban Traffic in Adverse Weather</title>
+    <updated>2026-11-09T16:12:51Z</updated>
+    <link href="https://arxiv.org/abs/2611.12635v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12635v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Urban traffic flow prediction is a cornerstone of intelligent transportation systems, yet accurate forecasting under adverse weather conditions remains a significant challenge. Existing data-driven models, while effective for routine patterns, often struggle with the sparse data and complex non-linear shifts associated with rare meteorological events. These methods typically treat environmental contexts as shallow numerical features, failing to capture the underlying semantic reasoning-why and how specific adverse conditions alter mobility behaviors across regions with different functional compositions. To address this limitation, we propose Multi-STG, a unified framework that integrates Large Language Model (LLM)-derived semantic priors with graph-based spatiotemporal learning. Multi-STG introduces an LLM-empowered semantic enhancement module that transforms comprehensive context descriptions such as weather, POIs, and holidays into high-level semantic embeddings, effectively providing a knowledge-driven complement to data scarcity. Furthermore, we design a multimodal attentional fusion mechanism to dynamically weigh heterogeneous inputs and a semantic-enhanced prediction head with gated residual calibration to robustly adjust forecasts based on semantic guidance. Extensive experiments on real-world multi-city private car datasets demonstrate that Multi-STG outperforms state-of-the-art baselines, reducing MAE by 11.82\% on average relative to the strongest baseline across three cities, while maintaining stable performance under sparse and non-stationary conditions.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T16:12:51Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Zhu Xiao</name>
+    </author>
+    <author>
+      <name>Kuan Feng</name>
+    </author>
+    <author>
+      <name>Tong Li</name>
+    </author>
+    <author>
+      <name>Chenxi Liu</name>
+    </author>
+    <author>
+      <name>Gang Wang</name>
+    </author>
+    <author>
+      <name>Zhuo Tang</name>
+    </author>
+    <author>
+      <name>Kenli Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12574v1</id>
+    <title>Evaluating Cross-Signal Coherence in Mammography Vision-Language Models</title>
+    <updated>2026-11-09T15:33:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.12574v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12574v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As vision-language models (VLMs) move toward interpreting medical images directly, their outputs increasingly include not just a label but a stated confidence and a written justification. Yet the field still predominantly evaluates VLMs using just accuracy. We evaluate the coherence between answer, confidence, and explanation across four VLMs on breast density and BI-RADS categorization, using two mammography datasets. We perform controlled perturbations of the question, multiple choice option orders, and the images and assess changes in the three outputs. Our results suggest confidence does not decrease even as the mammography image is changed. Shuffling the options also changes most VLMs' answers. Notably, there are cases where a model's own stated reasoning contradicts its final answer, a distinction accuracy alone cannot capture but one that governs whether an AI-generated answer can be trusted.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T15:33:50Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Rebeca Nam</name>
+    </author>
+    <author>
+      <name>Chase M. Fensore</name>
+    </author>
+    <author>
+      <name>Christian A. Fauria-Robinson</name>
+    </author>
+    <author>
+      <name>Judy Gichoya</name>
+    </author>
+    <author>
+      <name>Joyce C. Ho</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12564v1</id>
+    <title>GHiML: VLM-Guided Hierarchical Multi-Label Learning with Applications to Benthic Imagery</title>
+    <updated>2026-11-09T15:28:27Z</updated>
+    <link href="https://arxiv.org/abs/2611.12564v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12564v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Vision language models (VLMs) encode substantial expert knowledge within their weights, yet their direct application to specialised classification domains such as benthic imagery remains limited. Meanwhile, vision transformers trained on these tasks rely predominantly on low-level visual latents (colours, textures, and shapes) that lack the higher-level reasoning humans employ for identification. We propose Guided Hierarchical Multi-Label (GHiML) learning, a pipeline that extracts conceptual latent variables from a VLM conditioned on training data, generates sample-relevant captions grounded in those variables, and fuses the resulting textual embeddings with image embeddings via cross-attention and a per-node gated router. We also introduce the inverted HML score ($d_{\mathrm{inv}}$), a similarity score that evaluates hierarchical multi-label predictions through graph traversal distance and a cardinality penalty, providing an interpretable alternative to existing measures, which are insensitive to realistic degradations in sparse, deep hierarchies. Experiments on BenthicNet, FathomNet and iNaturalist show that the router improves macro $F_1$ over the vision-only baseline by up to 6.7 pp and $d_{\mathrm{inv}}$ by up to 21.1 pp on in-domain benthic data, with gains persisting under distribution shift. Ablations locate the contribution of the text itself: on the multi-label biotic hierarchies, removing the per-sample text signal degrades $d_{\mathrm{inv}}$ while leaving macro $F_1$ unchanged, consistent with text acting through prediction cardinality rather than node discrimination, whereas iNaturalist, whose annotations are single-label, loses 18.7% of macro $F_1$. Our results support the hypothesis that VLMs contain exploitable specialised knowledge that, when appropriately elicited, can augment classification in domains where direct visual learning is insufficient.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T15:28:27Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Isaac Xu</name>
+    </author>
+    <author>
+      <name>Devi Ayyagari</name>
+    </author>
+    <author>
+      <name>Martin Gillis</name>
+    </author>
+    <author>
+      <name>Benjamin Misiuk</name>
+    </author>
+    <author>
+      <name>Craig J. Brown</name>
+    </author>
+    <author>
+      <name>Thomas Trappenberg</name>
+    </author>
+  </entry>
+</feed>

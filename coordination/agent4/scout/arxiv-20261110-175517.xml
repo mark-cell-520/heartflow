@@ -1,0 +1,429 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/tL/PKhdRZFa7Yt64JAMBTUbzR8w</id>
+  <title>arXiv Query: search_query=all:opportunity OR all:cost OR all:reasoning OR all:error&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T17:55:18Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:opportunity+OR+(all:cost+OR+(all:reasoning+OR+all:error))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>435033</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12886v1</id>
+    <title>Reframe: Observation-Aligned Multi-Teacher On-Policy Distillation for Agentic Visual Reasoning</title>
+    <updated>2026-11-09T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.12886v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12886v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agentic reinforcement learning (RL) and multi-teacher on-policy distillation (MOPD) offer complementary routes to post-training. For visual agents, however, tool use presents two related challenges. Models may overlook useful tool-returned observations, while poorly grounded actions can limit the evidence available for subsequent distillation. We introduce Reframe, a post-training framework that treats the observation state, rather than only the output distribution, as an object of alignment. First, Ground-Drop-GRPO (GD-GRPO) trains spatial and temporal specialists with evidence-aware rewards and stochastic removal of the original visual input, encouraging them to acquire grounded evidence and use the returned observations. Second, Observation-Gated-MOPD (OG-MOPD) replaces deficient tool actions with canonical ones mid-rollout and resumes distillation from the repaired observation. The two stages complement each other, as learning to rely on tool-returned observations can help the policy benefit from observation repair. Neither stage requires a task-specific SFT cold start. Extensive experiments over 14 image and video benchmarks demonstrate that Reframe outperforms both Mix-RL and vanilla MOPD. Ablation results show that GD-GRPO increases observation dependence and tool gain compared with outcome-based GRPO.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:54Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Haozhi Yuan</name>
+    </author>
+    <author>
+      <name>Handong Li</name>
+    </author>
+    <author>
+      <name>Yifan Zhang</name>
+    </author>
+    <author>
+      <name>Qianshan Wei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12882v1</id>
+    <title>Chiral waveguide model for error-correctable quantum computation</title>
+    <updated>2026-11-09T18:59:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.12882v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12882v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We develop a first-principles framework connecting microscopic waveguide scattering to quantum error correction and algorithmic performance. For polarization-encoded single photons interacting with an ensemble of two-level atoms in a chiral waveguide, we derive an effective polarization quantum channel by tracing out the frequency degree of freedom. Using this channel as the physical noise model for a rotated planar code, we observe threshold behavior as the number of atoms $N$ and the atom-waveguide coupling strength $Γ$ are varied. An asymptotic analysis of the microscopic scattering model explains the threshold scaling with $NΓ/σ$, where $σ$ is the photon spectral bandwidth. For identical, lossless atoms with symmetric real coupling and a photon spectrum centered at resonance, the effective noise is strongly biased toward $X$ errors. We then incorporate the resulting logical errors into quantum phase estimation and demonstrate that the noise bias can guide circuit design. In particular, a Hadamard-basis implementation reduces sensitivity to the dominant error, improving algorithmic performance.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:36Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Zixiang Hong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12878v1</id>
+    <title>Adaptive Quantization Preserves Fast Rates for TD Learning over Rate-Limited Channels</title>
+    <updated>2026-11-09T18:58:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.12878v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12878v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Motivated by reinforcement learning subject to communication constraints, we study a policy evaluation problem with linear function approximation over a rate-limited channel. In our setup, an agent interacting with an unknown environment (modeled as a Markov Decision Process) transmits quantized estimates of a temporal-difference (TD) learning update direction to a server over a finite-capacity channel. Our goal is to investigate to what extent one can preserve the statistical convergence rates achievable when the channel has infinite capacity. To that end, we propose a new algorithm called Batched Adaptively Quantized TD (BAQ-TD), which uses batching to reduce the variance of the transmitted information, and adaptive quantization to encode innovations. We prove a high-probability finite-time error bound for BAQ-TD, and show that, above a certain finite channel capacity, BAQ-TD preserves the convergence rate of unquantized TD up to logarithmic factors. Specifically, for a $d$-dimensional value function parameter, we establish that transmitting a total of $\mathcal{O}(d \log(T))$ bits over a horizon of length $T$ suffices to achieve the order-optimal rate of $\tilde{\mathcal{O}}(1/T)$, marking an exponential improvement in communication-complexity over prior work.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:58:41Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Sreejeet Maity</name>
+    </author>
+    <author>
+      <name>Aritra Mitra</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12875v1</id>
+    <title>Click3R: Interactive Stereo 3D Reconstruction with Sparse Correspondence Clicks</title>
+    <updated>2026-11-09T18:58:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.12875v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12875v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Despite impressive progress, existing feed-forward large 3D reconstruction models produce a single, irrevocable prediction. When these models fail, there is no mechanism to correct their mistakes. To address this limitation, we introduce Click3R, a framework for interactive geometric correction of feed-forward models using sparse human correspondence clicks. Given an image pair and a small set of cross-view point correspondences provided by a user, Click3R injects geometric constraints into the 3D reconstruction networks through a lightweight point correspondence adapter, enabling the model to resolve ambiguities in challenging scenarios such as repetitive textures, symmetric structures, large viewpoint changes, or textureless regions. To evaluate interactive reconstruction, we curate a challenging benchmark specifically designed to expose failure modes of existing feed-forward 3D reconstruction methods. Experiments show that Click3R reduces reconstruction error with as few as a single correspondence click, improving performance on both standard and our curated benchmarks. Our results highlight that sparse human interaction provides an effective and practical mechanism for correcting geometric reconstruction errors.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:58:02Z</published>
+    <arxiv:comment>NeurIPS 2026. Project page: https://uva-computer-vision-lab.github.io/click3r/</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Hao Gu</name>
+    </author>
+    <author>
+      <name>Jin Yao</name>
+    </author>
+    <author>
+      <name>Zezhou Cheng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12876v1</id>
+    <title>The simulability frontiers of photonic quantum computing</title>
+    <updated>2026-11-09T18:58:02Z</updated>
+    <link href="https://arxiv.org/abs/2611.12876v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12876v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Estimates of when photonic devices outgrow classical simulation are hard to compare: even for single-photon boson sampling, quoted thresholds range from 50 to 98 photons, as they rest on different tasks and assumptions. We propose as a common unit the time a classical computer needs to draw one sample from the device's exact output distribution, up to floating-point rounding. Only exactness applies equally to every kind of light, since the cost of approximate sampling depends on the accuracy required. The simulability frontier is the device size at which our fastest exact sampler produces one sample per second on a fixed machine; this device size increases with better hardware and algorithms. As the time per sample grows exponentially with the number of detected photons, doubling the machine speed moves the frontier by about one photon, whereas a better algorithm changes the growth rate. We measure the frontier with photonic-engines, an open-source GPU library of exact samplers for single photons, entangled photons from quantum emitters, vacuum-single-photon superpositions and squeezed light. Each sampler is validated against a simulator sharing no code with it. On one NVIDIA H100 GPU, with Haar-random interferometers, twice as many modes as photonic inputs and photon-number-resolving detectors, the frontier lies at 38.3 single photons and at 31.0 entangled photons from one emitter. For squeezed light, a timing model fitted to measurements places it at 41.5 squeezed photonic inputs of mean photon number 0.5. For our samplers, coherence alone makes simulation harder: sources that emit a photon with probability one half reach 64.2 when vacuum and photon are mixed incoherently, as for lossy single photons, but only 50.0 when they are in coherent superposition. Feed-forward from mid-circuit measurement of up to three modes lowers the single-photon frontier only from 38.3 to 38.1.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:58:02Z</published>
+    <arxiv:comment>22 pages of main text, 4 Figures, 4 Tables and 22 pages of Supplementary Information</arxiv:comment>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Jean Senellart</name>
+    </author>
+    <author>
+      <name>Benjamin Stott</name>
+    </author>
+    <author>
+      <name>Stephen Wein</name>
+    </author>
+    <author>
+      <name>Esperanza Cuenca Gomez</name>
+    </author>
+    <author>
+      <name>Pascale Senellart</name>
+    </author>
+    <author>
+      <name>Shane Mansfield</name>
+    </author>
+    <author>
+      <name>Pierre-Emmanuel Emeriau</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12867v1</id>
+    <title>Optimal Injectivity of the SparseStack</title>
+    <updated>2026-11-09T18:53:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.12867v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12867v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>An Oblivious Subspace Injection (OSI) is a random sketching matrix that reliably preserves the minimum singular value of any fixed subspace with high constant probability, requiring only a one-sided spectral lower bound without controlling upper singular values. While classical Oblivious Subspace Embeddings (OSEs) fundamentally require row sparsity $Ω(\log r)$ at linear sketch dimension $k = O(r)$, we show that one-sided injectivity permits strictly sparser sketches, establishing matching (up to $\log\log r$ factors) upper and lower bounds of $\tildeΘ(\sqrt{\log r})$.
+  First, we prove that the SparseStack sketch achieves constant injectivity at linear dimension $k = Θ(r)$ with row sparsity only $ζ= O(\sqrt{\log r})$, well below the $Θ(\log r)$ barrier where standard operator-norm concentration fails. Second, we establish a matching lower bound: any isotropic random sketching matrix satisfying a mild row-overlap condition requires row sparsity $ζ= Ω(\sqrt{\log r / \log \log r})$ to achieve linear-dimension injectivity, confirming that the $\sqrt{\log r}$ scale is fundamental.
+  To bypass the lack of an operator-norm upper bound when $ζ= O(\sqrt{\log r})$, we decouple the sketch into two independent halves and introduce three techniques: (i) a uniform lower bound for flat vectors via randomized rounding, controlling discretization error using solely the Frobenius norm; (ii) a Gaussian truncation and minimax duality argument showing that all non-flat vectors escaping injectivity in the first half concentrate on a single universal coordinate subset $I \subseteq [n]$ of size $O(r/ζ)$, bypassing union bounds over supports; and (iii) a two-tier coordinate isolation analysis in the second half that suppresses collisions to $e^{-Ω(ζ^2)} \ll 1/r$, reliably preserving these heavy coordinates.</summary>
+    <category term="cs.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:53:30Z</published>
+    <arxiv:primary_category term="cs.DS"/>
+    <author>
+      <name>Lorenzo Beretta</name>
+    </author>
+    <author>
+      <name>Simone Bombari</name>
+    </author>
+    <author>
+      <name>Margalit Glasgow</name>
+    </author>
+    <author>
+      <name>Raphael Arkady Meyer</name>
+    </author>
+    <author>
+      <name>Kijun Shin</name>
+    </author>
+    <author>
+      <name>David P. Woodruff</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12860v1</id>
+    <title>Search for a Dispersion Measure Excess Toward Nearby Galaxy Halos Using Fast Radio Bursts from the Second CHIME/FRB Baseband Catalog</title>
+    <updated>2026-11-09T18:49:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.12860v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12860v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Fast radio bursts (FRBs) probe foreground ionized baryons via their dispersion measures (DM). Using 1748 sub-arcminute-localized sources from the Second CHIME/FRB Baseband Catalog, we conduct a statistical stacking study of the circumgalactic media (CGM) of nearby galaxies by analyzing the DMs of FRBs whose sightlines intersect foreground halos. For galaxy halos within 50 Mpc, we measure a mean DM excess of $119\pm44$ pc~cm$^{-3}$ $(p = 0.0053; \sim 2.6σ)$ within one virial radius. Expanding to 150 Mpc (628 intersections), we find a tentative decline in the mean DM as a function of impact parameter $(p = 0.0046; \sim 2.6σ)$, which is predominantly driven by typical Milky Way (MW)-like galaxies $(10 \leq \log(M_*/M_\odot)\leq 11)$. We use this DM profile to constrain parameters of the CGM electron density distribution, $n_e^\mathrm{CGM}(r) \propto r^{-3β}$, finding an extrapolated central electron density in the range of $(1.7-21.1) \times 10^{-3}\mathrm{\,cm}^{-3}$, with a radial power-law index of $β= 0.68^{+0.15}_{-0.16}$, consistent with constraints from X-ray stacking studies of MW-like galaxies. At very low impact parameters, we detect a significant DM deficit likely due to cross-matching FRBs that originate from galaxies within our galaxy sample. By deriving the DM-galaxy cross-correlation function, we show that this deficit matches theoretical predictions if 20 FRBs originate from galaxies within 150 Mpc, indicating that CHIME/FRB detects a higher fraction of low-$z$ FRBs than previously thought. We forecast that $10^4$ FRBs with similar localization errors will provide a 5-$σ$ detection of the CGM, and that FRBs at intermediate redshifts ($0.4\lesssim z_\mathrm{FRB}\lesssim 0.75$) are ideal for studying intervening CGMs.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.HE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:49:50Z</published>
+    <arxiv:comment>Submitted to ApJ</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Affan Khadir</name>
+    </author>
+    <author>
+      <name>Ayush Pandhi</name>
+    </author>
+    <author>
+      <name>Jason Hessels</name>
+    </author>
+    <author>
+      <name>Calvin Leung</name>
+    </author>
+    <author>
+      <name>B. M. Gaensler</name>
+    </author>
+    <author>
+      <name>Ludwig M. Böss</name>
+    </author>
+    <author>
+      <name>Amanda M. Cook</name>
+    </author>
+    <author>
+      <name>Alice P. Curtin</name>
+    </author>
+    <author>
+      <name>Klaus Dolag</name>
+    </author>
+    <author>
+      <name>Naman Jain</name>
+    </author>
+    <author>
+      <name>Victoria Kaspi</name>
+    </author>
+    <author>
+      <name>Afrokk Khan</name>
+    </author>
+    <author>
+      <name>Adam E. Lanman</name>
+    </author>
+    <author>
+      <name>Kiyoshi W. Masui</name>
+    </author>
+    <author>
+      <name>Daniele Michilli</name>
+    </author>
+    <author>
+      <name>Mason Ng</name>
+    </author>
+    <author>
+      <name>Aaron B. Pearlman</name>
+    </author>
+    <author>
+      <name>Sachin Pradeep E. T.</name>
+    </author>
+    <author>
+      <name>Aniket Prasad</name>
+    </author>
+    <author>
+      <name>Mawson Sammons</name>
+    </author>
+    <author>
+      <name>Paul Scholz</name>
+    </author>
+    <author>
+      <name>Kaitlyn Shin</name>
+    </author>
+    <author>
+      <name>Kendrick M. Smith</name>
+    </author>
+    <author>
+      <name>Jenny G. Sorce</name>
+    </author>
+    <author>
+      <name>Haochen Wang</name>
+    </author>
+    <author>
+      <name>Michele Woodland</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12843v1</id>
+    <title>Contention Resolution with a Fast-but-Fickle Channel</title>
+    <updated>2026-11-09T18:39:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.12843v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12843v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The contention-resolution problem studies how $n$ devices share a communication channel without centralized coordination. Classical models typically assume a single continuously available channel and focus on minimizing total completion time. However, modern wireless systems increasingly rely on shared spectrum, where access may be abruptly revoked by incumbent users.
+  Motivated by this setting, we study contention resolution with two channels: a reliable slow channel and a faster channel that can be intermittently disabled by unpredictable eviction periods. Moving a batch of packets from the slow channel to the fast channel incurs a unit cost, while evictions from the fast channel impose a larger per-packet penalty. Our goal is to achieve asymptotically optimal latency while minimizing switching overhead relative to an optimal offline algorithm that knows the eviction schedule.
+  We present Randomized Adaptive Channel Exploitation (RACE), a randomized algorithm that exploits the fast channel when available while maintaining progress on the slow channel during disruptions. When the fast channel has rate $ρ\in \bigl[Ω(\log n), O(\sqrt n)\bigr]$ and a sufficiently large constant-factor resource augmentation, RACE achieves an $O(1)$ competitive ratio for expected latency. RACE's expected switching-cost competitive ratio relative to any optimal-latency offline algorithm OPT is $O(ρ+\sqrt{n/m})$, where $m \geq 1$ is the number of fast-channel availability intervals used by OPT.
+  We also prove a worst-case $Ω(\sqrt n)$ switching-cost competitive ratio for latency-competitive randomized algorithms, and a separate $Ω(ρ)$ switching-cost competitive-ratio lower bound. These lower bounds hold even with fixed constant-factor augmentation on both channels.</summary>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:39:24Z</published>
+    <arxiv:primary_category term="cs.DC"/>
+    <author>
+      <name>Umesh Biswas</name>
+    </author>
+    <author>
+      <name>Vini Chaudhary</name>
+    </author>
+    <author>
+      <name>Shafqat Hasan</name>
+    </author>
+    <author>
+      <name>Maxwell Young</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12842v1</id>
+    <title>Delaunay Asymptotics for the Singular Escobar-Yamabe Equation</title>
+    <updated>2026-11-09T18:38:58Z</updated>
+    <link href="https://arxiv.org/abs/2611.12842v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12842v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In dimensions $n\geq3$, we prove that near an isolated boundary singularity a positive solution of the Escobar--Yamabe equation for a smooth metric approaches a fixed periodic Delaunay solution or the cylindrical solution if its trace lies between positive multiples of $|\overline x|^{-(n-2)/2}$, where $\overline x$ is the tangential Fermi coordinate. The relative error decays at a positive power rate, with weighted estimates through two derivatives in Fermi coordinates. The necksize is unique, and the translation parameter is unique modulo the least positive period in the periodic case. The Hamiltonian smoothly parametrizes the periodic family modulo translation. We classify Jacobi fields of polynomial growth at both ends without assuming symmetry. Translation and energy differentiation generate these fields along periodic solutions, and two oscillatory fields generate them along the cylindrical solution. We also exhibit a first-order obstruction to improving these asymptotics by boundary-preserving conformal deformations of the flat models.</summary>
+    <category term="math.DG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:38:58Z</published>
+    <arxiv:primary_category term="math.DG"/>
+    <author>
+      <name>Felipe G. Bogo</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12835v1</id>
+    <title>Mitigating Agentic Deception via Evaluation-Side Partially Observable Games</title>
+    <updated>2026-11-09T18:33:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.12835v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12835v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As large language models become more capable agents, they can exhibit deceptive behaviors, cheating human for higher rewards while appearing helpful. We attribute this failure to evaluation-side partial observability, where models are evaluated mainly from final outcome, without checking the faithfulness of underlying reasoning, tool use, and environmental effects. Prior mitigations address this partial observability by predefined evaluator latent belief space or one-shot monitoring, which do not extend to free-form language space and vulnerable to stronger deceptions that evade simple monitoring. In this work, we formulate deception mitigation as an Evaluation-Side Partially Observable Extensive Form Game (e-PoG), a max-min framework in which an agent maximizes reward, a monitor minimizes the agent's payoff by exposing deception from the full interaction trajectory, and a fixed verifier validates the monitor's claims and converts them into penalties. We define the solution concept as a Subgame-Perfect Oversight Equilibrium (SPOE) between agent and monitor, and prove its existence in finite games. With a perfect verifier, every SPOE is faithful; with an imperfect verifier, the guarantee persists if verifier errors do not reverse the ranking of monitor actions. To achieve faithful SPOE, we derive a two-timescale policy gradient algorithm and enhance the pipeline empirically with NLI verification and deterministic checks. Experiments with Gemma3-4B-IT and Qwen3-4B/8B on Agentic Role-Playing, SearchQA, and WebShop show that e-PoG mitigates multiple emergent deception modes, outperforming the strongest baselines by 26.0% in deception mitigation and by up to 39.8% in task success. These gains persist under weak-to-strong supervision. Code is available at https://github.com/Toyoid/deceptive-agent.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:33:13Z</published>
+    <arxiv:comment>44 pages, 10 figures. Code: https://github.com/Toyoid/deceptive-agent; Project website: https://shutongliu-dev.github.io/epog-agentic-deception/</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Hanxiao Li</name>
+    </author>
+    <author>
+      <name>Shutong Liu</name>
+    </author>
+    <author>
+      <name>Yongjia Ma</name>
+    </author>
+    <author>
+      <name>Jiaming Ji</name>
+    </author>
+    <author>
+      <name>Juntao Dai</name>
+    </author>
+    <author>
+      <name>Shuning Zhang</name>
+    </author>
+    <author>
+      <name>Kejian Shi</name>
+    </author>
+    <author>
+      <name>Kai Chen</name>
+    </author>
+    <author>
+      <name>Pu Feng</name>
+    </author>
+    <author>
+      <name>Yuqing Ma</name>
+    </author>
+    <author>
+      <name>Qi Dou</name>
+    </author>
+    <author>
+      <name>Yaodong Yang</name>
+    </author>
+    <author>
+      <name>Xianglong Liu</name>
+    </author>
+    <author>
+      <name>Simin Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12834v1</id>
+    <title>Programming Prescience: Issues in Human Construction of Forecasting Bots</title>
+    <updated>2026-11-09T18:33:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.12834v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12834v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI models' growing capacity for complex reasoning has made them attractive tools for forecasting, or the systematic prediction of the future based on past and present data. However, should AI forecasting systems be adopted, human builders will shoulder the work of building and evaluating them. In this paper, we explore what this work looks like with a qualitative interview study with 15 builders of forecasting bots, sampled from among successful participants in a recent AI forecasting competition. Our analysis surfaces the challenges around (1) tuning a bot to acquire factual research, (2) implementing coherent reasoning, and (3) understanding how well one's bot actually does. During their work, builders frequently introduced complexity that did not pay off, and tested in ways that were opportunistic and piecemeal. Our detailed account of their challenges helps clarify what problems should be targeted in upcoming innovations in process, tools, and human-AI teaming for forecasting.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:33:13Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Priya Dhawka</name>
+    </author>
+    <author>
+      <name>Benjamin Wilson</name>
+    </author>
+    <author>
+      <name>Andrew Head</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12833v1</id>
+    <title>GARI++: A General-Purpose Decoder for Quantum Error Correction</title>
+    <updated>2026-11-09T18:31:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.12833v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12833v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present GARI++, a two-stage decoding pipeline achieving accuracy competitive with the state of the art across surface, bivariate bicycle and color codes without relying on ensembles. The first stage uses GARI, a normalized min-sum decoder with random serial scheduling on the GARI transformed matrix. The second stage decoder is used only for the cases that the first stage does not converge, and the decoder is configurable based on the choice of the QEC code. The first stage pipelines towards the second stage both the residual syndrome and the soft information. GARI++ pipelining is predictive, meaning that GARI++ chooses the first stage iteration outputs which are expected to deliver the best accuracy in the second stage. GARI++ motivates a hybrid FPGA-CPU architecture for real-time decoding. For example, under uniform circuit-level depolarising noise with a physical error rate of 0.001, the FPGA implementation of GARI achieves average latencies per round ranging from $201 ns$ to $11.8μs$ for surface code distances between 7 and 25. At the same time, due to the very low weight residuals output by the first stage, the average residual decoding time per round remains near constant and below one microsecond on a single Apple M2 core for surface code distances even up to 51 when using Union-Find and accuracy on par with correlated MWPM.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:31:41Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Arshpreet Singh Maan</name>
+    </author>
+    <author>
+      <name>Francisco Garcia-Herrero</name>
+    </author>
+    <author>
+      <name>Daniel Bascones</name>
+    </author>
+    <author>
+      <name>Valentin Savin</name>
+    </author>
+    <author>
+      <name>Alexandru Paler</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12832v1</id>
+    <title>What the Loss Curve Misses: FP4 Pretraining Slows the Acquisition of Rare Facts</title>
+    <updated>2026-11-09T18:30:41Z</updated>
+    <link href="https://arxiv.org/abs/2611.12832v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12832v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Low-precision pretraining is usually judged by validation loss. We ask whether matching loss also means learning rare facts as efficiently. We train transformers from scratch with emulated 4-bit matrix multiplications on synthetic biographies with controlled exposure counts, on their own and mixed into web text. NVFP4 needs 1.32$\times$ and 1.52$\times$ as many exposures as BF16 to match its recall while validation loss differs by only 0.5% and 2%, and 1.26$\times$ and 1.30$\times$ when both models are evaluated with BF16 matrix multiplications. Under our primary readout, the exposure cost is about 1.2$\times$ at matched loss. Zero-mean gradient noise reproduces the cost of quantizing only the backward pass, which barely moves the loss. In a controlled experiment at twice the NVFP4 error, noise fed only to Adam's second-moment estimate acts like a lower learning rate and its cost fades, whereas noise in the update lowers its signal-to-noise ratio and carries about two thirds of the cost through the end of training. Raising the learning rate to offset the smaller average step does not recover the cost, either for this noise or for NVFP4. Gradient statistics of BF16 checkpoints rank the costs of formats, partial quantizations and noise controls without fitting (Spearman 0.96). We suggest measuring rare-fact acquisition alongside loss when evaluating low-precision recipes.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:30:41Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Chang Lu</name>
+    </author>
+    <author>
+      <name>Mengjiao Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12823v1</id>
+    <title>Coding Agents in KVM: Practical Containment and User Control with Limited Resources</title>
+    <updated>2026-11-09T18:24:46Z</updated>
+    <link href="https://arxiv.org/abs/2611.12823v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12823v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Coding agents often need broad authority for productive development work, but granting that authority can expose users' data and infrastructure. Off-the-shelf cloud workspaces can help contain agent activity, but reliance on provider-specific platforms can lead to vendor lock-in and reduced user control. Researchers and engineers must therefore balance agent autonomy, enforced containment, and user control within available financial, computational, and human resources. We analyze these trade-offs and present KVM-Agent, an open-source implementation that automates most setup and provisioning steps. It gives agents broad authority inside replaceable Ubuntu VMs while keeping host administration outside those VMs and supporting multiple coding-agent applications, model services, and remote job delegation. The approach retains familiar workflows and user choice at the cost of VM resources, maintenance, and residual risks from secrets accessible inside the VMs and permitted network access.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:24:46Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Yutaka Nagashima</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12820v1</id>
+    <title>How Well Does AI Peer Review Work? A Benchmark Built from 100 Planted Errors</title>
+    <updated>2026-11-09T18:22:19Z</updated>
+    <link href="https://arxiv.org/abs/2611.12820v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12820v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>One hundred known errors were planted into 10 open-access psychology papers, and the modified papers were then run through frontier models and two commercial AI review tools. The best single system caught 71 of the 100 errors, while the worst caught 30. Pooling every system's output caught 93. Models are only partly correlated in the errors they find, which makes ensembling a big lever for finding issues in papers. Seven errors could not be caught by any system, and all seven were omissions: information deleted from a paper rather than mistakes inserted into it. Refine.ink contributes more unique catches than any other single system, though it is expensive on a per-error basis. False positives were not measured, and how this error distribution compares to the distribution of errors in real papers remains unknown. The papers, errors, model outputs, and full experiment log are public, so that others can build on this toward a comprehensive evaluation benchmark across disciplines.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:22:19Z</published>
+    <arxiv:comment>5 pages; accepted at Cognitive Security for Human-AI Systems (CogSec 2026), a non-archival workshop at ACM HCOMP / CI 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Paul Litvak</name>
+    </author>
+  </entry>
+</feed>

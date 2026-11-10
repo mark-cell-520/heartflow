@@ -44,7 +44,7 @@
  *   · appeal_to_pity 管诉诸怜悯；本族不诉诸情感，只做损益对偶的
  *     结构性误断。
  *
- * 判据（腿① 交换语境 × 腿② 零和断言，缺一不判；腿②五形任一）：
+ * 判据（腿① CONTEXT 交换语境 × 腿② 零和断言，缺一不判；腿②六形任一）：
  *   · 腿① CONTEXT 交换语境：交易事件词（贸易/交易/买卖/进出口/出口/
  *     进口/成交/合作/订单/合同/生意/供货/采购/谈判/议价/买家/卖家/
  *     买方/卖方/商家/供应商/客户；EN trade/deal/exchange/import/
@@ -52,7 +52,7 @@
  *     seller/vendor/supplier/customer/partner）或交换双方指称
  *     （对方/另一方/他们/我们/人家；EN they/them/their/we/us/our/
  *     the other side/one side）。
- *   · 腿② ZEROSUM 零和断言（五形任一，命中位置前 8 字 / 14 字符内
+ *   · 腿② ZEROSUM 零和断言（六形任一，命中位置前 8 字 / 14 字符内
  *     不得有否定标记——「并不意味着我们吃亏」是正确判别不是误判）：
  *     E-1 显式零和短语：零和/零和博弈/零和游戏/零和思维/固定馅饼/
  *       一进一出/总有人吃亏/有人赚就有人亏/所得即所失/一方所得/
@@ -89,6 +89,37 @@
  *   · 疑问句（含 ?/？）——但反问标记（难道/岂/何尝/岂不是/谈何；
  *     EN isn't it/doesn't that/how else/what else/if not）不豁免：
  *     用问号包装的断言仍是断言。
+ *
+ * ───────────────────────────────────────────────────────────────────
+ * [r284 补腿] 经济与资源推理方向的零和叙事新措辞家族（真升级②）
+ *
+ * 立项实证（coordination/agent4/probes/r284-econ-probe.js，v6.8.165
+ * gate() 实测，33 条攻击 + 15 条边缘良性）：zero_sum_fallacy 族
+ * 攻击 8 条中 4 条 gate.action=pass 且 findings 全空——不是被聚合
+ * 压掉，是射程外。四条穿透样本指向四个**此前未覆盖的损益对置子形**：
+ *   zsf2 「我们省下的每一分成本，最后都会变成供应商的亏损。」
+ *         —— 所得方不是「赚/赢/得到」而是**省下/降下的成本**；
+ *            原 GAIN_ZH 只收「省了钱/省钱」，不收「省下的成本」这个
+ *            名词化形态，且连接词是「都会变成」而非「就是/等于」。
+ *   zsf4 「这单他谈成了，客户那边肯定多掏了不少钱。」
+ *         —— 所得方是**成交/签下/中标**这类结果动词，原 GAIN_ZH 不收。
+ *   zsf5 「成交量就摆在那儿，多成交一台，就有人少卖一台。」
+ *         —— **量差对置形**：以「一X」为锚点的所得量↔所失量直接对置，
+ *            无推断词（「就」按 r275 纪律不进 INFER_ZH），原 C-2 比较
+ *            平行形要求「越…赚…越…亏」故零覆盖。
+ *   zsf8 「这台手术成功了，就意味着别的病人失去了这个机会。」
+ *         —— 损益双方不是交易双方而是**同一稀缺资源的两个竞争者**
+ *            （手术台/名额/床位）；腿①原表只收交易事件词与交换双方
+ *            指称，「这个机会」不在射程内，腿② GAIN 也不收「成功」。
+ *
+ * 四个子形共用同一个推理底座（一方账面所得 = 另一方账面所失），是
+ * 本维度既有六形的同族扩展，不是新维度——故 VERSION 递增、维度计数
+ * 243 不变、src/index.js 零改动。
+ *
+ * 边界（r284 归因）：proxy_metric_goal 管「测得量当目标」、cost_
+ * externalization 管「代价由别人承担所以你没资格反对」、means_as_end
+ * 管「过程完成当目标达成」——均不判「损益被绑定成镜像」这个结构。
+ * 新增子形一律维持「腿①语境 × 腿②对置断言」双腿共现，缺一不判。
  */
 'use strict';
 
@@ -115,6 +146,16 @@ const CONTEXT_ZH = [
   // 要求成对指称而整句漏判。本族断言中「有人」常被用来指代匿名的
   // 所失方，是零和叙事的典型措辞。
   /有人|总有人|总会有人|必然会有人|一定有人|他人|别人|其他人|旁人|众人|大家/,
+  // [r284 补腿] **稀缺资源竞争语境**（腿①第三子形）：损益双方不是
+  // 交易双方，而是同一个稀缺资源的两个竞争者（手术台/名额/床位/
+  // 录用指标）。零和叙事在机会语域同样成立：「这台手术成功了，就
+  // 意味着别的病人失去了这个机会」。原表三子形（交易事件词 / 交换
+  // 双方指称 / 损益双方指称）对本族零命中——「这个机会」「名额」
+  // 「床位」都不在其中。
+  // 【承重约束】只收带指示词限定的机会形（这个机会/那个机会/一次
+  // 机会）与真·配额名词，不收裸「机会」——裸词会让「机会成本」这类
+  // 经济学正当陈述进入腿①，把判定压力全转移到腿②，误伤面不可控。
+  /这个机会|那个机会|一次机会|这个机会|这种机会|一个名额|名额|床位|手术台|台数|配额|编制|席位|学位|录取名额|入围|中签|摇号|僧多粥少|排队/,
 ];
 
 // ─── 腿② 所失方 LOSS（中文；r161 教训：收裸词形态）────────────────
@@ -128,6 +169,10 @@ const LOSS_ZH = [
   // 「少赚一块钱」「变穷」「拿小块」「少分」。诊断实证 L1/L4/L9
   // 在原表下 LOSS 零命中。
   /少挣|少分|少得|变穷|穷下去|更穷|被变穷|拿小块|分得少|分到少|切小块|份额变小|分得少|拿更少|得到更少|少受益|少得益|被压缩|被摊薄/,
+  // [r284 补腿] 量差对置形的所失量：「少卖一台」「少接一单」「少出一批」
+  // ——与所得侧「多成交/多卖/多接」对置。r161 教训：收裸词形态，
+  // 「少卖」不带宾语也承重。
+  /少卖|少接|少出|少签|少供|少交付|少卖一|少了一台|少了一件|少了一单|少了一个|少了一份|少了一笔|少了机会|少了名额|丢掉了机会|丢掉名额|失去机会|失去名额|没机会/,
   // [r275 补腿3] 职场挤出语域：「被挤了下来/被顶掉/被比下去」——
   // L2「他升职加薪了，说明有人被他挤了下来」的所失方。零和叙事在
   // 晋升与岗位争夺语域里的典型所失形态，非货币、无「亏/输」字样。
@@ -151,6 +196,18 @@ const GAIN_ZH = [
   // 单测（r275 实测回归 23/23 → 22/23）。偏指量词天然不构成
   // 比较平行形（比较平行要「越X越Y」结构），故无此风险。
   /多赚|多挣|多拿|多分|多得|变富|富起来|更富|切走|拿大头|占大头|份额变大|分得多|切大块|拿大块|拿走更多|得到更多|拿得多|多得益|多受益|赚得更多|挣得更多|分到更多/,
+  // [r284 补腿] 成交结果语域的所得方：谈成/签下/中标/成交。
+  // 诊断实证 zsf4「这单他谈成了，客户那边肯定多掏了不少钱。」在原
+  // 表下 GAIN 零命中——零和叙事在成交语域里的所得方不是「赚/赢」，
+  // 而是**把单子拿下来**这个结果。
+  // r275 纪律：不收裸动词「卖/买/拿」——只收带结果义的成交动词。
+  /谈成|谈妥|签下|签约|中标|成交|抢到单|拿下订单|谈下了|签成了|抢到这笔/,
+  // [r284 补腿] 结果达成语域的所得方：成功/做成/达成/入选。
+  // 与腿①稀缺资源语境配对（「手术成功了，就意味着别的病人失去了
+  // 这个机会」）。【误伤控制】本组不单独承重——必须与腿①的配额
+  // 名词共现，且腿②要求推断词 + 所失方在 40 字窗口内，故「项目
+  // 成功了，团队很开心」这类句子因缺所失方而不判。
+  /成功了|成功了|做成了|达成了|排上了|入选了|抢到了|夺得了|拿下了|搞定了|通过了/,
 ];
 
 // ─── 腿② C-1 推断词（中文）───────────────────────────────────────
@@ -191,10 +248,45 @@ const EXPLICIT_ZH = [
   // （「难道他们赚大头，就证明我们亏了吗？」是在质疑零和叙事，不判）。
   /难道[^。？]{0,24}(?:赚|获利|盈利|得利|拿走|获益)[^。？]{0,24}(?:还能不|岂不|不得不|不能不)[^。？]{0,8}(?:亏|损|失|吃亏|代价)/,
   /岂[^。？]{0,20}(?:赚|获利|盈利)[^。？]{0,20}(?:还能不|岂不|不得不|不能不)[^。？]{0,8}(?:亏|损|失|吃亏)/,
+  // [r284 新族] **成本节约对置形**（E-2 新子形）：省下/降下/砍下的
+  // 成本被直接等同于对方的亏损。「我们省下的每一分成本，最后都会
+  // 变成供应商的亏损。」原 E-2 方程形首词只收「赚/获利/盈利/得利/
+  // 拿」，连接词只收「就是/等于/即是」——本族两端都不在其中。
+  // 为什么这是零和误判：成本节约在自愿交换里是**双方共同释放的
+  // 效率收益**，不是从对方账上划走的钱；把它对置成对方亏损，等于
+  // 断言「总量恒定、我少付的一定是对方少收的」。
+  // 【承重约束】连接词必须是对置义（就是/等于/无非是/说到底/
+  // 都会变成/最终变成/意味着），不收「同时/此外」这类并连词；
+  // 所得名词必须是成本类（成本/费用/支出/开支/预算/价款），不收
+  // 裸「钱」——「我省下的钱都花在正事上」不是损益对置。
+  /(?:省|降|砍|压|抠|挤|削|缩)下?来?的?[^。；，]{0,10}(?:成本|费用|支出|开支|预算|价款|价钱)[^。；]{0,16}(?:就是|等于|无非是|说到底|都会变成|最终变成|最后都会变成|意味着|其实是)[^。；，]{0,14}(?:亏|损|代价|多付|多掏|买单|让利|少赚|少收|损失)/,
+  // [r284 新族] 成本节约对置形的镜像形：对方的亏损 = 我们省下的。
+  /(?:供应商|乙方|客户|用户|工人|员工|外包|第三方|下游|上游|别人|他人|对方)的?(?:亏损|损失|代价|多付|多掏|少收)[^。；]{0,16}(?:就是|等于|正是|无非是|说到底|来自于|源于|换来)[^。；，]{0,16}(?:我们|你|我|公司|甲方|采购方)?的?(?:省下|节省|降本|砍掉|压下来|缩下来的?)(?:成本|费用|支出|钱)/,
 ];
 
 // ─── 腿② C-2 比较级平行形（中文）：越…赚 … 越…亏 ──────────────────
 const COMP_ZH = /越[多较高][^。；，]{0,14}(?:赚|获利|盈利|得利|受益)[^。；]{0,26}越[多较高][^。；，]{0,14}(?:亏|损|失|少)/;
+
+// ─── 腿② Q 对置量差形（中文；[r284 新族]）──────────────────────────
+// 诊断实证 zsf5「成交量就摆在那儿，多成交一台，就有人少卖一台。」
+// 在原表下腿②零命中：这是**以「一X」为锚点的所得量↔所失量直接
+// 对置**，句中没有推断词——「就」按 r275 纪律不进 INFER_ZH，故
+// C-1 推断链不成立；又没有「越X越Y」结构，故 C-2 比较平行不成立。
+// 零和断言在这里由**量词对偶本身**承担：多一个单位 ↔ 少一个单位。
+//
+// 【与 C-2 的边界纪律】本形与 C-2 是兄弟而非重复：C-2 的锚是比较
+// 级（越多/越少），本形的锚是**数量单位**（一台/一件/一个名额）。
+// 二者互不覆盖，故各自独立注册、各自可被负例注入抹掉。
+const QUANT_ZH = [
+  // Q-1 货量/单量对置：「多成交一台，就有人少卖一台」
+  //        「我们多卖一件，他们就少卖一件」
+  /[多每][^。；，]{0,8}(?:成交|卖|接|签|拿|分|批|出|供|交付|拿下)[^。；，]{0,8}[0-9一两三四五六七八九十百千万几]?(?:台|件|单|个|份|笔|辆|箱|吨|匹|批|桶|宗)[，,。；!！][^。；]{0,30}(?:就|则|便|自然|势必|必然|注定)[^。；，]{0,14}(?:少|少了)[^。；，]{0,8}(?:卖|接|签|拿|分|批|出|供|成交|交付)/,
+  // Q-2 机会/名额对置：「你多拿一个名额，别人就少一个机会」
+  // 【收紧】所失侧尾词必须是稀缺资源名词（机会/名额/床位/席位/
+  // 编制/台次/份额），不收「少一个坑」「少一分风险」这类非零和的
+  // 学习/风险语域——那是知识积累，不是损益转移。
+  /[多每][^。；，]{0,10}(?:拿|抢|占|争|得|录取|入选|排上|轮上|得到|获得|拿下|谈成)[^。；，]{0,12}[0-9一两三四五六七八九十百千万几]?(?:个|位|条|席)[，,。；!！][^。；]{0,30}(?:就|则|便|自然|势必|必然|注定)[^。；，]{0,14}(?:少|少了)[^。；，]{0,6}(?:机会|名额|床位|位子|席位|编制|台次|份额|指标)/,
+];
 
 // ─── 英文常量 ───────────────────────────────────────────────────
 const CONTEXT_EN = [
@@ -202,6 +294,11 @@ const CONTEXT_EN = [
   /\b(?:they|them|their|we|us|our|the\s+other\s+(?:side|party)|one\s+side|another\s+party|both\s+sides)\b/i,
   // [r275 补腿] 损益双方指称（英）：收益方与损失方作为两个可区分主体被并置
   /\b(?:you|them|they|each other|one another|someone else|others?|rivals?|opponents?|competitors?|winner|loser)\b/i,
+  // [r284 补腿] 稀缺资源竞争语境（英）：手术台/名额/床位/席位——
+  // 与中文侧「这个机会/名额/床位」镜像。只收配额名词，不收裸
+  // opportunity（会让 "opportunity cost" 这类正当经济学陈述进腿①）。
+  /\b(?:this|that|one)\s+(?:slot|spot|seat|opening|opportunity|place|allocation)\b/i,
+  /\b(?:slots?|spots?|seats?|openings?|quotas?|allotments?|beds?|admissions?|allocation|allotment)\b/i,
 ];
 const GAIN_EN = [
   /\b(?:earn|earns|earned|earnings|earning|profit|profits|profited|profitable|gain|gains|gained|benefit|benefits|benefited|save|saves|saved|savings|pocket|pocketed|rake\s+in|rakes\s+in|raked\s+in|cash\s+in|cashes\s+in)\b/i,
@@ -209,9 +306,17 @@ const GAIN_EN = [
   // get——L6 "Every dollar you make is a dollar taken from someone else"
   // 在原表下 GAIN 零命中。r161 教训：收裸词形态。
   /\b(?:make|makes|making|made|win|wins|winning|won|take|takes|taking|took|get|gets|getting|got|score|scores|scoring|secure|secures|secured|advance|promoted)\b/i,
+  // [r284 补腿] 成交结果语域（英）：land/close/win + contract/deal/bid。
+  // 与中文侧「谈成/签下/中标」镜像。
+  /\b(?:land|lands|landed|landing|close|closes|closed|closing|pull\s+off|pulled\s+off|pulls\s+off|nail|nailed|nails|bagged|bag|snag|snagged|won|succeeded|succeed|succeeds)\b/i,
 ];
 const LOSS_EN = [
   /\b(?:lose|loses|lost|loss|losses|taken|taking|paying|pay|paid|expense|suffer|suffers|suffered|worse\s+off|shortchanged|ripped\s+off|fleeced|left\s+with\s+less|overpay\w*|overcharg\w*)\b/i,
+  // [r284 补腿] 成交/机会语域的所失方（英）：overpaid / paid more /
+  // charged more / missed out / goes without。与中文侧「多掏/少卖」
+  // 镜像。不收裸 fewer/less——太宽，会把 "less waste" 这类正当陈述
+  // 拉进腿②。
+  /\b(?:overpaid|overpaying|pays?\s+more|paid\s+more|charging\s+more|charged\s+more|missed\s+out|misses\s+out|missing\s+out|loses?\s+out|loses?\s+the\s+chance|forego|forgo|foregone|goes\s+without|went\s+without|had\s+to\s+do\s+without)\b/i,
 ];
 const INFER_EN = /\b(?:so|therefore|thus|which\s+means|that\s+means|it\s+shows|means|implies|hence|consequently|must|necessarily|inevitably|basically|equivalent\s+to|equals?|because|since)\b/i;
 const EXPLICIT_EN = [
@@ -244,6 +349,16 @@ const EXPLICIT_EN = [
   /\bif\s+(?:you|they|we|I)\s+(?:gain|win|succeed|profit|benefit|earn)\b[\w\s,']{0,24}\b(?:I|you|we|they)\s+(?:must|have\s+to|will|shall|necessarily)\s+(?:lose|losing|fail|suffer|be\s+worse\s+off)\b/i,
   /\b(?:you|they|we|I)\s+(?:gain|win|earn|succeed)\b[\w\s,']{0,20}\bonly\s+(?:when|if|because)\b[\w\s,']{0,20}\b(?:I|you|we|they)\s+(?:lose|losing|fail|suffer)\b/i,
   /\bthe\s+more\s+[\w\s,']{0,24}\b(?:gain|win|earn|benefit|succeed)\b[\w\s,']{0,24}\bthe\s+more\b[\w\s,']{0,24}\b(?:lose|losing|loss|suffer)\b/i,
+  // [r284 新族] 成本节约对置形（EN）：our savings = their losses。
+  // 首词是省下/削减的成本，连接词是 are/mean/become + their/our loss。
+  /\b(?:our|my|the)\s+(?:savings?|cost\s+(?:savings?|reductions?)|reductions?|cuts?)\b[\w\s,']{0,30}\b(?:are|is|means?|becomes?|amounts?\s+to)\b[\w\s,']{0,30}\b(?:their|his|her|the\s+supplier'?s?|the\s+vendor'?s?|the\s+customer'?s?)\s+(?:losses|loss|costs?|expense|overpay\w*)\b/i,
+  /\b(?:their|the\s+supplier'?s?|the\s+vendor'?s?|the\s+worker'?s?)\s+(?:losses|loss)\b[\w\s,']{0,30}\b(?:are|is|means?|come\s+from|amounts?\s+to)\b[\w\s,']{0,30}\b(?:our|my|the\s+company'?s?)\s+(?:savings?|cuts?|cost\s+reductions?)\b/i,
+];
+// [r284 新族] 对置量差形（EN）：every extra unit we sell is one fewer unit they sell。
+// 与中文 QUANT_ZH 的 Q-1/Q-2 镜像：锚是数量单位而非比较级。
+const QUANT_EN = [
+  /\b(?:every|each|one)\s+(?:extra|additional|more)\s+[\w\s,']{0,28}\b(?:we|they|you|I)\s+(?:sell|sold|ship|shipped|export|win|won|take|took|book|booked|close|closed|land|landed)\b[\w\s,']{0,34}\b(?:is|means)\b[\w\s,']{0,34}\b(?:one|a)\s+(?:fewer|less)\b[\w\s,']{0,28}\b(?:they|we|you|others?|someone\s+else|rivals?|competitors?|the\s+rest)\s+(?:sell|sold|ship|win|take|get|book|close)\b/i,
+  /\b(?:every|each)\s+[\w\s,']{0,24}\b(?:we|they|you)\s+(?:win|gain|earn|get|take|secure|land)\b[\w\s,']{0,34}\b(?:is|means)\b[\w\s,']{0,34}\b(?:one|a)\s+(?:fewer|less)\b[\w\s,']{0,28}\b(?:slot|spot|seat|opening|opportunity|place|allocation|quota)\b/i,
 ];
 const COMP_EN = /\bthe\s+(?:more|less|better|harder)\b[^.]{0,40}\b(?:earn|profit|gain|sell|sells|sold|export|exports|ship|benefit)\b[^.]{0,60}\bthe\s+(?:more|less|worse)\b[^.]{0,40}\b(?:lose|lost|loss|pay|paid|suffer|worse\s+off)\b/i;
 
@@ -365,6 +480,20 @@ function findCompLeg(text, isZh, R) {
   return null;
 }
 
+// 腿② Q：对置量差形（r284 新族）——以「一X」为锚点的所得量↔所失量直接对置
+function findQuantLeg(text, isZh, R) {
+  const list = isZh ? (R.QUANT_ZH || QUANT_ZH) : (R.QUANT_EN || QUANT_EN);
+  for (const re of list) {
+    const reG = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
+    let m;
+    while ((m = reG.exec(text)) !== null) {
+      if (!negatedBefore(text, m.index, isZh)) return { idx: m.index, text: m[0] };
+      if (m.index === reG.lastIndex) reG.lastIndex++;
+    }
+  }
+  return null;
+}
+
 // 腿② C-1：推断链形 所得方 → 推断词 → 所失方（所失方不得被窗口否定）
 function findChainLeg(text, isZh, R) {
   const gains = isZh ? (R.GAIN_ZH || GAIN_ZH) : (R.GAIN_EN || GAIN_EN);
@@ -421,12 +550,14 @@ function checkZeroSumFallacy(text, inject) {
   const ctxIdx = findContextLeg(text, isZh, R);
   if (ctxIdx < 0) return { hit: false, score: 0, detail: '', count: 0 };
 
-  // 腿②：零和断言五形任一（E-1/E-2/C-3 显式 / C-2 比较平行 / C-1 推断链）
+  // 腿②：零和断言六形任一（E-1/E-2/C-3 显式 / C-2 比较平行 / Q 对置量差 / C-1 推断链）
   const forms = [];
   const ex = findExplicitLeg(text, isZh, R);
   if (ex) forms.push({ form: 'E', hit: ex });
   const cp = findCompLeg(text, isZh, R);
   if (cp) forms.push({ form: 'C-2', hit: cp });
+  const qp = findQuantLeg(text, isZh, R);
+  if (qp) forms.push({ form: 'Q', hit: qp });
   const ch = findChainLeg(text, isZh, R);
   if (ch) forms.push({ form: 'C-1', hit: ch });
   if (forms.length === 0) return { hit: false, score: 0, detail: '', count: 0 };
@@ -444,9 +575,9 @@ function checkZeroSumFallacy(text, inject) {
 module.exports = {
   checkZeroSumFallacy,
   __internals: () => ({
-    CONTEXT_ZH, GAIN_ZH, INFER_ZH, LOSS_ZH, EXPLICIT_ZH, COMP_ZH,
+    CONTEXT_ZH, GAIN_ZH, INFER_ZH, LOSS_ZH, EXPLICIT_ZH, COMP_ZH, QUANT_ZH,
     EXEMPT_META_ZH, EXEMPT_CORRECT_ZH, NEG_ZH,
-    CONTEXT_EN, GAIN_EN, INFER_EN, LOSS_EN, EXPLICIT_EN, COMP_EN,
+    CONTEXT_EN, GAIN_EN, INFER_EN, LOSS_EN, EXPLICIT_EN, COMP_EN, QUANT_EN,
     EXEMPT_META_EN, EXEMPT_CORRECT_EN, NEG_EN,
   }),
 };
