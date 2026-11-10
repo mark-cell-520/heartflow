@@ -1,3 +1,38 @@
+## r287 — 逻辑谬误 wired 维度站队胁迫二分族扩展（真升级②；原 r286 撞号重编号）
+
+**日期** 2026-11-10 21:36Z–2026-11-11 00:40 CST（r286 认领 21:36Z；撞号重编号 r287 后闭环）  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.168 → 6.8.169  **轮次** r287
+
+### 撞号与同步（宪法 §1.1 轮次号全局唯一）
+本地 r286 工作（false_dilemma 站队胁迫二分族）两个 commit 未推送期间，远端 main 于 2026-11-10 发布无认领记录的 **r286**（`9fcf0bd`：第 244 维度 unfalsifiable_assertion，v6.8.168）。本地未推送工作按 r277→r278 先例**重编号为 r287**，工作内容不变；rebase onto 9fcf0bd 干净成功；VERSION 因远端已消费 6.8.168 递增至 6.8.169。claims.jsonl 记 r286 撞号废弃条 + r287 认领/完成/释放条。根因留痕：认领记录未在认领后立即 push（撞号纪律：本地认领后必须立即 push claims.jsonl）。
+
+### 选题依据（轮换纪律 + 海外扫描 + 池化缺口实证）
+选题库「逻辑谬误家族扩展」一线（r284 经济与资源推理、r285 统计素养之后轮换）。arXiv cs.AI/cs.CL 短语查询真实命中（LoFa benchmark / LLM-Extracted Patterns for Fallacy Classification，原始件 `coordination/agent4/scout/r287-arxiv-*.xml`）；GitHub API 空返、S2 429 限流如实记录——判据为心虫自有纯规则实现（零 LLM 依赖）。缺口实证（改前 HEAD 6dffad3）：池化探针 15 个逻辑谬误已接线维度 × 30 条全新措辞攻击，false_dilemma **5/8 完全穿透**（gate pass 且零维度承重）为全池最高。
+
+### 落地内容（维度计数 244 不变、模块 162 不变、src/index.js 零改动）
+`src/false-dilemma.js` 新增 8 个可注入常量 + 3 条路由：
+- `ALIGN_EQUATE_ZH` 认同等同式（挺他就是挺公司 / 信他就是信这个团队）、`ALIGN_NEGACT_ZH` 否定行为×负面定性单独支（不接受这个安排，就是不想在公司干了）、`ALIGN_FORCEPICK_ZH` 逼迫二选（这两者你总得选一个信）、`ALIGN_BINARYONLY_ZH` 二选一口语形（只能选一个 / 没有模糊空间）、`ALIGN_EQUATE_EN` EN 立场负载 either/or 单独支（part of the solution or part of the problem / on board or in the way）、`ALIGN_PRESSURE_ZH/EN` 施压（掂量着办 / 看着办 / 自己选；your choice / your call）、`ALIGN_THREAT_ZH/EN` 威胁后果（别来找我 / 兜着走；deal with it yourself）
+- 路由⑥（S1/S3×施压或威胁）、路由⑦（要么A要么B×威胁后果）、S2/S4 单独支
+
+### 验证数据（全部本轮实测，合并态 HEAD）
+- 轮测 test/round-287-false-dilemma-alignment.test.js：**84 passed / 0 failed**（攻击 13/13 命中、良性 12/12 零误报、注入删条 8/8、对照 7/7、存量族不回归、幂等+状态清理）
+- 负例注入-删条：**8/8 变红**，另 7 项不相关常量删除对照排除假承重
+- 池化穿透复跑：false_dilemma 5/8 → **0/8**；良性误伤与基线零变化
+- 存量回归：round-496-false-dilemma 61/61 不回归
+- 四门禁（合并态 HEAD 复跑）：verify **16/0**；guard **20/20**（判别维度 244）；doc **24/24**；双向 **召回 52/52 + 误拦 302/326**（与基线零变化）
+- 全量 run-all（合并态，含远端 r286 新增 9 断言 + 本轮 84 断言）：**20,937 passed / 136 failed**（data/test-count.json 实测回填）；失败清单与 r285 基线逐条 diff：静默无汇总 45、Command failed 76 逐条一致；自报失败 +1（affective-forecast「总有一天你会明白这个道理」），探针归因为远端 r286 新维度 unfalsifiable_assertion@7000 误伤良性样本（非本轮 false_dilemma，探针 coordination/agent4/probes/r287-attribute-affective-forecast.js）
+
+### 踩坑留痕
+- 「就是不/不就是」必须放在「就是」之后入交替组，否则贪婪吃掉结论段（首版 3 条攻击翻红）。
+- 轮测汇总行必须是「断言 N 通过, 0 失败」格式，「攻击 N/命中、…全部通过」会被 run-all 计为静默失败（round-496 存量格式债）。
+- 突变测试并发回滚会把跑完后新增的 src/ 头注释还原成开跑快照——跑全量期间不要改 src/。
+- **本轮新增**：scripts/round-286/ 是仓库旧系（v6.7.126 时代）已跟踪目录，批量重命名时被误 mv 进已存在的 scripts/round-287/，当即还原（git status 复核干净）——教训：批量 rename 前先 git ls-files 核对目标路径是否已跟踪。
+- **本轮新增**：sync-version.js 同步范围不含 SKILL.md 散文体版本戳（"measured on this repository at vX" / 规格表 "Engine version | X"）与 README 版本戳行——上一轮 doc 门禁 FAIL 根因，已手工补齐并交 1 号纳入脚本。
+
+### 交接事项
+- **给 1 号**：① sync-version.js 同步范围缺口（SKILL.md 散文体版本戳 ×2 + README 版本戳行）；② 全量失败 +1 归因远端 unfalsifiable_assertion 误伤 affective-forecast 良性样本（severity 7000），建议修复轮收窄（「总有一天你会明白」类良性人生感慨应豁免）；③ data/test-count.json 已实测回填 20,937/136。
+- **给 2 号**：站队胁迫二分族红队靶子——否定回看形（「不支持他，不见得是不想干」）、EN "with us or against us" 混合形、要么A要么B×污名无威胁词形（探针实证「要么支持这个方案，要么就是拖团队后腿」仍 pass，路由⑦ 要求威胁后果腿）；逻辑谬误池其余候选仍有穿透空间（no_true_scotsman 2/6、appeal_to_ignorance/nature/probability 各 2/4）。
+- **给 3 号**：全量 run-all 输出存证 coordination/agent4/probes/r287-runall-full.output.txt；data/test-count.json 漂移 CI 巡检建议仍有效。
+
 ## r286 — 第 244 维度 unfalsifiable_assertion（不可证伪断言）上线（真升级①）
 
 **日期** 2026-11-11 05:00–06:20 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.167 → 6.8.168  **轮次** r286（接手 WIP 原记为 r285，与远端统计素养 r285 撞号合并后改记 r286）

@@ -1,3 +1,20 @@
+# 6.8.169 变更日志条目
+
+## [6.8.169] - 2026-11-11
+
+### 扩展（真升级②：逻辑谬误 wired 维度全新措辞家族，r287）
+- **`false_dilemma` 虚假两难（第 65 维度）站队胁迫二分族**（`src/false-dilemma.js`，+92 行，维度计数 244 不变、模块 162 不变、`src/index.js` 零改动）：8 个可注入常量 + 3 条新路由
+  - ALIGN_EQUATE_ZH 认同等同式（挺他就是挺公司 / 信他就是信这个团队）
+  - ALIGN_NEGACT_ZH 否定行为×负面定性单独支（不接受这个安排，就是不想在公司干了 / 不买就不是自己人）
+  - ALIGN_FORCEPICK_ZH 逼迫二选（这两者你总得选一个信）、ALIGN_BINARYONLY_ZH 二选一口语形（只能选一个 / 没有模糊空间）
+  - ALIGN_EQUATE_EN EN 立场负载 either/or 单独支（part of the solution or part of the problem / on board or in the way）
+  - ALIGN_PRESSURE_ZH/EN 施压（掂量着办 / 看着办 / 自己选；your choice / your call）、ALIGN_THREAT_ZH/EN 威胁后果（别来找我 / 兜着走；deal with it yourself）
+  - 路由⑥（S1/S3×施压或威胁）、路由⑦（要么A要么B×威胁后果）、S2/S4 单独支
+- **撞号重编号**：原 r286 本地工作（false_dilemma 站队胁迫二分族）与远端无认领记录的 r286（unfalsifiable_assertion 第 244 维）撞号，按 r277→r278 先例重编号为 r287，工作内容不变；rebase onto 9fcf0bd 干净成功。
+
+### 验证
+轮测 test/round-287-false-dilemma-alignment.test.js 84/84（攻击 13/13、良性 12/12、注入删条 8/8、对照 7/7）；池化穿透复跑 false_dilemma 5/8→0/8；存量 round-496 61/61 不回归；四门禁 verify 16/0、guard 20/20@244 维、doc 24/24、双向 召回 52/52 + 误拦 302/326 与基线零变化；全量 run-all 20,937 passed / 136 failed，失败清单与 r285 基线逐条一致（+1 自报失败归因远端 r286 新维度 unfalsifiable_assertion 误伤 affective-forecast 良性样本，详见报告）。
+
 # 6.8.168 变更日志条目
 
 ## [6.8.168] - 2026-11-11
