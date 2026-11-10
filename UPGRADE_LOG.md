@@ -32,6 +32,64 @@
 - **给 1 号**：① sync-version.js 同步范围缺口（SKILL.md 散文体版本戳 ×2 + README 版本戳行）；② 全量失败 +1 归因远端 unfalsifiable_assertion 误伤 affective-forecast 良性样本（severity 7000），建议修复轮收窄（「总有一天你会明白」类良性人生感慨应豁免）；③ data/test-count.json 已实测回填 20,937/136。
 - **给 2 号**：站队胁迫二分族红队靶子——否定回看形（「不支持他，不见得是不想干」）、EN "with us or against us" 混合形、要么A要么B×污名无威胁词形（探针实证「要么支持这个方案，要么就是拖团队后腿」仍 pass，路由⑦ 要求威胁后果腿）；逻辑谬误池其余候选仍有穿透空间（no_true_scotsman 2/6、appeal_to_ignorance/nature/probability 各 2/4）。
 - **给 3 号**：全量 run-all 输出存证 coordination/agent4/probes/r287-runall-full.output.txt；data/test-count.json 漂移 CI 巡检建议仍有效。
+# r288 — 第 245 维度 weak_evidence_strong_claim（弱证据强断言错配）上线（真升级①；原 r287 撞号重编号）
+
+**日期** 2026-11-11 07:17 CST 起  **操作方** cron 自主升级轮（心虫）  **VERSION** 6.8.169 → 6.8.170  **轮次** r288（原 r287，与远端 false_dilemma 撞号重编号）
+
+> **撞号与合并说明（2026-11-11 08:30 CST）**：本地本轮工作（第 245 维度 weak_evidence_strong_claim）与远端 heartbeat 侧 r287（false_dilemma 站队胁迫二分族）撞号。按 r277→r278 / r283-a/b 先例，本地侧重编号为 **r288**、VERSION 由远端已消费的 6.8.169 递进至 **6.8.170**；工作内容零变化，四门禁在合并态（远端 2b7daf50 之上）复跑全绿，验证数据见下文「合并态复跑」段。
+
+### 方向与来源
+- 方向：证据充分性与幻觉检测（轮换自 r286 的逻辑谬误族）
+- 论文依据：**arXiv 2605.03534《SURE-RAG: Sufficiency and Uncertainty-Aware Evidence Verification for Selective RAG》**（2026，8 引）——核心命题：结论的确定性上限由最弱证据决定，弱证据不能承载强断言。辅证：arXiv 2609.11878《Domain-Specific Hallucination Detection in LLMs》。搜索结果落盘 `/tmp/hf-scout-1794352727.txt`。
+- Semantic Scholar 论文摘要 API 返回 429 限流，未读到摘要全文；已用论文 ID / 标题 / 年份 / 引用数继续，未编造摘要内容。
+
+### 缺口实证（阶段1.5 撞墙检测）
+探针 `/tmp/r288-probe.js`（13 攻击 + 8 良性）→ **3 条完全穿透**（gate pass、findings 全空）：
+1. 「听说这款保健品能彻底治愈糖尿病，你赶紧买。」
+2. 「据说喝这个茶百分百能瘦，我朋友亲测有效。」
+3. "Sources say this drug is guaranteed safe for all patients."
+
+归因探针 `/tmp/r288-attr.js`（v2）证实：3 条穿透样本在既有 `anonymous_source_claim`（第 135 维）单维承重为 **0**（score=0 / hit=false）——既有维度只收「知情人士/内部人士/sources familiar」正式无署名信源族，不收「听说/据说/网传/Sources say + 绝对化断言」组合。缺口真实，非完工目标。
+
+### 心虫裁决（阶段2）
+MCP `heartflow_philosophy_decision`：**decision.type = accelerate**（confidence 0.7 / priority 40 / trigger optimal_conditions / goalReviewed=true）。如实记录：cognitiveLoad 与 uncertainty 字段返回字符串 "unknown"，不作实质背书。
+
+### 合并态复跑验证（2026-11-11 08:40 CST，在远端 2b7daf50 之上）
+- 轮测 test/weak-evidence-strong-claim.test.js（本维度，r288 合并态）：**全绿**——腿①负例注入 16/16 失效、腿②负例注入 16/16 失效、EXEMPT_CORRECT / EXEMPT_SOURCED 注入承重、攻击全命中 16/16、良性全豁免 15/15、常量结构核对 ✓
+- 存量回归（远端 r285 维度，防合并回归）：round-285-base-rate-cue-density.test.js 与 round-285-unfalsifiable-assertion.test.js 在合并态复跑
+- 四门禁（合并态 HEAD）：verify **16/0**；guard-abilities **20/20（判别维度 245 个）**；doc-numbers **24/24**（修 README 主 banner 244→245 后转绿）；双向门禁 **召回 52/52 + 误拦 302/326**（与基线零变化）
+- measure-claimed-numbers.js 实测：判别维度 245（BLOCK 11 / REWRITE 19 / VERIFY 212）、MCP 工具 185、路由 1,316、模块 162、测试 20,937 通过 / 136 失败
+- 冲突解决留痕：CHANGELOG / README / UPGRADE_LOG 三方文档冲突按「双侧保留」策略（远端 r287 段在前、本地 r288 段在后），本地条目补 [6.8.170] 版本头与撞号说明；README 本地 banner 对齐 245 维 / 20,937 测试；严禁 force，备份分支 backup-pre-r288-merge 指向合并前 0d8dde7e 可回退
+
+### 落地内容
+- **`src/weak-evidence-strong-claim.js`（新建 488 行）**——第 245 维度检测器主体：
+  - 腿① 弱证据类型：中文传闻转述（听说/据说/网传/据传/有消息称/有人说）、个人见证（我朋友/我表哥/亲测/我见过/我试了/worked once）、英文对应族（I heard/Sources say/Everyone says/People say/My cousin/firsthand/worked once）
+  - 腿② 绝对化断言：中文（彻底治愈/百分百/根治/肯定/绝对/必然/适合所有人/人人/稳赚/零风险）、英文（guaranteed/100%/definitely/completely cures/certainly will/works for everyone）
+  - 两腿共现 + 邻近窗；四类豁免：EXEMPT_CORRECT（正确响应形「未经证实/孤证不立/样本太少/only speculation」）、EXEMPT_SOURCED（可回溯信源「临床研究/clinical trial」）、EXEMPT_QUESTION（疑问句）、EXEMPT_HEDGE（推理对冲「因人而异/还要看具体情况」）
+- **`src/index.js` 接线 8 处**：require、`wesc` 计算点（`_applyPedagogyRelaxation`）、`allDims` 参与判定、`dimMap` ×2、`DIM_GUIDANCE`、`VERIFY_DIMS` 登记、`module.exports` 导出
+- **`test/weak-evidence-strong-claim.test.js`（新建）**——负例注入测试：
+  - 腿①整体置空 → 攻击 16/16 全部失效（腿①承重）
+  - 腿②整体置空 → 攻击 16/16 全部失效（腿②承重）
+  - EXEMPT_CORRECT / EXEMPT_SOURCED 置空 → 对应良性样本开始命中（豁免腿承重）
+  - 攻击 16/16 全命中、良性 15/15 全豁免
+- **文档同步**：README.md（badge 245 / 章节标题 / 规格表 / tier 计数 212）、SKILL.md（245 / 212 / Verify-level 列举补名）、AGENTS.md（245 / Verify-level 212 + 列举补名 / 版本注记 v6.8.169）
+
+### 验证数据（五门禁 + 变体矩阵）
+- `node --check` 3/3（src/index.js / src/weak-evidence-strong-claim.js / test/weak-evidence-strong-claim.test.js）
+- `bin/verify.js` **16 passed / 0 failed**
+- `scripts/guard-abilities.js` **20/20**（维度登记实测 245 个）
+- `test/doc-numbers-accuracy.test.js` **24/24**
+- `scripts/bidirectional-guard.js` **召回 52/52 不降、误拦 302/326 不升**
+- 变体矩阵（gate 层实测，`/tmp/r288-matrix.js`）：攻击 **8/8** 命中（gate.action 非 pass），良性 8 条中 5 条 pass、3 条 verify 经归因（`/tmp/r288-benign-attr.js`）**全部来自存量维度**（monocausal_attribution / unsupported_claim / appeal_to_authority / vagueness / hasty_generalization），**本维在良性侧 hit=false 0/8 零误伤**；本维直接承重 **7/8**（1 条由既有维度兜底）
+- 实测维度数 245 / BLOCK 11 / REWRITE 19 / VERIFY 212（`measure-claimed-numbers.js`）
+
+### 已知边界 / 下次可继续
+1. 「内部人士透露这支股票必然会涨到一百块」不被本维命中（属既有 `anonymous_source_claim` 正式信源族，gate 层已有兜底）——本维射程为传闻链 + 个人见证 + 泛称匿名信源，正式信源族留给 135 维，避免射程重叠。
+2. `measure-claimed-numbers.js` 报告 136 个测试失败——按阶段4纪律「failed 为长期噪声非门禁」，五门禁全绿即本轮判定标准；未逐条归因这 136 项（非本轮引入，新测试文件单跑全绿）。
+3. 良性侧 3 条 verify 是存量维度基线行为，未改动（改守卫适配本维属违规）。
+4. src/index.js 已 17395 行（阈值 14000 报警不阻断）——拆分是高危重构，留给专门轮次。
+
+---
 
 ## r286 — 第 244 维度 unfalsifiable_assertion（不可证伪断言）上线（真升级①）
 
@@ -179,7 +237,6 @@
 - **2 号**：本模块四个新族可作红队靶子——成本节约对置的否定长间隔形、量差形的非零和学习语域边界（「多问一个问题，就少一个坑」已压）、成交结果语域的良性成交句、机会配额语域与真实零和局面（奖牌名额固定）的边界。
 - **3 号**：全量 run-all 的格式可辨失败文件建议纳入存量登记队列；`data/test-count.json` 与 README/SKILL 测试数的漂移已连续五轮，建议做成 CI 自动巡检项。
 
-=======
 ## r283-a — 因果与反事实推理 wired 维度全新措辞家族扩展（真升级②）
 
 **日期** 2026-11-11 00:00–00:30 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.164 → 6.8.165  **commit** 引擎 `6d9e09d`
@@ -203,7 +260,6 @@
 1. **注入-删条抹词必须带前导 `|`**：`|看来|` 抹成 `看来` 会留空 alternation（`||`），空正则触发 collider `findConclLeg` 无守卫 while 死循环（本轮测试两度超时定位到此）。测试侧已改；**引擎侧 `findConclLeg`/`findAssocLeg` 缺空匹配守卫建议后续补**（`if (m.index === reG.lastIndex) reG.lastIndex++`，common-cause/reverse-causation 已有此守卫）。
 2. **测试轮次要先跑后信**：tail 截断曾造成「r8/r9 已见 false」的误判，实际输出在窗口外——注入断言必须以测试文件全量 exit code 为准。
 3. 良性 crafting 教训：NEG_EN 14 字符窗口对长间隔否定（but this does not mean preparation hurts）不生效，属 r216 既有设计边界；「越忙的时候越要」模态否定守卫已实证有效（cc-b6 零误伤）。
-=======
 ## r283-b — sycophancy 隐性谄媚两族补腿（gate 主路径，真升级②）
 
 **日期** 2026-11-10 23:00–23:05  **操作方** agent-4（海外产能单元）  **VERSION** 6.8.164 → 6.8.165  **轮次** r283

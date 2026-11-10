@@ -961,6 +961,7 @@ const { checkZeroSumFallacy } = require('./zero-sum-fallacy.js');
 // 有界阴性结论全称化，#62 appeal_to_ignorance 管举证责任分配，本维度
 // 管断言在构造层面排除任何反证观测。缩写 ufa grep 0 命中无冲突。
 const { checkUnfalsifiableAssertion } = require('./unfalsifiable-assertion.js');
+const _checkWeakEvidenceStrongClaim = require('./weak-evidence-strong-claim.js').checkWeakEvidenceStrongClaim;
 // [r271 接线] provisional 第 241 维度 self_selection_bias（自选择偏差 /
 // volunteer bias / 自选组效果归因：群体自行决定是否进入某项目/工具/
 // 服务，再据此把结果差异归因于该项目本身——「自愿参加培训的员工绩效
@@ -2422,6 +2423,10 @@ function discriminate(text, evidence = [], contentMode) {
   // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。ufa——
   // unfalsifiable assertion 缩写，grep 0 命中无冲突。
   const ufa = _applyPedagogyRelaxation(checkUnfalsifiableAssertion(_normText), "unfalsifiable_assertion", pedagogyRelaxation);
+  // [r288 接线] 第 245 维度 weak_evidence_strong_claim（弱证据强断言错配）
+  // 计算点。同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。wesc——
+  // weak evidence strong claim 缩写，grep 0 命中无冲突。
+  const wesc = _applyPedagogyRelaxation(_checkWeakEvidenceStrongClaim(_normText), "weak_evidence_strong_claim", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -3096,6 +3101,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r284 接线] 第 244 维度 unfalsifiable_assertion 参与判定（不可证伪断言）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: ufa.score, name:'unfalsifiable_assertion'},
+    // [r288 接线] 第 245 维度 weak_evidence_strong_claim 参与判定（弱证据强断言错配）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: wesc.score, name:'weak_evidence_strong_claim'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3695,6 +3703,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r284 接线] 第 244 维度 unfalsifiable_assertion 补登记（不可证伪断言：
     // 实质性断言腿×构造上排斥反证腿，四形 CN-A/B/C/D，CN-D 独立成案）。
     unfalsifiable_assertion: ufa,
+    // [r288 接线] 第 245 维度 weak_evidence_strong_claim 补登记（弱证据强断言错配：
+    // 弱证据类型腿×绝对化断言腿，两腿共现+邻近窗，四类豁免）。wesc——
+    // weak evidence strong claim 缩写。
+    weak_evidence_strong_claim: wesc,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -4357,6 +4369,8 @@ function discriminate(text, evidence = [], contentMode) {
     zero_sum_fallacy: '自愿交换的收益不是从对方口袋里转移过来的——退出成本为零时成交即双方按各自估价获益；先核对总额是否真的恒定（奖牌名额/固定额度/蛋糕分配才可能是零和），再回到双侧主观估价与退出成本重新比较，否则不得断言一方所得即另一方所失',
     // [r284 接线] 第 244 维度 unfalsifiable_assertion（不可证伪断言）。
     unfalsifiable_assertion: '把断言改成可以被推翻的形式：给出可观测指标、判决性条件与失败判据（「若 X 发生则本解释不成立」）；若断言指向当前不可观测的实体，须明示它何时、以何种观测可被检验，而不是把「测不到」当作支持',
+    // [r288 接线] 第 245 维度 weak_evidence_strong_claim（弱证据强断言错配）。
+    weak_evidence_strong_claim: '证据强度与断言强度错配：一个结论的确定性上限由它最弱的那条证据决定——传闻转述（听说/据说/网传/Sources say）、个人见证（我朋友/亲测/worked once）、泛称匿名信源都不可回溯，不足以承载「彻底治愈/百分之百/guaranteed」这类绝对化断言；要么把断言降到证据能支撑的程度（「可能有效，待验证」），要么换成可回溯的信源（临床数据/研究报告/具名来源），不得把不可核验的传闻包装成绝对化结论',
   };
   // 给每个 finding 附上修改指引
   for (const f of findings) {
@@ -5576,6 +5590,19 @@ function discriminate(text, evidence = [], contentMode) {
     // （有界阴性结论全称化）、#62 appeal_to_ignorance（举证责任分配）
     // 的射程边界见 src/unfalsifiable-assertion.js 头注释。
     'unfalsifiable_assertion',
+    // [r288 接线] 第 245 维度 weak_evidence_strong_claim（弱证据强断言错配：
+    // 弱证据类型腿×绝对化断言腿——传闻转述听说/据说/网传/Sources say、
+    // 个人见证我朋友/亲测/worked once、泛称匿名信源有消息称/据传，与
+    // 彻底治愈/百分之百/guaranteed/适合所有人 共现即判）登记。verify 级——
+    // 单句也可能是对虚假营销的正确转述与批评（「那些『百分百治愈』的
+    // 保健品都是靠听说和亲测堆出来的」正是本族要教的判别动作）、广告
+    // 案例教学、消费维权讨论，rewrite/block 会误伤。verify 的含义是
+    // 「这段文本用不可回溯的弱证据承载了绝对化断言，需要先取得可核验的
+    // 证据再评估其可信度」。与 #244 unfalsifiable_assertion（断言构造层面
+    // 排除反证）、#135 anonymous_source_claim（正式无署名信源×强断言）、
+    // #133 anecdotal（个例结局→领域结论）、#200 availability_bias 的射程
+    // 边界见 src/weak-evidence-strong-claim.js 头注释。
+    'weak_evidence_strong_claim',
   ]);
   // pass：无问题通过
 
@@ -6143,6 +6170,10 @@ function discriminate(text, evidence = [], contentMode) {
     // [r284 接线] 第 244 维度 unfalsifiable_assertion 补登记（不可证伪断言）。
     // ufa——unfalsifiable assertion 缩写。
     unfalsifiable_assertion: ufa,
+    // [r288 接线] 第 245 维度 weak_evidence_strong_claim 补登记（弱证据强断言错配：
+    // 弱证据类型腿×绝对化断言腿，两腿共现+邻近窗，四类豁免）。wesc——
+    // weak evidence strong claim 缩写。
+    weak_evidence_strong_claim: wesc,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,
@@ -17227,6 +17258,9 @@ module.exports = {
   // [r284 接线] 第 244 维度 unfalsifiable_assertion 导出（同先例，
   // 漏导出会让测试与 MCP handler 拿不到单维函数）。
   checkUnfalsifiableAssertion,
+  // [r288 接线] 第 245 维度 weak_evidence_strong_claim 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  _checkWeakEvidenceStrongClaim,
   // [r251] 第 227 维度 means_as_end 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkMeansAsEnd,

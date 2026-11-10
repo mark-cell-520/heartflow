@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-185-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-244-blueviolet.svg)](#what-it-catches-244-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-245-blueviolet.svg)](#what-it-catches-245-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,9 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-244 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
+245 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
+×  1,316 dispatch routes  ×  20,937 passing tests  ×  2 npm dependencies
+45 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
 ×  1,316 dispatch routes  ×  20,937 passing tests  ×  2 npm dependencies
 ```
 
@@ -158,7 +160,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (244 dimensions) -> gate
+scope-check -> premise-check -> discriminate (245 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +187,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (244 dimensions)
+## What it catches (245 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **211 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **212 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +206,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.169**. Not marketing copy.
+Measured on this repository at **v6.8.170**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 244 |
+| Discrimination dimensions | 245 |
 | MCP tools | 185 |
 | Test suite | 20,937 passing / 136 failing | `node test/run-all.js` (full run 2026-11-11; passed baseline resynced per r241/r412 precedent — failed 135 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修，失败数与 r280 基线持平)) |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +384,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.170 | 2026-11-11 | r288（原 r287 撞号重编号）：第 245 维度 `weak_evidence_strong_claim` 弱证据强断言错配上线（真升级①）——弱证据腿 × 绝对化断言腿双腿共现，维度 244→245、VERIFY 211→212、模块 162 不变；`src/index.js` 接线 8 处；轮测注入删条全绿；论文依据 arXiv 2605.03534（SURE-RAG）|
 | 6.8.169 | 2026-11-11 | r287（原 r286 撞号重编号）：`false_dilemma` 站队胁迫二分族上线（真升级②）——认同等同式/否定行为×负面定性单独支/逼迫二选/EN 立场负载 either-or/施压/威胁后果 8 常量 + 3 路由，维度计数 244 不变、`src/index.js` 零改动；轮测 84/84、注入删条 8/8、池化穿透 5/8→0/8 |
 | 6.8.168 | 2026-11-11 | **第 244 维度 unfalsifiable_assertion（不可证伪断言）上线** — 判别「**在构造层面排斥任何反证观测的实质性断言**」结构：断言本身排除了任何能观测到它不成立的场景，于是永远无法被推翻。四形：**CN-A 不可观测实体**（能量场/气场/祖先的庇佑在起作用，只是仪器测不到）、**CN-B 事后可调解释**（没显灵是因为你心不够诚/市场不好只是暂时的调整）、**CN-C 无限延期验证**（再等等/时机未到/下次一定）、**CN-D 万能免责**（这套方法永远有效，不灵只能说明你没做对/市场永远是对的，错的只能是你的仓位）。判据**两腿共现**：腿①实质性结论/预测/机制断言，腿②构造上排除反证观测；CN-D 自身即完整结构独立成案。边界划清：#202 unfalsifiable_confirmation 管双果自证（事后解释层），#182 absence_of_problems 管有界阴性结论全称化，#62 appeal_to_ignorance 管举证责任分配——本维度管「断言构造本身排除反证」。豁免表七组：科学假说、可检验预测、范围限定、对冲、教学转述、拒绝推断、疑问句。模块 `src/unfalsifiable-assertion.js`（406 行，两腿判据 + 四形 + 豁免表），`src/index.js` 七处接线（require / 计算点 / allDims / dimMap×2 / guidance / VERIFY_DIMS / 导出）。验证：轮测 `test/round-285-unfalsifiable-assertion.test.js` 9/9（攻击 ZH 11/11 + EN 11/11 全命中、良性 48 条零误伤、gate 入口攻击全 rewrite 且维度承重、CN-D 独立成案、腿①缺失不误判、空输入不崩）；四门禁 verify 16/0、guard 20/20@244维、doc 24/24、双向 52/52 + 误拦 302/326。维度 243→244，VERIFY 210→211，模块 162 不变。 |
 | 6.8.167 | 2026-11-11 | **统计素养 wired 维度 cue-density 轴共现观察族扩展（r285，真升级②）** — `base_rate_neglect`（基础概率忽视）第二轴落地，来源海外真实命中论文 arXiv "Two base rates, two weights: base-rate neglect has a second axis"（r285 扫描入档）：把共现读成判断需两次基础概率校正——结果先验（古典轴，既有腿）+ **线索自身出现频率**（本轮新增）。缺口实证：改前统计素养五候选族 24 条新措辞攻击中本族 4/8 完全穿透（gate pass 且零维度承重）为最高。新增腿① `CUE_ZH`/`CUE_EN` 共现观察族（十个被骗的老人里九个都接过陌生来电 / Nine out of ten fraud victims / Every executive who got fired / Almost all the companies that collapsed / 有个共同点）、腿② `CUE_CONF_ZH`/`CUE_CONF_EN` 新归属落点（你很可能已经被盯上了 / 八成也危险了 / 铁定会出事；probably being targeted / likely next on the list / going to fail）、豁免 `EXEMPT_CUEDENSITY`（线索本身就很常见 = 计及 cue 密度的正确推理）。轮测 53/53；负例注入删条 13/13 变红；存量 round-263/279/267 不回归；四门禁全绿（双向误拦 302/326 与基线零变化）；维度 243、模块 162、src/index.js 零改动。 |

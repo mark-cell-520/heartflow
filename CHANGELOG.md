@@ -14,6 +14,20 @@
 
 ### 验证
 轮测 test/round-287-false-dilemma-alignment.test.js 84/84（攻击 13/13、良性 12/12、注入删条 8/8、对照 7/7）；池化穿透复跑 false_dilemma 5/8→0/8；存量 round-496 61/61 不回归；四门禁 verify 16/0、guard 20/20@244 维、doc 24/24、双向 召回 52/52 + 误拦 302/326 与基线零变化；全量 run-all 20,937 passed / 136 failed，失败清单与 r285 基线逐条一致（+1 自报失败归因远端 r286 新维度 unfalsifiable_assertion 误伤 affective-forecast 良性样本，详见报告）。
+# 6.8.170 变更日志条目
+
+## [6.8.170] - 2026-11-11
+
+> **撞号重编号**：本地 r287 工作（本条目）与远端 r287（`false_dilemma` 站队胁迫二分族）撞号，按 r277→r278 / r283-a/b 先例本地侧重编号为 **r288**、VERSION 递进至 6.8.170；远端 r287 保留于上方 [6.8.169] 段。
+
+## 新增（真升级①：第 245 维度 weak_evidence_strong_claim 弱证据强断言错配）
+- **新维度 `weak_evidence_strong_claim`（VERIFY）**（`src/weak-evidence-strong-claim.js`，488 行，维度 244→245、VERIFY 211→212、模块 162 不变）：判别「**弱证据类型 × 绝对化断言**」的错配——结论的确定性上限由最弱证据决定，传闻转述、个人见证与泛称匿名信源不能承载「彻底治愈/百分百/guaranteed/适合所有人」这类断言。论文依据 arXiv 2605.03534（SURE-RAG）。
+  - **腿① 弱证据类型**：中文传闻转述（听说/据说/网传/据传/有消息称/有人说）、个人见证（我朋友/我表哥/亲测/我试了/worked once）、泛称匿名信源（匿名人士/知情人透露）；英文对应族（I heard/Sources say/Everyone says/People say/My cousin/firsthand/worked once）
+  - **腿② 绝对化断言**：中文（彻底治愈/百分百/根治/肯定/绝对/必然/适合所有人/人人/稳赚/零风险）；英文（guaranteed/100%/definitely/completely cures/certainly will/works for everyone）
+  - **两腿共现 + 邻近窗**；四类豁免：EXEMPT_CORRECT（未经证实/孤证不立/样本太少）、EXEMPT_SOURCED（临床研究/clinical trial 可回溯信源）、EXEMPT_QUESTION（疑问句）、EXEMPT_HEDGE（因人而异/因人而异对冲）
+  - **边界划清**：#135 anonymous_source_claim 管正式无署名信源族（知情人士/内部人士/sources familiar），本维管传闻链 + 个人见证 + 泛称匿名信源与绝对化断言的错配，射程互补不重叠
+
+---
 
 # 6.8.168 变更日志条目
 
