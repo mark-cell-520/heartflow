@@ -1,0 +1,8 @@
+test/round-171-base-rate-neglect.js                    10 通过, 1 失败
+test/round-263-base-rate-neglect.test.js               102 通过, 0 失败
+test/count-rate-conflation.test.js                     16 通过, 2 失败
+test/law-of-small-numbers.test.js                      17 通过, 0 失败
+test/round-272-wired-family-extensions.test.js         92 通过, 0 失败
+test/round-269-statistical-literacy-wiring.test.js     test/significance-effect-size.test.js                  18 通过, 0 失败
+test/round-228-conditional-transposition.test.js       67 通过, 0 失败
+test/prosecutors-fallacy.test.js                       test/round-274-gate-family-extensions.test.js          44 通过, 0 失败
