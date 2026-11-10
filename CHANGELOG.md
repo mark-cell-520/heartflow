@@ -1,3 +1,26 @@
+# 6.8.161 变更日志条目
+
+## [6.8.161] - 2026-11-10
+
+### 新增（真升级②：已有维度的全新措辞家族 ×3 模块，r278）
+- **`appeal_to_tradition` 诉诸传统新措辞家族**（`src/appeal-tradition.js`）：TRAD_ZH 补 t10 千百年来/多少代人时间跨度口语形、t11 牌子口碑年资；SUPP_ZH 补 s10 别瞎折腾/别乱动压制族、s11 不能丢了传统、s12 老规矩还是得守；CONCL_ZH 补 c8 还能有错？/不可能有问题封闭反问、c9 照老方子来服从指令；EN 补 e11 been around for ages、e12 reputation spans、e13 see no reason to stop、e14 who are we to change、e15 keep X as it has always been，e3 扩 do not go fixing。探针 10/10 穿透、良性 8/8 零误伤。
+- **`false_dilemma` 虚假两难新措辞家族**（`src/false-dilemma.js`）：STIGMA_ZH 补 n1 不是A就是B（贬名标签族）、n2 要么A要么跟我作对（胁迫对立族）、n3 不转发就是不爱国（行为品质污名族）；DILEMMA_ZH 补中庸就是和稀泥（中间路线污名）；FORCE_ZH 补立场鲜明（胁迫站队）；EXMID 补灰色地带/no gray area（排除中项）；STIGMA_EN 补 you do not care about / either a friend or an enemy / or you are against me。探针 9/9 穿透、良性 7/7 零误伤。
+- **`no_true_scotsman` 无真正苏格兰人新措辞家族**（`src/no-true-scotsman.js`）：ROLE_NOUNS +104（高手/铁粉/甲方/爷们/老玩家/作者/gamer/foodie/programmer 等互联网世代与零工身份族）、AUTH 标记补有骨气/legit/die-hard 等 14 个、新增铁粉/老玩家/是个爷们三个 authenticity 独腿签名、EXCLUSION_EN 扩 do not/don't 一般现在时否定。探针 10/10 穿透（改前 4/10）、良性 5/5 零误伤。
+- 三模块均附 inject 钩子（负例逐支注入通道）：appeal 分支表删支 / false_dilemma dropAlt / nts 旧版常量复原。
+
+### 修复
+- `test/round-274-gate-family-extensions.test.js` VERSION 基线断言 `6.8.160` → `6.8.161`：跨轮次版本基线登记维护（与 r277 同步 6.8.158→6.8.160 同性质，非适配性改动）。
+- 文档三层同步：README 规格表版本戳 v6.8.161 + Version history 新增 6.8.161 条目；SKILL.md frontmatter/measured-at/Engine version 三处版本戳；AGENTS.md 维度链备注因文件写保护未追加（doc 门禁不校验 AGENTS 版本戳，无门禁影响）。
+
+### 验证
+- 轮测 `test/round-278-wired-family-extensions.test.js`：**68 passed / 0 failed**（攻击 29 全承重 + 良性 22 零误伤 + 登记 5 + 注入删条 **32/32 全变红**、0 未变红）。
+- 探针池合并态复跑：appeal_to_tradition 10/10、false_dilemma 9/9、no_true_scotsman 10/10，良性误伤 0。
+- 五门禁：verify 16/0、guard-abilities 20/20（维度登记 243 键）、doc-numbers 24/0、bidirectional 召回 52/52 + 误拦 302/326（与基线零变化）。
+- 维度计数 243 不变、模块数 162 不变、src/index.js 零改动。
+
+### 运维注记
+- 本地 r277 认领未推送期间，远端 main 于 13:38 CST 发布了无认领记录的另一条 r277（v6.8.160 counterfactual EN-B）。按宪法 §1.1 轮次号全局唯一，本地未推送工作重编号为 r278 落地；根因是认领记录滞留本地未 push，后续认领后应立即 push。
+
 # 6.8.160 变更日志条目
 
 ## [6.8.160] - 2026-11-10

@@ -3,8 +3,8 @@
  * test/round-274-gate-family-extensions.test.js
  * [r274] 三个已接线维度的全新措辞家族扩展（真升级②，live 生效，维度计数
  * 240 不变、src/index.js 零改动、VERSION 未 bump（r274 纯措辞家族扩展；
- * 基线于 r277 前同步：r273 bump 至 6.8.159 时未回填本断言，本轮 r277
- * 递增至 6.8.160 后统一对齐，属跨轮次基线登记维护而非适配性改动）：
+ * 基线于 r278 前同步：r277 bump 至 6.8.160 时未回填本断言，本轮 r278
+ * 递增至 6.8.161 后统一对齐，属跨轮次基线登记维护而非适配性改动）：
  *
  * ① gamblers_fallacy（第 148 维度）口语 streak/due 族：
  *    STREAK_ZH 补 连续输/接连/连连（动词后置连败形）、(正反背)面 N 次、
@@ -312,7 +312,7 @@ t('登记-数组长度守恒 + 维度总数不减', () => {
   const idx = require('../src/index.js');
   const V = require('../src/core/version.js');
   assert.ok(typeof idx.detect === 'function', 'index.js detect 入口在位');
-  assert.strictEqual(V.VERSION || V.version || V.default, '6.8.160', 'VERSION 未 bump（r277 递增至 6.8.160）');
+  assert.strictEqual(V.VERSION || V.version || V.default, '6.8.161', 'VERSION 未 bump（r278 递增至 6.8.161）');
 });
 
 // ─── 8. 收尾清理：无全局状态变更 ──────────────────────────────────
