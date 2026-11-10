@@ -3256,6 +3256,28 @@ function _topicScopeFallback() {
   } catch (_) { _tsFallback = null; }
   return _tsFallback;
 }
+// [r278] KnowledgeBase（带证据与状态的命题库）进程内回退单例，与 _klFallback 同构：
+// 引擎未启动时兜底，正常路径走 heartflow.knowledgeBase（module-registry 动态接线）。
+// 刻意不用模块级缓存实例替代引擎实例——那会退化成 r312「两套状态互相看不见」老路。
+let _kbFallback = null;
+function _knowledgeBaseFallback() {
+  if (_kbFallback) return _kbFallback;
+  try {
+    const { KnowledgeBase } = require('./reasoning/knowledge-base.js');
+    _kbFallback = new KnowledgeBase({ silent: true });
+  } catch (_) { _kbFallback = null; }
+  return _kbFallback;
+}
+// [r278] InferenceChain（推理链构建与校验引擎）进程内回退单例，同上。
+let _icFallback = null;
+function _inferenceChainFallback() {
+  if (_icFallback) return _icFallback;
+  try {
+    const { InferenceChain } = require('./reasoning/inference-chain.js');
+    _icFallback = new InferenceChain({ silent: true });
+  } catch (_) { _icFallback = null; }
+  return _icFallback;
+}
 // [v6.8.0 第 589 轮] InstructionRegistry（七条指令）进程内回退单例。
 // r589 之前 heartflow.js:1645 实例化 this.instructions 后全仓零调用点——
 // 七条指令的检查从未执行过一次，4 条连判据都没有（check 恒 aligned:true）。
@@ -4328,6 +4350,123 @@ const HANDLERS = {
       const r = mq.score ? mq.score(args?.memory || '') : {};
       return { quality: r, timestamp: Date.now() };
     } catch (e) { return { error: e.message }; }
+  },
+
+  // [r278] 知识库 + 推理链（KnowledgeBase + InferenceChain）—— 真升级③+④。
+  // 此前两个模块（src/reasoning/knowledge-base.js 416B stub / inference-chain.js
+  // 422B stub）经 module-registry 动态加载，但全仓零 dispatch、零 MCP 工具。
+  // 本工具把它们接成外部 agent 可调用的能力：
+  //   · action=assert   命题入库（带来源与置信度）
+  //   · action=evidence 给命题附加支持/反驳证据（影响其可信度状态）
+  //   · action=query    关键词检索（返回带证据溯源的命题）
+  //   · action=contradictions 一致性检查（找出矛盾与冗余命题）
+  //   · action=chain_new / chain_add / chain_analyze / chain_expand
+  //                     推理链的创建、追加、逐环节校验与缺失步骤建议
+  //   · action=stats    知识库与推理链统计
+  // 常驻实例优先（heartflow.knowledgeBase / heartflow.inferenceChain），
+  // 引擎未启动时退化到进程内单例（与 knowledge_layer / associative 同构）。
+  // 纯读能力，无写权限收口需求；未来若加 memory_write 类动作再按三层权限模型收口。
+  heartflow_reasoning: (args) => {
+    const action = args?.action || 'stats';
+    const kb = (heartflow && heartflow.knowledgeBase) || _knowledgeBaseFallback();
+    const ic = (heartflow && heartflow.inferenceChain) || _inferenceChainFallback();
+    if (!kb || !ic) {
+      return { error: '知识库/推理链未初始化：引擎未启动且回退单例创建失败' };
+    }
+
+    // ── 知识库动作 ──────────────────────────────────────────────
+    if (action === 'assert') {
+      const claim = typeof args?.claim === 'string' ? args.claim.trim() : '';
+      if (!claim) return { error: 'assert 需要 claim（要入库的命题）' };
+      const r = kb.addFact(claim, {
+        source: args?.source || 'mcp-caller',
+        confidence: typeof args?.confidence === 'number' ? args.confidence : 0.8,
+        domain: args?.domain || 'general',
+      });
+      return { action, ...r, timestamp: Date.now() };
+    }
+
+    if (action === 'evidence') {
+      const factId = args?.factId;
+      const type = args?.type === 'refute' ? 'refute' : 'support';
+      if (!factId) return { error: 'evidence 需要 factId（目标命题 ID）' };
+      const r = kb.addEvidence(factId, {
+        type,
+        source: args?.source || 'mcp-caller',
+        weight: typeof args?.weight === 'number' ? args.weight : 0.5,
+        note: args?.note || '',
+      });
+      return { action, ...r, timestamp: Date.now() };
+    }
+
+    if (action === 'query') {
+      const q = typeof args?.query === 'string' ? args.query : '';
+      if (!q) return { error: 'query 需要 query（检索关键词）' };
+      const results = kb.query(q, { limit: args?.limit || 10 });
+      return { action, query: q, count: results.length, results, timestamp: Date.now() };
+    }
+
+    if (action === 'contradictions') {
+      const r = kb.checkConsistency();
+      return {
+        action,
+        checked: r.checked,
+        contradictions: r.contradictions,
+        redundancies: r.redundancies,
+        timestamp: Date.now(),
+      };
+    }
+
+    // ── 推理链动作 ──────────────────────────────────────────────
+    if (action === 'chain_new') {
+      const question = typeof args?.question === 'string' ? args.question : '';
+      const r = ic.createChain(question);
+      return { action, ...r, timestamp: Date.now() };
+    }
+
+    if (action === 'chain_add') {
+      const chainId = args?.chainId;
+      const text = typeof args?.text === 'string' ? args.text : '';
+      if (!chainId) return { error: 'chain_add 需要 chainId' };
+      if (!text) return { error: 'chain_add 需要 text（该步骤内容）' };
+      const r = ic.addStep(chainId, {
+        type: args?.type || 'inference',
+        text,
+        confidence: typeof args?.confidence === 'number' ? args.confidence : undefined,
+        declaredAssumption: !!args?.declaredAssumption,
+      });
+      return { action, ...r, timestamp: Date.now() };
+    }
+
+    if (action === 'chain_analyze') {
+      const chainId = args?.chainId;
+      if (!chainId) return { error: 'chain_analyze 需要 chainId' };
+      const r = ic.analyze(chainId);
+      return { action, ...r, timestamp: Date.now() };
+    }
+
+    if (action === 'chain_expand') {
+      const chainId = args?.chainId;
+      if (!chainId) return { error: 'chain_expand 需要 chainId' };
+      const r = ic.expandChain(chainId);
+      return { action, ...r, timestamp: Date.now() };
+    }
+
+    if (action === 'chain_get') {
+      const chainId = args?.chainId;
+      if (!chainId) return { error: 'chain_get 需要 chainId' };
+      const r = ic.getChain(chainId);
+      if (!r) return { action, error: `推理链不存在: ${chainId}` };
+      return { action, chain: r, timestamp: Date.now() };
+    }
+
+    // stats（默认）：知识库 + 推理链统计
+    return {
+      action,
+      knowledgeBase: kb.getStats ? kb.getStats() : null,
+      inferenceChain: ic.getStats ? ic.getStats() : null,
+      timestamp: Date.now(),
+    };
   },
 
   // [v6.8.0 第 579 轮] 话题隔离栈（TopicScope）—— 真正可用的 MCP 接线。

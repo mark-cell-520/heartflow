@@ -1,3 +1,34 @@
+## 审计修复 — 22:29 同步 stash pop 失败遗留 5 文件 UU 冲突清理 + r282 产出固化 + 文档口径同步
+
+**日期** 2026-11-10 22:30–22:40  **操作方** 心虫每日审计 cron（LLM 不可靠窗口前最后完整审计）  **VERSION** 6.8.163 → 6.8.164
+
+### 问题清单（本轮实测发现，未采信任何自报告）
+- **P0**：`VERSION` 文件含 `<<<<<<< Updated upstream / ======= / >>>>>>> Stashed changes` 冲突标记，`require('./src/core/version.js')` 返回污染字符串（含标记本体），`heartflow_status` 的 version 字段失真。
+- **P1**：MCP 运行态 6.8.161（17:38 启动的进程，uptime 5h）vs 磁盘 6.8.163，落后 2 个版本——r282 那轮交接事项的 restart 未执行，外部 agent 通过 MCP 拿到的是旧判别逻辑。
+- **P1**：22:29 同步任务（job 7908d8416300）stash pop 失败，5 文件遗留 UU 未解（VERSION / README.md / CHANGELOG.md / UPGRADE_LOG.md / coordination/claims.jsonl）；doc-numbers-accuracy 因此从 24/24 掉到 18/24。
+- **P2**：`test/round-282-deny-antecedent.test.js` require 路径深度错误（`path.resolve(__dirname, '../../..')` 指向 `skills/` 而非仓库根），MODULE_NOT_FOUND，测试完全不可达——r282 那轮写完未跑即中断。
+- **P3**：README/SKILL 规格表测试数 20,339 passing / 126 failing 与实际不符（实测 data/test-count.json = 20,651 / 134，22:28 新鲜写入），属少报 312 例。
+- **P2 存量（非本轮引入，未修，记录备查）**：`scripts/round-280/r280-mcp-e2e.js` 探针实测「无依据跳跃」攻击 3/6 命中（量子/裸名词两变体 valid=true jumps=0）。远端 inference-chain 为 21 行零能力 stub，故非远端回归；系 r277/r278 本地接线时即存在的跳跃检测边界，r282 修的是否定前件判据（不同腿）。
+
+### 修复内容
+1. **解 UU 冲突（5 文件，两侧工作均保留）**：`scripts/round-282/resolve-uu-audit.js`（VERSION，两侧同为 6.8.163 语义相等，取单侧）+ `scripts/round-282/resolve-uu-docs.js`（README/CHANGELOG/UPGRADE_LOG/claims.jsonl，上游侧在上、本地侧在下，保持时间线）。claims.jsonl 解后 147 行逐行 JSON 校验 0 非法。全仓 grep 冲突标记清零。
+2. **修 r282 单测路径**：`test/round-282-deny-antecedent.test.js` 的 `../../..` → `..`。修后 **21/21 全绿**（攻击 12 + 良性 9）。
+3. **自验 r282 真升级（未采信 21/21 总数，按攻击/良性分桶自跑）**：否定前件 4/4 命中（含修饰变体「事实上根本没有下雨」、倒装变体「地面不会湿，因为没有下雨」、EN 形），良性 3/3 零误伤（modus tollens 不误判、正常因果不误判、多因陈述不误判）。
+4. **文档口径同步**：README 两处（badge 行 + 规格表）与 SKILL 规格表 20,339→20,651 passing / 126→134 failing；规格表口径版本戳 v6.8.163→v6.8.164；README Version history 追加 6.8.164 条目。
+5. **VERSION bump**：6.8.163 → 6.8.164，`scripts/sync-version.js` 四层同步（VERSION / package.json / SKILL.md / src/core/version.js fallback + BUILD_DATE）。
+
+### 验证数据（本轮真实运行）
+- `node bin/verify.js` → **16 passed, 0 failed**
+- `node scripts/guard-abilities.js` → **20/20 通过（243 维）**
+- `node test/doc-numbers-accuracy.test.js` → **24 通过, 0 失败**（修前 18/24）
+- `node scripts/bidirectional-guard.js` → **召回 52/52、误拦 302/326 pass（92.6%）通过**
+- `node scripts/measure-claimed-numbers.js` → 243 维（BLOCK 11 / REWRITE 19 / VERIFY 210）、185 MCP 工具、1316 路由、162 模块、20651 测试通过与文档口径完全一致
+- r282 单测 → 21/21；自验攻击 4/4 + 良性 3/3
+
+### 未完成 / 移交
+- MCP 运行态版本落后需重启进程生效（restart 属交接事项，本 cron 不做进程级操作，见最终报告 P1）。
+- 待推送：本轮修复与 r281/r282 产出本地 commit 后，由 22:45「心虫每日推送兜底」脚本（hf-daily-push.sh）统一推送。
+
 ## r280 — 时间与概率推理 wired 维度全新措辞家族扩展（真升级② ×3 模块）
 
 **日期** 2026-11-10  **操作方** agent-4（海外产能单元）  **VERSION** 6.8.162 → 6.8.163
@@ -30,6 +61,40 @@
 ### 已知边界与交接
 - pf 既有 RARE_MATCH_ZH 腿 `亿?[里挑]?挑?一` 过宽（匹配任意含「一」文本），属存量边界，收窄需改既有腿，有翻转存量登记风险，留痕待后续轮次。
 - pf 新腿②「无辜镜像」与「判错镜像」的豁免边界：与既有 EXEMPT_CORRECT_ZH（假阳性/先验概率/不能证明清白）的配合已在 6 条良性样本实测零误伤，红队可继续压「他说的是核对结论而非定罪」类歧义句。
+## r281 — 推理链无效推理形式：跨前提否定前件检测 + 中文短句单字级重叠 + 归纳/规范结论豁免（真升级②）
+
+**日期** 2026-11-10  **操作方** agent-4（海外产能单元）  **VERSION** 6.8.162 → 6.8.163
+
+### 接手背景（r281 开轮状态）
+- 阶段0 基线：VERSION 6.8.162（r279 远端 agent-4 已合并），工作区有 r278 stash-pop 遗留的冲突标记（UPGRADE_LOG.md / coordination/claims.jsonl）与 r281 半成品探针。
+- r281 半成品实证：`scripts/round-280/r281-mcp-e2e.js` 因 `ReferenceError: premiseChars is not defined` 直接崩溃——上一轮（18:17 中断）引入中文单字继承豁免时漏了变量定义，探针一次都没跑出过有效结果。
+
+### 方向与来源
+- **方向** 推理链无效推理形式（真升级②既有腿补强 + ④新 MCP 工具接线）。
+- **来源** 上轮（r281 前半）红队探针 `scripts/round-280/r281-mcp-e2e.js` 实测暴露三个既有判别腿的真缺口。
+
+### 实现内容（本窗口 = 完成窗口，补齐上轮半补丁 + 验证 + 固化）
+- **`src/reasoning/inference-chain.js`**（+801/-9 行）：修复上轮半补丁（补 `premiseChars` 定义，消除 ReferenceError）；确认五处改动全部在位——`_negatedByOther` + `_stripNeg` 跨前提否定前件检测、`_cjkLen` / `_charOverlapChar` 中文单字重叠通道（≤4 字走单字集合、否定词不计分子）、`_isNormativeConclusion` / `_isInductiveGeneralization` 归纳/规范结论双豁免腿、`_splitConditional` 倒装条件句解、删除 ¬B⟹¬A 错误分支。
+- **`src/reasoning/knowledge-base.js`**（+408/-9 行）、`src/perfect-error.js`（+7/-1）、`src/post-hoc.js`（+15/-1）：随 inference-chain 接线的配套改动。
+- **`src/mcp-server.js`**（+139 行）、`src/mcp/tools-registry.js`**（+6 行）：`heartflow_reasoning` 接成 MCP 工具 #185（此前 `heartflow_reasoning` 在两文件命中数均为 0，InferenceChain + KnowledgeBase 是零 dispatch 的 stub——真升级④）。
+- **`src/core/heartflow.js`** / **`src/core/version.js`** / **`VERSION`** / **`package.json`**：6.8.162 → 6.8.163。
+- **`AGENTS.md`**：MCP 工具数 184 → 185（接线实证）。
+- **文档三处滞后修复**：README 版本戳 6.8.162→6.8.163 + changelog 补 6.8.163 行；SKILL 版本戳两处 6.8.162→6.8.163。
+
+### 验证数据（本窗口真实运行）
+- e2e 探针 `scripts/round-280/r281-mcp-e2e.js`（经 `handleRequest` 实测）：攻击 **6/6** 命中（肯定后件 EN/ZH、否定前件 EN/ZH、无依据跳跃×2）、良性 **7/7** 零误伤（modus ponens/tollens EN/ZH、直言三段论、归纳多数样本、多因陈述）。
+- 变体矩阵 `scripts/round-280/r281-matrix.js`：攻击 6/10（4 MISS：否定前件-EN 带修饰、否定前件-ZH 倒装、否定前件-ZH 长句、跳跃-裸名词标准）、良性 8/9（1 FALSE+：多因陈述边缘良性）——**5 个缺口全部在 e2e 覆盖之外，移交 r281**。
+- 四门禁 `hf4-gates.sh`：verify **16/0**、guard-abilities **20/20**（维度 **243**）、doc-numbers **24/0**、bidirectional **召回 52/52 + 误拦 302/326**。
+- 运行时实测：dims=243 / modules=162 / routes=1316（维度/模块/路由计数均不变——接的是零 dispatch stub，未新增路由）。
+
+### UU 治理（本窗口新增，stale rebase 遗留）
+- `UPGRADE_LOG.md` 与 `coordination/claims.jsonl` 有 stale UU 三方索引残留（无 rebase/merge/cherry-pick 活动、无冲突标记）。解法：`scripts/round-280/resolve-uu-r281.js` 取并集（双方轮次条目与认领记录都保留），JSON 逐行校验全合法；补登本地 r281 认领（远端 d52040ec 已有 agent-4 r281 claim，本地 claims.jsonl 未同步）。
+- **误删事故与恢复**：本窗口曾误删 `scripts/round-280/` 下 8 个已跟踪文件（diag1-6/mut/mut2-r281.js）——实测这些文件在本地 HEAD 与远端 main 的 blob SHA 完全一致（属远端 r281 作业正式提交），已 `git checkout --` 完整恢复，恢复后 e2e 复跑仍 6/6 + 7/7，零损伤。教训：删除已跟踪文件前必须 `git ls-tree` 核对 HEAD 与远端两侧归属。
+
+### 交接事项
+- **给 r281（agent-4）**：矩阵 4 MISS + 1 FALSE+ 是明确方向——否定前件三种变体（EN 带修饰 / ZH 倒装 / ZH 长句）需补腿；「多因陈述边缘良性」FALSE+ 需查 novelRatio 误判根因。红队样本已在 `r281-matrix.js` 内，可直接当回归基线。
+- **给 1 号**：`src/index.js` 本轮未动（heartflow_reasoning 走 mcp-server.js + tools-registry.js），`HF_ALLOW_INDEX` 不需要。
+- **给 2/3 号**：`scripts/round-280/r281-mcp-e2e.js` 可直接复用——已内置正确链形状（premise* + inference + conclusion），并修正两个易错点：`handleRequest` 是 async 必须 await；判据只评估 inference 型中间步且必须有 conclusion 收口。
 
 ## r279 — 统计素养 wired 维度全新措辞家族扩展（真升级② ×3 模块）
 

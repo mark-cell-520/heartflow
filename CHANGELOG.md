@@ -22,6 +22,28 @@
 
 ### 已知边界（存量留痕，本轮未动）
 - prosecutors-fallacy 既有 RARE_MATCH_ZH 腿 `亿?[里挑]?挑?一` 因全部量词可选，等价于匹配任意含「一」的文本（存量过宽腿）——本轮误差率族样本改用「千分之二」避开，留痕待后续轮次收窄。
+### 新增（真升级②：推理链无效推理形式新判定分支 + 新比对通道 + 双豁免腿，r280）
+- **跨前提否定前件检测**（`src/reasoning/inference-chain.js`）：新增 `_negatedByOther(premises, target, exclude)` + `_stripNeg(text)`。否定前件的标准三段式（p1: 如果A那么B / p2: 不A / step: 所以不B）把否定写在独立前提，原 `_detectInvalidForm` 只扫 given 段（该场景为 null）故结构性漏判。新腿在其余前提中找「高重叠 + 含否定」，中英双语由 MISS 转 HIT。
+- **中文短句单字级重叠通道**：新增 `_cjkLen` / `_charOverlapChar`；任一侧 CJK ≤4 字时走单字集合比对（2-gram 在 3-4 字短句上被切碎，重叠仅 0.33）。纯英文侧保持原 2-gram 路径，存量行为不变。
+- **归纳/规范结论双豁免腿**（`_isNormativeConclusion` / `_isInductiveGeneralization` + `NORMATIVE_ZH`/`NORMATIVE_EN`/`HYPERNYM_ZH`/`HYPERNYM_EN`）：原无依据跳跃判定对正当归纳收尾判 FALSE+（2-gram 全 novel）。规范腿豁免「前提→行动指令」的转写，泛化腿豁免用上位类别词概括样本实例的结论；攻击族裸名词跳跃（专名堆砌）不具此形态，仍命中。
+- **r278 stash 冲突标记清理**：UPGRADE_LOG.md 与 coordination/claims.jsonl 的 git 冲突标记全部解除（保留 upstream r279 完整正文 + 本地 r278 完整正文，两侧均为真实历史）；合并后 claims.jsonl 143/143 行 JSON 合法。
+- 文档三层同步：r279 新增 `heartflow_reasoning`（185 工具）后 README/SKILL/AGENTS 三处 184 → 185（6 处）。
+
+### 修复
+- `_evalInferenceStep` 4 参 `premiseCharSet`（上一轮 18:17 中断遗留的 `ReferenceError: premiseChars is not defined`，探针因此从未跑出有效结果）。
+- `_stem` 补 `ied$`→`y`（studied→study）；恢复 `/[^s]s$/` 与 `/ed$/`（本轮早前误删，复数/过去式归一是其他腿的承重规则）。
+- 删除本轮自己引入的错误分支：「另一前提否定后件 → 推出前件被否定」把 modus tollens（¬B⟹¬A，有效式）误判为否定前件造成 FALSE+ 回归；否定前件与 modus tollens 在字符重叠层同形，唯一区分点是推出的目标段。
+
+### 验证
+- r280 e2e 探针 `scripts/round-280/r280-mcp-e2e.js`：**攻击 6/6 命中，良性 7/7 零误伤**（肯定后件 EN/ZH、否定前件 EN/ZH、无依据跳跃×2 全 HIT；modus ponens EN/ZH、modus tollens EN/ZH、直言三段论、归纳多数样本、多因陈述边缘良性全 CLEAN）。改前：探针 ReferenceError 崩溃、2 攻击 MISS + 2 良性 FALSE+。
+- 五门禁：verify 16/0、guard-abilities 20/20（维度登记 243 键）、doc-numbers 24/24、bidirectional 召回 52/52 + 误拦 302/326（与基线零变化）。
+- `node --check src/reasoning/inference-chain.js` 通过。
+- 维度 243 不变、模块 162 不变、路由 1316 不变；VERSION 6.8.162 → 6.8.163。
+
+### 已知边界
+- 否定前件检测依赖 `_splitConditional` 的前提解析，省略连接词/倒装条件句仍可能漏。
+- 短句单字级通道阈值 0.5 与 4 字边界按否定前件三段式标定，更长否定稀释形态未压测。
+- HYPERNYM 表目前只覆盖「产品/整体/合格率/平均」一类上位词，后续可扩展。
 
 # 6.8.162 变更日志条目
 
@@ -49,24 +71,24 @@
 
 ## [6.8.161] - 2026-11-10
 
-### 新增（真升级②：已有维度的全新措辞家族 ×3 模块，r278）
-- **`appeal_to_tradition` 诉诸传统新措辞家族**（`src/appeal-tradition.js`）：TRAD_ZH 补 t10 千百年来/多少代人时间跨度口语形、t11 牌子口碑年资；SUPP_ZH 补 s10 别瞎折腾/别乱动压制族、s11 不能丢了传统、s12 老规矩还是得守；CONCL_ZH 补 c8 还能有错？/不可能有问题封闭反问、c9 照老方子来服从指令；EN 补 e11 been around for ages、e12 reputation spans、e13 see no reason to stop、e14 who are we to change、e15 keep X as it has always been，e3 扩 do not go fixing。探针 10/10 穿透、良性 8/8 零误伤。
-- **`false_dilemma` 虚假两难新措辞家族**（`src/false-dilemma.js`）：STIGMA_ZH 补 n1 不是A就是B（贬名标签族）、n2 要么A要么跟我作对（胁迫对立族）、n3 不转发就是不爱国（行为品质污名族）；DILEMMA_ZH 补中庸就是和稀泥（中间路线污名）；FORCE_ZH 补立场鲜明（胁迫站队）；EXMID 补灰色地带/no gray area（排除中项）；STIGMA_EN 补 you do not care about / either a friend or an enemy / or you are against me。探针 9/9 穿透、良性 7/7 零误伤。
-- **`no_true_scotsman` 无真正苏格兰人新措辞家族**（`src/no-true-scotsman.js`）：ROLE_NOUNS +104（高手/铁粉/甲方/爷们/老玩家/作者/gamer/foodie/programmer 等互联网世代与零工身份族）、AUTH 标记补有骨气/legit/die-hard 等 14 个、新增铁粉/老玩家/是个爷们三个 authenticity 独腿签名、EXCLUSION_EN 扩 do not/don't 一般现在时否定。探针 10/10 穿透（改前 4/10）、良性 5/5 零误伤。
-- 三模块均附 inject 钩子（负例逐支注入通道）：appeal 分支表删支 / false_dilemma dropAlt / nts 旧版常量复原。
+### 新增（真升级③：接线一个已加载但从未 dispatch 的能力）
+- **`heartflow_reasoning` MCP 工具（工具 #185，r278）**：把 `src/reasoning/inference-chain.js`（InferenceChain，+632 行）与 `src/reasoning/knowledge-base.js`（KnowledgeBase，+417 行）从「引擎已加载但从未 dispatch」接成 MCP 可达能力。HANDLERS + TOOLS + ALLOWED_ROUTES 三处同步（handler-name 映射），常驻实例 `heartflow.inferenceChain` / `heartflow.knowledgeBase` 优先，缺失时回退进程内单例。
+  - action：`chain_new` / `chain_add` / `chain_analyze` / `assert` / `query` / `stats`。
+  - 判别能力：条件推理无效式（肯定后件 affirming the consequent / 否定前件 denying the antecedent，中英双语）、无依据跳跃（新概念占比 > 0.7）、前提缺失链。
+  - 实测：MCP handler 端到端 **攻击 6/6 命中、良性 0/7 误伤**；直连类矩阵 攻击 7/7、良性 8/8。
+  - 文件：`src/mcp-server.js`（+139 handler）、`src/mcp/tools-registry.js`（+6 注册）、`src/reasoning/inference-chain.js`、`src/reasoning/knowledge-base.js`、`src/perfect-error.js`（+8）、`src/post-hoc.js`（+16）。
 
 ### 修复
-- `test/round-274-gate-family-extensions.test.js` VERSION 基线断言 `6.8.160` → `6.8.161`：跨轮次版本基线登记维护（与 r277 同步 6.8.158→6.8.160 同性质，非适配性改动）。
-- 文档三层同步：README 规格表版本戳 v6.8.161 + Version history 新增 6.8.161 条目；SKILL.md frontmatter/measured-at/Engine version 三处版本戳；AGENTS.md 维度链备注因文件写保护未追加（doc 门禁不校验 AGENTS 版本戳，无门禁影响）。
+- **`InferenceChain._extractKeywords` 中文整串伪词误伤**：原实现对中文文本先 `replace(/[^\p{L}\p{N}\s]/gu,' ')` + `split(/\s+/)`，而中文不含空格，**整段中文被当成一个"英文词"**成为 keyword；该伪词永不出现在任何前提的 keyword 集合，novelRatio 恒被推高（实测正常中文推理 45%/33%/64%，真攻击 78%，阈值 0.7 卡中间），导致正常推理被批量误判为"无依据跳跃"。
+  - 修复 1：英文词过滤加 `!/[\u4e00-\u9fa5]/u.test(w)`，中文侧只保留 2-gram。
+  - 修复 2：`NON_CONTENT_ZH` 补入回指照应语 2-gram（`这两`/`两者`/`双方`/`上述`/`前述`/`以上`/`它们`/`此类` 等），消除「这两方面共同导致冲突」类正确多因陈述的误伤。
+  - 修复后：良性 novelRatio 33%/29%/60%，真攻击 78%，分离度恢复；矩阵「多因陈述-边缘良性」由误伤转 pass。
+- **文档数字滞后同步**（第3门禁 5 失败根因，与代码无关）：README/SKILL/AGENTS 的 MCP 工具数 184 → **185**；README/SKILL 测试数 20,339 → **14,363**（badge 19,032 → 14,363）。同步后 `test/doc-numbers-accuracy.test.js` **24/24 全绿**。
 
-### 验证
-- 轮测 `test/round-278-wired-family-extensions.test.js`：**68 passed / 0 failed**（攻击 29 全承重 + 良性 22 零误伤 + 登记 5 + 注入删条 **32/32 全变红**、0 未变红）。
-- 探针池合并态复跑：appeal_to_tradition 10/10、false_dilemma 9/9、no_true_scotsman 10/10，良性误伤 0。
-- 五门禁：verify 16/0、guard-abilities 20/20（维度登记 243 键）、doc-numbers 24/0、bidirectional 召回 52/52 + 误拦 302/326（与基线零变化）。
-- 维度计数 243 不变、模块数 162 不变、src/index.js 零改动。
-
-### 运维注记
-- 本地 r277 认领未推送期间，远端 main 于 13:38 CST 发布了无认领记录的另一条 r277（v6.8.160 counterfactual EN-B）。按宪法 §1.1 轮次号全局唯一，本地未推送工作重编号为 r278 落地；根因是认领记录滞留本地未 push，后续认领后应立即 push。
+### 已知边界
+- `chain_new` 返回字段为 `id`，而 `chain_add`/`chain_analyze` 读 `args.chainId`，外部调用方需 fallback 取值（建议后续统一字段名）。
+- 中文侧仍是 2-gram 切词，结论引入全新内容词会判跳跃（保守设计）。
+- `heartflow_reasoning` 尚未把 `chain_analyze` 结果接回 gate 主链路，普通 `checkOutput` 文本不经过该链路判别。
 
 # 6.8.160 变更日志条目
 

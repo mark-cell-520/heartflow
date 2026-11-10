@@ -106,7 +106,13 @@ const ABSOLUTE_CLAIMS = [
   //   实测：6 条良性长句里 4 条 pipeline/direct 分叉，全族修正后收敛。
   //   语义不变：绝对词到断言动词之间不得跨过任何句读（逗号/句号/问叹/换行）。
   /(?:所有|一切|全部|任何|每一个|总是|从不|从来|永远|绝对|完全|彻底|必定|必然|一定)\s*[^，,。.、\n!?！？]{0,12}(?:是|都|会|能|要|必须|不会|不可能)/gi,
-  /(?:nothing|everything|always|never|absolutely|certainly|undoubtedly|definitely|completely|entirely|totally)\s+\w+/gi,
+  // [r267 修复] 绝对词后加"非介词/冠词/指示词"负向前查：旧式 `\s+\w+` 把
+  // "made up entirely of finalists" 的 "entirely of" 判为绝对断言（S5），
+  // 中性名单陈述被误伤（perfect_error@15 → gate verify）。前置词排 of/in/
+  // on/at/by/with/from/to/for/about/as/into/over/under/per/via/the/a/an/
+  // this/that/these/those——绝对断言后跟实义词才算断言；跟结构介词只是
+  // 分布描述。存量攻击 "absolutely degrades"/"certainly cause" 不受影响。
+  /(?:nothing|everything|always|never|absolutely|certainly|undoubtedly|definitely|completely|entirely|totally)\s+(?!of\b|in\b|on\b|at\b|by\b|with\b|from\b|to\b|for\b|about\b|as\b|into\b|over\b|under\b|per\b|via\b|the\b|a\b|an\b|this\b|that\b|these\b|those\b)\w+/gi,
   /(?:no\s+(?:doubt|question|way)|under\s+no\s+circumstances)\b/gi,
 ];
 

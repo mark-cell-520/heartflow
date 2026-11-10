@@ -165,7 +165,21 @@ function checkPostHoc(text) {
     matches.push({ route: 2, legA: '干预', legB: '变化' });
   }
   // R2 干预 × 症状变化（EN 块——干预腿用词边界匹配，防 got⊂renegotiate 类子串误判）
-  if (hasWord(INTERVENE_EN, lower) && has(CHANGE_EN, lower)) {
+  // [r267 修复] 机构/复数主语 + 无归因断言 → 不触发：旧式仅 `干预词 × 变化词`
+  // 两腿粗匹配，把 "Many families installed water purifiers, and water quality
+  // improved measurably." / "The city installed bike lanes, and traffic congestion
+  // dropped citywide." 这类中性公共趋势叙述判为事后归因（route 2 score 68 →
+  // gate rewrite）。区分规则：机构/复数主语（many/the/our + 复数名词/机构词）
+  // 且句中无归因断言（ASSERT_EN: proves/is why/to blame/which proves…）时，
+  // 属公共指标陈述而非个人因果归因，不触发 R2 EN。
+  // 存量 R2 EN 攻击 5 条（个人第一/第三人称叙事）不受影响（探针实证）。
+  // ATK6 "Neighborhoods that installed doorbell cameras…so doorbell cameras are
+  // attracting thieves" 现码 post_hoc score 0（由 false_cause 代拦），不受影响。
+  const INSTITUTIONAL_EN = /^\s*(?:many|the|most|several|our|some|these|those|neighborhoods?|residents?|households?|families|companies|cities|schools|people|users|drivers|teams|stores|factories|governments?|officials?|researchers?|studies|reports)\b/i;
+  const interventionEn = hasWord(INTERVENE_EN, lower);
+  const changeEn = has(CHANGE_EN, lower);
+  const attributionEn = has(ASSERT_EN, lower);
+  if (interventionEn && changeEn && (attributionEn || !INSTITUTIONAL_EN.test(text))) {
     routes.add(2);
     matches.push({ route: 2, legA: 'intervention', legB: 'change' });
   }
