@@ -1,3 +1,25 @@
+# 6.8.162 变更日志条目
+
+## [6.8.162] - 2026-11-10
+
+### 新增（真升级②：统计素养 wired 维度全新措辞家族 ×3 模块，r279）
+- **`base_rate_neglect` 基础概率忽视新措辞家族**（`src/base-rate-neglect.js`）：SIGNAL_ZH 补健康码/行程码变色族（变成黄色/变黄/变红/黄了/红了/赋黄）、判定/评分/预测动词族（系统判定你是/模型预测/风控打了低分）、信用分征信降扣族（信用分被降到/芝麻分被扣）、AI 识别你是族；SIGNAL_EN 补模型引擎预测评分族（model predicts / risk engine scored / algorithm assessed）；CONFIDENT_ZH 补结论动词×归属定罪（判定/认定/断定/锁定/坐实/定罪/实锤 + 老赖/骗子/罪犯/逃犯）、暴露史归属（肯定去过/铁定接触过/途经/来自 中高风险或确诊者）、铁定/肯定 + 错不了/没跑口语收尾、九成/九成九 + 跑不了；EXEMPT_NOOVERCLAIM_ZH 补对冲豁免（可能只是/说不定只是）。模块层 8/8 穿透、良性 7/7 零误伤。
+- **`count_rate_conflation` 计数-比率混淆新措辞家族**（`src/count-rate-conflation.js`）：COUNT_ZH 补执法/治安/司法事件计数族（报警/报案/立案/发案/破案/起诉/官司/误诊/漏诊/翻台/犯规/加班/掉粉/取关/违约/逾期/坏账/弃购/召回/返修/理赔/出险/罢工/旷工/迟到/早退/缺考/退赛/酒驾/醉驾/违章/违停/刑拘/逮捕/判刑/电诈/被盗/诈骗/盗窃/拥堵/延误 及其数/量形式）；VERDICT_ZH 补网络世代裁定形容族（更笨/更傻/更乱/最乱/更脏/最脏/更卷/最卷/更水/最水/更坑/更良心/更规范/更清廉/更发达/更落后/更堵/更穷/更富/更负责/更认真/更敷衍 及补语后缀形）；QTY_ZH 补最高量级标记。模块层 9/9 穿透、良性 7/7 零误伤。
+- **`law_of_small_numbers` 小数定律新措辞家族**（`src/law-of-small-numbers.js`）：SMALL_N_ZH 补游戏/消费行为量词族（把/局/场/发/单/轮/波/关/节/趟 及几把/几局/两把/两场/三连/五连固化形）；UNIVERSAL_ZH 补账号命运/产品定性裁定族（这号是废的/翻车是早晚的事/出金率就是高/这游戏不坑钱）；EXEMPT_ZH 补真相型（小样本才是真相/才是事实/才是真理）、大样本失真型（样本越大越不准/数据一多就失真/被平均）、敷衍型（问几个人就行/调查那么多都是走形式）辩护；EXEMPT_EN 补 trend-is-obvious / no need for a bigger dataset / small samples tell the truth / big datasets average everything away。模块层 10/10 穿透、良性 6/6 零误伤。
+- 三模块均附 inject 钩子（负例逐腿注入删条通道）。
+- 已知边界（本轮未动）：「随机抽样本身就是假」类攻击被 law_of_small_numbers 既有 CONCEPT_ZH 的「随机抽样」术语豁免，属存量豁免边界，留痕待后续轮次收窄。
+
+### 修复
+- `test/round-274-gate-family-extensions.test.js` VERSION 基线断言 `6.8.161` → `6.8.162`：跨轮次版本基线登记维护（与 r278 同性质，非适配性改动）。
+- 文档三层同步：README 规格表版本戳 v6.8.162 + Version history 新增 6.8.162 条目（并顺带修正 6.8.161 条目「逻辑谬错」 typo 为「逻辑谬误」）；SKILL.md frontmatter/measured-at/Engine version 三处版本戳；AGENTS.md 维度链备注因文件写保护未追加（doc 门禁不校验 AGENTS 版本戳，无门禁影响）。
+
+### 验证
+- 轮测 `test/round-279-statistical-literacy-families.test.js`：**76 passed / 0 failed**（攻击 27 全承重 + 良性 20 零误伤 + 登记 11 + 注入删条 **37/37 全变红**、0 未变红，含 3 个「删豁免→良性转红」豁免承重证明）。
+- 探针池复跑（`coordination/agent4/probes/r279-probe-pool.js`）：改前 3 维合计 25 条全穿透 → 改后 0 穿透（base_rate 9/13 维度承重、crc 12/15、lsn 9/13，其余由相邻维度拦截），良性误伤 0。
+- 四门禁：verify 16/0、guard-abilities 20/20（维度登记 243 键）、doc-numbers 24/0、bidirectional 召回 52/52 + 误拦 302/326（与基线零变化）。
+- 维度计数 243 不变、模块数 162 不变、src/index.js 零改动；VERSION 6.8.161 → 6.8.162。
+- 海外扫描（arXiv stat.ME/cs.AI / GitHub / Semantic Scholar）两查询均空返，按既有形态自建。
+
 # 6.8.161 变更日志条目
 
 ## [6.8.161] - 2026-11-10
