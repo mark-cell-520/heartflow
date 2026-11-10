@@ -132,7 +132,13 @@ t(!rc.checkReverseCausation(ATTACKS[8][1], { CAUSE_ZH: [NEVER] }).hit, 'rc 全�
 
 // ─── 六、登记断言 ──────────────────────────────────────────────────
 const fs = require('fs');
-t(fs.readFileSync('VERSION', 'utf8').trim() === '6.8.165', 'VERSION 应为 6.8.165（r283 bump）');
+// [r284 修订] r283 原文写死 VERSION === '6.8.165'，下一轮 bump 必然误红
+// （本轮 run-all 实测该断言成为 134→135 的唯一新增失败）。改为语义版本
+// 格式 + 下限校验：既保住了"r283 确实 bump 过"的登记意图，又不再随后续
+// 轮次递增而失效。
+t(/^\d+\.\d+\.\d+$/.test(fs.readFileSync('VERSION', 'utf8').trim()) &&
+  (function (v) { const p = v.split('.').map(Number); return p[0] > 6 || (p[0] === 6 && p[1] > 8) || (p[0] === 6 && p[1] === 8 && p[2] >= 165); })(fs.readFileSync('VERSION', 'utf8').trim()),
+  'VERSION 应为合法语义版本且 ≥6.8.165（r283 bump 下限）');
 t(ccI.COVARY_MOVE_ZH.length === 3, 'round-264 登记纪律：COVARY_MOVE_ZH 恒 3 条（飙升族并入首元素）');
 t(ccI.COVARY_MOVE_EN.length === 2, 'round-264 登记纪律：COVARY_MOVE_EN 恒 2 条');
 t(ccI.CAUSE_EN.length === 3, 'round-264 登记纪律：CAUSE_EN 恒 3 条');
