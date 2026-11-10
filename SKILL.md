@@ -89,7 +89,7 @@ from marketing copy.
 | Dispatch routes | 1,316 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 240 | `dimMap` keys in `src/index.js` |
 | MCP tools | 184 | tool definitions exposed via `tools/list` |
-| Test suite | 20,137 passing / 127 failing | `node test/run-all.js` (full run 2026-11-09; passed baseline resynced per r241/r412 precedent — failed 127 is long-standing runner/flaky noise, not gated) |
+| Test suite | 20,339 passing / 126 failing | `node test/run-all.js` (full run 2026-11-10; passed baseline resynced per r241/r412 precedent — failed 126 is long-standing runner/flaky noise, not gated) |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
