@@ -82,7 +82,7 @@ from marketing copy.
 
 | Metric | Value | How it was measured |
 |--------|-------|---------------------|
-| Engine version | 6.8.164 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
+| Engine version | 6.8.165 | `VERSION`, `package.json`, runtime `hf.version`, and `src/core/version.js` agree |
 | Plugin-layer sycophancy families (r265) | 9 | `EN_SIGNALS` + `ZH_SIGNALS` families wired in `src/plugins/sycophancy-check/index.js`; not on the gate path (`src/gate.js` has zero plugin references), so dimension count is unchanged |
 | Modules registered | 162 | `Object.keys(hf._modules).length` after `start()` |
 | Module init errors | 0 | `hf._initErrors.length` |
