@@ -116,7 +116,11 @@ const RESP_ZH = [
   // [r266 新增族] 风险焦虑/信息恐慌触发的应对行为（其"后果"恰是触发它的处境）
   // 自查：不收疫苗族——疫苗相关因果话语在公共讨论中高度极化，边际覆盖增益
   // 小于误伤面，按 r161 口径让位给人工审查（gate verify 由其他维度兜）。
-  /囤口罩|囤盐|囤货|抢购|吃保健品|装净水器|买净化器|备药|囤药|装警报器|请保镖|买防身器|加装锁|换锁芯/,
+  /囤口罩|囤盐|囤货|抢购|吃保健品|装净水器|买净化器|备药|囤药|装警报器|请保镖|买防身器|加装锁|换锁芯|劝退|清退|退学|开除|除名|留级|降级|停职|免职|撤职|问责|分手|离婚|拉黑|绝交|断亲/,
+  // [r283 新增族·并入上方 r266 元素内] 纪律处分/学业处置/关系解除类应对行为：
+  // 「成绩差的学生才被劝退学」——劝退/降级/离婚 是对已存在不利后果（成绩差/
+  // 绩效差/感情破裂）的处置，被误当成后果的原因。裸词形态：劝退/开除/离婚
+  // 去前后缀仍命中。按 round-266 登记纪律并入既有元素（RESP_ZH 恒 2 条）。
 ];
 
 // ─── 腿① R-a 群体名词（中文）────────────────────────────────────────
@@ -126,7 +130,7 @@ const RESP_ZH = [
 // （无「的」约束的「公司裁员」式巧合邻近会造成误配——「裁员之后公司
 // 效益好转」因此不判）。
 const GROUP_DE_ZH = [
-  /的(?:人|患者|病人|病患|患儿|孩子|儿童|学生|学员|社区|地区|区域|国家|公司|单位|官员|干部|群体|家庭|用户|股民|家长|员工|老人|女性|男性|案例|对象|人群|会员|居民|群众|乘客|司机|骑手|贫困户|农民工|创业者|消费者|业主|租客|账号|账户|职场人|打工人|车主|船主|货主|买家|患者家属|家长群|业主群)|(?:人|患者|病人|病患|患儿|孩子|儿童|学生|学员|社区|地区|区域|国家|公司|单位|官员|干部|群体|家庭|用户|股民|家长|员工|老人|女性|男性|案例|对象|人群|会员|居民|群众|乘客|司机|骑手|贫困户|农民工|创业者|消费者|业主|租客|账号|账户|职场人|打工人|车主|船主|货主|买家|患者家属)的/,
+  /的(?:人|患者|病人|病患|患儿|孩子|儿童|学生|学员|社区|地区|区域|国家|公司|单位|官员|干部|群体|家庭|用户|股民|家长|员工|老人|女性|男性|案例|对象|人群|会员|居民|群众|乘客|司机|骑手|贫困户|农民工|创业者|消费者|业主|租客|账号|账户|职场人|打工人|车主|船主|货主|买家|患者家属|家长群|业主群|夫妻|情侣)|(?:人|患者|病人|病患|患儿|孩子|儿童|学生|学员|社区|地区|区域|国家|公司|单位|官员|干部|群体|家庭|用户|股民|家长|员工|老人|女性|男性|案例|对象|人群|会员|居民|群众|乘客|司机|骑手|贫困户|农民工|创业者|消费者|业主|租客|账号|账户|职场人|打工人|车主|船主|货主|买家|患者家属|夫妻|情侣)的/,
 ];
 
 // ─── 腿① R-a 差异/相关标记（中文）────────────────────────────────────
@@ -145,11 +149,15 @@ const CAUSE_ZH = [
 // ─── 腿② RESULT 负面结果名词（中文，裸名词形态）──────────────────────
 const RESULT_ZH = [
   /死亡|死亡率|身亡|病故|猝死|遇难|伤亡|自杀|轻生|事故|车祸|犯罪|作案|违法|违规|小偷|窃贼|盗贼|复发|恶化|并发症|后遗症|失眠|抑郁|焦虑|成瘾|上瘾|失败|落榜|落马|出事|被抓|被查|被罚|爆雷|亏损|倒闭|破产|衰败|衰退|下滑|下跌|崩盘|瘫痪|泄露|被盗|被骗|生病|感冒|感染|受伤|受害|遇害|辍学|退学|更差|变差|退步|垫底|掉队|风险|问题|乱子|漏洞|故障|副作用|不良反应|反噬|反弹|雪崩/,
+  // [r283] 裸表现结果族：「劝退直接导致成绩差」——无「更/变」前缀的结果形容
+  // 词（成绩差/评分低/幸福感低），与纪律处分族配对。旧表只收 更差/变差 形。
+  // [r283 修订] 名词与形容词之间容许「更」——「离婚导致幸福感更低」。
+  /成绩[更]?[差低]|分数[更]?[差低]|表现[更]?[差低]|业绩[更]?[差低]|评价[更]?[差低]|口碑[更]?[差]|评分[更]?[差低]|排名[更]?[低后]|满意度[更]?[低差]|幸福感[更]?[低差]|收入[更]?[低少]|薪资[更]?[低少]|工资[更]?[低少]/,
 ];
 
 // ─── 英文侧腿① ───────────────────────────────────────────────────────
 const RESP_EN = [
-  /\b(?:hospitali[sz]ed?|hospitali[sz]ation|in\s+hospital|hospital\s+care|admitted|admission|seeing\s+a\s+doctor|doctor'?s\s+visits?|taking\s+(?:sleeping\s+)?pills?|medication|therapy|psychological\s+(?:treatment|help|counseling)|counseling|sessions?|calling\s+the\s+police|police\s+reports?|reporting|complaints?|lawsuits?|suing|tutoring|cram\s+school|private\s+lessons?|wearing\s+(?:a\s+)?(?:mask|helmets?|seatbelts?)|security\s+cameras?|alarms?|insurance|layoffs?|downsizing|being\s+(?:fired|banned|blocked|suspended)|quarantine|lockdown|screenings?|antidepressants?|painkillers?|hearing\s+aids?|crutches|knee\s+supports?|wheelchairs?|prosthetics|drug\s+rehab|rehab|anti-fraud(?:\s+apps?)?|fraud[- ]prevention(?:\s+(?:education|programs?|campaigns?))?|safety\s+education|extended\s+warrant\w+|credit\s+checks?|background\s+checks?|claims?)\b/i,
+  /\b(?:hospitali[sz]ed?|hospitali[sz]ation|in\s+hospital|hospital\s+care|admitted|admission|seeing\s+a\s+doctor|doctor'?s\s+visits?|taking\s+(?:sleeping\s+)?pills?|medication|therapy|psychological\s+(?:treatment|help|counseling)|counseling|sessions?|calling\s+the\s+police|police\s+reports?|reporting|complaints?|lawsuits?|suing|tutoring|cram\s+school|private\s+lessons?|wearing\s+(?:a\s+)?(?:mask|helmets?|seatbelts?)|security\s+cameras?|alarms?|insurance|layoffs?|downsizing|being\s+(?:fired|banned|blocked|suspended)|quarantine|lockdown|screenings?|antidepressants?|painkillers?|hearing\s+aids?|crutches|knee\s+supports?|wheelchairs?|prosthetics|drug\s+rehab|rehab|anti-fraud(?:\s+apps?)?|fraud[- ]prevention(?:\s+(?:education|programs?|campaigns?))?|safety\s+education|extended\s+warrant\w+|credit\s+checks?|background\s+checks?|claims?|expelled|expulsion|suspensions?|suspended|demoted|demotion|held\s+back|expelled\s+from)\b/i,
   // [r266 新增族] 风险焦虑/财产防护触发的应对行为（同 ZH 侧囤货族）
   /\b(?:doorbell\s+cameras?|ring\s+cameras?|vitamin\s+supplements?|security\s+guards?|panic\s+buying|stockpiling|hoarding|air\s+purifiers?|water\s+filters?|pepper\s+spray|self-?defense\s+(?:classes?|training))\b/i,
 ];

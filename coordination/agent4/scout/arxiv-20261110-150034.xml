@@ -1,0 +1,500 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/43fwzM0YcSF661z08G/Wdl+D51Q</id>
+  <title>arXiv Query: search_query=all:collider OR all:bias OR all:mediator OR all:confusion OR all:reverse OR all:causation OR all:natural OR all:language OR all:reasoning OR all:fallacies&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T15:00:35Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:collider+OR+(all:bias+OR+(all:mediator+OR+(all:confusion+OR+(all:reverse+OR+(all:causation+OR+(all:natural+OR+(all:language+OR+(all:reasoning+OR+all:fallacies))))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>664796</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12886v1</id>
+    <title>Reframe: Observation-Aligned Multi-Teacher On-Policy Distillation for Agentic Visual Reasoning</title>
+    <updated>2026-11-09T18:59:54Z</updated>
+    <link href="https://arxiv.org/abs/2611.12886v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12886v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agentic reinforcement learning (RL) and multi-teacher on-policy distillation (MOPD) offer complementary routes to post-training. For visual agents, however, tool use presents two related challenges. Models may overlook useful tool-returned observations, while poorly grounded actions can limit the evidence available for subsequent distillation. We introduce Reframe, a post-training framework that treats the observation state, rather than only the output distribution, as an object of alignment. First, Ground-Drop-GRPO (GD-GRPO) trains spatial and temporal specialists with evidence-aware rewards and stochastic removal of the original visual input, encouraging them to acquire grounded evidence and use the returned observations. Second, Observation-Gated-MOPD (OG-MOPD) replaces deficient tool actions with canonical ones mid-rollout and resumes distillation from the repaired observation. The two stages complement each other, as learning to rely on tool-returned observations can help the policy benefit from observation repair. Neither stage requires a task-specific SFT cold start. Extensive experiments over 14 image and video benchmarks demonstrate that Reframe outperforms both Mix-RL and vanilla MOPD. Ablation results show that GD-GRPO increases observation dependence and tool gain compared with outcome-based GRPO.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:54Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Haozhi Yuan</name>
+    </author>
+    <author>
+      <name>Handong Li</name>
+    </author>
+    <author>
+      <name>Yifan Zhang</name>
+    </author>
+    <author>
+      <name>Qianshan Wei</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12883v1</id>
+    <title>Beyond Modality Preference: Controlling Multimodal Arbitration under Modality Conflict in MLLMs</title>
+    <updated>2026-11-09T18:59:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.12883v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12883v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Multimodal large language models (MLLMs) integrate information across modalities, but become unreliable when those modalities disagree. Under conflicting inputs, MLLMs may favor modalities that are not the most reliable for the task, thus motivating inference-time control of modality arbitration. We identify a small set of attention heads, termed arbitration heads, that causally influence whether predictions follow visual or textual evidence. Building on this, we introduce a lightweight, training-free intervention that biases these heads toward a designated trusted modality at inference time. The identified heads are stable across calibration set sizes and generalize across settings, and steering them enables effective bidirectional control of modality reliance across diverse benchmarks. Our findings identify an effective control mechanism to align MLLM predictions with task-specified modality priorities. The code is available at https://github.com/zhaoyingpan/modality-arbitration.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:36Z</published>
+    <arxiv:comment>WACV 2027</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Zhaoying Pan</name>
+    </author>
+    <author>
+      <name>Shenyu Lu</name>
+    </author>
+    <author>
+      <name>Jun Hui Wong</name>
+    </author>
+    <author>
+      <name>Junyi Chai</name>
+    </author>
+    <author>
+      <name>Xiaoqian Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12882v1</id>
+    <title>Chiral waveguide model for error-correctable quantum computation</title>
+    <updated>2026-11-09T18:59:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.12882v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12882v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We develop a first-principles framework connecting microscopic waveguide scattering to quantum error correction and algorithmic performance. For polarization-encoded single photons interacting with an ensemble of two-level atoms in a chiral waveguide, we derive an effective polarization quantum channel by tracing out the frequency degree of freedom. Using this channel as the physical noise model for a rotated planar code, we observe threshold behavior as the number of atoms $N$ and the atom-waveguide coupling strength $Γ$ are varied. An asymptotic analysis of the microscopic scattering model explains the threshold scaling with $NΓ/σ$, where $σ$ is the photon spectral bandwidth. For identical, lossless atoms with symmetric real coupling and a photon spectrum centered at resonance, the effective noise is strongly biased toward $X$ errors. We then incorporate the resulting logical errors into quantum phase estimation and demonstrate that the noise bias can guide circuit design. In particular, a Hadamard-basis implementation reduces sensitivity to the dominant error, improving algorithmic performance.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:36Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Zixiang Hong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12879v1</id>
+    <title>Grasping the Future: Joint 3D Hand-Object Forecasting From Internet Videos</title>
+    <updated>2026-11-09T18:59:01Z</updated>
+    <link href="https://arxiv.org/abs/2611.12879v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12879v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>To interact with an object, we need to anticipate both how it will move and how our hands should move with it. Human videos capture these relationships across everyday activities, offering a natural source for learning to predict future interactions. Learning from them requires recovering motion from completed interactions and using it to anticipate what could happen next. We present $\textit{Grasping-the-Future}$, a unified generative model of joint 3D hand-object motion, including wrist motion, finger articulation, and object position and orientation. Through masked spatiotemporal completion and flow matching, we train a single model for several prediction tasks: forecasting future interactions, predicting hand motion given object motion or vice versa, generating both trajectories toward a desired final object pose, and completing partially observed interactions. We explicitly model hand-object relations and incorporate contact constraints to help preserve grasp relationships during motion. To obtain 3D supervision from internet videos, we develop a scalable pipeline that combines pretrained perception models with joint geometric optimization to reconstruct completed interactions. We combine these recovered trajectories with annotated interaction datasets as training data for all tasks. We demonstrate strong performance across all tasks, outperforming released forecasters on datasets with 3D annotations. Moreover, we show geometric and physical plausibility of the predicted trajectories by retargeting them to a robotic embodiment. Videos are available at https://grasping-the-future.github.io.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:59:01Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Rustin Soraki</name>
+    </author>
+    <author>
+      <name>Matthew Wallingford</name>
+    </author>
+    <author>
+      <name>Ryan Aby</name>
+    </author>
+    <author>
+      <name>Brandon Chee</name>
+    </author>
+    <author>
+      <name>Jason Ren</name>
+    </author>
+    <author>
+      <name>Ali Farhadi</name>
+    </author>
+    <author>
+      <name>Homanga Bharadhwaj</name>
+    </author>
+    <author>
+      <name>Roozbeh Mottaghi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12873v1</id>
+    <title>Tetragonal-to-orthorhombic distortion in CeRh$_{2}$As$_{2}$</title>
+    <updated>2026-11-09T18:57:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.12873v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12873v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>CeRh$_{2}$As$_{2}$ is best known for its two superconducting phases, which are observed when a magnetic field is applied along the $c$ axis of its tetragonal unit cell. The emergence of superconductivity, with $T_{c} \approx 0.31$K, is preceded by an ordered state (phase I), with an ordering temperature $T_{0} \approx 0.46$K. The precise nature of the order parameter in phase I is still unknown, although evidence of dipolar ordering was found. To investigate a possible symmetry breaking at $T_{\textrm{0}}$, we conducted longitudinal thermal-expansion measurements along the crystallographic [100], [010], [110], and [1$\overline{1}$0] directions on a single-crystalline sample cut into an octagonal shape. Our results demonstrate the breaking of the fourfold in-plane symmetry below $T_{\textrm{0}}$, evidencing a small tetragonal-to-orthorhombic distortion (orthorhombicity $δ\sim 10^{-7}$). The breaking of the tetragonal symmetry at $T_{\textrm{0}}$ might imply that the superconducting order parameter that develops within phase I cannot be multi-component. More generally, the distortion places restrictions on the possible order parameters for phase I.</summary>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:57:10Z</published>
+    <arxiv:comment>8 pages 5 figures in the main paper, 4 pages, 4 figues in the supplemental material</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.str-el"/>
+    <author>
+      <name>P. Khanenko</name>
+      <arxiv:affiliation>Hochfeld-Magnetlabor Dresden</arxiv:affiliation>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>M. Pfeiffer</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+      <arxiv:affiliation>Institute for Solid State and Materials Physics, Technical University Dresden, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>K. Semeniuk</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+      <arxiv:affiliation>Institute for Quantum Materials and Technologies, Karlsruhe Institute of Technology, Karlsruhe, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>E. Hassinger</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+      <arxiv:affiliation>Institute for Quantum Materials and Technologies, Karlsruhe Institute of Technology, Karlsruhe, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>P. Thalmeier</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>J. Wosnitza</name>
+      <arxiv:affiliation>Hochfeld-Magnetlabor Dresden</arxiv:affiliation>
+      <arxiv:affiliation>Institute for Solid State and Materials Physics, Technical University Dresden, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>A. M. León</name>
+      <arxiv:affiliation>Departamento de Física, Facultad de Ciencias, Universidad de Chile, Santiago, Chile</arxiv:affiliation>
+    </author>
+    <author>
+      <name>G. Zwicknagl</name>
+      <arxiv:affiliation>Institute for Mathematical Physics, Technische Universität Braunschweig, Braunschweig, Germany</arxiv:affiliation>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>C. Geibel</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>S. Khim</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+    <author>
+      <name>M. Brando</name>
+      <arxiv:affiliation>Max Planck Institute for Chemical Physics of Solids, Dresden, Germany</arxiv:affiliation>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12872v1</id>
+    <title>HiVe-Mem: Interleaving Horizontal Memory Expansion and Vertical Evidence Composition for Multimodal Agents</title>
+    <updated>2026-11-09T18:57:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.12872v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12872v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As multimodal agents accumulate increasingly long interaction histories, effectively retrieving and utilizing past information becomes critical for long-term interaction. Existing memory systems typically rely on semantic retrieval over compressed memories and expose predefined representations, which may miss relevant memories and overlook heterogeneous evidence needs across queries. We introduce \textbf{\hivemem}, a multimodal memory framework that interleaves \textbf{\textsc{H}}or\textbf{\textsc{i}}zontal Memory Expansion with \textbf{\textsc{Ve}}rtical Evidence Composition. For horizontal memory expansion, \hivemem organizes memory episodes into a relational graph using textual and visual anchors, expanding semantically retrieved seeds with related neighbors to recover complementary information. For vertical evidence composition, each retrieved memory retains multiple evidence forms, including compact summaries, captions, grounded visual views, raw images, and interaction history. A lightweight trainable selector independently composes an evidence subset for each retrieved memory, enabling query-adaptive utilization of heterogeneous multimodal information. This two-dimensional design jointly broadens memory coverage and adapts the evidence contributed by individual memories. Experiments across three multimodal memory benchmarks show that \hivemem consistently improves task performance across base models while reducing token consumption by about 90\% compared with the most efficient competing multimodal baselines.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:57:00Z</published>
+    <arxiv:comment>Code is available at https://github.com/ViktorAxelsen/HiVe-Mem</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Haozhen Zhang</name>
+    </author>
+    <author>
+      <name>Bohan Liu</name>
+    </author>
+    <author>
+      <name>Jianzhu Bao</name>
+    </author>
+    <author>
+      <name>Qingyuan Liu</name>
+    </author>
+    <author>
+      <name>Haodong Yue</name>
+    </author>
+    <author>
+      <name>Xiao Li</name>
+    </author>
+    <author>
+      <name>Zi Pong Lim</name>
+    </author>
+    <author>
+      <name>Wenya Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12870v1</id>
+    <title>SWAM: Scaling World Action Models with Cross-Modal Alignment</title>
+    <updated>2026-11-09T18:55:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.12870v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12870v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>World action models jointly predict video and actions conditioned on language. Existing studies focus primarily on architectures and training mechanisms, typically treating language-video alignment acquired through video pretraining as an established foundation. However, introducing action learning may impair this alignment. Principled guidance on data and supervision design for maintaining language-video alignment during action learning remains limited. To investigate this, we curate a pool of approximately 47,000 hours of general videos, egocentric videos, UMI demonstrations, and robot demonstrations. Building on this, we systematically study how language-video supervision, language-video-action supervision, and the joint use of these two forms affect WAM performance. In particular, we examine how language annotation quality affects pretrained language-video capabilities, and how action supervision from UMI and robot demonstrations extends these capabilities to language-video-action modeling. To better scale the model, we further conduct detailed studies on joint training recipe and model architecture. Under a fixed training budget, mixing egocentric videos and UMI demonstrations improves control generalization. Model architecture affects how effectively these experiences are used, while scaling pretraining under the selected configuration brings further gains. The resulting recipe, post-trained on RoboTwin Clean demonstrations only, achieves success rates of 88.10% and 61.56% under Easy (Clean-to-Clean) and Hard (Clean-to-Random) conditions, respectively. Our model achieves 40.00% SR across three real-world tasks, compared with 23.33% for the strongest baseline, indicating better generalization under unseen conditions. We release the curated data, training code, and model weights.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:55:04Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Yu Zhou</name>
+    </author>
+    <author>
+      <name>Xinyuan Xia</name>
+    </author>
+    <author>
+      <name>Xuankun Yang</name>
+    </author>
+    <author>
+      <name>Yinghao Yang</name>
+    </author>
+    <author>
+      <name>Wendi Chen</name>
+    </author>
+    <author>
+      <name>Bowen Liu</name>
+    </author>
+    <author>
+      <name>Jianhan Ma</name>
+    </author>
+    <author>
+      <name>Weicheng Duan</name>
+    </author>
+    <author>
+      <name>Jun Lv</name>
+    </author>
+    <author>
+      <name>Cewu Lu</name>
+    </author>
+    <author>
+      <name>Yanwei Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12869v1</id>
+    <title>Where Does Alignment Emerge and What Does It Mean? A Closer Look at the Platonic Representation Hypothesis</title>
+    <updated>2026-11-09T18:53:57Z</updated>
+    <link href="https://arxiv.org/abs/2611.12869v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12869v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Platonic Representation Hypothesis (PRH) suggests that neural networks are converging toward similar representation spaces. As language models become more capable, their representations are aligning with those of vision models. However, recent work has questioned whether this trend continues to hold for newer language models. Moreover, it has been shown that representation similarity metrics can be confounded by model depth and width, requiring appropriate baselines for interpretation. In this work, we first investigate where alignment emerges between unimodal models across model layers and representation dimensions. Next, we find that the PRH capability-alignment trend persists for newer models as long as the captions are sufficiently clean and informative. Finally, we contextualize cross-modal alignment, introducing unimodal and multimodal baselines on various datasets. Our results show that the cross-modal representational alignment of unimodal models can surpass that of explicitly aligned vision-language models, but remains substantially behind the alignment observed for models of the same modality. Code is available at https://github.com/ExplainableML/prh-closer-look.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:53:57Z</published>
+    <arxiv:comment>NeurIPS 2026 Workshop on Neural Network Artifacts as a New Data Modality (Spotlight)</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Julia Herbst</name>
+    </author>
+    <author>
+      <name>Simon Roschmann</name>
+    </author>
+    <author>
+      <name>Quentin Bouniot</name>
+    </author>
+    <author>
+      <name>Zeynep Akata</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12864v1</id>
+    <title>Is Persona Generalization Predictable?</title>
+    <updated>2026-11-09T18:51:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.12864v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12864v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Persona generalization occurs when fine-tuning a language model in one domain induces behavioral changes in others -- for example, the broadly unsafe behavior observed in emergent misalignment. We discover a surprising "on-the-line" phenomenon in persona generalization: in-domain and out-of-domain persona rates across various fine-tuning hyperparameters follow an approximately probit-linear relationship, and the specific probit-linear relationship is surprisingly shared even across model families and model sizes, including Qwen and Llama. Training choices that leave the set of trainable parameters unchanged, such as learning rate, weight decay, and training duration, largely move models along the same line, reducing transfer mainly by weakening in-domain learning. Changing which layers are fine-tuned, however, can change the slope. For unsafe behavior, fine-tuning only later layers yields shallower slopes, retaining strong in-domain learning while reducing out-of-domain misalignment. This "on-the-line" phenomenon unifies unexpected, isolated observations of persona generalization within a quantitative framework for predicting and controlling behavioral transfer.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:51:03Z</published>
+    <arxiv:comment>55 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Olina Mukherjee</name>
+    </author>
+    <author>
+      <name>Arnav Goel</name>
+    </author>
+    <author>
+      <name>Aditi Raghunathan</name>
+    </author>
+    <author>
+      <name>Jacob Mitchell Springer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12859v1</id>
+    <title>The hidden symmetry operators of the asymmetric quantum Rabi model and its two-photon and two-mode variants in closed form</title>
+    <updated>2026-11-09T18:47:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.12859v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12859v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The asymmetric quantum Rabi model, a two-level system with splitting $Δ$ and bias $ε$ coupled with strength $g$ to a boson mode, has level crossings when $ε$ is an integer multiple $N$ of the mode frequency. They are due to a hidden symmetry operator $J$, for which no general formula has been available. Here we obtain $J$ in closed form for every $N$. We find that $J$ is given by the parity of the symmetric model times the continuant (ordered tridiagonal determinant) of $N$ first-order operators, which are the Hamiltonians at the intermediate biases $N-1,N-3,\dots,1-N$ minus a common number operator. The symmetry is thus a staircase of $N$ bias steps that closes on the mirror image of the model precisely at integer bias. The proof uses induction on two commutation relations. The same relations hold in the asymmetric two-photon and two-mode models, written with the generators of $\mathfrak{su}(1,1)$, so that the same continuant gives their symmetry operators for every order, previously known only for the lowest ones. We also relate the closed formula for $J$ to the known recursion relations for its coefficients and give their terms of lowest order in $Δ$ explicitly.</summary>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:47:24Z</published>
+    <arxiv:primary_category term="quant-ph"/>
+    <author>
+      <name>Marcus Kollar</name>
+    </author>
+    <author>
+      <name>Arka Dutta</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12856v1</id>
+    <title>WorkflowArena: Benchmarking Executable Workflow Orchestration in LLM-Based Multi-Agent Systems</title>
+    <updated>2026-11-09T18:45:28Z</updated>
+    <link href="https://arxiv.org/abs/2611.12856v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12856v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language model agents are increasingly deployed as multi-agent systems rather than as a standalone model operating within a single context. Recent agent harnesses allow the model to instantiate worker agents and to author the executable workflow that coordinates them, shifting the design of system structure from developers to the model at run time. The quality of this organization therefore constitutes a distinct capability, yet existing benchmarks either measure end-to-end task completion or evaluate coordination under structures specified in advance. We formalize this capability as workflow orchestration and introduce WorkflowArena, a benchmark of 145 long-horizon tasks spanning 8 professional domains, from software engineering and formal mathematics to legal analysis and 3D production. Each task specifies an initial workspace and an integrated deliverable composed of interdependent components, which is assessed by a hidden verifier. Agents determine autonomously whether and how to delegate, and all delegation is recorded, enabling joint evaluation of deliverable quality and the organization of the underlying work. Experiments with nine models show that no single configuration performs best across all domains and that systems exhibit distinct delegation strategies: at high effort, Claude models in Claude Code invoke workflows less frequently but with larger worker groups, whereas GPT models in Codex delegate more frequently in smaller units. When the executing model is held fixed on a challenging subset of tasks, workflows authored by Claude Opus 5.5 substantially improve weaker executors, indicating that workflow organization is itself a measurable determinant of task performance.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:45:28Z</published>
+    <arxiv:comment>Project page: https://lab.einsia.ai/workflowarena</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Zheng Jiang</name>
+    </author>
+    <author>
+      <name>Fang Niu</name>
+    </author>
+    <author>
+      <name>Bo Peng</name>
+    </author>
+    <author>
+      <name>Houde Qian</name>
+    </author>
+    <author>
+      <name>Wenyi Li</name>
+    </author>
+    <author>
+      <name>Deyao Hong</name>
+    </author>
+    <author>
+      <name>Mingju Gao</name>
+    </author>
+    <author>
+      <name>Yizhe Chi</name>
+    </author>
+    <author>
+      <name>Youjie Zheng</name>
+    </author>
+    <author>
+      <name>Kaisen Yang</name>
+    </author>
+    <author>
+      <name>Calvin Xiao</name>
+    </author>
+    <author>
+      <name>Lifeng Sun</name>
+    </author>
+    <author>
+      <name>Huan-ang Gao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12852v1</id>
+    <title>What kills $v$-prediction? A Patch-wise PCA Perspective on Pixel-Space Flow Matching</title>
+    <updated>2026-11-09T18:44:37Z</updated>
+    <link href="https://arxiv.org/abs/2611.12852v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12852v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Latent Diffusion Models dominate generative modeling but face two-stage training complexity and the inherent reconstruction limits of pre-trained autoencoders. Pixel-space Flow Matching offers a simplified end-to-end alternative yet often encounters training difficulties when using the standard $v$-prediction objective. Recent research attributes this difficulty to the off-manifold nature of noised targets, motivating a shift toward $x$-prediction. In this paper, we investigate this explanation through patch-wise Principal Component Analysis (PCA) and identify a bandwidth bottleneck. The velocity in minor components is largely determined by the raw noisy input, requiring deep backbones to preserve information that competes with principal-component modeling. Through controlled experiments and representation analysis, we further examine why $x$-prediction remains effective: its parameterization provides a raw-input bypass, while its learned input representation can spontaneously concentrate on principal directions. Under low-rank observations, our analysis of the induced flow characterizes $x$-prediction as an implicit conditional-mean decoder, reconstructing discarded components from the retained information. These observations motivate the Raw-injected Transformer (RiT), which combines a lightweight raw-conditioned decoder with an output-side shortcut to separate semantic modeling from raw-state propagation. Our method restores effective $v$-prediction and achieves competitive performance on ImageNet $256\times256$, providing a perspective on the interaction between prediction objectives and architectural bandwidth.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:44:37Z</published>
+    <arxiv:comment>Accepted as a Spotlight paper at NeurIPS 2026. Our code is available at https://github.com/THUMAI-Lab/RiT</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Tianze Luo</name>
+    </author>
+    <author>
+      <name>Haofeng Huang</name>
+    </author>
+    <author>
+      <name>Yuan Yao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12846v1</id>
+    <title>Forward modeling linear variable filter data: High resolution PAH and Paschen-$α$ maps from SPHEREx</title>
+    <updated>2026-11-09T18:40:04Z</updated>
+    <link href="https://arxiv.org/abs/2611.12846v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12846v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Polycyclic aromatic hydrocarbon (PAH) emission is a powerful tool for the study of the interstellar medium (ISM) in both Galactic and extragalactic contexts. It can reveal ionization state, radiation field, metallicity, composition, and ISM structure as sculpted by processes like turbulence and stellar feedback. Here we use NASA's SPHEREx to produce clean, high-resolution PAH maps at spectral resolution R $\sim$ 35 (compared to WISE at R $\sim$ 2). Prior treatments of the SPHEREx linear variable filter data seek to convert them to more conventional band-averaged maps that can leave striping artifacts associated with spatially variable wavelength sampling, especially at emission lines. In contrast, we deliver a scalable forward-modeling method capable of generating high-quality all-sky SPHEREx emission-line maps at 8.5 arcsec FWHM angular resolution (on 6.4 arcsec pixels), while naturally producing maps without visible striping. We reformat the data into a pixel-level database, mask stellar contamination, and infill missing pixels with a conditional, data-driven, anisotropic Gaussian process. We apply our method to produce 3.3 $μ$m and 3.4 $μ$m PAH and Paschen-$α$ emission maps of a set of fields spanning a range of Galactic and extragalactic conditions including the Rosette nebula, the Corona Australis molecular cloud, M33, and M31. We demonstrate the quality and synergies of our SPHEREx 3.3 $μ$m PAH maps by comparisons with other available gas and dust tracer maps and achieve sensitivities up to $σ(I_{3.3}) = 2.7 \times 10^{-8}$ erg s$^{-1}$ cm$^{-2}$ sr$^{-1}$. We estimate that a two-year extension of the SPHEREx survey, with modest modifications to the scanning strategy, would match or exceed the PAH sensitivity of WISE over the whole sky.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:40:04Z</published>
+    <arxiv:comment>34 pages, 16 figures</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Andrew K. Saydjari</name>
+    </author>
+    <author>
+      <name>Connor Hainje</name>
+    </author>
+    <author>
+      <name>Benjamin Dodge</name>
+    </author>
+    <author>
+      <name>Philipp Frank</name>
+    </author>
+    <author>
+      <name>David W. Hogg</name>
+    </author>
+    <author>
+      <name>Susan E. Clark</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12835v1</id>
+    <title>Mitigating Agentic Deception via Evaluation-Side Partially Observable Games</title>
+    <updated>2026-11-09T18:33:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.12835v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12835v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As large language models become more capable agents, they can exhibit deceptive behaviors, cheating human for higher rewards while appearing helpful. We attribute this failure to evaluation-side partial observability, where models are evaluated mainly from final outcome, without checking the faithfulness of underlying reasoning, tool use, and environmental effects. Prior mitigations address this partial observability by predefined evaluator latent belief space or one-shot monitoring, which do not extend to free-form language space and vulnerable to stronger deceptions that evade simple monitoring. In this work, we formulate deception mitigation as an Evaluation-Side Partially Observable Extensive Form Game (e-PoG), a max-min framework in which an agent maximizes reward, a monitor minimizes the agent's payoff by exposing deception from the full interaction trajectory, and a fixed verifier validates the monitor's claims and converts them into penalties. We define the solution concept as a Subgame-Perfect Oversight Equilibrium (SPOE) between agent and monitor, and prove its existence in finite games. With a perfect verifier, every SPOE is faithful; with an imperfect verifier, the guarantee persists if verifier errors do not reverse the ranking of monitor actions. To achieve faithful SPOE, we derive a two-timescale policy gradient algorithm and enhance the pipeline empirically with NLI verification and deterministic checks. Experiments with Gemma3-4B-IT and Qwen3-4B/8B on Agentic Role-Playing, SearchQA, and WebShop show that e-PoG mitigates multiple emergent deception modes, outperforming the strongest baselines by 26.0% in deception mitigation and by up to 39.8% in task success. These gains persist under weak-to-strong supervision. Code is available at https://github.com/Toyoid/deceptive-agent.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:33:13Z</published>
+    <arxiv:comment>44 pages, 10 figures. Code: https://github.com/Toyoid/deceptive-agent; Project website: https://shutongliu-dev.github.io/epog-agentic-deception/</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Hanxiao Li</name>
+    </author>
+    <author>
+      <name>Shutong Liu</name>
+    </author>
+    <author>
+      <name>Yongjia Ma</name>
+    </author>
+    <author>
+      <name>Jiaming Ji</name>
+    </author>
+    <author>
+      <name>Juntao Dai</name>
+    </author>
+    <author>
+      <name>Shuning Zhang</name>
+    </author>
+    <author>
+      <name>Kejian Shi</name>
+    </author>
+    <author>
+      <name>Kai Chen</name>
+    </author>
+    <author>
+      <name>Pu Feng</name>
+    </author>
+    <author>
+      <name>Yuqing Ma</name>
+    </author>
+    <author>
+      <name>Qi Dou</name>
+    </author>
+    <author>
+      <name>Yaodong Yang</name>
+    </author>
+    <author>
+      <name>Xianglong Liu</name>
+    </author>
+    <author>
+      <name>Simin Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.12834v1</id>
+    <title>Programming Prescience: Issues in Human Construction of Forecasting Bots</title>
+    <updated>2026-11-09T18:33:13Z</updated>
+    <link href="https://arxiv.org/abs/2611.12834v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.12834v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI models' growing capacity for complex reasoning has made them attractive tools for forecasting, or the systematic prediction of the future based on past and present data. However, should AI forecasting systems be adopted, human builders will shoulder the work of building and evaluating them. In this paper, we explore what this work looks like with a qualitative interview study with 15 builders of forecasting bots, sampled from among successful participants in a recent AI forecasting competition. Our analysis surfaces the challenges around (1) tuning a bot to acquire factual research, (2) implementing coherent reasoning, and (3) understanding how well one's bot actually does. During their work, builders frequently introduced complexity that did not pay off, and tested in ways that were opportunistic and piecemeal. Our detailed account of their challenges helps clarify what problems should be targeted in upcoming innovations in process, tools, and human-AI teaming for forecasting.</summary>
+    <category term="cs.HC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-09T18:33:13Z</published>
+    <arxiv:primary_category term="cs.HC"/>
+    <author>
+      <name>Priya Dhawka</name>
+    </author>
+    <author>
+      <name>Benjamin Wilson</name>
+    </author>
+    <author>
+      <name>Andrew Head</name>
+    </author>
+  </entry>
+</feed>

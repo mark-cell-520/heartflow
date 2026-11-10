@@ -1,0 +1,27 @@
+✓红 [cc1 时段共变] verify common_cause :: 冰淇淋卖得多的月份溺水事故也多，看来是冰淇淋推高了溺水数。
+✓红 [cc2 的-link] verify common_cause,pseudo_causal,pseudo_causal :: 消防车越多的火灾损失越大，看来多派消防车拉高了损失。
+✓红 [cc3 飙升族] verify common_cause :: 夏天用电量和气温一起飙升，看来空调用电推高了气温。
+✓红 [cc4 with-more] verify common_cause :: Cities with more police have more crime,
+✓红 [co1 看来+更差结论] verify collider_bias :: 在被录用的人里，笔试成绩高的面试分数反而低，看来会考试的面试都更差。
+✓红 [co2 比字比较] verify collider_bias :: 在活到九十岁的人里，抽烟喝酒的比例比普通人高，看来烟酒确实有助于长寿。
+✓红 [co3 EN least/most] rewrite fallacy_of_relevance,collider_bias :: Among the admitted students, those who p
+✓红 [co4 dismiss结论] verify collider_bias :: 在被录用的人里，笔试成绩高的面试分数反而低，看来会考试的都不会说话。
+✓红 [rc1 劝退] verify reverse_causation :: 成绩差的学生才被劝退学，看来劝退直接导致成绩差。
+✓红 [rc2 降级] verify reverse_causation :: 绩效差的员工才被降级，看来降级导致业绩更差。
+✓红 [rc3 离婚] verify reverse_causation :: 闹离婚的夫妻幸福感更低，看来离婚导致幸福感更低。
+✓红 [rc4 EN expelled] rewrite fallacy_of_relevance,reverse_causation :: Students who were expelled had worse gra
+✓绿 [cc-b1] pass none :: 今年销量多的月份退货也多，这是促销节奏，不代表促销导致退货。
+✓绿 [cc-b2] pass moral_foundations :: 消防车越多的火灾损失越大，这个现象可能还有混杂因素，需要控制后再看。
+✓绿 [cc-b3] pass none :: 夏天用电量和气温一起飙升，但这是季节性规律，并不意味着高温导致用电变化。
+✓绿 [cc-b4] pass none :: Cities with more police have more crime,
+✓绿 [cc-b5] pass none :: 他越练越强，成绩提高了不少。
+✓绿 [cc-b6] pass none :: 越忙的时候越要多喝水，补充水分很重要。
+✓绿 [co-b1] pass none :: 在被录用的人里，笔试成绩高的面试分数反而低，看来不同场次考察的能力维度不一样。
+✓绿 [co-b2] pass none :: 在活到九十岁的人里，抽烟喝酒的比例比普通人高，但这可能只是样本选择，未必说明抽烟
+✓绿 [co-b3] pass moral_foundations :: Among the admitted students, those who p
+✓绿 [co-b4] pass none :: 在活到九十岁的人里，规律作息者的各项指标比熬夜者好，但这与多种因素有关，不能单独
+✓绿 [rc-b1] pass none :: 学校劝退违纪学生依据的是校规校纪，家长表示理解。
+✓绿 [rc-b2] pass none :: 被劝退的学生如果及时补救，照样能考上好大学。
+✓绿 [rc-b3] pass none :: 闹离婚的夫妻更需要沟通，这说明婚姻需要经营。
+✓绿 [rc-b4] pass none :: Students who were expelled can still app
+攻击 12/12，良性 14/14
