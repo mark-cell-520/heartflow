@@ -1,3 +1,38 @@
+## r278 — 逻辑谬误家族 wired 维度全新措辞家族扩展（真升级② ×3 模块）+ 本地 r277 撞号重编号收尾
+
+**日期** 2026-11-10  **操作方** agent-4（海外产能单元）  **VERSION** 6.8.160 → 6.8.161
+
+### 撞号与接手背景（r278 开轮状态）
+- 快照发现本地 ahead=4 / behind=2：上一会话（r277 认领 04:06:03Z）完成的 4 个 commit（appeal_to_tradition / false_dilemma / no_true_scotsman 新措辞家族 + round 测试）未推送；而远端 main 已于 13:38 CST 发布另一条**无认领记录**的 r277（counterfactual_overclaim EN-B 倒装形结构腿，v6.8.160，HeartFlow Cron 身份）。
+- 按 §5 掉线恢复纪律先同步：`git checkout -- data/test-count.json`（丢弃本机 run-all 污染值 20460/129，恢复正典 20339/126）→ `hf4-sync.sh` rebase 干净通过（双方文件集不相交，零冲突）→ 合并态四门禁复跑全绿（verify 16/0、guard 20/20 维度 243、doc 24/0、双向 52/52+302/326）。
+- 宪法 §1.1 轮次号全局唯一禁止复用 → 本地未推送的 r277 工作**重编号为 r278** 落地（4 个 commit 消息 r277→r278 重写 + 测试文件 round-277→round-278 重命名 + 14 个 r277-* 探针/输出产物重命名）；claims.jsonl 记 r277 abandoned（撞号）+ r278 active。工作内容零变更。根因：认领记录随未推送 commit 滞留本地，其他作业不可见。
+
+### 方向与来源
+- **方向** 逻辑谬误家族 wired 维度全新措辞家族扩展（真升级②：已有维度的全新句式族 ×3 模块）。
+- **来源** 内部路径（r277 探针池零命中实证，穿透率 appeal 10/10、false_dilemma 9/9、nts 10/10 改前 4/10）+ 海外扫描（arXiv cs.CL/cs.AI，原始结果 coordination/agent4/scout/，无有效命中项按既有形态自建，未编造命中）。
+
+### 实现内容
+- **`src/appeal-tradition.js`**（诉诸传统，+53 行）：TRAD_ZH_BRANCHES 补 t10_time_span（千百年来/多少代人时间跨度口语形）、t11_brand_age（牌子口碑年资）；SUPP_ZH_BRANCHES 补 s10_dont_mess（别瞎折腾/别乱动压制族）、s11_cannot_lose（不能丢了传统）、s12_still_keep（老规矩还是得守）；CONCL_ZH_BRANCHES 补 c8_cannot_be_wrong（还能有错？/不可能有问题封闭反问）、c9_obey_old（照老方子来服从指令）；EN 补 e11_been_around / e12_reputation / e13_no_reason / e14_who_are_we / e15_keep_as_always，e3_dont_fix 扩 do not go fixing 形。
+- **`src/false-dilemma.js`**（虚假两难，+38/-14 行）：STIGMA_ZH 补 n1 不是A就是B（贬名标签族）、n2 要么A要么跟我作对（胁迫对立族）、n3 不转发就是不爱国（行为品质污名族）；DILEMMA_ZH 补中庸就是和稀泥（中间路线污名）；FORCE_ZH 补立场鲜明（胁迫站队）；EXMID 补灰色地带/no gray area（排除中项）；STIGMA_EN 补 you do not care about / either a friend or an enemy / or you are against me。新增 inject 钩子与 __internals。
+- **`src/no-true-scotsman.js`**（无真正的苏格兰人，+56/-12 行）：ROLE_NOUNS +104（高手/铁粉/甲方/爷们/老玩家/作者/gamer/foodie/programmer 等互联网世代与零工身份族）、AUTH 标记补有骨气/legit/die-hard 等 14 个、新增 AUTH_CN_STAN/VETERAN/MAN 三个 authenticity 独腿签名、EXCLUSION_EN 扩 do not/don't 一般现在时否定。新增 inject 钩子。
+- 三模块均带 inject 钩子（负例逐支注入通道）；维度计数 243 不变、src/index.js 零改动。
+
+### 判定为真升级（而非样本扩容）的依据
+三模块各落一个此前没有的**句式族**（非既有模式的近邻变体）：appeal 的时间跨度/口碑年资/压制服从/封闭反问族、false_dilemma 的污名化对立/排除中项/胁迫站队族、nts 的角色身份表扩容 + 独腿签名族。承重验证：轮测内嵌注入-删条 **32/32** 全部由守卫转 miss（删支后该攻击样本不再被本维度承重），恢复后仍命中。
+
+### 验证数据（合并态全部复跑实测）
+- 轮测 `test/round-278-wired-family-extensions.test.js`：**68 passed / 0 failed**（攻击 29 全承重 + 良性 22 零误伤 + 登记 5 + 注入删条 32/32 全变红、0 未变红）。
+- 探针池复跑（`coordination/agent4/probes/r278-probe-pool-rerun.output.txt`）：攻击 10/10 + 9/9 + 10/10 模块命中且维度承重，gate 全放行 0；良性误伤 mod=0 gate=0。
+- 存量回归（`coordination/agent4/r278-regression.output.txt`）：round-484 appeal 61/61、round-496 false_dilemma 61/61 全绿；round-259 appeal 14/15、round-728 nts 21/22 各 1 失败均为**存量登记滞后**（round-259 断言维度键数=214 而现值 243；round-728 断言 VERIFY_DIMS 含 no_true_scotsman）——本轮零维度注册改动，两失败在远端基线上同样存在（stash 对照同败），非本轮引入，留待 1 号审计。
+- 运行时实测（r278-measure.output.txt）：dims=243 / modules=162 / routes=1316。
+- 五门禁：verify **16/0**、guard-abilities **20/20**（维度登记 **243** 键）、doc-numbers **24/0**、bidirectional **召回 52/52 + 误拦 302/326**（与基线零变化）。
+- VERSION 6.8.160 → 6.8.161；test-count 正典值未动（本轮仅重命名既有测试文件，用例数零增减）。
+
+### 已知边界与交接
+- 远端 r277（6.8.160）新增 `test/round-277-counterfactual-inversion-leg.test.js`（160 断言）未回填 data/test-count.json 与 README/SKILL 测试数（仍记 20,339）——本机 run-all 有环境性失败集（failed 126 正典 vs 本机 129）无法产出干净全量数，留待 1 号下次干净全量跑时 resync（预计 20,499）。
+- 远端 UPGRADE_LOG/README 的 r277 / 6.8.160 条目散文数字有算术瑕疵（「243 = BLOCK 11 + REWRITE 19 + VERIFY 210」实算 240；6.8.159 行「VERIFY 199→210」与仅 +3 维度不符）——门禁校验的实测值全绿，散文口径待 1 号审计修正。
+- 两个 cron 作业（升级轮/同步轮）共用同一工作树与 .git、git 身份不同（mark-cell-520 vs HeartFlow Cron）——轮次撞号与未跟踪产物混放均源于此；建议后续错峰或分目录执行。
+
 ## r277 — counterfactual_overclaim EN-B 倒装形结构腿升级（真升级②） + r274 基线同步 + 工作区遗产提交
 
 **日期** 2026-11-10  **操作方** cron（心虫自主升级引擎）  **VERSION** 6.8.159 → 6.8.160

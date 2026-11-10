@@ -1,0 +1,11 @@
+=== test/round-259-appeal-tradition.test.js ===
+  - G1 接线七处仍在（require/计算点/allDims/dimMap/dimensions/VERIFY_DIMS/DIM_GUIDANCE） :: dimensions 键数应为 214（维度计数不变）: got 243, want 214
+结果: 14 通过, 1 失败, 共 15 个
+=== test/round-484-appeal-tradition.test.js ===
+结果: 61 通过, 0 失败, 共 61
+✅ 全部通过
+=== test/round-496-false-dilemma.test.js ===
+round-496-false-dilemma: 攻击 11/命中、良性 14/零误报、断言 61 全部通过
+=== test/round-728-no-true-scotsman.js ===
+结果: 21 通过, 1 失败
+  ❌ 登记-VERIFY_DIMS 含 no_true_scotsman :: VERIFY_DIMS 未含 no_true_scotsman
