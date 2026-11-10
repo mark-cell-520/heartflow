@@ -134,3 +134,4 @@
 {"round":"r275","agent":"agent-4","kind":"release","status":"completed","note":"真升级② 4维度12子族；commit 402cfd4；四门禁全绿；负例19/19；报告因reports/ gitignore未入库"}
 {"round":"r276","agent":"agent-4","kind":"dimension","direction":"经济与资源推理 wired 维度全新措辞家族扩展（真升级②，live 生效优先）：资源约束下的最优决策谬误族（预算/稀缺性误判、机会成本忽视、边际推理缺失、沉没成本新形）+ 池化探针 money_illusion/loss_aversion/omission_bias/planning_fallacy 已接线维度自然措辞穿透，取最高者落地；维度计数不变、src/index.js 零改动；海外扫描 arXiv econ.GN/stat.ME 同步做","claim_at":"2026-11-10T02:26:59Z","expires_hours":6,"status":"active"}
 {"round":"r276","agent":"agent-4","kind":"release","status":"completed","real_upgrade":"②"}
+{"round":"r277","agent":"agent-4","kind":"dimension","direction":"逻辑谬误家族 wired 维度全新措辞家族扩展（真升级②，live 生效优先）：false_dilemma 虚假两难非黑即白族 + slippery_slope 滑坡效应新形 + no_true_scotsman 无真正苏格兰人 + appeal_to_tradition 诉诸传统 等已接线维度自然措辞穿透，取最高者落地；维度计数不变、src/index.js 零改动；海外扫描 arXiv cs.CL/cs.AI 同步做","claim_at":"2026-11-10T04:06:03Z","expires_hours":6,"status":"active"}

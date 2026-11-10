@@ -1,0 +1,343 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/4DAuyYwi0u6QUr5q2zwUz1BgJUg</id>
+  <title>arXiv Query: search_query=all:fallacy OR all:recognition OR all:argument OR all:quality OR all:benchmark&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T04:07:11Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:fallacy+OR+(all:recognition+OR+(all:argument+OR+(all:quality+OR+all:benchmark)))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>491578</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11497v1</id>
+    <title>TID System for Speech-COSER Challenge 2026: ASR Track</title>
+    <updated>2026-11-08T16:50:34Z</updated>
+    <link href="https://arxiv.org/abs/2611.11497v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11497v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We describe the system submitted by Telefónica Innovación Digital to the Speech-COSER Challenge 2026, which features spontaneous speech from elderly speakers recorded in rural Spain. For ASR, we perform CTC-based pseudo-forced alignment scores audio-text match quality to guide a two-stage LoRA curriculum, followed by post-hoc magnitude pruning of the LoRA matrices to enhance generalization. An ensemble of seven systems combined via ROVER achieves 36.25\% unnormalized and 22.17\% normalized WER.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:50:34Z</published>
+    <arxiv:comment>TID system for Speech-COSER Challenge 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Fernando López</name>
+    </author>
+    <author>
+      <name>Jordi Luque</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11495v1</id>
+    <title>Smooth Rigidity Near Extremal Horizons</title>
+    <updated>2026-11-08T16:48:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.11495v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11495v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The Einstein equations constrain the transverse Taylor series at a degenerate Killing horizon, but even complete knowledge of that series need not determine a smooth spacetime: a nonzero difference can vanish to every order at the horizon. We show that this ambiguity disappears when the limiting metric on the space of Killing orbits admits a spacelike graph over a compact horizon section. In dimensions $d\geq4$, smooth vacuum Einstein germs with the same marked transverse jets are then locally isometric on a two-sided neighborhood of the whole section. The proof combines a terminal wave-map gauge with energy estimates on the orbit cylinder and yields a finite weighted matching criterion. For unwarped horizons with positive-Einstein sections, a condition on the full Lichnerowicz spectrum reduces the smooth classification to parallel first transverse data. All such data have convergent multiwarped Einstein realizations, including examples whose sections have negative sectional-curvature directions. We also obtain a finite-regularity version for round sections. The continuation argument extends to four-dimensional Einstein--Maxwell theory and gives smooth charged-Nariai rigidity. Finally, rotating Nariai data admit the required spacelike graph throughout the regular branch; an all-order tensor estimate yields smooth Kerr--de Sitter or rotating-Nariai rigidity for $a^2/r_0^2\leq1/8$, without assuming ambient axial symmetry.</summary>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.DG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:48:47Z</published>
+    <arxiv:comment>55 pages</arxiv:comment>
+    <arxiv:primary_category term="gr-qc"/>
+    <author>
+      <name>Ye Zhou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11488v1</id>
+    <title>A note on exact external information complexity</title>
+    <updated>2026-11-08T16:29:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.11488v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11488v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the prior-free zero-error private-coin external information complexity $B(f)$ of finite two-party functions, with correctness on every input. An elementary rectangle/entropy argument gives $B(\mathsf{AND})=\log_2 3$. A complete classification of Boolean $3\times3$ matrices leaves, up to input permutations and output complementation, only the two-overlapping-rectangles function $F$ without an exact value. An entropy potential and a finite rational protocol give $2.1212661667060486842\ldots\le B(F)&lt;2.130998318$. We also determine its deterministic external information and zero-error communication costs. A separate product-prior certificate and internal-information additivity yield $R_0^{\mathrm{pub}}(F^{\times t})\ge2.021991187178562\ldots\,t$, strictly exceeding the fractional-cover rate $2t$.</summary>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:29:50Z</published>
+    <arxiv:primary_category term="cs.CC"/>
+    <author>
+      <name>Henning Wunderlich</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11487v1</id>
+    <title>THEATRON: A Benchmark for Evaluating Persona Persistence in Long-Horizon LLM Decision-Making</title>
+    <updated>2026-11-08T16:29:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.11487v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11487v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Existing evaluations often test persona expression rather than whether persona information persists in extended decision-making. We introduce THEATRON, a controlled benchmark that uses financial replay to evaluate persona persistence in long-horizon sequential decision-making. In these environments, models conditioned on fixed behavioral-finance personas observe shared daily market evidence and trajectory-specific account-state feedback and make sequential decisions over multi-month trajectories. We evaluate Zero-Shot, One-Shot, and Chain-of-Thought persona injection across four LLMs, using cumulative-return and action trajectories to diagnose within-persona stability, cross-persona separability, and action collapse. Persona conditioning produces systematic behavioral shifts beyond a no-persona baseline, and persona-level separation generally exceeds the variation induced by semantically equivalent descriptions. Nevertheless, these shifts do not reliably form coherent persona-specific policies: apparently stable separation can arise from stereotyped action collapse, while diverse policies can exhibit noisy trajectory switching. These findings expose a gap between observable persona-induced behavior and persistent, context-sensitive persona-conditioned decision policies. Code and benchmark data are publicly available at: https://github.com/yuyan12138/theatron</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:29:09Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yuyan Wang</name>
+    </author>
+    <author>
+      <name>Yuechen Jiang</name>
+    </author>
+    <author>
+      <name>Zhiwei Liu</name>
+    </author>
+    <author>
+      <name>Jimin Huang</name>
+    </author>
+    <author>
+      <name>Sophia Ananiadou</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11486v1</id>
+    <title>MicroSim: Contrastive Graph Neural Networks for Binary Code Similarity Detection</title>
+    <updated>2026-11-08T16:28:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.11486v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11486v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present MicroSim, a system for binary code similarity detection that represents each function as a graph built from IDA Pro Hex-Rays microcode and compares such graphs with a contrastive Siamese graph neural network (GNN). We evaluate on the TREX cross-optimization benchmark, a corpus of 849,072 function-level microcode graphs spanning optimization levels -O0 through -O3, under a strict class-disjoint split in which no function key is shared between train and test. Under this protocol, MicroSim reaches 0.9972 area under the receiver operating characteristic curve (ROC-AUC) and 0.9762 Matthews correlation coefficient (MCC), outperforming Gemini (0.9332 ROC-AUC), SAFE (0.9752), and jTrans (0.9740) retrained on the same split, as well as a structure-free Bag-of-Words (BoW) baseline (0.9484). We analyze the gap between pair classification and ranked retrieval in graph transformers, showing that Cross-domain Similarity Local Scaling (CSLS) under unified tie-resolved evaluation raises GraphGPS mean reciprocal rank (MRR) from 0.2542 to 0.2559 (R@1 = 0.1639, R@10 = 0.4561), strictly satisfying the theoretical MRR upper bound. Finally, over 5 seeds with equal compute, the pairwise cosine-embedding loss attains a slightly higher ROC-AUC (Δ = -0.0256, 95% confidence interval [-0.3282, +0.2770]), whereas the supervised-contrastive information noise-contrastive estimation (InfoNCE) loss is significantly better on thresholded classification and ranked retrieval.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:28:10Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Moussa Moussaoui</name>
+    </author>
+    <author>
+      <name>Tarik Houichime</name>
+    </author>
+    <author>
+      <name>Abdelghani Souhar</name>
+    </author>
+    <author>
+      <name>Abdelalim Sadiq</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11477v1</id>
+    <title>Robust and Private Swarm Learning via Zero-Knowledge Validator Admission and Consensus Aggregation</title>
+    <updated>2026-11-08T16:15:20Z</updated>
+    <link href="https://arxiv.org/abs/2611.11477v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11477v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Swarm Learning improves resilience and removes the need for a single trusted coordinator by distributing model aggregation and validation across participating nodes. However, it also delegates the validation of model updates to peers whose private data may be biased, unrepresentative, or adversarial, and existing Swarm Learning protocols generally do not attest that data, leaving decentralized validation as an attack surface. We present a robust, privacy-preserving Swarm Learning framework that makes verifiable data quality the condition for admission to the learning task. A validator joins only after a zero-knowledge attestation proves, without revealing any raw sample, that a reference model ran correctly on its private data. The attested outputs also yield a label-free class profile, so the network assembles a collectively IID validator pool from individually skewed validators as accurately as an oracle with the true labels (total-variation distance to uniform 0.025, against 0.021 for the oracle and 0.21 for random selection). Admitted validators score client updates and, through a Tendermint-style Byzantine Fault Tolerant consensus, agree on a gradient mask and a quality-derived aggregation weight for each submission, replacing dataset-size weighting with a quality-aware signal. Adapting the cut-layer idea of Split Learning, a challenge-based audit lets peers re-verify that a mask was computed on the attested data without an expensive end-to-end zero-knowledge proof. Across four benchmarks under non-IID partitions the framework matches FedAvg on clean data; under a gradient-scaling attack that collapses FedAvg to random chance, it retains 94% of clean accuracy on CIFAR-100 and over 99% on FashionMNIST, where FedAvg achieves only 2.1% and 11%. The result is a private, robust, and auditable foundation for decentralized learning.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:15:20Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Marco Arazzi</name>
+    </author>
+    <author>
+      <name>Mert Cihangiroglu</name>
+    </author>
+    <author>
+      <name>Antonino Nocera</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11470v1</id>
+    <title>GOPR-CAD: Graph-of-Operations Progressive Reasoning for CAD Generation</title>
+    <updated>2026-11-08T16:07:56Z</updated>
+    <link href="https://arxiv.org/abs/2611.11470v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11470v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Generating accurate CAD models requires substantial engineering expertise and careful control of geometry, topology, and mechanical constraints. Text-to-CAD aims to simplify this process, but current LLM-based methods often generate CAD programs directly. Language models remain unreliable when producing long code while coordinating coupled geometric, topological, and dimensional constraints. Consequently, executable programs may still produce structurally incorrect models, which execution rate and rendered appearance may fail to reveal. To address these limitations, we propose GOPR-CAD, an agentic Text-to-CAD pipeline based on Graph-of-Operations Progressive Reasoning. A language model acts as a decision agent over encapsulated CAD operations and progressively constructs an executable operation graph, which a deterministic compiler converts into the final CAD model. This separation requires no additional training and supports different language models. To evaluate structural fidelity, we construct MHCAD, a benchmark of 300 standard mechanical part requirements derived from Machinery's Handbook. Their explicit structures enable reference-free STEP/B-rep evaluation. GOPR-CAD achieves 82.7% Structural Yield on MHCAD, and 87.2% Structural Yield on an external CADPrompt subset.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:07:56Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yitian Pang</name>
+    </author>
+    <author>
+      <name>Yifan Li</name>
+    </author>
+    <author>
+      <name>Xiaowei Yue</name>
+    </author>
+    <author>
+      <name>Li Zheng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11469v1</id>
+    <title>RealEmbedBench: Benchmarking LLMs on Real-World Application-Layer Embedded Software Tasks</title>
+    <updated>2026-11-08T16:05:31Z</updated>
+    <link href="https://arxiv.org/abs/2611.11469v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11469v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) perform well on general coding tasks, but their capabilities in application-layer embedded software development remain underexplored. Existing embedded benchmarks primarily focus on hardware-in-the-loop validation in simulated environments. We introduce RealEmbedBench, a benchmark of 5,142 samples covering three application-layer tasks: code generation and completion, state machine modeling and implementation, and cross-OS code translation. We evaluate six representative LLMs and find substantial performance differences across tasks and models. Project context, especially the local code window, significantly affects code generation and completion. Models perform reasonably well at state machine modeling but struggle to translate these models into executable code. Cross-OS translation performance varies substantially by direction. Translation from Harmony to RT-Thread is particularly challenging, with an average pass rate of 0.1667. These findings suggest that developers should consider local code context when using LLMs for code generation and completion and select models according to the translation direction. They also motivate the use of more real-world state machine implementation data in LLM training to narrow the gap between modeling and executable code.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:05:31Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Yujun Huang</name>
+    </author>
+    <author>
+      <name>Yuwei Zhang</name>
+    </author>
+    <author>
+      <name>Yi Zhou</name>
+    </author>
+    <author>
+      <name>Shanshan Wu</name>
+    </author>
+    <author>
+      <name>Xiang Chen</name>
+    </author>
+    <author>
+      <name>Lina Gong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11464v1</id>
+    <title>Off-Policy RL with Online Inference Tuning: My Solution to the CoRL 2026 RoboEval Challenge</title>
+    <updated>2026-11-08T15:53:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.11464v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11464v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The CoRL 2026 RoboEval challenge has eight bimanual tasks, and it ranks a policy not only on whether it succeeds but on how: every stage of the task, done safely, efficiently and with both arms in coordination, scored against human demonstrations. My solution has two parts. The generic part, carried over from my LeHome challenge solution, is off-policy RL on a $π_{0.5}$-based policy that is also its own value function. It is trained with AWR and RECAP on advantages of the exact official score, in a loop where every rollout is at the same time a Thompson-sampling trial of about 20 inference parameters. Out of the box, it took the policy to 0.85 RDS on held-out seeds in two days (and it was still very far from convergence). The competition-specific part adds data that local exploration cannot find: generated demonstrations that reach the full reward, and recovery episodes that start from the policy's own failures. The submitted policy reaches 0.990 RDS on held-out seeds and 0.987 on the official seeds.</summary>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T15:53:59Z</published>
+    <arxiv:comment>Technical report for the RoboEval Challenge at CoRL 2026. Code: https://github.com/IliaLarchenko/RoboEvalSolution ; checkpoint: https://huggingface.co/IliaLarchenko/RoboEvalSolution ; project page: https://ilialarchenko.com/projects/roboeval2026/</arxiv:comment>
+    <arxiv:primary_category term="cs.RO"/>
+    <author>
+      <name>Ilia Larchenko</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11459v1</id>
+    <title>From Imperfect Information to Controlled Steps: Stochastic Optimization under Heavy-Tailed Noise and Compression</title>
+    <updated>2026-11-08T15:45:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.11459v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11459v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Stochastic optimization relies on information whose statistical quality, availability, and computational cost can vary substantially. Heavy-tailed observations challenge concentration, compression distorts communicated vectors, and generalized smoothness changes how far an algorithm can move. This dissertation studies these difficulties through two linked design decisions: how to construct an informative search vector and how to convert it into a controlled step.
+  We first develop high-probability methods under bounded central $p$-th moments, $p\in(1,2]$, allowing infinite variance when $p&lt;2$. Clipped gradient, accelerated, extragradient, and gradient descent-ascent methods come with guarantees for stochastic minimization and variational inequalities, with smoothness and moment conditions needed only where the iterates lie with high probability. For composite and distributed problems, shifted and innovation clipping preserve the fixed point that direct clipping can disturb, while retaining linear speedup.
+  We then characterize the value of richer stochastic information: lower complexity bounds quantify when same-sample gradient differences and stochastic Hessian information improve heavy-tailed nonconvex optimization, and normalized momentum variance reduction and Hessian-corrected momentum attain matching or near-matching in-expectation bounds. Separately clipping gradients and their correction terms yields batch-free high-probability methods.
+  For compressed distributed optimization, we prove convergence of normalized error-feedback methods under generalized smoothness without a uniform gradient-dissimilarity assumption, and develop parameter-agnostic variants with five momentum estimators. Finally, we extend the estimator hierarchy to linear minimization oracles over arbitrary norm balls, recovering the Euclidean rates under estimator-specific generalized smoothness.</summary>
+    <category term="math.OC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T15:45:59Z</published>
+    <arxiv:comment>PhD dissertation, King Abdullah University of Science and Technology (KAUST), 2026. 698 pages, 26 figures, 15 tables</arxiv:comment>
+    <arxiv:primary_category term="math.OC"/>
+    <author>
+      <name>Abdurakhmon Sadiev</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11458v1</id>
+    <title>After the Higgs: Looking for the Universe Behind the Particle</title>
+    <updated>2026-11-08T15:42:14Z</updated>
+    <link href="https://arxiv.org/abs/2611.11458v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11458v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Fourteen years after its discovery, the Higgs boson has changed roles. It was once the object of the search, but today it is an instrument with which we interrogate Nature's vacuum, test quantum field theory and look for new principles. This shift comes at a time when, unlike before the Higgs discovery, we have no theoretical argument guaranteeing new physics within experimental reach. At the same time, securing long-term support for fundamental science is becoming increasingly challenging. I revisit the path from a theoretically motivated discovery to a precision programme, explain why the Higgs is such an unusual quantum field, and argue that this same peculiarity makes it a gateway to cosmology and other sectors. I then turn to a less technical question: how should a field plan for exploration when no theorem guarantees the next discovery? My answer is to pursue precision without pretending to know in advance which measurement will matter, sustain a diverse experimental portfolio, protect theoretical risk-taking, and make the public case for fundamental exploration on its own terms.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T15:42:14Z</published>
+    <arxiv:comment>Vision talk from Higgs Hunting 2026. 11 pages</arxiv:comment>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>Veronica Sanz</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11452v1</id>
+    <title>Semantically Aligned KV Cache Compression for Efficient Agentic Autoregressive Video Generation</title>
+    <updated>2026-11-08T15:28:33Z</updated>
+    <link href="https://arxiv.org/abs/2611.11452v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11452v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agentic autoregressive video generation combines semantic planning, sequential generation, and visual verification for controllable synthesis. Growing visual histories enlarge the key-value (KV) cache, increasing memory use and attention costs across candidate rollouts. Existing compression methods primarily optimize individual generators without the planner's semantic constraints, risking low priority for states supporting requested attributes or actions. We introduce SemanticKV, a training-free method for semantically aligned KV cache compression. To our knowledge, SemanticKV is the first KV cache compression method for agentic autoregressive video generation that explicitly uses planner-extracted semantic constraints to guide retention. Text cross-attention identifies constraint-related video positions, whose self-attention queries are collected into separate groups. Attention weights are averaged within each group and maximized across groups, giving each cached entry a high score when strongly used by any represented constraint. A single top-k selection retains high-scoring entries under the memory budget, leaving their keys, values, and positions unchanged. For fixed query groups and equal entry costs, this selection minimizes an additive upper bound on worst-group discarded attention. The method operates independently within each candidate without retraining or additional video generations. We evaluate four AR video backbones on three benchmarks for 5-, 30-, and 60-second generation. On Causal Forcing at a compression ratio of 0.7, SemanticKV obtains a VBench Total Score of 84.10, compared with 84.05 for the strongest compressed baseline and 83.99 for Full KV. It achieves a 1.22x speedup over Full KV and reduces KV-cache memory from 6.04 GB to 1.81 GB, a 3.35x reduction.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T15:28:33Z</published>
+    <arxiv:comment>32 pages, 12 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Weizhong Huang</name>
+    </author>
+    <author>
+      <name>Huaijia Kou</name>
+    </author>
+    <author>
+      <name>Tianyu Xie</name>
+    </author>
+    <author>
+      <name>Xiawu Zheng</name>
+    </author>
+    <author>
+      <name>Liujuan Cao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11450v1</id>
+    <title>How Much Training-Inference Mismatch Can On-Policy Distillation Tolerate?</title>
+    <updated>2026-11-08T15:22:47Z</updated>
+    <link href="https://arxiv.org/abs/2611.11450v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11450v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>On-policy distillation (OPD) trains a student language model on its own responses, guided by a fixed teacher. Generating these responses is expensive, so systems use quantized inference and asynchronous rollouts to reduce the cost. Both, however, introduce training-inference mismatch between the rollout engine and the model being trained. Such mismatch can destabilize reinforcement learning (RL), but its effects on OPD remain unclear. This paper investigates how much mismatch OPD tolerates, where its effects arise, and how training systems can use this tolerance. Measuring all mismatch sources on one scale, we examine quantization across three student-teacher pairs, with additional tests of weight staleness and injected noise on one pair. OPD tolerates substantial mismatch without meaningful loss of training quality but degrades at higher levels, revealing an empirical mismatch budget. Both the quality cost of mismatch and the mismatch introduced by quantization depend on the model, with some layers particularly sensitive to reduced precision. In controlled comparisons, OPD remains stable under rollout configurations that destabilize RL methods. Under weight noise, mismatch also shifts the prefixes reached during generation, introducing errors that per-token corrections cannot address. To put these findings into practice, we introduce a lightweight admission check that screens rollout configurations against a calibrated budget without requiring a full training run for each candidate. Model-specific FP8 recipes preserve training quality while providing capacity for at least $1.93\times$ as many KV-cache tokens as BF16. Combining FP8 with asynchronous rollouts reaches the same training quality $1.62\times$ sooner than synchronous BF16 training. Code is available at https://github.com/benyucong/train-inference-mismatch-opd</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T15:22:47Z</published>
+    <arxiv:comment>28 pages, 10 figures, 12 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Cong Yu</name>
+    </author>
+    <author>
+      <name>Ziting Wang</name>
+    </author>
+    <author>
+      <name>Songlin Jiang</name>
+    </author>
+    <author>
+      <name>Sitong Zhang</name>
+    </author>
+    <author>
+      <name>Chengliang Chai</name>
+    </author>
+    <author>
+      <name>Youhe Jiang</name>
+    </author>
+    <author>
+      <name>Eiko Yoneki</name>
+    </author>
+    <author>
+      <name>Tuo Shi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11447v1</id>
+    <title>Learning to Rank Propagators in Constraint Programming</title>
+    <updated>2026-11-08T15:18:52Z</updated>
+    <link href="https://arxiv.org/abs/2611.11447v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11447v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The order in which propagators are executed can substantially affect the performance of constraint programming solvers, yet propagator priorities are typically determined by fixed, manually designed heuristics. In this work, we explore learning instance-dependent propagator priorities from static problem features. We formulate the task as a learning-to-rank problem, addressing the challenge that the quality of a priority assignment can be measured through solver runtime, while the desired priorities of individual propagators are not directly observable. A self-attention-based model jointly scores the propagators present in an instance and is trained using pairwise preferences derived from solver runtimes measured under randomized propagator priority assignments, with a Plackett-Luce-based ranking objective. Predicted rankings are mapped to the discrete priority levels of the Choco solver before search begins, without modifying its propagation or search procedures. We evaluate the approach on XCSP3 instances and demonstrate that propagator ordering can have a substantial impact on solving time. On a test set of 698 instances, picked out as most difficult by problem class, the learned priorities increase the number of solved instances from 634 to 654, reduce median solver runtime by 27.93%, and reduce aggregate penalized runtime (PAR1) by 12.65% compared with Choco's default priorities. We further observe that improvements vary across problem classes and show that a simple policy selecting between learned and default priorities further increases the number of solved instances. These results demonstrate the potential of learning instance-dependent propagator priorities to improve constraint programming performance, particularly on difficult instances.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T15:18:52Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Matija Lojović</name>
+    </author>
+    <author>
+      <name>Mladen Nikolić</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11439v1</id>
+    <title>SWHForest: A Structural Curation and Search Layer for Large-Scale Code Corpora</title>
+    <updated>2026-11-08T15:03:30Z</updated>
+    <link href="https://arxiv.org/abs/2611.11439v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11439v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Pre-training code language models relies on massive code corpora usually streamed over the internet. However, researchers rarely need a multi-terabyte archive in its entirety; instead, their workflow centers on curated subsets: selecting well-documented files, filtering out repetitive boilerplate, auditing for benchmark contamination, or retrieving specific code patterns. Yet, because modern corpora are typically published as file pointers and basic attributes rather than source text, no general structural layer exists to select which files to download: curating a subset requires downloading and parsing millions of files first just to discard most of them. We present SWHForest, an open-source framework and public dataset that provides this missing structural layer for any pointer-based corpus without redistributing source code. A single pass over the archive parses each file into an AST and immediately discards the source text, keeping only its structural summary. Queried locally or exposed by archive providers as a server-side filtering API, SWHForest selects matching files first (via SQL or index intersection) and downloads only surviving candidates. Across the ten largest languages of Stack-Edu (52.1M unique files, 341M definitions), SWHForest answers curation queries in milliseconds while cutting downloads by 46-72%, reducing live structural searches from hours of per-language streaming to seconds or minutes.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T15:03:30Z</published>
+    <arxiv:comment>5 pages, 3 figures, 2 tables. Submitted to the MSR 2027 Data and Tool Showcase Track. Code: https://github.com/halykoss/swhforest ; Data: https://huggingface.co/datasets/halykoss/swhforest</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Federico Pennino</name>
+    </author>
+    <author>
+      <name>Andrea Gurioli</name>
+    </author>
+    <author>
+      <name>Maurizio Gabbrielli</name>
+    </author>
+    <author>
+      <name>Paolo Ferragina</name>
+    </author>
+  </entry>
+</feed>

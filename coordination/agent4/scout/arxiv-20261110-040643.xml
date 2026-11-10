@@ -1,0 +1,424 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/UNX6o9c3alwJw0iSV49N5TXKjj8</id>
+  <title>arXiv Query: search_query=all:false OR all:dilemma OR all:slippery OR all:slope OR all:fallacy OR all:detection OR all:taxonomy OR all:logical OR all:fallacies&amp;id_list=&amp;start=0&amp;max_results=15</title>
+  <updated>2026-11-10T04:06:44Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:false+OR+(all:dilemma+OR+(all:slippery+OR+(all:slope+OR+(all:fallacy+OR+(all:detection+OR+(all:taxonomy+OR+(all:logical+OR+all:fallacies)))))))&amp;start=0&amp;max_results=15&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>15</opensearch:itemsPerPage>
+  <opensearch:totalResults>357648</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11498v1</id>
+    <title>EVAX: Towards a Practical, Pro-active &amp; Adaptive Architecture for High Performance &amp; Security</title>
+    <updated>2026-11-08T16:55:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.11498v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11498v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper provides an end-to-end solution to defend against known microarchitectural attacks such as speculative execution attacks, fault-injection attacks, covert and side channel attacks, and unknown or evasive versions of these attacks. Current defenses are attack specific and can have unacceptably high performance overhead. We propose an approach that reduces the overhead of state-of-art defenses by over 95%, by applying defenses only when attacks are detected. Many current proposed mitigations are not practical for deployment; for example, InvisiSpec has 27% overhead and Fencing has 74% overhead while protecting against only Spectre attacks. Other mitigations carry similar performance penalties. We reduce the overhead for InvisiSpec to 1.26% and for Fencing to 3.45% offering performance and security for not only spectre attacks but other known transient attacks as well, including the dangerous class of LVI and Rowhammer attacks, as well as covering a large set of future evasive and zero-day attacks. Critical to our approach is an accurate detector that is not fooled by evasive attacks and that can generalize to novel zero-day attacks. We use a novel Generative framework, Evasion Vaccination (EVAX) for training ML models and engineering new security-centric performance counters. EVAX significantly increases sensitivity to detect and classify attacks in time for mitigation to be deployed with low false positives (4 FPs in every 1M instructions in our experiments). Such performance enables efficient and timely mitigations, enabling the processor to automatically switch between performance and security as needed.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:55:08Z</published>
+    <arxiv:comment>Author manuscript of 2022 55th IEEE/ACM International Symposium on Microarchitecture (MICRO), pp. 1218-1236 (2022). 19 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <arxiv:journal_ref>2022 55th IEEE/ACM International Symposium on Microarchitecture (MICRO), pp. 1218-1236 (2022)</arxiv:journal_ref>
+    <author>
+      <name>Samira Mirbagher Ajorpaz</name>
+    </author>
+    <author>
+      <name>Daniel Moghimi</name>
+    </author>
+    <author>
+      <name>Jeffrey Neal Collins</name>
+    </author>
+    <author>
+      <name>Gilles Pokam</name>
+    </author>
+    <author>
+      <name>Nael Abu-Ghazaleh</name>
+    </author>
+    <author>
+      <name>Dean Tullsen</name>
+    </author>
+    <arxiv:doi>10.1109/MICRO56248.2022.00085</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1109/MICRO56248.2022.00085" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11491v1</id>
+    <title>CallCleaner: Lightweight Bioacoustic Denoising from an Audio Foundation Model</title>
+    <updated>2026-11-08T16:34:06Z</updated>
+    <link href="https://arxiv.org/abs/2611.11491v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11491v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many studies of animal vocalizations require clean recordings, but animals are usually recorded in the field, with background noise from weather, vehicles, and other animals. Animal vocalization denoising is challenged by the scarcity of clean training data and the extreme diversity of animal vocalizations. Classical spectral gates leave residual noise, especially without voice activity detection (VAD), while detector-free neural denoisers designed for bioacoustics remove less noise. We show that a general-purpose source separation foundation model, SAM-Audio, removes more noise than either of these types of methods, when used without training and prompted with time spans from a simple animal VAD. To turn this heavy method into a practical tool, we distill it into CallCleaner, a 19M-parameter denoiser that needs no detector and runs ~90x faster than real time on a laptop CPU. We find that SI-SDR has limited utility in our setting as it penalizes regenerated output and conflates noise removal with call fidelity, a trade-off our separate metrics reveal. CallCleaner leaves 11 dB less noise around the call than Biodenoising, the leading neural bioacoustic denoiser with public weights, and among fast, CPU-capable systems it pushes the Pareto frontier of noise removal vs. call fidelity, without requiring a detector. We release code and weights for CallCleaner, which enables fast, private, local denoising of single-caller recordings without specialized hardware.</summary>
+    <category term="eess.AS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SD" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:34:06Z</published>
+    <arxiv:comment>Project page: https://callcleaner.github.io</arxiv:comment>
+    <arxiv:primary_category term="eess.AS"/>
+    <author>
+      <name>Michael Xie</name>
+    </author>
+    <author>
+      <name>Gašper Beguš</name>
+    </author>
+    <author>
+      <name>Morris Alper</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11486v1</id>
+    <title>MicroSim: Contrastive Graph Neural Networks for Binary Code Similarity Detection</title>
+    <updated>2026-11-08T16:28:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.11486v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11486v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present MicroSim, a system for binary code similarity detection that represents each function as a graph built from IDA Pro Hex-Rays microcode and compares such graphs with a contrastive Siamese graph neural network (GNN). We evaluate on the TREX cross-optimization benchmark, a corpus of 849,072 function-level microcode graphs spanning optimization levels -O0 through -O3, under a strict class-disjoint split in which no function key is shared between train and test. Under this protocol, MicroSim reaches 0.9972 area under the receiver operating characteristic curve (ROC-AUC) and 0.9762 Matthews correlation coefficient (MCC), outperforming Gemini (0.9332 ROC-AUC), SAFE (0.9752), and jTrans (0.9740) retrained on the same split, as well as a structure-free Bag-of-Words (BoW) baseline (0.9484). We analyze the gap between pair classification and ranked retrieval in graph transformers, showing that Cross-domain Similarity Local Scaling (CSLS) under unified tie-resolved evaluation raises GraphGPS mean reciprocal rank (MRR) from 0.2542 to 0.2559 (R@1 = 0.1639, R@10 = 0.4561), strictly satisfying the theoretical MRR upper bound. Finally, over 5 seeds with equal compute, the pairwise cosine-embedding loss attains a slightly higher ROC-AUC (Δ = -0.0256, 95% confidence interval [-0.3282, +0.2770]), whereas the supervised-contrastive information noise-contrastive estimation (InfoNCE) loss is significantly better on thresholded classification and ranked retrieval.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T16:28:10Z</published>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Moussa Moussaoui</name>
+    </author>
+    <author>
+      <name>Tarik Houichime</name>
+    </author>
+    <author>
+      <name>Abdelghani Souhar</name>
+    </author>
+    <author>
+      <name>Abdelalim Sadiq</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11465v1</id>
+    <title>When Normality Shifts: Multi-Level WavLM Modeling for Open-World Audio Deepfake Detection</title>
+    <updated>2026-11-08T15:54:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.11465v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11465v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Audio deepfake detectors trained with known synthesis attacks can learn generator-specific shortcuts that fail as synthesis systems and acoustic conditions evolve. We investigate an attack-free alternative: a normality model trained exclusively on bona fide speech, which scores synthetic audio by its deviation from authentic representations. We propose MLN-WavLM, a method that applies shrinkage-Mahalanobis modeling to pooled hidden states from a frozen large-scale, pre-trained speech processing WavLM Base+ architecture. Evaluated on ASVspoof 2019 LA, our best attack-free variant achieves an 8.45\% Equal Error Rate (EER), closely tracking a fully supervised WavLM-HM-Conformer baseline (7.86%). However, when subjected to the ASVspoof 2021 DF domain shift, performance drops to 22.12% EER, exposing vulnerabilities in the bona-fide-calibrated operating point. Layer-wise analysis reveals that early WavLM representations dominate the ensemble. To test real-world viability, we simulated deployment streams using unlabeled threshold adaptation. While robust median/MAD recalibration easily handles in-domain contamination up to 10%, recalibrating under the 2021 DF domain shift triggers a total collapse of low-FPR recall. We conclude that while frozen source-domain normality can effectively rank deepfakes, it does not yield a stable open-world decision rule, and downstream threshold adaptation cannot rescue upstream ranking degradation.</summary>
+    <category term="cs.SD" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T15:54:07Z</published>
+    <arxiv:comment>Accpeted for the OWAD Workshop at ICDM 2026</arxiv:comment>
+    <arxiv:primary_category term="cs.SD"/>
+    <author>
+      <name>Daniel Niekurzak</name>
+    </author>
+    <author>
+      <name>Daniel Kozuch</name>
+    </author>
+    <author>
+      <name>Weronika Folwarska</name>
+    </author>
+    <author>
+      <name>Khan Muhammad</name>
+    </author>
+    <author>
+      <name>Rafał Scherer</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11440v1</id>
+    <title>MeerKAT reveals an ultra-steep spectrum radio halo in Abell 370</title>
+    <updated>2026-11-08T15:03:44Z</updated>
+    <link href="https://arxiv.org/abs/2611.11440v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11440v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Hubble Frontier Field cluster Abell 370 ($z=0.375$) has been the target of a suite of legacy multi-wavelength observational campaigns and is a prime candidate to host a diffuse radio halo, given its high mass ($\sim10^{15}\,\rm{M_\odot}$) and non-relaxed dynamical state. Previous detections of its radio halo were of low significance and imaging fidelity, leading to an uncertain characterisation of its nature. We use deep MeerKAT Ultra-High Frequency observations ($580-1015\,\rm{MHz}$) to robustly map the halo's spatial extent and spectral properties. We find a radio emission size of $\sim 1.1\,\rm{Mpc}$, significantly larger than previously reported. We measure a MeerKAT UHF in-band integrated spectral index of $α=-1.54\pm0.05$. This result is consistent with an ultra-steep spectrum radio halo ($α\lesssim-1.5$). We find a strong, sub-linear correlation ($k=0.60\pm0.08$) between the radio and X-ray surface brightness. The radio halo's position on the $P_{1.4\,\rm{GHz}}-M_{500}$ scaling relation is underluminous, consistent with the known USSRH population. The combined evidence strongly supports that the diffuse central radio emission in Abell 370 is an Ultra-Steep Spectrum Radio Halo (USSRH), refining its previous classification and providing further support for the turbulent re-acceleration model.</summary>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T15:03:44Z</published>
+    <arxiv:comment>10 pages, 7 figures, accepted for publication in MNRAS</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.GA"/>
+    <author>
+      <name>Graham Lawrie</name>
+    </author>
+    <author>
+      <name>Roger Deane</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11399v1</id>
+    <title>RoCoMark: Robust Code Watermarking Against LLM-Based Functionality-Preserving Rewriting Attacks</title>
+    <updated>2026-11-08T14:07:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.11399v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11399v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large Language Models (LLMs) present significant challenges to source tracing of generated code, as LLM rewriting can substantially alter the syntactic and structural characteristics of watermarked code. However, existing watermarking methods often suffer severe performance degradation under LLM-based functionality-preserving rewriting attacks. We attribute this vulnerability not merely to the intensity of rewriting, but to a fundamental distribution mismatch between the perturbations encountered during watermark training and the global, non-deterministic rewriting behaviors induced by LLMs. In order to deal with this challenge, we propose RoCoMark, a Robust Code waterMarking framework that explicitly learns and adapts to LLM rewriting behaviors. RoCoMark is a multi-round minimax game between the watermark embedder and LLM rewriter. In each round, the embedder first learns threat profiling from LLM-rewritten code by optimizing the watermark encoder through contrastive learning and knowledge distillation while mitigating catastrophic representation drift. Then the embedder improves strategies by optimizing the watermark encoder and extractor simultaneously. Finally, an adaptive attack-evolution mechanism based on Reflexion and short- and long-term memory pools is applied, enabling continuous interaction between the watermark embedder and evolving rewriting strategies. This iterative attacker-defender process progressively improves the robustness of the watermark against diverse and previously unseen LLM rewriting behaviors. Extensive experiments on four typical benchmarks, under attacks generated by five LLMs, show the effectiveness of RoCoMark. RoCoMark achieves an average detection AUROC of 74.2% and a Rewrite BitACC of 75.3%, while maintaining a code functionality pass rate above 99.7%.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T14:07:24Z</published>
+    <arxiv:comment>17 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Hongjie Zhang</name>
+    </author>
+    <author>
+      <name>Xingcheng Li</name>
+    </author>
+    <author>
+      <name>Hanzhou Wu</name>
+    </author>
+    <author>
+      <name>Zhihua Xia</name>
+    </author>
+    <author>
+      <name>Xinpeng Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11398v1</id>
+    <title>Decomposing Earth Embeddings with Sparse Autoencoders</title>
+    <updated>2026-11-08T14:07:08Z</updated>
+    <link href="https://arxiv.org/abs/2611.11398v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11398v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Earth observation foundation models produce global metre-resolution embeddings that underpin work across agriculture, ecology, hydrology, and beyond. Yet these embeddings are opaque: each dimension entangles unrelated physical concepts, which makes them difficult to interpret and their robustness hard to assess. Here, we propose sparse autoencoders (SAEs) as a principled way to decompose Earth embeddings into sparse, approximately monosemantic features over an overcomplete dictionary. Because LLM judges of interpretations do not transfer to satellite pixels, and spatial autocorrelation matters, we introduce a tailored evaluation protocol. It scores any SAE on reconstruction at matched sparsity, alignment with reference concepts, and spatial scale, each against baselines that include an SAE whose decoder is a frozen random dictionary. On this protocol, SAEs reconstruct AlphaEarth and Tessera embeddings better than every baseline at matched sparsity. Their features align with far fewer reference concepts than raw embedding dimensions (on AlphaEarth, 88% align with at most one of 20 concept groups, most with none, against a median of 12 per raw dimension). They also carry more of their variance at fine spatial scales (23 to 32% within a 640 m patch for BatchTopK and Matryoshka, against 9%). An SAE with a frozen random decoder shares both properties, which therefore follow from sparsity, whereas only a learned dictionary reconstructs the embedding accurately: on AlphaEarth, trained SAEs leave eight times less variance unexplained. We test the sparse code on two applications, discovering land-cover sub-concepts and detecting out-of-distribution pixels by area-of-applicability estimation. Both indicate how sparse features could be used, but neither is yet reliable enough for practical use. Together, these results are a step toward Earth observation models whose features can be inspected.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.geo-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T14:07:08Z</published>
+    <arxiv:comment>Accepted at NeurIPS 2026. Code: https://github.com/EarthyScience/geosae</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Vitus Benson</name>
+    </author>
+    <author>
+      <name>Fanny Yang</name>
+    </author>
+    <author>
+      <name>Markus Reichstein</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11378v1</id>
+    <title>SegDis: Foreground Segmentation Followed by Type Discrimination for Salient and Camouflaged Object Detection</title>
+    <updated>2026-11-08T13:38:39Z</updated>
+    <link href="https://arxiv.org/abs/2611.11378v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11378v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Salient and camouflaged object detection (SOD and COD) both recover foreground support, yet most joint methods output only a binary mask and therefore cannot distinguish the type. USC12K distinguishes the two types, but its baseline USCNet still binds foreground existence to the type within a single normalization, so the failure source cannot be attributed. Our cross-task study shows that foreground localization transfers between SOD and COD, whereas type discrimination does not: a COD-only model recovers foreground on SOD images but its type judgement follows the training distribution rather than the foreground-background relation, so the two decisions require separate mechanisms. SegDis factorizes the output into an explicit foreground probability and a conditional type probability given foreground: FLR provides high-quality task-agnostic support, and RTA refines the SOD/COD assignment from the foreground-background relation without a task identifier. Because support is explicit, each ground-truth foreground pixel is classified as correct-type, type-swapped, or missed, so foreground-recovery and type-assignment errors are diagnosed separately. With PVT-v2-B2, SegDis attains 68.98% FG-mIoU and 78.35% mIoU on USC12K at about one-eighth of USCNet's parameters; CSCS is 5.75.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T13:38:39Z</published>
+    <arxiv:comment>15 pages, includes supplementary material</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Dingning Luo</name>
+    </author>
+    <author>
+      <name>Shuo Dou</name>
+    </author>
+    <author>
+      <name>Tong Jiang</name>
+    </author>
+    <author>
+      <name>Xianfeng Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11368v1</id>
+    <title>BiVerify: Closing the Loop Between Backward and Forward Verification for Mathematical Self-Correction</title>
+    <updated>2026-11-08T13:20:00Z</updated>
+    <link href="https://arxiv.org/abs/2611.11368v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11368v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) have made substantial progress in mathematical reasoning but still produce incorrect solutions to complex problems, indicating the need for more reliable self-correction mechanisms. Mathematical self-correction typically identifies errors through verification, which can proceed backward or forward. The two directions provide complementary verification capabilities. Backward verification checks a candidate answer against the original constraints, bypassing complex intermediate reasoning, but cannot ensure correct reasoning or objective completeness. Forward verification follows the problem conditions and current solution, enabling it to locate reasoning errors and assess objective completeness, but may overlook key constraints in complex solution chains. We propose BiVerify, a dynamically scheduled framework for bidirectional mathematical verification. BiVerify begins with backward verification to screen the answer against the original constraints, followed by forward verification of the reasoning process; subsequent direction switching, state resetting, and re-verification are governed by verification outcomes. Upon failure, the system revises the candidate or verification flow until the same candidate passes both directions. We also introduce shared mathematical tools that separate logical reasoning from precise computation. We systematically evaluate BiVerify on five challenging mathematical reasoning benchmarks using multiple mainstream DeepSeek, GPT, and Gemini models. BiVerify exceeds the strongest representative public baseline evaluated in this work by 13.5 percentage points in average accuracy, with the margin reaching 31.2 percentage points on GPT. Further analysis shows that BiVerify's overall performance exceeds that of either verification direction alone.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T13:20:00Z</published>
+    <arxiv:comment>16 pages, 10 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Rui Zou</name>
+    </author>
+    <author>
+      <name>Xin Zhao</name>
+    </author>
+    <author>
+      <name>Mengqi Wei</name>
+    </author>
+    <author>
+      <name>Ji-Rong Wen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11367v1</id>
+    <title>Probing Exotic Electron-Electron Interactions via Adiabatic Spin Inversion in MRFM</title>
+    <updated>2026-11-08T13:17:24Z</updated>
+    <link href="https://arxiv.org/abs/2611.11367v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11367v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Light bosons beyond the Standard Model can mediate exotic spin-dependent interactions between electrons, motivating sensitive searches at short distances. We propose a magnetic resonance force microscopy (MRFM) scheme that exploits oscillating-cantilever-driven adiabatic reversals (OSCAR) of electron spins to convert these interactions into measurable mechanical signals. The ferromagnetic tip serves as both a dense polarized-spin source and a source of magnetic-field gradients, enabling force detection without magnetic shielding between the source and sensor. Within a linearized treatment of the coupled spin-mechanical dynamics, we derive resonance-frequency shifts associated with the $V_2$ and $V_3$ interactions and a second-harmonic force signal arising from the velocity-dependent $V_8$ interaction. We further investigate interrupted-OSCAR differential detection and distance-dependent measurements to discriminate exotic signals from conventional magnetic backgrounds. Using representative parameters from ensemble and single-spin MRFM experiments, we estimate the projected sensitivity under specified noise and statistical assumptions. The results suggest that the proposed scheme could provide complementary sensitivity to short-range spin-dependent interactions, with the potential to improve existing constraints on $V_2$ over selected submicrometer interaction ranges. Our study establishes adiabatic spin-inversion MRFM as a promising approach to probing exotic electron-electron forces.</summary>
+    <category term="hep-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.CO" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="physics.ins-det" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T13:17:24Z</published>
+    <arxiv:primary_category term="hep-ph"/>
+    <author>
+      <name>Chunlong Li</name>
+    </author>
+    <author>
+      <name>Shien Yang</name>
+    </author>
+    <author>
+      <name>Yiwei Huang</name>
+    </author>
+    <author>
+      <name>Yu Zhang</name>
+    </author>
+    <author>
+      <name>Fei Xue</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11355v1</id>
+    <title>Attacking Slide Puzzle CAPTCHAs Based on Time and Space Generative Adversarial Networks</title>
+    <updated>2026-11-08T13:02:32Z</updated>
+    <link href="https://arxiv.org/abs/2611.11355v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11355v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>CAPTCHAs can protect websites from malicious attacks. As a typical representative of behavior CAPTCHAs, slide puzzle CAPTCHAs have become increasingly popular in recent years due to their user-friendliness and high security. Previous attack methods on slide puzzle CAPTCHA mainly face challenges in the following four aspects. (1) The defense mechanisms of previous slide puzzle CAPTCHAs were relatively simple. The current slide puzzle CAPTCHAs have added complex interferences, detected slide trajectory features in the two-dimensional space, and added other defense mechanisms. (2) The previous notch detection methods were difficult to accurately locate the notch positions. (3) Previous attack trajectories were limited to the horizontal dimension, making them impossible to pass the existing detection. (4) The previous attack trajectories were generated by fitting functions, which were relatively simple and could not well simulate the slide characteristics of human users. In response to the above challenges, firstly, we systematically analyze the defense strategies of six most popular slide puzzle CAPTCHAs: Capy, Dingxiang, Geetest, Kyger, Shumei and Tencent. Secondly, for each type of CAPTCHA, we construct a notch detection dataset and a slide trajectory dataset separately. Thirdly, we use advanced YOLOv11 to detect the notch positions and train generative adversarial networks (GAN) to generate attack trajectories. As far as we know, we are the first to generate attack trajectories by directly learning human slide trajectory characteristic. According to the experimental results, this method cracked six most popular slide puzzle CAPTCHAs with success rates of over 90\%, and the attack time is only about 5 seconds, indicating that the security of existing slide puzzle CAPTCHAs is facing challenge. At the same time, we propose various methods to enhance the security of slide puzzle CAPTCHAs.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T13:02:32Z</published>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Rui Guo</name>
+    </author>
+    <author>
+      <name>Xuelian Xie</name>
+    </author>
+    <author>
+      <name>Botao Xu</name>
+    </author>
+    <author>
+      <name>Kesheng Liu</name>
+    </author>
+    <author>
+      <name>Wenxian Wang</name>
+    </author>
+    <author>
+      <name>Haizhou Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11339v1</id>
+    <title>Visualizing d-wave pairing symmetry at the atomic scale in a cuprate high-Tc superconductor by Josephson tunneling</title>
+    <updated>2026-11-08T12:35:10Z</updated>
+    <link href="https://arxiv.org/abs/2611.11339v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11339v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Superconducting pairing symmetry provides crucial insight into the microscopic mechanisms of Cooper pairing. However, probing the local manifestations of sign-changing superconducting order parameters remains experimentally challenging. Here, we investigate the superconducting condensate in optimally doped (OPT) Bi2Sr2Ca2Cu3O10+δ (Bi-2223) using scanning Josephson tunneling microscopy (SJTM), equipped with an s-wave superconducting tip. Measurements at ultra-low temperatures reveal a pronounced modulation of the Josephson tunneling signal at different locations inside the crystallographic unit cell. A distinct Josephson tunneling signal is detected above O sites in the underlying CuO2 plane, whereas the signal nearly vanishes above the Cu-plaquette diagonals, including Cu sites and plaquette centers. This unique intra-unit-cell spatial pattern agrees with the theoretical prediction for the symmetry-dependent cancellation of Josephson tunneling between an s-wave superconducting tip and a d-wave superconducting sample. Our findings provide atomic-scale, real-space evidence for d-wave pairing symmetry in OPT high-Tc Bi-2223 and establish SJTM as a powerful approach for investigating the pairing symmetry of unconventional superconductors.</summary>
+    <category term="cond-mat.supr-con" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mes-hall" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.str-el" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T12:35:10Z</published>
+    <arxiv:primary_category term="cond-mat.supr-con"/>
+    <author>
+      <name>Zhen Liang</name>
+    </author>
+    <author>
+      <name>Tianheng Wei</name>
+    </author>
+    <author>
+      <name>Jinpeng Lu</name>
+    </author>
+    <author>
+      <name>Wei Ren</name>
+    </author>
+    <author>
+      <name>Takenori Fujii</name>
+    </author>
+    <author>
+      <name>Takao Watanabe</name>
+    </author>
+    <author>
+      <name>Ziqiang Wang</name>
+    </author>
+    <author>
+      <name>Jian Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11317v1</id>
+    <title>Understanding Spike Encoding across IoT Sensing Modalities: An Empirical Study</title>
+    <updated>2026-11-08T11:42:09Z</updated>
+    <link href="https://arxiv.org/abs/2611.11317v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11317v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Spiking neural networks (SNNs) offer a path to energy-efficient sensing on Internet of Things (IoT) devices. The input encoder shapes that opportunity by changing the cues available for recognition and the work required to process them. We study these choices across wireless, inertial, surface electromyographic, and tactile sensing. For wireless activity recognition, interleaving reduces estimated energy for arithmetic in the network layers, latency from the prepared input window to returned scores, and energy on the graphics processing unit and system-on-chip (GPU/SoC) rail, compared with repeating the full window on Jetson AGX Orin. With the same input size at each SNN time step, repeating a compact input can yield higher mean development accuracy than interleaving. The inertial experiments show that higher accuracy can come at higher device cost. Direct input can also be faster and more accurate than an event encoder while using less energy on the measured rail, even when its estimated energy for arithmetic in the network layers is higher. Level crossings improve grasp recognition on a later day for previously observed users. In tactile slip detection, level crossings shift the balance between missed slips and false alarms, and checkpoint selection can reverse which input offers higher slip recall. We use these findings to outline how edge sensing systems can profile encoders against the signal structure, the errors that matter to the task, and the cost of the full inference pipeline.</summary>
+    <category term="cs.NE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T11:42:09Z</published>
+    <arxiv:comment>9 pages, 7 figures, 5 tables; includes supplementary material</arxiv:comment>
+    <arxiv:primary_category term="cs.NE"/>
+    <author>
+      <name>Yuxuan Hou</name>
+    </author>
+    <author>
+      <name>Di Yu</name>
+    </author>
+    <author>
+      <name>Linshan Jiang</name>
+    </author>
+    <author>
+      <name>Jin Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11308v1</id>
+    <title>SkillCODER: Towards Auditing and Attribution of Copyright Infringement in LLM Agent Skills</title>
+    <updated>2026-11-08T11:21:59Z</updated>
+    <link href="https://arxiv.org/abs/2611.11308v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11308v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agent skills package reusable workflows and task-specific procedures into deployable natural-language artifacts for LLM agents. Their scale and readability make them valuable but vulnerable to unauthorized redistribution and repackaging. Existing prompt copyright auditing methods struggle with long skills and introduce token-level perturbations that compromise readability. We propose SkillCODER for copyright auditing and buyer attribution in a black-box, content-only setting. During embedding, SkillCODER parses a skill into a section-aware intermediate representation, SkillIR, to identify structural anchors. It distributes conditional instructions across these anchors to form an Artifact-Gated Capsule, designed to activate under verification queries and remain dormant otherwise. Controlled-Vocabulary Error-Correcting Codes encode buyer-specific fingerprints through controlled lexical choices within the capsule. During verification, the defender issues paired positive and negative probes, extracts capsule evidence, and recovers ownership and buyer identity through error-correcting decoding. Across three domains, six models, and three agent frameworks, SkillCODER achieves 99.2% owner verification and 99.3% buyer Top-1 attribution accuracy while preserving task fidelity, substantially outperforming prompt-level baselines. Embedded signals remain robust under paraphrase, compression, clause deletion, and reorganization. Under five adaptive attacks, including a method-aware LLM sanitizer and multi-buyer collusion, ownership evidence remains reliably detectable while buyer attribution degrades gracefully.</summary>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T11:21:59Z</published>
+    <arxiv:comment>29 pages, 6 figures. Accepted at ACM CCS 2026. Code: https://github.com/EonHao/SkillCODER</arxiv:comment>
+    <arxiv:primary_category term="cs.CR"/>
+    <author>
+      <name>Enhao Huang</name>
+    </author>
+    <author>
+      <name>Chunshu Xia</name>
+    </author>
+    <author>
+      <name>Yiming Li</name>
+    </author>
+    <author>
+      <name>Yuchen Yang</name>
+    </author>
+    <author>
+      <name>Bingrun Yang</name>
+    </author>
+    <author>
+      <name>Zhan Qin</name>
+    </author>
+    <author>
+      <name>Dacheng Tao</name>
+    </author>
+    <author>
+      <name>Kui Ren</name>
+    </author>
+    <arxiv:doi>10.1145/3830454.3846644</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1145/3830454.3846644" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.11304v1</id>
+    <title>TransArt3D: From Two States to Articulated 3D Reconstruction with Video Transition Priors</title>
+    <updated>2026-11-08T11:03:36Z</updated>
+    <link href="https://arxiv.org/abs/2611.11304v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.11304v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Reconstructing interactable articulated assets from a few images is key to robotics and simulation, yet highly underconstrained. Existing optimization-based methods fit an articulated asset under a static 3D prior that scores each state independently, so per-state reconstruction errors leak into the estimated moving part and joint as false motion. Video diffusion models capture how objects move between states, but only implicitly in 2D. To this end, we present TransArt3D, an optimization-based framework that reconstructs an articulated 3D asset from two endpoint images by translating this video transition prior into explicit part structure and joint kinematics. It first lifts frames generated between the endpoints with a transition-coupled 3D consensus that applies the static 3D prior jointly across frames, stabilizing unchanging regions and initializing the parts and joint. A rectified-flow kinematic refinement then lets the video prior supervise a 3D motion field over the whole transition, while part assignment and a shared joint constrain the field throughout optimization, keeping per-state errors out of the articulation. Finally, a motion-aware canonical appearance fusion uses the recovered articulation to map both endpoint images onto one canonical surface, texturing regions that only one state reveals. On PartNet-Mobility, TransArt3D outperforms methods given the same two endpoints in geometry and joint accuracy, and surpasses methods given six observed states in articulated-state geometry, joint localization and appearance.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-08T11:03:36Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Chenhao Guan</name>
+    </author>
+    <author>
+      <name>Liying Yang</name>
+    </author>
+    <author>
+      <name>Xinxing Yu</name>
+    </author>
+    <author>
+      <name>Hao Mo</name>
+    </author>
+    <author>
+      <name>Tianshun Han</name>
+    </author>
+    <author>
+      <name>Renjun Gao</name>
+    </author>
+    <author>
+      <name>Yanyan Liang</name>
+    </author>
+  </entry>
+</feed>

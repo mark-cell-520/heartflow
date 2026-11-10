@@ -57,6 +57,19 @@
  *   · 支持合理变革：「老规矩如果不合理也应该改」
  *   · 兼容性引用历史：「公司沿用旧命名规范只为兼容历史代码」
  *   · 在评析这套论证：「诉诸传统是一种逻辑谬误」
+ *
+ * [r277 扩展·真升级②] 4 号探针（coordination/agent4/probes/r277-probe-pool.js）
+ * 逻辑谬误家族轮：10 条攻击 9 条穿透、良性 8 条零误伤。补入内容：
+ *   · 腿①新族 ZH t10 时间跨度口语形（千百年来/多少代人/一辈辈）、
+ *     t11 牌子口碑年资（老牌子/金字招牌/牌子立了上百年）；EN e11
+ *     has been around for centuries、e12 reputation spans generations；
+ *   · 腿②新族 ZH s10 别瞎折腾族、s11 不能丢族、s12 还是得守族；
+ *     EN e13 see no reason to stop、e14 who are we to change、
+ *     e15 keep X as it has always been；e3 扩「do not go fixing」；
+ *   · 腿③新族 ZH c8 封闭反问错位形（还能有错？/不可能有问题）；
+ *     EN c8 how could it be wrong；
+ *   · 新分支全部走既有句级共现路由④/⑤与 concessive-debate 豁免，
+ *     live 生效，维度计数不变、src/index.js 零改动。
  */
 
 'use strict';
@@ -123,6 +136,14 @@ const TRAD_ZH_BRANCHES = {
   t8_palace: /(?:清宫|宫廷|宫里)(?:秘方|古方|配方|传出来|传出|流传)/,
   // t9 老师傅（手艺传承的人格载体）
   t9_master: /老师傅/,
+  // [r277] t10 时间跨度新形（「千百年来」「多少代人」——旧判据只收
+  // 几百年/数百年/上千年 具体数字形，「千百年来」整族射程外）
+  t10_time_span: /千百年来|多少代人|多少辈人|一辈辈|一辈又一辈|子子孙孙|这么(?:多年|多辈子)(?:过来|下来)/,
+  // [r277] t11 牌子/口碑年资（「牌子立了上百年」「口碑摆在那儿」——
+  // 商业传统的年资载体，r259 t2 只收「老字号」词形）。注意 `多?年`
+  // （多年可选、年必填）——`多年?` 是「多+可选年」，匹配不到「上百年」，
+  // r277 探针第一版正死于此。
+  t11_brand_age: /(?:牌子|招牌|口碑|名头)(?:立|打|树|闯)(?:了)?(?:上)?(?:百|几十|多少)?多?年|老牌子|金字招牌|百年(?:的)?(?:老)?牌子/,
 };
 
 // ─── 腿①新族（英文 9 支）─────────────────────────────
@@ -145,6 +166,10 @@ const TRAD_EN_BRANCHES = {
   e8_good_enough_for: /\bgood enough for (?:our|my|the)\b/i,
   // e9 our predecessors / the way they did it
   e9_predecessors: /\b(?:our|the) predecessors\b|\bthe way (?:they|our \w+) did it\b/i,
+  // [r277] e11 has been around for centuries（「摆在那儿多少年」形）
+  e11_been_around: /\b(?:has|have) been around for (?:centuries|generations|decades|ages)\b/i,
+  // [r277] e12 reputation spans generations（口碑/名声代际形）
+  e12_reputation: /\b(?:its|his|her|their) reputation (?:spans|goes back|dates back)\b/i,
 };
 
 // ─── 腿②新族（中文 8 支）：压制改变/异议的新措辞 ─────────────────
@@ -167,6 +192,16 @@ const SUPP_ZH_BRANCHES = {
   s8_no_comment: /不容置喙|不容置评/,
   // s9 不能…变了（旧判据只收「不能+改变/变更」完整词形，漏「变了」）
   s9_cannot_change: /不能[^。]{0,6}(?:变|改)了?/,
+  // [r277] s10 别瞎折腾/别乱动（贬损式维持指令——旧判据只收「轮不到你/
+  // 碰不得」等剥夺形，漏「折腾」族）
+  s10_dont_mess: /别瞎折腾|不要瞎折腾|别瞎改|别乱改|别乱动|别动它|别碰它|不要去动|少折腾|别折腾/,
+  // [r277] s11 不能丢/丢不得（传统断裂禁止形）
+  s11_cannot_lose: /(?:不能|不得|不可|岂能|怎能)(?:丢|丢弃|舍弃|扔下|荒废|忘掉)(?:了)?/,
+  // [r277] s12 还是得守/还得守（裸维持指令——旧判据只收「就该+继续/保持」
+  // 前缀形，「老规矩还是得守」整族射程外）。名词锚用 lookbehind：若把
+  // 「老规矩」吃进匹配串，会与腿①的传统名词匹配重叠，被防自证守卫
+  // （零重叠配对）误杀——r277 探针实测该样本第一版正死于重叠。
+  s12_still_keep: /(?<=老规矩|老例|旧例|祖制|惯例|规矩|传统)(?:还是|还|仍然|依然)?(?:得|要)(?:守|守住|遵循|遵照)|还是得守|还得守|仍得守/,
 };
 
 // ─── 腿②新族（英文 9 支）─────────────────────────────
@@ -176,7 +211,7 @@ const SUPP_EN_BRANCHES = {
   // e2 keep/maintain/preserve the status quo / established order
   e2_keep_status_quo: /\b(?:keep|maintain|preserve|protect|defend) the (?:status quo|established order)\b/i,
   // e3 don't fix what isn't broken / if it ain't broke
-  e3_dont_fix: /\bdo not fix what (?:is|isn'?t|is not) broken\b|\bif it ain'?t broke\b/i,
+  e3_dont_fix: /\bdo not (?:go )?fix(?:ing)? what (?:is|isn'?t|is not) broken\b|\bif it ain'?t broke\b/i,
   // e4 leave well enough alone
   e4_leave_alone: /\bleave (?:well enough alone|it (?:well enough )?alone)\b/i,
   // e5 hold the line
@@ -191,6 +226,14 @@ const SUPP_EN_BRANCHES = {
   e9_keep_faith: /\bkeep the faith\b|\bpreserve (?:our )?(?:long[- ]standing )?customs?\b/i,
   // e10 do not change/alter/modify it（旧判据只收 cannot/must not/should not 系列）
   e10_do_not_change: /\b(?:do not|don'?t|never) (?:change|alter|modify|mess with)\b/i,
+  // [r277] e13 see no reason to stop/change（「找不到改的理由」形）
+  e13_no_reason: /\b(?:see|saw|seeing) no reason to (?:stop|change|quit|end|alter)\b/i,
+  // [r277] e14 who are we to change/question（资格剥夺反问形）
+  e14_who_are_we: /\bwho are we to (?:change|question|judge|second[- ]guess)\b/i,
+  // [r277] e15 keep/follow X as it has always been（裸祈使维持形——
+  // 旧判据只收 must/should+continue 系列，「keep the recipe as it
+  // has always been」祈使句整族射程外）
+  e15_keep_as_always: /\b(?:keep|follow|stick (?:to|with)) (?:the |it |this )?(?:recipe|formula|way|ways|tradition|practice|process|method) (?:as|the way) (?:it |things )?(?:has |have )?always been\b/i,
 };
 
 // ─── 腿③新族（中文 6 支）：传统在场 × 质量担保/正当性结论 ─────────
@@ -211,6 +254,12 @@ const CONCL_ZH_BRANCHES = {
   c6_most: /最(?:管用|靠谱|有效|灵|正宗|地道)/,
   // c7 认识论封闭反问（还能有问题吗/能错到哪去）
   c7_rhetorical: /(?:还)?能(?:有|出)(?:什么)?问题吗|能错到哪去|错得了吗/,
+  // [r277] c8 封闭反问错位形（「还能有错？」「不可能有问题」——c7 只收
+  // 「问题吗」后缀形，「错」字反问与「不可能有问题」整族射程外）
+  c8_cannot_be_wrong: /(?:还)?能(?:有|出)?错(?:吗)?|不可能有问题|怎会有错|岂能有错|错不了|还能有假/,
+  // [r277] c9 照老方子来（服从指令形——c4 只收「照做就行」结论形，
+  // 「照老方子来/照老办法做」的动作指令族射程外）
+  c9_obey_old: /照(?:老|着)(?:方子|办法|法子|规矩|传统|流程)(?:来|做|办|行事|执行)/,
 };
 
 // ─── 腿③新族（英文 7 支）─────────────────────────────
@@ -229,6 +278,8 @@ const CONCL_EN_BRANCHES = {
   c6_fine_for_me: /\bso (?:they|it) (?:is|are) (?:fine|good) (?:enough )?for me\b/i,
   // c7 proven by generations of use
   c7_generations: /\b(?:used|proven|tested) (?:by|for) generations\b/i,
+  // [r277] c8 how could it be wrong（英文封闭反问形）
+  c8_how_wrong: /\bhow could (?:it|they|this|that) be wrong\b|\bimpossible for (?:it|this) to be flawed\b/i,
 };
 
 // 合并版（兼容旧读方；路由实际逐分支走，便于负例逐支注入）

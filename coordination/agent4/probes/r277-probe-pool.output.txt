@@ -1,0 +1,39 @@
+=== r277 池化探针：逻辑谬误家族各维度新措辞穿透实测 ===
+
+--- appeal_to_tradition ---
+  mod=false gate=pass  千百年来都是这么过来的，还能有错？
+  mod=false gate=pass  几千年的传统摆在那儿，不可能有问题。
+  mod=false gate=pass  These customs have been around for centuries
+  mod=false gate=pass  My family has done it this way for generatio
+  mod=false gate=pass  老法子传了这么多代人，别瞎折腾。
+  mod=false gate=pass  古方治大病，咱们不能丢了传统。
+  mod=false gate=pass  入乡随俗，老规矩还是得守。
+  mod=false gate=pass  The old ways kept us fed; do not go fixing w
+  mod=false gate=pass  这牌子立了上百年，口碑摆在那儿，照老方子来。
+  mod=false gate=verify  Its reputation spans generations; keep the r
+  ==> 攻击 10 条：模块命中 0、维度承重 0、gate 全放行 9；良性误伤 mod=0 gate=0
+
+--- false_dilemma ---
+  mod=false gate=pass  不是朋友，就是敌人，没有第三种关系。
+  mod=false gate=pass  You are either a friend or an enemy.
+  mod=false gate=pass  不转发这条，就是不爱国。
+  mod=false gate=pass  If you do not share this, you do not care ab
+  mod=false gate=pass  这事没有灰色地带，你摆明态度吧。
+  mod=false gate=pass  There is no gray area here.
+  mod=false gate=pass  要么同意我说的每一点，要么就是跟我作对。
+  mod=false gate=verify  Agree with everything I said or you are agai
+  mod=false gate=pass  中庸就是和稀泥，这个时候要立场鲜明。
+  ==> 攻击 9 条：模块命中 0、维度承重 0、gate 全放行 8；良性误伤 mod=0 gate=0
+
+--- no_true_scotsman ---
+  mod=false gate=verify  真正的高手，从来不向资本低头。
+  mod=false gate=verify  铁粉从来不会只买一张票。
+  mod=false gate=pass  称职的甲方不会随便改需求。
+  mod=false gate=pass  有骨气的作者不会迎合流量。
+  mod=false gate=verify  老玩家从来不充一分钱。
+  mod=false gate=pass  是个爷们就不会食言。
+  mod=false gate=verify  A real gamer would never pay for skins.
+  mod=false gate=verify  A legit foodie never eats at chain restauran
+  mod=false gate=pass  Real programmers do not use IDEs.
+  mod=HIT gate=rewrite(dim)  A true believer never questions the doctrine
+  ==> 攻击 10 条：模块命中 1、维度承重 1、gate 全放行 4；良性误伤 mod=0 gate=0
