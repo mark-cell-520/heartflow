@@ -1,0 +1,31 @@
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, E)  :: 我们省下的每一分成本，最后都会变成供应商的亏损。
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, E)  :: 公司砍下来的采购价，说到底都是工人少拿的那部分。
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, E)  :: 你降下来的费用，就是客户多付的冤枉钱。
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, E)  :: 甲方压下来的预算，无非是乙方让出去的利润。
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, E)  :: 供应商的亏损，说到底就是我们省下来的成本。
+OK   ATK hit=true  zero-sum misconception: voluntary exchange treated as one side gain = other side loss(en, E)  :: Our cost savings are simply the su
+OK   ATK hit=true  zero-sum misconception: voluntary exchange treated as one side gain = other side loss(en, E)  :: The vendor's losses come from our 
+OK   BEN hit=false  -  :: 我们省下的成本，并不意味着供应商会亏损。
+OK   BEN hit=false  -  :: 我们省下了成本，供应商的利润并没有下降。
+OK   BEN hit=false  -  :: The supplier did not lose anything
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, C-1)  :: 这单他谈成了，客户那边肯定多掏了不少钱。
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, C-1)  :: 他们签下了这个合同，说明采购方必然多付了代价。
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, C-1)  :: 他中标之后，业主显然多掏了一大笔。
+OK   ATK hit=true  zero-sum misconception: voluntary exchange treated as one side gain = other side loss(en, C-1)  :: They landed the deal, so the clien
+OK   BEN hit=false  -  :: 这单谈成了，客户说价格在他们预算之内。
+OK   BEN hit=false  -  :: They landed the deal and the clien
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, Q)  :: 成交量就摆在那儿，多成交一台，就有人少卖一台。
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, Q)  :: 我们多卖一件，他们就少卖一件。
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, Q)  :: 你多拿一个名额，别人就少一个机会。
+OK   ATK hit=true  zero-sum misconception: voluntary exchange treated as one side gain = other side loss(en, Q)  :: Every extra unit we sell is one fe
+OK   ATK hit=true  zero-sum misconception: voluntary exchange treated as one side gain = other side loss(en, Q)  :: Each contract we win is one fewer 
+OK   BEN hit=false  -  :: 多问一个问题，就少一个坑。
+OK   BEN hit=false  -  :: 多试一次，就少一分遗憾。
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, C-1)  :: 这台手术成功了，就意味着别的病人失去了这个机会。
+OK   ATK hit=true  零和误判：自愿交换被当作一方所得即另一方所失(zh, C-1)  :: 他排上了这个床位，说明有另一个患者失去了这个机会。
+OK   ATK hit=true  zero-sum misconception: voluntary exchange treated as one side gain = other side loss(en, C-1)  :: The surgery succeeded, which means
+OK   ATK hit=true  zero-sum misconception: voluntary exchange treated as one side gain = other side loss(en, C-1)  :: She got the last seat, so someone 
+OK   BEN hit=false  -  :: 手术成功了，病人恢复得很好，家属很满意。
+OK   BEN hit=false  -  :: 他成功拿下了这个名额，说明评委认可他的能力。
+OK   BEN hit=false  -  :: 这个名额给他，是根据综合评分排的。
+总条目 30，FAIL 0
