@@ -1,0 +1,59 @@
+== 新攻击矩阵（18 条）==
+  ✅ gamblers_fallacy | 这个号十期没出了，下期出它的概率大多了。
+  ✅ gamblers_fallacy | 都连续黑了五把，下一把不可能再黑了。
+  ✅ gamblers_fallacy | 连着输了六个回合，再怎么也得赢一回了。
+  ✅ gamblers_fallacy | 倒霉了这么久，下一次总该轮到我走运。
+  ✅ gamblers_fallacy | 背了这么久，下一次也轮到它了。
+  ✅ gamblers_fallacy | 运气不可能一直差，下一把准赢。
+  ✅ gamblers_fallacy | 冷了这么多天，该热一把了。
+  ✅ gamblers_fallacy | 连续红了八期，下一期不可能再红了。
+  ✅ gamblers_fallacy | It has been cold for so long, a ho
+  ✅ gamblers_fallacy | Luck can’t stay bad forever; the n
+  ✅ appeal_to_probability | 可能性这么高，铁定会发生。
+  ✅ appeal_to_probability | 希望这么大，肯定跑不了。
+  ✅ appeal_to_probability | 胜算那么高，十有八九会成。
+  ✅ appeal_to_probability | 机会这么好，准会发生。
+  ✅ prosecutors_fallacy | DNA 比对吻合的概率是百万分之一，所以他是无辜的概率也只有百万分之
+  ✅ prosecutors_fallacy | 误差率只有千分之二，这案子判错的概率也就千分之二。
+  ✅ prosecutors_fallacy | The DNA match probability is one i
+  ✅ prosecutors_fallacy | The test misses one in a billion, 
+== 良性矩阵（21 条）==
+  ✅ 良性零误伤（0 误伤）
+== 登记纪律 ==
+  ✅ 三个模块均带 inject 钩子（负例通道）
+  ✅ STREAK_ZH 含 r280 新族（期天周/黑红/倒霉/连着输了/冷热/运气）
+  ✅ STREAK_EN 含 r280 新族（been cold / luck stay / cold streak）
+  ✅ DUE_ZH 含 r280 新族（不可能再/准赢/再怎么也得/轮到它了/该热一把）
+  ✅ BASE_ZH 含 r280 新族（这么高/希望胜算机会这么大高好多）
+  ✅ CERTAIN_ZH 含 r280 新族（肯定跑不了/铁定/十有八九/准会发生）
+  ✅ RARE_MATCH_ZH 含 r280 新族（误差率名词/通用 N分之一）
+  ✅ GUILT_INFERENCE_ZH 含 r280 新族（无辜镜像/判错镜像）
+  ✅ GUILT_INFERENCE_EN 含 r280 新族（innocent mirror）
+== 负例注入（删本轮新规则，守卫须转 miss）==
+  ✅ 注入删条变红: STREAK_ZH 期天周开奖计数族
+  ✅ 注入删条变红: STREAK_ZH 黑红连开族
+  ✅ 注入删条变红: STREAK_ZH 倒霉时长族
+  ✅ 注入删条变红: STREAK_ZH 动词间隔形（连着输了）
+  ✅ 注入删条变红: STREAK_ZH 冷热时长族
+  ✅ 注入删条变红: STREAK_ZH 运气持续差族
+  ✅ 注入删条变红: STREAK_ZH 背了这么久（同一族第二条腿）
+  ✅ 注入删条变红: DUE_ZH 不可能再黑（否定反转）
+  ✅ 注入删条变红: DUE_ZH 下一把准赢
+  ✅ 注入删条变红: DUE_ZH 再怎么也得赢一回
+  ✅ 注入删条变红: DUE_ZH 也轮到它了
+  ✅ 注入删条变红: DUE_ZH 该热一把了
+  ✅ 注入删条变红: STREAK_EN has been cold
+  ✅ 注入删条变红: STREAK_EN luck can’t stay
+  ✅ 注入删条变红: BASE_ZH 这么高（可能性这么高）
+  ✅ 注入删条变红: BASE_ZH 希望胜算机会这么好（胜算这么好）
+  ✅ 注入删条变红: CERTAIN_ZH 肯定跑不了
+  ✅ 注入删条变红: CERTAIN_ZH 铁定会发生
+  ✅ 注入删条变红: CERTAIN_ZH 十有八九
+  ✅ 注入删条变红: CERTAIN_ZH 准会发生
+  ✅ 注入删条变红: GUILT_ZH 无辜镜像
+  ✅ 注入删条变红: GUILT_ZH 判错镜像
+  ✅ 注入删条变红: GUILT_EN innocent mirror
+  ✅ 注入删条变红: GUILT_EN probability of innocence
+  ✅ 注入删条变红: RARE_ZH 误差率族+通用分之一形
+
+=== r280 轮测汇总: passed=53 failed=0 注入变红=25/25 ===

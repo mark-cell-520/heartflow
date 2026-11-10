@@ -1,3 +1,28 @@
+# 6.8.163 变更日志条目
+
+## [6.8.163] - 2026-11-10
+
+### 新增（真升级②：时间与概率推理 wired 维度全新措辞家族 ×3 模块，r280）
+- **`gamblers_fallacy` 赌徒谬误新措辞家族**（`src/gamblers-fallacy.js`）：腿①（连开/持续形）补期/天/周开奖计数（十期没出/七期没开）、黑红连开（连续黑了五把/连黑三把）、倒霉时长（倒霉了这么久/背了这么久）、动词间隔形（连着输了六个回合）、冷热时长（冷了这么多天）、运气持续差（运气不可能一直差/最近运气太差）；EN 补 has been cold/hot/dry、luck can't stay bad、cold streak/spell/run；腿②（到期形）补不可能再[黑红输赢]（否定反转）、[准铁定][能会]?[赢中]（下一把准赢）、再怎么也得…赢/中/回本（让步反转）、[也该总]轮到X了、该[冷热][一这]?[把次]（该热一把）。模块层 11/11 穿透（改前 7/8 穿透）、良性 12/12 零误伤。
+- **`appeal_to_probability` 诉诸概率新措辞家族**（`src/appeal-to-probability.js`）：腿①补这么[高强]/那么[高]/[希望胜算机会把握]这么[大高多好]（概率高度自然形）；腿②补肯定[跑逃溜]不了/铁定/十有八九/准[会能]?[发生中来成]（口语必然短收尾）。模块层 6/6 穿透、良性 5/5 零误伤。
+- **`prosecutors_fallacy` 检察官谬误镜像族与误差率族**（`src/prosecutors-fallacy.js`）：腿①补设备误差率名词族（误差率/错误率/误判率/漏检率/漏报率/假阴性率/假阳性率/误报率）+ 通用 N分之一 分数形；腿②补**无辜镜像**（他是无辜的概率也只有百万分之一——P(匹配|无辜) 与 P(无辜|匹配) 颠倒，即辩护人谬误同构）、**判错镜像**（这案子判错的概率也就千分之二——设备误差率与个案错判概率的混淆）；EN 补 the chance he is innocent is / the probability of innocence is。模块层 6/6 穿透、良性 6/6 零误伤。
+- 三模块均附 inject 钩子（负例逐腿注入删条通道）。
+
+### 修复
+- EN 撇号字符类：STREAK_EN 的 can['']?t 在工具链中被折叠为两个 ASCII 撇号，改用 `\u2019` 转义序列（弯引号 U+2019 与 ASCII 撇号同时接受）。
+- `test/round-274-gate-family-extensions.test.js` VERSION 基线断言 `6.8.162` → `6.8.163`：跨轮次版本基线登记维护（与前轮同性质，非适配性改动）。
+
+### 验证
+- 轮测 `test/round-280-time-probability-families.test.js`：**53 passed / 0 failed**（攻击 18 全承重 + 良性 23 零误伤 + 登记 7 + 注入删条 **25/25 全变红**、0 未变红）。
+- 模块层快验（`coordination/agent4/probes/r280-{gamblers,atp,pf}-quick.js`）：gamblers 11/11、atp 6/6、pf 6/6，良性零误伤。
+- 探针池（`r280-probe-pool.js`）：改前 gamblers_reversal_zh 7/8、appeal_prob_zh 2/3、prosecutor 镜像族 2/5 穿透 → 改后 0 穿透，良性误伤 0。
+- 四门禁：verify 16/0、guard-abilities 20/20（维度登记 243 键）、doc-numbers 24/0、bidirectional 召回 52/52 + 误拦 302/326（与基线零变化）。
+- 维度计数 243 不变、模块数 162 不变、src/index.js 零改动；VERSION 6.8.162 → 6.8.163。
+- 海外扫描（arXiv cs.AI/stat.ME / GitHub / Semantic Scholar）空返，按既有形态自建。
+
+### 已知边界（存量留痕，本轮未动）
+- prosecutors-fallacy 既有 RARE_MATCH_ZH 腿 `亿?[里挑]?挑?一` 因全部量词可选，等价于匹配任意含「一」的文本（存量过宽腿）——本轮误差率族样本改用「千分之二」避开，留痕待后续轮次收窄。
+
 # 6.8.162 变更日志条目
 
 ## [6.8.162] - 2026-11-10

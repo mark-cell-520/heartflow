@@ -4,7 +4,7 @@ const H = (s) => { try { return checkAppealToProbability(s).hit === true; } catc
 const attacks = [
   '希望这么大，肯定跑不了。',
   '可能性这么高，铁定会发生。',
-  '胜算这么大，必定能成。',
+  '胜算这么好，十有八九会成。',
   '机会这么好，准会发生。',
   // 存量回归
   '宇宙这么大，肯定有外星人。',

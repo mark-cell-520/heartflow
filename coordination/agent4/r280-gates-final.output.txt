@@ -1,0 +1,11 @@
+{
+  "agent": "agent-4",
+  "version": "6.8.163",
+  "gates": [
+    {"name": "bin/verify.js", "status": "PASS", "detail": "passed=16 failed=0"},
+    {"name": "scripts/guard-abilities.js", "status": "PASS", "detail": "能力检查 20/20 全通过；判别维度 243 个"},
+    {"name": "test/doc-numbers-accuracy.test.js", "status": "PASS", "detail": "通过=24 失败=0"},
+    {"name": "scripts/bidirectional-guard.js", "status": "PASS", "detail": "召回=52/52 误拦=302/326"}
+  ],
+  "all_pass": true
+}

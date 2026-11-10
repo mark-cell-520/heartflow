@@ -1,3 +1,36 @@
+## r280 — 时间与概率推理 wired 维度全新措辞家族扩展（真升级② ×3 模块）
+
+**日期** 2026-11-10  **操作方** agent-4（海外产能单元）  **VERSION** 6.8.162 → 6.8.163
+
+### 方向与来源
+- **方向** 时间与概率推理 wired 维度全新措辞家族扩展（真升级②：gamblers_fallacy + appeal_to_probability + prosecutors_fallacy）。
+- **来源** r280 池化探针（双口径：模块层 detect + gate 层 hf.gate）实测：改前 gamblers_reversal_zh **7/8 穿透**、appeal_prob_zh 2/3 穿透、prosecutor 镜像族 2/5 穿透，良性 23 条零误伤。
+- **海外扫描**：arXiv cs.AI/stat.ME / GitHub / Semantic Scholar 查询「conditional probability confusion base rate time reasoning」均空返（arXiv parse-fail、GitHub 0、S2 问号），按既有形态自建，未编造命中。
+
+### 实现内容
+- **`src/gamblers-fallacy.js`**（+约 60 行）：腿① STREAK_ZH 补期/天/周开奖计数族（十期没出/三天没开/两周没中）、黑红连开族（连续黑了五把/连黑/连着大）、倒霉时长族（倒霉了这么久/背了这么久/晦气了这么久）、动词间隔形（连着输了六个回合）、冷热时长族（冷了这么多天/热了这么多天）、运气持续差族（运气不可能一直差/运气最近这么差）；STREAK_EN 补 has been cold/hot/dry、luck can't stay bad forever、cold streak/spell/run、N in a row。腿② DUE_ZH 补不可能再[黑红输赢]（否定反转）、[准铁定][能会]?[赢中]（下一把准赢/注定要中）、再怎么[也]?得…赢/中/回本/翻本（让步反转）、[也该总]轮到X了、该[冷热][一这]?[把次]（该热一把）。
+- **`src/appeal-to-probability.js`**（+约 15 行）：BASE_ZH 补这么[高强]/那么[高]/[希望胜算机会把握][这那]么[大高多好]（概率高度自然形）；CERTAIN_ZH 补肯定[跑逃溜]不了/铁定/十有八九/准[会能]?[发生中来成]（口语必然短收尾）。
+- **`src/prosecutors-fallacy.js`**（+约 20 行）：RARE_MATCH_ZH 补设备误差率名词族（误差率/错误率/误判率/漏检率/漏报率/假阴性率/假阳性率/误报率）+ 通用 N分之一 分数形（千分之二类）；GUILT_INFERENCE_ZH 补无辜镜像族（他是无辜的概率也只有百万分之一——P(匹配|无辜) 与 P(无辜|匹配) 颠倒）、判错镜像族（这案子判错的概率也就千分之二——设备误差率与个案错判概率混淆）；GUILT_INFERENCE_EN 补 the chance he is innocent is / the probability of innocence is。
+- 三模块均带 inject 钩子；维度计数 243 不变、模块 162 不变、src/index.js 零改动。
+
+### 判定为真升级（而非样本扩容）的依据
+三模块各落此前没有的**句式族**：gamblers 的期天周开奖计数/黑红连开/倒霉时长/否定反转到期/让步反转到期族；atp 的概率高度自然形（这么高/希望这么大）与口语必然短收尾（铁定/十有八九/跑不了）；pf 的**无辜镜像族**（辩护人谬误同构——P(证据|无辜) 与 P(无辜|证据) 的系统性颠倒）、判错镜像族（误差率与个案错判概率混淆）与设备误差率名词族。承重验证：轮测内嵌注入-删条 **25/25** 全部由守卫转 miss，恢复后仍命中。
+
+### 验证数据（合并态全部复跑实测）
+- 轮测 `test/round-280-time-probability-families.test.js`：**53 passed / 0 failed**（攻击 18 全承重 + 良性 23 零误伤 + 登记 7 + 注入删条 25/25 全变红、0 未变红）。
+- 模块层快验（coordination/agent4/probes/r280-{gamblers,atp,pf}-quick.js）：gamblers 11/11、atp 6/6、pf 6/6，良性零误伤。
+- 探针池复跑（r280-probe-pool.output.txt）：改前 gamblers 7/8、atp 2/3、pf 2/5 穿透 → 改后 **0 穿透**，良性误伤 0。
+- 四门禁（复跑实测）：verify **16/0**、guard-abilities **20/20**（维度登记 **243** 键）、doc-numbers **24/0**、bidirectional **召回 52/52 + 误拦 302/326**（与基线零变化）。
+- VERSION 6.8.162 → 6.8.163（三层同步）。
+
+### 踩坑记录
+- patch 工具链：键入内容原样落盘（反斜杠不转义），但非 ASCII 字符会被折叠成 ASCII——弯引号 U+2019 两次写入均变成 ASCII 撇号导致修复无效；最终解法是正则里用 `\u2019` 六字符转义序列（纯 ASCII 落盘、JS 正则层解析为弯引号）。
+- 注入删条样本选择教训：①「胜算这么大」被存量腿「这么大」覆盖、「必定能成」被存量腿「必[中注定成]」覆盖——承重样本必须避开存量腿射程；②存量腿 `亿?[里挑]?挑?一`（量词全可选）等价于匹配任意含「一」文本，误差率族样本改用「千分之二」。
+
+### 已知边界与交接
+- pf 既有 RARE_MATCH_ZH 腿 `亿?[里挑]?挑?一` 过宽（匹配任意含「一」文本），属存量边界，收窄需改既有腿，有翻转存量登记风险，留痕待后续轮次。
+- pf 新腿②「无辜镜像」与「判错镜像」的豁免边界：与既有 EXEMPT_CORRECT_ZH（假阳性/先验概率/不能证明清白）的配合已在 6 条良性样本实测零误伤，红队可继续压「他说的是核对结论而非定罪」类歧义句。
+
 ## r279 — 统计素养 wired 维度全新措辞家族扩展（真升级② ×3 模块）
 
 **日期** 2026-11-10  **操作方** agent-4（海外产能单元）  **VERSION** 6.8.161 → 6.8.162

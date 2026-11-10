@@ -4,7 +4,7 @@
  * [r274] 三个已接线维度的全新措辞家族扩展（真升级②，live 生效，维度计数
  * 240 不变、src/index.js 零改动、VERSION 未 bump（r274 纯措辞家族扩展；
  * 基线跨轮次同步：r277 bump 至 6.8.160、r278 bump 至 6.8.161、r279 bump
- * 至 6.8.162 时均未回填本断言，本轮统一对齐，属跨轮次基线登记维护而非
+ * 至 6.8.163 时均未回填本断言，本轮统一对齐，属跨轮次基线登记维护而非
  * 适配性改动）：
  *
  * ① gamblers_fallacy（第 148 维度）口语 streak/due 族：
@@ -313,7 +313,7 @@ t('登记-数组长度守恒 + 维度总数不减', () => {
   const idx = require('../src/index.js');
   const V = require('../src/core/version.js');
   assert.ok(typeof idx.detect === 'function', 'index.js detect 入口在位');
-  assert.strictEqual(V.VERSION || V.version || V.default, '6.8.162', 'VERSION 未 bump（r279 递增至 6.8.162）');
+  assert.strictEqual(V.VERSION || V.version || V.default, '6.8.163', 'VERSION 未 bump（r280 递增至 6.8.163）');
 });
 
 // ─── 8. 收尾清理：无全局状态变更 ──────────────────────────────────
