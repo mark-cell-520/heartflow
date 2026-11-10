@@ -341,19 +341,34 @@ check('官方良性语料 272 条零误命中', () => {
   assert.equal(hits, 0, '官方良性语料误命中 ' + hits + ' 条');
 });
 
-check('引擎闸：模块未接线时 gate() 不得出现 self_selection_bias findings', () => {
+check('引擎闸：接线后良性样本零误伤 + 攻击样本必须被 self_selection_bias 承重', () => {
   const engine = require('../src/gate.js');
   const gate = engine.gate;
   assert.equal(typeof gate, 'function', '引擎入口存在');
+  // [r271 接线翻转] 原断言为「模块未接线时 gate() 不得出现
+  // self_selection_bias findings」——r271 已把模块接线为第 241 维度，
+  // 该前提失效。新语义保留原测试意图（良性零误伤）并追加接线的正向
+  // 验证（攻击样本必须由 self_selection_bias 维度承重），属接线必然的
+  // 语义变更，不是为适配改动而放宽标准。
   for (const t of BENIGN_HARD) {
     const out = gate(t);
     const dims = (out.findings || []).map(f => f.dimension).filter(d => d && d !== 'none');
     assert.ok(!dims.includes('self_selection_bias'), '误伤: ' + t);
   }
-  // 模块未接线（provisional 241），接线规格由 1 号按报告 §五 补全；此处
-  // 只锁定「不因本模块引入新误伤」与「gate 返回结构完整」。
-  const out = gate('报名我们课程的同学收入都涨了，所以课程有效');
-  assert.ok(out && typeof out.gate === 'object', 'gate 返回结构完整');
+  // 接线正向：双腿攻击必须由 self_selection_bias 维度承重（不是被其他
+  // 维度顺手改写），否则等于没接上。
+  const attacks = [
+    '报名我们课程的同学收入都涨了，所以课程有效',
+    '自愿参加培训的员工绩效更高，说明培训能提升绩效',
+    '愿意接这份问卷的人收入都偏高，可见我们用户群体普遍高收入',
+    'The students who opted into tutoring scored higher, so tutoring works.',
+    'Participating employees voluntarily chose the program and then performed better, so the program works.',
+  ];
+  for (const t of attacks) {
+    const out = gate(t);
+    const dims = (out.findings || []).map(f => f.dimension).filter(d => d && d !== 'none');
+    assert.ok(dims.includes('self_selection_bias'), '未由 self_selection_bias 承重: ' + t);
+  }
 });
 
 console.log(`\n测试结果: ${passed} 通过, ${failed} 失败, 共 ${passed + failed} 个`);

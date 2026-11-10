@@ -153,6 +153,23 @@ const SELF_COME_ZH = [
   /来[^。，！？；\n]{0,12}(?:看病|就诊|咨询|报名|参加|购买|使用|学习|上课)[^。，！？；\n]{0,2}的(?:人群|用户|客户|团队|企业|商家|学员|学生|读者|成员|家庭|患者|公司|人|选手|程序员|家长|观众|买家|顾客|病人)/,
 ];
 
+// S1c [r271] 愿意/乐意/肯 系自愿词 + 自选动作（r271 补齐 S1 族的裸同族
+// 形态：SELF_VOLUNTARY_ZH 只收「自愿/主动/自发/自行/自愿报名/主动请缨」
+// 六词，漏「愿意接这份问卷的人」——「愿意」与「自愿」同族且同样表达
+// 自行决定进入，属于 r161 教训的裸名词形态缺口）。收尾动作沿用 S1 动词表。
+const SELF_WILLING_ZH = [
+  /(?:愿意|乐意|乐意于|肯|甘愿|心甘情愿|自告奋勇|争先恐后|主动请缨|自愿报名|自愿参加|自愿加入|自愿参与|自愿选择|自愿使用|自愿购买)[^。，！？；\n]{0,16}(?:参加|报名|加入|参与|选择|选用|使用|订阅|购买|申请|投入|投身|接龙|请缨|走[上到]|接|填|答|完成|接受|尝试|体验|测试|填答|回应)/,
+  /(?:愿意|乐意|肯)[^。，！？；\n]{0,12}的(?:人群|用户|客户|团队|企业|商家|学员|学生|读者|成员|家庭|患者|公司|人|选手|程序员|家长|观众|买家|顾客|开发者|病人|粉丝|员工)/,
+];
+
+// S7 [r271] EN 自选动词主谓间允许副词打断（`employees voluntarily chose`
+// `customers actively opted`——既有 SELF_EN 要求 who/that + 动词紧贴，
+// 副词插入即整族漏判）。主语族沿用 SELF_EN 第二条的主语表。
+const SELF_ADV_EN = [
+  /\b(?:customers?|users?|readers?|employees?|teams?|firms?|students?|patients?|companies|people|consumers?|subscribers?|participants?|members|clients|shoppers?|players|workers|staff)\s+(?:\w+ly\s+|voluntarily\s+|actively\s+|freely\s+|personally\s+|deliberately\s+){1,3}(?:chose|chosen|opted|volunteered|selected|picked|sought|subscribed|applied|signed|enrolled)\b/i,
+  /\b(?:who|that)\s+(?:\w+ly\s+|voluntarily\s+|actively\s+|freely\s+){1,3}(?:volunteered?|chose|chosen|opted\s+(?:in|into)|signed\s+up(?:\s+for)?|enrolled|applied|selected|picked|sought|subscribed|elected|self[-\s]?selected)\b/i,
+];
+
 // EN：who/that + 自选动词；主语 + 自选动词
 const SELF_EN = [
   /\b(?:who|that)\s+(?:volunteered?|chose|chosen|opted\s+(?:in|into)|signed\s+up(?:\s+for)?|enrolled|applied|selected|picked|sought|subscribed|elected|self[-\s]?selected)\b/i,
@@ -172,6 +189,22 @@ const CAUSE_TREAT_ZH = [
 // 「说明我们医术好」——系词可省）
 const CAUSE_SUPER_ZH = [
   /(?:所以|因此|因而|可见|足见|说明|证明|显然|毫无疑问|事实证明|果然|自然)[^。，！？；\n]{0,10}(?:我们|它|这|那|他们|咱们)[^。，！？；\n]{0,8}(?:是|才是|算|真是|就叫)?[^。，！？；\n]{0,4}(?:最好|最优|最强|更专业|更靠谱|最靠谱|值得|有效|有用|更好|更高|更强|高明|专业|靠谱|厉害|行|好|不错|出色|一流|顶尖|过硬)/,
+];
+
+// E2c [r273 补腿] 推断标记 + 群体名词 + 属性名词 + 裸比较级/程度词
+// （「可见我们用户群体普遍高收入」「说明这批学员成绩都偏好」）——
+// E2b 要求「我们/它/这」主语后接系词+最高级，漏掉「群体+属性+普遍
+// 偏高」这类无系词裸比较形态：属性词（收入/成绩/绩效/满意度）本身
+// 自带程度义，无需系词即完成归因。属 r161 教训的裸名词形态缺口。
+// 与 E2b 的射程分工：E2b 收「主语+系词+最高级/效价形容词」，
+// E2c 收「群体+属性名词+（程度副词）+比较级」。比较级取属性词的
+// **前后两侧**：中文既可说「收入偏高」也可说「高收入」「成绩偏好」，
+// 只查后侧会漏前缀比较形（「高收入」的比较词「高」在属性词之前）。
+const CAUSE_ATTR_ZH = [
+  // 后置比较级：「收入偏高/成绩偏好/水平更高」
+  /(?:所以|因此|因而|可见|足见|说明|证明|显然|毫无疑问|事实证明|果然|自然)[^。，！？；\n]{0,14}(?:人群|用户|客户|团队|学员|学生|读者|成员|家庭|患者|选手|程序员|家长|观众|买家|顾客|开发者|病人|粉丝|员工|群体)[^。，！？；\n]{0,12}(?:普遍|大都|大多|基本上|基本|都|几乎|整体|总体|往往|通常)?[^。，！？；\n]{0,8}(?:收入|成绩|绩效|满意度|转化率|留存率|复购率|续费率|完课率|通过率|分数|排名|水平|能力|素质|素养|忠诚度|活跃度|时长|消费|支出|流失率|跳出率)[^。，！？；\n]{0,10}(?:偏高|更高|较高|最高|偏好|更好|最好|更强|较差|更好一截|高出一截|领先|靠前|排前|名列前茅|超出|胜过|优于|强于|好于)/,
+  // 前置比较级：「高收入/高绩效/高满意度/低流失率」——比较词贴在属性词前
+  /(?:所以|因此|因而|可见|足见|说明|证明|显然|毫无疑问|事实证明|果然|自然)[^。，！？；\n]{0,14}(?:人群|用户|客户|团队|学员|学生|读者|成员|家庭|患者|选手|程序员|家长|观众|买家|顾客|开发者|病人|粉丝|员工|群体)[^。，！？；\n]{0,12}(?:普遍|大都|大多|基本上|基本|都|几乎|整体|总体|往往|通常)?[^。，！？；\n]{0,8}(?:高|低|好|差|强|弱|优|劣)(?:收入|成绩|绩效|满意度|转化率|留存率|复购率|续费率|完课率|通过率|分数|排名|水平|能力|素质|素养|忠诚度|活跃度|时长|消费|支出|流失率|跳出率)/,
 ];
 
 const CAUSE_EN = [
@@ -299,18 +332,20 @@ function findSignatures(text, R) {
         ...(R.SELF_ONESELF_ZH || SELF_ONESELF_ZH),
         ...(R.SELF_ACTIVE_ZH || SELF_ACTIVE_ZH),
         ...(R.SELF_COME_ZH || SELF_COME_ZH),
+        ...(R.SELF_WILLING_ZH || SELF_WILLING_ZH),
       ],
       cause: [
         ...(R.CAUSE_CMP_ZH || CAUSE_CMP_ZH),
         ...(R.CAUSE_TREAT_ZH || CAUSE_TREAT_ZH),
         ...(R.CAUSE_SUPER_ZH || CAUSE_SUPER_ZH),
+        ...(R.CAUSE_ATTR_ZH || CAUSE_ATTR_ZH),
       ],
       infer: R.INFER_ZH || INFER_ZH,
       w: R.W_ZH != null ? R.W_ZH : W_ZH,
       lang: 'zh',
     },
     {
-      self: R.SELF_EN || SELF_EN,
+      self: [...(R.SELF_EN || SELF_EN), ...(R.SELF_ADV_EN || SELF_ADV_EN)],
       cause: R.CAUSE_EN || CAUSE_EN,
       infer: R.INFER_EN || INFER_EN,
       w: R.W_EN != null ? R.W_EN : W_EN,
@@ -404,8 +439,8 @@ function detectSelfSelectionBias(text, inject) {
 module.exports = {
   detectSelfSelectionBias,
   __internals: () => ({
-    SELF_VOLUNTARY_ZH, SELF_BARE_ZH, SELF_APPLY_ZH, SELF_ATTRACT_ZH, SELF_ONESELF_ZH, SELF_ACTIVE_ZH, SELF_COME_ZH, SELF_EN,
-    CAUSE_CMP_ZH, CAUSE_TREAT_ZH, CAUSE_SUPER_ZH, CAUSE_EN,
+    SELF_VOLUNTARY_ZH, SELF_BARE_ZH, SELF_APPLY_ZH, SELF_ATTRACT_ZH, SELF_ONESELF_ZH, SELF_ACTIVE_ZH, SELF_COME_ZH, SELF_WILLING_ZH, SELF_EN, SELF_ADV_EN,
+    CAUSE_CMP_ZH, CAUSE_TREAT_ZH, CAUSE_SUPER_ZH, CAUSE_ATTR_ZH, CAUSE_EN,
     SOLO_ZH, SOLO_EN,
     INFER_ZH, INFER_EN, W_ZH, W_EN,
     CONCEPT_ZH, CONCEPT_EN, CORRECTIVE_ZH, CORRECTIVE_EN,

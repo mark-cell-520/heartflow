@@ -7,7 +7,7 @@
 [![Node >= 18.17](https://img.shields.io/badge/node-%3E%3D18.17-brightgreen.svg)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-19%2C032%20passing-brightgreen.svg)](#tests)
 [![MCP tools](https://img.shields.io/badge/MCP%20tools-184-blue.svg)](#mcp-server)
-[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-240-blueviolet.svg)](#what-it-catches-240-dimensions)
+[![Dimensions](https://img.shields.io/badge/discrimination%20dimensions-243-blueviolet.svg)](#what-it-catches-243-dimensions)
 
 **AGI Layer 1 — the Discriminator.**
 
@@ -15,7 +15,7 @@ A pure rule engine that judges whether a statement or an action is right, wrong,
 or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
-240 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
+243 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  184 MCP tools
 ×  1,316 dispatch routes  ×  20,339 passing tests  ×  2 npm dependencies
 ```
 
@@ -158,7 +158,7 @@ Read `gate.action` if you only read one field — `verdict` is derived from it.
 input
   |
   v
-scope-check -> premise-check -> discriminate (240 dimensions) -> gate
+scope-check -> premise-check -> discriminate (243 dimensions) -> gate
                                                                    |
   +----------------------------------------------------------------+
   v
@@ -185,9 +185,9 @@ The gate aggregates findings from every layer and emits a single action:
 
 ---
 
-## What it catches (240 dimensions)
+## What it catches (243 dimensions)
 
-Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **206 request `verify`**. The families that shipped across the 6.7–6.8 lines:
+Dimensions are grouped by the action they can trigger: **11 can `block`**, **19 can force a `rewrite`**, **210 request `verify`**. The families that shipped across the 6.7–6.8 lines:
 
 | Family | Representative dimensions | Line |
 |--------|--------------------------|------|
@@ -204,14 +204,14 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.158**. Not marketing copy.
+Measured on this repository at **v6.8.160**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
 | Modules registered | 162 |
 | Module init errors | 0 |
 | Dispatch routes | 1,316 |
-| Discrimination dimensions | 240 |
+| Discrimination dimensions | 243 |
 | MCP tools | 184 |
 | Test suite | 20,339 passing / 126 failing | `node test/run-all.js` (full run 2026-11-10; passed baseline resynced per r241/r412 precedent — failed 126 is long-standing runner/flaky noise, not gated) |
 | Capability guard | 20 / 20 checks |
@@ -382,6 +382,8 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.160 | 2026-11-10 | **counterfactual_overclaim 第 173 维度 EN-B 倒装形结构腿升级（真升级②：已有维度的全新句式族）** — 原 EN-B 为 14 动词枚举表（known/taken/chosen/invested/acted/gone/waited/listened/started/made/been/seen/tried/moved/stayed），r277 动词矩阵实测 58 个常见过去分词中 44 个漏判（picked/decided/sold/bought/hired/signed/wrote/found/kept/put/cut/paid/sent/built/broke/held/read/gave/told/thought/felt/opted/switched/pivoted/expanded/paused/cancelled/delayed/shipped/launched/joined/left/won/lost/met/asked/called/pushed/set/run…），且组织/集体主语（the company / the team）整句漏判。改造：CF_EN_B_RE 从枚举腿改为「had + (人称代词 | 36 个组织名词) + 任意过去分词」结构腿——-ed/-en 规则形走 `[a-z]+(?:ed|en)` 分支，同形过去式（left/wrote/gave/spoke/drove/ate/fell/froze/stole/wore/tore/swam/began/rang/sang/sank/sprang/spun/swung/blew/knew/flew/hid/lit/slid/swept/slept/wept…）与不规则分词走白名单分支，主语侧补 company/team/board/firm/government/agency/startup/corporation/committee/council/department/ministry/regulator/bank/investors/founders/executives/engineers/scientists/researchers/voters/public/market/country/nation/city/state/party/opposition/competitors。判定为真升级（非样本扩容）的依据：结构腿使倒装形对**任意**过去分词开放，射程由枚举决定变为由语法形态决定；承重验证（负例注入 CF_EN_B_RE=永假）确认 5/5 攻击样本由该腿承重而非 EN-A/EN-C 代拦。验证：r277 轮测 160/160（含 15 存量动词不回归 + 15 规则形 + 21 不规则分词 + 28 同形过去式 + 29 组织主语 + gate 变体矩阵攻击 10/10 非 pass + 良性 23/23 零误伤含对冲/疑问/组织主语边缘良性 + 承重注入 5/5 全红 + 恢复后 5/5 仍命中）。五门禁：verify 16/0、guard 20/20、doc 22/22（本轮同步 r274 基线断言至 6.8.160）、双向 52/52。维度计数不变（243 = BLOCK 11 / REWRITE 19 / VERIFY 210），模块数不变。 |
+| 6.8.159 | 2026-11-10 | **第 241–243 维度接线闭环（r276：self_selection_bias / completion_evidence / zero_sum_fallacy，VERIFY 199→210，维度 240→243）** — 三个模块于 r275 前落地但接线与文档未随本轮 commit 固化：`src/self-selection-bias.js`（241，自选择偏差：样本自选择机制 × 效应结论，VERIFY）、`src/completion-evidence.js`（242，完成态无证据断言：工作自述动作 × 完成动词 × 无证据锚，VERIFY；r275 已补 2 条召回腿 + 3 条误伤豁免腿）、`src/zero-sum-fallacy.js`（243，零和谬误：收益-损失互斥框架 × 分配结论，VERIFY）在本轮 `src/index.js` 完成九处接线（require / 计算点 / allDims / dimMap / dimensions / DIM_GUIDANCE / VERIFY_DIMS / summary / exports），维度数 240→243、VERIFY 199→210、三层列举同步追加 3 维度。文档三层同步（README/AGENTS/SKILL 维度数 240→243、verify 计数 206→210、规格表版本戳 v6.8.159、Verify 列举追加）。 |
 | 6.8.155 | 2026-11-09 | **第231维度 affirming_disjunct（肯定析取 / affirming a disjunct）上线（r256 并发接线）+ 第230维度 fallacy_of_relevance 功能修复** — 新文件 src/affirming-disjunct.js；fallacy_of_relevance 补三项修复：① 否定极性盲区（「不支持…所以必须支持」族因 2-gram 碎片共享实词整族 miss，改用前段否定词干判别）；② INFER_ZH 补论证意图族（「却想用这个证明」等，答非所问类无推断词致切分返回 null）；③ 日常情境→自身心境豁免（SCENE_ZH × MOOD_ZH 成对，「天气不错所以心情很好」属正当因果）。 |
 | 6.8.158 | 2026-11-09 | **统计素养三维度接线闭环（r269 双维 + r270 immortal_time_bias，VERIFY 199→206，维度 237→240）** — count_rate_conflation 238 / law_of_small_numbers 239 于 r269 在 `src/index.js` 完成九处接线；immortal_time_bias 240 于 r270 落地，三腿判据（起点时点锚 × 起点差异[显式/对置/存活门槛] × 疗效结论）+ 三组豁免（方法学纠正在场 / 统一起点声明 / 严谨设计）。r270 收尾修复两条单测漏判：腿③ EFFICACY_ZH 补「疗效结论需要重新核对」类纠正性引用、腿① START_ANCHOR_EN 补裸起点名词（`starting points`/`baseline`/`entry point`）——实证 gap_zh/gap_en 从 hit=false 转绿，ITB 单测 64/64。同步三份文档维度数 237→240、verify 计数 199→206、Verify 列举追加 3 维度。 |
 | 6.8.158 | 2026-11-09 | **5 个行为经济学偏误维度接线闭环（r268，VERIFY 189→199，维度 232→237）** — 承接 r267 交接：上一轮实证 18 个 provisional 模块 gate 层 18/18 穿透、think 层 0 可达，本轮取其中 5 个在 `src/index.js` 完成九处接线（require / 计算点 / allDims / dimMap / dimensions / DIM_GUIDANCE / VERIFY_DIMS / summary / module.exports）：omission_bias 233、money_illusion 234、planning_fallacy 235、loss_aversion 236、fundamental_attribution_error 237，全部入 VERIFY_DIMS。5 模块 + 5 单测随接线提交，单测全绿。**接线有效性探针实证**（`scripts/round-268/r268-wire-probe.js` v2，走 `src/gate.js` 的 `gate()`）：用各模块文件头声明的标准攻击形态注入，**5/5 维度 gate 层真实可达**；良性样本 **4/4 零误伤**。剩余 2 条穿透（money_illusion / loss_aversion 的非标准措辞）经 `r268-direct-probe.js` 直调 detect 函数判定为模块中文腿措辞覆盖缺口，非接线缺失，作交接事项给 3 号。同步更新 AGENTS.md / README.md / SKILL.md 三份共享文档：维度数 232→237、verify 计数 189→199、Verify 层列举追加 5 维度、AGENTS.md 版本史追加 r268 条目；修复 r267 畸形 claim 记录（kind/direction 字段值互换）。四门禁逐位零漂移：verify 16/0、guard-abilities 20/20（237 维度）、doc-numbers 24/24、bidirectional 52/52 召回 + 302/326 误拦。 |

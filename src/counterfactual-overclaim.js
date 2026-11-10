@@ -67,8 +67,26 @@ const RE = {
   // EN-A：if + 主语 + had（if we had invested…）
   CF_EN_A_RE: /\bif\s+(?:we|i|you|they|he|she)\s+had\b/i,
 
-  // EN-B：倒装 had we/they + 过去分词（Had we taken…）
-  CF_EN_B_RE: /\bhad\s+(?:we|i|you|they)\s+(?:known|taken|chosen|invested|acted|gone|waited|listened|started|made|been|seen|tried|moved|stayed)/i,
+  // EN-B：倒装 had + 主语 + 过去分词（Had we taken… / Had they picked…）
+  // 【r277 结构腿】原为 14 动词枚举表（known|taken|chosen|invested|acted|
+  // gone|waited|listened|started|made|been|seen|tried|moved|stayed），
+  // r277 动词矩阵实测 44/58 常见过去分词漏判（picked/decided/sold/
+  // bought/hired/signed/wrote/found/kept/put/cut/paid/sent/built/broke/
+  // held/read/gave/told/thought/felt/opted/switched/pivoted/expanded/
+  // paused/cancelled/delayed/shipped/launched/joined/left/won/lost/met/
+  // asked/called/pushed/set/run…）——枚举扩容只是样本扩容，不是真升级，
+  // 故改为**结构腿**：倒装 had + 人称主语 + 过去分词形态，任意过去分词
+  // 均承重。同形态既有约束保留：主语限 we/i/you/they/he/she/it（倒装
+  // 反事实的主语必是人称或组织代词），且倒装形后面必须跟过去分词——
+  // 「Had they a chance」类古旧省略形与「Had we known」的合法形都由
+  // 第三条分支（不规则过去分词白名单）兜住。
+  // 承重边界（负例注入目标）：整条正则置为永假后，EN-B 全部样本失配。
+  // 【r277 主语扩展】主语从人称代词扩为「人称代词 + 组织/集体名词」——
+  // r277 变体矩阵实测 'Had the company paused…' / 'Had the team launched…'
+  // 因主语是组织名词整句漏判（gate 仅被其他维度 verify 代拦，本维度未承重）。
+  // 组织主体与个人一样是反事实推演的主体，「had the company/team/board/
+  // government invested…」是英文商业与政策论述的标准倒装形。
+  CF_EN_B_RE: /\bhad\s+(?:we|i|you|they|he|she|it|the\s+(?:company|team|board|firm|government|agency|startup|corporation|organisation|organization|union|committee|council|department|ministry|regulator|bank|investors?|founders?|executives?|managers?|engineers?|scientists?|researchers?|voters?|public|market|country|nation|city|state|party|opposition|incumbents?|competitors?))\s+(?:[a-z]+(?:ed|en)|(?:known|taken|chosen|given|invested|acted|gone|been|seen|tried|moved|stayed|made|done|had|come|become|run|won|lost|met|sold|bought|brought|built|broke|brought|caught|chose|cut|dealt|did|drawn|driven|drunk|eaten|fallen|felt|found|forgotten|frozen|got|grew|held|hidden|hit|hurt|kept|knelt|laid|led|lent|let|lit|lost|meant|paid|put|read|ridden|risen|said|seen|sent|set|shaken|shot|shown|shut|sold|sought|spent|stood|stolen|struck|sworn|swum|taught|thought|threw|told|took|torn|understood|woke|worn|won|wound|written|left|wrote|gave|spoke|broke|chose|drove|ate|fell|froze|stole|wore|tore|swam|began|rang|sang|sank|shrank|sprang|spun|stung|swung|threw|blew|grew|knew|flew|forbade|forbad|hid|lit|slid|spelt|spilt|strove|wet|strung|swept|slept|wept|crept|leapt|leaned|leant|learned|learnt|burned|burnt|dreamed|dreamt|kneeled|knelt|smelled|smelt|spelled|spelt|spilled|spilt|spoiled|spoilt|canceled|cancelled|counseled|counselled|traveled|travelled|labeled|labelled|totaled|totalled))\b/i,
 
   // EN-C：if only + 主语 + had（If only we had acted…）
   CF_EN_C_RE: /\bif\s+only\s+(?:we|i|you|they)\s+had\b/i,

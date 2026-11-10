@@ -1,3 +1,19 @@
+# 6.8.159 变更日志条目
+
+## [6.8.159] - 2026-11-10
+
+### 新增
+- **第 241 维度 `self_selection_bias`（自选择偏差 / self-selection bias / volunteer bias）接线闭环**（r271 接线、r273 收尾）：判「样本的入选本身由被研究的属性决定（自愿参与/自荐/留存），却把入选子群体的特征当作总体特征的证据」。src/index.js 九处接线（require / 计算点 / allDims / dimMap / dimensions / DIM_GUIDANCE / VERIFY_DIMS / summary / module.exports）；归因腿补常量 CAUSE_ATTR_ZH（推断标记 × 群体名词 × 属性名词 × 裸比较级，前置「高收入/高绩效」与后置「收入偏高/成绩偏好」双向覆盖）——原族只收系词+最高级，「愿意接这份问卷的人收入都偏高，可见我们用户群体普遍高收入」整句漏判，补腿后 hits=2。维度数 240→241，VERIFY 206→208。
+- **r272 谄媚族五语 i18n 补腿**（`src/plugins/sycophancy-check/index.js`）：uniqueness_flattery / unconditional_deference 两个隐性谄媚族补 EN+ZH 及日/韩/西语措辞（10 组）；插件层不在 gate 路径故维度计数不变。同轮修复 agent-4 引入的 matchAll 非全局正则回归（i18n 单测 10/10 全挂 → 增加 _countMatches 辅助后恢复）。
+
+### 修复
+- 三份FAIL样本经实证均为措辞问题非引擎回归：EN uniqueness_flattery 词族在 remarkable 前只允许单个可选前缀词（副词插入失配）、KO/ES 自造词形不在任何词族（换成本族实测命中句）。
+
+### 验证
+- 五门禁：verify 16/0、guard-abilities 20/20（241 键）、doc-numbers 24/24、bidirectional 召回 52/52 + 误拦 302/326
+- 单测：self-selection-bias 20/20（官方良性 272 条零误命中）、sycophancy-i18n 10/10、round-272 44/44
+- 补腿实证：攻击 6/6 命中、良性 8/8 零误伤
+
 # 6.8.158 变更日志条目
 
 ## [6.8.158] - 2026-11-10

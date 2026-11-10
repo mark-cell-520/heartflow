@@ -936,6 +936,32 @@ const { detectLawOfSmallNumbers } = require('./law-of-small-numbers.js');
 // 统一起点明示、严谨设计三类豁免。itb 缩写 grep 0 命中无冲突。
 // 细节见 src/immortal-time-bias.js。
 const { checkImmortalTimeBias } = require('./immortal-time-bias.js');
+// [r275 接线] provisional 第 242 维度 zero_sum_fallacy（零和误判 /
+// fixed-pie misjudgment / 固定馅饼信念：把自愿交换/收益-损失对置断言成
+// 「一方所得即另一方所失」——「你多赚一块钱，就一定有人少赚一块钱」
+// 「他升职了，说明有人被他挤了下来」）。模块 src/zero-sum-fallacy.js
+// 为 r218 起草（358 行：腿①交换语境 × 腿②零和断言五形 E-1/E-2/C-1/C-2/
+// C-3 缺一不判，窗口化否定守卫，教学转述/正确响应/疑问句三组豁免），
+// 单测 23/23 全绿，但从未接线——r275 缺口实证：同族攻击变体 10 条中
+// 8 条 gate.action=pass 穿引擎（中英双语均漏），242 个已接线维度无
+// zero_sum 键，最接近的 false_equivalence/sunk_cost_coercion/
+// relative_privation/appeal_to_pity 均不判损益对偶结构。decision 本体
+// 裁决 accelerate（confidence 0.7 / priority 40）。zsf 缩写 grep 0
+// 命中无冲突。细节见 src/zero-sum-fallacy.js 头注释。
+const { checkZeroSumFallacy } = require('./zero-sum-fallacy.js');
+// [r271 接线] provisional 第 241 维度 self_selection_bias（自选择偏差 /
+// volunteer bias / 自选组效果归因：群体自行决定是否进入某项目/工具/
+// 服务，再据此把结果差异归因于该项目本身——「自愿参加培训的员工绩效
+// 更好，所以培训有效」）。模块 src/self-selection-bias.js 为 r253 起草
+// （413 行：双腿链 + SOLO 独腿签名 + 邻近距离窗 + 否定守卫 + 概念教学/
+// 正确因果口径两组豁免），单测 20/20、官方良性语料 272 条零误命中，
+// 但从未接线——gate 层实测仅 3/8 命中。缺口实证：
+// scripts/round-271/probe-gate-gap.js；decision 本体裁决 accelerate
+// （confidence 0.7 / priority 40）。判据腿①自选进入（自愿/主动/报名/
+// opt-in/volunteered/signed up 等七族）须与腿②效果归因（推断标记×
+// 因果动词/处理名词+效果词）落在邻近窗内，方向不限。ssb 缩写 grep 0
+// 命中无冲突。细节见 src/self-selection-bias.js 头注释。
+const { detectSelfSelectionBias } = require('./self-selection-bias.js');
 // [r268 接线] 第 234 维度 money_illusion（货币幻觉：把名义金额变动
 // 当成实际购买力变动）。模块 src/money-illusion.js 为 r251 起草
 // （19/19 测试全绿、良性 272 条零误伤）。mi——money illusion 缩写。
@@ -2205,6 +2231,14 @@ function discriminate(text, evidence = [], contentMode) {
   // 同 r190 先例：接线一次接齐，漏一处 gate.action 恒 pass。
   // 变量名 fp——false precision 缩写，grep 实测 0 命中无冲突。
   const fp = _applyPedagogyRelaxation(checkFalsePrecision(_normText), "false_precision", pedagogyRelaxation);
+  // [r274] 第 242 维度 completion_evidence（空完成声明：无证据的
+  // 「已完成/已修复/全部通过/已推送」）计算点。
+  // 真升级类型③：checkCompletionEvidence 早在第 N 轮即 require（index.js:194）
+  // 并导出（index.js:17157），但从未在 gate 主路径 dispatch——能力已加载、
+  // 零调用。本轮按 r192「九处一次接齐」先例接入主路径。
+  // 变量名 cevd——completion evidence dimension 缩写，避开已占用
+  // 的 cev（confirmatory_evidence，index.js:2344，grep 实测冲突）。
+  const cevd = _applyPedagogyRelaxation(checkCompletionEvidence(_normText), "completion_evidence", pedagogyRelaxation);
   // [r193] 第 191 维度 ad_nauseam（诉诸重复）计算点。
   // 同 r192 先例：接线一次接齐，漏一处 gate.action 恒 pass。变量名 adn。
   const adn = _applyPedagogyRelaxation(checkAdNauseam(_normText), "ad_nauseam", pedagogyRelaxation);
@@ -2365,6 +2399,13 @@ function discriminate(text, evidence = [], contentMode) {
   // [r270] 第 240 维度 immortal_time_bias（永生时间偏误）计算点。
   // itb——immortal time bias 缩写，grep 0 命中无冲突。
   const itb = _applyPedagogyRelaxation(checkImmortalTimeBias(_normText), "immortal_time_bias", pedagogyRelaxation);
+  // [r271 接线] provisional 第 241 维度 self_selection_bias（自选择偏差）计算点。
+  // ssb——self-selection bias 缩写，grep 0 命中无冲突。
+  const ssb = _applyPedagogyRelaxation(detectSelfSelectionBias(_normText), "self_selection_bias", pedagogyRelaxation);
+  // [r275 接线] provisional 第 242 维度 zero_sum_fallacy（零和误判）计算点。
+  // 同 r232 先例：九处一次接齐，漏一处 gate.action 恒 pass。zsf——
+  // zero-sum fallacy 缩写，grep 0 命中无冲突。
+  const zsf = _applyPedagogyRelaxation(checkZeroSumFallacy(_normText), "zero_sum_fallacy", pedagogyRelaxation);
   // [r249] 第 215 维度 conditional_transposition（条件概率换位）计算点。
   // cnt——conditional transposition 缩写（ct 已被 contradiction 占用，grep 0 命中无冲突）。
   const cnt = _applyPedagogyRelaxation(checkConditionalTransposition(_normText), "conditional_transposition", pedagogyRelaxation);
@@ -2883,6 +2924,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r192] 第 188 维度 false_precision 参与判定（伪精确断言）。
     // 同 r190 先例：dimMap 与 allDims 必须两处都接。
     {score: fp.score, name:'false_precision'},
+    // [r274] 第 242 维度 completion_evidence 参与判定（空完成声明）。
+    // 同 r192 先例：dimMap 与 allDims 必须两处都接。
+    {score: cevd.score, name:'completion_evidence'},
     // [r193] 第 191 维度 ad_nauseam 参与判定（诉诸重复）。
     {score: adn.score, name:'ad_nauseam'},
     // [r194] 第 192 维度 motte_and_bailey 参与判定（稻草城堡谬误）。
@@ -3027,6 +3071,12 @@ function discriminate(text, evidence = [], contentMode) {
     // [r270] 第 240 维度 immortal_time_bias 参与判定（永生时间偏误）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: itb.score, name:'immortal_time_bias'},
+    // [r271 接线] provisional 第 241 维度 self_selection_bias 参与判定（自选择偏差）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: ssb.score, name:'self_selection_bias'},
+    // [r275 接线] provisional 第 242 维度 zero_sum_fallacy 参与判定（零和误判）。
+    // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
+    {score: zsf.score, name:'zero_sum_fallacy'},
     // [r249] 第 215 维度 conditional_transposition 参与判定（条件概率换位）。
     // 同 r232 先例：dimMap 与 allDims 两处都接，否则命中进不了 findings。
     {score: cnt.score, name:'conditional_transposition'},
@@ -3466,6 +3516,9 @@ function discriminate(text, evidence = [], contentMode) {
     // [r192] 第 188 维度 false_precision（伪精确断言×
     // 精确数字腿×断言语境腿）。
     false_precision: fp,
+    // [r274] 第 242 维度 completion_evidence（空完成声明×
+    // 完成声明腿×证据缺席腿）。
+    completion_evidence: cevd,
     // [r193] 第 191 维度 ad_nauseam（诉诸重复×
     // 重复单元腿×出现次数腿）。
     ad_nauseam: adn,
@@ -3612,6 +3665,14 @@ function discriminate(text, evidence = [], contentMode) {
     // 两组生存时间计算起点不一致，却把结构性时差当成干预有效证据）。
     // itb——immortal time bias 缩写。
     immortal_time_bias: itb,
+    // [r271 接线] provisional 第 241 维度 self_selection_bias 补登记（自选择
+    // 偏差：群体自行决定进入某项目，再据此把结果差异归因于项目本身）。
+    // ssb——self-selection bias 缩写。
+    self_selection_bias: ssb,
+    // [r275 接线] provisional 第 242 维度 zero_sum_fallacy 补登记（零和
+    // 误判：自愿交换/收益-损失被对置成一方所得即另一方所失）。zsf——
+    // zero-sum fallacy 缩写。
+    zero_sum_fallacy: zsf,
     // [r249] 第 215 维度 conditional_transposition（条件概率换位：
     // 数值两现腿×条件框腿×推断词腿×实体回指腿）。
     conditional_transposition: cnt,
@@ -3966,6 +4027,7 @@ function discriminate(text, evidence = [], contentMode) {
     'cum_hoc': "不得把**两个变量的相关/共现/同步直接当成其中一个导致另一个的证据**——cum hoc ergo propter hoc（拉丁语「与此并存，故因彼此」）是指看到 A 与 B **相关/成正比/同步波动**，就直接断言 **A 导致/造成 B**：「冰淇淋销量和溺水死亡率高度相关，所以吃冰淇淋会导致溺水」「国家的人均巧克力消费量与诺贝尔奖得主数量呈显著正相关，可见吃巧克力能提升智力」「这两项指标多年来一直同步波动，可见 A 的提高直接带来了 B 的增长」「Iced tea sales are correlated with drowning deaths, so iced tea causes drowning.」「Countries with more Nobel laurets consume more chocolate; therefore chocolate boosts intelligence.」（样本形状与负例见 test/round-198-cum-hoc.js）。为什么这本身就是问题：相关性只说明两变量同变，不说明方向、更不说明因果——同变可能源于**第三变量**（夏天炎热同时推高冰淇淋与溺水）、**双向因果**、或**纯巧合**。把相关当因果，会让未经检验的因果叙事获得数据外衣，驱动错误的干预与决策。正当做法是**补上因果证据**（给出时间先后、对照组、机制路径：没吃冰淇淋的同质群体溺水率如何）或**把结论降级为「观察到相关，因果待检验」**，而不是把相关直接当成因果。判据**两腿共现 + 邻近窗，缺一不判**：腿① CORRELATION 显式相关/共现标记（相关/关联/成正比/成反比/伴随/同步/共现/一同出现/联动/高度相关/显著相关；EN correlated / associated / linked / goes hand in hand / co-occur / proportional）；腿② CAUSAL 前向因果动词（导致/造成/引起/引发/促使/带来/催生/诱发/使得/提升了/能够提升；EN causes / leads to / results in / drives / boosts / brings about / increases）。两腿落在 24 字（EN 70 字符）邻近窗内即视为同一次「相关→因果」推断。边界：post_hoc 管「A 在 B 前所以 A 导致 B」的**时序连接**，本族不依赖时序、承重的是共变/相关这个前提；reverse_causation 管**反应型行为×负面结果**的方向倒置（腿①用比较级 更/多/高），本族腿①用显式相关词，词表不交叉；common_cause 管**伪相关**（A、B 同由 C 导致），本族不管第三变量，且「A 和 B 相关是因为 C」这种正确的共同因素解释因弃用「是因为」作因果腿 + 共同因素豁免而明确放行；pseudo_causal 管**精确倍数**假机制，本族管相关→因果的推断方向；statistical_misleading 管**统计数据呈现误导**，本族管「相关被当成因果证据」的推理谬误；monocause 管多因压单因，本族不断言唯一原因、反对的是推断依据无效。明确不判：概念/教学转述与共同因素解释（相关不等于/相关并非/伪相关/混淆变量/混淆因素/第三变量/共同因素/共同原因/辛普森/内生性/因果推断/相关系数/统计学/教材/论文；EN correlation is not causation / confounding / spurious correlation / common cause / Simpson's paradox / statistics——讨论这个概念本身、或正确指出共同因素，是正确判别）、实验/证据语境（随机对照/对照组/双盲/安慰剂/控制变量/前瞻性/队列/元分析/临床试验/格兰杰/数据显示/研究表明/证据表明；EN randomized / controlled trial / RCT / Granger / data show / evidence shows——以证据而非裸相关立论时因果已被检验）、推理否定/觉察承认（不代表/不等于/并不意味着/推不出/不能说明/未必/不一定/很难说/可能只是/纯属巧合/只是相关；EN does not mean / not necessarily / cannot conclude / may just be / mere coincidence——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/有待；EN maybe / perhaps / might / seems）、疑问句（含 ?/？）。",
     'regression_to_the_mean': "不得把**极端值之后向均值方向的自然移动当成干预的功劳**——回归均值误归因（regression to the mean / regression fallacy）是指某指标先处于**极端值**（最差/谷底/连败/创新低，或巅峰/夺冠/历史新高——回归是**双向**的），随后**朝均值移动**（好转/回升/回到中等，或回落/退潮），文本把这次移动**归功于同期的某个干预**（吃药/贴膏药/换人/报班/换方法/请大师；EN took / hired / switched / started）：「上次考了年级最差，考前吃了巧克力，这次回到班级中等——巧克力确实有用」「他连败五场之后换了新球拍，接着就赢回来了，可见新球拍很关键」「After our worst quarter on record we hired the new consultant, and revenue bounced back — the hire fixed it.」（样本形状与负例见 test/round-195-regression-to-the-mean.js）。为什么这本身就是问题：极端值之后的下一次测量天然朝均值移动，与干预是否有效无关；没有对照组时「干预后好转」证明不了任何事，真正起作用的可能只是统计必然性。正当做法是**补上对照组**（没做这件事的同质群体是否也回归了）、**把结论降级为「观察到改善，功效待检验」**，或**点名自然回归的可能性**（极端值后的回落/回升部分是回归效应），而不是把回归直接当成干预的功劳。判据**三腿共现 + 叙事窗，缺一不判**：腿① EXTREME 极端基线陈述（双向：极端低族最差/谷底/垫底/连败/暴跌，极端高族巅峰/夺冠/历史新高/年级第一）；腿② REGRESSION 回归性变化（双向：自低处回升好转/恢复/回升/回到.{0,8}(正常|平均|中游|中等)，自高处回落回落/减退/平息/回归平淡）；腿③ ATTRIB 干预×功劳/功效归因（干预动词吃了/换了/请了/贴膏药/换帅/报班 × 功劳词多亏/全靠/幸亏/功劳/归功于 或功效词有效/见效/管用/很关键/果然/一贴就，两者 12 字窗内共现）。边界：post_hoc 管「A 在 B 前所以 A 导致 B」的时序连接，本族不依赖时序、承重的是极端基线这个统计前提；gamblers_fallacy 管**预测下一次**结果随 streak 反转，本族管**解释已经发生的**回归；hot_hand 管把连胜势头当成下次胜率升高的根据，本族不预测未来；clustering_illusion 管随机聚集被当规律，本族管单次极端→回归的归因；base_rate_neglect 管拿单个阳性信号无视基础概率，本族管忽略「极端值必然回归」的统计必然性；pseudo_causal 管精确倍数/玄学归因白话伪因果，本族的归因对象是同期干预但缺对照组；common_cause / reverse_causation 管相关→因果与方向倒置，本族不依赖两变量共变；monocause 管多因压成单因，本族不断言唯一原因、反对的是归因本身无效。明确不判：概念/教学转述（均值回归/向均值回归/regression to the mean/统计学/教材/论文——讨论这个概念本身是正确判别）、实验/证据语境（随机对照/对照组/双盲/安慰剂/剔除极端值/截尾/温莎化/基线校正/前瞻性/队列/元分析/纵向/自然实验/随机分组；EN randomized / controlled trial / RCT / placebo / trimmed / winsorized / longitudinal——受控设计或已对回归校正时观察经设计成为证据）、推理否定/反向承认（不能说明/不能证明/不代表/推不出/未必/不一定/很难说/不好说/说不清/难以确定/不能全归/不能单靠/有待验证/可能是自然/其实是因为回归；EN does not mean / cannot conclude / not necessarily / fails to show / may just be / natural regression——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定/有待；EN maybe / perhaps / might / probably / seems——概率化结论不作谬误判定）、疑问句（含 ?/？）。",
     'argument_to_moderation': "不得把**折中立场本身当成真理的依据**——诉诸中庸（argument to moderation / 中间立场谬误）是指把两个立场并置后，断言**「真相/正确答案在中间」「各打五十大板」「折中才是对的」「一个巴掌拍不响」**，用「取中」这个动作替代对双方证据的检验：「甲方乙方各有过错，真相在中间，各打五十大板才是最公道的处理」「这两种观点都太极端了，正确的答案在它们中间」「公说公有理婆说婆有理，其实折中才是对的」「关于这项政策该不该继续，支持和反对的人都走了极端，中间立场才是理性的」「Both extremes are wrong, so the truth lies somewhere in the middle.」「Let's just split the difference — the middle ground is the correct answer.」「When two sides clash, the fairest position is usually the one in between.」（样本形状与负例见 test/round-196-argument-to-moderation.js）。为什么这本身就是问题：中间立场偶尔确实更接近真相，但那要凭证据成立，不能凭「它在中间」成立——以位置取信跳过的是举证责任，两端各自的证据强度、折中结论为何比任一端更成立，都需要单独检验。正当做法是**列出两端各自的证据**并说明折中结论为何更成立，或明确「目前证据不足以在两端间定论」，而不是把「取中」当成结论本身。判据**两腿共现 + 叙事窗，缺一不判**：腿① MIDDLE 中间/折中立场表述（中间立场/中间道路/真相·答案·结论在(两者|双方)之间/折中/中庸/各打五十大板/一个巴掌拍不响/双方都有错/都太极端/走了极端/各让一步/各退一步；EN middle ground / in between / split the difference / meet in the middle / both extremes / compromise position）；腿② TRUTH 中间=正确断言（才是(对|正确|真理|正解|理性|客观|公道|合理|最优)的/(中间|折中)才是X/(都|全)不(完全)(对|错)|都不全对/把(中间|折中)当成(真理|真相|正确)/(最|才)(公平|合理)的(处理|解决|做法|方案|方式)/(正确|真正|对)的(答案|结论|真相|立场)(就)在；EN is the (correct|right|true|rational|fair|fairest|reasonable|best) answer/position/conclusion / truth lies in the middle / both sides are wrong / neither side is entirely right / middle ground is the (correct|fairest|rational) / the (fairest|correct|best) position is (the one) in between），两腿命中相距 ≤50 字（EN ≤200 字符）。边界：false_balance 管**等权并置**（「两种说法/各有道理」把未证实指控并列到已证事实旁），本族不停留在并置、而是进一步断言**中间立场才是正确的**——false_balance 说「一样重」，本族说「中间对」；false_dilemma 管**排除第三选项的二元压迫**（「要么A要么B，没有中间路线」），本族恰好相反——承认两端存在，但把**中间**封为真理，不逼人选边；false_equivalence 管两类事物的错误类比，本族不引入类比对象；sole_narrative 管口径垄断（只许一种说法），本族的主张是「只有中间那种说法对」；monocause 管多因压成单因，本族不断言原因数量，反对的是**以位置取信**而非以证据取信。明确不判：概念/教学转述（诉诸中庸/argument to moderation/中庸之道/儒家/亚里士多德/逻辑谬误/教材/论文——讨论这个概念本身是正确判别）、谈判/交易/和解语境（谈判/协商/和解/调解/协议/签约/签署/成交/报价/让步/调解员/合同；EN negotiated / deal / signed / contract / settlement / mediation / agreement——博弈中「各让一步」是关于成交的程序动作，不是真理断言）、算术/统计取中（平均值/均值/中位数/中间值/取平均；EN average / median / midpoint——取中位数是正当计算）、推理否定/反向承认（并不总是/并不等于/不等于/并不意味着/未必/不一定/推不出/不见得/不是都对也都错/是谬误；EN does not mean / not automatically / not necessarily / is not correct——拒绝该推断本身是正确判别）、对冲（可能/也许/或许/大概/似乎/好像/说不定；EN maybe / perhaps / might / probably / seems——概率化结论不作谬误判定）、疑问句（含 ?/？）。",
+    'completion_evidence': "不得**在没有可验证证据的情况下声明工作已完成**——空完成声明（empty completion claim / unfalsifiable completion）是把「已完成/已修复/已解决/已搞定/已交付/已推送/已提交/全部通过/确认正常/验证通过/没问题/可以了」当作事实陈述，却不附任何**可定位、可复现的完成证据**：git commit 哈希、测试通过的具体数字（16/0）、文件路径、退出码、PR 链接、被调用的具体命令。声明与证据之间的**缺口本身就是判别信号**——真正完成的工作必然留下痕迹（哈希/计数/路径/输出），「说完成了但没有任何痕迹」与「完成了」在证据上不可区分，因此空声明不可信。这是 AI agent 输出中最常见的自欺形态：汇报时把「执行了动作」等同于「达成了效果」，把「我跑了测试」等同于「测试通过了」，把「代码写完了」等同于「问题解决了」。「我已经修复了这个问题。」「全部测试都通过了。」「改动已经推送到远端。」「确认正常，可以上线了。」「Everything is done and working.」判据**声明腿 × 证据缺席腿，缺一不判**：腿① CLAIM 完成/验证声明（已完成/已修复/已解决/已搞定/已交付/已推送/已提交 + done/fixed/resolved/pushed/committed；全部通过/all tests passed/确认正常/验证通过/检查无误/checked ok/verification passed/all good；模糊收尾 可以了/好了/没问题/works fine/no problem/all set）；腿② EVIDENCE 证据在场检查——声明点 ±200 字窗口内出现 git 哈希（[0-9a-f]{7,40}）、测试计数（\\d+ passed/通过/tests）、commit 引用、PR 编号、URL、具体计数（N 个/N 条/N 处/N 项）、exit code 0、`验证:` 冒号引内容、C2/C3 的检查方法词（curl/node/python/pytest/test/git log/cat/运行/执行/查看了）。**豁免**：① 带证据的声明不判（「已修复，commit 3f2a91b，verify 16/0」有哈希有计数）；② C2/C3 附近出现具体检查方法词时是正当技术陈述（「运行 node test/run-all.js，确认正常」——方法在场）；③ C4 附近有数字时是真实汇报（「全部通过：16 passed, 0 failed」）。明确不判：转述他人的完成声明并附出处、历史陈述（「2024 年已完成迁移」是事实陈述非工作声明）、教学示例（演示本维度概念的句子）、带哈希/计数/路径/URL 任一证据的正常汇报。与 reward_hacking（BLOCK：自认式指标作弊）、bullshit（伪深度空话）边界错开：本族管的是**声明与证据的结构性缺口**，是证据纪律判别，不是文风判别。来源（真实，未编造）：内部路径——`src/completion-evidence.js` 自第 N 轮起即 require（src/index.js:194）并 module.exports 导出（src/index.js:17157），但从未进入 gate/dispatch 主路径（r274 接线前 grep 实证：模块 5 类检测 C1-C5 全部零调用），属「已加载未 dispatch」能力；判据为心虫自有纯规则实现（零 LLM 依赖）。探针 /tmp/hf-probe-r274.js。",
     'false_precision': "不得**用超出证据支撑精度的数字冒充量化证据**——伪精确断言（false precision / spurious precision / overprecision）是把**小数百分比、小数倍数、小数评分、小数年限、精确副词+数字**（37.42% / 3.7 倍 / 92.6 分 / 12.5 年 / 整整 3.7 倍 / exactly 47.83%）以**无来源、无约数、无对冲**的断言形式给出，用过分的数字精度制造「量化严谨」的假象：数字的**精度形态**本身就是证据——样本多大、怎么测的都没说，小数却给到小数点后一两位，是把随机噪声包装成测量读数，是 AI 输出中最典型的数字幻觉形态：「用户满意度达到 92.6 分，远超预期。」「性能提升了整整 3.7 倍，几乎没有代价。」「新药可延长预期寿命 12.5 年。」「该模型在测试集上的准确率达到 99.37%。」「转化率 37.42%，完播率 21.8%。」「The study shows engagement improved by exactly 47.83%.」（样本形状与负例见 test/round-192-false-precision.js）。为什么精度形态本身就是证据：可验证的数字必须同时给出**数值与精度依据**（来源、样本、测量手段）；只给数值不给依据、且精度还异常精致时，数字不可能来自真实测量——「92.6 分」的 0.6 没有出处，「12.5 年」的 0.5 没有队列。它常以汇报、测评、疗效口吻出现，是「似是而非」的典型：看起来是用数据说话，实则是用小数位说话。正当做法是**补上可验证来源**（谁测的、怎么测的、样本多大）、**把数字退回调约形态**（约 37%、大约 3.7 倍、±误差范围）或**声明测量精度**（保留几位小数、置信区间）。判据**两腿共现 + 分组豁免，缺一不判**：腿① PREC 精确数字形（**必须含小数点或精确副词**——四舍五入的整数 37% / 3 倍是约整数的合法形态，不判：小数 %/％、小数倍、小评分（92.6 分，排除分钱/分钟/分利/分贝/分米）、小数年岁（12.5 年/岁）、精确副词+数字（整整/恰好/正好/分毫不差/精确地/准确地/精准地 + ≤4 字 + 数字，含整数形——161 轮教训：副词腿收裸词形态，「准确率 92.6 分」由「准确」前缀+数字命中）；EN 小数 %、小数 x/times、小数 years/months/weeks/days/hours、exactly/precisely/accurately + 数字）；腿② CLAIM 断言/度量语境（腿①匹配点前后 ≤24 字 / EN 48 字符内任一：效果动词 提升/提高/增长/增加/降低/减少/下降/达到/高达/低至/升至/突破/改善/优化/翻番/刷新/创下；EN improves/increases/reduces/reaches/boosts/extends/achieves；度量名词 准确率/满意度/转化率/增长率/覆盖率/留存率/性能/效率/得分/评分/寿命/预期寿命/占比；EN accuracy/satisfaction/conversion/coverage/retention/performance/efficiency/life expectancy；结论标记 证明/表明/显示/说明/意味着/可见/足见；EN proves/shows/demonstrates/indicates/means——**裸名词形即断言语境**：「转化率 37.42%，完播率 21.8%」无动词也是伪精确陈列）。边界：perfect_error 的 S1_false_precision 管**裸**精确百分比（无度量名词、无来源，如「市场份额达到 87.3%」）且是多信号协同判定的一票（[v6.7.93] 起对度量名词语境整体豁免，本为「latency dropped 40%」这类工程读数设计），本族专打**度量名词语境下**的小数断言——正是 S1 豁免腾出的空间，且是单维专项判据、不依赖多信号叠加；statistical_misleading / percentage_overflow 管**比例数字的呈现问题**（基数隐藏/占比合计溢出），本族不管呈现结构、管**数字精度本身是否被证据支撑**；unsupported_claim / bullshit 管断言缺依据的强度，本族有数字在场但数字的**精度形态**无效。明确不判：约数/对冲（约/大约/接近/将近/左右/上下/近似/估算/预计/差不多/误差范围/容差/±/大概/可能/也许/据说；EN about/around/approximately/roughly/nearly/almost/estimated/give or take——概率化或约数化的结论精度已被声明有限）、具名来源（根据X统计局/X大学/X报告/X调查/《X》/据X统计/年报/季报/月报/财报/公报/白皮书/来源于/数据来源/转引自/参见；EN according to X report/study/survey/census/source:——有可定位出处的数字归验证流，不归伪精确）、天然精确语境（数字近邻 ≤40 字 / EN 80 字符内：日期/年份、版本号 v6.8.118、自然计数 12 个/1200 人、物理量纲与精度规格 0.01 毫米/±0.5℃/毫秒、数学常数 π/约等于、时长与历史语境 历时/持续/为期/已有/建于/成立于/研发——这些场合小数是合法精确值）、仪器读数语域（数字近邻内 监控/压测/日志/报表/看板…显示/表明——同 r437「可定位复现」边界，数据可从监控/巡检记录复现）、统计口径（同比/环比/较上期/去年同期/百分点/percentage point/year-over-year——报表变化率引用是统计惯例）、元讨论（有效数字/小数点/四舍五入/位数/保留/精度——讨论精确度本身是正确判别）、疑问句（含 ?/？）。已知边界：① 「实验组有效率为 87.3%」这类**无效果动词、度量名词未入表**的形暂不判（「有效率/完成量/满意度指数」等词可续入腿②，保守方向）；② 豁免为句级属性时，同句混合合法时长与伪精确断言会整句放过（「研发历时 2.5 年，延长预期寿命 12.5 年」——天然精确与仪器豁免已收窄为数字近邻窗，句级豁免仅留约数/来源/口径/元讨论四类真句级属性）；③ 跨段数字（上文给出口径、本段只出现小数）不判。",
     'activity_outcome_confusion': "不得**把活动量/投入工当成成果的证据**——「以工代果」是用**过程与手段的计数**冒充**成果与绩效**：会议开了多少场、文件发了多少份、班加了多少个、代码写了几万行、群众走访了几百户，这些是**投入与活动**，不是**结果**；用它们的数量给「推进得好/进展巨大/成效显著/成绩斐然」这类抽象成果背书，是把「做了很多」偷换成「做成很多」：「我们开了 50 场会、发了 100 份文件，所以项目推进得很好」「团队天天加班到深夜，说明大家成绩显著」「代码写了几万行，可见进展巨大」「今年走访了几百户群众，足以证明基层工作卓有成效」「培训办了几十期，可见人才培养卓有成效」「We held dozens of meetings, so the project is clearly on track.」「The team pulled countless all-nighters, which shows remarkable results.」（样本形状与负例见 test/round-186-activity-outcome-confusion.js）。为什么是无效推理：活动量与成果之间没有必然传递——会开得多可能议题涣散，班加得猛可能在做无用返工，代码行数多可能蕴含更多缺陷，走访户数多可能没有解决任何问题；活动的**数量**不增加成果的**证据**，只增加过程的**成本**。它常以工作汇报的口吻出现，是 AI 总结与绩效陈述中最典型的似是而非：听起来是成绩盘点，实则是把忙碌本身当成了产出。正当做法是**用成果指标替代活动计数**（要证「推进好」就给出交付物完成率/用户留存/收入转化等可验证结果数据）、**把活动与成果分开陈述**（「本月开了 20 次对齐会；上线 3 个模块，留存提升 5 个百分点」——先列活动、再列可验证成果）、或**明示活动只是手段**（「会议只是对齐信息的过程，成果要靠交付来衡量」）。判据**三腿共现，缺一不判**：腿① ACT 活动/投入两类——A 可计数活动名词（会议/开会/文件/发文/代码/代码行/行数/加班/工时/值班/演练/走访/巡查/排查/视察/培训/宣讲/开班/邮件/消息/对接/拜访，及忙碌标记 忙得脚不沾地/夜以继日/起早贪黑/通宵/熬夜；EN meetings/emails/reports/training sessions/inspections/overtime/lines of code/all-nighters），B 泛指投入词（投入/付出/辛劳/辛苦/心血/汗水/精力/奔波——**须与强度标记同现**：大量/很多/天天/每天/日夜/数十/上百/几百/几千/几万/无数；EN a lot of/countless/day and night/dozens of）；腿② OUT 抽象成果结论（**只收抽象成功/进展/绩效**：推进得（好|顺利）/进展（巨大|显著|顺利|喜人）/成效（显著|卓著）/成绩（显著|突出|斐然）/卓有成效/效果（好|显著）/（圆满）成功/势头（好|喜人）/落实有力/扎实有效/干劲十足/业绩（突出）/绩效（优秀|突出）；EN on track/going well/great progress/fruitful/productive/successful/highly effective/remarkable results——**不收具体结果**，具体结果交付归良性）；腿③ CONN 因果连接（活动腿与成果腿之间有 所以/因此/因而/足见/据此/可见/于是/那么/说明/证明/表明/足以证明/足以说明/显然/无疑；EN so/therefore/thus/which means/which shows/proving/demonstrating，**或**两腿以逗号并置且无转折词——中文逗号常承载隐性因果；句号分隔或含转折词不判），活动腿与成果腿总跨度 ≤80 字（EN 160 字符）。边界：reward_hacking（BLOCK）及其 metric_substitution/metric_denominator_gaming/best_run_picking/HAP-Z* 族管**自认式指标作弊**（句中必有「换成/改为/优化…而不是/刷分/让指标好看」的作弊自认标记），本族是**无欺骗的推理谬误**——陈述者真诚相信「做了这么多=成果这么大」，无任何作弊自认，两族可同句共现但判定结构不同；Goodhart 代理**指标**族（点击率/GDP/停留时长/分数——**测得的量**被当作目标）本维度不碰——腿①刻意只收**活动/投入**（开会/加班/代码行/走访——**做的事、花的工**），不收任何度量名词，「下载量破百万所以满足需求」「分数上去所以教学变好」归 Goodhart/代理族射程；bullshit/unsupported_claim 管断言缺依据的强度，本族有明确的「活动量×抽象成果×因果连接」三件结构。明确不判：正确分离过程与成果（只是过程/只是手段/不等于/不代表/不能等同/不能混为一谈/不能只看/关键要看/才是…目标/衡量…的方式/而不是/而非；EN is only a proxy/what matters is/outcomes are/not the same as/a means, not an end——主动区分活动与成果是正确判别）、具体成果在场（交付/上线/发布/出货/签单/成交/收入/营收/转化率/留存率/用户增长/完成了/达标；EN shipped/delivered/deployed/launched/revenue/signed/completed the goal——成果已被具体结果背书，不再是拿活动计数充数）、对冲（可能/也许/或许/未必/不一定/大概/恐怕/有待/仍需；EN maybe/perhaps/might/probably/remains to be seen——概率化结论不作谬误判定）、疑问句（含 ?/？）。已知边界：① 活动腿与成果腿限同句，总跨度 ≤80 字（EN 160 字符），跨段形本轮保守不收；② 两腿仅以句号分隔、无显式连接词时不判（保守，避免把两个独立事实误并为一个因果断言）；③ 泛指投入词（投入/付出）单独出现不判，须与强度标记同现，避免误伤「投入研发取得突破」这类正常因果叙述；④ 含转折词（但/然而/却/不过/虽然）的并置不判——那是并列或反向陈述。",
     // [r188] 第 185 维度 most_transitivity（「大多数」链式传递）guidance。
@@ -4267,6 +4329,10 @@ function discriminate(text, evidence = [], contentMode) {
     premature_termination: '输出疑似过早终止——只有状态陈述/承诺/空完成而无具体结果。需继续执行到产出可验证的结果或明确的完成描述',
     // [r270] 第 240 维度 immortal_time_bias（永生时间偏误）。
     immortal_time_bias: '两组生存时间的计算起点或起点定义不一致——先核对是否从同一时点（确诊/入组/首次用药）起算；存在起点错位时改用时依协变量分析、兰德分析或边际结构模型，把起点对齐后再比较，否则不得据此断言干预有效',
+    // [r271 接线] provisional 第 241 维度 self_selection_bias（自选择偏差）。
+    self_selection_bias: '样本是自愿参加/主动报名/自行选择进入的——自选组的结果差异包含选择效应，不能直接归因于项目本身；改用随机分组、对照组或倾向得分等口径重新比较，否则不得据此断言项目有效',
+    // [r275 接线] provisional 第 242 维度 zero_sum_fallacy（零和误判）。
+    zero_sum_fallacy: '自愿交换的收益不是从对方口袋里转移过来的——退出成本为零时成交即双方按各自估价获益；先核对总额是否真的恒定（奖牌名额/固定额度/蛋糕分配才可能是零和），再回到双侧主观估价与退出成本重新比较，否则不得断言一方所得即另一方所失',
   };
   // 给每个 finding 附上修改指引
   for (const f of findings) {
@@ -4970,6 +5036,12 @@ function discriminate(text, evidence = [], contentMode) {
     // 句式就能补的；单句也可能是转述他人汇报、带具名出处的正常引用或
     // 仪器读数。与 r161-r190 同口径只登记 VERIFY。
     'false_precision',
+    // [r274] 第 242 维度 completion_evidence（空完成声明：声明已完成但
+    // 无任何可定位证据）。verify 级——「空完成声明」需要补的是
+    // **可复现的完成证据**（git hash / 测试计数 / 文件路径 / URL），
+    // 不是改写句式就能补的；单句也可能是附证据的正常汇报、历史
+    // 陈述或转述他人的复盘。与 r192-r273 同口径只登记 VERIFY。
+    'completion_evidence',
     // [r193] 第 191 维度 ad_nauseam（诉诸重复：复读冒充论据）。verify 级——
     // 「重复代替论证」需要补的是**递进内容**（机制/数据/反例），不是改写
     // 句式；单句/整段也可能是真诚强调或教学复述。与 r161-r192 同口径。
@@ -5329,6 +5401,17 @@ function discriminate(text, evidence = [], contentMode) {
     // survivor_time_bias(226)/survivorship_bias(132)/selection_bias(168)/
     // denominator_swap(224) 的射程边界见 src/immortal-time-bias.js 头注释。
     'immortal_time_bias',
+    // [r271 接线] provisional 第 241 维度 self_selection_bias（自选择偏差 /
+    // self-selection bias / volunteer bias / 自选组效果归因：群体自行
+    // 决定是否进入某项目/工具/服务，再据此把结果差异归因于该项目本身
+    // ——「自愿参加培训的员工绩效更好，所以培训有效」）登记。verify 级
+    // ——单句也可能是正当的分组事实转述、统计学教学反例（「报名者自驱
+    // 更强，需要对照组才能判断课程效果」正是本族要教的判别动作）、对
+    // 他人错误归因的揭批引用。与 r206-r270 同口径只登记 VERIFY。与
+    // survivorship_bias(132)/selection_on_dependent_variable(provisional
+    // 240)/selection_bias(168)/collider_bias(209) 的射程边界见
+    // src/self-selection-bias.js 头注释。
+    'self_selection_bias',
     // [r249] 第 215 维度 conditional_transposition（条件概率换位 /
     // confusion of the inverse：P(E|I) 的数值在方向翻转后原样沿用为
     // P(I|E)——「这种病检测阳性的概率是 95%，所以得了这种病检测阳性的
@@ -5440,6 +5523,24 @@ function discriminate(text, evidence = [], contentMode) {
     // 定律。与 hasty_generalization/anecdotal/base_rate_neglect 的射程
     // 边界见 src/law-of-small-numbers.js 头注释。
     'law_of_small_numbers',
+    // [r271 接线] provisional 第 241 维度 self_selection_bias（自选择偏差：
+    // 自愿参加/主动报名/自行选择进入的群体结果更好，直接归因于项目本身）。
+    // verify 级——单句可能是正当的分组事实转述、统计学教学、对他人错误
+    // 归因的揭批引用。与 survivorship_bias/selection_bias/collider_bias
+    // 的射程边界见 src/self-selection-bias.js 头注释。
+    'self_selection_bias',
+    // [r275 接线] provisional 第 242 维度 zero_sum_fallacy（零和误判 /
+    // fixed-pie misjudgment：把自愿交换或收益-损失对置断言成「一方所得
+    // 即另一方所失」——「你多赚一块钱，就一定有人少赚一块钱」「蛋糕就
+    // 那么大，你切走大块我就只能拿小块」）登记。verify 级——单句也可能
+    // 是对真实零和局面的客观描述（奖牌名额固定、一块蛋糕的分配、座位
+    // 有限的拍卖）、新闻报道转述、课堂案例、或明确指出这是零和谬误，
+    // rewrite 会误伤。verify 的含义是「这段文本把自愿交换断言成了单向
+    // 损益转移，需要回到交换双侧主观估价与退出成本再下结论」。与
+    // r206-r271 同口径只登记 VERIFY。与 false_equivalence/sunk_cost_
+    // coercion/relative_privation/appeal_to_pity/false_dilemma 的射程
+    // 边界见 src/zero-sum-fallacy.js 头注释。
+    'zero_sum_fallacy',
   ]);
   // pass：无问题通过
 
@@ -5859,6 +5960,8 @@ function discriminate(text, evidence = [], contentMode) {
       // [r192] 第 188 维度 false_precision（伪精确断言）。
       // 同上：九处一次接齐，漏一处 dimensions 读数缺键。
       false_precision: fp,
+      // [r274] 第 242 维度 completion_evidence（空完成声明）。同上：九处一次接齐。
+      completion_evidence: cevd,
       // [r193] 第 191 维度 ad_nauseam（诉诸重复）。同上：九处一次接齐。
       ad_nauseam: adn,
       // [r194] 第 192 维度 motte_and_bailey（稻草城堡谬误）。同上：九处一次接齐。
@@ -5995,6 +6098,13 @@ function discriminate(text, evidence = [], contentMode) {
       // [r270] 第 240 维度 immortal_time_bias 补登记（永生时间偏误）。
       // itb——immortal time bias 缩写。同上：九处一次接齐。
       immortal_time_bias: itb,
+      // [r271 接线] provisional 第 241 维度 self_selection_bias 补登记（自选择
+      // 偏差）。ssb——self-selection bias 缩写。同上：九处一次接齐。
+      self_selection_bias: ssb,
+    // [r275 接线] provisional 第 242 维度 zero_sum_fallacy 补登记（零和
+    // 误判：自愿交换/收益-损失被对置成一方所得即另一方所失）。zsf——
+    // zero-sum fallacy 缩写。
+    zero_sum_fallacy: zsf,
       // [r249] 第 215 维度 conditional_transposition 补登记（条件概率换位）。
       // 同上：九处一次接齐。
       conditional_transposition: cnt,
@@ -16994,6 +17104,12 @@ module.exports = {
   // 测试与 MCP handler 拿不到单维函数）。
   checkSurvivorTimeBias,
   checkImmortalTimeBias,
+  // [r271 接线] provisional 第 241 维度 self_selection_bias 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  detectSelfSelectionBias,
+  // [r275 接线] provisional 第 242 维度 zero_sum_fallacy 导出（同先例，
+  // 漏导出会让测试与 MCP handler 拿不到单维函数）。
+  checkZeroSumFallacy,
   // [r251] 第 227 维度 means_as_end 导出（同先例，漏导出会让
   // 测试与 MCP handler 拿不到单维函数）。
   checkMeansAsEnd,

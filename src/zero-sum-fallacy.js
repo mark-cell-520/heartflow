@@ -93,25 +93,73 @@
 'use strict';
 
 // ─── 腿① CONTEXT 交换语境（中文）──────────────────────────────────
+// [r275 补腿] 原表只收交易事件词与对方/他们/我们/人家/彼此/双方——诊断
+// 实证 8/10 攻击句 ctx=false：「你多赚一块钱，就一定有人少赚一块钱」
+// 「你的收益就是我的损失」这类**收益方×损失方对置**句不含任何交易
+// 事件词。本族的推理底座是「损益对偶」，不必然出现在贸易语域（职场
+// 晋升、比赛胜负、机会争夺同样成立），故腿①扩为三选一：交换事件词 /
+// 交换双方指称 / 损益双方指称（你-我、有人-他人、A-B 对置）。
 const CONTEXT_ZH = [
   /贸易|交易|买卖|进出口|出口|进口|成交|合作|订单|合同|生意|供货|采购|商业|谈判|议价|讨价还价|竞价|成交价|市场化|互通有无|各取所需/,
   /买家|卖家|买方|卖方|商家|客户|供应商|生产商|经销商|贸易商|厂商|甲方|乙方/,
   /对方|另一方|他们|我们|人家|彼此|双方/,
+  // [r275] 损益双方指称：收益方与损失方作为两个可区分主体被并置。
+  // 注：不排除逗号——「我赢了这场比赛，意味着你输了这场比赛」的损益
+  // 双方被逗号隔开仍是同一断言的对偶两端；否定守卫与窗口限制在腿②
+  // 另行收紧，此处只负责确认「句中存在两个可区分的损益主体」。
+  /你[^。；]{0,12}我|我[^。；]{0,12}你|有人[^。；]{0,8}(别人|他人|其他人)|别人|他人|其他人|其他人等|一方[^。；]{0,6}另一方|赢家|输家|赢方|输方|胜者|败者|赢的|输的|这个(人|团队|公司|国家)[^。；]{0,8}那个(人|团队|公司|国家)|A[^。；]{0,6}B|他[^。；]{0,8}你|你[^。；]{0,8}他/,
+  // [r275 补腿2] **单侧指称形**：句中出现「有人/他人/别人/总有人」作为
+  // 独立的损益主体，而不需要成对的「你-我」——「你多赚一块钱，就一定
+  // 有人少赚一块钱」「有人变富就必然有人变穷」都属此类。诊断实证
+  // L1/L4 腿②三件套齐备（GAIN→INFER→LOSS 顺序与窗口全对），仅因腿①
+  // 要求成对指称而整句漏判。本族断言中「有人」常被用来指代匿名的
+  // 所失方，是零和叙事的典型措辞。
+  /有人|总有人|总会有人|必然会有人|一定有人|他人|别人|其他人|旁人|众人|大家/,
 ];
 
 // ─── 腿② 所失方 LOSS（中文；r161 教训：收裸词形态）────────────────
 const LOSS_ZH = [
   /亏了|亏得|亏钱|亏本|吃亏|受损失|有损失|遭受损失|损失了|利益受损|血本无归|赔了|赔钱|倒了霉|晦气/,
   /多付|付了代价|付出代价|买单|流失|被拿走|被抢走|被占了|亏损|蚀本|折本|吐出去|多掏|掏了|让利(?![的])/,
+  // [r275 补腿] 胜负/机会竞争语域的所失方：输、失去、落选、被挤掉。
+  // r161 教训：收裸词形态——「输」「失去」不带宾语也承重。
+  /输了|输掉|败了|落败|落选|没选上|没选上|被刷|被淘汰|出局|没机会|失去|失掉|少了|少赚|少拿|少得|受损|被挤|被顶|被顶替|被替换|被裁|被辞|被辞退|被优化|丢工作|失业|排名下降|掉出/,
+  // [r275 补腿2] 与 GAIN 侧「多赚/变富/切走大块」对置的所失量：
+  // 「少赚一块钱」「变穷」「拿小块」「少分」。诊断实证 L1/L4/L9
+  // 在原表下 LOSS 零命中。
+  /少挣|少分|少得|变穷|穷下去|更穷|被变穷|拿小块|分得少|分到少|切小块|份额变小|分得少|拿更少|得到更少|少受益|少得益|被压缩|被摊薄/,
+  // [r275 补腿3] 职场挤出语域：「被挤了下来/被顶掉/被比下去」——
+  // L2「他升职加薪了，说明有人被他挤了下来」的所失方。零和叙事在
+  // 晋升与岗位争夺语域里的典型所失形态，非货币、无「亏/输」字样。
+  /被挤|挤了|挤掉|被顶|被比下去|比下去|被刷下来|刷下来|被顶替|取代了|被换掉|换掉|被抢走|抢走|被夺走|夺走|被抢占|抢占|被占掉|占掉/,
 ];
 
 // ─── 腿② 所得方 GAIN（中文）──────────────────────────────────────
 const GAIN_ZH = [
   /赚了|赚得|挣了|多赚|赚的|挣的|赚大头|挣大头|拿大头|捞一笔|捞一票|获利|盈利|得利|受益|发了财|发财|省了钱|省钱|获益|渔利|牟利|分到大头|占了大头|拿走|拿到|利润|收益|毛利|营收|营业额|报酬/,
+  // [r275 补腿] 胜负/机会竞争语域的所得方：赢、得到、升职、入选、
+  // 拿到名额。r161 教训：收裸词形态——「赢」「得到」不带宾语也承重。
+  /赢了|赢到|胜出|夺冠|拿下|得到|获得|入选|选中|被选|升职|晋升|加薪|上位|占位|抢到|夺得|攀上|跻身/,
+  // [r275 补腿2] 量词-损益对置与份额词：「多赚一块钱/少赚一块钱」
+  // 「变富/变穷」「切走大块/拿小块」「多分/少分」。r161 教训：同一族
+  // 里「赚」的裸词与「多赚/少赚」的偏指形态都要收——前者是动作，后者
+  // 才是零和断言里真正出现的对置量。
+  // 【承重约束】只收**带偏指/量差/份额语义**的词形，不收「拿走/拿到/
+  // 得到/切走」这类裸动词——裸动词会让 C-2 比较平行形测试句
+  // （「他们出口越多赚得越多，我们买得越多就亏得越多」）改走 C-1
+  // 推断链，导致注入 COMP_ZH=永假后仍然命中，破坏「COMP_ZH 承重」
+  // 单测（r275 实测回归 23/23 → 22/23）。偏指量词天然不构成
+  // 比较平行形（比较平行要「越X越Y」结构），故无此风险。
+  /多赚|多挣|多拿|多分|多得|变富|富起来|更富|切走|拿大头|占大头|份额变大|分得多|切大块|拿大块|拿走更多|得到更多|拿得多|多得益|多受益|赚得更多|挣得更多|分到更多/,
 ];
 
 // ─── 腿② C-1 推断词（中文）───────────────────────────────────────
-const INFER_ZH = /所以|因此|因而|可见|说明|意味着|证明|显然|肯定|必然|一定|注定|那就|相当于|等于|即是|无非|不过就是|说白了|说到底|也就|自然|势必|全是|都是|是因为|因为/;
+// 【r275 收紧】不收录「就/那就/就只能/只能」这类泛伴随词——C-2 比较
+// 平行形测试句「他们出口越多赚得越多，我们买得越多就亏得越多」里的
+// 「就」会被 INFER 捕获，使该句改走 C-1 推断链，注入 COMP_ZH=永假后
+// 仍命中，破坏「COMP_ZH 承重」单测（r275 实测回归）。零和断言的推断
+// 力由「说明/意味着/必然/一定」等实词承担，泛「就」不承重。
+const INFER_ZH = /所以|因此|因而|可见|说明|意味着|证明|显然|肯定|必然|一定|注定|相当于|等于|即是|无非|不过就是|说白了|说到底|自然|势必|必将|必定|定然|全是因为|完全是因为|归根到底|说到底/;
 
 // ─── 腿② E-1 显式零和短语（中文）─────────────────────────────────
 const EXPLICIT_ZH = [
@@ -121,6 +169,23 @@ const EXPLICIT_ZH = [
   /(?:拿|赚|获|取)走?的[^。；]{0,12}(?:全是|都是|正是|即是)[^。；]{0,12}(?:吐|付|亏|损|失|代价)/,
   /每[^。；，]{0,12}(?:赚|获利|得利|多拿|多挣)[^。；]{0,16}(?:亏|损|失|代价)/,
   /(?:所赚|所获|所得)[^。；，]{0,8}(?:即|就是|全是)[^。；，]{0,8}(?:所失|所亏|损失|代价)/,
+  // [r275 补腿] 损益对置方程形（E-2 新族）：收益方词 + 等词/推断词 +
+  // 损失方词，双向可写（「你的收益就是我的损失」/「我的损失就是你
+  // 的收益」）。诊断实证原五形对「你多赚一块钱，就一定有人少赚一块
+  // 块钱」「A 赢意味着 B 输」「他得到了这份工作，你就必然失去这个
+  // 机会」全部零覆盖——这类句子的收益词（赚/赢/得到/收益）与损失词
+  // （少赚/输/失去/损失）由等词或推断词直接对置，中间隔的是损益主体
+  // 指称而非损益量。
+  /(?:你|我|他|对方|有人|他人|别人|一方|赢家|胜者)的?(?:收益|所得|获利|盈利|得到|赢得|赢|赚|多赚|收入|成果|好处|利益)[^。；，]{0,14}(?:就是|等于|即是|意味着|说明|换来)[^。；，]{0,14}(?:我|你|他|对方|有人|他人|别人|另一方|输家|败者)的?(?:损失|所失|亏损|失去|输|亏|少赚|代价|付出)/,
+  /(?:我|你|他|对方|有人|他人|别人|一方)的?(?:损失|所失|失去|亏损|亏)[^。；，]{0,14}(?:就是|等于|即是|意味着|说明|换来)[^。；，]{0,14}(?:你|我|他|对方|有人|他人|别人|另一方)的?(?:收益|所得|获利|得到|赢得|赚|多赚|好处|利益)/,
+  // 无主体词的裸对置形：「有赚就有亏」「有人赚就一定有人亏」
+  /(?:有人|有人家|总有人)?[^。；，]{0,6}(?:赚|赢|得到|获利)[^。；，]{0,10}(?:就|必然|一定|注定|势必)[^。；，]{0,10}(?:有)?(?:人|他人|别人)?[^。；，]{0,4}(?:亏|输|失去|损失|少赚|受损)/,
+  // 【r275 撤腿】不收「越…赚…越…亏」形——它与 C-2 比较平行形
+  // （「他们出口越多赚得越多，我们买得越多就亏得越多」）结构完全重叠，
+  // 而 COMP_ZH 已覆盖该结构。r275 实测：注册该形后单测「注入
+  // COMP_ZH=永假 → C-2 承重」回归（22/23）——测试句改走 E-2 旁路，
+  // 说明该形不是独立族而是 C-2 的重复注册。零和断言的「越X越Y」必须
+  // 由 COMP_ZH 承重，这是 r218 设计的腿②归属纪律。
   // 反问族：「难道A赚…，我们还能不亏吗」——用反问句式包装的零和断言。
   // 收紧在「还能不/岂不/不得不/不能不 + 损益词」形，放过质疑式反问
   // （「难道他们赚大头，就证明我们亏了吗？」是在质疑零和叙事，不判）。
@@ -135,9 +200,15 @@ const COMP_ZH = /越[多较高][^。；，]{0,14}(?:赚|获利|盈利|得利|受
 const CONTEXT_EN = [
   /\b(?:trade|trading|deals?|exchange|imports?|exports?|purchase|purchases|purchased|contract|contracts|transaction|transactions|business|commerce|market|buyers?|sellers?|vendors?|suppliers?|customers?|clients?|partners?|partnership)\b/i,
   /\b(?:they|them|their|we|us|our|the\s+other\s+(?:side|party)|one\s+side|another\s+party|both\s+sides)\b/i,
+  // [r275 补腿] 损益双方指称（英）：收益方与损失方作为两个可区分主体被并置
+  /\b(?:you|them|they|each other|one another|someone else|others?|rivals?|opponents?|competitors?|winner|loser)\b/i,
 ];
 const GAIN_EN = [
   /\b(?:earn|earns|earned|earnings|earning|profit|profits|profited|profitable|gain|gains|gained|benefit|benefits|benefited|save|saves|saved|savings|pocket|pocketed|rake\s+in|rakes\s+in|raked\s+in|cash\s+in|cashes\s+in)\b/i,
+  // [r275 补腿] 非货币与一般所得（英）：make（赚到）、win、take、
+  // get——L6 "Every dollar you make is a dollar taken from someone else"
+  // 在原表下 GAIN 零命中。r161 教训：收裸词形态。
+  /\b(?:make|makes|making|made|win|wins|winning|won|take|takes|taking|took|get|gets|getting|got|score|scores|scoring|secure|secures|secured|advance|promoted)\b/i,
 ];
 const LOSS_EN = [
   /\b(?:lose|loses|lost|loss|losses|taken|taking|paying|pay|paid|expense|suffer|suffers|suffered|worse\s+off|shortchanged|ripped\s+off|fleeced|left\s+with\s+less|overpay\w*|overcharg\w*)\b/i,
@@ -155,20 +226,43 @@ const EXPLICIT_EN = [
   /\bour\s+loss\b/i,
   /\bwhat\s+they\s+win\b[^.]{0,40}\bwe\s+(?:lose|lost)\b/i,
   /\bevery\s+(?:dollar|cent|unit|euro|yuan)\s+they\s+earn\b[^.]{0,40}\b(?:taken|lost|from\s+us)\b/i,
+  // [r275 补腿] E-2 方程形（EN）：Every dollar YOU make IS A DOLLAR taken
+  // FROM SOMEONE ELSE. —— 所得与所失由「is a」直接等同、所失方是
+  // someone else 而非 us/our，故 C-3 与 E-2 既有形都不命中。诊断实证
+  // L6 在原表下 GAIN/LOSS 双零命中。
+  /\bevery\s+(?:dollar|cent|unit|euro|yuan)\s+(?:that\s+)?(?:you|they|he|she|we|I)\s+(?:make|earn|gain|win|take|get)\b[\w\s,']{0,24}\b(?:is|are)\s+(?:a|an|one)?\s*(?:dollar|cent|unit|euro|yuan)?\s*\w{0,12}\s*(?:taken|lost|away)\s+from\s+(?:someone|somebody|others?|them)\b/i,
   // E-2 损益方程形（EN）：what they earn is what we lose / their gain equals our loss
   /\bwhat\s+they\s+(?:earn|gain|profit)\b[^.]{0,30}\b(?:is|equals?)\b[^.]{0,30}\b(?:we\s+(?:lose|lost)|our\s+(?:loss|losses))\b/i,
   /\btheir\s+(?:gain|profit|earnings?)\s+(?:is|equals?|means)\s+our\s+(?:loss|losses)\b/i,
   // C-3 每A即B形（EN）：every dollar they make is a dollar off our books
   /\bevery\s+(?:dollar|cent|unit|euro|yuan)\s+they\s+(?:make|earn|take)\b[^.]{0,40}\b(?:off\s+our|from\s+our|out\s+of\s+our)\b/i,
+  // [r275 补腿] 损益对置方程形（英，镜像 E-2 新族）：收益方词 + 等词/
+  // 推断词 + 损失方词，双向可写；含「if X gains, Y must lose」与
+  // 「X wins only when Y loses」两个条件对置形。
+  /\b(?:your|my|his|her|their|our|one'?s)\s+(?:gain|gains|profit|win|success|earnings?|benefit|benefits|advantage)\b[\w\s,']{0,20}\b(?:is|are|means|implies|equals?|signals)\b[\w\s,']{0,20}\b(?:my|your|his|her|their|our|someone\s+else'?s)\s+(?:loss|losses|losing|defeat|cost|expense|disadvantage)\b/i,
+  /\b(?:my|your|his|her|their|our)\s+(?:loss|losses|losing|defeat)\b[\w\s,']{0,20}\b(?:is|are|means|implies|equals?|signals)\b[\w\s,']{0,20}\b(?:your|my|his|her|their|our)\s+(?:gain|gains|profit|win|success|benefit)\b/i,
+  /\bif\s+(?:you|they|we|I)\s+(?:gain|win|succeed|profit|benefit|earn)\b[\w\s,']{0,24}\b(?:I|you|we|they)\s+(?:must|have\s+to|will|shall|necessarily)\s+(?:lose|losing|fail|suffer|be\s+worse\s+off)\b/i,
+  /\b(?:you|they|we|I)\s+(?:gain|win|earn|succeed)\b[\w\s,']{0,20}\bonly\s+(?:when|if|because)\b[\w\s,']{0,20}\b(?:I|you|we|they)\s+(?:lose|losing|fail|suffer)\b/i,
+  /\bthe\s+more\s+[\w\s,']{0,24}\b(?:gain|win|earn|benefit|succeed)\b[\w\s,']{0,24}\bthe\s+more\b[\w\s,']{0,24}\b(?:lose|losing|loss|suffer)\b/i,
 ];
 const COMP_EN = /\bthe\s+(?:more|less|better|harder)\b[^.]{0,40}\b(?:earn|profit|gain|sell|sells|sold|export|exports|ship|benefit)\b[^.]{0,60}\bthe\s+(?:more|less|worse)\b[^.]{0,40}\b(?:lose|lost|loss|pay|paid|suffer|worse\s+off)\b/i;
 
 // ─── 豁免一：教学/概念转述（讨论概念本身不是运用它）────────────────
 const EXEMPT_META_ZH = [
   /教材|课堂|教科书|讲座|教案|习题|论文|文献|称为|定义为|概念|所谓|是指|悖论|理论上|博弈论|学术|研讨|谬误|误区|思维陷阱|认知偏误/,
+  // [r275] 「零和博弈/零和游戏/零和思维」作为**被讨论的概念名**出现时，
+  // 后文是定义或属性陈述（「在零和博弈里，一方所得正是另一方所失」是
+  // 教科书定义句，不是运用）。与 EXPLICIT_ZH 的 E-1 同词形，靠这句豁免
+  // 区分「谈论概念」与「运用概念」。
+  /(?:在|这是|属于|所谓|称为|所谓|就是|属于|典型|标准|严格|真正|纯粹|完全|真正意义上的|教科书式的|经典|典型)的?(?:零和博弈|零和游戏|零和思维|零和局|零和局面|零和情境)/,
 ];
 const EXEMPT_META_EN = [
   /\b(?:textbook|lecture|paradox|called|defined|definition|concept|game\s+theory|theory|fallacy|misconception|cognitive\s+bias|paper|study\s+(?:shows|found))\b/i,
+  // [r275] 与 ZH 镜像的「严格/纯粹/教科书式 + zero-sum」定义形——「strict
+  // zero-sum game」是教科书定义句而非断言运用。诊断实证 EN 良性样本
+  // "In a strict zero-sum game, one player's payoff is the other player's
+  // loss." 在原表下被 EXPLICIT_EN 的 zero-sum 与 E-2 方程形双命中。
+  /\b(?:strictly|truly|pure(?:ly)?|technically|textbook|classic(?:al)?|standard|by\s+definition|in\s+a)\s+zero[-\s]?sum\s+(?:game|games|situation|scenario|setting|contest|match|framework|model)\b/i,
 ];
 
 // ─── 豁免二：正确响应形（指出交换可双侧获益，正是要教的判别动作）───
