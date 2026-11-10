@@ -39,7 +39,7 @@
 // ─── C1: 二元框架标记 ────────────────────────────────────
 // 中文：要么A要么B / 只有两种 / 没有折中 / 不存在第三种立场 / 二选一。
 // 边界：只说「两个方案」而不排除其他可能的不判（那是并列陈述）。
-const DILEMMA_ZH = /(?:要么|或者|或是|或是)(?:[^，。？！；\n]{0,40}?)(?:要么|或者|或是)|(?:要么|或者|或是)(?:[^，。？！；\n]{0,40}?)?[，,](?:要么|或者|或是)|(?:只有|仅有|不外乎|不外)(?:两种|两个|两条|两方面)(?:选择|选项|态度|路|立场|可能|情况|结果|答案|声音)|(?:不是|不)(?:[^，。？！；\n]{0,20}?)(?:就是|便是|即是)[^，。？！；\n]{0,25}|(?:没有|不存在|谈不上|谈不上有|无)(?:任何|什么|半点|丝毫)?(?:中间|折中|妥协|中立|回旋|腾挪|商量|第三条|第三|第三种|其他|别的)(?:这个|那个|这种|那种|一种|一个)?(?:的)?(?:路线|道路|选项|立场|态度|可能|选择|余地|空间)|(?:非|必须)(?:[^，。？！；\n]{0,15}?)(?:即|则|那)[^，。？！；\n]{0,20}|二选一|别无选择|没有选择(?:的余地|空间)|(?:站|划)(?:队|分界)/;
+const DILEMMA_ZH = /(?:要么|或者|或是|或是)(?:[^，。？！；\n]{0,40}?)(?:要么|或者|或是)|(?:要么|或者|或是)(?:[^，。？！；\n]{0,40}?)?[，,](?:要么|或者|或是)|(?:只有|仅有|不外乎|不外)(?:两种|两个|两条|两方面)(?:选择|选项|态度|路|立场|可能|情况|结果|答案|声音)|(?:不是|不)(?:[^，。？！；\n]{0,20}?)[，,]?(?:就是|便是|即是)[^，。？！；\n]{0,25}|(?:没有|不存在|谈不上|谈不上有|无)(?:任何|什么|半点|丝毫)?(?:中间|折中|妥协|中立|回旋|腾挪|商量|第三条|第三|第三种|其他|别的|灰色)(?:这个|那个|这种|那种|一种|一个)?(?:的)?(?:地带|区域|路线|道路|选项|立场|态度|可能|选择|余地|空间)|(?:非|必须)(?:[^，。？！；\n]{0,15}?)(?:即|则|那)[^，。？！；\n]{0,20}|二选一|别无选择|没有选择(?:的余地|空间)|(?:站|划)(?:队|分界)|(?:中庸|折中|调和|中间|灰色)(?:就是|等于|无非是|不过是)(?:和稀泥|骑墙|墙头草|两头讨好|各打五十大板|逃避|投降)/;
 
 // 英文：either A or B / there are only two / no middle ground /
 // no third option / it is a binary choice。
@@ -50,7 +50,7 @@ const DILEMMA_EN = /\beither\s+[^.!?;]{2,60}?\s+or\s+[^.!?;]{2,60}\b|\bthere\s+(
 // ─── C2a: 强迫表态（把二元框架变成立场胁迫）────────────────
 // 中文：你选一个 / 必须表态 / 必须站队 / 现在就要答案 / 没有中立。
 // 这是「伪」的放大器——真实二元陈述不需要逼人表态。
-const FORCE_ZH = /(?:你|你们)(?:给|来)?(?:选|挑|定)(?:一个|一下吧?|个吧)?|必须?(?:现在|立刻|马上|当即|今天|此刻)?(?:表态|站队|选边|表明|选出|选一个|选择|定夺|给出|回答|决定|二选一)|(?:现在|今天|此刻)(?:就)?(?:要|得)(?:一个|个)?(?:答案|答复|态度|立场|结果)|你(?:到底|究竟)(?:站|选|支不支持|同不同意)|别(?:再)?(?:含糊|模糊|犹豫|回避|打太极|和稀泥|再无消磨)/;
+const FORCE_ZH = /(?:你|你们)(?:给|来)?(?:选|挑|定)(?:一个|一下吧?|个吧)?|必须?(?:现在|立刻|马上|当即|今天|此刻)?(?:表态|站队|选边|表明|选出|选一个|选择|定夺|给出|回答|决定|二选一)|(?:现在|今天|此刻)(?:就)?(?:要|得)(?:一个|个)?(?:答案|答复|态度|立场|结果)|你(?:到底|究竟)(?:站|选|支不支持|同不同意)|别(?:再)?(?:含糊|模糊|犹豫|回避|打太极|和稀泥|再无消磨)|(?:要|必须|应当|就得|需要)(?:立场)?(?:鲜明|坚定|明确|站队|选边站)/;
 
 // 英文：pick one / you have to choose / take a side / stay neutral is not
 // an option。
@@ -59,11 +59,19 @@ const FORCE_EN = /\b(?:pick|choose|take)\s+(?:one|a\s+side|your\s+side|sides)\b|
 // ─── C2b: 一侧污名化（把非A选项定性为敌对/错误立场）─────────
 // 中文：不支持就是反对 / 不X就是Y / 否则就是（对立面/不信任/没担当）。
 // 边界：「不是Bug就是需求变更」这类技术中性二分不判，需带定性词。
-const STIGMA_ZH = /(?:不|没)(?:支持|认同|同意|赞成|相信|信任|配合|参与|接受)(?:我们|大家|团队|公司|组织)?(?:，|,)?(?:就是|便是|即|等于|意味着|说明)(?:[^，。？！；\n]{0,25}?(?:对立面|反对|反|背叛|抛弃|否认|否定|不信任|不信|没担当|不负责|自私|冷漠|旁观|看戏|唱反调|异类|外人|不把|不当))|(?:否则|不然|要不然)(?:就是|便是|意味着|等于|说明)(?:[^，。？！；\n]{0,25}?(?:对立面|反对|背叛|不信任|外人|不把|不当|没))|(?:完全|彻底|无条件|百分之百)(?:配合|支持|信任|服从|认同)(?:，|,)?(?:否则|不然|要不然|或者|要么|再?不然)/;
+// [r277] 新族 n1「不是A，就是B(贬名)」——A/B 是关系名词、B 是污名标签
+// （「不是朋友，就是敌人」）；n2 要么A要么就是跟我作对（胁迫二选对立定性）；
+// n3 不X就是不Y（不转发=不爱国：行为族×品质标签族）。旧判据的动词表
+// （支持/认同/配合…）与结论词表均不收这些形状，整族射程外。
+const STIGMA_ZH = /(?:不|没)(?:支持|认同|同意|赞成|相信|信任|配合|参与|接受)(?:我们|大家|团队|公司|组织)?(?:，|,)?(?:就是|便是|即|等于|意味着|说明)(?:[^，。？！；\n]{0,25}?(?:对立面|反对|反|背叛|抛弃|否认|否定|不信任|不信|没担当|不负责|自私|冷漠|旁观|看戏|唱反调|异类|外人|不把|不当))|(?:否则|不然|要不然)(?:就是|便是|意味着|等于|说明)(?:[^，。？！；\n]{0,25}?(?:对立面|反对|背叛|不信任|外人|不把|不当|没))|(?:完全|彻底|无条件|百分之百)(?:配合|支持|信任|服从|认同)(?:，|,)?(?:否则|不然|要不然|或者|要么|再?不然)|(?:不是|算不上|不算|绝非)(?:[^，。？！；\n]{0,10}?)(?:，|,)?(?:就是|便是|即|等于)(?:[^，。？！；\n]{0,12}?)(?:敌人|仇人|陌路|对头|叛徒|奸细|间谍|坏人|恶人|人渣|垃圾|废物|走狗|卖国贼)|(?:要么|或者|再?不然)(?:[^，。？！；\n]{0,30}?)(?:要么|或者|就是|便是)(?:[^，。？！；\n]{0,12}?)(?:作对|对立|对抗|过不去|对着干|唱反调|背叛|反对我|反对我们)|(?:不|没)(?:转发|分享|点赞|转评|声援|买|用|看|听)(?:[^，。？！；\n]{0,12}?)[，,]?(?:就是|便是|等于|意味着)(?:[^，。？！；\n]{0,15}?)(?:不爱国|不忠|不孝|冷血|没良心|无心|卖国|叛徒|走狗|别有用心|居心不良)/;
 
 // 英文：if you don't X, you're Y / anyone who doesn't ... is ...
 // 边界：「if not A, then B」用于纯流程说明（不判）需带定性词。
-const STIGMA_EN = /\b(?:if\s+you\s+(?:don'?t|do\s+not|aren'?t|are\s+not)\s+[^.!?;]{2,50}?,\s*(?:then\s+)?(?:you'?re|you\s+are)\s+(?:not\s+)?(?:against|opposing|with\s+them|against\s+us|the\s+enemy|part\s+of\s+the\s+problem|no\s+better|just\s+as\s+bad|disloyal|untrustworthy))\b|\b(?:anyone|anybody|no\s+one)\s+who\s+(?:doesn'?t|does\s+not|isn'?t|is\s+not)\s+[^.!?;]{2,50}?\s+(?:is|are)\s+(?:not\s+)?(?:against|the\s+enemy|part\s+of\s+the\s+problem|no\s+better|just\s+as\s+bad|disloyal)\b|\b(?:you'?re|you\s+are)\s+(?:either\s+)?(?:with\s+us|for\s+us)\s+or\s+(?:you'?re\s+)?(?:against\s+us|the\s+enemy|part\s+of\s+the\s+problem)\b|\bunconditional\s+(?:support|compliance|obedience)\b/i;
+// [r277] 新族：① 分支一扩 "you do not care about" 与 "not one of us /
+// on the wrong side" 结论词（"If you do not share this, you do not care
+// about the cause."）；② either a friend or an enemy（关系名词二分）；
+// ③ or you are against me（同意一切否则对立，反向语序形）。
+const STIGMA_EN = /\b(?:if\s+you\s+(?:don'?t|do\s+not|aren'?t|are\s+not)\s+[^.!?;]{2,50}?,\s*(?:then\s+)?(?:you'?re|you\s+are|you\s+do\s+not|you\s+don'?t)\s+(?:not\s+)?(?:care\s+about|against|opposing|with\s+them|against\s+us|the\s+enemy|part\s+of\s+the\s+problem|no\s+better|just\s+as\s+bad|disloyal|untrustworthy|not\s+one\s+of\s+us|on\s+the\s+wrong\s+side))\b|\b(?:anyone|anybody|no\s+one)\s+who\s+(?:doesn'?t|does\s+not|isn'?t|is\s+not)\s+[^.!?;]{2,50}?\s+(?:is|are)\s+(?:not\s+)?(?:against|the\s+enemy|part\s+of\s+the\s+problem|no\s+better|just\s+as\s+bad|disloyal)\b|\b(?:you'?re|you\s+are)\s+(?:either\s+)?(?:with\s+us|for\s+us)\s+or\s+(?:you'?re\s+)?(?:against\s+us|the\s+enemy|part\s+of\s+the\s+problem)\b|\bunconditional\s+(?:support|compliance|obedience)\b|\b(?:you'?re|you\s+are|it'?s|it\s+is)\s+either\s+(?:a\s+|an\s+)?\w+\s+or\s+(?:a\s+|an\s+)?(?:enemy|foe|adversary|opponent|traitor|nothing|nobody)\b|\bor\s+(?:you'?re|you\s+are)\s+(?:against|opposed\s+to|with)\s+(?:me|us|him|her|them)\b/i;
 
 // ─── 豁免：真实二元 / 程序性二选 / 技术限定 ─────────────────
 // 判据边界：这些句子**也有**二元措辞，但二元是事实陈述或流程说明，
@@ -80,12 +88,22 @@ const FACTUAL_EN = /\b(?:the\s+)?(?:field|column|parameter|variable|boolean|flag
 const SCHEDULE_ZH = /(?:排期|窗口期|资源|预算|工期|人力)(?:决定|限制|约束)(?:了)?(?:只)?(?:能|有|需)(?:两个|两种|两条)|(?:要么|或者)(?:今天|这周|本月|现在|立即)(?:发布|上线|提交|交付|上线)(?:，|,)?(?:要么|或者|就)(?:等|等到|推到|顺延到)(?:下周|下个月|下个窗口|之后|以后)|(?:A|B)\s*方案(?:延迟|延期|砍|缩|加|减)/;
 const SCHEDULE_EN = /\b(?:timeline|schedule|budget|headcount|deadline|release\s+window)\s+(?:decides?|determines?|dictates?|limits?)\b|\b(?:either|either\s+ship|ship)\s+(?:today|now|this\s+week)\s+or\s+(?:wait|slip|delay)\s+(?:until\s+|for\s+)?(?:next\s+week|the\s+next\s+window|next\s+month)\b|\b(?:option|plan|scope)\s+[AB12]\s+(?:is|costs?)\s+(?:three\s+days|delayed|cut|reduced)/i;
 
+// ─── 排除中项单独形（无 C2 放大器亦命中）────────────────────
+// 「没有中间路线 / no middle ground」本身就是伪二选一的定义句。
+// [r277] 扩「灰色地带 / gray area」族——旧判据只收「中间/折中/妥协」
+// 与 EN middle ground/third option 形，「没有灰色地带」「There is no
+// gray area」整族射程外。
+const EXMID_ZH = /(?:没有|无|不存在)(?:任何|什么|半点|丝毫)?(?:中间|折中|妥协|中立|回旋|腾挪|商量|第三条|第三|第三种|其他|别的|灰色)(?:这个|那个|这种|那种|一种|一个|的)?(?:地带|区域|路线|道路|选项|立场|态度|可能|选择|余地|空间)/;
+const EXMID_EN = /no\s+(?:middle\s+ground|third\s+option|in[- ]between|other\s+option|room\s+for\s+nuance|middle\s+path|neutral|room\s+to\s+compromise|(?:gray|grey)\s+area)/i;
+
 /**
  * @param {string} text 归一化后的文本
+ * @param {object} [inject] 负例脚本注入用：以自定义正则替换指定常量
  * @returns {{hit:boolean, score:number, detail:string}}
  */
-function checkFalseDilemma(text) {
+function checkFalseDilemma(text, inject) {
   if (!text || text.length < 6) return { hit: false, score: 0, detail: '' };
+  const R = inject || {};
 
   // 豁免：技术/事实/排期二元在场时，本族不判。
   // 注意豁免**不**覆盖 C2b 污名化形——「不是支持我们就是反对我们」
@@ -93,20 +111,20 @@ function checkFalseDilemma(text) {
   const factual = FACTUAL_ZH.test(text) || FACTUAL_EN.test(text);
   const scheduled = SCHEDULE_ZH.test(text) || SCHEDULE_EN.test(text);
 
-  const dilemma = DILEMMA_ZH.test(text) || DILEMMA_EN.test(text);
-  const force = FORCE_ZH.test(text) || FORCE_EN.test(text);
-  const stigma = STIGMA_ZH.test(text) || STIGMA_EN.test(text);
+  const dilemma = (R.DILEMMA_ZH || DILEMMA_ZH).test(text) || (R.DILEMMA_EN || DILEMMA_EN).test(text);
+  const force = (R.FORCE_ZH || FORCE_ZH).test(text) || (R.FORCE_EN || FORCE_EN).test(text);
+  const stigma = (R.STIGMA_ZH || STIGMA_ZH).test(text) || (R.STIGMA_EN || STIGMA_EN).test(text);
 
   const isZh = /[\u4e00-\u9fa5]/.test(text);
-  const hitZh = DILEMMA_ZH.test(text);
-  const hitEn = DILEMMA_EN.test(text);
+  const hitZh = (R.DILEMMA_ZH || DILEMMA_ZH).test(text);
+  const hitEn = (R.DILEMMA_EN || DILEMMA_EN).test(text);
 
   // C2b 污名化单独即命中：一侧定性本身已构成压迫（与其它维度
   // 「DEFLECT_DENY 单独支」同设计），事实性豁免不覆盖它。
   if (stigma && (dilemma || force || (isZh ? hitZh : hitEn))) {
     return { hit: true, score: 0.82, detail: '二选一污名化(不支持就是反对)' };
   }
-  if (STIGMA_EN.test(text)) {
+  if ((R.STIGMA_EN || STIGMA_EN).test(text)) {
     return { hit: true, score: 0.82, detail: '二选一污名化(with us or against us)' };
   }
 
@@ -118,8 +136,8 @@ function checkFalseDilemma(text) {
   // 二元框架单独形：句式里同时出现显式「排除中项」时即命中
   // （没有中间路线/no middle ground 本身就是伪二选一的定义句）。
   // 事实/排期二元不判。
-  const excludeMiddle = /(?:没有|无)(?:任何|什么|半点|丝毫)?(?:中间|折中|妥协|中立|回旋|腾挪|商量|第三条|第三|第三种|其他|别的)(?:这个|那个|这种|那种|一种|一个|的)?(?:路线|道路|选项|立场|态度|可能|选择|余地|空间)/.test(text)
-    || /no\s+(?:middle\s+ground|third\s+option|in[- ]between|other\s+option|room\s+for\s+nuance|middle\s+path|neutral|room\s+to\s+compromise)/i.test(text);
+  const excludeMiddle = (R.EXMID_ZH || EXMID_ZH).test(text)
+    || (R.EXMID_EN || EXMID_EN).test(text);
   if (excludeMiddle && !factual && !scheduled) {
     return { hit: true, score: 0.72, detail: '排除中项(没有中间路线)' };
   }
@@ -127,4 +145,10 @@ function checkFalseDilemma(text) {
   return { hit: false, score: 0, detail: '' };
 }
 
-module.exports = { checkFalseDilemma };
+module.exports = {
+  checkFalseDilemma,
+  __internals: () => ({
+    DILEMMA_ZH, DILEMMA_EN, FORCE_ZH, FORCE_EN, STIGMA_ZH, STIGMA_EN,
+    FACTUAL_ZH, FACTUAL_EN, SCHEDULE_ZH, SCHEDULE_EN, EXMID_ZH, EXMID_EN,
+  }),
+};
