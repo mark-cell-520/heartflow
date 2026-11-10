@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 243 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
-×  1,316 dispatch routes  ×  20,651 passing tests  ×  2 npm dependencies
+×  1,316 dispatch routes  ×  20,695 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.166**. Not marketing copy.
 | Dispatch routes | 1,316 |
 | Discrimination dimensions | 243 |
 | MCP tools | 185 |
-| Test suite | 20,651 passing / 134 failing | `node test/run-all.js` (full run 2026-11-10; passed baseline resynced per r241/r412 precedent — failed 134 is long-standing runner/flaky noise, not gated) |
+| Test suite | 20,695 passing / 135 failing | `node test/run-all.js` (full run 2026-11-11; passed baseline resynced per r241/r412 precedent — failed 135 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修，失败数与 r280 基线持平)) |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |

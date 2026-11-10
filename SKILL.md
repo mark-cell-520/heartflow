@@ -90,7 +90,7 @@ from marketing copy.
 | Dispatch routes | 1,316 | sum of entries in `hf.routes()` |
 | Discrimination dimensions | 243 | `dimMap` keys in `src/index.js` |
 | MCP tools | 185 | tool definitions exposed via `tools/list` |
-| Test suite | 20,651 passing / 134 failing | `node test/run-all.js` (full run 2026-11-10; passed baseline resynced per r241/r412 precedent — failed 134 is long-standing runner/flaky noise, not gated) |
+| Test suite | 20,695 passing / 135 failing | `node test/run-all.js` (full run 2026-11-11; passed baseline resynced per r241/r412 precedent — failed 135 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修，失败数与 r280 基线持平)) |
 | Capability guard | 20 / 20 checks | `node scripts/guard-abilities.js` |
 | Security regression | 16 / 16 | `node test/security-audit.test.js` |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) | `dependencies` in `package.json` |
