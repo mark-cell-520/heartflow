@@ -1,3 +1,23 @@
+# 6.8.160 变更日志条目
+
+## [6.8.160] - 2026-11-10
+
+### 新增（真升级②：已有维度的全新句式族）
+- **`counterfactual_overclaim`（第 173 维度）EN-B 倒装形结构腿升级（r277）**：原 `CF_EN_B_RE` 为「had + 人称代词 + 14 动词枚举表」（known/taken/chosen/invested/acted/gone/waited/listened/started/made/been/seen/tried/moved/stayed），58 个常见英文过去分词实测 **44 个漏判**（picked/decided/sold/bought/hired/signed/wrote/found/kept/put/cut/paid/sent/built/broke/held/read/gave/told/thought/felt/opted/switched/pivoted/expanded/paused/cancelled/delayed/shipped/launched/joined…），且组织/集体主语（the company / the team）整句漏判。
+  - 改造为「had + (人称代词 | 36 个组织名词) + **任意**过去分词」结构腿：`-ed/-en` 规则形走 `[a-z]+(?:ed|en)` 分支，同形过去式（left/wrote/gave/spoke/drive/ate/fall…）与不规则分词走白名单分支。
+  - **判定为真升级而非样本扩容**：结构腿使倒装形射程由枚举决定变为由语法形态决定；负例注入 `CF_EN_B_RE=永假` 确认 5/5 攻击样本由该腿承重（非 EN-A/EN-C 代拦），恢复后 5/5 仍命中。
+  - 文件：`src/counterfactual-overclaim.js`（EN-B 腿重构 + r277 注释）；维度计数不变（243 = BLOCK 11 / REWRITE 19 / VERIFY 210），模块数不变（162）。
+
+### 修复
+- `test/round-274-gate-family-extensions.test.js` VERSION 基线断言 `6.8.158` → `6.8.160`：r273 bump 至 6.8.159 时未回填该断言的跨轮次登记滞后（非适配性改动），r274 轮测恢复全绿。
+- 文档三层同步：README 规格表版本戳 + Version history 新增 6.8.160 条目；SKILL.md 版本戳两处。
+
+### 验证
+- r277 轮测 `test/round-277-counterfactual-inversion-leg.test.js`：**160 passed / 0 failed**。
+- 动词矩阵：改造前 MISS 44/58 → 改造后 MISS **0/58**；变体矩阵攻击 8/8 命中（gate 非 pass），良性 23/23 零误伤（含对冲/疑问/组织主语边缘良性）。
+- 五门禁：bin/verify.js **16/0**、guard-abilities **20/20**、doc-numbers **24/0**、bidirectional **召回 52/52、误拦 302/326 (92.6%)** 未升。
+- 撞墙检测（阶段1.5）：上一轮目标 zero-sum-fallacy 新句式族实证已完工（射程外：机会争夺/强制排名超「自愿交易/交换」射程，无真实增量），本轮换方向，记录于 UPGRADE_LOG。
+
 # 6.8.159 变更日志条目
 
 ## [6.8.159] - 2026-11-10
