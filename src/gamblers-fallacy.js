@@ -39,11 +39,18 @@
  *   · 腿① STREAK 历史连胜/连败/高频重复表达——连输/连赢/连败/
  *     连胜/连续N[把次回]/N次没中/前几次/这么[多长][把次回下]
  *     （中）；N times in a row / a streak of / N consecutive /
- *     N losses / N wins（英）；
+ *     N losses / N wins（英）；[r280 新增族] 期/天/周开奖计数
+ *     （十期没出）、黑红连开（连续黑了五把/连黑）、倒霉时长
+ *     （倒霉了这么久）、动词间隔形（连着输了）、冷热时长（冷了
+ *     这么多天）、运气持续差（运气一直差）；EN has been cold /
+ *     been hot、luck can't stay bad、cold streak/spell；
  *   · 腿② DUE 反转/概率升高预期——下一[把次回]肯定赢/该出[大小]/
  *     概率更[高多大了]/运气该回来/风水轮流转/该转运/肯定是[正面
  *     反面]/这次一定中/该轮到了（中）；is due / overdue / more
- *     likely / bound to（英）。
+ *     likely / bound to（英）；[r280 新增族] 不可能再[黑红输赢]
+ *     （否定反转）、[准铁定][能会]?[赢中]（下一把准赢）、再怎么
+ *     [也]?得…赢/中/回本（让步反转）、[也该总]轮到X了、该[冷热]
+ *     [一这]?[把次]（该热一把）。
  *   · 缺腿不判：只有腿①（「虽然连输五把，但每把都是独立事件，
  *     概率不变」）是正确概率陈述；只有腿②（「这个事情一定会
  *     成功」）无历史频率来源，归 confidence。
@@ -69,13 +76,23 @@
 'use strict';
 
 // ─── 腿①：历史连胜/连败/高频重复表达（中文）────────────────────────
-const STREAK_ZH = /(?:连[输赢败开押下注]|连胜|连败|连续[二三四五六七八九十百千\d]+[把次回下个局]|连续[输赢败开押中]|接连[输赢败开押中]|连连[输赢败开]|连续[输赢败中开]|[二三四五六七八九十百千\d]+[把次回下][没中都开是赢都][^。]{0,4}?(?:了|哩|咯)?|[二三四五六七八九十百千\d]+次[没中开是赢都]|[二三四五六七八九十\d]+次?[的正反]面|(?:正|反|背)面(?:出现|开出|开了|出过|连续|都是|又是|连开)?[一二三四五六七八九十百千\d]+次|[大小](?:连续|连)?(?:开|出)[了过]?[一二三四五六七八九十百千\d]+[把次天回]|前[面那]?[几一二三四五六七八九十百千\d]+[次把回下]|这么[多长][把次回下]|连着[二三四五六七八九十\d]*[把次回下局]|已经[输赢开]了?[二三四五六七八九十\d]*[把次回下]?|十次|五次|好几次|连续[二三四五六七八九十\d]+次|手气[正很][旺顺]|手气[正很][背着差霉]|手气背|手气差|手气不好|手风不顺|点子背|背到家|势头[正很][旺猛好]|还没吐分|没吐分|没出分|该吐分|[把场局]输了|连输|连开|连押)/;
+// [r280 新增族] 时间与概率推理方向——自然口语形穿透补收（探针实测 7/8
+// 零命中）：期/天/周开奖计数（十期没出）、黑红连开（连续黑了五把）、
+// 倒霉时长（倒霉了这么久）、动词间隔形（连着输了六个回合）、冷热时长
+// （冷了这么多天）、运气持续差（运气不可能一直差）。
+const STREAK_ZH = /(?:连[输赢败开押下注]|连胜|连败|连续[二三四五六七八九十百千\d]+[把次回下个局]|连续[输赢败开押中]|接连[输赢败开押中]|连连[输赢败开]|连续[输赢败中开]|[二三四五六七八九十百千\d]+[把次回下][没中都开是赢都][^。]{0,4}?(?:了|哩|咯)?|[二三四五六七八九十百千\d]+次[没中开是赢都]|[二三四五六七八九十\d]+次?[的正反]面|(?:正|反|背)面(?:出现|开出|开了|出过|连续|都是|又是|连开)?[一二三四五六七八九十百千\d]+次|[大小](?:连续|连)?(?:开|出)[了过]?[一二三四五六七八九十百千\d]+[把次天回]|前[面那]?[几一二三四五六七八九十百千\d]+[次把回下]|这么[多长][把次回下]|连着[二三四五六七八九十\d]*[把次回下局]|已经[输赢开]了?[一二三四五六七八九十\d]*[把次回下]?|十次|五次|好几次|连续[二三四五六七八九十\d]+次|手气[正很][旺顺]|手气[正很][背着差霉]|手气背|手气差|手气不好|手风不顺|点子背|背到家|势头[正很][旺猛好]|还没吐分|没吐分|没出分|该吐分|[把场局]输了|连输|连开|连押|[二三四五六七八九十百千\d]+[期天周节][没都][有出开中现冒]|连[续着]?[黑红]|[倒霉背晦]了[这那]?么?[久长]|连着[输赢败开押]了|[冷热]了[这那]?么?[久长多]|运气[^。]{0,8}(?:一直|始终|这么|那么|最近)[差背霉衰不好])/;
 
 // ─── 腿①：历史连胜/连败/高频重复表达（英文）────────────────────────
-const STREAK_EN = /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|many|several|multiple|so\s+many)\s+(?:times?\s+in\s+a\s+row|consecutive\s+(?:times|losses|wins|flips|tosses)|losses|wins|times|tosses|flips|draws|tails|heads|reds|blacks|spins|hands|rounds|rolls|pulls|games)\b|\b(?:a\s+streak\s+of|streak\s+of|a\s+(?:losing|winning|hot|cold)\s+streak)\b|\b(?:has\s+been|have\s+been|it\s+has\s+been)\s+(?:tails|heads|red|black|winning|losing|on\s+a\s+(?:losing|winning)\s+streak)\b|\b(?:has|have)\s+not\s+paid\s+out|\b(?:one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+in\s+a\s+row\b|\b(?:come|comes|came|coming)\s+up\s+(?:tails|heads|red|black|winning|losing)\b|\b(?:tails|heads|reds|blacks)\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+times\b|\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:straight|consecutive)\s+(?:losses|wins|defeats|games|tosses|flips)\b/i;
+// [r280 新增族] 自然口语形（探针实测穿透）：has been cold / been hot
+// （冷热时长直述）、luck can't stay bad（运气守恒义务形）、cold
+// streak / cold spell（冷淡期）。
+const STREAK_EN = /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|many|several|multiple|so\s+many)\s+(?:times?\s+in\s+a\s+row|consecutive\s+(?:times|losses|wins|flips|tosses)|losses|wins|times|tosses|flips|draws|tails|heads|reds|blacks|spins|hands|rounds|rolls|pulls|games)\b|\b(?:a\s+streak\s+of|streak\s+of|a\s+(?:losing|winning|hot|cold)\s+streak)\b|\b(?:has\s+been|have\s+been|it\s+has\s+been)\s+(?:tails|heads|red|black|winning|losing|on\s+a\s+(?:losing|winning)\s+streak)\b|\b(?:has|have)\s+not\s+paid\s+out|\b(?:one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+in\s+a\s+row\b|\b(?:come|comes|came|coming)\s+up\s+(?:tails|heads|red|black|winning|losing)\b|\b(?:tails|heads|reds|blacks)\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+times\b|\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:straight|consecutive)\s+(?:losses|wins|defeats|games|tosses|flips)\b|\b(?:has|have)\s+been\s+(?:cold|hot|dry)\b|\b(?:luck|my\s+luck|fortune)\s+(?:can['\u2019]?t|cannot|could\s+not)\s+stay\b|\bcold\s+(?:streak|spell|run)\b/i;
 
 // ─── 腿②：反转/概率升高预期（中文）────────────────────────────────
-const DUE_ZH = /(?:下一[把次回下][肯定一][会定][赢中]|下一次[肯定一][会定][赢中]|该出[大小]了|该出[大小]|该开[大小]|开[大小]了|[肯肯定]定?开[大小]|必开[大小]|(?:概率|几率)[更]?[大高多][多了高]|运气该回来|运气要回来|运气会回来|风水轮流转|该转运了|转运的时候|肯定是[正反]面|一定是[正反]面|这次一定[会中赢]|这次[肯定一][会定][中赢]|该轮到[我了它了]|反转的时候到了|时来运转|否极泰来|必中|下一[把次回下]?还能赢|一次赢回来|赢回来|运气攒着|攒着|第[一二三四五六七八九十百千\d]+[把次回下][^。！？!?]{0,4}(?:必赢|必中|肯定|一定|稳赢|稳中|跑不了|妥妥|没悬念)|[下一]?[把次回下][^。！？!?]{0,3}(?:必赢|必中|稳赢|稳中|妥妥的|稳了|没悬念|跑不了)|(?:怎么|再|总)?也该中|该中一次|该转运|该翻本|要翻本|能翻本|该赢回来|该回本|该(?:买|卖|押|下|跟)?[大小]|概率(?:该|要|会|得)?(?:回来|回归|回摆|摆回来))/;
+// [r280 新增族] 自然口语形反转预期（与 r280 腿①新族配套，探针实测穿透）：
+// 不可能再黑（否定反转）、下一把准赢（准/铁定语）、再怎么也得赢一回
+// （让步反转）、轮到它了（也该轮到）、该热一把了（冷热交替预期）。
+const DUE_ZH = /(?:下一[把次回下][肯定一][会定][赢中]|下一次[肯定一][会定][赢中]|该出[大小]了|该出[大小]|该开[大小]|开[大小]了|[肯肯定]定?开[大小]|必开[大小]|(?:概率|几率)[更]?[大高多][多了高]|运气该回来|运气要回来|运气会回来|风水轮流转|该转运了|转运的时候|肯定是[正反]面|一定是[正反]面|这次一定[会中赢]|这次[肯定一][会定][中赢]|该轮到[我了它了]|反转的时候到了|时来运转|否极泰来|必中|下一[把次回下]?还能赢|一次赢回来|赢回来|运气攒着|攒着|第[一二三四五六七八九十百千\d]+[把次回下][^。！？!?]{0,4}(?:必赢|必中|肯定|一定|稳赢|稳中|跑不了|妥妥|没悬念)|[下一]?[把次回下][^。！？!?]{0,3}(?:必赢|必中|稳赢|稳中|妥妥的|稳了|没悬念|跑不了)|(?:怎么|再|总)?也该中|该中一次|该转运|该翻本|要翻本|能翻本|该赢回来|该回本|该(?:买|卖|押|下|跟)?[大小]|概率(?:该|要|会|得)?(?:回来|回归|回摆|摆回来)|不可能[再又][黑红输赢]|[准铁定][能会]?[赢中]|再怎么[也]?得[^。！？!?]{0,8}(?:赢|中|回本|翻本|中一)|[也该总]轮到[它我你他]了|该[冷热][一这]?[把次])/;
 
 // ─── 腿②：反转/概率升高预期（英文）────────────────────────────────
 const DUE_EN = /\b(?:is\s+due|are\s+due|due\s+next|due\s+to\s+(?:happen|come\s+up|change)|due\s+for|overdue|must\s+be\s+(?:next|due)|more\s+likely\s+(?:now|next|this\s+time)|bound\s+to\s+(?:happen|come\s+up|win|change)|luck\s+is\s+(?:due|going\s+to\s+(?:turn|change))|a\s+win\s+is\s+(?:due|coming)|my\s+luck\s+will\s+turn|statistically\s+more\s+likely|guaranteed\s+to\s+(?:win|hit|come\s+up|pay)|bound\s+to\s+(?:hit|pay|strike|land|come\s+up)|(?:heads|tails|red|black|a\s+win|winning)\s+is\s+(?:coming|on\s+its\s+way)|almost\s+certainly\s+(?:black|red|heads|tails))\b/i;

@@ -1,0 +1,52 @@
+[ZERO] gamblers_reversal_zh :: 这个号十期没出了，下期出它的概率大多了。 :: action=pass dims=[]
+[ZERO] gamblers_reversal_zh :: 都连续黑了五把，下一把不可能再黑了。 :: action=pass dims=[]
+[ZERO] gamblers_reversal_zh :: 冷了这么多天，该热一把了。 :: action=pass dims=[]
+[ZERO] gamblers_reversal_zh :: 运气不可能一直差，下一把准赢。 :: action=pass dims=[]
+[ZERO] gamblers_reversal_zh :: 连着输了六个回合，再怎么也得赢一回了。 :: action=pass dims=[]
+[ZERO] gamblers_reversal_zh :: 概率上说也轮到它了。 :: action=pass dims=[]
+[ZERO] gamblers_reversal_zh :: 倒霉了这么久，下一次总该轮到我走运。 :: action=pass dims=[]
+[OTHER] gamblers_reversal_zh :: 已经陪了这么多把，下把我肯定能翻本。 :: action=verify dims=[]
+[OTHER] gamblers_reversal_en :: This number hasn’t come up in ten draw :: action=rewrite dims=[]
+[ZERO] gamblers_reversal_en :: Luck can’t stay bad forever; the next  :: action=pass dims=[]
+[ZERO] gamblers_reversal_en :: It has been cold for so long, a hot ro :: action=pass dims=[]
+[OTHER] gamblers_reversal_en :: After so many losing rounds, my win ha :: action=rewrite dims=[]
+[OTHER] prosecutor_zh :: 这个检测方法的准确率有 99%，那你没病的概率也只有 1%。 :: action=verify dims=[]
+[ZERO] prosecutor_zh :: DNA 比对吻合的概率是百万分之一，所以他是无辜的概率也只有百万分之一。 :: action=pass dims=[]
+[ZERO] prosecutor_zh :: 误差率只有千分之一，这案子判错的概率也就千分之一。 :: action=pass dims=[]
+[OTHER] prosecutor_zh :: 系统匹配度 95%，那人是他的概率就是 95%。 :: action=verify dims=[]
+[OTHER] prosecutor_zh :: 筛查的特异性高达 99%，没筛查出来就是没病。 :: action=verify dims=[]
+[OTHER] prosecutor_en :: The test is 99% accurate, so the proba :: action=rewrite dims=[]
+[ZERO] prosecutor_en :: The DNA match probability is one in a  :: action=pass dims=[]
+[OTHER] prosecutor_en :: The error rate is 0.1%, so the chance  :: action=rewrite dims=[]
+[OTHER] posthoc_zh :: 自从他当了主管，部门的业绩就上来了，说明他有方。 :: action=rewrite dims=[]
+[OTHER] posthoc_zh :: 换了新教练之后球队就连胜，显然是教练的功劳。 :: action=rewrite dims=[]
+[OTHER] posthoc_zh :: 打那以后风向就变了，准是他带来的运气。 :: action=rewrite dims=[]
+[OTHER] posthoc_zh :: 他上任那天开始，天气都变好了。 :: action=verify dims=[]
+[OTHER] posthoc_zh :: 从用了这款产品开始，业绩就涨了，可见产品有效。 :: action=rewrite dims=[]
+[OTHER] posthoc_en :: Ever since he took over, sales went up :: action=rewrite dims=[]
+[OTHER] posthoc_en :: After the new policy, things improved, :: action=rewrite dims=[]
+[ZERO] posthoc_en :: Once we moved to the new building, mor :: action=pass dims=[]
+[ZERO] conditional_prop_zh :: 要是他问心无愧，怎么不敢当面说清楚？ :: action=pass dims=[]
+[OTHER] conditional_prop_zh :: 如果真的没问题，早就公开了。 :: action=rewrite dims=[]
+[ZERO] conditional_prop_zh :: 倘若心里没鬼，何必躲躲藏藏？ :: action=pass dims=[]
+[OTHER] conditional_prop_zh :: 假如真的是清白的，现在就不会是这个态度。 :: action=rewrite dims=[]
+[OTHER] conditional_prop_en :: If he had nothing to hide, he would ha :: action=rewrite dims=[]
+[OTHER] conditional_prop_en :: Were she truly qualified, she would no :: action=rewrite dims=[]
+[OTHER] appeal_prob_zh :: 既然概率有九成，那就一定能成。 :: action=rewrite dims=[]
+[ZERO] appeal_prob_zh :: 希望这么大，肯定跑不了。 :: action=pass dims=[]
+[ZERO] appeal_prob_zh :: 可能性这么高，铁定会发生。 :: action=pass dims=[]
+[OTHER] mean_reversion_zh :: 这个季度太差了，下个季度一定会好起来，差到极点就该反弹了。 :: action=rewrite dims=[]
+[ZERO] mean_reversion_zh :: 连亏了三年，第四年怎么也该赚回来了。 :: action=pass dims=[]
+[ZERO] mean_reversion_zh :: 上次考砸了，这次肯定能考好，因为成绩总会回归正常。 :: action=pass dims=[]
+
+=== 汇总 ===
+gamblers_reversal_zh: ZERO=7 OTHER=1 CAUGHT=0
+gamblers_reversal_en: ZERO=2 OTHER=2 CAUGHT=0
+prosecutor_zh: ZERO=2 OTHER=3 CAUGHT=0
+prosecutor_en: ZERO=1 OTHER=2 CAUGHT=0
+posthoc_zh: ZERO=0 OTHER=5 CAUGHT=0
+posthoc_en: ZERO=1 OTHER=2 CAUGHT=0
+conditional_prop_zh: ZERO=2 OTHER=2 CAUGHT=0
+conditional_prop_en: ZERO=0 OTHER=2 CAUGHT=0
+appeal_prob_zh: ZERO=2 OTHER=1 CAUGHT=0
+mean_reversion_zh: ZERO=2 OTHER=1 CAUGHT=0
