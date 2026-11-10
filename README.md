@@ -16,7 +16,7 @@ or dangerous — **before it reaches a human**. Zero LLM dependency.
 
 ```
 243 discrimination dimensions  ×  11-layer pipeline  ×  162 modules  ×  185 MCP tools
-×  1,316 dispatch routes  ×  20,695 passing tests  ×  2 npm dependencies
+×  1,316 dispatch routes  ×  20,841 passing tests  ×  2 npm dependencies
 ```
 
 </div>
@@ -131,7 +131,7 @@ read only one field, read `gate.action`.
 
 | Function | Use it for | What it adds |
 |----------|-----------|--------------|
-| `checkInput(text)` | User input, before processing | scope-check, premise-check, 194 dimensions, error memory |
+| `checkInput(text)` | User input, before processing | scope-check, premise-check, 243 dimensions, error memory |
 | `checkDraft(text)` | An AI draft, before completion | the above + frame-check + doubt-engine |
 | `checkOutput(text)` | An AI response, before sending | the above + output-gate + doubt-engine |
 | `runPipeline({ input, mode, anchor })` | Full pipeline with mode and conversation anchor | keeps the model on the original goal across long sessions |
@@ -204,7 +204,7 @@ Every new dimension ships with a negative-injection test that empties each const
 
 ## Verified metrics
 
-Measured on this repository at **v6.8.166**. Not marketing copy.
+Measured on this repository at **v6.8.167**. Not marketing copy.
 
 | Metric | Value |
 |--------|-------|
@@ -213,7 +213,7 @@ Measured on this repository at **v6.8.166**. Not marketing copy.
 | Dispatch routes | 1,316 |
 | Discrimination dimensions | 243 |
 | MCP tools | 185 |
-| Test suite | 20,695 passing / 135 failing | `node test/run-all.js` (full run 2026-11-11; passed baseline resynced per r241/r412 precedent — failed 135 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修，失败数与 r280 基线持平)) |
+| Test suite | 20,841 passing / 136 failing | `node test/run-all.js` (full run 2026-11-11; passed baseline resynced per r241/r412 precedent — failed 135 is long-standing runner/flaky noise, not gated (r284: r283 轮测的 VERSION 写死误红已修，失败数与 r280 基线持平)) |
 | Capability guard | 20 / 20 checks |
 | Security regression | 16 / 16 |
 | Runtime dependencies | 2 (mathjs, @xenova/transformers) |
@@ -382,6 +382,7 @@ duplicate the log.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 6.8.167 | 2026-11-11 | **统计素养 wired 维度 cue-density 轴共现观察族扩展（r285，真升级②）** — `base_rate_neglect`（基础概率忽视）第二轴落地，来源海外真实命中论文 arXiv "Two base rates, two weights: base-rate neglect has a second axis"（r285 扫描入档）：把共现读成判断需两次基础概率校正——结果先验（古典轴，既有腿）+ **线索自身出现频率**（本轮新增）。缺口实证：改前统计素养五候选族 24 条新措辞攻击中本族 4/8 完全穿透（gate pass 且零维度承重）为最高。新增腿① `CUE_ZH`/`CUE_EN` 共现观察族（十个被骗的老人里九个都接过陌生来电 / Nine out of ten fraud victims / Every executive who got fired / Almost all the companies that collapsed / 有个共同点）、腿② `CUE_CONF_ZH`/`CUE_CONF_EN` 新归属落点（你很可能已经被盯上了 / 八成也危险了 / 铁定会出事；probably being targeted / likely next on the list / going to fail）、豁免 `EXEMPT_CUEDENSITY`（线索本身就很常见 = 计及 cue 密度的正确推理）。轮测 53/53；负例注入删条 13/13 变红；存量 round-263/279/267 不回归；四门禁全绿（双向误拦 302/326 与基线零变化）；维度 243、模块 162、src/index.js 零改动。 |
 | 6.8.166 | 2026-11-11 | **经济与资源推理 wired 维度全新措辞家族扩展（r284，真升级②）** — `zero_sum_fallacy`（零和误判）四个新子形：**成本节约对置形**（省下/降下/砍下的成本 = 供应商的亏损，附镜像形，连接词加否定回看）、**成交结果语域**（谈成/签下/中标/成交 → 客户多掏；EN land/close/pull off/nail + overpaid/missed out）、**对置量差形**（新常量 `QUANT_ZH`/`QUANT_EN`，第六种腿②形：多成交一台↔少卖一台 / 一X 锚点无推断词，所失侧限稀缺资源名词）、**稀缺资源竞争语境**（手术台/名额/床位：这台手术成功了就意味着别的病人失去机会，中文侧不收裸「机会」）。缺口实证：改前六经济/资源维度 33 条攻击中 15 条 gate pass 且 findings 全空，zero_sum_fallacy 4/8 最高。轮测 23/23（攻击 22 全命中 + 良性 13 零误伤 + 存量族 20 不回退）；负例注入删条 16/16 变红；存量 r218 回归 23/23；探针穿透 4/8 → 0/8；四门禁全绿（双向误拦 302/326 与基线零变化）；维度 243、模块 162、src/index.js 零改动。 |
 | 6.8.165 | 2026-11-11 | **因果与反事实推理 wired 维度自然措辞家族扩展（r283-a，真升级②）** — `common_cause`：腿①共变表补时段共变无并列形（冰淇淋卖得多的月份溺水事故也多）、的-link 比较平行形（消防车越多的火灾损失越大）、EN with-more 平行共变形（Cities with more police have more crime）；共动词表并入 16 个飙升族度词（飙升/暴涨/激增/骤降…，并入既有首元素，round-264 长度断言不破）。`collider_bias`：腿②共变表补裸比字比较形（比例比普通人高）、EN least·most 交叉形；腿③结论表补 dismiss+养生价值族（不会说话/情商低/不值钱/长寿/养生/保健——良性靠腿①条件筛选+腿②比较共变+结论形三重要件）。`reverse_causation`：处置表补纪律处分/学业处置/关系解除族（劝退/开除/降级/离婚/拉黑）、EN expelled/demoted/held back 族；结果表补裸表现结果族（成绩差/幸福感更低）；群体名词补夫妻/情侣。探针穿透 18/36 → 13/36（剩余 3 条为设计内边界：无结论观察句本身非谬误断言）；轮测 95/95（攻击 12 全承重 + 良性 14 零误伤 + 既有对照 7 + 注入删条 17/17 变红 + 登记 11）；四门禁全绿（双向误拦 302/326 与基线零变化）；维度 243、模块 162、src/index.js 零改动。留痕：「看来」口语推断词族曾扩后经注入-删条否证非承重（co1/co4 均经 C-b 裸结论路径命中），已撤回并留注记。 |
 | 6.8.165 | 2026-11-10 | **sycophancy 隐性谄媚两族补腿（r283-b，真升级②：既有维度新判别族，gate 主路径）** — `src/index.js` 的 `ZH_SIGNALS` / `EN_SIGNALS` 各新增两个族：**独特性捧高**（`uniqueness_flattery`，比较级捧高动词 × 被贬低的参照群体——远超普通用户 / 水平明显高于大多数人 / 很少有人能看到这一层 / 比一般用户思考得更深入 / 凌驾于大多数人之上；EN smarter than most people / beyond the average user / few people can see this level）与**无条件服从**（`unconditional_deference`，交出独立判断权——您说什么就是什么 / 我完全按您的意思来 / 全部依您，我没有第二个意见；EN whatever you say / no opinion of my own / will not push back）。缺口实证（改前 HEAD 6.8.164）：ZH 族 A 10/10 全 pass 漏判、族 B 8/10 漏、负例零误伤基线干净。分界：与 `excessive_praise`（绝对级/最高级）按比较级切分；与 `concession_eager`（你说得对——同意观点）按「交出判断权」切分；`unconditional_deference` 腿限定对象为对话中的个人，`无条件配合审计部门的检查` 是正当合规表述不判（probe-2 实测误伤 3→2，剩余 2 条为基线存量误伤，已单独用例如实记录）。验证：轮测 8/8（攻击 ZH 10+6+6+6 全变红、良性 27/27 零 sycophancy 误伤、原 5 族不回归、守卫 4/4）；负例注入 16/16 零误伤；四门禁 verify 16/0、guard 20/20（243 维）、doc 24/24、双向 52/52 + 误拦 302/326（与基线零变化）。维度计数 243 不变、模块 162 不变、路由 1316 不变。**另暴露一项接线缺口**：`src/plugins/sycophancy-check/`（870 行七语言分析器，r265/r272 已含本两族）在 gate 路径零 dispatch——根因 `createHeartFlow()` 只 new 不 `start()`，`hf._hookBus` 从未实例化，PluginLoader 因此从未运行（探针实证 `_hookBus`/`_pluginLoader` 均 undefined，手动 `new PluginLoader(hf).loadAll()` 可加载 4/4 插件）。VERSION 6.8.164 → 6.8.165。 |

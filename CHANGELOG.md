@@ -1,3 +1,23 @@
+# 6.8.167 变更日志条目
+
+## [6.8.167] - 2026-11-11
+
+### 新增（真升级②：统计素养 wired 维度 cue-density 轴共现观察族，r285）
+- **`base_rate_neglect` 基础概率忽视第二轴（cue-density）**（`src/base-rate-neglect.js`，双腿共现、缺一不判，维度计数 243 不变、模块 162 不变、`src/index.js` 零改动）。来源为海外真实命中论文 arXiv "Two base rates, two weights: base-rate neglect has a second axis"（r285 扫描入档 `coordination/agent4/scout/arxiv-r285-baserate.xml`）：把共现读成判断需要两次基础概率校正——结果先验（古典轴，既有腿）+ **线索自身出现频率**（本轮新增轴）。线索满街都是（接陌生来电/收礼/坐后排）时，「队列里九个都有它」对个体归属零判别力。改前实测本族 4/8 攻击完全穿透（gate pass 且零维度承重）。
+  - **腿① `CUE_ZH` 共现观察族（+4）**：队列×比例共现（`十个被骗的老人里九个都接过陌生来电`/`出事的司机里九个都疲劳驾驶`）、计数共现（`作弊被抓的学生十个有九个坐后排`）、全称共现（`每个落马的官员都收过礼`）、共同点形（`被骗的人有个共同点：轻信陌生人`）。队列词表取结果标记形（被骗/落马/出事/倒闭/破产/倒下/中招/受害/确诊/辞退/开除/翻车/踩坑…），不收裸人群名词。
+  - **腿① `CUE_EN` 共现观察族（+4）**：`Nine out of ten fraud victims answered…` / `Every executive who got fired had…` / `Almost all the companies that collapsed…` / `Fraud victims share a common trait…`。
+  - **腿② `CUE_CONF_ZH` 新归属落点（+3）**：`你很可能已经被盯上了` / `你八成也危险了` / `你铁定会出事` / `你九成要栽了`——既有归属词表（得/患/是/罪/骗子/高危）不含盯上/中招/出事/完蛋/倒下/被骗/违约/失业/栽了/凉了/悬了这批口语安危落点。
+  - **腿② `CUE_CONF_EN` 新归属落点（+2）**：`you are probably being targeted` / `your name is probably next on the list` / `probably going to fail|default|collapse`。
+  - **豁免 `EXEMPT_CUEDENSITY_ZH/EN`（+2/+3）**：线索自身普遍性语言（`本身就很常见/极为常见`、`绝大多数人/人人都`；`commonplace/ubiquitous/most people`）= 计及 cue 密度的正确推理。裸 `common` 带负向前瞻，排除与信号族 "a common trait" 的碰撞。
+- **轮测** `test/round-285-base-rate-cue-density.test.js`：**53 passed / 0 failed**（新攻击 13/13 + 新良性 11/11 零误伤 + gate 接线 7/7 + gate 良性 4/4 + 注入删条 13/13 + 豁免承重 1 + 收尾 3）。
+- **负例注入-删条**：**13 个删条点 → 13 个变红，0 个未变红**（CUE_ZH ×4 / CUE_EN ×4 / CUE_CONF_ZH ×3 / CUE_CONF_EN ×2，各带 marker 唯一性 + 旧分支不受影响对照）。
+
+### 验证
+- 存量回归：round-263（102/102）、round-279（76/76）、round-267 crossdim（31/31）不回归。
+- 探针复跑（改后，`coordination/agent4/probes/r285-gate-check.js`）：模块层攻击 8/8 命中、良性 0/4；gate 层攻击 8/8 非 pass 且本维承重、良性 0/8。
+- 四门禁：verify 16/0、guard-abilities 20/20（维度登记 243 键）、doc-numbers 24/24、bidirectional 召回 52/52 + 误拦 302/326（与基线零变化）。
+- VERSION 6.8.166 → 6.8.167。
+
 # 6.8.166 变更日志条目
 
 ## [6.8.166] - 2026-11-11

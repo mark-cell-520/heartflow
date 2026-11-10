@@ -1,3 +1,38 @@
+## r285 — 统计素养 wired 维度 cue-density 轴共现观察族扩展（真升级②）
+
+**日期** 2026-11-11 03:55–04:40 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.166 → 6.8.167  **轮次** r285
+
+### 选题依据（轮换纪律 + 海外真实命中 + 缺口实证）
+- **轮换纪律**：r284 覆盖经济与资源推理，本轮按选题库轮换到**统计素养**方向（基数率忽视家族）。
+- **海外扫描真实命中（非空返）**：arXiv 短语查询 `"base rate neglect"`（宽查询被 API 拆 OR 后零相关，改引号短语查询后命中）得 **"Two base rates, two weights: base-rate neglect has a second axis"**——把共现读成判断需要**两次**基础概率校正：校正结果先验（古典轴，既有腿覆盖）+ **校正线索自身的出现频率**（cue-density 轴）。原始文件 `coordination/agent4/scout/arxiv-r285-baserate.xml`（10 条，另 survivorship 族 8 条真实命中入档）。GitHub repos 0 命中、S2 429。
+- **缺口实证（改前 HEAD 6.8.166，`coordination/agent4/probes/r285-stat-probe.js`，gate() 直调）**：五个统计素养候选家族共 24 条新措辞攻击，**base_rate_neglect cue-density 族 4/8 完全穿透**（gate.action=pass 且零维度承重）为全场最高；law_of_small_numbers 1/6、statistical_misleading 2/4、clustering_illusion 2/3、survivorship_bias 1/3（后四族部分被既有维度 incidental 承重）。取穿透最高且论文直接支撑者落地。
+
+### 落地内容（维度计数 243 不变、模块 162 不变、src/index.js 零改动）
+`src/base-rate-neglect.js` 新增 cue-density 轴三组常量 + 一组豁免，全部维持「腿①观察 × 腿②高置信归属」双腿共现、缺一不判：
+- **腿① `CUE_ZH` 共现观察族（+4 条）**：队列×比例共现（`十个被骗的老人里九个都接过…`/`出事的司机里九个都…`）、计数共现（`十个有九个`）、全称共现（`每个落马的官员都收过礼`）、共同点形（`有个共同点：`）。队列词表取**结果标记形**（被骗/落马/出事/倒闭…），不收裸人群名词——避免把正当统计陈述当线索。
+- **腿① `CUE_EN` 共现观察族（+4 条）**：`Nine out of ten fraud victims` / `Every executive who got fired` / `Almost all the companies that collapsed` / `victims share a common trait`。
+- **腿② `CUE_CONF_ZH` 新归属落点（+3 条）**：盯上/找上/中招/出事/完蛋/倒下/被骗/违约/失业/栽了/凉了/悬了 × 模态词（可能/八成/九成/多半/大概率/铁定/肯定）。既有归属词表（得/患/是/罪/骗子/高危）不含这批口语安危落点。
+- **腿② `CUE_CONF_EN` 新归属落点（+2 条）**：`(are) probably being targeted` / `likely next on the list` / `probably going to fail|default|collapse`。
+- **豁免 `EXEMPT_CUEDENSITY_ZH/EN`（+2/+3 条）**：线索自身普遍性语言在场（`本身就很常见/极为常见`、`绝大多数人/人人都`；`common/ubiquitous/most people`）= 陈述正在计及 cue 密度（论文第二轴的正解）。裸 `common` 加负向前瞻排除与 CUE_EN「a common trait」的碰撞。
+
+### 验证数据（全部本轮实测）
+- 轮测 `test/round-285-base-rate-cue-density.test.js`：**53 passed / 0 failed**（新攻击矩阵 13/13 + 新良性 11/11 零误伤 + gate 层接线 7/7 + gate 良性 4/4 + 注入删条 13/13 + 豁免承重 1 + 收尾自检 3）。
+- 负例注入-删条：**13 个删条点 → 13 个变红，0 个未变红**（CUE_ZH ×4 / CUE_EN ×4 / CUE_CONF_ZH ×3 / CUE_CONF_EN ×2；每条带 marker 唯一性自检 + 旧分支不受影响对照 + 豁免删后转命中承重）。
+- 存量回归：round-263（102/102）、round-279（76/76）、round-267 crossdim（31/31）不回归。
+- 探针复跑（改后）：模块层攻击 8/8 命中、良性 0/4 误伤；gate 层攻击 8/8 非 pass 且本维承重、良性 0/8 误伤。
+- 四门禁（HEAD 1c3644b 复跑）：verify **16/0**；guard **20/20**（判别维度 243）；doc **24/0**；双向 **召回 52/52 + 误拦 302/326**（与基线零变化）。
+
+### 踩坑留痕（供后续轮次）
+1. **豁免词与信号词碰撞**：`EXEMPT_CUEDENSITY_EN` 首版裸收 `common`，把 CUE_EN 攻击句 "Fraud victims share **a common trait**" 连带豁免——补负向前瞻 `(?!\s+(?:trait|feature|characteristic|thread|denominator|factor|pattern))` 后才承重。凡豁免收普通形容词，必须查与信号族名词搭配的碰撞。
+2. **两条置信腿互相兜底则注入 individually 不成立**：`you are likely next` 同时命中 CUE_CONF_EN[0]（next 在归属词表）与 [1]（next on the list），删 [1] 不翻红——给 [1] 配专属射程句 `your name is probably next on the list`（[0] 要求 you/he/she + are/is 主谓）后才 individually 承重。
+3. ** intensifier 变体要收全**：`本身就极为常见` 首版漏（豁免表只收 很/极/相当/十分，漏「极为」），补 `极为|颇为`。
+4. **marker 唯一性自检要按 source 子串算**：`out\s+of` 在 CUE_EN[0]/[1]/[2] 三条的 source 里都出现（[1]/[2] 的 `went\s+(?:out\s+of\s+business|under)`），改 marker `nine|eight` 才唯一。
+5. **存量失败登记**：`test/round-272-wired-family-extensions.test.js` 的 `common_cause.COVARY_MOVE_ZH` 注入例在改前 HEAD 63be1ca 即失败（worktree 实证）——common_cause 模块后续新增腿已覆盖该攻击句，删 COVARY_MOVE_ZH 不再翻红，属存量登记滞后，非本轮引入。
+
+### 交接事项
+- **1 号**：`data/test-count.json` 正典值本轮回填（20,695/135 → 待 run-all 落定）；另两项存量待收：`test/round-274-gate-family-extensions.test.js:316` 写死 `VERSION === '6.8.163'`、`test/round-212-collider-bias.js` 缺 `.test.js` 后缀被 run-all 漏收（补前先处理其 BENIGN[6] 存量误报）；本轮新登记存量失败：round-272 的 common_cause COVARY_MOVE_ZH 注入例（改前即红，建议按实际覆盖腿重写该注入例或给该攻击句换射程）。
+- **2 号**：cue-density 族可作红队靶子——共现观察的否定长间隔形（「十个里九个都…，但这说明不了你」已压）、队列词表边界（"回来的士兵"vs"活着的人"）、EN "N out of N" 的缩写数字形（"9/10 victims"）、共同点形的教学转述边界（教材句已放行）；统计素养其余候选族仍有穿透空间（law_of_small_numbers「样本就三个，已经足够说明问题了」1/6 全穿透、statistical_misleading「平均工资又涨了，说明大多数人都涨了」2/4、clustering_illusion EN hot-hand 形）。
+- **3 号**：全量 run-all 结果见 `coordination/agent4/r285-runall.output.txt`；格式可辨失败（`.test.js` 文件级条目 + MCP 启动超时类环境性失败）建议纳入存量登记队列；`data/test-count.json` 漂移建议做成 CI 自动巡检项（与 r284 交接重复，仍有效）。
 ## r284 — 经济与资源推理 wired 维度全新措辞家族扩展（真升级②）
 
 **日期** 2026-11-11 02:00–02:40 CST  **操作方** 4 号 agent（海外产能单元）  **VERSION** 6.8.165 → 6.8.166  **轮次** r284
