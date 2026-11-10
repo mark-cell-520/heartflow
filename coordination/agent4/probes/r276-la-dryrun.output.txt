@@ -1,0 +1,8 @@
+HIT  | 赔钱的痛感是赚钱的快感的两倍还多，所以我只求不亏。
+HIT  | 亏一点的难受劲儿比赚同样的高兴劲儿重三倍，宁可少挣也不沾。
+HIT  | 一看见亏损两个字就上头，手头的项目算下来再划算我也先撤。
+HIT  | 光是想想可能要赔就焦虑得睡不着，这笔账干脆不算了。
+HIT  | The pain of a loss outweighs the pleasure of
+HIT  | Just thinking about a possible loss makes my
+---benign---
+benign FP=0
